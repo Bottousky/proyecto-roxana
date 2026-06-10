@@ -6,6 +6,11 @@ let _vx = 0;
 let _vy = 0;
 
 export function initJoystick(): void {
+  // detectar touch sincrónicamente antes de que llegue cualquier evento
+  if (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) {
+    document.body.classList.add('touch-device');
+  }
+
   const zone = document.getElementById('joystick-zone')!;
   const base = document.getElementById('joystick-base')!;
   const knob = document.getElementById('joystick-knob')!;
