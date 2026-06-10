@@ -24,6 +24,21 @@ npm run preview    # sirve el build localmente
 `dist/` es un sitio estático con rutas relativas (`base: './'`): se puede subir tal
 cual a cualquier hosting (Netlify, Cloudflare Pages, un VPS propio, etc.).
 
+## Deploy (GitHub Pages, gratis)
+
+El repo incluye un workflow ([.github/workflows/deploy.yml](.github/workflows/deploy.yml))
+que compila y publica el juego automáticamente en cada push a `main`. Para activarlo
+la primera vez:
+
+```bash
+gh auth login                                            # autenticarse (una sola vez)
+gh repo create proyecto-roxana --public --source . --push
+```
+
+Eso crea el repo, sube el código y dispara el primer deploy (~2 minutos). El juego
+queda en `https://<tu-usuario>.github.io/proyecto-roxana/`. Después, cada
+`git push` republica solo. El repo debe ser público (GitHub Pages gratis lo requiere).
+
 ## Stack
 
 - **Phaser 4** (exploración top-down en canvas)
