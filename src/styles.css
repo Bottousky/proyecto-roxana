@@ -286,6 +286,73 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .title-buttons button#btn-continue:hover { border-color: var(--accent-dim); }
 .title-card .hint { color: #665e70; font-size: 13px; line-height: 1.6; }
 
+/* ---------- Joystick virtual (mobile) ---------- */
+#joystick-zone {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 48%;
+  height: 55%;
+  z-index: 25;
+  display: none;
+  touch-action: none;
+}
+
+#joystick-base {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .15s;
+  pointer-events: none;
+  left: 0; top: 0;
+}
+
+#joystick-knob {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.42);
+  border: 2px solid rgba(255,255,255,.7);
+  pointer-events: none;
+}
+
+/* ---------- Botón de acción contextual (mobile) ---------- */
+#action-btn {
+  position: fixed;
+  bottom: 36px;
+  right: 28px;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(28,26,34,.88);
+  border: 2px solid rgba(255,255,255,.22);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 30;
+  display: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  transition: border-color .15s, background .15s;
+  align-items: center;
+  justify-content: center;
+}
+#action-btn:active { background: rgba(50,45,60,.95); border-color: var(--accent-dim); }
+
+/* en dispositivos táctiles: mostrar joystick y botón, ocultar prompt de teclado */
+body.touch-device #joystick-zone { display: block; }
+body.touch-device #action-btn:not(.hidden) { display: flex; }
+body.touch-device #prompt { display: none !important; }
+
 @media (max-width: 640px) {
   .bita-book { flex-direction: column; height: 94vh; }
   .bita-index { width: 100%; min-width: 0; max-height: 130px; border-right: none; border-bottom: 2px solid #c9b48e; }

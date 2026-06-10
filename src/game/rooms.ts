@@ -18,6 +18,7 @@ export interface ThingDef {
   color: number | (() => number);
   visible?: () => boolean;
   solid?: boolean;
+  emoji?: string;
   onInteract: () => void;
 }
 
@@ -165,7 +166,7 @@ export const ROOMS: Record<string, RoomDef> = {
     things: [
       {
         id: 'preceptor', x: 500, y: 300, w: 36, h: 36, shape: 'circle',
-        label: 'Preceptor', prompt: 'Hablar con el preceptor', color: 0x6a7a8a, solid: true,
+        label: 'Preceptor', prompt: 'Hablar con el preceptor', color: 0x6a7a8a, solid: true, emoji: '📋',
         onInteract: () => {
           const fl = f();
           if (!fl.talkedPreceptor) {
@@ -191,13 +192,13 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'vitrina', x: 230, y: 115, w: 170, h: 50,
-        label: 'Vitrina de trofeos', prompt: 'Mirar la vitrina', color: 0x3a3548, solid: true,
+        label: 'Vitrina de trofeos', prompt: 'Mirar la vitrina', color: 0x3a3548, solid: true, emoji: '🏆',
         onInteract: () =>
           say(L('', 'Trofeos bajo el polvo: «Feria Técnica Nacional — 1er premio». El más nuevo tiene veinte años.')),
       },
       {
         id: 'cartel', x: 690, y: 115, w: 170, h: 42,
-        label: 'Cuadro de honor', prompt: 'Leer el cuadro de honor', color: 0x3a3548, solid: true,
+        label: 'Cuadro de honor', prompt: 'Leer el cuadro de honor', color: 0x3a3548, solid: true, emoji: '📜',
         onInteract: () =>
           say(L('', 'Un cuadro de honor con los nombres borrados por el sol. Alguien, hace poco, escribió con el dedo en el polvo: «¿hola?»')),
       },
@@ -226,7 +227,7 @@ export const ROOMS: Record<string, RoomDef> = {
     things: [
       {
         id: 'escritorio', x: 450, y: 280, w: 150, h: 70,
-        label: 'Escritorio', prompt: 'Examinar el escritorio', color: 0x4a3c30, solid: true,
+        label: 'Escritorio', prompt: 'Examinar el escritorio', color: 0x4a3c30, solid: true, emoji: '📖',
         onInteract: () => {
           if (!f().hasBitacora) pickupBitacora();
           else say(L('', 'El escritorio de Roxana. El polvo dibuja el contorno de cosas que ya no están. Solo queda el hueco donde esperaba la Bitácora.'));
@@ -234,7 +235,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'retrato', x: 450, y: 105, w: 130, h: 64,
-        label: 'Retrato', prompt: 'Mirar el retrato', color: 0x52443a, solid: true,
+        label: 'Retrato', prompt: 'Mirar el retrato', color: 0x52443a, solid: true, emoji: '🖼️',
         onInteract: () => {
           setFlag('vioRetrato');
           say([
@@ -257,13 +258,13 @@ export const ROOMS: Record<string, RoomDef> = {
     things: [
       {
         id: 'pizarron', x: 480, y: 100, w: 280, h: 54,
-        label: 'Pizarrón', prompt: 'Leer el pizarrón', color: 0x24352c, solid: true,
+        label: 'Pizarrón', prompt: 'Leer el pizarrón', color: 0x24352c, solid: true, emoji: '✏️',
         onInteract: () =>
           say(L('', 'En el pizarrón, escrito hace mucho y nunca borrado del todo: «Donde otros ven magia, …». El resto se perdió.')),
       },
       {
         id: 'proyector', x: 330, y: 330, w: 90, h: 60,
-        label: 'Proyector', prompt: 'Encender el proyector', color: 0x4a4a55, solid: true,
+        label: 'Proyector', prompt: 'Encender el proyector', color: 0x4a4a55, solid: true, emoji: '📽️',
         onInteract: () => {
           if (f().sawProjector) {
             say(L('Proyector', '*clac* …Que tenga una buena clase. *clac*'));
@@ -286,7 +287,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'portal', x: 740, y: 330, w: 80, h: 100,
-        label: 'Portal', prompt: 'Cruzar el portal', color: 0x2e8b8b, solid: false,
+        label: 'Portal', prompt: 'Cruzar el portal', color: 0x2e8b8b, solid: false, emoji: '✨',
         visible: () => f().sawProjector,
         onInteract: () =>
           say(
@@ -338,7 +339,7 @@ export const ROOMS: Record<string, RoomDef> = {
     things: [
       {
         id: 'pedestal', x: 480, y: 200, w: 56, h: 56, shape: 'circle',
-        label: 'Ohm', prompt: 'Acercarse al pedestal', solid: true,
+        label: 'Ohm', prompt: 'Acercarse al pedestal', solid: true, emoji: '⚡',
         color: () => (f().ohmAwake ? 0xc9a437 : 0x4a4a4f),
         onInteract: () => {
           const fl = f();
@@ -349,7 +350,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'edda', x: 640, y: 330, w: 34, h: 34, shape: 'circle',
-        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true,
+        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         // Edda acompaña la historia: tras despertar a Ohm se va al taller,
         // después a la Puerta, y vuelve a la plaza cuando todo se enciende
         visible: () => !f().ohmAwake || f().puertaDone,
@@ -378,7 +379,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'lumen-plaza', x: 700, y: 200, w: 38, h: 38, shape: 'circle',
-        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true,
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         visible: () => f().puertaDone,
         onInteract: () =>
           say(
@@ -394,7 +395,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'lampara1', x: 220, y: 170, w: 26, h: 26, shape: 'circle',
-        label: '', prompt: 'Mirar la lámpara', solid: true,
+        label: '', prompt: 'Mirar la lámpara', solid: true, emoji: '💡',
         color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
         onInteract: () =>
           say(
@@ -407,14 +408,14 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'lampara2', x: 760, y: 170, w: 26, h: 26, shape: 'circle',
-        label: '', prompt: 'Mirar la lámpara', solid: true,
+        label: '', prompt: 'Mirar la lámpara', solid: true, emoji: '💡',
         color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
         onInteract: () =>
           say(L('', f().puertaDone ? 'Luz firme. La plaza tiene sombras de nuevo — de las buenas.' : 'Otra lámpara muerta. O dormida. Empieza a parecer que hay una diferencia.')),
       },
       {
         id: 'campana', x: 790, y: 110, w: 54, h: 66,
-        label: 'Campana', prompt: 'La campana de Ohmdal', solid: true,
+        label: 'Campana', prompt: 'La campana de Ohmdal', solid: true, emoji: '🔔',
         color: () => (f().puertaDone ? 0xb08d2a : 0x4f4a42),
         onInteract: () => {
           if (f().finished) say(L('', 'La campana todavía vibra, contenta. Los dos cables siguen ahí, esperando su lección.'));
@@ -448,7 +449,7 @@ export const ROOMS: Record<string, RoomDef> = {
     things: [
       {
         id: 'lumen', x: 620, y: 220, w: 38, h: 38, shape: 'circle',
-        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true,
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         // tras el puzzle del freno se adelanta a la Puerta (y después, a la plaza)
         visible: () => !f().frenoDone,
         onInteract: () => {
@@ -473,7 +474,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'edda-taller', x: 700, y: 310, w: 34, h: 34, shape: 'circle',
-        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true,
+        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => !f().frenoDone,
         onInteract: () =>
           say(
@@ -484,7 +485,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'banco', x: 400, y: 330, w: 170, h: 70,
-        label: 'Banco de trabajo', prompt: 'Usar el banco de trabajo', color: 0x4a3c30, solid: true,
+        label: 'Banco de trabajo', prompt: 'Usar el banco de trabajo', color: 0x4a3c30, solid: true, emoji: '⚡',
         onInteract: () => {
           const fl = f();
           if (!fl.metLumen) say(L('', 'Mejor hablar primero con el dueño del taller. La túnica impone.'));
@@ -494,7 +495,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'estantes', x: 360, y: 105, w: 280, h: 44,
-        label: 'Estantes', prompt: 'Curiosear los estantes', color: 0x3c332a, solid: true,
+        label: 'Estantes', prompt: 'Curiosear los estantes', color: 0x3c332a, solid: true, emoji: '🔬',
         onInteract: () =>
           say(L('', 'Frascos con etiquetas a mano: «Chispa embotellada (vacío)», «Silencio de tormenta», «NO ABRIR: ya está abierto».')),
       },
@@ -512,7 +513,7 @@ export const ROOMS: Record<string, RoomDef> = {
     things: [
       {
         id: 'lapuerta', x: 480, y: 190, w: 180, h: 150,
-        label: 'La Puerta de Ohm', prompt: 'Examinar la Puerta', solid: true,
+        label: 'La Puerta de Ohm', prompt: 'Examinar la Puerta', solid: true, emoji: '⚡',
         color: () => (f().puertaDone ? 0x8a7c50 : 0x3a3340),
         onInteract: () => {
           if (f().puertaDone) abrirPuerta(() => {}, true); // modo práctica
@@ -521,7 +522,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'edda-puerta', x: 330, y: 390, w: 34, h: 34, shape: 'circle',
-        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true,
+        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => !f().puertaDone,
         onInteract: () =>
           say([
@@ -531,7 +532,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'lumen-puerta', x: 630, y: 390, w: 38, h: 38, shape: 'circle',
-        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true,
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         visible: () => !f().puertaDone,
         onInteract: () =>
           say([

@@ -3,6 +3,7 @@ import { ROOMS, type ThingDef, type DoorDef } from './rooms';
 import { state, hooks, save } from '../state';
 import { uiOpen, el } from '../ui/overlay';
 import { say } from '../ui/dialog';
+import { initJoystick, getJoystickDir } from '../ui/joystick';
 
 export const W = 960;
 export const H = 540;
@@ -69,6 +70,17 @@ export class ExplorationScene extends Phaser.Scene {
     this.player.setDepth(10);
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.onPointer(p));
+
+    initJoystick();
+
+    const actionBtn = el<HTMLButtonElement>('action-btn');
+    actionBtn.addEventListener('click', () => {
+      if (this.nearThing && !uiOpen()) this.nearThing.def.onInteract();
+    });
+    actionBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (this.nearThing && !uiOpen()) this.nearThing.def.onInteract();
+    });
 
     hooks.goto = (room, spawn) => this.loadRoom(room, spawn, true);
     hooks.refresh = () =>
@@ -222,14 +234,16 @@ export class ExplorationScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     const prompt = el('prompt');
+    const actionBtn = el<HTMLButtonElement>('action-btn');
     if (uiOpen()) {
       prompt.classList.add('hidden');
+      actionBtn.classList.add('hidden');
       return;
     }
     const dt = delta / 1000;
     this.doorCooldown = Math.max(0, this.doorCooldown - delta);
 
-    // dirección de movimiento
+    // dirección de movimiento — teclado, joystick, o tap-to-move (en ese orden)
     let vx = 0;
     let vy = 0;
     const k = this.keys;
@@ -237,6 +251,15 @@ export class ExplorationScene extends Phaser.Scene {
     if (k.down.isDown || k.s.isDown) vy += 1;
     if (k.left.isDown || k.a.isDown) vx -= 1;
     if (k.right.isDown || k.d.isDown) vx += 1;
+
+    if (vx === 0 && vy === 0) {
+      const joy = getJoystickDir();
+      if (joy.vx !== 0 || joy.vy !== 0) {
+        vx = joy.vx;
+        vy = joy.vy;
+        this.moveTarget = null;
+      }
+    }
 
     if (vx !== 0 || vy !== 0) {
       this.moveTarget = null;
@@ -323,9 +346,12 @@ export class ExplorationScene extends Phaser.Scene {
     if (this.nearThing) {
       prompt.textContent = `E · ${this.nearThing.def.prompt}`;
       prompt.classList.remove('hidden');
+      actionBtn.textContent = this.nearThing.def.emoji ?? '👆';
+      actionBtn.classList.remove('hidden');
       if (Phaser.Input.Keyboard.JustDown(k.e)) this.nearThing.def.onInteract();
     } else {
       prompt.classList.add('hidden');
+      actionBtn.classList.add('hidden');
     }
   }
 }
