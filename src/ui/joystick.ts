@@ -1,6 +1,6 @@
 import { uiOpen } from './overlay';
 
-const KNOB_MAX = 44;
+const KNOB_MAX = 40;
 
 let _vx = 0;
 let _vy = 0;
@@ -11,20 +11,12 @@ export function initJoystick(): void {
   const knob = document.getElementById('joystick-knob')!;
 
   let touchId: number | null = null;
-  let originX = 0;
-  let originY = 0;
 
   zone.addEventListener('touchstart', (e) => {
     e.preventDefault();
     document.body.classList.add('touch-device');
     if (touchId !== null) return;
-    const t = e.changedTouches[0];
-    touchId = t.identifier;
-    originX = t.clientX;
-    originY = t.clientY;
-    const zr = zone.getBoundingClientRect();
-    base.style.left = `${originX - zr.left - 50}px`;
-    base.style.top = `${originY - zr.top - 50}px`;
+    touchId = e.changedTouches[0].identifier;
     base.style.opacity = '1';
   }, { passive: false });
 
@@ -34,8 +26,9 @@ export function initJoystick(): void {
     for (let i = 0; i < e.changedTouches.length; i++) {
       const t = e.changedTouches[i];
       if (t.identifier !== touchId) continue;
-      const dx = t.clientX - originX;
-      const dy = t.clientY - originY;
+      const br = base.getBoundingClientRect();
+      const dx = t.clientX - (br.left + br.width / 2);
+      const dy = t.clientY - (br.top + br.height / 2);
       const dist = Math.hypot(dx, dy);
       if (dist === 0) { _vx = 0; _vy = 0; break; }
       const nx = dx / dist;
@@ -54,7 +47,7 @@ export function initJoystick(): void {
         _vx = 0;
         _vy = 0;
         knob.style.transform = 'translate(0, 0)';
-        base.style.opacity = '0';
+        base.style.opacity = ''; // vuelve al valor CSS (preview)
         break;
       }
     }
@@ -63,7 +56,6 @@ export function initJoystick(): void {
   zone.addEventListener('touchend', endTouch, { passive: false });
   zone.addEventListener('touchcancel', endTouch, { passive: false });
 
-  // activa modo mobile en el primer toque (aunque sea fuera de la zona)
   window.addEventListener('touchstart', () => {
     document.body.classList.add('touch-device');
   }, { once: true, passive: true });

@@ -289,10 +289,11 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 /* ---------- Joystick virtual (mobile) ---------- */
 #joystick-zone {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 48%;
-  height: 55%;
+  bottom: 24px;
+  left: 24px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
   z-index: 25;
   display: none;
   touch-action: none;
@@ -300,27 +301,26 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 
 #joystick-base {
   position: absolute;
-  width: 100px;
-  height: 100px;
+  inset: 0;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,.22);
-  background: rgba(255,255,255,.07);
+  border: 2px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
+  opacity: 0.28; /* previsualización siempre visible */
   transition: opacity .15s;
   pointer-events: none;
-  left: 0; top: 0;
 }
 
 #joystick-knob {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: rgba(255,255,255,.42);
-  border: 2px solid rgba(255,255,255,.7);
+  background: rgba(255,255,255,.35);
+  border: 2px solid rgba(255,255,255,.55);
   pointer-events: none;
+  flex-shrink: 0;
 }
 
 /* ---------- Botón de acción contextual (mobile) ---------- */

@@ -214,6 +214,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   private onPointer(p: Phaser.Input.Pointer): void {
     if (uiOpen()) return;
+    if (document.body.classList.contains('touch-device')) return;
     const wx = p.worldX;
     const wy = p.worldY;
     for (const t of this.things) {
