@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Proyecto Roxana — Unidad 1 (vertical slice)</title>
+</head>
+<body>
+  <div id="app">
+    <div id="game"></div>
+
+    <div id="hud">
+      <button id="bitacora-btn" class="hidden" title="Bitácora (B)">✒<span id="bitacora-dot" class="hidden"></span></button>
+    </div>
+
+    <div id="prompt" class="hidden"></div>
+
+    <div id="dialog" class="hidden">
+      <div id="dialog-who"></div>
+      <div id="dialog-text"></div>
+      <div id="dialog-next">▼</div>
+    </div>
+
+    <div id="toast" class="hidden"></div>
+
+    <div id="bench" class="hidden"></div>
+
+    <div id="bitacora" class="hidden"></div>
+
+    <div id="title-screen">
+      <div class="title-card">
+        <h1>Proyecto Roxana</h1>
+        <h2>Unidad 1 — La corriente no es magia</h2>
+        <p class="note">Vertical slice · greybox jugable<br/>(formas y sistemas, sin arte final)</p>
+        <div class="title-buttons">
+          <button id="btn-continue" class="hidden">Continuar</button>
+          <button id="btn-new">Empezar de nuevo</button>
+        </div>
+        <p class="hint">PC: flechas / WASD para moverte · E o click para interactuar · B abre la Bitácora<br/>Mobile: tocá el piso para caminar, tocá los objetos para usarlos</p>
+      </div>
+    </div>
+
+    <div id="end-screen" class="hidden"></div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
