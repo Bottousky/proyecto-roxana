@@ -188,6 +188,40 @@ function abrirCampanaUnidad2(): void {
   );
 }
 
+function abrirInspeccionCastillo(): void {
+  if (f().metConsejera) {
+    say(L('Consejera', 'Inspección supervisada. Yo entro con ustedes. Yo anoto TODO.'));
+    return;
+  }
+  say(
+    [
+      L('Consejera', 'Alto. Este recinto está clausurado por conservación de chispa. El Consejo no cierra puertas: conserva aperturas futuras.'),
+      L('Edda', 'Medimos la campana. El río no se gasta: se reparte. Tenemos los números.'),
+      L('Consejera', 'Los números del Consejo dicen que la chispa disminuye desde hace cuarenta años.'),
+      L('Lumen', 'Los míos también lo decían, Consejera. Resultó que yo medía mi miedo, no el río. …Y mis fusibles murieron más dignamente desde entonces.'),
+      L('Ohm', 'Solicitud: inspección. Probabilidad de desastre: moderada.'),
+      L('Consejera', '«Moderada.» Al menos el calderito es honesto. Inspección supervisada. Yo entro con ustedes. Yo anoto TODO.'),
+    ],
+    () => {
+      setFlag('metConsejera');
+      setFlag('enteredCastle');
+      hooks.refresh();
+    },
+  );
+}
+
+function reconocerCastillo(): void {
+  if (!f().enteredCastle || f().ohmRecognizedCastle) return;
+  say(
+    [
+      L('Ohm', 'Registro antiguo encontrado. Este lugar. Origen: este lugar.'),
+      L('Edda', '¿Ohm…?'),
+      L('Ohm', 'Continuar.'),
+    ],
+    () => setFlag('ohmRecognizedCastle'),
+  );
+}
+
 /* ---------- las salas ---------- */
 
 export const ROOMS: Record<string, RoomDef> = {
@@ -429,6 +463,17 @@ export const ROOMS: Record<string, RoomDef> = {
                 L('', 'Edda dijo que esa cosa escupe rayos cuando se ofende. Mejor entender las piedras primero: el taller de Lumen queda al este.'),
               ],
       },
+      {
+        x: 0, y: 75, w: 26, h: 110,
+        to: 'castle_gate', spawn: { x: 860, y: 270 },
+        label: 'Camino al Castillo',
+        color: 0x65536f,
+        locked: () => {
+          if (f().solvedBellPaths) return null;
+          // TODO(guion): falta una línea ambiente para el camino antes de resolver la campana.
+          return [L('', 'El camino al Castillo sigue oculto entre la niebla.')];
+        },
+      },
     ],
     things: [
       {
@@ -666,5 +711,337 @@ export const ROOMS: Record<string, RoomDef> = {
         );
       }
     },
+  },
+
+  castle_gate: {
+    id: 'castle_gate',
+    name: 'Ohmdal — Puerta del Castillo',
+    floor: () => 0x201b25,
+    wall: () => 0x342b38,
+    doors: [
+      {
+        x: 934, y: 220, w: 26, h: 110,
+        to: 'plaza', spawn: { x: 95, y: 135 },
+        label: 'Plaza de Ohmdal',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'castle_gallery', spawn: { x: 480, y: 440 },
+        label: 'Umbral del Castillo',
+        color: 0x765d45,
+        locked: () =>
+          f().metConsejera
+            ? null
+            : [L('Consejera', 'Este recinto está clausurado por conservación de chispa.')],
+      },
+    ],
+    things: [
+      {
+        id: 'puerta-castillo', x: 480, y: 95, w: 230, h: 110,
+        label: 'Puerta monumental', prompt: 'Examinar la puerta lacrada',
+        color: () => (f().metConsejera ? 0x7a674f : 0x443842),
+        solid: false,
+        onInteract: abrirInspeccionCastillo,
+      },
+      {
+        id: 'cartel-chispa', x: 190, y: 180, w: 190, h: 58,
+        label: 'Cartel del Consejo', prompt: 'Leer el cartel',
+        color: 0x665344, solid: true,
+        onInteract: () => say(L('', '«La chispa que no se usa es chispa que se ahorra.»')),
+      },
+      {
+        id: 'cartel-caminos', x: 770, y: 180, w: 190, h: 58,
+        label: 'Cartel del Consejo', prompt: 'Leer el cartel',
+        color: 0x665344, solid: true,
+        onInteract: () => say(L('', '«Denuncie caminos abiertos sin permiso.»')),
+      },
+      {
+        id: 'atril-consejo', x: 610, y: 345, w: 90, h: 62,
+        label: 'Atril', prompt: 'Examinar el libro de inventario',
+        color: 0x514334, solid: true,
+        onInteract: () =>
+          say(L('', 'La Consejera está junto a un atril con un libro de inventario.')),
+      },
+      {
+        id: 'consejera-puerta', x: 505, y: 350, w: 38, h: 38, shape: 'circle',
+        label: 'Consejera', prompt: 'Hablar con la Consejera',
+        color: 0x725d79, solid: true,
+        visible: () => f().solvedBellPaths,
+        onInteract: abrirInspeccionCastillo,
+      },
+      {
+        id: 'edda-castle-gate', x: 365, y: 390, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true,
+        visible: () => f().solvedBellPaths,
+        onInteract: () => say(L('Edda', 'Medimos la campana. El río no se gasta: se reparte. Tenemos los números.')),
+      },
+      {
+        id: 'lumen-castle-gate', x: 285, y: 335, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true,
+        visible: () => f().solvedBellPaths,
+        onInteract: () =>
+          say(L('Lumen', 'Los míos también lo decían, Consejera. Resultó que yo medía mi miedo, no el río. …Y mis fusibles murieron más dignamente desde entonces.')),
+      },
+      {
+        id: 'ohm-castle-gate', x: 735, y: 355, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().solvedBellPaths,
+        onInteract: () => say(L('Ohm', 'Solicitud: inspección. Probabilidad de desastre: moderada.')),
+      },
+    ],
+  },
+
+  castle_gallery: {
+    id: 'castle_gallery',
+    name: 'Castillo de Ohmdal — La Galería en Cadena',
+    floor: () => 0x24212a,
+    wall: () => 0x393341,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'castle_gate', spawn: { x: 480, y: 115 },
+        label: 'Puerta del Castillo',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'castle_branches', spawn: { x: 480, y: 440 },
+        label: 'Sala de los Ramales',
+        locked: () => {
+          if (f().solvedGalleryChain) return null;
+          // TODO(guion): falta una línea de puerta para el gate de la Galería.
+          return [L('', 'La puerta del fondo permanece sellada.')];
+        },
+      },
+    ],
+    things: [
+      {
+        id: 'lamparas-galeria', x: 480, y: 115, w: 520, h: 34,
+        label: 'Lámparas en fila', prompt: 'Examinar las lámparas',
+        color: 0x756c4a, solid: true,
+        onInteract: () =>
+          say(L('', 'Una sola línea de cobre recorre el techo con lámparas en fila: encendidas, pero tenues, todas exactamente igual de tenues.')),
+      },
+      {
+        id: 'pedestales-galeria', x: 210, y: 280, w: 170, h: 58,
+        label: 'Pedestales vacíos', prompt: 'Examinar los pedestales',
+        color: 0x4c4652, solid: true,
+        onInteract: () => say(L('', 'Pedestales vacíos donde antes hubo más lámparas.')),
+      },
+      {
+        id: 'banco-cadena', x: 480, y: 330, w: 190, h: 76,
+        label: 'Banco de la Cadena', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        onInteract: () => {
+          // TODO(M4): abrir el puzzle de la Cadena.
+          // TODO(guion): falta una línea ambiente para el placeholder del banco.
+          say(L('', 'El banco aún no responde.'));
+        },
+      },
+      {
+        id: 'consejera-galeria', x: 725, y: 335, w: 38, h: 38, shape: 'circle',
+        label: 'Consejera', prompt: 'Hablar con la Consejera',
+        color: 0x725d79, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () =>
+          say([
+            L('Consejera', 'La Galería en régimen de austeridad: una sola línea. Sin derroches. Antes había seis lámparas. Las reduje yo misma a cuatro para ahorrar chispa.'),
+            L('Edda', '¿Y brillan más desde entonces?'),
+            L('Consejera', '…Brillan distinto.'),
+            L('Ohm', 'Distinto: sí. Más: no.'),
+          ]),
+      },
+      {
+        id: 'edda-galeria', x: 800, y: 405, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () => say(L('Edda', '¿Y brillan más desde entonces?')),
+      },
+      {
+        id: 'lumen-galeria', x: 650, y: 420, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () =>
+          say(L('Lumen', '¡La fila entera muere por un soldado! En mis tiempos a eso lo llamábamos diseño solemne.')),
+      },
+      {
+        id: 'ohm-galeria', x: 580, y: 395, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () => say(L('Ohm', 'Distinto: sí. Más: no.')),
+      },
+    ],
+    onEnter: reconocerCastillo,
+  },
+
+  castle_branches: {
+    id: 'castle_branches',
+    name: 'Castillo de Ohmdal — Sala de los Ramales',
+    floor: () => 0x211f27,
+    wall: () => 0x34303b,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'castle_gallery', spawn: { x: 480, y: 95 },
+        label: 'Galería en Cadena',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'castle_heart', spawn: { x: 480, y: 440 },
+        label: 'Corazón del Castillo',
+        locked: () => {
+          if (f().solvedBranches) return null;
+          // TODO(guion): falta una línea de puerta para el gate de los Ramales.
+          return [L('', 'La puerta del Corazón permanece sellada.')];
+        },
+      },
+    ],
+    things: [
+      {
+        id: 'tronco-ramales', x: 480, y: 145, w: 70, h: 190,
+        label: 'Tronco', prompt: 'Examinar el Tronco',
+        color: 0x8a6842, solid: true,
+        onInteract: () =>
+          say(L('', 'Un Tronco grueso baja de lo alto y se abre en brazos hacia tres bocas de taller selladas.')),
+      },
+      {
+        id: 'bocas-ramales', x: 250, y: 235, w: 230, h: 64,
+        label: 'Tres bocas selladas', prompt: 'Examinar las bocas de taller',
+        color: 0x4d4248, solid: true,
+        onInteract: () => say(L('', 'Tres bocas de taller selladas.')),
+      },
+      {
+        id: 'fusible-mayor', x: 705, y: 180, w: 180, h: 70,
+        label: 'Fusible mayor', prompt: 'Examinar la vitrina',
+        color: 0x61584c, solid: true,
+        onInteract: () =>
+          say(L('', 'Sobre el Tronco, un fusible mayor del tamaño de un antebrazo, en una vitrina con honores.')),
+      },
+      {
+        id: 'banco-ramales', x: 480, y: 360, w: 190, h: 76,
+        label: 'Banco de los Ramales', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        onInteract: () => {
+          // TODO(M5): abrir el puzzle de los Ramales.
+          // TODO(guion): falta una línea ambiente para el placeholder del banco.
+          say(L('', 'El banco aún no responde.'));
+        },
+      },
+      {
+        id: 'consejera-ramales', x: 740, y: 350, w: 38, h: 38, shape: 'circle',
+        label: 'Consejera', prompt: 'Hablar con la Consejera',
+        color: 0x725d79, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () =>
+          say([
+            L('Lumen', 'El Fusible del Tronco. El mártir más grande de Ohmdal. Cuando este se inmola, Consejera, no hay ritual que lo consuele.'),
+            L('Consejera', 'Por eso las bocas están selladas. Tres talleres abiertos vaciarían el Tronco.'),
+            L('Edda', '¿Vaciarlo? El río no es un balde… …¿O sí? Ohm: ¿es un balde?'),
+            L('Ohm', 'Balde: no. Contable: sí.'),
+          ]),
+      },
+      {
+        id: 'edda-ramales', x: 815, y: 410, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () => say(L('Edda', '¿Vaciarlo? El río no es un balde… …¿O sí? Ohm: ¿es un balde?')),
+      },
+      {
+        id: 'lumen-ramales', x: 660, y: 425, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () =>
+          say(L('Lumen', 'El Fusible del Tronco. El mártir más grande de Ohmdal. Cuando este se inmola, Consejera, no hay ritual que lo consuele.')),
+      },
+      {
+        id: 'ohm-ramales', x: 590, y: 405, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () => say(L('Ohm', 'Balde: no. Contable: sí.')),
+      },
+    ],
+  },
+
+  castle_heart: {
+    id: 'castle_heart',
+    name: 'Castillo de Ohmdal — El Corazón',
+    floor: () => 0x241f29,
+    wall: () => 0x3b303e,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'castle_branches', spawn: { x: 480, y: 95 },
+        label: 'Sala de los Ramales',
+      },
+    ],
+    things: [
+      {
+        id: 'repartidor', x: 480, y: 205, w: 250, h: 130,
+        label: 'El Repartidor', prompt: 'Examinar el tablero maestro',
+        color: 0x766247, solid: true,
+        onInteract: () =>
+          say(L('', 'Un tablero maestro de cobre y piedra del que parten tres canales mayores, uno por distrito del Castillo: la forja, el campanario, la biblioteca.')),
+      },
+      {
+        id: 'mosaico-corazon', x: 480, y: 390, w: 330, h: 72,
+        label: 'Mosaico del Cruce', prompt: 'Examinar el mosaico',
+        color: 0x4f5660, solid: false,
+        onInteract: () =>
+          say(L('', 'En el suelo, un mosaico: un río que entra a un cruce y sale en tres brazos, con la inscripción gastada que se revelará al final.')),
+      },
+      {
+        id: 'banco-repartidor', x: 180, y: 315, w: 190, h: 76,
+        label: 'Banco del Repartidor', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        onInteract: () => {
+          // TODO(M6): abrir el puzzle del Repartidor.
+          // TODO(guion): falta una línea ambiente para el placeholder del banco.
+          say(L('', 'El banco aún no responde.'));
+        },
+      },
+      {
+        id: 'consejera-corazon', x: 745, y: 330, w: 38, h: 38, shape: 'circle',
+        label: 'Consejera', prompt: 'Hablar con la Consejera',
+        color: 0x725d79, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () =>
+          say([
+            L('Lumen', 'El Repartidor. Mi maestro decía que aquí los Maestros «le enseñaban al río a contar».'),
+            L('Consejera', 'El Consejo lo selló primero. Dijimos: si el corazón no gasta, el cuerpo conserva.'),
+            L('Edda', 'Y el cuerpo se apagó entero. Qué manera de conservar.'),
+          ]),
+      },
+      {
+        id: 'edda-corazon', x: 820, y: 405, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () => say(L('Edda', 'Y el cuerpo se apagó entero. Qué manera de conservar.')),
+      },
+      {
+        id: 'lumen-corazon', x: 660, y: 420, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true,
+        visible: () => f().enteredCastle,
+        onInteract: () =>
+          say(L('Lumen', 'El Repartidor. Mi maestro decía que aquí los Maestros «le enseñaban al río a contar».')),
+      },
+      {
+        id: 'ohm-corazon', x: 585, y: 405, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().enteredCastle,
+        // TODO(guion): la sección 7 no incluye una línea de presentación de Ohm.
+        onInteract: () => say(L('', 'Ohm observa el Repartidor en silencio.')),
+      },
+    ],
   },
 };
