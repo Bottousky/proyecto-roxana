@@ -273,6 +273,55 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .bell-key-left.open line { transform: rotate(-48deg); }
 .bell-key-right.open line { transform: rotate(48deg); }
 
+.chain-stage { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
+.chain-circuit { min-width: 0; }
+.chain-source, .chain-return {
+  width: max-content; margin: 0 auto; padding: 5px 10px; border-radius: 6px;
+  border: 1px solid #8a7c50; color: #d8cfc0; background: #45382a; font-size: 11px;
+}
+.chain-wire {
+  width: 6px; height: 24px; margin: 0 auto; border-radius: 4px;
+  background: #5d5868; transition: background .25s, box-shadow .25s;
+}
+.chain-wire.live { background: var(--accent); box-shadow: 0 0 8px rgba(255,211,77,.7); }
+.chain-slots {
+  display: grid; grid-template-columns: repeat(6, minmax(48px, 1fr)); gap: 8px;
+  padding: 12px 0; border-top: 5px solid #8a7c50; border-bottom: 5px solid #8a7c50;
+}
+.chain-socket {
+  min-height: 86px; padding: 7px 4px; border-radius: 9px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  background: #26222e; color: #a99; border: 2px solid #6b6478;
+}
+.chain-socket:hover { border-color: var(--accent); }
+.chain-socket:disabled { cursor: default; }
+.chain-socket.available { border-style: dashed; }
+.chain-bulb {
+  width: 34px; height: 42px; border-radius: 50% 50% 42% 42%;
+  background: rgba(255,211,77,var(--lamp-glow));
+  border: 2px solid #d6b54f;
+  box-shadow: 0 0 var(--lamp-radius) rgba(255,211,77,var(--lamp-glow));
+  transition: opacity .25s, background .25s, box-shadow .25s;
+}
+.chain-socket-label { font-size: 11px; }
+.chain-plug {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  border: 2px solid #6b6478; color: #a99; font-size: 22px;
+}
+.chain-socket.off .chain-bulb, .chain-stage.blackout .chain-bulb {
+  opacity: .15; background: #555; box-shadow: none;
+}
+.chain-instruments { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 190px; }
+.chain-gauge { text-align: center; }
+.chain-gauge-label, .chain-band { color: #a99; font-size: 11px; }
+.chain-band { margin-top: 2px; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; }
+.chain-probe-host .ohm-probes { justify-content: center; }
+.chain-progress {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; color: #887f90; font-size: 12px;
+}
+.chain-progress span { padding: 5px 8px; border: 1px solid #4a4554; border-radius: 999px; }
+.chain-progress .done { color: var(--ok); border-color: rgba(126,196,106,.55); }
+
 /* ---------- Bitácora ---------- */
 #bitacora {
   position: absolute; inset: 0; z-index: 60;
@@ -425,4 +474,7 @@ body.touch-device #prompt { display: none !important; }
   .bita-book { flex-direction: column; height: 94vh; }
   .bita-index { width: 100%; min-width: 0; max-height: 130px; border-right: none; border-bottom: 2px solid #c9b48e; }
   .title-card h1 { font-size: 34px; }
+  .chain-stage { grid-template-columns: 1fr; }
+  .chain-slots { grid-template-columns: repeat(3, 1fr); }
+  .chain-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
 }

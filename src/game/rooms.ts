@@ -5,6 +5,7 @@ import { abrirDespertar } from '../puzzles/despertar';
 import { abrirFreno } from '../puzzles/freno';
 import { abrirPuerta } from '../puzzles/puerta';
 import { abrirBell } from '../puzzles/bell';
+import { abrirChain } from '../puzzles/chain';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal } from '../audio';
@@ -219,6 +220,23 @@ function reconocerCastillo(): void {
       L('Ohm', 'Continuar.'),
     ],
     () => setFlag('ohmRecognizedCastle'),
+  );
+}
+
+function abrirCadenaGaleria(): void {
+  say(
+    [
+      L('Consejera', 'La Galería en régimen de austeridad: una sola línea. Sin derroches. Antes había seis lámparas. Las reduje yo misma a cuatro para ahorrar chispa.'),
+      L('Edda', '¿Y brillan más desde entonces?'),
+      L('Consejera', '…Brillan distinto.'),
+      L('Ohm', 'Distinto: sí. Más: no.'),
+    ],
+    () =>
+      abrirChain(() => {
+        setFlag('solvedGalleryChain');
+        notifyNewEntry('La Cadena');
+        hooks.refresh();
+      }),
   );
 }
 
@@ -835,9 +853,8 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Banco de la Cadena', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
         onInteract: () => {
-          // TODO(M4): abrir el puzzle de la Cadena.
-          // TODO(guion): falta una línea ambiente para el placeholder del banco.
-          say(L('', 'El banco aún no responde.'));
+          if (f().solvedGalleryChain) abrirChain(() => {}, true);
+          else abrirCadenaGaleria();
         },
       },
       {
