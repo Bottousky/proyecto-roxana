@@ -75,7 +75,7 @@ function despertarOhm(): void {
       [
         L('Edda', '¡¿Lo DESPERTASTE?! ¿Qué ritual usaste? ¿El de los tres golpes? ¿El del incienso doble?'),
         L('', '—Ningún ritual. Solo… completé el camino.'),
-        L('Edda', '«Completé el camino», dice, así nomás. No se lo cuentes a Lumen de una, que le agarra un soponcio.'),
+        L('Edda', '«Completé el camino», dice, tan tranquilo. No se lo cuentes a Lumen de golpe, que le da un soponcio.'),
         L('Edda', 'El taller de Lumen está al este. Si Ohm despertó, va a querer conocerte. O exorcizarte. Cincuenta y cincuenta.'),
       ],
       () => {
@@ -91,8 +91,8 @@ function resolverFreno(): void {
     setFlag('frenoDone');
     say(
       [
-        L('Maese Lumen', '«La piedra justa»… Donde otros ven magia, buscá camino. Eso decían los Maestros. Nunca supe qué significaba.'),
-        L('Maese Lumen', 'Si entendés a las piedras… quizás puedas con la Puerta de Ohm. Al norte de la plaza. Nadie la abre desde la época de los Maestros.'),
+        L('Maese Lumen', '«La piedra justa»… Donde otros ven magia, busca camino. Eso decían los Maestros. Nunca supe qué significaba.'),
+        L('Maese Lumen', 'Si entiendes a las piedras… quizás puedas con la Puerta de Ohm. Al norte de la plaza. Nadie la abre desde la época de los Maestros.'),
         L('Edda', 'Voy con ustedes. Si explota, quiero verlo de cerca.'),
         L('Maese Lumen', 'Adelántense. Yo junto los fusibles de repuesto. …Mejor llevo seis.'),
       ],
@@ -126,9 +126,9 @@ function tocarCampana(): void {
   sfxBell();
   say(
     [
-      L('', 'Tirás de la cuerda. La campana de Ohmdal suena por primera vez en décadas: una nota limpia que recorre la plaza encendida.'),
-      L('Maese Lumen', 'Los Maestros la tocaban al final de cada lección. Decían que el sonido «cerraba el circuito del día». Recién hoy le encuentro la gracia.'),
-      L('Edda', 'Ey. Mirá. De la campana bajan DOS cables. Dos caminos. ¿Para qué querría alguien dos caminos para un mismo río?'),
+      L('', 'Tiras de la cuerda. La campana de Ohmdal suena por primera vez en décadas: una nota limpia que recorre la plaza encendida.'),
+      L('Maese Lumen', 'Los Maestros la tocaban al final de cada lección. Decían que el sonido «cerraba el circuito del día». Hasta hoy no le había encontrado la gracia.'),
+      L('Edda', 'Oye. Mira. De la campana bajan DOS cables. Dos caminos. ¿Para qué querría alguien dos caminos para un mismo río?'),
       L('', '(Eso, Edda, es otra lección.)'),
     ],
     () => {
@@ -176,8 +176,8 @@ export const ROOMS: Record<string, RoomDef> = {
           if (!fl.talkedPreceptor) {
             say(
               [
-                L('Preceptor', '¿El nuevo? Llegás tarde. O temprano. Acá ya nadie lleva mucho la cuenta.'),
-                L('Preceptor', 'Antes del aula tenés que pasar por Dirección. La puerta de la izquierda. Está abierta; siempre está abierta. No sé por qué la seguimos llamando Dirección.'),
+                L('Preceptor', '¿El nuevo? Llegas tarde. O temprano. Aquí ya nadie lleva mucho la cuenta.'),
+                L('Preceptor', 'Antes del aula tienes que pasar por Dirección. La puerta de la izquierda. Está abierta; siempre está abierta. No sé por qué la seguimos llamando Dirección.'),
                 L('Preceptor', 'Y una cosa: si algo zumba, no lo toques. …Todavía.'),
               ],
               () => setFlag('talkedPreceptor'),
@@ -187,10 +187,10 @@ export const ROOMS: Record<string, RoomDef> = {
           } else if (!fl.sawProjector) {
             say([
               L('Preceptor', '¿Eso es… una Bitácora? Hacía años que no veía una de esas.'),
-              L('Preceptor', 'El Aula de Electrónica es la puerta de la derecha. Andá: el aula sabe qué hacer. …Es una forma de decir. Creo.'),
+              L('Preceptor', 'El Aula de Electrónica es la puerta de la derecha. Anda: el aula sabe qué hacer. …Es una forma de decir. Creo.'),
             ]);
           } else {
-            say(L('Preceptor', '¿Todavía por acá? El aula. La derecha. Saludame a… bah. Vos andá.'));
+            say(L('Preceptor', '¿Todavía por aquí? El aula. La derecha. Salúdame a… bah. Tú solo ve.'));
           }
         },
       },
@@ -211,8 +211,8 @@ export const ROOMS: Record<string, RoomDef> = {
       if (!f().introSeen) {
         say(
           [
-            L('', 'El Instituto Roxana. Nadie te acompañó hasta la puerta; «queda lejos», dijeron. La verdad es que nadie elige venir acá. Vos tampoco.'),
-            L('', 'El hall es enorme y huele a cera vieja. Los pasos hacen eco. Junto a la escalera hay un hombre de guardapolvo gris.'),
+            L('', 'El Instituto Roxana. Nadie te acompañó hasta la puerta; «queda lejos», dijeron. La verdad es que nadie elige venir aquí. Tú tampoco.'),
+            L('', 'El hall es enorme y huele a cera vieja. Los pasos hacen eco. Junto a la escalera hay un hombre de bata gris.'),
           ],
           () => setFlag('introSeen'),
         );
@@ -367,11 +367,11 @@ export const ROOMS: Record<string, RoomDef> = {
           if (!fl.ohmAwake) {
             say([
               L('Edda', 'Eso del pedestal es Ohm, el guardián de la plaza. Lleva años dormido. Maese Lumen dice que los espíritus están ofendidos.'),
-              L('Edda', 'Yo digo que algo se cortó. Pero a mí nadie me da bola.'),
-              L('Edda', 'La fuente del pedestal todavía zumba, ¿sabés? Tiene fuerza. Lo que no tiene es… no sé. Andá a mirarlo vos.'),
+              L('Edda', 'Yo digo que algo se cortó. Pero a mí nadie me hace caso.'),
+              L('Edda', 'La fuente del pedestal todavía zumba, ¿sabes? Tiene fuerza. Lo que no tiene es… no sé. Anda a verlo tú.'),
             ]);
           } else if (!fl.frenoDone) {
-            say(L('Edda', 'El taller de Lumen, al este. Dale. Quiero ver su cara cuando le cuentes lo de Ohm.'));
+            say(L('Edda', 'El taller de Lumen, al este. Vamos. Quiero ver su cara cuando le cuentes lo de Ohm.'));
           } else if (!fl.puertaDone) {
             say([
               L('Edda', '¿Viste la cara de Lumen con la lámpara? Valió la pena tanto humo.'),
@@ -398,7 +398,7 @@ export const ROOMS: Record<string, RoomDef> = {
                 ]
               : [
                   L('Maese Lumen', 'Empuje sobre freno. Toda una vida custodiando una cuenta. …Una cuenta hermosa, eso sí.'),
-                  L('Maese Lumen', 'Mirá la plaza. Mirá las lámparas. Andá a tocar la campana, forastero: te lo ganaste.'),
+                  L('Maese Lumen', 'Mira la plaza. Mira las lámparas. Ve a tocar la campana, forastero: te lo ganaste.'),
                 ],
           ),
       },
@@ -438,8 +438,8 @@ export const ROOMS: Record<string, RoomDef> = {
         say(
           [
             L('', 'La plaza está apagada. No oscura: apagada. Como si alguien hubiera bajado una palanca hace mucho y nadie recordara dónde.'),
-            L('Edda', '¡Eh! ¿Y vos de dónde saliste? Nadie cruza el Arco desde antes de que yo naciera.'),
-            L('Edda', 'Da igual. Si venís a robar reliquias, llegaste tarde: ya no funcionan.'),
+            L('Edda', '¡Eh! ¿Y tú de dónde saliste? Nadie cruza el Arco desde antes de que yo naciera.'),
+            L('Edda', 'Da igual. Si vienes a robar reliquias, llegaste tarde: ya no funcionan.'),
           ],
           () => setFlag('plazaSeen'),
         );
@@ -467,18 +467,18 @@ export const ROOMS: Record<string, RoomDef> = {
           if (!fl.metLumen) {
             say(
               [
-                L('Maese Lumen', '¡Atrás, espectro! …Oh. Carne y hueso. Disculpá: con esta túnica uno termina esperando fantasmas en todos lados.'),
-                L('Maese Lumen', 'Así que vos sos quien despertó al guardián. Sin incienso. Sin cántico. Sin los tres golpes sagrados.'),
+                L('Maese Lumen', '¡Atrás, espectro! …Oh. Carne y hueso. Disculpa: con esta túnica uno termina esperando fantasmas en todos lados.'),
+                L('Maese Lumen', 'Así que tú eres quien despertó al guardián. Sin incienso. Sin cántico. Sin los tres golpes sagrados.'),
                 L('Edda', 'Te dije mil veces que los golpes no hacían nada.'),
                 L('Maese Lumen', '¡Los golpes mantienen la TRADICIÓN, Edda!'),
-                L('Maese Lumen', '…Pero el forastero despertó a Ohm, y eso no lo logró ninguna tradición en treinta años. Vení. Mirá esto.'),
+                L('Maese Lumen', '…Pero el forastero despertó a Ohm, y eso no lo logró ninguna tradición en treinta años. Ven. Mira esto.'),
                 L('Maese Lumen', 'La Lámpara Eterna del taller. Lleva una piedra rajada, y cada vez que bajo la palanca escupe chispas como dragón resfriado.'),
-                L('Maese Lumen', 'Si tenés el don, el banco es tuyo. Yo miro desde acá. Por la tradición. Y por las cejas.'),
+                L('Maese Lumen', 'Si tienes el don, el banco es tuyo. Yo miro desde aquí. Por la tradición. Y por las cejas.'),
               ],
               () => setFlag('metLumen'),
             );
           } else {
-            say(L('Maese Lumen', 'El banco es tuyo, forastero. Yo miro desde acá, con las cejas a salvo.'));
+            say(L('Maese Lumen', 'El banco es tuyo, forastero. Yo miro desde aquí, con las cejas a salvo.'));
           }
         },
       },
@@ -490,8 +490,8 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () =>
           say(
             !f().metLumen
-              ? [L('Edda', 'Ese es Maese Lumen. Dejá que te grite lo del espectro primero; después es un pan de dios.')]
-              : [L('Edda', 'Dale, el banco. Quiero ver la cara de Lumen cuando la lámpara funcione de verdad.')],
+              ? [L('Edda', 'Ese es Maese Lumen. Deja que te grite lo del espectro primero; después es un pan de dios.')]
+              : [L('Edda', 'Vamos, al banco. Quiero ver la cara de Lumen cuando la lámpara funcione de verdad.')],
           ),
       },
       {
@@ -538,8 +538,8 @@ export const ROOMS: Record<string, RoomDef> = {
         walksTo: 'plaza',
         onInteract: () =>
           say([
-            L('Edda', 'Mirala bien: el ojo de aguja. Dicen que mide el río que la cruza.'),
-            L('Edda', 'Si la aguja se pasa de largo, agachate. Consejo de amiga.'),
+            L('Edda', 'Mírala bien: el ojo de aguja. Dicen que mide el río que la cruza.'),
+            L('Edda', 'Si la aguja se pasa de largo, agáchate. Consejo de amiga.'),
           ]),
       },
       {
@@ -559,8 +559,8 @@ export const ROOMS: Record<string, RoomDef> = {
         say(
           [
             L('', 'La Puerta de Ohm. Dos hojas de metal oscuro, un ojo de aguja, y el símbolo Ω grabado en el centro.'),
-            L('Edda', 'Vinimos a mirar. Si explota, yo no estuve acá.'),
-            L('Maese Lumen', 'Si se abre, yo SÍ estuve acá.'),
+            L('Edda', 'Vinimos a mirar. Si explota, yo no estuve aquí.'),
+            L('Maese Lumen', 'Si se abre, yo SÍ estuve aquí.'),
           ],
           () => setFlag('puertaIntro'),
         );

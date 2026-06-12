@@ -54,7 +54,7 @@ Las piedras llevan bandas de color con el **código verdadero de resistencias** 
 - Regla compartida: **ninguno explica; los tres reaccionan** — Edda al resultado, Lumen al método, Ohm al estado eléctrico.
 - **Ohm** es reserva narrativa de largo plazo: un autómata antiguo *vio* cómo Ohmdal olvidó — no gastar su backstory en la Unidad 1.
 - **Edda** modela la actitud científica sin dar respuestas; es el avatar de la pregunta del jugador.
-- **Lumen** dice la frase guía citando a los antiguos: *«Donde otros ven magia, buscá camino.»* Sus misconcepciones (y las de los ciudadanos) mapean a misconcepciones reales de estudiantes (ej. "la corriente se gasta en el camino").
+- **Lumen** dice la frase guía citando a los antiguos: *«Donde otros ven magia, busca camino.»* Sus misconcepciones (y las de los ciudadanos) mapean a misconcepciones reales de estudiantes (ej. "la corriente se gasta en el camino").
 
 ### A.6. Estado de implementación (junio 2026)
 
@@ -290,7 +290,7 @@ El símbolo V/I/R debe aparecer, pero sin explicación. Podría estar medio borr
 
 **Después de volver de Ohmdal:**
 
-> Ahora el dibujo parece menos misterioso. O tal vez vos cambiaste.
+> Ahora el dibujo parece menos misterioso. O tal vez cambiaste tú.
 
 ### Frascos de resistencias
 
@@ -357,7 +357,7 @@ Mostrar el ideal. El jugador debe entender cómo debería verse Ohmdal.
 ## Imagen 2 — Estudiantes antiguos
 
 **Visual:**  
-Estudiantes del Instituto Roxana en uniformes o guardapolvos antiguos conectan cables, prueban lámparas y observan medidores en una plaza. Un autómata pequeño parecido a Ohm aparece al fondo.
+Estudiantes del Instituto Roxana en uniformes o batas técnicas antiguas conectan cables, prueban lámparas y observan medidores en una plaza. Un autómata pequeño parecido a Ohm aparece al fondo.
 
 **Narrador:**
 
@@ -456,7 +456,7 @@ Opciones jugador:
 
 **Edda:**
 
-> Si te equivocaste, hacelo otra vez. Necesitamos ayuda.
+> Si te equivocaste, hazlo otra vez. Necesitamos ayuda.
 
 Si el jugador elige “¿La magia?”:
 
@@ -468,7 +468,7 @@ Si elige “Estoy buscando mi aula”:
 
 **Edda:**
 
-> Excelente. Entonces sabés leer carteles. Eso ya te pone por encima del Consejo.
+> Excelente. Entonces sabes leer carteles. Eso ya te pone por encima del Consejo.
 
 Si elige “Me equivoqué de puerta”:
 
@@ -484,7 +484,7 @@ Edda señala el pedestal de Ohm.
 
 **Edda:**
 
-> Vení. Hay algo que nadie logró despertar.
+> Ven. Hay algo que nadie logró despertar.
 
 El jugador puede explorar antes.
 
@@ -695,7 +695,7 @@ Edda entra.
 
 **Lumen:**
 
-> Si venís a decirme que no golpee el generador, llegaste tarde.
+> Si vienes a decirme que no golpee el generador, llegaste tarde.
 
 **Edda:**
 

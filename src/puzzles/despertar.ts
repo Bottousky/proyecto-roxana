@@ -97,7 +97,7 @@ export function abrirDespertar(onSuccess: () => void): void {
       bench.setStatus(
         'El camino sale de la fuente por el lado <b>+</b>, pasa por Ohm, y tiene que volver ' +
           'al lado <b>−</b>. Está lleno de huecos. En la bandeja hay <b>tres puentes de cobre</b>. ' +
-          'Tocá un hueco para cubrirlo (o descubrirlo).',
+          'Toca un hueco para cubrirlo (o descubrirlo).',
       );
 
       const isWin = () =>

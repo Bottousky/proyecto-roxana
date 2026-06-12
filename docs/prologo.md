@@ -109,7 +109,7 @@ No se busca mostrar fantasía explícita todavía. La cinemática debe construir
 
 ### Descripción visual
 
-Una mesa cotidiana con papeles de inscripción, una mochila nueva, útiles escolares, una lapicera, una computadora o celular mostrando la asignación escolar.
+Una mesa cotidiana con papeles de inscripción, una mochila nueva, útiles escolares, un bolígrafo, una computadora o celular mostrando la asignación escolar.
 
 En la pantalla o en un papel se lee, agregado luego en engine o composición final:
 
@@ -356,7 +356,7 @@ Bueno… supongo que es acá.
 ### Objetivo inicial
 
 ```text
-Objetivo: Buscá a alguien de la escuela.
+Objetivo: Busca a alguien de la escuela.
 ```
 
 ---
@@ -370,7 +370,7 @@ Antes de hablar con el preceptor, el jugador puede inspeccionar algunos elemento
 ## 9.1. Entrada principal
 
 ```text
-La puerta quedó abierta detrás tuyo.
+La puerta quedó abierta detrás de ti.
 
 Por alguna razón, eso no tranquiliza demasiado.
 ```
@@ -548,7 +548,7 @@ En esta escuela esas dos cosas suelen ser parecidas.
 
 ```text
 Preceptor:
-Como sos nuevo, primero tenés que pasar por Dirección.
+Como eres nuevo, primero tienes que pasar por Dirección.
 
 Jugador:
 ¿Dirección?
@@ -562,7 +562,7 @@ Jugador:
 ¿Tengo que hablar con la directora?
 
 Preceptor:
-Si alguien te contesta, avisame.
+Si alguien te contesta, avísame.
 
 Jugador:
 ¿Cómo?
@@ -570,7 +570,7 @@ Jugador:
 Preceptor:
 Nada. Cosas de la escuela.
 
-Andá. Después volvés y te digo a qué aula tenés que ir.
+Anda. Después vuelves y te digo a qué aula tienes que ir.
 ```
 
 ### Objetivo actualizado
@@ -664,7 +664,7 @@ Buenísimo.
 ### Objetivo
 
 ```text
-Objetivo: Revisá el despacho.
+Objetivo: Revisa el despacho.
 ```
 
 ---
@@ -835,7 +835,7 @@ Estudiante vinculado.
 
 Inscripción pendiente de confirmación.
 
-Volvé a Preceptoría.
+Vuelve a Preceptoría.
 ```
 
 ### Objetivo actualizado
@@ -960,7 +960,7 @@ El preceptor mira al jugador.
 
 ```text
 Preceptor:
-¿Qué tenés ahí?
+¿Qué tienes ahí?
 
 Jugador:
 Un libro. Estaba en Dirección.
@@ -1017,7 +1017,7 @@ Jugador:
 Preceptor:
 Ahora.
 
-Y llevate eso.
+Y llévate eso.
 ```
 
 El preceptor mira la Bitácora.
@@ -1085,16 +1085,16 @@ Ese es el problema.
 
 ```text
 Estudiante:
-Uh, mirá. El nuevo ya encontró una reliquia.
+Uh, mira. El nuevo ya encontró una reliquia.
 
-Cuidado. Capaz te empieza a dar tarea.
+Cuidado. A lo mejor te empieza a dar tarea.
 ```
 
 Si el jugador vuelve a hablarle:
 
 ```text
 Estudiante:
-Igual posta… ese libro es raro.
+Igual, en serio… ese libro es raro.
 ```
 
 ---
@@ -1178,11 +1178,11 @@ Y revelar Ohmdal unos minutos después, dentro del aula. Esto mantiene la progre
 # 23. Flujo resumido de objetivos
 
 ```text
-1. Buscá a alguien de la escuela.
+1. Busca a alguien de la escuela.
 2. Hablá con el preceptor.
 3. Ir a Dirección.
-4. Revisá el despacho.
-5. Tomá la Bitácora.
+4. Revisa el despacho.
+5. Toma la Bitácora.
 6. Volver con el preceptor.
 7. Ir al Taller de Electrónica.
 8. Entrar al taller.
@@ -1351,7 +1351,7 @@ El greybox actual implementa una versión comprimida: hall → preceptor → des
 
 # 29. Versión corta de referencia
 
-El jugador empieza la secundaria en la Escuela Roxana, una institución antigua que le fue asignada por descarte. La escuela, alguna vez prestigiosa y llena de talleres vivos, hoy está casi vacía. Al llegar, el único preceptor le indica que debe pasar por Dirección y agrega una frase inquietante: “Si alguien te contesta, avisame”.
+El jugador empieza la secundaria en la Escuela Roxana, una institución antigua que le fue asignada por descarte. La escuela, alguna vez prestigiosa y llena de talleres vivos, hoy está casi vacía. Al llegar, el único preceptor le indica que debe pasar por Dirección y agrega una frase inquietante: “Si alguien te contesta, avísame”.
 
 En el despacho de Dirección no hay nadie. Al explorar, el jugador encuentra una Bitácora antigua que se registra con su nombre y funciona como menú escolar: cursos, objetivos, mapa, registros y progreso. Al volver, el preceptor reacciona con incomodidad, pero lo envía a su primer bloque: Taller de Electrónica.
 

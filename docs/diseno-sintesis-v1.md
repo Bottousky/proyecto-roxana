@@ -10,7 +10,7 @@
 
 Juego narrativo educativo. Un estudiante llega "por descarte" al Instituto Roxana, una escuela técnica viva pero detenida: prestigio viejo, rutinas vacías, memoria perdida. Las aulas abren puertas a mundos conceptuales donde el conocimiento técnico sobrevivió degradado en ritual y superstición. El jugador aprende reactivando mundos; la Bitácora convierte la experiencia vivida en conocimiento formal, siempre después del hecho.
 
-**Pitch:** "Una escuela olvidó lo que sabía. Vos vas a recordarlo jugando."
+**Pitch:** "Una escuela olvidó lo que sabía. Tú vas a recordarlo jugando."
 
 **Simetría temática central:** el Instituto y Ohmdal tienen la misma enfermedad — conservan las formas del conocimiento pero perdieron la comprensión. Restaurar los mundos restaura, de a poco, al Instituto. Esta es la columna vertebral narrativa de todas las unidades.
 

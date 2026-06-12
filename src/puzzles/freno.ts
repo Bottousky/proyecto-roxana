@@ -13,7 +13,7 @@ const EMPUJE_TALLER = 8; // fijo: la "fuente del taller" de Lumen
  * Con Empuje 8: rajada(1)→8 fusible · roja(2)→4 caliente · amarilla(4)→2 ✓ · gris(8)→1 débil.
  *
  * replay: tras resolverlo, el banco queda abierto para experimentar libremente
- * (la Bitácora invita a volver; los huecos de «errores comunes» se completan acá).
+ * (la Bitácora invita a volver; los huecos de «errores comunes» se completan aquí).
  */
 export function abrirFreno(onSuccess: () => void, replay = false): void {
   openBench(
@@ -51,7 +51,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           ${ohmWidgetHTML()}
         </div>`;
       bench.root.appendChild(stage);
-      setOhmState(stage, 'estable'); // Ohm vino con vos, despierto
+      setOhmState(stage, 'estable'); // Ohm vino contigo, despierto
 
       const lamp = stage.querySelector<SVGCircleElement>('.lampara')!;
       const slotPiedra = stage.querySelector<SVGRectElement>('.slot-piedra')!;
@@ -82,7 +82,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
       tray.className = 'bench-tray';
       const label = document.createElement('span');
       label.className = 'tray-label';
-      label.textContent = 'Piedras de Lumen (tocá una para engastarla):';
+      label.textContent = 'Piedras de Lumen (toca una para engastarla):';
       tray.appendChild(label);
       bench.root.appendChild(tray);
 
@@ -113,7 +113,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
       bench.setStatus(
         replay
           ? 'La amarilla sigue engastada y la luz, firme. ¿Qué harían las otras piedras? ' +
-              'Acá nadie te juzga. Bueno… Ohm, un poco.'
+              'Aquí nadie te juzga. Bueno… Ohm, un poco.'
           : 'La lámpara lleva una <b>piedra rajada</b>, casi sin cuerpo. ' +
               'Lumen: «Las Piedras de Freno calman el ánimo del Río. Las de marca oscura calman mucho. ' +
               'O poco. El pergamino está manchado justo ahí.»',
@@ -196,7 +196,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
             setOhmState(stage, 'estable');
             bench.setStatus(
               replay
-                ? 'Fusible nuevo. Le diste los tres golpes solemnes, por las dudas. El banco está listo de nuevo.'
+                ? 'Fusible nuevo. Le diste los tres golpes solemnes, por si acaso. El banco está listo de nuevo.'
                 : 'Lumen instala el fusible nuevo con tres golpes solemnes. Edda pone los ojos en blanco. ' +
                     'El banco está listo de nuevo… quizás con otra piedra.',
             );

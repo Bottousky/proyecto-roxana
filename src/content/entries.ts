@@ -41,7 +41,7 @@ export function getEntries(): EntryView[] {
       fecha: 'Ohmdal — la plaza',
       vivencial: `
         <p>Ohm no despertaba aunque la fuente tenía fuerza. Probé de todo.
-        Recién cuando el camino estuvo completo —sin un solo hueco, de la fuente
+        Solo cuando el camino estuvo completo —sin un solo hueco, de la fuente
         a Ohm y de vuelta a la fuente— la chispa corrió y abrió los ojos.</p>
         <p>Un hueco. Uno solo. Y nada se mueve en <em>ninguna</em> parte del camino.</p>`,
       formal: `
@@ -58,7 +58,7 @@ export function getEntries(): EntryView[] {
              Lo encontré detrás de la Puerta.</p>`
           : `<p class="blank">Los Maestros tenían un nombre para esto.
              Todavía no lo encontré.</p>`}
-        <div class="pregunta">✎ Pensá en tu casa: ¿qué aparato es, en el fondo,
+        <div class="pregunta">✎ Piensa en tu casa: ¿qué aparato es, en el fondo,
         un «hueco a propósito» en un camino, puesto ahí para abrirlo y cerrarlo a voluntad?</div>`,
     });
   }
@@ -100,7 +100,7 @@ export function getEntries(): EntryView[] {
         ${f.burnedSomething
           ? `<p>Lo comprobé con humo: poca piedra no significa «más potencia útil».
              Significa exceso. Y el exceso rompe.</p>`
-          : `<p class="blank">(Acá hay dibujada una mancha de humo, pero a mí no se me
+          : `<p class="blank">(Aquí hay dibujada una mancha de humo, pero a mí no se me
              quemó nada todavía. ¿Qué pasa si pongo la piedra que MENOS frena y bajo
              la palanca? …No lo probé.)</p>`}
         <div class="pregunta">✎ ¿Qué piedra dejaría pasar exactamente la mitad de río
@@ -142,7 +142,7 @@ export function getEntries(): EntryView[] {
         <p>· Creer que más empuje siempre da más luz útil. No: sin freno suficiente, rompe.<br/>
         · Creer que el freno «gasta» el río para mal. No: lo dosifica para que sirva.</p>
         <div class="pregunta">✎ Si el Empuje se duplica y la Piedra también se duplica,
-        ¿el Río cambia? Volvé a la Puerta y probalo. La Puerta no se ofende.</div>`,
+        ¿el Río cambia? Vuelve a la Puerta y pruébalo. La Puerta no se ofende.</div>`,
     });
   }
 

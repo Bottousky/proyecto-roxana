@@ -122,7 +122,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
         replay
           ? 'La franja verde espera. ¿Cuántos pares distintos de fuente y piedra la encuentran? La Puerta no se ofende. Ya no.'
           : 'La Puerta pide un caudal <b>justo</b>: la aguja en la franja verde. ' +
-              'Lumen: «Ni hambrienta ni ahogada, decían los Maestros.» Elegí una fuente y una piedra.',
+              'Lumen: «Ni hambrienta ni ahogada, decían los Maestros.» Elige una fuente y una piedra.',
       );
 
       const weakLines = replay
