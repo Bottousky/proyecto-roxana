@@ -266,6 +266,59 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .fuse.burned { border-color: var(--danger); }
 .fuse.burned .fuse-fill { background: var(--danger); }
 .fuse.burned .fuse-status { color: var(--danger); font-weight: 700; }
+.breakable-channel {
+  width: min(300px, 100%); padding: 10px; border: 1px solid #6b6478;
+  border-radius: 8px; background: #211e29;
+}
+.breakable-channel.warning { animation: channel-vibrate .14s linear infinite; }
+.breakable-channel.warning .fuse-fill { background: #ff6a32; }
+.breakable-channel.cut { border-color: var(--danger); }
+.breakable-channel.cut .fuse-fill { background: var(--danger); }
+.breakable-channel.cut .fuse-status { color: var(--danger); font-weight: 700; }
+@keyframes channel-vibrate {
+  25% { transform: translateX(1px); }
+  75% { transform: translateX(-1px); }
+}
+
+/* U3: termómetros y banco del canal tibio */
+.channel-thermometer { max-width: 92px; margin: 0 auto; }
+.thermometer-fill, .thermometer-bulb, .thermometer-label {
+  transition: y .35s, height .35s, fill .35s;
+}
+.warmth-stage { display: grid; gap: 12px; }
+.warmth-channels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.warmth-channel {
+  min-width: 0; padding: 10px; border: 1px solid #5d5868; border-radius: 10px;
+  background: #211e29; text-align: center; transition: border-color .25s, box-shadow .25s;
+}
+.warmth-channel.measured { border-color: #8a7c50; }
+.warmth-channel[data-level='rojo'] {
+  border-color: var(--danger); box-shadow: inset 0 0 22px rgba(226,86,58,.14);
+}
+.warmth-channel h3 { margin: 0 0 8px; color: #d8cfc0; font-size: 13px; }
+.warmth-cut { display: flex; align-items: center; justify-content: center; gap: 7px; }
+.warmth-copper { width: 58px; height: 10px; border-radius: 5px; background: #a2673f; }
+.warmth-machine {
+  padding: 3px 6px; border-radius: 5px; background: #342f3d; color: #a99;
+  font-size: 10px; text-transform: uppercase;
+}
+.warmth-thickness { margin-top: 7px; color: #a99; font-size: 11px; }
+.warmth-river { display: flex; justify-content: center; gap: 3px; min-height: 9px; margin: 8px 0 3px; }
+.warmth-river span {
+  width: 7px; height: 7px; border-radius: 50%; background: #3f3949;
+  transition: background .25s, box-shadow .25s;
+}
+.warmth-river span.live { background: var(--accent); box-shadow: 0 0 5px rgba(255,211,77,.65); }
+.warmth-thermometer { min-height: 120px; transition: opacity .25s, filter .25s; }
+.warmth-thermometer.unread { opacity: .22; filter: grayscale(1); }
+.warmth-switch-host { display: flex; justify-content: center; }
+.warmth-probe-host .ohm-probes { justify-content: center; margin-top: 0; }
+.warmth-progress { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
+.warmth-progress span {
+  padding: 4px 7px; border: 1px solid #4a4554; border-radius: 999px;
+  color: #887f90; font-size: 11px;
+}
+.warmth-progress span.done { color: var(--ok); border-color: rgba(126,196,106,.55); }
 
 .bell-stage { position: relative; }
 .bell-stage .bell-ohm { position: absolute; right: 12px; bottom: 12px; }
@@ -603,6 +656,7 @@ body.touch-device #prompt { display: none !important; }
   .branches-stage { grid-template-columns: 1fr; }
   .branches-cards { grid-template-columns: 1fr; }
   .branches-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+  .warmth-channels { grid-template-columns: 1fr; }
   .distributor-stage { grid-template-columns: 1fr; }
   .distributor-districts { grid-template-columns: 1fr; }
   .distributor-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }

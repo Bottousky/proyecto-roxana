@@ -11,6 +11,7 @@
     "skipLibCheck": true,
     "types": ["vite/client"],
     "isolatedModules": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "useDefineForClassFields": true
   },

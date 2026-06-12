@@ -18,6 +18,71 @@ export function setOhmState(scope: HTMLElement, s: OhmState): void {
   scope.querySelector('.ohm-widget')?.setAttribute('data-state', s);
 }
 
+/* ---------- Calor y grosor de canales ---------- */
+
+export type HeatLevel = 'frio' | 'tibio' | 'caliente' | 'rojo';
+
+export const CHANNEL_TOLERANCES = {
+  angosto: 2,
+  medio: 4,
+  ancho: 8,
+} as const;
+
+export type ChannelThickness = keyof typeof CHANNEL_TOLERANCES;
+
+/** Bandas canónicas de U3 §A.3. Los bordes pertenecen a la banda inferior. */
+export function heatLevel(rio: number, tolerancia: number): HeatLevel {
+  if (rio <= tolerancia / 2) return 'frio';
+  if (rio <= tolerancia) return 'tibio';
+  if (rio <= tolerancia * 1.5) return 'caliente';
+  return 'rojo';
+}
+
+const THERMOMETER_LEVELS: Record<
+  HeatLevel,
+  { label: string; color: string; y: number; height: number }
+> = {
+  frio: { label: 'frío', color: '#72b8d4', y: 72, height: 16 },
+  tibio: { label: 'tibio', color: '#d6a84a', y: 56, height: 32 },
+  caliente: { label: 'caliente', color: '#e77832', y: 40, height: 48 },
+  rojo: { label: 'al rojo', color: '#ff3f2f', y: 22, height: 66 },
+};
+
+/** Termómetro cualitativo: solo muestra bandas de calor, nunca cifras. */
+export function thermometerSVG(level: HeatLevel = 'frio'): string {
+  const visual = THERMOMETER_LEVELS[level];
+  return `
+    <svg viewBox="0 0 110 130" class="channel-thermometer" data-level="${level}"
+      role="img" aria-label="Termómetro de canal: ${visual.label}">
+      <rect x="43" y="14" width="24" height="82" rx="12" fill="#27232e" stroke="#746c7f" stroke-width="4"/>
+      <rect class="thermometer-fill" x="49" y="${visual.y}" width="12" height="${visual.height}"
+        rx="6" fill="${visual.color}"/>
+      <circle class="thermometer-bulb" cx="55" cy="101" r="20" fill="${visual.color}"
+        stroke="#746c7f" stroke-width="4"/>
+      <text class="thermometer-label" x="55" y="128" text-anchor="middle"
+        fill="${visual.color}" font-size="13">${visual.label}</text>
+    </svg>`;
+}
+
+export function setThermometer(scope: HTMLElement, level: HeatLevel): void {
+  const thermometer = scope.querySelector<SVGSVGElement>('.channel-thermometer');
+  if (!thermometer) return;
+  const visual = THERMOMETER_LEVELS[level];
+  const fill = thermometer.querySelector<SVGRectElement>('.thermometer-fill');
+  const bulb = thermometer.querySelector<SVGCircleElement>('.thermometer-bulb');
+  const label = thermometer.querySelector<SVGTextElement>('.thermometer-label');
+  thermometer.dataset.level = level;
+  thermometer.setAttribute('aria-label', `Termómetro de canal: ${visual.label}`);
+  fill?.setAttribute('y', String(visual.y));
+  fill?.setAttribute('height', String(visual.height));
+  fill?.setAttribute('fill', visual.color);
+  bulb?.setAttribute('fill', visual.color);
+  if (label) {
+    label.textContent = visual.label;
+    label.setAttribute('fill', visual.color);
+  }
+}
+
 /* ---------- Piezas de topología U2 ---------- */
 
 export interface LlaveTramoHandle {
@@ -118,10 +183,23 @@ export interface FuseState {
 
 export type FuseResult = 'ok' | 'warning' | 'burned';
 
+export interface InsistenceState {
+  insistences: number;
+  failed: boolean;
+}
+
+export function advanceInsistence(state: InsistenceState, active: boolean): InsistenceState {
+  if (state.failed || !active) return state;
+  const insistences = state.insistences + 1;
+  return { insistences, failed: insistences >= 3 };
+}
+
 export function advanceFuse(state: FuseState, value: number, threshold: number): FuseState {
-  if (state.burned || value <= threshold) return state;
-  const overloads = state.overloads + 1;
-  return { overloads, burned: overloads >= 3 };
+  const next = advanceInsistence(
+    { insistences: state.overloads, failed: state.burned },
+    value > threshold,
+  );
+  return { overloads: next.insistences, burned: next.failed };
 }
 
 export interface FusibleHandle {
@@ -129,6 +207,42 @@ export interface FusibleHandle {
   state(): FuseState;
   setValue(value: number): FuseResult;
   reset(): void;
+}
+
+interface FailureStrip {
+  root: HTMLElement;
+  green: HTMLElement;
+  fill: HTMLElement;
+  mark: HTMLElement;
+  status: HTMLElement;
+}
+
+function failureStrip(
+  rootClass: string,
+  heading: string,
+  marker: string,
+  initialStatus: string,
+): FailureStrip {
+  const root = document.createElement('div');
+  root.className = rootClass;
+  root.innerHTML = `
+    <div class="fuse-heading">
+      <span>${heading}</span>
+      <span class="fuse-threshold">${marker}</span>
+    </div>
+    <div class="fuse-scale">
+      <div class="fuse-green"></div>
+      <div class="fuse-fill"></div>
+      <div class="fuse-mark"></div>
+    </div>
+    <div class="fuse-status">${initialStatus}</div>`;
+  return {
+    root,
+    green: root.querySelector<HTMLElement>('.fuse-green')!,
+    fill: root.querySelector<HTMLElement>('.fuse-fill')!,
+    mark: root.querySelector<HTMLElement>('.fuse-mark')!,
+    status: root.querySelector<HTMLElement>('.fuse-status')!,
+  };
 }
 
 /**
@@ -141,24 +255,12 @@ export function fusible(
   onBurn?: () => void,
 ): FusibleHandle {
   let fuseState: FuseState = { overloads: 0, burned: false };
-  const root = document.createElement('div');
-  root.className = 'fuse';
-  root.innerHTML = `
-    <div class="fuse-heading">
-      <span>Fusible</span>
-      <span class="fuse-threshold">umbral: ${threshold}</span>
-    </div>
-    <div class="fuse-scale">
-      <div class="fuse-green"></div>
-      <div class="fuse-fill"></div>
-      <div class="fuse-mark"></div>
-    </div>
-    <div class="fuse-status">tolerancia disponible</div>`;
-
-  const green = root.querySelector<HTMLElement>('.fuse-green')!;
-  const fill = root.querySelector<HTMLElement>('.fuse-fill')!;
-  const mark = root.querySelector<HTMLElement>('.fuse-mark')!;
-  const status = root.querySelector<HTMLElement>('.fuse-status')!;
+  const { root, green, fill, mark, status } = failureStrip(
+    'fuse',
+    'Fusible',
+    `umbral: ${threshold}`,
+    'tolerancia disponible',
+  );
   const thresholdPct = Math.min(100, (threshold / maxValue) * 100);
   green.style.width = `${thresholdPct}%`;
   mark.style.left = `${thresholdPct}%`;
@@ -197,6 +299,91 @@ export function fusible(
 
       root.classList.add('warning');
       status.textContent = `aviso ${fuseState.overloads} de 3`;
+      return 'warning';
+    },
+    reset,
+  };
+}
+
+/* ---------- Canales reparables ---------- */
+
+export interface ChannelCutState {
+  insistences: number;
+  cut: boolean;
+}
+
+export type ChannelCutResult = 'ok' | 'warning' | 'cut';
+
+export function advanceChannelCut(state: ChannelCutState, level: HeatLevel): ChannelCutState {
+  const next = advanceInsistence(
+    { insistences: state.insistences, failed: state.cut },
+    level === 'rojo',
+  );
+  return { insistences: next.insistences, cut: next.failed };
+}
+
+export interface BreakableChannelHandle {
+  element: HTMLElement;
+  state(): ChannelCutState;
+  setLevel(level: HeatLevel): ChannelCutResult;
+  reset(): void;
+}
+
+/**
+ * Canal reparable. El consumidor decide cómo se reempalma y llama reset()
+ * desde su acción diegética; el widget administra aviso, vibración y corte.
+ */
+export function canalCortable(
+  label = 'Canal',
+  onCut?: () => void,
+): BreakableChannelHandle {
+  let channelState: ChannelCutState = { insistences: 0, cut: false };
+  const { root, green, fill, mark, status } = failureStrip(
+    'breakable-channel',
+    label,
+    'límite: al rojo',
+    'canal continuo',
+  );
+  green.style.width = '75%';
+  mark.style.left = '75%';
+
+  const fillByLevel: Record<HeatLevel, number> = {
+    frio: 25,
+    tibio: 50,
+    caliente: 75,
+    rojo: 100,
+  };
+
+  const reset = () => {
+    channelState = { insistences: 0, cut: false };
+    root.classList.remove('warning', 'cut');
+    status.textContent = 'canal continuo';
+    fill.style.width = '0%';
+  };
+
+  return {
+    element: root,
+    state: () => ({ ...channelState }),
+    setLevel(level: HeatLevel) {
+      fill.style.width = `${fillByLevel[level]}%`;
+      if (channelState.cut) return 'cut';
+      if (level !== 'rojo') {
+        root.classList.remove('warning');
+        status.textContent = 'canal estable';
+        return 'ok';
+      }
+
+      channelState = advanceChannelCut(channelState, level);
+      if (channelState.cut) {
+        root.classList.remove('warning');
+        root.classList.add('cut');
+        status.textContent = 'canal cortado';
+        onCut?.();
+        return 'cut';
+      }
+
+      root.classList.add('warning');
+      status.textContent = `vibra · aviso ${channelState.insistences} de 3`;
       return 'warning';
     },
     reset,

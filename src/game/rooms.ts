@@ -9,6 +9,7 @@ import { abrirChain } from '../puzzles/chain';
 import { abrirBranches } from '../puzzles/branches';
 import { abrirDistributor } from '../puzzles/distributor';
 import { abrirTimbre } from '../puzzles/timbre';
+import { abrirWarmth } from '../puzzles/warmth';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -399,6 +400,17 @@ function hablarForjadoraPatio(): void {
       setFlag('metForjadora');
       hooks.refresh();
     },
+  );
+}
+
+function abrirBancoWarmth(): void {
+  abrirWarmth(
+    () => {
+      setFlag('solvedWarmChannel');
+      notifyNewEntry('El peaje');
+      hooks.refresh();
+    },
+    f().solvedWarmChannel,
   );
 }
 
@@ -1380,8 +1392,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-canal-tibio', x: 480, y: 390, w: 200, h: 76,
         label: 'Banco del canal tibio', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(F2)
-        onInteract: () => say(L('', 'El banco todavía no está disponible.')),
+        onInteract: abrirBancoWarmth,
       },
       {
         id: 'forjadora-patio', x: 335, y: 320, w: 40, h: 40, shape: 'circle',

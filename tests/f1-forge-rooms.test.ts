@@ -40,8 +40,8 @@ equal(
 );
 equal(
   (roomsSource.match(/\/\/ TODO\(F[2345]\)/g) ?? []).length,
-  4,
-  'los cuatro bancos quedan marcados para sus hitos',
+  3,
+  'los bancos F3-F5 quedan marcados para sus hitos',
 );
 
 for (const text of [
