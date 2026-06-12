@@ -541,7 +541,7 @@ La entrada mayor de la unidad:
 > El río no se gasta. Se reparte.
 > Lo que entra en un cruce, sale del cruce.
 
-Con la red del Repartidor dibujada y las tres soluciones equivalentes anotadas. Nombres verdaderos: **serie**, **paralelo**, **nodo**. Nota al pie, en letra de la Bitácora: *«Mucho después, alguien le puso su apellido a la regla del cruce: Kirchhoff. Pero el cruce ya la sabía.»* **Pregunta:** ✎ El timbre de la escuela tiene dos caminos. ¿Para qué, ahora que lo sabes?
+Con la red del Repartidor dibujada y las dos soluciones equivalentes anotadas. Nombres verdaderos: **serie**, **paralelo**, **nodo**. Nota al pie, en letra de la Bitácora: *«Mucho después, alguien le puso su apellido a la regla del cruce: Kirchhoff. Pero el cruce ya la sabía.»* **Pregunta:** ✎ El timbre de la escuela tiene dos caminos. ¿Para qué, ahora que lo sabes?
 
 ---
 

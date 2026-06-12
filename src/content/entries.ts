@@ -146,5 +146,106 @@ export function getEntries(): EntryView[] {
     });
   }
 
+  if (f.solvedBellPaths) {
+    out.push({
+      id: 'dos-caminos',
+      title: 'Dos caminos',
+      fecha: 'Ohmdal — la plaza',
+      vivencial: `
+        <p>Medición de la campana: medio río y medio río; el tronco lleva todo;
+        un camino abierto no pierde su río — se muda al hermano.</p>
+        <p>Los Maestros duplicaban caminos como promesa, no como gasto.</p>`,
+      formal: `
+        ${f.learnedSeriesParallel
+          ? `<h4>Nombre verdadero</h4>
+             <p>En un cruce, la corriente se reparte entre los caminos; la suma de
+             lo que sale es igual a lo que entra.</p>
+             <h4>Error común</h4>
+             <p>Creer que la corriente «se gasta» al repartirse.</p>`
+          : `<p class="blank">Los Maestros tenían un nombre para esto.
+             Todavía no lo encontré.</p>`}`,
+    });
+  }
+
+  if (f.solvedGalleryChain) {
+    out.push({
+      id: 'la-cadena',
+      title: 'La Cadena',
+      fecha: 'Ohmdal — el Castillo',
+      vivencial: `
+        <p>Todas las lámparas igual de tenues; quitar una mata todas;
+        Ohm midió el mismo río en cada punto de la fila.</p>`,
+      formal: `
+        ${f.learnedSeriesParallel
+          ? `<h4>Nombre verdadero</h4>
+             <p>Eso se llama <strong>circuito en serie</strong>: un solo camino,
+             una sola corriente, y las resistencias <strong>se suman</strong>.</p>
+             <p>Las lámparas en serie no se reparten corriente: la comparten entera,
+             frenándola entre todas.</p>
+             <h4>Error común</h4>
+             <p>«La primera lámpara brilla más» — no: en serie no hay primera ni
+             última para el río.</p>
+             <div class="pregunta">✎ ¿Las luces de tu casa estarán en fila?
+             Pista: ¿qué pasa cuando se quema una sola?</div>`
+          : `<p class="blank">Los Maestros tenían un nombre para esto.
+             Todavía no lo encontré.</p>`}`,
+    });
+  }
+
+  if (f.solvedBranches) {
+    out.push({
+      id: 'los-ramales',
+      title: 'Los Ramales',
+      fecha: 'Ohmdal — el Castillo',
+      vivencial: `
+        <p>Cada rama cobró según su piedra; conectar una rama no cambió a las otras;
+        el Tronco pagó la suma${f.burnedTrunkFuse
+          ? ' y el Fusible mayor se inmoló cuando pedimos de más.'
+          : '.'}</p>`,
+      formal: `
+        ${f.learnedSeriesParallel
+          ? `<h4>Nombre verdadero</h4>
+             <p>Eso se llama <strong>circuito en paralelo</strong>: cada rama recibe
+             el mismo Empuje y toma su propia corriente
+             (<strong>I = V/R</strong>, ¡la de la Puerta!, una vez por rama).
+             La fuente entrega la suma.</p>
+             <h4>Error común</h4>
+             ${f.burnedTrunkFuse
+               ? `<p>«Agregar ramas es gratis» — cada rama nueva es corriente nueva
+                  que el Tronco debe poder llevar. El Fusible mayor se inmoló cuando
+                  pedimos de más.</p>`
+               : `<p class="blank">(Aquí hay dibujado el Fusible mayor, pero todavía
+                  no se inmoló. ¿Qué pasa si conecto las tres ramas con piedras
+                  glotonas, marrón en todas, en modo práctica? …No lo probé.)</p>`}`
+          : `<p class="blank">Los Maestros tenían un nombre para esto.
+             Todavía no lo encontré.</p>`}`,
+    });
+  }
+
+  if (f.learnedSeriesParallel) {
+    out.push({
+      id: 'regla-del-cruce',
+      title: 'La Regla del Cruce',
+      fecha: 'Ohmdal — el Castillo',
+      vivencial: `
+        <p><strong>El río no se gasta. Se reparte.</strong><br/>
+        Lo que entra en un cruce, sale del cruce.</p>
+        <p>Con la red del Repartidor dibujada y las dos soluciones equivalentes
+        anotadas.</p>`,
+      formal: `
+        <h4>Los nombres verdaderos</h4>
+        <table>
+          <tr><th>En Ohmdal</th><th>Nombre verdadero</th></tr>
+          <tr><td>La Cadena</td><td><strong>serie</strong></td></tr>
+          <tr><td>Los Ramales</td><td><strong>paralelo</strong></td></tr>
+          <tr><td>El Cruce</td><td><strong>nodo</strong></td></tr>
+        </table>
+        <p><em>Mucho después, alguien le puso su apellido a la regla del cruce:
+        Kirchhoff. Pero el cruce ya la sabía.</em></p>
+        <div class="pregunta">✎ El timbre de la escuela tiene dos caminos.
+        ¿Para qué, ahora que lo sabes?</div>`,
+    });
+  }
+
   return out;
 }
