@@ -224,11 +224,18 @@ Detrás de la Forja, un canal angosto de doscientos pasos cruza el patio viejo h
 
 Si el jugador encuentra B y C: **Ohm:** «Misma entrega. Peaje distinto. La Forjadora prefiere el frío.»
 
-Resolución (con B o C): el horno lejano respira, y la Forjadora apoya la mano en el canal — y la deja ahí.
+Resolución (con B o C): el horno lejano respira, y la Forjadora apoya la mano en el canal — y la deja ahí. Su primera línea depende del camino:
 
-**Forjadora:**
+**Forjadora** *(si resolvió con B — canal frío)*:
 
 > Frío. El horno a fuego pleno y el canal frío.
+
+**Forjadora** *(si resolvió con C — canal tibio)*:
+
+> Tibio. Apenas tibio, con el horno a fuego pleno. Treinta años creyendo que esto no se podía.
+
+Y en ambos casos continúa:
+
 > El río no se gasta. El río trabaja. Y el trabajo se paga. …Por fin alguien que lo dice con números.
 
 **Edda:**
