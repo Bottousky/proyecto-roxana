@@ -406,7 +406,7 @@ En el suelo, un mosaico: un río que entra a un cruce y sale en tres brazos, con
 **Duración:** 6–9 minutos.
 **Vista de banco:** elegir cristal de Empuje (4 / 8 / 16); una rama por distrito con engaste de piedra; aguja por distrito (cada una con SU zona verde, distinta) + aguja de Tronco con tolerancia 8; Ohm caminante por toda la red; fusibles de repuesto de Lumen (reset diegético con comentario distinto cada vez, como la Puerta de Ohm).
 
-Solución canónica (no única): Empuje 8 — forja con roja (4), campanario con amarilla (2), biblioteca con gris (1). Tronco: 7 de 8. **Soluciones alternativas válidas** con Empuje 4 o 16 y otras piedras: el banco las acepta todas; Ohm celebra la equivalencia («Otra red. El mismo reparto.»).
+Solución canónica (no única): Empuje 8 — forja con roja (4), campanario con amarilla (2), biblioteca con gris (1). Tronco: 7 de 8. **Solución alternativa válida** con Empuje 4 — forja con marrón (4), campanario con roja (2), biblioteca con amarilla (1), Tronco 7: el banco acepta ambas; Ohm celebra la equivalencia («Otra red. El mismo reparto.»). **Con Empuje 16 no existe solución** con una piedra por rama (la biblioteca pediría una piedra de 16): es deliberado — el cristal más fuerte no siempre es el mejor, y descubrirlo en el banco es parte de la lección. *(Corregido tras revisión de implementación: la versión anterior de este doc afirmaba erróneamente que el Empuje 16 tenía soluciones.)*
 
 Feedback de fallo (siempre información, nunca castigo):
 
