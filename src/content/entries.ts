@@ -262,5 +262,124 @@ export function getEntries(): EntryView[] {
     });
   }
 
+  /* ============ UNIDAD 3 — La Forja ============ */
+
+  if (f.solvedWarmChannel) {
+    out.push({
+      id: 'el-peaje',
+      title: 'El peaje',
+      fecha: 'La Forja — el patio',
+      vivencial: `
+        <p>Ohm apoyó la mano en los canales y reportó el calor de cada uno.</p>
+        <p>El mismo río por un canal ancho: frío. Por uno angosto: al rojo.
+        El río no cambió — cambió el cauce.</p>
+        <p>El canal viejo, sin río, estaba helado. Cien años y helado.
+        Así que no es la edad.</p>
+        <p>Al duplicar el río del yunque, el termómetro saltó de tibio a al rojo
+        de un golpe, sin pasar por caliente. Dos niveles de un salto.</p>`,
+      formal: f.learnedPower
+        ? `
+        <h4>El efecto Joule</h4>
+        <p>El calor que cobra el canal crece mucho más rápido que el río:
+        «el doble de río, cuatro veces el peaje» — medido, no formulado.
+        No es fantasma ni vejez: es el precio del paso.</p>
+        <h4>Error común</h4>
+        <p>«El calor es porque el cable está viejo.» El canal nuevo con río grande
+        calienta igual: el peaje depende del río y del cauce, no de la edad.</p>`
+        : `<p class="blank">La Bitácora tiene espacio para el nombre de esto.
+           Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.solvedFuseInfirmary) {
+    out.push({
+      id: 'martir-margen',
+      title: 'El mártir y el margen',
+      fecha: 'La Forja — enfermería de fusibles',
+      vivencial: `
+        <p>El fusible justo muere al arrancar: el pico de arranque lo supera,
+        y se va antes de que la máquina empiece a trabajar.</p>
+        <p>El fusible demasiado gordo no salta nunca — y deja morir al canal.
+        El canal cuesta una semana. El fusible, un cobre.</p>
+        <p>Lumen lo resumió: un mártir por año es santidad. Uno por semana es
+        mal cálculo. La respuesta era margen: elegir el margen.</p>
+        ${f.burnedChannelDemo
+          ? `<h4>El canal cortado</h4>
+             <p>Vi el canal cortarse cuando el fusible gordo no lo protegió.
+             La Forjadora lo reemplazó. Entendí por qué el gordo no era un santo:
+             era un cómplice.</p>`
+          : `<p class="blank">(Hay un espacio en blanco aquí. La demo del fusible
+             gordo se puede revisar en modo práctica en la enfermería.)</p>`}`,
+      formal: f.learnedPower
+        ? `
+        <h4>El fusible y el margen</h4>
+        <p>El fusible correcto es el menor calibre que el pico de arranque no supera,
+        y que salte antes de que el canal llegue al rojo. Con margen sobre el pico
+        y por debajo de lo que aguanta el canal.</p>
+        <h4>Error común</h4>
+        <p>«Más grande aguanta más.» Un fusible que no puede morir no protege nada:
+        deja morir a lo que está detrás.</p>`
+        : `<p class="blank">Los Maestros tenían un nombre para esto.
+           Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.solvedLongChannel) {
+    out.push({
+      id: 'la-entrega',
+      title: 'La Entrega',
+      fecha: 'La Forja — el Canal Largo',
+      vivencial: `
+        <p>El horno lejano pedía entrega 16. Con río 4 por el canal angosto,
+        la entrega llegaba — pero el canal se ponía al rojo.</p>
+        <p>Con mucho empuje y poco río, la misma entrega 16 llegaba al horno
+        y el canal quedaba frío. O tibio, al límite justo.
+        El horno no distinguía. El canal, sí.</p>
+        <p>La Forjadora apoyó la mano en el canal y la dejó ahí:
+        «El río no se gasta. El río trabaja. Y el trabajo se paga.
+        …Por fin alguien que lo dice con números.»</p>`,
+      formal: f.learnedPower
+        ? `
+        <h4>Potencia = empuje × río (P = V·I)</h4>
+        <p>Lo que llega al horno no es río: es empuje multiplicado por río.
+        El vatio es la unidad de esa entrega. La misma entrega puede viajar
+        con poco río y mucho empuje — y el canal agradece el río pequeño.</p>
+        <div class="pregunta">✎ ¿Por qué los cables que cruzan el campo van
+        tan alto y con tanto empuje?</div>`
+        : `<p class="blank">La Bitácora tiene espacio para el nombre de esto.
+           Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.learnedPower) {
+    out.push({
+      id: 'el-jornal',
+      title: 'El Jornal',
+      fecha: 'La Forja — nave mayor',
+      vivencial: `
+        <p>La Forja cantó. Los tres ritmos se trabaron en un compás: el Martillo marcaba,
+        el Fuelle respiraba, la Lumbre sostenía.</p>
+        <p>La Consejera abrió un libro nuevo, flamante, y leyó los números del inventario
+        en voz alta. La Bitácora ardió y se abrió sola.</p>`,
+      formal: `
+        <h4>Energía = potencia × tiempo</h4>
+        <p>La Consejera abrió su libro y leyó el inventario de la Forja encendida:</p>
+        <table>
+          <tr><th>Máquina</th><th>Jornales por hora</th></tr>
+          <tr><td>Martillo</td><td>32</td></tr>
+          <tr><td>Fuelle</td><td>16</td></tr>
+          <tr><td>Lumbre</td><td>8</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>56</strong></td></tr>
+        </table>
+        <p>Y luego, del libro viejo: los lacres ceremoniales del Consejo consumían
+        9 jornales por hora. La biblioteca, 8.
+        Cuarenta años lacrando puertas con más entrega de la que ahorraban al lacrarlas.</p>
+        <p><em>Mucho después, a la entrega le pusieron Watt, y al jornal, joule.
+        El peaje también se llama joule. No es casualidad: es la misma moneda.</em></p>
+        <div class="pregunta">✎ Busca en tu casa un aparato que diga "W".
+        Ese número es su hambre.</div>`,
+    });
+  }
+
   return out;
 }

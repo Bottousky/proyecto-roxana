@@ -516,6 +516,41 @@ function abrirBancoForge(): void {
   });
 }
 
+/* ---------- F6: cierre de la Unidad 3 ---------- */
+
+function checkUnit3Complete(): void {
+  if (!f().learnedPower || f().unit3Completed) return;
+  setFlag('unit3Completed');
+  const entradas = getEntries().length;
+  const canales = f().burnedChannelDemo
+    ? 'Canales cortados: sí. (La Forjadora ya casi no te lo cobra.)'
+    : 'Canales cortados: ninguno.';
+  showEnd({
+    title: 'Fin de la Unidad 3 — «El precio del río»',
+    note: `
+      Entradas en la Bitácora: ${entradas} · 56 jornales por hora, anotados.<br/>
+      ${canales}<br/><br/>
+      <em>Las Terrazas esperan: el empuje que baja por escalones.</em>
+    `,
+    continueLabel: 'Continuar',
+    onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+  });
+}
+
+function verElValle(): void {
+  say(
+    [
+      L('Edda', '¿Ves el valle, allá abajo? Las Terrazas. El acueducto de cobre de los Maestros.'),
+      L('Edda', 'Riega por niveles. O regaba.'),
+      L('Forjadora', 'Mi hierro va a las Terrazas desde siempre. La guardiana es de fiar — pero está paralizada: dice que el empuje «baja por escalones» y que la terraza más baja casi no recibe.'),
+      L('Forjadora', 'Treinta años sin tocar una piedra. Por miedo a que tocar una mueva todas. …Y lo peor es que tiene razón: mueve todas.'),
+      L('Ohm', 'Dato: correcto. Conclusión: incompleta. Lo que mueve todas… se puede contar todo.'),
+      L('Edda', '(sonríe) Eso suena a próxima lección.'),
+    ],
+    () => checkUnit3Complete(),
+  );
+}
+
 /* ---------- las salas ---------- */
 
 export const ROOMS: Record<string, RoomDef> = {
@@ -1508,6 +1543,23 @@ export const ROOMS: Record<string, RoomDef> = {
         color: 0x725d79, solid: true, emoji: '💬',
         onInteract: () =>
           say(L('Consejera', 'Eso vine a preguntar. Medimos el río: no se gasta. Lo demostraron ustedes. Entonces, ¿qué es lo que falta cada mañana?')),
+      },
+      /* F6: Edda mirando el valle — gancho a las Terrazas */
+      {
+        id: 'edda-patio-forja', x: 660, y: 420, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().learnedPower && !f().unit3Completed,
+        onInteract: verElValle,
+      },
+      /* F6: alternativa sin Edda — «Mirar el valle» tras unit3Completed */
+      {
+        id: 'mirar-el-valle', x: 660, y: 420, w: 34, h: 34,
+        label: 'El valle', prompt: 'Mirar el valle',
+        color: 0x4a6a7a, solid: false, emoji: '🏔️',
+        visible: () => f().unit3Completed,
+        onInteract: () =>
+          say(L('', 'El valle se abre abajo: las Terrazas, el acueducto de los Maestros. Las Terrazas esperan.')),
       },
     ],
     onEnter: () => setAmbience('forge'),
