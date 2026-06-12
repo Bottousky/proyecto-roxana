@@ -383,6 +383,68 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
   100% { box-shadow: inset 0 0 0 rgba(255,255,255,0); }
 }
 
+.distributor-sources { justify-content: center; margin-bottom: 10px; }
+.distributor-source:disabled { opacity: .55; cursor: default; }
+.distributor-stage {
+  display: grid; grid-template-columns: 1fr 210px; gap: 14px; align-items: center;
+}
+.distributor-network { min-width: 0; }
+.distributor-crystal {
+  width: max-content; margin: 0 auto; padding: 6px 14px; border-radius: 8px;
+  border: 2px solid #8a7c50; color: #f1dda8; background: #45382a; font-size: 12px;
+  box-shadow: 0 0 12px rgba(255,211,77,.22);
+}
+.distributor-trunk {
+  width: 12px; height: 34px; margin: 0 auto; border-radius: 6px; background: #5d5868;
+}
+.distributor-crossing {
+  width: 70px; height: 36px; margin: 0 auto 9px; display: grid; place-items: center;
+  border-radius: 50%; border: 3px solid #8a7c50; background: #26222e;
+  color: #d8cfc0; font-size: 11px;
+}
+.distributor-trunk.live, .distributor-wire.live {
+  background: var(--accent); box-shadow: 0 0 9px rgba(255,211,77,.7);
+}
+.distributor-districts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.distributor-district {
+  min-width: 0; padding: 8px; border: 1px solid #5d5868; border-radius: 9px;
+  background: #211e29; text-align: center;
+}
+.distributor-district.green {
+  border-color: var(--ok); box-shadow: inset 0 0 0 1px rgba(126,196,106,.25);
+}
+.distributor-district.wrong { border-color: rgba(205,102,82,.65); }
+.distributor-district h3 { margin: 3px 0 5px; font-size: 13px; color: #d8cfc0; }
+.distributor-wire {
+  width: 6px; height: 20px; margin: -8px auto 3px; border-radius: 4px; background: #5d5868;
+}
+.distributor-emblem {
+  width: 34px; height: 28px; margin: 0 auto 2px; border: 2px solid #8a7c50;
+  border-radius: 7px; background: #342f3d;
+}
+.distributor-district.forja .distributor-emblem { box-shadow: inset 0 0 13px #8c3e2d; }
+.distributor-district.campanario .distributor-emblem { border-radius: 50% 50% 7px 7px; }
+.distributor-district.biblioteca .distributor-emblem {
+  border-radius: 2px; background: linear-gradient(90deg, #342f3d 47%, #8a7c50 48% 52%, #342f3d 53%);
+}
+.distributor-district-gauge .gauge { max-width: 150px !important; margin: -5px auto -8px; }
+.distributor-target, .distributor-river, .distributor-gauge-label {
+  color: #a99; font-size: 10px;
+}
+.distributor-river { margin: 3px 0 7px; color: var(--accent); }
+.distributor-stones { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+.distributor-stones .piedra { min-width: 0; padding: 5px 3px; font-size: 10px; }
+.distributor-stones .piedra[aria-disabled="true"] { pointer-events: none; opacity: .55; }
+.distributor-instruments {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.distributor-trunk-gauge { text-align: center; }
+.distributor-trunk-reading { margin-top: 3px; color: var(--accent); font-size: 11px; }
+.distributor-fuse { margin: 10px auto 0; }
+.distributor-probes .ohm-probes { justify-content: center; }
+.distributor-stage.burned { animation: trunk-flash .35s ease-out; }
+.distributor-stage.burned .distributor-emblem { opacity: .18; box-shadow: none; }
+
 /* ---------- Bitácora ---------- */
 #bitacora {
   position: absolute; inset: 0; z-index: 60;
@@ -541,4 +603,7 @@ body.touch-device #prompt { display: none !important; }
   .branches-stage { grid-template-columns: 1fr; }
   .branches-cards { grid-template-columns: 1fr; }
   .branches-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+  .distributor-stage { grid-template-columns: 1fr; }
+  .distributor-districts { grid-template-columns: 1fr; }
+  .distributor-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
 }

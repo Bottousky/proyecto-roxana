@@ -7,6 +7,7 @@ import { abrirPuerta } from '../puzzles/puerta';
 import { abrirBell } from '../puzzles/bell';
 import { abrirChain } from '../puzzles/chain';
 import { abrirBranches } from '../puzzles/branches';
+import { abrirDistributor } from '../puzzles/distributor';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal } from '../audio';
@@ -261,6 +262,33 @@ function abrirBancoRamales(): void {
     onSolved: () => {
       setFlag('solvedBranches');
       notifyNewEntry('Los Ramales');
+      hooks.refresh();
+    },
+  });
+}
+
+let distributorIntroSeen = false;
+
+function presentarCorazonCastillo(): void {
+  if (distributorIntroSeen || f().solvedDistributor) return;
+  distributorIntroSeen = true;
+  say([
+    L('Lumen', 'El Repartidor. Mi maestro decía que aquí los Maestros «le enseñaban al río a contar».'),
+    L('Consejera', 'El Consejo lo selló primero. Dijimos: si el corazón no gasta, el cuerpo conserva.'),
+    L('Edda', 'Y el cuerpo se apagó entero. Qué manera de conservar.'),
+  ]);
+}
+
+function abrirBancoDistributor(): void {
+  abrirDistributor({
+    practica: f().solvedDistributor,
+    onBurnedFuse: () => setFlag('burnedTrunkFuse'),
+    onSolved: () => {
+      setFlag('solvedDistributor');
+      setFlag('castleRestored');
+      setFlag('learnedSeriesParallel');
+      notifyNewEntry('La Regla del Cruce');
+      openBitacora('regla-del-cruce');
       hooks.refresh();
     },
   });
@@ -760,8 +788,8 @@ export const ROOMS: Record<string, RoomDef> = {
   castle_gate: {
     id: 'castle_gate',
     name: 'Ohmdal — Puerta del Castillo',
-    floor: () => 0x201b25,
-    wall: () => 0x342b38,
+    floor: () => (f().castleRestored ? 0x35271f : 0x201b25),
+    wall: () => (f().castleRestored ? 0x5a4332 : 0x342b38),
     doors: [
       {
         x: 934, y: 220, w: 26, h: 110,
@@ -841,8 +869,8 @@ export const ROOMS: Record<string, RoomDef> = {
   castle_gallery: {
     id: 'castle_gallery',
     name: 'Castillo de Ohmdal — La Galería en Cadena',
-    floor: () => 0x24212a,
-    wall: () => 0x393341,
+    floor: () => (f().castleRestored ? 0x382d23 : 0x24212a),
+    wall: () => (f().castleRestored ? 0x5b4735 : 0x393341),
     doors: [
       {
         x: 420, y: 514, w: 120, h: 26,
@@ -925,8 +953,8 @@ export const ROOMS: Record<string, RoomDef> = {
   castle_branches: {
     id: 'castle_branches',
     name: 'Castillo de Ohmdal — Sala de los Ramales',
-    floor: () => 0x211f27,
-    wall: () => 0x34303b,
+    floor: () => (f().castleRestored ? 0x34291f : 0x211f27),
+    wall: () => (f().castleRestored ? 0x554333 : 0x34303b),
     doors: [
       {
         x: 420, y: 514, w: 120, h: 26,
@@ -1013,8 +1041,8 @@ export const ROOMS: Record<string, RoomDef> = {
   castle_heart: {
     id: 'castle_heart',
     name: 'Castillo de Ohmdal — El Corazón',
-    floor: () => 0x241f29,
-    wall: () => 0x3b303e,
+    floor: () => (f().castleRestored ? 0x3b2b20 : 0x241f29),
+    wall: () => (f().castleRestored ? 0x654936 : 0x3b303e),
     doors: [
       {
         x: 420, y: 514, w: 120, h: 26,
@@ -1035,17 +1063,20 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Mosaico del Cruce', prompt: 'Examinar el mosaico',
         color: 0x4f5660, solid: false,
         onInteract: () =>
-          say(L('', 'En el suelo, un mosaico: un río que entra a un cruce y sale en tres brazos, con la inscripción gastada que se revelará al final.')),
+          say(
+            L(
+              '',
+              f().castleRestored
+                ? '«Lo que entra en el cruce, sale del cruce. Nada se pierde. Todo se reparte.»'
+                : 'En el suelo, un mosaico: un río que entra a un cruce y sale en tres brazos, con la inscripción gastada que se revelará al final.',
+            ),
+          ),
       },
       {
         id: 'banco-repartidor', x: 180, y: 315, w: 190, h: 76,
         label: 'Banco del Repartidor', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        onInteract: () => {
-          // TODO(M6): abrir el puzzle del Repartidor.
-          // TODO(guion): falta una línea ambiente para el placeholder del banco.
-          say(L('', 'El banco aún no responde.'));
-        },
+        onInteract: abrirBancoDistributor,
       },
       {
         id: 'consejera-corazon', x: 745, y: 330, w: 38, h: 38, shape: 'circle',
@@ -1083,5 +1114,6 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () => say(L('', 'Ohm observa el Repartidor en silencio.')),
       },
     ],
+    onEnter: presentarCorazonCastillo,
   },
 };
