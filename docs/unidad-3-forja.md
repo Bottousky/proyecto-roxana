@@ -1,15 +1,15 @@
 # Proyecto Roxana — Ohmdal, Unidad 3
 # “El precio del río”
 
-**Versión:** 0.1 — propuesta de diseño (nivel medio de detalle: estructura, puzzles con números y beats de diálogo; el guion línea por línea se escribe antes del build, como se hizo con la U2)
+**Versión:** 0.2 — guion detallado listo para build (diálogos finales; los ejecutores copian textual)
 **Alcance:** Unidad 3 completa: de la forja que entibia (gancho de la U2) hasta la Forja restaurada y el gancho a las Terrazas (U4).
 **Tema técnico:** potencia y energía — P = V·I, efecto Joule, dimensionado de conductores y fusibles, energía = potencia × tiempo.
 **Requisito narrativo:** Unidad 2 completada (`unit2Completed`, Castillo encendido).
-**Estado:** borrador para revisar con el autor. Nada implementado.
+**Estado:** guion aprobado para construcción. Plan de hitos: `plan-implementacion-u3.md`.
 
 ---
 
-## A. Síntesis de la unidad (canon propuesto)
+## A. Síntesis de la unidad (canon)
 
 ### A.1. Premisa
 
@@ -17,11 +17,11 @@ El Castillo encendido despertó a la Forja, el distrito hambriento de la U2. La 
 
 > **«Si el río no se gasta… ¿qué es lo que estamos pagando?»**
 
-La unidad entera responde con las manos: el río no se gasta, pero el río **trabaja** — y el trabajo se paga. Lo que se entrega no es río: es **empuje por caudal**. Y todo canal cobra **peaje en calor** según cuánto río lleva.
+La unidad responde con las manos: el río no se gasta, pero el río **trabaja** — y el trabajo se paga. Lo que se entrega no es río: es **empuje por caudal**. Y todo canal cobra **peaje en calor** según cuánto río lleva.
 
-Es la finura pedagógica del arco: en la U2 desmentimos «la corriente se gasta»; acá la refinamos antes de que se convierta en el error opuesto («entonces nada cuesta nada»). Algo SÍ se entrega. Distinguir el río de lo que el río entrega es distinguir corriente de energía.
+Es la finura pedagógica del arco: en la U2 desmentimos «la corriente se gasta»; acá la refinamos antes de que se convierta en el error opuesto («entonces nada cuesta nada»).
 
-Frase central de la unidad:
+Frase central:
 
 > El río no se gasta. El río trabaja. Y el trabajo se paga.
 
@@ -29,115 +29,316 @@ Frase central de la unidad:
 
 | Técnico | Diegético | Momento de conversión |
 |---|---|---|
-| potencia (P = V·I) | la Entrega («lo que el río entrega») | Bitácora, tras encender la Forja |
-| efecto Joule (calor en el conductor) | el Peaje («todo canal cobra peaje en calor») | Bitácora, tras encender la Forja |
-| energía (P × t) | el Jornal («entrega sostenida un tiempo») | Bitácora, tras encender la Forja |
-| sección / calibre del conductor | el grosor del canal (angosto / medio / ancho) | es físico, no se convierte: se ve |
-| disipación, sobrecarga | canal frío / tibio / caliente / al rojo | ídem |
+| potencia (P = V·I) | la Entrega | Bitácora, tras encender la Forja |
+| efecto Joule | el Peaje | Bitácora, tras encender la Forja |
+| energía (P × t) | el Jornal | Bitácora, tras encender la Forja |
+| sección del conductor | el grosor del canal (angosto / medio / ancho) | físico, se ve |
+| disipación, sobrecarga | canal frío / tibio / caliente / al rojo | físico, se ve |
 
-El instrumento nuevo es el **termómetro de canal**: una aguja de calor que se apoya sobre cualquier tramo. (Patrón U1: cada arco de aprendizaje trae UNA aguja nueva.)
+Instrumento nuevo: el **termómetro de canal** (Ohm gana el modo termómetro: apoya la mano sobre un tramo y reporta el calor).
 
-### A.3. Diseño de puzzles — una variable nueva por puzzle
+### A.3. Matemática canónica (enteros, decidida — los ejecutores no la cambian)
 
-| Puzzle | Concepto | Manipulación | Feedback de fallo |
-|---|---|---|---|
-| El canal tibio | el calor existe y depende del río, no del tiempo de uso | medir con el termómetro tramos con distinto río | ninguno: medición pura (tutorial) |
-| La enfermería de fusibles | el fusible se elige con margen: ni mártir ni inútil | elegir calibre de fusible por máquina | fusible joven muere al arrancar; fusible gordo deja quemar el canal |
-| El Canal Largo | misma entrega, dos maneras: empuje alto paga menos peaje | elegir cristal + piedras para alimentar el horno lejano | canal al rojo (la entrega llega, pero el peaje se come el resto) |
-| La Forja completa (evento mayor) | dimensionar una red real: entrega, grosor, fusible por rama | configurar toda la red de la Forja | máquinas hambrientas, canales calientes o mártires en serie; el fallo informa |
+- **Río** = Empuje / Piedra. **Entrega** = Empuje × Río. Piedras marrón 1 / roja 2 / amarilla 4 / gris 8; **filas de piedras se suman** (U2).
+- **Grosores de canal y termómetro:** angosto tolera río 2, medio 4, ancho 8. Termómetro: **frío** si río ≤ mitad de la tolerancia; **tibio** si ≤ tolerancia; **caliente** si ≤ 1.5×; **al rojo** si más. Un canal al rojo, a la **tercera insistencia, se corta** (reparable: la Forjadora lo reempalma, comentario distinto cada vez — patrón fusible de Lumen).
+- **Peaje cuadrático vivido:** duplicar el río en un mismo canal salta DOS niveles de termómetro («el doble de río, cuatro veces el peaje» — medido, jamás formulado).
+- **Arranque de máquina:** al arrancar, cada máquina pica el río a **río de trabajo + 1** por un instante. **Fusible** calibre 1/2/4/8: se inmola si el río lo supera (aviso/vibración antes, patrón U2). **Regla de la enfermería:** el fusible correcto es el menor calibre **mayor que el pico** de arranque y que **salte antes de que el canal llegue al rojo**.
 
-**Aritmética canónica** (cristales 4/8/16 y piedras marrón 1 / roja 2 / amarilla 4 / gris 8, heredados de U1–U2):
+### A.4. Misconcepciones que la unidad ataca
 
-- **Río** = Empuje / Piedra (la Puerta de Ohm, intacta).
-- **Entrega** = Empuje × Río. Con Empuje 8: marrón→río 8→entrega 64; roja→río 4→entrega 32; amarilla→río 2→entrega 16; gris→río 1→entrega 8.
-- **Peaje** del canal: crece con el río al cuadrado y baja con el grosor — en el juego es **cualitativo**: el termómetro marca frío / tibio / caliente / al rojo. Tolerancias de grosor propuestas: angosto aguanta río 2, medio río 4, ancho río 8 (por encima: caliente; muy por encima: al rojo y el canal se corta).
-- **El Canal Largo** (núcleo conceptual): entregar **entrega 16** al horno lejano.
-  - Camino A: Empuje 4 + marrón (1) → río 4 → entrega 16 ✓, pero el canal largo y angosto con río 4 se pone **al rojo**.
-  - Camino B: Empuje 16 + gris+gris en fila (8+8=16, ¡los frenos en fila se suman — U2 reusada!) → río 1 → entrega 16 ✓, canal **frío**.
-  - Misma entrega; peaje dieciséis veces menor. Es —sin decirlo— por qué la electricidad viaja con empuje alto. La Bitácora lo formaliza después como pregunta: ✎ *¿Por qué los cables que cruzan el campo van tan alto y con tanto empuje?*
-
-**Regla de reuso:** ninguna pieza de la U1–U2 se reemplaza; se agrega el termómetro y los grosores de canal. La fila de piedras de la U2 reaparece como herramienta (sumar frenos para bajar río).
-
-### A.4. Misconcepciones reales que la unidad ataca
-
-| Misconcepción documentada | Dónde se desmiente jugando |
+| Misconcepción | Dónde cae |
 |---|---|
-| «Si la corriente no se gasta, entonces nada se gasta» | el termómetro: el calor es real, medible, y alguien lo paga |
-| «Un cable es un cable» | el mismo río pone tibio al canal ancho y al rojo al angosto |
-| «Más grande siempre aguanta más» (fusibles) | el fusible gordo no muere… y deja que muera el canal: proteger es elegir el margen justo |
-| «El calor de los cables es porque están viejos / usados» | canal nuevo + río grande = caliente igual; el peaje depende del río, no de la edad |
-| «Potencia y corriente son lo mismo» | el Canal Largo: misma entrega con río 4 o con río 1 |
+| «Si la corriente no se gasta, nada se gasta» | el termómetro: el calor es real y alguien lo paga |
+| «Un cable es un cable» | mismo río: canal ancho tibio, angosto al rojo |
+| «Más grande siempre aguanta más» (fusibles) | el fusible gordo deja morir al canal |
+| «El calor es porque están viejos» | canal nuevo + río grande = caliente igual |
+| «Potencia y corriente son lo mismo» | el Canal Largo: misma entrega con río 4 o río 1 |
 
 ### A.5. Personajes
 
-- **La Forjadora** *(personaje nuevo — propuesta de nombre: **Brasa**; revisar con el autor si lleva nombre propio: es habitante de Ohmdal, no figura institucional, así que el canon de «sin nombre» no la alcanza)* — dueña del fuego, práctica, sin paciencia para doctrinas: ella SIEMPRE supo que algo se pagaba, porque su gremio lo paga en carbón desde hace generaciones. Su fricción no es creer/no creer: es que nadie le sepa decir **cuánto**. Es la clienta perfecta de la unidad: pide números, no consuelo.
-- **La Consejera** — regresa como aliada. Su arco: el libro de inventario, que en la U2 contaba un tesoro imaginario, acá por primera vez **cuenta algo real**: jornales (energía). La burocracia encuentra su redención: medir de verdad. Beat de humor: descubre con horror cuánta entrega derrochaban los sellos ceremoniales («los lacres del Consejo consumían más que la biblioteca»).
-- **Edda** — su arco de enseñar avanza: acá le explica el peaje a la Forjadora… y fracasa con palabras hasta que la deja **tocar el canal** con el termómetro. Aprende la regla de la casa: fenómeno antes que sermón.
-- **Maese Lumen** — duelo y gloria: la unidad lo obliga a aceptar que sus mártires (los fusibles) no eran héroes sino **mal elegidos**. La enfermería de fusibles es su escena: pasa de venerar el sacrificio a calcular el margen. («Un mártir por año es santidad. Uno por semana es mal cálculo.»)
-- **Ohm** — gana el modo termómetro además del de río (sigue siendo el medidor vivo). Cero backstory nueva: la reserva no se gasta.
-
-### A.6. Estado de implementación
-
-Sin construir. Patrón U1/U2: salas top-down + vistas de banco + Bitácora. Piezas de banco nuevas: termómetro de canal, selector de grosor (angosto/medio/ancho), fusibles con calibre visible, máquina de forja con placa de entrega. Escala greybox: Forja = 2–3 salas nuevas + reuso del Castillo (la forja ya existe como distrito del Repartidor).
+- **La Forjadora** *(nueva; propuesta de nombre: Brasa — pendiente del autor; en el guion habla como «Forjadora»)* — práctica, sin paciencia para doctrinas: SIEMPRE supo que algo se pagaba, porque su gremio lo paga en carbón. No pide consuelo: pide **cuánto**.
+- **La Consejera** — aliada. Su libro por primera vez cuenta algo real: jornales. Humor: descubre que los lacres del Consejo consumían más que la biblioteca.
+- **Edda** — aprende a enseñar: fracasa con palabras, acierta dejando tocar.
+- **Maese Lumen** — la enfermería lo obliga a aceptar que sus mártires estaban **mal elegidos**. De venerar el sacrificio a calcular el margen.
+- **Ohm** — gana el modo termómetro. Cero backstory nueva.
 
 ---
 
-## 1. Resumen narrativo
+## 1. NIVEL 0 — Aula de Electrónica (módulo tres)
 
-La U2 cerró con Lumen retirando la mano del canal tibio. La U3 abre con la Forja a pleno: martillos que caen solos, hornos respirando — y la Forjadora esperando en la puerta con un fusible muerto en la mano: el tercero de la semana. La Consejera llega por su lado: desde que el reino se encendió, «algo» se consume, y el Consejo quiere saber qué cosa, porque esta vez **no piensa volver a sellar nada sin números**.
+**Función:** re-entrada; con `unit2Completed`, el proyector ofrece el módulo tres. 2 min.
 
-Primer acto (el canal tibio): medir con el termómetro lo que la mano ya sabía. El calor no está en las máquinas viejas ni en los rituales: está donde el río es grande y el canal es chico. El peaje existe y tiene reglas.
+**Proyector:**
 
-Segundo acto (la enfermería): Lumen despliega su colección de mártires. Elegir calibre de fusible por máquina: el justo muere al arrancar; el gordo no muere nunca — y en la demostración más incómoda de la unidad, el canal se corta antes que el fusible. El fusible no es un héroe: es **el que muere a propósito para que no muera otra cosa**.
+> *clac* MUNDOS APLICADOS. UNIDAD TRES.
+>
+> La Forja de Ohmdal: donde el río trabaja.
+>
+> Recuerde, estudiante: nada que trabaja, trabaja gratis.
 
-Tercer acto (el Canal Largo): el horno lejano de la Forjadora, al final de un canal angosto imposible de recablear. Con empuje bajo, la entrega llega… y el canal se pone al rojo. La solución no es más río: es **más empuje y menos río** — misma entrega, peaje mínimo. La Forjadora, tocando el canal frío que alimenta su horno encendido, dicta la frase de la unidad.
+La imagen tiembla y se corta. Sobre la lente, un instante, la silueta de un fusible fundido.
 
-Evento mayor (la Forja completa): dimensionar la red entera — cuatro máquinas con placas de entrega distintas, grosor de canal y fusible por rama, presupuesto de Tronco heredado de la U2. Cuando la Forja canta (martillos en ritmo), la Bitácora formaliza: **potencia, efecto Joule, energía**. La Consejera abre un libro nuevo: «Inventario de jornales. Este sí.»
+> (¿Eso fue una lección… o un aviso?)
 
-Gancho a la U4: la Forjadora menciona el viejo acueducto de cobre — **las Terrazas** que riegan el valle por niveles. «El empuje baja por escalones, dicen. La terraza más baja casi no recibe. Nadie sabe repartirlo desde que se fueron los Maestros.»
+Re-interacción posterior: **Proyector:** «*clac* Unidad tres: en curso. Abríguese. O no. Ya va a entender. *clac*»
 
----
-
-## 2. Estructura de niveles (resumen — guion fino antes del build)
-
-| Nivel | Mapa | Función | Duración |
-|---|---|---|---|
-| 0 | Aula de Electrónica (reuso) | proyector módulo 3: «POTENCIA. Lo que el río entrega.» — se corta antes de explicar (como siempre) | 2 min |
-| 1 | Patio de la Forja | la Forjadora, el fusible muerto, la Consejera con su pregunta; **Puzzle 1: el canal tibio** | 5–6 min |
-| 2 | Enfermería de fusibles (taller de Lumen en la Forja) | **Puzzle 2: la enfermería** — calibre y margen | 5–7 min |
-| 3 | El Canal Largo | **Puzzle 3** — misma entrega, dos caminos; el corazón conceptual | 6–8 min |
-| 4 | Nave mayor de la Forja | **Puzzle 4 (evento mayor): la Forja completa** — dimensionar la red | 8–10 min |
-| 5 | Cierre | la Forja en ritmo; inventario de jornales; gancho Terrazas | 3–4 min |
-
-**Beats de diálogo clave** (a desarrollar):
-
-- Forjadora, presentación: «¿Vos sos el que anda encendiendo cosas? Bien. Ahora explicame quién paga el carbón de TODO esto.»
-- Consejera, pregunta de la unidad: «El río no se gasta. Lo medimos. Entonces, ¿qué es lo que falta cada mañana?»
-- Ohm, en el canal tibio: «Río: grande. Canal: chico. Peaje: en curso.»
-- Lumen, enfermería: «Este murió joven. Este no murió nunca y dejó morir al canal. La santidad, estudiante, era una cuestión de calibre.»
-- Forjadora, Canal Largo resuelto (frase de la unidad): «El río no se gasta. El río trabaja. Y el trabajo se paga. Por fin alguien que lo dice con números.»
+Flag: `playedUnit3Intro`. El portal lleva a la plaza; en la plaza (nocturna), el **Camino a la Forja** está abierto (visible con `unit2Completed`).
 
 ---
 
-## 3. Entradas de Bitácora de la Unidad 3
+## 2. NIVEL 1 — El patio de la Forja: el canal tibio
 
-Formato de dos capas. Las vivenciales nacen incompletas; la formal llega tras el evento mayor.
+**ID propuesto:** `MAP_FORGE_YARD` · 5–6 min · **Puzzle 1 (tutorial de medición)**
 
-1. **«El peaje»** — vivencial: el termómetro en los canales; mismo río, distinto grosor, distinto calor. Formal: efecto Joule; el calor crece fuerte con la corriente (con el cuadrado — dicho como «el doble de río, cuatro veces el peaje», medido, no como fórmula).
-2. **«El mártir y el margen»** — vivencial: el fusible justo muere joven, el gordo no protege. Formal: el fusible se dimensiona con margen sobre el río de trabajo y por debajo de lo que aguanta el canal. **Error común:** «más grande aguanta más» — un fusible que no puede morir no protege nada.
-3. **«La Entrega»** — vivencial: el Canal Largo — entrega 16 con río 4 (al rojo) o con río 1 (frío). Formal: **potencia = empuje × río (P = V·I)**, el vatio nombrado; la misma potencia puede viajar con poco río y mucho empuje. ✎ *¿Por qué los cables que cruzan el campo van tan alto y con tanto empuje?*
-4. **«El Jornal»** (formal, tras el evento mayor) — energía = potencia × tiempo; el inventario de la Consejera como tabla real (entrega de cada máquina × horas de forja). Nota al pie estilo Bitácora: *«Mucho después, a la entrega le pusieron Watt, y al jornal, joule. El peaje también se llama joule. No es casualidad: es la misma moneda.»*
+Patio de piedra y cobre. Martillos que caen solos al fondo. La **Forjadora** espera en la puerta con un fusible muerto en la mano. La **Consejera** llega con su libro.
+
+**Forjadora:**
+
+> ¿Tú eres quien anda encendiendo cosas? Bien. Tenemos que hablar.
+> Tercer fusible de la semana. Y los canales entibian como sopa. Esto antes no pasaba.
+
+**Consejera:**
+
+> Antes no pasaba NADA, Forjadora. Esa era exactamente la política.
+
+**Forjadora:**
+
+> …Touché.
+> Mira: yo no entiendo de ríos ni de cuentas. Entiendo de carbón. Y desde que la Forja despertó, el carbón vuela. Algo se está yendo a alguna parte.
+
+**Consejera:**
+
+> Eso vine a preguntar. Medimos el río: no se gasta. Lo demostraron ustedes. Entonces, ¿qué es lo que falta cada mañana?
+
+**Edda:**
+
+> …Esa es buena pregunta. Ohm: ¿tienes algo para el calor?
+
+**Ohm:**
+
+> Modo nuevo disponible: termómetro. Apoyo la mano. Reporto el peaje.
+
+### PUZZLE 1 — El canal tibio
+
+**ID:** `PUZZLE_WARM_CHANNEL` · medición pura, sin fallo · 4–5 min
+**Vista de banco:** tres canales del patio en corte (martillo: río 4 por canal angosto / fuelle: río 4 por canal ancho / canal viejo en desuso: río 0), llave para conectar una segunda máquina al canal del fuelle (duplica su río), termómetro por tramo (modo nuevo de Ohm) y los puntos de río de siempre.
+
+Experiencias (en cualquier orden):
+
+1. **Canal del martillo** (río 4, angosto): **al rojo.** — **Ohm:** «Río: grande. Canal: chico. Peaje: en curso.»
+2. **Canal del fuelle** (río 4, ancho): **tibio.** — **Edda:** «¡El mismo río! ¿Por qué este no quema?» **Ohm:** «Mismo río. Más cauce. Menos peaje.»
+3. **Canal viejo** (río 0): **frío**, aunque es el más viejo del patio. — **Forjadora:** «Ese canal tiene cien años y está helado. Así que no es la edad. Mi abuelo SIEMPRE dijo que era la edad.»
+4. **Duplicar el río del fuelle** (llave): el termómetro salta de tibio a **al rojo** — dos niveles de un golpe. — **Ohm:** «Doble de río. Cuádruple de peaje. Anótelo.» **Consejera:** «YA lo anoté. Es mi línea, calderito.»
+
+Cierre:
+
+**Forjadora:**
+
+> A ver si entendí: el calor no es fantasma ni vejez. Es el precio del paso. Más río por el mismo canal, más caro el peaje.
+> …¿Y quién lo cobra?
+
+**Edda:**
+
+> El aire, supongo. Se lo lleva y no da recibo.
+
+Flags: `solvedWarmChannel`. Bitácora «El peaje» (vivencial).
 
 ---
 
-## 4. Flags de la unidad
+## 3. NIVEL 2 — La enfermería de fusibles
+
+**ID:** `MAP_FORGE_INFIRMARY` · 5–7 min · **Puzzle 2**
+
+El taller de Lumen dentro de la Forja: una pared entera de fusibles muertos, etiquetados con fecha y una velita. La colección de mártires.
+
+**Lumen:**
+
+> Mi enfermería. Bueno… mi cementerio, técnicamente. Cada uno de estos murió por la Forja.
+> Este murió joven. Este no murió nunca — y dejó morir al canal. Empiezo a sospechar, estudiante, que la santidad era una cuestión de calibre.
+
+**Forjadora:**
+
+> Yo necesito que dejen de morirse, Lumen. O al menos que se mueran con sentido.
+
+**Ohm:**
+
+> Corrección: morirse con sentido es la función. Fusible = el que muere a propósito, para que no muera otra cosa.
+
+**Edda:**
+
+> …Eso es lo más bonito que dijiste nunca, Ohm.
+
+**Ohm:**
+
+> Registro: poesía accidental. No se repetirá.
+
+### PUZZLE 2 — La enfermería
+
+**ID:** `PUZZLE_FUSE_INFIRMARY` · 5–7 min
+**Vista de banco:** tres máquinas con placa de **río de trabajo** y su canal (A: río 1, canal angosto · B: río 2, canal medio · C: río 4, canal ancho). Engaste de fusible por máquina (calibres 1/2/4/8) y botón **«Arrancar la Forja»**: al arrancar, cada máquina pica a río+1 un instante. El termómetro y las agujas, visibles.
+
+Comportamiento:
+
+- **Fusible ≤ pico de arranque:** muere al arrancar («joven»). — **Lumen:** «¡Otro mártir del amanecer! …Ya ni los velo, fíjate.»
+- **Fusible demasiado gordo** (no salta antes del rojo del canal, demostración guiada con una falla simulada en la máquina A): el canal se corta primero. — **Forjadora:** «¿Y ESO quién lo repone? El fusible cuesta un cobre. El canal, una semana.» **Lumen:** «…El gordo no era un santo. Era un cómplice.»
+- **Correctos:** A→2, B→4, C→8. Al arrancar la Forja con los tres bien: ritmo de martillos estable.
+
+Cierre:
+
+**Lumen:**
+
+> Un mártir por año es santidad. Uno por semana es mal cálculo.
+> Cuarenta años venerando el sacrificio y la respuesta era… margen. Elegir el margen.
+
+Flags: `solvedFuseInfirmary`, `burnedChannelDemo` (si vivió la demo del canal). Bitácora «El mártir y el margen» (vivencial).
+
+---
+
+## 4. NIVEL 3 — El Canal Largo
+
+**ID:** `MAP_FORGE_LONGCHANNEL` · 6–8 min · **Puzzle 3 — el corazón conceptual**
+
+Detrás de la Forja, un canal angosto de doscientos pasos cruza el patio viejo hasta el **horno lejano** de la Forjadora. Imposible de recablear: pasa bajo tres edificios.
+
+**Forjadora:**
+
+> Mi horno. El bueno. Lleva años frío porque cada vez que lo alimentamos, el canal se pone al rojo a mitad de camino.
+> No se puede cambiar el canal. Pasa por abajo de media Forja. O lo alimentas con ESE cable, o no hay horno.
+
+**Edda:**
+
+> Río suficiente para el horno, por un canal que no aguanta río… Suena a trampa.
+
+**Ohm:**
+
+> Reformulación: entrega suficiente. La entrega viaja de más de una manera.
+
+### PUZZLE 3 — El Canal Largo
+
+**ID:** `PUZZLE_LONG_CHANNEL` · 5–7 min
+**Vista de banco:** cristal de Empuje elegible (4 / 8 / 16), engaste de piedras **en fila** (U2: los frenos en fila se suman) junto al horno, el canal largo angosto (tolera río 2) con termómetro en tres puntos, y la placa del horno: **ENTREGA 16**.
+
+- **Camino A (la trampa natural):** Empuje 4 + marrón → río 4 → entrega 16 ✓… y el canal **al rojo** (a la tercera insistencia se corta; la Forjadora lo reempalma: «Una.» / «Dos. Me estás cobrando el favor.» / «Tres. La próxima lo reempalmas tú.»).
+- **Camino B (canónico):** Empuje 16 + gris+gris en fila (16) → río 1 → entrega 16 ✓ — canal **frío**.
+- **Camino C (también válido):** Empuje 8 + amarilla → río 2 → entrega 16 ✓ — canal **tibio**, al límite justo.
+
+Si el jugador encuentra B y C: **Ohm:** «Misma entrega. Peaje distinto. La Forjadora prefiere el frío.»
+
+Resolución (con B o C): el horno lejano respira, y la Forjadora apoya la mano en el canal — y la deja ahí.
+
+**Forjadora:**
+
+> Frío. El horno a fuego pleno y el canal frío.
+> El río no se gasta. El río trabaja. Y el trabajo se paga. …Por fin alguien que lo dice con números.
+
+**Edda:**
+
+> Mucho empuje, poco río: la misma entrega con menos peaje. ¿Por eso los Maestros subían el empuje para los caminos largos…?
+
+**Ohm:**
+
+> Hipótesis: correcta. Alcance: más grande de lo que crees.
+
+Flags: `solvedLongChannel`. Bitácora «La Entrega» (vivencial).
+
+---
+
+## 5. NIVEL 4 — La nave mayor: encender la Forja completa
+
+**ID:** `MAP_FORGE_HALL` · 8–10 min · **Puzzle 4 — evento mayor**
+
+La nave central: tres máquinas mayores apagadas — el **Martillo** (placa: ENTREGA 32), el **Fuelle** (ENTREGA 16) y la **Lumbre** (ENTREGA 8) — y el tablero de la Forja con su cristal de bus.
+
+**Forjadora:**
+
+> Todo junto, una vez. Como cuando era niña.
+> Tres máquinas, un solo tronco, y el cobre que hay: un canal ancho, dos medios, dos angostos. Ni uno más. Repártelo bien.
+
+**Consejera:**
+
+> Y yo anoto la entrega de cada una. Por hora. *(abre un libro nuevo, flamante)* Inventario de jornales. Este sí.
+
+### PUZZLE 4 — La Forja completa
+
+**ID:** `PUZZLE_FORGE_NETWORK` · 7–9 min
+**Vista de banco:** cristal de bus elegible (8 / 16); por máquina: engaste de piedras (fila permitida), **selector de grosor** con stock compartido (1 ancho, 2 medios, 2 angostos), engaste de fusible (1/2/4/8); termómetro y aguja por rama; aguja de Tronco con tolerancia 8; botón «Arrancar la Forja» (pico río+1 por máquina). **Validación por condiciones:** entregas exactas + ningún canal pasa de caliente en el pico + fusibles correctos (regla de la enfermería) + Tronco ≤ 8.
+
+Solución canónica (Empuje 8): Martillo roja → río 4 (pico 5) → canal **ancho** + fusible 8 · Fuelle amarilla → río 2 (pico 3) → canal **medio** + fusible 4 · Lumbre gris → río 1 (pico 2) → canal **angosto** + fusible 2. Tronco 7 ≤ 8 ✓. **Soluciones alternativas válidas por elección de margen** (p. ej. Fuelle en el otro canal medio o el ancho si el Martillo usó medio tolerando el pico caliente-breve): el banco acepta toda combinación que cumpla las condiciones; con **Empuje 16 no hay solución** (la Lumbre pediría río ½): deliberado, eco del Repartidor.
+
+Feedback de fallo (información, nunca castigo): máquina hambrienta = su placa parpadea y la Forjadora la nombra («El Martillo pide y no le llega.»); canal excedido = termómetro y, a la tercera, corte reparable; fusible mal elegido = muere al arrancar o deja sufrir al canal (diálogos de la enfermería reutilizables).
+
+### Resolución
+
+Los tres ritmos se traban en un compás: el Martillo marca, el Fuelle respira, la Lumbre sostiene. **La Forja canta.**
+
+**Forjadora:**
+
+> *(escucha, los ojos cerrados)* Ese compás. ESE. Treinta años sin oírlo.
+> Dile a tu escuela que la Forja paga sus deudas: cuando necesiten hierro bien nacido, es acá.
+
+**Consejera:**
+
+> Entrega del Martillo: treinta y dos. Del Fuelle: dieciséis. De la Lumbre: ocho. Por hora, cincuenta y seis jornales.
+> *(pausa, hojea su libro viejo)* …Los lacres ceremoniales del Consejo consumían nueve. La biblioteca, ocho.
+> Cuarenta años lacrando puertas con más entrega de la que ahorrábamos al lacrarlas. No anote eso, calderito.
+
+**Ohm:**
+
+> Anotado.
+
+La Bitácora arde y se abre sola: entradas formales de la unidad.
+
+Flags: `solvedForgeNetwork`, `forgeRestored`, `learnedPower`.
+
+---
+
+## 6. NIVEL 5 — Cierre y gancho
+
+**Duración:** 3–4 min.
+
+La Forja en ritmo, de noche. El compás se oye desde la plaza (cambio permanente del mundo: la Forja suena).
+
+**Edda** (mirando el valle desde el patio):
+
+> ¿Ves el valle, allá abajo? Las Terrazas. El acueducto de cobre de los Maestros.
+> Riega por niveles. O regaba.
+
+**Forjadora:**
+
+> Mi hierro va a las Terrazas desde siempre. La guardiana es de fiar — pero está paralizada: dice que el empuje «baja por escalones» y que la terraza más baja casi no recibe.
+> Treinta años sin tocar una piedra. Por miedo a que tocar una mueva todas. …Y lo peor es que tiene razón: mueve todas.
+
+**Ohm:**
+
+> Dato: correcto. Conclusión: incompleta. Lo que mueve todas… se puede contar todo.
+
+**Edda:**
+
+> *(sonríe)* Eso suena a próxima lección.
+
+Flags: `unit3Completed`. Pantalla de cierre de unidad (patrón U2): título «Fin de la Unidad 3 — “El precio del río”», resumen (jornales anotados, canales cortados sí/no) y teaser de las Terrazas.
+
+---
+
+## 7. Entradas de Bitácora de la Unidad 3
+
+Dos capas; las vivenciales nacen al resolver cada puzzle; las formales llegan con `learnedPower` (tras el evento mayor).
+
+1. **«El peaje»** (`solvedWarmChannel`) — vivencial: el termómetro; mismo río, distinto grosor, distinto calor; el canal viejo helado; doble de río = salto doble del termómetro. Formal: **efecto Joule** — el calor crece fuerte con la corriente («el doble de río, cuatro veces el peaje» — medido, no formulado). **Error común:** «el calor es porque el cable está viejo» — el peaje depende del río y del cauce, no de la edad.
+2. **«El mártir y el margen»** (`solvedFuseInfirmary`) — vivencial: el justo muere al arrancar; el gordo deja morir al canal. Formal: el fusible se elige con **margen sobre el pico** y por debajo de lo que aguanta el canal. **Error común:** «más grande aguanta más» — un fusible que no puede morir no protege nada. *(El bloque del canal cortado se completa solo si `burnedChannelDemo`.)*
+3. **«La Entrega»** (`solvedLongChannel`) — vivencial: entrega 16 con río 4 (al rojo) o con río 1 (frío). Formal: **potencia = empuje × río (P = V·I)**, el vatio nombrado; la misma potencia puede viajar con poco río y mucho empuje. ✎ *¿Por qué los cables que cruzan el campo van tan alto y con tanto empuje?*
+4. **«El Jornal»** (formal mayor, `learnedPower`) — energía = potencia × tiempo; la tabla del inventario de la Consejera (56 jornales/hora de la Forja; los lacres: 9). Nota al pie: *«Mucho después, a la entrega le pusieron Watt, y al jornal, joule. El peaje también se llama joule. No es casualidad: es la misma moneda.»* ✎ *Busca en tu casa un aparato que diga “W”. Ese número es su hambre.*
+
+---
+
+## 8. Flags de la unidad
 
 ```txt
 playedUnit3Intro
 metForjadora
 solvedWarmChannel
 solvedFuseInfirmary
-burnedChannelDemo      (si el jugador vivió el canal-muere-antes-que-el-fusible)
+burnedChannelDemo
 solvedLongChannel
 solvedForgeNetwork
 forgeRestored
@@ -147,7 +348,7 @@ unit3Completed
 
 ---
 
-## 5. Criterios de aceptación
+## 9. Criterios de aceptación
 
 El jugador puede decir, sin clase previa:
 
@@ -161,10 +362,9 @@ Y recién después leer: *eso se llama potencia, efecto Joule y energía.*
 
 ---
 
-## 6. Notas de coherencia y pendientes
+## 10. Notas de coherencia y pendientes
 
-1. **Nombre de la Forjadora** («Brasa» es propuesta) y si los habitantes de Ohmdal nuevos siguen llevando nombre propio (Edda y Lumen lo tienen; el canon «sin nombre» es solo institucional). Decisión del autor.
-2. **El peaje cuadrático** se enseña medido («doble de río, cuatro veces el peaje»), nunca como I²R. Verificar en build que el termómetro lo respete numéricamente.
-3. **La Consejera recurrente** queda confirmada por esta unidad si el autor aprueba (resuelve la decisión abierta de `unidad-2-caminos.md` §13.5).
-4. **Continuidad:** el canal tibio del cierre de la U2 debe ser EL MISMO canal que abre el nivel 1 (mismo lugar del mapa).
-5. Los valores de tolerancia de grosor (2/4/8) y las placas de entrega del evento mayor se ajustan en build para que existan **al menos dos soluciones válidas** (regla de la casa desde la U1).
+1. **Nombre de la Forjadora** («Brasa») — pendiente del autor; decidir junto con Vega (U4) y Ciro (U5). El código usa el label «Forjadora».
+2. **Continuidad:** el canal que Lumen tocó en el cierre de la U2 (plaza nocturna) es el mismo que alimenta la Forja; el Camino a la Forja sale de la plaza.
+3. La matemática de §A.3 es **canon de diseño**: si un ejecutor encuentra una contradicción, frena y reporta (no la resuelve).
+4. El compás de la Forja queda como **ambience permanente** del distrito tras `forgeRestored` (variación del tema del Castillo con percusión grave).
