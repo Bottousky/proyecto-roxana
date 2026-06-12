@@ -30,7 +30,7 @@ La progresión emocional acompaña: el Arco I enciende el **reino**, el Arco II 
 - **Escenario:** la plaza, el taller de Lumen, la Puerta de Ohm.
 - **Gancho saliente:** la campana de dos cables.
 
-### U2 — «El río se reparte» ✅ diseñada (`unidad-2-caminos.md`)
+### U2 — «El río se reparte» ✅ construida (greybox, jun 2026) (`unidad-2-caminos.md`)
 
 - **Conceptos:** serie, paralelo, nodos/ramas, ley de corrientes de Kirchhoff como intuición («la Regla del Cruce»).
 - **Escenario:** el Castillo sellado por el Consejo (galería en cadena, ramales, el Repartidor).
@@ -143,7 +143,7 @@ Razones, en orden de peso:
 ### La ruta completa, en una línea de tiempo
 
 ```
-v1  ── Ohmdal Arco I ──────────── U1 ✅  U2 ✅dis  U3 ✅dis  U4 ✅dis  U5 ✅dis   ← CORTE «mundo completo»
+v1  ── Ohmdal Arco I ──────────── U1 ✅  U2 ✅  U3 ✅dis  U4 ✅dis  U5 ✅dis   ← CORTE «mundo completo»
 v2  ── Programación Arco I ────── P1  P2  (P3)
 v3  ── Ohmdal Arco II ─────────── U6  U7  U8  U9
 v4  ── El Empalme (mundo compartido) ── sigue-líneas · sumo · fútbol + historia de Ohm

@@ -5,7 +5,9 @@ los **Mundos Aplicados**: mundos creados por la escuela para enseñar, hoy degra
 en ritual y superstición. La Unidad 1 («La corriente no es magia») lleva al jugador
 a Ohmdal, donde descubre jugando la Ley de Ohm.
 
-**Estado:** greybox jugable de punta a punta (formas y sistemas, sin arte final).
+**Estado:** greybox jugable de punta a punta — Unidad 1 («La corriente no es magia»,
+Ley de Ohm) y Unidad 2 («El río se reparte», serie/paralelo: el Castillo, la Consejera,
+el Repartidor, el timbre del Instituto). Formas y sistemas, sin arte final.
 
 ## Correr en desarrollo
 
@@ -64,10 +66,14 @@ src/
     end.ts                 pantalla de cierre del slice
     overlay.ts             contador de overlays (pausa el input del juego)
   puzzles/
-    common.ts              widget de Ohm, piedras con código de colores, medidor de aguja
-    despertar.ts           Puzzle 1: el camino completo
-    freno.ts               Puzzle 2: la resistencia como freno
-    puerta.ts              Puzzle 3: la relación V-I-R (3 soluciones válidas)
+    common.ts              widget de Ohm, piedras, medidor, ohmProbe, llaves, fusibles
+    despertar.ts           U1-1: el camino completo
+    freno.ts               U1-2: la resistencia como freno
+    puerta.ts              U1-3: la relación V-I-R (3 soluciones válidas)
+    bell.ts / chain.ts / branches.ts / distributor.ts / timbre.ts
+                           U2: campana, Cadena (serie), Ramales (paralelo),
+                           el Repartidor (evento mayor) y el timbre del Instituto
+                           (cada uno con su xModel.ts puro y tests en tests/)
   content/
     entries.ts             entradas de la Bitácora (dos capas, contenido dinámico)
 docs/
@@ -80,6 +86,7 @@ docs/
   unidad-5-faro.md         diseño de la Unidad 5: el Faro (capacitor, tiempo) — cierre Arco I
   ohmdal-ruta-contenidos.md  ruta completa de Ohmdal (arcos I-II + el Empalme) y corte de la v1
   plan-implementacion-u2.md  hitos M0-M8 para construir la U2 (handoff a agente de código)
+  estandar-implementacion.md workflow multi-modelo: Fable planifica/audita, ejecutores codifican
 ```
 
 ## Reglas de diseño que el código respeta
