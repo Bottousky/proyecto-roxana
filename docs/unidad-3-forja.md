@@ -121,14 +121,14 @@ Patio de piedra y cobre. Martillos que caen solos al fondo. La **Forjadora** esp
 ### PUZZLE 1 — El canal tibio
 
 **ID:** `PUZZLE_WARM_CHANNEL` · medición pura, sin fallo · 4–5 min
-**Vista de banco:** tres canales del patio en corte (martillo: río 4 por canal angosto / fuelle: río 4 por canal ancho / canal viejo en desuso: río 0), llave para conectar una segunda máquina al canal del fuelle (duplica su río), termómetro por tramo (modo nuevo de Ohm) y los puntos de río de siempre.
+**Vista de banco:** cuatro canales del patio en corte (martillo: río 4 por canal angosto / fuelle: río 4 por canal ancho / canal viejo en desuso: río 0, angosto / yunque: río 2 por canal angosto), llave para conectar el segundo martillo al canal del yunque (duplica su río: 2 → 4), termómetro por tramo (modo nuevo de Ohm) y los puntos de río de siempre.
 
 Experiencias (en cualquier orden):
 
 1. **Canal del martillo** (río 4, angosto): **al rojo.** — **Ohm:** «Río: grande. Canal: chico. Peaje: en curso.»
-2. **Canal del fuelle** (río 4, ancho): **tibio.** — **Edda:** «¡El mismo río! ¿Por qué este no quema?» **Ohm:** «Mismo río. Más cauce. Menos peaje.»
+2. **Canal del fuelle** (río 4, ancho): **frío.** — **Edda:** «¡El mismo río! ¿Por qué este ni se entera?» **Ohm:** «Mismo río. Más cauce. Menos peaje.»
 3. **Canal viejo** (río 0): **frío**, aunque es el más viejo del patio. — **Forjadora:** «Ese canal tiene cien años y está helado. Así que no es la edad. Mi abuelo SIEMPRE dijo que era la edad.»
-4. **Duplicar el río del fuelle** (llave): el termómetro salta de tibio a **al rojo** — dos niveles de un golpe. — **Ohm:** «Doble de río. Cuádruple de peaje. Anótelo.» **Consejera:** «YA lo anoté. Es mi línea, calderito.»
+4. **Duplicar el río del yunque** (llave, 2 → 4): el termómetro salta de tibio a **al rojo** — dos niveles de un golpe, sin pasar por caliente. — **Ohm:** «Doble de río. Cuádruple de peaje. Anótelo.» **Consejera:** «YA lo anoté. Es mi línea, calderito.»
 
 Cierre:
 
