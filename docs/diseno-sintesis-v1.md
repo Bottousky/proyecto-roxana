@@ -4,7 +4,8 @@
 > **Mapa de documentos:** este archivo contiene las reglas generales del juego (concepto, loop, Bitácora, anti-clase, formato, distribución, arquitectura, riesgos). El detalle narrativo y de diseño vive en un documento por unidad:
 > - `prologo.md` — guion completo del prólogo en la escuela.
 > - `unidad-1-ohmdal.md` — síntesis del mundo Ohmdal + guion detallado de la Unidad 1.
-> - (futuro) `unidad-2-*.md` — circuitos serie/paralelo.
+> - `unidad-2-caminos.md` — el Castillo de Ohmdal + guion de la Unidad 2 (serie/paralelo).
+> - `ohmdal-ruta-contenidos.md` — ruta completa del mundo Ohmdal (U1–U9 + Arco de los Autómatas) y punto de corte de la v1.
 
 ## 1. Concepto
 

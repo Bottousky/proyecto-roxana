@@ -74,6 +74,12 @@ docs/
   diseno-sintesis-v1.md    diseño general del juego (sistemas, formato, arquitectura)
   prologo.md               guion detallado del prólogo en la escuela
   unidad-1-ohmdal.md       síntesis del mundo Ohmdal + guion de la Unidad 1
+  unidad-2-caminos.md      guion de la Unidad 2: el Castillo (serie/paralelo)
+  unidad-3-forja.md        diseño de la Unidad 3: la Forja (potencia, Joule, energía)
+  unidad-4-terrazas.md     diseño de la Unidad 4: las Terrazas (KVL, divisores, escalera)
+  unidad-5-faro.md         diseño de la Unidad 5: el Faro (capacitor, tiempo) — cierre Arco I
+  ohmdal-ruta-contenidos.md  ruta completa de Ohmdal (arcos I-II + el Empalme) y corte de la v1
+  plan-implementacion-u2.md  hitos M0-M8 para construir la U2 (handoff a agente de código)
 ```
 
 ## Reglas de diseño que el código respeta
