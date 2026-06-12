@@ -18,6 +18,191 @@ export function setOhmState(scope: HTMLElement, s: OhmState): void {
   scope.querySelector('.ohm-widget')?.setAttribute('data-state', s);
 }
 
+/* ---------- Piezas de topología U2 ---------- */
+
+export interface LlaveTramoHandle {
+  element: HTMLButtonElement;
+  isClosed(): boolean;
+  setClosed(closed: boolean): void;
+}
+
+/** Interruptor reutilizable para abrir o cerrar un tramo del banco. */
+export function llaveTramo(
+  label: string,
+  initialClosed: boolean,
+  onChange: (closed: boolean) => void,
+): LlaveTramoHandle {
+  let closed = initialClosed;
+  const button = document.createElement('button');
+  button.className = 'tramo-switch';
+
+  const render = () => {
+    button.classList.toggle('closed', closed);
+    button.classList.toggle('open', !closed);
+    button.setAttribute('aria-pressed', String(closed));
+    button.innerHTML = `
+      <span class="tramo-switch-name">${label}</span>
+      <span class="tramo-switch-state">${closed ? 'cerrado' : 'abierto'}</span>`;
+  };
+
+  button.addEventListener('click', () => {
+    closed = !closed;
+    render();
+    onChange(closed);
+  });
+  render();
+
+  return {
+    element: button,
+    isClosed: () => closed,
+    setClosed(next: boolean) {
+      closed = next;
+      render();
+    },
+  };
+}
+
+export interface OhmProbeTramo {
+  id: string;
+  label: string;
+}
+
+export interface OhmProbeHandle {
+  element: HTMLElement;
+  clear(): void;
+  select(id: string): void;
+}
+
+/**
+ * Puntos de medición para llamar a Ohm. Solo un tramo queda activo a la vez.
+ * El consumidor entrega bench.setStatus mediante `report`.
+ */
+export function ohmProbe(
+  tramos: OhmProbeTramo[],
+  getRio: (id: string) => string,
+  report: (rio: string, tramo: OhmProbeTramo) => void,
+): OhmProbeHandle {
+  const root = document.createElement('div');
+  root.className = 'ohm-probes';
+  const buttons = new Map<string, HTMLButtonElement>();
+
+  const select = (id: string) => {
+    for (const [buttonId, button] of buttons) {
+      button.classList.toggle('active', buttonId === id);
+    }
+  };
+
+  for (const tramo of tramos) {
+    const button = document.createElement('button');
+    button.className = 'ohm-probe';
+    button.innerHTML = `<span class="ohm-probe-marker">Ω</span>${tramo.label}`;
+    button.addEventListener('click', () => {
+      select(tramo.id);
+      report(getRio(tramo.id), tramo);
+    });
+    buttons.set(tramo.id, button);
+    root.appendChild(button);
+  }
+
+  return {
+    element: root,
+    clear: () => select(''),
+    select,
+  };
+}
+
+export interface FuseState {
+  overloads: number;
+  burned: boolean;
+}
+
+export type FuseResult = 'ok' | 'warning' | 'burned';
+
+export function advanceFuse(state: FuseState, value: number, threshold: number): FuseState {
+  if (state.burned || value <= threshold) return state;
+  const overloads = state.overloads + 1;
+  return { overloads, burned: overloads >= 3 };
+}
+
+export interface FusibleHandle {
+  element: HTMLElement;
+  state(): FuseState;
+  setValue(value: number): FuseResult;
+  reset(): void;
+}
+
+/**
+ * Fusible con tolerancia y umbral visibles. Cada evaluación sobre el umbral
+ * cuenta como una insistencia; a la tercera, el fusible se inmola.
+ */
+export function fusible(
+  threshold: number,
+  maxValue = threshold * 1.5,
+  onBurn?: () => void,
+): FusibleHandle {
+  let fuseState: FuseState = { overloads: 0, burned: false };
+  const root = document.createElement('div');
+  root.className = 'fuse';
+  root.innerHTML = `
+    <div class="fuse-heading">
+      <span>Fusible</span>
+      <span class="fuse-threshold">umbral: ${threshold}</span>
+    </div>
+    <div class="fuse-scale">
+      <div class="fuse-green"></div>
+      <div class="fuse-fill"></div>
+      <div class="fuse-mark"></div>
+    </div>
+    <div class="fuse-status">tolerancia disponible</div>`;
+
+  const green = root.querySelector<HTMLElement>('.fuse-green')!;
+  const fill = root.querySelector<HTMLElement>('.fuse-fill')!;
+  const mark = root.querySelector<HTMLElement>('.fuse-mark')!;
+  const status = root.querySelector<HTMLElement>('.fuse-status')!;
+  const thresholdPct = Math.min(100, (threshold / maxValue) * 100);
+  green.style.width = `${thresholdPct}%`;
+  mark.style.left = `${thresholdPct}%`;
+
+  const renderValue = (value: number) => {
+    fill.style.width = `${Math.min(100, Math.max(0, (value / maxValue) * 100))}%`;
+  };
+
+  const reset = () => {
+    fuseState = { overloads: 0, burned: false };
+    root.classList.remove('warning', 'burned');
+    status.textContent = 'tolerancia disponible';
+    renderValue(0);
+  };
+
+  return {
+    element: root,
+    state: () => ({ ...fuseState }),
+    setValue(value: number) {
+      renderValue(value);
+      if (fuseState.burned) return 'burned';
+      if (value <= threshold) {
+        root.classList.remove('warning');
+        status.textContent = 'dentro de tolerancia';
+        return 'ok';
+      }
+
+      fuseState = advanceFuse(fuseState, value, threshold);
+      if (fuseState.burned) {
+        root.classList.remove('warning');
+        root.classList.add('burned');
+        status.textContent = 'se inmoló';
+        onBurn?.();
+        return 'burned';
+      }
+
+      root.classList.add('warning');
+      status.textContent = `aviso ${fuseState.overloads} de 3`;
+      return 'warning';
+    },
+    reset,
+  };
+}
+
 /* ---------- Piedras de Freno (con banda de color = código real de resistencias) ---------- */
 
 export interface PiedraDef {

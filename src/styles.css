@@ -234,6 +234,45 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 /* aguja / medidor */
 .gauge-needle { transition: transform .7s cubic-bezier(.3,1.4,.5,1); transform-origin: var(--pivot); }
 
+/* piezas U2: llaves, Ohm caminante y fusible con tolerancia */
+.tramo-switch, .ohm-probe {
+  padding: 8px 12px; border-radius: 8px; cursor: pointer;
+  background: #26222e; color: #d8cfc0; border: 1px solid #6b6478;
+}
+.tramo-switch { min-width: 150px; text-align: left; }
+.tramo-switch:hover, .ohm-probe:hover { border-color: var(--accent); }
+.tramo-switch-name { display: block; font-size: 13px; }
+.tramo-switch-state { display: block; margin-top: 2px; font-size: 11px; color: #a99; text-transform: uppercase; }
+.tramo-switch.closed { border-color: #8a7c50; }
+.tramo-switch.open { border-color: #7a4438; }
+.tramo-switch:disabled { opacity: .55; cursor: default; }
+.bell-switches, .ohm-probes { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.ohm-probe { display: inline-flex; align-items: center; gap: 7px; }
+.ohm-probe-marker {
+  display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+  border-radius: 50%; background: #4a4a4f; color: #211e29; font-weight: 700;
+}
+.ohm-probe.active { border-color: var(--accent); background: #45382a; }
+.ohm-probe.active .ohm-probe-marker { background: var(--accent); }
+
+.fuse { width: min(300px, 100%); padding: 10px; border: 1px solid #6b6478; border-radius: 8px; background: #211e29; }
+.fuse-heading { display: flex; justify-content: space-between; font-size: 12px; color: #d8cfc0; }
+.fuse-threshold, .fuse-status { color: #a99; }
+.fuse-scale { height: 16px; margin: 8px 0 5px; border-radius: 8px; background: #342f3d; position: relative; overflow: hidden; }
+.fuse-green { position: absolute; inset: 0 auto 0 0; background: rgba(126,196,106,.4); }
+.fuse-fill { position: absolute; inset: 3px auto 3px 0; border-radius: 6px; background: #e8dcc0; transition: width .35s; }
+.fuse-mark { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+.fuse.warning .fuse-fill { background: #e8c33a; }
+.fuse.burned { border-color: var(--danger); }
+.fuse.burned .fuse-fill { background: var(--danger); }
+.fuse.burned .fuse-status { color: var(--danger); font-weight: 700; }
+
+.bell-stage { position: relative; }
+.bell-stage .bell-ohm { position: absolute; right: 12px; bottom: 12px; }
+.bell-key-left line, .bell-key-right line { transition: transform .25s; transform-box: fill-box; transform-origin: bottom center; }
+.bell-key-left.open line { transform: rotate(-48deg); }
+.bell-key-right.open line { transform: rotate(48deg); }
+
 /* ---------- Bitácora ---------- */
 #bitacora {
   position: absolute; inset: 0; z-index: 60;

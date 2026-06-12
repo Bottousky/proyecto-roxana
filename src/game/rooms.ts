@@ -4,6 +4,7 @@ import { showBitacoraButton, notifyNewEntry, openBitacora } from '../ui/bitacora
 import { abrirDespertar } from '../puzzles/despertar';
 import { abrirFreno } from '../puzzles/freno';
 import { abrirPuerta } from '../puzzles/puerta';
+import { abrirBell } from '../puzzles/bell';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal } from '../audio';
@@ -167,6 +168,23 @@ function reproducirIntroUnidad2(): void {
       setFlag('playedUnit2Intro');
       hooks.refresh();
     },
+  );
+}
+
+function abrirCampanaUnidad2(): void {
+  say(
+    [
+      L('Edda', 'Volviste. Bien. No dormí pensando en esto.'),
+      L('Edda', 'DOS cables. Misma campana. Los Maestros no ponían nada por adorno.'),
+      L('Edda', '¿Para qué dos caminos para un mismo río?'),
+      L('Ohm', 'Hipótesis disponible. Medición recomendada.'),
+    ],
+    () =>
+      abrirBell(() => {
+        setFlag('solvedBellPaths');
+        notifyNewEntry('Dos caminos');
+        hooks.refresh();
+      }),
   );
 }
 
@@ -429,7 +447,9 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         // Edda acompaña la historia: tras despertar a Ohm se va al taller,
         // después a la Puerta, y vuelve a la plaza cuando todo se enciende
-        visible: () => !f().ohmAwake || f().puertaDone,
+        visible: () =>
+          (!f().ohmAwake || f().puertaDone) &&
+          !(f().playedUnit2Intro && !f().solvedBellPaths),
         walksTo: 'taller',
         onInteract: () => {
           const fl = f();
@@ -453,6 +473,12 @@ export const ROOMS: Record<string, RoomDef> = {
             ]);
           }
         },
+      },
+      {
+        id: 'edda-campana', x: 710, y: 115, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().playedUnit2Intro && !f().solvedBellPaths,
+        onInteract: abrirCampanaUnidad2,
       },
       {
         id: 'lumen-plaza', x: 700, y: 200, w: 38, h: 38, shape: 'circle',
@@ -496,8 +522,13 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Campana', prompt: 'La campana de Ohmdal', solid: true, emoji: '🔔',
         color: () => (f().puertaDone ? 0xb08d2a : 0x4f4a42),
         onInteract: () => {
-          if (f().finished) say(L('', 'La campana todavía vibra, contenta. Los dos cables siguen ahí, esperando su lección.'));
-          else if (f().puertaDone) tocarCampana();
+          const fl = f();
+          if (fl.playedUnit2Intro) {
+            if (fl.solvedBellPaths) abrirBell(() => {}, true);
+            else abrirCampanaUnidad2();
+          } else if (fl.finished) {
+            say(L('', 'La campana todavía vibra, contenta. Los dos cables siguen ahí, esperando su lección.'));
+          } else if (fl.puertaDone) tocarCampana();
           else say(L('', 'La campana de Ohmdal cuelga muda sobre la plaza apagada. La cuerda está al alcance, pero algo dice que todavía no.'));
         },
       },
