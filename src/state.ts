@@ -12,6 +12,20 @@ export interface Flags {
   puertaDone: boolean;
   burnedSomething: boolean;
   finished: boolean;
+  playedUnit2Intro: boolean;
+  solvedBellPaths: boolean;
+  metConsejera: boolean;
+  enteredCastle: boolean;
+  ohmRecognizedCastle: boolean;
+  solvedGalleryChain: boolean;
+  solvedBranches: boolean;
+  burnedTrunkFuse: boolean;
+  solvedDistributor: boolean;
+  castleRestored: boolean;
+  learnedSeriesParallel: boolean;
+  fixedSchoolBell: boolean;
+  sawStoredSpark: boolean;
+  unit2Completed: boolean;
 }
 
 const DEFAULT_FLAGS: Flags = {
@@ -28,6 +42,20 @@ const DEFAULT_FLAGS: Flags = {
   puertaDone: false,
   burnedSomething: false,
   finished: false,
+  playedUnit2Intro: false,
+  solvedBellPaths: false,
+  metConsejera: false,
+  enteredCastle: false,
+  ohmRecognizedCastle: false,
+  solvedGalleryChain: false,
+  solvedBranches: false,
+  burnedTrunkFuse: false,
+  solvedDistributor: false,
+  castleRestored: false,
+  learnedSeriesParallel: false,
+  fixedSchoolBell: false,
+  sawStoredSpark: false,
+  unit2Completed: false,
 };
 
 export interface GameState {

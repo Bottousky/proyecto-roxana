@@ -5,6 +5,7 @@ import { abrirDespertar } from '../puzzles/despertar';
 import { abrirFreno } from '../puzzles/freno';
 import { abrirPuerta } from '../puzzles/puerta';
 import { showEnd } from '../ui/end';
+import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal } from '../audio';
 
 export interface ThingDef {
@@ -133,7 +134,20 @@ function tocarCampana(): void {
     ],
     () => {
       setFlag('finished');
-      showEnd();
+      const entradas = getEntries().length;
+      const humo = state.flags.burnedSomething
+        ? 'Cosas quemadas: sí. (Así se aprende.)'
+        : 'Cosas quemadas: ninguna. (¿En serio nunca probaste qué pasaba?)';
+      showEnd({
+        title: 'Fin del vertical slice — Unidad 1: «La corriente no es magia»',
+        note: `
+          Entradas en la Bitácora: ${entradas} · ${humo}<br/><br/>
+          La campana sonó. La plaza tiene luz. Y de la campana bajan dos cables…<br/>
+          <em>Unidad 2: circuitos con más de un camino.</em>
+        `,
+        continueLabel: 'Continuar',
+        onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
+      });
     },
   );
 }
