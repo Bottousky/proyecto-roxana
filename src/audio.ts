@@ -860,6 +860,25 @@ export function sfxWin(): void {
   notas.forEach((f, i) => tone(f, 'triangle', 0.09, 1.0, { when: i * 0.15, echo: true }));
 }
 
+/** Compás de la Forja restaurada: Martillo, Fuelle y Lumbre trabados en un ritmo. */
+export function sfxForgeRhythm(): void {
+  for (let beat = 0; beat < 4; beat++) {
+    const when = beat * 0.72;
+    tone(72, 'square', 0.17, 0.13, { when, to: 48, attack: 0.002 });
+    noise(0.12, 0.18, 'lowpass', 240, { when, to: 90, q: 1.4 });
+    noise(0.065, 0.5, 'bandpass', 620, {
+      when: when + 0.12,
+      to: 210,
+      q: 0.8,
+    });
+    tone(196, 'triangle', 0.045, 0.62, {
+      when: when + 0.08,
+      to: 220,
+      attack: 0.08,
+    });
+  }
+}
+
 /** La Puerta de Ohm abriéndose: retumbe que sube. */
 export function sfxGate(): void {
   noise(0.22, 1.6, 'lowpass', 140);

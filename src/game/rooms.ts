@@ -12,6 +12,7 @@ import { abrirTimbre } from '../puzzles/timbre';
 import { abrirWarmth } from '../puzzles/warmth';
 import { abrirInfirmary } from '../puzzles/infirmary';
 import { abrirLongChannel } from '../puzzles/longchannel';
+import { abrirForge } from '../puzzles/forge';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -471,6 +472,46 @@ function abrirBancoLongChannel(): void {
       setFlag('solvedLongChannel');
       notifyNewEntry('La Entrega');
       hooks.refresh();
+    },
+  });
+}
+
+let forgeIntroSeen = false;
+
+function presentarForjaCompleta(): void {
+  if (forgeIntroSeen || f().solvedForgeNetwork) return;
+  forgeIntroSeen = true;
+  say([
+    L('Forjadora', 'Todo junto, una vez. Como cuando era niña.'),
+    L('Forjadora', 'Tres máquinas, un solo tronco, y el cobre que hay: un canal ancho, dos medios, dos angostos. Ni uno más. Repártelo bien.'),
+    L('Consejera', 'Y yo anoto la entrega de cada una. Por hora.'),
+    L('Consejera', 'Inventario de jornales. Este sí.'),
+  ]);
+}
+
+function hablarForjadoraNave(): void {
+  if (!forgeIntroSeen && !f().solvedForgeNetwork) {
+    presentarForjaCompleta();
+    return;
+  }
+  if (f().forgeRestored) {
+    say(L('Forjadora', 'Ese compás. ESE.'));
+    return;
+  }
+  // TODO(guion): re-interacción con la Forjadora antes de resolver F5.
+  say(L('Forjadora', 'Las tres máquinas esperan.'));
+}
+
+function abrirBancoForge(): void {
+  abrirForge({
+    practica: f().solvedForgeNetwork,
+    onSolved: () => {
+      setFlag('solvedForgeNetwork');
+      setFlag('forgeRestored');
+      setFlag('learnedPower');
+      notifyNewEntry('El Jornal');
+      hooks.refresh();
+      openBitacora('el-jornal');
     },
   });
 }
@@ -1416,8 +1457,8 @@ export const ROOMS: Record<string, RoomDef> = {
   forge_yard: {
     id: 'forge_yard',
     name: 'La Forja — Patio',
-    floor: () => 0x30251f,
-    wall: () => 0x51392c,
+    floor: () => (f().forgeRestored ? 0x4b3020 : 0x30251f),
+    wall: () => (f().forgeRestored ? 0x7a4a2c : 0x51392c),
     doors: [
       {
         x: 934, y: 190, w: 26, h: 110,
@@ -1475,8 +1516,8 @@ export const ROOMS: Record<string, RoomDef> = {
   forge_infirmary: {
     id: 'forge_infirmary',
     name: 'La Forja — Enfermería de fusibles',
-    floor: () => 0x2a2422,
-    wall: () => 0x4b3932,
+    floor: () => (f().forgeRestored ? 0x443027 : 0x2a2422),
+    wall: () => (f().forgeRestored ? 0x6e4936 : 0x4b3932),
     doors: [
       {
         x: 420, y: 514, w: 120, h: 26,
@@ -1525,8 +1566,8 @@ export const ROOMS: Record<string, RoomDef> = {
   forge_longchannel: {
     id: 'forge_longchannel',
     name: 'La Forja — El Canal Largo',
-    floor: () => 0x2d251f,
-    wall: () => 0x49372b,
+    floor: () => (f().forgeRestored ? 0x493020 : 0x2d251f),
+    wall: () => (f().forgeRestored ? 0x74472c : 0x49372b),
     doors: [
       {
         x: 420, y: 514, w: 120, h: 26,
@@ -1580,8 +1621,8 @@ export const ROOMS: Record<string, RoomDef> = {
   forge_hall: {
     id: 'forge_hall',
     name: 'La Forja — Nave mayor',
-    floor: () => 0x302720,
-    wall: () => 0x543b2d,
+    floor: () => (f().forgeRestored ? 0x51311f : 0x302720),
+    wall: () => (f().forgeRestored ? 0x82482b : 0x543b2d),
     doors: [
       {
         x: 420, y: 514, w: 120, h: 26,
@@ -1622,17 +1663,18 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-forja-completa', x: 480, y: 405, w: 210, h: 76,
         label: 'Banco de la Forja', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(F5)
-        onInteract: () => say(L('', 'El banco todavía no está disponible.')),
+        onInteract: abrirBancoForge,
       },
       {
         id: 'forjadora-nave', x: 740, y: 390, w: 40, h: 40, shape: 'circle',
         label: 'Forjadora', prompt: 'Hablar con la Forjadora',
         color: 0x9b5438, solid: true, emoji: '💬',
-        // TODO(guion): diálogo de presentación de F5.
-        onInteract: () => say(L('Forjadora', 'Las tres máquinas esperan.')),
+        onInteract: hablarForjadoraNave,
       },
     ],
-    onEnter: () => setAmbience('forge'),
+    onEnter: () => {
+      setAmbience('forge');
+      presentarForjaCompleta();
+    },
   },
 };

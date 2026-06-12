@@ -40,8 +40,8 @@ equal(
 );
 equal(
   (roomsSource.match(/\/\/ TODO\(F[2345]\)/g) ?? []).length,
-  1,
-  'el banco F5 queda marcado para su hito',
+  0,
+  'los bancos F2-F5 ya no conservan placeholders de hito',
 );
 
 for (const text of [

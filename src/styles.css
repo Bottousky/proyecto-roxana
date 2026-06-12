@@ -420,6 +420,81 @@ button.longchannel-slot { cursor: pointer; }
   border-color: var(--ok); box-shadow: 0 0 18px rgba(126,196,106,.25);
 }
 
+/* U3: Forja completa */
+.forge-stage { display: grid; gap: 10px; }
+.forge-stock {
+  display: flex; gap: 7px; flex-wrap: wrap; align-items: center; justify-content: center;
+  color: #a99; font-size: 11px;
+}
+.forge-stock strong, .forge-stock span {
+  padding: 4px 7px; border: 1px solid #4a4554; border-radius: 999px;
+}
+.forge-stock strong { color: var(--accent); border-color: #8a7c50; }
+.forge-machines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.forge-machine {
+  min-width: 0; padding: 9px; border: 1px solid #5d5868; border-radius: 10px;
+  background: #211e29; text-align: center; transition: border-color .25s, box-shadow .25s;
+}
+.forge-machine h3 { margin: 0 0 6px; color: var(--accent); font-size: 12px; }
+.forge-channel {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  color: #a99; font-size: 10px;
+}
+.forge-copper { width: 46px; height: 9px; border-radius: 5px; background: #a2673f; }
+.forge-instruments {
+  display: grid; grid-template-columns: minmax(0, 1fr) 58px; align-items: center; gap: 2px;
+}
+.forge-gauge .gauge { max-width: 126px !important; margin: 0 auto; }
+.forge-gauge > span { display: block; margin-top: -8px; color: #887f90; font-size: 9px; }
+.forge-thermometer .channel-thermometer { max-width: 58px; }
+.forge-readings {
+  min-height: 30px; margin: 3px 0 6px; color: #a99; font-size: 10px; line-height: 1.35;
+}
+.forge-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+.forge-slot {
+  min-width: 0; min-height: 34px; padding: 1px; border: 1px dashed #746c7f;
+  border-radius: 6px; background: #1a1820; color: #746c7f;
+}
+button.forge-slot { cursor: pointer; }
+.forge-slot .piedra { width: 100%; height: 31px; pointer-events: none; font-size: 9px; }
+.forge-stone-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-top: 5px; }
+.forge-stone-button {
+  min-width: 0; padding: 0; border: 0; border-radius: 6px; background: transparent; cursor: pointer;
+}
+.forge-stone-button .piedra { width: 100%; height: 31px; pointer-events: none; font-size: 9px; }
+.forge-stone-button:disabled { opacity: .35; cursor: default; }
+.forge-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-top: 5px; }
+.forge-selector[data-selector='thickness'] { grid-template-columns: repeat(3, 1fr); }
+.forge-choice, .forge-repair {
+  padding: 5px 2px; border: 1px solid #6b6478; border-radius: 6px;
+  background: #2a2733; color: #d8cfc0; font-size: 9px; cursor: pointer;
+}
+.forge-choice:hover, .forge-choice.selected {
+  border-color: var(--accent); color: var(--accent); background: #45382a;
+}
+.forge-choice:disabled { opacity: .35; cursor: default; }
+.forge-repair { width: 100%; margin-top: 6px; border-color: var(--danger); }
+.forge-machine.starting { border-color: var(--accent); }
+.forge-machine[data-level='rojo'] { border-color: var(--danger); }
+.forge-machine.cut {
+  border-color: var(--danger); box-shadow: inset 0 0 24px rgba(226,86,58,.18);
+}
+.forge-machine.cut .forge-copper {
+  background: linear-gradient(90deg, #a2673f 0 43%, transparent 44% 56%, #a2673f 57%);
+}
+.forge-machine.stable {
+  border-color: var(--ok); box-shadow: inset 0 0 18px rgba(126,196,106,.12);
+}
+.forge-trunk {
+  display: grid; grid-template-columns: minmax(0, 260px) auto;
+  align-items: center; justify-content: center; gap: 14px; color: #d8cfc0;
+}
+.forge-trunk .gauge { max-width: 230px !important; }
+.forge-trunk span { display: block; margin-top: -8px; color: #a99; font-size: 10px; text-align: center; }
+.forge-trunk strong { color: var(--ok); }
+.forge-stage.trunk-overload .forge-trunk strong { color: var(--danger); }
+.forge-stage.solved { box-shadow: inset 0 0 28px rgba(232,195,58,.12); }
+
 .bell-stage { position: relative; }
 .bell-stage .bell-ohm { position: absolute; right: 12px; bottom: 12px; }
 .bell-key-left line, .bell-key-right line { transition: transform .25s; transform-box: fill-box; transform-origin: bottom center; }
@@ -760,6 +835,8 @@ body.touch-device #prompt { display: none !important; }
   .infirmary-machines { grid-template-columns: 1fr; }
   .longchannel-network { grid-template-columns: 1fr; }
   .longchannel-line { justify-content: center; }
+  .forge-machines { grid-template-columns: 1fr; }
+  .forge-trunk { grid-template-columns: 1fr; }
   .distributor-stage { grid-template-columns: 1fr; }
   .distributor-districts { grid-template-columns: 1fr; }
   .distributor-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
