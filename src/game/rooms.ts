@@ -152,6 +152,24 @@ function tocarCampana(): void {
   );
 }
 
+function reproducirIntroUnidad2(): void {
+  say(
+    [
+      L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD DOS.'),
+      L('Proyector', 'El Castillo de Ohmdal: corazón de la red. De sus salas parten todos los ríos del reino.'),
+      L('Proyector', 'Recuerde, estudiante: un reino no se enciende con un solo camino.'),
+      L('', 'La imagen se corta. Sobre la lente, un lacre proyectado:'),
+      L('', 'CLAUSURADO POR ORDEN DEL CONSEJO DE OHMDAL.'),
+      L('', '«Conservación de chispa. Sin excepciones.»'),
+      L('', '¿Un mundo de práctica… con zonas clausuradas por sus propios habitantes?'),
+    ],
+    () => {
+      setFlag('playedUnit2Intro');
+      hooks.refresh();
+    },
+  );
+}
+
 /* ---------- las salas ---------- */
 
 export const ROOMS: Record<string, RoomDef> = {
@@ -275,16 +293,39 @@ export const ROOMS: Record<string, RoomDef> = {
     ],
     things: [
       {
+        id: 'lampara-aula', x: 160, y: 105, w: 30, h: 30, shape: 'circle',
+        label: 'Lámpara', prompt: 'Mirar la lámpara', color: 0xffd34d, solid: true, emoji: '💡',
+        visible: () => f().finished,
+        onInteract: () => say(L('', 'Una de las lámparas del aula ahora funciona.')),
+      },
+      {
         id: 'pizarron', x: 480, y: 100, w: 280, h: 54,
         label: 'Pizarrón', prompt: 'Leer el pizarrón', color: 0x24352c, solid: true, emoji: '✏️',
         onInteract: () =>
-          say(L('', 'En el pizarrón, escrito hace mucho y nunca borrado del todo: «Donde otros ven magia, …». El resto se perdió.')),
+          say(
+            L(
+              '',
+              f().finished
+                ? '«Donde otros ven magia, busca camino»'
+                : 'En el pizarrón, escrito hace mucho y nunca borrado del todo: «Donde otros ven magia, …». El resto se perdió.',
+            ),
+          ),
       },
       {
         id: 'proyector', x: 330, y: 330, w: 90, h: 60,
         label: 'Proyector', prompt: 'Encender el proyector', color: 0x4a4a55, solid: true, emoji: '📽️',
         onInteract: () => {
-          if (f().sawProjector) {
+          const fl = f();
+          if (fl.finished && !fl.playedUnit2Intro) {
+            reproducirIntroUnidad2();
+            return;
+          }
+          if (fl.finished) {
+            // TODO(guion): falta la línea del proyector tras reproducir el módulo dos.
+            say(L('', 'El proyector está apagado.'));
+            return;
+          }
+          if (fl.sawProjector) {
             say(L('Proyector', '*clac* …Que tenga una buena clase. *clac*'));
             return;
           }
@@ -304,17 +345,31 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
+        id: 'panel-portal', x: 740, y: 245, w: 100, h: 34,
+        label: 'Panel V/I/R', prompt: 'Examinar el panel V/I/R', color: 0x4fd6c8, solid: true, emoji: '⚡',
+        visible: () => f().finished,
+        onInteract: () => say(L('', 'El panel V/I/R del portal brilla estable, no intermitente.')),
+      },
+      {
         id: 'portal', x: 740, y: 330, w: 80, h: 100,
-        label: 'Portal', prompt: 'Cruzar el portal', color: 0x2e8b8b, solid: false, emoji: '✨',
+        label: 'Portal', prompt: 'Cruzar el portal',
+        color: () => (f().finished ? 0x45c7bd : 0x2e8b8b),
+        solid: false, emoji: '✨',
         visible: () => f().sawProjector,
-        onInteract: () =>
+        onInteract: () => {
+          if (f().finished) {
+            sfxPortal();
+            hooks.goto('plaza', { x: 480, y: 430 });
+            return;
+          }
           say(
             [L('', 'El marco del portal zumba, suave, como invitando. Del otro lado se adivina una plaza en penumbra.')],
             () => {
               sfxPortal();
               hooks.goto('plaza', { x: 480, y: 430 });
             },
-          ),
+          );
+        },
       },
     ],
   },
