@@ -27,6 +27,16 @@ export interface Flags {
   sawStoredSpark: boolean;
   unit2Completed: boolean;
   heardForgeWarmth: boolean;
+  playedUnit3Intro: boolean;
+  metForjadora: boolean;
+  solvedWarmChannel: boolean;
+  solvedFuseInfirmary: boolean;
+  burnedChannelDemo: boolean;
+  solvedLongChannel: boolean;
+  solvedForgeNetwork: boolean;
+  forgeRestored: boolean;
+  learnedPower: boolean;
+  unit3Completed: boolean;
 }
 
 const DEFAULT_FLAGS: Flags = {
@@ -58,6 +68,16 @@ const DEFAULT_FLAGS: Flags = {
   sawStoredSpark: false,
   unit2Completed: false,
   heardForgeWarmth: false,
+  playedUnit3Intro: false,
+  metForjadora: false,
+  solvedWarmChannel: false,
+  solvedFuseInfirmary: false,
+  burnedChannelDemo: false,
+  solvedLongChannel: false,
+  solvedForgeNetwork: false,
+  forgeRestored: false,
+  learnedPower: false,
+  unit3Completed: false,
 };
 
 export interface GameState {

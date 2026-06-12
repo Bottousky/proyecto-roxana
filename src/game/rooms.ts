@@ -175,6 +175,22 @@ function reproducirIntroUnidad2(): void {
   );
 }
 
+function reproducirIntroUnidad3(): void {
+  say(
+    [
+      L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD TRES.'),
+      L('Proyector', 'La Forja de Ohmdal: donde el río trabaja.'),
+      L('Proyector', 'Recuerde, estudiante: nada que trabaja, trabaja gratis.'),
+      L('', 'La imagen tiembla y se corta. Sobre la lente, un instante, la silueta de un fusible fundido.'),
+      L('', '(¿Eso fue una lección… o un aviso?)'),
+    ],
+    () => {
+      setFlag('playedUnit3Intro');
+      hooks.refresh();
+    },
+  );
+}
+
 function abrirCampanaUnidad2(): void {
   say(
     [
@@ -524,6 +540,14 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Proyector', prompt: 'Encender el proyector', color: 0x4a4a55, solid: true, emoji: '📽️',
         onInteract: () => {
           const fl = f();
+          if (fl.unit2Completed && !fl.playedUnit3Intro) {
+            reproducirIntroUnidad3();
+            return;
+          }
+          if (fl.unit2Completed) {
+            say(L('Proyector', '*clac* Unidad tres: en curso. Abríguese. O no. Ya va a entender. *clac*'));
+            return;
+          }
           if (fl.finished && !fl.playedUnit2Intro) {
             reproducirIntroUnidad2();
             return;
