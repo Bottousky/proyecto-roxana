@@ -131,13 +131,15 @@ export class ExplorationScene extends Phaser.Scene {
 
     // atmósfera musical por zona (la plaza y la Puerta cambian al encenderse Ohmdal)
     const mood: Ambience =
-      id === 'taller'
-        ? 'taller'
-        : id === 'plaza' || id === 'puerta'
-          ? state.flags.puertaDone
-            ? 'ohmdal-on'
-            : 'ohmdal'
-          : 'instituto';
+      id.startsWith('forge_')
+        ? 'forge'
+        : id === 'taller'
+          ? 'taller'
+          : id === 'plaza' || id === 'puerta'
+            ? state.flags.puertaDone
+              ? 'ohmdal-on'
+              : 'ohmdal'
+            : 'instituto';
     setAmbience(mood);
 
     for (const o of this.roomObjects) {
@@ -172,6 +174,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     // puertas
     for (const d of def.doors) {
+      if (d.visible && !d.visible()) continue;
       const cx = d.x + d.w / 2;
       const cy = d.y + d.h / 2;
       add(this.add.rectangle(cx, cy, d.w, d.h, d.color ?? 0x50465e));

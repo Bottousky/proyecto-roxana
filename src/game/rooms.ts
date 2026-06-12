@@ -40,6 +40,7 @@ export interface DoorDef {
   spawn: { x: number; y: number };
   label: string;
   color?: number;
+  visible?: () => boolean;
   /** si devuelve líneas, la puerta está trabada y se muestran */
   locked?: () => Line[] | null;
 }
@@ -375,6 +376,32 @@ function abrirBancoTimbre(): void {
   });
 }
 
+/* ---------- F1: salas de la Forja ---------- */
+
+function hablarForjadoraPatio(): void {
+  if (f().metForjadora) {
+    // TODO(guion): re-interacción con la Forjadora antes de resolver el canal tibio.
+    say(L('Forjadora', 'El banco del canal tibio sigue esperando.'));
+    return;
+  }
+  say(
+    [
+      L('Forjadora', '¿Tú eres quien anda encendiendo cosas? Bien. Tenemos que hablar.'),
+      L('Forjadora', 'Tercer fusible de la semana. Y los canales entibian como sopa. Esto antes no pasaba.'),
+      L('Consejera', 'Antes no pasaba NADA, Forjadora. Esa era exactamente la política.'),
+      L('Forjadora', '…Touché.'),
+      L('Forjadora', 'Mira: yo no entiendo de ríos ni de cuentas. Entiendo de carbón. Y desde que la Forja despertó, el carbón vuela. Algo se está yendo a alguna parte.'),
+      L('Consejera', 'Eso vine a preguntar. Medimos el río: no se gasta. Lo demostraron ustedes. Entonces, ¿qué es lo que falta cada mañana?'),
+      L('Edda', '…Esa es buena pregunta. Ohm: ¿tienes algo para el calor?'),
+      L('Ohm', 'Modo nuevo disponible: termómetro. Apoyo la mano. Reporto el peaje.'),
+    ],
+    () => {
+      setFlag('metForjadora');
+      hooks.refresh();
+    },
+  );
+}
+
 /* ---------- las salas ---------- */
 
 export const ROOMS: Record<string, RoomDef> = {
@@ -654,6 +681,13 @@ export const ROOMS: Record<string, RoomDef> = {
             L('', 'Sin evidencia, nadie va a mover ese cordón. La campana de los dos cables espera en la plaza.'),
           ];
         },
+      },
+      {
+        x: 0, y: 190, w: 26, h: 110,
+        to: 'forge_yard', spawn: { x: 860, y: 245 },
+        label: 'Camino a la Forja',
+        color: 0x7a5438,
+        visible: () => f().unit2Completed,
       },
     ],
     things: [
@@ -1302,5 +1336,228 @@ export const ROOMS: Record<string, RoomDef> = {
       setAmbience('castle');
       presentarCorazonCastillo();
     },
+  },
+
+  /* ============ LA FORJA ============ */
+
+  forge_yard: {
+    id: 'forge_yard',
+    name: 'La Forja — Patio',
+    floor: () => 0x30251f,
+    wall: () => 0x51392c,
+    doors: [
+      {
+        x: 934, y: 190, w: 26, h: 110,
+        to: 'plaza', spawn: { x: 95, y: 245 },
+        label: 'Plaza de Ohmdal',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'forge_infirmary', spawn: { x: 480, y: 440 },
+        label: 'Enfermería de fusibles',
+        locked: () => {
+          if (f().solvedWarmChannel) return null;
+          // TODO(guion): puerta trabada F2
+          return [L('', 'El paso sigue cerrado.')];
+        },
+      },
+    ],
+    things: [
+      {
+        id: 'martillos-patio', x: 480, y: 105, w: 470, h: 54,
+        label: 'Martillos al fondo', prompt: 'Mirar los martillos',
+        color: 0x6f5642, solid: true,
+        onInteract: () => say(L('', 'Martillos que caen solos al fondo.')),
+      },
+      {
+        id: 'canal-tibio-patio', x: 240, y: 245, w: 260, h: 30,
+        label: 'Canal tibio', prompt: 'Examinar el canal',
+        color: 0xa2673f, solid: true,
+        // TODO(guion): examen del canal del patio.
+        onInteract: () => say(L('', 'Un canal de cobre cruza el patio de piedra.')),
+      },
+      {
+        id: 'banco-canal-tibio', x: 480, y: 390, w: 200, h: 76,
+        label: 'Banco del canal tibio', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(F2)
+        onInteract: () => say(L('', 'El banco todavía no está disponible.')),
+      },
+      {
+        id: 'forjadora-patio', x: 335, y: 320, w: 40, h: 40, shape: 'circle',
+        label: 'Forjadora', prompt: 'Hablar con la Forjadora',
+        color: 0x9b5438, solid: true, emoji: '💬',
+        onInteract: hablarForjadoraPatio,
+      },
+      {
+        id: 'consejera-patio', x: 660, y: 325, w: 38, h: 38, shape: 'circle',
+        label: 'Consejera', prompt: 'Hablar con la Consejera',
+        color: 0x725d79, solid: true, emoji: '💬',
+        onInteract: () =>
+          say(L('Consejera', 'Eso vine a preguntar. Medimos el río: no se gasta. Lo demostraron ustedes. Entonces, ¿qué es lo que falta cada mañana?')),
+      },
+    ],
+    onEnter: () => setAmbience('forge'),
+  },
+
+  forge_infirmary: {
+    id: 'forge_infirmary',
+    name: 'La Forja — Enfermería de fusibles',
+    floor: () => 0x2a2422,
+    wall: () => 0x4b3932,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'forge_yard', spawn: { x: 480, y: 95 },
+        label: 'Patio de la Forja',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'forge_longchannel', spawn: { x: 480, y: 440 },
+        label: 'Canal Largo',
+        locked: () => {
+          if (f().solvedFuseInfirmary) return null;
+          // TODO(guion): puerta trabada F3
+          return [L('', 'El paso sigue cerrado.')];
+        },
+      },
+    ],
+    things: [
+      {
+        id: 'pared-fusibles', x: 480, y: 110, w: 600, h: 72,
+        label: 'Pared de fusibles', prompt: 'Examinar la pared',
+        color: 0x665244, solid: true,
+        onInteract: () =>
+          say(L('', 'Una pared entera de fusibles muertos, etiquetados con fecha y una velita.')),
+      },
+      {
+        id: 'banco-enfermeria', x: 480, y: 370, w: 200, h: 76,
+        label: 'Banco de la enfermería', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(F3)
+        onInteract: () => say(L('', 'El banco todavía no está disponible.')),
+      },
+      {
+        id: 'lumen-enfermeria', x: 700, y: 330, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        // TODO(guion): diálogo de presentación de F3.
+        onInteract: () => say(L('Maese Lumen', 'La enfermería espera.')),
+      },
+    ],
+    onEnter: () => setAmbience('forge'),
+  },
+
+  forge_longchannel: {
+    id: 'forge_longchannel',
+    name: 'La Forja — El Canal Largo',
+    floor: () => 0x2d251f,
+    wall: () => 0x49372b,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'forge_infirmary', spawn: { x: 480, y: 95 },
+        label: 'Enfermería de fusibles',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'forge_hall', spawn: { x: 480, y: 440 },
+        label: 'Nave mayor',
+        locked: () => {
+          if (f().solvedLongChannel) return null;
+          // TODO(guion): puerta trabada F4
+          return [L('', 'El paso sigue cerrado.')];
+        },
+      },
+    ],
+    things: [
+      {
+        id: 'canal-doscientos-pasos', x: 455, y: 220, w: 720, h: 34,
+        label: 'Canal de doscientos pasos', prompt: 'Examinar el canal',
+        color: 0x8d5b36, solid: true,
+        onInteract: () =>
+          say(L('', 'Un canal angosto de doscientos pasos cruza el patio viejo hasta el horno lejano.')),
+      },
+      {
+        id: 'horno-lejano', x: 825, y: 120, w: 105, h: 90,
+        label: 'Horno lejano', prompt: 'Mirar el horno',
+        color: 0x5c3a2c, solid: true,
+        onInteract: () => say(L('', 'El horno lejano de la Forjadora lleva años frío.')),
+      },
+      {
+        id: 'banco-canal-largo', x: 450, y: 385, w: 200, h: 76,
+        label: 'Banco del Canal Largo', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(F4)
+        onInteract: () => say(L('', 'El banco todavía no está disponible.')),
+      },
+      {
+        id: 'forjadora-canal-largo', x: 720, y: 370, w: 40, h: 40, shape: 'circle',
+        label: 'Forjadora', prompt: 'Hablar con la Forjadora',
+        color: 0x9b5438, solid: true, emoji: '💬',
+        // TODO(guion): diálogo de presentación de F4.
+        onInteract: () => say(L('Forjadora', 'El horno sigue esperando al final del canal.')),
+      },
+    ],
+    onEnter: () => setAmbience('forge'),
+  },
+
+  forge_hall: {
+    id: 'forge_hall',
+    name: 'La Forja — Nave mayor',
+    floor: () => 0x302720,
+    wall: () => 0x543b2d,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'forge_longchannel', spawn: { x: 480, y: 95 },
+        label: 'Canal Largo',
+      },
+    ],
+    things: [
+      {
+        id: 'martillo-forja', x: 210, y: 150, w: 180, h: 90,
+        label: 'Martillo · ENTREGA 32', prompt: 'Examinar el Martillo',
+        color: 0x70513b, solid: true,
+        // TODO(guion): examen del Martillo.
+        onInteract: () => say(L('', 'El Martillo está apagado. Su placa dice: ENTREGA 32.')),
+      },
+      {
+        id: 'fuelle-forja', x: 480, y: 150, w: 180, h: 90,
+        label: 'Fuelle · ENTREGA 16', prompt: 'Examinar el Fuelle',
+        color: 0x665046, solid: true,
+        // TODO(guion): examen del Fuelle.
+        onInteract: () => say(L('', 'El Fuelle está apagado. Su placa dice: ENTREGA 16.')),
+      },
+      {
+        id: 'lumbre-forja', x: 750, y: 150, w: 180, h: 90,
+        label: 'Lumbre · ENTREGA 8', prompt: 'Examinar la Lumbre',
+        color: 0x704536, solid: true,
+        // TODO(guion): examen de la Lumbre.
+        onInteract: () => say(L('', 'La Lumbre está apagada. Su placa dice: ENTREGA 8.')),
+      },
+      {
+        id: 'tablero-bus', x: 480, y: 285, w: 260, h: 76,
+        label: 'Tablero de bus', prompt: 'Examinar el tablero',
+        color: 0x6b5944, solid: true,
+        // TODO(guion): examen del tablero de bus.
+        onInteract: () => say(L('', 'El tablero de la Forja espera su cristal de bus.')),
+      },
+      {
+        id: 'banco-forja-completa', x: 480, y: 405, w: 210, h: 76,
+        label: 'Banco de la Forja', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(F5)
+        onInteract: () => say(L('', 'El banco todavía no está disponible.')),
+      },
+      {
+        id: 'forjadora-nave', x: 740, y: 390, w: 40, h: 40, shape: 'circle',
+        label: 'Forjadora', prompt: 'Hablar con la Forjadora',
+        color: 0x9b5438, solid: true, emoji: '💬',
+        // TODO(guion): diálogo de presentación de F5.
+        onInteract: () => say(L('Forjadora', 'Las tres máquinas esperan.')),
+      },
+    ],
+    onEnter: () => setAmbience('forge'),
   },
 };

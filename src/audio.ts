@@ -2,7 +2,7 @@
    Todo WebAudio, sin assets — pensado para el greybox. Cuando haya música real,
    este módulo se reemplaza manteniendo la misma interfaz (setAmbience + sfx*). */
 
-export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on' | 'castle';
+export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on' | 'castle' | 'forge';
 
 /** Una pieza compuesta: pistas de melodía y bajo como listas de [nota, pulsos].
  *  null = silencio. Las notas en notación científica ('D5', 'Bb2', 'F#4'). */
@@ -10,6 +10,7 @@ interface ThemeDef {
   tempo: number;
   melody: [string | null, number][];
   bass: [string | null, number][];
+  percussion?: { beat: number; freq: number; level: number }[];
   melodyLevel: number;
   bassLevel: number;
 }
@@ -110,6 +111,22 @@ const TEMA_CASTLE: ThemeDef = {
   bassLevel: 0.5,
 };
 
+// «La Forja de Ohmdal» — variación del Castillo con un compás grave de trabajo.
+const TEMA_FORGE: ThemeDef = {
+  ...TEMA_CASTLE,
+  tempo: 56,
+  percussion: [
+    { beat: 0, freq: 62, level: 0.22 },
+    { beat: 4, freq: 55, level: 0.18 },
+    { beat: 8, freq: 62, level: 0.22 },
+    { beat: 12, freq: 55, level: 0.18 },
+    { beat: 16, freq: 62, level: 0.22 },
+    { beat: 20, freq: 55, level: 0.18 },
+    { beat: 24, freq: 62, level: 0.22 },
+    { beat: 28, freq: 55, level: 0.18 },
+  ],
+};
+
 const MOODS: Record<Ambience, MoodDef> = {
   // el Instituto: polvo, eco, melancolía — re menor (deriva i → VI → VII)
   instituto: {
@@ -171,6 +188,21 @@ const MOODS: Record<Ambience, MoodDef> = {
     phraseGap: [8000, 18000],
     pluckLevel: 0.035,
     theme: TEMA_CASTLE,
+  },
+  // La Forja: armonía del Castillo, más seca, con golpes graves de taller.
+  forge: {
+    chords: [
+      [27.5, 41.2],
+      [21.83, 32.7],
+      [24.5, 36.71],
+    ],
+    droneType: 'triangle',
+    filter: 210,
+    level: 0.14,
+    scale: [110.0, 130.81, 146.83, 164.81, 196.0],
+    phraseGap: [7500, 16000],
+    pluckLevel: 0.03,
+    theme: TEMA_FORGE,
   },
   // Ohmdal encendida: el mismo re, pero abierto y luminoso (re → sol → la)
   'ohmdal-on': {
@@ -610,6 +642,24 @@ function bassNote(freq: number, when: number, dur: number, level: number, dest: 
   o.stop(when + dur * 1.05 + 0.1);
 }
 
+/** Golpe grave corto para el compás de la Forja. */
+function percussionHit(freq: number, when: number, level: number, dest: GainNode): void {
+  if (!ctx) return;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0, when);
+  g.gain.linearRampToValueAtTime(level, when + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, when + 0.42);
+  g.connect(dest);
+
+  const o = ctx.createOscillator();
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(freq, when);
+  o.frequency.exponentialRampToValueAtTime(freq * 0.48, when + 0.38);
+  o.connect(g);
+  o.start(when);
+  o.stop(when + 0.45);
+}
+
 /** Toca el tema completo (melodía + bajo) y devuelve su duración en ms. */
 function playTheme(theme: ThemeDef, dest: GainNode): number {
   if (!ctx) return 0;
@@ -628,7 +678,12 @@ function playTheme(theme: ThemeDef, dest: GainNode): number {
     if (n) bassNote(noteFreq(n), t0 + bassBeats * beat, b * beat, theme.bassLevel, dest);
     bassBeats += b;
   }
-  return Math.max(beats, bassBeats) * beat * 1000;
+  let percussionBeats = 0;
+  for (const hit of theme.percussion ?? []) {
+    percussionHit(hit.freq, t0 + hit.beat * beat, hit.level, dest);
+    percussionBeats = Math.max(percussionBeats, hit.beat + 1);
+  }
+  return Math.max(beats, bassBeats, percussionBeats) * beat * 1000;
 }
 
 function pluck(freq: number, level: number, dest: GainNode, when = 0): void {
