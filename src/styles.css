@@ -320,6 +320,56 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 }
 .warmth-progress span.done { color: var(--ok); border-color: rgba(126,196,106,.55); }
 
+/* U3: enfermería de fusibles */
+.infirmary-stage { display: grid; gap: 10px; }
+.infirmary-machines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.infirmary-machine {
+  min-width: 0; padding: 10px; border: 1px solid #5d5868; border-radius: 10px;
+  background: #211e29; text-align: center; transition: border-color .25s, box-shadow .25s;
+}
+.infirmary-machine h3 { margin: 0 0 6px; color: #d8cfc0; font-size: 14px; }
+.infirmary-plate {
+  display: inline-block; padding: 3px 7px; border-radius: 5px;
+  background: #342f3d; color: var(--accent); font-size: 11px;
+}
+.infirmary-channel {
+  display: flex; justify-content: center; align-items: center; gap: 6px;
+  margin: 8px 0 2px; color: #a99; font-size: 10px;
+}
+.infirmary-copper { width: 48px; height: 9px; border-radius: 5px; background: #a2673f; }
+.infirmary-instruments {
+  display: grid; grid-template-columns: minmax(0, 1fr) 62px; align-items: center; gap: 3px;
+}
+.infirmary-gauge .gauge { max-width: 128px !important; margin: 0 auto; }
+.infirmary-gauge > span { display: block; margin-top: -8px; color: #a99; font-size: 10px; }
+.infirmary-thermometer .channel-thermometer { max-width: 62px; }
+.infirmary-fuse-slot {
+  margin: 5px auto 7px; padding: 5px 7px; border: 1px dashed #746c7f;
+  border-radius: 6px; color: #a99; font-size: 11px;
+}
+.infirmary-fuses { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.infirmary-fuse {
+  padding: 6px 2px; border: 1px solid #6b6478; border-radius: 6px;
+  background: #2a2733; color: #d8cfc0; cursor: pointer;
+}
+.infirmary-fuse:hover, .infirmary-fuse.selected {
+  border-color: var(--accent); color: var(--accent); background: #45382a;
+}
+.infirmary-fuse:disabled { opacity: .45; cursor: default; }
+.infirmary-machine.starting { border-color: var(--accent); }
+.infirmary-machine.stable { border-color: var(--ok); box-shadow: inset 0 0 18px rgba(126,196,106,.12); }
+.infirmary-machine.cut {
+  border-color: var(--danger); box-shadow: inset 0 0 24px rgba(226,86,58,.18);
+  animation: channel-vibrate .14s linear 4;
+}
+.infirmary-machine.cut .infirmary-copper {
+  background: linear-gradient(90deg, #a2673f 0 43%, transparent 44% 56%, #a2673f 57%);
+}
+.infirmary-legend {
+  display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  color: #887f90; font-size: 11px;
+}
+
 .bell-stage { position: relative; }
 .bell-stage .bell-ohm { position: absolute; right: 12px; bottom: 12px; }
 .bell-key-left line, .bell-key-right line { transition: transform .25s; transform-box: fill-box; transform-origin: bottom center; }
@@ -657,6 +707,7 @@ body.touch-device #prompt { display: none !important; }
   .branches-cards { grid-template-columns: 1fr; }
   .branches-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
   .warmth-channels { grid-template-columns: 1fr; }
+  .infirmary-machines { grid-template-columns: 1fr; }
   .distributor-stage { grid-template-columns: 1fr; }
   .distributor-districts { grid-template-columns: 1fr; }
   .distributor-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }

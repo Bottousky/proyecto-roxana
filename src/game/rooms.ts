@@ -10,6 +10,7 @@ import { abrirBranches } from '../puzzles/branches';
 import { abrirDistributor } from '../puzzles/distributor';
 import { abrirTimbre } from '../puzzles/timbre';
 import { abrirWarmth } from '../puzzles/warmth';
+import { abrirInfirmary } from '../puzzles/infirmary';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -412,6 +413,33 @@ function abrirBancoWarmth(): void {
     },
     f().solvedWarmChannel,
   );
+}
+
+let infirmaryIntroSeen = false;
+
+function presentarEnfermeria(): void {
+  if (infirmaryIntroSeen || f().solvedFuseInfirmary) return;
+  infirmaryIntroSeen = true;
+  say([
+    L('Lumen', 'Mi enfermería. Bueno… mi cementerio, técnicamente. Cada uno de estos murió por la Forja.'),
+    L('Lumen', 'Este murió joven. Este no murió nunca — y dejó morir al canal. Empiezo a sospechar, estudiante, que la santidad era una cuestión de calibre.'),
+    L('Forjadora', 'Yo necesito que dejen de morirse, Lumen. O al menos que se mueran con sentido.'),
+    L('Ohm', 'Corrección: morirse con sentido es la función. Fusible = el que muere a propósito, para que no muera otra cosa.'),
+    L('Edda', '…Eso es lo más bonito que dijiste nunca, Ohm.'),
+    L('Ohm', 'Registro: poesía accidental. No se repetirá.'),
+  ]);
+}
+
+function abrirBancoInfirmary(): void {
+  abrirInfirmary({
+    practica: f().solvedFuseInfirmary,
+    onBurnedChannel: () => setFlag('burnedChannelDemo'),
+    onSolved: () => {
+      setFlag('solvedFuseInfirmary');
+      notifyNewEntry('El mártir y el margen');
+      hooks.refresh();
+    },
+  });
 }
 
 /* ---------- las salas ---------- */
@@ -1445,18 +1473,20 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-enfermeria', x: 480, y: 370, w: 200, h: 76,
         label: 'Banco de la enfermería', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(F3)
-        onInteract: () => say(L('', 'El banco todavía no está disponible.')),
+        onInteract: abrirBancoInfirmary,
       },
       {
         id: 'lumen-enfermeria', x: 700, y: 330, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
         color: 0x7a6a3a, solid: true, emoji: '💬',
-        // TODO(guion): diálogo de presentación de F3.
+        // TODO(guion): re-interacción con Lumen después de la presentación de F3.
         onInteract: () => say(L('Maese Lumen', 'La enfermería espera.')),
       },
     ],
-    onEnter: () => setAmbience('forge'),
+    onEnter: () => {
+      setAmbience('forge');
+      presentarEnfermeria();
+    },
   },
 
   forge_longchannel: {
