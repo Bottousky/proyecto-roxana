@@ -71,7 +71,9 @@ src/
   content/
     entries.ts             entradas de la Bitácora (dos capas, contenido dinámico)
 docs/
-  diseno-sintesis-v1.md    documento de diseño
+  diseno-sintesis-v1.md    diseño general del juego (sistemas, formato, arquitectura)
+  prologo.md               guion detallado del prólogo en la escuela
+  unidad-1-ohmdal.md       síntesis del mundo Ohmdal + guion de la Unidad 1
 ```
 
 ## Reglas de diseño que el código respeta

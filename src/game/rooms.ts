@@ -5,6 +5,7 @@ import { abrirDespertar } from '../puzzles/despertar';
 import { abrirFreno } from '../puzzles/freno';
 import { abrirPuerta } from '../puzzles/puerta';
 import { showEnd } from '../ui/end';
+import { sfxBell, sfxPortal } from '../audio';
 
 export interface ThingDef {
   id: string;
@@ -17,6 +18,8 @@ export interface ThingDef {
   prompt: string;
   color: number | (() => number);
   visible?: () => boolean;
+  /** sala hacia la que camina al irse (o desde la que llega) cuando `visible` cambia en un refresh */
+  walksTo?: string;
   solid?: boolean;
   emoji?: string;
   onInteract: () => void;
@@ -120,6 +123,7 @@ function resolverPuerta(): void {
 }
 
 function tocarCampana(): void {
+  sfxBell();
   say(
     [
       L('', 'Tirás de la cuerda. La campana de Ohmdal suena por primera vez en décadas: una nota limpia que recorre la plaza encendida.'),
@@ -292,7 +296,10 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () =>
           say(
             [L('', 'El marco del portal zumba, suave, como invitando. Del otro lado se adivina una plaza en penumbra.')],
-            () => hooks.goto('plaza', { x: 480, y: 430 }),
+            () => {
+              sfxPortal();
+              hooks.goto('plaza', { x: 480, y: 430 });
+            },
           ),
       },
     ],
@@ -354,6 +361,7 @@ export const ROOMS: Record<string, RoomDef> = {
         // Edda acompaña la historia: tras despertar a Ohm se va al taller,
         // después a la Puerta, y vuelve a la plaza cuando todo se enciende
         visible: () => !f().ohmAwake || f().puertaDone,
+        walksTo: 'taller',
         onInteract: () => {
           const fl = f();
           if (!fl.ohmAwake) {
@@ -381,6 +389,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'lumen-plaza', x: 700, y: 200, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         visible: () => f().puertaDone,
+        walksTo: 'puerta',
         onInteract: () =>
           say(
             f().finished
@@ -452,6 +461,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         // tras el puzzle del freno se adelanta a la Puerta (y después, a la plaza)
         visible: () => !f().frenoDone,
+        walksTo: 'plaza',
         onInteract: () => {
           const fl = f();
           if (!fl.metLumen) {
@@ -476,6 +486,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'edda-taller', x: 700, y: 310, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => !f().frenoDone,
+        walksTo: 'plaza',
         onInteract: () =>
           say(
             !f().metLumen
@@ -524,6 +535,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'edda-puerta', x: 330, y: 390, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => !f().puertaDone,
+        walksTo: 'plaza',
         onInteract: () =>
           say([
             L('Edda', 'Mirala bien: el ojo de aguja. Dicen que mide el río que la cruza.'),
@@ -534,6 +546,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'lumen-puerta', x: 630, y: 390, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         visible: () => !f().puertaDone,
+        walksTo: 'plaza',
         onInteract: () =>
           say([
             L('Maese Lumen', '«Ni hambrienta ni ahogada», decían los Maestros de la Puerta. Toda mi vida creí que hablaban de cortesía en la mesa.'),

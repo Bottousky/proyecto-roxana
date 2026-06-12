@@ -5,8 +5,10 @@ import { initDialog } from './ui/dialog';
 import { initBitacora, showBitacoraButton } from './ui/bitacora';
 import { el } from './ui/overlay';
 import { hasSave, load, resetSave, state } from './state';
+import { initAudio, initAudioButton } from './audio';
 
 function startGame(): void {
+  initAudio(); // el click de "Empezar"/"Continuar" es el gesto que habilita el sonido
   el('title-screen').classList.add('hidden');
   if (state.flags.hasBitacora) showBitacoraButton();
 
@@ -30,6 +32,7 @@ function startGame(): void {
 
 initDialog();
 initBitacora();
+initAudioButton();
 
 const btnContinue = el<HTMLButtonElement>('btn-continue');
 const btnNew = el<HTMLButtonElement>('btn-new');

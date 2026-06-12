@@ -1,4 +1,5 @@
 import { el, pushUI, popUI } from './overlay';
+import { sfxBlip, sfxToast } from '../audio';
 
 export interface Line {
   who: string;
@@ -16,6 +17,7 @@ let active = false;
 let lastAdvance = 0;
 
 function render(): void {
+  sfxBlip();
   const line = queue[idx];
   el('dialog-who').textContent = line.who;
   el('dialog-who').style.display = line.who ? 'block' : 'none';
@@ -77,6 +79,7 @@ export function initDialog(): void {
 let toastTimer: number | undefined;
 
 export function toast(msg: string, ms = 3200): void {
+  sfxToast();
   const t = el('toast');
   t.textContent = msg;
   t.classList.remove('hidden');

@@ -1,6 +1,7 @@
 import { openBench, benchActions } from '../ui/bench';
 import { ohmWidgetHTML, setOhmState, piedraEl, PIEDRAS, gaugeSVG, setGauge } from './common';
 import { setFlag, state } from '../state';
+import { sfxClick, sfxFzzt, sfxHot, sfxDim, sfxOk, sfxWin, sfxGate } from '../audio';
 
 interface Fuente {
   key: string;
@@ -81,6 +82,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
         btn.innerHTML = `${f.glifo}<br/>${f.nombre}`;
         btn.addEventListener('click', () => {
           if (solved) return;
+          sfxClick();
           fuente = f;
           rowF.querySelectorAll('.fuente-opt').forEach((b) => b.classList.remove('selected'));
           btn.classList.add('selected');
@@ -98,6 +100,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
         const p = piedraEl(key);
         p.addEventListener('click', () => {
           if (solved) return;
+          sfxClick();
           piedra = key;
           rowP.querySelectorAll('.piedra').forEach((b) => b.classList.remove('selected'));
           p.classList.add('selected');
@@ -157,6 +160,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
         window.setTimeout(() => {
           if (Math.abs(I - 2) < 0.35) {
             if (replay) {
+              sfxOk();
               setOhmState(stage, 'estable');
               bench.setStatus(
                 '<b>El caudal justo, otra vez.</b> La aguja clavada en la franja verde; la Puerta ronronea. ' +
@@ -165,6 +169,8 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
               return;
             }
             solved = true;
+            sfxGate();
+            sfxWin();
             setOhmState(stage, 'estable');
             stage.querySelector<SVGRectElement>('.door-l')!.style.transform = 'translateX(-70px)';
             stage.querySelector<SVGRectElement>('.door-r')!.style.transform = 'translateX(70px)';
@@ -178,6 +184,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
           } else if (I > 4) {
             fusibleQuemado = true;
             if (!state.flags.burnedSomething) setFlag('burnedSomething');
+            sfxFzzt();
             setOhmState(stage, 'sobrecarga');
             window.setTimeout(() => {
               setOhmState(stage, 'inerte');
@@ -192,10 +199,12 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
             actions['Bajar la palanca'].classList.add('hidden');
             actions['Cambiar fusible ritual'].classList.remove('hidden');
           } else if (I > 2) {
+            sfxHot();
             setOhmState(stage, 'sobrecarga');
             window.setTimeout(() => setOhmState(stage, 'estable'), 1300);
             bench.setStatus(hotLines[hi++ % hotLines.length]);
           } else {
+            sfxDim();
             setOhmState(stage, 'debil');
             window.setTimeout(() => setOhmState(stage, 'estable'), 1300);
             bench.setStatus(weakLines[wi++ % weakLines.length]);

@@ -1,6 +1,7 @@
 import { openBench, benchActions } from '../ui/bench';
 import { ohmWidgetHTML, setOhmState, piedraEl, PIEDRAS } from './common';
 import { setFlag, state } from '../state';
+import { sfxBridge, sfxFzzt, sfxHot, sfxDim, sfxOk, sfxWin } from '../audio';
 
 const EMPUJE_TALLER = 8; // fijo: la "fuente del taller" de Lumen
 
@@ -97,6 +98,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
               return;
             }
             enSlot = key;
+            sfxBridge();
             renderSlot();
             renderTray();
             setLamp('off');
@@ -124,6 +126,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
         if (corriente >= 8) {
           fusibleQuemado = true;
           if (!state.flags.burnedSomething) setFlag('burnedSomething');
+          sfxFzzt();
           setLamp('hot');
           setOhmState(stage, 'sobrecarga');
           setTimeout(() => {
@@ -140,6 +143,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           actions['Bajar la palanca'].classList.add('hidden');
           actions['Cambiar fusible ritual'].classList.remove('hidden');
         } else if (corriente >= 4) {
+          sfxHot();
           setLamp('hot');
           setOhmState(stage, 'sobrecarga');
           setTimeout(() => setOhmState(stage, 'estable'), 1400);
@@ -151,12 +155,14 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           );
         } else if (corriente >= 2) {
           if (replay) {
+            sfxOk();
             setLamp('ok');
             setOhmState(stage, 'estable');
             bench.setStatus('<b>Luz firme.</b> La piedra justa sigue siendo la justa.');
             return;
           }
           solved = true;
+          sfxWin();
           setLamp('ok');
           setOhmState(stage, 'estable');
           bench.setStatus(
@@ -168,6 +174,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           actions['Bajar la palanca'].classList.add('hidden');
           actions['Continuar'].classList.remove('hidden');
         } else {
+          sfxDim();
           setLamp('dim');
           setOhmState(stage, 'debil');
           bench.setStatus(
@@ -185,6 +192,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           label: 'Cambiar fusible ritual',
           onClick: () => {
             fusibleQuemado = false;
+            sfxBridge();
             setOhmState(stage, 'estable');
             bench.setStatus(
               replay

@@ -1,11 +1,13 @@
 import { el, pushUI, popUI } from './overlay';
 import { getEntries } from '../content/entries';
 import { state, resetSave } from '../state';
+import { sfxWin } from '../audio';
 
 export function showEnd(): void {
   const host = el('end-screen');
   host.classList.remove('hidden');
   pushUI();
+  sfxWin();
   const entradas = getEntries().length;
   const humo = state.flags.burnedSomething
     ? 'Cosas quemadas: sí. (Así se aprende.)'

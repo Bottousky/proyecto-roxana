@@ -1,6 +1,11 @@
 # Proyecto Roxana — Síntesis de diseño v1
 *Documento de trabajo — junio 2026*
 
+> **Mapa de documentos:** este archivo contiene las reglas generales del juego (concepto, loop, Bitácora, anti-clase, formato, distribución, arquitectura, riesgos). El detalle narrativo y de diseño vive en un documento por unidad:
+> - `prologo.md` — guion completo del prólogo en la escuela.
+> - `unidad-1-ohmdal.md` — síntesis del mundo Ohmdal + guion detallado de la Unidad 1.
+> - (futuro) `unidad-2-*.md` — circuitos serie/paralelo.
+
 ## 1. Concepto
 
 Juego narrativo educativo. Un estudiante llega "por descarte" al Instituto Roxana, una escuela técnica viva pero detenida: prestigio viejo, rutinas vacías, memoria perdida. Las aulas abren puertas a mundos conceptuales donde el conocimiento técnico sobrevivió degradado en ritual y superstición. El jugador aprende reactivando mundos; la Bitácora convierte la experiencia vivida en conocimiento formal, siempre después del hecho.
@@ -21,15 +26,14 @@ La recompensa emocional macro es la **restauración visible**: cada concepto com
 
 ## 3. Prólogo + Unidad 1 "La corriente no es magia" (20–30 min)
 
-Secuencia: llegada → hall/preceptor → despacho → Bitácora → aula de Electrónica → proyector institucional → portal → plaza apagada → reactivar a Ohm (camino completo) → taller de Lumen (Piedra de Freno) → Puerta de Ohm → formalización I=V/R → plaza restaurada → Campana de Ohmdal (gancho a circuitos multi-camino).
+Secuencia macro: llegada → hall/preceptor → despacho → Bitácora → aula de Electrónica → proyector institucional → portal → Ohmdal completo → formalización I=V/R → Campana (gancho a circuitos multi-camino). **Guion detallado: `prologo.md` y `unidad-1-ohmdal.md`.**
 
-Ajustes clave:
-- Prólogo 5–8 min máx., con 2–3 interacciones opcionales con personalidad (vitrina, cartel de honores borrado) para evitar sensación de pasillo-tutorial.
-- La Bitácora registra algo trivial apenas se obtiene (boceto del hall + nota) para enseñar su función de registro sin explicación.
-- El proyector institucional define el tono: video escolar viejo, formal, levemente absurdo.
+Reglas de ritmo que esos guiones deben respetar:
+- Prólogo 5–8 min máx., con 2–3 interacciones opcionales con personalidad para evitar sensación de pasillo-tutorial.
+- La Bitácora registra algo trivial apenas se obtiene, para enseñar su función de registro sin explicación.
 - Reactivar a Ohm = tutorial puro de "camino completo", sin tensión ni resistencia.
 - Taller de Lumen = primer espacio de falla segura: quemar/humear sin castigo es prerequisito conceptual de la Puerta.
-- La Campana muestra dos caminos posibles de corriente: el gancho a serie/paralelo vive en el mundo, no en texto.
+- El gancho a la unidad siguiente vive en el mundo, no en texto.
 
 Ritmo: ~25% prólogo, ~60% Ohmdal, ~15% formalización + cierre.
 
@@ -55,32 +59,15 @@ La estructura de dos capas hace visible la **traducción** experiencia→conocim
 4. Bitácora opt-in: el juego nunca bloquea avance detrás de leer texto.
 5. Las preguntas de la Bitácora se responden jugando, no tipeando; el juego las registra solo.
 
-**Léxico Unidad 1:** tensión=Empuje · corriente=Río/Chispa · resistencia=Piedra/Freno · circuito cerrado=Camino completo. I=V/R aparece solo tras la Puerta de Ohm.
+Cada unidad define su tabla de léxico en su propio documento (Unidad 1: ver `unidad-1-ohmdal.md` §A.2).
 
-## 6. Puzzles de Ley de Ohm
+## 6. Puzzles y personajes por unidad
 
-Una variable nueva por puzzle:
+El diseño de puzzles (una variable nueva por puzzle, fallo = información) y los personajes de cada mundo viven en el documento de su unidad. Para Ohmdal/Unidad 1 (puzzles de Ley de Ohm, Ohm/Edda/Lumen): `unidad-1-ohmdal.md` §A.4–A.5.
 
-| Puzzle | Concepto | Manipulación | Feedback de fallo |
-|---|---|---|---|
-| Reactivar a Ohm | Camino completo | Conectar/cerrar | Nada ocurre; Ohm inerte |
-| (Fuente de la plaza)* | Empuje | Elegir fuentes | Lámpara tenue; Ohm bosteza |
-| Piedra de Freno | Resistencia | Insertar/cambiar piedras | Humo, chispas, fusible; Ohm vibra |
-| Puerta de Ohm | Relación V-I-R | Ajustar dos variables hacia corriente objetivo | Poco → no se mueve; mucho → se traba y humea |
+Regla transversal de personajes para todas las unidades: **nadie explica; todos reaccionan**. Cada mundo necesita su trío funcional: un medidor vivo (reacción al estado físico), un escéptico (reacción al resultado) y un guardián de la tradición (reacción al método).
 
-*Se corta en el vertical slice; el Empuje se introduce dentro de la Puerta.
-
-**Puerta de Ohm:** indicador analógico (aguja en zona marcada, sin números), ~3 fuentes de Empuje × ~4 Piedras de Freno, **múltiples soluciones válidas** (mucho empuje+mucho freno ≈ poco+poco) — eso ES la proporcionalidad descubierta con las manos. Ohm como medidor vivo redundante (aguja=precisión, Ohm=lectura emocional). El fallo produce información, nunca pérdida (reset diegético: fusibles rituales de Lumen con comentario distinto cada vez). Valores cualitativos o en unidades ficticias hasta la formalización; las unidades reales aparecen en la Bitácora como "el nombre verdadero de las cosas".
-
-## 7. Personajes
-
-- **Ohm** — el instrumento con alma. Amperímetro emocional: animación+sonido distintivos por estado (inerte/débil/estable/sobrecarga). No habla, o casi; su elocuencia es física. Reserva narrativa de largo plazo: un autómata antiguo *vio* cómo Ohmdal olvidó — no gastar su backstory en la Unidad 1.
-- **Edda** — la escéptica práctica. Avatar de la pregunta del jugador; humor por fricción con Lumen; modela actitud científica sin dar respuestas.
-- **Maese Lumen** — la tradición que conserva sin comprender. Sus rituales son procedimientos técnicos fosilizados. Arco: de "el forastero profana" a "el forastero recuerda". Él dice la frase guía citando a los antiguos: *"Donde otros ven magia, buscá camino."*
-
-Regla compartida: **ninguno explica; los tres reaccionan** (Edda al resultado, Lumen al método, Ohm al estado eléctrico).
-
-## 8. Formato visual/interactivo
+## 7. Formato visual/interactivo
 
 Comparación: top-down 2D gana en costo, pipeline IA, web/mobile y escalabilidad; lateral pierde legibilidad espacial de circuitos; point-and-click encarece por arte único por escena; 3D (voxel o modelado) es riesgoso en mobile web y caro para esta escala.
 
@@ -88,9 +75,9 @@ Comparación: top-down 2D gana en costo, pipeline IA, web/mobile y escalabilidad
 - **Exploración 2D top-down** (Instituto + Ohmdal): tilesets reutilizables, restauración del mundo visible en el mapa, legible en pantalla chica.
 - **Vista de banco (close-up)** para puzzles: el circuito grande, claro, manipulable con tap directo. Resuelve la ilegibilidad de componentes en top-down mobile.
 - Estilo: ilustrado/pintado, paleta cálida-melancólica (pixel art de alta calidad como plan B presupuestario).
-- El patrón top-down + banco + Bitácora es el contrato de producción para todas las unidades futuras (química=mesa de alquimia, mecánica=banco de engranajes).
+- El patrón top-down + banco + Bitácora es el contrato de producción para todas las unidades futuras. Los cuatro mundos canónicos según el mapa del despacho (`prologo.md` §14.3): Matemática, Física, Electrónica (Ohmdal), Programación — cada uno con su "vista de banco" propia (ej. física=mesa de laboratorio, programación=consola).
 
-## 9. Distribución
+## 8. Distribución
 
 Web-first es correcto: el modelo educativo depende de "se abre con un click en un Chromebook escolar".
 
@@ -100,7 +87,7 @@ Web-first es correcto: el modelo educativo depende de "se abre con un click en u
 
 Modelo: B2C freemium suave + B2B escolar (licencias con panel docente y analíticas — la feature que convierte el producto en algo que una escuela paga).
 
-## 10. Arquitectura web
+## 9. Arquitectura web
 
 - **Stack:** Phaser 3 + TypeScript para escenas; **Bitácora en DOM/HTML sobre el canvas** (texto nítido, accesible, exportable a PDF, indexable). Alternativa Godot 4 web export defendible solo si el equipo ya lo domina; para web-first puro, Phaser gana.
 - **Progreso:** local-first (localStorage/IndexedDB) + sync a backend con cuenta (Supabase/Firebase). Jugador anónimo juega completo sin registro.
@@ -109,7 +96,7 @@ Modelo: B2C freemium suave + B2B escolar (licencias con panel docente y analíti
 - **Unidades futuras:** módulos con code-splitting + assets lazy; actualizaciones sin reinstalar; telemetría educativa con herramientas web estándar.
 - **Presupuesto mobile:** <25 MB carga inicial, 60 fps en Android gama media de hace 4 años, touch de primera clase. Probar en dispositivos reales desde la semana 1.
 
-## 11. Riesgos
+## 10. Riesgos
 
 1. La formalización se siente premio para unos y tarea para otros → entradas cortas, hermosas, opcionales en profundidad; medir en playtest.
 2. Scope creep multi-mundo → no diseñar Unidad 2 hasta validar la 1; fijar el patrón reutilizable como contrato.
@@ -118,7 +105,7 @@ Modelo: B2C freemium suave + B2B escolar (licencias con panel docente y analíti
 5. Assets IA inconsistentes → biblia de estilo antes de generar en volumen; mano humana en personajes clave y Ohm.
 6. Error técnico en contenido educativo destruye credibilidad B2B → revisión docente de cada entrada antes de publicar.
 
-## 12. Vertical slice
+## 11. Vertical slice
 
 **Hipótesis a validar:** (a) el loop experimentar→formalizar se siente recompensa; (b) la Puerta de Ohm enseña la relación V-I-R sin explicarla antes.
 
@@ -136,11 +123,9 @@ Modelo: B2C freemium suave + B2B escolar (licencias con panel docente y analíti
 
 ## Addendum v1.1 — decisiones tomadas (junio 2026)
 
-**Lore: los Mundos Aplicados.** Los mundos conceptuales fueron *creados por el propio Instituto* para enseñar («que la electricidad se aprenda caminándola»). Esto justifica el acceso por aula, explica que los mundos estén degradados (se degradaron junto con la escuela que los mantenía) y planta la pregunta de largo plazo: ¿quién los construyó y por qué se abandonaron? El proyector institucional lo establece en el prólogo. Línea clave: «el mundo responde a la comprensión del estudiante; la incomprensión también deja huella».
+**Lore: los Mundos Aplicados.** Los mundos conceptuales fueron *creados por el propio Instituto* para enseñar. Esto justifica el acceso por aula, explica que los mundos estén degradados (se degradaron junto con la escuela que los mantenía) y planta la pregunta de largo plazo: ¿quién los construyó y por qué se abandonaron? Detalle por mundo en el doc de cada unidad (Ohmdal: `unidad-1-ohmdal.md` §A.1).
 
 **Motor: Phaser 4 (v4.1.0 estable), no Phaser 3.** Phaser 4 es la rama actual con renderer nuevo y API continuista; empezar hoy en 3.x sería nacer con deuda técnica. Verificado: el greybox compila y corre en 4.1.0.
-
-**Piedras de Freno = código de colores real de resistencias.** Las piedras llevan banda de color con el código verdadero (marrón=1, rojo=2, amarillo=4, gris=8). En Ohmdal es «el código de los Maestros»; la entrada «La Piedra de Freno» de la Bitácora revela tras la formalización que es el código real (tabla 0–9 completa). El jugador llega a las resistencias físicas reconociendo las bandas.
 
 **Distribución: web propia.** El build es estático (Vite, rutas relativas), se sube a cualquier hosting. itch.io queda como espejo opcional de descubrimiento, no como canal principal.
 

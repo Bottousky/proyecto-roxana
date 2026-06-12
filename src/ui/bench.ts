@@ -1,4 +1,5 @@
 import { el, pushUI, popUI } from './overlay';
+import { sfxUIOpen, sfxUIClose, sfxClick } from '../audio';
 
 export interface BenchHandle {
   /** raíz del panel, para que el puzzle construya su contenido */
@@ -19,6 +20,7 @@ export function openBench(
   host.innerHTML = '';
   host.classList.remove('hidden');
   pushUI();
+  sfxUIOpen();
 
   const panel = document.createElement('div');
   panel.className = 'bench-panel';
@@ -41,6 +43,7 @@ export function openBench(
     close(after?: () => void) {
       if (closed) return;
       closed = true;
+      sfxUIClose();
       host.classList.add('hidden');
       host.innerHTML = '';
       popUI();
@@ -63,7 +66,10 @@ export function benchActions(
     const btn = document.createElement('button');
     btn.className = 'bench-btn' + (b.primary ? ' primary' : '');
     btn.textContent = b.label;
-    btn.addEventListener('click', b.onClick);
+    btn.addEventListener('click', () => {
+      sfxClick();
+      b.onClick();
+    });
     row.appendChild(btn);
     out[b.label] = btn;
   }

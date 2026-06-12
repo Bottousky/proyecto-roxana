@@ -4,6 +4,7 @@ import { state, hooks, save } from '../state';
 import { uiOpen, el } from '../ui/overlay';
 import { say } from '../ui/dialog';
 import { initJoystick, getJoystickDir } from '../ui/joystick';
+import { setAmbience, sfxStep, sfxDoor, sfxLocked, type Ambience } from '../audio';
 
 export const W = 960;
 export const H = 540;
@@ -46,6 +47,9 @@ export class ExplorationScene extends Phaser.Scene {
   private lastX = 0;
   private lastY = 0;
   private stuckMs = 0;
+  private stepDist = 0;
+  // generación de sala: invalida los tweens de NPCs caminantes si la sala cambia
+  private roomGen = 0;
 
   constructor() {
     super('explore');
@@ -116,8 +120,30 @@ export class ExplorationScene extends Phaser.Scene {
     if (!def) return;
     state.room = id;
     save();
+    this.roomGen++;
 
-    for (const o of this.roomObjects) o.destroy();
+    // NPCs caminantes que estaban visibles antes de este refresh
+    // (sirve para detectar quién se va y quién llega)
+    const prevNPCs = new Set<string>();
+    if (!fireEnter) {
+      for (const t of this.things) if (t.def.walksTo) prevNPCs.add(t.def.id);
+    }
+
+    // atmósfera musical por zona (la plaza y la Puerta cambian al encenderse Ohmdal)
+    const mood: Ambience =
+      id === 'taller'
+        ? 'taller'
+        : id === 'plaza' || id === 'puerta'
+          ? state.flags.puertaDone
+            ? 'ohmdal-on'
+            : 'ohmdal'
+          : 'instituto';
+    setAmbience(mood);
+
+    for (const o of this.roomObjects) {
+      this.tweens.killTweensOf(o);
+      o.destroy();
+    }
     this.roomObjects = [];
     this.things = [];
     this.doors = [];
@@ -171,17 +197,23 @@ export class ExplorationScene extends Phaser.Scene {
 
     // objetos y personajes
     for (const t of def.things) {
-      if (t.visible && !t.visible()) continue;
-      const color = typeof t.color === 'function' ? t.color() : t.color;
-      if (t.shape === 'circle') {
-        const c = add(this.add.circle(t.x, t.y, t.w / 2, color));
-        c.setStrokeStyle(2, 0x141119);
-      } else {
-        const r = add(this.add.rectangle(t.x, t.y, t.w, t.h, color));
-        r.setStrokeStyle(2, 0x141119);
+      if (t.visible && !t.visible()) {
+        // se fue durante este refresh: sale caminando hasta su puerta
+        if (!fireEnter && t.walksTo && prevNPCs.has(t.id)) {
+          const door = def.doors.find((d) => d.to === t.walksTo);
+          if (door) this.walkOut(t, door);
+        }
+        continue;
       }
+      const color = typeof t.color === 'function' ? t.color() : t.color;
+      const body: Phaser.GameObjects.Shape =
+        t.shape === 'circle'
+          ? add(this.add.circle(t.x, t.y, t.w / 2, color))
+          : add(this.add.rectangle(t.x, t.y, t.w, t.h, color));
+      body.setStrokeStyle(2, 0x141119);
+      let label: Phaser.GameObjects.Text | null = null;
       if (t.label) {
-        add(
+        label = add(
           this.add
             .text(t.x, t.y - t.h / 2 - 14, t.label, {
               fontFamily: 'Segoe UI, sans-serif',
@@ -192,8 +224,17 @@ export class ExplorationScene extends Phaser.Scene {
         );
       }
       const bounds: Rect = { x: t.x - t.w / 2, y: t.y - t.h / 2, w: t.w, h: t.h };
-      this.things.push({ def: t, bounds });
-      if (t.solid !== false) this.solids.push(bounds);
+      // llegó durante este refresh: entra caminando desde su puerta
+      const doorIn =
+        !fireEnter && t.walksTo && !prevNPCs.has(t.id)
+          ? def.doors.find((d) => d.to === t.walksTo)
+          : undefined;
+      if (doorIn) {
+        this.walkIn(t, doorIn, body, label, bounds);
+      } else {
+        this.things.push({ def: t, bounds });
+        if (t.solid !== false) this.solids.push(bounds);
+      }
     }
 
     // posicionar al jugador
@@ -210,6 +251,96 @@ export class ExplorationScene extends Phaser.Scene {
     this.doorCooldown = 700;
 
     if (fireEnter) def.onEnter?.();
+  }
+
+  /** centro de una puerta (a donde caminan los NPC que se van/llegan) */
+  private doorCenter(d: DoorDef): { x: number; y: number } {
+    return { x: d.x + d.w / 2, y: d.y + d.h / 2 };
+  }
+
+  /** onUpdate de tween: pasos suaves cada tanto trecho recorrido por el NPC */
+  private npcStepper(body: Phaser.GameObjects.Shape): () => void {
+    let lx = body.x;
+    let ly = body.y;
+    let acc = 0;
+    return () => {
+      acc += Math.hypot(body.x - lx, body.y - ly);
+      lx = body.x;
+      ly = body.y;
+      if (acc > 38) {
+        acc = 0;
+        sfxStep(0.45);
+      }
+    };
+  }
+
+  /** el NPC sale caminando hasta la puerta y desaparece (mientras tanto no es sólido ni interactuable) */
+  private walkOut(t: ThingDef, door: DoorDef): void {
+    const color = typeof t.color === 'function' ? t.color() : t.color;
+    const body: Phaser.GameObjects.Shape =
+      t.shape === 'circle'
+        ? this.add.circle(t.x, t.y, t.w / 2, color)
+        : this.add.rectangle(t.x, t.y, t.w, t.h, color);
+    body.setStrokeStyle(2, 0x141119);
+    this.roomObjects.push(body);
+    const { x: dx, y: dy } = this.doorCenter(door);
+    const dur = (Math.hypot(dx - t.x, dy - t.y) / SPEED) * 1000;
+    this.tweens.add({
+      targets: body,
+      x: dx,
+      y: dy,
+      duration: dur,
+      onUpdate: this.npcStepper(body),
+      onComplete: () => body.destroy(),
+    });
+    if (t.label) {
+      const label = this.add
+        .text(t.x, t.y - t.h / 2 - 14, t.label, {
+          fontFamily: 'Segoe UI, sans-serif',
+          fontSize: '12px',
+          color: '#cfc7da',
+        })
+        .setOrigin(0.5);
+      this.roomObjects.push(label);
+      this.tweens.add({
+        targets: label,
+        x: dx,
+        y: dy - t.h / 2 - 14,
+        alpha: 0,
+        duration: dur,
+        onComplete: () => label.destroy(),
+      });
+    }
+  }
+
+  /** el NPC entra caminando desde la puerta; recién al llegar se vuelve sólido e interactuable */
+  private walkIn(
+    t: ThingDef,
+    door: DoorDef,
+    body: Phaser.GameObjects.Shape,
+    label: Phaser.GameObjects.Text | null,
+    bounds: Rect,
+  ): void {
+    const { x: sx, y: sy } = this.doorCenter(door);
+    const dur = (Math.hypot(t.x - sx, t.y - sy) / SPEED) * 1000;
+    body.setPosition(sx, sy);
+    const gen = this.roomGen;
+    this.tweens.add({
+      targets: body,
+      x: t.x,
+      y: t.y,
+      duration: dur,
+      onUpdate: this.npcStepper(body),
+      onComplete: () => {
+        if (gen !== this.roomGen) return; // la sala cambió mientras caminaba
+        this.things.push({ def: t, bounds });
+        if (t.solid !== false) this.solids.push(bounds);
+      },
+    });
+    if (label) {
+      label.setPosition(sx, sy - t.h / 2 - 14);
+      this.tweens.add({ targets: label, x: t.x, y: t.y - t.h / 2 - 14, duration: dur });
+    }
   }
 
   private onPointer(p: Phaser.Input.Pointer): void {
@@ -283,6 +414,13 @@ export class ExplorationScene extends Phaser.Scene {
       if (!this.collides(this.player.x, this.player.y + stepY)) this.player.y += stepY;
     }
 
+    // pasos: sonar cada tanto trecho efectivamente recorrido
+    this.stepDist += Math.hypot(this.player.x - this.lastX, this.player.y - this.lastY);
+    if (this.stepDist > 38) {
+      this.stepDist = 0;
+      sfxStep();
+    }
+
     // si el tap-to-move quedó trabado contra algo, soltarlo
     if (this.moveTarget) {
       const moved = Math.hypot(this.player.x - this.lastX, this.player.y - this.lastY);
@@ -312,8 +450,10 @@ export class ExplorationScene extends Phaser.Scene {
           this.player.setPosition(cx + (dx / len) * 80, cy + (dy / len) * 80);
           this.moveTarget = null;
           this.doorCooldown = 900;
+          sfxLocked();
           say(lockedLines);
         } else {
+          sfxDoor();
           this.loadRoom(d.def.to, d.def.spawn, true);
         }
         return;

@@ -1,5 +1,6 @@
 import { openBench, benchActions } from '../ui/bench';
 import { ohmWidgetHTML, setOhmState } from './common';
+import { sfxBridge, sfxClick, sfxDim, sfxWin } from '../audio';
 
 /**
  * Puzzle 1 — "Reactivar a Ohm".
@@ -106,6 +107,7 @@ export function abrirDespertar(onSuccess: () => void): void {
 
       const win = () => {
         solved = true;
+        sfxWin();
         stage.querySelectorAll('.wire:not(.dead)').forEach((w) => w.classList.add('live'));
         setTimeout(() => setOhmState(stage, 'debil'), 350);
         setTimeout(() => setOhmState(stage, 'estable'), 1100);
@@ -123,6 +125,7 @@ export function abrirDespertar(onSuccess: () => void): void {
           if (solved) return;
           const gap = gaps.find((g) => g.id === slot.dataset.gap)!;
           if (gap.broken) {
+            sfxDim();
             bench.setStatus(
               'Este tramo está <b>partido</b>: los bordes no coinciden, ningún puente lo cubre. ' +
                 'Si la vuelta corta no se puede completar… habrá que dar la vuelta larga.',
@@ -133,11 +136,13 @@ export function abrirDespertar(onSuccess: () => void): void {
             gap.bridged = false;
             bridges++;
             slot.classList.remove('bridged');
+            sfxClick();
             bench.setStatus('Recuperaste el puente.');
           } else if (bridges > 0) {
             gap.bridged = true;
             bridges--;
             slot.classList.add('bridged');
+            sfxBridge();
             if (isWin()) {
               updateTray();
               win();

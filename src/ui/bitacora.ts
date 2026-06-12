@@ -2,6 +2,7 @@ import { el, pushUI, popUI, uiOpen } from './overlay';
 import { toast } from './dialog';
 import { getEntries } from '../content/entries';
 import { state, resetSave } from '../state';
+import { sfxUIOpen, sfxUIClose } from '../audio';
 
 let isOpen = false;
 
@@ -21,6 +22,7 @@ export function openBitacora(entryId?: string): void {
   if (isOpen) return;
   isOpen = true;
   pushUI();
+  sfxUIOpen();
   el('bitacora-dot').classList.add('hidden');
 
   const host = el('bitacora');
@@ -106,6 +108,7 @@ export function openBitacora(entryId?: string): void {
 export function closeBitacora(): void {
   if (!isOpen) return;
   isOpen = false;
+  sfxUIClose();
   el('bitacora').classList.add('hidden');
   el('bitacora').innerHTML = '';
   popUI();
