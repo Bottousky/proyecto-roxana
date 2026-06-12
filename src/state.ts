@@ -26,6 +26,7 @@ export interface Flags {
   fixedSchoolBell: boolean;
   sawStoredSpark: boolean;
   unit2Completed: boolean;
+  heardForgeWarmth: boolean;
 }
 
 const DEFAULT_FLAGS: Flags = {
@@ -56,6 +57,7 @@ const DEFAULT_FLAGS: Flags = {
   fixedSchoolBell: false,
   sawStoredSpark: false,
   unit2Completed: false,
+  heardForgeWarmth: false,
 };
 
 export interface GameState {

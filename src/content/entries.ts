@@ -247,5 +247,20 @@ export function getEntries(): EntryView[] {
     });
   }
 
+  if (f.sawStoredSpark) {
+    out.push({
+      id: 'anomalia-chispa',
+      title: 'Anomalía: la chispa que se queda',
+      fecha: 'Ohmdal — el Corazón del Castillo',
+      vivencial: `
+        <p>Se cortó el Tronco para el acta. El Repartidor quedó sin camino.</p>
+        <p>Un mecanismo auxiliar del tablero siguió brillando tres segundos, solo,
+        sin camino.</p>
+        <p>Edda lo vio. Yo lo vi. La Consejera decidió no anotarlo.</p>
+        <p class="blank">No tengo explicación. Solo el registro del hecho.</p>`,
+      formal: null,
+    });
+  }
+
   return out;
 }

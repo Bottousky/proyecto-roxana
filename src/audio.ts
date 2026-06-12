@@ -2,7 +2,7 @@
    Todo WebAudio, sin assets — pensado para el greybox. Cuando haya música real,
    este módulo se reemplaza manteniendo la misma interfaz (setAmbience + sfx*). */
 
-export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on';
+export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on' | 'castle';
 
 /** Una pieza compuesta: pistas de melodía y bajo como listas de [nota, pulsos].
  *  null = silencio. Las notas en notación científica ('D5', 'Bb2', 'F#4'). */
@@ -95,6 +95,21 @@ const TEMA_OHMDAL_ON: ThemeDef = {
   bassLevel: 0.5,
 };
 
+// «El Castillo de Ohmdal» — la menor grave y reverberante; más baja y espaciada que la plaza
+const TEMA_CASTLE: ThemeDef = {
+  tempo: 52,
+  melody: [
+    ['A3', 2], ['C4', 1], ['B3', 2], [null, 2], ['E4', 2], ['D4', 1], ['C4', 2], ['A3', 4], [null, 3],
+    ['F3', 2], ['G3', 1], ['A3', 3], ['G3', 2], ['E3', 4], [null, 3],
+    ['A3', 2], ['B3', 1], ['C4', 2], ['E4', 2], ['D4', 3], ['A3', 5], [null, 4],
+  ],
+  bass: [
+    ['A1', 9], ['F1', 9], ['G1', 9], ['A1', 9],
+  ],
+  melodyLevel: 0.45,
+  bassLevel: 0.5,
+};
+
 const MOODS: Record<Ambience, MoodDef> = {
   // el Instituto: polvo, eco, melancolía — re menor (deriva i → VI → VII)
   instituto: {
@@ -141,6 +156,21 @@ const MOODS: Record<Ambience, MoodDef> = {
     phraseGap: [3500, 8000],
     pluckLevel: 0.05,
     theme: TEMA_TALLER,
+  },
+  // El Castillo: la menor, más grave y reverberante que la plaza apagada (la → fa → sol)
+  castle: {
+    chords: [
+      [27.5, 41.2],   // la1 / mi1 — una octava más grave que ohmdal
+      [21.83, 32.7],  // fa1 / do1
+      [24.5, 36.71],  // sol1 / re1
+    ],
+    droneType: 'triangle',
+    filter: 180,
+    level: 0.13,
+    scale: [110.0, 130.81, 146.83, 164.81, 196.0],
+    phraseGap: [8000, 18000],
+    pluckLevel: 0.035,
+    theme: TEMA_CASTLE,
   },
   // Ohmdal encendida: el mismo re, pero abierto y luminoso (re → sol → la)
   'ohmdal-on': {
@@ -800,5 +830,17 @@ export function sfxBell(): void {
 export function sfxPortal(): void {
   for (let i = 0; i < 6; i++) {
     tone(900 + Math.random() * 1300, 'sine', 0.045, 0.8, { when: i * 0.09, echo: true });
+  }
+}
+
+/** Timbre eléctrico de escuela: tono metálico repetitivo ~0.8 s. */
+export function sfxSchoolBell(): void {
+  // Tres pulsos metálicos característicos del timbre eléctrico de escuela
+  const base = 880; // la5 — metálico
+  for (let i = 0; i < 3; i++) {
+    const when = i * 0.27;
+    tone(base, 'square', 0.14, 0.18, { when, attack: 0.002 });
+    tone(base * 1.5, 'sine', 0.07, 0.12, { when: when + 0.01 });
+    noise(0.06, 0.09, 'bandpass', 3500, { when: when + 0.005, q: 6 });
   }
 }

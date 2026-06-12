@@ -8,9 +8,10 @@ import { abrirBell } from '../puzzles/bell';
 import { abrirChain } from '../puzzles/chain';
 import { abrirBranches } from '../puzzles/branches';
 import { abrirDistributor } from '../puzzles/distributor';
+import { abrirTimbre } from '../puzzles/timbre';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
-import { sfxBell, sfxPortal } from '../audio';
+import { sfxBell, sfxPortal, setAmbience } from '../audio';
 
 export interface ThingDef {
   id: string;
@@ -294,6 +295,70 @@ function abrirBancoDistributor(): void {
   });
 }
 
+/* ---------- M8: gancho capacitor (castle_heart) ---------- */
+
+function cortarTroncoParaActa(): void {
+  // Secuencia: se corta el Tronco... el mecanismo sigue brillando 3 s
+  say(
+    [
+      L('', 'La Consejera toma nota. «Para el acta: corte del Tronco principal.»'),
+      L('', 'Se corta el Tronco. El Repartidor queda sin camino.'),
+      L('', '…Un mecanismo auxiliar del tablero sigue brillando. Tres segundos. Solo. Sin camino.'),
+      L('Edda', '…El camino estaba cortado. ¿De DÓNDE salió ese río?'),
+      L('Ohm', 'Dato no contable. Repetición recomendada.'),
+      L('Consejera', '(reabriendo el libro de inventario) No pienso anotar eso.'),
+    ],
+    () => {
+      setFlag('sawStoredSpark');
+      notifyNewEntry('Anomalía: la chispa que se queda');
+      hooks.refresh();
+    },
+  );
+}
+
+/* ---------- M8: cierre de unidad ---------- */
+
+function checkUnit2Complete(): void {
+  if (f().fixedSchoolBell && f().sawStoredSpark && !f().unit2Completed) {
+    setFlag('unit2Completed');
+    const entradas = getEntries().length;
+    const martir = f().burnedTrunkFuse
+      ? 'El Mártir cayó en cumplimiento del deber.'
+      : 'El Fusible mayor sigue intacto. ¿Nadie tuvo curiosidad?';
+    showEnd({
+      title: 'Fin de la Unidad 2 — «El río se reparte»',
+      note: `
+        Entradas en la Bitácora: ${entradas} · ${martir}<br/><br/>
+        …Y algo brilló sin camino. La Bitácora lo registró.
+      `,
+      continueLabel: 'Continuar',
+      onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+    });
+  }
+}
+
+/* ---------- M8: timbre del Instituto ---------- */
+
+function abrirBancoTimbre(): void {
+  abrirTimbre({
+    practica: f().fixedSchoolBell,
+    onSolved: () => {
+      setFlag('fixedSchoolBell');
+      say(
+        [
+          L('', 'El preceptor se asoma al pasillo. Mira el parlante un rato largo, como a un fantasma educado.'),
+          L('Preceptor', 'Veinte años sin sonar.'),
+          L('Preceptor', '…Voy a tener que volver a llegar puntual.'),
+        ],
+        () => {
+          hooks.refresh();
+          checkUnit2Complete();
+        },
+      );
+    },
+  });
+}
+
 /* ---------- las salas ---------- */
 
 export const ROOMS: Record<string, RoomDef> = {
@@ -345,8 +410,27 @@ export const ROOMS: Record<string, RoomDef> = {
               L('Preceptor', '¿Eso es… una Bitácora? Hacía años que no veía una de esas.'),
               L('Preceptor', 'El Aula de Electrónica es la puerta de la derecha. Anda: el aula sabe qué hacer. …Es una forma de decir. Creo.'),
             ]);
+          } else if (fl.fixedSchoolBell) {
+            say([
+              L('Preceptor', 'El timbre. Veinte años sin oírlo.'),
+              L('Preceptor', '…Voy a tener que volver a llegar puntual.'),
+            ]);
+            checkUnit2Complete();
           } else {
             say(L('Preceptor', '¿Todavía por aquí? El aula. La derecha. Salúdame a… bah. Tú solo ve.'));
+          }
+        },
+      },
+      {
+        id: 'timbre', x: 690, y: 310, w: 110, h: 60,
+        label: 'Timbre del Instituto', prompt: 'Examinar el timbre',
+        color: () => (f().fixedSchoolBell ? 0x8a7040 : 0x4a4250), solid: true, emoji: '🔔',
+        visible: () => f().castleRestored,
+        onInteract: () => {
+          if (f().fixedSchoolBell) {
+            say(L('', 'El timbre, vivo. Suena a horario ahora.'));
+          } else {
+            abrirBancoTimbre();
           }
         },
       },
@@ -502,8 +586,8 @@ export const ROOMS: Record<string, RoomDef> = {
   plaza: {
     id: 'plaza',
     name: 'Ohmdal — La plaza',
-    floor: () => (f().puertaDone ? 0x262033 : f().ohmAwake ? 0x1a1926 : 0x15141f),
-    wall: () => (f().puertaDone ? 0x3c3144 : 0x2e2a3c),
+    floor: () => (f().castleRestored ? 0x1e1b2e : f().puertaDone ? 0x262033 : f().ohmAwake ? 0x1a1926 : 0x15141f),
+    wall: () => (f().castleRestored ? 0x3a2e44 : f().puertaDone ? 0x3c3144 : 0x2e2a3c),
     doors: [
       {
         x: 435, y: 514, w: 90, h: 26,
@@ -567,7 +651,8 @@ export const ROOMS: Record<string, RoomDef> = {
         // después a la Puerta, y vuelve a la plaza cuando todo se enciende
         visible: () =>
           (!f().ohmAwake || f().puertaDone) &&
-          !(f().playedUnit2Intro && !f().solvedBellPaths),
+          !(f().playedUnit2Intro && !f().solvedBellPaths) &&
+          !f().castleRestored,
         walksTo: 'taller',
         onInteract: () => {
           const fl = f();
@@ -601,7 +686,7 @@ export const ROOMS: Record<string, RoomDef> = {
       {
         id: 'lumen-plaza', x: 700, y: 200, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
-        visible: () => f().puertaDone,
+        visible: () => f().puertaDone && !(f().castleRestored && !f().heardForgeWarmth),
         walksTo: 'puerta',
         onInteract: () =>
           say(
@@ -649,6 +734,68 @@ export const ROOMS: Record<string, RoomDef> = {
           } else if (fl.puertaDone) tocarCampana();
           else say(L('', 'La campana de Ohmdal cuelga muda sobre la plaza apagada. La cuerda está al alcance, pero algo dice que todavía no.'));
         },
+      },
+      /* M8: Castillo encendido visible al norte */
+      {
+        id: 'castillo-encendido', x: 130, y: 100, w: 120, h: 80,
+        label: 'El Castillo encendido', prompt: 'Mirar el Castillo',
+        color: 0xd4a035, solid: false, emoji: '🏰',
+        visible: () => f().castleRestored,
+        onInteract: () =>
+          say(L('', 'El Castillo de Ohmdal arde en luz cálida al norte. Los canales de cobre brillan desde aquí.')),
+      },
+      /* M8: ciudadanos nocturnos post-Castillo */
+      {
+        id: 'ciudadano-1', x: 220, y: 280, w: 30, h: 30, shape: 'circle',
+        label: 'Ciudadano', prompt: 'Escuchar al ciudadano',
+        color: 0x6a7a8a, solid: true, emoji: '💬',
+        visible: () => f().castleRestored,
+        onInteract: () =>
+          say(L('', '«El Castillo tiene luz. ¿Y la chispa no se acabó?»')),
+      },
+      {
+        id: 'ciudadano-2', x: 300, y: 360, w: 30, h: 30, shape: 'circle',
+        label: 'Ciudadano', prompt: 'Escuchar al ciudadano',
+        color: 0x6a7a8a, solid: true, emoji: '💬',
+        visible: () => f().castleRestored,
+        onInteract: () =>
+          say(L('', '«Mi abuela decía que ahí dentro el río sabía contar. Yo creía que era un cuento.»')),
+      },
+      {
+        id: 'ciudadano-nino', x: 380, y: 290, w: 26, h: 26, shape: 'circle',
+        label: 'Niño', prompt: 'Escuchar al niño',
+        color: 0x8a9a6a, solid: true, emoji: '💬',
+        visible: () => f().castleRestored,
+        onInteract: () =>
+          say(L('Niño', 'El robot contó los ríos. Yo conté con él. Dio justo.')),
+      },
+      /* M8: Edda nocturna con su beat post-Castillo */
+      {
+        id: 'edda-noche', x: 580, y: 200, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().castleRestored,
+        onInteract: () =>
+          say([
+            L('Edda', 'Primero una puerta. Ahora un castillo. ¿Qué sigue, el reino entero?'),
+            L('Edda', '…Quiero aprender a mostrárselo a los demás. Como hiciste conmigo: sin sermones. Con las manos.'),
+          ]),
+      },
+      /* M8: Lumen — gancho U3 (forja tibia) */
+      {
+        id: 'lumen-forja', x: 195, y: 185, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().castleRestored && !f().heardForgeWarmth,
+        onInteract: () =>
+          say(
+            [
+              L('', '(Lumen apoya la mano en el cobre que va a la forja y la retira rápido.)'),
+              L('Maese Lumen', 'Esto antes no pasaba. O pasaba y nadie tocaba los canales.'),
+              L('Maese Lumen', 'El río no se gasta, de acuerdo. ¿Y entonces qué es lo que estoy sintiendo?'),
+            ],
+            () => setFlag('heardForgeWarmth'),
+          ),
       },
     ],
     onEnter: () => {
@@ -865,6 +1012,7 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () => say(L('Ohm', 'Solicitud: inspección. Probabilidad de desastre: moderada.')),
       },
     ],
+    onEnter: () => setAmbience('castle'),
   },
 
   castle_gallery: {
@@ -947,7 +1095,10 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () => say(L('Ohm', 'Distinto: sí. Más: no.')),
       },
     ],
-    onEnter: reconocerCastillo,
+    onEnter: () => {
+      setAmbience('castle');
+      reconocerCastillo();
+    },
   },
 
   castle_branches: {
@@ -1034,7 +1185,10 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () => say(L('Ohm', 'Balde: no. Contable: sí.')),
       },
     ],
-    onEnter: presentarSalaRamales,
+    onEnter: () => {
+      setAmbience('castle');
+      presentarSalaRamales();
+    },
   },
 
   castle_heart: {
@@ -1111,7 +1265,18 @@ export const ROOMS: Record<string, RoomDef> = {
         visible: () => f().enteredCastle,
         onInteract: () => say(L('Ohm', 'Tablero maestro. Tres salidas, un río. Función: contar. …Función recordada.')),
       },
+      /* M8: gancho capacitor — cortar el Tronco para el acta */
+      {
+        id: 'tronco-acta', x: 480, y: 120, w: 200, h: 60,
+        label: 'Cortar el Tronco para el acta', prompt: 'Cortar el Tronco para el acta',
+        color: () => (f().sawStoredSpark ? 0x4a4040 : 0xa08050), solid: false,
+        visible: () => f().solvedDistributor && !f().sawStoredSpark,
+        onInteract: cortarTroncoParaActa,
+      },
     ],
-    onEnter: presentarCorazonCastillo,
+    onEnter: () => {
+      setAmbience('castle');
+      presentarCorazonCastillo();
+    },
   },
 };
