@@ -42,7 +42,7 @@ Instrumento nuevo: el **termómetro de canal** (Ohm gana el modo termómetro: ap
 - **Río** = Empuje / Piedra. **Entrega** = Empuje × Río. Piedras marrón 1 / roja 2 / amarilla 4 / gris 8; **filas de piedras se suman** (U2).
 - **Grosores de canal y termómetro:** angosto tolera río 2, medio 4, ancho 8. Termómetro: **frío** si río ≤ mitad de la tolerancia; **tibio** si ≤ tolerancia; **caliente** si ≤ 1.5×; **al rojo** si más. Un canal al rojo, a la **tercera insistencia, se corta** (reparable: la Forjadora lo reempalma, comentario distinto cada vez — patrón fusible de Lumen).
 - **Peaje cuadrático vivido:** duplicar el río en un mismo canal salta DOS niveles de termómetro («el doble de río, cuatro veces el peaje» — medido, jamás formulado).
-- **Arranque de máquina:** al arrancar, cada máquina pica el río a **río de trabajo + 1** por un instante. **Fusible** calibre 1/2/4/8: se inmola si el río lo supera (aviso/vibración antes, patrón U2). **Regla de la enfermería:** el fusible correcto es el menor calibre **mayor que el pico** de arranque y que **salte antes de que el canal llegue al rojo**.
+- **Arranque de máquina:** al arrancar, cada máquina pica el río a **río de trabajo + 1** por un instante. **Fusible** calibre 1/2/4/8: se inmola **solo si el río lo supera estrictamente** (río > calibre; aviso/vibración antes, patrón U2) — el pico igual al calibre se aguanta. **Regla de la enfermería:** el fusible correcto es **el menor calibre que el pico no supera** (calibre ≥ pico) y que **salte antes de que el canal llegue al rojo**. Con picos 2/3/5 (máquinas A/B/C): correctos 2/4/8.
 
 ### A.4. Misconcepciones que la unidad ataca
 
