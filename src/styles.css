@@ -322,6 +322,67 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .chain-progress span { padding: 5px 8px; border: 1px solid #4a4554; border-radius: 999px; }
 .chain-progress .done { color: var(--ok); border-color: rgba(126,196,106,.55); }
 
+.branches-stage { display: grid; grid-template-columns: 1fr 210px; gap: 14px; align-items: center; }
+.branches-network { min-width: 0; }
+.branches-source {
+  width: max-content; margin: 0 auto; padding: 5px 12px; border-radius: 6px;
+  border: 1px solid #8a7c50; color: #d8cfc0; background: #45382a; font-size: 11px;
+}
+.branches-trunk {
+  width: 10px; height: 34px; margin: 0 auto; border-radius: 5px;
+  background: #5d5868; transition: background .25s, box-shadow .25s;
+}
+.branches-crossing {
+  width: 64px; height: 34px; margin: 0 auto 9px; display: grid; place-items: center;
+  border-radius: 50%; border: 3px solid #8a7c50; background: #26222e;
+  color: #d8cfc0; font-size: 11px;
+}
+.branches-trunk.live, .branch-wire.live {
+  background: var(--accent); box-shadow: 0 0 9px rgba(255,211,77,.7);
+}
+.branches-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.branch-card {
+  min-width: 0; padding: 8px; border: 1px solid #5d5868; border-radius: 9px;
+  background: #211e29; text-align: center;
+}
+.branch-card.connected { border-color: #8a7c50; }
+.branch-card.green { border-color: var(--ok); box-shadow: inset 0 0 0 1px rgba(126,196,106,.25); }
+.branch-card h3 { margin: 4px 0 7px; font-size: 13px; color: #d8cfc0; }
+.branch-wire {
+  width: 6px; height: 22px; margin: -8px auto 3px; border-radius: 4px;
+  background: #5d5868; transition: background .25s, box-shadow .25s;
+}
+.branch-lamp {
+  width: 34px; height: 42px; margin: 0 auto 7px; border-radius: 50% 50% 42% 42%;
+  background: rgba(255,211,77,var(--lamp-glow)); border: 2px solid #d6b54f;
+  box-shadow: 0 0 var(--lamp-radius) rgba(255,211,77,var(--lamp-glow));
+  transition: background .25s, box-shadow .25s;
+}
+.branch-zone { position: relative; height: 8px; margin: 5px 0; border-radius: 5px; background: #342f3d; overflow: hidden; }
+.branch-zone span { position: absolute; inset-block: 0; background: rgba(126,196,106,.65); }
+.branch-river { color: #a99; font-size: 11px; }
+.branch-toggle {
+  width: 100%; margin: 7px 0; padding: 6px; border-radius: 7px; cursor: pointer;
+  border: 1px solid #6b6478; color: #d8cfc0; background: #26222e;
+}
+.branch-toggle:hover { border-color: var(--accent); }
+.branch-toggle:disabled { opacity: .55; cursor: default; }
+.branch-stones { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+.branch-stones .piedra { min-width: 0; padding: 5px 3px; font-size: 10px; }
+.branch-stones .piedra[aria-disabled="true"] { pointer-events: none; opacity: .55; }
+.branches-instruments { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.branches-gauge { text-align: center; }
+.branches-gauge-label, .branches-trunk-reading { color: #a99; font-size: 11px; }
+.branches-trunk-reading { margin-top: 3px; color: var(--accent); }
+.branches-fuse { margin: 10px auto 0; }
+.branches-probes .ohm-probes { justify-content: center; }
+.branches-stage.burned .branch-lamp { background: #555; box-shadow: none; opacity: .18; }
+.branches-stage.burned { animation: trunk-flash .35s ease-out; }
+@keyframes trunk-flash {
+  0% { box-shadow: inset 0 0 80px rgba(255,255,255,.8); }
+  100% { box-shadow: inset 0 0 0 rgba(255,255,255,0); }
+}
+
 /* ---------- Bitácora ---------- */
 #bitacora {
   position: absolute; inset: 0; z-index: 60;
@@ -477,4 +538,7 @@ body.touch-device #prompt { display: none !important; }
   .chain-stage { grid-template-columns: 1fr; }
   .chain-slots { grid-template-columns: repeat(3, 1fr); }
   .chain-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+  .branches-stage { grid-template-columns: 1fr; }
+  .branches-cards { grid-template-columns: 1fr; }
+  .branches-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
 }

@@ -239,9 +239,10 @@ const G_MAX = 6;
 const A_MIN = -80;
 const A_MAX = 80;
 
-function angleFor(v: number): number {
-  const c = Math.max(G_MIN, Math.min(G_MAX, v));
-  return A_MIN + ((c - G_MIN) / (G_MAX - G_MIN)) * (A_MAX - A_MIN);
+function angleFor(v: number, maxValue = G_MAX): number {
+  const max = Math.max(1, maxValue);
+  const c = Math.max(G_MIN, Math.min(max, v));
+  return A_MIN + ((c - G_MIN) / (max - G_MIN)) * (A_MAX - A_MIN);
 }
 
 function polar(cx: number, cy: number, r: number, aDeg: number): [number, number] {
@@ -257,11 +258,11 @@ function arcPath(cx: number, cy: number, r: number, a0: number, a1: number): str
 }
 
 /** Medidor con zona buena marcada alrededor de zoneCenter. */
-export function gaugeSVG(zoneCenter = 2, zoneHalf = 0.35): string {
+export function gaugeSVG(zoneCenter = 2, zoneHalf = 0.35, maxValue = G_MAX): string {
   const cx = 100;
   const cy = 95;
-  const zone0 = angleFor(zoneCenter - zoneHalf);
-  const zone1 = angleFor(zoneCenter + zoneHalf);
+  const zone0 = angleFor(zoneCenter - zoneHalf, maxValue);
+  const zone1 = angleFor(zoneCenter + zoneHalf, maxValue);
   return `
     <svg viewBox="0 0 200 110" class="gauge" style="max-width:220px">
       <path d="${arcPath(cx, cy, 70, A_MIN, A_MAX)}" stroke="#4a4554" stroke-width="10" fill="none"/>
@@ -275,7 +276,7 @@ export function gaugeSVG(zoneCenter = 2, zoneHalf = 0.35): string {
     </svg>`;
 }
 
-export function setGauge(scope: HTMLElement, value: number): void {
+export function setGauge(scope: HTMLElement, value: number, maxValue = G_MAX): void {
   const needle = scope.querySelector<SVGLineElement>('.gauge-needle');
-  if (needle) needle.style.transform = `rotate(${angleFor(value)}deg)`;
+  if (needle) needle.style.transform = `rotate(${angleFor(value, maxValue)}deg)`;
 }

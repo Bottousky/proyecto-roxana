@@ -6,6 +6,7 @@ import { abrirFreno } from '../puzzles/freno';
 import { abrirPuerta } from '../puzzles/puerta';
 import { abrirBell } from '../puzzles/bell';
 import { abrirChain } from '../puzzles/chain';
+import { abrirBranches } from '../puzzles/branches';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal } from '../audio';
@@ -238,6 +239,31 @@ function abrirCadenaGaleria(): void {
         hooks.refresh();
       }),
   );
+}
+
+let branchesIntroSeen = false;
+
+function presentarSalaRamales(): void {
+  if (branchesIntroSeen || f().solvedBranches) return;
+  branchesIntroSeen = true;
+  say([
+    L('Lumen', 'El Fusible del Tronco. El mártir más grande de Ohmdal. Cuando este se inmola, Consejera, no hay ritual que lo consuele.'),
+    L('Consejera', 'Por eso las bocas están selladas. Tres talleres abiertos vaciarían el Tronco.'),
+    L('Edda', '¿Vaciarlo? El río no es un balde… …¿O sí? Ohm: ¿es un balde?'),
+    L('Ohm', 'Balde: no. Contable: sí.'),
+  ]);
+}
+
+function abrirBancoRamales(): void {
+  abrirBranches({
+    practica: f().solvedBranches,
+    onBurnedFuse: () => setFlag('burnedTrunkFuse'),
+    onSolved: () => {
+      setFlag('solvedBranches');
+      notifyNewEntry('Los Ramales');
+      hooks.refresh();
+    },
+  });
 }
 
 /* ---------- las salas ---------- */
@@ -943,11 +969,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-ramales', x: 480, y: 360, w: 190, h: 76,
         label: 'Banco de los Ramales', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        onInteract: () => {
-          // TODO(M5): abrir el puzzle de los Ramales.
-          // TODO(guion): falta una línea ambiente para el placeholder del banco.
-          say(L('', 'El banco aún no responde.'));
-        },
+        onInteract: abrirBancoRamales,
       },
       {
         id: 'consejera-ramales', x: 740, y: 350, w: 38, h: 38, shape: 'circle',
@@ -985,6 +1007,7 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () => say(L('Ohm', 'Balde: no. Contable: sí.')),
       },
     ],
+    onEnter: presentarSalaRamales,
   },
 
   castle_heart: {

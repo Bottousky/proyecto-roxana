@@ -740,6 +740,13 @@ export function sfxFzzt(): void {
   noise(0.08, 0.05, 'bandpass', 2600, { when: 0.32, q: 4 });
 }
 
+/** Fusible mayor del Tronco: chasquido eléctrico y trueno grave. */
+export function sfxTrunkFuse(): void {
+  sfxFzzt();
+  noise(0.28, 1.15, 'lowpass', 190, { to: 55, q: 1.2 });
+  tone(48, 'sine', 0.2, 1.2, { to: 32, attack: 0.02 });
+}
+
 /** Sobrecarga sin fusible: crepitar caliente. */
 export function sfxHot(): void {
   for (let i = 0; i < 5; i++) {
