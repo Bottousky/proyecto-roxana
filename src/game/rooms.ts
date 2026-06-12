@@ -11,6 +11,7 @@ import { abrirDistributor } from '../puzzles/distributor';
 import { abrirTimbre } from '../puzzles/timbre';
 import { abrirWarmth } from '../puzzles/warmth';
 import { abrirInfirmary } from '../puzzles/infirmary';
+import { abrirLongChannel } from '../puzzles/longchannel';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -437,6 +438,38 @@ function abrirBancoInfirmary(): void {
     onSolved: () => {
       setFlag('solvedFuseInfirmary');
       notifyNewEntry('El mártir y el margen');
+      hooks.refresh();
+    },
+  });
+}
+
+let longChannelIntroSeen = false;
+
+function presentarCanalLargo(): void {
+  if (longChannelIntroSeen || f().solvedLongChannel) return;
+  longChannelIntroSeen = true;
+  say([
+    L('Forjadora', 'Mi horno. El bueno. Lleva años frío porque cada vez que lo alimentamos, el canal se pone al rojo a mitad de camino.'),
+    L('Forjadora', 'No se puede cambiar el canal. Pasa por abajo de media Forja. O lo alimentas con ESE cable, o no hay horno.'),
+    L('Edda', 'Río suficiente para el horno, por un canal que no aguanta río… Suena a trampa.'),
+    L('Ohm', 'Reformulación: entrega suficiente. La entrega viaja de más de una manera.'),
+  ]);
+}
+
+function hablarForjadoraCanalLargo(): void {
+  if (!longChannelIntroSeen && !f().solvedLongChannel) {
+    presentarCanalLargo();
+    return;
+  }
+  say(L('Forjadora', 'El horno sigue esperando al final del canal.'));
+}
+
+function abrirBancoLongChannel(): void {
+  abrirLongChannel({
+    practica: f().solvedLongChannel,
+    onSolved: () => {
+      setFlag('solvedLongChannel');
+      notifyNewEntry('La Entrega');
       hooks.refresh();
     },
   });
@@ -1529,18 +1562,19 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-canal-largo', x: 450, y: 385, w: 200, h: 76,
         label: 'Banco del Canal Largo', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(F4)
-        onInteract: () => say(L('', 'El banco todavía no está disponible.')),
+        onInteract: abrirBancoLongChannel,
       },
       {
         id: 'forjadora-canal-largo', x: 720, y: 370, w: 40, h: 40, shape: 'circle',
         label: 'Forjadora', prompt: 'Hablar con la Forjadora',
         color: 0x9b5438, solid: true, emoji: '💬',
-        // TODO(guion): diálogo de presentación de F4.
-        onInteract: () => say(L('Forjadora', 'El horno sigue esperando al final del canal.')),
+        onInteract: hablarForjadoraCanalLargo,
       },
     ],
-    onEnter: () => setAmbience('forge'),
+    onEnter: () => {
+      setAmbience('forge');
+      presentarCanalLargo();
+    },
   },
 
   forge_hall: {
