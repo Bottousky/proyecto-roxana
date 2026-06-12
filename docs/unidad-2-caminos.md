@@ -600,6 +600,18 @@ Y recién después leer en la Bitácora: *eso se llama serie, paralelo, y la reg
 
 ---
 
+## 13-bis. Líneas menores fijadas en implementación (v0.2)
+
+Texto conectivo que el guion original no especificaba, escrito durante el build (canon desde ahora):
+
+- **Proyector, re-interacción tras el módulo dos:** «*clac* Unidad dos: en curso. Consulte su Bitácora. …Y no firme nada sin medirlo antes. *clac*»
+- **Camino al Castillo antes de la campana (puerta trabada):» «Un cordón lacrado del Consejo cruza el camino al Castillo: "PASO RESTRINGIDO POR CONSERVACIÓN DE CHISPA. Sin excepciones."» / «Sin evidencia, nadie va a mover ese cordón. La campana de los dos cables espera en la plaza.»
+- **Gate Galería→Ramales (Consejera):** «Los Ramales siguen sellados. Primero la Galería: si el instrumento dice la verdad aquí, la dirá allá.»
+- **Gate Ramales→Corazón (Consejera):** «El Corazón, todavía no. El Consejo selló de afuera hacia adentro; se abre al revés. …Y los Ramales aún no me convencen.»
+- **Ohm en el Corazón (interacción):** «Tablero maestro. Tres salidas, un río. Función: contar. …Función recordada.» *(guiño mínimo a su origen, sin gastar reserva)*
+- **Lumen, repuestos del fusible (Ramales):** «El Mártir tiene hermanos. Yo los traigo; ustedes traten de que no hagan falta.» / «Segundo repuesto. Mi maestro decía que al tercero ya no es accidente: es costumbre.» / «…Tengo más. No me miren así.»
+- **Lumen, repuestos del fusible (Repartidor):** «Un fusible para el Corazón del Castillo. Si me lo decían de aprendiz, me desmayo.» / «Otro más. La Consejera anota; yo repongo. Cada cual su liturgia.» / «…Tengo más. No me miren así.»
+
 ## 13. Notas de coherencia y pendientes
 
 1. **Continuidad numérica:** el doc de la U1 dice «último mantenimiento: hace 43 años» pero el juego implementado dice «34 años» ([rooms.ts](../src/game/rooms.ts), proyector). Unificar (propuesta: 43, y corregir el código). La Consejera dice «cuarenta años de inventarios»: compatible con cualquiera de los dos si el sello fue posterior a la decadencia.

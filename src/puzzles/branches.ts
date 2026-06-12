@@ -48,11 +48,10 @@ const SOLVED_DIALOGUE =
   '<b>Edda:</b> «¿Por qué?»<br/>' +
   '<b>Consejera:</b> «Porque lo voy a anotar de nuevo, con mejor letra.»';
 
-// TODO(guion): faltan comentarios propios de Lumen para los primeros repuestos
-// del Fusible del Tronco. Se reutilizan líneas ya escritas hasta recibirlas.
 const REPLACEMENT_COMMENTS = [
-  '<b>Lumen:</b> «…Tengo más. No me mires así, Edda.»',
-  '<b>Lumen:</b> «¡La cuenta no falla! …Igual traje fusibles consagrados.»',
+  '<b>Lumen:</b> «El Mártir tiene hermanos. Yo los traigo; ustedes traten de que no hagan falta.»',
+  '<b>Lumen:</b> «Segundo repuesto. Mi maestro decía que al tercero ya no es accidente: es costumbre.»',
+  '<b>Lumen:</b> «…Tengo más. No me miren así.»',
 ];
 
 export function abrirBranches(opts: AbrirBranchesOptions): void {

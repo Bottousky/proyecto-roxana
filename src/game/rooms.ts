@@ -445,8 +445,7 @@ export const ROOMS: Record<string, RoomDef> = {
             return;
           }
           if (fl.finished) {
-            // TODO(guion): falta la línea del proyector tras reproducir el módulo dos.
-            say(L('', 'El proyector está apagado.'));
+            say(L('Proyector', '*clac* Unidad dos: en curso. Consulte su Bitácora. …Y no firme nada sin medirlo antes. *clac*'));
             return;
           }
           if (fl.sawProjector) {
@@ -542,8 +541,10 @@ export const ROOMS: Record<string, RoomDef> = {
         color: 0x65536f,
         locked: () => {
           if (f().solvedBellPaths) return null;
-          // TODO(guion): falta una línea ambiente para el camino antes de resolver la campana.
-          return [L('', 'El camino al Castillo sigue oculto entre la niebla.')];
+          return [
+            L('', 'Un cordón lacrado del Consejo cruza el camino al Castillo: «PASO RESTRINGIDO POR CONSERVACIÓN DE CHISPA. Sin excepciones.»'),
+            L('', 'Sin evidencia, nadie va a mover ese cordón. La campana de los dos cables espera en la plaza.'),
+          ];
         },
       },
     ],
@@ -628,7 +629,7 @@ export const ROOMS: Record<string, RoomDef> = {
           ),
       },
       {
-        id: 'lampara2', x: 760, y: 170, w: 26, h: 26, shape: 'circle',
+        id: 'lampara2', x: 760, y: 250, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: true, emoji: '💡',
         color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
         onInteract: () =>
@@ -883,8 +884,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Sala de los Ramales',
         locked: () => {
           if (f().solvedGalleryChain) return null;
-          // TODO(guion): falta una línea de puerta para el gate de la Galería.
-          return [L('', 'La puerta del fondo permanece sellada.')];
+          return [L('Consejera', 'Los Ramales siguen sellados. Primero la Galería: si el instrumento dice la verdad aquí, la dirá allá.')];
         },
       },
     ],
@@ -967,8 +967,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Corazón del Castillo',
         locked: () => {
           if (f().solvedBranches) return null;
-          // TODO(guion): falta una línea de puerta para el gate de los Ramales.
-          return [L('', 'La puerta del Corazón permanece sellada.')];
+          return [L('Consejera', 'El Corazón, todavía no. El Consejo selló de afuera hacia adentro; se abre al revés. …Y los Ramales aún no me convencen.')];
         },
       },
     ],
@@ -1110,8 +1109,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Ohm', prompt: 'Consultar a Ohm',
         color: 0xc9a437, solid: true,
         visible: () => f().enteredCastle,
-        // TODO(guion): la sección 7 no incluye una línea de presentación de Ohm.
-        onInteract: () => say(L('', 'Ohm observa el Repartidor en silencio.')),
+        onInteract: () => say(L('Ohm', 'Tablero maestro. Tres salidas, un río. Función: contar. …Función recordada.')),
       },
     ],
     onEnter: presentarCorazonCastillo,

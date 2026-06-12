@@ -57,11 +57,10 @@ const RESOLUTION =
   '<b>Ohm:</b> «Registro histórico: Consejo actualizado. Tiempo transcurrido: una tarde.»<br/>' +
   '<b>Lumen:</b> «Más rápido que yo. No se lo digan.»';
 
-// TODO(guion): faltan comentarios propios de Lumen para los repuestos del
-// Repartidor. Se reutilizan líneas ya presentes en bancos anteriores.
 const REPLACEMENT_COMMENTS = [
-  '<b>Lumen:</b> «…Tengo más. No me mires así, Edda.»',
-  '<b>Lumen:</b> «¡La cuenta no falla! …Igual traje fusibles consagrados.»',
+  '<b>Lumen:</b> «Un fusible para el Corazón del Castillo. Si me lo decían de aprendiz, me desmayo.»',
+  '<b>Lumen:</b> «Otro más. La Consejera anota; yo repongo. Cada cual su liturgia.»',
+  '<b>Lumen:</b> «…Tengo más. No me miren así.»',
 ];
 
 export function abrirDistributor(opts: AbrirDistributorOptions): void {
