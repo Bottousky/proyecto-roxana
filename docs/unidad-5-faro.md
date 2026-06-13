@@ -65,7 +65,9 @@ Frase central:
 
 El banco con **tick de simulación**: hasta ahora los bancos eran estáticos entre inputs; la U5 necesita un reloj que anime el Estanque (nivel que sube/vuelca), la aguja que decae sola, y el latido del Faro. Diseñar el tick reutilizable y con `requestAnimationFrame` o `setInterval` bien limpiado al cerrar el banco (sin fugas). Es el «delicado» de la unidad.
 
-**Escala de tiempo (canon, aprendido en L3):** ninguna animación de banco debe hacer esperar al jugador más de **~5 segundos**. En L3 la unidad de tiempo quedó en 150 ms (`SLEEPING_RIVER_UNIT_MS`), de modo que la config más lenta (estanque 4 × freno 8 = 32) tarda ~4.8 s. Para el Reloj (L4) y el Faro (L5): cada tic/latido debe ser **perceptible pero ágil** (~1–2 s por ciclo visible a ritmo objetivo), nunca tedioso. La lección se comunica con la *diferencia* de ritmo, no con la espera absoluta.
+**Escala de tiempo (canon, aprendido en L3):** distinguir dos casos.
+- **Espera obligatoria** (un llenado único que hay que completar para avanzar, como L3 y la carga de L5): nunca más de **~5 s**. En L3 la unidad quedó en 150 ms, de modo que la config más lenta (4 × 8 = 32) tarda ~4.8 s.
+- **Ritmo continuo ajustable** (el tictaqueo del Reloj L4, el latido del Faro L5): el jugador NO espera un ciclo completo — ajusta y lee. **El feedback del personaje (Farero) es inmediato al cambiar la config, sin esperar un ciclo.** A ritmo objetivo (4 para el Reloj, 8 para el Faro) el ciclo dura ~**1 s** (unidad ~250 ms): ágil y agradable. Las configs de ritmo muy alto se *ven* lentas pero no se cronometran (el jugador las descarta por el comentario inmediato del Farero). La lección se comunica con la *diferencia* de ritmo, no con la espera absoluta.
 
 ---
 
