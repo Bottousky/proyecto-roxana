@@ -44,7 +44,7 @@ La progresión emocional acompaña: el Arco I enciende el **reino**, el Arco II 
 - **Evento mayor:** dimensionar la red de la Forja: elegir grosores de canal y fusibles para cada máquina según su potencia. La aguja nueva es un **termómetro**.
 - **Gancho saliente:** las Terrazas del valle, donde el empuje «baja por escalones» (→U4).
 
-### U4 — «La vuelta completa» (Kirchhoff de tensiones, divisores, escalera) ✅ diseñada (`unidad-4-terrazas.md`)
+### U4 — «La vuelta completa» (Kirchhoff de tensiones, divisores, escalera) ✅ construida (greybox, jun 2026) (`unidad-4-terrazas.md`)
 
 - **Conceptos:** ley de tensiones de Kirchhoff («la Regla de la Vuelta»: en toda vuelta cerrada, las subidas y bajadas de empuje se cancelan), divisor de tensión, divisor de corriente, **circuito escalera** (red resistiva resuelta por etapas), resistencia equivalente (ver una red entera «como una sola piedra»).
 - **Escenario propuesto:** **las Terrazas** — el acueducto de cobre que riega el valle por niveles. Cada terraza toma su parte del empuje; la red completa es una escalera física que se camina.
@@ -143,7 +143,7 @@ Razones, en orden de peso:
 ### La ruta completa, en una línea de tiempo
 
 ```
-v1  ── Ohmdal Arco I ──────────── U1 ✅  U2 ✅  U3 ✅  U4 ✅dis  U5 ✅dis   ← CORTE «mundo completo»
+v1  ── Ohmdal Arco I ──────────── U1 ✅  U2 ✅  U3 ✅  U4 ✅  U5 ✅dis   ← CORTE «mundo completo»
 v2  ── Programación Arco I ────── P1  P2  (P3)
 v3  ── Ohmdal Arco II ─────────── U6  U7  U8  U9
 v4  ── El Empalme (mundo compartido) ── sigue-líneas · sumo · fútbol + historia de Ohm
