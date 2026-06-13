@@ -65,6 +65,8 @@ Frase central:
 
 El banco con **tick de simulación**: hasta ahora los bancos eran estáticos entre inputs; la U5 necesita un reloj que anime el Estanque (nivel que sube/vuelca), la aguja que decae sola, y el latido del Faro. Diseñar el tick reutilizable y con `requestAnimationFrame` o `setInterval` bien limpiado al cerrar el banco (sin fugas). Es el «delicado» de la unidad.
 
+**Escala de tiempo (canon, aprendido en L3):** ninguna animación de banco debe hacer esperar al jugador más de **~5 segundos**. En L3 la unidad de tiempo quedó en 150 ms (`SLEEPING_RIVER_UNIT_MS`), de modo que la config más lenta (estanque 4 × freno 8 = 32) tarda ~4.8 s. Para el Reloj (L4) y el Faro (L5): cada tic/latido debe ser **perceptible pero ágil** (~1–2 s por ciclo visible a ritmo objetivo), nunca tedioso. La lección se comunica con la *diferencia* de ritmo, no con la espera absoluta.
+
 ---
 
 ## 1. NIVEL 0 — Aula (módulo cinco)
