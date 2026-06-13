@@ -19,6 +19,7 @@ import { abrirSingleStone } from '../puzzles/singlestone';
 import { abrirLadder } from '../puzzles/ladder';
 import { abrirStoredSpark } from '../puzzles/storedspark';
 import { abrirSleepingRiver } from '../puzzles/sleepingriver';
+import { abrirClock } from '../puzzles/clock';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -273,6 +274,18 @@ function abrirBancoSleepingRiver(): void {
       hooks.refresh();
     },
     f().solvedSleepingRiver,
+  );
+}
+
+function abrirBancoClock(): void {
+  abrirClock(
+    () => {
+      setFlag('solvedClock');
+      setFlag('clockRestored');
+      notifyNewEntry('El tic');
+      hooks.refresh();
+    },
+    f().solvedClock,
   );
 }
 
@@ -2417,8 +2430,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-reloj', x: 480, y: 385, w: 230, h: 80,
         label: 'Banco del Reloj', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(L4)
-        onInteract: () => say(L('', 'Un Estanque con borde de volcado está unido al péndulo. La escala marca un ritmo objetivo.')),
+        onInteract: abrirBancoClock,
       },
       {
         id: 'farero-reloj', x: 750, y: 260, w: 40, h: 40, shape: 'circle',

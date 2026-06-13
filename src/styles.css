@@ -375,6 +375,108 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 }
 .sleepingriver-progress span.done { color: var(--ok); border-color: rgba(126,196,106,.55); }
 
+/* U5: el Reloj de Ohmdal */
+.clock-stage { display: grid; gap: 11px; --clock-period: 250ms; }
+.clock-machine {
+  display: grid; grid-template-columns: 80px minmax(150px, 1fr) 150px 130px;
+  align-items: center; gap: 10px; min-height: 205px;
+}
+.clock-source {
+  padding: 16px 8px; border: 2px solid #8a7c50; border-radius: 10px;
+  background: #302a22; color: var(--accent); text-align: center; font-weight: 700;
+}
+.clock-channel {
+  position: relative; height: 22px; border-radius: 11px; background: #403948;
+}
+.clock-flow {
+  position: absolute; inset: 4px; border-radius: 7px; background: var(--accent);
+  opacity: .65; box-shadow: 0 0 9px rgba(255,211,77,.45);
+}
+.clock-stone-slot {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+}
+.clock-stone-slot .piedra { width: 58px; height: 35px; font-size: 9px; }
+.clock-tank { position: relative; text-align: center; }
+.clock-tank[data-tank="1"] .tank { max-width: 105px; }
+.clock-tank[data-tank="2"] .tank { max-width: 130px; }
+.clock-tank[data-tank="4"] .tank { max-width: 150px; }
+.clock-threshold {
+  position: absolute; z-index: 1; top: 22px; left: 50%; width: 116px;
+  transform: translateX(-50%); border-top: 2px dashed #d66b4f;
+  color: #d98b76; font-size: 9px; pointer-events: none;
+}
+.clock-pendulum {
+  position: relative; display: grid; justify-items: center; align-self: stretch;
+  padding-top: 8px; color: #a99; font-size: 11px;
+}
+.clock-face {
+  position: relative; z-index: 2; width: 62px; height: 62px;
+  border: 4px solid #8a7c50; border-radius: 50%; background: #27232e;
+}
+.clock-hand {
+  position: absolute; left: 28px; top: 8px; width: 3px; height: 24px;
+  border-radius: 3px; background: var(--accent); transform-origin: 50% 23px;
+  transition: transform .12s ease-out;
+}
+.clock-rod {
+  width: 5px; height: 82px; margin-top: -2px; border-radius: 4px;
+  background: #b88d5a; transform-origin: 50% 0; transition: transform .12s ease-out;
+}
+.clock-weight {
+  width: 34px; height: 34px; margin-top: -13px; border-radius: 50%;
+  background: #8a704f; border: 3px solid #c09a68; transition: transform .12s ease-out;
+}
+.clock-reference {
+  display: grid; grid-template-columns: 145px 1fr 145px 1fr;
+  align-items: center; gap: 8px; padding: 8px 10px;
+  border: 1px solid #4a4554; border-radius: 8px; background: #1d1a23;
+}
+.clock-reference strong, .clock-reference span { display: block; }
+.clock-reference strong { color: #d8cfc0; font-size: 12px; }
+.clock-reference div > span { color: #887f90; font-size: 10px; }
+.clock-reference-pulse, .clock-actual-pulse {
+  position: relative; height: 8px; overflow: hidden; border-radius: 4px; background: #342f3d;
+}
+.clock-reference-pulse span, .clock-actual-pulse span {
+  position: absolute; top: 0; bottom: 0; width: 18px; border-radius: 4px;
+  background: var(--accent); animation: clock-pulse 1000ms linear infinite;
+}
+.clock-actual-pulse span { animation-duration: var(--clock-period); }
+.clock-stage[data-timing="fast"] .clock-actual-label { color: #e7a45d; }
+.clock-stage[data-timing="slow"] .clock-actual-label { color: #8fa9c8; }
+.clock-stage[data-timing="just"] .clock-actual-label { color: var(--ok); }
+@keyframes clock-pulse {
+  from { left: -18px; }
+  to { left: 100%; }
+}
+.clock-controls {
+  display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px;
+}
+.clock-controls section {
+  padding: 8px; border: 1px solid #4a4554; border-radius: 8px; background: #1d1a23;
+}
+.clock-controls h3 {
+  margin-bottom: 7px; color: #a99; font-size: 12px; font-weight: 500;
+}
+.clock-tanks, .clock-brakes {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+}
+.clock-brakes { grid-template-columns: repeat(4, 1fr); }
+.clock-choice, .clock-brake {
+  min-width: 0; padding: 4px; border: 1px solid #5d5868; border-radius: 7px;
+  background: #26222e; color: #d8cfc0; cursor: pointer;
+}
+.clock-choice strong, .clock-choice span { display: block; }
+.clock-choice strong { font-size: 11px; }
+.clock-choice span { margin-top: 2px; color: #887f90; font-size: 9px; }
+.clock-choice.selected, .clock-brake.selected {
+  border-color: var(--accent); background: rgba(255,211,77,.08);
+}
+.clock-choice:disabled, .clock-brake:disabled { opacity: .55; cursor: default; }
+.clock-brake .piedra {
+  width: 100%; min-width: 0; height: 30px; padding: 2px; font-size: 8px; pointer-events: none;
+}
+
 .fuse { width: min(300px, 100%); padding: 10px; border: 1px solid #6b6478; border-radius: 8px; background: #211e29; }
 .fuse-heading { display: flex; justify-content: space-between; font-size: 12px; color: #d8cfc0; }
 .fuse-threshold, .fuse-status { color: #a99; }
@@ -1277,6 +1379,10 @@ body.touch-device #prompt { display: none !important; }
   .sleepingriver-network { grid-template-columns: 65px 1fr 105px; gap: 5px; }
   .sleepingriver-controls { grid-template-columns: 1fr; }
   .sleepingriver-ohm { left: 0; transform: scale(.82); transform-origin: bottom left; }
+  .clock-machine { grid-template-columns: 60px 1fr 100px 90px; gap: 4px; }
+  .clock-pendulum { transform: scale(.82); transform-origin: center top; }
+  .clock-reference { grid-template-columns: 110px 1fr; }
+  .clock-controls { grid-template-columns: 1fr; }
   .warmth-channels { grid-template-columns: 1fr; }
   .infirmary-machines { grid-template-columns: 1fr; }
   .longchannel-network { grid-template-columns: 1fr; }
