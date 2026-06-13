@@ -67,7 +67,7 @@ El banco con **tick de simulación**: hasta ahora los bancos eran estáticos ent
 
 **Escala de tiempo (canon, aprendido en L3):** distinguir dos casos.
 - **Espera obligatoria** (un llenado único que hay que completar para avanzar, como L3 y la carga de L5): nunca más de **~5 s**. En L3 la unidad quedó en 150 ms, de modo que la config más lenta (4 × 8 = 32) tarda ~4.8 s.
-- **Ritmo continuo ajustable** (el tictaqueo del Reloj L4, el latido del Faro L5): el jugador NO espera un ciclo completo — ajusta y lee. **El feedback del personaje (Farero) es inmediato al cambiar la config, sin esperar un ciclo.** A ritmo objetivo (4 para el Reloj, 8 para el Faro) el ciclo dura ~**1 s** (unidad ~250 ms): ágil y agradable. Las configs de ritmo muy alto se *ven* lentas pero no se cronometran (el jugador las descarta por el comentario inmediato del Farero). La lección se comunica con la *diferencia* de ritmo, no con la espera absoluta.
+- **Ritmo continuo ajustable** (el tictaqueo del Reloj L4, el latido del Faro L5): el jugador NO espera un ciclo completo — ajusta y lee. **El feedback del personaje (Farero) es inmediato al cambiar la config, sin esperar un ciclo.** Unidad de tiempo **250 ms** para ambos. Con eso: el Reloj a ritmo objetivo 4 hace su tic cada ~**1 s** (ágil); el **Faro a ritmo objetivo 8 late cada ~2 s** — más lento a propósito (el guion §5 lo dice: «latido más lento»; un faro que late cada 2 s es contemplativo, apropiado para el cierre del arco). Esa diferencia Reloj-rápido / Faro-lento es diegética, no un error. Ninguno es tedioso. Las configs de ritmo muy alto se *ven* lentas pero no se cronometran (se descartan por el comentario inmediato del Farero). La lección se comunica con la *diferencia* de ritmo, no con la espera absoluta.
 
 ---
 
