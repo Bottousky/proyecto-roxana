@@ -1113,6 +1113,12 @@ export const ROOMS: Record<string, RoomDef> = {
         color: 0x65536f,
         locked: () => {
           if (f().solvedBellPaths) return null;
+          if (!f().playedUnit2Intro) {
+            return [
+              L('', 'El camino al Castillo está lacrado. Todavía no sabes qué evidencia necesita el Consejo.'),
+              L('', 'Vuelve al Aula de Electrónica. El proyector tiene preparada la próxima lección.'),
+            ];
+          }
           return [
             L('', 'Un cordón lacrado del Consejo cruza el camino al Castillo: «PASO RESTRINGIDO POR CONSERVACIÓN DE CHISPA. Sin excepciones.»'),
             L('', 'Sin evidencia, nadie va a mover ese cordón. La campana de los dos cables espera en la plaza.'),
@@ -1239,7 +1245,10 @@ export const ROOMS: Record<string, RoomDef> = {
             if (fl.solvedBellPaths) abrirBell(() => {}, true);
             else abrirCampanaUnidad2();
           } else if (fl.finished) {
-            say(L('', 'La campana todavía vibra, contenta. Los dos cables siguen ahí, esperando su lección.'));
+            say([
+              L('', 'La campana todavía vibra, contenta. Los dos cables siguen ahí, esperando su lección.'),
+              L('', 'Vuelve al Aula de Electrónica y enciende el proyector. Allí empieza la próxima unidad.'),
+            ]);
           } else if (fl.puertaDone) tocarCampana();
           else say(L('', 'La campana de Ohmdal cuelga muda sobre la plaza apagada. La cuerda está al alcance, pero algo dice que todavía no.'));
         },
