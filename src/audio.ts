@@ -2,7 +2,7 @@
    Todo WebAudio, sin assets — pensado para el greybox. Cuando haya música real,
    este módulo se reemplaza manteniendo la misma interfaz (setAmbience + sfx*). */
 
-export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on' | 'castle' | 'forge' | 'terraces';
+export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on' | 'castle' | 'forge' | 'terraces' | 'lighthouse';
 
 /** Una pieza compuesta: pistas de melodía y bajo como listas de [nota, pulsos].
  *  null = silencio. Las notas en notación científica ('D5', 'Bb2', 'F#4'). */
@@ -143,6 +143,22 @@ const TEMA_TERRACES: ThemeDef = {
   bassLevel: 0.38,
 };
 
+// «El Faro» — variación nocturna del Castillo, espaciosa como una señal sobre el lago.
+const TEMA_LIGHTHOUSE: ThemeDef = {
+  ...TEMA_CASTLE,
+  tempo: 48,
+  melody: [
+    ['A4', 3], [null, 2], ['E5', 1], ['D5', 3], [null, 3],
+    ['C5', 2], ['A4', 2], [null, 2], ['G4', 4], [null, 4],
+    ['A4', 2], ['C5', 1], ['E5', 3], [null, 3], ['D5', 5], [null, 5],
+  ],
+  bass: [
+    ['A1', 11], ['F1', 11], ['G1', 11], ['A1', 11],
+  ],
+  melodyLevel: 0.38,
+  bassLevel: 0.42,
+};
+
 const MOODS: Record<Ambience, MoodDef> = {
   // el Instituto: polvo, eco, melancolía — re menor (deriva i → VI → VII)
   instituto: {
@@ -234,6 +250,21 @@ const MOODS: Record<Ambience, MoodDef> = {
     phraseGap: [6500, 14000],
     pluckLevel: 0.035,
     theme: TEMA_TERRACES,
+  },
+  // El Faro: lago oscuro, piedra alta y una señal que todavía no encuentra su ritmo.
+  lighthouse: {
+    chords: [
+      [27.5, 41.2],
+      [21.83, 32.7],
+      [24.5, 36.71],
+    ],
+    droneType: 'sine',
+    filter: 240,
+    level: 0.11,
+    scale: [110.0, 130.81, 146.83, 164.81, 196.0, 220.0],
+    phraseGap: [9000, 19000],
+    pluckLevel: 0.028,
+    theme: TEMA_LIGHTHOUSE,
   },
   // Ohmdal encendida: el mismo re, pero abierto y luminoso (re → sol → la)
   'ohmdal-on': {
@@ -581,6 +612,7 @@ function startMood(mood: Ambience): void {
 
   schedulePhrase(def, moodGain, gen);
   if (mood === 'terraces') scheduleTerraceWater(gen);
+  if (mood === 'lighthouse') scheduleLighthouse(gen);
 }
 
 /** Agua del acueducto: ruido filtrado continuo en pulsos largos y gotas aisladas. */
@@ -594,6 +626,25 @@ function scheduleTerraceWater(gen: number): void {
     attack: 0.03,
   });
   window.setTimeout(() => scheduleTerraceWater(gen), 3200 + Math.random() * 1800);
+}
+
+/** Lago, trueno lejano y barrido grave de una linterna todavía apagada. */
+function scheduleLighthouse(gen: number): void {
+  if (gen !== moodGen || currentMood !== 'lighthouse') return;
+  noise(0.018, 5.2, 'lowpass', 720, { to: 260, q: 0.6 });
+
+  if (Math.random() < 0.32) {
+    noise(0.055, 2.6, 'lowpass', 150, { when: 1.2, to: 45, q: 1.1 });
+    tone(42, 'sine', 0.045, 2.8, { when: 1.25, to: 29, attack: 0.35 });
+  }
+
+  tone(164.81, 'sine', 0.022, 1.6, {
+    when: 0.5 + Math.random() * 1.4,
+    to: 82.41,
+    echo: true,
+    attack: 0.25,
+  });
+  window.setTimeout(() => scheduleLighthouse(gen), 5200 + Math.random() * 3200);
 }
 
 /** Frases de 1-3 notas con ritmo y dinámica variables, separadas por

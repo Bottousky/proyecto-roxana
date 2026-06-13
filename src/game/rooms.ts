@@ -232,6 +232,25 @@ function reproducirIntroUnidad5(): void {
   );
 }
 
+function presentarFarero(): void {
+  if (f().metFarero) {
+    say(L('Farero', 'El Faro no necesita más brillo. Necesita recordar su latido.'));
+    return;
+  }
+  say(
+    [
+      L('Farero', '¿Vienen por la luz? La luz es lo de menos. Este faro no alumbraba: avisaba.'),
+      L('Farero', 'Y para avisar hay que latir. La-aaa-tido. La-aaa-tido. Yo me acuerdo. El ritmo lo tengo acá. (se toca la sien)'),
+      L('Edda', 'Nosotros vimos algo imposible, hace tiempo. Una chispa que brilló sin camino. Lo anotamos y no lo entendimos.'),
+      L('Farero', 'Ah. Entonces ya conocen al Estanque. Solo que todavía no sabían su nombre.'),
+    ],
+    () => {
+      setFlag('metFarero');
+      hooks.refresh();
+    },
+  );
+}
+
 function abrirCampanaUnidad2(): void {
   say(
     [
@@ -997,6 +1016,13 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Camino a las Terrazas',
         color: 0x58755f,
         visible: () => f().unit3Completed,
+      },
+      {
+        x: 0, y: 450, w: 26, h: 64,
+        to: 'lighthouse_hall', spawn: { x: 860, y: 380 },
+        label: 'Camino al Faro',
+        color: 0x496978,
+        visible: () => f().unit4Completed,
       },
     ],
     things: [
@@ -2185,5 +2211,285 @@ export const ROOMS: Record<string, RoomDef> = {
       },
     ],
     onEnter: () => setAmbience('terraces'),
+  },
+
+  /* ============ EL FARO ============ */
+
+  lighthouse_hall: {
+    id: 'lighthouse_hall',
+    name: 'El Faro — Sala de la máquina',
+    floor: () => 0x1b2730,
+    wall: () => 0x304451,
+    doors: [
+      {
+        x: 934, y: 330, w: 26, h: 110,
+        to: 'plaza', spawn: { x: 95, y: 465 },
+        label: 'Camino a la plaza',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'lighthouse_bench', spawn: { x: 480, y: 440 },
+        label: 'Taller del Farero',
+        locked: () =>
+          f().solvedStoredSpark
+            ? null
+            : [L('Farero', 'Todavía no. Primero vean cómo una chispa se queda cuando el camino ya no está. Después hablamos de tiempo.')],
+      },
+    ],
+    things: [
+      {
+        id: 'maquina-faro-muerta', x: 300, y: 205, w: 310, h: 180,
+        label: 'Máquina del Faro', prompt: 'Examinar la máquina',
+        color: 0x4b5960, solid: true,
+        onInteract: () => say(L('', 'Bronce sin polvo, ruedas inmóviles y canales oscuros. La máquina está muerta, pero alguien la ha cuidado todos los días.')),
+      },
+      {
+        id: 'lente-lustrada', x: 690, y: 145, w: 125, h: 125, shape: 'circle',
+        label: 'Lente lustrada', prompt: 'Examinar la lente',
+        color: 0x8aaeb8, solid: true,
+        onInteract: () => say(L('', 'La lente está impecable. Devuelve la luz de la sala, aunque el Faro no produce ninguna propia.')),
+      },
+      {
+        id: 'banco-chispa', x: 480, y: 395, w: 220, h: 76,
+        label: 'Banco del Estanque', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(L2)
+        onInteract: () => say(L('', 'Una fuente, un canal con llave, un recipiente de cobre y una lámpara esperan sobre el banco.')),
+      },
+      {
+        id: 'farero-hall', x: 760, y: 320, w: 40, h: 40, shape: 'circle',
+        label: 'Farero', prompt: 'Hablar con el Farero',
+        color: 0x70818a, solid: true, emoji: '💬',
+        visible: () => f().unit4Completed,
+        onInteract: presentarFarero,
+      },
+      {
+        id: 'consejera-faro', x: 815, y: 400, w: 38, h: 38, shape: 'circle',
+        label: 'Consejera', prompt: 'Hablar con la Consejera',
+        color: 0x725d79, solid: true, emoji: '💬',
+        visible: () => f().unit4Completed,
+        onInteract: () => say(L('Consejera', 'Vine a revisar un registro pendiente. Esta vez pienso anotar lo que ocurra, aunque llegue cuarenta años tarde.')),
+      },
+      {
+        id: 'edda-faro-hall', x: 690, y: 385, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().unit4Completed,
+        onInteract: () => say(L('Edda', 'La chispa sin camino. Sabía que esa pregunta no iba a dejarnos tranquilos.')),
+      },
+      {
+        id: 'lumen-faro-hall', x: 150, y: 385, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().unit4Completed,
+        onInteract: () => say(L('Maese Lumen', 'Una máquina lustrada durante décadas, sin encender una sola vez. Conozco esa clase de paciencia.')),
+      },
+      {
+        id: 'ohm-faro-hall', x: 205, y: 435, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().unit4Completed,
+        onInteract: () => say(L('Ohm', 'Máquina: inmóvil. Cuidado acumulado: cuarenta años. Pregunta acumulada: una.')),
+      },
+    ],
+    onEnter: () => setAmbience('lighthouse'),
+  },
+
+  lighthouse_bench: {
+    id: 'lighthouse_bench',
+    name: 'El Faro — Taller del Farero',
+    floor: () => 0x202b31,
+    wall: () => 0x394a50,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'lighthouse_hall', spawn: { x: 480, y: 95 },
+        label: 'Sala de la máquina',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'clock_tower', spawn: { x: 480, y: 440 },
+        label: 'Torre del Reloj',
+        locked: () =>
+          f().solvedSleepingRiver
+            ? null
+            : [L('Farero', 'El Reloj puede esperar. Primero aprendan a oír cómo el río se duerme mientras el Estanque se llena.')],
+      },
+    ],
+    things: [
+      {
+        id: 'estantes-farero', x: 230, y: 155, w: 270, h: 90,
+        label: 'Herramientas del Farero', prompt: 'Examinar las herramientas',
+        color: 0x526168, solid: true,
+        onInteract: () => say(L('', 'Calibres, llaves y piedras de freno ordenadas por tamaño. Ninguna tiene polvo.')),
+      },
+      {
+        id: 'banco-rio-dormido', x: 480, y: 320, w: 250, h: 90,
+        label: 'Banco del Farero', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(L3)
+        onInteract: () => say(L('', 'Un canal, varias piedras de freno y tres Estanques de cobre esperan una prueba.')),
+      },
+      {
+        id: 'farero-taller', x: 735, y: 205, w: 40, h: 40, shape: 'circle',
+        label: 'Farero', prompt: 'Hablar con el Farero',
+        color: 0x70818a, solid: true, emoji: '💬',
+        visible: () => f().solvedStoredSpark,
+        onInteract: () => say(L('Farero', 'Mírenlo llenarse. No es magia. Es paciencia con forma de agua.')),
+      },
+      {
+        id: 'edda-faro-taller', x: 785, y: 360, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().solvedStoredSpark,
+        onInteract: () => say(L('Edda', 'Quiero ver la aguja moverse sola. Esta vez no pienso parpadear.')),
+      },
+      {
+        id: 'lumen-faro-taller', x: 145, y: 350, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().solvedStoredSpark,
+        onInteract: () => say(L('Maese Lumen', 'Piedras, canales y paciencia. Al fin una liturgia con piezas que puedo señalar.')),
+      },
+      {
+        id: 'ohm-faro-taller', x: 205, y: 420, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().solvedStoredSpark,
+        onInteract: () => say(L('Ohm', 'Variable nueva detectada: espera. Medición recomendada.')),
+      },
+    ],
+    onEnter: () => setAmbience('lighthouse'),
+  },
+
+  clock_tower: {
+    id: 'clock_tower',
+    name: 'Ohmdal — Torre del Reloj',
+    floor: () => 0x24272d,
+    wall: () => 0x47434a,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'lighthouse_bench', spawn: { x: 480, y: 95 },
+        label: 'Taller del Farero',
+      },
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'lighthouse_lantern', spawn: { x: 480, y: 440 },
+        label: 'Linterna del Faro',
+        locked: () =>
+          f().solvedClock
+            ? null
+            : [L('Farero', 'Arriba espera el latido grande. Antes devuélvanle a este pueblo un tic justo: ni apurado ni dormido.')],
+      },
+    ],
+    things: [
+      {
+        id: 'reloj-parado', x: 480, y: 155, w: 330, h: 190,
+        label: 'Reloj de Ohmdal', prompt: 'Examinar el Reloj',
+        color: 0x6a604f, solid: true,
+        onInteract: () => say(L('', 'El péndulo cuelga inmóvil. Los engranajes están completos; les falta algo que decida cuándo avanzar.')),
+      },
+      {
+        id: 'banco-reloj', x: 480, y: 385, w: 230, h: 80,
+        label: 'Banco del Reloj', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(L4)
+        onInteract: () => say(L('', 'Un Estanque con borde de volcado está unido al péndulo. La escala marca un ritmo objetivo.')),
+      },
+      {
+        id: 'farero-reloj', x: 750, y: 260, w: 40, h: 40, shape: 'circle',
+        label: 'Farero', prompt: 'Hablar con el Farero',
+        color: 0x70818a, solid: true, emoji: '💬',
+        visible: () => f().solvedSleepingRiver,
+        onInteract: () => say(L('Farero', 'El Reloj y el Faro son hermanos. Uno cuenta; el otro avisa. Los dos necesitan un latido que no mienta.')),
+      },
+      {
+        id: 'edda-reloj', x: 805, y: 390, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().solvedSleepingRiver,
+        onInteract: () => say(L('Edda', 'Un estanque que cuenta el tiempo. Claro. A esta altura, claro que sí.')),
+      },
+      {
+        id: 'lumen-reloj', x: 145, y: 335, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().solvedSleepingRiver,
+        onInteract: () => say(L('Maese Lumen', 'Dábamos cuerda a este reloj todos los meses. Nunca se nos ocurrió preguntarle de dónde salía el tic.')),
+      },
+      {
+        id: 'ohm-reloj', x: 205, y: 410, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().solvedSleepingRiver,
+        onInteract: () => say(L('Ohm', 'Reloj detenido. Tiempo disponible.')),
+      },
+    ],
+    onEnter: () => setAmbience('lighthouse'),
+  },
+
+  lighthouse_lantern: {
+    id: 'lighthouse_lantern',
+    name: 'El Faro — La linterna',
+    floor: () => 0x18242d,
+    wall: () => 0x2b3e4a,
+    doors: [
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'clock_tower', spawn: { x: 480, y: 95 },
+        label: 'Torre del Reloj',
+      },
+    ],
+    things: [
+      {
+        id: 'lente-enorme', x: 480, y: 180, w: 300, h: 220, shape: 'circle',
+        label: 'Lente del Faro', prompt: 'Examinar la lente',
+        color: 0x7698a8, solid: true,
+        onInteract: () => say(L('', 'La lente enorme domina la cima. Más allá del cristal, el lago negro parece no tener orilla.')),
+      },
+      {
+        id: 'lago-negro', x: 165, y: 150, w: 180, h: 95,
+        label: 'Lago negro', prompt: 'Mirar el lago',
+        color: 0x142b3a, solid: false,
+        onInteract: () => say(L('', 'El agua absorbe la noche. Un trueno lejano tarda en llegar hasta la torre.')),
+      },
+      {
+        id: 'banco-latido', x: 480, y: 405, w: 250, h: 80,
+        label: 'Banco del latido', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(L5)
+        onInteract: () => say(L('', 'Dos caminos rodean un Estanque: uno estrecho para llenarlo y otro casi libre para volcarlo hacia la lente.')),
+      },
+      {
+        id: 'farero-linterna', x: 745, y: 280, w: 40, h: 40, shape: 'circle',
+        label: 'Farero', prompt: 'Hablar con el Farero',
+        color: 0x70818a, solid: true, emoji: '💬',
+        visible: () => f().solvedClock,
+        onInteract: () => say(L('Farero', 'No tengo planos. Tengo el oído. Ustedes armen el latido; yo les digo cuándo sea el de verdad.')),
+      },
+      {
+        id: 'edda-linterna', x: 805, y: 385, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().solvedClock,
+        onInteract: () => say(L('Edda', 'Desde acá se ve todo lo que encendimos. Falta que esto responda.')),
+      },
+      {
+        id: 'lumen-linterna', x: 145, y: 335, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().solvedClock,
+        onInteract: () => say(L('Maese Lumen', 'Toda mi vida vi esta torre apagada. Preferiría estar mirando cuando deje de estarlo.')),
+      },
+      {
+        id: 'ohm-linterna', x: 205, y: 410, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().solvedClock,
+        onInteract: () => say(L('Ohm', 'Lente preparada. Lago preparado. Ritmo: pendiente.')),
+      },
+    ],
+    onEnter: () => setAmbience('lighthouse'),
   },
 };

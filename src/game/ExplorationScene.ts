@@ -133,6 +133,8 @@ export class ExplorationScene extends Phaser.Scene {
     const mood: Ambience =
       id.startsWith('forge_')
         ? 'forge'
+        : id.startsWith('lighthouse_') || id === 'clock_tower'
+          ? 'lighthouse'
         : id.startsWith('terraces_')
           ? 'terraces'
         : id === 'taller'
