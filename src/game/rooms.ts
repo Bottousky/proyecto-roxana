@@ -1029,7 +1029,7 @@ export const ROOMS: Record<string, RoomDef> = {
               L('Proyector', '*clac* INSTITUTO ROXANA PRESENTA: MUNDOS APLICADOS. UNIDAD UNO.'),
               L('Proyector', 'El Mundo Aplicado «Ohmdal» fue construido por este Instituto con un único propósito: que la electricidad se aprenda caminándola.'),
               L('Proyector', 'Recuerde, estudiante: el mundo responde a su comprensión. La incomprensión también deja huella.'),
-              L('Proyector', 'Último mantenimiento: hace 34 años. Que tenga una buena clase. *clac*'),
+              L('Proyector', 'Último mantenimiento: hace cuarenta años. Que tenga una buena clase. *clac*'),
               L('', '…¿Construyeron un mundo entero para enseñar? ¿Y después lo olvidaron?'),
             ],
             () => {
