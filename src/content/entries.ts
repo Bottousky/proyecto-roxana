@@ -381,5 +381,94 @@ export function getEntries(): EntryView[] {
     });
   }
 
+  /* ============ UNIDAD 4 — Las Terrazas ============ */
+
+  if (f.solvedVoltageSteps) {
+    out.push({
+      id: 'los-escalones',
+      title: 'Los escalones',
+      fecha: 'Las Terrazas — el canal alto',
+      vivencial: `
+        <p>El empuje cae piedra a piedra, por escalones. La vuelta completa siempre
+        cierra en cero: todo lo que sube, baja.</p>
+        <p>El río, en cambio, es el mismo en toda la fila.</p>`,
+      formal: f.learnedKVL
+        ? `
+        <h4>La Regla de la Vuelta</h4>
+        <p>La ley de tensiones de Kirchhoff (KVL) dice que, en toda vuelta cerrada,
+        las subidas y bajadas de tensión se cancelan.</p>
+        <p><em>El mismo apellido de la regla del cruce. Kirchhoff tenía dos reglas
+        y ningún apuro.</em></p>
+        <h4>Error común</h4>
+        <p>Confundir empuje con río: el empuje cae por escalones; el río, en una fila, no.</p>`
+        : `<p class="blank">La Bitácora tiene espacio para el nombre de esta regla.
+           Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.solvedFairSplit) {
+    out.push({
+      id: 'reparto-empuje',
+      title: 'El reparto del empuje',
+      fecha: 'Las Terrazas — el reparto',
+      vivencial: `
+        <p>Dos terrazas, una proporción 2:1 y más de una solución.</p>
+        <p>Las dos soluciones que probé repartían el mismo empuje: la de piedras
+        grandes pedía menos río al manantial.</p>`,
+      formal: f.learnedKVL
+        ? `
+        <h4>Divisor de tensión</h4>
+        <p>Cada resistencia cobra tensión en proporción a su freno.</p>
+        <h4>Error común</h4>
+        <p>Creer que «la piedra grande aguanta y la chica sufre»: cobran
+        proporcionalmente; ninguna sufre.</p>`
+        : `<p class="blank">La Bitácora tiene espacio para el nombre de este reparto.
+           Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.solvedSingleStone) {
+    out.push({
+      id: 'la-piedra-unica',
+      title: 'La Piedra Única',
+      fecha: 'Las Terrazas — el mural de los Maestros',
+      vivencial: `
+        <p>Una red entera puede esconderse dentro de una piedra. Ohm midió los dos
+        lados y no pudo distinguir la red de la Piedra Única.</p>`,
+      formal: f.learnedKVL
+        ? `
+        <h4>Resistencia equivalente</h4>
+        <p>Una red puede reemplazarse por una resistencia equivalente. En fila,
+        las resistencias se suman; dos resistencias iguales en paralelo equivalen
+        a la mitad de una.</p>
+        <div class="pregunta">✎ Si toda red puede ser una sola piedra...
+        ¿qué piedra es tu casa entera, vista desde el medidor de la entrada?</div>`
+        : `<p class="blank">La Bitácora tiene espacio para el nombre de la Piedra Única.
+           Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.learnedKVL) {
+    out.push({
+      id: 'la-escalera',
+      title: 'La Escalera',
+      fecha: 'Las Terrazas — el acueducto del valle',
+      vivencial: `
+        <p>Plegué la Escalera etapa por etapa, desde el fondo, hasta mirar el valle
+        entero como una sola piedra.</p>
+        <p>La Bitácora estrenó una página de predicción: lo esperado, lo medido
+        y la palabra <strong>IGUALES</strong>.</p>`,
+      formal: `
+        <h4>El método de plegado</h4>
+        <p>Desde la última etapa, cada tramo y cada ramal se reemplazan por su
+        resistencia equivalente. El resultado se vuelve a plegar hasta obtener
+        una sola resistencia para toda la red.</p>
+        <p>Hoy la Bitácora dejó de ser un diario. Ahora también es un mapa de lo
+        que va a pasar.</p>
+        <div class="pregunta">✎ Antes de enchufar algo nuevo en tu casa, ¿podrías
+        decir si la llave va a saltar? Esa pregunta ya es ingeniería.</div>`,
+    });
+  }
+
   return out;
 }

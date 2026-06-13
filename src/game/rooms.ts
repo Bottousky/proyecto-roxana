@@ -640,6 +640,38 @@ function abrirBancoEscalera(): void {
   });
 }
 
+/* ---------- T6: cierre de la Unidad 4 ---------- */
+
+function checkUnit4Complete(): void {
+  if (!f().learnedKVL || f().unit4Completed) return;
+  say(
+    [
+      L('Edda', '¿Y eso de ahí abajo? Esa torre, sobre el agua.'),
+      L('Guardiana', 'El Faro. Lleva apagado desde que se fueron los Maestros. Parpadeaba, ¿saben?... latía. La-aaa-tido... la-aaa-tido. Nadie supo nunca con qué corazón.'),
+      L('', 'Ohm se queda mirando el Faro un segundo de más, en silencio. Su pecho parpadea una vez.'),
+      L('Ohm', 'Nada. Un dato viejo. Sigamos.'),
+      L('Edda', '¿Ohm...?'),
+    ],
+    () => {
+      setFlag('unit4Completed');
+      const entradas = getEntries().length;
+      const prediccion = f().predictionExact
+        ? 'Primera predicción: exacta. (Dijiste el futuro y acertaste.)'
+        : 'Primera predicción: fallada y corregida. (Así se aprende a leer.)';
+      showEnd({
+        title: 'Fin de la Unidad 4 — «La vuelta completa»',
+        note: `
+          Entradas en la Bitácora: ${entradas}<br/>
+          ${prediccion}<br/><br/>
+          <em>El Faro espera, sobre el lago. Dicen que latía.</em>
+        `,
+        continueLabel: 'Continuar',
+        onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+      });
+    },
+  );
+}
+
 /* ---------- las salas ---------- */
 
 export const ROOMS: Record<string, RoomDef> = {
@@ -1880,7 +1912,13 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Edda', prompt: 'Hablar con Edda',
         color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => f().unit3Completed,
-        onInteract: () => say(L('Edda', 'Si todo está atado, habrá que aprender a leer los nudos.')),
+        onInteract: () => {
+          if (f().learnedKVL && !f().unit4Completed) {
+            checkUnit4Complete();
+            return;
+          }
+          say(L('Edda', 'Si todo está atado, habrá que aprender a leer los nudos.'));
+        },
       },
       {
         id: 'lumen-terrazas-alto', x: 830, y: 405, w: 38, h: 38, shape: 'circle',
@@ -2099,7 +2137,13 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Edda', prompt: 'Hablar con Edda',
         color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => f().solvedSingleStone,
-        onInteract: () => say(L('Edda', 'No toquemos nada todavía. Primero hay que poder decir qué va a pasar.')),
+        onInteract: () => {
+          if (f().learnedKVL && !f().unit4Completed) {
+            checkUnit4Complete();
+            return;
+          }
+          say(L('Edda', 'No toquemos nada todavía. Primero hay que poder decir qué va a pasar.'));
+        },
       },
       {
         id: 'lumen-terrazas-acueducto', x: 120, y: 285, w: 38, h: 38, shape: 'circle',
