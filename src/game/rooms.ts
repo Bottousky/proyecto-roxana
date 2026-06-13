@@ -17,6 +17,7 @@ import { abrirSteps } from '../puzzles/steps';
 import { abrirFairSplit } from '../puzzles/fairsplit';
 import { abrirSingleStone } from '../puzzles/singlestone';
 import { abrirLadder } from '../puzzles/ladder';
+import { abrirStoredSpark } from '../puzzles/storedspark';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -249,6 +250,18 @@ function presentarFarero(): void {
       hooks.refresh();
     },
   );
+}
+
+function abrirBancoStoredSpark(): void {
+  abrirStoredSpark({
+    practica: f().solvedStoredSpark,
+    onAnomalyNoted: () => setFlag('consejeraNotedAnomaly'),
+    onSolved: () => {
+      setFlag('solvedStoredSpark');
+      notifyNewEntry('La chispa que se queda');
+      hooks.refresh();
+    },
+  });
 }
 
 function abrirCampanaUnidad2(): void {
@@ -2253,8 +2266,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-chispa', x: 480, y: 395, w: 220, h: 76,
         label: 'Banco del Estanque', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(L2)
-        onInteract: () => say(L('', 'Una fuente, un canal con llave, un recipiente de cobre y una lámpara esperan sobre el banco.')),
+        onInteract: abrirBancoStoredSpark,
       },
       {
         id: 'farero-hall', x: 760, y: 320, w: 40, h: 40, shape: 'circle',

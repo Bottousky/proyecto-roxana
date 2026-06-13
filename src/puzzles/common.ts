@@ -18,6 +18,74 @@ export function setOhmState(scope: HTMLElement, s: OhmState): void {
   scope.querySelector('.ohm-widget')?.setAttribute('data-state', s);
 }
 
+/* ---------- Estanque y reloj de simulación U5 ---------- */
+
+const TANK_INNER_TOP = 20;
+const TANK_INNER_HEIGHT = 104;
+
+/** Estanque reutilizable con un nivel visible que ocupa de 0 a 100%. */
+export function tankSVG(): string {
+  return `
+    <svg viewBox="0 0 160 150" class="tank" data-level="0"
+      role="img" aria-label="Estanque: vacío">
+      <path d="M30 14 V124 Q30 140 46 140 H114 Q130 140 130 124 V14"
+        fill="#211e29" stroke="#a2673f" stroke-width="6" stroke-linecap="round"/>
+      <rect class="tank-level" x="36" y="${TANK_INNER_TOP + TANK_INNER_HEIGHT}"
+        width="88" height="0" rx="4" fill="#e8c33a"/>
+      <path d="M30 14 H130" stroke="#c58a59" stroke-width="6" stroke-linecap="round"/>
+      <text class="tank-label" x="80" y="146" text-anchor="middle"
+        fill="#a99" font-size="12">vacío</text>
+    </svg>`;
+}
+
+/** Actualiza el primer Estanque contenido en scope y acota el nivel a 0..100. */
+export function setTankLevel(scope: HTMLElement, pct: number): void {
+  const tank = scope.querySelector<SVGSVGElement>('.tank');
+  if (!tank) return;
+  const level = Math.min(100, Math.max(0, Number.isFinite(pct) ? pct : 0));
+  const height = (level / 100) * TANK_INNER_HEIGHT;
+  const fill = tank.querySelector<SVGRectElement>('.tank-level');
+  const label = tank.querySelector<SVGTextElement>('.tank-label');
+  const levelLabel = level <= 0 ? 'vacío' : level >= 100 ? 'lleno' : `${Math.round(level)}%`;
+  tank.dataset.level = String(level);
+  tank.setAttribute('aria-label', `Estanque: ${levelLabel}`);
+  fill?.setAttribute('y', String(TANK_INNER_TOP + TANK_INNER_HEIGHT - height));
+  fill?.setAttribute('height', String(height));
+  if (label) label.textContent = levelLabel;
+}
+
+export interface SimTickHandle {
+  stop(): void;
+}
+
+/**
+ * Reloj por frame para bancos animados. stop() es idempotente y también evita
+ * reprogramar un frame si se invoca desde onFrame.
+ */
+export function createSimTick(onFrame: (dtMs: number) => void): SimTickHandle {
+  let running = true;
+  let frameId = 0;
+  let previousTime: number | null = null;
+
+  const frame = (time: number) => {
+    if (!running) return;
+    const dtMs = previousTime === null ? 0 : Math.max(0, time - previousTime);
+    previousTime = time;
+    onFrame(dtMs);
+    if (running) frameId = requestAnimationFrame(frame);
+  };
+
+  frameId = requestAnimationFrame(frame);
+
+  return {
+    stop() {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(frameId);
+    },
+  };
+}
+
 /* ---------- Calor y grosor de canales ---------- */
 
 export type HeatLevel = 'frio' | 'tibio' | 'caliente' | 'rojo';

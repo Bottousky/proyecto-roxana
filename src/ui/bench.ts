@@ -6,6 +6,8 @@ export interface BenchHandle {
   root: HTMLElement;
   /** zona de mensajes reactivos (Edda / Lumen / el mundo) */
   setStatus(html: string): void;
+  /** registra recursos que deben liberarse antes de retirar el banco */
+  onClose(cleanup: () => void): () => void;
   /** cierra el banco; luego corre el callback que se pase */
   close(after?: () => void): void;
 }
@@ -35,14 +37,32 @@ export function openBench(
   panel.appendChild(status);
 
   let closed = false;
+  const cleanups = new Set<() => void>();
   const handle: BenchHandle = {
     root: body,
     setStatus(html: string) {
       status.innerHTML = html;
     },
+    onClose(cleanup: () => void) {
+      if (closed) {
+        cleanup();
+        return () => {};
+      }
+      cleanups.add(cleanup);
+      return () => cleanups.delete(cleanup);
+    },
     close(after?: () => void) {
       if (closed) return;
       closed = true;
+      const pendingCleanups = [...cleanups];
+      cleanups.clear();
+      for (const cleanup of pendingCleanups) {
+        try {
+          cleanup();
+        } catch (error) {
+          console.error('Error al cerrar el banco:', error);
+        }
+      }
       sfxUIClose();
       host.classList.add('hidden');
       host.innerHTML = '';

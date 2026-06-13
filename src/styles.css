@@ -255,6 +255,56 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .ohm-probe.active, .ohm-arm.active { border-color: var(--accent); background: #45382a; }
 .ohm-probe.active .ohm-probe-marker, .ohm-arm.active .ohm-arm-marker { background: var(--accent); }
 
+/* U5: Estanque y banco de la chispa guardada */
+.tank { max-width: 150px; margin: 0 auto; }
+.tank-level {
+  filter: drop-shadow(0 0 6px rgba(232,195,58,.55));
+  transition: y .08s linear, height .08s linear;
+}
+.storedspark-stage { display: grid; gap: 12px; }
+.storedspark-network {
+  display: grid; grid-template-columns: 90px minmax(130px, 1fr) 150px 90px;
+  align-items: center; gap: 10px;
+}
+.storedspark-source {
+  padding: 16px 8px; border: 2px solid #8a7c50; border-radius: 10px;
+  background: #302a22; color: var(--accent); text-align: center; font-weight: 700;
+}
+.storedspark-channel {
+  position: relative; height: 18px; border-radius: 9px; background: #403948;
+}
+.storedspark-river {
+  position: absolute; inset: 4px; border-radius: 6px; background: #756d80;
+  transition: background .15s, box-shadow .15s;
+}
+.storedspark-key {
+  position: absolute; left: 50%; top: 22px; transform: translateX(-50%);
+  width: max-content; color: #a99; font-size: 11px;
+}
+.storedspark-stage.path-open .storedspark-river {
+  background: var(--accent); box-shadow: 0 0 8px rgba(255,211,77,.7);
+}
+.storedspark-lamp {
+  display: grid; justify-items: center; gap: 7px; color: #a99; font-size: 11px;
+}
+.storedspark-lamp span {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: #4a4554; border: 3px solid #6b6478;
+  transition: background .12s, box-shadow .12s, opacity .12s;
+}
+.storedspark-stage.lamp-lit .storedspark-lamp span {
+  background: #d6a84a; box-shadow: 0 0 15px rgba(214,168,74,.5);
+}
+.storedspark-stage.path-open .storedspark-lamp span { opacity: .55; }
+.storedspark-stage.lamp-discharge .storedspark-lamp span {
+  background: #ffdc67; box-shadow: 0 0 24px rgba(255,220,103,.85); opacity: 1;
+}
+.storedspark-instruments {
+  display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap;
+}
+.storedspark-gauge { width: 220px; text-align: center; color: #a99; font-size: 11px; }
+.storedspark-probe-host .ohm-probes { justify-content: center; margin-top: 0; }
+
 .fuse { width: min(300px, 100%); padding: 10px; border: 1px solid #6b6478; border-radius: 8px; background: #211e29; }
 .fuse-heading { display: flex; justify-content: space-between; font-size: 12px; color: #d8cfc0; }
 .fuse-threshold, .fuse-status { color: #a99; }
@@ -1151,6 +1201,9 @@ body.touch-device #prompt { display: none !important; }
   .branches-stage { grid-template-columns: 1fr; }
   .branches-cards { grid-template-columns: 1fr; }
   .branches-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+  .storedspark-network { grid-template-columns: 70px 1fr 110px 70px; gap: 5px; }
+  .storedspark-key { font-size: 9px; }
+  .storedspark-lamp span { width: 38px; height: 38px; }
   .warmth-channels { grid-template-columns: 1fr; }
   .infirmary-machines { grid-template-columns: 1fr; }
   .longchannel-network { grid-template-columns: 1fr; }

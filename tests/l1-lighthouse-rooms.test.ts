@@ -30,7 +30,7 @@ includes(roomsSource, 'f().solvedSleepingRiver', 'la torre abre con solvedSleepi
 includes(roomsSource, "to: 'lighthouse_lantern'", 'la torre conecta con la linterna');
 includes(roomsSource, 'f().solvedClock', 'la linterna abre con solvedClock');
 
-for (const milestone of ['L2', 'L3', 'L4', 'L5']) {
+for (const milestone of ['L3', 'L4', 'L5']) {
   includes(roomsSource, `// TODO(${milestone})`, `el banco conserva el placeholder ${milestone}`);
 }
 
