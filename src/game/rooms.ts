@@ -16,6 +16,7 @@ import { abrirForge } from '../puzzles/forge';
 import { abrirSteps } from '../puzzles/steps';
 import { abrirFairSplit } from '../puzzles/fairsplit';
 import { abrirSingleStone } from '../puzzles/singlestone';
+import { abrirLadder } from '../puzzles/ladder';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -624,8 +625,19 @@ function abrirBancoPiedraUnica(): void {
   );
 }
 
-function bancoPendiente(hito: 'T5'): void {
-  say(L('', `El banco de las Terrazas espera el mecanismo del hito ${hito}.`));
+function abrirBancoEscalera(): void {
+  abrirLadder({
+    practica: f().solvedLadder,
+    onPredictionAttempted: () => setFlag('predictionAttempted'),
+    onPredictionExact: () => setFlag('predictionExact'),
+    onSolved: () => {
+      setFlag('solvedLadder');
+      setFlag('valleyRestored');
+      setFlag('learnedKVL');
+      openBitacora('la-escalera');
+      hooks.refresh();
+    },
+  });
 }
 
 /* ---------- las salas ---------- */
@@ -1818,8 +1830,8 @@ export const ROOMS: Record<string, RoomDef> = {
   terraces_top: {
     id: 'terraces_top',
     name: 'Las Terrazas — El canal alto',
-    floor: () => 0x334638,
-    wall: () => 0x5d684d,
+    floor: () => (f().valleyRestored ? 0x3f6247 : 0x334638),
+    wall: () => (f().valleyRestored ? 0x71845c : 0x5d684d),
     doors: [
       {
         x: 934, y: 80, w: 26, h: 110,
@@ -1891,8 +1903,8 @@ export const ROOMS: Record<string, RoomDef> = {
   terraces_mid: {
     id: 'terraces_mid',
     name: 'Las Terrazas — El reparto',
-    floor: () => 0x394737,
-    wall: () => 0x687052,
+    floor: () => (f().valleyRestored ? 0x466947 : 0x394737),
+    wall: () => (f().valleyRestored ? 0x7c8a60 : 0x687052),
     doors: [
       {
         x: 420, y: 0, w: 120, h: 26,
@@ -1963,8 +1975,8 @@ export const ROOMS: Record<string, RoomDef> = {
   terraces_mural: {
     id: 'terraces_mural',
     name: 'Las Terrazas — El mural de los Maestros',
-    floor: () => 0x353f35,
-    wall: () => 0x66705b,
+    floor: () => (f().valleyRestored ? 0x405d43 : 0x353f35),
+    wall: () => (f().valleyRestored ? 0x78876a : 0x66705b),
     doors: [
       {
         x: 420, y: 0, w: 120, h: 26,
@@ -2041,8 +2053,8 @@ export const ROOMS: Record<string, RoomDef> = {
   terraces_aqueduct: {
     id: 'terraces_aqueduct',
     name: 'Las Terrazas — El acueducto del valle',
-    floor: () => 0x34483e,
-    wall: () => 0x5b705e,
+    floor: () => (f().valleyRestored ? 0x3d6851 : 0x34483e),
+    wall: () => (f().valleyRestored ? 0x718d70 : 0x5b705e),
     doors: [
       {
         x: 420, y: 0, w: 120, h: 26,
@@ -2073,8 +2085,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-escalera', x: 230, y: 390, w: 210, h: 76,
         label: 'Banco de la Escalera', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(T5): implementar La Escalera y la página de predicción.
-        onInteract: () => bancoPendiente('T5'),
+        onInteract: abrirBancoEscalera,
       },
       {
         id: 'guardiana-acueducto', x: 775, y: 160, w: 40, h: 40, shape: 'circle',

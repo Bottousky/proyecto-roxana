@@ -33,7 +33,7 @@ includes(roomsSource, 'if (f().solvedSingleStone) return null;', 'el acueducto a
 equal(roomsSource.includes('// TODO(T2)'), false, 'el banco T2 ya no conserva su placeholder');
 equal(roomsSource.includes('// TODO(T3)'), false, 'el banco T3 ya no conserva su placeholder');
 equal(roomsSource.includes('// TODO(T4)'), false, 'el banco T4 ya no conserva su placeholder');
-includes(roomsSource, '// TODO(T5)', 'el banco T5 conserva su placeholder');
+equal(roomsSource.includes('// TODO(T5)'), false, 'el banco T5 ya no conserva su placeholder');
 
 for (const text of [
   'No te acerques a las piedras. …Perdón. Es la costumbre.',
