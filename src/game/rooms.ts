@@ -196,6 +196,22 @@ function reproducirIntroUnidad3(): void {
   );
 }
 
+function reproducirIntroUnidad4(): void {
+  say(
+    [
+      L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD CUATRO.'),
+      L('Proyector', 'Las Terrazas de Ohmdal: el agua que baja pensando.'),
+      L('Proyector', 'Recuerde, estudiante: lo que sube, baja. Y lo que baja, se reparte.'),
+      L('', 'La imagen se aclara un instante en un acueducto de cobre escalonado, y se apaga.'),
+      L('', '(Agua que piensa. En esta escuela ya nada me sorprende.)'),
+    ],
+    () => {
+      setFlag('playedUnit4Intro');
+      hooks.refresh();
+    },
+  );
+}
+
 function abrirCampanaUnidad2(): void {
   say(
     [
@@ -714,6 +730,14 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Proyector', prompt: 'Encender el proyector', color: 0x4a4a55, solid: true, emoji: '📽️',
         onInteract: () => {
           const fl = f();
+          if (fl.unit3Completed && !fl.playedUnit4Intro) {
+            reproducirIntroUnidad4();
+            return;
+          }
+          if (fl.unit3Completed) {
+            say(L('Proyector', '*clac* Unidad cuatro: en curso. Mida dos veces. Toque una. *clac*'));
+            return;
+          }
           if (fl.unit2Completed && !fl.playedUnit3Intro) {
             reproducirIntroUnidad3();
             return;

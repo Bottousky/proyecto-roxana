@@ -37,6 +37,17 @@ export interface Flags {
   forgeRestored: boolean;
   learnedPower: boolean;
   unit3Completed: boolean;
+  playedUnit4Intro: boolean;
+  metGuardiana: boolean;
+  solvedVoltageSteps: boolean;
+  solvedFairSplit: boolean;
+  solvedSingleStone: boolean;
+  predictionAttempted: boolean;
+  predictionExact: boolean;
+  solvedLadder: boolean;
+  valleyRestored: boolean;
+  learnedKVL: boolean;
+  unit4Completed: boolean;
 }
 
 const DEFAULT_FLAGS: Flags = {
@@ -78,6 +89,17 @@ const DEFAULT_FLAGS: Flags = {
   forgeRestored: false,
   learnedPower: false,
   unit3Completed: false,
+  playedUnit4Intro: false,
+  metGuardiana: false,
+  solvedVoltageSteps: false,
+  solvedFairSplit: false,
+  solvedSingleStone: false,
+  predictionAttempted: false,
+  predictionExact: false,
+  solvedLadder: false,
+  valleyRestored: false,
+  learnedKVL: false,
+  unit4Completed: false,
 };
 
 export interface GameState {
