@@ -565,6 +565,33 @@ function verElValle(): void {
   );
 }
 
+/* ---------- T1: salas de las Terrazas ---------- */
+
+function hablarGuardianaCanalAlto(): void {
+  if (f().metGuardiana) {
+    say(L('Guardiana', 'Todo está atado a todo. El banco muestra el canal alto, cuando estén listos.'));
+    return;
+  }
+  say(
+    [
+      L('Guardiana', 'No te acerques a las piedras. …Perdón. Es la costumbre.'),
+      L('Guardiana', 'Treinta años acá. Conozco cada canal de memoria. Y no muevo ninguno.'),
+      L('Edda', '¿Por qué no?'),
+      L('Guardiana', 'Porque si toco esta —y señala una cualquiera— cambia aquella, y la del fondo, y el riego entero. Todo está atado a todo.'),
+      L('Guardiana', 'No es miedo. Es respeto. …Bueno. Un poco de miedo.'),
+      L('Ohm', 'Observación correcta. Conclusión incompleta. Para leer una red atada: brazos.'),
+    ],
+    () => {
+      setFlag('metGuardiana');
+      hooks.refresh();
+    },
+  );
+}
+
+function bancoPendiente(hito: 'T2' | 'T3' | 'T4' | 'T5'): void {
+  say(L('', `El banco de las Terrazas espera el mecanismo del hito ${hito}.`));
+}
+
 /* ---------- las salas ---------- */
 
 export const ROOMS: Record<string, RoomDef> = {
@@ -859,6 +886,13 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Camino a la Forja',
         color: 0x7a5438,
         visible: () => f().unit2Completed,
+      },
+      {
+        x: 0, y: 330, w: 26, h: 110,
+        to: 'terraces_top', spawn: { x: 860, y: 135 },
+        label: 'Camino a las Terrazas',
+        color: 0x58755f,
+        visible: () => f().unit3Completed,
       },
     ],
     things: [
@@ -1741,5 +1775,303 @@ export const ROOMS: Record<string, RoomDef> = {
       setAmbience('forge');
       presentarForjaCompleta();
     },
+  },
+
+  /* ============ LAS TERRAZAS ============ */
+
+  terraces_top: {
+    id: 'terraces_top',
+    name: 'Las Terrazas — El canal alto',
+    floor: () => 0x334638,
+    wall: () => 0x5d684d,
+    doors: [
+      {
+        x: 934, y: 80, w: 26, h: 110,
+        to: 'plaza', spawn: { x: 95, y: 385 },
+        label: 'Plaza de Ohmdal',
+      },
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'terraces_mid', spawn: { x: 480, y: 95 },
+        label: 'Terrazas medias',
+        locked: () => {
+          if (f().solvedVoltageSteps) return null;
+          return [L('Guardiana', 'Antes de bajar, lean el canal alto. Si la primera cuenta no cierra, abajo solo van a multiplicar el error.')];
+        },
+      },
+    ],
+    things: [
+      {
+        id: 'ladera-escalonada', x: 250, y: 235, w: 330, h: 210,
+        label: 'Ladera escalonada', prompt: 'Examinar la ladera',
+        color: 0x6f704c, solid: true,
+        onInteract: () =>
+          say(L('', 'La ladera baja en escalones de cobre y tierra. Cada nivel recibe un canal más estrecho que el anterior.')),
+      },
+      {
+        id: 'compuerta-alta', x: 650, y: 155, w: 150, h: 74,
+        label: 'Compuerta del canal alto', prompt: 'Examinar la compuerta',
+        color: 0x98714c, solid: true,
+        onInteract: () => say(L('', 'Una compuerta de cobre inmóvil contiene el agua del manantial. Las piedras de control siguen en su sitio.')),
+      },
+      {
+        id: 'banco-escalones', x: 520, y: 385, w: 210, h: 76,
+        label: 'Banco de los escalones', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(T2): implementar Los escalones y el modo brazos de Ohm.
+        onInteract: () => bancoPendiente('T2'),
+      },
+      {
+        id: 'guardiana-alto', x: 735, y: 210, w: 40, h: 40, shape: 'circle',
+        label: 'Guardiana', prompt: 'Hablar con la Guardiana',
+        color: 0x657957, solid: true, emoji: '💬',
+        visible: () => f().unit3Completed,
+        onInteract: hablarGuardianaCanalAlto,
+      },
+      {
+        id: 'edda-terrazas-alto', x: 760, y: 350, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().unit3Completed,
+        onInteract: () => say(L('Edda', 'Si todo está atado, habrá que aprender a leer los nudos.')),
+      },
+      {
+        id: 'lumen-terrazas-alto', x: 830, y: 405, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().unit3Completed,
+        onInteract: () => say(L('Maese Lumen', 'Treinta años sin tocar una piedra. Admito que conozco liturgias más breves.')),
+      },
+      {
+        id: 'ohm-terrazas-alto', x: 690, y: 405, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().unit3Completed,
+        onInteract: () => say(L('Ohm', 'Red atada. Método disponible: medir entre puntos. Brazos.')),
+      },
+    ],
+    onEnter: () => setAmbience('terraces'),
+  },
+
+  terraces_mid: {
+    id: 'terraces_mid',
+    name: 'Las Terrazas — El reparto',
+    floor: () => 0x394737,
+    wall: () => 0x687052,
+    doors: [
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'terraces_top', spawn: { x: 480, y: 440 },
+        label: 'Canal alto',
+      },
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'terraces_mural', spawn: { x: 480, y: 95 },
+        label: 'Mural de los Maestros',
+        locked: () => {
+          if (f().solvedFairSplit) return null;
+          return [L('Guardiana', 'El mural puede esperar. Primero repartan el agua entre estas dos terrazas: una se ahoga y la otra se parte.')];
+        },
+      },
+    ],
+    things: [
+      {
+        id: 'terraza-alta-encharcada', x: 300, y: 165, w: 390, h: 115,
+        label: 'Terraza alta encharcada', prompt: 'Examinar la terraza alta',
+        color: 0x426d67, solid: true,
+        onInteract: () => say(L('', 'La terraza alta está encharcada. El maíz asoma entre charcos inmóviles.')),
+      },
+      {
+        id: 'terraza-baja-reseca', x: 660, y: 315, w: 390, h: 115,
+        label: 'Terraza baja reseca', prompt: 'Examinar la terraza baja',
+        color: 0x765a3d, solid: true,
+        onInteract: () => say(L('', 'La terraza baja está reseca y agrietada. El canal llega hasta ella, pero apenas trae agua.')),
+      },
+      {
+        id: 'banco-reparto', x: 260, y: 385, w: 210, h: 76,
+        label: 'Banco del reparto', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(T3): implementar El reparto justo.
+        onInteract: () => bancoPendiente('T3'),
+      },
+      {
+        id: 'guardiana-medio', x: 735, y: 185, w: 40, h: 40, shape: 'circle',
+        label: 'Guardiana', prompt: 'Hablar con la Guardiana',
+        color: 0x657957, solid: true, emoji: '💬',
+        visible: () => f().solvedVoltageSteps,
+        onInteract: () => say(L('Guardiana', 'Arriba sobra. Abajo falta. La misma agua, mal repartida.')),
+      },
+      {
+        id: 'edda-terrazas-medio', x: 805, y: 220, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().solvedVoltageSteps,
+        onInteract: () => say(L('Edda', 'Podemos mostrarlo en chico antes de tocar el valle. Para eso está el banco.')),
+      },
+      {
+        id: 'lumen-terrazas-medio', x: 125, y: 325, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().solvedVoltageSteps,
+        onInteract: () => say(L('Maese Lumen', 'La abundancia arriba y la penitencia abajo. Muy tradicional. Muy mal regado.')),
+      },
+      {
+        id: 'ohm-terrazas-medio', x: 160, y: 405, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().solvedVoltageSteps,
+        onInteract: () => say(L('Ohm', 'Objetivo visible: repartir. Medición entre niveles recomendada.')),
+      },
+    ],
+    onEnter: () => setAmbience('terraces'),
+  },
+
+  terraces_mural: {
+    id: 'terraces_mural',
+    name: 'Las Terrazas — El mural de los Maestros',
+    floor: () => 0x353f35,
+    wall: () => 0x66705b,
+    doors: [
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'terraces_mid', spawn: { x: 480, y: 440 },
+        label: 'Terrazas medias',
+      },
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'terraces_aqueduct', spawn: { x: 480, y: 95 },
+        label: 'Acueducto del valle',
+        locked: () => {
+          if (f().solvedSingleStone) return null;
+          return [L('Guardiana', 'No bajen al acueducto entero hasta entender este muro. Una maraña puede ser una piedra; sin eso, el valle no se deja leer.')];
+        },
+      },
+    ],
+    things: [
+      {
+        id: 'mural-marana', x: 330, y: 160, w: 360, h: 175,
+        label: 'Maraña de canales', prompt: 'Examinar la maraña grabada',
+        color: 0x936f4d, solid: true,
+        onInteract: () => say(L('', 'En el cobre hay una maraña de canales grabados: filas, cruces y ramales que se doblan unos dentro de otros.')),
+      },
+      {
+        id: 'signo-mural', x: 550, y: 160, w: 64, h: 64,
+        label: '=', prompt: 'Examinar el signo',
+        color: 0xb49a68, solid: false,
+        onInteract: () => say(L('', 'Entre la maraña y la piedra, los Maestros grabaron un signo igual.')),
+      },
+      {
+        id: 'mural-piedra', x: 720, y: 160, w: 130, h: 130,
+        label: 'Una sola piedra', prompt: 'Examinar la piedra grabada',
+        color: 0xa5483f, solid: true,
+        onInteract: () => say(L('', 'Al otro lado del signo hay una única piedra roja, lisa y deliberadamente sencilla.')),
+      },
+      {
+        id: 'banco-piedra-unica', x: 480, y: 370, w: 220, h: 76,
+        label: 'Banco de la Piedra Única', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(T4): implementar La Piedra Única.
+        onInteract: () => bancoPendiente('T4'),
+      },
+      {
+        id: 'guardiana-mural', x: 780, y: 315, w: 40, h: 40, shape: 'circle',
+        label: 'Guardiana', prompt: 'Hablar con la Guardiana',
+        color: 0x657957, solid: true, emoji: '💬',
+        visible: () => f().solvedFairSplit,
+        onInteract: () => say(L('Guardiana', 'Una maraña… igual a una piedra. Llevo años mirando ese signo sin entender qué promete.')),
+      },
+      {
+        id: 'edda-terrazas-mural', x: 830, y: 390, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().solvedFairSplit,
+        onInteract: () => say(L('Edda', 'Si el signo dice la verdad, Ohm debería poder comprobarlo.')),
+      },
+      {
+        id: 'lumen-terrazas-mural', x: 155, y: 345, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().solvedFairSplit,
+        onInteract: () => say(L('Maese Lumen', 'Los Maestros también tallaban acertijos en paredes. Al menos estos no exigen incienso.')),
+      },
+      {
+        id: 'ohm-terrazas-mural', x: 230, y: 410, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().solvedFairSplit,
+        onInteract: () => say(L('Ohm', 'Comparación disponible. Tráiganme una red.')),
+      },
+    ],
+    onEnter: () => setAmbience('terraces'),
+  },
+
+  terraces_aqueduct: {
+    id: 'terraces_aqueduct',
+    name: 'Las Terrazas — El acueducto del valle',
+    floor: () => 0x34483e,
+    wall: () => 0x5b705e,
+    doors: [
+      {
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'terraces_mural', spawn: { x: 480, y: 440 },
+        label: 'Mural de los Maestros',
+      },
+    ],
+    things: [
+      {
+        id: 'acueducto-nivel-alto', x: 250, y: 125, w: 310, h: 64,
+        label: 'Nivel alto', prompt: 'Examinar el nivel alto',
+        color: 0x99734e, solid: true,
+        onInteract: () => say(L('', 'El acueducto nace alto, junto al manantial, y entrega su primer brazo al valle.')),
+      },
+      {
+        id: 'acueducto-nivel-medio', x: 480, y: 245, w: 360, h: 64,
+        label: 'Nivel medio', prompt: 'Examinar el nivel medio',
+        color: 0x876a49, solid: true,
+        onInteract: () => say(L('', 'El segundo nivel recibe lo que dejó pasar el primero. Las agujas de riego están clavadas en posiciones desiguales.')),
+      },
+      {
+        id: 'acueducto-nivel-bajo', x: 705, y: 365, w: 330, h: 64,
+        label: 'Nivel bajo y lago', prompt: 'Mirar hacia el lago',
+        color: 0x3e6a70, solid: true,
+        onInteract: () => say(L('', 'El último nivel termina junto al lago. Apenas un hilo alcanza la terraza del fondo.')),
+      },
+      {
+        id: 'banco-escalera', x: 230, y: 390, w: 210, h: 76,
+        label: 'Banco de la Escalera', prompt: 'Usar el banco',
+        color: 0x4a3c30, solid: true,
+        // TODO(T5): implementar La Escalera y la página de predicción.
+        onInteract: () => bancoPendiente('T5'),
+      },
+      {
+        id: 'guardiana-acueducto', x: 775, y: 160, w: 40, h: 40, shape: 'circle',
+        label: 'Guardiana', prompt: 'Hablar con la Guardiana',
+        color: 0x657957, solid: true, emoji: '💬',
+        visible: () => f().solvedSingleStone,
+        onInteract: () => say(L('Guardiana', 'El valle completo. Tres niveles. Acá una piedra mueve todas las agujas.')),
+      },
+      {
+        id: 'edda-terrazas-acueducto', x: 830, y: 220, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda',
+        color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().solvedSingleStone,
+        onInteract: () => say(L('Edda', 'No toquemos nada todavía. Primero hay que poder decir qué va a pasar.')),
+      },
+      {
+        id: 'lumen-terrazas-acueducto', x: 120, y: 285, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
+        color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().solvedSingleStone,
+        onInteract: () => say(L('Maese Lumen', 'Tres niveles y un lago. Mi liturgia para esto ocupa siete páginas. La cuenta, sospecho, menos.')),
+      },
+      {
+        id: 'ohm-terrazas-acueducto', x: 155, y: 350, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        visible: () => f().solvedSingleStone,
+        onInteract: () => say(L('Ohm', 'Red completa detectada. Recomendación: leer desde el fondo.')),
+      },
+    ],
+    onEnter: () => setAmbience('terraces'),
   },
 };

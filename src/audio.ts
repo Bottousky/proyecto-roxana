@@ -2,7 +2,7 @@
    Todo WebAudio, sin assets — pensado para el greybox. Cuando haya música real,
    este módulo se reemplaza manteniendo la misma interfaz (setAmbience + sfx*). */
 
-export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on' | 'castle' | 'forge';
+export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on' | 'castle' | 'forge' | 'terraces';
 
 /** Una pieza compuesta: pistas de melodía y bajo como listas de [nota, pulsos].
  *  null = silencio. Las notas en notación científica ('D5', 'Bb2', 'F#4'). */
@@ -127,6 +127,22 @@ const TEMA_FORGE: ThemeDef = {
   ],
 };
 
+// «Las Terrazas» — variación serena del Castillo, más clara y sin percusión.
+const TEMA_TERRACES: ThemeDef = {
+  ...TEMA_CASTLE,
+  tempo: 58,
+  melody: [
+    ['A4', 2], ['C5', 1], ['E5', 2], [null, 2], ['D5', 2], ['C5', 1], ['A4', 3], [null, 3],
+    ['F4', 2], ['A4', 1], ['C5', 2], ['B4', 2], ['A4', 4], [null, 3],
+    ['G4', 2], ['A4', 1], ['C5', 2], ['E5', 2], ['D5', 3], ['A4', 5], [null, 4],
+  ],
+  bass: [
+    ['A2', 9], ['F2', 9], ['G2', 9], ['A2', 9],
+  ],
+  melodyLevel: 0.42,
+  bassLevel: 0.38,
+};
+
 const MOODS: Record<Ambience, MoodDef> = {
   // el Instituto: polvo, eco, melancolía — re menor (deriva i → VI → VII)
   instituto: {
@@ -203,6 +219,21 @@ const MOODS: Record<Ambience, MoodDef> = {
     phraseGap: [7500, 16000],
     pluckLevel: 0.03,
     theme: TEMA_FORGE,
+  },
+  // Las Terrazas: aire abierto, cobre y agua constante.
+  terraces: {
+    chords: [
+      [55.0, 82.41],
+      [43.65, 65.41],
+      [49.0, 73.42],
+    ],
+    droneType: 'sine',
+    filter: 360,
+    level: 0.1,
+    scale: [220.0, 261.63, 293.66, 329.63, 392.0, 440.0],
+    phraseGap: [6500, 14000],
+    pluckLevel: 0.035,
+    theme: TEMA_TERRACES,
   },
   // Ohmdal encendida: el mismo re, pero abierto y luminoso (re → sol → la)
   'ohmdal-on': {
@@ -549,6 +580,20 @@ function startMood(mood: Ambience): void {
   };
 
   schedulePhrase(def, moodGain, gen);
+  if (mood === 'terraces') scheduleTerraceWater(gen);
+}
+
+/** Agua del acueducto: ruido filtrado continuo en pulsos largos y gotas aisladas. */
+function scheduleTerraceWater(gen: number): void {
+  if (gen !== moodGen || currentMood !== 'terraces') return;
+  noise(0.022, 3.8, 'lowpass', 1250, { to: 520, q: 0.7 });
+  tone(920 + Math.random() * 380, 'sine', 0.018, 0.42, {
+    when: 0.35 + Math.random() * 1.8,
+    to: 620,
+    echo: true,
+    attack: 0.03,
+  });
+  window.setTimeout(() => scheduleTerraceWater(gen), 3200 + Math.random() * 1800);
 }
 
 /** Frases de 1-3 notas con ritmo y dinámica variables, separadas por
