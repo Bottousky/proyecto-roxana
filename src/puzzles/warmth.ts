@@ -98,10 +98,9 @@ export function abrirWarmth(onSolved: () => void, practica = false): void {
           state = setAnvilDoubled(state, closed);
           probe.clear();
           render();
-          // TODO(guion): reacción breve al mover la llave antes de apoyar la mano.
           bench.setStatus(
             closed
-              ? 'El segundo martillo entra en el canal del yunque. Ohm espera una medición.'
+              ? 'El segundo martillo entra en el canal del yunque. <b>Ohm:</b> «Cambio detectado. Mano recomendada.»'
               : 'El segundo martillo queda fuera del canal del yunque.',
           );
         },

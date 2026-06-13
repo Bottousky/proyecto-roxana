@@ -311,14 +311,14 @@ equal(
   'el fallo hambriento del Martillo conserva el texto canónico',
 );
 equal(
-  forgeSource.includes('// TODO(guion): fallo de entrega del Fuelle.'),
+  forgeSource.includes('El Fuelle pide y no le llega. Y un fuelle con hambre silba feo.'),
   true,
-  'el fallo del Fuelle queda marcado como texto pendiente',
+  'el fallo del Fuelle conserva su texto canónico',
 );
 equal(
-  forgeSource.includes('// TODO(guion): fallo de entrega de la Lumbre.'),
+  forgeSource.includes('La Lumbre pide y no le llega. Sin Lumbre no hay Forja: ella guarda el fuego madre.'),
   true,
-  'el fallo de la Lumbre queda marcado como texto pendiente',
+  'el fallo de la Lumbre conserva su texto canónico',
 );
 
 for (const text of [

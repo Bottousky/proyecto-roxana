@@ -67,10 +67,8 @@ const THICKNESSES: readonly ChannelThickness[] = ['ancho', 'medio', 'angosto'];
 
 const HUNGRY_DIALOGUE: Record<ForgeMachineId, string> = {
   martillo: '<b>Forjadora:</b> «El Martillo pide y no le llega.»',
-  // TODO(guion): fallo de entrega del Fuelle.
-  fuelle: '<b>Forjadora:</b> «El Fuelle pide y no le llega.»',
-  // TODO(guion): fallo de entrega de la Lumbre.
-  lumbre: '<b>Forjadora:</b> «La Lumbre pide y no le llega.»',
+  fuelle: '<b>Forjadora:</b> «El Fuelle pide y no le llega. Y un fuelle con hambre silba feo.»',
+  lumbre: '<b>Forjadora:</b> «La Lumbre pide y no le llega. Sin Lumbre no hay Forja: ella guarda el fuego madre.»',
 };
 
 const SOLVED_DIALOGUE =

@@ -384,8 +384,7 @@ function abrirBancoTimbre(): void {
 
 function hablarForjadoraPatio(): void {
   if (f().metForjadora) {
-    // TODO(guion): re-interacción con la Forjadora antes de resolver el canal tibio.
-    say(L('Forjadora', 'El banco del canal tibio sigue esperando.'));
+    say(L('Forjadora', '¿Y? El canal sigue tibio y yo sigo pagando carbón. El banco está ahí.'));
     return;
   }
   say(
@@ -498,8 +497,7 @@ function hablarForjadoraNave(): void {
     say(L('Forjadora', 'Ese compás. ESE.'));
     return;
   }
-  // TODO(guion): re-interacción con la Forjadora antes de resolver F5.
-  say(L('Forjadora', 'Las tres máquinas esperan.'));
+  say(L('Forjadora', 'Tres máquinas, un tronco, el cobre que hay. Cuando estés listo: el tablero.'));
 }
 
 function abrirBancoForge(): void {
@@ -1506,8 +1504,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Enfermería de fusibles',
         locked: () => {
           if (f().solvedWarmChannel) return null;
-          // TODO(guion): puerta trabada F2
-          return [L('', 'El paso sigue cerrado.')];
+          return [L('Forjadora', 'Primero el canal tibio. En mi casa, los misterios se resuelven en orden.')];
         },
       },
     ],
@@ -1522,8 +1519,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'canal-tibio-patio', x: 240, y: 245, w: 260, h: 30,
         label: 'Canal tibio', prompt: 'Examinar el canal',
         color: 0xa2673f, solid: true,
-        // TODO(guion): examen del canal del patio.
-        onInteract: () => say(L('', 'Un canal de cobre cruza el patio de piedra.')),
+        onInteract: () => say(L('', 'Un canal de cobre cruza el patio de piedra. Tibio al tacto, como con fiebre baja. Antes, dicen, estaba siempre frío.')),
       },
       {
         id: 'banco-canal-tibio', x: 480, y: 390, w: 200, h: 76,
@@ -1582,8 +1578,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Canal Largo',
         locked: () => {
           if (f().solvedFuseInfirmary) return null;
-          // TODO(guion): puerta trabada F3
-          return [L('', 'El paso sigue cerrado.')];
+          return [L('Maese Lumen', 'El Canal Largo puede esperar. Los fusibles, no: aquí se muere gente de cobre todos los días.')];
         },
       },
     ],
@@ -1605,8 +1600,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'lumen-enfermeria', x: 700, y: 330, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
         color: 0x7a6a3a, solid: true, emoji: '💬',
-        // TODO(guion): re-interacción con Lumen después de la presentación de F3.
-        onInteract: () => say(L('Maese Lumen', 'La enfermería espera.')),
+        onInteract: () => say(L('Maese Lumen', 'Elige calibres, estudiante. Mis mártires observan. Sin presión.')),
       },
     ],
     onEnter: () => {
@@ -1632,8 +1626,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Nave mayor',
         locked: () => {
           if (f().solvedLongChannel) return null;
-          // TODO(guion): puerta trabada F4
-          return [L('', 'El paso sigue cerrado.')];
+          return [L('Forjadora', 'La nave mayor, todavía no. Quien no puede alimentar un horno lejano no puede alimentar tres máquinas juntas.')];
         },
       },
     ],
@@ -1687,29 +1680,25 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'martillo-forja', x: 210, y: 150, w: 180, h: 90,
         label: 'Martillo · ENTREGA 32', prompt: 'Examinar el Martillo',
         color: 0x70513b, solid: true,
-        // TODO(guion): examen del Martillo.
-        onInteract: () => say(L('', 'El Martillo está apagado. Su placa dice: ENTREGA 32.')),
+        onInteract: () => say(L('', 'El Martillo mayor, quieto. Placa de bronce: ENTREGA 32. Hay polvo en toda la nave — en la placa, no: alguien la pule todas las mañanas.')),
       },
       {
         id: 'fuelle-forja', x: 480, y: 150, w: 180, h: 90,
         label: 'Fuelle · ENTREGA 16', prompt: 'Examinar el Fuelle',
         color: 0x665046, solid: true,
-        // TODO(guion): examen del Fuelle.
-        onInteract: () => say(L('', 'El Fuelle está apagado. Su placa dice: ENTREGA 16.')),
+        onInteract: () => say(L('', 'El Fuelle, plegado como un animal dormido. Placa: ENTREGA 16.')),
       },
       {
         id: 'lumbre-forja', x: 750, y: 150, w: 180, h: 90,
         label: 'Lumbre · ENTREGA 8', prompt: 'Examinar la Lumbre',
         color: 0x704536, solid: true,
-        // TODO(guion): examen de la Lumbre.
-        onInteract: () => say(L('', 'La Lumbre está apagada. Su placa dice: ENTREGA 8.')),
+        onInteract: () => say(L('', 'La Lumbre, fría. Placa: ENTREGA 8. En el hollín hay marcas de manos chicas: aquí se calentaban los aprendices.')),
       },
       {
         id: 'tablero-bus', x: 480, y: 285, w: 260, h: 76,
         label: 'Tablero de bus', prompt: 'Examinar el tablero',
         color: 0x6b5944, solid: true,
-        // TODO(guion): examen del tablero de bus.
-        onInteract: () => say(L('', 'El tablero de la Forja espera su cristal de bus.')),
+        onInteract: () => say(L('', 'El tablero maestro de la Forja: dos engastes de cristal y décadas de hollín. Espera su Empuje.')),
       },
       {
         id: 'banco-forja-completa', x: 480, y: 405, w: 210, h: 76,

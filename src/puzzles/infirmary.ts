@@ -144,7 +144,6 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
         sfxBridge();
         state = setMachineFuse(state, machineId, rating);
         render();
-        // TODO(guion): reacción al engastar un calibre antes de arrancar.
         bench.setStatus(
           `<b>Máquina ${machineId}:</b> fusible ${rating} engastado. La aguja espera el pico.`,
         );
@@ -183,11 +182,9 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
         } else if (result.event === 'incomplete') {
           const missing = MACHINE_IDS.filter((id) => state.fuses[id] === null);
           if (missing.length > 0) {
-            // TODO(guion): aviso si se intenta arrancar con engastes vacíos.
-            bench.setStatus(`Faltan fusibles en: ${missing.join(', ')}.`);
+            bench.setStatus(`Faltan fusibles en: ${missing.join(', ')}. <b>Lumen:</b> «Una máquina sin fusible no es valiente. Es huérfana.»`);
           } else {
-            // TODO(guion): devolución para una combinación segura pero con margen excesivo.
-            bench.setStatus('Las máquinas arrancan, pero algún margen no es el menor disponible.');
+            bench.setStatus('Las máquinas arrancan. <b>Lumen:</b> «Funciona… con margen de más. El calibre justo también es una forma de respeto.»');
           }
         }
         render();
@@ -198,8 +195,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
         stage.classList.remove('channel-cut');
         actions['La Forjadora repara el canal'].classList.add('hidden');
         sfxBridge();
-        // TODO(guion): comentario de la Forjadora al reempalmar la demostración.
-        bench.setStatus('La Forjadora reempalma el canal. La prueba puede continuar.');
+        bench.setStatus('<b>Forjadora:</b> «Reempalmado. Las demostraciones también se cobran, Lumen.»');
         render();
       }
 

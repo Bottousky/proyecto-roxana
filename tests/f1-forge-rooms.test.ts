@@ -33,11 +33,9 @@ includes(roomsSource, 'if (f().solvedFuseInfirmary) return null;', 'el Canal Lar
 includes(roomsSource, "to: 'forge_hall'", 'el Canal Largo conecta con la nave mayor');
 includes(roomsSource, 'if (f().solvedLongChannel) return null;', 'la nave abre con solvedLongChannel');
 
-equal(
-  (roomsSource.match(/\/\/ TODO\(guion\): puerta trabada F[2345]/g) ?? []).length,
-  3,
-  'las tres puertas trabadas documentan el texto pendiente',
-);
+includes(roomsSource, 'En mi casa, los misterios se resuelven en orden.', 'la puerta trabada de la enfermería tiene línea de la Forjadora');
+includes(roomsSource, 'aquí se muere gente de cobre todos los días.', 'la puerta trabada del Canal Largo tiene línea de Lumen');
+includes(roomsSource, 'no puede alimentar tres máquinas juntas.', 'la puerta trabada de la nave tiene línea de la Forjadora');
 equal(
   (roomsSource.match(/\/\/ TODO\(F[2345]\)/g) ?? []).length,
   0,
