@@ -366,6 +366,65 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 }
 .steps-progress span.done { color: var(--ok); border-color: rgba(126,196,106,.55); }
 
+/* U4: reparto justo */
+.fairsplit-stage { display: grid; gap: 9px; }
+.fairsplit-source {
+  width: max-content; margin: 0 auto; padding: 6px 16px; border: 1px solid #8a7c50;
+  border-radius: 8px; background: #2f2a25; color: #d8cfc0; text-align: center;
+  display: flex; flex-direction: column; font-size: 11px;
+}
+.fairsplit-source strong { color: var(--accent); font-size: 13px; }
+.fairsplit-channel {
+  width: 8px; height: 22px; margin: 0 auto; border-radius: 5px; background: #a2673f;
+}
+.fairsplit-terraces {
+  display: grid; grid-template-columns: 1fr 28px 1fr; gap: 8px; align-items: center;
+}
+.fairsplit-terrace {
+  min-width: 0; padding: 9px; border: 1px solid #5d5868; border-radius: 10px;
+  background: #211e29; text-align: center; transition: border-color .2s, box-shadow .2s;
+}
+.fairsplit-terrace.green {
+  border-color: var(--ok); box-shadow: inset 0 0 0 1px rgba(126,196,106,.25);
+}
+.fairsplit-terrace h3 { margin: 0 0 6px; color: #d8cfc0; font-size: 14px; }
+.fairsplit-slot {
+  width: 78px; min-height: 42px; margin: 0 auto 4px; padding: 3px;
+  border: 1px dashed #746c7f; border-radius: 7px; display: grid; place-items: center;
+}
+.fairsplit-slot .piedra { width: 68px; height: 34px; font-size: 10px; }
+.fairsplit-gauge { max-width: 190px; margin: 0 auto; }
+.fairsplit-gauge-label { color: #a99; font-size: 10px; }
+.fairsplit-reading { color: var(--accent); font-size: 15px; }
+.fairsplit-stones {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 7px;
+}
+.fairsplit-stone {
+  min-width: 0; padding: 2px; border: 1px solid transparent; border-radius: 7px;
+  background: transparent; cursor: pointer;
+}
+.fairsplit-stone .piedra {
+  width: 100%; min-width: 0; height: 31px; padding: 3px; font-size: 9px; pointer-events: none;
+}
+.fairsplit-stone.selected { border-color: var(--accent); background: rgba(255,211,77,.08); }
+.fairsplit-stone:disabled { opacity: .55; cursor: default; }
+.fairsplit-return {
+  width: 58%; height: 15px; margin: -3px auto 0; border: solid #665744;
+  border-width: 0 4px 4px; border-radius: 0 0 9px 9px; color: #8f806d;
+  font-size: 9px; text-align: center;
+}
+.fairsplit-instruments {
+  display: grid; grid-template-columns: 130px 1fr 90px; gap: 8px; align-items: center;
+}
+.fairsplit-ohm .ohm-widget { flex-direction: row; justify-content: center; }
+.fairsplit-ohm .ohm-body { width: 46px; height: 46px; }
+.fairsplit-ohm .ohm-eye { top: 15px; }
+.fairsplit-ohm .ohm-eye.l { left: 9px; }
+.fairsplit-ohm .ohm-eye.r { right: 9px; }
+.fairsplit-ohm .ohm-mouth { bottom: 8px; }
+.fairsplit-arms .ohm-arms { justify-content: center; margin-top: 0; }
+.fairsplit-river { color: var(--accent); text-align: center; font-size: 13px; }
+
 /* U3: enfermería de fusibles */
 .infirmary-stage { display: grid; gap: 10px; }
 .infirmary-machines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -877,6 +936,9 @@ body.touch-device #prompt { display: none !important; }
   .steps-loop { grid-template-columns: 70px 1fr minmax(180px, 3fr) 1fr 58px; }
   .steps-stones { gap: 3px; }
   .steps-stone .piedra { height: 34px; font-size: 9px; }
+  .fairsplit-terraces { grid-template-columns: 1fr; }
+  .fairsplit-terraces > .fairsplit-channel { height: 15px; }
+  .fairsplit-instruments { grid-template-columns: 1fr; }
   .branches-stage { grid-template-columns: 1fr; }
   .branches-cards { grid-template-columns: 1fr; }
   .branches-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }

@@ -14,6 +14,7 @@ import { abrirInfirmary } from '../puzzles/infirmary';
 import { abrirLongChannel } from '../puzzles/longchannel';
 import { abrirForge } from '../puzzles/forge';
 import { abrirSteps } from '../puzzles/steps';
+import { abrirFairSplit } from '../puzzles/fairsplit';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -600,7 +601,18 @@ function abrirBancoEscalones(): void {
   );
 }
 
-function bancoPendiente(hito: 'T3' | 'T4' | 'T5'): void {
+function abrirBancoReparto(): void {
+  abrirFairSplit(
+    () => {
+      setFlag('solvedFairSplit');
+      notifyNewEntry('El reparto del empuje');
+      hooks.refresh();
+    },
+    f().solvedFairSplit,
+  );
+}
+
+function bancoPendiente(hito: 'T4' | 'T5'): void {
   say(L('', `El banco de las Terrazas espera el mecanismo del hito ${hito}.`));
 }
 
@@ -1902,8 +1914,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-reparto', x: 260, y: 385, w: 210, h: 76,
         label: 'Banco del reparto', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(T3): implementar El reparto justo.
-        onInteract: () => bancoPendiente('T3'),
+        onInteract: abrirBancoReparto,
       },
       {
         id: 'guardiana-medio', x: 735, y: 185, w: 40, h: 40, shape: 'circle',
