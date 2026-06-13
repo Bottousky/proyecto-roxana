@@ -48,6 +48,19 @@ export interface Flags {
   valleyRestored: boolean;
   learnedKVL: boolean;
   unit4Completed: boolean;
+  playedUnit5Intro: boolean;
+  metFarero: boolean;
+  solvedStoredSpark: boolean;
+  consejeraNotedAnomaly: boolean;
+  solvedSleepingRiver: boolean;
+  solvedClock: boolean;
+  clockRestored: boolean;
+  solvedLighthouse: boolean;
+  lighthouseRestored: boolean;
+  learnedCapacitor: boolean;
+  arcOneCompleted: boolean;
+  sawCrystalEye: boolean;
+  unit5Completed: boolean;
 }
 
 const DEFAULT_FLAGS: Flags = {
@@ -100,6 +113,19 @@ const DEFAULT_FLAGS: Flags = {
   valleyRestored: false,
   learnedKVL: false,
   unit4Completed: false,
+  playedUnit5Intro: false,
+  metFarero: false,
+  solvedStoredSpark: false,
+  consejeraNotedAnomaly: false,
+  solvedSleepingRiver: false,
+  solvedClock: false,
+  clockRestored: false,
+  solvedLighthouse: false,
+  lighthouseRestored: false,
+  learnedCapacitor: false,
+  arcOneCompleted: false,
+  sawCrystalEye: false,
+  unit5Completed: false,
 };
 
 export interface GameState {

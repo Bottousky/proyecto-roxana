@@ -216,6 +216,22 @@ function reproducirIntroUnidad4(): void {
   );
 }
 
+function reproducirIntroUnidad5(): void {
+  say(
+    [
+      L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD CINCO.'),
+      L('Proyector', 'El Faro de Ohmdal: la luz que recuerda.'),
+      L('Proyector', 'Recuerde, estudiante: lo que sube y baja… a veces se queda un rato.'),
+      L('', 'La imagen muestra un destello que late —una vez, dos— y se apaga.'),
+      L('', '(¿Se queda? Aprendimos que sin camino no se queda nada. …¿O sí?)'),
+    ],
+    () => {
+      setFlag('playedUnit5Intro');
+      hooks.refresh();
+    },
+  );
+}
+
 function abrirCampanaUnidad2(): void {
   say(
     [
@@ -837,6 +853,14 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Proyector', prompt: 'Encender el proyector', color: 0x4a4a55, solid: true, emoji: '📽️',
         onInteract: () => {
           const fl = f();
+          if (fl.unit4Completed && !fl.playedUnit5Intro) {
+            reproducirIntroUnidad5();
+            return;
+          }
+          if (fl.unit4Completed) {
+            say(L('Proyector', '*clac* Unidad cinco: en curso. Tenga paciencia. El tiempo es parte del circuito. *clac*'));
+            return;
+          }
           if (fl.unit3Completed && !fl.playedUnit4Intro) {
             reproducirIntroUnidad4();
             return;
