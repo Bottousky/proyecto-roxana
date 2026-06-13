@@ -15,6 +15,7 @@ import { abrirLongChannel } from '../puzzles/longchannel';
 import { abrirForge } from '../puzzles/forge';
 import { abrirSteps } from '../puzzles/steps';
 import { abrirFairSplit } from '../puzzles/fairsplit';
+import { abrirSingleStone } from '../puzzles/singlestone';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -612,7 +613,18 @@ function abrirBancoReparto(): void {
   );
 }
 
-function bancoPendiente(hito: 'T4' | 'T5'): void {
+function abrirBancoPiedraUnica(): void {
+  abrirSingleStone(
+    () => {
+      setFlag('solvedSingleStone');
+      notifyNewEntry('La Piedra Única');
+      hooks.refresh();
+    },
+    f().solvedSingleStone,
+  );
+}
+
+function bancoPendiente(hito: 'T5'): void {
   say(L('', `El banco de las Terrazas espera el mecanismo del hito ${hito}.`));
 }
 
@@ -1992,8 +2004,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-piedra-unica', x: 480, y: 370, w: 220, h: 76,
         label: 'Banco de la Piedra Única', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(T4): implementar La Piedra Única.
-        onInteract: () => bancoPendiente('T4'),
+        onInteract: abrirBancoPiedraUnica,
       },
       {
         id: 'guardiana-mural', x: 780, y: 315, w: 40, h: 40, shape: 'circle',

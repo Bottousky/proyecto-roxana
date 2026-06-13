@@ -425,6 +425,91 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .fairsplit-arms .ohm-arms { justify-content: center; margin-top: 0; }
 .fairsplit-river { color: var(--accent); text-align: center; font-size: 13px; }
 
+/* U4: Piedra Única */
+.singlestone-stage { display: grid; gap: 10px; }
+.singlestone-workbench {
+  display: grid; grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr);
+  gap: 10px; align-items: center;
+}
+.singlestone-side {
+  min-width: 0; min-height: 300px; padding: 9px; border: 1px solid #5d5868;
+  border-radius: 10px; background: #211e29; text-align: center;
+}
+.singlestone-side h3 { margin: 0 0 7px; color: #d8cfc0; font-size: 14px; }
+.singlestone-network-choices {
+  display: grid; grid-template-columns: 1fr; gap: 4px; margin-bottom: 8px;
+}
+.singlestone-network-choice {
+  padding: 5px 7px; border: 1px solid #5d5868; border-radius: 6px;
+  background: #2a2733; color: #c8bfaf; cursor: pointer; font-size: 10px;
+}
+.singlestone-network-choice:hover,
+.singlestone-network-choice.selected { border-color: var(--accent); }
+.singlestone-network-choice.matched {
+  color: var(--ok); border-color: rgba(126,196,106,.55);
+}
+.singlestone-network {
+  min-height: 130px; padding: 6px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.singlestone-source, .singlestone-return {
+  padding: 3px 9px; border: 1px solid #8a7c50; border-radius: 6px;
+  background: #2f2a25; color: var(--accent); font-size: 10px;
+}
+.singlestone-return { color: #a99; border-color: #665744; }
+.singlestone-wire {
+  width: 7px; height: 12px; border-radius: 4px; background: #a2673f;
+}
+.singlestone-series { margin-bottom: 5px; }
+.singlestone-series .piedra,
+.singlestone-branch .piedra { width: 62px; height: 31px; font-size: 9px; }
+.singlestone-parallel {
+  width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  padding: 7px 5px; margin-bottom: 5px; border: solid #a2673f;
+  border-width: 3px 3px 3px; border-radius: 9px;
+}
+.singlestone-branch { display: flex; justify-content: center; }
+.singlestone-ohm { text-align: center; color: #a99; font-size: 10px; }
+.singlestone-ohm .ohm-body { width: 54px; height: 54px; }
+.singlestone-ohm .ohm-eye { top: 18px; }
+.singlestone-ohm .ohm-eye.l { left: 11px; }
+.singlestone-ohm .ohm-eye.r { right: 11px; }
+.singlestone-ohm .ohm-mouth { bottom: 10px; }
+.singlestone-slot {
+  width: 86px; min-height: 54px; margin: 28px auto 14px; padding: 6px;
+  border: 1px dashed #746c7f; border-radius: 8px; display: grid; place-items: center;
+}
+.singlestone-slot .piedra { width: 70px; }
+.singlestone-stones {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;
+}
+.singlestone-stone {
+  min-width: 0; padding: 3px; border: 1px solid transparent;
+  border-radius: 7px; background: transparent; cursor: pointer;
+}
+.singlestone-stone .piedra {
+  width: 100%; min-width: 0; height: 32px; padding: 3px; font-size: 9px;
+  pointer-events: none;
+}
+.singlestone-stone.selected {
+  border-color: var(--accent); background: rgba(255,211,77,.08);
+}
+.singlestone-reading {
+  margin-top: 10px; color: var(--accent); font-size: 13px; font-weight: 600;
+}
+.singlestone-compare {
+  width: max-content; max-width: 100%; margin: 0 auto; padding: 9px 16px;
+  border: 1px solid var(--accent-dim); border-radius: 8px;
+  background: #45382a; color: #f1dda8; cursor: pointer;
+}
+.singlestone-compare:hover { border-color: var(--accent); }
+.singlestone-compare:disabled,
+.singlestone-network-choice:disabled,
+.singlestone-stone:disabled { opacity: .55; cursor: default; }
+.singlestone-progress {
+  color: #a99; text-align: center; font-size: 11px;
+}
+
 /* U3: enfermería de fusibles */
 .infirmary-stage { display: grid; gap: 10px; }
 .infirmary-machines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -939,6 +1024,11 @@ body.touch-device #prompt { display: none !important; }
   .fairsplit-terraces { grid-template-columns: 1fr; }
   .fairsplit-terraces > .fairsplit-channel { height: 15px; }
   .fairsplit-instruments { grid-template-columns: 1fr; }
+  .singlestone-workbench { grid-template-columns: 1fr; }
+  .singlestone-side { min-height: 0; }
+  .singlestone-ohm { order: -1; }
+  .singlestone-network-choices { grid-template-columns: repeat(2, 1fr); }
+  .singlestone-slot { margin-top: 8px; }
   .branches-stage { grid-template-columns: 1fr; }
   .branches-cards { grid-template-columns: 1fr; }
   .branches-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }

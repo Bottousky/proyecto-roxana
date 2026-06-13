@@ -30,11 +30,10 @@ includes(roomsSource, 'if (f().solvedFairSplit) return null;', 'el mural abre co
 includes(roomsSource, "to: 'terraces_aqueduct'", 'el mural conecta con el acueducto');
 includes(roomsSource, 'if (f().solvedSingleStone) return null;', 'el acueducto abre con solvedSingleStone');
 
-for (const hito of ['T4', 'T5']) {
-  includes(roomsSource, `// TODO(${hito})`, `el banco ${hito} conserva su placeholder`);
-}
 equal(roomsSource.includes('// TODO(T2)'), false, 'el banco T2 ya no conserva su placeholder');
 equal(roomsSource.includes('// TODO(T3)'), false, 'el banco T3 ya no conserva su placeholder');
+equal(roomsSource.includes('// TODO(T4)'), false, 'el banco T4 ya no conserva su placeholder');
+includes(roomsSource, '// TODO(T5)', 'el banco T5 conserva su placeholder');
 
 for (const text of [
   'No te acerques a las piedras. …Perdón. Es la costumbre.',
