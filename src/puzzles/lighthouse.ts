@@ -23,15 +23,12 @@ const BRAKES: { key: string; value: LighthouseBrake }[] = [
   { key: 'gris', value: 8 },
 ];
 
-// TODO(guion): falta el texto definitivo del Farero para un latido rápido.
 const FAST_DIALOGUE =
-  '<b>Farero:</b> «La lente tartamudea. El latido va demasiado rápido.»';
-// TODO(guion): falta el texto definitivo del Farero para un latido lento.
+  '<b>Farero:</b> «Tartamudea. Ese no avisa: balbucea. Más lento, que el barco tiene que verlo venir.»';
 const SLOW_DIALOGUE =
-  '<b>Farero:</b> «La lente se queda casi fija. El latido va demasiado lento.»';
-// TODO(guion): falta el texto definitivo del Farero para una descarga frenada.
+  '<b>Farero:</b> «Casi se queda quieto. Un faro dormido no salva a nadie. Un poco más de pulso.»';
 const DRAGGED_DUMP_DIALOGUE =
-  '<b>Farero:</b> «El intervalo es ese, pero el volcado se arrastra. Dejen casi libre la salida.»';
+  '<b>Farero:</b> «El tiempo es ese, lo reconozco… pero el destello se arrastra como despedida. Tiene que volcar de golpe: la salida, casi libre.»';
 const JUST_DIALOGUE =
   '<b>Farero:</b> «Ese. Ese es. …Cuarenta años afinando el oído para esta noche.» ' +
   '<em>(se le llenan los ojos)</em><br/><br/>' +
