@@ -20,6 +20,7 @@ import { abrirLadder } from '../puzzles/ladder';
 import { abrirStoredSpark } from '../puzzles/storedspark';
 import { abrirSleepingRiver } from '../puzzles/sleepingriver';
 import { abrirClock } from '../puzzles/clock';
+import { abrirLighthouse } from '../puzzles/lighthouse';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -287,6 +288,30 @@ function abrirBancoClock(): void {
     },
     f().solvedClock,
   );
+}
+
+function abrirBancoLighthouse(): void {
+  abrirLighthouse(
+    () => {
+      setFlag('solvedLighthouse');
+      setFlag('lighthouseRestored');
+      setFlag('learnedCapacitor');
+      openBitacora('el-arco-del-rio');
+      hooks.refresh();
+    },
+    f().solvedLighthouse,
+  );
+}
+
+function hablarFareroLinterna(): void {
+  if (f().solvedLighthouse) {
+    say(L('Farero', 'Cuarenta años. Y sí: era exactamente ese latido.'));
+    return;
+  }
+  say([
+    L('Farero', 'No tengo planos. Tengo el oído. Mi padre me lo pasó, y a él el suyo.'),
+    L('Farero', 'Ustedes ármenlo. Yo les digo cuándo. Cierro los ojos y escucho. Cuando el latido sea EL latido, lo van a saber porque se me van a llenar los ojos. No lo puedo evitar.'),
+  ]);
 }
 
 function abrirCampanaUnidad2(): void {
@@ -2493,15 +2518,14 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-latido', x: 480, y: 405, w: 250, h: 80,
         label: 'Banco del latido', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(L5)
-        onInteract: () => say(L('', 'Dos caminos rodean un Estanque: uno estrecho para llenarlo y otro casi libre para volcarlo hacia la lente.')),
+        onInteract: abrirBancoLighthouse,
       },
       {
         id: 'farero-linterna', x: 745, y: 280, w: 40, h: 40, shape: 'circle',
         label: 'Farero', prompt: 'Hablar con el Farero',
         color: 0x70818a, solid: true, emoji: '💬',
         visible: () => f().solvedClock,
-        onInteract: () => say(L('Farero', 'No tengo planos. Tengo el oído. Ustedes armen el latido; yo les digo cuándo sea el de verdad.')),
+        onInteract: hablarFareroLinterna,
       },
       {
         id: 'edda-linterna', x: 805, y: 385, w: 34, h: 34, shape: 'circle',

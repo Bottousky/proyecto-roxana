@@ -30,7 +30,7 @@ includes(roomsSource, 'f().solvedSleepingRiver', 'la torre abre con solvedSleepi
 includes(roomsSource, "to: 'lighthouse_lantern'", 'la torre conecta con la linterna');
 includes(roomsSource, 'f().solvedClock', 'la linterna abre con solvedClock');
 
-includes(roomsSource, '// TODO(L5)', 'el banco conserva el placeholder L5');
+equal(roomsSource.includes('// TODO(L5)'), false, 'L5 reemplazó su placeholder');
 equal(roomsSource.includes('// TODO(L4)'), false, 'L4 reemplazó su placeholder');
 
 for (const text of [
