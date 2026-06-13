@@ -18,6 +18,7 @@ import { abrirFairSplit } from '../puzzles/fairsplit';
 import { abrirSingleStone } from '../puzzles/singlestone';
 import { abrirLadder } from '../puzzles/ladder';
 import { abrirStoredSpark } from '../puzzles/storedspark';
+import { abrirSleepingRiver } from '../puzzles/sleepingriver';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -262,6 +263,17 @@ function abrirBancoStoredSpark(): void {
       hooks.refresh();
     },
   });
+}
+
+function abrirBancoSleepingRiver(): void {
+  abrirSleepingRiver(
+    () => {
+      setFlag('solvedSleepingRiver');
+      notifyNewEntry('El río que se duerme');
+      hooks.refresh();
+    },
+    f().solvedSleepingRiver,
+  );
 }
 
 function abrirCampanaUnidad2(): void {
@@ -2339,8 +2351,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-rio-dormido', x: 480, y: 320, w: 250, h: 90,
         label: 'Banco del Farero', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(L3)
-        onInteract: () => say(L('', 'Un canal, varias piedras de freno y tres Estanques de cobre esperan una prueba.')),
+        onInteract: abrirBancoSleepingRiver,
       },
       {
         id: 'farero-taller', x: 735, y: 205, w: 40, h: 40, shape: 'circle',

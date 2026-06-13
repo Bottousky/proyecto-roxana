@@ -305,6 +305,76 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .storedspark-gauge { width: 220px; text-align: center; color: #a99; font-size: 11px; }
 .storedspark-probe-host .ohm-probes { justify-content: center; margin-top: 0; }
 
+/* U5: el río que se duerme */
+.sleepingriver-stage { display: grid; gap: 11px; }
+.sleepingriver-network {
+  display: grid; grid-template-columns: 90px minmax(220px, 1fr) 150px;
+  align-items: center; gap: 12px; min-height: 190px;
+}
+.sleepingriver-source {
+  padding: 16px 8px; border: 2px solid #8a7c50; border-radius: 10px;
+  background: #302a22; color: var(--accent); text-align: center; font-weight: 700;
+}
+.sleepingriver-channel {
+  position: relative; height: 22px; border-radius: 11px; background: #403948;
+}
+.sleepingriver-flow {
+  position: absolute; inset: 4px; border-radius: 7px; background: var(--accent);
+  opacity: .12;
+}
+.sleepingriver-stone-slot {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+}
+.sleepingriver-stone-slot .piedra { width: 58px; height: 35px; font-size: 9px; }
+.sleepingriver-ohm {
+  position: absolute; left: 8%; bottom: 25px; width: 86px; text-align: center;
+}
+.sleepingriver-ohm .ohm-widget { gap: 4px; }
+.sleepingriver-ohm .ohm-body { width: 52px; height: 52px; }
+.sleepingriver-ohm .ohm-eye { top: 15px; }
+.sleepingriver-tank[data-tank="1"] .tank { max-width: 105px; }
+.sleepingriver-tank[data-tank="2"] .tank { max-width: 130px; }
+.sleepingriver-tank[data-tank="4"] .tank { max-width: 150px; }
+.sleepingriver-controls {
+  display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px;
+}
+.sleepingriver-controls section {
+  padding: 8px; border: 1px solid #4a4554; border-radius: 8px; background: #1d1a23;
+}
+.sleepingriver-controls h3 {
+  margin-bottom: 7px; color: #a99; font-size: 12px; font-weight: 500;
+}
+.sleepingriver-tanks, .sleepingriver-brakes {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+}
+.sleepingriver-brakes { grid-template-columns: repeat(4, 1fr); }
+.sleepingriver-choice, .sleepingriver-brake {
+  min-width: 0; padding: 4px; border: 1px solid #5d5868; border-radius: 7px;
+  background: #26222e; color: #d8cfc0; cursor: pointer;
+}
+.sleepingriver-choice strong, .sleepingriver-choice span { display: block; }
+.sleepingriver-choice strong { font-size: 11px; }
+.sleepingriver-choice span { margin-top: 2px; color: #887f90; font-size: 9px; }
+.sleepingriver-choice.selected, .sleepingriver-brake.selected {
+  border-color: var(--accent); background: rgba(255,211,77,.08);
+}
+.sleepingriver-choice:disabled, .sleepingriver-brake:disabled { opacity: .55; cursor: default; }
+.sleepingriver-brake .piedra {
+  width: 100%; min-width: 0; height: 30px; padding: 2px; font-size: 8px; pointer-events: none;
+}
+.sleepingriver-instruments {
+  display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap;
+}
+.sleepingriver-gauge { width: 220px; color: #a99; font-size: 11px; text-align: center; }
+.sleepingriver-gauge .gauge-needle { transition: transform .08s linear; }
+.sleepingriver-probe-host .ohm-probes { justify-content: center; margin-top: 0; }
+.sleepingriver-progress { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
+.sleepingriver-progress span {
+  padding: 4px 7px; border: 1px solid #4a4554; border-radius: 999px;
+  color: #887f90; font-size: 11px;
+}
+.sleepingriver-progress span.done { color: var(--ok); border-color: rgba(126,196,106,.55); }
+
 .fuse { width: min(300px, 100%); padding: 10px; border: 1px solid #6b6478; border-radius: 8px; background: #211e29; }
 .fuse-heading { display: flex; justify-content: space-between; font-size: 12px; color: #d8cfc0; }
 .fuse-threshold, .fuse-status { color: #a99; }
@@ -1204,6 +1274,9 @@ body.touch-device #prompt { display: none !important; }
   .storedspark-network { grid-template-columns: 70px 1fr 110px 70px; gap: 5px; }
   .storedspark-key { font-size: 9px; }
   .storedspark-lamp span { width: 38px; height: 38px; }
+  .sleepingriver-network { grid-template-columns: 65px 1fr 105px; gap: 5px; }
+  .sleepingriver-controls { grid-template-columns: 1fr; }
+  .sleepingriver-ohm { left: 0; transform: scale(.82); transform-origin: bottom left; }
   .warmth-channels { grid-template-columns: 1fr; }
   .infirmary-machines { grid-template-columns: 1fr; }
   .longchannel-network { grid-template-columns: 1fr; }
