@@ -168,16 +168,19 @@ function tocarCampana(): void {
           La campana sonó. La plaza tiene luz. Y de la campana bajan dos cables…<br/>
           <em>Unidad 2: circuitos con más de un camino.</em>
         `,
-        continueLabel: 'Continuar',
+        continueLabel: 'Regresar al Instituto',
         onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
       });
     },
   );
 }
 
-function reproducirIntroUnidad2(): void {
+function reproducirIntroUnidad2(activacionAutomatica = false): void {
   say(
     [
+      ...(activacionAutomatica
+        ? [L('', 'Apenas cruzas el portal, la nota de la campana vibra en los vidrios del aula. El proyector responde solo: *clac*.')]
+        : []),
       L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD DOS.'),
       L('Proyector', 'El Castillo de Ohmdal: corazón de la red. De sus salas parten todos los ríos del reino.'),
       L('Proyector', 'Recuerde, estudiante: un reino no se enciende con un solo camino.'),
@@ -193,9 +196,12 @@ function reproducirIntroUnidad2(): void {
   );
 }
 
-function reproducirIntroUnidad3(): void {
+function reproducirIntroUnidad3(activacionAutomatica = false): void {
   say(
     [
+      ...(activacionAutomatica
+        ? [L('', 'Al entrar al aula, la Bitácora vibra sobre tu costado. El proyector reconoce una nueva entrada y se enciende solo: *clac*.')]
+        : []),
       L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD TRES.'),
       L('Proyector', 'La Forja de Ohmdal: donde el río trabaja.'),
       L('Proyector', 'Recuerde, estudiante: nada que trabaja, trabaja gratis.'),
@@ -209,9 +215,12 @@ function reproducirIntroUnidad3(): void {
   );
 }
 
-function reproducirIntroUnidad4(): void {
+function reproducirIntroUnidad4(activacionAutomatica = false): void {
   say(
     [
+      ...(activacionAutomatica
+        ? [L('', 'Al entrar al aula, la Bitácora vibra sobre tu costado. El proyector reconoce una nueva entrada y se enciende solo: *clac*.')]
+        : []),
       L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD CUATRO.'),
       L('Proyector', 'Las Terrazas de Ohmdal: el agua que baja pensando.'),
       L('Proyector', 'Recuerde, estudiante: lo que sube, baja. Y lo que baja, se reparte.'),
@@ -225,9 +234,12 @@ function reproducirIntroUnidad4(): void {
   );
 }
 
-function reproducirIntroUnidad5(): void {
+function reproducirIntroUnidad5(activacionAutomatica = false): void {
   say(
     [
+      ...(activacionAutomatica
+        ? [L('', 'Al entrar al aula, la Bitácora vibra sobre tu costado. El proyector reconoce una nueva entrada y se enciende solo: *clac*.')]
+        : []),
       L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD CINCO.'),
       L('Proyector', 'El Faro de Ohmdal: la luz que recuerda.'),
       L('Proyector', 'Recuerde, estudiante: lo que sube y baja… a veces se queda un rato.'),
@@ -523,8 +535,8 @@ function checkUnit2Complete(): void {
         Entradas en la Bitácora: ${entradas} · ${martir}<br/><br/>
         …Y algo brilló sin camino. La Bitácora lo registró.
       `,
-      continueLabel: 'Continuar',
-      onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+      continueLabel: 'Regresar al Instituto',
+      onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
     });
   }
 }
@@ -701,8 +713,8 @@ function checkUnit3Complete(): void {
       ${canales}<br/><br/>
       <em>Las Terrazas esperan: el empuje que baja por escalones.</em>
     `,
-    continueLabel: 'Continuar',
-    onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+    continueLabel: 'Regresar al Instituto',
+    onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
   });
 }
 
@@ -816,8 +828,8 @@ function checkUnit4Complete(): void {
           ${prediccion}<br/><br/>
           <em>El Faro espera, sobre el lago. Dicen que latía.</em>
         `,
-        continueLabel: 'Continuar',
-        onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+        continueLabel: 'Regresar al Instituto',
+        onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
       });
     },
   );
@@ -1067,6 +1079,17 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
     ],
+    onEnter: () => {
+      if (f().unit4Completed && !f().playedUnit5Intro) {
+        reproducirIntroUnidad5(true);
+      } else if (f().unit3Completed && !f().playedUnit4Intro) {
+        reproducirIntroUnidad4(true);
+      } else if (f().unit2Completed && !f().playedUnit3Intro) {
+        reproducirIntroUnidad3(true);
+      } else if (f().finished && !f().playedUnit2Intro) {
+        reproducirIntroUnidad2(true);
+      }
+    },
   },
 
   /* ============ OHMDAL ============ */
@@ -1116,7 +1139,7 @@ export const ROOMS: Record<string, RoomDef> = {
           if (!f().playedUnit2Intro) {
             return [
               L('', 'El camino al Castillo está lacrado. Todavía no sabes qué evidencia necesita el Consejo.'),
-              L('', 'Vuelve al Aula de Electrónica. El proyector tiene preparada la próxima lección.'),
+              L('', 'El sello de cobre tiembla con el eco de la campana. Al sur, el portal responde con un breve destello.'),
             ];
           }
           return [
@@ -1247,7 +1270,7 @@ export const ROOMS: Record<string, RoomDef> = {
           } else if (fl.finished) {
             say([
               L('', 'La campana todavía vibra, contenta. Los dos cables siguen ahí, esperando su lección.'),
-              L('', 'Vuelve al Aula de Electrónica y enciende el proyector. Allí empieza la próxima unidad.'),
+              L('', 'La nota corre por el cobre hacia el portal. Desde el otro lado llega una respuesta apagada: *clac*.'),
             ]);
           } else if (fl.puertaDone) tocarCampana();
           else say(L('', 'La campana de Ohmdal cuelga muda sobre la plaza apagada. La cuerda está al alcance, pero algo dice que todavía no.'));

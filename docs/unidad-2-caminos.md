@@ -83,7 +83,7 @@ Sin construir. Para el greybox de esta unidad se reutiliza el patrón U1: salas 
 
 ## 1. Resumen narrativo completo
 
-Tras el final de la U1, la Bitácora registró la anomalía: *caminos múltiples*. De regreso en el Aula de Electrónica, el proyector reconoce el avance y proyecta el módulo dos: el Castillo de Ohmdal, corazón de la red, «de donde salen todos los ríos». La grabación se corta con un sello superpuesto: **CLAUSURADO POR ORDEN DEL CONSEJO**.
+Tras el final de la U1, la Bitácora registró la anomalía: *caminos múltiples*. La nota de la campana viaja por el portal; de regreso en el Aula de Electrónica, el proyector reconoce el avance y se activa solo para proyectar el módulo dos: el Castillo de Ohmdal, corazón de la red, «de donde salen todos los ríos». La grabación se corta con un sello superpuesto: **CLAUSURADO POR ORDEN DEL CONSEJO**.
 
 En la plaza, Edda espera junto a la campana: nadie le explicó por qué los Maestros le pusieron DOS cables. El jugador, con Ohm como medidor, descubre el primer principio midiendo: por cada cable corre **medio río**, y por el tronco, el río entero. Si se abre un cable, el otro lleva todo — y la campana sigue sonando. Los Maestros no desperdiciaban: **duplicaban caminos para que la campana nunca callara**.
 
@@ -119,6 +119,10 @@ Cambios visibles respecto de la U1 (restauración del Instituto en marcha):
 - el panel V/I/R del portal brilla estable, no intermitente.
 
 ### Proyector — módulo dos
+
+Al cruzar el portal después de completar la U1, el proyector se activa sin que el jugador tenga que buscar una interacción administrativa:
+
+> Apenas cruzas el portal, la nota de la campana vibra en los vidrios del aula. El proyector responde solo: *clac*.
 
 > *clac* MUNDOS APLICADOS. UNIDAD DOS.
 >
@@ -605,6 +609,7 @@ Y recién después leer en la Bitácora: *eso se llama serie, paralelo, y la reg
 Texto conectivo que el guion original no especificaba, escrito durante el build (canon desde ahora):
 
 - **Proyector, re-interacción tras el módulo dos:** «*clac* Unidad dos: en curso. Consulte su Bitácora. …Y no firme nada sin medirlo antes. *clac*»
+- **Transiciones entre unidades:** cada cierre ofrece «Regresar al Instituto» y lleva al aula; el proyector reconoce automáticamente el avance e inicia el módulo siguiente. Interactuar con él sirve para repetir contexto, nunca para destrabar progreso. En una partida vieja que siga en la plaza tras U1, la campana y el lacre del Castillo señalan el portal con vibración, luz y un *clac*, sin instrucciones extradiegéticas.
 - **Camino al Castillo antes de la campana (puerta trabada):» «Un cordón lacrado del Consejo cruza el camino al Castillo: "PASO RESTRINGIDO POR CONSERVACIÓN DE CHISPA. Sin excepciones."» / «Sin evidencia, nadie va a mover ese cordón. La campana de los dos cables espera en la plaza.»
 - **Gate Galería→Ramales (Consejera):** «Los Ramales siguen sellados. Primero la Galería: si el instrumento dice la verdad aquí, la dirá allá.»
 - **Gate Ramales→Corazón (Consejera):** «El Corazón, todavía no. El Consejo selló de afuera hacia adentro; se abre al revés. …Y los Ramales aún no me convencen.»
