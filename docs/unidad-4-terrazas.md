@@ -1,19 +1,19 @@
 # Proyecto Roxana — Ohmdal, Unidad 4
 # “La vuelta completa”
 
-**Versión:** 0.1 — propuesta de diseño (nivel medio de detalle; guion línea por línea antes del build)
-**Alcance:** Unidad 4 completa: del acueducto moribundo (gancho de la U3) hasta el valle regado y el gancho al Faro (U5).
+**Versión:** 0.2 — guion detallado listo para build (diálogos finales; los ejecutores copian textual)
+**Alcance:** Unidad 4 completa: del acueducto moribundo (gancho de la U3) al valle regado y el gancho al Faro (U5).
 **Tema técnico:** ley de tensiones de Kirchhoff, divisor de tensión, divisor de corriente, resistencia equivalente, circuito escalera. La unidad «de maestría»: nada nuevo que tocar, todo nuevo que combinar — y la primera vez que el jugador **predice antes de probar**.
 **Requisito narrativo:** Unidad 3 completada (`unit3Completed`, Forja en ritmo).
-**Estado:** borrador para revisar con el autor. Nada implementado.
+**Estado:** guion aprobado para construcción. Plan de hitos: `plan-implementacion-u4.md`.
 
 ---
 
-## A. Síntesis de la unidad (canon propuesto)
+## A. Síntesis de la unidad (canon)
 
 ### A.1. Premisa
 
-Las Terrazas: el acueducto de cobre que riega el valle por niveles, obra mayor de los Maestros. Cada terraza toma su parte del empuje y deja pasar el resto. Hace décadas que nadie sabe **repartirlo**: las terrazas altas ahogan sus cultivos y a la más baja no le llega casi nada. La guardiana de las Terrazas lo resume:
+Las Terrazas: el acueducto de cobre que riega el valle por niveles, obra mayor de los Maestros. Cada terraza toma su parte del empuje y deja pasar el resto. Hace décadas que nadie sabe **repartirlo**: las terrazas altas ahogan sus cultivos y a la más baja no le llega casi nada. La guardiana lo resume:
 
 > **«Acá arriba sobra y allá abajo falta. Y si toco una sola piedra, cambia TODO el valle. Por eso no toco nada.»**
 
@@ -29,111 +29,325 @@ Frases centrales:
 
 | Técnico | Diegético | Momento de conversión |
 |---|---|---|
-| caída de tensión | el escalón («cada piedra le cobra un escalón al empuje») | Bitácora, tras el evento mayor |
+| caída de tensión | el escalón | Bitácora, tras el evento mayor |
 | ley de tensiones de Kirchhoff (KVL) | la Regla de la Vuelta | Bitácora, tras el evento mayor |
 | divisor de tensión | el reparto del empuje | Bitácora, tras el evento mayor |
 | resistencia equivalente | la Piedra Única | Bitácora, tras el evento mayor |
-| circuito escalera | la Escalera (es el acueducto: física, se camina) | es el escenario, no se convierte |
+| circuito escalera | la Escalera (es el acueducto: se camina) | escenario, no se convierte |
 
-**Instrumento nuevo:** Ohm aprende a medir **entre dos puntos**: abre los brazos y reporta el escalón (la diferencia de empuje) entre sus dos manos. Hasta ahora medía el río parado en un tramo; ahora mide el empuje abrazando un trecho. (Diegéticamente hermoso: para medir empuje hay que abarcar, no pararse.)
+**Instrumento nuevo:** Ohm aprende a medir **entre dos puntos** (modo brazos): abre los brazos y reporta el escalón —la diferencia de empuje— entre sus dos manos. Hasta ahora medía el río parado en un tramo; ahora mide el empuje abarcando un trecho. (Para medir empuje hay que abarcar, no pararse.)
 
-### A.3. Diseño de puzzles — una variable nueva por puzzle
+### A.3. Matemática canónica (enteros — verificada; los ejecutores no la cambian)
 
-| Puzzle | Concepto | Manipulación | Feedback de fallo |
-|---|---|---|---|
-| Los escalones | el empuje cae por escalones; la vuelta completa suma cero | Ohm con brazos abiertos, tramo por tramo, alrededor de una vuelta | ninguno: medición pura (tutorial) |
-| El reparto justo | divisor de tensión: cada piedra cobra su parte proporcional | elegir piedras en fila para dar a cada terraza su empuje objetivo | terraza ahogada o sedienta; las agujas lo muestran |
-| La Piedra Única | equivalencia: una red se comporta como una sola piedra | reemplazar una maraña por la piedra que «engaña a Ohm» | Ohm detecta la diferencia: «Red distinta. Río distinto.» |
-| La Escalera del valle (evento mayor) | escalera resistiva resuelta por etapas + **predicción** | calcular en la Bitácora, recién después abrir el agua | la predicción errada no castiga: la Bitácora anota «lo esperado vs. lo medido» |
+Piedras marrón 1 / roja 2 / amarilla 4 / gris 8; **filas se suman**; **dos iguales en paralelo = la mitad** (roja∥roja=marrón 1, amarilla∥amarilla=roja 2, gris∥gris=amarilla 4). Cristales de Empuje 4/8/16.
 
-**Aritmética canónica (a verificar en build — restricción dura: todos los empujes intermedios deben ser enteros):**
+- **Los escalones (tutorial):** Empuje 16 sobre fila marrón+marrón+roja+amarilla (1+1+2+4 = 8) → río 2. Escalones (río × piedra): 2, 2, 4, 8. La vuelta: +16 −2 −2 −4 −8 = **0**, exacto.
+- **El reparto justo (divisor):** dos terrazas en fila, Empuje 12, objetivos: alta 8, baja 4 (proporción 2:1). Solución A: roja(2)+marrón(1) → río 4 → escalones 8 y 4. Solución B: amarilla(4)+roja(2) → río 2 → escalones 8 y 4. **Misma proporción, distinto río**: la de piedras grandes (B) paga menos río (menos peaje — puente a U3). Dos soluciones válidas.
+- **La Piedra Única (equivalente):** roja∥roja = marrón; amarilla∥amarilla = roja; gris∥gris = amarilla. Y serie+paralelo: marrón + (roja∥roja) = 1+1 = roja(2); roja + (amarilla∥amarilla) = 2+2 = amarilla(4). Ohm «no distingue» la red de su piedra única.
+- **La Escalera del valle (evento mayor) — VERIFICADA:** manantial Empuje 16; tramo manantial→terraza 1 = roja(2); terraza 1 cuelga con amarilla(4); tramo terraza 1→terraza 2 = roja(2); terraza 2 (última) cuelga con roja(2).
+  - Plegado con la Piedra Única, desde abajo: terraza 2 = roja(2); rama hacia ella = roja+roja = amarilla(4); en terraza 1: amarilla ∥ amarilla = **roja(2)**; total = roja+roja = amarilla(4); río del manantial = 16/4 = 4.
+  - Empujes: terraza 1 recibe **8**; terraza 2 recibe **4** (= un cuarto del manantial). La **predicción** que pide la unidad: «a la última terraza llega 4».
+  - **Segunda solución válida** (escala de piedras): tramos amarilla(4), terraza 1 gris(8), terraza 2 amarilla(4) → mismo reparto (8 y 4) con menos río (manantial río 2). El banco acepta toda configuración que dé terraza 1 = 8 y terraza 2 = 4. Con otros empujes el objetivo «un cuarto» se mantiene proporcional.
 
-- **Los escalones (tutorial):** Empuje 16 sobre una fila marrón+marrón+roja+amarilla (1+1+2+4 = 8) → río 2 → escalones de 2, 2, 4 y 8. La vuelta: +16 −2 −2 −4 −8 = 0. Ohm, abrazando la fuente: «Subida: dieciséis.» Abrazando las piedras, una por una: «Escalón: dos… dos… cuatro… ocho.» Edda hace la cuenta en voz alta y se queda callada un segundo: la vuelta cierra **exacta**.
-- **El reparto justo:** dos terrazas en fila con Empuje 12 (o el cristal que se canonice); objetivo: terraza alta 8, terraza baja 4 → piedras en proporción 2:1 (roja+marrón, río 4). Variante segunda: mismo objetivo con otra pareja proporcional (amarilla+roja, río 2) — **el reparto depende de la proporción, no del tamaño**: dos soluciones válidas, y la diferencia entre ellas es cuánto río paga el Tronco (puente a U3: la solución de piedras grandes paga menos peaje). Maestría = todas las unidades anteriores hablando a la vez.
-- **La Piedra Única:** se presenta una red chica ya conocida (dos ramas en paralelo de la U2, p. ej. roja ∥ roja) y un engaste con una sola piedra al lado. Desafío: ¿qué piedra única hace que Ohm, parado en la fuente, **no pueda distinguir** una red de la otra? (roja ∥ roja = marrón: 2∥2 = 1.) Después una serie+paralelo simple (marrón + (roja ∥ roja) = 1+1 = roja). El asombro es conceptual: la red entera «se esconde» dentro de una piedra. Es la herramienta que vuelve resoluble la Escalera.
-- **La Escalera del valle (evento mayor):** acueducto de 3 etapas; cada etapa = un tramo de canal (piedra en serie) + una terraza que bebe (rama en derivación). El jugador la resuelve **desde abajo hacia arriba** plegando con la Piedra Única (última terraza → equivalente → sumar el tramo → equivalente con la anterior → …), anota en la **página de predicción** de la Bitácora cuánto empuje llega a la terraza más baja, y recién entonces abre el agua. Los valores exactos de piedras se fijan en build con la restricción de enteros y al menos dos configuraciones válidas; objetivo canónico propuesto: «a la última terraza debe llegar un cuarto del empuje del manantial».
+**Regla de reuso:** cero piezas nuevas de banco. La novedad es el **modo brazos de Ohm** y la **página de predicción** de la Bitácora. La unidad es topología + método.
 
-**Regla de reuso:** cero piezas nuevas de banco. La única novedad es el **modo brazos de Ohm** y la **página de predicción** de la Bitácora. La unidad es topología + método.
+### A.4. Misconcepciones que la unidad ataca
 
-### A.4. Misconcepciones reales que la unidad ataca
-
-| Misconcepción documentada | Dónde se desmiente jugando |
+| Misconcepción | Dónde cae |
 |---|---|
-| «La tensión se gasta como la corriente» (confunden V con I) | Ohm con brazos abiertos: el empuje SÍ cae por escalones — y el río sigue siendo el mismo en toda la fila (U2 reusada como contraste) |
-| «La fuente da siempre la misma corriente» | la Piedra Única: cambiar la red cambia el río de la fuente; la fuente fija el empuje, no el río |
+| «La tensión se gasta como la corriente» (confunden V con I) | Ohm con brazos abiertos: el empuje SÍ cae por escalones — y el río sigue igual en toda la fila (contraste con U2) |
+| «La fuente da siempre la misma corriente» | la Piedra Única: cambiar la red cambia el río del manantial |
 | «Cada componente es independiente» | tocar una piedra de la Escalera mueve TODAS las agujas del valle |
 | «No se puede saber sin probar» | la página de predicción: el jugador calcula, después mide, y la vuelta cierra exacta |
 
 ### A.5. Personajes
 
-- **La guardiana de las Terrazas** *(personaje nuevo — propuesta de nombre: **Maesa Vega**; habitante de Ohmdal, puede llevar nombre como Edda y Lumen)* — vieja, precisa, paralizada por respeto: sabe que todo está conectado (¡su intuición es correcta!) y por eso no toca nada. Su arco es del miedo reverencial al cálculo: no «animarse», sino **saber antes de tocar**. Es la encarnación de la misconcepción meta de la unidad: la red como misterio intocable.
-- **Edda** — su arco de enseñar culmina: la página de predicción es idea SUYA («si de verdad lo entendimos, tendríamos que poder decirlo antes de verlo»). Edda inventa, diegéticamente, el examen honesto: predecir no para aprobar, sino para saber si entendiste.
-- **Maese Lumen** — beat de comedia y de cierre de arco: intenta predecir con su vieja liturgia («el río preferirá el camino consagrado») y falla; predice con la cuenta y acierta. Su frase: «La cuenta le gana al rezo. Otra vez. Empiezo a tomármelo personal.»
-- **Ohm** — modo brazos. Y un (1) beat mudo: en la terraza más baja, frente al lago, se queda mirando el Faro apagado un segundo de más. No dice nada. (Plantado para U5/Empalme; la reserva no se gasta.)
-- **La Consejera** — opcional en esta unidad (cameo): trae el inventario de jornales de la U3 y pregunta cuánto costará regar el valle. Si aparece, una escena, no más.
-
-### A.6. Estado de implementación
-
-Sin construir. Patrón U1/U2: salas top-down + banco + Bitácora. Lo nuevo: modo brazos de Ohm (medición entre dos puntos en la vista de banco), página de predicción en la Bitácora (input numérico del jugador + comparación con lo medido), y el mapa de las Terrazas (2–3 salas en pendiente + el evento mayor). 4 puzzles, 4 entradas de Bitácora.
+- **La Guardiana de las Terrazas** *(nueva; propuesta de nombre: Vega — pendiente del autor; el código usa el label «Guardiana»)* — vieja, precisa, paralizada por respeto: sabe que todo está conectado (¡intuición correcta!) y por eso no toca nada. Arco: del miedo reverencial al cálculo — no «animarse», sino **saber antes de tocar**.
+- **Edda** — su arco de enseñar culmina: la página de predicción es idea SUYA. Inventa, diegéticamente, el examen honesto: predecir no para aprobar, sino para saber si entendiste.
+- **Maese Lumen** — comedia y cierre de arco: predice con su vieja liturgia y falla; predice con la cuenta y acierta.
+- **Ohm** — modo brazos. Un (1) beat mudo: en la terraza más baja, frente al lago, se queda mirando el Faro apagado un segundo de más. No dice nada. (Plantado para U5.)
+- **La Consejera** — cameo opcional (una escena): trae el inventario de jornales de la U3 y pregunta cuánto costará regar el valle.
 
 ---
 
-## 1. Resumen narrativo
+## 1. NIVEL 0 — Aula (módulo cuatro)
 
-La Forjadora presentó el problema en el cierre de la U3: el acueducto que riega el valle no se reparte desde que se fueron los Maestros. En las Terrazas espera Maesa Vega, que conoce cada canal de memoria y no ha movido una piedra en treinta años: «si toco acá, cambia allá, y nadie me sabe decir cuánto».
+Con `unit3Completed`, el proyector ofrece el módulo cuatro. 2 min.
 
-Primer acto (los escalones): Ohm estrena los brazos. Caminando una vuelta completa del canal alto, el empuje sube en el manantial y baja escalón a escalón hasta volver a cero, **exacto**. La vuelta cierra. Vega, que lo vio mil veces, lo entiende por primera vez: el acueducto no es un misterio — es una cuenta que siempre cerró sola.
+**Proyector:**
 
-Segundo acto (el reparto justo): dos terrazas, dos necesidades. El reparto es proporción de piedras, no tamaño — y hay dos soluciones válidas que difieren en el peaje (U3 viva). Vega elige la de piedras grandes «porque el valle paga menos», y al elegir por una razón medible, toca una piedra por primera vez en treinta años.
+> *clac* MUNDOS APLICADOS. UNIDAD CUATRO.
+>
+> Las Terrazas de Ohmdal: el agua que baja pensando.
+>
+> Recuerde, estudiante: lo que sube, baja. Y lo que baja, se reparte.
 
-Tercer acto (la Piedra Única): el truco de los Maestros, grabado en un mural del acueducto: una maraña y una piedra sola con el signo «=». Toda red puede esconderse en una piedra. Ohm no distingue una de otra — y si Ohm no distingue, el río tampoco.
+La imagen se aclara un instante en un acueducto de cobre escalonado, y se apaga.
 
-Evento mayor (la Escalera): el acueducto completo, tres etapas, el valle entero esperando. Edda propone lo nunca hecho: decir el número ANTES de abrir el agua. El jugador pliega la Escalera desde abajo con la Piedra Única, anota su predicción en la Bitácora, y abre el manantial. Si acertó: el valle se riega y la Bitácora estampa «PREDICHO Y MEDIDO: IGUALES». Si no: nada se rompe — se mide, se compara, se entiende dónde se torció la cuenta, y se vuelve a predecir. **El error es información, también en el papel.**
+> (Agua que piensa. En esta escuela ya nada me sorprende.)
 
-Cierre: el valle verde encendido al atardecer (la restauración más serena del juego: no luces — riego). Vega ya no custodia el acueducto: lo **opera**. Gancho a la U5: en la terraza más baja, junto al lago, el viejo **Faro** apagado. Vega: «Parpadeaba, ¿saben? No alumbraba fijo como una lámpara: latía. Nadie supo nunca con qué corazón.»
+Re-interacción: **Proyector:** «*clac* Unidad cuatro: en curso. Mida dos veces. Toque una. *clac*»
 
----
-
-## 2. Estructura de niveles (resumen — guion fino antes del build)
-
-| Nivel | Mapa | Función | Duración |
-|---|---|---|---|
-| 0 | Aula de Electrónica (reuso) | proyector módulo 4: «LA VUELTA COMPLETA. Lo que sube, baja.» | 2 min |
-| 1 | Canal alto de las Terrazas | Vega; **Puzzle 1: los escalones** (Ohm estrena brazos) | 5–6 min |
-| 2 | Terrazas medias | **Puzzle 2: el reparto justo** | 6–7 min |
-| 3 | El mural de los Maestros | **Puzzle 3: la Piedra Única** | 5–7 min |
-| 4 | El acueducto completo | **Puzzle 4 (evento mayor): la Escalera** con página de predicción | 9–12 min |
-| 5 | Cierre: el valle regado | atardecer, Vega operadora, gancho del Faro | 3–4 min |
-
-**Beats de diálogo clave** (a desarrollar):
-
-- Vega, presentación: «Treinta años sin mover una piedra. No por miedo. Por respeto. …Bueno. Un poco por miedo.»
-- Ohm, primera vuelta cerrada: «Subidas: dieciséis. Bajadas: dieciséis. Deuda de la vuelta: cero. Siempre cero.»
-- Edda, inventando la predicción: «Medir después es mirar. Decirlo antes — eso es entender. Quiero que lo digamos antes.»
-- Lumen, tras acertar su predicción: «La cuenta le gana al rezo. Otra vez. Empiezo a tomármelo personal.»
-- Vega, cierre: «Toqué una piedra y el valle no se murió. Se ordenó. Los Maestros no eran magos: eran prolijos.»
+Flag: `playedUnit4Intro`. En la plaza, el **Camino a las Terrazas** está abierto (visible con `unit3Completed`; el camino baja del lado de la Forja).
 
 ---
 
-## 3. Entradas de Bitácora de la Unidad 4
+## 2. NIVEL 1 — El canal alto: los escalones
 
-1. **«Los escalones»** — vivencial: el empuje cae piedra a piedra; la vuelta completa siempre cierra en cero. Formal: **la Regla de la Vuelta** (ley de tensiones de Kirchhoff). Nota al pie: *«El mismo apellido de la regla del cruce. Kirchhoff tenía dos reglas y ningún apuro.»*
-2. **«El reparto del empuje»** — vivencial: las dos terrazas, la proporción 2:1, las dos soluciones (y cuál pagaba menos peaje). Formal: **divisor de tensión** — cada piedra cobra empuje en proporción a su freno. **Error común:** creer que la piedra grande «aguanta» y la chica «sufre»: ninguna sufre — cobran proporcional.
-3. **«La Piedra Única»** — vivencial: la red que Ohm no pudo distinguir de una piedra. Formal: **resistencia equivalente**; en fila se suman, en ramales se achican (dicho con los casos vividos, no con la fórmula de paralelo). ✎ *Si toda red puede ser una sola piedra… ¿qué piedra es tu casa entera vista desde el medidor de la entrada?*
-4. **«La Escalera»** (formal, tras el evento mayor) — la entrada mayor: el método de plegado etapa por etapa, el dibujo de la Escalera del valle, y la **página de predicción** estrenada: lo esperado, lo medido, y la palabra IGUALES. Cierre: *«Hoy la Bitácora dejó de ser un diario. Ahora también es un mapa de lo que va a pasar.»*
+**ID propuesto:** `MAP_TERRACES_TOP` · 5–6 min · **Puzzle 1 (tutorial)**
+
+Una ladera de cobre y tierra, terrazas de cultivo escalonadas hacia el valle. Arriba, la **Guardiana**, inmóvil junto a una compuerta, como si montara guardia desde hace décadas.
+
+**Guardiana:**
+
+> No te acerques a las piedras. …Perdón. Es la costumbre.
+> Treinta años acá. Conozco cada canal de memoria. Y no muevo ninguno.
+
+**Edda:**
+
+> ¿Por qué no?
+
+**Guardiana:**
+
+> Porque si toco esta —y señala una cualquiera— cambia aquella, y la del fondo, y el riego entero. Todo está atado a todo.
+> No es miedo. Es respeto. …Bueno. Un poco de miedo.
+
+**Ohm:**
+
+> Observación correcta. Conclusión incompleta. Para leer una red atada: brazos.
+
+*(Ohm extiende los brazos por primera vez. Modo nuevo: mide el empuje ENTRE dos puntos.)*
+
+### PUZZLE 1 — Los escalones
+
+**ID:** `PUZZLE_VOLTAGE_STEPS` · medición pura, sin fallo · 4–5 min
+**Vista de banco:** una vuelta completa del canal alto: manantial (Empuje 16) → fila de cuatro piedras fijas (marrón, marrón, roja, amarilla) → vuelta a tierra. Ohm con **modo brazos**: botón «abrazar» entre dos puntos cualesquiera; reporta el escalón. También el modo río de siempre (parado en un tramo).
+
+Experiencias (en cualquier orden):
+
+1. **Abrazar el manantial:** Ohm reporta «Subida: dieciséis.»
+2. **Abrazar cada piedra, una por una:** escalones de 2, 2, 4, 8.
+   **Edda** (haciendo la cuenta en voz alta): «Dos, dos, cuatro, ocho… son dieciséis. Lo que subió, bajó. Exacto. No sobra ni falta un escalón.»
+   **Ohm:** «Deuda de la vuelta: cero. Siempre cero.»
+3. **Medir el río parado en cada tramo** (modo viejo): el mismo río 2 en toda la fila.
+   **Edda:** «El empuje baja por escalones… pero el río es el mismo en todos lados. No son la misma cosa. ¡NUNCA fueron la misma cosa!»
+   *(El gran error que la unidad desmonta: confundir empuje con río.)*
+4. **Abrazar la vuelta entera** (manantial + las cuatro piedras): «Deuda: cero.»
+
+Cierre:
+
+**Guardiana** (que lo vio mil veces):
+
+> Mil veces vi bajar esa agua. Nunca vi que la cuenta cerraba sola.
+> El acueducto no es un misterio. Es una cuenta que siempre cerró, y yo no sabía leerla.
+
+Flags: `solvedVoltageSteps`. Bitácora «Los escalones» (vivencial).
 
 ---
 
-## 4. Flags de la unidad
+## 3. NIVEL 2 — Las terrazas medias: el reparto justo
+
+**ID propuesto:** `MAP_TERRACES_MID` · 6–7 min · **Puzzle 2**
+
+Dos terrazas de cultivo, una sobre la otra. La alta, encharcada; la baja, reseca y agrietada.
+
+**Guardiana:**
+
+> Mira. Arriba se ahoga el maíz. Abajo se raja la tierra. Y el agua es la misma — solo que mal repartida.
+> Los Maestros sabían darle a cada terraza lo suyo. Yo no me animo a tocar la proporción.
+
+**Edda:**
+
+> ¿Y si te lo mostramos con las manos, en chico, antes de tocar el valle de verdad?
+
+### PUZZLE 2 — El reparto justo
+
+**ID:** `PUZZLE_FAIR_SPLIT` · 5–7 min
+**Vista de banco:** dos terrazas en fila bajo un manantial de Empuje 12; engaste de una piedra por terraza (marrón/roja/amarilla/gris); aguja de empuje recibido por terraza (alta: zona verde en 8; baja: zona verde en 4); Ohm modo brazos. Objetivo: alta 8, baja 4.
+
+- **Piedras iguales** (p. ej. roja+roja): río 3, escalones 6 y 6 — reparto mitad y mitad. La alta no llega a 8, la baja sobra. **Ohm:** «Reparto igual. Objetivo: desigual. Ajuste la proporción.»
+- **Solución A** (roja arriba 2, marrón abajo 1): río 4 → alta 8, baja 4. ✓
+- **Solución B** (amarilla 4, roja 2): río 2 → alta 8, baja 4. ✓ — mismo reparto, menos río.
+  **Edda:** «¡Las dos andan! Pero la de piedras grandes pide menos río al manantial…»
+  **Guardiana:** «Menos agua para el mismo riego. Eso… eso es lo que yo nunca supe calcular.»
+  **Ohm:** «El reparto es proporción, no tamaño. La proporción manda.»
+
+Cierre — la Guardiana toca una piedra por primera vez en treinta años (elige la solución B, «porque el valle paga menos»):
+
+**Guardiana:**
+
+> Toqué una piedra. Por una razón. Con un número.
+> …No tembló el valle. Se ordenó.
+
+Flags: `solvedFairSplit`. Bitácora «El reparto del empuje» (vivencial).
+
+---
+
+## 4. NIVEL 3 — El mural de los Maestros: la Piedra Única
+
+**ID propuesto:** `MAP_TERRACES_MURAL` · 5–7 min · **Puzzle 3**
+
+Un muro de cobre grabado: a un lado, una maraña de canales; al otro, una sola piedra; entre los dos, el signo **=**. El truco de los Maestros, perdido.
+
+**Guardiana:**
+
+> Este mural lleva aquí más que yo. Nunca lo entendí. Una maraña… igual a una piedra. ¿Igual cómo?
+
+**Ohm:**
+
+> Demostrable. Tráiganme una red. Yo decido si la distingo.
+
+### PUZZLE 3 — La Piedra Única
+
+**ID:** `PUZZLE_SINGLE_STONE` · 5–7 min
+**Vista de banco:** a la izquierda, una red armable (dos ramas en paralelo, o serie+paralelo); a la derecha, un engaste de **una** piedra; Ohm parado en el manantial mide el río de cada lado. Desafío: encontrar la piedra única que hace que Ohm **no distinga** un lado del otro.
+
+- **roja ∥ roja** → piedra única = **marrón** (1). Ohm: «Izquierda: río X. Derecha: río X. No distingo. Son la misma piedra.»
+- **amarilla ∥ amarilla** → **roja** (2).
+- **gris ∥ gris** → **amarilla** (4).
+- **marrón + (roja ∥ roja)** → **roja** (2). *(serie del marrón con el equivalente marrón)*
+- **roja + (amarilla ∥ amarilla)** → **amarilla** (4).
+
+Al resolver dos o más equivalencias:
+
+**Edda:**
+
+> La red entera se esconde dentro de una piedra. Y si Ohm no la distingue…
+
+**Ohm:**
+
+> …el río tampoco. Una red es una piedra que todavía no terminaste de mirar.
+
+**Guardiana:**
+
+> Entonces el valle entero… es una piedra. Una sola piedra que aprendí a temer.
+
+Flags: `solvedSingleStone`. Bitácora «La Piedra Única» (vivencial). *(Esta es la herramienta que vuelve resoluble la Escalera.)*
+
+---
+
+## 5. NIVEL 4 — El acueducto completo: la Escalera
+
+**ID propuesto:** `MAP_TERRACES_AQUEDUCT` · 9–12 min · **Puzzle 4 — evento mayor, y la primera predicción**
+
+El acueducto entero a la vista, bajando del manantial al lago por tres niveles. El valle, expectante.
+
+**Guardiana:**
+
+> El valle completo. Tres niveles. Si me equivoco, riego mal toda una temporada.
+> Por eso nunca lo toqué. Mejor mal repartido y quieto, que peor por mi mano.
+
+**Edda:**
+
+> No vamos a tocar nada todavía. Primero lo decimos. *(a ti)* Plegá la Escalera con la Piedra Única, desde abajo. Decime cuánto empuje le va a llegar a la terraza del fondo. ANTES de abrir el agua.
+
+**Guardiana:**
+
+> ¿Adivinar?
+
+**Edda:**
+
+> No. Saber. Medir después es mirar. Decirlo antes — eso es entender.
+
+### PUZZLE 4 — La Escalera (con página de predicción)
+
+**ID:** `PUZZLE_LADDER` · 8–10 min
+**Vista de banco:** el acueducto — manantial (Empuje 16) → tramo roja → terraza 1 (cuelga amarilla) → tramo roja → terraza 2 (cuelga roja, la última). Herramienta de plegado: el jugador colapsa la red por etapas con la Piedra Única (cada plegado muestra el equivalente). La **página de predicción** de la Bitácora: input numérico «empuje que llega a la terraza del fondo». Recién con la predicción cargada, el botón **«Abrir el agua»** se habilita.
+
+Plegado guiado (la Piedra Única, U3 viva):
+1. Terraza 2 (final) = roja (2).
+2. Rama hacia terraza 2 = roja + roja = amarilla (4).
+3. En terraza 1: amarilla ∥ amarilla = **roja (2)**.
+4. Total: roja + roja = amarilla (4). Río del manantial = 16/4 = 4.
+5. Escalón del primer tramo = 4×2 = 8 → terraza 1 recibe 8. Terraza 2 recibe **4**.
+
+**Predicción correcta: 4.** El jugador escribe 4, abre el agua, y la aguja del fondo marca 4.
+
+- **Predicción exacta:** el valle se riega parejo; la Bitácora estampa **«PREDICHO Y MEDIDO: IGUALES».** `predictionExact`.
+- **Predicción errada:** nada se rompe. El agua corre, la aguja marca 4, y la página muestra «lo esperado / lo medido» lado a lado. **Ohm:** «Diferencia entre lo dicho y lo visto: ahí está la lección. Repliegue. Vuelva a decir.» Se puede re-predecir las veces que haga falta. *(El error es información, también en el papel.)*
+
+**Segunda solución** (tramos amarilla, terraza 1 gris, terraza 2 amarilla): mismo reparto 8/4 con menos río; el banco la acepta. La predicción del fondo sigue siendo 4 (un cuarto).
+
+### Resolución
+
+Las tres terrazas en su verde, el agua repartida. El valle entero se riega parejo por primera vez en décadas — la restauración más serena del juego: no luces, riego.
+
+El mosaico del manantial se completa:
+
+> Lo que sube, baja. Lo que baja, se reparte en escalones.
+> Y los escalones de toda vuelta, sumados, dan cero.
+
+**Guardiana:**
+
+> Toqué las piedras. Todas. Y supe lo que iba a pasar antes de que pasara.
+> Treinta años de respeto, y bastaba con aprender a leer. Los Maestros no eran magos. Eran prolijos.
+
+**Ohm:**
+
+> Registro: primera predicción del estudiante. Resultado: el futuro es calculable. Anótelo en grande.
+
+**Lumen** *(que predijo primero con su liturgia y falló, después con la cuenta y acertó)*:
+
+> La cuenta le gana al rezo. Otra vez. Empiezo a tomármelo personal.
+
+La Bitácora arde y se abre sola: la entrada mayor.
+
+Flags: `solvedLadder`, `valleyRestored`, `learnedKVL`. La Bitácora estrena su **página de predicción** como herramienta permanente.
+
+---
+
+## 6. NIVEL 5 — Cierre y gancho al Faro
+
+**Duración:** 3–4 min.
+
+El valle verde al atardecer. La Guardiana ya no monta guardia: **opera** el acueducto, moviendo piedras con confianza.
+
+**Edda** (mirando el lago al pie del valle):
+
+> ¿Y eso de ahí abajo? Esa torre, sobre el agua.
+
+**Guardiana:**
+
+> El Faro. Lleva apagado desde que se fueron los Maestros.
+> Parpadeaba, ¿saben? No alumbraba fijo como una lámpara: **latía**. La-aaa-tido… la-aaa-tido. Nadie supo nunca con qué corazón.
+
+**Ohm** *(se queda mirando el Faro un segundo de más, en silencio. Su pecho parpadea una vez. No dice nada.)*
+
+**Edda:**
+
+> ¿Ohm…?
+
+**Ohm:**
+
+> Nada. Un dato viejo. Sigamos.
+
+*(Beat plantado para U5. La reserva no se gasta.)*
+
+Flags: `unit4Completed`. Pantalla de cierre (patrón U2/U3): título «Fin de la Unidad 4 — “La vuelta completa”», resumen (si la primera predicción fue exacta; entradas de Bitácora) y teaser del Faro que late.
+
+---
+
+## 7. Entradas de Bitácora de la Unidad 4
+
+Dos capas; las vivenciales nacen al resolver cada puzzle; las formales llegan con `learnedKVL` (tras el evento mayor).
+
+1. **«Los escalones»** (`solvedVoltageSteps`) — vivencial: el empuje cae piedra a piedra; la vuelta siempre cierra en cero; el río es el mismo en toda la fila. Formal: **la Regla de la Vuelta** (ley de tensiones de Kirchhoff): en toda vuelta cerrada, las subidas y bajadas de empuje se cancelan. Nota al pie: *«El mismo apellido de la regla del cruce. Kirchhoff tenía dos reglas y ningún apuro.»* **Error común:** confundir empuje con río — el empuje cae por escalones; el río, en una fila, no.
+2. **«El reparto del empuje»** (`solvedFairSplit`) — vivencial: las dos terrazas, la proporción 2:1, las dos soluciones y cuál pagaba menos río. Formal: **divisor de tensión** — cada piedra cobra empuje en proporción a su freno. **Error común:** creer que la piedra grande «aguanta» y la chica «sufre»: cobran proporcional, ninguna sufre.
+3. **«La Piedra Única»** (`solvedSingleStone`) — vivencial: la red que Ohm no pudo distinguir de una piedra. Formal: **resistencia equivalente**; en fila se suman, en ramales se achican (con los casos vividos: dos iguales en paralelo = la mitad). ✎ *Si toda red puede ser una sola piedra… ¿qué piedra es tu casa entera, vista desde el medidor de la entrada?*
+4. **«La Escalera»** (formal mayor, `learnedKVL`) — el método de plegado etapa por etapa, el dibujo de la Escalera del valle, y la **página de predicción** estrenada: lo esperado, lo medido, la palabra IGUALES. Cierre: *«Hoy la Bitácora dejó de ser un diario. Ahora también es un mapa de lo que va a pasar.»* ✎ *Antes de enchufar algo nuevo en tu casa, ¿podrías decir si la llave va a saltar? Esa pregunta ya es ingeniería.*
+
+---
+
+## 8. Flags de la unidad
 
 ```txt
 playedUnit4Intro
-metVega
+metGuardiana
 solvedVoltageSteps
 solvedFairSplit
 solvedSingleStone
-predictionAttempted     (hizo al menos una predicción, acertada o no)
-predictionExact         (la primera predicción fue exacta — para sabor, no para gate)
+predictionAttempted
+predictionExact
 solvedLadder
 valleyRestored
 learnedKVL
@@ -142,11 +356,12 @@ unit4Completed
 
 ---
 
-## 5. Criterios de aceptación
+## 9. Criterios de aceptación
 
 El jugador puede decir, sin clase previa:
 
 - «El empuje baja por escalones; en toda vuelta completa, lo que sube baja.»
+- «El empuje y el río no son la misma cosa: en una fila el empuje cae y el río no.»
 - «En una fila, cada piedra cobra empuje según su proporción.»
 - «Una red entera se puede mirar como una sola piedra, y el río no nota la diferencia.»
 - «Puedo decir cuánto va a marcar la aguja ANTES de conectar — y verificarlo.»
@@ -155,10 +370,10 @@ Y recién después leer: *eso se llama ley de tensiones de Kirchhoff, divisor de
 
 ---
 
-## 6. Notas de coherencia y pendientes
+## 10. Notas de coherencia y pendientes
 
-1. **Nombre de Vega** (propuesta: Maesa Vega) — misma decisión pendiente que la Forjadora (U3 §6.1): los habitantes de Ohmdal sí llevan nombre.
-2. **La aritmética de la Escalera** es la deuda técnica de diseño más delicada del arco: fijar valores en build con enteros en TODOS los nodos y dos configuraciones válidas. Si no se logra con las piedras 1/2/4/8, considerar permitir filas de piedras como valores compuestos (ya canónico desde U3).
-3. **La página de predicción** es una pieza de UI nueva de la Bitácora — diseñarla reutilizable: U5 y el Arco II la van a querer.
-4. **El modo brazos de Ohm** debe nacer acá y quedar disponible en todos los bancos futuros (y en modo práctica de los viejos).
+1. **Nombre de la Guardiana** (propuesta: Vega) — pendiente del autor, junto con la Forjadora (Brasa) y el Farero (Ciro). El código usa el label «Guardiana».
+2. **La aritmética de §A.3 está verificada a mano** (enteros en todos los nodos, dos configuraciones válidas para el evento mayor). Es canon: contradicción ⇒ frenar y reportar.
+3. **El modo brazos de Ohm** nace acá y queda disponible en todos los bancos futuros (y en modo práctica de los viejos).
+4. **La página de predicción** es UI nueva de la Bitácora — diseñarla reutilizable: U5 la va a querer.
 5. **El cameo de la Consejera** es opcional: decidir según ritmo (la unidad ya tiene personaje nuevo).
