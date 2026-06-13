@@ -39,7 +39,7 @@ const YOUNG_FUSE_DIALOGUE =
   '<b>Lumen:</b> «¡Otro mártir del amanecer! …Ya ni los velo, fíjate.»';
 
 const BURNED_CHANNEL_DIALOGUE =
-  '<b>Forjadora:</b> «¿Y ESO quién lo repone? El fusible cuesta un cobre. El canal, una semana.»<br/>' +
+  '<b>Yesca:</b> «¿Y ESO quién lo repone? El fusible cuesta un cobre. El canal, una semana.»<br/>' +
   '<b>Lumen:</b> «…El gordo no era un santo. Era un cómplice.»';
 
 const SOLVED_DIALOGUE =
@@ -117,7 +117,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
       const actions = benchActions(bench.root, [
         { label: 'Alejarse', onClick: () => bench.close() },
         {
-          label: 'La Forjadora repara el canal',
+          label: 'Yesca repara el canal',
           onClick: repairChannel,
         },
         {
@@ -135,7 +135,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
           onClick: () => bench.close(opts.onSolved),
         },
       ]);
-      actions['La Forjadora repara el canal'].classList.add('hidden');
+      actions['Yesca repara el canal'].classList.add('hidden');
       actions['Reiniciar práctica'].classList.add('hidden');
       actions['Continuar'].classList.add('hidden');
 
@@ -158,7 +158,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
         if (result.event === 'burned-channel-demo') {
           sfxHot();
           stage.classList.add('channel-cut');
-          actions['La Forjadora repara el canal'].classList.remove('hidden');
+          actions['Yesca repara el canal'].classList.remove('hidden');
           if (!demoHandled) {
             demoHandled = true;
             opts.onBurnedChannel();
@@ -193,9 +193,9 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
       function repairChannel(): void {
         state = repairDemoChannel(state);
         stage.classList.remove('channel-cut');
-        actions['La Forjadora repara el canal'].classList.add('hidden');
+        actions['Yesca repara el canal'].classList.add('hidden');
         sfxBridge();
-        bench.setStatus('<b>Forjadora:</b> «Reempalmado. Las demostraciones también se cobran, Lumen.»');
+        bench.setStatus('<b>Yesca:</b> «Reempalmado. Las demostraciones también se cobran, Lumen.»');
         render();
       }
 
@@ -203,7 +203,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
         state = createInfirmaryState();
         demoHandled = false;
         stage.classList.remove('channel-cut');
-        actions['La Forjadora repara el canal'].classList.add('hidden');
+        actions['Yesca repara el canal'].classList.add('hidden');
         actions['Reiniciar práctica'].classList.add('hidden');
         bench.setStatus('Práctica reiniciada.');
         render();

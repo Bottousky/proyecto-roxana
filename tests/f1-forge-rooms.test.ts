@@ -33,9 +33,9 @@ includes(roomsSource, 'if (f().solvedFuseInfirmary) return null;', 'el Canal Lar
 includes(roomsSource, "to: 'forge_hall'", 'el Canal Largo conecta con la nave mayor');
 includes(roomsSource, 'if (f().solvedLongChannel) return null;', 'la nave abre con solvedLongChannel');
 
-includes(roomsSource, 'En mi casa, los misterios se resuelven en orden.', 'la puerta trabada de la enfermería tiene línea de la Forjadora');
+includes(roomsSource, 'En mi casa, los misterios se resuelven en orden.', 'la puerta trabada de la enfermería tiene línea de Yesca');
 includes(roomsSource, 'aquí se muere gente de cobre todos los días.', 'la puerta trabada del Canal Largo tiene línea de Lumen');
-includes(roomsSource, 'no puede alimentar tres máquinas juntas.', 'la puerta trabada de la nave tiene línea de la Forjadora');
+includes(roomsSource, 'no puede alimentar tres máquinas juntas.', 'la puerta trabada de la nave tiene línea de Yesca');
 equal(
   (roomsSource.match(/\/\/ TODO\(F[2345]\)/g) ?? []).length,
   0,
@@ -45,7 +45,7 @@ equal(
 for (const text of [
   '¿Tú eres quien anda encendiendo cosas? Bien. Tenemos que hablar.',
   'Tercer fusible de la semana. Y los canales entibian como sopa. Esto antes no pasaba.',
-  'Antes no pasaba NADA, Forjadora. Esa era exactamente la política.',
+  'Antes no pasaba NADA, Yesca. Esa era exactamente la política.',
   '…Touché.',
   'Mira: yo no entiendo de ríos ni de cuentas. Entiendo de carbón. Y desde que la Forja despertó, el carbón vuela. Algo se está yendo a alguna parte.',
   'Eso vine a preguntar. Medimos el río: no se gasta. Lo demostraron ustedes. Entonces, ¿qué es lo que falta cada mañana?',

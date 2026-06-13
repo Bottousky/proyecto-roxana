@@ -306,7 +306,7 @@ export function getEntries(): EntryView[] {
         ${f.burnedChannelDemo
           ? `<h4>El canal cortado</h4>
              <p>Vi el canal cortarse cuando el fusible gordo no lo protegió.
-             La Forjadora lo reemplazó. Entendí por qué el gordo no era un santo:
+             Yesca lo reemplazó. Entendí por qué el gordo no era un santo:
              era un cómplice.</p>`
           : `<p class="blank">(Hay un espacio en blanco aquí. La demo del fusible
              gordo se puede revisar en modo práctica en la enfermería.)</p>`}`,
@@ -335,7 +335,7 @@ export function getEntries(): EntryView[] {
         <p>Con mucho empuje y poco río, la misma entrega 16 llegaba al horno
         y el canal quedaba frío. O tibio, al límite justo.
         El horno no distinguía. El canal, sí.</p>
-        <p>La Forjadora apoyó la mano en el canal y la dejó ahí:
+        <p>Yesca apoyó la mano en el canal y la dejó ahí:
         «El río no se gasta. El río trabaja. Y el trabajo se paga.
         …Por fin alguien que lo dice con números.»</p>`,
       formal: f.learnedPower

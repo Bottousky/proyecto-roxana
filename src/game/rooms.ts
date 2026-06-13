@@ -555,16 +555,16 @@ function abrirBancoTimbre(): void {
 
 function hablarForjadoraPatio(): void {
   if (f().metForjadora) {
-    say(L('Forjadora', '¿Y? El canal sigue tibio y yo sigo pagando carbón. El banco está ahí.'));
+    say(L('Yesca', '¿Y? El canal sigue tibio y yo sigo pagando carbón. El banco está ahí.'));
     return;
   }
   say(
     [
-      L('Forjadora', '¿Tú eres quien anda encendiendo cosas? Bien. Tenemos que hablar.'),
-      L('Forjadora', 'Tercer fusible de la semana. Y los canales entibian como sopa. Esto antes no pasaba.'),
-      L('Consejera', 'Antes no pasaba NADA, Forjadora. Esa era exactamente la política.'),
-      L('Forjadora', '…Touché.'),
-      L('Forjadora', 'Mira: yo no entiendo de ríos ni de cuentas. Entiendo de carbón. Y desde que la Forja despertó, el carbón vuela. Algo se está yendo a alguna parte.'),
+      L('Yesca', '¿Tú eres quien anda encendiendo cosas? Bien. Tenemos que hablar.'),
+      L('Yesca', 'Tercer fusible de la semana. Y los canales entibian como sopa. Esto antes no pasaba.'),
+      L('Consejera', 'Antes no pasaba NADA, Yesca. Esa era exactamente la política.'),
+      L('Yesca', '…Touché.'),
+      L('Yesca', 'Mira: yo no entiendo de ríos ni de cuentas. Entiendo de carbón. Y desde que la Forja despertó, el carbón vuela. Algo se está yendo a alguna parte.'),
       L('Consejera', 'Eso vine a preguntar. Medimos el río: no se gasta. Lo demostraron ustedes. Entonces, ¿qué es lo que falta cada mañana?'),
       L('Edda', '…Esa es buena pregunta. Ohm: ¿tienes algo para el calor?'),
       L('Ohm', 'Modo nuevo disponible: termómetro. Apoyo la mano. Reporto el peaje.'),
@@ -595,7 +595,7 @@ function presentarEnfermeria(): void {
   say([
     L('Lumen', 'Mi enfermería. Bueno… mi cementerio, técnicamente. Cada uno de estos murió por la Forja.'),
     L('Lumen', 'Este murió joven. Este no murió nunca — y dejó morir al canal. Empiezo a sospechar, estudiante, que la santidad era una cuestión de calibre.'),
-    L('Forjadora', 'Yo necesito que dejen de morirse, Lumen. O al menos que se mueran con sentido.'),
+    L('Yesca', 'Yo necesito que dejen de morirse, Lumen. O al menos que se mueran con sentido.'),
     L('Ohm', 'Corrección: morirse con sentido es la función. Fusible = el que muere a propósito, para que no muera otra cosa.'),
     L('Edda', '…Eso es lo más bonito que dijiste nunca, Ohm.'),
     L('Ohm', 'Registro: poesía accidental. No se repetirá.'),
@@ -620,8 +620,8 @@ function presentarCanalLargo(): void {
   if (longChannelIntroSeen || f().solvedLongChannel) return;
   longChannelIntroSeen = true;
   say([
-    L('Forjadora', 'Mi horno. El bueno. Lleva años frío porque cada vez que lo alimentamos, el canal se pone al rojo a mitad de camino.'),
-    L('Forjadora', 'No se puede cambiar el canal. Pasa por abajo de media Forja. O lo alimentas con ESE cable, o no hay horno.'),
+    L('Yesca', 'Mi horno. El bueno. Lleva años frío porque cada vez que lo alimentamos, el canal se pone al rojo a mitad de camino.'),
+    L('Yesca', 'No se puede cambiar el canal. Pasa por abajo de media Forja. O lo alimentas con ESE cable, o no hay horno.'),
     L('Edda', 'Río suficiente para el horno, por un canal que no aguanta río… Suena a trampa.'),
     L('Ohm', 'Reformulación: entrega suficiente. La entrega viaja de más de una manera.'),
   ]);
@@ -632,7 +632,7 @@ function hablarForjadoraCanalLargo(): void {
     presentarCanalLargo();
     return;
   }
-  say(L('Forjadora', 'El horno sigue esperando al final del canal.'));
+  say(L('Yesca', 'El horno sigue esperando al final del canal.'));
 }
 
 function abrirBancoLongChannel(): void {
@@ -652,8 +652,8 @@ function presentarForjaCompleta(): void {
   if (forgeIntroSeen || f().solvedForgeNetwork) return;
   forgeIntroSeen = true;
   say([
-    L('Forjadora', 'Todo junto, una vez. Como cuando era niña.'),
-    L('Forjadora', 'Tres máquinas, un solo tronco, y el cobre que hay: un canal ancho, dos medios, dos angostos. Ni uno más. Repártelo bien.'),
+    L('Yesca', 'Todo junto, una vez. Como cuando era niña.'),
+    L('Yesca', 'Tres máquinas, un solo tronco, y el cobre que hay: un canal ancho, dos medios, dos angostos. Ni uno más. Repártelo bien.'),
     L('Consejera', 'Y yo anoto la entrega de cada una. Por hora.'),
     L('Consejera', 'Inventario de jornales. Este sí.'),
   ]);
@@ -665,10 +665,10 @@ function hablarForjadoraNave(): void {
     return;
   }
   if (f().forgeRestored) {
-    say(L('Forjadora', 'Ese compás. ESE.'));
+    say(L('Yesca', 'Ese compás. ESE.'));
     return;
   }
-  say(L('Forjadora', 'Tres máquinas, un tronco, el cobre que hay. Cuando estés listo: el tablero.'));
+  say(L('Yesca', 'Tres máquinas, un tronco, el cobre que hay. Cuando estés listo: el tablero.'));
 }
 
 function abrirBancoForge(): void {
@@ -692,7 +692,7 @@ function checkUnit3Complete(): void {
   setFlag('unit3Completed');
   const entradas = getEntries().length;
   const canales = f().burnedChannelDemo
-    ? 'Canales cortados: sí. (La Forjadora ya casi no te lo cobra.)'
+    ? 'Canales cortados: sí. (Yesca ya casi no te lo cobra.)'
     : 'Canales cortados: ninguno.';
   showEnd({
     title: 'Fin de la Unidad 3 — «El precio del río»',
@@ -711,8 +711,8 @@ function verElValle(): void {
     [
       L('Edda', '¿Ves el valle, allá abajo? Las Terrazas. El acueducto de cobre de los Maestros.'),
       L('Edda', 'Riega por niveles. O regaba.'),
-      L('Forjadora', 'Mi hierro va a las Terrazas desde siempre. La guardiana es de fiar — pero está paralizada: dice que el empuje «baja por escalones» y que la terraza más baja casi no recibe.'),
-      L('Forjadora', 'Treinta años sin tocar una piedra. Por miedo a que tocar una mueva todas. …Y lo peor es que tiene razón: mueve todas.'),
+      L('Yesca', 'Mi hierro va a las Terrazas desde siempre. La guardiana es de fiar — pero está paralizada: dice que el empuje «baja por escalones» y que la terraza más baja casi no recibe.'),
+      L('Yesca', 'Treinta años sin tocar una piedra. Por miedo a que tocar una mueva todas. …Y lo peor es que tiene razón: mueve todas.'),
       L('Ohm', 'Dato: correcto. Conclusión: incompleta. Lo que mueve todas… se puede contar todo.'),
       L('Edda', '(sonríe) Eso suena a próxima lección.'),
     ],
@@ -1808,7 +1808,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Enfermería de fusibles',
         locked: () => {
           if (f().solvedWarmChannel) return null;
-          return [L('Forjadora', 'Primero el canal tibio. En mi casa, los misterios se resuelven en orden.')];
+          return [L('Yesca', 'Primero el canal tibio. En mi casa, los misterios se resuelven en orden.')];
         },
       },
     ],
@@ -1833,7 +1833,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'forjadora-patio', x: 335, y: 320, w: 40, h: 40, shape: 'circle',
-        label: 'Forjadora', prompt: 'Hablar con la Forjadora',
+        label: 'Yesca', prompt: 'Hablar con Yesca',
         color: 0x9b5438, solid: true, emoji: '💬',
         onInteract: hablarForjadoraPatio,
       },
@@ -1930,7 +1930,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Nave mayor',
         locked: () => {
           if (f().solvedLongChannel) return null;
-          return [L('Forjadora', 'La nave mayor, todavía no. Quien no puede alimentar un horno lejano no puede alimentar tres máquinas juntas.')];
+          return [L('Yesca', 'La nave mayor, todavía no. Quien no puede alimentar un horno lejano no puede alimentar tres máquinas juntas.')];
         },
       },
     ],
@@ -1946,7 +1946,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'horno-lejano', x: 825, y: 120, w: 105, h: 90,
         label: 'Horno lejano', prompt: 'Mirar el horno',
         color: 0x5c3a2c, solid: true,
-        onInteract: () => say(L('', 'El horno lejano de la Forjadora lleva años frío.')),
+        onInteract: () => say(L('', 'El horno lejano de Yesca lleva años frío.')),
       },
       {
         id: 'banco-canal-largo', x: 450, y: 385, w: 200, h: 76,
@@ -1956,7 +1956,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'forjadora-canal-largo', x: 720, y: 370, w: 40, h: 40, shape: 'circle',
-        label: 'Forjadora', prompt: 'Hablar con la Forjadora',
+        label: 'Yesca', prompt: 'Hablar con Yesca',
         color: 0x9b5438, solid: true, emoji: '💬',
         onInteract: hablarForjadoraCanalLargo,
       },
@@ -2012,7 +2012,7 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'forjadora-nave', x: 740, y: 390, w: 40, h: 40, shape: 'circle',
-        label: 'Forjadora', prompt: 'Hablar con la Forjadora',
+        label: 'Yesca', prompt: 'Hablar con Yesca',
         color: 0x9b5438, solid: true, emoji: '💬',
         onInteract: hablarForjadoraNave,
       },

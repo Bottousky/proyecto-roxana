@@ -48,15 +48,15 @@ const sharedDialogue =
 
 equal(
   longChannelSolvedDialogue(pathB.level),
-  '<b>El horno lejano respira.</b> La Forjadora apoya la mano en el canal y la deja ahí.<br/><br/>' +
-    '<b>Forjadora:</b> «Frío. El horno a fuego pleno y el canal frío.<br/>' +
+  '<b>El horno lejano respira.</b> Yesca apoya la mano en el canal y la deja ahí.<br/><br/>' +
+    '<b>Yesca:</b> «Frío. El horno a fuego pleno y el canal frío.<br/>' +
     sharedDialogue,
   'B cierra con canal frío y conserva la secuencia común',
 );
 equal(
   longChannelSolvedDialogue(pathC.level),
-  '<b>El horno lejano respira.</b> La Forjadora apoya la mano en el canal y la deja ahí.<br/><br/>' +
-    '<b>Forjadora:</b> «Tibio. Apenas tibio, con el horno a fuego pleno. Treinta años creyendo que esto no se podía.<br/>' +
+  '<b>El horno lejano respira.</b> Yesca apoya la mano en el canal y la deja ahí.<br/><br/>' +
+    '<b>Yesca:</b> «Tibio. Apenas tibio, con el horno a fuego pleno. Treinta años creyendo que esto no se podía.<br/>' +
     sharedDialogue,
   'C cierra con canal tibio y conserva la secuencia común',
 );
@@ -94,7 +94,7 @@ equal(result.event, 'cut', 'tercera insistencia al rojo corta el canal');
 equal(result.state.channel.cut, true, 'el modelo conserva el canal cortado');
 
 cut = repairLongChannel(result.state);
-equal(cut.channel.cut, false, 'la Forjadora reempalma el canal');
+equal(cut.channel.cut, false, 'Yesca reempalma el canal');
 equal(cut.channel.insistences, 0, 'el reempalme reinicia las insistencias');
 equal(cut.repairs, 1, 'el reempalme cuenta para los comentarios');
 cut = setLongChannelPush(cut, 8);
@@ -154,7 +154,7 @@ for (const text of [
   'Una.',
   'Dos. Me estás cobrando el favor.',
   'Tres. La próxima lo reempalmas tú.',
-  'Misma entrega. Peaje distinto. La Forjadora prefiere el frío.',
+  'Misma entrega. Peaje distinto. Yesca prefiere el frío.',
   'Frío. El horno a fuego pleno y el canal frío.',
   'Tibio. Apenas tibio, con el horno a fuego pleno. Treinta años creyendo que esto no se podía.',
   'El río no se gasta. El río trabaja. Y el trabajo se paga. …Por fin alguien que lo dice con números.',

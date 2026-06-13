@@ -1,7 +1,7 @@
 import type { HeatLevel } from './common.ts';
 
 const SOLVED_SCENE =
-  '<b>El horno lejano respira.</b> La Forjadora apoya la mano en el canal y la deja ahí.<br/><br/>';
+  '<b>El horno lejano respira.</b> Yesca apoya la mano en el canal y la deja ahí.<br/><br/>';
 
 const SOLVED_OPENING = {
   frio: 'Frío. El horno a fuego pleno y el canal frío.',
@@ -21,7 +21,7 @@ export function longChannelSolvedDialogue(level: HeatLevel): string {
 
   return (
     SOLVED_SCENE +
-    `<b>Forjadora:</b> «${SOLVED_OPENING[level]}<br/>` +
+    `<b>Yesca:</b> «${SOLVED_OPENING[level]}<br/>` +
     SOLVED_SHARED_DIALOGUE
   );
 }

@@ -29,13 +29,13 @@ export interface AbrirLongChannelOptions {
 }
 
 const REPAIR_COMMENTS = [
-  '<b>Forjadora:</b> «Una.»',
-  '<b>Forjadora:</b> «Dos. Me estás cobrando el favor.»',
-  '<b>Forjadora:</b> «Tres. La próxima lo reempalmas tú.»',
+  '<b>Yesca:</b> «Una.»',
+  '<b>Yesca:</b> «Dos. Me estás cobrando el favor.»',
+  '<b>Yesca:</b> «Tres. La próxima lo reempalmas tú.»',
 ];
 
 const EQUIVALENCE_DIALOGUE =
-  '<b>Ohm:</b> «Misma entrega. Peaje distinto. La Forjadora prefiere el frío.»';
+  '<b>Ohm:</b> «Misma entrega. Peaje distinto. Yesca prefiere el frío.»';
 
 export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
   const practica = opts.practica ?? false;
@@ -141,7 +141,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
       const actions = benchActions(bench.root, [
         { label: 'Alejarse', onClick: () => bench.close() },
         {
-          label: 'La Forjadora reempalma',
+          label: 'Yesca reempalma',
           onClick: repair,
         },
         {
@@ -155,7 +155,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
           onClick: () => bench.close(opts.onSolved),
         },
       ]);
-      actions['La Forjadora reempalma'].classList.add('hidden');
+      actions['Yesca reempalma'].classList.add('hidden');
       actions['Continuar'].classList.add('hidden');
 
       function attempt(): void {
@@ -168,7 +168,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         if (result.event === 'cut' && visualResult === 'cut') {
           sfxHot();
           stage.classList.add('cut');
-          actions['La Forjadora reempalma'].classList.remove('hidden');
+          actions['Yesca reempalma'].classList.remove('hidden');
           bench.setStatus('El canal se corta a mitad de camino.');
           return;
         }
@@ -225,7 +225,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         state = repairLongChannel(state);
         breakable.reset();
         stage.classList.remove('cut');
-        actions['La Forjadora reempalma'].classList.add('hidden');
+        actions['Yesca reempalma'].classList.add('hidden');
         sfxBridge();
         const comment =
           REPAIR_COMMENTS[Math.min(state.repairs - 1, REPAIR_COMMENTS.length - 1)];

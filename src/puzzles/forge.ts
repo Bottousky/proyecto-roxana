@@ -66,14 +66,14 @@ const MACHINE_LABELS: Record<ForgeMachineId, string> = {
 const THICKNESSES: readonly ChannelThickness[] = ['ancho', 'medio', 'angosto'];
 
 const HUNGRY_DIALOGUE: Record<ForgeMachineId, string> = {
-  martillo: '<b>Forjadora:</b> «El Martillo pide y no le llega.»',
-  fuelle: '<b>Forjadora:</b> «El Fuelle pide y no le llega. Y un fuelle con hambre silba feo.»',
-  lumbre: '<b>Forjadora:</b> «La Lumbre pide y no le llega. Sin Lumbre no hay Forja: ella guarda el fuego madre.»',
+  martillo: '<b>Yesca:</b> «El Martillo pide y no le llega.»',
+  fuelle: '<b>Yesca:</b> «El Fuelle pide y no le llega. Y un fuelle con hambre silba feo.»',
+  lumbre: '<b>Yesca:</b> «La Lumbre pide y no le llega. Sin Lumbre no hay Forja: ella guarda el fuego madre.»',
 };
 
 const SOLVED_DIALOGUE =
   '<b>Los tres ritmos se traban en un compás: el Martillo marca, el Fuelle respira, la Lumbre sostiene. La Forja canta.</b><br/><br/>' +
-  '<b>Forjadora:</b> «<i>(escucha, los ojos cerrados)</i> Ese compás. ESE. Treinta años sin oírlo.<br/>' +
+  '<b>Yesca:</b> «<i>(escucha, los ojos cerrados)</i> Ese compás. ESE. Treinta años sin oírlo.<br/>' +
   'Dile a tu escuela que la Forja paga sus deudas: cuando necesiten hierro bien nacido, es acá.»<br/>' +
   '<b>Consejera:</b> «Entrega del Martillo: treinta y dos. Del Fuelle: dieciséis. De la Lumbre: ocho. Por hora, cincuenta y seis jornales.<br/>' +
   '<i>(pausa, hojea su libro viejo)</i> …Los lacres ceremoniales del Consejo consumían nueve. La biblioteca, ocho.<br/>' +
@@ -159,7 +159,7 @@ export function abrirForge(opts: AbrirForgeOptions): void {
           <div class="forge-stone-options" aria-label="Piedras para ${label}"></div>
           <div class="forge-selector" data-selector="thickness"></div>
           <div class="forge-selector" data-selector="fuse"></div>
-          <button class="forge-repair hidden">La Forjadora reempalma</button>`;
+          <button class="forge-repair hidden">Yesca reempalma</button>`;
 
         const stoneButtons: HTMLButtonElement[] = [];
         const stoneHost = card.querySelector<HTMLElement>('.forge-stone-options')!;
@@ -306,13 +306,13 @@ export function abrirForge(opts: AbrirForgeOptions): void {
             `Se cortó el canal de ${result.redMachines
               .filter((machineId) => state.branches[machineId].channel.cut)
               .map((machineId) => MACHINE_LABELS[machineId])
-              .join(', ')}. La Forjadora puede reempalmarlo.`,
+              .join(', ')}. Yesca puede reempalmarlo.`,
           );
           return;
         }
         if (result.event === 'channel-cut') {
           sfxDim();
-          bench.setStatus('Hay un canal cortado. La Forjadora debe reempalmarlo.');
+          bench.setStatus('Hay un canal cortado. Yesca debe reempalmarlo.');
           return;
         }
         if (result.event === 'invalid') {
@@ -361,7 +361,7 @@ export function abrirForge(opts: AbrirForgeOptions): void {
         state = repairForgeChannel(state, machineId);
         sfxBridge();
         bench.setStatus(
-          `La Forjadora reempalma el canal de ${MACHINE_LABELS[machineId]}.`,
+          `Yesca reempalma el canal de ${MACHINE_LABELS[machineId]}.`,
         );
         render();
       }

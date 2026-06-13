@@ -372,7 +372,7 @@ Y recién después leer: *eso se llama ley de tensiones de Kirchhoff, divisor de
 
 ## 10. Notas de coherencia y pendientes
 
-1. **Nombre de la Guardiana** (propuesta: Vega) — pendiente del autor, junto con la Forjadora (Brasa) y el Farero (Ciro). El código usa el label «Guardiana».
+1. **Nombre de la Guardiana** (propuesta: Vega) — pendiente del autor. La Forjadora ya se llama **Yesca** (decidido jun 2026, en el juego); el Farero sigue como rol (propuesta: Ciro). El código usa el label «Guardiana».
 2. **La aritmética de §A.3 está verificada a mano** (enteros en todos los nodos, dos configuraciones válidas para el evento mayor). Es canon: contradicción ⇒ frenar y reportar.
 3. **El modo brazos de Ohm** nace acá y queda disponible en todos los bancos futuros (y en modo práctica de los viejos).
 4. **La página de predicción** es UI nueva de la Bitácora — diseñarla reutilizable: U5 la va a querer.

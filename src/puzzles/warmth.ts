@@ -27,14 +27,14 @@ const FUELLE_DIALOGUE =
   '<b>Ohm:</b> «Mismo río. Más cauce. Menos peaje.»';
 
 const VIEJO_DIALOGUE =
-  '<b>Forjadora:</b> «Ese canal tiene cien años y está helado. Así que no es la edad. Mi abuelo SIEMPRE dijo que era la edad.»';
+  '<b>Yesca:</b> «Ese canal tiene cien años y está helado. Así que no es la edad. Mi abuelo SIEMPRE dijo que era la edad.»';
 
 const DUPLICADO_DIALOGUE =
   '<b>Ohm:</b> «Doble de río. Cuádruple de peaje. Anótelo.»<br/>' +
   '<b>Consejera:</b> «YA lo anoté. Es mi línea, calderito.»';
 
 const SOLVED_DIALOGUE =
-  '<b>Forjadora:</b> «A ver si entendí: el calor no es fantasma ni vejez. Es el precio del paso. Más río por el mismo canal, más caro el peaje.<br/>…¿Y quién lo cobra?»<br/>' +
+  '<b>Yesca:</b> «A ver si entendí: el calor no es fantasma ni vejez. Es el precio del paso. Más río por el mismo canal, más caro el peaje.<br/>…¿Y quién lo cobra?»<br/>' +
   '<b>Edda:</b> «El aire, supongo. Se lo lleva y no da recibo.»';
 
 interface ChannelRefs {

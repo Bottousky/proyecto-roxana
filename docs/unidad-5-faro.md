@@ -321,7 +321,7 @@ Y recién después leer: *eso se llama capacitor, y al ritmo se lo conoce como R
 
 ## 9. Notas de coherencia y pendientes
 
-1. **Nombre del Farero** (propuesta: Ciro) — pendiente del autor, junto con la Forjadora (Brasa) y la Guardiana (Vega). El código usa el label «Farero».
+1. **Nombre del Farero** (propuesta: Ciro) — pendiente del autor. La Forjadora ya se llama **Yesca** (decidido jun 2026, en el juego); la Guardiana sigue como rol (propuesta: Vega). El código usa el label «Farero».
 2. **El banco con tick de tiempo real** es la novedad técnica (§A.6): diseñar el tick reutilizable y limpiarlo al cerrar el banco (sin fugas de timers). Es el «delicado» de la unidad.
 3. **La matemática de §A.3 es producto puro** (ritmo = estanque × freno), enteros garantizados. Contradicción ⇒ frenar y reportar (no debería haber).
 4. **La noche de Ohmdal** pide más producción audiovisual que cualquier escena previa (mapa completo, luces, audio en capas). Es EL tráiler del juego: presupuestarla como tal. En greybox: una pantalla compuesta con los cinco lugares iluminados + audio en capas de los cinco ambientes.

@@ -51,7 +51,7 @@ equal(result.event, 'burned-channel-demo', 'A con fusible 8 vive la falla simula
 equal(result.state.burnedChannelDemo, true, 'la demo queda registrada');
 equal(result.state.channelCut, true, 'la falla simulada corta el canal angosto');
 const repaired = repairDemoChannel(result.state);
-equal(repaired.channelCut, false, 'la Forjadora puede reparar el canal sin castigo');
+equal(repaired.channelCut, false, 'Yesca puede reparar el canal sin castigo');
 equal(repaired.fuses.A, 8, 'reparar conserva el fusible elegido');
 result = startForge(repaired);
 equal(result.event, 'incomplete', 'la demo ocurre una sola vez y no bloquea nuevos arranques');

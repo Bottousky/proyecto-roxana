@@ -40,7 +40,7 @@ Instrumento nuevo: el **termómetro de canal** (Ohm gana el modo termómetro: ap
 ### A.3. Matemática canónica (enteros, decidida — los ejecutores no la cambian)
 
 - **Río** = Empuje / Piedra. **Entrega** = Empuje × Río. Piedras marrón 1 / roja 2 / amarilla 4 / gris 8; **filas de piedras se suman** (U2).
-- **Grosores de canal y termómetro:** angosto tolera río 2, medio 4, ancho 8. Termómetro: **frío** si río ≤ mitad de la tolerancia; **tibio** si ≤ tolerancia; **caliente** si ≤ 1.5×; **al rojo** si más. Un canal al rojo, a la **tercera insistencia, se corta** (reparable: la Forjadora lo reempalma, comentario distinto cada vez — patrón fusible de Lumen).
+- **Grosores de canal y termómetro:** angosto tolera río 2, medio 4, ancho 8. Termómetro: **frío** si río ≤ mitad de la tolerancia; **tibio** si ≤ tolerancia; **caliente** si ≤ 1.5×; **al rojo** si más. Un canal al rojo, a la **tercera insistencia, se corta** (reparable: Yesca lo reempalma, comentario distinto cada vez — patrón fusible de Lumen).
 - **Peaje cuadrático vivido:** duplicar el río en un mismo canal salta DOS niveles de termómetro («el doble de río, cuatro veces el peaje» — medido, jamás formulado).
 - **Arranque de máquina:** al arrancar, cada máquina pica el río a **río de trabajo + 1** por un instante. **Fusible** calibre 1/2/4/8: se inmola **solo si el río lo supera estrictamente** (río > calibre; aviso/vibración antes, patrón U2) — el pico igual al calibre se aguanta. **Regla de la enfermería:** el fusible correcto es **el menor calibre que el pico no supera** (calibre ≥ pico) y que **salte antes de que el canal llegue al rojo**. Con picos 2/3/5 (máquinas A/B/C): correctos 2/4/8.
 
@@ -56,7 +56,7 @@ Instrumento nuevo: el **termómetro de canal** (Ohm gana el modo termómetro: ap
 
 ### A.5. Personajes
 
-- **La Forjadora** *(nueva; propuesta de nombre: Brasa — pendiente del autor; en el guion habla como «Forjadora»)* — práctica, sin paciencia para doctrinas: SIEMPRE supo que algo se pagaba, porque su gremio lo paga en carbón. No pide consuelo: pide **cuánto**.
+- **Yesca** *(nombre decidido por el autor, jun 2026 — antes se proponía «Brasa», descartado por colisión con el cristal de empuje «Brasa» de la U1; en el juego habla como «Yesca». La yesca es lo que toma la chispa y la vuelve fuego: apto para la forjadora del mundo de la chispa)* — práctica, sin paciencia para doctrinas: SIEMPRE supo que algo se pagaba, porque su gremio lo paga en carbón. No pide consuelo: pide **cuánto**.
 - **La Consejera** — aliada. Su libro por primera vez cuenta algo real: jornales. Humor: descubre que los lacres del Consejo consumían más que la biblioteca.
 - **Edda** — aprende a enseñar: fracasa con palabras, acierta dejando tocar.
 - **Maese Lumen** — la enfermería lo obliga a aceptar que sus mártires estaban **mal elegidos**. De venerar el sacrificio a calcular el margen.
@@ -90,18 +90,18 @@ Flag: `playedUnit3Intro`. El portal lleva a la plaza; en la plaza (nocturna), el
 
 **ID propuesto:** `MAP_FORGE_YARD` · 5–6 min · **Puzzle 1 (tutorial de medición)**
 
-Patio de piedra y cobre. Martillos que caen solos al fondo. La **Forjadora** espera en la puerta con un fusible muerto en la mano. La **Consejera** llega con su libro.
+Patio de piedra y cobre. Martillos que caen solos al fondo. **Yesca** espera en la puerta con un fusible muerto en la mano. La **Consejera** llega con su libro.
 
-**Forjadora:**
+**Yesca:**
 
 > ¿Tú eres quien anda encendiendo cosas? Bien. Tenemos que hablar.
 > Tercer fusible de la semana. Y los canales entibian como sopa. Esto antes no pasaba.
 
 **Consejera:**
 
-> Antes no pasaba NADA, Forjadora. Esa era exactamente la política.
+> Antes no pasaba NADA, Yesca. Esa era exactamente la política.
 
-**Forjadora:**
+**Yesca:**
 
 > …Touché.
 > Mira: yo no entiendo de ríos ni de cuentas. Entiendo de carbón. Y desde que la Forja despertó, el carbón vuela. Algo se está yendo a alguna parte.
@@ -127,12 +127,12 @@ Experiencias (en cualquier orden):
 
 1. **Canal del martillo** (río 4, angosto): **al rojo.** — **Ohm:** «Río: grande. Canal: chico. Peaje: en curso.»
 2. **Canal del fuelle** (río 4, ancho): **frío.** — **Edda:** «¡El mismo río! ¿Por qué este ni se entera?» **Ohm:** «Mismo río. Más cauce. Menos peaje.»
-3. **Canal viejo** (río 0): **frío**, aunque es el más viejo del patio. — **Forjadora:** «Ese canal tiene cien años y está helado. Así que no es la edad. Mi abuelo SIEMPRE dijo que era la edad.»
+3. **Canal viejo** (río 0): **frío**, aunque es el más viejo del patio. — **Yesca:** «Ese canal tiene cien años y está helado. Así que no es la edad. Mi abuelo SIEMPRE dijo que era la edad.»
 4. **Duplicar el río del yunque** (llave, 2 → 4): el termómetro salta de tibio a **al rojo** — dos niveles de un golpe, sin pasar por caliente. — **Ohm:** «Doble de río. Cuádruple de peaje. Anótelo.» **Consejera:** «YA lo anoté. Es mi línea, calderito.»
 
 Cierre:
 
-**Forjadora:**
+**Yesca:**
 
 > A ver si entendí: el calor no es fantasma ni vejez. Es el precio del paso. Más río por el mismo canal, más caro el peaje.
 > …¿Y quién lo cobra?
@@ -156,7 +156,7 @@ El taller de Lumen dentro de la Forja: una pared entera de fusibles muertos, eti
 > Mi enfermería. Bueno… mi cementerio, técnicamente. Cada uno de estos murió por la Forja.
 > Este murió joven. Este no murió nunca — y dejó morir al canal. Empiezo a sospechar, estudiante, que la santidad era una cuestión de calibre.
 
-**Forjadora:**
+**Yesca:**
 
 > Yo necesito que dejen de morirse, Lumen. O al menos que se mueran con sentido.
 
@@ -180,7 +180,7 @@ El taller de Lumen dentro de la Forja: una pared entera de fusibles muertos, eti
 Comportamiento:
 
 - **Fusible ≤ pico de arranque:** muere al arrancar («joven»). — **Lumen:** «¡Otro mártir del amanecer! …Ya ni los velo, fíjate.»
-- **Fusible demasiado gordo** (no salta antes del rojo del canal, demostración guiada con una falla simulada en la máquina A): el canal se corta primero. — **Forjadora:** «¿Y ESO quién lo repone? El fusible cuesta un cobre. El canal, una semana.» **Lumen:** «…El gordo no era un santo. Era un cómplice.»
+- **Fusible demasiado gordo** (no salta antes del rojo del canal, demostración guiada con una falla simulada en la máquina A): el canal se corta primero. — **Yesca:** «¿Y ESO quién lo repone? El fusible cuesta un cobre. El canal, una semana.» **Lumen:** «…El gordo no era un santo. Era un cómplice.»
 - **Correctos:** A→2, B→4, C→8. Al arrancar la Forja con los tres bien: ritmo de martillos estable.
 
 Cierre:
@@ -198,9 +198,9 @@ Flags: `solvedFuseInfirmary`, `burnedChannelDemo` (si vivió la demo del canal).
 
 **ID:** `MAP_FORGE_LONGCHANNEL` · 6–8 min · **Puzzle 3 — el corazón conceptual**
 
-Detrás de la Forja, un canal angosto de doscientos pasos cruza el patio viejo hasta el **horno lejano** de la Forjadora. Imposible de recablear: pasa bajo tres edificios.
+Detrás de la Forja, un canal angosto de doscientos pasos cruza el patio viejo hasta el **horno lejano** de Yesca. Imposible de recablear: pasa bajo tres edificios.
 
-**Forjadora:**
+**Yesca:**
 
 > Mi horno. El bueno. Lleva años frío porque cada vez que lo alimentamos, el canal se pone al rojo a mitad de camino.
 > No se puede cambiar el canal. Pasa por abajo de media Forja. O lo alimentas con ESE cable, o no hay horno.
@@ -218,19 +218,19 @@ Detrás de la Forja, un canal angosto de doscientos pasos cruza el patio viejo h
 **ID:** `PUZZLE_LONG_CHANNEL` · 5–7 min
 **Vista de banco:** cristal de Empuje elegible (4 / 8 / 16), engaste de piedras **en fila** (U2: los frenos en fila se suman) junto al horno, el canal largo angosto (tolera río 2) con termómetro en tres puntos, y la placa del horno: **ENTREGA 16**.
 
-- **Camino A (la trampa natural):** Empuje 4 + marrón → río 4 → entrega 16 ✓… y el canal **al rojo** (a la tercera insistencia se corta; la Forjadora lo reempalma: «Una.» / «Dos. Me estás cobrando el favor.» / «Tres. La próxima lo reempalmas tú.»).
+- **Camino A (la trampa natural):** Empuje 4 + marrón → río 4 → entrega 16 ✓… y el canal **al rojo** (a la tercera insistencia se corta; Yesca lo reempalma: «Una.» / «Dos. Me estás cobrando el favor.» / «Tres. La próxima lo reempalmas tú.»).
 - **Camino B (canónico):** Empuje 16 + gris+gris en fila (16) → río 1 → entrega 16 ✓ — canal **frío**.
 - **Camino C (también válido):** Empuje 8 + amarilla → río 2 → entrega 16 ✓ — canal **tibio**, al límite justo.
 
-Si el jugador encuentra B y C: **Ohm:** «Misma entrega. Peaje distinto. La Forjadora prefiere el frío.»
+Si el jugador encuentra B y C: **Ohm:** «Misma entrega. Peaje distinto. Yesca prefiere el frío.»
 
-Resolución (con B o C): el horno lejano respira, y la Forjadora apoya la mano en el canal — y la deja ahí. Su primera línea depende del camino:
+Resolución (con B o C): el horno lejano respira, y Yesca apoya la mano en el canal — y la deja ahí. Su primera línea depende del camino:
 
-**Forjadora** *(si resolvió con B — canal frío)*:
+**Yesca** *(si resolvió con B — canal frío)*:
 
 > Frío. El horno a fuego pleno y el canal frío.
 
-**Forjadora** *(si resolvió con C — canal tibio)*:
+**Yesca** *(si resolvió con C — canal tibio)*:
 
 > Tibio. Apenas tibio, con el horno a fuego pleno. Treinta años creyendo que esto no se podía.
 
@@ -256,7 +256,7 @@ Flags: `solvedLongChannel`. Bitácora «La Entrega» (vivencial).
 
 La nave central: tres máquinas mayores apagadas — el **Martillo** (placa: ENTREGA 32), el **Fuelle** (ENTREGA 16) y la **Lumbre** (ENTREGA 8) — y el tablero de la Forja con su cristal de bus.
 
-**Forjadora:**
+**Yesca:**
 
 > Todo junto, una vez. Como cuando era niña.
 > Tres máquinas, un solo tronco, y el cobre que hay: un canal ancho, dos medios, dos angostos. Ni uno más. Repártelo bien.
@@ -272,13 +272,13 @@ La nave central: tres máquinas mayores apagadas — el **Martillo** (placa: ENT
 
 Solución canónica (Empuje 8): Martillo roja → río 4 (pico 5) → canal **ancho** + fusible 8 · Fuelle amarilla → río 2 (pico 3) → canal **medio** + fusible 4 · Lumbre gris → río 1 (pico 2) → canal **angosto** + fusible 2. Tronco 7 ≤ 8 ✓. **El Martillo exige el único canal ancho** (con pico 5, el fusible 8 obligado solo protege a un canal que aguante más que él: la máquina grande reclama el cobre grande — y descubrirlo es parte del puzzle). **Alternativa válida por margen:** la Lumbre en el **segundo canal medio** con fusible 2 (pico 2: frío en el medio; el fusible salta mucho antes del rojo). El banco acepta toda combinación que cumpla las condiciones; con **Empuje 16 no hay solución** (la Lumbre pediría río ½): deliberado, eco del Repartidor.
 
-Feedback de fallo (información, nunca castigo): máquina hambrienta = su placa parpadea y la Forjadora la nombra («El Martillo pide y no le llega.»); canal excedido = termómetro y, a la tercera, corte reparable; fusible mal elegido = muere al arrancar o deja sufrir al canal (diálogos de la enfermería reutilizables).
+Feedback de fallo (información, nunca castigo): máquina hambrienta = su placa parpadea y Yesca la nombra («El Martillo pide y no le llega.»); canal excedido = termómetro y, a la tercera, corte reparable; fusible mal elegido = muere al arrancar o deja sufrir al canal (diálogos de la enfermería reutilizables).
 
 ### Resolución
 
 Los tres ritmos se traban en un compás: el Martillo marca, el Fuelle respira, la Lumbre sostiene. **La Forja canta.**
 
-**Forjadora:**
+**Yesca:**
 
 > *(escucha, los ojos cerrados)* Ese compás. ESE. Treinta años sin oírlo.
 > Dile a tu escuela que la Forja paga sus deudas: cuando necesiten hierro bien nacido, es acá.
@@ -310,7 +310,7 @@ La Forja en ritmo, de noche. El compás se oye desde la plaza (cambio permanente
 > ¿Ves el valle, allá abajo? Las Terrazas. El acueducto de cobre de los Maestros.
 > Riega por niveles. O regaba.
 
-**Forjadora:**
+**Yesca:**
 
 > Mi hierro va a las Terrazas desde siempre. La guardiana es de fiar — pero está paralizada: dice que el empuje «baja por escalones» y que la terraza más baja casi no recibe.
 > Treinta años sin tocar una piedra. Por miedo a que tocar una mueva todas. …Y lo peor es que tiene razón: mueve todas.
@@ -371,7 +371,7 @@ Y recién después leer: *eso se llama potencia, efecto Joule y energía.*
 
 ## 10. Notas de coherencia y pendientes
 
-1. **Nombre de la Forjadora** («Brasa») — pendiente del autor; decidir junto con Vega (U4) y Ciro (U5). El código usa el label «Forjadora».
+1. **Nombre de Yesca** — DECIDIDO (jun 2026), reemplaza a «Brasa» (que colisionaba con el cristal de empuje de la U1). Está en el juego. La Guardiana (U4) y el Farero (U5) siguen como roles; el autor puede nombrarlos cuando quiera.
 2. **Continuidad:** el canal que Lumen tocó en el cierre de la U2 (plaza nocturna) es el mismo que alimenta la Forja; el Camino a la Forja sale de la plaza.
 3. La matemática de §A.3 es **canon de diseño**: si un ejecutor encuentra una contradicción, frena y reporta (no la resuelve).
 4. El compás de la Forja queda como **ambience permanente** del distrito tras `forgeRestored` (variación del tema del Castillo con percusión grave).

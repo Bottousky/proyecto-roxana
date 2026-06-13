@@ -253,7 +253,7 @@ const repaired = repairForgeChannel(redAttempt.state, 'martillo');
 equal(
   repaired.branches.martillo.channel.cut,
   false,
-  'la Forjadora puede reparar el canal cortado',
+  'Yesca puede reparar el canal cortado',
 );
 equal(
   repaired.branches.martillo.channel.insistences,
