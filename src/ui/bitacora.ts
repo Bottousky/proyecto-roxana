@@ -5,6 +5,7 @@ import { state, resetSave } from '../state';
 import { sfxUIOpen, sfxUIClose } from '../audio';
 
 let isOpen = false;
+const openedEntries = new Set<string>();
 
 /** Muestra el botón del HUD (cuando el jugador obtiene la Bitácora). */
 export function showBitacoraButton(): void {
@@ -21,6 +22,7 @@ export function notifyNewEntry(title: string): void {
 export function openBitacora(entryId?: string): void {
   if (isOpen) return;
   isOpen = true;
+  if (entryId) openedEntries.add(entryId);
   pushUI();
   sfxUIOpen();
   el('bitacora-dot').classList.add('hidden');
@@ -103,6 +105,10 @@ export function openBitacora(entryId?: string): void {
   index.appendChild(footer);
 
   renderEntry();
+}
+
+export function wasBitacoraEntryOpened(entryId: string): boolean {
+  return openedEntries.has(entryId);
 }
 
 export function closeBitacora(): void {

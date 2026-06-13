@@ -7,6 +7,7 @@ export interface EndOptions {
   note: string;
   continueLabel: string;
   onContinue: () => void;
+  variant?: 'arc';
 }
 
 export function showEnd(opts: EndOptions): void {
@@ -15,7 +16,7 @@ export function showEnd(opts: EndOptions): void {
   pushUI();
   sfxWin();
   host.innerHTML = `
-    <div class="title-card">
+    <div class="title-card${opts.variant === 'arc' ? ' arc-final' : ''}">
       <h1>Ω</h1>
       <h2>${opts.title}</h2>
       <p class="note">${opts.note}</p>

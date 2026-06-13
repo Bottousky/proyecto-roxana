@@ -1,6 +1,11 @@
 import { state, setFlag, hooks } from '../state';
 import { say, L, type Line } from '../ui/dialog';
-import { showBitacoraButton, notifyNewEntry, openBitacora } from '../ui/bitacora';
+import {
+  showBitacoraButton,
+  notifyNewEntry,
+  openBitacora,
+  wasBitacoraEntryOpened,
+} from '../ui/bitacora';
 import { abrirDespertar } from '../puzzles/despertar';
 import { abrirFreno } from '../puzzles/freno';
 import { abrirPuerta } from '../puzzles/puerta';
@@ -312,6 +317,54 @@ function hablarFareroLinterna(): void {
     L('Farero', 'No tengo planos. Tengo el oído. Mi padre me lo pasó, y a él el suyo.'),
     L('Farero', 'Ustedes ármenlo. Yo les digo cuándo. Cierro los ojos y escucho. Cuando el latido sea EL latido, lo van a saber porque se me van a llenar los ojos. No lo puedo evitar.'),
   ]);
+}
+
+function cerrarArcoUno(): void {
+  if (!f().learnedCapacitor || f().arcOneCompleted) return;
+  setAmbience('ohmdal-on');
+  say(
+    [
+      L('', 'La cámara se aleja. Ohmdal entero aparece encendido bajo la noche.'),
+      L('', 'En la plaza, la campana responde a la Ley de Ohm: empuje y freno en la medida justa.'),
+      L('', 'El Castillo sostiene sus tres distritos con la Regla del Cruce: el río no se gasta, se reparte.'),
+      L('', 'La Forja trabaja en ritmo con la Entrega: empuje por río, trabajo que llega y peaje que se paga.'),
+      L('', 'Las Terrazas brillan regadas por la Regla de la Vuelta: todo lo que sube, baja.'),
+      L('', 'El Reloj marca y el Faro late por la Chispa que se queda: lo guardado espera y vuelve.'),
+      L('Edda', 'Cinco lugares. Cinco lecciones. Y la chispa que «se estaba acabando» encendió todo, sin gastarse.'),
+      L('Edda', '…Quiero estar del otro lado, alguna vez. Quiero que alguien me lo pregunte a MÍ. Con las manos, como hiciste vos.'),
+      L('Maese Lumen', 'Yo cuidé esto cuarenta años sin entenderlo. Ustedes lo entendieron en cinco lunas.'),
+      L('Maese Lumen', '…Gracias por no decírmelo en voz alta. Mis mártires van al museo de la Forja. Que aprendan los jóvenes lo que era el miedo.'),
+      L('Consejera', 'Inventario final del Consejo: la chispa no disminuyó en cuarenta años. La estábamos guardando para nadie. Caso cerrado.'),
+      L('Ohm', 'Registro: red de Ohmdal completa. Estado: viva en el tiempo. Promesa de la primera lección: cumplida.'),
+      L('', 'En lo alto del Faro, el Farero muestra un ojo de cristal. Cuando la luz lo toca, mueve una aguja sin que nadie lo haya conectado a nada.'),
+      L('Edda', '¿Y a ESE quién lo empuja? Un rayo de luz… ¿empujando un río?'),
+      L('Farero', 'Eso, jóvenes, es de otra noche. La materia que decide. Yo ya tengo bastante con mi latido.'),
+    ],
+    () => {
+      if (!wasBitacoraEntryOpened('el-arco-del-rio')) {
+        notifyNewEntry('El Arco del Río');
+      }
+      setFlag('arcOneCompleted');
+      setFlag('sawCrystalEye');
+      setFlag('unit5Completed');
+      const entradas = getEntries().length;
+      showEnd({
+        title: 'Fin del Arco I — «El Río» · Ohmdal, cinco unidades',
+        variant: 'arc',
+        note: `
+          Entradas en la Bitácora: ${entradas}<br/><br/>
+          <strong>Unidad 1 · La plaza:</strong> la Ley de Ohm encendió la campana.<br/>
+          <strong>Unidad 2 · El Castillo:</strong> la Regla del Cruce sostuvo sus tres distritos.<br/>
+          <strong>Unidad 3 · La Forja:</strong> la Entrega devolvió el ritmo al trabajo.<br/>
+          <strong>Unidad 4 · Las Terrazas:</strong> la Regla de la Vuelta regó el valle.<br/>
+          <strong>Unidad 5 · El Reloj y el Faro:</strong> la Chispa que se queda les devolvió el tiempo.<br/><br/>
+          <em>Semilla de otra historia: un ojo de cristal que responde a la luz.</em>
+        `,
+        continueLabel: 'Continuar',
+        onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+      });
+    },
+  );
 }
 
 function abrirCampanaUnidad2(): void {
@@ -2510,9 +2563,19 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'lago-negro', x: 165, y: 150, w: 180, h: 95,
-        label: 'Lago negro', prompt: 'Mirar el lago',
+        label: 'Ohmdal de noche', prompt: 'Mirar Ohmdal de noche',
         color: 0x142b3a, solid: false,
-        onInteract: () => say(L('', 'El agua absorbe la noche. Un trueno lejano tarda en llegar hasta la torre.')),
+        onInteract: () => {
+          if (f().learnedCapacitor && !f().arcOneCompleted) {
+            cerrarArcoUno();
+            return;
+          }
+          if (f().arcOneCompleted) {
+            say(L('', 'Ohmdal sigue encendido. El Reloj marca y el Faro late sobre el lago.'));
+            return;
+          }
+          say(L('', 'El agua absorbe la noche. Un trueno lejano tarda en llegar hasta la torre.'));
+        },
       },
       {
         id: 'banco-latido', x: 480, y: 405, w: 250, h: 80,

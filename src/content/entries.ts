@@ -470,5 +470,102 @@ export function getEntries(): EntryView[] {
     });
   }
 
+  /* ============ UNIDAD 5 — El Faro ============ */
+
+  if (f.solvedStoredSpark) {
+    out.push({
+      id: 'la-chispa-que-se-queda',
+      title: 'La chispa que se queda',
+      fecha: 'El Faro — sala de la máquina',
+      vivencial: `
+        <p>El Estanque, ya lleno, brilló sin camino. No era una regla rota:
+        lo guardado se devuelve.</p>
+        <p>Primero dejó pasar el río. Después, cuando estuvo lleno, se volvió
+        una pared que recuerda.</p>`,
+      formal: f.learnedCapacitor
+        ? `
+        <h4>El capacitor</h4>
+        <p>El Estanque es un <strong>capacitor</strong>: un almacén de carga.</p>
+        <h4>Error común</h4>
+        <p>«El capacitor deja pasar el río.» Pasa mientras se llena; lleno,
+        es una pared que recuerda.</p>`
+        : `<p class="blank">La Bitácora tiene espacio para el nombre verdadero
+           del Estanque. Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.solvedSleepingRiver) {
+    out.push({
+      id: 'el-rio-que-se-duerme',
+      title: 'El río que se duerme',
+      fecha: 'El Faro — taller del Farero',
+      vivencial: `
+        <p>La aguja murió sola mientras el Estanque se llenaba.</p>
+        <p>El Estanque grande y el canal angosto tardaron más. El chico y el
+        canal ancho, casi nada. La espera también se puede elegir.</p>`,
+      formal: f.learnedCapacitor
+        ? `
+        <p>La <strong>carga no es instantánea</strong>: el tiempo de llenado
+        crece con el tamaño del Estanque y con el freno del canal.</p>
+        <div class="pregunta">✎ ¿Qué se llena despacio y se vuelca de golpe
+        en tu casa? Pista: hay una en el baño.</div>`
+        : `<p class="blank">La Bitácora espera el nombre verdadero de esta
+           demora. Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.solvedClock) {
+    out.push({
+      id: 'el-tic',
+      title: 'El tic',
+      fecha: 'Ohmdal — Torre del Reloj',
+      vivencial: `
+        <p>El Reloj aceptó tres soluciones distintas: Estanque chico con freno
+        grande, mediano con mediano, grande con chico.</p>
+        <p>Otro Estanque. El mismo tiempo. Tres caminos para un tic justo.</p>`,
+      formal: f.learnedCapacitor
+        ? `
+        <p><strong>Llenado + umbral = ritmo.</strong> Elegir Estanque y freno
+        es elegir el tiempo.</p>
+        <p><em>Mucho después lo llamaron circuito RC. La R y la C son la piedra
+        y el estanque. El tiempo siempre fue de ellos.</em></p>`
+        : `<p class="blank">La Bitácora dejó un margen para el nombre de este
+           ritmo. Todavía no llegó.</p>`,
+    });
+  }
+
+  if (f.learnedCapacitor) {
+    out.push({
+      id: 'el-arco-del-rio',
+      title: 'El Arco del Río',
+      fecha: 'Ohmdal — la noche completa',
+      vivencial: `
+        <p>El mapa de Ohmdal está completo: la plaza con su campana, el Castillo
+        con sus tres distritos, la Forja en ritmo, las Terrazas regadas, el Reloj
+        marcando y el Faro latiendo sobre el lago.</p>
+        <p>Cinco restauraciones. Cinco lecciones. Una sola red viva en el tiempo.</p>`,
+      formal: f.learnedCapacitor
+        ? `
+        <h4>Las cinco reglas del Arco del Río</h4>
+        <ol>
+          <li><strong>La Ley de Ohm:</strong> el río crece con el empuje y baja
+          con el freno.</li>
+          <li><strong>La Regla del Cruce:</strong> el río no se gasta; se reparte.
+          Lo que entra en un cruce, sale.</li>
+          <li><strong>La Entrega:</strong> el trabajo que llega es empuje por río,
+          y el paso cobra su peaje.</li>
+          <li><strong>La Regla de la Vuelta:</strong> en una vuelta completa,
+          todo lo que sube, baja.</li>
+          <li><strong>La Chispa que se queda:</strong> puede guardarse, esperar
+          y volver cuando el camino la necesita.</li>
+        </ol>
+        <p><strong>El río ya no es un misterio. Ahora es una herramienta.
+        Lo que sigue no es más río: es enseñarle a decidir.</strong></p>
+        <div class="pregunta">✎ <strong>El ojo de cristal</strong><br/><br/>
+        <span class="blank">Esta página está en blanco.</span></div>`
+        : `<p class="blank">Las reglas esperan su nombre verdadero.</p>`,
+    });
+  }
+
   return out;
 }

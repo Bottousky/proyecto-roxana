@@ -1387,6 +1387,17 @@ button.forge-slot { cursor: pointer; }
 }
 .title-card h2 { font-size: 19px; font-weight: 400; color: var(--accent); margin-bottom: 14px; font-style: italic; }
 .title-card .note { color: #887f90; font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
+.title-card.arc-final {
+  max-width: 680px;
+  padding: 34px 42px;
+  border: 1px solid rgba(176,141,42,.5);
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 0%, rgba(176,141,42,.14), rgba(16,14,21,.78) 62%);
+  box-shadow: 0 0 60px rgba(176,141,42,.12), 0 24px 80px rgba(0,0,0,.45);
+}
+.title-card.arc-final h1 { font-size: 62px; text-shadow: 0 0 28px rgba(230,201,112,.38); }
+.title-card.arc-final h2 { font-size: 24px; }
+.title-card.arc-final .note { color: #aaa1b2; line-height: 1.7; }
 .title-buttons { display: flex; gap: 14px; justify-content: center; margin-bottom: 26px; }
 .title-buttons button {
   padding: 13px 30px; font-size: 17px; border-radius: 10px; cursor: pointer;
