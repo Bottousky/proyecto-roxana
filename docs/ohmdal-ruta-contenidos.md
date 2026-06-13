@@ -36,7 +36,7 @@ La progresión emocional acompaña: el Arco I enciende el **reino**, el Arco II 
 - **Escenario:** el Castillo sellado por el Consejo (galería en cadena, ramales, el Repartidor).
 - **Ganchos salientes:** la forja restaurada entibia sus cables (→U3); «la chispa que se queda» (→U5).
 
-### U3 — «El precio del río» (potencia y energía) ✅ diseñada (`unidad-3-forja.md`)
+### U3 — «El precio del río» (potencia y energía) ✅ construida (greybox, jun 2026) (`unidad-3-forja.md`)
 
 - **Conceptos:** P = V·I, efecto Joule (el calor como gasto real — ahora sí algo «se gasta», y distinguirlo del río es LA finura pedagógica del arco), dimensionar cables y fusibles, energía = potencia × tiempo.
 - **Escenario propuesto:** **la Forja de Ohmdal** (ya nombrada en U2 como el distrito hambriento). La forja funciona pero sus canales entibian, los fusibles «justos» mueren jóvenes, y el Consejo —ahora aliado— pregunta cuánto cuesta de verdad mantener el reino encendido.
@@ -143,7 +143,7 @@ Razones, en orden de peso:
 ### La ruta completa, en una línea de tiempo
 
 ```
-v1  ── Ohmdal Arco I ──────────── U1 ✅  U2 ✅  U3 ✅dis  U4 ✅dis  U5 ✅dis   ← CORTE «mundo completo»
+v1  ── Ohmdal Arco I ──────────── U1 ✅  U2 ✅  U3 ✅  U4 ✅dis  U5 ✅dis   ← CORTE «mundo completo»
 v2  ── Programación Arco I ────── P1  P2  (P3)
 v3  ── Ohmdal Arco II ─────────── U6  U7  U8  U9
 v4  ── El Empalme (mundo compartido) ── sigue-líneas · sumo · fútbol + historia de Ohm
