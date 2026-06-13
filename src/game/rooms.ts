@@ -13,6 +13,7 @@ import { abrirWarmth } from '../puzzles/warmth';
 import { abrirInfirmary } from '../puzzles/infirmary';
 import { abrirLongChannel } from '../puzzles/longchannel';
 import { abrirForge } from '../puzzles/forge';
+import { abrirSteps } from '../puzzles/steps';
 import { showEnd } from '../ui/end';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
@@ -588,7 +589,18 @@ function hablarGuardianaCanalAlto(): void {
   );
 }
 
-function bancoPendiente(hito: 'T2' | 'T3' | 'T4' | 'T5'): void {
+function abrirBancoEscalones(): void {
+  abrirSteps(
+    () => {
+      setFlag('solvedVoltageSteps');
+      notifyNewEntry('Los escalones');
+      hooks.refresh();
+    },
+    f().solvedVoltageSteps,
+  );
+}
+
+function bancoPendiente(hito: 'T3' | 'T4' | 'T5'): void {
   say(L('', `El banco de las Terrazas espera el mecanismo del hito ${hito}.`));
 }
 
@@ -1818,8 +1830,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-escalones', x: 520, y: 385, w: 210, h: 76,
         label: 'Banco de los escalones', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        // TODO(T2): implementar Los escalones y el modo brazos de Ohm.
-        onInteract: () => bancoPendiente('T2'),
+        onInteract: abrirBancoEscalones,
       },
       {
         id: 'guardiana-alto', x: 735, y: 210, w: 40, h: 40, shape: 'circle',

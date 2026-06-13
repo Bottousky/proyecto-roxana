@@ -235,25 +235,25 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .gauge-needle { transition: transform .7s cubic-bezier(.3,1.4,.5,1); transform-origin: var(--pivot); }
 
 /* piezas U2: llaves, Ohm caminante y fusible con tolerancia */
-.tramo-switch, .ohm-probe {
+.tramo-switch, .ohm-probe, .ohm-arm {
   padding: 8px 12px; border-radius: 8px; cursor: pointer;
   background: #26222e; color: #d8cfc0; border: 1px solid #6b6478;
 }
 .tramo-switch { min-width: 150px; text-align: left; }
-.tramo-switch:hover, .ohm-probe:hover { border-color: var(--accent); }
+.tramo-switch:hover, .ohm-probe:hover, .ohm-arm:hover { border-color: var(--accent); }
 .tramo-switch-name { display: block; font-size: 13px; }
 .tramo-switch-state { display: block; margin-top: 2px; font-size: 11px; color: #a99; text-transform: uppercase; }
 .tramo-switch.closed { border-color: #8a7c50; }
 .tramo-switch.open { border-color: #7a4438; }
 .tramo-switch:disabled { opacity: .55; cursor: default; }
-.bell-switches, .ohm-probes { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-.ohm-probe { display: inline-flex; align-items: center; gap: 7px; }
-.ohm-probe-marker {
+.bell-switches, .ohm-probes, .ohm-arms { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.ohm-probe, .ohm-arm { display: inline-flex; align-items: center; gap: 7px; }
+.ohm-probe-marker, .ohm-arm-marker {
   display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
   border-radius: 50%; background: #4a4a4f; color: #211e29; font-weight: 700;
 }
-.ohm-probe.active { border-color: var(--accent); background: #45382a; }
-.ohm-probe.active .ohm-probe-marker { background: var(--accent); }
+.ohm-probe.active, .ohm-arm.active { border-color: var(--accent); background: #45382a; }
+.ohm-probe.active .ohm-probe-marker, .ohm-arm.active .ohm-arm-marker { background: var(--accent); }
 
 .fuse { width: min(300px, 100%); padding: 10px; border: 1px solid #6b6478; border-radius: 8px; background: #211e29; }
 .fuse-heading { display: flex; justify-content: space-between; font-size: 12px; color: #d8cfc0; }
@@ -319,6 +319,52 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
   color: #887f90; font-size: 11px;
 }
 .warmth-progress span.done { color: var(--ok); border-color: rgba(126,196,106,.55); }
+
+/* U4: modo brazos y banco de los escalones */
+.steps-stage { display: grid; gap: 11px; }
+.steps-loop {
+  display: grid; grid-template-columns: 90px 1fr minmax(280px, 3fr) 1fr 70px;
+  align-items: center; gap: 7px; position: relative; padding-bottom: 28px;
+}
+.steps-source, .steps-ground {
+  min-height: 52px; padding: 6px; border: 1px solid #8a7c50; border-radius: 8px;
+  background: #2f2a25; display: flex; flex-direction: column; justify-content: center;
+  text-align: center; color: #d8cfc0; font-size: 11px;
+}
+.steps-source strong { color: var(--accent); font-size: 12px; }
+.steps-ground { border-color: #665744; background: #34291f; color: #bca98f; }
+.steps-wire { height: 8px; border-radius: 5px; background: #a2673f; }
+.steps-stones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.steps-stone { min-width: 0; display: flex; justify-content: center; }
+.steps-stone .piedra { width: 100%; max-width: 66px; cursor: default; }
+.steps-return {
+  position: absolute; left: 40px; right: 34px; bottom: 2px; height: 17px;
+  border: solid #665744; border-width: 0 4px 4px; border-radius: 0 0 9px 9px;
+  color: #8f806d; font-size: 9px; text-align: center;
+}
+.steps-ohm .ohm-widget { flex-direction: row; justify-content: center; }
+.steps-ohm .ohm-body { width: 48px; height: 48px; }
+.steps-ohm .ohm-eye { top: 16px; }
+.steps-ohm .ohm-eye.l { left: 10px; }
+.steps-ohm .ohm-eye.r { right: 10px; }
+.steps-ohm .ohm-mouth { bottom: 9px; }
+.steps-modes { display: flex; justify-content: center; gap: 8px; }
+.steps-mode {
+  padding: 7px 12px; border: 1px solid #6b6478; border-radius: 999px;
+  background: #26222e; color: #a99; cursor: pointer;
+}
+.steps-mode.active { color: #1a1408; border-color: var(--accent); background: var(--accent); }
+.steps-mode:disabled { opacity: .55; cursor: default; }
+.steps-measurements { min-height: 90px; }
+.steps-measurements .ohm-arms, .steps-measurements .ohm-probes {
+  justify-content: center; margin-top: 0;
+}
+.steps-progress { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
+.steps-progress span {
+  padding: 4px 7px; border: 1px solid #4a4554; border-radius: 999px;
+  color: #887f90; font-size: 11px;
+}
+.steps-progress span.done { color: var(--ok); border-color: rgba(126,196,106,.55); }
 
 /* U3: enfermería de fusibles */
 .infirmary-stage { display: grid; gap: 10px; }
@@ -828,6 +874,9 @@ body.touch-device #prompt { display: none !important; }
   .chain-stage { grid-template-columns: 1fr; }
   .chain-slots { grid-template-columns: repeat(3, 1fr); }
   .chain-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+  .steps-loop { grid-template-columns: 70px 1fr minmax(180px, 3fr) 1fr 58px; }
+  .steps-stones { gap: 3px; }
+  .steps-stone .piedra { height: 34px; font-size: 9px; }
   .branches-stage { grid-template-columns: 1fr; }
   .branches-cards { grid-template-columns: 1fr; }
   .branches-instruments { flex-direction: row; justify-content: center; flex-wrap: wrap; }

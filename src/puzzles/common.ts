@@ -176,6 +176,57 @@ export function ohmProbe(
   };
 }
 
+export interface OhmArmsPair<Id extends string = string> {
+  id: Id;
+  label: string;
+  from: string;
+  to: string;
+}
+
+export interface OhmArmsHandle<Id extends string = string> {
+  element: HTMLElement;
+  clear(): void;
+  select(id: Id): void;
+}
+
+/**
+ * Trechos de medición para Ohm con los brazos abiertos. Cada botón representa
+ * un par de puntos y solo un trecho queda activo a la vez.
+ */
+export function ohmArms<Id extends string>(
+  pairs: readonly OhmArmsPair<Id>[],
+  getEscalon: (from: string, to: string, pair: OhmArmsPair<Id>) => string,
+  report: (escalon: string, pair: OhmArmsPair<Id>) => void,
+): OhmArmsHandle<Id> {
+  const root = document.createElement('div');
+  root.className = 'ohm-arms';
+  const buttons = new Map<Id, HTMLButtonElement>();
+
+  const select = (id: Id | null) => {
+    for (const [buttonId, button] of buttons) {
+      button.classList.toggle('active', buttonId === id);
+    }
+  };
+
+  for (const pair of pairs) {
+    const button = document.createElement('button');
+    button.className = 'ohm-arm';
+    button.innerHTML = `<span class="ohm-arm-marker">↔</span>${pair.label}`;
+    button.addEventListener('click', () => {
+      select(pair.id);
+      report(getEscalon(pair.from, pair.to, pair), pair);
+    });
+    buttons.set(pair.id, button);
+    root.appendChild(button);
+  }
+
+  return {
+    element: root,
+    clear: () => select(null),
+    select,
+  };
+}
+
 export interface FuseState {
   overloads: number;
   burned: boolean;
