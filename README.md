@@ -1,13 +1,16 @@
-# Proyecto Roxana — Unidad 1 (vertical slice greybox)
+# Proyecto Roxana — Ohmdal, Arco I «El Río» (greybox)
 
 Juego narrativo educativo. Un estudiante nuevo llega al Instituto Roxana y descubre
 los **Mundos Aplicados**: mundos creados por la escuela para enseñar, hoy degradados
-en ritual y superstición. La Unidad 1 («La corriente no es magia») lleva al jugador
-a Ohmdal, donde descubre jugando la Ley de Ohm.
+en ritual y superstición. En **Ohmdal**, el mundo de la electrónica, restaura el reino
+aprendiendo jugando los circuitos de corriente continua.
 
-**Estado:** greybox jugable de punta a punta — Unidad 1 («La corriente no es magia»,
-Ley de Ohm) y Unidad 2 («El río se reparte», serie/paralelo: el Castillo, la Consejera,
-el Repartidor, el timbre del Instituto). Formas y sistemas, sin arte final.
+**Estado:** **Arco I completo** — greybox jugable de punta a punta, las cinco unidades:
+U1 «La corriente no es magia» (Ley de Ohm), U2 «El río se reparte» (serie/paralelo, el
+Castillo), U3 «El precio del río» (potencia/Joule, la Forja), U4 «La vuelta completa»
+(Kirchhoff/escalera, las Terrazas, la predicción), U5 «La chispa que se queda» (capacitor/
+tiempo, el Faro) — y cierra con **la noche de Ohmdal**. Formas y sistemas, sin arte final.
+Es el corte v1 del producto: circuitos de DC, cinco unidades.
 
 ## Correr en desarrollo
 

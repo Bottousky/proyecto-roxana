@@ -52,7 +52,7 @@ La progresión emocional acompaña: el Arco I enciende el **reino**, el Arco II 
 - **Evento mayor:** restaurar el riego del valle: una escalera de N etapas donde hay que predecir (¡por primera vez predecir antes de probar!) cuánto empuje llega al último escalón. La Bitácora estrena la página de cálculo: el jugador ya no solo registra — anticipa.
 - **Gancho saliente:** en la terraza más baja, el viejo Faro del lago, apagado, con un mecanismo que «parpadeaba» (→U5).
 
-### U5 — «La chispa que se queda» (capacitor, tiempo) — **cierre del Arco I** ✅ diseñada (`unidad-5-faro.md`)
+### U5 — «La chispa que se queda» (capacitor, tiempo) — **cierre del Arco I** ✅ construida (greybox, jun 2026) (`unidad-5-faro.md`)
 
 - **Conceptos:** el capacitor como almacén de carga, carga/descarga, la curva RC como *tiempo* (cualitativa: llenar/vaciar un estanque por un canal angosto), el destello periódico.
 - **Escenario propuesto:** **el Faro del lago** (y el Reloj de Ohmdal). Paga la anomalía registrada en U2: aquello que brilló sin camino. La chispa puede *guardarse*, y un almacén que se llena despacio y se vuelca de golpe es un corazón que late: el Faro parpadea, el Reloj vuelve a marcar.
@@ -143,7 +143,7 @@ Razones, en orden de peso:
 ### La ruta completa, en una línea de tiempo
 
 ```
-v1  ── Ohmdal Arco I ──────────── U1 ✅  U2 ✅  U3 ✅  U4 ✅  U5 ✅dis   ← CORTE «mundo completo»
+v1  ── Ohmdal Arco I ──────────── U1 ✅  U2 ✅  U3 ✅  U4 ✅  U5 ✅   ← ✅ ARCO I COMPLETO (greybox v1)
 v2  ── Programación Arco I ────── P1  P2  (P3)
 v3  ── Ohmdal Arco II ─────────── U6  U7  U8  U9
 v4  ── El Empalme (mundo compartido) ── sigue-líneas · sumo · fútbol + historia de Ohm
