@@ -18,14 +18,30 @@ equal(bellReading(true, true, 'right'), 'Medio río.', 'derecho con ambos cerrad
 equal(bellReading(true, true, 'trunk'), 'Río entero.', 'Tronco con ambos cerrados');
 
 equal(bellState(false, true), 'one-open', 'un tramo abierto');
-equal(bellReading(false, true, 'left'), 'Río: cero.', 'tramo izquierdo abierto');
+equal(
+  bellReading(false, true, 'left'),
+  'Sin río. Tramo izquierdo abierto: por acá no pasa nada.',
+  'tramo izquierdo abierto',
+);
 equal(bellReading(false, true, 'right'), 'Río entero.', 'tramo derecho cerrado');
 equal(bellReading(false, true, 'trunk'), 'Río entero.', 'Tronco con un tramo cerrado');
 
 equal(bellState(false, false), 'both-open', 'ambos abiertos');
-equal(bellReading(false, false, 'left'), 'Río: cero.', 'izquierdo con ambos abiertos');
-equal(bellReading(false, false, 'right'), 'Río: cero.', 'derecho con ambos abiertos');
-equal(bellReading(false, false, 'trunk'), 'Río: cero.', 'Tronco con ambos abiertos');
+equal(
+  bellReading(false, false, 'left'),
+  'Sin río. Tramo izquierdo abierto: por acá no pasa nada.',
+  'izquierdo con ambos abiertos',
+);
+equal(
+  bellReading(false, false, 'right'),
+  'Sin río. Tramo derecho abierto: por acá no pasa nada.',
+  'derecho con ambos abiertos',
+);
+equal(
+  bellReading(false, false, 'trunk'),
+  'Sin río. Las dos llaves abiertas: ningún camino llega al Tronco.',
+  'Tronco con ambos abiertos',
+);
 
 let progress = createBellProgress();
 equal(progress.solved, false, 'no empieza resuelto');

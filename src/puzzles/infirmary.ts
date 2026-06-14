@@ -57,6 +57,16 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
       let demoHandled = false;
       const refs = new Map<InfirmaryMachineId, MachineRefs>();
 
+      const pendingTimers = new Set<number>();
+      const trackTimer = (id: number): number => {
+        pendingTimers.add(id);
+        return id;
+      };
+      bench.onClose(() => {
+        pendingTimers.forEach((id) => window.clearTimeout(id));
+        pendingTimers.clear();
+      });
+
       const stage = document.createElement('div');
       stage.className = 'bench-stage infirmary-stage';
       stage.innerHTML = `
@@ -221,7 +231,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
           machineRefs.card.classList.add('starting');
         }
 
-        window.setTimeout(() => {
+        trackTimer(window.setTimeout(() => {
           if (state.channelCut || state.solved) return;
           for (const id of MACHINE_IDS) {
             const machineRefs = refs.get(id)!;
@@ -229,7 +239,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
             setThermometer(machineRefs.thermometer, infirmaryReading(id).workLevel);
             machineRefs.card.classList.remove('starting');
           }
-        }, 850);
+        }, 850));
       }
 
       function render(): void {

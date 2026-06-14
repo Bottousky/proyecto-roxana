@@ -2,7 +2,7 @@
 # “El río se reparte”
 
 **Versión:** 0.1 — propuesta de diseño y guion
-**Alcance:** Unidad 2 completa: del regreso al Aula de Electrónica hasta la restauración del Castillo de Ohmdal y el gancho a la Unidad 3.
+**Alcance:** Unidad 2 completa: del regreso al Taller de Electrónica hasta la restauración del Castillo de Ohmdal y el gancho a la Unidad 3.
 **Tema técnico:** circuitos con más de un camino — serie, paralelo, reparto de corriente (la ley de nudos como intuición, no como fórmula).
 **Requisito narrativo:** Unidad 1 completada (campana sonando, plaza encendida, `learnedOhmsLaw`).
 **Estado:** borrador para revisar con el autor. Nada implementado.
@@ -83,7 +83,7 @@ Sin construir. Para el greybox de esta unidad se reutiliza el patrón U1: salas 
 
 ## 1. Resumen narrativo completo
 
-Tras el final de la U1, la Bitácora registró la anomalía: *caminos múltiples*. La nota de la campana viaja por el portal; de regreso en el Aula de Electrónica, el proyector reconoce el avance y se activa solo para proyectar el módulo dos: el Castillo de Ohmdal, corazón de la red, «de donde salen todos los ríos». La grabación se corta con un sello superpuesto: **CLAUSURADO POR ORDEN DEL CONSEJO**.
+Tras el final de la U1, la Bitácora registró la anomalía: *caminos múltiples*. La nota de la campana viaja por el portal; de regreso en el Taller de Electrónica, el proyector reconoce el avance y se activa solo para proyectar el módulo dos: el Castillo de Ohmdal, corazón de la red, «de donde salen todos los ríos». La grabación se corta con un sello superpuesto: **CLAUSURADO POR ORDEN DEL CONSEJO**.
 
 En la plaza, Edda espera junto a la campana: nadie le explicó por qué los Maestros le pusieron DOS cables. El jugador, con Ohm como medidor, descubre el primer principio midiendo: por cada cable corre **medio río**, y por el tronco, el río entero. Si se abre un cable, el otro lleva todo — y la campana sigue sonando. Los Maestros no desperdiciaban: **duplicaban caminos para que la campana nunca callara**.
 
@@ -106,7 +106,7 @@ Gancho a la Unidad 3: en el Corazón del Castillo, al cortar el Tronco para la i
 
 ---
 
-## 2. NIVEL 0 — Aula de Electrónica (retorno)
+## 2. NIVEL 0 — Taller de Electrónica (retorno)
 
 **ID:** `MAP_ELECTRONICS_CLASSROOM` (reusada)
 **Duración:** 2–3 minutos
@@ -176,9 +176,11 @@ Estados deseados:
    **Edda:** «Medio y medio… ¿y el Tronco lleva todo? A ver, ¿dónde se está gastando?»
    **Ohm:** «Gasto detectado: ninguno.»
 
-2. **Se abre un camino:** la campana SIGUE sonando. Ohm en el tramo abierto: «Río: cero.» En el otro: «Río entero.»
+2. **Se abre un camino:** la campana SIGUE sonando. Ohm en el tramo abierto: «Sin río. Tramo abierto: por acá no pasa nada.» En el otro: «Río entero.»
 
    **Edda:** «…El río que iba por ahí no se perdió. Se mudó.»
+
+   *(Aquí Ohm hace explícito por primera vez algo que ya valía en U1: parado en un tramo (modo río = serie), solo puede leer el río cuando el camino está cerrado. «Sin río» es distinto de «cero»: si no hay camino, no hay nada para medir.)*
 
 3. **Se abren los dos:** silencio. (Reaprendizaje U1: sin camino completo, nada.)
 
@@ -553,7 +555,7 @@ Con la red del Repartidor dibujada y las dos soluciones equivalentes anotadas. N
 
 | Momento | Emoción buscada |
 |---|---|
-| Aula con lámpara nueva | recompensa, pertenencia |
+| Taller con lámpara nueva | recompensa, pertenencia |
 | Proyector clausurado | intriga + indignación suave |
 | Campana de dos cables | curiosidad resuelta con las manos |
 | La Consejera | fricción institucional con humor |
@@ -619,8 +621,8 @@ Texto conectivo que el guion original no especificaba, escrito durante el build 
 
 ## 13. Notas de coherencia y pendientes
 
-1. **Continuidad numérica:** el doc de la U1 dice «último mantenimiento: hace 43 años» pero el juego implementado dice «34 años» ([rooms.ts](../src/game/rooms.ts), proyector). Unificar (propuesta: 43, y corregir el código). La Consejera dice «cuarenta años de inventarios»: compatible con cualquiera de los dos si el sello fue posterior a la decadencia.
-2. **«Aula» vs «Taller» de Electrónica:** sigue pendiente de la revisión del prólogo (§28.3 de `prologo.md`): este doc usa «Aula» por coherencia con lo implementado; si se canoniza «Taller», cambiar aquí también.
+1. **Continuidad numérica:** ~~el doc de la U1 dice «último mantenimiento: hace 43 años» pero el juego implementado dice «34 años».~~ **Resuelto (jun 2026):** canon unificado en **cuarenta años**; código y docs alineados (commit `679d9ff`).
+2. **«Aula» vs «Taller» de Electrónica:** ~~pendiente de la revisión del prólogo.~~ **Resuelto (jun 2026):** canon **Taller de Electrónica** (prologo.md §28.3). Código y docs U1–U5 alineados.
 3. **La Consejera no tiene nombre propio**, coherente con Roxana sin apellido y el preceptor sin nombre. Si esta regla se vuelve incómoda con más personajes institucionales, revisarla a nivel juego, no por personaje.
 4. **Escala greybox sugerida** (si se construye como slice): NIVEL 0 reusa el aula; Castillo = 3 salas nuevas (galería, ramales, corazón) + puerta; la campana y el timbre reusan la plaza y el hall. 4 puzzles de banco nuevos, 4 entradas de Bitácora. Estimación gruesa: similar a la U1 (el motor, el banco y la Bitácora ya existen).
 5. **Decisiones abiertas para el autor:**

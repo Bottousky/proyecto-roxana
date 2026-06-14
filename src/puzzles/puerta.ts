@@ -39,6 +39,16 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
       let solved = false;
       let intentos = 0;
 
+      const pendingTimers = new Set<number>();
+      const trackTimer = (id: number): number => {
+        pendingTimers.add(id);
+        return id;
+      };
+      bench.onClose(() => {
+        pendingTimers.forEach((id) => window.clearTimeout(id));
+        pendingTimers.clear();
+      });
+
       const stage = document.createElement('div');
       stage.className = 'bench-stage';
       stage.style.display = 'flex';
@@ -157,7 +167,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
         const I = fuente.valor / PIEDRAS[piedra].valor;
         setGauge(stage, I);
 
-        window.setTimeout(() => {
+        trackTimer(window.setTimeout(() => {
           if (Math.abs(I - 2) < 0.35) {
             if (replay) {
               sfxOk();
@@ -186,10 +196,10 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
             if (!state.flags.burnedSomething) setFlag('burnedSomething');
             sfxFzzt();
             setOhmState(stage, 'sobrecarga');
-            window.setTimeout(() => {
+            trackTimer(window.setTimeout(() => {
               setOhmState(stage, 'inerte');
               setGauge(stage, 0);
-            }, 900);
+            }, 900));
             bench.setStatus(
               replay
                 ? '<b>¡FZZT!</b> La aguja se clava al fondo y el fusible ritual se inmola. Quedan repuestos en la caja que dejó Lumen.'
@@ -201,15 +211,15 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
           } else if (I > 2) {
             sfxHot();
             setOhmState(stage, 'sobrecarga');
-            window.setTimeout(() => setOhmState(stage, 'estable'), 1300);
+            trackTimer(window.setTimeout(() => setOhmState(stage, 'estable'), 1300));
             bench.setStatus(hotLines[hi++ % hotLines.length]);
           } else {
             sfxDim();
             setOhmState(stage, 'debil');
-            window.setTimeout(() => setOhmState(stage, 'estable'), 1300);
+            trackTimer(window.setTimeout(() => setOhmState(stage, 'estable'), 1300));
             bench.setStatus(weakLines[wi++ % weakLines.length]);
           }
-        }, 750);
+        }, 750));
       };
 
       const actions = benchActions(bench.root, [

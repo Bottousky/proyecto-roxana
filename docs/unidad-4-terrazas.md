@@ -70,7 +70,7 @@ Piedras marrón 1 / roja 2 / amarilla 4 / gris 8; **filas se suman**; **dos igua
 
 ---
 
-## 1. NIVEL 0 — Aula (módulo cuatro)
+## 1. NIVEL 0 — Taller (módulo cuatro)
 
 Con `unit3Completed`, el proyector ofrece el módulo cuatro. 2 min.
 

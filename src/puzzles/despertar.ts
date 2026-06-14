@@ -33,6 +33,16 @@ export function abrirDespertar(onSuccess: () => void): void {
       let bridges = 3;
       let solved = false;
 
+      const pendingTimers = new Set<number>();
+      const trackTimer = (id: number): number => {
+        pendingTimers.add(id);
+        return id;
+      };
+      bench.onClose(() => {
+        pendingTimers.forEach((id) => window.clearTimeout(id));
+        pendingTimers.clear();
+      });
+
       const stage = document.createElement('div');
       stage.className = 'bench-stage';
       stage.style.display = 'flex';
@@ -109,8 +119,8 @@ export function abrirDespertar(onSuccess: () => void): void {
         solved = true;
         sfxWin();
         stage.querySelectorAll('.wire:not(.dead)').forEach((w) => w.classList.add('live'));
-        setTimeout(() => setOhmState(stage, 'debil'), 350);
-        setTimeout(() => setOhmState(stage, 'estable'), 1100);
+        trackTimer(window.setTimeout(() => setOhmState(stage, 'debil'), 350));
+        trackTimer(window.setTimeout(() => setOhmState(stage, 'estable'), 1100));
         bench.setStatus(
           '<b>La chispa corre por todo el anillo:</b> sale por +, cruza por arriba, atraviesa a Ohm ' +
             'y vuelve al − por abajo. El atajo partido queda mudo: por ahí no pasa nada. ' +

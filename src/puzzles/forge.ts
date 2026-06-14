@@ -91,6 +91,16 @@ export function abrirForge(opts: AbrirForgeOptions): void {
       let solvedHandled = false;
       const refs = new Map<ForgeMachineId, MachineRefs>();
 
+      const pendingTimers = new Set<number>();
+      const trackTimer = (id: number): number => {
+        pendingTimers.add(id);
+        return id;
+      };
+      bench.onClose(() => {
+        pendingTimers.forEach((id) => window.clearTimeout(id));
+        pendingTimers.clear();
+      });
+
       const sourceTray = document.createElement('div');
       sourceTray.className = 'bench-tray forge-sources';
       sourceTray.innerHTML =
@@ -383,9 +393,9 @@ export function abrirForge(opts: AbrirForgeOptions): void {
           setThermometer(machineRefs.thermometer, machine.peakLevel);
           machineRefs.card.classList.add('starting');
         }
-        window.setTimeout(() => {
+        trackTimer(window.setTimeout(() => {
           render();
-        }, 900);
+        }, 900));
       }
 
       function render(forcedEvaluation?: ForgeEvaluation): void {

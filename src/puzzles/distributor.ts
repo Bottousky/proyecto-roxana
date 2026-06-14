@@ -171,7 +171,7 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
           { id: 'district-2', label: 'Biblioteca' },
         ],
         (id) => {
-          if (state.fuse.burned) return 'Río: cero.';
+          if (state.fuse.burned) return 'Sin río. El fusible reventó: camino cortado.';
           const river =
             id === 'trunk'
               ? distributorTrunkRiver(state)

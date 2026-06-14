@@ -2,7 +2,7 @@
 # “La corriente no es magia”
 
 **Versión:** 0.3 — guion detallado + síntesis del mundo unificados  
-**Alcance:** todo el canon de Ohmdal: lore del mundo, léxico, personajes, diseño de puzzles y guion completo de la Unidad 1 (desde el Aula de Electrónica hasta el cierre).  
+**Alcance:** todo el canon de Ohmdal: lore del mundo, léxico, personajes, diseño de puzzles y guion completo de la Unidad 1 (desde el Taller de Electrónica hasta el cierre).  
 **Uso recomendado:** fuente de verdad narrativa y de diseño para implementación Phaser y generación de assets. Las reglas de diseño generales del juego (Bitácora, anti-clase, formato, arquitectura) viven en `diseno-sintesis-v1.md`.  
 **Estado:** propuesta avanzada para canonizar.
 
@@ -12,13 +12,13 @@
 
 ### A.1. Qué es Ohmdal
 
-Ohmdal es un **Mundo Aplicado**: un reino experimental *creado por el propio Instituto Roxana* para enseñar Electrónica («que la electricidad se aprenda caminándola»). El acceso es por el Aula/Taller de Electrónica; el proyector institucional lo establece en la transición. Los Mundos Aplicados se degradaron junto con la escuela que los mantenía — la pregunta de largo plazo (¿quién los construyó y por qué se abandonaron?) queda abierta.
+Ohmdal es un **Mundo Aplicado**: un reino experimental *creado por el propio Instituto Roxana* para enseñar Electrónica («que la electricidad se aprenda caminándola»). El acceso es por el Taller de Electrónica; el proyector institucional lo establece en la transición. Los Mundos Aplicados se degradaron junto con la escuela que los mantenía — la pregunta de largo plazo (¿quién los construyó y por qué se abandonaron?) queda abierta.
 
 Línea clave del lore: *«el mundo responde a la comprensión del estudiante; la incomprensión también deja huella»*.
 
 **Simetría temática central:** el Instituto y Ohmdal tienen la misma enfermedad — conservan las formas del conocimiento pero perdieron la comprensión. Restaurar Ohmdal restaura, de a poco, al Instituto.
 
-Último mantenimiento registrado: hace 43 años (establecido en la cinemática del proyector).
+Último mantenimiento registrado: hace cuarenta años (establecido en la cinemática del proyector).
 
 ### A.2. Léxico diegético de la Unidad 1
 
@@ -82,11 +82,11 @@ Frase central de la unidad:
 
 ## 1. Resumen narrativo completo
 
-Después de encontrar la Bitácora de Roxana en el despacho, el jugador descubre que el mapa antiguo de la escuela señala el Aula de Electrónica. Al entrar, encuentra un aula técnica polvorienta pero todavía cargada de intención: bancos de trabajo, resistencias, fuentes de alimentación, osciloscopios, carteles viejos y un proyector institucional.
+Después de encontrar la Bitácora de Roxana en el despacho, el jugador descubre que el mapa antiguo de la escuela señala el Taller de Electrónica. Al entrar, encuentra un taller técnico polvoriento pero todavía cargado de intención: bancos de trabajo, resistencias, fuentes de alimentación, osciloscopios, carteles viejos y un proyector institucional.
 
-El proyector muestra una pieza educativa antigua sobre Ohmdal: un reino experimental donde la electricidad “toma forma” para que los estudiantes puedan aprender observando. La grabación muestra un Ohmdal brillante, lleno de lámparas, canales de cobre, molinos, estudiantes y autómatas. Pero al final el video falla: el último mantenimiento fue hace 43 años.
+El proyector muestra una pieza educativa antigua sobre Ohmdal: un reino experimental donde la electricidad “toma forma” para que los estudiantes puedan aprender observando. La grabación muestra un Ohmdal brillante, lleno de lámparas, canales de cobre, molinos, estudiantes y autómatas. Pero al final el video falla: el último mantenimiento fue hace cuarenta años.
 
-El portal del aula se abre.
+El portal del taller se abre.
 
 Cuando el jugador entra a Ohmdal, descubre que el mundo real no se parece al video. La plaza está apagada. Los ciudadanos conservan símbolos eléctricos, pero los interpretan como supersticiones. El triángulo V/I/R aparece en amuletos, mosaicos y puertas, pero nadie lo entiende como relación entre tensión, corriente y resistencia.
 
@@ -249,7 +249,7 @@ Diálogo ambiental:
 
 ---
 
-# NIVEL 0 — Aula de Electrónica
+# NIVEL 0 — Taller de Electrónica
 
 **ID sugerido:** `MAP_ELECTRONICS_CLASSROOM`  
 **Duración:** 3–5 minutos  
@@ -257,13 +257,13 @@ Diálogo ambiental:
 
 ## 3.1. Contexto
 
-El jugador llega al Aula de Electrónica después de encontrar la bitácora y el mapa en el despacho de Roxana.
+El jugador llega al Taller de Electrónica después de encontrar la bitácora y el mapa en el despacho de Roxana.
 
-El aula no debe sentirse como dungeon. Debe sentirse como un aula técnica real, pero con algo latente.
+El taller no debe sentirse como dungeon. Debe sentirse como un taller técnico real, pero con algo latente.
 
 ## 3.2. Descripción visual
 
-Aula rectangular, antigua, con bancos de trabajo. Luz tenue entrando por ventanas altas. Polvo sobre equipos. Un olor sugerido a madera vieja, metal y cables.
+Taller rectangular, antiguo, con bancos de trabajo. Luz tenue entrando por ventanas altas. Polvo sobre equipos. Un olor sugerido a madera vieja, metal y cables.
 
 Elementos visuales:
 
@@ -399,7 +399,7 @@ Glitch.
 
 **Texto:**
 
-> Último mantenimiento registrado: hace 43 años.
+> Último mantenimiento registrado: hace cuarenta años.
 
 **Intención:**  
 Contraste. Lo que el jugador verá no será lo prometido.
@@ -1240,7 +1240,7 @@ Tema futuro:
 
 | Momento | Emoción buscada |
 |---|---|
-| Aula de Electrónica | curiosidad, rareza |
+| Taller de Electrónica | curiosidad, rareza |
 | Cinemática | maravilla institucional |
 | Plaza apagada | contraste, melancolía |
 | Edda | urgencia con humor |

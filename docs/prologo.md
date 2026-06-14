@@ -1326,9 +1326,9 @@ La síntesis de diseño fija **prólogo 5–8 min máx.** Este guion, con cinem�
 
 La regla inviolable es "la Bitácora nunca anticipa **conocimiento** no vivido". La primera activación (§16) lista cursos y zonas no visitadas: no la viola, porque es **registro administrativo escolar** — la Bitácora es un sistema de la escuela y sabe de la escuela. La distinción que hay que sostener: *puede saber de la institución; nunca del contenido conceptual que el jugador no experimentó*. Las secciones "Conceptos descubiertos" y entradas de Registro siguen siendo estrictamente post-vivencia.
 
-## 28.3. Nomenclatura a unificar: "Taller" vs "Aula" de Electrónica
+## 28.3. Nomenclatura: "Taller de Electrónica" (canónico)
 
-Este doc usa **Taller de Electrónica**; el guion de la Unidad 1 (`unidad-1-ohmdal.md`, NIVEL 0) y el juego implementado usan **Aula de Electrónica**. Propuesta: canonizar **Taller** (es escuela técnica; "taller" suena a manos en la mesa, que es el tema del juego) y ajustar guion U1 + textos del juego cuando se toque esa escena.
+**Resuelto (jun 2026):** se canoniza **Taller de Electrónica** ("taller" suena a manos en la mesa, que es el tema del juego, y es vocabulario natural de escuela técnica). Código (`src/game/rooms.ts`) y guiones U1–U5 alineados. "Aula" queda reservada para otros espacios (Aula de Matemática, etc.).
 
 ## 28.4. Delta contra el slice implementado
 

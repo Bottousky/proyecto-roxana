@@ -148,7 +148,7 @@ export function abrirBranches(opts: AbrirBranchesOptions): void {
           { id: 'branch-2', label: 'Rama 3' },
         ],
         (id) => {
-          if (state.fuse.burned) return 'Río: cero.';
+          if (state.fuse.burned) return 'Sin río. El fusible reventó: camino cortado.';
           const river =
             id === 'trunk'
               ? trunkRiver(state)

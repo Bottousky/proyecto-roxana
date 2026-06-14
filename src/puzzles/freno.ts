@@ -26,6 +26,16 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
       let fusibleQuemado = false;
       let solved = false;
 
+      const pendingTimers = new Set<number>();
+      const trackTimer = (id: number): number => {
+        pendingTimers.add(id);
+        return id;
+      };
+      bench.onClose(() => {
+        pendingTimers.forEach((id) => window.clearTimeout(id));
+        pendingTimers.clear();
+      });
+
       const stage = document.createElement('div');
       stage.className = 'bench-stage';
       stage.style.display = 'flex';
@@ -129,10 +139,10 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           sfxFzzt();
           setLamp('hot');
           setOhmState(stage, 'sobrecarga');
-          setTimeout(() => {
+          trackTimer(window.setTimeout(() => {
             setLamp('off');
             setOhmState(stage, 'inerte');
-          }, 900);
+          }, 900));
           bench.setStatus(
             replay
               ? '<b>¡FZZT!</b> Chispas, humo, olor a tormenta vieja. Así que ESTO pasa con la rajada. ' +
@@ -146,7 +156,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           sfxHot();
           setLamp('hot');
           setOhmState(stage, 'sobrecarga');
-          setTimeout(() => setOhmState(stage, 'estable'), 1400);
+          trackTimer(window.setTimeout(() => setOhmState(stage, 'estable'), 1400));
           bench.setStatus(
             replay
               ? 'La lámpara arde con luz furiosa y huele a caliente. Ohm vibra, incómodo. Eso no es brillo: es fiebre.'

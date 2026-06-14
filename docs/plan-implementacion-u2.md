@@ -55,11 +55,11 @@ Convenciones: TypeScript estricto, sin dependencias nuevas, todo el texto visibl
 - `end.ts`: la pantalla de cierre de la U1 gana un botón «Continuar» que devuelve al Instituto (`hooks.goto`) en lugar de terminar. Reutilizable: `showEnd(opts)` parametrizada por unidad.
 - **Aceptación:** un save con `finished=true` puede volver a caminar por el Instituto; build verde.
 
-### M1 — El Aula, módulo dos
+### M1 — El Taller, módulo dos
 
 **Archivos:** `rooms.ts`.
 
-- Estado U2 del aula (con `finished`): una lámpara del aula encendida, pizarrón con la frase completa, panel del portal estable (cambios de `color`/`label` por flag — patrón ya usado en U1).
+- Estado U2 del taller (con `finished`): una lámpara del taller encendida, pizarrón con la frase completa, panel del portal estable (cambios de `color`/`label` por flag — patrón ya usado en U1).
 - Interactuar con el proyector con `finished && !playedUnit2Intro` reproduce la secuencia del proyector + lacre del Consejo (texto de `unidad-2-caminos.md` §2) y setea `playedUnit2Intro`.
 - **Aceptación:** la secuencia se ve una sola vez; el portal lleva a la plaza de Ohmdal.
 

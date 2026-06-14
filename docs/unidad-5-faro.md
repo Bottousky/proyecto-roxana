@@ -71,7 +71,7 @@ El banco con **tick de simulación**: hasta ahora los bancos eran estáticos ent
 
 ---
 
-## 1. NIVEL 0 — Aula (módulo cinco)
+## 1. NIVEL 0 — Taller (módulo cinco)
 
 Con `unit4Completed`, el proyector ofrece el módulo cinco. 2 min.
 

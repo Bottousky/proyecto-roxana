@@ -64,7 +64,7 @@ Instrumento nuevo: el **termómetro de canal** (Ohm gana el modo termómetro: ap
 
 ---
 
-## 1. NIVEL 0 — Aula de Electrónica (módulo tres)
+## 1. NIVEL 0 — Taller de Electrónica (módulo tres)
 
 **Función:** re-entrada; con `unit2Completed`, el proyector ofrece el módulo tres. 2 min.
 

@@ -13,13 +13,14 @@ export function bellReading(
   segment: BellSegment,
 ): string {
   if (segment === 'trunk') {
-    return leftClosed || rightClosed ? 'Río entero.' : 'Río: cero.';
+    if (leftClosed || rightClosed) return 'Río entero.';
+    return 'Sin río. Las dos llaves abiertas: ningún camino llega al Tronco.';
   }
   if (segment === 'left') {
-    if (!leftClosed) return 'Río: cero.';
+    if (!leftClosed) return 'Sin río. Tramo izquierdo abierto: por acá no pasa nada.';
     return rightClosed ? 'Medio río.' : 'Río entero.';
   }
-  if (!rightClosed) return 'Río: cero.';
+  if (!rightClosed) return 'Sin río. Tramo derecho abierto: por acá no pasa nada.';
   return leftClosed ? 'Medio río.' : 'Río entero.';
 }
 

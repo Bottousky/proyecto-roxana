@@ -854,12 +854,12 @@ export const ROOMS: Record<string, RoomDef> = {
       {
         x: 934, y: 225, w: 26, h: 100,
         to: 'aula', spawn: { x: 95, y: 270 },
-        label: 'Aula de Electrónica',
+        label: 'Taller de Electrónica',
         locked: () =>
           f().hasBitacora
             ? null
             : [
-                L('', 'La puerta del Aula de Electrónica está cerrada con llave.'),
+                L('', 'La puerta del Taller de Electrónica está cerrada con llave.'),
                 L('Preceptor', 'Dirección primero. La puerta de la izquierda.'),
               ],
       },
@@ -874,7 +874,7 @@ export const ROOMS: Record<string, RoomDef> = {
             say(
               [
                 L('Preceptor', '¿El nuevo? Llegas tarde. O temprano. Aquí ya nadie lleva mucho la cuenta.'),
-                L('Preceptor', 'Antes del aula tienes que pasar por Dirección. La puerta de la izquierda. Está abierta; siempre está abierta. No sé por qué la seguimos llamando Dirección.'),
+                L('Preceptor', 'Antes del taller tienes que pasar por Dirección. La puerta de la izquierda. Está abierta; siempre está abierta. No sé por qué la seguimos llamando Dirección.'),
                 L('Preceptor', 'Y una cosa: si algo zumba, no lo toques. …Todavía.'),
               ],
               () => setFlag('talkedPreceptor'),
@@ -884,7 +884,7 @@ export const ROOMS: Record<string, RoomDef> = {
           } else if (!fl.sawProjector) {
             say([
               L('Preceptor', '¿Eso es… una Bitácora? Hacía años que no veía una de esas.'),
-              L('Preceptor', 'El Aula de Electrónica es la puerta de la derecha. Anda: el aula sabe qué hacer. …Es una forma de decir. Creo.'),
+              L('Preceptor', 'El Taller de Electrónica es la puerta de la derecha. Anda: el taller sabe qué hacer. …Es una forma de decir. Creo.'),
             ]);
           } else if (fl.fixedSchoolBell) {
             say([
@@ -969,7 +969,7 @@ export const ROOMS: Record<string, RoomDef> = {
 
   aula: {
     id: 'aula',
-    name: 'Aula de Electrónica',
+    name: 'Taller de Electrónica',
     floor: () => 0x1d2026,
     wall: () => 0x2a2f38,
     doors: [

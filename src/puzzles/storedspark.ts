@@ -74,7 +74,7 @@ export function abrirStoredSpark({
         [{ id: 'canal', label: 'Medir el canal con Ohm' }],
         () => {
           const flow = storedSparkReading(state).channelFlow;
-          if (!state.pathOpen) return 'Río: cero. Camino cortado.';
+          if (!state.pathOpen) return 'Sin río. Camino cortado.';
           if (flow === 0) return 'Río: cero. El Estanque está lleno.';
           if (flow > 0.65) return 'Río: fuerte.';
           if (flow > 0.15) return 'Río: debilitándose.';
