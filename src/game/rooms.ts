@@ -1130,7 +1130,10 @@ export const ROOMS: Record<string, RoomDef> = {
               ],
       },
       {
-        x: 0, y: 75, w: 26, h: 110,
+        // Zona alta del borde izquierdo (hasta cerca del tope): el label apunta
+        // arriba-izquierda; sin esto quedaba una franja muerta de pared encima de
+        // la puerta donde el jugador se atascaba sin cruzar ni ver el cordón.
+        x: 0, y: 20, w: 26, h: 165,
         to: 'castle_gate', spawn: { x: 860, y: 270 },
         label: 'Camino al Castillo',
         color: 0x65536f,
