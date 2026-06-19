@@ -1187,11 +1187,24 @@ button.forge-slot { cursor: pointer; }
 .chain-gauge-label, .chain-band { color: #a99; font-size: 11px; }
 .chain-band { margin-top: 2px; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; }
 .chain-probe-host .ohm-probes { justify-content: center; }
-.chain-progress {
-  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; color: #887f90; font-size: 12px;
+.chain-sources { justify-content: center; margin-bottom: 10px; }
+.chain-crystal:disabled { opacity: .5; cursor: default; }
+.chain-predict {
+  margin: 4px auto 12px; padding: 12px 14px; max-width: 540px;
+  border: 1px solid #6b6478; border-radius: 12px; background: #2a2533; text-align: center;
 }
-.chain-progress span { padding: 5px 8px; border: 1px solid #4a4554; border-radius: 999px; }
-.chain-progress .done { color: var(--ok); border-color: rgba(126,196,106,.55); }
+.chain-predict.hidden { display: none; }
+.chain-predict-q { margin: 0 0 10px; color: #e8dcc0; font-size: 14px; }
+.chain-predict-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.chain-predict-btn {
+  padding: 8px 14px; border-radius: 8px; border: 2px solid #8a7c50;
+  background: #322d28; color: #e8d8b8; cursor: pointer; font-size: 13px;
+}
+.chain-predict-btn:hover { border-color: var(--accent); background: #45382a; }
+.chain-goal {
+  margin-top: 10px; text-align: center; color: #b9a; font-size: 12px;
+  text-transform: uppercase; letter-spacing: .05em;
+}
 
 .branches-stage { display: grid; grid-template-columns: 1fr 210px; gap: 14px; align-items: center; }
 .branches-network { min-width: 0; }

@@ -1,11 +1,27 @@
+// La Cadena (serie): un solo río en todo el camino, frenos que se suman, la fila
+// que muere entera si se corta un eslabón. La victoria NO premia el recorte: se
+// gana devolviendo el brillo a las SEIS lámparas subiendo el Empuje, nunca
+// quitando. El aprendizaje se garantiza con dos predicciones (predecir → observar
+// → explicar) antes de cada revelación.
+
 export const CHAIN_MIN_LAMPS = 1;
 export const CHAIN_MAX_LAMPS = 6;
 export const CHAIN_INITIAL_LAMPS = 4;
-export const CHAIN_TARGET_LAMPS = 2;
-export const CHAIN_PUSH = 8;
+export const CHAIN_TARGET_LAMPS = 6;
 export const CHAIN_LAMP_BRAKE = 2;
+export const CHAIN_PUSHES = [4, 8, 16] as const;
+export const CHAIN_INITIAL_PUSH = 8;
 
-export type ChainBrightnessBand = 'exceso' | 'correcta' | 'tenue' | 'casi-nada';
+export type ChainPush = (typeof CHAIN_PUSHES)[number];
+export type ChainBand = 'demasiado' | 'bien' | 'tenue' | 'casi-nada';
+
+/** Predicción 1: ¿dónde corre más río en la fila? La verdad es 'igual'. */
+export type RiverGuess = 'antes' | 'despues' | 'igual';
+export const RIVER_ANSWER: RiverGuess = 'igual';
+
+/** Predicción 2: ¿qué les pasa a las otras si saco una? La verdad es 'apagan'. */
+export type RemovalGuess = 'iguales' | 'mas' | 'apagan';
+export const REMOVAL_ANSWER: RemovalGuess = 'apagan';
 
 export interface ChainExperiences {
   measuredSameRiver: boolean;
@@ -13,9 +29,16 @@ export interface ChainExperiences {
   addedLamp: boolean;
 }
 
+export interface ChainPredictions {
+  river: RiverGuess | null;
+  removal: RemovalGuess | null;
+}
+
 export interface ChainState {
+  push: ChainPush;
   lampCount: number;
   measuredSegments: string[];
+  predictions: ChainPredictions;
   experiences: ChainExperiences;
   solved: boolean;
 }
@@ -35,36 +58,59 @@ export function chainSegmentIds(lampCount: number): string[] {
   return segments;
 }
 
-export function chainReading(lampCount: number, segmentId: string): number {
+/** El río de la fila: mismo valor en todo el camino (un solo río en serie). */
+export function chainRiver(push: number, lampCount: number): number {
+  return push / (CHAIN_LAMP_BRAKE * clampLampCount(lampCount));
+}
+
+/** Lectura en un tramo concreto: idéntica en cualquier punto de la fila. */
+export function chainReading(push: number, lampCount: number, segmentId: string): number {
   if (!chainSegmentIds(lampCount).includes(segmentId)) {
     throw new Error(`Tramo desconocido: ${segmentId}`);
   }
-  return CHAIN_PUSH / (CHAIN_LAMP_BRAKE * clampLampCount(lampCount));
+  return chainRiver(push, lampCount);
 }
 
-export function chainBrightness(lampCount: number): number {
-  return chainReading(lampCount, 'before');
-}
-
-export function chainBrightnessBand(lampCount: number): ChainBrightnessBand {
-  const brightness = chainBrightness(lampCount);
-  if (brightness > 2.25) return 'exceso';
-  if (brightness >= 1.75) return 'correcta';
-  if (brightness >= 1) return 'tenue';
+export function chainBand(push: number, lampCount: number): ChainBand {
+  const river = chainRiver(push, lampCount);
+  if (river >= 3) return 'demasiado';
+  if (river >= 1.2) return 'bien';
+  if (river >= 0.6) return 'tenue';
   return 'casi-nada';
 }
 
 export function createChainState(): ChainState {
-  return {
+  return withSolved({
+    push: CHAIN_INITIAL_PUSH,
     lampCount: CHAIN_INITIAL_LAMPS,
     measuredSegments: [],
+    predictions: { river: null, removal: null },
     experiences: {
       measuredSameRiver: false,
       removedLamp: false,
       addedLamp: false,
     },
     solved: false,
-  };
+  });
+}
+
+export function predictRiver(state: ChainState, guess: RiverGuess): ChainState {
+  return withSolved({
+    ...state,
+    predictions: { ...state.predictions, river: guess },
+  });
+}
+
+export function predictRemoval(state: ChainState, guess: RemovalGuess): ChainState {
+  return withSolved({
+    ...state,
+    predictions: { ...state.predictions, removal: guess },
+  });
+}
+
+export function setChainPush(state: ChainState, push: ChainPush): ChainState {
+  if (push === state.push) return state;
+  return withSolved({ ...state, push, measuredSegments: [] });
 }
 
 export function measureChainSegment(state: ChainState, segmentId: string): ChainState {
@@ -122,11 +168,11 @@ function clampLampCount(lampCount: number): number {
   return Math.max(CHAIN_MIN_LAMPS, Math.min(CHAIN_MAX_LAMPS, lampCount));
 }
 
-function withSolved(state: Omit<ChainState, 'solved'> | ChainState): ChainState {
+function withSolved(state: ChainState): ChainState {
   const solved =
     state.experiences.measuredSameRiver &&
     state.experiences.removedLamp &&
-    state.experiences.addedLamp &&
-    state.lampCount === CHAIN_TARGET_LAMPS;
+    state.lampCount === CHAIN_TARGET_LAMPS &&
+    chainBand(state.push, state.lampCount) === 'bien';
   return { ...state, solved };
 }
