@@ -6,21 +6,15 @@ export const BRANCH_COUNT = 3;
 export type BranchStone = 'marron' | 'roja' | 'amarilla' | 'gris';
 export type BranchFuseResult = 'ok' | 'warning' | 'burned';
 
+export type IndependenceGuess = 'baja' | 'sube' | 'igual';
+export const INDEPENDENCE_ANSWER: IndependenceGuess = 'igual';
+export type TrunkGuess = 'nada' | 'sobrecarga' | 'apagan';
+export const TRUNK_ANSWER: TrunkGuess = 'sobrecarga';
+
 export interface BranchFuseState {
   overloads: number;
   burned: boolean;
 }
-
-export interface BranchZone {
-  min: number;
-  max: number;
-}
-
-export const BRANCH_ZONES: readonly BranchZone[] = [
-  { min: 2, max: 4 },
-  { min: 1, max: 2 },
-  { min: 1, max: 2 },
-];
 
 export interface BranchState {
   connected: boolean;
@@ -28,15 +22,22 @@ export interface BranchState {
   river: number;
 }
 
+export interface BranchPredictions {
+  independence: IndependenceGuess | null;
+  trunk: TrunkGuess | null;
+}
+
 export interface BranchExperiences {
-  connectedOne: boolean;
   connectedSecond: boolean;
+  /** vivió que el Tronco se sobrecarga al pedirle de más (el Tronco paga la suma). */
+  sawTrunkStrain: boolean;
 }
 
 export interface BranchesState {
   branches: BranchState[];
   fuse: BranchFuseState;
   replacements: number;
+  predictions: BranchPredictions;
   experiences: BranchExperiences;
   solved: boolean;
 }
@@ -46,7 +47,7 @@ export interface BranchesChange {
   fuseResult: BranchFuseResult;
 }
 
-const STONE_VALUES: Record<BranchStone, number> = {
+export const STONE_VALUES: Record<BranchStone, number> = {
   marron: 1,
   roja: 2,
   amarilla: 4,
@@ -58,20 +59,35 @@ export function branchRiver(stone: BranchStone): number {
 }
 
 export function createBranchesState(): BranchesState {
-  return {
-    branches: Array.from({ length: BRANCH_COUNT }, () => ({
-      connected: false,
-      stone: 'marron' as const,
-      river: 0,
-    })),
+  return withDerived({
+    branches: [
+      { connected: true, stone: 'amarilla', river: 0 },
+      { connected: false, stone: 'amarilla', river: 0 },
+      { connected: false, stone: 'amarilla', river: 0 },
+    ],
     fuse: { overloads: 0, burned: false },
     replacements: 0,
-    experiences: {
-      connectedOne: false,
-      connectedSecond: false,
-    },
+    predictions: { independence: null, trunk: null },
+    experiences: { connectedSecond: false, sawTrunkStrain: false },
     solved: false,
-  };
+  });
+}
+
+export function predictIndependence(
+  state: BranchesState,
+  guess: IndependenceGuess,
+): BranchesState {
+  return withDerived({
+    ...state,
+    predictions: { ...state.predictions, independence: guess },
+  });
+}
+
+export function predictTrunk(state: BranchesState, guess: TrunkGuess): BranchesState {
+  return withDerived({
+    ...state,
+    predictions: { ...state.predictions, trunk: guess },
+  });
 }
 
 export function setBranchStone(
@@ -102,19 +118,15 @@ export function trunkRiver(state: BranchesState): number {
   return state.branches.reduce((sum, branch) => sum + branch.river, 0);
 }
 
-export function branchInGreenZone(state: BranchesState, branchIndex: number): boolean {
-  assertBranchIndex(branchIndex);
-  const branch = state.branches[branchIndex];
-  const zone = BRANCH_ZONES[branchIndex];
-  return branch.connected && branch.river >= zone.min && branch.river <= zone.max;
-}
-
 export function isBranchesSolution(state: BranchesState): boolean {
   return (
     !state.fuse.burned &&
     state.branches.every((branch) => branch.connected) &&
-    state.branches.every((_, index) => branchInGreenZone(state, index)) &&
-    trunkRiver(state) <= TRUNK_TOLERANCE
+    trunkRiver(state) <= TRUNK_TOLERANCE &&
+    state.predictions.independence !== null &&
+    state.predictions.trunk !== null &&
+    state.experiences.connectedSecond &&
+    state.experiences.sawTrunkStrain
   );
 }
 
@@ -158,9 +170,10 @@ function withDerived(state: BranchesState): BranchesState {
     river: branch.connected ? branchRiver(branch.stone) : 0,
   }));
   const connectedCount = branches.filter((branch) => branch.connected).length;
+  const trunk = branches.reduce((sum, branch) => sum + branch.river, 0);
   const experiences = {
-    connectedOne: state.experiences.connectedOne || connectedCount >= 1,
     connectedSecond: state.experiences.connectedSecond || connectedCount >= 2,
+    sawTrunkStrain: state.experiences.sawTrunkStrain || trunk > TRUNK_TOLERANCE,
   };
   const derived = { ...state, branches, experiences, solved: false };
   return { ...derived, solved: isBranchesSolution(derived) };

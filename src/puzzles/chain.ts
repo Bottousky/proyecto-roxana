@@ -88,7 +88,7 @@ export function abrirChain(onSolved: () => void, practica = false): void {
 
       // Panel de predicción (predecir → observar → explicar).
       const predict = document.createElement('div');
-      predict.className = 'chain-predict';
+      predict.className = 'bench-predict';
       bench.root.appendChild(predict);
 
       const stage = document.createElement('div');
@@ -116,7 +116,7 @@ export function abrirChain(onSolved: () => void, practica = false): void {
       bench.root.appendChild(probeHost);
 
       const goal = document.createElement('div');
-      goal.className = 'chain-goal';
+      goal.className = 'bench-goal';
       bench.root.appendChild(goal);
 
       let actions: Record<string, HTMLButtonElement>;
@@ -214,11 +214,11 @@ export function abrirChain(onSolved: () => void, practica = false): void {
       const renderPredict = (phase: Phase) => {
         if (phase === 'predict-river') {
           predict.classList.remove('hidden');
-          predict.innerHTML = '<p class="chain-predict-q"><b>Ohm:</b> «Antes de medir: ¿dónde crees que corre más río?»</p>';
+          predict.innerHTML = '<p class="bench-predict-q"><b>Ohm:</b> «Antes de medir: ¿dónde crees que corre más río?»</p>';
           appendPredictButtons(predict, RIVER_OPTIONS, (key) => chooseRiver(key));
         } else if (phase === 'predict-removal') {
           predict.classList.remove('hidden');
-          predict.innerHTML = '<p class="chain-predict-q"><b>Ohm:</b> «Si saco una lámpara, ¿qué crees que les pasa a las otras?»</p>';
+          predict.innerHTML = '<p class="bench-predict-q"><b>Ohm:</b> «Si saco una lámpara, ¿qué crees que les pasa a las otras?»</p>';
           appendPredictButtons(predict, REMOVAL_OPTIONS, (key) => chooseRemoval(key));
         } else {
           predict.classList.add('hidden');
@@ -352,10 +352,10 @@ function appendPredictButtons<K extends string>(
   onPick: (key: K) => void,
 ): void {
   const row = document.createElement('div');
-  row.className = 'chain-predict-row';
+  row.className = 'bench-predict-row';
   for (const option of options) {
     const button = document.createElement('button');
-    button.className = 'chain-predict-btn';
+    button.className = 'bench-predict-btn';
     button.textContent = option.label;
     button.addEventListener('click', () => onPick(option.key));
     row.appendChild(button);
