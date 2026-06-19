@@ -85,6 +85,12 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
           if (solved || state.fuse.burned) return;
           sfxClick();
           applyChange(setDistributorPush(state, push));
+          if (push === 16 && !state.solved) {
+            bench.setStatus(
+              '<b>Ohm:</b> «Empuje 16: a la forja le sobra brío, pero a la biblioteca no le das un hilo. ' +
+              'Ni la piedra que más frena baja de Río 2.»',
+            );
+          }
         });
         sourceButtons.set(push, button);
         sourceTray.appendChild(button);
@@ -96,8 +102,12 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
       stage.innerHTML = `
         <div class="distributor-network">
           <div class="distributor-crystal">Empuje <span>4</span></div>
-          <div class="distributor-trunk live"></div>
+          <div class="distributor-trunk-line">
+            <div class="distributor-trunk live"></div>
+            <span class="distributor-trunk-tag">Tronco</span>
+          </div>
           <div class="distributor-crossing">Cruce</div>
+          <div class="distributor-crossing-sum"></div>
           <div class="distributor-districts"></div>
         </div>
         <aside class="distributor-instruments">
@@ -113,7 +123,8 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
       const districtsHost = stage.querySelector<HTMLElement>('.distributor-districts')!;
       const districtRefs: {
         card: HTMLElement;
-        river: HTMLElement;
+        state: HTMLElement;
+        detail: HTMLElement;
         stones: HTMLElement;
         gauge: HTMLElement;
       }[] = [];
@@ -128,8 +139,8 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
           <div class="distributor-district-gauge">
             ${gaugeSVG(district.target, 0.12, 8)}
           </div>
-          <div class="distributor-target">marca justa: Río ${district.target}</div>
-          <div class="distributor-river">Río: 0</div>
+          <div class="distributor-district-state">—</div>
+          <div class="distributor-district-detail">pide Río ${district.target} · llega Río 0</div>
           <div class="distributor-stones" aria-label="Piedras de Freno"></div>`;
         const stones = card.querySelector<HTMLElement>('.distributor-stones')!;
         for (const stone of DISTRIBUTOR_STONES) {
@@ -153,7 +164,8 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
         districtsHost.appendChild(card);
         districtRefs.push({
           card,
-          river: card.querySelector<HTMLElement>('.distributor-river')!,
+          state: card.querySelector<HTMLElement>('.distributor-district-state')!,
+          detail: card.querySelector<HTMLElement>('.distributor-district-detail')!,
           stones,
           gauge: card.querySelector<HTMLElement>('.distributor-district-gauge')!,
         });
@@ -283,6 +295,18 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
         stage.querySelector<HTMLElement>('.distributor-trunk-reading')!.textContent =
           `Tronco: ${blackedOut ? 0 : trunk}`;
         setGauge(stage.querySelector<HTMLElement>('.distributor-trunk-gauge')!, blackedOut ? 0 : trunk, 24);
+
+        // La cuenta del Cruce: el Tronco lleva la suma de lo que toma cada distrito.
+        const crossingSum = stage.querySelector<HTMLElement>('.distributor-crossing-sum')!;
+        if (blackedOut) {
+          crossingSum.classList.remove('over');
+          crossingSum.innerHTML = '<span class="eq-hint">el fusible cortó el Tronco</span>';
+        } else {
+          const parts = state.districts.map((district) => district.river).join(' + ');
+          crossingSum.textContent = `Tronco ${trunk} = ${parts}`;
+          crossingSum.classList.toggle('over', trunk > DISTRIBUTOR_TRUNK_TOLERANCE);
+        }
+
         setOhmState(
           stage,
           blackedOut
@@ -305,7 +329,18 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
           refs.card.classList.toggle('green', !blackedOut && districtInGreenZone(state, index));
           refs.card.classList.toggle('wrong', !blackedOut && !districtInGreenZone(state, index));
           refs.card.querySelector('.distributor-wire')?.classList.toggle('live', !blackedOut);
-          refs.river.textContent = `Río: ${river}`;
+          const target = DISTRIBUTOR_TARGETS[index];
+          const conforme = !blackedOut && district.river === target;
+          refs.state.textContent = blackedOut
+            ? '—'
+            : conforme
+              ? 'conforme'
+              : district.river < target
+                ? 'pide más río'
+                : 'le sobra río';
+          refs.state.classList.toggle('ok', conforme);
+          refs.state.classList.toggle('off', !blackedOut && !conforme);
+          refs.detail.textContent = `pide Río ${target} · llega Río ${river}`;
           setGauge(refs.gauge, river, 8);
           refs.stones.querySelectorAll<HTMLElement>('.piedra').forEach((stone) => {
             const selected = stone.dataset.key === district.stone;
