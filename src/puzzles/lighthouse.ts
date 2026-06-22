@@ -5,6 +5,7 @@ import {
   advanceLighthouse,
   configureLighthouse,
   createLighthouseState,
+  LIGHTHOUSE_TARGET_RHYTHM,
   lighthouseReading,
   type LighthouseBrake,
   type LighthouseTank,
@@ -81,6 +82,10 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
             <span class="lighthouse-actual-label">demasiado rápido</span>
           </div>
           <div class="lighthouse-actual-pulse"><span></span></div>
+        </div>
+        <div class="lighthouse-conditions">
+          <div class="lighthouse-condition" data-condition="rhythm"></div>
+          <div class="lighthouse-condition" data-condition="discharge"></div>
         </div>
         <div class="lighthouse-controls">
           <section>
@@ -227,6 +232,22 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
               : reading.briefDischarge
                 ? 'latido justo'
                 : 'volcado lento';
+        const rhythmState =
+          reading.rhythm < LIGHTHOUSE_TARGET_RHYTHM
+            ? 'rápido'
+            : reading.rhythm > LIGHTHOUSE_TARGET_RHYTHM
+              ? 'lento'
+              : 'justo';
+        const rhythmCondition = stage.querySelector<HTMLElement>('[data-condition="rhythm"]')!;
+        rhythmCondition.textContent =
+          `Ritmo de carga: ${reading.rhythm} · objetivo ${LIGHTHOUSE_TARGET_RHYTHM} · ${rhythmState}`;
+        rhythmCondition.classList.toggle('ok', rhythmState === 'justo');
+
+        const dischargeState = reading.briefDischarge ? 'de golpe' : 'se arrastra';
+        const dischargeCondition = stage.querySelector<HTMLElement>('[data-condition="discharge"]')!;
+        dischargeCondition.textContent =
+          `Volcado: ${formatSeconds(reading.dischargePeriodMs)} s · ${dischargeState}`;
+        dischargeCondition.classList.toggle('ok', reading.briefDischarge);
 
         renderStone('.lighthouse-charge-slot', state.chargeBrake);
         renderStone('.lighthouse-discharge-slot', state.dischargeBrake);
@@ -260,4 +281,8 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
       render();
     },
   );
+}
+
+function formatSeconds(ms: number): string {
+  return (ms / 1000).toFixed(1);
 }

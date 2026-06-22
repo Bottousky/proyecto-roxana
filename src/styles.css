@@ -565,6 +565,15 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .lighthouse-stage[data-timing="just"][data-discharge="brief"] .lighthouse-actual-label {
   color: var(--ok);
 }
+.lighthouse-conditions {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+}
+.lighthouse-condition {
+  padding: 7px 9px; border: 1px solid #4a4554; border-radius: 8px;
+  background: #1d1a23; color: #cd9a52; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.lighthouse-condition.ok { color: var(--ok); }
 .lighthouse-controls {
   display: grid; grid-template-columns: .8fr 1.25fr 1.25fr; gap: 8px;
 }

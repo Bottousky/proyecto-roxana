@@ -23,6 +23,8 @@ const BRAKES: { key: string; value: ClockBrake }[] = [
   { key: 'gris', value: 8 },
 ];
 
+type OpeningPrediction = 'rapido' | 'lento';
+
 const FAST_DIALOGUE = '<b>Farero:</b> «Ese reloj tomó café. Más despacio.»';
 const SLOW_DIALOGUE =
   '<b>Farero:</b> «Ese reloj está por jubilarse. Un poco más de brío.»';
@@ -37,6 +39,11 @@ export function abrirClock(onSolved: () => void, practica = false): void {
     (bench) => {
       let state = createClockState();
       let solved = false;
+      let openingPrediction: OpeningPrediction | undefined;
+
+      const predict = document.createElement('div');
+      predict.className = 'bench-predict';
+      bench.root.appendChild(predict);
 
       const stage = document.createElement('div');
       stage.className = 'bench-stage clock-stage';
@@ -116,7 +123,7 @@ export function abrirClock(onSolved: () => void, practica = false): void {
           button.dataset.tank = String(tank.value);
           button.innerHTML = `<strong>${tank.label}</strong><span>${tank.value}</span>`;
           button.addEventListener('click', () => {
-            if (solved) return;
+            if (solved || !openingPrediction) return;
             sfxClick();
             state = configureClock(state, tank.value, state.brake);
             render();
@@ -137,7 +144,7 @@ export function abrirClock(onSolved: () => void, practica = false): void {
           button.setAttribute('aria-label', `${PIEDRAS[brake.key].nombre}, freno ${brake.value}`);
           button.appendChild(piedraEl(brake.key));
           button.addEventListener('click', () => {
-            if (solved) return;
+            if (solved || !openingPrediction) return;
             sfxClick();
             state = configureClock(state, state.tank, brake.value);
             render();
@@ -146,6 +153,45 @@ export function abrirClock(onSolved: () => void, practica = false): void {
           host.appendChild(button);
           brakeButtons.push(button);
         }
+      }
+
+      function chooseOpeningPrediction(prediction: OpeningPrediction): void {
+        if (openingPrediction) return;
+        sfxClick();
+        openingPrediction = prediction;
+        predict.classList.add('hidden');
+        predict.innerHTML = '';
+        render();
+        bench.setStatus(
+          prediction === 'lento'
+            ? '<b>Farero:</b> «Bien pensado: más Estanque, más lento el tic. Ahora buscá el tic justo (ritmo 4).»'
+            : '<b>Farero:</b> «Al revés de lo que parece: más Estanque tarda más en llenarse, así que más lento. Comprobalo: buscá el tic justo (ritmo 4).»',
+        );
+      }
+
+      function renderPredict(): void {
+        if (openingPrediction) {
+          predict.classList.add('hidden');
+          predict.innerHTML = '';
+          return;
+        }
+
+        predict.classList.remove('hidden');
+        predict.innerHTML =
+          '<p class="bench-predict-q"><b>Ohm:</b> «Antes de tocar nada: si agrandás el Estanque, ¿el tic se vuelve más rápido o más lento?»</p>';
+        const row = document.createElement('div');
+        row.className = 'bench-predict-row';
+        for (const option of [
+          { key: 'rapido' as const, label: 'Más rápido' },
+          { key: 'lento' as const, label: 'Más lento' },
+        ]) {
+          const button = document.createElement('button');
+          button.className = 'bench-predict-btn';
+          button.textContent = option.label;
+          button.addEventListener('click', () => chooseOpeningPrediction(option.key));
+          row.appendChild(button);
+        }
+        predict.appendChild(row);
       }
 
       function evaluateConfiguration(): void {
@@ -202,10 +248,13 @@ export function abrirClock(onSolved: () => void, practica = false): void {
 
         tankButtons.forEach((button) => {
           button.classList.toggle('selected', button.dataset.tank === String(state.tank));
+          button.disabled = solved || !openingPrediction;
         });
         brakeButtons.forEach((button) => {
           button.classList.toggle('selected', button.dataset.brake === String(state.brake));
+          button.disabled = solved || !openingPrediction;
         });
+        renderPredict();
       }
 
       bench.setStatus(

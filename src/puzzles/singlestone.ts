@@ -10,8 +10,10 @@ import {
   SINGLE_STONE_NETWORKS,
   SINGLE_STONE_PUSH,
   SINGLE_STONE_REQUIRED_MATCHES,
+  SINGLE_STONE_VALUES,
   compareSingleStone,
   createSingleStoneState,
+  equivalentResistance,
   isSingleStoneSolved,
   recordSingleStoneMatch,
   type SingleStone,
@@ -44,7 +46,7 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
             <h3>Red armable</h3>
             <div class="singlestone-network-choices" aria-label="Redes objetivo"></div>
             <div class="singlestone-network" aria-live="polite"></div>
-            <div class="singlestone-reading" data-reading="left">Río: —</div>
+            <div class="singlestone-reading" data-reading="left">Río: 0</div>
           </section>
           <div class="singlestone-ohm">
             ${ohmWidgetHTML('Ohm · manantial')}
@@ -54,7 +56,7 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
             <h3>Una piedra</h3>
             <div class="singlestone-slot"></div>
             <div class="singlestone-stones" aria-label="Piedras únicas posibles"></div>
-            <div class="singlestone-reading" data-reading="right">Río: —</div>
+            <div class="singlestone-reading" data-reading="right">Río: 0</div>
           </section>
         </div>
         <button class="singlestone-compare" type="button">Pedirle a Ohm que mida</button>
@@ -103,7 +105,7 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
         if (solved) return;
         sfxClick();
         networkId = nextNetworkId;
-        clearReadings();
+        setOhmState(stage, 'inerte');
         render();
         bench.setStatus('Red elegida. Falta encontrar su Piedra Única.');
       }
@@ -112,7 +114,7 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
         if (solved) return;
         sfxClick();
         candidateStone = stone;
-        clearReadings();
+        setOhmState(stage, 'inerte');
         render();
         bench.setStatus('Piedra colocada. Ohm puede comparar los dos ríos.');
       }
@@ -121,8 +123,7 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
         if (solved) return;
         sfxClick();
         const comparison = compareSingleStone(networkId, candidateStone);
-        setReading('left', comparison.leftRiver);
-        setReading('right', comparison.rightRiver);
+        setReadings(comparison.leftRiver, comparison.rightRiver);
 
         if (comparison.distinguishes) {
           setOhmState(stage, 'debil');
@@ -153,15 +154,11 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
         bench.setStatus(matchingDialogue);
       }
 
-      function clearReadings(): void {
-        stage.querySelector<HTMLElement>('[data-reading="left"]')!.textContent = 'Río: —';
-        stage.querySelector<HTMLElement>('[data-reading="right"]')!.textContent = 'Río: —';
-        setOhmState(stage, 'inerte');
-      }
-
-      function setReading(side: 'left' | 'right', value: number): void {
-        stage.querySelector<HTMLElement>(`[data-reading="${side}"]`)!.textContent =
-          `Río: ${formatNumber(value)}`;
+      function setReadings(leftRiver: number, rightRiver: number): void {
+        stage.querySelector<HTMLElement>('[data-reading="left"]')!.textContent =
+          `Río: ${formatNumber(leftRiver)}`;
+        stage.querySelector<HTMLElement>('[data-reading="right"]')!.textContent =
+          `Río: ${formatNumber(rightRiver)}`;
       }
 
       function disableWorkbench(): void {
@@ -172,6 +169,8 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
 
       function render(): void {
         const network = SINGLE_STONE_NETWORKS.find((candidate) => candidate.id === networkId)!;
+        const leftRiver = SINGLE_STONE_PUSH / equivalentResistance(network);
+        const rightRiver = SINGLE_STONE_PUSH / SINGLE_STONE_VALUES[candidateStone];
         renderNetwork(
           stage.querySelector<HTMLElement>('.singlestone-network')!,
           network,
@@ -187,13 +186,14 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
         for (const [stone, button] of stoneButtons) {
           button.classList.toggle('selected', stone === candidateStone);
         }
+        setReadings(leftRiver, rightRiver);
         renderProgress();
       }
 
       function renderProgress(): void {
         const progress = stage.querySelector<HTMLElement>('.singlestone-progress')!;
         progress.textContent =
-          `Redes que Ohm no distinguió: ${state.matchedNetworkIds.length} de ${SINGLE_STONE_REQUIRED_MATCHES}`;
+          `Equivalencias encontradas: ${state.matchedNetworkIds.length} de ${SINGLE_STONE_REQUIRED_MATCHES}`;
       }
 
       bench.setStatus(
@@ -201,7 +201,6 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
         '<b>Ohm:</b> «Demostrable. Tráiganme una red. Yo decido si la distingo.»',
       );
       render();
-      clearReadings();
     },
   );
 }
