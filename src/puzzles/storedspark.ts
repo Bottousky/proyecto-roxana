@@ -15,6 +15,8 @@ import {
   storedSparkReading,
 } from './storedsparkModel';
 
+const STORED_SPARK_OBSERVE_LEVEL = 95;
+
 const ANOMALY_DIALOGUE =
   '<b>Edda:</b> «Ahí está. EXACTAMENTE eso. Tres segundos sin camino.»<br/>' +
   '<b>Ohm:</b> «Camino: cortado. Chispa: presente. Reglas: intactas. Paciencia: detectada.»';
@@ -61,6 +63,7 @@ export function abrirStoredSpark({
             <small>lámpara</small>
           </div>
         </div>
+        <div class="storedspark-charge" aria-live="polite">Carga del Estanque: 0%</div>
         <div class="storedspark-instruments">
           <div class="storedspark-gauge">
             ${gaugeSVG(0, 0.18, 1)}
@@ -105,13 +108,13 @@ export function abrirStoredSpark({
           label: 'Cortar el camino',
           onClick: () => {
             if (solved || !state.pathOpen) return;
-            chargedEnoughToObserve = state.level >= 95;
+            chargedEnoughToObserve = state.level >= STORED_SPARK_OBSERVE_LEVEL;
             state = setStoredSparkPath(state, false);
             probe.clear();
             sfxDim();
             bench.setStatus(
               chargedEnoughToObserve
-                ? 'La llave se cierra. El camino está cortado, pero la lámpara sigue brillando.'
+                ? 'El camino está cortado, pero la lámpara sigue brillando.'
                 : 'La llave se cierra demasiado pronto. Quedó poca chispa: pruebe llenar el Estanque.',
             );
             render();
@@ -182,6 +185,10 @@ export function abrirStoredSpark({
         stage
           .querySelector<HTMLElement>('.storedspark-lamp')!
           .setAttribute('aria-label', reading.lampLit ? 'Lámpara encendida' : 'Lámpara apagada');
+        stage.querySelector<HTMLElement>('.storedspark-charge')!.textContent =
+          state.pathOpen && state.level >= STORED_SPARK_OBSERVE_LEVEL
+            ? `Carga del Estanque: ${Math.round(state.level)}% — casi lleno, cortá el camino`
+            : `Carga del Estanque: ${Math.round(state.level)}%`;
       }
 
       bench.setStatus('Abra la llave y deje que el Estanque se llene.');

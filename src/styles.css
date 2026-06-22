@@ -302,6 +302,7 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .storedspark-instruments {
   display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap;
 }
+.storedspark-charge { color: var(--accent); text-align: center; font-size: 12px; font-weight: 700; }
 .storedspark-gauge { width: 220px; text-align: center; color: #a99; font-size: 11px; }
 .storedspark-probe-host .ohm-probes { justify-content: center; margin-top: 0; }
 
@@ -733,6 +734,7 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .fairsplit-gauge { max-width: 190px; margin: 0 auto; }
 .fairsplit-gauge-label { color: #a99; font-size: 10px; }
 .fairsplit-reading { color: var(--accent); font-size: 15px; }
+.fairsplit-direction { color: #a99; font-size: 11px; }
 .fairsplit-stones {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 7px;
 }
@@ -975,6 +977,7 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
   display: inline-block; padding: 3px 7px; border-radius: 5px;
   background: #342f3d; color: var(--accent); font-size: 11px;
 }
+.infirmary-peak { margin-top: 4px; color: #d8cfc0; font-size: 11px; }
 .infirmary-channel {
   display: flex; justify-content: center; align-items: center; gap: 6px;
   margin: 8px 0 2px; color: #a99; font-size: 10px;

@@ -1,6 +1,7 @@
 import { sfxBridge, sfxDim, sfxHot, sfxOk, sfxWin } from '../audio';
 import { benchActions, openBench } from '../ui/bench';
 import {
+  CHANNEL_TOLERANCES,
   PIEDRAS,
   canalCortable,
   piedraEl,
@@ -11,6 +12,7 @@ import {
   LONG_CHANNEL_MAX_STONES,
   LONG_CHANNEL_PUSHES,
   LONG_CHANNEL_STONES,
+  LONG_CHANNEL_TARGET_DELIVERY,
   addLongChannelStone,
   attemptLongChannel,
   createLongChannelState,
@@ -96,7 +98,8 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         <div class="longchannel-readings">
           <span data-reading="brake">Freno total: 0</span>
           <span data-reading="river">Río: 0</span>
-          <span data-reading="delivery">Entrega: 0 / 16</span>
+          <span data-reading="delivery">Entrega: 0 / ${LONG_CHANNEL_TARGET_DELIVERY}</span>
+          <span>Canal angosto: tolera Río ${CHANNEL_TOLERANCES.angosto}</span>
         </div>
         <div class="longchannel-row" aria-label="Fila de piedras junto al horno"></div>`;
       bench.root.appendChild(stage);
@@ -175,7 +178,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         if (result.event === 'red-warning') {
           sfxHot();
           bench.setStatus(
-            `La entrega llega a 16, pero el canal está al rojo. Aviso ${state.channel.insistences} de 3.`,
+            `La entrega llega a ${LONG_CHANNEL_TARGET_DELIVERY}, pero el canal está al rojo. Aviso ${state.channel.insistences} de 3.`,
           );
           return;
         }
@@ -186,8 +189,11 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         }
         if (result.event === 'wrong-delivery') {
           sfxDim();
+          const delivery = formatNumber(result.evaluation.delivery);
           bench.setStatus(
-            `El horno pide entrega 16. Esta fila entrega ${formatNumber(result.evaluation.delivery)}.`,
+            result.evaluation.delivery < LONG_CHANNEL_TARGET_DELIVERY
+              ? `La entrega quedó corta (${delivery} de ${LONG_CHANNEL_TARGET_DELIVERY}). Subí el Empuje, o aflojá el freno.`
+              : `Te pasaste (${delivery} de ${LONG_CHANNEL_TARGET_DELIVERY}). Bajá el Empuje, o sumá freno.`,
           );
           return;
         }
@@ -203,7 +209,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
           bench.setStatus(
             foundBoth
               ? EQUIVALENCE_DIALOGUE
-              : `Entrega 16. Canal ${heatLabel(result.evaluation.level)}. El horno respira.`,
+              : `Entrega ${LONG_CHANNEL_TARGET_DELIVERY}. Canal ${heatLabel(result.evaluation.level)}. El horno respira.`,
           );
           return;
         }
@@ -243,7 +249,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         stage.querySelector<HTMLElement>('[data-reading="river"]')!.textContent =
           `Río: ${formatNumber(evaluation.river)}`;
         stage.querySelector<HTMLElement>('[data-reading="delivery"]')!.textContent =
-          `Entrega: ${formatNumber(evaluation.delivery)} / 16`;
+          `Entrega: ${formatNumber(evaluation.delivery)} / ${LONG_CHANNEL_TARGET_DELIVERY}`;
 
         stage.querySelectorAll<HTMLElement>('.longchannel-thermometer').forEach((host) => {
           setThermometer(host, evaluation.level);
@@ -294,7 +300,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
       }
 
       bench.setStatus(
-        'Elige un cristal y arma una fila de piedras. El horno exige ENTREGA 16; el canal angosto tolera río 2.',
+        `Elige un cristal y arma una fila de piedras. El horno exige ENTREGA ${LONG_CHANNEL_TARGET_DELIVERY}; el canal angosto tolera Río ${CHANNEL_TOLERANCES.angosto}.`,
       );
       render();
     },

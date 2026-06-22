@@ -72,8 +72,9 @@ export function abrirFairSplit(onSolved: () => void, practica = false): void {
             <div class="fairsplit-slot" data-slot="high"></div>
             <div class="fairsplit-gauge">
               ${gaugeSVG(FAIR_SPLIT_HIGH_TARGET, 0.35, FAIR_SPLIT_PUSH)}
-              <div class="fairsplit-gauge-label">empuje recibido · objetivo ${FAIR_SPLIT_HIGH_TARGET}</div>
+              <div class="fairsplit-gauge-label">empuje recibido · marca justa ${FAIR_SPLIT_HIGH_TARGET}</div>
               <strong class="fairsplit-reading" data-reading="high">0</strong>
+              <div class="fairsplit-direction" data-direction="high">le falta</div>
             </div>
             <div class="fairsplit-stones" data-stones="high" aria-label="Piedras para la terraza alta"></div>
           </section>
@@ -83,8 +84,9 @@ export function abrirFairSplit(onSolved: () => void, practica = false): void {
             <div class="fairsplit-slot" data-slot="low"></div>
             <div class="fairsplit-gauge">
               ${gaugeSVG(FAIR_SPLIT_LOW_TARGET, 0.35, FAIR_SPLIT_PUSH)}
-              <div class="fairsplit-gauge-label">empuje recibido · objetivo ${FAIR_SPLIT_LOW_TARGET}</div>
+              <div class="fairsplit-gauge-label">empuje recibido · marca justa ${FAIR_SPLIT_LOW_TARGET}</div>
               <strong class="fairsplit-reading" data-reading="low">0</strong>
+              <div class="fairsplit-direction" data-direction="low">le falta</div>
             </div>
             <div class="fairsplit-stones" data-stones="low" aria-label="Piedras para la terraza baja"></div>
           </section>
@@ -172,7 +174,7 @@ export function abrirFairSplit(onSolved: () => void, practica = false): void {
         }
 
         bench.setStatus(
-          `<b>Ohm:</b> «Río: ${formatNumber(result.river)}. Alta: ${formatNumber(result.highPush)}. Baja: ${formatNumber(result.lowPush)}.»`,
+          `<b>Ohm:</b> «Río: ${formatNumber(result.river)}. Alta: ${formatNumber(result.highPush)} (${directionLabel(result.highPush, FAIR_SPLIT_HIGH_TARGET)}). Baja: ${formatNumber(result.lowPush)} (${directionLabel(result.lowPush, FAIR_SPLIT_LOW_TARGET)}).»`,
         );
       }
 
@@ -193,6 +195,10 @@ export function abrirFairSplit(onSolved: () => void, practica = false): void {
           formatNumber(result.highPush);
         stage.querySelector<HTMLElement>('[data-reading="low"]')!.textContent =
           formatNumber(result.lowPush);
+        stage.querySelector<HTMLElement>('[data-direction="high"]')!.textContent =
+          directionLabel(result.highPush, FAIR_SPLIT_HIGH_TARGET);
+        stage.querySelector<HTMLElement>('[data-direction="low"]')!.textContent =
+          directionLabel(result.lowPush, FAIR_SPLIT_LOW_TARGET);
         stage.querySelector<HTMLElement>('.fairsplit-river')!.textContent =
           `Río: ${formatNumber(result.river)}`;
         stage.querySelector('.fairsplit-terrace.high')?.classList.toggle(
@@ -227,4 +233,9 @@ export function abrirFairSplit(onSolved: () => void, practica = false): void {
 
 function formatNumber(value: number): string {
   return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+}
+
+function directionLabel(value: number, target: number): string {
+  if (value === target) return 'conforme';
+  return value < target ? 'le falta' : 'le sobra';
 }

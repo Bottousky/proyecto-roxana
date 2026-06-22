@@ -87,6 +87,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
         card.innerHTML = `
           <h3>Máquina ${id}</h3>
           <div class="infirmary-plate">río de trabajo ${machine.workRiver}</div>
+          <div class="infirmary-peak">pico esperado ~Río ${machine.peakRiver}</div>
           <div class="infirmary-channel">
             <span class="infirmary-copper"></span>
             <span>canal ${machine.thickness}</span>
