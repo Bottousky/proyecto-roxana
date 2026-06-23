@@ -1,4 +1,6 @@
 export interface Flags {
+  // Arc I (Ohmdal) flags
+  /** introSeen: Hall monologue with the preceptor. seenIntro (below) is the opening cinematic. */
   introSeen: boolean;
   talkedPreceptor: boolean;
   hasBitacora: boolean;
@@ -61,6 +63,30 @@ export interface Flags {
   arcOneCompleted: boolean;
   sawCrystalEye: boolean;
   unit5Completed: boolean;
+
+  // Prologue (H1) flags
+  /** Opening cinematic viewed. Different from introSeen (Hall monologue). */
+  seenIntro: boolean;
+  /** Bitácora menu (diegetic) opened. */
+  bitacoraOpened: boolean;
+  /** Second reaction from the preceptor triggered. */
+  preceptorReprise: boolean;
+  /** Assigned course: 'ninguno', 'electronica', or others for future worlds. */
+  cursoAsignado: 'ninguno' | 'electronica';
+  /** Room IDs visited by the student. */
+  salasVisitadas: string[];
+  /** Current objective ID. */
+  objetivoActual: string;
+  /** Array of past objective IDs. */
+  objetivosHistorial: string[];
+  /** Saw the old map in the preceptor's office (interaction). */
+  vioMapaDespacho: boolean;
+  /** Saw the old note (interaction). */
+  vioNotaVieja: boolean;
+  /** Array of student IDs talked to. */
+  estudiantesHablados: string[];
+  /** Cinematic was skipped. */
+  cinematicaSkipped: boolean;
 }
 
 const DEFAULT_FLAGS: Flags = {
@@ -126,6 +152,19 @@ const DEFAULT_FLAGS: Flags = {
   arcOneCompleted: false,
   sawCrystalEye: false,
   unit5Completed: false,
+
+  // Prologue (H1) defaults
+  seenIntro: false,
+  bitacoraOpened: false,
+  preceptorReprise: false,
+  cursoAsignado: 'ninguno',
+  salasVisitadas: [],
+  objetivoActual: '',
+  objetivosHistorial: [],
+  vioMapaDespacho: false,
+  vioNotaVieja: false,
+  estudiantesHablados: [],
+  cinematicaSkipped: false,
 };
 
 export interface GameState {
@@ -166,8 +205,8 @@ export function resetSave(): void {
   state.flags = { ...DEFAULT_FLAGS };
 }
 
-export function setFlag(name: keyof Flags): void {
-  state.flags[name] = true;
+export function setFlag(name: Exclude<keyof Flags, 'cursoAsignado' | 'salasVisitadas' | 'objetivoActual' | 'objetivosHistorial' | 'estudiantesHablados'>): void {
+  (state.flags[name] as any) = true;
   save();
 }
 

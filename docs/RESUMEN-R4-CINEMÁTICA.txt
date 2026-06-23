@@ -1,0 +1,244 @@
+================================================================================
+RESUMEN EJECUTIVO — R4 CINEMÁTICA INTRO_02–04
+Proyecto Roxana — 2026-06-22
+================================================================================
+
+TAREA COMPLETADA:
+Especificación visual + prompts + integración para 3 imágenes cinemáticas.
+
+ENTREGA:
+  5 documentos (~11,000 palabras):
+  1. spec-cinematica-intro-visual.md       (visión visual detallada + prompts)
+  2. como-generar-cinemática.md            (paso-a-paso: DALL-E/Midjourney/Stable)
+  3. cinemática-prompts-copy-paste.md      (prompts listos para copy-paste)
+  4. integracion-cinematica-engine.md      (especificación técnica Phaser 4)
+  5. R4-ENTREGA-CINEMÁTICA.md              (este resumen + aprobación)
+
+================================================================================
+LAS 3 IMÁGENES
+================================================================================
+
+INTRO_02 — "Roxana años atrás" (40 años, apogeo)
+  Dimensión: 1536×1024 px | Paleta: Dorado cálido, tierra, verde oscuro
+  Atmósfera: Energía, curiosidad, prestigio
+  Elementos: Hall lleno, talleres activos, circuitos, luz dorada cálida
+  Personajes: Muchas siluetas (sin rostros detallados), en movimiento
+
+INTRO_03 — "La leyenda de la Bitácora" (Archivo viejo, misterio)
+  Dimensión: 1536×1024 px | Paleta: Sepia, gris, café oscuro
+  Atmósfera: Misterio, leyenda olvidada, descubrimiento
+  Elementos: Fotos viejas, documentos, trofeos oxidados, libro difuminado
+  Texto: Fragmentado/borroso ("Mundos Aplicados", "Solo registra a quienes...")
+
+INTRO_04 — "Escuela actual vacía" (Hoy 2026, silencio)
+  Dimensión: 1536×1024 px | Paleta: Gris, azul frío tenue, marrón desteñido
+  Atmósfera: Melancolía, abandono no destructivo, espera
+  Elementos: Hall vacío, bancos, escalera central, estatua, luz mínima, polvo
+  Personajes: Ninguno (o 1 silueta lejana)
+
+CONTINUIDAD VISUAL:
+  ✓ Misma escuela en 3 momentos (arquitectura reconocible)
+  ✓ Transición de paleta: dorada → sepia → gris
+  ✓ Escalera + estatua visibles (referencia espacial)
+
+================================================================================
+PRÓXIMOS PASOS PARA MANUEL
+================================================================================
+
+PASO 1 — LEER (5 min):
+  Abrir: docs/como-generar-cinemática.md
+
+PASO 2 — GENERAR (15 min):
+  Opción A: DALL-E (rápido, accesible)
+    → https://chat.openai.com (tab "Create images")
+
+  Opción B: Midjourney (mejor calidad, recomendado)
+    → https://discord.gg/midjourney
+    → Usar prompts de docs/cinemática-prompts-copy-paste.md
+
+  Opción C: Stable Diffusion local (gratis si tienes GPU)
+    → Instalar WebUI, copiar prompts, generar
+
+PASO 3 — VERIFICAR (10 min):
+  ☐ Dimensiones: 1536×1024 px
+  ☐ Formato: PNG
+  ☐ Tamaño: ~200–500 KB c/u
+  ☐ Guardar en: assets/cinematic/INTRO_0X.png
+  ☐ Checklist visual en R4-ENTREGA-CINEMÁTICA.md §5
+
+PASO 4 — ENTREGAR:
+  Cuando las 3 imágenes estén listas en assets/cinematic/:
+  → Avisar a Claude Code
+  → Proceder con hito H6 (integración en engine)
+
+TIEMPO TOTAL: ~30 min (generación + verificación).
+
+================================================================================
+PROMPTS (COPY-PASTE READY)
+================================================================================
+
+Archivo: docs/cinemática-prompts-copy-paste.md
+
+  DALL-E, Midjourney, Stable Diffusion — 3 servicios × 3 imágenes
+
+  Uso: Copiar exacto del doc, pegar en tu servicio de imagegen, generar.
+
+================================================================================
+PALETAS DE COLOR (REFERENCIAS)
+================================================================================
+
+INTRO_02 (dorada/cálida):
+  Dorado:      #D4AF37, #E6C200, #FFD700
+  Tierra:      #8B6F47, #A0826D, #D2B48C
+  Verde:       #3D5C3D, #556B55
+  Gris:        #A9A9A9, #B8B8B8
+
+INTRO_03 (sepia/misterio):
+  Sepia:       #704214, #8B7355, #A0826D
+  Gris:        #808080, #696969, #778899
+  Café:        #3E2723, #5C4033
+  Oro:         #B8860B, #DAA520
+
+INTRO_04 (gris/apagada):
+  Gris:        #B0B0B0, #A9A9A9, #A0A0A0
+  Azul:        #4A6FA5, #658BA3, #6B8FC7
+  Marrón:      #7A5C47, #8B6F47
+  Metal:       #505050, #666666, #888888
+
+================================================================================
+CHECKLIST POST-GENERACIÓN
+================================================================================
+
+TÉCNICO:
+  ☐ 1536×1024 px (c/u)
+  ☐ PNG (no JPG)
+  ☐ <500 KB (si >500 KB, comprimir con optipng)
+  ☐ assets/cinematic/INTRO_0X.png (ubicación correcta)
+
+VISUAL:
+  ☐ INTRO_02: luz dorada, gente (siluetas), talleres, energía
+  ☐ INTRO_03: fotos viejas, documentos, texto borroso, libro difuminado
+  ☐ INTRO_04: Hall vacío, bancos, escalera, estatua, luz mínima, polvo (no destrucción)
+
+COHERENCIA:
+  ☐ Arquitectura reconocible en las 3 (escalera, puertas, estatua)
+  ☐ Paleta transita suavemente (dorada → sepia → gris)
+  ☐ Sensación temporal clara (pasado → presente)
+
+SI NECESITAS RELANZAR:
+  Problema: INTRO_02 muy oscura
+  Solución: Relanzar con "+ brighter, more golden light"
+
+  Problema: INTRO_02 con rostros detallados
+  Solución: Relanzar con "+ no faces, silhouettes only"
+
+  [Ver docs/R4-ENTREGA-CINEMÁTICA.md §9 para más troubleshooting]
+
+================================================================================
+DOCUMENTACIÓN COMPLETA
+================================================================================
+
+docs/spec-cinematica-intro-visual.md (4200 palabras)
+  → Descripción visual detallada
+  → Paletas con hex codes
+  → Prompts para 3 servicios
+  → Checklist de verificación
+
+docs/como-generar-cinemática.md (2000 palabras)
+  → Instrucciones paso-a-paso (DALL-E, Midjourney, Stable)
+  → Coste estimado + tiempo
+  → Troubleshooting
+
+docs/cinemática-prompts-copy-paste.md (500 palabras)
+  → Prompts listos para copy-paste (3×3)
+  → Quick tweaks para ajustes
+
+docs/integracion-cinematica-engine.md (2500 palabras)
+  → Especificación técnica Phaser 4
+  → Código template IntroCinematic.ts
+  → Tests + checklist de integración
+
+docs/R4-ENTREGA-CINEMÁTICA.md (1500 palabras)
+  → Resumen ejecutivo completo
+  → Visión general de las 3 imágenes
+  → Cronograma + riesgos
+
+docs/RESUMEN-R4-CINEMÁTICA.txt (este archivo)
+  → Referencia rápida 1 página
+
+================================================================================
+INTEGRACIÓN EN ENGINE (DESPUÉS)
+================================================================================
+
+Hito H6 — IntroCinematic.ts (ejecutor Sonnet implementará):
+
+  Ubicación assets:
+  assets/cinematic/INTRO_01.png (renombrar de hero-asignacion.png)
+  assets/cinematic/INTRO_02.png (generar)
+  assets/cinematic/INTRO_03.png (generar)
+  assets/cinematic/INTRO_04.png (generar)
+
+  Código nuevo:
+  src/game/IntroCinematic.ts       (escena cinemática)
+  src/content/intro-textos.ts      (textos de la cinemática)
+  tests/p6-intro-cinematica.test.ts (tests)
+
+  Cambios:
+  src/main.ts  (disparar cinemática si !seenIntro)
+  src/state.ts (agregar flags seenIntro, cinematicaSkipped)
+
+================================================================================
+ESTADO
+================================================================================
+
+✅ COMPLETADO:
+  • Especificación visual (3 imágenes detalladas)
+  • Prompts optimizados (3 servicios × 3 imágenes)
+  • Documentación técnica (integración Phaser 4)
+  • Checklist de verificación
+  • Cronograma de ejecución
+
+⏳ PENDIENTE:
+  • Generación de las 3 imágenes PNG (TAREA DE MANUEL)
+  • Integración en engine (HITO H6, Sonnet)
+  • Playtest con usuarios reales
+
+================================================================================
+APROBACIÓN REQUERIDA
+================================================================================
+
+Director (Manuel Gonzalo Botto Docampo):
+  ☐ Visión general de las 3 imágenes: APROBADA
+  ☐ Paletas de color: APROBADA
+  ☐ Prompts: APROBADA
+  ☐ Cronograma: APROBADA
+
+Comentarios:
+  (Por completar.)
+
+================================================================================
+CONTACTO / PRÓXIMOS PASOS
+================================================================================
+
+Preguntas sobre especificación visual?
+  → Ver docs/spec-cinematica-intro-visual.md
+
+Cómo generar las imágenes?
+  → Seguir docs/como-generar-cinemática.md (paso-a-paso)
+  → O copiar prompts de docs/cinemática-prompts-copy-paste.md
+
+Problemas al generar?
+  → Ver troubleshooting en docs/R4-ENTREGA-CINEMÁTICA.md §9
+
+Listo para integrar en engine?
+  → Ejecutor (Sonnet) implementa hito H6 basado en docs/integracion-cinematica-engine.md
+
+================================================================================
+FIN DE RESUMEN
+================================================================================
+
+Versión: 1.0
+Fecha: 2026-06-22
+Orquestador: Claude Code
+Proyecto: Roxana — Juego educativo web, Phaser 4 + TypeScript
+
