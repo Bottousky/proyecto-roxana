@@ -1,0 +1,105 @@
+/* Landing styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+@keyframes rx-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+@keyframes rx-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes rx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Links hover state */
+a[href]:not([href='#']):not([href^='javascript']) {
+  transition: color 0.15s;
+}
+
+a[href]:not([href='#']):not([href^='javascript']):hover {
+  color: var(--accent);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header nav {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  header nav > div:nth-child(3) {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* Cart drawer smooth transitions */
+#cart-drawer {
+  transition: transform 0.3s ease-out;
+}
+
+#cart-drawer[style*='display: flex'] {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Toast animation */
+#toast {
+  animation: rx-rise 0.25s ease-out;
+}

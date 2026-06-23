@@ -14,7 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="./src/landing/landing.css" />
+  <link rel="stylesheet" href="./landing.css" />
 </head>
 <body>
   <div
@@ -56,7 +56,7 @@
         <button id="cart-btn" style="display: flex; align-items: center; gap: 8px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 8px 13px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: border-color 0.15s;">
           <span style="font-size: 15px;">◷</span><span>Cesta · <span id="cart-count">0</span></span>
         </button>
-        <a href="/src/jugar" style="background: var(--accent); color: #1a1408; text-decoration: none; border-radius: 9px; padding: 9px 18px; font-weight: 700; font-size: 14.5px; box-shadow: 0 0 0 1px var(--accent-dim);">Jugar</a>
+        <a href="/jugar" style="background: var(--accent); color: #1a1408; text-decoration: none; border-radius: 9px; padding: 9px 18px; font-weight: 700; font-size: 14.5px; box-shadow: 0 0 0 1px var(--accent-dim);">Jugar</a>
       </nav>
     </header>
 
@@ -98,7 +98,7 @@
             <p style="font-family: 'Spectral', serif; font-style: italic; font-size: clamp(20px, 2.5vw, 30px); line-height: 1.32; color: var(--paper); max-width: 620px; margin: 18px 0 0;">«Una escuela olvidó lo que sabía. Tú vas a recordarlo jugando.»</p>
             <p style="font-size: clamp(16px, 1.5vw, 18.5px); line-height: 1.6; color: var(--muted); max-width: 560px; margin: 22px 0 0;">Cuatro Mundos Aplicados — Matemática, Física, Electrónica y Programación — donde el conocimiento sobrevive degradado en ritual. Empieza por <strong style="color: var(--text); font-weight: 600;">Ohmdal</strong>, el mundo de la corriente, ya jugable de punta a punta.</p>
             <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px;">
-              <a href="/src/jugar" style="display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #1a1408; text-decoration: none; border-radius: 11px; padding: 15px 26px; font-weight: 700; font-size: 16.5px; box-shadow: 0 8px 30px color-mix(in srgb, var(--accent) 34%, transparent);">Jugar Ohmdal <span style="font-size: 18px;">→</span></a>
+              <a href="/jugar" style="display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #1a1408; text-decoration: none; border-radius: 11px; padding: 15px 26px; font-weight: 700; font-size: 16.5px; box-shadow: 0 8px 30px color-mix(in srgb, var(--accent) 34%, transparent);">Jugar Ohmdal <span style="font-size: 18px;">→</span></a>
               <a href="#proyecto" style="display: inline-flex; align-items: center; gap: 9px; background: transparent; color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 11px; padding: 15px 24px; font-weight: 600; font-size: 16.5px; transition: border-color 0.15s; cursor: pointer;">Conocer el proyecto</a>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 30px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.04em; color: var(--muted);">
@@ -123,7 +123,7 @@
             <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); padding: 22px 0 4px;">Ficha técnica</div>
             <div id="ficha-rows"></div>
             <div style="padding: 18px 0 22px;">
-              <a href="/src/jugar" style="display: block; text-align: center; background: transparent; color: var(--accent); text-decoration: none; border: 1px solid var(--accent-dim); border-radius: 10px; padding: 13px; font-weight: 600; font-size: 15px; transition: background 0.15s; cursor: pointer;">Abrir el juego →</a>
+              <a href="/jugar" style="display: block; text-align: center; background: transparent; color: var(--accent); text-decoration: none; border: 1px solid var(--accent-dim); border-radius: 10px; padding: 13px; font-weight: 600; font-size: 15px; transition: background 0.15s; cursor: pointer;">Abrir el juego →</a>
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@
             <div>
               <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px;">Jugar</div>
               <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;">
-                <li><a href="/src/jugar" style="color: var(--text); text-decoration: none; transition: color 0.15s;">Abrir Ohmdal</a></li>
+                <li><a href="/jugar" style="color: var(--text); text-decoration: none; transition: color 0.15s;">Abrir Ohmdal</a></li>
                 <li><a href="#mundos" style="color: var(--text); text-decoration: none; transition: color 0.15s;">Ver mundos</a></li>
               </ul>
             </div>
@@ -205,6 +205,6 @@
     <div id="cart-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 99; backdrop-filter: blur(4px);"></div>
   </div>
 
-  <script type="module" src="./src/landing/index.ts"></script>
+  <script type="module" src="./index.ts"></script>
 </body>
 </html>

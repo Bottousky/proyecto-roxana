@@ -1,6 +1,6 @@
 import './styles.css';
 import Phaser from 'phaser';
-import { ExplorationScene, W, H } from './game/ExplorationScene';
+import { ExplorationScene, W, H } from './jugar/ExplorationScene';
 import { initDialog } from './ui/dialog';
 import { initBitacora, showBitacoraButton } from './ui/bitacora';
 import { el } from './ui/overlay';
