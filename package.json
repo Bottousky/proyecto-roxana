@@ -11,7 +11,9 @@
     "verify": "bash scripts/verificar-hito.sh"
   },
   "dependencies": {
-    "phaser": "^4.1.0"
+    "@types/three": "^0.185.0",
+    "phaser": "^4.1.0",
+    "three": "^0.177.0"
   },
   "devDependencies": {
     "typescript": "~5.6.3",

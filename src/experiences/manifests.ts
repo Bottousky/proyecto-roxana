@@ -1,13 +1,19 @@
 import type { ExperienceManifest } from './types.ts';
 
+// La escuela 3D es un prototipo gateado por URL: sin ?school3d=1 se conserva
+// el prólogo cenital. Node (tests) no tiene location: cae al runtime actual.
+const school3dEnabled =
+  typeof location !== 'undefined' && new URLSearchParams(location.search).has('school3d');
+
 export const INSTITUTO: ExperienceManifest = {
   id: 'instituto',
   title: 'Instituto Roxana',
   discipline: 'Mundo real / memoria del conocimiento',
   status: 'playable',
-  // El prólogo existente sigue operativo. Este runtime se reemplazará sólo
-  // cuando el prototipo 3D/2.5D demuestre que funciona en web y mobile.
-  runtime: 'topdown-phaser',
+  // El prólogo cenital sigue operativo por defecto. El prototipo 3D/2.5D se
+  // activa solo con ?school3d=1 hasta que demuestre ser mejor (no se reemplaza
+  // el prólogo hasta entonces).
+  runtime: school3dEnabled ? 'school-webgl' : 'topdown-phaser',
   rooms: ['hall', 'despacho', 'aula'],
   learningVerb: 'reunir',
   fantasy: 'Volver a encender una escuela que olvidó lo que sabía.',

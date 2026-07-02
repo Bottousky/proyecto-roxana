@@ -170,9 +170,13 @@ se mantienen tests con saves viejos reales. Ningún prototipo nuevo puede romper
 
 **Salida:** reemplazar el Instituto no exige tocar Ohmdal.
 
-### P3 — Spike del Instituto
+### P3 — Spike del Instituto [en curso]
 
-Construir la misma estancia mínima en hasta tres variantes:
+**2026-07-02:** el Director eligió la variante WebGL 3D real (Three.js + assets voxel
+MagicaVoxel→GLB a futuro). Hall greybox jugable gateado por `?school3d=1`
+(`docs/spec-p3-escuela-3d.md`). Pendiente: medición en Android objetivo y ADR formal.
+
+Variantes originalmente consideradas:
 
 1. Phaser 2.5D con capas y fondos;
 2. WebGL 3D liviano con cámara fija/semi-fija;

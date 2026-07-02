@@ -4,8 +4,7 @@ import type { RuntimeLoaderMap } from './types.ts';
 
 export const runtimeLoaders: RuntimeLoaderMap = {
   'topdown-phaser': () => import('./ohmdal/topdownRuntime.ts').then((m) => m.topdownRuntime),
-  'school-webgl': () =>
-    import('./placeholderRuntime.ts').then((m) => m.placeholderRuntime('school-webgl', 'instituto')),
+  'school-webgl': () => import('./instituto/schoolRuntime.ts').then((m) => m.schoolRuntime),
   'dataflow-phaser': () =>
     import('./placeholderRuntime.ts').then((m) => m.placeholderRuntime('dataflow-phaser', 'bitland')),
   'platformer-phaser': () =>

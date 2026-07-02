@@ -3,14 +3,19 @@
 import Phaser from 'phaser';
 import { ExplorationScene, W, H } from '../../jugar/ExplorationScene.ts';
 import { state, hooks } from '../../state.ts';
-import { activateExperienceForRoom } from '../registry.ts';
+import { activateExperienceForRoom, experienceOfRoom } from '../registry.ts';
 import type { ExperienceRuntimeModule, RuntimeHandle } from '../types.ts';
 
 export const topdownRuntime: ExperienceRuntimeModule = {
   runtime: 'topdown-phaser',
   async mount(hostEl, context) {
+    // El shell puede pedir montar en una sala concreta (p. ej. la puerta 3D → plaza).
+    const requestedRoom = context.initialLocation.roomId;
+    if (requestedRoom && experienceOfRoom(requestedRoom)?.runtime === 'topdown-phaser') {
+      state.room = requestedRoom;
+    }
+
     // La escena ya lee state.room directamente.
-    // P2: initialLocation reemplazará la lectura directa de state.room
     activateExperienceForRoom(state.room);
 
     const game = new Phaser.Game({
@@ -30,8 +35,6 @@ export const topdownRuntime: ExperienceRuntimeModule = {
       // solo en desarrollo: handle para pruebas E2E desde la consola
       (window as any).__game = game;
     }
-
-    void context; // el contexto todavía no se usa (ver comentario arriba)
 
     const handle: RuntimeHandle = {
       async travelTo(destination) {
