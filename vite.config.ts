@@ -6,12 +6,17 @@ export default defineConfig({
   plugins: [
     {
       name: 'rewrite-jugar-dev',
-      // En desarrollo: reescribe /jugar/* a /src/jugar/*
+      // En desarrollo: redirige /jugar/* a /src/jugar/* con 302, para que el
+      // navegador quede en /src/jugar/ y los paths relativos del HTML
+      // (p. ej. ../main.ts) resuelvan solos.
       // (en producción este rewrite lo hace _redirects, no tocar eso)
       configureServer(server) {
-        server.middlewares.use((req, _res, next) => {
+        server.middlewares.use((req, res, next) => {
           if (req.url?.startsWith('/jugar')) {
-            req.url = req.url.replace(/^\/jugar/, '/src/jugar');
+            res.statusCode = 302;
+            res.setHeader('Location', req.url.replace(/^\/jugar/, '/src/jugar'));
+            res.end();
+            return;
           }
           next();
         });
