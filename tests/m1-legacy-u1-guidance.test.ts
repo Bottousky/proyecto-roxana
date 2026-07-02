@@ -6,7 +6,7 @@ function includes(source: string, expected: string, label: string): void {
   }
 }
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 
 includes(
   roomsSource,

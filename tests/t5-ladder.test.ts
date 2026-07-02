@@ -82,7 +82,7 @@ equal(
   'una predicción incorrecta conserva la medición',
 );
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const ladderSource = readFileSync(new URL('../src/puzzles/ladder.ts', import.meta.url), 'utf8');
 const predictionSource = readFileSync(new URL('../src/ui/prediction.ts', import.meta.url), 'utf8');
 

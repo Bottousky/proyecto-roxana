@@ -10,8 +10,8 @@ function includes(source: string, text: string, label: string): void {
   equal(source.includes(text), true, label);
 }
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
-const sceneSource = readFileSync(new URL('../src/game/ExplorationScene.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
+const sceneSource = readFileSync(new URL('../src/jugar/ExplorationScene.ts', import.meta.url), 'utf8');
 const audioSource = readFileSync(new URL('../src/audio.ts', import.meta.url), 'utf8');
 
 includes(roomsSource, 'visible?: () => boolean;', 'las puertas admiten visibilidad por flags');

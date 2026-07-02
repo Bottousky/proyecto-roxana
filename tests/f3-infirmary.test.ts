@@ -64,7 +64,7 @@ result = startForge(canonical);
 equal(result.event, 'solved', '2/4/8 produce ritmo estable');
 equal(result.state.solved, true, 'el modelo queda resuelto');
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const infirmarySource = readFileSync(new URL('../src/puzzles/infirmary.ts', import.meta.url), 'utf8');
 
 equal(

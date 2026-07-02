@@ -103,7 +103,7 @@ cut = addLongChannelStone(cut, 'amarilla');
 result = attemptLongChannel(cut);
 equal(result.event, 'valid', 'el reempalme no bloquea una solución posterior');
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const puzzleSource = readFileSync(
   new URL('../src/puzzles/longchannel.ts', import.meta.url),
   'utf8',

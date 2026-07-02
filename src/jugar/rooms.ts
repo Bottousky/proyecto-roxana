@@ -133,9 +133,10 @@ function resolverPuerta(): void {
     setFlag('puertaDone');
     say(
       [
-        L('Maese Lumen', 'Se abrió… La Puerta pedía el caudal justo: ni hambrienta ni ahogada. Empuje y freno, medidos el uno contra el otro.'),
+        L('', 'Las hojas se apartan. Del otro lado no hay una sala: una calzada de cobre sube hacia el manantial y el río de chispa corre por ella hasta la plaza.'),
+        L('Maese Lumen', 'Se abrió… La Puerta regulaba el caudal del pueblo: ni hambrienta ni ahogada. Empuje y freno, medidos el uno contra el otro.'),
         L('Edda', 'Empuje sobre freno. Es… ¿es una CUENTA? ¿Todo este tiempo era una cuenta?'),
-        L('', 'La Bitácora arde tibia en tu bolsillo. Se está escribiendo sola otra vez — y esta vez, a fuego.'),
+        L('', 'Las lámparas despiertan una tras otra a tus espaldas. La Bitácora arde tibia en tu bolsillo, escribiéndose a fuego.'),
       ],
       () => {
         notifyNewEntry('La Ley de Ohm');
@@ -954,8 +955,8 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        id: 'retrato', x: 450, y: 105, w: 130, h: 64,
-        label: 'Retrato', prompt: 'Mirar el retrato', color: 0x52443a, solid: true, emoji: '🖼️',
+        id: 'retrato', x: 450, y: 70, w: 130, h: 54,
+        label: 'Retrato', prompt: 'Mirar el retrato', color: 0x52443a, solid: false, emoji: '🖼️',
         onInteract: () => {
           setFlag('vioRetrato');
           say([
@@ -1429,11 +1430,25 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => 0x2b2638,
     doors: [
       { x: 420, y: 514, w: 120, h: 26, to: 'plaza', spawn: { x: 480, y: 80 }, label: 'Plaza' },
+      {
+        x: 370, y: 0, w: 220, h: 26,
+        to: 'manantial_ohm', spawn: { x: 480, y: 440 },
+        label: 'Puerta de Ohm · Manantial', color: 0x8a7c50,
+        locked: () =>
+          f().puertaDone
+            ? null
+            : [
+                L('', 'Las dos hojas de la Puerta cierran la calzada. El ojo de aguja espera una medida.'),
+                L('Maese Lumen', 'El mecanismo está junto al umbral. «Ni hambrienta ni ahogada».'),
+              ],
+      },
     ],
     things: [
       {
-        id: 'lapuerta', x: 480, y: 190, w: 180, h: 150,
-        label: 'La Puerta de Ohm', prompt: 'Examinar la Puerta', solid: true, emoji: '⚡',
+        // a caballo del muro norte, con el ancho exacto del paso: la Puerta ES la muralla abierta.
+        // Altura = banda del muro + fachada (¾) + pie mínimo, para coincidir con la línea de pared.
+        id: 'lapuerta', x: 480, y: 20, w: 220, h: 84,
+        label: 'La Puerta de Ohm', prompt: 'Usar el mecanismo de la Puerta', solid: false, emoji: '⚡',
         color: () => (f().puertaDone ? 0x8a7c50 : 0x3a3340),
         onInteract: () => {
           if (f().puertaDone) abrirPuerta(() => {}, true); // modo práctica
@@ -1477,6 +1492,61 @@ export const ROOMS: Record<string, RoomDef> = {
     },
   },
 
+  manantial_ohm: {
+    id: 'manantial_ohm',
+    name: 'Ohmdal — Calzada del Manantial',
+    floor: () => (f().puertaDone ? 0x26313a : 0x171a22),
+    wall: () => (f().puertaDone ? 0x46505a : 0x292d36),
+    doors: [
+      {
+        x: 370, y: 514, w: 220, h: 26,
+        to: 'puerta', spawn: { x: 480, y: 90 },
+        label: 'Puerta de Ohm · Plaza', color: 0x8a7c50,
+      },
+    ],
+    things: [
+      {
+        id: 'cauce-maestro', x: 480, y: 275, w: 115, h: 330,
+        label: 'Río de chispa', prompt: 'Observar el cauce',
+        color: 0xc99f45, solid: false, emoji: '⚡',
+        onInteract: () =>
+          say([
+            L('', 'El cauce luminoso baja desde el manantial, atraviesa la Puerta abierta y se divide bajo las calles de Ohmdal.'),
+            L('Ohm', 'Caudal estable: dos. Destinos activos: plaza, campana, alumbrado.'),
+            L('Edda', 'Entonces la Puerta no guardaba un tesoro. Cuidaba que el pueblo recibiera lo justo.'),
+          ]),
+      },
+      {
+        id: 'hito-proporciones', x: 245, y: 185, w: 190, h: 115,
+        label: 'Hito de los tres caudales', prompt: 'Leer las marcas del hito',
+        color: 0x6f665b, solid: true,
+        onInteract: () =>
+          say([
+            L('', 'Tres pares están tallados en la piedra: 4 sobre 2; 8 sobre 4; 16 sobre 8. Los tres desembocan en la misma marca: 2.'),
+            L('Maese Lumen', 'Distinto empuje, distinto freno… el mismo río. Los Maestros dejaron la explicación del otro lado de la prueba. Muy propio de ellos.'),
+          ]),
+      },
+      {
+        id: 'mirador-manantial', x: 735, y: 170, w: 220, h: 120,
+        label: 'Mirador del Manantial', prompt: 'Mirar más allá de Ohmdal',
+        color: 0x3d5863, solid: false,
+        onInteract: () =>
+          say([
+            L('', 'La calzada termina en un balcón sobre una grieta azul. Desde allí, conductos antiguos parten hacia montañas, terrazas y una luz remota junto al lago.'),
+            L('Edda', 'La Puerta era un comienzo. Hay caminos por todo el mundo.'),
+          ]),
+      },
+      {
+        id: 'ohm-manantial', x: 600, y: 390, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm',
+        color: 0xc9a437, solid: true,
+        // detrás de una Puerta sellada no puede verse a nadie del otro lado
+        visible: () => f().puertaDone,
+        onInteract: () => say(L('Ohm', 'Origen visible. Camino visible. Misterio reducido.')),
+      },
+    ],
+  },
+
   castle_gate: {
     id: 'castle_gate',
     name: 'Ohmdal — Puerta del Castillo',
@@ -1501,7 +1571,9 @@ export const ROOMS: Record<string, RoomDef> = {
     ],
     things: [
       {
-        id: 'puerta-castillo', x: 480, y: 95, w: 230, h: 110,
+        // a caballo del muro norte, con el ancho exacto del paso (mismo tratamiento que
+        // lapuerta): la Puerta monumental ES la muralla abierta, no un mueble en el piso
+        id: 'puerta-castillo', x: 480, y: 20, w: 150, h: 84,
         label: 'Puerta monumental', prompt: 'Examinar la puerta lacrada',
         color: () => (f().metConsejera ? 0x7a674f : 0x443842),
         solid: false,
@@ -1668,7 +1740,9 @@ export const ROOMS: Record<string, RoomDef> = {
     ],
     things: [
       {
-        id: 'tronco-ramales', x: 480, y: 145, w: 70, h: 190,
+        // Deja un corredor legible frente al vano norte: con y=145/h=190 el
+        // jugador sólo tenía ~1 px útil entre el Tronco y el borde del paso.
+        id: 'tronco-ramales', x: 480, y: 175, w: 70, h: 150,
         label: 'Tronco', prompt: 'Examinar el Tronco',
         color: 0x8a6842, solid: true,
         onInteract: () =>

@@ -71,7 +71,7 @@ state = observeWarmth(state, 'yunque');
 equal(state.experiences.anvilDoubled, true, 'medir el yunque duplicado registra la experiencia');
 equal(isWarmthSolved(state), true, 'las cuatro experiencias resuelven el banco en cualquier orden');
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const warmthSource = readFileSync(new URL('../src/puzzles/warmth.ts', import.meta.url), 'utf8');
 
 equal(roomsSource.includes("import { abrirWarmth } from '../puzzles/warmth';"), true, 'rooms importa F2');

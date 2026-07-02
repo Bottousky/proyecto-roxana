@@ -76,7 +76,7 @@ state = advanceLighthouse(state, lighthouseDischargePeriodMs(1));
 equal(state.level, 0, 'el volcado vacía el Estanque');
 equal(state.phase, 'charging', 'después del volcado vuelve a cargar');
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const puzzleSource = readFileSync(new URL('../src/puzzles/lighthouse.ts', import.meta.url), 'utf8');
 
 equal(LIGHTHOUSE_UNIT_MS, 250, 'L5 usa 250 ms por unidad');

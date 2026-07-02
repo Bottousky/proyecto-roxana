@@ -39,7 +39,7 @@ equal(state.level, 100, 'el Estanque queda lleno');
 equal(sleepingRiverReading(state).full, true, 'el modelo informa Estanque lleno');
 equal(sleepingRiverReading(state).riverFlow, 0, 'el río es cero con el Estanque lleno');
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const puzzleSource = readFileSync(new URL('../src/puzzles/sleepingriver.ts', import.meta.url), 'utf8');
 
 equal(roomsSource.includes("import { abrirSleepingRiver } from '../puzzles/sleepingriver';"), true, 'rooms importa L3');

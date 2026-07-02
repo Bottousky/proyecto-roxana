@@ -54,7 +54,7 @@ state = advanceClock(state, clockPeriodMs(2, 2) * 2.25);
 equal(state.level, 25, 'el modelo conserva el resto después de varios volcados');
 equal(state.pendulumStep, 3, 'un dt grande no pierde tics');
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const puzzleSource = readFileSync(new URL('../src/puzzles/clock.ts', import.meta.url), 'utf8');
 
 equal(CLOCK_UNIT_MS, 250, 'L4 usa 250 ms por unidad');

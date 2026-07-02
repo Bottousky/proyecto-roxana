@@ -11,7 +11,7 @@ function includes(source: string, text: string, label: string): void {
 }
 
 const entriesSource = readFileSync(new URL('../src/content/entries.ts', import.meta.url), 'utf8');
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 
 for (const id of [
   'la-chispa-que-se-queda',

@@ -52,7 +52,7 @@ state = observeStepsRiver(state, 'between-stones-3-4');
 equal(isStepsSolved(state), true, 'las cuatro experiencias resuelven en cualquier orden');
 
 const commonSource = readFileSync(new URL('../src/puzzles/common.ts', import.meta.url), 'utf8');
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const stepsSource = readFileSync(new URL('../src/puzzles/steps.ts', import.meta.url), 'utf8');
 
 equal(commonSource.includes('export function ohmArms<'), true, 'common exporta el modo brazos');

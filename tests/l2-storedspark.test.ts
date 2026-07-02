@@ -75,7 +75,7 @@ else delete (globalThis as { cancelAnimationFrame?: typeof cancelAnimationFrame 
 
 const commonSource = readFileSync(new URL('../src/puzzles/common.ts', import.meta.url), 'utf8');
 const benchSource = readFileSync(new URL('../src/ui/bench.ts', import.meta.url), 'utf8');
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const puzzleSource = readFileSync(new URL('../src/puzzles/storedspark.ts', import.meta.url), 'utf8');
 
 equal(commonSource.includes('export function tankSVG()'), true, 'common exporta tankSVG');

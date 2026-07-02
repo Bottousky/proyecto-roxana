@@ -27,7 +27,7 @@ for (const flag of unit5Flags) {
   equal(state.flags[flag], false, `${flag} empieza en false`);
 }
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const unit5Branch = roomsSource.indexOf('if (fl.unit4Completed && !fl.playedUnit5Intro)');
 const unit4Branch = roomsSource.indexOf('if (fl.unit3Completed && !fl.playedUnit4Intro)');
 

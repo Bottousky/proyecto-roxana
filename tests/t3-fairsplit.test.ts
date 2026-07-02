@@ -65,7 +65,7 @@ equal(
   'la enumeración incluye la solución B',
 );
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const fairSplitSource = readFileSync(new URL('../src/puzzles/fairsplit.ts', import.meta.url), 'utf8');
 
 equal(roomsSource.includes("import { abrirFairSplit } from '../puzzles/fairsplit';"), true, 'rooms importa T3');

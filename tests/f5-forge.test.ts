@@ -261,7 +261,7 @@ equal(
   'la reparación reinicia las insistencias',
 );
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const forgeSource = readFileSync(new URL('../src/puzzles/forge.ts', import.meta.url), 'utf8');
 const audioSource = readFileSync(new URL('../src/audio.ts', import.meta.url), 'utf8');
 

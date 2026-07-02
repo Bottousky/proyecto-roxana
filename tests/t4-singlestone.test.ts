@@ -77,7 +77,7 @@ state = recordSingleStoneMatch(
 equal(state.matchedNetworkIds.length, 2, 'una segunda red distinta y correcta cuenta');
 equal(isSingleStoneSolved(state), true, 'dos redes distintas resuelven el puzzle');
 
-const roomsSource = readFileSync(new URL('../src/game/rooms.ts', import.meta.url), 'utf8');
+const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const singleStoneSource = readFileSync(
   new URL('../src/puzzles/singlestone.ts', import.meta.url),
   'utf8',
