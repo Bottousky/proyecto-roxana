@@ -38,6 +38,10 @@ export const schoolRuntime: ExperienceRuntimeModule = {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(rect.width, rect.height);
     renderer.shadowMap.enabled = false;
+    // Iluminación física (three ≥ r165) + ACES: sin esto las lámparas puntuales
+    // quedan apagadas y la sala ilegible.
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
     renderer.domElement.style.display = 'block';
     hostEl.appendChild(renderer.domElement);
 
