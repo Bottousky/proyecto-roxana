@@ -1,7 +1,9 @@
 # Plan técnico — Plataforma para cinco juegos
 
-**Estado:** borrador operativo 0.1  
-**Base estable:** `main` / `ohmdal-base` en `296eee7`  
+**Estado:** borrador operativo 0.1
+
+**Base estable:** `main` / `ohmdal-base` en `296eee7`
+
 **Visión:** [`vision-mundos-multilenguaje.md`](vision-mundos-multilenguaje.md)
 
 ## 1. Decisión arquitectónica
