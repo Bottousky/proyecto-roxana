@@ -26,14 +26,14 @@ export const H = 540;
 
 // penumbra por atmósfera: cuánta oscuridad cubre la sala (la luz vuelve al progresar)
 const AMBIENT: Record<Ambience, number> = {
-  ohmdal: 0.2,
-  'ohmdal-on': 0.06,
-  castle: 0.16,
+  ohmdal: 0.1,
+  'ohmdal-on': 0.025,
+  castle: 0.1,
   instituto: 0.12,
-  taller: 0.15,
-  forge: 0.1,
-  terraces: 0.08,
-  lighthouse: 0.18,
+  taller: 0.07,
+  forge: 0.055,
+  terraces: 0.035,
+  lighthouse: 0.1,
 };
 const B = 26; // grosor del borde
 const SPEED = 250;
@@ -101,11 +101,30 @@ export class ExplorationScene extends Phaser.Scene {
   private currentChunk = '';
   private darkness!: Phaser.GameObjects.Rectangle;
   private roomName!: Phaser.GameObjects.Text;
+  private mapLayer!: Phaser.GameObjects.Container;
+  private mapOpen = false;
   // el mundo puede extenderse hacia y negativo: el y-sort se normaliza con este mínimo
   private worldMinY = 0;
 
   constructor() {
     super('explore');
+  }
+
+  preload(): void {
+    this.load.spritesheet('ohmdal-student-walk', new URL('../../assets/ohmdal/hero-student-walk-solid-64.png', import.meta.url).href, {
+      frameWidth: 64,
+      frameHeight: 96,
+    });
+    this.load.spritesheet('ohmdal-student-idle', new URL('../../assets/ohmdal/hero-student-idle-solid-64.png', import.meta.url).href, {
+      frameWidth: 64,
+      frameHeight: 96,
+    });
+    this.load.spritesheet('ohmdal-npc-core', new URL('../../assets/ohmdal/npc-core-atlas-64.png', import.meta.url).href, {
+      frameWidth: 64,
+      frameHeight: 96,
+    });
+    this.load.image('ohmdal-forest-objects', new URL('../../assets/vendor/tiny-rpg-forest/environment/objects.png', import.meta.url).href);
+    this.load.image('ohmdal-map-panel', new URL('../../assets/ohmdal/world-map-panel-1024.png', import.meta.url).href);
   }
 
   create(): void {
@@ -120,6 +139,7 @@ export class ExplorationScene extends Phaser.Scene {
       s: kb.addKey(Phaser.Input.Keyboard.KeyCodes.S),
       d: kb.addKey(Phaser.Input.Keyboard.KeyCodes.D),
       e: kb.addKey(Phaser.Input.Keyboard.KeyCodes.E),
+      m: kb.addKey(Phaser.Input.Keyboard.KeyCodes.M),
     };
 
     ensureTextures(this, W, H);
@@ -139,12 +159,25 @@ export class ExplorationScene extends Phaser.Scene {
     this.roomName = this.add
       .text(36, 34, '', {
         fontFamily: 'Georgia, serif',
-        fontSize: '15px',
-        color: '#9a92a8',
-        fontStyle: 'italic',
+        fontSize: '14px',
+        color: '#fff1bd',
+        fontStyle: 'bold',
+        stroke: '#171321',
+        strokeThickness: 4,
       })
       .setScrollFactor(0)
       .setDepth(DEPTH.ui);
+    this.mapLayer = this.add
+      .container(0, 0)
+      .setScrollFactor(0)
+      .setDepth(DEPTH.ui + 30)
+      .setVisible(false);
+    kb.on('keydown-M', () => {
+      if (!uiOpen()) this.toggleMap();
+    });
+    kb.on('keydown-ESC', () => {
+      if (this.mapOpen) this.toggleMap(false);
+    });
     // la chispa que acompaña al protagonista: mantiene legible la penumbra
     this.playerHalo = this.add
       .image(this.player.x, this.player.y, 'vis-glow')
@@ -312,6 +345,7 @@ export class ExplorationScene extends Phaser.Scene {
   private enterChunk(id: string): void {
     this.currentChunk = id;
     state.room = id;
+    if (!state.flags.salasVisitadas.includes(id)) state.flags.salasVisitadas.push(id);
     save();
     activateExperienceForRoom(id);
     const def = ROOMS[id];
@@ -332,6 +366,7 @@ export class ExplorationScene extends Phaser.Scene {
     const def = ROOMS[id];
     if (!def) return;
     state.room = id;
+    if (!state.flags.salasVisitadas.includes(id)) state.flags.salasVisitadas.push(id);
     save();
     activateExperienceForRoom(id);
     this.roomGen++;
@@ -472,7 +507,7 @@ export class ExplorationScene extends Phaser.Scene {
               bd.rect.x + bd.rect.w / 2 + (horizontal ? 0 : bd.rect.x < ox + W / 2 ? 56 : -56),
               bd.rect.y + bd.rect.h / 2 + (horizontal ? (bd.rect.y < oy + H / 2 ? 42 : -38) : 0),
               bd.door.label,
-              { fontFamily: 'Segoe UI, sans-serif', fontSize: '12px', color: '#8d84a0' },
+              { fontFamily: 'Georgia, serif', fontSize: '12px', color: '#e4d394', stroke: '#161323', strokeThickness: 3 },
             )
             .setOrigin(0.5)
             .setAlpha(0.9)
@@ -502,9 +537,11 @@ export class ExplorationScene extends Phaser.Scene {
       add(
         this.add
           .text(lx, ly, sd.label, {
-            fontFamily: 'Segoe UI, sans-serif',
+            fontFamily: 'Georgia, serif',
             fontSize: '12px',
-            color: '#8d84a0',
+            color: '#e4d394',
+            stroke: '#161323',
+            strokeThickness: 3,
           })
           .setOrigin(0.5)
           .setAlpha(0.9)
@@ -538,14 +575,16 @@ export class ExplorationScene extends Phaser.Scene {
       const color = typeof st.color === 'function' ? st.color() : st.color;
       const body = add(this.makeThingVisual(st));
       let label: Phaser.GameObjects.Text | null = null;
-      if (st.label) {
+      if (st.label && body instanceof CharacterRig) {
         const halfH = body instanceof CharacterRig ? 30 * body.scale : st.h / 2;
         label = add(
           this.add
             .text(st.x, st.y - halfH - 12, st.label, {
-              fontFamily: 'Segoe UI, sans-serif',
-              fontSize: '12px',
-              color: '#cfc7da',
+              fontFamily: 'Georgia, serif',
+              fontSize: '11px',
+              color: '#fff3c4',
+              stroke: '#171321',
+              strokeThickness: 3,
             })
             .setOrigin(0.5)
             .setAlpha(0.85)
@@ -709,7 +748,128 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
+  private toggleMap(force?: boolean): void {
+    this.mapOpen = force ?? !this.mapOpen;
+    this.mapLayer.setVisible(this.mapOpen);
+    if (!this.mapOpen) return;
+
+    this.mapLayer.removeAll(true);
+    const world = worldOf(this.currentChunk);
+    const accent = world?.accent ?? 0xd0a34a;
+    const accentCss = `#${accent.toString(16).padStart(6, '0')}`;
+    const backdrop = this.add
+      .image(480, 270, 'ohmdal-map-panel')
+      .setDisplaySize(790, 470)
+      .setAlpha(0.98);
+    const panel = this.add.graphics();
+    panel.fillStyle(0x071026, 0.3);
+    panel.fillRoundedRect(112, 45, 736, 450, 8);
+    panel.lineStyle(2, accent, 0.9);
+    panel.strokeRoundedRect(128, 62, 704, 416, 5);
+    this.mapLayer.add([backdrop, panel]);
+
+    const title = this.add.text(154, 75, (world?.name ?? 'Ohmdal').toLocaleUpperCase('es'), {
+      fontFamily: 'Georgia, serif',
+      fontSize: '20px',
+      color: accentCss,
+      fontStyle: 'bold',
+      letterSpacing: 2,
+    });
+    const hint = this.add.text(806, 78, 'M / ESC · cerrar', {
+      fontFamily: 'Segoe UI, sans-serif',
+      fontSize: '12px',
+      color: '#aebbe8',
+    }).setOrigin(1, 0);
+    const location = this.add.text(154, 103, `UBICACIÓN · ${ROOMS[this.currentChunk]?.name ?? this.currentChunk}`, {
+      fontFamily: 'Segoe UI, sans-serif',
+      fontSize: '11px',
+      color: '#d6def4',
+      letterSpacing: 1,
+    });
+    this.mapLayer.add([title, hint, location]);
+
+    const entries = Object.entries(this.chunks);
+    const minX = Math.min(...entries.map(([, p]) => p.ox));
+    const maxX = Math.max(...entries.map(([, p]) => p.ox + W));
+    const minY = Math.min(...entries.map(([, p]) => p.oy));
+    const maxY = Math.max(...entries.map(([, p]) => p.oy + H));
+    const spanX = Math.max(W, maxX - minX);
+    const spanY = Math.max(H, maxY - minY);
+    const scale = Math.min(520 / spanX, 285 / spanY);
+    const originX = 480 - (spanX * scale) / 2;
+    const originY = 137 + (285 - spanY * scale) / 2;
+
+    const map = this.add.graphics();
+    // Red de caminos primero: el mapa cuenta continuidad, no una lista de cajas.
+    const linked = new Set<string>();
+    for (const [id, p] of entries) {
+      for (const door of ROOMS[id]?.doors ?? []) {
+        const target = this.chunks[door.to];
+        if (!target) continue;
+        const edge = [id, door.to].sort().join('|');
+        if (linked.has(edge)) continue;
+        linked.add(edge);
+        const ax = originX + (p.ox - minX + W / 2) * scale;
+        const ay = originY + (p.oy - minY + H / 2) * scale;
+        const bx = originX + (target.ox - minX + W / 2) * scale;
+        const by = originY + (target.oy - minY + H / 2) * scale;
+        map.lineStyle(8, 0x071020, 0.9);
+        map.lineBetween(ax, ay, bx, by);
+        map.lineStyle(3, accent, 0.85);
+        map.lineBetween(ax, ay, bx, by);
+      }
+    }
+    const visited = new Set(state.flags.salasVisitadas);
+    for (const [id, p] of entries) {
+      const x = originX + (p.ox - minX) * scale;
+      const y = originY + (p.oy - minY) * scale;
+      const cw = W * scale;
+      const ch = H * scale;
+      const active = id === this.currentChunk;
+      const known = active || visited.has(id);
+      map.fillStyle(active ? accent : known ? 0x293765 : 0x111a35, active ? 0.98 : 0.9);
+      map.fillRoundedRect(x + 5, y + 5, cw - 10, ch - 10, 6);
+      map.lineStyle(active ? 3 : 1.5, active ? 0xfff0b0 : known ? 0x8296ca : 0x435170, 1);
+      map.strokeRoundedRect(x + 5, y + 5, cw - 10, ch - 10, 6);
+      // Marca de arquitectura: pequeñas losas, canales o placas según el plano.
+      map.lineStyle(1, active ? 0x271b22 : 0x9aabd8, active ? 0.35 : 0.2);
+      for (let stripe = 14; stripe < cw - 12; stripe += 17) {
+        map.lineBetween(x + stripe, y + 10, x + stripe, y + ch - 10);
+      }
+      const label = this.add.text(x + cw / 2, y + ch / 2, ROOMS[id]?.name.split('—').pop()?.trim() ?? id, {
+        fontFamily: 'Georgia, serif',
+        fontSize: `${Math.max(9, Math.min(12, ch * 0.18))}px`,
+        color: active ? '#171321' : known ? '#edf0fa' : '#7180a5',
+        align: 'center',
+        wordWrap: { width: Math.max(64, cw - 10) },
+      }).setOrigin(0.5);
+      this.mapLayer.add(label);
+    }
+    const px = originX + (this.player.x - minX) * scale;
+    const py = originY + (this.player.y - minY) * scale;
+    map.fillStyle(0xfff1a4, 1);
+    map.fillCircle(px, py, 6);
+    map.lineStyle(2, 0x20142c, 1);
+    map.strokeCircle(px, py, 6);
+    map.lineStyle(1, 0xffffff, 0.8);
+    map.lineBetween(px, py - 10, px, py + 10);
+    map.lineBetween(px - 10, py, px + 10, py);
+
+    const legend = this.add.text(154, 456, '◆ POSICIÓN ACTUAL     ━ CAMINO CONTINUO     SALAS OSCURAS · AÚN NO VISITADAS', {
+      fontFamily: 'Segoe UI, sans-serif',
+      fontSize: '10px',
+      color: '#b9c5e6',
+      letterSpacing: 0.5,
+    });
+    this.mapLayer.addAt(map, 2);
+    this.mapLayer.add(legend);
+  }
+
   private onPointer(p: Phaser.Input.Pointer): void {
+    if (this.mapOpen) {
+      this.toggleMap(false);
+      return;
+    }
     if (uiOpen()) return;
     if (document.body.classList.contains('touch-device')) return;
     const wx = p.worldX;
@@ -733,9 +893,11 @@ export class ExplorationScene extends Phaser.Scene {
   update(time: number, delta: number): void {
     const prompt = el('prompt');
     const actionBtn = el<HTMLButtonElement>('action-btn');
-    if (uiOpen()) {
+    if (uiOpen() || this.mapOpen) {
       prompt.classList.add('hidden');
       actionBtn.classList.add('hidden');
+      this.player.setMoving(false);
+      this.player.tick(delta);
       return;
     }
     const dt = delta / 1000;

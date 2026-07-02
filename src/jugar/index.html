@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Proyecto Roxana — Unidad 1 (vertical slice)</title>
+  <link rel="icon" href="data:," />
+  <title>Proyecto Roxana — Ohmdal · Arco I</title>
 </head>
 <body>
   <div id="app">
@@ -17,8 +18,13 @@
     <div id="prompt" class="hidden"></div>
 
     <div id="dialog" class="hidden">
-      <div id="dialog-who"></div>
-      <div id="dialog-text"></div>
+      <div id="dialog-portrait">
+        <img id="dialog-portrait-image" alt="" />
+      </div>
+      <div id="dialog-copy">
+        <div id="dialog-who"></div>
+        <div id="dialog-text"></div>
+      </div>
       <div id="dialog-next">▼</div>
     </div>
 
@@ -39,13 +45,13 @@
     <div id="title-screen">
       <div class="title-card">
         <h1>Proyecto Roxana</h1>
-        <h2>Unidad 1 — La corriente no es magia</h2>
-        <p class="note">Vertical slice · greybox jugable<br/>(formas y sistemas, sin arte final)</p>
+        <h2>OHMDAL · ARCO I</h2>
+        <p class="note">Un mundo construido para aprender caminándolo.<br/>La luz vuelve cuando algo se comprende.</p>
         <div class="title-buttons">
           <button id="btn-continue" class="hidden">Continuar</button>
           <button id="btn-new">Empezar de nuevo</button>
         </div>
-        <p class="hint">PC: flechas / WASD para moverte · E o click para interactuar · B abre la Bitácora<br/>Mobile: usa el joystick para caminar y el botón para interactuar</p>
+        <p class="hint">PC: flechas / WASD · E interactúa · B Bitácora · M mapa de zona<br/>Mobile: usa el joystick para caminar y el botón para interactuar</p>
       </div>
     </div>
 
@@ -62,6 +68,6 @@
     </div>
   </div>
 
-  <script type="module" src="../main.ts"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

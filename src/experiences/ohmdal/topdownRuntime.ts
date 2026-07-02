@@ -24,6 +24,13 @@ export const topdownRuntime: ExperienceRuntimeModule = {
       width: W,
       height: H,
       backgroundColor: '#0e0d12',
+      pixelArt: true,
+      roundPixels: true,
+      render: {
+        antialias: false,
+        antialiasGL: false,
+        roundPixels: true,
+      },
       scene: [ExplorationScene],
       scale: {
         mode: Phaser.Scale.FIT,

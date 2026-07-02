@@ -13,8 +13,9 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
           if (req.url?.startsWith('/jugar')) {
+            const suffix = req.url.slice('/jugar'.length);
             res.statusCode = 302;
-            res.setHeader('Location', req.url.replace(/^\/jugar/, '/src/jugar'));
+            res.setHeader('Location', `/src/jugar${suffix || '/'}`);
             res.end();
             return;
           }

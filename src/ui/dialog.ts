@@ -16,12 +16,51 @@ let endCb: (() => void) | null = null;
 let active = false;
 let lastAdvance = 0;
 
+const PORTRAITS: Record<string, string> = {
+  student: new URL('../../assets/ohmdal/portraits/student.png', import.meta.url).href,
+  edda: new URL('../../assets/ohmdal/portraits/edda.png', import.meta.url).href,
+  lumen: new URL('../../assets/ohmdal/portraits/lumen.png', import.meta.url).href,
+  preceptor: new URL('../../assets/ohmdal/portraits/preceptor.png', import.meta.url).href,
+  consejera: new URL('../../assets/ohmdal/portraits/consejera.png', import.meta.url).href,
+  guardiana: new URL('../../assets/ohmdal/portraits/guardiana.png', import.meta.url).href,
+  yesca: new URL('../../assets/ohmdal/portraits/yesca.png', import.meta.url).href,
+  farero: new URL('../../assets/ohmdal/portraits/farero.png', import.meta.url).href,
+  ohm: new URL('../../assets/ohmdal/portraits/ohm.png', import.meta.url).href,
+  nino: new URL('../../assets/ohmdal/portraits/nino.png', import.meta.url).href,
+  proyector: new URL('../../assets/ohmdal/portraits/proyector.png', import.meta.url).href,
+  ciudadano: new URL('../../assets/ohmdal/portraits/ciudadano.png', import.meta.url).href,
+};
+
 function render(): void {
   sfxBlip();
   const line = queue[idx];
   el('dialog-who').textContent = line.who;
   el('dialog-who').style.display = line.who ? 'block' : 'none';
   el('dialog-text').textContent = line.text;
+  const portrait = el('dialog-portrait');
+  const key = portraitKey(line.who);
+  portrait.className = key ? `portrait-${key}` : 'portrait-narrator';
+  portrait.setAttribute('aria-label', line.who || 'Narración');
+  const image = el('dialog-portrait-image') as HTMLImageElement;
+  image.src = key ? PORTRAITS[key] : '';
+  image.alt = key ? `Retrato de ${line.who}` : '';
+}
+
+function portraitKey(who: string): string {
+  const name = who.toLocaleLowerCase('es');
+  if (!name) return '';
+  if (name.includes('edda')) return 'edda';
+  if (name.includes('lumen')) return 'lumen';
+  if (name.includes('preceptor')) return 'preceptor';
+  if (name.includes('consejera')) return 'consejera';
+  if (name.includes('guardiana')) return 'guardiana';
+  if (name.includes('forjadora') || name.includes('yesca')) return 'yesca';
+  if (name.includes('farero')) return 'farero';
+  if (name.includes('ohm')) return 'ohm';
+  if (name.includes('proyector')) return 'proyector';
+  if (name.includes('niño') || name.includes('nino')) return 'nino';
+  if (name.includes('ciudadano')) return 'ciudadano';
+  return 'student';
 }
 
 function closeDialog(): void {

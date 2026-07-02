@@ -57,6 +57,11 @@ function mulberry32(seed: number): () => number {
 /* ---------- texturas generadas ---------- */
 
 export function ensureTextures(scene: Phaser.Scene, w: number, h: number): void {
+  if (scene.textures.exists('ohmdal-forest-objects')) {
+    const objects = scene.textures.get('ohmdal-forest-objects');
+    if (!objects.has('tree-copper')) objects.add('tree-copper', 0, 48, 16, 64, 80);
+    if (!objects.has('tree-violet')) objects.add('tree-violet', 0, 144, 16, 64, 80);
+  }
   if (scene.textures.exists('vis-glow')) return;
 
   // glow radial blanco (para luces, halos y resaltados)
@@ -132,7 +137,17 @@ export interface RoomPalette {
 
 /** aclara los colores de rooms.ts (autorados para greybox oscuro) hacia un gris cálido */
 export function liftPalette(pal: RoomPalette): RoomPalette {
-  return { floor: mix(pal.floor, 0x554e63, 0.38), wall: mix(pal.wall, 0x554e63, 0.2) };
+  return { floor: mix(pal.floor, 0x695f64, 0.24), wall: mix(pal.wall, 0x62525f, 0.14) };
+}
+
+function authoredPalette(roomId: string, raw: RoomPalette): RoomPalette {
+  if (roomId === 'plaza') return { floor: 0x59654a, wall: 0x6b4b39 };
+  if (roomId === 'puerta' || roomId === 'manantial_ohm') return { floor: 0x526052, wall: 0x51465d };
+  if (roomId.startsWith('castle_')) return { floor: 0x493e58, wall: 0x30283f };
+  if (roomId.startsWith('forge_')) return { floor: 0x654737, wall: 0x493026 };
+  if (roomId.startsWith('terraces_')) return { floor: 0x426459, wall: 0x355049 };
+  if (roomId.startsWith('lighthouse_') || roomId === 'clock_tower') return { floor: 0x40566b, wall: 0x314252 };
+  return liftPalette(raw);
 }
 
 export function drawRoomBase(
@@ -147,7 +162,7 @@ export function drawRoomBase(
   border: number,
 ): void {
   const rnd = mulberry32(hashStr(roomId));
-  const pal = liftPalette(rawPal);
+  const pal = authoredPalette(roomId, rawPal);
 
   // pared: base + biselado interior para que el borde tenga cuerpo
   add(scene.add.rectangle(ox + w / 2, oy + h / 2, w, h, shade(pal.wall, 0.92)).setDepth(DEPTH.floor));
@@ -191,7 +206,7 @@ export function drawRoomBase(
       if (x1 - x0 < 6 || y1 - y0 < 6) continue;
       const jitter = 0.93 + rnd() * 0.17;
       g.fillStyle(shade(pal.floor, jitter), 1);
-      g.fillRoundedRect(ox + x0, oy + y0, x1 - x0, y1 - y0, 5);
+      g.fillRect(ox + x0, oy + y0, x1 - x0, y1 - y0);
     }
   }
   // juntas: trazo sutil más oscuro
@@ -203,17 +218,110 @@ export function drawRoomBase(
   }
 
   // medallón central de mosaico (cada sala con leve variación propia)
-  const mr = 68 + rnd() * 26;
-  const cxm = ox + w / 2;
-  const cym = oy + h / 2 + 14;
-  g.lineStyle(4, shade(pal.floor, 1.22), 0.55);
-  g.strokeCircle(cxm, cym, mr);
-  g.lineStyle(2, shade(pal.floor, 0.78), 0.55);
-  g.strokeCircle(cxm, cym, mr - 12);
-  g.fillStyle(shade(pal.floor, 1.16), 0.5);
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2 + mr;
-    g.fillCircle(cxm + Math.cos(a) * (mr - 6), cym + Math.sin(a) * (mr - 6), 3);
+  // Motivos autorados por región: el suelo funciona como identidad y orientación.
+  if (roomId === 'plaza') {
+    g.fillStyle(0x85806b, 0.9);
+    g.fillRect(ox + w / 2 - 76, oy + border, 152, h - border * 2);
+    g.fillRect(ox + border, oy + h / 2 - 54, w - border * 2, 108);
+    // Calzada legible: adoquines chicos y bordes dorados, no una cruz plana.
+    g.lineStyle(2, 0x555746, 0.55);
+    for (let y = border + 18, row = 0; y < h - border; y += 26, row++) {
+      g.lineBetween(ox + w / 2 - 74, oy + y, ox + w / 2 + 74, oy + y);
+      const seam = row % 2 ? w / 2 - 18 : w / 2 + 24;
+      g.lineBetween(ox + seam, oy + y - 25, ox + seam, oy + y);
+    }
+    for (let x = border + 20, col = 0; x < w - border; x += 34, col++) {
+      g.lineBetween(ox + x, oy + h / 2 - 52, ox + x, oy + h / 2 + 52);
+      if (col % 2 === 0) g.fillStyle(0xb6a36d, 0.25), g.fillRect(ox + x + 3, oy + h / 2 - 48, 25, 18);
+    }
+    g.lineStyle(4, 0xc5ae70, 0.65);
+    g.strokeCircle(ox + w / 2, oy + h / 2, 58);
+    g.lineStyle(2, 0x314b50, 0.9);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      g.lineBetween(ox + w / 2, oy + h / 2, ox + w / 2 + Math.cos(a) * 52, oy + h / 2 + Math.sin(a) * 52);
+    }
+  } else if (roomId.startsWith('castle_')) {
+    g.fillStyle(0x701f45, 0.92);
+    g.fillRect(ox + w / 2 - 64, oy + border, 128, h - border * 2);
+    g.fillStyle(0xd0a34a, 0.82);
+    g.fillRect(ox + w / 2 - 64, oy + border, 5, h - border * 2);
+    g.fillRect(ox + w / 2 + 59, oy + border, 5, h - border * 2);
+    // Rombos heráldicos convierten el corredor en una secuencia ceremonial.
+    for (let y = border + 38; y < h - border; y += 62) {
+      g.fillStyle(0x351a35, 0.95);
+      g.fillTriangle(ox + w / 2, oy + y - 17, ox + w / 2 + 20, oy + y, ox + w / 2, oy + y + 17);
+      g.fillTriangle(ox + w / 2, oy + y - 17, ox + w / 2 - 20, oy + y, ox + w / 2, oy + y + 17);
+      g.fillStyle(0xe0b75f, 0.8);
+      g.fillCircle(ox + w / 2, oy + y, 3);
+    }
+  } else if (roomId.startsWith('forge_')) {
+    g.fillStyle(0x2e2726, 0.8);
+    for (let x = border + 60; x < w - border; x += 120) g.fillRect(ox + x, oy + border, 12, h - border * 2);
+    g.fillStyle(0xd46b2f, 0.65);
+    for (let x = border + 66; x < w - border; x += 120) g.fillRect(ox + x, oy + border, 3, h - border * 2);
+    // Placas remachadas y rejillas: el piso entero parece parte de una máquina.
+    g.lineStyle(2, 0x241f22, 0.7);
+    for (let y = border + 64; y < h - border; y += 82) g.lineBetween(ox + border, oy + y, ox + w - border, oy + y);
+    for (let y = border + 24; y < h - border; y += 82) {
+      for (let x = border + 28; x < w - border; x += 60) {
+        g.fillStyle(0xb06a42, 0.85); g.fillCircle(ox + x, oy + y, 2.5);
+      }
+    }
+    for (const x of [border + 18, w - border - 38]) {
+      for (let y = border + 18; y < h - border - 12; y += 28) {
+        g.fillStyle((Math.floor(y / 28) % 2) ? 0xe2933e : 0x2c2626, 0.8);
+        g.fillRect(ox + x, oy + y, 20, 12);
+      }
+    }
+  } else if (roomId.startsWith('terraces_')) {
+    for (let y = border + 44; y < h - border; y += 92) {
+      // Frente de contención: una sombra vertical hace leer cada nivel como altura.
+      g.fillStyle(0x243f39, 0.9);
+      g.fillRect(ox + border, oy + y + 22, w - border * 2, 12);
+      g.fillStyle(0x6d8b66, 0.75);
+      g.fillRect(ox + border, oy + y - 7, w - border * 2, 7);
+      g.fillStyle(0x246d70, 0.78);
+      g.fillRect(ox + border, oy + y, w - border * 2, 22);
+      g.fillStyle(0x77d0b9, 0.46);
+      for (let x = border + 18; x < w - border; x += 52) g.fillRect(ox + x, oy + y + 5, 24, 3);
+      g.fillStyle(0xd5f3d4, 0.5);
+      for (let x = border + 31; x < w - border; x += 88) g.fillCircle(ox + x, oy + y + 17, 2);
+    }
+  } else if (roomId.startsWith('lighthouse_') || roomId === 'clock_tower') {
+    g.lineStyle(3, 0x88a8c5, 0.38);
+    for (let r = 46; r < 220; r += 38) g.strokeCircle(ox + w / 2, oy + h / 2, r);
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      g.lineStyle(i % 3 === 0 ? 3 : 1, i % 3 === 0 ? 0xd1b16a : 0x88a8c5, i % 3 === 0 ? 0.55 : 0.25);
+      g.lineBetween(ox + w / 2 + Math.cos(a) * 42, oy + h / 2 + Math.sin(a) * 42, ox + w / 2 + Math.cos(a) * 216, oy + h / 2 + Math.sin(a) * 216);
+    }
+    g.fillStyle(0x8bdcff, 0.28);
+    g.fillCircle(ox + w / 2, oy + h / 2, 34);
+  } else if (roomId === 'puerta' || roomId === 'manantial_ohm') {
+    // Río de chispa: une visualmente el manantial, la Puerta y la plaza.
+    g.fillStyle(0x304d57, 0.88);
+    g.fillRect(ox + w / 2 - 34, oy + border, 68, h - border * 2);
+    g.fillStyle(0x67b8b0, 0.48);
+    g.fillRect(ox + w / 2 - 17, oy + border, 34, h - border * 2);
+    g.fillStyle(0xe6cf75, 0.7);
+    for (let y = border + 20; y < h - border; y += 46) g.fillRect(ox + w / 2 - 4, oy + y, 8, 19);
+  }
+
+  const specializedFloor = roomId === 'plaza' || roomId === 'puerta' || roomId === 'manantial_ohm' || roomId.startsWith('castle_') || roomId.startsWith('forge_') || roomId.startsWith('terraces_') || roomId.startsWith('lighthouse_') || roomId === 'clock_tower';
+  if (!specializedFloor) {
+    const mr = 68 + rnd() * 26;
+    const cxm = ox + w / 2;
+    const cym = oy + h / 2 + 14;
+    g.lineStyle(4, shade(pal.floor, 1.22), 0.55);
+    g.strokeCircle(cxm, cym, mr);
+    g.lineStyle(2, shade(pal.floor, 0.78), 0.55);
+    g.strokeCircle(cxm, cym, mr - 12);
+    g.fillStyle(shade(pal.floor, 1.16), 0.5);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 + mr;
+      g.fillCircle(cxm + Math.cos(a) * (mr - 6), cym + Math.sin(a) * (mr - 6), 3);
+    }
   }
 
   // desgaste: manchas y piedras sueltas esparcidas
@@ -245,6 +353,166 @@ export function drawRoomBase(
       w - 2 * (border + i * 2),
       h - 2 * (border + i * 2),
     );
+  }
+
+  // Escenografía no interactiva en los márgenes: densidad de mapa sin tapar rutas.
+  const deco = scene.add.graphics().setDepth(DEPTH.decor + 1);
+  add(deco);
+  const planter = (x: number, y: number, foliage: number): void => {
+    deco.fillStyle(0x2a1d20, 0.6); deco.fillEllipse(x + 3, y + 15, 50, 18);
+    deco.fillStyle(0x8a5a37, 1); deco.fillRect(x - 18, y + 4, 36, 18);
+    deco.fillStyle(0xb77b49, 1); deco.fillRect(x - 21, y, 42, 7);
+    deco.fillStyle(shade(foliage, 0.65), 1); deco.fillRect(x - 20, y - 18, 40, 22);
+    deco.fillStyle(foliage, 1); deco.fillRect(x - 14, y - 27, 28, 30);
+    deco.fillStyle(shade(foliage, 1.45), 0.75); deco.fillRect(x - 10, y - 23, 8, 14);
+  };
+  const lamp = (x: number, y: number, glowColor: number): void => {
+    deco.fillStyle(0x241e2b, 1); deco.fillRect(x - 3, y, 6, 31);
+    deco.fillStyle(0x5c4930, 1); deco.fillRect(x - 7, y - 5, 14, 9);
+    deco.fillStyle(glowColor, 1); deco.fillRect(x - 5, y - 16, 10, 12);
+    deco.fillStyle(0xfff1a4, 0.9); deco.fillRect(x - 2, y - 14, 4, 7);
+  };
+  const vendorTree = (x: number, y: number, violet = false): void => {
+    if (!scene.textures.exists('ohmdal-forest-objects')) return;
+    const tree = scene.add
+      .image(x, y, 'ohmdal-forest-objects', violet ? 'tree-violet' : 'tree-copper')
+      .setOrigin(0.5, 1)
+      .setDisplaySize(88, 110)
+      .setDepth(DEPTH.decor + 2);
+    add(tree);
+  };
+  if (roomId === 'plaza' || roomId === 'puerta' || roomId === 'manantial_ohm') {
+    vendorTree(ox + 104, oy + h - 54, roomId !== 'plaza');
+    vendorTree(ox + w - 104, oy + h - 54, roomId === 'puerta');
+    lamp(ox + 168, oy + h - 93, 0xffcc57);
+    lamp(ox + w - 168, oy + 116, 0xffcc57);
+  } else if (roomId.startsWith('castle_')) {
+    for (const x of [ox + 125, ox + w - 125]) {
+      deco.fillStyle(0x241c30, 1); deco.fillRect(x - 18, oy + 48, 36, 92);
+      deco.fillStyle(0x8e2c5c, 1); deco.fillRect(x - 13, oy + 58, 26, 65);
+      deco.fillStyle(0xd0a34a, 1); deco.fillRect(x - 13, oy + 58, 26, 5);
+    }
+    lamp(ox + 205, oy + 105, 0xc78cff);
+    lamp(ox + w - 205, oy + 105, 0xc78cff);
+  } else if (roomId.startsWith('forge_')) {
+    for (const x of [ox + 120, ox + w - 120]) {
+      deco.fillStyle(0x292126, 1); deco.fillRect(x - 42, oy + 62, 84, 66);
+      deco.fillStyle(0x9a4b2c, 1); deco.fillRect(x - 25, oy + 82, 50, 29);
+      deco.fillStyle(0xff9d3d, 0.9); deco.fillRect(x - 17, oy + 91, 34, 15);
+    }
+  } else if (roomId.startsWith('terraces_')) {
+    vendorTree(ox + 112, oy + 148);
+    vendorTree(ox + w - 112, oy + 148, true);
+    planter(ox + 178, oy + 112, 0x54a66d);
+  } else if (roomId.startsWith('lighthouse_') || roomId === 'clock_tower') {
+    lamp(ox + 130, oy + 105, 0x87d9ff);
+    lamp(ox + w - 130, oy + 105, 0x87d9ff);
+  }
+
+  // Hitos regionales: cada distrito tiene una silueta que permite reconocerlo
+  // antes de leer el nombre de la sala.
+  const plaque = (name: string, ink: string): void => {
+    deco.fillStyle(0x201a24, 0.92);
+    deco.fillRect(ox + w / 2 - 74, oy + 34, 148, 28);
+    deco.fillStyle(0xb58a52, 1);
+    deco.fillRect(ox + w / 2 - 70, oy + 38, 140, 3);
+    const label = scene.add.text(ox + w / 2, oy + 49, name, {
+      fontFamily: 'Georgia, serif', fontSize: '11px', color: ink,
+      letterSpacing: 2, stroke: '#17121b', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(DEPTH.decor + 2);
+    add(label);
+  };
+  if (roomId === 'plaza') {
+    plaque('PLAZA DE OHMDAL', '#f4d895');
+    // Toldos de mercado al borde: población y color sin invadir la ruta central.
+    for (const x of [ox + 96, ox + w - 96]) {
+      deco.fillStyle(0x38262d, 1); deco.fillRect(x - 42, oy + 64, 84, 40);
+      deco.fillStyle(0xa94c55, 1); deco.fillRect(x - 46, oy + 61, 92, 12);
+      deco.fillStyle(0xf0c66c, 1);
+      for (let s = -38; s <= 30; s += 17) deco.fillRect(x + s, oy + 61, 8, 12);
+    }
+  } else if (roomId.startsWith('castle_')) {
+    plaque('PALACIO DEL CIRCUITO', '#e2bf6f');
+    const cx = ox + w / 2;
+    deco.fillStyle(0x171422, 1); deco.fillRect(cx - 25, oy + 68, 50, 48);
+    deco.lineStyle(3, 0xd0a34a, 1); deco.strokeRect(cx - 22, oy + 71, 44, 42);
+    deco.lineStyle(4, 0xb64a71, 1);
+    deco.lineBetween(cx, oy + 78, cx, oy + 106);
+    deco.lineBetween(cx - 15, oy + 91, cx + 15, oy + 91);
+    deco.fillStyle(0xf4cf72, 1); deco.fillCircle(cx, oy + 91, 5);
+  } else if (roomId.startsWith('forge_')) {
+    plaque('FORJAS DE COBRE', '#ffbd72');
+    // Tuberías, remaches y manómetros convierten cada nave en una máquina.
+    deco.fillStyle(0x713d2c, 1); deco.fillRect(ox + 54, oy + 57, w - 108, 9);
+    deco.fillStyle(0xc06b3c, 1);
+    for (let x = ox + 75; x < ox + w - 60; x += 74) {
+      deco.fillRect(x, oy + 54, 7, 15);
+      deco.fillCircle(x + 3, oy + 75, 10);
+      deco.fillStyle(0x241d23, 1); deco.fillCircle(x + 3, oy + 75, 6);
+      deco.fillStyle(0xf0a54d, 1); deco.fillRect(x + 2, oy + 69, 2, 7);
+      deco.fillStyle(0xc06b3c, 1);
+    }
+  } else if (roomId.startsWith('terraces_')) {
+    plaque('TERRAZAS DEL CAUDAL', '#a9efce');
+    const wx = ox + w - 86; const wy = oy + h - 70;
+    deco.lineStyle(5, 0x8f6743, 1); deco.strokeCircle(wx, wy, 30);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      deco.lineBetween(wx, wy, wx + Math.cos(a) * 27, wy + Math.sin(a) * 27);
+    }
+    deco.fillStyle(0xc69b62, 1); deco.fillCircle(wx, wy, 7);
+  } else if (roomId.startsWith('lighthouse_') || roomId === 'clock_tower') {
+    plaque('FARO DEL NORTE', '#bde8ff');
+    const tx = ox + w - 112; const ty = oy + h - 77;
+    deco.fillStyle(0x241f2c, 1); deco.fillRect(tx - 3, ty, 6, 38);
+    deco.lineStyle(7, 0x9db2c4, 1); deco.lineBetween(tx - 24, ty - 9, tx + 22, ty - 22);
+    deco.lineStyle(3, 0x4b6075, 1); deco.lineBetween(tx - 24, ty - 9, tx + 22, ty - 22);
+    deco.fillStyle(0x89dcff, 1); deco.fillCircle(tx + 23, ty - 22, 5);
+  } else if (roomId === 'manantial_ohm') {
+    plaque('MANANTIAL DE OHM', '#d8c8ff');
+    for (const x of [ox + 110, ox + w - 110]) {
+      deco.fillStyle(0x4a3f68, 1); deco.fillTriangle(x - 18, oy + 112, x, oy + 62, x + 18, oy + 112);
+      deco.fillStyle(0xa996e8, 0.9); deco.fillTriangle(x - 7, oy + 103, x, oy + 73, x + 6, oy + 103);
+    }
+  }
+
+  // Movimiento ambiental mínimo por región: la sala respira incluso en reposo.
+  if (roomId.startsWith('forge_')) {
+    for (let i = 0; i < 7; i++) {
+      const ember = scene.add
+        .rectangle(ox + 120 + rnd() * (w - 240), oy + h - 70 - rnd() * 120, 3, 3, i % 2 ? 0xffc257 : 0xe86732)
+        .setDepth(DEPTH.decor + 3)
+        .setAlpha(0.75);
+      add(ember);
+      scene.tweens.add({
+        targets: ember,
+        y: ember.y - 64 - rnd() * 42,
+        x: ember.x + (rnd() - 0.5) * 24,
+        alpha: 0,
+        duration: 1300 + rnd() * 1000,
+        delay: rnd() * 900,
+        repeat: -1,
+      });
+    }
+  } else if (roomId.startsWith('terraces_')) {
+    for (let i = 0; i < 6; i++) {
+      const glint = scene.add
+        .rectangle(ox + border + 22 + rnd() * (w - border * 2 - 80), oy + border + 49 + (i % 4) * 92, 22, 2, 0xb9f3dc)
+        .setDepth(DEPTH.decor + 3)
+        .setAlpha(0.18 + rnd() * 0.25);
+      add(glint);
+      scene.tweens.add({ targets: glint, x: glint.x + 48, alpha: 0.05, duration: 1600 + rnd() * 900, yoyo: true, repeat: -1 });
+    }
+  } else if (roomId.startsWith('lighthouse_') || roomId === 'clock_tower') {
+    const pulse = scene.add
+      .image(ox + w / 2, oy + h / 2, 'vis-glow')
+      .setTint(0x8bdcff)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDisplaySize(360, 260)
+      .setDepth(DEPTH.decor + 2)
+      .setAlpha(0.06);
+    add(pulse);
+    scene.tweens.add({ targets: pulse, alpha: 0.16, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
 }
 
@@ -336,16 +604,19 @@ interface CharLook {
   /** criatura orbe (Ohm): ignora cuerpo humanoide */
   orb?: boolean;
   scale?: number;
+  sprite?: 'hero';
+  /** Fila del atlas direccional de PNJ: sur, oeste, este, norte. */
+  npcRow?: number;
 }
 
 const CHAR_LOOKS: Array<[RegExp, CharLook]> = [
-  [/^player$/, { body: 0x4d7d92, head: 0xe9c9a2, hair: 0x33303d }],
-  [/^edda/, { body: 0xa85f78, head: 0xeccaa5, hair: 0x6e3448 }],
-  [/^lumen/, { body: 0x8a6a3a, head: 0xe2c29a, hair: 0xd9d2e0, lantern: 0xffc966 }],
+  [/^player$/, { body: 0x4d7d92, head: 0xe9c9a2, hair: 0x33303d, sprite: 'hero' }],
+  [/^edda/, { body: 0xa85f78, head: 0xeccaa5, hair: 0x6e3448, npcRow: 0 }],
+  [/^lumen/, { body: 0x8a6a3a, head: 0xe2c29a, hair: 0xd9d2e0, lantern: 0xffc966, npcRow: 1 }],
   [/^(pedestal$|ohm-)/, { body: 0xc9a437, head: 0xc9a437, hair: 0xc9a437, orb: true }],
-  [/^consejera/, { body: 0x5b4a75, head: 0xe0c2a0, hair: 0x2f2a3a }],
+  [/^consejera/, { body: 0x5b4a75, head: 0xe0c2a0, hair: 0x2f2a3a, npcRow: 2 }],
   [/^guardiana/, { body: 0x58755f, head: 0xd9b894, hair: 0x4a3a2e }],
-  [/^forjadora/, { body: 0xa8562e, head: 0xdfb48c, hair: 0x3a2620 }],
+  [/^forjadora/, { body: 0xa8562e, head: 0xdfb48c, hair: 0x3a2620, npcRow: 3 }],
   [/^farero/, { body: 0x496978, head: 0xd9b894, hair: 0x9aa4ac, lantern: 0x9adcff }],
   [/^preceptor/, { body: 0x55505e, head: 0xe3c39b, hair: 0x8d8496 }],
   [/^ciudadano-nino/, { body: 0x7a6a50, head: 0xeccaa5, hair: 0x4a3a2e, scale: 0.8 }],
@@ -374,6 +645,11 @@ export class CharacterRig extends Phaser.GameObjects.Container {
   private lanternImg: Phaser.GameObjects.Image | null = null;
   private orbGlow: Phaser.GameObjects.Image | null = null;
   private orbSign: Phaser.GameObjects.Text | null = null;
+  private walkSprite: Phaser.GameObjects.Sprite | null = null;
+  private idleSprite: Phaser.GameObjects.Sprite | null = null;
+  private npcSprite: Phaser.GameObjects.Sprite | null = null;
+  private walkFrameBase = 0;
+  private idleFrameBase = 0;
   private look: CharLook;
   private moving = false;
   private phase = Math.random() * 100;
@@ -385,11 +661,26 @@ export class CharacterRig extends Phaser.GameObjects.Container {
     super(scene, x, y);
     this.look = look;
     this.stateColor = stateColor ?? null;
-    this.shadowImg = scene.add.image(0, 16, 'vis-shadow').setScale(0.9, 0.42).setAlpha(0.9);
+    this.shadowImg = scene.add.image(0, 16, 'vis-shadow').setScale(0.56, 0.2).setAlpha(0.82);
     this.add(this.shadowImg);
     this.g = scene.add.graphics();
     this.add(this.g);
-    if (look.orb) {
+    if (look.sprite === 'hero') {
+      const groundedSprite = (texture: string): Phaser.GameObjects.Sprite => scene.add
+        .sprite(0, 15, texture, 0)
+        .setScale(0.72)
+        // Las hojas de producción comparten la línea de suela y=91.
+        .setOrigin(0.5, 91 / 96);
+      this.walkSprite = groundedSprite('ohmdal-student-walk').setVisible(false);
+      this.idleSprite = groundedSprite('ohmdal-student-idle');
+      this.add([this.walkSprite, this.idleSprite]);
+    } else if (look.npcRow !== undefined) {
+      this.npcSprite = scene.add
+        .sprite(0, 15, 'ohmdal-npc-core', look.npcRow * 4)
+        .setScale(0.72)
+        .setOrigin(0.5, 92 / 96);
+      this.add(this.npcSprite);
+    } else if (look.orb) {
       this.orbGlow = scene.add
         .image(0, -4, 'vis-glow')
         .setBlendMode(Phaser.BlendModes.ADD)
@@ -445,6 +736,19 @@ export class CharacterRig extends Phaser.GameObjects.Container {
   tick(deltaMs: number): void {
     if (!this.active) return; // los rigs que salieron caminando ya fueron destruidos
     this.phase += deltaMs / 1000;
+    if (this.walkSprite && this.idleSprite) {
+      this.walkSprite.setVisible(this.moving);
+      this.idleSprite.setVisible(!this.moving);
+      if (this.moving) this.walkSprite.setFrame(this.walkFrameBase + Math.floor(this.phase * 10) % 6);
+      else this.idleSprite.setFrame(this.idleFrameBase + Math.floor(this.phase * 2.2) % 4);
+      // La zancada comunica el movimiento; el punto de apoyo no rebota.
+      this.shadowImg.setScale(this.moving ? 0.6 : 0.56, this.moving ? 0.18 : 0.2);
+      return;
+    }
+    if (this.npcSprite) {
+      this.npcSprite.setAlpha(1);
+      return;
+    }
     if (this.look.orb) {
       // Ohm flota: vaivén lento + pulso de luz
       const f = Math.sin(this.phase * 2.2);
@@ -478,6 +782,21 @@ export class CharacterRig extends Phaser.GameObjects.Container {
     const look = this.look;
     g.clear();
 
+    if (this.walkSprite && this.idleSprite) {
+      const row = this.facing === 'south' ? 0 : this.facing === 'west' ? 1 : this.facing === 'east' ? 2 : 3;
+      this.walkFrameBase = row * 6;
+      this.idleFrameBase = row * 4;
+      this.walkSprite.setFrame(this.walkFrameBase);
+      this.idleSprite.setFrame(this.idleFrameBase);
+      return;
+    }
+
+    if (this.npcSprite && look.npcRow !== undefined) {
+      const column = this.facing === 'south' ? 0 : this.facing === 'west' ? 1 : this.facing === 'east' ? 2 : 3;
+      this.npcSprite.setFrame(look.npcRow * 4 + column);
+      return;
+    }
+
     if (look.orb) {
       const c = this.stateColor ?? look.body;
       const asleep = luminance(c) <= 0.3;
@@ -504,47 +823,53 @@ export class CharacterRig extends Phaser.GameObjects.Container {
     const outline = 0x17141d;
 
     // cuerpo capsular con falda levemente más ancha (silueta legible)
-    g.fillStyle(shade(look.body, 0.72), 1);
-    g.fillEllipse(0, 12, 17, 7); // pies/base
+    g.fillStyle(outline, 1);
+    g.fillRect(-10, -9, 20, 24);
+    g.fillStyle(shade(look.body, 0.7), 1);
+    g.fillRect(-8, 7, 6, 9);
+    g.fillRect(2, 7, 6, 9);
     g.fillStyle(look.body, 1);
-    g.fillRoundedRect(-9, -8, 18, 21, { tl: 9, tr: 9, bl: 6, br: 6 });
-    // sombreado lateral del cuerpo (volumen)
-    g.fillStyle(shade(look.body, 0.8), 1);
-    g.fillRoundedRect(flip > 0 ? 3 : -9, -8, 6, 21, { tl: 6, tr: 6, bl: 4, br: 4 });
-    // brazo insinuado
-    g.fillStyle(shade(look.body, 0.9), 1);
-    if (dir === 'east' || dir === 'west') g.fillRoundedRect(flip * 5 - 2.5, -4, 5, 12, 3);
-    g.lineStyle(1.5, outline, 0.85);
-    g.strokeRoundedRect(-9, -8, 18, 21, { tl: 9, tr: 9, bl: 6, br: 6 });
+    g.fillRect(-8, -7, 16, 17);
+    g.fillStyle(shade(look.body, 1.28), 1);
+    g.fillRect(-6, -5, 5, 13);
+    g.fillStyle(shade(look.body, 0.72), 1);
+    g.fillRect(flip > 0 ? 4 : -8, -7, 4, 17);
+    if (dir === 'east' || dir === 'west') {
+      g.fillStyle(look.head, 1);
+      g.fillRect(flip * 7 - 2, -3, 4, 10);
+    }
 
     // cabeza
-    const hy = -16;
+    const hy = -18;
+    g.fillStyle(outline, 1);
+    g.fillRect(-10, hy - 9, 20, 20);
     g.fillStyle(look.head, 1);
-    g.fillCircle(0, hy, 8.5);
-    g.lineStyle(1.5, outline, 0.85);
-    g.strokeCircle(0, hy, 8.5);
+    g.fillRect(-8, hy - 7, 16, 16);
+    g.fillStyle(shade(look.head, 0.82), 1);
+    g.fillRect(flip > 0 ? 5 : -8, hy - 5, 3, 13);
 
     // pelo direccional: define la lectura de orientación
     g.fillStyle(look.hair, 1);
     if (dir === 'north') {
-      g.fillCircle(0, hy, 7.5); // de espaldas: pelo cubre la cara
-      g.fillEllipse(0, hy + 5, 12, 6);
+      g.fillRect(-8, hy - 7, 16, 15);
+      g.fillRect(-6, hy + 7, 12, 4);
     } else if (dir === 'south') {
-      g.slice(0, hy, 8, Math.PI * 1.02, Math.PI * 1.98, false);
-      g.fillPath(); // flequillo
+      g.fillRect(-8, hy - 7, 16, 6);
+      g.fillRect(-8, hy - 1, 4, 5);
+      g.fillRect(1, hy - 1, 4, 4);
     } else {
-      g.slice(0, hy, 8, Math.PI * (flip > 0 ? 0.62 : 1.38), Math.PI * (flip > 0 ? 1.98 : 0.02), false);
-      g.fillPath();
+      g.fillRect(-8, hy - 7, 16, 6);
+      g.fillRect(flip > 0 ? -8 : 4, hy - 2, 4, 9);
     }
 
     // ojos (solo si se le ve la cara)
     if (dir !== 'north') {
       g.fillStyle(0x201d28, 1);
       if (dir === 'south') {
-        g.fillCircle(-3, hy + 1.5, 1.3);
-        g.fillCircle(3, hy + 1.5, 1.3);
+        g.fillRect(-5, hy + 2, 3, 3);
+        g.fillRect(3, hy + 2, 3, 3);
       } else {
-        g.fillCircle(flip * 4, hy + 1.5, 1.3);
+        g.fillRect(flip > 0 ? 3 : -6, hy + 2, 3, 3);
       }
     }
   }
@@ -708,13 +1033,17 @@ export function makePropVisual(
     // cara frontal + tapa superior más clara (lectura ¾)
     const top = Math.min(10, h * 0.28);
     g.fillStyle(shade(color, 0.55), 1);
-    g.fillRoundedRect(-w / 2, -h / 2 + 2, w, h, 6);
+    g.fillRect(-w / 2 - 2, -h / 2 + 4, w + 4, h);
     g.fillStyle(color, 1);
-    g.fillRoundedRect(-w / 2, -h / 2, w, h - 3, 6);
+    g.fillRect(-w / 2, -h / 2, w, h - 3);
     g.fillStyle(shade(color, 1.3), 1);
-    g.fillRoundedRect(-w / 2, -h / 2, w, top, { tl: 6, tr: 6, bl: 0, br: 0 });
-    g.lineStyle(1.5, shade(color, 0.45), 0.9);
-    g.strokeRoundedRect(-w / 2, -h / 2, w, h - 3, 6);
+    g.fillRect(-w / 2 + 2, -h / 2 + 2, w - 4, top);
+    g.fillStyle(shade(color, 0.78), 0.8);
+    for (let x = -w / 2 + 8; x < w / 2 - 4; x += 18) g.fillRect(x, -h / 2 + top + 7, 3, Math.max(3, h - top - 15));
+    g.lineStyle(2, shade(color, 0.38), 1);
+    g.strokeRect(-w / 2, -h / 2, w, h - 3);
+    g.lineStyle(2, shade(color, 1.55), 0.7);
+    g.lineBetween(-w / 2 + 2, -h / 2 + 2, w / 2 - 2, -h / 2 + 2);
   }
 
   scene.add.existing(c);

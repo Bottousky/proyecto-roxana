@@ -13,6 +13,8 @@
 
 export interface WorldLayout {
   id: string;
+  name: string;
+  accent: number;
   rooms: Record<string, { ox: number; oy: number }>;
 }
 
@@ -31,6 +33,8 @@ export const WORLDS: WorldLayout[] = [
     // como tales en rooms.ts (color y label de camino, no de puerta genérica).
     // Ver docs/plan-arco-1-hubs.md, Fase A.
     id: 'ohmdal',
+    name: 'Ciudad de Ohmdal',
+    accent: 0xd0a34a,
     rooms: {
       plaza: { ox: 0, oy: 0 },
       puerta: { ox: 0, oy: -540 },
@@ -39,6 +43,46 @@ export const WORLDS: WorldLayout[] = [
       castle_gallery: { ox: -960, oy: -540 },
       castle_branches: { ox: -960, oy: -1080 },
       castle_heart: { ox: -960, oy: -1620 },
+    },
+  },
+  {
+    // La Forja se lee como un descenso industrial: patio → enfermería → canal
+    // largo → nave mayor. Las cuatro salas comparten mundo y se recorren sin
+    // fundidos ni teletransportes una vez cruzado el camino desde la plaza.
+    id: 'forge',
+    name: 'Forjas de Cobre',
+    accent: 0xe7783d,
+    rooms: {
+      forge_yard: { ox: 0, oy: 0 },
+      forge_infirmary: { ox: 0, oy: -540 },
+      forge_longchannel: { ox: 0, oy: -1080 },
+      forge_hall: { ox: 0, oy: -1620 },
+    },
+  },
+  {
+    // Las Terrazas descienden físicamente hacia el valle. El orden espacial
+    // refuerza el contenido: cada chunk está un nivel más abajo que el anterior.
+    id: 'terraces',
+    name: 'Terrazas del Caudal',
+    accent: 0x62c8a5,
+    rooms: {
+      terraces_top: { ox: 0, oy: 0 },
+      terraces_mid: { ox: 0, oy: 540 },
+      terraces_mural: { ox: 0, oy: 1080 },
+      terraces_aqueduct: { ox: 0, oy: 1620 },
+    },
+  },
+  {
+    // El Faro asciende desde la sala de máquinas hasta la linterna. El jugador
+    // ve el progreso como una torre vertical continua en mundo y mapa.
+    id: 'lighthouse',
+    name: 'Faro del Norte',
+    accent: 0x78ccee,
+    rooms: {
+      lighthouse_hall: { ox: 0, oy: 0 },
+      lighthouse_bench: { ox: 0, oy: -540 },
+      clock_tower: { ox: 0, oy: -1080 },
+      lighthouse_lantern: { ox: 0, oy: -1620 },
     },
   },
 ];

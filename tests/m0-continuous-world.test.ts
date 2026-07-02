@@ -21,6 +21,24 @@ for (const id of ['castle_gate', 'castle_gallery', 'castle_branches', 'castle_he
   assert(world?.rooms[id].ox === -960, `${id} está alineado en la columna del Castillo`);
 }
 
+// Fase B: las tres regiones aplicadas se recorren como planos continuos.
+const forge = worldOf('forge_yard');
+assert(forge?.id === 'forge', 'la Forja tiene un plano regional propio');
+assert(forge?.rooms.forge_infirmary.oy === -540, 'la Enfermería continúa al norte del Patio');
+assert(forge?.rooms.forge_longchannel.oy === -1080, 'el Canal Largo continúa tras la Enfermería');
+assert(forge?.rooms.forge_hall.oy === -1620, 'la Nave Mayor remata la columna de la Forja');
+assert(worldOf('forge_hall') === forge, 'la Nave Mayor comparte el plano continuo de la Forja');
+
+const terraces = worldOf('terraces_top');
+assert(terraces?.id === 'terraces', 'las Terrazas tienen un plano regional propio');
+assert(terraces?.rooms.terraces_mid.oy === 540, 'el reparto queda un nivel debajo del canal alto');
+assert(terraces?.rooms.terraces_aqueduct.oy === 1620, 'el Acueducto ocupa el nivel inferior del valle');
+
+const lighthouse = worldOf('lighthouse_hall');
+assert(lighthouse?.id === 'lighthouse', 'el Faro tiene un plano regional propio');
+assert(lighthouse?.rooms.lighthouse_bench.oy === -540, 'el Taller queda sobre la sala de máquinas');
+assert(lighthouse?.rooms.lighthouse_lantern.oy === -1620, 'la Linterna corona la torre continua');
+
 // Normalizamos CRLF -> LF: en Windows con core.autocrlf=true el working tree
 // puede tener CRLF aunque el repo guarde LF; los asserts de texto no deben
 // depender del line ending local.
@@ -44,5 +62,6 @@ assert(
 const scene = readFileSync(new URL('../src/jugar/ExplorationScene.ts', import.meta.url), 'utf8');
 assert(scene.includes('this.enterChunk(entered)'), 'el cruce cambia de zona sin teletransporte');
 assert(scene.includes('d.pushTo.x - cx'), 'los portones empujan hacia su propio chunk');
+assert(scene.includes('salasVisitadas.push(id)'), 'el mapa registra cada chunk al cruzarlo');
 
 console.log('M0 continuous world tests: OK');
