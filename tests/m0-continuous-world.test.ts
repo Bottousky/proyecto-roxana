@@ -21,7 +21,10 @@ for (const id of ['castle_gate', 'castle_gallery', 'castle_branches', 'castle_he
   assert(world?.rooms[id].ox === -960, `${id} está alineado en la columna del Castillo`);
 }
 
-const rooms = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
+// Normalizamos CRLF -> LF: en Windows con core.autocrlf=true el working tree
+// puede tener CRLF aunque el repo guarde LF; los asserts de texto no deben
+// depender del line ending local.
+const rooms = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 assert(rooms.includes("to: 'manantial_ohm'"), 'la Puerta abre un destino real');
 assert(rooms.includes('f().puertaDone\n            ? null'), 'el camino se abre al resolver la Puerta');
 assert(rooms.includes("id: 'cauce-maestro'"), 'el destino muestra qué regula la Puerta');
