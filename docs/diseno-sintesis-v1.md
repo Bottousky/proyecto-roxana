@@ -70,13 +70,20 @@ Regla transversal de personajes para todas las unidades: **nadie explica; todos 
 
 ## 7. Formato visual/interactivo
 
+> **Actualización 2026-07-01:** esta sección conserva la decisión de producción para Ohmdal,
+> pero ya no obliga a los otros Mundos Aplicados. La visión vigente es
+> [`vision-mundos-multilenguaje.md`](vision-mundos-multilenguaje.md): cada disciplina adopta
+> su propia gramática y todas comparten shell, progreso y Bitácora.
+
 Comparación: top-down 2D gana en costo, pipeline IA, web/mobile y escalabilidad; lateral pierde legibilidad espacial de circuitos; point-and-click encarece por arte único por escena; 3D (voxel o modelado) es riesgoso en mobile web y caro para esta escala.
 
 **Recomendación: híbrido de dos vistas.**
 - **Exploración 2D top-down** (Instituto + Ohmdal): tilesets reutilizables, restauración del mundo visible en el mapa, legible en pantalla chica.
 - **Vista de banco (close-up)** para puzzles: el circuito grande, claro, manipulable con tap directo. Resuelve la ilegibilidad de componentes en top-down mobile.
 - Estilo: ilustrado/pintado, paleta cálida-melancólica (pixel art de alta calidad como plan B presupuestario).
-- El patrón top-down + banco + Bitácora es el contrato de producción para todas las unidades futuras. Los cuatro mundos canónicos según el mapa del despacho (`prologo.md` §14.3): Matemática, Física, Electrónica (Ohmdal), Programación — cada uno con su "vista de banco" propia (ej. física=mesa de laboratorio, programación=consola).
+- El patrón top-down + banco + Bitácora es el contrato de producción de **Ohmdal**. Los
+  otros mundos conservan la Bitácora y el orden fenómeno→consecuencia→formalización, no
+  necesariamente su cámara ni su motor gráfico.
 
 ## 8. Distribución
 

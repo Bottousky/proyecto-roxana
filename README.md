@@ -1,9 +1,14 @@
-# Proyecto Roxana — Ohmdal, Arco I «El Río» (greybox)
+# Proyecto Roxana — Mundos Aplicados
 
 Juego narrativo educativo. Un estudiante nuevo llega al Instituto Roxana y descubre
 los **Mundos Aplicados**: mundos creados por la escuela para enseñar, hoy degradados
 en ritual y superstición. En **Ohmdal**, el mundo de la electrónica, restaura el reino
 aprendiendo jugando los circuitos de corriente continua.
+
+La visión de producto es un solo juego con cinco lenguajes de experiencia: el Instituto como
+mundo real y nexo; Ohmdal para electrónica; Bitland para programación; Physica para física; y
+Arithmos para matemática. Comparten protagonista, progreso, narrativa y Bitácora, pero cada
+mundo adopta la cámara y la gramática jugable que mejor expresa su disciplina.
 
 **Estado:** **Arco I completo** — greybox jugable de punta a punta, las cinco unidades:
 U1 «La corriente no es magia» (Ley de Ohm), U2 «El río se reparte» (serie/paralelo, el
@@ -44,7 +49,7 @@ Eso crea el repo, sube el código y dispara el primer deploy (~2 minutos). El ju
 queda en `https://<tu-usuario>.github.io/proyecto-roxana/`. Después, cada
 `git push` republica solo. El repo debe ser público (GitHub Pages gratis lo requiere).
 
-## Stack
+## Stack actual
 
 - **Phaser 4** (exploración top-down en canvas)
 - **TypeScript + Vite**
@@ -52,16 +57,25 @@ queda en `https://<tu-usuario>.github.io/proyecto-roxana/`. Después, cada
   DOM, no en el canvas — texto nítido, accesible y exportable.
 - **Progreso**: `localStorage` (local-first, sin backend).
 
+Ohmdal es la primera experiencia terminada y la base estable del repositorio. Los runtimes de
+los otros mundos se incorporarán como módulos cargados bajo demanda; no se reescribe Ohmdal.
+
 ## Estructura
 
 ```
 src/
-  main.ts                  arranque, pantalla de título, config de Phaser
+  main.ts                  shell y arranque del runtime actual
   state.ts                 flags de progreso, guardado, hooks de mundo
   styles.css               estética completa (greybox + Bitácora papel)
-  game/
-    rooms.ts               las 6 salas, diálogos, gating de la secuencia
+  experiences/
+    manifests.ts           identidad y gramática de los cinco mundos
+    registry.ts            sala → experiencia activa
+    types.ts               contratos compartidos iniciales
+  jugar/
+    rooms.ts               23 salas, diálogos y gating del Arco I
     ExplorationScene.ts    escena top-down: movimiento, colisiones, puertas, interacción
+    world.ts               composición de mundos continuos
+    visuals.ts             lenguaje visual procedural de la experiencia cenital
   ui/
     dialog.ts              caja de diálogo + toast
     bench.ts               marco de la "vista de banco" (primer plano de puzzles)
@@ -80,6 +94,9 @@ src/
   content/
     entries.ts             entradas de la Bitácora (dos capas, contenido dinámico)
 docs/
+  README.md                mapa de documentos y fuentes de verdad
+  vision-mundos-multilenguaje.md  visión de los cinco lenguajes
+  plan-plataforma-cinco-juegos.md plan técnico para montarlos
   diseno-sintesis-v1.md    diseño general del juego (sistemas, formato, arquitectura)
   prologo.md               guion detallado del prólogo en la escuela
   unidad-1-ohmdal.md       síntesis del mundo Ohmdal + guion de la Unidad 1
@@ -112,12 +129,11 @@ docs/
   cierra la Bitácora · Escape la cierra.
 - **Mobile**: tocar el piso para caminar, tocar objetos para usarlos.
 
-## Limitaciones conocidas del greybox
+## Limitaciones conocidas de la base Ohmdal
 
 - El tap-to-move no tiene pathfinding: si hay un mueble en línea recta, el jugador
   se detiene (con teclado se esquiva sin problema). Para la versión con arte:
   steering simple o grilla de navegación.
-- Sin audio todavía. La campana final pide un sonido real a gritos.
-- El render del juego usa formas planas de Phaser a propósito: el layout de salas
-  está pensado para reemplazarse por tilesets sin tocar la lógica
-  (las salas son datos en `rooms.ts`).
+- El arte actual es procedural/greybox y todavía necesita el pase de producción por zona.
+- El Instituto conserva temporalmente el runtime cenital; su reemplazo 3D/2.5D depende de un
+  spike de rendimiento y producción, no de una decisión estética aislada.
