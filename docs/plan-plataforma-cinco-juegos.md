@@ -151,7 +151,7 @@ se mantienen tests con saves viejos reales. Ningún prototipo nuevo puede romper
 - logs y carpeta duplicada retirados;
 - manifiestos de cinco experiencias y test de pertenencia de salas.
 
-### P1 — Runtime host [siguiente]
+### P1 — Runtime host [hecho]
 
 - extraer el bootstrap de Phaser de `main.ts`;
 - crear `RuntimeHost` y contrato real;
@@ -161,7 +161,7 @@ se mantienen tests con saves viejos reales. Ningún prototipo nuevo puede romper
 
 **Salida:** el juego actual se juega igual, pero `main.ts` ya no conoce Phaser.
 
-### P2 — Frontera Instituto ↔ Ohmdal
+### P2 — Frontera Instituto ↔ Ohmdal [siguiente]
 
 - convertir el portal en solicitud de viaje al shell;
 - separar ubicación global de sala top-down;

@@ -30,11 +30,14 @@ export function experienceOfRoom(roomId: string): ExperienceManifest | null {
 }
 
 /**
- * Publica la experiencia activa en el shell web. Hoy habilita estilos y pruebas;
- * mañana será la señal de frontera para descargar/cambiar de runtime.
+ * Publica la experiencia activa en el shell web: habilita estilos y avisa por evento.
+ * Compartido por el flujo basado en salas (Ohmdal/Instituto) y por runtimes nuevos
+ * que no tienen roomId (mundos `planned`).
  */
-export function activateExperienceForRoom(roomId: string): ExperienceManifest | null {
-  const experience = experienceOfRoom(roomId);
+export function activateExperience(
+  experience: ExperienceManifest | null,
+  roomId: string | null,
+): ExperienceManifest | null {
   document.documentElement.dataset.experience = experience?.id ?? 'unknown';
   document.documentElement.dataset.runtime = experience?.runtime ?? 'unknown';
   window.dispatchEvent(
@@ -43,4 +46,12 @@ export function activateExperienceForRoom(roomId: string): ExperienceManifest | 
     }),
   );
   return experience;
+}
+
+/**
+ * Publica la experiencia activa en el shell web. Hoy habilita estilos y pruebas;
+ * mañana será la señal de frontera para descargar/cambiar de runtime.
+ */
+export function activateExperienceForRoom(roomId: string): ExperienceManifest | null {
+  return activateExperience(experienceOfRoom(roomId), roomId);
 }
