@@ -1,6 +1,11 @@
 // Pasillo de Aulas: puertas DOM/CSS/SVG + router de hash + shell de aula (placeholder).
 // No importar ./index.ts desde acá (evita import circular).
+import aulaBgUrl from '../../assets/instituto/aula-electronica-fondo-v1.png';
+import { pizarronViewModel } from './aulaModel.ts';
+import { parseAulaHash } from './aulaRouter.ts';
 import { readSchoolState, type AulaId, type AulaEstado } from './schoolModel.ts';
+
+export { parseAulaHash } from './aulaRouter.ts';
 
 export interface Aula {
   id: AulaId;
@@ -16,18 +21,6 @@ export const AULAS: Aula[] = [
   { id: 'fisica', motif: 'Δ', disciplina: 'Física', nombre: 'Physica', desc: 'Movimiento, energía y las leyes que lo gobiernan.' },
   { id: 'matematica', motif: '∑', disciplina: 'Matemática', nombre: 'Arithmos', desc: 'Números como fuerzas, ecuaciones como equilibrio.' },
 ];
-
-const AULA_IDS: AulaId[] = ['electronica', 'programacion', 'fisica', 'matematica'];
-
-/** Función pura: parsea el hash de ubicación a un AulaId, o null si no aplica. */
-export function parseAulaHash(hash: string): AulaId | null {
-  if (!hash) return null;
-  const clean = hash.startsWith('#') ? hash.slice(1) : hash;
-  const parts = clean.split('/');
-  if (parts.length !== 2 || parts[0] !== 'aula') return null;
-  const candidate = parts[1];
-  return (AULA_IDS as string[]).includes(candidate) ? (candidate as AulaId) : null;
-}
 
 function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
@@ -171,6 +164,9 @@ function rattleDoor(doorEl: HTMLElement): void {
 let overlayEl: HTMLElement | null = null;
 let lastFocusedDoor: HTMLElement | null = null;
 let scrollYBeforeOpen = 0;
+let activePizarronPanel: HTMLElement | null = null;
+let aulaToastTimer: number | null = null;
+let aulaPanX = 0;
 
 function ensureOverlay(): HTMLElement {
   if (overlayEl) return overlayEl;
@@ -181,52 +177,237 @@ function ensureOverlay(): HTMLElement {
   overlay.setAttribute('aria-modal', 'true');
   overlay.style.cssText = `
     position: fixed; inset: 0; z-index: 500; display: none;
-    background: var(--bg);
+    background: var(--bg); overflow: hidden;
   `;
 
   overlay.innerHTML = `
-    <div id="aula-bg" data-aula="electronica" style="position:absolute; inset:0; background: radial-gradient(ellipse at 50% 30%, #2a2318 0%, #16141c 55%, #0e0d12 100%);">
-      <!-- TODO(M3): fondo generado assets/instituto/aula-electronica-fondo-v1.png + hotspots -->
+    <div id="aula-bg" class="rx-aula-bg" data-aula="electronica">
+      <div class="rx-aula-stage" aria-label="Aula de Electrónica">
+        <img class="rx-aula-image" src="${aulaBgUrl}" width="1792" height="1024" alt="" aria-hidden="true" />
+        <div class="rx-aula-portal-glow" aria-hidden="true"></div>
+        <div class="rx-aula-hotspot rx-aula-hotspot-pizarron" data-hotspot="pizarron" role="button" tabindex="0" aria-label="El pizarrón">
+          <span class="rx-aula-hotspot-label">El pizarrón</span>
+        </div>
+        <div class="rx-aula-hotspot rx-aula-hotspot-portal" data-hotspot="portal" role="button" tabindex="0" aria-label="El portal">
+          <span class="rx-aula-hotspot-label"><span>El portal</span><small>Cruza.</small></span>
+        </div>
+        <div class="rx-aula-hotspot rx-aula-hotspot-proyector" data-hotspot="proyector" role="button" tabindex="0" aria-label="El proyector">
+          <span class="rx-aula-hotspot-label">El proyector</span>
+        </div>
+        <p class="rx-aula-entry-line">Huele a cobre y a polvo. Algo, al fondo, todavía respira.</p>
+      </div>
     </div>
-    <div style="position:relative; z-index:1; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px;">
-      <div style="font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.24em; text-transform:uppercase; color:var(--accent-dim); margin-bottom:18px;">Aula</div>
-      <h2 id="aula-titulo" style="font-family:'Spectral', serif; font-weight:600; font-size:clamp(30px,5vw,54px); margin:0 0 20px; color:var(--text);">Aula de Electrónica</h2>
-      <p style="font-size:16px; line-height:1.6; color:var(--muted); max-width:520px; margin:0;">
-        <!-- TODO(guion): intro del aula (M3) -->
-        El aula está tomando forma.
-      </p>
-    </div>
-    <button id="aula-salir" aria-label="Salir del aula" style="
+    <h2 id="aula-titulo" class="rx-aula-title">Aula de Electrónica</h2>
+    <button id="aula-salir" aria-label="Salir del aula" class="rx-aula-exit" style="
       position:absolute; top:20px; right:20px; z-index:2;
       background: transparent; color: var(--muted); border: 1px solid var(--border);
       border-radius: 9px; padding: 9px 16px; font-family:inherit; font-size:13.5px; font-weight:600;
       cursor:pointer; transition: color 0.15s, border-color 0.15s;
     ">Salir del aula ×</button>
+    <div id="aula-toast" class="rx-aula-toast" role="status" aria-live="polite"></div>
   `;
 
   document.body.appendChild(overlay);
   overlayEl = overlay;
 
   overlay.querySelector('#aula-salir')?.addEventListener('click', () => closeAula());
+  bindAulaHotspots(overlay);
+  bindAulaPan(overlay);
 
   overlay.addEventListener('keydown', (e) => {
     const ev = e as KeyboardEvent;
     if (ev.key === 'Escape') {
       ev.preventDefault();
-      closeAula();
+      if (activePizarronPanel) {
+        closePizarronPanel();
+      } else {
+        closeAula();
+      }
       return;
     }
     if (ev.key === 'Tab') {
-      // trap de foco básico: único elemento enfocable es el botón salir
-      const btn = overlay.querySelector<HTMLElement>('#aula-salir');
-      if (btn) {
-        ev.preventDefault();
-        btn.focus();
-      }
+      trapOverlayFocus(overlay, ev);
     }
   });
 
   return overlay;
+}
+
+function bindAulaHotspots(overlay: HTMLElement): void {
+  overlay.querySelectorAll<HTMLElement>('[data-hotspot]').forEach((hotspot) => {
+    const activate = () => activateHotspot(hotspot.dataset.hotspot);
+    hotspot.addEventListener('click', activate);
+    hotspot.addEventListener('focus', () => panStageToHotspot(hotspot));
+    hotspot.addEventListener('keydown', (e) => {
+      const ev = e as KeyboardEvent;
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        activate();
+      }
+    });
+  });
+}
+
+function bindAulaPan(overlay: HTMLElement): void {
+  const stage = overlay.querySelector<HTMLElement>('.rx-aula-stage');
+  if (!stage) return;
+
+  let pointerId: number | null = null;
+  let startX = 0;
+  let startPan = 0;
+
+  stage.addEventListener('pointerdown', (e) => {
+    const ev = e as PointerEvent;
+    if ((ev.target as HTMLElement).closest('[data-hotspot]')) return;
+    pointerId = ev.pointerId;
+    startX = ev.clientX;
+    startPan = aulaPanX;
+    stage.setPointerCapture(pointerId);
+  });
+
+  stage.addEventListener('pointermove', (e) => {
+    const ev = e as PointerEvent;
+    if (pointerId !== ev.pointerId) return;
+    applyAulaPan(stage, startPan + ev.clientX - startX);
+  });
+
+  const release = (e: PointerEvent) => {
+    if (pointerId !== e.pointerId) return;
+    if (stage.hasPointerCapture(pointerId)) stage.releasePointerCapture(pointerId);
+    pointerId = null;
+  };
+
+  stage.addEventListener('pointerup', release);
+  stage.addEventListener('pointercancel', release);
+
+  // Si el viewport cambia con el aula abierta, re-clampear el pan
+  // (evita bandas vacías al pasar de móvil a desktop o rotar).
+  window.addEventListener('resize', () => applyAulaPan(stage, aulaPanX));
+}
+
+function applyAulaPan(stage: HTMLElement, nextPan: number): void {
+  const overflow = Math.max(0, stage.getBoundingClientRect().width - window.innerWidth);
+  const limit = overflow / 2;
+  aulaPanX = Math.max(-limit, Math.min(limit, nextPan));
+  stage.style.transform = `translate(calc(-50% + ${aulaPanX}px), -50%)`;
+}
+
+function panStageToHotspot(hotspot: HTMLElement): void {
+  const stage = hotspot.closest<HTMLElement>('.rx-aula-stage');
+  if (!stage) return;
+
+  const stageRect = stage.getBoundingClientRect();
+  const hotspotRect = hotspot.getBoundingClientRect();
+  const targetCenter = window.innerWidth / 2;
+  const hotspotCenter = hotspotRect.left + hotspotRect.width / 2;
+  const needsPan = hotspotRect.left < 12 || hotspotRect.right > window.innerWidth - 12;
+  if (!needsPan && stageRect.width <= window.innerWidth + 2) return;
+
+  applyAulaPan(stage, aulaPanX + targetCenter - hotspotCenter);
+}
+
+function activateHotspot(hotspotId: string | undefined): void {
+  if (hotspotId === 'pizarron') {
+    openPizarronPanel();
+    return;
+  }
+  if (hotspotId === 'proyector') {
+    showAulaToast('La cinta está rebobinada. Pronto habrá función.');
+    return;
+  }
+  if (hotspotId === 'portal') {
+    window.location.href = '/src/jugar/';
+  }
+}
+
+function openPizarronPanel(): void {
+  const overlay = overlayEl;
+  if (!overlay || activePizarronPanel) return;
+
+  const vm = pizarronViewModel(readSchoolState());
+  const body = vm.lineas
+    ? `<ul class="rx-pizarron-list">${vm.lineas
+        .map((linea) => `<li><span class="rx-pizarron-mark">${linea.marca}</span><span>${linea.texto}</span></li>`)
+        .join('')}</ul>`
+    : `<p class="rx-pizarron-empty">${vm.vacio ?? ''}</p>`;
+  const pie = vm.pie ? `<p class="rx-pizarron-foot">${vm.pie}</p>` : '';
+
+  const layer = document.createElement('div');
+  layer.className = 'rx-pizarron-layer';
+  layer.innerHTML = `
+    <section class="rx-pizarron-panel" role="dialog" aria-modal="true" aria-labelledby="pizarron-title">
+      <button class="rx-pizarron-close" type="button" aria-label="Cerrar">×</button>
+      <h3 id="pizarron-title">${vm.titulo}</h3>
+      ${body}
+      ${pie}
+    </section>
+  `;
+
+  layer.addEventListener('click', (e) => {
+    if (e.target === layer) closePizarronPanel();
+  });
+  layer.querySelector('.rx-pizarron-close')?.addEventListener('click', () => closePizarronPanel());
+
+  overlay.appendChild(layer);
+  activePizarronPanel = layer;
+  layer.querySelector<HTMLElement>('.rx-pizarron-close')?.focus();
+}
+
+function closePizarronPanel(): void {
+  const panel = activePizarronPanel;
+  if (!panel) return;
+  activePizarronPanel = null;
+  panel.remove();
+  overlayEl?.querySelector<HTMLElement>('[data-hotspot="pizarron"]')?.focus();
+}
+
+function showAulaToast(message: string): void {
+  const toast = overlayEl?.querySelector<HTMLElement>('#aula-toast');
+  if (!toast) return;
+  if (aulaToastTimer !== null) window.clearTimeout(aulaToastTimer);
+  toast.textContent = message;
+  toast.classList.add('rx-aula-toast-visible');
+  aulaToastTimer = window.setTimeout(() => {
+    toast.classList.remove('rx-aula-toast-visible');
+    aulaToastTimer = null;
+  }, 2200);
+}
+
+function trapOverlayFocus(overlay: HTMLElement, ev: KeyboardEvent): void {
+  const root = activePizarronPanel ?? overlay;
+  const focusables = Array.from(
+    root.querySelectorAll<HTMLElement>('button, [href], [role="button"], [tabindex]:not([tabindex="-1"])'),
+  ).filter((el) => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true');
+
+  if (focusables.length === 0) return;
+
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  const active = document.activeElement;
+
+  if (ev.shiftKey && active === first) {
+    ev.preventDefault();
+    last.focus();
+  } else if (!ev.shiftKey && active === last) {
+    ev.preventDefault();
+    first.focus();
+  }
+}
+
+function syncAulaState(overlay: HTMLElement): void {
+  const school = readSchoolState();
+  const bg = overlay.querySelector<HTMLElement>('#aula-bg');
+  const stage = overlay.querySelector<HTMLElement>('.rx-aula-stage');
+  if (!bg) return;
+
+  if (stage) applyAulaPan(stage, 0);
+
+  bg.classList.toggle('rx-aula-off', school.aulas.electronica === 'off');
+  bg.classList.toggle('rx-aula-viva', school.aulas.electronica === 'enCurso' || school.aulas.electronica === 'completada');
+
+  bg.classList.remove('rx-aula-entered');
+  void bg.offsetWidth;
+  bg.classList.add('rx-aula-entered');
 }
 
 function lockScroll(): void {
@@ -332,6 +513,7 @@ function openAula(aulaId: AulaId, opts: OpenOptions = {}): void {
   const aula = AULAS.find((a) => a.id === aulaId);
   if (titulo && aula) titulo.textContent = `Aula de ${aula.disciplina}`;
   if (bg) bg.setAttribute('data-aula', aulaId);
+  syncAulaState(overlay);
 
   lastFocusedDoor = opts.fromDoorEl ?? (document.activeElement as HTMLElement | null);
 
@@ -355,6 +537,12 @@ function focusOverlay(overlay: HTMLElement): void {
 function closeAula(): void {
   const overlay = overlayEl;
   if (!overlay || overlay.style.display === 'none') return;
+  closePizarronPanel();
+  if (aulaToastTimer !== null) {
+    window.clearTimeout(aulaToastTimer);
+    aulaToastTimer = null;
+  }
+  overlay.querySelector<HTMLElement>('#aula-toast')?.classList.remove('rx-aula-toast-visible');
   overlay.style.transition = 'opacity 0.2s ease-out';
   overlay.style.opacity = '0';
   window.setTimeout(() => {

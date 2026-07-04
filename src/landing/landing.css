@@ -246,11 +246,343 @@ button:disabled {
   animation: rx-rattle 0.4s ease-in-out;
 }
 
+/* ---------- Aula de Electrónica ---------- */
+
+.rx-aula-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0e0d12;
+}
+
+/* El paneo horizontal en viewports angostos lo maneja JS (bindAulaPan en
+   aulas.ts) vía transform; ver también panStageToHotspot para teclado. */
+.rx-aula-stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100vw, calc(100vh * 1.75));
+  aspect-ratio: 1792 / 1024;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  touch-action: none;
+}
+
+.rx-aula-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+  pointer-events: none;
+  transition: filter 0.35s ease-out;
+}
+
+.rx-aula-off .rx-aula-image {
+  filter: brightness(0.75) saturate(0.85);
+}
+
+.rx-aula-viva .rx-aula-image {
+  filter: brightness(1) saturate(1);
+}
+
+.rx-aula-title {
+  position: absolute;
+  left: 22px;
+  top: 18px;
+  z-index: 2;
+  margin: 0;
+  font-family: 'Spectral', serif;
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 600;
+  color: var(--text);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+.rx-aula-hotspot {
+  position: absolute;
+  z-index: 1;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+  box-shadow: 0 0 0 rgba(255, 211, 77, 0);
+  cursor: pointer;
+  outline: none;
+  animation: rx-hotspot-idle 3.8s ease-in-out infinite;
+}
+
+.rx-aula-hotspot:hover,
+.rx-aula-hotspot:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 34%, transparent), inset 0 0 28px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.rx-aula-hotspot:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 75%, transparent);
+  outline-offset: 4px;
+}
+
+.rx-aula-hotspot-pizarron {
+  left: 10.5%;
+  top: 26%;
+  width: 23%;
+  height: 28%;
+}
+
+.rx-aula-hotspot-portal {
+  left: 38%;
+  top: 8%;
+  width: 24%;
+  height: 49%;
+  border-radius: 50%;
+}
+
+.rx-aula-hotspot-proyector {
+  left: 84%;
+  top: 36%;
+  width: 15%;
+  height: 24%;
+}
+
+.rx-aula-hotspot-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%) translateY(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: max-content;
+  max-width: 190px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  transition: opacity 0.16s ease-out, transform 0.16s ease-out;
+}
+
+.rx-aula-hotspot-label small {
+  color: var(--accent);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+.rx-aula-hotspot:hover .rx-aula-hotspot-label,
+.rx-aula-hotspot:focus-visible .rx-aula-hotspot-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.rx-aula-portal-glow {
+  position: absolute;
+  left: 34%;
+  top: 2%;
+  width: 32%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 34%, transparent) 0%, color-mix(in srgb, var(--accent) 12%, transparent) 34%, transparent 70%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rx-aula-viva .rx-aula-portal-glow {
+  opacity: 0.68;
+  animation: rx-portal-glow 4.2s ease-in-out infinite;
+}
+
+.rx-aula-entry-line {
+  position: absolute;
+  left: 50%;
+  bottom: 4.5%;
+  z-index: 2;
+  transform: translateX(-50%);
+  width: min(620px, 74%);
+  margin: 0;
+  padding: 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent-dim) 35%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg) 62%, transparent);
+  color: var(--paper);
+  font-family: 'Spectral', serif;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.35;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rx-aula-entered .rx-aula-entry-line {
+  animation: rx-entry-line 5s ease-out forwards;
+}
+
+.rx-aula-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 5;
+  transform: translateX(-50%) translateY(8px);
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent-dim) 45%, transparent);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 14.5px;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+}
+
+.rx-aula-toast-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.rx-pizarron-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.rx-pizarron-panel {
+  position: relative;
+  width: min(720px, calc(100vw - 32px));
+  max-height: min(78vh, 620px);
+  overflow: auto;
+  padding: clamp(28px, 5vw, 46px);
+  border: 12px solid #4a2f18;
+  border-radius: 8px;
+  background: #22332c;
+  color: var(--text);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.62), inset 0 0 42px rgba(0, 0, 0, 0.38);
+  font-family: 'Caveat', cursive;
+  text-shadow: 0 0 3px rgba(232, 226, 212, 0.28);
+}
+
+.rx-pizarron-panel h3 {
+  margin: 0 42px 22px 0;
+  font-size: clamp(34px, 6vw, 54px);
+  line-height: 1;
+  font-weight: 700;
+}
+
+.rx-pizarron-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--text) 42%, transparent);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rx-pizarron-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: clamp(28px, 5vw, 42px);
+  line-height: 1.05;
+}
+
+.rx-pizarron-list li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.rx-pizarron-mark {
+  color: var(--accent);
+}
+
+.rx-pizarron-empty,
+.rx-pizarron-foot {
+  margin: 0;
+  font-size: clamp(30px, 5.4vw, 46px);
+  line-height: 1.08;
+}
+
+.rx-pizarron-foot {
+  margin-top: 26px;
+  color: var(--accent);
+}
+
+@keyframes rx-hotspot-idle {
+  0%,
+  100% {
+    opacity: 0.52;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
+@keyframes rx-portal-glow {
+  0%,
+  100% {
+    transform: scale(0.96);
+    opacity: 0.52;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.78;
+  }
+}
+
+@keyframes rx-entry-line {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  14%,
+  74% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rx-puerta,
-  .rx-rattle {
+  .rx-rattle,
+  .rx-aula-hotspot,
+  .rx-aula-viva .rx-aula-portal-glow,
+  .rx-aula-entered .rx-aula-entry-line {
     animation: none !important;
     transition: none !important;
+  }
+
+  .rx-aula-entry-line {
+    opacity: 1;
   }
 }
 
@@ -258,5 +590,36 @@ button:disabled {
   .rx-aulas-grid {
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 14px;
+  }
+
+  .rx-aula-title {
+    left: 14px;
+    top: 14px;
+    max-width: calc(100vw - 160px);
+    font-size: 20px;
+  }
+
+  .rx-aula-exit {
+    top: 12px !important;
+    right: 12px !important;
+    padding: 8px 10px !important;
+  }
+
+  .rx-aula-hotspot {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .rx-aula-hotspot-label {
+    font-size: 11px;
+    max-width: 140px;
+  }
+
+  .rx-pizarron-layer {
+    padding: 14px;
+  }
+
+  .rx-pizarron-panel {
+    border-width: 9px;
   }
 }

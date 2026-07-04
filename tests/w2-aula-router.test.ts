@@ -1,4 +1,4 @@
-import { parseAulaHash } from '../src/landing/aulas.ts';
+import { parseAulaHash } from '../src/landing/aulaRouter.ts';
 
 function equal<T>(actual: T, expected: T, label: string): void {
   if (actual !== expected) {
