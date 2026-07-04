@@ -1,5 +1,5 @@
 // Landing page logic: cart, content rendering
-import { readSchoolState, type AulaId } from './schoolModel.ts';
+import { initAulas } from './aulas.ts';
 
 interface Product {
   id: string;
@@ -8,14 +8,6 @@ interface Product {
   nombre: string;
   desc: string;
   price: number; // €
-}
-
-interface Aula {
-  id: AulaId;
-  motif: string;
-  disciplina: string;
-  nombre: string;
-  desc: string;
 }
 
 interface FichaTecnica {
@@ -30,13 +22,6 @@ const PRODUCTS: Product[] = [
   { id: 'ohm-04', code: 'OHM-04', motif: '📌', nombre: 'Pines (set 3)', desc: 'Set de pines del Instituto', price: 12 },
   { id: 'ohm-05', code: 'OHM-05', motif: '☕', nombre: 'Taza «I=V/R»', desc: 'Taza de cerámica con la ley de Ohm', price: 14 },
   { id: 'ohm-06', code: 'OHM-06', motif: '🔖', nombre: 'Stickers', desc: 'Pack de stickers del juego', price: 8 },
-];
-
-const AULAS: Aula[] = [
-  { id: 'electronica', motif: 'Ω', disciplina: 'Electrónica', nombre: 'Ohmdal', desc: 'Corriente, resistencia, la chispa que lo mueve.' },
-  { id: 'programacion', motif: '{ }', disciplina: 'Programación', nombre: 'Bitland', desc: 'Lógica, bucles, estructuras de pensamiento.' },
-  { id: 'fisica', motif: 'Δ', disciplina: 'Física', nombre: 'Physica', desc: 'Movimiento, energía y las leyes que lo gobiernan.' },
-  { id: 'matematica', motif: '∑', disciplina: 'Matemática', nombre: 'Arithmos', desc: 'Números como fuerzas, ecuaciones como equilibrio.' },
 ];
 
 const FICHA: FichaTecnica[] = [
@@ -58,6 +43,7 @@ class Landing {
     this.setupEventListeners();
     this.renderContent();
     this.updateCartUI();
+    initAulas();
   }
 
   private loadCart(): void {
@@ -241,48 +227,6 @@ class Landing {
           <span style="font-size: 14.5px; font-weight: 600; color: var(--text); text-align: right;">${row.v}</span>
         </div>`,
       ).join('');
-    }
-
-    // Aulas grid
-    const aulasGrid = document.getElementById('aulas-grid');
-    if (aulasGrid) {
-      const school = readSchoolState();
-      aulasGrid.innerHTML = AULAS.map((a) => {
-        const estado = school.aulas[a.id];
-        const activa = estado !== 'cerrada';
-
-        let badgeLabel: string;
-        if (!activa) {
-          badgeLabel = 'Próximamente';
-        } else if (estado === 'off') {
-          badgeLabel = 'Disponible';
-        } else if (estado === 'enCurso') {
-          badgeLabel = `En curso — ${school.electronica.unidadesCompletadas}/${school.electronica.totalUnidades} unidades`;
-        } else {
-          badgeLabel = 'Arco I completado';
-        }
-
-        const badgeStyle = activa
-          ? "color: #1a1408; background: var(--accent); border-radius: 20px; padding: 5px 11px; font-weight: 600;"
-          : "color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 5px 11px;";
-
-        const linkHtml = activa
-          ? `<a href="/src/jugar/" style="color: var(--accent); text-decoration: none; font-size: 14.5px; font-weight: 600;">Entrar a Ohmdal →</a>`
-          : '';
-
-        return `
-          <div style="position: relative; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 26px 24px 24px; display: flex; flex-direction: column; gap: 12px; min-height: 240px; transition: transform 0.18s, border-color 0.18s; cursor: pointer;" onmouseenter="this.style.transform='translateY(-4px)'; this.style.borderColor='var(--accent-dim)'" onmouseleave="this.style.transform='translateY(0)'; this.style.borderColor='var(--border)'">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between;">
-              <div style="width: 56px; height: 56px; border-radius: 12px; background: var(--panel2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Spectral', serif; font-size: 28px; color: var(--accent);">${a.motif}</div>
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; ${badgeStyle}">${badgeLabel}</span>
-            </div>
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-top: 6px;">${a.disciplina} — ${a.nombre}</div>
-            <h3 style="font-family: 'Spectral', serif; font-weight: 600; font-size: 23px; margin: 0; letter-spacing: -0.01em;">${a.nombre}</h3>
-            <p style="font-size: 14.5px; line-height: 1.5; color: var(--muted); margin: 0; flex: 1;">${a.desc}</p>
-            ${linkHtml}
-          </div>
-        `;
-      }).join('');
     }
 
     // Store grid
