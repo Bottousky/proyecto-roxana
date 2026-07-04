@@ -119,9 +119,29 @@
         <div style="max-width: 1180px; margin: 0 auto;">
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Cartelera</div>
           <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 32px;">El tablón de anuncios</h2>
-          <div style="position: relative; max-width: 620px; background: var(--paper); color: var(--ink); border-radius: 4px; padding: 28px 32px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35); transform: rotate(-1deg);">
-            <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; border-radius: 50%; background: var(--ember); box-shadow: 0 3px 6px rgba(0,0,0,0.4); border: 3px solid #a83a26;"></div>
-            <p style="font-family: 'Spectral', serif; font-weight: 500; font-size: 19px; line-height: 1.5; margin: 0;">«Ohmdal, el mundo de la electricidad, ya abre sus puertas.»</p>
+          <!-- Cork board container -->
+          <div style="position: relative; background: linear-gradient(135deg, #b9895a 0%, #a6763f 50%, #9a6b35 100%), radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.08) 1px, transparent 1px), radial-gradient(circle at 42% 67%, rgba(0, 0, 0, 0.15) 1.5px, transparent 1.5px), radial-gradient(circle at 73% 35%, rgba(255, 255, 255, 0.06) 1px, transparent 1px), radial-gradient(circle at 28% 82%, rgba(0, 0, 0, 0.12) 2px, transparent 2px), radial-gradient(circle at 61% 11%, rgba(255, 255, 255, 0.07) 1.5px, transparent 1.5px); border: 8px solid #6b4a2a; border-radius: 5px; padding: clamp(32px, 5vw, 48px); box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 12px 40px rgba(0, 0, 0, 0.4); max-width: 900px;">
+            <!-- Notes grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(20px, 3vw, 36px);">
+              <!-- Note 1: Novedad (Ember) -->
+              <div style="position: relative; background: var(--paper); color: var(--ink); padding: 24px 20px; border-radius: 3px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); transform: rotate(-1.5deg);">
+                <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; border-radius: 50%; background: var(--ember); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset -1px -1px 3px rgba(0, 0, 0, 0.3), inset 1px 1px 3px rgba(255, 255, 255, 0.2); border: 2px solid #a83a26;"></div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 12px; font-weight: 600;">Novedad</div>
+                <p style="font-family: 'Spectral', serif; font-weight: 500; font-size: 17px; line-height: 1.5; margin: 0;">Ohmdal, el mundo de la electricidad, ya abre sus puertas.</p>
+              </div>
+              <!-- Note 2: En obras (Blue) -->
+              <div style="position: relative; background: var(--paper); color: var(--ink); padding: 24px 20px; border-radius: 3px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); transform: rotate(0.8deg);">
+                <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; border-radius: 50%; background: #4a7ba7; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset -1px -1px 3px rgba(0, 0, 0, 0.3), inset 1px 1px 3px rgba(255, 255, 255, 0.15); border: 2px solid #2a5280;"></div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 12px; font-weight: 600;">En obras</div>
+                <p style="font-family: 'Spectral', serif; font-weight: 500; font-size: 17px; line-height: 1.5; margin: 0;">Tres mundos más esperan su turno: Programación, Física y Matemática.</p>
+              </div>
+              <!-- Note 3: Bitácora (Amber) -->
+              <div style="position: relative; background: var(--paper); color: var(--ink); padding: 24px 20px; border-radius: 3px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); transform: rotate(1.2deg);">
+                <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; border-radius: 50%; background: var(--accent-dim); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset -1px -1px 3px rgba(0, 0, 0, 0.3), inset 1px 1px 3px rgba(255, 255, 255, 0.2); border: 2px solid #8a6f1f;"></div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 12px; font-weight: 600;">Bitácora</div>
+                <p style="font-family: 'Spectral', serif; font-weight: 500; font-size: 17px; line-height: 1.5; margin: 0;">Todo lo que descubras queda escrito. Buscalo en la Biblioteca.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
