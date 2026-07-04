@@ -175,7 +175,7 @@ export interface GameState {
 const KEY = 'roxana-slice-v1';
 
 export const state: GameState = {
-  room: 'hall',
+  room: 'escuela_hub',
   flags: { ...DEFAULT_FLAGS },
 };
 
@@ -192,7 +192,7 @@ export function load(): void {
   if (!raw) return;
   try {
     const data = JSON.parse(raw) as GameState;
-    state.room = data.room ?? 'hall';
+    state.room = data.room ?? 'escuela_hub';
     state.flags = { ...DEFAULT_FLAGS, ...data.flags };
   } catch {
     /* save corrupto: empezar de cero */
@@ -201,7 +201,7 @@ export function load(): void {
 
 export function resetSave(): void {
   localStorage.removeItem(KEY);
-  state.room = 'hall';
+  state.room = 'escuela_hub';
   state.flags = { ...DEFAULT_FLAGS };
 }
 
@@ -216,4 +216,6 @@ export const hooks = {
   refresh: () => {},
   /** viajar a otra sala */
   goto: (_room: string, _spawn?: { x: number; y: number }) => {},
+  /** cruzar la frontera entre runtimes a través del shell */
+  travel: (_experienceId: string, _room?: string) => {},
 };

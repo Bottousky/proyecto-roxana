@@ -4,11 +4,14 @@ import Phaser from 'phaser';
 import { ExplorationScene, W, H } from '../../jugar/ExplorationScene.ts';
 import { state, hooks } from '../../state.ts';
 import { activateExperienceForRoom, experienceOfRoom } from '../registry.ts';
-import type { ExperienceRuntimeModule, RuntimeHandle } from '../types.ts';
+import type { ExperienceId, ExperienceRuntimeModule, RuntimeHandle } from '../types.ts';
 
 export const topdownRuntime: ExperienceRuntimeModule = {
   runtime: 'topdown-phaser',
   async mount(hostEl, context) {
+    hooks.travel = (experienceId, roomId) => {
+      void context.requestTravel({ experienceId: experienceId as ExperienceId, roomId });
+    };
     // El shell puede pedir montar en una sala concreta (p. ej. la puerta 3D → plaza).
     const requestedRoom = context.initialLocation.roomId;
     if (requestedRoom && experienceOfRoom(requestedRoom)?.runtime === 'topdown-phaser') {

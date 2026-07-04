@@ -925,6 +925,10 @@ export const ROOMS: Record<string, RoomDef> = {
       },
     ],
     onEnter: () => {
+      if (f().seenIntro) {
+        hooks.travel('instituto', 'escuela_hub');
+        return;
+      }
       if (!f().introSeen) {
         say(
           [
