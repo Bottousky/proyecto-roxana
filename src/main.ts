@@ -8,6 +8,7 @@ import { experienceById, experienceOfRoom } from './experiences/registry';
 import { createRuntimeHost } from './app/runtimeHost.ts';
 import { runtimeLoaders } from './experiences/loaders.ts';
 import type { ExperienceId } from './experiences/types.ts';
+import { esLlegadaPorPortal } from './shared/portalLink.ts';
 
 function startGame(): void {
   initAudio(); // el click de "Empezar"/"Continuar" es el gesto que habilita el sonido
@@ -31,16 +32,40 @@ initAudioButton();
 
 const btnContinue = el<HTMLButtonElement>('btn-continue');
 const btnNew = el<HTMLButtonElement>('btn-new');
+const arrivedByPortal = esLlegadaPorPortal(location.search);
 
-if (hasSave()) {
-  btnContinue.classList.remove('hidden');
-  btnContinue.addEventListener('click', () => {
-    load();
-    startGame();
-  });
+function continueGame(): void {
+  load();
+  startGame();
 }
 
-btnNew.addEventListener('click', () => {
+function newGame(): void {
   resetSave();
   startGame();
-});
+}
+
+function showPortalArrivalOverlay(): void {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:fixed; inset:0; z-index:200; background:#dfe9ff; opacity:1;
+    pointer-events:none; transition:opacity 0.6s ease-out;
+  `;
+  document.body.appendChild(overlay);
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+  requestAnimationFrame(() => {
+    overlay.style.transitionDuration = reduced ? '0.05s' : '0.6s';
+    overlay.style.opacity = '0';
+  });
+  window.setTimeout(() => overlay.remove(), reduced ? 80 : 650);
+}
+
+if (arrivedByPortal) {
+  showPortalArrivalOverlay();
+  if (hasSave()) continueGame();
+  else newGame();
+} else if (hasSave()) {
+  btnContinue.classList.remove('hidden');
+  btnContinue.addEventListener('click', continueGame);
+}
+
+btnNew.addEventListener('click', newGame);

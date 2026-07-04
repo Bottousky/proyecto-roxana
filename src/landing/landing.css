@@ -452,6 +452,23 @@ button:disabled {
   transform: translateX(-50%) translateY(0);
 }
 
+.rx-portal-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #dfe9ff;
+  opacity: 0;
+  pointer-events: all;
+  cursor: wait;
+  transition: opacity 0.2s ease-out;
+}
+
+.rx-portal-transition-canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
 .rx-pizarron-layer {
   position: absolute;
   inset: 0;

@@ -23,6 +23,7 @@ export function showEnd(opts: EndOptions): void {
       <div class="title-buttons">
         <button id="btn-end-continue">${opts.continueLabel}</button>
         <button id="btn-end-reset">Reiniciar demo</button>
+        <button id="btn-home">← Volver a la web</button>
       </div>
     </div>`;
   el('btn-end-continue').addEventListener('click', () => {
@@ -34,5 +35,8 @@ export function showEnd(opts: EndOptions): void {
   el('btn-end-reset').addEventListener('click', () => {
     resetSave();
     location.reload();
+  });
+  el('btn-home').addEventListener('click', () => {
+    window.location.href = '/#aula/electronica';
   });
 }

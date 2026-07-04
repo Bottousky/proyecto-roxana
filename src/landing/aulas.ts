@@ -3,6 +3,7 @@
 import aulaBgUrl from '../../assets/instituto/aula-electronica-fondo-v1.png';
 import { pizarronViewModel } from './aulaModel.ts';
 import { parseAulaHash } from './aulaRouter.ts';
+import { startPortalTransition } from './portal.ts';
 import { readSchoolState, type AulaId, type AulaEstado } from './schoolModel.ts';
 
 export { parseAulaHash } from './aulaRouter.ts';
@@ -235,7 +236,7 @@ function ensureOverlay(): HTMLElement {
 
 function bindAulaHotspots(overlay: HTMLElement): void {
   overlay.querySelectorAll<HTMLElement>('[data-hotspot]').forEach((hotspot) => {
-    const activate = () => activateHotspot(hotspot.dataset.hotspot);
+    const activate = () => activateHotspot(hotspot);
     hotspot.addEventListener('click', activate);
     hotspot.addEventListener('focus', () => panStageToHotspot(hotspot));
     hotspot.addEventListener('keydown', (e) => {
@@ -306,7 +307,8 @@ function panStageToHotspot(hotspot: HTMLElement): void {
   applyAulaPan(stage, aulaPanX + targetCenter - hotspotCenter);
 }
 
-function activateHotspot(hotspotId: string | undefined): void {
+function activateHotspot(hotspot: HTMLElement): void {
+  const hotspotId = hotspot.dataset.hotspot;
   if (hotspotId === 'pizarron') {
     openPizarronPanel();
     return;
@@ -316,7 +318,7 @@ function activateHotspot(hotspotId: string | undefined): void {
     return;
   }
   if (hotspotId === 'portal') {
-    window.location.href = '/src/jugar/';
+    startPortalTransition(hotspot);
   }
 }
 
