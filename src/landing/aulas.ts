@@ -116,14 +116,10 @@ function buildDoorHtml(a: Aula, estado: AulaEstado, school: ReturnType<typeof re
 
   const candado = activa
     ? ''
-    : `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="var(--muted)" stroke-width="1.6" style="position:absolute; top:14px; right:14px; opacity:0.85;">
+    : `<svg class="rx-puerta-candado" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
         <rect x="4" y="11" width="16" height="10" rx="2"/>
         <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
       </svg>`;
-
-  const picaporte = activa
-    ? `<span style="position:absolute; right:10%; top:50%; width:9px; height:9px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffe9a8, var(--accent) 60%, var(--accent-dim)); box-shadow:0 0 8px color-mix(in srgb, var(--accent) 55%, transparent);"></span>`
-    : `<span style="position:absolute; right:10%; top:50%; width:8px; height:8px; border-radius:50%; background:var(--border);"></span>`;
 
   return `
     <div
@@ -135,17 +131,19 @@ function buildDoorHtml(a: Aula, estado: AulaEstado, school: ReturnType<typeof re
       aria-label="${a.disciplina} — ${a.nombre}${activa ? '' : ' (próximamente)'}"
       title="${activa ? '' : 'Próximamente'}"
     >
+      <div class="rx-puerta-cartel">${a.disciplina} — ${a.nombre}</div>
       <div class="rx-puerta-marco">
+        <div class="rx-puerta-luz" aria-hidden="true"></div>
         <div class="rx-puerta-hoja">
-          <div class="rx-puerta-panel rx-puerta-panel-arriba"></div>
-          <div class="rx-puerta-panel rx-puerta-panel-abajo"></div>
-          ${picaporte}
+          <div class="rx-puerta-ventana" aria-hidden="true">${a.motif}</div>
+          <div class="rx-puerta-panel rx-puerta-panel-a"></div>
+          <div class="rx-puerta-panel rx-puerta-panel-b"></div>
+          <span class="rx-puerta-picaporte" aria-hidden="true"></span>
         </div>
+        ${candado}
       </div>
-      ${candado}
-      <div class="rx-puerta-placa">
-        <div class="rx-puerta-disciplina">${a.disciplina} — ${a.nombre}</div>
-        <div class="rx-puerta-badge ${activa ? 'rx-puerta-badge-activa' : ''}">${badgeLabel}</div>
+      <div class="rx-puerta-pie">
+        <span class="rx-puerta-badge ${activa ? 'rx-puerta-badge-activa' : ''}">${badgeLabel}</span>
       </div>
     </div>
   `;
@@ -447,65 +445,42 @@ function openAulaDirect(overlay: HTMLElement): void {
   focusOverlay(overlay);
 }
 
-function openAulaWithFlip(overlay: HTMLElement, doorEl: HTMLElement, withSound: boolean): void {
-  const rect = doorEl.getBoundingClientRect();
-
-  const clone = doorEl.cloneNode(true) as HTMLElement;
-  clone.classList.remove('rx-rattle');
-  clone.style.cssText = `
-    position: fixed;
-    top: ${rect.top}px; left: ${rect.left}px;
-    width: ${rect.width}px; height: ${rect.height}px;
-    margin: 0; z-index: 600;
-    transition: top 0.4s cubic-bezier(0.4,0,0.2,1), left 0.4s cubic-bezier(0.4,0,0.2,1),
-                width 0.4s cubic-bezier(0.4,0,0.2,1), height 0.4s cubic-bezier(0.4,0,0.2,1);
-    pointer-events: none;
-  `;
-  document.body.appendChild(clone);
-
+function openAulaThroughDoor(overlay: HTMLElement, doorEl: HTMLElement, withSound: boolean): void {
+  // Fase 1: la hoja se abre en su propio marco (bisagra 3D en CSS,
+  // clase rx-puerta-abriendo) dejando ver la luz del interior.
+  doorEl.classList.add('rx-puerta-abriendo');
   if (withSound) playDoorOpen(false);
-
   lockScroll();
 
-  requestAnimationFrame(() => {
-    clone.style.top = '0px';
-    clone.style.left = '0px';
-    clone.style.width = '100vw';
-    clone.style.height = '100vh';
-  });
+  const marco = doorEl.querySelector<HTMLElement>('.rx-puerta-marco') ?? doorEl;
 
   window.setTimeout(() => {
-    // Fase 2: bisagra 3D
-    const hinge = document.createElement('div');
-    hinge.style.cssText = `
-      position: fixed; inset: 0; z-index: 601; perspective: 1600px;
-      pointer-events: none;
-    `;
-    const leaf = document.createElement('div');
-    leaf.style.cssText = `
-      position: absolute; inset: 0; background: var(--panel2);
-      border-right: 1px solid var(--border);
-      transform-origin: left center;
-      transition: transform 0.6s cubic-bezier(0.6,0,0.4,1);
-      transform: rotateY(0deg);
-    `;
-    hinge.appendChild(leaf);
-    document.body.appendChild(hinge);
+    // Fase 2: el aula se revela expandiéndose desde el hueco de la puerta
+    // (container transform con clip-path: nada se estira ni deforma).
+    const rect = marco.getBoundingClientRect();
+    const top = Math.max(0, rect.top);
+    const left = Math.max(0, rect.left);
+    const right = Math.max(0, window.innerWidth - rect.right);
+    const bottom = Math.max(0, window.innerHeight - rect.bottom);
 
     overlay.style.display = 'block';
     overlay.style.opacity = '1';
-    overlay.style.transition = '';
+    overlay.style.transition = 'clip-path 0.65s cubic-bezier(0.55, 0, 0.2, 1)';
+    overlay.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px round 6px)`;
 
     requestAnimationFrame(() => {
-      leaf.style.transform = 'rotateY(-115deg)';
+      requestAnimationFrame(() => {
+        overlay.style.clipPath = 'inset(0px 0px 0px 0px round 0px)';
+      });
     });
 
     window.setTimeout(() => {
-      hinge.remove();
-      clone.remove();
+      overlay.style.clipPath = '';
+      overlay.style.transition = '';
+      doorEl.classList.remove('rx-puerta-abriendo');
       focusOverlay(overlay);
-    }, 650);
-  }, 420);
+    }, 720);
+  }, 430);
 }
 
 function openAula(aulaId: AulaId, opts: OpenOptions = {}): void {
@@ -523,7 +498,7 @@ function openAula(aulaId: AulaId, opts: OpenOptions = {}): void {
     if (opts.playSound && prefersReducedMotion()) playDoorOpen(true);
     openAulaDirect(overlay);
   } else {
-    openAulaWithFlip(overlay, opts.fromDoorEl, opts.playSound !== false);
+    openAulaThroughDoor(overlay, opts.fromDoorEl, opts.playSound !== false);
   }
 
   if (location.hash !== `#aula/${aulaId}`) {
