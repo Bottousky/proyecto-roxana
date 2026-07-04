@@ -7,7 +7,6 @@ export type ExperienceId = 'instituto' | 'ohmdal' | 'bitland' | 'physica' | 'ari
  */
 export type ExperienceRuntime =
   | 'topdown-phaser'
-  | 'school-webgl'
   | 'dataflow-phaser'
   | 'platformer-phaser'
   | 'cosmos-web';
