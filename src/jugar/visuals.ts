@@ -160,23 +160,27 @@ export function drawRoomBase(
   w: number,
   h: number,
   border: number,
+  texturedFloor = false,
+  continuousWorld = false,
 ): void {
   const rnd = mulberry32(hashStr(roomId));
   const pal = authoredPalette(roomId, rawPal);
 
-  // pared: base + biselado interior para que el borde tenga cuerpo
+  const visualBorder = continuousWorld ? 0 : border;
+  // Un interior tiene marco. En el exterior continuo el borde es angosto y
+  // deja de delatar el rectángulo completo de cada chunk.
   add(scene.add.rectangle(ox + w / 2, oy + h / 2, w, h, shade(pal.wall, 0.92)).setDepth(DEPTH.floor));
-  const wallG = scene.add.graphics().setDepth(DEPTH.floor);
+  const wallG = scene.add.graphics().setDepth(continuousWorld ? DEPTH.decor : DEPTH.floor);
   add(wallG);
   wallG.fillStyle(pal.wall, 1);
-  wallG.fillRect(ox, oy, w, border);
+  wallG.fillRect(ox, oy, w, visualBorder);
   wallG.fillStyle(shade(pal.wall, 0.8), 1);
-  wallG.fillRect(ox, oy + h - border, w, border);
+  wallG.fillRect(ox, oy + h - visualBorder, w, visualBorder);
   wallG.fillStyle(shade(pal.wall, 0.88), 1);
-  wallG.fillRect(ox, oy, border, h);
-  wallG.fillRect(ox + w - border, oy, border, h);
+  wallG.fillRect(ox, oy, visualBorder, h);
+  wallG.fillRect(ox + w - visualBorder, oy, visualBorder, h);
   // pilastras: ritmo arquitectónico en los muros horizontales
-  for (let x = border + 34; x < w - border - 30; x += 148) {
+  for (let x = border + 34; !continuousWorld && x < w - border - 30; x += 148) {
     wallG.fillStyle(shade(pal.wall, 1.22), 1);
     wallG.fillRect(ox + x, oy + 2, 13, border - 2);
     wallG.fillRect(ox + x, oy + h - border, 13, border - 2);
@@ -186,35 +190,39 @@ export function drawRoomBase(
   }
 
   // piso: lajas con leve variación tonal (determinista por sala)
-  const g = scene.add.graphics().setDepth(DEPTH.floor);
+  // Con tiles, este graphics conserva caminos, canales, relieves y desgaste
+  // por encima de la textura; la base repetida la aporta decorData.ts.
+  const g = scene.add.graphics().setDepth(texturedFloor ? DEPTH.decor - 1 : DEPTH.floor);
   add(g);
-  g.fillStyle(pal.floor, 1);
-  g.fillRect(ox + border, oy + border, w - 2 * border, h - 2 * border);
-  const SW = 56;
-  const SH = 40;
-  for (let row = 0; ; row++) {
-    const y = border + row * SH;
-    if (y >= h - border) break;
-    const off = row % 2 === 0 ? 0 : SW / 2;
-    for (let col = -1; ; col++) {
-      const x = border + off + col * SW;
-      if (x >= w - border) break;
-      const x0 = Math.max(x + 2, border + 1);
-      const y0 = y + 2;
-      const x1 = Math.min(x + SW - 2, w - border - 1);
-      const y1 = Math.min(y + SH - 2, h - border - 1);
-      if (x1 - x0 < 6 || y1 - y0 < 6) continue;
-      const jitter = 0.93 + rnd() * 0.17;
-      g.fillStyle(shade(pal.floor, jitter), 1);
-      g.fillRect(ox + x0, oy + y0, x1 - x0, y1 - y0);
+  if (!texturedFloor) {
+    g.fillStyle(pal.floor, 1);
+    g.fillRect(ox + border, oy + border, w - 2 * border, h - 2 * border);
+    const SW = 56;
+    const SH = 40;
+    for (let row = 0; ; row++) {
+      const y = border + row * SH;
+      if (y >= h - border) break;
+      const off = row % 2 === 0 ? 0 : SW / 2;
+      for (let col = -1; ; col++) {
+        const x = border + off + col * SW;
+        if (x >= w - border) break;
+        const x0 = Math.max(x + 2, border + 1);
+        const y0 = y + 2;
+        const x1 = Math.min(x + SW - 2, w - border - 1);
+        const y1 = Math.min(y + SH - 2, h - border - 1);
+        if (x1 - x0 < 6 || y1 - y0 < 6) continue;
+        const jitter = 0.93 + rnd() * 0.17;
+        g.fillStyle(shade(pal.floor, jitter), 1);
+        g.fillRect(ox + x0, oy + y0, x1 - x0, y1 - y0);
+      }
     }
-  }
-  // juntas: trazo sutil más oscuro
-  g.lineStyle(2, shade(pal.floor, 0.82), 0.35);
-  for (let row = 0; ; row++) {
-    const y = border + row * SH;
-    if (y >= h - border) break;
-    g.lineBetween(ox + border, oy + y, ox + w - border, oy + y);
+    // juntas: trazo sutil más oscuro
+    g.lineStyle(2, shade(pal.floor, 0.82), 0.35);
+    for (let row = 0; ; row++) {
+      const y = border + row * SH;
+      if (y >= h - border) break;
+      g.lineBetween(ox + border, oy + y, ox + w - border, oy + y);
+    }
   }
 
   // medallón central de mosaico (cada sala con leve variación propia)
@@ -332,27 +340,31 @@ export function drawRoomBase(
     g.fillEllipse(ox + x, oy + y, 4 + rnd() * 6, 2.5 + rnd() * 4);
   }
 
-  // cara sur del muro norte (vista ¾ Pokémon: los muros tienen altura, se ve su frente)
-  g.fillStyle(shade(pal.wall, 0.76), 1);
-  g.fillRect(ox + border, oy + border, w - 2 * border, 12);
-  g.fillStyle(shade(pal.wall, 0.5), 1);
-  g.fillRect(ox + border, oy + border + 12, w - 2 * border, 3);
-  g.fillStyle(shade(pal.wall, 0.62), 0.8);
-  for (let x = border + 22; x < w - border - 8; x += 56) {
-    g.fillRect(ox + x, oy + border, 2, 12);
+  if (!continuousWorld) {
+    // cara sur del muro norte (vista ¾ Pokémon: los muros tienen altura)
+    g.fillStyle(shade(pal.wall, 0.76), 1);
+    g.fillRect(ox + border, oy + border, w - 2 * border, 12);
+    g.fillStyle(shade(pal.wall, 0.5), 1);
+    g.fillRect(ox + border, oy + border + 12, w - 2 * border, 3);
+    g.fillStyle(shade(pal.wall, 0.62), 0.8);
+    for (let x = border + 22; x < w - border - 8; x += 56) {
+      g.fillRect(ox + x, oy + border, 2, 12);
+    }
   }
 
   // sombra interior del muro (el piso se hunde respecto de la pared)
-  const inset = scene.add.graphics().setDepth(DEPTH.decor);
-  add(inset);
-  for (let i = 0; i < 5; i++) {
-    inset.lineStyle(2, 0x06060e, 0.12 - i * 0.02);
-    inset.strokeRect(
-      ox + border + i * 2,
-      oy + border + i * 2,
-      w - 2 * (border + i * 2),
-      h - 2 * (border + i * 2),
-    );
+  if (!continuousWorld) {
+    const inset = scene.add.graphics().setDepth(DEPTH.decor);
+    add(inset);
+    for (let i = 0; i < 5; i++) {
+      inset.lineStyle(2, 0x06060e, 0.12 - i * 0.02);
+      inset.strokeRect(
+        ox + border + i * 2,
+        oy + border + i * 2,
+        w - 2 * (border + i * 2),
+        h - 2 * (border + i * 2),
+      );
+    }
   }
 
   // Escenografía no interactiva en los márgenes: densidad de mapa sin tapar rutas.
@@ -1017,6 +1029,113 @@ export function makePropVisual(
         .setAlpha(0.95);
       c.add(sign);
     }
+  } else if (/^campana$/.test(t.id)) {
+    // La campana es un hito narrativo, no un cajón rectangular.
+    const w = t.w;
+    const h = t.h;
+    g.fillStyle(0x4a2d1d, 1);
+    g.fillRect(-w * 0.42, -h * 0.44, 7, h * 0.82);
+    g.fillRect(w * 0.3, -h * 0.44, 7, h * 0.82);
+    g.fillStyle(0x7c4d27, 1);
+    g.fillRect(-w * 0.48, -h * 0.48, w * 0.96, 7);
+    g.fillStyle(shade(color, 0.62), 1);
+    g.fillCircle(0, -h * 0.08, w * 0.34);
+    g.fillStyle(color, 1);
+    g.fillTriangle(-w * 0.31, -h * 0.1, w * 0.31, -h * 0.1, w * 0.4, h * 0.29);
+    g.fillStyle(shade(color, 1.55), 0.8);
+    g.fillEllipse(-w * 0.09, -h * 0.08, w * 0.11, h * 0.2);
+    g.fillStyle(0x251b18, 1);
+    g.fillCircle(0, h * 0.34, 5);
+    g.lineStyle(2, 0x3b2519, 1);
+    g.strokeEllipse(0, h * 0.28, w * 0.82, 10);
+  } else if (/^banco-|^tablero-/.test(t.id)) {
+    // Banco de trabajo JRPG: tapa, bastidor, cajones y piezas legibles.
+    const w = t.w;
+    const h = t.h;
+    const top = Math.max(15, h * 0.3);
+    g.fillStyle(0x241b1a, 1);
+    g.fillRect(-w / 2 + 10, h * 0.16, 12, h * 0.48);
+    g.fillRect(w / 2 - 22, h * 0.16, 12, h * 0.48);
+    g.fillStyle(shade(color, 0.58), 1);
+    g.fillRoundedRect(-w / 2 - 3, -h / 2 + 8, w + 6, h * 0.62, 5);
+    g.fillStyle(shade(color, 1.25), 1);
+    g.fillRoundedRect(-w / 2, -h / 2, w, top, 5);
+    g.fillStyle(color, 1);
+    g.fillRect(-w / 2 + 7, -h / 2 + top, w - 14, h * 0.34);
+    g.lineStyle(2, shade(color, 0.42), 1);
+    g.strokeRoundedRect(-w / 2, -h / 2, w, h * 0.66, 5);
+    const drawers = Math.max(2, Math.floor(w / 68));
+    for (let i = 0; i < drawers; i++) {
+      const x = -w / 2 + 12 + i * ((w - 24) / drawers);
+      const dw = (w - 30) / drawers;
+      g.lineStyle(1.5, shade(color, 0.5), 0.9);
+      g.strokeRect(x, -h * 0.05, dw, h * 0.22);
+      g.fillStyle(0xd0a34a, 1);
+      g.fillCircle(x + dw / 2, h * 0.06, 2.5);
+    }
+    // Herramientas y dos engastes sobre la tapa.
+    g.lineStyle(3, 0xc47b45, 1);
+    g.lineBetween(-w * 0.3, -h * 0.32, -w * 0.08, -h * 0.39);
+    g.fillStyle(0x62d1c4, 1);
+    g.fillCircle(w * 0.24, -h * 0.33, 5);
+    g.fillStyle(0xa94c55, 1);
+    g.fillCircle(w * 0.34, -h * 0.33, 5);
+  } else if (/(repartidor|maquina|reloj|martillo|fuelle|lumbre|horno|tronco|fusible|lamparas|pared-fusibles)/.test(t.id)) {
+    // Maquinaria antigua: paneles de hierro, conducciones de cobre y medidores.
+    const w = t.w;
+    const h = t.h;
+    g.fillStyle(0x171923, 1);
+    g.fillRoundedRect(-w / 2 - 3, -h / 2 + 5, w + 6, h, 10);
+    g.fillStyle(shade(color, 0.62), 1);
+    g.fillRoundedRect(-w / 2, -h / 2, w, h - 4, 8);
+    g.fillStyle(shade(color, 0.9), 1);
+    g.fillRoundedRect(-w / 2 + 9, -h / 2 + 10, w - 18, h - 24, 5);
+    g.lineStyle(4, 0xb8733f, 0.95);
+    g.strokeRoundedRect(-w / 2 + 6, -h / 2 + 6, w - 12, h - 16, 7);
+    const gauges = Math.max(2, Math.min(5, Math.floor(w / 85)));
+    for (let i = 0; i < gauges; i++) {
+      const x = -w * 0.36 + i * (w * 0.72 / Math.max(1, gauges - 1));
+      const y = -h * 0.08;
+      const r = Math.max(8, Math.min(16, h * 0.16));
+      g.fillStyle(0x202534, 1);
+      g.fillCircle(x, y, r);
+      g.lineStyle(2, 0xd0a34a, 1);
+      g.strokeCircle(x, y, r);
+      g.lineStyle(2, i % 2 ? 0x62d1c4 : 0xf3c765, 1);
+      g.lineBetween(x, y, x + r * 0.55, y - r * 0.42);
+    }
+    g.fillStyle(0x2b2020, 1);
+    g.fillRect(-w * 0.4, h * 0.25, w * 0.8, 8);
+    g.fillStyle(0xe6753f, 0.9);
+    for (let x = -w * 0.34; x < w * 0.35; x += 24) g.fillCircle(x, h * 0.29, 3);
+  } else if (/(estantes|pedestales|bocas)/.test(t.id)) {
+    const w = t.w;
+    const h = t.h;
+    g.fillStyle(0x241a1d, 1);
+    g.fillRect(-w / 2, -h / 2, w, h);
+    for (let row = 0; row < 2; row++) {
+      const y = -h / 2 + 7 + row * (h * 0.42);
+      g.fillStyle(shade(color, 0.72 + row * 0.15), 1);
+      g.fillRect(-w / 2 + 7, y, w - 14, h * 0.32);
+      g.fillStyle(0xc88a4e, 0.9);
+      for (let x = -w / 2 + 18; x < w / 2 - 8; x += 28) {
+        g.fillRect(x, y + 4, 8, h * 0.22);
+      }
+    }
+    g.lineStyle(2, shade(color, 1.35), 0.8);
+    g.strokeRect(-w / 2, -h / 2, w, h);
+  } else if (/^lente-/.test(t.id)) {
+    const r = t.w / 2;
+    g.fillStyle(0x263847, 1);
+    g.fillCircle(0, 2, r);
+    g.fillStyle(color, 1);
+    g.fillCircle(0, -r * 0.08, r * 0.86);
+    g.fillStyle(0xbff5ff, 0.72);
+    g.fillCircle(-r * 0.23, -r * 0.32, r * 0.32);
+    g.lineStyle(Math.max(3, r * 0.06), 0x91b6c7, 1);
+    g.strokeCircle(0, -r * 0.08, r * 0.9);
+    g.lineStyle(2, 0xeafcff, 0.5);
+    g.lineBetween(-r * 0.55, r * 0.18, r * 0.5, -r * 0.34);
   } else if (t.shape === 'circle') {
     const r = t.w / 2;
     g.fillStyle(shade(color, 0.62), 1);

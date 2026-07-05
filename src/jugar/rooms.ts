@@ -1153,25 +1153,18 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        x: 0, y: 190, w: 26, h: 110,
-        to: 'forge_yard', spawn: { x: 860, y: 245 },
+        x: 934, y: 35, w: 26, h: 110,
+        to: 'forge_yard', spawn: { x: 95, y: 245 },
         label: 'Camino a la Forja',
         color: 0x7a5438,
         visible: () => f().unit2Completed,
       },
       {
-        x: 0, y: 330, w: 26, h: 110,
-        to: 'terraces_top', spawn: { x: 860, y: 135 },
+        x: 145, y: 514, w: 120, h: 26,
+        to: 'terraces_top', spawn: { x: 205, y: 95 },
         label: 'Camino a las Terrazas',
         color: 0x58755f,
         visible: () => f().unit3Completed,
-      },
-      {
-        x: 0, y: 450, w: 26, h: 64,
-        to: 'lighthouse_hall', spawn: { x: 860, y: 380 },
-        label: 'Camino al Faro',
-        color: 0x496978,
-        visible: () => f().unit4Completed,
       },
     ],
     things: [
@@ -1907,13 +1900,13 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => (f().forgeRestored ? 0x7a4a2c : 0x51392c),
     doors: [
       {
-        x: 934, y: 190, w: 26, h: 110,
-        to: 'plaza', spawn: { x: 95, y: 245 },
+        x: 0, y: 35, w: 26, h: 110,
+        to: 'plaza', spawn: { x: 860, y: 90 },
         label: 'Plaza de Ohmdal',
       },
       {
-        x: 420, y: 0, w: 120, h: 26,
-        to: 'forge_infirmary', spawn: { x: 480, y: 440 },
+        x: 934, y: 190, w: 26, h: 110,
+        to: 'forge_infirmary', spawn: { x: 95, y: 245 },
         label: 'Enfermería de fusibles',
         locked: () => {
           if (f().solvedWarmChannel) return null;
@@ -1981,13 +1974,13 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => (f().forgeRestored ? 0x6e4936 : 0x4b3932),
     doors: [
       {
-        x: 420, y: 514, w: 120, h: 26,
-        to: 'forge_yard', spawn: { x: 480, y: 95 },
+        x: 0, y: 190, w: 26, h: 110,
+        to: 'forge_yard', spawn: { x: 860, y: 245 },
         label: 'Patio de la Forja',
       },
       {
-        x: 420, y: 0, w: 120, h: 26,
-        to: 'forge_longchannel', spawn: { x: 480, y: 440 },
+        x: 934, y: 190, w: 26, h: 110,
+        to: 'forge_longchannel', spawn: { x: 95, y: 245 },
         label: 'Canal Largo',
         locked: () => {
           if (f().solvedFuseInfirmary) return null;
@@ -2029,13 +2022,13 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => (f().forgeRestored ? 0x74472c : 0x49372b),
     doors: [
       {
-        x: 420, y: 514, w: 120, h: 26,
-        to: 'forge_infirmary', spawn: { x: 480, y: 95 },
+        x: 0, y: 190, w: 26, h: 110,
+        to: 'forge_infirmary', spawn: { x: 860, y: 245 },
         label: 'Enfermería de fusibles',
       },
       {
-        x: 420, y: 0, w: 120, h: 26,
-        to: 'forge_hall', spawn: { x: 480, y: 440 },
+        x: 934, y: 190, w: 26, h: 110,
+        to: 'forge_hall', spawn: { x: 95, y: 245 },
         label: 'Nave mayor',
         locked: () => {
           if (f().solvedLongChannel) return null;
@@ -2083,8 +2076,8 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => (f().forgeRestored ? 0x82482b : 0x543b2d),
     doors: [
       {
-        x: 420, y: 514, w: 120, h: 26,
-        to: 'forge_longchannel', spawn: { x: 480, y: 95 },
+        x: 0, y: 190, w: 26, h: 110,
+        to: 'forge_longchannel', spawn: { x: 860, y: 245 },
         label: 'Canal Largo',
       },
     ],
@@ -2141,8 +2134,8 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => (f().valleyRestored ? 0x71845c : 0x5d684d),
     doors: [
       {
-        x: 934, y: 80, w: 26, h: 110,
-        to: 'plaza', spawn: { x: 95, y: 385 },
+        x: 145, y: 0, w: 120, h: 26,
+        to: 'plaza', spawn: { x: 205, y: 440 },
         label: 'Plaza de Ohmdal',
       },
       {
@@ -2374,6 +2367,13 @@ export const ROOMS: Record<string, RoomDef> = {
         to: 'terraces_mural', spawn: { x: 480, y: 440 },
         label: 'Mural de los Maestros',
       },
+      {
+        x: 934, y: 330, w: 26, h: 110,
+        to: 'lighthouse_hall', spawn: { x: 95, y: 385 },
+        label: 'Camino al Faro',
+        color: 0x496978,
+        visible: () => f().unit4Completed,
+      },
     ],
     things: [
       {
@@ -2447,13 +2447,13 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => 0x304451,
     doors: [
       {
-        x: 934, y: 330, w: 26, h: 110,
-        to: 'plaza', spawn: { x: 95, y: 465 },
-        label: 'Camino a la plaza',
+        x: 0, y: 330, w: 26, h: 110,
+        to: 'terraces_aqueduct', spawn: { x: 860, y: 385 },
+        label: 'Acueducto del valle',
       },
       {
-        x: 420, y: 0, w: 120, h: 26,
-        to: 'lighthouse_bench', spawn: { x: 480, y: 440 },
+        x: 934, y: 190, w: 26, h: 110,
+        to: 'lighthouse_bench', spawn: { x: 95, y: 245 },
         label: 'Taller del Farero',
         locked: () =>
           f().solvedStoredSpark
@@ -2526,13 +2526,13 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => 0x394a50,
     doors: [
       {
-        x: 420, y: 514, w: 120, h: 26,
-        to: 'lighthouse_hall', spawn: { x: 480, y: 95 },
+        x: 0, y: 190, w: 26, h: 110,
+        to: 'lighthouse_hall', spawn: { x: 860, y: 245 },
         label: 'Sala de la máquina',
       },
       {
-        x: 420, y: 0, w: 120, h: 26,
-        to: 'clock_tower', spawn: { x: 480, y: 440 },
+        x: 934, y: 190, w: 26, h: 110,
+        to: 'clock_tower', spawn: { x: 95, y: 245 },
         label: 'Torre del Reloj',
         locked: () =>
           f().solvedSleepingRiver
@@ -2592,13 +2592,13 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => 0x47434a,
     doors: [
       {
-        x: 420, y: 514, w: 120, h: 26,
-        to: 'lighthouse_bench', spawn: { x: 480, y: 95 },
+        x: 0, y: 190, w: 26, h: 110,
+        to: 'lighthouse_bench', spawn: { x: 860, y: 245 },
         label: 'Taller del Farero',
       },
       {
-        x: 420, y: 0, w: 120, h: 26,
-        to: 'lighthouse_lantern', spawn: { x: 480, y: 440 },
+        x: 934, y: 190, w: 26, h: 110,
+        to: 'lighthouse_lantern', spawn: { x: 95, y: 245 },
         label: 'Linterna del Faro',
         locked: () =>
           f().solvedClock
@@ -2658,8 +2658,8 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => 0x2b3e4a,
     doors: [
       {
-        x: 420, y: 514, w: 120, h: 26,
-        to: 'clock_tower', spawn: { x: 480, y: 95 },
+        x: 0, y: 190, w: 26, h: 110,
+        to: 'clock_tower', spawn: { x: 860, y: 245 },
         label: 'Torre del Reloj',
       },
     ],

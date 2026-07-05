@@ -1,5 +1,6 @@
 import { el, pushUI, popUI } from './overlay';
 import { sfxBlip, sfxToast } from '../audio';
+import { portraitKey } from './portrait.ts';
 
 export interface Line {
   who: string;
@@ -44,23 +45,6 @@ function render(): void {
   const image = el('dialog-portrait-image') as HTMLImageElement;
   image.src = key ? PORTRAITS[key] : '';
   image.alt = key ? `Retrato de ${line.who}` : '';
-}
-
-function portraitKey(who: string): string {
-  const name = who.toLocaleLowerCase('es');
-  if (!name) return '';
-  if (name.includes('edda')) return 'edda';
-  if (name.includes('lumen')) return 'lumen';
-  if (name.includes('preceptor')) return 'preceptor';
-  if (name.includes('consejera')) return 'consejera';
-  if (name.includes('guardiana')) return 'guardiana';
-  if (name.includes('forjadora') || name.includes('yesca')) return 'yesca';
-  if (name.includes('farero')) return 'farero';
-  if (name.includes('ohm')) return 'ohm';
-  if (name.includes('proyector')) return 'proyector';
-  if (name.includes('niño') || name.includes('nino')) return 'nino';
-  if (name.includes('ciudadano')) return 'ciudadano';
-  return 'student';
 }
 
 function closeDialog(): void {

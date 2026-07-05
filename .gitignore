@@ -5,3 +5,41 @@ dist/
 .DS_Store
 .claude/settings.local.json
 docs/superpowers/
+
+# --- Cantera de assets (packs crudos descargados; lo USADO vive en
+#     assets/ohmdal/generated/ y assets/ohmdal/tilesets/) ---
+*.zip
+*.psd
+.playwright-cli/
+output/
+assets/hub/
+assets/ohmdal/ChatGPT Image*
+assets/ohmdal/496_RPG_icons/
+assets/ohmdal/Castle2.png
+assets/ohmdal/Dungeon Crawl Stone Soup Full*/
+assets/ohmdal/Dungeon Crawl Stone Soup Supplemental/
+assets/ohmdal/DungeonCrawl_ProjectUtumnoTileset.png
+assets/ohmdal/FREE_PixelFlow_fantasy/
+assets/ohmdal/Fantasy Sprite MegaPack/
+assets/ohmdal/MedievalVillageExteriorv1.0/
+assets/ohmdal/ProjectUtumno_full*.png
+assets/ohmdal/ProjectUtumno_supplemental.png
+assets/ohmdal/S Frisk - Fantasy Interior Tileset/
+assets/ohmdal/colony-*/
+assets/ohmdal/crawl-tiles*/
+assets/ohmdal/dirt-tiles.png
+assets/ohmdal/interface.psd
+assets/ohmdal/magecity.png
+assets/ohmdal/ohmdal-complete-map*
+assets/ohmdal/town_rpg_pack/
+assets/ohmdal/town_tiles.png
+assets/ohmdal/trees_and_bushes_pack/
+assets/ohmdal/ui_big_pieces.png
+# instituto: packs crudos y renders de referencia no usados por el código
+assets/instituto/2dClassroomAssetPackByStyloo/
+assets/instituto/Modern tiles_Free/
+assets/instituto/Modern_Interiors_Free_v2.2/
+assets/instituto/hall-master-v1.png
+assets/instituto/intro-0*-v1.png
+assets/instituto/proyector-electronica-0*-v1.png
+assets/instituto/student-v1.png

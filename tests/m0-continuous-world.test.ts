@@ -21,23 +21,21 @@ for (const id of ['castle_gate', 'castle_gallery', 'castle_branches', 'castle_he
   assert(world?.rooms[id].ox === -960, `${id} está alineado en la columna del Castillo`);
 }
 
-// Fase B: las tres regiones aplicadas se recorren como planos continuos.
+// Arco I: las regiones dejaron de ser mapas separados.
 const forge = worldOf('forge_yard');
-assert(forge?.id === 'forge', 'la Forja tiene un plano regional propio');
-assert(forge?.rooms.forge_infirmary.oy === -540, 'la Enfermería continúa al norte del Patio');
-assert(forge?.rooms.forge_longchannel.oy === -1080, 'el Canal Largo continúa tras la Enfermería');
-assert(forge?.rooms.forge_hall.oy === -1620, 'la Nave Mayor remata la columna de la Forja');
-assert(worldOf('forge_hall') === forge, 'la Nave Mayor comparte el plano continuo de la Forja');
+assert(forge === world, 'la Forja comparte el mundo de la plaza');
+assert(forge?.rooms.forge_yard.ox === 960, 'la Forja comienza al este de la plaza');
+assert(forge?.rooms.forge_hall.ox === 3840, 'la Nave Mayor remata el distrito industrial');
 
 const terraces = worldOf('terraces_top');
-assert(terraces?.id === 'terraces', 'las Terrazas tienen un plano regional propio');
-assert(terraces?.rooms.terraces_mid.oy === 540, 'el reparto queda un nivel debajo del canal alto');
-assert(terraces?.rooms.terraces_aqueduct.oy === 1620, 'el Acueducto ocupa el nivel inferior del valle');
+assert(terraces === world, 'las Terrazas comparten el mundo de la plaza');
+assert(terraces?.rooms.terraces_top.oy === 540, 'el canal alto comienza al sur de la plaza');
+assert(terraces?.rooms.terraces_aqueduct.oy === 2160, 'el Acueducto ocupa el fondo del valle');
 
 const lighthouse = worldOf('lighthouse_hall');
-assert(lighthouse?.id === 'lighthouse', 'el Faro tiene un plano regional propio');
-assert(lighthouse?.rooms.lighthouse_bench.oy === -540, 'el Taller queda sobre la sala de máquinas');
-assert(lighthouse?.rooms.lighthouse_lantern.oy === -1620, 'la Linterna corona la torre continua');
+assert(lighthouse === world, 'el Faro comparte el mundo de Ohmdal');
+assert(lighthouse?.rooms.lighthouse_hall.ox === 960, 'el Faro nace al este del Acueducto');
+assert(lighthouse?.rooms.lighthouse_lantern.ox === 3840, 'la Linterna corona el recorrido del lago');
 
 // Normalizamos CRLF -> LF: en Windows con core.autocrlf=true el working tree
 // puede tener CRLF aunque el repo guarde LF; los asserts de texto no deben

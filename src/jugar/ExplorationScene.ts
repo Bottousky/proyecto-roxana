@@ -9,7 +9,6 @@ import {
   ensureTextures,
   drawRoomBase,
   drawDoorVisual,
-  drawThreshold,
   makePropVisual,
   addLight,
   CharacterRig,
@@ -20,6 +19,8 @@ import {
 } from './visuals';
 import { worldOf } from './world';
 import { activateExperienceForRoom } from '../experiences/registry';
+import { preloadDecorAtlases, applyNearestFilter, renderDecor } from './tiles';
+import { hasRoomDecor } from './decorData';
 
 export const W = 960;
 export const H = 540;
@@ -99,6 +100,7 @@ export class ExplorationScene extends Phaser.Scene {
   // mundo continuo: chunks cargados (sala → offset en el plano) y chunk activo
   private chunks: Record<string, { ox: number; oy: number }> = {};
   private currentChunk = '';
+  private activeActorChunks = new Map<string, string>();
   private darkness!: Phaser.GameObjects.Rectangle;
   private roomName!: Phaser.GameObjects.Text;
   private mapLayer!: Phaser.GameObjects.Container;
@@ -125,6 +127,7 @@ export class ExplorationScene extends Phaser.Scene {
     });
     this.load.image('ohmdal-forest-objects', new URL('../../assets/vendor/tiny-rpg-forest/environment/objects.png', import.meta.url).href);
     this.load.image('ohmdal-map-panel', new URL('../../assets/ohmdal/world-map-panel-1024.png', import.meta.url).href);
+    preloadDecorAtlases(this);
   }
 
   create(): void {
@@ -222,6 +225,7 @@ export class ExplorationScene extends Phaser.Scene {
     hooks.refresh = () =>
       this.loadRoom(state.room, { x: this.player.x, y: this.player.y }, false);
 
+    applyNearestFilter(this);
     this.loadRoom(state.room, undefined, true);
   }
 
@@ -270,6 +274,39 @@ export class ExplorationScene extends Phaser.Scene {
       if (x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h) return id;
     }
     return null;
+  }
+
+  /** Identidad persistente de los personajes de la comitiva. */
+  private actorKey(id: string): string | null {
+    if (/^edda/.test(id)) return 'edda';
+    if (/^lumen/.test(id)) return 'lumen';
+    if (/^(pedestal$|ohm-)/.test(id)) return 'ohm';
+    if (/^consejera/.test(id)) return 'consejera';
+    if (/^guardiana/.test(id)) return 'guardiana';
+    if (/^forjadora/.test(id)) return 'forjadora';
+    if (/^farero/.test(id)) return 'farero';
+    return null;
+  }
+
+  /**
+   * Una persona solo puede existir una vez dentro del mundo continuo. Se elige
+   * su puesta en escena del chunk activo o, si no tiene una, la más cercana.
+   */
+  private resolveActorChunks(activeId: string): Map<string, string> {
+    const chosen = new Map<string, { roomId: string; score: number }>();
+    const origin = this.chunks[activeId] ?? { ox: 0, oy: 0 };
+    for (const [roomId, offset] of Object.entries(this.chunks)) {
+      for (const thing of ROOMS[roomId]?.things ?? []) {
+        const key = this.actorKey(thing.id);
+        if (!key || thing.visible?.() === false) continue;
+        const score = roomId === activeId
+          ? -1
+          : Math.abs(offset.ox - origin.ox) + Math.abs(offset.oy - origin.oy);
+        const previous = chosen.get(key);
+        if (!previous || score < previous.score) chosen.set(key, { roomId, score });
+      }
+    }
+    return new Map([...chosen].map(([key, value]) => [key, value.roomId]));
   }
 
   /** rect del paso en la muralla compartida (cubre el grosor de ambos muros) */
@@ -343,11 +380,10 @@ export class ExplorationScene extends Phaser.Scene {
 
   /** el jugador cruzó una abertura: la "sala" activa cambia sin recargar el mundo */
   private enterChunk(id: string): void {
-    this.currentChunk = id;
-    state.room = id;
-    if (!state.flags.salasVisitadas.includes(id)) state.flags.salasVisitadas.push(id);
-    save();
-    activateExperienceForRoom(id);
+    const position = { x: this.player.x, y: this.player.y };
+    // Reconstruye solo la puesta en escena: la cámara y la posición global se
+    // conservan, pero la comitiva adopta una única ubicación en el nuevo sector.
+    this.loadRoom(id, position, false);
     const def = ROOMS[id];
     const mood = this.moodOf(id);
     setAmbience(mood);
@@ -402,6 +438,7 @@ export class ExplorationScene extends Phaser.Scene {
     const world = worldOf(id);
     this.chunks = world ? world.rooms : { [id]: { ox: 0, oy: 0 } };
     this.currentChunk = id;
+    this.activeActorChunks = this.resolveActorChunks(id);
 
     // cámara: límites = unión de chunks; sigue al jugador con suavidad
     let minX = Infinity;
@@ -418,6 +455,25 @@ export class ExplorationScene extends Phaser.Scene {
     this.worldMinY = minY;
     this.cameras.main.setBounds(minX, minY, maxX - minX, maxY - minY);
     this.cameras.main.startFollow(this.player, false, 0.12, 0.12);
+
+    // El plano irregular del reino no puede dejar ver el vacío entre distritos.
+    // Una única tesela repetida funciona como campo/monte de fondo y mantiene
+    // la lectura de un mundo, aunque esas zonas no sean transitables todavía.
+    if (world) {
+      add(
+        this.add
+          .tileSprite(
+            minX + (maxX - minX) / 2,
+            minY + (maxY - minY) / 2,
+            maxX - minX,
+            maxY - minY,
+            'decor-medieval-ground',
+            0,
+          )
+          .setDepth(-5)
+          .setTint(0x71814d),
+      );
+    }
 
     const boundaries = this.computeBoundaries();
     for (const [cid, off] of Object.entries(this.chunks)) {
@@ -462,10 +518,31 @@ export class ExplorationScene extends Phaser.Scene {
     boundaries: Boundary[],
   ): void {
     const def = ROOMS[id];
-    drawRoomBase(this, add, id, { floor: def.floor(), wall: def.wall() }, ox, oy, W, H, B);
+    drawRoomBase(
+      this,
+      add,
+      id,
+      { floor: def.floor(), wall: def.wall() },
+      ox,
+      oy,
+      W,
+      H,
+      B,
+      hasRoomDecor(id),
+      Object.keys(this.chunks).length > 1,
+    );
+    // vestido pixel opcional por sala (M1): sala sin entrada en DECOR no cambia.
+    for (const o of renderDecor(this, id, ox, oy)) add(o);
 
     // murallas sólidas con pasos abiertos recortados
-    const openGaps = boundaries.filter((bd) => !bd.door.locked?.()).map((bd) => bd.rect);
+    const openGaps = boundaries
+      .filter((bd) => !bd.door.locked?.())
+      .map((bd) => {
+        const from = this.chunks[bd.from];
+        return bd.rect.w >= bd.rect.h
+          ? { x: from.ox, y: bd.rect.y, w: W, h: bd.rect.h }
+          : { x: bd.rect.x, y: from.oy, w: bd.rect.w, h: H };
+      });
     this.pushWallSolids(ox, oy, openGaps);
 
     // aberturas hacia chunks vecinos (se dibujan una sola vez, desde su lado canónico)
@@ -495,10 +572,6 @@ export class ExplorationScene extends Phaser.Scene {
           boundary: true,
           pushTo: this.chunkCenter(id),
         });
-      } else {
-        // el umbral atraviesa también la cara vista del muro norte (¾)
-        const rect = horizontal ? { ...bd.rect, h: bd.rect.h + 15 } : bd.rect;
-        drawThreshold(this, add, rect, def.floor());
       }
       if (!monument) {
         add(
@@ -563,6 +636,8 @@ export class ExplorationScene extends Phaser.Scene {
       return dd ? { ...dd, x: dd.x + ox, y: dd.y + oy } : undefined;
     };
     for (const t of def.things) {
+      const actor = this.actorKey(t.id);
+      if (actor && this.activeActorChunks.get(actor) !== id) continue;
       const st: ThingDef = { ...t, x: t.x + ox, y: t.y + oy };
       if (st.visible && !st.visible()) {
         // se fue durante este refresh: sale caminando hasta su puerta

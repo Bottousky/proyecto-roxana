@@ -2,13 +2,13 @@ import './styles.css';
 import { initDialog } from './ui/dialog';
 import { initBitacora, showBitacoraButton } from './ui/bitacora';
 import { el } from './ui/overlay';
-import { hasSave, load, resetSave, state } from './state';
+import { hasSave, load, resetSave, save, state } from './state';
 import { initAudio, initAudioButton } from './audio';
 import { experienceById, experienceOfRoom } from './experiences/registry';
 import { createRuntimeHost } from './app/runtimeHost.ts';
 import { runtimeLoaders } from './experiences/loaders.ts';
 import type { ExperienceId } from './experiences/types.ts';
-import { esLlegadaPorPortal } from './shared/portalLink.ts';
+import { esLlegadaPorPortal, salaLlegadaPortal } from './shared/portalLink.ts';
 
 function startGame(): void {
   initAudio(); // el click de "Empezar"/"Continuar" es el gesto que habilita el sonido
@@ -44,6 +44,16 @@ function newGame(): void {
   startGame();
 }
 
+function enterFromPortal(): void {
+  // El portal conserva los flags de la partida, pero su destino no puede depender
+  // de la última sala visitada (aula, hall o un save antiguo/inválido).
+  if (hasSave()) load();
+  else resetSave();
+  state.room = salaLlegadaPortal(location.search);
+  save();
+  startGame();
+}
+
 function showPortalArrivalOverlay(): void {
   const overlay = document.createElement('div');
   overlay.style.cssText = `
@@ -61,8 +71,7 @@ function showPortalArrivalOverlay(): void {
 
 if (arrivedByPortal) {
   showPortalArrivalOverlay();
-  if (hasSave()) continueGame();
-  else newGame();
+  enterFromPortal();
 } else if (hasSave()) {
   btnContinue.classList.remove('hidden');
   btnContinue.addEventListener('click', continueGame);
