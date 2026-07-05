@@ -12,12 +12,14 @@ export default defineConfig({
       // (en producción este rewrite lo hace _redirects, no tocar eso)
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url?.startsWith('/jugar')) {
-            const suffix = req.url.slice('/jugar'.length);
-            res.statusCode = 302;
-            res.setHeader('Location', `/src/jugar${suffix || '/'}`);
-            res.end();
-            return;
+          for (const p of ['/jugar', '/ohmdal']) {
+            if (req.url === p || req.url?.startsWith(p + '/') || req.url?.startsWith(p + '?')) {
+              const suffix = req.url.slice(p.length);
+              res.statusCode = 302;
+              res.setHeader('Location', `/src${p}${suffix || '/'}`);
+              res.end();
+              return;
+            }
           }
           next();
         });
@@ -30,6 +32,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         jugar: resolve(__dirname, 'src/jugar/index.html'),
+        ohmdal: resolve(__dirname, 'src/ohmdal/index.html'),
       },
     },
   },
