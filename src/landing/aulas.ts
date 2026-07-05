@@ -70,7 +70,7 @@ export function playDoorOpen(short = false): void {
 
     const creakGain = ctx.createGain();
     creakGain.gain.setValueAtTime(0.0001, now);
-    creakGain.gain.linearRampToValueAtTime(short ? 0.05 : 0.09, now + creakDur * 0.3);
+    creakGain.gain.linearRampToValueAtTime(short ? 0.1 : 0.2, now + creakDur * 0.3);
     creakGain.gain.exponentialRampToValueAtTime(0.0001, now + creakDur);
 
     noise.connect(bandpass);
@@ -88,7 +88,7 @@ export function playDoorOpen(short = false): void {
 
     const thunkGain = ctx.createGain();
     thunkGain.gain.setValueAtTime(0.0001, thunkStart);
-    thunkGain.gain.linearRampToValueAtTime(0.16, thunkStart + 0.015);
+    thunkGain.gain.linearRampToValueAtTime(0.32, thunkStart + 0.015);
     thunkGain.gain.exponentialRampToValueAtTime(0.0001, thunkStart + 0.22);
 
     osc.connect(thunkGain);
@@ -166,6 +166,10 @@ let scrollYBeforeOpen = 0;
 let activePizarronPanel: HTMLElement | null = null;
 let aulaToastTimer: number | null = null;
 let aulaPanX = 0;
+// true mientras corre la animación de apertura (el overlay aún puede estar
+// display:none): evita que el handler de hashchange haga un segundo open
+// directo que pise la transición.
+let aulaOpening = false;
 
 function ensureOverlay(): HTMLElement {
   if (overlayEl) return overlayEl;
@@ -185,6 +189,7 @@ function ensureOverlay(): HTMLElement {
         <img class="rx-aula-image" src="${aulaBgUrl}" width="1792" height="1024" alt="" aria-hidden="true" />
         <div class="rx-aula-portal-glow" aria-hidden="true"></div>
         <div class="rx-aula-hotspot rx-aula-hotspot-pizarron" data-hotspot="pizarron" role="button" tabindex="0" aria-label="El pizarrón">
+          <div class="rx-pizarron-thumbnail" aria-hidden="true"></div>
           <span class="rx-aula-hotspot-label">El pizarrón</span>
         </div>
         <div class="rx-aula-hotspot rx-aula-hotspot-portal" data-hotspot="portal" role="button" tabindex="0" aria-label="El portal">
@@ -196,17 +201,20 @@ function ensureOverlay(): HTMLElement {
         <p class="rx-aula-entry-line">Huele a cobre y a polvo. Algo, al fondo, todavía respira.</p>
       </div>
     </div>
-    <h2 id="aula-titulo" class="rx-aula-title">Aula de Electrónica</h2>
-    <button id="aula-salir" aria-label="Salir del aula" class="rx-aula-exit" style="
-      position:absolute; top:20px; right:20px; z-index:2;
-      background: transparent; color: var(--muted); border: 1px solid var(--border);
-      border-radius: 9px; padding: 9px 16px; font-family:inherit; font-size:13.5px; font-weight:600;
-      cursor:pointer; transition: color 0.15s, border-color 0.15s;
-    ">Salir del aula ×</button>
+    <div class="rx-aula-title-sign" aria-live="polite">
+      <span class="rx-aula-title-kicker">Instituto Roxana</span>
+      <h2 id="aula-titulo" class="rx-aula-title">Aula de Electrónica</h2>
+    </div>
+    <button id="aula-salir" aria-label="Volver al hall" class="rx-aula-exit" type="button">
+      <span class="rx-aula-exit-arrow" aria-hidden="true">←</span>
+      <span>Volver al hall</span>
+    </button>
     <div id="aula-toast" class="rx-aula-toast" role="status" aria-live="polite"></div>
   `;
 
-  document.body.appendChild(overlay);
+  // El root contiene las variables de color del Instituto. Mantener el overlay
+  // dentro de él evita que los controles del aula pierdan la paleta compartida.
+  (document.getElementById('root') ?? document.body).appendChild(overlay);
   overlayEl = overlay;
 
   overlay.querySelector('#aula-salir')?.addEventListener('click', () => closeAula());
@@ -325,21 +333,13 @@ function openPizarronPanel(): void {
   if (!overlay || activePizarronPanel) return;
 
   const vm = pizarronViewModel(readSchoolState());
-  const body = vm.lineas
-    ? `<ul class="rx-pizarron-list">${vm.lineas
-        .map((linea) => `<li><span class="rx-pizarron-mark">${linea.marca}</span><span>${linea.texto}</span></li>`)
-        .join('')}</ul>`
-    : `<p class="rx-pizarron-empty">${vm.vacio ?? ''}</p>`;
-  const pie = vm.pie ? `<p class="rx-pizarron-foot">${vm.pie}</p>` : '';
-
   const layer = document.createElement('div');
   layer.className = 'rx-pizarron-layer';
   layer.innerHTML = `
     <section class="rx-pizarron-panel" role="dialog" aria-modal="true" aria-labelledby="pizarron-title">
       <button class="rx-pizarron-close" type="button" aria-label="Cerrar">×</button>
       <h3 id="pizarron-title">${vm.titulo}</h3>
-      ${body}
-      ${pie}
+      ${pizarronContentHtml(vm)}
     </section>
   `;
 
@@ -351,6 +351,23 @@ function openPizarronPanel(): void {
   overlay.appendChild(layer);
   activePizarronPanel = layer;
   layer.querySelector<HTMLElement>('.rx-pizarron-close')?.focus();
+}
+
+function pizarronContentHtml(vm: ReturnType<typeof pizarronViewModel>): string {
+  const body = vm.lineas
+    ? `<ul class="rx-pizarron-list">${vm.lineas
+        .map((linea) => `<li><span class="rx-pizarron-mark">${linea.marca}</span><span>${linea.texto}</span></li>`)
+        .join('')}</ul>`
+    : `<p class="rx-pizarron-empty">${vm.vacio ?? ''}</p>`;
+  const pie = vm.pie ? `<p class="rx-pizarron-foot">${vm.pie}</p>` : '';
+  return `${body}${pie}`;
+}
+
+function syncPizarronThumbnail(overlay: HTMLElement): void {
+  const thumbnail = overlay.querySelector<HTMLElement>('.rx-pizarron-thumbnail');
+  if (!thumbnail) return;
+  const vm = pizarronViewModel(readSchoolState());
+  thumbnail.innerHTML = `<h3>${vm.titulo}</h3>${pizarronContentHtml(vm)}`;
 }
 
 function closePizarronPanel(): void {
@@ -401,6 +418,7 @@ function syncAulaState(overlay: HTMLElement): void {
   if (!bg) return;
 
   if (stage) applyAulaPan(stage, 0);
+  syncPizarronThumbnail(overlay);
 
   bg.classList.toggle('rx-aula-off', school.aulas.electronica === 'off');
   bg.classList.toggle('rx-aula-viva', school.aulas.electronica === 'enCurso' || school.aulas.electronica === 'completada');
@@ -408,6 +426,11 @@ function syncAulaState(overlay: HTMLElement): void {
   bg.classList.remove('rx-aula-entered');
   void bg.offsetWidth;
   bg.classList.add('rx-aula-entered');
+
+  const titleSign = overlay.querySelector<HTMLElement>('.rx-aula-title-sign');
+  titleSign?.classList.remove('rx-aula-title-sign-entered');
+  if (titleSign) void titleSign.offsetWidth;
+  titleSign?.classList.add('rx-aula-title-sign-entered');
 }
 
 function lockScroll(): void {
@@ -448,6 +471,7 @@ function openAulaDirect(overlay: HTMLElement): void {
 function openAulaThroughDoor(overlay: HTMLElement, doorEl: HTMLElement, withSound: boolean): void {
   // Fase 1: la hoja se abre en su propio marco (bisagra 3D en CSS,
   // clase rx-puerta-abriendo) dejando ver la luz del interior.
+  aulaOpening = true;
   doorEl.classList.add('rx-puerta-abriendo');
   if (withSound) playDoorOpen(false);
   lockScroll();
@@ -456,12 +480,23 @@ function openAulaThroughDoor(overlay: HTMLElement, doorEl: HTMLElement, withSoun
 
   window.setTimeout(() => {
     // Fase 2: el aula se revela expandiéndose desde el hueco de la puerta
-    // (container transform con clip-path: nada se estira ni deforma).
+    // (container transform con clip-path) mientras el escenario hace un
+    // dolly-in: scale desde el centro de la puerta hacia 1 (sensación de
+    // "entrar"). Nada se estira ni deforma.
     const rect = marco.getBoundingClientRect();
     const top = Math.max(0, rect.top);
     const left = Math.max(0, rect.left);
     const right = Math.max(0, window.innerWidth - rect.right);
     const bottom = Math.max(0, window.innerHeight - rect.bottom);
+
+    const bg = overlay.querySelector<HTMLElement>('.rx-aula-bg');
+    if (bg) {
+      const cx = (((rect.left + rect.right) / 2) / window.innerWidth) * 100;
+      const cy = (((rect.top + rect.bottom) / 2) / window.innerHeight) * 100;
+      bg.style.transformOrigin = `${cx}% ${cy}%`;
+      bg.style.transform = 'scale(1.16)';
+      bg.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+    }
 
     overlay.style.display = 'block';
     overlay.style.opacity = '1';
@@ -471,15 +506,22 @@ function openAulaThroughDoor(overlay: HTMLElement, doorEl: HTMLElement, withSoun
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         overlay.style.clipPath = 'inset(0px 0px 0px 0px round 0px)';
+        if (bg) bg.style.transform = 'scale(1)';
       });
     });
 
     window.setTimeout(() => {
       overlay.style.clipPath = '';
       overlay.style.transition = '';
+      if (bg) {
+        bg.style.transform = '';
+        bg.style.transition = '';
+        bg.style.transformOrigin = '';
+      }
       doorEl.classList.remove('rx-puerta-abriendo');
+      aulaOpening = false;
       focusOverlay(overlay);
-    }, 720);
+    }, 740);
   }, 430);
 }
 
@@ -512,6 +554,7 @@ function focusOverlay(overlay: HTMLElement): void {
 }
 
 function closeAula(): void {
+  aulaOpening = false;
   const overlay = overlayEl;
   if (!overlay || overlay.style.display === 'none') return;
   closePizarronPanel();
@@ -528,7 +571,7 @@ function closeAula(): void {
   unlockScroll();
 
   if (location.hash.startsWith('#aula/')) {
-    location.hash = '#aulas';
+    location.hash = '#hall';
   }
 
   lastFocusedDoor?.focus();
@@ -577,7 +620,9 @@ export function initAulas(): void {
     if (aulaId) {
       const estado = readSchoolState().aulas[aulaId];
       if (estado !== 'cerrada') {
-        if (!isOverlayOpen()) openAula(aulaId, { playSound: false });
+        // aulaOpening: la apertura animada ya está en curso (overlay todavía
+        // display:none) — no pisarla con un open directo.
+        if (!isOverlayOpen() && !aulaOpening) openAula(aulaId, { playSound: false });
       }
     } else if (isOverlayOpen()) {
       closeAula();
