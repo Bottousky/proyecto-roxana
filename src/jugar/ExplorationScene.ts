@@ -127,6 +127,10 @@ export class ExplorationScene extends Phaser.Scene {
     });
     this.load.image('ohmdal-forest-objects', new URL('../../assets/vendor/tiny-rpg-forest/environment/objects.png', import.meta.url).href);
     this.load.image('ohmdal-map-panel', new URL('../../assets/ohmdal/world-map-panel-1024.png', import.meta.url).href);
+    // props pixel del mundo (reemplazan props procedurales vía ThingDef.sprite)
+    for (const p of ['prop_lamp_post', 'prop_bell', 'prop_pedestal']) {
+      this.load.image(p, new URL(`../../assets/ohmdal/generated/${p}.png`, import.meta.url).href);
+    }
     preloadDecorAtlases(this);
   }
 
@@ -710,6 +714,16 @@ export class ExplorationScene extends Phaser.Scene {
       rig.setDepth(this.bodyDepth(t.y));
       this.rigs.push(rig);
       return rig;
+    }
+    // prop pixel: una textura reemplaza el dibujo procedural (mismo tinte por color/flag)
+    if (t.sprite && this.textures.exists(t.sprite)) {
+      const container = this.add.container(t.x, t.y);
+      const img = this.add.image(0, 0, t.sprite).setOrigin(0.5, 0.88);
+      img.setScale(t.spriteScale ?? 1);
+      img.setTint(color);
+      container.add(img);
+      container.setDepth(this.bodyDepth(t.y));
+      return container;
     }
     const noop = <T extends Phaser.GameObjects.GameObject>(o: T): T => o;
     const prop = makePropVisual(this, noop, t, color);

@@ -45,6 +45,10 @@ export interface ThingDef {
   walksTo?: string;
   solid?: boolean;
   emoji?: string;
+  /** textura pixel (clave cargada en la escena) que reemplaza el prop procedural */
+  sprite?: string;
+  /** escala del sprite respecto a su tamaño nativo (default 1) */
+  spriteScale?: number;
   onInteract: () => void;
 }
 
@@ -1238,6 +1242,7 @@ export const ROOMS: Record<string, RoomDef> = {
       {
         id: 'lampara1', x: 220, y: 170, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: true, emoji: '💡',
+        sprite: 'prop_lamp_post', spriteScale: 1.1,
         color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
         onInteract: () =>
           say(
@@ -1251,6 +1256,7 @@ export const ROOMS: Record<string, RoomDef> = {
       {
         id: 'lampara2', x: 760, y: 250, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: true, emoji: '💡',
+        sprite: 'prop_lamp_post', spriteScale: 1.1,
         color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
         onInteract: () =>
           say(L('', f().puertaDone ? 'Luz firme. La plaza tiene sombras de nuevo — de las buenas.' : 'Otra lámpara muerta. O dormida. Empieza a parecer que hay una diferencia.')),
@@ -1258,6 +1264,7 @@ export const ROOMS: Record<string, RoomDef> = {
       {
         id: 'campana', x: 790, y: 110, w: 54, h: 66,
         label: 'Campana', prompt: 'La campana de Ohmdal', solid: true, emoji: '🔔',
+        sprite: 'prop_bell', spriteScale: 1.4,
         color: () => (f().puertaDone ? 0xb08d2a : 0x4f4a42),
         onInteract: () => {
           const fl = f();

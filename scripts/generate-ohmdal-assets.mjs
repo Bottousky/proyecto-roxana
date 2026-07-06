@@ -195,6 +195,48 @@ function journal() {
   c.rect(2, 2, 2, 12, C.copper);
   save('journal_icon', c);
 }
+// ---- Props de jugar (48px, para el mundo continuo de src/jugar) ----
+// Base clara para tintar en runtime: gris = apagado, cálido = encendido.
+function propLampPost() {
+  const c = new Canvas(24, 48);
+  c.disc(12, 45, 6, [0, 0, 0, 70]);         // sombra de contacto
+  c.rect(11, 20, 2, 25, C.copperLo);        // poste
+  c.rect(9, 44, 6, 3, C.copperLo);          // base
+  c.rect(8, 8, 8, 12, C.copper);            // farol (marco)
+  c.frame(8, 8, 8, 12, C.copperLo);
+  c.rect(10, 10, 4, 8, C.white);            // vidrio (recibe el tinte)
+  c.rect(9, 5, 6, 3, C.copperLo);           // sombrerete
+  c.rect(11, 3, 2, 2, C.copperLo);          // colgador
+  save('prop_lamp_post', c);
+}
+function propBell() {
+  const c = new Canvas(40, 44);
+  c.disc(20, 41, 10, [0, 0, 0, 70]);
+  c.rect(6, 4, 28, 3, C.copperLo);          // travesaño
+  c.rect(19, 4, 2, 6, C.copperLo);          // colgador
+  // campana
+  for (let y = 0; y < 22; y++) {
+    const w = 6 + Math.round((y / 22) * 12);
+    c.rect(20 - w, 10 + y, w * 2, 1, C.copper);
+  }
+  c.rect(10, 31, 20, 3, C.copperLo);        // labio
+  c.rect(19, 33, 2, 4, C.copperLo);         // badajo
+  c.rect(14, 14, 3, 10, C.white);           // brillo (recibe el tinte)
+  save('prop_bell', c);
+}
+function propPedestal() {
+  const c = new Canvas(56, 40);
+  c.disc(28, 34, 20, [0, 0, 0, 60]);
+  c.rect(10, 20, 36, 14, C.stoneLo);        // tambor
+  c.rect(10, 20, 36, 4, C.stone);
+  c.rect(6, 30, 44, 6, C.stoneLo);          // base
+  c.rect(6, 30, 44, 2, C.stone);
+  // nudo de canales de cobre convergiendo
+  c.rect(2, 26, 8, 3, C.copper); c.rect(46, 26, 8, 3, C.copper);
+  c.disc(28, 22, 5, C.copperLo); c.disc(28, 22, 3, C.copper);
+  save('prop_pedestal', c);
+}
+
 function sign() {
   const c = new Canvas(16, 16);
   c.rect(7, 10, 2, 5, C.copperLo);       // poste
@@ -234,6 +276,9 @@ spark();
 glow();
 journal();
 sign();
+propLampPost();
+propBell();
+propPedestal();
 crystal('crystal_conductor', C.copper);
 crystal('crystal_insulator', C.off);
 
