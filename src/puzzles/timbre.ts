@@ -7,7 +7,7 @@
  */
 import { sfxBridge, sfxClick, sfxOk, sfxWin, sfxSchoolBell } from '../audio';
 import { benchActions, openBench } from '../ui/bench';
-import { piedraEl, PIEDRAS } from './common';
+import { makeInteractive, piedraEl, PIEDRAS } from './common';
 import {
   createTimbreState,
   setStoneB,
@@ -77,8 +77,6 @@ export function abrirTimbre(opts: AbrirTimbreOptions): void {
       const stonesHost = stage.querySelector<HTMLElement>('#timbre-stones')!;
       for (const stone of STONES) {
         const el = piedraEl(stone);
-        el.setAttribute('role', 'button');
-        el.setAttribute('tabindex', '0');
         const choose = () => {
           if (solved) return;
           sfxClick();
@@ -87,9 +85,7 @@ export function abrirTimbre(opts: AbrirTimbreOptions): void {
           tryRing();
         };
         el.addEventListener('click', choose);
-        el.addEventListener('keydown', (ev) => {
-          if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); choose(); }
-        });
+        makeInteractive(el, PIEDRAS[stone].nombre);
         stonesHost.appendChild(el);
       }
 

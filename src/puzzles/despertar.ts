@@ -1,5 +1,5 @@
 import { openBench, benchActions } from '../ui/bench';
-import { ohmWidgetHTML, setOhmState } from './common';
+import { ohmWidgetHTML, setOhmState, makeInteractive } from './common';
 import { sfxBridge, sfxClick, sfxDim, sfxWin } from '../audio';
 
 /**
@@ -170,6 +170,7 @@ export function abrirDespertar(onSuccess: () => void): void {
           }
           updateTray();
         });
+        makeInteractive(slot);
       });
 
       const actions = benchActions(bench.root, [

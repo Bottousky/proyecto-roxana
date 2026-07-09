@@ -1,5 +1,13 @@
 import { openBench, benchActions } from '../ui/bench';
-import { ohmWidgetHTML, setOhmState, piedraEl, PIEDRAS, gaugeSVG, setGauge } from './common';
+import {
+  ohmWidgetHTML,
+  setOhmState,
+  piedraEl,
+  PIEDRAS,
+  gaugeSVG,
+  setGauge,
+  makeInteractive,
+} from './common';
 import { setFlag, state } from '../state';
 import { sfxClick, sfxFzzt, sfxHot, sfxDim, sfxOk, sfxWin, sfxGate } from '../audio';
 
@@ -116,6 +124,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
           p.classList.add('selected');
           ready();
         });
+        makeInteractive(p, PIEDRAS[key].nombre);
         rowP.appendChild(p);
       }
       bench.root.appendChild(rowP);

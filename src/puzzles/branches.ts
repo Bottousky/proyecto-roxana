@@ -3,6 +3,7 @@ import { benchActions, openBench } from '../ui/bench';
 import {
   fusible,
   gaugeSVG,
+  makeInteractive,
   ohmProbe,
   ohmWidgetHTML,
   piedraEl,
@@ -149,20 +150,13 @@ export function abrirBranches(opts: AbrirBranchesOptions): void {
 
         for (const stone of STONES) {
           const element = piedraEl(stone);
-          element.setAttribute('role', 'button');
-          element.setAttribute('tabindex', '0');
           const choose = () => {
             if (solved || state.fuse.burned || phaseOf(state) !== 'solve') return;
             sfxClick();
             applyChange(setBranchStone(state, index, stone), index, 'stone');
           };
           element.addEventListener('click', choose);
-          element.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              choose();
-            }
-          });
+          makeInteractive(element, PIEDRAS[stone].nombre);
           stones.appendChild(element);
         }
 

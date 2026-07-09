@@ -4,6 +4,7 @@ import {
   CHANNEL_TOLERANCES,
   PIEDRAS,
   canalCortable,
+  makeInteractive,
   piedraEl,
   setThermometer,
   thermometerSVG,
@@ -109,8 +110,6 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
       stoneTray.innerHTML = '<span class="tray-label">Piedras para la fila:</span>';
       for (const stone of LONG_CHANNEL_STONES) {
         const element = piedraEl(stone);
-        element.setAttribute('role', 'button');
-        element.setAttribute('tabindex', '0');
         const add = () => {
           if (
             state.channel.cut ||
@@ -127,12 +126,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
           );
         };
         element.addEventListener('click', add);
-        element.addEventListener('keydown', (event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            add();
-          }
-        });
+        makeInteractive(element, PIEDRAS[stone].nombre);
         stoneTray.appendChild(element);
       }
       bench.root.appendChild(stoneTray);

@@ -1,5 +1,19 @@
 /* Widgets compartidos por las vistas de banco: Ohm (indicador vivo) y el medidor de aguja. */
 
+/** Hace operable por teclado un elemento clickeable que no es <button>. */
+export function makeInteractive(el: HTMLElement | SVGElement, label?: string): void {
+  el.setAttribute('tabindex', '0');
+  el.setAttribute('role', 'button');
+  if (label) el.setAttribute('aria-label', label);
+  el.addEventListener('keydown', (ev: Event) => {
+    const k = (ev as KeyboardEvent).key;
+    if (k === 'Enter' || k === ' ') {
+      ev.preventDefault();
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    }
+  });
+}
+
 export type OhmState = 'inerte' | 'debil' | 'estable' | 'sobrecarga';
 
 export function ohmWidgetHTML(label = 'Ohm'): string {

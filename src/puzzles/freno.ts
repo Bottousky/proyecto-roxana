@@ -1,5 +1,5 @@
 import { openBench, benchActions } from '../ui/bench';
-import { ohmWidgetHTML, setOhmState, piedraEl, PIEDRAS } from './common';
+import { ohmWidgetHTML, setOhmState, piedraEl, PIEDRAS, makeInteractive } from './common';
 import { setFlag, state } from '../state';
 import { sfxBridge, sfxFzzt, sfxHot, sfxDim, sfxOk, sfxWin } from '../audio';
 
@@ -115,6 +115,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
             setOhmState(stage, 'estable');
             bench.setStatus(`Engastada la piedra de <b>${PIEDRAS[key].nombre}</b>. La palanca espera.`);
           });
+          makeInteractive(p, PIEDRAS[key].nombre);
           tray.appendChild(p);
         }
       };

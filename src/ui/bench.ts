@@ -12,6 +12,19 @@ export interface BenchHandle {
   close(after?: () => void): void;
 }
 
+/** Selector de elementos "focoseables" dentro de un banco (para foco inicial y Tab-trap). */
+const FOCUSABLE_SELECTOR = 'button, [tabindex]:not([tabindex="-1"])';
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((element) => {
+    if ((element as HTMLButtonElement).disabled) return false;
+    // offsetParent es null si el elemento (o un ancestro) tiene display:none.
+    return element.offsetParent !== null;
+  });
+}
+
 /** Abre la "vista de banco": un primer plano del mecanismo, sobre la exploración. */
 export function openBench(
   title: string,
@@ -38,6 +51,7 @@ export function openBench(
 
   let closed = false;
   const cleanups = new Set<() => void>();
+
   const handle: BenchHandle = {
     root: body,
     setStatus(html: string) {
@@ -54,6 +68,7 @@ export function openBench(
     close(after?: () => void) {
       if (closed) return;
       closed = true;
+      host.removeEventListener('keydown', onKeydown);
       const pendingCleanups = [...cleanups];
       cleanups.clear();
       for (const cleanup of pendingCleanups) {
@@ -71,7 +86,39 @@ export function openBench(
     },
   };
 
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      handle.close();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+
+    const focusable = getFocusableElements(panel);
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = document.activeElement;
+    const insidePanel = active instanceof Node && panel.contains(active);
+
+    if (event.shiftKey) {
+      if (!insidePanel || active === first) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else if (!insidePanel || active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+  host.addEventListener('keydown', onKeydown);
+
   build(handle);
+
+  requestAnimationFrame(() => {
+    if (closed) return;
+    getFocusableElements(panel)[0]?.focus();
+  });
 }
 
 /** Botonera estándar al pie del banco. */

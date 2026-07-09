@@ -11,6 +11,7 @@ import { benchActions, openBench } from '../ui/bench';
 import {
   fusible,
   gaugeSVG,
+  makeInteractive,
   ohmProbe,
   ohmWidgetHTML,
   piedraEl,
@@ -145,20 +146,13 @@ export function abrirDistributor(opts: AbrirDistributorOptions): void {
         const stones = card.querySelector<HTMLElement>('.distributor-stones')!;
         for (const stone of DISTRIBUTOR_STONES) {
           const element = piedraEl(stone);
-          element.setAttribute('role', 'button');
-          element.setAttribute('tabindex', '0');
           const choose = () => {
             if (solved || state.fuse.burned) return;
             sfxBridge();
             applyChange(setDistributorStone(state, index, stone));
           };
           element.addEventListener('click', choose);
-          element.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              choose();
-            }
-          });
+          makeInteractive(element, PIEDRAS[stone].nombre);
           stones.appendChild(element);
         }
         districtsHost.appendChild(card);
