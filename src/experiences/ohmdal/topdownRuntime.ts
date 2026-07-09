@@ -31,6 +31,10 @@ export const topdownRuntime: ExperienceRuntimeModule = {
         antialiasGL: false,
         roundPixels: true,
       },
+      // Phaser 4.1: con más archivos en preload que maxParallelDownloads (32),
+      // el loader nunca despacha los que exceden el límite y create() no corre.
+      // Los 21 fondos de sala del Arco I llevan la cola a 34 → subir el límite.
+      loader: { maxParallelDownloads: 64 },
       scene: [ExplorationScene],
       scale: {
         mode: Phaser.Scale.FIT,

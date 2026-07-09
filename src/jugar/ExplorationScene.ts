@@ -21,6 +21,15 @@ import { worldOf } from './world';
 import { activateExperienceForRoom } from '../experiences/registry';
 import { preloadDecorAtlases, applyNearestFilter, renderDecor } from './tiles';
 import { hasRoomDecor } from './decorData';
+import {
+  ROOM_BACKGROUND_FILES,
+  backgroundKey,
+  rectContainsRect,
+  roomScene,
+  scaleAt,
+  type RoomSceneProfile,
+  type SceneEffect,
+} from './roomScenes';
 
 export const W = 960;
 export const H = 540;
@@ -105,6 +114,8 @@ export class ExplorationScene extends Phaser.Scene {
   private roomName!: Phaser.GameObjects.Text;
   private mapLayer!: Phaser.GameObjects.Container;
   private mapOpen = false;
+  private hitboxesOpen = false;
+  private activeScene?: RoomSceneProfile;
   // el mundo puede extenderse hacia y negativo: el y-sort se normaliza con este mínimo
   private worldMinY = 0;
 
@@ -131,6 +142,9 @@ export class ExplorationScene extends Phaser.Scene {
     for (const p of ['prop_lamp_post', 'prop_bell', 'prop_pedestal']) {
       this.load.image(p, new URL(`../../assets/ohmdal/generated/${p}.png`, import.meta.url).href);
     }
+    for (const [key, url] of Object.entries(ROOM_BACKGROUND_FILES)) {
+      this.load.image(key, url);
+    }
     preloadDecorAtlases(this);
   }
 
@@ -147,6 +161,7 @@ export class ExplorationScene extends Phaser.Scene {
       d: kb.addKey(Phaser.Input.Keyboard.KeyCodes.D),
       e: kb.addKey(Phaser.Input.Keyboard.KeyCodes.E),
       m: kb.addKey(Phaser.Input.Keyboard.KeyCodes.M),
+      h: kb.addKey(Phaser.Input.Keyboard.KeyCodes.H),
     };
 
     ensureTextures(this, W, H);
@@ -184,6 +199,11 @@ export class ExplorationScene extends Phaser.Scene {
     });
     kb.on('keydown-ESC', () => {
       if (this.mapOpen) this.toggleMap(false);
+    });
+    kb.on('keydown-H', () => {
+      if (uiOpen()) return;
+      this.hitboxesOpen = !this.hitboxesOpen;
+      this.loadRoom(state.room, { x: this.player.x, y: this.player.y }, false);
     });
     // la chispa que acompaña al protagonista: mantiene legible la penumbra
     this.playerHalo = this.add
@@ -234,12 +254,14 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private playerBounds(x = this.player.x, y = this.player.y): Rect {
-    return { x: x - PLAYER_R, y: y - PLAYER_R, w: PLAYER_R * 2, h: PLAYER_R * 2 };
+    const r = PLAYER_R * Math.max(0.5, this.player?.scale ?? 1);
+    return { x: x - r, y: y - r, w: r * 2, h: r * 2 };
   }
 
   private collides(x: number, y: number): boolean {
     // las murallas de cada chunk ya son sólidos (con los pasos abiertos recortados)
     const pb = this.playerBounds(x, y);
+    if (this.activeScene?.walkable.length && !this.activeScene.walkable.some((r) => rectContainsRect(r, pb))) return true;
     return this.solids.some((s) => rectsOverlap(pb, s));
   }
 
@@ -405,6 +427,7 @@ export class ExplorationScene extends Phaser.Scene {
   ): void {
     const def = ROOMS[id];
     if (!def) return;
+    this.activeScene = roomScene(id);
     state.room = id;
     if (!state.flags.salasVisitadas.includes(id)) state.flags.salasVisitadas.push(id);
     save();
@@ -438,8 +461,9 @@ export class ExplorationScene extends Phaser.Scene {
       return o;
     };
 
-    // el mundo continuo al que pertenece la sala (o la sala sola, si es interior)
-    const world = worldOf(id);
+    // el mundo continuo al que pertenece la sala (o la sala sola, si es interior
+    // o si es una sala cerrada con fondo pintado: esas nunca son continuas)
+    const world = def.background || this.activeScene ? null : worldOf(id);
     this.chunks = world ? world.rooms : { [id]: { ox: 0, oy: 0 } };
     this.currentChunk = id;
     this.activeActorChunks = this.resolveActorChunks(id);
@@ -483,6 +507,10 @@ export class ExplorationScene extends Phaser.Scene {
     for (const [cid, off] of Object.entries(this.chunks)) {
       this.buildChunk(cid, off.ox, off.oy, prevNPCs, fireEnter, add, boundaries);
     }
+    if (this.activeScene) {
+      this.buildSceneEffects(this.activeScene, add);
+      if (this.hitboxesOpen) this.drawHitboxDebug(this.activeScene, add);
+    }
 
     // penumbra y HUD
     this.darkness.setAlpha(AMBIENT[mood]);
@@ -491,12 +519,14 @@ export class ExplorationScene extends Phaser.Scene {
     if (fireEnter) this.cameras.main.fadeIn(240, 7, 8, 16);
 
     // posicionar al jugador (spawns de puertas/goto son locales a la sala destino)
-    const sp = spawn ?? { x: W / 2, y: H - 90 };
+    const profileSpawn = this.activeScene?.entries ? Object.values(this.activeScene.entries)[0] : undefined;
+    const sp = spawn ?? profileSpawn ?? { x: W / 2, y: H - 90 };
     const fo = this.chunks[id];
     this.player.setPosition(
       fireEnter ? sp.x + fo.ox : sp.x,
       fireEnter ? sp.y + fo.oy : sp.y,
     );
+    this.player.setScale(scaleAt(this.activeScene, this.player.y - fo.oy));
     // si quedó dentro de algo sólido (spawn junto a una puerta), empujar hacia el centro
     const cc = this.chunkCenter(id);
     let guard = 0;
@@ -522,32 +552,46 @@ export class ExplorationScene extends Phaser.Scene {
     boundaries: Boundary[],
   ): void {
     const def = ROOMS[id];
-    drawRoomBase(
-      this,
-      add,
-      id,
-      { floor: def.floor(), wall: def.wall() },
-      ox,
-      oy,
-      W,
-      H,
-      B,
-      hasRoomDecor(id),
-      Object.keys(this.chunks).length > 1,
-    );
-    // vestido pixel opcional por sala (M1): sala sin entrada en DECOR no cambia.
-    for (const o of renderDecor(this, id, ox, oy)) add(o);
+    const sceneProfile = roomScene(id);
+    const paintedKey = sceneProfile
+      ? backgroundKey(sceneProfile, state.flags as unknown as Record<string, unknown>)
+      : def.background;
 
-    // murallas sólidas con pasos abiertos recortados
-    const openGaps = boundaries
-      .filter((bd) => !bd.door.locked?.())
-      .map((bd) => {
-        const from = this.chunks[bd.from];
-        return bd.rect.w >= bd.rect.h
-          ? { x: from.ox, y: bd.rect.y, w: W, h: bd.rect.h }
-          : { x: bd.rect.x, y: from.oy, w: bd.rect.w, h: H };
-      });
-    this.pushWallSolids(ox, oy, openGaps);
+    // sala cerrada pintada: el fondo llena el chunk y la colisión es manual.
+    if (paintedKey && this.textures.exists(paintedKey)) {
+      const bg = this.add.image(ox + W / 2, oy + H / 2, paintedKey).setDepth(DEPTH.shadow - 4);
+      bg.setDisplaySize(W, H);
+      add(bg);
+      for (const c of sceneProfile?.collision ?? def.collision ?? [])
+        this.solids.push({ x: ox + c.x, y: oy + c.y, w: c.w, h: c.h });
+    } else {
+      drawRoomBase(
+        this,
+        add,
+        id,
+        { floor: def.floor(), wall: def.wall() },
+        ox,
+        oy,
+        W,
+        H,
+        B,
+        hasRoomDecor(id),
+        Object.keys(this.chunks).length > 1,
+      );
+      // vestido pixel opcional por sala (M1): sala sin entrada en DECOR no cambia.
+      for (const o of renderDecor(this, id, ox, oy)) add(o);
+
+      // murallas sólidas con pasos abiertos recortados
+      const openGaps = boundaries
+        .filter((bd) => !bd.door.locked?.())
+        .map((bd) => {
+          const from = this.chunks[bd.from];
+          return bd.rect.w >= bd.rect.h
+            ? { x: from.ox, y: bd.rect.y, w: W, h: bd.rect.h }
+            : { x: bd.rect.x, y: from.oy, w: bd.rect.w, h: H };
+        });
+      this.pushWallSolids(ox, oy, openGaps);
+    }
 
     // aberturas hacia chunks vecinos (se dibujan una sola vez, desde su lado canónico)
     for (const bd of boundaries) {
@@ -597,17 +641,22 @@ export class ExplorationScene extends Phaser.Scene {
     for (const d of def.doors) {
       if (d.visible && !d.visible()) continue;
       if (d.to in this.chunks) continue; // es una abertura del mundo, ya tratada
-      const sd: DoorDef = { ...d, x: d.x + ox, y: d.y + oy };
+      const anchor = sceneProfile?.doors?.[d.to];
+      const sd: DoorDef = anchor
+        ? { ...d, ...anchor, x: anchor.x + ox, y: anchor.y + oy }
+        : { ...d, x: d.x + ox, y: d.y + oy };
       const cx = sd.x + sd.w / 2;
       const cy = sd.y + sd.h / 2;
       // los vanos del muro norte atraviesan también su cara vista (¾)
       const extraH = sd.w > sd.h && cy < oy + H / 2 ? 15 : 0;
-      drawDoorVisual(
-        this,
-        add,
-        { x: sd.x, y: sd.y, w: sd.w, h: sd.h + extraH, color: sd.color, locked: !!sd.locked?.() },
-        def.wall(),
-      );
+      // en salas con fondo pintado los arcos ya están dibujados: no dibujar puerta procedural
+      if (!paintedKey)
+        drawDoorVisual(
+          this,
+          add,
+          { x: sd.x, y: sd.y, w: sd.w, h: sd.h + extraH, color: sd.color, locked: !!sd.locked?.() },
+          def.wall(),
+        );
       const horizontal = sd.w > sd.h;
       const lx = Math.min(Math.max(cx, ox + 90), ox + W - 90);
       const ly = horizontal ? (cy < oy + H / 2 ? cy + 28 : cy - 24) : cy - sd.h / 2 - 14;
@@ -637,12 +686,24 @@ export class ExplorationScene extends Phaser.Scene {
     const shiftedDoor = (to: string | undefined): DoorDef | undefined => {
       if (!to) return undefined;
       const dd = def.doors.find((d) => d.to === to);
-      return dd ? { ...dd, x: dd.x + ox, y: dd.y + oy } : undefined;
+      if (!dd) return undefined;
+      const anchor = sceneProfile?.doors?.[to];
+      return anchor ? { ...dd, ...anchor, x: anchor.x + ox, y: anchor.y + oy } : { ...dd, x: dd.x + ox, y: dd.y + oy };
     };
     for (const t of def.things) {
       const actor = this.actorKey(t.id);
       if (actor && this.activeActorChunks.get(actor) !== id) continue;
-      const st: ThingDef = { ...t, x: t.x + ox, y: t.y + oy };
+      const placed = sceneProfile?.things?.[t.id];
+      const baked = placed?.baked
+        ?? t.baked
+        ?? (sceneProfile ? !!sceneProfile.bakedThings?.includes(t.id) : false);
+      const st: ThingDef = {
+        ...t,
+        baked,
+        solid: baked ? false : t.solid,
+        x: (placed?.x ?? t.x) + ox,
+        y: (placed?.y ?? t.y) + oy,
+      };
       if (st.visible && !st.visible()) {
         // se fue durante este refresh: sale caminando hasta su puerta
         if (!fireEnter && st.walksTo && prevNPCs.has(st.id)) {
@@ -653,6 +714,7 @@ export class ExplorationScene extends Phaser.Scene {
       }
       const color = typeof st.color === 'function' ? st.color() : st.color;
       const body = add(this.makeThingVisual(st));
+      if (body instanceof CharacterRig) body.setScale(body.scale * scaleAt(sceneProfile, st.y - oy));
       let label: Phaser.GameObjects.Text | null = null;
       if (st.label && body instanceof CharacterRig) {
         const halfH = body instanceof CharacterRig ? 30 * body.scale : st.h / 2;
@@ -708,6 +770,12 @@ export class ExplorationScene extends Phaser.Scene {
   /** cuerpo visual de un thing: rig de personaje si su id es conocido, prop biselado si no */
   private makeThingVisual(t: ThingDef): Phaser.GameObjects.Container {
     const color = typeof t.color === 'function' ? t.color() : t.color;
+    // prop ya pintado en el fondo: cuerpo invisible (conserva hotspot/luz/colisión)
+    if (t.baked) {
+      const empty = this.add.container(t.x, t.y);
+      empty.setDepth(this.bodyDepth(t.y));
+      return empty;
+    }
     const look = charLookFor(t.id);
     if (look) {
       const rig = new CharacterRig(this, t.x, t.y, look, look.orb ? color : undefined);
@@ -954,6 +1022,80 @@ export class ExplorationScene extends Phaser.Scene {
     this.mapLayer.add(legend);
   }
 
+  private effectEnabled(effect: SceneEffect): boolean {
+    return !effect.flag || !!(state.flags as unknown as Record<string, unknown>)[effect.flag];
+  }
+
+  private buildSceneEffects(
+    profile: RoomSceneProfile,
+    add: <T extends Phaser.GameObjects.GameObject>(o: T) => T,
+  ): void {
+    for (const effect of profile.effects ?? []) {
+      if (!this.effectEnabled(effect)) continue;
+      if (effect.kind === 'glow' || effect.kind === 'pulse') {
+        const glow = add(
+          this.add.image(effect.x, effect.y, 'vis-glow')
+            .setTint(effect.color)
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setDisplaySize(effect.radius * 2, effect.radius * 2)
+            .setDepth(DEPTH.light)
+            .setAlpha(effect.kind === 'pulse' ? 0.09 : 0.16),
+        );
+        this.tweens.add({ targets: glow, alpha: effect.kind === 'pulse' ? 0.24 : 0.1, duration: effect.kind === 'pulse' ? 1250 : 2100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+        continue;
+      }
+      if (effect.kind === 'beam') {
+        const beam = add(
+          this.add.image(effect.x, effect.y, 'vis-glow')
+            .setOrigin(0.08, 0.5)
+            .setTint(effect.color)
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setDisplaySize(effect.radius, 55)
+            .setDepth(DEPTH.light)
+            .setAlpha(0.11),
+        );
+        this.tweens.add({ targets: beam, angle: 360, duration: 10500, repeat: -1, ease: 'Linear' });
+        continue;
+      }
+      if (!('w' in effect) || !('h' in effect)) continue;
+
+      const count = effect.kind === 'embers' ? 18 : effect.kind === 'water' ? 12 : 10;
+      for (let i = 0; i < count; i++) {
+        const color = effect.color ?? (effect.kind === 'embers' ? 0xff8b45 : 0xd7e5de);
+        const mote = add(
+          this.add.rectangle(
+            effect.x + Math.random() * effect.w,
+            effect.y + Math.random() * effect.h,
+            effect.kind === 'water' ? 18 + Math.random() * 24 : 2 + Math.random() * 3,
+            effect.kind === 'water' ? 2 : 2 + Math.random() * 3,
+            color,
+          ).setDepth(effect.kind === 'water' ? DEPTH.decor + 2 : DEPTH.light)
+            .setBlendMode(effect.kind === 'embers' || effect.kind === 'water' ? Phaser.BlendModes.ADD : Phaser.BlendModes.NORMAL)
+            .setAlpha(effect.kind === 'water' ? 0.16 : 0.2),
+        );
+        const dx = effect.kind === 'water' ? 55 : (Math.random() - 0.5) * 35;
+        const dy = effect.kind === 'embers' ? -70 - Math.random() * 70 : effect.kind === 'mist' ? -8 : -18;
+        this.tweens.add({ targets: mote, x: mote.x + dx, y: mote.y + dy, alpha: 0, duration: 1300 + Math.random() * 2200, delay: Math.random() * 1400, repeat: -1 });
+      }
+    }
+  }
+
+  private drawHitboxDebug(
+    profile: RoomSceneProfile,
+    add: <T extends Phaser.GameObjects.GameObject>(o: T) => T,
+  ): void {
+    const g = add(this.add.graphics().setDepth(DEPTH.ui - 2));
+    g.fillStyle(0x38e37a, 0.12);
+    g.lineStyle(2, 0x38e37a, 0.8);
+    for (const r of profile.walkable) { g.fillRect(r.x, r.y, r.w, r.h); g.strokeRect(r.x, r.y, r.w, r.h); }
+    g.fillStyle(0xff4d5a, 0.18);
+    g.lineStyle(2, 0xff4d5a, 0.9);
+    for (const r of profile.collision ?? []) { g.fillRect(r.x, r.y, r.w, r.h); g.strokeRect(r.x, r.y, r.w, r.h); }
+    g.fillStyle(0x4aa8ff, 0.2);
+    g.lineStyle(2, 0x4aa8ff, 0.95);
+    for (const r of Object.values(profile.doors ?? {})) { g.fillRect(r.x, r.y, r.w, r.h); g.strokeRect(r.x, r.y, r.w, r.h); }
+  }
+
   private onPointer(p: Phaser.Input.Pointer): void {
     if (this.mapOpen) {
       this.toggleMap(false);
@@ -1047,6 +1189,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     // vida de los rigs: orientación, trote, respiración, y-sort, luz que acompaña
     if (vx !== 0 || vy !== 0) this.player.setFacing(facingOf(vx, vy));
+    this.player.setScale(scaleAt(this.activeScene, this.player.y));
     this.player.setMoving(Math.hypot(this.velX, this.velY) > 30);
     this.player.setDepth(this.bodyDepth(this.player.y));
     this.player.tick(delta);
@@ -1096,7 +1239,9 @@ export class ExplorationScene extends Phaser.Scene {
           sfxDoor();
           // una frontera abierta no llega a esta lista: se cruza caminando.
           // Las puertas restantes conectan interiores o regiones lejanas.
-          this.loadRoom(d.def.to, d.def.spawn, true);
+          const targetScene = roomScene(d.def.to);
+          const entry = targetScene?.entries?.[this.currentChunk] ?? d.def.spawn;
+          this.loadRoom(d.def.to, entry, true);
         }
         return;
       }

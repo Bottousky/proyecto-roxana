@@ -4,6 +4,18 @@
 apagado, 960×540, cenital) + los **props aislados** (sprites con fondo transparente) que se
 montan encima. Coordenadas y salidas salen de `docs/grilla-mundo-ohmdal.md` (CANON).
 
+**Contexto ambiental obligatorio:** antes de usar cualquier prompt, leer
+`docs/direccion-ambiental-salas-ohmdal-arco1.md`. “Apagado” describe la red de Ohmdal, no la
+luz natural. Cada prompt debe declarar si el espacio es exterior, interior o semicubierto,
+la hora, la luz natural y qué paisaje se ve más allá. Un exterior no se cierra con cuatro
+paredes como si fuera una habitación.
+
+**Salas cerradas (decisión 2026-07-05):** cada sala se genera como **recinto autocontenido**
+con sus propias murallas y **arcos de salida**; los arcos son **transiciones** (no se camina de
+un fondo a otro). Por eso **no hace falta ensamblar bordes** con la sala vecina: donde el
+`[BASE]` de abajo dice “bordes que ensamblan”, léase ahora “muralla con arco en el borde de
+salida”. Referencia montada: `plaza` (`assets/ohmdal/rooms/plaza.png`).
+
 **Qué NO se genera (lo hace el motor):** transiciones, apertura de puertas, glow/luces,
 partículas (chispas, brasas, haz del faro), penumbra por flags, agua/animaciones. Regla del
 Director: **no animamos puertas**; los estados que sí importan (lámpara **encendida ↔ apagada**,
@@ -22,8 +34,9 @@ todo el set para consistencia; iterar con cambios chicos (“misma paleta y gran
 
 **[ESTILO] (idéntico en TODO el set — no variar):**
 > Pixel art 16-bit estilo RPG de consola portátil (GBA), grano fino y contorno legible.
-> Vista **cenital 3/4** (top-down ligeramente inclinada), escala de tile 48 px. Luz **neutra,
-> difusa y apagada** desde arriba (el mundo está “dormido”, sin restaurar). Paleta cálida
+> Vista **cenital 3/4** (top-down ligeramente inclinada), escala de tile 48 px. Luz ambiental
+> coherente con el lugar y la hora definidos en la dirección ambiental. La red está apagada
+> y no emite luz (el mundo está “dormido”, sin restaurar). Paleta cálida
 > medieval con acentos de **cobre y turquesa** (la electricidad-magia). Sin texto, sin logos,
 > sin marca de agua, sin personajes, sin interfaz.
 

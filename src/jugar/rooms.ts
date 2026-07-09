@@ -49,6 +49,8 @@ export interface ThingDef {
   sprite?: string;
   /** escala del sprite respecto a su tamaño nativo (default 1) */
   spriteScale?: number;
+  /** el prop ya está pintado en el fondo de sala: no se dibuja cuerpo (sí interactúa/ilumina) */
+  baked?: boolean;
   onInteract: () => void;
 }
 
@@ -71,6 +73,11 @@ export interface RoomDef {
   name: string;
   floor: () => number;
   wall: () => number;
+  /** sala cerrada con fondo pintado: clave de textura que llena el chunk 960×540.
+   *  Desactiva el pase procedural y el mundo continuo; las puertas son transición. */
+  background?: string;
+  /** colisión manual (muros/props horneados) para salas con `background` */
+  collision?: { x: number; y: number; w: number; h: number }[];
   doors: DoorDef[];
   things: ThingDef[];
   onEnter?: () => void;
@@ -1104,14 +1111,30 @@ export const ROOMS: Record<string, RoomDef> = {
     name: 'Ohmdal — La plaza',
     floor: () => (f().castleRestored ? 0x1e1b2e : f().puertaDone ? 0x262033 : f().ohmAwake ? 0x1a1926 : 0x15141f),
     wall: () => (f().castleRestored ? 0x3a2e44 : f().puertaDone ? 0x3c3144 : 0x2e2a3c),
+    // Sala cerrada pintada (patio del castillo con arcos = transición). Ver
+    // docs/grilla-mundo-ohmdal.md. Colisión: murallas con vanos en los 4 arcos,
+    // el pozo central y el edificio del taller (este).
+    background: 'room-plaza',
+    collision: [
+      // muralla norte (vano del arco central x430–535)
+      { x: 0, y: 0, w: 430, h: 58 }, { x: 535, y: 0, w: 425, h: 58 },
+      // muralla sur (vano del arco central)
+      { x: 0, y: 486, w: 430, h: 54 }, { x: 535, y: 486, w: 425, h: 54 },
+      // muralla oeste (vano del portón del castillo y150–335)
+      { x: 0, y: 58, w: 42, h: 92 }, { x: 0, y: 335, w: 42, h: 151 },
+      // edificio del taller al este (vano de la puerta y225–330)
+      { x: 812, y: 58, w: 148, h: 167 }, { x: 812, y: 330, w: 148, h: 156 },
+      // pozo/fuente central
+      { x: 412, y: 214, w: 136, h: 96 },
+    ],
     doors: [
       {
-        x: 435, y: 514, w: 90, h: 26,
+        x: 145, y: 514, w: 120, h: 26,
         to: 'aula', spawn: { x: 740, y: 420 },
         label: 'Portal de regreso', color: 0x2e8b8b,
       },
       {
-        x: 934, y: 245, w: 26, h: 100,
+        x: 812, y: 235, w: 92, h: 95,
         to: 'taller', spawn: { x: 95, y: 300 },
         label: 'Taller de Lumen',
         locked: () =>
@@ -1138,7 +1161,7 @@ export const ROOMS: Record<string, RoomDef> = {
         // Zona alta del borde izquierdo (hasta cerca del tope): el label apunta
         // arriba-izquierda; sin esto quedaba una franja muerta de pared encima de
         // la puerta donde el jugador se atascaba sin cruzar ni ver el cordón.
-        x: 0, y: 20, w: 26, h: 165,
+        x: 0, y: 150, w: 42, h: 185,
         to: 'castle_gate', spawn: { x: 860, y: 270 },
         label: 'Camino al Castillo',
         color: 0x65536f,
@@ -1157,15 +1180,15 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        x: 934, y: 35, w: 26, h: 110,
-        to: 'forge_yard', spawn: { x: 95, y: 245 },
+        x: 0, y: 370, w: 26, h: 100,
+        to: 'forge_yard', spawn: { x: 825, y: 410 },
         label: 'Camino a la Forja',
         color: 0x7a5438,
         visible: () => f().unit2Completed,
       },
       {
-        x: 145, y: 514, w: 120, h: 26,
-        to: 'terraces_top', spawn: { x: 205, y: 95 },
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'terraces_top', spawn: { x: 480, y: 105 },
         label: 'Camino a las Terrazas',
         color: 0x58755f,
         visible: () => f().unit3Completed,
@@ -1173,7 +1196,7 @@ export const ROOMS: Record<string, RoomDef> = {
     ],
     things: [
       {
-        id: 'pedestal', x: 480, y: 200, w: 56, h: 56, shape: 'circle',
+        id: 'pedestal', x: 480, y: 258, w: 56, h: 56, shape: 'circle',
         label: 'Ohm', prompt: 'Acercarse al pedestal', solid: true, emoji: '⚡',
         color: () => (f().ohmAwake ? 0xc9a437 : 0x4a4a4f),
         onInteract: () => {
@@ -1240,9 +1263,9 @@ export const ROOMS: Record<string, RoomDef> = {
           ),
       },
       {
-        id: 'lampara1', x: 220, y: 170, w: 26, h: 26, shape: 'circle',
-        label: '', prompt: 'Mirar la lámpara', solid: true, emoji: '💡',
-        sprite: 'prop_lamp_post', spriteScale: 1.1,
+        id: 'lampara1', x: 290, y: 356, w: 26, h: 26, shape: 'circle',
+        label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
+        baked: true,
         color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
         onInteract: () =>
           say(
@@ -1254,15 +1277,15 @@ export const ROOMS: Record<string, RoomDef> = {
           ),
       },
       {
-        id: 'lampara2', x: 760, y: 250, w: 26, h: 26, shape: 'circle',
-        label: '', prompt: 'Mirar la lámpara', solid: true, emoji: '💡',
-        sprite: 'prop_lamp_post', spriteScale: 1.1,
+        id: 'lampara2', x: 672, y: 344, w: 26, h: 26, shape: 'circle',
+        label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
+        baked: true,
         color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
         onInteract: () =>
           say(L('', f().puertaDone ? 'Luz firme. La plaza tiene sombras de nuevo — de las buenas.' : 'Otra lámpara muerta. O dormida. Empieza a parecer que hay una diferencia.')),
       },
       {
-        id: 'campana', x: 790, y: 110, w: 54, h: 66,
+        id: 'campana', x: 690, y: 150, w: 54, h: 66,
         label: 'Campana', prompt: 'La campana de Ohmdal', solid: true, emoji: '🔔',
         sprite: 'prop_bell', spriteScale: 1.4,
         color: () => (f().puertaDone ? 0xb08d2a : 0x4f4a42),
@@ -1567,6 +1590,13 @@ export const ROOMS: Record<string, RoomDef> = {
           f().metConsejera
             ? null
             : [L('Consejera', 'Este recinto está clausurado por conservación de chispa.')],
+      },
+      {
+        x: 420, y: 514, w: 120, h: 26,
+        to: 'forge_yard', spawn: { x: 480, y: 220 },
+        label: 'Camino a la Forja',
+        color: 0x7a5438,
+        visible: () => f().unit2Completed,
       },
     ],
     things: [
@@ -1920,6 +1950,12 @@ export const ROOMS: Record<string, RoomDef> = {
           return [L('Yesca', 'Primero el canal tibio. En mi casa, los misterios se resuelven en orden.')];
         },
       },
+      {
+        x: 700, y: 26, w: 120, h: 26,
+        to: 'castle_gate', spawn: { x: 480, y: 450 },
+        label: 'Explanada del Castillo',
+        color: 0x65536f,
+      },
     ],
     things: [
       {
@@ -2141,8 +2177,8 @@ export const ROOMS: Record<string, RoomDef> = {
     wall: () => (f().valleyRestored ? 0x71845c : 0x5d684d),
     doors: [
       {
-        x: 145, y: 0, w: 120, h: 26,
-        to: 'plaza', spawn: { x: 205, y: 440 },
+        x: 420, y: 0, w: 120, h: 26,
+        to: 'plaza', spawn: { x: 480, y: 445 },
         label: 'Plaza de Ohmdal',
       },
       {

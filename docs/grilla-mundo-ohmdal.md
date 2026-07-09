@@ -4,6 +4,15 @@
 fuente de verdad geográfica; esta grilla la baja a coordenadas de chunk. Las celdas del Arco II
 y el Empalme son **reservadas/aproximadas** (se afinan al construir esos arcos).
 
+**Arquitectura (decisión 2026-07-05):** cada sala es un **recinto cerrado con arcos**; los
+enlaces entre salas son **transiciones** (`⟿`), no bordes caminados. Por eso cada fondo se
+genera **autocontenido** (murallas propias + arcos), sin ensamblar bordes con la vecina. En el
+motor: `RoomDef.background` (clave de textura) hace la sala **standalone** (ignora el mundo
+continuo), llena el chunk 960×540 con el fondo pintado y usa `RoomDef.collision` para los muros;
+las puertas de la sala pasan a transición. Los `═` de la tabla son la geografía conceptual (qué
+sala limita con cuál), pero se **implementan como `⟿`**. Referencia viva: `plaza` (fondo
+`assets/ohmdal/rooms/plaza.png`).
+
 **Objetivo:** un plano único de coordenadas donde cada sala del RPG tiene una celda fija,
 coherente con `assets/ohmdal/ohmdal-complete-map.png` (el mapa isla, fuente de verdad
 geográfica) y abarcando **todos los arcos** (I, II y el Empalme). Sirve para (a) generar las

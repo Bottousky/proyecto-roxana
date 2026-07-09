@@ -43,3 +43,9 @@ assets/instituto/hall-master-v1.png
 assets/instituto/intro-0*-v1.png
 assets/instituto/proyector-electronica-0*-v1.png
 assets/instituto/student-v1.png
+assets/ohmdal/753c6248-4aae-4dc1-8667-58386c18a42d.png
+# salas pintadas: se versionan los finales; fuentes crudas de generación y
+# hojas de revisión quedan solo en disco (105+ MB)
+assets/ohmdal/rooms/_sources/
+assets/ohmdal/rooms/pilot-arco1/_sources/
+assets/ohmdal/rooms/pilot-arco1/_review/
