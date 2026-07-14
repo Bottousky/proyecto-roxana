@@ -33,9 +33,13 @@ El vocabulario técnico es spoiler. Nadie dice "voltaje" antes de la Puerta de O
 
 I = V/R aparece solo tras la Puerta de Ohm. En Ohmdal la relación se llama **el Pacto de los Tres Signos** (Empuje · Río · Piedra), con el triángulo V/I/R como emblema degradado a amuleto.
 
+### Nota de canon — la red de Ohmdal
+
+En la lectura autoral, la Calzada del Manantial funciona como el equivalente de una central eléctrica: allí nace el caudal de chispa que sostiene el mundo. La Puerta de Ohm lo regula, los canales bajo el Castillo lo distribuyen y la Campana, los faroles y los talleres son sus cargas. Dentro de la ficción, antes de la formalización, los personajes conservan el vocabulario de río, empuje, freno y caminos; esta equivalencia técnica no se verbaliza como clase adelantada.
+
 ### A.3. Piedras de Freno = código real de resistencias
 
-Las piedras llevan bandas de color con el **código verdadero de resistencias** (marrón=1, rojo=2, amarillo=4, gris=8). En Ohmdal es «el código de los Maestros»; la entrada «La Piedra de Freno» de la Bitácora revela tras la formalización que es el código real (tabla 0–9 completa). El jugador llega a las resistencias físicas reconociendo las bandas.
+Las piedras llevan bandas de color con el **código verdadero de resistencias** (marrón=1, rojo=2, amarillo=4, gris=8). Cada piedra muestra su cifra junto a la banda y los bancos ofrecen el «código de los Maestros» 0–9 como referencia visual; la entrada «La Piedra de Freno» de la Bitácora revela tras la formalización que es el código real. Oro y plata se reservan para explicar multiplicadores y tolerancias: no son Piedras de Freno numeradas. El jugador llega a las resistencias físicas reconociendo las bandas.
 
 ### A.4. Diseño de puzzles — una variable nueva por puzzle
 

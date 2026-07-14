@@ -46,3 +46,27 @@ Editar únicamente el gran arco norte vacío del chunk base e integrar allí el 
 - Props: PNG RGBA con transparencia real y esquinas transparentes.
 - Fuentes de generación conservadas en `_sources/` y excluidas de validación.
 - Assets existentes y manifest sin modificar.
+
+## Revisión aprobada de Plaza, Taller y Ohm
+
+### `prop_plaza_portal-v2.png`
+
+Portal compacto de retorno al Instituto, aislado sobre croma: arco de piedra y cobre con núcleo cian, perspectiva cenital 3/4 y escala compatible con la plaza. Silueta limpia, simétrica, sin escenario, texto ni personajes. La fuente con croma queda en `_sources/`; la versión final tiene alfa real.
+
+### `ohm-turnaround-v2.png` y `ohm-atlas-64-v2.png`
+
+Ohm como guardián pequeño y reconocible: cuerpo bajo de cerámica clara y cobre, dos ojos cian y emblema omega frontal. Volúmenes gruesos, sin piezas frágiles ni apéndices flotantes, para que el diseño pueda simplificarse a una impresión 3D. Turnaround frontal, lateral izquierdo, lateral derecho y posterior; el atlas final conserva esas cuatro direcciones en celdas de 64×96.
+
+### `plaza+campana_portal-v2.png`
+
+Edición única sobre la plaza base: reemplazar el pozo/jaula central por una sola Campana monumental perfectamente centrada e integrada al pavimento; integrar el portal de retorno en el sello V/I/R del suroeste; dejar libre el arco sur para la ruta a Terrazas. Mantener seis faroles físicamente apagados, murallas, taller, caminos, perspectiva y noche exterior. Reservar un pequeño soporte delante de la Campana para Ohm como sprite separado. Sin personajes, etiquetas ni glow horneado.
+
+### `taller+props_lumen-v2.png`
+
+Edición única sobre el taller base: integrar un banco de trabajo detallado dentro del recinto izquierdo, con instrumentos y pequeñas pistas visuales; poblar estanterías laterales con frascos absurdos, fusibles y herramientas; completar la máquina del recinto derecho. Mantener despejada la circulación central y la salida sur. Noche interior con ventana azul, iluminación material tenue y ningún personaje, texto, UI o efecto eléctrico horneado.
+
+QA: los dos chunks finales están normalizados a 960×540; portal y turnaround tienen transparencia real; fuentes originales conservadas bajo `_sources/`.
+
+### `plaza+campana_portal-castillo_abierto-v2.png`
+
+Variante horneada derivada de la Plaza integrada aprobada. Cambiar solamente el acceso oeste al Castillo: levantar la reja dentro del arco, retirar el cordón del Consejo y revelar una continuación corta de adoquín/cobre hacia el oeste. Mantener sin cambios Campana, portal, taller, faroles, murallas, cielo nocturno, cámara, composición y estado apagado. Esta variante se activa al resolver la Campana de dos caminos (`solvedBellPaths`), cuando el Consejo concede la inspección supervisada del Castillo.

@@ -6,7 +6,7 @@ export type LighthousePhase = 'charging' | 'dumping';
 export const LIGHTHOUSE_UNIT_MS = 250;
 export const LIGHTHOUSE_TARGET_RHYTHM = 8;
 export const LIGHTHOUSE_DISCHARGE_UNIT_MS = 100;
-export const LIGHTHOUSE_MAX_BRIEF_DISCHARGE_BRAKE = 2;
+export const LIGHTHOUSE_MAX_BRIEF_DISCHARGE_MS = 800;
 
 export interface LighthouseState {
   tank: LighthouseTank;
@@ -40,8 +40,11 @@ export function lighthouseChargePeriodMs(
   return LIGHTHOUSE_UNIT_MS * lighthouseRhythm(tank, chargeBrake);
 }
 
-export function lighthouseDischargePeriodMs(dischargeBrake: LighthouseBrake): number {
-  return LIGHTHOUSE_DISCHARGE_UNIT_MS * dischargeBrake;
+export function lighthouseDischargePeriodMs(
+  tank: LighthouseTank,
+  dischargeBrake: LighthouseBrake,
+): number {
+  return LIGHTHOUSE_DISCHARGE_UNIT_MS * tank * dischargeBrake;
 }
 
 export function lighthouseTiming(
@@ -54,8 +57,8 @@ export function lighthouseTiming(
   return 'just';
 }
 
-export function isBriefDischarge(dischargeBrake: LighthouseBrake): boolean {
-  return dischargeBrake <= LIGHTHOUSE_MAX_BRIEF_DISCHARGE_BRAKE;
+export function isBriefDischarge(tank: LighthouseTank, dischargeBrake: LighthouseBrake): boolean {
+  return lighthouseDischargePeriodMs(tank, dischargeBrake) <= LIGHTHOUSE_MAX_BRIEF_DISCHARGE_MS;
 }
 
 export function isLighthouseSolution(
@@ -65,7 +68,7 @@ export function isLighthouseSolution(
 ): boolean {
   return (
     lighthouseTiming(tank, chargeBrake) === 'just' &&
-    isBriefDischarge(dischargeBrake)
+    isBriefDischarge(tank, dischargeBrake)
   );
 }
 
@@ -121,7 +124,7 @@ export function advanceLighthouse(state: LighthouseState, dtMs: number): Lightho
       continue;
     }
 
-    const period = lighthouseDischargePeriodMs(next.dischargeBrake);
+    const period = lighthouseDischargePeriodMs(next.tank, next.dischargeBrake);
     const untilEmpty = period * (next.level / 100);
     if (remaining < untilEmpty) {
       next.level -= (remaining / period) * 100;
@@ -138,11 +141,11 @@ export function advanceLighthouse(state: LighthouseState, dtMs: number): Lightho
 
 export function lighthouseReading(state: LighthouseState): LighthouseReading {
   const timing = lighthouseTiming(state.tank, state.chargeBrake);
-  const briefDischarge = isBriefDischarge(state.dischargeBrake);
+  const briefDischarge = isBriefDischarge(state.tank, state.dischargeBrake);
   return {
     rhythm: lighthouseRhythm(state.tank, state.chargeBrake),
     chargePeriodMs: lighthouseChargePeriodMs(state.tank, state.chargeBrake),
-    dischargePeriodMs: lighthouseDischargePeriodMs(state.dischargeBrake),
+    dischargePeriodMs: lighthouseDischargePeriodMs(state.tank, state.dischargeBrake),
     timing,
     briefDischarge,
     valid: timing === 'just' && briefDischarge,

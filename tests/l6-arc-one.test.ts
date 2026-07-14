@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { ARC_PANORAMA_ZONES } from '../src/ui/arcPanorama.ts';
 
 function equal<T>(actual: T, expected: T, label: string): void {
   if (actual !== expected) {
@@ -12,6 +13,26 @@ function includes(source: string, text: string, label: string): void {
 
 const entriesSource = readFileSync(new URL('../src/content/entries.ts', import.meta.url), 'utf8');
 const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
+const panoramaSource = readFileSync(new URL('../src/ui/arcPanorama.ts', import.meta.url), 'utf8');
+const stylesSource = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
+
+equal(
+  ARC_PANORAMA_ZONES.map((zone) => zone.label).join(','),
+  'Plaza,Castillo,Forja,Terrazas,Reloj,Faro',
+  'la panorámica enciende las seis zonas en orden',
+);
+includes(panoramaSource, 'world-map-panel-1024.png', 'la panorámica usa el mapa canónico');
+includes(panoramaSource, "root.setAttribute('role', 'dialog')", 'el overlay expone role dialog');
+includes(panoramaSource, "root.setAttribute('aria-modal', 'true')", 'el overlay es modal accesible');
+includes(panoramaSource, '>Continuar</button>', 'Continuar está disponible desde el inicio');
+includes(panoramaSource, 'index * 450', 'la secuencia completa dura menos de cinco segundos');
+includes(panoramaSource, 'prefers-reduced-motion: reduce', 'la lógica respeta reduced motion');
+includes(panoramaSource, 'timers.forEach', 'el cleanup cancela todos los timers');
+includes(panoramaSource, 'root.remove()', 'el cleanup elimina el DOM del overlay');
+includes(panoramaSource, 'popUI()', 'el cleanup libera el bloqueo de exploración');
+includes(stylesSource, 'aspect-ratio: 4 / 3', 'el mapa conserva una relación 4:3 responsive');
+includes(stylesSource, '@media (max-aspect-ratio: 4 / 3)', 'el overlay se adapta a pantallas 4:3');
+includes(stylesSource, '@media (prefers-reduced-motion: reduce)', 'CSS elimina animaciones reducidas');
 
 for (const id of [
   'la-chispa-que-se-queda',
@@ -41,6 +62,11 @@ includes(
   roomsSource,
   "if (f().learnedCapacitor && !f().arcOneCompleted)",
   'el cierre exige comprensión y no se repite',
+);
+equal(
+  roomsSource.indexOf('showArcPanorama(() => {') < roomsSource.indexOf("L('', 'La cámara se aleja."),
+  true,
+  'cerrarArcoUno muestra la panorámica antes del diálogo existente',
 );
 
 for (const place of [

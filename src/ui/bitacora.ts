@@ -3,6 +3,7 @@ import { toast } from './dialog';
 import { getEntries } from '../content/entries';
 import { state, resetSave } from '../state';
 import { sfxUIOpen, sfxUIClose } from '../audio';
+import { touchControlsEnabled } from './inputMode.ts';
 
 let isOpen = false;
 const openedEntries = new Set<string>();
@@ -52,6 +53,7 @@ export function openBitacora(entryId?: string): void {
 
   const entries = getEntries();
   let current = entryId ?? entries[entries.length - 1]?.id;
+  const entryButtons: HTMLButtonElement[] = [];
 
   const renderEntry = () => {
     const entry = entries.find((e) => e.id === current);
@@ -80,6 +82,7 @@ export function openBitacora(entryId?: string): void {
       current = entry.id;
       renderEntry();
     });
+    entryButtons.push(btn);
     index.appendChild(btn);
   }
 
@@ -105,6 +108,36 @@ export function openBitacora(entryId?: string): void {
   index.appendChild(footer);
 
   renderEntry();
+  requestAnimationFrame(() => {
+    (entryButtons.find((button) => button.dataset.id === current) ?? closeBtn).focus();
+  });
+
+  host.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeBitacora();
+      return;
+    }
+    const direction = event.code === 'ArrowUp' || event.code === 'KeyW'
+      ? -1
+      : event.code === 'ArrowDown' || event.code === 'KeyS'
+        ? 1
+        : 0;
+    if (direction && entryButtons.length > 0) {
+      event.preventDefault();
+      const activeIndex = entryButtons.indexOf(document.activeElement as HTMLButtonElement);
+      const nextIndex = activeIndex < 0
+        ? 0
+        : (activeIndex + direction + entryButtons.length) % entryButtons.length;
+      entryButtons[nextIndex].focus();
+      entryButtons[nextIndex].click();
+      return;
+    }
+    if (event.code === 'KeyE' && document.activeElement instanceof HTMLButtonElement) {
+      event.preventDefault();
+      document.activeElement.click();
+    }
+  });
 }
 
 export function wasBitacoraEntryOpened(entryId: string): boolean {
@@ -122,8 +155,11 @@ export function closeBitacora(): void {
 
 export function initBitacora(): void {
   el('bitacora-btn').addEventListener('click', () => {
-    if (!state.flags.hasBitacora) return;
-    if (!isOpen) openBitacora();
+    if (!touchControlsEnabled()) return;
+    // La visibilidad del botón ya es el permiso. Nunca dejar un control visible
+    // que falle en silencio si un save antiguo tiene el flag desincronizado.
+    if (isOpen) closeBitacora();
+    else openBitacora();
   });
   window.addEventListener('keydown', (ev) => {
     if (ev.code === 'Escape' && isOpen) closeBitacora();

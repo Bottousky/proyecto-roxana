@@ -18,7 +18,7 @@ Cada fondo representa la primera llegada, antes de la restauración de su unidad
 |---|---|---|---|---|
 | `plaza` | exterior urbano | noche, ambiente frío de cielo cubierto/luna difusa | cielo en arcos, fachadas, murallas y caminos abiertos | reino detenido pero habitable, no terrorífico |
 | `puerta` | patio exterior contra muralla | noche fría, cobre sin emisión | cielo sobre almenas y profundidad hacia la plaza al sur | umbral solemne que alimenta la ciudad |
-| `manantial_ohm` | santuario exterior/patio de manantial | noche húmeda, reflejo natural tenue | cielo abierto, roca húmeda, vegetación y nacimiento del canal | origen antiguo del cobre, quietud viva |
+| `manantial_ohm` | santuario exterior/patio de manantial | noche húmeda, reflejo natural tenue | cielo abierto, roca húmeda, vegetación y nacimiento del canal | cabecera energética del reino: el caudal nace aquí antes de ser regulado y repartido |
 | `castle_gate` | atrio exterior del Castillo | noche, fachada recortada contra cielo | fachada alta, cielo, acceso desde plaza; no cuatro paredes interiores | institución cerrada y vigilada |
 | `castle_gallery` | interior | penumbra violeta, luz fría por ventanas altas | corredor ceremonial profundo, techo implícito, fila de lámparas apagadas/tenues como props | austeridad convertida en doctrina |
 | `castle_branches` | interior | penumbra sellada, mínimos reflejos de cobre | tres bocas de taller clausuradas y tronco central | miedo real al exceso, remedio equivocado |

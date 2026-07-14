@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "for f in tests/*.test.ts; do node --experimental-strip-types \"$f\" || exit 1; done",
+    "test": "node scripts/run-tests.mjs",
     "verify": "bash scripts/verificar-hito.sh"
   },
   "dependencies": {

@@ -12,8 +12,16 @@ export interface BenchHandle {
   close(after?: () => void): void;
 }
 
+export interface BenchPresentation {
+  theme?: 'default' | 'plaza' | 'terraces';
+  location?: string;
+  mechanism?: string;
+  /** Conserva el mundo vivo bajo el primer plano. */
+  worldCloseup?: boolean;
+}
+
 /** Selector de elementos "focoseables" dentro de un banco (para foco inicial y Tab-trap). */
-const FOCUSABLE_SELECTOR = 'button, [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE_SELECTOR = 'button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 function getFocusableElements(container: HTMLElement): HTMLElement[] {
   return Array.from(
@@ -25,21 +33,66 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
   });
 }
 
+type FocusDirection = 'up' | 'down' | 'left' | 'right';
+
+/** Elige el control más cercano en la dirección pedida, como una grilla de consola. */
+function focusInDirection(panel: HTMLElement, direction: FocusDirection): void {
+  const focusable = getFocusableElements(panel);
+  if (focusable.length === 0) return;
+  const active = document.activeElement as HTMLElement | null;
+  if (!active || !panel.contains(active)) {
+    focusable[0].focus();
+    return;
+  }
+
+  const origin = active.getBoundingClientRect();
+  const ox = origin.left + origin.width / 2;
+  const oy = origin.top + origin.height / 2;
+  let best: { element: HTMLElement; score: number } | null = null;
+
+  for (const element of focusable) {
+    if (element === active) continue;
+    const rect = element.getBoundingClientRect();
+    const dx = rect.left + rect.width / 2 - ox;
+    const dy = rect.top + rect.height / 2 - oy;
+    const forward = direction === 'left' ? -dx : direction === 'right' ? dx : direction === 'up' ? -dy : dy;
+    if (forward <= 2) continue;
+    const sideways = direction === 'left' || direction === 'right' ? Math.abs(dy) : Math.abs(dx);
+    const score = forward + sideways * 2.4;
+    if (!best || score < best.score) best = { element, score };
+  }
+
+  if (!best) return;
+  best.element.focus();
+  best.element.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
 /** Abre la "vista de banco": un primer plano del mecanismo, sobre la exploración. */
 export function openBench(
   title: string,
   subtitle: string,
   build: (bench: BenchHandle) => void,
+  presentation: BenchPresentation = {},
 ): void {
   const host = el('bench');
   host.innerHTML = '';
   host.classList.remove('hidden');
+  host.classList.toggle('world-closeup', presentation.worldCloseup === true);
+  host.dataset.theme = presentation.theme ?? 'default';
+  document.body.classList.add('bench-open');
   pushUI();
   sfxUIOpen();
 
   const panel = document.createElement('div');
   panel.className = 'bench-panel';
-  panel.innerHTML = `<h2>${title}</h2><div class="bench-sub">${subtitle}</div>`;
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
+  panel.setAttribute('aria-label', title);
+  const context = presentation.location || presentation.mechanism
+    ? `<div class="bench-context"><span>${presentation.location ?? ''}</span><strong>${presentation.mechanism ?? ''}</strong></div>`
+    : '';
+  panel.innerHTML = `${context}<h2>${title}</h2><div class="bench-sub">${subtitle}</div>
+    <div class="bench-control-hint" aria-hidden="true">Flechas / WASD: mover · E: usar · Esc: salir</div>`;
   host.appendChild(panel);
 
   const body = document.createElement('div');
@@ -68,7 +121,7 @@ export function openBench(
     close(after?: () => void) {
       if (closed) return;
       closed = true;
-      host.removeEventListener('keydown', onKeydown);
+      window.removeEventListener('keydown', onKeydown, true);
       const pendingCleanups = [...cleanups];
       cleanups.clear();
       for (const cleanup of pendingCleanups) {
@@ -80,7 +133,10 @@ export function openBench(
       }
       sfxUIClose();
       host.classList.add('hidden');
+      host.classList.remove('world-closeup');
       host.innerHTML = '';
+      delete host.dataset.theme;
+      document.body.classList.remove('bench-open');
       popUI();
       after?.();
     },
@@ -90,6 +146,28 @@ export function openBench(
     if (event.key === 'Escape') {
       event.preventDefault();
       handle.close();
+      return;
+    }
+    const target = event.target as HTMLElement | null;
+    const nativeArrowControl = target?.matches('input, select, textarea, [contenteditable="true"]') === true;
+    const directions: Record<string, FocusDirection | undefined> = {
+      ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down',
+      ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right',
+    };
+    const direction = directions[event.code];
+    if (direction && !nativeArrowControl) {
+      event.preventDefault();
+      event.stopPropagation();
+      focusInDirection(panel, direction);
+      return;
+    }
+    if (event.code === 'KeyE' && !nativeArrowControl) {
+      const active = document.activeElement;
+      if (active instanceof Element && panel.contains(active)) {
+        event.preventDefault();
+        event.stopPropagation();
+        active.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      }
       return;
     }
     if (event.key !== 'Tab') return;
@@ -111,7 +189,10 @@ export function openBench(
       first.focus();
     }
   };
-  host.addEventListener('keydown', onKeydown);
+  // Algunos puzzles reconstruyen el control activo al cambiar una pieza. En ese
+  // instante el foco cae temporalmente en <body>, fuera de `host`; escuchar en
+  // capture mantiene las flechas/WASD disponibles para recuperar el foco.
+  window.addEventListener('keydown', onKeydown, true);
 
   build(handle);
 

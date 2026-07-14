@@ -10,7 +10,10 @@ export interface Flags {
   ohmAwake: boolean;
   metLumen: boolean;
   frenoDone: boolean;
+  /** Edda llamó al jugador desde el arco norte al salir del Taller. */
+  eddaGateCall: boolean;
   puertaIntro: boolean;
+  puertaMecanismoIntro: boolean;
   puertaDone: boolean;
   burnedSomething: boolean;
   finished: boolean;
@@ -99,7 +102,9 @@ const DEFAULT_FLAGS: Flags = {
   ohmAwake: false,
   metLumen: false,
   frenoDone: false,
+  eddaGateCall: false,
   puertaIntro: false,
+  puertaMecanismoIntro: false,
   puertaDone: false,
   burnedSomething: false,
   finished: false,

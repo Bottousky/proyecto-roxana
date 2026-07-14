@@ -107,7 +107,7 @@ export function abrirDespertar(onSuccess: () => void): void {
       bench.setStatus(
         'El camino sale de la fuente por el lado <b>+</b>, pasa por Ohm, y tiene que volver ' +
           'al lado <b>−</b>. Está lleno de huecos. En la bandeja hay <b>tres puentes de cobre</b>. ' +
-          'Toca un hueco para cubrirlo (o descubrirlo).',
+        'Toca un hueco —o selecciónalo con flechas y presiona <b>E</b>— para cubrirlo o descubrirlo.',
       );
 
       const isWin = () =>
@@ -170,7 +170,13 @@ export function abrirDespertar(onSuccess: () => void): void {
           }
           updateTray();
         });
-        makeInteractive(slot);
+        const gap = gaps.find((candidate) => candidate.id === slot.dataset.gap)!;
+        makeInteractive(
+          slot,
+          gap.broken
+            ? 'Tramo partido: no admite un puente'
+            : `Hueco ${gap.id.slice(1)}: colocar o retirar puente`,
+        );
       });
 
       const actions = benchActions(bench.root, [
@@ -178,6 +184,12 @@ export function abrirDespertar(onSuccess: () => void): void {
         { label: 'Continuar', primary: true, onClick: () => bench.close(onSuccess) },
       ]);
       actions['Continuar'].classList.add('hidden');
+    },
+    {
+      theme: 'plaza',
+      location: 'Plaza de Ohmdal · pedestal central',
+      mechanism: 'Anillo de despertar',
+      worldCloseup: true,
     },
   );
 }

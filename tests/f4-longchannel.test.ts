@@ -139,6 +139,15 @@ equal(
   true,
   'el banco elige el cierre según el nivel del camino resuelto',
 );
+equal(puzzleSource.includes('bench-predict'), true, 'F4 reutiliza la predicción comprometida');
+for (const text of [
+  'Antes de probar: ¿el canal quedará frío, tibio o al rojo?',
+  'Frío',
+  'Tibio',
+  'Al rojo',
+]) {
+  equal(puzzleSource.includes(text), true, `predicción canónica F4: ${text}`);
+}
 
 for (const text of [
   'Mi horno. El bueno. Lleva años frío porque cada vez que lo alimentamos, el canal se pone al rojo a mitad de camino.',

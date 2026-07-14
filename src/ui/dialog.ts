@@ -1,6 +1,7 @@
 import { el, pushUI, popUI } from './overlay';
 import { sfxBlip, sfxToast } from '../audio';
 import { portraitKey } from './portrait.ts';
+import { touchControlsEnabled } from './inputMode.ts';
 
 export interface Line {
   who: string;
@@ -87,7 +88,9 @@ export function say(lines: Line[] | Line, onEnd?: () => void): void {
 }
 
 export function initDialog(): void {
-  el('dialog').addEventListener('click', advance);
+  el('dialog').addEventListener('click', () => {
+    if (touchControlsEnabled()) advance();
+  });
   window.addEventListener('keydown', (ev) => {
     if (!active) return;
     if (ev.code === 'Enter' || ev.code === 'Space' || ev.code === 'KeyE') {

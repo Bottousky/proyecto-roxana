@@ -1,4 +1,4 @@
-import { esLlegadaPorPortal, portalGateUrl, salaLlegadaPortal } from '../src/shared/portalLink.ts';
+import { esLlegadaPorPortal, portalExitUrl, portalGateUrl, salaLlegadaPortal } from '../src/shared/portalLink.ts';
 
 function equal<T>(actual: T, expected: T, label: string): void {
   if (actual !== expected) {
@@ -13,6 +13,7 @@ equal(esLlegadaPorPortal('?x=1&from=portal'), true, 'from portal con otros param
 equal(portalGateUrl().includes('/src/jugar/'), true, 'portalGateUrl contiene ruta jugar');
 equal(portalGateUrl().includes('from=portal'), true, 'portalGateUrl contiene from portal');
 equal(portalGateUrl().includes('room=plaza'), true, 'portalGateUrl fija la plaza como destino');
+equal(portalExitUrl(), '/#aula/electronica', 'la salida abandona Phaser y vuelve al aula real');
 equal(salaLlegadaPortal('?from=portal&room=plaza'), 'plaza', 'el portal llega a la plaza');
 equal(salaLlegadaPortal('?from=portal'), 'plaza', 'un link viejo también llega a la plaza');
 equal(salaLlegadaPortal('?from=portal&room=hall'), 'plaza', 'el portal no acepta una sala del Instituto');

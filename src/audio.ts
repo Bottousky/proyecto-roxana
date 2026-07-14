@@ -2,6 +2,8 @@
    Todo WebAudio, sin assets — pensado para el greybox. Cuando haya música real,
    este módulo se reemplaza manteniendo la misma interfaz (setAmbience + sfx*). */
 
+import { touchControlsEnabled } from './ui/inputMode.ts';
+
 export type Ambience = 'instituto' | 'ohmdal' | 'taller' | 'ohmdal-on' | 'castle' | 'forge' | 'terraces' | 'lighthouse';
 
 /** Una pieza compuesta: pistas de melodía y bajo como listas de [nota, pulsos].
@@ -377,7 +379,7 @@ function iconForVolume(v: number): string {
   return '🔊';
 }
 
-/** Conecta el botón 🔊 del HUD (abre popover con slider) y la tecla M. */
+/** Conecta el botón del HUD en táctil y la tecla V en escritorio. */
 export function initAudioButton(): void {
   const btn = document.getElementById('audio-btn') as HTMLButtonElement | null;
   if (!btn) return;
@@ -396,7 +398,7 @@ export function initAudioButton(): void {
 
   const paint = () => {
     btn.textContent = iconForVolume(volLevel);
-    btn.title = 'Volumen (M silencia)';
+    btn.title = 'Volumen (V silencia)';
     slider.value = String(volLevel);
     label.textContent = String(volLevel);
   };
@@ -419,6 +421,7 @@ export function initAudioButton(): void {
 
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
+    if (!touchControlsEnabled()) return;
     initAudio();
     if (popOpen) closePop(); else openPop();
   });
@@ -427,10 +430,11 @@ export function initAudioButton(): void {
     if (popOpen && !pop.contains(e.target as Node) && e.target !== btn) closePop();
   });
 
-  // M: silencia/restaura sin tocar el slider
+  // V: silencia/restaura sin tocar el slider. M queda reservado al mapa.
   let lastNonZero = volLevel > 0 ? volLevel : 7;
   window.addEventListener('keydown', (ev) => {
-    if (ev.code === 'KeyM') {
+    if (ev.code === 'KeyV') {
+      ev.preventDefault();
       if (volLevel > 0) {
         lastNonZero = volLevel;
         setVolume(0);

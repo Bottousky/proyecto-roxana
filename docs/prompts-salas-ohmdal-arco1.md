@@ -22,11 +22,12 @@ Director: **no animamos puertas**; los estados que sí importan (lámpara **ence
 faro on/off, brasero on/off) se generan como **dos imágenes estáticas** y el motor cruza entre
 ellas. El arte interno de los puzzles (aguja, banco, bandas) **no se toca**.
 
-Base de técnica: guías de prompting de GPT-image (OpenAI cookbook · pixverse). Reglas que se
-aplican abajo: (1) encabezar con el **tipo de entregable**; (2) **aspect ratio temprano**;
-(3) cámara y luz explícitas; (4) **exclusiones duras**; (5) para props, fondo transparente con
-“silueta nítida, sin halos ni fringing”; (6) **bloquear paleta, escala y dirección de luz** en
-todo el set para consistencia; iterar con cambios chicos (“misma paleta y grano que la anterior”).
+Contrato de producción: `docs/sistema-arte-ohmdal-v1.md`. Reglas que se aplican abajo:
+(1) encabezar con tipo de entregable y caso de uso; (2) adjuntar una guía de composición
+derivada del runtime; (3) enumerar cada imagen de entrada y su rol; (4) fijar cámara y luz;
+(5) usar exclusiones duras; (6) bloquear paleta, escala, piso caminable y salidas durante las
+iteraciones. Los props opacos simples se piden sobre croma plano y se convierten a alfa
+localmente; no se confía en transparencia perfecta producida por el modelo.
 
 ---
 
@@ -34,7 +35,11 @@ todo el set para consistencia; iterar con cambios chicos (“misma paleta y gran
 
 **[ESTILO] (idéntico en TODO el set — no variar):**
 > Pixel art 16-bit estilo RPG de consola portátil (GBA), grano fino y contorno legible.
-> Vista **cenital 3/4** (top-down ligeramente inclinada), escala de tile 48 px. Luz ambiental
+> Vista **cenital 3/4** (top-down ligeramente inclinada), escala de tile aparente 48 px.
+> El archivo final es 960×540 pero el píxel artístico corresponde a un máster 480×270
+> ampliado 2×. Escala humana final: 64×96 px; la arquitectura debe proporcionarse a esa
+> silueta. Superficies jugables amplias, formas grandes y detalle concentrado en bordes y
+> pieza héroe; evitar ruido y microtextura uniforme. Luz ambiental
 > coherente con el lugar y la hora definidos en la dirección ambiental. La red está apagada
 > y no emite luz (el mundo está “dormido”, sin restaurar). Paleta cálida
 > medieval con acentos de **cobre y turquesa** (la electricidad-magia). Sin texto, sin logos,
@@ -42,22 +47,28 @@ todo el set para consistencia; iterar con cambios chicos (“misma paleta y gran
 
 **[BASE] plantilla de fondo de sala:**
 > Fondo de sala para juego RPG cenital, **relación de aspecto 16:9 (960×540)**. [ESTILO].
-> Contenido: {DESCRIPCIÓN}. Composición: {SALIDAS/BORDES}, dejar zonas de calma (no saturar).
+> Input images: Imagen 1 = guía de composición obligatoria; Imagen 2 = ancla de estilo
+> aprobada; Imagen 3 opcional = referencia ambiental, no referencia de cámara. Contenido:
+> {DESCRIPCIÓN}. Composición: respetar el piso caminable, sólidos, reservas y salidas de la
+> Imagen 1; dejar zonas de calma y una lectura inmediata del recorrido.
 > La **red de cobre** (dos hilos paralelos, ida y retorno) corre por el suelo **apagada**
 > (cobre con pátina) entrando por {BORDE} y saliendo por {BORDE OPUESTO}. **Estado apagado:**
 > lámparas y máquinas sin luz, sin glow ni chispas. No incluir props movibles ni personajes
 > (se montan aparte). Bordes que dan a mar/vacío/otra región **cerrados** con muralla o
-> acantilado; los bordes de salida marcados quedan **abiertos y alineados** para ensamblar con
-> la sala vecina.
+> acantilado; en cada borde de salida hay un arco o umbral legible para la transición. No es
+> necesario coser sus píxeles con la sala vecina.
 
 **[PROP] plantilla de prop aislado:**
-> Sprite de prop de juego, **fondo transparente**, silueta nítida, bordes limpios, **sin halos
-> ni fringing**. [ESTILO]. Objeto: {DESCRIPCIÓN}, ~{ALTO} px de alto, apoyado (base al pie).
-> Una sola pieza centrada, sin sombra proyectada (la sombra la pone el motor). {ESTADOS}.
+> Use case: background-extraction. Asset type: prop opaco de Ohmdal. Crear el objeto sobre
+> fondo croma perfectamente plano `{CROMA}`, sin sombras, gradiente, textura, reflejo ni plano
+> de suelo; no usar `{CROMA}` dentro del objeto. [ESTILO]. Objeto: {DESCRIPCIÓN}, ~{ALTO} px de
+> alto en runtime, apoyado (base al pie). Una sola pieza centrada, con margen generoso y
+> silueta nítida. Sin sombra proyectada, texto ni watermark. {ESTADOS}.
 
-> **Nota de exportación (todos):** generar a 2× y reducir con vecino más cercano; recortar;
-> verificar transparencia; registrar en `data/asset_manifest.json`. Para dos estados, misma
-> cámara/encuadre exactos y **cambiar solo lo indicado**.
+> **Nota de exportación (todos):** generar a 2× y reducir con vecino más cercano; retirar el
+> croma, recortar y dimensionar el sprite final; verificar alfa y esquinas transparentes. No
+> registrar el piloto en `data/asset_manifest.json` antes de aprobación. Para dos estados,
+> derivar el segundo del primero, mantener cámara/encuadre exactos y **cambiar solo lo indicado**.
 
 ---
 
@@ -269,8 +280,8 @@ oxidada — el andar lo pone el motor); **engranaje** ([PROP], ~48 px).
 ## 8. Checklist por sala (antes de dar por lista una imagen)
 
 1. 960×540 (o múltiplo), cenital 3/4, paleta del set, luz apagada. ✅
-2. Bordes de salida abiertos y **alineados** con el vecino (cotejar “Salidas” en la grilla). ✅
+2. Arcos de salida presentes en el borde conceptual correcto (no necesitan coser píxeles). ✅
 3. Bordes sin salida cerrados (muralla/acantilado/agua). ✅
 4. Sin personajes, sin props movibles, sin lámparas encendidas/glow/chispas, sin texto. ✅
 5. Props aislados con fondo transparente, sin halos; estados on/off con encuadre idéntico. ✅
-6. Registrada en `data/asset_manifest.json` y ubicada por `ox,oy` de la grilla. ✅
+6. Validada con `scripts/validate_room_assets.py`; manifest solo después de aprobación. ✅

@@ -1,4 +1,5 @@
 import { state } from '../state';
+import { RESISTOR_DIGIT_COLORS, RESISTOR_METALLIC_BANDS } from '../shared/resistorColorCode.ts';
 
 export interface EntryView {
   id: string;
@@ -8,6 +9,30 @@ export interface EntryView {
   vivencial: string;
   /** capa formal: el "nombre verdadero" de las cosas; null = entrada solo vivencial */
   formal: string | null;
+}
+
+function resistorColorTableHTML(): string {
+  const pairs = RESISTOR_DIGIT_COLORS.slice(0, 5).map((left, index) => {
+    const right = RESISTOR_DIGIT_COLORS[index + 5];
+    const cell = (entry: (typeof RESISTOR_DIGIT_COLORS)[number]) => `
+      <td><span class="resistor-swatch" style="--swatch:${entry.color}" aria-hidden="true"></span>${entry.label}</td>
+      <td><strong>${entry.digit}</strong></td>`;
+    return `<tr>${cell(left)}${cell(right)}</tr>`;
+  });
+  const metals = RESISTOR_METALLIC_BANDS.map(
+    (entry) => `<span class="resistor-metal" style="--swatch:${entry.color}">
+      <i aria-hidden="true"></i><strong>${entry.label}</strong>: ${entry.multiplier} · ${entry.tolerance}
+    </span>`,
+  ).join('');
+
+  return `
+    <table class="resistor-code-table">
+      <tr><th>Color</th><th>Cifra</th><th>Color</th><th>Cifra</th></tr>
+      ${pairs.join('')}
+    </table>
+    <div class="resistor-metal-row">${metals}</div>
+    <p class="resistor-code-note">Oro y plata no representan cifras: se usan como multiplicador
+    o tolerancia. Por eso no son Piedras de Freno numeradas.</p>`;
 }
 
 /**
@@ -87,12 +112,7 @@ export function getEntries(): EntryView[] {
              <p>La piedra es una <strong>resistencia (R)</strong>. Y el código de colores
              de los Maestros existe de verdad fuera de Ohmdal: las resistencias reales se
              marcan con bandas de color. El código completo va del 0 al 9:</p>
-             <table><tr><th>Color</th><th>Cifra</th><th>Color</th><th>Cifra</th></tr>
-             <tr><td>Negro</td><td>0</td><td>Verde</td><td>5</td></tr>
-             <tr><td>Marrón</td><td>1</td><td>Azul</td><td>6</td></tr>
-             <tr><td>Rojo</td><td>2</td><td>Violeta</td><td>7</td></tr>
-             <tr><td>Naranja</td><td>3</td><td>Gris</td><td>8</td></tr>
-             <tr><td>Amarillo</td><td>4</td><td>Blanco</td><td>9</td></tr></table>
+             ${resistorColorTableHTML()}
              <p>Por eso la marrón (1) frenaba poco y la gris (8) frenaba mucho.</p>`
           : `<p class="blank">¿Por qué justo esos colores? ¿Qué cifra esconde cada uno?
              Falta una pieza.</p>`}

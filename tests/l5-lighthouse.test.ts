@@ -54,11 +54,11 @@ for (const [tank, chargeBrake] of [
   );
 }
 
-equal(isBriefDischarge(1), true, 'la piedra marrón permite un volcado breve');
-equal(isBriefDischarge(2), true, 'la piedra roja permite un volcado breve');
-equal(isBriefDischarge(4), false, 'la piedra amarilla frena demasiado el volcado');
-equal(isBriefDischarge(8), false, 'la piedra gris frena demasiado el volcado');
-equal(isLighthouseSolution(2, 4, 4), false, 'ritmo 8 con freno de descarga grande no valida');
+equal(isBriefDischarge(4, 1), true, 'estanque grande con marrón vuelca breve');
+equal(isBriefDischarge(4, 2), true, 'estanque grande con roja queda en el límite breve');
+equal(isBriefDischarge(4, 4), false, 'estanque grande con amarilla se arrastra');
+equal(isBriefDischarge(1, 8), true, 'un estanque chico descarga más rápido aun con freno grande');
+equal(isLighthouseSolution(2, 4, 8), false, 'ritmo 8 con freno de descarga grande no valida');
 
 equal(lighthouseTiming(1, 4), 'fast', 'ritmo menor que 8 se detecta rápido');
 equal(lighthouseTiming(4, 4), 'slow', 'ritmo mayor que 8 se detecta lento');
@@ -72,7 +72,7 @@ state = advanceLighthouse(state, lighthouseChargePeriodMs(2, 4) / 2);
 equal(state.level, 100, 'el umbral inicia el volcado desde lleno');
 equal(state.phase, 'dumping', 'al alcanzar el umbral cambia al camino de volcado');
 equal(state.flashCount, 1, 'cada umbral produce un destello de la lente');
-state = advanceLighthouse(state, lighthouseDischargePeriodMs(1));
+state = advanceLighthouse(state, lighthouseDischargePeriodMs(2, 1));
 equal(state.level, 0, 'el volcado vacía el Estanque');
 equal(state.phase, 'charging', 'después del volcado vuelve a cargar');
 
@@ -104,6 +104,8 @@ equal(
 equal(roomsSource.includes('// TODO(L5)'), false, 'L5 reemplaza el placeholder de la linterna');
 equal(puzzleSource.includes('createSimTick('), true, 'L5 usa el tick compartido');
 equal(puzzleSource.includes('bench.onClose(tick.stop)'), true, 'L5 cancela el tick al cerrar');
+equal(puzzleSource.includes('Probar un latido'), true, 'L5 exige una prueba explícita');
+equal(puzzleSource.includes('data-prediction'), true, 'L5 registra predicción antes de observar');
 
 for (const text of [
   'El lago entero parpadea con la lente.',

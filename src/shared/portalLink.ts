@@ -2,6 +2,11 @@ export function portalGateUrl(): string {
   return '/src/jugar/?from=portal&room=plaza';
 }
 
+/** El regreso abandona el runtime de Ohmdal y abre el aula real del Instituto. */
+export function portalExitUrl(): string {
+  return '/#aula/electronica';
+}
+
 export function esLlegadaPorPortal(search: string): boolean {
   return new URLSearchParams(search).get('from') === 'portal';
 }

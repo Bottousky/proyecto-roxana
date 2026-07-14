@@ -15,7 +15,9 @@ const sceneSource = readFileSync(new URL('../src/jugar/ExplorationScene.ts', imp
 const audioSource = readFileSync(new URL('../src/audio.ts', import.meta.url), 'utf8');
 
 includes(roomsSource, 'visible?: () => boolean;', 'las puertas admiten visibilidad por flags');
-includes(sceneSource, 'if (d.visible && !d.visible()) continue;', 'la escena no dibuja puertas invisibles');
+includes(sceneSource, 'const hidden = !!(d.visible && !d.visible());', 'la escena evalúa visibilidad de puertas');
+includes(sceneSource, 'if (hidden) continue;', 'la escena no dibuja puertas invisibles');
+includes(sceneSource, 'if (hidden || d.locked?.()) this.solids.push', 'puerta trabada u oculta sella el vano con barrera física');
 
 includes(roomsSource, "label: 'Camino a la Forja'", 'la plaza tiene el Camino a la Forja');
 includes(roomsSource, "to: 'forge_yard'", 'el camino conduce al patio');

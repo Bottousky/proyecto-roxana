@@ -9,11 +9,24 @@ import { createRuntimeHost } from './app/runtimeHost.ts';
 import { runtimeLoaders } from './experiences/loaders.ts';
 import type { ExperienceId } from './experiences/types.ts';
 import { esLlegadaPorPortal, salaLlegadaPortal } from './shared/portalLink.ts';
+import { initOhmCompanion, syncOhmCompanionButton } from './ui/ohmCompanion.ts';
+
+function dismissBootCurtain(): void {
+  const curtain = document.getElementById('boot-curtain');
+  if (!curtain || curtain.classList.contains('is-gone')) return;
+  curtain.classList.add('is-gone');
+  window.setTimeout(() => curtain.remove(), 500);
+}
+
+// En una llegada desde el aula el curtain permanece hasta que Phaser ya pintó
+// la Plaza: evita exponer el HTML sin estilos entre los dos documentos.
+window.addEventListener('roxana:game-ready', dismissBootCurtain, { once: true });
 
 function startGame(): void {
   initAudio(); // el click de "Empezar"/"Continuar" es el gesto que habilita el sonido
   el('title-screen').classList.add('hidden');
   if (state.flags.hasBitacora) showBitacoraButton();
+  syncOhmCompanionButton();
 
   // El host monta el runtime de la experiencia activa; main.ts ya no conoce Phaser.
   const host = createRuntimeHost(el('game'), runtimeLoaders);
@@ -29,6 +42,7 @@ function startGame(): void {
 initDialog();
 initBitacora();
 initAudioButton();
+initOhmCompanion();
 
 const btnContinue = el<HTMLButtonElement>('btn-continue');
 const btnNew = el<HTMLButtonElement>('btn-new');
@@ -54,27 +68,14 @@ function enterFromPortal(): void {
   startGame();
 }
 
-function showPortalArrivalOverlay(): void {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position:fixed; inset:0; z-index:200; background:#dfe9ff; opacity:1;
-    pointer-events:none; transition:opacity 0.6s ease-out;
-  `;
-  document.body.appendChild(overlay);
-  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
-  requestAnimationFrame(() => {
-    overlay.style.transitionDuration = reduced ? '0.05s' : '0.6s';
-    overlay.style.opacity = '0';
-  });
-  window.setTimeout(() => overlay.remove(), reduced ? 80 : 650);
-}
-
 if (arrivedByPortal) {
-  showPortalArrivalOverlay();
   enterFromPortal();
 } else if (hasSave()) {
+  dismissBootCurtain();
   btnContinue.classList.remove('hidden');
   btnContinue.addEventListener('click', continueGame);
+} else {
+  dismissBootCurtain();
 }
 
 btnNew.addEventListener('click', newGame);

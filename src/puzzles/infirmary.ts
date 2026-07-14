@@ -55,6 +55,8 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
       let state = createInfirmaryState();
       let solvedHandled = false;
       let demoHandled = false;
+      let openingPrediction: InfirmaryMachineId | 'all' | null = null;
+      let predictionOpen = false;
       const refs = new Map<InfirmaryMachineId, MachineRefs>();
 
       const pendingTimers = new Set<number>();
@@ -76,6 +78,10 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
           <span>al arrancar: pico = río + 1</span>
         </div>`;
       bench.root.appendChild(stage);
+
+      const predict = document.createElement('div');
+      predict.className = 'bench-predict hidden';
+      bench.root.appendChild(predict);
 
       const machinesHost = stage.querySelector<HTMLElement>('.infirmary-machines')!;
       for (const id of MACHINE_IDS) {
@@ -138,7 +144,7 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
         {
           label: 'Arrancar la Forja',
           primary: true,
-          onClick: start,
+          onClick: requestStart,
         },
         {
           label: 'Continuar',
@@ -151,13 +157,54 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
       actions['Continuar'].classList.add('hidden');
 
       function chooseFuse(machineId: InfirmaryMachineId, rating: FuseRating): void {
-        if (state.channelCut || state.solved) return;
+        if (state.channelCut || state.solved || predictionOpen) return;
         sfxBridge();
         state = setMachineFuse(state, machineId, rating);
         render();
         bench.setStatus(
           `<b>Máquina ${machineId}:</b> fusible ${rating} engastado. La aguja espera el pico.`,
         );
+      }
+
+      function requestStart(): void {
+        if (state.channelCut || state.solved || predictionOpen) return;
+        const configured = MACHINE_IDS.filter((id) => state.fuses[id] !== null);
+        if (!openingPrediction && configured.length === MACHINE_IDS.length) {
+          showOpeningPrediction(configured);
+          return;
+        }
+        start();
+      }
+
+      function showOpeningPrediction(configured: InfirmaryMachineId[]): void {
+        predictionOpen = true;
+        predict.classList.remove('hidden');
+        predict.innerHTML =
+          '<p class="bench-predict-q"><b>Edda:</b> «Antes de arrancar: ¿cuál fusible no sobrevivirá al pico?»</p>';
+        const row = document.createElement('div');
+        row.className = 'bench-predict-row';
+        const options: Array<[InfirmaryMachineId | 'all', string]> = configured.map((id) => [
+          id,
+          `Máquina ${id} · fusible ${state.fuses[id]}`,
+        ]);
+        options.push(['all', 'Aguantan todos']);
+        for (const [key, label] of options) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'bench-predict-btn';
+          button.textContent = label;
+          button.addEventListener('click', () => {
+            if (openingPrediction) return;
+            openingPrediction = key;
+            predictionOpen = false;
+            predict.classList.add('hidden');
+            predict.innerHTML = '';
+            start();
+          });
+          row.appendChild(button);
+        }
+        predict.appendChild(row);
+        render();
       }
 
       function start(): void {
@@ -213,6 +260,10 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
       function resetPractice(): void {
         state = createInfirmaryState();
         demoHandled = false;
+        openingPrediction = null;
+        predictionOpen = false;
+        predict.classList.add('hidden');
+        predict.innerHTML = '';
         stage.classList.remove('channel-cut');
         actions['Yesca repara el canal'].classList.add('hidden');
         actions['Reiniciar práctica'].classList.add('hidden');
@@ -253,11 +304,12 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
           machineRefs.card.classList.toggle('stable', state.solved);
           machineRefs.fuseButtons.forEach((button) => {
             button.classList.toggle('selected', Number(button.dataset.rating) === selected);
-            button.disabled = state.channelCut || state.solved;
+            button.disabled = state.channelCut || state.solved || predictionOpen;
           });
         }
 
-        actions['Arrancar la Forja'].disabled = state.channelCut || state.solved;
+        actions['Arrancar la Forja'].disabled =
+          state.channelCut || state.solved || predictionOpen;
       }
 
       bench.setStatus(

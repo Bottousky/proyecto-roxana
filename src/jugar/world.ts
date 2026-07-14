@@ -18,6 +18,9 @@ export const WORLDS: WorldLayout[] = [
     rooms: {
       // Ciudad y manantial.
       plaza: { ox: 0, oy: 0 },
+      // El Taller es interior en runtime, pero pertenece al esquema global y
+      // se muestra como ala este de la Plaza en el mapa.
+      taller: { ox: 960, oy: 0 },
       puerta: { ox: 0, oy: -540 },
       manantial_ohm: { ox: 0, oy: -1080 },
 
@@ -27,11 +30,12 @@ export const WORLDS: WorldLayout[] = [
       castle_branches: { ox: -960, oy: -1080 },
       castle_heart: { ox: -960, oy: -1620 },
 
-      // Forja: distrito industrial al este, recorrido horizontal.
-      forge_yard: { ox: 960, oy: 0 },
-      forge_infirmary: { ox: 1920, oy: 0 },
-      forge_longchannel: { ox: 2880, oy: 0 },
-      forge_hall: { ox: 3840, oy: 0 },
+      // Forja: distrito industrial al oeste y una cota por debajo de la plaza.
+      // Coincide con el mapa-isla y deja libre el este para el Arco II.
+      forge_yard: { ox: -960, oy: 540 },
+      forge_infirmary: { ox: -1920, oy: 540 },
+      forge_longchannel: { ox: -2880, oy: 540 },
+      forge_hall: { ox: -3840, oy: 540 },
 
       // Terrazas: el valle desciende al sur.
       terraces_top: { ox: 0, oy: 540 },

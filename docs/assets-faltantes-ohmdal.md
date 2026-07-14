@@ -126,19 +126,26 @@ reducir a la medida indicada con vecino más cercano (mismo pipeline que el hér
 
 ---
 
+## Deuda cerrada: personajes secundarios
+
+Guardiana, Farero, Preceptor, Ciudadano adulto y Niño ya tienen cuatro direcciones de
+producción en `assets/ohmdal/characters/npc-secondary-atlas-64.png` y están integrados en el
+runtime desde 2026-07-12. Ya no dependen del rig procedural y no forman parte de este
+inventario de faltantes.
+
 ## Registro
 
 | # | Pieza | Generada | Integrada | Placeholder activo |
 |---|---|---|---|---|
-| 1 | Red de cobre off/on | ☐ | ☐ | rasgos de suelo procedurales |
-| 2 | Puerta de Ohm | ☐ | ☐ | prop procedural actual |
-| 3 | Pedestal de Ohm | ☐ | ☐ | prop procedural actual |
-| 4 | Campana | ☐ | ☐ | prop procedural actual |
-| 5 | Portal Instituto | ☐ | ☐ | prop procedural actual |
-| 6 | Fachada Taller | ☐ | ☐ | prop procedural actual |
-| 7 | Nave Forja | ☐ | ☐ | prop procedural actual |
-| 8 | Faro | ☐ | ☐ | prop procedural actual |
-| 9 | Torre Reloj | ☐ | ☐ | prop procedural actual |
-| 10 | Muelle y barca | ☐ | ☐ | no existe aún en escena |
-| 11 | Acueducto | ☐ | ☐ | rasgos de suelo procedurales |
-| 12 | Sellos Arco II | ☐ | ☐ | no existe aún (M7) |
+| 1 | Red de cobre off/on | ☑ | ☑ | No: red apagada horneada por sala + overlay de Phaser |
+| 2 | Puerta de Ohm | ☑ | ☑ | No: variantes cerrada/abierta |
+| 3 | Pedestal de Ohm | ☑ | ☑ | No: sprite raster de producción |
+| 4 | Campana | ☑ | ☑ | No: integrada en Plaza |
+| 5 | Portal Instituto | ☑ | ☑ | No: plataforma y portal integrados |
+| 6 | Fachada Taller | ☑ | ☑ | No: integrada en Plaza y Taller |
+| 7 | Nave Forja | ☑ | ☑ | No: sala pintada + hogar encendido por estado |
+| 8 | Faro | ☑ | ☑ | No: sala pintada + lente/haz por estado |
+| 9 | Torre Reloj | ☑ | ☑ | No: sala pintada + pulso por estado |
+| 10 | Muelle y barca | ☑ | ☑ | No: aparecen con el ferry restaurado |
+| 11 | Acueducto | ☑ | ☑ | No: cuatro salas pintadas + agua animada |
+| 12 | Sellos Arco II | ☐ | ☐ | Fuera del alcance del Arco I; reservado para M7 |

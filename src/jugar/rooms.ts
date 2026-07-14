@@ -27,8 +27,12 @@ import { abrirSleepingRiver } from '../puzzles/sleepingriver';
 import { abrirClock } from '../puzzles/clock';
 import { abrirLighthouse } from '../puzzles/lighthouse';
 import { showEnd } from '../ui/end';
+import { showArcPanorama } from '../ui/arcPanorama';
+import { confirmExitOhmdal } from '../ui/confirmExitOhmdal';
 import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
+import { syncOhmCompanionButton } from '../ui/ohmCompanion.ts';
+import { portalExitUrl } from '../shared/portalLink.ts';
 
 export interface ThingDef {
   id: string;
@@ -51,6 +55,10 @@ export interface ThingDef {
   spriteScale?: number;
   /** el prop ya está pintado en el fondo de sala: no se dibuja cuerpo (sí interactúa/ilumina) */
   baked?: boolean;
+  /** decorado/obstáculo sin hotspot ni prompt */
+  interactive?: boolean;
+  /** encaja el lienzo transparente del sprite en w×h */
+  spriteFit?: 'bounds';
   onInteract: () => void;
 }
 
@@ -64,8 +72,8 @@ export interface DoorDef {
   label: string;
   color?: number;
   visible?: () => boolean;
-  /** si devuelve líneas, la puerta está trabada y se muestran */
-  locked?: () => Line[] | null;
+  /** Si devuelve líneas, la puerta está trabada y se muestran. `true` la traba en silencio. */
+  locked?: () => Line[] | true | null;
 }
 
 export interface RoomDef {
@@ -106,11 +114,15 @@ function pickupBitacora(): void {
 function despertarOhm(): void {
   abrirDespertar(() => {
     setFlag('ohmAwake');
+    syncOhmCompanionButton();
     say(
       [
         L('Edda', '¡¿Lo DESPERTASTE?! ¿Qué ritual usaste? ¿El de los tres golpes? ¿El del incienso doble?'),
         L('', '—Ningún ritual. Solo… completé el camino.'),
         L('Edda', '«Completé el camino», dice, tan tranquilo. No se lo cuentes a Lumen de golpe, que le da un soponcio.'),
+        L('Edda', 'Ohm, vienes con nosotros. Nada de volver a dormir apenas me doy vuelta.'),
+        L('Ohm', 'Compañía aceptada. Orientación disponible cuando sea requerida.'),
+        L('', 'Ohm se acomoda en el comunicador de tu Bitácora. Desde ahora puedes consultarlo con O o desde su retrato en el HUD.'),
         L('Edda', 'El taller de Lumen está al este. Si Ohm despertó, va a querer conocerte. O exorcizarte. Cincuenta y cincuenta.'),
       ],
       () => {
@@ -142,6 +154,9 @@ function resolverFreno(): void {
 function resolverPuerta(): void {
   abrirPuerta(() => {
     setFlag('puertaDone');
+    // La sala debe contar el resultado antes que los personajes: al aparecer
+    // el diálogo de victoria, las hojas ya están visualmente abiertas.
+    hooks.refresh();
     say(
       [
         L('', 'Las hojas se apartan. Del otro lado no hay una sala: una calzada de cobre sube hacia el manantial y el río de chispa corre por ella hasta la plaza.'),
@@ -152,7 +167,6 @@ function resolverPuerta(): void {
       () => {
         notifyNewEntry('La Ley de Ohm');
         openBitacora('ley-de-ohm');
-        hooks.refresh();
       },
     );
   });
@@ -160,30 +174,21 @@ function resolverPuerta(): void {
 
 function tocarCampana(): void {
   sfxBell();
+  // El mundo cambia antes del diálogo: la plaza se ilumina mientras la nota
+  // todavía está sonando, igual que la Puerta al resolverse.
+  setFlag('finished');
+  hooks.refresh();
   say(
     [
       L('', 'Tiras de la cuerda. La campana de Ohmdal suena por primera vez en décadas: una nota limpia que recorre la plaza encendida.'),
       L('Maese Lumen', 'Los Maestros la tocaban al final de cada lección. Decían que el sonido «cerraba el circuito del día». Hasta hoy no le había encontrado la gracia.'),
       L('Edda', 'Oye. Mira. De la campana bajan DOS cables. Dos caminos. ¿Para qué querría alguien dos caminos para un mismo río?'),
-      L('', '(Eso, Edda, es otra lección.)'),
+      L('Ohm', 'La nota cruzó el portal. Respuesta detectada en el Instituto.'),
+      L('', 'Desde el otro lado llega un sonido pequeño y conocido: el proyector acaba de encenderse. *clac*'),
     ],
-    () => {
-      setFlag('finished');
-      const entradas = getEntries().length;
-      const humo = state.flags.burnedSomething
-        ? 'Cosas quemadas: sí. (Así se aprende.)'
-        : 'Cosas quemadas: ninguna. (¿En serio nunca probaste qué pasaba?)';
-      showEnd({
-        title: 'Fin del vertical slice — Unidad 1: «La corriente no es magia»',
-        note: `
-          Entradas en la Bitácora: ${entradas} · ${humo}<br/><br/>
-          La campana sonó. La plaza tiene luz. Y de la campana bajan dos cables…<br/>
-          <em>Unidad 2: circuitos con más de un camino.</em>
-        `,
-        continueLabel: 'Regresar al Instituto',
-        onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
-      });
-    },
+    // El Instituto ya no se representa dentro de Phaser. La continuación
+    // vuelve al aula gráfica de la web, que reproduce allí la introducción U2.
+    () => { window.location.href = portalExitUrl(); },
   );
 }
 
@@ -285,6 +290,10 @@ function presentarFarero(): void {
 }
 
 function abrirBancoStoredSpark(): void {
+  if (!f().metFarero) {
+    say(L('', 'La máquina está cuidada, pero no sabés qué espera de vos. El Farero conoce su pulso.'));
+    return;
+  }
   abrirStoredSpark({
     practica: f().solvedStoredSpark,
     onAnomalyNoted: () => setFlag('consejeraNotedAnomaly'),
@@ -344,38 +353,48 @@ function hablarFareroLinterna(): void {
 }
 
 function cerrarArcoUno(): void {
-  if (!f().learnedCapacitor || f().arcOneCompleted) return;
+  const fl = f();
+  if (
+    fl.arcOneCompleted ||
+    !fl.finished ||
+    !fl.unit2Completed ||
+    !fl.unit3Completed ||
+    !fl.unit4Completed ||
+    !fl.lighthouseRestored ||
+    !fl.learnedCapacitor
+  ) return;
   setAmbience('ohmdal-on');
-  say(
-    [
-      L('', 'La cámara se aleja. Ohmdal entero aparece encendido bajo la noche.'),
-      L('', 'En la plaza, la campana responde a la Ley de Ohm: empuje y freno en la medida justa.'),
-      L('', 'El Castillo sostiene sus tres distritos con la Regla del Cruce: el río no se gasta, se reparte.'),
-      L('', 'La Forja trabaja en ritmo con la Entrega: empuje por río, trabajo que llega y peaje que se paga.'),
-      L('', 'Las Terrazas brillan regadas por la Regla de la Vuelta: todo lo que sube, baja.'),
-      L('', 'El Reloj marca y el Faro late por la Chispa que se queda: lo guardado espera y vuelve.'),
-      L('Edda', 'Cinco lugares. Cinco lecciones. Y la chispa que «se estaba acabando» encendió todo, sin gastarse.'),
-      L('Edda', '…Quiero estar del otro lado, alguna vez. Quiero que alguien me lo pregunte a MÍ. Con las manos, como hiciste vos.'),
-      L('Maese Lumen', 'Yo cuidé esto cuarenta años sin entenderlo. Ustedes lo entendieron en cinco lunas.'),
-      L('Maese Lumen', '…Gracias por no decírmelo en voz alta. Mis mártires van al museo de la Forja. Que aprendan los jóvenes lo que era el miedo.'),
-      L('Consejera', 'Inventario final del Consejo: la chispa no disminuyó en cuarenta años. La estábamos guardando para nadie. Caso cerrado.'),
-      L('Ohm', 'Registro: red de Ohmdal completa. Estado: viva en el tiempo. Promesa de la primera lección: cumplida.'),
-      L('', 'En lo alto del Faro, el Farero muestra un ojo de cristal. Cuando la luz lo toca, mueve una aguja sin que nadie lo haya conectado a nada.'),
-      L('Edda', '¿Y a ESE quién lo empuja? Un rayo de luz… ¿empujando un río?'),
-      L('Farero', 'Eso, jóvenes, es de otra noche. La materia que decide. Yo ya tengo bastante con mi latido.'),
-    ],
-    () => {
-      if (!wasBitacoraEntryOpened('el-arco-del-rio')) {
-        notifyNewEntry('El Arco del Río');
-      }
-      setFlag('arcOneCompleted');
-      setFlag('sawCrystalEye');
-      setFlag('unit5Completed');
-      const entradas = getEntries().length;
-      showEnd({
-        title: 'Fin del Arco I — «El Río» · Ohmdal, cinco unidades',
-        variant: 'arc',
-        note: `
+  showArcPanorama(() => {
+    say(
+      [
+        L('', 'La cámara se aleja. Ohmdal entero aparece encendido bajo la noche.'),
+        L('', 'En la plaza, la campana responde a la Ley de Ohm: empuje y freno en la medida justa.'),
+        L('', 'El Castillo sostiene sus tres distritos con la Regla del Cruce: el río no se gasta, se reparte.'),
+        L('', 'La Forja trabaja en ritmo con la Entrega: empuje por río, trabajo que llega y peaje que se paga.'),
+        L('', 'Las Terrazas brillan regadas por la Regla de la Vuelta: todo lo que sube, baja.'),
+        L('', 'El Reloj marca y el Faro late por la Chispa que se queda: lo guardado espera y vuelve.'),
+        L('Edda', 'Cinco lugares. Cinco lecciones. Y la chispa que «se estaba acabando» encendió todo, sin gastarse.'),
+        L('Edda', '…Quiero estar del otro lado, alguna vez. Quiero que alguien me lo pregunte a MÍ. Con las manos, como hiciste vos.'),
+        L('Maese Lumen', 'Yo cuidé esto cuarenta años sin entenderlo. Ustedes lo entendieron en cinco lunas.'),
+        L('Maese Lumen', '…Gracias por no decírmelo en voz alta. Mis mártires van al museo de la Forja. Que aprendan los jóvenes lo que era el miedo.'),
+        L('Consejera', 'Inventario final del Consejo: la chispa no disminuyó en cuarenta años. La estábamos guardando para nadie. Caso cerrado.'),
+        L('Ohm', 'Registro: red de Ohmdal completa. Estado: viva en el tiempo. Promesa de la primera lección: cumplida.'),
+        L('', 'En lo alto del Faro, el Farero muestra un ojo de cristal. Cuando la luz lo toca, mueve una aguja sin que nadie lo haya conectado a nada.'),
+        L('Edda', '¿Y a ESE quién lo empuja? Un rayo de luz… ¿empujando un río?'),
+        L('Farero', 'Eso, jóvenes, es de otra noche. La materia que decide. Yo ya tengo bastante con mi latido.'),
+      ],
+      () => {
+        if (!wasBitacoraEntryOpened('el-arco-del-rio')) {
+          notifyNewEntry('El Arco del Río');
+        }
+        setFlag('arcOneCompleted');
+        setFlag('sawCrystalEye');
+        setFlag('unit5Completed');
+        const entradas = getEntries().length;
+        showEnd({
+          title: 'Fin del Arco I — «El Río» · Ohmdal, cinco unidades',
+          variant: 'arc',
+          note: `
           Entradas en la Bitácora: ${entradas}<br/><br/>
           <strong>Unidad 1 · La plaza:</strong> la Ley de Ohm encendió la campana.<br/>
           <strong>Unidad 2 · El Castillo:</strong> la Regla del Cruce sostuvo sus tres distritos.<br/>
@@ -383,12 +402,13 @@ function cerrarArcoUno(): void {
           <strong>Unidad 4 · Las Terrazas:</strong> la Regla de la Vuelta regó el valle.<br/>
           <strong>Unidad 5 · El Reloj y el Faro:</strong> la Chispa que se queda les devolvió el tiempo.<br/><br/>
           <em>Semilla de otra historia: un ojo de cristal que responde a la luz.</em>
-        `,
-        continueLabel: 'Continuar',
-        onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
-      });
-    },
-  );
+          `,
+          continueLabel: 'Continuar',
+          onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+        });
+      },
+    );
+  });
 }
 
 function abrirCampanaUnidad2(): void {
@@ -528,6 +548,7 @@ function cortarTroncoParaActa(): void {
       setFlag('sawStoredSpark');
       notifyNewEntry('Anomalía: la chispa que se queda');
       hooks.refresh();
+      checkUnit2Complete();
     },
   );
 }
@@ -601,6 +622,10 @@ function hablarForjadoraPatio(): void {
 }
 
 function abrirBancoWarmth(): void {
+  if (!f().metForjadora) {
+    say(L('', 'El canal está tibio, pero todavía falta entender qué problema está intentando mostrar Yesca.'));
+    return;
+  }
   abrirWarmth(
     () => {
       setFlag('solvedWarmChannel');
@@ -768,6 +793,10 @@ function hablarGuardianaCanalAlto(): void {
 }
 
 function abrirBancoEscalones(): void {
+  if (!f().metGuardiana) {
+    say(L('', 'Las compuertas forman una sola red. Antes de tocarlas, conviene escuchar a quien lleva treinta años cuidándolas.'));
+    return;
+  }
   abrirSteps(
     () => {
       setFlag('solvedVoltageSteps');
@@ -1124,17 +1153,15 @@ export const ROOMS: Record<string, RoomDef> = {
       { x: 0, y: 58, w: 42, h: 92 }, { x: 0, y: 335, w: 42, h: 151 },
       // edificio del taller al este (vano de la puerta y225–330)
       { x: 812, y: 58, w: 148, h: 167 }, { x: 812, y: 330, w: 148, h: 156 },
-      // pozo/fuente central
-      { x: 412, y: 214, w: 136, h: 96 },
+      // Campana monumental central. El portal suroeste ahora es una plataforma
+      // circular al ras del piso y no bloquea la navegación.
+      { x: 424, y: 112, w: 112, h: 188 },
+      { x: 390, y: 178, w: 27, h: 118 },
+      { x: 543, y: 178, w: 27, h: 118 },
     ],
     doors: [
       {
-        x: 145, y: 514, w: 120, h: 26,
-        to: 'aula', spawn: { x: 740, y: 420 },
-        label: 'Portal de regreso', color: 0x2e8b8b,
-      },
-      {
-        x: 812, y: 235, w: 92, h: 95,
+        x: 844, y: 246, w: 60, h: 72,
         to: 'taller', spawn: { x: 95, y: 300 },
         label: 'Taller de Lumen',
         locked: () =>
@@ -1161,7 +1188,7 @@ export const ROOMS: Record<string, RoomDef> = {
         // Zona alta del borde izquierdo (hasta cerca del tope): el label apunta
         // arriba-izquierda; sin esto quedaba una franja muerta de pared encima de
         // la puerta donde el jugador se atascaba sin cruzar ni ver el cordón.
-        x: 0, y: 150, w: 42, h: 185,
+        x: 38, y: 190, w: 72, h: 120,
         to: 'castle_gate', spawn: { x: 860, y: 270 },
         label: 'Camino al Castillo',
         color: 0x65536f,
@@ -1180,14 +1207,14 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        x: 0, y: 370, w: 26, h: 100,
+        x: 0, y: 388, w: 34, h: 68,
         to: 'forge_yard', spawn: { x: 825, y: 410 },
         label: 'Camino a la Forja',
         color: 0x7a5438,
         visible: () => f().unit2Completed,
       },
       {
-        x: 420, y: 514, w: 120, h: 26,
+        x: 452, y: 504, w: 56, h: 30,
         to: 'terraces_top', spawn: { x: 480, y: 105 },
         label: 'Camino a las Terrazas',
         color: 0x58755f,
@@ -1196,7 +1223,12 @@ export const ROOMS: Record<string, RoomDef> = {
     ],
     things: [
       {
-        id: 'pedestal', x: 480, y: 258, w: 56, h: 56, shape: 'circle',
+        id: 'portal-aula', x: 180, y: 382, w: 96, h: 54,
+        label: 'Portal al Instituto', prompt: 'Salir de Ohmdal', color: 0x45c7bd, solid: false,
+        onInteract: confirmExitOhmdal,
+      },
+      {
+        id: 'pedestal', x: 480, y: 342, w: 56, h: 56, shape: 'circle',
         label: 'Ohm', prompt: 'Acercarse al pedestal', solid: true, emoji: '⚡',
         color: () => (f().ohmAwake ? 0xc9a437 : 0x4a4a4f),
         onInteract: () => {
@@ -1240,13 +1272,13 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        id: 'edda-campana', x: 710, y: 115, w: 34, h: 34, shape: 'circle',
+        id: 'edda-campana', x: 620, y: 340, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
-        visible: () => f().playedUnit2Intro && !f().solvedBellPaths,
+        visible: () => f().puertaDone && f().playedUnit2Intro && !f().solvedBellPaths,
         onInteract: abrirCampanaUnidad2,
       },
       {
-        id: 'lumen-plaza', x: 700, y: 200, w: 38, h: 38, shape: 'circle',
+        id: 'lumen-plaza', x: 660, y: 300, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         visible: () => f().puertaDone && !(f().castleRestored && !f().heardForgeWarmth),
         walksTo: 'puerta',
@@ -1266,13 +1298,13 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'lampara1', x: 290, y: 356, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
         baked: true,
-        color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
+        color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
         onInteract: () =>
           say(
             L('', f().puertaDone
               ? 'La lámpara arde con luz tibia y constante. Cuesta creer que estuvo muerta.'
               : f().ohmAwake
-                ? 'La lámpara parpadea, tímida, desde que Ohm despertó. Como si recordara cómo se hacía.'
+                ? 'Ohm despertó, pero este farol sigue frío. Su pequeño brillo no alimenta la ciudad.'
                 : 'Una lámpara de la plaza. Fría, muda, apagada hace años.'),
           ),
       },
@@ -1280,14 +1312,14 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'lampara2', x: 672, y: 344, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
         baked: true,
-        color: () => (f().puertaDone ? 0xffd34d : f().ohmAwake ? 0x6e6448 : 0x3a3744),
+        color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
         onInteract: () =>
           say(L('', f().puertaDone ? 'Luz firme. La plaza tiene sombras de nuevo — de las buenas.' : 'Otra lámpara muerta. O dormida. Empieza a parecer que hay una diferencia.')),
       },
       {
-        id: 'campana', x: 690, y: 150, w: 54, h: 66,
-        label: 'Campana', prompt: 'La campana de Ohmdal', solid: true, emoji: '🔔',
-        sprite: 'prop_bell', spriteScale: 1.4,
+        id: 'campana', x: 480, y: 225, w: 170, h: 180,
+        label: 'Campana', prompt: 'La campana de Ohmdal', solid: false, emoji: '🔔',
+        baked: true,
         color: () => (f().puertaDone ? 0xb08d2a : 0x4f4a42),
         onInteract: () => {
           const fl = f();
@@ -1299,15 +1331,24 @@ export const ROOMS: Record<string, RoomDef> = {
               L('', 'La campana todavía vibra, contenta. Los dos cables siguen ahí, esperando su lección.'),
               L('', 'La nota corre por el cobre hacia el portal. Desde el otro lado llega una respuesta apagada: *clac*.'),
             ]);
-          } else if (fl.puertaDone) tocarCampana();
-          else say(L('', 'La campana de Ohmdal cuelga muda sobre la plaza apagada. La cuerda está al alcance, pero algo dice que todavía no.'));
+          } else if (fl.puertaDone) {
+            // el cierre de U1 exige haber subido a ver qué regulaba la Puerta
+            if (!fl.salasVisitadas.includes('manantial_ohm')) {
+              say([
+                L('Maese Lumen', '¿Tocar la campana ya? La Puerta no se abrió para mirarla desde abajo. Sube por la calzada: el manantial está ahí arriba, corriendo por primera vez en cuarenta años.'),
+                L('Edda', 'Sí, arriba. Yo quiero ver el famoso río antes de que nadie toque nada.'),
+              ]);
+            } else tocarCampana();
+          } else say(L('', 'La campana de Ohmdal cuelga muda sobre la plaza apagada. La cuerda está al alcance, pero algo dice que todavía no.'));
         },
       },
       /* M8: Castillo encendido visible al norte */
       {
         id: 'castillo-encendido', x: 130, y: 100, w: 120, h: 80,
         label: 'El Castillo encendido', prompt: 'Mirar el Castillo',
-        color: 0xd4a035, solid: false, emoji: '🏰',
+        // Es un punto de mirada, no un bloque de utilería: la Plaza no tiene
+        // espacio para sumar otra silueta gigante sobre el acceso oeste.
+        baked: true, color: 0xd4a035, solid: false, emoji: '🏰',
         visible: () => f().castleRestored,
         onInteract: () =>
           say(L('', 'El Castillo de Ohmdal arde en luz cálida al norte. Los canales de cobre brillan desde aquí.')),
@@ -1376,6 +1417,15 @@ export const ROOMS: Record<string, RoomDef> = {
           ],
           () => setFlag('plazaSeen'),
         );
+      } else if (f().frenoDone && !f().puertaDone && !f().eddaGateCall) {
+        say(
+          [
+            L('', 'Apenas sales del Taller, una voz baja desde el arco norte.'),
+            L('Edda', '¡Eh, por aquí! La Puerta de Ohm está al norte. Lumen ya llegó con sus seis fusibles y cara de funeral.'),
+            L('Edda', 'Te espero junto al mecanismo. Trae la piedra: hoy esa puerta deja de ser un cuento.'),
+          ],
+          () => setFlag('eddaGateCall'),
+        );
       }
     },
   },
@@ -1390,7 +1440,7 @@ export const ROOMS: Record<string, RoomDef> = {
     ],
     things: [
       {
-        id: 'lumen', x: 620, y: 220, w: 38, h: 38, shape: 'circle',
+        id: 'lumen', x: 560, y: 250, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         // tras el puzzle del freno se adelanta a la Puerta (y después, a la plaza)
         visible: () => !f().frenoDone,
@@ -1416,7 +1466,7 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        id: 'edda-taller', x: 700, y: 310, w: 34, h: 34, shape: 'circle',
+        id: 'edda-taller', x: 540, y: 350, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => !f().frenoDone,
         walksTo: 'plaza',
@@ -1428,7 +1478,7 @@ export const ROOMS: Record<string, RoomDef> = {
           ),
       },
       {
-        id: 'banco', x: 400, y: 330, w: 170, h: 70,
+        id: 'banco', x: 285, y: 280, w: 125, h: 145,
         label: 'Banco de trabajo', prompt: 'Usar el banco de trabajo', color: 0x4a3c30, solid: true, emoji: '⚡',
         onInteract: () => {
           const fl = f();
@@ -1438,10 +1488,27 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        id: 'estantes', x: 360, y: 105, w: 280, h: 44,
+        id: 'estantes', x: 210, y: 135, w: 130, h: 90,
         label: 'Estantes', prompt: 'Curiosear los estantes', color: 0x3c332a, solid: true, emoji: '🔬',
         onInteract: () =>
           say(L('', 'Frascos con etiquetas a mano: «Chispa embotellada (vacío)», «Silencio de tormenta», «NO ABRIR: ya está abierto».')),
+      },
+      {
+        id: 'estantes-derecha', x: 785, y: 135, w: 120, h: 90,
+        label: 'Estantes de fusibles', prompt: 'Curiosear los trofeos de Lumen', color: 0x3c332a, solid: false, emoji: '🔬',
+        onInteract: () =>
+          say([
+            L('', 'Una fila de fusibles quemados cuelga de cintas como medallas. Debajo: «Mártires del exceso de entusiasmo».'),
+            L('Edda', 'Lumen les pone nombre. Ese de ahí es Sir Chispazo Tercero. Los otros dos no sobrevivieron al bautismo.'),
+          ]),
+      },
+      {
+        id: 'generador-taller', x: 715, y: 270, w: 145, h: 130,
+        label: 'Máquina del taller', prompt: 'Escuchar la máquina', color: 0x4a3c30, solid: false,
+        onInteract: () =>
+          say(L('', f().frenoDone
+            ? 'La máquina gira pareja. Por primera vez, el taller huele más a aceite que a cejas chamuscadas.'
+            : 'La máquina carraspea detrás de la reja. Cada intento termina en un chasquido demasiado orgulloso.')),
       },
     ],
   },
@@ -1457,13 +1524,9 @@ export const ROOMS: Record<string, RoomDef> = {
         x: 370, y: 0, w: 220, h: 26,
         to: 'manantial_ohm', spawn: { x: 480, y: 440 },
         label: 'Puerta de Ohm · Manantial', color: 0x8a7c50,
-        locked: () =>
-          f().puertaDone
-            ? null
-            : [
-                L('', 'Las dos hojas de la Puerta cierran la calzada. El ojo de aguja espera una medida.'),
-                L('Maese Lumen', 'El mecanismo está junto al umbral. «Ni hambrienta ni ahogada».'),
-              ],
+        // La presentación vive en la primera interacción con el mecanismo. El
+        // límite físico no debe volver a interrumpir al jugador por proximidad.
+        locked: () => (f().puertaDone ? null : true),
       },
     ],
     things: [
@@ -1475,13 +1538,24 @@ export const ROOMS: Record<string, RoomDef> = {
         color: () => (f().puertaDone ? 0x8a7c50 : 0x3a3340),
         onInteract: () => {
           if (f().puertaDone) abrirPuerta(() => {}, true); // modo práctica
-          else resolverPuerta();
+          else if (!f().puertaMecanismoIntro) {
+            say(
+              [
+                L('', 'Las dos hojas de la Puerta cierran la calzada. El ojo de aguja espera una medida.'),
+                L('Maese Lumen', 'El mecanismo está junto al umbral. «Ni hambrienta ni ahogada».'),
+              ],
+              () => {
+                setFlag('puertaMecanismoIntro');
+                resolverPuerta();
+              },
+            );
+          } else resolverPuerta();
         },
       },
       {
-        id: 'edda-puerta', x: 330, y: 390, w: 34, h: 34, shape: 'circle',
+        id: 'edda-puerta', x: 420, y: 385, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
-        visible: () => !f().puertaDone,
+        visible: () => f().frenoDone && !f().puertaDone,
         walksTo: 'plaza',
         onInteract: () =>
           say([
@@ -1490,9 +1564,9 @@ export const ROOMS: Record<string, RoomDef> = {
           ]),
       },
       {
-        id: 'lumen-puerta', x: 630, y: 390, w: 38, h: 38, shape: 'circle',
+        id: 'lumen-puerta', x: 560, y: 385, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
-        visible: () => !f().puertaDone,
+        visible: () => f().frenoDone && !f().puertaDone,
         walksTo: 'plaza',
         onInteract: () =>
           say([
@@ -1537,6 +1611,7 @@ export const ROOMS: Record<string, RoomDef> = {
             L('', 'El cauce luminoso baja desde el manantial, atraviesa la Puerta abierta y se divide bajo las calles de Ohmdal.'),
             L('Ohm', 'Caudal estable: dos. Destinos activos: plaza, campana, alumbrado.'),
             L('Edda', 'Entonces la Puerta no guardaba un tesoro. Cuidaba que el pueblo recibiera lo justo.'),
+            L('Edda', 'Y uno de esos caminos termina en la Campana. Volvamos a la plaza: si el río ya llega hasta ella, quiero oír qué hace.'),
           ]),
       },
       {
@@ -1565,7 +1640,19 @@ export const ROOMS: Record<string, RoomDef> = {
         color: 0xc9a437, solid: true,
         // detrás de una Puerta sellada no puede verse a nadie del otro lado
         visible: () => f().puertaDone,
-        onInteract: () => say(L('Ohm', 'Origen visible. Camino visible. Misterio reducido.')),
+        onInteract: () => say(L('Ohm', 'Origen visible. Siguiente destino recomendado: Campana de la plaza.')),
+      },
+      {
+        id: 'edda-manantial', x: 545, y: 410, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().puertaDone && !f().playedUnit2Intro,
+        onInteract: () => say(L('Edda', 'No era una puerta a un tesoro. Era una puerta para cuidar cuánto recibía todo el pueblo.')),
+      },
+      {
+        id: 'lumen-manantial', x: 655, y: 420, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().puertaDone && !f().playedUnit2Intro,
+        onInteract: () => say(L('Maese Lumen', 'Distinto empuje, distinto freno, el mismo río. Cuarenta años custodiando una proporción.')),
       },
     ],
   },
@@ -1986,6 +2073,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'consejera-patio', x: 660, y: 325, w: 38, h: 38, shape: 'circle',
         label: 'Consejera', prompt: 'Hablar con la Consejera',
         color: 0x725d79, solid: true, emoji: '💬',
+        visible: () => f().unit2Completed && !f().unit3Completed,
         onInteract: () =>
           say(L('Consejera', 'Eso vine a preguntar. Medimos el río: no se gasta. Lo demostraron ustedes. Entonces, ¿qué es lo que falta cada mañana?')),
       },
@@ -1994,8 +2082,22 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'edda-patio-forja', x: 660, y: 420, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda',
         color: 0xa85f78, solid: true, emoji: '💬',
-        visible: () => f().learnedPower && !f().unit3Completed,
-        onInteract: verElValle,
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => f().learnedPower
+          ? verElValle()
+          : say(L('Edda', 'El río no se gasta, pero el canal se calienta. Esta unidad empieza con una pregunta incómoda.')),
+      },
+      {
+        id: 'lumen-patio-forja', x: 560, y: 430, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Maese Lumen', 'Los canales siempre estuvieron ahí. Lo nuevo es que por fin nos animamos a tocarlos.')),
+      },
+      {
+        id: 'ohm-patio-forja', x: 490, y: 420, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm', color: 0xc9a437, solid: true,
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Ohm', 'Modo termómetro disponible. Trabajo detectado. Peaje pendiente de medir.')),
       },
       /* F6: alternativa sin Edda — «Mirar el valle» tras unit3Completed */
       {
@@ -2005,6 +2107,16 @@ export const ROOMS: Record<string, RoomDef> = {
         visible: () => f().unit3Completed,
         onInteract: () =>
           say(L('', 'El valle se abre abajo: las Terrazas, el acueducto de los Maestros. Las Terrazas esperan.')),
+      },
+      {
+        id: 'barril-forja', x: 190, y: 430, w: 48, h: 58,
+        label: '', prompt: '', color: 0xffffff, solid: true, interactive: false,
+        sprite: 'prop_forge_barrel', spriteFit: 'bounds', onInteract: () => {},
+      },
+      {
+        id: 'cajon-forja', x: 275, y: 450, w: 64, h: 52,
+        label: '', prompt: '', color: 0xffffff, solid: true, interactive: false,
+        sprite: 'prop_forge_crate', spriteFit: 'bounds', onInteract: () => {},
       },
     ],
     onEnter: () => setAmbience('forge'),
@@ -2050,6 +2162,24 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
         color: 0x7a6a3a, solid: true, emoji: '💬',
         onInteract: () => say(L('Maese Lumen', 'Elige calibres, estudiante. Mis mártires observan. Sin presión.')),
+      },
+      {
+        id: 'forjadora-enfermeria', x: 625, y: 355, w: 40, h: 40, shape: 'circle',
+        label: 'Yesca', prompt: 'Hablar con Yesca', color: 0x9b5438, solid: true, emoji: '💬',
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Yesca', 'Que se corte el fusible, no el canal. Si podemos elegir cuál pierde, elegimos bien.')),
+      },
+      {
+        id: 'edda-enfermeria', x: 290, y: 360, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Edda', 'Un margen para trabajar y un límite para cortar. Es menos mártir y más guardia.')),
+      },
+      {
+        id: 'ohm-enfermeria', x: 220, y: 410, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm', color: 0xc9a437, solid: true,
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Ohm', 'Fusible: límite deliberado. Canal: límite costoso. Orden de sacrificio recomendado.')),
       },
     ],
     onEnter: () => {
@@ -2104,6 +2234,18 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Yesca', prompt: 'Hablar con Yesca',
         color: 0x9b5438, solid: true, emoji: '💬',
         onInteract: hablarForjadoraCanalLargo,
+      },
+      {
+        id: 'edda-canal-largo', x: 635, y: 380, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Edda', 'El horno está lejos. No alcanza con que llegue río: tiene que llegar trabajo.')),
+      },
+      {
+        id: 'ohm-canal-largo', x: 555, y: 390, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm', color: 0xc9a437, solid: true,
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Ohm', 'Canal fijo. Entrega variable. Más de una combinación disponible.')),
       },
     ],
     onEnter: () => {
@@ -2160,6 +2302,35 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Yesca', prompt: 'Hablar con Yesca',
         color: 0x9b5438, solid: true, emoji: '💬',
         onInteract: hablarForjadoraNave,
+      },
+      {
+        id: 'consejera-nave', x: 790, y: 390, w: 38, h: 38, shape: 'circle',
+        label: 'Consejera', prompt: 'Hablar con la Consejera', color: 0x725d79, solid: true, emoji: '💬',
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Consejera', 'Entrega 32, 16 y 8. Esta vez el inventario describe trabajo, no miedo.')),
+      },
+      {
+        id: 'edda-nave', x: 660, y: 425, w: 34, h: 34, shape: 'circle',
+        label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Edda', 'Tres máquinas, una red. Ya no estamos arreglando piezas: estamos leyendo un sistema.')),
+      },
+      {
+        id: 'lumen-nave', x: 250, y: 420, w: 38, h: 38, shape: 'circle',
+        label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Maese Lumen', 'Toda la nave esperando una cuenta. Menos incienso del que calculaba.')),
+      },
+      {
+        id: 'ohm-nave', x: 320, y: 430, w: 34, h: 34, shape: 'circle',
+        label: 'Ohm', prompt: 'Consultar a Ohm', color: 0xc9a437, solid: true,
+        visible: () => f().unit2Completed && !f().unit3Completed,
+        onInteract: () => say(L('Ohm', 'Objetivos de entrega: 32, 16, 8. Red disponible.')),
+      },
+      {
+        id: 'lingotes-forja', x: 170, y: 250, w: 86, h: 48,
+        label: '', prompt: '', color: 0xffffff, solid: true, interactive: false,
+        sprite: 'prop_forge_ingots', spriteFit: 'bounds', onInteract: () => {},
       },
     ],
     onEnter: () => {
@@ -2704,6 +2875,12 @@ export const ROOMS: Record<string, RoomDef> = {
         x: 0, y: 190, w: 26, h: 110,
         to: 'clock_tower', spawn: { x: 860, y: 245 },
         label: 'Torre del Reloj',
+      },
+      {
+        x: 150, y: 514, w: 130, h: 26,
+        to: 'plaza', spawn: { x: 330, y: 445 },
+        label: 'Ferry de regreso a la Plaza',
+        visible: () => f().lighthouseRestored,
       },
     ],
     things: [

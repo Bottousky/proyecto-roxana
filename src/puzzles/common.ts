@@ -1,10 +1,16 @@
 /* Widgets compartidos por las vistas de banco: Ohm (indicador vivo) y el medidor de aguja. */
 
+import {
+  RESISTOR_DIGIT_COLORS,
+  resistorColorByDigit,
+  type ResistorDigit,
+} from '../shared/resistorColorCode.ts';
+
 /** Hace operable por teclado un elemento clickeable que no es <button>. */
 export function makeInteractive(el: HTMLElement | SVGElement, label?: string): void {
   el.setAttribute('tabindex', '0');
   el.setAttribute('role', 'button');
-  if (label) el.setAttribute('aria-label', label);
+  if (label && !el.hasAttribute('aria-label')) el.setAttribute('aria-label', label);
   el.addEventListener('keydown', (ev: Event) => {
     const k = (ev as KeyboardEvent).key;
     if (k === 'Enter' || k === ' ') {
@@ -527,18 +533,25 @@ export function canalCortable(
 
 export interface PiedraDef {
   nombre: string;
-  /** banda de color (código real: marrón=1, rojo=2, amarillo=4, gris=8) */
+  /** Banda y cifra del código real de resistores. */
   color: string;
   valor: number;
+  codigo: ResistorDigit;
   rajada?: boolean;
 }
 
 export const PIEDRAS: Record<string, PiedraDef> = {
-  marron: { nombre: 'marca marrón', color: '#8b5a2b', valor: 1 },
-  roja: { nombre: 'marca roja', color: '#cc3b2e', valor: 2 },
-  amarilla: { nombre: 'marca amarilla', color: '#e8c33a', valor: 4 },
-  gris: { nombre: 'marca gris', color: '#9a9a9a', valor: 8 },
-  rajada: { nombre: 'piedra rajada', color: '#8b5a2b', valor: 1, rajada: true },
+  marron: { nombre: 'marca marrón', color: resistorColorByDigit(1).color, valor: 1, codigo: 1 },
+  roja: { nombre: 'marca roja', color: resistorColorByDigit(2).color, valor: 2, codigo: 2 },
+  amarilla: { nombre: 'marca amarilla', color: resistorColorByDigit(4).color, valor: 4, codigo: 4 },
+  gris: { nombre: 'marca gris', color: resistorColorByDigit(8).color, valor: 8, codigo: 8 },
+  rajada: {
+    nombre: 'piedra rajada de marca marrón',
+    color: resistorColorByDigit(1).color,
+    valor: 1,
+    codigo: 1,
+    rajada: true,
+  },
 };
 
 export function piedraEl(key: string): HTMLElement {
@@ -546,10 +559,49 @@ export function piedraEl(key: string): HTMLElement {
   const div = document.createElement('div');
   div.className = 'piedra' + (def.rajada ? ' rajada' : '');
   div.dataset.key = key;
+  div.dataset.code = String(def.codigo);
   div.style.setProperty('--band', def.color);
-  div.textContent = def.rajada ? 'rajada' : def.nombre.replace('marca ', '');
-  div.title = def.nombre;
+  div.setAttribute(
+    'aria-label',
+    `${def.rajada ? 'Piedra rajada' : `Piedra ${def.nombre}`}. Código de color ${def.codigo}. Freno ${def.valor}.`,
+  );
+  div.title = `${def.nombre} · código ${def.codigo} · freno ${def.valor}`;
+
+  const name = document.createElement('span');
+  name.className = 'piedra-name';
+  name.textContent = def.rajada ? 'rajada' : def.nombre.replace('marca ', '');
+  const code = document.createElement('span');
+  code.className = 'piedra-code';
+  code.textContent = String(def.codigo);
+  code.setAttribute('aria-hidden', 'true');
+  div.append(name, code);
   return div;
+}
+
+/** Referencia diegética opcional: el nombre técnico sigue reservado a la Bitácora. */
+export function resistorCodeLegendEl(): HTMLDetailsElement {
+  const details = document.createElement('details');
+  details.className = 'resistor-code-guide';
+
+  const summary = document.createElement('summary');
+  summary.textContent = 'Código de los Maestros · bandas 0–9';
+  summary.tabIndex = 0;
+  details.appendChild(summary);
+
+  const grid = document.createElement('div');
+  grid.className = 'resistor-code-grid';
+  grid.setAttribute('aria-label', 'Código de colores del cero al nueve');
+  for (const entry of RESISTOR_DIGIT_COLORS) {
+    const item = document.createElement('span');
+    item.className = 'resistor-code-chip';
+    item.style.setProperty('--code-color', entry.color);
+    item.style.setProperty('--code-ink', entry.ink);
+    item.title = `${entry.label}: ${entry.digit}`;
+    item.innerHTML = `<i aria-hidden="true">${entry.digit}</i><span>${entry.label}</span>`;
+    grid.appendChild(item);
+  }
+  details.appendChild(grid);
+  return details;
 }
 
 /* ---------- Medidor de aguja (sin números: zonas, no cifras) ---------- */

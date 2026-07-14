@@ -50,6 +50,8 @@ export function abrirWarmth(onSolved: () => void, practica = false): void {
     (bench) => {
       let state = createWarmthState();
       let solved = false;
+      let anvilPrediction: 'igual' | 'doble' | 'mas' | null = null;
+      let pendingAnvilDouble = false;
       const refs = new Map<WarmthChannelId, ChannelRefs>();
 
       const stage = document.createElement('div');
@@ -65,6 +67,10 @@ export function abrirWarmth(onSolved: () => void, practica = false): void {
           <span data-experience="anvilDoubled">salto del yunque</span>
         </div>`;
       bench.root.appendChild(stage);
+
+      const predict = document.createElement('div');
+      predict.className = 'bench-predict hidden';
+      bench.root.appendChild(predict);
 
       const channelsHost = stage.querySelector<HTMLElement>('.warmth-channels')!;
       for (const id of CHANNEL_IDS) {
@@ -94,6 +100,18 @@ export function abrirWarmth(onSolved: () => void, practica = false): void {
         false,
         (closed) => {
           if (solved) return;
+          if (closed && !anvilPrediction) {
+            anvilSwitch.setClosed(false);
+            pendingAnvilDouble = true;
+            showAnvilPrediction();
+            return;
+          }
+          applyAnvilSwitch(closed);
+        },
+      );
+
+      function applyAnvilSwitch(closed: boolean): void {
+          anvilSwitch.setClosed(closed);
           sfxBridge();
           state = setAnvilDoubled(state, closed);
           probe.clear();
@@ -103,8 +121,46 @@ export function abrirWarmth(onSolved: () => void, practica = false): void {
               ? 'El segundo martillo entra en el canal del yunque. <b>Ohm:</b> «Cambio detectado. Mano recomendada.»'
               : 'El segundo martillo queda fuera del canal del yunque.',
           );
-        },
-      );
+      }
+
+      function showAnvilPrediction(): void {
+        anvilSwitch.element.disabled = true;
+        predict.classList.remove('hidden');
+        predict.innerHTML =
+          '<p class="bench-predict-q"><b>Edda:</b> «Si duplicamos el río del yunque, ¿el peaje sube igual, sube el doble o sube más que el doble?»</p>';
+        appendPredictButtons(predict, [
+          ['igual', 'Sube igual'],
+          ['doble', 'Sube el doble'],
+          ['mas', 'Sube más que el doble'],
+        ]);
+      }
+
+      function appendPredictButtons(
+        host: HTMLElement,
+        options: readonly (readonly [NonNullable<typeof anvilPrediction>, string])[],
+      ): void {
+        const row = document.createElement('div');
+        row.className = 'bench-predict-row';
+        for (const [key, label] of options) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'bench-predict-btn';
+          button.textContent = label;
+          button.addEventListener('click', () => {
+            if (anvilPrediction) return;
+            anvilPrediction = key;
+            anvilSwitch.element.disabled = false;
+            predict.classList.add('hidden');
+            predict.innerHTML = '';
+            if (pendingAnvilDouble) {
+              pendingAnvilDouble = false;
+              applyAnvilSwitch(true);
+            }
+          });
+          row.appendChild(button);
+        }
+        host.appendChild(row);
+      }
       stage.querySelector<HTMLElement>('.warmth-switch-host')!.appendChild(anvilSwitch.element);
 
       const probe = ohmProbe(

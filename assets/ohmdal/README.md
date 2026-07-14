@@ -25,6 +25,19 @@ El personaje es arte original del proyecto. No deriva de los packs CC0 de `asset
 
 El idle se generó con la herramienta integrada de imagegen sobre croma magenta. El pedido fijó cuatro direcciones y cuatro cuadros por dirección, con ambas botas plantadas, respiración sutil, parpadeo y pulso del amuleto. Después se retiró el croma y se normalizó cada dirección para compartir la misma línea de suelo.
 
+## Elenco secundario
+
+- `characters/npc-secondary-atlas-64.png`: atlas de producción de Guardiana, Farero,
+  Preceptor, Ciudadano adulto y Niño; grilla de 5 filas por 4 columnas, cuadros de 64×96 px.
+- `characters/{guardiana,farero,preceptor,ciudadano,nino}-turnaround.png`: maestros
+  direccionales con alfa real.
+- `characters/_sources/*-turnaround-chroma.png`: fuentes generadas sobre croma magenta.
+
+Las columnas mantienen el orden sur, oeste, este, norte y la línea de suela `y=92`. Cada
+personaje usa su retrato como ancla de identidad y `npc-core-atlas-64.png` como ancla de
+escala y técnica. El runtime carga este elenco desde una textura separada para preservar sin
+cambios las filas de Edda, Lumen, la Consejera y la Forjadora.
+
 ## Elenco principal
 
 - `npc-core-atlas-master.png`: maestro direccional de Edda, Lumen, la Consejera y la Forjadora.

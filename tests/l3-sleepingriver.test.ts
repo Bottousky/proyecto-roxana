@@ -48,6 +48,20 @@ equal(roomsSource.includes("notifyNewEntry('El río que se duerme')"), true, 'L3
 equal(puzzleSource.includes('createSimTick('), true, 'L3 anima la simulación con el tick compartido');
 equal(puzzleSource.includes('bench.onClose(tick.stop)'), true, 'L3 cancela el tick al cerrar');
 equal(puzzleSource.includes('ohmProbe('), true, 'L3 reutiliza la sonda de Ohm');
+equal(puzzleSource.includes('bench-predict'), true, 'L3 reutiliza la predicción comprometida');
+equal(
+  puzzleSource.includes('previousConfig.tank !== state.tank || previousConfig.brake !== state.brake'),
+  true,
+  'L3 pide la predicción al cambiar la segunda configuración',
+);
+for (const text of [
+  'Con esta combinación, ¿tardará más o menos que el intento anterior?',
+  "['mas', 'Más']",
+  "['menos', 'Menos']",
+  "['igual', 'Igual']",
+]) {
+  equal(puzzleSource.includes(text), true, `predicción canónica L3: ${text}`);
+}
 
 for (const text of [
   'No se rompió. Se está llenando. ¡Mira la aguja, está RESPIRANDO!',

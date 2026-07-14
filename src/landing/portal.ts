@@ -5,6 +5,12 @@ const DURATION = 1180;
 let active = false;
 let audioCtx: AudioContext | null = null;
 
+/** El timestamp de requestAnimationFrame puede preceder por unas décimas al start capturado. */
+export function portalTransitionProgress(now: number, start: number, duration = DURATION): number {
+  if (!Number.isFinite(now) || !Number.isFinite(start) || !Number.isFinite(duration) || duration <= 0) return 1;
+  return Math.max(0, Math.min(1, (now - start) / duration));
+}
+
 function reduced(): boolean {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
 }
@@ -84,7 +90,7 @@ function draw(canvas: HTMLCanvasElement, origin: DOMRect, start: number): void {
   const cx = origin.left + origin.width / 2, cy = origin.top + origin.height / 2;
   const maxR = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy)) * 1.1;
   const tick = (now: number) => {
-    const t = Math.min(1, (now - start) / DURATION), eased = 1 - (1 - t) ** 3;
+    const t = portalTransitionProgress(now, start), eased = 1 - (1 - t) ** 3;
     g.clearRect(0, 0, innerWidth, innerHeight);
     const glow = g.createRadialGradient(cx, cy, 0, cx, cy, maxR * eased);
     glow.addColorStop(0, 'rgba(255,255,255,0.98)'); glow.addColorStop(0.22, 'rgba(223,233,255,0.74)');
@@ -122,5 +128,12 @@ export function startPortalTransition(hotspot: HTMLElement): void {
   playPortalCrossing(false);
   const { root, canvas } = overlay();
   root.style.opacity = '1';
-  draw(canvas, hotspot.getBoundingClientRect(), performance.now());
+  // La navegación no puede depender de que Canvas/WebAudio funcionen: si un frame
+  // falla en un navegador concreto, este watchdog completa igualmente el cruce.
+  goSoon(DURATION + 450);
+  try {
+    draw(canvas, hotspot.getBoundingClientRect(), performance.now());
+  } catch {
+    goSoon(0);
+  }
 }

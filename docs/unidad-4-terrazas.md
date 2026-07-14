@@ -41,7 +41,7 @@ Frases centrales:
 
 Piedras marrón 1 / roja 2 / amarilla 4 / gris 8; **filas se suman**; **dos iguales en paralelo = la mitad** (roja∥roja=marrón 1, amarilla∥amarilla=roja 2, gris∥gris=amarilla 4). Cristales de Empuje 4/8/16.
 
-- **Los escalones (tutorial):** Empuje 16 sobre fila marrón+marrón+roja+amarilla (1+1+2+4 = 8) → río 2. Escalones (río × piedra): 2, 2, 4, 8. La vuelta: +16 −2 −2 −4 −8 = **0**, exacto.
+- **Los escalones (tutorial reparable):** Empuje 16 sobre cuatro engastes configurables con piedras 1/2/4/8 repetibles. Arranca desordenado con amarilla+marrón+roja+marrón `[4,1,2,1]`: resistencia total 8, río 2 y escalones **8, 2, 4, 2**. El objetivo visible es **2, 2, 4, 8**, creciendo al bajar. Se acepta cualquier fila cuyos escalones calculados coincidan con ese objetivo: por ejemplo `[1,1,2,4]` da río 2 y `[2,2,4,8]` da río 1. En ambas, la vuelta +16 −2 −2 −4 −8 = **0**. La validación compara los cuatro escalones, no una combinación fija de piedras.
 - **El reparto justo (divisor):** dos terrazas en fila, Empuje 12, objetivos: alta 8, baja 4 (proporción 2:1). Solución A: roja(2)+marrón(1) → río 4 → escalones 8 y 4. Solución B: amarilla(4)+roja(2) → río 2 → escalones 8 y 4. Solución C: gris(8)+amarilla(4) → río 1 → escalones 8 y 4. **Misma proporción 2:1, distinto río**: a más piedra, menos río (menos peaje — puente a U3). El banco acepta toda configuración con proporción 2:1 (alta=8, baja=4). El diálogo «¡Las dos andan!» de Edda es genérico: compara las dos soluciones que el jugador probó, sean cuales sean.
 - **La Piedra Única (equivalente):** roja∥roja = marrón; amarilla∥amarilla = roja; gris∥gris = amarilla. Y serie+paralelo: marrón + (roja∥roja) = 1+1 = roja(2); roja + (amarilla∥amarilla) = 2+2 = amarilla(4). Ohm «no distingue» la red de su piedra única.
 - **La Escalera del valle (evento mayor) — VERIFICADA:** manantial Empuje 16; tramo manantial→terraza 1 = roja(2); terraza 1 cuelga con amarilla(4); tramo terraza 1→terraza 2 = roja(2); terraza 2 (última) cuelga con roja(2).
@@ -120,19 +120,31 @@ Una ladera de cobre y tierra, terrazas de cultivo escalonadas hacia el valle. Ar
 
 ### PUZZLE 1 — Los escalones
 
-**ID:** `PUZZLE_VOLTAGE_STEPS` · medición pura, sin fallo · 4–5 min
-**Vista de banco:** una vuelta completa del canal alto: manantial (Empuje 16) → fila de cuatro piedras fijas (marrón, marrón, roja, amarilla) → vuelta a tierra. Ohm con **modo brazos**: botón «abrazar» entre dos puntos cualesquiera; reporta el escalón. También el modo río de siempre (parado en un tramo).
+**ID:** `PUZZLE_VOLTAGE_STEPS` · configuración, predicción y reparación · 4–5 min
+**Vista de banco:** una vuelta completa del canal alto: manantial (Empuje 16) → cuatro engastes configurables con piedras 1/2/4/8 (se pueden repetir) → vuelta a tierra. La fila inicial `[4,1,2,1]` produce escalones 8, 2, 4, 2: cobra demasiado arriba y demasiado poco abajo. El objetivo **2, 2, 4, 8** está siempre visible.
 
-Experiencias (en cualquier orden):
+**Guardiana:** «La compuerta alta quedó desordenada: el primer golpe recibe demasiado y el último casi nada. Necesito que los escalones crezcan al bajar.»
 
-1. **Abrazar el manantial:** Ohm reporta «Subida: dieciséis.»
-2. **Abrazar cada piedra, una por una:** escalones de 2, 2, 4, 8.
-   **Edda** (haciendo la cuenta en voz alta): «Dos, dos, cuatro, ocho… son dieciséis. Lo que subió, bajó. Exacto. No sobra ni falta un escalón.»
-   **Ohm:** «Deuda de la vuelta: cero. Siempre cero.»
-3. **Medir el río parado en cada tramo** (modo viejo): el mismo río 2 en toda la fila.
-   **Edda:** «El empuje baja por escalones… pero el río es el mismo en todos lados. No son la misma cosa. ¡NUNCA fueron la misma cosa!»
-   *(El gran error que la unidad desmonta: confundir empuje con río.)*
-4. **Abrazar la vuelta entera** (manantial + las cuatro piedras): «Deuda: cero.»
+Antes de habilitar el primer movimiento y la primera apertura, Edda exige una predicción comprometida:
+
+> Antes de moverlas: ¿qué lugar debería cobrar el escalón más grande?
+
+Opciones: «Primero», «Segundo», «Tercero», «Cuarto». Equivocarse no castiga ni bloquea: la predicción queda anotada y el resultado físico permite corregir la idea.
+
+El jugador elige una piedra para cada engaste, ve la fila completa y pulsa **«Abrir la compuerta»**. Cada prueba muestra los cuatro escalones, el río común y la deuda de vuelta. Si el reparto es inválido, el feedback indica qué escalones deben subir o bajar, sin consumir recursos ni cerrar el banco.
+
+**Ohm (inválido):** «Escalones desordenados. La vuelta cierra, pero el reparto golpea donde no debe.»
+
+**Ohm (válido):** «Dos, dos, cuatro, ocho. La vuelta cierra y el agua baja sin golpes.»
+
+El puzzle valida las condiciones sobre los escalones calculados: exactamente 2, 2, 4, 8. No valida una receta fija. Debe aceptar como mínimo `[1,1,2,4]` (río 2) y `[2,2,4,8]` (río 1). Se resuelve solo después de comprometer una predicción y abrir la compuerta con un reparto válido.
+
+Los modos de Ohm permanecen disponibles como exploración opcional: **brazos** mide la subida, cada escalón o la vuelta entera; **río** mide cualquier tramo. Ya no es necesario recorrer todos los hotspots para avanzar. Al resolver, las observaciones canónicas siguen cerrando la idea:
+
+- **Edda:** «Dos, dos, cuatro, ocho… son dieciséis. Lo que subió, bajó. Exacto. No sobra ni falta un escalón.»
+- **Ohm:** «Deuda de la vuelta: cero. Siempre cero.»
+- **Edda:** «El empuje baja por escalones… pero el río es el mismo en todos lados. No son la misma cosa. ¡NUNCA fueron la misma cosa!»
+- **Vuelta entera:** «Deuda: cero.»
 
 Cierre:
 

@@ -85,6 +85,16 @@ equal(
 );
 equal(warmthSource.includes('Segundo martillo'), true, 'la llave parte del segundo martillo');
 equal(warmthSource.includes('canal del yunque'), true, 'la llave conecta el canal del yunque');
+equal(warmthSource.includes('bench-predict'), true, 'F2 reutiliza la predicción comprometida');
+
+for (const text of [
+  'Si duplicamos el río del yunque, ¿el peaje sube igual, sube el doble o sube más que el doble?',
+  'Sube igual',
+  'Sube el doble',
+  'Sube más que el doble',
+]) {
+  equal(warmthSource.includes(text), true, `predicción canónica F2: ${text}`);
+}
 
 for (const text of [
   'Río: grande. Canal: chico. Peaje: en curso.',

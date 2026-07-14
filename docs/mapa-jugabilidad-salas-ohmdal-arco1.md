@@ -34,5 +34,21 @@ la ficha de escena define qué parte de esa apariencia se puede caminar.
 - `solvedStoredSpark`, `solvedSleepingRiver`, `clockRestored`: pulsos del faro/reloj.
 - `lighthouseRestored`: lente encendida y haz giratorio sobre el lago.
 
-La prueba de conectividad recorre una grilla de 12 px desde la entrada principal
-hasta cada umbral. Resultado actual: 20 salas, 40 conexiones, 0 rutas bloqueadas.
+La prueba estricta de conectividad usa las colisiones reales, los props sólidos y
+cada punto de entrada por separado. Desde cada llegada exige alcanzar todos los
+umbrales y todas las interacciones de la sala. Resultado actual: 20 salas, 42
+transiciones, 130 objetos runtime y 0 rutas bloqueadas.
+
+## Continuidad global
+
+- La Forja ocupa el oeste de la fila central: Patio → Enfermería → Canal Largo → Nave mayor.
+- Castillo, Terrazas y Faro conservan recorridos de ida y vuelta hacia la Plaza.
+- Al restaurar el Faro aparece un ferry diegético desde la Linterna hasta la Plaza.
+- El mapa de zona muestra el mundo completo aun dentro de una sala pintada mediante
+  un esquema espacial legible: conserva conexiones y orientación, sin comprimir las
+  distancias literales de los distritos ni deformar el pergamino 4:3.
+- Los acompañantes comunes entre dos salas recorren el piso hasta el umbral, cruzan
+  con un fundido breve y vuelven a entrar por la puerta de origen; no se recrean a la
+  vista del jugador.
+- Los “bancos” técnicos de los puzzles no se montan como obstáculos independientes:
+  su interacción se ancla a la máquina, canal, mural, compuerta, reloj o lente real.

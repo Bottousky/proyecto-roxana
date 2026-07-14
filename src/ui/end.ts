@@ -26,17 +26,43 @@ export function showEnd(opts: EndOptions): void {
         <button id="btn-home">← Volver a la web</button>
       </div>
     </div>`;
-  el('btn-end-continue').addEventListener('click', () => {
+  const continueButton = el<HTMLButtonElement>('btn-end-continue');
+  const resetButton = el<HTMLButtonElement>('btn-end-reset');
+  const homeButton = el<HTMLButtonElement>('btn-home');
+  const buttons = [continueButton, resetButton, homeButton];
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    const direction = ['ArrowLeft', 'ArrowUp', 'KeyA', 'KeyW'].includes(event.code)
+      ? -1
+      : ['ArrowRight', 'ArrowDown', 'KeyD', 'KeyS'].includes(event.code)
+        ? 1
+        : 0;
+    if (direction) {
+      event.preventDefault();
+      const active = buttons.indexOf(document.activeElement as HTMLButtonElement);
+      buttons[(Math.max(0, active) + direction + buttons.length) % buttons.length].focus();
+      return;
+    }
+    if (event.code === 'KeyE' && document.activeElement instanceof HTMLButtonElement) {
+      event.preventDefault();
+      document.activeElement.click();
+    }
+  };
+  window.addEventListener('keydown', onKeyDown);
+
+  continueButton.addEventListener('click', () => {
+    window.removeEventListener('keydown', onKeyDown);
     host.classList.add('hidden');
     host.innerHTML = '';
     popUI();
     opts.onContinue();
   });
-  el('btn-end-reset').addEventListener('click', () => {
+  resetButton.addEventListener('click', () => {
     resetSave();
     location.reload();
   });
-  el('btn-home').addEventListener('click', () => {
+  homeButton.addEventListener('click', () => {
     window.location.href = '/#aula/electronica';
   });
+  continueButton.focus();
 }

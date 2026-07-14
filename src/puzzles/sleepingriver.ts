@@ -53,6 +53,9 @@ export function abrirSleepingRiver(onSolved: () => void, practica = false): void
       let sawFast = practica;
       let measuredZero = practica;
       let introducesBreathingThisRun = false;
+      let previousConfig: { tank: SleepingRiverTank; brake: SleepingRiverBrake } | null = null;
+      let comparisonPrediction: 'mas' | 'menos' | 'igual' | null = null;
+      let predictionOpen = false;
 
       const stage = document.createElement('div');
       stage.className = 'bench-stage sleepingriver-stage';
@@ -90,6 +93,10 @@ export function abrirSleepingRiver(onSolved: () => void, practica = false): void
         </div>`;
       bench.root.appendChild(stage);
 
+      const predict = document.createElement('div');
+      predict.className = 'bench-predict hidden';
+      bench.root.appendChild(predict);
+
       const tankButtons: HTMLButtonElement[] = [];
       const brakeButtons: HTMLButtonElement[] = [];
       addTankChoices();
@@ -120,20 +127,7 @@ export function abrirSleepingRiver(onSolved: () => void, practica = false): void
         {
           label: 'Llenar',
           primary: true,
-          onClick: () => {
-            if (solved || state.filling) return;
-            state = startSleepingRiver(state);
-            probe.clear();
-            sfxBridge();
-            introducesBreathingThisRun = !sawBreathing;
-            bench.setStatus(
-              sawBreathing
-                ? 'El río entra fuerte. La aguja empieza a bajar sola.'
-                : BREATHING_DIALOGUE,
-            );
-            sawBreathing = true;
-            render();
-          },
+          onClick: requestFill,
         },
         { label: 'Alejarse', onClick: () => bench.close() },
         {
@@ -153,6 +147,59 @@ export function abrirSleepingRiver(onSolved: () => void, practica = false): void
       });
       bench.onClose(tick.stop);
 
+      function requestFill(): void {
+        if (solved || state.filling || predictionOpen) return;
+        const changed = previousConfig !== null &&
+          (previousConfig.tank !== state.tank || previousConfig.brake !== state.brake);
+        if (changed && !comparisonPrediction) {
+          predictionOpen = true;
+          predict.classList.remove('hidden');
+          predict.innerHTML =
+            '<p class="bench-predict-q"><b>Edda:</b> «Con esta combinación, ¿tardará más o menos que el intento anterior?»</p>';
+          const row = document.createElement('div');
+          row.className = 'bench-predict-row';
+          const options: Array<['mas' | 'menos' | 'igual', string]> = [
+            ['mas', 'Más'],
+            ['menos', 'Menos'],
+            ['igual', 'Igual'],
+          ];
+          for (const [key, label] of options) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'bench-predict-btn';
+            button.textContent = label;
+            button.addEventListener('click', () => {
+              if (comparisonPrediction) return;
+              comparisonPrediction = key;
+              predictionOpen = false;
+              predict.classList.add('hidden');
+              predict.innerHTML = '';
+              startFill();
+            });
+            row.appendChild(button);
+          }
+          predict.appendChild(row);
+          render();
+          return;
+        }
+        startFill();
+      }
+
+      function startFill(): void {
+        previousConfig = { tank: state.tank, brake: state.brake };
+        state = startSleepingRiver(state);
+        probe.clear();
+        sfxBridge();
+        introducesBreathingThisRun = !sawBreathing;
+        bench.setStatus(
+          sawBreathing
+            ? 'El río entra fuerte. La aguja empieza a bajar sola.'
+            : BREATHING_DIALOGUE,
+        );
+        sawBreathing = true;
+        render();
+      }
+
       function addTankChoices(): void {
         const host = stage.querySelector<HTMLElement>('.sleepingriver-tanks')!;
         for (const tank of TANKS) {
@@ -162,7 +209,7 @@ export function abrirSleepingRiver(onSolved: () => void, practica = false): void
           button.dataset.tank = String(tank.value);
           button.innerHTML = `<strong>${tank.label}</strong><span>${tank.value}</span>`;
           button.addEventListener('click', () => {
-            if (state.filling || solved) return;
+            if (state.filling || solved || predictionOpen) return;
             sfxClick();
             state = configureSleepingRiver(state, tank.value, state.brake);
             probe.clear();
@@ -184,7 +231,7 @@ export function abrirSleepingRiver(onSolved: () => void, practica = false): void
           button.setAttribute('aria-label', `${PIEDRAS[brake.key].nombre}, freno ${brake.value}`);
           button.appendChild(piedraEl(brake.key));
           button.addEventListener('click', () => {
-            if (state.filling || solved) return;
+            if (state.filling || solved || predictionOpen) return;
             sfxClick();
             state = configureSleepingRiver(state, state.tank, brake.value);
             probe.clear();
@@ -253,13 +300,13 @@ export function abrirSleepingRiver(onSolved: () => void, practica = false): void
         stoneSlot.querySelector('.piedra')?.classList.add('in-slot');
         tankButtons.forEach((button) => {
           button.classList.toggle('selected', button.dataset.tank === String(state.tank));
-          button.disabled = state.filling || solved;
+          button.disabled = state.filling || solved || predictionOpen;
         });
         brakeButtons.forEach((button) => {
           button.classList.toggle('selected', button.dataset.brake === String(state.brake));
-          button.disabled = state.filling || solved;
+          button.disabled = state.filling || solved || predictionOpen;
         });
-        actions['Llenar'].disabled = state.filling || solved;
+        actions['Llenar'].disabled = state.filling || solved || predictionOpen;
         renderProgress();
       }
 

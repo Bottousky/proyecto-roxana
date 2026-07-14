@@ -45,6 +45,9 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
     (bench) => {
       let state = createLighthouseState();
       let solved = false;
+      let testing = false;
+      let testStartFlash = 0;
+      let prediction: LighthouseTiming | null = null;
 
       const stage = document.createElement('div');
       stage.className = 'bench-stage lighthouse-stage';
@@ -87,6 +90,12 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
           <div class="lighthouse-condition" data-condition="rhythm"></div>
           <div class="lighthouse-condition" data-condition="discharge"></div>
         </div>
+        <div class="lighthouse-prediction">
+          <strong>Antes de probar: ¿cómo va a latir?</strong>
+          <button type="button" data-prediction="fast">Demasiado rápido</button>
+          <button type="button" data-prediction="just">Ritmo justo</button>
+          <button type="button" data-prediction="slow">Demasiado lento</button>
+        </div>
         <div class="lighthouse-controls">
           <section>
             <h3>Estanque</h3>
@@ -112,6 +121,7 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
 
       const actions = benchActions(bench.root, [
         { label: 'Alejarse', onClick: () => bench.close() },
+        { label: 'Probar un latido', primary: true, onClick: startTest },
         {
           label: 'Continuar',
           primary: true,
@@ -119,13 +129,26 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
         },
       ]);
       actions['Continuar'].classList.add('hidden');
+      actions['Probar un latido'].disabled = true;
+      stage.querySelectorAll<HTMLButtonElement>('[data-prediction]').forEach((button) => {
+        button.addEventListener('click', () => {
+          if (testing || solved) return;
+          prediction = button.dataset.prediction as LighthouseTiming;
+          stage.querySelectorAll('[data-prediction]').forEach((candidate) => candidate.classList.toggle('selected', candidate === button));
+          actions['Probar un latido'].disabled = false;
+        });
+      });
 
       const tick = createSimTick((dtMs) => {
         if (solved) return;
         const previousFlash = state.flashCount;
+        const previousPhase = state.phase;
         state = advanceLighthouse(state, dtMs);
         if (state.flashCount > previousFlash) sfxBridge();
         render();
+        if (testing && previousPhase === 'dumping' && state.phase === 'charging' && state.flashCount > testStartFlash) {
+          finishTest();
+        }
       });
       bench.onClose(tick.stop);
 
@@ -147,7 +170,6 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
               state.dischargeBrake,
             );
             render();
-            evaluateConfiguration();
           });
           host.appendChild(button);
           tankButtons.push(button);
@@ -181,17 +203,41 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
               path === 'discharge' ? brake.value : state.dischargeBrake,
             );
             render();
-            evaluateConfiguration();
           });
           host.appendChild(button);
           buttons.push(button);
         }
       }
 
-      function evaluateConfiguration(): void {
+      function setControlsDisabled(disabled: boolean): void {
+        [...tankButtons, ...chargeButtons, ...dischargeButtons].forEach((button) => { button.disabled = disabled; });
+        actions['Probar un latido'].disabled = disabled;
+      }
+
+      function startTest(): void {
+        if (solved || testing || !prediction) return;
+        testing = true;
+        state = configureLighthouse(state, state.tank, state.chargeBrake, state.dischargeBrake);
+        testStartFlash = state.flashCount;
+        setControlsDisabled(true);
+        bench.setStatus('Configuración fijada. Observá una carga y un volcado completos antes de decidir.');
+        render();
+      }
+
+      function finishTest(): void {
+        testing = false;
+        const predicted = prediction;
+        if (!predicted) return;
         const reading = lighthouseReading(state);
+        const predictionNote = predicted === reading.timing
+          ? '<b>Predicción confirmada.</b> '
+          : `<b>Predicción corregida:</b> esperabas ${predictionLabel(predicted)}, resultó ${predictionLabel(reading.timing)}. `;
         if (!reading.valid || practica || solved) {
-          bench.setStatus(feedbackFor(reading.timing, reading.briefDischarge));
+          bench.setStatus(predictionNote + feedbackFor(reading.timing, reading.briefDischarge));
+          prediction = null;
+          stage.querySelectorAll('[data-prediction]').forEach((candidate) => candidate.classList.remove('selected'));
+          setControlsDisabled(false);
+          actions['Probar un latido'].disabled = true;
           return;
         }
 
@@ -199,13 +245,12 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
         tick.stop();
         sfxWin();
         stage.classList.add('restored');
-        [...tankButtons, ...chargeButtons, ...dischargeButtons].forEach((button) => {
-          button.disabled = true;
-        });
+        setControlsDisabled(true);
+        actions['Probar un latido'].classList.add('hidden');
         actions['Alejarse'].classList.add('hidden');
         actions['Continuar'].classList.remove('hidden');
         bench.setStatus(
-          '<b>El lago entero parpadea con la lente.</b><br/><br/>' + JUST_DIALOGUE,
+          predictionNote + '<b>El lago entero parpadea con la lente.</b><br/><br/>' + JUST_DIALOGUE,
         );
       }
 
@@ -276,7 +321,7 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
       }
 
       bench.setStatus(
-        'Ajuste los dos caminos. El Farero responde en cuanto cambia el ritmo.',
+        'Ajustá los dos caminos, hacé una predicción y probá un latido completo.',
       );
       render();
     },
@@ -285,4 +330,8 @@ export function abrirLighthouse(onSolved: () => void, practica = false): void {
 
 function formatSeconds(ms: number): string {
   return (ms / 1000).toFixed(1);
+}
+
+function predictionLabel(timing: LighthouseTiming): string {
+  return timing === 'fast' ? 'rápido' : timing === 'slow' ? 'lento' : 'justo';
 }

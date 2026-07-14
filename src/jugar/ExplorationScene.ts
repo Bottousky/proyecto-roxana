@@ -4,6 +4,7 @@ import { state, hooks, save } from '../state';
 import { uiOpen, el } from '../ui/overlay';
 import { say } from '../ui/dialog';
 import { initJoystick, getJoystickDir } from '../ui/joystick';
+import { touchControlsEnabled } from '../ui/inputMode.ts';
 import { setAmbience, sfxStep, sfxDoor, sfxLocked, type Ambience } from '../audio';
 import {
   ensureTextures,
@@ -46,7 +47,10 @@ const AMBIENT: Record<Ambience, number> = {
   lighthouse: 0.1,
 };
 const B = 26; // grosor del borde
-const SPEED = 250;
+// Ritmo de exploracion deliberadamente mas sereno: a escala 960x540, 250 px/s
+// hacia que los personajes cruzaran casi cuatro cuerpos por segundo.
+export const PLAYER_MOVE_SPEED = 170;
+export const NPC_MOVE_SPEED = 145;
 const PLAYER_R = 12;
 const INTERACT_DIST = 72;
 
@@ -97,12 +101,10 @@ export class ExplorationScene extends Phaser.Scene {
   private things: PlacedThing[] = [];
   private doors: PlacedDoor[] = [];
   private solids: Rect[] = [];
-  private moveTarget: { x: number; y: number } | null = null;
   private doorCooldown = 0;
   private nearThing: PlacedThing | null = null;
   private lastX = 0;
   private lastY = 0;
-  private stuckMs = 0;
   private stepDist = 0;
   // generación de sala: invalida los tweens de NPCs caminantes si la sala cambia
   private roomGen = 0;
@@ -110,6 +112,11 @@ export class ExplorationScene extends Phaser.Scene {
   private chunks: Record<string, { ox: number; oy: number }> = {};
   private currentChunk = '';
   private activeActorChunks = new Map<string, string>();
+  private actorBodies = new Map<string, CharacterRig>();
+  private actorLabels = new Map<string, Phaser.GameObjects.Text>();
+  private transitioning = false;
+  private incomingActorKeys = new Set<string>();
+  private incomingFromRoom: string | null = null;
   private darkness!: Phaser.GameObjects.Rectangle;
   private roomName!: Phaser.GameObjects.Text;
   private mapLayer!: Phaser.GameObjects.Container;
@@ -136,12 +143,24 @@ export class ExplorationScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 96,
     });
+    this.load.spritesheet('ohmdal-npc-secondary', new URL('../../assets/ohmdal/characters/npc-secondary-atlas-64.png', import.meta.url).href, {
+      frameWidth: 64,
+      frameHeight: 96,
+    });
+    this.load.spritesheet('ohmdal-ohm-atlas', new URL('../../assets/ohmdal/characters/ohm-atlas-64-v2.png', import.meta.url).href, {
+      frameWidth: 64,
+      frameHeight: 96,
+    });
     this.load.image('ohmdal-forest-objects', new URL('../../assets/vendor/tiny-rpg-forest/environment/objects.png', import.meta.url).href);
     this.load.image('ohmdal-map-panel', new URL('../../assets/ohmdal/world-map-panel-1024.png', import.meta.url).href);
     // props pixel del mundo (reemplazan props procedurales vía ThingDef.sprite)
     for (const p of ['prop_lamp_post', 'prop_bell', 'prop_pedestal']) {
       this.load.image(p, new URL(`../../assets/ohmdal/generated/${p}.png`, import.meta.url).href);
     }
+    this.load.image('prop_plaza_bell', new URL('../../assets/ohmdal/rooms/pilot-arco1/prop_plaza_bell.png', import.meta.url).href);
+    this.load.image('prop_forge_barrel', new URL('../../assets/ohmdal/rooms/pilot-arco1/prop_forge_barrel_runtime.png', import.meta.url).href);
+    this.load.image('prop_forge_crate', new URL('../../assets/ohmdal/rooms/pilot-arco1/prop_forge_crate_runtime.png', import.meta.url).href);
+    this.load.image('prop_forge_ingots', new URL('../../assets/ohmdal/rooms/pilot-arco1/prop_forge_ingots_runtime.png', import.meta.url).href);
     for (const [key, url] of Object.entries(ROOM_BACKGROUND_FILES)) {
       this.load.image(key, url);
     }
@@ -251,6 +270,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     applyNearestFilter(this);
     this.loadRoom(state.room, undefined, true);
+    requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('roxana:game-ready')));
   }
 
   private playerBounds(x = this.player.x, y = this.player.y): Rect {
@@ -263,6 +283,25 @@ export class ExplorationScene extends Phaser.Scene {
     const pb = this.playerBounds(x, y);
     if (this.activeScene?.walkable.length && !this.activeScene.walkable.some((r) => rectContainsRect(r, pb))) return true;
     return this.solids.some((s) => rectsOverlap(pb, s));
+  }
+
+  /** Punto legal más cercano; evita rescatar al jugador hacia centros ocupados. */
+  private nearestLegalPoint(x: number, y: number): { x: number; y: number } {
+    const candidates: { x: number; y: number }[] = [];
+    for (const p of Object.values(this.activeScene?.entries ?? {})) candidates.push(p);
+    for (const r of this.activeScene?.walkable ?? []) {
+      for (let cy = r.y + 16; cy <= r.y + r.h - 16; cy += 16) {
+        for (let cx = r.x + 16; cx <= r.x + r.w - 16; cx += 16) candidates.push({ x: cx, y: cy });
+      }
+    }
+    let best: { x: number; y: number } | null = null;
+    let bestDist = Infinity;
+    for (const p of candidates) {
+      if (this.collides(p.x, p.y)) continue;
+      const distance = Math.hypot(p.x - x, p.y - y);
+      if (distance < bestDist) { best = p; bestDist = distance; }
+    }
+    return best ?? this.chunkCenter(this.currentChunk);
   }
 
   /** atmósfera musical por zona (la plaza y la Puerta cambian al encenderse Ohmdal) */
@@ -314,6 +353,20 @@ export class ExplorationScene extends Phaser.Scene {
     return null;
   }
 
+  /** Evita que flags históricos vuelvan a poblar unidades ya terminadas. */
+  private actorFitsNarrativeStage(actor: string, roomId: string): boolean {
+    const party = actor === 'edda' || actor === 'lumen' || actor === 'ohm' || actor === 'consejera';
+    if (!party) return true;
+    const flags = state.flags;
+    if (roomId.startsWith('castle_')) return flags.enteredCastle && !flags.unit2Completed;
+    if (roomId.startsWith('forge_')) return flags.unit2Completed && !flags.unit3Completed;
+    if (roomId.startsWith('terraces_')) return flags.unit3Completed && !flags.unit4Completed;
+    if (roomId.startsWith('lighthouse_') || roomId === 'clock_tower') {
+      return flags.unit4Completed && !flags.unit5Completed;
+    }
+    return true;
+  }
+
   /**
    * Una persona solo puede existir una vez dentro del mundo continuo. Se elige
    * su puesta en escena del chunk activo o, si no tiene una, la más cercana.
@@ -325,6 +378,9 @@ export class ExplorationScene extends Phaser.Scene {
       for (const thing of ROOMS[roomId]?.things ?? []) {
         const key = this.actorKey(thing.id);
         if (!key || thing.visible?.() === false) continue;
+        // Despierto, Ohm deja de ser una copia estática por sala y pasa a ser
+        // el compañero persistente del HUD. El pedestal sólo existe antes.
+        if (key === 'ohm' && state.flags.ohmAwake) continue;
         const score = roomId === activeId
           ? -1
           : Math.abs(offset.ox - origin.ox) + Math.abs(offset.oy - origin.oy);
@@ -410,14 +466,27 @@ export class ExplorationScene extends Phaser.Scene {
     // Reconstruye solo la puesta en escena: la cámara y la posición global se
     // conservan, pero la comitiva adopta una única ubicación en el nuevo sector.
     this.loadRoom(id, position, false);
-    const def = ROOMS[id];
     const mood = this.moodOf(id);
     setAmbience(mood);
     this.tweens.add({ targets: this.darkness, alpha: AMBIENT[mood], duration: 700 });
-    this.roomName.setText(def.name);
-    this.roomName.setAlpha(0);
-    this.tweens.add({ targets: this.roomName, alpha: 1, duration: 600 });
-    def.onEnter?.();
+    this.showRoomBanner(ROOMS[id].name);
+    ROOMS[id].onEnter?.();
+  }
+
+  /** Cartel breve de llegada: informa la zona y luego libera la escena. */
+  private showRoomBanner(name: string): void {
+    this.tweens.killTweensOf(this.roomName);
+    this.roomName.setText(name).setAlpha(0).setY(26);
+    this.tweens.add({
+      targets: this.roomName,
+      alpha: 1,
+      y: 34,
+      duration: 260,
+      ease: 'Sine.Out',
+      hold: 1700,
+      yoyo: true,
+      completeDelay: 150,
+    });
   }
 
   private loadRoom(
@@ -450,10 +519,14 @@ export class ExplorationScene extends Phaser.Scene {
     }
     this.roomObjects = [];
     this.rigs = [];
+    this.actorBodies.clear();
+    this.actorLabels.clear();
     this.things = [];
     this.doors = [];
     this.solids = [];
-    this.moveTarget = null;
+    // Una transición no debe arrastrar la inercia del movimiento anterior a la sala nueva.
+    this.velX = 0;
+    this.velY = 0;
     this.nearThing = null;
 
     const add = <T extends Phaser.GameObjects.GameObject>(o: T): T => {
@@ -514,8 +587,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     // penumbra y HUD
     this.darkness.setAlpha(AMBIENT[mood]);
-    this.roomName.setText(def.name);
-    this.roomName.setAlpha(1);
+    if (fireEnter) this.showRoomBanner(def.name);
     if (fireEnter) this.cameras.main.fadeIn(240, 7, 8, 16);
 
     // posicionar al jugador (spawns de puertas/goto son locales a la sala destino)
@@ -528,17 +600,16 @@ export class ExplorationScene extends Phaser.Scene {
     );
     this.player.setScale(scaleAt(this.activeScene, this.player.y - fo.oy));
     // si quedó dentro de algo sólido (spawn junto a una puerta), empujar hacia el centro
-    const cc = this.chunkCenter(id);
-    let guard = 0;
-    while (this.collides(this.player.x, this.player.y) && guard++ < 60) {
-      const dx = cc.x - this.player.x;
-      const dy = cc.y - this.player.y;
-      const len = Math.hypot(dx, dy) || 1;
-      this.player.setPosition(this.player.x + (dx / len) * 8, this.player.y + (dy / len) * 8);
+    if (this.collides(this.player.x, this.player.y)) {
+      const safe = this.nearestLegalPoint(this.player.x, this.player.y);
+      this.player.setPosition(safe.x, safe.y);
     }
     this.doorCooldown = 700;
 
     if (fireEnter) def.onEnter?.();
+    this.transitioning = false;
+    this.incomingActorKeys.clear();
+    this.incomingFromRoom = null;
   }
 
   /** construye un chunk del mundo: base, murallas, puertas/aberturas, cosas y personajes */
@@ -597,7 +668,6 @@ export class ExplorationScene extends Phaser.Scene {
     for (const bd of boundaries) {
       if (bd.from !== id) continue;
       const locked = !!bd.door.locked?.();
-      const horizontal = bd.rect.w >= bd.rect.h;
       // si un portal monumental (thing) cubre el paso, él cuenta el estado con su
       // propio arte: no se dibuja el sello genérico ni la etiqueta duplicada
       const monument = def.things.some(
@@ -621,31 +691,20 @@ export class ExplorationScene extends Phaser.Scene {
           pushTo: this.chunkCenter(id),
         });
       }
-      if (!monument) {
-        add(
-          this.add
-            .text(
-              bd.rect.x + bd.rect.w / 2 + (horizontal ? 0 : bd.rect.x < ox + W / 2 ? 56 : -56),
-              bd.rect.y + bd.rect.h / 2 + (horizontal ? (bd.rect.y < oy + H / 2 ? 42 : -38) : 0),
-              bd.door.label,
-              { fontFamily: 'Georgia, serif', fontSize: '12px', color: '#e4d394', stroke: '#161323', strokeThickness: 3 },
-            )
-            .setOrigin(0.5)
-            .setAlpha(0.9)
-            .setDepth(DEPTH.label),
-        );
-      }
     }
 
     // puertas con transición (interiores y regiones lejanas)
     for (const d of def.doors) {
-      if (d.visible && !d.visible()) continue;
       if (d.to in this.chunks) continue; // es una abertura del mundo, ya tratada
       const anchor = sceneProfile?.doors?.[d.to];
       const sd: DoorDef = anchor
         ? { ...d, ...anchor, x: anchor.x + ox, y: anchor.y + oy }
         : { ...d, x: d.x + ox, y: d.y + oy };
-      const cx = sd.x + sd.w / 2;
+      // vano sellado: una puerta trabada u oculta es muro mientras dure su estado.
+      // El rebuild por flags retira la barrera cuando la puerta se abre.
+      const hidden = !!(d.visible && !d.visible());
+      if (hidden || d.locked?.()) this.solids.push({ x: sd.x, y: sd.y, w: sd.w, h: sd.h });
+      if (hidden) continue;
       const cy = sd.y + sd.h / 2;
       // los vanos del muro norte atraviesan también su cara vista (¾)
       const extraH = sd.w > sd.h && cy < oy + H / 2 ? 15 : 0;
@@ -657,22 +716,6 @@ export class ExplorationScene extends Phaser.Scene {
           { x: sd.x, y: sd.y, w: sd.w, h: sd.h + extraH, color: sd.color, locked: !!sd.locked?.() },
           def.wall(),
         );
-      const horizontal = sd.w > sd.h;
-      const lx = Math.min(Math.max(cx, ox + 90), ox + W - 90);
-      const ly = horizontal ? (cy < oy + H / 2 ? cy + 28 : cy - 24) : cy - sd.h / 2 - 14;
-      add(
-        this.add
-          .text(lx, ly, sd.label, {
-            fontFamily: 'Georgia, serif',
-            fontSize: '12px',
-            color: '#e4d394',
-            stroke: '#161323',
-            strokeThickness: 3,
-          })
-          .setOrigin(0.5)
-          .setAlpha(0.9)
-          .setDepth(DEPTH.label),
-      );
       // zona de activación inflada: la puerta visual vive dentro del muro,
       // el jugador debe poder dispararla al tocarla desde el interior de la sala
       this.doors.push({
@@ -690,57 +733,76 @@ export class ExplorationScene extends Phaser.Scene {
       const anchor = sceneProfile?.doors?.[to];
       return anchor ? { ...dd, ...anchor, x: anchor.x + ox, y: anchor.y + oy } : { ...dd, x: dd.x + ox, y: dd.y + oy };
     };
+    const aliasedSources = new Set(Object.values(sceneProfile?.interactionAliases ?? {}));
+    let walkInStagger = 0;
     for (const t of def.things) {
-      const actor = this.actorKey(t.id);
-      if (actor && this.activeActorChunks.get(actor) !== id) continue;
-      const placed = sceneProfile?.things?.[t.id];
+      if (sceneProfile?.hiddenThings?.includes(t.id) || aliasedSources.has(t.id)) continue;
+      const interactionSourceId = sceneProfile?.interactionAliases?.[t.id];
+      const interactionSource = interactionSourceId
+        ? def.things.find((candidate) => candidate.id === interactionSourceId)
+        : undefined;
+      const effectiveThing: ThingDef = interactionSource
+        ? {
+            ...t,
+            prompt: sceneProfile?.interactionPrompts?.[t.id] ?? interactionSource.prompt,
+            emoji: interactionSource.emoji,
+            onInteract: interactionSource.onInteract,
+          }
+        : t;
+      const actor = this.actorKey(effectiveThing.id);
+      if (actor && !this.actorFitsNarrativeStage(actor, id)) continue;
+      if (actor === 'ohm' && state.flags.ohmAwake) continue;
+      const placed = sceneProfile?.things?.[effectiveThing.id];
       const baked = placed?.baked
-        ?? t.baked
-        ?? (sceneProfile ? !!sceneProfile.bakedThings?.includes(t.id) : false);
+        ?? effectiveThing.baked
+        ?? (sceneProfile ? !!sceneProfile.bakedThings?.includes(effectiveThing.id) : false);
       const st: ThingDef = {
-        ...t,
+        ...effectiveThing,
         baked,
-        solid: baked ? false : t.solid,
-        x: (placed?.x ?? t.x) + ox,
-        y: (placed?.y ?? t.y) + oy,
+        solid: baked ? false : effectiveThing.solid,
+        x: (placed?.x ?? effectiveThing.x) + ox,
+        y: (placed?.y ?? effectiveThing.y) + oy,
       };
       if (st.visible && !st.visible()) {
         // se fue durante este refresh: sale caminando hasta su puerta
+        // Esto debe evaluarse antes de deduplicar actores: al quedar invisible,
+        // el actor ya no figura en activeActorChunks, pero su cuerpo anterior
+        // sigue siendo precisamente el que tiene que despedirse caminando.
         if (!fireEnter && st.walksTo && prevNPCs.has(st.id)) {
           const door = shiftedDoor(st.walksTo);
           if (door) this.walkOut(st, door);
         }
         continue;
       }
+      if (actor && this.activeActorChunks.get(actor) !== id) continue;
       const color = typeof st.color === 'function' ? st.color() : st.color;
       const body = add(this.makeThingVisual(st));
       if (body instanceof CharacterRig) body.setScale(body.scale * scaleAt(sceneProfile, st.y - oy));
-      let label: Phaser.GameObjects.Text | null = null;
-      if (st.label && body instanceof CharacterRig) {
-        const halfH = body instanceof CharacterRig ? 30 * body.scale : st.h / 2;
-        label = add(
-          this.add
-            .text(st.x, st.y - halfH - 12, st.label, {
-              fontFamily: 'Georgia, serif',
-              fontSize: '11px',
-              color: '#fff3c4',
-              stroke: '#171321',
-              strokeThickness: 3,
-            })
-            .setOrigin(0.5)
-            .setAlpha(0.85)
-            .setDepth(DEPTH.label),
-        );
+      // Los nombres aparecen en el prompt contextual al acercarse; no flotan
+      // permanentemente sobre todos los habitantes.
+      const label: Phaser.GameObjects.Text | null = null;
+      if (actor && body instanceof CharacterRig) {
+        this.actorBodies.set(actor, body);
+        if (label) this.actorLabels.set(actor, label);
       }
       const bounds: Rect = { x: st.x - st.w / 2, y: st.y - st.h / 2, w: st.w, h: st.h };
+      // El sprite ocupa alto visual, pero físicamente el personaje sólo bloquea
+      // una pequeña zona en los pies. Así se puede circular entre grupos.
+      const solidBounds: Rect = body instanceof CharacterRig
+        ? { x: st.x - 8, y: st.y - 5, w: 16, h: 10 }
+        : bounds;
       // llegó durante este refresh: entra caminando desde su puerta
-      const doorIn =
-        !fireEnter && st.walksTo && !prevNPCs.has(st.id) ? shiftedDoor(st.walksTo) : undefined;
+      const carriedDoor = actor && this.incomingActorKeys.has(actor) && this.incomingFromRoom
+        ? shiftedDoor(this.incomingFromRoom)
+        : undefined;
+      const doorIn = carriedDoor
+        ?? (!fireEnter && st.walksTo && !prevNPCs.has(st.id) ? shiftedDoor(st.walksTo) : undefined);
       if (doorIn) {
-        this.walkIn(st, doorIn, body, label, bounds);
+        this.walkIn(st, doorIn, body, label, bounds, solidBounds, walkInStagger);
+        walkInStagger += 240;
       } else {
-        this.things.push({ def: st, bounds });
-        if (st.solid !== false) this.solids.push(bounds);
+        if (st.interactive !== false) this.things.push({ def: st, bounds });
+        if (st.solid !== false) this.solids.push(solidBounds);
         // luz real de lo encendido (lámparas, portal, farol de Lumen, Ohm despierto…)
         const portalAbierto =
           (st.id === 'lapuerta' || st.id === 'puerta-castillo') && luminance(color) > 0.35;
@@ -787,7 +849,8 @@ export class ExplorationScene extends Phaser.Scene {
     if (t.sprite && this.textures.exists(t.sprite)) {
       const container = this.add.container(t.x, t.y);
       const img = this.add.image(0, 0, t.sprite).setOrigin(0.5, 0.88);
-      img.setScale(t.spriteScale ?? 1);
+      if (t.spriteFit === 'bounds') img.setDisplaySize(t.w, t.h);
+      else img.setScale(t.spriteScale ?? 1);
       img.setTint(color);
       container.add(img);
       container.setDepth(this.bodyDepth(t.y));
@@ -828,7 +891,16 @@ export class ExplorationScene extends Phaser.Scene {
       body.setMoving(true);
     }
     this.roomObjects.push(body);
-    const dur = (Math.hypot(dx - t.x, dy - t.y) / SPEED) * 1000;
+    if (body instanceof CharacterRig) {
+      this.animateActorPath(
+        body,
+        undefined,
+        this.navigationPath({ x: t.x, y: t.y }, { x: dx, y: dy }),
+        () => body.destroy(),
+      );
+      return;
+    }
+    const dur = (Math.hypot(dx - t.x, dy - t.y) / NPC_MOVE_SPEED) * 1000;
     const step = this.npcStepper(body);
     this.tweens.add({
       targets: body,
@@ -841,24 +913,6 @@ export class ExplorationScene extends Phaser.Scene {
       },
       onComplete: () => body.destroy(),
     });
-    if (t.label) {
-      const label = this.add
-        .text(t.x, t.y - t.h / 2 - 14, t.label, {
-          fontFamily: 'Segoe UI, sans-serif',
-          fontSize: '12px',
-          color: '#cfc7da',
-        })
-        .setOrigin(0.5);
-      this.roomObjects.push(label);
-      this.tweens.add({
-        targets: label,
-        x: dx,
-        y: dy - t.h / 2 - 14,
-        alpha: 0,
-        duration: dur,
-        onComplete: () => label.destroy(),
-      });
-    }
   }
 
   /** el NPC entra caminando desde la puerta; recién al llegar se vuelve sólido e interactuable */
@@ -868,41 +922,43 @@ export class ExplorationScene extends Phaser.Scene {
     body: Phaser.GameObjects.Container,
     label: Phaser.GameObjects.Text | null,
     bounds: Rect,
+    solidBounds: Rect,
+    startDelay = 0,
   ): void {
     const { x: sx, y: sy } = this.doorCenter(door);
-    const dur = (Math.hypot(t.x - sx, t.y - sy) / SPEED) * 1000;
     body.setPosition(sx, sy);
     const rig = body instanceof CharacterRig ? body : null;
-    if (rig) {
-      rig.setFacing(facingOf(t.x - sx, t.y - sy));
-      rig.setMoving(true);
-    }
     const gen = this.roomGen;
+    const finish = (): void => {
+      if (rig) {
+        rig.setMoving(false);
+        rig.setFacing('south');
+        rig.setDepth(this.bodyDepth(t.y));
+      }
+      if (label) label.setPosition(t.x, t.y - t.h / 2 - 14);
+      if (gen !== this.roomGen) return;
+      if (t.interactive !== false) this.things.push({ def: t, bounds });
+      if (t.solid !== false) this.solids.push(solidBounds);
+    };
+    if (label) label.setPosition(sx, sy - t.h / 2 - 14);
+    if (rig) {
+      this.animateActorPath(
+        rig,
+        label ?? undefined,
+        this.navigationPath({ x: sx, y: sy }, { x: t.x, y: t.y }),
+        finish,
+        startDelay,
+      );
+      return;
+    }
+    const duration = (Math.hypot(t.x - sx, t.y - sy) / NPC_MOVE_SPEED) * 1000;
     const step = this.npcStepper(body);
     this.tweens.add({
-      targets: body,
-      x: t.x,
-      y: t.y,
-      duration: dur,
-      onUpdate: () => {
-        step();
-        body.setDepth(this.bodyDepth(body.y));
-      },
-      onComplete: () => {
-        if (rig) {
-          rig.setMoving(false);
-          rig.setFacing('south');
-          rig.setDepth(this.bodyDepth(t.y));
-        }
-        if (gen !== this.roomGen) return; // la sala cambió mientras caminaba
-        this.things.push({ def: t, bounds });
-        if (t.solid !== false) this.solids.push(bounds);
-      },
+      targets: body, x: t.x, y: t.y, duration, delay: startDelay,
+      onUpdate: () => { step(); body.setDepth(this.bodyDepth(body.y)); },
+      onComplete: finish,
     });
-    if (label) {
-      label.setPosition(sx, sy - t.h / 2 - 14);
-      this.tweens.add({ targets: label, x: t.x, y: t.y - t.h / 2 - 14, duration: dur });
-    }
+    if (label) this.tweens.add({ targets: label, x: t.x, y: t.y - t.h / 2 - 14, duration, delay: startDelay });
   }
 
   private toggleMap(force?: boolean): void {
@@ -916,16 +972,18 @@ export class ExplorationScene extends Phaser.Scene {
     const accentCss = `#${accent.toString(16).padStart(6, '0')}`;
     const backdrop = this.add
       .image(480, 270, 'ohmdal-map-panel')
-      .setDisplaySize(790, 470)
+      // El PNG del pergamino es 4:3. Mantener esa proporción evita deformar
+      // el marco y da al diagrama una caja de lectura más serena.
+      .setDisplaySize(640, 480)
       .setAlpha(0.98);
     const panel = this.add.graphics();
     panel.fillStyle(0x071026, 0.3);
-    panel.fillRoundedRect(112, 45, 736, 450, 8);
+    panel.fillRoundedRect(176, 49, 608, 442, 8);
     panel.lineStyle(2, accent, 0.9);
-    panel.strokeRoundedRect(128, 62, 704, 416, 5);
+    panel.strokeRoundedRect(192, 64, 576, 398, 5);
     this.mapLayer.add([backdrop, panel]);
 
-    const title = this.add.text(154, 75, (world?.name ?? 'Ohmdal').toLocaleUpperCase('es'), {
+    const title = this.add.text(208, 76, (world?.name ?? 'Ohmdal').toLocaleUpperCase('es'), {
       fontFamily: 'Georgia, serif',
       fontSize: '20px',
       color: accentCss,
@@ -943,45 +1001,64 @@ export class ExplorationScene extends Phaser.Scene {
       color: '#d6def4',
       letterSpacing: 1,
     });
+    hint.setPosition(752, 79);
+    location.setPosition(208, 103);
     this.mapLayer.add([title, hint, location]);
 
-    const entries = Object.entries(this.chunks);
-    const minX = Math.min(...entries.map(([, p]) => p.ox));
-    const maxX = Math.max(...entries.map(([, p]) => p.ox + W));
-    const minY = Math.min(...entries.map(([, p]) => p.oy));
-    const maxY = Math.max(...entries.map(([, p]) => p.oy + H));
-    const spanX = Math.max(W, maxX - minX);
-    const spanY = Math.max(H, maxY - minY);
-    const scale = Math.min(520 / spanX, 285 / spanY);
-    const originX = 480 - (spanX * scale) / 2;
-    const originY = 137 + (285 - spanY * scale) / 2;
-
+    // Las salas pintadas se renderizan de a una, pero el mapa siempre cuenta
+    // la geografía completa del mundo al que pertenecen.
+    const mapChunks = world?.rooms ?? this.chunks;
+    // Esquema de lectura: conserva conexiones, pero no copia literalmente las
+    // distancias del mundo. Así evita que el ferry o los extremos del valle
+    // aplasten el resto del mapa dentro del pergamino.
+    const mapNodes: Record<string, { x: number; y: number }> = {
+      plaza: { x: 510, y: 255 }, taller: { x: 610, y: 255 }, puerta: { x: 510, y: 205 }, manantial_ohm: { x: 510, y: 155 },
+      castle_gate: { x: 390, y: 245 }, castle_gallery: { x: 390, y: 205 }, castle_branches: { x: 390, y: 165 }, castle_heart: { x: 390, y: 125 },
+      forge_yard: { x: 440, y: 305 }, forge_infirmary: { x: 370, y: 305 }, forge_longchannel: { x: 300, y: 305 }, forge_hall: { x: 230, y: 305 },
+      terraces_top: { x: 510, y: 305 }, terraces_mid: { x: 510, y: 340 }, terraces_mural: { x: 510, y: 375 }, terraces_aqueduct: { x: 510, y: 410 },
+      lighthouse_hall: { x: 590, y: 410 }, lighthouse_bench: { x: 645, y: 375 }, clock_tower: { x: 700, y: 340 }, lighthouse_lantern: { x: 735, y: 305 },
+    };
+    const mapNames: Record<string, string> = {
+      plaza: 'Plaza', taller: 'Taller', puerta: 'Puerta', manantial_ohm: 'Manantial',
+      castle_gate: 'Castillo', castle_gallery: 'Galería', castle_branches: 'Ramales', castle_heart: 'Corazón',
+      forge_yard: 'Patio', forge_infirmary: 'Fusibles', forge_longchannel: 'Canal largo', forge_hall: 'Nave mayor',
+      terraces_top: 'Terraza alta', terraces_mid: 'Reparto', terraces_mural: 'Mural', terraces_aqueduct: 'Acueducto',
+      lighthouse_hall: 'Faro', lighthouse_bench: 'Taller', clock_tower: 'Reloj', lighthouse_lantern: 'Linterna',
+    };
+    const nodeFor = (id: string): { x: number; y: number } => mapNodes[id] ?? { x: 480, y: 300 };
+    const nodeW = 68;
+    const nodeH = 28;
+    const entries = Object.entries(mapChunks);
     const map = this.add.graphics();
     // Red de caminos primero: el mapa cuenta continuidad, no una lista de cajas.
     const linked = new Set<string>();
-    for (const [id, p] of entries) {
+    for (const [id] of entries) {
       for (const door of ROOMS[id]?.doors ?? []) {
-        const target = this.chunks[door.to];
+        if (door.visible && !door.visible()) continue;
+        const target = mapChunks[door.to];
         if (!target) continue;
         const edge = [id, door.to].sort().join('|');
         if (linked.has(edge)) continue;
         linked.add(edge);
-        const ax = originX + (p.ox - minX + W / 2) * scale;
-        const ay = originY + (p.oy - minY + H / 2) * scale;
-        const bx = originX + (target.ox - minX + W / 2) * scale;
-        const by = originY + (target.oy - minY + H / 2) * scale;
-        map.lineStyle(8, 0x071020, 0.9);
+        const fromNode = nodeFor(id);
+        const toNode = nodeFor(door.to);
+        const ax = fromNode.x;
+        const ay = fromNode.y;
+        const bx = toNode.x;
+        const by = toNode.y;
+        map.lineStyle(6, 0x071020, 0.9);
         map.lineBetween(ax, ay, bx, by);
-        map.lineStyle(3, accent, 0.85);
+        map.lineStyle(2, accent, 0.85);
         map.lineBetween(ax, ay, bx, by);
       }
     }
     const visited = new Set(state.flags.salasVisitadas);
-    for (const [id, p] of entries) {
-      const x = originX + (p.ox - minX) * scale;
-      const y = originY + (p.oy - minY) * scale;
-      const cw = W * scale;
-      const ch = H * scale;
+    for (const [id] of entries) {
+      const node = nodeFor(id);
+      const x = node.x - nodeW / 2;
+      const y = node.y - nodeH / 2;
+      const cw = nodeW;
+      const ch = nodeH;
       const active = id === this.currentChunk;
       const known = active || visited.has(id);
       map.fillStyle(active ? accent : known ? 0x293765 : 0x111a35, active ? 0.98 : 0.9);
@@ -1000,10 +1077,16 @@ export class ExplorationScene extends Phaser.Scene {
         align: 'center',
         wordWrap: { width: Math.max(64, cw - 10) },
       }).setOrigin(0.5);
+      label.setText(mapNames[id] ?? id);
+      label.setFontSize(8);
+      label.setWordWrapWidth(cw - 8);
       this.mapLayer.add(label);
     }
-    const px = originX + (this.player.x - minX) * scale;
-    const py = originY + (this.player.y - minY) * scale;
+    const activeNode = nodeFor(this.currentChunk);
+    const localX = Math.max(-0.35, Math.min(0.35, (this.player.x - W / 2) / W));
+    const px = activeNode.x + localX * nodeW;
+    // La marca se apoya bajo el nodo activo para no tapar su nombre.
+    const py = activeNode.y + nodeH / 2 + 7;
     map.fillStyle(0xfff1a4, 1);
     map.fillCircle(px, py, 6);
     map.lineStyle(2, 0x20142c, 1);
@@ -1018,6 +1101,7 @@ export class ExplorationScene extends Phaser.Scene {
       color: '#b9c5e6',
       letterSpacing: 0.5,
     });
+    legend.setPosition(208, 438);
     this.mapLayer.addAt(map, 2);
     this.mapLayer.add(legend);
   }
@@ -1032,6 +1116,14 @@ export class ExplorationScene extends Phaser.Scene {
   ): void {
     for (const effect of profile.effects ?? []) {
       if (!this.effectEnabled(effect)) continue;
+      if (effect.kind === 'sprite') {
+        add(
+          this.add.image(effect.x, effect.y, effect.texture)
+            .setDisplaySize(effect.w, effect.h)
+            .setDepth(DEPTH.decor + 3),
+        );
+        continue;
+      }
       if (effect.kind === 'glow' || effect.kind === 'pulse') {
         const glow = add(
           this.add.image(effect.x, effect.y, 'vis-glow')
@@ -1039,9 +1131,9 @@ export class ExplorationScene extends Phaser.Scene {
             .setBlendMode(Phaser.BlendModes.ADD)
             .setDisplaySize(effect.radius * 2, effect.radius * 2)
             .setDepth(DEPTH.light)
-            .setAlpha(effect.kind === 'pulse' ? 0.09 : 0.16),
+            .setAlpha(effect.kind === 'pulse' ? 0.2 : 0.3),
         );
-        this.tweens.add({ targets: glow, alpha: effect.kind === 'pulse' ? 0.24 : 0.1, duration: effect.kind === 'pulse' ? 1250 : 2100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+        this.tweens.add({ targets: glow, alpha: effect.kind === 'pulse' ? 0.42 : 0.2, duration: effect.kind === 'pulse' ? 1250 : 2100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
         continue;
       }
       if (effect.kind === 'beam') {
@@ -1052,9 +1144,9 @@ export class ExplorationScene extends Phaser.Scene {
             .setBlendMode(Phaser.BlendModes.ADD)
             .setDisplaySize(effect.radius, 55)
             .setDepth(DEPTH.light)
-            .setAlpha(0.11),
+            .setAlpha(0.34),
         );
-        this.tweens.add({ targets: beam, angle: 360, duration: 10500, repeat: -1, ease: 'Linear' });
+        this.tweens.add({ targets: beam, angle: 360, alpha: { from: 0.3, to: 0.46 }, duration: 10500, repeat: -1, yoyo: false, ease: 'Linear' });
         continue;
       }
       if (!('w' in effect) || !('h' in effect)) continue;
@@ -1102,7 +1194,9 @@ export class ExplorationScene extends Phaser.Scene {
       return;
     }
     if (uiOpen()) return;
-    if (document.body.classList.contains('touch-device')) return;
+    // El canvas no es un point-and-click en escritorio: E es la única acción.
+    // En táctil se admite tocar el hotspot además del botón de acción.
+    if (!touchControlsEnabled()) return;
     const wx = p.worldX;
     const wy = p.worldY;
     for (const t of this.things) {
@@ -1112,13 +1206,135 @@ export class ExplorationScene extends Phaser.Scene {
         const cy = b.y + b.h / 2;
         if (Phaser.Math.Distance.Between(this.player.x, this.player.y, cx, cy) <= INTERACT_DIST + b.w / 2) {
           t.def.onInteract();
-        } else {
-          this.moveTarget = { x: cx, y: cy };
         }
         return;
       }
     }
-    this.moveTarget = { x: wx, y: wy };
+  }
+
+  /** Ruta ortogonal corta sobre el mismo mapa de colisiones que usa el jugador. */
+  private navigationPath(start: { x: number; y: number }, exit: { x: number; y: number }): { x: number; y: number }[] {
+    const step = 24;
+    const goal = this.nearestLegalPoint(exit.x, exit.y);
+    const startSafe = this.collides(start.x, start.y) ? this.nearestLegalPoint(start.x, start.y) : start;
+    const key = (x: number, y: number) => `${Math.round(x / step)},${Math.round(y / step)}`;
+    const queue = [{ x: startSafe.x, y: startSafe.y }];
+    const parent = new Map<string, string | null>([[key(startSafe.x, startSafe.y), null]]);
+    const points = new Map<string, { x: number; y: number }>([[key(startSafe.x, startSafe.y), startSafe]]);
+    const goalKey = key(goal.x, goal.y);
+    let found: string | null = null;
+    for (let index = 0; index < queue.length && index < 2400; index++) {
+      const current = queue[index];
+      const currentKey = key(current.x, current.y);
+      if (currentKey === goalKey || Math.hypot(current.x - goal.x, current.y - goal.y) < step) { found = currentKey; break; }
+      for (const [dx, dy] of [[step, 0], [-step, 0], [0, step], [0, -step]]) {
+        const next = { x: current.x + dx, y: current.y + dy };
+        const nextKey = key(next.x, next.y);
+        if (parent.has(nextKey) || next.x < 0 || next.x > W || next.y < 0 || next.y > H || this.collides(next.x, next.y)) continue;
+        parent.set(nextKey, currentKey);
+        points.set(nextKey, next);
+        queue.push(next);
+      }
+    }
+    if (!found) return [goal, exit];
+    const reversed: { x: number; y: number }[] = [];
+    for (let cursor: string | null = found; cursor; cursor = parent.get(cursor) ?? null) reversed.push(points.get(cursor)!);
+    reversed.reverse();
+    const corners: { x: number; y: number }[] = [];
+    let lastDirection = '';
+    for (let i = 1; i < reversed.length; i++) {
+      const previous = reversed[i - 1];
+      const current = reversed[i];
+      const direction = Math.abs(current.x - previous.x) > Math.abs(current.y - previous.y) ? 'h' : 'v';
+      if (i > 1 && direction !== lastDirection) corners.push(previous);
+      lastDirection = direction;
+    }
+    corners.push(goal, exit);
+    return corners;
+  }
+
+  private animateActorPath(
+    body: CharacterRig,
+    label: Phaser.GameObjects.Text | undefined,
+    points: { x: number; y: number }[],
+    onComplete?: () => void,
+    startDelay = 0,
+  ): number {
+    let total = 0;
+    let previous = { x: body.x, y: body.y };
+    const run = (index: number): void => {
+      const target = points[index];
+      if (!target) { body.setMoving(false); onComplete?.(); return; }
+      const duration = Math.max(90, (Math.hypot(target.x - body.x, target.y - body.y) / NPC_MOVE_SPEED) * 1000);
+      body.setFacing(facingOf(target.x - body.x, target.y - body.y));
+      body.setMoving(true);
+      this.tweens.add({
+        targets: body, x: target.x, y: target.y, duration, ease: 'Linear',
+        onUpdate: () => body.setDepth(this.bodyDepth(body.y)),
+        onComplete: () => run(index + 1),
+      });
+      if (label) this.tweens.add({ targets: label, x: target.x, y: target.y - 42, duration, ease: 'Linear' });
+    };
+    for (const point of points) {
+      total += Math.max(90, (Math.hypot(point.x - previous.x, point.y - previous.y) / NPC_MOVE_SPEED) * 1000);
+      previous = point;
+    }
+    if (startDelay > 0) {
+      // la comitiva sale en fila, no superpuesta: cada actor espera su turno
+      const gen = this.roomGen;
+      this.time.delayedCall(startDelay, () => { if (gen === this.roomGen) run(0); });
+    } else run(0);
+    return startDelay + total;
+  }
+
+  /**
+   * Cruce diegético entre salas pintadas: la comitiva camina hasta el umbral,
+   * hay un fundido corto y los mismos actores entran por el vano de destino.
+   */
+  private beginDoorTransition(door: PlacedDoor): void {
+    if (this.transitioning) return;
+    this.transitioning = true;
+    this.player.setMoving(false);
+
+    const from = this.currentChunk;
+    const to = door.def.to;
+    const targetActors = new Set<string>();
+    for (const thing of ROOMS[to]?.things ?? []) {
+      const key = this.actorKey(thing.id);
+      if (key && !(key === 'ohm' && state.flags.ohmAwake)
+        && this.actorFitsNarrativeStage(key, to) && thing.visible?.() !== false) targetActors.add(key);
+    }
+    this.incomingActorKeys = new Set(
+      [...this.actorBodies.keys()].filter((key) => targetActors.has(key)),
+    );
+    this.incomingFromRoom = from;
+
+    const exitX = door.bounds.x + door.bounds.w / 2;
+    const exitY = door.bounds.y + door.bounds.h / 2;
+    let travelMs = 180;
+    let stagger = 0;
+    for (const key of this.incomingActorKeys) {
+      const body = this.actorBodies.get(key);
+      if (!body) continue;
+      const label = this.actorLabels.get(key);
+      const duration = this.animateActorPath(
+        body,
+        label,
+        this.navigationPath(body, { x: exitX, y: exitY }),
+        undefined,
+        stagger,
+      );
+      stagger += 240;
+      travelMs = Math.max(travelMs, duration);
+    }
+
+    const fadeDelay = Math.min(900, travelMs + 40);
+    this.time.delayedCall(Math.max(0, fadeDelay - 220), () => this.cameras.main.fadeOut(220, 7, 8, 16));
+    this.time.delayedCall(fadeDelay, () => {
+      const targetScene = roomScene(to);
+      const entry = targetScene?.entries?.[from] ?? door.def.spawn;
+      this.loadRoom(to, entry, true);
+    });
   }
 
   update(time: number, delta: number): void {
@@ -1131,10 +1347,16 @@ export class ExplorationScene extends Phaser.Scene {
       this.player.tick(delta);
       return;
     }
+    if (this.transitioning) {
+      this.player.setMoving(false);
+      this.player.tick(delta);
+      for (const rig of this.rigs) rig.tick(delta);
+      return;
+    }
     const dt = delta / 1000;
     this.doorCooldown = Math.max(0, this.doorCooldown - delta);
 
-    // dirección de movimiento — teclado, joystick, o tap-to-move (en ese orden)
+    // dirección de movimiento — teclado o joystick
     let vx = 0;
     let vy = 0;
     const k = this.keys;
@@ -1148,20 +1370,6 @@ export class ExplorationScene extends Phaser.Scene {
       if (joy.vx !== 0 || joy.vy !== 0) {
         vx = joy.vx;
         vy = joy.vy;
-        this.moveTarget = null;
-      }
-    }
-
-    if (vx !== 0 || vy !== 0) {
-      this.moveTarget = null;
-    } else if (this.moveTarget) {
-      const dx = this.moveTarget.x - this.player.x;
-      const dy = this.moveTarget.y - this.player.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist < 6) this.moveTarget = null;
-      else {
-        vx = dx / dist;
-        vy = dy / dist;
       }
     }
 
@@ -1170,8 +1378,8 @@ export class ExplorationScene extends Phaser.Scene {
     let ty = 0;
     if (vx !== 0 || vy !== 0) {
       const len = Math.hypot(vx, vy);
-      tx = (vx / len) * SPEED;
-      ty = (vy / len) * SPEED;
+      tx = (vx / len) * PLAYER_MOVE_SPEED;
+      ty = (vy / len) * PLAYER_MOVE_SPEED;
     }
     const smooth = Math.min(1, dt * (tx !== 0 || ty !== 0 ? 14 : 18));
     this.velX += (tx - this.velX) * smooth;
@@ -1204,15 +1412,6 @@ export class ExplorationScene extends Phaser.Scene {
       this.dust.emitParticleAt(this.player.x, this.player.y + 14, 2);
     }
 
-    // si el tap-to-move quedó trabado contra algo, soltarlo
-    if (this.moveTarget) {
-      const moved = Math.hypot(this.player.x - this.lastX, this.player.y - this.lastY);
-      this.stuckMs = moved < 0.4 ? this.stuckMs + delta : 0;
-      if (this.stuckMs > 320) {
-        this.moveTarget = null;
-        this.stuckMs = 0;
-      }
-    }
     this.lastX = this.player.x;
     this.lastY = this.player.y;
 
@@ -1223,25 +1422,19 @@ export class ExplorationScene extends Phaser.Scene {
         if (!rectsOverlap(pb, d.bounds)) continue;
         const lockedLines = d.def.locked?.() ?? null;
         if (lockedLines) {
-          // empujar al jugador SIEMPRE hacia el interior de la sala
-          // (alejarlo "de la puerta" puede mandarlo fuera del mapa)
-          const cx = d.bounds.x + d.bounds.w / 2;
-          const cy = d.bounds.y + d.bounds.h / 2;
-          const dx = d.pushTo.x - cx;
-          const dy = d.pushTo.y - cy;
-          const len = Math.hypot(dx, dy) || 1;
-          this.player.setPosition(cx + (dx / len) * 80, cy + (dy / len) * 80);
-          this.moveTarget = null;
+          // la barrera del vano ya impide entrar; solo rescatar si quedó en posición ilegal
+          if (this.collides(this.player.x, this.player.y)) {
+            const safe = this.nearestLegalPoint(this.player.x, this.player.y);
+            this.player.setPosition(safe.x, safe.y);
+          }
           this.doorCooldown = 900;
-          sfxLocked();
-          say(lockedLines);
+          if (Array.isArray(lockedLines) && lockedLines.length > 0) {
+            sfxLocked();
+            say(lockedLines);
+          }
         } else {
           sfxDoor();
-          // una frontera abierta no llega a esta lista: se cruza caminando.
-          // Las puertas restantes conectan interiores o regiones lejanas.
-          const targetScene = roomScene(d.def.to);
-          const entry = targetScene?.entries?.[this.currentChunk] ?? d.def.spawn;
-          this.loadRoom(d.def.to, entry, true);
+          this.beginDoorTransition(d);
         }
         return;
       }
@@ -1249,24 +1442,22 @@ export class ExplorationScene extends Phaser.Scene {
 
     // red de seguridad: si el jugador quedó en una posición ilegal
     // (empujones, cambios de flags, etc.), devolverlo al piso
-    let guard = 0;
-    while (this.collides(this.player.x, this.player.y) && guard++ < 60) {
-      const safe = this.chunkCenter(this.currentChunk);
-      const dx = safe.x - this.player.x;
-      const dy = safe.y - this.player.y;
-      const len = Math.hypot(dx, dy) || 1;
-      this.player.setPosition(this.player.x + (dx / len) * 8, this.player.y + (dy / len) * 8);
+    if (this.collides(this.player.x, this.player.y)) {
+      const safe = this.nearestLegalPoint(this.player.x, this.player.y);
+      this.player.setPosition(safe.x, safe.y);
     }
 
     // objeto interactuable más cercano
     this.nearThing = null;
     let best = Infinity;
     for (const t of this.things) {
-      const cx = t.bounds.x + t.bounds.w / 2;
-      const cy = t.bounds.y + t.bounds.h / 2;
-      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, cx, cy);
-      const reach = INTERACT_DIST + Math.max(t.bounds.w, t.bounds.h) / 2;
-      if (dist < reach && dist < best) {
+      // Distancia al borde del hotspot, no a su centro. Un prop grande como la
+      // Campana debe ganar prioridad cuando el jugador toca su perímetro, aun
+      // si hay un NPC cuyo centro está algo más cerca.
+      const dx = Math.max(t.bounds.x - this.player.x, 0, this.player.x - (t.bounds.x + t.bounds.w));
+      const dy = Math.max(t.bounds.y - this.player.y, 0, this.player.y - (t.bounds.y + t.bounds.h));
+      const dist = Math.hypot(dx, dy);
+      if (dist < INTERACT_DIST && dist < best) {
         best = dist;
         this.nearThing = t;
       }

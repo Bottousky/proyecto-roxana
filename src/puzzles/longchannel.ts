@@ -49,6 +49,8 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
       let state = createLongChannelState();
       let solvedHandled = false;
       let equivalenceHandled = false;
+      let openingPrediction: 'frio' | 'tibio' | 'rojo' | null = null;
+      let predictionOpen = false;
 
       const sourceTray = document.createElement('div');
       sourceTray.className = 'bench-tray longchannel-sources';
@@ -59,7 +61,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         button.className = 'fuente-opt longchannel-source';
         button.textContent = `Empuje ${push}`;
         button.addEventListener('click', () => {
-          if (state.channel.cut || solvedHandled) return;
+          if (state.channel.cut || solvedHandled || predictionOpen) return;
           state = setLongChannelPush(state, push);
           sfxBridge();
           render();
@@ -105,6 +107,10 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         <div class="longchannel-row" aria-label="Fila de piedras junto al horno"></div>`;
       bench.root.appendChild(stage);
 
+      const predict = document.createElement('div');
+      predict.className = 'bench-predict hidden';
+      bench.root.appendChild(predict);
+
       const stoneTray = document.createElement('div');
       stoneTray.className = 'bench-tray longchannel-stones';
       stoneTray.innerHTML = '<span class="tray-label">Piedras para la fila:</span>';
@@ -114,6 +120,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
           if (
             state.channel.cut ||
             solvedHandled ||
+            predictionOpen ||
             state.stones.length >= LONG_CHANNEL_MAX_STONES
           ) {
             return;
@@ -144,7 +151,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
         {
           label: 'Alimentar el horno',
           primary: true,
-          onClick: attempt,
+          onClick: requestAttempt,
         },
         {
           label: 'Continuar',
@@ -154,6 +161,42 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
       ]);
       actions['Yesca reempalma'].classList.add('hidden');
       actions['Continuar'].classList.add('hidden');
+
+      function requestAttempt(): void {
+        if (state.channel.cut || solvedHandled) return;
+        if (!openingPrediction) {
+          predictionOpen = true;
+          predict.classList.remove('hidden');
+          predict.innerHTML =
+            '<p class="bench-predict-q"><b>Edda:</b> «Antes de probar: ¿el canal quedará frío, tibio o al rojo?»</p>';
+          const row = document.createElement('div');
+          row.className = 'bench-predict-row';
+          const options: Array<['frio' | 'tibio' | 'rojo', string]> = [
+            ['frio', 'Frío'],
+            ['tibio', 'Tibio'],
+            ['rojo', 'Al rojo'],
+          ];
+          for (const [key, label] of options) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'bench-predict-btn';
+            button.textContent = label;
+            button.addEventListener('click', () => {
+              if (openingPrediction) return;
+              openingPrediction = key;
+              predictionOpen = false;
+              predict.classList.add('hidden');
+              predict.innerHTML = '';
+              attempt();
+            });
+            row.appendChild(button);
+          }
+          predict.appendChild(row);
+          render();
+          return;
+        }
+        attempt();
+      }
 
       function attempt(): void {
         if (state.channel.cut || solvedHandled) return;
@@ -253,7 +296,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
 
         sourceButtons.forEach((button, push) => {
           button.classList.toggle('selected', push === state.push);
-          button.disabled = state.channel.cut || solvedHandled;
+          button.disabled = state.channel.cut || solvedHandled || predictionOpen;
         });
 
         const row = stage.querySelector<HTMLElement>('.longchannel-row')!;
@@ -262,7 +305,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
           const slot = document.createElement('button');
           slot.className = 'longchannel-slot';
           slot.title = `Quitar ${PIEDRAS[stone].nombre}`;
-          slot.disabled = state.channel.cut || solvedHandled;
+          slot.disabled = state.channel.cut || solvedHandled || predictionOpen;
           const stoneVisual = piedraEl(stone);
           stoneVisual.classList.add('in-slot');
           slot.appendChild(stoneVisual);
@@ -286,11 +329,13 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
             String(
               state.channel.cut ||
                 solvedHandled ||
+                predictionOpen ||
                 state.stones.length >= LONG_CHANNEL_MAX_STONES,
             ),
           );
         });
-        actions['Alimentar el horno'].disabled = state.channel.cut || solvedHandled;
+        actions['Alimentar el horno'].disabled =
+          state.channel.cut || solvedHandled || predictionOpen;
       }
 
       bench.setStatus(

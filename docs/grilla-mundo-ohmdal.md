@@ -15,8 +15,9 @@ sala limita con cuál), pero se **implementan como `⟿`**. Referencia viva: `pl
 
 **Objetivo:** un plano único de coordenadas donde cada sala del RPG tiene una celda fija,
 coherente con `assets/ohmdal/ohmdal-complete-map.png` (el mapa isla, fuente de verdad
-geográfica) y abarcando **todos los arcos** (I, II y el Empalme). Sirve para (a) generar las
-salas enteras en ChatGPT con bordes que ensamblen, y (b) fijar los offsets de `world.ts`.
+geográfica) y abarcando **todos los arcos** (I, II y el Empalme). Sirve para (a) fijar la
+geografía, salidas y continuidad de la red entre recintos y (b) fijar los offsets de
+`world.ts`. Los fondos no cosen píxeles entre sí: cada salida termina en un arco de transición.
 
 Encima de cada sala generada se montan luego **props** (sprites) y **efectos** (glow, partículas,
 penumbra) por Phaser/CSS: el fondo generado es el **ambiente estático en estado apagado**.
@@ -142,9 +143,9 @@ Estado: **✅** construida · **◻︎** por construir (Arco II / Empalme).
 2. **Solo ambiente estático y APAGADO.** Nada de lámparas encendidas, glow, partículas ni
    personajes: eso se monta encima con Phaser/CSS y se enciende por flags. Dibujar el mundo
    “dormido”.
-3. **Bordes que ensamblan (═):** en cada borde continuo, el suelo y la **red de cobre** deben
-   coincidir en posición con el borde del vecino (ver columna “Salidas”). En los bordes que dan
-   al mar/vacío o a un portal, cerrar con muralla/acantilado/arco.
+3. **Salidas canónicas:** cada enlace de la tabla debe aparecer como arco o umbral legible en
+   el borde conceptual indicado. No hace falta que sus píxeles ensamblen con el fondo vecino:
+   el motor usa una transición. Los bordes sin salida se cierran con arquitectura o paisaje.
 4. **Red de cobre = guía de navegación:** dos hilos paralelos (ida y retorno) que entran por el
    borde del vecino indicado y cruzan hacia la salida opuesta. Apagados: cobre con pátina.
 5. **Zonas de calma:** no llenar cada tile de detalle; dejar aire para leer la jerarquía
@@ -154,8 +155,9 @@ Estado: **✅** construida · **◻︎** por construir (Arco II / Empalme).
    verdes/teal; Faro azules fríos; Corazón/Arco II según su emblema.
 7. **Ancla de estilo:** adjuntar un tile/render ya aprobado y pedir “misma paleta y grano”.
 
-Cada fondo entra al juego como imagen del chunk; `world.ts` la ubica en su `ox,oy`; los props
-(`ThingDef.sprite`) y la penumbra/luz por flags se dibujan encima.
+Cada fondo entra al juego como imagen del chunk; los props (`ThingDef.sprite`) y la
+penumbra/luz por flags se dibujan encima. Para nuevas producciones, el contrato de cámara,
+guía jugable, prompts y validación vive en `docs/sistema-arte-ohmdal-v1.md`.
 
 ---
 

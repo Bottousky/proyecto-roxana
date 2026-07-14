@@ -1,5 +1,12 @@
 import { openBench, benchActions } from '../ui/bench';
-import { ohmWidgetHTML, setOhmState, piedraEl, PIEDRAS, makeInteractive } from './common';
+import {
+  ohmWidgetHTML,
+  setOhmState,
+  piedraEl,
+  PIEDRAS,
+  makeInteractive,
+  resistorCodeLegendEl,
+} from './common';
 import { setFlag, state } from '../state';
 import { sfxBridge, sfxFzzt, sfxHot, sfxDim, sfxOk, sfxWin } from '../audio';
 
@@ -37,7 +44,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
       });
 
       const stage = document.createElement('div');
-      stage.className = 'bench-stage';
+      stage.className = 'bench-stage freno-stage';
       stage.style.display = 'flex';
       stage.style.alignItems = 'center';
       stage.style.gap = '10px';
@@ -51,6 +58,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           <text x="205" y="71" fill="#776f82" font-size="10" text-anchor="middle">ENGASTE</text>
           <rect class="slot-piedra" x="170" y="84" width="70" height="32" rx="5" fill="#4a4440"/>
           <rect class="slot-banda" x="180" y="87" width="8" height="26" rx="2" fill="#8b5a2b"/>
+          <text class="slot-code" x="222" y="106" fill="#f3e9d5" font-size="13" font-weight="700" text-anchor="middle">1</text>
           <path class="slot-crack" d="M200 84 l6 12 l-9 8 l7 12" stroke="#262220" stroke-width="2" fill="none"/>
           <path class="wire c-loop" d="M248 100 H330"/>
           <circle class="lampara" cx="362" cy="100" r="26" fill="#34313d" stroke="#6b6478" stroke-width="3"/>
@@ -66,11 +74,13 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
       const lamp = stage.querySelector<SVGCircleElement>('.lampara')!;
       const slotPiedra = stage.querySelector<SVGRectElement>('.slot-piedra')!;
       const slotBanda = stage.querySelector<SVGRectElement>('.slot-banda')!;
+      const slotCode = stage.querySelector<SVGTextElement>('.slot-code')!;
       const slotCrack = stage.querySelector<SVGPathElement>('.slot-crack')!;
 
       const renderSlot = () => {
         const def = PIEDRAS[enSlot];
         slotBanda.setAttribute('fill', def.color);
+        slotCode.textContent = String(def.codigo);
         slotCrack.style.display = def.rajada ? '' : 'none';
         slotPiedra.setAttribute('fill', def.rajada ? '#383230' : '#4a4440');
       };
@@ -114,12 +124,16 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
             setLamp('off');
             setOhmState(stage, 'estable');
             bench.setStatus(`Engastada la piedra de <b>${PIEDRAS[key].nombre}</b>. La palanca espera.`);
+            // La piedra pulsada deja de existir al pasar al engaste. Llevar el
+            // foco al siguiente paso evita que teclado/gamepad queden en <body>.
+            requestAnimationFrame(() => actions['Bajar la palanca'].focus());
           });
           makeInteractive(p, PIEDRAS[key].nombre);
           tray.appendChild(p);
         }
       };
       renderTray();
+      bench.root.appendChild(resistorCodeLegendEl());
 
       bench.setStatus(
         replay

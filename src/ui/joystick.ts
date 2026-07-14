@@ -1,4 +1,5 @@
 import { uiOpen } from './overlay';
+import { enableTouchControls, hasTouchInput } from './inputMode.ts';
 
 const KNOB_MAX = 40;
 
@@ -7,9 +8,7 @@ let _vy = 0;
 
 export function initJoystick(): void {
   // detectar touch sincrónicamente antes de que llegue cualquier evento
-  if (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) {
-    document.body.classList.add('touch-device');
-  }
+  if (hasTouchInput()) enableTouchControls();
 
   const zone = document.getElementById('joystick-zone')!;
   const base = document.getElementById('joystick-base')!;
@@ -19,7 +18,7 @@ export function initJoystick(): void {
 
   zone.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    document.body.classList.add('touch-device');
+    enableTouchControls();
     if (touchId !== null) return;
     touchId = e.changedTouches[0].identifier;
     base.style.opacity = '1';
@@ -62,7 +61,7 @@ export function initJoystick(): void {
   zone.addEventListener('touchcancel', endTouch, { passive: false });
 
   window.addEventListener('touchstart', () => {
-    document.body.classList.add('touch-device');
+    enableTouchControls();
   }, { once: true, passive: true });
 }
 

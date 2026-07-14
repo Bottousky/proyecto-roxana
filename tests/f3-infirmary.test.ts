@@ -92,6 +92,18 @@ equal(
   true,
   'F3 reabre en modo práctica',
 );
+equal(infirmarySource.includes('bench-predict'), true, 'F3 reutiliza la predicción comprometida');
+equal(
+  infirmarySource.includes('Antes de arrancar: ¿cuál fusible no sobrevivirá al pico?'),
+  true,
+  'F3 pide compromiso antes del primer arranque completo',
+);
+equal(infirmarySource.includes('Aguantan todos'), true, 'F3 permite predecir que todos sobreviven');
+equal(
+  infirmarySource.includes('configured.length === MACHINE_IDS.length'),
+  true,
+  'F3 arma opciones desde la configuración vigente completa',
+);
 
 for (const text of [
   'Mi enfermería. Bueno… mi cementerio, técnicamente. Cada uno de estos murió por la Forja.',

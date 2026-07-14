@@ -616,7 +616,9 @@ interface CharLook {
   /** criatura orbe (Ohm): ignora cuerpo humanoide */
   orb?: boolean;
   scale?: number;
-  sprite?: 'hero';
+  sprite?: 'hero' | 'ohm';
+  /** Textura que contiene la fila direccional del PNJ. */
+  npcTexture?: 'ohmdal-npc-core' | 'ohmdal-npc-secondary';
   /** Fila del atlas direccional de PNJ: sur, oeste, este, norte. */
   npcRow?: number;
 }
@@ -625,14 +627,14 @@ const CHAR_LOOKS: Array<[RegExp, CharLook]> = [
   [/^player$/, { body: 0x4d7d92, head: 0xe9c9a2, hair: 0x33303d, sprite: 'hero' }],
   [/^edda/, { body: 0xa85f78, head: 0xeccaa5, hair: 0x6e3448, npcRow: 0 }],
   [/^lumen/, { body: 0x8a6a3a, head: 0xe2c29a, hair: 0xd9d2e0, lantern: 0xffc966, npcRow: 1 }],
-  [/^(pedestal$|ohm-)/, { body: 0xc9a437, head: 0xc9a437, hair: 0xc9a437, orb: true }],
+  [/^(pedestal$|ohm-)/, { body: 0xc9a437, head: 0xc9a437, hair: 0xc9a437, orb: true, sprite: 'ohm' }],
   [/^consejera/, { body: 0x5b4a75, head: 0xe0c2a0, hair: 0x2f2a3a, npcRow: 2 }],
-  [/^guardiana/, { body: 0x58755f, head: 0xd9b894, hair: 0x4a3a2e }],
+  [/^guardiana/, { body: 0x58755f, head: 0xd9b894, hair: 0x4a3a2e, npcTexture: 'ohmdal-npc-secondary', npcRow: 0 }],
   [/^forjadora/, { body: 0xa8562e, head: 0xdfb48c, hair: 0x3a2620, npcRow: 3 }],
-  [/^farero/, { body: 0x496978, head: 0xd9b894, hair: 0x9aa4ac, lantern: 0x9adcff }],
-  [/^preceptor/, { body: 0x55505e, head: 0xe3c39b, hair: 0x8d8496 }],
-  [/^ciudadano-nino/, { body: 0x7a6a50, head: 0xeccaa5, hair: 0x4a3a2e, scale: 0.8 }],
-  [/^ciudadano/, { body: 0x6b5d4f, head: 0xdfc09c, hair: 0x3f3630 }],
+  [/^farero/, { body: 0x496978, head: 0xd9b894, hair: 0x9aa4ac, lantern: 0x9adcff, npcTexture: 'ohmdal-npc-secondary', npcRow: 1 }],
+  [/^preceptor/, { body: 0x55505e, head: 0xe3c39b, hair: 0x8d8496, npcTexture: 'ohmdal-npc-secondary', npcRow: 2 }],
+  [/^ciudadano-nino/, { body: 0x7a6a50, head: 0xeccaa5, hair: 0x4a3a2e, scale: 0.8, npcTexture: 'ohmdal-npc-secondary', npcRow: 4 }],
+  [/^ciudadano/, { body: 0x6b5d4f, head: 0xdfc09c, hair: 0x3f3630, npcTexture: 'ohmdal-npc-secondary', npcRow: 3 }],
 ];
 
 export function charLookFor(id: string): CharLook | null {
@@ -659,6 +661,7 @@ export class CharacterRig extends Phaser.GameObjects.Container {
   private orbSign: Phaser.GameObjects.Text | null = null;
   private walkSprite: Phaser.GameObjects.Sprite | null = null;
   private idleSprite: Phaser.GameObjects.Sprite | null = null;
+  private ohmSprite: Phaser.GameObjects.Sprite | null = null;
   private npcSprite: Phaser.GameObjects.Sprite | null = null;
   private walkFrameBase = 0;
   private idleFrameBase = 0;
@@ -686,9 +689,19 @@ export class CharacterRig extends Phaser.GameObjects.Container {
       this.walkSprite = groundedSprite('ohmdal-student-walk').setVisible(false);
       this.idleSprite = groundedSprite('ohmdal-student-idle');
       this.add([this.walkSprite, this.idleSprite]);
+    } else if (look.sprite === 'ohm') {
+      this.orbGlow = scene.add
+        .image(0, -4, 'vis-glow')
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setDisplaySize(84, 84);
+      this.addAt(this.orbGlow, 1);
+      this.ohmSprite = scene.add
+        .sprite(0, 15, 'ohmdal-ohm-atlas', 0)
+        .setOrigin(0.5, 90 / 96);
+      this.add(this.ohmSprite);
     } else if (look.npcRow !== undefined) {
       this.npcSprite = scene.add
-        .sprite(0, 15, 'ohmdal-npc-core', look.npcRow * 4)
+        .sprite(0, 15, look.npcTexture ?? 'ohmdal-npc-core', look.npcRow * 4)
         .setScale(0.72)
         .setOrigin(0.5, 92 / 96);
       this.add(this.npcSprite);
@@ -725,6 +738,10 @@ export class CharacterRig extends Phaser.GameObjects.Container {
 
   setMoving(m: boolean): void {
     this.moving = m;
+    if (!m && this.npcSprite) {
+      this.npcSprite.setPosition(0, 15).setRotation(0).setScale(0.72);
+      this.shadowImg.setScale(0.56, 0.2);
+    }
   }
 
   setStateColor(c: number): void {
@@ -758,7 +775,30 @@ export class CharacterRig extends Phaser.GameObjects.Container {
       return;
     }
     if (this.npcSprite) {
-      this.npcSprite.setAlpha(1);
+      const stride = Math.sin(this.phase * 10);
+      if (this.moving) {
+        const lift = Math.abs(stride);
+        this.npcSprite
+          .setPosition(0, 15 - lift * 1.5)
+          .setRotation(stride * 0.025)
+          .setScale(0.72);
+        this.shadowImg.setScale(0.6 + lift * 0.03, 0.18 - lift * 0.015);
+      } else {
+        // Escala alrededor del origen en la suela: respira sin deslizar los pies.
+        const breath = Math.sin(this.phase * 2.2) * 0.004;
+        this.npcSprite
+          .setPosition(0, 15)
+          .setRotation(0)
+          .setScale(0.72 - breath * 0.35, 0.72 + breath);
+        this.shadowImg.setScale(0.56 + breath * 0.4, 0.2);
+      }
+      return;
+    }
+    if (this.ohmSprite) {
+      const f = Math.sin(this.phase * 2.2);
+      this.ohmSprite.y = 15 + f * 2;
+      if (this.orbGlow) this.orbGlow.setAlpha(0.48 + Math.sin(this.phase * 3.1) * 0.1);
+      this.shadowImg.setScale(0.68 - f * 0.04, 0.28 - f * 0.02);
       return;
     }
     if (this.look.orb) {
@@ -806,6 +846,18 @@ export class CharacterRig extends Phaser.GameObjects.Container {
     if (this.npcSprite && look.npcRow !== undefined) {
       const column = this.facing === 'south' ? 0 : this.facing === 'west' ? 1 : this.facing === 'east' ? 2 : 3;
       this.npcSprite.setFrame(look.npcRow * 4 + column);
+      return;
+    }
+
+    if (this.ohmSprite) {
+      const frame = this.facing === 'south' ? 0 : this.facing === 'west' ? 1 : this.facing === 'east' ? 2 : 3;
+      const c = this.stateColor ?? look.body;
+      const asleep = luminance(c) <= 0.3;
+      this.ohmSprite.setFrame(frame).setTint(asleep ? 0x666674 : 0xffffff).setAlpha(asleep ? 0.72 : 1);
+      if (this.orbGlow) {
+        this.orbGlow.setTint(asleep ? 0x333344 : c);
+        this.orbGlow.setAlpha(asleep ? 0.12 : 0.5);
+      }
       return;
     }
 
@@ -900,7 +952,7 @@ export function makePropVisual(
   // rasgo de suelo (cauce, canal, terraza…): área transitable grande y no sólida,
   // se dibuja plana a nivel de piso, sin sombra de mueble ni bisel.
   // Los portales monumentales también son cruzables pero se alzan, no se acuestan.
-  const esPortal = t.id === 'lapuerta' || t.id === 'puerta-castillo';
+  const esPortal = t.id === 'lapuerta' || t.id === 'puerta-castillo' || t.id === 'portal-aula';
   const flat = t.solid === false && t.w * t.h > 15000 && !esPortal;
   // Los elementos murales no proyectan la sombra elíptica de un mueble apoyado en el piso.
   if (t.id !== 'retrato' && !flat) {
@@ -953,14 +1005,14 @@ export function makePropVisual(
     g.fillRoundedRect(-15, 2, 30, 16, { tl: 12, tr: 12, bl: 2, br: 2 });
     g.lineStyle(1.5, shade(color, 0.35), 0.9);
     g.strokeRoundedRect(-w / 2, -h / 2, w, h, 3);
-  } else if (t.id === 'lapuerta' || t.id === 'puerta-castillo') {
+  } else if (t.id === 'lapuerta' || t.id === 'puerta-castillo' || t.id === 'portal-aula') {
     // portal monumental: el color del thing cuenta su estado (oscuro = sellado,
     // claro = abierto). Cerrado: dos hojas bajo el arco. Abierto: las hojas
     // quedan plegadas contra las jambas y el vano deja pasar el río de chispa.
     const w = t.w;
     const h = t.h;
     const arc = Math.min(w * 0.24, 40);
-    const open = luminance(color) > 0.35;
+    const open = t.id === 'portal-aula' || luminance(color) > 0.35;
     if (!open) {
       g.fillStyle(shade(color, 0.45), 1);
       g.fillRoundedRect(-w / 2, -h / 2, w, h, { tl: arc, tr: arc, bl: 4, br: 4 });
