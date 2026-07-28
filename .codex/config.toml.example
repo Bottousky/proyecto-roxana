@@ -1,0 +1,16 @@
+# Copiar o fusionar estos bloques en la configuración activa de Codex.
+# La clave de Meshy nunca debe escribirse aquí: el proceso la hereda del entorno.
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@0.0.78"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+
+[mcp_servers.meshy]
+command = "npx"
+args = ["-y", "@meshy-ai/meshy-mcp-server@0.4.0"]
+env_vars = ["MESHY_API_KEY"]
+startup_timeout_sec = 30
+tool_timeout_sec = 300
+default_tools_approval_mode = "writes"

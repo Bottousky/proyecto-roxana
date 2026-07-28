@@ -12,6 +12,11 @@
     "school:plan": "python scripts/validate_school_plan.py && python scripts/generate_school_plan_diagram.py",
     "school:validate-gltf": "node scripts/validate-school-glb.mjs",
     "school:validation-renders": "powershell -ExecutionPolicy Bypass -File scripts/blender/render-validation.ps1",
+    "3d:validate-manifests": "node scripts/3d/validate-asset-manifests.mjs",
+    "3d:asset-index": "node scripts/3d/generate-asset-index.mjs",
+    "3d:validate-glb": "node scripts/3d/validate-glb.mjs",
+    "3d:optimize-glb": "node scripts/3d/optimize-glb.mjs",
+    "3d:report-budget": "node scripts/3d/report-runtime-budget.mjs",
     "test": "node scripts/run-tests.mjs",
     "verify": "bash scripts/verificar-hito.sh"
   },

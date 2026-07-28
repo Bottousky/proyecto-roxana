@@ -30,6 +30,7 @@ supersede. Sus decisiones sobre Ohmdal continúan vigentes salvo contradicción 
 - [`biblia-arte-produccion-v0.md`](biblia-arte-produccion-v0.md)
 - [`biblia-estilo-instituto.md`](biblia-estilo-instituto.md)
 - [`mapa-ohmdal-greybox.md`](mapa-ohmdal-greybox.md)
+- [`3d/README.md`](3d/README.md) — contratos, toolchain y estado del ecosistema 3D.
 
 ## Implementación y auditoría de hitos terminados
 

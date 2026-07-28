@@ -1,0 +1,63 @@
+{
+  "id": "rx_instituto_estatua_roxana_001",
+  "displayName": "Estatua de Roxana",
+  "world": "instituto",
+  "category": "hero-prop",
+  "sourceMethod": "img2threejs",
+  "status": "review-required",
+  "references": [
+    "assets/school3d/sculpts/roxana-statue/references/roxana-front.png",
+    "assets/school3d/sculpts/roxana-statue/references/roxana-right.png"
+  ],
+  "generation": {
+    "provider": "img2threejs",
+    "taskId": "",
+    "promptFile": "assets/school3d/sculpts/roxana-statue/pipeline/roxana-statue-sculpt-spec.json",
+    "creditsSpent": 0,
+    "generatedAt": "2026-07-25"
+  },
+  "license": {
+    "owner": "Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Referencias originales preparadas para el proyecto; sin contenido Meshy."
+  },
+  "scale": {
+    "unit": "meter",
+    "height": 2.4,
+    "humanRatio": 1.4
+  },
+  "frontAxis": "+Z",
+  "pivot": "bottom-center",
+  "collider": {
+    "type": "cylinder",
+    "radius": 0.65,
+    "height": 2.7
+  },
+  "sockets": [
+    "plaque",
+    "interaction_anchor"
+  ],
+  "runtime": {
+    "desktop": {
+      "path": "assets/runtime/instituto/desktop/estatua-roxana.glb",
+      "maxTriangles": 18000,
+      "maxTexture": 2048,
+      "maxMaterials": 4,
+      "maxDrawCalls": 4
+    },
+    "mobile": {
+      "path": "assets/runtime/instituto/mobile/estatua-roxana.glb",
+      "maxTriangles": 8000,
+      "maxTexture": 1024,
+      "maxMaterials": 3,
+      "maxDrawCalls": 3
+    }
+  },
+  "print": {
+    "enabled": true,
+    "type": "decorative",
+    "path": "",
+    "scaleMm": 180
+  },
+  "notes": "Ejemplo contractual. El GLB heredado sigue en assets/school3d hasta un hito de migración."
+}

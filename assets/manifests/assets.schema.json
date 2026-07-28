@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proyecto-roxana.local/schemas/asset-manifest.json",
+  "title": "Proyecto Roxana 3D asset manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "displayName",
+    "world",
+    "category",
+    "sourceMethod",
+    "status",
+    "references",
+    "generation",
+    "license",
+    "scale",
+    "frontAxis",
+    "pivot",
+    "collider",
+    "sockets",
+    "runtime"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^rx_[a-z0-9]+(?:_[a-z0-9]+)*$"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "world": {
+      "type": "string",
+      "enum": [
+        "instituto",
+        "ohmdal",
+        "bitland",
+        "physica",
+        "arithmos",
+        "shared"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "architecture",
+        "module",
+        "hard-surface",
+        "hero-prop",
+        "prop",
+        "character",
+        "creature",
+        "sprite",
+        "terrain",
+        "mechanism",
+        "ui-3d",
+        "physical-product"
+      ]
+    },
+    "sourceMethod": {
+      "type": "string",
+      "enum": [
+        "procedural-three",
+        "img2threejs",
+        "meshy-text-to-3d",
+        "meshy-image-to-3d",
+        "meshy-multi-image",
+        "sprite",
+        "cad",
+        "blender-manual",
+        "hybrid"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "reference-ready",
+        "generating",
+        "review-required",
+        "approved-master",
+        "optimized-runtime",
+        "integrated",
+        "qa-approved",
+        "print-prototype",
+        "rejected",
+        "archived"
+      ]
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^assets/"
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "taskId",
+        "promptFile",
+        "creditsSpent",
+        "generatedAt"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "none",
+            "img2threejs",
+            "meshy",
+            "blender",
+            "manual"
+          ]
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "promptFile": {
+          "type": "string"
+        },
+        "creditsSpent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner",
+        "referenceRightsVerified",
+        "notes"
+      ],
+      "properties": {
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceRightsVerified": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "scale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "height",
+        "humanRatio"
+      ],
+      "properties": {
+        "unit": {
+          "type": "string",
+          "const": "meter"
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0.001
+        },
+        "humanRatio": {
+          "type": "number",
+          "minimum": 0.001
+        }
+      }
+    },
+    "frontAxis": {
+      "type": "string",
+      "enum": [
+        "+Z",
+        "-Z",
+        "+X",
+        "-X"
+      ]
+    },
+    "pivot": {
+      "type": "string",
+      "enum": [
+        "bottom-center",
+        "center",
+        "custom"
+      ]
+    },
+    "collider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "box",
+            "capsule",
+            "cylinder",
+            "sphere",
+            "mesh",
+            "none"
+          ]
+        },
+        "radius": {
+          "type": "number",
+          "minimum": 0
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0
+        },
+        "size": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "sockets": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "desktop",
+        "mobile"
+      ],
+      "properties": {
+        "desktop": {
+          "$ref": "#/$defs/runtimeVariant"
+        },
+        "mobile": {
+          "$ref": "#/$defs/runtimeVariant"
+        }
+      }
+    },
+    "print": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "type",
+        "path",
+        "scaleMm"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "decorative",
+            "functional"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "scaleMm": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "runtimeVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "maxTriangles",
+        "maxTexture",
+        "maxMaterials",
+        "maxDrawCalls"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^assets/runtime/"
+        },
+        "maxTriangles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxTexture": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxMaterials": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxDrawCalls": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

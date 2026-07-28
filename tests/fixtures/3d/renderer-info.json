@@ -1,0 +1,21 @@
+{
+  "render": {
+    "frame": 120,
+    "calls": 51,
+    "triangles": 298410,
+    "points": 0,
+    "lines": 0
+  },
+  "memory": {
+    "geometries": 44,
+    "textures": 0
+  },
+  "programs": [
+    {
+      "name": "school-main"
+    },
+    {
+      "name": "post-fx"
+    }
+  ]
+}

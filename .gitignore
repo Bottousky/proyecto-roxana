@@ -2,6 +2,9 @@ node_modules/
 dist/
 *.local
 *.log
+.env
+.env.*
+!.env.example
 __pycache__/
 *.pyc
 *.blend1
@@ -53,3 +56,14 @@ assets/ohmdal/rooms/_sources/
 assets/ohmdal/rooms/pilot-arco1/_sources/
 assets/ohmdal/rooms/pilot-arco1/_review/
 .vercel
+
+# Fuentes 3D nuevas: sin Git LFS configurado se versionan sólo marcadores y documentación.
+assets/source/**
+!assets/source/**/
+!assets/source/**/.gitkeep
+!assets/source/README.md
+
+# Capturas/diffs reproducibles se regeneran; sólo las baselines aprobadas se versionan.
+tests/visual/current/**
+tests/visual/diffs/**
+assets/manifests/assets.index.json

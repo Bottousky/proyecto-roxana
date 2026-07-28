@@ -1,0 +1,4 @@
+interface:
+  display_name: "Roxana 3D Director"
+  short_description: "Orquesta assets y escenas 3D de Roxana"
+  default_prompt: "Use $roxana-3d-director to route this Roxana 3D task through the safest production pipeline."

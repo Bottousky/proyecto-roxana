@@ -1,0 +1,41 @@
+{
+  "id": "Estatua Roxana",
+  "world": "unknown",
+  "category": "hero-prop",
+  "sourceMethod": "meshy-multi-image",
+  "status": "done",
+  "references": [],
+  "generation": {
+    "provider": "meshy",
+    "taskId": "fixture-only",
+    "promptFile": "",
+    "creditsSpent": -5,
+    "generatedAt": "28/07/2026"
+  },
+  "license": {
+    "owner": "",
+    "referenceRightsVerified": false,
+    "notes": "Fixture deliberadamente inválido."
+  },
+  "scale": {
+    "unit": "centimeter",
+    "height": 0,
+    "humanRatio": 0
+  },
+  "frontAxis": "Y",
+  "pivot": "feet-ish",
+  "collider": {
+    "type": "triangle-soup"
+  },
+  "sockets": [],
+  "runtime": {
+    "desktop": {
+      "path": "dist/estatua.glb",
+      "maxTriangles": -1,
+      "maxTexture": 0,
+      "maxMaterials": -1,
+      "maxDrawCalls": -1
+    }
+  },
+  "unexpected": true
+}

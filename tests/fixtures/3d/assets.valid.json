@@ -1,0 +1,57 @@
+{
+  "id": "rx_shared_lampara_001",
+  "displayName": "Lámpara institucional",
+  "world": "shared",
+  "category": "prop",
+  "sourceMethod": "procedural-three",
+  "status": "planned",
+  "references": [
+    "assets/references/shared/lampara-frontal.png"
+  ],
+  "generation": {
+    "provider": "none",
+    "taskId": "",
+    "promptFile": "",
+    "creditsSpent": 0,
+    "generatedAt": "2026-07-28"
+  },
+  "license": {
+    "owner": "Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Fixture sintético."
+  },
+  "scale": {
+    "unit": "meter",
+    "height": 0.42,
+    "humanRatio": 0.244
+  },
+  "frontAxis": "+Z",
+  "pivot": "bottom-center",
+  "collider": {
+    "type": "box",
+    "size": [
+      0.2,
+      0.42,
+      0.2
+    ]
+  },
+  "sockets": [
+    "light_anchor"
+  ],
+  "runtime": {
+    "desktop": {
+      "path": "assets/runtime/shared/desktop/lampara.glb",
+      "maxTriangles": 2500,
+      "maxTexture": 1024,
+      "maxMaterials": 2,
+      "maxDrawCalls": 2
+    },
+    "mobile": {
+      "path": "assets/runtime/shared/mobile/lampara.glb",
+      "maxTriangles": 1200,
+      "maxTexture": 512,
+      "maxMaterials": 2,
+      "maxDrawCalls": 2
+    }
+  }
+}
