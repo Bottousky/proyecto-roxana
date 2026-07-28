@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "milestone": "replace-me",
+  "collisionPolicy": "stop-and-return-to-director",
+  "roles": {
+    "director_integrator": [],
+    "architecture": [],
+    "asset_forge": [],
+    "visual_evaluator": []
+  },
+  "sharedReadOnly": [
+    "AGENTS.md",
+    "docs/3d/**"
+  ]
+}

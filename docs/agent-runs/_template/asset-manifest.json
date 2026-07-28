@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "milestone": "replace-me",
+  "status": "planned",
+  "meshy": {
+    "approved": false,
+    "balanceChecked": false,
+    "maxCredits": 0,
+    "maxPreviewsPerAsset": 0
+  },
+  "assets": []
+}

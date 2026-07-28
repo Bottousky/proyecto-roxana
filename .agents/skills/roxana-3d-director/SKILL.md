@@ -1,9 +1,22 @@
 ---
 name: roxana-3d-director
-description: Orquesta tareas de producción 3D, assets, escenas, rendimiento, QA visual e impresión de Proyecto Roxana. Usar antes de img2threejs, Meshy, author-game-levels, build-hybrid-game-assets u optimize-threejs-games para elegir el pipeline, exigir manifiestos y frenar por coste, referencias, derechos, estabilidad o presupuesto.
+description: Orquesta hitos multiagente, producción 3D, assets, escenas, rendimiento, QA visual e impresión de Proyecto Roxana. Usar al iniciar o coordinar un hito 3D y antes de img2threejs, Meshy, author-game-levels, build-hybrid-game-assets u optimize-threejs-games para asignar ownership, elegir pipeline, exigir contratos y frenar por coste, referencias, derechos, estabilidad o presupuesto.
 ---
 
 # Roxana 3D Director
+
+## Coordinar un hito multiagente
+
+Leer [`docs/agent-runs/README.md`](../../../docs/agent-runs/README.md) y los contratos del hito
+activo. Mantener al hilo principal como Director/integrador; delegar como máximo tres tareas
+independientes después de verificar `executionAuthorized`, `baseCommit`, ownership exclusivo y
+criterios de aceptación. Usar un worktree y una rama `codex/<hito>-<rol>` por especialista.
+Para trabajadores que escriben en paralelo, usar tareas separadas de Codex App en modo Worktree;
+no asumir que un subagente del mismo hilo recibe aislamiento Git.
+
+Frenar ante fronteras solapadas. Integrar secuencialmente y ejecutar un único Evaluador después
+de la integración. Limitar la corrección automática a dos rondas; exigir aprobación para una
+tercera. No adoptar Agents SDK durante la fase contractual.
 
 ## Reunir la entrada
 

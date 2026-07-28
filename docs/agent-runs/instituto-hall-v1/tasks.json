@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "milestone": "instituto-hall-v1",
+  "status": "draft",
+  "executionAuthorized": false,
+  "baseRef": "codex/setup-ecosistema-3d",
+  "baseCommit": null,
+  "budgets": {
+    "maxConcurrentExecutors": 3,
+    "maxEvaluators": 1,
+    "maxAutomaticReviewRounds": 2,
+    "thirdRoundRequiresApproval": true,
+    "taskMinutes": {
+      "min": 30,
+      "max": 90
+    }
+  },
+  "tasks": [
+    {
+      "id": "DIR-001",
+      "role": "director_integrator",
+      "title": "Cerrar ruta, gate, cámara, seed y contratos",
+      "status": "planned",
+      "estimatedMinutes": 45,
+      "branch": "codex/instituto-hall-v1-integrator",
+      "dependsOn": [],
+      "acceptance": [
+        "executionAuthorized y baseCommit quedan fijados",
+        "brief, visual-contract y ownership quedan aprobados",
+        "la ruta de laboratorio no altera /jugar"
+      ]
+    },
+    {
+      "id": "ARCH-001",
+      "role": "architecture",
+      "title": "Construir blockout procedural modular con materiales e iluminación base",
+      "status": "planned",
+      "estimatedMinutes": 90,
+      "branch": "codex/instituto-hall-v1-architecture",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "escala y ruta legibles con maniquí de 1,72 m",
+        "módulos, materiales y luces permanecen en la frontera asignada",
+        "no modifica el archivo de integración"
+      ]
+    },
+    {
+      "id": "ASSET-001",
+      "role": "asset_forge",
+      "title": "Cerrar inventario y manifiestos de assets sin generación paga",
+      "status": "planned",
+      "estimatedMinutes": 60,
+      "branch": "codex/instituto-hall-v1-assets",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "cada asset declara origen, derechos, escala, pivote y presupuesto",
+        "no agrega modelos pesados de prueba",
+        "Meshy permanece deshabilitado"
+      ]
+    },
+    {
+      "id": "INT-001",
+      "role": "director_integrator",
+      "title": "Integrar arquitectura y assets en la ruta de laboratorio",
+      "status": "planned",
+      "estimatedMinutes": 60,
+      "branch": "codex/instituto-hall-v1-integrator",
+      "dependsOn": [
+        "ARCH-001",
+        "ASSET-001"
+      ],
+      "acceptance": [
+        "los commits se integran de forma secuencial",
+        "build y tests pasan",
+        "la experiencia estable conserva su comportamiento"
+      ]
+    },
+    {
+      "id": "EVAL-001",
+      "role": "visual_evaluator",
+      "title": "Evaluar visual, funcional, responsive y rendimiento",
+      "status": "planned",
+      "estimatedMinutes": 45,
+      "branch": "codex/instituto-hall-v1-evaluator",
+      "dependsOn": [
+        "INT-001"
+      ],
+      "acceptance": [
+        "capturas desktop/mobile y consola quedan registradas",
+        "performance.json contiene mediciones reproducibles",
+        "el evaluador no modifica código ni assets"
+      ]
+    },
+    {
+      "id": "DIR-002",
+      "role": "director_integrator",
+      "title": "Resolver veredicto y cerrar o abrir corrección acotada",
+      "status": "planned",
+      "estimatedMinutes": 30,
+      "branch": "codex/instituto-hall-v1-integrator",
+      "dependsOn": [
+        "EVAL-001"
+      ],
+      "acceptance": [
+        "final-report referencia commits y evidencia",
+        "no se exceden dos rondas automáticas",
+        "riesgos y próximo paso quedan explícitos"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "milestone": "instituto-hall-v1",
+  "status": "planned",
+  "meshy": {
+    "approved": false,
+    "balanceChecked": false,
+    "maxCredits": 0,
+    "maxPreviewsPerAsset": 0,
+    "reason": "El primer pase valida arquitectura y composición sin generación paga."
+  },
+  "assets": [],
+  "requiredFieldsForFutureAssets": [
+    "id",
+    "purpose",
+    "method",
+    "source",
+    "rights",
+    "scale",
+    "front",
+    "pivot",
+    "collider",
+    "desktopBudget",
+    "mobileBudget",
+    "status"
+  ],
+  "canonicalManifestSchema": "assets/manifests/assets.schema.json"
+}

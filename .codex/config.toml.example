@@ -1,4 +1,5 @@
-# Copiar o fusionar estos bloques en la configuración activa de Codex.
+# Copiar o fusionar sólo los bloques MCP necesarios en la configuración activa de Codex.
+# El límite multiagente del proyecto ya vive en `.codex/config.toml`.
 # La clave de Meshy nunca debe escribirse aquí: el proceso la hereda del entorno.
 
 [mcp_servers.playwright]

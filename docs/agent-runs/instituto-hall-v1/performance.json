@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "milestone": "instituto-hall-v1",
+  "status": "not-run",
+  "commit": null,
+  "route": "/labs/instituto-hall",
+  "capturedAt": null,
+  "desktop": {
+    "viewport": "1440x900",
+    "fps": null,
+    "drawCalls": null,
+    "triangles": null,
+    "geometries": null,
+    "textures": null,
+    "consoleErrors": null
+  },
+  "mobile": {
+    "viewport": "390x844",
+    "fps": null,
+    "drawCalls": null,
+    "triangles": null,
+    "geometries": null,
+    "textures": null,
+    "consoleErrors": null
+  },
+  "budgetSource": "docs/3d/BUDGETS.md",
+  "evidence": []
+}

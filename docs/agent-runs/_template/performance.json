@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "milestone": "replace-me",
+  "status": "not-run",
+  "commit": null,
+  "capturedAt": null,
+  "desktop": {
+    "viewport": null,
+    "fps": null,
+    "drawCalls": null,
+    "triangles": null,
+    "geometries": null,
+    "textures": null,
+    "consoleErrors": null
+  },
+  "mobile": {
+    "viewport": null,
+    "fps": null,
+    "drawCalls": null,
+    "triangles": null,
+    "geometries": null,
+    "textures": null,
+    "consoleErrors": null
+  }
+}

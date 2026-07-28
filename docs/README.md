@@ -31,6 +31,8 @@ supersede. Sus decisiones sobre Ohmdal continúan vigentes salvo contradicción 
 - [`biblia-estilo-instituto.md`](biblia-estilo-instituto.md)
 - [`mapa-ohmdal-greybox.md`](mapa-ohmdal-greybox.md)
 - [`3d/README.md`](3d/README.md) — contratos, toolchain y estado del ecosistema 3D.
+- [`agent-runs/README.md`](agent-runs/README.md) — sistema multiagente, worktrees, ownership y
+  contratos persistentes por hito.
 
 ## Implementación y auditoría de hitos terminados
 

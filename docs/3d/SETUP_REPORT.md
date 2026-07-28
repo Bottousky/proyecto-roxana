@@ -61,6 +61,8 @@ separado y pasaron.
 ## Diff por área
 
 - Agentes: `AGENTS.md`, diez skills fijadas y licencias/atribuciones.
+- Orquestación: cuatro perfiles en `.codex/agents/`, límite activo de tres subagentes y contratos
+  reutilizables en `docs/agent-runs/`.
 - MCP/secretos: `.codex/config.toml.example`, `.env.example` e ignores.
 - Contratos: schema draft 2020-12, ejemplo, fixtures y estructura source/reference/runtime.
 - Pipeline: validación de manifiestos/GLB, índice, dry-run de optimización y budget reporter.
@@ -92,6 +94,23 @@ separado y pasaron.
 | métricas smoke desktop | 60 FPS, 66 draw calls, 286.002 triángulos |
 | auditoría de secretos | 0 valores detectados; símbolo ausente de código cliente |
 | outputs | `dist`, `node_modules` y `output` ignorados |
+
+## Addendum multiagente
+
+El 2026-07-28 se incorporó la Fase 1 de orquestación sin dependencias nuevas:
+
+- el hilo principal conserva el rol Director/integrador;
+- Arquitectura incluye materiales e iluminación;
+- Asset Forge queda bloqueado para Meshy por defecto;
+- un único Evaluador registra evidencia pero no corrige implementación;
+- ownership exclusivo, ramas `codex/<hito>-<rol>`, worktrees separados, tareas de 30–90 minutos
+  y máximo dos rondas automáticas quedaron como reglas durables;
+- `instituto-hall-v1` se inicializó en estado contractual con
+  `executionAuthorized: false`, `baseCommit: null` y cero agentes lanzados.
+
+Los scripts de Fase 2 y Agents SDK de Fase 3 permanecen deliberadamente diferidos hasta observar
+repetición real. Cambios en configuración, perfiles e instrucciones se descubren al abrir una
+tarea nueva o reiniciar Codex.
 
 Las capturas `setup-school-desktop.png` y `setup-school-mobile.png` son evidencia temporal
 revisada visualmente y no se versionan.

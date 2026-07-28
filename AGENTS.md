@@ -90,9 +90,41 @@ entorno y ejecutar como mínimo `npm run build` y `npm test`; no declarar que `v
 - No adoptar Draco, Meshopt, KTX2 o una segunda compresión por ritual: exigir comparación
   reproducible de peso, tiempo de carga y coste CPU/GPU.
 
+## Sistema multiagente
+
+- El hilo principal ocupa el rol Director/integrador y conserva decisiones, contratos e
+  integración final.
+- Delegar sólo cuando el usuario autorice ejecutar un hito y
+  `docs/agent-runs/<hito>/tasks.json` marque `executionAuthorized: true`.
+- Usar como máximo tres agentes ejecutores simultáneos, sólo para tareas independientes.
+- No asumir que un subagente obtiene un worktree propio. Para dos trabajadores que escriben en
+  paralelo, usar tareas separadas de Codex App iniciadas en modo Worktree.
+- Reservar subagentes del mismo hilo para exploración, pruebas, revisión o escrituras que no
+  requieran aislamiento Git.
+- Los cuatro roles disponibles son Director/integrador, Arquitectura procedural,
+  Asset Forge y Evaluador visual/funcional/rendimiento.
+- Materiales e iluminación pertenecen a Arquitectura hasta que un hito aprobado los separe.
+- Crear una rama por rol con formato `codex/<hito>-<rol>` y un worktree aislado por rama.
+- Todos los worktrees de un hito deben partir del mismo commit fijado en `tasks.json`.
+- Cada agente modifica únicamente los globs asignados en `ownership.json`. Si dos agentes
+  necesitan la misma frontera, detener ambos y devolver la decisión al Director.
+- El Director integra commits de trabajadores de forma secuencial y resuelve conflictos; los
+  trabajadores no editan el archivo de integración.
+- Ejecutar un único Evaluador después de integrar. El Evaluador no corrige código: registra
+  evidencia en `review-round-*.md` y `performance.json`.
+- Permitir como máximo dos rondas automáticas de revisión. Una tercera ronda requiere aprobación
+  explícita del usuario.
+- Cada tarea delegada debe tener un entregable acotado y una estimación de 30 a 90 minutos. No
+  abrir sesiones sin condición de cierre.
+- Meshy exige presupuesto, balance y aprobación explícitos en `asset-manifest.json`; la
+  disponibilidad de una credencial no constituye aprobación.
+- Antes de delegar, leer `docs/agent-runs/README.md` y todos los contratos del hito activo.
+- No usar Agents SDK para este flujo hasta cumplir los gates documentados y aprobar un ADR.
+
 ## Git
 
-- Trabajar en ramas cortas `codex/<hito>`.
+- Trabajar en ramas cortas `codex/<hito>`; en hitos multiagente usar
+  `codex/<hito>-<rol>`.
 - `main` debe quedar desplegable.
 - No borrar trabajo ajeno, forzar ramas ni reescribir historia.
 - Revisar secretos, builds y archivos grandes antes de agregar al índice.
