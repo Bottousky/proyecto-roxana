@@ -1,0 +1,90 @@
+{
+  "sourceImage": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\references\\roxana-front.png",
+  "overlayImage": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\anatomy-overlay.png",
+  "overlayLegend": {
+    "C": "center symmetry axis",
+    "1..N": "head-unit horizontal ticks (blue, dashed)",
+    "H": "hairline guide (default fraction of the first head-unit band)",
+    "E": "eye line guide",
+    "N": "nose base guide",
+    "M": "mouth line guide",
+    "S": "shoulder line guide (default fraction, adjust to observed pose)",
+    "P": "hip line guide (default fraction, adjust to observed pose)",
+    "grayDashed": "rule-of-thirds compositional grid"
+  },
+  "anatomy": {
+    "styleHeads": 6.3,
+    "proportions": {
+      "headUnit": 0.159,
+      "torso": 2.15,
+      "legs": 3.15,
+      "shoulderWidth": 1.65,
+      "hipWidth": 1.3
+    },
+    "pose": {
+      "type": "upright near-symmetric stance with asymmetrical book arm",
+      "jointAngles": {
+        "neck": [
+          0,
+          0,
+          0
+        ],
+        "leftShoulder": [18, 0, -12],
+        "rightShoulder": [4, 0, 4],
+        "leftElbow": [0, 0, 82],
+        "rightElbow": [0, 0, 9],
+        "leftWrist": [0, -10, 8],
+        "rightWrist": [0, 0, 2],
+        "leftHip": [
+          0,
+          0,
+          0
+        ],
+        "rightHip": [
+          0,
+          0,
+          0
+        ],
+        "leftKnee": [
+          0,
+          0,
+          0
+        ],
+        "rightKnee": [
+          0,
+          0,
+          0
+        ],
+        "leftAnkle": [
+          0,
+          0,
+          0
+        ],
+        "rightAnkle": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "faceLandmarks": {
+      "hairline": 0.12,
+      "eyeLine": 0.47,
+      "eyeSpacing": 0.27,
+      "noseBase": 0.66,
+      "mouthLine": 0.79,
+      "earTop": 0.45,
+      "earBottom": 0.68
+    },
+    "features": [
+      "center-parted long hair below shoulder blades",
+      "long narrow mature face",
+      "neutral serious expression",
+      "bow tie and pointed lapels",
+      "book held against left chest",
+      "floor-length skirt under split coat"
+    ],
+    "confidence": 0.82
+  },
+  "authoringInstruction": "Open overlayImage and read the reference against its head-unit ticks, thirds grid, face-line guides, shoulder/hip lines, and center axis. Replace every null/placeholder value in anatomy with normalized coordinates or joint angles actually observed; the drawn guide lines are generic starting positions, not measurements."
+}

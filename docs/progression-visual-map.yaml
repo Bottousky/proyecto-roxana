@@ -1,0 +1,67 @@
+schema: 1
+state_source: school.electronica.unidadesCompletadas
+states:
+  initial:
+    condition: unidadesCompletadas == 0
+    hall:
+      relic_case: empty
+      recovery_lamp: off
+      trophy_emission: off
+      ambient_warmth: 0.72
+    electronica:
+      room_activity: partial
+      portal:
+        active_sectors: 0
+        idle_glow: 0.18
+      chalkboard: baseline_circuit
+      robot: hidden
+      workbench_a: active
+      workbench_b: dormant
+      projector: off
+    sleeping_rooms:
+      matematica: { saturation: 0.28, emission: 0, activity: 0 }
+      fisica: { saturation: 0.28, emission: 0, activity: 0 }
+      programacion: { saturation: 0.28, emission: 0, activity: 0 }
+  electronics_arc_1_complete:
+    condition: unidadesCompletadas >= totalUnidades
+    transition_seconds: 1.2
+    hall:
+      relic_case: resistor_relic_visible
+      recovery_lamp: on
+      trophy_emission: warm
+      ambient_warmth: 1.0
+    electronica:
+      room_activity: restored
+      portal:
+        active_sectors: 1
+        active_color: violet
+        secondary_glow: green
+      chalkboard: ohms_law_stage_1
+      robot: visible_idle
+      workbench_a: active
+      workbench_b: active
+      projector: learned_circuit
+    sleeping_rooms:
+      matematica: { saturation: 0.28, emission: 0, activity: 0 }
+      fisica: { saturation: 0.28, emission: 0, activity: 0 }
+      programacion: { saturation: 0.28, emission: 0, activity: 0 }
+arcs_reserved:
+  electronics_arc_2:
+    hall: second_trophy_slot
+    electronica: second_portal_sector
+  physics_arc_1:
+    hall: physics_relic
+    fisica: wake_room
+  programming_arc_1:
+    hall: programming_relic
+    programacion: wake_room
+accessibility:
+  reduced_motion:
+    transition_seconds: 0
+    preserve_state_contrast: true
+  non_color_cues:
+    - visible_relic
+    - portal_sector_geometry
+    - robot_presence
+    - second_workbench_instruments
+

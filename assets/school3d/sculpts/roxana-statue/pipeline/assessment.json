@@ -1,0 +1,256 @@
+{
+  "targetName": "Roxana Statue",
+  "sourceImage": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\references\\roxana-front.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "low-poly memorial statue on architectural pedestal",
+      "primaryDomain": "hybrid",
+      "formLanguage": [
+        "character-like",
+        "sculptural",
+        "faceted",
+        "fabric-like",
+        "architectural"
+      ],
+      "structureKind": [
+        "compound object",
+        "continuous character volumes",
+        "conforming garment shells",
+        "stepped assembled pedestal"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "warm carved limestone"
+      ],
+      "notes": "Full-body stylized adult woman holding a closed book against her left torso. Four orthographic-like views are available. Target is a readable low-poly sculpture, not an exact face copy."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 1,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 5,
+        "mesoComponents": 18,
+        "microFeatureGroups": 12,
+        "materialLayers": 3,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The silhouette combines a 6.3-head stylized human, long fitted coat, floor-length skirt, long layered hair, asymmetrical bent book arm, relaxed right arm, and a pedestal occupying roughly 27 percent of total height.",
+        "Faceted planes are identity-defining and must come from low-segment geometry with flat normals, not a smooth primitive stack.",
+        "The four views reduce occlusion uncertainty for hair, coat split, book depth, arm pose, and pedestal profile."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Character anatomy, conforming garments, layered hair and architectural pedestal require separate semantic components even though the prop remains static."
+    },
+    "unknownsToResolveBeforeImplementation": [
+      "Exact facial identity is not recoverable from the 384px frontal crop; preserve mature angular expression and landmark placement rather than claiming portrait likeness.",
+      "Book cover ornament and pedestal inscription are not visible and will remain unadorned.",
+      "Fine fabric and stone variation will be procedural and approximate."
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 12,
+      "note": "Enumerate every identity-defining small detail before authoring the spec. Each detail must map to a component.localFeatures entry or material.localOverrides entry, never prose only. Use forge/stage1_intake/build_detail_inventory.py to scan zones.",
+      "details": []
+    },
+    "anatomy": {
+      "applies": true,
+      "styleHeads": 6.3,
+      "proportions": {
+        "headUnit": 0.159,
+        "torso": 2.15,
+        "legs": 3.15,
+        "shoulderWidth": 1.65,
+        "hipWidth": 1.30
+      },
+      "pose": {
+        "type": "upright near-symmetric stance with asymmetrical book arm",
+        "jointAngles": {
+          "neck": [0, 0, 0],
+          "leftShoulder": [18, 0, -12],
+          "leftElbow": [0, 0, 82],
+          "leftWrist": [0, -10, 8],
+          "rightShoulder": [4, 0, 4],
+          "rightElbow": [0, 0, 9],
+          "rightWrist": [0, 0, 2]
+        }
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.47,
+        "eyeSpacing": 0.27,
+        "noseBase": 0.66,
+        "mouthLine": 0.79,
+        "hairline": 0.12
+      },
+      "features": [
+        "center-parted long hair terminating below shoulder blades",
+        "long narrow face with pronounced cheek and jaw planes",
+        "serious neutral expression",
+        "bow tie and pointed lapels",
+        "book pressed against left chest",
+        "long split-front coat over floor-length skirt"
+      ],
+      "confidence": 0.82,
+      "note": "Measured from the isolated frontal figure and cross-checked against right, back and left views. Head-unit excludes the pedestal."
+    },
+    "sourceImage": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\references\\roxana-front.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "At Hall close-up the model reads immediately as the referenced Roxana statue: a 6.3-head adult woman with long center-parted hair, angular mature face, pointed period coat, bow tie, book held to the left chest, relaxed right arm, floor-length skirt, and stepped carved-stone pedestal.",
+      "Front, right profile, back and three-quarter renders retain consistent depth and do not collapse into cards or disconnected primitive stacks.",
+      "Flat-shaded triangulated planes create the low-poly carved-stone response while maintaining continuous anatomy and garment contact."
+    ],
+    "minimumSpecDepth": {
+        "macroComponents": 5,
+        "mesoComponents": 16,
+        "microFeatureGroups": 10,
+      "materialLayers": 3,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "anatomy-pose-silhouette",
+        "name": "6.3-head anatomy, upright stance and asymmetrical arm silhouette",
+        "required": true,
+        "qualityCriteria": [
+          "Head, shoulders, waist, coat hem, skirt hem and pedestal preserve the measured vertical ratios.",
+          "The left elbow bends across the torso around the book while the right arm hangs close to the coat."
+        ],
+        "evidenceRefs": [
+          "front",
+          "right",
+          "left"
+        ],
+        "failureModes": [
+          "figure reads as chibi, mannequin-like or capsule-built",
+          "book arm and relaxed arm become symmetric",
+          "pedestal overwhelms or miniaturizes the figure"
+        ]
+      },
+      {
+        "id": "face-hair-identity",
+        "name": "Angular mature face and long center-parted faceted hair",
+        "required": true,
+        "qualityCriteria": [
+          "Face uses measured landmarks, tapered jaw, nose bridge, brow and mouth planes rather than a featureless sphere.",
+          "Hair forms 8-14 large connected clumps around the face and down the back, with a visible center part."
+        ],
+        "evidenceRefs": [
+          "front-head",
+          "right-head",
+          "back-head",
+          "left-head"
+        ],
+        "failureModes": [
+          "head reads as a ball or mask",
+          "hair reads as a helmet, loose cylinders or disconnected strands",
+          "expression becomes youthful or cartoonish"
+        ]
+      },
+      {
+        "id": "period-outfit-book",
+        "name": "Period coat, lapels, bow, waistcoat, skirt and held book",
+        "required": true,
+        "qualityCriteria": [
+          "Coat is a conforming shell with long split front and back panels over a separate skirt volume.",
+          "Pointed lapels, bow tie and button row remain legible at the Hall close-up distance.",
+          "Book intersects neither torso nor hand and is visibly supported by forearm and fingers."
+        ],
+        "evidenceRefs": [
+          "front-torso",
+          "right-torso",
+          "left-torso",
+          "back-coat"
+        ],
+        "failureModes": [
+          "coat becomes a rectangular box",
+          "book floats or clips through the torso",
+          "hands detach from sleeves",
+          "front coat split disappears"
+        ]
+      },
+      {
+        "id": "pedestal-architecture",
+        "name": "Stepped architectural pedestal with recessed framed plaque",
+        "required": true,
+        "qualityCriteria": [
+          "Pedestal contains foot, lower steps, rectangular shaft, framed recessed plaque, cornice and statue cap as distinct beveled levels.",
+          "Plaque border and step shadows remain visible without introducing unreadable text."
+        ],
+        "evidenceRefs": [
+          "front-pedestal",
+          "right-pedestal"
+        ],
+        "failureModes": [
+          "pedestal reads as a single cube",
+          "plaque is painted rather than recessed",
+          "step proportions disagree between front and profile"
+        ]
+      },
+      {
+        "id": "faceted-stone-lookdev",
+        "name": "Warm faceted carved-stone material and readable planar lighting",
+        "required": true,
+        "qualityCriteria": [
+          "One coherent warm limestone family uses subtle light/dark regional variation and high roughness.",
+          "Flat normals and controlled triangulation create visible planes on face, hair, sleeves, coat and skirt.",
+          "Key, fill and rim lighting explain the planes without metallic or plastic highlights."
+        ],
+        "evidenceRefs": [
+          "full-object",
+          "material-close-up"
+        ],
+        "failureModes": [
+          "surface reads as bronze, plastic or smooth clay",
+          "faceting is random noise that damages the silhouette",
+          "lighting flattens facial and garment planes"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity."
+    ]
+  },
+  "authoringInstruction": "Fill observed object class, complexity reasoning, featureGroups, visualDeltaChecks, and unknowns before generating or implementing ObjectSculptSpec."
+}

@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-07-27T00:05:48.444Z",
+  "delivery": {
+    "geometryCompression": "KHR_draco_mesh_compression",
+    "textures": "none: baked vertex colours; KTX2 conversion is not applicable",
+    "lighting": "Cycles COMBINED baked into COLOR_0"
+  },
+  "files": [
+    {
+      "file": "school-overview.original.glb",
+      "bytes": 9382124,
+      "mebibytes": 8.947,
+      "nodes": 159,
+      "meshes": 40,
+      "primitives": 40,
+      "estimatedDrawCalls": 40,
+      "vertices": 327173,
+      "triangles": 248488,
+      "materials": 1,
+      "textures": 0,
+      "images": 0,
+      "animations": 0,
+      "extensionsUsed": []
+    },
+    {
+      "file": "school-overview.glb",
+      "bytes": 1753956,
+      "mebibytes": 1.673,
+      "nodes": 159,
+      "meshes": 40,
+      "primitives": 40,
+      "estimatedDrawCalls": 40,
+      "vertices": 331538,
+      "triangles": 248488,
+      "materials": 1,
+      "textures": 0,
+      "images": 0,
+      "animations": 0,
+      "extensionsUsed": [
+        "KHR_draco_mesh_compression"
+      ]
+    },
+    {
+      "file": "electronics-room.original.glb",
+      "bytes": 2251144,
+      "mebibytes": 2.147,
+      "nodes": 45,
+      "meshes": 14,
+      "primitives": 14,
+      "estimatedDrawCalls": 14,
+      "vertices": 79506,
+      "triangles": 54892,
+      "materials": 1,
+      "textures": 0,
+      "images": 0,
+      "animations": 0,
+      "extensionsUsed": []
+    },
+    {
+      "file": "electronics-room.glb",
+      "bytes": 456004,
+      "mebibytes": 0.435,
+      "nodes": 45,
+      "meshes": 14,
+      "primitives": 14,
+      "estimatedDrawCalls": 14,
+      "vertices": 80361,
+      "triangles": 54892,
+      "materials": 1,
+      "textures": 0,
+      "images": 0,
+      "animations": 0,
+      "extensionsUsed": [
+        "KHR_draco_mesh_compression"
+      ]
+    }
+  ],
+  "compression": {
+    "overview": {
+      "bytesSaved": 7628168,
+      "compressedRatio": 0.1869,
+      "reductionPercent": 81.3
+    },
+    "electronics": {
+      "bytesSaved": 1795140,
+      "compressedRatio": 0.2026,
+      "reductionPercent": 79.7
+    }
+  }
+}

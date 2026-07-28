@@ -1,0 +1,26 @@
+[
+  {
+    "id": "anatomy-proportion",
+    "score": 0.62,
+    "accepted": false,
+    "notes": "Overall vertical proportion is close, but the coat mass is too oval and shoulders are not articulated."
+  },
+  {
+    "id": "asymmetric-book-pose",
+    "score": 0.12,
+    "accepted": false,
+    "notes": "Arms and book are absent from the blockout render, removing the defining asymmetry."
+  },
+  {
+    "id": "pedestal-architecture",
+    "score": 0.58,
+    "accepted": false,
+    "notes": "Base and shaft read correctly, but cornice, cap and plaque must enter the structural pass."
+  },
+  {
+    "id": "head-hair-silhouette",
+    "score": 0.42,
+    "accepted": false,
+    "notes": "Head scale is usable; hair silhouette and center-part framing are not represented yet."
+  }
+]

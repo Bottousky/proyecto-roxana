@@ -16,8 +16,151 @@
     rel="stylesheet"
   />
   <link rel="stylesheet" href="./src/landing/landing.css" />
+  <link rel="stylesheet" href="./src/landing/school3d.css" />
+  <script>document.documentElement.dataset.view = new URLSearchParams(location.search).get('view') === 'classic' ? 'classic' : 'school';</script>
 </head>
 <body>
+  <section id="school-experience" class="rx-school3d" aria-label="Escuela interactiva del Instituto Roxana">
+    <div class="rx-school3d__parallax" aria-hidden="true">
+      <svg class="rx-school3d__parallax-layer rx-school3d__parallax-layer--far" data-parallax-depth="far" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="school-dot-grid" width="54" height="54" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1.2" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="1600" height="1000" fill="url(#school-dot-grid)" class="is-grid" />
+        <g class="is-code">
+          <text x="78" y="100">01001010 01110101 01100101 01100111 01101111</text>
+          <text x="1130" y="92">const recuerdo = true;</text>
+          <text x="1240" y="760">1011 · 0010 · 1101</text>
+          <text x="84" y="860">if (luz) { avanzar(); }</text>
+        </g>
+        <g class="is-math">
+          <text x="20" y="340">x² + y² = r²</text>
+          <text x="1430" y="360">Σ n²</text>
+          <text x="1050" y="910">∠α + ∠β = 180°</text>
+        </g>
+        <g class="is-physics">
+          <text x="1480" y="560">Δx / Δt</text>
+          <text x="20" y="620">F = m · a</text>
+        </g>
+      </svg>
+
+      <svg class="rx-school3d__parallax-layer rx-school3d__parallax-layer--mid" data-parallax-depth="mid" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+        <g class="is-electronics">
+          <text x="70" y="225">V = I · R</text>
+          <path d="M20 700 H64 l12 -22 22 44 22 -44 22 44 12 -22 H210" />
+          <circle cx="20" cy="700" r="7" />
+          <circle cx="210" cy="700" r="7" />
+          <text x="1275" y="665">Ω 220</text>
+        </g>
+        <g class="is-geometry">
+          <path d="M1290 190 L1425 190 L1357 72 Z" />
+          <circle cx="140" cy="470" r="64" />
+          <path d="M76 470 H204 M140 406 V534" />
+          <path d="M1378 820 h112 v112 h-112 z" />
+          <path d="M1378 932 l112 -112" />
+        </g>
+        <g class="is-code">
+          <text x="1370" y="270">[ 1, 0, 1, 1 ]</text>
+          <text x="140" y="940">BITLAND // SECUENCIA 04</text>
+        </g>
+        <g class="is-roxana">
+          <text x="1370" y="470">R · O · X · A · N · A</text>
+          <text x="610" y="96">INSTITUTO / ARCHIVO 01</text>
+        </g>
+      </svg>
+
+      <svg class="rx-school3d__parallax-layer rx-school3d__parallax-layer--near" data-parallax-depth="near" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+        <g class="is-electronics">
+          <path d="M18 300 H95 M18 318 H62" />
+          <path d="M1505 510 h76 M1538 474 v73" />
+          <circle cx="1538" cy="510" r="38" />
+        </g>
+        <g class="is-math">
+          <text x="32" y="520">√2</text>
+          <text x="1450" y="250">φ</text>
+          <path d="M70 90 h110 M70 90 v110" />
+        </g>
+        <g class="is-roxana rx-school3d__parallax-seal">
+          <circle cx="1510" cy="885" r="56" />
+          <circle cx="1510" cy="885" r="43" />
+          <text x="1510" y="902" text-anchor="middle">R</text>
+        </g>
+        <g class="is-physics">
+          <path d="M45 930 C120 820 205 1020 290 900" />
+          <text x="55" y="970">señal / tiempo</text>
+        </g>
+      </svg>
+    </div>
+    <canvas id="school3d-canvas" class="rx-school3d__canvas" aria-label="Escuela 3D interactiva"></canvas>
+    <div class="rx-school3d__atmosphere" aria-hidden="true"></div>
+
+    <header class="rx-school3d__topbar">
+      <button id="school3d-home" class="rx-school3d__brand" type="button" aria-label="Volver a la vista completa de la escuela">
+        <span class="rx-school3d__crest">R</span>
+        <span><small>Instituto</small> Roxana</span>
+      </button>
+      <div class="rx-school3d__top-actions">
+        <button id="school3d-progress-preview" class="rx-school3d__button rx-school3d__button--progress" type="button" aria-pressed="false">Simular Arco 1</button>
+        <button id="school3d-rooms-toggle" class="rx-school3d__button rx-school3d__button--quiet" type="button" aria-expanded="false" aria-controls="school3d-room-list">Salas</button>
+        <a class="rx-school3d__button rx-school3d__button--quiet" href="?view=classic">Vista clásica</a>
+        <a class="rx-school3d__button rx-school3d__button--primary" href="/jugar">Continuar viaje <span aria-hidden="true">→</span></a>
+      </div>
+    </header>
+
+    <nav id="school3d-room-list" class="rx-school3d__rooms" aria-label="Salas del Instituto"></nav>
+
+    <!-- Rótulos proyectados desde las anclas 3D. Decorativos: el mismo contenido,
+         con el mismo estado, ya está en el menú «Salas» de arriba. -->
+    <div id="school3d-labels" class="rx-school3d__labels" aria-hidden="true"></div>
+
+    <div class="rx-school3d__intro" id="school3d-intro">
+      <p>El núcleo de Proyecto Roxana</p>
+      <h1>Una escuela que<br /><em>recuerda contigo.</em></h1>
+      <span>Explora sus aulas, sigue tu progreso y descubre quién volvió de cada mundo.</span>
+    </div>
+
+    <aside id="school3d-panel" class="rx-school3d__panel" aria-live="polite" aria-hidden="true">
+      <button id="school3d-panel-close" class="rx-school3d__panel-close" type="button" aria-label="Volver a la escuela"><span aria-hidden="true">←</span> Escuela</button>
+      <div class="rx-school3d__panel-heading">
+        <div id="school3d-eyebrow" class="rx-school3d__eyebrow"></div>
+        <h2 id="school3d-title"></h2>
+        <span id="school3d-status" class="rx-school3d__status"></span>
+      </div>
+      <div class="rx-school3d__panel-body">
+        <p id="school3d-description"></p>
+        <div class="rx-school3d__room-meta">
+          <span><small>Actividad</small><strong id="school3d-activity"></strong></span>
+          <span><small>Progreso</small><strong id="school3d-progress-label"></strong></span>
+        </div>
+        <div class="rx-school3d__progress" aria-hidden="true"><i id="school3d-progress-bar"></i></div>
+      </div>
+      <div class="rx-school3d__panel-actions">
+        <a id="school3d-action" class="rx-school3d__panel-action" href="/jugar">Entrar</a>
+      </div>
+    </aside>
+
+    <div class="rx-school3d__help" aria-hidden="true">
+      <span class="rx-school3d__live-dot"></span>
+      Escuela viva
+      <i></i>
+      <span class="rx-school3d__help-copy">Elige una sala para acercarte · vuelve a Escuela para regresar</span>
+    </div>
+
+    <div id="school3d-loading" class="rx-school3d__loading" role="status">
+      <span class="rx-school3d__loader-mark">R</span>
+      <p>Abriendo el Instituto</p>
+      <div><i id="school3d-loading-bar"></i></div>
+      <small id="school3d-loading-label">Preparando la escuela…</small>
+    </div>
+
+    <div id="school3d-fallback" class="rx-school3d__fallback" hidden>
+      <strong>La vista 3D no está disponible en este dispositivo.</strong>
+      <span>Puedes continuar en la experiencia clásica.</span>
+      <a href="?view=classic">Abrir vista clásica</a>
+    </div>
+  </section>
   <div
     id="root"
     style="
@@ -51,6 +194,7 @@
         <div style="flex: 1;"></div>
         <div style="display: flex; align-items: center; gap: 18px; font-size: 14px; font-weight: 500; flex-wrap: wrap;">
           <a href="#hall" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Hall</a>
+          <a href="?view=school" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Escuela 3D</a>
           <a href="#cartelera" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Cartelera</a>
           <a href="#aulas" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Aulas</a>
           <a href="#biblioteca" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Biblioteca</a>
@@ -113,6 +257,37 @@
           </div>
         </div>
         <div style="position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 22px; animation: rx-float 2.4s ease-in-out infinite;">↓</div>
+      </section>
+
+      <!-- Escuela voxel isométrica -->
+      <section id="instituto-voxel" class="rx-voxel-school" data-screen-label="Mapa voxel del Instituto">
+        <div class="rx-voxel-school__heading">
+          <div>
+            <div class="rx-voxel-school__kicker">El Instituto completo</div>
+            <h2>Una escuela que puedes recorrer</h2>
+            <p>Explora el plano isométrico, selecciona cada sala y descubre qué partes de Roxana ya despertaron. Arrastra para mover el mapa y usa la rueda para acercarte.</p>
+          </div>
+          <div class="rx-voxel-school__legend" aria-label="Ayuda del mapa">
+            <span><i class="is-open"></i> Abierta</span>
+            <span><i class="is-active"></i> En restauración</span>
+            <span><i class="is-closed"></i> Cerrada</span>
+          </div>
+        </div>
+        <div class="rx-voxel-school__shell">
+          <div class="rx-voxel-school__viewport">
+            <canvas id="voxel-school-canvas" aria-label="Mapa isométrico interactivo del Instituto Roxana"></canvas>
+            <div class="rx-voxel-school__hint" aria-hidden="true">Arrastrar · Rueda para zoom · Tocar una sala</div>
+          </div>
+          <aside class="rx-voxel-school__panel" aria-live="polite">
+            <div id="voxel-zone-eyebrow" class="rx-voxel-school__eyebrow"></div>
+            <h3 id="voxel-zone-title"></h3>
+            <span id="voxel-zone-status" class="rx-voxel-school__status"></span>
+            <p id="voxel-zone-description"></p>
+            <a id="voxel-zone-action" class="rx-voxel-school__action" href="#"></a>
+            <div class="rx-voxel-school__rooms-label">Todas las salas</div>
+            <div id="voxel-zone-list" class="rx-voxel-school__rooms" aria-label="Seleccionar sala"></div>
+          </aside>
+        </div>
       </section>
 
       <!-- Cartelera -->

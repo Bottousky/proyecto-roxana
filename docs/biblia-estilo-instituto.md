@@ -16,6 +16,47 @@ Compatible con el motor **sin tocar código**: `ExplorationScene.ts` usa colisi�
   - **Pendiente técnico:** guardar el archivo elegido en `assets/biblia-estilo/hall-v2.png` (no tengo acceso de archivo a las imágenes pegadas en el chat; hay que bajarlas manualmente desde Codex e indicarme la ruta).
   - Una vez elegida: reposicionar en `rooms.ts` las hitboxes de escritorio/estatua/vitrinas/puertas del Hall para que coincidan en x/y con la imagen real (hoy son rectángulos de color genéricos).
 
+## Hall central 3D — escala y jerarquía canónicas (2026-07-25)
+
+Estas reglas aplican a `ROOM_hall` en la escuela 3D de la landing. No cambian la
+cámara ¾ ni las colisiones del hall 2D jugable descritas en las secciones
+anteriores.
+
+### Hoja de escala institucional
+
+**1 NPC adulto = 1 unidad base.** Las relaciones se auditan visualmente en el
+encuadre final; las unidades de Blender son instrumentales y pueden compensar
+la proyección ortográfica.
+
+| Elemento | Medida canónica |
+|---|---:|
+| NPC adulto | 1 NPC |
+| Puerta interior | 2,2 NPC |
+| Baranda | 0,6 NPC |
+| Escritorio | 0,8 NPC |
+| Biblioteca | 1,8 NPC |
+| Estatua de Roxana sin pedestal | 2,2–2,8 NPC |
+| Pedestal | 0,8–1,2 NPC |
+| Estatua total | 3–4 NPC |
+| Escalera principal, ancho útil | 4–6 NPC |
+| Altura entre niveles visibles | 3–4 NPC |
+
+Implementación verificada del hall 3D: monumento **3,21 NPC** (figura ≈**2,2**
+NPC y pedestal ≈**1 NPC**), escalera **4,00–4,24 NPC** de ancho y baranda
+**0,60 NPC**. Puertas, escritorios y bibliotecas conservan esta tabla como
+criterio de aceptación cuando se audite cada sala; no se reescalan globalmente
+desde el hall.
+
+- La lectura obligatoria es **plataforma central → estatua de Roxana → escalera → nivel superior**.
+- El conjunto **estatua + pedestal** debe medir visualmente entre **3× y 4×** la altura de un NPC del hall.
+- La estatua es el foco primario: debe dominar el centro tanto por altura como por silueta, sin quedar absorbida por el dibujo del piso.
+- El pedestal debe sentirse institucional y arquitectónico. Debe apoyarse sobre un basamento propio, ancho y escalonado; nunca parecer un prop suelto sobre la alfombra.
+- La escalera es protagonista secundaria. Su ancho debe ser menor que el campo visual de la plataforma central y sus escalones deben tener contrahuellas bajas, losas finas y una progresión creíble.
+- Los pasamanos y postes no pueden tener el grosor visual de columnas ni superar la presencia de la estatua.
+- Los NPCs funcionan como referencia de escala. Deben ser pequeños, esbeltos y subordinados; si distraen o compiten con el monumento, se reducen o se eliminan de esta vista.
+- La vista conserva el lenguaje ortográfico/isométrico, voxel y low-poly de la escuela 3D, pero evita cabezas chibi, piezas sobredimensionadas y proporciones de juguete.
+- Esta corrección queda limitada al hall. No se propagan escalas de NPC, escaleras ni mobiliario a otras salas hasta auditarlas por separado.
+
 ## Prompt para Codex (skill imagegen) — Hall principal, ¾ top-down
 
 ```

@@ -1,0 +1,21 @@
+schema: 1
+external_generators:
+  meshy: { status: unavailable, reason: no_configured_access }
+  tripo: { status: unavailable, reason: no_configured_access }
+gates:
+  reference_probe: pass
+  img2threejs_strict_quality: pass
+  visual_pipeline_pass: blockout
+weights:
+  fidelity: 0.30
+  coherence: 0.20
+  editability: 0.18
+  web: 0.17
+  integration_time: 0.15
+selected:
+  wall_module: blender_procedural
+  bookcase: img2threejs_to_blender
+  workbench: gpt_multiview_to_blender
+  portal: gpt_multiview_to_blender
+  robot: gpt_multiview_to_blender
+  institutional_lamp: blender_procedural

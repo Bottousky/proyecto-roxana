@@ -1,0 +1,154 @@
+{
+  "sourceImage": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\references\\roxana-front.png",
+  "zonesDir": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones",
+  "detailInventory": {
+    "scanMethod": "component-zones",
+    "targetMinDetails": 12,
+    "details": [
+      {
+        "id": "hair-center-part",
+        "kind": "groove",
+        "description": "Centered part line separates two large angular hair masses above the forehead.",
+        "region": {"x": 0.36, "y": 0.06, "width": 0.28, "height": 0.08, "units": "normalized"},
+        "scale": "meso",
+        "affects": "hair silhouette and crown relief",
+        "mapsTo": {"type": "component.localFeatures", "ref": "hair.center-part-groove"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\head.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "hair-lock-system",
+        "kind": "ridge",
+        "description": "Eight to fourteen broad tapered hair clumps descend beside the face and down the back.",
+        "region": {"x": 0.24, "y": 0.07, "width": 0.52, "height": 0.20, "units": "normalized"},
+        "scale": "meso",
+        "affects": "hair volume and back silhouette",
+        "mapsTo": {"type": "component.localFeatures", "ref": "hair.major-lock-ridges"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\references\\roxana-back.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "angular-face-planes",
+        "kind": "contour",
+        "description": "Long face has planar brow, cheek, tapered jaw and square chin transitions.",
+        "region": {"x": 0.38, "y": 0.09, "width": 0.24, "height": 0.13, "units": "normalized"},
+        "scale": "meso",
+        "affects": "facial silhouette and mature expression",
+        "mapsTo": {"type": "component.localFeatures", "ref": "face.angular-landmark-planes"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\head.png",
+        "confidence": 0.84
+      },
+      {
+        "id": "bow-tie",
+        "kind": "ridge",
+        "description": "Small central knot with two faceted bow wings under the collar.",
+        "region": {"x": 0.39, "y": 0.21, "width": 0.22, "height": 0.06, "units": "normalized"},
+        "scale": "micro",
+        "affects": "period outfit identity",
+        "mapsTo": {"type": "component.localFeatures", "ref": "bow.faceted-wings"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\torso-book.png",
+        "confidence": 0.92
+      },
+      {
+        "id": "pointed-lapels",
+        "kind": "seam",
+        "description": "Long pointed lapels form a sharp V from shoulders to waistcoat.",
+        "region": {"x": 0.31, "y": 0.23, "width": 0.38, "height": 0.17, "units": "normalized"},
+        "scale": "meso",
+        "affects": "coat front relief",
+        "mapsTo": {"type": "component.localFeatures", "ref": "coat.pointed-lapel-shells"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\torso-book.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "waistcoat-buttons",
+        "kind": "fastener",
+        "description": "Four small raised buttons run vertically down the waistcoat.",
+        "region": {"x": 0.46, "y": 0.28, "width": 0.10, "height": 0.16, "units": "normalized"},
+        "scale": "micro",
+        "affects": "front torso detail",
+        "mapsTo": {"type": "component.localFeatures", "ref": "waistcoat.button-row"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\torso-book.png",
+        "confidence": 0.90
+      },
+      {
+        "id": "book-layered-pages",
+        "kind": "bevel",
+        "description": "Closed rectangular book has a darker cover and visible layered page block along its upper edge.",
+        "region": {"x": 0.24, "y": 0.25, "width": 0.25, "height": 0.14, "units": "normalized"},
+        "scale": "meso",
+        "affects": "book thickness and held-object readability",
+        "mapsTo": {"type": "component.localFeatures", "ref": "book.cover-page-bevel"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\torso-book.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "hand-finger-clusters",
+        "kind": "ridge",
+        "description": "Book hand wraps across the cover while the relaxed hand separates into four simplified vertical fingers.",
+        "region": {"x": 0.25, "y": 0.34, "width": 0.62, "height": 0.18, "units": "normalized"},
+        "scale": "micro",
+        "affects": "hand articulation",
+        "mapsTo": {"type": "component.localFeatures", "ref": "hands.finger-capsule-clusters"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\torso-book.png",
+        "confidence": 0.78
+      },
+      {
+        "id": "coat-front-split",
+        "kind": "seam",
+        "description": "Two long coat tails separate from waist to hem and reveal the skirt beneath.",
+        "region": {"x": 0.18, "y": 0.42, "width": 0.64, "height": 0.27, "units": "normalized"},
+        "scale": "macro",
+        "affects": "coat silhouette and negative space",
+        "mapsTo": {"type": "component.localFeatures", "ref": "coat.front-split-shells"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\coat-skirt.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "skirt-faceted-folds",
+        "kind": "ridge",
+        "description": "Floor-length skirt uses irregular vertical triangular fold ridges widening toward the hem.",
+        "region": {"x": 0.22, "y": 0.55, "width": 0.56, "height": 0.20, "units": "normalized"},
+        "scale": "meso",
+        "affects": "skirt planar rhythm",
+        "mapsTo": {"type": "component.localFeatures", "ref": "skirt.vertical-faceted-folds"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\coat-skirt.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "pedestal-step-stack",
+        "kind": "bevel",
+        "description": "Base, foot, shaft, cornice and cap create repeated stepped shadow lines.",
+        "region": {"x": 0.10, "y": 0.75, "width": 0.80, "height": 0.24, "units": "normalized"},
+        "scale": "macro",
+        "affects": "pedestal architectural profile",
+        "mapsTo": {"type": "component.localFeatures", "ref": "pedestal.stepped-beveled-levels"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\pedestal.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "pedestal-recessed-plaque",
+        "kind": "groove",
+        "description": "Front shaft contains a deeply framed rectangular plaque with clipped ornamental corners.",
+        "region": {"x": 0.22, "y": 0.82, "width": 0.56, "height": 0.13, "units": "normalized"},
+        "scale": "meso",
+        "affects": "pedestal front relief",
+        "mapsTo": {"type": "component.localFeatures", "ref": "plaque.clipped-corner-recess"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\pipeline\\detail-zones\\pedestal.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "stone-tonal-variation",
+        "kind": "stain",
+        "description": "Warm limestone varies subtly between broad planes and darkens in recesses without metallic response.",
+        "region": {"x": 0.08, "y": 0.05, "width": 0.84, "height": 0.94, "units": "normalized"},
+        "scale": "micro",
+        "affects": "stone material albedo and roughness",
+        "mapsTo": {"type": "material.localOverrides", "ref": "stone.cavity-and-plane-variation"},
+        "evidenceRef": "C:\\YO\\Proyectos\\Roxana claude\\assets\\school3d\\sculpts\\roxana-statue\\references\\roxana-front.png",
+        "confidence": 0.80
+      }
+    ]
+  },
+  "authoringInstruction": "Open each zone crop under zonesDir and replace every detail stub's kind, description, scale, affects, mapsTo, and confidence with what is actually observed. Add more detail entries per zone if a single zone contains multiple distinct marks; do not leave stubs unfilled or unlinked (mapsTo must reference a real component.localFeatures or material.localOverrides entry)."
+}

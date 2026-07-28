@@ -7,6 +7,11 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "school:build": "powershell -ExecutionPolicy Bypass -File scripts/blender/build-school.ps1",
+    "school:report": "node scripts/report-school-assets.mjs",
+    "school:plan": "python scripts/validate_school_plan.py && python scripts/generate_school_plan_diagram.py",
+    "school:validate-gltf": "node scripts/validate-school-glb.mjs",
+    "school:validation-renders": "powershell -ExecutionPolicy Bypass -File scripts/blender/render-validation.ps1",
     "test": "node scripts/run-tests.mjs",
     "verify": "bash scripts/verificar-hito.sh"
   },
@@ -16,6 +21,7 @@
     "three": "^0.177.0"
   },
   "devDependencies": {
+    "gltf-validator": "^2.0.0-dev.3.10",
     "typescript": "~5.6.3",
     "vite": "^6.3.5"
   }

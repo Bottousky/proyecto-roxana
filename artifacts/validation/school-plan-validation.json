@@ -1,0 +1,298 @@
+{
+  "gridUnitMeters": 0.5,
+  "rooms": [
+    {
+      "id": "matematica",
+      "bounds": [
+        -24.0,
+        6.0,
+        -10.0,
+        16.0
+      ],
+      "center": [
+        -17.0,
+        11.0
+      ],
+      "size": [
+        14.0,
+        10.0
+      ],
+      "exposedFrontSegments": []
+    },
+    {
+      "id": "direccion",
+      "bounds": [
+        -5.5,
+        10.0,
+        5.5,
+        17.0
+      ],
+      "center": [
+        0.0,
+        13.5
+      ],
+      "size": [
+        11.0,
+        7.0
+      ],
+      "exposedFrontSegments": []
+    },
+    {
+      "id": "fisica",
+      "bounds": [
+        10.0,
+        6.0,
+        24.0,
+        16.0
+      ],
+      "center": [
+        17.0,
+        11.0
+      ],
+      "size": [
+        14.0,
+        10.0
+      ],
+      "exposedFrontSegments": []
+    },
+    {
+      "id": "electronica",
+      "bounds": [
+        -24.0,
+        -4.0,
+        -10.0,
+        6.0
+      ],
+      "center": [
+        -17.0,
+        1.0
+      ],
+      "size": [
+        14.0,
+        10.0
+      ],
+      "exposedFrontSegments": [
+        [
+          -24.0,
+          -22.0
+        ]
+      ]
+    },
+    {
+      "id": "hall",
+      "bounds": [
+        -10.0,
+        -12.0,
+        10.0,
+        10.0
+      ],
+      "center": [
+        0.0,
+        -1.0
+      ],
+      "size": [
+        20.0,
+        22.0
+      ],
+      "exposedFrontSegments": [
+        [
+          -10.0,
+          10.0
+        ]
+      ]
+    },
+    {
+      "id": "programacion",
+      "bounds": [
+        10.0,
+        -4.0,
+        24.0,
+        6.0
+      ],
+      "center": [
+        17.0,
+        1.0
+      ],
+      "size": [
+        14.0,
+        10.0
+      ],
+      "exposedFrontSegments": [
+        [
+          22.0,
+          24.0
+        ]
+      ]
+    },
+    {
+      "id": "preceptoria",
+      "bounds": [
+        -22.0,
+        -12.0,
+        -10.0,
+        -4.0
+      ],
+      "center": [
+        -16.0,
+        -8.0
+      ],
+      "size": [
+        12.0,
+        8.0
+      ],
+      "exposedFrontSegments": [
+        [
+          -22.0,
+          -10.0
+        ]
+      ]
+    },
+    {
+      "id": "visitantes",
+      "bounds": [
+        10.0,
+        -12.0,
+        22.0,
+        -4.0
+      ],
+      "center": [
+        16.0,
+        -8.0
+      ],
+      "size": [
+        12.0,
+        8.0
+      ],
+      "exposedFrontSegments": [
+        [
+          10.0,
+          22.0
+        ]
+      ]
+    }
+  ],
+  "sharedBoundaries": [
+    {
+      "rooms": [
+        "matematica",
+        "electronica"
+      ],
+      "axis": "horizontal",
+      "coordinate": 6.0,
+      "start": -24.0,
+      "end": -10.0,
+      "length": 14.0
+    },
+    {
+      "rooms": [
+        "matematica",
+        "hall"
+      ],
+      "axis": "vertical",
+      "coordinate": -10.0,
+      "start": 6.0,
+      "end": 10.0,
+      "length": 4.0
+    },
+    {
+      "rooms": [
+        "direccion",
+        "hall"
+      ],
+      "axis": "horizontal",
+      "coordinate": 10.0,
+      "start": -5.5,
+      "end": 5.5,
+      "length": 11.0
+    },
+    {
+      "rooms": [
+        "fisica",
+        "hall"
+      ],
+      "axis": "vertical",
+      "coordinate": 10.0,
+      "start": 6.0,
+      "end": 10.0,
+      "length": 4.0
+    },
+    {
+      "rooms": [
+        "fisica",
+        "programacion"
+      ],
+      "axis": "horizontal",
+      "coordinate": 6.0,
+      "start": 10.0,
+      "end": 24.0,
+      "length": 14.0
+    },
+    {
+      "rooms": [
+        "electronica",
+        "hall"
+      ],
+      "axis": "vertical",
+      "coordinate": -10.0,
+      "start": -4.0,
+      "end": 6.0,
+      "length": 10.0
+    },
+    {
+      "rooms": [
+        "electronica",
+        "preceptoria"
+      ],
+      "axis": "horizontal",
+      "coordinate": -4.0,
+      "start": -22.0,
+      "end": -10.0,
+      "length": 12.0
+    },
+    {
+      "rooms": [
+        "hall",
+        "programacion"
+      ],
+      "axis": "vertical",
+      "coordinate": 10.0,
+      "start": -4.0,
+      "end": 6.0,
+      "length": 10.0
+    },
+    {
+      "rooms": [
+        "hall",
+        "preceptoria"
+      ],
+      "axis": "vertical",
+      "coordinate": -10.0,
+      "start": -12.0,
+      "end": -4.0,
+      "length": 8.0
+    },
+    {
+      "rooms": [
+        "hall",
+        "visitantes"
+      ],
+      "axis": "vertical",
+      "coordinate": 10.0,
+      "start": -12.0,
+      "end": -4.0,
+      "length": 8.0
+    },
+    {
+      "rooms": [
+        "programacion",
+        "visitantes"
+      ],
+      "axis": "horizontal",
+      "coordinate": -4.0,
+      "start": 10.0,
+      "end": 22.0,
+      "length": 12.0
+    }
+  ],
+  "issues": []
+}

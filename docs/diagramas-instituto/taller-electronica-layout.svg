@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Diagrama de planta del Taller de Electrónica del Instituto Roxana</title>
+  <desc id="desc">Planta rectangular del taller con acceso desde el Hall al este, portal a Ohmdal al noreste, pizarrón al norte y dos bancos de trabajo con corredor libre.</desc>
+  <defs>
+    <pattern id="tile" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="#8c725b"/>
+      <path d="M40 0H0V40" fill="none" stroke="#634e40" stroke-width="1.5" opacity=".5"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5 0 10z" fill="#63d6d0"/>
+    </marker>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .title{font:700 31px system-ui,sans-serif;fill:#eff8ed}
+      .subtitle{font:16px system-ui,sans-serif;fill:#b8c9c0}
+      .label{font:700 14px system-ui,sans-serif;fill:#eff8ed;text-anchor:middle}
+      .small{font:13px system-ui,sans-serif;fill:#b8c9c0}
+      .legendTitle{font:700 18px system-ui,sans-serif;fill:#eff8ed}
+      .legend{font:14px system-ui,sans-serif;fill:#c9d7d0}
+      .number{font:700 16px system-ui,sans-serif;fill:#111918;text-anchor:middle;dominant-baseline:middle}
+      .wall{fill:#b8aa95;stroke:#ded4c3;stroke-width:20}
+      .furniture{fill:#653f2a;stroke:#bc8250;stroke-width:3}
+      .equipment{fill:#183c3e;stroke:#61b6b0;stroke-width:3}
+      .path{fill:none;stroke:#63d6d0;stroke-width:8;stroke-linecap:round;stroke-dasharray:15 11;marker-end:url(#arrow)}
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#101a1b"/>
+  <rect x="28" y="25" width="1544" height="950" rx="24" fill="#1b2727" stroke="#385b59" stroke-width="2"/>
+  <text x="70" y="76" class="title">Taller de Electrónica · planta de producción</text>
+  <text x="70" y="106" class="subtitle">Norte arriba · módulo actual 12,5 × 9 u · puerta al Hall en pared este · portal apagado por defecto</text>
+
+  <!-- room shell -->
+  <rect x="105" y="150" width="960" height="700" rx="8" class="wall"/>
+  <rect x="125" y="170" width="920" height="660" fill="url(#tile)" stroke="#3f3028" stroke-width="5"/>
+  <rect x="1030" y="625" width="40" height="135" fill="#1b2727"/>
+  <line x1="1050" y1="640" x2="1050" y2="745" stroke="#f2d686" stroke-width="11" stroke-linecap="round"/>
+
+  <!-- back wall copper network -->
+  <path d="M155 230H245V195H390V230H555V195H720V230H955" fill="none" stroke="#bd6d32" stroke-width="13" stroke-linejoin="round"/>
+  <path d="M175 230V315M525 230V315M780 230V300M950 230V345" fill="none" stroke="#bd6d32" stroke-width="13"/>
+  <g fill="#df9b4e" stroke="#70421f" stroke-width="3">
+    <circle cx="245" cy="230" r="14"/><circle cx="390" cy="230" r="14"/><circle cx="555" cy="230" r="14"/>
+    <circle cx="720" cy="230" r="14"/><circle cx="950" cy="230" r="14"/>
+  </g>
+
+  <!-- board + roll screen -->
+  <rect x="205" y="183" width="330" height="105" rx="5" fill="#173d32" stroke="#7b5738" stroke-width="13"/>
+  <rect x="190" y="174" width="360" height="16" rx="8" fill="#ddd5c4"/>
+  <text x="370" y="244" class="label">PIZARRÓN VACÍO</text>
+
+  <!-- portal assembly -->
+  <ellipse cx="865" cy="270" rx="99" ry="76" fill="#223231" stroke="#6a3e25" stroke-width="27"/>
+  <ellipse cx="865" cy="270" rx="65" ry="46" fill="#132021" stroke="#4b9f9e" stroke-width="10" opacity=".45"/>
+  <rect x="755" y="341" width="220" height="50" rx="13" fill="#51463d" stroke="#a28d72" stroke-width="5"/>
+  <g fill="#b87333" stroke="#6c3d21" stroke-width="3">
+    <circle cx="785" cy="333" r="20"/><circle cx="945" cy="333" r="20"/>
+    <circle cx="765" cy="282" r="17"/><circle cx="965" cy="282" r="17"/>
+  </g>
+  <rect x="740" y="410" width="105" height="55" rx="6" class="equipment"/>
+  <circle cx="765" cy="438" r="8" fill="#469c99"/>
+  <circle cx="792" cy="438" r="8" fill="#469c99"/>
+  <circle cx="819" cy="438" r="8" fill="#469c99"/>
+
+  <!-- instructor diagnostics bench -->
+  <rect x="170" y="340" width="420" height="70" rx="8" class="furniture"/>
+  <rect x="195" y="323" width="90" height="46" rx="5" class="equipment"/>
+  <rect x="310" y="323" width="90" height="46" rx="5" class="equipment"/>
+  <rect x="425" y="323" width="90" height="46" rx="5" class="equipment"/>
+  <circle cx="230" cy="346" r="9" fill="#64d2c7"/>
+  <circle cx="345" cy="346" r="9" fill="#64d2c7"/>
+  <circle cx="460" cy="346" r="9" fill="#64d2c7"/>
+
+  <!-- cabinets west -->
+  <rect x="140" y="445" width="70" height="185" rx="5" class="furniture"/>
+  <rect x="140" y="650" width="70" height="125" rx="5" class="furniture"/>
+  <g stroke="#bd8556" stroke-width="3">
+    <line x1="148" y1="485" x2="202" y2="485"/><line x1="148" y1="525" x2="202" y2="525"/>
+    <line x1="148" y1="565" x2="202" y2="565"/><line x1="148" y1="690" x2="202" y2="690"/>
+    <line x1="148" y1="730" x2="202" y2="730"/>
+  </g>
+
+  <!-- two workbenches shifted west -->
+  <g>
+    <rect x="260" y="490" width="510" height="86" rx="8" class="furniture"/>
+    <rect x="260" y="655" width="510" height="86" rx="8" class="furniture"/>
+    <g class="equipment">
+      <rect x="295" y="473" width="66" height="44" rx="5"/>
+      <rect x="415" y="473" width="66" height="44" rx="5"/>
+      <rect x="535" y="473" width="66" height="44" rx="5"/>
+      <rect x="655" y="473" width="66" height="44" rx="5"/>
+      <rect x="295" y="638" width="66" height="44" rx="5"/>
+      <rect x="415" y="638" width="66" height="44" rx="5"/>
+      <rect x="535" y="638" width="66" height="44" rx="5"/>
+      <rect x="655" y="638" width="66" height="44" rx="5"/>
+    </g>
+    <g fill="#315b59" stroke="#173331" stroke-width="3">
+      <circle cx="315" cy="605" r="20"/><circle cx="435" cy="605" r="20"/><circle cx="555" cy="605" r="20"/><circle cx="675" cy="605" r="20"/>
+      <circle cx="315" cy="780" r="20"/><circle cx="435" cy="780" r="20"/><circle cx="555" cy="780" r="20"/><circle cx="675" cy="780" r="20"/>
+    </g>
+  </g>
+
+  <!-- projector cart and safety station -->
+  <rect x="815" y="645" width="105" height="80" rx="8" fill="#49514e" stroke="#92a39c" stroke-width="4"/>
+  <circle cx="842" cy="663" r="25" fill="#252b2a" stroke="#c1ab79" stroke-width="5"/>
+  <circle cx="895" cy="663" r="19" fill="#252b2a" stroke="#c1ab79" stroke-width="5"/>
+  <rect x="835" y="700" width="68" height="23" rx="4" fill="#2b3130"/>
+  <path d="M815 665C695 570 575 415 470 290" fill="none" stroke="#dcefe8" stroke-width="3" stroke-dasharray="8 8" opacity=".65"/>
+
+  <rect x="975" y="520" width="44" height="90" rx="10" fill="#a93f32" stroke="#e7c2a5" stroke-width="3"/>
+  <rect x="962" y="456" width="70" height="42" rx="5" fill="#dfd8c5" stroke="#8a816f" stroke-width="3"/>
+  <rect x="944" y="785" width="70" height="30" rx="5" fill="#3d4441" stroke="#79817d" stroke-width="3"/>
+
+  <!-- circulation -->
+  <path d="M1020 690 C940 690 865 610 865 505 C865 450 865 415 865 380" class="path"/>
+  <path d="M960 690 C850 690 835 610 790 610 C730 610 790 600 805 535" class="path" opacity=".7"/>
+
+  <!-- callouts -->
+  <g>
+    <circle cx="865" cy="270" r="21" fill="#63d6d0"/><text x="865" y="270" class="number">1</text>
+    <circle cx="370" cy="244" r="21" fill="#63d6d0"/><text x="370" y="244" class="number">2</text>
+    <circle cx="870" cy="685" r="21" fill="#63d6d0"/><text x="870" y="685" class="number">3</text>
+    <circle cx="515" cy="535" r="21" fill="#63d6d0"/><text x="515" y="535" class="number">4</text>
+    <circle cx="515" cy="700" r="21" fill="#63d6d0"/><text x="515" y="700" class="number">5</text>
+    <circle cx="175" cy="535" r="21" fill="#63d6d0"/><text x="175" y="535" class="number">6</text>
+    <circle cx="997" cy="565" r="21" fill="#63d6d0"/><text x="997" y="565" class="number">7</text>
+    <circle cx="1053" cy="690" r="21" fill="#63d6d0"/><text x="1053" y="690" class="number">8</text>
+  </g>
+
+  <text x="1086" y="695" class="label" transform="rotate(90 1086 695)">AL HALL</text>
+
+  <!-- legend -->
+  <rect x="1130" y="150" width="400" height="700" rx="20" fill="#111919" stroke="#385b59" stroke-width="2"/>
+  <text x="1170" y="198" class="legendTitle">Zonas y lectura</text>
+  <g class="legend">
+    <circle cx="1182" cy="242" r="15" fill="#63d6d0"/><text x="1182" y="242" class="number">1</text>
+    <text x="1210" y="247">Portal hero, visible desde la entrada.</text>
+    <circle cx="1182" cy="289" r="15" fill="#63d6d0"/><text x="1182" y="289" class="number">2</text>
+    <text x="1210" y="294">Pizarrón vacío + pantalla retráctil.</text>
+    <circle cx="1182" cy="336" r="15" fill="#63d6d0"/><text x="1182" y="336" class="number">3</text>
+    <text x="1210" y="341">Proyector 16 mm en carro móvil.</text>
+    <circle cx="1182" cy="383" r="15" fill="#63d6d0"/><text x="1182" y="383" class="number">4</text>
+    <text x="1210" y="388">Banco A: medición y fuentes.</text>
+    <circle cx="1182" cy="430" r="15" fill="#63d6d0"/><text x="1182" y="430" class="number">5</text>
+    <text x="1210" y="435">Banco B: montaje y soldadura.</text>
+    <circle cx="1182" cy="477" r="15" fill="#63d6d0"/><text x="1182" y="477" class="number">6</text>
+    <text x="1210" y="482">Guardado: componentes, cables, herramientas.</text>
+    <circle cx="1182" cy="524" r="15" fill="#63d6d0"/><text x="1182" y="524" class="number">7</text>
+    <text x="1210" y="529">Seguridad: corte, matafuego, botiquín.</text>
+    <circle cx="1182" cy="571" r="15" fill="#63d6d0"/><text x="1182" y="571" class="number">8</text>
+    <text x="1210" y="576">Entrada: revela taller antes que fantasía.</text>
+  </g>
+
+  <line x1="1170" y1="615" x2="1490" y2="615" stroke="#385b59" stroke-width="2"/>
+  <text x="1170" y="651" class="legendTitle">Reglas de circulación</text>
+  <text x="1170" y="686" class="legend">• Corredor puerta → portal: 1,2 NPC libres.</text>
+  <text x="1170" y="719" class="legend">• Entre bancos: mínimo 0,9 NPC.</text>
+  <text x="1170" y="752" class="legend">• El portal no bloquea el pizarrón.</text>
+  <text x="1170" y="785" class="legend">• Equipos densos en bordes; centro legible.</text>
+  <text x="1170" y="825" class="small">El brillo cyan, el haz, los contenidos del pizarrón</text>
+  <text x="1170" y="846" class="small">y el movimiento de cables pertenecen al motor.</text>
+</svg>

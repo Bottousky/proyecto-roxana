@@ -2,6 +2,9 @@ node_modules/
 dist/
 *.local
 *.log
+__pycache__/
+*.pyc
+*.blend1
 .DS_Store
 .claude/settings.local.json
 docs/superpowers/
@@ -49,3 +52,4 @@ assets/ohmdal/753c6248-4aae-4dc1-8667-58386c18a42d.png
 assets/ohmdal/rooms/_sources/
 assets/ohmdal/rooms/pilot-arco1/_sources/
 assets/ohmdal/rooms/pilot-arco1/_review/
+.vercel

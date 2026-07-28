@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/dev/scene-editor", "destination": "/index.html" },
+    { "source": "/jugar", "destination": "/src/jugar/index.html" },
+    { "source": "/jugar/:path*", "destination": "/src/jugar/index.html" },
+    { "source": "/ohmdal", "destination": "/src/ohmdal/index.html" },
+    { "source": "/ohmdal/:path*", "destination": "/src/ohmdal/index.html" }
+  ]
+}

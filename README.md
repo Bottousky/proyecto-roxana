@@ -31,7 +31,7 @@ npm run build      # genera dist/ (estático, listo para subir a cualquier hosti
 npm run preview    # sirve el build localmente
 ```
 
-`dist/` es un sitio estático con rutas relativas (`base: './'`): se puede subir tal
+`dist/` es un sitio estático servido desde la raíz (`base: '/'`): se puede subir tal
 cual a cualquier hosting (Netlify, Cloudflare Pages, un VPS propio, etc.).
 
 ## Deploy (GitHub Pages, gratis)

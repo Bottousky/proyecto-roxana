@@ -1,5 +1,7 @@
 // Landing page logic: cart, content rendering
 import { initAulas } from './aulas.ts';
+import { initVoxelSchool } from './voxelSchool.ts';
+import { initSchool3D } from './school3d.ts';
 
 interface Product {
   id: string;
@@ -44,6 +46,7 @@ class Landing {
     this.renderContent();
     this.updateCartUI();
     initAulas();
+    initVoxelSchool();
   }
 
   private loadCart(): void {
@@ -257,5 +260,9 @@ class Landing {
 
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
-  new Landing();
+  if (document.documentElement.dataset.view === 'classic') {
+    new Landing();
+  } else {
+    void initSchool3D();
+  }
 });

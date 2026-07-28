@@ -1025,3 +1025,173 @@ button:disabled {
   }
 
 }
+
+/* Escuela voxel isométrica ------------------------------------------------ */
+.rx-voxel-school {
+  padding: clamp(64px, 8vw, 112px) 24px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 211, 77, 0.08), transparent 34%),
+    #111017;
+  border-bottom: 1px solid var(--border);
+}
+
+.rx-voxel-school__heading {
+  max-width: 1240px;
+  margin: 0 auto 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 32px;
+}
+
+.rx-voxel-school__kicker,
+.rx-voxel-school__eyebrow,
+.rx-voxel-school__rooms-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+}
+
+.rx-voxel-school__heading h2 {
+  margin: 12px 0 10px;
+  font: 600 clamp(34px, 4.8vw, 58px)/1.02 'Spectral', serif;
+  letter-spacing: -0.02em;
+}
+
+.rx-voxel-school__heading p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.rx-voxel-school__legend {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  color: var(--muted);
+  font: 500 11px 'IBM Plex Mono', monospace;
+}
+
+.rx-voxel-school__legend span { display: inline-flex; align-items: center; gap: 7px; }
+.rx-voxel-school__legend i { width: 8px; height: 8px; border-radius: 50%; background: #77717f; }
+.rx-voxel-school__legend .is-open { background: #75b8a4; }
+.rx-voxel-school__legend .is-active { background: var(--accent); box-shadow: 0 0 10px rgba(255, 211, 77, 0.55); }
+.rx-voxel-school__legend .is-closed { background: #686270; }
+
+.rx-voxel-school__shell {
+  max-width: 1240px;
+  min-height: 650px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--panel);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.36);
+}
+
+.rx-voxel-school__viewport { position: relative; min-height: 650px; overflow: hidden; }
+#voxel-school-canvas { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#voxel-school-canvas.is-dragging { cursor: grabbing; }
+
+.rx-voxel-school__hint {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  background: rgba(14, 13, 18, 0.78);
+  color: var(--muted);
+  font: 500 10px 'IBM Plex Mono', monospace;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.rx-voxel-school__panel {
+  position: relative;
+  z-index: 2;
+  padding: clamp(26px, 3.5vw, 42px) clamp(22px, 3vw, 34px);
+  border-left: 1px solid var(--border);
+  background: linear-gradient(160deg, #211e29, #17151d);
+}
+
+.rx-voxel-school__panel h3 {
+  margin: 12px 0 10px;
+  font: 600 31px/1.04 'Spectral', serif;
+}
+
+.rx-voxel-school__panel > p { min-height: 100px; margin: 18px 0 22px; color: var(--muted); line-height: 1.62; }
+
+.rx-voxel-school__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font: 600 10px 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.rx-voxel-school__status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #77717f; }
+.rx-voxel-school__status[data-state='active']::before,
+.rx-voxel-school__status[data-state='restored']::before { background: var(--accent); box-shadow: 0 0 9px rgba(255, 211, 77, 0.55); }
+.rx-voxel-school__status[data-state='open']::before { background: #75b8a4; }
+
+.rx-voxel-school__action {
+  display: inline-flex;
+  padding: 11px 15px;
+  border: 1px solid var(--accent-dim);
+  border-radius: 9px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rx-voxel-school__action[hidden] { display: none; }
+.rx-voxel-school__rooms-label { margin: 30px 0 12px; color: var(--muted); }
+.rx-voxel-school__rooms { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.rx-voxel-school__rooms button {
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font: 500 11px 'Hanken Grotesk', sans-serif;
+  cursor: pointer;
+}
+
+.rx-voxel-school__rooms button:hover,
+.rx-voxel-school__rooms button:focus-visible,
+.rx-voxel-school__rooms button.is-selected { border-color: var(--accent-dim); color: var(--accent); outline: none; }
+
+@media (max-width: 820px) {
+  .rx-voxel-school__heading { display: block; }
+  .rx-voxel-school__legend { margin-top: 22px; }
+  .rx-voxel-school__shell { grid-template-columns: 1fr; }
+  .rx-voxel-school__viewport { min-height: 520px; }
+  .rx-voxel-school__panel { border-left: 0; border-top: 1px solid var(--border); }
+  .rx-voxel-school__panel > p { min-height: 0; }
+}
+
+@media (max-width: 520px) {
+  .rx-voxel-school { padding-inline: 12px; }
+  .rx-voxel-school__viewport { min-height: 430px; }
+  .rx-voxel-school__hint { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #voxel-school-canvas { scroll-behavior: auto; }
+}

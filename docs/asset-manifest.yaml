@@ -1,0 +1,168 @@
+schema: 1
+project: instituto-roxana-school3d
+units: meters
+vertical_slice: [hall, electronica, fisica_dormida]
+budgets:
+  desktop:
+    triangles: 240000
+    draw_calls: 90
+    materials: 18
+    texture_memory_mb: 96
+    transfer_mb_gzip: 8
+  mobile:
+    triangles: 120000
+    draw_calls: 55
+    materials: 12
+    texture_memory_mb: 48
+    transfer_mb_gzip: 5
+texture_rules:
+  color_space: srgb
+  data_maps: linear
+  max_dimension_hero: 2048
+  max_dimension_repeat: 1024
+  delivery: ktx2_basisu
+  atlas_gutter_px: 16
+shared_materials:
+  - { id: stone_light, budget: 1024, states: [all] }
+  - { id: stone_dark, budget: 1024, states: [all] }
+  - { id: walnut, budget: 2048, states: [all] }
+  - { id: copper, budget: 1024, states: [all] }
+  - { id: green_floor, budget: 1024, states: [all] }
+  - { id: glass_smoked, budget: 512, states: [all] }
+  - { id: emission_green, budget: 512, states: [baseline, stage_1] }
+  - { id: emission_violet, budget: 512, states: [baseline, stage_1] }
+assets:
+  - id: school_base
+    category: architecture
+    room: shared
+    lod_triangles: { lod0: 18000, lod1: 9000, lod2: 2800 }
+    texture_budget: 2048
+    states: [all]
+    method: blender_procedural
+  - id: wall_column_cornice
+    category: architecture_module
+    room: shared
+    lod_triangles: { lod0: 2600, lod1: 1100, lod2: 240 }
+    texture_budget: 1024
+    states: [all]
+    method: img2threejs_then_blender
+    repeated: instanced
+  - id: hall_shell
+    category: architecture
+    room: hall
+    lod_triangles: { lod0: 24000, lod1: 11000, lod2: 3800 }
+    texture_budget: 2048
+    states: [initial, stage_1]
+    method: blender_procedural
+  - id: hall_stairs_and_rails
+    category: architecture
+    room: hall
+    lod_triangles: { lod0: 12000, lod1: 5500, lod2: 1600 }
+    texture_budget: 1024
+    states: [all]
+    method: img2threejs_then_blender
+  - id: hall_floor_medallion
+    category: architecture
+    room: hall
+    lod_triangles: { lod0: 1200, lod1: 640, lod2: 180 }
+    texture_budget: 1024
+    states: [all]
+    method: blender_procedural_plus_decal
+  - id: roxana_statue
+    category: hero_prop
+    room: hall
+    lod_triangles: { lod0: 24000, lod1: 11000, lod2: 4200 }
+    texture_budget: 2048
+    states: [all]
+    method: img2threejs_character_track
+  - id: relic_resistor_case
+    category: progression_prop
+    room: hall
+    lod_triangles: { lod0: 2800, lod1: 1200, lod2: 360 }
+    texture_budget: 512
+    states: [stage_1]
+    method: blender_procedural
+  - id: institutional_lamp
+    category: repeated_prop
+    room: shared
+    lod_triangles: { lod0: 760, lod1: 320, lod2: 96 }
+    texture_budget: 256
+    states: [all]
+    method: blender_procedural
+    repeated: instanced
+  - id: bookcase
+    category: furniture
+    room: shared
+    lod_triangles: { lod0: 1800, lod1: 720, lod2: 180 }
+    texture_budget: 1024
+    states: [all]
+    method: img2threejs_then_blender
+  - id: books
+    category: repeated_prop
+    room: shared
+    lod_triangles: { lod0: 36, lod1: 12, lod2: 0 }
+    texture_budget: 512
+    states: [all]
+    method: blender_procedural
+    repeated: instanced
+  - id: electronics_shell
+    category: architecture
+    room: electronica
+    lod_triangles: { lod0: 18000, lod1: 8500, lod2: 2700 }
+    texture_budget: 2048
+    states: [locked, baseline, stage_1]
+    method: blender_procedural
+  - id: electronics_workbench
+    category: furniture_hero
+    room: electronica
+    lod_triangles: { lod0: 6500, lod1: 2800, lod2: 720 }
+    texture_budget: 1024
+    states: [locked, baseline, stage_1]
+    method: img2threejs_then_blender
+    repeated: instanced_shell_unique_instruments
+  - id: electronics_portal
+    category: hero_prop
+    room: electronica
+    lod_triangles: { lod0: 14000, lod1: 6200, lod2: 1800 }
+    texture_budget: 2048
+    states: [locked, baseline, stage_1]
+    method: img2threejs_then_blender
+    pivots: [root, ring_a, ring_b, emission_sector_01]
+  - id: electronics_robot
+    category: progression_prop
+    room: electronica
+    lod_triangles: { lod0: 7200, lod1: 3200, lod2: 980 }
+    texture_budget: 1024
+    states: [stage_1]
+    method: img2threejs_then_blender
+    pivots: [root, head, shoulders, elbows, hips]
+  - id: chalkboard
+    category: furniture
+    room: electronica
+    lod_triangles: { lod0: 360, lod1: 180, lod2: 24 }
+    texture_budget: 1024
+    states: [locked, baseline, stage_1]
+    method: blender_procedural_plus_decal
+  - id: circuit_decal_atlas
+    category: decal
+    room: electronica
+    lod_triangles: { lod0: 4, lod1: 4, lod2: 0 }
+    texture_budget: 1024
+    states: [baseline, stage_1]
+    method: gpt_image_2_plus_alpha_cleanup
+  - id: physics_dormant_shell
+    category: room_lod
+    room: fisica
+    lod_triangles: { lod0: 9000, lod1: 4200, lod2: 1500 }
+    texture_budget: 1024
+    states: [locked]
+    method: blender_procedural
+  - id: exterior_foliage
+    category: repeated_prop
+    room: exterior
+    lod_triangles: { lod0: 260, lod1: 120, lod2: 36 }
+    texture_budget: 512
+    states: [all]
+    method: blender_procedural
+    repeated: instanced
+

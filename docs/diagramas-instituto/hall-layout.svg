@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Diagrama de planta del Hall del Instituto Roxana</title>
+  <desc id="desc">Planta esquemática del hall octogonal con entrada al sur, estatua central, escalera a Dirección al norte y accesos laterales a las aulas.</desc>
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#77563b" stroke-width="1" opacity=".2"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f0bd59"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#140f0d" flood-opacity=".38"/>
+    </filter>
+    <style>
+      .title{font:700 31px system-ui,sans-serif;fill:#f5e8ce}
+      .subtitle{font:16px system-ui,sans-serif;fill:#cbbda7}
+      .label{font:700 15px system-ui,sans-serif;fill:#fff4dd;text-anchor:middle}
+      .small{font:13px system-ui,sans-serif;fill:#d9cab5}
+      .legendTitle{font:700 18px system-ui,sans-serif;fill:#f5e8ce}
+      .legend{font:14px system-ui,sans-serif;fill:#d9cab5}
+      .number{font:700 16px system-ui,sans-serif;fill:#181514;text-anchor:middle;dominant-baseline:middle}
+      .zone{stroke:#f3d28e;stroke-width:2}
+      .prop{stroke:#7c563d;stroke-width:2}
+      .door{stroke:#f1c96f;stroke-width:13;stroke-linecap:round}
+      .path{fill:none;stroke:#f0bd59;stroke-width:7;stroke-linecap:round;stroke-dasharray:14 11;marker-end:url(#arrow)}
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#171b20"/>
+  <rect x="28" y="25" width="1544" height="950" rx="24" fill="#23252a" stroke="#4f4439" stroke-width="2"/>
+  <text x="70" y="76" class="title">Hall principal · planta de producción</text>
+  <text x="70" y="106" class="subtitle">Norte arriba · módulo actual 18 × 15 u · cámara ortográfica ¾ · esquema, no plano constructivo</text>
+
+  <!-- shell -->
+  <polygon points="275,135 875,135 1045,275 1045,725 875,865 275,865 105,725 105,275"
+           fill="#704526" stroke="#b28b62" stroke-width="26" stroke-linejoin="round" filter="url(#shadow)"/>
+  <polygon points="290,160 860,160 1018,290 1018,710 860,840 290,840 132,710 132,290"
+           fill="#9a6841" stroke="#3e2b20" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="290,160 860,160 1018,290 1018,710 860,840 290,840 132,710 132,290"
+           fill="url(#grid)"/>
+
+  <!-- integrated doors / transitions -->
+  <line x1="485" y1="145" x2="665" y2="145" class="door"/>
+  <line x1="490" y1="855" x2="660" y2="855" class="door"/>
+  <line x1="112" y1="385" x2="112" y2="505" class="door"/>
+  <line x1="1038" y1="385" x2="1038" y2="505" class="door"/>
+  <line x1="185" y1="235" x2="260" y2="175" class="door" opacity=".65"/>
+  <line x1="890" y1="175" x2="965" y2="235" class="door" opacity=".65"/>
+
+  <!-- staircase -->
+  <g filter="url(#shadow)">
+    <rect x="405" y="155" width="340" height="46" rx="5" fill="#5a3724" stroke="#d29b58" stroke-width="4"/>
+    <rect x="417" y="199" width="316" height="35" fill="#99603b" stroke="#c7884f" stroke-width="3"/>
+    <rect x="425" y="232" width="300" height="35" fill="#a46b42" stroke="#c7884f" stroke-width="3"/>
+    <rect x="433" y="265" width="284" height="35" fill="#ad754a" stroke="#c7884f" stroke-width="3"/>
+    <rect x="441" y="298" width="268" height="35" fill="#b47b50" stroke="#c7884f" stroke-width="3"/>
+    <rect x="449" y="331" width="252" height="35" fill="#bd8356" stroke="#c7884f" stroke-width="3"/>
+    <line x1="426" y1="178" x2="467" y2="355" stroke="#4c2d20" stroke-width="12"/>
+    <line x1="724" y1="178" x2="683" y2="355" stroke="#4c2d20" stroke-width="12"/>
+  </g>
+
+  <!-- central carpet and monument -->
+  <polygon points="360,380 790,380 870,460 870,630 790,710 360,710 280,630 280,460"
+           fill="#6f2835" stroke="#f0bd59" stroke-width="13"/>
+  <polygon points="385,410 765,410 830,475 830,615 765,680 385,680 320,615 320,475"
+           fill="#803848" stroke="#c68b3e" stroke-width="4"/>
+  <polygon points="505,445 645,445 690,490 690,600 645,645 505,645 460,600 460,490"
+           fill="#b8aa91" stroke="#54483d" stroke-width="7" filter="url(#shadow)"/>
+  <circle cx="575" cy="535" r="42" fill="#e1d3b7" stroke="#736655" stroke-width="6"/>
+  <rect x="548" y="472" width="54" height="98" rx="17" fill="#d6c5a7" stroke="#6f6251" stroke-width="5"/>
+
+  <!-- side galleries / shelves -->
+  <rect x="150" y="305" width="70" height="320" rx="8" fill="#39251b" class="prop"/>
+  <rect x="930" y="305" width="70" height="320" rx="8" fill="#39251b" class="prop"/>
+  <g fill="#b26f3e">
+    <rect x="158" y="328" width="54" height="18"/><rect x="158" y="392" width="54" height="18"/>
+    <rect x="158" y="456" width="54" height="18"/><rect x="158" y="520" width="54" height="18"/>
+    <rect x="938" y="328" width="54" height="18"/><rect x="938" y="392" width="54" height="18"/>
+    <rect x="938" y="456" width="54" height="18"/><rect x="938" y="520" width="54" height="18"/>
+  </g>
+
+  <!-- vitrines -->
+  <rect x="235" y="292" width="92" height="170" rx="8" fill="#27474a" fill-opacity=".75" class="zone"/>
+  <rect x="823" y="292" width="92" height="170" rx="8" fill="#27474a" fill-opacity=".75" class="zone"/>
+  <circle cx="281" cy="345" r="17" fill="#d7ad54"/>
+  <rect x="265" y="390" width="32" height="44" rx="3" fill="#be8b41"/>
+  <circle cx="869" cy="345" r="17" fill="#d7ad54"/>
+  <rect x="848" y="390" width="42" height="44" rx="3" fill="#8ca8a8"/>
+
+  <!-- notice board and benches -->
+  <rect x="180" y="665" width="150" height="78" rx="7" fill="#8b5635" class="prop"/>
+  <rect x="193" y="678" width="124" height="52" fill="#b98a59"/>
+  <rect x="338" y="735" width="130" height="38" rx="8" fill="#4f2f20" class="prop"/>
+  <rect x="682" y="735" width="130" height="38" rx="8" fill="#4f2f20" class="prop"/>
+  <rect x="225" y="540" width="92" height="34" rx="7" fill="#4f2f20" class="prop"/>
+  <rect x="833" y="540" width="92" height="34" rx="7" fill="#4f2f20" class="prop"/>
+
+  <!-- preceptor station -->
+  <rect x="790" y="655" width="165" height="78" rx="9" fill="#5c3825" class="prop"/>
+  <rect x="806" y="643" width="135" height="24" rx="6" fill="#a2663d"/>
+  <rect x="820" y="675" width="45" height="28" fill="#dfcda4"/>
+  <circle cx="912" cy="680" r="14" fill="#f0bd59"/>
+  <rect x="842" y="745" width="60" height="44" rx="7" fill="#3f5c5c" class="prop"/>
+
+  <!-- plants -->
+  <g fill="#426843" stroke="#2a3e2b" stroke-width="4">
+    <circle cx="235" cy="600" r="28"/><circle cx="915" cy="600" r="28"/>
+    <circle cx="355" cy="260" r="25"/><circle cx="795" cy="260" r="25"/>
+  </g>
+
+  <!-- circulation -->
+  <path d="M575 822 L575 670 L575 650" class="path"/>
+  <path d="M510 424 C430 440 325 455 145 448" class="path"/>
+  <path d="M640 424 C720 440 825 455 1005 448" class="path"/>
+  <path d="M575 420 L575 355" class="path"/>
+
+  <!-- numbered callouts -->
+  <g>
+    <circle cx="575" cy="116" r="20" fill="#f0bd59"/><text x="575" y="116" class="number">1</text>
+    <circle cx="575" cy="535" r="20" fill="#f0bd59"/><text x="575" y="535" class="number">2</text>
+    <circle cx="91" cy="445" r="20" fill="#f0bd59"/><text x="91" y="445" class="number">3</text>
+    <circle cx="1059" cy="445" r="20" fill="#f0bd59"/><text x="1059" y="445" class="number">4</text>
+    <circle cx="872" cy="640" r="20" fill="#f0bd59"/><text x="872" y="640" class="number">5</text>
+    <circle cx="255" cy="640" r="20" fill="#f0bd59"/><text x="255" y="640" class="number">6</text>
+    <circle cx="575" cy="887" r="20" fill="#f0bd59"/><text x="575" y="887" class="number">7</text>
+    <circle cx="282" cy="275" r="20" fill="#f0bd59"/><text x="282" y="275" class="number">8</text>
+  </g>
+
+  <text x="575" y="181" class="label">DIRECCIÓN / NIVEL SUPERIOR</text>
+  <text x="73" y="470" class="label" transform="rotate(-90 73 470)">TALLER DE ELECTRÓNICA</text>
+  <text x="1077" y="470" class="label" transform="rotate(90 1077 470)">PROGRAMACIÓN</text>
+  <text x="575" y="928" class="label">ENTRADA PRINCIPAL</text>
+
+  <!-- legend panel -->
+  <rect x="1130" y="135" width="400" height="730" rx="20" fill="#17191d" stroke="#5e5146" stroke-width="2"/>
+  <text x="1170" y="185" class="legendTitle">Zonas y lectura</text>
+  <g class="legend">
+    <circle cx="1182" cy="229" r="15" fill="#f0bd59"/><text x="1182" y="229" class="number">1</text>
+    <text x="1210" y="234">Escalera protagonista y puerta a Dirección.</text>
+    <circle cx="1182" cy="278" r="15" fill="#f0bd59"/><text x="1182" y="278" class="number">2</text>
+    <text x="1210" y="283">Monumento Roxana: foco primario, 3–4 NPC.</text>
+    <circle cx="1182" cy="327" r="15" fill="#f0bd59"/><text x="1182" y="327" class="number">3</text>
+    <text x="1210" y="332">Acceso prioritario a Electrónica.</text>
+    <circle cx="1182" cy="376" r="15" fill="#f0bd59"/><text x="1182" y="376" class="number">4</text>
+    <text x="1210" y="381">Acceso a Programación, cerrado al inicio.</text>
+    <circle cx="1182" cy="425" r="15" fill="#f0bd59"/><text x="1182" y="425" class="number">5</text>
+    <text x="1210" y="430">Puesto del preceptor, fuera del eje central.</text>
+    <circle cx="1182" cy="474" r="15" fill="#f0bd59"/><text x="1182" y="474" class="number">6</text>
+    <text x="1210" y="479">Cartelera de ingresantes y banco narrativo.</text>
+    <circle cx="1182" cy="523" r="15" fill="#f0bd59"/><text x="1182" y="523" class="number">7</text>
+    <text x="1210" y="528">Entrada y spawn; vista limpia al monumento.</text>
+    <circle cx="1182" cy="572" r="15" fill="#f0bd59"/><text x="1182" y="572" class="number">8</text>
+    <text x="1210" y="577">Vitrinas: memoria técnica y antigua Bitácora.</text>
+  </g>
+
+  <line x1="1170" y1="618" x2="1490" y2="618" stroke="#4f4439" stroke-width="2"/>
+  <text x="1170" y="655" class="legendTitle">Reglas de circulación</text>
+  <text x="1170" y="690" class="legend">• Eje sur–norte: mínimo 2 NPC libres.</text>
+  <text x="1170" y="723" class="legend">• Anillo alrededor de estatua: 1,5 NPC.</text>
+  <text x="1170" y="756" class="legend">• Escalera: 4–6 NPC de ancho útil.</text>
+  <text x="1170" y="789" class="legend">• Muebles nunca cortan accesos laterales.</text>
+  <text x="1170" y="829" class="small">Los accesos diagonales secundarios pueden ser</text>
+  <text x="1170" y="850" class="small">puertas cerradas o corredores hacia Física/Matemática.</text>
+</svg>

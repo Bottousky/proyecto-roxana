@@ -1,0 +1,586 @@
+:root {
+  --school-ink: #f6eddc;
+  --school-muted: #b9ad98;
+  --school-gold: #f4bb54;
+  --school-edge: rgba(255, 255, 255, 0.13);
+  --school-glass: rgba(11, 14, 25, 0.74);
+}
+
+html[data-view='school'],
+html[data-view='school'] body {
+  overflow: hidden;
+}
+
+html[data-view='school'] #root { display: none; }
+html[data-view='classic'] #school-experience { display: none; }
+
+.rx-school3d {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  min-height: 100svh;
+  overflow: hidden;
+  color: var(--school-ink);
+  background: #010204;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+}
+
+.rx-school3d,
+.rx-school3d * { box-sizing: border-box; }
+
+.rx-school3d__parallax {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 43%, rgba(24, 32, 48, .23), transparent 38%),
+    linear-gradient(180deg, #010204, #04060a 52%, #010204);
+}
+
+.rx-school3d__parallax::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, .08), transparent 20%, transparent 78%, rgba(0, 0, 0, .42)),
+    radial-gradient(ellipse at center, transparent 52%, rgba(0, 0, 0, .58) 100%);
+}
+
+.rx-school3d__parallax-layer {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  overflow: visible;
+  will-change: transform;
+}
+
+.rx-school3d__parallax-layer text {
+  fill: currentColor;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: .08em;
+}
+
+.rx-school3d__parallax-layer path,
+.rx-school3d__parallax-layer circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.rx-school3d__parallax-layer .is-grid { display: none; color: #7890ae; }
+.rx-school3d__parallax-layer .is-math { color: #e4ad4a; }
+.rx-school3d__parallax-layer .is-code { color: #5db5cf; }
+.rx-school3d__parallax-layer .is-electronics { color: #53c7a3; }
+.rx-school3d__parallax-layer .is-geometry { color: #b996ff; }
+.rx-school3d__parallax-layer .is-physics { color: #8298e8; }
+.rx-school3d__parallax-layer .is-roxana { color: #c98973; }
+
+.rx-school3d__parallax-layer--far {
+  opacity: .13;
+  animation: rx-school-parallax-far 46s ease-in-out infinite alternate;
+}
+
+.rx-school3d__parallax-layer--far text { font-size: 18px; }
+
+.rx-school3d__parallax-layer--mid {
+  opacity: .20;
+  animation: rx-school-parallax-mid 31s ease-in-out infinite alternate;
+}
+
+.rx-school3d__parallax-layer--near {
+  opacity: .27;
+  animation: rx-school-parallax-near 22s ease-in-out infinite alternate;
+}
+
+.rx-school3d__parallax-layer--near text { font-size: 28px; }
+.rx-school3d__parallax-seal text {
+  font-family: 'Spectral', serif;
+  font-size: 62px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.rx-school3d__canvas {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: default;
+  touch-action: none;
+  outline: 0;
+}
+
+.rx-school3d__canvas.is-object-hovered { cursor: pointer; }
+
+.rx-school3d__atmosphere {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3, 5, 12, .22), transparent 22%, transparent 72%, rgba(3, 5, 12, .72)),
+    radial-gradient(ellipse at center, transparent 48%, rgba(2, 4, 10, .55) 100%);
+}
+
+.rx-school3d__topbar {
+  position: absolute;
+  z-index: 12;
+  top: 16px;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.rx-school3d__brand,
+.rx-school3d__button,
+.rx-school3d__rooms,
+.rx-school3d__panel { pointer-events: auto; }
+
+.rx-school3d__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 6px 12px 6px 7px;
+  border: 1px solid var(--school-edge);
+  border-radius: 13px;
+  color: var(--school-ink);
+  background: var(--school-glass);
+  backdrop-filter: blur(18px) saturate(130%);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .25);
+  font: 600 17px/1 'Spectral', serif;
+  cursor: pointer;
+}
+
+.rx-school3d__brand small {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--school-muted);
+  font: 600 8px/1 'IBM Plex Mono', monospace;
+  letter-spacing: .22em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.rx-school3d__crest {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(244, 187, 84, .48);
+  border-radius: 10px;
+  color: #17100a;
+  background: linear-gradient(145deg, #ffdc86, #d99027);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .65), 0 0 22px rgba(244, 187, 84, .2);
+  font: 700 18px 'Spectral', serif;
+}
+
+.rx-school3d__top-actions { display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+
+.rx-school3d__button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 15px;
+  border: 1px solid var(--school-edge);
+  border-radius: 11px;
+  color: var(--school-ink);
+  background: var(--school-glass);
+  backdrop-filter: blur(18px) saturate(130%);
+  font: 650 12px 'Hanken Grotesk', sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.rx-school3d__button:hover,
+.rx-school3d__button:focus-visible { transform: translateY(-1px); border-color: rgba(244, 187, 84, .58); outline: none; }
+.rx-school3d__button--primary { border-color: #e1a944; color: #1c1408; background: linear-gradient(145deg, #ffd77c, #e9a83d); box-shadow: 0 9px 28px rgba(220, 144, 36, .24); }
+.rx-school3d__button--progress {
+  border-color: rgba(101, 202, 164, .42);
+  color: #bdebd7;
+  background: linear-gradient(145deg, rgba(17, 60, 48, .92), rgba(11, 24, 27, .92));
+}
+.rx-school3d__button--progress[data-state='complete'] {
+  border-color: rgba(151, 111, 255, .66);
+  color: #e2d8ff;
+  background: linear-gradient(145deg, rgba(64, 35, 105, .92), rgba(20, 16, 38, .94));
+  box-shadow: 0 0 24px rgba(117, 76, 225, .16);
+}
+
+.rx-school3d__rooms {
+  position: absolute;
+  z-index: 11;
+  top: 72px;
+  right: 18px;
+  width: min(312px, calc(100vw - 36px));
+  max-height: calc(100svh - 98px);
+  padding: 10px;
+  overflow: auto;
+  border: 1px solid var(--school-edge);
+  border-radius: 15px;
+  background: rgba(10, 13, 23, .88);
+  backdrop-filter: blur(22px) saturate(130%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .42);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(.98);
+  transform-origin: top right;
+  transition: opacity .18s ease, visibility .18s ease, transform .18s ease;
+}
+
+.rx-school3d__rooms.is-open { opacity: 1; visibility: visible; transform: none; }
+
+.rx-school3d__room-button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  gap: 11px;
+  align-items: center;
+  padding: 11px 10px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--school-muted);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rx-school3d__room-button:hover,
+.rx-school3d__room-button.is-selected { color: var(--school-ink); background: rgba(255, 255, 255, .07); }
+.rx-school3d__room-button i { width: 7px; height: 7px; border-radius: 50%; background: #7f8491; }
+.rx-school3d__room-button[data-state='open'] i { background: #65caa4; }
+.rx-school3d__room-button[data-state='active'] i,
+.rx-school3d__room-button[data-state='restored'] i { background: var(--school-gold); box-shadow: 0 0 10px rgba(244, 187, 84, .6); }
+.rx-school3d__room-button strong { font-size: 13px; font-weight: 650; }
+.rx-school3d__room-button small { color: #747988; font: 500 9px 'IBM Plex Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+
+/* Rótulos proyectados sobre el plano --------------------------------------
+   Sustituyen al texto extruido que antes vivía dentro del GLB: se leen a
+   cualquier zoom, se traducen y no cuestan un solo triángulo. */
+
+.rx-school3d__labels {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rx-school3d__label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
+  border: 1px solid var(--school-edge);
+  border-radius: 999px;
+  color: var(--school-ink);
+  background: var(--school-glass);
+  backdrop-filter: blur(14px) saturate(130%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .34);
+  font: 650 10.5px/1 'Hanken Grotesk', system-ui, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .3s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.rx-school3d__label.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Tallo que ata la píldora a su sala. */
+.rx-school3d__label::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: 15px;
+  background: linear-gradient(180deg, rgba(244, 187, 84, .55), transparent);
+}
+
+.rx-school3d__label:hover,
+.rx-school3d__label.is-hovered {
+  border-color: rgba(244, 187, 84, .55);
+  background: rgba(26, 21, 14, .86);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .44), 0 0 0 1px rgba(244, 187, 84, .16);
+}
+
+.rx-school3d__label-dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: #7f8491;
+}
+
+.rx-school3d__label[data-state='open'] .rx-school3d__label-dot { background: #65caa4; }
+
+.rx-school3d__label[data-state='active'] .rx-school3d__label-dot,
+.rx-school3d__label[data-state='restored'] .rx-school3d__label-dot {
+  background: var(--school-gold);
+  box-shadow: 0 0 10px rgba(244, 187, 84, .6);
+}
+
+.rx-school3d__label-state {
+  display: none;
+  color: #7c8191;
+  font: 500 8px 'IBM Plex Mono', monospace;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.rx-school3d__intro {
+  position: absolute;
+  z-index: 5;
+  left: clamp(18px, 2.2vw, 36px);
+  bottom: clamp(46px, 5vh, 64px);
+  width: min(360px, calc(100vw - 36px));
+  padding: 14px 16px 15px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 14px;
+  background: rgba(7, 10, 18, .68);
+  backdrop-filter: blur(18px) saturate(125%);
+  pointer-events: none;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, .42));
+  transition: opacity .35s ease, transform .35s ease;
+}
+
+.rx-school3d__intro.is-hidden { opacity: 0; transform: translateY(14px); }
+.rx-school3d[data-mode='room'] .rx-school3d__help { opacity: 0; visibility: hidden; }
+.rx-school3d[data-mode='room'] .rx-school3d__atmosphere {
+  background:
+    linear-gradient(180deg, rgba(3, 5, 12, .18), transparent 28%, transparent 58%, rgba(3, 5, 12, .78)),
+    radial-gradient(ellipse at 50% 35%, transparent 36%, rgba(2, 4, 10, .42) 100%);
+}
+.rx-school3d__intro > p,
+.rx-school3d__eyebrow { margin: 0 0 12px; color: var(--school-gold); font: 600 10px 'IBM Plex Mono', monospace; letter-spacing: .24em; text-transform: uppercase; }
+.rx-school3d__intro h1 { margin: 0; font: 600 clamp(27px, 2.4vw, 38px)/.98 'Spectral', serif; letter-spacing: -.03em; text-wrap: balance; }
+.rx-school3d__intro h1 em { color: #f4c776; font-weight: 500; }
+.rx-school3d__intro > span { display: block; max-width: 330px; margin-top: 10px; color: var(--school-muted); font-size: 12px; line-height: 1.45; }
+
+.rx-school3d__panel {
+  position: absolute;
+  z-index: 10;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-height: 214px;
+  display: grid;
+  grid-template-columns: minmax(260px, .9fr) minmax(320px, 1.25fr) auto;
+  gap: clamp(28px, 4vw, 72px);
+  align-items: end;
+  padding: 30px clamp(26px, 5vw, 76px) 34px;
+  border-top: 1px solid var(--school-edge);
+  background: linear-gradient(180deg, rgba(8, 11, 19, .72), rgba(8, 11, 19, .97) 34%);
+  backdrop-filter: blur(20px) saturate(125%);
+  box-shadow: 0 -28px 80px rgba(0, 0, 0, .24);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(30px);
+  transition: opacity .32s ease, visibility .32s ease, transform .48s cubic-bezier(.2, .8, .2, 1);
+}
+
+.rx-school3d__panel.is-open { opacity: 1; visibility: visible; transform: none; }
+.rx-school3d__panel.is-object { border-top-color: rgba(101, 202, 164, .42); }
+.rx-school3d__panel-close {
+  position: absolute;
+  top: -47px;
+  left: clamp(18px, 3vw, 44px);
+  display: inline-flex;
+  height: 37px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid var(--school-edge);
+  border-radius: 10px;
+  color: var(--school-ink);
+  background: rgba(9, 12, 20, .84);
+  backdrop-filter: blur(16px);
+  font: 650 11px 'Hanken Grotesk', sans-serif;
+  cursor: pointer;
+}
+.rx-school3d__panel h2 { margin: 0 0 10px; font: 600 clamp(34px, 3.5vw, 52px)/.96 'Spectral', serif; letter-spacing: -.025em; }
+.rx-school3d__panel-body > p { max-width: 620px; margin: 0 0 18px; color: var(--school-muted); font-size: 14px; line-height: 1.55; }
+.rx-school3d__status { display: inline-flex; align-items: center; gap: 7px; color: #c8c0b1; font: 600 9px 'IBM Plex Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+.rx-school3d__status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #7f8491; }
+.rx-school3d__status[data-state='open']::before { background: #65caa4; }
+.rx-school3d__status[data-state='active']::before,
+.rx-school3d__status[data-state='restored']::before { background: var(--school-gold); box-shadow: 0 0 10px rgba(244, 187, 84, .6); }
+.rx-school3d__room-meta { display: flex; flex-wrap: wrap; gap: 24px; }
+.rx-school3d__room-meta span { display: grid; gap: 3px; }
+.rx-school3d__room-meta small { color: #777e8e; font: 600 8px 'IBM Plex Mono', monospace; letter-spacing: .15em; text-transform: uppercase; }
+.rx-school3d__room-meta strong { color: var(--school-ink); font-size: 12px; font-weight: 650; }
+.rx-school3d__progress { width: min(400px, 100%); height: 3px; margin-top: 13px; overflow: hidden; border-radius: 10px; background: rgba(255,255,255,.10); }
+.rx-school3d__progress i { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6ad5ac, var(--school-gold)); transition: width .6s cubic-bezier(.2,.8,.2,1); }
+.rx-school3d__panel-actions { align-self: center; }
+.rx-school3d__panel-action { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 0 22px; border: 1px solid #d89d39; border-radius: 11px; color: #1b1207; background: linear-gradient(145deg, #ffd77c, #e9a83d); box-shadow: 0 12px 34px rgba(220,144,36,.18); font-size: 13px; font-weight: 750; text-decoration: none; white-space: nowrap; }
+
+.rx-school3d__help {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: 17px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 999px;
+  color: #9096a5;
+  background: rgba(7, 9, 16, .64);
+  backdrop-filter: blur(14px);
+  font: 500 9px 'IBM Plex Mono', monospace;
+  letter-spacing: .04em;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.rx-school3d__help i { width: 1px; height: 12px; background: rgba(255,255,255,.13); }
+.rx-school3d__live-dot { width: 6px; height: 6px; border-radius: 50%; background: #68d7aa; box-shadow: 0 0 10px rgba(104,215,170,.7); animation: rx-school-live 2s ease-in-out infinite; }
+
+.rx-school3d__loading,
+.rx-school3d__fallback {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  padding: 24px;
+  color: var(--school-ink);
+  background: #080b13;
+  text-align: center;
+  transition: opacity .5s ease, visibility .5s ease;
+}
+
+.rx-school3d__loading.is-ready { opacity: 0; visibility: hidden; }
+.rx-school3d__loader-mark { display: grid; width: 58px; height: 58px; place-items: center; border: 1px solid rgba(244,187,84,.55); border-radius: 18px; color: #17100a; background: linear-gradient(145deg, #ffdc86, #d99027); box-shadow: 0 0 50px rgba(244,187,84,.22); font: 700 30px 'Spectral', serif; animation: rx-school-loader 1.8s ease-in-out infinite; }
+.rx-school3d__loading p { margin: 17px 0 12px; font: 600 22px 'Spectral', serif; }
+.rx-school3d__loading > div { width: min(240px, 65vw); height: 3px; overflow: hidden; border-radius: 9px; background: rgba(255,255,255,.1); }
+.rx-school3d__loading > div i { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--school-gold); transition: width .2s ease; }
+.rx-school3d__loading small { margin-top: 10px; color: #767c89; font: 500 9px 'IBM Plex Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.rx-school3d__fallback[hidden] { display: none; }
+.rx-school3d__fallback strong { font: 600 24px 'Spectral', serif; }
+.rx-school3d__fallback span { margin: 8px 0 18px; color: var(--school-muted); }
+.rx-school3d__fallback a { color: var(--school-gold); }
+
+.rx-scene-editor {
+  position: absolute;
+  z-index: 40;
+  top: 74px;
+  left: 18px;
+  width: min(330px, calc(100vw - 36px));
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(101, 202, 164, .38);
+  border-radius: 13px;
+  color: var(--school-ink);
+  background: rgba(7, 12, 18, .94);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .38);
+}
+.rx-scene-editor strong { font: 600 18px 'Spectral', serif; }
+.rx-scene-editor small { color: var(--school-muted); font-size: 10px; }
+.rx-scene-editor label { display: grid; gap: 5px; color: #8f98a8; font: 600 9px 'IBM Plex Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+.rx-scene-editor select,
+.rx-scene-editor button {
+  min-height: 34px;
+  border: 1px solid var(--school-edge);
+  border-radius: 8px;
+  color: var(--school-ink);
+  background: rgba(255,255,255,.06);
+  font: 600 10px 'Hanken Grotesk', sans-serif;
+}
+.rx-scene-editor > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.rx-scene-editor pre { max-height: 180px; margin: 0; overflow: auto; color: #9ee2c7; font: 9px/1.45 'IBM Plex Mono', monospace; white-space: pre-wrap; }
+
+@keyframes rx-school-live { 50% { opacity: .42; transform: scale(.75); } }
+@keyframes rx-school-loader { 50% { transform: translateY(-4px); box-shadow: 0 8px 58px rgba(244,187,84,.34); } }
+@keyframes rx-school-parallax-far {
+  from { transform: translate3d(-1.2%, -.8%, 0) scale(1.01); }
+  to { transform: translate3d(1.3%, .9%, 0) scale(1.035); }
+}
+@keyframes rx-school-parallax-mid {
+  from { transform: translate3d(1.4%, -1.1%, 0) rotate(-.18deg); }
+  to { transform: translate3d(-1.5%, 1.2%, 0) rotate(.18deg); }
+}
+@keyframes rx-school-parallax-near {
+  from { transform: translate3d(-1.7%, 1.1%, 0); }
+  to { transform: translate3d(1.8%, -1.2%, 0); }
+}
+
+@media (max-width: 720px) {
+  .rx-school3d__topbar { top: 10px; left: 10px; right: 10px; }
+  .rx-school3d__brand { padding-right: 8px; }
+  .rx-school3d__brand > span:last-child { display: none; }
+  .rx-school3d__top-actions { gap: 5px; }
+  .rx-school3d__button { min-height: 39px; padding: 0 11px; font-size: 11px; }
+  .rx-school3d__button--progress { max-width: 102px; padding-inline: 9px; font-size: 9.5px; line-height: 1.05; text-align: center; }
+  .rx-school3d__button--primary span { display: none; }
+  .rx-school3d__rooms { top: 62px; right: 10px; max-height: calc(100svh - 82px); }
+  .rx-school3d__intro { left: 18px; bottom: 56px; }
+  .rx-school3d__intro h1 { font-size: clamp(34px, 11vw, 54px); }
+  .rx-school3d__intro > span { max-width: 330px; font-size: 12px; }
+  .rx-school3d__panel {
+    min-height: 36svh;
+    max-height: 46svh;
+    grid-template-columns: 1fr auto;
+    gap: 14px 18px;
+    align-items: start;
+    align-content: start;
+    padding: 22px 18px 18px;
+    overflow-y: auto;
+  }
+  .rx-school3d__panel-heading { grid-column: 1 / -1; }
+  .rx-school3d__panel-body { grid-column: 1; }
+  .rx-school3d__panel-actions { grid-column: 2; align-self: end; }
+  .rx-school3d__panel h2 { font-size: 31px; }
+  .rx-school3d__panel-body > p { margin-bottom: 12px; font-size: 12.5px; }
+  .rx-school3d__room-meta { gap: 16px; }
+  .rx-school3d__panel-action { min-height: 43px; padding: 0 14px; font-size: 11px; }
+  .rx-school3d__panel-close { top: 13px; right: 13px; left: auto; }
+  .rx-school3d__panel-heading { padding-right: 82px; }
+  .rx-school3d__help { bottom: 9px; }
+  .rx-school3d__help i,
+  .rx-school3d__help-copy { display: none; }
+  /* Once píldoras sobre un plano pequeño tapan la escuela: en móvil el rótulo
+     se reduce al nombre y el estado queda en el menú «Salas». */
+  .rx-school3d__label { padding: 5px 10px 5px 8px; font-size: 10.5px; gap: 6px; }
+  .rx-school3d__label-state { display: none; }
+  .rx-school3d__label::after { height: 10px; }
+}
+
+@media (max-height: 640px) {
+  .rx-school3d__intro > span { display: none; }
+  .rx-school3d__intro { bottom: 42px; }
+  .rx-school3d__panel { min-height: 48svh; padding-block: 15px; }
+  .rx-school3d__panel-body > p { margin: 8px 0 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rx-school3d *, .rx-school3d *::before { animation: none !important; transition-duration: .01ms !important; }
+}

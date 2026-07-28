@@ -1,0 +1,14 @@
+[
+  {
+    "id": "anatomy-proportion",
+    "score": 0.78,
+    "accepted": true,
+    "notes": "The broad shoulder line, narrow waist, floor-length garment and asymmetric arm pose now match the reference at blockout scale."
+  },
+  {
+    "id": "pedestal-architecture",
+    "score": 0.84,
+    "accepted": true,
+    "notes": "The stepped plinth, shaft, projecting cornice, cap and clipped-corner plaque all read clearly in the front and hall views."
+  }
+]
