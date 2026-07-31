@@ -107,6 +107,7 @@ type SchoolDebugMetrics = {
 declare global {
   interface Window {
     __roxanaSchool3D?: SchoolDebugMetrics;
+    render_game_to_text?: () => string;
   }
 }
 
@@ -244,6 +245,22 @@ class School3DExperience {
 
   private get arcOneComplete(): boolean {
     return this.schoolState.electronica.arcoCompleto;
+  }
+
+  snapshot(): string {
+    return JSON.stringify({
+      mode: this.selected ? 'room' : 'overview',
+      selectedRoom: this.selected,
+      hoveredRoom: this.hovered,
+      progressPreview: this.progressPreview,
+      rooms: VOXEL_ROOMS.map((room) => ({
+        id: room.id,
+        state: voxelZoneState(room.id, this.schoolState),
+        selected: room.id === this.selected,
+      })),
+      metrics: window.__roxanaSchool3D ?? null,
+      coordinateSystem: 'Three.js world coordinates: +X right, +Y up, +Z toward the entrance',
+    });
   }
 
   constructor(canvas: HTMLCanvasElement) {
@@ -1014,6 +1031,7 @@ export async function initSchool3D(): Promise<void> {
   try {
     const experience = new School3DExperience(canvas);
     await experience.load();
+    window.render_game_to_text = () => experience.snapshot();
   } catch (error) {
     console.error('WebGL no está disponible', error);
     document.querySelector<HTMLElement>('#school3d-loading')?.classList.add('is-ready');

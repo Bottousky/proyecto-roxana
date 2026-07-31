@@ -4,6 +4,9 @@ Este índice evita que una entrega histórica se confunda con una decisión vige
 
 ## Fuentes de verdad activas
 
+**Comenzar por [`START_HERE.md`](START_HERE.md):** consolida la promesa, el loop, la arquitectura
+híbrida y el único vertical siguiente. Los documentos de abajo desarrollan ese norte.
+
 1. [`vision-mundos-multilenguaje.md`](vision-mundos-multilenguaje.md) — visión de producto:
    un núcleo compartido y cinco lenguajes de experiencia.
 2. [`plan-plataforma-cinco-juegos.md`](plan-plataforma-cinco-juegos.md) — arquitectura y orden

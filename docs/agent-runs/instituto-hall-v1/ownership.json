@@ -38,7 +38,8 @@
     "docs/spec-p3-escuela-3d.md",
     "src/landing/school3d.ts",
     "src/experiences/instituto/EscuelaHubScene.ts",
-    "src/experiences/instituto/hubRuntime.ts",
+    "src/experiences/instituto/hubModel.ts",
+    "src/experiences/instituto/parallaxModel.ts",
     "src/jugar/**",
     "src/ohmdal/**"
   ],

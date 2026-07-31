@@ -5,6 +5,10 @@ los **Mundos Aplicados**: mundos creados por la escuela para enseñar, hoy degra
 en ritual y superstición. En **Ohmdal**, el mundo de la electrónica, restaura el reino
 aprendiendo jugando los circuitos de corriente continua.
 
+La fuente de verdad para la dirección actual es
+[`docs/START_HERE.md`](docs/START_HERE.md): Instituto, mundos, Bitácora, arquitectura híbrida y
+el próximo spike «Ohmdal mundo vivo».
+
 La visión de producto es un solo juego con cinco lenguajes de experiencia: el Instituto como
 mundo real y nexo; Ohmdal para electrónica; Bitland para programación; Physica para física; y
 Arithmos para matemática. Comparten protagonista, progreso, narrativa y Bitácora, pero cada
@@ -57,8 +61,9 @@ queda en `https://<tu-usuario>.github.io/proyecto-roxana/`. Después, cada
   DOM, no en el canvas — texto nítido, accesible y exportable.
 - **Progreso**: `localStorage` (local-first, sin backend).
 
-Ohmdal es la primera experiencia terminada y la base estable del repositorio. Los runtimes de
-los otros mundos se incorporarán como módulos cargados bajo demanda; no se reescribe Ohmdal.
+Ohmdal es la primera experiencia completa y la base estable de regresión del repositorio. Su
+narrativa, estado y modelos pedagógicos se preservan mientras un laboratorio aislado rediseña
+escala, mundo, arte y puzzles. La implementación actual no está aprobada como diseño final.
 
 ## Estructura
 
@@ -75,10 +80,10 @@ src/
     rooms.ts               23 salas, diálogos y gating del Arco I
     ExplorationScene.ts    escena top-down: movimiento, colisiones, puertas, interacción
     world.ts               composición de mundos continuos
-    visuals.ts             lenguaje visual procedural de la experiencia cenital
+    visuals.ts             lenguaje visual procedural top-down actual (prototipo)
   ui/
     dialog.ts              caja de diálogo + toast
-    bench.ts               marco de la "vista de banco" (primer plano de puzzles)
+    bench.ts               marco modal actual de puzzles (deuda a reemplazar en el spike)
     bitacora.ts            el libro: índice + entradas, botón del HUD
     end.ts                 pantalla de cierre del slice
     overlay.ts             contador de overlays (pausa el input del juego)
@@ -131,6 +136,10 @@ docs/
 
 ## Limitaciones conocidas de la base Ohmdal
 
+- El supuesto mundo continuo está compuesto por sectores fijos de 960 × 540; conserva movimiento
+  entre ellos, pero no produce todavía una región orgánica y autorada.
+- La mayoría de los puzzles abre una vista de banco DOM y separa la manipulación del escenario.
+  El spike siguiente debe convertir un puzzle representativo en un mecanismo diegético.
 - El tap-to-move no tiene pathfinding: si hay un mueble en línea recta, el jugador
   se detiene (con teclado se esquiva sin problema). Para la versión con arte:
   steering simple o grilla de navegación.

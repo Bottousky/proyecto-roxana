@@ -18,7 +18,10 @@ docs/superpowers/
 *.psd
 .playwright-cli/
 output/
-assets/hub/
+# El mapa y los recortes runtime del hub histórico siguen referenciados por código y tests.
+# El resto de la cantera queda fuera.
+assets/hub/*
+!assets/hub/escuela.json
 assets/ohmdal/ChatGPT Image*
 assets/ohmdal/496_RPG_icons/
 assets/ohmdal/Castle2.png
@@ -46,7 +49,10 @@ assets/instituto/2dClassroomAssetPackByStyloo/
 assets/instituto/Modern tiles_Free/
 assets/instituto/Modern_Interiors_Free_v2.2/
 assets/instituto/hall-master-v1.png
-assets/instituto/intro-0*-v1.png
+assets/instituto/intro-01-llegada-v1.png
+assets/instituto/intro-02-roxana-viva-v1.png
+assets/instituto/intro-03-leyenda-bitacora-v1.png
+assets/instituto/intro-04-umbral-v1.png
 assets/instituto/proyector-electronica-0*-v1.png
 assets/instituto/student-v1.png
 assets/ohmdal/753c6248-4aae-4dc1-8667-58386c18a42d.png

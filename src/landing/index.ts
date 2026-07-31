@@ -1,7 +1,6 @@
-// Landing page logic: cart, content rendering
-import { initAulas } from './aulas.ts';
-import { initVoxelSchool } from './voxelSchool.ts';
-import { initSchool3D } from './school3d.ts';
+// Landing page logic: cart, content rendering.
+// La escuela 3D y la portada clásica son experiencias excluyentes: se cargan
+// bajo demanda para que una iteración descartada no viaje en el bundle activo.
 
 interface Product {
   id: string;
@@ -45,8 +44,6 @@ class Landing {
     this.setupEventListeners();
     this.renderContent();
     this.updateCartUI();
-    initAulas();
-    initVoxelSchool();
   }
 
   private loadCart(): void {
@@ -259,10 +256,17 @@ class Landing {
 }
 
 // Init on load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   if (document.documentElement.dataset.view === 'classic') {
+    const [{ initAulas }, { initVoxelSchool }] = await Promise.all([
+      import('./aulas.ts'),
+      import('./voxelSchool.ts'),
+    ]);
     new Landing();
+    initAulas();
+    initVoxelSchool();
   } else {
+    const { initSchool3D } = await import('./school3d.ts');
     void initSchool3D();
   }
 });
