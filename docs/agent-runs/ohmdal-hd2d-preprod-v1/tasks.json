@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "milestone": "ohmdal-hd2d-preprod-v1",
+  "status": "authorized",
+  "executionAuthorized": true,
+  "authorizationScope": "H1 educational V2 plus H2 visual/technical spike only; H3 remains blocked",
+  "authorizedBy": "user",
+  "authorizedAt": "2026-08-01",
+  "baseRef": "codex/ohmdal-hd2d-biblia",
+  "baseCommit": "aaab28ad63abab8b177c152a9f3d39cb9c678dc5",
+  "controlPlane": "docs/agent-runs/ohmdal-hd2d-preprod-v1",
+  "budgets": {
+    "maxConcurrentExecutors": 2,
+    "maxEvaluators": 1,
+    "maxAutomaticReviewRounds": 2,
+    "thirdRoundRequiresApproval": true,
+    "taskMinutes": {
+      "min": 30,
+      "max": 90
+    },
+    "meshyCredits": 0,
+    "paidGeneration": false
+  },
+  "tasks": [
+    {
+      "id": "DIR-001",
+      "role": "director_integrator",
+      "title": "Validar baseline, contratos y worktrees comunes",
+      "status": "ready",
+      "estimatedMinutes": 30,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [],
+      "acceptance": [
+        "todos los roles leen los contratos desde el control plane",
+        "cada worktree parte de baseCommit",
+        "build, tests y manifiestos se registran antes de implementar",
+        "ningún archivo de src/jugar se asigna a escritura"
+      ]
+    },
+    {
+      "id": "DIR-EDU-001",
+      "role": "director_integrator",
+      "title": "Producir y auditar las seis fichas educativas V2",
+      "status": "ready",
+      "estimatedMinutes": 90,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": [
+        "seguridad, circuito, instrumento, Lumen, Puerta y Bitácora usan la ficha de 30 campos",
+        "cálculos y topologías tienen tests deterministas",
+        "un segundo pase reproduce fuentes y resultados",
+        "sólo contradicción, seguridad o incertidumbre real escalan"
+      ]
+    },
+    {
+      "id": "ARCH-001",
+      "role": "architecture",
+      "title": "Construir blockout modular, navegación y cámaras A/B",
+      "status": "ready",
+      "estimatedMinutes": 90,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-arquitectura",
+      "dependsOn": ["DIR-001"],
+      "acceptance": [
+        "Portal, Plaza, Taller y Puerta/Manantial usan metros y maniquí de 1,72 m",
+        "el recorrido funciona en 1440x900 y 390x844",
+        "materiales e iluminación permanecen dentro de la frontera architecture",
+        "renderer.info y disposal son observables"
+      ]
+    },
+    {
+      "id": "ASSET-001",
+      "role": "asset_forge",
+      "title": "Cerrar referencias, manifests y prototipos A/B 4/8 y Ohm",
+      "status": "ready",
+      "estimatedMinutes": 90,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-assets",
+      "dependsOn": ["DIR-001"],
+      "acceptance": [
+        "las observaciones de footage citan fuente oficial sin extraer assets",
+        "los prototipos son originales, mínimos y comparables",
+        "cada asset declara origen, derechos, escala, pivote, frente, collider y presupuesto",
+        "Meshy y toda generación paga permanecen deshabilitados"
+      ]
+    },
+    {
+      "id": "DIR-INT-001",
+      "role": "director_integrator",
+      "title": "Integrar educación, arquitectura y assets en el harness aislado",
+      "status": "blocked",
+      "estimatedMinutes": 90,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-EDU-001", "ARCH-001", "ASSET-001"],
+      "acceptance": [
+        "commits de trabajadores integrados secuencialmente",
+        "A/B usa seed, recorrido, cámara y presupuesto equivalentes",
+        "render_game_to_text describe estado y puntos de medición",
+        "/jugar conserva comportamiento y tests"
+      ]
+    },
+    {
+      "id": "EVAL-001",
+      "role": "visual_evaluator",
+      "title": "Evaluar evidencia integrada sin corregir implementación",
+      "status": "blocked",
+      "estimatedMinutes": 60,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-evaluacion",
+      "dependsOn": ["DIR-INT-001"],
+      "acceptance": [
+        "review-round-01 emite PASS, CONDITIONAL o FAIL por gate",
+        "performance.json contiene sólo mediciones observadas o null",
+        "capturas desktop/mobile y consola son reproducibles",
+        "el Evaluador no modifica src, tests ni assets"
+      ]
+    },
+    {
+      "id": "DIR-VERDICT-001",
+      "role": "director_integrator",
+      "title": "Emitir veredicto de H1+H2",
+      "status": "blocked",
+      "estimatedMinutes": 30,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["EVAL-001"],
+      "acceptance": [
+        "final-report referencia commits, capturas, tests y métricas",
+        "se elige 4/8 y una representación de Ohm o se registra bloqueo",
+        "el veredicto es avanzar, corregir una vez o descartar",
+        "H3 no cambia de estado sin veredicto favorable"
+      ]
+    }
+  ]
+}

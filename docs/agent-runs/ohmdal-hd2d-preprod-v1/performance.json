@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "milestone": "ohmdal-hd2d-preprod-v1",
+  "status": "not-run",
+  "integratedCommit": null,
+  "captureState": {
+    "seed": "ohmdal-hd2d-preprod-v1",
+    "desktopViewport": "1440x900",
+    "mobileViewport": "390x844",
+    "route": "Portal-Plaza-Taller-Puerta-Manantial"
+  },
+  "desktop": {
+    "browser": null,
+    "fps": null,
+    "frameTimeMs": null,
+    "drawCalls": null,
+    "triangles": null,
+    "geometries": null,
+    "textures": null,
+    "transferredBytes": null,
+    "consoleErrors": null
+  },
+  "mobileEmulation": {
+    "browser": null,
+    "fps": null,
+    "frameTimeMs": null,
+    "drawCalls": null,
+    "triangles": null,
+    "geometries": null,
+    "textures": null,
+    "transferredBytes": null,
+    "consoleErrors": null
+  },
+  "androidPhysical": {
+    "device": null,
+    "releaseYearClass": "mid-range-2022",
+    "fps": null,
+    "frameTimeMs": null,
+    "result": "not-run"
+  },
+  "largestAssets": [],
+  "evidence": []
+}

@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "milestone": "ohmdal-hd2d-preprod-v1",
+  "status": "planned",
+  "meshy": {
+    "approved": false,
+    "balanceChecked": false,
+    "maxCredits": 0,
+    "maxPreviewsPerAsset": 0,
+    "reason": "H1+H2 usan blockout procedural y prototipos originales mínimos; no requieren generación paga."
+  },
+  "assets": [
+    {
+      "id": "env_preprod_blockout_kit",
+      "purpose": "Módulos métricos de Portal, Plaza, Taller, Puerta y Manantial",
+      "method": "procedural-threejs",
+      "source": "original-project-spec",
+      "rights": "project-owned",
+      "scale": "meters; mannequin 1.72m",
+      "front": "+Z",
+      "pivot": "ground-center per module",
+      "collider": "primitive separate colliders",
+      "desktopBudget": "shared within 400k-700k visible triangles and 250 draw calls",
+      "mobileBudget": "shared within 150k-300k visible triangles and 150 draw calls",
+      "status": "planned"
+    },
+    {
+      "id": "student_sprite_direction_ab",
+      "purpose": "Comparar cuatro y ocho direcciones en cámara real",
+      "method": "original-placeholder-pixel-art",
+      "source": "character bible; no extracted footage",
+      "rights": "project-owned",
+      "scale": "camera-relative; feet aligned to ground",
+      "front": "screen-facing directional atlas",
+      "pivot": "feet-center",
+      "collider": "capsule owned by runtime",
+      "desktopBudget": "one active atlas variant",
+      "mobileBudget": "one active atlas variant; texture 512-1024",
+      "status": "planned"
+    },
+    {
+      "id": "ohm_representation_ab",
+      "purpose": "Comparar sprite/impostor con hard-surface procedural",
+      "method": "original-sprite-and-procedural-threejs",
+      "source": "Ohm character bible and original geometry spec",
+      "rights": "project-owned",
+      "scale": "declared after camera blockout",
+      "front": "+Z for procedural; feet/base center for sprite",
+      "pivot": "ground-center with explicit moving-part pivots",
+      "collider": "simple capsule or box",
+      "desktopBudget": "same screen size and action set for A/B",
+      "mobileBudget": "same draw-call and memory ceiling for A/B",
+      "status": "planned"
+    },
+    {
+      "id": "official_footage_observation_notes",
+      "purpose": "Registrar giros y cualidades de cámara sin reutilizar material protegido",
+      "method": "textual-analysis-only",
+      "source": "https://dragonquest.square-enix-games.com/games/es-xl/dragon-quest-3-hd2d-remake/",
+      "rights": "reference-only; no redistribution",
+      "scale": "not-applicable",
+      "front": "not-applicable",
+      "pivot": "not-applicable",
+      "collider": "not-applicable",
+      "desktopBudget": "not a runtime asset",
+      "mobileBudget": "not a runtime asset",
+      "status": "planned"
+    }
+  ],
+  "requiredFieldsForFutureAssets": [
+    "id",
+    "purpose",
+    "method",
+    "source",
+    "rights",
+    "scale",
+    "front",
+    "pivot",
+    "collider",
+    "desktopBudget",
+    "mobileBudget",
+    "status"
+  ],
+  "canonicalManifestSchema": "assets/manifests/assets.schema.json"
+}

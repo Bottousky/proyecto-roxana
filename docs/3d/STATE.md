@@ -64,7 +64,13 @@
 El hito Phaser `ohmdal-vnext-spike` conserva sus contratos históricos y su evidencia. La promoción
 documental no autoriza ejecutarlo de nuevo ni lo convierte en la dirección final.
 
-El próximo hito a autorizar es el vertical slice **Portal–Plaza–Edda–Ohm–Lumen–Puerta–Manantial**
+El hito `ohmdal-hd2d-preprod-v1` tiene `executionAuthorized: true` para H1+H2 exclusivamente:
+fichas educativas V2, blockout Portal–Manantial, cámaras A/B, sprites 4/8 y Ohm sprite/procedural.
+Todos los ejecutores parten de `aaab28ad63abab8b177c152a9f3d39cb9c678dc5`, usan worktrees y
+ownership exclusivos. Meshy y generación paga tienen presupuesto cero.
+
+El próximo hito a autorizar, sólo después del veredicto H1+H2, es el vertical slice
+**Portal–Plaza–Edda–Ohm–Lumen–Puerta–Manantial**
 de 25–35 minutos. Antes de producir requiere `docs/agent-runs/<hito>/tasks.json` con
 `executionAuthorized: true`, commit base, ownership y contratos. Su alcance máximo es:
 

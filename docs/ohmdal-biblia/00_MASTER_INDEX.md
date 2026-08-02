@@ -92,12 +92,15 @@ Una metáfora puede simplificar la entrada, pero nunca contradecir el modelo té
 
 Autoridad, conflicto, alcance educativo/comercial, territorio y slice quedaron decididos.
 
-### Fase 2 — próxima, no autorizada por esta entrega
+### Fase 2 — activa y autorizada en alcance H1+H2
 
 Instanciar fichas V0–V2 del slice y contratos de producción desde esta Biblia. Los agentes validan de forma autónoma
 fuentes, cálculos y tests; escalan contradicciones, seguridad o incertidumbre real.
 
-### Fase 3 — preproducción del slice
+La autorización vive en `docs/agent-runs/ohmdal-hd2d-preprod-v1/tasks.json`, con base común
+`aaab28ad63abab8b177c152a9f3d39cb9c678dc5`. No se extiende a H3.
+
+### Fase 3 — preproducción del slice completo, bloqueada por veredicto
 
 Desglosar el GDD y el guion canónicos en escenas, cámaras, navegación y contratos ejecutables.
 Cada puzzle debe declarar fenómeno, hipótesis, medición, consecuencia y transferencia. Este

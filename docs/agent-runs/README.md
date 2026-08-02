@@ -1,5 +1,15 @@
 # Sistema de corridas multiagente
 
+## Hito activo
+
+- [`ohmdal-hd2d-preprod-v1/`](ohmdal-hd2d-preprod-v1/brief.md): H1+H2 autorizados para cerrar
+  fichas educativas V2, blockout Portal–Manantial, cámara y comparativas 4/8 y Ohm. No autoriza
+  el vertical slice H3, migrar `/jugar`, Meshy ni producción masiva.
+
+Los contratos son independientes de la interfaz de orquestación. OpenCode puede dirigirlos si
+respeta el mismo `baseCommit`, los worktrees/ramas por rol, el ownership exclusivo y la secuencia
+de integración descrita en el runbook del hito. No se incorpora Agents SDK.
+
 ## Decisión vigente
 
 Proyecto Roxana usa la orquestación nativa de Codex App, subagentes, perfiles de proyecto,

@@ -1,6 +1,6 @@
 # Backlog de producción y autorización
 
-**Estado:** backlog canónico; ejecución del nuevo slice no autorizada
+**Estado:** backlog canónico; H1+H2 autorizados, H3 bloqueado
 **Regla:** los ítems de producción permanecen bloqueados hasta crear un hito con
 `executionAuthorized: true`. El spike Phaser existente no se retargetea silenciosamente.
 
@@ -8,6 +8,7 @@
 
 - `READY-DOC`: tarea documental realizable sin producción.
 - `READY-AUTH`: contrato listo para decisión de autorización.
+- `AUTHORIZED`: ejecución limitada por un `tasks.json` aprobado.
 - `BLOCKED-SLICE`: depende del veredicto del vertical slice.
 - `BLOCKED-ADR`: depende de decisión arquitectónica.
 - `FUTURE`: horizonte; no estimar como compromiso.
@@ -24,7 +25,7 @@
 
 ## H1 — Fichas educativas del slice
 
-**Estado global:** `READY-AUTH`
+**Estado global:** `AUTHORIZED` en `docs/agent-runs/ohmdal-hd2d-preprod-v1/`
 **Owner futuro:** Director educativo/agente auditor; sin assets.
 
 | ID | Entregable | Dependencia | Criterio de cierre |
@@ -42,7 +43,7 @@ desde este documento.
 
 ## H2 — Spike visual preparatorio
 
-**Estado global:** `READY-AUTH`
+**Estado global:** `AUTHORIZED` en `docs/agent-runs/ohmdal-hd2d-preprod-v1/`
 **Objetivo:** reducir incertidumbre antes de construir el slice completo.
 
 | ID | Entregable | Gate |
