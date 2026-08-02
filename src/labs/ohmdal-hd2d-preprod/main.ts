@@ -74,6 +74,7 @@ let currentHeading = 90;
 let moving = false;
 let diagnosis = createDiagnosisHarnessState();
 let currentAnchor: CameraAnchorId = 'C1_PORTAL_PLAZA';
+let lastBlockedIds = new Set<string>();
 
 function viewportProfile(): ViewportProfileId {
   return window.innerWidth <= 720 ? 'mobile-390x844' : 'desktop-1440x900';
@@ -177,12 +178,12 @@ function updateGame(dtSeconds: number): void {
     new THREE.Vector3(player.x, 0.08, player.z),
     new THREE.Vector3(player.x, 1.72, player.z),
   ];
-  const blockedIds = findBlockedOccluderIds(
+  lastBlockedIds = findBlockedOccluderIds(
     cameraController.camera.position,
     protectedSockets,
     blockout.occlusionBindings.map(({ object }) => object),
   );
-  occlusionController.update(blockedIds, dt, reducedMotion);
+  occlusionController.update(lastBlockedIds, dt, reducedMotion);
   blockout.lighting.syncEmitterState();
 }
 
@@ -210,6 +211,10 @@ function snapshot(): HarnessSnapshot {
       triangles: info.triangles,
       geometries: info.geometries,
       textures: info.textures,
+    },
+    occlusion: {
+      blockedIds: [...lastBlockedIds].sort(),
+      targets: occlusionController.diagnostics().targets.map(({ id, opacity }) => ({ id, opacity })),
     },
   };
 }

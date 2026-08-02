@@ -3,16 +3,16 @@ import { defineEducationCard, type EducationCard } from './types.ts';
 const SOURCES =
   'Primarias: Escuela Técnica Otto Krause, Primer Ciclo (https://www.ottokrause.edu.ar/primer-ciclo/) y Electrónica (https://www.ottokrause.edu.ar/electronica/); CFE 15/07 Anexo III–Electrónica (https://www.inet.edu.ar/wp-content/uploads/2013/04/15-07-anexo03.pdf), medición, instrumental, fallas, documentación y seguridad. Internas: Biblia educativa §Ficha/§Escala V1–V2, vertical slice Beats 3–7 y backlog H1.1–H1.7. Reglas candidatas propias —no institucionales—: 5 V, 100/150 ohm, umbral 300 ohm, rangos, resoluciones, órdenes de diagnóstico, cuatro bloques de Bitácora y telemetría.';
 const STATUS =
-  'V1-ready-for-independent-audit; implementada y auto-revisada, pendiente de reproducción por un segundo agente; no V2 y no CANON-EDU.';
+  'V2 CANON-EDU; fuentes, cálculos, seguridad, estados inválidos y tests reproducidos por auditor independiente el 2026-08-02 tras dos rondas correctivas.';
 const TELEMETRY =
   'Sólo local y opt-in: códigos de estado, orden de acciones, configuración y completitud; nunca identidad, texto libre ni identificadores escolares.';
 
 export const safetyCard = defineEducationCard({
-  identifierVersion: 'H1.1-seguridad-virtual-v1',
+  identifierVersion: 'H1.1-seguridad-virtual-v2',
   technicalName: 'Seguridad operativa en circuito DC ficticio, aislado y simulado de 5,00 V.',
   competencyLevel: 'F0 — Cultura de taller; compatible con seguridad, medición y documentación, sin equivalencia escolar.',
   sources: SOURCES,
-  reviewerDate: 'Autoría DIR-EDU-001, 2026-08-02; auditor independiente pendiente.',
+  reviewerDate: 'Autoría DIR-EDU-001 y auditoría independiente PASS, 2026-08-02.',
   prerequisites: 'Distinguir simulación de equipo real; reconocer fuente, retorno, nodo, referencia, V y estado energizado/desenergizado.',
   observableObjective: 'Inspeccionar, formular hipótesis, configurar y medir el modelo protegido, desenergizar antes de intervenir y documentar evidencia.',
   technicalModel: 'Fuente ideal virtual 5,00 V DC; las conexiones sólo cambian en deenergized_isolated y la medición energizada bloquea la topología.',
@@ -41,11 +41,11 @@ export const safetyCard = defineEducationCard({
 });
 
 export const circuitCard = defineEducationCard({
-  identifierVersion: 'H1.2-circuito-continuidad-v1',
+  identifierVersion: 'H1.2-circuito-continuidad-v2',
   technicalName: 'Circuito DC serie completo, retorno abierto y continuidad virtual desenergizada.',
   competencyLevel: 'F0 — Circuito simple, medición y documentación; compatible con trayectos iniciales, sin acreditación.',
   sources: SOURCES,
-  reviewerDate: 'Autoría DIR-EDU-001, 2026-08-02; cálculos auto-reproducidos; auditor independiente pendiente.',
+  reviewerDate: 'Autoría DIR-EDU-001; cálculos y auditoría independiente PASS, 2026-08-02.',
   prerequisites: 'Reconocer fuente, resistores, nodo, retorno y referencia; leer V, mA, ohm y W.',
   observableObjective: 'Predecir y verificar una trayectoria completa, distinguir continuidad desenergizada de funcionamiento bajo carga y localizar el retorno abierto.',
   technicalModel: 'V_PLUS→R1 100 ohm→N1→R2 150 ohm→N2→retorno→REF; Vs=5,00 V; retorno closed u open.',
@@ -74,11 +74,11 @@ export const circuitCard = defineEducationCard({
 });
 
 export const instrumentCard = defineEducationCard({
-  identifierVersion: 'H1.3-instrumento-ohm-v1',
+  identifierVersion: 'H1.3-instrumento-ohm-v2',
   technicalName: 'Selección de magnitud, puntos, polaridad, rango y estado del instrumento exclusivamente virtual.',
   competencyLevel: 'F0 — Instrumentación básica simulada; no equivale a práctica con multímetro.',
   sources: SOURCES,
-  reviewerDate: 'Autoría DIR-EDU-001, 2026-08-02; auditor independiente pendiente.',
+  reviewerDate: 'Autoría DIR-EDU-001 y auditoría independiente PASS, 2026-08-02.',
   prerequisites: 'Distinguir V_DC, R y continuidad; reconocer puntos, referencia, signo, energía y comparación inclusiva.',
   observableObjective: 'Configurar una consulta completa, interpretar signo/límite/fuera de rango/apertura y usarla como evidencia sin habilitar intervención.',
   technicalModel: 'V_DC devuelve A−B energizado/bloqueado; R y CONTINUITY consultan la red pasiva desenergizada/aislada.',
@@ -107,11 +107,11 @@ export const instrumentCard = defineEducationCard({
 });
 
 export const lumenDiagnosisCard = defineEducationCard({
-  identifierVersion: 'H1.4-diagnostico-lumen-v1',
+  identifierVersion: 'H1.4-diagnostico-lumen-v2',
   technicalName: 'Diagnóstico por hipótesis y evidencia del retorno abierto del circuito virtual de Lumen.',
   competencyLevel: 'F0 con puente a F1 — diagnóstico inicial, sin práctica certificada.',
   sources: SOURCES,
-  reviewerDate: 'Autoría DIR-EDU-001, 2026-08-02; auditor independiente pendiente.',
+  reviewerDate: 'Autoría DIR-EDU-001 y auditoría independiente PASS, 2026-08-02.',
   prerequisites: 'Dominar invariantes H1.1, topología H1.2 y configuración H1.3.',
   observableObjective: 'Localizar el retorno abierto sin sustitución ciega mediante inspección, hipótesis, al menos una evidencia válida, intervención protegida, verificación y registro.',
   technicalModel: 'Máquina de estados pura con energía, medición activa, inspección, hipótesis, configuración, evidencias, intervención, verificación y documentación.',
@@ -140,11 +140,11 @@ export const lumenDiagnosisCard = defineEducationCard({
 });
 
 export const puertaTransferCard = defineEducationCard({
-  identifierVersion: 'H1.5-puerta-transferencia-v1',
+  identifierVersion: 'H1.5-puerta-transferencia-v2',
   technicalName: 'Transferencia de circuito completo y diagnóstico protegido en la Puerta de Ohm.',
   competencyLevel: 'F0/F1 inicial — transferencia de estrategia en representación distinta.',
   sources: SOURCES,
-  reviewerDate: 'Autoría DIR-EDU-001, 2026-08-02; auditor independiente pendiente.',
+  reviewerDate: 'Autoría DIR-EDU-001 y auditoría independiente PASS, 2026-08-02.',
   prerequisites: 'Completar H1.4 y explicar evidencia sin depender de la metáfora de Lumen.',
   observableObjective: 'Reconocer la topología equivalente bajo nuevos rótulos y resolverla con un orden válido distinto o justificadamente elegido.',
   technicalModel: 'Misma red 5 V, 100+150 ohm y retorno open/closed; rótulos V_PLUS/N1/N2/REF cambian a marca_este/bisagra_alta/bisagra_baja/marca_oeste.',
@@ -173,11 +173,11 @@ export const puertaTransferCard = defineEducationCard({
 });
 
 export const bitacoraCard = defineEducationCard({
-  identifierVersion: 'H1.6-bitacora-evidencia-v1',
+  identifierVersion: 'H1.6-bitacora-evidencia-v2',
   technicalName: 'Registro estructurado de vivencia, evidencia, traducción formal y siguiente pregunta.',
   competencyLevel: 'F0 transversal — documentación y comunicación técnica.',
   sources: SOURCES,
-  reviewerDate: 'Autoría DIR-EDU-001, 2026-08-02; auditor independiente pendiente.',
+  reviewerDate: 'Autoría DIR-EDU-001 y auditoría independiente PASS, 2026-08-02.',
   prerequisites: 'Haber vivido y verificado H1.2–H1.5; distinguir observación, hipótesis, evidencia e interpretación.',
   observableObjective: 'Dejar un registro reproducible que otra persona pueda seguir sin convertirlo en tutorial anticipado.',
   technicalModel: 'Entrada con cuatro bloques obligatorios: vivencia ilustrada, evidencia estructurada, traducción formal y siguiente pregunta; URL https opcional.',

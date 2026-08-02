@@ -1,6 +1,6 @@
-# Fichas educativas H1 — paquete V1 para auditoría independiente
+# Fichas educativas H1 — paquete V2 validado
 
-**Estado del paquete:** `V1-ready-for-independent-audit`
+**Estado del paquete:** `V2 CANON-EDU`
 
 Este paquete entrega seis fichas completas como datos TypeScript puros en
 [`cards.ts`](../../../../../src/labs/ohmdal-hd2d-preprod/education/cards.ts). Cada ficha usa
@@ -10,12 +10,12 @@ en el mismo orden. Los tests rechazan campos faltantes, adicionales o vacíos.
 
 | Ficha | Identificador | Modelo ejecutable |
 |---|---|---|
-| Seguridad | `H1.1-seguridad-virtual-v1` | estados protegidos en `diagnosisModel.ts` |
-| Circuito/continuidad | `H1.2-circuito-continuidad-v1` | `circuitModel.ts` |
-| Instrumento | `H1.3-instrumento-ohm-v1` | `instrumentModel.ts` |
-| Diagnóstico Lumen | `H1.4-diagnostico-lumen-v1` | `diagnosisModel.ts` |
-| Transferencia Puerta | `H1.5-puerta-transferencia-v1` | mapeo `PUERTA_NODE_LABELS` |
-| Bitácora | `H1.6-bitacora-evidencia-v1` | `bitacoraModel.ts` |
+| Seguridad | `H1.1-seguridad-virtual-v2` | estados protegidos en `diagnosisModel.ts` |
+| Circuito/continuidad | `H1.2-circuito-continuidad-v2` | `circuitModel.ts` |
+| Instrumento | `H1.3-instrumento-ohm-v2` | `instrumentModel.ts` |
+| Diagnóstico Lumen | `H1.4-diagnostico-lumen-v2` | `diagnosisModel.ts` |
+| Transferencia Puerta | `H1.5-puerta-transferencia-v2` | mapeo `PUERTA_NODE_LABELS` |
+| Bitácora | `H1.6-bitacora-evidencia-v2` | `bitacoraModel.ts` |
 
 ## Contrato técnico común
 
@@ -56,8 +56,9 @@ un multímetro. `R` y `CONTINUITY` se bloquean energizados. Toda intervención r
 `deenergized_isolated`, ninguna acción describe una práctica física y el paquete no cubre red,
 AC, baterías de alta energía, equipos reales, cortos o sobrecargas.
 
-## Condición para promoción
+## Promoción independiente
 
-DIR-EDU-001 sólo auto-reproduce cálculos y tests. Un segundo agente debe volver a ejecutar los
-tests, verificar fuentes y seguridad y registrar su propia reproducción. Hasta entonces las seis
-fichas son V1, no V2 y no `CANON-EDU`.
+Un segundo agente reprodujo fuentes, cálculos, seguridad, estados inválidos y tests. La primera
+revisión detectó trazabilidad primaria insuficiente, desacoplamiento de T05 y validaciones
+incompletas de Bitácora; las dos rondas correctivas cerraron todos los hallazgos. El veredicto
+independiente final fue PASS el 2026-08-02, por lo que las seis fichas son V2 y `CANON-EDU`.

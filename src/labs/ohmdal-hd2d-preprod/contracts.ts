@@ -22,6 +22,10 @@ export interface HarnessSnapshot {
     readonly geometries: number;
     readonly textures: number;
   };
+  readonly occlusion: {
+    readonly blockedIds: readonly string[];
+    readonly targets: readonly { readonly id: string; readonly opacity: number }[];
+  };
 }
 
 declare global {

@@ -18,12 +18,12 @@ for (const [id, card] of Object.entries(EDUCATION_CARDS)) {
     equal(card[field].trim().length > 0, true, `${id}.${field}: contenido no vacío`);
   }
   equal(
-    card.validationStatus.startsWith('V1-ready-for-independent-audit'),
+    card.validationStatus.startsWith('V2 CANON-EDU'),
     true,
     `${id}: estado correcto`,
   );
-  equal(card.validationStatus.includes('no V2'), true, `${id}: no declara V2`);
-  equal(card.validationStatus.includes('no CANON-EDU'), true, `${id}: no declara CANON-EDU`);
+  equal(card.validationStatus.includes('auditor independiente'), true, `${id}: registra segundo pase`);
+  equal(card.identifierVersion.endsWith('-v2'), true, `${id}: identificador promovido`);
 }
 
 equal(
