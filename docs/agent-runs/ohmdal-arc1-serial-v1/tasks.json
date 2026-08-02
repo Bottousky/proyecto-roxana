@@ -53,9 +53,7 @@
     "meshyCredits": 0,
     "paidGeneration": false,
     "maxRoundsPerPacket": 2,
-    "maxRoundsPerIssue": 4,
-    "packetMinutesMin": 30,
-    "packetMinutesMax": 90
+    "maxRoundsPerIssue": 4
   },
   "issues": [
     {

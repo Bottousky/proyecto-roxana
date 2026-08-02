@@ -27,7 +27,7 @@ Esto no reemplaza a `DECISIONS.md`: allí van decisiones tomadas, acá problemas
 
 | ID | Fecha | Descubierto en | Hallazgo | Sev. | ¿Bloquea? | Destino |
 |---|---|---|---|---|---|---|
-| — | — | — | *sin hallazgos registrados* | — | — | — |
+| OI-001 | 2026-08-02 | `CP-016` | `ownership.json` quedó en `ARC1-003`: su `activeIssueKey` apunta al ticket ya cerrado y `protected` incluye `tickets/ARC1-004.md`, que es el que hay que escribir | P1 | sí, para `ARC1-004` | Director, antes de `/arc-plan ARC1-004` |
 
 Formato del ID: `OI-001`, `OI-002`… correlativo, nunca se reutiliza.
 `Descubierto en` es el paquete o ticket exacto (`ARC1-011-C`), no «durante el desarrollo».

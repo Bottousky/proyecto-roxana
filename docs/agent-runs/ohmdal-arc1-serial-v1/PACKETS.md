@@ -11,6 +11,8 @@ de tres horas sin punto de evaluación.
 | Ticket `ARC1-NNN` | resultado cerrado del backlog | 0,5–2 días | varias |
 | Paquete `ARC1-NNN-X` | un artefacto observable | 30–90 min | **una, nueva** |
 
+La duración no se repite acá: la fija `workflow.internalTaskMinutes` en `tasks.json`.
+
 `X` es `A`, `B`, `C`… en orden serial. WIP de paquetes = 1, igual que el de tickets.
 
 ## Cuándo se subdivide
