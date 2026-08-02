@@ -98,7 +98,7 @@ Instanciar fichas V0–V2 del slice y contratos de producción desde esta Biblia
 fuentes, cálculos y tests; escalan contradicciones, seguridad o incertidumbre real.
 
 La autorización vive en `docs/agent-runs/ohmdal-hd2d-preprod-v1/tasks.json`, con base común
-`aaab28ad63abab8b177c152a9f3d39cb9c678dc5`. No se extiende a H3.
+`12d6f88d2a366da89ed91008013f42ba6295e42d`. No se extiende a H3.
 
 ### Fase 3 — preproducción del slice completo, bloqueada por veredicto
 

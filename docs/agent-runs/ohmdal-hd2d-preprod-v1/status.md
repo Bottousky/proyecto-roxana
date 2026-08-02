@@ -3,7 +3,7 @@
 **Fase:** listo para orquestación
 **Ejecución autorizada:** sí, exclusivamente H1+H2
 **Ronda:** 0/2
-**Base común:** `aaab28ad63abab8b177c152a9f3d39cb9c678dc5`
+**Base común:** `12d6f88d2a366da89ed91008013f42ba6295e42d`
 **Bloqueo:** ninguno para DIR-001; H3 continúa bloqueado
 
 ## Baseline registrado

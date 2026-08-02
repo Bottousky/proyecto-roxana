@@ -66,7 +66,7 @@ documental no autoriza ejecutarlo de nuevo ni lo convierte en la dirección fina
 
 El hito `ohmdal-hd2d-preprod-v1` tiene `executionAuthorized: true` para H1+H2 exclusivamente:
 fichas educativas V2, blockout Portal–Manantial, cámaras A/B, sprites 4/8 y Ohm sprite/procedural.
-Todos los ejecutores parten de `aaab28ad63abab8b177c152a9f3d39cb9c678dc5`, usan worktrees y
+Todos los ejecutores parten de `12d6f88d2a366da89ed91008013f42ba6295e42d`, usan worktrees y
 ownership exclusivos. Meshy y generación paga tienen presupuesto cero.
 
 El próximo hito a autorizar, sólo después del veredicto H1+H2, es el vertical slice
