@@ -43,6 +43,28 @@ git worktree add "C:\YO\Worktrees\roxana-hd2d-evaluacion" -b codex/ohmdal-hd2d-p
 
 No abrir la misma rama en otro checkout ni compartir un worktree entre agentes.
 
+## Abrir las sesiones de OpenCode
+
+En terminales independientes:
+
+```powershell
+Set-Location -LiteralPath "C:\YO\Worktrees\roxana-hd2d-director"
+opencode --agent roxana-director
+```
+
+```powershell
+Set-Location -LiteralPath "C:\YO\Worktrees\roxana-hd2d-arquitectura"
+opencode --agent ohmdal-architecture
+```
+
+```powershell
+Set-Location -LiteralPath "C:\YO\Worktrees\roxana-hd2d-assets"
+opencode --agent ohmdal-asset-forge
+```
+
+En el Director, ejecutar `/ohmdal-hd2d-start`. No usar `--auto` como sustituto de los permisos:
+las reglas `deny` permanecen obligatorias y las acciones `ask` conservan supervisión humana.
+
 ## Orden de ejecución
 
 1. Director ejecuta DIR-001 y registra baseline.

@@ -38,6 +38,18 @@ Sobre la base estabilizada previa al commit canónico:
 4. El Director integra commits secuencialmente.
 5. Se abre un único Evaluador sobre la integración terminada.
 
+## Worktrees preparados
+
+| Rol | Ruta | Rama | Estado inicial |
+|---|---|---|---|
+| Director | `C:\YO\Worktrees\roxana-hd2d-director` | `codex/ohmdal-hd2d-preprod-v1-director` | creado en `baseCommit` |
+| Arquitectura | `C:\YO\Worktrees\roxana-hd2d-arquitectura` | `codex/ohmdal-hd2d-preprod-v1-arquitectura` | creado en `baseCommit` |
+| Asset Forge | `C:\YO\Worktrees\roxana-hd2d-assets` | `codex/ohmdal-hd2d-preprod-v1-assets` | creado en `baseCommit` |
+| Evaluador | — | `codex/ohmdal-hd2d-preprod-v1-evaluacion` | crear sólo desde commit integrado |
+
+Las dependencias NPM no se duplicaron en los worktrees; cada sesión debe ejecutar `npm install`
+antes del baseline si no dispone de un runtime compartido explícito.
+
 ## Frenos activos
 
 - Meshy y generación paga: prohibidos.
