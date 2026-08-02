@@ -15,12 +15,13 @@
     "shotDeck": "docs/agent-runs/ohmdal-arc1-serial-v1/SHOT_DECK.md",
     "sceneInventory": "docs/agent-runs/ohmdal-arc1-serial-v1/SCENE_INVENTORY.md",
     "contentV2": "docs/agent-runs/ohmdal-arc1-serial-v1/CONTENT_V2.md",
-    "note": "Seven frozen documents. ARC1-003 froze what must be legible (CP-015); ARC1-004, with which light and where in frame (CP-018); ARC1-005, which scenes exist, how long each beat lasts and what is taught in each (CP-019). A scene ticket may not redefine any of them to make its own result pass: amending one requires its own CP decision. On conflict the earlier frozen document wins and a CP is opened; in particular, if shotDeck and goldenFrames conflict, goldenFrames wins. sceneInventory may report that colorScript does not cover a beat, but may not redefine its beat map."
+    "sceneBudgets": "docs/agent-runs/ohmdal-arc1-serial-v1/SCENE_BUDGETS.md",
+    "note": "Eight frozen documents. ARC1-003 froze what must be legible (CP-015); ARC1-004, with which light and where in frame (CP-018); ARC1-005, which scenes exist, how long each beat lasts and what is taught in each (CP-019); ARC1-006, how much each scene may cost (CP-020). A scene ticket may not redefine any of them to make its own result pass: amending one requires its own CP decision. On conflict the earlier frozen document wins and a CP is opened; in particular, if shotDeck and goldenFrames conflict, goldenFrames wins. sceneInventory may report that colorScript does not cover a beat, but may not redefine its beat map; sceneBudgets may report that a frozen requirement does not fit under the H3 ceiling, but may not lower the requirement or raise the ceiling."
   },
   "branch": "codex/ohmdal-arc1-control-plane",
   "planningBaseCommit": "e07be6332fa10f5df36fe5f679c66c1603961257",
   "baseCommit": "b49b617",
-  "activeIssueKey": "ARC1-006",
+  "activeIssueKey": "ARC1-007",
   "workflow": {
     "mode": "STRICT-SERIAL",
     "globalWipLimit": 1,
@@ -175,9 +176,22 @@
       "epic": "Control",
       "title": "Fijar presupuesto por escena",
       "owner": "director",
-      "status": "READY",
+      "status": "DONE",
       "dependsOn": [
         "ARC1-005"
+      ],
+      "spec": "tickets/ARC1-006.md",
+      "packets": [
+        "packets/ARC1-006/ARC1-006-A.md",
+        "packets/ARC1-006/ARC1-006-B.md"
+      ],
+      "decidedOn": "2026-08-02",
+      "decisions": [
+        "CP-020"
+      ],
+      "evidence": "evidence/ARC1-006/",
+      "deliverables": [
+        "SCENE_BUDGETS.md"
       ]
     },
     {
@@ -185,7 +199,7 @@
       "epic": "Slice",
       "title": "Montar laboratorio Three.js mediante RuntimeHost",
       "owner": "director",
-      "status": "BLOCKED",
+      "status": "READY",
       "dependsOn": [
         "ARC1-006"
       ]

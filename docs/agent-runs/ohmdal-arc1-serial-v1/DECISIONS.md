@@ -21,8 +21,69 @@
 | CP-017 | 2026-08-02 | Rotar `ownership.json` es parte del **cierre**; builder y reviewer obtienen append-only | `ARC1-003` verificado y congelado; `ARC1-004` desbloqueado; `OI-001` cerrado |
 | CP-018 | 2026-08-02 | Color script y shot deck **congelados**; las safe areas son vinculantes | `CP-012` deja de ser cualitativo: mobile `FAIL` con número, destino `ARC1-026` |
 | CP-019 | 2026-08-02 | Inventario de escenas y contenido V2 **congelados**: cinco escenas, tres actos causales, envolvente de duración por beat | `ARC1-006` presupuesta sobre esas cinco escenas; el mapa aporta <2 % de la duración; `OI-002` y `OI-003` abiertos |
+| CP-020 | 2026-08-02 | Presupuesto por escena **congelado**: por frame son techos independientes, por descarga son partición; el overworld recibe línea propia | El Arco I completo proyecta ≈ 35 MiB de descarga; `ARC1-008` hereda el gate de fugas; `OI-004` y `OI-005` abiertos |
 
-Una decisión nueva agrega `CP-020+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-021+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-020 — Presupuesto por escena congelado
+
+**Motivo.** `H3_CONTRACT.md` §5 fija el techo global de runtime y remite explícitamente el reparto a
+`ARC1-006`; `SCENE_INVENTORY.md` §6 remite desde el otro lado. Un techo global dice cuándo el slice
+entero está roto, pero no dice si `ARC1-016` puede gastar lo que quiere gastar en el Taller. Sin
+reparto, cada ticket de escena negocia su propio límite contra un número que sólo se viola al final,
+cuando ya hay cinco escenas construidas y ninguna es la culpable.
+
+**Evidencia.** `SCENE_BUDGETS.md`, `evidence/ARC1-006/js-budget.json` y
+`evidence/ARC1-006/runtime-budget.json`. Todo medido, no citado:
+
+- el chunk de producción del slice son **528.540 B**, de los cuales **487.112 B —el 92,2 %— son
+  `three`**; el código propio de doce módulos son 34.474 B;
+- 480 muestras del recorrido completo en ambos viewports: el pico del slice son **22 draw calls** y
+  **508 triángulos**, ambos en E4;
+- eso es el **8,8 %** del techo de draw calls de desktop y el **0,07 %** del de triángulos;
+- heap 8,75 → 10,27 MB en desktop y 13,74 → 14,31 MB en mobile sobre el recorrido completo;
+- **una** luz con sombra y un shadow map de 1024², en ambos perfiles;
+- arranque en **dos requests** y 534.702 B, con `loadEventEnd` de 100,4 ms sobre localhost;
+- **cero** archivos de audio en el repositorio.
+
+**Impacto.**
+
+1. `SCENE_BUDGETS.md` pasa a canon congelado; enmendarlo requiere `CP-0NN` propia. El canon congelado
+   son ahora **ocho** documentos.
+2. **Las seis dimensiones no se presupuestan igual.** Draw calls, triángulos y memoria son techos
+   **independientes** por escena, porque sólo una escena se dibuja a la vez. JS, texturas, audio y
+   tiempo de carga son una **partición**. Tratarlas por igual invierte el signo del cálculo.
+3. Se aparta una **reserva** que ninguna escena puede gastar: 20 % de los draw calls y 30 % de los
+   triángulos del techo global. E3 recibe el máximo asignable exacto —120/200 llamadas,
+   210.000/490.000 triángulos— y ninguna otra escena lo alcanza. Es coherente con
+   `SCENE_INVENTORY.md`, que ya la declaró la escena más cara.
+4. **El overworld mínimo de `ARC1-010` recibe línea propia**, fuera de las cinco escenas.
+   Financiarlo desde E1 empujaría a recortar la escena con la que `GOLDEN_FRAMES.md` GF-02 juzga el
+   atlas de cuatro direcciones. Su **duración** sigue sin asignar: eso es `SCENE_INVENTORY.md` §4.4 y
+   darle una exige `CP-0NN` propia.
+5. **Cada byte se imputa una sola vez.** Los dos atlas que `vite` inlinea como `data:` URI —6.617 B,
+   el 1,25 % del bundle— se imputan a textura, no a JS.
+6. El arranque es de **dos fases**: el primer frame jugable espera JS y textura de E1, un mega en
+   total; todo lo demás se descarga detrás. Una implementación que bloquee el primer frame hasta
+   tener las cinco escenas incumple el presupuesto aunque el total esté dentro del techo.
+7. **`ARC1-008` hereda un número:** el gate de fugas es ≤ 512 kB por ciclo `mount`→`destroy`. Este
+   documento lo fija; `ARC1-008` lo mide por primera vez.
+8. **Proyección obligada:** a este presupuesto, el Arco I completo pesa **≈ 35 MiB** de descarga. Ése
+   es el número que `ARC1-027` tiene que sostener como PWA instalable offline y `ARC1-035` como
+   coste. Si no es viable, se corrige ahora, mientras el slice todavía es barato de rehacer.
+9. Se abren `OI-004` —los manifests declaran bytes en LF y el árbol está en CRLF— y `OI-005` —los
+   atlas inlineados ahorran requests pero entran al bundle crítico con 23,2 % de sobrecoste—. Ambos
+   P2. **No se corrigen acá.**
+
+**Lo que esta decisión no hace.** No declara fps ni frame time: `CP-014` lo prohíbe hasta `ARC1-060`,
+y el coste de CPU por frame forzado que se midió —0,264 ms— **no es frame time**. No mide TTI real
+sobre 4G ni Android físico. No fija duración jugada, que es `SCENE_INVENTORY.md` §4.3. No fija coste
+por minuto, que es `ARC1-035`. Y no autoriza producir un solo asset: tener presupuesto no es tener
+permiso, y el orden de `ASSET_PIPELINE.md` sigue vigente.
+
+**Desviación declarada.** Las fases de ambos paquetes corrieron en la misma sesión y con la misma
+ruta, contra `PACKETS.md` §«Frontera de sesión». Mismo criterio que `CP-018` y `CP-019`, registrado
+en `telemetry.json`. **No hubo review independiente.**
 
 ## CP-019 — Escenas, beats, duración y fichas V2 congelados
 

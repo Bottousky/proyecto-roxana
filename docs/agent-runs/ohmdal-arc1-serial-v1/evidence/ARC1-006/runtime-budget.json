@@ -1,0 +1,100 @@
+{
+  "issue": "ARC1-006",
+  "packet": "ARC1-006-A",
+  "generatedAt": "2026-08-02",
+  "base": "b49b617",
+  "method": {
+    "server": "roxana-dev-alt (vite dev, puerto 5199)",
+    "url": "http://localhost:5199/labs/ohmdal-hd2d-preprod/",
+    "sampling": "window.advanceTime(50) en bucle sobre el recorrido automático; window.render_game_to_text() después de cada paso. advanceTime fuerza un render sincrónico, así que renderer.info.render corresponde a ese frame.",
+    "samples": 480,
+    "simulatedSeconds": 23.95,
+    "sceneBoundaries": "por x, derivadas de ROUTE_ANCHORS y de SCENE_INVENTORY.md §2: E1 [-18,-7.5), E2 [-7.5,-3), E3 [-3,5), E4 [5,13.5), E5 [13.5,16.5]",
+    "warning": "requestAnimationFrame está throttled en este panel: no se midió fps y no se declara ninguno."
+  },
+  "perScene": {
+    "desktop-1440x900": {
+      "devicePixelRatio": 1,
+      "E1": { "n": 132, "callsMin": 13, "callsMedian": 16, "callsP95": 19, "callsMax": 19, "trisMin": 150, "trisMedian": 176, "trisP95": 400, "trisMax": 400, "geoMax": 21, "texMax": 3, "blockedMax": 0 },
+      "E2": { "n": 56, "callsMin": 19, "callsMedian": 19, "callsP95": 19, "callsMax": 19, "trisMin": 400, "trisMedian": 400, "trisP95": 400, "trisMax": 400, "geoMax": 21, "texMax": 3, "blockedMax": 0 },
+      "E3": { "n": 136, "callsMin": 13, "callsMedian": 17, "callsP95": 18, "callsMax": 19, "trisMin": 150, "trisMedian": 412, "trisP95": 412, "trisMax": 424, "geoMax": 23, "texMax": 3, "blockedMax": 1 },
+      "E4": { "n": 108, "callsMin": 16, "callsMedian": 17, "callsP95": 21, "callsMax": 22, "trisMin": 258, "trisMedian": 412, "trisP95": 496, "trisMax": 508, "geoMax": 28, "texMax": 3, "blockedMax": 1 },
+      "E5": { "n": 48, "callsMin": 16, "callsMedian": 16, "callsP95": 17, "callsMax": 17, "trisMin": 222, "trisMedian": 222, "trisP95": 270, "trisMax": 270, "geoMax": 28, "texMax": 3, "blockedMax": 0 },
+      "TOTAL": { "n": 480, "callsMin": 13, "callsMedian": 17, "callsP95": 19, "callsMax": 22, "trisMin": 150, "trisMedian": 400, "trisP95": 412, "trisMax": 508, "geoMax": 28, "texMax": 3, "blockedMax": 1 }
+    },
+    "mobile-390x844": {
+      "devicePixelRatio": 2,
+      "rendererPixelRatioClamp": 1.5,
+      "E1": { "n": 132, "callsMin": 11, "callsMedian": 12, "callsP95": 15, "callsMax": 15, "trisMin": 126, "trisMedian": 138, "trisP95": 358, "trisMax": 358, "geoMax": 19, "texMax": 2, "blockedMax": 0 },
+      "E2": { "n": 56, "callsMin": 15, "callsMedian": 15, "callsP95": 15, "callsMax": 15, "trisMin": 358, "trisMedian": 358, "trisP95": 358, "trisMax": 358, "geoMax": 19, "texMax": 2, "blockedMax": 0 },
+      "E3": { "n": 136, "callsMin": 11, "callsMedian": 18, "callsP95": 18, "callsMax": 19, "trisMin": 126, "trisMedian": 388, "trisP95": 424, "trisMax": 424, "geoMax": 23, "texMax": 3, "blockedMax": 1 },
+      "E4": { "n": 108, "callsMin": 16, "callsMedian": 18, "callsP95": 19, "callsMax": 20, "trisMin": 240, "trisMedian": 406, "trisP95": 424, "trisMax": 448, "geoMax": 28, "texMax": 3, "blockedMax": 1 },
+      "E5": { "n": 48, "callsMin": 16, "callsMedian": 17, "callsP95": 18, "callsMax": 18, "trisMin": 258, "trisMedian": 270, "trisP95": 282, "trisMax": 282, "geoMax": 28, "texMax": 3, "blockedMax": 0 },
+      "TOTAL": { "n": 480, "callsMin": 11, "callsMedian": 16, "callsP95": 18, "callsMax": 20, "trisMin": 126, "trisMedian": 358, "trisP95": 424, "trisMax": 448, "geoMax": 28, "texMax": 3, "blockedMax": 1 }
+    }
+  },
+  "memory": {
+    "protocol": "reload → advanceTime(16) → heap base → recorrido completo (480 pasos) → heap final",
+    "desktop-1440x900": {
+      "baselineHeapBytes": 8752610,
+      "afterRouteHeapBytes": 10265142,
+      "deltaHeapBytes": 1512532,
+      "geometriesAtSpawn": 20,
+      "geometriesAtEnd": 28,
+      "texturesAtSpawn": 2,
+      "texturesAtEnd": 3
+    },
+    "mobile-390x844": {
+      "baselineHeapBytes": 13735198,
+      "afterRouteHeapBytes": 14312434,
+      "deltaHeapBytes": 577236,
+      "geometriesAtSpawn": 19,
+      "geometriesAtEnd": 28,
+      "texturesAtSpawn": 2,
+      "texturesAtEnd": 3
+    },
+    "gpuTextures": {
+      "studentAtlas": { "pixels": "960x256", "rgbaBytes": 983040, "mipmaps": false, "filter": "Nearest" },
+      "ohmAtlas": { "pixels": "288x256", "rgbaBytes": 294912, "mipmaps": false, "filter": "Nearest" },
+      "shadowMap": { "pixels": "1024x1024", "count": 1, "source": "blockoutLighting.ts:43" },
+      "atlasRgbaTotalBytes": 1277952
+    },
+    "lights": {
+      "hemisphere": 1,
+      "directionalWithShadow": 1,
+      "pointWithoutShadow": 2,
+      "shadowCastersTotal": 1,
+      "source": "blockoutLighting.ts:35,39,42,50,53,57,60"
+    }
+  },
+  "load": {
+    "method": "build de producción aislado servido como estático en http://localhost:5311, sin compresión y sin latencia de red",
+    "navigation": {
+      "responseEndMs": 13.1,
+      "domInteractiveMs": 30.3,
+      "domContentLoadedMs": 99.6,
+      "loadEventEndMs": 100.4,
+      "documentTransferBytes": 5862,
+      "documentEncodedBytes": 5562
+    },
+    "resources": [
+      { "name": "/assets/slice-CUyGpgIJ.js", "transferBytes": 528840, "encodedBytes": 528540, "responseEndMs": 29.9 }
+    ],
+    "httpRequests": 2,
+    "totalTransferBytes": 534702,
+    "notRun": "TTI sobre red real, 4G y Android físico. Se resuelve en ARC1-028 y ARC1-060 (CP-014)."
+  },
+  "cpu": {
+    "forcedFrameMs": 0.264,
+    "samples": 240,
+    "meaning": "coste de CPU de updateGame + renderer.render forzados en serie. NO es frame time ni fps: no incluye espera de GPU ni presentación, y rAF está throttled en este panel."
+  },
+  "assetsOnDisk": {
+    "note": "El árbol de trabajo está en CRLF; los manifests registraron los tamaños en LF. La diferencia es exactamente el número de líneas de cada archivo.",
+    "student-atlas-4.svg": { "bytesCrlf": 2995, "bytesLf": 2975, "lines": 20 },
+    "student-atlas-4.json": { "bytesCrlf": 836, "bytesLf": 821, "lines": 15 },
+    "ohm-sprite-atlas.svg": { "bytesCrlf": 2408, "bytesLf": 2395, "lines": 13 },
+    "ohm-sprite-atlas.json": { "bytesCrlf": 548, "bytesLf": 538, "lines": 10 },
+    "audioFiles": 0
+  }
+}
