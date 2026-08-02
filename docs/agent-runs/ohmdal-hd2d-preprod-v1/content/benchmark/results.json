@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "milestone": "ohmdal-hd2d-preprod-v1",
+  "protocolCommit": "aa2cc39",
+  "status": "running",
+  "plannedExecutions": 10,
+  "completedExecutions": 0,
+  "pairs": [
+    { "id": "B01", "status": "ready", "codex": null, "hybrid": null, "winner": null },
+    { "id": "B02", "status": "blocked-by-B01", "codex": null, "hybrid": null, "winner": null },
+    { "id": "B03", "status": "ready", "codex": null, "hybrid": null, "winner": null },
+    { "id": "B04", "status": "ready", "codex": null, "hybrid": null, "winner": null },
+    { "id": "B05", "status": "ready", "codex": null, "hybrid": null, "winner": null }
+  ],
+  "routingDecision": null
+}
