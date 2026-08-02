@@ -1,10 +1,10 @@
 # Estado — Ohmdal HD-2D preproducción v1
 
-**Fase:** benchmark cerrado; routing comparativo bloqueado por infraestructura externa
+**Fase:** implementación H1+H2, ola 1 activa
 **Ejecución autorizada:** sí, exclusivamente H1+H2
 **Ronda:** 0/2
 **Base común:** `12d6f88d2a366da89ed91008013f42ba6295e42d`
-**Bloqueo:** proveedores híbridos no produjeron contenido; B03–B05 requieren correcciones; H3 continúa bloqueado
+**Bloqueo:** ninguno para DIR-EDU-001 y ARCH-001; H3 continúa bloqueado
 
 ## Baseline registrado
 
@@ -28,8 +28,8 @@ Sobre la base estabilizada previa al commit canónico:
 | BENCH-H2-01 A/B | Director | EXECUTED: Codex entregó; MiMo timeout | candidatos read-only | evidencia en `content/benchmark` |
 | BENCH-H2-02 A/B | Director | EXECUTED: Codex entregó; North timeout | candidatos read-only | evidencia en `content/benchmark` |
 | BENCH-H2-03 A/B | Director | EXECUTED: Codex entregó; MiniMax 429 | candidatos read-only | evidencia en `content/benchmark` |
-| DIR-EDU-001 | Director | READY | `codex/ohmdal-hd2d-preprod-v1-director` | — |
-| ARCH-001 | Arquitectura | READY | `codex/ohmdal-hd2d-preprod-v1-arquitectura` | — |
+| DIR-EDU-001 | Director | IN PROGRESS | `codex/ohmdal-hd2d-preprod-v1-director` | — |
+| ARCH-001 | Arquitectura | IN PROGRESS | `codex/ohmdal-hd2d-preprod-v1-arquitectura` | — |
 | ASSET-001 | Asset Forge | READY | `codex/ohmdal-hd2d-preprod-v1-assets` | — |
 | DIR-INT-001 | Director | BLOCKED por dependencias | `codex/ohmdal-hd2d-preprod-v1-director` | — |
 | EVAL-001 | Evaluador | BLOCKED por integración | `codex/ohmdal-hd2d-preprod-v1-evaluacion` | — |
@@ -37,11 +37,18 @@ Sobre la base estabilizada previa al commit canónico:
 
 ## Secuencia inmediata
 
-1. Ejecutar cinco pares A/B con el paquete congelado de `benchmark-plan.md`.
-2. Puntuar primero gates y calidad; coste y tiempo sólo desempatan.
-3. Elegir routing por tipo de tarea, sin integrar automáticamente salidas candidatas.
-4. Arquitectura y Asset Forge trabajan luego en worktrees separados.
-5. El Director integra commits secuencialmente y abre un único Evaluador oficial.
+1. Director ejecuta DIR-EDU-001 en su worktree y corrige los hallazgos B01/B02.
+2. Arquitectura ejecuta ARCH-001 en paralelo, con blockout y cámara antes de materiales.
+3. Asset Forge inicia ASSET-001 cuando uno de los dos slots quede libre.
+4. El Director integra commits secuencialmente y ejecuta DIR-INT-001.
+5. Se abre un único Evaluador oficial sobre el estado integrado.
+
+## Pool de modelos operativo
+
+- Codex: control plane, implementación, integración y evaluación.
+- Claude Code Pro: disponible por CLI autenticada para revisiones acotadas cuando aporte valor.
+- OpenCode: sólo modelos gratuitos y únicamente después de un smoke exitoso del endpoint Zen.
+- MiniMax, OpenCode Go y Ollama/Qwen: fuera del pool vigente.
 
 ## Worktrees preparados
 

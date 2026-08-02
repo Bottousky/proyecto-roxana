@@ -39,11 +39,12 @@
     "allowedInference": [
       "Codex subscription models",
       "Claude Code Pro subscription",
-      "OpenCode free models",
-      "MiniMax Token Plan subscription"
+      "OpenCode free models after a successful availability smoke"
     ],
     "prohibitedInference": [
       "OpenCode Go until subscribed and verified",
+      "MiniMax because no active paid plan is available",
+      "local Ollama/Qwen because it was removed and is below the project quality/latency bar",
       "metered API credits without a separate explicit cap",
       "Meshy or paid asset generation"
     ]
@@ -170,7 +171,7 @@
       "id": "DIR-EDU-001",
       "role": "director_integrator",
       "title": "Producir y auditar las seis fichas educativas V2",
-      "status": "ready",
+      "status": "in-progress",
       "estimatedMinutes": 90,
       "branch": "codex/ohmdal-hd2d-preprod-v1-director",
       "dependsOn": ["DIR-001"],
@@ -185,7 +186,7 @@
       "id": "ARCH-001",
       "role": "architecture",
       "title": "Construir blockout modular, navegación y cámaras A/B",
-      "status": "ready",
+      "status": "in-progress",
       "estimatedMinutes": 90,
       "branch": "codex/ohmdal-hd2d-preprod-v1-arquitectura",
       "dependsOn": ["DIR-001"],
