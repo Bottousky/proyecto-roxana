@@ -1,7 +1,7 @@
 {
   "version": 2,
   "milestone": "ohmdal-hd2d-preprod-v1",
-  "status": "in-evaluation",
+  "status": "completed-conditional",
   "executionAuthorized": true,
   "authorizationScope": "H1 educational V2, H2 visual/technical spike and the ten read-only benchmark executions; H3 remains blocked",
   "authorizedBy": "user",
@@ -270,7 +270,8 @@
       ],
       "completionCommits": [
         "b4b15cf17166b95e6f05afe5eff992e6e13ea3fa",
-        "f89b75bccfa508d6b9309c8c292d69e9864c1100"
+        "f89b75bccfa508d6b9309c8c292d69e9864c1100",
+        "12f221052ffe252263ea379983749f0f52806dd5"
       ]
     },
     {
@@ -289,7 +290,10 @@
         "cada asset declara origen, derechos, escala, pivote, frente, collider y presupuesto",
         "Meshy y toda generación paga permanecen deshabilitados"
       ],
-      "completionCommit": "1908e67"
+      "completionCommits": [
+        "1908e67",
+        "6d3a905"
+      ]
     },
     {
       "id": "DIR-INT-001",
@@ -309,15 +313,23 @@
         "render_game_to_text describe estado y puntos de medición",
         "/jugar conserva comportamiento y tests"
       ],
-      "completionCommit": "64e0b92"
+      "completionCommits": [
+        "64e0b92",
+        "697d23d",
+        "3b9f98a",
+        "fd38f29"
+      ]
     },
     {
       "id": "EVAL-001",
       "role": "visual_evaluator",
       "title": "Evaluar evidencia integrada sin corregir implementación",
-      "status": "in-progress",
+      "status": "completed-conditional",
       "estimatedMinutes": 60,
-      "branch": "codex/ohmdal-hd2d-preprod-v1-evaluacion",
+      "branches": [
+        "codex/ohmdal-hd2d-preprod-v1-evaluacion",
+        "codex/ohmdal-hd2d-preprod-v1-evaluacion-r2"
+      ],
       "dependsOn": [
         "DIR-INT-001"
       ],
@@ -326,13 +338,19 @@
         "performance.json contiene sólo mediciones observadas o null",
         "capturas desktop/mobile y consola son reproducibles",
         "el Evaluador no modifica src, tests ni assets"
-      ]
+      ],
+      "completionCommits": [
+        "329c927",
+        "ffc61b4"
+      ],
+      "verdict": "CONDITIONAL — avanzar",
+      "condition": "Android físico medio de 2022 permanece not-run"
     },
     {
       "id": "DIR-VERDICT-001",
       "role": "director_integrator",
       "title": "Emitir veredicto de H1+H2",
-      "status": "blocked",
+      "status": "completed",
       "estimatedMinutes": 30,
       "branch": "codex/ohmdal-hd2d-preprod-v1-director",
       "dependsOn": [
@@ -343,7 +361,10 @@
         "se elige 4/8 y una representación de Ohm o se registra bloqueo",
         "el veredicto es avanzar, corregir una vez o descartar",
         "H3 no cambia de estado sin veredicto favorable"
-      ]
+      ],
+      "completionCommit": "pending-final-director-commit",
+      "verdict": "avanzar",
+      "h3Authorized": false
     }
   ]
 }

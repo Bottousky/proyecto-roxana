@@ -1,10 +1,28 @@
 # Estado del ecosistema 3D
 
-**Actualizado:** 2026-08-01
+**Actualizado:** 2026-08-02
 
 **Rama documental:** `codex/ohmdal-hd2d-biblia`
 
 **Base estabilizada:** `c5b6dfc` (descendiente directo de `main`, previo al spike vnext)
+
+## Cierre H1+H2 Ohmdal HD-2D — 2026-08-02
+
+- `ohmdal-hd2d-preprod-v1` terminó sus dos rondas automáticas con estado
+  `completed-conditional` y veredicto del Director **avanzar**.
+- El pipeline promovido para el siguiente contrato es cámara casi ortográfica, estudiante pixel
+  art de 4 direcciones y Ohm sprite. Las variantes de 8 direcciones, perspectiva suave y Ohm
+  procedural quedan archivadas sólo como evidencia del spike.
+- Las seis fichas educativas están en V2 `CANON-EDU`; el harness aislado cubre navegación,
+  diagnóstico no bloqueante, teclado/táctil, reducción de movimiento y observabilidad Three.js.
+- La segunda evaluación cerró los cuatro P1 de composición, silueta, jerarquía del diagnóstico e
+  integración de Ohm. Desktop y mobile emulado pasaron con consola limpia.
+- El estado es CONDITIONAL porque Android físico medio de 2022 no fue probado. `npm run verify`
+  también permanece `not-run` por falta de una distribución WSL operativa.
+- H3 continúa **sin autorización**. El veredicto sólo habilita preparar un contrato separado con
+  nueva base, ownership, presupuesto, gates y aprobación humana; no autoriza producirlo.
+- `/jugar`, Phaser estable, Meshy, generación paga y servicios externos permanecieron intactos.
+  El informe reproducible está en `docs/agent-runs/ohmdal-hd2d-preprod-v1/final-report.md`.
 
 ## Biblia canónica de Ohmdal HD-2D — 2026-08-01
 
@@ -64,10 +82,11 @@
 El hito Phaser `ohmdal-vnext-spike` conserva sus contratos históricos y su evidencia. La promoción
 documental no autoriza ejecutarlo de nuevo ni lo convierte en la dirección final.
 
-El hito `ohmdal-hd2d-preprod-v1` tiene `executionAuthorized: true` para H1+H2 exclusivamente:
+El hito `ohmdal-hd2d-preprod-v1` agotó su `executionAuthorized: true` para H1+H2 exclusivamente:
 fichas educativas V2, blockout Portal–Manantial, cámaras A/B, sprites 4/8 y Ohm sprite/procedural.
-Todos los ejecutores parten de `aaab28ad63abab8b177c152a9f3d39cb9c678dc5`, usan worktrees y
-ownership exclusivos. Meshy y generación paga tienen presupuesto cero.
+Todos los ejecutores partieron de `12d6f88d2a366da89ed91008013f42ba6295e42d`, usaron worktrees y
+ownership exclusivos. Meshy y generación paga tuvieron presupuesto cero. El veredicto final fue
+`avanzar`, condicionado a medir Android físico dentro del próximo hito autorizado.
 
 El próximo hito a autorizar, sólo después del veredicto H1+H2, es el vertical slice
 **Portal–Plaza–Edda–Ohm–Lumen–Puerta–Manantial**
