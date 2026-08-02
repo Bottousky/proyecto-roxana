@@ -16,6 +16,7 @@ export interface HarnessSnapshot {
   readonly autoRoute: boolean;
   readonly reducedMotion: boolean;
   readonly diagnosis: DiagnosisState;
+  readonly diagnosisUnlocked: boolean;
   readonly renderer: {
     readonly calls: number;
     readonly triangles: number;

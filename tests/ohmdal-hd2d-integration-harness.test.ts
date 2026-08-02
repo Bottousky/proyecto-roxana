@@ -6,6 +6,7 @@ import {
   createDiagnosisHarnessState,
   directionIndex,
   headingDegrees,
+  updateDiagnosisUnlock,
   zoneForPosition,
 } from '../src/labs/ohmdal-hd2d-preprod/integration/harnessState.ts';
 
@@ -27,4 +28,10 @@ test('positions resolve to the three authored sets', () => {
   assert.equal(zoneForPosition({ x: -18, y: 0, z: 0 }), 'portal_plaza');
   assert.equal(zoneForPosition({ x: 2, y: 0, z: 0 }), 'taller');
   assert.equal(zoneForPosition({ x: 16, y: 0, z: 0 }), 'puerta_manantial');
+});
+
+test('diagnosis stays locked in Portal and unlocks only after visiting Taller', () => {
+  assert.equal(updateDiagnosisUnlock(false, 'portal_plaza'), false);
+  assert.equal(updateDiagnosisUnlock(false, 'taller'), true);
+  assert.equal(updateDiagnosisUnlock(true, 'puerta_manantial'), true);
 });

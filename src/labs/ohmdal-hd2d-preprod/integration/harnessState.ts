@@ -27,6 +27,10 @@ export function zoneForPosition(position: MetricPoint): ZoneId {
   ))?.id ?? 'portal_plaza';
 }
 
+export function updateDiagnosisUnlock(unlocked: boolean, zone: ZoneId): boolean {
+  return unlocked || zone === 'taller';
+}
+
 export function headingDegrees(x: number, z: number): number {
   if (x === 0 && z === 0) return 0;
   return (Math.atan2(x, z) * 180 / Math.PI + 360) % 360;

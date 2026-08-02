@@ -13,12 +13,13 @@ import {
   type MetricPoint,
   type ViewportProfileId,
 } from './architecture/index.ts';
-import type { DirectionVariant, HarnessSnapshot, OhmVariant, TimeVariant } from './contracts.ts';
+import type { HarnessSnapshot, TimeVariant } from './contracts.ts';
 import {
   SAFE_DIAGNOSIS_SEQUENCE,
   advanceSafeDiagnosis,
   createDiagnosisHarnessState,
   headingDegrees,
+  updateDiagnosisUnlock,
   zoneForPosition,
 } from './integration/harnessState.ts';
 import { createOhmActor, createStudentActor } from './integration/spriteActors.ts';
@@ -46,6 +47,28 @@ const ohm = createOhmActor();
 ohm.root.position.set(0.7, 0, -1.45);
 scene.add(ohm.root);
 
+const lumenRoot = new THREE.Group();
+lumenRoot.name = 'lumen_spatial_presence';
+lumenRoot.position.set(-0.75, 0, -2.7);
+const lumenBaseGeometry = new THREE.CylinderGeometry(0.26, 0.34, 0.72, 10);
+const lumenOrbGeometry = new THREE.SphereGeometry(0.24, 12, 8);
+const lumenBaseMaterial = new THREE.MeshStandardMaterial({ color: 0x635546, roughness: 0.82 });
+const lumenOrbMaterial = new THREE.MeshStandardMaterial({
+  color: 0xe1b45a,
+  emissive: 0x4b2708,
+  emissiveIntensity: 0.7,
+  roughness: 0.38,
+});
+const lumenBase = new THREE.Mesh(lumenBaseGeometry, lumenBaseMaterial);
+lumenBase.position.y = 0.36;
+lumenBase.castShadow = true;
+const lumenOrb = new THREE.Mesh(lumenOrbGeometry, lumenOrbMaterial);
+lumenOrb.name = 'lumen_indicator';
+lumenOrb.position.y = 0.94;
+lumenOrb.castShadow = true;
+lumenRoot.add(lumenBase, lumenOrb);
+scene.add(lumenRoot);
+
 const markerGeometry = new THREE.CylinderGeometry(0.14, 0.2, 0.42, 12);
 const markerMaterial = new THREE.MeshStandardMaterial({ color: 0xd6a84c, emissive: 0x382004 });
 const markerGroup = new THREE.Group();
@@ -62,9 +85,9 @@ for (const anchorId of ['R6_TALLER_MEASURE', 'R8_DOOR_MEASURE'] as const) {
 scene.add(markerGroup);
 
 let player: MetricPoint = { ...ROUTE_ANCHORS[0].position };
-let directionVariant: DirectionVariant = 4;
-let ohmVariant: OhmVariant = 'sprite';
-let cameraVariant: CameraVariant = 'quasi-orthographic';
+const directionVariant = 4 as const;
+const ohmVariant = 'sprite' as const;
+const cameraVariant: CameraVariant = 'quasi-orthographic';
 let timeVariant: TimeVariant = 'afternoon';
 let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let autoRoute = false;
@@ -73,6 +96,7 @@ let elapsedSeconds = 0;
 let currentHeading = 90;
 let moving = false;
 let diagnosis = createDiagnosisHarnessState();
+let diagnosisUnlocked = false;
 let currentAnchor: CameraAnchorId = 'C1_PORTAL_PLAZA';
 let lastBlockedIds = new Set<string>();
 
@@ -166,6 +190,7 @@ function updateGame(dtSeconds: number): void {
   }
   student.root.position.set(player.x, 0, player.z);
   student.update(currentHeading, moving, elapsedSeconds);
+  diagnosisUnlocked = updateDiagnosisUnlock(diagnosisUnlocked, zoneForPosition(player));
 
   const nextAnchor = selectCameraAnchor(currentAnchor, player.x);
   if (nextAnchor !== currentAnchor) {
@@ -178,6 +203,17 @@ function updateGame(dtSeconds: number): void {
     new THREE.Vector3(player.x, 0.08, player.z),
     new THREE.Vector3(player.x, 1.72, player.z),
   ];
+  if (currentAnchor === 'C2_TALLER') {
+    protectedSockets.push(
+      new THREE.Vector3(ohm.root.position.x, 0.12, ohm.root.position.z),
+      new THREE.Vector3(ohm.root.position.x, 1.05, ohm.root.position.z),
+      new THREE.Vector3(lumenRoot.position.x, 0.2, lumenRoot.position.z),
+      new THREE.Vector3(lumenRoot.position.x, 1.2, lumenRoot.position.z),
+      new THREE.Vector3(5, 0.55, 1),
+    );
+  } else if (currentAnchor === 'C3_DOOR_SPRING') {
+    protectedSockets.push(new THREE.Vector3(13.5, 0.55, -0.5));
+  }
   lastBlockedIds = findBlockedOccluderIds(
     cameraController.camera.position,
     protectedSockets,
@@ -206,6 +242,7 @@ function snapshot(): HarnessSnapshot {
     autoRoute,
     reducedMotion,
     diagnosis: diagnosis.state,
+    diagnosisUnlocked,
     renderer: {
       calls: info.calls,
       triangles: info.triangles,
@@ -229,7 +266,11 @@ function updateHud(dt: number): void {
   requireElement('status-label').textContent = `${state.camera} · ${state.directionVariant} dir · Ohm ${state.ohmVariant} · ${state.time}`;
   requireElement('metrics-label').textContent = `${state.renderer.calls} llamadas · ${state.renderer.triangles} triángulos · ruta ${routeIndex}/${ROUTE_ANCHORS.length}`;
   const next = SAFE_DIAGNOSIS_SEQUENCE[diagnosis.nextIndex];
-  requireElement('diagnosis-label').textContent = diagnosis.state.documented
+  const diagnosisButton = requireElement<HTMLButtonElement>('diagnosis-next');
+  diagnosisButton.disabled = !diagnosisUnlocked || diagnosis.state.documented;
+  requireElement('diagnosis-label').textContent = !diagnosisUnlocked
+    ? 'Lumen está en el Taller. Visitá ese set para habilitar la experiencia; el recorrido permanece libre.'
+    : diagnosis.state.documented
     ? 'Evidencia verificada y documentada. La Puerta conserva la transferencia; la aventura sigue libre.'
     : `Estado: ${diagnosis.state.power}. Próxima acción: ${next ?? 'completo'}. Evidencias: ${diagnosis.state.evidence.join(', ') || 'ninguna'}.`;
 }
@@ -255,18 +296,6 @@ function resize(): void {
 window.addEventListener('resize', resize);
 resize();
 
-requireElement<HTMLSelectElement>('camera-variant').addEventListener('change', (event) => {
-  cameraVariant = (event.currentTarget as HTMLSelectElement).value as CameraVariant;
-  rebuildCamera();
-});
-requireElement<HTMLSelectElement>('direction-variant').addEventListener('change', (event) => {
-  directionVariant = Number((event.currentTarget as HTMLSelectElement).value) as DirectionVariant;
-  student.setDirectionVariant(directionVariant);
-});
-requireElement<HTMLSelectElement>('ohm-variant').addEventListener('change', (event) => {
-  ohmVariant = (event.currentTarget as HTMLSelectElement).value as OhmVariant;
-  ohm.setVariant(ohmVariant);
-});
 requireElement<HTMLButtonElement>('time-toggle').addEventListener('click', (event) => {
   timeVariant = timeVariant === 'afternoon' ? 'twilight' : 'afternoon';
   blockout.setTimeOfDay(timeVariant);
@@ -290,10 +319,17 @@ reducedMotionInput.addEventListener('change', () => {
   ohm.setState(diagnosis.state.verified ? 'measurement_valid' : 'idle', reducedMotion);
 });
 requireElement<HTMLButtonElement>('diagnosis-next').addEventListener('click', () => {
+  if (!diagnosisUnlocked) return;
   diagnosis = advanceSafeDiagnosis(diagnosis);
-  if (diagnosis.state.evidence.length > 0) ohm.setState('sensor_deployed', reducedMotion);
+  if (diagnosis.state.evidence.length > 0) {
+    ohm.setState('sensor_deployed', reducedMotion);
+    lumenOrbMaterial.emissive.setHex(0x69410b);
+    lumenOrbMaterial.emissiveIntensity = 1.2;
+  }
   if (diagnosis.state.verified) {
     ohm.setState('measurement_valid', reducedMotion);
+    lumenOrbMaterial.color.setHex(0x8ee6d9);
+    lumenOrbMaterial.emissive.setHex(0x1f7b72);
     markerMaterial.emissive.setHex(0x1f7b72);
     markerMaterial.color.setHex(0x72e0d7);
   }
@@ -316,6 +352,11 @@ function dispose(): void {
   occlusionController.dispose();
   student.dispose();
   ohm.dispose();
+  lumenRoot.removeFromParent();
+  lumenBaseGeometry.dispose();
+  lumenOrbGeometry.dispose();
+  lumenBaseMaterial.dispose();
+  lumenOrbMaterial.dispose();
   markerGroup.removeFromParent();
   markerGeometry.dispose();
   markerMaterial.dispose();

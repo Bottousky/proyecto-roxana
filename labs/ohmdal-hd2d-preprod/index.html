@@ -29,6 +29,7 @@
         min-height: 34px; border: 1px solid #bd9b69; border-radius: 6px;
         background: #292b37; color: inherit; padding: 5px 9px;
       }
+      select:disabled, button:disabled { opacity: .66; cursor: not-allowed; }
       .topbar button:focus-visible, .topbar select:focus-visible,
       .diagnosis button:focus-visible, .touch button:focus-visible {
         outline: 3px solid #65d9e8; outline-offset: 2px;
@@ -70,16 +71,13 @@
     <div class="topbar" aria-label="Comparativas del laboratorio">
       <h1>OHMDAL · H1+H2</h1>
       <label>Cámara
-        <select id="camera-variant">
-          <option value="quasi-orthographic">Casi ortográfica</option>
-          <option value="soft-perspective">Perspectiva suave</option>
-        </select>
+        <select id="camera-variant" disabled><option value="quasi-orthographic">Casi ortográfica · elegida</option></select>
       </label>
       <label>Estudiante
-        <select id="direction-variant"><option value="4">4 direcciones</option><option value="8">8 direcciones</option></select>
+        <select id="direction-variant" disabled><option value="4">4 direcciones · elegida</option></select>
       </label>
       <label>Ohm
-        <select id="ohm-variant"><option value="sprite">Sprite</option><option value="procedural">Procedural</option></select>
+        <select id="ohm-variant" disabled><option value="sprite">Sprite · elegido</option></select>
       </label>
       <button id="time-toggle" type="button">Crepúsculo</button>
       <button id="route-toggle" type="button">Recorrido automático</button>
@@ -89,7 +87,7 @@
     <section class="diagnosis" aria-labelledby="diagnosis-title">
       <h2 id="diagnosis-title">Diagnóstico protegido de Lumen</h2>
       <p id="diagnosis-label">Acercate al Taller para comenzar. La prueba nunca bloquea el recorrido.</p>
-      <button id="diagnosis-next" type="button">Siguiente acción segura</button>
+      <button id="diagnosis-next" type="button" disabled>Siguiente acción segura</button>
     </section>
     <div class="touch" aria-label="Movimiento táctil">
       <button type="button" data-move="up" aria-label="Mover hacia arriba">▲</button>
