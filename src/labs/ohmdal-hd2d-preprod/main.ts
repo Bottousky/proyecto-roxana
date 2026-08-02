@@ -107,6 +107,7 @@ function viewportProfile(): ViewportProfileId {
 let cameraController = new AuthorCameraController({
   variant: cameraVariant,
   viewport: viewportProfile(),
+  viewportSize: { width: window.innerWidth, height: window.innerHeight },
   initialAnchor: currentAnchor,
   reducedMotion,
 });
@@ -117,6 +118,7 @@ function rebuildCamera(): void {
   cameraController = new AuthorCameraController({
     variant: cameraVariant,
     viewport: viewportProfile(),
+    viewportSize: { width: window.innerWidth, height: window.innerHeight },
     initialAnchor: currentAnchor,
     reducedMotion,
   });
@@ -197,7 +199,7 @@ function updateGame(dtSeconds: number): void {
     currentAnchor = nextAnchor;
     cameraController.setAnchor(nextAnchor);
   }
-  cameraController.setLookTarget(new THREE.Vector3(player.x, 1, player.z));
+  cameraController.followSubject(new THREE.Vector3(player.x, 1, player.z));
   cameraController.update(dt);
   const protectedSockets = [
     new THREE.Vector3(player.x, 0.08, player.z),
@@ -289,9 +291,15 @@ function frame(now: number): void {
 function resize(): void {
   const previousProfile = cameraController.snapshot().viewport;
   const nextProfile = viewportProfile();
+  const width = Math.max(1, window.innerWidth);
+  const height = Math.max(1, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, nextProfile === 'mobile-390x844' ? 1.5 : 2));
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
-  if (previousProfile !== nextProfile) rebuildCamera();
+  renderer.setSize(width, height, false);
+  if (previousProfile !== nextProfile) {
+    rebuildCamera();
+  } else {
+    cameraController.setViewportSize(width, height);
+  }
 }
 window.addEventListener('resize', resize);
 resize();

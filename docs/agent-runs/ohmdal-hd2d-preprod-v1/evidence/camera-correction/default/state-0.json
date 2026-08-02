@@ -1,0 +1,63 @@
+{
+  "seed": "ohmdal-hd2d-preprod-v1",
+  "player": {
+    "x": -16.03491548438813,
+    "y": 0,
+    "z": -0.12823405942401414,
+    "headingDegrees": 87.58052481996185
+  },
+  "zone": "portal_plaza",
+  "camera": "quasi-orthographic",
+  "directionVariant": 4,
+  "ohmVariant": "sprite",
+  "time": "afternoon",
+  "autoRoute": true,
+  "reducedMotion": false,
+  "diagnosis": {
+    "power": "deenergized_isolated",
+    "activeMeasurement": "none",
+    "inspected": false,
+    "hypothesisRecorded": false,
+    "configured": false,
+    "evidence": [],
+    "intervened": false,
+    "verified": false,
+    "documented": false
+  },
+  "diagnosisUnlocked": false,
+  "renderer": {
+    "calls": 13,
+    "triangles": 150,
+    "geometries": 20,
+    "textures": 2
+  },
+  "occlusion": {
+    "blockedIds": [],
+    "targets": [
+      {
+        "id": "workshop-wall-front-west",
+        "opacity": 1
+      },
+      {
+        "id": "workshop-wall-front-east",
+        "opacity": 1
+      },
+      {
+        "id": "workshop-roof-low",
+        "opacity": 1
+      },
+      {
+        "id": "workshop-roof-high",
+        "opacity": 1
+      },
+      {
+        "id": "door-pier-north",
+        "opacity": 1
+      },
+      {
+        "id": "door-pier-south",
+        "opacity": 1
+      }
+    ]
+  }
+}
