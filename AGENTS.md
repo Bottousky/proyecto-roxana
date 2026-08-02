@@ -92,6 +92,32 @@ entorno y ejecutar como mínimo `npm run build` y `npm test`; no declarar que `v
 
 ## Sistema multiagente
 
+### Arco I Ohmdal — precedencia STRICT-SERIAL
+
+Para `docs/agent-runs/ohmdal-arc1-serial-v1/` estas reglas prevalecen sobre cualquier permiso de
+paralelismo general:
+
+- Leer, en orden, `STATE.md`, `tasks.json`, `EXECUTION_PROTOCOL.md`, `ACCEPTANCE_GATES.md` y la
+  ficha del único ticket activo.
+- WIP global `1`. No comenzar, explorar productivamente ni modificar el ticket sucesor hasta que
+  el activo esté `DONE`.
+- Sólo el Director cambia estados. `IMPLEMENTED`, `TECH_REVIEW`, `HUMAN_REVIEW`, `CONDITIONAL` y
+  `not-run` no son `DONE`.
+- Trabajar únicamente dentro del ownership de la ficha activa. Ante solapamiento, cambio de canon,
+  seguridad, coste o arquitectura: detenerse y marcar `BLOCKED`.
+- No hacer commits desde el builder antes de review técnico y gate humano aplicable. No hacer push
+  ni abrir el ticket siguiente automáticamente.
+- Todo cambio visible exige captura 1440×900 y 390×844, consola limpia y aprobación humana.
+- Máximo dos rondas por ticket visible; una tercera requiere autorización humana explícita.
+- H3, `/jugar`, Meshy, generación paga y migración de runtime permanecen bloqueados salvo que el
+  ticket activo y `tasks.json` los autoricen expresamente.
+- Comandos reales: `npm run build`, `npm test`, `npm run 3d:validate-manifests` y
+  `git diff --check`. `npm run verify` sólo se declara PASS si Bash/WSL realmente lo ejecuta.
+- Assets: manifest obligatorio, origen/derechos, escala, pivote, frente, collider, presupuesto,
+  cámara real y métricas. Nunca una región como malla única.
+- Cierre: evidencia, review, decisión humana cuando corresponda, actualización de `tasks.json`,
+  `STATE.md`, `DECISIONS.md` y commit acotado. Luego detenerse.
+
 - El hilo principal ocupa el rol Director/integrador y conserva decisiones, contratos e
   integración final.
 - Delegar sólo cuando el usuario autorice ejecutar un hito y

@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "milestone": "ohmdal-arc1-serial-v1",
+  "activeIssueKey": "ARC1-001",
+  "collisionPolicy": "stop-and-return-to-director",
+  "owners": {
+    "director": {
+      "write": [
+        "docs/agent-runs/ohmdal-arc1-serial-v1/STATE.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/tasks.json",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/DECISIONS.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-001/**"
+      ]
+    },
+    "builder": { "write": [] },
+    "reviewer": { "write": [] }
+  },
+  "protected": [
+    "src/**",
+    "assets/**",
+    "tests/**",
+    "package.json",
+    "package-lock.json",
+    "docs/agent-runs/ohmdal-arco1/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-002.md"
+  ],
+  "notes": [
+    "ARC1-001 is a human visual gate; no implementation ownership is granted.",
+    "Replace this contract only after ARC1-001 is DONE and ARC1-002 becomes the active ticket."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "milestone": "ohmdal-arc1-serial-v1",
+  "activeIssueKey": "ARC1-001",
+  "assets": [],
+  "generation": {
+    "paidAuthorized": false,
+    "meshyAuthorized": false,
+    "meshyCreditBudget": 0,
+    "heroAssetApprovalRequired": true
+  },
+  "notes": [
+    "ARC1-001 creates no runtime assets.",
+    "Every future runtime asset requires origin, rights, scale, pivot, front, collider, budget and QA before import."
+  ]
+}

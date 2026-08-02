@@ -1,0 +1,59 @@
+{
+  "version": 2,
+  "milestone": "ohmdal-hd2d-preprod-v1",
+  "protocolCommit": "aa2cc39",
+  "promptCommits": ["7672e83", "89159bc", "9b1c6d6"],
+  "status": "completed-routing-blocked",
+  "plannedExecutions": 10,
+  "attemptedExecutions": 10,
+  "contentDeliveries": 5,
+  "infrastructureFailures": 5,
+  "pairs": [
+    {
+      "id": "B01",
+      "status": "unpaired",
+      "codex": { "model": "gpt-5.6-terra", "outcome": "delivered", "artifact": "candidates/B01/codex.md", "usage": null },
+      "hybrid": { "model": "Claude Code Pro/sonnet", "outcome": "authentication-failed", "artifact": "candidates/B01/hybrid-failure.md", "usage": { "inputTokens": 0, "outputTokens": 0, "costUsd": 0 } },
+      "winner": null
+    },
+    {
+      "id": "B02",
+      "status": "unpaired",
+      "codex": { "model": "gpt-5.6-sol", "outcome": "delivered", "artifact": "candidates/B02/codex.md", "usage": null },
+      "hybrid": { "model": "minimax-coding-plan/MiniMax-M2.7", "outcome": "availability-timeout", "artifact": "candidates/B02/hybrid-failure.md", "usage": null },
+      "winner": null
+    },
+    {
+      "id": "B03",
+      "status": "unpaired",
+      "codex": { "model": "gpt-5.6-sol", "outcome": "delivered", "artifact": "candidates/B03/codex.md", "usage": null },
+      "hybrid": { "model": "opencode/mimo-v2.5-free", "outcome": "availability-timeout", "artifact": "candidates/B03/hybrid-failure.md", "usage": null },
+      "winner": null
+    },
+    {
+      "id": "B04",
+      "status": "unpaired",
+      "codex": { "model": "gpt-5.6-terra", "outcome": "delivered", "artifact": "candidates/B04/codex.md", "usage": null },
+      "hybrid": { "model": "opencode/north-mini-code-free", "outcome": "availability-timeout", "artifact": "candidates/B04/hybrid-failure.md", "usage": null },
+      "winner": null
+    },
+    {
+      "id": "B05",
+      "status": "unpaired",
+      "codex": { "model": "gpt-5.6-terra", "outcome": "delivered", "artifact": "candidates/B05/codex.md", "usage": null },
+      "hybrid": { "model": "minimax-coding-plan/MiniMax-M3", "outcome": "rate-limited", "artifact": "candidates/B05/hybrid-failure.md", "usage": null },
+      "winner": null
+    }
+  ],
+  "evaluation": {
+    "timeAndUsagePolicy": "null; observed scores use 85 available points and normalizedScore = observed/85*100",
+    "codex": [
+      { "pair": "B01", "hardGate": "pass", "observedScore": 80, "normalizedScore": 94.1, "decision": "valid" },
+      { "pair": "B02", "hardGate": "pass", "observedScore": 77, "normalizedScore": 90.6, "decision": "valid" },
+      { "pair": "B03", "hardGate": "pass", "observedScore": 62, "normalizedScore": 72.9, "decision": "conditional" },
+      { "pair": "B04", "hardGate": "fail", "observedScore": 61, "normalizedScore": 71.8, "decision": "invalid" },
+      { "pair": "B05", "hardGate": "fail", "observedScore": 57, "normalizedScore": 67.1, "decision": "invalid" }
+    ]
+  },
+  "routingDecision": "blocked: no hybrid candidate produced content; keep Codex as operational control plane, correct invalid Codex drafts, and rerun paired comparison only after provider recovery and explicit approval"
+}

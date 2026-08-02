@@ -101,6 +101,14 @@ Todos los ejecutores partieron de `12d6f88d2a366da89ed91008013f42ba6295e42d`, us
 ownership exclusivos. Meshy y generación paga tuvieron presupuesto cero. El veredicto final fue
 `avanzar`, condicionado a medir Android físico dentro del próximo hito autorizado.
 
+El control operativo siguiente vive en
+`docs/agent-runs/ohmdal-arc1-serial-v1/` sobre la rama
+`codex/ohmdal-arc1-control-plane`. Resume 62 tickets con workflow `STRICT-SERIAL`, WIP 1 y
+transiciones exclusivas del Director. `ARC1-001` está en `HUMAN_REVIEW`; `ARC1-002` y todo H3
+siguen bloqueados con `executionAuthorized: false`. Los perfiles OpenCode son planificador
+read-only, builder acotado y reviewer no implementador; ningún modelo recibe el backlog completo
+como encargo autónomo.
+
 El próximo hito a autorizar, sólo después del veredicto H1+H2, es el vertical slice
 **Portal–Plaza–Edda–Ohm–Lumen–Puerta–Manantial**
 de 25–35 minutos. Antes de producir requiere `docs/agent-runs/<hito>/tasks.json` con

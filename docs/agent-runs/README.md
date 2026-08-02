@@ -4,12 +4,13 @@
 
 - [`ohmdal-hd2d-preprod-v1/`](ohmdal-hd2d-preprod-v1/final-report.md): H1+H2 cerrados de forma
   condicional; `CAM-FIX-001` espera aprobación visual humana.
-- [`ohmdal-arc1-serial-v1/`](ohmdal-arc1-serial-v1/status.md): backlog serie preparado con WIP 1
-  y `executionAuthorized: false`. No autoriza H3, migrar `/jugar`, Meshy ni producción masiva.
+- [`ohmdal-arc1-serial-v1/`](ohmdal-arc1-serial-v1/STATE.md): control plane canónico del Arco I,
+  backlog serie de 62 tickets y WIP 1. `ARC1-001` espera revisión humana y
+  `executionAuthorized: false`; no autoriza H3, migrar `/jugar`, Meshy ni producción masiva.
 
-Los contratos son independientes de la interfaz de orquestación. OpenCode puede dirigirlos si
-respeta el mismo `baseCommit`, los worktrees/ramas por rol, el ownership exclusivo y la secuencia
-de integración descrita en el runbook del hito. No se incorpora Agents SDK.
+Los contratos son independientes de la interfaz de orquestación. Para Arco I, OpenCode procesa
+un único ticket por ciclo mediante `arc-plan`, `arc-build`, `arc-review` y `arc-close`; el Director
+conserva estados, commits y decisiones. No se incorpora Agents SDK.
 
 ## Decisión vigente
 

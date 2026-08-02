@@ -50,6 +50,18 @@ versión incompleta del juego.
 - Meshy, generación paga, hero assets o descarga de material protegido como asset runtime.
 - Dashboard docente, backend, cuentas, gamepad o servicios remotos.
 
+## Benchmark de routing autorizado
+
+Antes de implementar se ejecutan exactamente diez propuestas read-only agrupadas en cinco pares:
+una ruta Codex y una ruta híbrida para seguridad V2, circuito/instrumento, cámara, sprites 4/8 y
+representación de Ohm. Ambos candidatos de cada par reciben el mismo paquete congelado y no pueden
+editar el repositorio. Sólo el Director persiste evidencia y elige routing por gates, calidad,
+correcciones, integración, tiempo y uso observado, en ese orden.
+
+El benchmark no autoriza H3, `/jugar`, arte final, Meshy, producción masiva, dependencias nuevas ni
+créditos API medidos sin tope separado. Su definición de terminado es diez ejecuciones registradas
+y una decisión de routing —o bloqueo explícito—; nunca dos pipelines productivos vivos.
+
 ## Plataformas y presupuestos
 
 - Chrome, Edge, Firefox y Safari recientes como contrato; smoke automatizado donde el entorno lo

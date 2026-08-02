@@ -2,6 +2,9 @@
 
 **Estado:** decisión de producto y arquitectura actualizada el 1 de agosto de 2026. Para Ohmdal,
 la autoridad detallada es [`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md).
+La ejecución del Arco I se rige por
+[`agent-runs/ohmdal-arc1-serial-v1/STATE.md`](agent-runs/ohmdal-arc1-serial-v1/STATE.md): un ticket
+activo, WIP 1 y ningún sucesor antes de `DONE`.
 
 ## La decisión en una frase
 
