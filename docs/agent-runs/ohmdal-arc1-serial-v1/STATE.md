@@ -5,18 +5,30 @@
 **WIP:** 1/1
 **Ejecución autorizada:** **sí** — H3 golden slice, `CP-013`, contrato en `H3_CONTRACT.md`
 **Base congelada:** `b49b617`
-**Ticket activo:** `ARC1-003 — READY`
-**Anteriores:** `ARC1-001 — DONE` (aprobado), `ARC1-002 — DONE` (autorizado)
-**Siguiente:** `ARC1-004 — BLOCKED`
+**Ticket activo:** `ARC1-004 — READY`
+**Anteriores:** `ARC1-001 — DONE`, `ARC1-002 — DONE`, `ARC1-003 — DONE`
+**Siguiente:** `ARC1-005 — BLOCKED`
 
 ## Estado real
 
 - `ARC1-001` cerrado con veredicto humano: aprobar y avanzar (`CP-010`). `CAM-FIX-001` aceptado.
 - `ARC1-002` cerrado: el usuario autorizó H3 con base `b49b617` (`CP-013`).
+- `ARC1-003` cerrado: canon visual congelado (`CP-015`).
 - H3 cubre `ARC1-003` … `ARC1-035`: golden slice Portal → Plaza → Taller → Puerta → Manantial.
 - La autorización es de **alcance, no de resultado**. Cada ticket conserva sus gates, su evidencia y
   su aprobación humana cuando el cambio sea visible.
 - La unidad de producción es la **escena causal completa**, no la región ni el lote de assets.
+
+## Canon congelado — no se redefine dentro de un ticket de escena
+
+| Documento | Qué fija |
+|---|---|
+| `GOLDEN_FRAMES.md` | GF-01 … GF-08: qué debe ser legible en cada encuadre del slice |
+| `IDENTITY.md` | seis materias, tiempo tarde→crepúsculo, 10 reglas verificables |
+| `LEGAL_REFERENCES.md` | qué se toma de la referencia y qué no; 10 fuentes oficiales |
+
+Cada golden frame tiene contrato de **lectura** (captura) y de **recorrido** (jugando). Un frame
+aprobado sólo por screenshot no está aprobado. Sólo GF-01 tiene capturas, y son de blockout.
 
 ## Prohibiciones vigentes
 

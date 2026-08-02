@@ -7,10 +7,16 @@
   "authorizationDecision": "CP-013",
   "authorizationDate": "2026-08-02",
   "contract": "docs/agent-runs/ohmdal-arc1-serial-v1/H3_CONTRACT.md",
+  "frozenCanon": {
+    "goldenFrames": "docs/agent-runs/ohmdal-arc1-serial-v1/GOLDEN_FRAMES.md",
+    "identity": "docs/agent-runs/ohmdal-arc1-serial-v1/IDENTITY.md",
+    "legal": "docs/agent-runs/ohmdal-arc1-serial-v1/LEGAL_REFERENCES.md",
+    "note": "frozen in ARC1-003; a scene ticket may not redefine these so its own result passes. Amending requires its own CP decision."
+  },
   "branch": "codex/ohmdal-arc1-control-plane",
   "planningBaseCommit": "e07be6332fa10f5df36fe5f679c66c1603961257",
   "baseCommit": "b49b617",
-  "activeIssueKey": "ARC1-003",
+  "activeIssueKey": "ARC1-004",
   "workflow": {
     "mode": "STRICT-SERIAL",
     "globalWipLimit": 1,
@@ -43,8 +49,8 @@
   "issues": [
     { "key": "ARC1-001", "epic": "Gate 0", "title": "Aprobar visualmente cámara corregida", "owner": "director", "status": "DONE", "dependsOn": [], "spec": "tickets/ARC1-001.md", "verdict": "approved-advance", "decidedOn": "2026-08-02", "decisions": ["CP-010", "CP-011", "CP-012"], "evidence": "evidence/ARC1-001/", "openQuestions": ["CP-011 DQ3 HD-2D reference"], "debt": ["CP-012 mobile HUD layout -> ARC1-026"] },
     { "key": "ARC1-002", "epic": "Control", "title": "Crear contrato H3 con base, presupuesto, ownership y autorización", "owner": "director", "status": "DONE", "dependsOn": ["ARC1-001"], "spec": "tickets/ARC1-002.md", "verdict": "authorized", "decidedOn": "2026-08-02", "decisions": ["CP-013", "CP-014"], "evidence": "evidence/ARC1-002/" },
-    { "key": "ARC1-003", "epic": "Control", "title": "Congelar golden frames, identidad y referencias legales", "owner": "director", "status": "READY", "dependsOn": ["ARC1-002"] },
-    { "key": "ARC1-004", "epic": "Control", "title": "Congelar color script y shot deck del slice", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-003"] },
+    { "key": "ARC1-003", "epic": "Control", "title": "Congelar golden frames, identidad y referencias legales", "owner": "director", "status": "DONE", "dependsOn": ["ARC1-002"], "spec": "tickets/ARC1-003.md", "decidedOn": "2026-08-02", "decisions": ["CP-015"], "evidence": "evidence/ARC1-003/", "deliverables": ["GOLDEN_FRAMES.md", "IDENTITY.md", "LEGAL_REFERENCES.md"] },
+    { "key": "ARC1-004", "epic": "Control", "title": "Congelar color script y shot deck del slice", "owner": "architecture", "status": "READY", "dependsOn": ["ARC1-003"] },
     { "key": "ARC1-005", "epic": "Control", "title": "Congelar escenas, beats, duración y fichas V2", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-004"] },
     { "key": "ARC1-006", "epic": "Control", "title": "Fijar presupuesto por escena", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-005"] },
     { "key": "ARC1-007", "epic": "Slice", "title": "Montar laboratorio Three.js mediante RuntimeHost", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-006"] },

@@ -16,8 +16,31 @@
 | CP-012 | 2026-08-02 | El layout/HUD mobile es deuda P2, no defecto de cámara | Se atiende en `ARC1-026`; no amplía el alcance de `ARC1-001` |
 | CP-013 | 2026-08-02 | **H3 autorizado** con `baseCommit = b49b617` | `executionAuthorized = true`; `ARC1-003` pasa a `READY` |
 | CP-014 | 2026-08-02 | Android físico diferido a `ARC1-060` (opción B) | Todo claim de rendimiento en Android físico es `not-run` hasta el QA de release |
+| CP-015 | 2026-08-02 | Golden frames, identidad y límites legales **congelados** | Un ticket de escena no puede redefinirlos para que su resultado pase |
 
-Una decisión nueva agrega `CP-015+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-016+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-015 — Canon visual congelado
+
+**Motivo.** Doc. 15 registra que en DQIII la identidad precede al efecto, y que lo que no se debe
+imitar es «aprobar planta por captura estática». Congelar los contratos de lectura antes de producir
+arte evita construirlo alrededor de una escala o una cámara todavía inestables.
+
+**Evidencia.** `GOLDEN_FRAMES.md`, `IDENTITY.md`, `LEGAL_REFERENCES.md` y
+`evidence/ARC1-003/freeze.md`. Los parámetros de cámara citados salen de
+`evidence/ARC1-001/metrics.json`; las rutas R0…R9 de `architecture/levelData.ts:107-116`.
+
+**Impacto.** Cada golden frame tiene **dos** contratos: uno de lectura, verificable en captura, y uno
+de recorrido, verificable sólo jugando. Un frame aprobado sólo por screenshot no está aprobado.
+
+«Identidad propia / legal» es el único criterio de la quality bar que exige **5/5**; un fallo ahí es
+P0 y bloquea el ticket sin importar la calidad visual alcanzada.
+
+Sólo GF-01 tiene capturas reales, de blockout. GF-02 … GF-08 quedan especificados y **no capturados**;
+se declara en vez de simularse. Ningún ticket puede inferir el resultado visual de un frame que no
+capturó.
+
+Enmendar cualquiera de los tres documentos requiere una decisión `CP-0NN` propia.
 
 ## CP-013 — Autorización de H3
 

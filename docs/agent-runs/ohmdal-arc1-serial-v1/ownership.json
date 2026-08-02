@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "milestone": "ohmdal-arc1-serial-v1",
-  "activeIssueKey": "ARC1-002",
+  "activeIssueKey": "ARC1-003",
   "collisionPolicy": "stop-and-return-to-director",
   "owners": {
     "director": {
@@ -10,9 +10,11 @@
         "docs/agent-runs/ohmdal-arc1-serial-v1/tasks.json",
         "docs/agent-runs/ohmdal-arc1-serial-v1/DECISIONS.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/ownership.json",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/H3_CONTRACT.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-002.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-002/**"
+        "docs/agent-runs/ohmdal-arc1-serial-v1/GOLDEN_FRAMES.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/IDENTITY.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/LEGAL_REFERENCES.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-003.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-003/**"
       ]
     },
     "builder": { "write": [] },
@@ -27,12 +29,13 @@
     "docs/agent-runs/ohmdal-arco1/**",
     "docs/agent-runs/ohmdal-hd2d-preprod-v1/**",
     "docs/ohmdal-biblia/**",
-    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-003.md"
+    "docs/agent-runs/ohmdal-arc1-serial-v1/H3_CONTRACT.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-004.md"
   ],
   "notes": [
-    "ARC1-002 only drafts the H3 contract; it grants no implementation ownership.",
-    "H3_CONTRACT.md is a proposal until the user authorizes it explicitly; drafting it does not set executionAuthorized.",
-    "ARC1-001 closed DONE in b49b617 with verdict approved-advance.",
-    "Replace this contract only after ARC1-002 is DONE and ARC1-003 becomes the active ticket."
+    "ARC1-003 freezes golden frames, Ohmdal identity and the legal reference list. It is a canon ticket: no runtime change.",
+    "H3_CONTRACT.md is now authorized and frozen; it is protected. Amending it requires a new CP decision.",
+    "ARC1-001 closed DONE in b49b617; ARC1-002 closed DONE in 8225ba6 with H3 authorized (CP-013).",
+    "Replace this contract only after ARC1-003 is DONE and ARC1-004 becomes the active ticket."
   ]
 }
