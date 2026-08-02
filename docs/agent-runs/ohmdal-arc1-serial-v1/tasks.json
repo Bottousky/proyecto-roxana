@@ -1,13 +1,13 @@
 {
   "version": 2,
   "milestone": "ohmdal-arc1-serial-v1",
-  "status": "awaiting-human-camera-approval",
+  "status": "arc1-001-approved; preparing ARC1-002 contract",
   "executionAuthorized": false,
-  "authorizationScope": "control-plane preparation and human review only; no H3 implementation",
+  "authorizationScope": "control-plane preparation and ARC1-002 contract drafting only; no H3 implementation",
   "branch": "codex/ohmdal-arc1-control-plane",
   "planningBaseCommit": "e07be6332fa10f5df36fe5f679c66c1603961257",
   "baseCommit": null,
-  "activeIssueKey": "ARC1-001",
+  "activeIssueKey": "ARC1-002",
   "workflow": {
     "mode": "STRICT-SERIAL",
     "globalWipLimit": 1,
@@ -38,8 +38,8 @@
     "paidGeneration": false
   },
   "issues": [
-    { "key": "ARC1-001", "epic": "Gate 0", "title": "Aprobar visualmente cámara corregida", "owner": "director", "status": "HUMAN_REVIEW", "dependsOn": [], "spec": "tickets/ARC1-001.md" },
-    { "key": "ARC1-002", "epic": "Control", "title": "Crear contrato H3 con base, presupuesto, ownership y autorización", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-001"] },
+    { "key": "ARC1-001", "epic": "Gate 0", "title": "Aprobar visualmente cámara corregida", "owner": "director", "status": "DONE", "dependsOn": [], "spec": "tickets/ARC1-001.md", "verdict": "approved-advance", "decidedOn": "2026-08-02", "decisions": ["CP-010", "CP-011", "CP-012"], "evidence": "evidence/ARC1-001/", "openQuestions": ["CP-011 DQ3 HD-2D reference"], "debt": ["CP-012 mobile HUD layout -> ARC1-026"] },
+    { "key": "ARC1-002", "epic": "Control", "title": "Crear contrato H3 con base, presupuesto, ownership y autorización", "owner": "director", "status": "READY", "dependsOn": ["ARC1-001"], "spec": "tickets/ARC1-002.md" },
     { "key": "ARC1-003", "epic": "Control", "title": "Congelar golden frames, identidad y referencias legales", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-002"] },
     { "key": "ARC1-004", "epic": "Control", "title": "Congelar color script y shot deck del slice", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-003"] },
     { "key": "ARC1-005", "epic": "Control", "title": "Congelar escenas, beats, duración y fichas V2", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-004"] },
