@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "milestone": "ohmdal-hd2d-preprod-v1",
   "status": "authorized",
   "executionAuthorized": true,
-  "authorizationScope": "H1 educational V2 plus H2 visual/technical spike only; H3 remains blocked",
+  "authorizationScope": "H1 educational V2, H2 visual/technical spike and the ten read-only benchmark executions; H3 remains blocked",
   "authorizedBy": "user",
   "authorizedAt": "2026-08-01",
   "baseRef": "codex/ohmdal-hd2d-biblia",
@@ -21,12 +21,36 @@
     "meshyCredits": 0,
     "paidGeneration": false
   },
+  "benchmark": {
+    "authorized": true,
+    "scope": "H1/H2 process and technical benchmark only",
+    "h3Authorized": false,
+    "protocol": "docs/agent-runs/ohmdal-hd2d-preprod-v1/benchmark-plan.md",
+    "results": "docs/agent-runs/ohmdal-hd2d-preprod-v1/content/benchmark/results.json",
+    "executionCount": 10,
+    "pairCount": 5,
+    "maxConcurrentCandidates": 2,
+    "extraRunsRequireApproval": true,
+    "candidateRepositoryAccess": "read-only",
+    "directorPersistsOutputs": true,
+    "allowedInference": [
+      "Codex subscription models",
+      "Claude Code Pro subscription",
+      "OpenCode free models"
+    ],
+    "prohibitedInference": [
+      "OpenCode Go until subscribed and verified",
+      "metered API credits without a separate explicit cap",
+      "Meshy or paid asset generation"
+    ]
+  },
   "tasks": [
     {
       "id": "DIR-001",
       "role": "director_integrator",
       "title": "Validar baseline, contratos y worktrees comunes",
-      "status": "ready",
+      "status": "completed",
+      "completionCommit": "16df1b5",
       "estimatedMinutes": 30,
       "branch": "codex/ohmdal-hd2d-preprod-v1-director",
       "dependsOn": [],
@@ -34,8 +58,109 @@
         "todos los roles leen los contratos desde el control plane",
         "cada worktree parte de baseCommit",
         "build, tests y manifiestos se registran antes de implementar",
-        "ningún archivo de src/jugar se asigna a escritura"
+        "ningún archivo de src/jugar se asigna a escritura",
+        "baseline registrado en commit 16df1b5"
       ]
+    },
+    {
+      "id": "BENCH-H1-01-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para ficha V2 de seguridad ficticia",
+      "status": "ready",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": ["salida estructurada con 30 campos", "fuentes y límites trazables", "sin escritura del candidato"]
+    },
+    {
+      "id": "BENCH-H1-01-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para ficha V2 de seguridad ficticia",
+      "status": "ready",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": ["mismo paquete congelado que Codex", "salida estructurada con 30 campos", "sin escritura del candidato"]
+    },
+    {
+      "id": "BENCH-H1-02-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para circuito completo e instrumento",
+      "status": "blocked",
+      "estimatedMinutes": 60,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["BENCH-H1-01-CODEX", "BENCH-H1-01-HYBRID"],
+      "acceptance": ["dos fichas de 30 campos", "valores, unidades y tests reproducibles", "estados inválidos explícitos"]
+    },
+    {
+      "id": "BENCH-H1-02-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para circuito completo e instrumento",
+      "status": "blocked",
+      "estimatedMinutes": 60,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["BENCH-H1-01-CODEX", "BENCH-H1-01-HYBRID"],
+      "acceptance": ["mismo paquete congelado que Codex", "valores, unidades y tests reproducibles", "estados inválidos explícitos"]
+    },
+    {
+      "id": "BENCH-H2-01-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para comparativa de cámara del blockout",
+      "status": "ready",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": ["parámetros A/B equivalentes", "desktop y mobile cubiertos", "ruta y evidencia reproducibles"]
+    },
+    {
+      "id": "BENCH-H2-01-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para comparativa de cámara del blockout",
+      "status": "ready",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": ["mismo paquete congelado que Codex", "desktop y mobile cubiertos", "ruta y evidencia reproducibles"]
+    },
+    {
+      "id": "BENCH-H2-02-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para protocolo original 4/8 direcciones",
+      "status": "ready",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": ["protocolo legal y original", "mismos encuadres y acciones", "manifiesto y descarte definidos"]
+    },
+    {
+      "id": "BENCH-H2-02-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para protocolo original 4/8 direcciones",
+      "status": "ready",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": ["mismo paquete congelado que Codex", "mismos encuadres y acciones", "manifiesto y descarte definidos"]
+    },
+    {
+      "id": "BENCH-H2-03-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para comparativa de representación de Ohm",
+      "status": "ready",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": ["sprite/impostor y procedural comparables", "presupuesto y pivotes explícitos", "sin Meshy ni generación paga"]
+    },
+    {
+      "id": "BENCH-H2-03-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para comparativa de representación de Ohm",
+      "status": "ready",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": ["DIR-001"],
+      "acceptance": ["mismo paquete congelado que Codex", "presupuesto y pivotes explícitos", "sin Meshy ni generación paga"]
     },
     {
       "id": "DIR-EDU-001",

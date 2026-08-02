@@ -11,6 +11,7 @@
       "docs/agent-runs/ohmdal-hd2d-preprod-v1/status.md",
       "docs/agent-runs/ohmdal-hd2d-preprod-v1/final-report.md",
       "docs/agent-runs/ohmdal-hd2d-preprod-v1/OPENCODE_RUNBOOK.md",
+      "docs/agent-runs/ohmdal-hd2d-preprod-v1/benchmark-plan.md",
       "docs/agent-runs/ohmdal-hd2d-preprod-v1/content/**",
       "labs/ohmdal-hd2d-preprod/index.html",
       "src/labs/ohmdal-hd2d-preprod/contracts.ts",
@@ -59,6 +60,7 @@
     "Las fronteras planificadas se crean sólo al ejecutar la tarea propietaria.",
     "El Director no edita archivos de architecture o asset_forge durante integración; integra commits completos.",
     "El Evaluador nunca corrige código, tests o assets.",
+    "Los ejecutores de benchmark son proponentes read-only; sólo el Director persiste sus salidas bajo content/benchmark.",
     "Modificar sharedReadOnly o necesitar el mismo glob en dos roles detiene el hito."
   ]
 }
