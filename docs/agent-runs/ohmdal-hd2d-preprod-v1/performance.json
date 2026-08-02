@@ -1,35 +1,62 @@
 {
   "version": 1,
   "milestone": "ohmdal-hd2d-preprod-v1",
-  "status": "not-run",
-  "integratedCommit": null,
+  "status": "measured-with-physical-android-pending",
+  "integratedCommit": "64e0b92651d5d1d36e6156f7b91fbb8729ad0b57",
+  "measuredAt": "2026-08-02",
   "captureState": {
     "seed": "ohmdal-hd2d-preprod-v1",
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
-    "route": "Portal-Plaza-Taller-Puerta-Manantial"
+    "route": "Portal-Plaza-Taller-Puerta-Manantial",
+    "desktopRepresentativeState": "Taller; quasi-orthographic; 8 directions; Ohm sprite; twilight; reduced motion; diagnosis documented",
+    "mobileRepresentativeState": "Puerta-Manantial; quasi-orthographic; 4 directions; Ohm sprite; afternoon; reduced motion"
+  },
+  "method": {
+    "browserAutomation": "Playwright CLI",
+    "frameTiming": "180 consecutive requestAnimationFrame deltas; mean, p50 and p95 reported",
+    "rendererMetrics": "window.render_game_to_text backed by THREE.WebGLRenderer.info after a rendered frame",
+    "transferCaveat": "Vite development server reused cache and the lab is not a production build entry; transferredBytes is null"
   },
   "desktop": {
-    "browser": null,
-    "fps": null,
-    "frameTimeMs": null,
-    "drawCalls": null,
-    "triangles": null,
-    "geometries": null,
-    "textures": null,
+    "browser": "HeadlessChrome 150.0.0.0 on Windows 10 x64",
+    "fps": 60.0,
+    "frameTimeMs": 16.6667,
+    "frameTimeP50Ms": 16.7,
+    "frameTimeP95Ms": 16.8,
+    "frameSamples": 180,
+    "drawCalls": 15,
+    "triangles": 200,
+    "geometries": 28,
+    "textures": 4,
+    "devicePixelRatio": 1,
+    "rendererPixelRatio": 1,
     "transferredBytes": null,
-    "consoleErrors": null
+    "consoleErrors": 0,
+    "consoleWarnings": 0
   },
   "mobileEmulation": {
-    "browser": null,
-    "fps": null,
-    "frameTimeMs": null,
-    "drawCalls": null,
-    "triangles": null,
-    "geometries": null,
-    "textures": null,
+    "browser": "Chrome 151.0.7922.10; Playwright generic mobile Pixel 10; Android 16 emulation",
+    "fps": 59.998,
+    "frameTimeMs": 16.6672,
+    "frameTimeP50Ms": 16.7,
+    "frameTimeP95Ms": 16.8,
+    "frameSamples": 180,
+    "drawCalls": 11,
+    "triangles": 162,
+    "geometries": 19,
+    "textures": 2,
+    "devicePixelRatio": 3,
+    "rendererPixelRatio": 1.5,
     "transferredBytes": null,
-    "consoleErrors": null
+    "consoleErrors": 0,
+    "consoleWarnings": 0,
+    "touchTest": {
+      "method": "CDP Input.dispatchTouchEvent with a 700ms active touch on Mover hacia arriba",
+      "startX": -18,
+      "endX": -16.5666,
+      "result": "pass"
+    }
   },
   "androidPhysical": {
     "device": null,
@@ -38,6 +65,70 @@
     "frameTimeMs": null,
     "result": "not-run"
   },
-  "largestAssets": [],
-  "evidence": []
+  "devResourceObservation": {
+    "resourceCount": 19,
+    "encodedBodyBytes": 2105763,
+    "transferSizeBytes": null,
+    "note": "encoded body sizes are reproducible development-resource observations, not a production payload claim"
+  },
+  "largestAssets": [
+    {
+      "path": "/node_modules/.vite/deps/chunk-QUPN4MTR.js",
+      "encodedBodyBytes": 1604330,
+      "basis": "PerformanceResourceTiming on Vite dev server"
+    },
+    {
+      "path": "/@vite/client",
+      "encodedBodyBytes": 182615,
+      "basis": "PerformanceResourceTiming on Vite dev server"
+    },
+    {
+      "path": "/node_modules/.vite/deps/three.js",
+      "encodedBodyBytes": 62828,
+      "basis": "PerformanceResourceTiming on Vite dev server"
+    },
+    {
+      "path": "/src/labs/ohmdal-hd2d-preprod/main.ts",
+      "encodedBodyBytes": 39346,
+      "basis": "PerformanceResourceTiming on Vite dev server"
+    },
+    {
+      "path": "/src/labs/ohmdal-hd2d-preprod/architecture/levelData.ts",
+      "encodedBodyBytes": 27570,
+      "basis": "PerformanceResourceTiming on Vite dev server"
+    }
+  ],
+  "variantObservations": {
+    "cameraSameScene": {
+      "quasiOrthographic": {
+        "drawCalls": 15,
+        "triangles": 200
+      },
+      "softPerspective": {
+        "drawCalls": 17,
+        "triangles": 260
+      }
+    },
+    "ohmSameScene": {
+      "sprite": {
+        "drawCalls": 16,
+        "triangles": 248
+      },
+      "procedural": {
+        "drawCalls": 22,
+        "triangles": 350
+      }
+    },
+    "sourceBytes": {
+      "studentAtlas4Svg": 2995,
+      "studentAtlas8Svg": 4121,
+      "ohmSpriteSvg": 2408,
+      "ohmProceduralMjs": 3392
+    }
+  },
+  "evidence": [
+    "C:/Users/manue/AppData/Local/Temp/roxana-eval-001/desktop-turn135-qortho-8-sprite-twilight-rm.png",
+    "C:/Users/manue/AppData/Local/Temp/roxana-eval-001/mobile-manantial-qortho-4-sprite-afternoon-reduced.png",
+    "docs/agent-runs/ohmdal-hd2d-preprod-v1/review-round-01.md"
+  ]
 }
