@@ -1,7 +1,7 @@
 {
   "version": 2,
   "milestone": "ohmdal-hd2d-preprod-v1",
-  "status": "corrective-in-progress",
+  "status": "corrective-awaiting-human-review",
   "executionAuthorized": true,
   "authorizationScope": "H1 educational V2, H2 visual/technical spike, the ten read-only benchmark executions, and CAM-FIX-001 explicitly authorized on 2026-08-02; H3 remains blocked",
   "authorizedBy": "user",
@@ -370,7 +370,7 @@
       "id": "CAM-FIX-001",
       "role": "architecture",
       "title": "Corregir aspect ratio y estabilizar seguimiento de cámara",
-      "status": "in-progress",
+      "status": "implemented-awaiting-human-review",
       "estimatedMinutes": 60,
       "branch": "codex/ohmdal-camera-correction-architecture",
       "dependsOn": [
@@ -384,6 +384,16 @@
         "desktop, desktop angosto y mobile tienen evidencia reproducible",
         "src/jugar, H3, assets y contenido pedagógico permanecen intactos",
         "el gate final es revisión humana, sin tercera ronda automática"
+      ],
+      "completionCommits": [
+        "e8faf3e",
+        "ade81bf",
+        "0e39d06"
+      ],
+      "evidence": [
+        "docs/agent-runs/ohmdal-hd2d-preprod-v1/evidence/camera-correction/desktop-1440x900.png",
+        "docs/agent-runs/ohmdal-hd2d-preprod-v1/evidence/camera-correction/desktop-narrow-900x900.png",
+        "docs/agent-runs/ohmdal-hd2d-preprod-v1/evidence/camera-correction/mobile-390x844.png"
       ]
     }
   ]

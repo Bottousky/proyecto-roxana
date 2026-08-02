@@ -8,6 +8,11 @@
 
 ## Cierre H1+H2 Ohmdal HD-2D — 2026-08-02
 
+- La corrección post-H2 `CAM-FIX-001` quedó implementada y verificada automáticamente: la
+  proyección usa el aspect ratio real sin deformar, y el seguimiento jugable incorpora una zona
+  muerta antes de mover el encuadre. Hay evidencia 1440×900, 900×900 y 390×844 con consola limpia.
+  Falta exclusivamente la aprobación visual humana; no se abrió H3 ni una tercera ronda Evaluador.
+
 - `ohmdal-hd2d-preprod-v1` terminó sus dos rondas automáticas con estado
   `completed-conditional` y veredicto del Director **avanzar**.
 - El pipeline promovido para el siguiente contrato es cámara casi ortográfica, estudiante pixel

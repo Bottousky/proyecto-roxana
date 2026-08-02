@@ -6,7 +6,7 @@
 
 **Veredicto del Director:** `avanzar`
 
-**Ejecución autorizada:** agotada; comprendía exclusivamente H1+H2
+**Ejecución autorizada:** agotada; comprendía H1+H2 y la corrección post-H2 `CAM-FIX-001`
 
 **Rondas automáticas usadas:** 2/2
 
@@ -17,6 +17,15 @@
 **Evaluación final integrada:** `e8f7bac` (origen Evaluador `ffc61b4`)
 
 **Bloqueo vigente:** H3, Meshy, generación paga y `src/jugar/**`
+
+## Corrección de cámara CAM-FIX-001
+
+- Implementación y tests de Arquitectura: `e8faf3e`, integrado como `ade81bf`.
+- Conexión del resize real y seguimiento con zona muerta: `0e39d06`.
+- Capturas reproducibles: 1440×900, 900×900 y 390×844 en
+  `evidence/camera-correction/`; consola Chrome con 0 errores y 0 warnings.
+- `npm run build`, `npm test`, `npm run 3d:validate-manifests` y `git diff --check`: PASS.
+- Estado: `implemented-awaiting-human-review`. No consume una tercera ronda automática y no abre H3.
 
 ## Resultado
 

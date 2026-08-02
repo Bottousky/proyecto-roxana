@@ -28,3 +28,12 @@ Original prompt: Rescatar Proyecto Roxana después de varios meses de iteracione
 - No declarar prototipos 3D como arte final.
 - No borrar trabajo versionado ambiguo sin clasificarlo.
 - No reescribir la historia Git de aproximadamente 848 MiB sin una tarea y aprobación separadas.
+
+## Corrección de cámara HD-2D — 2026-08-02
+
+- `CAM-FIX-001` corrige la deformación al redimensionar: la proyección conserva el alto autoral y
+  calcula el ancho con el aspect ratio real.
+- El seguimiento usa una zona muerta testeada; C1/C2/C3, histéresis y reducción de movimiento se
+  preservan.
+- Evidencia visual en 1440×900, 900×900 y 390×844; Chrome sin errores ni warnings.
+- Gates automáticos verdes. Pendiente: revisión visual manual del usuario antes de cerrar la tarea.

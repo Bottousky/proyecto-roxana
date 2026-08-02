@@ -2,6 +2,7 @@
 
 **Autorización humana:** 2026-08-02  
 **Tipo:** corrección post-H2; no abre H3  
+**Estado:** implementada; pendiente de revisión visual humana
 **Referencia:** DRAGON QUEST III HD-2D REMAKE como barra de coherencia, sin copiar IP
 
 ## Resultado esperado
@@ -37,3 +38,13 @@ desplaza lo mínimo al salir; los cambios C1/C2/C3 siguen ocurriendo por umbrale
 4. El usuario revisa manualmente el movimiento y decide aprobar o pedir un único ajuste.
 5. No se abre una tercera ronda del Evaluador y H3 permanece bloqueado.
 
+## Resultado observado
+
+- Claude/Arquitectura implementó y testeó la API en `e8faf3e`; el Director la integró como
+  `ade81bf` y conectó el harness en `0e39d06`.
+- 1440×900, 900×900 y 390×844 conservan proporciones. El viewport angosto recorta laterales y el
+  ancho revela más mundo, sin cambiar el alto autoral.
+- El seguimiento deja quieto el objetivo dentro de la zona muerta y sólo corrige el excedente.
+- Chrome/Playwright: 0 errores y 0 warnings. Build, suite completa, manifests y diff check pasan.
+- El servidor local queda disponible para que el usuario apruebe la sensación de cámara. Hasta esa
+  decisión, el estado no se promueve a `completed`.
