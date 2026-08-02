@@ -36,7 +36,8 @@
     "allowedInference": [
       "Codex subscription models",
       "Claude Code Pro subscription",
-      "OpenCode free models"
+      "OpenCode free models",
+      "MiniMax Token Plan subscription"
     ],
     "prohibitedInference": [
       "OpenCode Go until subscribed and verified",

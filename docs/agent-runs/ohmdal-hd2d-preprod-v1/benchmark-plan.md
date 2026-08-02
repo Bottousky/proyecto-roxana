@@ -22,14 +22,24 @@ varianza estadística de un modelo.
 | Par | Unidad | Ruta Codex | Ruta híbrida | Resultado esperado |
 |---|---|---|---|---|
 | B01 | Ficha V2 de seguridad de baja tensión ficticia | Codex Terra | Claude Code Pro | Ficha de 30 campos, fuentes, límites y test |
-| B02 | Circuito completo, continuidad e instrumento | Codex Sol | OpenCode `deepseek-v4-flash-free` | Dos fichas, tabla de valores y tests |
+| B02 | Circuito completo, continuidad e instrumento | Codex Sol | MiniMax Token Plan `MiniMax-M2.7` | Dos fichas, tabla de valores y tests |
 | B03 | Cámara cuasi-ortográfica/perspectiva suave | Codex Sol | OpenCode `mimo-v2.5-free` | Contrato A/B, parámetros y protocolo de captura |
 | B04 | Protocolo de sprites originales 4/8 | Codex Terra | OpenCode `north-mini-code-free` | Matriz de acciones, manifiesto y decisión |
-| B05 | Ohm sprite/impostor frente a procedural | Codex Terra | OpenCode `nemotron-3-ultra-free` | Especificación equivalente, presupuestos y descarte |
+| B05 | Ohm sprite/impostor frente a procedural | Codex Terra | MiniMax Token Plan `MiniMax-M3` | Especificación equivalente, presupuestos y descarte |
 
 Los nombres de modelos documentan la muestra; no anticipan el ganador. OpenCode Go, créditos API
 medidos y generación paga quedan fuera de esta ronda. Si un modelo declarado no responde, se
 registra el fallo y no se sustituye silenciosamente.
+
+### Enmienda operativa de routing — 2026-08-02
+
+Claude Code Pro devolvió `401 OAuth access token has expired`. Dos modelos gratuitos de OpenCode
+Zen y un smoke aislado alcanzaron `https://opencode.ai/zen/v1/chat/completions` pero fallaron con
+`ConnectionRefused`; no emitieron una respuesta candidata. Esos intentos se conservan como fallos
+de disponibilidad. B02 y B05, que todavía no habían iniciado su brazo híbrido, se reasignan de
+forma visible al MiniMax Token Plan ya autenticado. No se usan créditos API por consumo, OpenCode
+Go, Meshy ni generación de assets. Esta enmienda no repite B01, B03 o B04 ni eleva el total de diez
+ejecuciones.
 
 ## Paquete congelado común
 
