@@ -1,6 +1,6 @@
 # Estado del ecosistema 3D
 
-**Actualizado:** 2026-08-01
+**Actualizado:** 2026-08-02
 
 **Rama documental:** `codex/ohmdal-hd2d-biblia`
 
@@ -46,6 +46,21 @@
 - La decisión vigente está consolidada en `docs/START_HERE.md`: Instituto Three.js; Ohmdal futuro
   como experiencia HD-2D híbrida bajo demanda; Phaser preservado como base estable; UI/Bitácora en
   DOM y runtimes bajo demanda.
+
+## Benchmark de routing H1+H2 — 2026-08-02
+
+- Se intentaron diez ejecuciones read-only en cinco pares: seguridad, circuito/instrumento,
+  cámara, sprites 4/8 y representación de Ohm.
+- Codex produjo 5/5 propuestas. Los brazos híbridos no produjeron contenido: Claude Code tuvo OAuth
+  vencido, OpenCode Zen rechazó conexiones y MiniMax agotó el Token Plan. Son fallos operativos,
+  no evidencia de menor calidad de esos modelos.
+- La evaluación independiente declaró B01 válida, B02 válida con corrección menor, B03
+  condicional y B04/B05 inválidas por trazabilidad/manifests que referían rutas inexistentes como
+  verificadas. Ninguna salida candidata se promovió a canon ni runtime.
+- El routing comparativo queda bloqueado. Codex continúa como control plane operativo; repetir los
+  cinco brazos híbridos requiere recuperar proveedores y aprobación de ejecuciones adicionales.
+- Evidencia y scores: `docs/agent-runs/ohmdal-hd2d-preprod-v1/content/benchmark/`.
+- No se modificaron `src`, `assets` ni `/jugar`; H3, Meshy y generación paga continúan bloqueados.
 
 ## Deuda y diferencias
 
