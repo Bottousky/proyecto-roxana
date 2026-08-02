@@ -112,6 +112,44 @@ equal(
   'Bitácora rechaza valor no finito',
 );
 equal(
+  validateBitacoraEntry({
+    ...entry,
+    evidence: [{ ...entry.evidence[0], magnitude: undefined }],
+  }).ok,
+  false,
+  'Bitácora rechaza magnitud ausente',
+);
+equal(
+  validateBitacoraEntry({
+    ...entry,
+    evidence: [{ ...entry.evidence[0], observedErrorCodes: undefined }],
+  }).ok,
+  false,
+  'Bitácora devuelve incompleto si faltan errores observados',
+);
+equal(
+  validateBitacoraEntry({
+    ...entry,
+    formalTranslation: { ...entry.formalTranslation, mathematicalRelation: undefined },
+  }).ok,
+  false,
+  'Bitácora devuelve incompleto si falta la relación matemática',
+);
+equal(
+  validateBitacoraEntry({
+    ...entry,
+    evidence: [{
+      ...entry.evidence[0],
+      magnitude: 'CONTINUITY',
+      value: 301,
+      unit: 'ohm',
+      powerState: 'deenergized_isolated',
+    }],
+  }).ok,
+  false,
+  'Bitácora rechaza continuidad numérica sobre 300 ohm',
+);
+equal(
   validateBitacoraEntry({ ...entry, optionalEvaluationUrl: 'http://inseguro.example' }).ok,
   false,
   'evaluación opcional exige https',
