@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "ticket": "ARC1-004",
+  "packet": "ARC1-004-B",
+  "generatedFor": "SHOT_DECK.md",
+  "base": "b49b617",
+  "date": "2026-08-02",
+  "method": "getBoundingClientRect() sobre los overlays fixed/absolute de /labs/ohmdal-hd2d-preprod/, servido por vite en :5199. No requiere componer frames, asi que la limitacion de GOLDEN_FRAMES.md §7 no aplica.",
+  "console": {
+    "errors": 0,
+    "warnings": 0,
+    "note": "solo mensajes de conexion de vite"
+  },
+  "disclaimer": "Mide el HUD del harness de preproduccion, no el HUD final del slice. Sirve para cuantificar CP-012, no para aprobarlo.",
+  "viewports": {
+    "desktop-1440x900": {
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "safeAreaContract": {
+        "topPct": 12,
+        "bottomPct": 18,
+        "sidePct": 6,
+        "topPx": 108,
+        "bottomPx": 162,
+        "sidePx": 86,
+        "criticalZonePx": {
+          "top": 108,
+          "bottom": 738,
+          "left": 86,
+          "right": 1354
+        },
+        "criticalHeightPct": 70,
+        "criticalHeightMetersAtC2": 6.3,
+        "visibleHeightC2Meters": 9
+      },
+      "measured": {
+        "overlays": [
+          {
+            "id": "topbar",
+            "x": 10,
+            "y": 10,
+            "w": 970,
+            "h": 95
+          },
+          {
+            "id": "hud",
+            "x": 12,
+            "y": 813,
+            "w": 390,
+            "h": 75
+          },
+          {
+            "id": "diagnosis",
+            "x": 1098,
+            "y": 769,
+            "w": 330,
+            "h": 119
+          }
+        ],
+        "freeBandPx": 664,
+        "freeBandPct": 73.8,
+        "freeBandMetersAtC2": 6.64
+      },
+      "conformance": {
+        "intrusionsIntoCriticalZone": [],
+        "uiOverlapDefects": [],
+        "verdict": "PASS",
+        "shortfallMetersAtC2": 0
+      }
+    },
+    "mobile-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 2
+      },
+      "safeAreaContract": {
+        "topPct": 14,
+        "bottomPct": 26,
+        "sidePct": 5,
+        "topPx": 118,
+        "bottomPx": 219,
+        "sidePx": 20,
+        "criticalZonePx": {
+          "top": 118,
+          "bottom": 625,
+          "left": 20,
+          "right": 370
+        },
+        "criticalHeightPct": 60.1,
+        "criticalHeightMetersAtC2": 8.71,
+        "visibleHeightC2Meters": 14.5
+      },
+      "measured": {
+        "overlays": [
+          {
+            "id": "topbar",
+            "x": 10,
+            "y": 10,
+            "w": 370,
+            "h": 168
+          },
+          {
+            "id": "diagnosis",
+            "x": 8,
+            "y": 583,
+            "w": 374,
+            "h": 119
+          },
+          {
+            "id": "touch",
+            "x": 244,
+            "y": 702,
+            "w": 134,
+            "h": 134
+          },
+          {
+            "id": "hud",
+            "x": 12,
+            "y": 770,
+            "w": 272,
+            "h": 66
+          }
+        ],
+        "freeBandPx": 405,
+        "freeBandPct": 48,
+        "freeBandMetersAtC2": 6.96
+      },
+      "conformance": {
+        "intrusionsIntoCriticalZone": [
+          {
+            "id": "topbar",
+            "verticalPx": 60,
+            "horizontalPx": 350,
+            "edge": "top"
+          },
+          {
+            "id": "diagnosis",
+            "verticalPx": 42,
+            "horizontalPx": 350,
+            "edge": "bottom"
+          }
+        ],
+        "uiOverlapDefects": [
+          {
+            "a": "touch",
+            "b": "hud",
+            "widthPx": 40,
+            "heightPx": 66
+          }
+        ],
+        "verdict": "FAIL",
+        "shortfallMetersAtC2": 1.75
+      }
+    }
+  }
+}

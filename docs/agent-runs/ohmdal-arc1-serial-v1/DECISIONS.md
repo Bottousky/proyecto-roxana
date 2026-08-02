@@ -19,8 +19,60 @@
 | CP-015 | 2026-08-02 | Golden frames, identidad y límites legales **congelados** | Un ticket de escena no puede redefinirlos para que su resultado pase |
 | CP-016 | 2026-08-02 | La unidad de ejecución pasa a ser el **paquete** `ARC1-NNN-X` | Una sesión nueva por fase; hallazgos ajenos a `OPEN_ISSUES.md`; cada fase emite telemetría |
 | CP-017 | 2026-08-02 | Rotar `ownership.json` es parte del **cierre**; builder y reviewer obtienen append-only | `ARC1-003` verificado y congelado; `ARC1-004` desbloqueado; `OI-001` cerrado |
+| CP-018 | 2026-08-02 | Color script y shot deck **congelados**; las safe areas son vinculantes | `CP-012` deja de ser cualitativo: mobile `FAIL` con número, destino `ARC1-026` |
 
-Una decisión nueva agrega `CP-018+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-019+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-018 — Color script y shot deck congelados; safe areas vinculantes
+
+**Motivo.** El harness ya implementaba dos horas —`afternoon` y `twilight`— con valores concretos,
+pero ninguna regla escrita explicaba qué comunican ni dónde cambia una por la otra. Sin eso,
+`ARC1-024` habría tenido que decidir el lenguaje de color y la composición *dentro* de un ticket de
+escena, y cualquier resultado habría sido defendible a posteriori — exactamente lo que `CP-015`
+prohíbe.
+
+Faltaba además la «hoja de encuadres con safe areas desktop/mobile» que doc. 15 §«Golden slice antes
+de campaña» exige antes de producir arte.
+
+**Evidencia.** El cálculo determinista sobre los valores reales del harness **confirmó** el patrón
+que la Biblia declaraba en prosa, y aportó dos reglas que no estaban escritas:
+
+- luz natural −29,8 % (principal) y −28,7 % (fill), oficio 0,0 %, y **la única que sube es la
+  motivada por el sistema**: conducto de la Puerta **+51,6 %**;
+- **el vidrio no cede valor** al crepúsculo (+0,6 % contra ≈ −31 % del resto) y el agua cede la mitad
+  que la piedra: la infraestructura se lee *más*, no menos;
+- el rango de luma entre familias **se ensancha** 0,267 → 0,291: el crepúsculo no comprime el
+  contraste, y ahora no puede hacerlo;
+- un solo color del slice supera el umbral de saturación 0,60 reservado al estado eléctrico, y es el
+  correcto (`0x63dce8`, S = 0,743).
+
+Medición del HUD por DOM sobre `/labs/ohmdal-hd2d-preprod/`, 0 errores y 0 warnings en consola:
+desktop 1440×900 **PASS** (franja libre 73,8 % contra 70 % de contrato); mobile 390×844 **FAIL**
+(48,0 % contra 60,1 %, faltan 1,75 m en C2).
+
+Detalle en `evidence/ARC1-004/palette.json`, `hud-rects.json` y `freeze.md`.
+
+**Impacto.** `COLOR_SCRIPT.md` y `SHOT_DECK.md` pasan a canon congelado, al mismo nivel que
+`GOLDEN_FRAMES.md`, `IDENTITY.md` y `LEGAL_REFERENCES.md`: un ticket de escena no puede redefinirlos
+para que su resultado pase. Ante contradicción entre el shot deck y un golden frame, **gana el
+golden frame**.
+
+`ARC1-024` reemplazará los valores de blockout por arte final, pero seguirá obligado por la regla de
+intensidad, la de valor, el beat map y la reserva del cian, y deberá volver a medir contra
+`palette.json`.
+
+**`CP-012` queda reclasificado.** Deja de ser una observación cualitativa y pasa a ser
+incumplimiento medible de `SHOT_DECK.md` §2, con tres defectos numerados: `topbar` invade 60 px,
+`diagnosis` 42 px, y el D-pad se solapa con el panel de estado en 40 × 66 px. Sigue siendo P2 y sigue
+resolviéndose en `ARC1-026`, que ahora tiene criterio de cierre en vez de un juicio de gusto. No se
+corrigió acá: el HUD está fuera del ownership de un ticket de canon.
+
+No cambia el backlog, el alcance autorizado por `CP-013` ni el canon de `ARC1-003`. No requiere ADR.
+
+**Desviación declarada.** Las fases `plan`, `build` y `review` de ambos paquetes corrieron en la
+misma sesión y con la misma ruta (`claude`), contra `PACKETS.md` §«Frontera de sesión». El Director
+lo decidió antes de empezar. Está registrado en `telemetry.json`, no simulado como review
+independiente.
 
 ## CP-017 — La rotación de ownership pertenece al cierre
 

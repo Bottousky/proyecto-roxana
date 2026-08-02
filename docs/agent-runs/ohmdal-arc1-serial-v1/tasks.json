@@ -11,12 +11,14 @@
     "goldenFrames": "docs/agent-runs/ohmdal-arc1-serial-v1/GOLDEN_FRAMES.md",
     "identity": "docs/agent-runs/ohmdal-arc1-serial-v1/IDENTITY.md",
     "legal": "docs/agent-runs/ohmdal-arc1-serial-v1/LEGAL_REFERENCES.md",
-    "note": "frozen in ARC1-003; a scene ticket may not redefine these so its own result passes. Amending requires its own CP decision."
+    "colorScript": "docs/agent-runs/ohmdal-arc1-serial-v1/COLOR_SCRIPT.md",
+    "shotDeck": "docs/agent-runs/ohmdal-arc1-serial-v1/SHOT_DECK.md",
+    "note": "goldenFrames, identity and legal frozen in ARC1-003 (CP-015); colorScript and shotDeck frozen in ARC1-004 (CP-018). A scene ticket may not redefine these so its own result passes. Amending requires its own CP decision. If shotDeck and goldenFrames conflict, goldenFrames wins."
   },
   "branch": "codex/ohmdal-arc1-control-plane",
   "planningBaseCommit": "e07be6332fa10f5df36fe5f679c66c1603961257",
   "baseCommit": "b49b617",
-  "activeIssueKey": "ARC1-004",
+  "activeIssueKey": "ARC1-005",
   "workflow": {
     "mode": "STRICT-SERIAL",
     "globalWipLimit": 1,
@@ -123,9 +125,23 @@
       "epic": "Control",
       "title": "Congelar color script y shot deck del slice",
       "owner": "architecture",
-      "status": "READY",
+      "status": "DONE",
       "dependsOn": [
         "ARC1-003"
+      ],
+      "spec": "tickets/ARC1-004.md",
+      "packets": [
+        "packets/ARC1-004/ARC1-004-A.md",
+        "packets/ARC1-004/ARC1-004-B.md"
+      ],
+      "decidedOn": "2026-08-02",
+      "decisions": [
+        "CP-018"
+      ],
+      "evidence": "evidence/ARC1-004/",
+      "deliverables": [
+        "COLOR_SCRIPT.md",
+        "SHOT_DECK.md"
       ]
     },
     {
@@ -133,7 +149,7 @@
       "epic": "Control",
       "title": "Congelar escenas, beats, duración y fichas V2",
       "owner": "director",
-      "status": "BLOCKED",
+      "status": "READY",
       "dependsOn": [
         "ARC1-004"
       ]
