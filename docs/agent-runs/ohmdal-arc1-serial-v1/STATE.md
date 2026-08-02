@@ -14,7 +14,10 @@
 
 - `ARC1-001` cerrado con veredicto humano: aprobar y avanzar (`CP-010`). `CAM-FIX-001` aceptado.
 - `ARC1-002` cerrado: el usuario autorizó H3 con base `b49b617` (`CP-013`).
-- `ARC1-003` cerrado: canon visual congelado (`CP-015`).
+- `ARC1-003` cerrado: canon visual congelado (`CP-015`). Verificado condición por condición en
+  `CP-017` antes de rotar el ownership; sus artefactos ya son `protected`.
+- `ownership.json` v4 apunta a `ARC1-004`. La rotación es ahora paso del cierre (`CP-017`), no
+  del ticket siguiente.
 - H3 cubre `ARC1-003` … `ARC1-035`: golden slice Portal → Plaza → Taller → Puerta → Manantial.
 - La autorización es de **alcance, no de resultado**. Cada ticket conserva sus gates, su evidencia y
   su aprobación humana cuando el cambio sea visible.

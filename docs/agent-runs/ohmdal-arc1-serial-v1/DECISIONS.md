@@ -18,8 +18,42 @@
 | CP-014 | 2026-08-02 | Android físico diferido a `ARC1-060` (opción B) | Todo claim de rendimiento en Android físico es `not-run` hasta el QA de release |
 | CP-015 | 2026-08-02 | Golden frames, identidad y límites legales **congelados** | Un ticket de escena no puede redefinirlos para que su resultado pase |
 | CP-016 | 2026-08-02 | La unidad de ejecución pasa a ser el **paquete** `ARC1-NNN-X` | Una sesión nueva por fase; hallazgos ajenos a `OPEN_ISSUES.md`; cada fase emite telemetría |
+| CP-017 | 2026-08-02 | Rotar `ownership.json` es parte del **cierre**; builder y reviewer obtienen append-only | `ARC1-003` verificado y congelado; `ARC1-004` desbloqueado; `OI-001` cerrado |
 
-Una decisión nueva agrega `CP-017+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-018+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-017 — La rotación de ownership pertenece al cierre
+
+**Motivo.** `ownership.json` v3 seguía declarando `activeIssueKey: ARC1-003` y protegiendo
+`tickets/ARC1-004.md`, justo la ficha que hay que escribir para abrir el sucesor. La causa no fue una
+ejecución interrumpida: la nota del propio archivo difería el reemplazo a «cuando `ARC1-004` sea el
+ticket activo», y ningún paso de `EXECUTION_PROTOCOL.md` era responsable de hacerlo. El defecto es
+estructural y se habría repetido en los 58 tickets restantes.
+
+**Evidencia.** `ARC1-003` verificado condición por condición antes de congelarlo, no por declaración:
+
+- los nueve archivos de `88f669d` caen dentro del ownership declarado por la ficha;
+- anclajes contra `evidence/ARC1-001/metrics.json` — C1 13,5/20 m, C2 9,0/14,5 m, C3 12,0/18,0 m,
+  desktop y mobile, coincidencia exacta;
+- histéresis 0,75 m en ambos cruces (`x = −3,0` y `x = 9,5`), `extraChanges = 0`;
+- zona muerta declarada 16/10/4 % de 13,5 m = 2,16 / 1,35 / 0,54 m, idéntica a la medida;
+- estado de captura declarado en `GOLDEN_FRAMES.md` §7, no inferido: sólo GF-01 tiene capturas y son
+  de blockout;
+- build, tests, manifests y `git diff --check` PASS;
+- `ARC1-004` ya estaba `READY` en `tasks.json`.
+
+**Impacto.** `ownership.json` pasa a v4: `activeIssueKey = ARC1-004`; los artefactos de `ARC1-003`
+—`GOLDEN_FRAMES.md`, `IDENTITY.md`, `LEGAL_REFERENCES.md`, su ficha y su evidencia— pasan de
+`director/write` a `protected`, coherente con `CP-015`; se libera `tickets/ARC1-004.md` y se protege
+`tickets/ARC1-005.md`. `EXECUTION_PROTOCOL.md` §E incorpora la rotación como paso del cierre, con sus
+cuatro movimientos explícitos.
+
+Además, `builder` y `reviewer` reciben acceso **append-only** a `OPEN_ISSUES.md` y `telemetry.json`.
+Sin eso `CP-016` no puede funcionar: el ejecutor no podría registrar un hallazgo que tiene prohibido
+arreglar, ni cerrar su propia fase. Append-only es agregar una fila o un record; nunca editar ni
+borrar los existentes. No amplía el acceso a código, assets ni canon.
+
+No cambia el backlog, el canon congelado ni el alcance autorizado por `CP-013`. No requiere ADR.
 
 ## CP-016 — El paquete es la unidad de ejecución
 

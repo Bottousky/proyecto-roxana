@@ -57,6 +57,17 @@ Ejecutar `/arc-close ARC1-N` únicamente tras gates completos de **todos** sus p
 estado, decisiones, evidencia y manifests. Crear un commit acotado — a nivel de ticket, nunca de
 paquete. Marcar el sucesor `READY`, pero detenerse sin analizarlo ni implementarlo.
 
+**Rotar `ownership.json` es parte del cierre, no del ticket siguiente.** En el mismo commit:
+
+1. subir `version` y apuntar `activeIssueKey` al sucesor;
+2. mover los artefactos del ticket cerrado de `director/write` a `protected`;
+3. quitar de `protected` la ficha del sucesor, que ahora hay que escribir;
+4. agregar a `protected` la ficha del ticket que viene después.
+
+Diferirlo deja el contrato apuntando a un ticket cerrado y protegiendo la ficha que el sucesor
+necesita escribir: eso bloqueó `ARC1-004` (`OI-001`). Rotar no autoriza analizar ni implementar el
+sucesor; sólo habilita que su `/arc-plan` pueda escribir.
+
 Cada fase de paquete emite su record en [`telemetry.json`](telemetry.json) al cerrarse: ruta,
 `modelId` literal, duración medida, ronda, resultado. Lo no medido va en `null` y cuenta como
 `not-run`; no se estima. Sin ese record, la fase no está cerrada.

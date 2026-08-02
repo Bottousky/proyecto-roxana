@@ -64,8 +64,10 @@ if (activeKey && existsSync(packetDir)) {
 }
 const activePacket = packets.find((p) => p.estado && !['DONE', 'READY'].includes(p.estado)) ?? packets.find((p) => p.estado === 'READY') ?? null;
 
-// Hallazgos abiertos: filas reales de la tabla de registro, sin el placeholder.
-const openIssues = (issuesMd.match(/^\|\s*OI-\d+\s*\|.*$/gm) ?? []).map((row) => {
+// Hallazgos abiertos: sólo la tabla de registro. Todo lo que va después de «## Cerrados»
+// está resuelto y no debe contarse como abierto.
+const openSection = issuesMd.split(/^##\s+Cerrados\s*$/m)[0];
+const openIssues = (openSection.match(/^\|\s*OI-\d+\s*\|.*$/gm) ?? []).map((row) => {
   const c = row.split('|').map((s) => s.trim().replace(/`/g, ''));
   return { id: c[1], fecha: c[2], donde: c[3], que: c[4], sev: c[5], bloquea: c[6], destino: c[7] };
 });

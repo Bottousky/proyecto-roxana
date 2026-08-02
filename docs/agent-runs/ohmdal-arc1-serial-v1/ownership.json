@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "milestone": "ohmdal-arc1-serial-v1",
-  "activeIssueKey": "ARC1-003",
+  "activeIssueKey": "ARC1-004",
   "collisionPolicy": "stop-and-return-to-director",
   "owners": {
     "director": {
@@ -10,15 +10,32 @@
         "docs/agent-runs/ohmdal-arc1-serial-v1/tasks.json",
         "docs/agent-runs/ohmdal-arc1-serial-v1/DECISIONS.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/ownership.json",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/GOLDEN_FRAMES.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/IDENTITY.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/LEGAL_REFERENCES.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-003.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-003/**"
+        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-004.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-004/**",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-004/**"
       ]
     },
-    "builder": { "write": [] },
-    "reviewer": { "write": [] }
+    "builder": {
+      "write": [
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-004/**",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/OPEN_ISSUES.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/telemetry.json"
+      ],
+      "append-only": [
+        "docs/agent-runs/ohmdal-arc1-serial-v1/OPEN_ISSUES.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/telemetry.json"
+      ]
+    },
+    "reviewer": {
+      "write": [
+        "docs/agent-runs/ohmdal-arc1-serial-v1/OPEN_ISSUES.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/telemetry.json"
+      ],
+      "append-only": [
+        "docs/agent-runs/ohmdal-arc1-serial-v1/OPEN_ISSUES.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/telemetry.json"
+      ]
+    }
   },
   "protected": [
     "src/**",
@@ -30,12 +47,20 @@
     "docs/agent-runs/ohmdal-hd2d-preprod-v1/**",
     "docs/ohmdal-biblia/**",
     "docs/agent-runs/ohmdal-arc1-serial-v1/H3_CONTRACT.md",
-    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-004.md"
+    "docs/agent-runs/ohmdal-arc1-serial-v1/GOLDEN_FRAMES.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/IDENTITY.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/LEGAL_REFERENCES.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-003.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-003/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-005.md"
   ],
   "notes": [
-    "ARC1-003 freezes golden frames, Ohmdal identity and the legal reference list. It is a canon ticket: no runtime change.",
-    "H3_CONTRACT.md is now authorized and frozen; it is protected. Amending it requires a new CP decision.",
+    "ARC1-004 is the active ticket: freeze the slice color script and shot deck. Canon ticket, no runtime change expected; /arc-plan narrows this contract to the exact artifacts when it writes the ficha.",
+    "ARC1-003 closed DONE in 88f669d, validated field by field against evidence/ARC1-001/metrics.json: anchors C1 13.5/20, C2 9/14.5, C3 12/18, hysteresis 0.75 m, dead zone 16/10/4 percent of 13.5 m. Its artifacts move from director/write to protected.",
+    "GOLDEN_FRAMES.md, IDENTITY.md and LEGAL_REFERENCES.md are frozen by CP-015. Protected here means no ticket may edit them to make its own result pass; amending them requires its own CP decision, not a ticket.",
+    "H3_CONTRACT.md is authorized and frozen; amending it requires a new CP decision.",
     "ARC1-001 closed DONE in b49b617; ARC1-002 closed DONE in 8225ba6 with H3 authorized (CP-013).",
-    "Replace this contract only after ARC1-003 is DONE and ARC1-004 becomes the active ticket."
+    "builder and reviewer get append-only access to OPEN_ISSUES.md and telemetry.json (CP-017). Without it CP-016 cannot work: the executor could not log a finding it is forbidden to fix, nor close its own phase. Append-only means adding a row or a record; never editing or deleting existing ones.",
+    "Rotating this contract is step E of EXECUTION_PROTOCOL.md, executed by /arc-close. Do not defer it to the next ticket: that is what left version 3 pointing at a closed ARC1-003 while protecting the ficha of ARC1-004 (OI-001)."
   ]
 }
