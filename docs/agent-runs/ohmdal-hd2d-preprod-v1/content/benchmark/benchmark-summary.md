@@ -1,7 +1,8 @@
 # Resultado del benchmark de routing
 
-**Estado:** cerrado con routing comparativo bloqueado  
-**Fecha:** 2026-08-02  
+**Estado:** cerrado con routing comparativo bloqueado
+
+**Fecha:** 2026-08-02
 **Ejecuciones:** 10 intentadas; 5 entregas Codex; 5 fallos de infraestructura híbrida
 
 ## Resultado ejecutivo
