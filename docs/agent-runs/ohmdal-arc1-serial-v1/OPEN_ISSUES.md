@@ -27,7 +27,8 @@ Esto no reemplaza a `DECISIONS.md`: allí van decisiones tomadas, acá problemas
 
 | ID | Fecha | Descubierto en | Hallazgo | Sev. | ¿Bloquea? | Destino |
 |---|---|---|---|---|---|---|
-| — | — | — | *sin hallazgos abiertos* | — | — | — |
+| OI-002 | 2026-08-02 | `ARC1-005-A` | La escena E2 —activación de Ohm, Beat 3— no tiene anclaje de ruta en `levelData.ts:106-117`, no tiene golden frame en `GOLDEN_FRAMES.md` §4 y C1 no protege ningún sujeto suyo: `cameraConfig.ts:112` sólo lista `player-feet`, `player-head` y `portal-landmark`. Es la primera interacción educativa del slice y hoy no admite evidencia | P2 | no | `ARC1-011` (anclaje y blockout) y `ARC1-015` (Ohm y Edda como sujetos) |
+| OI-003 | 2026-08-02 | `ARC1-005-B` | Ninguna ficha describe el fenómeno inicial del Beat 3. `H1.1` lo sitúa en el Taller —«el indicador de Lumen está apagado»— y `H1.2` habla de «el indicador» sin ubicarlo. La activación de Ohm en la Plaza queda con modelo técnico cubierto pero **sin contrato de fenómeno**: `ARC1-015` no tiene ficha que le diga qué debe percibir el jugador | P2 | no | `ARC1-015`, con consulta a `ARC1-018` si exigiera tocar el modelo |
 
 ## Cerrados
 

@@ -20,8 +20,58 @@
 | CP-016 | 2026-08-02 | La unidad de ejecución pasa a ser el **paquete** `ARC1-NNN-X` | Una sesión nueva por fase; hallazgos ajenos a `OPEN_ISSUES.md`; cada fase emite telemetría |
 | CP-017 | 2026-08-02 | Rotar `ownership.json` es parte del **cierre**; builder y reviewer obtienen append-only | `ARC1-003` verificado y congelado; `ARC1-004` desbloqueado; `OI-001` cerrado |
 | CP-018 | 2026-08-02 | Color script y shot deck **congelados**; las safe areas son vinculantes | `CP-012` deja de ser cualitativo: mobile `FAIL` con número, destino `ARC1-026` |
+| CP-019 | 2026-08-02 | Inventario de escenas y contenido V2 **congelados**: cinco escenas, tres actos causales, envolvente de duración por beat | `ARC1-006` presupuesta sobre esas cinco escenas; el mapa aporta <2 % de la duración; `OI-002` y `OI-003` abiertos |
 
-Una decisión nueva agrega `CP-019+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-020+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-019 — Escenas, beats, duración y fichas V2 congelados
+
+**Motivo.** `H3_CONTRACT.md` §2 declara que la unidad de producción es la escena causal completa,
+pero nunca se escribió la lista. Convivían cuatro particiones del mismo slice —3 zonas de nivel,
+3 sets de doc. 10, 7 beats y 8 golden frames— y ninguna era la autoridad. Sin reconciliarlas,
+`ARC1-006` no puede presupuestar «por escena» y `ARC1-030` no tiene contra qué medir ritmo.
+
+En paralelo, `ACCEPTANCE_GATES.md` §Educación exige ficha V2 antes de producir interacción final,
+pero las fichas vivían sólo en `src/**` y en el run de preproducción: ningún documento del control
+plane las declaraba canon ni decía qué beats quedan sin ficha y por qué.
+
+**Evidencia.** `SCENE_INVENTORY.md`, `CONTENT_V2.md`, `evidence/ARC1-005/route-timing.json` y
+`evidence/ARC1-005/cards-audit.json`. Todo calculado, no citado:
+
+- recorrido completo **38,05 m**, **19,03 s** de caminata más 4,50 s de esperas guionadas;
+- las cuatro particiones se reconcilian sin resto en **cinco escenas**, de las cuales sólo **tres**
+  cargan un acto causal;
+- las **seis** fichas verifican 30/30 campos, orden canónico, identificador `-v2` y `V2 CANON-EDU`
+  por ejecución sobre `cards.ts`;
+- el solver de la Puerta es **idéntico** al de Lumen, verificado por igualdad, no prometido;
+- **88.044** órdenes de diagnóstico válidos de ≤12 acciones: 9 acciones el mínimo por continuidad,
+  10 por tensión.
+
+**Impacto.**
+
+1. `SCENE_INVENTORY.md` y `CONTENT_V2.md` pasan a canon congelado; enmendarlos requiere `CP-0NN`
+   propia. El canon congelado son ahora **siete** documentos.
+2. `ARC1-006` presupuesta sobre las cinco escenas, no sobre zonas ni golden frames, y debe decidir
+   si el overworld mínimo de `ARC1-010` recibe línea propia: hoy no tiene duración asignada.
+3. **El mapa no produce la duración.** El piso de recorrido es 23,53 s, entre 1,1 % y 1,6 % del
+   objetivo de 25–35 min. Las escenas causales cargan 24,6–34,6 min. No se agranda el mapa para
+   llenar el tiempo: doc. 10 descarta mundo abierto explícitamente.
+4. La envolvente de duración por beat es **objetivo de diseño, no medición**, y `ARC1-030` la
+   reporta por beat con mediana y dispersión. Un informe de duración total no cierra el gate.
+5. `ARC1-018`, `ARC1-019`, `ARC1-021` y `ARC1-022` implementan las seis fichas y **no** las
+   reinterpretan. Una discrepancia es P1 del ticket, no una corrección de la ficha.
+6. Se abren `OI-002` y `OI-003`, ambos P2 y ambos sobre la escena E2 —activación de Ohm—: sin
+   anclaje, sin golden frame, sin sujeto protegido de cámara y sin ficha que describa su fenómeno
+   inicial. Destinos `ARC1-011` y `ARC1-015`. **No se corrigen acá**, y convertirlos en ticket es
+   decisión del Director (`CP-002`).
+
+**Lo que esta decisión no hace.** No repite la auditoría independiente V2: la hereda del run de
+preproducción y lo declara (`CONTENT_V2.md` §3.2). No promueve nada a V3 —eso exige playtest,
+`ARC1-030`— ni fija el presupuesto técnico por escena.
+
+**Desviación declarada.** Las fases `plan`, `build` y `review` de ambos paquetes corrieron en la
+misma sesión y con la misma ruta, contra `PACKETS.md` §«Frontera de sesión». Mismo criterio que
+`CP-018`, registrado en `telemetry.json`. **No hubo review independiente.**
 
 ## CP-018 — Color script y shot deck congelados; safe areas vinculantes
 

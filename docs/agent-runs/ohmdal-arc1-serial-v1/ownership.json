@@ -1,7 +1,7 @@
 {
-  "version": 6,
+  "version": 8,
   "milestone": "ohmdal-arc1-serial-v1",
-  "activeIssueKey": "ARC1-005",
+  "activeIssueKey": "ARC1-006",
   "collisionPolicy": "stop-and-return-to-director",
   "owners": {
     "director": {
@@ -10,14 +10,14 @@
         "docs/agent-runs/ohmdal-arc1-serial-v1/tasks.json",
         "docs/agent-runs/ohmdal-arc1-serial-v1/DECISIONS.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/ownership.json",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-005.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-005/**",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-005/**"
+        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-006.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-006/**",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-006/**"
       ]
     },
     "builder": {
       "write": [
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-005/**",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-006/**",
         "docs/agent-runs/ohmdal-arc1-serial-v1/OPEN_ISSUES.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/telemetry.json"
       ],
@@ -52,21 +52,29 @@
     "docs/agent-runs/ohmdal-arc1-serial-v1/LEGAL_REFERENCES.md",
     "docs/agent-runs/ohmdal-arc1-serial-v1/COLOR_SCRIPT.md",
     "docs/agent-runs/ohmdal-arc1-serial-v1/SHOT_DECK.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/SCENE_INVENTORY.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/CONTENT_V2.md",
     "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-003.md",
     "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-003/**",
     "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-004.md",
     "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-004/**",
     "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-004/**",
-    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-006.md"
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-005.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-005/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-005/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-007.md"
   ],
   "notes": [
-    "ARC1-005 is the active ticket: freeze the scene inventory, beats, duration and V2 sheets of the slice. /arc-plan narrows this contract to the exact artifacts when it writes the ficha, exactly as version 5 did for ARC1-004.",
-    "ARC1-004 closed DONE with two packets. ARC1-004-A froze COLOR_SCRIPT.md; ARC1-004-B froze SHOT_DECK.md. Both move from director/write to protected, consistent with CP-018.",
-    "Frozen canon is now five documents: GOLDEN_FRAMES.md, IDENTITY.md and LEGAL_REFERENCES.md from ARC1-003 (CP-015), plus COLOR_SCRIPT.md and SHOT_DECK.md from ARC1-004 (CP-018). Protected means no ticket may edit them to make its own result pass; amending requires its own CP decision, not a ticket. If SHOT_DECK.md and GOLDEN_FRAMES.md conflict, GOLDEN_FRAMES.md wins.",
-    "SHOT_DECK.md section 2 makes the safe areas binding. The mobile HUD currently fails it by a measured margin (evidence/ARC1-004/hud-rects.json). Fixing it belongs to ARC1-026, not to whatever ticket happens to touch the harness next. Do not correct it opportunistically: that would be an out-of-ownership diff.",
+    "ARC1-006 is the active ticket: fix the per-scene budget for JS, textures, audio, memory, draw calls and time. /arc-plan narrows this contract to the exact artifacts when it writes the ficha, exactly as versions 5 and 7 did for ARC1-004 and ARC1-005.",
+    "ARC1-005 closed DONE with two packets. ARC1-005-A froze SCENE_INVENTORY.md; ARC1-005-B froze CONTENT_V2.md. Both move from director/write to protected, consistent with CP-019.",
+    "Frozen canon is now seven documents: GOLDEN_FRAMES.md, IDENTITY.md and LEGAL_REFERENCES.md from ARC1-003 (CP-015); COLOR_SCRIPT.md and SHOT_DECK.md from ARC1-004 (CP-018); SCENE_INVENTORY.md and CONTENT_V2.md from ARC1-005 (CP-019). Protected means no ticket may edit them to make its own result pass; amending requires its own CP decision, not a ticket.",
+    "Precedence on conflict: GOLDEN_FRAMES.md beats SHOT_DECK.md; the earlier frozen document beats the later one; SCENE_INVENTORY.md may report that COLOR_SCRIPT.md does not cover a beat, but may not redefine its beat map.",
+    "ARC1-006 budgets over the five scenes of SCENE_INVENTORY.md, not over zones or golden frames. The minimal overworld of ARC1-010 has no duration allocated and no scene: ARC1-006 must decide whether it gets its own budget line.",
+    "cards.ts stays in src/**, protected. CONTENT_V2.md verifies and freezes those six V2 sheets; it does not own them. ARC1-018, ARC1-019, ARC1-021 and ARC1-022 implement them and may not reinterpret their values.",
+    "SHOT_DECK.md section 2 makes the safe areas binding. The mobile HUD currently fails it by a measured margin (evidence/ARC1-004/hud-rects.json). Fixing it belongs to ARC1-026. Do not correct it opportunistically.",
+    "OI-002 and OI-003 are open, both P2, both about scene E2 (Ohm activation, Beat 3): it has no route anchor, no golden frame, no protected camera subject and no sheet describing its initial phenomenon. Destinations ARC1-011 and ARC1-015. Converting an OI into a ticket is the Director's call, never the executor's (CP-002).",
     "H3_CONTRACT.md is authorized and frozen; amending it requires a new CP decision.",
-    "ARC1-001 closed DONE in b49b617; ARC1-002 closed DONE in 8225ba6 with H3 authorized (CP-013); ARC1-003 closed DONE in 88f669d (CP-015), verified field by field in CP-017.",
-    "builder and reviewer get append-only access to OPEN_ISSUES.md and telemetry.json (CP-017). Without it CP-016 cannot work: the executor could not log a finding it is forbidden to fix, nor close its own phase. Append-only means adding a row or a record; never editing or deleting existing ones.",
-    "Rotating this contract is step E of EXECUTION_PROTOCOL.md, executed at close. Version 6 was written as part of closing ARC1-004, not when opening ARC1-005: that is the fix CP-017 introduced after OI-001."
+    "builder and reviewer get append-only access to OPEN_ISSUES.md and telemetry.json (CP-017). Append-only means adding a row or a record; never editing or deleting existing ones.",
+    "Rotating this contract is step E of EXECUTION_PROTOCOL.md, executed at close. Version 8 was written as part of closing ARC1-005, not when opening ARC1-006: that is the fix CP-017 introduced after OI-001."
   ]
 }
