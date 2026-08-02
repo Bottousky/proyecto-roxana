@@ -33,6 +33,8 @@ evidencia; una modificación de dirección requiere registrar una nueva decisió
 | D23 | Accesibilidad desde el slice | Texto, contraste, color, subtítulos, movimiento, reasignación y tiempo sin presión |
 | D24 | Audio de identidad propia | Voces parciales; orquesta + electrónica; slice de tarde a crepúsculo |
 | D25 | Continuidad selectiva | Preservar mundo, personajes, modelos y mejores escenas; reescribir presentación |
+| D26 | H2 promueve cámara casi ortográfica, 4 direcciones y Ohm sprite | Las alternativas quedan archivadas; sólo se reabren con una falla observable nueva |
+| D27 | Arco I usa Jira serie con WIP global uno | Ninguna tarea sucesora comienza hasta que la anterior esté `DONE` |
 
 ## Nombres cerrados
 
@@ -55,7 +57,6 @@ evidencia; una modificación de dirección requiere registrar una nueva decisió
 
 | Riesgo | Evidencia que lo cierra | Freno |
 |---|---|---|
-| Cantidad de direcciones de sprites | Análisis de footage oficial + spike 4/8 en todas las cámaras | No producir atlas masivo antes del veredicto |
 | Exactitud educativa | Fuentes, cálculos reproducidos, tests y auditoría V2 | Escalar seguridad, contradicción o incertidumbre real |
 | Quality bar demasiado costoso | Coste por minuto, captura comparada y backlog del slice | No ampliar territorio antes de aprobar composición y actuación |
 | Rendimiento mobile | Android medio 2022, `renderer.info`, peso y frame time | Piso inferior a 30 fps bloquea avance |

@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "milestone": "ohmdal-arc1-serial-v1",
+  "status": "awaiting-human-camera-approval",
+  "executionAuthorized": false,
+  "authorizationScope": "planning and human review only; H3 and production remain blocked",
+  "baseRef": "codex/ohmdal-hd2d-preprod-v1-director",
+  "planningBaseCommit": "8784206216f9bebf5b98b6cacbb12e789adb6bdb",
+  "baseCommit": null,
+  "workflow": {
+    "mode": "strict-serial",
+    "globalWipLimit": 1,
+    "directorOwnsTransitions": true,
+    "successorRequiresPredecessorDone": true,
+    "conditionalIsDone": false,
+    "notRunIsPass": false,
+    "humanReviewRequiredForVisibleChanges": true,
+    "internalTaskMinutes": { "min": 30, "max": 90 }
+  },
+  "currentIssue": {
+    "key": "ARC1-001",
+    "title": "Aprobar visualmente la cámara corregida",
+    "status": "HUMAN_REVIEW",
+    "dependsOn": [],
+    "evidence": "docs/agent-runs/ohmdal-hd2d-preprod-v1/evidence/camera-correction/"
+  },
+  "orderedIssues": {
+    "first": "ARC1-001",
+    "last": "ARC1-062",
+    "canonicalBacklog": "docs/ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md",
+    "defaultStatusAfterCurrent": "BLOCKED",
+    "dependencyRule": "each ARC1-N depends on ARC1-(N-1) being DONE"
+  },
+  "budgets": {
+    "maxConcurrentExecutors": 1,
+    "maxEvaluators": 1,
+    "maxAutomaticReviewRounds": 2,
+    "thirdRoundRequiresApproval": true,
+    "meshyCredits": 0,
+    "paidGeneration": false
+  },
+  "prohibitedUntilAuthorized": [
+    "H3 implementation",
+    "changes to src/jugar/**",
+    "Meshy",
+    "paid generation",
+    "mass asset production",
+    "runtime migration"
+  ]
+}

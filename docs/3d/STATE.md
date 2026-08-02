@@ -8,6 +8,14 @@
 
 ## Cierre H1+H2 Ohmdal HD-2D — 2026-08-02
 
+- La investigación de producción desde fuentes oficiales y la auditoría del pipeline quedaron en
+  `docs/ohmdal-biblia/15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md`. El Arco I se desglosó en Jira serie
+  en `16_ARC1_JIRA_BACKLOG.md`: WIP global uno, sucesor bloqueado hasta `DONE` y sin autorización
+  implícita de H3.
+- El control draft `docs/agent-runs/ohmdal-arc1-serial-v1/tasks.json` tiene
+  `executionAuthorized: false`. `ARC1-001` espera aprobación humana de cámara; `ARC1-002`–`062`
+  permanecen bloqueados.
+
 - La corrección post-H2 `CAM-FIX-001` quedó implementada y verificada automáticamente: la
   proyección usa el aspect ratio real sin deformar, y el seguimiento jugable incorpora una zona
   muerta antes de mover el encuadre. Hay evidencia 1440×900, 900×900 y 390×844 con consola limpia.
@@ -100,7 +108,7 @@ de 25–35 minutos. Antes de producir requiere `docs/agent-runs/<hito>/tasks.jso
 
 1. laboratorio Three.js aislado bajo `RuntimeHost`, sin alterar `/jugar`;
 2. overworld mínimo sólo para demostrar entrada a la región;
-3. diorama modular denso, cámara autoral y A/B de personajes 4/8 direcciones;
+3. diorama modular denso, cámara casi ortográfica, personajes de cuatro direcciones y Ohm sprite;
 4. diagnóstico guiado auténtico de Lumen y transferencia en la Puerta;
 5. validación educativa automatizada, Playwright desktop/mobile, accesibilidad, navegadores
    recientes, consola, métricas reales y Android medio de 2022 a 30 fps;

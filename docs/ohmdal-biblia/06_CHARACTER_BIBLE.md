@@ -1,8 +1,8 @@
 # Biblia de personajes
 
 **Estado:** canon de reparto, función, voz y arco
-**Regla visual:** humanos en pixel art direccional; cuatro diseños del protagonista. Ohm puede
-usar volumen 3D procedural si el spike demuestra mejor integración.
+**Regla visual:** humanos en pixel art de cuatro direcciones; cuatro diseños del protagonista.
+Ohm usa sprite. Las alternativas de ocho direcciones y Ohm 3D quedan sólo como evidencia H2.
 
 ## Principios
 
@@ -45,7 +45,8 @@ evitan pronunciar el nombre escrito.
 
 Cuatro siluetas inequívocas con igual hitbox y alcance. Idle atento, caminar/correr moderado,
 agacharse a inspeccionar, usar instrumento, escribir/dibujar, sorpresa contenida y gesto de
-explicación. El contrato 4/8 direcciones se decide por spike; no generar atlas finales antes.
+explicación. H2 aprobó cuatro direcciones para el recorrido y las cámaras vigentes; un cambio exige
+nueva evidencia de que una acción obligatoria produce snaps, deslizamiento o pérdida de actuación.
 
 ## Ohm
 
@@ -74,10 +75,9 @@ registrada. Explicación todavía no». Las líneas técnicas permanecen subtitu
 
 ### Visual
 
-Hard-surface de escala pequeña, origen a nivel de suelo, lectura clara junto a sprites. Pecho o
-visor comunica estado por forma, ritmo, texto y sonido, nunca sólo color. Pivotes/sockets para
-sensor, brazos, tapa y emisor. Comparar 3D procedural contra sprite; elegir por integración en
-cámara, no por novedad.
+Autómata pequeño resuelto como sprite, con pivote de suelo y lectura clara junto al reparto. Pecho
+o visor comunica estado por forma, ritmo, texto y sonido, nunca sólo color. El atlas conserva
+puntos lógicos para sensor, brazos, tapa y emisor. H2 descartó el procedural 3D del runtime activo.
 
 ## Edda
 

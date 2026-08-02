@@ -10,8 +10,8 @@ es una categoría de calidad ni una autorización implícita.
 |---|---|---|---|
 | Arquitectura y kits | Blender modular/procedural | `img2threejs` con medidas | planta, escala, cámara y sockets |
 | Puertas/mecanismos | procedural/`img2threejs` | CAD si hay función física | estados, pivotes, collider y animación |
-| Ohm | procedural 3D A/B sprite | impostor/sprite | cámara real, contacto, actuación y coste |
-| Humanos | pixel art direccional | impostor sólo como prueba | silueta, atlas 4/8, pivote de pies y escala |
+| Ohm | sprite aprobado en H2 | procedural 3D sólo como evidencia archivada | cámara real, contacto, actuación y coste |
+| Humanos | pixel art de 4 direcciones | 8 direcciones sólo con nueva evidencia | silueta, pivote de pies y escala |
 | Props repetidos | módulos/instancing | asset importado con licencia | densidad y draw calls |
 | Orgánico hero | Meshy con aprobación | modelado manual | referencia legal, presupuesto y preview |
 | Vegetación | procedural/atlas/instancing | modelos importados | silueta, alpha overdraw y densidad |
@@ -82,8 +82,8 @@ Un asset sin dato conserva `planned`; no se inventa un valor para pasarlo de est
 
 1. Hoja de escala/silueta de los cuatro estudiantes y reparto.
 2. Paleta y accesorios que no dependan sólo del color.
-3. Análisis de footage oficial para orientación observable.
-4. A/B 4/8 direcciones con el mismo personaje, recorrido y cámaras.
+3. Usar la orientación de cuatro direcciones aprobada en H2.
+4. Reabrir A/B 4/8 sólo si una acción o cámara obligatoria nueva falla de forma observable.
 5. Idle/walk antes de actuación adicional.
 6. Pivote de pies, padding, atlas, naming, frame timing y versión.
 7. Prueba de billboard, profundidad, oclusión, sombra/contacto y luz.
@@ -95,9 +95,9 @@ No generar seis apariencias: la decisión canónica es cuatro diseños completos
 
 ## Pipeline de Ohm
 
-Prueba A procedural 3D y prueba B sprite/impostor bajo cámara, escala y presupuesto idénticos.
-Puntuar lectura de instrumento, actuación, integración, editabilidad, pivotes, draw calls y memoria.
-La variante perdedora se archiva como evidencia; no quedan dos runtimes activos.
+Usar el sprite aprobado en H2 y medir lectura de instrumento, actuación, integración, editabilidad,
+pivotes, draw calls y memoria. La variante procedural 3D perdedora queda archivada; no hay dos
+runtimes activos.
 
 ## Uso de IA/Meshy
 

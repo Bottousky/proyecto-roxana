@@ -20,10 +20,14 @@ históricas.
 2. [`plan-plataforma-cinco-juegos.md`](plan-plataforma-cinco-juegos.md) — arquitectura y orden
    de implementación de la plataforma multiruntime.
 3. [`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md) — autoridad canónica de
-   Ohmdal, dependencias y estado de los quince documentos.
-4. [`diseno-sintesis-v1.md`](diseno-sintesis-v1.md) — loop, tono y reglas pedagógicas comunes.
-5. [`guia-puzzles.md`](guia-puzzles.md) — canon para diseñar y auditar puzzles.
-6. [`estandar-implementacion.md`](estandar-implementacion.md) — gate de implementación.
+   Ohmdal, dependencias y estado del paquete documental.
+4. [`ohmdal-biblia/15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md`](ohmdal-biblia/15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md)
+   — investigación primaria del remake y auditoría de aplicación/pipeline.
+5. [`ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md`](ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md) — backlog
+   serie de La Luz, WIP uno y gates de `DONE`.
+6. [`diseno-sintesis-v1.md`](diseno-sintesis-v1.md) — loop, tono y reglas pedagógicas comunes.
+7. [`guia-puzzles.md`](guia-puzzles.md) — canon para diseñar y auditar puzzles.
+8. [`estandar-implementacion.md`](estandar-implementacion.md) — gate de implementación.
 
 Los planes `plan-arco-1-*`, la ruta anterior y las unidades implementadas son fuentes históricas y
 cantera de continuidad selectiva. Si contradicen la Biblia de Ohmdal, prevalece la Biblia; el

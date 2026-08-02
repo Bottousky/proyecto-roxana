@@ -5,6 +5,12 @@
   "executionAuthorized": false,
   "baseRef": null,
   "baseCommit": null,
+  "workflow": {
+    "mode": "parallel-independent",
+    "globalWipLimit": 3,
+    "directorOwnsTransitions": true,
+    "successorRequiresPredecessorDone": false
+  },
   "budgets": {
     "maxConcurrentExecutors": 3,
     "maxEvaluators": 1,

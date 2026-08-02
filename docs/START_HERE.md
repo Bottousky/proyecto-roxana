@@ -114,16 +114,23 @@ resuelve por sí misma continuidad artística, diseño de interacción o producc
 Cada elemento se produce con la representación que mejor sirve a su lectura:
 
 - arquitectura, puertas, mecanismos y sockets: Blender modular o geometría procedural;
-- personajes humanos de Ohmdal: pixel art direccional integrado al 3D; la cantidad de direcciones
-  se decide con footage oficial y un spike 4/8, no por suposición;
-- Ohm y mecanismos hard-surface: procedural/`img2threejs` cuando pivotes y sockets lo exijan;
+- personajes humanos de Ohmdal: pixel art de cuatro direcciones integrado al 3D, selección H2;
+- Ohm: sprite aprobado en H2; mecanismos hard-surface usan procedural/`img2threejs` cuando
+  pivotes y sockets lo exijan;
 - retratos, páginas de Bitácora, iconos y fondos: ilustración 2D;
 - imágenes generadas: referencia o media 2D con procedencia, no falsa geometría 3D;
 - conceptos: fijan composición, silueta, paleta y materiales; la escena jugable se construye aparte.
 
 Ningún asset entra al runtime sin comprobarse con la cámara real, en desktop y mobile.
 
-## Próximo hito: vertical slice «La pregunta vuelve»
+## Próximo gate: cámara y contrato del vertical slice
+
+La corrección de cámara está implementada y espera aprobación visual humana en `ARC1-001`.
+`ARC1-002`–`ARC1-062` permanecen bloqueados y el control draft conserva
+`executionAuthorized: false`. El backlog serie está en
+[`ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md`](ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md).
+
+Después de ese gate, el próximo hito propuesto es el vertical slice «La pregunta vuelve».
 
 Antes de migrar el Arco I hay que demostrar el lenguaje HD-2D en un laboratorio Three.js aislado
 de 25–35 minutos: Portal, Plaza, encuentro regional con Edda, despertar de Ohm, Taller de Lumen,
@@ -169,7 +176,8 @@ cierre. Termina con evidencia en el navegador real. No se dejan agentes iterando
 sin un entregable intermedio verificable.
 
 La producción multiagente sólo se habilita cuando el contrato del hito fija commit base,
-ownership, presupuesto y `executionAuthorized: true`.
+ownership, presupuesto y `executionAuthorized: true`. Para Arco I rige WIP global uno: una tarea
+sucesora no comienza hasta que la anterior esté `DONE`.
 
 ## Referencias externas verificadas
 

@@ -1,6 +1,6 @@
 # Biblia de dirección visual
 
-**Estado:** canon visual; hipótesis técnicas requieren evidencia del slice
+**Estado:** canon visual; H2 seleccionó cámara casi ortográfica, cuatro direcciones y Ohm sprite
 **Quality bar permanente:** DRAGON QUEST III HD-2D REMAKE — igual coherencia y pulido en menor
 escala, identidad propia y cero copia de propiedad intelectual.
 
@@ -42,8 +42,8 @@ historia, escala o interacción.
 
 ## Cámara
 
-- `PerspectiveCamera` suave o lente larga que se aproxime a una proyección ortográfica; la
-  elección final se realiza por captura A/B.
+- Cámara casi ortográfica promovida por H2; conserva el aspect ratio real y usa reencuadre
+  específico desktop/mobile. La perspectiva suave queda archivada como evidencia.
 - Encuadres autorales por volúmenes con transiciones suaves; sin rotación libre.
 - Zoom limitado y accesible, sin revelar reversos no producidos.
 - Oclusores de foreground se desvanecen o recortan; techos se gestionan por habitación.
@@ -64,22 +64,16 @@ historia, escala o interacción.
 
 ### Direcciones
 
-No se fija «ocho» por ritual. Antes de producir atlas:
-
-1. analizar footage oficial de la referencia en exterior, interior, diagonales, escaleras y giro;
-2. registrar ángulos/cambios observables sin extraer assets;
-3. montar el mismo recorrido con atlas de 4 y 8 direcciones;
-4. probar todas las cámaras del slice, desktop y mobile;
-5. elegir el mínimo sin snaps visibles, deslizamiento lateral falso ni pérdida de actuación.
-
-Si cuatro pasa todos los encuadres, se descartan ocho. Si falla uno obligatorio, se adoptan ocho
-para protagonistas; usar menos en NPC exige que la inconsistencia no sea visible en su cámara.
+H2 comparó cuatro y ocho direcciones con recorrido y cámaras equivalentes. Se promueven **cuatro**:
+la variante de ocho no aportó una diferencia observable que justificara su coste. El atlas final
+sólo se amplía si una cámara o acción obligatoria nueva demuestra snaps, deslizamiento lateral
+falso o pérdida de actuación; no se reabre por preferencia.
 
 ## Ohm
 
-Comparar sprite/impostor con modelo procedural 3D. El 3D es preferible sólo si mejora lectura de
-sensor, pivotes, brazos, tapa, contacto y luz sin romper el contraste HD-2D. Debe comunicar estado
-por forma, animación, texto y sonido; color no basta.
+H2 promueve **sprite**. El procedural 3D permanece archivado y no convive en el runtime activo.
+Ohm comunica sensor, brazos, tapa, contacto y estado por forma, animación, texto y sonido; color
+no basta.
 
 ## Arquitectura y kits
 

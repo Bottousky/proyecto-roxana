@@ -37,8 +37,7 @@ debe demostrar viaje, landmark y transición; no se produce el mapa de Ohmdal.
   el manifest declara la deuda de variantes.
 - Edda: aliada regional en dos o tres cruces, no compañera permanente.
 - Lumen: sprite/híbrido con ritual de taller y cambio de actitud.
-- Ohm: compañero permanente y autómata consciente; comparar objeto 3D procedural con sprite bajo
-  cámara/presupuesto idénticos.
+- Ohm: compañero permanente y autómata consciente, representado como sprite según H2.
 - Dos o tres habitantes de fondo reutilizables para probar escala y vida comunitaria.
 
 ### Sistemas incluidos
@@ -131,14 +130,13 @@ La elección de runtime final exige ADR después de la comparación. El slice no
 
 ### Direcciones de sprites
 
-Analizar footage oficial y ejecutar A/B 4/8 direcciones con recorrido/cámaras idénticos. Elegir el
-mínimo que no produzca snaps, deslizamiento o pérdida de actuación. No producir atlas masivos
-antes del veredicto.
+Usar cuatro direcciones, selección promovida por H2. Ocho direcciones permanece como evidencia
+archivada y sólo se reconsidera si una acción o cámara obligatoria nueva falla de forma observable.
 
 ## Cámara
 
-- Perspectiva suave o proyección casi ortográfica: el spike selecciona la variante que mantenga
-  legibilidad, escala y continuidad en todas las capturas aprobadas.
+- Proyección casi ortográfica promovida por H2, aspect ratio real y encuadres específicos por
+  formato. La perspectiva suave no permanece como variante activa.
 - Dos o tres encuadres autorales conectados por volúmenes; no rotación libre.
 - Zoom limitado para lectura y accesibilidad.
 - Ocultamiento/fade de foreground y techos.

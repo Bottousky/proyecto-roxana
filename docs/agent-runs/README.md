@@ -2,9 +2,10 @@
 
 ## Hito activo
 
-- [`ohmdal-hd2d-preprod-v1/`](ohmdal-hd2d-preprod-v1/brief.md): H1+H2 autorizados para cerrar
-  fichas educativas V2, blockout Portal–Manantial, cámara y comparativas 4/8 y Ohm. No autoriza
-  el vertical slice H3, migrar `/jugar`, Meshy ni producción masiva.
+- [`ohmdal-hd2d-preprod-v1/`](ohmdal-hd2d-preprod-v1/final-report.md): H1+H2 cerrados de forma
+  condicional; `CAM-FIX-001` espera aprobación visual humana.
+- [`ohmdal-arc1-serial-v1/`](ohmdal-arc1-serial-v1/status.md): backlog serie preparado con WIP 1
+  y `executionAuthorized: false`. No autoriza H3, migrar `/jugar`, Meshy ni producción masiva.
 
 Los contratos son independientes de la interfaz de orquestación. OpenCode puede dirigirlos si
 respeta el mismo `baseCommit`, los worktrees/ramas por rol, el ownership exclusivo y la secuencia
@@ -52,6 +53,13 @@ Cada directorio `docs/agent-runs/<hito>/` contiene:
 
 Copiar `_template/` para un hito nuevo. No marcar `executionAuthorized: true` hasta que el
 Director y el usuario aprueben brief, contrato visual, ownership y presupuesto.
+
+### Workflow serie
+
+Un hito puede declarar `workflow.mode: strict-serial`. En ese modo `globalWipLimit` es uno, sólo
+el Director cambia estados y una tarea sucesora permanece bloqueada hasta que la anterior esté
+`DONE`. `CONDITIONAL`, `HUMAN_REVIEW`, `implemented` y `not-run` no equivalen a `DONE`. Los
+paquetes internos de 30–90 minutos atienden únicamente el ticket activo.
 
 ## Protocolo
 

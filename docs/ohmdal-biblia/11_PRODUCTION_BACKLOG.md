@@ -1,8 +1,11 @@
 # Backlog de producción y autorización
 
-**Estado:** backlog canónico; H1+H2 autorizados, H3 bloqueado
+**Estado:** H1+H2 completados condicionalmente; H3 bloqueado; Arco I usa Jira serie
 **Regla:** los ítems de producción permanecen bloqueados hasta crear un hito con
 `executionAuthorized: true`. El spike Phaser existente no se retargetea silenciosamente.
+
+El desglose ejecutable de La Luz está en `16_ARC1_JIRA_BACKLOG.md`: WIP global uno y dependencia
+dura entre `ARC1-001` y `ARC1-062`.
 
 ## Estados
 
@@ -25,7 +28,7 @@
 
 ## H1 — Fichas educativas del slice
 
-**Estado global:** `AUTHORIZED` en `docs/agent-runs/ohmdal-hd2d-preprod-v1/`
+**Estado global:** `DONE` en `docs/agent-runs/ohmdal-hd2d-preprod-v1/`
 **Owner futuro:** Director educativo/agente auditor; sin assets.
 
 | ID | Entregable | Dependencia | Criterio de cierre |
@@ -43,25 +46,25 @@ desde este documento.
 
 ## H2 — Spike visual preparatorio
 
-**Estado global:** `AUTHORIZED` en `docs/agent-runs/ohmdal-hd2d-preprod-v1/`
+**Estado global:** `DONE-CONDITIONAL` en `docs/agent-runs/ohmdal-hd2d-preprod-v1/`
 **Objetivo:** reducir incertidumbre antes de construir el slice completo.
 
-| ID | Entregable | Gate |
-|---|---|---|
-| H2.1 | Brief y visual contract | Quality bar, cámara, referencia, exclusiones de IP |
-| H2.2 | Análisis footage oficial | Matriz de orientación/cámara sin extracción de assets |
-| H2.3 | A/B sprites 4/8 | Mismo recorrido; veredicto por snaps, actuación y coste |
-| H2.4 | A/B Ohm sprite/3D | Mismo presupuesto y cámara; una variante descartada |
-| H2.5 | Blockout Portal–Manantial | Metros, maniquí 1,72 m, navegación y cámara mobile |
-| H2.6 | Prueba PWA/carga | Campaña descargable, offline y actualización recuperable |
-| H2.7 | Presupuesto medido | `renderer.info`, peso, frame time y Android medio 2022 |
+| ID | Estado | Entregable | Gate |
+|---|---|---|---|
+| H2.1 | DONE | Brief y visual contract | Quality bar, cámara, referencia, exclusiones de IP |
+| H2.2 | DONE | Análisis footage oficial | Matriz de orientación/cámara sin extracción de assets |
+| H2.3 | DONE | A/B sprites 4/8 | Se promovieron cuatro direcciones |
+| H2.4 | DONE | A/B Ohm sprite/3D | Se promovió sprite; procedural archivado |
+| H2.5 | DONE | Blockout Portal–Manantial | Metros, maniquí 1,72 m, navegación y cámara mobile |
+| H2.6 | NOT-RUN | Prueba PWA/carga | Se trasladó al slice; no declarar offline probado |
+| H2.7 | CONDITIONAL | Presupuesto medido | Desktop/mobile emulado medidos; Android físico `not-run` |
 
 No se texturizan regiones ni se generan hero assets. H2 termina con `avanzar`, `corregir una vez`
 o `descartar`.
 
 ## H3 — Vertical slice «La pregunta vuelve»
 
-**Estado global:** `BLOCKED-SLICE` hasta aprobar H1/H2 y contratos multiagente.
+**Estado global:** `BLOCKED-HUMAN`; falta `ARC1-001 DONE` y un contrato H3 autorizado.
 
 ### Fronteras futuras
 

@@ -48,6 +48,8 @@ Etiquetas de autoridad:
 | `12_EXPANSIONS_AND_DLC.md` | Juego base, acceso y ampliaciones | Completo |
 | `13_OPEN_QUESTIONS_AND_DECISIONS.md` | Decisiones cerradas y riesgos verificables | Completo |
 | `14_GLOSSARY.md` | Vocabulario narrativo, pedagógico, eléctrico y productivo | Completo para preproducción |
+| `15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md` | Investigación primaria, principios aplicables y auditoría de pipeline | Completo |
+| `16_ARC1_JIRA_BACKLOG.md` | Jira serie del Arco I, WIP 1 y Definition of Done | Preparado; ejecución no autorizada |
 
 ## Dependencias y orden de aprobación
 
@@ -92,19 +94,21 @@ Una metáfora puede simplificar la entrada, pero nunca contradecir el modelo té
 
 Autoridad, conflicto, alcance educativo/comercial, territorio y slice quedaron decididos.
 
-### Fase 2 — activa y autorizada en alcance H1+H2
+### Fase 2 — completada con condición
 
 Instanciar fichas V0–V2 del slice y contratos de producción desde esta Biblia. Los agentes validan de forma autónoma
 fuentes, cálculos y tests; escalan contradicciones, seguridad o incertidumbre real.
 
-La autorización vive en `docs/agent-runs/ohmdal-hd2d-preprod-v1/tasks.json`, con base común
-`aaab28ad63abab8b177c152a9f3d39cb9c678dc5`. No se extiende a H3.
+La ejecución partió de `12d6f88d2a366da89ed91008013f42ba6295e42d` y cerró con veredicto
+`avanzar`: cámara casi ortográfica, estudiante de cuatro direcciones y Ohm sprite. Android físico
+medio 2022 permanece `not-run`, por lo que el cierre es condicional. No se extiende a H3.
 
-### Fase 3 — preproducción del slice completo, bloqueada por veredicto
+### Fase 3 — preproducción del slice completo, bloqueada por gate humano y autorización
 
-Desglosar el GDD y el guion canónicos en escenas, cámaras, navegación y contratos ejecutables.
-Cada puzzle debe declarar fenómeno, hipótesis, medición, consecuencia y transferencia. Este
-desglose no reabre decisiones de producto.
+El desglose ejecutable vive en `16_ARC1_JIRA_BACKLOG.md`. `ARC1-001` espera aprobación visual
+humana de la corrección de cámara y todas las tareas posteriores permanecen bloqueadas. Cada puzzle
+declara fenómeno, hipótesis, medición, consecuencia y transferencia. El desglose no reabre
+decisiones de producto ni autoriza producción.
 
 ### Fase 4 — prueba visual y técnica
 
@@ -120,4 +124,5 @@ No se autoriza Meshy ni producción masiva desde este paquete.
 
 Las decisiones de producto están cerradas. Abrir ejecución exige `brief.md`, `visual-contract.md`,
 `tasks.json` con `executionAuthorized: true`, `baseCommit`, ownership exclusivo, presupuesto y
-criterios de cierre. La base estable conserva prioridad hasta el ADR de migración.
+criterios de cierre. Para Arco I rige WIP global uno: ningún sucesor comienza hasta que el anterior
+esté `DONE`. La base estable conserva prioridad hasta el ADR de migración.
