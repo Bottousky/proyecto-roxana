@@ -1,20 +1,22 @@
 {
   "version": 1,
   "milestone": "ohmdal-hd2d-preprod-v1",
-  "status": "measured-with-physical-android-pending",
-  "integratedCommit": "64e0b92651d5d1d36e6156f7b91fbb8729ad0b57",
+  "status": "round-02-measured-with-physical-android-pending",
+  "integratedCommit": "fd38f292ef93e9fc0f891e1cf1eedec6ecc35afc",
+  "reviewRound": 2,
   "measuredAt": "2026-08-02",
   "captureState": {
     "seed": "ohmdal-hd2d-preprod-v1",
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "route": "Portal-Plaza-Taller-Puerta-Manantial",
-    "desktopRepresentativeState": "Taller; quasi-orthographic; 8 directions; Ohm sprite; twilight; reduced motion; diagnosis documented",
-    "mobileRepresentativeState": "Puerta-Manantial; quasi-orthographic; 4 directions; Ohm sprite; afternoon; reduced motion"
+    "desktopRepresentativeState": "Taller; quasi-orthographic; 4 directions; Ohm sprite; afternoon; diagnosis documented",
+    "mobileRepresentativeState": "Taller; quasi-orthographic; 4 directions; Ohm sprite; afternoon; reduced motion; diagnosis unlocked",
+    "activePipeline": "quasi-orthographic + 4 directions + Ohm sprite"
   },
   "method": {
     "browserAutomation": "Playwright CLI",
-    "frameTiming": "180 consecutive requestAnimationFrame deltas; mean, p50 and p95 reported",
+    "frameTiming": "120 consecutive requestAnimationFrame deltas; round-02 regression smoke; mean, p50 and p95 reported",
     "rendererMetrics": "window.render_game_to_text backed by THREE.WebGLRenderer.info after a rendered frame",
     "transferCaveat": "Vite development server reused cache and the lab is not a production build entry; transferredBytes is null"
   },
@@ -24,11 +26,11 @@
     "frameTimeMs": 16.6667,
     "frameTimeP50Ms": 16.7,
     "frameTimeP95Ms": 16.8,
-    "frameSamples": 180,
-    "drawCalls": 15,
-    "triangles": 200,
+    "frameSamples": 120,
+    "drawCalls": 17,
+    "triangles": 412,
     "geometries": 28,
-    "textures": 4,
+    "textures": 3,
     "devicePixelRatio": 1,
     "rendererPixelRatio": 1,
     "transferredBytes": null,
@@ -37,15 +39,15 @@
   },
   "mobileEmulation": {
     "browser": "Chrome 151.0.7922.10; Playwright generic mobile Pixel 10; Android 16 emulation",
-    "fps": 59.998,
-    "frameTimeMs": 16.6672,
+    "fps": 59.994,
+    "frameTimeMs": 16.6683,
     "frameTimeP50Ms": 16.7,
     "frameTimeP95Ms": 16.8,
-    "frameSamples": 180,
-    "drawCalls": 11,
-    "triangles": 162,
-    "geometries": 19,
-    "textures": 2,
+    "frameSamples": 120,
+    "drawCalls": 18,
+    "triangles": 388,
+    "geometries": 28,
+    "textures": 3,
     "devicePixelRatio": 3,
     "rendererPixelRatio": 1.5,
     "transferredBytes": null,
@@ -54,7 +56,7 @@
     "touchTest": {
       "method": "CDP Input.dispatchTouchEvent with a 700ms active touch on Mover hacia arriba",
       "startX": -18,
-      "endX": -16.5666,
+      "endX": -16.5336,
       "result": "pass"
     }
   },
@@ -66,39 +68,14 @@
     "result": "not-run"
   },
   "devResourceObservation": {
-    "resourceCount": 19,
-    "encodedBodyBytes": 2105763,
+    "resourceCount": null,
+    "encodedBodyBytes": null,
     "transferSizeBytes": null,
-    "note": "encoded body sizes are reproducible development-resource observations, not a production payload claim"
+    "note": "not repeated in round 2; cached round-01 values are not promoted to the corrected commit"
   },
-  "largestAssets": [
-    {
-      "path": "/node_modules/.vite/deps/chunk-QUPN4MTR.js",
-      "encodedBodyBytes": 1604330,
-      "basis": "PerformanceResourceTiming on Vite dev server"
-    },
-    {
-      "path": "/@vite/client",
-      "encodedBodyBytes": 182615,
-      "basis": "PerformanceResourceTiming on Vite dev server"
-    },
-    {
-      "path": "/node_modules/.vite/deps/three.js",
-      "encodedBodyBytes": 62828,
-      "basis": "PerformanceResourceTiming on Vite dev server"
-    },
-    {
-      "path": "/src/labs/ohmdal-hd2d-preprod/main.ts",
-      "encodedBodyBytes": 39346,
-      "basis": "PerformanceResourceTiming on Vite dev server"
-    },
-    {
-      "path": "/src/labs/ohmdal-hd2d-preprod/architecture/levelData.ts",
-      "encodedBodyBytes": 27570,
-      "basis": "PerformanceResourceTiming on Vite dev server"
-    }
-  ],
+  "largestAssets": [],
   "variantObservations": {
+    "status": "historical-round-01-selection-evidence; inactive in round 02",
     "cameraSameScene": {
       "quasiOrthographic": {
         "drawCalls": 15,
@@ -126,9 +103,26 @@
       "ohmProceduralMjs": 3392
     }
   },
+  "round02FinalState": {
+    "desktopC3": {
+      "drawCalls": 13,
+      "triangles": 186,
+      "geometries": 28,
+      "textures": 3,
+      "blockedIds": []
+    },
+    "mobileC3": {
+      "drawCalls": 13,
+      "triangles": 222,
+      "geometries": 28,
+      "textures": 3,
+      "blockedIds": []
+    }
+  },
   "evidence": [
-    "C:/Users/manue/AppData/Local/Temp/roxana-eval-001/desktop-turn135-qortho-8-sprite-twilight-rm.png",
-    "C:/Users/manue/AppData/Local/Temp/roxana-eval-001/mobile-manantial-qortho-4-sprite-afternoon-reduced.png",
-    "docs/agent-runs/ohmdal-hd2d-preprod-v1/review-round-01.md"
+    "C:/Users/manue/AppData/Local/Temp/roxana-eval-001-r2/desktop-taller-lumen-ohm.png",
+    "C:/Users/manue/AppData/Local/Temp/roxana-eval-001-r2/desktop-manantial-final-afternoon.png",
+    "C:/Users/manue/AppData/Local/Temp/roxana-eval-001-r2/mobile-manantial-final-reduced.png",
+    "docs/agent-runs/ohmdal-hd2d-preprod-v1/review-round-02.md"
   ]
 }
