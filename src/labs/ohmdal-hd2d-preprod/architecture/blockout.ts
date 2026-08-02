@@ -163,8 +163,11 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
     );
     mesh.name = `${definition.id}__mesh`;
     mesh.position.y = baseY + definition.height / 2;
-    if (definition.id === 'workshop-roof-low') mesh.rotation.z = -0.12;
-    if (definition.id === 'workshop-roof-high') mesh.rotation.z = 0.12;
+    mesh.rotation.set(
+      definition.rotationX ?? 0,
+      definition.rotationY ?? 0,
+      definition.rotationZ ?? 0,
+    );
     mesh.castShadow = !definition.tags.includes('floor');
     mesh.receiveShadow = true;
     moduleRoot.add(mesh);

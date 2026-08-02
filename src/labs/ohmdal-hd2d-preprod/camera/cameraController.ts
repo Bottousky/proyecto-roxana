@@ -103,7 +103,10 @@ export class AuthorCameraController {
     const anchor = CAMERA_ANCHORS[this.anchorId];
     const span = verticalSpan(anchor, VIEWPORT_PROFILES[this.viewportId], this.zoomFactor);
     const distance = cameraDistanceForSpan(span);
-    this.desiredPosition.copy(this.desiredTarget).addScaledVector(CAMERA_VIEW_OFFSET, distance);
+    const viewOffset = this.variant === 'quasi-orthographic'
+      ? anchor.quasiOrthographicViewOffset ?? CAMERA_VIEW_OFFSET
+      : CAMERA_VIEW_OFFSET;
+    this.desiredPosition.copy(this.desiredTarget).addScaledVector(viewOffset, distance);
     if (this.camera instanceof THREE.OrthographicCamera) {
       const aspect = VIEWPORT_PROFILES[this.viewportId].width / VIEWPORT_PROFILES[this.viewportId].height;
       this.camera.left = -span * aspect / 2;

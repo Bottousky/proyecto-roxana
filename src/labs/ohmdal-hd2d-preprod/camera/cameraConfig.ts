@@ -15,6 +15,7 @@ export interface AuthorCameraAnchor {
   readonly id: CameraAnchorId;
   readonly focus: Readonly<THREE.Vector3>;
   readonly forward: Readonly<THREE.Vector3>;
+  readonly quasiOrthographicViewOffset?: Readonly<THREE.Vector3>;
   readonly targetBounds: NamedLocalBounds;
   readonly protectedSubjects: readonly string[];
   readonly verticalSpan: Readonly<Record<'desktop' | 'mobile', number>>;
@@ -61,11 +62,33 @@ export const VIEW_OFFSET_COMPONENTS = Object.freeze({
   up: 0.78,
 });
 
-export const CAMERA_VIEW_OFFSET = CAMERA_FORWARD.clone()
-  .multiplyScalar(VIEW_OFFSET_COMPONENTS.backward)
-  .addScaledVector(CAMERA_RIGHT, VIEW_OFFSET_COMPONENTS.right)
-  .addScaledVector(CAMERA_UP, VIEW_OFFSET_COMPONENTS.up)
-  .normalize();
+export interface ViewOffsetComponents {
+  readonly backward: number;
+  readonly right: number;
+  readonly up: number;
+}
+
+export function viewOffsetFromComponents(components: ViewOffsetComponents): THREE.Vector3 {
+  return CAMERA_FORWARD.clone()
+    .multiplyScalar(components.backward)
+    .addScaledVector(CAMERA_RIGHT, components.right)
+    .addScaledVector(CAMERA_UP, components.up)
+    .normalize();
+}
+
+export const CAMERA_VIEW_OFFSET = viewOffsetFromComponents(VIEW_OFFSET_COMPONENTS);
+
+// C3 casi ortografica reduce el componente lateral que alineaba pilar sur y estudiante.
+// La perspectiva suave permanece congelada con CAMERA_VIEW_OFFSET.
+export const C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS = Object.freeze({
+  backward: -0.70,
+  right: 0.24,
+  up: 0.78,
+});
+
+export const C3_QUASI_ORTHOGRAPHIC_VIEW_OFFSET = viewOffsetFromComponents(
+  C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS,
+);
 
 function point(id: Parameters<typeof routeAnchor>[0]): THREE.Vector3 {
   const { position } = routeAnchor(id);
@@ -98,19 +121,20 @@ export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>
       forward: { min: -2, max: 2 },
       vertical: { min: 0.9, max: 1.6 },
     },
-    protectedSubjects: ['player-feet', 'player-head', 'taller-measure', 'taller-response'],
+    protectedSubjects: ['player-feet', 'player-head', 'lumen-head', 'ohm-head', 'taller-measure', 'taller-response'],
     verticalSpan: { desktop: 9, mobile: 14.5 },
   },
   C3_DOOR_SPRING: {
     id: 'C3_DOOR_SPRING',
     focus: lerpRoute('R8_DOOR_MEASURE', 'R9_SPRING_EDGE', 0.45).add(new THREE.Vector3(0, 1, 0)),
     forward: CAMERA_FORWARD,
+    quasiOrthographicViewOffset: C3_QUASI_ORTHOGRAPHIC_VIEW_OFFSET,
     targetBounds: {
       right: { min: -3, max: 3 },
       forward: { min: -2.5, max: 3 },
       vertical: { min: 0.8, max: 1.8 },
     },
-    protectedSubjects: ['player-feet', 'player-head', 'door-measure', 'spring-consequence'],
+    protectedSubjects: ['player-feet', 'player-head', 'ohm-head', 'door-measure', 'spring-consequence'],
     verticalSpan: { desktop: 12, mobile: 18 },
   },
 };

@@ -67,6 +67,9 @@ export interface BoxModuleDefinition {
   readonly height: number;
   readonly depth: number;
   readonly baseY?: number;
+  readonly rotationX?: number;
+  readonly rotationY?: number;
+  readonly rotationZ?: number;
   readonly pivotY: typeof GAMEPLAY_PLANE_Y;
   readonly tags: readonly ('floor' | 'structure' | 'landmark' | 'cameraOccluder' | 'cameraRoof' | 'emitter')[];
 }
@@ -142,35 +145,35 @@ export const BOX_MODULES: readonly BoxModuleDefinition[] = [
   { id: 'workshop-floor', zoneId: 'taller', family: 'wood', centerX: 2, centerZ: -0.25, width: 13, height: 0.09, depth: 9.5, pivotY: 0, tags: ['floor'] },
   { id: 'door-floor', zoneId: 'puerta_manantial', family: 'stone', centerX: 14.25, centerZ: 0.25, width: 12.5, height: 0.08, depth: 10.5, pivotY: 0, tags: ['floor'] },
 
-  { id: 'portal-pier-north', zoneId: 'portal_plaza', family: 'stone', centerX: -19, centerZ: -3, width: 1.5, height: 4.8, depth: 1.5, pivotY: 0, tags: ['structure', 'landmark'] },
-  { id: 'portal-pier-south', zoneId: 'portal_plaza', family: 'stone', centerX: -19, centerZ: 3, width: 1.5, height: 4.8, depth: 1.5, pivotY: 0, tags: ['structure', 'landmark'] },
-  { id: 'portal-arch', zoneId: 'portal_plaza', family: 'copper', centerX: -19, centerZ: 0, width: 1, height: 0.65, depth: 4.6, baseY: 4.15, pivotY: 0, tags: ['structure', 'landmark'] },
+  { id: 'portal-pier-north', zoneId: 'portal_plaza', family: 'stone', centerX: -19, centerZ: -3, width: 1.8, height: 5.2, depth: 1.8, pivotY: 0, tags: ['structure', 'landmark'] },
+  { id: 'portal-pier-south', zoneId: 'portal_plaza', family: 'stone', centerX: -19, centerZ: 3, width: 1.2, height: 3.6, depth: 1.2, pivotY: 0, tags: ['structure', 'landmark'] },
+  { id: 'portal-arch', zoneId: 'portal_plaza', family: 'copper', centerX: -19, centerZ: -0.8, width: 1, height: 0.55, depth: 4.1, baseY: 4.45, rotationX: -0.12, pivotY: 0, tags: ['structure', 'landmark'] },
   { id: 'plaza-wayfinder', zoneId: 'portal_plaza', family: 'copper', centerX: -9.5, centerZ: 3.8, width: 0.8, height: 3.2, depth: 0.8, pivotY: 0, tags: ['structure'] },
 
-  { id: 'workshop-wall-back', zoneId: 'taller', family: 'wood', centerX: 2, centerZ: -4.55, width: 12, height: 3.8, depth: 0.35, pivotY: 0, tags: ['structure'] },
-  { id: 'workshop-wall-front-west', zoneId: 'taller', family: 'wood', centerX: -1.75, centerZ: 4.05, width: 4.5, height: 3.3, depth: 0.3, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
-  { id: 'workshop-wall-front-east', zoneId: 'taller', family: 'wood', centerX: 6.25, centerZ: 4.05, width: 3.5, height: 3.3, depth: 0.3, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
-  { id: 'workshop-roof-low', zoneId: 'taller', family: 'wood', centerX: 0, centerZ: -1.2, width: 5.8, height: 0.35, depth: 6.4, baseY: 3.3, pivotY: 0, tags: ['structure', 'landmark', 'cameraRoof'] },
-  { id: 'workshop-roof-high', zoneId: 'taller', family: 'wood', centerX: 5.2, centerZ: -1.2, width: 4.4, height: 0.35, depth: 6.4, baseY: 4.15, pivotY: 0, tags: ['structure', 'landmark', 'cameraRoof'] },
+  { id: 'workshop-wall-back', zoneId: 'taller', family: 'wood', centerX: 2, centerZ: -4.55, width: 12, height: 3, depth: 0.35, pivotY: 0, tags: ['structure'] },
+  { id: 'workshop-wall-front-west', zoneId: 'taller', family: 'wood', centerX: -2.3, centerZ: 4.05, width: 3, height: 2.6, depth: 0.3, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
+  { id: 'workshop-wall-front-east', zoneId: 'taller', family: 'wood', centerX: 7, centerZ: 4.05, width: 2, height: 2.6, depth: 0.3, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
+  { id: 'workshop-roof-low', zoneId: 'taller', family: 'wood', centerX: -0.6, centerZ: -1.4, width: 3.8, height: 0.28, depth: 4.6, baseY: 3.15, rotationZ: -0.16, pivotY: 0, tags: ['structure', 'landmark', 'cameraRoof'] },
+  { id: 'workshop-roof-high', zoneId: 'taller', family: 'wood', centerX: 4.6, centerZ: -1.4, width: 3.2, height: 0.28, depth: 4.2, baseY: 3.7, rotationZ: 0.16, pivotY: 0, tags: ['structure', 'landmark', 'cameraRoof'] },
   { id: 'workshop-bench', zoneId: 'taller', family: 'wood', centerX: 4.8, centerZ: -2.5, width: 2.4, height: 0.9, depth: 0.9, pivotY: 0, tags: ['structure'] },
   { id: 'workshop-lantern-emitter', zoneId: 'taller', family: 'glass', centerX: 3.2, centerZ: -3.9, width: 0.3, height: 0.35, depth: 0.3, baseY: 2.55, pivotY: 0, tags: ['emitter'] },
 
-  { id: 'door-pier-north', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: -3, width: 1.4, height: 5.2, depth: 1.4, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
-  { id: 'door-pier-south', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: 3, width: 1.4, height: 5.2, depth: 1.4, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
-  { id: 'ohm-door-frame', zoneId: 'puerta_manantial', family: 'copper', centerX: 13, centerZ: 0, width: 0.9, height: 0.75, depth: 4.8, baseY: 4.45, pivotY: 0, tags: ['structure', 'landmark'] },
-  { id: 'door-conduit-emitter', zoneId: 'puerta_manantial', family: 'glass', centerX: 13.1, centerZ: 0, width: 0.25, height: 0.4, depth: 0.25, baseY: 4.65, pivotY: 0, tags: ['emitter'] },
+  { id: 'door-pier-north', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: -3, width: 0.9, height: 4.8, depth: 0.9, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
+  { id: 'door-pier-south', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: 4.5, width: 0.9, height: 3.2, depth: 0.9, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
+  { id: 'ohm-door-frame', zoneId: 'puerta_manantial', family: 'copper', centerX: 15, centerZ: -3, width: 4.2, height: 0.55, depth: 0.65, baseY: 4.25, pivotY: 0, tags: ['structure', 'landmark'] },
+  { id: 'door-conduit-emitter', zoneId: 'puerta_manantial', family: 'glass', centerX: 16.7, centerZ: -3, width: 0.25, height: 0.4, depth: 0.25, baseY: 4.3, pivotY: 0, tags: ['emitter'] },
   { id: 'spring-basin', zoneId: 'puerta_manantial', family: 'water', centerX: 18, centerZ: 1.5, width: 3, height: 0.25, depth: 3, pivotY: 0, tags: ['structure'] },
 ] as const;
 
 export const COLLIDERS: readonly ColliderDefinition[] = [
-  { id: 'C_PORTAL_NORTH', zoneId: 'portal_plaza', bounds: { minX: -19.75, maxX: -18.25, minZ: -3.75, maxZ: -2.25 }, height: 4.8, planeY: 0 },
-  { id: 'C_PORTAL_SOUTH', zoneId: 'portal_plaza', bounds: { minX: -19.75, maxX: -18.25, minZ: 2.25, maxZ: 3.75 }, height: 4.8, planeY: 0 },
-  { id: 'C_WALL_BACK', zoneId: 'taller', bounds: { minX: -4, maxX: 8, minZ: -4.75, maxZ: -4.35 }, height: 3.8, planeY: 0 },
-  { id: 'C_WALL_FRONT_WEST', zoneId: 'taller', bounds: { minX: -4, maxX: 0.5, minZ: 3.85, maxZ: 4.25 }, height: 3.3, planeY: 0 },
-  { id: 'C_WALL_FRONT_EAST', zoneId: 'taller', bounds: { minX: 4.5, maxX: 8, minZ: 3.85, maxZ: 4.25 }, height: 3.3, planeY: 0 },
+  { id: 'C_PORTAL_NORTH', zoneId: 'portal_plaza', bounds: { minX: -19.9, maxX: -18.1, minZ: -3.9, maxZ: -2.1 }, height: 5.2, planeY: 0 },
+  { id: 'C_PORTAL_SOUTH', zoneId: 'portal_plaza', bounds: { minX: -19.6, maxX: -18.4, minZ: 2.4, maxZ: 3.6 }, height: 3.6, planeY: 0 },
+  { id: 'C_WALL_BACK', zoneId: 'taller', bounds: { minX: -4, maxX: 8, minZ: -4.75, maxZ: -4.35 }, height: 3, planeY: 0 },
+  { id: 'C_WALL_FRONT_WEST', zoneId: 'taller', bounds: { minX: -3.8, maxX: -0.8, minZ: 3.9, maxZ: 4.2 }, height: 2.6, planeY: 0 },
+  { id: 'C_WALL_FRONT_EAST', zoneId: 'taller', bounds: { minX: 6, maxX: 8, minZ: 3.9, maxZ: 4.2 }, height: 2.6, planeY: 0 },
   { id: 'C_WORKBENCH', zoneId: 'taller', bounds: { minX: 3.6, maxX: 6, minZ: -2.95, maxZ: -2.05 }, height: 0.9, planeY: 0 },
-  { id: 'C_DOOR_NORTH', zoneId: 'puerta_manantial', bounds: { minX: 12.3, maxX: 13.7, minZ: -3.7, maxZ: -2.3 }, height: 5.2, planeY: 0 },
-  { id: 'C_DOOR_SOUTH', zoneId: 'puerta_manantial', bounds: { minX: 12.3, maxX: 13.7, minZ: 2.3, maxZ: 3.7 }, height: 5.2, planeY: 0 },
+  { id: 'C_DOOR_NORTH', zoneId: 'puerta_manantial', bounds: { minX: 12.55, maxX: 13.45, minZ: -3.45, maxZ: -2.55 }, height: 4.8, planeY: 0 },
+  { id: 'C_DOOR_SOUTH', zoneId: 'puerta_manantial', bounds: { minX: 12.55, maxX: 13.45, minZ: 4.05, maxZ: 4.95 }, height: 3.2, planeY: 0 },
   { id: 'C_SPRING_BASIN', zoneId: 'puerta_manantial', bounds: { minX: 17.35, maxX: 19.5, minZ: 0, maxZ: 3 }, height: 0.25, planeY: 0 },
 ] as const;
 
