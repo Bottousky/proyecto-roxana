@@ -14,8 +14,40 @@
 | CP-010 | 2026-08-02 | `ARC1-001` aprobado: la cámara corregida se acepta y el Arco I avanza | `ARC1-001` pasa a `DONE`; `ARC1-002` pasa a `READY` |
 | CP-011 | 2026-08-02 | La equivalencia con *DQ3 HD-2D Remake* queda abierta, no bloqueante | Se re-evalúa en `ARC1-024` y `ARC1-030`, con materiales y luz presentes; no se reabre `ARC1-001` |
 | CP-012 | 2026-08-02 | El layout/HUD mobile es deuda P2, no defecto de cámara | Se atiende en `ARC1-026`; no amplía el alcance de `ARC1-001` |
+| CP-013 | 2026-08-02 | **H3 autorizado** con `baseCommit = b49b617` | `executionAuthorized = true`; `ARC1-003` pasa a `READY` |
+| CP-014 | 2026-08-02 | Android físico diferido a `ARC1-060` (opción B) | Todo claim de rendimiento en Android físico es `not-run` hasta el QA de release |
 
-Una decisión nueva agrega `CP-013+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-015+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-013 — Autorización de H3
+
+**Motivo.** El usuario autorizó explícitamente el contrato `H3_CONTRACT.md` con las cuatro respuestas
+que el propio contrato exigía: base en `b49b617`, presupuesto de §5, ownership de §4 y opción B de
+Android.
+
+**Evidencia.** `H3_CONTRACT.md` §8 y `evidence/ARC1-002/authorization.md`. Precondición de doc. 15
+cumplida: `ARC1-001` quedó `DONE` en `b49b617` antes de autorizar.
+
+**Impacto.** `executionAuthorized` pasa a `true` y `baseCommit` se congela en `b49b617`. Habilita la
+cadena `ARC1-003` … `ARC1-035`. **No** levanta ninguna prohibición del §3: `src/jugar/**`, migración
+de runtime, Meshy, generación paga, dependencias nuevas, regiones fuera del slice y la IP de Dragon
+Quest siguen prohibidos.
+
+La autorización es de alcance, no de resultado. Cada ticket conserva sus gates, su evidencia y su
+aprobación humana cuando el cambio sea visible.
+
+## CP-014 — Android físico diferido
+
+**Motivo.** El informe final de H1/H2 condiciona H3 a medir en Android físico antes de reclamar
+30 fps. No hay dispositivo medio de 2022 en este entorno. El usuario eligió avanzar difiriendo la
+medición en vez de declarar un PASS emulado.
+
+**Evidencia.** `docs/agent-runs/ohmdal-hd2d-preprod-v1/final-report.md` líneas 20-22 y 84-85.
+
+**Impacto.** `ARC1-028` y `ARC1-029` miden desktop y mobile **emulado** únicamente. Ningún ticket
+puede declarar PASS de rendimiento en Android físico antes de `ARC1-060`; el que lo necesite lo
+declara `not-run` y continúa. Si aparece un dispositivo antes, se puede adelantar la medición sin
+cambiar esta decisión.
 
 ## CP-010 — Aprobación de `ARC1-001`
 

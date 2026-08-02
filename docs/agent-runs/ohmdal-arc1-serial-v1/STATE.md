@@ -2,49 +2,55 @@
 
 **Branch:** `codex/ohmdal-arc1-control-plane`
 **Workflow:** `STRICT-SERIAL`
-**WIP:** 1/1 (`ARC1-002`, redacción de contrato; sin ejecutor de implementación)
-**Ejecución autorizada:** no
-**Ticket activo:** `ARC1-002 — READY`
-**Anterior:** `ARC1-001 — DONE` (aprobado 2026-08-02)
-**Siguiente:** `ARC1-003 — BLOCKED`
+**WIP:** 1/1
+**Ejecución autorizada:** **sí** — H3 golden slice, `CP-013`, contrato en `H3_CONTRACT.md`
+**Base congelada:** `b49b617`
+**Ticket activo:** `ARC1-003 — READY`
+**Anteriores:** `ARC1-001 — DONE` (aprobado), `ARC1-002 — DONE` (autorizado)
+**Siguiente:** `ARC1-004 — BLOCKED`
 
 ## Estado real
 
-- `ARC1-001` cerrado con veredicto humano explícito: aprobar y avanzar (`CP-010`).
-- `CAM-FIX-001` queda aceptado: distorsión 0.0e+0 en cinco viewports, zona muerta que corrige
-  exactamente el excedente, un solo cambio de anclaje por cruce con jitter de ±0.30 m absorbido.
-- La equivalencia con *DQ3 HD-2D Remake* queda **abierta y no bloqueante** (`CP-011`). Se re-evalúa
-  en `ARC1-024` y `ARC1-030`, cuando existan materiales, luz, DOF y VFX.
-- El layout/HUD mobile es deuda P2 (`CP-012`), atendida en `ARC1-026`; no es defecto de cámara.
-- H1/H2 terminaron `completed-conditional` con veredicto `avanzar`.
-- Cámara promovida: casi ortográfica; estudiante: cuatro direcciones; Ohm: sprite.
-- Android físico medio 2022 y PWA/Safari continúan `not-run`; no se declaran PASS.
-- H3, `/jugar`, Meshy, generación paga y migración permanecen bloqueados: `ARC1-002` debe fijar base,
-  ownership, presupuesto y autorización humana propia antes de habilitar nada.
-- El archivo no rastreado `docs/agent-runs/ohmdal-arco1/diseno-bancos-ohm-lumen.md` pertenece al
-  usuario y está fuera del ownership de este control; no se modifica ni incorpora automáticamente.
+- `ARC1-001` cerrado con veredicto humano: aprobar y avanzar (`CP-010`). `CAM-FIX-001` aceptado.
+- `ARC1-002` cerrado: el usuario autorizó H3 con base `b49b617` (`CP-013`).
+- H3 cubre `ARC1-003` … `ARC1-035`: golden slice Portal → Plaza → Taller → Puerta → Manantial.
+- La autorización es de **alcance, no de resultado**. Cada ticket conserva sus gates, su evidencia y
+  su aprobación humana cuando el cambio sea visible.
+- La unidad de producción es la **escena causal completa**, no la región ni el lote de assets.
 
-## Condición de avance
+## Prohibiciones vigentes
 
-`ARC1-002` redacta el contrato de H3 pero **no lo autoriza**. `executionAuthorized` sigue en `false`
-y `baseCommit` en `null` hasta que el usuario apruebe explícitamente ese contrato. Recién entonces
-`ARC1-003` puede pasar a `READY`.
+`src/jugar/**`, migración de runtime o de save, Meshy, generación paga, producción masiva de assets,
+dependencias npm nuevas, regiones fuera del slice, `push`/`reset`/`rebase`/reescritura de historia,
+`docs/agent-runs/ohmdal-arco1/**` y copiar IP de Dragon Quest.
+
+## `not-run` declarados — nunca se presentan como PASS
+
+| Qué | Estado | Se resuelve en |
+|---|---|---|
+| Android físico medio 2022 | `not-run` (`CP-014`) | `ARC1-060` |
+| `npm run verify` | `not-run`, WSL sin distribución | sustituido por build + test + manifests + diff-check |
+| Safari / PWA / offline | `not-run` | `ARC1-027` y `ARC1-060` |
+
+Ningún ticket puede declarar PASS de rendimiento en Android físico antes de `ARC1-060`.
+
+## Preguntas abiertas, no bloqueantes
+
+- `CP-011` — equivalencia de cámara con *DQ3 HD-2D Remake*. Se re-evalúa en `ARC1-024` (con
+  materiales, luz, DOF y VFX) y `ARC1-030` (playtest). Si no sostiene la referencia, se abre ticket
+  de corrección propio; no se reabre `ARC1-001`.
+- `CP-012` — layout/HUD mobile: el panel superior recorta «Recorrido automático», la franja jugable
+  queda comprimida y el D-pad pisa el estado. Deuda P2 hacia `ARC1-026`.
 
 ## Última verificación
 
-Sobre `73fecae`, 2026-08-02:
+Sobre `b49b617`, 2026-08-02:
 
 - `npm run build`: PASS, `✓ built in 7.48s`.
 - `npm test`: PASS, `ℹ fail 0`.
 - `npm run 3d:validate-manifests`: PASS, 5 manifests.
 - `git diff --check`: PASS.
-- Harness en vivo en `http://localhost:5199/labs/ohmdal-hd2d-preprod/`: consola 0 errores/0 warnings;
-  `render_game_to_text()` reporta `quasi-orthographic`, `4 direcciones`, `Ohm sprite`, sin oclusores
-  bloqueados.
-- Medición determinista de cámara: registrada en `evidence/ARC1-001/metrics.json`.
+- Harness en vivo en `/labs/ohmdal-hd2d-preprod/`: consola 0 errores/0 warnings.
+- Medición determinista de cámara: `evidence/ARC1-001/metrics.json`.
 - `tasks.json`, `ownership.json` y `asset-manifest.json`: JSON válido.
 - Backlog machine-readable: 62 keys exactas, cadena serial completa.
-- `npm run verify`: **not-run**; `bash.exe` informa que WSL no tiene distribuciones instaladas. No se
-  declara PASS.
-- Captura en vivo del navegador: **not-run**; el panel no compone frames. Se usó la evidencia ya
-  versionada de `camera-correction/`.

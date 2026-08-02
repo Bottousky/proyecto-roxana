@@ -1,7 +1,7 @@
 {
-  "version": 1,
+  "version": 2,
   "milestone": "ohmdal-arc1-serial-v1",
-  "activeIssueKey": "ARC1-001",
+  "activeIssueKey": "ARC1-002",
   "collisionPolicy": "stop-and-return-to-director",
   "owners": {
     "director": {
@@ -9,7 +9,10 @@
         "docs/agent-runs/ohmdal-arc1-serial-v1/STATE.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/tasks.json",
         "docs/agent-runs/ohmdal-arc1-serial-v1/DECISIONS.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-001/**"
+        "docs/agent-runs/ohmdal-arc1-serial-v1/ownership.json",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/H3_CONTRACT.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-002.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-002/**"
       ]
     },
     "builder": { "write": [] },
@@ -22,10 +25,14 @@
     "package.json",
     "package-lock.json",
     "docs/agent-runs/ohmdal-arco1/**",
-    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-002.md"
+    "docs/agent-runs/ohmdal-hd2d-preprod-v1/**",
+    "docs/ohmdal-biblia/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-003.md"
   ],
   "notes": [
-    "ARC1-001 is a human visual gate; no implementation ownership is granted.",
-    "Replace this contract only after ARC1-001 is DONE and ARC1-002 becomes the active ticket."
+    "ARC1-002 only drafts the H3 contract; it grants no implementation ownership.",
+    "H3_CONTRACT.md is a proposal until the user authorizes it explicitly; drafting it does not set executionAuthorized.",
+    "ARC1-001 closed DONE in b49b617 with verdict approved-advance.",
+    "Replace this contract only after ARC1-002 is DONE and ARC1-003 becomes the active ticket."
   ]
 }
