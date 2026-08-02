@@ -165,6 +165,40 @@ export function cameraDistanceForSpan(span: number): number {
   return span / (2 * Math.tan(THREE.MathUtils.degToRad(ORTHOGRAPHIC_MATCH_HALF_ANGLE_DEGREES)));
 }
 
+/**
+ * Zona muerta de seguimiento, expresada como fraccion del alto visible (`verticalSpan`).
+ * Al escalar con el encuadre, la misma banda se percibe igual en desktop y en mobile:
+ * el jugador recorre casi un tercio del alto visible antes de que la camara reaccione.
+ * Los ejes usan la base ortonormal del anclaje (CAMERA_RIGHT / anchor.forward / mundo Y).
+ */
+export const CAMERA_FOLLOW_DEAD_ZONE = Object.freeze({
+  rightFraction: 0.16,
+  forwardFraction: 0.10,
+  verticalFraction: 0.04,
+});
+
+export interface FollowDeadZoneExtents {
+  readonly right: number;
+  readonly forward: number;
+  readonly vertical: number;
+}
+
+/** Semiejes en metros de la zona muerta para un alto visible dado. */
+export function followDeadZone(span: number): FollowDeadZoneExtents {
+  return {
+    right: span * CAMERA_FOLLOW_DEAD_ZONE.rightFraction,
+    forward: span * CAMERA_FOLLOW_DEAD_ZONE.forwardFraction,
+    vertical: span * CAMERA_FOLLOW_DEAD_ZONE.verticalFraction,
+  };
+}
+
+/** Excedente firmado fuera de la banda; 0 cuando el valor esta dentro. */
+export function deadZoneExcess(value: number, halfExtent: number): number {
+  if (value > halfExtent) return value - halfExtent;
+  if (value < -halfExtent) return value + halfExtent;
+  return 0;
+}
+
 export function clampTargetToAnchor(target: Readonly<THREE.Vector3>, anchor: AuthorCameraAnchor): THREE.Vector3 {
   const relative = new THREE.Vector3().subVectors(target, anchor.focus);
   const right = CAMERA_RIGHT;
