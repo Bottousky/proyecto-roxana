@@ -21,15 +21,31 @@ observado, sin copiar las candidatas ciegamente.
    [Biblia educativa](../../../../ohmdal-biblia/02_EDUCATIONAL_CONTENT_BIBLE.md) y al
    [vertical slice](../../../../ohmdal-biblia/10_VERTICAL_SLICE.md); las tres rutas resuelven desde
    este archivo.
-2. **B01, precondiciones incompletas de T05.** La ficha de seguridad y el test de instrumento
-   exigen inspección completa, hipótesis registrada, configuración completa, energía bloqueada y
-   rango `V_0_50` antes de interpretar `REF−REF=0,00 V`.
+2. **B01, precondiciones incompletas de T05.** El instrumento conserva un solver puro, pero la
+   actividad usa `measureVirtualWithDiagnosis`: exige inspección, hipótesis, configuración,
+   estado energético coincidente, medición activa y evidencia antes de interpretar
+   `REF−REF=0,00 V`. El test también prueba el rechazo sin workflow.
 3. **B02, corriente presentada como medición.** La ficha de circuito y la Bitácora dicen
    “calculé `20,00 mA`”. El instrumento no ofrece modo de corriente.
 4. **B02, códigos confundibles.** El modelo y los tests separan fuera de rango, apertura,
    configuración incompleta, punto inexistente, magnitud incompatible y estado no medible.
 
-## Fuentes canónicas usadas
+## Fuentes primarias e institucionales
+
+- [Escuela Técnica Otto Krause — Primer Ciclo](https://www.ottokrause.edu.ar/primer-ciclo/):
+  autoridad institucional para el marco de Taller del ciclo básico.
+- [Escuela Técnica Otto Krause — Electrónica](https://www.ottokrause.edu.ar/electronica/):
+  autoridad institucional para la especialidad, Circuitos Electrónicos y Laboratorio de Mediciones.
+- [Resolución CFE 15/07, Anexo III — Electrónica](https://www.inet.edu.ar/wp-content/uploads/2013/04/15-07-anexo03.pdf):
+  marco primario para mediciones, instrumental, detección de fallas, documentación técnica y
+  seguridad. Ver especialmente pp. 3–7 y trayectoria formativa desde p. 9.
+
+Estas fuentes respaldan el alcance educativo, no los parámetros del simulador. `5 V`, resistores
+de `100/150 ohm`, umbral `300 ohm`, rangos, resoluciones, órdenes aceptados, cuatro bloques de
+Bitácora y telemetría son reglas didácticas candidatas de Ohmdal y se validan por cálculos/tests;
+no se atribuyen a Otto Krause ni al CFE.
+
+## Fuentes canónicas internas usadas
 
 - [Biblia de contenido educativo](../../../../ohmdal-biblia/02_EDUCATIONAL_CONTENT_BIBLE.md):
   doctrina, 30 campos, Bitácora, telemetría y escala V1–V2.
@@ -38,4 +54,5 @@ observado, sin copiar las candidatas ciegamente.
 - [Backlog H1](../../../../ohmdal-biblia/11_PRODUCTION_BACKLOG.md): límites H1.1–H1.7 y segundo
   pase obligatorio.
 
-No se consultó red ni se modeló una práctica física real.
+La revisión independiente del 2026-08-02 consultó las fuentes institucionales anteriores. No se
+modeló una práctica física real: todo el circuito permanece ficticio, aislado y simulado.

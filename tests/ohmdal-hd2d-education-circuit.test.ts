@@ -5,7 +5,10 @@ import {
   solvePuertaTransfer,
 } from '../src/labs/ohmdal-hd2d-preprod/education/circuitModel.ts';
 import { runDiagnosisOrder } from '../src/labs/ohmdal-hd2d-preprod/education/diagnosisModel.ts';
-import { measureVirtual } from '../src/labs/ohmdal-hd2d-preprod/education/instrumentModel.ts';
+import {
+  measureVirtual,
+  measureVirtualWithDiagnosis,
+} from '../src/labs/ohmdal-hd2d-preprod/education/instrumentModel.ts';
 
 function equal<T>(actual: T, expected: T, label: string): void {
   if (!Object.is(actual, expected)) {
@@ -64,16 +67,25 @@ equal(
   'polaridad invertida',
 );
 const sameNodePreconditions = runDiagnosisOrder([
-  'inspect', 'record_hypothesis', 'configure_measurement', 'energize_locked',
+  'inspect', 'record_hypothesis', 'configure_measurement', 'energize_locked', 'measure_voltage',
 ]);
 equal(sameNodePreconditions.ok, true, 'mismo nodo parte de inspección, hipótesis y configuración');
+if (!sameNodePreconditions.ok) throw new Error('precondiciones diagnósticas inesperadamente inválidas');
 equal(
-  measureVirtual({
+  measureVirtualWithDiagnosis(sameNodePreconditions.state, {
     mode: 'V_DC', pointA: 'REF', pointB: 'REF', range: 'V_0_50',
     power: 'energized_locked', returnState: 'closed',
   }).value,
   0,
   'mismo nodo con precondiciones completas devuelve 0,00 V',
+);
+equal(
+  measureVirtualWithDiagnosis(runDiagnosisOrder([]).state, {
+    mode: 'V_DC', pointA: 'REF', pointB: 'REF', range: 'V_0_50',
+    power: 'energized_locked', returnState: 'closed',
+  }).code,
+  'WORKFLOW_PRECONDITION_MISSING',
+  'la actividad no mide sin precondiciones aunque el solver bajo nivel sea puro',
 );
 equal(
   measureVirtual({

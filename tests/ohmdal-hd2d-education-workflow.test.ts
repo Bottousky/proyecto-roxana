@@ -66,10 +66,15 @@ const entry: BitacoraEntry = {
     magnitude: 'V_DC',
     value: 5,
     unit: 'V',
+    powerState: 'energized_locked',
+    observedErrorCodes: ['OUT_OF_RANGE'],
   }],
   formalTranslation: {
     technicalName: 'Retorno abierto en circuito serie',
+    schematicDescription: 'Vs—R1—R2—retorno—REF; apertura entre N2 y REF.',
     variables: ['Vs', 'I', 'R1', 'R2'],
+    units: ['V', 'A', 'ohm', 'W'],
+    mathematicalRelation: 'Req = R1 + R2; I = Vs / Req',
     assumptions: ['componentes ideales', 'fuente virtual limitada'],
     metaphorLimit: 'La luz no es carga eléctrica.',
   },
@@ -81,6 +86,30 @@ equal(
   validateBitacoraEntry({ ...entry, nextQuestion: '' }).ok,
   false,
   'Bitácora sin siguiente pregunta incompleta',
+);
+equal(
+  validateBitacoraEntry({
+    ...entry,
+    formalTranslation: { ...entry.formalTranslation, variables: ['   '] },
+  }).ok,
+  false,
+  'Bitácora rechaza variables vacías',
+);
+equal(
+  validateBitacoraEntry({
+    ...entry,
+    evidence: [{ ...entry.evidence[0], unit: 'ohm' }],
+  }).ok,
+  false,
+  'Bitácora rechaza unidad incompatible con tensión',
+);
+equal(
+  validateBitacoraEntry({
+    ...entry,
+    evidence: [{ ...entry.evidence[0], value: Number.NaN }],
+  }).ok,
+  false,
+  'Bitácora rechaza valor no finito',
 );
 equal(
   validateBitacoraEntry({ ...entry, optionalEvaluationUrl: 'http://inseguro.example' }).ok,

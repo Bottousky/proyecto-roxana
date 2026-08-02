@@ -5,6 +5,7 @@ import {
   type CircuitNode,
   type ReturnState,
 } from './circuitModel.ts';
+import type { DiagnosisState } from './diagnosisModel.ts';
 
 export type InstrumentMode = 'V_DC' | 'R' | 'CONTINUITY';
 export type PowerState = 'deenergized_isolated' | 'energized_locked';
@@ -18,7 +19,8 @@ export type MeasurementCode =
   | 'INCOMPLETE_CONFIGURATION'
   | 'UNDEFINED_POINT'
   | 'MODE_INCOMPATIBLE_WITH_STATE'
-  | 'STATE_NOT_MEASURABLE';
+  | 'STATE_NOT_MEASURABLE'
+  | 'WORKFLOW_PRECONDITION_MISSING';
 
 export const RANGE_LIMITS: Readonly<Record<RangeId, number>> = {
   V_0_50: 0.5,
@@ -41,6 +43,24 @@ export interface MeasurementResult {
   code: MeasurementCode;
   value: number | null;
   unit: 'V' | 'ohm' | null;
+}
+
+/**
+ * Puente explícito entre el instrumento puro y el workflow de diagnóstico.
+ * El solver bajo nivel sigue siendo reusable; la actividad educativa usa este gate.
+ */
+export function measureVirtualWithDiagnosis(
+  diagnosis: Readonly<DiagnosisState>,
+  request: MeasurementRequest,
+): MeasurementResult {
+  const expectedActive = request.mode === 'V_DC' ? 'voltage' : 'continuity';
+  const authorized = diagnosis.inspected
+    && diagnosis.hypothesisRecorded
+    && diagnosis.configured
+    && diagnosis.power === request.power
+    && diagnosis.activeMeasurement === expectedActive
+    && diagnosis.evidence.includes(expectedActive);
+  return authorized ? measureVirtual(request) : result('WORKFLOW_PRECONDITION_MISSING');
 }
 
 export function measureVirtual(request: MeasurementRequest): MeasurementResult {

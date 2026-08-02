@@ -1,7 +1,7 @@
 import { defineEducationCard, type EducationCard } from './types.ts';
 
 const SOURCES =
-  'Biblia educativa canónica §Ficha/§Escala V1–V2; vertical slice Beats 3–7; backlog H1.1–H1.7; borradores B01/B02 corregidos por benchmark-summary.';
+  'Primarias: Escuela Técnica Otto Krause, Primer Ciclo (https://www.ottokrause.edu.ar/primer-ciclo/) y Electrónica (https://www.ottokrause.edu.ar/electronica/); CFE 15/07 Anexo III–Electrónica (https://www.inet.edu.ar/wp-content/uploads/2013/04/15-07-anexo03.pdf), medición, instrumental, fallas, documentación y seguridad. Internas: Biblia educativa §Ficha/§Escala V1–V2, vertical slice Beats 3–7 y backlog H1.1–H1.7. Reglas candidatas propias —no institucionales—: 5 V, 100/150 ohm, umbral 300 ohm, rangos, resoluciones, órdenes de diagnóstico, cuatro bloques de Bitácora y telemetría.';
 const STATUS =
   'V1-ready-for-independent-audit; implementada y auto-revisada, pendiente de reproducción por un segundo agente; no V2 y no CANON-EDU.';
 const TELEMETRY =
