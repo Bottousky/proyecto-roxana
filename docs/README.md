@@ -2,24 +2,34 @@
 
 Este índice evita que una entrega histórica se confunda con una decisión vigente.
 
+## Biblia canónica de Ohmdal
+
+[`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md) es la fuente de verdad
+narrativa, educativa, visual y productiva de Ohmdal desde el 1 de agosto de 2026. La promoción
+documental no migra el runtime: `/jugar` y sus regresiones continúan protegidos hasta que un ADR y
+el vertical slice aprueben su reemplazo.
+
 ## Fuentes de verdad activas
 
-**Comenzar por [`START_HERE.md`](START_HERE.md):** consolida la promesa, el loop, la arquitectura
-híbrida y el único vertical siguiente. Los documentos de abajo desarrollan ese norte.
+**Comenzar por [`START_HERE.md`](START_HERE.md):** consolida la promesa y la arquitectura global.
+Para cualquier decisión de Ohmdal, continuar por la Biblia canónica antes de consultar fuentes
+históricas.
 
 1. [`vision-mundos-multilenguaje.md`](vision-mundos-multilenguaje.md) — visión de producto:
    un núcleo compartido y cinco lenguajes de experiencia.
 2. [`plan-plataforma-cinco-juegos.md`](plan-plataforma-cinco-juegos.md) — arquitectura y orden
    de implementación de la plataforma multiruntime.
-3. [`plan-arco-1-hubs.md`](plan-arco-1-hubs.md) — plan táctico vigente de Ohmdal/Arco I.
+3. [`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md) — autoridad canónica de
+   Ohmdal, dependencias y estado de los quince documentos.
 4. [`diseno-sintesis-v1.md`](diseno-sintesis-v1.md) — loop, tono y reglas pedagógicas comunes.
 5. [`guia-puzzles.md`](guia-puzzles.md) — canon para diseñar y auditar puzzles.
 6. [`estandar-implementacion.md`](estandar-implementacion.md) — gate de implementación.
 
-Si un documento antiguo prescribe top-down para todos los mundos, la visión multilenguaje lo
-supersede. Sus decisiones sobre Ohmdal continúan vigentes salvo contradicción explícita.
+Los planes `plan-arco-1-*`, la ruta anterior y las unidades implementadas son fuentes históricas y
+cantera de continuidad selectiva. Si contradicen la Biblia de Ohmdal, prevalece la Biblia; el
+código estable no cambia hasta una migración aprobada.
 
-## Contenido canónico de Ohmdal
+## Fuentes históricas de contenido de Ohmdal
 
 - [`ohmdal-ruta-contenidos.md`](ohmdal-ruta-contenidos.md)
 - [`unidad-1-ohmdal.md`](unidad-1-ohmdal.md)

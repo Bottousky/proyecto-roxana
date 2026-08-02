@@ -5,9 +5,11 @@ los **Mundos Aplicados**: mundos creados por la escuela para enseñar, hoy degra
 en ritual y superstición. En **Ohmdal**, el mundo de la electrónica, restaura el reino
 aprendiendo jugando los circuitos de corriente continua.
 
-La fuente de verdad para la dirección actual es
-[`docs/START_HERE.md`](docs/START_HERE.md): Instituto, mundos, Bitácora, arquitectura híbrida y
-el próximo spike «Ohmdal mundo vivo».
+La fuente de verdad para la dirección actual está en
+[`docs/START_HERE.md`](docs/START_HERE.md) y en la
+[`Biblia canónica de Ohmdal`](docs/ohmdal-biblia/00_MASTER_INDEX.md): Instituto, mundos,
+Bitácora, arquitectura híbrida y el futuro slice HD-2D. La implementación Phaser que sigue
+descrita abajo es la base estable de regresión, no la presentación futura aprobada.
 
 La visión de producto es un solo juego con cinco lenguajes de experiencia: el Instituto como
 mundo real y nexo; Ohmdal para electrónica; Bitland para programación; Physica para física; y
@@ -55,7 +57,8 @@ queda en `https://<tu-usuario>.github.io/proyecto-roxana/`. Después, cada
 
 ## Stack actual
 
-- **Phaser 4** (exploración top-down en canvas)
+- **Phaser 4** (base estable de Ohmdal, exploración top-down en canvas)
+- **Three.js** (Instituto y futuro Ohmdal HD-2D aislado bajo `RuntimeHost`)
 - **TypeScript + Vite**
 - **UI en DOM/HTML**: diálogos, vistas de banco (puzzles) y la Bitácora viven en el
   DOM, no en el canvas — texto nítido, accesible y exportable.

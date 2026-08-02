@@ -1,6 +1,7 @@
 # Proyecto Roxana — norte de producto
 
-**Estado:** decisión de producto y arquitectura después de la auditoría del 30 de julio de 2026.
+**Estado:** decisión de producto y arquitectura actualizada el 1 de agosto de 2026. Para Ohmdal,
+la autoridad detallada es [`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md).
 
 ## La decisión en una frase
 
@@ -49,7 +50,7 @@ Bitácora y video viven en DOM accesible y nítido.
 
 | Disciplina | Mundo | Lenguaje jugable | Núcleo narrativo |
 | --- | --- | --- | --- |
-| Electrónica | Ohmdal | top-down tres cuartos en rediseño, mundo continuo y mecanismos diegéticos | la electrónica se recuerda como magia |
+| Electrónica | Ohmdal | HD-2D web: overworld explorable, dioramas 3D, pixel art y mecanismos diegéticos | la electrónica se recuerda como magia |
 | Programación | Bitland | ciudad cenital cibernética | el sistema obedece literalmente; Null sobrevive por no estar referenciado |
 | Física | Physica | 2D o 3D según el fenómeno | un instrumento permite alterar leyes para descubrir sus relaciones |
 | Matemática | Arithmos | pizarrón vivo y narrador | la estructura pura que sostiene a todos los demás mundos |
@@ -88,8 +89,9 @@ Se conserva una arquitectura híbrida:
 - **Vite + TypeScript** como shell web ligero;
 - **Three.js** para la maqueta axonométrica del Instituto, con Blender → GLB como pipeline
   principal;
-- **Phaser** como candidato principal para el Ohmdal top-down por su cámara, tilemaps, input,
-  colisión y compatibilidad web; el spike debe probarlo, no asumir que el runtime actual alcanza;
+- **Three.js híbrido** como dirección futura de Ohmdal: entornos 3D modulares, personajes pixel
+  art y cámara autoral. Se prueba en un laboratorio aislado; Phaser conserva `/jugar` y funciona
+  como baseline hasta que un ADR apruebe una migración;
 - **DOM/CSS** para Bitácora, diálogos, accesibilidad, sesión y video;
 - **runtimes bajo demanda** mediante el `RuntimeHost`;
 - **manifiestos de assets** para escala, pivote, frente, collider, presupuesto y procedencia.
@@ -112,35 +114,32 @@ resuelve por sí misma continuidad artística, diseño de interacción o producc
 Cada elemento se produce con la representación que mejor sirve a su lectura:
 
 - arquitectura, puertas, mecanismos y sockets: Blender modular o geometría procedural;
-- personajes hero con animación: malla riggeada importada, con licencia y escala verificadas;
-- personajes secundarios con cámara controlada: sprites 2D;
+- personajes humanos de Ohmdal: pixel art direccional integrado al 3D; la cantidad de direcciones
+  se decide con footage oficial y un spike 4/8, no por suposición;
+- Ohm y mecanismos hard-surface: procedural/`img2threejs` cuando pivotes y sockets lo exijan;
 - retratos, páginas de Bitácora, iconos y fondos: ilustración 2D;
 - imágenes generadas: referencia o media 2D con procedencia, no falsa geometría 3D;
 - conceptos: fijan composición, silueta, paleta y materiales; la escena jugable se construye aparte.
 
 Ningún asset entra al runtime sin comprobarse con la cámara real, en desktop y mobile.
 
-## Próximo hito: «Ohmdal mundo vivo»
+## Próximo hito: vertical slice «La pregunta vuelve»
 
-Antes de integrar el ecosistema completo hay que demostrar que Ohmdal puede alcanzar la escala y
-la integración buscadas. El hito es un laboratorio aislado de 5–10 minutos:
+Antes de migrar el Arco I hay que demostrar el lenguaje HD-2D en un laboratorio Three.js aislado
+de 25–35 minutos: Portal, Plaza, encuentro regional con Edda, despertar de Ohm, Taller de Lumen,
+diagnóstico auténtico, Puerta de Ohm y Manantial. Un overworld mínimo demuestra la entrada a la
+región; no se produce el mapa completo.
 
-1. recorrer sin transiciones una región amplia que conecte Plaza, Taller, río y Puerta;
-2. orientarse mediante caminos, hitos, actividad y composición, no por cajas consecutivas;
-3. encontrar un mecanismo eléctrico que existe físicamente en el escenario;
-4. observar el flujo, accionar piezas, medir y provocar consecuencias sin abrir un banco modal;
-5. completar o abandonar el mecanismo sin bloquear el mundo;
-6. comparar el resultado contra el Ohmdal actual en desktop y mobile.
-
-El contenido actual aporta modelos y narrativa, pero no se reutilizan sus chunks fijos ni su
-presentación de formularios superpuestos. «La escuela recuerda» queda postergado hasta aprobar o
-rechazar este nuevo lenguaje jugable.
+El slice usa personajes pixel art, cámara por encuadres, tarde hacia crepúsculo, voces parciales,
+música de orquesta + electrónica y gameplay completo en desktop/mobile. Ohm acompaña siempre;
+Edda reaparece en momentos estratégicos. La Bitácora traduce la experiencia a conocimiento formal
+y puede enlazar una evaluación opcional de La Escuela en otra pestaña.
 
 ### Fuera de alcance
 
-- migrar el Arco I completo;
+- migrar o reescribir `/jugar`;
 - producir Programación, Física, Matemática o nuevas salas del Instituto;
-- backend, cuentas, comercio o biblioteca de YouTube;
+- backend, cuentas obligatorias, dashboard docente o comercio dentro del mundo;
 - reescribir modelos matemáticos o el guardado estable;
 - generar un lote completo de arte;
 - adoptar otro motor sin una comparación reproducible del mismo slice.
@@ -151,14 +150,17 @@ rechazar este nuevo lenguaje jugable.
 - recorrido completo y reiniciable en desktop y mobile;
 - puzzle resuelto mediante objetos, posiciones y feedback del mundo;
 - ninguna pantalla modal obligatoria durante la resolución;
-- cámara top-down tres cuartos legible, con landmarks antes del compromiso;
+- cámara autoral legible, con landmarks y consecuencia dentro del mismo encuadre cuando el puzzle
+  lo requiera;
 - cero errores de consola;
 - build y tests verdes;
 - `render_game_to_text` y `advanceTime(ms)` para pruebas deterministas;
 - captura y recorrido Playwright después de cada cambio significativo;
-- prueba en Android físico;
-- cinco pruebas observadas: al menos cuatro personas entienden qué manipularon y por qué cambió
-  el mecanismo.
+- prueba en Android medio de 2022, con piso de 30 fps;
+- navegadores recientes Chrome, Edge, Firefox y Safari; teclado y táctil completos;
+- accesibilidad baseline: escala de texto, contraste, independencia del color, subtítulos,
+  reducción de movimiento/partículas, reasignación y sin presión temporal obligatoria;
+- playtest mixto 13–18: al menos 80% explica la causa con evidencia sin repetir sólo la metáfora.
 
 ## Forma de trabajo
 
