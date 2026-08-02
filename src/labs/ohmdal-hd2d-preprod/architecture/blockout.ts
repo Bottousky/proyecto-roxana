@@ -1,0 +1,269 @@
+import * as THREE from 'three';
+import { type OcclusionBinding } from '../camera/occlusion.ts';
+import { createBlockoutLighting, type BlockoutLightRig } from '../lighting/blockoutLighting.ts';
+import {
+  createBlockoutMaterials,
+  type BlockoutMaterialSet,
+  type BlockoutTimeOfDay,
+} from '../materials/blockoutMaterials.ts';
+import { NAVIGATION_REGIONS } from '../navigation/navigation.ts';
+import {
+  BOX_MODULES,
+  COLLIDERS,
+  GAMEPLAY_PLANE_Y,
+  MANNEQUIN_HEIGHT_METERS,
+  ROUTE_ANCHORS,
+} from './levelData.ts';
+
+export interface RendererInfoSnapshot {
+  readonly calls: number;
+  readonly triangles: number;
+  readonly lines: number;
+  readonly points: number;
+  readonly geometries: number;
+  readonly textures: number;
+}
+
+export interface RendererInfoSource {
+  readonly info: {
+    readonly render: { readonly calls: number; readonly triangles: number; readonly lines: number; readonly points: number };
+    readonly memory: { readonly geometries: number; readonly textures: number };
+  };
+}
+
+export interface RendererCacheOwner extends RendererInfoSource {
+  readonly renderLists: { dispose(): void };
+}
+
+export interface BlockoutDiagnostics {
+  readonly disposed: boolean;
+  readonly geometryCount: number;
+  readonly visualMeshCount: number;
+  readonly colliderMeshCount: number;
+  readonly navigationMeshCount: number;
+  readonly mannequinHeightMeters: number;
+  readonly material: ReturnType<BlockoutMaterialSet['diagnostics']>;
+  readonly lighting: ReturnType<BlockoutLightRig['diagnostics']>;
+}
+
+export interface OhmdalBlockout {
+  readonly root: THREE.Group;
+  readonly visualLayer: THREE.Group;
+  readonly colliderLayer: THREE.Group;
+  readonly navigationLayer: THREE.Group;
+  readonly anchorLayer: THREE.Group;
+  readonly referenceLayer: THREE.Group;
+  readonly mannequin: THREE.Group;
+  readonly occlusionBindings: readonly OcclusionBinding[];
+  readonly materials: BlockoutMaterialSet;
+  readonly lighting: BlockoutLightRig;
+  setTimeOfDay(timeOfDay: BlockoutTimeOfDay): void;
+  diagnostics(): BlockoutDiagnostics;
+  dispose(): void;
+}
+
+function geometryKey(width: number, height: number, depth: number): string {
+  return `${width}:${height}:${depth}`;
+}
+
+function createMannequin(
+  geometries: Set<THREE.BufferGeometry>,
+  material: THREE.Material,
+): THREE.Group {
+  const mannequin = new THREE.Group();
+  mannequin.name = 'REFERENCE_MANNEQUIN_1_72M';
+  mannequin.position.set(-11.5, GAMEPLAY_PLANE_Y, 1.6);
+  mannequin.userData.heightMeters = MANNEQUIN_HEIGHT_METERS;
+  mannequin.userData.pivot = 'feet-at-ground';
+
+  const addBox = (name: string, width: number, height: number, depth: number, y: number): void => {
+    const geometry = new THREE.BoxGeometry(width, height, depth);
+    geometries.add(geometry);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.name = name;
+    mesh.position.y = y;
+    mesh.castShadow = true;
+    mannequin.add(mesh);
+  };
+  addBox('MANNEQUIN_LEGS', 0.36, 0.75, 0.28, 0.375);
+  addBox('MANNEQUIN_TORSO', 0.48, 0.65, 0.3, 1.075);
+  addBox('MANNEQUIN_HEAD', 0.32, 0.32, 0.32, 1.56);
+  return mannequin;
+}
+
+export function readRendererInfo(renderer: RendererInfoSource): RendererInfoSnapshot {
+  return {
+    calls: renderer.info.render.calls,
+    triangles: renderer.info.render.triangles,
+    lines: renderer.info.render.lines,
+    points: renderer.info.render.points,
+    geometries: renderer.info.memory.geometries,
+    textures: renderer.info.memory.textures,
+  };
+}
+
+/** El runtime integrador conserva ownership del renderer; este helper limpia solo su cache de listas. */
+export function disposeRendererCaches(renderer: RendererCacheOwner): void {
+  renderer.renderLists.dispose();
+}
+
+export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
+  const root = new THREE.Group();
+  root.name = 'OHMDAL_HD2D_BLOCKOUT';
+  root.userData.units = 'meters';
+  root.userData.gameplayPlaneY = GAMEPLAY_PLANE_Y;
+
+  const visualLayer = new THREE.Group();
+  visualLayer.name = 'LAYER_VISUAL';
+  const colliderLayer = new THREE.Group();
+  colliderLayer.name = 'LAYER_COLLIDERS';
+  colliderLayer.visible = false;
+  const navigationLayer = new THREE.Group();
+  navigationLayer.name = 'LAYER_NAVIGATION';
+  navigationLayer.visible = false;
+  const anchorLayer = new THREE.Group();
+  anchorLayer.name = 'LAYER_ANCHORS';
+  anchorLayer.visible = false;
+  const referenceLayer = new THREE.Group();
+  referenceLayer.name = 'LAYER_REFERENCE';
+
+  const materials = createBlockoutMaterials();
+  const geometryCache = new Map<string, THREE.BoxGeometry>();
+  const geometries = new Set<THREE.BufferGeometry>();
+  const emitters = new Map<string, THREE.Object3D>();
+  const occlusionBindings: OcclusionBinding[] = [];
+
+  const boxGeometry = (width: number, height: number, depth: number): THREE.BoxGeometry => {
+    const key = geometryKey(width, height, depth);
+    const existing = geometryCache.get(key);
+    if (existing) return existing;
+    const geometry = new THREE.BoxGeometry(width, height, depth);
+    geometryCache.set(key, geometry);
+    geometries.add(geometry);
+    return geometry;
+  };
+
+  for (const definition of BOX_MODULES) {
+    const moduleRoot = new THREE.Group();
+    moduleRoot.name = definition.id;
+    moduleRoot.position.set(definition.centerX, definition.pivotY, definition.centerZ);
+    moduleRoot.userData.zoneId = definition.zoneId;
+    moduleRoot.userData.pivot = 'ground';
+    moduleRoot.userData.tags = [...definition.tags];
+    if (definition.tags.includes('cameraOccluder')) moduleRoot.userData.cameraOccluder = true;
+    if (definition.tags.includes('cameraRoof')) moduleRoot.userData.cameraRoof = true;
+
+    const baseY = definition.baseY ?? 0;
+    const material = definition.tags.includes('cameraOccluder') || definition.tags.includes('cameraRoof')
+      ? materials.createOccluderMaterial(definition.family)
+      : materials.materialFor(definition.family);
+    const mesh = new THREE.Mesh(
+      boxGeometry(definition.width, definition.height, definition.depth),
+      material,
+    );
+    mesh.name = `${definition.id}__mesh`;
+    mesh.position.y = baseY + definition.height / 2;
+    if (definition.id === 'workshop-roof-low') mesh.rotation.z = -0.12;
+    if (definition.id === 'workshop-roof-high') mesh.rotation.z = 0.12;
+    mesh.castShadow = !definition.tags.includes('floor');
+    mesh.receiveShadow = true;
+    moduleRoot.add(mesh);
+    visualLayer.add(moduleRoot);
+
+    if (definition.tags.includes('emitter')) emitters.set(definition.id, moduleRoot);
+    if (material !== materials.materialFor(definition.family)) {
+      occlusionBindings.push({
+        id: definition.id,
+        object: moduleRoot,
+        setOpacity(opacity) {
+          material.opacity = opacity;
+          moduleRoot.visible = opacity > 0.001;
+        },
+      });
+    }
+  }
+
+  for (const collider of COLLIDERS) {
+    const width = collider.bounds.maxX - collider.bounds.minX;
+    const depth = collider.bounds.maxZ - collider.bounds.minZ;
+    const mesh = new THREE.Mesh(
+      boxGeometry(width, collider.height, depth),
+      materials.colliderDebug,
+    );
+    mesh.name = collider.id;
+    mesh.position.set(
+      (collider.bounds.minX + collider.bounds.maxX) / 2,
+      collider.planeY + collider.height / 2,
+      (collider.bounds.minZ + collider.bounds.maxZ) / 2,
+    );
+    mesh.userData.zoneId = collider.zoneId;
+    colliderLayer.add(mesh);
+  }
+
+  for (const region of NAVIGATION_REGIONS) {
+    const width = region.bounds.maxX - region.bounds.minX;
+    const depth = region.bounds.maxZ - region.bounds.minZ;
+    const mesh = new THREE.Mesh(boxGeometry(width, 0.02, depth), materials.navigationDebug);
+    mesh.name = region.id;
+    mesh.position.set(
+      (region.bounds.minX + region.bounds.maxX) / 2,
+      region.planeY + 0.01,
+      (region.bounds.minZ + region.bounds.maxZ) / 2,
+    );
+    navigationLayer.add(mesh);
+  }
+
+  for (const anchor of ROUTE_ANCHORS) {
+    const object = new THREE.Object3D();
+    object.name = anchor.id;
+    object.position.set(anchor.position.x, anchor.position.y, anchor.position.z);
+    object.userData.purpose = anchor.purpose;
+    anchorLayer.add(object);
+  }
+
+  const mannequin = createMannequin(geometries, materials.materialFor('glass'));
+  referenceLayer.add(mannequin);
+  const lighting = createBlockoutLighting(emitters);
+  root.add(visualLayer, colliderLayer, navigationLayer, anchorLayer, referenceLayer, lighting.worldRoot);
+  scene?.add(root);
+  let disposed = false;
+
+  return {
+    root,
+    visualLayer,
+    colliderLayer,
+    navigationLayer,
+    anchorLayer,
+    referenceLayer,
+    mannequin,
+    occlusionBindings,
+    materials,
+    lighting,
+    setTimeOfDay(timeOfDay) {
+      if (disposed) throw new Error('Ohmdal blockout is disposed');
+      materials.setTimeOfDay(timeOfDay);
+      lighting.setTimeOfDay(timeOfDay);
+    },
+    diagnostics() {
+      return {
+        disposed,
+        geometryCount: geometries.size,
+        visualMeshCount: visualLayer.children.length,
+        colliderMeshCount: colliderLayer.children.length,
+        navigationMeshCount: navigationLayer.children.length,
+        mannequinHeightMeters: MANNEQUIN_HEIGHT_METERS,
+        material: materials.diagnostics(),
+        lighting: lighting.diagnostics(),
+      };
+    },
+    dispose() {
+      if (disposed) return;
+      lighting.dispose();
+      root.removeFromParent();
+      root.clear();
+      geometries.forEach((geometry) => geometry.dispose());
+      materials.dispose();
+      disposed = true;
+    },
+  };
+}
