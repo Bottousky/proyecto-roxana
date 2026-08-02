@@ -362,7 +362,7 @@
         "el veredicto es avanzar, corregir una vez o descartar",
         "H3 no cambia de estado sin veredicto favorable"
       ],
-      "completionCommit": "pending-final-director-commit",
+      "completionCommit": "8be6edd",
       "verdict": "avanzar",
       "h3Authorized": false
     }
