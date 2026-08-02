@@ -1,9 +1,9 @@
 {
   "version": 2,
   "milestone": "ohmdal-hd2d-preprod-v1",
-  "status": "completed-conditional",
+  "status": "corrective-in-progress",
   "executionAuthorized": true,
-  "authorizationScope": "H1 educational V2, H2 visual/technical spike and the ten read-only benchmark executions; H3 remains blocked",
+  "authorizationScope": "H1 educational V2, H2 visual/technical spike, the ten read-only benchmark executions, and CAM-FIX-001 explicitly authorized on 2026-08-02; H3 remains blocked",
   "authorizedBy": "user",
   "authorizedAt": "2026-08-01",
   "baseRef": "codex/ohmdal-hd2d-biblia",
@@ -365,6 +365,26 @@
       "completionCommit": "8be6edd",
       "verdict": "avanzar",
       "h3Authorized": false
+    },
+    {
+      "id": "CAM-FIX-001",
+      "role": "architecture",
+      "title": "Corregir aspect ratio y estabilizar seguimiento de cámara",
+      "status": "in-progress",
+      "estimatedMinutes": 60,
+      "branch": "codex/ohmdal-camera-correction-architecture",
+      "dependsOn": [
+        "DIR-VERDICT-001"
+      ],
+      "contract": "docs/agent-runs/ohmdal-hd2d-preprod-v1/camera-correction-001.md",
+      "acceptance": [
+        "resize usa el aspect ratio real sin deformar la proyección",
+        "la cámara conserva el encuadre dentro de una zona muerta testeable",
+        "transiciones autorales, histéresis y reduced motion permanecen vigentes",
+        "desktop, desktop angosto y mobile tienen evidencia reproducible",
+        "src/jugar, H3, assets y contenido pedagógico permanecen intactos",
+        "el gate final es revisión humana, sin tercera ronda automática"
+      ]
     }
   ]
 }
