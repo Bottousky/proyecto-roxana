@@ -1,10 +1,10 @@
 # Estado — Ohmdal HD-2D preproducción v1
 
-**Fase:** benchmark A/B autorizado; implementación H1+H2 preparada
+**Fase:** benchmark cerrado; routing comparativo bloqueado por infraestructura externa
 **Ejecución autorizada:** sí, exclusivamente H1+H2
 **Ronda:** 0/2
 **Base común:** `12d6f88d2a366da89ed91008013f42ba6295e42d`
-**Bloqueo:** ninguno para el benchmark de diez ejecuciones; H3 continúa bloqueado
+**Bloqueo:** proveedores híbridos no produjeron contenido; B03–B05 requieren correcciones; H3 continúa bloqueado
 
 ## Baseline registrado
 
@@ -23,11 +23,11 @@ Sobre la base estabilizada previa al commit canónico:
 | ID | Rol | Estado | Rama | Commit |
 |---|---|---|---|---|
 | DIR-001 | Director | COMPLETED | `codex/ohmdal-hd2d-preprod-v1-director` | `16df1b5` |
-| BENCH-H1-01 A/B | Director | READY | candidatos read-only | — |
-| BENCH-H1-02 A/B | Director | BLOCKED por BENCH-H1-01 | candidatos read-only | — |
-| BENCH-H2-01 A/B | Director | READY | candidatos read-only | — |
-| BENCH-H2-02 A/B | Director | READY | candidatos read-only | — |
-| BENCH-H2-03 A/B | Director | READY | candidatos read-only | — |
+| BENCH-H1-01 A/B | Director | EXECUTED: Codex entregó; Claude 401 | candidatos read-only | evidencia en `content/benchmark` |
+| BENCH-H1-02 A/B | Director | EXECUTED: Codex entregó; MiniMax timeout | candidatos read-only | evidencia en `content/benchmark` |
+| BENCH-H2-01 A/B | Director | EXECUTED: Codex entregó; MiMo timeout | candidatos read-only | evidencia en `content/benchmark` |
+| BENCH-H2-02 A/B | Director | EXECUTED: Codex entregó; North timeout | candidatos read-only | evidencia en `content/benchmark` |
+| BENCH-H2-03 A/B | Director | EXECUTED: Codex entregó; MiniMax 429 | candidatos read-only | evidencia en `content/benchmark` |
 | DIR-EDU-001 | Director | READY | `codex/ohmdal-hd2d-preprod-v1-director` | — |
 | ARCH-001 | Arquitectura | READY | `codex/ohmdal-hd2d-preprod-v1-arquitectura` | — |
 | ASSET-001 | Asset Forge | READY | `codex/ohmdal-hd2d-preprod-v1-assets` | — |
