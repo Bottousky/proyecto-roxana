@@ -17,8 +17,30 @@
 | CP-013 | 2026-08-02 | **H3 autorizado** con `baseCommit = b49b617` | `executionAuthorized = true`; `ARC1-003` pasa a `READY` |
 | CP-014 | 2026-08-02 | Android físico diferido a `ARC1-060` (opción B) | Todo claim de rendimiento en Android físico es `not-run` hasta el QA de release |
 | CP-015 | 2026-08-02 | Golden frames, identidad y límites legales **congelados** | Un ticket de escena no puede redefinirlos para que su resultado pase |
+| CP-016 | 2026-08-02 | La unidad de ejecución pasa a ser el **paquete** `ARC1-NNN-X` | Una sesión nueva por fase; hallazgos ajenos a `OPEN_ISSUES.md`; cada fase emite telemetría |
 
-Una decisión nueva agrega `CP-016+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-017+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-016 — El paquete es la unidad de ejecución
+
+**Motivo.** El ticket describe qué queda cerrado, no qué cabe en una sesión. Faltaba esa segunda
+capa: tickets como `ARC1-011` («cerrar escala, recorrido y blockout Portal–Plaza», estimado en un
+día) se estaban entregando a un ejecutor como una sola instrucción. El resultado observado son
+sesiones largas sin punto de evaluación, contexto contaminado y loops abiertos.
+
+**Evidencia.** El control plane ya tenía WIP 1, gates, ownership, rondas acotadas y estados de
+cierre — pero todos definidos a nivel de ticket. `tickets/` sólo admite el ticket activo y no existía
+ningún artefacto entre «ficha del ticket» y «prompt de ejecución». `evidence/ARC1-001/metrics.json`
+mide la cámara, no el proceso: no había ningún registro de qué modelo ejecutó qué, cuánto tardó ni
+cuántas rondas consumió, con lo cual `CP-007` («routing por inventario, no por fama») no tenía datos
+locales con los que decidir.
+
+**Impacto.** Se agregan `PACKETS.md`, `packets/`, `OPEN_ISSUES.md` y `telemetry.json`, y se cablean
+en `control` de `tasks.json`. El ciclo A–D de `EXECUTION_PROTOCOL.md` pasa a ejecutarse por paquete;
+E sigue siendo por ticket, igual que el commit. Presupuesto de rondas: 2 por paquete y 4 por ticket
+— la nueva capa no puede usarse para multiplicar correcciones. No cambia el backlog, ni los 62
+issues, ni el canon congelado por `CP-015`, ni el alcance autorizado por `CP-013`. No requiere ADR.
+`ARC1-004` es el primer ticket que ejecuta con esta capa.
 
 ## CP-015 — Canon visual congelado
 

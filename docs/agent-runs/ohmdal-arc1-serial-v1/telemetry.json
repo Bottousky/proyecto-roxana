@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "milestone": "ohmdal-arc1-serial-v1",
+  "purpose": "Registro append-only de ejecuciones reales. Sirve para descubrir empiricamente que ruta de modelo sirve para que tipo de paquete, cuanto cuesta realmente una escena y donde se van las rondas. Sin esto el routing se decide por reputacion, no por evidencia (CP-007).",
+  "rules": [
+    "Un record por FASE de paquete ejecutada: plan, build, review, fix.",
+    "Se escribe al cerrar la fase, nunca antes.",
+    "Append-only: no se edita ni se borra un record cerrado; una correccion agrega otro record.",
+    "Lo no medido va en null y cuenta como not-run. Jamas se estima ni se inventa una duracion.",
+    "modelId es el ID literal que devuelve `opencode models`. No se anota un modelo que no existe en el inventario local."
+  ],
+  "recordSchema": {
+    "ticket": "ARC1-NNN",
+    "packet": "ARC1-NNN-X o null si el ticket ejecuto como paquete unico",
+    "phase": "plan | build | review | fix",
+    "session": "nombre literal de la sesion, p. ej. ARC1-011-C-BUILD",
+    "route": "rol de MODEL_ROUTING.md: director-plan | builder | reviewer | revision-visual | claude | codex | humano",
+    "modelId": "ID literal del modelo, o null",
+    "date": "YYYY-MM-DD",
+    "durationMin": "entero de minutos medidos, o null",
+    "round": "numero de ronda dentro del paquete, empezando en 1",
+    "filesTouched": "entero, o null en fases read-only",
+    "ownershipRespected": "true | false | null",
+    "firstArtifactMin": "minutos hasta el primer artefacto observable, o null si no aplica",
+    "result": "TECH_REVIEW | HUMAN_REVIEW | BLOCKED | FAILED | DONE",
+    "notes": "una linea: que fallo, que hubo que repetir, que no se pudo medir"
+  },
+  "records": []
+}

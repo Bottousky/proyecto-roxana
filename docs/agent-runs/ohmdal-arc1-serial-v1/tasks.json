@@ -27,7 +27,10 @@
     "humanReviewRequiredForVisibleChanges": true,
     "maxVisibleRounds": 2,
     "thirdRoundRequiresHumanApproval": true,
-    "internalTaskMinutes": { "min": 30, "max": 90 }
+    "internalTaskMinutes": {
+      "min": 30,
+      "max": 90
+    }
   },
   "control": {
     "state": "docs/agent-runs/ohmdal-arc1-serial-v1/STATE.md",
@@ -38,77 +41,675 @@
     "ownership": "docs/agent-runs/ohmdal-arc1-serial-v1/ownership.json",
     "assetManifest": "docs/agent-runs/ohmdal-arc1-serial-v1/asset-manifest.json",
     "decisions": "docs/agent-runs/ohmdal-arc1-serial-v1/DECISIONS.md",
-    "canonicalBacklog": "docs/ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md"
+    "canonicalBacklog": "docs/ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md",
+    "packets": "docs/agent-runs/ohmdal-arc1-serial-v1/PACKETS.md",
+    "packetsDir": "docs/agent-runs/ohmdal-arc1-serial-v1/packets/",
+    "openIssues": "docs/agent-runs/ohmdal-arc1-serial-v1/OPEN_ISSUES.md",
+    "telemetry": "docs/agent-runs/ohmdal-arc1-serial-v1/telemetry.json"
   },
   "budgets": {
     "maxConcurrentExecutors": 1,
     "maxEvaluators": 1,
     "meshyCredits": 0,
-    "paidGeneration": false
+    "paidGeneration": false,
+    "maxRoundsPerPacket": 2,
+    "maxRoundsPerIssue": 4,
+    "packetMinutesMin": 30,
+    "packetMinutesMax": 90
   },
   "issues": [
-    { "key": "ARC1-001", "epic": "Gate 0", "title": "Aprobar visualmente cámara corregida", "owner": "director", "status": "DONE", "dependsOn": [], "spec": "tickets/ARC1-001.md", "verdict": "approved-advance", "decidedOn": "2026-08-02", "decisions": ["CP-010", "CP-011", "CP-012"], "evidence": "evidence/ARC1-001/", "openQuestions": ["CP-011 DQ3 HD-2D reference"], "debt": ["CP-012 mobile HUD layout -> ARC1-026"] },
-    { "key": "ARC1-002", "epic": "Control", "title": "Crear contrato H3 con base, presupuesto, ownership y autorización", "owner": "director", "status": "DONE", "dependsOn": ["ARC1-001"], "spec": "tickets/ARC1-002.md", "verdict": "authorized", "decidedOn": "2026-08-02", "decisions": ["CP-013", "CP-014"], "evidence": "evidence/ARC1-002/" },
-    { "key": "ARC1-003", "epic": "Control", "title": "Congelar golden frames, identidad y referencias legales", "owner": "director", "status": "DONE", "dependsOn": ["ARC1-002"], "spec": "tickets/ARC1-003.md", "decidedOn": "2026-08-02", "decisions": ["CP-015"], "evidence": "evidence/ARC1-003/", "deliverables": ["GOLDEN_FRAMES.md", "IDENTITY.md", "LEGAL_REFERENCES.md"] },
-    { "key": "ARC1-004", "epic": "Control", "title": "Congelar color script y shot deck del slice", "owner": "architecture", "status": "READY", "dependsOn": ["ARC1-003"] },
-    { "key": "ARC1-005", "epic": "Control", "title": "Congelar escenas, beats, duración y fichas V2", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-004"] },
-    { "key": "ARC1-006", "epic": "Control", "title": "Fijar presupuesto por escena", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-005"] },
-    { "key": "ARC1-007", "epic": "Slice", "title": "Montar laboratorio Three.js mediante RuntimeHost", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-006"] },
-    { "key": "ARC1-008", "epic": "Slice", "title": "Probar mount pause resume destroy y fugas", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-007"] },
-    { "key": "ARC1-009", "epic": "Slice", "title": "Implementar acciones, teclado, táctil y reasignación", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-008"] },
-    { "key": "ARC1-010", "epic": "Slice", "title": "Construir overworld mínimo y transición a Cuenca", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-009"] },
-    { "key": "ARC1-011", "epic": "Slice", "title": "Cerrar escala, recorrido y blockout Portal-Plaza", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-010"] },
-    { "key": "ARC1-012", "epic": "Slice", "title": "Cerrar cámaras y oclusión Portal-Plaza", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-011"] },
-    { "key": "ARC1-013", "epic": "Slice", "title": "Integrar estudiante 4-dir", "owner": "asset-forge", "status": "BLOCKED", "dependsOn": ["ARC1-012"] },
-    { "key": "ARC1-014", "epic": "Slice", "title": "Integrar Ohm sprite", "owner": "asset-forge", "status": "BLOCKED", "dependsOn": ["ARC1-013"] },
-    { "key": "ARC1-015", "epic": "Slice", "title": "Implementar llegada, Edda y activación de Ohm", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-014"] },
-    { "key": "ARC1-016", "epic": "Slice", "title": "Cerrar blockout, cámara y navegación del Taller", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-015"] },
-    { "key": "ARC1-017", "epic": "Slice", "title": "Integrar Edda y Lumen", "owner": "asset-forge", "status": "BLOCKED", "dependsOn": ["ARC1-016"] },
-    { "key": "ARC1-018", "epic": "Slice", "title": "Implementar modelo V2 de diagnóstico de Lumen", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-017"] },
-    { "key": "ARC1-019", "epic": "Slice", "title": "Integrar medición diegética y error recuperable", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-018"] },
-    { "key": "ARC1-020", "epic": "Slice", "title": "Cerrar blockout y cámara Puerta-Manantial", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-019"] },
-    { "key": "ARC1-021", "epic": "Slice", "title": "Implementar transferencia Lumen-Puerta", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-020"] },
-    { "key": "ARC1-022", "epic": "Slice", "title": "Implementar Bitácora del slice", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-021"] },
-    { "key": "ARC1-023", "epic": "Slice", "title": "Implementar estados y transformación causal", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-022"] },
-    { "key": "ARC1-024", "epic": "Slice", "title": "Aplicar materiales, luz, DOF, agua y VFX", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-023"] },
-    { "key": "ARC1-025", "epic": "Slice", "title": "Integrar audio, ambiente, subtítulos y VO parcial", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-024"] },
-    { "key": "ARC1-026", "epic": "Slice", "title": "Implementar baseline de accesibilidad", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-025"] },
-    { "key": "ARC1-027", "epic": "Slice", "title": "Implementar PWA, guardado y recuperación offline", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-026"] },
-    { "key": "ARC1-028", "epic": "Slice", "title": "Optimizar calidad adaptativa y medir hardware", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-027"] },
-    { "key": "ARC1-029", "epic": "Slice", "title": "QA navegadores, controles, consola y save", "owner": "evaluator", "status": "BLOCKED", "dependsOn": ["ARC1-028"] },
-    { "key": "ARC1-030", "epic": "Slice", "title": "Playtest y promoción V2-V3", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-029"] },
-    { "key": "ARC1-031", "epic": "Slice", "title": "Evaluación integrada ronda 1", "owner": "evaluator", "status": "BLOCKED", "dependsOn": ["ARC1-030"] },
-    { "key": "ARC1-032", "epic": "Slice", "title": "Corregir sólo P0-P1 de ronda 1", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-031"] },
-    { "key": "ARC1-033", "epic": "Slice", "title": "Evaluación final y veredicto humano", "owner": "evaluator", "status": "BLOCKED", "dependsOn": ["ARC1-032"] },
-    { "key": "ARC1-034", "epic": "ADR", "title": "Registrar ADR de runtime y migración gradual", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-033"] },
-    { "key": "ARC1-035", "epic": "Preprod", "title": "Congelar kit productivo y coste por minuto", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-034"] },
-    { "key": "ARC1-036", "epic": "Cuenca", "title": "Cerrar escenas, V2, habitantes y rutas", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-035"] },
-    { "key": "ARC1-037", "epic": "Cuenca", "title": "Producir blockout, cámaras y landmarks", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-036"] },
-    { "key": "ARC1-038", "epic": "Cuenca", "title": "Integrar sistemas U1 y Bitácora", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-037"] },
-    { "key": "ARC1-039", "epic": "Cuenca", "title": "Producir arte y audio de Cuenca", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-038"] },
-    { "key": "ARC1-040", "epic": "Cuenca", "title": "QA, V3 y aceptación humana", "owner": "evaluator", "status": "BLOCKED", "dependsOn": ["ARC1-039"] },
-    { "key": "ARC1-041", "epic": "Castillo", "title": "Cerrar escenas, V2, habitantes y rutas", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-040"] },
-    { "key": "ARC1-042", "epic": "Castillo", "title": "Producir blockout, cámaras y red", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-041"] },
-    { "key": "ARC1-043", "epic": "Castillo", "title": "Integrar serie, paralelo y distribución", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-042"] },
-    { "key": "ARC1-044", "epic": "Castillo", "title": "Producir arte y audio del Castillo", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-043"] },
-    { "key": "ARC1-045", "epic": "Castillo", "title": "QA, V3 y aceptación humana", "owner": "evaluator", "status": "BLOCKED", "dependsOn": ["ARC1-044"] },
-    { "key": "ARC1-046", "epic": "Forja-Terrazas", "title": "Cerrar escenas, V2, habitantes y rutas", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-045"] },
-    { "key": "ARC1-047", "epic": "Forja-Terrazas", "title": "Producir blockout, cámaras y landmarks", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-046"] },
-    { "key": "ARC1-048", "epic": "Forja-Terrazas", "title": "Integrar potencia, Joule, KVL y divisores", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-047"] },
-    { "key": "ARC1-049", "epic": "Forja-Terrazas", "title": "Producir arte y audio de Forja-Terrazas", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-048"] },
-    { "key": "ARC1-050", "epic": "Forja-Terrazas", "title": "QA, V3 y aceptación humana", "owner": "evaluator", "status": "BLOCKED", "dependsOn": ["ARC1-049"] },
-    { "key": "ARC1-051", "epic": "Faro-Lago", "title": "Cerrar escenas, V2, habitantes y rutas", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-050"] },
-    { "key": "ARC1-052", "epic": "Faro-Lago", "title": "Producir blockout, cámaras y landmarks", "owner": "architecture", "status": "BLOCKED", "dependsOn": ["ARC1-051"] },
-    { "key": "ARC1-053", "epic": "Faro-Lago", "title": "Integrar capacitor, tiempo y diagnóstico", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-052"] },
-    { "key": "ARC1-054", "epic": "Faro-Lago", "title": "Producir arte y audio de Faro-Lago", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-053"] },
-    { "key": "ARC1-055", "epic": "Faro-Lago", "title": "QA, V3 y aceptación humana", "owner": "evaluator", "status": "BLOCKED", "dependsOn": ["ARC1-054"] },
-    { "key": "ARC1-056", "epic": "Cierre", "title": "Implementar noche de Ohmdal y epílogo", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-055"] },
-    { "key": "ARC1-057", "epic": "Cierre", "title": "Integrar campaña, save y continuidad", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-056"] },
-    { "key": "ARC1-058", "epic": "Cierre", "title": "Completar guía docente y enlaces de La Escuela", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-057"] },
-    { "key": "ARC1-059", "epic": "Release", "title": "Auditoría curricular V4, seguridad, privacidad y legal", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-058"] },
-    { "key": "ARC1-060", "epic": "Release", "title": "QA completo PWA, navegadores, Android y accesibilidad", "owner": "evaluator", "status": "BLOCKED", "dependsOn": ["ARC1-059"] },
-    { "key": "ARC1-061", "epic": "Release", "title": "Corregir sólo blockers de release", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-060"] },
-    { "key": "ARC1-062", "epic": "Release", "title": "Aceptación humana, tag y postmortem", "owner": "director", "status": "BLOCKED", "dependsOn": ["ARC1-061"] }
+    {
+      "key": "ARC1-001",
+      "epic": "Gate 0",
+      "title": "Aprobar visualmente cámara corregida",
+      "owner": "director",
+      "status": "DONE",
+      "dependsOn": [],
+      "spec": "tickets/ARC1-001.md",
+      "verdict": "approved-advance",
+      "decidedOn": "2026-08-02",
+      "decisions": [
+        "CP-010",
+        "CP-011",
+        "CP-012"
+      ],
+      "evidence": "evidence/ARC1-001/",
+      "openQuestions": [
+        "CP-011 DQ3 HD-2D reference"
+      ],
+      "debt": [
+        "CP-012 mobile HUD layout -> ARC1-026"
+      ]
+    },
+    {
+      "key": "ARC1-002",
+      "epic": "Control",
+      "title": "Crear contrato H3 con base, presupuesto, ownership y autorización",
+      "owner": "director",
+      "status": "DONE",
+      "dependsOn": [
+        "ARC1-001"
+      ],
+      "spec": "tickets/ARC1-002.md",
+      "verdict": "authorized",
+      "decidedOn": "2026-08-02",
+      "decisions": [
+        "CP-013",
+        "CP-014"
+      ],
+      "evidence": "evidence/ARC1-002/"
+    },
+    {
+      "key": "ARC1-003",
+      "epic": "Control",
+      "title": "Congelar golden frames, identidad y referencias legales",
+      "owner": "director",
+      "status": "DONE",
+      "dependsOn": [
+        "ARC1-002"
+      ],
+      "spec": "tickets/ARC1-003.md",
+      "decidedOn": "2026-08-02",
+      "decisions": [
+        "CP-015"
+      ],
+      "evidence": "evidence/ARC1-003/",
+      "deliverables": [
+        "GOLDEN_FRAMES.md",
+        "IDENTITY.md",
+        "LEGAL_REFERENCES.md"
+      ]
+    },
+    {
+      "key": "ARC1-004",
+      "epic": "Control",
+      "title": "Congelar color script y shot deck del slice",
+      "owner": "architecture",
+      "status": "READY",
+      "dependsOn": [
+        "ARC1-003"
+      ]
+    },
+    {
+      "key": "ARC1-005",
+      "epic": "Control",
+      "title": "Congelar escenas, beats, duración y fichas V2",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-004"
+      ]
+    },
+    {
+      "key": "ARC1-006",
+      "epic": "Control",
+      "title": "Fijar presupuesto por escena",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-005"
+      ]
+    },
+    {
+      "key": "ARC1-007",
+      "epic": "Slice",
+      "title": "Montar laboratorio Three.js mediante RuntimeHost",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-006"
+      ]
+    },
+    {
+      "key": "ARC1-008",
+      "epic": "Slice",
+      "title": "Probar mount pause resume destroy y fugas",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-007"
+      ]
+    },
+    {
+      "key": "ARC1-009",
+      "epic": "Slice",
+      "title": "Implementar acciones, teclado, táctil y reasignación",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-008"
+      ]
+    },
+    {
+      "key": "ARC1-010",
+      "epic": "Slice",
+      "title": "Construir overworld mínimo y transición a Cuenca",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-009"
+      ]
+    },
+    {
+      "key": "ARC1-011",
+      "epic": "Slice",
+      "title": "Cerrar escala, recorrido y blockout Portal-Plaza",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-010"
+      ]
+    },
+    {
+      "key": "ARC1-012",
+      "epic": "Slice",
+      "title": "Cerrar cámaras y oclusión Portal-Plaza",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-011"
+      ]
+    },
+    {
+      "key": "ARC1-013",
+      "epic": "Slice",
+      "title": "Integrar estudiante 4-dir",
+      "owner": "asset-forge",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-012"
+      ]
+    },
+    {
+      "key": "ARC1-014",
+      "epic": "Slice",
+      "title": "Integrar Ohm sprite",
+      "owner": "asset-forge",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-013"
+      ]
+    },
+    {
+      "key": "ARC1-015",
+      "epic": "Slice",
+      "title": "Implementar llegada, Edda y activación de Ohm",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-014"
+      ]
+    },
+    {
+      "key": "ARC1-016",
+      "epic": "Slice",
+      "title": "Cerrar blockout, cámara y navegación del Taller",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-015"
+      ]
+    },
+    {
+      "key": "ARC1-017",
+      "epic": "Slice",
+      "title": "Integrar Edda y Lumen",
+      "owner": "asset-forge",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-016"
+      ]
+    },
+    {
+      "key": "ARC1-018",
+      "epic": "Slice",
+      "title": "Implementar modelo V2 de diagnóstico de Lumen",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-017"
+      ]
+    },
+    {
+      "key": "ARC1-019",
+      "epic": "Slice",
+      "title": "Integrar medición diegética y error recuperable",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-018"
+      ]
+    },
+    {
+      "key": "ARC1-020",
+      "epic": "Slice",
+      "title": "Cerrar blockout y cámara Puerta-Manantial",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-019"
+      ]
+    },
+    {
+      "key": "ARC1-021",
+      "epic": "Slice",
+      "title": "Implementar transferencia Lumen-Puerta",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-020"
+      ]
+    },
+    {
+      "key": "ARC1-022",
+      "epic": "Slice",
+      "title": "Implementar Bitácora del slice",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-021"
+      ]
+    },
+    {
+      "key": "ARC1-023",
+      "epic": "Slice",
+      "title": "Implementar estados y transformación causal",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-022"
+      ]
+    },
+    {
+      "key": "ARC1-024",
+      "epic": "Slice",
+      "title": "Aplicar materiales, luz, DOF, agua y VFX",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-023"
+      ]
+    },
+    {
+      "key": "ARC1-025",
+      "epic": "Slice",
+      "title": "Integrar audio, ambiente, subtítulos y VO parcial",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-024"
+      ]
+    },
+    {
+      "key": "ARC1-026",
+      "epic": "Slice",
+      "title": "Implementar baseline de accesibilidad",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-025"
+      ]
+    },
+    {
+      "key": "ARC1-027",
+      "epic": "Slice",
+      "title": "Implementar PWA, guardado y recuperación offline",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-026"
+      ]
+    },
+    {
+      "key": "ARC1-028",
+      "epic": "Slice",
+      "title": "Optimizar calidad adaptativa y medir hardware",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-027"
+      ]
+    },
+    {
+      "key": "ARC1-029",
+      "epic": "Slice",
+      "title": "QA navegadores, controles, consola y save",
+      "owner": "evaluator",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-028"
+      ]
+    },
+    {
+      "key": "ARC1-030",
+      "epic": "Slice",
+      "title": "Playtest y promoción V2-V3",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-029"
+      ]
+    },
+    {
+      "key": "ARC1-031",
+      "epic": "Slice",
+      "title": "Evaluación integrada ronda 1",
+      "owner": "evaluator",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-030"
+      ]
+    },
+    {
+      "key": "ARC1-032",
+      "epic": "Slice",
+      "title": "Corregir sólo P0-P1 de ronda 1",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-031"
+      ]
+    },
+    {
+      "key": "ARC1-033",
+      "epic": "Slice",
+      "title": "Evaluación final y veredicto humano",
+      "owner": "evaluator",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-032"
+      ]
+    },
+    {
+      "key": "ARC1-034",
+      "epic": "ADR",
+      "title": "Registrar ADR de runtime y migración gradual",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-033"
+      ]
+    },
+    {
+      "key": "ARC1-035",
+      "epic": "Preprod",
+      "title": "Congelar kit productivo y coste por minuto",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-034"
+      ]
+    },
+    {
+      "key": "ARC1-036",
+      "epic": "Cuenca",
+      "title": "Cerrar escenas, V2, habitantes y rutas",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-035"
+      ]
+    },
+    {
+      "key": "ARC1-037",
+      "epic": "Cuenca",
+      "title": "Producir blockout, cámaras y landmarks",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-036"
+      ]
+    },
+    {
+      "key": "ARC1-038",
+      "epic": "Cuenca",
+      "title": "Integrar sistemas U1 y Bitácora",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-037"
+      ]
+    },
+    {
+      "key": "ARC1-039",
+      "epic": "Cuenca",
+      "title": "Producir arte y audio de Cuenca",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-038"
+      ]
+    },
+    {
+      "key": "ARC1-040",
+      "epic": "Cuenca",
+      "title": "QA, V3 y aceptación humana",
+      "owner": "evaluator",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-039"
+      ]
+    },
+    {
+      "key": "ARC1-041",
+      "epic": "Castillo",
+      "title": "Cerrar escenas, V2, habitantes y rutas",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-040"
+      ]
+    },
+    {
+      "key": "ARC1-042",
+      "epic": "Castillo",
+      "title": "Producir blockout, cámaras y red",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-041"
+      ]
+    },
+    {
+      "key": "ARC1-043",
+      "epic": "Castillo",
+      "title": "Integrar serie, paralelo y distribución",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-042"
+      ]
+    },
+    {
+      "key": "ARC1-044",
+      "epic": "Castillo",
+      "title": "Producir arte y audio del Castillo",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-043"
+      ]
+    },
+    {
+      "key": "ARC1-045",
+      "epic": "Castillo",
+      "title": "QA, V3 y aceptación humana",
+      "owner": "evaluator",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-044"
+      ]
+    },
+    {
+      "key": "ARC1-046",
+      "epic": "Forja-Terrazas",
+      "title": "Cerrar escenas, V2, habitantes y rutas",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-045"
+      ]
+    },
+    {
+      "key": "ARC1-047",
+      "epic": "Forja-Terrazas",
+      "title": "Producir blockout, cámaras y landmarks",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-046"
+      ]
+    },
+    {
+      "key": "ARC1-048",
+      "epic": "Forja-Terrazas",
+      "title": "Integrar potencia, Joule, KVL y divisores",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-047"
+      ]
+    },
+    {
+      "key": "ARC1-049",
+      "epic": "Forja-Terrazas",
+      "title": "Producir arte y audio de Forja-Terrazas",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-048"
+      ]
+    },
+    {
+      "key": "ARC1-050",
+      "epic": "Forja-Terrazas",
+      "title": "QA, V3 y aceptación humana",
+      "owner": "evaluator",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-049"
+      ]
+    },
+    {
+      "key": "ARC1-051",
+      "epic": "Faro-Lago",
+      "title": "Cerrar escenas, V2, habitantes y rutas",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-050"
+      ]
+    },
+    {
+      "key": "ARC1-052",
+      "epic": "Faro-Lago",
+      "title": "Producir blockout, cámaras y landmarks",
+      "owner": "architecture",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-051"
+      ]
+    },
+    {
+      "key": "ARC1-053",
+      "epic": "Faro-Lago",
+      "title": "Integrar capacitor, tiempo y diagnóstico",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-052"
+      ]
+    },
+    {
+      "key": "ARC1-054",
+      "epic": "Faro-Lago",
+      "title": "Producir arte y audio de Faro-Lago",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-053"
+      ]
+    },
+    {
+      "key": "ARC1-055",
+      "epic": "Faro-Lago",
+      "title": "QA, V3 y aceptación humana",
+      "owner": "evaluator",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-054"
+      ]
+    },
+    {
+      "key": "ARC1-056",
+      "epic": "Cierre",
+      "title": "Implementar noche de Ohmdal y epílogo",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-055"
+      ]
+    },
+    {
+      "key": "ARC1-057",
+      "epic": "Cierre",
+      "title": "Integrar campaña, save y continuidad",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-056"
+      ]
+    },
+    {
+      "key": "ARC1-058",
+      "epic": "Cierre",
+      "title": "Completar guía docente y enlaces de La Escuela",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-057"
+      ]
+    },
+    {
+      "key": "ARC1-059",
+      "epic": "Release",
+      "title": "Auditoría curricular V4, seguridad, privacidad y legal",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-058"
+      ]
+    },
+    {
+      "key": "ARC1-060",
+      "epic": "Release",
+      "title": "QA completo PWA, navegadores, Android y accesibilidad",
+      "owner": "evaluator",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-059"
+      ]
+    },
+    {
+      "key": "ARC1-061",
+      "epic": "Release",
+      "title": "Corregir sólo blockers de release",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-060"
+      ]
+    },
+    {
+      "key": "ARC1-062",
+      "epic": "Release",
+      "title": "Aceptación humana, tag y postmortem",
+      "owner": "director",
+      "status": "BLOCKED",
+      "dependsOn": [
+        "ARC1-061"
+      ]
+    }
   ],
   "prohibited": [
     "changes to src/jugar/**",
@@ -124,11 +725,29 @@
     "copying Dragon Quest IP: palette, composition, UI, characters or maps"
   ],
   "notRun": {
-    "androidPhysical": { "status": "not-run", "resolvedIn": "ARC1-060", "decision": "CP-014", "note": "no physical mid-range 2022 device; no ticket may claim mobile fps PASS before ARC1-060" },
-    "npmRunVerify": { "status": "not-run", "note": "bash scripts/verificar-hito.sh requires WSL; no distribution installed. Substituted by build + test + 3d:validate-manifests + git diff --check" },
-    "safariPwaOffline": { "status": "not-run", "resolvedIn": "ARC1-027 and ARC1-060" }
+    "androidPhysical": {
+      "status": "not-run",
+      "resolvedIn": "ARC1-060",
+      "decision": "CP-014",
+      "note": "no physical mid-range 2022 device; no ticket may claim mobile fps PASS before ARC1-060"
+    },
+    "npmRunVerify": {
+      "status": "not-run",
+      "note": "bash scripts/verificar-hito.sh requires WSL; no distribution installed. Substituted by build + test + 3d:validate-manifests + git diff --check"
+    },
+    "safariPwaOffline": {
+      "status": "not-run",
+      "resolvedIn": "ARC1-027 and ARC1-060"
+    }
   },
   "openQuestions": {
-    "CP-011": { "topic": "DQ3 HD-2D camera equivalence", "blocking": false, "reevaluateIn": ["ARC1-024", "ARC1-030"] }
+    "CP-011": {
+      "topic": "DQ3 HD-2D camera equivalence",
+      "blocking": false,
+      "reevaluateIn": [
+        "ARC1-024",
+        "ARC1-030"
+      ]
+    }
   }
 }

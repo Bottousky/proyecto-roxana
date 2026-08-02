@@ -6,6 +6,7 @@
 **Ejecución autorizada:** **sí** — H3 golden slice, `CP-013`, contrato en `H3_CONTRACT.md`
 **Base congelada:** `b49b617`
 **Ticket activo:** `ARC1-004 — READY`
+**Paquete activo:** ninguno — los define `/arc-plan ARC1-004` (`CP-016`)
 **Anteriores:** `ARC1-001 — DONE`, `ARC1-002 — DONE`, `ARC1-003 — DONE`
 **Siguiente:** `ARC1-005 — BLOCKED`
 
@@ -18,6 +19,9 @@
 - La autorización es de **alcance, no de resultado**. Cada ticket conserva sus gates, su evidencia y
   su aprobación humana cuando el cambio sea visible.
 - La unidad de producción es la **escena causal completa**, no la región ni el lote de assets.
+- Desde `CP-016` la unidad de **ejecución** es el paquete `ARC1-NNN-X` (30–90 min, una sesión
+  nueva), no el ticket. Protocolo en `PACKETS.md`; hallazgos ajenos en `OPEN_ISSUES.md`; medición
+  real de rutas, modelos y duraciones en `telemetry.json`.
 
 ## Canon congelado — no se redefine dentro de un ticket de escena
 
