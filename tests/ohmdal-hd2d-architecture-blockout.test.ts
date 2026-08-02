@@ -4,6 +4,7 @@ import {
   disposeRendererCaches,
   readRendererInfo,
 } from '../src/labs/ohmdal-hd2d-preprod/architecture/blockout.ts';
+import { CameraOcclusionController } from '../src/labs/ohmdal-hd2d-preprod/camera/occlusion.ts';
 
 function assert(condition: boolean, message: string): void {
   if (!condition) throw new Error(message);
@@ -38,7 +39,26 @@ assert(before.lighting.lightCount === 4, 'la luz global y local tiene inventario
 assert(before.lighting.shadowLightCount === 1, 'solo la luz principal proyecta sombra');
 assert(before.lighting.enabledLocalLightCount === 2, 'ambos emisores locales nacen habilitados');
 assert(blockout.lighting.inventory.filter((entry) => entry.type === 'point').every((entry) => entry.emitterId !== 'WORLD'), 'cada luz local tiene emisor visible');
-assert(blockout.occlusionBindings.length === 4, 'foreground y techos exponen bindings de oclusion propios');
+const occlusionBindingIds = blockout.occlusionBindings.map((binding) => binding.id).sort();
+assert(occlusionBindingIds.length === 6, 'foreground, techos y pilares de Puerta exponen bindings propios');
+assert(occlusionBindingIds.includes('door-pier-north'), 'el pilar norte de Puerta participa del fade');
+assert(occlusionBindingIds.includes('door-pier-south'), 'el pilar sur que ocultaba al estudiante participa del fade');
+assert(!occlusionBindingIds.includes('ohm-door-frame'), 'el landmark dominante de la Puerta nunca se oculta');
+const doorLandmark = blockout.visualLayer.getObjectByName('ohm-door-frame');
+assert(doorLandmark?.visible === true, 'el landmark de Puerta permanece visible');
+
+const doorSouthBinding = blockout.occlusionBindings.find((binding) => binding.id === 'door-pier-south');
+assert(doorSouthBinding !== undefined, 'el binding del pilar sur es resoluble por ID estable');
+const doorSouthMaterial = (doorSouthBinding.object.children[0] as THREE.Mesh).material as THREE.Material & { opacity: number };
+const doorOcclusion = new CameraOcclusionController([doorSouthBinding]);
+doorOcclusion.update(new Set(['door-pier-south']), 1 / 60, true);
+assert(doorSouthMaterial.opacity === 1, 'un frame bloqueado no altera el pilar');
+doorOcclusion.update(new Set(['door-pier-south']), 1 / 60, true);
+assert(doorSouthMaterial.opacity === 0.18 && doorSouthBinding.object.visible, 'el pilar hace fade sin desaparecer por completo');
+for (let index = 0; index < 6; index += 1) doorOcclusion.update(new Set(), 1 / 60, true);
+assert(doorSouthMaterial.opacity === 1 && doorSouthBinding.object.visible, 'el pilar recupera opacidad tras seis frames libres');
+assert(doorLandmark?.visible === true, 'la recuperacion del pilar no modifica el landmark');
+doorOcclusion.dispose();
 const workshopEmitter = blockout.visualLayer.getObjectByName('workshop-lantern-emitter');
 assert(workshopEmitter !== undefined, 'el emisor visible del Taller existe');
 workshopEmitter.visible = false;

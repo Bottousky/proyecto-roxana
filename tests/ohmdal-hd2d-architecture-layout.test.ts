@@ -46,6 +46,14 @@ for (const socket of ARCHITECTURE_SOCKETS) {
 for (const zone of LEVEL_ZONES) {
   assert(BOX_MODULES.some((module) => module.id === zone.landmarkId), `${zone.id} declara un landmark visible`);
 }
+const doorFrame = BOX_MODULES.find((module) => module.id === 'ohm-door-frame');
+assert(doorFrame?.tags.includes('landmark') === true, 'el marco de la Puerta conserva jerarquia de landmark');
+assert(doorFrame?.tags.includes('cameraOccluder') === false, 'el landmark de Puerta no participa del fade');
+for (const pierId of ['door-pier-north', 'door-pier-south']) {
+  const pier = BOX_MODULES.find((module) => module.id === pierId);
+  assert(pier?.tags.includes('cameraOccluder') === true, `${pierId} puede despejar sujetos protegidos`);
+  assert(pier?.tags.includes('landmark') === false, `${pierId} no suplanta el landmark dominante`);
+}
 
 const navigationIssues = validateNavigation();
 assert(navigationIssues.length === 0, `la navegacion plana pasa: ${navigationIssues.join(', ')}`);

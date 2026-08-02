@@ -155,8 +155,8 @@ export const BOX_MODULES: readonly BoxModuleDefinition[] = [
   { id: 'workshop-bench', zoneId: 'taller', family: 'wood', centerX: 4.8, centerZ: -2.5, width: 2.4, height: 0.9, depth: 0.9, pivotY: 0, tags: ['structure'] },
   { id: 'workshop-lantern-emitter', zoneId: 'taller', family: 'glass', centerX: 3.2, centerZ: -3.9, width: 0.3, height: 0.35, depth: 0.3, baseY: 2.55, pivotY: 0, tags: ['emitter'] },
 
-  { id: 'door-pier-north', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: -3, width: 1.4, height: 5.2, depth: 1.4, pivotY: 0, tags: ['structure', 'landmark'] },
-  { id: 'door-pier-south', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: 3, width: 1.4, height: 5.2, depth: 1.4, pivotY: 0, tags: ['structure', 'landmark'] },
+  { id: 'door-pier-north', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: -3, width: 1.4, height: 5.2, depth: 1.4, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
+  { id: 'door-pier-south', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: 3, width: 1.4, height: 5.2, depth: 1.4, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
   { id: 'ohm-door-frame', zoneId: 'puerta_manantial', family: 'copper', centerX: 13, centerZ: 0, width: 0.9, height: 0.75, depth: 4.8, baseY: 4.45, pivotY: 0, tags: ['structure', 'landmark'] },
   { id: 'door-conduit-emitter', zoneId: 'puerta_manantial', family: 'glass', centerX: 13.1, centerZ: 0, width: 0.25, height: 0.4, depth: 0.25, baseY: 4.65, pivotY: 0, tags: ['emitter'] },
   { id: 'spring-basin', zoneId: 'puerta_manantial', family: 'water', centerX: 18, centerZ: 1.5, width: 3, height: 0.25, depth: 3, pivotY: 0, tags: ['structure'] },
