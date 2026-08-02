@@ -4,8 +4,11 @@
   "world": "ohmdal",
   "category": "sprite",
   "sourceMethod": "sprite",
-  "status": "review-required",
-  "references": ["assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md"],
+  "status": "integrated",
+  "references": [
+    "assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md",
+    "assets/references/ohmdal-hd2d-preprod/eval-001-selection.md"
+  ],
   "generation": {
     "provider": "manual",
     "taskId": "ASSET-001",
@@ -27,5 +30,5 @@
     "desktop": { "path": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-sprite-atlas.svg", "maxTriangles": 128, "maxTexture": 512, "maxMaterials": 1, "maxDrawCalls": 7 },
     "mobile": { "path": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-sprite-atlas.svg", "maxTriangles": 128, "maxTexture": 512, "maxMaterials": 1, "maxDrawCalls": 7 }
   },
-  "notes": "Techo idéntico al procedural para A/B. Uso esperado: 2 tris y 1 draw call. Atlas 288x256 y 24 celdas; sidecar existente. Transferencia observada: SVG 2395 B + metadata 538 B = 2933 B. Memoria RGBA calculada: 294912 B."
+  "notes": "selectionState=selected-for-corrective-harness por EVAL-001 en 329c927 sobre 64e0b92. Techo idéntico al procedural para A/B. Uso esperado: 2 tris y 1 draw call. Atlas 288x256 y 24 celdas; sidecar existente. Transferencia observada: SVG 2395 B + metadata 538 B = 2933 B. Memoria RGBA calculada: 294912 B. Integrado sólo como prototipo de la ronda correctiva; no es arte final ni QA aprobado."
 }

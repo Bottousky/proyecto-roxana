@@ -1,7 +1,7 @@
 {
   "version": 2,
   "milestone": "ohmdal-hd2d-preprod-v1",
-  "status": "prototypes-ready-for-integration-review",
+  "status": "h2-evaluated-corrective-selection-recorded",
   "meshy": {
     "approved": false,
     "balanceChecked": false,
@@ -38,7 +38,8 @@
       "mobileBudget": "same; one atlas variant active",
       "runtime": "assets/runtime/ohmdal-hd2d-preprod/student/student-atlas-4.svg",
       "manifest": "assets/manifests/ohmdal-hd2d-preprod-student-4.json",
-      "status": "review-required"
+      "status": "selected-for-corrective-harness",
+      "selectionEvidence": "assets/references/ohmdal-hd2d-preprod/eval-001-selection.md"
     },
     {
       "id": "student_sprite_direction_8",
@@ -54,7 +55,8 @@
       "mobileBudget": "same; one atlas variant active",
       "runtime": "assets/runtime/ohmdal-hd2d-preprod/student/student-atlas-8.svg",
       "manifest": "assets/manifests/ohmdal-hd2d-preprod-student-8.json",
-      "status": "review-required"
+      "status": "archived-after-h2-evaluation",
+      "selectionEvidence": "assets/references/ohmdal-hd2d-preprod/eval-001-selection.md"
     },
     {
       "id": "ohm_sprite_ab",
@@ -70,7 +72,8 @@
       "mobileBudget": "same",
       "runtime": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-sprite-atlas.svg",
       "manifest": "assets/manifests/ohmdal-hd2d-preprod-ohm-sprite.json",
-      "status": "review-required"
+      "status": "selected-for-corrective-harness",
+      "selectionEvidence": "assets/references/ohmdal-hd2d-preprod/eval-001-selection.md"
     },
     {
       "id": "ohm_procedural_ab",
@@ -86,7 +89,8 @@
       "mobileBudget": "same",
       "runtime": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-procedural.mjs",
       "manifest": "assets/manifests/ohmdal-hd2d-preprod-ohm-procedural.json",
-      "status": "review-required"
+      "status": "archived-after-h2-evaluation",
+      "selectionEvidence": "assets/references/ohmdal-hd2d-preprod/eval-001-selection.md"
     },
     {
       "id": "official_footage_observation_notes",

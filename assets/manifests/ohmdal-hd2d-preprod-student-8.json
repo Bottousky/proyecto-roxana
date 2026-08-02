@@ -4,10 +4,11 @@
   "world": "ohmdal",
   "category": "sprite",
   "sourceMethod": "sprite",
-  "status": "review-required",
+  "status": "archived",
   "references": [
     "assets/references/ohmdal-hd2d-preprod/student-original-spec.md",
-    "assets/references/ohmdal-hd2d-preprod/official-footage-observations.md"
+    "assets/references/ohmdal-hd2d-preprod/official-footage-observations.md",
+    "assets/references/ohmdal-hd2d-preprod/eval-001-selection.md"
   ],
   "generation": {
     "provider": "manual",
@@ -30,5 +31,5 @@
     "desktop": { "path": "assets/runtime/ohmdal-hd2d-preprod/student/student-atlas-8.svg", "maxTriangles": 2, "maxTexture": 1024, "maxMaterials": 1, "maxDrawCalls": 1 },
     "mobile": { "path": "assets/runtime/ohmdal-hd2d-preprod/student/student-atlas-8.svg", "maxTriangles": 2, "maxTexture": 1024, "maxMaterials": 1, "maxDrawCalls": 1 }
   },
-  "notes": "Atlas 960x512, 160 celdas de 48x64. Sidecar existente: student-atlas-8.json. Transferencia observada de prototipo: SVG 4103 B + metadata 955 B = 5058 B. Memoria RGBA calculada al rasterizar: 1966080 B. Pendiente de cámara integrada; no es arte final."
+  "notes": "selectionState=archived-after-h2-evaluation por EVAL-001 en 329c927 sobre 64e0b92. Atlas 960x512, 160 celdas de 48x64. Sidecar existente: student-atlas-8.json. Transferencia observada de prototipo: SVG 4103 B + metadata 955 B = 5058 B. Memoria RGBA calculada al rasterizar: 1966080 B. Preservado sólo como evidencia A/B; no cargar en el runtime correctivo activo."
 }

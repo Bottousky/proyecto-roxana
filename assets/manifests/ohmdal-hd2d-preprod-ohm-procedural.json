@@ -4,8 +4,11 @@
   "world": "ohmdal",
   "category": "hard-surface",
   "sourceMethod": "procedural-three",
-  "status": "review-required",
-  "references": ["assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md"],
+  "status": "archived",
+  "references": [
+    "assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md",
+    "assets/references/ohmdal-hd2d-preprod/eval-001-selection.md"
+  ],
   "generation": {
     "provider": "manual",
     "taskId": "ASSET-001",
@@ -27,5 +30,5 @@
     "desktop": { "path": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-procedural.mjs", "maxTriangles": 128, "maxTexture": 512, "maxMaterials": 1, "maxDrawCalls": 7 },
     "mobile": { "path": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-procedural.mjs", "maxTriangles": 128, "maxTexture": 512, "maxMaterials": 1, "maxDrawCalls": 7 }
   },
-  "notes": "Techo idéntico al sprite para A/B. Geometría construida: 104 triángulos calculados, siete meshes/draw calls y un material compartido; sin textura. Transferencia observada del módulo: 3309 B. Pendiente renderer.info en el harness integrado."
+  "notes": "selectionState=archived-after-h2-evaluation por EVAL-001 en 329c927 sobre 64e0b92. Techo idéntico al sprite para A/B. Geometría construida: 104 triángulos calculados, siete meshes/draw calls y un material compartido; sin textura. Transferencia observada del módulo: 3309 B. Preservado sólo como evidencia A/B; no cargar en el runtime correctivo activo."
 }
