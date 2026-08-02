@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "image": "student-atlas-4.svg",
+  "cell": { "width": 48, "height": 64, "pivot": [24, 60] },
+  "atlas": { "width": 960, "height": 256, "columns": 20, "rows": 4 },
+  "directions": ["N", "E", "S", "W"],
+  "actions": [
+    { "id": "idle", "firstColumn": 0, "frames": 2, "frameMs": 300 },
+    { "id": "walk", "firstColumn": 2, "frames": 6, "frameMs": 100 },
+    { "id": "turn_135", "firstColumn": 8, "frames": 4, "frameMs": 100 },
+    { "id": "inspect_lumen", "firstColumn": 12, "frames": 4, "frameMs": 125 },
+    { "id": "measure", "firstColumn": 16, "frames": 4, "frameMs": 125 }
+  ],
+  "heading": { "zeroAxis": "+Z", "clockwise": true, "interval": "[start,end)", "boundaryTieBreak": "next-clockwise", "sectors": { "N": [[315, 360], [0, 45]], "E": [[45, 135]], "S": [[135, 225]], "W": [[225, 315]] } }
+}

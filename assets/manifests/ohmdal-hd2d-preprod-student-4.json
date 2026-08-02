@@ -1,0 +1,34 @@
+{
+  "id": "rx_ohmdal_student_sprite_ab4",
+  "displayName": "Estudiante provisional original — 4 direcciones",
+  "world": "ohmdal",
+  "category": "sprite",
+  "sourceMethod": "sprite",
+  "status": "review-required",
+  "references": [
+    "assets/references/ohmdal-hd2d-preprod/student-original-spec.md",
+    "assets/references/ohmdal-hd2d-preprod/official-footage-observations.md"
+  ],
+  "generation": {
+    "provider": "manual",
+    "taskId": "ASSET-001",
+    "promptFile": "assets/references/ohmdal-hd2d-preprod/specs/student-sprite-ab-spec.md",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-02"
+  },
+  "license": {
+    "owner": "Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Diseño y SVG originales. La referencia oficial se conserva sólo como observación textual y no se redistribuye."
+  },
+  "scale": { "unit": "meter", "height": 1.72, "humanRatio": 1 },
+  "frontAxis": "+Z",
+  "pivot": "bottom-center",
+  "collider": { "type": "capsule", "radius": 0.28, "height": 1.72 },
+  "sockets": ["feet_anchor", "hand_instrument"],
+  "runtime": {
+    "desktop": { "path": "assets/runtime/ohmdal-hd2d-preprod/student/student-atlas-4.svg", "maxTriangles": 2, "maxTexture": 1024, "maxMaterials": 1, "maxDrawCalls": 1 },
+    "mobile": { "path": "assets/runtime/ohmdal-hd2d-preprod/student/student-atlas-4.svg", "maxTriangles": 2, "maxTexture": 1024, "maxMaterials": 1, "maxDrawCalls": 1 }
+  },
+  "notes": "Atlas 960x256, 80 celdas de 48x64. Sidecar existente: student-atlas-4.json. Transferencia observada de prototipo: SVG 2975 B + metadata 821 B = 3796 B. Memoria RGBA calculada al rasterizar: 983040 B. Pendiente de cámara integrada; no es arte final."
+}

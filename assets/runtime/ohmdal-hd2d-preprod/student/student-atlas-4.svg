@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="256" viewBox="0 0 960 256" shape-rendering="crispEdges">
+  <title>Estudiante provisional original — atlas de cuatro direcciones</title>
+  <defs>
+    <symbol id="south" viewBox="0 0 48 64"><path fill="#242743" d="M16 20h16v7h5v25h-8v8h-5v-8h-5v8h-5v-8h-3V27h5z"/><path fill="#d6b88b" d="M18 8h12v12H18z"/><path fill="#58c1bc" d="M20 13h8v3h-8z"/><path fill="#a66a42" d="M12 30h5v14h-5z"/></symbol>
+    <symbol id="north" viewBox="0 0 48 64"><path fill="#242743" d="M16 20h16v7h5v25h-8v8h-5v-8h-5v8h-5v-8h-3V27h5z"/><path fill="#b7956f" d="M18 8h12v12H18z"/><path fill="#a66a42" d="M20 24h8v17h-8z"/><path fill="#58c1bc" d="M22 10h4v3h-4z"/></symbol>
+    <symbol id="east" viewBox="0 0 48 64"><path fill="#242743" d="M15 20h17v7h7v25h-9v8h-5v-8h-6v8h-5v-8h-2V27h3z"/><path fill="#d6b88b" d="M18 8h12v12H18z"/><path fill="#58c1bc" d="M25 13h7v3h-7z"/><path fill="#a66a42" d="M11 30h5v14h-5z"/></symbol>
+    <symbol id="west" viewBox="0 0 48 64"><path fill="#242743" d="M16 20h17v7h3v25h-2v8h-5v-8h-6v8h-5v-8H9V27h7z"/><path fill="#d6b88b" d="M18 8h12v12H18z"/><path fill="#58c1bc" d="M16 13h7v3h-7z"/><path fill="#a66a42" d="M32 30h5v14h-5z"/></symbol>
+    <pattern id="p-s" width="48" height="64" patternUnits="userSpaceOnUse"><use href="#south" width="48" height="64"/></pattern>
+    <pattern id="p-n" width="48" height="64" patternUnits="userSpaceOnUse"><use href="#north" width="48" height="64"/></pattern>
+    <pattern id="p-e" width="48" height="64" patternUnits="userSpaceOnUse"><use href="#east" width="48" height="64"/></pattern>
+    <pattern id="p-w" width="48" height="64" patternUnits="userSpaceOnUse"><use href="#west" width="48" height="64"/></pattern>
+    <pattern id="idle" width="96" height="64" patternUnits="userSpaceOnUse"><path fill="#e6d8ad" d="M21 29h6v2h-6zM69 28h6v3h-6z"/></pattern>
+    <pattern id="walk" width="96" height="64" patternUnits="userSpaceOnUse"><path fill="#e6d8ad" d="M12 57h13v3H12zM71 57h13v3H71z"/></pattern>
+    <pattern id="turn" width="48" height="64" patternUnits="userSpaceOnUse"><path fill="#d68b54" d="M34 22h4v4h-4zM38 26h3v8h-3z"/></pattern>
+    <pattern id="inspect" width="48" height="64" patternUnits="userSpaceOnUse"><path fill="#58c1bc" d="M33 18h7v7h-7zM38 25h3v8h-3z"/></pattern>
+    <pattern id="measure" width="48" height="64" patternUnits="userSpaceOnUse"><path fill="#f0d46b" d="M35 29h6v9h-6zM39 36h6v3h-6z"/></pattern>
+  </defs>
+  <rect width="960" height="64" fill="url(#p-n)"/><rect y="64" width="960" height="64" fill="url(#p-e)"/><rect y="128" width="960" height="64" fill="url(#p-s)"/><rect y="192" width="960" height="64" fill="url(#p-w)"/>
+  <g><rect width="96" height="256" fill="url(#idle)"/><rect x="96" width="288" height="256" fill="url(#walk)"/><rect x="384" width="192" height="256" fill="url(#turn)"/><rect x="576" width="192" height="256" fill="url(#inspect)"/><rect x="768" width="192" height="256" fill="url(#measure)"/></g>
+</svg>

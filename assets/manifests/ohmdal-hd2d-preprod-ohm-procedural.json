@@ -1,0 +1,31 @@
+{
+  "id": "rx_ohm_procedural_ab",
+  "displayName": "Ohm provisional — hard-surface procedural",
+  "world": "ohmdal",
+  "category": "hard-surface",
+  "sourceMethod": "procedural-three",
+  "status": "review-required",
+  "references": ["assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md"],
+  "generation": {
+    "provider": "manual",
+    "taskId": "ASSET-001",
+    "promptFile": "assets/references/ohmdal-hd2d-preprod/specs/ohm-procedural-spec.md",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-02"
+  },
+  "license": {
+    "owner": "Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Fábrica y geometría originales; sin Meshy, GLB importado ni generación externa."
+  },
+  "scale": { "unit": "meter", "height": 1.03, "humanRatio": 0.5988 },
+  "frontAxis": "+Z",
+  "pivot": "bottom-center",
+  "collider": { "type": "capsule", "radius": 0.32, "height": 1.03 },
+  "sockets": ["sensor_mount", "arm_left", "arm_right", "hatch_top", "emitter_front"],
+  "runtime": {
+    "desktop": { "path": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-procedural.mjs", "maxTriangles": 128, "maxTexture": 512, "maxMaterials": 1, "maxDrawCalls": 7 },
+    "mobile": { "path": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-procedural.mjs", "maxTriangles": 128, "maxTexture": 512, "maxMaterials": 1, "maxDrawCalls": 7 }
+  },
+  "notes": "Techo idéntico al sprite para A/B. Geometría construida: 104 triángulos calculados, siete meshes/draw calls y un material compartido; sin textura. Transferencia observada del módulo: 3309 B. Pendiente renderer.info en el harness integrado."
+}

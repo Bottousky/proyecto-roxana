@@ -1,0 +1,31 @@
+{
+  "id": "rx_ohm_sprite_impostor_ab",
+  "displayName": "Ohm provisional — sprite/impostor",
+  "world": "ohmdal",
+  "category": "sprite",
+  "sourceMethod": "sprite",
+  "status": "review-required",
+  "references": ["assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md"],
+  "generation": {
+    "provider": "manual",
+    "taskId": "ASSET-001",
+    "promptFile": "assets/references/ohmdal-hd2d-preprod/specs/ohm-sprite-spec.md",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-02"
+  },
+  "license": {
+    "owner": "Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Diseño, silueta y atlas originales; sin contenido generado o extraído."
+  },
+  "scale": { "unit": "meter", "height": 1.03, "humanRatio": 0.5988 },
+  "frontAxis": "+Z",
+  "pivot": "bottom-center",
+  "collider": { "type": "capsule", "radius": 0.32, "height": 1.03 },
+  "sockets": ["sensor_mount", "arm_left", "arm_right", "hatch_top", "emitter_front"],
+  "runtime": {
+    "desktop": { "path": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-sprite-atlas.svg", "maxTriangles": 128, "maxTexture": 512, "maxMaterials": 1, "maxDrawCalls": 7 },
+    "mobile": { "path": "assets/runtime/ohmdal-hd2d-preprod/ohm/ohm-sprite-atlas.svg", "maxTriangles": 128, "maxTexture": 512, "maxMaterials": 1, "maxDrawCalls": 7 }
+  },
+  "notes": "Techo idéntico al procedural para A/B. Uso esperado: 2 tris y 1 draw call. Atlas 288x256 y 24 celdas; sidecar existente. Transferencia observada: SVG 2395 B + metadata 538 B = 2933 B. Memoria RGBA calculada: 294912 B."
+}
