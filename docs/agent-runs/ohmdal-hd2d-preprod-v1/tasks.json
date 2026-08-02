@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "milestone": "ohmdal-hd2d-preprod-v1",
-  "status": "authorized",
+  "status": "in-evaluation",
   "executionAuthorized": true,
-  "authorizationScope": "H1 educational V2 plus H2 visual/technical spike only; H3 remains blocked",
+  "authorizationScope": "H1 educational V2, H2 visual/technical spike and the ten read-only benchmark executions; H3 remains blocked",
   "authorizedBy": "user",
   "authorizedAt": "2026-08-01",
   "baseRef": "codex/ohmdal-hd2d-biblia",
@@ -21,12 +21,41 @@
     "meshyCredits": 0,
     "paidGeneration": false
   },
+  "benchmark": {
+    "authorized": true,
+    "status": "completed-routing-blocked",
+    "scope": "H1/H2 process and technical benchmark only",
+    "h3Authorized": false,
+    "protocol": "docs/agent-runs/ohmdal-hd2d-preprod-v1/benchmark-plan.md",
+    "results": "docs/agent-runs/ohmdal-hd2d-preprod-v1/content/benchmark/results.json",
+    "executionCount": 10,
+    "attemptedExecutionCount": 10,
+    "contentDeliveryCount": 5,
+    "pairCount": 5,
+    "maxConcurrentCandidates": 2,
+    "extraRunsRequireApproval": true,
+    "candidateRepositoryAccess": "read-only",
+    "directorPersistsOutputs": true,
+    "allowedInference": [
+      "Codex subscription models",
+      "Claude Code Pro subscription",
+      "OpenCode free models after a successful availability smoke"
+    ],
+    "prohibitedInference": [
+      "OpenCode Go until subscribed and verified",
+      "MiniMax because no active paid plan is available",
+      "local Ollama/Qwen because it was removed and is below the project quality/latency bar",
+      "metered API credits without a separate explicit cap",
+      "Meshy or paid asset generation"
+    ]
+  },
   "tasks": [
     {
       "id": "DIR-001",
       "role": "director_integrator",
       "title": "Validar baseline, contratos y worktrees comunes",
       "status": "completed",
+      "completionCommit": "16df1b5",
       "estimatedMinutes": 30,
       "branch": "codex/ohmdal-hd2d-preprod-v1-director",
       "dependsOn": [],
@@ -34,77 +63,264 @@
         "todos los roles leen los contratos desde el control plane",
         "cada worktree parte de baseCommit",
         "build, tests y manifiestos se registran antes de implementar",
-        "ningún archivo de src/jugar se asigna a escritura"
+        "ningún archivo de src/jugar se asigna a escritura",
+        "baseline registrado en commit 16df1b5"
+      ]
+    },
+    {
+      "id": "BENCH-H1-01-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para ficha V2 de seguridad ficticia",
+      "status": "completed",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "salida estructurada con 30 campos",
+        "fuentes y límites trazables",
+        "sin escritura del candidato"
+      ]
+    },
+    {
+      "id": "BENCH-H1-01-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para ficha V2 de seguridad ficticia",
+      "status": "completed-with-infrastructure-failure",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "mismo paquete congelado que Codex",
+        "salida estructurada con 30 campos",
+        "sin escritura del candidato"
+      ]
+    },
+    {
+      "id": "BENCH-H1-02-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para circuito completo e instrumento",
+      "status": "completed",
+      "estimatedMinutes": 60,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "BENCH-H1-01-CODEX",
+        "BENCH-H1-01-HYBRID"
+      ],
+      "acceptance": [
+        "dos fichas de 30 campos",
+        "valores, unidades y tests reproducibles",
+        "estados inválidos explícitos"
+      ]
+    },
+    {
+      "id": "BENCH-H1-02-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para circuito completo e instrumento",
+      "status": "completed-with-infrastructure-failure",
+      "estimatedMinutes": 60,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "BENCH-H1-01-CODEX",
+        "BENCH-H1-01-HYBRID"
+      ],
+      "acceptance": [
+        "mismo paquete congelado que Codex",
+        "valores, unidades y tests reproducibles",
+        "estados inválidos explícitos"
+      ]
+    },
+    {
+      "id": "BENCH-H2-01-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para comparativa de cámara del blockout",
+      "status": "completed",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "parámetros A/B equivalentes",
+        "desktop y mobile cubiertos",
+        "ruta y evidencia reproducibles"
+      ]
+    },
+    {
+      "id": "BENCH-H2-01-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para comparativa de cámara del blockout",
+      "status": "completed-with-infrastructure-failure",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "mismo paquete congelado que Codex",
+        "desktop y mobile cubiertos",
+        "ruta y evidencia reproducibles"
+      ]
+    },
+    {
+      "id": "BENCH-H2-02-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para protocolo original 4/8 direcciones",
+      "status": "completed",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "protocolo legal y original",
+        "mismos encuadres y acciones",
+        "manifiesto y descarte definidos"
+      ]
+    },
+    {
+      "id": "BENCH-H2-02-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para protocolo original 4/8 direcciones",
+      "status": "completed-with-infrastructure-failure",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "mismo paquete congelado que Codex",
+        "mismos encuadres y acciones",
+        "manifiesto y descarte definidos"
+      ]
+    },
+    {
+      "id": "BENCH-H2-03-CODEX",
+      "role": "director_integrator",
+      "title": "Candidato Codex para comparativa de representación de Ohm",
+      "status": "completed",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "sprite/impostor y procedural comparables",
+        "presupuesto y pivotes explícitos",
+        "sin Meshy ni generación paga"
+      ]
+    },
+    {
+      "id": "BENCH-H2-03-HYBRID",
+      "role": "director_integrator",
+      "title": "Candidato híbrido para comparativa de representación de Ohm",
+      "status": "completed-with-infrastructure-failure",
+      "estimatedMinutes": 45,
+      "branch": "codex/ohmdal-hd2d-preprod-v1-director",
+      "dependsOn": [
+        "DIR-001"
+      ],
+      "acceptance": [
+        "mismo paquete congelado que Codex",
+        "presupuesto y pivotes explícitos",
+        "sin Meshy ni generación paga"
       ]
     },
     {
       "id": "DIR-EDU-001",
       "role": "director_integrator",
       "title": "Producir y auditar las seis fichas educativas V2",
-      "status": "ready",
+      "status": "completed",
       "estimatedMinutes": 90,
       "branch": "codex/ohmdal-hd2d-preprod-v1-director",
-      "dependsOn": ["DIR-001"],
+      "dependsOn": [
+        "DIR-001"
+      ],
       "acceptance": [
         "seguridad, circuito, instrumento, Lumen, Puerta y Bitácora usan la ficha de 30 campos",
         "cálculos y topologías tienen tests deterministas",
         "un segundo pase reproduce fuentes y resultados",
         "sólo contradicción, seguridad o incertidumbre real escalan"
+      ],
+      "completionCommits": [
+        "585c302b4576439526313a1d43ded9b2afe55a54",
+        "697d23d",
+        "42c1262",
+        "64e0b92"
       ]
     },
     {
       "id": "ARCH-001",
       "role": "architecture",
       "title": "Construir blockout modular, navegación y cámaras A/B",
-      "status": "ready",
+      "status": "completed",
       "estimatedMinutes": 90,
       "branch": "codex/ohmdal-hd2d-preprod-v1-arquitectura",
-      "dependsOn": ["DIR-001"],
+      "dependsOn": [
+        "DIR-001"
+      ],
       "acceptance": [
         "Portal, Plaza, Taller y Puerta/Manantial usan metros y maniquí de 1,72 m",
         "el recorrido funciona en 1440x900 y 390x844",
         "materiales e iluminación permanecen dentro de la frontera architecture",
         "renderer.info y disposal son observables"
+      ],
+      "completionCommits": [
+        "b4b15cf17166b95e6f05afe5eff992e6e13ea3fa",
+        "f89b75bccfa508d6b9309c8c292d69e9864c1100"
       ]
     },
     {
       "id": "ASSET-001",
       "role": "asset_forge",
       "title": "Cerrar referencias, manifests y prototipos A/B 4/8 y Ohm",
-      "status": "ready",
+      "status": "completed",
       "estimatedMinutes": 90,
       "branch": "codex/ohmdal-hd2d-preprod-v1-assets",
-      "dependsOn": ["DIR-001"],
+      "dependsOn": [
+        "DIR-001"
+      ],
       "acceptance": [
         "las observaciones de footage citan fuente oficial sin extraer assets",
         "los prototipos son originales, mínimos y comparables",
         "cada asset declara origen, derechos, escala, pivote, frente, collider y presupuesto",
         "Meshy y toda generación paga permanecen deshabilitados"
-      ]
+      ],
+      "completionCommit": "1908e67"
     },
     {
       "id": "DIR-INT-001",
       "role": "director_integrator",
       "title": "Integrar educación, arquitectura y assets en el harness aislado",
-      "status": "blocked",
+      "status": "completed",
       "estimatedMinutes": 90,
       "branch": "codex/ohmdal-hd2d-preprod-v1-director",
-      "dependsOn": ["DIR-EDU-001", "ARCH-001", "ASSET-001"],
+      "dependsOn": [
+        "DIR-EDU-001",
+        "ARCH-001",
+        "ASSET-001"
+      ],
       "acceptance": [
         "commits de trabajadores integrados secuencialmente",
         "A/B usa seed, recorrido, cámara y presupuesto equivalentes",
         "render_game_to_text describe estado y puntos de medición",
         "/jugar conserva comportamiento y tests"
-      ]
+      ],
+      "completionCommit": "64e0b92"
     },
     {
       "id": "EVAL-001",
       "role": "visual_evaluator",
       "title": "Evaluar evidencia integrada sin corregir implementación",
-      "status": "blocked",
+      "status": "in-progress",
       "estimatedMinutes": 60,
       "branch": "codex/ohmdal-hd2d-preprod-v1-evaluacion",
-      "dependsOn": ["DIR-INT-001"],
+      "dependsOn": [
+        "DIR-INT-001"
+      ],
       "acceptance": [
         "review-round-01 emite PASS, CONDITIONAL o FAIL por gate",
         "performance.json contiene sólo mediciones observadas o null",
@@ -119,7 +335,9 @@
       "status": "blocked",
       "estimatedMinutes": 30,
       "branch": "codex/ohmdal-hd2d-preprod-v1-director",
-      "dependsOn": ["EVAL-001"],
+      "dependsOn": [
+        "EVAL-001"
+      ],
       "acceptance": [
         "final-report referencia commits, capturas, tests y métricas",
         "se elige 4/8 y una representación de Ohm o se registra bloqueo",

@@ -1,62 +1,59 @@
 # Estado — Ohmdal HD-2D preproducción v1
 
-**Fase:** DIR-001 completado; H1+H2 listos para ejecución por tareas
+**Fase:** EVAL-001 sobre integración H1+H2
 **Ejecución autorizada:** sí, exclusivamente H1+H2
-**Ronda:** 0/2
+**Rondas automáticas usadas:** 2/2 educativas; 1 corrección visual de Arquitectura
 **Base común:** `12d6f88d2a366da89ed91008013f42ba6295e42d`
-**Bloqueo:** ninguno para DIR-EDU-001, ARCH-001 o ASSET-001; H3 continúa bloqueado
+**Commit integrado evaluado:** `64e0b92`
+**Bloqueo:** H3, Meshy, generación paga y `src/jugar/**` continúan bloqueados
 
-## DIR-001 — baseline registrado
+## Resultado integrado previo a evaluación
 
-Ejecutado el 2026-08-02 en `C:\YO\Worktrees\roxana-hd2d-director`, rama
-`codex/ohmdal-hd2d-preprod-v1-director`, con `HEAD` exactamente en
-`12d6f88d2a366da89ed91008013f42ba6295e42d` y working tree limpio antes del baseline:
-
-- `npm run build`: PASS, 185 módulos.
-- `npm test`: PASS.
-- `npm run 3d:validate-manifests`: PASS; valida el manifiesto de ejemplo existente.
-- El `asset-manifest.json` del hito es un inventario de control y parsea como JSON. No reemplaza
-  los manifests runtime individuales; Asset Forge debe crear y validar uno por asset antes de
-  producir o integrar.
-- `npm run verify`: no ejecutado; `wsl -l -q` no informa distribuciones instaladas. No se declara
-  PASS.
-
-Los worktrees de Director, Arquitectura y Asset Forge existen, están limpios y parten exactamente
-del `baseCommit`. Los contratos vigentes fueron leídos desde
-`codex/ohmdal-hd2d-biblia`; los ejecutores deben repetir esa lectura al iniciar su sesión. Los
-globs de escritura no incluyen `src/jugar/**`, que permanece en `sharedReadOnly`.
+- Seis fichas educativas con exactamente 30 campos: **V2 `CANON-EDU`** después de auditoría
+  independiente y dos rondas correctivas.
+- Blockout modular Portal–Plaza–Taller–Puerta/Manantial, navegación plana y cámaras A/B.
+- Prototipos originales A/B de estudiante 4/8 direcciones y Ohm sprite/procedural.
+- Harness determinista en `/labs/ohmdal-hd2d-preprod/` con teclado, táctil, reduced motion,
+  tarde/crepúsculo, diagnóstico protegido y `render_game_to_text`.
+- Corrección visual de oclusión: los pilares de Puerta usan fade; el landmark principal permanece.
+- Evidencia local Director en 1440×900 y 390×844: consola sin errores; capturas bajo
+  `output/playwright/ohmdal-hd2d-preprod/` (salida ignorada, no versionada).
+- Métricas observadas del blockout en los estados capturados: 11–20 draw calls, 150–296
+  triángulos, 18–23 geometrías y 2–4 texturas. No equivalen a medición Android física.
 
 ## Tareas
 
-| ID | Rol | Estado | Rama | Commit |
-|---|---|---|---|---|
-| DIR-001 | Director | COMPLETED | `codex/ohmdal-hd2d-preprod-v1-director` | commit de cierre DIR-001 en esta rama |
-| DIR-EDU-001 | Director | READY | `codex/ohmdal-hd2d-preprod-v1-director` | — |
-| ARCH-001 | Arquitectura | READY | `codex/ohmdal-hd2d-preprod-v1-arquitectura` | — |
-| ASSET-001 | Asset Forge | READY | `codex/ohmdal-hd2d-preprod-v1-assets` | — |
-| DIR-INT-001 | Director | BLOCKED por dependencias | `codex/ohmdal-hd2d-preprod-v1-director` | — |
-| EVAL-001 | Evaluador | BLOCKED por integración | `codex/ohmdal-hd2d-preprod-v1-evaluacion` | — |
-| DIR-VERDICT-001 | Director | BLOCKED por evaluación | `codex/ohmdal-hd2d-preprod-v1-director` | — |
+| ID | Estado | Commit(s) |
+|---|---|---|
+| DIR-001 | COMPLETED | `16df1b5` |
+| DIR-EDU-001 | COMPLETED | `585c302`, `697d23d`, `42c1262`, `64e0b92` |
+| ARCH-001 | COMPLETED | `b4b15cf`, corrección `f89b75b` |
+| ASSET-001 | COMPLETED | `1908e67` |
+| DIR-INT-001 | COMPLETED | `64e0b92` |
+| EVAL-001 | IN PROGRESS | worktree `codex/ohmdal-hd2d-preprod-v1-evaluacion` |
+| DIR-VERDICT-001 | BLOCKED por EVAL-001 | — |
 
-## Secuencia inmediata
+## Gates del Director
 
-1. Arquitectura y Asset Forge pueden iniciar en sus worktrees separados y en paralelo.
-2. El Director puede ejecutar DIR-EDU-001 en su propia frontera.
-3. El Director integra commits secuencialmente después de las tres entregas.
-4. Se abre un único Evaluador sólo sobre la integración terminada.
+- `npm run build`: PASS, 185 módulos.
+- `npm test`: PASS.
+- `npm run 3d:validate-manifests`: PASS.
+- `git diff --check`: PASS.
+- Navegador Chrome/Playwright desktop y mobile: PASS funcional; consola 0 errores/0 warnings.
+- `npm run verify`: no ejecutado; Windows no tiene una distribución WSL operativa. No se
+  declara PASS.
+- Android físico de 2022: no probado; cualquier FPS asociado permanece `null`.
 
-## Worktrees verificados
+## Pool de modelos operativo
 
-| Rol | Ruta | Rama | Estado inicial |
-|---|---|---|---|
-| Director | `C:\YO\Worktrees\roxana-hd2d-director` | `codex/ohmdal-hd2d-preprod-v1-director` | limpio en `baseCommit`; baseline PASS |
-| Arquitectura | `C:\YO\Worktrees\roxana-hd2d-arquitectura` | `codex/ohmdal-hd2d-preprod-v1-arquitectura` | limpio en `baseCommit`; requiere `npm install` al iniciar |
-| Asset Forge | `C:\YO\Worktrees\roxana-hd2d-assets` | `codex/ohmdal-hd2d-preprod-v1-assets` | limpio en `baseCommit`; requiere `npm install` al iniciar |
-| Evaluador | — | `codex/ohmdal-hd2d-preprod-v1-evaluacion` | no creado; crear sólo desde commit integrado |
+- Codex: control plane, implementación, integración y evaluación.
+- Claude Code Pro: CLI autenticada disponible para revisiones acotadas.
+- OpenCode: sólo modelos gratuitos y después de un smoke exitoso; la web puede estar bloqueada
+  por el proveedor de internet sin demostrar que la CLI esté caída.
+- MiniMax, OpenCode Go, Ollama/Qwen, créditos API medidos y Meshy: fuera del pool vigente.
 
-## Frenos activos
+## Próximo cierre automático
 
-- Meshy y generación paga: prohibidos.
-- H3 y migración de `/jugar`: no autorizados.
-- Tercera ronda: requiere nueva aprobación humana.
-- Ownership solapado: detener ambos roles y devolver al Director.
+1. El Evaluador registra `review-round-01.md` y `performance.json` sin corregir código.
+2. El Director integra ese commit y emite `avanzar`, `corregir una vez` o `descartar`.
+3. H3 no cambia de estado sin veredicto favorable y autorización humana correspondiente.
