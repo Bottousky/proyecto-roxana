@@ -1,14 +1,16 @@
 # Estado — Ohmdal HD-2D preproducción v1
 
-**Fase:** listo para orquestación
+**Fase:** DIR-001 completado; H1+H2 listos para ejecución por tareas
 **Ejecución autorizada:** sí, exclusivamente H1+H2
 **Ronda:** 0/2
-**Base común:** `aaab28ad63abab8b177c152a9f3d39cb9c678dc5`
-**Bloqueo:** ninguno para DIR-001; H3 continúa bloqueado
+**Base común:** `12d6f88d2a366da89ed91008013f42ba6295e42d`
+**Bloqueo:** ninguno para DIR-EDU-001, ARCH-001 o ASSET-001; H3 continúa bloqueado
 
-## Baseline registrado
+## DIR-001 — baseline registrado
 
-Sobre la base estabilizada previa al commit canónico:
+Ejecutado el 2026-08-02 en `C:\YO\Worktrees\roxana-hd2d-director`, rama
+`codex/ohmdal-hd2d-preprod-v1-director`, con `HEAD` exactamente en
+`12d6f88d2a366da89ed91008013f42ba6295e42d` y working tree limpio antes del baseline:
 
 - `npm run build`: PASS, 185 módulos.
 - `npm test`: PASS.
@@ -16,13 +18,19 @@ Sobre la base estabilizada previa al commit canónico:
 - El `asset-manifest.json` del hito es un inventario de control y parsea como JSON. No reemplaza
   los manifests runtime individuales; Asset Forge debe crear y validar uno por asset antes de
   producir o integrar.
-- `npm run verify`: no ejecutado; Windows no tiene distribución WSL operativa.
+- `npm run verify`: no ejecutado; `wsl -l -q` no informa distribuciones instaladas. No se declara
+  PASS.
+
+Los worktrees de Director, Arquitectura y Asset Forge existen, están limpios y parten exactamente
+del `baseCommit`. Los contratos vigentes fueron leídos desde
+`codex/ohmdal-hd2d-biblia`; los ejecutores deben repetir esa lectura al iniciar su sesión. Los
+globs de escritura no incluyen `src/jugar/**`, que permanece en `sharedReadOnly`.
 
 ## Tareas
 
 | ID | Rol | Estado | Rama | Commit |
 |---|---|---|---|---|
-| DIR-001 | Director | READY | `codex/ohmdal-hd2d-preprod-v1-director` | — |
+| DIR-001 | Director | COMPLETED | `codex/ohmdal-hd2d-preprod-v1-director` | commit de cierre DIR-001 en esta rama |
 | DIR-EDU-001 | Director | READY | `codex/ohmdal-hd2d-preprod-v1-director` | — |
 | ARCH-001 | Arquitectura | READY | `codex/ohmdal-hd2d-preprod-v1-arquitectura` | — |
 | ASSET-001 | Asset Forge | READY | `codex/ohmdal-hd2d-preprod-v1-assets` | — |
@@ -32,11 +40,19 @@ Sobre la base estabilizada previa al commit canónico:
 
 ## Secuencia inmediata
 
-1. OpenCode abre el Director y verifica contratos/base.
-2. Arquitectura y Asset Forge trabajan en worktrees separados y en paralelo.
-3. El Director produce las fichas V2 en su propia frontera.
-4. El Director integra commits secuencialmente.
-5. Se abre un único Evaluador sobre la integración terminada.
+1. Arquitectura y Asset Forge pueden iniciar en sus worktrees separados y en paralelo.
+2. El Director puede ejecutar DIR-EDU-001 en su propia frontera.
+3. El Director integra commits secuencialmente después de las tres entregas.
+4. Se abre un único Evaluador sólo sobre la integración terminada.
+
+## Worktrees verificados
+
+| Rol | Ruta | Rama | Estado inicial |
+|---|---|---|---|
+| Director | `C:\YO\Worktrees\roxana-hd2d-director` | `codex/ohmdal-hd2d-preprod-v1-director` | limpio en `baseCommit`; baseline PASS |
+| Arquitectura | `C:\YO\Worktrees\roxana-hd2d-arquitectura` | `codex/ohmdal-hd2d-preprod-v1-arquitectura` | limpio en `baseCommit`; requiere `npm install` al iniciar |
+| Asset Forge | `C:\YO\Worktrees\roxana-hd2d-assets` | `codex/ohmdal-hd2d-preprod-v1-assets` | limpio en `baseCommit`; requiere `npm install` al iniciar |
+| Evaluador | — | `codex/ohmdal-hd2d-preprod-v1-evaluacion` | no creado; crear sólo desde commit integrado |
 
 ## Frenos activos
 

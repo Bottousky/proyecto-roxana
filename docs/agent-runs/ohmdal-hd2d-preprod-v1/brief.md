@@ -3,7 +3,7 @@
 **Estado:** autorizado para ejecutar H1+H2
 **Autorización del usuario:** 2026-08-01
 **Director:** hilo/control plane principal
-**Base común:** `aaab28ad63abab8b177c152a9f3d39cb9c678dc5`
+**Base común:** `12d6f88d2a366da89ed91008013f42ba6295e42d`
 **Ruta de laboratorio:** `/labs/ohmdal-hd2d-preprod/`
 
 ## Objetivo

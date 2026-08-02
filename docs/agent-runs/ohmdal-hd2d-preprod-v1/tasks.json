@@ -7,7 +7,7 @@
   "authorizedBy": "user",
   "authorizedAt": "2026-08-01",
   "baseRef": "codex/ohmdal-hd2d-biblia",
-  "baseCommit": "aaab28ad63abab8b177c152a9f3d39cb9c678dc5",
+  "baseCommit": "12d6f88d2a366da89ed91008013f42ba6295e42d",
   "controlPlane": "docs/agent-runs/ohmdal-hd2d-preprod-v1",
   "budgets": {
     "maxConcurrentExecutors": 2,
@@ -26,7 +26,7 @@
       "id": "DIR-001",
       "role": "director_integrator",
       "title": "Validar baseline, contratos y worktrees comunes",
-      "status": "ready",
+      "status": "completed",
       "estimatedMinutes": 30,
       "branch": "codex/ohmdal-hd2d-preprod-v1-director",
       "dependsOn": [],
