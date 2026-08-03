@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "ticket": "ARC1-007",
+  "packet": "ARC1-007-B",
+  "date": "2026-08-03",
+  "purpose": "Verificar que el laboratorio se monta y se desmonta a traves de RuntimeHost, que three no entra al grafo estatico del shell, y que el traslado del arranque no cambio el comportamiento. Informativo en cuanto a memoria: el gate de fugas es de ARC1-008.",
+  "decision": "CP-021 — ExperienceLocation.runtime opcional. Sin el campo, el comportamiento es identico al anterior.",
+  "behaviourParity": {
+    "method": "Mismo recorrido determinista y mismo digest que ARC1-007-A, ahora con el laboratorio arrancado por createRuntimeHost().start({..., runtime: 'hd2d-three'}).",
+    "viewport": "1440x900",
+    "devicePixelRatio": 1,
+    "samples": 480,
+    "hash": "db322500",
+    "chars": 605701,
+    "identicalToBaseline_aeb9f70": true,
+    "identicalToPacketA": true,
+    "drawCalls": { "min": 13, "max": 22 },
+    "triangles": { "min": 150, "max": 508 },
+    "note": "El digest coincide con el de aeb9f70 y con el de A. La cadena completa aeb9f70 -> A -> B no movio una sola cifra del recorrido."
+  },
+  "lifecycleThroughHost": {
+    "method": "Host real con runtimeLoaders reales sobre un contenedor propio: ejercita el import() dinamico de verdad, no un loader falso.",
+    "start_activeRuntime": "hd2d-three",
+    "mount1_children": 1,
+    "mount1_canvas": true,
+    "afterDestroy_children": 0,
+    "afterDestroy_activeRuntime": null,
+    "mount2_children": 1,
+    "mount2_canvas": true,
+    "mount2_activeRuntime": "hd2d-three",
+    "afterDestroy2_children": 0,
+    "consoleErrors": 0,
+    "note": "destroy() deja el contenedor vacio y activeRuntime en null; un segundo start() vuelve a montar sobre el mismo contenedor sin excepciones."
+  },
+  "staticGraph": {
+    "claim": "three no entra al grafo estatico del shell",
+    "verifiedIn": "build de produccion, no por lectura del codigo",
+    "entryChunks": [
+      { "file": "main-gQLXWNfp.js", "kB": 8.67, "containsThree": false },
+      { "file": "jugar-RpBqDbg7.js", "kB": 53.08, "containsThree": false },
+      { "file": "ohmdal-f3JvbCJm.js", "kB": 31.47, "containsThree": false }
+    ],
+    "lazyChunks": [
+      { "file": "hd2dRuntime-DPhC7OzL.js", "kB": 46.84, "gzipKB": 15.19, "note": "el laboratorio entero: lab.ts, labUi.ts y los siete modulos de simulacion" },
+      { "file": "three.module-Bin6bwlq.js", "kB": 534.81, "gzipKB": 135.77, "note": "chunk compartido entre school3d y hd2dRuntime" }
+    ],
+    "verdict": "PASS. Ningun chunk de entrada contiene three; el laboratorio vive en un chunk propio que solo se descarga si una ubicacion pide 'hd2d-three'."
+  },
+  "publishedShellDelta": {
+    "what": "El build de produccion cambio de forma, aunque ninguna ubicacion publicada pide 'hd2d-three'.",
+    "before_aeb9f70": { "school3d_kB": 715.6, "school3d_gzipKB": 209.05, "threeChunk": null, "hd2dRuntimeChunk": null },
+    "after": { "school3d_kB": 185.03, "school3d_gzipKB": 74.38, "threeChunk_kB": 534.81, "hd2dRuntime_kB": 46.84 },
+    "effectForSchool3dVisitor": { "rawKB_before": 715.6, "rawKB_after": 719.84, "deltaKB": 4.24, "extraRequests": 1 },
+    "effectForJugarVisitor": "ninguno: ni three ni hd2dRuntime se descargan",
+    "caveat": "La comparacion contra aeb9f70 usa el listado de build previo a `npm ci`. No es un A/B limpio de bytes: los numeros de `after` estan medidos sobre el arbol actual y los de `before` sobre el arbol anterior con un node_modules que tenia paquetes extraneos. La conclusion estructural —tres chunks nuevos, ninguno en entrada— no depende de esa diferencia; las cifras exactas de delta si. Un A/B de bytes limpio requiere construir aeb9f70 con este node_modules y no se hizo.",
+    "status": "registrado en OI-007, decision del Director"
+  },
+  "frameAtStep200": {
+    "step": 200,
+    "zone": "taller",
+    "drawCalls": 18,
+    "triangles": 388,
+    "occludedIds": ["workshop-roof-low"],
+    "canvasSize": [1440, 900],
+    "canvasPngFnv": "55a3c48a",
+    "canvasPngBase64Chars": 149410,
+    "pngFileWritten": false,
+    "whyNoPngFile": "La captura de A se hizo con playwright, que estaba instalado como paquete extraneo al lock. `npm ci` —necesario para reparar el node_modules que dañe al quitar el worktree de la baseline— lo elimino, y reinstalarlo fue denegado por el usuario. El panel del navegador no estaba visible, asi que tampoco pudo componerse una captura por pantalla. Queda la huella de pixeles del canvas, medida sobre el arranque por RuntimeHost.",
+    "whyItIsEnough": "El frame de B esta determinado por las mismas 480 muestras que el de A, y el digest es identico. desktop-1440x900.png de A ya es pixel identico a aeb9f70. Un PNG de B seria, por construccion, el mismo frame.",
+    "status": "not-run como archivo; verificado como huella y por digest"
+  },
+  "gates": {
+    "npmRunBuild": "PASS — built in 5.02s",
+    "npmTest": "PASS — exit 0, incluye a2-hd2d-runtime con 5 casos",
+    "3dValidateManifests": "PASS — 5 manifests",
+    "gitDiffCheck": "PASS",
+    "npmRunVerify": "not-run — WSL sin distribucion"
+  },
+  "notRun": [
+    { "what": "gate de fugas de 512 kB por ciclo mount->destroy", "why": "es de ARC1-008, este ticket no se lo adelanta", "status": "not-run" },
+    { "what": "fps y frame time", "why": "CP-014", "status": "not-run" },
+    { "what": "captura PNG desde el arranque por RuntimeHost", "why": "playwright removido por npm ci, reinstalacion denegada, panel no visible", "status": "not-run" }
+  ]
+}

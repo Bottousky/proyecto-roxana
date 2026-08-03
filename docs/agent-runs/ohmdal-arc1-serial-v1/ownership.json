@@ -1,7 +1,7 @@
 {
-  "version": 10,
+  "version": 11,
   "milestone": "ohmdal-arc1-serial-v1",
-  "activeIssueKey": "ARC1-007",
+  "activeIssueKey": "ARC1-008",
   "collisionPolicy": "stop-and-return-to-director",
   "owners": {
     "director": {
@@ -10,14 +10,14 @@
         "docs/agent-runs/ohmdal-arc1-serial-v1/tasks.json",
         "docs/agent-runs/ohmdal-arc1-serial-v1/DECISIONS.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/ownership.json",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-007.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-007/**",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-007/**"
+        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-008.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-008/**",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-008/**"
       ]
     },
     "builder": {
       "write": [
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-007/**",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-008/**",
         "docs/agent-runs/ohmdal-arc1-serial-v1/OPEN_ISSUES.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/telemetry.json"
       ],
@@ -67,12 +67,16 @@
     "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-006.md",
     "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-006/**",
     "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-006/**",
-    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-008.md"
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-007.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-007/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-007/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-009.md"
   ],
   "notes": [
-    "ARC1-007 is the active ticket: mount the Three.js laboratory through RuntimeHost without touching /jugar. /arc-plan narrows this contract to the exact artifacts when it writes the ficha, exactly as versions 5, 7 and 9 did for ARC1-004, ARC1-005 and ARC1-006.",
-    "ARC1-007 is the first ticket of this run that changes runtime, not only the control plane. Its plan must open the src/** paths it needs one by one; src/** stays globally protected until then, and src/jugar/** stays prohibited outright under H3_CONTRACT.md section 3.",
-    "ARC1-006 closed DONE with two packets. ARC1-006-A measured; ARC1-006-B froze SCENE_BUDGETS.md. Both move from director/write to protected, consistent with CP-020.",
+    "ARC1-008 is the active ticket: measure mount -> pause -> resume -> destroy and leaks under 512 kB per cycle. The cycle now exists, which is what ARC1-007 delivered. /arc-plan narrows this contract to the exact artifacts when it writes the ficha, exactly as versions 5, 7, 9 and 10 did for ARC1-004 through ARC1-007.",
+    "src/** stays globally protected. ARC1-007 opened nine paths one by one in its ficha and they close with it; ARC1-008 must open the ones it needs in its own plan. src/jugar/** stays prohibited outright under H3_CONTRACT.md section 3.",
+    "ARC1-007 closed DONE with two packets and CP-021. ARC1-007-A made the laboratory a mountable factory; ARC1-007-B mounted it through RuntimeHost. Both move from director/write to protected. Read OI-006 before trusting any packet ficha of this run: both of ARC1-007's declared DONE on 2026-08-02 with evidence that did not exist, and B had no implementation at all. The state was corrected and the work executed for real on 2026-08-03.",
+    "ARC1-008 inherits a laboratory whose deterministic route produces the same digest as aeb9f70 — db322500 at 1440x900, 50543361 at 390x844. Any change of those digests during ARC1-008 is a regression of ARC1-007, not a measurement artifact.",
     "Frozen canon is now eight documents: GOLDEN_FRAMES.md, IDENTITY.md and LEGAL_REFERENCES.md from ARC1-003 (CP-015); COLOR_SCRIPT.md and SHOT_DECK.md from ARC1-004 (CP-018); SCENE_INVENTORY.md and CONTENT_V2.md from ARC1-005 (CP-019); SCENE_BUDGETS.md from ARC1-006 (CP-020). Protected means no ticket may edit them to make its own result pass; amending requires its own CP decision, not a ticket.",
     "Precedence on conflict: GOLDEN_FRAMES.md beats SHOT_DECK.md; the earlier frozen document beats the later one. SCENE_BUDGETS.md may report that an already frozen requirement does not fit under the H3 ceiling, but may not lower the requirement or raise the ceiling.",
     "vite.config.ts is now explicitly protected. ARC1-006 found that the slice harness is not one of its build inputs; the temptation to add it, or to tune the config so a measurement comes out better, belongs to no ticket of this run without its own CP decision.",
@@ -80,9 +84,10 @@
     "Every scene ticket from ARC1-011 onward closes with a renderer.info sweep over its own anchors, in 1440x900 and 390x844, with the protocol of evidence/ARC1-006/runtime-budget.json. A scene ticket without that measurement does not close.",
     "No ticket may declare fps before ARC1-060 (CP-014). The 0.264 ms in runtime-budget.json is forced-frame CPU cost, not frame time: it excludes GPU wait and presentation, and rAF was throttled.",
     "SHOT_DECK.md section 2 makes the safe areas binding. The mobile HUD currently fails it by a measured margin (evidence/ARC1-004/hud-rects.json). Fixing it belongs to ARC1-026. Do not correct it opportunistically.",
-    "OI-002 and OI-003 stay open, both P2, both about scene E2. OI-004 and OI-005 are new, both P2: manifest bytes recorded in LF against a CRLF tree, and sprite atlases inlined as data URIs into the critical startup bundle. Destinations ARC1-035 and ARC1-028. Converting an OI into a ticket is the Director's call, never the executor's (CP-002).",
+    "OI-002 through OI-005 stay open, all P2. OI-006, OI-007 and OI-008 are new. OI-006 records that ARC1-007's packet fichas declared DONE without evidence and closes with this rotation. OI-007 is P2 and needs a Director decision before ARC1-035: the production bundle now emits hd2dRuntime (46.84 kB) and a shared three chunk (534.81 kB) because rollup follows the dynamic import in loaders.ts, so the build publishes prototype code that CP-020 had kept out. No entry chunk contains three and no published location requests hd2d-three, so nothing is downloaded. OI-008 is P2 and general: tests/ is never typechecked — tsconfig.json has include: [src] and tests run under --experimental-strip-types — which is why a1-runtime-host.test.ts can name a runtime, school-webgl, that does not exist. Converting an OI into a ticket is the Director's call, never the executor's (CP-002).",
     "H3_CONTRACT.md is authorized and frozen; amending it requires a new CP decision.",
     "builder and reviewer get append-only access to OPEN_ISSUES.md and telemetry.json (CP-017). Append-only means adding a row or a record; never editing or deleting existing ones.",
-    "Rotating this contract is step E of EXECUTION_PROTOCOL.md, executed at close. Version 10 was written as part of closing ARC1-006, not when opening ARC1-007: that is the fix CP-017 introduced after OI-001."
+    "CP-021 extends the P1 contract: ExperienceLocation.runtime is optional and, when present, decides which runtime serves that location. It is additive — without the field the behaviour is identical, proven by a1-runtime-host.test.ts passing untouched. src/experiences/registry.ts and manifests.ts were not modified and Ohmdal still declares topdown-phaser.",
+    "Rotating this contract is step E of EXECUTION_PROTOCOL.md, executed at close. Version 11 was written as part of closing ARC1-007, not when opening ARC1-008: that is the fix CP-017 introduced after OI-001."
   ]
 }

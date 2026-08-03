@@ -7,6 +7,7 @@ export type ExperienceId = 'instituto' | 'ohmdal' | 'bitland' | 'physica' | 'ari
  */
 export type ExperienceRuntime =
   | 'topdown-phaser'
+  | 'hd2d-three'
   | 'dataflow-phaser'
   | 'platformer-phaser'
   | 'cosmos-web';
@@ -34,6 +35,17 @@ export interface ExperienceLocation {
   /** Sala destino dentro del runtime (si aplica). */
   roomId?: string;
   spawn?: { x: number; y: number };
+  /**
+   * Qué gramática técnica debe servir esta ubicación. Ausente, gana la del manifest.
+   *
+   * Existe porque durante el slice H3 una misma experiencia necesita dos runtimes a la vez:
+   * Ohmdal se juega en `topdown-phaser` y se prototipa en `hd2d-three`. El registro de
+   * experiencias modela los cinco lenguajes jugables, no los laboratorios, así que el
+   * laboratorio no gana una entrada propia: la pide quien abre el viaje (`CP-021`).
+   *
+   * Es aditivo: sin el campo, el comportamiento es idéntico al anterior.
+   */
+  runtime?: ExperienceRuntime;
 }
 
 /** Estado espacial privado que un runtime entrega al shell antes de desmontarse. */

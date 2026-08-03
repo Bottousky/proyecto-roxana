@@ -46,6 +46,13 @@ export function createRuntimeHost(hostEl: HTMLElement, loaders: RuntimeLoaderMap
     return result;
   }
 
+  // Qué runtime sirve una ubicación. El manifest decide salvo que la ubicación nombre otro:
+  // durante el slice H3, Ohmdal se juega en `topdown-phaser` y se prototipa en `hd2d-three`
+  // sin que el registro de experiencias gane una entrada falsa (`CP-021`).
+  function resolveRuntime(location: ExperienceLocation): ExperienceRuntime {
+    return location.runtime ?? experienceById(location.experienceId).runtime;
+  }
+
   async function loadModule(runtime: ExperienceRuntime): Promise<ExperienceRuntimeModule> {
     const cached = modules.get(runtime);
     if (cached) return cached;
@@ -63,7 +70,7 @@ export function createRuntimeHost(hostEl: HTMLElement, loaders: RuntimeLoaderMap
   }
 
   async function mountAt(destination: ExperienceLocation): Promise<void> {
-    const runtime = experienceById(destination.experienceId).runtime;
+    const runtime = resolveRuntime(destination);
     const module = await loadModule(runtime);
     const handle = await module.mount(hostEl, makeContext(destination));
     current = { runtime, handle };
@@ -75,7 +82,7 @@ export function createRuntimeHost(hostEl: HTMLElement, loaders: RuntimeLoaderMap
   }
 
   async function doTravel(destination: ExperienceLocation): Promise<void> {
-    const targetRuntime = experienceById(destination.experienceId).runtime;
+    const targetRuntime = resolveRuntime(destination);
 
     if (current && current.runtime === targetRuntime) {
       // Viaje dentro del mismo runtime: no desmonta.

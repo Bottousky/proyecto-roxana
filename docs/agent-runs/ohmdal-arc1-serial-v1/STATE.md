@@ -5,10 +5,10 @@
 **WIP:** 1/1
 **Ejecución autorizada:** **sí** — H3 golden slice, `CP-013`, contrato en `H3_CONTRACT.md`
 **Base congelada:** `b49b617`
-**Ticket activo:** `ARC1-007 — READY`
-**Paquete activo:** ninguno — los define `/arc-plan ARC1-007` (`CP-016`)
-**Anteriores:** `ARC1-001` … `ARC1-006`, todos `DONE`
-**Siguiente:** `ARC1-008 — BLOCKED`
+**Ticket activo:** `ARC1-008 — READY`
+**Paquete activo:** ninguno — los define `/arc-plan ARC1-008` (`CP-016`)
+**Anteriores:** `ARC1-001` … `ARC1-007`, todos `DONE`
+**Siguiente:** `ARC1-009 — BLOCKED`
 
 ## Estado real
 
@@ -21,11 +21,21 @@
 - `ARC1-005` cerrado: escenas, beats, duración y fichas V2 congelados (`CP-019`).
 - `ARC1-006` cerrado: presupuesto por escena congelado (`CP-020`). Dos paquetes, `ARC1-006-A`
   —medición— y `ARC1-006-B` —reparto—, ambos `DONE` en ronda 1.
-- `ownership.json` v10 apunta a `ARC1-007`. La rotación es paso del cierre (`CP-017`), no del ticket
+- `ARC1-007` cerrado: el laboratorio se monta y se desmonta por `RuntimeHost` (`CP-021`). Primer
+  ticket de esta corrida que cambió código ejecutable. Dos paquetes, ambos `DONE`.
+- `ownership.json` v11 apunta a `ARC1-008`. La rotación es paso del cierre (`CP-017`), no del ticket
   siguiente.
-- **`ARC1-007` es el primer ticket de esta corrida que toca runtime**, no sólo el control plane. Su
-  plan tiene que abrir de a uno los paths de `src/**` que necesite; `src/**` sigue globalmente
-  protegido hasta entonces y `src/jugar/**` sigue prohibido de plano (`H3_CONTRACT.md` §3).
+- **`src/**` sigue globalmente protegido.** `ARC1-007` abrió nueve paths de a uno en su ficha y se
+  cierran con él; `ARC1-008` tiene que abrir los suyos en su propio plan. `src/jugar/**` sigue
+  prohibido de plano (`H3_CONTRACT.md` §3).
+- **Lo que `ARC1-007` deja medido y `ARC1-008` no puede mover:** el recorrido determinista produce
+  `db322500` en 1440×900 y `50543361` en 390×844, los mismos digests que `aeb9f70`. Si `ARC1-008`
+  los ve cambiar, es una regresión de `ARC1-007`, no un artefacto de su medición.
+- **Advertencia de método, `OI-006`.** Las fichas de los dos paquetes de `ARC1-007` declararon `DONE`
+  el 2026-08-02 con evidencia que no existía, y `B` no tenía una sola línea implementada. El control
+  plane resistió —`STATE.md` seguía en `READY` y `ownership.json` sin rotar— pero nada impidió que
+  las fichas afirmaran lo contrario durante una sesión entera. Se corrigió y se ejecutó de verdad el
+  2026-08-03. Ninguna ficha de esta corrida vale como evidencia por sí sola.
 - H3 cubre `ARC1-003` … `ARC1-035`: golden slice Portal → Plaza → Taller → Puerta → Manantial.
 - La autorización es de **alcance, no de resultado**. Cada ticket conserva sus gates, su evidencia y
   su aprobación humana cuando el cambio sea visible.
@@ -129,10 +139,50 @@ ritmo antes de `ARC1-030`, ni fps en ningún punto antes de `ARC1-028`.
   en los cuatro sidecars. P2, destino `ARC1-035`.
 - `OI-005` — los atlas SVG se inlinean como `data:` URI: cero requests, pero +23,2 % de
   percent-encoding dentro del bundle crítico de arranque. P2, destino `ARC1-028`.
+- `OI-007` — **el bundle de producción ahora publica el laboratorio.** `loaders.ts` referencia
+  `hd2dRuntime` por `import()`, así que rollup emite `hd2dRuntime` (46,84 kB) y `three.module`
+  (534,81 kB compartido, antes dentro de `school3d`). Ningún chunk de entrada contiene `three` y
+  ninguna ubicación publicada pide `hd2d-three`, así que nadie los descarga — pero `CP-020` había
+  dejado `labs/**` fuera del build y entra por esta puerta. P2. Decisión pendiente: si el loader va
+  detrás de `import.meta.env.DEV`. Conviene resolverlo antes de `ARC1-035`, que congela el coste.
+- `OI-008` — **ningún test de este repositorio está typechequeado.** `tsconfig.json` tiene
+  `include: ["src"]` y los tests corren con `--experimental-strip-types`. Por eso
+  `a1-runtime-host.test.ts` puede nombrar cuatro veces un runtime `'school-webgl'` que no existe en
+  `ExperienceRuntime` sin que nadie lo note. P2, sin asignar.
 
 Convertir un `OI` en ticket es decisión del Director (`CP-002`).
 
 ## Última verificación
+
+Sobre `aeb9f70`, 2026-08-03, al cerrar `ARC1-007`:
+
+- `npm run build`: PASS, `✓ built in 4.97s`.
+- `npm test`: PASS, exit 0, incluye `a2-hd2d-runtime` con 5 casos.
+- `npm run 3d:validate-manifests`: PASS, 5 manifests.
+- `git diff --check`: PASS.
+- **Paridad de comportamiento, medida contra un worktree real en `aeb9f70`:** el recorrido
+  determinista de 480 muestras da `db322500` en 1440×900 y `50543361` en 390×844. Los mismos digests
+  antes del traslado, después del traslado y después de montar por `RuntimeHost`. La serie completa
+  es idéntica carácter por carácter: 605.701 y 605.891 chars. Detalle en `evidence/ARC1-007/parity.json`.
+- La baseline reprodujo 22 draw calls y 508 triángulos de pico —las cifras que registró `ARC1-006`—,
+  lo que confirma que el método de medición es el mismo y no uno más laxo.
+- `desktop-1440x900.png` **pixel idéntico** a la baseline, mismo `sha256`. La diferencia de 48 B en
+  mobile está demostrada como ruido de DPR 2: cada lado produce 3 hashes distintos en 4 corridas y
+  ambas series comparten `0b0560b7896f17a5`.
+- Ciclo `mount → destroy → mount` por el host real con `runtimeLoaders` de verdad: contenedor vacío
+  tras `destroy`, `activeRuntime` `null`, segundo montaje sin excepciones. Consola con 0 errores.
+- `three` **fuera de los tres chunks de entrada**. Emite dos chunks perezosos nuevos, registrados en
+  `OI-007`.
+- **Desviación declarada:** no hubo review técnico independiente en ninguno de los dos paquetes. El
+  gate humano fue la única revisión, igual que en `ARC1-006`, `CP-018` y `CP-019`.
+- **Desviación declarada:** `git worktree remove --force` siguió la junction de `node_modules` y dañó
+  el `node_modules` real. Reparado con `npm ci`; `package.json` y `package-lock.json` intactos,
+  verificado. Se perdió `playwright`, que era extraño al lock, y con él la posibilidad de escribir un
+  PNG desde el arranque nuevo: `not-run` declarado.
+- **fps no medido y no declarado**, `CP-014`. Gate de fugas de 512 kB: es de `ARC1-008`, no se
+  adelantó.
+
+## Verificación anterior
 
 Sobre `b49b617`, 2026-08-02, al cerrar `ARC1-006`:
 
@@ -154,7 +204,7 @@ Sobre `b49b617`, 2026-08-02, al cerrar `ARC1-006`:
 - **fps no medido y no declarado:** `requestAnimationFrame` está throttled en el panel. Los 0,264 ms
   registrados son coste de CPU por frame forzado, **no** frame time.
 
-## Verificación anterior
+## Verificación previa
 
 Sobre `b49b617`, 2026-08-02, al cerrar `ARC1-005`:
 

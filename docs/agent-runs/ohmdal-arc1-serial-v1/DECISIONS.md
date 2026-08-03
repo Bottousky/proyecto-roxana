@@ -22,8 +22,42 @@
 | CP-018 | 2026-08-02 | Color script y shot deck **congelados**; las safe areas son vinculantes | `CP-012` deja de ser cualitativo: mobile `FAIL` con número, destino `ARC1-026` |
 | CP-019 | 2026-08-02 | Inventario de escenas y contenido V2 **congelados**: cinco escenas, tres actos causales, envolvente de duración por beat | `ARC1-006` presupuesta sobre esas cinco escenas; el mapa aporta <2 % de la duración; `OI-002` y `OI-003` abiertos |
 | CP-020 | 2026-08-02 | Presupuesto por escena **congelado**: por frame son techos independientes, por descarga son partición; el overworld recibe línea propia | El Arco I completo proyecta ≈ 35 MiB de descarga; `ARC1-008` hereda el gate de fugas; `OI-004` y `OI-005` abiertos |
+| CP-021 | 2026-08-03 | `ExperienceLocation.runtime` opcional: la ubicación puede nombrar qué runtime la sirve; ausente, gana el manifest | Ohmdal sostiene `topdown-phaser` y `hd2d-three` a la vez sin tocar el registro ni el juego publicado; el build gana dos chunks perezosos y abre `OI-007` |
 
-Una decisión nueva agrega `CP-021+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-022+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-021 — El runtime lo puede nombrar la ubicación, no sólo el manifest
+
+**Motivo.** `RuntimeHost` resolvía el runtime destino con `experienceById(destination.experienceId).runtime`:
+**un runtime por experiencia**. El slice necesita **dos para Ohmdal a la vez** — el `topdown-phaser`
+que hoy es el producto y el `hd2d-three` que todavía es laboratorio— y el canon pide exactamente eso:
+*«cargado bajo demanda mediante `RuntimeHost` […] manteniendo Phaser como baseline»*.
+
+**Decisión.** `ExperienceLocation` acepta `runtime?: ExperienceRuntime` opcional. Quien abre el viaje
+puede nombrar qué gramática técnica debe servir esa ubicación; ausente, gana la del manifest.
+
+**Por qué no las otras dos.** Repuntar `OHMDAL.runtime` sustituiría el juego jugable por un greybox, y
+ese veredicto es de `ARC1-030`, no de este ticket. Agregar una experiencia `ohmdal-lab` metería un
+mundo falso en un registro que modela los cinco lenguajes jugables, y además obligaría a editar el
+assert de `tests/a0-experience-registry.test.ts` para que el cambio pasara — que es justo lo que los
+gates prohíben.
+
+**Es aditivo, no una enmienda.** Sin el campo, el comportamiento es idéntico al anterior. Verificado
+por ejecución, no por lectura: `tests/a2-hd2d-runtime.test.ts` comprueba que `ohmdal` sin `runtime`
+sigue montando `topdown-phaser`, y `tests/a1-runtime-host.test.ts` pasa **sin tocarse**.
+
+**Evidencia.** `evidence/ARC1-007/runtime-mount.json`. El recorrido determinista de 480 muestras da
+`db322500` en 1440×900, el mismo digest que `aeb9f70` y que `ARC1-007-A`: la cadena completa no movió
+una cifra. `three` no aparece en ningún chunk de entrada del build.
+
+**Consecuencia que no estaba prevista.** El bundle de producción gana dos chunks perezosos —
+`hd2dRuntime` 46,84 kB y `three.module` 534,81 kB compartido—, porque rollup sigue el `import()` de
+`loaders.ts`. Ninguna ubicación publicada pide `hd2d-three`, así que nadie los descarga, pero el
+build ahora **publica código de prototipo** que `CP-020` había dejado fuera. Abierto en `OI-007`:
+decidir antes de `ARC1-035` si el loader va detrás de `import.meta.env.DEV`.
+
+**Alcance.** Extensión del contrato P1 (`docs/spec-p1-runtime-host.md`). No requiere ADR: no cambia de
+motor, de save ni de arquitectura, y es reversible por ser opcional y aditivo.
 
 ## CP-020 — Presupuesto por escena congelado
 
