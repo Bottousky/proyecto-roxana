@@ -1,0 +1,169 @@
+{
+  "version": 2,
+  "purpose": "Mapa rol -> proveedor -> modelo, con el pool de cuota que consume cada ruta. Es la unica fuente de verdad de routing ejecutable: MODEL_ROUTING.md explica el criterio, este archivo lo hace consultable por un script. Ningun modelId se escribe aqui si no aparece en `opencode models`.",
+  "observedOn": "2026-08-03",
+  "observedWith": "opencode models (OpenCode 1.14.29) con OpenCode Go activo + codex-cli 0.145.0",
+  "regenerateWith": "node automation/scripts/providers.mjs --write",
+  "changelog": [
+    "v2 2026-08-03: Go contratado y vinculado. 18 modelos bajo el proveedor `opencode-go`. Claude entra en cuenta regresiva (no se renueva). Codex al 7% del limite semanal hasta el 2026-08-08. Se separan `vision` (leer imagen) e `imagegen` (crear imagen): NINGUN modelo de OpenCode genera imagenes."
+  ],
+
+  "pools": {
+    "opencode-go": {
+      "subscribed": true,
+      "subscribedOn": "2026-08-03",
+      "description": "Suscripcion OpenCode Go, 10 USD/mes. Es el caballo de batalla del proyecto desde ahora.",
+      "surfaces": ["opencode", "opencode run"],
+      "limits": { "per5h": "12 USD equivalentes", "weekly": "30 USD", "monthly": "60 USD" },
+      "exhaustionPolicy": "degrade-to-free",
+      "burnRateWarning": "El limite de Go es en DOLARES equivalentes, no en requests: el modelo que elegis ES la tasa de quemado. Segun la documentacion de Go, `deepseek-v4-flash` rinde ~31.650 requests por ventana de 5 h y `kimi-k3` solo ~110. Un builder en kimi-k3 agota la ventana en una tarde. Volumen va a flash; los caros se reservan para lo que flash no puede.",
+      "balanceFallback": "La opcion `Use balance` cae al saldo Zen al agotar el limite. Debe quedar DESACTIVADA para que el gasto sea previsible: 10 USD/mes y nada mas."
+    },
+    "opencode-free": {
+      "description": "Modelos gratuitos del proveedor `opencode`. Coste cero. Red de seguridad cuando Go agota la ventana de 5 h.",
+      "surfaces": ["opencode", "opencode run"],
+      "exhaustionPolicy": "none",
+      "warning": "El inventario gratuito rota en dias. Correr providers.mjs antes de confiar en el routing."
+    },
+    "chatgpt-plan": {
+      "description": "Cuota agentica del plan ChatGPT. La consumen Codex CLI, Codex web/IDE y tambien OpenCode cuando se enruta a openai/*, porque `opencode auth list` muestra OpenAI por OAuth y no por API key.",
+      "surfaces": ["codex", "codex exec", "opencode --model openai/*"],
+      "sharedWindow": true,
+      "status": "RESERVA — 7% del limite semanal restante, se repone el 2026-08-08",
+      "exhaustionPolicy": "wait",
+      "warning": "Es el UNICO pool con generacion de imagen. Cada request que no sea imagen y se pueda hacer en Go es cuota de arte que se quema al pedo. Enrutar openai/* desde OpenCode NO es una via de escape: es el mismo pool.",
+      "reservedFor": ["imagegen", "desbloqueos que Go no resuelve"]
+    },
+    "anthropic-claude": {
+      "description": "Claude Code CLI. NO SE RENUEVA: la suscripcion vence en dias y no se repone.",
+      "surfaces": ["claude"],
+      "status": "EN CUENTA REGRESIVA — no planificar ninguna ruta permanente sobre este pool",
+      "exhaustionPolicy": "gone",
+      "useWhileAvailable": [
+        "Diagnosticar por que un modelo de Go falla un paquete, mientras todavia hay con que comparar.",
+        "Auditoria y decisiones de canon que queden escritas y sobrevivan al pool.",
+        "NO usar como builder: cada ticket que construye Claude es un ticket que no prueba el pipeline que si va a quedar."
+      ]
+    }
+  },
+
+  "roles": {
+    "orchestrator": {
+      "purpose": "Entiende el pedido, lo clasifica contra taxonomy.json, escribe la Task Spec y decide pipeline. No implementa.",
+      "primary": { "surface": "opencode", "model": "opencode-go/gpt-5.6-luna", "pool": "opencode-go" },
+      "fallback": [
+        { "surface": "opencode", "model": "opencode-go/glm-5.2", "pool": "opencode-go" },
+        { "surface": "codex", "model": "openai/gpt-5.6-sol", "pool": "chatgpt-plan" }
+      ],
+      "smokeStatus": "not-run",
+      "writes": false,
+      "note": "Codex/Sol pasa de primario a ultimo recurso: esta al 7% y su cuota vale mas como imagen que como razonamiento."
+    },
+    "planner": {
+      "purpose": "Analiza el ticket activo sin modificar archivos. Agente `director-plan` de .opencode/agents/.",
+      "primary": { "surface": "opencode", "model": "opencode-go/glm-5.2", "pool": "opencode-go" },
+      "fallback": [
+        { "surface": "opencode", "model": "opencode/nemotron-3-ultra-free", "pool": "opencode-free" }
+      ],
+      "smokeStatus": "not-run",
+      "writes": false,
+      "opencodeAgent": "director-plan"
+    },
+    "code-worker": {
+      "purpose": "Implementa el paquete activo dentro de su ownership. Agente `builder`.",
+      "primary": { "surface": "opencode", "model": "opencode-go/deepseek-v4-flash", "pool": "opencode-go" },
+      "escalation": [
+        { "surface": "opencode", "model": "opencode-go/kimi-k2.7-code", "pool": "opencode-go" },
+        { "surface": "opencode", "model": "opencode-go/deepseek-v4-pro", "pool": "opencode-go" }
+      ],
+      "escalateAfterFailures": 2,
+      "smokeStatus": "not-run",
+      "writes": true,
+      "opencodeAgent": "builder",
+      "note": "flash es el modelo de volumen: la tasa de quemado mas baja de Go. Se escala por fallo medido, nunca por sospecha."
+    },
+    "reviewer-tech": {
+      "purpose": "Revision independiente del diff. Sesion nueva y modelo distinto del que construyo.",
+      "primary": { "surface": "opencode", "model": "opencode-go/glm-5.2", "pool": "opencode-go" },
+      "fallback": [
+        { "surface": "opencode", "model": "opencode-go/qwen3.8-max", "pool": "opencode-go" },
+        { "surface": "opencode", "model": "opencode/deepseek-v4-flash-free", "pool": "opencode-free" }
+      ],
+      "constraint": "mustDifferFrom:code-worker",
+      "smokeStatus": "not-run",
+      "writes": false,
+      "opencodeAgent": "reviewer"
+    },
+    "reviewer-visual": {
+      "purpose": "Lee capturas y las contrasta contra el contrato visual. No sustituye el gate humano.",
+      "primary": { "surface": "opencode", "model": "opencode-go/mimo-v2.5-pro", "pool": "opencode-go" },
+      "fallback": [
+        { "surface": "opencode", "model": "opencode-go/gpt-5.6-luna", "pool": "opencode-go" }
+      ],
+      "requiredCapabilities": ["vision"],
+      "smokeStatus": "not-run",
+      "writes": false
+    },
+    "proc3d-worker": {
+      "purpose": "Reconstruye un objeto como codigo Three.js procedural con la skill img2threejs. Necesita LEER imagenes y escribir codigo en el mismo turno.",
+      "primary": { "surface": "opencode", "model": "opencode-go/gpt-5.6-luna", "pool": "opencode-go" },
+      "fallback": [
+        { "surface": "opencode", "model": "opencode-go/mimo-v2.5-pro", "pool": "opencode-go" },
+        { "surface": "codex", "model": "openai/gpt-5.6-sol", "pool": "chatgpt-plan" }
+      ],
+      "requiredCapabilities": ["vision", "code"],
+      "smokeStatus": "not-run",
+      "writes": true,
+      "note": "Era el unico hueco sin cubrir cuando Claude se va. Luna via Go lo tapa SI su vision funciona con la skill: img2threejs compara un screenshot contra la referencia en cada pass. Ese smoke es TASK-003 y es el mas importante de los tres."
+    },
+    "art-generator": {
+      "purpose": "Generar la imagen. NO ES UN ROL DE AGENTE.",
+      "primary": { "surface": "human", "model": null, "pool": "chatgpt-plan" },
+      "fallback": [],
+      "requiredCapabilities": ["imagegen"],
+      "writes": false,
+      "note": "NINGUN modelo de OpenCode genera imagenes, ni Luna ni mimo. `imagegen` vive solo en Codex ($imagegen / gpt-image-2) o en ChatGPT a mano. Y ASSET_PIPELINE.md ya lo decia: un builder de OpenCode «puede procesar atlas, formatos, materiales e integracion, pero no elige la identidad final ni declara una imagen como geometria». O sea que el paso de generacion siempre fue tuyo; lo unico que cambia es que ahora esta escrito.",
+      "humanStep": true
+    },
+    "art-integrator": {
+      "purpose": "Todo lo que rodea a la imagen: spec artistica antes, y atlas, formatos, pivote, frente, manifest e integracion despues.",
+      "primary": { "surface": "opencode", "model": "opencode-go/deepseek-v4-flash", "pool": "opencode-go" },
+      "escalation": [
+        { "surface": "opencode", "model": "opencode-go/glm-5.2", "pool": "opencode-go" }
+      ],
+      "requiredCapabilities": ["code"],
+      "smokeStatus": "not-run",
+      "writes": true,
+      "note": "Este rol SI es barato y SI corre en Go. Una tarea de arte se parte en tres: spec (agente) -> generacion (vos) -> integracion (agente). Solo el del medio depende de la cuota de ChatGPT."
+    }
+  },
+
+  "capabilities": {
+    "imagegen": {
+      "description": "CREAR una imagen.",
+      "availableIn": ["codex", "chatgpt-web"],
+      "notAvailableIn": ["opencode (ningun modelo, tampoco gpt-5.6-luna ni mimo-v2.5-pro)"],
+      "pool": "chatgpt-plan",
+      "verified": false,
+      "blocking": "Codex al 7% hasta 2026-08-08. Todo kind que la requiera nace en WAITING_PROVIDER."
+    },
+    "vision": {
+      "description": "LEER una imagen. Distinta de imagegen: casi todo el trabajo visual del proyecto —comparar un screenshot contra una referencia, revisar un golden frame, verificar safe areas— necesita esta y no aquella.",
+      "availableIn": ["codex", "opencode-go/gpt-5.6-luna", "opencode-go/mimo-v2.5-pro", "opencode/mimo-v2.5-free"],
+      "pool": "opencode-go",
+      "verified": false
+    },
+    "code": { "availableIn": ["codex", "opencode"], "verified": true },
+    "browser": { "availableIn": ["codex"], "verified": true, "note": "Playwright no esta en el lock tras la reparacion de node_modules de ARC1-007. Las capturas siguen siendo `not-run` hasta reinstalarlo." }
+  },
+
+  "rules": [
+    "Disponibilidad no demuestra calidad: antes del primer uso real de una ruta, smoke acotado y registro en telemetry.json. Ninguna ruta de esta version tiene smoke todavia.",
+    "Un modelId que no aparece en el inventario local no se escribe aqui ni en un record de telemetria.",
+    "El reviewer nunca usa el mismo modelo que el builder del mismo paquete.",
+    "En Go el modelo elegido es la tasa de quemado: volumen a `deepseek-v4-flash`, caros solo cuando flash falla de verdad.",
+    "La cuota de ChatGPT se reserva para imagen. Cualquier otra cosa que Go pueda hacer, la hace Go.",
+    "Ninguna ruta decide identidad visual, canon ni alcance: eso es del Director.",
+    "Si un rol requiere una capability cuyo proveedor esta agotado, la tarea va a WAITING_PROVIDER; no se sustituye por una ruta que no tiene la capability."
+  ]
+}

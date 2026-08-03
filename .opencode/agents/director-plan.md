@@ -1,7 +1,7 @@
 ---
 description: Planifica únicamente el ticket activo de Ohmdal sin modificar archivos
 mode: primary
-model: opencode/nemotron-3-ultra-free
+model: opencode-go/glm-5.2
 temperature: 0.1
 steps: 12
 permission:

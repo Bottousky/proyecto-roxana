@@ -23,8 +23,54 @@
 | CP-019 | 2026-08-02 | Inventario de escenas y contenido V2 **congelados**: cinco escenas, tres actos causales, envolvente de duración por beat | `ARC1-006` presupuesta sobre esas cinco escenas; el mapa aporta <2 % de la duración; `OI-002` y `OI-003` abiertos |
 | CP-020 | 2026-08-02 | Presupuesto por escena **congelado**: por frame son techos independientes, por descarga son partición; el overworld recibe línea propia | El Arco I completo proyecta ≈ 35 MiB de descarga; `ARC1-008` hereda el gate de fugas; `OI-004` y `OI-005` abiertos |
 | CP-021 | 2026-08-03 | `ExperienceLocation.runtime` opcional: la ubicación puede nombrar qué runtime la sirve; ausente, gana el manifest | Ohmdal sostiene `topdown-phaser` y `hd2d-three` a la vez sin tocar el registro ni el juego publicado; el build gana dos chunks perezosos y abre `OI-007` |
+| CP-022 | 2026-08-03 | El routing pasa a **OpenCode Go**; Claude sale del contrato y la cuota de ChatGPT se reserva para `imagegen` | Builder y reviewer son modelos distintos por configuración; generar arte 2D es paso manual del Director; ninguna ruta tiene smoke hasta `TASK-002` y `TASK-003` |
 
-Una decisión nueva agrega `CP-022+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-023+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-022 — El routing pasa a OpenCode Go; Claude sale del contrato
+
+**Motivo.** El Director contrató OpenCode Go el 2026-08-03 y declaró que **la suscripción de Claude
+no se renueva**. Codex queda al 7 % de su límite semanal hasta el 2026-08-08. El routing vigente
+apuntaba a modelos gratuitos y a Claude, y ninguna de las dos cosas describe ya el equipo real.
+
+El problema de fondo no es el precio: los ocho records de `telemetry.json` registran `route: claude`,
+`modelId: claude-opus-5` en **todas** las fases de `ARC1-004` a `ARC1-007`. El 100 % del trabajo lo
+hizo el proveedor que se va, así que ninguna otra ruta tiene evidencia de funcionar.
+
+**Evidencia.** `opencode models` del 2026-08-03 devuelve 18 modelos bajo el proveedor `opencode-go`,
+7 gratuitos bajo `opencode` y 22 bajo `openai`. Inventario completo en
+`automation/provider-health.json`, generado por `automation/scripts/providers.mjs`, no escrito a mano.
+
+**Decisión.**
+
+| Rol | Antes | Ahora |
+|---|---|---|
+| `director-plan` | `opencode/nemotron-3-ultra-free` | `opencode-go/glm-5.2` |
+| `builder` | `opencode/north-mini-code-free` | `opencode-go/deepseek-v4-flash` |
+| `reviewer` | `opencode/deepseek-v4-flash-free` | `opencode-go/glm-5.2` |
+| revisión visual | `opencode/mimo-v2.5-free` | `opencode-go/mimo-v2.5-pro` |
+| `img2threejs` | — | `opencode-go/gpt-5.6-luna` |
+
+**Impacto.**
+
+1. **Builder y reviewer son modelos distintos por configuración, no por disciplina.** La desviación
+   que `ARC1-004` a `ARC1-006` declararon a mano —build y review con el mismo modelo— deja de
+   depender de que alguien se acuerde.
+2. **La cuota de ChatGPT queda reservada para `imagegen`.** Es la única capability que OpenCode no
+   cubre con ningún modelo, tampoco `gpt-5.6-luna` ni `mimo-v2.5-pro`. Generar arte 2D vuelve a ser
+   un paso manual del Director, exactamente como ya decía `ASSET_PIPELINE.md`; lo que cambia es que
+   ahora está escrito en el routing en vez de sobreentendido.
+3. **Cuidado con el prefijo.** `opencode-go/gpt-5.6-luna` no consume cuota de ChatGPT;
+   `openai/gpt-5.6-luna` sí. Mismo modelo, factura distinta.
+4. **En Go el modelo elegido es la tasa de quemado**: el límite es en dólares equivalentes, no en
+   requests. El volumen va a `deepseek-v4-flash`; los caros se reservan para fallos medidos.
+5. **Ninguna ruta tiene smoke al momento de esta decisión.** `TASK-002` y `TASK-003` de
+   `automation/tasks/queue/` lo establecen antes del primer ticket real. `CP-007` sigue vigente:
+   disponibilidad no demuestra calidad.
+6. `MODEL_ROUTING.md` no tenía dueño en `ownership.json` v11. Se le asigna al Director en la
+   rotación de cierre de `ARC1-008`.
+
+No requiere ADR: no cambia arquitectura del producto, sólo quién ejecuta.
 
 ## CP-021 — El runtime lo puede nombrar la ubicación, no sólo el manifest
 

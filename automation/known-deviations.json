@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "purpose": "Desviaciones YA declaradas por el Director, con su motivo y su fecha de resolucion. La auditoria las baja de FAIL a warn para que no tapen hallazgos nuevos, pero NUNCA las oculta: se siguen imprimiendo, con el motivo al lado.",
+  "rules": [
+    "Una desviacion se acepta solo si ya esta declarada en STATE.md o DECISIONS.md. Este archivo no crea excusas: registra las que el Director ya asumio por escrito.",
+    "El `scope` es una lista cerrada de paquetes concretos. Nunca un glob ni un `todos`. Un paquete que no este en la lista sigue fallando.",
+    "`resolvedBy` es obligatorio: una desviacion aceptada sin decision que la cierre es deuda escondida, no deuda registrada.",
+    "Agregar una entrada aca es decision del Director. Un ejecutor que quiera silenciar un FAIL propio esta haciendo lo contrario de lo que este archivo existe para permitir."
+  ],
+  "accepted": [
+    {
+      "id": "DEV-001",
+      "check": "same-model-build-review",
+      "scope": [
+        "ARC1-004-A",
+        "ARC1-004-B",
+        "ARC1-005-A",
+        "ARC1-005-B",
+        "ARC1-006-A",
+        "ARC1-006-B"
+      ],
+      "reason": "Las fases plan, build y review corrieron en la misma sesion y con la misma ruta (claude-opus-5), contra la frontera de sesion de PACKETS.md. No hubo review independiente.",
+      "declaredIn": "STATE.md — «Desviacion declarada» en los cierres de ARC1-004, ARC1-005 y ARC1-006",
+      "decision": "CP-018, CP-019, CP-020",
+      "acceptedOn": "2026-08-02",
+      "resolvedBy": "CP-022: builder pasa a opencode-go/deepseek-v4-flash y reviewer a opencode-go/glm-5.2. Son modelos distintos por configuracion, no por disciplina: la desviacion deja de ser posible sin editar los agentes.",
+      "doNotRepeat": true
+    },
+    {
+      "id": "DEV-002",
+      "check": "build-without-review",
+      "scope": [
+        "ARC1-007-A",
+        "ARC1-007-B"
+      ],
+      "reason": "No hubo review tecnico independiente en ninguno de los dos paquetes. El gate humano fue la unica revision.",
+      "declaredIn": "STATE.md — «Desviacion declarada» en el cierre de ARC1-007",
+      "decision": "CP-021",
+      "acceptedOn": "2026-08-03",
+      "resolvedBy": "CP-022: el reviewer tiene ruta propia y distinta del builder. ARC1-008 en adelante ejecuta la fase review como sesion separada.",
+      "doNotRepeat": true
+    }
+  ]
+}

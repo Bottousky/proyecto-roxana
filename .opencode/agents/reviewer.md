@@ -1,7 +1,7 @@
 ---
 description: Revisa el diff del ticket activo sin editar ni reimplementar
 mode: subagent
-model: opencode/deepseek-v4-flash-free
+model: opencode-go/glm-5.2
 temperature: 0.1
 steps: 14
 permission:

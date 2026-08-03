@@ -1,7 +1,7 @@
 ---
 description: Implementa el cambio mínimo del único ticket activo dentro de su ownership
 mode: primary
-model: opencode/north-mini-code-free
+model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 steps: 28
 permission:

@@ -1,0 +1,79 @@
+{
+  "id": "TASK-003",
+  "title": "Smoke de vision de Luna via Go para el pipeline img2threejs",
+  "kind": "TECH_QA",
+  "state": "QUEUE",
+  "priority": "high",
+  "project": "Roxana/Ohmdal",
+  "createdOn": "2026-08-03",
+
+  "goal": "Queda decidido si opencode-go/gpt-5.6-luna puede LEER una imagen y comparar un render contra una referencia dentro de una sesion de OpenCode, que es lo que la skill img2threejs necesita en cada pass.",
+  "requestedByUser": "el tema es que no puedo generar imagenes desde opencode mediante gpt-5.6-luna",
+  "contextSummary": "img2threejs no genera imagenes: reconstruye un objeto como codigo Three.js procedural y verifica cada pass comparando un screenshot contra la referencia. Necesita `vision`, no `imagegen`. Era el unico rol sin reemplazo cuando Claude se va. Si Luna via Go lee imagenes, el hueco queda tapado sin gastar cuota de ChatGPT; si no, hay que decidir plan B —modular o Blender procedural, ya evaluados en docs/tool-bakeoff-plan.md— con dias de margen y no con el slice a medias.",
+  "dependsOn": [],
+
+  "scope": {
+    "mustDo": [
+      "Adjuntar a una sesion de OpenCode con opencode-go/gpt-5.6-luna una imagen existente del repo, por ejemplo docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-007/desktop-1440x900.png.",
+      "Pedirle que describa lo que ve y que nombre tres elementos concretos del encuadre.",
+      "Adjuntar las dos capturas del mismo ticket, desktop y mobile, y pedir en que se diferencian.",
+      "Repetir lo mismo con opencode-go/mimo-v2.5-pro como candidato de respaldo.",
+      "Anotar si el adjuntar imagen funciona por CLI (--file), por TUI, o por ninguna de las dos."
+    ],
+    "mustNotDo": [
+      "No pedirle que GENERE una imagen: ya esta confirmado que ningun modelo de OpenCode lo hace.",
+      "No correr la skill img2threejs completa en este smoke: es un pass de lectura, no una reconstruccion.",
+      "No usar Codex: la prueba pierde sentido si la resuelve el pool que se quiere evitar.",
+      "No editar codigo ni assets."
+    ],
+    "allowedPaths": [
+      "automation/runs/TASK-003/**"
+    ],
+    "protectedPaths": [
+      "src/**",
+      "assets/**",
+      "docs/agent-runs/**",
+      ".agents/skills/**"
+    ]
+  },
+
+  "acceptanceCriteria": [
+    "El informe dice si Luna via Go recibio la imagen, con la salida literal de la sesion.",
+    "Si la recibio, los tres elementos que nombra se contrastan contra la captura real: describir mal es peor que no ver nada.",
+    "La comparacion desktop vs mobile detecta una diferencia verificable, o se declara que no la detecto.",
+    "Queda anotado el mecanismo que funciono para adjuntar la imagen, o que ninguno funciono.",
+    "Hay un veredicto explicito: img2threejs corre en Go, corre solo en Codex, o no corre."
+  ],
+  "gates": [],
+
+  "limits": {
+    "maxAttempts": 2,
+    "maxSteps": 8,
+    "timeboxMinutes": 45,
+    "maxRounds": 2
+  },
+
+  "route": {
+    "role": "proc3d-worker",
+    "surface": "opencode",
+    "model": "opencode-go/gpt-5.6-luna",
+    "pool": "opencode-go",
+    "session": "TASK-003-SMOKE"
+  },
+
+  "reviewRequired": false,
+  "reviewMode": "human_only",
+  "humanGate": "always",
+
+  "evidence": {
+    "dir": "automation/runs/TASK-003",
+    "files": [
+      "smoke.md"
+    ]
+  },
+
+  "notes": [
+    "Es el smoke mas importante de los tres: de el depende si la mitad de las cinco escenas del slice tiene pipeline despues de que venza Claude.",
+    "`vision` (leer) e `imagegen` (crear) son capabilities distintas. Este smoke prueba la primera."
+  ]
+}

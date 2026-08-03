@@ -1,0 +1,83 @@
+{
+  "id": "TASK-002",
+  "title": "Smoke de las tres rutas de OpenCode Go antes del primer ticket real",
+  "kind": "TECH_QA",
+  "state": "QUEUE",
+  "priority": "high",
+  "project": "Roxana/Ohmdal",
+  "createdOn": "2026-08-03",
+
+  "goal": "Existe evidencia medida de si glm-5.2 y deepseek-v4-flash sirven para planner, builder y reviewer, antes de que un ticket real dependa de ellos.",
+  "requestedByUser": "estoy por suscribirme a opencode Go y me quedaré con GPT por sus imagenes y OpenCode por los modelos baratos",
+  "contextSummary": "Los ocho records de telemetry.json dicen route:claude. El 100% del trabajo lo hizo el modelo que se va. Los tres agentes de .opencode/agents/ ahora apuntan a Go y NINGUNO tiene smoke. MODEL_ROUTING.md es explicito: disponibilidad no demuestra calidad.",
+  "dependsOn": [],
+
+  "scope": {
+    "mustDo": [
+      "Correr las tres rutas contra ARC1-007, que ya esta cerrado, en modo read-only.",
+      "planner (glm-5.2): pedirle el estado real del ticket activo y ver si lee AGENTS.md, STATE.md y ownership.json sin que se lo indiquen archivo por archivo.",
+      "builder (deepseek-v4-flash): pedirle que EXPLIQUE el diff de ARC1-007 sin editar, para medir comprension sin arriesgar el arbol.",
+      "reviewer (glm-5.2): darle el review packet de ARC1-007-B y pedir veredicto SHIP/FIX_FIRST/RETHINK.",
+      "Cronometrar cada corrida con reloj de pared y anotar los minutos reales."
+    ],
+    "mustNotDo": [
+      "No dejar que ninguna ruta edite archivos en este smoke.",
+      "No usar ningun modelo openai/*: esa cuota esta al 7% y se reserva para imagen.",
+      "No probar kimi-k3 ni los modelos caros de Go: rinden ~110 requests por ventana de 5 h.",
+      "No repetir un smoke fallido mas de una vez sin una causa tecnica distinta.",
+      "No cambiar routing.json ni los agentes: el smoke informa, la ruta la decide el Director."
+    ],
+    "allowedPaths": [
+      "automation/runs/TASK-002/**"
+    ],
+    "protectedPaths": [
+      "src/**",
+      "docs/agent-runs/**",
+      "automation/routing.json",
+      ".opencode/agents/**"
+    ]
+  },
+
+  "acceptanceCriteria": [
+    "Las tres rutas tienen minutos medidos con reloj, no estimados, o `null` declarado como not-run.",
+    "Cada fila dice si el modelo leyo las reglas del proyecto por su cuenta y si respeto los limites de permiso de su agente.",
+    "El veredicto del reviewer sobre ARC1-007-B se contrasta contra lo que ya se sabe del ticket: si dice SHIP sobre un paquete con desviaciones declaradas, la ruta no sirve para revisar.",
+    "Hay una recomendacion por ruta: adoptar, escalar a un modelo mas caro, o descartar, con el motivo observado.",
+    "Ningun modelId aparece en el informe si no esta en `opencode models`."
+  ],
+  "gates": [
+    "node automation/scripts/providers.mjs"
+  ],
+
+  "limits": {
+    "maxAttempts": 2,
+    "maxSteps": 10,
+    "timeboxMinutes": 60,
+    "maxRounds": 2
+  },
+
+  "route": {
+    "role": "reviewer-tech",
+    "surface": "opencode",
+    "model": "opencode-go/glm-5.2",
+    "pool": "opencode-go",
+    "session": "TASK-002-SMOKE"
+  },
+
+  "reviewRequired": false,
+  "reviewMode": "human_only",
+  "humanGate": "no",
+
+  "evidence": {
+    "dir": "automation/runs/TASK-002",
+    "files": [
+      "smoke.md",
+      "latencies.json"
+    ]
+  },
+
+  "notes": [
+    "Este smoke es la linea base que nunca se tomo: con durationMin null en los ocho records, no hay con que comparar ninguna ruta nueva.",
+    "Usar el review packet ya generable: node automation/scripts/review-packet.mjs ARC1-007-B --out automation/runs/TASK-002/packet.md"
+  ]
+}
