@@ -170,3 +170,95 @@ export function localModelIds() {
   const health = json(join(AUTO, 'provider-health.json'));
   return health?.models ?? null;
 }
+
+// ---------- resolución de ruta ----------
+// Compartido por route.mjs (imprime) y dispatch.mjs (ejecuta). Vive acá para que no puedan
+// divergir: si el despachador calculara la ruta distinto del que la muestra, el comando que
+// leés no sería el que corre.
+
+/**
+ * Qué hace cada etapa y quién la ejecuta. Las etapas sin `role` heredan el rol del kind.
+ * `exec: false` significa que el ciclo se detiene ahí: no es una limitación técnica, es
+ * un punto donde decide una persona.
+ */
+export const PHASES = {
+  'plan':          { role: 'planner', agent: 'director-plan', exec: true, readOnly: true },
+  'build':         { agent: 'builder', exec: true },
+  'review':        { role: 'reviewer-tech', agent: 'reviewer', exec: true, readOnly: true },
+  'visual-qa':     { role: 'reviewer-visual', exec: true, readOnly: true },
+  'review-visual': { role: 'reviewer-visual', exec: true, readOnly: true },
+  'human-gate':    { exec: false, stop: 'gate humano: aprobás o rechazás vos' },
+  'close':         { exec: false, stop: 'sólo el Director cambia estados y commitea (CP-002)' },
+  'generate':      { exec: false, stop: 'generar la imagen es paso manual del Director' },
+  'select':        { exec: false, stop: 'elegir la identidad visual es paso manual del Director' },
+  'budget-approval': { exec: false, stop: 'aprobación de presupuesto: decisión del Director' },
+};
+
+/** Ruta efectiva de una tarea: rol, superficie, modelo, pool y qué la bloquea. */
+export function resolveRoute(task, { tax = taxonomy(), route = routing() } = {}) {
+  const kind = tax.kinds[task.kind];
+  if (!kind) return { error: `kind desconocido: ${task.kind}` };
+  const roleName = task.route?.role ?? kind.role;
+  const role = route.roles[roleName];
+  if (!role) return { error: `rol desconocido: ${roleName}` };
+
+  const blockers = [];
+  for (const cap of kind.requiredCapabilities ?? []) {
+    const c = route.capabilities[cap];
+    if (!c) blockers.push(`capability "${cap}" no declarada`);
+    else if (c.verified === false) blockers.push(`capability "${cap}" sin smoke local`);
+  }
+  if (kind.blockedByDefault) blockers.push(`${task.kind} bloqueado por defecto: ${(kind.unblockRequires ?? []).join(', ')}`);
+  if (role.primary?.surface === 'human') blockers.push(`el rol "${roleName}" no es un agente: lo ejecuta una persona`);
+
+  return {
+    kind, roleName, role, blockers,
+    surface: task.route?.surface ?? role.primary.surface,
+    model: task.route?.model ?? role.primary.model,
+    pool: task.route?.pool ?? role.primary.pool,
+  };
+}
+
+/** Ruta de una ETAPA concreta: puede diferir del rol de la tarea (review, visual-qa…). */
+export function resolvePhase(task, stage, { tax = taxonomy(), route = routing() } = {}) {
+  const spec = PHASES[stage] ?? { exec: true };
+  if (spec.exec === false) return { stage, exec: false, stop: spec.stop };
+
+  const base = resolveRoute(task, { tax, route });
+  if (base.error) return { stage, exec: false, error: base.error };
+
+  const roleName = spec.role ?? base.roleName;
+  const role = route.roles[roleName];
+  if (!role) return { stage, exec: false, error: `rol desconocido: ${roleName}` };
+
+  const useTaskRoute = !spec.role; // sólo la etapa del rol propio hereda el override de la tarea
+  return {
+    stage, exec: true, roleName, role, agent: spec.agent ?? role.opencodeAgent ?? null,
+    readOnly: spec.readOnly === true,
+    surface: (useTaskRoute && task.route?.surface) || role.primary.surface,
+    model: (useTaskRoute && task.route?.model) || role.primary.model,
+    pool: (useTaskRoute && task.route?.pool) || role.primary.pool,
+    blockers: base.blockers,
+    session: `${task.id}-${stage.toUpperCase().replace(/[^A-Z0-9]/g, '-')}`,
+  };
+}
+
+/** El comando literal de una etapa. Devuelve { bin, args } listo para spawn, y `line` para mostrar. */
+export function phaseCommand(task, ph, taskFile) {
+  const rel = String(taskFile ?? '').replace(/\\/g, '/');
+  const prompt =
+    `Ejecutá la etapa "${ph.stage}" de ${task.id}. El contrato completo está en ${rel}: leelo primero. ` +
+    `Respetá scope.allowedPaths, scope.mustNotDo, limits y acceptanceCriteria. ` +
+    (ph.readOnly ? `NO modifiques ningún archivo: esta etapa es de sólo lectura. ` : '') +
+    `Al terminar emití el reporte de EXECUTION_PROTOCOL.md y cerrá con una de estas palabras en la ` +
+    `última línea: TECH_REVIEW, HUMAN_REVIEW, BLOCKED, FAILED o DONE.`;
+
+  if (ph.surface === 'opencode') {
+    const args = [prompt.length ? 'run' : 'run', prompt, '--model', ph.model, '--title', ph.session];
+    if (ph.agent) args.push('--agent', ph.agent);
+    return { bin: 'opencode', args, line: `opencode run "…" --model ${ph.model}${ph.agent ? ` --agent ${ph.agent}` : ''} --title ${ph.session}`, prompt };
+  }
+  if (ph.surface === 'codex') return { bin: 'codex', args: ['exec', prompt], line: `codex exec "…"`, prompt };
+  if (ph.surface === 'claude') return { bin: 'claude', args: ['-p', prompt], line: `claude -p "…"`, prompt };
+  return { bin: null, args: [], line: '(rol humano — no hay comando)', prompt };
+}

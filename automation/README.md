@@ -156,6 +156,7 @@ automation/
     providers.mjs              observa el inventario y lo contrasta
     validate-task.mjs          valida una Task Spec contra schema, taxonomía, routing y DISCO
     route.mjs                  imprime destino y comando exacto; no ejecuta
+    dispatch.mjs               encadena las etapas de UNA tarea; para en cada gate humano
     audit-control-plane.mjs    audita docs/agent-runs/<hito>/ contra sus reglas
     review-packet.mjs          arma el paquete mínimo del reviewer
 ```
@@ -164,14 +165,19 @@ automation/
 
 ## 6. Lo que deliberadamente NO se construyó
 
-**Un router que dispara workers solo.** `route.mjs` imprime el comando; el humano lo pega. Disparar
-automáticamente solo tiene sentido cuando las rutas están medidas, y hoy `imagegen` y `vision` no
-tienen smoke, tres modelos gratuitos son desconocidos y `telemetry.json` tiene ocho registros con
-`durationMin: null`. Automatizar un despacho que no se sabe si funciona es exactamente cómo se
-pierden cuatro horas. Cuando haya telemetría suficiente, agregar `--exec` son veinte líneas.
+**Una cola que corre sola.** `dispatch.mjs` toma **una** tarea por invocación. No hay un demonio
+mirando `queue/` y despachando lo que aparezca. La razón no es técnica: un despachador de cola
+convierte cada error de spec en N errores antes de que te enteres.
 
 **Reintentos automáticos.** El límite de dos intentos ya existe y la escalación está declarada en
 `routing.json`. Quien decide escalar es el Director.
+
+**Cambio de estado y commit.** `CP-002`: sólo el Director. `dispatch.mjs` para en `close` y no
+escribe una línea de `tasks.json` ni de `STATE.md`.
+
+**Auto-aprobación de permisos por defecto.** Existe `--unattended`, que le pasa
+`--dangerously-skip-permissions` al builder. No es el default y no debería serlo hasta que una ruta
+tenga varios tickets de historial limpio.
 
 **Un segundo dashboard.** `scripts/arc-board.mjs` ya lo hace y lee del control plane.
 

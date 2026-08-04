@@ -4,6 +4,71 @@ Estado al 2026-08-03. Go activo, Codex al 7 % hasta el 8/8, Claude en cuenta reg
 
 ---
 
+## 0. El ciclo, en seis comandos
+
+Esto es todo. Lo demás de este documento es contexto.
+
+```text
+1.  opencode  →  /arc-plan ARC1-008          leés el plan · cerrás
+2.  opencode  →  /arc-build ARC1-008-A       aprobás cada edición · cerrás
+3.  terminal  →  npm run build && npm test
+4.  opencode  →  /arc-review ARC1-008-A      leés el veredicto · cerrás
+5.  opencode  →  /arc-close ARC1-008         cerrás
+6.  terminal  →  git commit
+```
+
+Cuatro sesiones de OpenCode y dos vueltas a la terminal. **«Cerrás» es literal:** salís del programa
+y volvés a entrar, porque `opencode` a secas abre sesión nueva y `-c` continúa la anterior. Esa es la
+única regla que no se rompe.
+
+**Todo lo que hay en `automation/` es opcional.** Son lupas para cuando algo huele mal, no pasos del
+ciclo. Si nunca corrés un script, el ciclo funciona igual.
+
+| Cuándo | Lupa |
+|---|---|
+| «¿en qué estado estoy?» | `node automation/scripts/audit-control-plane.mjs` |
+| «¿qué tareas tengo?» | `node automation/scripts/route.mjs automation/tasks --queue` |
+| «el builder dice que terminó, ¿le creo?» | `node automation/scripts/audit-control-plane.mjs` |
+| «el reviewer necesita contexto acotado» | `node automation/scripts/review-packet.mjs <paquete> --out <ruta>` |
+| «cambió algo en los proveedores» | `node automation/scripts/providers.mjs --write` |
+
+### El ciclo automático
+
+Los pasos 1, 2 y 4 son mecánicos: leer la ruta de una tabla y abrir un proceso. `dispatch.mjs` los
+encadena, un proceso por etapa —o sea una sesión por etapa, que es la regla— y **para donde tiene que
+parar**.
+
+```bash
+node automation/scripts/dispatch.mjs TASK-002
+```
+
+Sin `--go` no lanza un solo proceso: te muestra el plan, qué modelo va en cada etapa y dónde se va a
+detener. Con `--go`, corre.
+
+```bash
+node automation/scripts/dispatch.mjs TASK-002 --go
+```
+
+**Dónde para, siempre:**
+
+| Etapa | Por qué |
+|---|---|
+| `human-gate` | aprobás o rechazás vos |
+| `close` | sólo el Director cambia estados y commitea (`CP-002`) |
+| `generate` · `select` | generar y elegir una imagen son pasos manuales tuyos |
+| cualquier etapa que devuelva `BLOCKED`, `FAILED` o `HUMAN_REVIEW` | — |
+| exit distinto de cero, o timebox agotado | mata el proceso, no lo deja colgado |
+
+**El freno.** El builder pide permiso por cada edición y cada comando. `--unattended` se lo saca —le
+pasa `--dangerously-skip-permissions`— y ahí deja de ser «automatizar el tipeo» para ser «escribir
+código sin supervisión». Es una decisión distinta; el flag existe, el default no lo usa.
+
+**Efecto lateral que vale más de lo que parece:** mide la duración real de cada etapa con reloj de
+pared y la escribe en `dispatch.json`. Los ocho records de `telemetry.json` tienen `durationMin:
+null` porque nadie cronometró nunca. Esto cronometra gratis.
+
+---
+
 ## 1. Cuatro superficies, un trabajo cada una
 
 | Superficie | Para qué | Cuándo |

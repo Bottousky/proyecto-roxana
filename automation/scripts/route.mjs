@@ -12,7 +12,7 @@
 
 import { readdirSync, statSync } from 'node:fs';
 import { join, relative, extname, isAbsolute } from 'node:path';
-import { ROOT, json, taxonomy, routing, bold, dim, green, yellow, red } from './lib.mjs';
+import { ROOT, json, taxonomy, routing, resolveRoute, resolvePhase, phaseCommand, bold, dim, green, yellow, red } from './lib.mjs';
 
 const tax = taxonomy();
 const route = routing();
@@ -31,43 +31,17 @@ function collect(target) {
   return out;
 }
 
-/** Resuelve la ruta efectiva: lo que dice la tarea, y si no, lo que deriva de kind + routing. */
-function resolve(task) {
-  const kind = tax.kinds[task.kind];
-  if (!kind) return { error: `kind desconocido: ${task.kind}` };
-  const roleName = task.route?.role ?? kind.role;
-  const role = route.roles[roleName];
-  if (!role) return { error: `rol desconocido: ${roleName}` };
+// La resolución vive en lib.mjs, compartida con dispatch.mjs: si el que imprime el comando y el
+// que lo ejecuta calcularan la ruta distinto, lo que leés no sería lo que corre.
+const resolve = (task) => resolveRoute(task, { tax, route });
 
-  const blockers = [];
-  for (const cap of kind.requiredCapabilities ?? []) {
-    const c = route.capabilities[cap];
-    if (!c) blockers.push(`capability "${cap}" no declarada`);
-    else if (c.verified === false) blockers.push(`capability "${cap}" sin smoke local`);
+/** Primera etapa ejecutable del kind: la que arranca el ciclo. */
+function firstStage(task, r) {
+  for (const s of r.kind.stages ?? ['build']) {
+    const ph = resolvePhase(task, s, { tax, route });
+    if (ph.exec && !ph.error) return ph;
   }
-  if (kind.blockedByDefault) blockers.push(`${task.kind} bloqueado por defecto: ${(kind.unblockRequires ?? []).join(', ')}`);
-
-  const surface = task.route?.surface ?? role.primary.surface;
-  const model = task.route?.model ?? role.primary.model;
-  const pool = task.route?.pool ?? role.primary.pool;
-  return { kind, roleName, role, surface, model, pool, blockers };
-}
-
-/** El comando literal. Es todo el valor del script: elimina el 'con que modelo era esto'. */
-function command(task, r) {
-  const stage = task.state === 'QUEUE' ? 'plan' : task.state === 'PLANNED' ? 'build' : task.state === 'TECH_REVIEW' ? 'review' : 'build';
-  const session = task.route?.session ?? `${task.id}-${stage.toUpperCase()}`;
-  const prompt = `Ejecuta ${task.id}. Contrato: ${relative(ROOT, task.__file).replace(/\\/g, '/')}. ` +
-    `Respeta scope.allowedPaths, limits y acceptanceCriteria. Al terminar, emiti el reporte de ` +
-    `EXECUTION_PROTOCOL.md y detenete en TECH_REVIEW, HUMAN_REVIEW o BLOCKED.`;
-
-  if (r.surface === 'opencode') {
-    const agent = r.role.opencodeAgent ? ` --agent ${r.role.opencodeAgent}` : '';
-    return { session, cmd: `opencode run${agent} --model ${r.model} --title ${session} "${prompt}"` };
-  }
-  if (r.surface === 'codex') return { session, cmd: `codex exec "${prompt}"` };
-  if (r.surface === 'claude') return { session, cmd: `claude -p "${prompt}"` };
-  return { session, cmd: `(rol humano — no hay comando)` };
+  return null;
 }
 
 const args = process.argv.slice(2);
@@ -128,9 +102,15 @@ for (const task of tasks) {
     for (const b of r.blockers) console.log(`              · ${b}`);
     console.log(`  ${dim('estado correcto: WAITING_PROVIDER hasta resolverlo')}`);
   } else {
-    const { session, cmd } = command(task, r);
-    console.log(`  sesion      ${session}  ${dim('(sesion NUEVA — PACKETS.md, frontera de sesion)')}`);
-    console.log(`\n  ${green('ejecutar:')}\n  ${cmd}`);
+    const ph = firstStage(task, r);
+    if (!ph) console.log(`  ${yellow('sin etapa ejecutable')}`);
+    else {
+      const c = phaseCommand(task, ph, relative(ROOT, task.__file).replace(/\\/g, '/'));
+      console.log(`  sesion      ${ph.session}  ${dim('(sesion NUEVA — PACKETS.md, frontera de sesion)')}`);
+      console.log(`\n  ${green(`ejecutar la etapa «${ph.stage}»:`)}\n  ${c.line}`);
+      console.log(`\n  ${dim('o el ciclo entero:')}\n  node automation/scripts/dispatch.mjs ${task.id}        ${dim('(muestra el plan)')}`);
+      console.log(`  node automation/scripts/dispatch.mjs ${task.id} --go   ${dim('(lo ejecuta)')}`);
+    }
   }
   console.log('');
 }
