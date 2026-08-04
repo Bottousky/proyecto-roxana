@@ -34,7 +34,7 @@
 
 | CP-027 | 2026-08-04 | **`ARC1-008-B` mide con el navegador embebido de Claude Code**, porque reproducir un digest exige viewport exacto y el driver de `CP-026` no lo controla | Los dos digests congelados reproducen exactos en los dos viewports; `CP-026` sigue rigiendo el paquete `A`; playwright sigue excluido; `OI-015` gana un cuarto camino y `OI-016` queda abierto |
 
-| CP-028 | 2026-08-04 | **El Director ordena orquestar `ARC1-008` con Claude** (`sonnet` y `haiku` según la tarea). Contradice la línea «nunca builder» de `MODEL_ROUTING.md` y se aplica igual, porque la decisión de routing es del Director (`CP-002`) | `ARC1-008` cierra con el **primer review técnico independiente real** de la corrida; builder y reviewer siguen siendo sesiones distintas con contratos distintos, pero ya no proveedores distintos; `CP-022` no se revoca y `TASK-002` sigue siendo la línea base del pipeline sin Claude |
+| CP-028 | 2026-08-04 | **El Director ordena orquestar `ARC1-008` con Claude** (`sonnet` y `haiku` según la tarea). Contradice la línea «nunca builder» de `MODEL_ROUTING.md` y se aplica igual, porque la decisión de routing es del Director (`CP-002`) | `ARC1-008` cierra con la **primera fase `review` realmente ejecutada** de la corrida, pero **no independiente por modelo**: builder y reviewer fueron ambos `claude-sonnet-5` (`DEV-003`), y el chequeo que debía marcarlo falló (`OI-018`); `CP-022` no se revoca y `TASK-002` sigue siendo la línea base del pipeline sin Claude |
 
 Una decisión nueva agrega `CP-029+`, motivo, evidencia, impacto y si requiere autorización o ADR.
 
@@ -69,10 +69,15 @@ builder Claude sin explicación.
    builder. Lo que ya **no** son es proveedores distintos, que era la garantía estructural que
    `CP-022` compró. Un sesgo compartido entre builder y reviewer del mismo proveedor no lo detecta
    este arreglo.
-3. **`ARC1-008` es el primer ticket de la corrida con review técnico independiente real.** `ARC1-004`,
-   `ARC1-005`, `ARC1-006` y `ARC1-007` cerraron los cuatro declarando la desviación «no hubo review
-   independiente»; acá la fase `C` existió, produjo dos P2 y cero P0/P1, y verificó por su cuenta lo
-   que el builder afirmó.
+3. **`ARC1-008` es el primer ticket de la corrida cuya fase `C` corrió de verdad.** `ARC1-004`,
+   `ARC1-005`, `ARC1-006` y `ARC1-007` cerraron los cuatro declarando «no hubo review independiente»;
+   acá la fase existió, produjo dos P2 y cero P0/P1, y verificó por su cuenta lo que el builder
+   afirmó. **Lo que no es: independiente por modelo.** Builder y reviewer corrieron los dos con
+   `claude-sonnet-5` —la condición exacta de `DEV-001`—, así que la mejora es de proceso, no
+   estructural. Declarado como `DEV-003`. Peor todavía: el chequeo de `audit-control-plane.mjs` que
+   debía marcarlo **pasó**, porque se queda con el último record de cada fase y el segundo `build`
+   del paquete lo tapó (`OI-018`). La primera vez que este control plane tenía que atrapar una
+   desviación propia, no la atrapó; la atrapó una lectura manual del script.
 4. **Lo que esta decisión no resuelve:** si el pipeline sin Claude funciona de punta a punta. Sigue
    sin ejercitarse en un ticket real. Cuando el Director quiera esa evidencia, el camino es correr un
    ticket entero por las rutas de `MODEL_ROUTING.md`, no deducirlo de este.

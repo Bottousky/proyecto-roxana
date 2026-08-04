@@ -505,6 +505,22 @@
       "firstArtifactMin": null,
       "result": "DONE",
       "notes": "Paridad del recorrido determinista: db322500 y 50543361 reproducen exactos, dos corridas por viewport con un ciclo destroy-start intercalado. Diff de src/** vacio. Driver distinto por CP-027 porque el CLI de Orca no controla viewport. Recupero los dos detalles de protocolo que ARC1-007 no dejo escritos, OI-016."
+    },
+    {
+      "ticket": "ARC1-008",
+      "packet": "ARC1-008-B",
+      "phase": "review",
+      "session": "ARC1-008-B-REVIEW",
+      "route": "claude",
+      "modelId": "claude-sonnet-5",
+      "date": "2026-08-04",
+      "durationMin": null,
+      "round": 1,
+      "filesTouched": null,
+      "ownershipRespected": null,
+      "firstArtifactMin": null,
+      "result": "DONE",
+      "notes": "Review de evidencia, no de codigo: el diff del paquete es vacio. El mismo reviewer independiente de A verifico con git status --short que B solo agrego evidence/ARC1-008/B/, leyo parity.json y confirmo los dos digests y las dos corridas por viewport. Corroboracion aceptada sin reemplazar su propio analisis de la delegacion pause/resume. Duracion no separable de la sesion de review de A."
     }
   ]
 }

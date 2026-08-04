@@ -21,7 +21,7 @@
   "branch": "codex/ohmdal-arc1-control-plane",
   "planningBaseCommit": "e07be6332fa10f5df36fe5f679c66c1603961257",
   "baseCommit": "b49b617",
-  "activeIssueKey": "ARC1-008",
+  "activeIssueKey": "ARC1-009",
   "workflow": {
     "mode": "STRICT-SERIAL",
     "globalWipLimit": 1,
@@ -234,7 +234,29 @@
       "dependsOn": [
         "ARC1-007"
       ],
-      "note": "Dos paquetes, ambos DONE en ronda 1. A: pause/resume en RuntimeHost por delegacion y window.labControl en la pagina del laboratorio; ciclo completo por el host real y gate de fugas de 512 kB medido por primera vez, PASS con suelo de 8451 B/ciclo sobre 16 ciclos. B: paridad del recorrido determinista, db322500 y 50543361 reproducen exactos en dos corridas por viewport. PRIMER ticket de la corrida con review tecnico independiente real: APROBADO CON P2, cero P0 y cero P1. Tres hallazgos ajenos: OI-015, OI-016 y OI-017. Desviacion declarada: final-state.png not-run porque el driver de CP-026 no captura sin la ventana al frente."
+      "spec": "tickets/ARC1-008.md",
+      "packets": [
+        "packets/ARC1-008/ARC1-008-A.md",
+        "packets/ARC1-008/ARC1-008-B.md"
+      ],
+      "decidedOn": "2026-08-04",
+      "decisions": [
+        "CP-026",
+        "CP-027",
+        "CP-028"
+      ],
+      "evidence": "evidence/ARC1-008/",
+      "deliverables": [
+        "src/app/runtimeHost.ts",
+        "src/labs/ohmdal-hd2d-preprod/main.ts"
+      ],
+      "openIssues": [
+        "OI-015",
+        "OI-016",
+        "OI-017",
+        "OI-018"
+      ],
+      "note": "Dos paquetes, ambos DONE en ronda 1. A: pause/resume en RuntimeHost por delegacion y window.labControl en la pagina del laboratorio; ciclo completo por el host real y gate de fugas de 512 kB medido por primera vez, PASS con suelo de 8451 B/ciclo sobre 16 ciclos. B: paridad del recorrido determinista, db322500 y 50543361 reproducen exactos en dos corridas por viewport. PRIMER ticket de la corrida cuya fase review corrio de verdad, como sesion separada: APROBADO CON P2, cero P0 y cero P1. NO es independiente por modelo: builder y reviewer fueron ambos claude-sonnet-5 (DEV-003), y el chequeo que debia marcarlo fallo (OI-018). Tres hallazgos ajenos: OI-015, OI-016 y OI-017. Desviacion declarada: final-state.png not-run porque el driver de CP-026 no captura sin la ventana al frente."
     },
     {
       "key": "ARC1-009",

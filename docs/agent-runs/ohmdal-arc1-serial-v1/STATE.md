@@ -25,8 +25,10 @@
   ticket de esta corrida que cambió código ejecutable. Dos paquetes, ambos `DONE`.
 - `ARC1-008` cerrado: el ciclo de vida completo queda ejercido por el host real y **el gate de fugas
   de 512 kB queda medido por primera vez** (`CP-027`, `CP-028`). Dos paquetes, ambos `DONE` en ronda
-  1. Es el **primer ticket de la corrida con review técnico independiente real**: `APROBADO CON P2`,
-  cero P0 y cero P1.
+  1. Es el **primer ticket de la corrida cuya fase `review` corrió de verdad**, como sesión separada
+  que re-verificó el trabajo: `APROBADO CON P2`, cero P0 y cero P1. **No es independiente por
+  modelo:** build y review corrieron los dos con `claude-sonnet-5`, que es la condición exacta que
+  `DEV-001` marca. Declarado como `DEV-003`; el chequeo que debía atraparlo falló y es `OI-018`.
 - `ownership.json` v15 apunta a `ARC1-009`. La rotación es paso del cierre (`CP-017`), no del ticket
   siguiente. v12 (`CP-023`) y v13 (`CP-025`) fueron correcciones, no rotaciones; **v15 sí es una
   rotación**: `ARC1-008` avanzó a `DONE` y sus dos paths de `src/**` se cerraron con él.
@@ -248,10 +250,18 @@ Sobre `8da2110`, 2026-08-04, al cerrar `ARC1-008`:
   mobile). Detalle en `evidence/ARC1-008/B/parity.json`.
 - Consola: 8 entradas, las 8 `debug` del cliente de HMR de vite. **0 errores, 0 warnings** a lo largo
   de todo el ejercicio.
-- **Review técnico independiente: `APROBADO CON P2`**, cero P0 y cero P1 — el primero real de esta
-  corrida. El reviewer recalculó los tres estimadores de fuga con su propio script y coinciden al
-  byte; re-corrió los tres gates; y verificó contra `dist/` que `labControl` no se publica
-  (`grep -rl labControl dist/` sin resultados, ningún `dist/labs`). Sus dos P2 son `OI-015` y `OI-017`.
+- **Review: `APROBADO CON P2`**, cero P0 y cero P1 — la primera fase `review` de esta corrida que
+  corrió de verdad, como sesión separada. El reviewer recalculó los tres estimadores de fuga con su
+  propio script y coinciden al byte; re-corrió los tres gates; y verificó contra `dist/` que
+  `labControl` no se publica (`grep -rl labControl dist/` sin resultados, ningún `dist/labs`). Sus dos
+  P2 son `OI-015` y `OI-017`.
+- **Pero no es independiente por modelo, y hay que decirlo:** el builder y el reviewer corrieron los
+  dos con `claude-sonnet-5`. Es la condición exacta que `DEV-001` existe para marcar y que `CP-022`
+  quiso volver imposible. Lo que sí hubo —sesiones separadas, contextos aislados, contratos distintos
+  y un reviewer que re-derivó los números en vez de creerle al builder— es real y no es poco, pero no
+  es lo mismo. Declarado como `DEV-003`. **El chequeo automático que debía atraparlo no lo atrapó**
+  (`OI-018`): `audit-control-plane.mjs` se queda con el último record de cada fase, y el segundo
+  `build` del paquete —la medición, con `claude-opus-5`— tapó al primero.
 - **Límite del review, declarado por el propio reviewer:** puede auditar la consistencia interna de
   las muestras y la coherencia entre archivos, pero **no puede probar que el JSON transcripto en
   `commands.md` sea una sesión real y no algo tecleado**. Es `OI-006` visto desde la fase `C`, y

@@ -39,6 +39,20 @@
       "acceptedOn": "2026-08-03",
       "resolvedBy": "CP-022: el reviewer tiene ruta propia y distinta del builder. ARC1-008 en adelante ejecuta la fase review como sesion separada.",
       "doNotRepeat": true
+    },
+    {
+      "id": "DEV-003",
+      "check": "same-model-build-review",
+      "scope": [
+        "ARC1-008-A"
+      ],
+      "reason": "El build y el review del paquete corrieron los dos con claude-sonnet-5. Fueron sesiones separadas, con contextos aislados y contratos distintos, y el reviewer re-corrio los tres gates y recalculo los tres estimadores de fuga con su propio script en vez de creerle al builder — pero es el mismo modelo, que es la condicion exacta que DEV-001 marca.",
+      "declaredIn": "STATE.md — «no es independiente por modelo» en el cierre de ARC1-008; DECISIONS.md CP-028 punto 3",
+      "decision": "CP-028",
+      "acceptedOn": "2026-08-04",
+      "resolvedBy": "sin resolver. CP-022 —builder y reviewer en rutas distintas de opencode-go— sigue siendo el plan que lo vuelve imposible, y sigue sin ejercitarse en un ticket real. Mientras el Director rutee a Claude, la separacion es de sesion y de contrato, no de modelo.",
+      "doNotRepeat": false,
+      "note": "La auditoria NO marco esta desviacion sola: el chequeo se quedo con el ultimo record de fase build (la medicion, claude-opus-5) y tapo al primero. Es OI-018. Esta entrada existe porque una lectura manual del script la encontro, no porque el control plane la haya detectado."
     }
   ]
 }
