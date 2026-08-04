@@ -1,26 +1,28 @@
 #!/usr/bin/env node
-// Ejecuta las etapas de UNA tarea, una sesión por etapa, y para donde tiene que parar.
+// Ejecuta las etapas de una tarea —o de una cola— una sesión por etapa, y para donde tiene que parar.
 //
 //   node automation/scripts/dispatch.mjs TASK-002              muestra el plan, NO ejecuta
 //   node automation/scripts/dispatch.mjs TASK-002 --go         ejecuta
 //   node automation/scripts/dispatch.mjs TASK-002 --go --from build
-//   node automation/scripts/dispatch.mjs TASK-002 --go --only plan
+//   node automation/scripts/dispatch.mjs --queue               plan de toda la cola
+//   node automation/scripts/dispatch.mjs --queue --go --max 3  corre hasta 3 tareas
 //
-// Sin `--go` no lanza un solo proceso. Es el freno: podés ver exactamente qué se va a correr
-// antes de que corra.
+// Sin `--go` no lanza un solo proceso.
+//
+// En modo cola: una tarea que topa con un gate humano se APARCA en review/ y la cola sigue con la
+// siguiente. Así juntás varios gates y los mirás de una sentada, en vez de una interrupción por
+// tarea. Una tarea que termina en BLOCKED o FAILED detiene la cola entera: si el setup está mal,
+// seguir sólo multiplica el error.
 //
 // Lo que NO hace, y no es un pendiente:
-//   - no toma la cola entera: una tarea por invocación;
-//   - no cambia el estado de un ticket ni commitea (CP-002: eso es del Director);
-//   - no pasa --dangerously-skip-permissions salvo que se lo pidas con --unattended;
-//   - no reintenta por su cuenta más allá del presupuesto de rondas de la tarea.
-//
-// Efecto lateral que sí importa: mide la duración real de cada etapa. Los ocho records de
-// telemetry.json tienen `durationMin: null` porque nadie cronometró. Esto cronometra gratis.
+//   - no cambia el estado de un ticket de docs/agent-runs/ ni commitea (CP-002);
+//   - no mueve ninguna tarea a done/: DONE exige evidencia en disco y decisión tuya;
+//   - no pasa --dangerously-skip-permissions salvo --unattended;
+//   - no reintenta más allá del presupuesto de rondas de la tarea.
 
 import { spawn } from 'node:child_process';
-import { writeFileSync, mkdirSync, appendFileSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { join, isAbsolute, relative, extname } from 'node:path';
+import { writeFileSync, mkdirSync, appendFileSync, existsSync, readdirSync, renameSync } from 'node:fs';
+import { join, isAbsolute, relative, extname, basename } from 'node:path';
 import {
   ROOT, AUTO, json, taxonomy, routing, resolvePhase, phaseCommand,
   Report, bold, dim, green, yellow, red,
@@ -29,106 +31,110 @@ import {
 const argv = process.argv.slice(2);
 const flag = (n) => argv.includes(`--${n}`);
 const val = (n) => { const i = argv.indexOf(`--${n}`); return i >= 0 ? argv[i + 1] : null; };
-const target = argv.find((a) => !a.startsWith('--') && argv[argv.indexOf(a) - 1]?.startsWith('--') !== true);
 
 const GO = flag('go');
+const QUEUE = flag('queue');
 const UNATTENDED = flag('unattended');
 const FROM = val('from');
 const ONLY = val('only');
+const MAX = Number(val('max') ?? 0) || Infinity;
 
-if (!target) {
-  console.error('uso: node automation/scripts/dispatch.mjs <TASK-ID | ruta.json> [--go] [--from <etapa>] [--only <etapa>] [--unattended]');
-  process.exit(2);
-}
+const FLAGS_WITH_VALUE = new Set(['from', 'only', 'max']);
+const positional = argv.filter((a, i) => {
+  if (a.startsWith('--')) return false;
+  const prev = argv[i - 1];
+  return !(prev?.startsWith('--') && FLAGS_WITH_VALUE.has(prev.slice(2)));
+});
 
-// ---------- localizar la tarea ----------
+const tax = taxonomy();
+const route = routing();
+const TERMINAL = /\b(BLOCKED|FAILED|TECH_REVIEW|HUMAN_REVIEW|DONE)\b/g;
+const STATE_DIRS = { QUEUE: 'queue', IN_PROGRESS: 'in-progress', TECH_REVIEW: 'review', HUMAN_REVIEW: 'review', BLOCKED: 'blocked', FAILED: 'blocked', WAITING_PROVIDER: 'waiting-provider' };
 
-function findTask(t) {
-  if (t.endsWith('.json')) return isAbsolute(t) ? t : join(ROOT, t);
-  const base = join(AUTO, 'tasks');
-  const hits = [];
+// ---------- localizar tareas ----------
+
+function allTaskFiles(dir = join(AUTO, 'tasks')) {
+  const out = [];
   (function walk(d) {
+    if (!existsSync(d)) return;
     for (const e of readdirSync(d, { withFileTypes: true })) {
       const p = join(d, e.name);
       if (e.isDirectory()) walk(p);
-      else if (extname(e.name) === '.json' && e.name.startsWith(t)) hits.push(p);
+      else if (extname(e.name) === '.json' && !e.name.startsWith('_')) out.push(p);
     }
-  })(base);
+  })(dir);
+  return out;
+}
+
+function findTask(t) {
+  if (t.endsWith('.json')) return isAbsolute(t) ? t : join(ROOT, t);
+  const hits = allTaskFiles().filter((f) => basename(f).startsWith(t));
   if (!hits.length) { console.error(`no se encontró ninguna tarea que empiece con "${t}" en automation/tasks/`); process.exit(2); }
   if (hits.length > 1) { console.error(`"${t}" es ambiguo: ${hits.map((h) => relative(ROOT, h)).join(', ')}`); process.exit(2); }
   return hits[0];
 }
 
-const file = findTask(target);
-const relFile = relative(ROOT, file).replace(/\\/g, '/');
-const task = json(file);
-const tax = taxonomy();
-const route = routing();
-const kind = tax.kinds[task.kind];
-
-if (!kind) { console.error(`kind "${task.kind}" no existe en taxonomy.json`); process.exit(2); }
-
 // ---------- precondiciones ----------
 
-const pre = new Report(`dispatch — ${task.id}`);
-
-if (!['QUEUE', 'PLANNED', 'IN_PROGRESS', 'TECH_REVIEW'].includes(task.state)) {
-  pre.fail(`state=${task.state}: sólo se despacha QUEUE, PLANNED, IN_PROGRESS o TECH_REVIEW`);
-}
-if (task.state === 'WAITING_PROVIDER') pre.fail(`espera ${task.waitingFor?.capability}: no se despacha hasta que el Director lo resuelva`);
-if (task.run) pre.warn(`la tarea pertenece al hito "${task.run}": el despachador NO cambia su estado ni rota ownership`);
-if (UNATTENDED) pre.warn('--unattended: el builder va a auto-aprobar ediciones y comandos. Sin freno.');
-
-pre.print();
-if (pre.exitCode) process.exit(1);
-
-// ---------- plan de etapas ----------
-
-let stages = kind.stages ?? ['build'];
-if (ONLY) stages = stages.filter((s) => s === ONLY);
-else if (FROM) { const i = stages.indexOf(FROM); if (i >= 0) stages = stages.slice(i); }
-if (!stages.length) { console.error(`ninguna etapa coincide (kind ${task.kind}: ${(kind.stages ?? []).join(', ')})`); process.exit(2); }
-
-const plan = stages.map((s) => resolvePhase(task, s, { tax, route }));
-
-console.log(bold(`\nplan de ejecución — ${task.id} · ${task.kind}`));
-console.log(dim(`contrato: ${relFile}   timebox: ${task.limits.timeboxMinutes} min por etapa   rondas: ${task.limits.maxRounds ?? kind.maxRounds ?? 2}\n`));
-
-for (const ph of plan) {
-  if (!ph.exec) { console.log(`  ${yellow('■')} ${ph.stage.padEnd(15)} ${dim('PARA — ' + (ph.stop ?? ph.error))}`); continue; }
-  if (ph.blockers?.length) { console.log(`  ${red('■')} ${ph.stage.padEnd(15)} ${red('bloqueada: ' + ph.blockers.join('; '))}`); continue; }
-  const c = phaseCommand(task, ph, relFile);
-  console.log(`  ${green('▸')} ${ph.stage.padEnd(15)} ${ph.roleName} · ${ph.model} ${dim('· sesión ' + ph.session)}`);
-  console.log(`    ${dim(c.line)}`);
+function preflight(task, { quiet = false } = {}) {
+  const rep = new Report(`dispatch — ${task.id}`);
+  if (!['QUEUE', 'PLANNED', 'IN_PROGRESS', 'TECH_REVIEW'].includes(task.state)) {
+    rep.fail(`state=${task.state}: sólo se despacha QUEUE, PLANNED, IN_PROGRESS o TECH_REVIEW`);
+  }
+  if (task.state === 'WAITING_PROVIDER') rep.fail(`espera ${task.waitingFor?.capability}: lo resuelve el Director`);
+  if (task.run) rep.warn(`pertenece al hito "${task.run}": el despachador NO cambia su estado ni rota ownership`);
+  if (UNATTENDED) rep.warn('--unattended: el builder auto-aprueba ediciones y comandos. Sin freno.');
+  if (!quiet) rep.print();
+  return rep.exitCode === 0;
 }
 
-const runnable = plan.filter((p) => p.exec && !p.blockers?.length);
-const firstStop = plan.find((p) => !p.exec || p.blockers?.length);
-if (firstStop) console.log(`\n  ${yellow('el ciclo se detiene en')} ${bold(firstStop.stage)} ${dim('— ' + (firstStop.stop ?? firstStop.error ?? firstStop.blockers?.join('; ')))}`);
-
-if (!GO) {
-  console.log(dim(`\nnada se ejecutó. Agregá --go para correr las ${runnable.length} etapas ejecutables.`));
-  process.exit(0);
+/** Una tarea no arranca si alguna de sus dependencias no está DONE. */
+function depsSatisfied(task, byId) {
+  const pending = (task.dependsOn ?? []).filter((d) => (byId.get(d)?.state ?? 'DESCONOCIDA') !== 'DONE');
+  return { ok: pending.length === 0, pending };
 }
-if (!runnable.length) { console.log(dim('\nno hay etapas ejecutables.')); process.exit(0); }
+
+// ---------- plan ----------
+
+function stagesOf(kind) {
+  let s = kind.stages ?? ['build'];
+  if (ONLY) return s.filter((x) => x === ONLY);
+  if (FROM) { const i = s.indexOf(FROM); if (i >= 0) return s.slice(i); }
+  return s;
+}
+
+function planOf(task) {
+  const kind = tax.kinds[task.kind];
+  if (!kind) return { error: `kind "${task.kind}" no existe en taxonomy.json` };
+  return { kind, phases: stagesOf(kind).map((s) => resolvePhase(task, s, { tax, route })) };
+}
+
+function printPlan(task, file, { kind, phases }) {
+  console.log(bold(`\nplan — ${task.id} · ${task.kind}`));
+  console.log(dim(`contrato: ${file}   timebox: ${task.limits.timeboxMinutes} min/etapa   rondas: ${task.limits.maxRounds ?? kind.maxRounds ?? 2}\n`));
+  for (const ph of phases) {
+    if (!ph.exec) { console.log(`  ${yellow('■')} ${ph.stage.padEnd(15)} ${dim('PARA — ' + (ph.stop ?? ph.error))}`); continue; }
+    if (ph.blockers?.length) { console.log(`  ${red('■')} ${ph.stage.padEnd(15)} ${red('bloqueada: ' + ph.blockers.join('; '))}`); continue; }
+    console.log(`  ${green('▸')} ${ph.stage.padEnd(15)} ${ph.roleName} · ${ph.model} ${dim('· ' + ph.session)}`);
+    // Silenciar un override declarado sería peor que ignorarlo: la tarea diría una cosa y correría otra.
+    if (task.route?.role && task.route.role !== ph.roleName) {
+      console.log(`    ${yellow(`la tarea declara route.role="${task.route.role}" y la etapa "${ph.stage}" usa "${ph.roleName}" — manda la etapa`)}`);
+    }
+    console.log(`    ${dim(phaseCommand(task, ph, file).line)}`);
+  }
+}
 
 // ---------- ejecución ----------
 
-const runDir = join(ROOT, task.evidence?.dir ?? `automation/runs/${task.id}`);
-mkdirSync(runDir, { recursive: true });
-
-const records = [];
-const TERMINAL = /\b(BLOCKED|FAILED|TECH_REVIEW|HUMAN_REVIEW|DONE)\b/g;
-
-function runPhase(ph) {
-  const c = phaseCommand(task, ph, relFile);
-  if (!c.bin) return { result: 'SKIPPED', note: 'sin comando' };
+function runPhase(task, ph, file, runDir) {
+  const c = phaseCommand(task, ph, file);
+  if (!c.bin) return Promise.resolve({ result: 'SKIPPED', durationMin: 0 });
 
   const args = [...c.args];
   if (UNATTENDED && ph.surface === 'opencode' && !ph.readOnly) args.push('--dangerously-skip-permissions');
 
   const logPath = join(runDir, `dispatch-${ph.stage}.log`);
-  writeFileSync(logPath, `$ ${c.bin} ${c.line}\n\n--- prompt ---\n${c.prompt}\n\n--- salida ---\n`, 'utf8');
+  writeFileSync(logPath, `$ ${c.line}\n\n--- prompt ---\n${c.prompt}\n\n--- salida ---\n`, 'utf8');
 
   const t0 = Date.now();
   return new Promise((resolve) => {
@@ -143,64 +149,134 @@ function runPhase(ph) {
     child.stdout.on('data', onData);
     child.stderr.on('data', onData);
 
-    const ms = (task.limits.timeboxMinutes ?? 60) * 60_000;
     const timer = setTimeout(() => {
       appendFileSync(logPath, `\n\n[dispatch] timebox de ${task.limits.timeboxMinutes} min agotado — proceso terminado\n`, 'utf8');
       child.kill();
-    }, ms);
+    }, (task.limits.timeboxMinutes ?? 60) * 60_000);
 
     child.on('close', (code) => {
       clearTimeout(timer);
-      const durationMin = Math.round((Date.now() - t0) / 60_000 * 10) / 10;
       const found = [...tail.matchAll(TERMINAL)].map((m) => m[1]);
-      const result = code !== 0 ? 'FAILED' : (found.at(-1) ?? 'TECH_REVIEW');
-      resolve({ result, code, durationMin, log: relative(ROOT, logPath).replace(/\\/g, '/') });
+      resolve({
+        result: code !== 0 ? 'FAILED' : (found.at(-1) ?? 'TECH_REVIEW'),
+        code,
+        durationMin: Math.round((Date.now() - t0) / 6000) / 10,
+        log: relative(ROOT, logPath).replace(/\\/g, '/'),
+      });
     });
   });
 }
 
-console.log(bold(`\n─── ejecutando ${runnable.length} etapa(s) ───\n`));
+async function dispatchTask(file) {
+  const rel = relative(ROOT, file).replace(/\\/g, '/');
+  const task = json(file);
+  const plan = planOf(task);
+  if (plan.error) return { task, error: plan.error };
 
-let stopped = null;
-for (const ph of plan) {
-  if (!ph.exec || ph.blockers?.length) {
-    stopped = { stage: ph.stage, why: ph.stop ?? ph.error ?? ph.blockers?.join('; ') };
-    break;
+  printPlan(task, rel, plan);
+  if (!GO) return { task, dryRun: true, plan };
+
+  const runDir = join(ROOT, task.evidence?.dir ?? `automation/runs/${task.id}`);
+  mkdirSync(runDir, { recursive: true });
+
+  const records = [];
+  let stopped = null;
+  console.log(bold(`\n─── ejecutando ${task.id} ───\n`));
+
+  for (const ph of plan.phases) {
+    if (!ph.exec || ph.blockers?.length) { stopped = { stage: ph.stage, why: ph.stop ?? ph.error ?? ph.blockers.join('; '), kind: 'gate' }; break; }
+    console.log(bold(`\n▸ ${ph.stage}  ${dim(`${ph.roleName} · ${ph.model} · ${ph.session}`)}\n`));
+    const r = await runPhase(task, ph, rel, runDir);
+    records.push({
+      task: task.id, stage: ph.stage, session: ph.session, role: ph.roleName,
+      surface: ph.surface, modelId: ph.model ?? null, pool: ph.pool ?? null,
+      date: new Date().toISOString().slice(0, 10),
+      durationMin: r.durationMin ?? null, exitCode: r.code ?? null, result: r.result, log: r.log ?? null,
+    });
+    const paint = r.result === 'DONE' ? green : ['BLOCKED', 'FAILED'].includes(r.result) ? red : yellow;
+    console.log(`\n  ${paint(r.result)}  ${dim(`${r.durationMin} min · exit ${r.code} · ${r.log}`)}`);
+
+    if (['BLOCKED', 'FAILED'].includes(r.result)) { stopped = { stage: ph.stage, why: `terminó en ${r.result}`, kind: 'fail' }; break; }
+    if (r.result === 'HUMAN_REVIEW') { stopped = { stage: ph.stage, why: 'pide gate humano', kind: 'gate' }; break; }
   }
-  console.log(bold(`\n▸ ${ph.stage}  ${dim(`${ph.roleName} · ${ph.model} · ${ph.session}`)}\n`));
-  const r = await runPhase(ph);
-  records.push({
-    task: task.id, stage: ph.stage, session: ph.session, role: ph.roleName,
-    surface: ph.surface, modelId: ph.model ?? null, pool: ph.pool ?? null,
-    date: new Date().toISOString().slice(0, 10),
-    durationMin: r.durationMin ?? null, exitCode: r.code ?? null,
-    result: r.result, log: r.log ?? null,
-  });
 
-  const paint = r.result === 'DONE' ? green : ['BLOCKED', 'FAILED'].includes(r.result) ? red : yellow;
-  console.log(`\n  ${paint(r.result)}  ${dim(`${r.durationMin} min · exit ${r.code} · ${r.log}`)}`);
-
-  if (['BLOCKED', 'FAILED'].includes(r.result)) { stopped = { stage: ph.stage, why: `la etapa terminó en ${r.result}` }; break; }
-  if (r.result === 'HUMAN_REVIEW') { stopped = { stage: ph.stage, why: 'la etapa pide gate humano' }; break; }
+  const summary = { task: task.id, kind: task.kind, contract: rel, dispatchedOn: new Date().toISOString(), unattended: UNATTENDED, stoppedAt: stopped, records };
+  writeFileSync(join(runDir, 'dispatch.json'), JSON.stringify(summary, null, 2) + '\n', 'utf8');
+  return { task, file, records, stopped };
 }
 
-// ---------- cierre ----------
+/** Mueve el archivo de tarea al directorio de su estado. Nunca a done/: eso lo decide el Director. */
+function park(file, result) {
+  const dir = STATE_DIRS[result];
+  const tasksRoot = join(AUTO, 'tasks');
+  if (!dir || !file.startsWith(tasksRoot)) return null; // sólo mueve tareas de automation/tasks/
+  const dest = join(tasksRoot, dir, basename(file));
+  if (dest === file) return null;
+  mkdirSync(join(AUTO, 'tasks', dir), { recursive: true });
+  renameSync(file, dest);
+  return relative(ROOT, dest).replace(/\\/g, '/');
+}
 
-const summary = {
-  task: task.id, kind: task.kind, contract: relFile,
-  dispatchedOn: new Date().toISOString(),
-  unattended: UNATTENDED,
-  stoppedAt: stopped ?? null,
-  records,
-};
-const outPath = join(runDir, 'dispatch.json');
-writeFileSync(outPath, JSON.stringify(summary, null, 2) + '\n', 'utf8');
+// ---------- main ----------
 
-console.log(bold('\n─── resumen ───'));
-for (const r of records) console.log(`  ${r.stage.padEnd(15)} ${String(r.durationMin).padStart(5)} min  ${r.result.padEnd(13)} ${dim(r.modelId ?? '')}`);
-if (stopped) console.log(`\n  ${yellow('detenido en')} ${bold(stopped.stage)} — ${stopped.why}`);
-console.log(dim(`\n  ${relative(ROOT, outPath).replace(/\\/g, '/')}`));
-console.log(dim('  Las duraciones son de reloj de pared, medidas, no estimadas. Copialas a telemetry.json.'));
-console.log(dim('  El estado del ticket y el commit siguen siendo tuyos (CP-002).'));
+if (!QUEUE && !positional.length) {
+  console.error('uso: dispatch.mjs <TASK-ID | ruta.json> [--go] | dispatch.mjs --queue [--go] [--max N]');
+  process.exit(2);
+}
 
-process.exit(records.some((r) => ['BLOCKED', 'FAILED'].includes(r.result)) ? 1 : 0);
+if (!QUEUE) {
+  const file = findTask(positional[0]);
+  const task = json(file);
+  if (!preflight(task)) process.exit(1);
+  const out = await dispatchTask(file);
+  if (out.error) { console.error(red(out.error)); process.exit(2); }
+  if (out.dryRun) { console.log(dim(`\nnada se ejecutó. Agregá --go para correr.`)); process.exit(0); }
+  console.log(bold('\n─── resumen ───'));
+  for (const r of out.records) console.log(`  ${r.stage.padEnd(15)} ${String(r.durationMin).padStart(5)} min  ${r.result.padEnd(13)} ${dim(r.modelId ?? '')}`);
+  if (out.stopped) console.log(`\n  ${yellow('detenido en')} ${bold(out.stopped.stage)} — ${out.stopped.why}`);
+  console.log(dim('\n  Duraciones de reloj de pared, medidas. Copialas a telemetry.json.'));
+  console.log(dim('  El estado del ticket y el commit siguen siendo tuyos (CP-002).'));
+  process.exit(out.records.some((r) => ['BLOCKED', 'FAILED'].includes(r.result)) ? 1 : 0);
+}
+
+// --- modo cola ---
+
+const files = allTaskFiles().filter((f) => /[\\/](queue|in-progress)[\\/]/.test(f)).sort();
+const byId = new Map(allTaskFiles().map((f) => { const t = json(f); return [t.id, t]; }));
+
+console.log(bold(`cola — ${files.length} tarea(s) en queue/ e in-progress/`));
+if (!GO) console.log(dim('modo plan: no se ejecuta nada.\n'));
+
+const results = [];
+let ran = 0;
+
+for (const file of files) {
+  const task = json(file);
+  const dep = depsSatisfied(task, byId);
+  if (!dep.ok) { console.log(`\n${yellow('○')} ${task.id} ${dim('— espera a ' + dep.pending.join(', '))}`); results.push({ id: task.id, outcome: 'ESPERA' }); continue; }
+  if (!preflight(task, { quiet: true })) { console.log(`\n${yellow('○')} ${task.id} ${dim('— no despachable en state=' + task.state)}`); results.push({ id: task.id, outcome: 'NO-DESPACHABLE' }); continue; }
+  if (ran >= MAX) { console.log(`\n${dim('○ ' + task.id + ' — --max ' + MAX + ' alcanzado')}`); results.push({ id: task.id, outcome: 'SIN-CORRER' }); continue; }
+
+  const out = await dispatchTask(file);
+  if (out.error) { console.log(red(`  ${out.error}`)); results.push({ id: task.id, outcome: 'ERROR' }); continue; }
+  if (out.dryRun) { results.push({ id: task.id, outcome: 'PLAN' }); continue; }
+
+  ran++;
+  const last = out.records.at(-1)?.result ?? 'SIN-ETAPAS';
+  const moved = park(file, last);
+  results.push({ id: task.id, outcome: last, stopped: out.stopped?.why, moved, min: out.records.reduce((a, r) => a + (r.durationMin ?? 0), 0) });
+
+  // Un gate humano aparca la tarea y la cola sigue. Un fallo la detiene entera.
+  if (out.stopped?.kind === 'fail') { console.log(`\n${red('cola detenida')}: ${task.id} terminó en fallo. Si el setup está mal, seguir multiplica el error.`); break; }
+}
+
+console.log(bold('\n═══ resumen de cola ═══'));
+for (const r of results) {
+  const paint = r.outcome === 'DONE' ? green : ['BLOCKED', 'FAILED', 'ERROR'].includes(r.outcome) ? red : yellow;
+  console.log(`  ${r.id.padEnd(12)} ${paint(String(r.outcome).padEnd(15))} ${r.min ? String(r.min).padStart(5) + ' min ' : '          '} ${dim(r.moved ? '→ ' + r.moved : (r.stopped ?? ''))}`);
+}
+const total = results.reduce((a, r) => a + (r.min ?? 0), 0);
+if (total) console.log(dim(`\n  ${Math.round(total * 10) / 10} min de reloj en total, medidos.`));
+const gates = results.filter((r) => r.outcome === 'HUMAN_REVIEW' || r.outcome === 'TECH_REVIEW');
+if (gates.length) console.log(`\n  ${yellow(`${gates.length} tarea(s) esperando tu revisión en automation/tasks/review/`)}`);
+process.exit(results.some((r) => ['BLOCKED', 'FAILED', 'ERROR'].includes(r.outcome)) ? 1 : 0);
