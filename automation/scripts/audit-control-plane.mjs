@@ -43,6 +43,30 @@ if (distinct.length > 1) {
 } else rep.fail('no se pudo leer el ticket activo en ningun archivo');
 const ACTIVE = distinct[0];
 
+// ---------- 1b. Superficies derivadas que repiten el estado ----------
+//
+// BACKLOG.md repite ticket activo y autorizacion, y ningun paso del cierre lo tocaba: quedo seis
+// tickets atras entre CP-013 y CP-023, diciendo «Ejecucion: no autorizada» con executionAuthorized
+// en true. Un documento derivado que miente es peor que no tenerlo, porque se lee como autoridad.
+
+const backlogMd = read(join(DIR, 'BACKLOG.md')) ?? '';
+if (backlogMd) {
+  const bField = (label) => backlogMd.match(new RegExp(`^\\*\\*${label}:\\*\\*\\s*(.+)$`, 'm'))?.[1].replace(/[`*]/g, '').trim() ?? null;
+
+  const bActive = bField('Ticket activo')?.split(/\s*—\s*/)[0]?.trim();
+  if (!bActive) rep.warn('BACKLOG.md no declara ticket activo');
+  else if (ACTIVE && bActive !== ACTIVE) rep.fail(`BACKLOG.md dice que el ticket activo es ${bActive} y tasks.json dice ${ACTIVE}`);
+  else rep.ok(`BACKLOG.md coincide con el ticket activo (${bActive})`);
+
+  const bAuth = bField('Ejecución') ?? bField('Ejecucion');
+  const authorized = tasks?.executionAuthorized === true;
+  if (bAuth) {
+    const saysNo = /no autorizada/i.test(bAuth);
+    if (saysNo === authorized) rep.fail(`BACKLOG.md dice «Ejecución: ${bAuth}» y tasks.json tiene executionAuthorized=${authorized}`);
+    else rep.ok('BACKLOG.md coincide con executionAuthorized');
+  }
+}
+
 // ---------- 2. WIP y precedencia ----------
 
 const issues = tasks?.issues ?? [];

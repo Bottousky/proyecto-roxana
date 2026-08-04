@@ -23,8 +23,15 @@
   —medición— y `ARC1-006-B` —reparto—, ambos `DONE` en ronda 1.
 - `ARC1-007` cerrado: el laboratorio se monta y se desmonta por `RuntimeHost` (`CP-021`). Primer
   ticket de esta corrida que cambió código ejecutable. Dos paquetes, ambos `DONE`.
-- `ownership.json` v11 apunta a `ARC1-008`. La rotación es paso del cierre (`CP-017`), no del ticket
-  siguiente.
+- `ownership.json` v12 apunta a `ARC1-008`. La rotación es paso del cierre (`CP-017`), no del ticket
+  siguiente. **v12 es una corrección (`CP-023`), no una rotación:** ningún ticket avanzó.
+- **`CP-023` reconcilió tres documentos que afirmaban un estado que el disco desmiente.** `BACKLOG.md`
+  decía «Ejecución: no autorizada» y ticket activo `ARC1-001`; `MODEL_ROUTING.md` decía que ninguna
+  ruta tenía smoke cuando `TASK-003` ya había cerrado `vision`; y `TASK-003` seguía en `queue/` con
+  `state: QUEUE`, donde un `dispatch --queue --go` la habría vuelto a correr. Es `OI-006` otra vez,
+  una capa más arriba. Ahora lo comprueban `audit-control-plane.mjs` —ticket activo y autorización de
+  `BACKLOG.md`— y `validate-task.mjs` —el directorio de una tarea contra su `state`—, los dos
+  probados en negativo.
 - **`src/**` sigue globalmente protegido.** `ARC1-007` abrió nueve paths de a uno en su ficha y se
   cierran con él; `ARC1-008` tiene que abrir los suyos en su propio plan. `src/jugar/**` sigue
   prohibido de plano (`H3_CONTRACT.md` §3).
@@ -149,6 +156,21 @@ ritmo antes de `ARC1-030`, ni fps en ningún punto antes de `ARC1-028`.
   `include: ["src"]` y los tests corren con `--experimental-strip-types`. Por eso
   `a1-runtime-host.test.ts` puede nombrar cuatro veces un runtime `'school-webgl'` que no existe en
   `ExperienceRuntime` sin que nadie lo note. P2, sin asignar.
+- `OI-009` — `taxonomy.json` no tiene kind para probar una capability de un proveedor. Los tres
+  smokes del proyecto caen en `TECH_QA`, que enruta a un rol distinto del que usan. P2, sin asignar.
+
+## Bloqueantes de contenido, no de código — `CP-023`
+
+Los dos son P1 y ninguno bloquea `ARC1-008`. Los dos son trabajo de Director que **no toca `src/**`**,
+así que pueden escribirse en paralelo al chain serial sin romper WIP 1.
+
+- `OI-010` — **el guion del slice no existe.** Cinco líneas `[VO]` para siete beats; sin diálogo, sin
+  texto de Bitácora, sin texto de UI, sin mensajes del puzzle del Beat 5. `CLAUDE.md` §5 obliga a
+  copiar el texto textual del guion: aplicado literalmente, `ARC1-015`, `ARC1-018`, `ARC1-019`,
+  `ARC1-021` y `ARC1-022` producirían placeholders.
+- `OI-011` — **el audio es load-bearing y no tiene pipeline.** `IDENTITY.md` regla 1 y GF-07 exigen
+  «forma + animación + etiqueta + sonido» para que el estado eléctrico no dependa del color. Hay cero
+  archivos de audio, cero fila de audio en `ASSET_PIPELINE.md` y cero capability en `routing.json`.
 
 Convertir un `OI` en ticket es decisión del Director (`CP-002`).
 

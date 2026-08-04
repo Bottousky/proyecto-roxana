@@ -2,8 +2,13 @@
 
 **Workflow:** `STRICT-SERIAL`
 **WIP global:** 1
-**Ejecución:** no autorizada
-**Ticket activo:** `ARC1-001 — HUMAN_REVIEW`
+**Ejecución:** **autorizada** — H3 golden slice, `ARC1-003` … `ARC1-035` (`CP-013`)
+**Ticket activo:** `ARC1-008 — READY`
+**Cerrados:** `ARC1-001` … `ARC1-007`
+
+> Este archivo es **derivado**. El estado vive en `tasks.json` y `STATE.md`; acá sólo se resume.
+> Quedó seis tickets desactualizado entre `CP-013` y `CP-023` porque ningún paso del cierre lo
+> tocaba. Desde `CP-023` lo verifica `audit-control-plane.mjs`.
 
 ## Autoridad
 

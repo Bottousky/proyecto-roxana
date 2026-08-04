@@ -110,6 +110,20 @@ function validateOne(file) {
   if (task.state === 'WAITING_PROVIDER' && !task.waitingFor) {
     rep.fail('state=WAITING_PROVIDER sin waitingFor: falta declarar capability, proveedor y condicion de reanudacion');
   }
+  if (task.state === 'DONE' && !task.closure) {
+    rep.fail('state=DONE sin closure: falta declarar quien la cerro, cuando y con que veredicto (CP-023)');
+  }
+  // El archivo vive en un directorio que ES una afirmacion de estado. Si no coinciden, una de las dos
+  // miente: TASK-003 estuvo cerrada en queue/ una sesion entera y un `dispatch --queue --go` la habria
+  // vuelto a correr, gastando la ventana de Go en repetir un smoke ya pagado.
+  const DIR_STATE = { queue: 'QUEUE', 'in-progress': 'IN_PROGRESS', review: ['TECH_REVIEW', 'HUMAN_REVIEW'], blocked: ['BLOCKED', 'FAILED'], 'waiting-provider': 'WAITING_PROVIDER', done: 'DONE' };
+  const dirName = file.replace(/\\/g, '/').split('/').at(-2);
+  const expected = DIR_STATE[dirName];
+  if (expected) {
+    const ok = Array.isArray(expected) ? expected.includes(task.state) : expected === task.state;
+    if (!ok) rep.fail(`state=${task.state} y el archivo esta en tasks/${dirName}/, que significa ${[expected].flat().join(' o ')}`);
+    else rep.ok(`state=${task.state} coincide con tasks/${dirName}/`);
+  }
 
   // 6. La regla de OI-006. Sin esto todo lo anterior es decoracion.
   const ev = checkEvidence(task.evidence.dir, task.evidence.files);

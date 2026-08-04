@@ -2,7 +2,13 @@
   "id": "TASK-003",
   "title": "Smoke de vision de Luna via Go para el pipeline img2threejs",
   "kind": "TECH_QA",
-  "state": "QUEUE",
+  "state": "DONE",
+  "closure": {
+    "closedOn": "2026-08-03",
+    "closedBy": "CP-023",
+    "verdict": "PASS. Vision confirmada en opencode-go/gpt-5.6-luna y, a coste cero, en opencode/mimo-v2.5-free. img2threejs tiene pipeline en Go sin tocar la cuota de ChatGPT: el hueco que dejaba Claude queda cerrado.",
+    "limits": "No quedo demostrada la precision geometrica. Los dos modelos aciertan layout, presencia y direccion del cambio, y fallan magnitudes absolutas: mimo invirtio la direccion de un cambio de tamano (6,3% -> 12,8% del ancho) justificandolo con un razonamiento plausible, y Luna llamo mas alto a un panel que es mas bajo (75 -> 66 px). Ningun numero suyo es una medicion. El primer prop reconstruido con img2threejs necesita verificacion humana de proporcion."
+  },
   "priority": "high",
   "project": "Roxana/Ohmdal",
   "createdOn": "2026-08-03",
@@ -74,6 +80,8 @@
 
   "notes": [
     "Es el smoke mas importante de los tres: de el depende si la mitad de las cinco escenas del slice tiene pipeline despues de que venza Claude.",
-    "`vision` (leer) e `imagegen` (crear) son capabilities distintas. Este smoke prueba la primera."
+    "`vision` (leer) e `imagegen` (crear) son capabilities distintas. Este smoke prueba la primera.",
+    "CIERRE (CP-023): corrio en tres passes el 2026-08-03 y quedo en automation/runs/TASK-003/smoke.md, pero el archivo de tarea siguio en queue/ con state QUEUE durante toda la sesion. Un `dispatch.mjs --queue --go` lo habria vuelto a correr y habria gastado la ventana de Go repitiendo un smoke ya pagado. Es la misma patologia de OI-006 —lo declarado no coincide con el disco— una capa mas arriba, y esta vez en la capa que existe para detectarla.",
+    "Limite que gobierna el uso de las dos rutas: aciertan layout, presencia y direccion del cambio; fallan magnitudes absolutas. Ningun numero suyo es una medicion. Ver MODEL_ROUTING.md, gate duro de vision."
   ]
 }

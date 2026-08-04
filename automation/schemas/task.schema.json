@@ -146,6 +146,24 @@
         "suggestPipelineChange": { "type": "string" }
       }
     },
+    "closure": {
+      "type": "object",
+      "description": "Obligatorio cuando state es DONE. Simetrico de blockedReport y waitingFor: hasta CP-023 una tarea podia declararse DONE sin decir quien la cerro, cuando, ni con que veredicto — y TASK-003 se quedo en queue/ una sesion entera justamente por eso.",
+      "additionalProperties": false,
+      "required": ["closedOn", "closedBy", "verdict"],
+      "properties": {
+        "closedOn": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "closedBy": {
+          "type": "string",
+          "description": "Decision CP-0NN o el Director. Nunca un ejecutor: solo el Director cambia estados (CP-002)."
+        },
+        "verdict": { "type": "string", "minLength": 10 },
+        "limits": {
+          "type": "string",
+          "description": "Que NO quedo demostrado. Un PASS sin limites declarados se lee como mas amplio de lo que es."
+        }
+      }
+    },
     "waitingFor": {
       "type": "object",
       "description": "Obligatorio cuando state es WAITING_PROVIDER.",

@@ -1,27 +1,57 @@
 # Routing de modelos
 
-**Decisión vigente:** `CP-022`, 2026-08-03.
+**Decisión vigente:** `CP-022`, actualizada por `CP-023`, 2026-08-03.
 **Inventario observado:** `opencode models`, 2026-08-03, OpenCode 1.14.29 — 18 modelos
 `opencode-go/*`, 7 `opencode/*` gratuitos, 22 `openai/*`.
 **Regla:** disponibilidad no demuestra calidad (`CP-007`); smoke acotado antes del primer ticket real.
 
-La versión ejecutable de este documento es `automation/routing.json`. Acá está el criterio; allá está
-lo que un script puede consultar. Si los dos se contradicen, manda este archivo y se corrige el otro.
-El inventario nunca se escribe a mano: lo genera `node automation/scripts/providers.mjs --write`.
+La versión ejecutable de este documento es `automation/routing.json`. El inventario nunca se escribe
+a mano: lo genera `node automation/scripts/providers.mjs --write`.
+
+## Cuál manda ante contradicción
+
+Hasta `CP-023` este archivo decía «manda este archivo y se corrige el otro», sin distinguir qué tipo
+de afirmación estaba en juego. El resultado fue previsible: `TASK-003` cerró el smoke de `vision` el
+2026-08-03, `routing.json` pasó a v2.2 y este documento siguió afirmando que ninguna ruta tenía
+smoke. **La regla de precedencia le daba la razón al documento equivocado.**
+
+La precedencia ahora se parte según el tipo de afirmación:
+
+| Tipo de afirmación | Manda | Por qué |
+|---|---|---|
+| **Criterio** — qué rol usa qué clase de modelo, qué se reserva para qué, qué está prohibido | este archivo | es una decisión, y las decisiones se escriben |
+| **Hecho observado** — qué modelos existen, qué smoke pasó, qué capability está verificada | `routing.json` + `provider-health.json` | son medición, y una medición no se discute con prosa |
+
+Un hecho observado sólo entra acá **copiado** de su archivo, con su fecha. Si divergen, se corrige
+este documento, nunca la medición.
 
 ## Routing vigente
 
-| Rol | Modelo | Razón observable | Permiso |
-|---|---|---|---|
-| `director-plan` | `opencode-go/glm-5.2` | razonamiento y tool calls; read-only por contrato | read-only |
-| `builder` | `opencode-go/deepseek-v4-flash` | la tasa de quemado más baja de Go | edit/terminal con aprobación |
-| `reviewer` | `opencode-go/glm-5.2` | modelo distinto del builder **por configuración** | read-only subtask |
-| revisión visual auxiliar | `opencode-go/mimo-v2.5-pro` | entrada de imagen; el humano decide igual | read-only |
-| `img2threejs` | `opencode-go/gpt-5.6-luna` | necesita leer imagen y escribir código en el mismo turno | edit con aprobación |
-| generación de imagen | **ninguno** | ver §«Arte» | — |
+Estado de smoke copiado de `automation/routing.json` v2.2, 2026-08-03.
 
-**Ninguna de estas rutas tiene smoke.** `smokeStatus: not-run` en las siete de `routing.json`.
-`TASK-002` y `TASK-003` de `automation/tasks/queue/` lo establecen.
+| Rol | Modelo | Razón observable | Permiso | Smoke |
+|---|---|---|---|---|
+| `orchestrator` | `opencode-go/gpt-5.6-luna` | clasifica el pedido y escribe la Task Spec; no implementa | read-only | `not-run` |
+| `director-plan` | `opencode-go/glm-5.2` | razonamiento y tool calls; read-only por contrato | read-only | `not-run` |
+| `builder` | `opencode-go/deepseek-v4-flash` | la tasa de quemado más baja de Go | edit/terminal con aprobación | `not-run` |
+| `reviewer` | `opencode-go/glm-5.2` | modelo distinto del builder **por configuración** | read-only subtask | `not-run` |
+| `reviewer-visual` | `opencode/mimo-v2.5-free` | **coste cero**; detecta layout y presencia igual que Luna | read-only | **`pass`** |
+| `img2threejs` | `opencode-go/gpt-5.6-luna` | necesita leer imagen y escribir código en el mismo turno | edit con aprobación | **`pass`** |
+| generación de imagen | **ninguno** | ver §«Arte» | — | — |
+
+**Las dos rutas de visión tienen smoke; las cuatro de texto no.** `TASK-003` cerró `vision` el
+2026-08-03 en tres passes (`automation/runs/TASK-003/smoke.md`) y bajó la revisión visual a coste
+cero. `TASK-002` —la línea base de `glm-5.2` y `deepseek-v4-flash` como planner, builder y reviewer—
+sigue en `automation/tasks/queue/` **sin correr**, y es lo único que separa al pipeline de tener
+evidencia local de que funciona sin Claude.
+
+### Gate duro de visión
+
+Ningún veredicto de **escala, proporción o distancia** de un modelo de visión vale como evidencia,
+con ningún modelo. `mimo` invirtió la dirección de un cambio de tamaño —6,3 % → 12,8 % del ancho— y
+lo justificó con un razonamiento plausible; Luna llamó «más alto» a un panel que es más bajo, 75 →
+66 px. Los dos aciertan layout, presencia y dirección del cambio; los dos fallan magnitudes. Una
+magnitud se mide con `getBoundingClientRect()` o la mira un humano.
 
 ## Lo que cambió y por qué
 
@@ -60,8 +90,10 @@ escape.
 Son dos capabilities distintas y confundirlas cuesta un pipeline entero.
 
 - **`vision`** — *leer* una imagen: comparar un screenshot contra una referencia, revisar un golden
-  frame, verificar safe areas. La cubren `opencode-go/gpt-5.6-luna` y `mimo-v2.5-pro`. Es lo que
-  `img2threejs` necesita en cada pass.
+  frame, verificar safe areas. La cubren `opencode/mimo-v2.5-free` —la más barata verificada—,
+  `opencode-go/gpt-5.6-luna` y `opencode-go/mimo-v2.5-pro`. Es lo que `img2threejs` necesita en cada
+  pass. **Verificada** el 2026-08-03 por `TASK-003`, con el gate duro de magnitudes de §«Routing
+  vigente».
 - **`imagegen`** — *crear* una imagen. **Ningún modelo de OpenCode la tiene**, tampoco Luna ni mimo.
   Vive sólo en Codex (`$imagegen` / `gpt-image-2`) o en ChatGPT a mano.
 
@@ -90,8 +122,9 @@ No usar reputación de internet como sustituto de evidencia local.
 
 ## Ownership
 
-`ownership.json` v11 no le asigna este archivo a nadie. Se edita bajo `CP-022` con autorización
-explícita del Director y se le asigna a `director/write` en la rotación de cierre de `ARC1-008`.
+`ownership.json` v12 le asigna este archivo a `director/write` (`CP-023`). Hasta v11 no tenía dueño,
+y el plan era dárselo «en la rotación de cierre de `ARC1-008`» — el mismo diferimiento que ya había
+causado `OI-001`. Se corrigió en vez de repetirlo por tercera vez.
 
 ## Fuentes oficiales
 

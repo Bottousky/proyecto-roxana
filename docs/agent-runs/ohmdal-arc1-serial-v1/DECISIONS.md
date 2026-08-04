@@ -24,8 +24,73 @@
 | CP-020 | 2026-08-02 | Presupuesto por escena **congelado**: por frame son techos independientes, por descarga son partición; el overworld recibe línea propia | El Arco I completo proyecta ≈ 35 MiB de descarga; `ARC1-008` hereda el gate de fugas; `OI-004` y `OI-005` abiertos |
 | CP-021 | 2026-08-03 | `ExperienceLocation.runtime` opcional: la ubicación puede nombrar qué runtime la sirve; ausente, gana el manifest | Ohmdal sostiene `topdown-phaser` y `hd2d-three` a la vez sin tocar el registro ni el juego publicado; el build gana dos chunks perezosos y abre `OI-007` |
 | CP-022 | 2026-08-03 | El routing pasa a **OpenCode Go**; Claude sale del contrato y la cuota de ChatGPT se reserva para `imagegen` | Builder y reviewer son modelos distintos por configuración; generar arte 2D es paso manual del Director; ninguna ruta tiene smoke hasta `TASK-002` y `TASK-003` |
+| CP-023 | 2026-08-03 | **Reconciliación de estado.** Se corrigen tres documentos que afirmaban un estado que el disco desmiente, y se le da dueño a lo que no lo tenía | `ownership.json` v12; `TASK-003` cerrada; la precedencia entre `MODEL_ROUTING.md` y `routing.json` se parte por tipo de afirmación; el auditor cubre `BACKLOG.md` y el directorio de cada tarea |
 
-Una decisión nueva agrega `CP-023+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+Una decisión nueva agrega `CP-024+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-023 — Reconciliación de estado
+
+**Motivo.** Una auditoría de dirección del 2026-08-03, pedida por el Director antes de montar ORCA,
+encontró que tres documentos del control plane afirmaban un estado que el árbol desmiente. No son
+erratas: los tres son la misma patología que `OI-006` —lo declarado no coincide con el disco—, pero
+una capa más arriba, y en dos casos dentro de la capa que existe precisamente para detectarla.
+
+| Dónde | Afirmaba | Era |
+|---|---|---|
+| `BACKLOG.md` | «Ejecución: no autorizada», «Ticket activo: `ARC1-001` — `HUMAN_REVIEW`» | `executionAuthorized: true` desde `CP-013`; activo `ARC1-008` |
+| `MODEL_ROUTING.md` | «Ninguna de estas rutas tiene smoke», `reviewer-visual` = `mimo-v2.5-pro` | `TASK-003` cerró `vision` y bajó la revisión visual a `mimo-v2.5-free`, coste cero |
+| `automation/tasks/queue/TASK-003.json` | `state: QUEUE` | corrió en tres passes, `PASS`, evidencia en `automation/runs/TASK-003/smoke.md` |
+
+**Lo que hace grave a la segunda.** `MODEL_ROUTING.md` se declaraba ganador ante contradicción
+—«manda este archivo y se corrige el otro»— sin distinguir qué tipo de afirmación estaba en juego.
+La regla de precedencia le daba la razón al documento equivocado: un builder obediente habría
+re-corrido un smoke ya pagado y enrutado la revisión visual a un modelo de Go teniendo uno gratuito
+verificado.
+
+**Lo que hace cara a la tercera.** Una tarea cerrada durmiendo en `queue/` es munición cargada:
+`dispatch.mjs --queue --go` la habría vuelto a despachar y gastado la ventana de 5 h de Go repitiendo
+un smoke que ya estaba pago.
+
+**Evidencia.** `node automation/scripts/audit-control-plane.mjs` pasa de 20 ok · 11 warn a 22 ok ·
+7 warn · 0 fail; los cuatro warns de ownership desaparecen porque se corrigieron, no porque se
+silenciaran. Los siete que quedan son `DEV-001` y `DEV-002`, desviaciones históricas ya declaradas
+por el Director, y deben seguir imprimiéndose. `validate-task.mjs` pasa a 5 checks en `TASK-003` con
+0 fail. Los dos checks nuevos se probaron **en negativo**: revertir el ticket activo de `BACKLOG.md`
+produce `FAIL`, y una tarea `DONE` colocada en `queue/` produce `FAIL`.
+
+**Decisión.**
+
+1. **La precedencia se parte por tipo de afirmación.** `MODEL_ROUTING.md` manda sobre el *criterio*
+   —qué rol usa qué clase de modelo, qué se reserva para qué—; `routing.json` y `provider-health.json`
+   mandan sobre el *hecho observado* —qué modelos existen, qué smoke pasó—. Una medición no se
+   discute con prosa. Un hecho observado sólo entra al `.md` copiado, con fecha.
+2. **`BACKLOG.md` se declara derivado** y el auditor comprueba que su ticket activo y su estado de
+   autorización coincidan con `tasks.json`. Es la única defensa contra que vuelva a quedar seis
+   tickets atrás, porque ningún paso del cierre lo tocaba.
+3. **El directorio de una tarea es una afirmación de estado** y `validate-task.mjs` la verifica.
+   `TASK-003` pasa a `DONE` en `tasks/done/`.
+4. **Una Task Spec puede declarar su cierre.** El schema gana `closure` —`closedOn`, `closedBy`,
+   `verdict` y `limits`—, obligatorio cuando `state` es `DONE`, simétrico de `blockedReport` y
+   `waitingFor`. Hasta ahora una tarea podía cerrarse sin decir quién la cerró ni con qué veredicto.
+   `closedBy` es una `CP` o el Director, nunca un ejecutor (`CP-002`).
+5. **`ownership.json` v12** hace tres backfills: las fichas y evidencias de `ARC1-001` y `ARC1-002`
+   pasan a `protected` —cerraron antes de que `CP-017` existiera y nunca se rotaron—; `BACKLOG.md` y
+   `MODEL_ROUTING.md` reciben dueño por primera vez; y `automation/**` también.
+
+**Lo que esta decisión NO hace.** No mueve ningún ticket: `activeIssueKey` sigue en `ARC1-008` y
+`ARC1-009` sigue `BLOCKED`. No toca canon congelado, alcance ni presupuesto. No incorpora
+`automation/` al flujo de la corrida: `automation/README.md` §7 sigue vigente y el veredicto de esos
+scripts **no es vinculante para ningún gate** hasta que una `CP` propia lo decida. Darle dueño a un
+directorio no es promoverlo a canon; sólo corrige que un builder pudiera haber editado el script que
+audita builders. Y no cierra `TASK-002`, que sigue en `queue/` sin correr: es la línea base del
+pipeline sin Claude y es lo único que separa al proyecto de tener evidencia local de que funciona.
+
+**Precedente que conviene no repetir.** Ésta es la tercera vez que un contrato de ownership se
+difiere «al cierre del ticket siguiente». La primera produjo `OI-001` y costó `CP-017`; la segunda
+dejó `MODEL_ROUTING.md` sin dueño mientras `CP-022` lo editaba. Se corrigió acá en vez de diferirlo
+otra vez.
+
+No requiere ADR: no cambia arquitectura del producto, ni alcance, ni quién ejecuta.
 
 ## CP-022 — El routing pasa a OpenCode Go; Claude sale del contrato
 
