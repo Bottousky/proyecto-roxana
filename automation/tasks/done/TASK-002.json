@@ -2,7 +2,13 @@
   "id": "TASK-002",
   "title": "Smoke de las tres rutas de OpenCode Go antes del primer ticket real",
   "kind": "TECH_QA",
-  "state": "QUEUE",
+  "state": "DONE",
+  "closure": {
+    "closedOn": "2026-08-03",
+    "closedBy": "CP-024",
+    "verdict": "Las tres rutas corrieron. Solo UNA hace lo que el routing dice: planner glm-5.2 PASS, leyo el control plane sin guia y sin inventar. builder deepseek-v4-flash INCOMPLETO —lee y navega bien, pero se auto-rechaza los permisos de bash en modo no interactivo y termina sin conclusion—. reviewer NO VALIDO por dos motivos independientes: --agent reviewer no se aplica porque es subagent y cae a `build` con permisos totales, y el review packet contenia el diff equivocado. El pipeline automatizado funciona hoy para 1 de sus 3 roles, y no por calidad de los modelos sino por plomeria.",
+    "limits": "No se midio duracion por ruta salvo el planner (~1,5 min de reloj): builder y reviewer corrieron en paralelo y los archivos ya estaban estables al primer sondeo, asi que durationMin queda null y no se estima. No se midio coste por ruta: opencode stats da 0,27 USD acumulados en dos dias y nueve sesiones, no atribuible. No se probo al builder ESCRIBIENDO codigo ni al reviewer juzgando un diff real: este smoke era de comprension."
+  },
   "priority": "high",
   "project": "Roxana/Ohmdal",
   "createdOn": "2026-08-03",

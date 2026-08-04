@@ -159,6 +159,21 @@ ritmo antes de `ARC1-030`, ni fps en ningún punto antes de `ARC1-028`.
 - `OI-009` — `taxonomy.json` no tiene kind para probar una capability de un proveedor. Los tres
   smokes del proyecto caen en `TECH_QA`, que enruta a un rol distinto del que usan. P2, sin asignar.
 
+## El pipeline sin Claude sirve para un rol de tres — `CP-024`
+
+`TASK-002` cerró el 2026-08-03. Las tres rutas corrieron desde Orca; **sólo el planner hace lo que el
+routing dice.** No es calidad de modelo: son tres defectos de plomería, los tres P1 y los tres sin
+asignar.
+
+| Ruta | Modelo | Resultado | Por qué |
+|---|---|---|---|
+| planner | `glm-5.2` | **PASS** | leyó el control plane sin guía, nueve afirmaciones verificadas, cero inventadas |
+| builder | `deepseek-v4-flash` | INCOMPLETO | `OI-014` — `bash: ask` sin TTY se auto-rechaza y termina sin conclusión |
+| reviewer | `glm-5.2` | NO VÁLIDO | `OI-012` — es `subagent`, cae a `build` con permisos totales; `OI-013` — el packet traía el diff equivocado |
+
+**`OI-012` y `OI-013` conviene resolverlos antes del primer `review` real de `ARC1-008`.** Sin ellos la
+fase `C` de `EXECUTION_PROTOCOL.md` emite un veredicto que no vale, y lo emite **sin fallar**.
+
 ## Bloqueantes de contenido, no de código — `CP-023`
 
 Los dos son P1 y ninguno bloquea `ARC1-008`. Los dos son trabajo de Director que **no toca `src/**`**,

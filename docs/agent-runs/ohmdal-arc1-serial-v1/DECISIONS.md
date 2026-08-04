@@ -26,7 +26,57 @@
 | CP-022 | 2026-08-03 | El routing pasa a **OpenCode Go**; Claude sale del contrato y la cuota de ChatGPT se reserva para `imagegen` | Builder y reviewer son modelos distintos por configuración; generar arte 2D es paso manual del Director; ninguna ruta tiene smoke hasta `TASK-002` y `TASK-003` |
 | CP-023 | 2026-08-03 | **Reconciliación de estado.** Se corrigen tres documentos que afirmaban un estado que el disco desmiente, y se le da dueño a lo que no lo tenía | `ownership.json` v12; `TASK-003` cerrada; la precedencia entre `MODEL_ROUTING.md` y `routing.json` se parte por tipo de afirmación; el auditor cubre `BACKLOG.md` y el directorio de cada tarea |
 
-Una decisión nueva agrega `CP-024+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+| CP-024 | 2026-08-03 | **`TASK-002` cerrada.** Las tres rutas de Go corrieron por Orca; sólo una hace lo que el routing dice | El pipeline automatizado sirve hoy para 1 de sus 3 roles, por plomería y no por calidad de modelo; se abren `OI-012`, `OI-013` y `OI-014`, los tres P1 |
+
+Una decisión nueva agrega `CP-025+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-024 — `TASK-002` cerrada: el pipeline funciona para un rol de tres
+
+**Motivo.** `CP-022` cambió el routing a OpenCode Go sin una sola ruta con smoke, y `MODEL_ROUTING.md`
+lo dejó escrito: *disponibilidad no demuestra calidad*. `TASK-002` era la línea base que nunca se tomó.
+Importa ahora porque la suscripción de Claude no se renueva y los ocho records de `telemetry.json`
+registran `route: claude` en el 100 % del trabajo hecho hasta acá.
+
+**Evidencia.** `automation/runs/TASK-002/smoke.md` y `latencies.json`. Las tres rutas se lanzaron desde
+Orca 1.4.167 con `orca terminal create` + `orca terminal send` → `opencode run`, y la salida se volcó a
+archivo con `Tee-Object` porque en el primer intento los terminales murieron y se llevaron el error.
+
+| Ruta | Modelo | Agente pedido | Agente real | Resultado |
+|---|---|---|---|---|
+| planner | `glm-5.2` | `director-plan` | `director-plan` | **PASS** |
+| builder | `deepseek-v4-flash` | `builder` | `builder` | **INCOMPLETO** |
+| reviewer | `glm-5.2` | `reviewer` | **`build`** | **NO VÁLIDO** |
+
+El planner leyó `STATE.md`, `ownership.json` y `tasks.json` **sin que se le nombrara un archivo**, y
+sus nueve afirmaciones se verificaron una por una contra el árbol. Cero inventadas. Leyó
+`ownership.json` **v12**, incluidas las rutas que agregó `CP-023`.
+
+**Impacto — tres defectos de plomería, ninguno de calidad de modelo.**
+
+1. **`OI-012`, P1.** `opencode run --agent reviewer` no invoca al reviewer: `reviewer.md` declara
+   `mode: subagent` y opencode cae al agente `build`, que tiene `permission "*": allow`. El reviewer
+   corre **sin su contrato read-only**. `CP-022` prometió builder y reviewer distintos «por
+   configuración, no por disciplina», y por esta vía no se cumple — el modelo coincide por casualidad,
+   el agente no. `dispatch.mjs` genera ese comando, así que su fase `review` está rota en silencio.
+2. **`OI-013`, P1.** `review-packet.mjs:91` toma el diff del árbol con fallback a `HEAD`, nunca el
+   commit del paquete. Al packet de `ARC1-007-B` le embebió el diff de `CP-023`. El reviewer emitió
+   tres `P0` correctos sobre datos incorrectos y un `P1` que lista literalmente los archivos de
+   `CP-023`. Para todo paquete ya cerrado este script entrega el diff equivocado.
+3. **`OI-014`, P1.** El builder no completa en modo no interactivo: `bash: "*": ask` sin TTY que
+   apruebe se auto-rechaza, y la corrida termina sin conclusión. `deepseek-v4-flash` leyó bien el diff,
+   `parity.json` y el test, y se quedó sin emitir el análisis.
+
+**Lo que esta decisión NO hace.** No cambia `routing.json`: la propia tarea lo prohíbe —«el smoke
+informa, la ruta la decide el Director»—. No promueve ninguna ruta ni la degrada: `glm-5.2` como
+planner es la única con evidencia local a favor, y de `deepseek-v4-flash` no se puede concluir nada
+hasta resolver `OI-014`. No mide coste por ruta: los 0,27 USD de `opencode stats` son acumulados de
+nueve sesiones y no son atribuibles. No mueve ningún ticket.
+
+**Lo que conviene resolver antes del primer `review` real de `ARC1-008`:** `OI-012` y `OI-013`. Sin
+ellos, la fase `C` de `EXECUTION_PROTOCOL.md` produce un veredicto que no vale, y lo produce sin
+fallar — que es la peor forma de romperse.
+
+No requiere ADR.
 
 ## CP-023 — Reconciliación de estado
 
