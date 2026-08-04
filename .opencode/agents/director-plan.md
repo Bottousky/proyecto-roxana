@@ -3,7 +3,7 @@ description: Planifica únicamente el ticket activo de Ohmdal sin modificar arch
 mode: primary
 model: opencode-go/glm-5.2
 temperature: 0.1
-steps: 12
+steps: 24
 permission:
   edit: deny
   task: deny

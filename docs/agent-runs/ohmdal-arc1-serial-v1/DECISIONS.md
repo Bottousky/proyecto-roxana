@@ -28,7 +28,177 @@
 
 | CP-024 | 2026-08-03 | **`TASK-002` cerrada.** Las tres rutas de Go corrieron por Orca; sólo una hace lo que el routing dice | El pipeline automatizado sirve hoy para 1 de sus 3 roles, por plomería y no por calidad de modelo; se abren `OI-012`, `OI-013` y `OI-014`, los tres P1 |
 
-Una decisión nueva agrega `CP-025+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+| CP-025 | 2026-08-04 | **Plomería del pipeline corregida** para poder ejecutar el ciclo de `ARC1-008` sin Claude | `OI-012` y `OI-014` cerrados; `OI-013` mitigado y abierto; `reviewer.md` pasa a `mode: primary`; `director-plan` sube a 24 steps; build desatendido usa `--auto`; `.opencode/**` con dueño en `ownership.json` v13 |
+
+| CP-026 | 2026-08-04 | **Método de medición de `ARC1-008`**: navegador embebido de Orca + sondas en la página; `RuntimeHost` gana `pause`/`resume` por delegación | Sin playwright (rechazado por el usuario en `ARC1-007`); el ciclo completo se ejercita por el host real; el gate de 512 kB se mide por primera vez |
+
+| CP-027 | 2026-08-04 | **`ARC1-008-B` mide con el navegador embebido de Claude Code**, porque reproducir un digest exige viewport exacto y el driver de `CP-026` no lo controla | Los dos digests congelados reproducen exactos en los dos viewports; `CP-026` sigue rigiendo el paquete `A`; playwright sigue excluido; `OI-015` gana un cuarto camino y `OI-016` queda abierto |
+
+| CP-028 | 2026-08-04 | **El Director ordena orquestar `ARC1-008` con Claude** (`sonnet` y `haiku` según la tarea). Contradice la línea «nunca builder» de `MODEL_ROUTING.md` y se aplica igual, porque la decisión de routing es del Director (`CP-002`) | `ARC1-008` cierra con el **primer review técnico independiente real** de la corrida; builder y reviewer siguen siendo sesiones distintas con contratos distintos, pero ya no proveedores distintos; `CP-022` no se revoca y `TASK-002` sigue siendo la línea base del pipeline sin Claude |
+
+Una decisión nueva agrega `CP-029+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-028 — `ARC1-008` se orquesta con Claude por orden del Director, contra la línea del routing
+
+**Motivo.** El Director instruyó, al retomar la rama: «continuá la orquestación de agentes, utilizá
+sonnet y haiku cuando corresponda según la tarea». `MODEL_ROUTING.md` §«Pools» dice de Claude
+«auditoría y diagnóstico; **nunca builder**», y `CP-022` lo había sacado del contrato. La orden es
+posterior y es del Director, que es quien decide routing (`CP-002`); se aplica. Pero se **registra**,
+porque un lector futuro leería «nunca builder» como canon y encontraría en `telemetry.json` un
+builder Claude sin explicación.
+
+**Evidencia.**
+
+- `MODEL_ROUTING.md`, tabla de pools: «Claude | cuenta regresiva | auditoría y diagnóstico; **nunca
+  builder**». Sigue escrito así; esta decisión no lo borra, lo acota.
+- `CP-024` dejó medido que el pipeline sin Claude sirve hoy para 1 de sus 3 roles, y `CP-025` arregló
+  la plomería de los otros dos sin llegar a ejercitarlos en un ticket real.
+- Fases realmente ejecutadas en `ARC1-008`: el **plan** corrió con `opencode-go/glm-5.2` según
+  `CP-026` —dos rondas, la primera muerta por presupuesto de steps (`automation/runs/ARC1-008/plan-session.log`)
+  y la segunda completa (`plan-session-2.log`)—; el **build** del paquete `A` corrió con
+  `claude-sonnet-5`; la **medición** de `A` y todo el paquete `B` los condujo el Orquestador; el
+  **review** de `A` corrió con `claude-sonnet-5` en sesión y contexto separados.
+
+**Decisiones.**
+
+1. **`ARC1-008` se ejecuta con Claude** en build, medición y review. `CP-022` no se revoca: sigue
+   siendo el plan de routing del proyecto y `TASK-002` sigue siendo su línea base.
+2. **La propiedad que `CP-022` quería no se pierde del todo, pero se debilita y se dice.** Builder y
+   reviewer fueron sesiones distintas, con contratos distintos y sin ver el trabajo del otro; el
+   reviewer re-corrió los gates y recalculó los estimadores con su propio script en vez de creerle al
+   builder. Lo que ya **no** son es proveedores distintos, que era la garantía estructural que
+   `CP-022` compró. Un sesgo compartido entre builder y reviewer del mismo proveedor no lo detecta
+   este arreglo.
+3. **`ARC1-008` es el primer ticket de la corrida con review técnico independiente real.** `ARC1-004`,
+   `ARC1-005`, `ARC1-006` y `ARC1-007` cerraron los cuatro declarando la desviación «no hubo review
+   independiente»; acá la fase `C` existió, produjo dos P2 y cero P0/P1, y verificó por su cuenta lo
+   que el builder afirmó.
+4. **Lo que esta decisión no resuelve:** si el pipeline sin Claude funciona de punta a punta. Sigue
+   sin ejercitarse en un ticket real. Cuando el Director quiera esa evidencia, el camino es correr un
+   ticket entero por las rutas de `MODEL_ROUTING.md`, no deducirlo de este.
+
+**Impacto.** `telemetry.json` gana records con `route: claude` y `modelId: claude-sonnet-5`, que es lo
+que realmente pasó. No cambia `routing.json`, ni `MODEL_ROUTING.md`, ni ningún documento congelado.
+No requiere ADR.
+
+## CP-027 — El driver de `CP-026` mide pero no controla la ventana: `ARC1-008-B` usa otro
+
+**Motivo.** `CP-026` fijó el navegador embebido de Orca como driver de `ARC1-008`. Para el paquete `A`
+alcanzó y sobró: condujo el ciclo completo por el host real, leyó el heap 17 veces y entregó la
+consola. Para el paquete `B` **no alcanza**, y el motivo es del laboratorio, no del driver: `lab.ts`
+deriva el perfil de `window.innerWidth <= 720` (línea 128) y la cámara y el renderer de
+`window.innerWidth`/`innerHeight` (líneas 326-329). Un digest congelado en 1440×900 sólo reproduce con
+la ventana en 1440×900. El CLI de Orca no tiene con qué fijarla: su sección `Browser Automation`
+ofrece `set device` —dispositivos con nombre—, `screenshot`, `eval` y `goto`, y ninguna acepta ancho y
+alto arbitrarios. La ventana estuvo en 1191×972 toda la medición del paquete `A`.
+
+**Evidencia.**
+
+- `orca --help`, sección `Browser Automation`: 40 subcomandos, ninguno de viewport.
+- `OI-015`: el mismo driver tampoco captura pantalla sin la ventana al frente. Tres intentos, mismo
+  error de CDP. Es la misma carencia —no controla la ventana— vista por otra cara.
+- El driver elegido reprodujo **`db322500`** en 1440×900 DPR 1 y **`50543361`** en 390×844 DPR 2, dos
+  corridas cada uno, con un ciclo `destroy → start` intercalado. Detalle en
+  `evidence/ARC1-008/B/parity.json` y `commands.md`.
+
+**Decisiones.**
+
+1. **El paquete `B` se mide con el navegador embebido de Claude Code** (`resize_window` +
+   `javascript_exec`). `CP-026` no se revoca: sigue rigiendo el paquete `A`, que ya cerró con él.
+2. **Playwright sigue excluido.** Esta decisión no lo reabre y no instala nada.
+3. **La validez del driver no se afirma, se demuestra.** Los dos valores que reproduce fueron
+   congelados por otro driver, en otra sesión, dos tickets atrás; son 32 bits sobre 605.701 y 605.891
+   caracteres. Un driver que midiera otra cosa no podría acertarlos. Ese es el argumento, y es
+   verificable: cualquiera puede volver a correrlo.
+4. **Qué driver queda como oficial para los gates visuales de `ARC1-011` en adelante no se decide
+   acá.** Hoy conviven uno que mide y no captura y otro que hace las dos cosas. Elegir exige `CP`
+   propia porque `CP-026` congeló la primera opción; queda anotado en `OI-015`.
+
+**Impacto.** Ninguno sobre `src/**`, `ownership.json` ni ningún documento congelado: el paquete `B`
+tiene diff vacío. `OI-016` queda abierto —`evidence/ARC1-007/parity.json` congela dos digests sin
+dejar escrito el protocolo que los reproduce—. No requiere ADR.
+
+## CP-026 — Método de medición de `ARC1-008`: Orca browser + sondas, sin playwright
+
+**Motivo.** El plan de `ARC1-008` (fase A, 2026-08-04, `director-plan` sobre `glm-5.2`) identificó dos
+bloqueos de método: la medición de fugas exige navegador con WebGL y heap real, y `playwright` —el
+driver histórico— fue removido por `npm ci` en el cierre de `ARC1-007`, y **el usuario rechazó su
+reinstalación** (`evidence/ARC1-007/runtime-mount.json` §`frameAtStep200`). Además `RuntimeHost` no
+expone `pause`/`resume`: viven en el `RuntimeHandle`, así que el ciclo que nombra el ticket no se
+puede ejercitar a través del host real sin una adición.
+
+**Evidencia.**
+
+- Sonda de factibilidad del Director, 2026-08-04, sobre el navegador embebido de Orca 1.4.167 y el
+  servidor de desarrollo (puerto 5199): la página del laboratorio monta (`#app` con 1 hijo, 1 canvas),
+  `window.render_game_to_text` y `window.advanceTime` son funciones, y `performance.memory` es legible
+  (`usedJSHeapSize` 8.505.603 B al cargar). `orca eval` ejecuta JavaScript en el contexto de la página.
+- `src/app/runtimeHost.ts` expone `start/travel/activeRuntime/lastSnapshot/destroy`; `pause`/`resume`
+  existen sólo en el handle (`src/experiences/ohmdal/hd2dRuntime.ts`).
+- El protocolo de medición de `ARC1-006` y `ARC1-007` ya era «sondas en la página + servidor de
+  desarrollo»: cambia el driver (de playwright a Orca), no el método.
+
+**Decisiones.**
+
+1. **Driver:** navegador embebido de Orca (`orca goto/eval/console/screenshot`) contra `vite dev` en
+   el puerto 5199. Playwright permanece excluido: la negativa del usuario durante `ARC1-007` sigue
+   vigente; esta decisión no la reabre.
+2. **`RuntimeHost` gana `pause()` y `resume()`** como delegación pura al handle activo (no-op sin
+   runtime montado). Es aditivo: `tests/a1-runtime-host.test.ts` debe pasar sin tocarse. Sin esto el
+   ticket no puede probar lo que su título nombra a través del host real.
+3. **Sonda de control:** `src/labs/ohmdal-hd2d-preprod/main.ts` expone `window.labControl`
+   (`start/pause/resume/destroy/status`) atado al host. Es la página dev del laboratorio; no es
+   entrada del build de producción (`CP-020`), así que nada publicado cambia.
+4. **Protocolo de fugas:** heap por `performance.memory.usedJSHeapSize` muestreado en el mismo punto
+   de fase de cada ciclo (tras `destroy` + pausa fija), un ciclo de warmup, N ≥ 5 ciclos, crecimiento
+   por ciclo ≤ 512 kB. Muestras crudas a `evidence/ARC1-008/A/lifecycle-leak.json`.
+5. **Subdivisión:** `ARC1-008-A` — ciclo + gate de fugas; `ARC1-008-B` — paridad del recorrido
+   determinista tras las sondas (título tentativo; su contrato se escribe al activarse, `PACKETS.md`).
+
+**Impacto.** `ownership.json` v14 abre al builder dos paths de `src/**` para el paquete A:
+`src/app/runtimeHost.ts` y `src/labs/ohmdal-hd2d-preprod/main.ts`. Si el navegador de Orca no pudiera
+medir el heap en la página del laboratorio, el paquete termina `BLOCKED` en su primer tercio; no se
+improvisa un segundo driver. No requiere ADR.
+
+## CP-025 — Plomería del pipeline: reviewer invocable, planner con presupuesto, build desatendido con freno parcial
+
+**Motivo.** `CP-024` dejó tres P1 sin asignar —`OI-012`, `OI-013`, `OI-014`— y `STATE.md` pide resolver
+`OI-012` antes del primer review real de `ARC1-008`. El usuario autorizó orquestar el flujo serial
+completo sin frenar la ejecución; sin estos arreglos las fases B y C de `ARC1-008` se rompen en
+silencio. La primera corrida real de `/arc-plan` sobre CLI 1.18.13 agregó un cuarto defecto:
+`director-plan` agotó su presupuesto de 12 steps explorando y murió sin emitir el plan.
+
+**Evidencia.**
+
+- `OI-012` reproducido en OpenCode 1.18.13: `opencode run --agent reviewer` imprime «agent "reviewer"
+  is a subagent, not a primary agent. Falling back to default agent» y corre como `build` con el modelo
+  default. Tras cambiar `reviewer.md` a `mode: primary`, el mismo comando corre `> reviewer · glm-5.2`
+  (sesiones `OI-012-TEST` y `OI-012-VERIFY`, 2026-08-04). El contrato read-only no dependía del modo:
+  vive en el bloque `permission` del agente (`edit: deny`, `bash "*": deny` con allowlist de lectura);
+  el modo sólo decidía quién podía invocarlo por CLI.
+- `director-plan`: `automation/runs/ARC1-008/plan-session.log` — 12 steps de exploración, cero salida
+  final. `steps: 12` → `steps: 24`.
+- Build desatendido: se usa `--auto` («auto-approve permissions that are not explicitly denied»),
+  disponible en CLI 1.18.13. Los deny del builder —`git push*`, `external_directory`, `task`,
+  `webfetch`, `websearch`— siguen vivos bajo `--auto`; con `--dangerously-skip-permissions` no.
+  El contrato del agente builder no se modifica: `ask` sigue siendo su default interactivo.
+
+**Decisiones.**
+
+1. `OI-012` cerrado con el arreglo option-1: `reviewer.md` `mode: subagent` → `primary`. El flujo
+   documentado —comando `/arc-review`, `dispatch.mjs`— ya invoca al reviewer real con su contrato.
+2. `OI-014` cerrado para esta corrida: las fases de edición no interactivas se lanzan con `--auto`.
+   Es el freno parcial de `FLUJO.md`: auto-aprueba lo no denegado, no elimina los deny.
+3. `OI-013` sigue abierto y no bloquea `ARC1-008`: el review ocurre antes del commit del ticket, así
+   que el diff del árbol de trabajo es el correcto. El Director verifica que el diff del packet
+   coincida con `git status` antes de entregarlo al reviewer. El arreglo de fondo —que la ficha
+   declare su commit— queda diferido.
+4. `.opencode/**` deja de no tener dueño: entra en `director/write` en `ownership.json` v13.
+   Corrección al estilo de `CP-023`, no rotación: ningún ticket avanza.
+
+**Impacto.** Las fases A, B y C de `ARC1-008` pueden correr con los modelos ruteados en sesiones
+nuevas. No autoriza commit sin review, no cambia presupuestos de rondas, no toca `routing.json`.
+No requiere ADR.
 
 ## CP-024 — `TASK-002` cerrada: el pipeline funciona para un rol de tres
 

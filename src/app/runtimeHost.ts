@@ -20,6 +20,10 @@ export interface RuntimeHost {
   activeRuntime(): ExperienceRuntime | null;
   /** Último snapshot capturado de un runtime desmontado. */
   lastSnapshot(runtime: ExperienceRuntime): RuntimeSnapshot | undefined;
+  /** Pausa el runtime activo. No-op si no hay ninguno montado. */
+  pause(): void;
+  /** Reanuda el runtime activo. No-op si no hay ninguno montado. */
+  resume(): void;
   destroy(): Promise<void>;
 }
 
@@ -115,6 +119,15 @@ export function createRuntimeHost(hostEl: HTMLElement, loaders: RuntimeLoaderMap
     },
     lastSnapshot(runtime) {
       return snapshots.get(runtime);
+    },
+    // pause/resume delegan directo en el handle activo: no montan ni desmontan nada, así
+    // que no hay ciclo de vida que serializar. Pasarlas por runSerialized las volvería
+    // async y les cambiaría la firma («(): void») sin ganar nada a cambio.
+    pause() {
+      current?.handle.pause();
+    },
+    resume() {
+      current?.handle.resume();
     },
     destroy() {
       return runSerialized(async () => {

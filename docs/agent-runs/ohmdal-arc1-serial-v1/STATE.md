@@ -5,10 +5,10 @@
 **WIP:** 1/1
 **Ejecución autorizada:** **sí** — H3 golden slice, `CP-013`, contrato en `H3_CONTRACT.md`
 **Base congelada:** `b49b617`
-**Ticket activo:** `ARC1-008 — READY`
-**Paquete activo:** ninguno — los define `/arc-plan ARC1-008` (`CP-016`)
-**Anteriores:** `ARC1-001` … `ARC1-007`, todos `DONE`
-**Siguiente:** `ARC1-009 — BLOCKED`
+**Ticket activo:** `ARC1-009 — READY`
+**Paquete activo:** ninguno — los define `/arc-plan ARC1-009` (`CP-016`)
+**Anteriores:** `ARC1-001` … `ARC1-008`, todos `DONE`
+**Siguiente:** `ARC1-010 — BLOCKED`
 
 ## Estado real
 
@@ -23,8 +23,13 @@
   —medición— y `ARC1-006-B` —reparto—, ambos `DONE` en ronda 1.
 - `ARC1-007` cerrado: el laboratorio se monta y se desmonta por `RuntimeHost` (`CP-021`). Primer
   ticket de esta corrida que cambió código ejecutable. Dos paquetes, ambos `DONE`.
-- `ownership.json` v12 apunta a `ARC1-008`. La rotación es paso del cierre (`CP-017`), no del ticket
-  siguiente. **v12 es una corrección (`CP-023`), no una rotación:** ningún ticket avanzó.
+- `ARC1-008` cerrado: el ciclo de vida completo queda ejercido por el host real y **el gate de fugas
+  de 512 kB queda medido por primera vez** (`CP-027`, `CP-028`). Dos paquetes, ambos `DONE` en ronda
+  1. Es el **primer ticket de la corrida con review técnico independiente real**: `APROBADO CON P2`,
+  cero P0 y cero P1.
+- `ownership.json` v15 apunta a `ARC1-009`. La rotación es paso del cierre (`CP-017`), no del ticket
+  siguiente. v12 (`CP-023`) y v13 (`CP-025`) fueron correcciones, no rotaciones; **v15 sí es una
+  rotación**: `ARC1-008` avanzó a `DONE` y sus dos paths de `src/**` se cerraron con él.
 - **`CP-023` reconcilió tres documentos que afirmaban un estado que el disco desmiente.** `BACKLOG.md`
   decía «Ejecución: no autorizada» y ticket activo `ARC1-001`; `MODEL_ROUTING.md` decía que ninguna
   ruta tenía smoke cuando `TASK-003` ya había cerrado `vision`; y `TASK-003` seguía en `queue/` con
@@ -32,12 +37,15 @@
   una capa más arriba. Ahora lo comprueban `audit-control-plane.mjs` —ticket activo y autorización de
   `BACKLOG.md`— y `validate-task.mjs` —el directorio de una tarea contra su `state`—, los dos
   probados en negativo.
-- **`src/**` sigue globalmente protegido.** `ARC1-007` abrió nueve paths de a uno en su ficha y se
-  cierran con él; `ARC1-008` tiene que abrir los suyos en su propio plan. `src/jugar/**` sigue
-  prohibido de plano (`H3_CONTRACT.md` §3).
-- **Lo que `ARC1-007` deja medido y `ARC1-008` no puede mover:** el recorrido determinista produce
-  `db322500` en 1440×900 y `50543361` en 390×844, los mismos digests que `aeb9f70`. Si `ARC1-008`
-  los ve cambiar, es una regresión de `ARC1-007`, no un artefacto de su medición.
+- **`src/**` sigue globalmente protegido.** `ARC1-008` abrió dos paths de a uno en su ficha
+  —`src/app/runtimeHost.ts` y `src/labs/ohmdal-hd2d-preprod/main.ts`— y se cierran con él;
+  `ARC1-009` tiene que abrir los suyos en su propio plan. `src/jugar/**` sigue prohibido de plano
+  (`H3_CONTRACT.md` §3).
+- **Lo que `ARC1-008` deja medido y `ARC1-009` no puede mover:** el recorrido determinista sigue
+  produciendo `db322500` en 1440×900 y `50543361` en 390×844, ahora reproducidos por un **segundo
+  driver independiente** (`CP-027`), dos corridas por viewport con un ciclo `destroy → start`
+  intercalado. Y el gate de fugas de `SCENE_BUDGETS.md` §4.3 está **cumplido con medición**: 8.451 B
+  por ciclo en el estimador de suelo sobre 16 ciclos, el 1,65 % del techo de 512 kB.
 - **Advertencia de método, `OI-006`.** Las fichas de los dos paquetes de `ARC1-007` declararon `DONE`
   el 2026-08-02 con evidencia que no existía, y `B` no tenía una sola línea implementada. El control
   plane resistió —`STATE.md` seguía en `READY` y `ownership.json` sin rotar— pero nada impidió que
@@ -102,8 +110,9 @@ prospectivo.
   entre escenas. JS, texturas, audio y tiempo de carga **sí** son una partición.
 - Reserva intocable: 20 % de los draw calls y 30 % de los triángulos del techo global. Una escena que
   cierra usando la reserva cierra en falso.
-- `ARC1-008` hereda su gate de fugas: **≤ 512 kB por ciclo `mount`→`destroy`**. Lo mide por primera
-  vez; no lo cambia.
+- El gate de fugas —**≤ 512 kB por ciclo `mount`→`destroy`**— lo midió `ARC1-008` por primera vez y
+  **pasa**: 8.451 B/ciclo por el suelo del diente de sierra, 25.769 B/ciclo por el estimador más
+  pesimista. Sigue vigente para todo ticket que monte y desmonte.
 - Techo de descarga del slice: **8 MiB**. Proyección del Arco I completo: **≈ 35 MiB**, que es lo que
   `ARC1-027` tiene que sostener como PWA offline y `ARC1-035` como coste.
 - Arranque en **dos fases**: el primer frame jugable espera JS y textura de E1 —1 MiB— y nada más.
@@ -158,6 +167,20 @@ ritmo antes de `ARC1-030`, ni fps en ningún punto antes de `ARC1-028`.
   `ExperienceRuntime` sin que nadie lo note. P2, sin asignar.
 - `OI-009` — `taxonomy.json` no tiene kind para probar una capability de un proveedor. Los tres
   smokes del proyecto caen en `TECH_QA`, que enruta a un rol distinto del que usan. P2, sin asignar.
+- `OI-015` — **el driver de `CP-026` mide pero no captura.** `orca screenshot` falla de forma
+  reproducible sin la ventana al frente. Inocuo para `ARC1-008`, cuyo gate es no visual, pero
+  `EXECUTION_PROTOCOL.md` §D pide capturas 1440×900 y 390×844 para **todo cambio visible** y desde
+  `ARC1-011` casi todos lo son. `ARC1-008-B` demostró que el navegador embebido de Claude Code sí
+  fija viewport exacto y captura; **cuál queda como driver oficial de los gates visuales no se
+  decidió**. **P1**, conviene resolverlo antes de `ARC1-011`.
+- `OI-016` — `evidence/ARC1-007/parity.json` congela dos digests y **no deja escrito el protocolo que
+  los reproduce**: faltan el orden avanzar-después-muestrear y el separador `\n`. `ARC1-008-B` los
+  recuperó por deducción y reprodujo los dos valores exactos, pero la lectura natural de un digest
+  que no reproduce es «regresión». P2.
+- `OI-017` — **el estado de pausa no sobrevive a un cambio de runtime.** `pause`/`resume` delegan
+  fuera de `runSerialized`: durante un `travel` cross-runtime en vuelo son no-op silencioso. Sin
+  corrupción ni excepción —el reviewer trazó las tres ventanas de `current`—; el costo es semántico.
+  P2, sin asignar.
 
 ## El pipeline sin Claude sirve para un rol de tres — `CP-024`
 
@@ -171,8 +194,16 @@ asignar.
 | builder | `deepseek-v4-flash` | INCOMPLETO | `OI-014` — `bash: ask` sin TTY se auto-rechaza y termina sin conclusión |
 | reviewer | `glm-5.2` | NO VÁLIDO | `OI-012` — es `subagent`, cae a `build` con permisos totales; `OI-013` — el packet traía el diff equivocado |
 
-**`OI-012` y `OI-013` conviene resolverlos antes del primer `review` real de `ARC1-008`.** Sin ellos la
-fase `C` de `EXECUTION_PROTOCOL.md` emite un veredicto que no vale, y lo emite **sin fallar**.
+`OI-012` y `OI-014` se cerraron en `CP-025`; `OI-013` quedó mitigado —en `ARC1-008` el review fue
+pre-commit, que es el único caso en que ese defecto no muerde—.
+
+**Lo que `ARC1-008` no probó:** que el pipeline sin Claude funcione de punta a punta. De sus cinco
+fases, **una sola** corrió por las rutas de `MODEL_ROUTING.md` —el plan, con `glm-5.2`, y necesitó
+dos rondas: la primera murió sin emitir plan por presupuesto de steps—. El build, la medición y el
+review corrieron con Claude por orden del Director (`CP-028`), contra la línea «nunca builder» del
+propio routing. La tabla de arriba sigue siendo la única evidencia de las otras dos rutas, y sigue
+diciendo lo mismo. Cuando el Director quiera esa evidencia, el camino es correr un ticket entero por
+esas rutas; no se deduce de `ARC1-008`.
 
 ## Bloqueantes de contenido, no de código — `CP-023`
 
@@ -190,6 +221,54 @@ así que pueden escribirse en paralelo al chain serial sin romper WIP 1.
 Convertir un `OI` en ticket es decisión del Director (`CP-002`).
 
 ## Última verificación
+
+Sobre `8da2110`, 2026-08-04, al cerrar `ARC1-008`:
+
+- `npm run build`: PASS, `✓ built in 5.34s`. Re-corrido por el reviewer: PASS, `✓ built in 5.93s`.
+- `npm test`: PASS, exit 0. `a1-runtime-host` pasa con sus cuatro casos **sin que el test se tocara**:
+  `git diff tests/` vacío.
+- `npm run 3d:validate-manifests`: PASS, 5 manifests. `git diff --check`: PASS.
+- **Ciclo `mount → pause → resume → destroy` por el host real**, con `hd2dRuntime` y `runtimeLoaders`
+  de verdad: tras `destroy`, `#app` con `innerHTML` de longitud 0, `activeRuntime()` en `null` y las
+  sondas de `hd2dRuntime` desmontadas. Segundo montaje sin excepciones, más 17 ciclos consecutivos en
+  la medición de fugas. Detalle en `evidence/ARC1-008/A/lifecycle.json`.
+- **`pause` detiene el tiempo simulado y `resume` lo continúa sin salto de `dt`**, medido con sondas:
+  0,0 unidades recorridas en 1508 ms de pausa, y en los primeros 154 ms tras reanudar un exceso de
+  2,3 % sobre el ritmo previo. El peor salto que permitiría el clamp de 0,05 s del bucle es catorce
+  veces mayor que ese exceso.
+- **Gate de fugas de 512 kB por ciclo: PASS**, medido por primera vez. 16 ciclos más warmup, heap por
+  `performance.memory.usedJSHeapSize` en el mismo punto de fase. Tres estimadores: suelo del diente de
+  sierra **8.451 B/ciclo** (1,65 % del techo), OLS **25.769 B/ciclo** con r² 0,0113 (5,03 %), extremo a
+  extremo **−81.213 B/ciclo**. Se corrieron 16 ciclos y no los 5 del contrato porque las primeras
+  cinco muestras dieron ±2 MB de varianza: con ese ruido, cinco puntos no distinguen una fuga de
+  512 kB del calendario del recolector. Muestras crudas en `evidence/ARC1-008/A/lifecycle-leak.json`.
+- **Paridad del recorrido determinista: exacta.** `db322500` en 1440×900 DPR 1 y `50543361` en
+  390×844 DPR 2, dos corridas por viewport con un ciclo `destroy → start` intercalado, y los cuatro
+  rangos de `renderer.info` de `ARC1-006` reproducidos (13–22 y 150–508 en desktop, 11–20 y 126–448 en
+  mobile). Detalle en `evidence/ARC1-008/B/parity.json`.
+- Consola: 8 entradas, las 8 `debug` del cliente de HMR de vite. **0 errores, 0 warnings** a lo largo
+  de todo el ejercicio.
+- **Review técnico independiente: `APROBADO CON P2`**, cero P0 y cero P1 — el primero real de esta
+  corrida. El reviewer recalculó los tres estimadores de fuga con su propio script y coinciden al
+  byte; re-corrió los tres gates; y verificó contra `dist/` que `labControl` no se publica
+  (`grep -rl labControl dist/` sin resultados, ningún `dist/labs`). Sus dos P2 son `OI-015` y `OI-017`.
+- **Límite del review, declarado por el propio reviewer:** puede auditar la consistencia interna de
+  las muestras y la coherencia entre archivos, pero **no puede probar que el JSON transcripto en
+  `commands.md` sea una sesión real y no algo tecleado**. Es `OI-006` visto desde la fase `C`, y
+  ninguna herramienta de este repositorio lo cierra hoy.
+- **Desviación declarada:** `final-state.png` **`not-run`**. `orca screenshot` falla de forma
+  reproducible sin la ventana al frente; no se sustituyó por una captura de otro driver. `OI-015`.
+- **Desviación declarada:** el gate humano de este ticket es **no visual** por contrato de la ficha, y
+  el commit se hizo bajo la instrucción permanente del Director para esta sesión —«continuá la
+  orquestación, no te detengas»—, no bajo una aprobación explícita ticket por ticket como pide
+  `CLAUDE.md` §8. No hubo `push`.
+- **Desviación declarada:** cuatro de las cinco fases corrieron con Claude por orden del Director
+  (`CP-028`), contra la línea «nunca builder» de `MODEL_ROUTING.md`. Builder y reviewer fueron
+  sesiones y contratos distintos, pero **ya no proveedores distintos**: la garantía estructural que
+  compró `CP-022` está debilitada y eso no lo arregla ninguna disciplina.
+- **fps no medido y no declarado** (`CP-014`). `npm run verify`: `not-run`, WSL sin distribución.
+
+## Verificación anterior
 
 Sobre `aeb9f70`, 2026-08-03, al cerrar `ARC1-007`:
 
@@ -219,7 +298,7 @@ Sobre `aeb9f70`, 2026-08-03, al cerrar `ARC1-007`:
 - **fps no medido y no declarado**, `CP-014`. Gate de fugas de 512 kB: es de `ARC1-008`, no se
   adelantó.
 
-## Verificación anterior
+## Verificación previa
 
 Sobre `b49b617`, 2026-08-02, al cerrar `ARC1-006`:
 
@@ -241,7 +320,7 @@ Sobre `b49b617`, 2026-08-02, al cerrar `ARC1-006`:
 - **fps no medido y no declarado:** `requestAnimationFrame` está throttled en el panel. Los 0,264 ms
   registrados son coste de CPU por frame forzado, **no** frame time.
 
-## Verificación previa
+## Verificaciones más viejas
 
 Sobre `b49b617`, 2026-08-02, al cerrar `ARC1-005`:
 

@@ -1,7 +1,7 @@
 {
-  "version": 12,
+  "version": 15,
   "milestone": "ohmdal-arc1-serial-v1",
-  "activeIssueKey": "ARC1-008",
+  "activeIssueKey": "ARC1-009",
   "collisionPolicy": "stop-and-return-to-director",
   "owners": {
     "director": {
@@ -12,15 +12,16 @@
         "docs/agent-runs/ohmdal-arc1-serial-v1/ownership.json",
         "docs/agent-runs/ohmdal-arc1-serial-v1/BACKLOG.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/MODEL_ROUTING.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-008.md",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-008/**",
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-008/**",
-        "automation/**"
+        "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-009.md",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-009/**",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-009/**",
+        "automation/**",
+        ".opencode/**"
       ]
     },
     "builder": {
       "write": [
-        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-008/**",
+        "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-009/**",
         "docs/agent-runs/ohmdal-arc1-serial-v1/OPEN_ISSUES.md",
         "docs/agent-runs/ohmdal-arc1-serial-v1/telemetry.json"
       ],
@@ -77,7 +78,10 @@
     "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-007.md",
     "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-007/**",
     "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-007/**",
-    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-009.md"
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-008.md",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/packets/ARC1-008/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/evidence/ARC1-008/**",
+    "docs/agent-runs/ohmdal-arc1-serial-v1/tickets/ARC1-010.md"
   ],
   "notes": [
     "ARC1-008 is the active ticket: measure mount -> pause -> resume -> destroy and leaks under 512 kB per cycle. The cycle now exists, which is what ARC1-007 delivered. /arc-plan narrows this contract to the exact artifacts when it writes the ficha, exactly as versions 5, 7, 9 and 10 did for ARC1-004 through ARC1-007.",
@@ -97,6 +101,8 @@
     "CP-021 extends the P1 contract: ExperienceLocation.runtime is optional and, when present, decides which runtime serves that location. It is additive — without the field the behaviour is identical, proven by a1-runtime-host.test.ts passing untouched. src/experiences/registry.ts and manifests.ts were not modified and Ohmdal still declares topdown-phaser.",
     "Rotating this contract is step E of EXECUTION_PROTOCOL.md, executed at close. Version 11 was written as part of closing ARC1-007, not when opening ARC1-008: that is the fix CP-017 introduced after OI-001.",
     "v12 is CP-023, a correction, not a rotation. activeIssueKey stays ARC1-008 and no ticket advances. Three fixes: (1) backfill — ARC1-001 and ARC1-002 closed DONE before CP-017 existed, so their fichas and evidence were never moved to protected; the audit had been warning about all four paths since the script was written. (2) BACKLOG.md and MODEL_ROUTING.md had no owner at all, in any version. MODEL_ROUTING.md was edited twice under CP-022 and CP-023 while formally unowned, and the plan of record was to give it an owner at ARC1-008's close — the same deferral that produced OI-001. It is fixed here instead of deferred a third time. (3) automation/** gets an owner for the same reason.",
-    "Giving automation/** an owner does NOT make its verdict binding on any gate. automation/README.md section 7 still governs: wiring the layer into the run — referencing it from tasks.json, or requiring arc-close to run the audit — is a separate control-plane change and needs its own CP decision. v12 only fixes that the directory belonged to nobody, which meant a builder could have edited the very script that audits builders."
+    "Giving automation/** an owner does NOT make its verdict binding on any gate. automation/README.md section 7 still governs: wiring the layer into the run — referencing it from tasks.json, or requiring arc-close to run the audit — is a separate control-plane change and needs its own CP decision. v12 only fixes that the directory belonged to nobody, which meant a builder could have edited the very script that audits builders.",
+    "v13 is CP-025, a correction, not a rotation: activeIssueKey stays ARC1-008 and no ticket advances. It gives .opencode/** an owner (director/write) because CP-025 had to edit .opencode/agents/reviewer.md and director-plan.md to close OI-012 and fix the planner step budget, and the directory belonged to nobody — the same disease CP-023 cured for BACKLOG.md, MODEL_ROUTING.md and automation/**. Builder and reviewer keep no access to .opencode/**: an executor editing the agent definitions that constrain executors is the exact loop v12 closed for automation/**.",
+    "v15 is the close of ARC1-008 and a real rotation: activeIssueKey moves to ARC1-009 and the ticket's ficha, packets and evidence move from director/write to protected. The two src/** paths ARC1-008 opened one by one — src/app/runtimeHost.ts and src/labs/ohmdal-hd2d-preprod/main.ts — close with it, so src/** is globally protected again; ARC1-009 must open the ones it needs in its own plan. What ARC1-008 leaves measured and ARC1-009 may not move: the leak gate of SCENE_BUDGETS.md 4.3 is met with a floor of 8451 B per cycle over 16 cycles, and the deterministic route still produces db322500 at 1440x900 and 50543361 at 390x844 — now reproduced by a second, independent driver (CP-027), which also recovered the two protocol details ARC1-007 never wrote down (OI-016). Three new open issues, all carried forward: OI-015 the driver of CP-026 measures but cannot capture, OI-016 evidence that freezes a value without leaving it reproducible, OI-017 the pause state does not survive a runtime swap. ARC1-008 is also the first ticket of this run with a real independent technical review, under CP-028: routed to Claude by Director order, against the 'never builder' line of MODEL_ROUTING.md, which is recorded rather than silently applied."
   ]
 }

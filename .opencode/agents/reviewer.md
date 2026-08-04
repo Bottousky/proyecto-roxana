@@ -1,6 +1,6 @@
 ---
 description: Revisa el diff del ticket activo sin editar ni reimplementar
-mode: subagent
+mode: primary
 model: opencode-go/glm-5.2
 temperature: 0.1
 steps: 14

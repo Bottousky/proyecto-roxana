@@ -230,17 +230,18 @@
       "epic": "Slice",
       "title": "Probar mount pause resume destroy y fugas",
       "owner": "director",
-      "status": "READY",
+      "status": "DONE",
       "dependsOn": [
         "ARC1-007"
-      ]
+      ],
+      "note": "Dos paquetes, ambos DONE en ronda 1. A: pause/resume en RuntimeHost por delegacion y window.labControl en la pagina del laboratorio; ciclo completo por el host real y gate de fugas de 512 kB medido por primera vez, PASS con suelo de 8451 B/ciclo sobre 16 ciclos. B: paridad del recorrido determinista, db322500 y 50543361 reproducen exactos en dos corridas por viewport. PRIMER ticket de la corrida con review tecnico independiente real: APROBADO CON P2, cero P0 y cero P1. Tres hallazgos ajenos: OI-015, OI-016 y OI-017. Desviacion declarada: final-state.png not-run porque el driver de CP-026 no captura sin la ventana al frente."
     },
     {
       "key": "ARC1-009",
       "epic": "Slice",
       "title": "Implementar acciones, teclado, táctil y reasignación",
       "owner": "director",
-      "status": "BLOCKED",
+      "status": "READY",
       "dependsOn": [
         "ARC1-008"
       ]
