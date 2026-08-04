@@ -10,8 +10,8 @@
 // sesion nueva. Este script produce el unico insumo que deberia cruzar esa frontera: objetivo,
 // criterios, diff y artefactos. No el razonamiento.
 
-import { writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { join, isAbsolute } from 'node:path';
+import { writeFileSync, existsSync, readdirSync, statSync, mkdirSync } from 'node:fs';
+import { join, isAbsolute, dirname } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { ROOT, read, json, taxonomy, dim, green } from './lib.mjs';
 
@@ -141,6 +141,7 @@ ${diffStat}
 
 if (outFile) {
   const p = isAbsolute(outFile) ? outFile : join(ROOT, outFile);
+  mkdirSync(dirname(p), { recursive: true });
   writeFileSync(p, md, 'utf8');
   console.log(green(`escrito: ${outFile}`));
 } else {

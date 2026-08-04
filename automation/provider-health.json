@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatedBy": "automation/scripts/providers.mjs",
-  "observedOn": "2026-08-03",
+  "observedOn": "2026-08-04",
   "versions": {
     "opencode": "1.14.29",
     "codex": "codex-cli 0.145.0",
@@ -131,7 +131,6 @@
     "opencode/big-pickle",
     "opencode/laguna-s-2.1-free",
     "opencode/ling-3.0-flash-free",
-    "opencode/mimo-v2.5-free",
     "opencode/north-mini-code-free",
     "opencode-go/glm-5.1",
     "opencode-go/grok-4.5",
@@ -146,16 +145,13 @@
     "opencode-go/qwen3.7-plus"
   ],
   "unverifiedCapabilities": [
-    "imagegen",
-    "vision"
+    "imagegen"
   ],
   "rolesWithoutSmoke": [
     "orchestrator",
     "planner",
     "code-worker",
     "reviewer-tech",
-    "reviewer-visual",
-    "proc3d-worker",
     "art-integrator"
   ]
 }
