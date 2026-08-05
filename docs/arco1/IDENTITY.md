@@ -1,8 +1,7 @@
-# Identidad de Ohmdal — congelada
+# Identidad de Ohmdal
 
-**Estado:** CONGELADA en `ARC1-003`, 2026-08-02
-**Base:** `b49b617`
-**Cambiarla:** requiere una decisión `CP-0NN` propia; no se altera dentro de un ticket de escena
+**Es una decisión tomada.** No se redefine para que un resultado pase: si el arte no la cumple,
+se corrige el arte. Cambiarla es una decisión aparte, y consciente.
 
 Doc. 15 de la Biblia registra que en DQIII **la identidad precede al efecto**: el equipo conservó la
 paleta viva y los colores funcionales de las vocaciones aun cuando cambió por completo la
@@ -88,7 +87,7 @@ Tomado de doc. 15, columna «lo que no se debe imitar»:
 - escala física uniforme o mundo *seamless* por prestigio técnico;
 - aprobar una planta por captura estática en vez de jugarla;
 - blur, bloom, viñeta o partículas como firma automática;
-- evaluar recién al final del arco en vez de por ticket;
+- evaluar recién al final del arco en vez de escena por escena;
 - migrar `/jugar` o el save para resolver una escena visual;
 - coleccionables o props sin función para inflar duración.
 
@@ -103,5 +102,9 @@ encima del manierismo, revisión autoral continua, y espacio nuevo justificado p
 
 Lo que no se toma es ningún píxel. Ver [`LEGAL_REFERENCES.md`](LEGAL_REFERENCES.md).
 
-La reserva `CP-011` —si la cámara de Ohmdal alcanza esa barra— sigue abierta y se re-evalúa en
-`ARC1-024` y `ARC1-030`.
+---
+
+## Pendiente
+
+- **Si la cámara de Ohmdal alcanza la barra de DQ III sigue sin decidirse.** No se puede decidir
+  mirando blockout: hay que volver a mirarlo cuando haya arte producido, y jugándolo.

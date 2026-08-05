@@ -28,7 +28,7 @@ La nueva definición resuelve el conflicto central: no hubo invasión, maldició
 | Dirección 3D | `docs/3d/*` | ACTIVA COMO ESTÁNDAR PRODUCTIVO | Escala en metros, modularidad, manifests, presupuesto, QA y carga diferida |
 | Dirección visual top-down | `docs/3d/VISUAL_BIBLE.md`, contratos del spike vnext | OBSOLETO PARA FUTURO | Gates de legibilidad y causalidad; no la prohibición de bitmaps o cámara obligatoria |
 | Implementación estable | `src/jugar`, `src/puzzles`, pruebas asociadas | PRESERVAR | Modelos deterministas, contenido probado y ruta de regresión |
-| Spike Phaser anterior | `src/labs/ohmdal-vnext`, `docs/agent-runs/ohmdal-vnext-spike/*` | EVIDENCIA | Mundo continuo, interacción diegética y datos de rendimiento; no define el runtime futuro |
+| Spike Phaser anterior | histórico, en el historial de git | EVIDENCIA | Mundo continuo, interacción diegética y datos de rendimiento; no define el runtime futuro |
 | Prototipo anterior | `src/ohmdal` | HISTÓRICO | Investigación de ritmo y composición; no base productiva |
 | Auditorías/revisiones | `revision-*`, `auditoria-*`, `plan-implementacion-*`, `spec-*` | EVIDENCIA | Hallazgos con fecha; distinguir los ya resueltos de los vigentes |
 | Instituto/cinemática | biblias y entregas del Instituto | FUERA DE ALCANCE DIRECTO | Continuidad del universo y del prólogo; su lenguaje visual no obliga a Ohmdal |

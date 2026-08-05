@@ -1,10 +1,9 @@
-# Presupuesto por escena del slice — congelado
+# Presupuesto por escena del slice
 
-**Estado:** CONGELADO en `ARC1-006`, 2026-08-02
-**Base:** `b49b617`
-**Alcance:** golden slice Portal → Plaza → Taller → Puerta → Manantial, más el overworld de `ARC1-010`
-**Cambiarlo:** requiere decisión `CP-0NN` propia. Un ticket de escena **no** puede ampliar su
-presupuesto para que su resultado pase.
+**Alcance:** golden slice Portal → Plaza → Taller → Puerta → Manantial, más el overworld mínimo
+
+**Es una decisión tomada.** Una escena no amplía su presupuesto para que su resultado pase: si no
+entra, se corrige la escena. Subir un techo es una decisión aparte, y consciente.
 
 ---
 
@@ -12,11 +11,11 @@ presupuesto para que su resultado pase.
 
 `H3_CONTRACT.md` §5 fija el **techo global** de runtime —draw calls, triángulos, DPR, luces con
 sombra— y remite explícitamente: *«El presupuesto por escena (JS, texturas, audio, memoria, draw
-calls y tiempo) lo fija `ARC1-006`»*. `SCENE_INVENTORY.md` §6 repite la remisión desde el otro lado:
+calls y tiempo) se fija acá»*. [`SCENE_INVENTORY.md`](SCENE_INVENTORY.md) §6 repite la remisión desde el otro lado:
 congeló qué escenas hay y cuánto dura cada beat, y dejó fuera el presupuesto técnico.
 
 Un techo global no sirve para cerrar una escena. Dice cuándo el slice completo está roto; no dice si
-`ARC1-016` puede gastar lo que quiere gastar en el Taller. Este documento reparte ese techo sobre las
+cada escena podría gastar lo que quisiera. Este documento reparte ese techo sobre las
 **cinco escenas de `SCENE_INVENTORY.md` §2** y sobre el overworld, y fija la reserva que ninguna
 escena puede tocar.
 
@@ -44,14 +43,14 @@ cambio, que E3 tenga 1,00 MiB de textura y E4 0,75 MiB **sí** significa que ent
 **Cada byte se imputa una sola vez, a la dimensión de su origen.** Hoy `vite` inlinea los dos atlas
 SVG como `data:` URI dentro del chunk de JS —6.617 B, el 1,25 % del bundle, cero requests—. Esos
 bytes se imputan a **textura**, no a JS. El presupuesto de JS se mide como *chunk menos data URIs*,
-que es lo que hace `evidence/ARC1-006/js-budget.json`.
+que es lo que hace [`js-budget.json`](js-budget.json).
 
 ### Convención de bytes
 
 El árbol de trabajo está en CRLF y los manifests registraron los tamaños en LF. La diferencia es
 exactamente el número de líneas del archivo, verificada en los cuatro sidecars del slice. **Todo peso
 de asset de este documento se declara en bytes LF**, y la discrepancia contra lo que sirve un HTTP
-real —0,7 % en los atlas actuales— queda en `OI-004`.
+real —0,7 % en los atlas actuales— queda pendiente, ver §7.
 
 Unidades: **`kB` = 1.000 B**, que es como los reporta `vite`, y **`MiB` = 1.048.576 B**. Se usan `kB`
 para JS y `MiB` para assets porque así vienen de sus herramientas de medición respectivas; mezclarlas
@@ -62,7 +61,7 @@ en una misma suma es error de lectura, no del documento.
 ## 3. Lo medido: dónde está el slice hoy
 
 Todo lo de esta sección es medición sobre `b49b617`, no estimación. Método y salidas completas en
-`evidence/ARC1-006/js-budget.json` y `evidence/ARC1-006/runtime-budget.json`.
+[`js-budget.json`](js-budget.json) y [`runtime-budget.json`](runtime-budget.json).
 
 ### 3.1 JS
 
@@ -81,7 +80,7 @@ slice no mueve la aguja; lo que la mueve es qué subsistemas de `three` se impor
 
 Cinco módulos de contenido educativo existen y **todavía no entran al bundle** porque `main.ts` no
 los importa: `cards.ts` (23.432 B), `bitacoraModel.ts`, `instrumentModel.ts`, `circuitModel.ts` y
-`types.ts`, 35.706 B de fuente en total. Entran con `ARC1-018`, `ARC1-019`, `ARC1-021` y `ARC1-022`.
+`types.ts`, 35.706 B de fuente en total. Entran cuando se implementen las fichas educativas.
 
 ### 3.2 Draw calls y triángulos por escena
 
@@ -101,8 +100,7 @@ El pico del slice son **22 draw calls y 508 triángulos**, ambos en E4. Contra e
 `H3_CONTRACT.md` §5 eso es el 8,8 % de los draw calls de desktop y el **0,07 %** de los triángulos.
 
 **El blockout no gasta triángulos.** Gasta cero coma cero siete por ciento. Todo el presupuesto de
-geometría de este documento es prospectivo: describe lo que `ARC1-024`, `ARC1-013`, `ARC1-014` y
-`ARC1-017` todavía no pusieron.
+geometría de este documento es prospectivo: describe lo que el arte todavía no puso.
 
 ### 3.3 Memoria
 
@@ -141,7 +139,7 @@ porque viajan inlineados.
 ### 3.5 Audio
 
 **Cero.** No existe un solo archivo de audio en `assets/**`. La columna de audio de §4.4 es la única
-del documento que no tiene ninguna medición debajo: es asignación pura hacia `ARC1-025`.
+del documento que no tiene ninguna medición debajo: es asignación pura, a falta del audio.
 
 ---
 
@@ -158,7 +156,7 @@ del documento que no tiene ninguna medición debajo: es asignación pura hacia `
 | Triángulos mobile | ≤ 300.000 | 30 % = 90.000 | **210.000** |
 | Triángulos desktop | ≤ 700.000 | 30 % = 210.000 | **490.000** |
 
-La reserva no es holgura de cortesía: es lo que `ARC1-024` (materiales, DOF, agua, VFX), `ARC1-028`
+La reserva no es holgura de cortesía: es lo que el arte final (materiales, DOF, agua, VFX), la optimización
 (calidad adaptativa) y las cuatro regiones posteriores van a necesitar sobre una escena **ya
 cerrada**. Una escena que cierra usando su reserva cierra en falso.
 
@@ -173,7 +171,7 @@ Techos independientes. No se suman.
 | E3 · Taller de Lumen | **120** | **200** | **210.000** | **490.000** |
 | E4 · Puerta de Ohm | 110 | 185 | 195.000 | 455.000 |
 | E5 · Manantial | 105 | 175 | 185.000 | 430.000 |
-| Overworld (`ARC1-010`) | 60 | 100 | 80.000 | 200.000 |
+| Overworld mínimo | 60 | 100 | 80.000 | 200.000 |
 
 E3 recibe el máximo asignable de §4.1, exactamente. Es coherente con `SCENE_INVENTORY.md` §4.3, que
 le da el 44 % del tiempo mínimo del slice y la llama la escena más cara: es la única donde la
@@ -194,8 +192,8 @@ E4 18,2 %, E5 17,1 %. El blockout ocupa alrededor de un sexto de lo que tiene as
 | Luces con sombra | 1 | 1 |
 | Resolución del shadow map | ≤ 1024² | ≤ 2048² |
 
-El límite de 512 kB por ciclo `mount`→`destroy` es el gate de fugas de **`ARC1-008`**. Hoy no está
-medido: `ARC1-008` es quien lo mide por primera vez.
+El límite de 512 kB por ciclo `mount`→`destroy` es el gate de fugas del ciclo de vida. **Ya está
+medido:** el piso real es de 8.451 B por ciclo sobre 16 ciclos, muy por debajo del techo.
 
 ### 4.4 Descarga — JS, texturas y audio
 
@@ -208,7 +206,7 @@ Partición. Estas líneas **sí** se suman.
 | E3 · Taller de Lumen | 1,00 MiB | 0,55 MiB | 60 kB |
 | E4 · Puerta de Ohm | 0,75 MiB | 0,45 MiB | 28 kB |
 | E5 · Manantial | 0,70 MiB | 0,50 MiB | 22 kB |
-| Overworld (`ARC1-010`) | 0,35 MiB | 0,25 MiB | 15 kB |
+| Overworld mínimo | 0,35 MiB | 0,25 MiB | 15 kB |
 | Transversal — actores, HUD, Bitácora, UI | 0,15 MiB | 0,65 MiB | 45 kB |
 | **Total** | **4,00 MiB** | **3,00 MiB** | **200 kB** |
 
@@ -226,7 +224,7 @@ los dos chunks más pesados que el repositorio ya sirve: `tiles16` (385,64 kB gz
 
 El presupuesto de `three` admite un 13 % de crecimiento y nada más. Eso alcanza para uno o dos
 subsistemas —un loader, un pase de post-proceso—, no para tres. **Importar un subsistema nuevo de
-`three` se declara en el ticket que lo importa**, con la cifra antes y después.
+`three` se declara donde se importa**, con la cifra antes y después.
 
 ### 4.5 Techo de descarga y proyección del Arco I
 
@@ -240,9 +238,9 @@ subsistemas —un loader, un pase de post-proceso—, no para tres. **Importar u
 | **Techo de descarga del slice** | **8,00 MiB** |
 
 Proyección obligada: el slice es **una** región de las cinco del Arco I. A este presupuesto, el arco
-completo pesa ≈ **35 MiB** de descarga. Ése es el número que `ARC1-027` tiene que sostener como PWA
-instalable offline y que `ARC1-035` tiene que sostener como coste. Si 35 MiB no es viable, se corrige
-**acá**, mientras el slice todavía es barato de rehacer, no en `ARC1-059`.
+completo pesa ≈ **35 MiB** de descarga. Ése es el número que hay que sostener como PWA instalable
+offline y como coste. Si 35 MiB no es viable, se corrige **acá**, mientras el slice todavía es
+barato de rehacer, no al final.
 
 ### 4.6 Tiempo de carga
 
@@ -252,10 +250,10 @@ instalable offline y que `ARC1-035` tiene que sostener como coste. Si 35 MiB no 
 | Primer frame jugable, 4G de referencia, desktop | ≤ 3 s |
 | Primer frame jugable, 4G de referencia, mobile | ≤ 6 s |
 | Transición entre escenas del slice | ≤ 400 ms, **sin pantalla de carga** |
-| Overworld → Cuenca (`ARC1-010`) | ≤ 2 s, con transición explícita |
+| Overworld → Cuenca | ≤ 2 s, con transición explícita |
 
 **4G de referencia:** 4 Mbit/s efectivos y 100 ms de RTT —el perfil «Fast 4G» de Chrome DevTools—.
-Se declara acá para que dos tickets no midan contra perfiles distintos.
+Se declara acá para que dos mediciones no usen perfiles distintos.
 
 Los 8 MiB del techo no entran en 6 segundos a 4 Mbit/s: entran en ≈ 17. Por eso el arranque es de
 **dos fases**. La primera espera exactamente dos cosas: el **JS** (0,20 MiB) y la **textura de E1**
@@ -272,7 +270,7 @@ optimización, y necesita su `CP-0NN`.
 
 ---
 
-## 5. El overworld de `ARC1-010` tiene línea propia
+## 5. El overworld mínimo tiene línea propia
 
 `SCENE_INVENTORY.md` §4.4 dejó su **duración** sin asignar y prohibió tomarla prestada de otro beat.
 Quedaba abierto si además tenía presupuesto técnico propio o si se financiaba desde alguna escena.
@@ -289,38 +287,46 @@ documento— y darle una exige `CP-0NN` propia.
 
 ## 6. Cómo se usa
 
-1. **Cada ticket de escena cierra midiendo, no estimando.** La evidencia mínima es un barrido de
+1. **Cada escena se da por cerrada midiendo, no estimando.** La evidencia mínima es un barrido de
    `renderer.info` sobre los anclajes de su escena, en 1440×900 y 390×844, con el protocolo de
-   `evidence/ARC1-006/runtime-budget.json`. Un ticket sin esa medición no cierra.
+   con el método de [`runtime-budget.json`](runtime-budget.json). Una escena sin esa medición no
+   se da por cerrada.
 2. **El presupuesto es techo, no objetivo.** Gastar menos no es un defecto y no habilita a otra
    escena a gastar la diferencia: las líneas por frame no son transferibles.
-3. **Pasarse no se arregla en otro ticket.** O la escena se optimiza dentro de su ronda, o se abre
+3. **Pasarse no se arregla más tarde.** O la escena se optimiza en el momento, o se abre
    `CP-0NN` para mover la línea. Tomar prestado de la reserva de §4.1 no es una opción.
-4. **Ningún ticket declara fps.** `CP-014` lo prohíbe hasta `ARC1-060`, y el coste de CPU por frame
+4. **Nadie declara fps.** No se afirma performance sin medirla en un teléfono real, y el coste de CPU por frame
    forzado que registra `runtime-budget.json` —0,264 ms— **no es frame time**: no incluye espera de
    GPU ni presentación, y `requestAnimationFrame` estaba throttled.
 5. **Este documento no autoriza producir assets.** El orden de `ASSET_PIPELINE.md` sigue vigente:
    función, derechos, escala, blockout, aprobación humana de forma, y recién después material y
    textura. Tener presupuesto no es tener permiso.
-6. **`ARC1-035` cierra contra §4.5.** El coste real por minuto jugable se compara con estas cifras,
+6. **El coste real por minuto jugable se compara contra §4.5**, no contra una estimación nueva,
    no con otras nuevas.
 
 ---
 
 ## 7. Lo que este documento deliberadamente NO aprueba
 
-- **fps y frame time.** `not-run` hasta `ARC1-028` y `ARC1-060` (`CP-014`).
+- **fps y frame time.** Sin medir; hace falta un teléfono real.
 - **TTI real sobre 4G o Android físico.** Lo medido en §3.4 es localhost sin compresión ni latencia.
-- **La duración jugada.** Es `SCENE_INVENTORY.md` §4.3 y se falsea en `ARC1-030`.
-- **El coste por minuto.** Es `ARC1-035`.
-- **La producción de cualquier asset.** Es `ASSET_PIPELINE.md` más el ticket que corresponda.
-- **La escala del blockout.** Si `ARC1-011` la cambia, §3.2 se vuelve a medir; los techos de §4 no se
+- **La duración jugada.** Es [`SCENE_INVENTORY.md`](SCENE_INVENTORY.md) §4.3 y se falsea jugando.
+- **El coste por minuto.** Se calcula cuando exista el arte final.
+- **La producción de cualquier asset.** Es [`ASSET_PIPELINE.md`](ASSET_PIPELINE.md).
+- **La escala del blockout.** Si cambia, §3.2 se vuelve a medir; los techos de §4 no se
   mueven por eso.
-- **El HUD mobile de `CP-012`.** Sigue siendo deuda de `ARC1-026` y no se corrige oportunistamente.
+- **El HUD mobile.** Deuda conocida en [`SHOT_DECK.md`](SHOT_DECK.md) §3; no se corrige de paso.
 
 ---
 
-## 8. Trazabilidad
+## 8. Pendiente
+
+- **El ratio real de ocupación de los atlas de textura** (0,7 % en los actuales) no está medido
+  contra un objetivo. Hasta que exista arte con texturas de verdad, el número no dice nada.
+
+---
+
+## 9. Trazabilidad
 
 | Dato | Origen |
 |---|---|
@@ -328,16 +334,16 @@ documento— y darle una exige `CP-0NN` propia.
 | las cinco escenas y sus fronteras por `x` | `SCENE_INVENTORY.md` §2, `levelData.ts:106-117` |
 | E3 como escena más cara | `SCENE_INVENTORY.md` §3 y §4.3 |
 | overworld sin duración asignada | `SCENE_INVENTORY.md` §4.4 |
-| peso del chunk, de `three` y por módulo | `evidence/ARC1-006/js-budget.json` |
-| data URI inlineados, 6.617 B y 1,25 % del bundle | `evidence/ARC1-006/js-budget.json` §`inlinedTextures` |
-| módulos educativos todavía fuera del bundle | `evidence/ARC1-006/js-budget.json` §`notBundledYet` |
-| draw calls y triángulos por escena, 480 muestras | `evidence/ARC1-006/runtime-budget.json` §`perScene` |
-| heap, geometrías, texturas y crecimiento | `evidence/ARC1-006/runtime-budget.json` §`memory` |
+| peso del chunk, de `three` y por módulo | [`js-budget.json`](js-budget.json) |
+| data URI inlineados, 6.617 B y 1,25 % del bundle | [`js-budget.json`](js-budget.json) §`inlinedTextures` |
+| módulos educativos todavía fuera del bundle | [`js-budget.json`](js-budget.json) §`notBundledYet` |
+| draw calls y triángulos por escena, 480 muestras | [`runtime-budget.json`](runtime-budget.json) §`perScene` |
+| heap, geometrías, texturas y crecimiento | [`runtime-budget.json`](runtime-budget.json) §`memory` |
 | una sola luz con sombra, 1024² | `blockoutLighting.ts:35,39,42,50,53,57,60` |
 | memoria RGBA de los atlas | manifests `ohmdal-hd2d-preprod-student-4.json` y `-ohm-sprite.json` |
-| marcas de carga y bytes transferidos | `evidence/ARC1-006/runtime-budget.json` §`load` |
-| ausencia total de audio | `evidence/ARC1-006/runtime-budget.json` §`assetsOnDisk` |
+| marcas de carga y bytes transferidos | [`runtime-budget.json`](runtime-budget.json) §`load` |
+| ausencia total de audio | [`runtime-budget.json`](runtime-budget.json) §`assetsOnDisk` |
 | chunks de referencia del repositorio | salida de `npm run build` sobre `b49b617` |
-| gate de fugas de `ARC1-008` | este documento §4.3 |
+| gate de fugas del ciclo de vida | este documento §4.3 |
 
 Todo §3 es medición. Todo §4 es contrato declarado. Ninguna cifra de §4 se presenta como medición.

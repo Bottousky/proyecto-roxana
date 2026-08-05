@@ -103,10 +103,10 @@ La ejecución partió de `12d6f88d2a366da89ed91008013f42ba6295e42d` y cerró con
 `avanzar`: cámara casi ortográfica, estudiante de cuatro direcciones y Ohm sprite. Android físico
 medio 2022 permanece `not-run`, por lo que el cierre es condicional. No se extiende a H3.
 
-### Fase 3 — preproducción del slice completo, bloqueada por gate humano y autorización
+### Fase 3 — preproducción del slice completo
 
-El desglose ejecutable vive en `16_ARC1_JIRA_BACKLOG.md`. `ARC1-001` espera aprobación visual
-humana de la corrección de cámara y todas las tareas posteriores permanecen bloqueadas. Cada puzzle
+El plan de trabajo vigente es [`../../ROADMAP.md`](../../ROADMAP.md); `16_ARC1_JIRA_BACKLOG.md`
+queda como enumeración histórica del trabajo que compone el arco. Cada puzzle
 declara fenómeno, hipótesis, medición, consecuencia y transferencia. El desglose no reabre
 decisiones de producto ni autoriza producción.
 
@@ -123,6 +123,6 @@ No se autoriza Meshy ni producción masiva desde este paquete.
 ## Gate para abrir ejecución
 
 Las decisiones de producto están cerradas. Abrir ejecución exige `brief.md`, `visual-contract.md`,
-`tasks.json` con `executionAuthorized: true`, `baseCommit`, ownership exclusivo, presupuesto y
+un alcance acordado, un commit base, presupuesto y
 criterios de cierre. Para Arco I rige WIP global uno: ningún sucesor comienza hasta que el anterior
 esté `DONE`. La base estable conserva prioridad hasta el ADR de migración.

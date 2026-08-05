@@ -1,0 +1,91 @@
+{
+  "generatedAt": "2026-08-02",
+  "base": "b49b617",
+  "method": "vite build con API programática, root = repositorio, outDir = scratchpad. Ninguna ruta del repositorio fue escrita. manualChunks separa node_modules/three en vendor-three; el resto queda en el chunk de entrada. renderedLength por módulo lo reporta rollup en generateBundle.",
+  "entry": "ohmdal/index.html",
+  "viteVersion": "6.4.3",
+  "threeVersion": "0.177.0",
+  "chunks": [
+    {
+      "fileName": "assets/vendor-three-*.js",
+      "isEntry": false,
+      "rawBytes": 487112,
+      "gzipBytes": 122069,
+      "brotliBytes": 100594,
+      "moduleCount": 2,
+      "note": "three tras tree-shaking, con lo que el harness importa hoy"
+    },
+    {
+      "fileName": "assets/slice-*.js",
+      "isEntry": true,
+      "rawBytes": 41091,
+      "gzipBytes": 13255,
+      "brotliBytes": 11625,
+      "moduleCount": 15,
+      "note": "código propio del slice + los dos atlas SVG inlineados como data URI"
+    }
+  ],
+  "totals": {
+    "rawBytes": 528203,
+    "gzipBytes": 135324,
+    "brotliBytes": 112219,
+    "moduleCount": 17,
+    "threeShareOfRaw": 0.9222,
+    "threeShareOfGzip": 0.9021
+  },
+  "singleChunkBuild": {
+    "note": "El mismo build sin manualChunks produce un único chunk; es la cifra que mide el arranque real.",
+    "fileName": "assets/slice-CUyGpgIJ.js",
+    "rawBytes": 528540,
+    "gzipBytesReportedByVite": 135900,
+    "htmlBytes": 5562,
+    "htmlGzipBytes": 2150
+  },
+  "sliceOwnCode": {
+    "moduleCount": 12,
+    "renderedBytes": 65498,
+    "originalBytes": 84874,
+    "note": "renderedBytes incluye los 6617 B de data URI de los dos atlas, atribuidos a spriteActors.ts"
+  },
+  "modules": [
+    { "module": "src/ohmdal/main.ts", "renderedBytes": 12628 },
+    { "module": "src/ohmdal/integration/spriteActors.ts", "renderedBytes": 9812 },
+    { "module": "src/ohmdal/camera/cameraController.ts", "renderedBytes": 8650 },
+    { "module": "src/ohmdal/architecture/blockout.ts", "renderedBytes": 6725 },
+    { "module": "src/ohmdal/architecture/levelData.ts", "renderedBytes": 6428 },
+    { "module": "src/ohmdal/camera/cameraConfig.ts", "renderedBytes": 5651 },
+    { "module": "src/ohmdal/lighting/blockoutLighting.ts", "renderedBytes": 3514 },
+    { "module": "src/ohmdal/materials/blockoutMaterials.ts", "renderedBytes": 3083 },
+    { "module": "src/ohmdal/education/diagnosisModel.ts", "renderedBytes": 3020 },
+    { "module": "src/ohmdal/camera/occlusion.ts", "renderedBytes": 3006 },
+    { "module": "src/ohmdal/navigation/navigation.ts", "renderedBytes": 1730 },
+    { "module": "src/ohmdal/integration/harnessState.ts", "renderedBytes": 1251 }
+  ],
+  "inlinedTextures": {
+    "note": "vite inlinea los dos atlas SVG como data URI porque pesan menos que assetsInlineLimit. Hoy la textura del slice no viaja como asset separado: viaja dentro del bundle JS y percent-encoded.",
+    "count": 2,
+    "dataUriBytes": [3620, 2997],
+    "dataUriTotalBytes": 6617,
+    "sourceBytesLf": 5370,
+    "encodingOverhead": 0.2323,
+    "shareOfBundle": 0.0125,
+    "httpRequestsForTextures": 0
+  },
+  "notBundledYet": {
+    "note": "Módulos de contenido educativo que existen en el harness pero que main.ts todavía no importa. Entran cuando se implementen las fichas educativas.",
+    "modules": [
+      { "module": "src/ohmdal/education/cards.ts", "sourceBytes": 23432 },
+      { "module": "src/ohmdal/education/bitacoraModel.ts", "sourceBytes": 4101 },
+      { "module": "src/ohmdal/education/instrumentModel.ts", "sourceBytes": 3919 },
+      { "module": "src/ohmdal/education/circuitModel.ts", "sourceBytes": 3265 },
+      { "module": "src/ohmdal/education/types.ts", "sourceBytes": 989 }
+    ],
+    "totalSourceBytes": 35706
+  },
+  "repositoryReference": {
+    "note": "Chunks ya existentes en dist/, medidos por el build de producción del repositorio. Sirven de escala, no de objetivo.",
+    "tiles16": { "rawBytes": 1692490, "gzipBytes": 385640 },
+    "school3d": { "rawBytes": 715600, "gzipBytes": 209050 },
+    "topdownRuntime": { "rawBytes": 353980, "gzipBytes": 114940 }
+  }
+}

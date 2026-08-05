@@ -10,11 +10,8 @@
 
 - La investigación de producción desde fuentes oficiales y la auditoría del pipeline quedaron en
   `docs/ohmdal-biblia/15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md`. El Arco I se desglosó en Jira serie
-  en `16_ARC1_JIRA_BACKLOG.md`: WIP global uno, sucesor bloqueado hasta `DONE` y sin autorización
-  implícita de H3.
-- El control draft `docs/agent-runs/ohmdal-arc1-serial-v1/tasks.json` tiene
-  `executionAuthorized: false`. `ARC1-001` espera aprobación humana de cámara; `ARC1-002`–`062`
-  permanecen bloqueados.
+  en `16_ARC1_JIRA_BACKLOG.md`, que queda como enumeración histórica del trabajo del arco. El plan
+  vigente es [`../../ROADMAP.md`](../../ROADMAP.md).
 
 - La corrección post-H2 `CAM-FIX-001` quedó implementada y verificada automáticamente: la
   proyección usa el aspect ratio real sin deformar, y el seguimiento jugable incorpora una zona
@@ -35,7 +32,6 @@
 - H3 continúa **sin autorización**. El veredicto sólo habilita preparar un contrato separado con
   nueva base, ownership, presupuesto, gates y aprobación humana; no autoriza producirlo.
 - `/jugar`, Phaser estable, Meshy, generación paga y servicios externos permanecieron intactos.
-  El informe reproducible está en `docs/agent-runs/ohmdal-hd2d-preprod-v1/final-report.md`.
 
 ## Biblia canónica de Ohmdal HD-2D — 2026-08-01
 
@@ -69,10 +65,6 @@
 - La landing escolar usa GLB + Draco y expone métricas de renderer.
 - La escuela y Electrónica tienen fuentes Blender, GLB y evidencia visual preservada.
 - El manifiesto de experiencias del juego todavía mantiene Instituto en `topdown-phaser`.
-- El sistema multiagente de Fase 1 está versionado en `.codex/agents/` y
-  `docs/agent-runs/`: Director/integrador, Arquitectura, Asset Forge y Evaluador.
-- `.codex/config.toml` limita a tres subagentes simultáneos y los contratos fijan dos rondas
-  automáticas como máximo.
 - No se inició producción artística adicional ni se consumieron servicios generativos.
 - La decisión vigente está consolidada en `docs/START_HERE.md`: Instituto Three.js; Ohmdal futuro
   como experiencia HD-2D híbrida bajo demanda; Phaser preservado como base estable; UI/Bitácora en
@@ -95,33 +87,27 @@
 El hito Phaser `ohmdal-vnext-spike` conserva sus contratos históricos y su evidencia. La promoción
 documental no autoriza ejecutarlo de nuevo ni lo convierte en la dirección final.
 
-El hito `ohmdal-hd2d-preprod-v1` agotó su `executionAuthorized: true` para H1+H2 exclusivamente:
-fichas educativas V2, blockout Portal–Manantial, cámaras A/B, sprites 4/8 y Ohm sprite/procedural.
-Todos los ejecutores partieron de `12d6f88d2a366da89ed91008013f42ba6295e42d`, usaron worktrees y
-ownership exclusivos. Meshy y generación paga tuvieron presupuesto cero. El veredicto final fue
-`avanzar`, condicionado a medir Android físico dentro del próximo hito autorizado.
+La preproducción H1+H2 produjo: fichas educativas V2, blockout Portal–Manantial, comparación A/B de
+cámaras, sprites de 4 y 8 direcciones, y Ohm en versión sprite y procedural. Meshy y generación paga
+tuvieron presupuesto cero. El veredicto fue **avanzar**, condicionado a medir Android físico —que
+sigue sin medirse.
 
-El control operativo siguiente vive en
-`docs/agent-runs/ohmdal-arc1-serial-v1/` sobre la rama
-`codex/ohmdal-arc1-control-plane`. Resume 62 tickets con workflow `STRICT-SERIAL`, WIP 1 y
-transiciones exclusivas del Director. `ARC1-001` está en `HUMAN_REVIEW`; `ARC1-002` y todo H3
-siguen bloqueados con `executionAuthorized: false`. Los perfiles OpenCode son planificador
-read-only, builder acotado y reviewer no implementador; ningún modelo recibe el backlog completo
-como encargo autónomo.
+El plan de trabajo vigente es [`../../ROADMAP.md`](../../ROADMAP.md).
 
-El próximo hito a autorizar, sólo después del veredicto H1+H2, es el vertical slice
-**Portal–Plaza–Edda–Ohm–Lumen–Puerta–Manantial**
-de 25–35 minutos. Antes de producir requiere `docs/agent-runs/<hito>/tasks.json` con
-`executionAuthorized: true`, commit base, ownership y contratos. Su alcance máximo es:
+El slice objetivo sigue siendo **Portal–Plaza–Edda–Ohm–Lumen–Puerta–Manantial**, de 25–35 minutos,
+con este alcance máximo:
 
-1. laboratorio Three.js aislado bajo `RuntimeHost`, sin alterar `/jugar`;
+1. runtime Three.js bajo `RuntimeHost`, sin alterar `/jugar`;
 2. overworld mínimo sólo para demostrar entrada a la región;
 3. diorama modular denso, cámara casi ortográfica, personajes de cuatro direcciones y Ohm sprite;
 4. diagnóstico guiado auténtico de Lumen y transferencia en la Puerta;
-5. validación educativa automatizada, Playwright desktop/mobile, accesibilidad, navegadores
-   recientes, consola, métricas reales y Android medio de 2022 a 30 fps;
-6. máximo dos rondas, con veredicto avanzar, corregir una vez o descartar dirección.
+5. validación educativa automatizada, desktop y mobile, accesibilidad, consola limpia, métricas
+   reales y Android medio de 2022 a 30 fps;
+6. veredicto humano: avanzar, corregir una vez o descartar la dirección.
 
-El hito `instituto-hall-v1` continúa como borrador con `executionAuthorized: false`. «La escuela
-recuerda» queda postergado hasta el veredicto del slice de Ohmdal. No se autoriza Meshy, producción
-masiva de assets, migración del runtime ni servicios generativos pagos.
+Sigue sin autorizarse Meshy, producción masiva de assets ni servicios generativos pagos.
+
+**Hecho desde entonces:** el prototipo HD-2D pasó a `src/ohmdal/` y se sirve en `/ohmdal`, con
+cámara frontal y post-procesado (bloom, tilt-shift, grado de color). El canon visual del arco vive
+en [`../arco1/`](../arco1/). Lo que falta para el slice es arte: la escena son 474 triángulos y cero
+texturas.

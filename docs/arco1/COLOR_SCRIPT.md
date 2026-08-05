@@ -1,10 +1,9 @@
-# Color script del slice — congelado
+# Color script del slice
 
-**Estado:** CONGELADO en `ARC1-004`, 2026-08-02
-**Base:** `b49b617`
 **Alcance:** golden slice Portal → Plaza → Taller → Puerta → Manantial
-**Cambiarlo:** requiere decisión `CP-0NN` propia. Un ticket de escena **no** puede redefinir el color
-script para que su resultado pase.
+
+**Es una decisión tomada.** No se redefine para que un resultado pase: si una escena no cumple el
+color script, se corrige la escena. Cambiarlo es una decisión aparte, y consciente.
 
 ---
 
@@ -13,8 +12,8 @@ script para que su resultado pase.
 El harness ya implementa dos horas —`afternoon` y `twilight`— con valores concretos. Lo que faltaba
 no eran los números: era **la regla que esos números obedecen**.
 
-Sin esa regla escrita, `ARC1-024` —materiales, luz, DOF, agua y VFX— tendría que decidir el lenguaje
-de color dentro de un ticket de escena, y cualquier resultado sería defendible a posteriori. Doc. 15
+Sin esa regla escrita, quien produzca materiales, luz, DOF, agua y VFX decidiría el lenguaje de
+color sobre la marcha, y cualquier resultado sería defendible a posteriori. Doc. 15
 registra que en DQIII **la identidad precede al efecto**: el equipo conservó la paleta viva y los
 colores funcionales aun cuando cambió por completo la representación.
 
@@ -24,8 +23,8 @@ Este documento fija tres cosas y nada más:
 2. **dónde** ocurre a lo largo del recorrido;
 3. **qué no puede hacer** el color, el `emissive` y el grading.
 
-Lo que **no** fija: los valores destino del arte final. Esos son de `ARC1-024`, con `CP-011`
-todavía abierto. Ver §8.
+Lo que **no** fija: los valores destino del arte final. Esos se deciden produciendo el arte.
+Ver §8.
 
 ---
 
@@ -58,8 +57,8 @@ Fuente: `src/labs/ohmdal-hd2d-preprod/lighting/blockoutLighting.ts:35-96`.
 | `LIGHT_WORKSHOP_LANTERN` | point, sin sombra | `0xffbd76`, 2,10 | `0xffbd76`, 2,10 | **0,0 %** |
 | `LIGHT_DOOR_CONDUIT` | point, sin sombra | `0x63dce8`, 1,55 | `0x63dce8`, **2,35** | **+51,6 %** |
 
-HSL, luma relativa WCAG y todas las deltas: `evidence/ARC1-004/palette.json`. Calculadas, no
-estimadas.
+HSL, luma relativa WCAG y todas las deltas: [`palette-blockout.json`](palette-blockout.json).
+Calculadas, no estimadas.
 
 ---
 
@@ -121,7 +120,7 @@ es el que produce la sensación de hora.
 
 En cambio la madera figura girando a 330,0°, pero su saturación al crepúsculo es 0,047: a esa
 saturación el tono es numéricamente inestable y **no significa nada**. No se convierte en regla ni
-se replica. Se anota para que ningún ticket futuro lo lea como decisión de diseño.
+se replica. Se anota para que nadie lo lea después como decisión de diseño.
 
 ---
 
@@ -204,15 +203,14 @@ cian es una restricción *adicional*, no un permiso para depender del color.
 ## 8. Lo que este documento deliberadamente NO aprueba
 
 - **Los valores de arte final.** Los de §2 son de blockout, sin texturas ni materiales producidos.
-  `ARC1-024` los reemplaza; cuando lo haga, debe seguir cumpliendo §3, §4, §5 y §6, y volver a medir
-  contra `palette.json`.
-- **La equivalencia con la referencia** — `CP-011`, abierto, se re-evalúa en `ARC1-024` y
-  `ARC1-030`.
+  El arte los reemplaza; cuando lo haga, tiene que seguir cumpliendo §3, §4, §5 y §6, y volver a
+  medirse contra [`palette-blockout.json`](palette-blockout.json) con el mismo método.
+- **La equivalencia con la referencia de DQ III** — sin decidir, ver [`IDENTITY.md`](IDENTITY.md).
 - **Cualquier medición de contraste sobre arte producido.** Hoy no existe arte que medir. Las
   mediciones de §4 son sobre colores planos de blockout y se declaran como tales.
-- **La accesibilidad de color.** La línea base se establece en `ARC1-026`. Este documento aporta la
-  restricción, no la verificación.
-- **El audio del cambio de hora.** El cue sheet es de `ARC1-025`.
+- **La accesibilidad de color.** Este documento aporta la restricción, no la verificación: falta
+  establecer la línea base sobre arte real.
+- **El audio del cambio de hora.** Falta el cue sheet.
 
 ---
 
@@ -227,6 +225,6 @@ cian es una restricción *adicional*, no un permiso para depender del color.
 | anclajes R0…R9 y sus x | `levelData.ts:107-116` |
 | umbral C2→C3 en x = 9,5; histéresis 0,75 m; 1,10 s | `GOLDEN_FRAMES.md` §3 |
 | horas por frame | `GOLDEN_FRAMES.md` §2 y §4 |
-| HSL, luma y deltas | `evidence/ARC1-004/palette.json` |
+| HSL, luma y deltas | [`palette-blockout.json`](palette-blockout.json) |
 
 Ningún número de este documento fue estimado. El que no se pudo medir no está.

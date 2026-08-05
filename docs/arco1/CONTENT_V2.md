@@ -1,22 +1,21 @@
-# Contenido educativo V2 del slice — congelado
+# Contenido educativo V2 del slice
 
-**Estado:** CONGELADO en `ARC1-005`, 2026-08-02
-**Base:** `b49b617`
 **Alcance:** golden slice Portal → Plaza → Taller → Puerta → Manantial
-**Cambiarlo:** requiere decisión `CP-0NN` propia. Un ticket de escena **no** puede redefinir el
-contenido para que su resultado pase.
+
+**Es una decisión tomada.** El contenido no se redefine para que una interacción pase: si la
+interacción no lo respeta, se corrige la interacción.
 
 ---
 
 ## 1. Para qué existe
 
-`ACCEPTANCE_GATES.md` §Educación exige **ficha V2 antes de producir interacción final**. Esa
-condición gobierna `ARC1-018`, `ARC1-019`, `ARC1-021` y `ARC1-022`.
+**La ficha V2 va antes de producir la interacción final.** Primero se sabe qué se enseña y cómo
+se verifica; recién después se construye con qué se juega.
 
 Las fichas existen y están auditadas, pero viven en `src/**` —protegido— y en el run de
 preproducción. Ningún documento del control plane decía cuáles son canon, en qué escena se juega
 cada una, ni **qué beats quedan sin ficha y por qué eso es correcto**. Sin eso, el gate no se puede
-aplicar: cada ticket tendría que decidir por su cuenta si su contenido está validado.
+aplicar: cada quien decidiría por su cuenta si su contenido está validado.
 
 Este documento fija tres cosas y nada más:
 
@@ -41,7 +40,7 @@ documento lo **lee, ejecuta y mide**.
 
 | Acción | Estado |
 |---|---|
-| Verificar integridad de las seis fichas por ejecución | **hecho**, `evidence/ARC1-005/cards-audit.json` |
+| Verificar integridad de las seis fichas por ejecución | **hecho**, [`cards-audit.json`](cards-audit.json) |
 | Recalcular la red del slice desde el modelo ejecutable | **hecho** |
 | Demostrar el requisito de dos órdenes por búsqueda exhaustiva | **hecho** |
 | **Repetir la auditoría independiente V2 (H1.7)** | **no** — se hereda, ver §3.2 |
@@ -53,14 +52,14 @@ documento lo **lee, ejecuta y mide**.
 
 ### 3.1 Inventario
 
-| Ficha | Identificador | Modelo ejecutable | Escena | Beats | Ticket que la implementa |
-|---|---|---|---|---|---|
-| Seguridad | `H1.1-seguridad-virtual-v2` | estados protegidos de `diagnosisModel.ts` | E2, E3, E4 | 3, 5, 6 | `ARC1-018`, `ARC1-019` |
-| Circuito y continuidad | `H1.2-circuito-continuidad-v2` | `circuitModel.ts` | E2, E3 | 3, 5 | `ARC1-018` |
-| Instrumento | `H1.3-instrumento-ohm-v2` | `instrumentModel.ts` | E3, E4 | 5, 6 | `ARC1-019` |
-| Diagnóstico de Lumen | `H1.4-diagnostico-lumen-v2` | `diagnosisModel.ts` | E3 | 5 | `ARC1-018`, `ARC1-019` |
-| Transferencia en la Puerta | `H1.5-puerta-transferencia-v2` | `PUERTA_NODE_LABELS` sobre el mismo solver | E4 | 6 | `ARC1-021` |
-| Bitácora | `H1.6-bitacora-evidencia-v2` | `bitacoraModel.ts` | E3, E5 | 5, 7 | `ARC1-022` |
+| Ficha | Identificador | Modelo ejecutable | Escena | Beats |
+|---|---|---|---|---|
+| Seguridad | `H1.1-seguridad-virtual-v2` | estados protegidos de `diagnosisModel.ts` | E2, E3, E4 | 3, 5, 6 |
+| Circuito y continuidad | `H1.2-circuito-continuidad-v2` | `circuitModel.ts` | E2, E3 | 3, 5 |
+| Instrumento | `H1.3-instrumento-ohm-v2` | `instrumentModel.ts` | E3, E4 | 5, 6 |
+| Diagnóstico de Lumen | `H1.4-diagnostico-lumen-v2` | `diagnosisModel.ts` | E3 | 5 |
+| Transferencia en la Puerta | `H1.5-puerta-transferencia-v2` | `PUERTA_NODE_LABELS` sobre el mismo solver | E4 | 6 |
+| Bitácora | `H1.6-bitacora-evidencia-v2` | `bitacoraModel.ts` | E3, E5 | 5, 7 |
 
 Ninguna ficha queda huérfana: las seis están asignadas a al menos una escena
 (`cards-audit.json`, `orphanCards: []`).
@@ -84,10 +83,10 @@ Medida por ejecución sobre `b49b617`, no leída de un comentario:
 **La auditoría independiente se hereda, no se repite.** El segundo pase que exige doc. 02 §V2
 —«un segundo pase de agente reproduce cálculos y tests»— lo ejecutó el run de preproducción: dos
 rondas correctivas y veredicto PASS el 2026-08-02
-(`docs/agent-runs/ohmdal-hd2d-preprod-v1/content/education/README.md:59-64`). `ARC1-005` **no**
-repitió esa auditoría; verificó que los artefactos que declara existen, están completos y coinciden
-con sus modelos ejecutables. Es una distinción que importa: si mañana alguien discute la validez
-de V2, el registro que hay que revisar es el del run de preproducción, no éste.
+durante la preproducción. Este documento **no** repitió esa auditoría: verificó que los artefactos
+que declara existen, están completos y coinciden con sus modelos ejecutables. Es una distinción que
+importa — si mañana se discute la validez de V2, lo que hay que reproducir es el cálculo contra los
+modelos, no releer este archivo.
 
 ---
 
@@ -169,11 +168,11 @@ inspect → record_hypothesis → configure_measurement → energize_locked → 
 
 **La diferencia de una acción no es un desbalance: es el precio de la seguridad, y está medido.**
 Medir tensión obliga a energizar; intervenir obliga a volver a aislar; verificar obliga a energizar
-otra vez. `H1.1` cobra ese ciclo. Ningún ticket puede «emparejar» las dos rutas eliminando el
+otra vez. `H1.1` cobra ese ciclo. No se pueden «emparejar» las dos rutas eliminando el
 aislamiento intermedio.
 
-Consecuencia para `ARC1-019`, que integra órdenes válidos y error recuperable: **la UI no puede
-premiar la ruta corta**. Ambas son correctas; la de continuidad es más barata en acciones, no mejor.
+Consecuencia para quien implemente órdenes válidos y error recuperable: **la UI no puede premiar
+la ruta corta**. Ambas son correctas; la de continuidad es más barata en acciones, no mejor.
 
 ---
 
@@ -183,7 +182,7 @@ premiar la ruta corta**. Ambas son correctas; la de continuidad es más barata e
 |---|---|---|---|
 | 1 · Llegada | E1 | **ninguna** | doc. 10 Beat 1 lo prohíbe explícitamente: «no hay exposición del currículo» |
 | 2 · Edda pregunta | E1 | **ninguna** | Edda contrasta dos relatos y se va; no hay interacción evaluable |
-| 3 · Activación de Ohm | E2 | `H1.1`, `H1.2` | microinteracción de circuito completo; ver `OI-003` |
+| 3 · Activación de Ohm | E2 | `H1.1`, `H1.2` | microinteracción de circuito completo — **sin especificar**, ver §9 |
 | 4 · Lumen y el ritual | E3 | `H1.4` | presenta el procedimiento heredado que el puzzle contrasta |
 | 5 · Puzzle de Lumen | E3 | `H1.1`–`H1.4`, `H1.6` | la doctrina completa de doc. 02 corre acá por primera vez |
 | 6 · Puerta de Ohm | E4 | `H1.1`, `H1.3`, `H1.5` | transferencia sobre el mismo solver |
@@ -193,8 +192,8 @@ premiar la ruta corta**. Ambas son correctas; la de continuidad es más barata e
 
 > **Ningún beat sin ficha puede recibir una interacción evaluable.**
 
-Si `ARC1-015` decide que Edda pida algo que el jugador pueda hacer bien o mal, ese beat pasa a
-necesitar ficha V2 **antes** de implementarse (`ACCEPTANCE_GATES.md` §Educación). No es una
+Si en algún momento Edda pide algo que el jugador pueda hacer bien o mal, ese beat pasa a
+necesitar ficha V2 **antes** de implementarse. No es una
 formalidad: es la diferencia entre una conversación y un cuestionario disfrazado, que doc. 02
 §Doctrina descarta como núcleo.
 
@@ -202,11 +201,11 @@ formalidad: es la diferencia entre una conversación y un cuestionario disfrazad
 
 ## 7. Lo que este documento obliga hacia adelante
 
-1. **`ARC1-018`, `ARC1-019`, `ARC1-021` y `ARC1-022` implementan estas fichas; no las reinterpretan.**
-   Una discrepancia entre implementación y ficha es P1 del ticket, no una corrección de la ficha.
-2. **Los valores de §4 son contractuales.** Un ticket que necesite otros números abre `CP-0NN`.
-3. **Nada del slice pasa a V3 antes de `ARC1-030`.** V3 exige playtest mixto 13–18 con y sin
-   electrónica; V4 exige auditoría curricular final, `ARC1-059`.
+1. **Quien implemente estas fichas no las reinterpreta.** Una discrepancia entre implementación y
+   ficha se arregla en la implementación, no bajando la ficha.
+2. **Los valores de §4 son contractuales.** Necesitar otros números es una decisión aparte.
+3. **Nada del slice pasa a V3 sin playtest.** V3 exige playtest mixto 13–18 con y sin electrónica;
+   V4 exige auditoría curricular final.
 4. **El vocabulario formal sigue gateado.** `serie`, `paralelo`, `nodo` y `Kirchhoff` sólo aparecen
    en la capa de traducción formal de la Bitácora, nunca en la vivencia.
 5. **Ninguna ficha se cita de memoria.** Toda afirmación sobre contenido educativo se resuelve
@@ -216,22 +215,34 @@ formalidad: es la diferencia entre una conversación y un cuestionario disfrazad
 
 ## 8. Lo que este documento deliberadamente NO aprueba
 
-- **La calidad pedagógica real.** Se mide con usuarios, en `ARC1-030`. V2 significa auditado, no
-  probado con estudiantes.
+- **La calidad pedagógica real.** Se mide con usuarios. V2 significa auditado, no probado con
+  estudiantes.
 - **La correspondencia escolar.** Doc. 02 §«Correspondencia escolar» es explícito: se expresa como
   `compatible con`, nunca como `equivale a`. Ninguna ficha acredita horas ni habilitación.
 - **La accesibilidad del contenido.** Las fichas la declaran campo por campo; verificarla es
-  `ARC1-026`.
+  trabajo aparte y sigue pendiente.
 - **La transferencia a práctica física.** Todo el paquete es virtual, aislado y ficticio. Ninguna
   lectura autoriza trabajo sobre equipos reales.
 - **El contenido de las otras regiones.** Cuenca, Castillo, Forja-Terrazas y Faro-Lago tienen sus
-  propios tickets de contenido; este documento no los alcanza.
+  propios documentos de contenido; éste no los alcanza.
 - **El guion.** Las líneas de Edda, Lumen y Ohm no están escritas; las entradas de Bitácora de las
   fichas son contrato de estructura, no diálogo final.
 
 ---
 
-## 9. Trazabilidad
+## 9. Pendiente
+
+- **La microinteracción del beat 3 (Activación de Ohm) no está especificada.** Es el momento en
+  que el circuito se completa y Ohm despierta: el corazón emocional del slice. Las fichas `H1.1` y
+  `H1.2` dicen qué se enseña ahí, pero nadie escribió **qué hace el jugador con las manos** para
+  que ocurra. [`SCENE_INVENTORY.md`](SCENE_INVENTORY.md) señala el mismo hueco desde su lado: esa
+  escena no tiene anclaje de ruta, ni golden frame, ni sujeto protegido.
+- **La verificación de accesibilidad del contenido.** Las fichas la declaran campo por campo; falta
+  comprobarla.
+
+---
+
+## 10. Trazabilidad
 
 | Dato | Origen |
 |---|---|
@@ -240,12 +251,11 @@ formalidad: es la diferencia entre una conversación y un cuestionario disfrazad
 | las seis fichas | `education/cards.ts` |
 | auditoría independiente PASS, dos rondas | `ohmdal-hd2d-preprod-v1/content/education/README.md:59-64` |
 | `Vs`, `R1`, `R2` | `circuitModel.ts:4-6` |
-| `Req`, `I`, nodos, potencias, caída y resistencias pasivas | `evidence/ARC1-005/cards-audit.json` |
+| `Req`, `I`, nodos, potencias, caída y resistencias pasivas | [`cards-audit.json`](cards-audit.json) |
 | identidad del solver Lumen/Puerta | `cards-audit.json`, `puertaSolverIdenticalToLumen` |
 | rangos, umbral de 300 Ω y cuantización | `instrumentModel.ts:25-31`, `:78` |
 | 88.044 órdenes válidos, mínimos 9 y 10 | `cards-audit.json`, `validOrders` |
 | requisito de dos órdenes | doc. 10 línea 100 |
-| ficha V2 antes de interacción final | `ACCEPTANCE_GATES.md` §Educación |
 | escenas y beats | `SCENE_INVENTORY.md` §2 |
 
 Ningún número de este documento fue estimado ni copiado de una ficha: todos salen de ejecutar el

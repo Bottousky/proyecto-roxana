@@ -1,16 +1,15 @@
 # Shot deck del slice — congelado
 
-**Estado:** CONGELADO en `ARC1-004`, 2026-08-02
-**Base:** `b49b617`
 **Alcance:** golden slice Portal → Plaza → Taller → Puerta → Manantial
-**Cambiarlo:** requiere decisión `CP-0NN` propia.
+
+**Es una decisión tomada.** Las safe areas no se reescriben para que un encuadre pase.
 
 Es la «hoja de encuadres con safe areas desktop/mobile» que doc. 15 §«Golden slice antes de
 campaña» exige antes de producir arte.
 
 ---
 
-## 1. Frontera con el canon de `ARC1-003` — leer primero
+## 1. Frontera con los golden frames — leer primero
 
 Es la línea que más fácil se cruza sin querer:
 
@@ -74,8 +73,8 @@ reemplazo.
 
 ## 3. Conformidad medida — 2026-08-02
 
-Medición real por DOM (`getBoundingClientRect()`) sobre `/labs/ohmdal-hd2d-preprod/`. Datos completos
-en `evidence/ARC1-004/hud-rects.json`. Consola: 0 errores, 0 warnings.
+Medición real por DOM (`getBoundingClientRect()`) sobre `/ohmdal`. Datos completos en
+[`hud-rects.json`](hud-rects.json). Consola: 0 errores, 0 warnings.
 
 | Viewport | Franja libre real | Contrato | Veredicto |
 |---|---:|---:|---|
@@ -90,17 +89,16 @@ en `evidence/ARC1-004/hud-rects.json`. Consola: 0 errores, 0 warnings.
 | 2 | `diagnosis` invade la zona crítica por abajo | 42 px de alto × 350 px de ancho |
 | 3 | el D-pad (`touch`) se solapa con el panel de estado (`hud`) | 40 × 66 px |
 
-Los tres son exactamente lo que `CP-012` describía en prosa: «el panel superior recorta *Recorrido
+Los tres son exactamente lo que ya se sabía en prosa: «el panel superior recorta *Recorrido
 automático*, la franja jugable queda comprimida y el D-pad pisa el estado». **Ahora tienen número.**
 
-**Destino: `ARC1-026`.** No se corrigen acá — `ARC1-004` es un ticket de canon y tocar el HUD estaría
-fuera de su ownership. `ARC1-026` cierra cuando mobile pasa contra la tabla de §2, medido con el
-mismo método.
+**Deuda abierta.** No se corrigen en este documento, que fija el contrato y no toca el HUD. Se
+cierra cuando mobile pase contra la tabla de §2, medido con el mismo método.
 
 ### Qué mide y qué no
 
-Se midió el HUD del **harness de preproducción**, no el HUD final del slice. Sirve para cuantificar
-`CP-012` y para demostrar que el contrato es alcanzable en desktop; **no** aprueba el layout mobile
+Se midió el HUD **de preproducción**, no el HUD final del slice. Sirve para poner número a la deuda
+de mobile y para demostrar que el contrato es alcanzable en desktop; **no** aprueba el layout mobile
 ni lo condena más allá de estos números.
 
 ---
@@ -172,8 +170,8 @@ verifica jugando.
 | Tres planos | **fg** banco de trabajo · **jugable** estudiante y Lumen · **landmark** silueta del Taller |
 
 **Encuadre:** los tres sujetos y Ohm con sombra de contacto entran en **6,30 m** verticales en
-desktop y **8,71 m** en mobile. Es el presupuesto espacial más ajustado del slice y la razón por la
-que la zona crítica se congela acá y no en `ARC1-024`.
+desktop y **8,71 m** en mobile. Es el presupuesto espacial más ajustado del slice, y por eso la zona
+crítica se decide acá y no más tarde, cuando ya haya arte que defender.
 
 **No debe pasar:** que la UI táctil cubra pies, conectores o puntos de medición. Hoy en mobile el
 panel `diagnosis` invade 42 px de la zona crítica por abajo — §3, defecto 2.
@@ -273,12 +271,11 @@ Manantial impecable es fallo de identidad, no un logro.
 ## 6. Lo que este documento deliberadamente NO aprueba
 
 - **Ninguna toma está capturada.** `GOLDEN_FRAMES.md` §7 sigue vigente: sólo GF-01 tiene capturas y
-  son de blockout (`8784206`). Este documento **especifica** encuadres; no los aprueba. Ningún
-  ticket puede inferir el resultado visual de una toma que no capturó.
-- **El layout mobile.** Se mide y se declara `FAIL`; corregirlo es de `ARC1-026`.
-- **El ritmo entre tomas.** Tiempo entre focos, densidad causal y fatiga se miden jugando, en
-  `ARC1-030`.
-- **La equivalencia con la referencia** — `CP-011`, abierto.
+  son de blockout (`8784206`). Este documento **especifica** encuadres; no los aprueba. Nunca
+  inferir el resultado visual de una toma que no se miró.
+- **El layout mobile.** Se mide y se declara `FAIL` en §3; corregirlo es trabajo aparte.
+- **El ritmo entre tomas.** Tiempo entre focos, densidad causal y fatiga se miden jugando.
+- **La equivalencia con la referencia de DQ III** — sin decidir, ver [`IDENTITY.md`](IDENTITY.md).
 - **El HUD final del slice.** Lo medido es el HUD del harness de preproducción.
 
 ---
@@ -295,6 +292,6 @@ Manantial impecable es fallo de identidad, no un logro.
 | sujetos protegidos de oclusión | `GOLDEN_FRAMES.md` GF-05 |
 | view offset lateral 0,24 | `GOLDEN_FRAMES.md` GF-06 |
 | horas y estados de mecanismo | `COLOR_SCRIPT.md` §5 |
-| rects del HUD, zona crítica y veredictos | `evidence/ARC1-004/hud-rects.json` |
+| rects del HUD, zona crítica y veredictos | [`hud-rects.json`](hud-rects.json) |
 
 Ningún número de este documento fue estimado. El que no se pudo medir está declarado en §6.

@@ -4,7 +4,7 @@
 
 ## Orden obligatorio
 
-1. función jugable/narrativa y ticket activo;
+1. función jugable o narrativa que el asset tiene que cumplir;
 2. referencia, origen, derechos y exclusiones de IP;
 3. escala, cámara, footprint, pivote, frente, collider y sockets;
 4. blockout y silueta;

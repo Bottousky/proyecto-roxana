@@ -62,7 +62,7 @@ separado y pasaron.
 
 - Agentes: `AGENTS.md`, diez skills fijadas y licencias/atribuciones.
 - Orquestación: cuatro perfiles en `.codex/agents/`, límite activo de tres subagentes y contratos
-  reutilizables en `docs/agent-runs/`.
+  reutilizables.
 - MCP/secretos: `.codex/config.toml.example`, `.env.example` e ignores.
 - Contratos: schema draft 2020-12, ejemplo, fixtures y estructura source/reference/runtime.
 - Pipeline: validación de manifiestos/GLB, índice, dry-run de optimización y budget reporter.
@@ -106,7 +106,7 @@ El 2026-07-28 se incorporó la Fase 1 de orquestación sin dependencias nuevas:
 - ownership exclusivo, ramas `codex/<hito>-<rol>`, worktrees separados, tareas de 30–90 minutos
   y máximo dos rondas automáticas quedaron como reglas durables;
 - `instituto-hall-v1` se inicializó en estado contractual con
-  `executionAuthorized: false`, `baseCommit: null` y cero agentes lanzados.
+  sin autorización de ejecución y cero agentes lanzados.
 
 Los scripts de Fase 2 y Agents SDK de Fase 3 permanecen deliberadamente diferidos hasta observar
 repetición real. Cambios en configuración, perfiles e instrucciones se descubren al abrir una

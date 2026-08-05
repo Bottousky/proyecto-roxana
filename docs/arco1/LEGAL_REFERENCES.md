@@ -1,8 +1,7 @@
 # Referencias y límites legales — Arco I
 
-**Estado:** CONGELADA en `ARC1-003`, 2026-08-02
-**Gate asociado:** «Identidad propia / legal» exige **5/5** en la quality bar. Es el único criterio
-que no admite 4.
+**Es el único criterio del proyecto que no admite un aprobado raspando.** Identidad propia y
+límites legales se cumplen enteros o no se cumplen.
 
 ---
 
@@ -70,7 +69,7 @@ Todo asset que entre al Arco I registra en su manifest:
 6. presupuesto y coste real.
 
 Un asset sin procedencia completa **no se integra**, aunque se vea bien. Meshy y toda generación paga
-mantienen presupuesto **cero** (`CP-008`); habilitarlos exige decisión registrada.
+mantienen presupuesto **cero**; habilitarlos es una decisión de Manuel, no de quien produce el asset.
 
 ## 6. Símbolos técnicos
 
@@ -79,7 +78,7 @@ la norma** que siguen. Un símbolo técnico no es una decisión artística: se c
 
 ## 7. Verificación
 
-En cada ticket con assets, el review comprueba:
+Antes de integrar cualquier asset se comprueba:
 
 - [ ] ningún archivo de la referencia entró al repositorio o al build;
 - [ ] todo asset nuevo tiene procedencia completa en su manifest;
@@ -87,4 +86,4 @@ En cada ticket con assets, el review comprueba:
 - [ ] las capturas comparativas viven en documentación, con URL y fecha, no en `assets/`;
 - [ ] los símbolos técnicos citan su norma.
 
-Un fallo acá es **P0**: bloquea el ticket sin importar la calidad visual alcanzada.
+Un fallo acá bloquea la integración sin importar la calidad visual alcanzada.

@@ -1,10 +1,9 @@
-# Golden frames del slice — congelados
+# Golden frames del slice
 
-**Estado:** CONGELADOS en `ARC1-003`, 2026-08-02
-**Base:** `b49b617`
 **Alcance:** golden slice Portal → Plaza → Taller → Puerta → Manantial
-**Cambiarlos:** requiere decisión `CP-0NN` propia. Un ticket de escena **no** puede redefinir un
-golden frame para que su resultado pase.
+
+**Son decisiones tomadas.** Un frame no se redefine para que un resultado pase: si la escena no
+da el frame, se corrige la escena. Cambiar un golden frame es una decisión aparte, y consciente.
 
 ---
 
@@ -42,9 +41,9 @@ Heredado del contrato visual de preproducción y del harness actual.
 Reproducción: `window.render_game_to_text()` debe coincidir con el estado declarado antes de
 capturar. Una captura cuyo snapshot no coincide **no es evidencia**.
 
-## 3. Parámetros de cámara congelados
+## 3. Parámetros de cámara
 
-Medidos sobre `b49b617` y registrados en `evidence/ARC1-001/metrics.json`.
+Medidos sobre el blockout. Cuando haya arte producido hay que volver a medirlos.
 
 | Anclaje | Rango de ruta | Alto visible desktop | Alto visible mobile |
 |---|---|---:|---:|
@@ -70,8 +69,8 @@ dirección de avance sin cartel que la explique.
 
 **No debe verse:** reversos no producidos; el Taller compitiendo por atención.
 
-**Línea base actual:** `docs/agent-runs/ohmdal-hd2d-preprod-v1/evidence/camera-correction/desktop-1440x900.png`
-y `mobile-390x844.png`. Es blockout: sirve como referencia de encuadre y escala, **no** de acabado.
+**Línea base actual:** las capturas de la corrección de cámara en 1440×900 y 390×844, en el commit
+`8784206`. Son blockout: sirven como referencia de encuadre y escala, **no** de acabado.
 
 **Recorrido:** el jugador debe elegir dirección sin instrucción.
 
@@ -207,13 +206,13 @@ con promedio**.
 Hoy existen capturas reales **sólo** de GF-01, y son de blockout (commit `8784206`). GF-02 … GF-08
 están **especificados pero no capturados**.
 
-Además, en esta sesión el panel de navegador no compone frames, así que no se pudieron tomar capturas
-nuevas. Cada ticket de escena debe resolver su propia captura o declararla `not-run`. **Ningún ticket
-puede inferir el resultado visual de un frame que no capturó.**
+Quien construya una escena tiene que capturar su propio frame o decir que no lo capturó.
+**Nunca inferir el resultado visual de un frame que no se miró.**
 
 ## 8. Lo que estos frames deliberadamente NO aprueban
 
-- ritmo, fatiga y tiempo entre focos: se miden **jugando**, en `ARC1-030`;
-- rendimiento en Android físico: `not-run` hasta `ARC1-060` (`CP-014`);
-- si la cámara alcanza la barra de DQ3: `CP-011`, abierto, se re-evalúa en `ARC1-024` y `ARC1-030`;
-- el layout/HUD mobile: deuda `CP-012` hacia `ARC1-026`.
+- **ritmo, fatiga y tiempo entre focos** — se miden jugando, no mirando capturas;
+- **rendimiento en Android físico** — sin medir; ninguna afirmación de performance mobile vale
+  hasta probarlo en un teléfono real;
+- **si la cámara alcanza la barra de DQ III** — sin decidir, ver [`IDENTITY.md`](IDENTITY.md);
+- **el layout y el HUD en mobile** — deuda conocida, ver [`SHOT_DECK.md`](SHOT_DECK.md).

@@ -2,10 +2,10 @@
 
 **Estado:** H1+H2 completados condicionalmente; H3 bloqueado; Arco I usa Jira serie
 **Regla:** los ítems de producción permanecen bloqueados hasta crear un hito con
-`executionAuthorized: true`. El spike Phaser existente no se retargetea silenciosamente.
+una autorización explícita. El spike Phaser existente no se retargetea silenciosamente.
 
-El desglose ejecutable de La Luz está en `16_ARC1_JIRA_BACKLOG.md`: WIP global uno y dependencia
-dura entre `ARC1-001` y `ARC1-062`.
+El plan de trabajo vigente es [`../../ROADMAP.md`](../../ROADMAP.md).
+`16_ARC1_JIRA_BACKLOG.md` queda como enumeración histórica del trabajo que compone el arco.
 
 ## Estados
 
@@ -28,7 +28,7 @@ dura entre `ARC1-001` y `ARC1-062`.
 
 ## H1 — Fichas educativas del slice
 
-**Estado global:** `DONE` en `docs/agent-runs/ohmdal-hd2d-preprod-v1/`
+**Estado global:** `DONE`
 **Owner futuro:** Director educativo/agente auditor; sin assets.
 
 | ID | Entregable | Dependencia | Criterio de cierre |
@@ -46,7 +46,7 @@ desde este documento.
 
 ## H2 — Spike visual preparatorio
 
-**Estado global:** `DONE-CONDITIONAL` en `docs/agent-runs/ohmdal-hd2d-preprod-v1/`
+**Estado global:** `DONE` con condiciones
 **Objetivo:** reducir incertidumbre antes de construir el slice completo.
 
 | ID | Estado | Entregable | Gate |
@@ -64,7 +64,7 @@ o `descartar`.
 
 ## H3 — Vertical slice «La pregunta vuelve»
 
-**Estado global:** `BLOCKED-HUMAN`; falta `ARC1-001 DONE` y un contrato H3 autorizado.
+**Estado global:** en curso. Ver [`../../ROADMAP.md`](../../ROADMAP.md).
 
 ### Fronteras futuras
 

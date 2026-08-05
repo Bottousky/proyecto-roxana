@@ -103,7 +103,8 @@ presupuesto y hardware de Ohmdal.
 
 **Veredicto director:** la Biblia es suficientemente buena para preproducción del slice, pero no
 para producción autónoma del Arco I sin el backlog serie, la actualización de decisiones del spike
-y el cierre humano de cámara. No se debe autorizar H3 mientras `ARC1-001` no esté `DONE`.
+y el cierre humano de cámara. La corrección de cámara ya está hecha; el estado vigente está en
+[`../../ROADMAP.md`](../../ROADMAP.md).
 
 ## Agentes y modelos
 
