@@ -63,20 +63,31 @@ seguridad hasta que el HD-2D lo alcance.
 
 ## Hitos
 
-### H1 — Sacar el HD-2D del laboratorio
+### H1 — Sacar el HD-2D del laboratorio · ✅ hecho
 
-Que deje de ser una página suelta en `/labs/` y pase a ser un runtime del juego, montado por
-`RuntimeHost` como cualquier otro mundo. Ya existe el enganche (`hd2dRuntime.ts` y el runtime
-`hd2d-three` en `loaders.ts`): falta que sea alcanzable desde el Instituto.
+Dejó de ser una página suelta en `/labs/`: vive en `src/ohmdal/`, se sirve en `/ohmdal`, lo
+monta `RuntimeHost` como cualquier otro mundo, y se llega desde el aula de Electrónica por la
+puerta «Ver el Ohmdal nuevo · en obra». La cámara pasó a frontal y tiene el acabado
+fotográfico (bloom, tilt-shift, grado de color).
 
-**Resultado:** tocás el aula de Electrónica en el Instituto 3D y aparecés en Ohmdal HD-2D.
+Lo que dejó medido: **474 triángulos y cero texturas**. La brecha con las referencias de
+*DQ III HD-2D* es arte, no configuración. Eso es lo que ataca H2.
 
-### H2 — La Plaza de verdad, en HD-2D
+### H2 — La Plaza de verdad, en HD-2D · ← acá estamos
 
 Reemplazar el blockout de prueba por la Plaza real del Arco I con su contenido: Edda, Ohm,
 la campana, las lámparas. El contenido ya está escrito en `src/jugar/rooms.ts`.
 
+La ruta más corta es la que ya funcionó una vez: el Instituto 3D se ve bien porque es un GLB
+modelado en Blender con la iluminación horneada en vertex colors, no geometría generada por
+código. El pipeline entero ya existe — `scripts/blender/`, `npm run 3d:validate-glb`,
+`npm run 3d:report-budget` y el contrato en [`docs/arco1/ASSET_PIPELINE.md`](docs/arco1/ASSET_PIPELINE.md).
+
 **Resultado:** la primera sala del juego con el look que querés, con sus personajes y diálogos.
+
+**Y cuando esté:** `portalGateUrl()` en `src/shared/portalLink.ts` pasa a apuntar a `/ohmdal`
+y toda la plataforma cambia de mundo. Es el único interruptor de la migración: lo usan las
+tres vías de entrada. Si no convence, se vuelve atrás cambiando la misma línea.
 
 ### H3 — El primer puzzle en HD-2D
 
