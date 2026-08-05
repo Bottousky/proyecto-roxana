@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import {
+  C3_PITCH_DEGREES,
+  C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS,
+  C3_QUASI_ORTHOGRAPHIC_VIEW_OFFSET,
   CAMERA_ANCHORS,
+  CAMERA_PITCH_DEGREES,
   CAMERA_RIGHT,
   CAMERA_VIEW_OFFSET,
   SOFT_PERSPECTIVE_FOV_Y_DEGREES,
@@ -11,12 +15,12 @@ import {
   createCamera,
   followDeadZone,
   verticalSpan,
-} from '../src/labs/ohmdal-hd2d-preprod/camera/cameraConfig.ts';
+} from '../src/ohmdal/camera/cameraConfig.ts';
 import {
   AuthorCameraController,
   selectCameraAnchor,
-} from '../src/labs/ohmdal-hd2d-preprod/camera/cameraController.ts';
-import { CameraOcclusionController } from '../src/labs/ohmdal-hd2d-preprod/camera/occlusion.ts';
+} from '../src/ohmdal/camera/cameraController.ts';
+import { CameraOcclusionController } from '../src/ohmdal/camera/occlusion.ts';
 
 function assert(condition: boolean, message: string): void {
   if (!condition) throw new Error(message);
@@ -26,10 +30,30 @@ function close(actual: number, expected: number, tolerance: number, message: str
   assert(Math.abs(actual - expected) <= tolerance, `${message}: ${actual} != ${expected}`);
 }
 
-assert(VIEW_OFFSET_COMPONENTS.backward === -0.70, 'B03 usa backward -0.70 sin coma ambigua');
-assert(VIEW_OFFSET_COMPONENTS.right === 0.55, 'B03 usa right 0.55 sin coma ambigua');
-assert(VIEW_OFFSET_COMPONENTS.up === 0.78, 'B03 usa up 0.78 sin coma ambigua');
+/** Grados sobre el horizonte de un offset ya normalizado. */
+function pitchDegrees(offset: THREE.Vector3): number {
+  return (Math.asin(offset.y / offset.length()) * 180) / Math.PI;
+}
+
+// La camara es frontal, no isometrica: cualquier componente lateral la pone en diagonal y
+// pierde la simetria que define el encuadre HD-2D. Se asertan las propiedades, no los numeros:
+// la inclinacion se puede afinar sin reescribir el test, el giro lateral no se puede reintroducir.
+assert(VIEW_OFFSET_COMPONENTS.right === 0, 'la camara es frontal: sin componente lateral');
+assert(VIEW_OFFSET_COMPONENTS.backward < 0, 'la camara mira hacia adelante desde atras del foco');
+assert(VIEW_OFFSET_COMPONENTS.up > 0, 'la camara mira desde arriba');
+close(pitchDegrees(CAMERA_VIEW_OFFSET), CAMERA_PITCH_DEGREES, 0.0001, 'la inclinacion es la autoral');
+assert(
+  pitchDegrees(CAMERA_VIEW_OFFSET) >= 40 && pitchDegrees(CAMERA_VIEW_OFFSET) <= 60,
+  'la inclinacion se mantiene en el rango que muestra piso sin aplastar fachadas',
+);
 close(CAMERA_VIEW_OFFSET.length(), 1, 0.000001, 'el offset comun esta normalizado');
+close(
+  pitchDegrees(C3_QUASI_ORTHOGRAPHIC_VIEW_OFFSET),
+  C3_PITCH_DEGREES,
+  0.0001,
+  'C3 abre el angulo pero sigue siendo frontal',
+);
+assert(C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS.right === 0, 'C3 tampoco tiene giro lateral');
 close(CAMERA_ANCHORS.C1_PORTAL_PLAZA.focus.x, -15.1, 0.000001, 'C1 usa lerp 0.58');
 close(CAMERA_ANCHORS.C1_PORTAL_PLAZA.focus.y, 0.95, 0.000001, 'C1 usa altura 0.95');
 close(CAMERA_ANCHORS.C2_TALLER.focus.y, 1.10, 0.000001, 'C2 usa altura 1.10');

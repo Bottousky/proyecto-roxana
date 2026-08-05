@@ -3,12 +3,12 @@ import {
   createDiagnosisState,
   runDiagnosisOrder,
   type DiagnosisAction,
-} from '../src/labs/ohmdal-hd2d-preprod/education/diagnosisModel.ts';
+} from '../src/ohmdal/education/diagnosisModel.ts';
 import {
   allowedPedagogicalTelemetry,
   validateBitacoraEntry,
   type BitacoraEntry,
-} from '../src/labs/ohmdal-hd2d-preprod/education/bitacoraModel.ts';
+} from '../src/ohmdal/education/bitacoraModel.ts';
 
 function equal<T>(actual: T, expected: T, label: string): void {
   if (!Object.is(actual, expected)) {

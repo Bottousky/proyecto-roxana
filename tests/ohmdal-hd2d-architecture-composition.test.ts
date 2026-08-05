@@ -1,20 +1,21 @@
 import * as THREE from 'three';
-import { createOhmdalBlockout } from '../src/labs/ohmdal-hd2d-preprod/architecture/blockout.ts';
+import { createOhmdalBlockout } from '../src/ohmdal/architecture/blockout.ts';
 import {
   BOX_MODULES,
   routeAnchor,
-} from '../src/labs/ohmdal-hd2d-preprod/architecture/levelData.ts';
+} from '../src/ohmdal/architecture/levelData.ts';
 import {
   CAMERA_ANCHORS,
   CAMERA_RIGHT,
   CAMERA_VIEW_OFFSET,
   C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS,
-} from '../src/labs/ohmdal-hd2d-preprod/camera/cameraConfig.ts';
-import { AuthorCameraController } from '../src/labs/ohmdal-hd2d-preprod/camera/cameraController.ts';
+  VIEW_OFFSET_COMPONENTS,
+} from '../src/ohmdal/camera/cameraConfig.ts';
+import { AuthorCameraController } from '../src/ohmdal/camera/cameraController.ts';
 import {
   CameraOcclusionController,
   findBlockedOccluderIds,
-} from '../src/labs/ohmdal-hd2d-preprod/camera/occlusion.ts';
+} from '../src/ohmdal/camera/occlusion.ts';
 
 interface ScreenRect {
   minX: number;
@@ -77,7 +78,13 @@ blockout.root.updateMatrixWorld(true);
 assert(blockout.diagnostics().visualMeshCount === 19, 'la diferenciacion no aumenta modulos visibles');
 
 // C3 casi ortografica tiene un encuadre propio; perspectiva permanece congelada.
-assert(C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS.right === 0.24, 'C3 reduce de forma explicita el componente lateral');
+// Se diferencia por inclinacion, no por giro lateral: la camara HD-2D es frontal en los tres
+// anchors, y romper la simetria en uno solo se lee como error de montaje al cruzar el umbral.
+assert(C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS.right === 0, 'C3 tampoco tiene giro lateral');
+assert(
+  C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS.up < VIEW_OFFSET_COMPONENTS.up,
+  'C3 abre el angulo: mira menos desde arriba que los otros anchors',
+);
 const routeEnd = routeAnchor('R9_SPRING_EDGE').position;
 const routeEndTarget = new THREE.Vector3(routeEnd.x, 1, routeEnd.z);
 const quasi = new AuthorCameraController({

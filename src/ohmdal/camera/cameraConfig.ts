@@ -55,11 +55,22 @@ export const CAMERA_FORWARD = new THREE.Vector3(1, 0, 0);
 export const CAMERA_UP = new THREE.Vector3(0, 1, 0);
 export const CAMERA_RIGHT = new THREE.Vector3().crossVectors(CAMERA_FORWARD, CAMERA_UP).normalize();
 
-// B03 corregido: cada componente usa punto decimal y un nombre semantico.
+// La camara HD-2D es FRONTAL, no isometrica: `right` vale 0. Mires la sala del trono o el
+// overworld del remake de DQ III, siempre estas mirando de frente por el eje de la escena —
+// la alfombra se va derecho al fondo y las columnas quedan simetricas. El giro lateral de 0.55
+// que habia antes ponia la camara en diagonal (38 grados) y daba un aire de Diablo, no de HD-2D.
+//
+// La inclinacion sale de descomponer 50 grados sobre el horizonte: cos(50) hacia atras y
+// sin(50) hacia arriba. Es el rango en el que las referencias muestran el piso sin aplastar
+// las fachadas. El vector se normaliza despues, asi que estos numeros ya salen unitarios.
+export const CAMERA_PITCH_DEGREES = 50;
+
+const PITCH_RADIANS = (CAMERA_PITCH_DEGREES * Math.PI) / 180;
+
 export const VIEW_OFFSET_COMPONENTS = Object.freeze({
-  backward: -0.70,
-  right: 0.55,
-  up: 0.78,
+  backward: -Math.cos(PITCH_RADIANS),
+  right: 0,
+  up: Math.sin(PITCH_RADIANS),
 });
 
 export interface ViewOffsetComponents {
@@ -78,12 +89,17 @@ export function viewOffsetFromComponents(components: ViewOffsetComponents): THRE
 
 export const CAMERA_VIEW_OFFSET = viewOffsetFromComponents(VIEW_OFFSET_COMPONENTS);
 
-// C3 casi ortografica reduce el componente lateral que alineaba pilar sur y estudiante.
-// La perspectiva suave permanece congelada con CAMERA_VIEW_OFFSET.
+// C3 abre un poco el angulo para que la Puerta no tape el Manantial que hay detras. Sigue
+// siendo frontal —`right` en 0— porque romper la simetria en una sola camara se lee como un
+// error de montaje al cruzar el umbral, no como intencion.
+export const C3_PITCH_DEGREES = 46;
+
+const C3_PITCH_RADIANS = (C3_PITCH_DEGREES * Math.PI) / 180;
+
 export const C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS = Object.freeze({
-  backward: -0.70,
-  right: 0.24,
-  up: 0.78,
+  backward: -Math.cos(C3_PITCH_RADIANS),
+  right: 0,
+  up: Math.sin(C3_PITCH_RADIANS),
 });
 
 export const C3_QUASI_ORTHOGRAPHIC_VIEW_OFFSET = viewOffsetFromComponents(

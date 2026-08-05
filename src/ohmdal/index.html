@@ -1,56 +1,26 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <link rel="icon" href="data:," />
-  <title>Ohmdal — El Despertar de la Primera Chispa</title>
-</head>
-<body>
-  <div id="oj-app">
-    <div id="oj-game"></div>
-
-    <!-- HUD -->
-    <div id="oj-hud">
-      <div id="oj-objective"></div>
-      <button id="oj-journal-btn" title="Bitácora (B)">✒<span id="oj-journal-dot" class="hidden"></span></button>
-    </div>
-    <div id="oj-prompt" class="hidden"></div>
-
-    <!-- Diálogo -->
-    <div id="od-dialog" class="hidden">
-      <div id="od-portrait"><img id="od-portrait-img" alt="" /></div>
-      <div id="od-copy">
-        <div id="od-who"></div>
-        <div id="od-text"></div>
-      </div>
-      <div id="od-next">▼</div>
-    </div>
-
-    <div id="od-toast" class="hidden"></div>
-
-    <!-- Bitácora -->
-    <div id="oj-journal" class="hidden">
-      <div id="oj-journal-panel">
-        <header><h2>Bitácora de Mundos Aplicados</h2><button id="oj-journal-close">✕</button></header>
-        <div id="oj-journal-body"></div>
-      </div>
-    </div>
-
-    <!-- Título -->
-    <div id="oj-title">
-      <div class="oj-title-card">
-        <p class="oj-kicker">Proyecto Roxana</p>
-        <h1>OHMDAL</h1>
-        <p class="oj-sub">El Despertar de la Primera Chispa · Arco 1</p>
-        <div class="oj-buttons">
-          <button id="oj-continue">Continuar</button>
-          <button id="oj-new">Empezar de nuevo</button>
-        </div>
-        <p class="oj-help">Flechas / WASD para caminar · E para interactuar · B para la Bitácora</p>
-      </div>
-    </div>
-  </div>
-  <script type="module" src="./main.ts"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" href="data:," />
+    <title>Ohmdal — el mundo de la corriente</title>
+    <style>
+      /* Sólo el shell del documento. El chrome del mundo —panel, HUD, diagnóstico
+         y D-pad— y sus estilos los construye `ui.ts`, para que el mundo pueda
+         montarse en cualquier contenedor que le dé el shell. */
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        background: #11141c;
+        color: #f5f0dd;
+      }
+      * { box-sizing: border-box; }
+      html, body, #app { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <div id="app" aria-label="Mundo tridimensional de Ohmdal"></div>
+    <script type="module" src="/src/ohmdal/main.ts"></script>
+  </body>
 </html>

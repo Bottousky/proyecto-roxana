@@ -8,7 +8,7 @@ import {
   headingDegrees,
   updateDiagnosisUnlock,
   zoneForPosition,
-} from '../src/labs/ohmdal-hd2d-preprod/integration/harnessState.ts';
+} from '../src/ohmdal/integration/harnessState.ts';
 
 test('direction boundaries use the documented next-clockwise tie break', () => {
   assert.equal(directionIndex(45, 4), 1);

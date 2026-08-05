@@ -3,8 +3,8 @@ import {
   parseBindings,
   DEFAULT_BINDINGS,
   RESERVED_KEYS,
-} from '../src/labs/ohmdal-hd2d-preprod/inputModel.ts';
-import type { InputAction } from '../src/labs/ohmdal-hd2d-preprod/inputModel.ts';
+} from '../src/ohmdal/inputModel.ts';
+import type { InputAction } from '../src/ohmdal/inputModel.ts';
 
 function assert(condition: unknown, label: string): void {
   if (!condition) throw new Error(label);

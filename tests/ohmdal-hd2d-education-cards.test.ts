@@ -1,5 +1,5 @@
-import { EDUCATION_CARDS } from '../src/labs/ohmdal-hd2d-preprod/education/cards.ts';
-import { EDUCATION_CARD_FIELDS } from '../src/labs/ohmdal-hd2d-preprod/education/types.ts';
+import { EDUCATION_CARDS } from '../src/ohmdal/education/cards.ts';
+import { EDUCATION_CARD_FIELDS } from '../src/ohmdal/education/types.ts';
 
 function equal<T>(actual: T, expected: T, label: string): void {
   if (!Object.is(actual, expected)) {

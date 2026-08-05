@@ -3,12 +3,12 @@ import {
   passiveResistanceOhms,
   solveCircuit,
   solvePuertaTransfer,
-} from '../src/labs/ohmdal-hd2d-preprod/education/circuitModel.ts';
-import { runDiagnosisOrder } from '../src/labs/ohmdal-hd2d-preprod/education/diagnosisModel.ts';
+} from '../src/ohmdal/education/circuitModel.ts';
+import { runDiagnosisOrder } from '../src/ohmdal/education/diagnosisModel.ts';
 import {
   measureVirtual,
   measureVirtualWithDiagnosis,
-} from '../src/labs/ohmdal-hd2d-preprod/education/instrumentModel.ts';
+} from '../src/ohmdal/education/instrumentModel.ts';
 
 function equal<T>(actual: T, expected: T, label: string): void {
   if (!Object.is(actual, expected)) {

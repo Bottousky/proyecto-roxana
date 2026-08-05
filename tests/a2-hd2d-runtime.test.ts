@@ -1,8 +1,8 @@
-// A2 — El laboratorio HD-2D se monta por `RuntimeHost` sin desplazar al runtime cenital.
+// A2 — El mundo HD-2D se monta por `RuntimeHost` sin desplazar al runtime cenital.
 //
 // Corre en Node, sin DOM y sin WebGL: los runtimes son falsos y el host recibe un `hostEl`
 // vacío. Este archivo NO importa `three` ni `hd2dRuntime.ts` — importarlos traería el motor
-// al proceso de test y ocultaría justamente lo que hay que verificar, que el laboratorio se
+// al proceso de test y ocultaría justamente lo que hay que verificar, que el mundo se
 // carga sólo bajo demanda.
 import { readFileSync } from 'node:fs';
 import { createRuntimeHost } from '../src/app/runtimeHost.ts';
@@ -81,8 +81,8 @@ async function testOverrideMonta(): Promise<void> {
 
   await host.start({ experienceId: 'ohmdal', roomId: 'plaza', runtime: 'hd2d-three' });
 
-  assert(host.activeRuntime() === 'hd2d-three', 'el override monta el laboratorio');
-  assert(calls.includes('mount:hd2d-three'), 'se montó el runtime del laboratorio');
+  assert(host.activeRuntime() === 'hd2d-three', 'el override monta el mundo');
+  assert(calls.includes('mount:hd2d-three'), 'se montó el runtime del mundo');
   assert(!calls.includes('mount:topdown-phaser'), 'el runtime cenital no se montó');
 
   console.log('A2 hd2d runtime: override de ubicación OK');
@@ -97,7 +97,7 @@ async function testSinOverrideNoCambiaNada(): Promise<void> {
   await host.start({ experienceId: 'ohmdal', roomId: 'plaza' });
 
   assert(host.activeRuntime() === 'topdown-phaser', 'sin override gana el manifest de Ohmdal');
-  assert(!calls.includes('mount:hd2d-three'), 'el laboratorio no se monta por accidente');
+  assert(!calls.includes('mount:hd2d-three'), 'el mundo no se monta por accidente');
 
   console.log('A2 hd2d runtime: sin override el juego publicado no cambia OK');
 }
@@ -121,7 +121,7 @@ async function testCruceDeRuntime(): Promise<void> {
   assert(host.activeRuntime() === 'topdown-phaser', 'quedó activo el runtime destino');
 
   const snap = host.lastSnapshot('hd2d-three');
-  assert(snap !== undefined && snap.data.marker === 'hd2d-three', 'el snapshot del laboratorio quedó guardado');
+  assert(snap !== undefined && snap.data.marker === 'hd2d-three', 'el snapshot del mundo quedó guardado');
 
   console.log('A2 hd2d runtime: cruce snapshot → destroy → mount OK');
 }
@@ -138,18 +138,18 @@ async function testMismoRuntimeYCache(): Promise<void> {
   assert(!calls.includes('destroy:hd2d-three'), 'viajar dentro del mismo runtime no desmonta');
   assert(calls.includes('travelTo:hd2d-three:taller'), 'el viaje delegó en travelTo');
 
-  // Ida y vuelta: el loader del laboratorio no debe volver a llamarse.
+  // Ida y vuelta: el loader del mundo no debe volver a llamarse.
   await host.travel({ experienceId: 'ohmdal', roomId: 'plaza' });
   await host.travel({ experienceId: 'ohmdal', roomId: 'plaza', runtime: 'hd2d-three' });
 
-  assert(counts['hd2d-three'] === 1, 'el loader del laboratorio se llamó una sola vez');
+  assert(counts['hd2d-three'] === 1, 'el loader del mundo se llamó una sola vez');
   assert(counts['topdown-phaser'] === 1, 'el loader del runtime cenital se llamó una sola vez');
 
   console.log('A2 hd2d runtime: same-runtime y caché de loader OK');
 }
 
 // ---- Caso 5: `hd2dRuntime` entra sólo por import() dinámico ----
-function testLaboratorioFueraDelGrafoEstatico(): void {
+function testMundoFueraDelGrafoEstatico(): void {
   const loadersPath = new URL('../src/experiences/loaders.ts', import.meta.url);
   const source = readFileSync(loadersPath, 'utf8');
 
@@ -158,7 +158,7 @@ function testLaboratorioFueraDelGrafoEstatico(): void {
   const staticNames = staticImports.join('\n');
 
   assert(!staticNames.includes('hd2dRuntime'), 'hd2dRuntime no se importa estáticamente en loaders.ts');
-  assert(!staticNames.includes('lab.ts'), 'el laboratorio no se importa estáticamente en loaders.ts');
+  assert(!staticNames.includes('lab.ts'), 'el mundo no se importa estáticamente en loaders.ts');
   assert(!/^\s*import\s[^(]*['"]three['"]/m.test(source), 'loaders.ts no importa three');
   assert(
     /'hd2d-three':\s*\(\)\s*=>\s*import\(/.test(source),
@@ -167,10 +167,10 @@ function testLaboratorioFueraDelGrafoEstatico(): void {
 
   // Y el host tampoco debe conocer runtimes concretos.
   const hostSource = readFileSync(new URL('../src/app/runtimeHost.ts', import.meta.url), 'utf8');
-  assert(!hostSource.includes('hd2dRuntime'), 'runtimeHost.ts no nombra al laboratorio');
+  assert(!hostSource.includes('hd2dRuntime'), 'runtimeHost.ts no nombra al mundo');
   assert(!hostSource.includes("'three'"), 'runtimeHost.ts no importa three');
 
-  console.log('A2 hd2d runtime: el laboratorio queda fuera del grafo estático OK');
+  console.log('A2 hd2d runtime: el mundo queda fuera del grafo estático OK');
 }
 
 async function main(): Promise<void> {
@@ -178,7 +178,7 @@ async function main(): Promise<void> {
   await testSinOverrideNoCambiaNada();
   await testCruceDeRuntime();
   await testMismoRuntimeYCache();
-  testLaboratorioFueraDelGrafoEstatico();
+  testMundoFueraDelGrafoEstatico();
   console.log('A2 hd2d runtime tests: OK');
 }
 

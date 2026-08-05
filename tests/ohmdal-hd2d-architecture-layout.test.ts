@@ -7,14 +7,14 @@ import {
   LEVEL_ZONES,
   MANNEQUIN_HEIGHT_METERS,
   ROUTE_ANCHORS,
-} from '../src/labs/ohmdal-hd2d-preprod/architecture/levelData.ts';
+} from '../src/ohmdal/architecture/levelData.ts';
 import {
   FIXED_STEP_SECONDS,
   canonicalRouteHash,
   isOnGameplayPlane,
   moveOnGameplayPlane,
   validateNavigation,
-} from '../src/labs/ohmdal-hd2d-preprod/navigation/navigation.ts';
+} from '../src/ohmdal/navigation/navigation.ts';
 
 function assert(condition: boolean, message: string): void {
   if (!condition) throw new Error(message);

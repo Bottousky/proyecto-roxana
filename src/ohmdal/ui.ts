@@ -1,91 +1,91 @@
-// Chrome del laboratorio: panel superior, HUD, tarjeta de diagnóstico y D-pad táctil.
-// Vivía en `labs/ohmdal-hd2d-preprod/index.html`; se muda acá para que el laboratorio
+// Chrome del mundo: panel superior, HUD, tarjeta de diagnóstico y D-pad táctil.
+// Vivía en `labs/ohmdal-hd2d-preprod/index.html`; se muda acá para que el mundo
 // pueda montarse dentro de cualquier contenedor que le dé el shell, sin depender de
 // identificadores del documento anfitrión (ARC1-007).
 //
 // Los textos son los mismos, carácter por carácter, que los del HTML anterior.
 
-const STYLE_ID = 'ohmdal-lab-style';
+const STYLE_ID = 'ohmdal-ui-style';
 
-// Copiado del bloque <style> del harness. Lo único que cambia es el prefijo `.ohmdal-lab`:
-// las reglas de página —:root, html, body, #app— siguen siendo del documento, no del laboratorio.
+// Copiado del bloque <style> del harness. Lo único que cambia es el prefijo `.ohmdal-ui`:
+// las reglas de página —:root, html, body, #app— siguen siendo del documento, no del mundo.
 const LAB_CSS = `
-.ohmdal-lab {
+.ohmdal-ui {
   color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   color: #f5f0dd;
   width: 100%; height: 100%;
 }
-.ohmdal-lab * { box-sizing: border-box; }
-.ohmdal-lab button, .ohmdal-lab select { font: inherit; }
-.ohmdal-lab canvas { display: block; width: 100%; height: 100%; }
-.ohmdal-lab .topbar {
+.ohmdal-ui * { box-sizing: border-box; }
+.ohmdal-ui button, .ohmdal-ui select { font: inherit; }
+.ohmdal-ui canvas { display: block; width: 100%; height: 100%; }
+.ohmdal-ui .topbar {
   position: fixed; inset: max(10px, env(safe-area-inset-top)) 10px auto 10px;
   z-index: 4; display: flex; flex-wrap: wrap; gap: 7px; align-items: center;
   max-width: min(970px, calc(100vw - 20px)); padding: 9px 11px;
   border: 1px solid #9e815a88; border-radius: 10px;
   background: #171923e8; box-shadow: 0 10px 30px #0008;
 }
-.ohmdal-lab .topbar h1 { margin: 0 9px 0 0; font-size: 14px; letter-spacing: .06em; }
-.ohmdal-lab .topbar label { display: flex; align-items: center; gap: 5px; font-size: 12px; }
-.ohmdal-lab .topbar select, .ohmdal-lab .topbar button,
-.ohmdal-lab .diagnosis button, .ohmdal-lab .touch button {
+.ohmdal-ui .topbar h1 { margin: 0 9px 0 0; font-size: 14px; letter-spacing: .06em; }
+.ohmdal-ui .topbar label { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+.ohmdal-ui .topbar select, .ohmdal-ui .topbar button,
+.ohmdal-ui .diagnosis button, .ohmdal-ui .touch button {
   min-height: 34px; border: 1px solid #bd9b69; border-radius: 6px;
   background: #292b37; color: inherit; padding: 5px 9px;
 }
-.ohmdal-lab select:disabled, .ohmdal-lab button:disabled { opacity: .66; cursor: not-allowed; }
-.ohmdal-lab .topbar button:focus-visible, .ohmdal-lab .topbar select:focus-visible,
-.ohmdal-lab .diagnosis button:focus-visible, .ohmdal-lab .touch button:focus-visible {
+.ohmdal-ui select:disabled, .ohmdal-ui button:disabled { opacity: .66; cursor: not-allowed; }
+.ohmdal-ui .topbar button:focus-visible, .ohmdal-ui .topbar select:focus-visible,
+.ohmdal-ui .diagnosis button:focus-visible, .ohmdal-ui .touch button:focus-visible {
   outline: 3px solid #65d9e8; outline-offset: 2px;
 }
-.ohmdal-lab .hud {
+.ohmdal-ui .hud {
   position: fixed; z-index: 4; left: 12px; bottom: max(12px, env(safe-area-inset-bottom));
   width: min(390px, calc(100vw - 24px)); padding: 10px 12px;
   border-left: 4px solid #72d7df; border-radius: 5px;
   background: #151721e8; font-size: 13px; line-height: 1.4;
 }
-.ohmdal-lab .hud strong { color: #8ee8ee; }
-.ohmdal-lab .diagnosis {
+.ohmdal-ui .hud strong { color: #8ee8ee; }
+.ohmdal-ui .diagnosis {
   position: fixed; z-index: 4; right: 12px; bottom: max(12px, env(safe-area-inset-bottom));
   width: min(330px, calc(100vw - 24px)); padding: 10px 12px;
   border: 1px solid #bd9b69; border-radius: 8px; background: #151721e8;
   font-size: 12px; line-height: 1.4;
 }
-.ohmdal-lab .diagnosis h2 { margin: 0 0 5px; font-size: 14px; }
-.ohmdal-lab .diagnosis p { margin: 5px 0; }
-.ohmdal-lab .diagnosis .diagnosis-actions { display: flex; gap: 6px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
-.ohmdal-lab .keys {
+.ohmdal-ui .diagnosis h2 { margin: 0 0 5px; font-size: 14px; }
+.ohmdal-ui .diagnosis p { margin: 5px 0; }
+.ohmdal-ui .diagnosis .diagnosis-actions { display: flex; gap: 6px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.ohmdal-ui .keys {
   position: fixed; z-index: 6; left: 50%; top: 120px; transform: translateX(-50%);
   display: none; width: min(430px, calc(100vw - 24px)); padding: 10px 12px;
   border: 1px solid #bd9b69; border-radius: 8px; background: #151721f5;
   font-size: 12px; line-height: 1.4; color: #f5f0dd;
 }
-.ohmdal-lab .keys.open { display: block; }
-.ohmdal-lab .keys-header { display: flex; align-items: center; gap: 6px; }
-.ohmdal-lab .keys-header h2 { margin: 0 auto 0 0; font-size: 14px; }
-.ohmdal-lab .keys-rows { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; max-height: 40vh; overflow: auto; }
-.ohmdal-lab .keys-row { display: flex; align-items: center; gap: 6px; border: 1px solid #9e815a55; border-radius: 6px; padding: 5px 7px; }
-.ohmdal-lab .keys-row .keys-action { width: 80px; flex-shrink: 0; font-weight: 600; }
-.ohmdal-lab .keys-row .keys-chips { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; min-width: 0; }
-.ohmdal-lab .keys-chip { display: inline-flex; align-items: center; gap: 3px; border: 1px solid #9e815a88; border-radius: 4px; padding: 2px 5px; background: #292b37; }
-.ohmdal-lab .keys-chip button { min-height: 0; padding: 0 4px; border: 0; background: none; color: #e08a7b; cursor: pointer; }
-.ohmdal-lab .keys-status { margin: 4px 0 0; min-height: 1.4em; color: #8ee8ee; }
-.ohmdal-lab .touch { display: none; position: fixed; z-index: 5; right: 12px; bottom: 185px; grid-template: repeat(3, 42px) / repeat(3, 42px); gap: 4px; }
-.ohmdal-lab .touch button { padding: 0; touch-action: none; user-select: none; }
-.ohmdal-lab .touch [data-move="up"] { grid-area: 1 / 2; }
-.ohmdal-lab .touch [data-move="left"] { grid-area: 2 / 1; }
-.ohmdal-lab .touch [data-move="right"] { grid-area: 2 / 3; }
-.ohmdal-lab .touch [data-move="down"] { grid-area: 3 / 2; }
-.ohmdal-lab .touch [data-action="action"] { grid-area: 2 / 2; }
-.ohmdal-lab .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); }
+.ohmdal-ui .keys.open { display: block; }
+.ohmdal-ui .keys-header { display: flex; align-items: center; gap: 6px; }
+.ohmdal-ui .keys-header h2 { margin: 0 auto 0 0; font-size: 14px; }
+.ohmdal-ui .keys-rows { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; max-height: 40vh; overflow: auto; }
+.ohmdal-ui .keys-row { display: flex; align-items: center; gap: 6px; border: 1px solid #9e815a55; border-radius: 6px; padding: 5px 7px; }
+.ohmdal-ui .keys-row .keys-action { width: 80px; flex-shrink: 0; font-weight: 600; }
+.ohmdal-ui .keys-row .keys-chips { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; min-width: 0; }
+.ohmdal-ui .keys-chip { display: inline-flex; align-items: center; gap: 3px; border: 1px solid #9e815a88; border-radius: 4px; padding: 2px 5px; background: #292b37; }
+.ohmdal-ui .keys-chip button { min-height: 0; padding: 0 4px; border: 0; background: none; color: #e08a7b; cursor: pointer; }
+.ohmdal-ui .keys-status { margin: 4px 0 0; min-height: 1.4em; color: #8ee8ee; }
+.ohmdal-ui .touch { display: none; position: fixed; z-index: 5; right: 12px; bottom: 185px; grid-template: repeat(3, 42px) / repeat(3, 42px); gap: 4px; }
+.ohmdal-ui .touch button { padding: 0; touch-action: none; user-select: none; }
+.ohmdal-ui .touch [data-move="up"] { grid-area: 1 / 2; }
+.ohmdal-ui .touch [data-move="left"] { grid-area: 2 / 1; }
+.ohmdal-ui .touch [data-move="right"] { grid-area: 2 / 3; }
+.ohmdal-ui .touch [data-move="down"] { grid-area: 3 / 2; }
+.ohmdal-ui .touch [data-action="action"] { grid-area: 2 / 2; }
+.ohmdal-ui .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); }
 @media (max-width: 720px) {
-  .ohmdal-lab .topbar { max-height: 168px; overflow: auto; }
-  .ohmdal-lab .topbar h1 { width: 100%; }
-  .ohmdal-lab .hud { bottom: 8px; width: calc(100vw - 118px); font-size: 11px; }
-  .ohmdal-lab .diagnosis { right: 8px; bottom: 142px; width: calc(100vw - 16px); }
-  .ohmdal-lab .touch { display: grid; bottom: 8px; }
+  .ohmdal-ui .topbar { max-height: 168px; overflow: auto; }
+  .ohmdal-ui .topbar h1 { width: 100%; }
+  .ohmdal-ui .hud { bottom: 8px; width: calc(100vw - 118px); font-size: 11px; }
+  .ohmdal-ui .diagnosis { right: 8px; bottom: 142px; width: calc(100vw - 16px); }
+  .ohmdal-ui .touch { display: grid; bottom: 8px; }
 }
-@media (prefers-reduced-motion: reduce) { .ohmdal-lab * { scroll-behavior: auto !important; } }
+@media (prefers-reduced-motion: reduce) { .ohmdal-ui * { scroll-behavior: auto !important; } }
 `;
 
 // La hoja se comparte entre montajes simultáneos y se retira cuando se va el último:
@@ -107,8 +107,8 @@ function releaseStyle(): void {
   document.getElementById(STYLE_ID)?.remove();
 }
 
-export interface LabUi {
-  /** Raíz del laboratorio dentro del contenedor. El canvas se agrega acá. */
+export interface OhmdalUi {
+  /** Raíz del mundo dentro del contenedor. El canvas se agrega acá. */
   readonly root: HTMLDivElement;
   readonly timeToggle: HTMLButtonElement;
   readonly routeToggle: HTMLButtonElement;
@@ -157,15 +157,15 @@ function labelled(text: string, control: HTMLElement): HTMLLabelElement {
   return label;
 }
 
-export function createLabUi(container: HTMLElement): LabUi {
+export function createOhmdalUi(container: HTMLElement): OhmdalUi {
   acquireStyle();
 
   const root = document.createElement('div');
-  root.className = 'ohmdal-lab';
+  root.className = 'ohmdal-ui';
 
   const topbar = document.createElement('div');
   topbar.className = 'topbar';
-  topbar.setAttribute('aria-label', 'Comparativas del laboratorio');
+  topbar.setAttribute('aria-label', 'Comparativas del mundo');
   const heading = document.createElement('h1');
   heading.textContent = 'OHMDAL · H1+H2';
   const cameraSelect = lockedSelect('camera-variant', 'quasi-orthographic', 'Casi ortográfica · elegida');

@@ -38,10 +38,10 @@ export interface ExperienceLocation {
   /**
    * Qué gramática técnica debe servir esta ubicación. Ausente, gana la del manifest.
    *
-   * Existe porque durante el slice H3 una misma experiencia necesita dos runtimes a la vez:
-   * Ohmdal se juega en `topdown-phaser` y se prototipa en `hd2d-three`. El registro de
-   * experiencias modela los cinco lenguajes jugables, no los laboratorios, así que el
-   * laboratorio no gana una entrada propia: la pide quien abre el viaje (`CP-021`).
+   * Existe porque Ohmdal convive en dos runtimes durante la migración: `topdown-phaser`
+   * conserva el Arco I jugable mientras `hd2d-three` lo reconstruye con el look definitivo.
+   * El registro de experiencias modela los cinco lenguajes jugables, no cada renderer,
+   * así que la gramática la pide quien abre el viaje.
    *
    * Es aditivo: sin el campo, el comportamiento es idéntico al anterior.
    */

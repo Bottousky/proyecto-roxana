@@ -1,6 +1,6 @@
 // Modelo de entrada puro: sabe qué tecla hace qué acción, qué está apretado,
 // qué intención de movimiento resulta de eso, y si una reasignación de tecla
-// es legal — sin tocar el DOM ni el laboratorio. Nadie lo importa todavía:
+// es legal — sin tocar el DOM ni el mundo. Nadie lo importa todavía:
 // cablearlo (lab.ts, eventos de teclado/pointer reales) es el paquete ARC1-009-B.
 //
 // El mapeo de ejes reproduce EXACTO el de manualIntent() en lab.ts (~186-190):

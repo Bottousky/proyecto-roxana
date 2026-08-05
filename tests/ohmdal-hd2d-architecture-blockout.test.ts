@@ -3,8 +3,8 @@ import {
   createOhmdalBlockout,
   disposeRendererCaches,
   readRendererInfo,
-} from '../src/labs/ohmdal-hd2d-preprod/architecture/blockout.ts';
-import { CameraOcclusionController } from '../src/labs/ohmdal-hd2d-preprod/camera/occlusion.ts';
+} from '../src/ohmdal/architecture/blockout.ts';
+import { CameraOcclusionController } from '../src/ohmdal/camera/occlusion.ts';
 
 function assert(condition: boolean, message: string): void {
   if (!condition) throw new Error(message);

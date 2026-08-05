@@ -1,12 +1,9 @@
-// Laboratorio HD-2D de Ohmdal como fábrica montable.
+// Mundo HD-2D de Ohmdal como fábrica montable.
 //
-// Antes esto era el cuerpo de `main.ts`: se ejecutaba al importarse, leía identificadores
-// del HTML de su propia página y no se podía desmontar. `ARC1-007` lo convierte en una
-// función que construye todo dentro del contenedor que recibe y devuelve un handle con
-// ciclo de vida, que es lo que `RuntimeHost` necesita para montarlo bajo demanda.
-//
-// La simulación no cambió: mismos umbrales, misma aritmética, mismos textos.
+// Construye todo dentro del contenedor que recibe y devuelve un handle con ciclo de vida,
+// que es lo que `RuntimeHost` necesita para montarlo bajo demanda.
 import * as THREE from 'three';
+import { createOhmdalPostFx } from './postfx.ts';
 import {
   AuthorCameraController,
   CameraOcclusionController,
@@ -31,7 +28,7 @@ import {
   zoneForPosition,
 } from './integration/harnessState.ts';
 import { createOhmActor, createStudentActor } from './integration/spriteActors.ts';
-import { createLabUi } from './labUi.ts';
+import { createOhmdalUi } from './ui.ts';
 import {
   createInputModel,
   parseBindings,
@@ -40,12 +37,12 @@ import {
   type RebindResult,
 } from './inputModel.ts';
 
-export interface OhmdalLab {
+export interface OhmdalWorld {
   /** Detiene el bucle de animación. La simulación queda intacta. */
   pause(): void;
   /** Reanuda el bucle sin salto de `dt`. */
   resume(): void;
-  /** Estado determinista del laboratorio, igual que el del harness anterior. */
+  /** Estado determinista del mundo, igual que el del harness anterior. */
   snapshot(): HarnessSnapshot;
   /** Avanza la simulación en subpasos de 60 Hz y fuerza un render sincrónico. */
   advanceTime(milliseconds: number): void;
@@ -59,13 +56,29 @@ const ZONE_NAMES = {
   puerta_manantial: 'Puerta · Manantial',
 } as const;
 
-export function createOhmdalLab(container: HTMLElement): OhmdalLab {
-  const ui = createLabUi(container);
+export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
+  const ui = createOhmdalUi(container);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  const renderer = new THREE.WebGLRenderer({
+    // El antialias del contexto se apaga: con composer no hace nada, porque el mundo se dibuja
+    // a un render target y no al canvas. El antialiasing real lo pone SMAA al final del pipeline.
+    antialias: false,
+    powerPreference: 'high-performance',
+    // Sólo en desarrollo: sin esto `canvas.toDataURL()` devuelve negro y no se puede capturar
+    // el encuadre para compararlo contra las referencias.
+    preserveDrawingBuffer: import.meta.env.DEV,
+  });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  // ACES comprime los altos en vez de recortarlos: sin esto el bloom sobre las velas y el
+  // conducto de la Puerta se empasta en blanco puro y pierde el color de la llama.
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // Con composer, cada pasada resetea `renderer.info` por su cuenta y el presupuesto termina
+  // midiendo el quad de la ultima pasada: 1 llamada, 1 triangulo. Reseteando a mano al abrir
+  // el frame, los contadores acumulan escena mas post-procesado, que es el costo real.
+  renderer.info.autoReset = false;
   ui.root.append(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -427,13 +440,22 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
       : `Estado: ${diagnosis.state.power}. Próxima acción: ${next ?? 'completo'}. Evidencias: ${diagnosis.state.evidence.join(', ') || 'ninguna'}.`;
   }
 
+  // El acabado fotografico va por composer, no por `renderer.render`: bloom, tilt-shift y
+  // grado de color son la mitad del look HD-2D (ver `postfx.ts`).
+  const postfx = createOhmdalPostFx(renderer, scene, cameraController.camera, {
+    width: Math.max(1, window.innerWidth),
+    height: Math.max(1, window.innerHeight),
+    mobile: viewportProfile() === 'mobile-390x844',
+  });
+
   let previous = performance.now();
   let frameRequest = 0;
   function frame(now: number): void {
     const dt = Math.min((now - previous) / 1000, 0.1);
     previous = now;
     updateGame(dt);
-    renderer.render(scene, cameraController.camera);
+    renderer.info.reset();
+    postfx.render();
     updateHud(dt);
     frameRequest = requestAnimationFrame(frame);
   }
@@ -460,9 +482,13 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
     renderer.setSize(width, height, false);
     if (previousProfile !== nextProfile) {
       rebuildCamera();
+      // `rebuildCamera` construye un controlador nuevo: sin esto el composer seguiria
+      // renderizando la camara que acaba de morir.
+      postfx.setCamera(cameraController.camera);
     } else {
       cameraController.setViewportSize(width, height);
     }
+    postfx.setSize(width, height, nextProfile === 'mobile-390x844');
   }
   window.addEventListener('resize', resize);
   resize();
@@ -532,7 +558,8 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
       const steps = Math.max(1, Math.ceil(milliseconds / (1000 / 60)));
       const dt = milliseconds / 1000 / steps;
       for (let index = 0; index < steps; index += 1) updateGame(dt);
-      renderer.render(scene, cameraController.camera);
+      renderer.info.reset();
+      postfx.render();
       updateHud(1);
     },
     dispose(): void {
@@ -553,6 +580,7 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
       markerGeometry.dispose();
       markerMaterial.dispose();
       blockout.dispose();
+      postfx.dispose();
       renderer.renderLists.dispose();
       renderer.dispose();
       // Sin esto el contexto WebGL sobrevive al desmontaje y unos pocos ciclos
