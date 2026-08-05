@@ -45,6 +45,22 @@ const LAB_CSS = `
   background: #151721e8; font-size: 13px; line-height: 1.4;
 }
 .ohmdal-ui .hud strong { color: #8ee8ee; }
+/* El prompt de interacción es del juego, no del harness: va centrado abajo, sobre el mundo,
+   y desaparece cuando no hay nada al alcance. */
+.ohmdal-ui .prompt {
+  position: fixed; z-index: 5; left: 50%; transform: translateX(-50%);
+  bottom: max(84px, calc(env(safe-area-inset-bottom) + 84px));
+  padding: 7px 16px; border-radius: 999px;
+  border: 1px solid #bd9b6988; background: #151721ee;
+  font-size: 14px; letter-spacing: .01em; color: #f2e6cd;
+  pointer-events: none; opacity: 0; transition: opacity .14s ease;
+}
+.ohmdal-ui .prompt[data-visible='true'] { opacity: 1; }
+.ohmdal-ui .prompt kbd {
+  margin-left: 8px; padding: 1px 7px; border-radius: 4px;
+  border: 1px solid #7d7286; background: #26222e; font-size: 12px; color: #e8c98a;
+}
+@media (prefers-reduced-motion: reduce) { .ohmdal-ui .prompt { transition: none; } }
 .ohmdal-ui .diagnosis {
   position: fixed; z-index: 4; right: 12px; bottom: max(12px, env(safe-area-inset-bottom));
   width: min(330px, calc(100vw - 24px)); padding: 10px 12px;
@@ -126,6 +142,8 @@ export interface OhmdalUi {
   readonly keysRows: HTMLElement;
   readonly keysStatus: HTMLElement;
   readonly keysPanel: HTMLElement;
+  /** El prompt de interacción del mundo. `null` lo apaga. */
+  setPrompt(text: string | null, key?: string): void;
   isKeysOpen(): boolean;
   setKeysOpen(open: boolean): void;
   setKeysStatus(text: string): void;
@@ -202,6 +220,13 @@ export function createOhmdalUi(container: HTMLElement): OhmdalUi {
   metricsLabel.id = 'metrics-label';
   hud.append(zoneLabel, document.createElement('br'), statusLabel, document.createElement('br'), metricsLabel);
 
+  const promptLabel = document.createElement('div');
+  promptLabel.className = 'prompt';
+  promptLabel.id = 'interaction-prompt';
+  promptLabel.dataset.visible = 'false';
+  promptLabel.setAttribute('role', 'status');
+  promptLabel.setAttribute('aria-live', 'polite');
+
   const diagnosis = document.createElement('section');
   diagnosis.className = 'diagnosis';
   diagnosis.setAttribute('aria-labelledby', 'diagnosis-title');
@@ -272,7 +297,7 @@ export function createOhmdalUi(container: HTMLElement): OhmdalUi {
   controlsHelp.id = 'controls-help';
   controlsHelp.textContent = 'El recorrido también funciona con W A S D o teclas de dirección.';
 
-  root.append(topbar, hud, diagnosis, keysPanel, touch, controlsHelp);
+  root.append(topbar, hud, promptLabel, diagnosis, keysPanel, touch, controlsHelp);
   container.append(root);
 
   return {
@@ -293,6 +318,19 @@ export function createOhmdalUi(container: HTMLElement): OhmdalUi {
     keysRows,
     keysStatus,
     keysPanel,
+    setPrompt(text: string | null, key = 'Espacio'): void {
+      if (text === null) {
+        promptLabel.dataset.visible = 'false';
+        delete promptLabel.dataset.prompt;
+        return;
+      }
+      const signature = `${text} ${key}`;
+      if (promptLabel.dataset.prompt === signature) return;
+      promptLabel.dataset.prompt = signature;
+      promptLabel.textContent = text;
+      promptLabel.append(Object.assign(document.createElement('kbd'), { textContent: key }));
+      promptLabel.dataset.visible = 'true';
+    },
     isKeysOpen(): boolean {
       return keysPanel.classList.contains('open');
     },

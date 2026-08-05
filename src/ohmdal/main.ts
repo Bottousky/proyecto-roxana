@@ -4,6 +4,10 @@
 //
 // Las sondas de medición —`render_game_to_text` y `advanceTime`— las publica `hd2dRuntime`,
 // que es quien tiene el handle del mundo.
+// Los overlays del juego —diálogo, banco, Bitácora— son los mismos que en `/jugar` y usan su
+// misma hoja de estilos. La página la carga; el módulo que los construye no puede, porque
+// está en la cadena de importación de tests que corren en Node.
+import '../styles.css';
 import { createRuntimeHost } from '../app/runtimeHost.ts';
 import { runtimeLoaders } from '../experiences/loaders.ts';
 import type { ExperienceLocation } from '../experiences/types.ts';

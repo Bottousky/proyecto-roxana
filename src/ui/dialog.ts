@@ -87,7 +87,15 @@ export function say(lines: Line[] | Line, onEnd?: () => void): void {
   render();
 }
 
+let dialogInitialised = false;
+
+/**
+ * Registra los controles de avance. Idempotente: la llaman tanto el arranque de `/jugar`
+ * como el del mundo HD-2D, y registrarlos dos veces haría saltar dos líneas por tecla.
+ */
 export function initDialog(): void {
+  if (dialogInitialised) return;
+  dialogInitialised = true;
   el('dialog').addEventListener('click', () => {
     if (touchControlsEnabled()) advance();
   });

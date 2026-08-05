@@ -27,7 +27,12 @@ import {
   updateDiagnosisUnlock,
   zoneForPosition,
 } from './integration/harnessState.ts';
-import { createOhmActor, createStudentActor } from './integration/spriteActors.ts';
+import { createStudentActor } from './integration/spriteActors.ts';
+import { createU1Cast } from './content/u1Cast.ts';
+import { anchorById, thingOf, type BenchId, type U1Anchor } from './content/u1Anchors.ts';
+import { hooks } from '../state.ts';
+import { uiJustClosed, uiOpen } from '../ui/overlay.ts';
+import { initDialog } from '../ui/dialog.ts';
 import { createOhmdalUi } from './ui.ts';
 import {
   createInputModel,
@@ -57,6 +62,8 @@ const ZONE_NAMES = {
 } as const;
 
 export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
+  // Los diálogos del Arco I son los mismos que en `/jugar` y usan sus mismos controles.
+  initDialog();
   const ui = createOhmdalUi(container);
 
   const renderer = new THREE.WebGLRenderer({
@@ -87,9 +94,42 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   const occlusionController = new CameraOcclusionController(blockout.occlusionBindings);
   const student = createStudentActor();
   scene.add(student.root);
-  const ohm = createOhmActor();
-  ohm.root.position.set(0.7, 0, -1.45);
-  scene.add(ohm.root);
+
+  // El reparto de la Unidad 1. Los diálogos, la visibilidad por flags y las consecuencias
+  // salen de `src/jugar/rooms.ts`: acá sólo se dibujan y se resuelve a cuál se está mirando.
+  const cast = createU1Cast((bench, anchor) => openWorldBench(bench, anchor));
+  scene.add(cast.root);
+  const ohm = cast.ohm;
+  const PEDESTAL = anchorById('pedestal');
+
+  /**
+   * Los tres bancos de la Unidad 1 van a ocurrir en el mundo, no en un modal.
+   *
+   * Todavía no: el banco de Ohm es el hito siguiente y necesita antes su encuadre, que es la
+   * única escena del slice sin anclaje ni golden frame. Hasta entonces cae al banco de
+   * `/jugar`, que funciona, está jugado y tiene el texto escrito. Es andamio declarado, no
+   * la forma final.
+   */
+  function openWorldBench(bench: BenchId, anchor: U1Anchor): void {
+    // TODO(H3): banco diegético de Ohm — cable, dos bocas de cobre y lámpara de prueba.
+    void bench;
+    thingOf(anchor).onInteract();
+  }
+
+  /** El anclaje al alcance del jugador, o `null`. Lo recalcula cada cuadro. */
+  let activeAnchor: U1Anchor | null = null;
+
+  /** La primera tecla de acción, con nombre legible: el prompt tiene que decir la verdad. */
+  function actionKeyLabel(): string {
+    const [code] = inputModel.bindingsFor('action');
+    if (!code) return 'Acción';
+    return code === 'Space' ? 'Espacio' : code.replace(/^Key|^Digit/, '');
+  }
+
+  // Un cambio de flags cambia quién está en la Plaza y cómo se ve cada prop. `/jugar` avisa
+  // por este mismo hook; el mundo HD-2D se limita a registrarse.
+  const previousRefresh = hooks.refresh;
+  hooks.refresh = () => { cast.refresh(); };
 
   const lumenRoot = new THREE.Group();
   lumenRoot.name = 'lumen_spatial_presence';
@@ -300,7 +340,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       autoRoute = false;
       ui.routeToggle.textContent = 'Recorrido automático';
     } else if (action === 'action' && !wasDown) {
-      triggerSafeDiagnosis();
+      triggerAction();
     }
   };
   const onKeyUp = (event: KeyboardEvent): void => {
@@ -322,6 +362,8 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     moveButton.addEventListener('pointerup', end);
     moveButton.addEventListener('pointercancel', end);
   }
+  const actionTap = (): void => { triggerAction(); };
+  ui.actionButton.addEventListener('click', actionTap);
   const actionBegin = (event: PointerEvent): void => {
     event.preventDefault();
     ui.actionButton.setPointerCapture(event.pointerId);
@@ -353,7 +395,9 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   function updateGame(dtSeconds: number): void {
     const dt = Math.min(Math.max(dtSeconds, 0), 0.05);
     elapsedSeconds += dt;
-    const intent = autoRoute ? routeIntent() : inputModel.movementIntent();
+    // Mientras hay un overlay abierto —diálogo, banco, Bitácora— el mundo no se mueve.
+    // Es la misma regla que en `/jugar`, y el contador es el mismo.
+    const intent = uiOpen() ? { x: 0, z: 0 } : autoRoute ? routeIntent() : inputModel.movementIntent();
     moving = Math.hypot(intent.x, intent.z) > 0.001;
     if (moving) {
       currentHeading = headingDegrees(intent.x, intent.z);
@@ -362,6 +406,9 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     student.root.position.set(player.x, 0, player.z);
     student.update(currentHeading, moving, elapsedSeconds);
     diagnosisUnlocked = updateDiagnosisUnlock(diagnosisUnlocked, zoneForPosition(player));
+
+    activeAnchor = cast.update(player.x, player.z, elapsedSeconds);
+    ui.setPrompt(activeAnchor ? cast.promptFor(activeAnchor) : null, actionKeyLabel());
 
     const nextAnchor = selectCameraAnchor(currentAnchor, player.x);
     if (nextAnchor !== currentAnchor) {
@@ -374,10 +421,15 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       new THREE.Vector3(player.x, 0.08, player.z),
       new THREE.Vector3(player.x, 1.72, player.z),
     ];
-    if (currentAnchor === 'C2_TALLER') {
+    if (currentAnchor === 'C1_PORTAL_PLAZA') {
+      // Ohm dejó de ser geometría de prueba y pasó a ser un actor de la Plaza, así que la
+      // cámara tiene que protegerlo: es el sujeto del primer acto causal del slice.
       protectedSockets.push(
-        new THREE.Vector3(ohm.root.position.x, 0.12, ohm.root.position.z),
-        new THREE.Vector3(ohm.root.position.x, 1.05, ohm.root.position.z),
+        new THREE.Vector3(PEDESTAL.position.x, 0.12, PEDESTAL.position.z),
+        new THREE.Vector3(PEDESTAL.position.x, 1.9, PEDESTAL.position.z),
+      );
+    } else if (currentAnchor === 'C2_TALLER') {
+      protectedSockets.push(
         new THREE.Vector3(lumenRoot.position.x, 0.2, lumenRoot.position.z),
         new THREE.Vector3(lumenRoot.position.x, 1.2, lumenRoot.position.z),
         new THREE.Vector3(5, 0.55, 1),
@@ -531,6 +583,21 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     }
     updateHud(1);
   }
+  /**
+   * La tecla de acción es una sola y el mundo manda: si hay algo al alcance, se interactúa
+   * con eso. El paso de diagnóstico del harness queda como lo que siempre fue —una sonda de
+   * medición— y sólo corre cuando no hay nada delante.
+   */
+  function triggerAction(): void {
+    // El diálogo y los bancos avanzan con sus propios controles: el mundo no compite, ni
+    // mientras están abiertos ni en la pulsación que acaba de cerrarlos.
+    if (uiOpen() || uiJustClosed()) return;
+    if (activeAnchor) {
+      cast.interact(activeAnchor);
+      return;
+    }
+    triggerSafeDiagnosis();
+  }
   ui.diagnosisNext.addEventListener('click', () => { triggerSafeDiagnosis(); });
   ui.keysToggle.addEventListener('click', () => {
     if (ui.isKeysOpen()) {
@@ -570,7 +637,9 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       cameraController.dispose();
       occlusionController.dispose();
       student.dispose();
-      ohm.dispose();
+      // El mundo no es dueño del hook: lo tomó prestado y lo devuelve como estaba.
+      hooks.refresh = previousRefresh;
+      cast.dispose();
       lumenRoot.removeFromParent();
       lumenBaseGeometry.dispose();
       lumenOrbGeometry.dispose();
@@ -587,6 +656,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       // mount→destroy agotan el límite de contextos del navegador (ARC1-008).
       renderer.forceContextLoss();
       renderer.domElement.remove();
+      ui.actionButton.removeEventListener('click', actionTap);
       ui.dispose();
     },
   };
