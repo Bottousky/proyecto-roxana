@@ -7,7 +7,7 @@
 
 const STYLE_ID = 'ohmdal-ui-style';
 
-// Copiado del bloque <style> del harness. Lo único que cambia es el prefijo `.ohmdal-ui`:
+// Estilos del chrome de Ohmdal, con prefijo `.ohmdal-ui`:
 // las reglas de página —:root, html, body, #app— siguen siendo del documento, no del mundo.
 const LAB_CSS = `
 .ohmdal-ui {
@@ -167,7 +167,7 @@ export function createOhmdalUi(container: HTMLElement): OhmdalUi {
   topbar.className = 'topbar';
   topbar.setAttribute('aria-label', 'Comparativas del mundo');
   const heading = document.createElement('h1');
-  heading.textContent = 'OHMDAL · H1+H2';
+  heading.textContent = 'OHMDAL · en obra';
   const cameraSelect = lockedSelect('camera-variant', 'quasi-orthographic', 'Casi ortográfica · elegida');
   const directionSelect = lockedSelect('direction-variant', '4', '4 direcciones · elegida');
   const ohmSelect = lockedSelect('ohm-variant', 'sprite', 'Sprite · elegido');

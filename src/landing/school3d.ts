@@ -224,6 +224,19 @@ function clearOhmdalAction(action: HTMLAnchorElement): void {
   delete action.dataset.portal;
 }
 
+/**
+ * Muestra la puerta al Ohmdal HD-2D en construcción, sólo en el aula de Electrónica.
+ *
+ * Existe para que el mundo nuevo se pueda mirar crecer sin tener que escribir `/ohmdal` a
+ * mano, y sin tocar el botón de jugar: hoy el HD-2D es blockout sin contenido del Arco I, así
+ * que no puede ser la puerta principal. Cuando lo alcance, `portalGateUrl()` apunta ahí y
+ * esta puerta sobra.
+ */
+function setWipDoor(visible: boolean): void {
+  const door = document.querySelector<HTMLAnchorElement>('#school3d-action-wip');
+  if (door) door.hidden = !visible;
+}
+
 class School3DExperience {
   private readonly canvas: HTMLCanvasElement;
   private readonly scene = new THREE.Scene();
@@ -846,6 +859,7 @@ class School3DExperience {
     if (progressLabel) progressLabel.textContent = progressText;
     if (progressBar) progressBar.style.width = `${Math.round(progress * 100)}%`;
     if (action) {
+      setWipDoor(room.id === 'electronica');
       if (room.id === 'electronica') {
         // «Viajar a Ohmdal» tiene que llegar a Ohmdal. Con `/jugar` a secas el destino se
         // pierde y caés donde diga el save —el hall del Instituto en 2D— que es justo lo
@@ -882,6 +896,8 @@ class School3DExperience {
     }
     if (description) description.textContent = detail.body;
     if (activity) activity.textContent = 'Seleccionable';
+    // Los objetos del aula son parte del aula de Electrónica: la puerta de obra sigue puesta.
+    setWipDoor(true);
     if (action) {
       setOhmdalAction(action, 'Practicar en Ohmdal');
     }

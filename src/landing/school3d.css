@@ -435,8 +435,15 @@ html[data-view='classic'] #school-experience { display: none; }
 .rx-school3d__room-meta strong { color: var(--school-ink); font-size: 12px; font-weight: 650; }
 .rx-school3d__progress { width: min(400px, 100%); height: 3px; margin-top: 13px; overflow: hidden; border-radius: 10px; background: rgba(255,255,255,.10); }
 .rx-school3d__progress i { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6ad5ac, var(--school-gold)); transition: width .6s cubic-bezier(.2,.8,.2,1); }
-.rx-school3d__panel-actions { align-self: center; }
+.rx-school3d__panel-actions { align-self: center; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .rx-school3d__panel-action { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 0 22px; border: 1px solid #d89d39; border-radius: 11px; color: #1b1207; background: linear-gradient(145deg, #ffd77c, #e9a83d); box-shadow: 0 12px 34px rgba(220,144,36,.18); font-size: 13px; font-weight: 750; text-decoration: none; white-space: nowrap; }
+/* La puerta de obra es deliberadamente secundaria: fantasma contra el botón lleno de jugar,
+   para que se lea como «mirá cómo va» y no como la forma de entrar al juego. Va DESPUÉS de la
+   regla base: misma especificidad, así que gana la última. */
+.rx-school3d__panel-action--wip { color: #cdbb99; background: none; border-color: #5d5544; box-shadow: none; font-weight: 600; gap: 8px; min-height: 42px; padding: 0 16px; font-size: 12px; }
+.rx-school3d__panel-action--wip:hover { border-color: #9a8768; color: #f3e8d0; }
+.rx-school3d__wip-tag { border: 1px solid currentColor; border-radius: 999px; padding: 1px 7px; font-size: 9.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; opacity: .75; }
+.rx-school3d__panel-action[hidden] { display: none; }
 
 .rx-school3d__help {
   position: absolute;
