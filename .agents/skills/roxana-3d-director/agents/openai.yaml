@@ -1,4 +1,0 @@
-interface:
-  display_name: "Roxana 3D Director"
-  short_description: "Orquesta hitos, agentes y assets 3D de Roxana"
-  default_prompt: "Use $roxana-3d-director to coordinate this Roxana milestone with explicit contracts, ownership, gates, and the safest production pipeline."

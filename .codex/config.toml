@@ -1,7 +1,0 @@
-# Configuración segura y versionada del proyecto.
-# Los modelos y el nivel de razonamiento heredan la selección del hilo principal.
-
-[agents]
-enabled = true
-max_concurrent_threads_per_session = 3
-interrupt_message = true

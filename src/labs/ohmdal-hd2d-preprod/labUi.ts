@@ -53,12 +53,30 @@ const LAB_CSS = `
 }
 .ohmdal-lab .diagnosis h2 { margin: 0 0 5px; font-size: 14px; }
 .ohmdal-lab .diagnosis p { margin: 5px 0; }
+.ohmdal-lab .diagnosis .diagnosis-actions { display: flex; gap: 6px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.ohmdal-lab .keys {
+  position: fixed; z-index: 6; left: 50%; top: 120px; transform: translateX(-50%);
+  display: none; width: min(430px, calc(100vw - 24px)); padding: 10px 12px;
+  border: 1px solid #bd9b69; border-radius: 8px; background: #151721f5;
+  font-size: 12px; line-height: 1.4; color: #f5f0dd;
+}
+.ohmdal-lab .keys.open { display: block; }
+.ohmdal-lab .keys-header { display: flex; align-items: center; gap: 6px; }
+.ohmdal-lab .keys-header h2 { margin: 0 auto 0 0; font-size: 14px; }
+.ohmdal-lab .keys-rows { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; max-height: 40vh; overflow: auto; }
+.ohmdal-lab .keys-row { display: flex; align-items: center; gap: 6px; border: 1px solid #9e815a55; border-radius: 6px; padding: 5px 7px; }
+.ohmdal-lab .keys-row .keys-action { width: 80px; flex-shrink: 0; font-weight: 600; }
+.ohmdal-lab .keys-row .keys-chips { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; min-width: 0; }
+.ohmdal-lab .keys-chip { display: inline-flex; align-items: center; gap: 3px; border: 1px solid #9e815a88; border-radius: 4px; padding: 2px 5px; background: #292b37; }
+.ohmdal-lab .keys-chip button { min-height: 0; padding: 0 4px; border: 0; background: none; color: #e08a7b; cursor: pointer; }
+.ohmdal-lab .keys-status { margin: 4px 0 0; min-height: 1.4em; color: #8ee8ee; }
 .ohmdal-lab .touch { display: none; position: fixed; z-index: 5; right: 12px; bottom: 185px; grid-template: repeat(3, 42px) / repeat(3, 42px); gap: 4px; }
 .ohmdal-lab .touch button { padding: 0; touch-action: none; user-select: none; }
 .ohmdal-lab .touch [data-move="up"] { grid-area: 1 / 2; }
 .ohmdal-lab .touch [data-move="left"] { grid-area: 2 / 1; }
 .ohmdal-lab .touch [data-move="right"] { grid-area: 2 / 3; }
 .ohmdal-lab .touch [data-move="down"] { grid-area: 3 / 2; }
+.ohmdal-lab .touch [data-action="action"] { grid-area: 2 / 2; }
 .ohmdal-lab .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); }
 @media (max-width: 720px) {
   .ohmdal-lab .topbar { max-height: 168px; overflow: auto; }
@@ -101,6 +119,16 @@ export interface LabUi {
   readonly metricsLabel: HTMLElement;
   readonly diagnosisLabel: HTMLElement;
   readonly moveButtons: readonly HTMLButtonElement[];
+  readonly actionButton: HTMLButtonElement;
+  readonly keysToggle: HTMLButtonElement;
+  readonly keysClose: HTMLButtonElement;
+  readonly keysReset: HTMLButtonElement;
+  readonly keysRows: HTMLElement;
+  readonly keysStatus: HTMLElement;
+  readonly keysPanel: HTMLElement;
+  isKeysOpen(): boolean;
+  setKeysOpen(open: boolean): void;
+  setKeysStatus(text: string): void;
   dispose(): void;
 }
 
@@ -185,7 +213,33 @@ export function createLabUi(container: HTMLElement): LabUi {
   diagnosisLabel.textContent = 'Acercate al Taller para comenzar. La prueba nunca bloquea el recorrido.';
   const diagnosisNext = button('diagnosis-next', 'Siguiente acción segura');
   diagnosisNext.disabled = true;
-  diagnosis.append(diagnosisTitle, diagnosisLabel, diagnosisNext);
+  const diagnosisActions = document.createElement('div');
+  diagnosisActions.className = 'diagnosis-actions';
+  const keysToggle = button('keys-toggle', 'Teclas');
+  keysToggle.setAttribute('aria-expanded', 'false');
+  keysToggle.setAttribute('aria-controls', 'keys-panel');
+  diagnosisActions.append(diagnosisNext, keysToggle);
+  diagnosis.append(diagnosisTitle, diagnosisLabel, diagnosisActions);
+
+  const keysPanel = document.createElement('section');
+  keysPanel.className = 'keys';
+  keysPanel.id = 'keys-panel';
+  keysPanel.setAttribute('aria-labelledby', 'keys-title');
+  const keysHeader = document.createElement('div');
+  keysHeader.className = 'keys-header';
+  const keysTitle = document.createElement('h2');
+  keysTitle.id = 'keys-title';
+  keysTitle.textContent = 'Teclas';
+  const keysReset = button('keys-reset', 'Restablecer');
+  const keysClose = button('keys-close', 'Cerrar');
+  keysHeader.append(keysTitle, keysReset, keysClose);
+  const keysRows = document.createElement('div');
+  keysRows.className = 'keys-rows';
+  const keysStatus = document.createElement('p');
+  keysStatus.className = 'keys-status';
+  keysStatus.id = 'keys-status';
+  keysStatus.textContent = 'Elegí una acción y apretá «Cambiar» para reasignar la próxima tecla.';
+  keysPanel.append(keysHeader, keysRows, keysStatus);
 
   const touch = document.createElement('div');
   touch.className = 'touch';
@@ -206,13 +260,19 @@ export function createLabUi(container: HTMLElement): LabUi {
     touch.append(element);
     return element;
   });
+  const actionButton = document.createElement('button');
+  actionButton.type = 'button';
+  actionButton.dataset.action = 'action';
+  actionButton.setAttribute('aria-label', 'Activar acción');
+  actionButton.textContent = '●';
+  touch.append(actionButton);
 
   const controlsHelp = document.createElement('p');
   controlsHelp.className = 'sr-only';
   controlsHelp.id = 'controls-help';
   controlsHelp.textContent = 'El recorrido también funciona con W A S D o teclas de dirección.';
 
-  root.append(topbar, hud, diagnosis, touch, controlsHelp);
+  root.append(topbar, hud, diagnosis, keysPanel, touch, controlsHelp);
   container.append(root);
 
   return {
@@ -226,6 +286,23 @@ export function createLabUi(container: HTMLElement): LabUi {
     metricsLabel,
     diagnosisLabel,
     moveButtons,
+    actionButton,
+    keysToggle,
+    keysClose,
+    keysReset,
+    keysRows,
+    keysStatus,
+    keysPanel,
+    isKeysOpen(): boolean {
+      return keysPanel.classList.contains('open');
+    },
+    setKeysOpen(open: boolean): void {
+      keysPanel.classList.toggle('open', open);
+      keysToggle.setAttribute('aria-expanded', String(open));
+    },
+    setKeysStatus(text: string): void {
+      keysStatus.textContent = text;
+    },
     dispose() {
       root.remove();
       releaseStyle();

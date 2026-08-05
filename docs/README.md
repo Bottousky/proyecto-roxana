@@ -48,8 +48,8 @@ código estable no cambia hasta una migración aprobada.
 - [`biblia-estilo-instituto.md`](biblia-estilo-instituto.md)
 - [`mapa-ohmdal-greybox.md`](mapa-ohmdal-greybox.md)
 - [`3d/README.md`](3d/README.md) — contratos, toolchain y estado del ecosistema 3D.
-- [`agent-runs/README.md`](agent-runs/README.md) — sistema multiagente, worktrees, ownership y
-  contratos persistentes por hito.
+- [`arco1/`](arco1/) — dirección visual del Arco I: identidad, color script, encuadres,
+  inventario de escenas, contenido educativo y presupuestos.
 
 ## Implementación y auditoría de hitos terminados
 

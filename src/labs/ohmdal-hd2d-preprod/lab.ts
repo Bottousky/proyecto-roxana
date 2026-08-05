@@ -32,6 +32,13 @@ import {
 } from './integration/harnessState.ts';
 import { createOhmActor, createStudentActor } from './integration/spriteActors.ts';
 import { createLabUi } from './labUi.ts';
+import {
+  createInputModel,
+  parseBindings,
+  DEFAULT_BINDINGS,
+  type InputAction,
+  type RebindResult,
+} from './inputModel.ts';
 
 export interface OhmdalLab {
   /** Detiene el bucle de animación. La simulación queda intacta. */
@@ -149,46 +156,169 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
     cameraController.setLookTarget(new THREE.Vector3(player.x, 1, player.z));
   }
 
-  const pressed = new Set<string>();
-  const keyMap: Readonly<Record<string, string>> = {
-    ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down',
-    ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right',
+  const PERSIST_KEY = 'roxana-lab-input-v1';
+
+  function loadPersistedBindings(): Record<string, readonly string[]> | undefined {
+    try {
+      const parsed = parseBindings(window.localStorage.getItem(PERSIST_KEY));
+      return parsed.fellBackToDefaults ? undefined : parsed.bindings;
+    } catch {
+      return undefined;
+    }
+  }
+
+  const inputModel = createInputModel(loadPersistedBindings());
+  let captureTarget: InputAction | null = null;
+
+  const ACTIONS = Object.keys(DEFAULT_BINDINGS) as InputAction[];
+  const ACTION_LABELS: Record<InputAction, string> = {
+    up: 'Arriba',
+    down: 'Abajo',
+    left: 'Izquierda',
+    right: 'Derecha',
+    action: 'Acción',
+    cancel: 'Cancelar',
   };
+
+  function persistInput(): void {
+    try {
+      window.localStorage.setItem(PERSIST_KEY, inputModel.serialize());
+    } catch {
+      // localStorage bloqueado: la reasignación vale para la sesión, no sobrevive a la recarga.
+    }
+  }
+
+  function reasonText(result: RebindResult): string {
+    switch (result.reason) {
+      case 'reserved-key':
+        return 'Esa tecla es del navegador y no se puede reasignar.';
+      case 'duplicate-binding':
+        return `Esa tecla ya es de ${result.conflictsWith ? ACTION_LABELS[result.conflictsWith] : 'otra acción'}.`;
+      case 'orphan-action':
+        return 'Cada acción necesita al menos una tecla.';
+      default:
+        return 'No se pudo cambiar la tecla.';
+    }
+  }
+
+  function renderKeys(): void {
+    ui.keysRows.textContent = '';
+    for (const action of ACTIONS) {
+      const row = document.createElement('div');
+      row.className = 'keys-row';
+      const name = document.createElement('span');
+      name.className = 'keys-action';
+      name.textContent = ACTION_LABELS[action];
+      const chips = document.createElement('div');
+      chips.className = 'keys-chips';
+      for (const code of inputModel.bindingsFor(action)) {
+        const chip = document.createElement('span');
+        chip.className = 'keys-chip';
+        chip.textContent = code;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.setAttribute('aria-label', `Quitar ${code} de ${ACTION_LABELS[action]}`);
+        remove.textContent = '×';
+        remove.addEventListener('click', () => {
+          const result = inputModel.unbind(action, code);
+          if (result.ok) {
+            persistInput();
+            renderKeys();
+            ui.setKeysStatus(`Tecla ${code} quitada de ${ACTION_LABELS[action]}.`);
+          } else {
+            ui.setKeysStatus(reasonText(result));
+          }
+        });
+        chip.append(remove);
+        chips.append(chip);
+      }
+      const change = document.createElement('button');
+      change.type = 'button';
+      change.setAttribute('aria-label', `Reasignar ${ACTION_LABELS[action]}`);
+      change.textContent = 'Cambiar';
+      change.addEventListener('click', () => {
+        captureTarget = action;
+        ui.setKeysStatus(`Apretá una tecla para ${ACTION_LABELS[action]}…`);
+      });
+      row.append(name, chips, change);
+      ui.keysRows.append(row);
+    }
+  }
+
+  function openKeys(): void {
+    captureTarget = null;
+    renderKeys();
+    ui.setKeysOpen(true);
+    ui.setKeysStatus('Elegí una acción y apretá «Cambiar» para reasignar la próxima tecla.');
+  }
+
+  function closeKeys(): void {
+    captureTarget = null;
+    ui.setKeysOpen(false);
+  }
+
   const onKeyDown = (event: KeyboardEvent): void => {
-    const mapped = keyMap[event.code];
-    if (!mapped) return;
-    event.preventDefault();
-    pressed.add(mapped);
-    autoRoute = false;
-    ui.routeToggle.textContent = 'Recorrido automático';
+    if (ui.isKeysOpen()) {
+      if (captureTarget !== null) {
+        event.preventDefault();
+        const target = captureTarget;
+        captureTarget = null;
+        const result = inputModel.rebind(target, event.code);
+        renderKeys();
+        if (result.ok) {
+          persistInput();
+          ui.setKeysStatus(`Tecla ${event.code} asignada a ${ACTION_LABELS[target]}.`);
+        } else {
+          ui.setKeysStatus(reasonText(result));
+        }
+        return;
+      }
+      if (inputModel.actionFor(event.code) === 'cancel') {
+        event.preventDefault();
+        closeKeys();
+        return;
+      }
+    }
+    const action = inputModel.actionFor(event.code);
+    const wasDown = action !== null && inputModel.isDown(action);
+    if (inputModel.press(event.code)) event.preventDefault();
+    if (action === null) return;
+    if (action === 'up' || action === 'down' || action === 'left' || action === 'right') {
+      autoRoute = false;
+      ui.routeToggle.textContent = 'Recorrido automático';
+    } else if (action === 'action' && !wasDown) {
+      triggerSafeDiagnosis();
+    }
   };
   const onKeyUp = (event: KeyboardEvent): void => {
-    const mapped = keyMap[event.code];
-    if (mapped) pressed.delete(mapped);
+    if (inputModel.release(event.code)) event.preventDefault();
   };
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
-  for (const button of ui.moveButtons) {
-    const move = button.dataset.move;
+  for (const moveButton of ui.moveButtons) {
+    const move = moveButton.dataset.move as InputAction | undefined;
     if (!move) continue;
     const begin = (event: PointerEvent): void => {
       event.preventDefault();
-      button.setPointerCapture(event.pointerId);
-      pressed.add(move);
+      moveButton.setPointerCapture(event.pointerId);
+      inputModel.pressAction(move);
       autoRoute = false;
     };
-    const end = (): void => { pressed.delete(move); };
-    button.addEventListener('pointerdown', begin);
-    button.addEventListener('pointerup', end);
-    button.addEventListener('pointercancel', end);
+    const end = (): void => { inputModel.releaseAction(move); };
+    moveButton.addEventListener('pointerdown', begin);
+    moveButton.addEventListener('pointerup', end);
+    moveButton.addEventListener('pointercancel', end);
   }
-
-  function manualIntent(): { x: number; z: number } {
-    return {
-      x: Number(pressed.has('up')) - Number(pressed.has('down')),
-      z: Number(pressed.has('right')) - Number(pressed.has('left')),
-    };
-  }
+  const actionBegin = (event: PointerEvent): void => {
+    event.preventDefault();
+    ui.actionButton.setPointerCapture(event.pointerId);
+    inputModel.pressAction('action');
+    triggerSafeDiagnosis();
+  };
+  const actionEnd = (): void => { inputModel.releaseAction('action'); };
+  ui.actionButton.addEventListener('pointerdown', actionBegin);
+  ui.actionButton.addEventListener('pointerup', actionEnd);
+  ui.actionButton.addEventListener('pointercancel', actionEnd);
 
   function routeIntent(): { x: number; z: number } {
     const target = ROUTE_ANCHORS[routeIndex];
@@ -210,7 +340,7 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
   function updateGame(dtSeconds: number): void {
     const dt = Math.min(Math.max(dtSeconds, 0), 0.05);
     elapsedSeconds += dt;
-    const intent = autoRoute ? routeIntent() : manualIntent();
+    const intent = autoRoute ? routeIntent() : inputModel.movementIntent();
     moving = Math.hypot(intent.x, intent.z) > 0.001;
     if (moving) {
       currentHeading = headingDegrees(intent.x, intent.z);
@@ -289,6 +419,7 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
     ui.metricsLabel.textContent = `${state.renderer.calls} llamadas · ${state.renderer.triangles} triángulos · ruta ${routeIndex}/${ROUTE_ANCHORS.length}`;
     const next = SAFE_DIAGNOSIS_SEQUENCE[diagnosis.nextIndex];
     ui.diagnosisNext.disabled = !diagnosisUnlocked || diagnosis.state.documented;
+    ui.actionButton.disabled = ui.diagnosisNext.disabled;
     ui.diagnosisLabel.textContent = !diagnosisUnlocked
       ? 'Lumen está en el Taller. Visitá ese set para habilitar la experiencia; el recorrido permanece libre.'
       : diagnosis.state.documented
@@ -357,8 +488,8 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
     cameraController.setReducedMotion(reducedMotion);
     ohm.setState(diagnosis.state.verified ? 'measurement_valid' : 'idle', reducedMotion);
   });
-  ui.diagnosisNext.addEventListener('click', () => {
-    if (!diagnosisUnlocked) return;
+  function triggerSafeDiagnosis(): void {
+    if (!diagnosisUnlocked || diagnosis.state.documented) return;
     diagnosis = advanceSafeDiagnosis(diagnosis);
     if (diagnosis.state.evidence.length > 0) {
       ohm.setState('sensor_deployed', reducedMotion);
@@ -373,6 +504,21 @@ export function createOhmdalLab(container: HTMLElement): OhmdalLab {
       markerMaterial.color.setHex(0x72e0d7);
     }
     updateHud(1);
+  }
+  ui.diagnosisNext.addEventListener('click', () => { triggerSafeDiagnosis(); });
+  ui.keysToggle.addEventListener('click', () => {
+    if (ui.isKeysOpen()) {
+      closeKeys();
+    } else {
+      openKeys();
+    }
+  });
+  ui.keysClose.addEventListener('click', closeKeys);
+  ui.keysReset.addEventListener('click', () => {
+    inputModel.reset();
+    persistInput();
+    renderKeys();
+    ui.setKeysStatus('Teclas restablecidas a los valores por defecto.');
   });
 
   updateHud(1);

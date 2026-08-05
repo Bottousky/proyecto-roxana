@@ -2,9 +2,7 @@
 
 **Estado:** decisión de producto y arquitectura actualizada el 1 de agosto de 2026. Para Ohmdal,
 la autoridad detallada es [`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md).
-La ejecución del Arco I se rige por
-[`agent-runs/ohmdal-arc1-serial-v1/STATE.md`](agent-runs/ohmdal-arc1-serial-v1/STATE.md): un ticket
-activo, WIP 1 y ningún sucesor antes de `DONE`.
+Qué se está construyendo ahora y en qué orden: [`../ROADMAP.md`](../ROADMAP.md).
 
 ## La decisión en una frase
 
@@ -126,14 +124,11 @@ Cada elemento se produce con la representación que mejor sirve a su lectura:
 
 Ningún asset entra al runtime sin comprobarse con la cámara real, en desktop y mobile.
 
-## Próximo gate: cámara y contrato del vertical slice
+## El prototipo HD-2D es la dirección visual
 
-La corrección de cámara está implementada y espera aprobación visual humana en `ARC1-001`.
-`ARC1-002`–`ARC1-062` permanecen bloqueados y el control draft conserva
-`executionAuthorized: false`. El backlog serie está en
-[`ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md`](ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md).
-
-Después de ese gate, el próximo hito propuesto es el vertical slice «La pregunta vuelve».
+Ohmdal se ve en HD-2D: sprites sobre dioramas 3D, cámara casi ortográfica, profundidad real.
+El prototipo vive en `src/labs/ohmdal-hd2d-preprod/` y ya renderiza. El plan para llevarle el
+contenido del Arco I está en [`../ROADMAP.md`](../ROADMAP.md).
 
 Antes de migrar el Arco I hay que demostrar el lenguaje HD-2D en un laboratorio Three.js aislado
 de 25–35 minutos: Portal, Plaza, encuentro regional con Edda, despertar de Ohm, Taller de Lumen,
@@ -174,13 +169,9 @@ y puede enlazar una evaluación opcional de La Escuela en otra pestaña.
 
 ## Forma de trabajo
 
-Un bloque empieza con una hipótesis, una captura objetivo, archivos permitidos y una condición de
-cierre. Termina con evidencia en el navegador real. No se dejan agentes iterando durante horas
-sin un entregable intermedio verificable.
-
-La producción multiagente sólo se habilita cuando el contrato del hito fija commit base,
-ownership, presupuesto y `executionAuthorized: true`. Para Arco I rige WIP global uno: una tarea
-sucesora no comienza hasta que la anterior esté `DONE`.
+Un hito por vez, y un hito es algo que se puede abrir en el navegador y jugar cuando termina.
+Build y tests en verde, verlo funcionando, proponer el commit. El detalle está en
+[`../CLAUDE.md`](../CLAUDE.md) y el orden en [`../ROADMAP.md`](../ROADMAP.md).
 
 ## Referencias externas verificadas
 

@@ -114,8 +114,11 @@ docs/
   unidad-5-faro.md         diseño de la Unidad 5: el Faro (capacitor, tiempo) — cierre Arco I
   ohmdal-ruta-contenidos.md  ruta completa de Ohmdal (arcos I-II + el Empalme) y corte de la v1
   plan-implementacion-u2.md  hitos M0-M8 para construir la U2 (handoff a agente de código)
-  estandar-implementacion.md workflow multi-modelo: Fable planifica/audita, ejecutores codifican
+  arco1/                   dirección visual del Arco I: identidad, color, encuadres, presupuestos
 ```
+
+Qué se está construyendo ahora y en qué orden: [`ROADMAP.md`](ROADMAP.md).
+Cómo se trabaja: [`CLAUDE.md`](CLAUDE.md).
 
 ## Reglas de diseño que el código respeta
 
