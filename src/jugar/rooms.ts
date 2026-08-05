@@ -878,6 +878,25 @@ function checkUnit4Complete(): void {
 
 /* ---------- las salas ---------- */
 
+/**
+ * Sala de arranque. Es el prólogo: llegás al Instituto y nadie te acompañó hasta la puerta.
+ */
+export const SALA_INICIAL = 'hall';
+
+/**
+ * Devuelve un id de sala que con seguridad existe.
+ *
+ * Existe porque montar una sala inexistente no falla ruidosamente: la escena dibuja el
+ * personaje sobre un mundo vacío y quedás en una pantalla negra sin error de consola, que
+ * es imposible de diagnosticar jugando. Un save viejo, un flag mal puesto o un destino de
+ * viaje que dejó de existir tienen que caer en el prólogo, no en la nada.
+ */
+export function resolverSala(id: string | null | undefined): string {
+  if (id && Object.prototype.hasOwnProperty.call(ROOMS, id)) return id;
+  if (id) console.warn(`[rooms] la sala «${id}» no existe; se abre ${SALA_INICIAL}`);
+  return SALA_INICIAL;
+}
+
 export const ROOMS: Record<string, RoomDef> = {
   /* ============ INSTITUTO ROXANA ============ */
 
@@ -965,10 +984,12 @@ export const ROOMS: Record<string, RoomDef> = {
       },
     ],
     onEnter: () => {
-      if (f().seenIntro) {
-        hooks.travel('instituto', 'escuela_hub');
-        return;
-      }
+      // Acá había un rebote a `escuela_hub` para quien ya vio la cinemática de apertura: la
+      // idea era mandarlo al hub caminable del Instituto. Ese hub nunca se registró en el
+      // runtime —`topdownRuntime` sólo monta `ExplorationScene`— así que el rebote dejaba al
+      // jugador en una sala inexistente: pantalla negra con el personaje y nada más.
+      // El Instituto es ahora la maqueta 3D de `/`, no un hub caminable, así que el rebote no
+      // tiene destino: quien vuelve al hall se queda en el hall, que es una sala real.
       if (!f().introSeen) {
         say(
           [

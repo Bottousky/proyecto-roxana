@@ -2,6 +2,7 @@
 // en main.ts se movió acá: main.ts ya no conoce Phaser.
 import Phaser from 'phaser';
 import { ExplorationScene, W, H } from '../../jugar/ExplorationScene.ts';
+import { resolverSala } from '../../jugar/rooms.ts';
 import { state, hooks } from '../../state.ts';
 import { activateExperienceForRoom, experienceOfRoom } from '../registry.ts';
 import type { ExperienceId, ExperienceRuntimeModule, RuntimeHandle } from '../types.ts';
@@ -17,6 +18,11 @@ export const topdownRuntime: ExperienceRuntimeModule = {
     if (requestedRoom && experienceOfRoom(requestedRoom)?.runtime === 'topdown-phaser') {
       state.room = requestedRoom;
     }
+
+    // Última red antes de montar: un save guardado hace meses, o un destino de viaje que dejó
+    // de existir, no pueden dejar al jugador en una pantalla negra. `resolverSala` avisa por
+    // consola y cae en el prólogo.
+    state.room = resolverSala(state.room);
 
     // La escena ya lee state.room directamente.
     activateExperienceForRoom(state.room);

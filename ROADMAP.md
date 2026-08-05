@@ -113,9 +113,9 @@ y H3. Cuando la última cruce, `/jugar` se retira.
 
 Cosas rotas o a medias que encontramos y no bloquean, pero conviene no olvidar:
 
-- **`escuela_hub` no pertenece a ninguna experiencia.** Es la sala inicial por defecto
-  (`src/state.ts:183`) pero no está en el `rooms` de ningún manifest, así que
-  `experienceOfRoom()` devuelve `null` y funciona sólo por el fallback de `main.ts`.
+- **`EscuelaHubScene.ts` es código muerto.** El hub caminable de Phaser
+  (`src/experiences/instituto/EscuelaHubScene.ts`) no lo monta nadie: `topdownRuntime` sólo
+  registra `ExplorationScene`. Descartado en las decisiones de arriba; falta borrarlo.
 - **`diseno-banco-diegetico.md` no existe.** `docs/arco1/diseno-bancos-ohm-lumen.md` lo cita
   como su complemento (el banco de la Puerta), pero el archivo no está en el repo.
 - **Dos de los tres bancos de A1.U1 siguen siendo modales a pantalla completa.** El de la

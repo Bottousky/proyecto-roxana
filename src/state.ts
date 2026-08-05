@@ -179,8 +179,13 @@ export interface GameState {
 
 const KEY = 'roxana-slice-v1';
 
+// `escuela_hub` era el valor por defecto y no es una sala de ninguna experiencia montable:
+// pertenecía al hub caminable de Phaser que nunca se registró en el runtime. Toda partida
+// nueva arrancaba apuntando a la nada. El prólogo empieza en el hall del Instituto.
+const SALA_INICIAL = 'hall';
+
 export const state: GameState = {
-  room: 'escuela_hub',
+  room: SALA_INICIAL,
   flags: { ...DEFAULT_FLAGS },
 };
 
@@ -197,7 +202,7 @@ export function load(): void {
   if (!raw) return;
   try {
     const data = JSON.parse(raw) as GameState;
-    state.room = data.room ?? 'escuela_hub';
+    state.room = data.room ?? SALA_INICIAL;
     state.flags = { ...DEFAULT_FLAGS, ...data.flags };
   } catch {
     /* save corrupto: empezar de cero */
@@ -206,7 +211,7 @@ export function load(): void {
 
 export function resetSave(): void {
   localStorage.removeItem(KEY);
-  state.room = 'escuela_hub';
+  state.room = SALA_INICIAL;
   state.flags = { ...DEFAULT_FLAGS };
 }
 
