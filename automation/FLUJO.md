@@ -9,6 +9,7 @@ Estado al 2026-08-03. Go activo, Codex al 7 % hasta el 8/8, Claude en cuenta reg
 Esto es todo. Lo demás de este documento es contexto.
 
 ```text
+0.  escritorio →  «Roxana — Consola Arco I»   qué toca, con qué modelo · copiás el prompt
 1.  opencode  →  /arc-plan ARC1-008          leés el plan · cerrás
 2.  opencode  →  /arc-build ARC1-008-A       aprobás cada edición · cerrás
 3.  terminal  →  npm run build && npm test
@@ -16,6 +17,9 @@ Esto es todo. Lo demás de este documento es contexto.
 5.  opencode  →  /arc-close ARC1-008         cerrás
 6.  terminal  →  git commit
 ```
+
+El paso 0 es el único que agrega esta capa al ciclo, y no lanza nada: te dice qué abrir y te deja el
+prompt en el portapapeles. Al terminar cada sesión volvés a la consola y registrás el resultado.
 
 Cuatro sesiones de OpenCode y dos vueltas a la terminal. **«Cerrás» es literal:** salís del programa
 y volvés a entrar, porque `opencode` a secas abre sesión nueva y `-c` continúa la anterior. Esa es la
@@ -32,40 +36,42 @@ ciclo. Si nunca corrés un script, el ciclo funciona igual.
 | «el reviewer necesita contexto acotado» | `node automation/scripts/review-packet.mjs <paquete> --out <ruta>` |
 | «cambió algo en los proveedores» | `node automation/scripts/providers.mjs --write` |
 
-### El ciclo automático
+### El ciclo automático — APARCADO por `CP-031`
 
-Los pasos 1, 2 y 4 son mecánicos: leer la ruta de una tabla y abrir un proceso. `dispatch.mjs` los
-encadena, un proceso por etapa —o sea una sesión por etapa, que es la regla— y **para donde tiene que
-parar**.
+`dispatch.mjs` encadena las etapas con `--go` y `--queue --go`. **Está aparcado:** el código queda,
+pero el trabajo no se lanza por ahí. El motivo, la evidencia medida y las condiciones para volver
+están en [`README.md` §4.1](README.md) y en `CP-031`.
+
+En una frase: encadenar `plan → build → review` no acelera el proyecto mientras las decisiones de
+tamaño, modelo, effort y duración sigan sin medir — acelera ejecutar decisiones mal calibradas.
+Abrir una sesión y pegar un prompt cuesta dos minutos y es el fusible que corta antes de quemar una
+hora de modelo.
+
+### Lo que reemplaza al ciclo automático
+
+Una consola que **decide y muestra**, y una sesión que **abrís vos**:
 
 ```bash
-node automation/scripts/dispatch.mjs TASK-002
+node scripts/arc-board.mjs --serve --open
 ```
 
-Sin `--go` no lanza un solo proceso: te muestra el plan, qué modelo va en cada etapa y dónde se va a
-detener. Con `--go`, corre.
+O el acceso directo **«Roxana — Consola Arco I»** del escritorio, que hace lo mismo.
 
-```bash
-node automation/scripts/dispatch.mjs TASK-002 --go
+```text
+tarjeta  →  una sesión  →  un resultado  →  una revisión  →  un commit
 ```
 
-**Dónde para, siempre:**
+La consola te dice el paquete activo, la fase, el modelo, el proveedor, el effort, la duración
+esperada, la ronda y el gate posterior; te copia el prompt listo; y al terminar te obliga a tildar
+la checklist antes de habilitar `DONE`. Lo que registres ahí va a `telemetry.json`.
 
-| Etapa | Por qué |
-|---|---|
-| `human-gate` | aprobás o rechazás vos |
-| `close` | sólo el Director cambia estados y commitea (`CP-002`) |
-| `generate` · `select` | generar y elegir una imagen son pasos manuales tuyos |
-| cualquier etapa que devuelva `BLOCKED`, `FAILED` o `HUMAN_REVIEW` | — |
-| exit distinto de cero, o timebox agotado | mata el proceso, no lo deja colgado |
+**Lo que no hace, y es a propósito:** no lanza agentes, no encadena fases y no decide si un paquete
+cumple. Esa última parte es tuya.
 
-**El freno.** El builder pide permiso por cada edición y cada comando. `--unattended` se lo saca —le
-pasa `--dangerously-skip-permissions`— y ahí deja de ser «automatizar el tipeo» para ser «escribir
-código sin supervisión». Es una decisión distinta; el flag existe, el default no lo usa.
-
-**Efecto lateral que vale más de lo que parece:** mide la duración real de cada etapa con reloj de
-pared y la escribe en `dispatch.json`. Los ocho records de `telemetry.json` tienen `durationMin:
-null` porque nadie cronometró nunca. Esto cronometra gratis.
+**Sobre cronometrar.** El argumento a favor de `dispatch.mjs` era que medía la duración con reloj de
+pared, y `durationMin` estaba en `null` en todos los records. Eso ya no depende del runner: el campo
+«minutos medidos» de la consola lo escribe igual. Si lo dejás vacío queda `null`, que es lo correcto
+—`not-run`—, porque la consola no estima.
 
 ---
 

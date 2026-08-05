@@ -6,6 +6,7 @@
 **Gate humano:** sí | no
 **Presupuesto:** 1 implementación + 1 corrección
 **Estimación:** <30–90> min
+**Effort:** low | medium | high
 
 ## Objetivo
 

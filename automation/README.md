@@ -37,7 +37,7 @@ Una ficha no puede ser su propia prueba. Todo lo que hay acá sale de esa frase.
 | Estados de tarea | `READY` · `TECH_REVIEW` · `HUMAN_REVIEW` · `BLOCKED` · `FAILED` · `DONE` |
 | Blocked report | estado `BLOCKED` + `OPEN_ISSUES.md` |
 | `/runs`, `/artifacts`, `/logs` | `evidence/<TICKET>/` + `telemetry.json` |
-| Dashboard | `node scripts/arc-board.mjs --open` |
+| Dashboard | `node scripts/arc-board.mjs --serve --open` — consola: qué toca ahora y con qué modelo |
 | Contratos por rol | `.codex/agents/*.toml`, `.opencode/agents/*.md` |
 | Pipelines de arte | `docs/agent-runs/<hito>/ASSET_PIPELINE.md`, `.agents/skills/` |
 
@@ -137,6 +137,60 @@ node automation/scripts/review-packet.mjs ARC1-007-B --out automation/runs/revie
 
 ---
 
+## 4.1 `dispatch.mjs` está aparcado — se ejecuta a mano
+
+**`CP-031`, 2026-08-04.** El código sigue acá, entero y funcionando. Lo que cambió es que **no se usa
+para lanzar trabajo**: la ejecución pasa por la consola y por una sesión que abrís vos.
+
+```bash
+node scripts/arc-board.mjs --serve --open
+```
+
+El motivo no es que el runner esté mal escrito. Es que todavía no hay evidencia para alimentarlo.
+Después de ocho tickets, `telemetry.json` no sabe todavía:
+
+- qué tamaño de paquete termina en una sesión y cuál se desborda;
+- qué modelo rinde en qué clase de trabajo — los 34 records son casi todos `route: claude`, el
+  proveedor que se va;
+- qué `effort` alcanza;
+- cuántos minutos necesita de verdad cada fase — `durationMin` es `null` en la mayoría;
+- qué significa que un agente «terminó», que no es lo mismo que «el proceso salió con 0»;
+- qué paquetes necesitan una devolución tuya antes de seguir.
+
+Encadenar `plan → build → review` hoy no acelera el proyecto: acelera la ejecución de decisiones
+que todavía están mal calibradas, y multiplica por tres el coste de cada una. Abrir una sesión y
+pegar un prompt cuesta uno o dos minutos, y ese paso manual es el **fusible** que corta antes de
+quemar una hora de modelo.
+
+Lo que el runner tendría que resolver para volver, y hoy no resuelve:
+
+| Problema | Por qué no está resuelto |
+|---|---|
+| Detectar que el agente terminó | «proceso finalizado» ≠ «tarea cumplida»; sin criterio medido no hay señal |
+| Timeouts y procesos colgados | no hay línea base de duración contra la cual declarar un cuelgue |
+| Verificar evidencia | `audit-control-plane.mjs` la comprueba, pero después del hecho |
+| Elegir fallback al agotarse una cuota | `routing.json` lo declara; nadie midió el punto de agotamiento |
+| No avanzar tras un resultado mediocre | «mediocre» es hoy un juicio humano, no un umbral |
+
+**Cuándo vuelve.** Con 10–15 paquetes cerrados desde la consola, `telemetry.json` va a tener
+modelo, effort, duración medida, rondas, si cumplió y consumo por fase. Recién con esa tabla se
+puede reactivar por etapas:
+
+1. **botón «Lanzar»** — la consola invoca el CLI correcto y te devuelve el resultado; no avanza sola;
+2. **validaciones automáticas** — `npm run build`, `npm test`, `git diff --check` y existencia de la
+   evidencia, corridos por la consola;
+3. **autoavance muy acotado** — sólo trabajo mecánico: lint, tests, documentación, conversión de
+   formatos, manifests, auditorías. **Nunca** cámara, escenas, gameplay, personajes, dirección
+   visual, puzzles, iluminación ni narrativa: ahí el gate humano no es una demora, es el producto.
+
+Mientras tanto `dispatch.mjs` sirve en modo plan, que no lanza nada:
+
+```bash
+node automation/scripts/dispatch.mjs TASK-002
+```
+
+---
+
 ## 5. Estructura
 
 ```text
@@ -156,7 +210,7 @@ automation/
     providers.mjs              observa el inventario y lo contrasta
     validate-task.mjs          valida una Task Spec contra schema, taxonomía, routing y DISCO
     route.mjs                  imprime destino y comando exacto; no ejecuta
-    dispatch.mjs               encadena las etapas de UNA tarea; para en cada gate humano
+    dispatch.mjs               encadena las etapas de UNA tarea — APARCADO, ver §4.1
     audit-control-plane.mjs    audita docs/agent-runs/<hito>/ contra sus reglas
     review-packet.mjs          arma el paquete mínimo del reviewer
 ```

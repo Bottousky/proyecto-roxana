@@ -7,7 +7,9 @@
     "Se escribe al cerrar la fase, nunca antes.",
     "Append-only: no se edita ni se borra un record cerrado; una correccion agrega otro record.",
     "Lo no medido va en null y cuenta como not-run. Jamas se estima ni se inventa una duracion.",
-    "modelId es el ID literal que devuelve `opencode models`. No se anota un modelo que no existe en el inventario local."
+    "modelId es el ID literal que devuelve `opencode models`. No se anota un modelo que no existe en el inventario local.",
+    "El record lo emite la consola al cerrar la fase: `node scripts/arc-board.mjs --serve`. Los campos que dejes vacios se guardan como null, que es lo correcto: la consola no estima.",
+    "metExpectation lo decide el Director, no el agente. Un paquete puede cerrar DONE y no haber cumplido; ese cruce es justamente lo que hay que poder mirar despues de 10-15 paquetes."
   ],
   "recordSchema": {
     "ticket": "ARC1-NNN",
@@ -22,7 +24,11 @@
     "filesTouched": "entero, o null en fases read-only",
     "ownershipRespected": "true | false | null",
     "firstArtifactMin": "minutos hasta el primer artefacto observable, o null si no aplica",
+    "effort": "el effort declarado en la ficha del paquete, o null si la ficha no lo declara",
     "result": "TECH_REVIEW | HUMAN_REVIEW | BLOCKED | FAILED | DONE",
+    "metExpectation": "true | false | null. Juicio del Director, no del agente: si el resultado sirvio para lo que el paquete queria. Un paquete puede terminar DONE y no haber cumplido.",
+    "burn": "bajo | medio | alto | null. Consumo de cuota observado en la ventana, a ojo. Sirve para cruzar modelo contra coste real.",
+    "problem": "una linea con el problema principal de la sesion, o null si no hubo",
     "notes": "una linea: que fallo, que hubo que repetir, que no se pudo medir"
   },
   "records": [
@@ -521,6 +527,54 @@
       "firstArtifactMin": null,
       "result": "DONE",
       "notes": "Review de evidencia, no de codigo: el diff del paquete es vacio. El mismo reviewer independiente de A verifico con git status --short que B solo agrego evidence/ARC1-008/B/, leyo parity.json y confirmo los dos digests y las dos corridas por viewport. Corroboracion aceptada sin reemplazar su propio analisis de la delegacion pause/resume. Duracion no separable de la sesion de review de A."
+    },
+    {
+      "ticket": "ARC1-009",
+      "packet": "ARC1-009-A",
+      "phase": "plan",
+      "session": "ARC1-009-PLAN",
+      "route": "claude",
+      "modelId": "claude-opus-5",
+      "date": "2026-08-04",
+      "durationMin": null,
+      "round": 1,
+      "filesTouched": 4,
+      "ownershipRespected": true,
+      "firstArtifactMin": null,
+      "result": "DONE",
+      "notes": "Ficha del ticket, contrato del paquete A, CP-029 y ownership v16. Subdivision en tres paquetes. El paquete B queda bloqueado por OI-015: su gate es visual y no esta decidido que driver captura. Plan escrito por el Orquestador, no por director-plan: CP-028."
+    },
+    {
+      "ticket": "ARC1-009",
+      "packet": "ARC1-009-A",
+      "phase": "build",
+      "session": "ARC1-009-A-BUILD",
+      "route": "claude",
+      "modelId": "claude-sonnet-5",
+      "date": "2026-08-04",
+      "durationMin": 14,
+      "round": 1,
+      "filesTouched": 2,
+      "ownershipRespected": true,
+      "firstArtifactMin": null,
+      "result": "TECH_REVIEW",
+      "notes": "inputModel.ts (214 lineas) y a3-input-model.test.ts (306 lineas, 13 casos), ambos archivos nuevos, dentro de ownership. Nadie importa el modelo: es requisito del contrato. Marco una ambiguedad del contrato sobre rebind y pidio confirmacion en vez de resolverla en silencio. Duracion medida: 858607 ms."
+    },
+    {
+      "ticket": "ARC1-009",
+      "packet": "ARC1-009-A",
+      "phase": "review",
+      "session": "ARC1-009-A-REVIEW",
+      "route": "claude",
+      "modelId": "claude-sonnet-5",
+      "date": "2026-08-04",
+      "durationMin": 12,
+      "round": 1,
+      "filesTouched": null,
+      "ownershipRespected": null,
+      "firstArtifactMin": null,
+      "result": "DONE",
+      "notes": "APROBADO: cero P0, P1 y P2, solo dos sugerencias. Verifico rebind con script propio en los cuatro caminos y probo que el umbral es dinamico y no lista fija; agrego 19 casos basura a parseBindings; e inyecto tres bugs en copias del modelo para comprobar que el test los detecta (los tres fallaron en el assert correcto). Mismo modelo que el build: DEV-003, no es independiente por modelo. Duracion medida: 739970 ms."
     }
   ]
 }

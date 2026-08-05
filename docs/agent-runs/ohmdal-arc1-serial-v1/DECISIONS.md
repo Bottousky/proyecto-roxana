@@ -36,7 +36,157 @@
 
 | CP-028 | 2026-08-04 | **El Director ordena orquestar `ARC1-008` con Claude** (`sonnet` y `haiku` según la tarea). Contradice la línea «nunca builder» de `MODEL_ROUTING.md` y se aplica igual, porque la decisión de routing es del Director (`CP-002`) | `ARC1-008` cierra con la **primera fase `review` realmente ejecutada** de la corrida, pero **no independiente por modelo**: builder y reviewer fueron ambos `claude-sonnet-5` (`DEV-003`), y el chequeo que debía marcarlo falló (`OI-018`); `CP-022` no se revoca y `TASK-002` sigue siendo la línea base del pipeline sin Claude |
 
-Una decisión nueva agrega `CP-029+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+| CP-029 | 2026-08-04 | **Vocabulario de entrada del slice congelado en seis acciones** —`up`, `down`, `left`, `right`, `action`, `cancel`— con modelo puro, validación de reasignación por condiciones y persistencia fuera del modelo | `ARC1-009` se subdivide en tres paquetes; `ownership.json` v16 abre dos archivos nuevos al builder; el paquete `B` queda bloqueado hasta que se decida el driver de gates visuales (`OI-015`) |
+
+| CP-030 | 2026-08-04 | **El navegador embebido de Claude Code es el driver oficial de los gates visuales** del resto de la corrida. `CP-026` queda acotada al paquete `A` de `ARC1-008` | `OI-015` cerrado; `ARC1-009-B` desbloqueado; `EXECUTION_PROTOCOL.md` §D vuelve a ser ejecutable sin intervención manual; la corrida pasa a tener dos drivers con roles declarados |
+
+| CP-031 | 2026-08-04 | **El encadenado automático de etapas queda aparcado y la ejecución vuelve a ser manual**, con una consola que decide y una sesión que abre el Director. `dispatch.mjs` no se borra ni se modifica | `scripts/arc-board.mjs` pasa de informe a consola con escritura acotada; `telemetry.json` gana `effort`, `metExpectation`, `burn` y `problem`; la reactivación queda condicionada a 10–15 paquetes medidos y por etapas |
+
+Una decisión nueva agrega `CP-032+`, motivo, evidencia, impacto y si requiere autorización o ADR.
+
+## CP-031 — El runner se aparca; la consola decide y vos ejecutás
+
+**Motivo.** El pipeline automático encadena `plan → build → review` más rápido de lo que el proyecto
+puede evaluar si esas etapas sirvieron. Tres días de trabajo sobre la automatización no produjeron
+un solo avance jugable, y el Director lo planteó en estos términos: automatizar hoy es ejecutar más
+rápido decisiones todavía imperfectas. La pregunta operativa dejó de ser «cómo logro que las IA
+trabajen solas» y pasó a ser «¿la última sesión produjo un avance visible, correcto y suficiente?».
+
+**Evidencia.** Medida sobre `telemetry.json`, 34 records, el 2026-08-04:
+
+- **`route: claude` en 30 de 34.** Contando `modelId`, 28 de 34 son Claude —23 `claude-opus-5`, 5
+  `claude-sonnet-5`— contra 2 de `opencode-go/glm-5.2`. El 88 % del historial lo produjo el proveedor
+  que **no se renueva**. Ninguna ruta de Go tiene evidencia de funcionar en trabajo real.
+- **`durationMin` es `null` en 30 de 34.** No existe línea base de duración, así que no hay número
+  contra el cual declarar un timeout ni un proceso colgado.
+- **`firstArtifactMin` es `null` en los 34.** El límite de «primer artefacto temprano» de `PACKETS.md`
+  nunca se midió: hoy es prosa, no un umbral.
+- **`effort` no existía como campo.** Se decidía por intuición y no quedaba registrado, así que no se
+  podía cruzar contra resultado ni contra consumo.
+- El acceso directo del escritorio apuntaba a `C:\YO\Proyectos\Roxana claude\`, una ruta inexistente,
+  y **fallaba en silencio**. La superficie que debía decir «qué toca ahora» llevaba días sin abrirse.
+
+**Decisiones.**
+
+1. **`dispatch.mjs` queda aparcado, no borrado ni modificado.** El código sigue entero y su modo plan
+   —sin `--go`— sigue sirviendo para ver qué comando correspondería. Lo que se retira es su uso para
+   lanzar trabajo.
+2. **La ejecución vuelve a ser manual, con la sesión como fusible.** Abrir una sesión y pegar un
+   prompt cuesta uno o dos minutos, y ese paso corta antes de quemar una hora de modelo.
+3. **`scripts/arc-board.mjs` pasa de informe a consola.** Sigue siendo superficie derivada, pero gana
+   `--serve` y escribe exactamente dos cosas que ya son verdad del control plane: el `Estado:` de la
+   ficha del paquete y un record de `telemetry.json`. No lanza agentes, no encadena y no commitea.
+4. **La consola obliga a comprobar antes de decidir.** `DONE` y `TECH_REVIEW` quedan deshabilitados
+   hasta tildar la checklist completa; `BLOCKED`, `FAILED` y `HUMAN_REVIEW` no la exigen, porque un
+   build roto tiene que poder bloquear. La checklist pide capturas sólo si el gate del paquete es
+   visual, para que no haya casillas que se tilden por inercia.
+5. **`telemetry.json` gana `effort`, `metExpectation`, `burn` y `problem`.** `metExpectation` lo
+   decide el Director: un paquete puede cerrar `DONE` y no haber cumplido, y ese cruce es justamente
+   lo que hay que poder mirar después.
+6. **La reactivación es por etapas y condicionada a 10–15 paquetes medidos:** primero un botón que
+   lanza sin avanzar; después las validaciones automáticas; y sólo al final autoavance para trabajo
+   mecánico —lint, tests, documentación, formatos, manifests, auditorías—. **Nunca** para cámara,
+   escenas, gameplay, personajes, dirección visual, puzzles, iluminación ni narrativa: ahí el gate
+   humano no es una demora, es el producto.
+
+**Impacto.** Ningún documento congelado cambia y `src/**` no se toca. `CP-002` se refuerza: los
+estados y el commit siguen siendo del Director, y ahora la única vía de escritura automática está
+acotada a dos campos y auditada por `audit-control-plane.mjs`. No requiere ADR.
+
+**Lo que esta decisión no arregla:** que la telemetría siga siendo autodeclarada. La consola escribe
+lo que vos le digas que pasó, y si tildás la checklist sin comprobar, registra una mentira prolija.
+Es `OI-006` otra vez —una ficha no puede ser su propia prueba— y esta decisión no lo cierra: sólo
+baja el coste de decir la verdad y obliga a que la afirmación sea explícita en vez de implícita.
+
+## CP-030 — Driver oficial de los gates visuales
+
+**Motivo.** `EXECUTION_PROTOCOL.md` §D exige capturas desktop 1440×900 y mobile 390×844 para **todo
+cambio visible**, y desde `ARC1-011` casi todos los tickets lo son — el primero es `ARC1-009-B`, que
+agrega un botón táctil. `OI-015` dejó registrado que el driver que congeló `CP-026` no puede
+producir esa evidencia: `orca screenshot` falla de forma reproducible con «the browser tab may not be
+visible or the window may not have focus». Un gate obligatorio sin ninguna ruta para cumplirlo no es
+un gate: es una desviación permanente esperando a declararse.
+
+**Evidencia.**
+
+- `OI-015`: tres intentos de `orca screenshot`, el mismo error de CDP las tres veces.
+- `orca --help`, sección `Browser Automation`: 40 subcomandos y **ninguno** de viewport. Por eso la
+  ventana quedó en 1191×972 toda la medición de `ARC1-008-A`.
+- `CP-027` y `evidence/ARC1-008/B/parity.json`: el navegador embebido de Claude Code fijó 1440×900
+  DPR 1 y 390×844 DPR 2 exactos, y con eso reprodujo `db322500` y `50543361` —dos valores congelados
+  por **otro** driver, dos tickets atrás— dos corridas cada uno. No es una promesa de que sirve: es
+  una demostración contra números que no se pueden acertar de casualidad.
+
+**Decisiones.**
+
+1. **Los gates visuales se cierran con el navegador embebido de Claude Code.** Fija viewport exacto y
+   captura; las dos cosas que `EXECUTION_PROTOCOL.md` §D necesita.
+2. **`CP-026` no se revoca: se acota.** Sigue siendo el método de `ARC1-008-A`, que ya cerró con él y
+   cuya evidencia no se re-mide. Lo que deja de ser es el driver por defecto de la corrida.
+3. **La corrida tiene dos drivers y eso se declara, no se disimula.** El de Orca conduce y mide desde
+   la línea de comandos; el de Claude Code fija viewport y captura. Toda evidencia dice con cuál se
+   tomó, como ya hacen `evidence/ARC1-008/A` y `/B`.
+4. **Playwright sigue excluido.** Esta decisión no lo reabre y no instala nada.
+
+**Impacto.** `OI-015` se cierra. `ARC1-009-B` se desbloquea. Ningún documento congelado cambia y
+`src/**` no se toca. No requiere ADR.
+
+**Lo que esta decisión no arregla:** que la evidencia visual siga sin ser reproducible por un tercero
+sin la sesión del agente delante. El reviewer de `ARC1-008-A` ya lo dijo de la evidencia de medición
+—puede auditar coherencia, no puede probar que una transcripción sea real— y con las capturas pasa lo
+mismo. Es el agujero de `OI-006` y ningún driver lo cierra.
+
+## CP-029 — Seis acciones, modelo puro, y la reasignación validada por condiciones
+
+**Motivo.** `ARC1-009` es el primer ticket que le agrega un **verbo** al slice: hasta hoy el
+laboratorio sólo sabe caminar. Lo único que se puede «hacer» es apretar `#diagnosis-next` con el
+mouse — no hay tecla, no hay botón táctil, no hay nada para quien no pueda usar el mouse. Decidir el
+vocabulario es del Director porque lo heredan `ARC1-017` en adelante, y porque el error caro acá es
+inventar verbos que el slice no tiene.
+
+**Evidencia.**
+
+- `lab.ts:151-183`: `keyMap` es un `Record` literal de 8 entradas, hardcodeado, sólo movimiento;
+  `pressed` es un `Set<string>` suelto; los botones `data-move` meten strings directo en ese `Set`.
+  No hay acción, ni reasignación, ni persistencia.
+- `IDENTITY.md` regla 1 cierra con «Un daltónico debe poder jugar». La misma lógica aplica a quien no
+  puede usar el mouse: si la única acción del slice es un click, la acción no existe para esa persona.
+- `CLAUDE.md` §5 exige modelo puro testeable con su test propio, y validación **por condiciones, no
+  por solución fija**.
+- `OI-008`: ningún test de este repositorio está typechequeado. Un test nuevo tiene que comprobar
+  valores en runtime, no descansar en el tipo.
+
+**Decisiones.**
+
+1. **Seis acciones lógicas y ninguna más:** `up`, `down`, `left`, `right`, `action`, `cancel`. No
+   entran Bitácora, inventario ni menú hasta que exista qué abrir. Un verbo sin destino es una
+   promesa que después hay que sostener.
+2. **El modelo es puro:** sin `three`, sin `window`, sin `document`, sin `localStorage`, sin saber
+   qué es un `KeyboardEvent`. Recibe códigos de tecla como strings. Es lo que lo vuelve testeable con
+   `node --experimental-strip-types`.
+3. **Teclado y táctil llegan a la misma acción por caminos distintos y ninguno privilegiado:** el
+   modelo expone `press(code)` y `pressAction(action)`. El táctil no tiene que inventarse una tecla
+   falsa para existir.
+4. **El mapeo de ejes no se toca:** `x = up − down`, `z = right − left`. Es la convención isométrica
+   ya instalada; cambiarla es otro ticket.
+5. **La reasignación se valida por condiciones:** sin tecla duplicada, sin acción huérfana, sin
+   teclas reservadas (`Tab`, `F1`…`F12`). El rechazo dice **por qué** y con quién choca; no se roba
+   una tecla en silencio.
+6. **La persistencia vive fuera del modelo**, bajo `roxana-lab-input-v1` — namespaceada aparte de
+   `roxana-slice-v1` para que un laboratorio roto no pueda corromper el save del juego.
+7. **Táctil no crece en superficie:** un botón de acción, no un HUD nuevo. `CP-012` prohíbe corregir
+   las safe areas de mobile acá; el ticket tiene que demostrar que la franja libre **no baja** de
+   48,0 %.
+
+**Impacto.** `ownership.json` v16 abre al builder dos archivos **nuevos**: `inputModel.ts` y
+`tests/a3-input-model.test.ts`. `lab.ts` y `labUi.ts` no se abren todavía: son del paquete `B`.
+
+**Lo que esta decisión deja bloqueado y hay que resolver antes del paquete `B`:** el gate visual.
+Agregar un botón táctil cambia el HUD, y `EXECUTION_PROTOCOL.md` §D exige capturas 1440×900 y
+390×844. `OI-015` dice que el driver de `CP-026` no captura sin la ventana al frente y que el
+navegador embebido de Claude Code sí, pero **cuál queda como oficial no está decidido** y decidirlo
+exige `CP` propia, porque `CP-026` congeló la primera opción. El paquete `A` no lo necesita: es un
+modelo puro y no dibuja nada. No requiere ADR.
 
 ## CP-028 — `ARC1-008` se orquesta con Claude por orden del Director, contra la línea del routing
 
