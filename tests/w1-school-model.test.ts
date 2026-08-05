@@ -13,7 +13,7 @@ function equal<T>(actual: T, expected: T, label: string): void {
   equal(s.perfilNombre, null, 'null/null: perfilNombre');
   equal(s.aulas.electronica, 'off', 'null/null: aula electronica');
   equal(s.aulas.programacion, 'cerrada', 'null/null: aula programacion');
-  equal(s.aulas.fisica, 'cerrada', 'null/null: aula fisica');
+  equal(s.aulas.fisica, 'off', 'null/null: aula fisica (abierta a Physica)');
   equal(s.aulas.matematica, 'cerrada', 'null/null: aula matematica');
   equal(s.electronica.unidadesCompletadas, 0, 'null/null: unidades completadas');
   equal(s.electronica.totalUnidades, 5, 'null/null: total unidades');
