@@ -18,6 +18,8 @@ import {
   installRoxanaStatue,
   ROXANA_HALL_MONUMENT,
 } from './sculpts/installRoxanaStatue.ts';
+import { startPortalTransition } from './portal.ts';
+import { portalGateUrl } from '../shared/portalLink.ts';
 import { createPostFx, type PostFx } from './school3dPostFx.ts';
 import { createRoomLabels, type LabelLayer } from './school3dLabels.ts';
 import { createSchoolBackdrop, type SchoolBackdrop } from './school3dBackdrop.ts';
@@ -202,6 +204,24 @@ function stateOverride(saved: SchoolState, preview: 'save' | 'initial' | 'comple
 
 function classicHref(hash: string): string {
   return `?view=classic${hash.startsWith('#') ? hash : ''}`;
+}
+
+/**
+ * Marca el botón del panel como «esto cruza a Ohmdal».
+ *
+ * El `href` real queda puesto igual, no como decoración: si el click con transición no llega
+ * a correr —JS todavía cargando, clic con rueda, abrir en pestaña nueva— el enlace tiene que
+ * llevar al mismo lugar por su cuenta. La transición es un adorno encima, no el mecanismo.
+ */
+function setOhmdalAction(action: HTMLAnchorElement, label: string): void {
+  action.href = portalGateUrl();
+  action.textContent = label;
+  action.dataset.portal = 'ohmdal';
+}
+
+/** El panel reusa el mismo botón para todas las salas: hay que limpiar la marca al salir. */
+function clearOhmdalAction(action: HTMLAnchorElement): void {
+  delete action.dataset.portal;
 }
 
 class School3DExperience {
@@ -646,6 +666,19 @@ class School3DExperience {
       this.setHover(null);
     });
 
+    // El cruce a Ohmdal usa la misma transición que la landing clásica, en vez de saltar de
+    // documento en seco. El listener va una sola vez sobre el botón del panel, que se reusa
+    // para todas las salas: quién cruza y quién no lo dice `dataset.portal`.
+    const panelAction = document.querySelector<HTMLAnchorElement>('#school3d-action');
+    panelAction?.addEventListener('click', (event) => {
+      if (panelAction.dataset.portal !== 'ohmdal') return;
+      // Un click con modificador es «abrilo aparte»: ahí el href hace su trabajo y la
+      // transición sobraría, porque esta pestaña no se va a ninguna parte.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+      event.preventDefault();
+      startPortalTransition(panelAction);
+    });
+
     document.querySelector('#school3d-home')?.addEventListener('click', () => this.showOverview());
     document.querySelector('#school3d-panel-close')?.addEventListener('click', () => this.showOverview());
     window.addEventListener('popstate', () => this.syncRoomFromLocation());
@@ -813,10 +846,18 @@ class School3DExperience {
     if (progressLabel) progressLabel.textContent = progressText;
     if (progressBar) progressBar.style.width = `${Math.round(progress * 100)}%`;
     if (action) {
-      if (room.id === 'electronica' || room.id === 'hall') {
+      if (room.id === 'electronica') {
+        // «Viajar a Ohmdal» tiene que llegar a Ohmdal. Con `/jugar` a secas el destino se
+        // pierde y caés donde diga el save —el hall del Instituto en 2D— que es justo lo
+        // contrario de lo que promete el botón. `portalGateUrl()` lleva a la Plaza.
+        setOhmdalAction(action, 'Viajar a Ohmdal');
+      } else if (room.id === 'hall') {
+        // «Continuar el viaje» sí retoma la partida donde haya quedado: destino correcto.
+        clearOhmdalAction(action);
         action.href = '/jugar';
-        action.textContent = room.id === 'electronica' ? 'Viajar a Ohmdal' : 'Continuar el viaje';
+        action.textContent = 'Continuar el viaje';
       } else {
+        clearOhmdalAction(action);
         action.href = classicHref(room.href ?? '#hall');
         action.textContent = room.actionLabel ?? 'Ver en la landing';
       }
@@ -842,8 +883,7 @@ class School3DExperience {
     if (description) description.textContent = detail.body;
     if (activity) activity.textContent = 'Seleccionable';
     if (action) {
-      action.href = '/jugar';
-      action.textContent = 'Practicar en Ohmdal';
+      setOhmdalAction(action, 'Practicar en Ohmdal');
     }
     panel?.classList.add('is-open', 'is-object');
     panel?.setAttribute('aria-hidden', 'false');
