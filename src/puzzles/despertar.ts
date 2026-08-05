@@ -1,5 +1,6 @@
 import { openBench, benchActions } from '../ui/bench';
 import { ohmWidgetHTML, setOhmState, makeInteractive } from './common';
+import { PEDESTAL_RING, coverRejection, readCircuit, toggleCover } from './ohmModel.ts';
 import { sfxBridge, sfxClick, sfxDim, sfxWin } from '../audio';
 
 /**
@@ -16,21 +17,23 @@ export function abrirDespertar(onSuccess: () => void): void {
     'El pedestal de Ohm',
     'Un autómata dormido. Una fuente que zumba. Y un camino lleno de huecos.',
     (bench) => {
-      interface Gap {
-        id: string;
-        x: number;
-        y: number;
-        broken?: boolean;
-        bridged: boolean;
-      }
-      const gaps: Gap[] = [
-        { id: 'g1', x: 280, y: 60, bridged: false }, // ida, por arriba
-        { id: 'g2', x: 390, y: 200, bridged: false }, // atajo de vuelta (señuelo)
-        { id: 'g3', x: 240, y: 200, broken: true, bridged: false }, // atajo: PARTIDO
-        { id: 'g4', x: 250, y: 260, bridged: false }, // vuelta larga
-        { id: 'g5', x: 380, y: 260, bridged: false }, // vuelta larga
-      ];
-      let bridges = 3;
+      // Sólo posiciones de dibujo. Qué conduce, qué está partido y cuántos puentes hay
+      // son reglas, y viven en `PEDESTAL_RING`.
+      const GAP_XY: Record<string, { x: number; y: number }> = {
+        g1: { x: 280, y: 60 }, // ida, por arriba
+        g2: { x: 390, y: 200 }, // atajo de vuelta (señuelo)
+        g3: { x: 240, y: 200 }, // atajo: PARTIDO
+        g4: { x: 250, y: 260 }, // vuelta larga
+        g5: { x: 380, y: 260 }, // vuelta larga
+      };
+      const gaps = PEDESTAL_RING.segments
+        .filter((segment) => segment.gap === true)
+        .map((segment) => ({
+          id: segment.id,
+          broken: segment.broken === true,
+          ...GAP_XY[segment.id],
+        }));
+      let covered: ReadonlySet<string> = new Set();
       let solved = false;
 
       const pendingTimers = new Set<number>();
@@ -100,7 +103,8 @@ export function abrirDespertar(onSuccess: () => void): void {
       bench.root.appendChild(tray);
 
       const updateTray = () => {
-        trayLabel.textContent = `Puentes de cobre: ${'▬ '.repeat(bridges) || '(ninguno)'}`;
+        const { supplyLeft } = readCircuit(PEDESTAL_RING, covered);
+        trayLabel.textContent = `Puentes de cobre: ${'▬ '.repeat(supplyLeft) || '(ninguno)'}`;
       };
       updateTray();
 
@@ -109,11 +113,6 @@ export function abrirDespertar(onSuccess: () => void): void {
           'al lado <b>−</b>. Está lleno de huecos. En la bandeja hay <b>tres puentes de cobre</b>. ' +
         'Toca un hueco —o selecciónalo con flechas y presiona <b>E</b>— para cubrirlo o descubrirlo.',
       );
-
-      const isWin = () =>
-        gaps.find((g) => g.id === 'g1')!.bridged &&
-        gaps.find((g) => g.id === 'g4')!.bridged &&
-        gaps.find((g) => g.id === 'g5')!.bridged;
 
       const win = () => {
         solved = true;
@@ -133,8 +132,9 @@ export function abrirDespertar(onSuccess: () => void): void {
       stage.querySelectorAll<SVGRectElement>('.gap-slot').forEach((slot) => {
         slot.addEventListener('click', () => {
           if (solved) return;
-          const gap = gaps.find((g) => g.id === slot.dataset.gap)!;
-          if (gap.broken) {
+          const id = slot.dataset.gap!;
+          const rejection = coverRejection(PEDESTAL_RING, covered, id);
+          if (rejection === 'partido') {
             sfxDim();
             bench.setStatus(
               'Este tramo está <b>partido</b>: los bordes no coinciden, ningún puente lo cubre. ' +
@@ -142,30 +142,30 @@ export function abrirDespertar(onSuccess: () => void): void {
             );
             return;
           }
-          if (gap.bridged) {
-            gap.bridged = false;
-            bridges++;
-            slot.classList.remove('bridged');
+          if (rejection === 'sin-material') {
+            bench.setStatus(
+              'No quedan puentes en la bandeja. Puedo <b>sacar</b> uno de donde lo puse, tocándolo.',
+            );
+            return;
+          }
+          const retirado = covered.has(id);
+          covered = toggleCover(PEDESTAL_RING, covered, id);
+          slot.classList.toggle('bridged', !retirado);
+          const lectura = readCircuit(PEDESTAL_RING, covered);
+          if (retirado) {
             sfxClick();
             bench.setStatus('Recuperaste el puente.');
-          } else if (bridges > 0) {
-            gap.bridged = true;
-            bridges--;
-            slot.classList.add('bridged');
+          } else {
             sfxBridge();
-            if (isWin()) {
+            if (lectura.complete) {
               updateTray();
               win();
               return;
             }
             bench.setStatus(
-              bridges === 0
+              lectura.supplyLeft === 0
                 ? 'No quedan puentes… y la chispa sigue sin correr. Un camino a medias es lo mismo que ningún camino. Quizás haya un puente mal gastado.'
                 : 'El puente encaja. Pero la chispa no corre todavía: la ida y la vuelta tienen que estar completas, sin un solo hueco.',
-            );
-          } else {
-            bench.setStatus(
-              'No quedan puentes en la bandeja. Puedo <b>sacar</b> uno de donde lo puse, tocándolo.',
             );
           }
           updateTray();

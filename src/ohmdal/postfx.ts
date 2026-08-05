@@ -173,7 +173,6 @@ export function createOhmdalPostFx(
   options: OhmdalPostFxOptions,
 ): OhmdalPostFx {
   const composer = new EffectComposer(renderer);
-  composer.setSize(options.width, options.height);
 
   const renderPass = new RenderPass(scene, camera);
   composer.addPass(renderPass);
@@ -210,7 +209,31 @@ export function createOhmdalPostFx(
     verticalBlur.uniforms.uTexelSize.value = texel.clone();
   }
 
-  applyTexelSize(options.width, options.height);
+  /**
+   * Todo el redimensionado pasa por acá, incluido el primero.
+   *
+   * `EffectComposer` captura el pixel ratio del renderer **al construirse** y no lo vuelve a
+   * mirar. Si no se lo actualizamos, arma sus render targets en pixeles CSS mientras el canvas
+   * dibuja en pixeles fisicos, y en una pantalla con dpr 2 el mundo entero termina renderizado
+   * en un cuarto del canvas con el resto en negro.
+   *
+   * `composer.setSize` ya propaga el tamano efectivo —CSS x ratio— a cada pasada, bloom y SMAA
+   * incluidos, asi que redimensionarlas a mano seria pisar el valor correcto con el equivocado.
+   * El tamano de texel del tilt-shift tambien va en pixeles reales: es un radio de muestreo.
+   */
+  function syncSize(width: number, height: number, mobile: boolean): void {
+    const ratio = renderer.getPixelRatio();
+    composer.setPixelRatio(ratio);
+    composer.setSize(width, height);
+    applyTexelSize(width * ratio, height * ratio);
+    // En pantallas angostas la banda nitida se estrecha con el encuadre: si no, el
+    // desenfoque se comeria los pies del personaje, que el contrato de encuadres protege.
+    const focusHeight = mobile ? 0.22 : 0.16;
+    horizontalBlur.uniforms.uFocusHeight.value = focusHeight;
+    verticalBlur.uniforms.uFocusHeight.value = focusHeight;
+  }
+
+  syncSize(options.width, options.height, options.mobile);
 
   return {
     composer,
@@ -218,15 +241,7 @@ export function createOhmdalPostFx(
       composer.render();
     },
     setSize(width, height, mobile): void {
-      composer.setSize(width, height);
-      bloom?.setSize(width, height);
-      smaa?.setSize(width, height);
-      applyTexelSize(width, height);
-      // En pantallas angostas la banda nitida se estrecha con el encuadre: si no, el
-      // desenfoque se comeria los pies del personaje, que el contrato de encuadres protege.
-      const focusHeight = mobile ? 0.22 : 0.16;
-      horizontalBlur.uniforms.uFocusHeight.value = focusHeight;
-      verticalBlur.uniforms.uFocusHeight.value = focusHeight;
+      syncSize(width, height, mobile);
     },
     setCamera(nextCamera): void {
       renderPass.camera = nextCamera;

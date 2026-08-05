@@ -9,20 +9,8 @@ import {
   makeInteractive,
 } from './common';
 import { setFlag, state } from '../state';
+import { FUENTES, PIEDRAS_PUERTA, leerPuerta, type FuenteDef } from './puertaModel.ts';
 import { sfxClick, sfxFzzt, sfxHot, sfxDim, sfxOk, sfxWin, sfxGate } from '../audio';
-
-interface Fuente {
-  key: string;
-  nombre: string;
-  glifo: string;
-  valor: number;
-}
-
-const FUENTES: Fuente[] = [
-  { key: 'brasa', nombre: 'Brasa', glifo: '△', valor: 4 },
-  { key: 'corazon', nombre: 'Corazón', glifo: '△△', valor: 8 },
-  { key: 'tormenta', nombre: 'Tormenta', glifo: '△△△', valor: 16 },
-];
 
 /**
  * Puzzle 3 — "La Puerta de Ohm".
@@ -41,7 +29,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
       ? 'Abierta, deja ver un pasillo de luz tibia. El mecanismo sigue respondiendo: Lumen lo llama «práctica». Edda lo llama «jugar».'
       : 'Nadie la abre desde la época de los Maestros. Tiene un ojo de aguja y mal carácter.',
     (bench) => {
-      let fuente: Fuente | null = null;
+      let fuente: FuenteDef | null = null;
       let piedra: string | null = null;
       let fusibleQuemado = false;
       let solved = false;
@@ -114,7 +102,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
       const rowP = document.createElement('div');
       rowP.className = 'bench-tray';
       rowP.innerHTML = '<span class="tray-label">Piedra de Freno:</span>';
-      for (const key of ['marron', 'roja', 'amarilla', 'gris']) {
+      for (const key of PIEDRAS_PUERTA) {
         const p = piedraEl(key);
         p.addEventListener('click', () => {
           if (solved) return;
@@ -173,11 +161,12 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
           return;
         }
         intentos++;
-        const I = fuente.valor / PIEDRAS[piedra].valor;
+        const lectura = leerPuerta(fuente.key, piedra);
+        const I = lectura.caudal!;
         setGauge(stage, I);
 
         trackTimer(window.setTimeout(() => {
-          if (Math.abs(I - 2) < 0.35) {
+          if (lectura.abre) {
             if (replay) {
               sfxOk();
               setOhmState(stage, 'estable');
@@ -200,7 +189,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
             actions['Alejarse'].classList.add('hidden');
             actions['Bajar la palanca'].classList.add('hidden');
             actions['Cruzar la Puerta'].classList.remove('hidden');
-          } else if (I > 4) {
+          } else if (lectura.estado === 'fusible') {
             fusibleQuemado = true;
             if (!state.flags.burnedSomething) setFlag('burnedSomething');
             sfxFzzt();
@@ -217,7 +206,7 @@ export function abrirPuerta(onSuccess: () => void, replay = false): void {
             );
             actions['Bajar la palanca'].classList.add('hidden');
             actions['Cambiar fusible ritual'].classList.remove('hidden');
-          } else if (I > 2) {
+          } else if (lectura.estado === 'caliente') {
             sfxHot();
             setOhmState(stage, 'sobrecarga');
             trackTimer(window.setTimeout(() => setOhmState(stage, 'estable'), 1300));

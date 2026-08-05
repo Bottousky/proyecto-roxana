@@ -8,9 +8,8 @@ import {
   resistorCodeLegendEl,
 } from './common';
 import { setFlag, state } from '../state';
+import { leerLamparaEterna } from './frenoModel.ts';
 import { sfxBridge, sfxFzzt, sfxHot, sfxDim, sfxOk, sfxWin } from '../audio';
-
-const EMPUJE_TALLER = 8; // fijo: la "fuente del taller" de Lumen
 
 /**
  * Puzzle 2 — "La Piedra de Freno".
@@ -146,9 +145,9 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
 
       const evaluar = () => {
         if (solved || fusibleQuemado) return;
-        const corriente = EMPUJE_TALLER / PIEDRAS[enSlot].valor;
+        const { estado } = leerLamparaEterna(enSlot);
 
-        if (corriente >= 8) {
+        if (estado === 'fusible') {
           fusibleQuemado = true;
           if (!state.flags.burnedSomething) setFlag('burnedSomething');
           sfxFzzt();
@@ -167,7 +166,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
           );
           actions['Bajar la palanca'].classList.add('hidden');
           actions['Cambiar fusible ritual'].classList.remove('hidden');
-        } else if (corriente >= 4) {
+        } else if (estado === 'caliente') {
           sfxHot();
           setLamp('hot');
           setOhmState(stage, 'sobrecarga');
@@ -178,7 +177,7 @@ export function abrirFreno(onSuccess: () => void, replay = false): void {
               : 'La lámpara arde con luz furiosa y huele a caliente. Ohm vibra, incómodo. ' +
                   'Edda: «Eso no es brillo, eso es fiebre.»',
           );
-        } else if (corriente >= 2) {
+        } else if (estado === 'justo') {
           if (replay) {
             sfxOk();
             setLamp('ok');

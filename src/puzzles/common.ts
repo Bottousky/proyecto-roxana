@@ -1,10 +1,11 @@
 /* Widgets compartidos por las vistas de banco: Ohm (indicador vivo) y el medidor de aguja. */
 
-import {
-  RESISTOR_DIGIT_COLORS,
-  resistorColorByDigit,
-  type ResistorDigit,
-} from '../shared/resistorColorCode.ts';
+import { RESISTOR_DIGIT_COLORS } from '../shared/resistorColorCode.ts';
+import { PIEDRAS, type PiedraDef } from './frenoModel.ts';
+
+// Las piedras son regla del puzzle, no presentación: viven en el modelo puro y se
+// reexportan acá para que los consumidores de siempre no tengan que enterarse.
+export { PIEDRAS, type PiedraDef };
 
 /** Hace operable por teclado un elemento clickeable que no es <button>. */
 export function makeInteractive(el: HTMLElement | SVGElement, label?: string): void {
@@ -531,35 +532,15 @@ export function canalCortable(
 
 /* ---------- Piedras de Freno (con banda de color = código real de resistencias) ---------- */
 
-export interface PiedraDef {
-  nombre: string;
-  /** Banda y cifra del código real de resistores. */
-  color: string;
-  valor: number;
-  codigo: ResistorDigit;
-  rajada?: boolean;
-}
-
-export const PIEDRAS: Record<string, PiedraDef> = {
-  marron: { nombre: 'marca marrón', color: resistorColorByDigit(1).color, valor: 1, codigo: 1 },
-  roja: { nombre: 'marca roja', color: resistorColorByDigit(2).color, valor: 2, codigo: 2 },
-  amarilla: { nombre: 'marca amarilla', color: resistorColorByDigit(4).color, valor: 4, codigo: 4 },
-  gris: { nombre: 'marca gris', color: resistorColorByDigit(8).color, valor: 8, codigo: 8 },
-  rajada: {
-    nombre: 'piedra rajada de marca marrón',
-    color: resistorColorByDigit(1).color,
-    valor: 1,
-    codigo: 1,
-    rajada: true,
-  },
-};
-
 export function piedraEl(key: string): HTMLElement {
   const def = PIEDRAS[key];
   const div = document.createElement('div');
   div.className = 'piedra' + (def.rajada ? ' rajada' : '');
   div.dataset.key = key;
   div.dataset.code = String(def.codigo);
+  // Canal redundante al color: la cifra ya se dibuja, y el cuerpo permite dimensionarla
+  // desde CSS. Ver la regla 1 de docs/arco1/IDENTITY.md.
+  div.dataset.cuerpo = def.cuerpo;
   div.style.setProperty('--band', def.color);
   div.setAttribute(
     'aria-label',
