@@ -43,7 +43,20 @@ assert(
   !blockout.visualLayer.children.some((child) => child.name === 'portal-floor'),
   'los modulos de prueba de la Plaza ya no se dibujan',
 );
-assert(before.visualMeshCount >= 15, 'Taller y Puerta/Manantial conservan sus modulos visibles');
+// El Taller siguio a la Plaza: lo construye `tallerKit` y entra como un solo nodo. De sus
+// modulos de prueba sobrevive el emisor de la linterna, que es lo que el rig de luz busca por
+// nombre. Los modulos sueltos que quedan son los de la Puerta.
+const tallerKitRoot = blockout.visualLayer.getObjectByName('TALLER_KIT');
+assert(tallerKitRoot !== undefined, 'el Taller entra a la capa visual como kit construido');
+assert(
+  tallerKitRoot!.children.some((child) => child.name === 'taller_floor'),
+  'el kit del Taller trae su piso de tablas',
+);
+assert(
+  blockout.visualLayer.children.some((child) => child.name === 'workshop-lantern-emitter'),
+  'el emisor de la linterna sobrevive: el rig de luz lo busca por nombre',
+);
+assert(before.visualMeshCount === 9, 'dos kits construidos mas los siete modulos de la Puerta');
 assert(before.colliderMeshCount === 12, 'los colliders primitivos son explicitos');
 assert(before.navigationMeshCount === 3, 'cada set tiene region de navegacion plana');
 assert(before.geometryCount < before.visualMeshCount + before.colliderMeshCount + 10, 'geometrias repetidas se comparten');
@@ -53,7 +66,13 @@ assert(before.lighting.shadowLightCount === 1, 'solo la luz principal proyecta s
 assert(before.lighting.enabledLocalLightCount === 2, 'ambos emisores locales nacen habilitados');
 assert(blockout.lighting.inventory.filter((entry) => entry.type === 'point').every((entry) => entry.emitterId !== 'WORLD'), 'cada luz local tiene emisor visible');
 const occlusionBindingIds = blockout.occlusionBindings.map((binding) => binding.id).sort();
-assert(occlusionBindingIds.length === 6, 'foreground, techos y pilares de Puerta exponen bindings propios');
+assert(occlusionBindingIds.length === 5, 'vano, dos faldones y pilares de Puerta exponen bindings propios');
+assert(occlusionBindingIds.includes('taller-roof-north'), 'el faldon norte del Taller se desvanece');
+assert(occlusionBindingIds.includes('taller-roof-south'), 'el faldon sur del Taller se desvanece');
+assert(
+  occlusionBindingIds.includes('taller-doorway'),
+  'el vano del Taller es el oclusor de primer plano que verifica GF-05',
+);
 assert(occlusionBindingIds.includes('door-pier-north'), 'el pilar norte de Puerta participa del fade');
 assert(occlusionBindingIds.includes('door-pier-south'), 'el pilar sur que ocultaba al estudiante participa del fade');
 assert(!occlusionBindingIds.includes('ohm-door-frame'), 'el landmark dominante de la Puerta nunca se oculta');

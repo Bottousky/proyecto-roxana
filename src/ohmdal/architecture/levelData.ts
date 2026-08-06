@@ -93,7 +93,7 @@ export const LEVEL_ZONES: readonly LevelZone[] = [
     id: 'taller',
     purpose: 'diagnosis-workspace',
     bounds: { minX: -4.5, maxX: 8.5, minZ: -5, maxZ: 4.5 },
-    landmarkId: 'workshop-roof-high',
+    landmarkId: 'TALLER_KIT',
   },
   {
     id: 'puerta_manantial',
@@ -146,19 +146,13 @@ export const ARCHITECTURE_SOCKETS: readonly ArchitectureSocket[] = [
 ] as const;
 
 export const BOX_MODULES: readonly BoxModuleDefinition[] = [
-  // La Plaza no declara modulos: la construye `plazaKit` con geometria fusionada y pintada.
-  // Dejar aca las cajas de prueba de la zona seria dato muerto, y los tests las leerian como
-  // si dibujaran algo.
-  { id: 'workshop-floor', zoneId: 'taller', family: 'wood', centerX: 2, centerZ: -0.25, width: 13, height: 0.09, depth: 9.5, pivotY: 0, tags: ['floor'] },
+  // Ni la Plaza ni el Taller declaran modulos: los construyen `plazaKit` y `tallerKit` con
+  // geometria fusionada, pintada y texturada. Dejar aca las cajas de prueba seria dato muerto,
+  // y los tests las leerian como si dibujaran algo. Del Taller sobrevive solo el emisor de la
+  // linterna, que es lo que el rig de luz busca por nombre para colgarle su point light.
   { id: 'door-floor', zoneId: 'puerta_manantial', family: 'stone', centerX: 14.25, centerZ: 0.25, width: 12.5, height: 0.08, depth: 10.5, pivotY: 0, tags: ['floor'] },
 
 
-  { id: 'workshop-wall-back', zoneId: 'taller', family: 'wood', centerX: 2, centerZ: -4.55, width: 12, height: 3, depth: 0.35, pivotY: 0, tags: ['structure'] },
-  { id: 'workshop-wall-front-west', zoneId: 'taller', family: 'wood', centerX: -2.3, centerZ: 4.05, width: 3, height: 2.6, depth: 0.3, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
-  { id: 'workshop-wall-front-east', zoneId: 'taller', family: 'wood', centerX: 7, centerZ: 4.05, width: 2, height: 2.6, depth: 0.3, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
-  { id: 'workshop-roof-low', zoneId: 'taller', family: 'wood', centerX: -0.6, centerZ: -1.4, width: 3.8, height: 0.28, depth: 4.6, baseY: 3.15, rotationZ: -0.16, pivotY: 0, tags: ['structure', 'landmark', 'cameraRoof'] },
-  { id: 'workshop-roof-high', zoneId: 'taller', family: 'wood', centerX: 4.6, centerZ: -1.4, width: 3.2, height: 0.28, depth: 4.2, baseY: 3.7, rotationZ: 0.16, pivotY: 0, tags: ['structure', 'landmark', 'cameraRoof'] },
-  { id: 'workshop-bench', zoneId: 'taller', family: 'wood', centerX: 4.8, centerZ: -2.5, width: 2.4, height: 0.9, depth: 0.9, pivotY: 0, tags: ['structure'] },
   { id: 'workshop-lantern-emitter', zoneId: 'taller', family: 'glass', centerX: 3.2, centerZ: -3.9, width: 0.3, height: 0.35, depth: 0.3, baseY: 2.55, pivotY: 0, tags: ['emitter'] },
 
   { id: 'door-pier-north', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: -3, width: 0.9, height: 4.8, depth: 0.9, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
@@ -180,10 +174,11 @@ export const COLLIDERS: readonly ColliderDefinition[] = [
   { id: 'C_BELL_PIER_NORTH', zoneId: 'portal_plaza', bounds: { minX: -11.13, maxX: -10.08, minZ: -2.28, maxZ: -1.23 }, height: 5.1, planeY: 0 },
   { id: 'C_BELL_PIER_SOUTH', zoneId: 'portal_plaza', bounds: { minX: -11.13, maxX: -10.08, minZ: 1.23, maxZ: 2.28 }, height: 5.1, planeY: 0 },
   { id: 'C_OHM_PEDESTAL', zoneId: 'portal_plaza', bounds: { minX: -14.78, maxX: -12.22, minZ: -1.28, maxZ: 1.28 }, height: 1.06, planeY: 0 },
-  { id: 'C_WALL_BACK', zoneId: 'taller', bounds: { minX: -4, maxX: 8, minZ: -4.75, maxZ: -4.35 }, height: 3, planeY: 0 },
-  { id: 'C_WALL_FRONT_WEST', zoneId: 'taller', bounds: { minX: -3.8, maxX: -0.8, minZ: 3.9, maxZ: 4.2 }, height: 2.6, planeY: 0 },
-  { id: 'C_WALL_FRONT_EAST', zoneId: 'taller', bounds: { minX: 6, maxX: 8, minZ: 3.9, maxZ: 4.2 }, height: 2.6, planeY: 0 },
-  { id: 'C_WORKBENCH', zoneId: 'taller', bounds: { minX: 3.6, maxX: 6, minZ: -2.95, maxZ: -2.05 }, height: 0.9, planeY: 0 },
+  { id: 'C_TALLER_BACK', zoneId: 'taller', bounds: { minX: -4.6, maxX: 8.6, minZ: -5.2, maxZ: -4.5 }, height: 2.8, planeY: 0 },
+  // El muro este se abre en el medio: por ahi sale el socket S_TALLER_TO_DOOR hacia la Puerta.
+  { id: 'C_TALLER_EAST_NORTH', zoneId: 'taller', bounds: { minX: 8.25, maxX: 8.6, minZ: -5.2, maxZ: -1.7 }, height: 2.8, planeY: 0 },
+  { id: 'C_TALLER_EAST_SOUTH', zoneId: 'taller', bounds: { minX: 8.25, maxX: 8.6, minZ: 1.7, maxZ: 4.7 }, height: 2.8, planeY: 0 },
+  { id: 'C_WORKBENCH', zoneId: 'taller', bounds: { minX: 3.5, maxX: 6.1, minZ: -3.03, maxZ: -1.97 }, height: 1, planeY: 0 },
   { id: 'C_DOOR_NORTH', zoneId: 'puerta_manantial', bounds: { minX: 12.55, maxX: 13.45, minZ: -3.45, maxZ: -2.55 }, height: 4.8, planeY: 0 },
   { id: 'C_DOOR_SOUTH', zoneId: 'puerta_manantial', bounds: { minX: 12.55, maxX: 13.45, minZ: 4.05, maxZ: 4.95 }, height: 3.2, planeY: 0 },
   { id: 'C_SPRING_BASIN', zoneId: 'puerta_manantial', bounds: { minX: 17.35, maxX: 19.5, minZ: 0, maxZ: 3 }, height: 0.25, planeY: 0 },

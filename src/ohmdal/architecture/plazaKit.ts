@@ -15,7 +15,18 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { LEVEL_SEED } from './levelData.ts';
+import {
+  block as kitBlock,
+  drum as kitDrum,
+  edgeProximity,
+  loadKitMaps,
+  noise,
+  paint,
+  projectUvs,
+  triangleCount,
+  weatheredPaint,
+  type PaintFn,
+} from './kitBuilder.ts';
 import type { BlockoutTimeOfDay } from '../materials/blockoutMaterials.ts';
 
 /**
@@ -45,124 +56,20 @@ const PAVER_SIZE = 1;
 const PAVER_JOINT = 0.07;
 const FLOOR_TOP_Y = 0.08;
 
-/** Semilla numérica estable a partir del seed del nivel: dos corridas pintan igual. */
-const SEED_OFFSET = [...LEVEL_SEED].reduce((total, char) => (total * 31 + char.charCodeAt(0)) % 9973, 7);
+/** Atajos del kit con el paso de textura de cada familia ya fijado. */
+const stonePaint = (topY: number, variation = 0.09): PaintFn =>
+  weatheredPaint({ topY, bounds: PLAZA_BOUNDS, variation });
 
-/** Ruido determinista en [0,1). No es azar: la misma pieza se pinta igual siempre. */
-function noise(x: number, z: number): number {
-  const value = Math.sin(x * 127.1 + z * 311.7 + SEED_OFFSET) * 43758.5453;
-  return value - Math.floor(value);
-}
+const block = (
+  width: number, height: number, depth: number,
+  x: number, baseY: number, z: number, paintFn: PaintFn,
+): THREE.BufferGeometry => kitBlock(width, height, depth, x, baseY, z, STONE_TILE_METERS, paintFn);
 
-/** Cuánto se acerca un punto al borde de la Plaza, de 0 (centro) a 1 (contra el muro). */
-function edgeProximity(x: number, z: number): number {
-  const toX = Math.min(x - PLAZA_BOUNDS.minX, PLAZA_BOUNDS.maxX - x);
-  const toZ = Math.min(z - PLAZA_BOUNDS.minZ, PLAZA_BOUNDS.maxZ - z);
-  const distance = Math.max(0, Math.min(toX, toZ));
-  return 1 - Math.min(1, distance / 2.2);
-}
-
-type PaintFn = (x: number, y: number, z: number, out: THREE.Color) => void;
-
-/** Escribe el atributo `color` de una geometría ya colocada en coordenadas de mundo. */
-function paint(geometry: THREE.BufferGeometry, paintFn: PaintFn): THREE.BufferGeometry {
-  const position = geometry.getAttribute('position');
-  const colors = new Float32Array(position.count * 3);
-  const scratch = new THREE.Color();
-  for (let index = 0; index < position.count; index += 1) {
-    paintFn(position.getX(index), position.getY(index), position.getZ(index), scratch);
-    colors[index * 3] = scratch.r;
-    colors[index * 3 + 1] = scratch.g;
-    colors[index * 3 + 2] = scratch.b;
-  }
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  return geometry;
-}
-
-/**
- * Pintura estándar de la piedra construida: se ensucia contra el suelo, se aclara arriba donde
- * la luz y el uso la gastan, y se oscurece contra los bordes de la Plaza. Cada pieza arranca de
- * un tono propio para que la repetición del kit no se note.
- */
-function stonePaint(topY: number, variation = 0.09): PaintFn {
-  return (x, y, z, out) => {
-    const own = (noise(Math.round(x * 2), Math.round(z * 2)) - 0.5) * 2 * variation;
-    const height = topY > 0 ? Math.min(1, Math.max(0, y / topY)) : 0;
-    // Mugre en el arranque, desgaste en la coronación.
-    const grime = -0.20 * (1 - height) ** 2;
-    const wear = 0.10 * height ** 2;
-    const occluded = -0.14 * edgeProximity(x, z);
-    const value = 1 + own + grime + wear + occluded;
-    out.setScalar(Math.min(1.35, Math.max(0.42, value)));
-  };
-}
-
-/**
- * Reescribe las UV proyectando desde coordenadas de **mundo** sobre el eje dominante de cada
- * cara. Es lo único que hace que un kit modular texture bien: las UV que trae `BoxGeometry` van
- * de 0 a 1 por cara, así que una losa de 1 m y un muro de 2 m mostrarían la misma textura a
- * escalas distintas, y en la junta entre dos módulos contiguos se vería el corte.
- *
- * Proyectando desde el mundo, la piedra es continua a través de las piezas y la densidad de
- * téxel es la misma en todas. Es la misma idea que un trim sheet, resuelta en el vértice.
- */
-function projectUvs(geometry: THREE.BufferGeometry, tileMeters: number): THREE.BufferGeometry {
-  const position = geometry.getAttribute('position');
-  const normal = geometry.getAttribute('normal');
-  const uv = new Float32Array(position.count * 2);
-  for (let index = 0; index < position.count; index += 1) {
-    const x = position.getX(index);
-    const y = position.getY(index);
-    const z = position.getZ(index);
-    const ax = Math.abs(normal.getX(index));
-    const ay = Math.abs(normal.getY(index));
-    const az = Math.abs(normal.getZ(index));
-    let u: number;
-    let v: number;
-    if (ay >= ax && ay >= az) {
-      u = x; v = z; // suelos y coronaciones
-    } else if (ax >= az) {
-      u = z; v = y; // caras que miran al este o al oeste
-    } else {
-      u = x; v = y; // caras que miran a la cámara o al fondo
-    }
-    uv[index * 2] = u / tileMeters;
-    uv[index * 2 + 1] = v / tileMeters;
-  }
-  geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-  return geometry;
-}
-
-/** Una caja con el pivote en su base, ya trasladada a mundo y pintada. */
-function block(
-  width: number,
-  height: number,
-  depth: number,
-  x: number,
-  baseY: number,
-  z: number,
-  paintFn: PaintFn,
-): THREE.BufferGeometry {
-  const geometry = new THREE.BoxGeometry(width, height, depth);
-  geometry.translate(x, baseY + height / 2, z);
-  return paint(projectUvs(geometry, STONE_TILE_METERS), paintFn);
-}
-
-/** Un cilindro con el pivote en su base, ya trasladado y pintado. */
-function drum(
-  radiusTop: number,
-  radiusBottom: number,
-  height: number,
-  x: number,
-  baseY: number,
-  z: number,
-  segments: number,
-  paintFn: PaintFn,
-): THREE.BufferGeometry {
-  const geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segments);
-  geometry.translate(x, baseY + height / 2, z);
-  return paint(projectUvs(geometry, STONE_TILE_METERS), paintFn);
-}
+const drum = (
+  radiusTop: number, radiusBottom: number, height: number,
+  x: number, baseY: number, z: number, segments: number, paintFn: PaintFn,
+): THREE.BufferGeometry =>
+  kitDrum(radiusTop, radiusBottom, height, x, baseY, z, segments, STONE_TILE_METERS, paintFn);
 
 /**
  * El piso empedrado. Una sola geometría de losas sueltas: la junta entre ellas es hueco real,
@@ -192,7 +99,7 @@ function paverFloor(): THREE.BufferGeometry {
           const own = (noise(column * 3.1, row * 7.7) - 0.5) * 0.22;
           // El paso de la gente pulió el eje del recorrido y dejó los bordes opacos.
           const path = Math.exp(-((pz / 3.4) ** 2)) * 0.12;
-          const occluded = -0.22 * edgeProximity(px, pz);
+          const occluded = -0.22 * edgeProximity(px, pz, PLAZA_BOUNDS);
           // La cara superior recibe; los cantos se hunden en sombra.
           const face = py > lift + FLOOR_TOP_Y * 0.4 ? 0 : -0.18;
           out.setScalar(Math.min(1.3, Math.max(0.38, 1 + own + path + occluded + face)));
@@ -296,24 +203,6 @@ function pedestalSteps(): THREE.BufferGeometry[] {
   ];
 }
 
-/**
- * Carga un mapa que se repite. Sin `RepeatWrapping` la proyección de mundo no tiene sentido.
- *
- * Fuera del navegador devuelve la textura vacía: los tests de arquitectura construyen el
- * blockout completo en Node para medir composición y presupuesto, y ahí no hay nada que
- * decodificar. El material queda igual de válido, sólo sin imagen.
- */
-function loadTiling(url: string, colorSpace: THREE.ColorSpace): THREE.Texture {
-  const texture = typeof document === 'undefined'
-    ? new THREE.Texture()
-    : new THREE.TextureLoader().load(url);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.colorSpace = colorSpace;
-  texture.anisotropy = 4;
-  return texture;
-}
-
 export interface PlazaKit {
   readonly root: THREE.Group;
   setTimeOfDay(timeOfDay: BlockoutTimeOfDay): void;
@@ -372,20 +261,16 @@ export function createPlazaKit(): PlazaKit {
   // luminancia por oclusión, contraste al 55 %, media 0,95. **No traen color.** El color lo
   // sigue poniendo la paleta de COLOR_SCRIPT.md a través del material, y el mapa multiplica.
   // Por eso sumar textura no reabre ninguna decisión de color ni rompe el paso a crepúsculo.
-  const grain = (url: string): THREE.Texture => loadTiling(url, THREE.SRGBColorSpace);
-  const relief = (url: string): THREE.Texture => loadTiling(url, THREE.NoColorSpace);
-  const pavingGrain = grain(MATERIAL_URLS.pavingGrain);
-  const pavingNormal = relief(MATERIAL_URLS.pavingNormal);
-  const stoneGrain = grain(MATERIAL_URLS.stoneGrain);
-  const stoneNormal = relief(MATERIAL_URLS.stoneNormal);
-  const textures = [pavingGrain, pavingNormal, stoneGrain, stoneNormal];
+  const paving = loadKitMaps(MATERIAL_URLS.pavingGrain, MATERIAL_URLS.pavingNormal);
+  const stone = loadKitMaps(MATERIAL_URLS.stoneGrain, MATERIAL_URLS.stoneNormal);
+  const textures = [paving.grain, paving.normal, stone.grain, stone.normal];
 
   // `flatShading` es lo que separa un kit por código de un blockout: sin él, una caja y un
   // cilindro se leen como volúmenes lisos y el sol no describe ninguna arista.
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: FLOOR_COLORS.afternoon,
-    map: pavingGrain,
-    normalMap: pavingNormal,
+    map: paving.grain,
+    normalMap: paving.normal,
     normalScale: new THREE.Vector2(0.8, 0.8),
     vertexColors: true,
     roughness: 0.96,
@@ -395,8 +280,8 @@ export function createPlazaKit(): PlazaKit {
   floorMaterial.name = 'PLAZA_FLOOR';
   const stoneMaterial = new THREE.MeshStandardMaterial({
     color: STONE_COLORS.afternoon,
-    map: stoneGrain,
-    normalMap: stoneNormal,
+    map: stone.grain,
+    normalMap: stone.normal,
     normalScale: new THREE.Vector2(0.65, 0.65),
     vertexColors: true,
     roughness: 0.9,
@@ -408,8 +293,8 @@ export function createPlazaKit(): PlazaKit {
     color: COPPER_COLORS.afternoon,
     // El cobre reusa el grano de la piedra: la oxidación se lee como picado, y compartir mapa
     // es lo que mantiene el presupuesto de textura de E1 en el 25 % de lo asignado.
-    map: stoneGrain,
-    normalMap: stoneNormal,
+    map: stone.grain,
+    normalMap: stone.normal,
     normalScale: new THREE.Vector2(0.4, 0.4),
     vertexColors: true,
     roughness: 0.55,
@@ -440,11 +325,9 @@ export function createPlazaKit(): PlazaKit {
       copperMaterial.color.setHex(COPPER_COLORS[timeOfDay]);
     },
     diagnostics() {
-      const count = (geometry: THREE.BufferGeometry): number =>
-        (geometry.index ? geometry.index.count : geometry.getAttribute('position').count) / 3;
       return {
         meshes: 3,
-        triangles: count(floorGeometry) + count(stoneGeometry) + count(copperGeometry),
+        triangles: triangleCount(floorGeometry) + triangleCount(stoneGeometry) + triangleCount(copperGeometry),
       };
     },
     dispose(): void {

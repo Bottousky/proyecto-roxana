@@ -8,6 +8,7 @@ import {
 } from '../materials/blockoutMaterials.ts';
 import { NAVIGATION_REGIONS } from '../navigation/navigation.ts';
 import { createPlazaKit } from './plazaKit.ts';
+import { createTallerKit } from './tallerKit.ts';
 import {
   BOX_MODULES,
   COLLIDERS,
@@ -153,6 +154,11 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
   // hasta que les toque.
   const plaza = createPlazaKit();
   visualLayer.add(plaza.root);
+  const taller = createTallerKit();
+  visualLayer.add(taller.root);
+  // Los faldones y el vano del Taller se desvanecen igual que cualquier otro oclusor: el kit
+  // aporta sus bindings y el controlador de oclusión no se entera de que cambió quién los hace.
+  occlusionBindings.push(...taller.occlusionBindings);
 
   for (const definition of BOX_MODULES) {
     const moduleRoot = new THREE.Group();
@@ -258,6 +264,7 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
       materials.setTimeOfDay(timeOfDay);
       lighting.setTimeOfDay(timeOfDay);
       plaza.setTimeOfDay(timeOfDay);
+      taller.setTimeOfDay(timeOfDay);
     },
     diagnostics() {
       return {
@@ -275,6 +282,7 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
       if (disposed) return;
       lighting.dispose();
       plaza.dispose();
+      taller.dispose();
       root.removeFromParent();
       root.clear();
       geometries.forEach((geometry) => geometry.dispose());

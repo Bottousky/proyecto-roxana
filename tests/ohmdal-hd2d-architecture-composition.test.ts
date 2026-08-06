@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { createOhmdalBlockout } from '../src/ohmdal/architecture/blockout.ts';
 import { PORTAL_SILHOUETTE } from '../src/ohmdal/architecture/plazaKit.ts';
+import { TALLER_BOUNDS, TALLER_SILHOUETTE } from '../src/ohmdal/architecture/tallerKit.ts';
 import {
   BOX_MODULES,
   routeAnchor,
@@ -76,16 +77,32 @@ assert(
 );
 assert(moduleById('door-pier-north').height - moduleById('door-pier-south').height >= 1.5, 'Puerta escalona sus pilares tecnicos');
 
-const workshopFloor = moduleById('workshop-floor');
-const workshopRoofs = [moduleById('workshop-roof-low'), moduleById('workshop-roof-high')];
-const roofFootprint = workshopRoofs.reduce((area, roof) => area + roof.width * roof.depth, 0);
-assert(roofFootprint / (workshopFloor.width * workshopFloor.depth) < 0.26, 'techos ocupan menos del 26% de la planta del Taller');
-assert(workshopRoofs.every((roof) => roof.tags.includes('landmark') && roof.tags.includes('cameraRoof')), 'Taller conserva sawtooth y fade aun con menor masa');
-assert(moduleById('workshop-wall-front-west').width + moduleById('workshop-wall-front-east').width <= 5, 'pilares de foreground dejan un vano dominante');
+// El Taller lo construye `tallerKit`, que declara su silueta como datos. Las relaciones que
+// lo definen se verifican igual, y por eso el kit las expone en vez de enterrarlas.
+const tallerWidth = TALLER_BOUNDS.maxX - TALLER_BOUNDS.minX;
+const tallerDepth = TALLER_BOUNDS.maxZ - TALLER_BOUNDS.minZ;
+const roofFootprint =
+  (TALLER_SILHOUETTE.roofNorth.depth + TALLER_SILHOUETTE.roofSouth.depth) * tallerWidth;
+assert(
+  roofFootprint / (tallerWidth * tallerDepth) < 0.68,
+  'los faldones dejan abierta buena parte de la planta: GF-04 necesita ver adentro',
+);
+assert(
+  Math.abs(TALLER_SILHOUETTE.roofNorth.tilt) !== Math.abs(TALLER_SILHOUETTE.roofSouth.tilt),
+  'Taller conserva su silueta asimetrica: no se confunde con el Portal ni con la Puerta',
+);
+assert(
+  TALLER_SILHOUETTE.doorway.width >= 3,
+  'el vano de acceso conserva paso legible y hace de oclusor de primer plano',
+);
+assert(
+  TALLER_SILHOUETTE.ridgeY > TALLER_SILHOUETTE.eaveY,
+  'la cumbrera esta por encima del alero',
+);
 
 const blockout = createOhmdalBlockout();
 blockout.root.updateMatrixWorld(true);
-assert(blockout.diagnostics().visualMeshCount === 15, 'la diferenciacion no aumenta modulos visibles: el kit de la Plaza mas los catorce del Taller y la Puerta');
+assert(blockout.diagnostics().visualMeshCount === 9, 'la diferenciacion no aumenta modulos visibles: dos kits construidos mas los siete modulos de la Puerta');
 
 // C3 casi ortografica tiene un encuadre propio; perspectiva permanece congelada.
 // Se diferencia por inclinacion, no por giro lateral: la camara HD-2D es frontal en los tres
@@ -194,16 +211,23 @@ const workshopBlocked = findBlockedOccluderIds(
   directorSockets,
   blockout.occlusionBindings.map(({ object }) => object),
 );
-assert(workshopBlocked.has('workshop-roof-low'), 'Lumen/Ohm protegidos activan fade del techo que los cruza');
-const roofBinding = blockout.occlusionBindings.find(({ id }) => id === 'workshop-roof-low');
-assert(roofBinding !== undefined, 'el techo bajo tiene binding estable');
-const roofMaterial = (roofBinding.object.children[0] as THREE.Mesh).material as THREE.Material & { opacity: number };
+// Es el recurso de HD-2D que mas se nota: al entrar, el techo se abre en vez de cortar a otra
+// pantalla. Se verifica el mecanismo, no cual de los dos faldones cae en el rayo: eso depende
+// de la posicion exacta del sujeto y volveria el test fragil ante cualquier ajuste de planta.
+const blockedTallerRoof = [...workshopBlocked].find((id) => id.startsWith('taller-roof-'));
+assert(
+  blockedTallerRoof !== undefined,
+  'Lumen/Ohm protegidos activan el fade del faldon que los cruza',
+);
+const roofBinding = blockout.occlusionBindings.find(({ id }) => id === blockedTallerRoof);
+assert(roofBinding !== undefined, 'el faldon que tapa tiene binding estable');
+const roofMaterial = (roofBinding.object as THREE.Mesh).material as THREE.Material & { opacity: number };
 const occlusion = new CameraOcclusionController([roofBinding]);
 occlusion.update(workshopBlocked, 1 / 60, true);
 occlusion.update(workshopBlocked, 1 / 60, true);
 assert(roofMaterial.opacity === 0.18, 'sockets adicionales aplican fade despues de dos frames');
 for (let index = 0; index < 6; index += 1) occlusion.update(new Set(), 1 / 60, true);
-assert(roofMaterial.opacity === 1, 'techo recupera opacidad luego de seis frames libres');
+assert(roofMaterial.opacity === 1, 'el faldon recupera opacidad luego de seis frames libres');
 
 occlusion.dispose();
 workshopCamera.dispose();

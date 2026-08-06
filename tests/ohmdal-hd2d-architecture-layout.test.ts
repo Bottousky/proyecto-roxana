@@ -45,7 +45,7 @@ for (const socket of ARCHITECTURE_SOCKETS) {
 }
 // Cada zona nombra su silueta dominante. La Plaza ya no la declara como modulo de prueba: la
 // construye `plazaKit`, asi que su landmark es el nodo que el kit publica en la escena.
-const KIT_LANDMARKS = new Set(['PLAZA_PORTAL_GATE']);
+const KIT_LANDMARKS = new Set(['PLAZA_PORTAL_GATE', 'TALLER_KIT']);
 for (const zone of LEVEL_ZONES) {
   const declared = BOX_MODULES.some((module) => module.id === zone.landmarkId)
     || KIT_LANDMARKS.has(zone.landmarkId);
