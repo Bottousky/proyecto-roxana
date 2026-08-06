@@ -30,8 +30,21 @@ const mannequinBounds = new THREE.Box3().setFromObject(blockout.mannequin);
 close(mannequinBounds.max.y - mannequinBounds.min.y, 1.72, 0.000001, 'la geometria del maniqui mide 1,72 m');
 
 const before = blockout.diagnostics();
-assert(before.visualMeshCount >= 19, 'Portal, Plaza, Taller y Puerta/Manantial tienen modulos visibles');
-assert(before.colliderMeshCount === 9, 'los colliders primitivos son explicitos');
+// La Plaza dejo de ser modulos de prueba: la construye `plazaKit` y entra a la capa visual
+// como un solo nodo con sus mallas fusionadas. Los modulos sueltos que quedan son los del
+// Taller y los de la Puerta, que siguen en blockout.
+const plazaKitRoot = blockout.visualLayer.getObjectByName('PLAZA_KIT');
+assert(plazaKitRoot !== undefined, 'la Plaza entra a la capa visual como kit construido');
+assert(
+  plazaKitRoot!.children.some((child) => child.name === 'plaza_floor'),
+  'el kit trae su piso empedrado',
+);
+assert(
+  !blockout.visualLayer.children.some((child) => child.name === 'portal-floor'),
+  'los modulos de prueba de la Plaza ya no se dibujan',
+);
+assert(before.visualMeshCount >= 15, 'Taller y Puerta/Manantial conservan sus modulos visibles');
+assert(before.colliderMeshCount === 12, 'los colliders primitivos son explicitos');
 assert(before.navigationMeshCount === 3, 'cada set tiene region de navegacion plana');
 assert(before.geometryCount < before.visualMeshCount + before.colliderMeshCount + 10, 'geometrias repetidas se comparten');
 assert(before.material.textureCount === 0, 'el blockout no introduce texturas');

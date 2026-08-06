@@ -37,6 +37,8 @@ export interface U1Anchor {
   readonly facing?: number;
   /** Radio de interacción en metros. La proximidad elige; la tecla de siempre confirma. */
   readonly reach?: number;
+  /** A qué altura se para el actor, si no es el suelo. Ohm duerme sobre el pedestal. */
+  readonly elevation?: number;
   /**
    * Si el anclaje abre un banco, el mundo lo intercepta **antes** del `onInteract` de
    * `/jugar`, que abriría el modal. El texto sigue viniendo de la misma cosa.
@@ -63,13 +65,18 @@ export const U1_ANCHORS: readonly U1Anchor[] = [
     actor: 'ohm',
     facing: 270,
     bench: 'ohm',
+    // Coronación del pedestal de cuatro escalones que construye `plazaKit`. El collider del
+    // pedestal frena al jugador a 2,02 m del centro, así que el alcance tiene que superarlo.
+    elevation: 1.06,
+    reach: 2.5,
   },
   {
     id: 'campana',
     position: { x: -10.6, z: 0 },
     source: { room: 'plaza', thing: 'campana' },
     actor: null,
-    reach: 2.6,
+    // El monumento ocupa 4,8 m: al jugador no lo dejan acercarse a menos de 2,8 m del centro.
+    reach: 3.4,
   },
   {
     id: 'edda',

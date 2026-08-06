@@ -43,8 +43,13 @@ for (const socket of ARCHITECTURE_SOCKETS) {
   assert(isOnGameplayPlane(socket.position), `${socket.id} permanece en Y=0`);
   assert(socket.width >= 3, `${socket.id} conserva paso legible`);
 }
+// Cada zona nombra su silueta dominante. La Plaza ya no la declara como modulo de prueba: la
+// construye `plazaKit`, asi que su landmark es el nodo que el kit publica en la escena.
+const KIT_LANDMARKS = new Set(['PLAZA_PORTAL_GATE']);
 for (const zone of LEVEL_ZONES) {
-  assert(BOX_MODULES.some((module) => module.id === zone.landmarkId), `${zone.id} declara un landmark visible`);
+  const declared = BOX_MODULES.some((module) => module.id === zone.landmarkId)
+    || KIT_LANDMARKS.has(zone.landmarkId);
+  assert(declared, `${zone.id} declara un landmark visible`);
 }
 const doorFrame = BOX_MODULES.find((module) => module.id === 'ohm-door-frame');
 assert(doorFrame?.tags.includes('landmark') === true, 'el marco de la Puerta conserva jerarquia de landmark');
@@ -57,7 +62,10 @@ for (const pierId of ['door-pier-north', 'door-pier-south']) {
 
 const navigationIssues = validateNavigation();
 assert(navigationIssues.length === 0, `la navegacion plana pasa: ${navigationIssues.join(', ')}`);
-assert(canonicalRouteHash() === 'be242e48', 'la ruta y las acciones tienen hash determinista');
+// El hash cambio con la Plaza construida: R1_PLAZA_ENTRY se corrio a z = -3,2 porque el eje
+// z = 0 lo ocupan ahora el pedestal y el monumento de la campana. El recorrido paso de 38,05 m
+// a 38,49 m y de 19,03 s a 19,25 s. Ver levelData.ts y docs/arco1/route-timing.json.
+assert(canonicalRouteHash() === '9c7e30ea', 'la ruta y las acciones tienen hash determinista');
 
 const start = { x: -10, y: 0, z: 0 };
 const moved = moveOnGameplayPlane(start, { x: 1, z: 1 }, 0.05, 2);

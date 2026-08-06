@@ -7,8 +7,6 @@
 import * as THREE from 'three';
 import bellPropUrl from '../../../assets/ohmdal/generated/prop_bell.png?url';
 import lampPropUrl from '../../../assets/ohmdal/generated/prop_lamp_post.png?url';
-import pedestalPropUrl from '../../../assets/ohmdal/generated/prop_pedestal.png?url';
-import portalPropUrl from '../../../assets/ohmdal/rooms/pilot-arco1/prop_plaza_portal-v2.png?url';
 import { createNpcActor, createOhmActor, type NpcActor, type OhmActor } from '../integration/spriteActors.ts';
 import {
   U1_ANCHORS,
@@ -23,12 +21,22 @@ import {
  * Props pixel del mundo. En HD-2D el detalle no está en la malla: está en los sprites que la
  * pueblan, y estos ya existen — los dibuja `/jugar` desde el primer día.
  */
-const PROPS: Readonly<Record<string, { readonly url: string; readonly height: number }>> = {
-  'portal-aula': { url: portalPropUrl, height: 4.2 },
-  campana: { url: bellPropUrl, height: 3.2 },
-  pedestal: { url: pedestalPropUrl, height: 1.1 },
-  lampara1: { url: lampPropUrl, height: 2.4 },
-  lampara2: { url: lampPropUrl, height: 2.4 },
+interface PropSpec {
+  readonly url: string;
+  readonly height: number;
+  /** `base` se apoya en el suelo; `hang` cuelga desde su borde superior. */
+  readonly anchor?: 'base' | 'hang';
+  /** Altura del punto de apoyo o de cuelgue, en metros. */
+  readonly y?: number;
+}
+
+const PROPS: Readonly<Record<string, PropSpec>> = {
+  // El Portal y el pedestal son arquitectura, y los construye `plazaKit` en geometría. Acá
+  // sólo quedan los objetos: en HD-2D la arquitectura es 3D y lo que se puede levantar con las
+  // manos es sprite.
+  campana: { url: bellPropUrl, height: 2.4, anchor: 'hang', y: 4.5 },
+  lampara1: { url: lampPropUrl, height: 2.6 },
+  lampara2: { url: lampPropUrl, height: 2.6 },
 };
 
 /**
@@ -79,7 +87,7 @@ export function createU1Cast(onBench: (bench: BenchId, anchor: U1Anchor) => void
   for (const anchor of U1_ANCHORS) {
     const group = new THREE.Group();
     group.name = `anchor_${anchor.id}`;
-    group.position.set(anchor.position.x, 0, anchor.position.z);
+    group.position.set(anchor.position.x, anchor.elevation ?? 0, anchor.position.z);
 
     const prop = PROPS[anchor.id];
     let propMaterial: THREE.SpriteMaterial | null = null;
@@ -87,8 +95,9 @@ export function createU1Cast(onBench: (bench: BenchId, anchor: U1Anchor) => void
       propMaterial = new THREE.SpriteMaterial({ transparent: true, alphaTest: 0.05 });
       const sprite = new THREE.Sprite(propMaterial);
       sprite.name = `prop_${anchor.id}`;
-      // El pivote va en la base: los props se apoyan en el suelo, no flotan.
-      sprite.center.set(0.5, 0);
+      // Lo que se apoya lleva el pivote abajo; lo que cuelga, arriba.
+      sprite.center.set(0.5, prop.anchor === 'hang' ? 1 : 0);
+      sprite.position.y = prop.y ?? 0;
       sprite.scale.set(prop.height, prop.height, 1);
       propMaterial.map = loadProp(prop.url, sprite, prop.height);
       textures.push(propMaterial.map);
@@ -99,8 +108,6 @@ export function createU1Cast(onBench: (bench: BenchId, anchor: U1Anchor) => void
     let ohm: OhmActor | null = null;
     if (anchor.actor === 'ohm') {
       ohm = createOhmActor();
-      // Ohm está sobre el pedestal, no en el piso.
-      ohm.root.position.y = prop ? prop.height : 0;
       ohm.setFacing(anchor.facing ?? 270);
       group.add(ohm.root);
     } else if (anchor.actor) {

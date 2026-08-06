@@ -1,11 +1,12 @@
 {
-  "generatedBy": "calculo determinista sobre b49b617",
+  "generatedBy": "calculo determinista sobre la Plaza construida (plazaKit)",
   "sources": {
     "anchors": "src/ohmdal/architecture/levelData.ts:106-117",
     "zones": "src/ohmdal/architecture/levelData.ts:85-104",
     "speed": "src/ohmdal/navigation/navigation.ts:15",
     "actions": "src/ohmdal/navigation/navigation.ts:39-48",
-    "durationTarget": "docs/ohmdal-biblia/10_VERTICAL_SLICE.md:8"
+    "durationTarget": "docs/ohmdal-biblia/10_VERTICAL_SLICE.md:8",
+    "geometry": "src/ohmdal/architecture/plazaKit.ts"
   },
   "levelSeed": "ohmdal-hd2d-preprod-v1",
   "mannequinHeightM": 1.72,
@@ -17,7 +18,7 @@
       "purpose": "arrival-orientation",
       "spanXm": 17,
       "spanZm": 12,
-      "landmarkId": "portal-arch"
+      "landmarkId": "PLAZA_PORTAL_GATE"
     },
     {
       "id": "taller",
@@ -38,14 +39,14 @@
     {
       "from": "R0_PORTAL_SPAWN",
       "to": "R1_PLAZA_ENTRY",
-      "distanceM": 5,
-      "walkSeconds": 2.5
+      "distanceM": 5.94,
+      "walkSeconds": 2.97
     },
     {
       "from": "R1_PLAZA_ENTRY",
       "to": "R2_PLAZA_DIAGONAL",
-      "distanceM": 6.04,
-      "walkSeconds": 3.02
+      "distanceM": 5.54,
+      "walkSeconds": 2.77
     },
     {
       "from": "R2_PLAZA_DIAGONAL",
@@ -180,5 +181,9 @@
     "tiempo de dialogo, interaccion y diagnostico: no estan modelados; exigen playtest",
     "tiempo de las acciones interact y restore de CANONICAL_ROUTE_ACTIONS: su value es un id, no una duracion",
     "tiempo real de jugador humano: exige playtest"
-  ]
+  ],
+  "routeHash": "9c7e30ea",
+  "totalDistanceM": 38.49,
+  "totalWalkSeconds": 19.25,
+  "note": "R1_PLAZA_ENTRY se corrio a z = -3,2: el eje z = 0 de la Plaza lo ocupan el pedestal de Ohm y el monumento de la campana. Medicion anterior: 38,05 m y 19,03 s, hash be242e48."
 }

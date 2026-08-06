@@ -443,6 +443,9 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       blockout.occlusionBindings.map(({ object }) => object),
     );
     occlusionController.update(lastBlockedIds, dt, reducedMotion);
+    // La ventana de sombra viaja con el jugador: es lo que la mantiene chica y nítida en un
+    // mundo de 38 metros.
+    blockout.lighting.focusShadowOn(player.x, player.z);
     blockout.lighting.syncEmitterState();
   }
 
@@ -613,6 +616,32 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     renderKeys();
     ui.setKeysStatus('Teclas restablecidas a los valores por defecto.');
   });
+
+  // Sonda de escena. Mirar una captura no alcanza para saber si un negro es sombra, es un
+  // hueco en la geometría o es el fondo: hay que poder preguntarle al grafo qué hay y dónde.
+  // Sólo en desarrollo, como el resto de las sondas.
+  if (import.meta.env.DEV) {
+    const scope = window as unknown as Record<string, unknown>;
+    scope.dumpOhmdalScene = (): string => {
+      const box = new THREE.Box3();
+      const size = new THREE.Vector3();
+      const rows: string[] = [];
+      scene.traverse((object) => {
+        if (!(object as THREE.Mesh).isMesh && !(object as THREE.Sprite).isSprite) return;
+        box.setFromObject(object);
+        if (box.isEmpty()) return;
+        box.getSize(size);
+        const round = (value: number): number => Math.round(value * 100) / 100;
+        rows.push(
+          `${object.visible ? ' ' : '·'} ${object.name || '(sin nombre)'}  ` +
+            `x[${round(box.min.x)}, ${round(box.max.x)}] ` +
+            `y[${round(box.min.y)}, ${round(box.max.y)}] ` +
+            `z[${round(box.min.z)}, ${round(box.max.z)}]`,
+        );
+      });
+      return rows.join('\n');
+    };
+  }
 
   updateHud(1);
   startLoop();

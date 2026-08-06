@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createOhmdalBlockout } from '../src/ohmdal/architecture/blockout.ts';
+import { PORTAL_SILHOUETTE } from '../src/ohmdal/architecture/plazaKit.ts';
 import {
   BOX_MODULES,
   routeAnchor,
@@ -59,11 +60,20 @@ function overlaps(a: ScreenRect, b: ScreenRect): boolean {
 }
 
 // Las tres siluetas usan relaciones distintas sin sumar modulos ni materiales.
-const portalArch = moduleById('portal-arch');
+//
+// El Portal dejo de ser modulos de prueba: lo construye `plazaKit`, que declara su silueta
+// como datos. Las dos relaciones que lo definen se verifican igual, y por eso el kit las
+// expone en vez de enterrarlas en las llamadas que arman la geometria.
 const doorFrame = moduleById('ohm-door-frame');
-assert(portalArch.depth / portalArch.width >= 4, 'Portal conserva dintel profundo transversal');
+assert(
+  PORTAL_SILHOUETTE.lintel.depth / PORTAL_SILHOUETTE.lintel.width >= 4,
+  'Portal conserva dintel profundo transversal',
+);
 assert(doorFrame.width / doorFrame.depth >= 6, 'Puerta usa brazo tecnico longitudinal en L');
-assert(moduleById('portal-pier-north').height - moduleById('portal-pier-south').height >= 1.5, 'Portal tiene ruina asimetrica');
+assert(
+  PORTAL_SILHOUETTE.pierNorth.height - PORTAL_SILHOUETTE.pierSouth.height >= 1.5,
+  'Portal tiene ruina asimetrica',
+);
 assert(moduleById('door-pier-north').height - moduleById('door-pier-south').height >= 1.5, 'Puerta escalona sus pilares tecnicos');
 
 const workshopFloor = moduleById('workshop-floor');
@@ -75,7 +85,7 @@ assert(moduleById('workshop-wall-front-west').width + moduleById('workshop-wall-
 
 const blockout = createOhmdalBlockout();
 blockout.root.updateMatrixWorld(true);
-assert(blockout.diagnostics().visualMeshCount === 19, 'la diferenciacion no aumenta modulos visibles');
+assert(blockout.diagnostics().visualMeshCount === 15, 'la diferenciacion no aumenta modulos visibles: el kit de la Plaza mas los catorce del Taller y la Puerta');
 
 // C3 casi ortografica tiene un encuadre propio; perspectiva permanece congelada.
 // Se diferencia por inclinacion, no por giro lateral: la camara HD-2D es frontal en los tres

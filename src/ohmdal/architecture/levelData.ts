@@ -87,7 +87,7 @@ export const LEVEL_ZONES: readonly LevelZone[] = [
     id: 'portal_plaza',
     purpose: 'arrival-orientation',
     bounds: { minX: -21, maxX: -4, minZ: -6, maxZ: 6 },
-    landmarkId: 'portal-arch',
+    landmarkId: 'PLAZA_PORTAL_GATE',
   },
   {
     id: 'taller',
@@ -105,7 +105,12 @@ export const LEVEL_ZONES: readonly LevelZone[] = [
 
 export const ROUTE_ANCHORS: readonly RouteAnchor[] = [
   { id: 'R0_PORTAL_SPAWN', position: { x: -18, y: 0, z: 0 }, purpose: 'spawn at Portal' },
-  { id: 'R1_PLAZA_ENTRY', position: { x: -13, y: 0, z: 0 }, purpose: 'enter Plaza' },
+  // La entrada a la Plaza se corrió a z = −3,2. Con la Plaza construida, el eje z = 0 lo
+  // ocupan el pedestal de Ohm y el monumento de la campana: el anclaje caía adentro de la
+  // piedra. Entrar bordeando también compone mejor —los dos monumentos se ven de costado en
+  // vez de venírsele encima al jugador— y encadena con R2, que ya leía la Plaza en diagonal.
+  // SCENE_INVENTORY §4.2 obliga a volver a medir `route-timing.json` por este cambio.
+  { id: 'R1_PLAZA_ENTRY', position: { x: -13, y: 0, z: -3.2 }, purpose: 'enter Plaza' },
   { id: 'R2_PLAZA_DIAGONAL', position: { x: -7.5, y: 0, z: -2.5 }, purpose: 'read Plaza diagonal' },
   { id: 'R3_TALLER_THRESHOLD', position: { x: -3, y: 0, z: -2.5 }, purpose: 'cross Taller threshold' },
   { id: 'R4_LUMEN_STOP', position: { x: 0, y: 0, z: -2.5 }, purpose: 'stop before Lumen' },
@@ -141,14 +146,12 @@ export const ARCHITECTURE_SOCKETS: readonly ArchitectureSocket[] = [
 ] as const;
 
 export const BOX_MODULES: readonly BoxModuleDefinition[] = [
-  { id: 'portal-floor', zoneId: 'portal_plaza', family: 'stone', centerX: -12.5, centerZ: 0, width: 17, height: 0.08, depth: 12, pivotY: 0, tags: ['floor'] },
+  // La Plaza no declara modulos: la construye `plazaKit` con geometria fusionada y pintada.
+  // Dejar aca las cajas de prueba de la zona seria dato muerto, y los tests las leerian como
+  // si dibujaran algo.
   { id: 'workshop-floor', zoneId: 'taller', family: 'wood', centerX: 2, centerZ: -0.25, width: 13, height: 0.09, depth: 9.5, pivotY: 0, tags: ['floor'] },
   { id: 'door-floor', zoneId: 'puerta_manantial', family: 'stone', centerX: 14.25, centerZ: 0.25, width: 12.5, height: 0.08, depth: 10.5, pivotY: 0, tags: ['floor'] },
 
-  { id: 'portal-pier-north', zoneId: 'portal_plaza', family: 'stone', centerX: -19, centerZ: -3, width: 1.8, height: 5.2, depth: 1.8, pivotY: 0, tags: ['structure', 'landmark'] },
-  { id: 'portal-pier-south', zoneId: 'portal_plaza', family: 'stone', centerX: -19, centerZ: 3, width: 1.2, height: 3.6, depth: 1.2, pivotY: 0, tags: ['structure', 'landmark'] },
-  { id: 'portal-arch', zoneId: 'portal_plaza', family: 'copper', centerX: -19, centerZ: -0.8, width: 1, height: 0.55, depth: 4.1, baseY: 4.45, rotationX: -0.12, pivotY: 0, tags: ['structure', 'landmark'] },
-  { id: 'plaza-wayfinder', zoneId: 'portal_plaza', family: 'copper', centerX: -9.5, centerZ: 3.8, width: 0.8, height: 3.2, depth: 0.8, pivotY: 0, tags: ['structure'] },
 
   { id: 'workshop-wall-back', zoneId: 'taller', family: 'wood', centerX: 2, centerZ: -4.55, width: 12, height: 3, depth: 0.35, pivotY: 0, tags: ['structure'] },
   { id: 'workshop-wall-front-west', zoneId: 'taller', family: 'wood', centerX: -2.3, centerZ: 4.05, width: 3, height: 2.6, depth: 0.3, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
@@ -165,9 +168,18 @@ export const BOX_MODULES: readonly BoxModuleDefinition[] = [
   { id: 'spring-basin', zoneId: 'puerta_manantial', family: 'water', centerX: 18, centerZ: 1.5, width: 3, height: 0.25, depth: 3, pivotY: 0, tags: ['structure'] },
 ] as const;
 
+// Los colliders de la Plaza siguen a la geometría que construye `plazaKit`. Los del blockout
+// viejo quedaron un tiempo como muros invisibles en medio de la nada: nadie los ve, y el
+// jugador choca contra piezas que ya no existen.
 export const COLLIDERS: readonly ColliderDefinition[] = [
-  { id: 'C_PORTAL_NORTH', zoneId: 'portal_plaza', bounds: { minX: -19.9, maxX: -18.1, minZ: -3.9, maxZ: -2.1 }, height: 5.2, planeY: 0 },
-  { id: 'C_PORTAL_SOUTH', zoneId: 'portal_plaza', bounds: { minX: -19.6, maxX: -18.4, minZ: 2.4, maxZ: 3.6 }, height: 3.6, planeY: 0 },
+  { id: 'C_PORTAL_PIER_NORTH', zoneId: 'portal_plaza', bounds: { minX: -21.15, maxX: -19.65, minZ: -3.15, maxZ: -1.65 }, height: 5.2, planeY: 0 },
+  { id: 'C_PORTAL_PIER_SOUTH', zoneId: 'portal_plaza', bounds: { minX: -21.15, maxX: -19.65, minZ: 1.65, maxZ: 3.15 }, height: 5.2, planeY: 0 },
+  // Del monumento frenan los machones, no el basamento: los dos escalones miden 22 cm y se
+  // pisan. Del pedestal frena de la segunda grada para arriba, por lo mismo. Bloquear la
+  // huella entera cerraba el eje de la Plaza y dejaba la ruta canonica sin paso.
+  { id: 'C_BELL_PIER_NORTH', zoneId: 'portal_plaza', bounds: { minX: -11.13, maxX: -10.08, minZ: -2.28, maxZ: -1.23 }, height: 5.1, planeY: 0 },
+  { id: 'C_BELL_PIER_SOUTH', zoneId: 'portal_plaza', bounds: { minX: -11.13, maxX: -10.08, minZ: 1.23, maxZ: 2.28 }, height: 5.1, planeY: 0 },
+  { id: 'C_OHM_PEDESTAL', zoneId: 'portal_plaza', bounds: { minX: -14.78, maxX: -12.22, minZ: -1.28, maxZ: 1.28 }, height: 1.06, planeY: 0 },
   { id: 'C_WALL_BACK', zoneId: 'taller', bounds: { minX: -4, maxX: 8, minZ: -4.75, maxZ: -4.35 }, height: 3, planeY: 0 },
   { id: 'C_WALL_FRONT_WEST', zoneId: 'taller', bounds: { minX: -3.8, maxX: -0.8, minZ: 3.9, maxZ: 4.2 }, height: 2.6, planeY: 0 },
   { id: 'C_WALL_FRONT_EAST', zoneId: 'taller', bounds: { minX: 6, maxX: 8, minZ: 3.9, maxZ: 4.2 }, height: 2.6, planeY: 0 },

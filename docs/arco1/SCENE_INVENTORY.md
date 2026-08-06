@@ -151,30 +151,35 @@ un Manantial impecable es fallo de identidad, no un logro (`GOLDEN_FRAMES.md` GF
 
 ### 4.1 Lo medido: el piso de recorrido
 
-Calculado sobre `b49b617` a partir de `ROUTE_ANCHORS` (`levelData.ts:106-117`) y
+Calculado a partir de `ROUTE_ANCHORS` (`levelData.ts`) y
 `ROUTE_SPEED_METERS_PER_SECOND = 2` (`navigation.ts:15`). Todo en
 [`route-timing.json`](route-timing.json).
 
+**Remedido con la Plaza construida.** `R1_PLAZA_ENTRY` se corrió a z = −3,2 porque el eje
+z = 0 lo ocupan ahora el pedestal de Ohm y el monumento de la campana: el anclaje caía dentro
+de la piedra. Entrar bordeando también compone mejor y encadena con R2, que ya leía la Plaza
+en diagonal. La medición anterior era 38,05 m y 19,03 s, con hash `be242e48`.
+
 | Escena | Distancia | Caminata | % del recorrido |
 |---|---:|---:|---:|
-| E1 | 11,04 m | 5,52 s | 29,0 % |
-| E2 | 4,50 m | 2,25 s | 11,8 % |
-| E3 | 10,27 m | 5,13 s | 27,0 % |
-| E4 | 8,64 m | 4,32 s | 22,7 % |
-| E5 | 3,61 m | 1,80 s | 9,5 % |
-| **Total** | **38,05 m** | **19,03 s** | 100 % |
+| E1 | 11,48 m | 5,74 s | 29,8 % |
+| E2 | 4,50 m | 2,25 s | 11,7 % |
+| E3 | 10,27 m | 5,13 s | 26,7 % |
+| E4 | 8,64 m | 4,32 s | 22,4 % |
+| E5 | 3,61 m | 1,80 s | 9,4 % |
+| **Total** | **38,49 m** | **19,25 s** | 100 % |
 
 Más 4,50 s de esperas guionadas en `CANONICAL_ROUTE_ACTIONS` (`navigation.ts:39-48`): 1,5 s en el
-spawn, 1 s ante Lumen y 2 s en el borde del Manantial. **Piso de recorrido: 23,53 s.**
+spawn, 1 s ante Lumen y 2 s en el borde del Manantial. **Piso de recorrido: 23,75 s.**
 
 `validateNavigation()` devuelve lista vacía: los diez anclajes son navegables y los nueve segmentos
-entre ellos también. Hash canónico de ruta: `be242e48`.
+entre ellos también. Hash canónico de ruta: `9c7e30ea`.
 
-**Dato de ritmo que pedía GF-02:** Portal → umbral del Taller son 15,54 m y **7,77 s**.
+**Dato de ritmo que pedía GF-02:** Portal → umbral del Taller son 15,98 m y **7,99 s**.
 
 ### 4.2 La consecuencia: el mapa no produce la duración
 
-Doc. 10 §Objetivo fija la experiencia en **25–35 minutos**. El piso de recorrido es **23,53 s**:
+Doc. 10 §Objetivo fija la experiencia en **25–35 minutos**. El piso de recorrido es **23,75 s**:
 entre **1,1 %** y **1,6 %** del objetivo.
 
 > Las escenas causales cargan entre **24,6 y 34,6 minutos**. El mapa aporta menos de un 2 %.
@@ -278,6 +283,7 @@ corre por primera vez.
 | esperas guionadas 1,5 / 1 / 2 s | `navigation.ts:39-48` |
 | sujetos protegidos por cámara | `cameraConfig.ts:112`, `:124`, `:137` |
 | distancias, tiempos, hash y validación de navegación | [`route-timing.json`](route-timing.json) |
+| geometría construida de la Plaza | `src/ohmdal/architecture/plazaKit.ts` |
 | 7 beats y sus contenidos | doc. 10 líneas 60-107 |
 | objetivo 25–35 min | doc. 10 línea 8 |
 | golden frames por escena y horas | `GOLDEN_FRAMES.md` §4 |

@@ -7,6 +7,7 @@ import {
   type BlockoutTimeOfDay,
 } from '../materials/blockoutMaterials.ts';
 import { NAVIGATION_REGIONS } from '../navigation/navigation.ts';
+import { createPlazaKit } from './plazaKit.ts';
 import {
   BOX_MODULES,
   COLLIDERS,
@@ -126,6 +127,10 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
   anchorLayer.visible = false;
   const referenceLayer = new THREE.Group();
   referenceLayer.name = 'LAYER_REFERENCE';
+  // El maniquí de 1,72 m sirve para comprobar escala contra geometría de prueba. Con la Plaza
+  // construida deja de ser una referencia y pasa a ser un muñeco gris parado en el medio del
+  // encuadre. Sigue existiendo —la escala se comprueba encendiéndolo— pero no se dibuja.
+  referenceLayer.visible = false;
 
   const materials = createBlockoutMaterials();
   const geometryCache = new Map<string, THREE.BoxGeometry>();
@@ -142,6 +147,12 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
     geometries.add(geometry);
     return geometry;
   };
+
+  // La Plaza dejó de ser blockout: la construye su propio kit, con piso empedrado, muros de
+  // perímetro, el Portal y el monumento de la campana. El Taller y la Puerta siguen en cajas
+  // hasta que les toque.
+  const plaza = createPlazaKit();
+  visualLayer.add(plaza.root);
 
   for (const definition of BOX_MODULES) {
     const moduleRoot = new THREE.Group();
@@ -246,6 +257,7 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
       if (disposed) throw new Error('Ohmdal blockout is disposed');
       materials.setTimeOfDay(timeOfDay);
       lighting.setTimeOfDay(timeOfDay);
+      plaza.setTimeOfDay(timeOfDay);
     },
     diagnostics() {
       return {
@@ -262,6 +274,7 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
     dispose() {
       if (disposed) return;
       lighting.dispose();
+      plaza.dispose();
       root.removeFromParent();
       root.clear();
       geometries.forEach((geometry) => geometry.dispose());
