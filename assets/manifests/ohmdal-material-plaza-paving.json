@@ -1,0 +1,51 @@
+{
+  "id": "rx_ohmdal_material_plaza_paving",
+  "displayName": "Empedrado de la Plaza",
+  "world": "ohmdal",
+  "category": "architecture",
+  "sourceMethod": "procedural-three",
+  "status": "integrated",
+  "references": [
+    "assets/references/ohmdal-materials/procedencia-cc0.md"
+  ],
+  "generation": {
+    "provider": "none",
+    "taskId": "U1-PLAZA-MATERIALS",
+    "promptFile": "assets/references/ohmdal-materials/procedencia-cc0.md",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-06"
+  },
+  "license": {
+    "owner": "ambientCG — Creative Commons CC0 1.0 Universal",
+    "referenceRightsVerified": true,
+    "notes": "Derivado de PavingStones051 de ambientCG, CC0 1.0: uso comercial permitido, sin atribución obligatoria, y la licencia autoriza explícitamente incluir los archivos dentro de un videojuego. Procesado propio: color a luminancia por su oclusión ambiental, contraste al 55 %, reescalado a 512. Queda como grano y no como dibujo: el color sale de la paleta de COLOR_SCRIPT.md. Procedencia completa en assets/references/ohmdal-materials/procedencia-cc0.md."
+  },
+  "scale": {
+    "unit": "meter",
+    "height": 2,
+    "humanRatio": 1.16
+  },
+  "frontAxis": "+Z",
+  "pivot": "center",
+  "collider": {
+    "type": "none"
+  },
+  "sockets": [],
+  "runtime": {
+    "desktop": {
+      "path": "assets/runtime/ohmdal/materials/plaza-paving-grain.jpg",
+      "maxTriangles": 0,
+      "maxTexture": 512,
+      "maxMaterials": 1,
+      "maxDrawCalls": 0
+    },
+    "mobile": {
+      "path": "assets/runtime/ohmdal/materials/plaza-paving-grain.jpg",
+      "maxTriangles": 0,
+      "maxTexture": 512,
+      "maxMaterials": 1,
+      "maxDrawCalls": 0
+    }
+  },
+  "notes": "Dos mapas de 512x512. Grano 67376 B (sha256 bb9c8301d6779bb10e831c6652406cfd), normal 68071 B (sha256 7fe408aea3a31b24393bf2e4760f2092). Piso de la Plaza. Grano y relieve; el color lo pone la paleta. Las UV se proyectan en caja desde coordenadas de mundo, asi que la densidad de texel es la misma en todas las piezas del kit y no hay costura entre modulos."
+}

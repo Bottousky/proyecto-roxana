@@ -18,6 +18,26 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { LEVEL_SEED } from './levelData.ts';
 import type { BlockoutTimeOfDay } from '../materials/blockoutMaterials.ts';
 
+/**
+ * Las rutas de los mapas se resuelven con `new URL(..., import.meta.url)` y no con `?url`.
+ * Vite las reconoce igual y emite el asset con hash, pero además **Node las puede evaluar**:
+ * media docena de tests construyen el blockout entero en Node, y un `import` de `.jpg` los
+ * mata con `ERR_UNKNOWN_FILE_EXTENSION` antes de llegar a la primera aserción.
+ */
+const MATERIAL_URLS = {
+  pavingGrain: new URL('../../../assets/runtime/ohmdal/materials/plaza-paving-grain.jpg', import.meta.url).href,
+  pavingNormal: new URL('../../../assets/runtime/ohmdal/materials/plaza-paving-normal.jpg', import.meta.url).href,
+  stoneGrain: new URL('../../../assets/runtime/ohmdal/materials/plaza-stone-grain.jpg', import.meta.url).href,
+  stoneNormal: new URL('../../../assets/runtime/ohmdal/materials/plaza-stone-normal.jpg', import.meta.url).href,
+} as const;
+
+/**
+ * Cada cuántos metros se repite la textura. Es densidad de téxel, no gusto: con 512 px sobre
+ * 2 m dan 256 px por metro, que es el orden del pixel art de los personajes.
+ */
+const FLOOR_TILE_METERS = 2;
+const STONE_TILE_METERS = 2.4;
+
 /** Huella de la Plaza, un poco más generosa que la zona jugable: los muros quedan afuera. */
 export const PLAZA_BOUNDS = Object.freeze({ minX: -21.4, maxX: -3.8, minZ: -6.8, maxZ: 6.8 });
 
@@ -77,6 +97,42 @@ function stonePaint(topY: number, variation = 0.09): PaintFn {
   };
 }
 
+/**
+ * Reescribe las UV proyectando desde coordenadas de **mundo** sobre el eje dominante de cada
+ * cara. Es lo único que hace que un kit modular texture bien: las UV que trae `BoxGeometry` van
+ * de 0 a 1 por cara, así que una losa de 1 m y un muro de 2 m mostrarían la misma textura a
+ * escalas distintas, y en la junta entre dos módulos contiguos se vería el corte.
+ *
+ * Proyectando desde el mundo, la piedra es continua a través de las piezas y la densidad de
+ * téxel es la misma en todas. Es la misma idea que un trim sheet, resuelta en el vértice.
+ */
+function projectUvs(geometry: THREE.BufferGeometry, tileMeters: number): THREE.BufferGeometry {
+  const position = geometry.getAttribute('position');
+  const normal = geometry.getAttribute('normal');
+  const uv = new Float32Array(position.count * 2);
+  for (let index = 0; index < position.count; index += 1) {
+    const x = position.getX(index);
+    const y = position.getY(index);
+    const z = position.getZ(index);
+    const ax = Math.abs(normal.getX(index));
+    const ay = Math.abs(normal.getY(index));
+    const az = Math.abs(normal.getZ(index));
+    let u: number;
+    let v: number;
+    if (ay >= ax && ay >= az) {
+      u = x; v = z; // suelos y coronaciones
+    } else if (ax >= az) {
+      u = z; v = y; // caras que miran al este o al oeste
+    } else {
+      u = x; v = y; // caras que miran a la cámara o al fondo
+    }
+    uv[index * 2] = u / tileMeters;
+    uv[index * 2 + 1] = v / tileMeters;
+  }
+  geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  return geometry;
+}
+
 /** Una caja con el pivote en su base, ya trasladada a mundo y pintada. */
 function block(
   width: number,
@@ -89,7 +145,7 @@ function block(
 ): THREE.BufferGeometry {
   const geometry = new THREE.BoxGeometry(width, height, depth);
   geometry.translate(x, baseY + height / 2, z);
-  return paint(geometry, paintFn);
+  return paint(projectUvs(geometry, STONE_TILE_METERS), paintFn);
 }
 
 /** Un cilindro con el pivote en su base, ya trasladado y pintado. */
@@ -105,7 +161,7 @@ function drum(
 ): THREE.BufferGeometry {
   const geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segments);
   geometry.translate(x, baseY + height / 2, z);
-  return paint(geometry, paintFn);
+  return paint(projectUvs(geometry, STONE_TILE_METERS), paintFn);
 }
 
 /**
@@ -132,7 +188,7 @@ function paverFloor(): THREE.BufferGeometry {
       const geometry = new THREE.BoxGeometry(pitchX - PAVER_JOINT, FLOOR_TOP_Y, pitchZ - PAVER_JOINT);
       geometry.translate(x, FLOOR_TOP_Y / 2 + lift, z);
       pavers.push(
-        paint(geometry, (px, py, pz, out) => {
+        paint(projectUvs(geometry, FLOOR_TILE_METERS), (px, py, pz, out) => {
           const own = (noise(column * 3.1, row * 7.7) - 0.5) * 0.22;
           // El paso de la gente pulió el eje del recorrido y dejó los bordes opacos.
           const path = Math.exp(-((pz / 3.4) ** 2)) * 0.12;
@@ -240,6 +296,24 @@ function pedestalSteps(): THREE.BufferGeometry[] {
   ];
 }
 
+/**
+ * Carga un mapa que se repite. Sin `RepeatWrapping` la proyección de mundo no tiene sentido.
+ *
+ * Fuera del navegador devuelve la textura vacía: los tests de arquitectura construyen el
+ * blockout completo en Node para medir composición y presupuesto, y ahí no hay nada que
+ * decodificar. El material queda igual de válido, sólo sin imagen.
+ */
+function loadTiling(url: string, colorSpace: THREE.ColorSpace): THREE.Texture {
+  const texture = typeof document === 'undefined'
+    ? new THREE.Texture()
+    : new THREE.TextureLoader().load(url);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = colorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
 export interface PlazaKit {
   readonly root: THREE.Group;
   setTimeOfDay(timeOfDay: BlockoutTimeOfDay): void;
@@ -293,10 +367,26 @@ export function createPlazaKit(): PlazaKit {
   const copperGeometry = mergeGeometries(copperPieces, false)!;
   for (const piece of [...stonePieces, ...copperPieces]) piece.dispose();
 
+  // Los mapas son de ambientCG bajo CC0 —procedencia en
+  // `assets/references/ohmdal-materials/procedencia-cc0.md`— y llegan ya reducidos a grano:
+  // luminancia por oclusión, contraste al 55 %, media 0,95. **No traen color.** El color lo
+  // sigue poniendo la paleta de COLOR_SCRIPT.md a través del material, y el mapa multiplica.
+  // Por eso sumar textura no reabre ninguna decisión de color ni rompe el paso a crepúsculo.
+  const grain = (url: string): THREE.Texture => loadTiling(url, THREE.SRGBColorSpace);
+  const relief = (url: string): THREE.Texture => loadTiling(url, THREE.NoColorSpace);
+  const pavingGrain = grain(MATERIAL_URLS.pavingGrain);
+  const pavingNormal = relief(MATERIAL_URLS.pavingNormal);
+  const stoneGrain = grain(MATERIAL_URLS.stoneGrain);
+  const stoneNormal = relief(MATERIAL_URLS.stoneNormal);
+  const textures = [pavingGrain, pavingNormal, stoneGrain, stoneNormal];
+
   // `flatShading` es lo que separa un kit por código de un blockout: sin él, una caja y un
   // cilindro se leen como volúmenes lisos y el sol no describe ninguna arista.
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: FLOOR_COLORS.afternoon,
+    map: pavingGrain,
+    normalMap: pavingNormal,
+    normalScale: new THREE.Vector2(0.8, 0.8),
     vertexColors: true,
     roughness: 0.96,
     metalness: 0,
@@ -305,6 +395,9 @@ export function createPlazaKit(): PlazaKit {
   floorMaterial.name = 'PLAZA_FLOOR';
   const stoneMaterial = new THREE.MeshStandardMaterial({
     color: STONE_COLORS.afternoon,
+    map: stoneGrain,
+    normalMap: stoneNormal,
+    normalScale: new THREE.Vector2(0.65, 0.65),
     vertexColors: true,
     roughness: 0.9,
     metalness: 0,
@@ -313,6 +406,11 @@ export function createPlazaKit(): PlazaKit {
   stoneMaterial.name = 'PLAZA_STONE';
   const copperMaterial = new THREE.MeshStandardMaterial({
     color: COPPER_COLORS.afternoon,
+    // El cobre reusa el grano de la piedra: la oxidación se lee como picado, y compartir mapa
+    // es lo que mantiene el presupuesto de textura de E1 en el 25 % de lo asignado.
+    map: stoneGrain,
+    normalMap: stoneNormal,
+    normalScale: new THREE.Vector2(0.4, 0.4),
     vertexColors: true,
     roughness: 0.55,
     metalness: 0.45,
@@ -354,6 +452,7 @@ export function createPlazaKit(): PlazaKit {
       floorGeometry.dispose();
       stoneGeometry.dispose();
       copperGeometry.dispose();
+      for (const texture of textures) texture.dispose();
       floorMaterial.dispose();
       stoneMaterial.dispose();
       copperMaterial.dispose();
