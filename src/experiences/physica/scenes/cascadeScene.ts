@@ -97,37 +97,10 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   const mesh = (m: BABYLON.Mesh): BABYLON.Mesh => { meshes.push(m); return m; };
 
   /* ============================================================
-     1. CIELO — gradiente pintado (planet-of-lana horizon glow)
+     1. CIELO — el gradiente de atardecer vive en babylonWorld.ts
+        (cielo-gradiente-global-*) y se comparte con las 7 escenas.
+        Acá solo aportamos el sol como elemento local de la escena.
      ============================================================ */
-  const skyCanvas = document.createElement('canvas');
-  skyCanvas.width = 8; skyCanvas.height = 512;
-  const skyCtx = skyCanvas.getContext('2d')!;
-  const skyGrad = skyCtx.createLinearGradient(0, 0, 0, 512);
-  skyGrad.addColorStop(0.0, PALETA.cieloTop);
-  skyGrad.addColorStop(0.32, PALETA.cieloMid);
-  skyGrad.addColorStop(0.68, PALETA.cieloBaja);
-  skyGrad.addColorStop(0.88, PALETA.cieloBase);
-  skyGrad.addColorStop(1.0, '#fde4b6');
-  skyCtx.fillStyle = skyGrad;
-  skyCtx.fillRect(0, 0, 8, 512);
-  // líneas atmosféricas suaves (Planeta Lana: bandas de densidad)
-  for (let i = 0; i < 6; i++) {
-    const y = 320 + i * 12;
-    skyCtx.fillStyle = `rgba(255,232,180,${0.06 - i * 0.008})`;
-    skyCtx.fillRect(0, y, 8, 2);
-  }
-  const skyTex = new BABYLON.Texture(skyCanvas.toDataURL(), scene, false, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
-  skyTex.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
-  textures.push(skyTex);
-  const skyMat = alphaMat('cascada-cielo-gradiente', '#ffffff', 1, PALETA.cieloMid);
-  skyMat.albedoTexture = skyTex;
-  skyMat.emissiveTexture = skyTex;
-  skyMat.emissiveColor = new BABYLON.Color3(0.45, 0.45, 0.45);
-  const sky = mesh(BABYLON.MeshBuilder.CreatePlane('cielo-gradiente', { width: 160, height: 72 }, scene));
-  sky.position.set(8, 16, -120);
-  sky.rotation.y = Math.PI;
-  sky.material = skyMat;
-  sky.applyFog = false;
 
   // Sol dorado suave (disco luminoso) — refuerza la dirección dominante.
   const solCanvas = document.createElement('canvas');

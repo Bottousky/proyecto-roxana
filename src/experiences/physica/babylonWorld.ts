@@ -118,8 +118,11 @@ const CAM = {
   estacion: { z: 110, y: 9, targetY: 5 },
   metro: { z: 300, y: 28, targetY: 10 },
 } as const;
-const CAM_FOV = 0.22;
-const CAM_FOV_METRO = 0.16;
+// FOV vertical en radianes. 0.45 = 25.8° (estándar 2.5D, comparable
+// a Trine / Planet of Lana). Antes 0.22 = 12.6° que era demasiado
+// cerrado: el fondo no respiraba y el cielo cálido quedaba ocluido.
+const CAM_FOV = 0.45;
+const CAM_FOV_METRO = 0.32;
 
 /* Save propio de Physica */
 const SAVE_KEY = 'roxana-physica-v1';
@@ -179,11 +182,14 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
 
   scene.clearColor = new BABYLON.Color4(0.08, 0.14, 0.22, 1);
   // Niebla atmosférica: lineal, calibrada para no tapar el primer plano.
-  // El primer plano (cornisa + avatar) está a ~25-40u de cámara; el horizonte
-  // cae en 200-280u y se desvanece con el color del cielo bajo.
+  // El primer plano (cornisa + avatar) está a ~25-40u de cámara; el
+  // horizonte y las montañas lejanas caen en 200-400u y se desvanecen
+  // con el color del cielo bajo. Empujamos fogEnd a 500 para que el
+  // cielo (z=-220, depth 410 desde dolly) no quede completamente
+  // aplastado por la niebla (el cielo tiene applyFog=false igual).
   scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
-  scene.fogStart = 50;
-  scene.fogEnd = 320;
+  scene.fogStart = 60;
+  scene.fogEnd = 500;
   scene.fogColor = new BABYLON.Color3(0.72, 0.78, 0.86);
 
   const camera = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, CAM.escena2.y, CAM.escena2.z), scene);
@@ -216,63 +222,107 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   const worldMountTextures: BABYLON.Texture[] = [];
   const paintMountainSilhouette = (
     W: number, H: number, topColor: string, midColor: string, baseColor: string,
-    scale: number, seed: number, fogColor: string,
+    scale: number, seed: number,
   ): BABYLON.Texture => {
     const c = document.createElement('canvas');
     c.width = W; c.height = H;
     const ctx = c.getContext('2d')!;
-    const sky = ctx.createLinearGradient(0, 0, 0, H);
-    sky.addColorStop(0, fogColor);
-    sky.addColorStop(0.5, fogColor);
-    sky.addColorStop(1, '#0d0f12');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H);
+    // CANVAS TRANSPARENTE. La parte de arriba (cielo) NO se pinta — el
+    // cielo global (babylonWorld globalSky) se ve a través. La silueta
+    // de la montaña se pinta con la paleta del layer. Importante: las
+    // cumbres NO pueden sobrepasar baseY; si lo hacen, el cuerpo
+    // opaco llena el canvas y el cielo se vuelve invisible (bug M0.4).
     const baseY = H * 0.55;
-    const segments = 80;
+    const segments = 110;
     const span = W;
+    const peaks: number[] = [];
+    for (let i = 0; i < segments; i++) {
+      // Peaks acotados: macro máx 50, meso 30, detail 20 → base 20.
+      // Para scale 1.4 (lejana): peak máx ≈ 168 → outline en y=114
+      // (22% superior transparente). Para scale 0.78 (cercana): peak
+      // máx ≈ 94 → outline en y=188 (37% superior transparente).
+      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 50;
+      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 30;
+      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 20;
+      const peak = 20 + macro + meso + detail;
+      peaks.push(peak * scale);
+    }
+    // 1) Sombra lejana (atmospheric perspective): capa oscura detrás con
+    //    offset para sensación de profundidad.
     ctx.beginPath();
-    ctx.moveTo(0, 0); ctx.lineTo(0, baseY);
+    ctx.moveTo(-6, baseY + 14);
     for (let i = 0; i < segments; i++) {
       const x = (i / (segments - 1)) * span;
-      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 130;
-      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 60;
-      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 25;
-      const peak = 30 + macro + meso + detail;
-      ctx.lineTo(x, baseY - peak * scale);
+      ctx.lineTo(x - 6, baseY - peaks[i] * 0.92 + 6);
     }
-    ctx.lineTo(W, baseY); ctx.lineTo(W, 0);
+    ctx.lineTo(W + 6, baseY + 14);
+    ctx.lineTo(W + 6, H);
+    ctx.lineTo(-6, H);
+    ctx.closePath();
+    const shadowGrad = ctx.createLinearGradient(0, baseY - 80, 0, H);
+    shadowGrad.addColorStop(0, 'rgba(20,28,42,0.55)');
+    shadowGrad.addColorStop(1, 'rgba(20,28,42,0)');
+    ctx.fillStyle = shadowGrad;
+    ctx.fill();
+    // 2) Silueta principal — pintada con bordes suaves (Planet of Lana).
+    //    El 25% inferior se desvanece a transparente para que el cuerpo
+    //    no parezca un rectángulo sólido contra el cielo (M0.5).
+    ctx.save();
+    ctx.filter = 'blur(1.6px)';
+    ctx.beginPath();
+    ctx.moveTo(-4, baseY + 6);
+    for (let i = 0; i < segments; i++) {
+      const x = (i / (segments - 1)) * span;
+      ctx.lineTo(x, baseY - peaks[i]);
+    }
+    ctx.lineTo(W + 4, baseY + 6);
+    ctx.lineTo(W + 4, H);
+    ctx.lineTo(-4, H);
     ctx.closePath();
     const g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, topColor);
-    g.addColorStop(0.45, midColor);
-    g.addColorStop(1, baseColor);
+    g.addColorStop(0.25, midColor);
+    g.addColorStop(0.50, baseColor);
+    // Fade dramático: el cuerpo se disuelve en la atmósfera para que
+    // la montaña no parezca un rectángulo sólido (M0.5).
+    const br = parseInt(baseColor.slice(1, 3), 16);
+    const bg = parseInt(baseColor.slice(3, 5), 16);
+    const bb = parseInt(baseColor.slice(5, 7), 16);
+    g.addColorStop(0.65, `rgba(${br},${bg},${bb},0.5)`);
+    g.addColorStop(0.80, `rgba(${br},${bg},${bb},0.12)`);
+    g.addColorStop(1.00, `rgba(${br},${bg},${bb},0.0)`);
     ctx.fillStyle = g;
     ctx.fill();
-    // Nieve en las cumbres
+    ctx.restore();
+    // 3) Nieve en las cumbres.
     for (let i = 0; i < segments; i++) {
       const px = (i / (segments - 1)) * span;
-      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 130;
-      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 60;
-      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 25;
-      const peak = (30 + macro + meso + detail) * scale;
-      if (peak < 30 * scale) continue;
+      const peak = peaks[i];
+      if (peak < 35 * scale) continue;
       const py = baseY - peak;
-      ctx.fillStyle = `rgba(255,250,235,${0.35 - (i % 3) * 0.04})`;
+      const grad = ctx.createRadialGradient(px, py + 4, 0, px, py + 4, 16 + (i % 5) * 4);
+      grad.addColorStop(0, 'rgba(255,250,235,0.55)');
+      grad.addColorStop(1, 'rgba(255,250,235,0)');
+      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.ellipse(px, py + 6, 12 + (i % 5) * 4, 4, 0, 0, Math.PI * 2);
+      ctx.ellipse(px, py + 4, 16 + (i % 5) * 4, 5, 0, 0, Math.PI * 2);
       ctx.fill();
     }
-    // Estrías
-    ctx.strokeStyle = 'rgba(20,28,40,0.32)';
-    ctx.lineWidth = 1.5;
-    for (let i = 0; i < 14; i++) {
-      const x0 = (i / 14) * W;
-      const y0 = baseY + 20;
+    // 4) Estrías suaves de roca en laderas.
+    ctx.filter = 'blur(0.5px)';
+    for (let i = 0; i < 18; i++) {
+      const x0 = (i / 18) * W;
+      const y0 = baseY + 8;
+      ctx.strokeStyle = `rgba(20,28,40,${0.20 + (i % 3) * 0.04})`;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.moveTo(x0, y0);
-      for (let j = 0; j < 6; j++) ctx.lineTo(x0 + Math.sin(i + j) * 30, y0 + j * 24);
+      for (let j = 0; j < 6; j++) {
+        ctx.lineTo(x0 + Math.sin(i + j) * 30, y0 + j * 22);
+      }
       ctx.stroke();
     }
+    ctx.filter = 'none';
     const t = new BABYLON.Texture(c.toDataURL(), scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
     t.hasAlpha = true;
     t.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
@@ -280,14 +330,20 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     worldMountTextures.push(t);
     return t;
   };
+  // Helper adaptador para el caller que pasaba 8 argumentos (incluyendo
+  // un fogColor ya sin efecto). Mantiene la firma.
+  const paintMountainSilhouetteWithFog = (
+    W: number, H: number, topColor: string, midColor: string, baseColor: string,
+    scale: number, seed: number, _fogColor: string,
+  ): BABYLON.Texture => paintMountainSilhouette(W, H, topColor, midColor, baseColor, scale, seed);
+  void paintMountainSilhouetteWithFog; // export-like: usado por makeBackgroundMountain abajo
   const makeBackgroundMountain = (
     name: string, xCenter: number, yPos: number, z: number,
     width: number, height: number,
     topColor: string, midColor: string, baseColor: string,
     scale: number, seed: number, fogged: boolean,
   ): void => {
-    const SKY_FOG = '#cdd6e0';
-    const tex = paintMountainSilhouette(1024, 512, topColor, midColor, baseColor, scale, seed, SKY_FOG);
+    const tex = paintMountainSilhouette(1024, 512, topColor, midColor, baseColor, scale, seed);
     const plane = BABYLON.MeshBuilder.CreatePlane(name, { width, height }, scene);
     plane.position.set(xCenter, yPos, z);
     const mat = new BABYLON.PBRMaterial(`mat-${name}`, scene);
@@ -304,23 +360,79 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     plane.applyFog = fogged;
     worldBackgroundMountains.push(plane);
   };
-  // Capa 1 — más lejana y pálida, repeatida para cubrir todo el mundo
-  for (let i = 0; i < 4; i++) {
-    const xCenter = -110 + i * 85;
-    makeBackgroundMountain(`world-montana-far-${i}`, xCenter, 12, -90, 80, 70,
-      '#cad6e6', '#9aaabe', '#5e6c84', 1.4, 13.7 + i * 31.1, true);
-  }
-  // Capa 2 — intermedia
+  // Capa LEJANA — fondo atmosférico (z=-180). Plano angosto y bajo
+  // para que las cumbres se asomen suavemente sobre el horizonte
+  // (~14% de la FOV vertical desde spawn, ~10% desde dolly).
+  // planeY=7 para que la base de la silueta quede cerca de la cornisa
+  // y no deje un gap visible con el suelo.
   for (let i = 0; i < 5; i++) {
-    const xCenter = -110 + i * 70;
-    makeBackgroundMountain(`world-montana-mid-${i}`, xCenter, 12, -55, 70, 65,
-      '#9eacc4', '#62728c', '#36445c', 1.0, 41.1 + i * 19.7, false);
+    const xCenter = -120 + i * 75;
+    makeBackgroundMountain(`world-montana-far-${i}`, xCenter, 7, -180, 75, 10,
+      '#cad6e6', '#9aaabe', '#5e6c84', 0.32, 13.7 + i * 31.1, true);
   }
-  // Capa 3 — cercana y oscura
+  // Capa MEDIA — silueta intermedia, más oscura, ligeramente más
+  // cerca. Cubre la zona justo arriba de las montañas del escenario.
+  for (let i = 0; i < 5; i++) {
+    const xCenter = -120 + i * 75;
+    makeBackgroundMountain(`world-montana-mid-${i}`, xCenter, 6, -130, 60, 7,
+      '#9eacc4', '#62728c', '#36445c', 0.24, 41.1 + i * 19.7, false);
+  }
+
+  /* ============================================================
+     CIELO GLOBAL — gradiente cálido de atardecer visible en todas
+     las escenas. Plano ancho detrás de las montañas, con la calidez
+     dominante en la mitad visible superior (la inferior queda
+     tapada por las montañas y la cornisa).
+     ============================================================ */
+  const globalSkyCanvas = document.createElement('canvas');
+  globalSkyCanvas.width = 8; globalSkyCanvas.height = 512;
+  const gsc = globalSkyCanvas.getContext('2d')!;
+  const gsky = gsc.createLinearGradient(0, 0, 0, 512);
+  // V=0 está en el TOP del plano (y=64, OUT OF FRAME por encima del
+  // cenit visible). V=1 está en el BOTTOM del plano (y=-36, OUT OF
+  // FRAME por debajo del cornisa y las montañas). El rango visible
+  // de V depende de la cámara:
+  //   • Dolly (z=190, y=14.5): visible V ∈ [0.11, 0.88]
+  //   • Spawn (z=36, y=3):    visible V ∈ [0.44, 0.82]
+  // El atardecer tiene warm en el horizonte (V alto) y cool en el
+  // cenit (V bajo), con transición en la franja V=0.45-0.65 que
+  // queda justo arriba de las montañas.
+  gsky.addColorStop(0.00, '#2a3858');  // cenit profundo (OUT OF FRAME)
+  gsky.addColorStop(0.15, '#4a5878');  // cenit (OUT OF FRAME)
+  gsky.addColorStop(0.30, '#6a6a82');  // banda fría (justo arriba del visible)
+  gsky.addColorStop(0.45, '#9a8a8a');  // transición fría → cálida
+  gsky.addColorStop(0.60, '#c89876');  // warm horizon (visible medio)
+  gsky.addColorStop(0.75, '#e8b890');  // warm glow (visible medio-bajo)
+  gsky.addColorStop(0.90, '#f0c898');  // sol-bajo glow (visible bajo)
+  gsky.addColorStop(1.00, '#b89070');  // tierra cálida (OUT OF FRAME abajo)
+  gsc.fillStyle = gsky;
+  gsc.fillRect(0, 0, 8, 512);
   for (let i = 0; i < 6; i++) {
-    const xCenter = -110 + i * 60;
-    makeBackgroundMountain(`world-montana-near-${i}`, xCenter, 12, -28, 60, 50,
-      '#7a8aa8', '#3e4e6a', '#1e2a40', 0.78, 54.8 + i * 11.3, false);
+    const y = 320 + i * 12;
+    gsc.fillStyle = `rgba(255,232,180,${0.06 - i * 0.008})`;
+    gsc.fillRect(0, y, 8, 2);
+  }
+  const globalSkyTex = new BABYLON.Texture(globalSkyCanvas.toDataURL(), scene, false, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+  globalSkyTex.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+  const globalSkyMat = new BABYLON.PBRMaterial('global-sky-gradiente', scene);
+  globalSkyMat.albedoTexture = globalSkyTex;
+  globalSkyMat.emissiveTexture = globalSkyTex;
+  globalSkyMat.emissiveColor = new BABYLON.Color3(0.85, 0.85, 0.85);
+  globalSkyMat.unlit = true;
+  globalSkyMat.environmentIntensity = 0;
+  globalSkyMat.specularIntensity = 0;
+  globalSkyMat.roughness = 1;
+  globalSkyMat.backFaceCulling = false;
+  // 6 planos repartidos a lo largo del mundo para cubrir todo el recorrido.
+  // z=-220 los pone detrás de las montañas más lejanas (z=-160) y del
+  // dolly (z=190). Altura 120u para que cubra el rango vertical visible
+  // completo desde cualquier cámara.
+  for (let i = 0; i < 6; i++) {
+    const xCenter = -60 + i * 50;
+    const globalSky = BABYLON.MeshBuilder.CreatePlane(`cielo-gradiente-global-${i}`, { width: 80, height: 120 }, scene);
+    globalSky.position.set(xCenter, 16, -220);
+    globalSky.material = globalSkyMat;
+    globalSky.applyFog = false;
   }
 
   /* ==================== helpers visuales ==================== */
