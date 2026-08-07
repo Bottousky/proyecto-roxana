@@ -237,13 +237,13 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     const span = W;
     const peaks: number[] = [];
     for (let i = 0; i < segments; i++) {
-      // Peaks acotados: macro máx 50, meso 30, detail 20 → base 20.
-      // Para scale 1.4 (lejana): peak máx ≈ 168 → outline en y=114
-      // (22% superior transparente). Para scale 0.78 (cercana): peak
-      // máx ≈ 94 → outline en y=188 (37% superior transparente).
-      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 50;
-      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 30;
-      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 20;
+      // Peaks más prominentes (M0.5.1): macro 100, meso 60, detail 40,
+      // base 20 → max 220. Para scale 0.35: peak max ≈ 77 → outline
+      // en y=204 (V=0.40, 40% superior transparente). Cumbres
+      // claramente visibles sobre el horizonte.
+      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 100;
+      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 60;
+      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 40;
       const peak = 20 + macro + meso + detail;
       peaks.push(peak * scale);
     }
@@ -281,15 +281,16 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     ctx.closePath();
     const g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, topColor);
-    g.addColorStop(0.25, midColor);
-    g.addColorStop(0.50, baseColor);
-    // Fade dramático: el cuerpo se disuelve en la atmósfera para que
-    // la montaña no parezca un rectángulo sólido (M0.5).
+    g.addColorStop(0.30, midColor);
+    g.addColorStop(0.58, baseColor);
+    // Fade menos agresivo: el cuerpo se mantiene más opaco (M0.5.1) para
+    // que las cumbres se lean claramente contra el cielo. El fade
+    // atmosférico sigue presente pero solo en el 30 % inferior.
     const br = parseInt(baseColor.slice(1, 3), 16);
     const bg = parseInt(baseColor.slice(3, 5), 16);
     const bb = parseInt(baseColor.slice(5, 7), 16);
-    g.addColorStop(0.65, `rgba(${br},${bg},${bb},0.5)`);
-    g.addColorStop(0.80, `rgba(${br},${bg},${bb},0.12)`);
+    g.addColorStop(0.72, `rgba(${br},${bg},${bb},0.85)`);
+    g.addColorStop(0.85, `rgba(${br},${bg},${bb},0.35)`);
     g.addColorStop(1.00, `rgba(${br},${bg},${bb},0.0)`);
     ctx.fillStyle = g;
     ctx.fill();
@@ -367,15 +368,15 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   // y no deje un gap visible con el suelo.
   for (let i = 0; i < 5; i++) {
     const xCenter = -120 + i * 75;
-    makeBackgroundMountain(`world-montana-far-${i}`, xCenter, 7, -180, 75, 10,
-      '#cad6e6', '#9aaabe', '#5e6c84', 0.32, 13.7 + i * 31.1, true);
+    makeBackgroundMountain(`world-montana-far-${i}`, xCenter, 7, -180, 75, 12,
+      '#cad6e6', '#9aaabe', '#5e6c84', 0.35, 13.7 + i * 31.1, true);
   }
   // Capa MEDIA — silueta intermedia, más oscura, ligeramente más
   // cerca. Cubre la zona justo arriba de las montañas del escenario.
   for (let i = 0; i < 5; i++) {
     const xCenter = -120 + i * 75;
-    makeBackgroundMountain(`world-montana-mid-${i}`, xCenter, 6, -130, 60, 7,
-      '#9eacc4', '#62728c', '#36445c', 0.24, 41.1 + i * 19.7, false);
+    makeBackgroundMountain(`world-montana-mid-${i}`, xCenter, 6, -130, 60, 8,
+      '#9eacc4', '#62728c', '#36445c', 0.26, 41.1 + i * 19.7, false);
   }
 
   /* ============================================================
@@ -513,12 +514,62 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   const desfiladeroBorde = box(desfiladeroAncho, 0.18, 4.4, estilizado(0x8a7a6a));
   desfiladeroBorde.position.set((W_E3_INICIO + W_E3_FIN) / 2, 0.1, 0);
 
-  /* gorge visual */
+  /* gorge visual — paredes con textura pintada (roca + musgo) y
+     profundidad atmosférica. Antes eran cajas planas oscuras sin
+     identidad. */
   const gorgeProfundo = box(desfiladeroAncho, 6, 30, estilizado(0x2a2830, { alpha: 0.5 }));
   gorgeProfundo.position.set((W_E3_INICIO + W_E3_FIN) / 2, -7, -26);
-  const paredGorgeL = box(0.8, 14, 28, estilizado(0x4a4a52));
+  // Canvas pintado: roca estratificada + musgo + grietas + luz cálida.
+  const paredGorgeTex = (() => {
+    const c = document.createElement('canvas');
+    c.width = 256; c.height = 512;
+    const ctx = c.getContext('2d')!;
+    const base = ctx.createLinearGradient(0, 0, 0, 512);
+    base.addColorStop(0, '#3a3a44');
+    base.addColorStop(0.4, '#2a2a34');
+    base.addColorStop(1, '#1a1a22');
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, 256, 512);
+    for (let i = 0; i < 14; i++) {
+      const x = (i / 14) * 256 + (i % 2 === 0 ? 4 : -4);
+      const w = 6 + (i % 3) * 3;
+      ctx.fillStyle = `rgba(60,60,72,${0.4 + (i % 3) * 0.12})`;
+      ctx.fillRect(x, 0, w, 512);
+    }
+    const musgo = ctx.createLinearGradient(0, 280, 0, 512);
+    musgo.addColorStop(0, 'rgba(58,90,68,0)');
+    musgo.addColorStop(0.5, 'rgba(58,90,68,0.45)');
+    musgo.addColorStop(1, 'rgba(40,70,52,0.75)');
+    ctx.fillStyle = musgo;
+    ctx.fillRect(0, 280, 256, 232);
+    ctx.strokeStyle = 'rgba(20,20,28,0.55)';
+    ctx.lineWidth = 1.4;
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(20 + i * 40, 60 + i * 18);
+      ctx.bezierCurveTo(80 + i * 20, 120 + i * 22, 40 + i * 30, 200 + i * 16, 100 + i * 35, 320 + i * 12);
+      ctx.stroke();
+    }
+    for (let i = 0; i < 10; i++) {
+      const y = 80 + (i * 47) % 400;
+      const a = 0.18 - (i % 4) * 0.04;
+      const grad = ctx.createRadialGradient(128, y, 0, 128, y, 40);
+      grad.addColorStop(0, `rgba(255,200,140,${a})`);
+      grad.addColorStop(1, 'rgba(255,200,140,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(88, y - 40, 80, 80);
+    }
+    const tex = new BABYLON.Texture(c.toDataURL(), scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+    tex.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
+    tex.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+    return tex;
+  })();
+  const paredGorgeMat = new BABYLON.StandardMaterial('pared-gorge-mat', scene);
+  paredGorgeMat.diffuseTexture = paredGorgeTex;
+  paredGorgeMat.specularColor = new BABYLON.Color3(0.08, 0.08, 0.1);
+  const paredGorgeL = box(0.8, 14, 28, paredGorgeMat);
   paredGorgeL.position.set(W_E3_INICIO + 2, 0, -24);
-  const paredGorgeR = box(0.8, 14, 28, estilizado(0x4a4a52));
+  const paredGorgeR = box(0.8, 14, 28, paredGorgeMat);
   paredGorgeR.position.set(W_E3_FIN - 2, 0, -24);
 
   /* INSTRUMENTO suspendido */
@@ -532,6 +583,70 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   let upCover = 1;
   /** Estado analítico del instrumento (integración cerrada por `integrarInstrumento`). */
   let instrumentoEstado: InstrumentoEstado = crearEstadoInstrumento(instrumentoYBase);
+
+  /* Corriente ascendente (visual) — el jugador debe VER qué cubrir.
+     Columna de partículas que sube desde el fondo del desfiladero
+     hasta el instrumento. La losa, al cubrirla, también atenúa este
+     visual (se aplica en el update de la escena). */
+  const corrienteAscCanvas = document.createElement('canvas');
+  corrienteAscCanvas.width = 32; corrienteAscCanvas.height = 32;
+  const cag = corrienteAscCanvas.getContext('2d')!;
+  const cagGrad = cag.createRadialGradient(16, 16, 1, 16, 16, 16);
+  cagGrad.addColorStop(0, 'rgba(180,255,235,1)');
+  cagGrad.addColorStop(0.5, 'rgba(120,230,200,0.7)');
+  cagGrad.addColorStop(1, 'rgba(80,180,160,0)');
+  cag.fillStyle = cagGrad;
+  cag.fillRect(0, 0, 32, 32);
+  const corrienteAscTex = new BABYLON.Texture(corrienteAscCanvas.toDataURL(), scene);
+  const corrienteAsc = new BABYLON.ParticleSystem('corriente-ascendente', 240, scene);
+  corrienteAsc.particleTexture = corrienteAscTex;
+  // emisor: caja pequeña en el fondo del desfiladero, debajo del instrumento
+  const corAscEmitter = BABYLON.MeshBuilder.CreateBox('cor-asc-emitter', { size: 0.01 }, scene);
+  corAscEmitter.position.set(instrumentoX, 0.4, -1);
+  corAscEmitter.isVisible = false;
+  corrienteAsc.emitter = corAscEmitter;
+  corrienteAsc.minEmitBox = new BABYLON.Vector3(-0.8, 0, -0.3);
+  corrienteAsc.maxEmitBox = new BABYLON.Vector3(0.8, 0, 0.3);
+  corrienteAsc.color1 = new BABYLON.Color4(0.4, 0.95, 0.78, 0.85);
+  corrienteAsc.color2 = new BABYLON.Color4(0.25, 0.75, 0.6, 0.7);
+  corrienteAsc.colorDead = new BABYLON.Color4(0.1, 0.3, 0.25, 0);
+  corrienteAsc.minSize = 0.18;
+  corrienteAsc.maxSize = 0.35;
+  corrienteAsc.minLifeTime = 1.2;
+  corrienteAsc.maxLifeTime = 2.0;
+  corrienteAsc.emitRate = 110;
+  corrienteAsc.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
+  corrienteAsc.gravity = new BABYLON.Vector3(0, 6, 0);
+  corrienteAsc.direction1 = new BABYLON.Vector3(-0.4, 2, -0.2);
+  corrienteAsc.direction2 = new BABYLON.Vector3(0.4, 4, 0.2);
+  corrienteAsc.minAngularSpeed = 0;
+  corrienteAsc.maxAngularSpeed = Math.PI;
+  corrienteAsc.minEmitPower = 1;
+  corrienteAsc.maxEmitPower = 2;
+  corrienteAsc.updateSpeed = 0.012;
+  corrienteAsc.start();
+  // Corriente descendente (más sutil) — fuerza que empuja el instrumento hacia abajo.
+  const corDescEmitter = BABYLON.MeshBuilder.CreateBox('cor-desc-emitter', { size: 0.01 }, scene);
+  corDescEmitter.position.set(instrumentoX, instrumentoYBase + 0.6, 0);
+  corDescEmitter.isVisible = false;
+  const corrienteDesc = new BABYLON.ParticleSystem('corriente-descendente', 100, scene);
+  corrienteDesc.particleTexture = corrienteAscTex;
+  corrienteDesc.emitter = corDescEmitter;
+  corrienteDesc.minEmitBox = new BABYLON.Vector3(-0.4, 0, -0.2);
+  corrienteDesc.maxEmitBox = new BABYLON.Vector3(0.4, 0, 0.2);
+  corrienteDesc.color1 = new BABYLON.Color4(1, 0.55, 0.45, 0.55);
+  corrienteDesc.color2 = new BABYLON.Color4(0.85, 0.35, 0.3, 0.45);
+  corrienteDesc.colorDead = new BABYLON.Color4(0.4, 0.1, 0.1, 0);
+  corrienteDesc.minSize = 0.12;
+  corrienteDesc.maxSize = 0.24;
+  corrienteDesc.minLifeTime = 0.9;
+  corrienteDesc.maxLifeTime = 1.6;
+  corrienteDesc.emitRate = 50;
+  corrienteDesc.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
+  corrienteDesc.gravity = new BABYLON.Vector3(0, -4, 0);
+  corrienteDesc.direction1 = new BABYLON.Vector3(-0.3, -1.5, -0.2);
+  corrienteDesc.direction2 = new BABYLON.Vector3(0.3, -3, 0.2);
+  corrienteDesc.start();
 
   /* flechas de fuerzas */
   const flechaUpMat = estilizado(0x62d4c0, { alpha: 0.6, emissive: 0x3a8e80 });
