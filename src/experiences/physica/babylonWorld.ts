@@ -5,7 +5,11 @@
 // atravesando cada escena sin transiciones de sala. Cada zona introduce un
 // nuevo fenómeno físico y un nuevo módulo del reloj-dispositivo.
 //
-// La física es analítica de forma cerrada (MRUV, tiro parabólico, vectores).
+// Física híbrida (decisión del Director 2026-08-07):
+//   • Analítica de forma cerrada (MRUV, tiro parabólico, vectores) es
+//     autoritativa para los fenómenos pedagógicos.
+//   • Havok maneja colisiones, rigid bodies pasivos y pushable props.
+//   • Detalles en `physics.ts` y en `docs/physica/arquitectura-fisica-hibrida.md`.
 import * as BABYLON from 'babylonjs';
 import { integrar, type MruvIntegrada } from './models/caidaLibre.ts';
 import {
@@ -26,6 +30,7 @@ import {
 } from './avatar.ts';
 import { Instrumento } from './companion.ts';
 import { RelojDispositivo } from './clock.ts';
+import { createPhysicaPhysics, type PhysicaPhysicsHandle } from './physics.ts';
 
 export interface PhysicaWorld {
   advanceTime(dtMs: number): void;
@@ -35,6 +40,8 @@ export interface PhysicaWorld {
   dispose(): void;
   press(action: string, down: boolean): void;
   teleport(x: number, y: number): void;
+  /** Acceso al plugin Havok para diagnóstico externo. `null` si no se cargó. */
+  physics(): PhysicaPhysicsHandle | null;
 }
 
 /* ==================== constantes ==================== */
@@ -124,6 +131,21 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
 
   const engine = new BABYLON.Engine(canvas, true, { stencil: false, antialias: true });
   const scene = new BABYLON.Scene(engine);
+
+  // Havok se inicializa en paralelo y de forma opcional: si no carga el WASM,
+  // el juego cae al modo analítico puro sin romper nada. Los modelos
+  // pedagógicos (cascada, piedras, instrumento, saquitos, plataformas drift,
+  // plano inclinado) son SIEMPRE autoritativos — Havok solo agrega
+  // colisiones para el avatar, losas, rocas grandes y decoraciones pesadas.
+  let physicaPhysics: PhysicaPhysicsHandle | null = null;
+  void createPhysicaPhysics(scene).then((handle) => {
+    physicaPhysics = handle;
+    if (handle) {
+      console.info('[Physica] Havok inicializado. Física híbrida activa.');
+    } else {
+      console.info('[Physica] Modo analítico puro (sin Havok).');
+    }
+  });
 
   scene.clearColor = new BABYLON.Color4(0.53, 0.74, 0.93, 1);
   scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
@@ -1446,9 +1468,13 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
       ui.remove();
       instrumento.dispose();
       reloj.dispose();
+      physicaPhysics?.dispose();
       engine.dispose();
       if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
     },
     press,
+    physics() {
+      return physicaPhysics;
+    },
   };
 }
