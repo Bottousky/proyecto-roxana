@@ -341,56 +341,39 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   const desfiladeroBorde = box(desfiladeroAncho, 0.18, 4.4, estilizado(0x8a7a6a));
   desfiladeroBorde.position.set((W_E3_INICIO + W_E3_FIN) / 2, 0.1, 0);
 
-  /* gorge visual — paredes con textura pintada (roca + musgo) y
+  /* gorge visual — paredes con textura mmx-cli (roca con musgo) y
      profundidad atmosférica. Antes eran cajas planas oscuras sin
      identidad. */
-  const gorgeProfundo = box(desfiladeroAncho, 6, 30, estilizado(0x2a2830, { alpha: 0.5 }));
+  // Capa de fondo: alpha 0.5, cliff-wall con uScale mayor (2) para que
+  // se lea como pared lejana sin detalle fino.
+  const gorgeProfTex = new BABYLON.Texture(
+    '/assets/physica/textures/cliff-wall-v2_001.jpg',
+    scene, false, true,
+    BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
+  );
+  gorgeProfTex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+  gorgeProfTex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
+  gorgeProfTex.uScale = 2;
+  gorgeProfTex.vScale = 0.5;
+  worldMountTextures.push(gorgeProfTex);
+  const gorgeProfundoMat = new BABYLON.StandardMaterial('gorge-profundo-mat', scene);
+  gorgeProfundoMat.diffuseTexture = gorgeProfTex;
+  gorgeProfundoMat.specularColor = new BABYLON.Color3(0.08, 0.08, 0.1);
+  gorgeProfundoMat.alpha = 0.55;
+  gorgeProfundoMat.backFaceCulling = false;
+  const gorgeProfundo = box(desfiladeroAncho, 6, 30, gorgeProfundoMat);
   gorgeProfundo.position.set((W_E3_INICIO + W_E3_FIN) / 2, -7, -26);
-  // Canvas pintado: roca estratificada + musgo + grietas + luz cálida.
-  const paredGorgeTex = (() => {
-    const c = document.createElement('canvas');
-    c.width = 256; c.height = 512;
-    const ctx = c.getContext('2d')!;
-    const base = ctx.createLinearGradient(0, 0, 0, 512);
-    base.addColorStop(0, '#3a3a44');
-    base.addColorStop(0.4, '#2a2a34');
-    base.addColorStop(1, '#1a1a22');
-    ctx.fillStyle = base;
-    ctx.fillRect(0, 0, 256, 512);
-    for (let i = 0; i < 14; i++) {
-      const x = (i / 14) * 256 + (i % 2 === 0 ? 4 : -4);
-      const w = 6 + (i % 3) * 3;
-      ctx.fillStyle = `rgba(60,60,72,${0.4 + (i % 3) * 0.12})`;
-      ctx.fillRect(x, 0, w, 512);
-    }
-    const musgo = ctx.createLinearGradient(0, 280, 0, 512);
-    musgo.addColorStop(0, 'rgba(58,90,68,0)');
-    musgo.addColorStop(0.5, 'rgba(58,90,68,0.45)');
-    musgo.addColorStop(1, 'rgba(40,70,52,0.75)');
-    ctx.fillStyle = musgo;
-    ctx.fillRect(0, 280, 256, 232);
-    ctx.strokeStyle = 'rgba(20,20,28,0.55)';
-    ctx.lineWidth = 1.4;
-    for (let i = 0; i < 6; i++) {
-      ctx.beginPath();
-      ctx.moveTo(20 + i * 40, 60 + i * 18);
-      ctx.bezierCurveTo(80 + i * 20, 120 + i * 22, 40 + i * 30, 200 + i * 16, 100 + i * 35, 320 + i * 12);
-      ctx.stroke();
-    }
-    for (let i = 0; i < 10; i++) {
-      const y = 80 + (i * 47) % 400;
-      const a = 0.18 - (i % 4) * 0.04;
-      const grad = ctx.createRadialGradient(128, y, 0, 128, y, 40);
-      grad.addColorStop(0, `rgba(255,200,140,${a})`);
-      grad.addColorStop(1, 'rgba(255,200,140,0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(88, y - 40, 80, 80);
-    }
-    const tex = new BABYLON.Texture(c.toDataURL(), scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
-    tex.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
-    tex.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
-    return tex;
-  })();
+  // Textura mmx: cliff-wall-v2_001.jpg, pared de roca con grietas y musgo
+  // en las uniones, tileable vertical, ideal para pared de gorge.
+  const paredGorgeTex = new BABYLON.Texture(
+    '/assets/physica/textures/cliff-wall-v2_001.jpg',
+    scene, false, true,
+    BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
+  );
+  paredGorgeTex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+  paredGorgeTex.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+  paredGorgeTex.uScale = 1.5;
+  paredGorgeTex.vScale = 0.7;
   const paredGorgeMat = new BABYLON.StandardMaterial('pared-gorge-mat', scene);
   paredGorgeMat.diffuseTexture = paredGorgeTex;
   paredGorgeMat.specularColor = new BABYLON.Color3(0.08, 0.08, 0.1);
@@ -818,9 +801,13 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     peldaño.receiveShadows = true;
   }
 
-  /* metrópolis 3D */
+  /* metrópolis 3D — edificios + skyline. Reposicionado más cerca del
+     observador (W_E8_INICIO + 50) para que se vea desde la escalerilla
+     de la estación. Antes estaba a W_E8_INICIO + 200 (300u), pero el
+     avatar termina la estación cerca de W_E8_FIN (140) y la cámara no
+     tiene distancia suficiente para apreciarlo. */
   const metropoGroup = new BABYLON.TransformNode('metropoli', scene);
-  metropoGroup.position.set(W_E8_INICIO + 200, Y_E8, -220);
+  metropoGroup.position.set(W_E8_INICIO + 50, Y_E8, -180);
   /* Por defecto la metrópoli está OCULTA — sólo se revela al subir a la
      cima de la estación con `estacionEstabilizada && Math.abs(avatar.vx) > 0.3`
      (ver gatillo de `metropolisRevelada` más abajo). Sin este setEnabled
@@ -919,6 +906,28 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     cono.receiveShadows = true;
   }
 
+  /* Skyline pintado (M0.6) — silueta de ciudad gótica con niebla
+     verde-azul generada con mmx-cli. Va detrás de los edificios 3D y
+     completa el horizonte de la metrópolis con detalle painterly.
+     width 240 (cubre todo el rango x del mirador) y height 90. */
+  const citySilhouetteTex = new BABYLON.Texture(
+    '/assets/physica/textures/city-silhouette_001.jpg',
+    scene, false, true,
+    BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
+  );
+  worldMountTextures.push(citySilhouetteTex);
+  const cityPlane = BABYLON.MeshBuilder.CreatePlane('metropoli-skyline', { width: 240, height: 90 }, scene);
+  cityPlane.position.set(W_E8_INICIO + 50, Y_E8 + 12, -150);
+  const cityMat = new BABYLON.StandardMaterial('mat-metropoli-skyline', scene);
+  cityMat.diffuseTexture = citySilhouetteTex;
+  cityMat.emissiveTexture = citySilhouetteTex;
+  cityMat.specularColor = new BABYLON.Color3(0, 0, 0);
+  cityMat.disableLighting = true;
+  cityMat.backFaceCulling = false;
+  cityPlane.material = cityMat;
+  cityPlane.applyFog = false;
+  cityPlane.parent = metropoGroup;
+
   metropoGroup.setEnabled(false);
 
   /* ==================== AVATAR ==================== */
@@ -1013,6 +1022,14 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
 
   if (observada || equilibrioResuelto || referenciaAnclada || vectorComun || planoInclinadoOk || estacionEstabilizada || metropolisRevelada) {
     bitaBtn.classList.remove('hidden');
+  }
+  /* Activar la metrópolis INMEDIATAMENTE al cargar si el flag ya estaba
+     seteado. Antes se hacía sólo en el update loop, que se ejecuta
+     DESPUÉS del primer frame — entonces en el reload del screenshot
+     la metrópolis aparecía un frame tarde, con la cámara ya teleported,
+     y se perdía la captura. */
+  if (metropolisRevelada) {
+    metropoGroup.setEnabled(true);
   }
 
   interface BitacoraEntry {

@@ -327,65 +327,51 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   /* ============================================================
      5. CORNISA — bloque estratificado con borde pintado y textura
      ============================================================ */
-  // Textura pintada del suelo: combina arenilla, pasto seco, grietas.
-  const cornisaCanvas = document.createElement('canvas');
-  cornisaCanvas.width = 256; cornisaCanvas.height = 256;
-  {
-    const ctx = cornisaCanvas.getContext('2d')!;
-    // base: arenilla cálida
-    const baseG = ctx.createLinearGradient(0, 0, 256, 256);
-    baseG.addColorStop(0, '#a8966e');
-    baseG.addColorStop(0.5, '#8a7a58');
-    baseG.addColorStop(1, '#7a6a48');
-    ctx.fillStyle = baseG;
-    ctx.fillRect(0, 0, 256, 256);
-    // moteado: pequeñas piedras
-    for (let i = 0; i < 90; i++) {
-      const x = (i * 53) % 256;
-      const y = (i * 89) % 256;
-      const r = 1.5 + ((i * 17) % 7) * 0.6;
-      ctx.fillStyle = ['#3a2e22', '#5a4a32', '#6a5a40', '#4a3a28'][i % 4];
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // grietas finas
-    ctx.strokeStyle = 'rgba(50,40,28,0.45)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 14; i++) {
-      ctx.beginPath();
-      const sx = (i * 37) % 256;
-      const sy = (i * 113) % 256;
-      ctx.moveTo(sx, sy);
-      for (let j = 0; j < 4; j++) {
-        ctx.lineTo(sx + Math.sin(i + j) * 30, sy + j * 12 + 8);
-      }
-      ctx.stroke();
-    }
-    // musgo en zonas: pintamos manchas verde-oliva
-    for (let i = 0; i < 16; i++) {
-      const x = (i * 71) % 256;
-      const y = (i * 131) % 256;
-      const r = 8 + ((i * 19) % 16);
-      const grad = ctx.createRadialGradient(x, y, 1, x, y, r);
-      grad.addColorStop(0, 'rgba(74,98,60,0.7)');
-      grad.addColorStop(1, 'rgba(74,98,60,0)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  const cornisaTex = new BABYLON.Texture(cornisaCanvas.toDataURL(), scene, false, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+  // Textura del suelo: generada con mmx-cli (plank-top-clean_001.jpg),
+  // tablas de madera con grano y nudos, sin hojas ni bordes heterogéneos.
+  // La imagen es 1024x1024; en wrap repeat con uScale=1, vScale=0.5 da
+  // tablas legibles a lo largo de los 38u del cornisa sin pixelarse.
+  // URL absoluta (ver nota en babylonWorld.ts backdrop).
+  const cornisaTex = new BABYLON.Texture(
+    '/assets/physica/textures/plank-top-clean_001.jpg',
+    scene, false, true,
+    BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
+  );
   cornisaTex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
   cornisaTex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
   cornisaTex.uScale = 2;
-  cornisaTex.vScale = 2;
+  cornisaTex.vScale = 1;
   textures.push(cornisaTex);
 
   const groundMat = makePbr('cornisa-roca-arcilla', '#ffffff', { roughness: 0.95 });
   groundMat.albedoTexture = cornisaTex;
   groundMat.environmentIntensity = 0.18;
+  /* Ground plane horizontal que extiende la cornisa lateralmente y
+     hacia atrás. Cubre el "navy void" que aparecía entre la cornisa y el
+     backdrop en vistas lejanas (dolly, metrópolis). Tamaño 400x400 con
+     uScale=6 vScale=6 — la textura plank-top se repite suficiente para
+     que el patrón no sea obvio. */
+  const groundTex2 = new BABYLON.Texture(
+    '/assets/physica/textures/plank-top-clean_001.jpg',
+    scene, false, true,
+    BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
+  );
+  groundTex2.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+  groundTex2.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
+  groundTex2.uScale = 6;
+  groundTex2.vScale = 6;
+  textures.push(groundTex2);
+  const groundExtMat = makePbr('ground-extendido', '#7a6a48', { roughness: 0.95 });
+  groundExtMat.albedoTexture = groundTex2;
+  groundExtMat.environmentIntensity = 0.15;
+  groundExtMat.albedoColor = new BABYLON.Color3(0.55, 0.45, 0.32);
+  // oscurece la textura plank-top para que el plano extendido no parezca
+  // un suelo de madera clara (rompe el alpenglow) sino una superficie de
+  // roca/grava coherente con la cornisa.
+  const groundExt = mesh(BABYLON.MeshBuilder.CreateGround('ground-extendido', { width: 400, height: 400 }, scene));
+  groundExt.material = groundExtMat;
+  groundExt.position.set(0, -0.71, 0);
+  groundExt.receiveShadows = true;
   const cornisaMat = makePbr('cornisa-húmeda', PALETA.cornisaHúmeda, { roughness: 0.88 });
   const cornisaTop = mesh(BABYLON.MeshBuilder.CreateBox('cornisa-estratificada', { width: 38, height: 0.7, depth: 4.6 }, scene));
   cornisaTop.material = groundMat;
