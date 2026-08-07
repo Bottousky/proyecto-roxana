@@ -349,25 +349,24 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   /* Ground plane horizontal que extiende la cornisa lateralmente y
      hacia atrás. Cubre el "navy void" que aparecía entre la cornisa y el
      backdrop en vistas lejanas (dolly, metrópolis). Tamaño 400x400 con
-     uScale=6 vScale=6 — la textura plank-top se repite suficiente para
-     que el patrón no sea obvio. */
+     uScale=8 vScale=8 — la textura de tierra/grava (ground-dirt-tile,
+     mmx-cli) es tileable y se repite sin costuras obvias. */
   const groundTex2 = new BABYLON.Texture(
-    '/assets/physica/textures/plank-top-clean_001.jpg',
+    '/assets/physica/textures/ground-dirt-tile_001.jpg',
     scene, false, true,
     BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
   );
   groundTex2.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
   groundTex2.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
-  groundTex2.uScale = 6;
-  groundTex2.vScale = 6;
+  groundTex2.uScale = 8;
+  groundTex2.vScale = 8;
   textures.push(groundTex2);
-  const groundExtMat = makePbr('ground-extendido', '#7a6a48', { roughness: 0.95 });
+  const groundExtMat = makePbr('ground-extendido', '#ffffff', { roughness: 0.95 });
   groundExtMat.albedoTexture = groundTex2;
   groundExtMat.environmentIntensity = 0.15;
-  groundExtMat.albedoColor = new BABYLON.Color3(0.55, 0.45, 0.32);
-  // oscurece la textura plank-top para que el plano extendido no parezca
-  // un suelo de madera clara (rompe el alpenglow) sino una superficie de
-  // roca/grava coherente con la cornisa.
+  // leve tinte cálido para que case con el alpenglow violeta-rosa del
+  // backdrop, sin teñir tanto como para perder el detalle de la grava.
+  groundExtMat.albedoColor = new BABYLON.Color3(0.78, 0.68, 0.55);
   const groundExt = mesh(BABYLON.MeshBuilder.CreateGround('ground-extendido', { width: 400, height: 400 }, scene));
   groundExt.material = groundExtMat;
   groundExt.position.set(0, -0.71, 0);
