@@ -131,65 +131,137 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
 
   // Sol dorado suave (disco luminoso) — refuerza la dirección dominante.
   const solCanvas = document.createElement('canvas');
-  solCanvas.width = 128; solCanvas.height = 128;
+  solCanvas.width = 256; solCanvas.height = 256;
   const solCtx = solCanvas.getContext('2d')!;
-  const solGrad = solCtx.createRadialGradient(64, 64, 2, 64, 64, 64);
-  solGrad.addColorStop(0.0, 'rgba(255,250,230,1)');
-  solGrad.addColorStop(0.25, 'rgba(255,220,160,0.85)');
-  solGrad.addColorStop(0.55, 'rgba(255,180,120,0.35)');
-  solGrad.addColorStop(1.0, 'rgba(255,160,100,0)');
+  const solGrad = solCtx.createRadialGradient(128, 128, 2, 128, 128, 128);
+  solGrad.addColorStop(0.0, 'rgba(255,252,238,1)');
+  solGrad.addColorStop(0.12, 'rgba(255,240,200,0.95)');
+  solGrad.addColorStop(0.30, 'rgba(255,210,150,0.75)');
+  solGrad.addColorStop(0.55, 'rgba(255,170,110,0.35)');
+  solGrad.addColorStop(0.85, 'rgba(255,150,90,0.10)');
+  solGrad.addColorStop(1.0, 'rgba(255,140,80,0)');
   solCtx.fillStyle = solGrad;
-  solCtx.fillRect(0, 0, 128, 128);
+  solCtx.fillRect(0, 0, 256, 256);
   const solTex = new BABYLON.Texture(solCanvas.toDataURL(), scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
   solTex.hasAlpha = true;
   textures.push(solTex);
-  const solMat = alphaMat('sol-dorado', '#ffffff', 0.9, '#fff0c0');
+  const solMat = alphaMat('sol-dorado', '#ffffff', 1, '#fff2c8');
   solMat.albedoTexture = solTex;
   solMat.emissiveTexture = solTex;
   solMat.emissiveColor = new BABYLON.Color3(1.0, 0.92, 0.78);
   solMat.useAlphaFromAlbedoTexture = true;
-  const sol = mesh(BABYLON.MeshBuilder.CreatePlane('disco-solar', { width: 12, height: 12 }, scene));
-  sol.position.set(40, 22, -110);
+  const sol = mesh(BABYLON.MeshBuilder.CreatePlane('disco-solar', { width: 18, height: 18 }, scene));
+  sol.position.set(48, 22, -150);
   sol.material = solMat;
   sol.applyFog = false;
   sol.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_NONE;
 
   /* ============================================================
-     2. MONTAÑAS — 4 capas de paralaje (Trine 5 / Planet of Lana)
+     2. MONTAÑAS — capas de siluetas pintadas sobre planos 2.5D
+     (Trine 4 / Planet of Lana: el fondo se pinta, no se modela).
+     Cada capa es un plano ancho con su silueta dibujada y un
+     gradiente de color de fondo. La profundidad se logra con
+     separacion en Z + niebla atmosférica.
      ============================================================ */
   const mountainLayers: BABYLON.Mesh[] = [];
-  const makeMountain = (index: number, z: number, baseY: number, scale: number, color: string, segments: number): void => {
+  /** Construye la silueta pintada de una cordillera, devuelve un Babylon.Texture. */
+  const makeMountainTexture = (topColor: string, midColor: string, baseColor: string, fogColor: string, scale: number, seed: number): BABYLON.Texture => {
+    const W = 1024; const H = 512;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d')!;
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, fogColor);
+    sky.addColorStop(0.55, fogColor);
+    sky.addColorStop(1, '#0d0f12');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+    const baseY = H * 0.55;
     const xs: number[] = [];
     const peaks: number[] = [];
-    // picos con ruido determinista (sin Math.random para que la escena sea
-    // estable entre cargas).
-    const seed = (index + 1) * 13.7;
+    const segments = 80;
+    const span = 600;
     for (let i = 0; i < segments; i++) {
-      const x = -38 + i * (92 / (segments - 1));
+      const x = (i / (segments - 1)) * span - 50;
       xs.push(x);
-      const peak = 4 + Math.abs(Math.sin(seed + i * 0.68)) * 7 + Math.abs(Math.cos(seed * 0.7 + i * 1.1)) * 4;
+      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 130;
+      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 60;
+      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 25;
+      const peak = 30 + macro + meso + detail;
       peaks.push(peak * scale);
     }
-    const front: BABYLON.Vector3[] = [];
-    const back: BABYLON.Vector3[] = [];
-    for (let i = 0; i < xs.length; i++) {
-      front.push(new BABYLON.Vector3(xs[i], baseY + peaks[i], z));
-      back.push(new BABYLON.Vector3(xs[i], baseY - 14, z));
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, baseY);
+    for (let i = 0; i < segments; i++) {
+      ctx.lineTo(xs[i], baseY - peaks[i]);
     }
-    const mountain = mesh(BABYLON.MeshBuilder.CreateRibbon(`montanas-parallax-${index}`, { pathArray: [front, back], sideOrientation: BABYLON.Mesh.DOUBLESIDE, closeArray: false, closePath: false }, scene));
-    const mat = makePbr(`montana-pbr-${index}`, color, { roughness: 1, metallic: 0 });
-    mat.unlit = false;
-    mat.environmentIntensity = 0.04;
-    mountain.material = mat;
-    mountain.receiveShadows = true;
-    mountain.applyFog = true;
-    mountainLayers.push(mountain);
+    ctx.lineTo(W, baseY);
+    ctx.lineTo(W, 0);
+    ctx.closePath();
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, topColor);
+    g.addColorStop(0.45, midColor);
+    g.addColorStop(1, baseColor);
+    ctx.fillStyle = g;
+    ctx.fill();
+    for (let i = 0; i < segments; i++) {
+      const px = xs[i];
+      const py = baseY - peaks[i];
+      if (peaks[i] < 30 * scale) continue;
+      ctx.fillStyle = `rgba(255,250,235,${0.35 - (i % 3) * 0.04})`;
+      ctx.beginPath();
+      ctx.ellipse(px, py + 6, 14 + (i % 5) * 4, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.strokeStyle = 'rgba(20,28,40,0.32)';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 14; i++) {
+      const x0 = (i / 14) * W;
+      const y0 = baseY + 20;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      for (let j = 0; j < 6; j++) {
+        ctx.lineTo(x0 + Math.sin(i + j) * 30, y0 + j * 24);
+      }
+      ctx.stroke();
+    }
+    const t = new BABYLON.Texture(c.toDataURL(), scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+    t.hasAlpha = true;
+    t.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
+    t.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+    textures.push(t);
+    return t;
   };
-  // 4 capas: la más lejana es la más pálida (silueta contra cielo).
-  makeMountain(0, 22,  -3, 1.15, '#8a96a8', 18);
-  makeMountain(1, 14,  -4, 0.95, PALETA.montanaLejana, 16);
-  makeMountain(2,  7,  -4.6, 0.78, PALETA.montanaMedia, 14);
-  makeMountain(3,  1,  -5.4, 0.62, PALETA.montanaCercana, 12);
+  // Crea una capa de fondo: plano ancho con la silueta pintada.
+  const makeMountain = (z: number, topColor: string, midColor: string, baseColor: string, scale: number, seed: number, fogged: boolean): void => {
+    const SKY_FOG = '#cdd6e0';
+    const tex = makeMountainTexture(topColor, midColor, baseColor, SKY_FOG, scale, seed);
+    const plane = mesh(BABYLON.MeshBuilder.CreatePlane(`montana-pintada-${z}`, { width: 220, height: 90 }, scene));
+    plane.position.set(0, 12, z);
+    const mat = new BABYLON.PBRMaterial(`mat-montana-${z}`, scene);
+    mat.albedoTexture = tex;
+    mat.useAlphaFromAlbedoTexture = true;
+    mat.transparencyMode = BABYLON.Material.MATERIAL_ALPHABLEND;
+    mat.backFaceCulling = false;
+    mat.emissiveTexture = tex;
+    // El emissive hace que la montaña brille a través de la niebla.
+    mat.emissiveColor = new BABYLON.Color3(0.55, 0.55, 0.62);
+    mat.environmentIntensity = 0.05;
+    mat.specularIntensity = 0;
+    mat.roughness = 1;
+    plane.material = mat;
+    plane.applyFog = fogged;
+    mountainLayers.push(plane);
+  };
+  // 4 capas, ordenadas de más lejana a más cercana. Las más lejanas son
+  // pálidas; las más cercanas más oscuras. Las separamos en Z NEGATIVO
+  // (detrás del cornisa) para que no ocluyan el primer plano. Las más
+  // lejanas se difuminan con la niebla; las cercanas no.
+  makeMountain(-90, '#cad6e6', '#9aaabe', '#5e6c84', 1.4, 13.7, true);
+  makeMountain(-65, '#b6c4d8', '#7e8ca8', '#46546e', 1.1, 27.4, true);
+  makeMountain(-45, '#9eacc4', '#62728c', '#36445c', 0.9, 41.1, false);
+  makeMountain(-25, '#8a98b4', '#4e5c74', '#28364c', 0.7, 54.8, false);
 
   /* ============================================================
      3. NUBES — clusters volumétricos a varias profundidades
@@ -281,19 +353,97 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   }
 
   /* ============================================================
-     5. CORNISA — bloque estratificado con borde pintado
+     5. CORNISA — bloque estratificado con borde pintado y textura
      ============================================================ */
-  const groundMat = makePbr('cornisa-roca-arcilla', PALETA.cornisaSeca, { roughness: 0.95 });
+  // Textura pintada del suelo: combina arenilla, pasto seco, grietas.
+  const cornisaCanvas = document.createElement('canvas');
+  cornisaCanvas.width = 256; cornisaCanvas.height = 256;
+  {
+    const ctx = cornisaCanvas.getContext('2d')!;
+    // base: arenilla cálida
+    const baseG = ctx.createLinearGradient(0, 0, 256, 256);
+    baseG.addColorStop(0, '#a8966e');
+    baseG.addColorStop(0.5, '#8a7a58');
+    baseG.addColorStop(1, '#7a6a48');
+    ctx.fillStyle = baseG;
+    ctx.fillRect(0, 0, 256, 256);
+    // moteado: pequeñas piedras
+    for (let i = 0; i < 90; i++) {
+      const x = (i * 53) % 256;
+      const y = (i * 89) % 256;
+      const r = 1.5 + ((i * 17) % 7) * 0.6;
+      ctx.fillStyle = ['#3a2e22', '#5a4a32', '#6a5a40', '#4a3a28'][i % 4];
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // grietas finas
+    ctx.strokeStyle = 'rgba(50,40,28,0.45)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 14; i++) {
+      ctx.beginPath();
+      const sx = (i * 37) % 256;
+      const sy = (i * 113) % 256;
+      ctx.moveTo(sx, sy);
+      for (let j = 0; j < 4; j++) {
+        ctx.lineTo(sx + Math.sin(i + j) * 30, sy + j * 12 + 8);
+      }
+      ctx.stroke();
+    }
+    // musgo en zonas: pintamos manchas verde-oliva
+    for (let i = 0; i < 16; i++) {
+      const x = (i * 71) % 256;
+      const y = (i * 131) % 256;
+      const r = 8 + ((i * 19) % 16);
+      const grad = ctx.createRadialGradient(x, y, 1, x, y, r);
+      grad.addColorStop(0, 'rgba(74,98,60,0.7)');
+      grad.addColorStop(1, 'rgba(74,98,60,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  const cornisaTex = new BABYLON.Texture(cornisaCanvas.toDataURL(), scene, false, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+  cornisaTex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+  cornisaTex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
+  cornisaTex.uScale = 2;
+  cornisaTex.vScale = 2;
+  textures.push(cornisaTex);
+
+  const groundMat = makePbr('cornisa-roca-arcilla', '#ffffff', { roughness: 0.95 });
+  groundMat.albedoTexture = cornisaTex;
+  groundMat.environmentIntensity = 0.18;
   const cornisaMat = makePbr('cornisa-húmeda', PALETA.cornisaHúmeda, { roughness: 0.88 });
-  const cornisaTop = mesh(BABYLON.MeshBuilder.CreateBox('cornisa-estratificada', { width: 34, height: 0.7, depth: 4.4 }, scene));
+  const cornisaTop = mesh(BABYLON.MeshBuilder.CreateBox('cornisa-estratificada', { width: 38, height: 0.7, depth: 4.6 }, scene));
   cornisaTop.material = groundMat;
-  cornisaTop.position.set(-1, -0.35, 0);
+  cornisaTop.position.set(0, -0.35, 0);
   cornisaTop.receiveShadows = true;
   // borde inferior — más oscuro, más erosionado
-  const cornisaBorde = mesh(BABYLON.MeshBuilder.CreateBox('cornisa-borde', { width: 34, height: 0.35, depth: 4.5 }, scene));
+  const cornisaBorde = mesh(BABYLON.MeshBuilder.CreateBox('cornisa-borde', { width: 38, height: 0.35, depth: 4.7 }, scene));
   cornisaBorde.material = cornisaMat;
-  cornisaBorde.position.set(-1, -0.85, 0);
+  cornisaBorde.position.set(0, -0.85, 0);
   cornisaBorde.receiveShadows = true;
+  // repisa interior: una banda de roca más oscura frente al lago, refuerza
+  // la sensación de cornisa real y no un rectángulo flotante.
+  const cornisaBanda = mesh(BABYLON.MeshBuilder.CreateBox('cornisa-banda-erosion', { width: 38, height: 0.4, depth: 0.6 }, scene));
+  cornisaBanda.material = makePbr('cornisa-banda', '#3a2e22', { roughness: 1 });
+  cornisaBanda.position.set(0, -0.55, 2.2);
+  cornisaBanda.receiveShadows = true;
+  // detalle de "saliente" a la izquierda: la cornisa se quiebra en un
+  // afloramiento rocoso, da silueta interesante al horizonte.
+  const salienteGeo = mesh(BABYLON.MeshBuilder.CreateIcoSphere('saliente-rocoso', { radius: 1.6, subdivisions: 2, flat: true }, scene));
+  salienteGeo.material = rockWarmMat;
+  salienteGeo.scaling.set(1.3, 0.55, 0.7);
+  salienteGeo.position.set(-15, -0.1, 0.5);
+  salienteGeo.rotation.y = 0.4;
+  salienteGeo.receiveShadows = true;
+  shadows.addShadowCaster(salienteGeo);
+  const salienteMusgo = mesh(BABYLON.MeshBuilder.CreateSphere('saliente-musgo', { diameter: 2.4, segments: 8 }, scene));
+  salienteMusgo.material = mossMat;
+  salienteMusgo.scaling.set(1.05, 0.18, 0.65);
+  salienteMusgo.position.set(-15.3, 0.55, 0.4);
+  salienteMusgo.receiveShadows = true;
 
   /* ============================================================
      6. VEGETACIÓN — hand-painted Canvas + planos alpha
@@ -440,16 +590,17 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   waterTex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
   textures.push(waterTex);
 
-  // Lago: plano translúcido que cubre la base de la cascada.
-  const lakeMat = makePbr('lago-translucido', PALETA.aguaProfunda, { alpha: 0.6, emissive: '#1a3a4a' });
+  // Lago: plano translúcido más grande y reflectivo, ancla la cascada visualmente.
+  const lakeMat = makePbr('lago-translucido', PALETA.aguaProfunda, { alpha: 0.78, emissive: '#1a4a6a' });
   lakeMat.albedoTexture = waterTex;
   lakeMat.emissiveTexture = waterTex;
-  lakeMat.specularIntensity = 1.2;
-  lakeMat.roughness = 0.35;
-  const lake = mesh(BABYLON.MeshBuilder.CreatePlane('lago-base', { width: 18, height: 12 }, scene));
+  lakeMat.specularIntensity = 1.6;
+  lakeMat.roughness = 0.25;
+  lakeMat.metallic = 0.05;
+  const lake = mesh(BABYLON.MeshBuilder.CreatePlane('lago-base', { width: 22, height: 14 }, scene));
   lake.material = lakeMat;
   lake.rotation.x = Math.PI / 2;
-  lake.position.set(8, -0.3, -1.5);
+  lake.position.set(9, -0.55, -2.0);
 
   /* ============================================================
      8. CASCADA — 4 cintas con alpha-blend + niebla volumétrica
@@ -484,44 +635,49 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
     m.backFaceCulling = false;
     return m;
   };
-  const cintasCount = 4;
+  // Cascada: ahora más ancha (×1.6) y con 5 cintas para profundidad real.
+  const CASCADA_SCALE_W = 1.6;
+  const CASCADA_SCALE_H = 1.05;
+  const cintasCount = 5;
   const cintas: BABYLON.Mesh[] = [];
   for (let i = 0; i < cintasCount; i++) {
     const w = BABYLON.MeshBuilder.CreatePlane(`cascada-volumen-${i}`, {
-      width: CASCADA_ANCHO - i * 0.28,
-      height: CASCADA_TOPE + 0.5,
+      width: (CASCADA_ANCHO * CASCADA_SCALE_W) - i * 0.5,
+      height: (CASCADA_TOPE + 0.5) * CASCADA_SCALE_H,
     }, scene);
     const mat = cintaAgua(
       i,
-      [0.62, 0.42, 0.26, 0.14][i],
-      ['#3a8aac', '#5faecf', '#85d4e8', '#bce8f0'][i],
+      [0.78, 0.58, 0.40, 0.24, 0.12][i],
+      ['#2a6e8c', '#4a98b8', '#6ec0d8', '#92dde8', '#c4ecf4'][i],
     );
     w.material = mat;
-    w.position.set(CASCADA_CENTRO, CASCADA_TOPE / 2, -0.18 - i * 0.16);
+    w.position.set(CASCADA_CENTRO, (CASCADA_TOPE * CASCADA_SCALE_H) / 2, -0.6 - i * 0.22);
     cintas.push(mesh(w));
   }
 
   // Halo de luz alrededor de la cascada: refuerza el "shaft" volumétrico.
+  // Ahora más ancho (×2) y más luminoso para anclar visualmente la cascada.
   const haloCanvas = document.createElement('canvas');
   haloCanvas.width = 64; haloCanvas.height = 256;
   const haloCtx = haloCanvas.getContext('2d')!;
   const haloGrad = haloCtx.createLinearGradient(0, 0, 64, 0);
   haloGrad.addColorStop(0, 'rgba(168,239,255,0)');
-  haloGrad.addColorStop(0.45, 'rgba(168,239,255,0.32)');
-  haloGrad.addColorStop(0.55, 'rgba(168,239,255,0.32)');
+  haloGrad.addColorStop(0.40, 'rgba(168,239,255,0.42)');
+  haloGrad.addColorStop(0.50, 'rgba(220,250,255,0.55)');
+  haloGrad.addColorStop(0.60, 'rgba(168,239,255,0.42)');
   haloGrad.addColorStop(1, 'rgba(168,239,255,0)');
   haloCtx.fillStyle = haloGrad;
   haloCtx.fillRect(0, 0, 64, 256);
   const haloTex = new BABYLON.Texture(haloCanvas.toDataURL(), scene, false, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
   textures.push(haloTex);
-  const haloMat = alphaMat('cascada-halo', '#ffffff', 0.55, '#a8efff');
+  const haloMat = alphaMat('cascada-halo', '#ffffff', 0.85, '#c0f0ff');
   haloMat.albedoTexture = haloTex;
   haloMat.emissiveTexture = haloTex;
-  haloMat.emissiveColor = new BABYLON.Color3(0.45, 0.7, 0.85);
-  haloMat.environmentIntensity = 0.05;
-  const halo = mesh(BABYLON.MeshBuilder.CreatePlane('cascada-halo-plano', { width: CASCADA_ANCHO * 1.65, height: CASCADA_TOPE * 1.08 }, scene));
+  haloMat.emissiveColor = new BABYLON.Color3(0.55, 0.85, 1.0);
+  haloMat.environmentIntensity = 0.06;
+  const halo = mesh(BABYLON.MeshBuilder.CreatePlane('cascada-halo-plano', { width: CASCADA_ANCHO * 2.4, height: CASCADA_TOPE * 1.15 }, scene));
   halo.material = haloMat;
-  halo.position.set(CASCADA_CENTRO, CASCADA_TOPE / 2, -1.2);
+  halo.position.set(CASCADA_CENTRO, CASCADA_TOPE * 0.55, -1.4);
 
   // Shaft de luz "godray" diagonal (Trine 5 / INSIDE inspiration).
   const shaftCanvas = document.createElement('canvas');
@@ -634,20 +790,20 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
     estado: MruvIntegrada;
   }
   const gotas: Gota[] = [];
-  const gotasCount = 40;
+  const gotasCount = 90;
   for (let i = 0; i < gotasCount; i++) {
-    const droplet = mesh(BABYLON.MeshBuilder.CreateSphere('gota-ascendente', { diameter: 0.16 + (i % 3) * 0.05, segments: 8 }, scene));
-    const dropletMat = makePbr('gota-ascendente-mat', '#dffaff', { alpha: 0.9, emissive: '#a8efff' });
-    dropletMat.environmentIntensity = 0.4;
+    const droplet = mesh(BABYLON.MeshBuilder.CreateSphere('gota-ascendente', { diameter: 0.18 + (i % 3) * 0.06, segments: 8 }, scene));
+    const dropletMat = makePbr('gota-ascendente-mat', '#dffaff', { alpha: 0.92, emissive: '#a8efff' });
+    dropletMat.environmentIntensity = 0.45;
     dropletMat.specularIntensity = 1.6;
     droplet.material = dropletMat;
     const desfase = (i / gotasCount) * 2.4; // 2.4s de desfase entre gotas
-    const xJitter = (((i * 0.13) % 1) - 0.5) * (CASCADA_ANCHO - 0.3);
+    const xJitter = (((i * 0.13) % 1) - 0.5) * ((CASCADA_ANCHO * CASCADA_SCALE_W) - 0.4);
     gotas.push({
       mesh: droplet,
       estado: { y: LAGO_Y, v: 0, t: -desfase },
     });
-    droplet.position.set(CASCADA_CENTRO + xJitter, LAGO_Y, -0.05);
+    droplet.position.set(CASCADA_CENTRO + xJitter, LAGO_Y, -0.05 - (i % 3) * 0.12);
   }
 
   /* ============================================================

@@ -109,17 +109,17 @@ const Y_E8 = 20;
 
 /* Cámaras curadas por zona */
 const CAM = {
-   escena2: { z: 34, y: 3.5, targetY: 1.3 },
-  cascada: { z: 190, y: 14.5, targetY: 13.5 },
-  desfiladero: { z: 80, y: 4, targetY: 2 },
-  valle: { z: 120, y: 8, targetY: 0 },
-  corriente: { z: 100, y: 6, targetY: 1 },
+   escena2: { z: 36, y: 3.0, targetY: 1.0 },
+  cascada: { z: 190, y: 14.5, targetY: 11.5 },
+  desfiladero: { z: 80, y: 3.5, targetY: 1.5 },
+  valle: { z: 120, y: 7, targetY: 0 },
+  corriente: { z: 100, y: 5.5, targetY: 1 },
   rampa: { z: 70, y: 3, targetY: 1 },
-  estacion: { z: 110, y: 10, targetY: 5 },
-  metro: { z: 300, y: 30, targetY: 10 },
+  estacion: { z: 110, y: 9, targetY: 5 },
+  metro: { z: 300, y: 28, targetY: 10 },
 } as const;
-const CAM_FOV = 0.16;
-const CAM_FOV_METRO = 0.12;
+const CAM_FOV = 0.22;
+const CAM_FOV_METRO = 0.16;
 
 /* Save propio de Physica */
 const SAVE_KEY = 'roxana-physica-v1';
@@ -178,9 +178,13 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   });
 
   scene.clearColor = new BABYLON.Color4(0.08, 0.14, 0.22, 1);
-  scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-  scene.fogDensity = 0.0042;
-  scene.fogColor = new BABYLON.Color3(0.42, 0.56, 0.62);
+  // Niebla atmosférica: lineal, calibrada para no tapar el primer plano.
+  // El primer plano (cornisa + avatar) está a ~25-40u de cámara; el horizonte
+  // cae en 200-280u y se desvanece con el color del cielo bajo.
+  scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+  scene.fogStart = 50;
+  scene.fogEnd = 320;
+  scene.fogColor = new BABYLON.Color3(0.72, 0.78, 0.86);
 
   const camera = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, CAM.escena2.y, CAM.escena2.z), scene);
   camera.fov = CAM_FOV;
@@ -188,20 +192,20 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   camera.maxZ = 800;
 
   const hemi = new BABYLON.HemisphericLight('cool-fill', new BABYLON.Vector3(-0.25, 1, 0.3), scene);
-  hemi.diffuse = new BABYLON.Color3(0.38, 0.55, 0.68);
-  hemi.groundColor = new BABYLON.Color3(0.08, 0.12, 0.15);
-  hemi.intensity = 0.72;
+  hemi.diffuse = new BABYLON.Color3(0.55, 0.72, 0.86);
+  hemi.groundColor = new BABYLON.Color3(0.18, 0.22, 0.26);
+  hemi.intensity = 1.05;
   const sun = new BABYLON.DirectionalLight('golden-key', new BABYLON.Vector3(-0.55, -0.82, 0.38), scene);
   sun.position = new BABYLON.Vector3(24, 34, 18);
-  sun.diffuse = new BABYLON.Color3(1, 0.68, 0.38);
-  sun.specular = new BABYLON.Color3(1, 0.82, 0.58);
-  sun.intensity = 2.2;
+  sun.diffuse = new BABYLON.Color3(1, 0.78, 0.52);
+  sun.specular = new BABYLON.Color3(1, 0.86, 0.62);
+  sun.intensity = 2.6;
   sun.shadowMinZ = -150;
   sun.shadowMaxZ = 400;
   const shadows = new BABYLON.ShadowGenerator(1024, sun);
   shadows.useBlurExponentialShadowMap = true;
   shadows.blurKernel = 24;
-  shadows.darkness = 0.42;
+  shadows.darkness = 0.34;
 
   /* ==================== helpers visuales ==================== */
 
