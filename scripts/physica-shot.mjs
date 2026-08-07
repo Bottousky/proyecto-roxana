@@ -57,7 +57,8 @@ const STATES = {
     await advance(page, 1500);
   },
   'e6-plano-fresh': async (page) => {
-    await teleport(page, 70, 0.8);
+    // y=2.9 = altura de la roca6 (roca6Y = rampaAlturaBase + 0.9 = 2.9).
+    await teleport(page, 70, 2.9);
     await advance(page, 1500);
   },
   'e7-estacion-fresh': async (page) => {

@@ -121,7 +121,7 @@ const SCENES = [
   { key: '3-equilibrio', x: 17, y: 0.8 },
   { key: '4-referencia', x: 38, y: 1.6 },
   { key: '5-vector', x: 55, y: 4.5 },
-  { key: '6-plano', x: 70, y: 0.8 },
+  { key: '6-plano', x: 70, y: 2.9 },
   { key: '7-estacion', x: 90, y: 4.8 },
   { key: '8-metropoli', x: 100, y: 20.5 },
 ];
@@ -343,7 +343,8 @@ async function run() {
     await page.waitForFunction(() => typeof window.__pxSnapshot === 'function', undefined, { timeout: 30000 });
 
     // No-act: caminar por la zona sin tocar la rampa ni la roca.
-    await teleport(page, 70, 0.8);
+    // y=2.9 = altura de la roca (roca6Y = rampaAlturaBase + 0.9 = 2.9).
+    await teleport(page, 70, 2.9);
     await advance(page, 200);
     await snapShot(page, 'e6-plano-fresh');
     await press(page, 'right', true);
