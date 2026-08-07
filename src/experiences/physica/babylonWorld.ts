@@ -954,6 +954,18 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   let anillo1Activo = false; // referencia
   let anillo2Activo = false; // vector
 
+  /* Estado analítico del contrapeso (Escena 7 anillo 0). Se integra con
+     `integrarInstrumento` a partir de la cobertura de la losa. El anillo
+     se activa cuando el modelo predice descenso Y la posición
+     realmente recorrida supera el umbral. */
+  const contrapesoYBase = estacionY + 3;
+  let contrapesoEstado: InstrumentoEstado = crearEstadoInstrumento(contrapesoYBase);
+  let contrapesoUpCover = 1;
+  /* Tiempo acumulado en el que la estación coincide con la plataforma
+     anclada (Escena 7 anillo 1). */
+  let anillo1TiempoEnMarco = 0;
+  const ANILLO1_TIEMPO_REQUERIDO = 1.5; // s
+
   const rocaFlotanteGeo = BABYLON.MeshBuilder.CreateIcoSphere('roca-flotante', { radius: 0.5, subdivisions: 1, flat: true }, scene);
   rocaFlotanteGeo.material = estilizado(0x7a7266, { alpha: 0.6, emissive: 0x5a5246 });
   rocaFlotanteGeo.position.set(estacionX + 8, estacionY + 8, 0);
@@ -1329,8 +1341,12 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
         if (down && !input.jump) jumpEdge = true;
         input.jump = down;
         break;
-      case 'act': actEdge = down; break;
-      case 'pred-sube': predSubeEdge = down; break;
+      // Acciones de tipo "trigger": se arman en rising-edge (press=true).
+      // El release (down=false) NO las limpia — el update loop las consume
+      // y resetea. Esto permite que el harness invoque press(true) +
+      // press(false) en el mismo microtask sin perder el evento.
+      case 'act': if (down) actEdge = true; break;
+      case 'pred-sube': if (down) predSubeEdge = true; break;
       case 'bita': if (down) bitaEdge = true; break;
     }
   }
@@ -1495,21 +1511,14 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
        Los tres anillos iluminan el material; la estación se estabiliza al
        completar los tres. */
 
-    if (planoInclinadoOk && !anillo0Activo && avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN &&
-        Math.abs(avatar.x - (estacionX + 5)) < 2 && Math.abs(avatar.y - (estacionY + 3)) < 1.5) {
-      losaEstacion.isVisible = true;
-      anillo0Activo = true;
-    anillos[0].material = anilloMat;
-    instrumento.speak('escena7_reconoce');
-    toast('Anillo exterior: la losa equilibra el contrapeso.');
-  }
-
-    if (planoInclinadoOk && !anillo1Activo && sistemaReferencia.anclajeIdx >= 0 &&
+    /* Escena 7 anillo 0/1 — la integración se hace en update(dt) para tener
+       acceso al paso de tiempo. Aquí sólo manejamos la visibilidad de la
+       losa cuando el jugador se acerca al contrapeso. */
+    if (planoInclinadoOk && !losaEstacion.isVisible &&
         avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN &&
-        Math.abs(avatar.x - (estacionX - 1.2)) < 1.6 && Math.abs(avatar.y - (estacionY + 0.7)) < 1.5) {
-      anillo1Activo = true;
-      anillos[1].material = anilloMat;
-      toast('Anillo medio: la estación adoptó la referencia de la plataforma.');
+        Math.abs(avatar.x - (estacionX + 5)) < 2 && avatar.y < estacionY + 2) {
+      losaEstacion.isVisible = true;
+      losaEstacion.position.set(estacionX + 5, estacionY + 0.6, 0);
     }
 
     if (planoInclinadoOk && !anillo2Activo && avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN &&
@@ -1535,8 +1544,13 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
       metroUI.classList.remove('hidden');
     }
 
-    /* Escena 8: revelar metrópolis */
-    if (avatar.x >= W_E8_INICIO && !metropolisRevelada) {
+    /* Escena 8: revelar metrópolis (M0.5.1: requiere velocidad real).
+       El umbral espacial se mantiene, pero se exige que el avatar tenga
+       velocidad horizontal no nula — descartar un teleport estático o
+       un spawn. La consecuencia se ancla al estado de la estación
+       (Escena 7), no a un toggle aislado. */
+    if (avatar.x >= W_E8_INICIO && !metropolisRevelada &&
+        estacionEstabilizada && Math.abs(avatar.vx) > 0.3) {
       metropolisRevelada = true;
       save.flags = { ...save.flags, metropolisRevelada: true };
       guardarSave(save);
@@ -1860,6 +1874,16 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
         piedraAterrizada = true;
         if (prediccion) resultadoObservado = resultadoPrediccion(prediccion);
         if (resultadoObservado === 'error') toast('La piedra cayó. El agua siguió subiendo.');
+        // La observación de la cascada se completa cuando la piedra aterriza:
+        // el jugador vio el agua subir y la piedra caer — los dos fenómenos.
+        // TODO(guion): disparar la entrada de bitácora con texto canónico
+        // cuando exista guion para "observación de la cascada".
+        if (!observada) {
+          observada = true;
+          save.flags = { ...save.flags, cascadaObservada: true };
+          guardarSave(save);
+          bitaBtn.classList.remove('hidden');
+        }
       } else if (p.x < W_INICIO - 0.5 || p.x > worldLimit + 0.5 || p.y > CIELO_Y + 4) {
         p.inFlight = false; p.restante = true; p.x = p.inicioX; p.y = PIEDRA_R; p.vx = 0; p.vy = 0;
       }
@@ -1957,6 +1981,52 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
         saquitoEstacion.vx = 0; saquitoEstacion.vy = 0;
         saquitoEstacion.x = estacionX - 6; saquitoEstacion.y = estacionY + 2;
         saquitoEstacion.mesh.position.set(saquitoEstacion.x, saquitoEstacion.y, 0.05);
+      }
+    }
+
+    /* Escena 7 anillo 0 — equilibrio del contrapeso con física real.
+       La cobertura del chorro se deriva del offset horizontal de la losa
+       sobre el contrapeso; el estado del contrapeso se integra con
+       `integrarInstrumento` cada frame. El anillo se activa cuando el
+       modelo predice descenso Y la posición recorrida supera -0.3. */
+    if (planoInclinadoOk && !anillo0Activo && losaEstacion.isVisible &&
+        avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN) {
+      const offsetEst = Math.abs(losaEstacion.position.x - (estacionX + 5));
+      contrapesoUpCover = Math.max(0.15, Math.min(1, 0.95 - offsetEst * 0.35));
+      const fEst: FuerzasOpuestas = {
+        upAcc: 9.8, downAcc: 9.8, upCover: contrapesoUpCover,
+      };
+      contrapesoEstado = integrarInstrumento(contrapesoEstado, fEst, dt);
+      contraPesoGeo.position.y = Math.max(estacionY, contrapesoEstado.y);
+      const descendiendoEst = descensoPredecible(fEst) &&
+        desplazamientoDesdeCentro(contrapesoEstado, contrapesoYBase) < -0.3;
+      if (descendiendoEst) {
+        anillo0Activo = true;
+        anillos[0].material = anilloMat;
+        instrumento.speak('escena7_reconoce');
+        toast('Anillo exterior: el contrapeso desciende. La estación se equilibra.');
+      }
+    }
+
+    /* Escena 7 anillo 1 — referencia con física real (modelo puro).
+       La estación debe COINCIDIR con la plataforma anclada durante
+       ≥1.5s. La coincidencia se mide con `posicionPlataformaModelo`
+       (modelo de referenciaMovil.ts). */
+    if (planoInclinadoOk && !anillo1Activo && sistemaReferencia.anclajeIdx >= 0 &&
+        avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN) {
+      const xPlataforma = posicionPlataformaModelo(
+        sistemaReferencia.plataformas[sistemaReferencia.anclajeIdx], simT,
+      );
+      const dentroDelCorredor = Math.abs(estacionX - xPlataforma) < 0.8;
+      if (dentroDelCorredor) {
+        anillo1TiempoEnMarco += dt;
+        if (anillo1TiempoEnMarco >= ANILLO1_TIEMPO_REQUERIDO) {
+          anillo1Activo = true;
+          anillos[1].material = anilloMat;
+          toast('Anillo medio: la estación adoptó la referencia de la plataforma.');
+        }
+      } else {
+        anillo1TiempoEnMarco = 0;
       }
     }
 
