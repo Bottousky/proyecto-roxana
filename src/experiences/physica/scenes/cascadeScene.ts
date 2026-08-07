@@ -93,6 +93,21 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   };
   const alphaMat = (name: string, color: string, alpha: number, emissive = '#000000'): BABYLON.PBRMaterial =>
     makePbr(name, color, { alpha, emissive });
+  /* M0.7.3 — alphaStandardMat: igual que alphaMat pero con StandardMaterial.
+     El PBR de las cintas de la cascada las mostraba como un cartel emisivo
+     congelado. StandardMaterial+ALPHABLEND real deja que el sol pase a
+     través de la cortina, leyéndose como agua translúcida. */
+  const alphaStandardMat = (name: string, color: string, alpha: number, emissive = '#000000'): BABYLON.StandardMaterial => {
+    const m = new BABYLON.StandardMaterial(name, scene);
+    m.diffuseColor = BABYLON.Color3.FromHexString(color);
+    m.emissiveColor = BABYLON.Color3.FromHexString(emissive);
+    m.specularColor = new BABYLON.Color3(0.4, 0.55, 0.65);
+    m.alpha = alpha;
+    m.transparencyMode = BABYLON.Material.MATERIAL_ALPHABLEND;
+    m.backFaceCulling = false;
+    materials.push(m);
+    return m;
+  };
 
   const mesh = (m: BABYLON.Mesh): BABYLON.Mesh => { meshes.push(m); return m; };
 
@@ -371,6 +386,12 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   groundExt.material = groundExtMat;
   groundExt.position.set(0, -0.71, 0);
   groundExt.receiveShadows = true;
+  /* M0.7.2 — disable fog para que el suelo se lea como tierra/grava en
+     TODAS las escenas, no como una niebla blanca en E8 (la cámara está
+     a x=100, z=20, distancia ~170u, dentro de la zona de niebla con
+     fogEnd=500 — antes la textura se desvanecía al color de la niebla
+     (0.72, 0.78, 0.86) y parecía "hielo"). */
+  groundExt.applyFog = false;
   const cornisaMat = makePbr('cornisa-húmeda', PALETA.cornisaHúmeda, { roughness: 0.88 });
   const cornisaTop = mesh(BABYLON.MeshBuilder.CreateBox('cornisa-estratificada', { width: 38, height: 0.7, depth: 4.6 }, scene));
   cornisaTop.material = groundMat;
@@ -578,13 +599,20 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   chorroTex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
   textures.push(chorroTex);
 
-  const cintaAgua = (i: number, alpha: number, emissive: string): BABYLON.PBRMaterial => {
-    const m = makePbr(`cascada-cinta-${i}`, '#ffffff', { alpha, emissive });
-    m.albedoTexture = chorroTex;
+  const cintaAgua = (i: number, alpha: number, emissive: string): BABYLON.StandardMaterial => {
+    /* M0.7.3 — cambio de PBR a StandardMaterial. PBR+unlit mostraba las
+       cintas como un cartel emisivo congelado ("ice block"). Con
+       StandardMaterial+alphaBlend real, las cintas se leen como agua
+       cayendo: translúcidas, con la luz del sol pasando a través, y el
+       alpha del chorroTex (bandas de densidad) controlado por la
+       propia textura, no por el material. */
+    const m = alphaStandardMat(`cascada-cinta-${i}`, '#ffffff', alpha, emissive);
+    m.diffuseTexture = chorroTex;
+    m.diffuseTexture.hasAlpha = true;
+    m.useAlphaFromDiffuseTexture = true;
     m.emissiveTexture = chorroTex;
     m.emissiveColor = BABYLON.Color3.FromHexString(emissive);
-    m.roughness = 0.4;
-    m.specularIntensity = 1.4;
+    m.specularColor = new BABYLON.Color3(0.4, 0.55, 0.65);
     m.backFaceCulling = false;
     return m;
   };
@@ -607,6 +635,26 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
     w.position.set(CASCADA_CENTRO, (CASCADA_TOPE * CASCADA_SCALE_H) / 2, -0.6 - i * 0.22);
     cintas.push(mesh(w));
   }
+
+  /* M0.7.3 — cintas secundarias de "stream" delante y detrás del cuerpo
+     principal. Más delgadas, con scrolls desfasados, dan la sensación de
+     agua cayendo en capas (no un cartel translúcido). El plano delante
+     tiene uOffset/vOffset animado a velocidad distinta para que el flujo
+     se lea como agua real. */
+  const streamDelante = mesh(BABYLON.MeshBuilder.CreatePlane('cascada-stream-delante', {
+    width: CASCADA_ANCHO * CASCADA_SCALE_W * 0.85,
+    height: (CASCADA_TOPE + 0.5) * CASCADA_SCALE_H,
+  }, scene));
+  const streamDelMat = cintaAgua(0, 0.55, '#c8e8f4');
+  streamDelante.material = streamDelMat;
+  streamDelante.position.set(CASCADA_CENTRO, (CASCADA_TOPE * CASCADA_SCALE_H) / 2, 0.6);
+  const streamDetras = mesh(BABYLON.MeshBuilder.CreatePlane('cascada-stream-detras', {
+    width: CASCADA_ANCHO * CASCADA_SCALE_W * 0.5,
+    height: (CASCADA_TOPE + 0.5) * CASCADA_SCALE_H,
+  }, scene));
+  const streamDetMat = cintaAgua(0, 0.32, '#1e5d7d');
+  streamDetras.material = streamDetMat;
+  streamDetras.position.set(CASCADA_CENTRO, (CASCADA_TOPE * CASCADA_SCALE_H) / 2, -2.0);
 
   // Halo de luz alrededor de la cascada: refuerza el "shaft" volumétrico.
   // Ahora más ancho (×2) y más luminoso para anclar visualmente la cascada.
@@ -662,6 +710,15 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   foam.rotation.x = Math.PI / 2;
   foam.position.set(CASCADA_CENTRO, LAGO_Y + 0.08, -0.45);
   foam.scaling.x = 2.1;
+  /* M0.7.3 — segundo anillo de espuma (interior) más pequeño y brillante
+     para que la base de la cascada tenga DOS capas: outer foam difuso +
+     inner foam blanco-núcleo. Refuerza la lectura de "agua golpeando
+     agua". */
+  const foam2Mat = alphaMat('espuma-nucleo', '#ffffff', 0.95, '#cffaff');
+  const foam2 = mesh(BABYLON.MeshBuilder.CreateDisc('espuma-nucleo', { radius: 0.9, tessellation: 32 }, scene));
+  foam2.material = foam2Mat;
+  foam2.rotation.x = Math.PI / 2;
+  foam2.position.set(CASCADA_CENTRO, LAGO_Y + 0.12, -0.35);
 
   /* ============================================================
      9. SPRAY Y NIEBLA — partículas no motor-físico
@@ -827,6 +884,28 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
       for (let i = 0; i < cintas.length; i++) {
         cintas[i].position.y = CASCADA_TOPE / 2 + Math.sin(time * 0.6 + i * 0.7) * 0.22;
       }
+      /* M0.7.3 — flujo de agua: animo vOffset del chorroTex para que las
+         bandas pintadas en canvas "bajen" con la cascada ascendente. Sin
+         esto, las cintas parecen un cartel estático. Velocidad calibrada
+         para que la textura recorra toda la altura (vScale 1.0) en ~1.4s. */
+      chorroTex.vOffset = (chorroTex.vOffset ?? 0) + dt * motionScale * 0.7;
+      if (chorroTex.vOffset > 1) chorroTex.vOffset -= 1;
+      /* Las cintas secundarias (delante/detrás) usan scrolls desfasados
+         para que las capas no se muevan en sincro perfecta — refuerza la
+         lectura de "agua con varias velocidades". */
+      if (streamDelMat.diffuseTexture) {
+        (streamDelMat.diffuseTexture as BABYLON.Texture).uOffset = Math.sin(time * 0.6) * 0.08;
+      }
+      if (streamDetMat.diffuseTexture) {
+        const t = streamDetMat.diffuseTexture as BABYLON.Texture;
+        t.vOffset = ((t.vOffset ?? 0) + dt * motionScale * 0.42);
+        if (t.vOffset > 1) t.vOffset -= 1;
+      }
+      /* Foam: pulso de tamaño (respiración) y rotación lenta. */
+      foam.scaling.x = 2.1 + Math.sin(time * 2.3) * 0.18;
+      foam.scaling.y = 1 + Math.sin(time * 1.9) * 0.12;
+      foam2.scaling.x = 1 + Math.sin(time * 3.1 + 0.7) * 0.22;
+      foam2.scaling.y = 1 + Math.sin(time * 2.7 + 0.7) * 0.18;
       // Halo: respira con un latido lento.
       halo.scaling.y = 1 + Math.sin(time * 0.5) * 0.04;
       halo.scaling.x = 1 + Math.sin(time * 0.4) * 0.02;

@@ -156,6 +156,23 @@ function round2(n: number): number { return Math.round(n * 100) / 100; }
 /* ==================== crear mundo ==================== */
 
 export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
+  // M0.7.1: ?clean=1 esconde TODO el HUD/paneles (back button, bita, metropoli,
+  // prompt, touch) para que las capturas del harness muestren sólo el canvas.
+  // El Visual Director auditó M0.6 y reportó la narrativa de Physica — Fundamentos
+  // sangrando en la esquina superior derecha del frame de E8. La regresión se
+  // debe a que el panel HTML está superpuesto al canvas y se capturaba junto
+  // con la escena 3D. La fix deja la UX intacta (no se ven cambios en juego) y
+  // deja el harness con capturas limpias para revisión de publisher.
+  const cleanMode = new URLSearchParams(window.location.search).get('clean') === '1';
+  if (cleanMode) {
+    hostEl.classList.add('px-clean');
+    // El HUD vive en #px-app (padre de #px-game donde se monta babylon) — el
+    // botón "← Instituto" (#px-hud) es hermano de hostEl, no hijo. Marcamos
+    // también #px-app y <html> para que los selectores CSS alcancen todos
+    // los overlays, vivan donde vivan.
+    document.getElementById('px-app')?.classList.add('px-clean');
+    document.documentElement.classList.add('px-clean');
+  }
   const canvas = document.createElement('canvas');
   canvas.setAttribute('role', 'img');
   canvas.setAttribute('aria-label', 'Physica: una naturaleza cuyas leyes pueden observarse y alterarse.');
@@ -252,7 +269,7 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   const makeBackdrop = (
     name: string, xCenter: number, yPos: number, z: number,
     width: number, height: number, tex: BABYLON.Texture,
-  ): void => {
+  ): BABYLON.Mesh => {
     const plane = BABYLON.MeshBuilder.CreatePlane(name, { width, height }, scene);
     plane.position.set(xCenter, yPos, z);
     // StandardMaterial con disableLighting es más predecible que PBR+unlit:
@@ -267,18 +284,24 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     plane.material = mat;
     plane.applyFog = false;
     worldBackgroundMountains.push(plane);
+    return plane;
   };
   // Backdrop lejano — un solo plano gigante que respeta el ratio 21:9 de
   // la imagen mmx. Cubre x∈[-220,220] (width 440) y y∈[-26,158] (height
   // 184, centrado en y=66). El plano se ve desde spawn, dolly y metrópolis
   // sin gaps. La parte inferior (y<0) queda tapada por la cornisa; la
   // parte superior (y>130) queda fuera de la FOV del cenit visible.
-  makeBackdrop('world-backdrop-far', 0, 66, -220, 440, 184, mountainFarTex);
+  // M0.7.4: en E8 (metropolisRevelada) se desactiva porque la silueta de
+  // ciudad pintada tiene su propio cielo y queremos que ocupe todo el BG.
+  const farBackdrop = makeBackdrop('world-backdrop-far', 0, 66, -220, 440, 184, mountainFarTex);
   // Capa media — siluetas de pinos + montañas teal, da parallax. Más
   // cerca (z=-100) y más baja (y=20, height 130) que el far. Se ve
   // DETRÁS de los meshes del juego (gorge, plataformas) y ADELANTE del
   // far alpenglow, creando la sensación de capas de cordillera.
-  makeBackdrop('world-backdrop-mid', 0, 20, -100, 440, 130, mountainMidTex);
+  // M0.7.4: en E8 (metropolisRevelada) se desactiva para no tapar la
+  // silueta pintada de ciudad, que vive a z=-150 y quedaría oculta detrás
+  // de este plano opaco.
+  const midBackdrop = makeBackdrop('world-backdrop-mid', 0, 20, -100, 440, 130, mountainMidTex);
 
   /* ==================== helpers visuales ==================== */
 
@@ -832,109 +855,23 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
      aparecen como bloques azules detrás de la cascada. */
   metropoGroup.setEnabled(false);
 
-  const matEdificioArr = [
-    estilizado(0x6a5a6a),
-    estilizado(0x7a6a8a),
-    estilizado(0x5a6a7a),
-    estilizado(0x8a7a9a),
-  ];
-
-  for (let i = 0; i < 12; i++) {
-    const h = 8 + Math.random() * 16;
-    const w = 3 + Math.random() * 5;
-    const d = 3 + Math.random() * 6;
-    const x = (i - 6) * 8 + Math.random() * 2;
-    const z = -Math.random() * 40 - 10;
-    const ed = box(w, h, d, matEdificioArr[Math.floor(Math.random() * 4)]);
-    ed.position.set(x, h / 2 + Y_E8, z);
-    ed.rotation.y = (Math.random() - 0.5) * 0.3;
-    ed.parent = metropoGroup;
-    ed.receiveShadows = true;
-  }
-
-  /* edificios en paredes */
-  for (let i = 0; i < 6; i++) {
-    const h = 12 + Math.random() * 8;
-    const w = 4 + Math.random() * 3;
-    const d = 6 + Math.random() * 4;
-    const x = 40 + i * 10;
-    const z = -80 + Math.random() * 10;
-    const ed = box(w, h, d, matEdificioArr[i % 4]);
-    ed.position.set(x, Y_E8 + 2, z);
-    ed.rotation.z = Math.PI / 2;
-    ed.parent = metropoGroup;
-    ed.receiveShadows = true;
-  }
-
-  /* torres */
-  for (let i = 0; i < 4; i++) {
-    const h = 25 + Math.random() * 10;
-    const torre = BABYLON.MeshBuilder.CreateCylinder('torre', { diameter: 2, height: h }, scene);
-    torre.material = matEdificioArr[i % 4];
-    torre.position.set(-30 + i * 12, Y_E8 + h / 2, -100 - i * 20);
-    torre.parent = metropoGroup;
-    torre.receiveShadows = true;
-  }
-
-  /* trenes */
-  const trenMat = estilizado(0xc0a080, { emissive: 0x8a6a4a });
-  for (let i = 0; i < 3; i++) {
-    const tren = box(4, 1.5, 1.5, trenMat);
-    tren.name = 'tren';
-    tren.position.set(-40 + i * 20, Y_E8 + 8, -90);
-    tren.rotation.z = Math.PI / 2;
-    tren.parent = metropoGroup;
-  }
-
-  /* siluetas distantes */
-  const metroSilhouette = new BABYLON.StandardMaterial('metro-silhouette', scene);
-  metroSilhouette.diffuseColor = new BABYLON.Color3(0.15, 0.16, 0.18);
-  metroSilhouette.emissiveColor = new BABYLON.Color3(0.12, 0.13, 0.14);
-  metroSilhouette.alpha = 0.4;
-  metroSilhouette.specularColor = new BABYLON.Color3(0, 0, 0);
-  for (let i = 0; i < 8; i++) {
-    const s = box(12 + Math.random() * 8, 20 + Math.random() * 30, 2, metroSilhouette);
-    s.position.set(W_E8_INICIO + 60 + i * 20, Y_E8 + 15, -300 - Math.random() * 60);
-    s.parent = metropoGroup;
-  }
-
-  /* faros */
-  for (let i = 0; i < 5; i++) {
-    const poste = BABYLON.MeshBuilder.CreateCylinder('poste', { diameter: 0.2, height: 8 }, scene);
-    poste.material = matEdificioArr[i % 4];
-    poste.position.set(W_E8_INICIO + 10 + i * 18, Y_E8 + 4, -40 - i * 5);
-    poste.parent = metropoGroup;
-    const luz = new BABYLON.PointLight(`luz-metro-${i}`, new BABYLON.Vector3(0, 4, 0), scene);
-    luz.parent = poste;
-    luz.diffuse = new BABYLON.Color3(0.5, 0.8, 1);
-    luz.specular = new BABYLON.Color3(0.6, 0.9, 1);
-    luz.intensity = 0.8;
-    luz.range = 30;
-  }
-
-  /* montañas de fondo */
-  for (let i = 0; i < 8; i++) {
-    const h = 10 + Math.random() * 15;
-    const w = 12 + Math.random() * 10;
-    const cono = BABYLON.MeshBuilder.CreateCylinder('montana', { diameterBottom: w, diameterTop: 0.1, height: h }, scene);
-    cono.material = estilizado(0x4a4a52, { alpha: 0.6 });
-    cono.position.set(W_E8_INICIO + 30 + i * 20, h / 2 + Y_E8 - 10, -150);
-    cono.parent = metropoGroup;
-    cono.receiveShadows = true;
-  }
-
-  /* Skyline pintado (M0.6) — silueta de ciudad gótica con niebla
-     verde-azul generada con mmx-cli. Va detrás de los edificios 3D y
-     completa el horizonte de la metrópolis con detalle painterly.
-     width 240 (cubre todo el rango x del mirador) y height 90. */
+  /* M0.7.4 — la metrópolis ahora es PURAMENTE la silueta pintada con mmx-cli
+     (city-silhouette_001.jpg — siluetas góticas con luces amarillas en
+     ventanas, niebla verde-azul) más un puñado de faros puntuales. Antes
+     había 12+6 edificios 3D, 4 torres, 3 trenes, 8 siluetas distantes y
+     8 montañas decorativas — todas chocaban con la imagen pintada y, peor,
+     las siluetas distantes a z=-300 a -540 quedaban dentro de la niebla
+     (fogEnd=500) y aparecían como rectángulos blancos fantasma en la captura
+     de E8. La imagen mmx ya tiene la densidad de skyline que necesitamos.
+     width 280 (un poco más grande para legibilidad) y height 110. */
   const citySilhouetteTex = new BABYLON.Texture(
     '/assets/physica/textures/city-silhouette_001.jpg',
     scene, false, true,
     BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
   );
   worldMountTextures.push(citySilhouetteTex);
-  const cityPlane = BABYLON.MeshBuilder.CreatePlane('metropoli-skyline', { width: 240, height: 90 }, scene);
-  cityPlane.position.set(W_E8_INICIO + 50, Y_E8 + 12, -150);
+  const cityPlane = BABYLON.MeshBuilder.CreatePlane('metropoli-skyline', { width: 500, height: 200 }, scene);
+  cityPlane.position.set(0, 40, 30);  // local; metropoGroup offset ya lo coloca
   const cityMat = new BABYLON.StandardMaterial('mat-metropoli-skyline', scene);
   cityMat.diffuseTexture = citySilhouetteTex;
   cityMat.emissiveTexture = citySilhouetteTex;
@@ -944,6 +881,25 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   cityPlane.material = cityMat;
   cityPlane.applyFog = false;
   cityPlane.parent = metropoGroup;
+
+  /* faros puntuales — puntos de luz cálida que danzan frente al skyline
+     pintado. Sin geometría 3D, sólo luces + pequeños halos planos que
+     sugieren actividad urbana. Mucho más limpio que la maraña de cajas
+     anterior. */
+  const faroPosArr = [
+    [-22, 6, 8], [-8, 4, 12], [4, 8, 10], [18, 5, 14], [32, 7, 9],
+  ];
+  const faros: BABYLON.PointLight[] = [];
+  for (let i = 0; i < faroPosArr.length; i++) {
+    const [fx, fy, fz] = faroPosArr[i];
+    const luz = new BABYLON.PointLight(`luz-metro-${i}`, new BABYLON.Vector3(fx, fy, fz), scene);
+    luz.parent = metropoGroup;
+    luz.diffuse = new BABYLON.Color3(0.95, 0.75, 0.45);
+    luz.specular = new BABYLON.Color3(1, 0.85, 0.55);
+    luz.intensity = 0.55;
+    luz.range = 18;
+    faros.push(luz);
+  }
 
   metropoGroup.setEnabled(false);
 
@@ -965,6 +921,15 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   const armL = box(0.13, 0.52, 0.15, estilizado(0xb17a56)); armL.position.set(-0.34, 0.86, 0);
   const armR = box(0.13, 0.52, 0.15, estilizado(0xb17a56)); armR.position.set(0.34, 0.86, 0);
   for (const part of [torso, cabeza, piernas, cape, hood, visor, armL, armR]) { avatarGroup.addChild(part); shadows.addShadowCaster(part); }
+  /* M0.7.5 — rim light del avatar. PointLight cálido desde arriba-atrás
+     que dibuja un contorno luminoso sobre el avatar contra el cielo
+     brillante (INSIDE / Planet of Lana standard). El avatar antes se
+     perdía contra el alpenglow rosado del backdrop. */
+  const avatarRim = new BABYLON.PointLight('avatar-rim', new BABYLON.Vector3(0, 3, -3), scene);
+  avatarRim.diffuse = new BABYLON.Color3(1.0, 0.78, 0.55);
+  avatarRim.specular = new BABYLON.Color3(1, 0.85, 0.6);
+  avatarRim.intensity = 0.9;
+  avatarRim.range = 6;
 
   /* ==================== RELOJ-DISPOSITIVO ==================== */
 
@@ -1047,6 +1012,15 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
      y se perdía la captura. */
   if (metropolisRevelada) {
     metropoGroup.setEnabled(true);
+    /* M0.7.4 — apagar el midBackdrop (pinos+teal) en E8 para que la silueta
+       de ciudad pintada sea visible. El mid vive a z=-100 y es opaco;
+       la ciudad a z=-150 quedaba completamente oculta detrás. */
+    midBackdrop.setEnabled(false);
+    /* M0.7.4 — apagar también el farBackdrop (alpenglow montañas) en E8.
+       La silueta de ciudad pintada tiene su propio cielo teal-grisáceo con
+       estrellas; el alpenglow rosa-morado del backdrop no combina con el
+       cielo nocturno de la ciudad. */
+    farBackdrop.setEnabled(false);
   }
 
   interface BitacoraEntry {
@@ -1940,15 +1914,16 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
       reloj.esconder();
     }
 
-    /* Metropolis animada */
+    /* Metropolis animada — flicker sutil en los faros. M0.7.4 eliminó
+       los 3D edificios/trenes (causaban rectángulos blancos fantasma por
+       niebla). Sólo quedan los 5 PointLights — les doy un parpadeo
+       cálido asíncrono para que la ciudad no se sienta "muerta". */
     if (metropolisRevelada) {
       metropoGroup.setEnabled(true);
-      const trenes = metropoGroup.getChildren();
-      for (const t of trenes) {
-        if (t.name === 'tren') {
-          (t as BABYLON.TransformNode).position.x += 0.3 * dt;
-          if ((t as BABYLON.TransformNode).position.x > 60) (t as BABYLON.TransformNode).position.x = -50;
-        }
+      midBackdrop.setEnabled(false);
+      farBackdrop.setEnabled(false);
+      for (let i = 0; i < faros.length; i++) {
+        faros[i].intensity = 0.45 + 0.15 * Math.sin(simT * (1.7 + i * 0.4) + i * 1.3);
       }
     }
 
@@ -1964,6 +1939,11 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
 
     /* mallas del avatar */
     avatarGroup.position.set(avatar.x, avatar.y - AVATAR_H / 2, 0);
+    /* M0.7.5 — rim light sigue al avatar. El local offset (0, 3, -3) es
+       "arriba y detrás" en coordenadas del avatar, así que cuando el
+       avatar se mueve, la luz lo acompanha. */
+    avatarRim.parent = avatarGroup;
+    avatarRim.position.set(0, 3, -3);
 
     /* roca flotante */
     if (estacionEstabilizada) {

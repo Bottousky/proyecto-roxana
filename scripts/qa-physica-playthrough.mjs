@@ -17,7 +17,7 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const URL = 'http://localhost:5173/physica/';
+const URL = 'http://localhost:5173/physica/?clean=1';
 const OUT = path.resolve('docs/physica/screenshots');
 fs.mkdirSync(OUT, { recursive: true });
 

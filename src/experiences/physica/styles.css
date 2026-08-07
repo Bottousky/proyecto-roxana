@@ -407,3 +407,20 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* M0.7.1 — modo "clean" para el harness de capturas (?clean=1): oculta
+   TODO el HUD/overlay HTML para que la captura del canvas no muestre UI
+   superpuesta (panel "Physica — Fundamentos" sangrando en upper-right,
+   botón "← Instituto", prompts, etc). La experiencia en juego conserva
+   el HUD completo. */
+.px-clean .px-metro-ui,
+.px-clean .px-bita-btn,
+.px-clean .px-bita,
+.px-clean .px-prompt,
+.px-clean .px-toast,
+.px-clean .px-measure,
+.px-clean .px-touch,
+.px-clean .rampa-hud,
+.px-clean #px-hud {
+  display: none !important;
+}
