@@ -207,6 +207,122 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   shadows.blurKernel = 24;
   shadows.darkness = 0.34;
 
+  /* ============================================================
+     MONTAÑAS PINTADAS DE FONDO — visibles en TODAS las escenas.
+     Planos 2.5D con silueta pintada a canvas + niebla atmosférica.
+     Cubre x ∈ [-110, 230] para envolver el mundo continuo.
+     ============================================================ */
+  const worldBackgroundMountains: BABYLON.Mesh[] = [];
+  const worldMountTextures: BABYLON.Texture[] = [];
+  const paintMountainSilhouette = (
+    W: number, H: number, topColor: string, midColor: string, baseColor: string,
+    scale: number, seed: number, fogColor: string,
+  ): BABYLON.Texture => {
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d')!;
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, fogColor);
+    sky.addColorStop(0.5, fogColor);
+    sky.addColorStop(1, '#0d0f12');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+    const baseY = H * 0.55;
+    const segments = 80;
+    const span = W;
+    ctx.beginPath();
+    ctx.moveTo(0, 0); ctx.lineTo(0, baseY);
+    for (let i = 0; i < segments; i++) {
+      const x = (i / (segments - 1)) * span;
+      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 130;
+      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 60;
+      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 25;
+      const peak = 30 + macro + meso + detail;
+      ctx.lineTo(x, baseY - peak * scale);
+    }
+    ctx.lineTo(W, baseY); ctx.lineTo(W, 0);
+    ctx.closePath();
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, topColor);
+    g.addColorStop(0.45, midColor);
+    g.addColorStop(1, baseColor);
+    ctx.fillStyle = g;
+    ctx.fill();
+    // Nieve en las cumbres
+    for (let i = 0; i < segments; i++) {
+      const px = (i / (segments - 1)) * span;
+      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 130;
+      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 60;
+      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 25;
+      const peak = (30 + macro + meso + detail) * scale;
+      if (peak < 30 * scale) continue;
+      const py = baseY - peak;
+      ctx.fillStyle = `rgba(255,250,235,${0.35 - (i % 3) * 0.04})`;
+      ctx.beginPath();
+      ctx.ellipse(px, py + 6, 12 + (i % 5) * 4, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Estrías
+    ctx.strokeStyle = 'rgba(20,28,40,0.32)';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 14; i++) {
+      const x0 = (i / 14) * W;
+      const y0 = baseY + 20;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      for (let j = 0; j < 6; j++) ctx.lineTo(x0 + Math.sin(i + j) * 30, y0 + j * 24);
+      ctx.stroke();
+    }
+    const t = new BABYLON.Texture(c.toDataURL(), scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+    t.hasAlpha = true;
+    t.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
+    t.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+    worldMountTextures.push(t);
+    return t;
+  };
+  const makeBackgroundMountain = (
+    name: string, xCenter: number, yPos: number, z: number,
+    width: number, height: number,
+    topColor: string, midColor: string, baseColor: string,
+    scale: number, seed: number, fogged: boolean,
+  ): void => {
+    const SKY_FOG = '#cdd6e0';
+    const tex = paintMountainSilhouette(1024, 512, topColor, midColor, baseColor, scale, seed, SKY_FOG);
+    const plane = BABYLON.MeshBuilder.CreatePlane(name, { width, height }, scene);
+    plane.position.set(xCenter, yPos, z);
+    const mat = new BABYLON.PBRMaterial(`mat-${name}`, scene);
+    mat.albedoTexture = tex;
+    mat.useAlphaFromAlbedoTexture = true;
+    mat.transparencyMode = BABYLON.Material.MATERIAL_ALPHABLEND;
+    mat.backFaceCulling = false;
+    mat.emissiveTexture = tex;
+    mat.emissiveColor = new BABYLON.Color3(0.55, 0.55, 0.62);
+    mat.environmentIntensity = 0.05;
+    mat.specularIntensity = 0;
+    mat.roughness = 1;
+    plane.material = mat;
+    plane.applyFog = fogged;
+    worldBackgroundMountains.push(plane);
+  };
+  // Capa 1 — más lejana y pálida, repeatida para cubrir todo el mundo
+  for (let i = 0; i < 4; i++) {
+    const xCenter = -110 + i * 85;
+    makeBackgroundMountain(`world-montana-far-${i}`, xCenter, 12, -90, 80, 70,
+      '#cad6e6', '#9aaabe', '#5e6c84', 1.4, 13.7 + i * 31.1, true);
+  }
+  // Capa 2 — intermedia
+  for (let i = 0; i < 5; i++) {
+    const xCenter = -110 + i * 70;
+    makeBackgroundMountain(`world-montana-mid-${i}`, xCenter, 12, -55, 70, 65,
+      '#9eacc4', '#62728c', '#36445c', 1.0, 41.1 + i * 19.7, false);
+  }
+  // Capa 3 — cercana y oscura
+  for (let i = 0; i < 6; i++) {
+    const xCenter = -110 + i * 60;
+    makeBackgroundMountain(`world-montana-near-${i}`, xCenter, 12, -28, 60, 50,
+      '#7a8aa8', '#3e4e6a', '#1e2a40', 0.78, 54.8 + i * 11.3, false);
+  }
+
   /* ==================== helpers visuales ==================== */
 
   function estilizado(color: number, opts: { alpha?: number; emissive?: number; specular?: number } = {}): BABYLON.StandardMaterial {

@@ -258,10 +258,9 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   // pálidas; las más cercanas más oscuras. Las separamos en Z NEGATIVO
   // (detrás del cornisa) para que no ocluyan el primer plano. Las más
   // lejanas se difuminan con la niebla; las cercanas no.
-  makeMountain(-90, '#cad6e6', '#9aaabe', '#5e6c84', 1.4, 13.7, true);
-  makeMountain(-65, '#b6c4d8', '#7e8ca8', '#46546e', 1.1, 27.4, true);
-  makeMountain(-45, '#9eacc4', '#62728c', '#36445c', 0.9, 41.1, false);
-  makeMountain(-25, '#8a98b4', '#4e5c74', '#28364c', 0.7, 54.8, false);
+  // Las montañas pintadas ahora son globales en babylonWorld.ts (cubren todo
+  // el mundo). Cascade sólo aporta cielo + sol + nubes + cascada.
+  void makeMountain; // mantener el helper disponible para reutilización futura
 
   /* ============================================================
      3. NUBES — clusters volumétricos a varias profundidades
