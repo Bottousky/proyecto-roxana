@@ -907,6 +907,11 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
 
   const avatar: Avatar = crearAvatar(0, Y_CORNISA + AVATAR_H / 2);
   const avatarGroup = new BABYLON.TransformNode('avatar', scene);
+  /* M0.7.1.3 — avatar 1.5x para que se lea como protagonista. El audit
+     M0.7 dijo que el avatar era un "6-pixel smudge" en 9/11 frames. Sin
+     cambiar la cámara, el cambio de escala es la única forma de hacer
+     legible al personaje sin romper el framing del cornisa. */
+  avatarGroup.scaling.setAll(1.5);
   const torso = BABYLON.MeshBuilder.CreateCylinder('cuerpo-proporcionado', { diameterTop: 0.34, diameterBottom: 0.52, height: 0.72, tessellation: 8 }, scene);
   torso.material = estilizado(0xc28d62, { specular: 0x7a523a }); torso.position.y = 0.84;
   const cabeza = BABYLON.MeshBuilder.CreateSphere('cabeza', { diameter: 0.46, segments: 12 }, scene);

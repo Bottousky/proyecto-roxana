@@ -364,24 +364,30 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   /* Ground plane horizontal que extiende la cornisa lateralmente y
      hacia atrás. Cubre el "navy void" que aparecía entre la cornisa y el
      backdrop en vistas lejanas (dolly, metrópolis). Tamaño 400x400 con
-     uScale=8 vScale=8 — la textura de tierra/grava (ground-dirt-tile,
-     mmx-cli) es tileable y se repite sin costuras obvias. */
+     uScale=4 vScale=4 — la textura de polvo desértico (ground-dust,
+     mmx-cli) es tileable y se repite sin costuras obvias. M0.7.1.1
+     cambió de ground-dirt-tile (orange-brown muy saturado) a
+     ground-dust (beige desaturado atmosférico) — el carpet macro de
+     M0.6/M0.7 leía como "foto de grava" porque era muy contrastado y
+     uScale=8 lo acercaba demasiado al observador. */
   const groundTex2 = new BABYLON.Texture(
-    '/assets/physica/textures/ground-dirt-tile_001.jpg',
+    '/assets/physica/textures/ground-dust_001.jpg',
     scene, false, true,
     BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
   );
   groundTex2.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
   groundTex2.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
-  groundTex2.uScale = 8;
-  groundTex2.vScale = 8;
+  groundTex2.uScale = 4;
+  groundTex2.vScale = 4;
   textures.push(groundTex2);
   const groundExtMat = makePbr('ground-extendido', '#ffffff', { roughness: 0.95 });
   groundExtMat.albedoTexture = groundTex2;
-  groundExtMat.environmentIntensity = 0.15;
-  // leve tinte cálido para que case con el alpenglow violeta-rosa del
-  // backdrop, sin teñir tanto como para perder el detalle de la grava.
-  groundExtMat.albedoColor = new BABYLON.Color3(0.78, 0.68, 0.55);
+  groundExtMat.environmentIntensity = 0.12;
+  /* M0.7.1.1 — tinte más frío y oscuro (antes 0.78/0.68/0.55 warm
+     brown). El audit M0.7 dijo que el ground "lucha" con el alpenglow
+     porque está muy saturado. Dust más frío y desaturado recede y se
+     mezcla con el sky sin pelear. */
+  groundExtMat.albedoColor = new BABYLON.Color3(0.50, 0.45, 0.40);
   const groundExt = mesh(BABYLON.MeshBuilder.CreateGround('ground-extendido', { width: 400, height: 400 }, scene));
   groundExt.material = groundExtMat;
   groundExt.position.set(0, -0.71, 0);
@@ -719,6 +725,39 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   foam2.material = foam2Mat;
   foam2.rotation.x = Math.PI / 2;
   foam2.position.set(CASCADA_CENTRO, LAGO_Y + 0.12, -0.35);
+  /* M0.7.1.2 — foam torus (anillo 3D) donde el agua golpea el lago.
+     El audit M0.7 dijo que la base de la cascada "no se lee como
+     agua" — le faltaba un anillo 3D de espuma continuo (no un disco
+     plano). Un torus blanco a la altura del agua refuerza la lectura
+     de "agua cayendo sobre agua". Textura procedural blanca pura
+     (no usamos water-surface porque su tinte rosado del atardecer
+     pintaba la espuma de rosa). */
+  const foamRingCanvas = document.createElement('canvas');
+  foamRingCanvas.width = 64; foamRingCanvas.height = 64;
+  {
+    const fc = foamRingCanvas.getContext('2d')!;
+    const fg = fc.createRadialGradient(32, 32, 2, 32, 32, 32);
+    fg.addColorStop(0, 'rgba(255,255,255,1)');
+    fg.addColorStop(0.5, 'rgba(220,240,250,0.6)');
+    fg.addColorStop(1, 'rgba(200,230,250,0)');
+    fc.fillStyle = fg;
+    fc.fillRect(0, 0, 64, 64);
+  }
+  const foamRingTex = new BABYLON.Texture(foamRingCanvas.toDataURL(), scene, false, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+  foamRingTex.hasAlpha = true;
+  textures.push(foamRingTex);
+  const foamRingMat = alphaStandardMat('espuma-anillo', '#ffffff', 0.85, '#ffffff');
+  foamRingMat.diffuseTexture = foamRingTex;
+  foamRingMat.emissiveTexture = foamRingTex;
+  foamRingMat.emissiveColor = new BABYLON.Color3(0.95, 0.99, 1.0);
+  foamRingMat.specularColor = new BABYLON.Color3(0.6, 0.7, 0.7);
+  const foamRing = mesh(
+    BABYLON.MeshBuilder.CreateTorus('espuma-anillo', {
+      diameter: CASCADA_ANCHO * 1.4, thickness: 0.32, tessellation: 48,
+    }, scene),
+  );
+  foamRing.material = foamRingMat;
+  foamRing.position.set(CASCADA_CENTRO, LAGO_Y + 0.06, -0.55);
 
   /* ============================================================
      9. SPRAY Y NIEBLA — partículas no motor-físico
@@ -778,11 +817,17 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   };
 
   makeParticles('niebla-cascada', new BABYLON.Vector3(CASCADA_CENTRO, LAGO_Y + 0.2, -0.3),
-    110, 0.46, 1.2, new BABYLON.Vector3(0, 0.55, 0),
-    { minLife: 1.8, maxLife: 4.0, color1: new BABYLON.Color4(1, 1, 1, 0.5), color2: new BABYLON.Color4(0.62, 0.78, 0.86, 0) });
+    /* M0.7.1.2 — niebla más densa y opaca (rate 110→180, alpha 0.5→0.7).
+       El audit dijo que la niebla era "barely visible". */
+    180, 0.55, 1.4, new BABYLON.Vector3(0, 0.55, 0),
+    { minLife: 1.8, maxLife: 4.0, color1: new BABYLON.Color4(1, 1, 1, 0.7), color2: new BABYLON.Color4(0.62, 0.78, 0.86, 0) });
   makeParticles('salpicadura-cascada', new BABYLON.Vector3(CASCADA_CENTRO, LAGO_Y + 0.25, 0),
-    90, 0.18, 3.4, new BABYLON.Vector3(0, -1.4, 0),
-    { minLife: 0.6, maxLife: 1.6, color1: new BABYLON.Color4(1, 1, 1, 0.85), color2: new BABYLON.Color4(0.78, 0.92, 1.0, 0) });
+    /* M0.7.1.2 — spray más visible (rate 90→220, size 0.18→0.32, power
+       3.4→5.0). El audit dijo que la base "no se lee como agua" — le
+       faltaba el penacho blanco de spray que define a una cascada
+       cayendo en Planet of Lana / Trine. */
+    220, 0.32, 5.0, new BABYLON.Vector3(0, -2.2, 0),
+    { minLife: 0.5, maxLife: 1.4, color1: new BABYLON.Color4(1, 1, 1, 0.95), color2: new BABYLON.Color4(0.85, 0.95, 1.0, 0) });
   makeParticles('polen-atmosferico', new BABYLON.Vector3(0, 4, 1.5),
     24, 0.11, 0.35, new BABYLON.Vector3(0, 0.05, 0),
     { minLife: 2.5, maxLife: 5.0, color1: new BABYLON.Color4(1.0, 0.92, 0.7, 0.45), color2: new BABYLON.Color4(1.0, 0.85, 0.6, 0) });
