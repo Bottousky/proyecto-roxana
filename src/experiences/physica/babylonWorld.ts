@@ -235,6 +235,18 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
   );
   worldMountTextures.push(mountainFarTex);
+  // Segunda capa de montañas (mmx-cli mountain-mid_001.jpg) — siluetas
+  // con pinos oscuros y tinte teal, da profundidad entre el observador
+  // y el mountain-far alpenglow. Va a z=-100 (más cerca que -220 del
+  // far), 21:9 width 440 height 130, centrada en y=20. El plano está
+  // tapado por la cornisa en x∈[-12,14] para que no se "meta" dentro
+  // del gameplay.
+  const mountainMidUrl = '/assets/physica/textures/mountain-mid_001.jpg';
+  const mountainMidTex = new BABYLON.Texture(
+    mountainMidUrl, scene, false, true,
+    BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
+  );
+  worldMountTextures.push(mountainMidTex);
   // Crear 3 planos del backdrop (far, mid, near-back) a diferentes Z
   // para depth parallax. Cada uno usa la imagen mmx.
   const makeBackdrop = (
@@ -262,6 +274,11 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   // sin gaps. La parte inferior (y<0) queda tapada por la cornisa; la
   // parte superior (y>130) queda fuera de la FOV del cenit visible.
   makeBackdrop('world-backdrop-far', 0, 66, -220, 440, 184, mountainFarTex);
+  // Capa media — siluetas de pinos + montañas teal, da parallax. Más
+  // cerca (z=-100) y más baja (y=20, height 130) que el far. Se ve
+  // DETRÁS de los meshes del juego (gorge, plataformas) y ADELANTE del
+  // far alpenglow, creando la sensación de capas de cordillera.
+  makeBackdrop('world-backdrop-mid', 0, 20, -100, 440, 130, mountainMidTex);
 
   /* ==================== helpers visuales ==================== */
 

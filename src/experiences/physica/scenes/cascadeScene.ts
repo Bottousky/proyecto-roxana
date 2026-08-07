@@ -527,24 +527,20 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   }
 
   /* ============================================================
-     7. LAGO — plano translúcido que se extiende bajo la cascada
+     7. LAGO — plano translúcido bajo la cascada. Reemplazado el
+     canvas-painted con water-surface_001.jpg (mmx-cli, atardecer sobre
+     lago con reflejos y niebla en el horizonte). uScale=1 vScale=0.6
+     para que la imagen 16:9 cubra los 22x14u del plano.
      ============================================================ */
-  const waterCanvas = document.createElement('canvas');
-  waterCanvas.width = 64; waterCanvas.height = 256;
-  const waterCtx = waterCanvas.getContext('2d')!;
-  const wg = waterCtx.createLinearGradient(0, 0, 64, 0);
-  wg.addColorStop(0, PALETA.aguaTono);
-  wg.addColorStop(0.5, PALETA.aguaLuz);
-  wg.addColorStop(1, PALETA.aguaProfunda);
-  waterCtx.fillStyle = wg;
-  waterCtx.fillRect(0, 0, 64, 256);
-  for (let y = 0; y < 256; y += 8) {
-    waterCtx.fillStyle = `rgba(255,255,255,${0.10 + (y % 24) / 140})`;
-    waterCtx.fillRect(0, y, 64, 3);
-  }
-  const waterTex = new BABYLON.Texture(waterCanvas.toDataURL(), scene, false, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+  const waterTex = new BABYLON.Texture(
+    '/assets/physica/textures/water-surface_001.jpg',
+    scene, false, true,
+    BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
+  );
   waterTex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
-  waterTex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
+  waterTex.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+  waterTex.uScale = 1;
+  waterTex.vScale = 0.6;
   textures.push(waterTex);
 
   // Lago: plano translúcido más grande y reflectivo, ancla la cascada visualmente.
