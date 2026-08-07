@@ -10,6 +10,7 @@ export interface Plataforma {
 export interface Avatar {
   x: number;
   y: number;
+  vx: number;
   vy: number;
   facing: 1 | -1;
   onGround: boolean;
@@ -30,7 +31,7 @@ export const AIR_V = 2.6;
 export const JUMP_V = 6.2;
 
 export function crearAvatar(x = 0, y = 0): Avatar {
-  return { x, y, vy: 0, facing: 1, onGround: true, carrying: false };
+  return { x, y, vx: 0, vy: 0, facing: 1, onGround: true, carrying: false };
 }
 
 export function integrarAvatar(
@@ -42,8 +43,9 @@ export function integrarAvatar(
   const vy0 = a.onGround && input.jump ? JUMP_V : a.vy;
   const dir = (input.left ? -1 : 0) + (input.right ? 1 : 0);
   const facing: 1 | -1 = dir !== 0 ? (dir > 0 ? 1 : -1) : a.facing;
-  const velocidadH = a.onGround ? RUN_V : AIR_V;
-  let x = a.x + dir * velocidadH * dt;
+  const velocidadHoriz = a.onGround ? RUN_V : AIR_V;
+  let x = a.x + dir * velocidadHoriz * dt;
+  let vx = dir * velocidadHoriz;
   let y = a.y + vy0 * dt;
   let vy = vy0 + GRAV_AVATAR * dt;
   let onGround = false;
@@ -60,5 +62,5 @@ export function integrarAvatar(
     }
   }
 
-  return { x, y, vy, facing, onGround, carrying: a.carrying };
+  return { x, y, vx, vy, facing, onGround, carrying: a.carrying };
 }

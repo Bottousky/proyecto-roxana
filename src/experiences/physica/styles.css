@@ -1,11 +1,12 @@
 /* Chrome de Physica. La página vive fuera del shell de la escuela, así que
    define su propia paleta y tipografía, siempre en español neutro. */
 :root {
-  --px-bg: #1b2430;
-  --px-panel: rgba(22, 29, 39, 0.92);
+  --px-bg: #101c29;
+  --px-panel: rgba(13, 24, 36, 0.9);
   --px-text: #e8eef6;
   --px-muted: #9fb0c4;
-  --px-accent: #7fc6ff;
+  --px-accent: #9edbff;
+  --px-copper: #e7b879;
   --px-serif: 'Spectral', Georgia, serif;
 }
 
@@ -37,10 +38,23 @@ body {
   display: block;
   width: 100%;
   height: 100%;
+  outline: none;
 }
 
 .hidden {
   display: none !important;
+}
+
+.px-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Título */
@@ -143,13 +157,14 @@ body {
   bottom: 2.2rem;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--px-panel);
-  border: 1px solid var(--px-muted);
+  background: linear-gradient(180deg, rgba(20, 39, 55, 0.94), var(--px-panel));
+  border: 1px solid rgba(158, 219, 255, 0.7);
   border-radius: 999px;
   padding: 0.5rem 1.2rem;
   font-size: 0.9rem;
   color: var(--px-text);
   white-space: nowrap;
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.24);
 }
 
 .px-toast {
@@ -165,6 +180,7 @@ body {
   color: var(--px-text);
   max-width: min(90vw, 30rem);
   text-align: center;
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.28);
 }
 
 .px-measure {
@@ -197,6 +213,15 @@ body {
 
 .px-bita-btn:hover {
   border-color: var(--px-accent);
+}
+
+.px-bita-btn:focus-visible,
+.px-bita-close:focus-visible,
+.px-touch button:focus-visible,
+#px-back:focus-visible,
+.px-buttons button:focus-visible {
+  outline: 2px solid var(--px-copper);
+  outline-offset: 3px;
 }
 
 .px-bita {
@@ -238,6 +263,10 @@ body {
   color: var(--px-accent);
 }
 
+.px-bita-panel p {
+  max-width: 34rem;
+}
+
 .px-bita-fecha {
   color: var(--px-muted);
   font-size: 0.82rem;
@@ -246,6 +275,14 @@ body {
 
 .px-bita-viv {
   line-height: 1.55;
+}
+
+.px-bita-evidencia {
+  margin-top: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--px-copper);
+  background: rgba(231, 184, 121, 0.08);
+  line-height: 1.5;
 }
 
 .px-bita-formal {
@@ -299,4 +336,31 @@ body {
 .px-touch button:active {
   background: rgba(127, 198, 255, 0.35);
   border-color: var(--px-accent);
+}
+
+@media (max-width: 700px) {
+  .px-prompt {
+    bottom: 6.2rem;
+    max-width: calc(100vw - 2rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .px-toast {
+    top: 3.8rem;
+  }
+
+  .px-bita-panel {
+    max-height: 74vh;
+    padding: 1.35rem 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

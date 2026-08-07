@@ -6,6 +6,8 @@ export const runtimeLoaders: RuntimeLoaderMap = {
   'topdown-phaser': () => import('./ohmdal/topdownRuntime.ts').then((m) => m.topdownRuntime),
   'platformer-three': () =>
     import('./physica/physicaRuntime.ts').then((m) => m.physicaRuntime),
+  'platformer-babylon': () =>
+    import('./physica/babylonRuntime.ts').then((m) => m.babylonRuntime),
   'dataflow-phaser': () =>
     import('./placeholderRuntime.ts').then((m) => m.placeholderRuntime('dataflow-phaser', 'bitland')),
   'platformer-phaser': () =>

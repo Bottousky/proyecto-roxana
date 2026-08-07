@@ -12,10 +12,12 @@
   },
   "dependencies": {
     "@types/three": "^0.185.0",
+    "babylonjs": "^9.19.1",
     "phaser": "^4.1.0",
     "three": "^0.177.0"
   },
   "devDependencies": {
+    "playwright": "^1.62.1",
     "typescript": "~5.6.3",
     "vite": "^6.3.5"
   }

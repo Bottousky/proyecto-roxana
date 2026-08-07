@@ -10,6 +10,7 @@ export type ExperienceRuntime =
   | 'dataflow-phaser'
   | 'platformer-phaser'
   | 'platformer-three'
+  | 'platformer-babylon'
   | 'cosmos-web';
 
 export interface ExperienceManifest {
