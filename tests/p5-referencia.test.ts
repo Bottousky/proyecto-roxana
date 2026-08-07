@@ -7,6 +7,8 @@ import {
   separacionRelativa,
   posicionRelativa,
   separacionConstante,
+  velocidadRelativa,
+  velocidadMarcoAnclado,
 } from '../src/experiences/physica/models/referenciaMovil.ts';
 
 function assert(condicion: unknown, etiqueta: string): void {
@@ -40,5 +42,13 @@ assert(casi(separacionRelativa(sis, 0, 1, 2), 10), 'separación sigue 10 en t=2'
 const anclado: SistemaReferencia = { ...sis, anclajeIdx: 1 };
 const xPlataforma = posicionPlataforma(sis.plataformas[1], 1);
 assert(casi(posicionRelativa(anclado, xPlataforma, 1), 0), 'plataforma anclada → posición relativa 0');
+
+// Velocidad relativa y velocidad del marco anclado.
+const tPrueba = 0;
+assert(casi(velocidadRelativa(anclado, 1, tPrueba), 0), 'plataforma anclada: velocidad relativa = 0');
+assert(casi(velocidadRelativa(anclado, 0, tPrueba), 0), 'plataforma vecina en marco anclado: velocidad relativa = 0 (separación constante)');
+assert(casi(velocidadRelativa(sis, 0, tPrueba), 3), 'sin anclaje: velocidad relativa = velocidad absoluta');
+assert(casi(velocidadMarcoAnclado(sis, tPrueba), 0), 'sin anclaje: marco anclado = 0 (inercial)');
+assert(casi(velocidadMarcoAnclado(anclado, tPrueba), -velocidadPlataforma(anclado.plataformas[1], tPrueba)), 'marco anclado: velocidad = -vAnclada');
 
 console.log('P5 referencia: OK');

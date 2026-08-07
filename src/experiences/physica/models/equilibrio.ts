@@ -57,6 +57,23 @@ export function descensoPredecible(f: FuerzasOpuestas): boolean {
   return aceleracionNetas(f) < 0;
 }
 
+/** Factor de cobertura mínimo para que la fuerza resultante apunte hacia abajo:
+ *  upCover < downAcc / upAcc. Devuelve 0..1. Si upAcc === 0 → 1. */
+export function coberturaUmbral(f: FuerzasOpuestas): number {
+  if (Math.abs(f.upAcc) < 1e-12) return 1;
+  return Math.max(0, Math.min(1, f.downAcc / f.upAcc));
+}
+
+/** Estado inicial canónico del instrumento suspendido. */
+export function crearEstadoInstrumento(y: number): InstrumentoEstado {
+  return { y, v: 0, t: 0 };
+}
+
+/** Resultado medible del instrumento: posición relativa al centro del valle. */
+export function desplazamientoDesdeCentro(estado: InstrumentoEstado, centroY: number): number {
+  return estado.y - centroY;
+}
+
 /**
  * Síntesis: "un cuerpo puede permanecer inmóvil aunque existan fuerzas;
  * si la suma vectorial sobre ese cuerpo es nula, su movimiento no cambia."

@@ -50,3 +50,21 @@ export function separacionConstante(s: SistemaReferencia, a: number, b: number, 
   }
   return true;
 }
+
+/** Velocidad relativa de una plataforma respecto al anclaje (0 si es la
+    anclada o si no hay anclaje — marco inercial). */
+export function velocidadRelativa(s: SistemaReferencia, plataformaIdx: number, t: number): number {
+  if (s.anclajeIdx < 0) {
+    return velocidadPlataforma(s.plataformas[plataformaIdx], t);
+  }
+  const vPropia = velocidadPlataforma(s.plataformas[plataformaIdx], t);
+  const vAnclada = velocidadPlataforma(s.plataformas[s.anclajeIdx], t);
+  return vPropia - vAnclada;
+}
+
+/** Vector de "el mundo se mueve en sentido contrario": la velocidad del marco
+    anclado vista desde el inercial (= −vAnclada cuando hay anclaje). */
+export function velocidadMarcoAnclado(s: SistemaReferencia, t: number): number {
+  if (s.anclajeIdx < 0) return 0;
+  return -velocidadPlataforma(s.plataformas[s.anclajeIdx], t);
+}

@@ -69,3 +69,25 @@ export function objetivoAlcanzable(
   const alcance = lanzamiento.x * tVuelo + desplazamiento;
   return alcance >= distancia - 1e-6;
 }
+
+/** Punto final (x, y) donde aterriza un tiro parabólico con corriente transversal.
+    La corriente sólo afecta x; el jugador sigue controlando la altura. Útil para
+    previsualizar el impacto en el reloj. */
+export function alcanceConCorriente(
+  lanzamiento: Vector2D,
+  corriente: Vector2D,
+  tVuelo: number,
+): Vector2D {
+  return {
+    x: lanzamiento.x * tVuelo + compensacionCorriente(corriente, tVuelo),
+    y: lanzamiento.y * tVuelo,
+  };
+}
+
+/** Dado el objetivo en x y la corriente, devuelve el vx que el jugador debe
+    imprimir para alcanzarlo. Útil para resolver puzzles con respuestas múltiples
+    (high arc / low arc con la misma corrección en x). */
+export function vxParaAlcance(distancia: number, corriente: Vector2D, tVuelo: number): number {
+  if (tVuelo <= 0) return 0;
+  return (distancia - compensacionCorriente(corriente, tVuelo)) / tVuelo;
+}

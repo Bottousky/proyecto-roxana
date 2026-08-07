@@ -35,6 +35,19 @@ export function crearPlano(height: number, angleDeg: number): PlanoInclinado {
   return { length, height, angleDeg };
 }
 
+/** Crea un plano a partir de altura y longitud (el ángulo se deduce). Si la
+    longitud es menor o igual a la altura, el ángulo sería ≥ 90°: se ignora y
+    se devuelve el ángulo máximo posible (≈ 89.9°). */
+export function crearPlanoPorLongitud(height: number, length: number): PlanoInclinado {
+  if (length <= height) {
+    const theta = Math.PI / 2 - 1e-3;
+    const angleDeg = (theta * 180) / Math.PI;
+    return { length: height / Math.sin(theta), height, angleDeg };
+  }
+  const angleRad = Math.asin(height / length);
+  return { length, height, angleDeg: (angleRad * 180) / Math.PI };
+}
+
 /**
  * Síntesis: "un plano inclinado permite alcanzar una altura aplicando
  * menor fuerza a lo largo de una distancia mayor. No crea energía gratuita."

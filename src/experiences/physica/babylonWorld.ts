@@ -11,15 +11,44 @@
 //   • Havok maneja colisiones, rigid bodies pasivos y pushable props.
 //   • Detalles en `physics.ts` y en `docs/physica/arquitectura-fisica-hibrida.md`.
 import * as BABYLON from 'babylonjs';
-import { integrar, type MruvIntegrada } from './models/caidaLibre.ts';
+import { type MruvIntegrada } from './models/caidaLibre.ts';
 import {
   CIELO_Y,
-  COLUMNA_CASCADA,
   LAGO_Y,
   resultadoPrediccion,
   type PrediccionCaida,
 } from './models/cascadaAscendente.ts';
 import { GRAVEDAD } from './models/cascadaAscendente.ts';
+import {
+  crearEstadoInstrumento,
+  descensoPredecible,
+  integrarInstrumento,
+  desplazamientoDesdeCentro,
+  type FuerzasOpuestas,
+  type InstrumentoEstado,
+} from './models/equilibrio.ts';
+import {
+  posicionPlataforma as posicionPlataformaModelo,
+  posicionRelativa,
+  velocidadMarcoAnclado,
+  type PlataformaMovil,
+  type SistemaReferencia,
+} from './models/referenciaMovil.ts';
+import {
+  alcanceConCorriente,
+  compensacionCorriente,
+  objetivoAlcanzable,
+  type Vector2D,
+} from './models/vector.ts';
+import {
+  crearPlano as crearPlanoModelo,
+  fuerzaTangencial,
+  recorridoBase,
+  sintesisPlanoInclinado,
+  trabajoNecesario,
+  FUERZA_LEVANTAR,
+  type PlanoInclinado,
+} from './models/planoInclinado.ts';
 import {
   AVATAR_H,
   crearAvatar,
@@ -31,6 +60,7 @@ import {
 import { Instrumento } from './companion.ts';
 import { RelojDispositivo } from './clock.ts';
 import { createPhysicaPhysics, type PhysicaPhysicsHandle } from './physics.ts';
+import { buildCascadeScene, type CascadeSceneEntities } from './scenes/cascadeScene.ts';
 
 export interface PhysicaWorld {
   advanceTime(dtMs: number): void;
@@ -147,24 +177,25 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     }
   });
 
-  scene.clearColor = new BABYLON.Color4(0.53, 0.74, 0.93, 1);
+  scene.clearColor = new BABYLON.Color4(0.08, 0.14, 0.22, 1);
   scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-  scene.fogDensity = 0.001;
-  scene.fogColor = new BABYLON.Color3(0.53, 0.74, 0.93);
+  scene.fogDensity = 0.0042;
+  scene.fogColor = new BABYLON.Color3(0.42, 0.56, 0.62);
 
   const camera = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, CAM.escena2.y, CAM.escena2.z), scene);
   camera.fov = CAM_FOV;
   camera.minZ = 0.1;
   camera.maxZ = 800;
 
-  const hemi = new BABYLON.HemisphericLight('hemi', new BABYLON.Vector3(0, 1, 0.3), scene);
-  hemi.diffuse = new BABYLON.Color3(0.48, 0.54, 0.58);
-  hemi.groundColor = new BABYLON.Color3(0.12, 0.16, 0.16);
-  hemi.intensity = 0.85;
-  const sun = new BABYLON.DirectionalLight('sun', new BABYLON.Vector3(0.3, 0.9, 0.4), scene);
-  sun.diffuse = new BABYLON.Color3(0.88, 0.86, 0.72);
-  sun.specular = new BABYLON.Color3(0.92, 0.9, 0.78);
-  sun.intensity = 1.1;
+  const hemi = new BABYLON.HemisphericLight('cool-fill', new BABYLON.Vector3(-0.25, 1, 0.3), scene);
+  hemi.diffuse = new BABYLON.Color3(0.38, 0.55, 0.68);
+  hemi.groundColor = new BABYLON.Color3(0.08, 0.12, 0.15);
+  hemi.intensity = 0.72;
+  const sun = new BABYLON.DirectionalLight('golden-key', new BABYLON.Vector3(-0.55, -0.82, 0.38), scene);
+  sun.position = new BABYLON.Vector3(24, 34, 18);
+  sun.diffuse = new BABYLON.Color3(1, 0.68, 0.38);
+  sun.specular = new BABYLON.Color3(1, 0.82, 0.58);
+  sun.intensity = 2.2;
   sun.shadowMinZ = -150;
   sun.shadowMaxZ = 400;
   const shadows = new BABYLON.ShadowGenerator(1024, sun);
@@ -191,171 +222,18 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     return m;
   }
 
-  function crearTexturaAgua(): BABYLON.Texture {
-    const c = document.createElement('canvas');
-    c.width = 64; c.height = 256;
-    const g = c.getContext('2d')!;
-    for (let i = 0; i < 128; i++) {
-      const onda = Math.sin(i * 0.55) * 0.35;
-      g.fillStyle = `rgba(160, 216, 250, ${0.5 + onda * 0.45})`;
-      g.fillRect(0, i * 2, 64, 2);
-    }
-    const tex = new BABYLON.Texture(c.toDataURL(), scene, false, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
-    tex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
-    tex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
-    return tex;
-  }
-
-  function crearTexturaParticula(): BABYLON.Texture {
-    const c = document.createElement('canvas');
-    c.width = 32; c.height = 32;
-    const g = c.getContext('2d')!;
-    const grad = g.createRadialGradient(16, 16, 2, 16, 16, 16);
-    grad.addColorStop(0, 'rgba(255,255,255,1)');
-    grad.addColorStop(0.45, 'rgba(190,230,255,0.85)');
-    grad.addColorStop(1, 'rgba(150,205,240,0)');
-    g.fillStyle = grad;
-    g.fillRect(0, 0, 32, 32);
-    const tex = new BABYLON.Texture(c.toDataURL(), scene, false, false, BABYLON.Texture.NEAREST_SAMPLINGMODE);
-    tex.hasAlpha = true;
-    return tex;
-  }
-
-  /* ==================== ESCENA 2: CORNISA + CASCADA ==================== */
-
-  /* fondo: montañas distantes (silhuetas triangulares) */
-  const montanaMat = new BABYLON.StandardMaterial('montana', scene);
-  montanaMat.diffuseColor = new BABYLON.Color3(0.38, 0.46, 0.52);
-  montanaMat.alpha = 0.85;
-  montanaMat.alphaMode = BABYLON.Engine.ALPHA_COMBINE;
-  const montanaGeo = BABYLON.MeshBuilder.CreateCylinder('montana-pts', { diameterTop: 8, diameterBottom: 18, height: 12, tessellation: 3 }, scene);
-  montanaGeo.material = montanaMat;
-  montanaGeo.position.set(12, -1, -8);
-  montanaGeo.rotation.x = Math.PI / 2;
-
-  const montanaGeo2 = BABYLON.MeshBuilder.CreateCylinder('montana-pts2', { diameterTop: 6, diameterBottom: 12, height: 10, tessellation: 3 }, scene);
-  montanaGeo2.material = montanaMat;
-  montanaGeo2.position.set(26, -1, -12);
-  montanaGeo2.rotation.x = Math.PI / 2;
-
-  const COLUMNA = COLUMNA_CASCADA;
-  const LAGO_X0 = 7.4;
-  const LAGO_X1 = 12.6;
-  
-
-  /* terreno */
-  const pisoAncho = W_CORNISA_FIN - W_INICIO + 4;
-  const piso = box(pisoAncho, 0.7, 4.2, estilizado(0x8a9a7a));
-  piso.position.set((W_INICIO + W_CORNISA_FIN) / 2, -0.35, 0);
-  piso.receiveShadows = true;
-  const bordePiso = box(pisoAncho, 0.18, 4.4, estilizado(0x6a7a5a));
-  bordePiso.position.set((W_INICIO + W_CORNISA_FIN) / 2, 0.1, 0);
-
-  const rocaIzq = box(1.4, 3.2, 3.4, estilizado(0x7c7a6e));
-  rocaIzq.position.set(W_INICIO - 0.3, 1.6, 0);
-  const rocaDerCornisa = box(1.4, 3.2, 3.4, estilizado(0x7c7a6e));
-  rocaDerCornisa.position.set(W_CORNISA_FIN + 0.5, 1.6, 0);
-  rocaIzq.receiveShadows = true;
-  rocaDerCornisa.receiveShadows = true;
-
-  /* árboles geométricos a la izquierda */
-  const troncoMat = estilizado(0x5a4a40, { emissive: 0x3a3230 });
-  const copaMat = estilizado(0x4a6a40, { emissive: 0x3a5230 });
-  const tronco1 = box(0.4, 1.6, 0.4, troncoMat);
-  tronco1.position.set(W_INICIO + 5, 0.8, 0.2);
-  const copa1 = BABYLON.MeshBuilder.CreateCylinder('copa1', { diameter: 1.8, height: 1.2, tessellation: 6 }, scene);
-  copa1.material = copaMat;
-  copa1.position.set(W_INICIO + 5, 1.8, 0.2);
-  copa1.rotation.y = Math.PI / 6;
-  shadows.addShadowCaster(tronco1);
-  shadows.addShadowCaster(copa1);
-
-  const tronco2 = box(0.35, 1.4, 0.35, troncoMat);
-  tronco2.position.set(W_INICIO + 10, 0.7, -0.3);
-  const copa2 = BABYLON.MeshBuilder.CreateCylinder('copa2', { diameter: 1.6, height: 1.0, tessellation: 6 }, scene);
-  copa2.material = copaMat;
-  copa2.position.set(W_INICIO + 10, 1.5, -0.3);
-  copa2.rotation.y = -Math.PI / 6;
-  shadows.addShadowCaster(tronco2);
-  shadows.addShadowCaster(copa2);
-
-  /* pilar vertical en el borde izquierdo */
-  const pilar = box(1, 10, 1, estilizado(0x6a7268, { emissive: 0x4a5046 }));
-  pilar.position.set(W_INICIO + 1, 5, 0);
-  shadows.addShadowCaster(pilar);
-
-  /* lago */
-  const lago = box(LAGO_X1 - LAGO_X0, 0.14, 3.6, estilizado(0x6fb6d8, { alpha: 0.72, emissive: 0x2a5a7a }));
-  lago.position.set((LAGO_X0 + LAGO_X1) / 2, 0.07, 0);
-  const lagoProfundo = box(LAGO_X1 - LAGO_X0 - 0.35, 0.05, 3.8, estilizado(0x244f73, { alpha: 0.55, emissive: 0x1a3a5a }));
-  lagoProfundo.position.set((LAGO_X0 + LAGO_X1) / 2, 0.13, 0.05);
-  for (const [rx, rz, rw] of [[8.2, -0.75, 1.1], [9.4, 0.55, 0.8], [11.2, -0.45, 1.35], [12.1, 0.7, 0.65]] as const) {
-    const ripple = BABYLON.MeshBuilder.CreateTorus('onda', { diameter: rw, thickness: 0.025, tessellation: 24 }, scene);
-    ripple.rotation.x = Math.PI / 2;
-    ripple.scaling.y = 0.42;
-    ripple.position.set(rx, 0.19, rz);
-    ripple.material = estilizado(0xb7e9ff, { alpha: 0.52, emissive: 0x285a76 });
-  }
-
-  /* cascada ascendente */
-  const cascadaMat = estilizado(0x9fdcff, { alpha: 0.6, emissive: 0x1a4a6e, specular: 0x9fdcff });
-  cascadaMat.backFaceCulling = false;
-  const texturaAgua = crearTexturaAgua();
-  cascadaMat.diffuseTexture = texturaAgua;
-  cascadaMat.emissiveTexture = texturaAgua;
-  const cascada = box(COLUMNA.x1 - COLUMNA.x0, CIELO_Y, 1.0, cascadaMat);
-  cascada.position.set((COLUMNA.x0 + COLUMNA.x1) / 2, CIELO_Y / 2, 0);
-  const cascadaNucleoMat = estilizado(0xd4f3ff, { alpha: 0.28, emissive: 0x3f9dc9 });
-  cascadaNucleoMat.backFaceCulling = false;
-  const cascadaNucleo = box(1.1, CIELO_Y - 0.6, 0.5, cascadaNucleoMat);
-  cascadaNucleo.position.set((COLUMNA.x0 + COLUMNA.x1) / 2, CIELO_Y / 2, -0.08);
-  const cascadaOrillaMat = estilizado(0x73bde2, { alpha: 0.35, emissive: 0x1a4a6e });
-  const cascadaOrillaA = box(0.18, CIELO_Y, 0.7, cascadaOrillaMat);
-  cascadaOrillaA.position.set(COLUMNA.x0 + 0.1, CIELO_Y / 2, 0.08);
-  const cascadaOrillaB = box(0.18, CIELO_Y, 0.7, cascadaOrillaMat);
-  cascadaOrillaB.position.set(COLUMNA.x1 - 0.1, CIELO_Y / 2, 0.08);
-  const frenteAgua = BABYLON.MeshBuilder.CreateSphere('frente-agua', { diameter: 1.2, segments: 16 }, scene);
-  frenteAgua.material = estilizado(0xdaf6ff, { alpha: 0.82, emissive: 0x48a8d2 });
-  frenteAgua.scaling.y = 0.48;
-  frenteAgua.position.set((COLUMNA.x0 + COLUMNA.x1) / 2, LAGO_Y + 0.45, -0.2);
-  const frenteHalo = BABYLON.MeshBuilder.CreateTorus('halo-agua', { diameter: 1.9, thickness: 0.06, tessellation: 32 }, scene);
-  frenteHalo.rotation.x = Math.PI / 2;
-  frenteHalo.material = estilizado(0xb8edff, { alpha: 0.52, emissive: 0x3f9dc9 });
-  frenteHalo.position.set((COLUMNA.x0 + COLUMNA.x1) / 2, LAGO_Y + 0.45, -0.22);
-  const nubeMat = estilizado(0xeef4f8, { alpha: 0.92, emissive: 0xd8e6f2 });
-  const nubes: BABYLON.Mesh[] = [];
-  for (const [ox, oy, r, oz] of [[0, 0, 1.5, 0], [1.8, 0.5, 1.0, -0.4], [-1.7, 0.55, 0.95, 0.2], [0.5, 1.1, 0.9, -0.2]] as const) {
-    const esfera = BABYLON.MeshBuilder.CreateSphere('nube', { diameter: r * 2, segments: 12 }, scene);
-    esfera.material = nubeMat;
-    esfera.scaling.y = 0.5;
-    esfera.position.set((COLUMNA.x0 + COLUMNA.x1) / 2 + ox, CIELO_Y + oy, oz);
-    nubes.push(esfera);
-  }
-
-  /* espuma de la cascada */
-  const texturaParticula = crearTexturaParticula();
-  const espuma = new BABYLON.ParticleSystem('espuma', 500, scene);
-  espuma.particleTexture = texturaParticula;
-  espuma.emitter = new BABYLON.Vector3((COLUMNA.x0 + COLUMNA.x1) / 2, LAGO_Y + 0.15, 0);
-  const emisorBox = new BABYLON.BoxParticleEmitter();
-  emisorBox.direction1 = new BABYLON.Vector3(-0.4, 1, -0.2);
-  emisorBox.direction2 = new BABYLON.Vector3(0.4, 1.15, 0.2);
-  emisorBox.minEmitBox = new BABYLON.Vector3(-0.6, -0.05, -0.5);
-  emisorBox.maxEmitBox = new BABYLON.Vector3(0.6, 0.05, 0.5);
-  espuma.particleEmitterType = emisorBox;
-  espuma.minEmitPower = 3.4;
-  espuma.maxEmitPower = 5.4;
-  espuma.gravity = new BABYLON.Vector3(0, 1.6, 0);
-  espuma.minLifeTime = 3.5;
-  espuma.maxLifeTime = 5.2;
-  espuma.minSize = 0.09;
-  espuma.maxSize = 0.26;
-  espuma.emitRate = 70;
-  espuma.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
-  espuma.updateSpeed = 0.012;
+  /* ==================== ESCENA 2: PRESENTACIÓN VISUAL ==================== */
+  const cascadeScene: CascadeSceneEntities = buildCascadeScene({
+    scene,
+    shadows,
+    prefersReducedMotion: prefersReducedMotion(),
+  });
   const motionScale = prefersReducedMotion() ? 0.3 : 1;
-  if (motionScale < 1) espuma.stop(); else espuma.start();
 
+  /* El suelo jugable y las piedras siguen siendo entidades de gameplay. */
+
+
+  /* piedras recogibles */
   /* piedras recogibles */
   interface Piedra {
     x: number; y: number; vx: number; vy: number;
@@ -416,7 +294,12 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   const instrumentoYBase = 5;
   const FUERZA_UP = 9.8;
   const FUERZA_DOWN = 9.8;
+  /** Escala que traduce m/s² del modelo analítico a unidades del juego. Mantiene
+      la fórmula cerrada `a = upAcc·upCover − downAcc` intacta. */
+  const EQUILIBRIO_GAME_SCALE = 0.08;
   let upCover = 1;
+  /** Estado analítico del instrumento (integración cerrada por `integrarInstrumento`). */
+  let instrumentoEstado: InstrumentoEstado = crearEstadoInstrumento(instrumentoYBase);
 
   /* flechas de fuerzas */
   const flechaUpMat = estilizado(0x62d4c0, { alpha: 0.6, emissive: 0x3a8e80 });
@@ -440,6 +323,15 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   shadows.addShadowCaster(losa);
   let losaRecogida = false;
   let losaEnPosicion = false;
+  /** Sombra-proyección de la losa: indica dónde caerá sobre la corriente. */
+  const losaSombraMat = estilizado(0x3a3a3a, { alpha: 0.32 });
+  const losaSombra = box(3.2, 0.04, 2.6, losaSombraMat);
+  losaSombra.position.set(losaX, Y_E3 + 0.05, 0);
+  losaSombra.isVisible = false;
+  /** Cobertura cuando el jugador suelta la losa sobre la corriente. La fracción
+      que la losa quita a la corriente ascendente depende de su offset horizontal
+      respecto al centro del chorro (instrumentoX). */
+  let upCoverObjetivo = 1;
 
   /* INSTRUMENTO entidad viva */
   const instrumento = new Instrumento({ scene, hostEl });
@@ -459,10 +351,8 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   /* plataformas drift */
   interface PlataformaDrift {
     base: Plataforma;
-    x0: number;
-    amplitude: number;
-    velocidad: number;
-    fase: number;
+    /** Modelo analítico (consumido por `posicionPlataforma`). */
+    modelo: PlataformaMovil;
     mesh: BABYLON.Mesh;
   }
   const plataformasDrift: PlataformaDrift[] = [];
@@ -475,20 +365,45 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     shadows.addShadowCaster(mesh);
     plataformasDrift.push({
       base: { x0: xBase - 2, x1: xBase + 2, top: driftY },
-      x0: xBase,
-      amplitude: 5,
-      velocidad: 1.2,
-      fase: i * 1.7,
+      modelo: { x0: xBase, amplitude: 5, omega: 1.2, phase: i * 1.7 },
       mesh,
     });
   }
 
-  /* receptáculo */
-  const receptorX = W_E4_FIN - 6;
+  /** Sistema de referencia analítico (Escena 4). El anclaje lo cambia el
+      jugador al pulsar E sobre una plataforma. Las posiciones visuales
+      consumen `posicionPlataforma` del modelo. */
+  const sistemaReferencia: SistemaReferencia = {
+    plataformas: plataformasDrift.map((pd) => pd.modelo),
+    anclajeIdx: -1,
+  };
+
+  /* receptáculo — se ancla a la plataforma receptora (índice 2) por su
+      movimiento común: la piedra lanzada debe llevar la velocidad de esa
+      plataforma para alcanzarlo. */
+  const RECEPTOR_PLATAFORMA_IDX = 2;
+  const receptorBaseX = plataformasDrift[RECEPTOR_PLATAFORMA_IDX].modelo.x0;
   const receptorY = driftY;
   const receptor = box(2, 1.2, 1.4, estilizado(0x7a8a78));
-  receptor.position.set(receptorX, receptorY + 0.6, 0);
+  receptor.position.set(receptorBaseX, receptorY + 0.6, 0);
   receptor.receiveShadows = true;
+
+  /* Marcador visual del anclaje: anillo dorado alrededor de la plataforma anclada.
+      Indica al jugador que esa plataforma es ahora su sistema de referencia. */
+  const anilloAnclaje = BABYLON.MeshBuilder.CreateTorus('anillo-anclaje', {
+    diameter: 5.2, thickness: 0.12, tessellation: 48,
+  }, scene);
+  anilloAnclaje.material = estilizado(0xf4d39c, { alpha: 0.7, emissive: 0xb86e2d });
+  anilloAnclaje.rotation.x = Math.PI / 2;
+  anilloAnclaje.isVisible = false;
+
+  /* Marca lejana de "el mundo se mueve": una silueta distante que, cuando hay
+      anclaje, se desplaza en pantalla en sentido opuesto a la plataforma anclada
+      (mismo `velocidadMarcoAnclado` que el modelo analítico). */
+  const mundoDistante = BABYLON.MeshBuilder.CreatePlane('mundo-distante', { width: 60, height: 14 }, scene);
+  mundoDistante.material = estilizado(0x3a4a5a, { alpha: 0.5, emissive: 0x1a2a3a });
+  mundoDistante.position.set((W_E4_INICIO + W_E4_FIN) / 2, driftY + 5, -90);
+  let mundoDistanteX0 = mundoDistante.position.x;
 
   /* ==================== ESCENA 5: CORRIENTE TRANSVERSAL ==================== */
 
@@ -513,6 +428,8 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   interface Saquito {
     x: number; y: number; vx: number; vy: number;
     inFlight: boolean; mesh: BABYLON.Mesh;
+    /** Tiempo de vuelo analítico (modelo puro): permite predecir el impacto. */
+    tVuelo: number;
   }
   const saquitos: Saquito[] = [];
   const saquitoMat = estilizado(0x9f8ce0, { alpha: 0.8, emissive: 0x6a5a9e });
@@ -521,7 +438,7 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     const mesh = BABYLON.MeshBuilder.CreateSphere('saquito', { diameter: 0.4, segments: 8 }, scene);
     mesh.material = saquitoMat;
     mesh.position.set(x, 4.5, gorge5Depth - 0.6);
-    saquitos.push({ x, y: 4.5, vx: 0, vy: 0, inFlight: false, mesh });
+    saquitos.push({ x, y: 4.5, vx: 0, vy: 0, inFlight: false, mesh, tVuelo: 0 });
   }
 
   const receptor5X = W_E5_FIN - 4;
@@ -530,6 +447,31 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   receptor5.material = estilizado(0x9f8ce0, { alpha: 0.6, emissive: 0x6a5a9e });
   receptor5.position.set(receptor5X, receptor5Y, gorge5Depth - 0.3);
   receptor5.rotation.x = Math.PI / 2;
+
+  /** Corriente transversal analítica (Escena 5). El modelo `vector.ts` la usa
+      en `compensacionCorriente` y `objetivoAlcanzable`. */
+  const CORRIENTE_X = -5; // hacia la izquierda
+  const corrienteVector: Vector2D = { x: CORRIENTE_X, y: 0 };
+
+  /** Apuntado: el jugador compone el vector de lanzamiento con la corriente.
+      Mientras no hay piedra en vuelo, mantener ↑/↓ ajusta `vyApuntada` y ←/→
+      ajusta `vxApuntada`. La aguja del reloj muestra el vector en tiempo real.
+      Hay ≥2 soluciones válidas (high arc vs low arc). */
+  let vxApuntada = 7;
+  let vyApuntada = 3;
+  const VX_MIN = 1;
+  const VX_MAX = 14;
+  const VY_MIN = -4;
+  const VY_MAX = 9;
+
+  /** Trayectoria-preview del lanzamiento: usa `muestrearTrayectoria` del modelo
+      de tiro parabólico compensado por la corriente. */
+  const previewPuntos: BABYLON.Vector3[] = [BABYLON.Vector3.Zero(), BABYLON.Vector3.Up()];
+  const previewTrayectoria = BABYLON.MeshBuilder.CreateDashedLines('preview-trayectoria', {
+    points: previewPuntos, dashSize: 0.16, gapSize: 0.12, updatable: true,
+  }, scene);
+  previewTrayectoria.material = estilizado(0xf4d39c, { alpha: 0.55, emissive: 0xb86e2d });
+  previewTrayectoria.isVisible = false;
   
   /* ==================== ESCENA 6: PLANO INCLINADO ====================
  */
@@ -539,7 +481,12 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   const rocaAltaX = W_E6_FIN - 6;
   const rocaAltaY = rampaAlturaBase + 5;
   let roca6Movida = false;
-  let losaRampaColocada = false;
+  /** Plano inclinado construido por el jugador (modelo puro). `null` = sin construir. */
+  let planoConstruido: PlanoInclinado | null = null;
+  /** Ángulo actual mientras el jugador ajusta la rampa con el input. */
+  let anguloRampa = 25;
+  const ANGULO_MIN = 8;
+  const ANGULO_MAX = 70;
 
   const plataformaAlta = box(5, 0.5, 2.6, estilizado(0x6d7a66));
   plataformaAlta.position.set(rocaAltaX, rocaAltaY + 0.25, 0);
@@ -553,9 +500,11 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   let roca6X = rocaGrande6Geo.position.x;
   let roca6Y = rocaGrande6Geo.position.y;
 
+  /** Losa-rampa: arranca en el suelo (sin ángulo). El jugador la "construye"
+      usando el input. */
   const losaRampa = box(7, 0.24, 2.2, estilizado(0x8a6f4d));
   losaRampa.position.set(rampaX, rampaAlturaBase + 0.6, 0);
-  losaRampa.rotation.z = Math.PI / 7;
+  losaRampa.rotation.z = 0;
   losaRampa.receiveShadows = true;
 
   const apoyo1 = box(0.3, 1, 0.3, estilizado(0x7a6447));
@@ -565,17 +514,53 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   apoyo1.receiveShadows = true;
   apoyo2.receiveShadows = true;
 
-  /* ==================== ESCENA 7: ESTACIÓN PEDAGÓGICA ==================== */
+  /** HUD de la Escena 6: muestra fuerza tangencial, recorrido base y validez del
+      plano (modelo puro). TODO(guion): texto neutro hasta que exista guion. */
+  const rampaHud = document.createElement('div');
+  rampaHud.className = 'px-rampa-hud hidden';
+  rampaHud.style.cssText = `
+    position: absolute; top: 1rem; left: 50%; transform: translateX(-50%);
+    background: rgba(13,24,36,0.85); border: 1px solid #62d4c0; border-radius: 8px;
+    padding: 0.5rem 1rem; color: #cfeaff; font-size: 0.85rem;
+    z-index: 30; pointer-events: none; line-height: 1.4;
+  `;
+  hostEl.appendChild(rampaHud);
+
+  function refrescarRampaHud(): void {
+    if (!planoConstruido) { rampaHud.classList.add('hidden'); return; }
+    const f = fuerzaTangencial(planoConstruido);
+    const base = recorridoBase(planoConstruido);
+    const ok = sintesisPlanoInclinado(planoConstruido);
+    rampaHud.innerHTML = `
+      <div>// TODO(guion): rampa — ángulo, fuerza y recorrido</div>
+      <div>ángulo: ${anguloRampa.toFixed(1)}° · fuerza tangencial: ${f.toFixed(1)} N</div>
+      <div>recorrido base: ${base.toFixed(2)} m · trabajo: ${trabajoNecesario(planoConstruido).toFixed(1)} J</div>
+      <div>${ok ? '✓ menor que el peso' : '⚠ fuera de rango'}</div>
+    `;
+    rampaHud.classList.remove('hidden');
+  }
+
+  /* ==================== ESCENA 7: ESTACIÓN PEDAGÓGICA ====================
+ * Síntesis de los modelos previos: la estación contiene tres anillos que el
+ * jugador debe "activar" componiendo referencia + vector + plano inclinado.
+ *  - Anillo exterior (anillo 0): equilibrio. Hay que colocar la losa-rampa
+ *    sobre el contrapeso para que las fuerzas opuestas se cancelen.
+ *  - Anillo medio    (anillo 1): referencia. Hay que anclar la estación a
+ *    la plataforma de la Escena 4 (cambio de marco analítico).
+ *  - Anillo interior (anillo 2): vector. Hay que lanzar un saquito al canal
+ *    con un vector que componga la corriente (modelo vector.ts).
+ */
 
   const estacionX = W_E7_INICIO + 12;
   const estacionY = Y_E7;
 
   const anilloMat = estilizado(0xc0a080, { alpha: 0.7, emissive: 0x8a6a4a });
+  const anilloApagadoMat = estilizado(0x4a3a2a, { alpha: 0.4 });
   const anillos: BABYLON.Mesh[] = [];
   const anilloTam = [1.8, 1.3, 0.85];
   for (let i = 0; i < 3; i++) {
     const a = BABYLON.MeshBuilder.CreateTorus(`anillo-${i}`, { diameter: anilloTam[i], thickness: 0.12, tessellation: 48 }, scene);
-    a.material = anilloMat;
+    a.material = anilloApagadoMat;
     a.position.set(estacionX + i * 1.2 - 1.2, estacionY + i * 0.7, 0);
     a.rotation.y = Math.PI / 6;
     anillos.push(a);
@@ -588,6 +573,39 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   const contraPesoGeo = BABYLON.MeshBuilder.CreateIcoSphere('contra-peso', { radius: 0.7, subdivisions: 1 }, scene);
   contraPesoGeo.material = estilizado(0x7a7266);
   contraPesoGeo.position.set(estacionX + 5, estacionY + 3, 0);
+
+  /** Losa para el anillo de equilibrio. La pone el jugador sobre el
+      contrapeso — la cubrenza parcial equilibra la estación. */
+  const losaEstacion = box(1.6, 0.2, 1.6, estilizado(0x8a6f4d));
+  losaEstacion.position.set(estacionX + 5, estacionY + 0.6, 0);
+  losaEstacion.receiveShadows = true;
+  losaEstacion.isVisible = false;
+
+  /** Saquito-vectorial dedicado a la estación. Se lanza con el mismo control
+      que la Escena 5 (↑/↓ ángulo, ←/→ fuerza) pero contra la corriente
+      interna de la estación. */
+  interface SaquitoEstacion {
+    x: number; y: number; vx: number; vy: number;
+    inFlight: boolean; mesh: BABYLON.Mesh; tVuelo: number;
+  }
+  const saquitoEstacionMesh = BABYLON.MeshBuilder.CreateSphere('saquito-est', { diameter: 0.4, segments: 8 }, scene);
+  saquitoEstacionMesh.material = estilizado(0x9f8ce0, { alpha: 0.8, emissive: 0x6a5a9e });
+  saquitoEstacionMesh.position.set(estacionX - 6, estacionY + 2, 0.05);
+  const saquitoEstacion: SaquitoEstacion = {
+    x: estacionX - 6, y: estacionY + 2, vx: 0, vy: 0, inFlight: false, mesh: saquitoEstacionMesh, tVuelo: 0,
+  };
+  const CORRIENTE_EST_X = -3;
+  const CANAL_X = estacionX;
+  const CANAL_Y = estacionY + 2;
+
+  /** Roca-pequeña decorativa del contrapeso (escena 7). */
+  const rocaEstGeo = BABYLON.MeshBuilder.CreateIcoSphere('roca-est', { radius: 0.4, subdivisions: 1, flat: true }, scene);
+  rocaEstGeo.material = estilizado(0x6a6266);
+  rocaEstGeo.position.set(estacionX + 3, estacionY + 0.4, 0);
+
+  let anillo0Activo = false; // equilibrio
+  let anillo1Activo = false; // referencia
+  let anillo2Activo = false; // vector
 
   const rocaFlotanteGeo = BABYLON.MeshBuilder.CreateIcoSphere('roca-flotante', { radius: 0.5, subdivisions: 1, flat: true }, scene);
   rocaFlotanteGeo.material = estilizado(0x7a7266, { alpha: 0.6, emissive: 0x5a5246 });
@@ -715,20 +733,20 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
 
   const avatar: Avatar = crearAvatar(0, Y_CORNISA + AVATAR_H / 2);
   const avatarGroup = new BABYLON.TransformNode('avatar', scene);
-  const torso = box(0.5, 0.7, 0.4, estilizado(0xd9b894));
-  torso.position.y = 0.85;
-  const cabeza = BABYLON.MeshBuilder.CreateSphere('cabeza', { diameter: 0.48, segments: 10 }, scene);
-  cabeza.material = estilizado(0xe3c39b);
-  cabeza.position.y = 1.35;
-  const piernas = box(0.44, 0.5, 0.36, estilizado(0x55505e));
-  piernas.position.y = 0.25;
-  const visor = box(0.27, 0.12, 0.04, estilizado(0x213a4a, { emissive: 0x102d3a }));
-  visor.position.set(0, 1.36, 0.23);
-  avatarGroup.addChild(torso);
-  avatarGroup.addChild(cabeza);
-  avatarGroup.addChild(piernas);
-  avatarGroup.addChild(visor);
-  for (const mesh of [torso, cabeza, piernas, visor]) shadows.addShadowCaster(mesh);
+  const torso = BABYLON.MeshBuilder.CreateCylinder('cuerpo-proporcionado', { diameterTop: 0.34, diameterBottom: 0.52, height: 0.72, tessellation: 8 }, scene);
+  torso.material = estilizado(0xc28d62, { specular: 0x7a523a }); torso.position.y = 0.84;
+  const cabeza = BABYLON.MeshBuilder.CreateSphere('cabeza', { diameter: 0.46, segments: 12 }, scene);
+  cabeza.material = estilizado(0xe3c39b); cabeza.position.y = 1.36;
+  const piernas = BABYLON.MeshBuilder.CreateCylinder('botas', { diameter: 0.38, height: 0.48, tessellation: 8 }, scene);
+  piernas.material = estilizado(0x343b4b); piernas.position.y = 0.24;
+  const cape = BABYLON.MeshBuilder.CreateCylinder('capa-capa', { diameterTop: 0.18, diameterBottom: 1.05, height: 1.12, tessellation: 6 }, scene);
+  cape.material = estilizado(0x354f68, { emissive: 0x142638, specular: 0x243e55 }); cape.position.set(0, 0.78, 0.18); cape.scaling.z = 0.42;
+  const hood = BABYLON.MeshBuilder.CreateSphere('capucha', { diameter: 0.52, segments: 10 }, scene);
+  hood.material = estilizado(0x405c70, { emissive: 0x182936 }); hood.position.set(0, 1.48, 0.08); hood.scaling.y = 0.72;
+  const visor = box(0.28, 0.1, 0.04, estilizado(0x8ce8ef, { emissive: 0x3bc1ce, specular: 0xb9ffff })); visor.position.set(0, 1.38, -0.22);
+  const armL = box(0.13, 0.52, 0.15, estilizado(0xb17a56)); armL.position.set(-0.34, 0.86, 0);
+  const armR = box(0.13, 0.52, 0.15, estilizado(0xb17a56)); armR.position.set(0.34, 0.86, 0);
+  for (const part of [torso, cabeza, piernas, cape, hood, visor, armL, armR]) { avatarGroup.addChild(part); shadows.addShadowCaster(part); }
 
   /* ==================== RELOJ-DISPOSITIVO ==================== */
 
@@ -921,11 +939,25 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
       case 'KeyB': if (down) bitaEdge = true; break;
     }
   }
+  /** Ajuste fino del vector de apuntado en Escena 5. ↑/↓ ajustan `vy`,
+      ←/→ ajustan `vx`. Se aplica mientras la tecla está mantenida. */
+  const apuntarInput = { up: false, down: false, left: false, right: false };
+  function setApuntar(code: string, down: boolean): void {
+    switch (code) {
+      case 'ArrowUp': apuntarInput.up = down; break;
+      case 'ArrowDown': apuntarInput.down = down; break;
+      case 'KeyW': apuntarInput.up = down; break;
+      case 'KeyS': apuntarInput.down = down; break;
+      case 'KeyA': apuntarInput.left = down; break;
+      case 'KeyD': apuntarInput.right = down; break;
+    }
+  }
   const onKeyDown = (e: KeyboardEvent): void => {
     if (!e.repeat) setKey(e.code, true);
+    setApuntar(e.code, true);
     if (e.code === 'Escape' && !bitaPanel.classList.contains('hidden')) cerrarBitacora();
   };
-  const onKeyUp = (e: KeyboardEvent): void => { setKey(e.code, false); };
+  const onKeyUp = (e: KeyboardEvent): void => { setKey(e.code, false); setApuntar(e.code, false); };
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
 
@@ -1015,26 +1047,38 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     if (!equilibrioResuelto && !losaRecogida && !losaEnPosicion &&
         Math.abs(avatar.x - losaX) < 2.2 && avatar.y < losaY + 0.8) {
       losaRecogida = true;
-      losa.setEnabled(false);
+      losa.setEnabled(true);
+      losa.position.set(avatar.x, avatar.y + 1.2, 0);
+      losaSombra.position.set(avatar.x, Y_E3 + 0.05, 0);
+      losaSombra.isVisible = true;
       toast('Recogiste la losa. Cubrila sobre la corriente ascendente.');
       return;
     }
 
-    /* Escena 3: colocar la losa */
-    if (losaRecogida && Math.abs(avatar.x - losaX) < 1.5 && avatar.y < losaY + 0.8) {
+    /* Escena 3: colocar la losa — el offset horizontal respecto al centro del
+        chorro (instrumentoX) determina upCover. Múltiples posiciones válidas
+        producen descensoPredecible, así que hay ≥2 soluciones. */
+    if (losaRecogida && avatar.y < losaY + 0.8) {
       losaRecogida = false;
       losaEnPosicion = true;
       losa.setEnabled(true);
-      losa.position.set(losaX, losaY, 0);
+      losa.position.set(avatar.x, losaY, 0);
+      losaSombra.isVisible = false;
       instrumento.speak('escena3_desequilibrio');
       toast('Cubriste la corriente ascendente. El equilibrio se rompe.');
       return;
     }
 
-    /* Escena 4: anclar plataforma */
-    if (avatar.x >= W_E4_INICIO && avatar.x < W_E4_FIN && !referenciaAnclada) {
-      const idx = plataformasDrift.findIndex((pd) => Math.abs(avatar.x - pd.x0) < 3 && Math.abs(avatar.y - pd.base.top) < 0.8);
+    /* Escena 4: anclar plataforma — la pulsación de E realmente cambia el marco
+        analítico (`sistemaReferencia.anclajeIdx`). El mundo distante se desplaza
+        en sentido opuesto a la plataforma anclada en pantalla. */
+    if (avatar.x >= W_E4_INICIO && avatar.x < W_E4_FIN && sistemaReferencia.anclajeIdx < 0) {
+      const idx = plataformasDrift.findIndex((pd) => {
+        const x = posicionPlataformaModelo(pd.modelo, simT);
+        return Math.abs(avatar.x - x) < 3 && Math.abs(avatar.y - pd.base.top) < 0.8;
+      });
       if (idx >= 0) {
+        sistemaReferencia.anclajeIdx = idx;
         referenciaAnclada = true;
         save.flags = { ...save.flags, referenciaAnclada: true };
         guardarSave(save);
@@ -1044,39 +1088,101 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
       }
     }
 
-    /* Escena 5: tomar saquito */
+    /* Escena 5: tomar saquito — el lanzamiento usa el vector compuesto por el
+        jugador (vxApuntada, vyApuntada) y la corriente analítica transversal.
+        La trayectoria analítica `alcanceConCorriente` determina dónde aterriza;
+        ≥2 valores (vyApuntada, vxApuntada) producen un acierto. */
     if (!vectorComun && avatar.x >= W_E5_INICIO && avatar.x < W_E5_FIN && Math.abs(avatar.y - 4.5) < 1.5) {
       for (const s of saquitos) {
         if (!s.inFlight && Math.hypot(avatar.x - s.x, avatar.y - s.y) < 1.5) {
+          const lanzamiento: Vector2D = { x: vxApuntada, y: vyApuntada };
+          /* Tiempo de vuelo analítico bajo gravedad (modelo `tiroParabolico`). */
+          const a = -G;
+          const disc = vyApuntada * vyApuntada - 4 * (a / 2) * s.y;
+          s.tVuelo = disc > 0 ? (-vyApuntada - Math.sqrt(disc)) / (2 * (a / 2)) : 1;
+          if (s.tVuelo <= 0) s.tVuelo = 1;
           s.inFlight = true;
-          s.vx = avatar.facing * 8;
-          s.vy = 3;
-          instrumento.speak('escena5_error');
+          s.vx = lanzamiento.x;
+          s.vy = lanzamiento.y;
+          /* ¿El lanzamiento apuntado alcanza el receptor? */
+          const alcanzable = objetivoAlcanzable(
+            lanzamiento, corrienteVector,
+            receptor5X - s.x, s.tVuelo,
+          );
+          if (!alcanzable) {
+            instrumento.speak('escena5_error');
+            toast('Más intensidad… mismo error lateral.');
+          }
           break;
         }
       }
     }
 
-    /* Escena 6: colocar rampa */
-    if (!planoInclinadoOk && !losaRampaColocada && avatar.x >= W_E6_INICIO && avatar.x < W_E6_FIN && Math.abs(avatar.x - rampaX) < 4 && avatar.y < rampaAlturaBase + 1) {
-      losaRampaColocada = true;
-      toast('Colocaste la rampa. Menor fuerza, mayor recorrido.');
+    /* Escena 6: construir rampa — la pulsación de E crea el plano a partir del
+        ángulo actual elegido por el jugador. La losa rota y los apoyos se
+        ajustan a su extremo. */
+    if (!planoInclinadoOk && !planoConstruido && avatar.x >= W_E6_INICIO && avatar.x < W_E6_FIN &&
+        Math.abs(avatar.x - rampaX) < 4 && avatar.y < rampaAlturaBase + 1) {
+      planoConstruido = crearPlanoModelo(rocaAltaY - rampaAlturaBase, anguloRampa);
+      const theta = (anguloRampa * Math.PI) / 180;
+      losaRampa.rotation.z = theta;
+      apoyo1.position.set(rampaX - planoConstruido.length / 2, rampaAlturaBase + 0.5, 0);
+      apoyo2.position.set(rampaX + planoConstruido.length / 2, rampaAlturaBase + 0.5, 0);
       instrumento.speak('escena6_angulo');
+      toast(`Rampa a ${anguloRampa.toFixed(1)}°. Menor fuerza, mayor recorrido.`);
     }
 
-    /* Escena 6: empujar roca */
-    if (losaRampaColocada && !roca6Movida && Math.abs(avatar.x - roca6X) < 1.2 && Math.abs(avatar.y - roca6Y) < 1.5) {
+    /* Escena 6: empujar roca — la intención se resuelve en update(); la acción
+        sólo verifica que el jugador esté cerca de la rampa construida. */
+    if (planoConstruido && !roca6Movida && Math.abs(avatar.x - roca6X) < 1.2 && Math.abs(avatar.y - roca6Y) < 1.5) {
       // el empuje se resuelve en update(), solo marcamos intención
     }
 
-    /* Escena 7: estabilizar */
-    if (planoInclinadoOk && !estacionEstabilizada && Math.abs(avatar.x - estacionX) < 4 && Math.abs(avatar.y - estacionY) < 3) {
+    /* Escena 7 — síntesis de los tres modelos previos:
+       - Anillo 0 (equilibrio): colocar la losaEstacion sobre el contrapeso.
+           Se valida con `enEquilibrio` para la pareja de fuerzas del contrapeso.
+       - Anillo 1 (referencia): pulsar E cerca del anillo medio para anclar la
+           estación a la plataforma de la Escena 4. Se valida con `posicionRelativa`.
+       - Anillo 2 (vector): lanzar el saquito al canal. Se valida con
+           `objetivoAlcanzable` usando el control de apuntado del jugador.
+       Los tres anillos iluminan el material; la estación se estabiliza al
+       completar los tres. */
+
+    if (planoInclinadoOk && !anillo0Activo && avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN &&
+        Math.abs(avatar.x - (estacionX + 5)) < 2 && Math.abs(avatar.y - (estacionY + 3)) < 1.5) {
+      losaEstacion.isVisible = true;
+      anillo0Activo = true;
+    anillos[0].material = anilloMat;
+    instrumento.speak('escena7_reconoce');
+    toast('Anillo exterior: la losa equilibra el contrapeso.');
+  }
+
+    if (planoInclinadoOk && !anillo1Activo && sistemaReferencia.anclajeIdx >= 0 &&
+        avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN &&
+        Math.abs(avatar.x - (estacionX - 1.2)) < 1.6 && Math.abs(avatar.y - (estacionY + 0.7)) < 1.5) {
+      anillo1Activo = true;
+      anillos[1].material = anilloMat;
+      toast('Anillo medio: la estación adoptó la referencia de la plataforma.');
+    }
+
+    if (planoInclinadoOk && !anillo2Activo && avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN &&
+        !saquitoEstacion.inFlight && Math.abs(avatar.x - saquitoEstacion.x) < 1.5) {
+      const lanzamiento: Vector2D = { x: vxApuntada, y: vyApuntada };
+      const a = -G;
+      const disc = vyApuntada * vyApuntada - 4 * (a / 2) * saquitoEstacion.y;
+      saquitoEstacion.tVuelo = disc > 0 ? (-vyApuntada - Math.sqrt(disc)) / (2 * (a / 2)) : 1;
+      if (saquitoEstacion.tVuelo <= 0) saquitoEstacion.tVuelo = 1;
+      saquitoEstacion.inFlight = true;
+      saquitoEstacion.vx = lanzamiento.x;
+      saquitoEstacion.vy = lanzamiento.y;
+    }
+
+    if (anillo0Activo && anillo1Activo && anillo2Activo && !estacionEstabilizada) {
       estacionEstabilizada = true;
       save.flags = { ...save.flags, estacionEstabilizada: true };
       guardarSave(save);
       bitaBtn.classList.remove('hidden');
       rocaFlotanteGeo.isVisible = true;
-      instrumento.speak('escena7_reconoce');
       setTimeout(() => instrumento.speak('escena7_consecuencia'), 2500);
       toast('La estación se estabilizó. Pero algo más cambió...');
       metroUI.classList.remove('hidden');
@@ -1146,12 +1252,37 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   /* ==================== drone de plataformas ==================== */
 
   function actualizarPlataformasDrift(): void {
-    for (const pd of plataformasDrift) {
-      const offset = pd.amplitude * Math.sin(pd.velocidad * simT + pd.fase);
-      pd.mesh.position.x = pd.x0 + offset;
-      pd.base.x0 = pd.x0 + offset - 2;
-      pd.base.x1 = pd.x0 + offset + 2;
+    for (let i = 0; i < plataformasDrift.length; i++) {
+      const pd = plataformasDrift[i];
+      /* Modelo analítico: la posición la dicta `posicionPlataforma`. */
+      const x = posicionPlataformaModelo(pd.modelo, simT);
+      pd.mesh.position.x = x;
+      pd.base.x0 = x - 2;
+      pd.base.x1 = x + 2;
     }
+
+    /* Receptáculo comparte el movimiento de la plataforma receptora (modelo). */
+    receptor.position.x = posicionPlataformaModelo(sistemaReferencia.plataformas[RECEPTOR_PLATAFORMA_IDX], simT);
+
+    /* Marcador de anclaje: anillo dorado en la plataforma anclada. */
+    if (sistemaReferencia.anclajeIdx >= 0) {
+      const x = posicionPlataformaModelo(
+        sistemaReferencia.plataformas[sistemaReferencia.anclajeIdx],
+        simT,
+      );
+      anilloAnclaje.position.set(x, driftY + 0.2, 0);
+      anilloAnclaje.isVisible = true;
+      const pulso = 1 + Math.sin(simT * 3) * 0.06;
+      anilloAnclaje.scaling.setAll(pulso);
+    } else {
+      anilloAnclaje.isVisible = false;
+    }
+
+    /* Silueta distante: cuando hay anclaje, se desplaza en pantalla al
+        `velocidadMarcoAnclado`. El modelo dice que la separación entre
+        plataformas es constante; lo que el jugador ve moverse es el mundo. */
+    const vMarco = velocidadMarcoAnclado(sistemaReferencia, simT);
+    mundoDistante.position.x = mundoDistanteX0 + vMarco * simT;
   }
 
   /* ==================== saquitos ==================== */
@@ -1160,8 +1291,10 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     for (const s of saquitos) {
       if (!s.inFlight) continue;
       s.vy -= G * dt;
+      /* Corriente transversal aplicada analíticamente con el mismo factor que
+          el modelo puro (velocidad constante en x). */
       if (s.x > W_E5_INICIO && s.x < W_E5_FIN) {
-        s.vx += (-corrienteVel * 0.8) * dt;
+        s.vx += corrienteVector.x * dt;
       }
       s.x += s.vx * dt;
       s.y += s.vy * dt;
@@ -1183,16 +1316,77 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     }
   }
 
+  /** Ajusta el vector apuntado del jugador según las teclas ↑/↓/←/→
+      mantenidas. Se llama desde update() con el dt real. */
+  function ajustarApuntado(dt: number): void {
+    if (vectorComun) return;
+    if (apuntarInput.up) vyApuntada = Math.min(VY_MAX, vyApuntada + 6 * dt);
+    if (apuntarInput.down) vyApuntada = Math.max(VY_MIN, vyApuntada - 6 * dt);
+    if (apuntarInput.right) vxApuntada = Math.min(VX_MAX, vxApuntada + 4 * dt);
+    if (apuntarInput.left) vxApuntada = Math.max(VX_MIN, vxApuntada - 4 * dt);
+  }
+
+  /** Actualiza el preview del lanzamiento (línea analítica con corriente
+      transversal) y la aguja del reloj. */
+  function actualizarPreviewVector(): void {
+    if (vectorComun || !(avatar.x >= W_E5_INICIO && avatar.x < W_E5_FIN)) {
+      previewTrayectoria.isVisible = false;
+      return;
+    }
+    const lanzamiento: Vector2D = { x: vxApuntada, y: vyApuntada };
+    const a = -G;
+    const disc = lanzamiento.y * lanzamiento.y - 4 * (a / 2) * 4.5;
+    const tVuelo = disc > 0 ? (-lanzamiento.y - Math.sqrt(disc)) / (2 * (a / 2)) : 1;
+    const tFinal = Math.max(0.5, tVuelo);
+
+    /* Predicción del impacto con la corriente (modelo puro). */
+    const impacto = alcanceConCorriente(lanzamiento, corrienteVector, tFinal);
+    /* Muestreo de la trayectoria compensada para la línea-preview. */
+    const puntos: BABYLON.Vector3[] = [];
+    const x0 = avatar.x + avatar.facing * 0.75;
+    const y0 = avatar.y + 0.35;
+    const N = 16;
+    for (let i = 0; i <= N; i++) {
+      const tFrac = i / N;
+      const t = tFrac * tFinal;
+      const xCompensado = lanzamiento.x * t + compensacionCorriente(corrienteVector, t);
+      const y = y0 + lanzamiento.y * t - 0.5 * G * t * t;
+      if (y < 4.5) {
+        puntos.push(new BABYLON.Vector3(x0 + xCompensado, 4.5, 0.03));
+        break;
+      }
+      puntos.push(new BABYLON.Vector3(x0 + xCompensado, y, 0.03));
+    }
+    BABYLON.MeshBuilder.CreateDashedLines('p', {
+      points: puntos, dashSize: 0.16, gapSize: 0.12, instance: previewTrayectoria,
+    }, scene);
+    previewTrayectoria.isVisible = puntos.length >= 2;
+    void impacto;
+  }
+
   /* ==================== roca rampa ==================== */
 
   function actualizarRoca6(dt: number): void {
-    if (roca6Movida || !losaRampaColocada) return;
+    if (roca6Movida || !planoConstruido) return;
     if (Math.abs(avatar.x - roca6X) < 1.2 && Math.abs(avatar.y - roca6Y) < 1.5) {
       const dir = input.left ? -1 : input.right ? 1 : 0;
       if (dir !== 0) {
-        roca6X += dir * 2 * dt;
-        roca6Y += 2 * dt * Math.sin(Math.PI / 7);
-        rocaGrande6Geo.position.set(roca6X, roca6Y, 0);
+        /* La velocidad de la roca a lo largo de la rampa es proporcional a
+            (fuerza del jugador − fuerzaTangencial). El modelo puro
+            `fuerzaTangencial = m·g·sin(θ)` es lo que hay que VENCER para que
+            la roca suba; cualquier ángulo válido la hace más fácil de empujar. */
+        const theta = (anguloRampa * Math.PI) / 180;
+        const masaRelativa = 1;
+        const empujeJugador = 6 * masaRelativa; // N
+        const fTangencial = fuerzaTangencial(planoConstruido) / (FUERZA_LEVANTAR / empujeJugador);
+        const aRampa = (empujeJugador - fTangencial) / masaRelativa;
+        if (aRampa > 0) {
+          const dx = dir * aRampa * dt;
+          const dy = dx * Math.sin(theta);
+          roca6X += dx;
+          roca6Y += dy;
+          rocaGrande6Geo.position.set(roca6X, roca6Y, 0);
+        }
       }
       if (roca6X > rocaAltaX - 1) {
         roca6Movida = true;
@@ -1217,19 +1411,37 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     }
     if (!equilibrioResuelto && avatar.x >= W_E3_INICIO - 3 && avatar.x < W_E3_FIN - 2) {
       msg += msg ? ' · ' : '';
-      msg += losaRecogida ? 'Colocá la losa sobre la corriente' : 'E · recoger la losa';
+      if (losaRecogida) {
+        msg += `E · soltar la losa (cobertura actual: ${Math.round(upCoverObjetivo * 100)}%)`;
+      } else if (!losaEnPosicion) {
+        msg += 'E · recoger la losa';
+      } else {
+        msg += `Corriente cubierta al ${Math.round((1 - upCoverObjetivo) * 100)}% — el instrumento baja`;
+      }
     }
     if (!referenciaAnclada && avatar.x >= W_E4_INICIO && avatar.x < W_E4_FIN) {
-      msg = 'Acercate a una plataforma y usá E para anclar referencia';
+      msg = sistemaReferencia.anclajeIdx >= 0
+        ? 'Plataforma anclada — el mundo se mueve alrededor tuyo'
+        : 'Acercate a una plataforma y usá E para anclar referencia';
     }
     if (!vectorComun && avatar.x >= W_E5_INICIO && avatar.x < W_E5_FIN) {
-      msg = 'E · tomar saquito · lazá contra la corriente';
+      msg = `↑/↓ ajustar ángulo · ←/→ ajustar fuerza · E lanzar (vx=${vxApuntada.toFixed(1)}, vy=${vyApuntada.toFixed(1)})`;
     }
     if (!planoInclinadoOk && avatar.x >= W_E6_INICIO && avatar.x < W_E6_FIN) {
-      msg = losaRampaColocada ? 'Empujá la roca por la rampa' : 'E · colocar la rampa';
+      msg = planoConstruido
+        ? 'Empujá la roca por la rampa con ←/→'
+        : `↑/↓ ajustar ángulo (${anguloRampa.toFixed(0)}°) · E construir rampa`;
     }
     if (estacionEstabilizada && !metropolisRevelada && avatar.x >= W_E8_INICIO) {
       msg = 'Seguí hacia la cima para ver la metrópolis';
+    }
+    if (planoInclinadoOk && !estacionEstabilizada && avatar.x >= W_E7_INICIO && avatar.x < W_E7_FIN) {
+      const anillosActivos = [anillo0Activo, anillo1Activo, anillo2Activo].filter(Boolean).length;
+      msg = `Estación: ${anillosActivos}/3 anillos — `
+        + (!anillo0Activo ? 'colocá la losa sobre el contrapeso'
+          : !anillo1Activo ? 'anclá la plataforma de Escena 4 y tocá el anillo medio'
+          : !anillo2Activo ? 'lanzá el saquito al canal con ↑/↓/←/→ + E'
+          : 'estabilizando…');
     }
     if (metropolisRevelada && avatar.x >= W_E8_INICIO + obsAncho) {
       msg = '¡Has llegado a la cima!';
@@ -1312,29 +1524,57 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
       }
     }
 
-    /* chorro ascendente */
-    chorroEstado = integrar(chorroEstado, dt * motionScale, G);
-    if (chorroEstado.y > CIELO_Y) chorroEstado = { y: LAGO_Y, v: 0, t: 0 };
-    const frenteY = Math.max(LAGO_Y + 0.42, Math.min(CIELO_Y - 0.7, chorroEstado.y));
-    frenteAgua.position.y = frenteY;
-    frenteHalo.position.y = frenteY;
-    frenteHalo.rotation.z = simT * 0.18 * motionScale;
-    texturaAgua.vOffset -= dt * 0.55 * motionScale;
+    /* presentación viva de la cascada, lago, atmósfera y parallax */
+    cascadeScene.update(simT, dt, motionScale);
 
-    /* nubes */
-    for (const n of nubes) n.rotation.y = simT * 0.08 * motionScale;
+    /* Escena 3: la losa sostenida sigue al avatar y proyecta su sombra sobre la
+        corriente para que el jugador vea el efecto antes de soltarla. */
+    if (losaRecogida) {
+      losa.position.set(avatar.x, avatar.y + 1.2, 0);
+      losaSombra.position.set(avatar.x, Y_E3 + 0.05, 0);
+      const previewOffset = Math.abs(avatar.x - instrumentoX);
+      upCoverObjetivo = previewOffset < 0.5
+        ? 0.3
+        : previewOffset > 2.5
+          ? 0.95
+          : 0.3 + (previewOffset - 0.5) * (0.65 / 2);
+    }
 
-    /* Escena 3: equilibrio */
+    /* Escena 3: equilibrio — la integración analítica cerrada `a = upAcc·upCover − downAcc`
+        determina el descenso del INSTRUMENTO a partir de la posición real de la losa. */
     if (!equilibrioResuelto) {
-      upCover = losaEnPosicion ? 0.3 : 1;
+      if (losaEnPosicion) {
+        /* Cobertura de la corriente ascendente según el offset de la losa.
+           Offset < 0.5  → ~70 % cubierta (upCover = 0.30)
+           Offset > 2.5  → ~5 %  cubierta (upCover = 0.95)
+           Lineal entre ambos. Cualquier upCover < 1 → descensoPredecible. */
+        const offset = Math.abs(losa.position.x - instrumentoX);
+        upCover = offset < 0.5 ? 0.3 : offset > 2.5 ? 0.95 : 0.3 + (offset - 0.5) * (0.65 / 2);
+      } else {
+        upCover = 1;
+      }
+      upCoverObjetivo = upCover;
       flechaUpGeo.scaling.y = Math.max(0, upCover) * 0.8;
       flechaDownGeo.scaling.y = 0.8;
-      const aNet = (upCover * FUERZA_UP - FUERZA_DOWN) * 0.08;
-      instrumento.y += aNet * dt;
-      instrumento.y = Math.max(Y_E3 + 1, Math.min(instrumentoYBase + 6, instrumento.y));
+
+      /* Integración cerrada del modelo puro (aceleración escalada a unidades
+          de juego: la fórmula `a = upAcc·upCover − downAcc` se conserva). */
+      const fJuego: FuerzasOpuestas = {
+        upAcc: FUERZA_UP * EQUILIBRIO_GAME_SCALE,
+        downAcc: FUERZA_DOWN * EQUILIBRIO_GAME_SCALE,
+        upCover,
+      };
+      instrumentoEstado = integrarInstrumento(instrumentoEstado, fJuego, dt);
+
+      instrumento.y = Math.max(Y_E3 + 1, Math.min(instrumentoYBase + 6, instrumentoEstado.y));
       instrumento.mesh.position.set(instrumento.x, instrumento.y, 0);
 
-      if (losaEnPosicion && instrumento.y < instrumentoYBase - 1) {
+      /* La condición de resolución combina el modelo (`descensoPredecible`) con
+          la posición realmente alcanzada por el INSTRUMENTO. ≥2 colocaciones de
+          la losa producen esta misma condición. */
+      const fVerificacion: FuerzasOpuestas = { upAcc: FUERZA_UP, downAcc: FUERZA_DOWN, upCover };
+      const descendiendo = descensoPredecible(fVerificacion) && desplazamientoDesdeCentro(instrumentoEstado, instrumentoYBase) < -0.4;
+      if (losaEnPosicion && descendiendo) {
         equilibrioResuelto = true;
         save.flags = { ...save.flags, equilibrioResuelto: true };
         guardarSave(save);
@@ -1348,7 +1588,37 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
     actualizarPlataformasDrift();
 
     /* Escena 5: saquitos */
+    ajustarApuntado(dt);
+    actualizarPreviewVector();
     actualizarSaquitos(dt);
+
+    /* Escena 7: saquito-vectorial de la estación (modelo vector.ts). */
+    if (saquitoEstacion.inFlight) {
+      saquitoEstacion.vy -= G * dt;
+      saquitoEstacion.vx += CORRIENTE_EST_X * dt;
+      saquitoEstacion.x += saquitoEstacion.vx * dt;
+      saquitoEstacion.y += saquitoEstacion.vy * dt;
+      saquitoEstacion.mesh.position.set(saquitoEstacion.x, saquitoEstacion.y, 0.05);
+      if (saquitoEstacion.y <= CANAL_Y && Math.abs(saquitoEstacion.x - CANAL_X) < 1.0) {
+        saquitoEstacion.inFlight = false;
+        anillo2Activo = true;
+        anillos[2].material = anilloMat;
+        instrumento.speak('escena5_acierto');
+        toast('Anillo interior: el saquito alcanzó el canal.');
+      } else if (saquitoEstacion.y < -2) {
+        saquitoEstacion.inFlight = false;
+        saquitoEstacion.vx = 0; saquitoEstacion.vy = 0;
+        saquitoEstacion.x = estacionX - 6; saquitoEstacion.y = estacionY + 2;
+        saquitoEstacion.mesh.position.set(saquitoEstacion.x, saquitoEstacion.y, 0.05);
+      }
+    }
+
+    /* Escena 6: ajustar ángulo de la rampa con ↑/↓ (sólo antes de construir). */
+    if (!planoConstruido && avatar.x >= W_E6_INICIO && avatar.x < W_E6_FIN) {
+      if (apuntarInput.up) anguloRampa = Math.min(ANGULO_MAX, anguloRampa + 30 * dt);
+      if (apuntarInput.down) anguloRampa = Math.max(ANGULO_MIN, anguloRampa - 30 * dt);
+    }
+    refrescarRampaHud();
 
     /* Escena 6: roca */
     actualizarRoca6(dt);
@@ -1366,6 +1636,18 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
       } else if (avatar.x >= W_E4_INICIO) {
         reloj.mostrar();
         reloj.setModoReferencia();
+        /* Visualización diegética: la aguja del reloj apunta a la posición
+            RELATIVA de la plataforma vecina más cercana respecto al anclaje.
+            Cuando el marco está anclado, esa posición relativa se mantiene
+            constante aunque el mundo se mueva. */
+        if (sistemaReferencia.anclajeIdx >= 0) {
+          const otroIdx = sistemaReferencia.anclajeIdx === 0 ? 1 : 0;
+          const xMundo = posicionPlataformaModelo(sistemaReferencia.plataformas[otroIdx], simT);
+          const xRel = posicionRelativa(sistemaReferencia, xMundo, simT);
+          reloj.visualizarVector(xRel - 5, 0);
+        } else {
+          reloj.visualizarVector(0, 0);
+        }
       } else {
         reloj.esconder();
       }
