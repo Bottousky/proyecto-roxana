@@ -4,7 +4,7 @@
     "cascadaObservada_after": false
   },
   "e2_cascada_canonical": {
-    "cascadaObservada": false,
+    "cascadaObservada": true,
     "piedrasInFlight": 0
   },
   "e3_walk": {

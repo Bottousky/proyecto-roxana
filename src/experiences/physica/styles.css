@@ -196,6 +196,49 @@ body {
   pointer-events: none;
 }
 
+.px-metro-ui {
+  position: absolute;
+  top: 0.75rem;
+  right: 4rem;
+  width: min(36vw, 24rem);
+  max-height: 70vh;
+  overflow: auto;
+  background: linear-gradient(180deg, rgba(20, 39, 55, 0.94), var(--px-panel));
+  border: 1px solid rgba(158, 219, 255, 0.55);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  color: var(--px-text);
+  z-index: 6;
+  pointer-events: auto;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.px-metro-panel h3 {
+  font-family: var(--px-serif);
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--px-accent);
+}
+
+.px-metro-panel ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.px-metro-panel li {
+  margin-bottom: 0.25rem;
+}
+
+.px-metro-panel li.done {
+  color: var(--px-accent);
+}
+
+.px-metro-panel li.pending {
+  color: var(--px-muted);
+  font-style: italic;
+}
+
 .px-bita-btn {
   position: absolute;
   top: 0.75rem;
