@@ -414,6 +414,35 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   cornisaBanda.material = makePbr('cornisa-banda', '#3a2e22', { roughness: 1 });
   cornisaBanda.position.set(0, -0.55, 2.2);
   cornisaBanda.receiveShadows = true;
+  /* M0.7.1.4 — contact shadow del cornisa. Una elipse oscura translúcida
+     en el suelo, justo bajo el plank, ancla visualmente la cornisa al
+     terreno y mata la sensación de "sticker flotante" que el audit
+     M0.7 marcó. Sin `receiveShadows` real-time (Harvok no genera shadow
+     maps para esta superficie), usamos un sprite procedural con un
+     gradiente radial. */
+  const cornisaShadowCanvas = document.createElement('canvas');
+  cornisaShadowCanvas.width = 256; cornisaShadowCanvas.height = 64;
+  {
+    const sc = cornisaShadowCanvas.getContext('2d')!;
+    const sg = sc.createRadialGradient(128, 32, 2, 128, 32, 120);
+    sg.addColorStop(0, 'rgba(0,0,0,0.55)');
+    sg.addColorStop(0.5, 'rgba(0,0,0,0.32)');
+    sg.addColorStop(1, 'rgba(0,0,0,0)');
+    sc.fillStyle = sg;
+    sc.fillRect(0, 0, 256, 64);
+  }
+  const cornisaShadowTex = new BABYLON.Texture(cornisaShadowCanvas.toDataURL(), scene, false, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+  cornisaShadowTex.hasAlpha = true;
+  textures.push(cornisaShadowTex);
+  const cornisaShadowMat = alphaStandardMat('cornisa-contact-shadow', '#000000', 0.6, '#000000');
+  cornisaShadowMat.diffuseTexture = cornisaShadowTex;
+  cornisaShadowMat.emissiveTexture = cornisaShadowTex;
+  cornisaShadowMat.emissiveColor = new BABYLON.Color3(0, 0, 0);
+  cornisaShadowMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+  cornisaShadowMat.disableLighting = true;
+  const cornisaShadow = mesh(BABYLON.MeshBuilder.CreateGround('cornisa-contact-shadow', { width: 40, height: 8 }, scene));
+  cornisaShadow.material = cornisaShadowMat;
+  cornisaShadow.position.set(0, -0.68, 1.5);  // un poco más alto que groundExt (-0.71) para evitar z-fighting
   // detalle de "saliente" a la izquierda: la cornisa se quiebra en un
   // afloramiento rocoso, da silueta interesante al horizonte.
   const salienteGeo = mesh(BABYLON.MeshBuilder.CreateIcoSphere('saliente-rocoso', { radius: 1.6, subdivisions: 2, flat: true }, scene));
