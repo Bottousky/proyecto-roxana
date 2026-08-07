@@ -599,17 +599,26 @@ export function buildCascadeScene(ctx: CascadeSceneContext): CascadeSceneEntitie
   waterTex.vScale = 0.6;
   textures.push(waterTex);
 
-  // Lago: plano translúcido más grande y reflectivo, ancla la cascada visualmente.
-  const lakeMat = makePbr('lago-translucido', PALETA.aguaProfunda, { alpha: 0.78, emissive: '#1a4a6a' });
+  // Lago: plano translúcido que ancla la cascada visualmente.
+  // M0.7.1.5 — el lake era 22x14 a y=-0.55 z=-2.0. En el e2-wide shot, el
+  // ángulo lateral lo mostraba como una banda azul delgada bajo el cornisa
+  // (el audit M0.7.1 lo marcó como "blue debug rectangle"). Después de
+  // probar bajarlo y agrandarlo (36x24 a y=-0.7), el problema empeoró
+  // porque el lago grande se ve como un "blue carpet" en el FG. Fix final:
+  // hacerlo un "puddle" pequeño (10x7) a la altura del ground, justo bajo
+  // la cascada, con alpha 0.55 (más translúcido). El puddle se ve sólo donde
+  // la cámara mira al área inmediata de la cascada, no como banda lateral.
+  const lakeMat = makePbr('lago-translucido', PALETA.aguaProfunda, { alpha: 0.55, emissive: '#1a4a6a' });
   lakeMat.albedoTexture = waterTex;
   lakeMat.emissiveTexture = waterTex;
   lakeMat.specularIntensity = 1.6;
   lakeMat.roughness = 0.25;
   lakeMat.metallic = 0.05;
-  const lake = mesh(BABYLON.MeshBuilder.CreatePlane('lago-base', { width: 22, height: 14 }, scene));
+  const lake = mesh(BABYLON.MeshBuilder.CreatePlane('lago-base', { width: 10, height: 7 }, scene));
   lake.material = lakeMat;
   lake.rotation.x = Math.PI / 2;
-  lake.position.set(9, -0.55, -2.0);
+  lake.position.set(10, -0.7, -0.5);
+  lake.applyFog = false;
 
   /* ============================================================
      8. CASCADA — 4 cintas con alpha-blend + niebla volumétrica
