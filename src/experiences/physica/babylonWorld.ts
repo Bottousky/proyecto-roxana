@@ -214,227 +214,54 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   shadows.darkness = 0.34;
 
   /* ============================================================
-     MONTAÑAS PINTADAS DE FONDO — visibles en TODAS las escenas.
-     Planos 2.5D con silueta pintada a canvas + niebla atmosférica.
-     Cubre x ∈ [-110, 230] para envolver el mundo continuo.
+     BACKDROP PINTADO (M0.6) — generado con mmx-cli. Un solo plano
+     ancho detrás de todo el mundo que combina cielo y montañas en
+     UNA imagen. Cubre x∈[-200,200], z=-220, height 200u. La
+     imagen tiene cielo arriba (top 50%) y montañas+atmósfera
+     abajo (bottom 50%) — el V-mapping del plano pone cielo en
+     y≈30..130 y montañas en y≈-70..30. La cornisa tapa la base.
      ============================================================ */
   const worldBackgroundMountains: BABYLON.Mesh[] = [];
   const worldMountTextures: BABYLON.Texture[] = [];
-  const paintMountainSilhouette = (
-    W: number, H: number, topColor: string, midColor: string, baseColor: string,
-    scale: number, seed: number,
-  ): BABYLON.Texture => {
-    const c = document.createElement('canvas');
-    c.width = W; c.height = H;
-    const ctx = c.getContext('2d')!;
-    // CANVAS TRANSPARENTE. La parte de arriba (cielo) NO se pinta — el
-    // cielo global (babylonWorld globalSky) se ve a través. La silueta
-    // de la montaña se pinta con la paleta del layer. Importante: las
-    // cumbres NO pueden sobrepasar baseY; si lo hacen, el cuerpo
-    // opaco llena el canvas y el cielo se vuelve invisible (bug M0.4).
-    const baseY = H * 0.55;
-    const segments = 110;
-    const span = W;
-    const peaks: number[] = [];
-    for (let i = 0; i < segments; i++) {
-      // Peaks más prominentes (M0.5.1): macro 100, meso 60, detail 40,
-      // base 20 → max 220. Para scale 0.35: peak max ≈ 77 → outline
-      // en y=204 (V=0.40, 40% superior transparente). Cumbres
-      // claramente visibles sobre el horizonte.
-      const macro = Math.abs(Math.sin(seed + i * 0.18)) * 100;
-      const meso = Math.abs(Math.cos(seed * 1.7 + i * 0.5)) * 60;
-      const detail = Math.abs(Math.sin(seed * 2.3 + i * 1.4)) * 40;
-      const peak = 20 + macro + meso + detail;
-      peaks.push(peak * scale);
-    }
-    // 1) Sombra lejana (atmospheric perspective): capa oscura detrás con
-    //    offset para sensación de profundidad.
-    ctx.beginPath();
-    ctx.moveTo(-6, baseY + 14);
-    for (let i = 0; i < segments; i++) {
-      const x = (i / (segments - 1)) * span;
-      ctx.lineTo(x - 6, baseY - peaks[i] * 0.92 + 6);
-    }
-    ctx.lineTo(W + 6, baseY + 14);
-    ctx.lineTo(W + 6, H);
-    ctx.lineTo(-6, H);
-    ctx.closePath();
-    const shadowGrad = ctx.createLinearGradient(0, baseY - 80, 0, H);
-    shadowGrad.addColorStop(0, 'rgba(20,28,42,0.55)');
-    shadowGrad.addColorStop(1, 'rgba(20,28,42,0)');
-    ctx.fillStyle = shadowGrad;
-    ctx.fill();
-    // 2) Silueta principal — pintada con bordes suaves (Planet of Lana).
-    //    El 25% inferior se desvanece a transparente para que el cuerpo
-    //    no parezca un rectángulo sólido contra el cielo (M0.5).
-    ctx.save();
-    ctx.filter = 'blur(1.6px)';
-    ctx.beginPath();
-    ctx.moveTo(-4, baseY + 6);
-    for (let i = 0; i < segments; i++) {
-      const x = (i / (segments - 1)) * span;
-      ctx.lineTo(x, baseY - peaks[i]);
-    }
-    ctx.lineTo(W + 4, baseY + 6);
-    ctx.lineTo(W + 4, H);
-    ctx.lineTo(-4, H);
-    ctx.closePath();
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, topColor);
-    g.addColorStop(0.30, midColor);
-    g.addColorStop(0.58, baseColor);
-    // Fade menos agresivo: el cuerpo se mantiene más opaco (M0.5.1) para
-    // que las cumbres se lean claramente contra el cielo. El fade
-    // atmosférico sigue presente pero solo en el 30 % inferior.
-    const br = parseInt(baseColor.slice(1, 3), 16);
-    const bg = parseInt(baseColor.slice(3, 5), 16);
-    const bb = parseInt(baseColor.slice(5, 7), 16);
-    g.addColorStop(0.72, `rgba(${br},${bg},${bb},0.85)`);
-    g.addColorStop(0.85, `rgba(${br},${bg},${bb},0.35)`);
-    g.addColorStop(1.00, `rgba(${br},${bg},${bb},0.0)`);
-    ctx.fillStyle = g;
-    ctx.fill();
-    ctx.restore();
-    // 3) Nieve en las cumbres.
-    for (let i = 0; i < segments; i++) {
-      const px = (i / (segments - 1)) * span;
-      const peak = peaks[i];
-      if (peak < 35 * scale) continue;
-      const py = baseY - peak;
-      const grad = ctx.createRadialGradient(px, py + 4, 0, px, py + 4, 16 + (i % 5) * 4);
-      grad.addColorStop(0, 'rgba(255,250,235,0.55)');
-      grad.addColorStop(1, 'rgba(255,250,235,0)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.ellipse(px, py + 4, 16 + (i % 5) * 4, 5, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // 4) Estrías suaves de roca en laderas.
-    ctx.filter = 'blur(0.5px)';
-    for (let i = 0; i < 18; i++) {
-      const x0 = (i / 18) * W;
-      const y0 = baseY + 8;
-      ctx.strokeStyle = `rgba(20,28,40,${0.20 + (i % 3) * 0.04})`;
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(x0, y0);
-      for (let j = 0; j < 6; j++) {
-        ctx.lineTo(x0 + Math.sin(i + j) * 30, y0 + j * 22);
-      }
-      ctx.stroke();
-    }
-    ctx.filter = 'none';
-    const t = new BABYLON.Texture(c.toDataURL(), scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
-    t.hasAlpha = true;
-    t.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
-    t.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
-    worldMountTextures.push(t);
-    return t;
-  };
-  // Helper adaptador para el caller que pasaba 8 argumentos (incluyendo
-  // un fogColor ya sin efecto). Mantiene la firma.
-  const paintMountainSilhouetteWithFog = (
-    W: number, H: number, topColor: string, midColor: string, baseColor: string,
-    scale: number, seed: number, _fogColor: string,
-  ): BABYLON.Texture => paintMountainSilhouette(W, H, topColor, midColor, baseColor, scale, seed);
-  void paintMountainSilhouetteWithFog; // export-like: usado por makeBackgroundMountain abajo
-  const makeBackgroundMountain = (
+  // Cargar las texturas generadas con mmx-cli desde public/assets.
+  // Importante: URL absoluta con slash inicial. Si es relativa y la página
+  // está en /physica/, Babylon la busca como /physica/assets/... que NO
+  // existe en producción, y muestra el checkerboard de debug. `invertY=true`
+  // porque las imágenes mmx se generan con cielo arriba en píxel top, pero
+  // Babylon lee las texturas con origen en bottom-left por defecto.
+  const mountainFarUrl = '/assets/physica/textures/mountain-far_001.jpg';
+  const mountainFarTex = new BABYLON.Texture(
+    mountainFarUrl, scene, false, true,
+    BABYLON.Texture.TRILINEAR_SAMPLINGMODE,
+  );
+  worldMountTextures.push(mountainFarTex);
+  // Crear 3 planos del backdrop (far, mid, near-back) a diferentes Z
+  // para depth parallax. Cada uno usa la imagen mmx.
+  const makeBackdrop = (
     name: string, xCenter: number, yPos: number, z: number,
-    width: number, height: number,
-    topColor: string, midColor: string, baseColor: string,
-    scale: number, seed: number, fogged: boolean,
+    width: number, height: number, tex: BABYLON.Texture,
   ): void => {
-    const tex = paintMountainSilhouette(1024, 512, topColor, midColor, baseColor, scale, seed);
     const plane = BABYLON.MeshBuilder.CreatePlane(name, { width, height }, scene);
     plane.position.set(xCenter, yPos, z);
-    const mat = new BABYLON.PBRMaterial(`mat-${name}`, scene);
-    mat.albedoTexture = tex;
-    mat.useAlphaFromAlbedoTexture = true;
-    mat.transparencyMode = BABYLON.Material.MATERIAL_ALPHABLEND;
-    mat.backFaceCulling = false;
+    // StandardMaterial con disableLighting es más predecible que PBR+unlit:
+    // se ve EXACTAMENTE como la imagen, sin contribuciones de luz ni de
+    // environment, sin patrón de damero cuando el noMipmap está mal.
+    const mat = new BABYLON.StandardMaterial(`mat-${name}`, scene);
+    mat.diffuseTexture = tex;
     mat.emissiveTexture = tex;
-    mat.emissiveColor = new BABYLON.Color3(0.55, 0.55, 0.62);
-    mat.environmentIntensity = 0.05;
-    mat.specularIntensity = 0;
-    mat.roughness = 1;
+    mat.specularColor = new BABYLON.Color3(0, 0, 0);
+    mat.disableLighting = true;
+    mat.backFaceCulling = false;
     plane.material = mat;
-    plane.applyFog = fogged;
+    plane.applyFog = false;
     worldBackgroundMountains.push(plane);
   };
-  // Capa LEJANA — fondo atmosférico (z=-180). Plano angosto y bajo
-  // para que las cumbres se asomen suavemente sobre el horizonte
-  // (~14% de la FOV vertical desde spawn, ~10% desde dolly).
-  // planeY=7 para que la base de la silueta quede cerca de la cornisa
-  // y no deje un gap visible con el suelo.
-  for (let i = 0; i < 5; i++) {
-    const xCenter = -120 + i * 75;
-    makeBackgroundMountain(`world-montana-far-${i}`, xCenter, 7, -180, 75, 12,
-      '#cad6e6', '#9aaabe', '#5e6c84', 0.35, 13.7 + i * 31.1, true);
-  }
-  // Capa MEDIA — silueta intermedia, más oscura, ligeramente más
-  // cerca. Cubre la zona justo arriba de las montañas del escenario.
-  for (let i = 0; i < 5; i++) {
-    const xCenter = -120 + i * 75;
-    makeBackgroundMountain(`world-montana-mid-${i}`, xCenter, 6, -130, 60, 8,
-      '#9eacc4', '#62728c', '#36445c', 0.26, 41.1 + i * 19.7, false);
-  }
-
-  /* ============================================================
-     CIELO GLOBAL — gradiente cálido de atardecer visible en todas
-     las escenas. Plano ancho detrás de las montañas, con la calidez
-     dominante en la mitad visible superior (la inferior queda
-     tapada por las montañas y la cornisa).
-     ============================================================ */
-  const globalSkyCanvas = document.createElement('canvas');
-  globalSkyCanvas.width = 8; globalSkyCanvas.height = 512;
-  const gsc = globalSkyCanvas.getContext('2d')!;
-  const gsky = gsc.createLinearGradient(0, 0, 0, 512);
-  // V=0 está en el TOP del plano (y=64, OUT OF FRAME por encima del
-  // cenit visible). V=1 está en el BOTTOM del plano (y=-36, OUT OF
-  // FRAME por debajo del cornisa y las montañas). El rango visible
-  // de V depende de la cámara:
-  //   • Dolly (z=190, y=14.5): visible V ∈ [0.11, 0.88]
-  //   • Spawn (z=36, y=3):    visible V ∈ [0.44, 0.82]
-  // El atardecer tiene warm en el horizonte (V alto) y cool en el
-  // cenit (V bajo), con transición en la franja V=0.45-0.65 que
-  // queda justo arriba de las montañas.
-  gsky.addColorStop(0.00, '#2a3858');  // cenit profundo (OUT OF FRAME)
-  gsky.addColorStop(0.15, '#4a5878');  // cenit (OUT OF FRAME)
-  gsky.addColorStop(0.30, '#6a6a82');  // banda fría (justo arriba del visible)
-  gsky.addColorStop(0.45, '#9a8a8a');  // transición fría → cálida
-  gsky.addColorStop(0.60, '#c89876');  // warm horizon (visible medio)
-  gsky.addColorStop(0.75, '#e8b890');  // warm glow (visible medio-bajo)
-  gsky.addColorStop(0.90, '#f0c898');  // sol-bajo glow (visible bajo)
-  gsky.addColorStop(1.00, '#b89070');  // tierra cálida (OUT OF FRAME abajo)
-  gsc.fillStyle = gsky;
-  gsc.fillRect(0, 0, 8, 512);
-  for (let i = 0; i < 6; i++) {
-    const y = 320 + i * 12;
-    gsc.fillStyle = `rgba(255,232,180,${0.06 - i * 0.008})`;
-    gsc.fillRect(0, y, 8, 2);
-  }
-  const globalSkyTex = new BABYLON.Texture(globalSkyCanvas.toDataURL(), scene, false, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
-  globalSkyTex.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
-  const globalSkyMat = new BABYLON.PBRMaterial('global-sky-gradiente', scene);
-  globalSkyMat.albedoTexture = globalSkyTex;
-  globalSkyMat.emissiveTexture = globalSkyTex;
-  globalSkyMat.emissiveColor = new BABYLON.Color3(0.85, 0.85, 0.85);
-  globalSkyMat.unlit = true;
-  globalSkyMat.environmentIntensity = 0;
-  globalSkyMat.specularIntensity = 0;
-  globalSkyMat.roughness = 1;
-  globalSkyMat.backFaceCulling = false;
-  // 6 planos repartidos a lo largo del mundo para cubrir todo el recorrido.
-  // z=-220 los pone detrás de las montañas más lejanas (z=-160) y del
-  // dolly (z=190). Altura 120u para que cubra el rango vertical visible
-  // completo desde cualquier cámara.
-  for (let i = 0; i < 6; i++) {
-    const xCenter = -60 + i * 50;
-    const globalSky = BABYLON.MeshBuilder.CreatePlane(`cielo-gradiente-global-${i}`, { width: 80, height: 120 }, scene);
-    globalSky.position.set(xCenter, 16, -220);
-    globalSky.material = globalSkyMat;
-    globalSky.applyFog = false;
-  }
+  // Backdrop lejano — un solo plano gigante que respeta el ratio 21:9 de
+  // la imagen mmx. Cubre x∈[-220,220] (width 440) y y∈[-26,158] (height
+  // 184, centrado en y=66). El plano se ve desde spawn, dolly y metrópolis
+  // sin gaps. La parte inferior (y<0) queda tapada por la cornisa; la
+  // parte superior (y>130) queda fuera de la FOV del cenit visible.
+  makeBackdrop('world-backdrop-far', 0, 66, -220, 440, 184, mountainFarTex);
 
   /* ==================== helpers visuales ==================== */
 
@@ -994,6 +821,12 @@ export function createPhysicaWorld(hostEl: HTMLElement): PhysicaWorld {
   /* metrópolis 3D */
   const metropoGroup = new BABYLON.TransformNode('metropoli', scene);
   metropoGroup.position.set(W_E8_INICIO + 200, Y_E8, -220);
+  /* Por defecto la metrópoli está OCULTA — sólo se revela al subir a la
+     cima de la estación con `estacionEstabilizada && Math.abs(avatar.vx) > 0.3`
+     (ver gatillo de `metropolisRevelada` más abajo). Sin este setEnabled
+     inicial, los edificios 3D se renderizan durante TODA la cornisa y
+     aparecen como bloques azules detrás de la cascada. */
+  metropoGroup.setEnabled(false);
 
   const matEdificioArr = [
     estilizado(0x6a5a6a),
