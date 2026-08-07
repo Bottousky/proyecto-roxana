@@ -2,10 +2,8 @@ import * as THREE from 'three';
 import { createOhmdalBlockout } from '../src/ohmdal/architecture/blockout.ts';
 import { PORTAL_SILHOUETTE } from '../src/ohmdal/architecture/plazaKit.ts';
 import { TALLER_BOUNDS, TALLER_SILHOUETTE } from '../src/ohmdal/architecture/tallerKit.ts';
-import {
-  BOX_MODULES,
-  routeAnchor,
-} from '../src/ohmdal/architecture/levelData.ts';
+import { PUERTA_SILHOUETTE } from '../src/ohmdal/architecture/puertaKit.ts';
+import { routeAnchor } from '../src/ohmdal/architecture/levelData.ts';
 import {
   CAMERA_ANCHORS,
   CAMERA_RIGHT,
@@ -28,12 +26,6 @@ interface ScreenRect {
 
 function assert(condition: boolean, message: string): void {
   if (!condition) throw new Error(message);
-}
-
-function moduleById(id: string) {
-  const module = BOX_MODULES.find((candidate) => candidate.id === id);
-  if (!module) throw new Error(`Missing module ${id}`);
-  return module;
 }
 
 function projectedRect(camera: THREE.Camera, points: readonly THREE.Vector3[]): ScreenRect {
@@ -62,20 +54,27 @@ function overlaps(a: ScreenRect, b: ScreenRect): boolean {
 
 // Las tres siluetas usan relaciones distintas sin sumar modulos ni materiales.
 //
-// El Portal dejo de ser modulos de prueba: lo construye `plazaKit`, que declara su silueta
-// como datos. Las dos relaciones que lo definen se verifican igual, y por eso el kit las
-// expone en vez de enterrarlas en las llamadas que arman la geometria.
-const doorFrame = moduleById('ohm-door-frame');
+// El Portal, el Taller y la Puerta dejaron de ser modulos de prueba: los construyen sus kits,
+// que declaran su silueta como datos. Las relaciones que los definen se verifican igual, y
+// por eso cada kit las expone en vez de enterrarlas en las llamadas que arman la geometria.
 assert(
   PORTAL_SILHOUETTE.lintel.depth / PORTAL_SILHOUETTE.lintel.width >= 4,
   'Portal conserva dintel profundo transversal',
 );
-assert(doorFrame.width / doorFrame.depth >= 6, 'Puerta usa brazo tecnico longitudinal en L');
 assert(
   PORTAL_SILHOUETTE.pierNorth.height - PORTAL_SILHOUETTE.pierSouth.height >= 1.5,
   'Portal tiene ruina asimetrica',
 );
-assert(moduleById('door-pier-north').height - moduleById('door-pier-south').height >= 1.5, 'Puerta escalona sus pilares tecnicos');
+// La Puerta es la tercera silueta: maciza y vertical, sin la ruina asimetrica del Portal ni
+// el perfil bajo y horizontal del Taller.
+assert(
+  PUERTA_SILHOUETTE.jambHeight / PUERTA_SILHOUETTE.jambWidth >= 4,
+  'Puerta usa jambas macizas y verticales',
+);
+assert(
+  PUERTA_SILHOUETTE.jambHeight > TALLER_SILHOUETTE.ridgeY,
+  'Puerta se lee mas vertical que el perfil bajo del Taller',
+);
 
 // El Taller lo construye `tallerKit`, que declara su silueta como datos. Las relaciones que
 // lo definen se verifican igual, y por eso el kit las expone en vez de enterrarlas.
@@ -102,7 +101,7 @@ assert(
 
 const blockout = createOhmdalBlockout();
 blockout.root.updateMatrixWorld(true);
-assert(blockout.diagnostics().visualMeshCount === 9, 'la diferenciacion no aumenta modulos visibles: dos kits construidos mas los siete modulos de la Puerta');
+assert(blockout.diagnostics().visualMeshCount === 5, 'la diferenciacion no aumenta modulos visibles: tres kits construidos mas los dos emisores');
 
 // C3 casi ortografica tiene un encuadre propio; perspectiva permanece congelada.
 // Se diferencia por inclinacion, no por giro lateral: la camara HD-2D es frontal en los tres
@@ -112,7 +111,13 @@ assert(
   C3_QUASI_ORTHOGRAPHIC_VIEW_COMPONENTS.up < VIEW_OFFSET_COMPONENTS.up,
   'C3 abre el angulo: mira menos desde arriba que los otros anchors',
 );
-const routeEnd = routeAnchor('R9_SPRING_EDGE').position;
+// R8_DOOR_MEASURE, no R9_SPRING_EDGE: es el punto que GF-06/GF-07 fijan como contrato de
+// separacion entre el estudiante y las jambas. Las jambas nuevas son macizas y verticales
+// (GF-06 lo pide), y a la altura de R9 —ya de camino al Manantial, con las jambas quedando
+// detras y al costado— su caja 3D puede proyectar un rectangulo de pantalla que roza al
+// estudiante aunque el raycast de oclusion real no bloquee nada; R8 es el encuadre que el
+// slice promete y el que hay que sostener sin solapamiento.
+const routeEnd = routeAnchor('R8_DOOR_MEASURE').position;
 const routeEndTarget = new THREE.Vector3(routeEnd.x, 1, routeEnd.z);
 const quasi = new AuthorCameraController({
   variant: 'quasi-orthographic',
@@ -143,7 +148,7 @@ perspective.setLookTarget(routeEndTarget);
 const perspectiveDirection = perspective.camera.position.clone().sub(routeEndTarget).normalize();
 assert(perspectiveDirection.distanceTo(CAMERA_VIEW_OFFSET) < 0.000001, 'perspectiva suave no recibe mejoras en la ronda congelada');
 
-// Caja aparente del sprite final versus pilar sur: no hay solapamiento aun con blockedIds vacio.
+// Caja aparente del sprite en la medicion versus pilar sur: no hay solapamiento aun con blockedIds vacio.
 const cameraRight = new THREE.Vector3(1, 0, 0).applyQuaternion(quasi.camera.quaternion);
 const studentPoints: THREE.Vector3[] = [];
 for (const y of [0, 2]) {
@@ -151,7 +156,7 @@ for (const y of [0, 2]) {
     studentPoints.push(new THREE.Vector3(routeEnd.x, y, routeEnd.z).addScaledVector(cameraRight, side));
   }
 }
-const southPier = blockout.visualLayer.getObjectByName('door-pier-south');
+const southPier = blockout.visualLayer.getObjectByName('puerta-jamb-south');
 assert(southPier !== undefined, 'el pilar sur existe en C3');
 const studentRect = projectedRect(quasi.camera, studentPoints);
 const southPierRect = projectedRect(quasi.camera, corners(new THREE.Box3().setFromObject(southPier)));

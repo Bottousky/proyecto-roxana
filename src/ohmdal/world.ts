@@ -30,7 +30,7 @@ import {
 import { createStudentActor } from './integration/spriteActors.ts';
 import { createU1Cast } from './content/u1Cast.ts';
 import { anchorById, thingOf, type BenchId, type U1Anchor } from './content/u1Anchors.ts';
-import { hooks } from '../state.ts';
+import { hooks, state } from '../state.ts';
 import { uiJustClosed, uiOpen } from '../ui/overlay.ts';
 import { initDialog } from '../ui/dialog.ts';
 import { createOhmdalUi } from './ui.ts';
@@ -126,10 +126,19 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     return code === 'Space' ? 'Espacio' : code.replace(/^Key|^Digit/, '');
   }
 
+  // E4 y E5: la Puerta abre y el Manantial vuelve a correr cuando `/jugar` marca `puertaDone`.
+  // `abrirPuerta` (src/puzzles/puerta.ts) es quien pone la flag; acá sólo se lee y se dibuja.
+  function syncPuertaCausality(): void {
+    const open = state.flags.puertaDone;
+    blockout.setDoorOpening(open ? 1 : 0);
+    blockout.setSpringWaterState(open ? 'estable' : 'detenida');
+  }
+
   // Un cambio de flags cambia quién está en la Plaza y cómo se ve cada prop. `/jugar` avisa
   // por este mismo hook; el mundo HD-2D se limita a registrarse.
   const previousRefresh = hooks.refresh;
-  hooks.refresh = () => { cast.refresh(); };
+  hooks.refresh = () => { cast.refresh(); syncPuertaCausality(); };
+  syncPuertaCausality();
 
   const lumenRoot = new THREE.Group();
   lumenRoot.name = 'lumen_spatial_presence';

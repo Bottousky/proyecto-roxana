@@ -99,7 +99,7 @@ export const LEVEL_ZONES: readonly LevelZone[] = [
     id: 'puerta_manantial',
     purpose: 'objective-consequence',
     bounds: { minX: 8, maxX: 20.5, minZ: -5, maxZ: 5.5 },
-    landmarkId: 'ohm-door-frame',
+    landmarkId: 'PUERTA_KIT',
   },
 ] as const;
 
@@ -146,20 +146,15 @@ export const ARCHITECTURE_SOCKETS: readonly ArchitectureSocket[] = [
 ] as const;
 
 export const BOX_MODULES: readonly BoxModuleDefinition[] = [
-  // Ni la Plaza ni el Taller declaran modulos: los construyen `plazaKit` y `tallerKit` con
-  // geometria fusionada, pintada y texturada. Dejar aca las cajas de prueba seria dato muerto,
-  // y los tests las leerian como si dibujaran algo. Del Taller sobrevive solo el emisor de la
-  // linterna, que es lo que el rig de luz busca por nombre para colgarle su point light.
-  { id: 'door-floor', zoneId: 'puerta_manantial', family: 'stone', centerX: 14.25, centerZ: 0.25, width: 12.5, height: 0.08, depth: 10.5, pivotY: 0, tags: ['floor'] },
+  // Ninguna de las tres zonas declara modulos: las construyen `plazaKit`, `tallerKit` y
+  // `puertaKit` con geometria fusionada, pintada y texturada. Dejar aca las cajas de prueba
+  // seria dato muerto, y los tests las leerian como si dibujaran algo. Lo unico que sobrevive
+  // son los dos emisores, que es lo que el rig de luz busca por nombre para colgarles su luz.
 
 
   { id: 'workshop-lantern-emitter', zoneId: 'taller', family: 'glass', centerX: 3.2, centerZ: -3.9, width: 0.3, height: 0.35, depth: 0.3, baseY: 2.55, pivotY: 0, tags: ['emitter'] },
 
-  { id: 'door-pier-north', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: -3, width: 0.9, height: 4.8, depth: 0.9, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
-  { id: 'door-pier-south', zoneId: 'puerta_manantial', family: 'stone', centerX: 13, centerZ: 4.5, width: 0.9, height: 3.2, depth: 0.9, pivotY: 0, tags: ['structure', 'cameraOccluder'] },
-  { id: 'ohm-door-frame', zoneId: 'puerta_manantial', family: 'copper', centerX: 15, centerZ: -3, width: 4.2, height: 0.55, depth: 0.65, baseY: 4.25, pivotY: 0, tags: ['structure', 'landmark'] },
   { id: 'door-conduit-emitter', zoneId: 'puerta_manantial', family: 'glass', centerX: 16.7, centerZ: -3, width: 0.25, height: 0.4, depth: 0.25, baseY: 4.3, pivotY: 0, tags: ['emitter'] },
-  { id: 'spring-basin', zoneId: 'puerta_manantial', family: 'water', centerX: 18, centerZ: 1.5, width: 3, height: 0.25, depth: 3, pivotY: 0, tags: ['structure'] },
 ] as const;
 
 // Los colliders de la Plaza siguen a la geometría que construye `plazaKit`. Los del blockout
@@ -179,9 +174,11 @@ export const COLLIDERS: readonly ColliderDefinition[] = [
   { id: 'C_TALLER_EAST_NORTH', zoneId: 'taller', bounds: { minX: 8.25, maxX: 8.6, minZ: -5.2, maxZ: -1.7 }, height: 2.8, planeY: 0 },
   { id: 'C_TALLER_EAST_SOUTH', zoneId: 'taller', bounds: { minX: 8.25, maxX: 8.6, minZ: 1.7, maxZ: 4.7 }, height: 2.8, planeY: 0 },
   { id: 'C_WORKBENCH', zoneId: 'taller', bounds: { minX: 3.5, maxX: 6.1, minZ: -3.03, maxZ: -1.97 }, height: 1, planeY: 0 },
-  { id: 'C_DOOR_NORTH', zoneId: 'puerta_manantial', bounds: { minX: 12.55, maxX: 13.45, minZ: -3.45, maxZ: -2.55 }, height: 4.8, planeY: 0 },
-  { id: 'C_DOOR_SOUTH', zoneId: 'puerta_manantial', bounds: { minX: 12.55, maxX: 13.45, minZ: 4.05, maxZ: 4.95 }, height: 3.2, planeY: 0 },
-  { id: 'C_SPRING_BASIN', zoneId: 'puerta_manantial', bounds: { minX: 17.35, maxX: 19.5, minZ: 0, maxZ: 3 }, height: 0.25, planeY: 0 },
+  // Las jambas de la Puerta. El vano entre ellas queda libre: GF-06 registra que la ronda 1
+  // fallo justo aca por falta de separacion entre el estudiante y los pilares.
+  { id: 'C_DOOR_JAMB_NORTH', zoneId: 'puerta_manantial', bounds: { minX: 13.95, maxX: 15.25, minZ: -3.15, maxZ: -1.4 }, height: 5.4, planeY: 0 },
+  { id: 'C_DOOR_JAMB_SOUTH', zoneId: 'puerta_manantial', bounds: { minX: 13.95, maxX: 15.25, minZ: 1.8, maxZ: 3.55 }, height: 5.4, planeY: 0 },
+  { id: 'C_SPRING_BASIN', zoneId: 'puerta_manantial', bounds: { minX: 16.9, maxX: 20.3, minZ: -0.2, maxZ: 3.2 }, height: 0.9, planeY: 0 },
 ] as const;
 
 export function routeAnchor(id: RouteAnchorId): RouteAnchor {

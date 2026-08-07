@@ -160,8 +160,10 @@ export function createU1Cast(onBench: (bench: BenchId, anchor: U1Anchor) => void
   }
   refresh();
 
-  const ohmActor = entries.find((entry) => entry.ohm !== null)?.ohm;
-  if (!ohmActor) throw new Error('La Unidad 1 no tiene anclaje para Ohm');
+  // Por id y no «el primero que tenga cuerpo de Ohm»: el reparto creció a tres escenas y el
+  // orden de la tabla dejó de ser una garantía de nada.
+  const ohmActor = entries.find((entry) => entry.anchor.id === 'pedestal')?.ohm;
+  if (!ohmActor) throw new Error('La Unidad 1 no tiene anclaje de Ohm en el pedestal');
 
   return {
     root,

@@ -51,7 +51,7 @@ const anchors = [
   ),
 ].map(([, id, room, thing]) => ({ id, room, thing }));
 
-assert(anchors.length >= 8, `se detectaron ${anchors.length} anclajes; la Plaza tiene 8`);
+assert(anchors.length >= 20, `se detectaron ${anchors.length} anclajes; la Unidad 1 tiene 20`);
 
 for (const anchor of anchors) {
   const things = thingsByRoom.get(anchor.room);
@@ -62,17 +62,20 @@ for (const anchor of anchors) {
   );
 }
 
-/* ---------- los anclajes caen dentro de la zona que dice el nivel ---------- */
+/* ---------- los anclajes caen dentro de alguna zona del nivel ---------- */
 
 const levelSource = readFileSync(
   new URL('../src/ohmdal/architecture/levelData.ts', import.meta.url),
   'utf8',
 );
-const plazaBounds = levelSource.match(
-  /id: 'portal_plaza',[\s\S]*?bounds: \{ minX: (-?[\d.]+), maxX: (-?[\d.]+), minZ: (-?[\d.]+), maxZ: (-?[\d.]+) \}/,
-);
-assert(plazaBounds !== null, 'levelData declara los límites de la zona portal_plaza');
-const [minX, maxX, minZ, maxZ] = plazaBounds!.slice(1, 5).map(Number);
+const zones = [
+  ...levelSource.matchAll(
+    /id: '(portal_plaza|taller|puerta_manantial)',[\s\S]*?bounds: \{ minX: (-?[\d.]+), maxX: (-?[\d.]+), minZ: (-?[\d.]+), maxZ: (-?[\d.]+) \}/g,
+  ),
+].map(([, id, minX, maxX, minZ, maxZ]) => ({
+  id, minX: Number(minX), maxX: Number(maxX), minZ: Number(minZ), maxZ: Number(maxZ),
+}));
+assert(zones.length === 3, `levelData declara ${zones.length} zonas; el slice tiene 3`);
 
 const positions = [
   ...anchorsSource.matchAll(/id: '([a-z0-9-]+)',\s*\n\s*position: \{ x: (-?[\d.]+), z: (-?[\d.]+) \}/g),
@@ -83,14 +86,14 @@ assert(
   `${positions.length} posiciones para ${anchors.length} anclajes: alguna no se pudo leer`,
 );
 
+// Un anclaje fuera de toda zona es contenido inalcanzable: el jugador no puede caminar hasta
+// él porque la navegación lo frena antes. El margen de 0,5 m tolera props apoyados contra un
+// muro, que están al alcance sin estar dentro del área caminable.
 for (const { id, x, z } of positions) {
-  assert(x >= minX && x <= maxX, `el anclaje ${id} cae fuera de la Plaza en x: ${x} ∉ [${minX}, ${maxX}]`);
-  // La z de los anclajes puede exceder los límites de blockout mientras la Plaza real no
-  // esté construida, pero no puede irse a otra sala: un margen de 2 m es el aviso.
-  assert(
-    z >= minZ - 2 && z <= maxZ + 2,
-    `el anclaje ${id} se fue muy lejos en z: ${z} ∉ [${minZ - 2}, ${maxZ + 2}]`,
-  );
+  const home = zones.find((zone) => (
+    x >= zone.minX - 0.5 && x <= zone.maxX + 0.5 && z >= zone.minZ - 0.5 && z <= zone.maxZ + 0.5
+  ));
+  assert(home !== undefined, `el anclaje ${id} cae fuera de toda zona: (${x}, ${z})`);
 }
 
 /* ---------- ningún anclaje pisa a otro ---------- */
@@ -98,9 +101,11 @@ for (const { id, x, z } of positions) {
 for (let a = 0; a < positions.length; a += 1) {
   for (let b = a + 1; b < positions.length; b += 1) {
     const separation = Math.hypot(positions[a].x - positions[b].x, positions[a].z - positions[b].z);
-    // Edda tiene dos anclajes en el mismo punto a propósito: son la misma persona en dos
-    // momentos del arco, y nunca están presentes a la vez.
-    const mismaPersona = positions[a].id.startsWith('edda') && positions[b].id.startsWith('edda');
+    // Edda y Lumen tienen varios anclajes: son la misma persona en momentos distintos del
+    // arco, y sus predicados de visibilidad se excluyen entre sí.
+    const persona = (id: string): string => id.split('-')[0];
+    const mismaPersona = ['edda', 'lumen'].includes(persona(positions[a].id))
+      && persona(positions[a].id) === persona(positions[b].id);
     assert(
       mismaPersona || separation > 0.9,
       `${positions[a].id} y ${positions[b].id} están a ${separation.toFixed(2)} m: se pisan`,
@@ -110,16 +115,26 @@ for (let a = 0; a < positions.length; a += 1) {
 
 /* ---------- los tres bancos siguen siendo tres ---------- */
 
+// Son los tres actos causales del slice —E2, E3 y E4— y la progresión de una variable por vez
+// que describe `diseno-bancos-ohm-lumen.md`: unir, cambiar, ajustar.
 const benches = [...anchorsSource.matchAll(/bench: '(ohm|lumen|gate)'/g)].map((match) => match[1]);
-assert(
-  benches.includes('ohm'),
-  'el pedestal tiene que estar marcado como banco: es el primer acto causal del slice',
-);
+for (const bench of ['ohm', 'lumen', 'gate']) {
+  assert(benches.includes(bench), `falta el anclaje del banco «${bench}»`);
+}
+assert(benches.length === 3, `hay ${benches.length} bancos declarados; la Unidad 1 tiene 3`);
 assert(
   castSource.includes('onBench'),
   'el reparto tiene que derivar los bancos al mundo en vez de abrir el modal',
 );
 
+/* ---------- las tres escenas jugables tienen reparto ---------- */
+
+const rooms = new Set(anchors.map((anchor) => anchor.room));
+for (const room of ['plaza', 'taller', 'puerta', 'manantial_ohm']) {
+  assert(rooms.has(room), `la sala ${room} no aporta ningún anclaje al mundo HD-2D`);
+}
+
 console.log(
-  `U1 anclajes HD-2D: OK (${anchors.length} anclajes, todos resuelven a una cosa de /jugar)`,
+  `U1 anclajes HD-2D: OK (${anchors.length} anclajes de ${rooms.size} salas, `
+  + 'todos resuelven a una cosa de /jugar)',
 );

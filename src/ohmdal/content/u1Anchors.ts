@@ -111,6 +111,125 @@ export const U1_ANCHORS: readonly U1Anchor[] = [
     source: { room: 'plaza', thing: 'lampara2' },
     actor: null,
   },
+
+  /* ---------- E3 · Taller de Lumen ---------- */
+  // La conversión desde la planta cenital deja de ser literal a partir de acá: la sala de
+  // `/jugar` es un cuadrado de 960×540 y el Taller construido es una nave ancha y baja. Lo que
+  // se conserva es la **relación**: el banco al este, Lumen a su lado, los estantes contra el
+  // fondo y el generador en el rincón opuesto a la puerta.
+  {
+    id: 'banco',
+    position: { x: 4.8, z: -2.5 },
+    source: { room: 'taller', thing: 'banco' },
+    actor: null,
+    bench: 'lumen',
+    reach: 2.4,
+  },
+  {
+    id: 'lumen',
+    position: { x: 3.2, z: -1.1 },
+    source: { room: 'taller', thing: 'lumen' },
+    actor: 'lumen',
+    facing: 90,
+  },
+  {
+    id: 'edda-taller',
+    position: { x: 2.5, z: 0.9 },
+    source: { room: 'taller', thing: 'edda-taller' },
+    actor: 'edda',
+    facing: 90,
+  },
+  {
+    id: 'estantes',
+    position: { x: -1.2, z: -4.1 },
+    source: { room: 'taller', thing: 'estantes' },
+    actor: null,
+    reach: 1.9,
+  },
+  {
+    id: 'estantes-derecha',
+    position: { x: 6.4, z: -4.1 },
+    source: { room: 'taller', thing: 'estantes-derecha' },
+    actor: null,
+    reach: 1.9,
+  },
+  {
+    id: 'generador-taller',
+    position: { x: 7.2, z: 2.4 },
+    source: { room: 'taller', thing: 'generador-taller' },
+    actor: null,
+    reach: 2.2,
+  },
+
+  /* ---------- E4 · Puerta de Ohm ---------- */
+  {
+    id: 'lapuerta',
+    position: { x: 13.5, z: -0.5 },
+    source: { room: 'puerta', thing: 'lapuerta' },
+    actor: null,
+    bench: 'gate',
+    // Coincide con `R8_DOOR_MEASURE`, que es donde GF-07 pide el frame de la medición.
+    reach: 2.8,
+  },
+  {
+    id: 'edda-puerta',
+    position: { x: 11.4, z: -1.7 },
+    source: { room: 'puerta', thing: 'edda-puerta' },
+    actor: 'edda',
+    facing: 90,
+  },
+  {
+    id: 'lumen-puerta',
+    position: { x: 11.4, z: 1.5 },
+    source: { room: 'puerta', thing: 'lumen-puerta' },
+    actor: 'lumen',
+    facing: 90,
+  },
+
+  /* ---------- E5 · Manantial ---------- */
+  {
+    id: 'cauce-maestro',
+    position: { x: 18, z: 1.5 },
+    source: { room: 'manantial_ohm', thing: 'cauce-maestro' },
+    actor: null,
+    reach: 2.6,
+  },
+  {
+    id: 'hito-proporciones',
+    position: { x: 16.8, z: -2.6 },
+    source: { room: 'manantial_ohm', thing: 'hito-proporciones' },
+    actor: null,
+    reach: 2,
+  },
+  {
+    id: 'mirador-manantial',
+    position: { x: 19.8, z: -1.4 },
+    source: { room: 'manantial_ohm', thing: 'mirador-manantial' },
+    actor: null,
+    reach: 2.4,
+  },
+  {
+    // Ohm acompaña al jugador desde que despierta, así que acá no lleva cuerpo propio: sería
+    // un segundo autómata a veinte metros del primero. Es el punto donde se lo consulta.
+    id: 'ohm-manantial',
+    position: { x: 16.4, z: 0.4 },
+    source: { room: 'manantial_ohm', thing: 'ohm-manantial' },
+    actor: null,
+  },
+  {
+    id: 'edda-manantial',
+    position: { x: 15.6, z: 2.1 },
+    source: { room: 'manantial_ohm', thing: 'edda-manantial' },
+    actor: 'edda',
+    facing: 90,
+  },
+  {
+    id: 'lumen-manantial',
+    position: { x: 16.9, z: 3.1 },
+    source: { room: 'manantial_ohm', thing: 'lumen-manantial' },
+    actor: 'lumen',
+    facing: 90,
+  },
 ];
 
 export function anchorById(id: string): U1Anchor {

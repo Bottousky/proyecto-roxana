@@ -9,6 +9,7 @@ import {
 import { NAVIGATION_REGIONS } from '../navigation/navigation.ts';
 import { createPlazaKit } from './plazaKit.ts';
 import { createTallerKit } from './tallerKit.ts';
+import { createPuertaKit, type WaterState } from './puertaKit.ts';
 import {
   BOX_MODULES,
   COLLIDERS,
@@ -60,6 +61,10 @@ export interface OhmdalBlockout {
   readonly materials: BlockoutMaterialSet;
   readonly lighting: BlockoutLightRig;
   setTimeOfDay(timeOfDay: BlockoutTimeOfDay): void;
+  /** E5: el estado del agua en el Manantial. Lo decide el mundo según los flags de `/jugar`. */
+  setSpringWaterState(state: WaterState): void;
+  /** E4: cuánto están abiertas las hojas de la Puerta. `0` cerrada, `1` abierta del todo. */
+  setDoorOpening(amount: number): void;
   diagnostics(): BlockoutDiagnostics;
   dispose(): void;
 }
@@ -159,6 +164,9 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
   // Los faldones y el vano del Taller se desvanecen igual que cualquier otro oclusor: el kit
   // aporta sus bindings y el controlador de oclusión no se entera de que cambió quién los hace.
   occlusionBindings.push(...taller.occlusionBindings);
+  const puerta = createPuertaKit();
+  visualLayer.add(puerta.root);
+  occlusionBindings.push(...puerta.occlusionBindings);
 
   for (const definition of BOX_MODULES) {
     const moduleRoot = new THREE.Group();
@@ -265,6 +273,15 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
       lighting.setTimeOfDay(timeOfDay);
       plaza.setTimeOfDay(timeOfDay);
       taller.setTimeOfDay(timeOfDay);
+      puerta.setTimeOfDay(timeOfDay);
+    },
+    setSpringWaterState(state) {
+      if (disposed) throw new Error('Ohmdal blockout is disposed');
+      puerta.setWaterState(state);
+    },
+    setDoorOpening(amount) {
+      if (disposed) throw new Error('Ohmdal blockout is disposed');
+      puerta.setDoorOpening(amount);
     },
     diagnostics() {
       return {
@@ -283,6 +300,7 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
       lighting.dispose();
       plaza.dispose();
       taller.dispose();
+      puerta.dispose();
       root.removeFromParent();
       root.clear();
       geometries.forEach((geometry) => geometry.dispose());

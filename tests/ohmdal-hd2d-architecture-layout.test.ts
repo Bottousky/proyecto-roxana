@@ -43,21 +43,21 @@ for (const socket of ARCHITECTURE_SOCKETS) {
   assert(isOnGameplayPlane(socket.position), `${socket.id} permanece en Y=0`);
   assert(socket.width >= 3, `${socket.id} conserva paso legible`);
 }
-// Cada zona nombra su silueta dominante. La Plaza ya no la declara como modulo de prueba: la
-// construye `plazaKit`, asi que su landmark es el nodo que el kit publica en la escena.
-const KIT_LANDMARKS = new Set(['PLAZA_PORTAL_GATE', 'TALLER_KIT']);
+// Cada zona nombra su silueta dominante. Ninguna de las tres la declara como modulo de
+// prueba: las construyen `plazaKit`, `tallerKit` y `puertaKit`, asi que su landmark es el
+// nodo que cada kit publica en la escena.
+const KIT_LANDMARKS = new Set(['PLAZA_PORTAL_GATE', 'TALLER_KIT', 'PUERTA_KIT']);
 for (const zone of LEVEL_ZONES) {
   const declared = BOX_MODULES.some((module) => module.id === zone.landmarkId)
     || KIT_LANDMARKS.has(zone.landmarkId);
   assert(declared, `${zone.id} declara un landmark visible`);
 }
-const doorFrame = BOX_MODULES.find((module) => module.id === 'ohm-door-frame');
-assert(doorFrame?.tags.includes('landmark') === true, 'el marco de la Puerta conserva jerarquia de landmark');
-assert(doorFrame?.tags.includes('cameraOccluder') === false, 'el landmark de Puerta no participa del fade');
-for (const pierId of ['door-pier-north', 'door-pier-south']) {
-  const pier = BOX_MODULES.find((module) => module.id === pierId);
-  assert(pier?.tags.includes('cameraOccluder') === true, `${pierId} puede despejar sujetos protegidos`);
-  assert(pier?.tags.includes('landmark') === false, `${pierId} no suplanta el landmark dominante`);
+// Los unicos BOX_MODULES que sobreviven son los dos emisores: el rig de luz los busca por
+// nombre. Ninguno suplanta el landmark dominante de su zona.
+for (const emitterId of ['workshop-lantern-emitter', 'door-conduit-emitter']) {
+  const emitter = BOX_MODULES.find((module) => module.id === emitterId);
+  assert(emitter?.tags.includes('emitter') === true, `${emitterId} conserva su tag de emisor`);
+  assert(emitter?.tags.includes('landmark') !== true, `${emitterId} no suplanta el landmark dominante`);
 }
 
 const navigationIssues = validateNavigation();
