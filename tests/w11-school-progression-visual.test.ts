@@ -9,9 +9,13 @@ function assert(condition: boolean, message: string): void {
 const initial = deriveSchoolState(null, null);
 assert(initial.electronica.arcoCompleto === false, 'la escuela nueva empieza antes del cierre de Arco 1');
 assert(voxelZoneState('electronica', initial) === 'open', 'Electrónica conserva actividad parcial');
-for (const id of ['matematica', 'fisica', 'programacion'] as const) {
+for (const id of ['matematica', 'programacion'] as const) {
   assert(voxelZoneState(id, initial) === 'closed', `${id} empieza dormida`);
 }
+// Fisica es 'off' en `deriveSchoolState` (el slice M0..M0.7 ya está mergeado, gateado
+// por `arcOneCompleted`), lo que el voxel mapea a 'open'. La distinción es interna:
+// 'off' = el aula existe pero el recorrido espera al cierre de Arco I.
+assert(voxelZoneState('fisica', initial) === 'open', 'fisica existe como slice pero su recorrido espera arco 1');
 
 const complete = deriveSchoolState(JSON.stringify({
   flags: {
