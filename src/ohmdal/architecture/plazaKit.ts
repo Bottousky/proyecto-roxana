@@ -110,20 +110,44 @@ function paverFloor(): THREE.BufferGeometry {
   return mergeGeometries(pavers, false)!;
 }
 
-/** Muro de perímetro con pilastras: da silueta a los costados del cuadro sin cerrar el paso. */
+/**
+ * Pretiles de perímetro: bordes bajos de banqueta, no muros.
+ *
+ * La Plaza es un espacio público, no una habitación. Estos pretiles a 1.2 m de altura
+ * dejan ver el Taller al este, el Manantial más allá y el cielo arriba, y al mismo
+ * tiempo definen el límite de la Plaza como lugar.
+ */
 function perimeterWall(z: number): THREE.BufferGeometry[] {
   const pieces: THREE.BufferGeometry[] = [];
-  const paintFn = stonePaint(2.6);
+  const paintFn = stonePaint(1.3);
   for (let x = PLAZA_BOUNDS.minX; x < PLAZA_BOUNDS.maxX - 0.5; x += 2) {
     const span = Math.min(2, PLAZA_BOUNDS.maxX - x);
-    const height = 2.1 + noise(x, z) * 0.25;
-    pieces.push(block(span - 0.08, height, 0.62, x + span / 2, 0, z, paintFn));
-    // Pilastra cada dos tramos: rompe la horizontal y explica cómo se sostiene el muro.
+    const height = 1.2 + noise(x, z) * 0.12;
+    pieces.push(block(span - 0.08, height, 0.55, x + span / 2, 0, z, paintFn));
+    // Cada cuatro tramos, un banquito de Plaza: explica la escala humana y rompe la línea.
     if (Math.round(x) % 4 === 0) {
-      pieces.push(block(0.62, height + 0.7, 0.86, x, 0, z, paintFn));
-      pieces.push(block(0.78, 0.22, 1.02, x, height + 0.7, z, paintFn));
+      pieces.push(block(0.5, 0.5, 0.4, x, 0, z, paintFn));
     }
   }
+  return pieces;
+}
+
+/**
+ * Árboles de la Plaza: troncos cilíndricos y copas cónicas. Repartidos a los costados
+ * del pasillo central — no tapan el pedestal de Ohm ni la campana, pero enmarcan el
+ * lugar como pueblo y no como plaza vacía.
+ */
+function plazaTree(x: number, z: number, scale = 1): THREE.BufferGeometry[] {
+  const pieces: THREE.BufferGeometry[] = [];
+  const trunkPaint = stonePaint(1.4);
+  const leavesPaint = stonePaint(2.4);
+  const trunkHeight = 1.2 * scale;
+  const crownRadius = 0.9 * scale;
+  const crownHeight = 2.2 * scale;
+  pieces.push(block(0.22, trunkHeight, 0.22, x, 0, z, trunkPaint));
+  pieces.push(block(crownRadius * 1.4, crownHeight * 0.45, crownRadius * 1.4, x, trunkHeight, z, leavesPaint));
+  pieces.push(block(crownRadius * 1.0, crownHeight * 0.35, crownRadius * 1.0, x, trunkHeight + crownHeight * 0.45, z, leavesPaint));
+  pieces.push(block(crownRadius * 0.55, crownHeight * 0.20, crownRadius * 0.55, x, trunkHeight + crownHeight * 0.80, z, leavesPaint));
   return pieces;
 }
 
@@ -212,6 +236,24 @@ export interface PlazaKit {
 
 // El piso y lo construido no comparten tono. En las referencias el suelo es el valor claro
 // sobre el que se recortan las siluetas; si empata con los muros, la Plaza se vuelve una masa.
+
+/**
+ * Posiciones de los árboles de la Plaza. Cada triplete es (x, z, escala).
+ *
+ * Repartidos por el borde de la huella, no por el centro: cuatro en las esquinas y dos
+ * flanqueando el monumento de la campana. La diagonal central queda libre, que es por
+ * donde entra y sale el recorrido. Escalas 0.85–1.0 para que ninguno tape la silueta del
+ * Portal desde R0 ni compita con el dintel de cobre.
+ */
+const TREE_POSITIONS: ReadonlyArray<readonly [number, number, number]> = [
+  [-19, -5.5, 1.0],
+  [-19, 5.5, 1.0],
+  [-7, 5.8, 0.85],
+  [-7, -5.8, 0.85],
+  [-5.5, -5.5, 1.0],
+  [-5.5, 5.5, 1.0],
+];
+
 const FLOOR_COLORS: Readonly<Record<BlockoutTimeOfDay, number>> = {
   afternoon: 0xa89a89,
   twilight: 0x7a7c88,
@@ -249,6 +291,9 @@ export function createPlazaKit(): PlazaKit {
     ...gate.stone,
     ...monument.stone,
     ...pedestalSteps(),
+    // Los árboles se funden en la misma malla de piedra que los pretiles: el presupuesto
+    // de dibujo es 3 mallas (piso / piedra / cobre) y no se reabre por sumar follaje.
+    ...TREE_POSITIONS.flatMap(([x, z, s]) => plazaTree(x, z, s)),
   ];
   const copperPieces = [...gate.copper, ...monument.copper];
 

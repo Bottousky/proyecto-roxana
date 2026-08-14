@@ -10,6 +10,8 @@ import { NAVIGATION_REGIONS } from '../navigation/navigation.ts';
 import { createPlazaKit } from './plazaKit.ts';
 import { createTallerKit } from './tallerKit.ts';
 import { createPuertaKit, type WaterState } from './puertaKit.ts';
+import { createBasicUnitKit } from './basicRoomKit.ts';
+import { BASIC_UNITS } from './units.ts';
 import {
   BOX_MODULES,
   COLLIDERS,
@@ -168,6 +170,15 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
   visualLayer.add(puerta.root);
   occlusionBindings.push(...puerta.occlusionBindings);
 
+  // Las 4 unidades básicas del arco (Castillo, Forja, Terrazas, Faro). Cada una se monta
+  // con su propio kit: piso empedrado, perímetro, siluetas por sub-sala. Devuelven una
+  // referencia al kit para poder propagar el cambio de hora del día.
+  const basicUnits = BASIC_UNITS.map((definition) => {
+    const kit = createBasicUnitKit(definition);
+    visualLayer.add(kit.root);
+    return kit;
+  });
+
   for (const definition of BOX_MODULES) {
     const moduleRoot = new THREE.Group();
     moduleRoot.name = definition.id;
@@ -274,6 +285,7 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
       plaza.setTimeOfDay(timeOfDay);
       taller.setTimeOfDay(timeOfDay);
       puerta.setTimeOfDay(timeOfDay);
+      for (const kit of basicUnits) kit.setTimeOfDay(timeOfDay);
     },
     setSpringWaterState(state) {
       if (disposed) throw new Error('Ohmdal blockout is disposed');
@@ -301,6 +313,7 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
       plaza.dispose();
       taller.dispose();
       puerta.dispose();
+      for (const kit of basicUnits) kit.dispose();
       root.removeFromParent();
       root.clear();
       geometries.forEach((geometry) => geometry.dispose());

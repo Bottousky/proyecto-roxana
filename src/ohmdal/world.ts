@@ -4,6 +4,7 @@
 // que es lo que `RuntimeHost` necesita para montarlo bajo demanda.
 import * as THREE from 'three';
 import { createOhmdalPostFx } from './postfx.ts';
+import { createOhmdalAtmosphere } from './atmosphere.ts';
 import {
   AuthorCameraController,
   CameraOcclusionController,
@@ -59,6 +60,10 @@ const ZONE_NAMES = {
   portal_plaza: 'Portal · Plaza',
   taller: 'Taller · Lumen',
   puerta_manantial: 'Puerta · Manantial',
+  castle: 'Castillo',
+  forge: 'Forja',
+  terraces: 'Terrazas',
+  lighthouse: 'Faro',
 } as const;
 
 export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
@@ -89,8 +94,10 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   ui.root.append(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x202534);
+  // El fondo y la niebla son de la atmósfera, que se monta más abajo: un color plano detrás de
+  // un diorama iluminado lo deja recortado contra el vacío.
   const blockout = createOhmdalBlockout(scene);
+  const atmosphere = createOhmdalAtmosphere(scene);
   const occlusionController = new CameraOcclusionController(blockout.occlusionBindings);
   const student = createStudentActor();
   scene.add(student.root);
@@ -185,6 +192,10 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let autoRoute = false;
   let routeIndex = 1;
+  // Si el usuario interactuó (movió al estudiante o presionó una tecla) antes del delay,
+  // el auto-start del recorrido se cancela. Así el recorrido solo se inicia solo cuando
+  // el usuario abre la página y se queda mirando — el caso en que más lo necesita.
+  let userInteracted = false;
   let elapsedSeconds = 0;
   let currentHeading = 90;
   let moving = false;
@@ -192,6 +203,8 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   let diagnosisUnlocked = false;
   let currentAnchor: CameraAnchorId = 'C1_PORTAL_PLAZA';
   let lastBlockedIds = new Set<string>();
+  /** Reusado cada cuadro: el bucle no puede permitirse un `Vector3` nuevo por actualización. */
+  const atmosphereFocus = new THREE.Vector3();
 
   function viewportProfile(): ViewportProfileId {
     return window.innerWidth <= 720 ? 'mobile-390x844' : 'desktop-1440x900';
@@ -207,7 +220,23 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
 
   function rebuildCamera(): void {
     cameraController.dispose();
-    currentAnchor = player.x >= 9.5 ? 'C3_DOOR_SPRING' : player.x >= -3 ? 'C2_TALLER' : 'C1_PORTAL_PLAZA';
+    // Selector compartido: la misma funcion decide la ancla tanto en el cambio de
+    // viewport como en el frame de update. Mantiene la cinematica del slice y del arco
+    // largo bajo un mismo contrato: `selectCameraAnchor(current, x) -> siguiente`.
+    const next: CameraAnchorId = player.x >= 118
+      ? 'C7_LIGHTHOUSE'
+      : player.x >= 82
+        ? 'C6_TERRACES'
+        : player.x >= 52
+          ? 'C5_FORGE'
+          : player.x >= 22
+            ? 'C4_CASTLE'
+            : player.x >= 9.5
+              ? 'C3_DOOR_SPRING'
+              : player.x >= -3
+                ? 'C2_TALLER'
+                : 'C1_PORTAL_PLAZA';
+    currentAnchor = next;
     cameraController = new AuthorCameraController({
       variant: cameraVariant,
       viewport: viewportProfile(),
@@ -346,6 +375,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     if (inputModel.press(event.code)) event.preventDefault();
     if (action === null) return;
     if (action === 'up' || action === 'down' || action === 'left' || action === 'right') {
+      userInteracted = true;
       autoRoute = false;
       ui.routeToggle.textContent = 'Recorrido automático';
     } else if (action === 'action' && !wasDown) {
@@ -364,6 +394,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       event.preventDefault();
       moveButton.setPointerCapture(event.pointerId);
       inputModel.pressAction(move);
+      userInteracted = true;
       autoRoute = false;
     };
     const end = (): void => { inputModel.releaseAction(move); };
@@ -445,6 +476,18 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       );
     } else if (currentAnchor === 'C3_DOOR_SPRING') {
       protectedSockets.push(new THREE.Vector3(13.5, 0.55, -0.5));
+    } else if (currentAnchor === 'C4_CASTLE') {
+      // El corazón del Castillo protege el trono: la silueta distintiva del heart, a la
+      // altura del pecho, para que el oclusor del fondo no se lo coma en cámara.
+      protectedSockets.push(new THREE.Vector3(46.5, 0.3, 0), new THREE.Vector3(46.5, 2.0, 0));
+    } else if (currentAnchor === 'C5_FORGE') {
+      protectedSockets.push(new THREE.Vector3(76.5, 0.4, 0), new THREE.Vector3(76.5, 1.8, 0));
+    } else if (currentAnchor === 'C6_TERRACES') {
+      // El foco de la cámara está en y=2.5 (la unidad trepa): protegemos un punto a la
+      // altura del mirador para que la silueta del mural no se desvanezca.
+      protectedSockets.push(new THREE.Vector3(108.5, 1.5, 0), new THREE.Vector3(108.5, 3.5, 0));
+    } else if (currentAnchor === 'C7_LIGHTHOUSE') {
+      protectedSockets.push(new THREE.Vector3(149.5, 0.3, 0), new THREE.Vector3(149.5, 2.5, 0));
     }
     lastBlockedIds = findBlockedOccluderIds(
       cameraController.camera.position,
@@ -456,6 +499,11 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     // mundo de 38 metros.
     blockout.lighting.focusShadowOn(player.x, player.z);
     blockout.lighting.syncEmitterState();
+    // El polvo se envuelve alrededor del jugador por la misma razón que la ventana de sombra:
+    // es el centro del encuadre, y repartirlo por los 38 metros del mundo dejaría en cuadro una
+    // décima parte de las motas.
+    atmosphereFocus.set(player.x, 0, player.z);
+    atmosphere.update(dt, atmosphereFocus);
   }
 
   function snapshot(): HarnessSnapshot {
@@ -560,7 +608,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   ui.timeToggle.addEventListener('click', (event) => {
     timeVariant = timeVariant === 'afternoon' ? 'twilight' : 'afternoon';
     blockout.setTimeOfDay(timeVariant);
-    scene.background = new THREE.Color(timeVariant === 'twilight' ? 0x151929 : 0x202534);
+    atmosphere.setTimeOfDay(timeVariant);
     (event.currentTarget as HTMLButtonElement).textContent = timeVariant === 'afternoon' ? 'Crepúsculo' : 'Tarde';
   });
   ui.routeToggle.addEventListener('click', (event) => {
@@ -631,6 +679,9 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   // Sólo en desarrollo, como el resto de las sondas.
   if (import.meta.env.DEV) {
     const scope = window as unknown as Record<string, unknown>;
+    // Los numeros del acabado se aprueban mirando. Con esto se mueven en caliente:
+    // `ohmdalTune({ tiltStrength: 6, vignette: 0.7 })`.
+    scope.ohmdalTune = (values: Parameters<typeof postfx.tune>[0]): void => { postfx.tune(values); };
     scope.dumpOhmdalScene = (): string => {
       const box = new THREE.Box3();
       const size = new THREE.Vector3();
@@ -654,6 +705,18 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
 
   updateHud(1);
   startLoop();
+
+  // El recorrido automático se inicia solo 3 segundos después de cargar, salvo que el
+  // usuario haya movido al estudiante o presionado una tecla. Es el caso del usuario que
+  // abre la página y se queda mirando: la Plaza sola en un vacío azul no cuenta la historia
+  // del arco, y la R la cuenta. Cualquier interacción cancela el auto-start y deja al
+  // usuario explorar a su ritmo.
+  window.setTimeout(() => {
+    if (!userInteracted && !autoRoute) {
+      autoRoute = true;
+      ui.routeToggle.textContent = 'Pausar recorrido';
+    }
+  }, 3000);
 
   return {
     pause: stopLoop,
@@ -686,6 +749,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       markerGroup.removeFromParent();
       markerGeometry.dispose();
       markerMaterial.dispose();
+      atmosphere.dispose();
       blockout.dispose();
       postfx.dispose();
       renderer.renderLists.dispose();

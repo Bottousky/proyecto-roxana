@@ -2,7 +2,14 @@ import * as THREE from 'three';
 import { routeAnchor } from '../architecture/levelData.ts';
 
 export type CameraVariant = 'quasi-orthographic' | 'soft-perspective';
-export type CameraAnchorId = 'C1_PORTAL_PLAZA' | 'C2_TALLER' | 'C3_DOOR_SPRING';
+export type CameraAnchorId =
+  | 'C1_PORTAL_PLAZA'
+  | 'C2_TALLER'
+  | 'C3_DOOR_SPRING'
+  | 'C4_CASTLE'
+  | 'C5_FORGE'
+  | 'C6_TERRACES'
+  | 'C7_LIGHTHOUSE';
 export type ViewportProfileId = 'desktop-1440x900' | 'mobile-390x844';
 
 export interface NamedLocalBounds {
@@ -49,6 +56,33 @@ export const CAMERA_TRANSITION_VOLUMES = Object.freeze({
     hysteresisMeters: 0.75,
     durationSeconds: 1.10,
   },
+  // Los volúmenes C3→C4..C7 están en x = 22, 52, 82 y 118: los puntos medios de los
+  // pasillos entre unidades. La histéresis es más generosa (1.5 m) porque el mundo se
+  // extiende a 152 m y la cámara tiende a oscilar si se afina demasiado.
+  castleApproach: {
+    id: 'VOLUME_C3_TO_C4',
+    crossingX: 22,
+    hysteresisMeters: 1.5,
+    durationSeconds: 1.10,
+  },
+  forgeApproach: {
+    id: 'VOLUME_C4_TO_C5',
+    crossingX: 52,
+    hysteresisMeters: 1.5,
+    durationSeconds: 1.10,
+  },
+  terracesApproach: {
+    id: 'VOLUME_C5_TO_C6',
+    crossingX: 82,
+    hysteresisMeters: 1.5,
+    durationSeconds: 1.10,
+  },
+  lighthouseApproach: {
+    id: 'VOLUME_C6_TO_C7',
+    crossingX: 118,
+    hysteresisMeters: 1.5,
+    durationSeconds: 1.10,
+  },
 });
 
 export const CAMERA_FORWARD = new THREE.Vector3(1, 0, 0);
@@ -63,7 +97,10 @@ export const CAMERA_RIGHT = new THREE.Vector3().crossVectors(CAMERA_FORWARD, CAM
 // La inclinacion sale de descomponer 50 grados sobre el horizonte: cos(50) hacia atras y
 // sin(50) hacia arriba. Es el rango en el que las referencias muestran el piso sin aplastar
 // las fachadas. El vector se normaliza despues, asi que estos numeros ya salen unitarios.
-export const CAMERA_PITCH_DEGREES = 50;
+// 42° en vez de 50°: con 50° la cámara se vuelve cenital y el mundo pierde horizonte. DQ III
+// HD-2D se ve a ~40-45°, que es el rango que mantiene la profundidad del suelo sin aplastar
+// las fachadas. Sigue dentro del assert del test (40-60°), que es lo que protege el contrato.
+export const CAMERA_PITCH_DEGREES = 42;
 
 const PITCH_RADIANS = (CAMERA_PITCH_DEGREES * Math.PI) / 180;
 
@@ -91,8 +128,9 @@ export const CAMERA_VIEW_OFFSET = viewOffsetFromComponents(VIEW_OFFSET_COMPONENT
 
 // C3 abre un poco el angulo para que la Puerta no tape el Manantial que hay detras. Sigue
 // siendo frontal —`right` en 0— porque romper la simetria en una sola camara se lee como un
-// error de montaje al cruzar el umbral, no como intencion.
-export const C3_PITCH_DEGREES = 46;
+// error de montaje al cruzar el umbral, no como intencion. 38° está por debajo del default
+// (42°): la Puerta-Manantial necesita ver la fuente detrás del muro, no el techo.
+export const C3_PITCH_DEGREES = 38;
 
 const C3_PITCH_RADIANS = (C3_PITCH_DEGREES * Math.PI) / 180;
 
@@ -152,6 +190,58 @@ export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>
     },
     protectedSubjects: ['player-feet', 'player-head', 'ohm-head', 'door-measure', 'spring-consequence'],
     verticalSpan: { desktop: 12, mobile: 18 },
+  },
+  // Anclas del resto del arco. Mismo offset y misma ortogonalidad que C3; lo único que
+  // cambia es el foco en x, que sigue al centro de cada unidad. La altura de foco sube
+  // en las Terrazas porque la unidad trepa 4.5 m y el objetivo de cámara tiene que
+  // quedar a la altura del jugador cuando está en la parte alta.
+  C4_CASTLE: {
+    id: 'C4_CASTLE',
+    focus: new THREE.Vector3(37, 1, 0),
+    forward: CAMERA_FORWARD,
+    targetBounds: {
+      right: { min: -3, max: 3 },
+      forward: { min: -3, max: 3 },
+      vertical: { min: 0.8, max: 1.8 },
+    },
+    protectedSubjects: ['player-feet', 'player-head'],
+    verticalSpan: { desktop: 13, mobile: 19 },
+  },
+  C5_FORGE: {
+    id: 'C5_FORGE',
+    focus: new THREE.Vector3(67, 1, 0),
+    forward: CAMERA_FORWARD,
+    targetBounds: {
+      right: { min: -3, max: 3 },
+      forward: { min: -3, max: 3 },
+      vertical: { min: 0.8, max: 1.8 },
+    },
+    protectedSubjects: ['player-feet', 'player-head'],
+    verticalSpan: { desktop: 13, mobile: 19 },
+  },
+  C6_TERRACES: {
+    id: 'C6_TERRACES',
+    focus: new THREE.Vector3(100, 2.5, 0),
+    forward: CAMERA_FORWARD,
+    targetBounds: {
+      right: { min: -3, max: 3 },
+      forward: { min: -3, max: 3 },
+      vertical: { min: 0.8, max: 1.8 },
+    },
+    protectedSubjects: ['player-feet', 'player-head'],
+    verticalSpan: { desktop: 14, mobile: 20 },
+  },
+  C7_LIGHTHOUSE: {
+    id: 'C7_LIGHTHOUSE',
+    focus: new THREE.Vector3(136, 1.5, 0),
+    forward: CAMERA_FORWARD,
+    targetBounds: {
+      right: { min: -3, max: 3 },
+      forward: { min: -3, max: 3 },
+      vertical: { min: 0.8, max: 1.8 },
+    },
+    protectedSubjects: ['player-feet', 'player-head'],
+    verticalSpan: { desktop: 13, mobile: 19 },
   },
 };
 

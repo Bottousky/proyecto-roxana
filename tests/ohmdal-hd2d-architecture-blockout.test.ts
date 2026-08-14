@@ -69,9 +69,9 @@ assert(
   blockout.visualLayer.children.some((child) => child.name === 'door-conduit-emitter'),
   'el emisor del conducto sobrevive: el rig de luz lo busca por nombre',
 );
-assert(before.visualMeshCount === 5, 'tres kits construidos mas los dos emisores');
-assert(before.colliderMeshCount === 12, 'los colliders primitivos son explicitos');
-assert(before.navigationMeshCount === 3, 'cada set tiene region de navegacion plana');
+assert(before.visualMeshCount === 9, 'siete kits construidos (3 del slice + 4 del arco) mas los dos emisores');
+assert(before.colliderMeshCount === 36, 'colliders primitivos: 12 del slice + 24 de los perimetros del arco');
+assert(before.navigationMeshCount === 7, 'cada zona del arco tiene region de navegacion plana');
 assert(before.geometryCount < before.visualMeshCount + before.colliderMeshCount + 10, 'geometrias repetidas se comparten');
 assert(before.material.textureCount === 0, 'el blockout no introduce texturas');
 assert(before.lighting.lightCount === 4, 'la luz global y local tiene inventario completo');

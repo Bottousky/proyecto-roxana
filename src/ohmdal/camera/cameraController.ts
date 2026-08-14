@@ -25,6 +25,10 @@ const TARGET_HALF_LIFE_SECONDS = 0.16;
 const TRANSITION_SECONDS: Readonly<Record<string, number>> = {
   'C1_PORTAL_PLAZA>C2_TALLER': 0.9,
   'C2_TALLER>C3_DOOR_SPRING': 1.1,
+  'C3_DOOR_SPRING>C4_CASTLE': 1.1,
+  'C4_CASTLE>C5_FORGE': 1.1,
+  'C5_FORGE>C6_TERRACES': 1.1,
+  'C6_TERRACES>C7_LIGHTHOUSE': 1.1,
 };
 
 interface TransitionState {
@@ -299,15 +303,40 @@ export function selectCameraAnchor(
   current: CameraAnchorId,
   playerX: number,
 ): CameraAnchorId {
-  const workshop = CAMERA_TRANSITION_VOLUMES.tallerThreshold;
+  const taller = CAMERA_TRANSITION_VOLUMES.tallerThreshold;
   const door = CAMERA_TRANSITION_VOLUMES.doorApproach;
+  const castle = CAMERA_TRANSITION_VOLUMES.castleApproach;
+  const forge = CAMERA_TRANSITION_VOLUMES.forgeApproach;
+  const terraces = CAMERA_TRANSITION_VOLUMES.terracesApproach;
+  const lighthouse = CAMERA_TRANSITION_VOLUMES.lighthouseApproach;
   if (current === 'C1_PORTAL_PLAZA') {
-    return playerX >= workshop.crossingX ? 'C2_TALLER' : current;
+    return playerX >= taller.crossingX ? 'C2_TALLER' : current;
   }
   if (current === 'C2_TALLER') {
-    if (playerX < workshop.crossingX - workshop.hysteresisMeters) return 'C1_PORTAL_PLAZA';
+    if (playerX < taller.crossingX - taller.hysteresisMeters) return 'C1_PORTAL_PLAZA';
     if (playerX >= door.crossingX) return 'C3_DOOR_SPRING';
     return current;
   }
-  return playerX < door.crossingX - door.hysteresisMeters ? 'C2_TALLER' : current;
+  if (current === 'C3_DOOR_SPRING') {
+    if (playerX < door.crossingX - door.hysteresisMeters) return 'C2_TALLER';
+    if (playerX >= castle.crossingX) return 'C4_CASTLE';
+    return current;
+  }
+  if (current === 'C4_CASTLE') {
+    if (playerX < castle.crossingX - castle.hysteresisMeters) return 'C3_DOOR_SPRING';
+    if (playerX >= forge.crossingX) return 'C5_FORGE';
+    return current;
+  }
+  if (current === 'C5_FORGE') {
+    if (playerX < forge.crossingX - forge.hysteresisMeters) return 'C4_CASTLE';
+    if (playerX >= terraces.crossingX) return 'C6_TERRACES';
+    return current;
+  }
+  if (current === 'C6_TERRACES') {
+    if (playerX < terraces.crossingX - terraces.hysteresisMeters) return 'C5_FORGE';
+    if (playerX >= lighthouse.crossingX) return 'C7_LIGHTHOUSE';
+    return current;
+  }
+  // C7_LIGHTHOUSE
+  return playerX < lighthouse.crossingX - lighthouse.hysteresisMeters ? 'C6_TERRACES' : current;
 }

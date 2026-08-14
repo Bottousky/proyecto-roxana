@@ -101,7 +101,7 @@ assert(
 
 const blockout = createOhmdalBlockout();
 blockout.root.updateMatrixWorld(true);
-assert(blockout.diagnostics().visualMeshCount === 5, 'la diferenciacion no aumenta modulos visibles: tres kits construidos mas los dos emisores');
+assert(blockout.diagnostics().visualMeshCount === 9, 'la diferenciacion no aumenta modulos visibles: siete kits construidos (3 del slice + 4 del arco) mas los dos emisores');
 
 // C3 casi ortografica tiene un encuadre propio; perspectiva permanece congelada.
 // Se diferencia por inclinacion, no por giro lateral: la camara HD-2D es frontal en los tres
