@@ -80,7 +80,7 @@ export function deriveSchoolState(saveRaw: string | null, webRaw: string | null)
     aulas: {
       electronica: electronicaEstado,
       programacion: 'cerrada',
-      fisica: 'cerrada',
+      fisica: 'off',
       matematica: 'cerrada',
     },
     electronica: {

@@ -688,6 +688,19 @@ export function initAulas(): void {
         rattleDoor(doorEl);
         return;
       }
+      // El aula de Física no es un overlay del Instituto: es la puerta al mundo
+      // de Physica (página propia). El portal de Ohmdal no se toca.
+      if (aulaId === 'fisica') {
+        if (prefersReducedMotion()) {
+          window.location.href = '/physica/';
+          return;
+        }
+        playDoorOpen(true);
+        window.setTimeout(() => {
+          window.location.href = '/physica/';
+        }, 260);
+        return;
+      }
       openAula(aulaId, { fromDoorEl: doorEl, playSound: true });
     };
 
@@ -708,6 +721,10 @@ export function initAulas(): void {
     if (aulaId) {
       const estado = readSchoolState().aulas[aulaId];
       if (estado !== 'cerrada') {
+        if (aulaId === 'fisica') {
+          window.location.href = '/physica/';
+          return;
+        }
         // aulaOpening: la apertura animada ya está en curso (overlay todavía
         // display:none) — no pisarla con un open directo.
         if (!isOverlayOpen() && !aulaOpening) openAula(aulaId, { playSound: false });
@@ -722,7 +739,11 @@ export function initAulas(): void {
   if (initialAulaId) {
     const estado = readSchoolState().aulas[initialAulaId];
     if (estado !== 'cerrada') {
-      openAula(initialAulaId, { playSound: false });
+      if (initialAulaId === 'fisica') {
+        window.location.href = '/physica/';
+      } else {
+        openAula(initialAulaId, { playSound: false });
+      }
     }
   }
 }

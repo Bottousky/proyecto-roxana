@@ -1,0 +1,426 @@
+/* Chrome de Physica. La página vive fuera del shell de la escuela, así que
+   define su propia paleta y tipografía, siempre en español neutro. */
+:root {
+  --px-bg: #101c29;
+  --px-panel: rgba(13, 24, 36, 0.9);
+  --px-text: #e8eef6;
+  --px-muted: #9fb0c4;
+  --px-accent: #9edbff;
+  --px-copper: #e7b879;
+  --px-serif: 'Spectral', Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--px-bg);
+  color: var(--px-text);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+#px-app {
+  position: fixed;
+  inset: 0;
+}
+
+#px-game {
+  position: absolute;
+  inset: 0;
+}
+
+#px-game canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.px-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Título */
+#px-title {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 40%, #263449 0%, var(--px-bg) 70%);
+  z-index: 10;
+}
+
+.px-title-card {
+  text-align: center;
+  padding: 2rem;
+  max-width: 34rem;
+}
+
+.px-kicker {
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--px-muted);
+  margin: 0 0 0.6rem;
+}
+
+#px-title h1 {
+  font-family: var(--px-serif);
+  font-size: clamp(2.6rem, 8vw, 4.6rem);
+  margin: 0;
+  letter-spacing: 0.08em;
+  color: var(--px-accent);
+}
+
+.px-sub {
+  color: var(--px-muted);
+  font-size: 1rem;
+  margin: 0.6rem auto 1.6rem;
+  max-width: 26rem;
+  line-height: 1.5;
+}
+
+.px-buttons button {
+  font: inherit;
+  font-size: 1.05rem;
+  padding: 0.7rem 2.2rem;
+  border: 1px solid var(--px-accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--px-text);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.px-buttons button:hover {
+  background: var(--px-accent);
+  color: var(--px-bg);
+}
+
+.px-help {
+  margin-top: 1.4rem;
+  font-size: 0.8rem;
+  color: var(--px-muted);
+}
+
+/* HUD */
+#px-hud {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 5;
+}
+
+#px-back {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--px-muted);
+  border-radius: 999px;
+  background: var(--px-panel);
+  color: var(--px-text);
+  cursor: pointer;
+}
+
+#px-back:hover {
+  border-color: var(--px-accent);
+}
+
+/* ---------- UI del mundo ---------- */
+
+.px-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.px-prompt {
+  position: absolute;
+  bottom: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(20, 39, 55, 0.94), var(--px-panel));
+  border: 1px solid rgba(158, 219, 255, 0.7);
+  border-radius: 999px;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.9rem;
+  color: var(--px-text);
+  white-space: nowrap;
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.24);
+}
+
+.px-toast {
+  position: absolute;
+  top: 4.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--px-panel);
+  border: 1px solid var(--px-accent);
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.92rem;
+  color: var(--px-text);
+  max-width: min(90vw, 30rem);
+  text-align: center;
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.28);
+}
+
+.px-measure {
+  position: absolute;
+  transform: translate(-50%, -130%);
+  background: rgba(13, 20, 30, 0.9);
+  border: 1px solid var(--px-accent);
+  border-radius: 8px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  color: #cfeaff;
+  pointer-events: none;
+}
+
+.px-metro-ui {
+  position: absolute;
+  top: 0.75rem;
+  right: 4rem;
+  width: min(36vw, 24rem);
+  max-height: 70vh;
+  overflow: auto;
+  background: linear-gradient(180deg, rgba(20, 39, 55, 0.94), var(--px-panel));
+  border: 1px solid rgba(158, 219, 255, 0.55);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  color: var(--px-text);
+  z-index: 6;
+  pointer-events: auto;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.px-metro-panel h3 {
+  font-family: var(--px-serif);
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--px-accent);
+}
+
+.px-metro-panel ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.px-metro-panel li {
+  margin-bottom: 0.25rem;
+}
+
+.px-metro-panel li.done {
+  color: var(--px-accent);
+}
+
+.px-metro-panel li.pending {
+  color: var(--px-muted);
+  font-style: italic;
+}
+
+.px-bita-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--px-muted);
+  background: var(--px-panel);
+  color: var(--px-text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.px-bita-btn:hover {
+  border-color: var(--px-accent);
+}
+
+.px-bita-btn:focus-visible,
+.px-bita-close:focus-visible,
+.px-touch button:focus-visible,
+#px-back:focus-visible,
+.px-buttons button:focus-visible {
+  outline: 2px solid var(--px-copper);
+  outline-offset: 3px;
+}
+
+.px-bita {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 12, 18, 0.72);
+  pointer-events: auto;
+  z-index: 20;
+}
+
+.px-bita-panel {
+  position: relative;
+  width: min(92vw, 34rem);
+  max-height: 80vh;
+  overflow: auto;
+  background: var(--px-panel);
+  border: 1px solid var(--px-muted);
+  border-radius: 16px;
+  padding: 1.6rem 1.8rem;
+  color: var(--px-text);
+}
+
+.px-bita-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.9rem;
+  background: none;
+  border: none;
+  color: var(--px-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.px-bita-panel h3 {
+  font-family: var(--px-serif);
+  margin: 0 0 0.3rem;
+  color: var(--px-accent);
+}
+
+.px-bita-panel p {
+  max-width: 34rem;
+}
+
+.px-bita-fecha {
+  color: var(--px-muted);
+  font-size: 0.82rem;
+  margin: 0 0 1rem;
+}
+
+.px-bita-viv {
+  line-height: 1.55;
+}
+
+.px-bita-evidencia {
+  margin-top: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--px-copper);
+  background: rgba(231, 184, 121, 0.08);
+  line-height: 1.5;
+}
+
+.px-bita-formal {
+  margin-top: 1rem;
+}
+
+.px-bita-todo {
+  color: var(--px-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Controles táctiles */
+.px-touch {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.px-touch-left,
+.px-touch-right {
+  position: absolute;
+  bottom: 1.4rem;
+  display: flex;
+  gap: 0.5rem;
+  pointer-events: auto;
+}
+
+.px-touch-left {
+  left: 1.2rem;
+}
+
+.px-touch-right {
+  right: 1.2rem;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.px-touch button {
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--px-muted);
+  background: rgba(22, 29, 39, 0.6);
+  color: var(--px-text);
+  font-size: 1.3rem;
+  touch-action: none;
+}
+
+.px-touch button:active {
+  background: rgba(127, 198, 255, 0.35);
+  border-color: var(--px-accent);
+}
+
+@media (max-width: 700px) {
+  .px-prompt {
+    bottom: 6.2rem;
+    max-width: calc(100vw - 2rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .px-toast {
+    top: 3.8rem;
+  }
+
+  .px-bita-panel {
+    max-height: 74vh;
+    padding: 1.35rem 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* M0.7.1 — modo "clean" para el harness de capturas (?clean=1): oculta
+   TODO el HUD/overlay HTML para que la captura del canvas no muestre UI
+   superpuesta (panel "Physica — Fundamentos" sangrando en upper-right,
+   botón "← Instituto", prompts, etc). La experiencia en juego conserva
+   el HUD completo. */
+.px-clean .px-metro-ui,
+.px-clean .px-bita-btn,
+.px-clean .px-bita,
+.px-clean .px-prompt,
+.px-clean .px-toast,
+.px-clean .px-measure,
+.px-clean .px-touch,
+.px-clean .rampa-hud,
+.px-clean #px-hud {
+  display: none !important;
+}

@@ -10,6 +10,8 @@ export type ExperienceRuntime =
   | 'hd2d-three'
   | 'dataflow-phaser'
   | 'platformer-phaser'
+  | 'platformer-three'
+  | 'platformer-babylon'
   | 'cosmos-web';
 
 export interface ExperienceManifest {

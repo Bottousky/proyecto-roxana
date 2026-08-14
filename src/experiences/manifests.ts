@@ -70,9 +70,9 @@ export const PHYSICA: ExperienceManifest = {
   id: 'physica',
   title: 'Physica',
   discipline: 'Física',
-  status: 'planned',
-  runtime: 'platformer-phaser',
-  rooms: [],
+  status: 'playable',
+  runtime: 'platformer-babylon',
+  rooms: ['cascada'],
   learningVerb: 'sentir',
   fantasy: 'Atravesar una naturaleza cuyas leyes pueden observarse y alterarse.',
   visualGrammar: {

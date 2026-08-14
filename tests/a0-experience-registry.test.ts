@@ -11,7 +11,7 @@ assert(experienceOfRoom('castle_heart')?.id === 'ohmdal', 'el Castillo sigue sie
 assert(experienceOfRoom('hall')?.id === 'instituto', 'el hall pertenece al Instituto');
 assert(experienceById('ohmdal').status === 'playable', 'Ohmdal es producto existente, no concepto futuro');
 assert(experienceById('ohmdal').runtime === 'topdown-phaser', 'Ohmdal conserva su motor cenital');
-assert(experienceById('physica').runtime === 'platformer-phaser', 'Physica declara su gramática lateral');
+assert(experienceById('physica').runtime === 'platformer-babylon', 'Physica se juega en su gramática Babylon de plataformero 2.5D');
 assert(experienceById('bitland').learningVerb === 'ejecutar', 'Bitland se define por su modelo mental');
 assert(experienceById('arithmos').learningVerb === 'contemplar', 'Arithmos evita copiar el loop de Ohmdal');
 

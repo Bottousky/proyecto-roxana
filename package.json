@@ -7,26 +7,19 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "school:build": "powershell -ExecutionPolicy Bypass -File scripts/blender/build-school.ps1",
-    "school:report": "node scripts/report-school-assets.mjs",
-    "school:plan": "python scripts/validate_school_plan.py && python scripts/generate_school_plan_diagram.py",
-    "school:validate-gltf": "node scripts/validate-school-glb.mjs",
-    "school:validation-renders": "powershell -ExecutionPolicy Bypass -File scripts/blender/render-validation.ps1",
-    "3d:validate-manifests": "node scripts/3d/validate-asset-manifests.mjs",
-    "3d:asset-index": "node scripts/3d/generate-asset-index.mjs",
-    "3d:validate-glb": "node scripts/3d/validate-glb.mjs",
-    "3d:optimize-glb": "node scripts/3d/optimize-glb.mjs",
-    "3d:report-budget": "node scripts/3d/report-runtime-budget.mjs",
     "test": "node scripts/run-tests.mjs",
     "verify": "bash scripts/verificar-hito.sh"
   },
   "dependencies": {
+    "@babylonjs/core": "^9.20.0",
+    "@babylonjs/havok": "^1.3.14",
     "@types/three": "^0.185.0",
+    "babylonjs": "^9.19.1",
     "phaser": "^4.1.0",
     "three": "^0.177.0"
   },
   "devDependencies": {
-    "gltf-validator": "^2.0.0-dev.3.10",
+    "playwright": "^1.62.1",
     "typescript": "~5.6.3",
     "vite": "^6.3.5"
   }
