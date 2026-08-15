@@ -74,3 +74,9 @@ tests/visual/current/**
 tests/visual/diffs/**
 assets/manifests/assets.index.json
 docs/agent-runs/*/board.html
+
+# Staging local: working copies de planes/sesiones en preparación. Lo
+# commiteado vive en docs/sessions/v1/ — esto es sólo buffer entre
+# sesiones, no se versiona.
+_STAGING_*/
+
