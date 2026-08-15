@@ -30,8 +30,15 @@ import {
 } from './integration/harnessState.ts';
 import { createStudentActor } from './integration/spriteActors.ts';
 import { createU1Cast } from './content/u1Cast.ts';
-import { anchorById, thingOf, type BenchId, type U1Anchor } from './content/u1Anchors.ts';
-import { hooks, state } from '../state.ts';
+import { VS_EVIDENCE_BY_ANCHOR, anchorById, thingOf, type BenchId, type U1Anchor } from './content/u1Anchors.ts';
+import { createOhmPedestalWorldBench } from './ohmPedestalBench.ts';
+import {
+  createPlazaObservation,
+  hasObserved,
+  markObservation,
+  observationComplete,
+} from '../puzzles/plazaEvidenceModel.ts';
+import { hooks, setFlag, state } from '../state.ts';
 import { uiJustClosed, uiOpen } from '../ui/overlay.ts';
 import { initDialog } from '../ui/dialog.ts';
 import { createOhmdalUi } from './ui.ts';
@@ -110,17 +117,70 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   const PEDESTAL = anchorById('pedestal');
 
   /**
-   * Los tres bancos de la Unidad 1 van a ocurrir en el mundo, no en un modal.
+   * Los tres bancos de la Unidad 1 ocurren en el mundo cuando tienen sentido.
    *
-   * Todavía no: el banco de Ohm es el hito siguiente y necesita antes su encuadre, que es la
-   * única escena del slice sin anclaje ni golden frame. Hasta entonces cae al banco de
-   * `/jugar`, que funciona, está jugado y tiene el texto escrito. Es andamio declarado, no
-   * la forma final.
+   * `ohm` se juega en 3D: cinco huecos del anillo del pedestal se dibujan como puntos
+   * luminosos sobre el suelo alrededor del pedestal; el jugador los cubre caminando hasta
+   * ellos y pulsando la tecla de acción. La validación sale del mismo modelo que usa
+   * `/jugar` (`PEDESTAL_RING`), así que las dos versiones cuentan la misma lección.
+   *
+   * `lumen` y `gate` siguen cayendo al banco modal de `/jugar` hasta que les toque. El
+   * andamiaje queda declarado para no perderlos.
    */
+  const ohmPedestalWorld = createOhmPedestalWorldBench({
+    scene,
+    pedestal: PEDESTAL.position,
+    onSolved: () => {
+      setFlag('ohmAwake');
+      ohm.setState('idle', reducedMotion);
+      closeOhmBench();
+      cast.refresh();
+    },
+  });
+
   function openWorldBench(bench: BenchId, anchor: U1Anchor): void {
-    // TODO(H3): banco diegético de Ohm — cable, dos bocas de cobre y lámpara de prueba.
-    void bench;
+    if (bench === 'ohm') {
+      if (state.flags.ohmAwake) {
+        // Ya está despierto: el banco se cierra solo y se habla con él desde el pedestal.
+        thingOf(anchor).onInteract();
+        return;
+      }
+      if (ohmPedestalWorld.isOpen()) return;
+      openOhmBench();
+      return;
+    }
+    // Los otros dos bancos siguen en `/jugar` hasta que les toque. El texto y el resultado
+    // son los mismos: lo que cambia es dónde se manipula, no qué se aprende (H3 / diseno-
+    // bancos-ohm-lumen.md §1).
     thingOf(anchor).onInteract();
+  }
+
+  function openOhmBench(): void {
+    setFlag('ohmBenchOpenedInWorld');
+    ohmPedestalWorld.open();
+  }
+
+  function closeOhmBench(): void {
+    ohmPedestalWorld.close();
+  }
+
+  /**
+   * Estado del beat VS01 en el mundo HD-2D. Vive acá y no en `state.ts` porque es
+   * **transversal** a las tres evidencias: el modelo es puro, pero el almacenamiento
+   * concreto del progreso (qué observaciones se hicieron y en qué orden) le pertenece
+   * a esta escena, no al save global.
+   */
+  let plazaObservations = createPlazaObservation();
+
+  /** Si el anclaje activa cuenta como observación del beat VS01, la marca. */
+  function maybeObserve(anchor: U1Anchor): void {
+    const evidence = VS_EVIDENCE_BY_ANCHOR[anchor.id];
+    if (!evidence) return;
+    if (hasObserved(plazaObservations, evidence)) return;
+    plazaObservations = markObservation(plazaObservations, evidence);
+    if (observationComplete(plazaObservations)) {
+      setFlag('plazaObservedComplete');
+    }
   }
 
   /** El anclaje al alcance del jugador, o `null`. Lo recalcula cada cuadro. */
@@ -652,7 +712,17 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     // El diálogo y los bancos avanzan con sus propios controles: el mundo no compite, ni
     // mientras están abiertos ni en la pulsación que acaba de cerrarlos.
     if (uiOpen() || uiJustClosed()) return;
+    // Banco diegético de Ohm: si está abierto, la tecla de acción opera sobre los huecos
+    // del pedestal antes de cualquier otra cosa. La cámara no dispara el diagnóstico.
+    if (ohmPedestalWorld.isOpen()) {
+      if (ohmPedestalWorld.tryActivateGap(player)) return;
+      // Sin hueco al alcance y banco abierto: la tecla hace las veces de "salir del
+      // primer plano" para no atrapar al jugador si decide abandonar.
+      closeOhmBench();
+      return;
+    }
     if (activeAnchor) {
+      maybeObserve(activeAnchor);
       cast.interact(activeAnchor);
       return;
     }
@@ -738,6 +808,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       cameraController.dispose();
       occlusionController.dispose();
       student.dispose();
+      ohmPedestalWorld.dispose();
       // El mundo no es dueño del hook: lo tomó prestado y lo devuelve como estaba.
       hooks.refresh = previousRefresh;
       cast.dispose();

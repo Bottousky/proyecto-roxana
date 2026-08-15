@@ -257,6 +257,20 @@ export function isPresent(anchor: U1Anchor): boolean {
   return thing.visible === undefined || thing.visible();
 }
 
+/**
+ * Mapeo declarativo de anclajes del VS a las evidencias que el beat VS01 pide. El mundo
+ * marca la observación cuando el jugador interactúa con uno de estos anclajes —sin agregar
+ * texto, sin cartel de "evidencia registrada", sólo la marca para que la Bitácora pueda
+ * aparecer cuando las tres estén.
+ */
+export const VS_EVIDENCE_BY_ANCHOR: Readonly<Record<string, import('../../puzzles/plazaEvidenceModel.ts').PlazaEvidenceId>> = {
+  'campana': 'campana-sin-respuesta',
+  'portal-aula': 'trazas-de-cobre',
+  // El agua detenida vive en otro cuarto (manantial_ohm); el anclaje `mirador-manantial`
+  // es el punto de observación desde la Plaza cuando la cámara acompaña al jugador.
+  'mirador-manantial': 'agua-detenida',
+};
+
 export function reachOf(anchor: U1Anchor): number {
   return anchor.reach ?? DEFAULT_REACH_METERS;
 }
