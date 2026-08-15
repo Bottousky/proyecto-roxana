@@ -59,6 +59,86 @@ export function getEntries(): EntryView[] {
     });
   }
 
+  /* ============ VERTICAL SLICE — Plaza del Arco I (HD-2D) ============ */
+  // Las entradas del VS son **vivenciales**, no formales: el vocabulario técnico es spoiler
+  // hasta que el jugador lo gana (P02, P06; reglas duras del proyecto). Acá sólo se registra
+  // lo que el protagonista vio al llegar, sin adelantar el "nombre verdadero" de nada.
+
+  if (f.plazaSeen) {
+    out.push({
+      id: 'vs-plaza-llegada',
+      title: 'La Plaza, de noche',
+      fecha: 'Ohmdal — la Plaza (HD-2D)',
+      vivencial: `
+        <p>El Portal se cerró a mi espalda y la Plaza estaba en silencio. No silencio de
+        pueblo dormido: silencio de algo que alguna vez sonó y ya no suena.</p>
+        <p>Una campana cuelga de un yugo de cobre. La cuerda está al alcance, pero algo
+        dice que todavía no. Edda me mira de costado y dice que las reliquias ya no
+        funcionan.</p>
+        <p>El pedestal del centro tiene un autómata dormido. Tiene los ojos apagados
+        y la forma de quien estuvo despierto mucho tiempo.</p>`,
+      formal: null,
+    });
+  }
+
+  if (f.plazaSeen) {
+    out.push({
+      id: 'vs-plaza-campana',
+      title: 'La cuerda que cuelga',
+      fecha: 'Ohmdal — la Plaza (HD-2D)',
+      vivencial: `
+        <p>La campana tiene cuerda. Nadie la tiró. Los cables que la atan al yugo de
+        cobre bajan hasta un cuadro de piedra que no entiendo.</p>
+        <p>Lumen me dijo una vez que la campana suena cuando algo está bien. Ahora
+        cuelga muda.</p>`,
+      formal: null,
+    });
+  }
+
+  if (f.plazaSeen) {
+    out.push({
+      id: 'vs-plaza-cobre',
+      title: 'Canales de cobre que no llevan nada',
+      fecha: 'Ohmdal — el Portal (HD-2D)',
+      vivencial: `
+        <p>En el dintel del Portal hay canales de cobre labrado. Brillan apagados, como
+        cubiertos de polvo. La forma de los canales es la misma que la del cuadro de la
+        campana y la del pedestal.</p>
+        <p>Todo está conectado a algo. Nada está conectado a todo.</p>`,
+      formal: null,
+    });
+  }
+
+  if (f.plazaSeen) {
+    out.push({
+      id: 'vs-plaza-agua',
+      title: 'El agua que no baja',
+      fecha: 'Ohmdal — el Manantial (HD-2D)',
+      vivencial: `
+        <p>Arriba del Monumento, una compuerta de cobre espera. Detrás se escucha agua,
+        pero no baja.</p>
+        <p>Hay una inscripción pequeña, gastada: <em>«Manantial»</em>.</p>
+        <p>El agua sabe dónde tiene que ir. Algo se lo impide.</p>`,
+      formal: null,
+    });
+  }
+
+  if (f.plazaObservedComplete) {
+    out.push({
+      id: 'vs-plaza-tres-evidencias',
+      title: 'Tres evidencias',
+      fecha: 'Ohmdal — la Plaza (HD-2D)',
+      vivencial: `
+        <p>Miré con tiempo. Tres cosas que faltan: la campana que no suena, los canales
+        de cobre que no llevan nada, el agua que no baja.</p>
+        <p>Las tres son del mismo metal. Las tres se callaron al mismo tiempo.</p>
+        <p>El autómata del pedestal tiene los ojos apagados, pero su forma es la de
+        alguien que sabe. Si le devolviera lo que le falta, ¿abriría los ojos?</p>
+        <p>Todavía no tengo cómo. Pero la pregunta existe.</p>`,
+      formal: null,
+    });
+  }
+
   if (f.ohmAwake) {
     out.push({
       id: 'camino',

@@ -90,6 +90,12 @@ export interface Flags {
   estudiantesHablados: string[];
   /** Cinematic was skipped. */
   cinematicaSkipped: boolean;
+
+  // Vertical slice (VS) flags
+  /** The three Plaza evidences have been observed in the HD-2D world (VS01). */
+  plazaObservedComplete: boolean;
+  /** The diegetic Ohm bench was opened in-world at least once (H3 of the ROADMAP). */
+  ohmBenchOpenedInWorld: boolean;
 }
 
 const DEFAULT_FLAGS: Flags = {
@@ -170,6 +176,10 @@ const DEFAULT_FLAGS: Flags = {
   vioNotaVieja: false,
   estudiantesHablados: [],
   cinematicaSkipped: false,
+
+  // VS defaults
+  plazaObservedComplete: false,
+  ohmBenchOpenedInWorld: false,
 };
 
 export interface GameState {
