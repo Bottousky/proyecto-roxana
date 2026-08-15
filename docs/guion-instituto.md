@@ -33,7 +33,7 @@ Estado CON save — lista de unidades, cada una con su marca (✓ completada, ·
 4. «La vuelta completa»
 5. «La chispa que se queda»
 
-<!-- Títulos canon tomados de los encabezados de docs/unidad-1..5. -->
+<!-- Títulos canon del guion de Ohmdal; ver docs/20-worlds/ohmdal/content/ohmdal-arc-01_v1.md. -->
 
 Pie del pizarrón SOLO si `arcoCompleto`:
 > Curso completado. El pueblo se enciende solo.

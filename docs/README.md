@@ -1,94 +1,151 @@
 # Mapa de documentación
 
-Este índice evita que una entrega histórica se confunda con una decisión vigente.
+Índice vivo de `docs/`. Lo lee cualquier agente para orientarse antes de consultar las
+fuentes de autoridad. Para reglas de trabajo y gobernanza del estudio ver el
+[`../AGENTS.md`](../AGENTS.md) raíz.
 
-## Arquitectura documental vigente · v1 (sesiones P1–P6)
+> Toda la v1 nace como `PROPOSED`. La promoción a `CANON` requiere ratificación autoral
+> explícita mediante un ADR firmado por Manuel (`00-governance/ROXANA_CANON_POLICY_v1.md` §5).
 
-La constitución y biblias de producción de Roxana, ratificadas en las sesiones de
-diseño del 14 de agosto de 2026, viven ahora bajo una jerarquía por `authority_level`
-(ver `docs/00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md` §1).
+---
 
-**Status actual:** toda la v1 nace como `PROPOSED`. La promoción a `CANON` requiere
-ratificación autoral explícita mediante un ADR firmado por Manuel
-(`ROXANA_CANON_POLICY_v1.md` §5). Hasta entonces, ningún doc puede tratarse como regla
-vigente sin esa firma.
+## 1. Estructura vigente
 
-| Capa | Contenido | Autoridad |
-|---|---|---|
-| [`docs/00-governance/`](00-governance/) | 5 docs fundacionales y operativos: pilares, lenguaje de diseño, política de canon, arquitectura documental, checklist de revisión. | nivel 0–1 |
-| [`docs/10-global/`](10-global/) | 8 docs de biblia global: Instituto, Bitácora como sistema, metaprogresión, narrativa global, perfil del jugador, UI/UX común, estructura de campañas, criterios de vertical slice global. | nivel 2 |
-| [`docs/20-worlds/`](20-worlds/) | 10 docs por cada uno de los 4 mundos (Ohmdal, Physica, Bitland, Arithmos): vision, gameplay, narrativa, contenido, producción. | nivel 3–5 |
-| [`docs/30-integration/`](30-integration/) | 2 docs: catálogo de cruces interdisciplinarios, mapa de autoridad de contenido. | nivel 3 |
+```text
+docs/
+├── README.md                   este índice
+├── START_HERE.md               norte de producto y arquitectura
+├── guia-puzzles.md             CANON — diseño y auditoría de puzzles
+├── asset-manifest.yaml         contrato runtime de assets 3D
+├── guion-instituto.md          texto canon del aula de Electrónica (referencia histórica, v1 lo absorbe)
+├── biblia-estilo-instituto.md  cámara ¾ top-down y escala del Instituto (referencia histórica)
+├── diseno-sintesis-v1.md       diseño general (loop, tono, reglas pedagógicas comunes)
+├── prologo.md                  guion detallado del prólogo en la escuela
+│
+├── 00-governance/              5 docs fundacionales y operativos
+│                                pilares · canon policy · lenguaje de diseño
+│                                arquitectura documental · checklist de revisión
+│
+├── 10-global/                  8 docs de biblia global
+│                                Instituto · Bitácora · narrativa · UI/UX
+│                                estructura de campañas · vertical slice
+│                                metaprogresión · perfil del jugador
+│
+├── 20-worlds/                  GDD modular por mundo
+│   ├── ohmdal/   (CONECTAR)    único en producción real — H1 hecho, H2 en curso
+│   ├── physica/  (EXPERIMENTAR) Hito 1 hecho en Babylon.js
+│   ├── bitland/  (PROGRAMAR)   PROPOSED, sin código todavía
+│   └── arithmos/ (TRANSFORMAR) PROPOSED, sin código todavía
+│       └── cada uno:
+│         ├── AGENTS.md         reglas del mundo + qué sub-agent dispatchar
+│         ├── vision/           North Star, anti-pilares, metáfora del mundo
+│         ├── gameplay/         sistemas, gramática de puzzles, progresión mecánica
+│         ├── world/            geografía, regiones, gating
+│         ├── narrative/        lore, personajes
+│         ├── content/          arcos, mapas, beats del vertical slice
+│         └── production/       prototipos, pipelines, specs operativas
+│
+├── 30-integration/             catálogo de cruces interdisciplinarios
+│                                + mapa de autoridad de contenido
+│
+├── ohmdal-biblia/              biblia canónica de Ohmdal (histórica — precede a la v1 de 20-worlds/)
+│                                absorbida por `20-worlds/ohmdal/` como insumo
+│                                La promoción documental no migra el runtime: `/jugar` y sus
+│                                regresiones continúan protegidos hasta que un ADR apruebe su reemplazo
+│
+├── arco1/                      dirección visual del Arco I: identidad, color script, encuadres,
+│                                inventario de escenas, contenido educativo, presupuestos
+│
+├── 3d/                         contratos, toolchain y estado del ecosistema 3D
+│                                (Blender → GLB, validadores, presupuestos)
+│
+└── sessions/                   bitácora de las 6 sesiones de diseño P1–P6
+                                 (proceso, no autoridad — ver `00-governance/ROXANA_CANON_POLICY_v1.md` §2)
+```
 
-> **Bitland y Arithmos** mantienen toda su lore como `PROPOSED` hasta ratificación
-> autoral explícita (ver `bitland-vision_v1.md` §5 y `arithmos-vision_v1.md`).
+---
 
-## Sesiones de diseño (proceso)
+## 2. Authority levels y precedencia
+
+Jerarquía numérica: menor = mayor autoridad. Definida en
+[`00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md`](00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md) §1.
+
+| Nivel | Qué vive ahí |
+|---|---|
+| **0** | Constitución fundacional (Pilares, Canon Policy) |
+| **1** | Constitución operativa (Design Language, Doc Architecture, Review Checklist) |
+| **2** | Biblia global (Instituto, Bitácora, metaprogresión, narrativa, UI/UX, vertical slice) |
+| **3** | Biblia de mundo (vision por mundo, sistemas, gramática de puzzles) |
+| **4** | Diseño de contenido (arcos, puzzles específicos, encounters) |
+| **5** | Producción (pipelines, presupuestos, runtimes, QA) |
+| **6** | Especificación de tarea (specs de hito, tickets) |
+| **7** | Evidencia de implementación (test reports, screenshots) |
+
+**Regla:** nivel menor gana. Si contradicen, se eleva por ADR. La implementación NUNCA
+convierte una idea en canon.
+
+---
+
+## 3. Cómo navegar por tarea
+
+### "Estoy diseñando un puzzle nuevo"
+1. [`../AGENTS.md`](../AGENTS.md) §5 — qué sub-agent dispatchar.
+2. [`guia-puzzles.md`](guia-puzzles.md) — canon de puzzles (CANON).
+3. `<mundo>/gameplay/<mundo>-puzzle-grammar_v1.md` — gramática local del mundo.
+4. `<mundo>/AGENTS.md` — reglas locales + convenciones de código.
+
+### "Estoy tocando código de Ohmdal"
+1. [`20-worlds/ohmdal/AGENTS.md`](20-worlds/ohmdal/AGENTS.md) — reglas locales.
+2. [`../ROADMAP.md`](../ROADMAP.md) — qué hito está en curso.
+3. [`20-worlds/ohmdal/gameplay/ohmdal-core-gameplay_v1.md`](20-worlds/ohmdal/gameplay/ohmdal-core-gameplay_v1.md) — modos y loop.
+4. `src/jugar/` o `src/ohmdal/` según el runtime activo.
+
+### "Estoy tocando el Instituto"
+1. [`../AGENTS.md`](../AGENTS.md) §6 — fuentes de verdad.
+2. [`10-global/ROXANA_INSTITUTE_BIBLE_v1.md`](10-global/ROXANA_INSTITUTE_BIBLE_v1.md) — biblia global del Instituto (nivel 2, autoridad máxima para el Instituto).
+3. `guion-instituto.md` y `biblia-estilo-instituto.md` — referencias históricas.
+4. `src/landing/` — código del Instituto.
+
+### "Estoy tocando Physica"
+1. [`20-worlds/physica/AGENTS.md`](20-worlds/physica/AGENTS.md) — reglas locales + convenciones.
+2. [`20-worlds/physica/README.md`](20-worlds/physica/README.md) — estado operativo (Hito 1 hecho).
+3. [`20-worlds/physica/production/arquitectura.md`](20-worlds/physica/production/arquitectura.md) — física híbrida.
+
+### "Quiero entender la visión general"
+1. [`START_HERE.md`](START_HERE.md) — norte de producto.
+2. [`../ROADMAP.md`](../ROADMAP.md) — qué se construye y en qué orden.
+3. [`10-global/ROXANA_INSTITUTE_BIBLE_v1.md`](10-global/ROXANA_INSTITUTE_BIBLE_v1.md) §1 — tesis.
+
+### "Necesito auditar un puzzle"
+1. [`guia-puzzles.md`](guia-puzzles.md) — checklist completo.
+2. `<mundo>/AGENTS.md` §3 — reglas DO/DON'T locales.
+3. Sub-agent `m3-qa` para el informe priorizado (ver [`../AGENTS.md`](../AGENTS.md) §5).
+
+---
+
+## 4. Sesiones de diseño (proceso, no autoridad)
 
 [`sessions/v1/INDEX.md`](sessions/v1/INDEX.md) es el mapa de las **seis sesiones de diseño**
 que llevaron los GDD Reboot a la arquitectura documental vigente arriba. Orden recomendado:
-P1 → P2 → P3 → P4 → P5 → P6, no en paralelo. Cada sesión tiene Definition of Done propio y
-los packs A–F contienen los prompts de arranque. P4 y P5 mantienen su lore en `PROPOSED`
-hasta ratificación explícita.
+P1 → P2 → P3 → P4 → P5 → P6, no en paralelo.
 
 > Las sesiones son **proceso**, no autoridad. Si una decisión de una sesión contradice un
 > doc de `00-governance/`, `10-global/`, `20-worlds/` o `30-integration/`, prevalece la
 > v1 (Canon Policy §2).
 
-## Biblia canónica de Ohmdal (histórica — precede a la v1)
+---
 
-[`ohmdal-biblia/00_MASTER_INDEX.md`](../ohmdal-biblia/00_MASTER_INDEX.md) consolidó la
-fuente de verdad narrativa, educativa, visual y productiva de Ohmdal desde el 1 de agosto
-de 2026. La v1 de `docs/20-worlds/ohmdal/` la absorbe como insumo; los puntos donde
-contradice, prevalece la v1. La promoción documental no migra el runtime: `/jugar` y sus
-regresiones continúan protegidos hasta que un ADR y el vertical slice aprueben su reemplazo.
+## 5. Archivos históricos relevantes
 
-## Fuentes de verdad activas pre-v1 (mantener como referencia)
+> El material de hitos cerrados (auditorías, specs viejas, planes-implementación, pilotos)
+> se retiró el 2026-08-14. Lo que queda aquí es insumo vivo:
 
-**Comenzar por [`START_HERE.md`](../START_HERE.md):** consolida la promesa y la
-arquitectura global. Para cualquier decisión de Ohmdal, continuar por la Biblia canónica
-antes de consultar fuentes históricas.
-
-1. [`vision-mundos-multilenguaje.md`](../vision-mundos-multilenguaje.md) — visión de
-   producto: un núcleo compartido y cinco lenguajes de experiencia.
-2. [`plan-plataforma-cinco-juegos.md`](../plan-plataforma-cinco-juegos.md) — arquitectura
-   y orden de implementación de la plataforma multiruntime.
-3. [`ohmdal-biblia/00_MASTER_INDEX.md`](../ohmdal-biblia/00_MASTER_INDEX.md) — autoridad
-   canónica de Ohmdal, dependencias y estado del paquete documental.
-4. [`ohmdal-biblia/15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md`](../ohmdal-biblia/15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md)
-   — investigación primaria del remake y auditoría de aplicación/pipeline.
-5. [`ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md`](../ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md)
-   — backlog serie de La Luz, WIP uno y gates de `DONE`.
-6. [`diseno-sintesis-v1.md`](../diseno-sintesis-v1.md) — loop, tono y reglas
-   pedagógicas comunes.
-7. [`guia-puzzles.md`](../guia-puzzles.md) — canon para diseñar y auditar puzzles.
-8. [`estandar-implementacion.md`](../estandar-implementacion.md) — gate de implementación.
-
-Los planes `plan-arco-1-*`, la ruta anterior y las unidades implementadas son fuentes
-históricas y cantera de continuidad selectiva. Si contradicen la Biblia de Ohmdal,
-prevalece la Biblia; el código estable no cambia hasta una migración aprobada.
-
-## Fuentes históricas de contenido de Ohmdal
-
-- [`ohmdal-ruta-contenidos.md`](../ohmdal-ruta-contenidos.md)
-- [`unidad-1-ohmdal.md`](../unidad-1-ohmdal.md)
-- [`unidad-2-caminos.md`](../unidad-2-caminos.md)
-- [`unidad-3-forja.md`](../unidad-3-forja.md)
-- [`unidad-4-terrazas.md`](../unidad-4-terrazas.md)
-- [`unidad-5-faro.md`](../unidad-5-faro.md)
-
-## Arte y espacio
-
-- [`biblia-arte-produccion-v0.md`](../biblia-arte-produccion-v0.md)
-- [`biblia-estilo-instituto.md`](../biblia-estilo-instituto.md)
-- [`mapa-ohmdal-greybox.md`](../mapa-ohmdal-greybox.md)
-- [`3d/README.md`](../3d/README.md) — contratos, toolchain y estado del ecosistema 3D.
-- [`arco1/`](../arco1/) — dirección visual del Arco I: identidad, color script, encuadres,
-  inventario de escenas, contenido educativo y presupuestos.
-
-## Implementación y auditoría de hitos terminados
-
-Los archivos `plan-implementacion-*`, `spec-*`, `auditoria-*` y las entregas de
-cinemática son registro de decisiones y criterios de regresión. No definen por sí solos
-la arquitectura futura. Se conservan porque explican por qué el Arco I funciona como
-funciona.
+- [`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md) — biblia consolidada
+  de Ohmdal desde el 1 de agosto de 2026. `20-worlds/ohmdal/` la absorbe como insumo; los
+  puntos donde contradice, prevalece la v1.
+- [`diseno-sintesis-v1.md`](diseno-sintesis-v1.md) — diseño general del juego (concepto, loop,
+  Bitácora, anti-clase, arquitectura). Insumo de los docs v1.
+- [`prologo.md`](prologo.md) — guion detallado del prólogo en la escuela. Insumo del Instituto
+  y del primer ingreso a Ohmdal.
+- [`arco1/`](arco1/) — dirección visual congelada del Arco I (identidad, color script,
+  encuadres, presupuestos por escena). El h2-h5 del ROADMAP se apoya aquí.

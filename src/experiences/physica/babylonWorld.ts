@@ -9,7 +9,7 @@
 //   • Analítica de forma cerrada (MRUV, tiro parabólico, vectores) es
 //     autoritativa para los fenómenos pedagógicos.
 //   • Havok maneja colisiones, rigid bodies pasivos y pushable props.
-//   • Detalles en `physics.ts` y en `docs/physica/arquitectura-fisica-hibrida.md`.
+//   • Detalles en `physics.ts` y en `docs/20-worlds/physica/production/arquitectura.md`.
 import * as BABYLON from 'babylonjs';
 import { type MruvIntegrada } from './models/caidaLibre.ts';
 import {

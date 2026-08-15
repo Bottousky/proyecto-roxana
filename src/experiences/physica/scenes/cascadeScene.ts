@@ -3,7 +3,7 @@
 // Esta capa es PURAMENTE presentación visual. La física pedagógica vive en
 // `models/cascadaAscendente.ts` (analítica) y en `physics.ts` (Havok con
 // autoridad sobre las piedras no voladoras y las rocas del piso). Detalles
-// en `docs/physica/arquitectura-fisica-hibrida.md`.
+// en `docs/20-worlds/physica/production/arquitectura.md`.
 //
 // Referencias visuales dirigidas por Manuel (closed-loop 2026-08-07):
 //   • Planet of Lana — luz dorada, horizonte cálido, escala grande.

@@ -102,19 +102,27 @@ src/
   content/
     entries.ts             entradas de la Bitácora (dos capas, contenido dinámico)
 docs/
-  README.md                mapa de documentos y fuentes de verdad
-  vision-mundos-multilenguaje.md  visión de los cinco lenguajes
-  plan-plataforma-cinco-juegos.md plan técnico para montarlos
-  diseno-sintesis-v1.md    diseño general del juego (sistemas, formato, arquitectura)
+  README.md                mapa de documentos y autoridad vigente
+  START_HERE.md            norte de producto y arquitectura
+  AGENTS.md                manual operativo del estudio (este repo)
+  guia-puzzles.md          canon para diseñar y auditar puzzles (CANON)
+  asset-manifest.yaml      contrato runtime de assets 3D
+  guion-instituto.md       texto canon del aula de Electrónica (M3 del Instituto)
+  biblia-estilo-instituto.md  cámara ¾ top-down y escala del Instituto (referencia histórica)
+  diseno-sintesis-v1.md    diseño general (loop, tono, reglas pedagógicas comunes)
   prologo.md               guion detallado del prólogo en la escuela
-  unidad-1-ohmdal.md       síntesis del mundo Ohmdal + guion de la Unidad 1
-  unidad-2-caminos.md      guion de la Unidad 2: el Castillo (serie/paralelo)
-  unidad-3-forja.md        diseño de la Unidad 3: la Forja (potencia, Joule, energía)
-  unidad-4-terrazas.md     diseño de la Unidad 4: las Terrazas (KVL, divisores, escalera)
-  unidad-5-faro.md         diseño de la Unidad 5: el Faro (capacitor, tiempo) — cierre Arco I
-  ohmdal-ruta-contenidos.md  ruta completa de Ohmdal (arcos I-II + el Empalme) y corte de la v1
-  plan-implementacion-u2.md  hitos M0-M8 para construir la U2 (handoff a agente de código)
+  00-governance/           pilares, política de canon, lenguaje de diseño, arquitectura documental
+  10-global/               biblia global: Instituto, Bitácora, metaprogresión, UI/UX, vertical slice
+  20-worlds/               GDD modular por mundo: vision / gameplay / world / narrative / content / production
+    ohmdal/                CONECTAR — único mundo en producción real
+    physica/               EXPERIMENTAR — Hito 1 hecho (Babylon)
+    bitland/               PROGRAMAR — PROPOSED, sin código todavía
+    arithmos/              TRANSFORMAR — PROPOSED, sin código todavía
+  30-integration/          catálogo de cruces interdisciplinarios + mapa de autoridad de contenido
+  ohmdal-biblia/           biblia canónica de Ohmdal (histórica — precede a la v1 de 20-worlds/)
   arco1/                   dirección visual del Arco I: identidad, color, encuadres, presupuestos
+  3d/                      contratos y toolchain del ecosistema 3D
+  sessions/                bitácora de las sesiones de diseño (P1–P6)
 ```
 
 Qué se está construyendo ahora y en qué orden: [`ROADMAP.md`](ROADMAP.md).

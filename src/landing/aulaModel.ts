@@ -14,7 +14,7 @@ export interface PizarronViewModel {
   pie?: string;
 }
 
-// Títulos canon: encabezados de docs/unidad-1..5 (ver docs/guion-instituto.md §1.3).
+// Títulos canon del guion de Ohmdal; ver docs/20-worlds/ohmdal/content/ohmdal-arc-01_v1.md.
 const UNIDADES_ELECTRONICA = [
   'La corriente no es magia',
   'El río se reparte',

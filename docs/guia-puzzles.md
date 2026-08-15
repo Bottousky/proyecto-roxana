@@ -210,5 +210,4 @@ Marcá cada punto. Un «no» es un hallazgo a corregir o justificar.
 - Reglas duras de ejecución (vocabulario spoiler, ≥2 soluciones, modelo testeable):
   `CLAUDE.md` §5.
 - Referencia de oro del patrón predecir-observar + brillo-primero + cuenta visible:
-  los tres puzzles del Castillo (`chain.ts`, `branches.ts`, `distributor.ts`) y
-  `docs/auditoria-puzzles-castillo.md`.
+  los tres puzzles del Castillo (`chain.ts`, `branches.ts`, `distributor.ts`).
