@@ -1,198 +1,199 @@
 # AGENTS.md — Proyecto Roxana
 
-**Manual operativo del estudio.** Lo lee cualquier agente que entre al repositorio.
-Define cómo se trabaja, qué se respeta y de dónde se saca la verdad. **No** contiene
-lore ni diseño de producto; eso vive en [`docs/`](docs/) y en los `AGENTS.md` por mundo.
+**Manual operativo del estudio.** Todo agente que trabaja en el repo lo lee. Lore/diseño viven en `docs/`; producción agentic en [`docs/80-production/agentic/`](docs/80-production/agentic/).
 
-> Este archivo es la capa de gobierno. El [`CLAUDE.md`](CLAUDE.md) y el [`ROADMAP.md`](ROADMAP.md)
-> siguen vigentes como contrato de trabajo y como plan de hitos. Si contradicen, gana `CLAUDE.md`.
+> `ROADMAP.md` decide el orden de producto. Los GDD y governance deciden qué es Roxana. La capa `80-production/agentic` decide **cómo convertir esas decisiones en juego verificable** y nunca asciende implementación a canon por accidente.
 
----
+## 1. Identidad y dirección técnica
 
-## 1. Identidad
+Proyecto Roxana es una experiencia educativa basada en mundos donde el conocimiento constituye reglas manipulables del gameplay.
 
-Proyecto Roxana es una **experiencia educativa basada en mundos** donde el conocimiento
-constituye las reglas manipulables del gameplay. El jugador experimenta antes de recibir
-formalización académica.
-
-Los cuatro mundos del producto, cada uno con su verbo y su gramática:
-
-| Mundo | Verbo | Disciplina |
+| Scope | Verbo / función | Dirección actual |
 |---|---|---|
-| **Ohmdal** | **CONECTAR** | Electrónica (corriente continua) |
-| **Physica** | **EXPERIMENTAR** | Física (cinemática, dinámica) |
-| **Bitland** | **PROGRAMAR** | Programación |
-| **Arithmos** | **TRANSFORMAR** | Matemática |
+| Instituto | unir / recordar / transformar | Three.js axonométrico + DOM — hipótesis fuerte |
+| Ohmdal | **CONECTAR** | Three.js HD-2D — north de producción actual |
+| Physica | **EXPERIMENTAR** | Babylon + analítica TS; 2.5D default, 3D selectivo |
+| Bitland | **PROGRAMAR** | simulation core TS + DOM; **Pixi vs Phaser por spikes separados** |
+| Arithmos | **TRANSFORMAR** | transformation core TS; **Three vs Pixi/SVG por representación** |
 
-El Instituto Roxana es el hogar compartido: donde el jugador vuelve, lo que cambia
-con sus acciones, y la cámara que recuerda su paso.
+P12 manda: los mundos comparten producto, no engine/cámara/género obligatorios.
 
----
+Ver:
+- [`ENGINE_MATRIX.md`](docs/80-production/agentic/ENGINE_MATRIX.md)
+- [`SPIKE_POLICY.md`](docs/80-production/agentic/SPIKE_POLICY.md)
+- [`GAME_DEV_AI_TOOLING.md`](docs/80-production/agentic/GAME_DEV_AI_TOOLING.md)
 
-## 2. Estados de autoridad documental
+## 2. Autoridad
 
-Todo documento de autoridad declara **uno** de los siguientes estados (definidos en
-[`docs/00-governance/ROXANA_CANON_POLICY_v1.md`](docs/00-governance/ROXANA_CANON_POLICY_v1.md)):
+Estados: `CANON`, `PROPOSED`, `LEGACY`, `EXPERIMENTAL`, `REJECTED`.
 
-| Estado | Significado |
-|---|---|
-| `CANON` | Regla ratificada. Sobrevive hasta nueva decisión explícita. |
-| `PROPOSED` | Candidato activo. Default para todo lo nuevo. |
-| `LEGACY` | Referencia histórica sin autoridad actual. |
-| `EXPERIMENTAL` | Hipótesis atada a un prototipo. No se eleva sin validación. |
-| `REJECTED` | Descartado conscientemente. Permanece registrado. |
+Precedencia:
 
-Niveles numéricos (`authority_level` 0–7): menor número = mayor autoridad. Jerarquía en
-[`docs/00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md`](docs/00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md).
+`governance → global → world → content → production → task contract → implementation evidence`.
 
-**Si dos documentos contradicen:** mayor `authority_level` → ratificación más reciente
-→ código nunca convierte una idea en canon (se corrige el código o se eleva por ADR).
+Si hay contradicción, aplicar `docs/00-governance/ROXANA_CANON_POLICY_v1.md`. Código/runtime nunca convierte una idea en canon.
 
----
+## 3. Reglas duras
 
-## 3. Reglas duras del estudio
+1. No inventar texto narrativo. Si falta: `TODO(guion)` + placeholder neutro + reportar.
+2. Formalización técnica sólo después de evidencia suficiente del jugador.
+3. Validación por condiciones; varias soluciones cuando la disciplina lo permita.
+4. Core pedagógico puro/testeable cuando corresponda; el renderer no es la verdad del concepto.
+5. Español neutro/tuteo en texto visible.
+6. Sin dependencia/engine upgrade incidental.
+7. No romper baselines jugables.
+8. No elegir engine por preferencia del agente. Si hay incertidumbre material, ejecutar los spikes definidos.
+9. No declarar DONE porque compila o porque hay un screenshot lindo.
+10. Normal: 1–3 repair loops. Hard cap: 5. Luego `ESCALATE`.
+11. Si el mismo defecto sobrevive a 2 fixes informados, cuestionar spec/representación antes de seguir parcheando.
+12. Nunca debilitar tests/acceptance/learning criteria para obtener PASS.
+13. Desktop + mobile/touch son targets de primera clase cuando el scope toca interacción/render.
+14. Licencia/provenance de assets, skills y código externo se verifica antes de copiarlo al producto.
+15. Integración de decisiones materiales requiere a Manuel.
 
-Las rompe un agente que se respete, no se parchean:
+## 4. Context-on-Demand
 
-1. **El texto del juego no se inventa.** Se copia textual del guion. Si falta una línea:
-   `// TODO(guion)` + placeholder neutro + reportar.
-2. **El vocabulario técnico es spoiler.** `serie`, `paralelo`, `nodo`, `Kirchhoff`,
-   `capacitor` solo aparecen en la capa formal de la Bitácora, gateada por flags de
-   formalización. Lo mismo vale para los términos formales de Physica/Bitland/Arithmos.
-3. **Validación por condiciones, no por solución fija.** Todo puzzle acepta ≥2 soluciones.
-   Ver [`docs/guia-puzzles.md`](docs/guia-puzzles.md) (CANON).
-4. **Modelo puro testeable por puzzle.** `src/puzzles/xModel.ts` + `tests/mX-x.test.ts`.
-   Imports con extensión `.ts`. Los tests corren con `node --experimental-strip-types`.
-5. **Español neutro (tuteo).** Sin voseo, sin "vos". El gate lo verifica.
-6. **Sin dependencias nuevas** sin pedirlo antes.
-7. **No romper lo jugable.** El Arco I de Ohmdal y la landing funcionan hoy: son la base
-   de regresión. Cualquier cambio que los rompa se revierte, no se parchea.
-8. **Nunca commitear sin aprobación de Manuel.**
-
----
-
-## 4. Política de carga de contexto (Context-on-Demand)
-
-No leas los 200 archivos. Para una tarea concreta:
+No leas todo el repo.
 
 ```text
-Objetivo
+objetivo humano
   ↓
-Identifica el mundo (ohmdal / physica / bitland / arithmos / instituto / global)
+AGENTS.md raíz
   ↓
-Lee AGENTS.md raíz (este) + AGENTS.md del scope más cercano
+AGENTS.md del scope
   ↓
-Lee el documento de autoridad nivel ≤2 que aplique
+authority docs estrictamente relevantes
   ↓
-Lee el task spec / brief
+Task + Learning Contract
   ↓
-Trabaja con código + assets requeridos
+ENGINE_MATRIX / SPIKE_POLICY / tooling si la tarea los toca
+  ↓
+código + assets necesarios
 ```
 
-Jerarquía de herencia para agentes:
+No cargar 20 skills “por si acaso”. Cargar skills/MCPs según la fase y engine real.
+
+## 5. Cadena de modelos por defecto
+
+Ver [`MODEL_ROUTING.md`](docs/80-production/agentic/MODEL_ROUTING.md).
 
 ```text
-AGENTS.md raíz            ← reglas del estudio
-  +
-<scope>/AGENTS.md         ← reglas locales del scope (ej: 20-worlds/ohmdal/AGENTS.md)
-  +
-docs/<nivel>/...          ← autoridad documental (00-governance → 10-global → 20-worlds → 30-integration)
-  +
-task spec / brief         ← qué producir
+Manuel
+  ↓ objetivo
+GPT-5.6 Sol — Director / Loop Owner
+  ↓ contract
+MiniMax M3 / MiniMax Code — Builder
+  ↓
+BUILD + TEST + VERIFY
+  ↓
+GPT-5.6 Luna — Player Agent blind-first
+  ├─ FAIL → DeepSeek V4 Flash — bounded repair → replay
+  └─ PASS
+      ↓
+GLM — adversarial read-only review
+      ↓
+GPT-5.6 Sol — DONE / REPAIR / ESCALATE
+      ↓
+Manuel — integración material
 ```
 
----
+Kimi/Grok/otros son challengers de benchmark hasta ganar un rol repetible. No hay model roulette.
 
-## 5. Por mundo, qué agente usar
+Los harnesses pueden ser distintos. Lo común es el repo contract, no la aplicación desktop.
 
-| Tarea | Mundo | Sub-agent recomendado |
-|---|---|---|
-| Diseñar puzzle eléctrico (modelo + vista + Bitácora) | Ohmdal | `worker-gameplay` + revisión de `visual-review` |
-| Modelar circuito de Ohmdal, validar ≥2 soluciones | Ohmdal | `worker-gameplay` (modelo puro + tests) |
-| Pintar/animar sprites Ohmdal, dioramas HD-2D | Ohmdal | `worker-world` + `m3-visual` |
-| Auditar puzzle existente contra `guia-puzzles.md` | Ohmdal | `m3-qa` (QA) |
-| Cinematografía de Ohmdal (encuadres, cámara) | Ohmdal | `m3-visual` |
-| Modelar física analítica (MRUV, tiro parabólico, vectores) | Physica | `m3-gameplay` (modelos) + `worker-qa` (tests) |
-| Implementar escena Babylon de Physica | Physica | `worker-world` |
-| Auditar puzzle físico contra `guia-puzzles.md` | Physica | `m3-qa` |
-| Diseñar puzzle de Bitland (lenguaje como jugable) | Bitland | `worker-gameplay` (modelo puro + tests) |
-| Auditar puzzle Bitland | Bitland | `m3-qa` |
-| Diseñar puzzle Arithmos (transformación de estructura) | Arithmos | `worker-gameplay` (modelo puro + tests) |
-| Auditar puzzle Arithmos | Arithmos | `m3-qa` |
-| Auditoría visual transversal | Cualquiera | `visual-review` (abre el navegador) |
-| Investigación documental amplia (leer mucho, proponer poco) | Cualquiera | `explore` |
-| Tarea multi-paso no especializada | Cualquiera | `general` |
+## 6. Bounded Play-Code Loop
 
-> Los sub-agents especializados (`m3-*` / `worker-*`) están optimizados para Physica
-> pero sus patrones aplican a Ohmdal/Bitland/Arithmos porque comparten la disciplina
-> "modelo puro testeable + vista + feedback observable".
+```text
+CONTRACT
+  ↓
+BUILD
+  ↓
+MECHANICAL GATE
+  ↓
+PLAYER AGENT
+  ├─ FAIL → REPAIR ─────────┐
+  └─ PASS                   │
+      ↓                     │
+ADVERSARIAL REVIEW          │
+  ├─ FAIL → REPAIR/ESCALATE ┘
+  └─ PASS
+      ↓
+DIRECTOR + HUMAN GATE
+```
 
----
-
-## 6. Fuentes de verdad — dónde mirar primero
-
-### Norte de producto
-
-- [`docs/START_HERE.md`](docs/START_HERE.md) — promesa, loop, mundos, Bitácora, arquitectura.
-- [`ROADMAP.md`](ROADMAP.md) — qué se está construyendo y en qué orden.
-- [`CLAUDE.md`](CLAUDE.md) — reglas duras de trabajo (este archivo las resume).
-
-### Autoridad de gobierno (no se contradice sin ADR)
-
-- [`docs/00-governance/ROXANA_GAME_DESIGN_PILLARS_v1.md`](docs/00-governance/ROXANA_GAME_DESIGN_PILLARS_v1.md)
-- [`docs/00-governance/ROXANA_CANON_POLICY_v1.md`](docs/00-governance/ROXANA_CANON_POLICY_v1.md)
-- [`docs/00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md`](docs/00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md)
-- [`docs/00-governance/ROXANA_DESIGN_LANGUAGE_v1.md`](docs/00-governance/ROXANA_DESIGN_LANGUAGE_v1.md)
-- [`docs/00-governance/ROXANA_DESIGN_REVIEW_CHECKLIST_v1.md`](docs/00-governance/ROXANA_DESIGN_REVIEW_CHECKLIST_v1.md)
-
-### Autoridad global (biblia del producto)
-
-- [`docs/10-global/ROXANA_INSTITUTE_BIBLE_v1.md`](docs/10-global/ROXANA_INSTITUTE_BIBLE_v1.md) — el Instituto como espacio.
-- [`docs/10-global/ROXANA_BITACORA_SYSTEM_v1.md`](docs/10-global/ROXANA_BITACORA_SYSTEM_v1.md) — el sistema pedagógico común.
-- [`docs/10-global/ROXANA_GLOBAL_NARRATIVE_v1.md`](docs/10-global/ROXANA_GLOBAL_NARRATIVE_v1.md) — la historia que une todo.
-- [`docs/10-global/ROXANA_GLOBAL_UI_UX_v1.md`](docs/10-global/ROXANA_GLOBAL_UI_UX_v1.md) — UI/UX transversal.
-
-### Por mundo (autoridad local)
-
-- [`docs/20-worlds/ohmdal/AGENTS.md`](docs/20-worlds/ohmdal/AGENTS.md) — único mundo en producción real.
-- [`docs/20-worlds/physica/AGENTS.md`](docs/20-worlds/physica/AGENTS.md) — Hito 1 hecho, Arco I pendiente.
-- [`docs/20-worlds/bitland/AGENTS.md`](docs/20-worlds/bitland/AGENTS.md) — PROPOSED, sin código todavía.
-- [`docs/20-worlds/arithmos/AGENTS.md`](docs/20-worlds/arithmos/AGENTS.md) — PROPOSED, sin código todavía.
-
-### Canon de puzzles (transversal)
-
-- [`docs/guia-puzzles.md`](docs/guia-puzzles.md) — **CANON**. Lee antes de crear o auditar cualquier puzzle.
-
----
-
-## 7. Forma de trabajo (recordatorio)
-
-Un hito = algo que se puede abrir en el navegador y jugar. Se hace uno por vez.
+Comandos base:
 
 ```bash
-npm run dev      # http://localhost:5173
-npm run build    # tsc + vite build
-npm test         # todos los tests de tests/
-npm run verify   # build + tests + gate de dialecto y spoilers (requiere bash)
+npm run build
+npm test
+npm run verify
 ```
 
-Ciclo:
+Después se **juega** el runtime. Mechanical PASS ≠ Play PASS.
 
-1. Implementar.
-2. `npm run build` y `npm test` en verde.
-3. Verlo funcionando en el navegador.
-4. Proponer el commit a Manuel y esperar su ok.
+## 7. Player Agent
 
-Si algo de esto se saltea, está mal.
+El playtester primero juega blind-first: objetivo, controles y estado inicial. **No lee diff/tests antes de intentar el camino como usuario.**
 
----
+Después puede usar Playwright/debug hooks/source para reproducir lo que sintió/vio.
 
-## 8. Cuándo parar y preguntar a Manuel
+No arregla. Reporta `BLOCKER | MAJOR | MINOR | PASS` con pasos exactos.
 
-- Decisiones de diseño (qué dice un personaje, cómo se siente un puzzle, qué va en pantalla).
-- Adopción de dependencias o librerías nuevas.
-- Cambios de arquitectura (motor, runtime, bundler).
-- Cambios a docs `CANON` o nivel 0–1.
-- Cualquier commit.
+## 8. Spikes
 
-Lo técnico se resuelve y se sigue.
+Cuando hay dos candidatos plausibles, no hacer un prototipo mezclado.
+
+- mismo commit baseline;
+- mismo core neutral;
+- mismo Builder/model/harness;
+- mismo Learning Contract;
+- mismo budget de loops;
+- dos implementaciones aisladas;
+- mismo Player Agent protocol;
+- comparación posterior.
+
+Hoy:
+
+- `BIT-R-A`: PixiJS machine-city;
+- `BIT-R-B`: Phaser 4 machine-city;
+- `ARI-R-A`: Three.js spatial equivalence;
+- `ARI-R-B`: Pixi/SVG diagrammatic equivalence;
+- `PHY-D-A/B`: sólo cuando un concepto concreto dispare duda 2.5D vs 3D;
+- `OHM-ASSET-A/B`: pipeline actual vs Vibe3D para el mismo asset hard-surface no-hero.
+
+## 9. Tooling por engine
+
+No improvisar stack desde memoria. Leer [`GAME_DEV_AI_TOOLING.md`](docs/80-production/agentic/GAME_DEV_AI_TOOLING.md).
+
+Highlights:
+
+- Three.js: WebGL baseline, glTF/GLB, Playwright, Spector MCP, skills Three game-specific seleccionadas; Vibe3D experimental para asset pipeline.
+- Babylon: Inspector CLI + MCPs oficiales selectivos + Spector; analítica TS manda.
+- PixiJS: skills oficiales v8 + AI-readable docs; simulation clock separado del ticker visual.
+- Phaser 4: skills oficiales; Phaser Editor v5/MCP sólo si el spike prueba valor de authoring.
+
+No copiar bundles externos con provenance dudosa.
+
+## 10. Fuentes rápidas
+
+- `docs/START_HERE.md`
+- `ROADMAP.md`
+- `docs/00-governance/ROXANA_GAME_DESIGN_PILLARS_v1.md`
+- `docs/00-governance/ROXANA_CANON_POLICY_v1.md`
+- `docs/00-governance/ROXANA_DESIGN_REVIEW_CHECKLIST_v1.md`
+- `docs/guia-puzzles.md`
+- `docs/20-worlds/<mundo>/AGENTS.md`
+- `docs/80-production/agentic/README.md`
+
+## 11. Escalar a Manuel
+
+- diseño/experiencia;
+- guion faltante;
+- dependencia/engine/runtime;
+- canon nivel alto;
+- ganador de spike;
+- hard cap sin PASS;
+- decisión visual/material de producto;
+- integración de milestone material.
+
+Un fix técnico local dentro de contrato claro se resuelve y se vuelve a jugar.

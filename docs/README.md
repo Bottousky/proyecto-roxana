@@ -1,151 +1,115 @@
 # Mapa de documentación
 
-Índice vivo de `docs/`. Lo lee cualquier agente para orientarse antes de consultar las
-fuentes de autoridad. Para reglas de trabajo y gobernanza del estudio ver el
-[`../AGENTS.md`](../AGENTS.md) raíz.
+Índice vivo de `docs/`. Para reglas operativas ver [`../AGENTS.md`](../AGENTS.md); para el norte actual ver [`START_HERE.md`](START_HERE.md).
 
-> Toda la v1 nace como `PROPOSED`. La promoción a `CANON` requiere ratificación autoral
-> explícita mediante un ADR firmado por Manuel (`00-governance/ROXANA_CANON_POLICY_v1.md` §5).
-
----
+> Menor `authority_level` = mayor autoridad. La implementación nunca convierte una idea en canon. Material `LEGACY`/histórico puede conservar valor como insumo o regresión, pero no gobierna una decisión nueva.
 
 ## 1. Estructura vigente
 
 ```text
 docs/
 ├── README.md                   este índice
-├── START_HERE.md               norte de producto y arquitectura
-├── guia-puzzles.md             CANON — diseño y auditoría de puzzles
-├── asset-manifest.yaml         contrato runtime de assets 3D
-├── guion-instituto.md          texto canon del aula de Electrónica (referencia histórica, v1 lo absorbe)
-├── biblia-estilo-instituto.md  cámara ¾ top-down y escala del Instituto (referencia histórica)
-├── diseno-sintesis-v1.md       diseño general (loop, tono, reglas pedagógicas comunes)
-├── prologo.md                  guion detallado del prólogo en la escuela
-│
-├── 00-governance/              5 docs fundacionales y operativos
-│                                pilares · canon policy · lenguaje de diseño
-│                                arquitectura documental · checklist de revisión
-│
-├── 10-global/                  8 docs de biblia global
-│                                Instituto · Bitácora · narrativa · UI/UX
-│                                estructura de campañas · vertical slice
-│                                metaprogresión · perfil del jugador
-│
+├── START_HERE.md               norte de producto actual
+├── guia-puzzles.md             CANON — diseño/auditoría de puzzles
+├── 00-governance/              pilares, canon policy, design language, doc architecture, review
+├── 10-global/                  Instituto, Bitácora, narrativa, campañas, UI/UX, metaprogresión
 ├── 20-worlds/                  GDD modular por mundo
-│   ├── ohmdal/   (CONECTAR)    único en producción real — H1 hecho, H2 en curso
-│   ├── physica/  (EXPERIMENTAR) Hito 1 hecho en Babylon.js
-│   ├── bitland/  (PROGRAMAR)   PROPOSED, sin código todavía
-│   └── arithmos/ (TRANSFORMAR) PROPOSED, sin código todavía
-│       └── cada uno:
-│         ├── AGENTS.md         reglas del mundo + qué sub-agent dispatchar
-│         ├── vision/           North Star, anti-pilares, metáfora del mundo
-│         ├── gameplay/         sistemas, gramática de puzzles, progresión mecánica
-│         ├── world/            geografía, regiones, gating
-│         ├── narrative/        lore, personajes
-│         ├── content/          arcos, mapas, beats del vertical slice
-│         └── production/       prototipos, pipelines, specs operativas
-│
-├── 30-integration/             catálogo de cruces interdisciplinarios
-│                                + mapa de autoridad de contenido
-│
-├── ohmdal-biblia/              biblia canónica de Ohmdal (histórica — precede a la v1 de 20-worlds/)
-│                                absorbida por `20-worlds/ohmdal/` como insumo
-│                                La promoción documental no migra el runtime: `/jugar` y sus
-│                                regresiones continúan protegidos hasta que un ADR apruebe su reemplazo
-│
-├── arco1/                      dirección visual del Arco I: identidad, color script, encuadres,
-│                                inventario de escenas, contenido educativo, presupuestos
-│
-├── 3d/                         contratos, toolchain y estado del ecosistema 3D
-│                                (Blender → GLB, validadores, presupuestos)
-│
-└── sessions/                   bitácora de las 6 sesiones de diseño P1–P6
-                                 (proceso, no autoridad — ver `00-governance/ROXANA_CANON_POLICY_v1.md` §2)
+│   ├── ohmdal/                 CONECTAR — foco principal de producción
+│   ├── physica/                EXPERIMENTAR — Hito 1 Babylon jugable
+│   ├── bitland/                PROGRAMAR — campaña PROPOSED; spikes renderer autorizados
+│   └── arithmos/               TRANSFORMAR — campaña PROPOSED; spikes representación autorizados
+├── 30-integration/             cruces interdisciplinarios
+├── 80-production/
+│   ├── agentic/                workflow IA, model routing, engine fit, tooling, DoD, spike policy
+│   └── spikes/                 specs A/B aisladas
+├── ohmdal-biblia/              fuente histórica absorbida progresivamente por Ohmdal v1
+├── arco1/                      dirección visual viva de Ohmdal Arco I
+├── 3d/                         contratos/pipeline Blender → GLB y QA 3D
+└── sessions/                   proceso de diseño; no autoridad de producto
 ```
 
----
+Cada mundo tiene un `AGENTS.md` con fuentes de autoridad, estado, restricciones y routing actual de modelos/harnesses.
 
-## 2. Authority levels y precedencia
-
-Jerarquía numérica: menor = mayor autoridad. Definida en
-[`00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md`](00-governance/ROXANA_DOCUMENT_ARCHITECTURE_v1.md) §1.
+## 2. Authority levels
 
 | Nivel | Qué vive ahí |
 |---|---|
-| **0** | Constitución fundacional (Pilares, Canon Policy) |
-| **1** | Constitución operativa (Design Language, Doc Architecture, Review Checklist) |
-| **2** | Biblia global (Instituto, Bitácora, metaprogresión, narrativa, UI/UX, vertical slice) |
-| **3** | Biblia de mundo (vision por mundo, sistemas, gramática de puzzles) |
-| **4** | Diseño de contenido (arcos, puzzles específicos, encounters) |
-| **5** | Producción (pipelines, presupuestos, runtimes, QA) |
-| **6** | Especificación de tarea (specs de hito, tickets) |
-| **7** | Evidencia de implementación (test reports, screenshots) |
+| **0** | constitución fundacional: pilares, canon policy |
+| **1** | constitución operativa: lenguaje, arquitectura documental, review |
+| **2** | biblia global |
+| **3** | biblia de mundo |
+| **4** | diseño de contenido |
+| **5** | producción: pipelines, runtimes, QA, engine/tooling hypotheses |
+| **6** | Task/Spike Contract |
+| **7** | evidencia de implementación/playtest |
 
-**Regla:** nivel menor gana. Si contradicen, se eleva por ADR. La implementación NUNCA
-convierte una idea en canon.
-
----
+Ante contradicción aplicar [`00-governance/ROXANA_CANON_POLICY_v1.md`](00-governance/ROXANA_CANON_POLICY_v1.md).
 
 ## 3. Cómo navegar por tarea
 
-### "Estoy diseñando un puzzle nuevo"
-1. [`../AGENTS.md`](../AGENTS.md) §5 — qué sub-agent dispatchar.
-2. [`guia-puzzles.md`](guia-puzzles.md) — canon de puzzles (CANON).
-3. `<mundo>/gameplay/<mundo>-puzzle-grammar_v1.md` — gramática local del mundo.
-4. `<mundo>/AGENTS.md` — reglas locales + convenciones de código.
+### Diseñar/implementar un puzzle
 
-### "Estoy tocando código de Ohmdal"
-1. [`20-worlds/ohmdal/AGENTS.md`](20-worlds/ohmdal/AGENTS.md) — reglas locales.
-2. [`../ROADMAP.md`](../ROADMAP.md) — qué hito está en curso.
-3. [`20-worlds/ohmdal/gameplay/ohmdal-core-gameplay_v1.md`](20-worlds/ohmdal/gameplay/ohmdal-core-gameplay_v1.md) — modos y loop.
-4. `src/jugar/` o `src/ohmdal/` según el runtime activo.
+1. [`../AGENTS.md`](../AGENTS.md)
+2. [`guia-puzzles.md`](guia-puzzles.md)
+3. `20-worlds/<mundo>/AGENTS.md`
+4. `20-worlds/<mundo>/gameplay/<mundo>-puzzle-grammar_v1.md`
+5. [`80-production/agentic/TASK_CONTRACT_TEMPLATE.md`](80-production/agentic/TASK_CONTRACT_TEMPLATE.md) cuando la milestone requiera coordinación/learning evidence.
 
-### "Estoy tocando el Instituto"
-1. [`../AGENTS.md`](../AGENTS.md) §6 — fuentes de verdad.
-2. [`10-global/ROXANA_INSTITUTE_BIBLE_v1.md`](10-global/ROXANA_INSTITUTE_BIBLE_v1.md) — biblia global del Instituto (nivel 2, autoridad máxima para el Instituto).
-3. `guion-instituto.md` y `biblia-estilo-instituto.md` — referencias históricas.
-4. `src/landing/` — código del Instituto.
+### Trabajar en Ohmdal
 
-### "Estoy tocando Physica"
-1. [`20-worlds/physica/AGENTS.md`](20-worlds/physica/AGENTS.md) — reglas locales + convenciones.
-2. [`20-worlds/physica/README.md`](20-worlds/physica/README.md) — estado operativo (Hito 1 hecho).
-3. [`20-worlds/physica/production/arquitectura.md`](20-worlds/physica/production/arquitectura.md) — física híbrida.
+1. [`20-worlds/ohmdal/AGENTS.md`](20-worlds/ohmdal/AGENTS.md)
+2. [`../ROADMAP.md`](../ROADMAP.md)
+3. docs de gameplay/content/visual citados por ese `AGENTS.md`
+4. **HD-2D nuevo:** `src/hd2d-ohmdal/`
+5. **baseline de regresión/contenido:** `src/jugar/`
 
-### "Quiero entender la visión general"
-1. [`START_HERE.md`](START_HERE.md) — norte de producto.
-2. [`../ROADMAP.md`](../ROADMAP.md) — qué se construye y en qué orden.
-3. [`10-global/ROXANA_INSTITUTE_BIBLE_v1.md`](10-global/ROXANA_INSTITUTE_BIBLE_v1.md) §1 — tesis.
+No asumir que `src/ohmdal/` es el árbol principal del world building nuevo; contiene piezas históricas/compatibilidad según el estado del repo.
 
-### "Necesito auditar un puzzle"
-1. [`guia-puzzles.md`](guia-puzzles.md) — checklist completo.
-2. `<mundo>/AGENTS.md` §3 — reglas DO/DON'T locales.
-3. Sub-agent `m3-qa` para el informe priorizado (ver [`../AGENTS.md`](../AGENTS.md) §5).
+### Trabajar en Physica
 
----
+1. [`20-worlds/physica/AGENTS.md`](20-worlds/physica/AGENTS.md)
+2. [`20-worlds/physica/production/arquitectura.md`](20-worlds/physica/production/arquitectura.md)
+3. `src/experiences/physica/`
 
-## 4. Sesiones de diseño (proceso, no autoridad)
+Babylon es la dirección de Physica, no un engine global de Roxana.
 
-[`sessions/v1/INDEX.md`](sessions/v1/INDEX.md) es el mapa de las **seis sesiones de diseño**
-que llevaron los GDD Reboot a la arquitectura documental vigente arriba. Orden recomendado:
-P1 → P2 → P3 → P4 → P5 → P6, no en paralelo.
+### Investigar Bitland sin abrir la campaña
 
-> Las sesiones son **proceso**, no autoridad. Si una decisión de una sesión contradice un
-> doc de `00-governance/`, `10-global/`, `20-worlds/` o `30-integration/`, prevalece la
-> v1 (Canon Policy §2).
+1. [`20-worlds/bitland/AGENTS.md`](20-worlds/bitland/AGENTS.md)
+2. [`80-production/agentic/SPIKE_POLICY.md`](80-production/agentic/SPIKE_POLICY.md)
+3. `80-production/spikes/BIT-R-A-*` o `BIT-R-B-*`
 
----
+Sólo spikes autorizados; no construir el Arco I completo todavía.
 
-## 5. Archivos históricos relevantes
+### Investigar Arithmos sin abrir la campaña
 
-> El material de hitos cerrados (auditorías, specs viejas, planes-implementación, pilotos)
-> se retiró el 2026-08-14. Lo que queda aquí es insumo vivo:
+1. [`20-worlds/arithmos/AGENTS.md`](20-worlds/arithmos/AGENTS.md)
+2. [`80-production/agentic/SPIKE_POLICY.md`](80-production/agentic/SPIKE_POLICY.md)
+3. `80-production/spikes/ARI-R-A-*` o `ARI-R-B-*`
 
-- [`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md) — biblia consolidada
-  de Ohmdal desde el 1 de agosto de 2026. `20-worlds/ohmdal/` la absorbe como insumo; los
-  puntos donde contradice, prevalece la v1.
-- [`diseno-sintesis-v1.md`](diseno-sintesis-v1.md) — diseño general del juego (concepto, loop,
-  Bitácora, anti-clase, arquitectura). Insumo de los docs v1.
-- [`prologo.md`](prologo.md) — guion detallado del prólogo en la escuela. Insumo del Instituto
-  y del primer ingreso a Ohmdal.
-- [`arco1/`](arco1/) — dirección visual congelada del Arco I (identidad, color script,
-  encuadres, presupuestos por escena). El h2-h5 del ROADMAP se apoya aquí.
+### Producir con agentes
+
+1. [`80-production/agentic/README.md`](80-production/agentic/README.md)
+2. [`80-production/agentic/WORKFLOW.md`](80-production/agentic/WORKFLOW.md)
+3. [`80-production/agentic/MODEL_ROUTING.md`](80-production/agentic/MODEL_ROUTING.md)
+4. [`80-production/agentic/ENGINE_MATRIX.md`](80-production/agentic/ENGINE_MATRIX.md)
+5. [`80-production/agentic/GAME_DEV_AI_TOOLING.md`](80-production/agentic/GAME_DEV_AI_TOOLING.md)
+6. [`80-production/agentic/TASK_CONTRACT_TEMPLATE.md`](80-production/agentic/TASK_CONTRACT_TEMPLATE.md)
+
+### Entender la visión general
+
+1. [`START_HERE.md`](START_HERE.md)
+2. [`../ROADMAP.md`](../ROADMAP.md)
+3. [`00-governance/ROXANA_GAME_DESIGN_PILLARS_v1.md`](00-governance/ROXANA_GAME_DESIGN_PILLARS_v1.md)
+4. [`10-global/ROXANA_INSTITUTE_BIBLE_v1.md`](10-global/ROXANA_INSTITUTE_BIBLE_v1.md)
+
+## 4. Histórico vs legacy útil
+
+No borrar algo sólo porque sea viejo:
+
+- `/jugar` es legacy visual pero baseline de contenido/regresión mientras HD-2D migra el Arco I;
+- `ohmdal-biblia/` conserva trazabilidad e insumo, pero `20-worlds/ohmdal/` gobierna cuando contradicen;
+- `sessions/` documenta proceso, no decisiones vigentes;
+- prototipos/renders viejos se conservan sólo cuando sirven de evidencia, regresión o referencia explícita.
+
+Una limpieza de legacy runtime/assets requiere una tarea propia: no se hace incidentalmente durante una milestone de gameplay.

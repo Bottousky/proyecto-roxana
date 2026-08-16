@@ -2,10 +2,9 @@
 
 > **Verbo nuclear:** **CONECTAR**.
 > **Disciplina:** Electrónica (corriente continua).
-> **Estado:** único mundo en **producción real**. H1 (Plaza HD-2D) hecho; H2 (Plaza de verdad) en curso; Arco I completo jugable en greybox (`/jugar`).
+> **Estado:** foco principal de producción actual. H1 (Plaza HD-2D) hecho; H2 (Plaza de verdad) en curso; Arco I completo jugable en greybox (`/jugar`) como baseline.
 
-Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Ohmdal. Cualquier
-agente que trabaje sobre Ohmdal lee los dos.
+Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Ohmdal. Cualquier agente que trabaje sobre Ohmdal lee ambos.
 
 ---
 
@@ -26,19 +25,19 @@ agente que trabaje sobre Ohmdal lee los dos.
 - [`../production/direccion-ambiental-arco1.md`](../production/direccion-ambiental-arco1.md) — color script y ambientación.
 - [`../production/sistema-arte-v1.md`](../production/sistema-arte-v1.md) — sistema de arte.
 
-### Autoridad histórica (insumo)
+### Autoridad histórica (insumo, no gobierna si contradice v1)
 
 - [`../../ohmdal-biblia/00_MASTER_INDEX.md`](../../ohmdal-biblia/00_MASTER_INDEX.md) — biblia consolidada pre-v1.
-- [`../../ohmdal-biblia/05_GAME_DESIGN_DOCUMENT.md`](../../ohmdal-biblia/05_GAME_DESIGN_DOCUMENT.md) — GDD canónico histórico.
+- [`../../ohmdal-biblia/05_GAME_DESIGN_DOCUMENT.md`](../../ohmdal-biblia/05_GAME_DESIGN_DOCUMENT.md) — GDD histórico.
 - [`../../ohmdal-biblia/15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md`](../../ohmdal-biblia/15_DQ3_HD2D_RESEARCH_AND_APPLICATION.md) — investigación DQ III HD-2D.
-- [`../../ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md`](../../ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md) — backlog serie La Luz.
+- [`../../ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md`](../../ohmdal-biblia/16_ARC1_JIRA_BACKLOG.md) — backlog histórico; no define el workflow agentic actual.
 
-### Direcciones vivas
+### Dirección visual viva
 
-- [`../../arco1/IDENTITY.md`](../../arco1/IDENTITY.md) — identidad visual.
-- [`../../arco1/COLOR_SCRIPT.md`](../../arco1/COLOR_SCRIPT.md) — color script.
-- [`../../arco1/GOLDEN_FRAMES.md`](../../arco1/GOLDEN_FRAMES.md) — encuadres canónicos.
-- [`../../arco1/SHOT_DECK.md`](../../arco1/SHOT_DECK.md) — contrato de encuadres.
+- [`../../arco1/IDENTITY.md`](../../arco1/IDENTITY.md)
+- [`../../arco1/COLOR_SCRIPT.md`](../../arco1/COLOR_SCRIPT.md)
+- [`../../arco1/GOLDEN_FRAMES.md`](../../arco1/GOLDEN_FRAMES.md)
+- [`../../arco1/SHOT_DECK.md`](../../arco1/SHOT_DECK.md)
 
 ---
 
@@ -47,70 +46,88 @@ agente que trabaje sobre Ohmdal lee los dos.
 | Hito | Descripción | Estado |
 |---|---|---|
 | H1 | HD-2D fuera del laboratorio | ✅ hecho |
-| H2 | Plaza de verdad en HD-2D | ← **acá estamos** |
+| H2 | Plaza de verdad en HD-2D | ← **foco actual** |
 | H3 | Primer puzzle en HD-2D (Reactivar a Ohm) | próximo |
 | H4 | El Instituto recuerda la partida | pendiente |
 | H5 | Arte real sobre el blockout | pendiente |
 | H6 | Resto del Arco I (Taller, Puerta, Castillo, Forja, Terrazas, Faro) | pendiente |
 
-**Baseline jugable:** `/jugar` (Phaser topdown, greybox). Se preserva como red de
-seguridad y referencia de contenido hasta que el HD-2D lo alcance. Ver [`ROADMAP.md`](../../../ROADMAP.md).
+**Baseline jugable:** `/jugar` (Phaser top-down, greybox). Se preserva como red de seguridad, contenido y regresión hasta que HD-2D alcance paridad suficiente. No recibe la nueva dirección visual por defecto.
 
 ---
 
-## 3. Reglas locales de Ohmdal
+## 3. Reglas locales
 
 ### DO
 
-- Electricidad = comportamiento del mundo observable (luz, calor, movimiento, sonido).
+- Electricidad = comportamiento observable del mundo (luz, calor, movimiento, sonido, continuidad).
 - Feedback inmediato: el jugador ve el efecto antes de ver el número.
-- ≥2 soluciones por puzzle (ver [`../../guia-puzzles.md`](../../guia-puzzles.md)).
-- Modelo puro en `src/puzzles/<x>Model.ts` con tests en `tests/m<X>-<x>.test.ts`.
-- Vocabulario diegético: Empuje / Río / Piedra / Camino / Freno / Chispa. Lo técnico
-  (`V`, `I`, `R`, `serie`, `paralelo`, `capacitor`) solo en la capa formal de la
-  Bitácora, gateada por flags de formalización.
-- Cámara casi ortográfica sobre dioramas 3D, sprites pixel art de 4 direcciones.
+- Predicción → intervención → observación → explicación → transferencia.
+- ≥2 soluciones cuando el sistema realmente las permite; validar condiciones, no una secuencia fija.
+- Modelos pedagógicos puros/testeables fuera del renderer.
+- Vocabulario diegético: Empuje / Río / Piedra / Camino / Freno / Chispa. Lo técnico (`V`, `I`, `R`, `serie`, `paralelo`, `capacitor`) aparece en formalización, no como spoiler.
+- Cámara casi ortográfica, dioramas/escenario 3D y sprites 2D cuando esa combinación sostenga legibilidad.
+- Producir por capas: greybox → kit modular → materiales/luz → assets identitarios → hero assets → polish.
 
 ### DON'T
 
-- Quizzes disfrazados ni "preguntar V = I·R para abrir una puerta".
-- Bancos modales a pantalla completa para puzzles del slice (los bancos modales son
-  deuda conocida del slice greybox; los nuevos van diegéticos).
-- Combinar nombres técnicos y diegéticos en el mismo diálogo.
-- "Tocar hasta que se ponga verde": todo puzzle exige predicción → observación → explicación.
-- Overlays físicos permanentes sobre el sprite (rompe HD-2D).
+- Quizzes disfrazados ni “preguntar V = I·R para abrir una puerta”.
+- Bancos modales como solución por defecto para puzzles nuevos.
+- Mezclar vocabulario técnico y diegético sin transición pedagógica.
+- “Tocar hasta que se ponga verde”.
+- Overlays físicos permanentes que rompan la lectura HD-2D.
+- Reabrir el engine porque otra herramienta sea nueva/popular; sólo si aparece un bloqueo material reproducible.
+- Exigir hero-art en cada prop secundario.
 
 ---
 
-## 4. Por tipo de tarea, qué sub-agent dispatchar
+## 4. Roles y harnesses
 
-| Tarea | Sub-agent | Input esperado | Output esperado |
-|---|---|---|---|
-| Diseñar un puzzle (modelo + vista + Bitácora) | `worker-gameplay` | unidad del guion + gramática | código + tests + flag |
-| Validar ≥2 soluciones de un modelo | `m3-qa` | `xModel.ts` + tests | informe de cobertura |
-| Pintar/animar sprites o dioramas HD-2D | `worker-world` | brief visual + ref DQ3 | assets + manifests |
-| Auditar encuadre / cámara / composición | `m3-visual` | screenshot + `SHOT_DECK.md` | veredicto + ajustes |
-| Auditar puzzle contra `guia-puzzles.md` | `m3-qa` | puzzle vivo + checklist | informe priorizado |
-| Investigar lore o historia del mundo | `explore` | objetivo textual | mapa de referencias |
-| Implementación multi-paso no especializada | `general` | brief | código + commit propuesta |
+No usar los antiguos `worker-*` / `m3-*`; fueron retirados.
 
----
+| Necesidad | Rol por defecto | Harness |
+|---|---|---|
+| diseño, arquitectura, Task/Learning Contract, escalaciones | **GPT-5.6 Sol — Director** | Codex Desktop / ChatGPT |
+| implementación principal, world building, integración de escena | **MiniMax M3 — Builder** | MiniMax Code |
+| uso real del juego / affordance / aprendizaje / fricción | **GPT-5.6 Luna — Player Agent** | OpenCode Go (`playtester`) |
+| bug acotado y reproducible | **DeepSeek V4 Flash — Repair** | OpenCode Go (`implementer`) |
+| intentar romper milestone antes de integrar | **GLM — Adversarial Reviewer** | OpenCode Go (`reviewer`) |
+| imágenes/audio/video/voz | **MiniMax multimodal** | herramientas nativas MiniMax |
 
-## 5. Convenciones del código Ohmdal
-
-- Runtime: `src/ohmdal/` (HD-2D con Three.js + Phaser topdown coexisten bajo `RuntimeHost`).
-- Baseline jugable: `src/jugar/` (Phaser topdown greybox).
-- Tests: `tests/mX-x.test.ts` con `node --experimental-strip-types`. Imports con `.ts`.
-- Manifiestos: `src/experiences/manifests.ts` — `OHMDAL.runtime` cambia entre
-  `topdown-phaser` (legacy `/jugar`) y `ohmdal-hd2d` (nuevo `/ohmdal`).
-- Portal: `src/shared/portalLink.ts` — único interruptor de migración (`portalGateUrl()`).
+Tooling Three.js específico, Vibe3D, Spector, Blender y skills se cargan **según la tarea**, no globalmente. Ver [`../../80-production/agentic/GAME_DEV_AI_TOOLING.md`](../../80-production/agentic/GAME_DEV_AI_TOOLING.md).
 
 ---
 
-## 6. Qué NO tocar sin ADR
+## 5. Convenciones de código
 
-- `src/jugar/rooms.ts` (23 salas U1–U5, contrato narrativo del slice).
-- `src/state.ts` y `src/ui/bitacora.ts` (Bitácora, flags de formalización).
-- `src/experiences/manifests.ts` campo `runtime` sin pasar por ADR.
-- Cualquier doc `CANON` o nivel 0–1.
-- `npm run build` debe seguir verde tras cada cambio.
+- **Runtime HD-2D activo:** `src/hd2d-ohmdal/`.
+- `src/ohmdal/` puede contener piezas de integración/compatibilidad históricas; no asumir que es el árbol principal del world building nuevo.
+- **Baseline:** `src/jugar/` (Phaser top-down greybox).
+- Modelos/tests históricos de puzzles viven en `src/puzzles/` + `tests/`; cualquier modelo nuevo debe seguir siendo renderer-neutral.
+- Manifiestos/routing: `src/experiences/` y `src/shared/portalLink.ts` son contratos de integración; no cambiar silenciosamente.
+- `package.json` es la verdad de versiones instaladas; no actualizar Three/Phaser/Babylon de paso.
+
+---
+
+## 6. Definition of Done local
+
+Además del DoD global:
+
+- la red/cadena causal sigue siendo legible en cámara real;
+- el Player Agent puede inferir la acción relevante sin leer el código;
+- el cambio no rompe `/jugar` cuando afecta contratos compartidos;
+- desktop + touch se prueban cuando cambia navegación/interacción;
+- un cambio visual se evalúa **dentro del juego**, no sólo como asset aislado;
+- ninguna mejora gráfica puede ocultar estado eléctrico pedagógicamente relevante.
+
+---
+
+## 7. Qué NO tocar sin decisión material
+
+- `src/jugar/rooms.ts` como baseline narrativo/contenido.
+- estado/Bitácora/flags compartidos sin revisar impacto de migración.
+- runtime/manifest/routing global.
+- docs `CANON` o nivel 0–1.
+- dependencia/engine.
+
+Todo cambio debe mantener `npm run build`, `npm test` y `npm run verify` verdes **y después jugarse en runtime**.

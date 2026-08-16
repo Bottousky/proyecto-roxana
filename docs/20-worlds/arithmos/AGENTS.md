@@ -2,110 +2,136 @@
 
 > **Verbo nuclear:** **TRANSFORMAR**.
 > **Disciplina:** Matemática.
-> **Estado:** **PROPOSED** sin código todavía. No se trabaja sobre Arithmos hasta que el Instituto + Ohmdal estén cerrados (`ROADMAP.md`).
+> **Estado:** GDD **PROPOSED**; campaña todavía no está en producción. Se permiten únicamente los **spikes de representación aprobados** en `docs/80-production/spikes/`.
 
-Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Arithmos. Cualquier
-agente que trabaje sobre Arithmos lee los dos.
-
-> **Recordatorio:** trabajar sobre Arithmos hoy es trabajo especulativo. La autoridad de
-> este `AGENTS.md` es de **planning**, no de implementación. La promoción a trabajo real
-> requiere ratificación de Manuel (probablemente cuando Ohmdal esté cerrado) y un ADR
-> que eleve el `AGENTS.md` y los docs v1 a `CANON`.
+Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Arithmos. Cualquier agente que trabaje sobre Arithmos lee ambos.
 
 ---
 
 ## 1. Fuentes de verdad
 
-### Autoridad vigente (level ≤ 3, toda PROPOSED)
+### Autoridad vigente (level ≤ 3, PROPOSED salvo ratificación posterior)
 
 - [`../vision/arithmos-vision_v1.md`](../vision/arithmos-vision_v1.md) — North Star y fantasía.
 - [`../vision/arithmos-world-rules_v1.md`](../vision/arithmos-world-rules_v1.md) — reglas del mundo.
-- [`../gameplay/arithmos-representation-system_v1.md`](../gameplay/arithmos-representation-system_v1.md) — cómo se representa la matemática.
-- [`../gameplay/arithmos-transformation-system_v1.md`](../gameplay/arithmos-transformation-system_v1.md) — sistema de transformaciones.
+- [`../gameplay/arithmos-representation-system_v1.md`](../gameplay/arithmos-representation-system_v1.md) — representaciones.
+- [`../gameplay/arithmos-transformation-system_v1.md`](../gameplay/arithmos-transformation-system_v1.md) — transformaciones.
 - [`../gameplay/arithmos-puzzle-grammar_v1.md`](../gameplay/arithmos-puzzle-grammar_v1.md) — gramática de puzzles.
 - [`../gameplay/arithmos-mechanics-progression_v1.md`](../gameplay/arithmos-mechanics-progression_v1.md) — progresión mecánica.
 - [`../narrative/arithmos-narrative-bible_v1.md`](../narrative/arithmos-narrative-bible_v1.md) — lore.
-- [`../content/arithmos-arc-01_v1.md`](../content/arithmos-arc-01_v1.md) — contenido del Arco I.
+- [`../content/arithmos-arc-01_v1.md`](../content/arithmos-arc-01_v1.md) — Arco I.
 - [`../content/arithmos-vertical-slice_v1.md`](../content/arithmos-vertical-slice_v1.md) — vertical slice.
-- [`../production/arithmos-prototype-evaluation_v1.md`](../production/arithmos-prototype-evaluation_v1.md) — estado del prototipo.
+- [`../production/arithmos-prototype-evaluation_v1.md`](../production/arithmos-prototype-evaluation_v1.md) — evaluación.
+- [`../../80-production/agentic/ENGINE_MATRIX.md`](../../80-production/agentic/ENGINE_MATRIX.md) — hipótesis de representación/runtime actual.
 
 ---
 
-## 2. Estado de implementación
+## 2. Estado
 
-| Hito | Descripción | Estado |
-|---|---|---|
-| — | Sin código todavía | el runtime es un `placeholderRuntime` declarado en `manifests.ts` con `status: 'planned'` |
+- Campaña: **sin implementación**; runtime `planned` mientras el roadmap no la active.
+- Investigación permitida: spikes aislados de representación.
+- Primeros spikes autorizados:
+  - [`../../80-production/spikes/ARI-R-A-three-spatial-equivalence.md`](../../80-production/spikes/ARI-R-A-three-spatial-equivalence.md)
+  - [`../../80-production/spikes/ARI-R-B-pixisvg-diagrammatic-equivalence.md`](../../80-production/spikes/ARI-R-B-pixisvg-diagrammatic-equivalence.md)
+
+No se busca obligatoriamente un único ganador: A y B pueden demostrar una frontera híbrida legítima.
 
 ---
 
-## 3. Reglas locales de Arithmos (diseño)
-
-### Tesis central
+## 3. Tesis central
 
 > **The world is mathematical structure.**
 
-Arithmos es el mundo de la estructura pura que sostiene a los otros. La matemática no
-es decoración ni recompensa: cambia el estado o la geometría del mundo. Si una operación
-no afecta el escenario visible, no es un puzzle de Arithmos.
+La matemática no es una respuesta escrita sobre una puerta. Una operación cambia una propiedad, relación, geometría, agrupación o representación del mundo.
+
+La evolución entre representaciones es parte del gameplay: el jugador debe reconocer que la estructura puede seguir siendo la misma aunque cambie cómo se ve.
+
+Ejemplo conceptual:
+
+```text
+12 piezas
+→ 3 grupos de 4
+→ 6 grupos de 2
+→ área equivalente
+→ notación posterior
+```
+
+---
+
+## 4. Core fijo
+
+```text
+Pure TypeScript transformation core
+  ├─ mathematical objects
+  ├─ representations
+  ├─ legal transforms
+  ├─ invariants
+  ├─ undo/redo
+  └─ condition-based validators
+          ↓
+views/adapters
+  ├─ Three.js 2.5D cuando profundidad/materialidad ayuda
+  ├─ PixiJS/SVG cuando precisión diagramática ayuda
+  └─ DOM para formalización/Bitácora/accessibility
+```
+
+**La vista nunca es la fuente de verdad matemática.**
+
+---
+
+## 5. Reglas locales
 
 ### DO
 
-- Operaciones que modifican el mundo (geometría, posición, estado, escala, agrupación).
-- Representación múltiple (visual, simbólica, gestual). Lo que importa es la estructura, no la notación.
-- Transformaciones con conservación de propiedades observables (lo que se transforma y lo que se preserva debe verse).
-- ≥2 soluciones por puzzle (ver [`../../guia-puzzles.md`](../../guia-puzzles.md)).
+- Operaciones que modifican mundo/estructura, no sólo texto.
+- Representación múltiple cuando permita descubrir equivalencias o invariantes.
+- Mostrar qué cambia y qué se conserva.
+- Manipulación antes de formalización simbólica.
+- Transferencia: una vez entendido el caso, presentar una variante razonable.
+- Usar 3D sólo cuando profundidad/materialidad aumenten comprensión.
 
 ### DON'T
 
-- "Resolvé 7 × 8 para abrir la puerta." Si la matemática no cambia el mundo, no es un puzzle.
-- Sobre-notación: si el jugador necesita un cuaderno externo para hacer la cuenta, el modelo está mal.
-- Ocultar la estructura bajo animaciones decorativas.
+- “Resolvé 7 × 8 para abrir la puerta”.
+- Sobre-notación antes de comprensión.
+- Ocultar estructura bajo animación decorativa.
+- Forzar Three.js a una gráfica si SVG/Pixi es más legible.
+- Forzar 2D a una relación espacial si materialidad 3D la vuelve evidente.
+- Elegir renderer por uniformidad con otro mundo.
 
 ---
 
-## 4. Por tipo de tarea, qué sub-agent dispatchar
+## 6. Roles y harnesses
 
-| Tarea | Sub-agent | Input esperado | Output esperado |
-|---|---|---|---|
-| Diseñar puzzle de transformación con efecto de mundo | `worker-gameplay` | estructura + transformación | código + tests |
-| Auditar puzzle Arithmos contra `guia-puzzles.md` | `m3-qa` | puzzle vivo + checklist | informe priorizado |
-| Diseñar sistema de representación múltiple (visual/simbólica/gestual) | `worker-gameplay` | brief + dominio | modelo + vistas |
-| Investigar referencias (Braid, Patrick's Parabox, A=B) | `explore` | objetivo | mapa de referencias |
-| Implementación multi-paso no especializada | `general` | brief | código + commit propuesta |
+Los antiguos `worker-*` / `m3-*` fueron retirados.
 
-> Los sub-agents visuales (`m3-visual`, `worker-world`) son relevantes aquí: Arithmos
-> probablemente vive de manipulaciones espaciales (geometría dinámica) más que de cámara
-> narrativa. Adaptar.
+| Necesidad | Rol por defecto | Harness |
+|---|---|---|
+| definir objeto matemático, invariantes, Learning Contract y Spike Card | **GPT-5.6 Sol — Director** | Codex Desktop / ChatGPT |
+| implementar cada spike bajo el mismo core/contrato | **MiniMax M3 — Builder** | MiniMax Code |
+| jugar blind-first y comprobar si descubre equivalencia/transformación | **GPT-5.6 Luna — Player Agent** | OpenCode Go (`playtester`) |
+| fix técnico acotado | **DeepSeek V4 Flash — Repair** | OpenCode Go (`implementer`) |
+| intentar romper invariantes, undo/redo, mobile o aislamiento del core | **GLM — Adversarial Reviewer** | OpenCode Go (`reviewer`) |
 
----
-
-## 5. Convenciones tentativas
-
-- Runtime: a definir. Probablemente DOM/canvas con visualización de la estructura (nodos,
-  grafos, transformaciones geométricas).
-- Modelos puros: la "álgebra del mundo" + efectos observables. Tests de la álgebra.
-- Tests: `tests/a<X>-*.test.ts` siguiendo el patrón Ohmdal/Physica.
-- Manifiesto: `ARITHMOS.runtime` declarado en `manifests.ts` con `status: 'planned'`.
+Tooling Three/Pixi/SVG se carga por spike. No contaminar A con la implementación del B. Ver [`../../80-production/agentic/GAME_DEV_AI_TOOLING.md`](../../80-production/agentic/GAME_DEV_AI_TOOLING.md).
 
 ---
 
-## 6. Qué NO hacer hoy
+## 7. Qué se puede hacer ahora
 
-- Empezar a codear Arithmos antes de que Ohmdal esté cerrado.
-- Convertir los docs PROPOSED de Arithmos en CANON sin ADR.
-- Crear dependencias nuevas para Arithmos sin pasar por Manuel.
-- Adoptar una librería simbólica (SymPy, mathjs) sin comparar contra una implementación
-  a mano y testeada pedagógicamente.
+**Sí:**
 
----
+- ejecutar ARI-R-A y ARI-R-B en ramas separadas;
+- construir el `transformation-core` mínimo compartido declarado por la Spike Card;
+- medir predicción, equivalencia, transferencia, touch y coste de producción;
+- concluir que una familia de conceptos pertenece a una vista distinta de otra.
 
-## 7. Cuándo se reactiva
+**No:**
 
-El `ROADMAP.md` actual dice:
+- construir la campaña completa;
+- promover GDD PROPOSED a CANON sin ratificación;
+- agregar math libraries/symbolic engines sin un problema concreto y comparación;
+- copiar renderer-specific code entre spikes;
+- convertir una representación bonita en canon sin Learning Contract aprobado.
 
-> Los otros tres mundos... Aparcado. No se tocan hasta que el Instituto + Ohmdal estén cerrados.
-
-Mientras esa cláusula siga vigente, este `AGENTS.md` es planning. Cualquier trabajo sobre
-Arithmos requiere un ADR que (a) cierre el trabajo de Ohmdal como `CANON` y (b) eleve
-Arithmos a `planned → in-progress` con un primer hito concreto.
+La campaña se activa por roadmap/ratificación; los spikes sólo retiran incertidumbre tecnológica/pedagógica.
