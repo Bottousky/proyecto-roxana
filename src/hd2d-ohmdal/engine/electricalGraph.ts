@@ -43,6 +43,12 @@ export class ElectricalGraph {
     return this.nodes.get(id);
   }
 
+  /** Current state of a cable. Undefined if the cable id is unknown. */
+  getCableState(id: string): CableState | undefined {
+    const c = this.cables.find((x) => x.id === id);
+    return c?.state;
+  }
+
   // Repair a cable (state -> complete). Returns true if the cable was broken
   // and is now complete.
   repair(cableId: string): boolean {
