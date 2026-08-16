@@ -1,7 +1,7 @@
 ---
 description: Read-only adversarial reviewer that tries to prove a Roxana milestone should not land
 mode: subagent
-model: opencode-go/glm-5.2
+model: opencode-go/glm-5.3
 temperature: 0.05
 permission:
   read: allow
@@ -39,4 +39,4 @@ Rules:
 - Return PASS only with zero BLOCKER and zero MAJOR findings.
 - If repeated repairs indicate the Task Contract/representation is wrong, recommend `ESCALATE`, not another patch.
 
-Model note: this file pins the strongest GLM model ID publicly documented by OpenCode Go when authored. If `opencode models` shows a newer verified GLM ID, update only the `model:` line and benchmark it before treating it as the new default.
+Model note: OpenCode Go documented `glm-5.3` as the current GLM model ID on 2026-08-16. If the local `opencode models` output changes later, update only the `model:` line after verifying the new ID and benchmark before treating it as a new default.

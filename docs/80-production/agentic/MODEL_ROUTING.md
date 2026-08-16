@@ -17,24 +17,22 @@ open_questions:
 
 # Model Routing — equipo mínimo orientado a juegos
 
-La cadena no existe para simular una empresa. Cada modelo tiene una **responsabilidad de juego distinta** y evita evaluar su propio trabajo.
+La cadena no existe para simular una empresa. Cada modelo tiene una responsabilidad distinta y evita evaluar su propio trabajo.
 
 ```text
 MANUEL
   ↓ objetivo
 GPT-5.6 SOL — DIRECTOR / LOOP OWNER
-  ↓ contract
+  ↓ Task + Learning Contract
 MINIMAX M3 — BUILDER
   ↓
 MECHANICAL GATES
   ↓
 GPT-5.6 LUNA — PLAYER AGENT
-  ├─ FAIL → DEEPSEEK V4 FLASH — REPAIR
-  │                         ↓
-  │                    gates + replay
+  ├─ FAIL → DEEPSEEK V4 FLASH — REPAIR → gates + replay
   └─ PASS
       ↓
-GLM — ADVERSARIAL PR REVIEW
+GLM-5.3 — ADVERSARIAL PR REVIEW
       ↓
 GPT-5.6 SOL — DONE / REPAIR / ESCALATE
       ↓
@@ -48,18 +46,18 @@ MANUEL — integración material
 Responsabilidad:
 
 - convertir intención en milestone/spike;
-- mantener la arquitectura y canon en contexto;
+- mantener arquitectura/canon en contexto;
 - escribir Task + Learning Contract;
-- elegir qué debe verificarse;
+- elegir verificadores;
 - leer reportes de Player/Reviewer;
-- detectar cuándo un bug es en realidad mala representación/spec;
+- detectar cuándo un bug es mala representación/spec;
 - decidir `DONE | REPAIR | ESCALATE`.
 
-No usarlo para churn mecánico salvo escalación. Su valor es conservar coherencia global y decidir cuándo dejar de iterar.
+No gastarlo en churn mecánico salvo escalación.
 
-## 2. Primary Builder — MiniMax M3 en MiniMax Code
+## 2. Primary Builder — MiniMax M3
 
-El default conserva el harness donde el modelo ha resultado más productivo para world-building e implementación visual.
+**Harness recomendado:** MiniMax Code.
 
 Responsabilidad:
 
@@ -67,26 +65,26 @@ Responsabilidad:
 - dividirla en subtareas locales;
 - ejecutar continuamente;
 - dejar debug hooks razonables;
-- reparar sus propios fallos mecánicos inmediatos.
+- reparar fallos mecánicos inmediatos.
 
-No certifica la experiencia final y no cambia engine/canon por iniciativa propia.
+No certifica su propia experiencia final y no cambia engine/canon por iniciativa propia.
 
-MiniMax vía OpenCode puede participar como benchmark, pero no hay razón para abandonar el harness nativo si no demuestra mejora real.
+MiniMax M3 en OpenCode Go puede participar como challenger, pero no sustituye el harness nativo sin una mejora reproducible.
 
 ## 3. Player Agent — GPT-5.6 Luna
 
-**Preferencia:** Luna Max/alta capacidad en un harness que pueda abrir y operar el juego. Si se usa OpenCode Go, el model ID público actual es `opencode-go/gpt-5.6-luna`; verificar siempre con `opencode models` antes de fijarlo.
+**Harness recomendado:** OpenCode Go cuando necesite operar el repo/runtime.
 
-Este rol **no es code review**.
+Model ID verificado el 2026-08-16: `opencode-go/gpt-5.6-luna`.
 
-Primera pasada blind-first:
+Primera pasada **blind-first**:
 
 - no diff;
 - no tests;
 - no explicación interna;
-- recibe controles, fantasía/objetivo del jugador y estado inicial.
+- recibe controles, fantasía/objetivo y estado inicial.
 
-Debe usar el producto como persona y juzgar:
+Juzga:
 
 - onboarding/affordance;
 - control/cámara;
@@ -96,15 +94,13 @@ Debe usar el producto como persona y juzgar:
 - fricción real;
 - touch/mobile cuando aplica.
 
-Después puede usar Playwright/debug state para transformar sus observaciones en repros.
-
-La independencia del Player Agent es una pieza central del loop. No reemplazarlo por “el Builder corre tests”.
+Después puede usar Playwright/debug state para convertir observaciones en repros.
 
 ## 4. Repair Agent — DeepSeek V4 Flash
 
-**Harness recomendado:** OpenCode Go para edición directa reproducible.
+**Harness recomendado:** OpenCode Go.
 
-Model ID público actual: `opencode-go/deepseek-v4-flash`.
+Model ID verificado el 2026-08-16: `opencode-go/deepseek-v4-flash`.
 
 Responsabilidad:
 
@@ -113,68 +109,48 @@ Responsabilidad:
 - no rediseñar;
 - volver a mechanical/play gates.
 
-Por coste/capacidad es el default para el volumen alto de reparaciones locales.
+Si un defecto sobrevive a dos fixes bien informados, revisar spec/representación primero. Si sigue siendo técnico, escalar a DeepSeek V4 Pro (`opencode-go/deepseek-v4-pro`) o a Sol.
 
-### Escalación de repair
+## 5. Adversarial Reviewer — GLM-5.3
 
-Si un defecto sobrevive a dos fixes bien informados:
+**Harness recomendado:** OpenCode Go, read-only.
 
-1. considerar primero error de spec/representación;
-2. si sigue siendo claramente técnico, probar **DeepSeek V4 Pro** (`opencode-go/deepseek-v4-pro`) o devolver a Sol;
-3. no quemar Flash en un loop repetitivo.
+OpenCode Go documenta al 2026-08-16 el ID `opencode-go/glm-5.3`.
 
-## 5. Adversarial PR Reviewer — GLM
-
-**Harness recomendado:** OpenCode Go, agente read-only.
-
-La documentación pública de OpenCode Go consultada el 2026-08-16 lista `glm-5.2` como model ID. Si `opencode models` en la instalación del usuario muestra una versión posterior (por ejemplo GLM-5.3), se actualiza el pin **después de verificar el ID real**.
-
-Rol: defensa, no construcción.
-
-Debe intentar encontrar motivos concretos para no integrar:
+Rol: intentar demostrar con evidencia que la milestone todavía **no debería integrarse**:
 
 - edge cases;
 - regresiones;
 - bypasses/hardcodes;
 - tests debilitados;
-- resource leaks/debt material;
+- leaks/deuda material;
 - assumptions falsas;
-- mobile/performance gaps contractuales;
-- contradicciones con el core pedagógico.
+- gaps contractuales de mobile/performance;
+- contradicciones con el core pedagógico o autoridad del repo.
 
-No edita y no produce feedback estético subjetivo sin criterio.
+No edita y no bloquea por gusto estético personal.
 
-Separarlo del Builder/Repair reduce confirmación de la solución implementada.
+## 6. Kimi / Grok / otros — challengers, no roulette
 
-## 6. Kimi K3 y Grok — challengers, no roulette
+OpenCode Go documenta actualmente Kimi K3 (`opencode-go/kimi-k3`) y Grok 4.5 (`opencode-go/grok-4.5`). La lista puede cambiar; `opencode models` es la fuente local de verdad.
 
-OpenCode Go publica actualmente Kimi K3 (`opencode-go/kimi-k3`) y Grok 4.5 (`opencode-go/grok-4.5`). Si el cliente local ofrece versiones posteriores, verificar con `opencode models` antes de documentarlas.
+No tienen rol permanente hoy. Casos útiles de benchmark:
 
-No tienen un rol permanente por ahora.
+- Kimi K3: integración/visual reasoning/lectura grande;
+- Grok: spike 3D/completo muy acotado para comparar autonomía;
+- modelo nuevo: mismo baseline, contrato, tools, loops, Player Agent y reviewer.
 
-Casos de benchmark útiles:
-
-- **Kimi K3:** tareas de integración/visual reasoning o lectura grande de escena/repo;
-- **Grok:** spikes completos/3D de alcance muy acotado donde se quiera comparar autonomía de construcción;
-- cualquier modelo nuevo: mismo baseline, contrato, tools, loops y Player Agent.
-
-Un buen demo viral no alcanza para mover el camino crítico.
+Un demo viral no mueve el camino crítico.
 
 ## 7. DeepSeek Harness
 
-`deepseek-ai/deepseek-harness` se mantiene como herramienta experimental. Upstream lo marca **developer preview** y advierte breaking changes.
+`deepseek-ai/deepseek-harness` sigue como herramienta experimental. Upstream lo marca developer preview y advierte breaking changes.
 
-Puede probarse para:
-
-- QA/repair aislado;
-- workflows de exploración;
-- investigación de patrones de harness;
-
-pero Roxana **no depende** de él para poder producir una milestone. OpenCode Go sigue siendo el fallback estable para ejecutar DeepSeek sobre el repo.
+Puede probarse en QA/repair aislado, exploración o investigación de patterns; Roxana no depende de él. OpenCode Go es el default estable para DeepSeek sobre el repo.
 
 ## 8. Harnesses nativos vs unificación
 
-No necesitamos obligar a todos los modelos a vivir en una misma app.
+No hace falta poner todos los modelos en una misma app.
 
 Lo común es:
 
@@ -182,15 +158,13 @@ Lo común es:
 
 Por eso es válido:
 
-- Sol en Codex Desktop;
+- Sol en Codex Desktop/ChatGPT;
 - MiniMax M3 en MiniMax Code;
-- Luna/DeepSeek/GLM en OpenCode/Codex según tooling;
+- Luna/DeepSeek/GLM en OpenCode Go.
 
-si todos observan el mismo contrato y estado del repo.
+La pregunta útil es: **¿puedo repetir la tarea y comparar el resultado sin cambiar qué significa DONE?**
 
-La pregunta correcta no es “¿qué IDE usa todo?” sino **“¿puedo repetir la tarea y comparar el resultado sin cambiar DONE?”**
-
-## 9. Benchmark de cambio de rol
+## 9. Benchmark para cambiar un rol
 
 Para reemplazar un default:
 
@@ -200,14 +174,24 @@ Para reemplazar un default:
 - mismo max de loops;
 - mismo Player Agent;
 - mismo adversarial review;
-- medir intervención humana, regressions, loops, coste/uso y calidad.
+- medir intervención humana, regresiones, loops, uso/coste y calidad.
 
-En un engine bake-off además se mantiene **el mismo Builder/model/harness en ambos spikes** para no confundir engine con capacidad de modelo.
+En un engine bake-off se mantiene el mismo Builder/model/harness en A y B.
 
 ## 10. Media
 
-MiniMax multimodal sigue siendo ruta preferida para imagen/voz/música/video dentro del stack disponible, pero media e integración son gates distintos:
+MiniMax multimodal sigue como ruta preferida del stack disponible para imagen/voz/música/video, pero generación e integración son gates distintos:
 
 `brief → generación → selección → provenance/manifest → integración runtime → Player/visual review`.
 
-Un asset no entra porque “quedó hermoso”: debe funcionar con escala, cámara, affordance, performance y mobile reales.
+Un asset entra sólo si funciona con escala, cámara, affordance, performance y mobile reales.
+
+## 11. Versionado de IDs
+
+La lista de OpenCode Go cambia. Antes de una ejecución importante:
+
+```bash
+opencode models
+```
+
+Actualizar un pin sólo cuando el ID esté realmente disponible y, si cambia el modelo de fondo de un rol crítico, benchmarkear antes de declararlo nuevo default.
