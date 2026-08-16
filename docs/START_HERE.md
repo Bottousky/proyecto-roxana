@@ -1,192 +1,322 @@
 # Proyecto Roxana — norte de producto
 
-**Estado:** decisión de producto y arquitectura actualizada el 1 de agosto de 2026. Para Ohmdal,
-la autoridad detallada es [`ohmdal-biblia/00_MASTER_INDEX.md`](ohmdal-biblia/00_MASTER_INDEX.md).
-Qué se está construyendo ahora y en qué orden: [`../ROADMAP.md`](../ROADMAP.md).
+**Estado:** actualizado el 16 de agosto de 2026.
+
+Este archivo responde **qué estamos construyendo**. El orden de ejecución vive en [`../ROADMAP.md`](../ROADMAP.md); cómo trabajan los agentes vive en [`../AGENTS.md`](../AGENTS.md) y [`80-production/agentic/`](80-production/agentic/).
 
 ## La decisión en una frase
 
-Proyecto Roxana es un **ecosistema educativo jugable**: el Instituto es el hogar que recuerda y
-cambia; cada disciplina abre un mundo con la gramática que mejor permite experimentarla; la
-Bitácora transforma lo vivido en conocimiento técnico.
+Proyecto Roxana es un **ecosistema educativo jugable**: el Instituto es el hogar que recuerda y cambia; cada disciplina abre un mundo con la gramática que mejor permite experimentarla; la Bitácora formaliza después lo que el jugador ya consiguió percibir y manipular.
 
-No es una tienda con minijuegos, una colección de cursos, una academia 3D completa ni cinco
-juegos independientes.
+No es una tienda de minijuegos, una colección de cursos, una academia 3D genérica ni cuatro reskins del mismo juego.
 
-## La promesa al jugador
+## Promesa pedagógica
 
-> Llego a una escuela casi olvidada. Aprendo haciendo para reparar sus mundos y, cuando regreso,
-> la escuela demuestra que recuerda lo que hice.
+```text
+observar
+  ↓
+experimentar / manipular
+  ↓
+predecir
+  ↓
+ver consecuencia y aprender del error
+  ↓
+comprender la relación
+  ↓
+formalizar en la Bitácora
+  ↓
+reutilizar en una variante nueva
+```
 
-El loop común es:
-
-1. **observar** un fenómeno extraño, antes de recibir una fórmula;
-2. **experimentar** con reglas legibles y consecuencias reversibles;
-3. **comprender** una relación, no acertar una respuesta aislada;
-4. **registrar** la traducción técnica en la Bitácora;
-5. **restaurar** una parte visible del mundo aplicado y del Instituto;
-6. **elegir** una nueva pregunta.
+El objetivo no es “cubrir temario” si la representación no enseña. Un concepto entra cuando encontramos una experiencia jugable capaz de hacerlo comprensible.
 
 ## Los cinco espacios
 
-### Instituto Roxana
+| Scope | Verbo / función | Fantasía / dirección | Tecnología como hipótesis de producción |
+|---|---|---|---|
+| **Instituto** | unir / recordar / transformar | hogar transformable que materializa progreso, personajes, preguntas y memoria | Three.js axonométrico + DOM; todavía debe demostrar que no se convierte en un menú 3D |
+| **Ohmdal** | **CONECTAR** | aventura/RPG HD-2D donde electricidad e infraestructura reaccionan al jugador | **Three.js HD-2D**; confianza alta, riesgo principal = producibilidad de escenarios/assets |
+| **Physica** | **EXPERIMENTAR** | plataformas/sandbox físico donde el jugador siente relaciones antes de escribirlas | **Babylon.js + modelos analíticos TS**; 2.5D default, 3D sólo cuando compra comprensión real |
+| **Bitland** | **PROGRAMAR** | **máquina-ciudad dentro de un microcontrolador**, visible mientras ejecuta programas | simulation core TS + DOM; **PixiJS y Phaser 4 compiten en spikes separados** |
+| **Arithmos** | **TRANSFORMAR** | mundo cuya representación evoluciona mientras una misma estructura matemática se conserva | transformation core TS + **Three.js / PixiJS-SVG / DOM** según la representación |
 
-Es una landing explorable y también el meta-juego. Su vista axonométrica/isométrica funciona
-como una maqueta viva, no como un avatar que deba conducirse por pasillos.
+El Pilar P12 manda: Roxana une los mundos, **no los uniforma**. Engine, cámara, género y arte no se comparten por conveniencia técnica.
 
-Las salas iniciales son:
+La evaluación detallada está en [`80-production/agentic/ENGINE_MATRIX.md`](80-production/agentic/ENGINE_MATRIX.md).
 
-- hall y estatua de Roxana;
-- preceptoría: identidad, sesión y orientación;
-- aulas de Electrónica, Programación, Física y Matemática;
-- anfiteatro: biblioteca audiovisual contextual;
-- dirección: misterio y progreso narrativo;
-- sala de trofeos: memoria visible de logros;
-- Bitácora: accesible desde todo el ecosistema.
+---
 
-Una sala puede ser un diorama 3D con focos interactivos, mientras que diálogos, fórmulas,
-Bitácora y video viven en DOM accesible y nítido.
+## Instituto Roxana
 
-### Mundos
+El Instituto debe cumplir simultáneamente funciones de:
 
-| Disciplina | Mundo | Lenguaje jugable | Núcleo narrativo |
-| --- | --- | --- | --- |
-| Electrónica | Ohmdal | HD-2D web: overworld explorable, dioramas 3D, pixel art y mecanismos diegéticos | la electrónica se recuerda como magia |
-| Programación | Bitland | ciudad cenital cibernética | el sistema obedece literalmente; Null sobrevive por no estar referenciado |
-| Física | Physica | 2D o 3D según el fenómeno | un instrumento permite alterar leyes para descubrir sus relaciones |
-| Matemática | Arithmos | pizarrón vivo y narrador | la estructura pura que sostiene a todos los demás mundos |
+- hogar;
+- misterio;
+- archivo;
+- mapa de progreso;
+- espacio transformable;
+- lugar de retorno de personajes/artefactos;
+- cruce entre disciplinas;
+- preparación para nuevos mundos.
 
-Ohmdal y su Arco I son una base estable de contenido, modelos pedagógicos y regresión. **No están
-aprobados como diseño espacial, dirección artística ni presentación de puzzles.** La versión
-actual permanece accesible mientras un laboratorio aislado demuestra una alternativa mejor.
+Three.js axonométrico es la hipótesis fuerte porque permite que el progreso se vuelva arquitectura visible. **No está aprobado sólo porque se vea bien:** debe demostrar que volver al Instituto es una acción con valor jugable y emocional.
+
+DOM/CSS conserva texto, Bitácora, accesibilidad y UI compleja.
+
+---
+
+## Ohmdal — CONECTAR
+
+North Star:
+
+> Mirar una instalación de Ohmdal, formar un modelo de cómo circula y se controla la energía, intervenir y observar al mundo reaccionar.
+
+Dirección vigente:
+
+- Three.js;
+- lenguaje HD-2D / 2.5D inspirado en dioramas 3D + sprites 2D;
+- cámara autoral casi ortográfica;
+- iluminación/materiales como feedback del sistema;
+- terreno e interiores sólo con complejidad que aporte navegación, lectura o fantasía;
+- modelos eléctricos TypeScript puros como verdad pedagógica.
+
+El runtime Phaser de `/jugar` conserva el Arco I greybox como **baseline de contenido y regresión**. No define la presentación final y no debe recibir la nueva dirección visual por inercia.
+
+El riesgo de HD-2D se gestiona por producción, no bajando automáticamente la ambición:
+
+```text
+greybox correcto
+→ kit modular
+→ materiales/luz
+→ assets identitarios
+→ hero assets
+→ polish de golden frames
+```
+
+No se exige arte hero en cada piedra.
+
+### Asset pipeline
+
+Baseline: Blender → GLB / geometría procedural cuando corresponde.
+
+Vibe3D/vibe-model es experimental y sólo puede ganar un rol después de un spike contra el mismo asset hard-surface no-hero. No reemplaza Blender globalmente.
+
+---
+
+## Physica — EXPERIMENTAR
+
+North Star:
+
+> Antes de escribir una ecuación, el jugador debe haber sentido la relación con su cuerpo, un objeto o una máquina.
+
+Arquitectura:
+
+```text
+modelos analíticos TypeScript = verdad pedagógica
+Babylon.js = espacio, cámara, render e interacción
+Havok = colisiones / cuerpos secundarios cuando corresponda
+```
+
+### Regla dimensional
+
+**2.5D por defecto.**
+
+Usar 3D real sólo cuando restringir el fenómeno a un plano:
+
+- genere una intuición incorrecta;
+- esconda un vector/orientación que forma parte del concepto;
+- impida comparar comportamientos necesarios del contenido planificado.
+
+Si la tercera dimensión sólo agrega cámara, input y espectacularidad, no se usa.
+
+Babylon es la dirección de **Physica**, no una decisión para todos los mundos.
+
+---
+
+## Bitland — PROGRAMAR
+
+Bitland no es una ciudad cyberpunk decorada con conceptos de programación. Es una **máquina-ciudad que existe dentro de un microcontrolador**.
+
+La máquina debe hacer observable:
+
+- clock/ticks;
+- estado y memoria;
+- ejecución paso a paso;
+- mensajes/rutas/buses cuando aporten;
+- agentes/procesos;
+- condiciones;
+- repetición;
+- fallos y trazas;
+- pausa, step y rewind donde corresponda.
+
+La metáfora no puede mentir: `IF`, loops, funciones o mensajes siguen siendo conceptos de programación; no se inventa electrónica falsa para justificar el paisaje.
+
+### Core fijo
+
+```text
+Pure TypeScript simulation core
+  ├─ deterministic state
+  ├─ clock/tick scheduler
+  ├─ programs/interpreter
+  ├─ agents/events/messages
+  ├─ snapshots/rewind
+  └─ validators
+          ↓
+renderer experimental
+          +
+DOM inspector / program UI / Bitácora
+```
+
+### Renderer pendiente
+
+Dos spikes aislados, mismo baseline/core/Learning Contract:
+
+- [`80-production/spikes/BIT-R-A-pixijs-machine-city.md`](80-production/spikes/BIT-R-A-pixijs-machine-city.md)
+- [`80-production/spikes/BIT-R-B-phaser-machine-city.md`](80-production/spikes/BIT-R-B-phaser-machine-city.md)
+
+PixiJS tiene ventaja hipotética para visualización masiva de señales/trazas; Phaser 4 tiene ventaja hipotética en infraestructura de juego/tooling. **El spike decide.**
+
+---
+
+## Arithmos — TRANSFORMAR
+
+North Star:
+
+> Los números no son respuestas escritas sobre puertas: son propiedades transformables de objetos, espacios y relaciones.
+
+La evolución entre representaciones es parte del juego, no un detalle técnico.
+
+Ejemplo conceptual:
+
+```text
+12 piezas
+→ 3 grupos de 4
+→ 6 grupos de 2
+→ área equivalente
+→ representación simbólica posterior
+```
+
+### Core fijo
+
+```text
+Pure TypeScript transformation core
+  ├─ mathematical objects
+  ├─ representations
+  ├─ legal transforms
+  ├─ invariants
+  ├─ undo/redo
+  └─ validators
+```
+
+Vistas:
+
+- Three.js 2.5D para materialidad, geometría, área, volumen, teselación, recomposición espacial;
+- PixiJS/SVG para grafos, rectas, funciones, relaciones y precisión diagramática;
+- DOM para formalización, Bitácora y accesibilidad.
+
+Los primeros spikes son:
+
+- [`80-production/spikes/ARI-R-A-three-spatial-equivalence.md`](80-production/spikes/ARI-R-A-three-spatial-equivalence.md)
+- [`80-production/spikes/ARI-R-B-pixisvg-diagrammatic-equivalence.md`](80-production/spikes/ARI-R-B-pixisvg-diagrammatic-equivalence.md)
+
+Acá A y B pueden descubrir una **frontera híbrida** en vez de un ganador único.
+
+---
 
 ## La Bitácora
 
-La Bitácora es el núcleo pedagógico, narrativo y coleccionable. Tiene tres capas:
+La Bitácora es memoria pedagógica, narrativa y coleccionable.
 
-1. **huella vivida:** dibujo, diálogo o evidencia de lo que ocurrió;
-2. **puente:** relación explícita entre la metáfora del mundo y el concepto;
-3. **formalización:** nombres técnicos, fórmula, unidades, límites y un nuevo experimento.
+Forma común:
 
-Se escribe después de la experiencia y conserva tachones, hipótesis, diagramas y errores útiles.
-No reemplaza al jugador con un resumen automático: le devuelve una lectura rigurosa de aquello
-que ya consiguió observar.
+1. **huella vivida** — evidencia de lo ocurrido;
+2. **hipótesis/puente** — relación que el jugador empieza a reconocer;
+3. **formalización** — nombre, símbolo, fórmula, código o representación técnica;
+4. **reutilización** — aplicar la idea en otro problema.
 
-## Qué existe hoy
+Nunca reemplaza la experiencia con teoría previa.
 
-- **Base estable de regresión:** `/jugar`, Ohmdal y Arco I conservan narrativa, lógica, estado y
-  modelos de puzzles mientras se prueba su reemplazo visual/espacial.
-- **Dirección visual válida:** la escuela axonométrica en Three.js, sus GLB y su selección de
-  salas.
-- **Shell válido:** TypeScript, Vite, `RuntimeHost`, estado local y carga por manifiestos.
-- **Prototipos/historia:** portadas clásicas, tienda ficticia, runtimes anteriores del Instituto,
-  renders y packs fuente. Son evidencia, no producto activo.
-- **Arte:** prototipo o dirección visual; todavía no se declara arte final.
+---
 
-## Decisión técnica
+## Arquitectura global
 
-Se conserva una arquitectura híbrida:
+- Vite + TypeScript como shell web.
+- `RuntimeHost` / carga por demanda cuando corresponda.
+- estado pedagógico y simulación separados del renderer.
+- DOM/CSS para texto, Bitácora y accesibilidad.
+- manifests/procedencia para assets.
+- Playwright + debug hooks deterministas para gameplay QA.
+- desktop + mobile/touch como targets de producto.
+- ningún engine upgrade incidental dentro de otra tarea.
 
-- **Vite + TypeScript** como shell web ligero;
-- **Three.js** para la maqueta axonométrica del Instituto, con Blender → GLB como pipeline
-  principal;
-- **Three.js híbrido** como dirección futura de Ohmdal: entornos 3D modulares, personajes pixel
-  art y cámara autoral. Se prueba en un laboratorio aislado; Phaser conserva `/jugar` y funciona
-  como baseline hasta que un ADR apruebe una migración;
-- **DOM/CSS** para Bitácora, diálogos, accesibilidad, sesión y video;
-- **runtimes bajo demanda** mediante el `RuntimeHost`;
-- **manifiestos de assets** para escala, pivote, frente, collider, presupuesto y procedencia.
+No existe un “motor global de Roxana”.
 
-No se migra a React, Next.js, R3F, Godot o PlayCanvas en esta etapa. Ninguna de esas migraciones
-resuelve por sí misma continuidad artística, diseño de interacción o producción de assets.
+---
 
-### Alternativas evaluadas
+## Producción con IA
 
-| Alternativa | Aporta | Costo o límite | Decisión |
-| --- | --- | --- | --- |
-| PlayCanvas | editor visual web y motor/runtime unificados | migración y nueva fuente de verdad de escenas | candidato a spike sólo si Blender → GLB bloquea la iteración |
-| PixiJS | renderer 2D muy flexible | reconstruir sistemas que Phaser ya aporta | no es primera opción para el spike |
-| Godot Web | editor y workflow de juego completo | WASM/WebGL2, restricciones web/mobile y otro runtime | reservar para un producto descargable futuro |
-| Next.js/React | ecosistema de aplicaciones y backend | complejidad sin ganancia para el loop jugable actual | no adoptar sin necesidad de producto |
-| Instituto íntegramente 2D | bajo costo de GPU y arte muy controlable | pierde la maqueta espacial y su respuesta de cámara | usar 2D como UI/sprites, no como reemplazo obligatorio |
+La metodología actual está diseñada específicamente para juegos:
 
-## Pipeline visual
+```text
+Manuel
+  ↓ objetivo
+GPT-5.6 Sol — Director / Loop Owner
+  ↓ Task + Learning Contract
+MiniMax M3 / MiniMax Code — Builder
+  ↓
+build + tests + verify
+  ↓
+GPT-5.6 Luna — Player Agent blind-first
+  ├─ FAIL → DeepSeek V4 Flash — bounded repair → replay
+  └─ PASS
+      ↓
+GLM — adversarial read-only review
+      ↓
+GPT-5.6 Sol — DONE / REPAIR / ESCALATE
+      ↓
+Manuel — integración material
+```
 
-Cada elemento se produce con la representación que mejor sirve a su lectura:
+Normal: 1–3 repair loops. Hard cap: 5.
 
-- arquitectura, puertas, mecanismos y sockets: Blender modular o geometría procedural;
-- personajes humanos de Ohmdal: pixel art de cuatro direcciones integrado al 3D, selección H2;
-- Ohm: sprite aprobado en H2; mecanismos hard-surface usan procedural/`img2threejs` cuando
-  pivotes y sockets lo exijan;
-- retratos, páginas de Bitácora, iconos y fondos: ilustración 2D;
-- imágenes generadas: referencia o media 2D con procedencia, no falsa geometría 3D;
-- conceptos: fijan composición, silueta, paleta y materiales; la escena jugable se construye aparte.
+El Player Agent primero **usa el juego como jugador** y recién después inspecciona tests/source para reproducir problemas.
 
-Ningún asset entra al runtime sin comprobarse con la cámara real, en desktop y mobile.
+Ver:
 
-## El prototipo HD-2D es la dirección visual
+- [`80-production/agentic/README.md`](80-production/agentic/README.md)
+- [`80-production/agentic/WORKFLOW.md`](80-production/agentic/WORKFLOW.md)
+- [`80-production/agentic/MODEL_ROUTING.md`](80-production/agentic/MODEL_ROUTING.md)
+- [`80-production/agentic/SPIKE_POLICY.md`](80-production/agentic/SPIKE_POLICY.md)
+- [`80-production/agentic/GAME_DEV_AI_TOOLING.md`](80-production/agentic/GAME_DEV_AI_TOOLING.md)
 
-Ohmdal se ve en HD-2D: sprites sobre dioramas 3D, cámara casi ortográfica, profundidad real.
-El prototipo vive en `src/labs/ohmdal-hd2d-preprod/` y ya renderiza. El plan para llevarle el
-contenido del Arco I está en [`../ROADMAP.md`](../ROADMAP.md).
+---
 
-Antes de migrar el Arco I hay que demostrar el lenguaje HD-2D en un laboratorio Three.js aislado
-de 25–35 minutos: Portal, Plaza, encuentro regional con Edda, despertar de Ohm, Taller de Lumen,
-diagnóstico auténtico, Puerta de Ohm y Manantial. Un overworld mínimo demuestra la entrada a la
-región; no se produce el mapa completo.
+## Gate de una experiencia educativa
 
-El slice usa personajes pixel art, cámara por encuadres, tarde hacia crepúsculo, voces parciales,
-música de orquesta + electrónica y gameplay completo en desktop/mobile. Ohm acompaña siempre;
-Edda reaparece en momentos estratégicos. La Bitácora traduce la experiencia a conocimiento formal
-y puede enlazar una evaluación opcional de La Escuela en otra pestaña.
+Una feature no está aprobada porque:
 
-### Fuera de alcance
+- compile;
+- pase tests;
+- se vea espectacular;
+- el agente diga que está “AAA”.
 
-- migrar o reescribir `/jugar`;
-- producir Programación, Física, Matemática o nuevas salas del Instituto;
-- backend, cuentas obligatorias, dashboard docente o comercio dentro del mundo;
-- reescribir modelos matemáticos o el guardado estable;
-- generar un lote completo de arte;
-- adoptar otro motor sin una comparación reproducible del mismo slice.
+Cuando el scope es pedagógico, debe existir evidencia de que el jugador puede al menos:
 
-### Gates
+1. percibir el estado relevante;
+2. manipular una variable/relación significativa;
+3. predecir una consecuencia;
+4. obtener información del fallo;
+5. transferir la idea a una variante razonable;
+6. formalizar después de la experiencia.
 
-- región continua mayor que varias pantallas, sin seams de chunks de 960 × 540;
-- recorrido completo y reiniciable en desktop y mobile;
-- puzzle resuelto mediante objetos, posiciones y feedback del mundo;
-- ninguna pantalla modal obligatoria durante la resolución;
-- cámara autoral legible, con landmarks y consecuencia dentro del mismo encuadre cuando el puzzle
-  lo requiera;
-- cero errores de consola;
-- build y tests verdes;
-- `render_game_to_text` y `advanceTime(ms)` para pruebas deterministas;
-- captura y recorrido Playwright después de cada cambio significativo;
-- prueba en Android medio de 2022, con piso de 30 fps;
-- navegadores recientes Chrome, Edge, Firefox y Safari; teclado y táctil completos;
-- accesibilidad baseline: escala de texto, contraste, independencia del color, subtítulos,
-  reducción de movimiento/partículas, reasignación y sin presión temporal obligatoria;
-- playtest mixto 13–18: al menos 80% explica la causa con evidencia sin repetir sólo la metáfora.
+El detalle vive en `TASK_CONTRACT_TEMPLATE.md` y `DEFINITION_OF_DONE.md`.
 
-## Forma de trabajo
+---
 
-Un hito por vez, y un hito es algo que se puede abrir en el navegador y jugar cuando termina.
-Build y tests en verde, verlo funcionando, proponer el commit. El detalle está en
-[`../CLAUDE.md`](../CLAUDE.md) y el orden en [`../ROADMAP.md`](../ROADMAP.md).
+## Qué leer después
 
-## Referencias externas verificadas
-
-- [OpenAI — Build browser games with Codex](https://learn.chatgpt.com/use-cases/browser-games):
-  flujo de varias etapas con plan escrito, Phaser/PixiJS como opciones, generación de assets,
-  navegador vivo y ajustes.
-- [Phaser — documentación](https://docs.phaser.io/): motor 2D web-first con TypeScript.
-- [Three.js — carga de modelos 3D](https://threejs.org/manual/en/loading-3d-models.html):
-  glTF/GLB como formato de entrega.
-- [Three.js — limpieza de recursos](https://threejs.org/manual/en/cleanup.html):
-  disposición explícita de recursos GPU.
-- [PlayCanvas — editor](https://developer.playcanvas.com/user-manual/editor/) y
-  [motor](https://developer.playcanvas.com/user-manual/engine/): alternativa visual evaluada.
-- [PixiJS — introducción](https://pixijs.com/8.x/guides/getting-started/intro): renderer 2D.
-- [Godot — exportación web](https://docs.godotengine.org/en/4.5/tutorials/export/exporting_for_web.html):
-  capacidades y restricciones del runtime web.
-- [Tiled — introducción](https://doc.mapeditor.org/en/stable/manual/introduction/):
-  editor candidato para mapas ortogonales o isométricos futuros.
+- Producto/autoridad: [`README.md`](README.md) y [`00-governance/`](00-governance/)
+- Orden: [`../ROADMAP.md`](../ROADMAP.md)
+- Reglas de agentes: [`../AGENTS.md`](../AGENTS.md)
+- Mundo concreto: `20-worlds/<mundo>/AGENTS.md`
+- Producción IA: [`80-production/agentic/README.md`](80-production/agentic/README.md)
