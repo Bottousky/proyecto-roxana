@@ -91,5 +91,23 @@ export function createInput(): InputState {
     cancel = false;
   };
 
-  return { move, interact, open, cancel, pointer, consume, attach };
+  // NOTE: interact/open/cancel are closure variables (primitives). Returning
+  // them directly (`return { move, interact, open, ... }`) would copy their
+  // *values* into the object, so the keydown/pointer handlers would mutate the
+  // closure while the world keeps reading the stale object properties (always
+  // false). That silently broke E interaction and J/Tab Bitácora. Expose them
+  // through getters/setters so both the handlers and the world (and debug
+  // harnesses that force `input.interact = true`) share the same state.
+  return {
+    move,
+    get interact() { return interact; },
+    set interact(v: boolean) { interact = v; },
+    get open() { return open; },
+    set open(v: boolean) { open = v; },
+    get cancel() { return cancel; },
+    set cancel(v: boolean) { cancel = v; },
+    pointer,
+    consume,
+    attach,
+  };
 }

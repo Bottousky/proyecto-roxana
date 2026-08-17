@@ -181,18 +181,12 @@ export function buildSendero(
     group.add(cap);
   }
 
-  // ---------- Background: a hill at the south (the road continues out) ----
-  const hill = new THREE.Mesh(
-    new THREE.PlaneGeometry(50, 12),
-    new THREE.MeshBasicMaterial({
-      color: 0x2a3a52,
-      transparent: true,
-      opacity: 0.92,
-      depthWrite: false,
-    }),
-  );
-  hill.position.set(0, 5, -14);
-  group.add(hill);
+  // NOTE: the "hill at the south" backdrop was removed. It was placed at
+  // world z=8 (between the Portal and the Camino), so with the camera rig
+  // (always south of the player, looking north) it rendered as a large
+  // translucent blue slab covering the Plaza, the player and the electrical
+  // network. Distant scenery is already provided by the horizon band
+  // (terrain.ts) and the landmark silhouettes (landmarks.ts).
 
   scene.add(group);
   return { group, lamps };

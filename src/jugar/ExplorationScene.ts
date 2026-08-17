@@ -198,13 +198,13 @@ export class ExplorationScene extends Phaser.Scene {
       .setDepth(DEPTH.ambient)
       .setAlpha(0);
     this.roomName = this.add
-      .text(36, 34, '', {
+      .text(20, H - 50, '', {
         fontFamily: 'Georgia, serif',
-        fontSize: '14px',
+        fontSize: '13px',
         color: '#fff1bd',
         fontStyle: 'bold',
         stroke: '#171321',
-        strokeThickness: 4,
+        strokeThickness: 3,
       })
       .setScrollFactor(0)
       .setDepth(DEPTH.ui);
@@ -476,11 +476,11 @@ export class ExplorationScene extends Phaser.Scene {
   /** Cartel breve de llegada: informa la zona y luego libera la escena. */
   private showRoomBanner(name: string): void {
     this.tweens.killTweensOf(this.roomName);
-    this.roomName.setText(name).setAlpha(0).setY(26);
+    this.roomName.setText(name).setAlpha(0).setY(H - 60);
     this.tweens.add({
       targets: this.roomName,
       alpha: 1,
-      y: 34,
+      y: H - 50,
       duration: 260,
       ease: 'Sine.Out',
       hold: 1700,

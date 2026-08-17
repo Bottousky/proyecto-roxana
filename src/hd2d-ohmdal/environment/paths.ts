@@ -63,16 +63,11 @@ export function buildCamino(
     group.add(coping);
   }
 
-  // ---------- A copper cable trace along the ground (from Portal to Plaza) ----------
-  const cable = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, 0.04, D - 0.4),
-    new THREE.MeshStandardMaterial({ color: 0x7a5232, roughness: 0.5, metalness: 0.55 }),
-  );
-  cable.position.set(0, 0.03, 0);
-  cable.receiveShadow = true;
-  group.add(cable);
-
   // ---------- Two lampposts ----------
+  // (The visible copper cable along the ground is now drawn by the
+  //  environment/cables.ts module so it follows the terrain elevation
+  //  and reflects broken/intact state. The old decorative box was
+  //  removed to avoid z-fight with the new network.)
   const lamps: Lamp[] = [];
   for (const z of [-D / 2 + 1, D / 2 - 1]) {
     const lamp = buildLamp(kit);
@@ -162,16 +157,9 @@ export function buildCalzada(
     group.add(foliage);
   }
 
-  // ---------- A copper cable trace ----------
-  const cable = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, 0.04, D - 0.4),
-    new THREE.MeshStandardMaterial({ color: 0x7a5232, roughness: 0.5, metalness: 0.55 }),
-  );
-  cable.position.set(0, 0.03, 0);
-  cable.receiveShadow = true;
-  group.add(cable);
-
   // ---------- Two lampposts ----------
+  // (Cable removed: see note in buildCamino above — the network is now
+  //  drawn by environment/cables.ts.)
   const lamps: Lamp[] = [];
   for (const z of [-D / 2 + 1, D / 2 - 1]) {
     const lamp = buildLamp(kit);

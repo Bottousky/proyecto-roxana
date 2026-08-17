@@ -1018,3 +1018,187 @@ export function sfxSchoolBell(): void {
     noise(0.06, 0.09, 'bandpass', 3500, { when: when + 0.005, q: 6 });
   }
 }
+
+/* ---------- música de archivo + voces (mp3) ----------
+ * Los tracks ambientales de Ohmdal ahora tienen una versión mp3 generada con music
+ * generation. Esta capa convive con la música procedural: si el track está disponible
+ * como mp3, se prefiere; si no, cae al procedural. Así no perdemos lo que ya
+ * funciona y le damos al jugador la versión cantable.
+ *
+ * Las voces son selectivas: se reproducen cuando el diálogo las pide por id, sin
+ * desplazar el texto (sigue siendo legible). El texto y la voz pueden divergir
+ * ligeramente; está aceptado como estilización, no como error.
+ */
+
+const MUSIC_TRACKS = {
+  dormant: '/assets/ohmdal/music/ohmdal-dormant.mp3',
+  awakening: '/assets/ohmdal/music/ohmdal-awakening.mp3',
+  alive: '/assets/ohmdal/music/ohmdal-alive.mp3',
+  taller: '/assets/ohmdal/music/ohmdal-taller.mp3',
+  twilight: '/assets/ohmdal/music/ohmdal-twilight.mp3',
+  manantial: '/assets/ohmdal/music/ohmdal-manantial.mp3',
+} as const;
+
+type MusicTrackId = keyof typeof MUSIC_TRACKS;
+
+/** Volumen relativo de la música de archivo contra la procedural. */
+const MUSIC_VOLUME = 0.55;
+let currentMusic: { audio: HTMLAudioElement; id: MusicTrackId } | null = null;
+
+/**
+ * Reproduce una pista musical con crossfade desde la pista actual (si la hay).
+ * Si el archivo no está disponible, la promesa se rechaza silenciosamente y el
+ * procedural sigue sonando. No es fatal.
+ */
+export function playMusicTrack(id: MusicTrackId, fadeMs = 2200): Promise<void> {
+  initAudio();
+  return new Promise((resolve) => {
+    const url = MUSIC_TRACKS[id];
+    const incoming = new Audio(url);
+    incoming.preload = 'auto';
+    incoming.loop = true;
+    incoming.volume = 0;
+    const onError = (): void => {
+      // La pista procedural sigue: no rompemos el ambiente.
+      // eslint-disable-next-line no-console
+      console.warn(`[audio] no se pudo cargar ${url}, se mantiene el procedural.`);
+      resolve();
+    };
+    incoming.addEventListener('error', onError, { once: true });
+    const startAt = performance.now() + 60;
+    incoming.addEventListener('canplay', () => {
+      if (performance.now() > startAt + 1500) return; // stale
+      void incoming.play().catch(() => resolve());
+      const fadeSteps = 20;
+      const stepMs = fadeMs / fadeSteps;
+      let i = 0;
+      const fadeIn = window.setInterval(() => {
+        i += 1;
+        incoming.volume = Math.min(MUSIC_VOLUME, (i / fadeSteps) * MUSIC_VOLUME);
+        if (i >= fadeSteps) {
+          window.clearInterval(fadeIn);
+          if (currentMusic && currentMusic.id !== id) {
+            const old = currentMusic;
+            const fadeOut = window.setInterval(() => {
+              old.audio.volume = Math.max(0, old.audio.volume - MUSIC_VOLUME / fadeSteps);
+              if (old.audio.volume <= 0.001) {
+                window.clearInterval(fadeOut);
+                old.audio.pause();
+                old.audio.src = '';
+              }
+            }, stepMs);
+          }
+          currentMusic = { audio: incoming, id };
+          resolve();
+        }
+      }, stepMs);
+    });
+  });
+}
+
+/** Detiene la música de archivo (no toca la procedural). */
+export function stopMusicTrack(fadeMs = 1400): void {
+  if (!currentMusic) return;
+  const old = currentMusic;
+  currentMusic = null;
+  const steps = 14;
+  let i = 0;
+  const stepMs = fadeMs / steps;
+  const fade = window.setInterval(() => {
+    i += 1;
+    old.audio.volume = Math.max(0, old.audio.volume - MUSIC_VOLUME / steps);
+    if (i >= steps) {
+      window.clearInterval(fade);
+      old.audio.pause();
+      old.audio.src = '';
+    }
+  }, stepMs);
+}
+
+const VOICE_LINES = {
+  'edda-awakening-surprise': '/assets/ohmdal/voice/edda-awakening-surprise.mp3',
+  'edda-ohm-comes': '/assets/ohmdal/voice/edda-ohm-comes.mp3',
+  'edda-realization': '/assets/ohmdal/voice/edda-realization.mp3',
+  'edda-warning': '/assets/ohmdal/voice/edda-warning.mp3',
+  'edda-startled-short': '/assets/ohmdal/voice/edda-startled-short.mp3',
+  'edda-lumen-warning': '/assets/ohmdal/voice/edda-lumen-warning.mp3',
+  'edda-warmth-question': '/assets/ohmdal/voice/edda-warmth-question.mp3',
+  'lumen-philosophy': '/assets/ohmdal/voice/lumen-philosophy.mp3',
+  'lumen-door-opens': '/assets/ohmdal/voice/lumen-door-opens.mp3',
+  'ohm-greeting': '/assets/ohmdal/voice/ohm-greeting.mp3',
+  'ohm-thermometer': '/assets/ohmdal/voice/ohm-thermometer.mp3',
+  'ohm-balde-contable': '/assets/ohmdal/voice/ohm-balde-contable.mp3',
+  'preceptor-twenty-years': '/assets/ohmdal/voice/preceptor-twenty-years.mp3',
+} as const;
+
+export type VoiceLineId = keyof typeof VOICE_LINES;
+
+const VOICE_VOLUME = 0.75;
+let currentVoice: HTMLAudioElement | null = null;
+
+/**
+ * Reproduce una línea de voz generada. Si ya hay otra sonando, la interrumpe.
+ * El `dialog.ts` la llama al entrar a una línea que tiene voz; el avance manual
+ * del diálogo la deja terminar sola (no se cancela al pasar de línea, sólo al
+ * cerrar el diálogo).
+ */
+export function playVoiceLine(id: VoiceLineId): void {
+  initAudio();
+  if (currentVoice) {
+    currentVoice.pause();
+    currentVoice.src = '';
+    currentVoice = null;
+  }
+  const url = VOICE_LINES[id];
+  const audio = new Audio(url);
+  audio.volume = VOICE_VOLUME;
+  audio.addEventListener('error', () => {
+    // Línea faltante: el texto del diálogo sigue siendo legible, esto es opcional.
+    // eslint-disable-next-line no-console
+    console.warn(`[audio] línea de voz no encontrada: ${url}`);
+  });
+  currentVoice = audio;
+  void audio.play().catch(() => { /* autoplay policy: sin gesto, se silencia */ });
+}
+
+export function stopVoiceLine(): void {
+  if (!currentVoice) return;
+  currentVoice.pause();
+  currentVoice.src = '';
+  currentVoice = null;
+}
+
+/** Chispa eléctrica: descarga rápida con armónicos agudos. */
+export function sfxSpark(): void {
+  // El crepitar tiene que escucharse como chispa, no como estática: pocos pulsos
+  // con un perfil de frecuencia que cae y vuelve a subir.
+  for (let i = 0; i < 4; i++) {
+    const when = i * 0.04;
+    const f = 1800 + Math.random() * 1600;
+    tone(f, 'sawtooth', 0.08, 0.08, { when, to: f * 0.4, attack: 0.001 });
+  }
+  // Componente grave: la chispa es chiquita pero se siente.
+  tone(95, 'square', 0.18, 0.32, { to: 55, attack: 0.005 });
+  noise(0.22, 0.18, 'highpass', 2400, { q: 1.4 });
+}
+
+/**
+ * Momento del despertar: sweep ascendente grave + armónico agudo, un acorde cálido
+ * que se abre. Diseñado para acompañar la transición dormant → alive.
+ */
+export function sfxAwakening(): void {
+  // Sweep grave: el río encontrando su cauce.
+  tone(55, 'sine', 0.18, 1.4, { to: 220, attack: 0.08 });
+  tone(82, 'sine', 0.12, 1.4, { to: 330, attack: 0.08, when: 0.05 });
+  // Chispa inicial: una sola descarga, breve y limpia.
+  noise(0.15, 0.18, 'highpass', 2800, { when: 0.0, q: 2 });
+  tone(880, 'triangle', 0.12, 0.5, { when: 0.02, to: 1320 });
+  // Acorde cálido que se abre a los 0.6s — el mundo "recuerda" la música.
+  const when = 0.5;
+  for (const f of [261.63, 329.63, 392.0, 523.25]) {
+    tone(f, 'sine', 0.1, 1.8, { when, echo: true, attack: 0.04 });
+  }
+  // Reverberación grave: el "pulmón" del mundo al respirar.
+  noise(0.06, 1.6, 'lowpass', 220, { when: 0.7, to: 90, q: 0.6 });
+}
+

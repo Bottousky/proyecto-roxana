@@ -45,6 +45,8 @@ export default defineConfig({
             '/jugar': '/src/jugar/',
             '/ohmdal': '/src/ohmdal/',
             '/physica': '/src/experiences/physica/',
+            '/ohmdal-arco1': '/src/ohmdal-arco1/',
+            '/hd2d-ohmdal': '/src/hd2d-ohmdal/',
           };
           for (const [p, target] of Object.entries(destinos)) {
             if (req.url === p || req.url?.startsWith(p + '/') || req.url?.startsWith(p + '?')) {
@@ -67,7 +69,9 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         jugar: resolve(__dirname, 'src/jugar/index.html'),
         ohmdal: resolve(__dirname, 'src/ohmdal/index.html'),
+        'ohmdal-arco1': resolve(__dirname, 'src/ohmdal-arco1/index.html'),
         physica: resolve(__dirname, 'src/experiences/physica/index.html'),
+        'hd2d-ohmdal': resolve(__dirname, 'src/hd2d-ohmdal/index.html'),
       },
     },
   },

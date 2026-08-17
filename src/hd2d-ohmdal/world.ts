@@ -24,9 +24,10 @@ import { buildManantial, type ManantialEntities } from "./environment/manantial.
 import { buildCamino, buildCalzada, type PathEntities } from "./environment/paths.ts";
 import { buildSendero, type SenderoEntities } from "./environment/sendero.ts";
 import { type Lamp } from "./environment/lamps.ts";
+import { buildCables, type CableVisuals } from "./environment/cables.ts";
 import { SpriteActor, spriteTexture } from "./environment/spriteActor.ts";
 import { ElectricalGraph } from "./engine/electricalGraph.ts";
-import { REGIONS, regionAt, NODES, CABLES, STEPS } from "./world/topology.ts";
+import { regionAt, NODES, CABLES, STEPS } from "./world/topology.ts";
 import {
   mountDialog,
   showDialog,
@@ -155,10 +156,15 @@ export function createWorld(scene: THREE.Scene): World {
   }
   electrical.recompute();
 
-  // ---------- Visible copper cables between nodes (drawn in world.ts so
-  // they follow the new terrain heights). For now, a few high-impact paths
-  // are drawn as low boxes on the ground. Future work: full cable mesh. ----
-  drawCableTraces(scene, CABLES, NODES, REGIONS);
+  // ---------- Visible copper cables (multi-segment, follow terrain, broken
+  // cables show a visible gap and a small sparking post so the player can
+  // read the break before being close enough to trigger the prompt). ----
+  const cableVisuals: CableVisuals = buildCables(
+    scene,
+    terrain.groundYAt,
+    CABLES,
+    electrical,
+  );
 
   // ---------- Atmospheric motes ----------
   const motesGeom = new THREE.BufferGeometry();
@@ -280,6 +286,7 @@ export function createWorld(scene: THREE.Scene): World {
   let interactionPrompt = "";
   let introShown = false;
   let cableParticlesT = 0;
+  let firstBrokenEncountered = false;
   const cableParticles = makeCableParticles(scene);
 
   // Initial dialog (only the first; player advances with E).
@@ -437,9 +444,13 @@ export function createWorld(scene: THREE.Scene): World {
     }
 
     // ---------- Interaction: repair broken cables ----------
+    // The cable state is the source of truth in the electrical graph
+    // (not the topology const) because `electrical.repair()` mutates the
+    // graph in place. Reading from the graph keeps the prompt in sync
+    // with the visual after a repair.
     let nearestCable: { id: string; dist: number } | null = null;
     for (const c of CABLES) {
-      if (c.state !== "broken") continue;
+      if (electrical.getCableState(c.id) !== "broken") continue;
       const mid = { x: (c.from.x + c.to.x) / 2, z: (c.from.z + c.to.z) / 2 };
       const d = distance(player.position, { x: mid.x, y: mid.z });
       if (d < 2.5 && (!nearestCable || d < nearestCable.dist)) {
@@ -447,11 +458,22 @@ export function createWorld(scene: THREE.Scene): World {
       }
     }
     if (nearestCable) {
-      interactionPrompt = "Reparar el cable roto [E]";
+      interactionPrompt = "Reparar el cable roto";
+      if (!firstBrokenEncountered) {
+        firstBrokenEncountered = true;
+        pushBitacoraEntry(
+          bitacoraRefs,
+          "Observación",
+          "Vi un cable cortado. La corriente busca su camino: si uno se corta, la línea entera se apaga. ¿La Cuenca no tiene fuerza, o la fuerza está pero no vuelve?",
+        );
+      }
       if (input.interact && !dialogOpen) {
         const ok = electrical.repair(nearestCable.id);
         if (ok) {
           audio.ping(660, 0.12, 0.25);
+          // Refresh the cable visuals so the gap visibly closes and the
+          // material switches from "broken" to "intact" on the same frame.
+          cableVisuals.refresh();
           pushBitacoraEntry(bitacoraRefs, "Acción", "Reparé un cable de cobre. La corriente busca su camino.", "cable roto");
           if (state === "dormant") {
             state = "awakening";
@@ -511,6 +533,13 @@ export function createWorld(scene: THREE.Scene): World {
 
     // ---------- Lighting + state machine ----------
     lighting.setState(state, dt);
+    // Drive the cable "live" sheen from the world state. dormant = 0,
+    // awakening = 0.4, powered_basic = 0.8, powered_full = 1.0.
+    const awakeLevel =
+      state === "dormant" ? 0 :
+      state === "awakening" ? 0.4 :
+      state === "powered_basic" ? 0.8 : 1.0;
+    cableVisuals.setAwake(awakeLevel);
     const targetFog = state === "dormant" ? new THREE.Color(0x3a4a68) : new THREE.Color(0x4a5a82);
     const targetBg = state === "dormant" ? new THREE.Color(0x3a4a68) : new THREE.Color(0x4a5a82);
     if (scene.fog instanceof THREE.Fog) {
@@ -562,6 +591,9 @@ export function createWorld(scene: THREE.Scene): World {
 
     // ---------- Animate landmarks (smoke puffs, lighthouse beam) ----------
     landmarks.update(performance.now() * 0.001);
+
+    // ---------- Animate the broken-cable spark orbs ----------
+    cableVisuals.update(performance.now() * 0.001);
   };
 
   return {
@@ -584,7 +616,10 @@ export function createWorld(scene: THREE.Scene): World {
     get dialogActive() { return dialogOpen; },
     electrical,
     bitacora: bitacoraRefs,
-    state: state,
+    // Getter (not a value copy) so the exposed state tracks the internal
+    // state machine after repairs. `state: state` would copy the primitive
+    // and stay "dormant" forever even though the world wakes up.
+    get state() { return state; },
     setState: (s: WorldState) => { state = s; },
     terrain,
   };
@@ -687,27 +722,11 @@ function makeCableParticles(scene: THREE.Scene): { geom: THREE.BufferGeometry; m
   return { geom, material };
 }
 
-// ---------- Cable traces (visible copper lines on the ground) ----------
-function drawCableTraces(
-  scene: THREE.Scene,
-  cables: { id: string; from: { x: number; z: number }; to: { x: number; z: number }; state: string }[],
-  _nodes: { id: string; position: { x: number; z: number; y: number } }[],
-  _regions: { id: string; x: number; z: number; width: number; depth: number; y: number }[],
-) {
-  for (const cable of cables) {
-    const dx = cable.to.x - cable.from.x;
-    const dz = cable.to.z - cable.from.z;
-    const len = Math.hypot(dx, dz);
-    if (len < 0.5) continue;
-    const color = cable.state === "broken" ? 0x5a3a1a : 0x7a5232;
-    const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0.55 });
-    const seg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.06, len), mat);
-    seg.position.set((cable.from.x + cable.to.x) / 2, 0.04, (cable.from.z + cable.to.z) / 2);
-    seg.lookAt(new THREE.Vector3(cable.to.x, 0.04, cable.to.z));
-    seg.receiveShadow = true;
-    scene.add(seg);
-  }
-}
+// ---------- Cable traces (deprecated — replaced by environment/cables.ts) ----------
+// The legacy single-segment drawer was removed in H2. The new module builds
+// multi-segment cables that follow the terrain elevation, render broken
+// cables with a visible gap and sparking posts, and respond to electrical
+// state changes via `cableVisuals.refresh()`.
 
 // ---------- Collision (Axis-Aligned Bounding Boxes) ----------
 interface AABB { x: number; z: number; w: number; d: number; tag?: string }

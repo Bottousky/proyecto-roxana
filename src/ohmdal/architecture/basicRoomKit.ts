@@ -70,6 +70,18 @@ export interface BasicSubRoom {
   readonly displayName: string;
 }
 
+/**
+ * Modo de representación del kit.
+ * - `'kit'` (default): la unidad se construye con materiales texturados, mapas de grano y
+ *   relieves, vertex colors pintados y un piso empedrado con junta real. Es la versión
+ *   "producida", la que se acerca al golden frame.
+ * - `'greybox'`: la unidad se reduce a cajas planas — un solo material liso por familia,
+ *   sin texturas, sin relieves, sin vertex colors, sin detalle de junta. Es la versión
+ *   estructural, la que sirve para validar layout, navegación y silueta a contraluz antes
+ *   de invertir tiempo en producción. Se usa para mapear todo el arco en una sola mirada.
+ */
+export type BasicUnitStyle = 'kit' | 'greybox';
+
 /** Presets de silueta — una composición de bloques simple, reconocible a contraluz. */
 export type BasicLandmark =
   | 'arch'
@@ -95,12 +107,19 @@ export interface BasicUnitDefinition {
   readonly wallHeight: number;
   /** Familia de los muros. */
   readonly wallFamily: BasicFamily;
-  /** Las 4 sub-salas. */
-  readonly subRooms: readonly [BasicSubRoom, BasicSubRoom, BasicSubRoom, BasicSubRoom];
+  /**
+   * Sub-salas de la unidad. El kit básico está hecho para 4, pero el modo greybox usa
+   * también unidades con 1 o 2 sub-salas (la Plaza, el Taller, la Puerta + Manantial).
+   * En modo `'kit'` se esperan 4 para mantener la densidad visual del panorama; el modo
+   * `'greybox'` acepta cualquier cantidad ≥ 1.
+   */
+  readonly subRooms: readonly BasicSubRoom[];
   /** Si la unidad se levanta hacia el este (Terrazas) o se mantiene plana. */
   readonly terrain?: 'flat' | 'ascending' | 'descending';
   /** Si la unidad está techada, el techo se desvanece con oclusión como el Taller. */
   readonly roofed?: boolean;
+  /** Estilo de representación. Default: `'kit'`. Ver `BasicUnitStyle`. */
+  readonly style?: BasicUnitStyle;
 }
 
 export interface BasicUnitKit {
@@ -375,10 +394,177 @@ function unitPaintBounds(unit: BasicUnitDefinition): { minX: number; maxX: numbe
   return { minX: unit.bounds.minX, maxX: unit.bounds.maxX, minZ: unit.bounds.minZ, maxZ: unit.bounds.maxZ };
 }
 
+/**
+ * Modo greybox: una sola losa plana, sin junta, sin relieve, sin pintura.
+ * Lo único que conserva del empedrado es la silueta rectangular.
+ */
+function flatFloor(bounds: BasicUnitDefinition['bounds']): THREE.BufferGeometry {
+  const width = bounds.maxX - bounds.minX;
+  const depth = bounds.maxZ - bounds.minZ;
+  const geometry = new THREE.BoxGeometry(width, 0.08, depth);
+  geometry.translate(
+    (bounds.minX + bounds.maxX) / 2,
+    0.04,
+    (bounds.minZ + bounds.maxZ) / 2,
+  );
+  return geometry;
+}
+
+/**
+ * Modo greybox: cuatro muros de perímetro como cajas simples, sin pilastras ni vanos.
+ * Los colliders de `levelData.ts` ya aportan la separación real entre unidades — el greybox
+ * sólo necesita marcar el contorno para que el ojo lea la huella de la sala.
+ */
+function flatPerimeter(unit: BasicUnitDefinition): THREE.BufferGeometry[] {
+  const pieces: THREE.BufferGeometry[] = [];
+  const { bounds, wallHeight } = unit;
+  const wallThickness = 0.62;
+  for (const z of [bounds.minZ, bounds.maxZ]) {
+    const geometry = new THREE.BoxGeometry(
+      bounds.maxX - bounds.minX,
+      wallHeight,
+      wallThickness,
+    );
+    geometry.translate(
+      (bounds.minX + bounds.maxX) / 2,
+      wallHeight / 2,
+      z,
+    );
+    pieces.push(geometry);
+  }
+  for (const x of [bounds.minX, bounds.maxX]) {
+    const geometry = new THREE.BoxGeometry(
+      wallThickness,
+      wallHeight,
+      bounds.maxZ - bounds.minZ,
+    );
+    geometry.translate(
+      x,
+      wallHeight / 2,
+      (bounds.minZ + bounds.maxZ) / 2,
+    );
+    pieces.push(geometry);
+  }
+  return pieces;
+}
+
+/**
+ * Material liso por familia, sin texturas ni normales. La paleta es la misma que el modo
+ * `kit` (`familyColor`) para que las dos versiones del mundo se lean como la misma escena.
+ */
+function flatMaterial(family: BasicFamily, name: string, _role: 'FLOOR' | 'WALL' | 'LANDMARK'): THREE.MeshStandardMaterial {
+  const isMetal = family === 'copper';
+  const isTransparent = family === 'water' || family === 'glass';
+  const material = new THREE.MeshStandardMaterial({
+    color: familyColor(family, 'afternoon'),
+    roughness: isMetal ? 0.55 : family === 'glass' ? 0.38 : 0.92,
+    metalness: isMetal ? 0.45 : 0,
+    transparent: isTransparent,
+    opacity: isTransparent ? (family === 'water' ? 0.72 : 0.78) : 1,
+    depthWrite: !isTransparent,
+    flatShading: true,
+  });
+  material.name = name;
+  return material;
+}
+
 export function createBasicUnitKit(definition: BasicUnitDefinition): BasicUnitKit {
+  if (definition.style === 'greybox') {
+    return createGreyboxUnitKit(definition);
+  }
+  return createDetailedUnitKit(definition);
+}
+
+/**
+ * Modo `'greybox'`: piso plano, perímetro de cuatro cajas, landmarks con la misma silueta
+ * que el modo `kit` pero sin texturas ni vertex colors. Es la lectura estructural del
+ * arco: veinte salas, todas en una sola pasada visual.
+ */
+function createGreyboxUnitKit(definition: BasicUnitDefinition): BasicUnitKit {
   const root = new THREE.Group();
   root.name = `${definition.id.toUpperCase()}_KIT`;
   root.userData.unitId = definition.id;
+  root.userData.style = 'greybox';
+
+  const floorGeometry = flatFloor(definition.bounds);
+  const floorMaterial = flatMaterial(definition.wallFamily, `${definition.id.toUpperCase()}_FLOOR`, 'FLOOR');
+  const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+  floorMesh.name = `${definition.id}_floor`;
+  floorMesh.receiveShadow = true;
+  floorMesh.castShadow = false;
+  root.add(floorMesh);
+
+  const wallPieces = flatPerimeter(definition);
+  const wallGeometry = mergeGeometries(wallPieces, false)!;
+  for (const piece of wallPieces) piece.dispose();
+  const wallMaterial = flatMaterial('stone', `${definition.id.toUpperCase()}_WALL`, 'WALL');
+  const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+  wallMesh.name = `${definition.id}_walls`;
+  wallMesh.castShadow = true;
+  wallMesh.receiveShadow = true;
+  root.add(wallMesh);
+
+  // Landmarks: una sola malla por familia, sin texturas. Las siluetas se conservan.
+  const landmarkByFamily = new Map<BasicFamily, THREE.BufferGeometry[]>();
+  for (const sub of definition.subRooms) {
+    const list = landmarkByFamily.get(sub.family) ?? [];
+    for (const piece of buildLandmark(sub.landmark, sub)) list.push(piece);
+    landmarkByFamily.set(sub.family, list);
+  }
+  const landmarkMaterials = new Map<BasicFamily, THREE.MeshStandardMaterial>();
+  for (const [family, pieces] of landmarkByFamily) {
+    if (pieces.length === 0) continue;
+    const merged = mergeGeometries(pieces, false)!;
+    for (const piece of pieces) piece.dispose();
+    const material = flatMaterial(family, `${definition.id.toUpperCase()}_LANDMARK_${family.toUpperCase()}`, 'LANDMARK');
+    landmarkMaterials.set(family, material);
+    const mesh = new THREE.Mesh(merged, material);
+    mesh.name = `${definition.id}_landmark_${family}`;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    root.add(mesh);
+  }
+
+  return {
+    root,
+    setTimeOfDay(timeOfDay): void {
+      floorMaterial.color.setHex(familyColor(definition.wallFamily, timeOfDay));
+      wallMaterial.color.setHex(familyColor('stone', timeOfDay));
+      for (const [family, material] of landmarkMaterials) {
+        material.color.setHex(familyColor(family, timeOfDay));
+      }
+    },
+    diagnostics() {
+      let totalTriangles = triangleCount(floorGeometry) + triangleCount(wallGeometry);
+      root.traverse((object) => {
+        if ((object as THREE.Mesh).isMesh) {
+          totalTriangles += triangleCount((object as THREE.Mesh).geometry);
+        }
+      });
+      return { meshes: root.children.length, triangles: totalTriangles };
+    },
+    dispose(): void {
+      root.removeFromParent();
+      root.clear();
+      floorGeometry.dispose();
+      wallGeometry.dispose();
+      floorMaterial.dispose();
+      wallMaterial.dispose();
+      for (const material of landmarkMaterials.values()) material.dispose();
+    },
+  };
+}
+
+/**
+ * Modo `'kit'` (default): la versión producida — empedrado, vertex colors pintados,
+ * texturas, normales. Es la misma función que vivía acá antes de que se sumara el modo
+ * greybox para mapear el arco completo.
+ */
+function createDetailedUnitKit(definition: BasicUnitDefinition): BasicUnitKit {
+  const root = new THREE.Group();
+  root.name = `${definition.id.toUpperCase()}_KIT`;
+  root.userData.unitId = definition.id;
+  root.userData.style = 'kit';
 
   // Los hashes por sub-sala mantienen la pintura determinista aunque las sub-salas vivan
   // en zonas distintas: la misma sub-sala pinta igual acá y en otro render.

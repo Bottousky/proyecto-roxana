@@ -33,6 +33,7 @@ import { getEntries } from '../content/entries';
 import { sfxBell, sfxPortal, setAmbience } from '../audio';
 import { syncOhmCompanionButton } from '../ui/ohmCompanion.ts';
 import { portalExitUrl } from '../shared/portalLink.ts';
+import { playAwakening } from './awakening.ts';
 
 export interface ThingDef {
   id: string;
@@ -115,22 +116,41 @@ function despertarOhm(): void {
   abrirDespertar(() => {
     setFlag('ohmAwake');
     syncOhmCompanionButton();
-    say(
-      [
-        L('Edda', '¡¿Lo DESPERTASTE?! ¿Qué ritual usaste? ¿El de los tres golpes? ¿El del incienso doble?'),
-        L('', '—Ningún ritual. Solo… completé el camino.'),
-        L('Edda', '«Completé el camino», dice, tan tranquilo. No se lo cuentes a Lumen de golpe, que le da un soponcio.'),
-        L('Edda', 'Ohm, vienes con nosotros. Nada de volver a dormir apenas me doy vuelta.'),
-        L('Ohm', 'Compañía aceptada. Orientación disponible cuando sea requerida.'),
-        L('', 'Ohm se acomoda en el comunicador de tu Bitácora. Desde ahora puedes consultarlo con O o desde su retrato en el HUD.'),
-        L('Edda', 'El taller de Lumen está al este. Si Ohm despertó, va a querer conocerte. O exorcizarte. Cincuenta y cincuenta.'),
-      ],
-      () => {
-        notifyNewEntry('El camino completo');
-        hooks.refresh();
-      },
-    );
+    // WOW del arco: flash + chispas + cámara + música. Solo si la escena
+    // topdown está viva. Si no, saltamos al dialog para no bloquear nada.
+    const game = (window as unknown as { __game?: { scene: { getScene(key: string): PhaserSceneLike } } }).__game;
+    const scene = game?.scene.getScene('explore') as PhaserSceneLike | null;
+    const speak = (): void => {
+      say(
+        [
+          L('Edda', '¡¿Lo DESPERTASTE?! ¿Qué ritual usaste? ¿El de los tres golpes? ¿El del incienso doble?', 'edda-awakening-surprise'),
+          L('', '—Ningún ritual. Solo… completé el camino.'),
+          L('Edda', '«Completé el camino», dice, tan tranquilo. No se lo cuentes a Lumen de golpe, que le da un soponcio.', 'edda-warning'),
+          L('Edda', 'Ohm, vienes con nosotros. Nada de volver a dormir apenas me doy vuelta.', 'edda-ohm-comes'),
+          L('Ohm', 'Compañía aceptada. Orientación disponible cuando sea requerida.', 'ohm-greeting'),
+          L('', 'Ohm se acomoda en el comunicador de tu Bitácora. Desde ahora puedes consultarlo con O o desde su retrato en el HUD.'),
+          L('Edda', 'El taller de Lumen está al este. Si Ohm despertó, va a querer conocerte. O exorcizarte. Cincuenta y cincuenta.'),
+        ],
+        () => {
+          notifyNewEntry('El camino completo');
+          hooks.refresh();
+        },
+      );
+    };
+    if (scene && typeof scene.add === 'object') {
+      const x = 480;
+      const y = 342;
+      const handle = playAwakening(scene as unknown as Phaser.Scene, x, y);
+      void handle.done.then(speak);
+    } else {
+      speak();
+    }
   });
+}
+
+interface PhaserSceneLike {
+  add: unknown;
+  cameras: { main: { centerOn(x: number, y: number): void } };
 }
 
 function resolverFreno(): void {
@@ -138,7 +158,7 @@ function resolverFreno(): void {
     setFlag('frenoDone');
     say(
       [
-        L('Maese Lumen', '«La piedra justa»… Donde otros ven magia, busca camino. Eso decían los Maestros. Nunca supe qué significaba.'),
+        L('Maese Lumen', '«La piedra justa»… Donde otros ven magia, busca camino. Eso decían los Maestros. Nunca supe qué significaba.', 'lumen-philosophy'),
         L('Maese Lumen', 'Si entiendes a las piedras… quizás puedas con la Puerta de Ohm. Al norte de la plaza. Nadie la abre desde la época de los Maestros.'),
         L('Edda', 'Voy con ustedes. Si explota, quiero verlo de cerca.'),
         L('Maese Lumen', 'Adelántense. Yo junto los fusibles de repuesto. …Mejor llevo seis.'),
@@ -160,8 +180,8 @@ function resolverPuerta(): void {
     say(
       [
         L('', 'Las hojas se apartan. Del otro lado no hay una sala: una calzada de cobre sube hacia el manantial y el río de chispa corre por ella hasta la plaza.'),
-        L('Maese Lumen', 'Se abrió… La Puerta regulaba el caudal del pueblo: ni hambrienta ni ahogada. Empuje y freno, medidos el uno contra el otro.'),
-        L('Edda', 'Empuje sobre freno. Es… ¿es una CUENTA? ¿Todo este tiempo era una cuenta?'),
+        L('Maese Lumen', 'Se abrió… La Puerta regulaba el caudal del pueblo: ni hambrienta ni ahogada. Empuje y freno, medidos el uno contra el otro.', 'lumen-door-opens'),
+        L('Edda', 'Empuje sobre freno. Es… ¿es una CUENTA? ¿Todo este tiempo era una cuenta?', 'edda-realization'),
         L('', 'Las lámparas despiertan una tras otra a tus espaldas. La Bitácora arde tibia en tu bolsillo, escribiéndose a fuego.'),
       ],
       () => {
@@ -488,7 +508,7 @@ function presentarSalaRamales(): void {
     L('Lumen', 'El Fusible del Tronco. El mártir más grande de Ohmdal. Cuando este se inmola, Consejera, no hay ritual que lo consuele.'),
     L('Consejera', 'Por eso las bocas están selladas. Tres talleres abiertos vaciarían el Tronco.'),
     L('Edda', '¿Vaciarlo? El río no es un balde… …¿O sí? Ohm: ¿es un balde?'),
-    L('Ohm', 'Balde: no. Contable: sí.'),
+    L('Ohm', 'Balde: no. Contable: sí.', 'ohm-balde-contable'),
   ]);
 }
 
@@ -584,7 +604,7 @@ function abrirBancoTimbre(): void {
       say(
         [
           L('', 'El preceptor se asoma al pasillo. Mira el parlante un rato largo, como a un fantasma educado.'),
-          L('Preceptor', 'Veinte años sin sonar.'),
+          L('Preceptor', 'Veinte años sin sonar.', 'preceptor-twenty-years'),
           L('Preceptor', '…Voy a tener que volver a llegar puntual.'),
         ],
         () => {
@@ -611,8 +631,8 @@ function hablarForjadoraPatio(): void {
       L('Yesca', '…Touché.'),
       L('Yesca', 'Mira: yo no entiendo de ríos ni de cuentas. Entiendo de carbón. Y desde que la Forja despertó, el carbón vuela. Algo se está yendo a alguna parte.'),
       L('Consejera', 'Eso vine a preguntar. Medimos el río: no se gasta. Lo demostraron ustedes. Entonces, ¿qué es lo que falta cada mañana?'),
-      L('Edda', '…Esa es buena pregunta. Ohm: ¿tienes algo para el calor?'),
-      L('Ohm', 'Modo nuevo disponible: termómetro. Apoyo la mano. Reporto el peaje.'),
+      L('Edda', '…Esa es buena pregunta. Ohm: ¿tienes algo para el calor?', 'edda-warmth-question'),
+      L('Ohm', 'Modo nuevo disponible: termómetro. Apoyo la mano. Reporto el peaje.', 'ohm-thermometer'),
     ],
     () => {
       setFlag('metForjadora');

@@ -41,10 +41,10 @@ export const CANONICAL_ROUTE_ACTIONS: readonly RouteAction[] = [
   { at: 'R1_PLAZA_ENTRY', action: 'walk', value: ROUTE_SPEED_METERS_PER_SECOND },
   { at: 'R2_PLAZA_DIAGONAL', action: 'turn', value: 135 },
   { at: 'R4_LUMEN_STOP', action: 'wait', value: 1 },
-  { at: 'R6_TALLER_MEASURE', action: 'interact', value: 'taller-measure' },
-  { at: 'R8_DOOR_MEASURE', action: 'interact', value: 'door-measure' },
-  { at: 'R8_DOOR_MEASURE', action: 'restore', value: 'mechanism-on' },
-  { at: 'R9_SPRING_EDGE', action: 'wait', value: 2 },
+  { at: 'R4_LUMEN_STOP', action: 'interact', value: 'taller-measure' },
+  { at: 'R6_DOOR_MEASURE', action: 'interact', value: 'door-measure' },
+  { at: 'R6_DOOR_MEASURE', action: 'restore', value: 'mechanism-on' },
+  { at: 'R7_SPRING_EDGE', action: 'wait', value: 2 },
 ] as const;
 
 function contains(bounds: MetricBounds2, point: MetricPoint, inset = 0): boolean {

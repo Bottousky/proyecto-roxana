@@ -7,17 +7,16 @@ import {
   type BlockoutTimeOfDay,
 } from '../materials/blockoutMaterials.ts';
 import { NAVIGATION_REGIONS } from '../navigation/navigation.ts';
-import { createPlazaKit } from './plazaKit.ts';
-import { createTallerKit } from './tallerKit.ts';
-import { createPuertaKit, type WaterState } from './puertaKit.ts';
-import { createBasicUnitKit } from './basicRoomKit.ts';
+import { createBasicUnitKit, type BasicUnitKit } from './basicRoomKit.ts';
 import { BASIC_UNITS } from './units.ts';
 import {
+  ARCHITECTURE_SOCKETS,
   BOX_MODULES,
   COLLIDERS,
   GAMEPLAY_PLANE_Y,
   MANNEQUIN_HEIGHT_METERS,
   ROUTE_ANCHORS,
+  type ArchitectureSocket,
 } from './levelData.ts';
 
 export interface RendererInfoSnapshot {
@@ -63,9 +62,18 @@ export interface OhmdalBlockout {
   readonly materials: BlockoutMaterialSet;
   readonly lighting: BlockoutLightRig;
   setTimeOfDay(timeOfDay: BlockoutTimeOfDay): void;
-  /** E5: el estado del agua en el Manantial. Lo decide el mundo según los flags de `/jugar`. */
-  setSpringWaterState(state: WaterState): void;
-  /** E4: cuánto están abiertas las hojas de la Puerta. `0` cerrada, `1` abierta del todo. */
+  /**
+   * Estado del agua en el Manantial. La Puerta y el Manantial ahora son greybox (sus
+   * kits `puertaKit` se reemplazaron por `createBasicUnitKit` con modo `'greybox'`), así
+   * que el cambio de estado del agua ya no se ve — la lógica del puzzle en
+   * `puzzles/puerta.ts` sigue corriendo y el flag `puertaDone` sigue marcando el cambio.
+   * El método queda como no-op para que `world.ts` no tenga que ramificar.
+   */
+  setSpringWaterState(state: 'estable' | 'detenida'): void;
+  /**
+   * Apertura de las hojas de la Puerta. Como `setSpringWaterState`, la Puerta es greybox
+   * y la apertura no se ve. El método queda como no-op para mantener el contrato.
+   */
   setDoorOpening(amount: number): void;
   diagnostics(): BlockoutDiagnostics;
   dispose(): void;
@@ -73,6 +81,64 @@ export interface OhmdalBlockout {
 
 function geometryKey(width: number, height: number, depth: number): string {
   return `${width}:${height}:${depth}`;
+}
+
+/**
+ * Cada socket del arco es una transición entre dos unidades. En modo greybox el muro
+ * perimetral es bajo y el ojo no siempre lee el hueco — los arcos marcan el paso:
+ * dos pilares a los lados del gap de 3 m, un dintel de cobre conectándolos. Material
+ * cobre, no piedra: contrasta con la paleta gris de los greybox y se lee como umbral.
+ *
+ * No se dibuja un arco para los self-sockets (S_PORTAL_TO_PLAZA): el Portal no es
+ * una transición entre zonas, es el spawn dentro de la Plaza. Un arco ahí confundiría
+ * la lectura.
+ */
+const SOCKET_ARCH_PILLAR_W = 0.3;
+const SOCKET_ARCH_PILLAR_H = 1.6;
+const SOCKET_ARCH_PILLAR_D = 0.3;
+const SOCKET_ARCH_BEAM_H = 0.3;
+const SOCKET_ARCH_BEAM_D = 0.4;
+const SOCKET_ARCH_COLOR = 0xa66a3a;
+
+function socketArch(socket: ArchitectureSocket): THREE.Group {
+  const root = new THREE.Group();
+  root.name = `${socket.id}_ARCH`;
+  const material = new THREE.MeshStandardMaterial({
+    color: SOCKET_ARCH_COLOR,
+    roughness: 0.55,
+    metalness: 0.35,
+    flatShading: true,
+  });
+  // Los sockets del arco son perpendiculares a la huella de las unidades: el muro está
+  // en x = constante y el paso va en z. Los pilares van a los lados del gap, no
+  // adentro: en z = socket.z ± (socket.width/2 + pillarDepth/2).
+  const zNorth = socket.position.z - socket.width / 2 - SOCKET_ARCH_PILLAR_D / 2;
+  const zSouth = socket.position.z + socket.width / 2 + SOCKET_ARCH_PILLAR_D / 2;
+  for (const [zOffset, side] of [[zNorth, 'N'], [zSouth, 'S']] as const) {
+    const pillar = new THREE.Mesh(
+      new THREE.BoxGeometry(SOCKET_ARCH_PILLAR_W, SOCKET_ARCH_PILLAR_H, SOCKET_ARCH_PILLAR_D),
+      material,
+    );
+    pillar.name = `${socket.id}_PILLAR_${side}`;
+    pillar.position.set(socket.position.x, SOCKET_ARCH_PILLAR_H / 2, zOffset);
+    pillar.castShadow = true;
+    root.add(pillar);
+  }
+  // El dintel cubre la luz del hueco: ancho = gap + pillarDepth, profundidad = beamDepth.
+  const beamLength = socket.width + SOCKET_ARCH_PILLAR_D;
+  const beam = new THREE.Mesh(
+    new THREE.BoxGeometry(SOCKET_ARCH_BEAM_D, SOCKET_ARCH_BEAM_H, beamLength),
+    material,
+  );
+  beam.name = `${socket.id}_BEAM`;
+  beam.position.set(
+    socket.position.x,
+    SOCKET_ARCH_PILLAR_H + SOCKET_ARCH_BEAM_H / 2,
+    socket.position.z,
+  );
+  beam.castShadow = true;
+  root.add(beam);
+  return root;
 }
 
 function createMannequin(
@@ -156,24 +222,12 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
     return geometry;
   };
 
-  // La Plaza dejó de ser blockout: la construye su propio kit, con piso empedrado, muros de
-  // perímetro, el Portal y el monumento de la campana. El Taller y la Puerta siguen en cajas
-  // hasta que les toque.
-  const plaza = createPlazaKit();
-  visualLayer.add(plaza.root);
-  const taller = createTallerKit();
-  visualLayer.add(taller.root);
-  // Los faldones y el vano del Taller se desvanecen igual que cualquier otro oclusor: el kit
-  // aporta sus bindings y el controlador de oclusión no se entera de que cambió quién los hace.
-  occlusionBindings.push(...taller.occlusionBindings);
-  const puerta = createPuertaKit();
-  visualLayer.add(puerta.root);
-  occlusionBindings.push(...puerta.occlusionBindings);
-
-  // Las 4 unidades básicas del arco (Castillo, Forja, Terrazas, Faro). Cada una se monta
-  // con su propio kit: piso empedrado, perímetro, siluetas por sub-sala. Devuelven una
-  // referencia al kit para poder propagar el cambio de hora del día.
-  const basicUnits = BASIC_UNITS.map((definition) => {
+  // Siete unidades: las 3 de U1 (Plaza, Taller, Puerta + Manantial) y las 4 de U2–U5
+  // (Castillo, Forja, Terrazas, Faro). Las tres primeras corren en modo `'greybox'`
+  // (cajas planas, sin texturas); las cuatro últimas en modo `'kit'` (texturas, vertex
+  // colors, empedrado). Es la lectura estructural del arco: las veinte salas del
+  // manifiesto, una sola pasada visual.
+  const allUnits: BasicUnitKit[] = BASIC_UNITS.map((definition) => {
     const kit = createBasicUnitKit(definition);
     visualLayer.add(kit.root);
     return kit;
@@ -260,6 +314,17 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
     anchorLayer.add(object);
   }
 
+  // Arcos de umbral: una capa visual que se monta encima de las unidades para que los
+  // sockets sean legibles desde cualquier camara. Los self-sockets (Portal dentro de la
+  // propia Plaza) se saltan: el Portal no es una transicion, es el spawn.
+  const socketArchGroup = new THREE.Group();
+  socketArchGroup.name = 'SOCKET_ARCHES';
+  for (const socket of ARCHITECTURE_SOCKETS) {
+    if (socket.from === socket.to) continue;
+    socketArchGroup.add(socketArch(socket));
+  }
+  visualLayer.add(socketArchGroup);
+
   const mannequin = createMannequin(geometries, materials.materialFor('glass'));
   referenceLayer.add(mannequin);
   const lighting = createBlockoutLighting(emitters);
@@ -282,18 +347,16 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
       if (disposed) throw new Error('Ohmdal blockout is disposed');
       materials.setTimeOfDay(timeOfDay);
       lighting.setTimeOfDay(timeOfDay);
-      plaza.setTimeOfDay(timeOfDay);
-      taller.setTimeOfDay(timeOfDay);
-      puerta.setTimeOfDay(timeOfDay);
-      for (const kit of basicUnits) kit.setTimeOfDay(timeOfDay);
+      for (const kit of allUnits) kit.setTimeOfDay(timeOfDay);
     },
-    setSpringWaterState(state) {
+    setSpringWaterState(_state) {
       if (disposed) throw new Error('Ohmdal blockout is disposed');
-      puerta.setWaterState(state);
+      // No-op: la Puerta y el Manantial son greybox. La lógica del puzzle en
+      // `puzzles/puerta.ts` sigue corriendo; sólo el reflejo visual desapareció.
     },
-    setDoorOpening(amount) {
+    setDoorOpening(_amount) {
       if (disposed) throw new Error('Ohmdal blockout is disposed');
-      puerta.setDoorOpening(amount);
+      // No-op: la Puerta es greybox. Ver `setSpringWaterState`.
     },
     diagnostics() {
       return {
@@ -310,10 +373,7 @@ export function createOhmdalBlockout(scene?: THREE.Scene): OhmdalBlockout {
     dispose() {
       if (disposed) return;
       lighting.dispose();
-      plaza.dispose();
-      taller.dispose();
-      puerta.dispose();
-      for (const kit of basicUnits) kit.dispose();
+      for (const kit of allUnits) kit.dispose();
       root.removeFromParent();
       root.clear();
       geometries.forEach((geometry) => geometry.dispose());

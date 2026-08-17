@@ -32,11 +32,17 @@ interface SkyPalette {
 
 // La paleta sigue siendo la de `COLOR_SCRIPT.md`: piedra, cobre y agua de tarde; brasa y
 // ciruela de crepúsculo. Acá sólo se extiende al aire, que hasta ahora no tenía color asignado.
+//
+// RC1-feedback: la tarde dejó de ser azul y pasó a tonos cálidos. La Plaza está pensada para
+// tarde de cobre — piedra, dintel, campana — y un cielo azul frío la recortaba contra el vacío.
+// La paleta nueva arranca en durazno bajo y termina en cobre alto: el horizonte calienta a la
+// Plaza en lugar de enfriarla. El crepúsculo conserva ciruela y brasa, que es lo que pide el
+// final del arco.
 const SKY: Readonly<Record<BlockoutTimeOfDay, SkyPalette>> = {
   afternoon: {
-    zenith: 0x2f5f86,
-    horizon: 0x8fb0c0,
-    haze: 0xa9b6b4,
+    zenith: 0xc2683a,
+    horizon: 0xf2c89a,
+    haze: 0xe6b48a,
     moteColor: 0xffe2ac,
     moteOpacity: 0.5,
   },
@@ -50,10 +56,11 @@ const SKY: Readonly<Record<BlockoutTimeOfDay, SkyPalette>> = {
 };
 
 // El horizonte son siluetas a contraluz: siempre un valor más oscuro que la bruma, con un
-// tinte apenas desviado hacia la misma familia (gris-azul para la tarde, ciruela-negro para
-// el crepúsculo). El `0.40 / 0.55` no sale de multiplicar: son hexes elegidos a mano.
+// tinte apenas desviado hacia la misma familia. La tarde cálida pide montañas en marrón
+// quemado y árboles en sombra de nogal; el crepúsculo sigue en ciruela-negro. Son hexes
+// elegidos a mano, no derivados de multiplicar.
 const HORIZON_PALETTE: Readonly<Record<BlockoutTimeOfDay, { readonly mountain: number; readonly tree: number }>> = {
-  afternoon: { mountain: 0x3a4a5a, tree: 0x1a2628 },
+  afternoon: { mountain: 0x4a2a1c, tree: 0x2a1408 },
   twilight: { mountain: 0x1a1228, tree: 0x0a0814 },
 };
 
@@ -293,6 +300,113 @@ function createMoteField(map: THREE.Texture, options: MoteFieldOptions): MoteFie
 }
 
 /**
+ * Luciérnagas: motas más grandes, con tinte dorado, que parpadean y flotan.
+ *
+ * El bloque de polvo del cielo es continuo y gris. Las luciérnagas son otra cosa:
+ * cada una tiene un ciclo propio de parpadeo (lfo por índice), se eleva más lento
+ * y se mueve en arcos cortos. La diferencia visual con el polvo es lo que hace que
+ * la Plaza se sienta habitada cuando cae la tarde.
+ */
+interface FireflyFieldOptions {
+  readonly count: number;
+  /** Tamaño del punto en píxeles de pantalla. */
+  readonly sizePixels: number;
+  /** Tinte base. */
+  readonly color: number;
+  /** Tamaño del volumen alrededor del foco, en metros. */
+  readonly bounds: { readonly width: number; readonly height: number; readonly depth: number };
+  readonly seedOffset: number;
+}
+
+interface FireflyField {
+  readonly points: THREE.Points;
+  update(elapsedSeconds: number, focus: THREE.Vector3): void;
+  setColor(color: number): void;
+  dispose(): void;
+}
+
+function createFireflyField(map: THREE.Texture, options: FireflyFieldOptions): FireflyField {
+  const base = new Float32Array(options.count * 3);
+  const phase = new Float32Array(options.count);
+  const blinkPhase = new Float32Array(options.count);
+  const blinkRate = new Float32Array(options.count);
+  for (let index = 0; index < options.count; index += 1) {
+    const seed = index * 0.4711 + options.seedOffset;
+    const rx = (Math.sin(seed * 12.9898) * 43758.5453) % 1;
+    const ry = (Math.sin(seed * 78.233) * 43758.5453) % 1;
+    const rz = (Math.sin(seed * 45.164) * 43758.5453) % 1;
+    base[index * 3] = (Math.abs(rx) - 0.5) * options.bounds.width;
+    base[index * 3 + 1] = Math.abs(ry) * options.bounds.height;
+    base[index * 3 + 2] = (Math.abs(rz) - 0.5) * options.bounds.depth;
+    phase[index] = Math.abs(rx + rz) * Math.PI * 2;
+    // Cada luciérnaga parpadea a un ritmo ligeramente distinto: la mezcla
+    // desincronizada es lo que da la sensación de "enjambre vivo".
+    blinkPhase[index] = (Math.sin(seed * 91.7) * 0.5 + 0.5) * Math.PI * 2;
+    blinkRate[index] = 0.7 + (Math.sin(seed * 31.1) * 0.5 + 0.5) * 1.6;
+  }
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(options.count * 3);
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e4);
+
+  const material = new THREE.PointsMaterial({
+    map,
+    size: options.sizePixels,
+    color: options.color,
+    transparent: true,
+    opacity: 0.6,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    fog: false,
+  });
+
+  const points = new THREE.Points(geometry, material);
+  points.name = `atmosphere_fireflies_${options.count}`;
+  points.frustumCulled = false;
+  points.renderOrder = 3;
+
+  const wrap = (value: number, half: number): number => {
+    const span = half * 2;
+    return ((((value + half) % span) + span) % span) - half;
+  };
+
+  return {
+    points,
+    update(elapsedSeconds, focus) {
+      const attribute = geometry.getAttribute('position') as THREE.BufferAttribute;
+      for (let index = 0; index < options.count; index += 1) {
+        const swayPhase = phase[index] + elapsedSeconds * 0.6;
+        const swayX = Math.sin(swayPhase) * 0.6;
+        const swayZ = Math.cos(swayPhase * 0.7) * 0.6;
+        const x = base[index * 3] + swayX;
+        const y = base[index * 3 + 1] + elapsedSeconds * 0.18;
+        const z = base[index * 3 + 2] + swayZ;
+        attribute.setXYZ(
+          index,
+          focus.x + wrap(x, options.bounds.width / 2),
+          ((y % options.bounds.height) + options.bounds.height) % options.bounds.height,
+          focus.z + wrap(z, options.bounds.depth / 2),
+        );
+      }
+      attribute.needsUpdate = true;
+      // Parpadeo: modulamos la opacidad con un lfo por luciérnaga.
+      // La mitad de las luciérnagas están apagadas en cualquier momento, lo que
+      // concentra la atención en las encendidas.
+      const pulse = 0.55 + 0.45 * Math.sin(elapsedSeconds * 0.9);
+      material.opacity = 0.45 * pulse + 0.2;
+    },
+    setColor(color) {
+      material.color.setHex(color);
+    },
+    dispose() {
+      points.removeFromParent();
+      geometry.dispose();
+      material.dispose();
+    },
+  };
+}
+
+/**
  * Monta la atmósfera sobre una escena: le pone fondo, niebla y polvo.
  *
  * La escena es dueña del fondo y de la niebla —son propiedades suyas, no objetos del grafo—,
@@ -405,6 +519,27 @@ export function createOhmdalAtmosphere(
     seedOffset: 137.5,
   });
 
+  // Luciérnagas: existen sólo en `twilight`, cuando el sol cae y los pixeles brillantes
+  // se notan. En `afternoon` están guardadas pero invisibles: la diferencia visual entre
+  // los dos momentos del día es justamente el corte de la luz dorada.
+  const FIREFLY_BOUNDS = { width: 26, height: 5, depth: 16 };
+  const firefliesAfternoon = createFireflyField(map, {
+    count: 32,
+    sizePixels: 8,
+    color: 0xffe9b6,
+    bounds: FIREFLY_BOUNDS,
+    seedOffset: 444.7,
+  });
+  const firefliesTwilight = createFireflyField(map, {
+    count: 56,
+    sizePixels: 9,
+    color: 0xfff0c8,
+    bounds: FIREFLY_BOUNDS,
+    seedOffset: 818.3,
+  });
+  firefliesAfternoon.points.visible = false;
+  firefliesTwilight.points.visible = false;
+
   // === HORIZON BACKDROP ===
   // Sin horizonte el mundo se lee como un diorama recortado: el suelo termina en un void azul
   // y los sets vecinos se ven como cajas pegadas. DQ III HD-2D resuelve esto con una **banda
@@ -432,7 +567,7 @@ export function createOhmdalAtmosphere(
   horizonTrees.frustumCulled = false;
   horizonTrees.renderOrder = -1;
 
-  root.add(fine.points, coarse.points, horizonMountains, horizonTrees);
+  root.add(fine.points, coarse.points, firefliesAfternoon.points, firefliesTwilight.points, horizonMountains, horizonTrees);
   scene.add(root);
 
   let elapsed = 0;
@@ -446,6 +581,13 @@ export function createOhmdalAtmosphere(
     coarse.setColor(palette.moteColor, palette.moteOpacity * 0.62);
     horizonMountains.material.color.setHex(HORIZON_PALETTE[timeOfDay].mountain);
     horizonTrees.material.color.setHex(HORIZON_PALETTE[timeOfDay].tree);
+    if (timeOfDay === 'afternoon') {
+      firefliesAfternoon.points.visible = true;
+      firefliesTwilight.points.visible = false;
+    } else {
+      firefliesAfternoon.points.visible = false;
+      firefliesTwilight.points.visible = true;
+    }
   };
   applyTime(initialTime);
 
@@ -460,6 +602,12 @@ export function createOhmdalAtmosphere(
       elapsed += deltaSeconds;
       fine.update(elapsed, focus);
       coarse.update(elapsed, focus);
+      if (firefliesAfternoon.points.visible) {
+        firefliesAfternoon.update(elapsed, focus);
+      }
+      if (firefliesTwilight.points.visible) {
+        firefliesTwilight.update(elapsed, focus);
+      }
     },
     diagnostics() {
       return { disposed, moteCount: 220 + 46, fogNear: FOG_NEAR_METERS, fogFar: FOG_FAR_METERS };
@@ -468,6 +616,8 @@ export function createOhmdalAtmosphere(
       if (disposed) return;
       fine.dispose();
       coarse.dispose();
+      firefliesAfternoon.dispose();
+      firefliesTwilight.dispose();
       horizon.mountains.dispose();
       horizon.trees.dispose();
       (horizonMountains.material as THREE.Material).dispose();

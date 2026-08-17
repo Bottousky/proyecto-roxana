@@ -148,36 +148,64 @@ body:not(.touch-device) .arc-panorama-continue {
 
 /* ---------- Prompt ---------- */
 #prompt {
-  position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%);
+  position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
   z-index: 20;
-  background: rgba(20,18,26,.92);
-  border: 1px solid var(--panel-edge);
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 15px;
+  background: rgba(20,18,26,.86);
+  border: 1px solid rgba(255, 222, 144, .35);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
   color: var(--accent);
   pointer-events: none;
   white-space: nowrap;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
 }
 
-/* ---------- Dialog ---------- */
+/* ---------- Dialog ----------
+   Compact, top-anchored, photographic-backdrop style.
+   Frees the painted room art instead of burying it.
+*/
 #dialog {
-  position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
-  width: min(860px, 94vw);
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  width: min(720px, 92vw);
+  max-height: 110px;
   z-index: 40;
-  display: grid; grid-template-columns: 142px 1fr; gap: 18px; align-items: stretch;
-  background: linear-gradient(180deg, rgba(30,40,92,.98), rgba(16,21,65,.98));
-  border: 4px solid #f3eee0;
-  border-radius: 6px;
-  padding: 10px 24px 14px 10px;
+  display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: stretch;
+  background: linear-gradient(180deg, rgba(14,18,38,.92), rgba(8,11,26,.94));
+  border: 1px solid rgba(255, 222, 144, .42);
+  border-radius: 8px;
+  padding: 8px 14px 10px 8px;
   cursor: pointer;
-  box-shadow: 0 0 0 3px #20244e, 0 0 0 6px rgba(5,7,20,.9), 0 8px 28px rgba(0,0,0,.75), inset 0 0 24px rgba(67,90,190,.35);
+  box-shadow: 0 0 0 1px rgba(8, 11, 26, .9), 0 6px 24px rgba(0, 0, 0, .55), 0 0 22px rgba(95, 70, 30, .15);
   user-select: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  overflow: hidden;
+  transition: opacity .18s ease, transform .18s ease;
 }
-#dialog-copy { min-width: 0; padding-top: 10px; }
-#dialog-who { display: inline-block; color: #fff5b8; font-weight: 800; font-size: 15px; margin: -30px 0 10px -2px; padding: 5px 20px; min-width: 116px; letter-spacing: .08em; text-transform: uppercase; text-align: center; background: linear-gradient(#294eb0,#172d79); border: 3px solid #f3eee0; border-radius: 5px; box-shadow: 0 0 0 2px #101841, 3px 4px 0 rgba(4,7,25,.7); text-shadow: 2px 2px #090b22; }
-#dialog-text { font-family: Georgia, 'Times New Roman', serif; font-size: 18px; line-height: 1.42; min-height: 52px; color: #fffdf4; text-shadow: 1px 2px #090b22; }
-#dialog-next { position: absolute; bottom: 7px; right: 12px; color: #ffd761; font-size: 13px; animation: bob 1s steps(2,end) infinite; }
+#dialog-copy { min-width: 0; padding: 2px 0 0 0; display: flex; flex-direction: column; gap: 2px; }
+#dialog-who {
+  display: inline-block; align-self: flex-start;
+  color: #ffe2a4; font-weight: 700; font-size: 11px;
+  margin: 0 0 0 0; padding: 2px 9px;
+  letter-spacing: .14em; text-transform: uppercase;
+  background: rgba(60, 38, 92, .85);
+  border: 1px solid rgba(255, 222, 144, .35);
+  border-radius: 3px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, .55);
+  line-height: 1.5;
+}
+#dialog-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px; line-height: 1.36;
+  color: #fbf3d8;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, .7);
+  margin: 0;
+  max-height: 64px; overflow: hidden;
+}
+#dialog-next { position: absolute; bottom: 6px; right: 10px; color: #ffd761; font-size: 12px; animation: bob 1s steps(2,end) infinite; }
 
 .confirm-exit-ohmdal {
   position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center;
@@ -199,13 +227,15 @@ body:not(.touch-device) .arc-panorama-continue {
 .confirm-exit-ohmdal button.primary { color: #071313; background: #65d8cf; border-color: #b8fff9; }
 .confirm-exit-ohmdal button:hover, .confirm-exit-ohmdal button:focus-visible { outline: 3px solid #ffe071; outline-offset: 3px; }
 
-/* Retratos originales: primer plano clásico de JRPG, distinto por interlocutor. */
+/* Retratos compactos al borde del dialog. */
 #dialog-portrait {
-  position: relative; width: 138px; height: 112px; overflow: hidden; align-self: end;
-  background: #10162f; border: 2px solid #8ba0e0;
-  box-shadow: inset 0 0 0 2px #151a43, 3px 3px 0 #090b22; image-rendering: pixelated;
+  position: relative; width: 76px; height: 76px; overflow: hidden; align-self: center;
+  background: #0c1024; border: 1px solid rgba(255, 222, 144, .42);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .4);
+  image-rendering: auto;
 }
-#dialog-portrait-image { display:block; width:100%; height:100%; object-fit:cover; object-position:center top; image-rendering:pixelated; }
+#dialog-portrait-image { display:block; width:100%; height:100%; object-fit:cover; object-position:center top; image-rendering: auto; }
 .portrait-narrator { display:none !important; }
 #dialog:has(.portrait-narrator) { grid-template-columns: 1fr; padding-left: 22px; }
 @keyframes bob { 50% { transform: translateY(3px); } }
@@ -1630,10 +1660,21 @@ button.forge-slot { cursor: pointer; }
 #title-screen {
   align-items: flex-start;
   padding-top: clamp(24px, 7vh, 76px);
-  background-image: linear-gradient(180deg, rgba(7,8,21,.18), rgba(7,8,21,.02) 55%, rgba(7,8,21,.72)), url('../assets/ohmdal-title-vista.png');
+  /* El nuevo fondo generado para el proyecto: la Plaza en tarde de cobre, en 2K.
+     La animación de Ken Burns abajo le da vida sin distraer del título. */
+  background-image:
+    linear-gradient(180deg, rgba(7,8,21,.18) 0%, rgba(7,8,21,.02) 55%, rgba(7,8,21,.86) 100%),
+    url('../assets/ohmdal/hero/plaza-afternoon.png');
   background-size: cover;
   background-position: center center;
-  image-rendering: pixelated;
+  background-repeat: no-repeat;
+  /* La nueva imagen es ilustración, no pixel art: se renderiza a calidad de pantalla. */
+  image-rendering: auto;
+  animation: ohmdalTitleKen 32s ease-in-out infinite alternate;
+}
+@keyframes ohmdalTitleKen {
+  0% { background-position: 52% 50%; background-size: 102% auto; }
+  100% { background-position: 48% 50%; background-size: 108% auto; }
 }
 .title-card { text-align: center; max-width: 650px; padding: 38px 46px; background: rgba(8,9,19,.72); border: 1px solid rgba(255,215,97,.45); box-shadow: 0 18px 70px #050612, inset 0 0 45px rgba(59,72,155,.2); }
 #title-screen .title-card { padding: 22px 42px; background: linear-gradient(180deg, rgba(8,9,23,.82), rgba(8,9,23,.55)); backdrop-filter: blur(1px); }
@@ -1664,11 +1705,130 @@ button.forge-slot { cursor: pointer; }
 .title-buttons button#btn-continue:hover { border-color: var(--accent-dim); }
 .title-card .hint { color: #665e70; font-size: 13px; line-height: 1.6; }
 
+/* ---------- Title screen enriquecido (Arco I) ---------- */
+#title-screen .title-card {
+  max-width: 720px;
+  padding: 30px 52px 34px;
+  text-align: left;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(11,10,21,.84) 0%, rgba(11,10,21,.55) 100%);
+  border: 1px solid rgba(255,215,97,.32);
+  box-shadow: 0 28px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(255,215,97,.06) inset;
+  backdrop-filter: blur(2px);
+  animation: titleCardIn 1.4s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes titleCardIn {
+  0% { opacity: 0; transform: translateY(18px) scale(.985); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+#title-screen .kicker {
+  font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 14px;
+  opacity: 0.88;
+}
+#title-screen h1 {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 68px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin: 0 0 6px;
+  color: #fff8dc;
+  text-shadow: 0 4px 22px rgba(255,211,77,.32);
+}
+#title-screen h2 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #d8c69a;
+  letter-spacing: 0.34em;
+  margin: 0 0 24px;
+  text-transform: uppercase;
+}
+#title-screen .quote {
+  font-family: 'Spectral', Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.4;
+  color: #d8c69a;
+  margin: 0 0 18px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(255,211,77,.4);
+}
+#title-screen .note {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: #d3ccd9;
+  margin: 0 0 10px;
+  text-align: left;
+}
+#title-screen .note-sub {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #8d8597;
+  margin: 0 0 26px;
+  text-align: left;
+}
+#title-screen .title-buttons { justify-content: flex-start; margin-bottom: 22px; }
+#title-screen .title-buttons button {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 14px 26px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #d6aa3b 0%, #a07724 100%);
+  border: 1px solid #ffd761;
+  color: #1a1408;
+}
+#title-screen .title-buttons button:hover {
+  background: linear-gradient(180deg, #f5cd63 0%, #c79027 100%);
+  box-shadow: 0 0 24px rgba(255,211,77,.35);
+}
+#title-screen .title-buttons button#btn-continue {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent-dim);
+  margin-right: 12px;
+}
+#title-screen .title-buttons button#btn-continue:hover {
+  background: rgba(255,211,77,.08);
+  color: #ffd761;
+  border-color: var(--accent);
+}
+#title-screen .hint {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  line-height: 1.7;
+  color: #665e70;
+  margin: 0 0 18px;
+  text-align: left;
+  border-top: 1px solid rgba(255,211,77,.12);
+  padding-top: 16px;
+}
+#title-screen .hint strong { color: var(--accent); font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+#title-screen .kicker-foot {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #56506b;
+  margin: 0;
+  text-align: left;
+}
+
 @media (max-width: 620px) {
-  #dialog { grid-template-columns: 82px 1fr; gap: 10px; padding: 8px 16px 10px 8px; bottom: 10px; }
-  #dialog-portrait { width: 80px; height: 72px; }
-  #dialog-who { font-size: 11px; min-width: 76px; padding: 4px 9px; margin: -24px 0 7px; }
-  #dialog-text { font-size: 15px; min-height: 42px; }
+  #dialog { grid-template-columns: 56px 1fr; gap: 9px; padding: 6px 12px 8px 6px; top: 8px; }
+  #dialog-portrait { width: 56px; height: 56px; }
+  #dialog-who { font-size: 10px; min-width: 64px; padding: 2px 7px; }
+  #dialog-text { font-size: 13px; line-height: 1.32; max-height: 60px; }
   .title-card { margin: 14px; padding: 28px 20px; }
   .title-card h1 { font-size: 36px; }
 }

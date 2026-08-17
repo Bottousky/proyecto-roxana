@@ -36,6 +36,19 @@ function startGame(): void {
     // solo en desarrollo: handle para pruebas E2E desde la consola
     (window as any).__travel = (experienceId: ExperienceId, roomId?: string) =>
       host.travel({ experienceId, roomId });
+    // teleport del jugador a (x, y) en la sala actual. Para QA visual.
+    (window as any).__pos = (x: number, y: number) => {
+      const game = (window as unknown as { __game?: { scene: { getScene(key: string): unknown } } }).__game;
+      const explore = game?.scene.getScene('explore') as
+        | { player?: { setPosition(x: number, y: number): void }; cameras: { main: { centerOn(x: number, y: number): void } } }
+        | undefined;
+      if (explore?.player) {
+        explore.player.setPosition(x, y);
+        explore.cameras.main.centerOn(x, y);
+        return true;
+      }
+      return false;
+    };
   }
 }
 
