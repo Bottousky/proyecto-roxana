@@ -27,7 +27,7 @@ import { type Lamp } from "./environment/lamps.ts";
 import { buildCables, type CableVisuals } from "./environment/cables.ts";
 import { SpriteActor, spriteTexture } from "./environment/spriteActor.ts";
 import { ElectricalGraph } from "./engine/electricalGraph.ts";
-import { regionAt, NODES, CABLES, STEPS } from "./world/topology.ts";
+import { regionAt, NODES, CABLES, STEPS, REGION_PLACEMENT, WORLD_BOUNDS, REGIONS } from "./world/topology.ts";
 import {
   mountDialog,
   showDialog,
@@ -60,6 +60,9 @@ export interface World {
   state: WorldState;
   setState: (s: WorldState) => void;
   terrain: TerrainEntities;
+  /** Set true while the layout review top camera is active, so the world
+   *  doesn't re-tune fog/background every frame. */
+  reviewMode: boolean;
 }
 
 export interface PlayerState {
@@ -71,6 +74,12 @@ export interface PlayerState {
 
 const PLAYER_SPEED = 4.5;
 const PLAYER_RADIUS = 0.4;
+
+/** Footprint of a runtime region (from REGIONS, derived from the layout). */
+function rectOf(id: string): { width: number; depth: number } {
+  const r = REGIONS.find((rr) => rr.id === id);
+  return { width: r?.width ?? 10, depth: r?.depth ?? 6 };
+}
 
 export function createWorld(scene: THREE.Scene): World {
   const kit = createMaterialKit();
@@ -93,38 +102,38 @@ export function createWorld(scene: THREE.Scene): World {
   const landmarks = buildLandmarks();
   scene.add(landmarks.group);
 
-  // ---------- Build each region at its topology-defined position ----------
-  const plaza = buildPlaza(scene, kit, tex);
-  plaza.group.position.set(0, 0, -3);
+  // ---------- Build each region at its layout-derived position ----------
+  // Group placement comes from REGION_PLACEMENT (derived from arc1-layout.json).
+  const plaza = buildPlaza(scene, kit, tex, { width: rectOf("plaza").width, depth: rectOf("plaza").depth });
+  plaza.group.position.set(REGION_PLACEMENT.plaza.x, 0, REGION_PLACEMENT.plaza.z);
 
   const portal = buildPortal(scene, kit, tex);
-  portal.group.position.set(0, 0, 12);
+  portal.group.position.set(REGION_PLACEMENT.portal.x, 0, REGION_PLACEMENT.portal.z);
 
   const puerta = buildPuerta(scene, kit, tex);
-  puerta.group.position.set(0, 0, -16);
+  puerta.group.position.set(REGION_PLACEMENT.puerta.x, 0, REGION_PLACEMENT.puerta.z);
 
   const taller = buildTaller(scene, kit, tex);
-  taller.group.position.set(16, 0, 0);
+  taller.group.position.set(REGION_PLACEMENT.taller.x, 0, REGION_PLACEMENT.taller.z);
 
   const manantial = buildManantial(scene, kit, tex);
-  manantial.group.position.set(0, 0, -32);
+  manantial.group.position.set(REGION_PLACEMENT.manantial.x, 0, REGION_PLACEMENT.manantial.z);
 
-  const camino = buildCamino(scene, kit, tex);
-  camino.group.position.set(0, 0, 6);
+  const camino = buildCamino(scene, kit, tex, { width: rectOf("camino").width, depth: rectOf("camino").depth });
+  camino.group.position.set(REGION_PLACEMENT.camino.x, 0, REGION_PLACEMENT.camino.z);
 
-  const calzada = buildCalzada(scene, kit, tex);
-  calzada.group.position.set(0, 0, -22);
+  const calzada = buildCalzada(scene, kit, tex, { width: rectOf("calzada").width, depth: rectOf("calzada").depth });
+  calzada.group.position.set(REGION_PLACEMENT.calzada.x, 0, REGION_PLACEMENT.calzada.z);
 
   // Calzada-alta: paved transition between Plaza and Puerta (uses the same
   // path module as Camino, slightly different layout).
-  const calzadaAlta = buildCamino(scene, kit, tex);
+  const calzadaAlta = buildCamino(scene, kit, tex, { width: rectOf("calzada_alta").width, depth: rectOf("calzada_alta").depth });
   calzadaAlta.group.name = "calzada_alta";
-  calzadaAlta.group.position.set(0, 0, -11);
+  calzadaAlta.group.position.set(REGION_PLACEMENT.calzada_alta.x, 0, REGION_PLACEMENT.calzada_alta.z);
 
   // Sendero: the south exterior, between the world edge and the Portal.
-  const sendero = buildSendero(scene, kit, tex);
-  // The Sendero is at world z=22 (center of the region z=18..26).
-  sendero.group.position.set(0, 0, 22);
+  const sendero = buildSendero(scene, kit, tex, { width: rectOf("sendero").width, depth: rectOf("sendero").depth });
+  sendero.group.position.set(REGION_PLACEMENT.sendero.x, 0, REGION_PLACEMENT.sendero.z);
 
   // ---------- Wire up the electrical graph ----------
   const electrical = new ElectricalGraph();
@@ -198,7 +207,7 @@ export function createWorld(scene: THREE.Scene): World {
     baseHeight: 1.7,
   });
   hero.setAnimation(0, 6, 0.14);
-  hero.setPosition(0, -3);
+  hero.setPosition(REGION_PLACEMENT.plaza.x, REGION_PLACEMENT.plaza.z);
   hero.setHeight(1.7);
   scene.add(hero.group);
 
@@ -213,7 +222,7 @@ export function createWorld(scene: THREE.Scene): World {
     baseHeight: 1.0,
   });
   ohm.setCell(0, 0);
-  ohm.setPosition(0, -18);
+  ohm.setPosition(REGION_PLACEMENT.puerta.x, REGION_PLACEMENT.puerta.z);
   ohm.setHeight(1.0);
   scene.add(ohm.group);
 
@@ -228,7 +237,7 @@ export function createWorld(scene: THREE.Scene): World {
     baseHeight: 1.65,
   });
   bindRowCol(edda, 0, 0);
-  edda.setPosition(0, 0);
+  edda.setPosition(REGION_PLACEMENT.plaza.x, REGION_PLACEMENT.plaza.z);
   edda.setHeight(1.65);
   scene.add(edda.group);
 
@@ -242,7 +251,7 @@ export function createWorld(scene: THREE.Scene): World {
     baseHeight: 1.7,
   });
   bindRowCol(lumen, 1, 0);
-  lumen.setPosition(18, 1);
+  lumen.setPosition(REGION_PLACEMENT.taller.x, REGION_PLACEMENT.taller.z);
   lumen.setHeight(1.7);
   scene.add(lumen.group);
 
@@ -258,14 +267,14 @@ export function createWorld(scene: THREE.Scene): World {
   const params = new URLSearchParams(window.location.search);
   const spawn = params.get("spawn") ?? "plaza";
   const spawnMap: Record<string, { x: number; y: number }> = {
-    portal:    { x:  0, y: 14 },  // south side of Portal (player faces N to Plaza)
-    camino:    { x:  0, y:  8 },
-    plaza:     { x:  0, y: -3 },  // center of the Plaza, by the fountain
-    taller:    { x: 14, y:  1 },  // just outside the Taller's west door (looking E)
-    puerta:    { x:  0, y: -15 },
-    calzada:   { x:  0, y: -22 },
-    manantial: { x:  0, y: -32 },  // center of the Manantial patio
-    sendero:   { x:  0, y: 22 },  // center of the Sendero
+    portal:    { x: REGION_PLACEMENT.portal.x, y: REGION_PLACEMENT.portal.z }, // on the Portal platform (facing N to Plaza)
+    camino:    { x: REGION_PLACEMENT.camino.x, y: REGION_PLACEMENT.camino.z },
+    plaza:     { x: REGION_PLACEMENT.plaza.x, y: REGION_PLACEMENT.plaza.z }, // center of the Plaza, by the fountain
+    taller:    { x: REGION_PLACEMENT.taller.x - 6, y: REGION_PLACEMENT.taller.z }, // just west of the Taller
+    puerta:    { x: REGION_PLACEMENT.puerta.x, y: REGION_PLACEMENT.puerta.z },
+    calzada:   { x: REGION_PLACEMENT.calzada.x, y: REGION_PLACEMENT.calzada.z },
+    manantial: { x: REGION_PLACEMENT.manantial.x, y: REGION_PLACEMENT.manantial.z }, // center of the Manantial patio
+    sendero:   { x: REGION_PLACEMENT.sendero.x, y: REGION_PLACEMENT.sendero.z }, // center of the Sendero
   };
   const spawnPos = spawnMap[spawn] ?? spawnMap.plaza;
   const player: PlayerState = {
@@ -280,6 +289,7 @@ export function createWorld(scene: THREE.Scene): World {
 
   // ---------- State ----------
   let state: WorldState = "dormant";
+  let reviewMode = false;
   let dialogOpen = false;
   let dialogQueue: { speaker: string; line: string; portrait?: string }[] = [];
   let lastInteract = 0;
@@ -301,17 +311,9 @@ export function createWorld(scene: THREE.Scene): World {
     "La Cuenca de Ohm está quieta. El Portal apagó detrás de mí. Cables de cobre en el suelo, una fuente detenida, una Puerta cerrada. Más allá, el Manantial espera. Al este, el Taller de Lumen.",
   );
 
-  // World bounds (encompass the playable area with margin). These match the
-  // terrain.bounds derived from the REGIONS (with EXPAND=6 in terrain.ts).
-  // The Sendero's south edge is at z=26 + 6 = 32, so the player must be
-  // allowed to walk that far south. Previously this was clamped to z=20
-  // which made the southern 6 m of the Sendero unreachable.
-  const worldBounds = {
-    minX: -28,
-    maxX: 28,
-    minZ: -44,
-    maxZ: 32,
-  };
+  // World bounds (encompass the playable area with margin). These derive from
+  // the diorama bounds in arc1-layout.json via WORLD_BOUNDS.
+  const worldBounds = WORLD_BOUNDS;
 
   // Stair stepping: when the player is within a stair's footprint, the
   // player's Y interpolates between the stair's "from" and "to" Y based
@@ -411,18 +413,18 @@ export function createWorld(scene: THREE.Scene): World {
     // ---------- NPC positions follow the terrain elevation ----------
     // Edda wanders the Plaza.
     const eddaWander = Math.sin(performance.now() * 0.0007) * 1.5;
-    edda.setPosition(eddaWander, -3);
+    edda.setPosition(eddaWander + REGION_PLACEMENT.plaza.x, REGION_PLACEMENT.plaza.z);
     edda.group.position.y = terrain.groundYAt(edda.position.x, edda.position.y);
     edda.setPlaying("idle");
     edda.update(dt);
     // Lumen stays in the Taller (around the bench).
     const lumenBob = Math.sin(performance.now() * 0.0006) * 0.4;
-    lumen.setPosition(18 + lumenBob, 1);
+    lumen.setPosition(REGION_PLACEMENT.taller.x + lumenBob, REGION_PLACEMENT.taller.z + 1);
     lumen.group.position.y = terrain.groundYAt(lumen.position.x, lumen.position.y);
     lumen.setPlaying("idle");
     lumen.update(dt);
     // Ohm sits on his pedestal in the Puerta region.
-    ohm.setPosition(0, -18);
+    ohm.setPosition(REGION_PLACEMENT.puerta.x, REGION_PLACEMENT.puerta.z);
     ohm.group.position.y = terrain.groundYAt(ohm.position.x, ohm.position.y);
     ohm.setPlaying("idle");
     ohm.update(dt);
@@ -430,7 +432,10 @@ export function createWorld(scene: THREE.Scene): World {
     // ---------- Camera framing per region ----------
     const region = regionAt(player.position.x, player.position.y);
     if (region) {
-      cam.setRegionFraming(region.id as "plaza" | "puerta" | "manantial" | "taller" | "sendero");
+      cam.setRegionFraming(
+        region.id as "plaza" | "puerta" | "manantial" | "taller" | "sendero",
+        { width: region.width, depth: region.depth },
+      );
     }
 
     // ---------- Camera elevation follows the player (so the Manantial, when
@@ -540,17 +545,21 @@ export function createWorld(scene: THREE.Scene): World {
       state === "awakening" ? 0.4 :
       state === "powered_basic" ? 0.8 : 1.0;
     cableVisuals.setAwake(awakeLevel);
-    const targetFog = state === "dormant" ? new THREE.Color(0x3a4a68) : new THREE.Color(0x4a5a82);
-    const targetBg = state === "dormant" ? new THREE.Color(0x3a4a68) : new THREE.Color(0x4a5a82);
-    if (scene.fog instanceof THREE.Fog) {
-      scene.fog.color.lerp(targetFog, 0.04);
-      const targetNear = state === "dormant" ? 32 : 38;
-      const targetFar = state === "dormant" ? 95 : 115;
-      scene.fog.near = THREE.MathUtils.lerp(scene.fog.near, targetNear, 0.04);
-      scene.fog.far = THREE.MathUtils.lerp(scene.fog.far, targetFar, 0.04);
-    }
-    if (scene.background instanceof THREE.Color) {
-      scene.background.lerp(targetBg, 0.04);
+    // In review mode (top-down layout camera) the fog/background are owned by
+    // the review tooling; don't re-tune them every frame.
+    if (!reviewMode) {
+      const targetFog = state === "dormant" ? new THREE.Color(0x3a4a68) : new THREE.Color(0x4a5a82);
+      const targetBg = state === "dormant" ? new THREE.Color(0x3a4a68) : new THREE.Color(0x4a5a82);
+      if (scene.fog instanceof THREE.Fog) {
+        scene.fog.color.lerp(targetFog, 0.04);
+        const targetNear = state === "dormant" ? 32 : 38;
+        const targetFar = state === "dormant" ? 95 : 115;
+        scene.fog.near = THREE.MathUtils.lerp(scene.fog.near, targetNear, 0.04);
+        scene.fog.far = THREE.MathUtils.lerp(scene.fog.far, targetFar, 0.04);
+      }
+      if (scene.background instanceof THREE.Color) {
+        scene.background.lerp(targetBg, 0.04);
+      }
     }
     audio.setAmbient(0.4 + (state === "dormant" ? 0 : 0.3));
     audio.setElectricalHum(state === "dormant" ? 0 : 0.6);
@@ -621,6 +630,8 @@ export function createWorld(scene: THREE.Scene): World {
     // and stay "dormant" forever even though the world wakes up.
     get state() { return state; },
     setState: (s: WorldState) => { state = s; },
+    get reviewMode() { return reviewMode; },
+    set reviewMode(v: boolean) { reviewMode = v; },
     terrain,
   };
 }
@@ -729,104 +740,117 @@ function makeCableParticles(scene: THREE.Scene): { geom: THREE.BufferGeometry; m
 // state changes via `cableVisuals.refresh()`.
 
 // ---------- Collision (Axis-Aligned Bounding Boxes) ----------
+// Colliders derive from REGIONS (layout zones/landmarks) and the module
+// placements, so they stay in sync with arc1-layout.json. No magic
+// coordinates here: everything is computed from the region rects below.
 interface AABB { x: number; z: number; w: number; d: number; tag?: string }
 
+const OPENING = 3.5; // wall opening width (m) for plaza/camino connectors
+
 function buildColliders(terrain: TerrainEntities): AABB[] {
-  // Taller walls (4 walls + lintel above the door).
-  // The Taller group is at world (16, 0, 0) and is 10m × 8m, so it spans
-  // world x=11..21, z=-4..+4. The door is on the WEST side (x=11) and is
-  // 2.4m wide, centered at z=0 (so the opening is at world z=-1.2..+1.2).
-  // Previously the colliders were placed at x=15.7 (4.7 m too far east),
-  // which split the Taller into two inaccessible rooms.
   const colliders: AABB[] = [];
-  // East wall (back of the building).
-  colliders.push({ x: 21.4, z: 0, w: 0.6, d: 8.4 });
-  // South wall.
-  colliders.push({ x: 16, z: 4.2, w: 10.4, d: 0.6 });
-  // North wall.
-  colliders.push({ x: 16, z: -4.2, w: 10.4, d: 0.6 });
-  // West wall left part (south of the door).
-  colliders.push({ x: 10.6, z: -2.6, w: 0.6, d: 2.8 });
-  // West wall right part (north of the door).
-  colliders.push({ x: 10.6, z:  2.6, w: 0.6, d: 2.8 });
-  // West lintel above door (the door opening at z=-1.2..+1.2).
-  colliders.push({ x: 10.6, z: 0, w: 0.6, d: 2.4 });
+  const region = (id: string) => REGIONS.find((r) => r.id === id)!;
 
-  // Plaza perimeter walls (with openings — 3.5m wide).
-  // The Plaza group is at world z=-3, so its walls are at world z = -3-8=-11 (north) and z = -3+8=5 (south).
-  // The Plaza walls are at x = -10..-1.75 (left) and x = 1.75..10 (right), with an opening at x=-1.75..1.75.
-  // North wall.
-  colliders.push({ x: -5.875, z: -11, w: 8.25, d: 0.5 });
-  colliders.push({ x:  5.875, z: -11, w: 8.25, d: 0.5 });
-  // South wall.
-  colliders.push({ x: -5.875, z:  5, w: 8.25, d: 0.5 });
-  colliders.push({ x:  5.875, z:  5, w: 8.25, d: 0.5 });
-  // West wall: full.
-  colliders.push({ x: -10.25, z: -3, w: 0.5, d: 16.4 });
-  // East wall: opening at world z=-1.75..+1.75 (centered at z=0, aligned
-  // with the Taller door). North segment: z=-11..-1.75 (9.25 m, center
-  // z=-6.375). South segment: z=+1.75..+5 (3.25 m, center z=+3.375).
-  colliders.push({ x: 10.25, z: -6.375, w: 0.5, d: 9.25 });
-  colliders.push({ x: 10.25, z:  3.375, w: 0.5, d: 3.25 });
+  // Wall along one side of a rect. `axis` x = vertical wall (constant x),
+  // z = horizontal wall (constant z). `openCenter` optionally leaves a gap.
+  const wall = (
+    rect: { x: number; z: number; width: number; depth: number },
+    axis: "x" | "z",
+    side: -1 | 1,
+    thickness: number,
+    open: { center: number; width: number } | null,
+  ) => {
+    if (axis === "z") {
+      // Horizontal wall at rect.z or rect.z+depth, spanning the width.
+      const z = side === -1 ? rect.z : rect.z + rect.depth;
+      if (open) {
+        const leftLen = open.center - open.width / 2 - rect.x;
+        const rightLen = rect.x + rect.width - (open.center + open.width / 2);
+        if (leftLen > 0) colliders.push({ x: rect.x + leftLen / 2, z, w: leftLen, d: thickness });
+        if (rightLen > 0) colliders.push({ x: open.center + open.width / 2 + rightLen / 2, z, w: rightLen, d: thickness });
+      } else {
+        colliders.push({ x: rect.x + rect.width / 2, z, w: rect.width, d: thickness });
+      }
+    } else {
+      // Vertical wall at rect.x or rect.x+width, spanning the depth.
+      const x = side === -1 ? rect.x : rect.x + rect.width;
+      if (open) {
+        const nearLen = open.center - open.width / 2 - rect.z;
+        const farLen = rect.z + rect.depth - (open.center + open.width / 2);
+        if (nearLen > 0) colliders.push({ x, z: rect.z + nearLen / 2, w: thickness, d: nearLen });
+        if (farLen > 0) colliders.push({ x, z: open.center + open.width / 2 + farLen / 2, w: thickness, d: farLen });
+      } else {
+        colliders.push({ x, z: rect.z + rect.depth / 2, w: thickness, d: rect.depth });
+      }
+    }
+  };
 
-  // Puerta de Ohm towers (3.5m wide × 9m tall × 6m deep), at world x=±6.25, z=-19..-13.
-  // The passage between the towers is at x=-2.5..+2.5 (5m wide).
-  // The Puerta group is at world z=-16, so the towers' local Z=-3..+3 maps to world z=-19..-13.
-  colliders.push({ x: -6.25, z: -16, w: 3.5, d: 6 });
-  colliders.push({ x:  6.25, z: -16, w: 3.5, d: 6 });
-  // Side connectors (the walls that continue from the Puerta to the Plaza/Calzada).
-  colliders.push({ x: -8, z: -12, w: 0.6, d: 2 });
-  colliders.push({ x:  8, z: -12, w: 0.6, d: 2 });
-  colliders.push({ x: -8, z: -20, w: 0.6, d: 2 });
-  colliders.push({ x:  8, z: -20, w: 0.6, d: 2 });
+  // Plaza: perimeter walls with openings at the main axis (N/S, x=0) and the
+  // Taller branch (E, centered at the plaza's east opening).
+  const plaza = region("plaza");
+  const plazaRect = { x: plaza.x, z: plaza.z, width: plaza.width, depth: plaza.depth };
+  const plazaCenterZ = plaza.z + plaza.depth / 2;
+  wall(plazaRect, "z", -1, 0.5, { center: 0, width: OPENING }); // north (→ Puerta)
+  wall(plazaRect, "z", 1, 0.5, { center: 0, width: OPENING }); // south (→ Camino)
+  wall(plazaRect, "x", -1, 0.5, null); // west (closed)
+  wall(plazaRect, "x", 1, 0.5, { center: plazaCenterZ, width: OPENING }); // east (→ Taller)
 
-  // Camino (south of Plaza, between Portal and Plaza). Walls on the sides.
-  // Camino is at world (x=-5..5, z=6..12). Walls at x=±4.8, full depth 6.
-  colliders.push({ x: -4.8, z: 9, w: 0.4, d: 6 });
-  colliders.push({ x:  4.8, z: 9, w: 0.4, d: 6 });
+  // Taller building walls (module is 10×8 at the lumen_forecourt placement).
+  const tallerPlace = REGION_PLACEMENT.taller;
+  const tw = 10, td = 8;
+  const tallerRect = {
+    x: tallerPlace.x - tw / 2,
+    z: tallerPlace.z - td / 2,
+    width: tw,
+    depth: td,
+  };
+  wall(tallerRect, "x", 1, 0.6, null); // east (back)
+  wall(tallerRect, "z", 1, 0.6, null); // south
+  wall(tallerRect, "z", -1, 0.6, null); // north
+  wall(tallerRect, "x", -1, 0.6, { center: tallerPlace.z, width: 2.4 }); // west (door)
 
-  // Calzada-alta (between Plaza and Puerta). Walls on the sides.
-  // Calzada-alta is at world (x=-7..7, z=-13..-9). Walls at x=±6.8, full depth 4.
-  colliders.push({ x: -6.8, z: -11, w: 0.4, d: 4 });
-  colliders.push({ x:  6.8, z: -11, w: 0.4, d: 4 });
+  // Puerta towers: flank the passage at the gate landmark footprint.
+  const puerta = region("puerta");
+  const puertaD = 6;
+  const puertaCenterX = puerta.x + puerta.width / 2;
+  const puertaCenterZ = puerta.z + puerta.depth / 2;
+  colliders.push({ x: puertaCenterX - 6.25, z: puertaCenterZ, w: 3.5, d: puertaD });
+  colliders.push({ x: puertaCenterX + 6.25, z: puertaCenterZ, w: 3.5, d: puertaD });
+  // Side connectors to Plaza / Calzada.
+  for (const s of [-1, 1]) {
+    colliders.push({ x: puertaCenterX + s * 8, z: puertaCenterZ - 4, w: 0.6, d: 2 });
+    colliders.push({ x: puertaCenterX + s * 8, z: puertaCenterZ + 4, w: 0.6, d: 2 });
+  }
 
-  // Calzada (between Puerta and Manantial). Walls on the sides.
-  // Calzada is at world (x=-5..5, z=-25..-19). Walls at x=±4.8.
-  colliders.push({ x: -4.8, z: -22, w: 0.4, d: 6 });
-  colliders.push({ x:  4.8, z: -22, w: 0.4, d: 6 });
+  // Camino / Calzada / Calzada-alta / Sendero: low side walls along X.
+  for (const id of ["camino", "calzada", "calzada_alta", "sendero"]) {
+    const r = region(id);
+    colliders.push({ x: r.x + 0.2, z: r.z + r.depth / 2, w: 0.4, d: r.depth });
+    colliders.push({ x: r.x + r.width - 0.2, z: r.z + r.depth / 2, w: 0.4, d: r.depth });
+  }
 
-  // Sendero walls (at x=±W/2-0.2=±21.8, full depth 8).
-  colliders.push({ x: -21.8, z: 22, w: 0.4, d: 8 });
-  colliders.push({ x:  21.8, z: 22, w: 0.4, d: 8 });
-  // Sendero boulder (at world x=-19.5, z=20.8, radius ~1.4m).
-  colliders.push({ x: -19.5, z: 20.8, w: 2.8, d: 2.2 });
-  // Sendero signpost (at world x=0, z=20.8).
-  colliders.push({ x: 0, z: 20.8, w: 0.6, d: 0.6 });
-
-  // Manantial compuerta — two stone posts at the south entrance. These
-  // are tagged so they can be removed when the gate opens (the visual
-  // gate lifts; the colliders lift with it).
-  colliders.push({ x: -2.4, z: -26.4, w: 0.8, d: 0.8, tag: "manantial_gate" });
-  colliders.push({ x:  2.4, z: -26.4, w: 0.8, d: 0.8, tag: "manantial_gate" });
+  // Manantial compuerta — two stone posts at the south entrance. Tagged so
+  // they can be removed when the gate opens (powered_full).
+  const manantial = region("manantial");
+  const manantialPlace = REGION_PLACEMENT.manantial;
+  colliders.push({ x: manantialPlace.x - 2.4, z: manantialPlace.z + 5.6, w: 0.8, d: 0.8, tag: "manantial_gate" });
+  colliders.push({ x: manantialPlace.x + 2.4, z: manantialPlace.z + 5.6, w: 0.8, d: 0.8, tag: "manantial_gate" });
 
   // Manantial platform walls: low barriers around the sunken patio.
-  // The patio is 32m × 12m centered at (0, -32). Outer walls block the
-  // boundary so the player can't walk off into the void.
-  colliders.push({ x: -16.2, z: -32, w: 0.5, d: 12.4 });  // west
-  colliders.push({ x:  16.2, z: -32, w: 0.5, d: 12.4 });  // east
-  colliders.push({ x: 0, z: -38.2, w: 32.4, d: 0.5 });    // north (back)
-  // South is blocked by the gate above (we keep it so the player feels
-  // the gate is a barrier; when power returns, we remove the gate collider).
+  colliders.push({ x: manantial.x + 0.2, z: manantial.z + manantial.depth / 2, w: 0.5, d: manantial.depth });
+  colliders.push({ x: manantial.x + manantial.width - 0.2, z: manantial.z + manantial.depth / 2, w: 0.5, d: manantial.depth });
+  colliders.push({ x: manantial.x + manantial.width / 2, z: manantial.z + 0.2, w: manantial.width, d: 0.5 });
 
-  // World perimeter (terrain already added visual walls; here we add
-  // colliders matching the world bounds, with the south opening for the
-  // Portal). The opening is the only way to enter the world.
-  colliders.push({ x: terrain.bounds.minX, z: (terrain.bounds.minZ + terrain.bounds.maxZ) / 2, w: 0.5, d: terrain.bounds.maxZ - terrain.bounds.minZ });
-  colliders.push({ x: terrain.bounds.maxX, z: (terrain.bounds.minZ + terrain.bounds.maxZ) / 2, w: 0.5, d: terrain.bounds.maxZ - terrain.bounds.minZ });
-  colliders.push({ x: (terrain.bounds.minX + terrain.bounds.maxX) / 2, z: terrain.bounds.minZ, w: terrain.bounds.maxX - terrain.bounds.minX, d: 0.5 });
-  // South wall (with opening for Portal).
-  colliders.push({ x: -20, z: terrain.bounds.maxZ, w: 14, d: 0.5 });
-  colliders.push({ x:  20, z: terrain.bounds.maxZ, w: 14, d: 0.5 });
+  // World perimeter (matches WORLD_BOUNDS + terrain.bounds; south opening for
+  // the Portal entry).
+  const b = WORLD_BOUNDS;
+  colliders.push({ x: b.minX, z: (b.minZ + b.maxZ) / 2, w: 0.5, d: b.maxZ - b.minZ });
+  colliders.push({ x: b.maxX, z: (b.minZ + b.maxZ) / 2, w: 0.5, d: b.maxZ - b.minZ });
+  colliders.push({ x: (b.minX + b.maxX) / 2, z: b.minZ, w: b.maxX - b.minX, d: 0.5 });
+  const southGap = 14;
+  colliders.push({ x: b.minX + (b.maxX - b.minX - southGap) / 4, z: b.maxZ, w: (b.maxX - b.minX - southGap) / 2, d: 0.5 });
+  colliders.push({ x: b.maxX - (b.maxX - b.minX - southGap) / 4, z: b.maxZ, w: (b.maxX - b.minX - southGap) / 2, d: 0.5 });
+  void terrain;
 
   return colliders;
 }

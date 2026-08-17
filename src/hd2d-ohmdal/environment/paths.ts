@@ -17,15 +17,22 @@ export interface PathEntities {
   lamps: Lamp[];
 }
 
-const W = 10;
-const D = 6;
+export interface PathSize {
+  /** Path footprint (XZ, meters). Defaults match the current H1 Camino/Calzada. */
+  width?: number;
+  depth?: number;
+}
+
 const WALL_H = 1.0;
 
 export function buildCamino(
   scene: THREE.Scene,
   kit: MaterialKit,
   tex: ProceduralTextures,
+  size: PathSize = {},
 ): PathEntities {
+  const W = size.width ?? 10;
+  const D = size.depth ?? 6;
   const group = new THREE.Group();
   group.name = "camino";
   group.position.y = 0.2;
@@ -102,7 +109,10 @@ export function buildCalzada(
   scene: THREE.Scene,
   kit: MaterialKit,
   tex: ProceduralTextures,
+  size: PathSize = {},
 ): PathEntities {
+  const W = size.width ?? 10;
+  const D = size.depth ?? 6;
   const group = new THREE.Group();
   group.name = "calzada";
   group.position.y = 0.0;

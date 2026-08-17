@@ -36,16 +36,23 @@ export interface Fountain {
   alive: boolean;
 }
 
-const W = 20;
-const D = 16;
 const WALL_H = 0.9;
 const OPENING = 3.5; // wall opening width
+
+export interface PlazaSize {
+  /** Plaza footprint (XZ, meters). Defaults match the current H1 plaza. */
+  width?: number;
+  depth?: number;
+}
 
 export function buildPlaza(
   scene: THREE.Scene,
   kit: MaterialKit,
   tex: ProceduralTextures,
+  size: PlazaSize = {},
 ): PlazaEntities {
+  const W = size.width ?? 20;
+  const D = size.depth ?? 16;
   const group = new THREE.Group();
   group.name = "plaza";
 

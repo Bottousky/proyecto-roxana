@@ -14,15 +14,22 @@ export interface SenderoEntities {
   lamps: Lamp[];
 }
 
-const W = 44;
-const D = 8;
+export interface SenderoSize {
+  /** Sendero footprint (XZ, meters). Defaults match the current H1 sendero. */
+  width?: number;
+  depth?: number;
+}
+
 const WALL_H = 0.7;
 
 export function buildSendero(
   scene: THREE.Scene,
   kit: MaterialKit,
   _tex: ProceduralTextures,
+  size: SenderoSize = {},
 ): SenderoEntities {
+  const W = size.width ?? 44;
+  const D = size.depth ?? 8;
   const group = new THREE.Group();
   group.name = "sendero";
   group.position.y = 0;

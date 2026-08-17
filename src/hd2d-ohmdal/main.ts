@@ -10,6 +10,8 @@ import { createInput, type InputState } from "./engine/input.ts";
 import { createWorld, type World } from "./world.ts";
 import { mountHud, mountDialog, mountBitacora, type UiRefs } from "./ui/ui.ts";
 import { AudioBus } from "./engine/audio.ts";
+import { createLayoutDebug, readLayoutDebugParams, type LayoutDebug } from "./layoutDebug.ts";
+import { WORLD_BOUNDS } from "./world/topology.ts";
 
 const canvas = document.getElementById("scene") as HTMLCanvasElement;
 const titleEl = document.getElementById("title") as HTMLDivElement;
@@ -24,6 +26,30 @@ const camera: GameCamera = createCamera(renderer.viewport);
 const input: InputState = createInput();
 const world: World = createWorld(renderer.scene);
 const audio = new AudioBus();
+
+// ---------- Layout debug / top-down review instruments ----------
+const debugOpts = readLayoutDebugParams();
+const layoutDebug: LayoutDebug = createLayoutDebug(renderer.scene, debugOpts);
+
+// Top-down review needs the fog pulled far back (the gameplay fog culls at
+// ~95m, but the review camera sits far above the diorama).
+const setTopView = (on: boolean) => {
+  layoutDebug.enableTop();
+  camera.setTopView(on, WORLD_BOUNDS);
+  world.reviewMode = on;
+  if (on) {
+    renderer.setToneExposure(1.1);
+    if (renderer.scene.fog instanceof THREE.Fog) {
+      renderer.setFog(0x3a4a68, 200, 500);
+    }
+  } else {
+    renderer.setToneExposure(1.45);
+    if (renderer.scene.fog instanceof THREE.Fog) {
+      renderer.setFog(0x3a4a68, 28, 75);
+    }
+  }
+};
+if (debugOpts.top) setTopView(true);
 
 // Wire UI events.
 titleStart.addEventListener("click", () => {
@@ -66,6 +92,24 @@ const updateHud = () => {
   }
 };
 
+// Layout-debug toggles (development-only review instruments).
+// F1 = top-down camera, F2 = wireframe overlay, F3 = labels, F4 = electrical.
+window.addEventListener("keydown", (e) => {
+  if (e.code === "F1") {
+    e.preventDefault();
+    setTopView(!camera.isTopView());
+  } else if (e.code === "F2") {
+    e.preventDefault();
+    layoutDebug.setOverlay(true);
+  } else if (e.code === "F3") {
+    e.preventDefault();
+    layoutDebug.setLabels(true);
+  } else if (e.code === "F4") {
+    e.preventDefault();
+    layoutDebug.setElectrical(true);
+  }
+});
+
 // Main loop.
 const clock = new THREE.Clock();
 let last = 0;
@@ -84,4 +128,11 @@ const tick = () => {
 requestAnimationFrame(tick);
 
 // Expose for the dev console / verification scripts.
-(window as unknown as { __ohmdal: unknown }).__ohmdal = { renderer, camera, world, input };
+(window as unknown as { __ohmdal: unknown }).__ohmdal = {
+  renderer,
+  camera,
+  world,
+  input,
+  layoutDebug,
+  setTopView,
+};
