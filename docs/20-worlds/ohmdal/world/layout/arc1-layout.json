@@ -1,0 +1,292 @@
+{
+  "schemaVersion": "0.1.0",
+  "status": "PROPOSED_PLANNING_V0",
+  "units": {
+    "overworld": "symbolic_atlas_units",
+    "dioramas": "meters"
+  },
+  "axes": {
+    "x": "+east/-west",
+    "y": "+up",
+    "z": "+south/-north",
+    "handedness": "right",
+    "rotationYDegrees": "0=north(-Z), 90=east(+X), 180=south(+Z), 270=west(-X)"
+  },
+  "sources": [
+    "docs/20-worlds/ohmdal/world/ohmdal-world-structure_v1.md",
+    "docs/20-worlds/ohmdal/content/ohmdal-arc-01_v1.md",
+    "docs/20-worlds/ohmdal/narrative/ohmdal-narrative-bible_v1.md",
+    "docs/20-worlds/ohmdal/AGENTS.md"
+  ],
+  "overworld": {
+    "origin": "cuenca_de_ohm",
+    "scalePolicy": "symbolic_only_do_not_infer_walk_time_or_metric_distance",
+    "macroterritories": [
+      {"id":"cuenca_de_ohm","label":"Cuenca de Ohm","position":[0,0,0],"footprint":[42,34],"landmark":"plaza_bell_gate_axis","arc1Chapters":["prologue","chapter_1"]},
+      {"id":"castillo_de_la_red","label":"Castillo de la Red","position":[-62,0,-52],"footprint":[46,38],"landmark":"network_heart_tower","arc1Chapters":["chapter_2"]},
+      {"id":"forja_y_terrazas","label":"Forja y Terrazas","position":[-76,0,48],"footprint":[58,46],"landmark":"forge_stack_and_aqueduct","arc1Chapters":["chapter_3"]},
+      {"id":"faro_y_lago","label":"Faro y Lago","position":[34,0,88],"footprint":[54,44],"landmark":"lighthouse","arc1Chapters":["chapter_4","epilogue"]}
+    ],
+    "links": [
+      {"from":"cuenca_de_ohm","to":"castillo_de_la_red","kind":"overworld_route","semantic":"distribution_route"},
+      {"from":"cuenca_de_ohm","to":"forja_y_terrazas","kind":"overworld_route","semantic":"production_route"},
+      {"from":"forja_y_terrazas","to":"faro_y_lago","kind":"overworld_route","semantic":"water_signal_route"},
+      {"from":"faro_y_lago","to":"cuenca_de_ohm","kind":"revisit_route","semantic":"return_loop"}
+    ]
+  },
+  "dioramas": {
+    "cuenca_de_ohm": {
+      "origin":"plaza_center",
+      "planningStatus":"H2_TARGET_VALIDATE_IN_GREYBOX",
+      "bounds":{"center":[0,0,-12],"size":[100,116]},
+      "zones":[
+        {"id":"portal_forecourt","center":[0,0,38],"size":[26,16],"purpose":"arrival_and_portal_staging"},
+        {"id":"arrival_promenade","center":[0,0,24],"size":[12,16],"purpose":"reveal_plaza"},
+        {"id":"plaza","center":[0,0,0],"size":[48,40],"purpose":"hub_orientation_ohm_activation_public_memory"},
+        {"id":"lumen_forecourt","center":[34,0,4],"size":[20,22],"purpose":"lateral_branch_and_workshop_staging"},
+        {"id":"ohm_gate_forecourt","center":[0,0,-32],"size":[32,16],"purpose":"transfer_puzzle_and_threshold"},
+        {"id":"spring_descent","center":[0,-0.75,-48],"size":[14,18],"purpose":"controlled_descent"},
+        {"id":"manantial","center":[0,-1.5,-64],"size":[38,22],"purpose":"consequence_water_and_bitacora"}
+      ],
+      "landmarks":[
+        {"id":"portal_omega","position":[0,0,43],"footprint":[9,4],"facingY":0},
+        {"id":"plaza_monument","position":[0,0,2],"footprint":[10,10],"facingY":0},
+        {"id":"ohm_activation_plinth","position":[0,0,-8],"footprint":[4,4],"facingY":180},
+        {"id":"ohm_gate","position":[0,0,-40],"footprint":[20,6],"facingY":180},
+        {"id":"spring_source","position":[0,-1.5,-66],"footprint":[20,10],"facingY":180}
+      ],
+      "buildings":[
+        {"id":"lumen_workshop","center":[44,0,4],"size":[18,15],"entrance":{"position":[35,0,4],"facingY":270},"interior":"lumen_workshop_interior"}
+      ],
+      "paths":[
+        {"id":"main_axis","from":[0,0,43],"to":[0,0,-66],"minClearWidth":8},
+        {"id":"workshop_branch","from":[14,0,4],"to":[35,0,4],"minClearWidth":5}
+      ],
+      "interactionAnchors":[
+        {"id":"ohm_activation","position":[0,0,-8],"stagingRadius":5},
+        {"id":"lumen_diagnosis","position":[39,0,4],"stagingRadius":6},
+        {"id":"gate_transfer","position":[0,0,-32],"stagingRadius":6},
+        {"id":"spring_reflection","position":[0,-1.5,-58],"stagingRadius":5}
+      ],
+      "entrances":[{"id":"from_overworld","position":[0,0,50],"facingY":0}],
+      "exits":[
+        {"id":"to_overworld","position":[0,0,50],"facingY":180},
+        {"id":"to_lumen_interior","position":[35,0,4],"facingY":90}
+      ],
+      "protectedSightlines":[
+        {"id":"portal_plaza_gate_axis","from":[0,2.2,42],"through":[0,1.5,0],"to":[0,4,-40]},
+        {"id":"plaza_to_lumen_entry","from":[8,2,2],"to":[35,2,4]}
+      ],
+      "reservedNegativeSpace":[
+        {"id":"plaza_breathing_room","center":[0,0,0],"size":[30,24],"allow":["plaza_monument","ohm_activation_plinth","player","npcs","electrical_routes"]}
+      ]
+    },
+    "lumen_workshop_interior": {
+      "origin":"workbench_center",
+      "planningStatus":"PLANNING_V0",
+      "bounds":{"center":[0,0,0],"size":[22,16]},
+      "zones":[
+        {"id":"entry","center":[0,0,6],"size":[8,4],"purpose":"entry_read"},
+        {"id":"diagnosis_bench","center":[0,0,0],"size":[10,7],"purpose":"chapter_1_integrator"},
+        {"id":"parts_wall","center":[-7,0,-2],"size":[4,8],"purpose":"components_and_ritual"},
+        {"id":"documentation_wall","center":[7,0,-2],"size":[4,8],"purpose":"published_scheme_and_bitacora"}
+      ],
+      "landmarks":[{"id":"lumen_workbench","position":[0,0,-1],"footprint":[6,2],"facingY":180}],
+      "paths":[{"id":"entry_to_bench","from":[0,0,8],"to":[0,0,1],"minClearWidth":3}],
+      "interactionAnchors":[{"id":"diagnosis_core","position":[0,0,1],"stagingRadius":4}],
+      "entrances":[{"id":"from_cuenca","position":[0,0,8],"facingY":0}],
+      "exits":[{"id":"to_cuenca","position":[0,0,8],"facingY":180}],
+      "protectedSightlines":[{"id":"entry_bench_response","from":[0,2,7],"through":[0,1,1],"to":[0,2,-4]}],
+      "reservedNegativeSpace":[]
+    },
+    "castillo_de_la_red": {
+      "origin":"distribution_court_center",
+      "planningStatus":"PLANNING_V0_VALIDATE_CHAPTER_2",
+      "bounds":{"center":[0,0,-12],"size":[112,126]},
+      "zones":[
+        {"id":"gate_approach","center":[0,0,46],"size":[30,18],"purpose":"threshold_and_first_transfer"},
+        {"id":"distribution_court","center":[0,0,18],"size":[46,32],"purpose":"public_distribution_and_orientation"},
+        {"id":"west_district_branch","center":[-34,0,8],"size":[24,24],"purpose":"service_priority_branch"},
+        {"id":"east_district_branch","center":[34,0,8],"size":[24,24],"purpose":"service_priority_branch"},
+        {"id":"institutional_gallery","center":[28,0,-22],"size":[28,28],"purpose":"consejera_evidence_and_seals"},
+        {"id":"branch_hall","center":[0,0,-26],"size":[38,24],"purpose":"series_parallel_distribution"},
+        {"id":"network_heart","center":[0,0,-56],"size":[34,24],"purpose":"chapter_2_integrator_and_visible_distribution"}
+      ],
+      "landmarks":[
+        {"id":"castle_gate","position":[0,0,54],"footprint":[24,7],"facingY":0},
+        {"id":"trunk_distributor","position":[0,0,-30],"footprint":[10,8],"facingY":180},
+        {"id":"network_heart_tower","position":[0,0,-62],"footprint":[22,12],"facingY":180}
+      ],
+      "buildings":[
+        {"id":"institutional_wing","center":[40,0,-23],"size":[22,30],"entrance":{"position":[29,0,-18],"facingY":270},"interior":"castle_institution_interior"}
+      ],
+      "paths":[
+        {"id":"castle_spine","from":[0,0,54],"to":[0,0,-62],"minClearWidth":7},
+        {"id":"west_service_branch","from":[0,0,15],"to":[-34,0,8],"minClearWidth":5},
+        {"id":"east_service_branch","from":[0,0,15],"to":[34,0,8],"minClearWidth":5}
+      ],
+      "interactionAnchors":[
+        {"id":"first_distribution_transfer","position":[0,0,30],"stagingRadius":6},
+        {"id":"consejera_evidence","position":[26,0,-15],"stagingRadius":5},
+        {"id":"district_distribution_integrator","position":[0,0,-30],"stagingRadius":7}
+      ],
+      "entrances":[{"id":"from_overworld","position":[0,0,62],"facingY":0}],
+      "exits":[{"id":"to_overworld","position":[0,0,62],"facingY":180}],
+      "protectedSightlines":[
+        {"id":"gate_to_heart","from":[0,2,48],"through":[0,2,18],"to":[0,8,-62]},
+        {"id":"court_to_districts","from":[0,2,18],"to":[34,2,8]},
+        {"id":"court_to_districts_w","from":[0,2,18],"to":[-34,2,8]}
+      ],
+      "reservedNegativeSpace":[{"id":"distribution_court_staging","center":[0,0,18],"size":[28,20],"allow":["player","npcs","temporary_instruments","electrical_routes"]}]
+    },
+    "castle_institution_interior": {
+      "origin":"evidence_table",
+      "planningStatus":"PLANNING_V0_OPTIONAL_INTERIOR",
+      "bounds":{"center":[0,0,0],"size":[24,18]},
+      "zones":[
+        {"id":"public_entry","center":[0,0,6],"size":[8,4],"purpose":"threshold"},
+        {"id":"evidence_table_zone","center":[0,0,0],"size":[10,7],"purpose":"defend_distribution_decision"},
+        {"id":"sealed_records","center":[0,0,-6],"size":[14,4],"purpose":"institutional_memory"}
+      ],
+      "landmarks":[{"id":"evidence_table","position":[0,0,0],"footprint":[5,2],"facingY":180}],
+      "paths":[{"id":"entry_to_evidence","from":[0,0,8],"to":[0,0,0],"minClearWidth":3}],
+      "interactionAnchors":[{"id":"consejera_review","position":[0,0,1],"stagingRadius":4}],
+      "entrances":[{"id":"from_castle","position":[0,0,8],"facingY":0}],
+      "exits":[{"id":"to_castle","position":[0,0,8],"facingY":180}],
+      "protectedSightlines":[],
+      "reservedNegativeSpace":[]
+    },
+    "forja_y_terrazas": {
+      "origin":"shared_trunk_junction",
+      "planningStatus":"PLANNING_V0_VALIDATE_CHAPTER_3",
+      "bounds":{"center":[-8,-2,24],"size":[146,128]},
+      "zones":[
+        {"id":"shared_trunk_junction","center":[0,0,0],"size":[22,18],"purpose":"make_tradeoff_visible"},
+        {"id":"forge_yard","center":[-32,0,-6],"size":[34,28],"purpose":"production_entry_and_staging"},
+        {"id":"forge_hall","center":[-62,0,-12],"size":[40,36],"purpose":"heat_power_and_overload"},
+        {"id":"safety_station","center":[-30,0,24],"size":[24,18],"purpose":"protection_materials_maintenance"},
+        {"id":"terraces_upper","center":[24,0,10],"size":[38,22],"purpose":"irrigation_priority_visible"},
+        {"id":"terraces_middle","center":[28,-2,34],"size":[40,22],"purpose":"distribution_by_level"},
+        {"id":"terraces_lower","center":[24,-4,58],"size":[44,22],"purpose":"abandoned_level_and_consequence"},
+        {"id":"aqueduct_outlet","center":[48,-5,72],"size":[30,16],"purpose":"water_delivery_and_route_to_faro"}
+      ],
+      "landmarks":[
+        {"id":"forge_stack","position":[-70,0,-20],"footprint":[16,16],"facingY":90},
+        {"id":"forge_hearth","position":[-60,0,-8],"footprint":[12,8],"facingY":90},
+        {"id":"main_sluice","position":[20,-1,26],"footprint":[8,4],"facingY":180},
+        {"id":"aqueduct_mouth","position":[52,-5,76],"footprint":[16,8],"facingY":90}
+      ],
+      "buildings":[
+        {"id":"forge_hall_building","center":[-64,0,-12],"size":[38,34],"entrance":{"position":[-45,0,-8],"facingY":90},"interior":"forge_hall_internal_play_space"},
+        {"id":"safety_station_building","center":[-36,0,25],"size":[18,14],"entrance":{"position":[-27,0,22],"facingY":90},"interior":null}
+      ],
+      "paths":[
+        {"id":"forge_trunk","from":[0,0,0],"to":[-62,0,-8],"minClearWidth":7},
+        {"id":"terraces_trunk","from":[0,0,0],"to":[24,-4,58],"minClearWidth":6},
+        {"id":"aqueduct_route","from":[24,-4,58],"to":[52,-5,76],"minClearWidth":5}
+      ],
+      "interactionAnchors":[
+        {"id":"overload_diagnosis","position":[-52,0,-7],"stagingRadius":7},
+        {"id":"protection_decision","position":[-28,0,22],"stagingRadius":6},
+        {"id":"forge_vs_irrigation_integrator","position":[0,0,0],"stagingRadius":8},
+        {"id":"terraces_verification","position":[24,-3,48],"stagingRadius":6}
+      ],
+      "entrances":[{"id":"from_overworld","position":[6,0,-10],"facingY":270}],
+      "exits":[{"id":"to_overworld","position":[6,0,-10],"facingY":90}],
+      "protectedSightlines":[
+        {"id":"junction_tradeoff","from":[0,2,0],"to":[-62,5,-8]},
+        {"id":"junction_to_terraces","from":[0,2,0],"to":[24,-2,58]},
+        {"id":"terraces_to_forge","from":[24,1,10],"to":[-62,5,-8]}
+      ],
+      "reservedNegativeSpace":[{"id":"junction_decision_space","center":[0,0,0],"size":[18,14],"allow":["player","npcs","temporary_instruments","electrical_and_water_routes"]}]
+    },
+    "forge_hall_internal_play_space": {
+      "origin":"hearth_center",
+      "planningStatus":"PLANNING_V0_EMBEDDED_OR_INTERIOR_TBD",
+      "bounds":{"center":[0,0,0],"size":[34,28]},
+      "zones":[
+        {"id":"hearth","center":[0,0,-4],"size":[12,10],"purpose":"heat_load"},
+        {"id":"conductor_service","center":[-9,0,4],"size":[8,12],"purpose":"conductor_and_temperature"},
+        {"id":"production_floor","center":[8,0,5],"size":[12,12],"purpose":"community_production"}
+      ],
+      "landmarks":[{"id":"main_hearth","position":[0,0,-5],"footprint":[10,6],"facingY":180}],
+      "paths":[{"id":"hall_loop","from":[0,0,12],"to":[0,0,-2],"minClearWidth":4}],
+      "interactionAnchors":[{"id":"hearth_measurement","position":[0,0,1],"stagingRadius":5}],
+      "entrances":[{"id":"from_forja","position":[0,0,13],"facingY":0}],
+      "exits":[{"id":"to_forja","position":[0,0,13],"facingY":180}],
+      "protectedSightlines":[],
+      "reservedNegativeSpace":[]
+    },
+    "faro_y_lago": {
+      "origin":"calibration_bench",
+      "planningStatus":"PLANNING_V0_VALIDATE_CHAPTER_4",
+      "bounds":{"center":[4,0,10],"size":[136,108]},
+      "zones":[
+        {"id":"shore_entry","center":[-46,0,12],"size":[24,18],"purpose":"arrival_and_lighthouse_reveal"},
+        {"id":"archive_pavilion","center":[-30,0,-12],"size":[24,22],"purpose":"memory_and_documentation"},
+        {"id":"calibration_platform","center":[0,0,8],"size":[28,22],"purpose":"chapter_4_integrator_staging"},
+        {"id":"clock_machinery","center":[22,0,-16],"size":[24,22],"purpose":"timing_and_intermediate_landmark"},
+        {"id":"lighthouse_promontory","center":[48,0,-28],"size":[30,30],"purpose":"final_signal_and_method"},
+        {"id":"dock","center":[36,0,34],"size":[26,12],"purpose":"shore_service_and_return"},
+        {"id":"lake","center":[10,-1,42],"size":[104,34],"purpose":"negative_space_reflection_and_system_consequence"}
+      ],
+      "landmarks":[
+        {"id":"archive","position":[-30,0,-14],"footprint":[18,14],"facingY":180},
+        {"id":"calibration_bench","position":[0,0,8],"footprint":[7,3],"facingY":180},
+        {"id":"clock_tower","position":[24,0,-20],"footprint":[14,14],"facingY":180},
+        {"id":"lighthouse","position":[52,0,-32],"footprint":[18,18],"facingY":180},
+        {"id":"dock_end","position":[44,0,38],"footprint":[6,5],"facingY":90}
+      ],
+      "buildings":[
+        {"id":"archive_building","center":[-30,0,-14],"size":[20,16],"entrance":{"position":[-30,0,-5],"facingY":180},"interior":"archive_memory_interior"},
+        {"id":"lighthouse_tower","center":[52,0,-32],"size":[18,18],"entrance":{"position":[45,0,-24],"facingY":135},"interior":"lighthouse_lantern_interior"}
+      ],
+      "paths":[
+        {"id":"shore_spine","from":[-54,0,12],"to":[42,0,-24],"minClearWidth":6},
+        {"id":"dock_branch","from":[12,0,12],"to":[44,0,38],"minClearWidth":4}
+      ],
+      "interactionAnchors":[
+        {"id":"nereo_memory_compare","position":[-6,0,8],"stagingRadius":6},
+        {"id":"calibration_integrator","position":[2,0,8],"stagingRadius":7},
+        {"id":"clock_verification","position":[22,0,-10],"stagingRadius":5},
+        {"id":"lighthouse_final_validation","position":[43,0,-23],"stagingRadius":6}
+      ],
+      "entrances":[{"id":"from_overworld","position":[-60,0,14],"facingY":90}],
+      "exits":[{"id":"to_overworld","position":[-60,0,14],"facingY":270}],
+      "protectedSightlines":[
+        {"id":"entry_lighthouse_reveal","from":[-52,2,12],"through":[0,2,8],"to":[52,12,-32]},
+        {"id":"calibration_clock_lighthouse","from":[0,2,8],"through":[24,4,-20],"to":[52,12,-32]}
+      ],
+      "reservedNegativeSpace":[{"id":"lake_visual_breathing_room","center":[10,-1,42],"size":[92,28],"allow":["water","dock","reflections","limited_service_markers"]}]
+    },
+    "archive_memory_interior": {
+      "origin":"memory_table",
+      "planningStatus":"PLANNING_V0_OPTIONAL_INTERIOR",
+      "bounds":{"center":[0,0,0],"size":[22,16]},
+      "zones":[
+        {"id":"memory_table_zone","center":[0,0,0],"size":[10,7],"purpose":"compare_memory_and_measurement"},
+        {"id":"records","center":[0,0,-5],"size":[14,4],"purpose":"validated_records"}
+      ],
+      "landmarks":[{"id":"memory_table","position":[0,0,0],"footprint":[5,2],"facingY":180}],
+      "paths":[{"id":"entry_to_table","from":[0,0,7],"to":[0,0,0],"minClearWidth":3}],
+      "interactionAnchors":[{"id":"memory_validation","position":[0,0,1],"stagingRadius":4}],
+      "entrances":[{"id":"from_faro","position":[0,0,8],"facingY":0}],
+      "exits":[{"id":"to_faro","position":[0,0,8],"facingY":180}],
+      "protectedSightlines":[],
+      "reservedNegativeSpace":[]
+    },
+    "lighthouse_lantern_interior": {
+      "origin":"lens_center",
+      "planningStatus":"PLANNING_V0_OPTIONAL_INTERIOR",
+      "bounds":{"center":[0,0,0],"size":[18,18]},
+      "zones":[{"id":"lantern_room","center":[0,0,0],"size":[14,14],"purpose":"final_signal_validation"}],
+      "landmarks":[{"id":"lighthouse_lens","position":[0,0,0],"footprint":[6,6],"facingY":180}],
+      "paths":[{"id":"entry_to_lens","from":[0,0,8],"to":[0,0,2],"minClearWidth":3}],
+      "interactionAnchors":[{"id":"final_signal","position":[0,0,2],"stagingRadius":4}],
+      "entrances":[{"id":"from_faro","position":[0,0,8],"facingY":0}],
+      "exits":[{"id":"to_faro","position":[0,0,8],"facingY":180}],
+      "protectedSightlines":[],
+      "reservedNegativeSpace":[]
+    }
+  }
+}
