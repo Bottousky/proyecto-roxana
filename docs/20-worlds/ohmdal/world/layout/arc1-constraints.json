@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "0.1.0",
+  "status": "PROPOSED",
+  "ruleSemantics": "Declarative review/test contract. A future validator may implement these rule types; until then agents must check them explicitly.",
+  "global": [
+    {
+      "id": "G01_METRIC_DIARAMAS_ONLY",
+      "type": "coordinate_space_separation",
+      "severity": "error",
+      "params": {"overworldUnits": "symbolic_atlas_units", "dioramaUnits": "meters"},
+      "reason": "The canonical overworld compresses distance and does not share scale with dioramas."
+    },
+    {
+      "id": "G02_NO_MAGIC_COORDINATES",
+      "type": "single_layout_source",
+      "severity": "error",
+      "params": {"source": "arc1-layout.json"},
+      "reason": "Persistent scene placement should be derived from or traced back to layout data, not scattered numeric literals."
+    },
+    {
+      "id": "G03_TOPDOWN_DERIVED",
+      "type": "derived_visual_required",
+      "severity": "error",
+      "params": {"views": ["top_down", "gameplay_entry", "gameplay_causal"]},
+      "reason": "Coordinates are machine-readable but insufficient to review composition, spacing and occlusion."
+    },
+    {
+      "id": "G04_REACHABLE_REQUIRED_ANCHORS",
+      "type": "navigation_reachability",
+      "severity": "error",
+      "params": {"from": "every_required_entrance", "to": "every_required_interactionAnchor"},
+      "reason": "Every critical Arc I action must be physically reachable."
+    },
+    {
+      "id": "G05_STATE_WITHOUT_TOPOLOGY_SWAP",
+      "type": "world_state_topology_stability",
+      "severity": "error",
+      "params": {"states": ["deteriorated", "intervention", "understood"]},
+      "reason": "World transformation changes operation, access, activity and presentation; it should not require replacing the entire region layout."
+    },
+    {
+      "id": "G06_INTERIOR_LIMIT",
+      "type": "max_significant_interiors",
+      "severity": "warning",
+      "params": {"maxPerRegionalDiorama": 2},
+      "reason": "Matches the current world-structure production rule."
+    }
+  ],
+  "cuenca_de_ohm": [
+    {
+      "id": "C01_MAIN_AXIS_ALIGNMENT",
+      "type": "x_alignment",
+      "severity": "error",
+      "params": {"items": ["portal_omega", "plaza_monument", "ohm_gate", "spring_source"], "toleranceMeters": 1.0},
+      "reason": "Portal → Plaza → Puerta → Manantial is the primary ceremonial and navigational read."
+    },
+    {
+      "id": "C02_MAIN_AXIS_CLEARANCE",
+      "type": "path_min_clear_width",
+      "severity": "error",
+      "params": {"path": "main_axis", "minMeters": 8},
+      "reason": "The main route must remain visually and physically dominant from the HD-2D camera."
+    },
+    {
+      "id": "C03_PLAZA_BREATHING_ROOM",
+      "type": "reserved_negative_space",
+      "severity": "error",
+      "params": {"zone": "plaza_breathing_room", "minSizeMeters": [30, 24]},
+      "reason": "Prevents the Plaza from collapsing back into a small courtyard."
+    },
+    {
+      "id": "C04_WORKSHOP_LATERAL",
+      "type": "relative_position",
+      "severity": "error",
+      "params": {"subject": "lumen_workshop", "relation": "east_of", "object": "plaza", "minSeparationMeters": 8},
+      "reason": "The Taller is a lateral branch, not part of the Portal–Puerta axis."
+    },
+    {
+      "id": "C05_WORKSHOP_ENTRANCE_FACES_PLAZA",
+      "type": "entrance_faces_target",
+      "severity": "error",
+      "params": {"building": "lumen_workshop", "target": "plaza", "maxAngularErrorDegrees": 25},
+      "reason": "The player should understand the Taller as an accessible branch directly from the Plaza."
+    },
+    {
+      "id": "C06_PORTAL_GATE_SIGHTLINE",
+      "type": "sightline_unblocked",
+      "severity": "error",
+      "params": {"sightline": "portal_plaza_gate_axis", "allowLowProfileOccludersMeters": 1.1},
+      "reason": "The Puerta must read as the northern objective while the Plaza remains the hub."
+    },
+    {
+      "id": "C07_CAUSAL_STAGING",
+      "type": "interaction_staging_min_radius",
+      "severity": "error",
+      "params": {"anchors": ["ohm_activation", "lumen_diagnosis", "gate_transfer"], "minMeters": 5},
+      "reason": "Player, Ohm/NPC and visible consequence need to coexist without crowding."
+    }
+  ],
+  "castillo_de_la_red": [
+    {
+      "id": "K01_GATE_HEART_ORIENTATION",
+      "type": "sightline_unblocked",
+      "severity": "error",
+      "params": {"sightline": "gate_to_heart"},
+      "reason": "The distributor/heart must orient the player through a branching institutional space."
+    },
+    {
+      "id": "K02_BRANCHES_READ_FROM_COURT",
+      "type": "multiple_destinations_visible",
+      "severity": "error",
+      "params": {"origin": "distribution_court", "destinations": ["west_district_branch", "east_district_branch", "branch_hall"]},
+      "reason": "Series/parallel and distribution should be spatially legible before formalization."
+    },
+    {
+      "id": "K03_BRANCH_EQUIVALENCE",
+      "type": "branch_access_parity",
+      "severity": "warning",
+      "params": {"branches": ["west_service_branch", "east_service_branch"], "maxWidthDeltaMeters": 1.5},
+      "reason": "Do not imply a correct branch solely through a much more generous route."
+    },
+    {
+      "id": "K04_INSTITUTION_OFF_SPINE",
+      "type": "relative_position",
+      "severity": "error",
+      "params": {"subject": "institutional_wing", "relation": "off_primary_spine", "object": "castle_spine"},
+      "reason": "Evidence review is important but must not turn the whole Castle into a corridor."
+    }
+  ],
+  "forja_y_terrazas": [
+    {
+      "id": "F01_TRADEOFF_VISIBLE",
+      "type": "dual_landmark_visibility",
+      "severity": "error",
+      "params": {"origin": "shared_trunk_junction", "targets": ["forge_hearth", "terraces_upper"]},
+      "reason": "The Chapter 3 conflict between production and irrigation must be visible in one spatial decision."
+    },
+    {
+      "id": "F02_SHARED_TRUNK_CLEAR",
+      "type": "interaction_space_clear",
+      "severity": "error",
+      "params": {"zone": "junction_decision_space"},
+      "reason": "The integrator requires room to compare paths and stage NPC/community feedback."
+    },
+    {
+      "id": "F03_TERRACE_DESCENT_LEGIBLE",
+      "type": "ordered_elevation",
+      "severity": "error",
+      "params": {"zones": ["terraces_upper", "terraces_middle", "terraces_lower", "aqueduct_outlet"], "direction": "descending"},
+      "reason": "Water and distribution by level are part of the spatial teaching model."
+    },
+    {
+      "id": "F04_FORGE_NOT_GENERIC_ROOM",
+      "type": "functional_infrastructure_visible",
+      "severity": "error",
+      "params": {"required": ["forge_hearth", "forge_trunk", "safety_station"]},
+      "reason": "Power, heat, conductor and safety limits must exist in the environment, not only in UI."
+    }
+  ],
+  "faro_y_lago": [
+    {
+      "id": "L01_LIGHTHOUSE_ORIENTATION",
+      "type": "sightline_unblocked",
+      "severity": "error",
+      "params": {"sightline": "entry_lighthouse_reveal"},
+      "reason": "The lighthouse is the Chapter 4 destination landmark and should orient without free camera rotation."
+    },
+    {
+      "id": "L02_LAKE_NEGATIVE_SPACE",
+      "type": "reserved_negative_space",
+      "severity": "error",
+      "params": {"zone": "lake_visual_breathing_room"},
+      "reason": "The lake provides scale, reflection, calm and a visual counterweight to machinery."
+    },
+    {
+      "id": "L03_METHOD_CHAIN_VISIBLE",
+      "type": "ordered_landmark_read",
+      "severity": "error",
+      "params": {"sequence": ["archive", "calibration_bench", "clock_tower", "lighthouse"]},
+      "reason": "Memory → measurement/calibration → mechanism → public signal should read spatially."
+    },
+    {
+      "id": "L04_MEMORY_NOT_ERASED",
+      "type": "coexistence_required",
+      "severity": "warning",
+      "params": {"elements": ["archive", "calibration_bench", "lighthouse"]},
+      "reason": "The final region must formalize human memory without visually replacing it with sterile machinery."
+    }
+  ]
+}
