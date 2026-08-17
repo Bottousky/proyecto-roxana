@@ -1,0 +1,92 @@
+[
+  {
+    "id": "00_portal",
+    "spawn": "portal",
+    "state": "dormant",
+    "region": "portal",
+    "pos": {
+      "x": 0,
+      "y": 43
+    }
+  },
+  {
+    "id": "01_camino",
+    "spawn": "camino",
+    "state": "dormant",
+    "region": "camino",
+    "pos": {
+      "x": 0,
+      "y": 24
+    }
+  },
+  {
+    "id": "02_plaza_dormant",
+    "spawn": "plaza",
+    "state": "dormant",
+    "region": "plaza",
+    "pos": {
+      "x": 0,
+      "y": 2
+    }
+  },
+  {
+    "id": "03_taller_approach",
+    "spawn": "taller",
+    "state": "dormant",
+    "region": "taller",
+    "pos": {
+      "x": 28,
+      "y": 4
+    }
+  },
+  {
+    "id": "04_puerta_forecourt",
+    "spawn": "calzada_alta",
+    "state": "dormant",
+    "region": "calzada_alta",
+    "pos": {
+      "x": 0,
+      "y": -32
+    }
+  },
+  {
+    "id": "05_puerta",
+    "spawn": "puerta",
+    "state": "dormant",
+    "region": "puerta",
+    "pos": {
+      "x": 0,
+      "y": -40
+    }
+  },
+  {
+    "id": "06_calzada_descent",
+    "spawn": "calzada",
+    "state": "dormant",
+    "region": "calzada",
+    "pos": {
+      "x": 0,
+      "y": -48
+    }
+  },
+  {
+    "id": "07_manantial",
+    "spawn": "manantial",
+    "state": "dormant",
+    "region": "manantial",
+    "pos": {
+      "x": 0,
+      "y": -64
+    }
+  },
+  {
+    "id": "08_sendero",
+    "spawn": "sendero",
+    "state": "dormant",
+    "region": "sendero",
+    "pos": {
+      "x": 0,
+      "y": 38
+    }
+  }
+]

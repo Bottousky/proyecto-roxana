@@ -169,11 +169,25 @@ export function createCamera(viewport: { width: number; height: number }): GameC
     // The reference framing (zoom 1.0) was tuned for a ~20×16 m plaza; larger
     // footprints pull the camera back (zoom < 1.0) so the whole region is
     // readable from the elevated HD-2D rig.
+    //
+    // H3: the Cuenca layout enlarged the Plaza (48×40) and Manantial (38×22)
+    // well past the H1 reference, so the FOV-only adjustment isn't enough.
+    // When the footprint is larger than the reference we also pull the
+    // camera back proportionally (offset.y, offset.z scaled together) so
+    // the camera angle of view stays the same and the whole region fits.
+    let scale = 1;
     if (footprint) {
       const refDepth = 16;
       const refWidth = 20;
-      const zoom = Math.max(0.55, Math.min(1.6, Math.min(refWidth / Math.max(1, footprint.width), refDepth / Math.max(1, footprint.depth))));
+      const zoom = Math.max(0.45, Math.min(1.6, Math.min(refWidth / Math.max(1, footprint.width), refDepth / Math.max(1, footprint.depth))));
       framingZoom = zoom;
+      scale = Math.max(
+        1,
+        Math.max(footprint.width / refWidth, footprint.depth / refDepth),
+      );
+      // Update desiredOffset directly so the next follow() picks it up.
+      // Keep the X offset (lateral parallax) at the base value.
+      desiredOffset.set(baseOffset.x, baseOffset.y * scale, baseOffset.z * scale);
     }
     // Plaza: 100%; Puerta: 95% (slight zoom in for intimacy); Manantial: 90% (slight zoom in); Taller: 100%; Sendero: 110% (closer).
     // For the Manantial we also override the camera offset so the camera
@@ -194,7 +208,10 @@ export function createCamera(viewport: { width: number; height: number }): GameC
         // is at z=-16 (about 10m north of the Manantial), so the camera
         // being at lookAt+(0, 20, 12) puts it above the Puerta, with the
         // line of sight to the player not intersecting the towers.
-        regionOffset = { x: 0, y: 20, z: 12 };
+        // H3: scale the magnitude with the footprint so the 38×22m
+        // Manantial patio fits the frame (default tuned for the old
+        // 16m-wide H1 layout).
+        regionOffset = { x: 0, y: 20 * scale, z: 12 * scale };
         break;
       case "taller":
         if (!footprint) framingZoom = 1.0;

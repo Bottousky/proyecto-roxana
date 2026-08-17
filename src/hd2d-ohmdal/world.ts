@@ -272,7 +272,8 @@ export function createWorld(scene: THREE.Scene): World {
     plaza:     { x: REGION_PLACEMENT.plaza.x, y: REGION_PLACEMENT.plaza.z }, // center of the Plaza, by the fountain
     taller:    { x: REGION_PLACEMENT.taller.x - 6, y: REGION_PLACEMENT.taller.z }, // just west of the Taller
     puerta:    { x: REGION_PLACEMENT.puerta.x, y: REGION_PLACEMENT.puerta.z },
-    calzada:   { x: REGION_PLACEMENT.calzada.x, y: REGION_PLACEMENT.calzada.z },
+    calzada_alta: { x: REGION_PLACEMENT.calzada_alta.x, y: REGION_PLACEMENT.calzada_alta.z }, // south forecourt of the Puerta
+    calzada:   { x: REGION_PLACEMENT.calzada.x, y: REGION_PLACEMENT.calzada.z }, // sunken band north of the Puerta
     manantial: { x: REGION_PLACEMENT.manantial.x, y: REGION_PLACEMENT.manantial.z }, // center of the Manantial patio
     sendero:   { x: REGION_PLACEMENT.sendero.x, y: REGION_PLACEMENT.sendero.z }, // center of the Sendero
   };

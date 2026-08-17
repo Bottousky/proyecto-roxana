@@ -1,0 +1,38 @@
+[
+  {
+    "step": "walk_N_into_promenade",
+    "state": "dormant",
+    "region": "portal",
+    "pos": {
+      "x": 0,
+      "y": 41.87499999999999
+    }
+  },
+  {
+    "step": "walk_N_into_plaza",
+    "state": "dormant",
+    "region": "sendero",
+    "pos": {
+      "x": 0,
+      "y": 40.749999999999986
+    }
+  },
+  {
+    "step": "walk_N_through_puerta",
+    "state": "dormant",
+    "region": "sendero",
+    "pos": {
+      "x": 0,
+      "y": 39.39999999999998
+    }
+  },
+  {
+    "step": "walk_N_into_manantial",
+    "state": "dormant",
+    "region": "sendero",
+    "pos": {
+      "x": 0,
+      "y": 38.49999999999997
+    }
+  }
+]
