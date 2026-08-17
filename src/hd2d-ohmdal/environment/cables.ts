@@ -22,8 +22,8 @@ const GAP = 0.3;            // visible gap in meters when broken
 const CABLE_W = 0.18;       // cable thickness
 const CABLE_H = 0.06;       // cable height
 const Y_OFFSET = 0.04;      // lift above the terrain so the cable is visible
-const POST_H = 0.22;        // sparking post height
-const POST_R = 0.045;       // sparking post radius
+const POST_H = 0.34;         // sparking post height
+const POST_R = 0.055;        // sparking post radius
 const POST_OFFSET = 0.05;   // gap between the broken cable end and the post base
 
 export interface CableVisuals {
@@ -73,8 +73,12 @@ export function buildCables(
 
   const postGeom = new THREE.CylinderGeometry(POST_R, POST_R * 1.4, POST_H, 6);
   postGeom.translate(0, POST_H / 2, 0);
-  const orbGeom = new THREE.SphereGeometry(POST_R * 1.4, 8, 6);
-  orbGeom.translate(0, POST_H + POST_R * 0.6, 0);
+  // Spark orbs are sized to be readable from the default camera distance
+  // (the player must be able to spot a broken cable from several meters
+  // away, before the interaction prompt appears). The old 0.063m orbs were
+  // ~10px on screen — invisible in normal exploration.
+  const orbGeom = new THREE.SphereGeometry(POST_R * 3.0, 10, 8);
+  orbGeom.translate(0, POST_H + POST_R * 1.2, 0);
 
   // Two materials, swapped per segment on state change. Awake glow is
   // driven by emissive on the intact material.
@@ -218,18 +222,19 @@ export function buildCables(
   // We return a small update closure for the world to call; since the
   // cables module is otherwise stateless, this is the cleanest seam.
   const update = (t: number) => {
-    // Subtle orb pulse + slight wobble. Frequency 6 Hz, amplitude small
-    // enough to not steal focus from gameplay.
-    const wobble = Math.sin(t * 6) * 0.05;
+    // Subtle orb pulse + slight wobble. The pulse is strong enough to draw
+    // the eye to a broken cable from the default camera distance, but the
+    // frequency stays low so it doesn't steal focus from gameplay.
+    const wobble = Math.sin(t * 5) * 0.08;
     for (const c of perCable) {
       for (const postGroup of c.gap.children) {
         const u = postGroup.userData as { sparkSign: number; sparkBaseY: number };
         const orb = postGroup.children[1] as THREE.Mesh | undefined;
         if (orb) {
           const mat = orb.material as THREE.MeshStandardMaterial;
-          mat.emissiveIntensity = 1.2 + 0.6 * awake + wobble;
+          mat.emissiveIntensity = 1.4 + 1.0 * awake + wobble * 3;
         }
-        postGroup.position.y = u.sparkBaseY + wobble * 0.3;
+        postGroup.position.y = u.sparkBaseY + wobble * 0.5;
       }
     }
   };

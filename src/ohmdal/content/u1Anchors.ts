@@ -5,18 +5,15 @@
 // interactuar. Los diálogos de Edda, de Lumen y de las lámparas siguen teniendo una sola
 // fuente de verdad, y sigue siendo la que ya se juega.
 //
-// ## De dónde salen las coordenadas
+// ## De dónde salen las coordenadas (red con hub central)
 //
-// La Plaza de `/jugar` es una sala pintada de 960×540 px a razón de unos 40 px por metro.
-// La vista cenital y la vista HD-2D comparten el eje horizontal, así que la conversión es
-// directa salvo por un giro de eje:
-//
-//   z(metros) = (x_px − 480) / 40        → derecha de la pantalla en las dos vistas
-//   x(metros) = x_pedestal − (y_px − 342) / 40
-//
-// El segundo cambia de signo porque en cenital +y baja hacia el jugador —el sur— y en HD-2D
-// el sur es −x: la cámara mira por +x. El pedestal de Ohm es el origen de la conversión
-// porque es el centro dramático de la sala.
+// El origen del mundo es el **centro de la Plaza** (0, 0, 0). Las otras zonas se
+// reparten alrededor: Taller y Puerta+Manantial al este (+x), Castillo al norte (-z),
+// Forja al oeste (-x), Terrazas al sur (+z), Faro al sureste. Las coordenadas de
+// cada anclaje se eligen para caer dentro de los `bounds` de su zona
+// (`LEVEL_ZONES` en `levelData.ts`) y respetar la topología del slice canónico:
+// Portal al oeste de la Plaza, pedestal al centro, campana al este, y los
+// personajes y props de cada zona siguiendo la lógica de la sala de `/jugar`.
 
 import { ROOMS, type ThingDef } from '../../jugar/rooms.ts';
 import type { NpcId } from '../integration/spriteActors.ts';
@@ -49,77 +46,82 @@ export interface U1Anchor {
 export const DEFAULT_REACH_METERS = 1.6;
 
 export const U1_ANCHORS: readonly U1Anchor[] = [
-  // El Portal queda donde el jugador aparece: la escena empieza con él apagándose detrás.
+  /* ---------- E1 · Plaza de Ohm (hub, origen) ---------- */
+  // El Portal queda donde el jugador aparece: la escena empieza con él apagándose detrás,
+  // en el borde oeste de la Plaza (x = -8). El spawn queda dentro de la Plaza, no afuera.
   {
     id: 'portal-aula',
-    position: { x: -19, z: 0 },
+    position: { x: -8, z: 0 },
     source: { room: 'plaza', thing: 'portal-aula' },
     actor: null,
     reach: 2.2,
   },
-  // El pedestal es el origen de la conversión: (480, 342) en la planta cenital.
+  // El pedestal es el centro de la Plaza (origen del mundo).
   {
     id: 'pedestal',
-    position: { x: -13.5, z: 0 },
+    position: { x: 0, z: 0 },
     source: { room: 'plaza', thing: 'pedestal' },
     actor: 'ohm',
     facing: 270,
     bench: 'ohm',
-    // Coronación del pedestal de cuatro escalones que construye `plazaKit`. El collider del
-    // pedestal frena al jugador a 2,02 m del centro, así que el alcance tiene que superarlo.
+    // Coronación del pedestal: el collider frena al jugador a 2,02 m del centro, así que
+    // el alcance tiene que superarlo.
     elevation: 1.06,
     reach: 2.5,
   },
+  // La campana al este del pedestal (landmark dominante del segundo half de la Plaza).
   {
     id: 'campana',
-    position: { x: -10.6, z: 0 },
+    position: { x: 3, z: 0 },
     source: { room: 'plaza', thing: 'campana' },
     actor: null,
     // El monumento ocupa 4,8 m: al jugador no lo dejan acercarse a menos de 2,8 m del centro.
     reach: 3.4,
   },
+  // Edda en la Plaza — al sur, frente al pedestal.
   {
     id: 'edda',
-    position: { x: -13.2, z: 3.6 },
+    position: { x: 0, z: 3.6 },
     source: { room: 'plaza', thing: 'edda' },
     actor: 'edda',
     facing: 250,
   },
   {
     id: 'edda-campana',
-    position: { x: -13.2, z: 3.6 },
+    position: { x: 0, z: 3.6 },
     source: { room: 'plaza', thing: 'edda-campana' },
     actor: 'edda',
     facing: 250,
   },
+  // Lumen en la Plaza — al sur, al lado de Edda.
   {
     id: 'lumen-plaza',
-    position: { x: -12.5, z: 5.2 },
+    position: { x: 1, z: 5.2 },
     source: { room: 'plaza', thing: 'lumen-plaza' },
     actor: 'lumen',
     facing: 250,
   },
+  // Lámparas: simétricas al norte y sur, flanqueando el pedestal.
   {
     id: 'lampara1',
-    position: { x: -13.85, z: -4.75 },
+    position: { x: -1.5, z: -4.75 },
     source: { room: 'plaza', thing: 'lampara1' },
     actor: null,
   },
   {
     id: 'lampara2',
-    position: { x: -13.55, z: 6.2 },
+    position: { x: -1, z: 6.2 },
     source: { room: 'plaza', thing: 'lampara2' },
     actor: null,
   },
 
-  /* ---------- E3 · Taller de Lumen ---------- */
-  // La conversión desde la planta cenital deja de ser literal a partir de acá: la sala de
-  // `/jugar` es un cuadrado de 960×540 y el Taller construido es una nave ancha y baja. Lo que
-  // se conserva es la **relación**: el banco al este, Lumen a su lado, los estantes contra el
-  // fondo y el generador en el rincón opuesto a la puerta.
+  /* ---------- E3 · Taller de Lumen (este de la Plaza) ---------- */
+  // El Taller vive en x ∈ [9, 22.5]; su centro es x ≈ 16. La distribución interna
+  // conserva la **relación** del slice: el banco al este, Lumen a su lado, los estantes
+  // contra el fondo y el generador en el rincón opuesto a la puerta.
   {
     id: 'banco',
-    position: { x: 4.8, z: -2.5 },
+    position: { x: 16, z: -2.5 },
     source: { room: 'taller', thing: 'banco' },
     actor: null,
     bench: 'lumen',
@@ -127,83 +129,83 @@ export const U1_ANCHORS: readonly U1Anchor[] = [
   },
   {
     id: 'lumen',
-    position: { x: 3.2, z: -1.1 },
+    position: { x: 14, z: -1.1 },
     source: { room: 'taller', thing: 'lumen' },
     actor: 'lumen',
     facing: 90,
   },
   {
     id: 'edda-taller',
-    position: { x: 2.5, z: 0.9 },
+    position: { x: 13, z: 0.9 },
     source: { room: 'taller', thing: 'edda-taller' },
     actor: 'edda',
     facing: 90,
   },
   {
     id: 'estantes',
-    position: { x: -1.2, z: -4.1 },
+    position: { x: 10.5, z: -4.1 },
     source: { room: 'taller', thing: 'estantes' },
     actor: null,
     reach: 1.9,
   },
   {
     id: 'estantes-derecha',
-    position: { x: 6.4, z: -4.1 },
+    position: { x: 20, z: -4.1 },
     source: { room: 'taller', thing: 'estantes-derecha' },
     actor: null,
     reach: 1.9,
   },
   {
     id: 'generador-taller',
-    position: { x: 7.2, z: 2.4 },
+    position: { x: 21, z: 2.4 },
     source: { room: 'taller', thing: 'generador-taller' },
     actor: null,
     reach: 2.2,
   },
 
-  /* ---------- E4 · Puerta de Ohm ---------- */
+  /* ---------- E4 · Puerta de Ohm (este, x = 22.5..30) ---------- */
   {
     id: 'lapuerta',
-    position: { x: 13.5, z: -0.5 },
+    position: { x: 25, z: -0.5 },
     source: { room: 'puerta', thing: 'lapuerta' },
     actor: null,
     bench: 'gate',
-    // Coincide con `R8_DOOR_MEASURE`, que es donde GF-07 pide el frame de la medición.
+    // Coincide con `R5_DOOR_APPROACH`, que es donde GF-07 pide el frame de la medición.
     reach: 2.8,
   },
   {
     id: 'edda-puerta',
-    position: { x: 11.4, z: -1.7 },
+    position: { x: 23.5, z: -1.7 },
     source: { room: 'puerta', thing: 'edda-puerta' },
     actor: 'edda',
     facing: 90,
   },
   {
     id: 'lumen-puerta',
-    position: { x: 11.4, z: 1.5 },
+    position: { x: 23.5, z: 1.5 },
     source: { room: 'puerta', thing: 'lumen-puerta' },
     actor: 'lumen',
     facing: 90,
   },
 
-  /* ---------- E5 · Manantial ---------- */
+  /* ---------- E5 · Manantial (este, x = 30..38.5) ---------- */
   {
     id: 'cauce-maestro',
-    position: { x: 18, z: 1.5 },
+    position: { x: 33, z: 1.5 },
     source: { room: 'manantial_ohm', thing: 'cauce-maestro' },
     actor: null,
     reach: 2.6,
   },
   {
     id: 'hito-proporciones',
-    position: { x: 16.8, z: -2.6 },
+    position: { x: 33, z: -2.6 },
     source: { room: 'manantial_ohm', thing: 'hito-proporciones' },
     actor: null,
     reach: 2,
   },
   {
     id: 'mirador-manantial',
-    position: { x: 19.8, z: -1.4 },
+    position: { x: 35, z: -1.4 },
     source: { room: 'manantial_ohm', thing: 'mirador-manantial' },
     actor: null,
     reach: 2.4,
@@ -212,20 +214,20 @@ export const U1_ANCHORS: readonly U1Anchor[] = [
     // Ohm acompaña al jugador desde que despierta, así que acá no lleva cuerpo propio: sería
     // un segundo autómata a veinte metros del primero. Es el punto donde se lo consulta.
     id: 'ohm-manantial',
-    position: { x: 16.4, z: 0.4 },
+    position: { x: 32, z: 0.4 },
     source: { room: 'manantial_ohm', thing: 'ohm-manantial' },
     actor: null,
   },
   {
     id: 'edda-manantial',
-    position: { x: 15.6, z: 2.1 },
+    position: { x: 32, z: 2.1 },
     source: { room: 'manantial_ohm', thing: 'edda-manantial' },
     actor: 'edda',
     facing: 90,
   },
   {
     id: 'lumen-manantial',
-    position: { x: 16.9, z: 3.1 },
+    position: { x: 33.5, z: 3.1 },
     source: { room: 'manantial_ohm', thing: 'lumen-manantial' },
     actor: 'lumen',
     facing: 90,

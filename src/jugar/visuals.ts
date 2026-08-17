@@ -624,17 +624,17 @@ interface CharLook {
 }
 
 const CHAR_LOOKS: Array<[RegExp, CharLook]> = [
-  [/^player$/, { body: 0x4d7d92, head: 0xe9c9a2, hair: 0x33303d, sprite: 'hero' }],
-  [/^edda/, { body: 0xa85f78, head: 0xeccaa5, hair: 0x6e3448, npcRow: 0 }],
-  [/^lumen/, { body: 0x8a6a3a, head: 0xe2c29a, hair: 0xd9d2e0, lantern: 0xffc966, npcRow: 1 }],
+  [/^player$/, { body: 0x4d7d92, head: 0xe9c9a2, hair: 0x33303d, sprite: 'hero', scale: 1.6 }],
+  [/^edda/, { body: 0xa85f78, head: 0xeccaa5, hair: 0x6e3448, npcRow: 0, scale: 1.4 }],
+  [/^lumen/, { body: 0x8a6a3a, head: 0xe2c29a, hair: 0xd9d2e0, lantern: 0xffc966, npcRow: 1, scale: 1.4 }],
   [/^(pedestal$|ohm-)/, { body: 0xc9a437, head: 0xc9a437, hair: 0xc9a437, orb: true, sprite: 'ohm' }],
-  [/^consejera/, { body: 0x5b4a75, head: 0xe0c2a0, hair: 0x2f2a3a, npcRow: 2 }],
-  [/^guardiana/, { body: 0x58755f, head: 0xd9b894, hair: 0x4a3a2e, npcTexture: 'ohmdal-npc-secondary', npcRow: 0 }],
-  [/^forjadora/, { body: 0xa8562e, head: 0xdfb48c, hair: 0x3a2620, npcRow: 3 }],
-  [/^farero/, { body: 0x496978, head: 0xd9b894, hair: 0x9aa4ac, lantern: 0x9adcff, npcTexture: 'ohmdal-npc-secondary', npcRow: 1 }],
-  [/^preceptor/, { body: 0x55505e, head: 0xe3c39b, hair: 0x8d8496, npcTexture: 'ohmdal-npc-secondary', npcRow: 2 }],
-  [/^ciudadano-nino/, { body: 0x7a6a50, head: 0xeccaa5, hair: 0x4a3a2e, scale: 0.8, npcTexture: 'ohmdal-npc-secondary', npcRow: 4 }],
-  [/^ciudadano/, { body: 0x6b5d4f, head: 0xdfc09c, hair: 0x3f3630, npcTexture: 'ohmdal-npc-secondary', npcRow: 3 }],
+  [/^consejera/, { body: 0x5b4a75, head: 0xe0c2a0, hair: 0x2f2a3a, npcRow: 2, scale: 1.4 }],
+  [/^guardiana/, { body: 0x58755f, head: 0xd9b894, hair: 0x4a3a2e, npcTexture: 'ohmdal-npc-secondary', npcRow: 0, scale: 1.4 }],
+  [/^forjadora/, { body: 0xa8562e, head: 0xdfb48c, hair: 0x3a2620, npcRow: 3, scale: 1.4 }],
+  [/^farero/, { body: 0x496978, head: 0xd9b894, hair: 0x9aa4ac, lantern: 0x9adcff, npcTexture: 'ohmdal-npc-secondary', npcRow: 1, scale: 1.4 }],
+  [/^preceptor/, { body: 0x55505e, head: 0xe3c39b, hair: 0x8d8496, npcTexture: 'ohmdal-npc-secondary', npcRow: 2, scale: 1.4 }],
+  [/^ciudadano-nino/, { body: 0x7a6a50, head: 0xeccaa5, hair: 0x4a3a2e, scale: 1.1, npcTexture: 'ohmdal-npc-secondary', npcRow: 4 }],
+  [/^ciudadano/, { body: 0x6b5d4f, head: 0xdfc09c, hair: 0x3f3630, npcTexture: 'ohmdal-npc-secondary', npcRow: 3, scale: 1.4 }],
 ];
 
 export function charLookFor(id: string): CharLook | null {

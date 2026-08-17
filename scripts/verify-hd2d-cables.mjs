@@ -193,6 +193,46 @@ try {
   ok("repair path: cable_c_camino_to_fountain closed (gap hidden, material swapped)");
   ok(`broken cables remaining: ${afterRepair.cablesBroken.join(", ")}`);
 
+  // --- Repair agent regressions: Bitácora (J/Tab) + readable prompt ---
+  // These verify the reported MAJOR findings with native keyboard input
+  // (no state writes): J and Tab must toggle the Bitácora panel, and the
+  // interaction prompt must be readable (>=14px, single [E] via CSS ::before).
+  const promptLegible = await page.evaluate(() => {
+    const el = document.getElementById("hud-prompt");
+    const rect = el.getBoundingClientRect();
+    return {
+      fontSize: parseFloat(getComputedStyle(el).fontSize),
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+    };
+  });
+  if (promptLegible.fontSize < 14) {
+    fail(`interaction prompt too small to read: ${promptLegible.fontSize}px`);
+  }
+  ok(`interaction prompt is readable (${promptLegible.fontSize}px, ${promptLegible.width}x${promptLegible.height})`);
+
+  await page.keyboard.press("KeyJ");
+  await page.waitForTimeout(300);
+  const bitacoraAfterJ = await page.evaluate(() => {
+    const b = document.getElementById("bitacora");
+    const r = b.getBoundingClientRect();
+    return { hidden: b.hidden, visible: getComputedStyle(b).display !== "none", w: Math.round(r.width) };
+  });
+  if (bitacoraAfterJ.hidden || !bitacoraAfterJ.visible || bitacoraAfterJ.w < 200) {
+    fail(`J did not open the Bitácora panel: ${JSON.stringify(bitacoraAfterJ)}`);
+  }
+  ok("J opens the Bitácora panel (native input)");
+  await page.keyboard.press("Tab");
+  await page.waitForTimeout(300);
+  const bitacoraAfterTab = await page.evaluate(() => {
+    const b = document.getElementById("bitacora");
+    return { hidden: b.hidden, display: getComputedStyle(b).display };
+  });
+  if (!bitacoraAfterTab.hidden) {
+    fail("Tab did not close the Bitácora panel");
+  }
+  ok("Tab closes the Bitácora panel (native input)");
+
   await page.screenshot({ path: "dist/verify-cables-2.png", fullPage: false });
   ok("screenshot saved: dist/verify-cables-2.png");
 

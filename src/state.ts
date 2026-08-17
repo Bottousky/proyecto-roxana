@@ -96,6 +96,8 @@ export interface Flags {
   plazaObservedComplete: boolean;
   /** The diegetic Ohm bench was opened in-world at least once (H3 of the ROADMAP). */
   ohmBenchOpenedInWorld: boolean;
+  /** The awakening WOW moment already played for this player. */
+  ohmAwakeEverSeen: boolean;
 }
 
 const DEFAULT_FLAGS: Flags = {
@@ -180,6 +182,7 @@ const DEFAULT_FLAGS: Flags = {
   // VS defaults
   plazaObservedComplete: false,
   ohmBenchOpenedInWorld: false,
+  ohmAwakeEverSeen: false,
 };
 
 export interface GameState {

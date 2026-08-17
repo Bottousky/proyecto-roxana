@@ -43,43 +43,50 @@ export const ORTHOGRAPHIC_MATCH_HALF_ANGLE_DEGREES = 14;
 export const CAMERA_ZOOM_MIN = 0.9;
 export const CAMERA_ZOOM_MAX = 1.1;
 
+// **Volúmenes de transición 2D (red con hub central).** La cámara cambia de ancla cuando
+// el jugador cruza uno de estos umbrales. La Plaza es el hub: tiene cuatro bocas
+// (N, S, E, O); el resto del arco se extiende desde ellas. Los thresholds son rectas
+// (no círculos) porque las zonas son rectangulares y la cámara sigue el eje del socket.
 export const CAMERA_TRANSITION_VOLUMES = Object.freeze({
-  tallerThreshold: {
+  // Plaza → Taller (este): x = 9 (el socket Plaza-Taller)
+  plazaToTaller: {
     id: 'VOLUME_C1_TO_C2',
     crossingX: routeAnchor('R3_TALLER_THRESHOLD').position.x,
     hysteresisMeters: 0.75,
     durationSeconds: 0.90,
   },
-  doorApproach: {
+  // Taller → Puerta+Manantial (este, dentro del corredor U1): x = 22.5
+  tallerToDoor: {
     id: 'VOLUME_C2_TO_C3',
-    crossingX: routeAnchor('R7_DOOR_APPROACH').position.x,
+    crossingX: routeAnchor('R5_DOOR_APPROACH').position.x,
     hysteresisMeters: 0.75,
     durationSeconds: 1.10,
   },
-  // Los volúmenes C3→C4..C7 están en x = 22, 52, 82 y 118: los puntos medios de los
-  // pasillos entre unidades. La histéresis es más generosa (1.5 m) porque el mundo se
-  // extiende a 152 m y la cámara tiende a oscilar si se afina demasiado.
-  castleApproach: {
-    id: 'VOLUME_C3_TO_C4',
-    crossingX: 22,
+  // Plaza → Castillo (norte): z = -7 (el socket Plaza-Castillo)
+  plazaToCastle: {
+    id: 'VOLUME_PLAZA_TO_C4',
+    crossingZ: routeAnchor('R8_CASTLE_APPROACH').position.z,
     hysteresisMeters: 1.5,
     durationSeconds: 1.10,
   },
-  forgeApproach: {
-    id: 'VOLUME_C4_TO_C5',
-    crossingX: 52,
+  // Plaza → Forja (oeste): x = -9 (el socket Plaza-Forja)
+  plazaToForge: {
+    id: 'VOLUME_PLAZA_TO_C5',
+    crossingX: routeAnchor('R14_FORGE_APPROACH').position.x,
     hysteresisMeters: 1.5,
     durationSeconds: 1.10,
   },
-  terracesApproach: {
-    id: 'VOLUME_C5_TO_C6',
-    crossingX: 82,
+  // Plaza → Terrazas (sur): z = 7 (el socket Plaza-Terrazas)
+  plazaToTerraces: {
+    id: 'VOLUME_PLAZA_TO_C6',
+    crossingZ: routeAnchor('R19_TERRACES_APPROACH').position.z,
     hysteresisMeters: 1.5,
     durationSeconds: 1.10,
   },
-  lighthouseApproach: {
+  // Terrazas → Faro (sureste): z = 18 (alineado con el socket en x = 22)
+  terracesToFaro: {
     id: 'VOLUME_C6_TO_C7',
-    crossingX: 118,
+    crossingX: routeAnchor('R24_FARO_APPROACH').position.x,
     hysteresisMeters: 1.5,
     durationSeconds: 1.10,
   },
@@ -126,6 +133,34 @@ export function viewOffsetFromComponents(components: ViewOffsetComponents): THRE
 
 export const CAMERA_VIEW_OFFSET = viewOffsetFromComponents(VIEW_OFFSET_COMPONENTS);
 
+/**
+ * Devuelve el vector de offset world para un anchor: la cámara se coloca a `distance`
+ * del focus siguiendo este vector, así que la cámara queda "detrás y arriba" del focus
+ * en el frame del anchor. `right` siempre vale 0 — la cámara HD-2D es frontal, no lateral.
+ *
+ * El cálculo es: `(-backward * forward + up * world_up)` normalizado. Para anchors con
+ * `forward = CAMERA_FORWARD (+x)`, el resultado coincide con `viewOffsetFromComponents`
+ * porque `CAMERA_RIGHT = cross(forward, up) = (0, 0, 1)`. Para anchors con otra
+ * `forward` (Norte, Sur, Oeste, diagonal), el resultado rota con el frame.
+ */
+export function viewOffsetForAnchor(
+  anchor: Pick<AuthorCameraAnchor, 'forward'>,
+  pitchDegrees: number = CAMERA_PITCH_DEGREES,
+): THREE.Vector3 {
+  const pitchRad = (pitchDegrees * Math.PI) / 180;
+  const backward = -Math.cos(pitchRad);
+  const up = Math.sin(pitchRad);
+  return anchor.forward.clone()
+    .multiplyScalar(backward)
+    .addScaledVector(CAMERA_UP, up)
+    .normalize();
+}
+
+/** Eje "right" del frame de un anchor: perpendicular a forward y a world_up. */
+export function rightVecForAnchor(anchor: Pick<AuthorCameraAnchor, 'forward'>): THREE.Vector3 {
+  return new THREE.Vector3().crossVectors(anchor.forward, CAMERA_UP).normalize();
+}
+
 // C3 abre un poco el angulo para que la Puerta no tape el Manantial que hay detras. Sigue
 // siendo frontal —`right` en 0— porque romper la simetria en una sola camara se lee como un
 // error de montaje al cruzar el umbral, no como intencion. 38° está por debajo del default
@@ -154,6 +189,7 @@ function lerpRoute(from: Parameters<typeof routeAnchor>[0], to: Parameters<typeo
 }
 
 export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>> = {
+  // C1: Portal + Plaza (origen del mundo). Foco en el spawn, mira hacia el pedestal.
   C1_PORTAL_PLAZA: {
     id: 'C1_PORTAL_PLAZA',
     focus: lerpRoute('R0_PORTAL_SPAWN', 'R1_PLAZA_ENTRY', 0.58).add(new THREE.Vector3(0, 0.95, 0)),
@@ -166,6 +202,7 @@ export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>
     protectedSubjects: ['player-feet', 'player-head', 'portal-landmark'],
     verticalSpan: { desktop: 13.5, mobile: 20 },
   },
+  // C2: Taller (este de la Plaza, x = 9..22.5). Foco sobre el banco de Lumen.
   C2_TALLER: {
     id: 'C2_TALLER',
     focus: point('R3_TALLER_THRESHOLD').addScaledVector(CAMERA_FORWARD, 3).add(new THREE.Vector3(0, 1.10, 0)),
@@ -178,9 +215,11 @@ export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>
     protectedSubjects: ['player-feet', 'player-head', 'lumen-head', 'ohm-head', 'taller-measure', 'taller-response'],
     verticalSpan: { desktop: 9, mobile: 14.5 },
   },
+  // C3: Puerta + Manantial (este, x = 22.5..38.5). Casi ortográfica: ver la fuente
+  // detrás del muro. Foco en R5 (el socket Taller→Puerta) + offset hacia la pileta.
   C3_DOOR_SPRING: {
     id: 'C3_DOOR_SPRING',
-    focus: lerpRoute('R8_DOOR_MEASURE', 'R9_SPRING_EDGE', 0.45).add(new THREE.Vector3(0, 1, 0)),
+    focus: lerpRoute('R5_DOOR_APPROACH', 'R7_SPRING_EDGE', 0.45).add(new THREE.Vector3(0, 1, 0)),
     forward: CAMERA_FORWARD,
     quasiOrthographicViewOffset: C3_QUASI_ORTHOGRAPHIC_VIEW_OFFSET,
     targetBounds: {
@@ -191,14 +230,12 @@ export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>
     protectedSubjects: ['player-feet', 'player-head', 'ohm-head', 'door-measure', 'spring-consequence'],
     verticalSpan: { desktop: 12, mobile: 18 },
   },
-  // Anclas del resto del arco. Mismo offset y misma ortogonalidad que C3; lo único que
-  // cambia es el foco en x, que sigue al centro de cada unidad. La altura de foco sube
-  // en las Terrazas porque la unidad trepa 4.5 m y el objetivo de cámara tiene que
-  // quedar a la altura del jugador cuando está en la parte alta.
+  // C4: Castillo (NORTE de la Plaza, z = -25..-7). Foco en la galería, mira hacia el
+  // corazón. El forward real (N) lo da `R8_CASTLE_APPROACH → R13_CASTLE_HEART`.
   C4_CASTLE: {
     id: 'C4_CASTLE',
-    focus: new THREE.Vector3(37, 1, 0),
-    forward: CAMERA_FORWARD,
+    focus: new THREE.Vector3(0, 1, -16),
+    forward: new THREE.Vector3(0, 0, -1),
     targetBounds: {
       right: { min: -3, max: 3 },
       forward: { min: -3, max: 3 },
@@ -207,10 +244,11 @@ export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>
     protectedSubjects: ['player-feet', 'player-head'],
     verticalSpan: { desktop: 13, mobile: 19 },
   },
+  // C5: Forja (OESTE de la Plaza, x = -45..-9). Foco en la nave. Forward real (O).
   C5_FORGE: {
     id: 'C5_FORGE',
-    focus: new THREE.Vector3(67, 1, 0),
-    forward: CAMERA_FORWARD,
+    focus: new THREE.Vector3(-25, 1, 0),
+    forward: new THREE.Vector3(-1, 0, 0),
     targetBounds: {
       right: { min: -3, max: 3 },
       forward: { min: -3, max: 3 },
@@ -219,10 +257,12 @@ export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>
     protectedSubjects: ['player-feet', 'player-head'],
     verticalSpan: { desktop: 13, mobile: 19 },
   },
+  // C6: Terrazas (SUR de la Plaza, z = 7..37). La unidad trepa 4.5 m hacia el sur; el
+  // foco se queda a la altura del suelo del patio bajo y la cámara sube al encuadrar.
   C6_TERRACES: {
     id: 'C6_TERRACES',
-    focus: new THREE.Vector3(100, 2.5, 0),
-    forward: CAMERA_FORWARD,
+    focus: new THREE.Vector3(0, 1, 20),
+    forward: new THREE.Vector3(0, 0, 1),
     targetBounds: {
       right: { min: -3, max: 3 },
       forward: { min: -3, max: 3 },
@@ -231,10 +271,12 @@ export const CAMERA_ANCHORS: Readonly<Record<CameraAnchorId, AuthorCameraAnchor>
     protectedSubjects: ['player-feet', 'player-head'],
     verticalSpan: { desktop: 14, mobile: 20 },
   },
+  // C7: Faro (SURESTE, x = 21..56, z = 14..22). Forward mixto: la línea Terrazas→Faro
+  // va por +x, no por +z. Lo derivamos del socket `R24_FARO_APPROACH → R28_FARO_LANTERN`.
   C7_LIGHTHOUSE: {
     id: 'C7_LIGHTHOUSE',
-    focus: new THREE.Vector3(136, 1.5, 0),
-    forward: CAMERA_FORWARD,
+    focus: point('R25_FARO_HALL'),
+    forward: point('R28_FARO_LANTERN').sub(point('R24_FARO_APPROACH')).normalize(),
     targetBounds: {
       right: { min: -3, max: 3 },
       forward: { min: -3, max: 3 },
@@ -307,7 +349,7 @@ export function deadZoneExcess(value: number, halfExtent: number): number {
 
 export function clampTargetToAnchor(target: Readonly<THREE.Vector3>, anchor: AuthorCameraAnchor): THREE.Vector3 {
   const relative = new THREE.Vector3().subVectors(target, anchor.focus);
-  const right = CAMERA_RIGHT;
+  const right = rightVecForAnchor(anchor);
   const forward = anchor.forward;
   const rightAmount = THREE.MathUtils.clamp(relative.dot(right), anchor.targetBounds.right.min, anchor.targetBounds.right.max);
   const forwardAmount = THREE.MathUtils.clamp(relative.dot(forward), anchor.targetBounds.forward.min, anchor.targetBounds.forward.max);

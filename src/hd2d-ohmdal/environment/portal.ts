@@ -208,18 +208,12 @@ export function buildPortal(
     group.add(rail);
   }
 
-  // ---------- Background hint: a low hill behind the Portal ----------
-  const hill = new THREE.Mesh(
-    new THREE.PlaneGeometry(30, 10),
-    new THREE.MeshBasicMaterial({
-      color: 0x2a3a52,
-      transparent: true,
-      opacity: 0.95,
-      depthWrite: false,
-    }),
-  );
-  hill.position.set(0, 4, -16);
-  group.add(hill);
+  // NOTE: the "low hill behind the Portal" backdrop was removed. It was
+  // placed at world z=-4 (inside the Plaza footprint), so with the camera
+  // rig (always south of the player, looking north) it rendered as a large
+  // translucent blue slab covering the Plaza, the player and the electrical
+  // network. Distant scenery is already provided by the horizon band
+  // (terrain.ts) and the landmark silhouettes (landmarks.ts).
 
   scene.add(group);
   return { group, core, coreLight, lamps };

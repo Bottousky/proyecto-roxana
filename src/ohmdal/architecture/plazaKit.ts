@@ -116,20 +116,105 @@ function paverFloor(): THREE.BufferGeometry {
  * La Plaza es un espacio público, no una habitación. Estos pretiles a 1.2 m de altura
  * dejan ver el Taller al este, el Manantial más allá y el cielo arriba, y al mismo
  * tiempo definen el límite de la Plaza como lugar.
+ *
+ * Variante `axis = 'x'` recorre el lado largo (norte y sur); variante `axis = 'z'`
+ * recorre los costados este y oeste. Cada cuatro tramos un banquito bajo de piedra
+ * explica la escala humana y rompe la línea continua.
  */
-function perimeterWall(z: number): THREE.BufferGeometry[] {
+function perimeterWall(axis: 'x' | 'z', constant: number): THREE.BufferGeometry[] {
   const pieces: THREE.BufferGeometry[] = [];
   const paintFn = stonePaint(1.3);
-  for (let x = PLAZA_BOUNDS.minX; x < PLAZA_BOUNDS.maxX - 0.5; x += 2) {
-    const span = Math.min(2, PLAZA_BOUNDS.maxX - x);
-    const height = 1.2 + noise(x, z) * 0.12;
-    pieces.push(block(span - 0.08, height, 0.55, x + span / 2, 0, z, paintFn));
-    // Cada cuatro tramos, un banquito de Plaza: explica la escala humana y rompe la línea.
-    if (Math.round(x) % 4 === 0) {
-      pieces.push(block(0.5, 0.5, 0.4, x, 0, z, paintFn));
+  const range = axis === 'x'
+    ? { from: PLAZA_BOUNDS.minX, to: PLAZA_BOUNDS.maxX, size: 'width' as const }
+    : { from: PLAZA_BOUNDS.minZ, to: PLAZA_BOUNDS.maxZ, size: 'depth' as const };
+  for (let step = range.from; step < range.to - 0.5; step += 2) {
+    const span = Math.min(2, range.to - step);
+    const height = 1.2 + noise(step, constant) * 0.12;
+    if (axis === 'x') {
+      pieces.push(block(span - 0.08, height, 0.55, step + span / 2, 0, constant, paintFn));
+      if (Math.round(step) % 4 === 0) {
+        pieces.push(block(0.5, 0.5, 0.4, step, 0, constant, paintFn));
+      }
+    } else {
+      pieces.push(block(0.55, height, span - 0.08, constant, 0, step + span / 2, paintFn));
+      if (Math.round(step) % 4 === 0) {
+        pieces.push(block(0.4, 0.5, 0.5, constant, 0, step, paintFn));
+      }
     }
   }
   return pieces;
+}
+
+/**
+ * Banca de piedra para la Plaza. Asiento a 0.45 m, patas a 0.45 m de alto y respaldo bajo
+ * de 0.85 m — escala humana, no trono. Se posiciona donde hay un hueco entre pretiles para
+ * que el jugador pueda sentarse y el sol pegue en el respaldo.
+ */
+function stoneBench(x: number, z: number, rotationY: number): THREE.BufferGeometry[] {
+  const paintFn = stonePaint(0.85, 0.08);
+  const pieces: THREE.BufferGeometry[] = [];
+  // Asiento: una losa larga y angosta.
+  pieces.push(block(1.8, 0.08, 0.45, x, 0.45, z, paintFn));
+  // Patas: dos bloques a los extremos, lo bastante anchos para que se vean desde el aire.
+  pieces.push(block(0.15, 0.45, 0.45, x - 0.825, 0, z, paintFn));
+  pieces.push(block(0.15, 0.45, 0.45, x + 0.825, 0, z, paintFn));
+  // Respaldo bajo.
+  pieces.push(block(1.8, 0.4, 0.08, x, 0.85, z - 0.18, paintFn));
+  // Rotar el conjunto alrededor de su propio pivote en Y.
+  if (rotationY !== 0) {
+    for (const piece of pieces) piece.rotateY(rotationY);
+  }
+  return pieces;
+}
+
+/**
+ * Plantador de piedra con un arbusto encima. Maceta cúbica de 0.7 m y copa cónica
+ * pequeña arriba. Se ve como los tiestos del PQ3 HD-2D que enmarcan los edificios.
+ */
+function stonePlanter(x: number, z: number): THREE.BufferGeometry[] {
+  const paintFn = stonePaint(0.7, 0.06);
+  const bushPaint = stonePaint(1.2, 0.1);
+  const pieces: THREE.BufferGeometry[] = [];
+  // Maceta: cubo de 0.7 m.
+  pieces.push(block(0.7, 0.7, 0.7, x, 0, z, paintFn));
+  // Borde superior, un escalón más angosto.
+  pieces.push(block(0.78, 0.06, 0.78, x, 0.7, z, paintFn));
+  // Arbusto: tres cajas apiladas de tamaño decreciente.
+  pieces.push(block(0.6, 0.5, 0.6, x, 0.76, z, bushPaint));
+  pieces.push(block(0.42, 0.4, 0.42, x, 1.26, z, bushPaint));
+  pieces.push(block(0.22, 0.3, 0.22, x, 1.66, z, bushPaint));
+  return pieces;
+}
+
+/**
+ * Poste de piedra decorativo, sin luz. Un fuste cuadrado de 1.6 m y un capitel
+ * más ancho arriba. Es lo que el remake usa para señalar cruces de camino;
+ * acá da escala sin sumar point lights (la Plaza no tiene red eléctrica todavía).
+ */
+function stonePost(x: number, z: number): THREE.BufferGeometry[] {
+  const paintFn = stonePaint(1.6, 0.05);
+  const pieces: THREE.BufferGeometry[] = [];
+  pieces.push(block(0.22, 1.6, 0.22, x, 0, z, paintFn));
+  pieces.push(block(0.42, 0.18, 0.42, x, 1.6, z, paintFn));
+  pieces.push(block(0.32, 0.32, 0.32, x, 1.78, z, paintFn));
+  return pieces;
+}
+
+/**
+ * Fuente de agua pequeña — un pilón circular bajo con un borde elevado. El agua es un
+ * disco de cobre ligeramente más oscuro; sin animación porque el slice todavía no enciende
+ * la red de Ohmdal. Lee como "lugar donde se reúne la gente", que es lo que necesita una
+ * plaza para no ser solo empedrado.
+ */
+function stoneBasin(x: number, z: number): { stone: THREE.BufferGeometry[]; copper: THREE.BufferGeometry[] } {
+  const stonePaintFn = stonePaint(0.4, 0.06);
+  const copperPaintFn = stonePaint(0.08, 0.05);
+  return {
+    // Borde elevado del pilón, octogonal para que el flat shading marque aristas.
+    stone: [drum(1.1, 1.15, 0.4, x, 0, z, 8, stonePaintFn)],
+    // Agua: disco más oscuro, apenas debajo del borde.
+    copper: [drum(0.95, 0.95, 0.05, x, 0.3, z, 8, copperPaintFn)],
+  };
 }
 
 /**
@@ -240,10 +325,12 @@ export interface PlazaKit {
 /**
  * Posiciones de los árboles de la Plaza. Cada triplete es (x, z, escala).
  *
- * Repartidos por el borde de la huella, no por el centro: cuatro en las esquinas y dos
- * flanqueando el monumento de la campana. La diagonal central queda libre, que es por
- * donde entra y sale el recorrido. Escalas 0.85–1.0 para que ninguno tape la silueta del
- * Portal desde R0 ni compita con el dintel de cobre.
+ * Repartidos por todo el borde de la huella, no solo en las esquinas: cuatro en las
+ * esquinas, cuatro a media cuadra flanqueando el eje central, y tres más retrasados
+ * hacia el Taller para que el fondo del encuadre no quede vacío cuando la cámara mira
+ * al este. La diagonal central queda libre, que es por donde entra y sale el recorrido.
+ * Escalas 0.85–1.05 para que ninguno tape la silueta del Portal desde R0 ni compita
+ * con el dintel de cobre.
  */
 const TREE_POSITIONS: ReadonlyArray<readonly [number, number, number]> = [
   [-19, -5.5, 1.0],
@@ -252,6 +339,45 @@ const TREE_POSITIONS: ReadonlyArray<readonly [number, number, number]> = [
   [-7, -5.8, 0.85],
   [-5.5, -5.5, 1.0],
   [-5.5, 5.5, 1.0],
+  [-15, -6.2, 0.95],
+  [-15, 6.2, 0.95],
+  [-12, 6.0, 0.85],
+  [-12, -6.0, 0.85],
+  [-9, 6.3, 0.9],
+  [-9, -6.3, 0.9],
+];
+
+/**
+ * Bancas de piedra. Asientos de 1.8 m orientados a lo ancho de la Plaza, mirando hacia
+ * el centro. Tres al norte, dos al sur, una al este — la del oeste queda libre para no
+ * tapar la línea visual desde el Portal.
+ */
+const BENCH_LAYOUT: ReadonlyArray<readonly [number, number, number]> = [
+  [-17.5, -5.5, 0],
+  [-11.5, -5.5, 0],
+  [-7.5, -5.5, 0],
+  [-11.5, 5.5, Math.PI],
+  [-7.5, 5.5, Math.PI],
+  [-4.6, 0, Math.PI / 2],
+];
+
+/**
+ * Plantadores con arbustos. Anclan el centro de cada lado y dan color verde entre el
+ * cobre y la piedra. Esquinas opuestas para que el ojo tenga cuatro puntos de interés.
+ */
+const PLANTER_LAYOUT: ReadonlyArray<readonly [number, number]> = [
+  [-13.5, -5.0],
+  [-9, 5.0],
+  [-5.5, -2.0],
+];
+
+/**
+ * Postes de piedra decorativos, sin luz. Marcan los cruces del camino principal con el
+ * eje central y dan escala cuando la cámara panea hacia el este.
+ */
+const POST_LAYOUT: ReadonlyArray<readonly [number, number]> = [
+  [-16, 0],
+  [-7, 0],
 ];
 
 const FLOOR_COLORS: Readonly<Record<BlockoutTimeOfDay, number>> = {
@@ -278,6 +404,11 @@ export function createPlazaKit(): PlazaKit {
 
   const gate = portalGate();
   const monument = bellMonument();
+  // La fuente se acomoda al sur del monumento de la campana, a suficiente distancia
+  // para no chocar con el basamento (z=±2.8) y dar espacio para caminar entre ambos.
+  // Completa la triada portal-pedestal-fuente que es la composición típica de una
+  // plaza de pueblo.
+  const basin = stoneBasin(-9.0, -4.6);
 
   // El piso va aparte de las estructuras, y no por orden: un piso **recibe** sombra pero no la
   // proyecta. Fusionado con los muros heredaba su `castShadow` y cada losa se sombreaba a sí
@@ -286,16 +417,25 @@ export function createPlazaKit(): PlazaKit {
   const floorGeometry = paverFloor();
 
   const stonePieces = [
-    ...perimeterWall(PLAZA_BOUNDS.minZ + 0.2),
-    ...perimeterWall(PLAZA_BOUNDS.maxZ - 0.2),
+    // Pretiles perimetrales en los cuatro lados: norte, sur, este, oeste. Antes había solo
+    // norte y sur — la Plaza se leía como una calle flanqueada, no como un lugar cerrado.
+    ...perimeterWall('x', PLAZA_BOUNDS.minZ + 0.2),
+    ...perimeterWall('x', PLAZA_BOUNDS.maxZ - 0.2),
+    ...perimeterWall('z', PLAZA_BOUNDS.minX + 0.2),
+    ...perimeterWall('z', PLAZA_BOUNDS.maxX - 0.2),
     ...gate.stone,
     ...monument.stone,
     ...pedestalSteps(),
-    // Los árboles se funden en la misma malla de piedra que los pretiles: el presupuesto
-    // de dibujo es 3 mallas (piso / piedra / cobre) y no se reabre por sumar follaje.
+    ...basin.stone,
+    // Los árboles, bancas, plantadores y postes se funden en la misma malla de piedra que
+    // los pretiles: el presupuesto de dibujo sigue siendo 3 mallas (piso / piedra / cobre)
+    // y no se reabre por sumar follaje, asientos o arbustos.
     ...TREE_POSITIONS.flatMap(([x, z, s]) => plazaTree(x, z, s)),
+    ...BENCH_LAYOUT.flatMap(([x, z, ry]) => stoneBench(x, z, ry)),
+    ...PLANTER_LAYOUT.flatMap(([x, z]) => stonePlanter(x, z)),
+    ...POST_LAYOUT.flatMap(([x, z]) => stonePost(x, z)),
   ];
-  const copperPieces = [...gate.copper, ...monument.copper];
+  const copperPieces = [...gate.copper, ...monument.copper, ...basin.copper];
 
   const stoneGeometry = mergeGeometries(stonePieces, false)!;
   const copperGeometry = mergeGeometries(copperPieces, false)!;

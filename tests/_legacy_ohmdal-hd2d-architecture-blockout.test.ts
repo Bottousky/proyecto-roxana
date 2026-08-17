@@ -4,7 +4,6 @@ import {
   disposeRendererCaches,
   readRendererInfo,
 } from '../src/ohmdal/architecture/blockout.ts';
-import { CameraOcclusionController } from '../src/ohmdal/camera/occlusion.ts';
 
 function assert(condition: boolean, message: string): void {
   if (!condition) throw new Error(message);
@@ -30,47 +29,39 @@ const mannequinBounds = new THREE.Box3().setFromObject(blockout.mannequin);
 close(mannequinBounds.max.y - mannequinBounds.min.y, 1.72, 0.000001, 'la geometria del maniqui mide 1,72 m');
 
 const before = blockout.diagnostics();
-// La Plaza dejo de ser modulos de prueba: la construye `plazaKit` y entra a la capa visual
-// como un solo nodo con sus mallas fusionadas. Los modulos sueltos que quedan son los del
-// Taller y los de la Puerta, que siguen en blockout.
+// Las 7 unidades (Plaza, Taller, Puerta, Castillo, Forja, Terrazas, Faro) entran a la
+// capa visual cada una como un nodo con el nombre canónico `*_KIT`. La Plaza, el Taller
+// y la Puerta ya no son kits a mano: las sirve `createBasicUnitKit` en modo `'greybox'`.
 const plazaKitRoot = blockout.visualLayer.getObjectByName('PLAZA_KIT');
-assert(plazaKitRoot !== undefined, 'la Plaza entra a la capa visual como kit construido');
+assert(plazaKitRoot !== undefined, 'la Plaza entra a la capa visual como kit greybox');
 assert(
   plazaKitRoot!.children.some((child) => child.name === 'plaza_floor'),
-  'el kit trae su piso empedrado',
+  'el greybox de la Plaza trae su piso plano',
 );
-assert(
-  !blockout.visualLayer.children.some((child) => child.name === 'portal-floor'),
-  'los modulos de prueba de la Plaza ya no se dibujan',
-);
-// El Taller siguio a la Plaza: lo construye `tallerKit` y entra como un solo nodo. De sus
-// modulos de prueba sobrevive el emisor de la linterna, que es lo que el rig de luz busca por
-// nombre.
 const tallerKitRoot = blockout.visualLayer.getObjectByName('TALLER_KIT');
-assert(tallerKitRoot !== undefined, 'el Taller entra a la capa visual como kit construido');
+assert(tallerKitRoot !== undefined, 'el Taller entra a la capa visual como kit greybox');
 assert(
   tallerKitRoot!.children.some((child) => child.name === 'taller_floor'),
-  'el kit del Taller trae su piso de tablas',
+  'el greybox del Taller trae su piso plano',
 );
+const puertaKitRoot = blockout.visualLayer.getObjectByName('PUERTA_KIT');
+assert(puertaKitRoot !== undefined, 'la Puerta entra a la capa visual como kit greybox');
+assert(
+  puertaKitRoot!.children.some((child) => child.name === 'puerta_floor'),
+  'el greybox de la Puerta trae su piso plano',
+);
+// Los dos emisores del Taller y la Puerta sobreviven porque están en `BOX_MODULES`, no
+// dentro de los kits. El rig de luz los busca por nombre.
 assert(
   blockout.visualLayer.children.some((child) => child.name === 'workshop-lantern-emitter'),
   'el emisor de la linterna sobrevive: el rig de luz lo busca por nombre',
-);
-// La Puerta siguio al Taller: la construye `puertaKit` y entra como un solo nodo, con las dos
-// jambas y las hojas como hijos propios. El unico modulo suelto que queda es el emisor del
-// conducto, que es lo que el rig de luz busca por nombre.
-const puertaKitRoot = blockout.visualLayer.getObjectByName('PUERTA_KIT');
-assert(puertaKitRoot !== undefined, 'la Puerta entra a la capa visual como kit construido');
-assert(
-  puertaKitRoot!.children.some((child) => child.name === 'puerta_mass'),
-  'el kit de la Puerta trae su masa de piedra fusionada',
 );
 assert(
   blockout.visualLayer.children.some((child) => child.name === 'door-conduit-emitter'),
   'el emisor del conducto sobrevive: el rig de luz lo busca por nombre',
 );
-assert(before.visualMeshCount === 9, 'siete kits construidos (3 del slice + 4 del arco) mas los dos emisores');
-assert(before.colliderMeshCount === 36, 'colliders primitivos: 12 del slice + 24 de los perimetros del arco');
+assert(before.visualMeshCount === 10, 'siete kits + dos emisores + grupo de arcos de socket (6 arcos)');
+assert(before.colliderMeshCount === 53, 'colliders primitivos: 29 del slice (12 anteriores + 17 perimetrales de U1) + 24 de los perimetros del arco');
 assert(before.navigationMeshCount === 7, 'cada zona del arco tiene region de navegacion plana');
 assert(before.geometryCount < before.visualMeshCount + before.colliderMeshCount + 10, 'geometrias repetidas se comparten');
 assert(before.material.textureCount === 0, 'el blockout no introduce texturas');
@@ -78,32 +69,13 @@ assert(before.lighting.lightCount === 4, 'la luz global y local tiene inventario
 assert(before.lighting.shadowLightCount === 1, 'solo la luz principal proyecta sombra');
 assert(before.lighting.enabledLocalLightCount === 2, 'ambos emisores locales nacen habilitados');
 assert(blockout.lighting.inventory.filter((entry) => entry.type === 'point').every((entry) => entry.emitterId !== 'WORLD'), 'cada luz local tiene emisor visible');
+// Las 3 unidades de U1 (Plaza, Taller, Puerta) son greybox puro: no hay oclusores
+// fundidos con sus kits. La oclusión de los kits full desapareció con ellos. Los
+// emisores del Taller y la Puerta siguen existiendo como `BOX_MODULES`, pero no
+// exponen bindings de oclusión (sus tags son solo `emitter`, no `cameraOccluder`).
 const occlusionBindingIds = blockout.occlusionBindings.map((binding) => binding.id).sort();
-assert(occlusionBindingIds.length === 5, 'vano, dos faldones y jambas de Puerta exponen bindings propios');
-assert(occlusionBindingIds.includes('taller-roof-north'), 'el faldon norte del Taller se desvanece');
-assert(occlusionBindingIds.includes('taller-roof-south'), 'el faldon sur del Taller se desvanece');
-assert(
-  occlusionBindingIds.includes('taller-doorway'),
-  'el vano del Taller es el oclusor de primer plano que verifica GF-05',
-);
-assert(occlusionBindingIds.includes('puerta-jamb-north'), 'la jamba norte de Puerta participa del fade');
-assert(occlusionBindingIds.includes('puerta-jamb-south'), 'la jamba sur que ocultaba al estudiante participa del fade');
-assert(!occlusionBindingIds.includes('puerta_mass'), 'el landmark dominante de la Puerta nunca se oculta');
-const doorLandmark = puertaKitRoot!.children.find((child) => child.name === 'puerta_mass');
-assert(doorLandmark?.visible === true, 'el landmark de Puerta permanece visible');
+assert(occlusionBindingIds.length === 0, 'las unidades greybox no aportan oclusores; los kits full se fueron');
 
-const doorSouthBinding = blockout.occlusionBindings.find((binding) => binding.id === 'puerta-jamb-south');
-assert(doorSouthBinding !== undefined, 'el binding de la jamba sur es resoluble por ID estable');
-const doorSouthMaterial = (doorSouthBinding.object as THREE.Mesh).material as THREE.Material & { opacity: number };
-const doorOcclusion = new CameraOcclusionController([doorSouthBinding]);
-doorOcclusion.update(new Set(['puerta-jamb-south']), 1 / 60, true);
-assert(doorSouthMaterial.opacity === 1, 'un frame bloqueado no altera el pilar');
-doorOcclusion.update(new Set(['puerta-jamb-south']), 1 / 60, true);
-assert(doorSouthMaterial.opacity === 0.18 && doorSouthBinding.object.visible, 'el pilar hace fade sin desaparecer por completo');
-for (let index = 0; index < 6; index += 1) doorOcclusion.update(new Set(), 1 / 60, true);
-assert(doorSouthMaterial.opacity === 1 && doorSouthBinding.object.visible, 'el pilar recupera opacidad tras seis frames libres');
-assert(doorLandmark?.visible === true, 'la recuperacion del pilar no modifica el landmark');
-doorOcclusion.dispose();
 const workshopEmitter = blockout.visualLayer.getObjectByName('workshop-lantern-emitter');
 assert(workshopEmitter !== undefined, 'el emisor visible del Taller existe');
 workshopEmitter.visible = false;
@@ -115,6 +87,11 @@ blockout.lighting.syncEmitterState();
 const afternoonColor = blockout.materials.shared.stone.color.getHex();
 blockout.setTimeOfDay('twilight');
 assert(blockout.materials.shared.stone.color.getHex() !== afternoonColor, 'el pase crepusculo es determinista y de blockout');
+
+// Los métodos del puzzle de la Puerta son no-ops ahora que la Puerta es greybox, pero el
+// contrato público se conserva: el mundo no tiene que ramificar.
+blockout.setDoorOpening(1);
+blockout.setSpringWaterState('estable');
 
 let rendererCacheDisposals = 0;
 const renderer = {

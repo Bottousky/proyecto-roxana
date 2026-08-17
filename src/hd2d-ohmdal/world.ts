@@ -458,7 +458,7 @@ export function createWorld(scene: THREE.Scene): World {
       }
     }
     if (nearestCable) {
-      interactionPrompt = "Reparar el cable roto [E]";
+      interactionPrompt = "Reparar el cable roto";
       if (!firstBrokenEncountered) {
         firstBrokenEncountered = true;
         pushBitacoraEntry(
@@ -616,7 +616,10 @@ export function createWorld(scene: THREE.Scene): World {
     get dialogActive() { return dialogOpen; },
     electrical,
     bitacora: bitacoraRefs,
-    state: state,
+    // Getter (not a value copy) so the exposed state tracks the internal
+    // state machine after repairs. `state: state` would copy the primitive
+    // and stay "dormant" forever even though the world wakes up.
+    get state() { return state; },
     setState: (s: WorldState) => { state = s; },
     terrain,
   };

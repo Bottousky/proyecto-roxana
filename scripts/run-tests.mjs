@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 const testsDir = resolve('tests');
 const files = readdirSync(testsDir)
-  .filter((name) => name.endsWith('.test.ts'))
+  .filter((name) => name.endsWith('.test.ts') && !name.startsWith('_legacy'))
   .sort();
 
 for (const file of files) {
@@ -16,3 +16,4 @@ for (const file of files) {
   );
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
+

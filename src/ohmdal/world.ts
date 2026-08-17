@@ -32,6 +32,7 @@ import { createStudentActor } from './integration/spriteActors.ts';
 import { createU1Cast } from './content/u1Cast.ts';
 import { VS_EVIDENCE_BY_ANCHOR, anchorById, thingOf, type BenchId, type U1Anchor } from './content/u1Anchors.ts';
 import { createOhmPedestalWorldBench } from './ohmPedestalBench.ts';
+import { playAwakening, type AwakeningHandle } from './awakening.ts';
 import {
   createPlazaObservation,
   hasObserved,
@@ -135,8 +136,20 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
       ohm.setState('idle', reducedMotion);
       closeOhmBench();
       cast.refresh();
+      // El WOW moment: destello, chispas, cámara, música. Dura ~2.4 s y se
+      // acopla al `update` del bucle principal. Dispone solo.
+      if (!activeAwakening && !state.flags.ohmAwakeEverSeen) {
+        setFlag('ohmAwakeEverSeen');
+        activeAwakening = playAwakening({
+          scene,
+          camera: cameraController.camera,
+          origin: new THREE.Vector3(PEDESTAL.position.x, 0.9, PEDESTAL.position.z),
+          reducedMotion,
+        });
+      }
     },
   });
+  let activeAwakening: AwakeningHandle | null = null;
 
   function openWorldBench(bench: BenchId, anchor: U1Anchor): void {
     if (bench === 'ohm') {
@@ -209,7 +222,10 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
 
   const lumenRoot = new THREE.Group();
   lumenRoot.name = 'lumen_spatial_presence';
-  lumenRoot.position.set(-0.75, 0, -2.7);
+  // El sprite "lumen" del taller se para junto al banco, en su nuevo anchor
+  // (`R4_LUMEN_STOP` ≈ x=14, z=0). El resto de los sprites de lumen se sirven desde
+  // `cast` y siguen `u1Anchors.ts`.
+  lumenRoot.position.set(14, 0, -0.4);
   const lumenBaseGeometry = new THREE.CylinderGeometry(0.26, 0.34, 0.72, 10);
   const lumenOrbGeometry = new THREE.SphereGeometry(0.24, 12, 8);
   const lumenBaseMaterial = new THREE.MeshStandardMaterial({ color: 0x635546, roughness: 0.82 });
@@ -233,7 +249,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   const markerMaterial = new THREE.MeshStandardMaterial({ color: 0xd6a84c, emissive: 0x382004 });
   const markerGroup = new THREE.Group();
   markerGroup.name = 'measurement_markers';
-  for (const anchorId of ['R6_TALLER_MEASURE', 'R8_DOOR_MEASURE'] as const) {
+  for (const anchorId of ['R4_LUMEN_STOP', 'R6_DOOR_MEASURE'] as const) {
     const anchor = ROUTE_ANCHORS.find(({ id }) => id === anchorId);
     if (!anchor) throw new Error(`Missing measurement anchor ${anchorId}`);
     const marker = new THREE.Mesh(markerGeometry, markerMaterial);
@@ -282,20 +298,10 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     cameraController.dispose();
     // Selector compartido: la misma funcion decide la ancla tanto en el cambio de
     // viewport como en el frame de update. Mantiene la cinematica del slice y del arco
-    // largo bajo un mismo contrato: `selectCameraAnchor(current, x) -> siguiente`.
-    const next: CameraAnchorId = player.x >= 118
-      ? 'C7_LIGHTHOUSE'
-      : player.x >= 82
-        ? 'C6_TERRACES'
-        : player.x >= 52
-          ? 'C5_FORGE'
-          : player.x >= 22
-            ? 'C4_CASTLE'
-            : player.x >= 9.5
-              ? 'C3_DOOR_SPRING'
-              : player.x >= -3
-                ? 'C2_TALLER'
-                : 'C1_PORTAL_PLAZA';
+    // largo bajo un mismo contrato: `selectCameraAnchor(current, x, z) -> siguiente`.
+    // En la red con hub central, la Plaza reparte a las seis zonas alrededor, así que el
+    // selector usa X para E/O y Z para N/S.
+    const next: CameraAnchorId = selectCameraAnchor(currentAnchor, player.x, player.z);
     currentAnchor = next;
     cameraController = new AuthorCameraController({
       variant: cameraVariant,
@@ -510,7 +516,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     activeAnchor = cast.update(player.x, player.z, elapsedSeconds);
     ui.setPrompt(activeAnchor ? cast.promptFor(activeAnchor) : null, actionKeyLabel());
 
-    const nextAnchor = selectCameraAnchor(currentAnchor, player.x);
+    const nextAnchor = selectCameraAnchor(currentAnchor, player.x, player.z);
     if (nextAnchor !== currentAnchor) {
       currentAnchor = nextAnchor;
       cameraController.setAnchor(nextAnchor);
@@ -626,6 +632,10 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
     const dt = Math.min((now - previous) / 1000, 0.1);
     previous = now;
     updateGame(dt);
+    if (activeAwakening) {
+      const stillRunning = activeAwakening.update(dt);
+      if (!stillRunning) activeAwakening = null;
+    }
     renderer.info.reset();
     postfx.render();
     updateHud(dt);
@@ -750,7 +760,7 @@ export function createOhmdalWorld(container: HTMLElement): OhmdalWorld {
   if (import.meta.env.DEV) {
     const scope = window as unknown as Record<string, unknown>;
     // Los numeros del acabado se aprueban mirando. Con esto se mueven en caliente:
-    // `ohmdalTune({ tiltStrength: 6, vignette: 0.7 })`.
+    // `ohmdalTune({ bloomStrength: 0.8, vignette: 0.7 })`.
     scope.ohmdalTune = (values: Parameters<typeof postfx.tune>[0]): void => { postfx.tune(values); };
     scope.dumpOhmdalScene = (): string => {
       const box = new THREE.Box3();

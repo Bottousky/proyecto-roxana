@@ -1,15 +1,21 @@
 import { el, pushUI, popUI } from './overlay';
-import { sfxBlip, sfxToast } from '../audio';
+import { sfxBlip, sfxToast, playVoiceLine, stopVoiceLine, type VoiceLineId } from '../audio';
 import { portraitKey } from './portrait.ts';
 import { touchControlsEnabled } from './inputMode.ts';
 
 export interface Line {
   who: string;
   text: string;
+  /**
+   * Si está definido, se reproduce esta línea de voz al entrar a la línea.
+   * El texto y la voz pueden divergir ligeramente; está aceptado como
+   * estilización, no como error.
+   */
+  voiceId?: VoiceLineId;
 }
 
-export function L(who: string, text: string): Line {
-  return { who, text };
+export function L(who: string, text: string, voiceId?: VoiceLineId): Line {
+  return { who, text, voiceId };
 }
 
 let queue: Line[] = [];
@@ -18,17 +24,20 @@ let endCb: (() => void) | null = null;
 let active = false;
 let lastAdvance = 0;
 
+// Retratos de alta calidad generados para el proyecto. Cuando la IA pinta un retrato
+// expresamente, gana el de `generated/portraits/`; los legacy de la master siguen
+// disponibles como fallback para personajes sin retrato dedicado.
 const PORTRAITS: Record<string, string> = {
-  student: new URL('../../assets/ohmdal/portraits/student.png', import.meta.url).href,
-  edda: new URL('../../assets/ohmdal/portraits/edda.png', import.meta.url).href,
-  lumen: new URL('../../assets/ohmdal/portraits/lumen.png', import.meta.url).href,
-  preceptor: new URL('../../assets/ohmdal/portraits/preceptor.png', import.meta.url).href,
-  consejera: new URL('../../assets/ohmdal/portraits/consejera.png', import.meta.url).href,
-  guardiana: new URL('../../assets/ohmdal/portraits/guardiana.png', import.meta.url).href,
-  yesca: new URL('../../assets/ohmdal/portraits/yesca.png', import.meta.url).href,
-  farero: new URL('../../assets/ohmdal/portraits/farero.png', import.meta.url).href,
-  ohm: new URL('../../assets/ohmdal/portraits/ohm.png', import.meta.url).href,
-  nino: new URL('../../assets/ohmdal/portraits/nino.png', import.meta.url).href,
+  student: new URL('../../assets/ohmdal/generated/portraits/student-portrait.png', import.meta.url).href,
+  edda: new URL('../../assets/ohmdal/generated/portraits/edda-portrait.png', import.meta.url).href,
+  lumen: new URL('../../assets/ohmdal/generated/portraits/lumen-portrait.png', import.meta.url).href,
+  preceptor: new URL('../../assets/ohmdal/generated/portraits/preceptor-portrait.png', import.meta.url).href,
+  consejera: new URL('../../assets/ohmdal/generated/portraits/consejera-portrait.png', import.meta.url).href,
+  guardiana: new URL('../../assets/ohmdal/generated/portraits/guardiana-portrait.png', import.meta.url).href,
+  yesca: new URL('../../assets/ohmdal/generated/portraits/yesca-portrait.png', import.meta.url).href,
+  farero: new URL('../../assets/ohmdal/generated/portraits/farero-portrait.png', import.meta.url).href,
+  ohm: new URL('../../assets/ohmdal/generated/portraits/ohm-portrait.png', import.meta.url).href,
+  nino: new URL('../../assets/ohmdal/generated/portraits/nino-portrait.png', import.meta.url).href,
   proyector: new URL('../../assets/ohmdal/portraits/proyector.png', import.meta.url).href,
   ciudadano: new URL('../../assets/ohmdal/portraits/ciudadano.png', import.meta.url).href,
 };
@@ -46,11 +55,25 @@ function render(): void {
   const image = el('dialog-portrait-image') as HTMLImageElement;
   image.src = key ? PORTRAITS[key] : '';
   image.alt = key ? `Retrato de ${line.who}` : '';
+  // Los retratos de alta calidad no se renderizan pixelados: son ilustraciones a 1K.
+  if (key) {
+    image.style.imageRendering = 'auto';
+  } else {
+    image.style.imageRendering = 'pixelated';
+  }
+  // Voz: si la línea trae un `voiceId`, lo reproducimos. La voz no bloquea
+  // el texto: el jugador puede avanzar cuando quiera, y la voz termina sola.
+  if (line.voiceId) {
+    playVoiceLine(line.voiceId);
+  } else {
+    stopVoiceLine();
+  }
 }
 
 function closeDialog(): void {
   active = false;
   el('dialog').classList.add('hidden');
+  stopVoiceLine();
   popUI();
   const cb = endCb;
   endCb = null;

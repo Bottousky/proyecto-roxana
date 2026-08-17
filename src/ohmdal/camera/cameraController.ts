@@ -1,9 +1,7 @@
 import * as THREE from 'three';
 import {
   CAMERA_ANCHORS,
-  CAMERA_RIGHT,
   CAMERA_TRANSITION_VOLUMES,
-  CAMERA_VIEW_OFFSET,
   CAMERA_ZOOM_MAX,
   CAMERA_ZOOM_MIN,
   VIEWPORT_PROFILES,
@@ -12,7 +10,9 @@ import {
   createCamera,
   deadZoneExcess,
   followDeadZone,
+  rightVecForAnchor,
   verticalSpan,
+  viewOffsetForAnchor,
   type CameraAnchorId,
   type CameraVariant,
   type FollowDeadZoneExtents,
@@ -160,9 +160,13 @@ export class AuthorCameraController {
   private recomputeDesiredPosition(): void {
     const anchor = CAMERA_ANCHORS[this.anchorId];
     const distance = cameraDistanceForSpan(this.visibleSpan());
-    const viewOffset = this.variant === 'quasi-orthographic'
-      ? anchor.quasiOrthographicViewOffset ?? CAMERA_VIEW_OFFSET
-      : CAMERA_VIEW_OFFSET;
+    // `viewOffsetForAnchor` respeta el `forward` de cada anchor: la cámara se coloca
+    // "detrás y arriba" del focus en el frame del anchor. Si el anchor trae un
+    // `quasiOrthographicViewOffset` (C3) y la variante es ortográfica, se usa tal cual
+    // —ese offset es world-space y ya viene con el pitch del anchor.
+    const viewOffset = this.variant === 'quasi-orthographic' && anchor.quasiOrthographicViewOffset
+      ? anchor.quasiOrthographicViewOffset
+      : viewOffsetForAnchor(anchor);
     this.desiredPosition.copy(this.desiredTarget).addScaledVector(viewOffset, distance);
     this.applyProjection();
   }
@@ -215,12 +219,13 @@ export class AuthorCameraController {
     const anchor = CAMERA_ANCHORS[this.anchorId];
     const zone = this.followDeadZone();
     const relative = new THREE.Vector3().subVectors(subject, this.desiredTarget);
-    const rightExcess = deadZoneExcess(relative.dot(CAMERA_RIGHT), zone.right);
+    const rightVec = rightVecForAnchor(anchor);
+    const rightExcess = deadZoneExcess(relative.dot(rightVec), zone.right);
     const forwardExcess = deadZoneExcess(relative.dot(anchor.forward), zone.forward);
     const verticalExcess = deadZoneExcess(relative.y, zone.vertical);
     if (rightExcess === 0 && forwardExcess === 0 && verticalExcess === 0) return;
     const corrected = this.desiredTarget.clone()
-      .addScaledVector(CAMERA_RIGHT, rightExcess)
+      .addScaledVector(rightVec, rightExcess)
       .addScaledVector(anchor.forward, forwardExcess);
     corrected.y += verticalExcess;
     this.setLookTarget(corrected);
@@ -298,45 +303,61 @@ export class AuthorCameraController {
   }
 }
 
-/** Seleccion por volumen con histeresis; nunca depende del render ni del pathfinding. */
+/**
+ * Selección por volumen 2D con histéresis; nunca depende del render ni del pathfinding.
+ *
+ * La Plaza es el hub: tiene cuatro bocas (N, S, E, O). El resto del arco se extiende
+ * desde ellas. Cada ancla cambia cuando el jugador cruza uno de los thresholds definidos
+ * en `CAMERA_TRANSITION_VOLUMES` (en X para E/O, en Z para N/S). La histéresis evita
+ * oscilación al徘徊 sobre el borde de un socket.
+ */
 export function selectCameraAnchor(
   current: CameraAnchorId,
   playerX: number,
+  playerZ: number,
 ): CameraAnchorId {
-  const taller = CAMERA_TRANSITION_VOLUMES.tallerThreshold;
-  const door = CAMERA_TRANSITION_VOLUMES.doorApproach;
-  const castle = CAMERA_TRANSITION_VOLUMES.castleApproach;
-  const forge = CAMERA_TRANSITION_VOLUMES.forgeApproach;
-  const terraces = CAMERA_TRANSITION_VOLUMES.terracesApproach;
-  const lighthouse = CAMERA_TRANSITION_VOLUMES.lighthouseApproach;
+  const plazaTaller = CAMERA_TRANSITION_VOLUMES.plazaToTaller;
+  const tallerDoor = CAMERA_TRANSITION_VOLUMES.tallerToDoor;
+  const plazaCastle = CAMERA_TRANSITION_VOLUMES.plazaToCastle;
+  const plazaForge = CAMERA_TRANSITION_VOLUMES.plazaToForge;
+  const plazaTerraces = CAMERA_TRANSITION_VOLUMES.plazaToTerraces;
+  const terracesFaro = CAMERA_TRANSITION_VOLUMES.terracesToFaro;
+
+  // C1 (Plaza/Portal): cuatro bocas. La Plaza vive en x ∈ [-9, 9] y z ∈ [-7, 7].
   if (current === 'C1_PORTAL_PLAZA') {
-    return playerX >= taller.crossingX ? 'C2_TALLER' : current;
+    if (playerX >= plazaTaller.crossingX) return 'C2_TALLER';
+    if (playerZ <= plazaCastle.crossingZ) return 'C4_CASTLE';
+    if (playerX <= plazaForge.crossingX) return 'C5_FORGE';
+    if (playerZ >= plazaTerraces.crossingZ) return 'C6_TERRACES';
+    return current;
   }
+  // C2 (Taller, este de la Plaza): una boca al este hacia la Puerta, una al oeste a la Plaza.
   if (current === 'C2_TALLER') {
-    if (playerX < taller.crossingX - taller.hysteresisMeters) return 'C1_PORTAL_PLAZA';
-    if (playerX >= door.crossingX) return 'C3_DOOR_SPRING';
+    if (playerX < plazaTaller.crossingX - plazaTaller.hysteresisMeters) return 'C1_PORTAL_PLAZA';
+    if (playerX >= tallerDoor.crossingX) return 'C3_DOOR_SPRING';
     return current;
   }
+  // C3 (Puerta + Manantial): una boca al oeste hacia el Taller, cerrado al este.
   if (current === 'C3_DOOR_SPRING') {
-    if (playerX < door.crossingX - door.hysteresisMeters) return 'C2_TALLER';
-    if (playerX >= castle.crossingX) return 'C4_CASTLE';
+    if (playerX < tallerDoor.crossingX - tallerDoor.hysteresisMeters) return 'C2_TALLER';
     return current;
   }
+  // C4 (Castillo, norte de la Plaza): una boca al sur hacia la Plaza, cerrado en las demás.
   if (current === 'C4_CASTLE') {
-    if (playerX < castle.crossingX - castle.hysteresisMeters) return 'C3_DOOR_SPRING';
-    if (playerX >= forge.crossingX) return 'C5_FORGE';
+    if (playerZ > plazaCastle.crossingZ + plazaCastle.hysteresisMeters) return 'C1_PORTAL_PLAZA';
     return current;
   }
+  // C5 (Forja, oeste de la Plaza): una boca al este hacia la Plaza, cerrado en las demás.
   if (current === 'C5_FORGE') {
-    if (playerX < forge.crossingX - forge.hysteresisMeters) return 'C4_CASTLE';
-    if (playerX >= terraces.crossingX) return 'C6_TERRACES';
+    if (playerX > plazaForge.crossingX + plazaForge.hysteresisMeters) return 'C1_PORTAL_PLAZA';
     return current;
   }
+  // C6 (Terrazas, sur de la Plaza): una boca al norte hacia la Plaza, una al este hacia el Faro.
   if (current === 'C6_TERRACES') {
-    if (playerX < terraces.crossingX - terraces.hysteresisMeters) return 'C5_FORGE';
-    if (playerX >= lighthouse.crossingX) return 'C7_LIGHTHOUSE';
+    if (playerZ < plazaTerraces.crossingZ - plazaTerraces.hysteresisMeters) return 'C1_PORTAL_PLAZA';
+    if (playerX >= terracesFaro.crossingX) return 'C7_LIGHTHOUSE';
     return current;
   }
-  // C7_LIGHTHOUSE
-  return playerX < lighthouse.crossingX - lighthouse.hysteresisMeters ? 'C6_TERRACES' : current;
+  // C7 (Faro, sureste): una boca al oeste hacia las Terrazas, cerrado en las demás.
+  return playerX < terracesFaro.crossingX - terracesFaro.hysteresisMeters ? 'C6_TERRACES' : current;
 }
