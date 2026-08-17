@@ -12,9 +12,12 @@ export interface GameCamera {
   setSize: (w: number, h: number) => void;
   pan: (to: Vec2, duration: number) => void;
   isPanning: () => boolean;
-  setRegionFraming: (region: "plaza" | "puerta" | "manantial" | "taller" | "sendero") => void;
+  setRegionFraming: (region: "plaza" | "puerta" | "manantial" | "taller" | "sendero", footprint?: { width: number; depth: number }) => void;
   applyCinematicPose: (pose: CinematicPose, duration: number) => void;
   followElevation: (playerY: number, dt: number) => void;
+  /** Switch to a top-down orthographic review camera (layout review mode). */
+  setTopView: (on: boolean, bounds?: { minX: number; maxX: number; minZ: number; maxZ: number }) => void;
+  isTopView: () => boolean;
 }
 
 export interface CinematicPose {
@@ -71,6 +74,8 @@ export function createCamera(viewport: { width: number; height: number }): GameC
   let framingZoom = 1.0; // multiplier on FOV per region.
   let elevationOffset = 0; // Y offset added to the camera height to follow sunken regions.
   let regionOffset: { x: number; y: number; z: number } | null = null; // per-region override of the camera offset.
+  let topView = false;
+  let topBounds: { minX: number; maxX: number; minZ: number; maxZ: number } | null = null;
 
   const setSize = (w: number, h: number) => {
     three.aspect = Math.max(0.0001, w / h);
@@ -78,6 +83,27 @@ export function createCamera(viewport: { width: number; height: number }): GameC
   };
 
   const follow = (target: Vec2, dt: number) => {
+    // Top-down review mode: fixed orthographic-like view over the layout
+    // bounds. We keep the PerspectiveCamera (no new camera class) and just
+    // pull it straight up over the bounds center.
+    if (topView) {
+      const b = topBounds;
+      const cx = b ? (b.minX + b.maxX) / 2 : target.x;
+      const cz = b ? (b.minZ + b.maxZ) / 2 : target.y;
+      const span = b ? Math.max(b.maxX - b.minX, b.maxZ - b.minZ) : 60;
+      const height = span * 1.35;
+      lookAt.set(cx, 0, cz);
+      three.position.set(cx, height, cz);
+      three.up.set(0, 0, -1);
+      three.lookAt(cx, 0, cz);
+      const targetFov = 45;
+      if (Math.abs(three.fov - targetFov) > 0.01) {
+        three.fov = targetFov;
+        three.updateProjectionMatrix();
+      }
+      return;
+    }
+    three.up.set(0, 1, 0);
     // Pan animation overrides the smooth-follow when active.
     if (panT < 1) {
       panElapsed += dt;
@@ -138,22 +164,32 @@ export function createCamera(viewport: { width: number; height: number }): GameC
 
   const isPanning = () => panT < 1;
 
-  const setRegionFraming: GameCamera["setRegionFraming"] = (region) => {
+  const setRegionFraming: GameCamera["setRegionFraming"] = (region, footprint) => {
+    // Auto-zoom to fit the region footprint when the layout supplies one.
+    // The reference framing (zoom 1.0) was tuned for a ~20×16 m plaza; larger
+    // footprints pull the camera back (zoom < 1.0) so the whole region is
+    // readable from the elevated HD-2D rig.
+    if (footprint) {
+      const refDepth = 16;
+      const refWidth = 20;
+      const zoom = Math.max(0.55, Math.min(1.6, Math.min(refWidth / Math.max(1, footprint.width), refDepth / Math.max(1, footprint.depth))));
+      framingZoom = zoom;
+    }
     // Plaza: 100%; Puerta: 95% (slight zoom in for intimacy); Manantial: 90% (slight zoom in); Taller: 100%; Sendero: 110% (closer).
     // For the Manantial we also override the camera offset so the camera
     // sits above the Puerta, looking down at the sunken patio. This
     // bypasses the Puerta's towers which would otherwise block the view.
     switch (region) {
       case "plaza":
-        framingZoom = 1.0;
+        if (!footprint) framingZoom = 1.0;
         regionOffset = null;
         break;
       case "puerta":
-        framingZoom = 0.95;
+        if (!footprint) framingZoom = 0.95;
         regionOffset = null;
         break;
       case "manantial":
-        framingZoom = 0.9;
+        if (!footprint) framingZoom = 0.9;
         // High-and-back, looking down at the Manantial patio. The Puerta
         // is at z=-16 (about 10m north of the Manantial), so the camera
         // being at lookAt+(0, 20, 12) puts it above the Puerta, with the
@@ -161,15 +197,28 @@ export function createCamera(viewport: { width: number; height: number }): GameC
         regionOffset = { x: 0, y: 20, z: 12 };
         break;
       case "taller":
-        framingZoom = 1.0;
+        if (!footprint) framingZoom = 1.0;
         regionOffset = null;
         break;
       case "sendero":
-        framingZoom = 1.05;
+        if (!footprint) framingZoom = 1.05;
         regionOffset = null;
         break;
     }
   };
+
+  const setTopView: GameCamera["setTopView"] = (on, bounds) => {
+    topView = on;
+    if (on) topBounds = bounds ?? null;
+    // Reset the camera up axis when leaving top view.
+    if (!on) {
+      three.up.set(0, 1, 0);
+      desiredOffset.copy(baseOffset);
+      desiredFov = BASE_FOV;
+    }
+  };
+
+  const isTopView = () => topView;
 
   const applyCinematicPose = (pose: CinematicPose, duration: number) => {
     panStartOffset.copy(three.position).sub(lookAt);
@@ -200,5 +249,7 @@ export function createCamera(viewport: { width: number; height: number }): GameC
     setRegionFraming,
     applyCinematicPose,
     followElevation,
+    setTopView,
+    isTopView,
   };
 }
