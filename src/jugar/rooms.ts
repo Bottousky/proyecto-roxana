@@ -69,6 +69,10 @@ export interface DoorDef {
   w: number;
   h: number;
   to: string;
+  /** Stable local exit identity. Defaults to `to` for current data. */
+  exit?: string;
+  /** Destination entry override for this specific exit. */
+  entry?: { x: number; y: number };
   spawn: { x: number; y: number };
   label: string;
   color?: number;
@@ -1185,40 +1189,23 @@ export const ROOMS: Record<string, RoomDef> = {
     name: 'Ohmdal — La plaza',
     floor: () => (f().castleRestored ? 0x1e1b2e : f().puertaDone ? 0x262033 : f().ohmAwake ? 0x1a1926 : 0x15141f),
     wall: () => (f().castleRestored ? 0x3a2e44 : f().puertaDone ? 0x3c3144 : 0x2e2a3c),
-    // Sala cerrada pintada (patio del castillo con arcos = transición). Ver
-    // docs/grilla-mundo-ohmdal.md. Colisión: murallas con vanos en los 4 arcos,
-    // el pozo central y el edificio del taller (este).
-    background: 'room-plaza',
-    collision: [
-      // muralla norte (vano del arco central x430–535)
-      { x: 0, y: 0, w: 430, h: 58 }, { x: 535, y: 0, w: 425, h: 58 },
-      // muralla sur (vano del arco central)
-      { x: 0, y: 486, w: 430, h: 54 }, { x: 535, y: 486, w: 425, h: 54 },
-      // muralla oeste (vano del portón del castillo y150–335)
-      { x: 0, y: 58, w: 42, h: 92 }, { x: 0, y: 335, w: 42, h: 151 },
-      // edificio del taller al este (vano de la puerta y225–330)
-      { x: 812, y: 58, w: 148, h: 167 }, { x: 812, y: 330, w: 148, h: 156 },
-      // Campana monumental central. El portal suroeste ahora es una plataforma
-      // circular al ras del piso y no bloquea la navegación.
-      { x: 424, y: 112, w: 112, h: 188 },
-      { x: 390, y: 178, w: 27, h: 118 },
-      { x: 543, y: 178, w: 27, h: 118 },
-    ],
+    // Commit 4 (H3 — Plaza multi-área greybox): la Plaza pasó de
+    // 960×540 a 1920×1080. Se elimina el `background` pintado y
+    // los `def.collision` de muros perimetrales. La puesta en
+    // escena queda a cargo de `drawRoomBase` + `renderDecor` (que
+    // derivan del `AreaDef` en `roomScenesData`). Los muros
+    // perimetrales se generan automáticamente desde los boundaries
+    // con `pushWallSolids` (ver `ExplorationScene.buildChunk`).
+    //
+    // Las coordenadas internas de la Plaza viven ahora en un
+    // espacio lógico de 1920×1080:
+    //   - el centro / landmark (pedestal de Ohm) en (960, 540)
+    //   - el portal al aula en el cuadrante SW
+    //   - las cuatro puertas cardinales reparten los 1920×1080
     doors: [
       {
-        x: 844, y: 246, w: 60, h: 72,
-        to: 'taller', spawn: { x: 95, y: 300 },
-        label: 'Taller de Lumen',
-        locked: () =>
-          f().ohmAwake
-            ? null
-            : [
-                L('', 'La puerta del taller está trabada. Adentro, algo zumba… con desgano.'),
-                L('Edda', 'Lumen no abre desde que el guardián se durmió. Dice que sin Ohm despierto el taller «perdió el alma». Dramático, el hombre.'),
-              ],
-      },
-      {
-        x: 420, y: 0, w: 120, h: 26,
+        // Arco norte: hacia la Puerta de Ohm.
+        x: 880, y: 0, w: 160, h: 60,
         to: 'puerta', spawn: { x: 480, y: 430 },
         label: 'Arco norte',
         locked: () =>
@@ -1230,10 +1217,23 @@ export const ROOMS: Record<string, RoomDef> = {
               ],
       },
       {
-        // Zona alta del borde izquierdo (hasta cerca del tope): el label apunta
-        // arriba-izquierda; sin esto quedaba una franja muerta de pared encima de
-        // la puerta donde el jugador se atascaba sin cruzar ni ver el cordón.
-        x: 38, y: 190, w: 72, h: 120,
+        // Arco este: hacia el Taller de Lumen. La Plaza es ahora
+        // 1920 px de ancho: el Taller queda pegado al borde este
+        // (ox=1920 en world.ts).
+        x: 1820, y: 500, w: 100, h: 80,
+        to: 'taller', spawn: { x: 95, y: 300 },
+        label: 'Taller de Lumen',
+        locked: () =>
+          f().ohmAwake
+            ? null
+            : [
+                L('', 'La puerta del taller está trabada. Adentro, algo zumba… con desgano.'),
+                L('Edda', 'Lumen no abre desde que el guardián se durmió. Dice que sin Ohm despierto el taller «perdió el alma». Dramático, el hombre.'),
+              ],
+      },
+      {
+        // Arco oeste alto: hacia el Castillo.
+        x: 0, y: 460, w: 60, h: 80,
         to: 'castle_gate', spawn: { x: 860, y: 270 },
         label: 'Camino al Castillo',
         color: 0x65536f,
@@ -1252,14 +1252,16 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        x: 0, y: 388, w: 34, h: 68,
+        // Arco oeste bajo: hacia la Forja.
+        x: 0, y: 540, w: 60, h: 80,
         to: 'forge_yard', spawn: { x: 825, y: 410 },
         label: 'Camino a la Forja',
         color: 0x7a5438,
         visible: () => f().unit2Completed,
       },
       {
-        x: 452, y: 504, w: 56, h: 30,
+        // Arco sur: hacia las Terrazas.
+        x: 880, y: 1020, w: 160, h: 60,
         to: 'terraces_top', spawn: { x: 480, y: 105 },
         label: 'Camino a las Terrazas',
         color: 0x58755f,
@@ -1268,12 +1270,18 @@ export const ROOMS: Record<string, RoomDef> = {
     ],
     things: [
       {
-        id: 'portal-aula', x: 180, y: 382, w: 96, h: 54,
+        // Portal al aula, reubicado en el cuadrante SW de la Plaza
+        // (x=220, y=760) — coincide con el entry point del Aula.
+        id: 'portal-aula', x: 220, y: 760, w: 96, h: 54,
         label: 'Portal al Instituto', prompt: 'Salir de Ohmdal', color: 0x45c7bd, solid: false,
         onInteract: confirmExitOhmdal,
       },
       {
-        id: 'pedestal', x: 480, y: 342, w: 56, h: 56, shape: 'circle',
+        // Pedestal central de Ohm (medallón). Coordenadas: centro
+        // horizontal del área (960), ligeramente al sur del
+        // centro vertical (640) para dejar espacio para la
+        // Campana en la zona norte.
+        id: 'pedestal', x: 960, y: 640, w: 80, h: 80, shape: 'circle',
         label: 'Ohm', prompt: 'Acercarse al pedestal', solid: true, emoji: '⚡',
         color: () => (f().ohmAwake ? 0xc9a437 : 0x4a4a4f),
         onInteract: () => {
@@ -1284,10 +1292,10 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        id: 'edda', x: 640, y: 330, w: 34, h: 34, shape: 'circle',
+        // Edda junto al pedestal, ligeramente al este para no
+        // superponerse con el monumento.
+        id: 'edda', x: 1100, y: 640, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
-        // Edda acompaña la historia: tras despertar a Ohm se va al taller,
-        // después a la Puerta, y vuelve a la plaza cuando todo se enciende
         visible: () =>
           (!f().ohmAwake || f().puertaDone) &&
           !(f().playedUnit2Intro && !f().solvedBellPaths) &&
@@ -1317,13 +1325,15 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        id: 'edda-campana', x: 620, y: 340, w: 34, h: 34, shape: 'circle',
+        // Edda, junto a la campana, durante el gancho U2.
+        id: 'edda-campana', x: 1080, y: 280, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => f().puertaDone && f().playedUnit2Intro && !f().solvedBellPaths,
         onInteract: abrirCampanaUnidad2,
       },
       {
-        id: 'lumen-plaza', x: 660, y: 300, w: 38, h: 38, shape: 'circle',
+        // Lumen, visible al este del medallón.
+        id: 'lumen-plaza', x: 1500, y: 640, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen', color: 0x7a6a3a, solid: true, emoji: '💬',
         visible: () => f().puertaDone && !(f().castleRestored && !f().heardForgeWarmth),
         walksTo: 'puerta',
@@ -1340,9 +1350,10 @@ export const ROOMS: Record<string, RoomDef> = {
           ),
       },
       {
-        id: 'lampara1', x: 290, y: 356, w: 26, h: 26, shape: 'circle',
+        // Lámparas distribuidas por la Plaza (ya no están baked:
+        // el área grande no tiene fondo pintado).
+        id: 'lampara1', x: 320, y: 540, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
-        baked: true,
         color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
         onInteract: () =>
           say(
@@ -1354,17 +1365,33 @@ export const ROOMS: Record<string, RoomDef> = {
           ),
       },
       {
-        id: 'lampara2', x: 672, y: 344, w: 26, h: 26, shape: 'circle',
+        id: 'lampara2', x: 1600, y: 540, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
-        baked: true,
         color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
         onInteract: () =>
           say(L('', f().puertaDone ? 'Luz firme. La plaza tiene sombras de nuevo — de las buenas.' : 'Otra lámpara muerta. O dormida. Empieza a parecer que hay una diferencia.')),
       },
       {
-        id: 'campana', x: 480, y: 225, w: 170, h: 180,
+        id: 'lampara3', x: 960, y: 100, w: 26, h: 26, shape: 'circle',
+        label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
+        color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
+        onInteract: () =>
+          say(L('', f().puertaDone ? 'Luz firme bajo el arco norte.' : 'Lámpara apagada. El arco norte se ve más oscuro sin ella.')),
+      },
+      {
+        id: 'lampara4', x: 960, y: 920, w: 26, h: 26, shape: 'circle',
+        label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
+        color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
+        onInteract: () =>
+          say(L('', f().puertaDone ? 'Luz firme sobre el camino al sur.' : 'Lámpara apagada. El camino sur se ve más oscuro sin ella.')),
+      },
+      {
+        // Campana monumental reubicada al norte del medallón.
+        // El cuerpo sólido está duplicado como bloque de colisión
+        // en roomScenesData.plaza.collision. La thing representa
+        // la zona interactuable (hotspot + prompt).
+        id: 'campana', x: 960, y: 280, w: 170, h: 180,
         label: 'Campana', prompt: 'La campana de Ohmdal', solid: false, emoji: '🔔',
-        baked: true,
         color: () => (f().puertaDone ? 0xb08d2a : 0x4f4a42),
         onInteract: () => {
           const fl = f();
@@ -1377,7 +1404,6 @@ export const ROOMS: Record<string, RoomDef> = {
               L('', 'La nota corre por el cobre hacia el portal. Desde el otro lado llega una respuesta apagada: *clac*.'),
             ]);
           } else if (fl.puertaDone) {
-            // el cierre de U1 exige haber subido a ver qué regulaba la Puerta
             if (!fl.salasVisitadas.includes('manantial_ohm')) {
               say([
                 L('Maese Lumen', '¿Tocar la campana ya? La Puerta no se abrió para mirarla desde abajo. Sube por la calzada: el manantial está ahí arriba, corriendo por primera vez en cuarenta años.'),
@@ -1387,20 +1413,20 @@ export const ROOMS: Record<string, RoomDef> = {
           } else say(L('', 'La campana de Ohmdal cuelga muda sobre la plaza apagada. La cuerda está al alcance, pero algo dice que todavía no.'));
         },
       },
-      /* M8: Castillo encendido visible al norte */
+      /* M8: Castillo encendido visible al norte — reposicionado al
+         cuadrante NW (esquina del área grande). */
       {
-        id: 'castillo-encendido', x: 130, y: 100, w: 120, h: 80,
+        id: 'castillo-encendido', x: 200, y: 160, w: 120, h: 80,
         label: 'El Castillo encendido', prompt: 'Mirar el Castillo',
-        // Es un punto de mirada, no un bloque de utilería: la Plaza no tiene
-        // espacio para sumar otra silueta gigante sobre el acceso oeste.
         baked: true, color: 0xd4a035, solid: false, emoji: '🏰',
         visible: () => f().castleRestored,
         onInteract: () =>
           say(L('', 'El Castillo de Ohmdal arde en luz cálida al norte. Los canales de cobre brillan desde aquí.')),
       },
-      /* M8: ciudadanos nocturnos post-Castillo */
+      /* M8: ciudadanos nocturnos post-Castillo — distribuidos por
+         la Plaza grande. */
       {
-        id: 'ciudadano-1', x: 220, y: 280, w: 30, h: 30, shape: 'circle',
+        id: 'ciudadano-1', x: 320, y: 380, w: 30, h: 30, shape: 'circle',
         label: 'Ciudadano', prompt: 'Escuchar al ciudadano',
         color: 0x6a7a8a, solid: true, emoji: '💬',
         visible: () => f().castleRestored,
@@ -1408,7 +1434,7 @@ export const ROOMS: Record<string, RoomDef> = {
           say(L('', '«El Castillo tiene luz. ¿Y la chispa no se acabó?»')),
       },
       {
-        id: 'ciudadano-2', x: 300, y: 360, w: 30, h: 30, shape: 'circle',
+        id: 'ciudadano-2', x: 1400, y: 380, w: 30, h: 30, shape: 'circle',
         label: 'Ciudadano', prompt: 'Escuchar al ciudadano',
         color: 0x6a7a8a, solid: true, emoji: '💬',
         visible: () => f().castleRestored,
@@ -1416,16 +1442,17 @@ export const ROOMS: Record<string, RoomDef> = {
           say(L('', '«Mi abuela decía que ahí dentro el río sabía contar. Yo creía que era un cuento.»')),
       },
       {
-        id: 'ciudadano-nino', x: 380, y: 290, w: 26, h: 26, shape: 'circle',
+        id: 'ciudadano-nino', x: 1500, y: 760, w: 26, h: 26, shape: 'circle',
         label: 'Niño', prompt: 'Escuchar al niño',
         color: 0x8a9a6a, solid: true, emoji: '💬',
         visible: () => f().castleRestored,
         onInteract: () =>
           say(L('Niño', 'El robot contó los ríos. Yo conté con él. Dio justo.')),
       },
-      /* M8: Edda nocturna con su beat post-Castillo */
+      /* M8: Edda nocturna con su beat post-Castillo — reubicada en
+         la Plaza grande, zona central-este. */
       {
-        id: 'edda-noche', x: 580, y: 200, w: 34, h: 34, shape: 'circle',
+        id: 'edda-noche', x: 1300, y: 320, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda',
         color: 0xa85f78, solid: true, emoji: '💬',
         visible: () => f().castleRestored,
@@ -1435,9 +1462,10 @@ export const ROOMS: Record<string, RoomDef> = {
             L('Edda', '…Quiero aprender a mostrárselo a los demás. Como hiciste conmigo: sin sermones. Con las manos.'),
           ]),
       },
-      /* M8: Lumen — gancho U3 (forja tibia) */
+      /* M8: Lumen — gancho U3 (forja tibia) — reubicado en la
+         Plaza grande, zona NW. */
       {
-        id: 'lumen-forja', x: 195, y: 185, w: 38, h: 38, shape: 'circle',
+        id: 'lumen-forja', x: 360, y: 220, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
         color: 0x7a6a3a, solid: true, emoji: '💬',
         visible: () => f().castleRestored && !f().heardForgeWarmth,

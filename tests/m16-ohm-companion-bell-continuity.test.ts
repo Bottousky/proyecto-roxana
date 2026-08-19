@@ -32,24 +32,33 @@ function overlaps(a: { x: number; y: number; w: number; h: number }, b: { x: num
 }
 
 const plaza = ROOM_SCENES.plaza;
+// Commit 4 (H3 — Plaza multi-área greybox): la Campana se
+// reposicionó a (960, 280, 170, 180) y el pedestal a
+// (960, 640, 80, 80) en la Plaza 1920×1080. El cuerpo central
+// sólido de la Campana es {x:924, y:180, w:72, h:188}; el
+// pedestal es {x:920, y:600, w:80, h:80}. La "corona superior"
+// pasa de (480, 135) a (960, 220), y el "punto de interacción
+// inferior" (la cuerda, accesible desde abajo) está en
+// (960, 400) — entre el cuerpo de la campana (y=180-368) y el
+// pedestal (y=600-680).
 assert(
-  plaza.collision!.some((rect) => overlaps(rect, playerBox(480, 135))),
+  plaza.collision!.some((rect) => overlaps(rect, playerBox(960, 220))),
   'la corona superior de la Campana bloquea al jugador',
 );
 assert(
-  !plaza.collision!.some((rect) => overlaps(rect, playerBox(480, 90))),
+  !plaza.collision!.some((rect) => overlaps(rect, playerBox(960, 90))),
   'queda espacio real entre la Campana y el arco norte',
 );
 assert(
-  plaza.walkable.some((rect) => rectContainsRect(rect, playerBox(480, 90))),
+  plaza.walkable.some((rect) => rectContainsRect(rect, playerBox(960, 90))),
   'el pasillo recuperado hacia el norte admite el cuerpo completo del jugador',
 );
 assert(
-  !plaza.collision!.some((rect) => overlaps(rect, playerBox(480, 330))),
+  !plaza.collision!.some((rect) => overlaps(rect, playerBox(960, 400))),
   'la cuerda sigue siendo accesible desde abajo',
 );
 assert(
-  plaza.walkable.some((rect) => rectContainsRect(rect, playerBox(480, 330))),
+  plaza.walkable.some((rect) => rectContainsRect(rect, playerBox(960, 400))),
   'el punto de interacción inferior sigue dentro del piso transitable',
 );
 

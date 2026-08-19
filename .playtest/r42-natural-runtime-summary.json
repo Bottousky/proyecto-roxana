@@ -1,0 +1,1521 @@
+{
+  "pass": true,
+  "pathA": {
+    "before": {
+      "room": "plaza",
+      "local": {
+        "x": 220,
+        "y": 760
+      },
+      "sprite": {
+        "x": 220,
+        "y": 760
+      },
+      "width": 1920,
+      "height": 1080,
+      "ticks": 86,
+      "requestCount": 0,
+      "cooldown": 0,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "onEnter": {
+        "plaza": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0,
+        "direction": false
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "result": {
+      "room": "taller",
+      "local": {
+        "x": 480,
+        "y": 410
+      },
+      "sprite": {
+        "x": 480,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "ticks": 135,
+      "requestCount": 1,
+      "cooldown": 678.33,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0,
+        "alpha": 1,
+        "direction": false
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "w": 960,
+        "h": 540
+      }
+    },
+    "delta": {
+      "ticks": 49,
+      "request": 1,
+      "onEnterTaller": 1
+    },
+    "decisiveFrames": [
+      {
+        "tick": 131,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      },
+      {
+        "tick": 132,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      },
+      {
+        "tick": 133,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      },
+      {
+        "tick": 134,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      }
+    ],
+    "fade": [
+      {
+        "t": 0,
+        "ticks": 138,
+        "room": "taller",
+        "request": 1,
+        "cooldown": 600.0099999999999,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.32633333333333364,
+          "alpha": 0.6736666666666664,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        }
+      },
+      {
+        "t": 50,
+        "ticks": 141,
+        "room": "taller",
+        "request": 1,
+        "cooldown": 520.0299999999999,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.6595833333333337,
+          "alpha": 0.34041666666666626,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        }
+      },
+      {
+        "t": 100,
+        "ticks": 144,
+        "room": "taller",
+        "request": 1,
+        "cooldown": 441.6999999999999,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.9859583333333338,
+          "alpha": 0.014041666666666175,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        }
+      },
+      {
+        "t": 150,
+        "ticks": 148,
+        "room": "taller",
+        "request": 1,
+        "cooldown": 355.02,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        }
+      },
+      {
+        "t": 250,
+        "ticks": 153,
+        "room": "taller",
+        "request": 1,
+        "cooldown": 253.34999999999988,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        }
+      },
+      {
+        "t": 350,
+        "ticks": 159,
+        "room": "taller",
+        "request": 1,
+        "cooldown": 120.0099999999999,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        }
+      }
+    ]
+  },
+  "keyboardForward": {
+    "start": {
+      "room": "plaza",
+      "local": {
+        "x": 1700,
+        "y": 540
+      },
+      "sprite": {
+        "x": 1700,
+        "y": 540
+      },
+      "width": 1920,
+      "height": 1080,
+      "ticks": 45,
+      "requestCount": 0,
+      "cooldown": 0,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "onEnter": {
+        "plaza": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0,
+        "direction": false
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "east": {
+      "start": {
+        "t": 0,
+        "room": "plaza",
+        "local": {
+          "x": 1700,
+          "y": 540
+        },
+        "sprite": {
+          "x": 1700,
+          "y": 540
+        },
+        "width": 1920,
+        "height": 1080,
+        "ticks": 46,
+        "requestCount": 0,
+        "cooldown": 0,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": false,
+          "castle_gate": false
+        },
+        "onEnter": {
+          "plaza": 1
+        },
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "w": 1920,
+          "h": 1080
+        }
+      },
+      "end": {
+        "room": "taller",
+        "local": {
+          "x": 485.23,
+          "y": 410
+        },
+        "sprite": {
+          "x": 485.23,
+          "y": 410
+        },
+        "width": 960,
+        "height": 540,
+        "ticks": 102,
+        "requestCount": 1,
+        "cooldown": 633.4266666666667,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        },
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.2080555555555552,
+          "alpha": 0.7919444444444448,
+          "direction": false
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "w": 960,
+          "h": 540
+        }
+      },
+      "samples": [
+        {
+          "t": 0,
+          "room": "plaza",
+          "local": {
+            "x": 1700,
+            "y": 540
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "request": 0
+        },
+        {
+          "t": 172,
+          "room": "plaza",
+          "local": {
+            "x": 1707.32,
+            "y": 540
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "request": 0
+        },
+        {
+          "t": 287,
+          "room": "plaza",
+          "local": {
+            "x": 1719.67,
+            "y": 540
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "request": 0
+        },
+        {
+          "t": 404,
+          "room": "plaza",
+          "local": {
+            "x": 1733.34,
+            "y": 540
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "request": 0
+        },
+        {
+          "t": 518,
+          "room": "plaza",
+          "local": {
+            "x": 1747.37,
+            "y": 540
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "request": 0
+        },
+        {
+          "t": 630,
+          "room": "plaza",
+          "local": {
+            "x": 1761.49,
+            "y": 540
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "request": 0
+        },
+        {
+          "t": 742,
+          "room": "plaza",
+          "local": {
+            "x": 1775.63,
+            "y": 540
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "request": 0
+        },
+        {
+          "t": 871,
+          "room": "plaza",
+          "local": {
+            "x": 1789.79,
+            "y": 540
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "request": 0
+        },
+        {
+          "t": 986,
+          "room": "plaza",
+          "local": {
+            "x": 1798.28,
+            "y": 540
+          },
+          "cooldown": 700,
+          "lock": "transitioning",
+          "armed": {
+            "puerta": false,
+            "taller": true,
+            "castle_gate": false
+          },
+          "request": 1
+        },
+        {
+          "t": 1114,
+          "room": "plaza",
+          "local": {
+            "x": 1798.28,
+            "y": 540
+          },
+          "cooldown": 700,
+          "lock": "transitioning",
+          "armed": {
+            "puerta": false,
+            "taller": true,
+            "castle_gate": false
+          },
+          "request": 1
+        },
+        {
+          "t": 1228,
+          "room": "plaza",
+          "local": {
+            "x": 1798.28,
+            "y": 540
+          },
+          "cooldown": 700,
+          "lock": "transitioning",
+          "armed": {
+            "puerta": false,
+            "taller": true,
+            "castle_gate": false
+          },
+          "request": 1
+        },
+        {
+          "t": 1352,
+          "room": "taller",
+          "local": {
+            "x": 485.23,
+            "y": 410
+          },
+          "cooldown": 633.4266666666667,
+          "lock": "idle",
+          "armed": {
+            "plaza": false
+          },
+          "request": 1
+        }
+      ]
+    },
+    "result": {
+      "room": "taller",
+      "local": {
+        "x": 488.76,
+        "y": 410
+      },
+      "sprite": {
+        "x": 488.76,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "ticks": 104,
+      "requestCount": 1,
+      "cooldown": 600.1200000000001,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.34683333333333277,
+        "alpha": 0.6531666666666672,
+        "direction": false
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "w": 960,
+        "h": 540
+      }
+    },
+    "fade": [
+      {
+        "t": 0,
+        "room": "taller",
+        "cooldown": 498.536666666667,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.770097222222221,
+          "alpha": 0.229902777777779,
+          "direction": false
+        }
+      },
+      {
+        "t": 50,
+        "room": "taller",
+        "cooldown": 443.59666666666715,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.9990138888888872,
+          "alpha": 0.0009861111111127974,
+          "direction": false
+        }
+      },
+      {
+        "t": 100,
+        "room": "taller",
+        "cooldown": 383.64333333333394,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 150,
+        "room": "taller",
+        "cooldown": 318.6700000000007,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 250,
+        "room": "taller",
+        "cooldown": 223.6800000000007,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 350,
+        "room": "taller",
+        "cooldown": 78.68000000000063,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      }
+    ],
+    "decisiveFrames": [
+      {
+        "tick": 93,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      },
+      {
+        "tick": 94,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      },
+      {
+        "tick": 95,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      },
+      {
+        "tick": 96,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      },
+      {
+        "tick": 97,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      },
+      {
+        "tick": 98,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      }
+    ]
+  },
+  "keyboardReturn": {
+    "start": {
+      "room": "taller",
+      "local": {
+        "x": 488.76,
+        "y": 410
+      },
+      "sprite": {
+        "x": 488.76,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "ticks": 104,
+      "requestCount": 1,
+      "cooldown": 600.1200000000001,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.34683333333333277,
+        "alpha": 0.6531666666666672,
+        "direction": false
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "w": 960,
+        "h": 540
+      }
+    },
+    "south": {
+      "start": {
+        "t": 0,
+        "room": "taller",
+        "local": {
+          "x": 491.89,
+          "y": 410
+        },
+        "sprite": {
+          "x": 491.89,
+          "y": 410
+        },
+        "width": 960,
+        "height": 540,
+        "ticks": 130,
+        "requestCount": 1,
+        "cooldown": 53.690000000000666,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        },
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "w": 960,
+          "h": 540
+        }
+      },
+      "end": {
+        "room": "plaza",
+        "local": {
+          "x": 1820,
+          "y": 541.12
+        },
+        "sprite": {
+          "x": 1820,
+          "y": 541.12
+        },
+        "width": 1920,
+        "height": 1080,
+        "ticks": 153,
+        "requestCount": 2,
+        "cooldown": 678.33,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        },
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0,
+          "alpha": 1,
+          "direction": false
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "w": 1920,
+          "h": 1080
+        }
+      },
+      "samples": [
+        {
+          "t": 0,
+          "room": "taller",
+          "local": {
+            "x": 491.89,
+            "y": 410
+          },
+          "cooldown": 53.690000000000666,
+          "lock": "idle",
+          "armed": {
+            "plaza": false
+          },
+          "request": 1
+        },
+        {
+          "t": 159,
+          "room": "taller",
+          "local": {
+            "x": 491.89,
+            "y": 423.16
+          },
+          "cooldown": 0,
+          "lock": "idle",
+          "armed": {
+            "plaza": false
+          },
+          "request": 1
+        },
+        {
+          "t": 276,
+          "room": "taller",
+          "local": {
+            "x": 491.89,
+            "y": 439.21
+          },
+          "cooldown": 700,
+          "lock": "transitioning",
+          "armed": {
+            "plaza": true
+          },
+          "request": 2
+        },
+        {
+          "t": 383,
+          "room": "taller",
+          "local": {
+            "x": 491.89,
+            "y": 439.21
+          },
+          "cooldown": 700,
+          "lock": "transitioning",
+          "armed": {
+            "plaza": true
+          },
+          "request": 2
+        },
+        {
+          "t": 494,
+          "room": "plaza",
+          "local": {
+            "x": 1820,
+            "y": 541.12
+          },
+          "cooldown": 678.33,
+          "lock": "idle",
+          "armed": {
+            "puerta": false,
+            "taller": true,
+            "castle_gate": false
+          },
+          "request": 2
+        }
+      ]
+    },
+    "result": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 544.42
+      },
+      "sprite": {
+        "x": 1820,
+        "y": 544.42
+      },
+      "width": 1920,
+      "height": 1080,
+      "ticks": 155,
+      "requestCount": 2,
+      "cooldown": 633.34,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.1874583333333332,
+        "alpha": 0.8125416666666668,
+        "direction": false
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "final": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 545.14
+      },
+      "sprite": {
+        "x": 1820,
+        "y": 545.14
+      },
+      "width": 1920,
+      "height": 1080,
+      "ticks": 156,
+      "requestCount": 2,
+      "cooldown": 611.6700000000001,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.2777499999999998,
+        "alpha": 0.7222500000000003,
+        "direction": false
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "fade": [
+      {
+        "t": 0,
+        "room": "plaza",
+        "cooldown": 588.35,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.37491666666666673,
+          "alpha": 0.6250833333333332,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        }
+      },
+      {
+        "t": 50,
+        "room": "plaza",
+        "cooldown": 520.0299999999999,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.6595833333333337,
+          "alpha": 0.34041666666666626,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        }
+      },
+      {
+        "t": 100,
+        "room": "plaza",
+        "cooldown": 448.3699999999998,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.9581666666666672,
+          "alpha": 0.041833333333332834,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        }
+      },
+      {
+        "t": 150,
+        "room": "plaza",
+        "cooldown": 378.3699999999997,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        }
+      },
+      {
+        "t": 250,
+        "room": "plaza",
+        "cooldown": 258.3599999999996,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        }
+      },
+      {
+        "t": 350,
+        "room": "plaza",
+        "cooldown": 135.03999999999954,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        }
+      }
+    ]
+  },
+  "counts": {
+    "requestDelta": 2,
+    "onEnterTaller": 1,
+    "onEnterPlaza": 2,
+    "noStuckLock": true
+  },
+  "consoleErrors": []
+}

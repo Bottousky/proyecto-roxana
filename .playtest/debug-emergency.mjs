@@ -1,0 +1,3 @@
+import { chromium } from 'playwright';
+const b=await chromium.launch({headless:true});const p=await b.newPage({viewport:{width:960,height:540}});p.on('request',r=>{if(r.url().includes('ExplorationScene'))console.log('REQ',r.url())});p.on('response',async r=>{if(r.url().includes('ExplorationScene'))console.log('RESP',r.status(),r.url())});p.on('requestfailed',r=>{if(r.url().includes('ExplorationScene'))console.log('FAIL',r.url(),r.failure())});p.on('console',m=>console.log('CON',m.type(),m.text()));p.on('pageerror',e=>console.log('ERR',e.message));await p.goto('http://localhost:5173/jugar/?from=portal&room=plaza',{waitUntil:'load'});await p.waitForTimeout(70000);console.log('done',await p.evaluate(()=>!!window.__game));await b.close();
+

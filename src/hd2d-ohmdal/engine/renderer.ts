@@ -30,8 +30,11 @@ export function createRenderer(canvas: HTMLCanvasElement): RendererBundle {
   const scene = new THREE.Scene();
   // Dormant sky: deep blue with warm horizon.
   scene.background = new THREE.Color(0x3a4a68);
-  // Fog gives depth and softens distance. Color matches sky.
-  scene.fog = new THREE.Fog(0x3a4a68, 28, 75);
+  // Fog gives depth and softens distance. Color matches sky. H3: the
+  // playable diorama spans ~100m, so the fog must start well past the
+  // near-ground (60m) and only fully tint the far horizon (200m+); a
+  // tighter range washes out the Plaza and dims the sprites.
+  scene.fog = new THREE.Fog(0x3a4a68, 60, 200);
 
   const viewport = { width: window.innerWidth, height: window.innerHeight };
 

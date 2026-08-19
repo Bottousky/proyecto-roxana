@@ -1,0 +1,1152 @@
+{
+  "browserMode": "headless",
+  "route": "/jugar/?from=portal&room=plaza",
+  "substitutions": {
+    "requestRoomTransition": false,
+    "loadRoom": false,
+    "manualTriggerLoop": false
+  },
+  "deterministicPositionInjection": {
+    "method": "window.__pos(1870, 540), then Phaser update only",
+    "before": {
+      "room": "plaza",
+      "local": {
+        "x": 220,
+        "y": 760
+      },
+      "sprite": {
+        "x": 220,
+        "y": 760
+      },
+      "width": 1920,
+      "height": 1080,
+      "sceneTicks": 1,
+      "cooldown": 0,
+      "lock": "idle",
+      "transitionRequestCount": 0,
+      "onEnter": {
+        "plaza": 1
+      },
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "result": {
+      "room": "taller",
+      "local": {
+        "x": 480,
+        "y": 410
+      },
+      "sprite": {
+        "x": 480,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "sceneTicks": 48,
+      "cooldown": 674.99,
+      "lock": "idle",
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "armed": {
+        "plaza": false
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0,
+        "alpha": 1
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "after": {
+      "room": "taller",
+      "local": {
+        "x": 480,
+        "y": 410
+      },
+      "sprite": {
+        "x": 480,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "sceneTicks": 49,
+      "cooldown": 643.3299999999999,
+      "lock": "idle",
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "armed": {
+        "plaza": false
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.13191666666666682,
+        "alpha": 0.8680833333333332
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "settled": {
+      "room": "taller",
+      "local": {
+        "x": 480,
+        "y": 410
+      },
+      "sprite": {
+        "x": 480,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "sceneTicks": 65,
+      "cooldown": 213.3499999999998,
+      "lock": "idle",
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "armed": {
+        "plaza": false
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "graph": "RoomGraph.resolve(plaza, taller)"
+  },
+  "keyboardPlazaToTaller": {
+    "method": "window.__pos(1700, 540) as legal staging, then real Playwright keydown D",
+    "start": {
+      "room": "plaza",
+      "local": {
+        "x": 220,
+        "y": 760
+      },
+      "sprite": {
+        "x": 220,
+        "y": 760
+      },
+      "width": 1920,
+      "height": 1080,
+      "sceneTicks": 1,
+      "cooldown": 0,
+      "lock": "idle",
+      "transitionRequestCount": 0,
+      "onEnter": {
+        "plaza": 1
+      },
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "move": {
+      "start": {
+        "room": "plaza",
+        "local": {
+          "x": 1700,
+          "y": 540
+        },
+        "sprite": {
+          "x": 1700,
+          "y": 540
+        },
+        "width": 1920,
+        "height": 1080,
+        "sceneTicks": 3,
+        "cooldown": 0,
+        "lock": "idle",
+        "transitionRequestCount": 0,
+        "onEnter": {
+          "plaza": 1
+        },
+        "armed": {
+          "puerta": false,
+          "taller": false,
+          "castle_gate": false
+        },
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        }
+      },
+      "end": {
+        "room": "taller",
+        "local": {
+          "x": 480.658997248,
+          "y": 410
+        },
+        "sprite": {
+          "x": 480.658997248,
+          "y": 410
+        },
+        "width": 960,
+        "height": 540,
+        "sceneTicks": 56,
+        "cooldown": 683.36,
+        "lock": "idle",
+        "transitionRequestCount": 1,
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        },
+        "armed": {
+          "plaza": false
+        },
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0,
+          "alpha": 1
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540
+        }
+      },
+      "path": [
+        {
+          "t": 0,
+          "room": "plaza",
+          "local": {
+            "x": 1700,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1700,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 3,
+          "cooldown": 0,
+          "lock": "idle",
+          "transitionRequestCount": 0,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 6,
+          "room": "plaza",
+          "local": {
+            "x": 1707.3109128425558,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1707.3109128425558,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 9,
+          "cooldown": 0,
+          "lock": "idle",
+          "transitionRequestCount": 0,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 12,
+          "room": "plaza",
+          "local": {
+            "x": 1722.32073317504,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1722.32073317504,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 15,
+          "cooldown": 0,
+          "lock": "idle",
+          "transitionRequestCount": 0,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 18,
+          "room": "plaza",
+          "local": {
+            "x": 1738.900927440524,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1738.900927440524,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 21,
+          "cooldown": 0,
+          "lock": "idle",
+          "transitionRequestCount": 0,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 23,
+          "room": "plaza",
+          "local": {
+            "x": 1752.984475003678,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1752.984475003678,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 26,
+          "cooldown": 0,
+          "lock": "idle",
+          "transitionRequestCount": 0,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 28,
+          "room": "plaza",
+          "local": {
+            "x": 1767.1255428521465,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1767.1255428521465,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 31,
+          "cooldown": 0,
+          "lock": "idle",
+          "transitionRequestCount": 0,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 33,
+          "room": "plaza",
+          "local": {
+            "x": 1781.280127013771,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1781.280127013771,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 36,
+          "cooldown": 0,
+          "lock": "idle",
+          "transitionRequestCount": 0,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 38,
+          "room": "plaza",
+          "local": {
+            "x": 1795.4317936604266,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1795.4317936604266,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 41,
+          "cooldown": 0,
+          "lock": "idle",
+          "transitionRequestCount": 0,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": false,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 43,
+          "room": "plaza",
+          "local": {
+            "x": 1798.2616091894977,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1798.2616091894977,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 46,
+          "cooldown": 700,
+          "lock": "transitioning",
+          "transitionRequestCount": 1,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": true,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": true,
+            "complete": false,
+            "progress": 0.2270303030303033,
+            "alpha": 0.2270303030303033
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 48,
+          "room": "plaza",
+          "local": {
+            "x": 1798.2616091894977,
+            "y": 540
+          },
+          "sprite": {
+            "x": 1798.2616091894977,
+            "y": 540
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 51,
+          "cooldown": 700,
+          "lock": "transitioning",
+          "transitionRequestCount": 1,
+          "onEnter": {
+            "plaza": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": true,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": true,
+            "complete": false,
+            "progress": 0.6053636363636367,
+            "alpha": 0.6053636363636367
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        {
+          "t": 53,
+          "room": "taller",
+          "local": {
+            "x": 480.658997248,
+            "y": 410
+          },
+          "sprite": {
+            "x": 480.658997248,
+            "y": 410
+          },
+          "width": 960,
+          "height": 540,
+          "sceneTicks": 56,
+          "cooldown": 683.36,
+          "lock": "idle",
+          "transitionRequestCount": 1,
+          "onEnter": {
+            "plaza": 1,
+            "taller": 1
+          },
+          "armed": {
+            "plaza": false
+          },
+          "fade": {
+            "running": true,
+            "complete": false,
+            "progress": 0,
+            "alpha": 1
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 960,
+            "height": 540
+          }
+        }
+      ]
+    },
+    "result": {
+      "room": "taller",
+      "local": {
+        "x": 482.63934984723187,
+        "y": 410
+      },
+      "sprite": {
+        "x": 482.63934984723187,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "sceneTicks": 58,
+      "cooldown": 650.0733333333334,
+      "lock": "idle",
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "armed": {
+        "plaza": false
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.13869444444444418,
+        "alpha": 0.8613055555555558
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "settled": {
+      "room": "taller",
+      "local": {
+        "x": 484.2250475637527,
+        "y": 410
+      },
+      "sprite": {
+        "x": 484.2250475637527,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "sceneTicks": 75,
+      "cooldown": 350.19333333333395,
+      "lock": "idle",
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "armed": {
+        "plaza": false
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "graph": "RoomGraph.resolve(plaza, taller)"
+  },
+  "keyboardTallerToPlaza": {
+    "method": "real Playwright keydown S from Taller entry to local plaza exit",
+    "start": {
+      "room": "taller",
+      "local": {
+        "x": 484.2250475637527,
+        "y": 410
+      },
+      "sprite": {
+        "x": 484.2250475637527,
+        "y": 410
+      },
+      "width": 960,
+      "height": 540,
+      "sceneTicks": 75,
+      "cooldown": 350.19333333333395,
+      "lock": "idle",
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "armed": {
+        "plaza": false
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "move": {
+      "start": {
+        "room": "taller",
+        "local": {
+          "x": 484.2250475637527,
+          "y": 410
+        },
+        "sprite": {
+          "x": 484.2250475637527,
+          "y": 410
+        },
+        "width": 960,
+        "height": 540,
+        "sceneTicks": 76,
+        "cooldown": 330.19333333333395,
+        "lock": "idle",
+        "transitionRequestCount": 1,
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        },
+        "armed": {
+          "plaza": false
+        },
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540
+        }
+      },
+      "end": {
+        "room": "plaza",
+        "local": {
+          "x": 1820,
+          "y": 540.952
+        },
+        "sprite": {
+          "x": 1820,
+          "y": 540.952
+        },
+        "width": 1920,
+        "height": 1080,
+        "sceneTicks": 98,
+        "cooldown": 680,
+        "lock": "idle",
+        "transitionRequestCount": 2,
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        },
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0,
+          "alpha": 1
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        }
+      },
+      "path": [
+        {
+          "t": 0,
+          "room": "taller",
+          "local": {
+            "x": 484.2250475637527,
+            "y": 410
+          },
+          "sprite": {
+            "x": 484.2250475637527,
+            "y": 410
+          },
+          "width": 960,
+          "height": 540,
+          "sceneTicks": 76,
+          "cooldown": 330.19333333333395,
+          "lock": "idle",
+          "transitionRequestCount": 1,
+          "onEnter": {
+            "plaza": 1,
+            "taller": 1
+          },
+          "armed": {
+            "plaza": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 960,
+            "height": 540
+          }
+        },
+        {
+          "t": 5,
+          "room": "taller",
+          "local": {
+            "x": 484.2250475637527,
+            "y": 419.3138609806164
+          },
+          "sprite": {
+            "x": 484.2250475637527,
+            "y": 419.3138609806164
+          },
+          "width": 960,
+          "height": 540,
+          "sceneTicks": 81,
+          "cooldown": 215.19333333333392,
+          "lock": "idle",
+          "transitionRequestCount": 1,
+          "onEnter": {
+            "plaza": 1,
+            "taller": 1
+          },
+          "armed": {
+            "plaza": false
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 960,
+            "height": 540
+          }
+        },
+        {
+          "t": 11,
+          "room": "taller",
+          "local": {
+            "x": 484.2250475637527,
+            "y": 442.4545742797101
+          },
+          "sprite": {
+            "x": 484.2250475637527,
+            "y": 442.4545742797101
+          },
+          "width": 960,
+          "height": 540,
+          "sceneTicks": 87,
+          "cooldown": 700,
+          "lock": "transitioning",
+          "transitionRequestCount": 2,
+          "onEnter": {
+            "plaza": 1,
+            "taller": 1
+          },
+          "armed": {
+            "plaza": true
+          },
+          "fade": {
+            "running": false,
+            "complete": true,
+            "progress": 1,
+            "alpha": 0
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 960,
+            "height": 540
+          }
+        },
+        {
+          "t": 17,
+          "room": "taller",
+          "local": {
+            "x": 484.2250475637527,
+            "y": 442.4545742797101
+          },
+          "sprite": {
+            "x": 484.2250475637527,
+            "y": 442.4545742797101
+          },
+          "width": 960,
+          "height": 540,
+          "sceneTicks": 93,
+          "cooldown": 700,
+          "lock": "transitioning",
+          "transitionRequestCount": 2,
+          "onEnter": {
+            "plaza": 1,
+            "taller": 1
+          },
+          "armed": {
+            "plaza": true
+          },
+          "fade": {
+            "running": true,
+            "complete": false,
+            "progress": 0.46209090909090883,
+            "alpha": 0.46209090909090883
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 960,
+            "height": 540
+          }
+        },
+        {
+          "t": 22,
+          "room": "plaza",
+          "local": {
+            "x": 1820,
+            "y": 540.952
+          },
+          "sprite": {
+            "x": 1820,
+            "y": 540.952
+          },
+          "width": 1920,
+          "height": 1080,
+          "sceneTicks": 98,
+          "cooldown": 680,
+          "lock": "idle",
+          "transitionRequestCount": 2,
+          "onEnter": {
+            "plaza": 2,
+            "taller": 1
+          },
+          "armed": {
+            "puerta": false,
+            "taller": true,
+            "castle_gate": false
+          },
+          "fade": {
+            "running": true,
+            "complete": false,
+            "progress": 0,
+            "alpha": 1
+          },
+          "camera": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        }
+      ]
+    },
+    "result": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 543.87133320896
+      },
+      "sprite": {
+        "x": 1820,
+        "y": 543.87133320896
+      },
+      "width": 1920,
+      "height": 1080,
+      "sceneTicks": 100,
+      "cooldown": 638.34,
+      "lock": "idle",
+      "transitionRequestCount": 2,
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      },
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.17358333333333312,
+        "alpha": 0.8264166666666669
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "settled": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 545.4565587786984
+      },
+      "sprite": {
+        "x": 1820,
+        "y": 545.4565587786984
+      },
+      "width": 1920,
+      "height": 1080,
+      "sceneTicks": 116,
+      "cooldown": 265.04,
+      "lock": "idle",
+      "transitionRequestCount": 2,
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      },
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "graph": "RoomGraph.resolve(taller, plaza)"
+  },
+  "transitionLock": {
+    "afterBothDirections": "idle",
+    "noStuckLock": true
+  },
+  "consoleErrors": [],
+  "pass": true
+}

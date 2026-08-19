@@ -1,0 +1,6 @@
+src/jugar/ExplorationScene.ts(59,3): error TS6133: 'doorExitId' is declared but its value is never read.
+src/jugar/ExplorationScene.ts(830,11): error TS2322: Type 'DoorDefLike' is not assignable to type 'DoorDef'.
+  Types of property 'locked' are incompatible.
+    Type '(() => unknown) | undefined' is not assignable to type '(() => true | Line[] | null) | undefined'.
+      Type '() => unknown' is not assignable to type '() => true | Line[] | null'.
+        Type 'unknown' is not assignable to type 'true | Line[] | null'.

@@ -1,0 +1,224 @@
+{
+  "tally": {
+    "pass": 27,
+    "fail": 10,
+    "info": [
+      {
+        "name": "T1.1 activeRoom.id === plaza",
+        "ok": true,
+        "detail": "{\"id\":\"plaza\",\"w\":1920,\"h\":1080,\"pl\":{\"x\":220,\"y\":760}}"
+      },
+      {
+        "name": "T1.2 activeRoom.width === 1920",
+        "ok": true,
+        "detail": "w=1920"
+      },
+      {
+        "name": "T1.3 activeRoom.height === 1080",
+        "ok": true,
+        "detail": "h=1080"
+      },
+      {
+        "name": "T1.4 playerLocal inside plaza",
+        "ok": true,
+        "detail": "{\"x\":220,\"y\":760}"
+      },
+      {
+        "name": "T1.5 camera local 1920×1080",
+        "ok": true,
+        "detail": "{\"x\":0,\"y\":0,\"w\":1920,\"h\":1080}"
+      },
+      {
+        "name": "T1.6 transition lock idle",
+        "ok": true,
+        "detail": "{\"phase\":\"idle\"}"
+      },
+      {
+        "name": "T1.7 chunks contains only plaza",
+        "ok": true,
+        "detail": "[\"plaza\"]"
+      },
+      {
+        "name": "T2.1 plaza has local taller exit",
+        "ok": true,
+        "detail": "{\"exitId\":\"taller\",\"rect\":{\"x\":1820,\"y\":500,\"w\":100,\"h\":80},\"defTo\":\"taller\"}"
+      },
+      {
+        "name": "T2.2 exit rect in LOCAL plaza coords (x<1920)",
+        "ok": true,
+        "detail": "x=1820"
+      },
+      {
+        "name": "T2.3 playerLocal inside plaza (target reached)",
+        "ok": true,
+        "detail": "pl={\"x\":1870,\"y\":540}"
+      },
+      {
+        "name": "T2.4 trigger fires transition (UI)",
+        "ok": false,
+        "detail": "{\"id\":\"plaza\",\"pl\":{\"x\":1870,\"y\":540}}"
+      },
+      {
+        "name": "T2.5 activeRoom.width === 960",
+        "ok": false,
+        "detail": "w=1920"
+      },
+      {
+        "name": "T2.6 activeRoom.height === 540",
+        "ok": false,
+        "detail": "h=1080"
+      },
+      {
+        "name": "T2.7 playerLocal inside taller bounds",
+        "ok": false,
+        "detail": "pl={\"x\":1870,\"y\":540}"
+      },
+      {
+        "name": "T2.8 camera local 960×540",
+        "ok": false,
+        "detail": "{\"x\":0,\"y\":0,\"w\":1920,\"h\":1080}"
+      },
+      {
+        "name": "T2.9 chunks contains only taller",
+        "ok": false,
+        "detail": "[\"plaza\"]"
+      },
+      {
+        "name": "T2c.1 manually invoking trigger loop fires",
+        "ok": true,
+        "detail": "{\"id\":\"taller\",\"pl\":{\"x\":480,\"y\":410}}"
+      },
+      {
+        "name": "T3.1 taller has plaza exit",
+        "ok": true,
+        "detail": "{\"exitId\":\"plaza\",\"rect\":{\"x\":430,\"y\":465,\"w\":100,\"h\":75},\"defTo\":\"plaza\"}"
+      },
+      {
+        "name": "T3.2 trigger fires transition (UI)",
+        "ok": false,
+        "detail": "{\"id\":\"taller\",\"pl\":{\"x\":480,\"y\":502.5}}"
+      },
+      {
+        "name": "T3.3 activeRoom.width === 1920",
+        "ok": false,
+        "detail": "w=960"
+      },
+      {
+        "name": "T3.4 activeRoom.height === 1080",
+        "ok": false,
+        "detail": "h=540"
+      },
+      {
+        "name": "T3.5 playerLocal inside plaza bounds",
+        "ok": true,
+        "detail": "pl={\"x\":480,\"y\":502.5}"
+      },
+      {
+        "name": "T3.6 transition lock idle",
+        "ok": true,
+        "detail": "{\"phase\":\"idle\"}"
+      },
+      {
+        "name": "T4.1 inspection: plaza→taller connection exists with sane visible/locked",
+        "ok": true,
+        "detail": "{\"exists\":true,\"to\":\"taller\",\"kind\":\"fade\",\"visible\":\"undef\",\"locked\":null}"
+      },
+      {
+        "name": "T4.2 destination still taller",
+        "ok": true,
+        "detail": "{\"id\":\"taller\",\"pl\":{\"x\":480,\"y\":410}}"
+      },
+      {
+        "name": "T4.3 local dimensions 960×540 unchanged",
+        "ok": true,
+        "detail": "w=960 h=540"
+      },
+      {
+        "name": "T4.4 camera local 960×540",
+        "ok": true,
+        "detail": "{\"x\":0,\"y\":0,\"w\":960,\"h\":540}"
+      },
+      {
+        "name": "T4.5 playerLocal inside taller",
+        "ok": true,
+        "detail": "pl={\"x\":480,\"y\":410}"
+      },
+      {
+        "name": "T4.6 placement restored",
+        "ok": true,
+        "detail": "manual"
+      },
+      {
+        "name": "T5.1 plaza→puerta connection exists",
+        "ok": true,
+        "detail": "{\"exists\":true,\"to\":\"puerta\",\"kind\":\"cinematic\",\"visible\":\"undef\",\"locked\":[{\"who\":\"\",\"text\":\"El arco norte. Más allá se adivina la Puerta de Ohm, y el aire pincha la piel.\"},{\"who\":\"\",\"text\":\"Edda dijo que esa cosa escupe rayos cuando se ofende. Mejor entender las piedras primero: el taller de Lumen queda al este.\"}]}"
+      },
+      {
+        "name": "T5.2 plaza→puerta is locked with diegetic lines",
+        "ok": true,
+        "detail": "2"
+      },
+      {
+        "name": "T5.3 activeRoom stays plaza (locked)",
+        "ok": true,
+        "detail": "{\"id\":\"plaza\",\"lock\":\"idle\"}"
+      },
+      {
+        "name": "T5.4 transition lock returns to idle",
+        "ok": true,
+        "detail": "{\"phase\":\"idle\"}"
+      },
+      {
+        "name": "T6.1 first direct call fires transition",
+        "ok": true,
+        "detail": "{\"r1\":\"transitioned\",\"id\":\"taller\"}"
+      },
+      {
+        "name": "T6.2 second call moves back to plaza",
+        "ok": true,
+        "detail": "{\"r2\":\"transitioned\",\"id\":\"plaza\"}"
+      },
+      {
+        "name": "T6.3 rapid back-and-forth ok",
+        "ok": false,
+        "detail": "{\"r3\":\"transitioned\",\"r3b\":\"blocked\",\"id\":\"taller\"}"
+      },
+      {
+        "name": "T6.4 lock is idle after rapid transitions",
+        "ok": true,
+        "detail": "{\"phase\":\"idle\"}"
+      }
+    ]
+  },
+  "consoleErrors": [],
+  "consoleLogs": [
+    {
+      "t": "debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "t": "debug",
+      "text": "[vite] connected."
+    },
+    {
+      "t": "log",
+      "text": "%cPhaser v4.1.0 (WebGL | Web Audio)%c https://phaser.io/v401 color: #ffffff; background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAOCAYAAAAmL5yKAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAARBJREFUeNpi/P//P0OHsPB/BiCoePuWkYFEwALSXJElzMBgLwE2CNkQxgWr/yMr/p8QimlBu5DQ//+8vBBco/ofzAe6imH+qv/53/6jYJAYSA4ZoxoANYTPKhiuCQZwGcJU+e4dqpMmvsDq14krV2MPAxDha2CMKvoXoiE/PBQUDgQD8j82UFae9B9bOIC8B9UD9gIjjIMN7Ns6lWHn4XMoYu62RgxO3tkMjIyMII2MYAOAtmFVhA+ADHf2ycGMRhANjUq8YO+WKWCvgAORIV8CkpDCrzIwsLIymC1qAtuAD4Bsh3sBmqAY3qcGwL2AC4DCpKtzHlgzOLWihwEuzTCN0GhDJHeYC4gByBphACDAAH2dDIxdjr+VAAAAAElFTkSuQmCC\"), linear-gradient(to bottom, #000814, #001d3d, #003566); background-repeat: no-repeat; background-position: 4px center, 0 0; padding: 2px 6px 2px 24px; background: transparent"
+    },
+    {
+      "t": "warning",
+      "text": "[.WebGL-0x789401fe9800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "t": "warning",
+      "text": "[.WebGL-0x789401fe9800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "t": "warning",
+      "text": "[.WebGL-0x789401fe9800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "t": "warning",
+      "text": "[.WebGL-0x789401fe9800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    }
+  ]
+}

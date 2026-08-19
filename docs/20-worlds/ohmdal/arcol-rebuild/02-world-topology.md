@@ -1,7 +1,29 @@
 # Ohmdal Arco I — Topología del mundo (rebuild)
 
-> Documento de trabajo. Es la geografía jugable de Cuenca de Ohm. NO es
-> canon (la biblia de mundo sigue siendo `docs/ohmdal-biblia/04_WORLD_BIBLE.md`).
+> ⚠ **ESTADO: `LEGACY` desde 2026-08-17.**
+>
+> Este documento describe el modelo "overworld simbólico + dioramas
+> regionales compactos con cargas/descargas" sobre Three.js HD-2D en
+> `src/hd2d-ohmdal/`. Por **ADR-001** (`docs/00-governance/ADR-001-phaser-multiarea-arc1.md`),
+> la dirección de producción del Arco I cambió a **Phaser 4 multi-área en
+> `src/jugar/`** con áreas contiguas mayores al viewport y cámara móvil.
+> El modelo "overworld + dioramas" **no es el plan de producción** del Arco
+> I.
+>
+> **Sigue siendo útil como:**
+> - referencia conceptual del atlas (qué landmarks existen, qué relaciones
+>   geográficas se preservan);
+> - insumo para el spatial map nuevo (`docs/20-worlds/ohmdal/room-based/ARC1_SPATIAL_MAP.md`),
+>   que reescribe las posiciones de las macroáreas en coordenadas de mundo
+>   del runtime Phaser;
+> - insumo para el room graph nuevo (`docs/20-worlds/ohmdal/room-based/ARC1_ROOM_GRAPH.md`),
+>   que adopta parte de las macroterritorios y los reagrupa en 11 macroáreas.
+>
+> **No usar como:** guía de arquitectura, modelo de carga/descarga, ni plan
+> de implementación. El runtime de producción es Phaser 4 multi-área, no
+> Three.js HD-2D con overworld+dioramas.
+>
+> Documento de trabajo. NO es canon (la biblia de mundo sigue siendo `docs/ohmdal-biblia/04_WORLD_BIBLE.md`).
 > Es la traducción de esa biblia a una topología concreta, continua y
 > espacialmente coherente para el rebuild.
 

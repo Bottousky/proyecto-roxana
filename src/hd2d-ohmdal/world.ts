@@ -28,6 +28,7 @@ import { buildCables, type CableVisuals } from "./environment/cables.ts";
 import { SpriteActor, spriteTexture } from "./environment/spriteActor.ts";
 import { ElectricalGraph } from "./engine/electricalGraph.ts";
 import { regionAt, NODES, CABLES, STEPS, REGION_PLACEMENT, WORLD_BOUNDS, REGIONS } from "./world/topology.ts";
+import { landmarkById } from "./world/layoutData.ts";
 import {
   mountDialog,
   showDialog,
@@ -86,7 +87,10 @@ export function createWorld(scene: THREE.Scene): World {
   const tex = createProceduralTextures();
   const lighting: LightingController = createLighting(scene);
   scene.background = new THREE.Color(0x3a4a68);
-  scene.fog = new THREE.Fog(0x3a4a68, 32, 95);
+  // Wider fog band so the 100m-wide diorama isn't washed in blue. The
+  // fog only fully tints the far horizon / distant landmarks; the Plaza
+  // and its characters stay readable.
+  scene.fog = new THREE.Fog(0x3a4a68, 60, 200);
 
   // ---------- Build the unified terrain (slabs + perimeter walls + horizon) ----------
   const terrain = buildTerrain(kit);
@@ -222,7 +226,11 @@ export function createWorld(scene: THREE.Scene): World {
     baseHeight: 1.0,
   });
   ohm.setCell(0, 0);
-  ohm.setPosition(REGION_PLACEMENT.puerta.x, REGION_PLACEMENT.puerta.z);
+  // Ohm stands on his activation plinth (north of the fountain, well
+  // inside the Plaza). Previously he was parked at the Puerta region
+  // (z=-40) which is 100m from the plaza camera and 100% fogged out.
+  const ohmPlinth = landmarkById("ohm_activation_plinth")!;
+  ohm.setPosition(ohmPlinth.position.x, ohmPlinth.position.z);
   ohm.setHeight(1.0);
   scene.add(ohm.group);
 
@@ -237,7 +245,12 @@ export function createWorld(scene: THREE.Scene): World {
     baseHeight: 1.65,
   });
   bindRowCol(edda, 0, 0);
-  edda.setPosition(REGION_PLACEMENT.plaza.x, REGION_PLACEMENT.plaza.z);
+  // Edda wanders the south-east quadrant of the Plaza (around the east
+  // bench + barrel). She used to be parked at the Plaza center, which
+  // is exactly where the fountain + bell stand, so her sprite ended
+  // up hidden behind the 1.65m-tall bell pedestal. The hero also
+  // spawns at the Plaza center, so the two stacked.
+  edda.setPosition(REGION_PLACEMENT.plaza.x + 6, REGION_PLACEMENT.plaza.z + 2);
   edda.setHeight(1.65);
   scene.add(edda.group);
 
@@ -251,7 +264,14 @@ export function createWorld(scene: THREE.Scene): World {
     baseHeight: 1.7,
   });
   bindRowCol(lumen, 1, 0);
-  lumen.setPosition(REGION_PLACEMENT.taller.x, REGION_PLACEMENT.taller.z);
+  // Lumen stands at the east opening of the Plaza (the doorway that
+  // leads into the Taller). He used to be parked at the Taller center
+  // (x=34, z=4), which is ~10m east of the Plaza east wall and out of
+  // the camera frame when the player is in the Plaza. The new position
+  // is just inside the Plaza on the east wall's opening threshold, so
+  // he's visible from the Plaza and the player walks past him on the
+  // way to the Taller.
+  lumen.setPosition(REGION_PLACEMENT.plaza.x + 18, REGION_PLACEMENT.plaza.z + 3);
   lumen.setHeight(1.7);
   scene.add(lumen.group);
 
@@ -269,7 +289,7 @@ export function createWorld(scene: THREE.Scene): World {
   const spawnMap: Record<string, { x: number; y: number }> = {
     portal:    { x: REGION_PLACEMENT.portal.x, y: REGION_PLACEMENT.portal.z }, // on the Portal platform (facing N to Plaza)
     camino:    { x: REGION_PLACEMENT.camino.x, y: REGION_PLACEMENT.camino.z },
-    plaza:     { x: REGION_PLACEMENT.plaza.x, y: REGION_PLACEMENT.plaza.z }, // center of the Plaza, by the fountain
+    plaza:     { x: REGION_PLACEMENT.plaza.x - 4, y: REGION_PLACEMENT.plaza.z - 3 }, // south-west of the fountain (avoids stacking on Edda / inside the bell)
     taller:    { x: REGION_PLACEMENT.taller.x - 6, y: REGION_PLACEMENT.taller.z }, // just west of the Taller
     puerta:    { x: REGION_PLACEMENT.puerta.x, y: REGION_PLACEMENT.puerta.z },
     calzada_alta: { x: REGION_PLACEMENT.calzada_alta.x, y: REGION_PLACEMENT.calzada_alta.z }, // south forecourt of the Puerta
@@ -412,20 +432,40 @@ export function createWorld(scene: THREE.Scene): World {
     hero.update(dt);
 
     // ---------- NPC positions follow the terrain elevation ----------
-    // Edda wanders the Plaza.
-    const eddaWander = Math.sin(performance.now() * 0.0007) * 1.5;
-    edda.setPosition(eddaWander + REGION_PLACEMENT.plaza.x, REGION_PLACEMENT.plaza.z);
+    // Edda wanders the south-east quadrant of the Plaza (around the east
+    // bench + barrel). She used to be parked at the Plaza center, which
+    // is exactly where the fountain + bell stand, so her sprite ended
+    // up hidden behind the 1.65m-tall bell pedestal.
+    const eddaT = performance.now() * 0.0006;
+    const eddaWanderX = Math.sin(eddaT) * 1.5;
+    const eddaWanderZ = Math.cos(eddaT * 0.7) * 0.8;
+    edda.setPosition(
+      REGION_PLACEMENT.plaza.x + 6 + eddaWanderX,
+      REGION_PLACEMENT.plaza.z + 2 + eddaWanderZ,
+    );
     edda.group.position.y = terrain.groundYAt(edda.position.x, edda.position.y);
     edda.setPlaying("idle");
     edda.update(dt);
-    // Lumen stays in the Taller (around the bench).
-    const lumenBob = Math.sin(performance.now() * 0.0006) * 0.4;
-    lumen.setPosition(REGION_PLACEMENT.taller.x + lumenBob, REGION_PLACEMENT.taller.z + 1);
+    // Lumen stands at the east opening of the Plaza (the doorway that
+    // leads into the Taller). He used to be parked at the Taller center
+    // (x=34, z=4), which is ~10m east of the Plaza east wall and out of
+    // the camera frame. The new position is just inside the Plaza on
+    // the east wall's opening threshold, with a small wander so he
+    // doesn't look glued to a single tile.
+    const lumenT = performance.now() * 0.0005;
+    const lumenWanderX = Math.sin(lumenT) * 0.6;
+    const lumenWanderZ = Math.cos(lumenT * 0.8) * 0.4;
+    lumen.setPosition(
+      REGION_PLACEMENT.plaza.x + 18 + lumenWanderX,
+      REGION_PLACEMENT.plaza.z + 3 + lumenWanderZ,
+    );
     lumen.group.position.y = terrain.groundYAt(lumen.position.x, lumen.position.y);
     lumen.setPlaying("idle");
     lumen.update(dt);
-    // Ohm sits on his pedestal in the Puerta region.
-    ohm.setPosition(REGION_PLACEMENT.puerta.x, REGION_PLACEMENT.puerta.z);
+    // Ohm stands on his activation plinth (north of the fountain, inside
+    // the Plaza). Previously he was at the Puerta region position, which
+    // is 100m from the plaza camera and 100% fogged out.
+    ohm.setPosition(ohmPlinth.position.x, ohmPlinth.position.z);
     ohm.group.position.y = terrain.groundYAt(ohm.position.x, ohm.position.y);
     ohm.setPlaying("idle");
     ohm.update(dt);
@@ -553,8 +593,10 @@ export function createWorld(scene: THREE.Scene): World {
       const targetBg = state === "dormant" ? new THREE.Color(0x3a4a68) : new THREE.Color(0x4a5a82);
       if (scene.fog instanceof THREE.Fog) {
         scene.fog.color.lerp(targetFog, 0.04);
-        const targetNear = state === "dormant" ? 32 : 38;
-        const targetFar = state === "dormant" ? 95 : 115;
+        // Wider fog band so the Plaza + Puerta + Taller stay readable. The
+        // state still tints the distance, but the playable area is clean.
+        const targetNear = state === "dormant" ? 60 : 70;
+        const targetFar = state === "dormant" ? 200 : 240;
         scene.fog.near = THREE.MathUtils.lerp(scene.fog.near, targetNear, 0.04);
         scene.fog.far = THREE.MathUtils.lerp(scene.fog.far, targetFar, 0.04);
       }

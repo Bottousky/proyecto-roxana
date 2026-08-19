@@ -1,6 +1,26 @@
 # 03 — HD-2D Greybox Build (Arc I)
 
-> Status: **playable, end-to-end walkable, ready for design review.**
+> ⚠ **ESTADO: `LEGACY` desde 2026-08-17.**
+>
+> Este documento describe el greybox HD-2D Three.js construido sobre
+> `src/hd2d-ohmdal/`. Por **ADR-001** (`docs/00-governance/ADR-001-phaser-multiarea-arc1.md`),
+> la dirección de producción del Arco I cambió a **Phaser 4 multi-área en
+> `src/jugar/`** y este greybox deja de ser el plan de producción.
+>
+> **Sigue siendo útil como:**
+> - referencia de lo que ya se construyó en HD-2D (qué regiones, qué
+>   escaleras, qué dimensiones);
+> - insumo conceptual para el greybox multi-área nuevo (qué landmarks,
+>   qué conectividad);
+> - evidencia histórica de que el "sendero continuo" es físicamente
+>   viable a escala 1 m = 16 px.
+>
+> **No usar como:** plan de producción. El greybox jugable del Arco I se
+> construye sobre `src/jugar/`, no sobre `src/hd2d-ohmdal/`.
+>
+> ---
+>
+> Status original: **playable, end-to-end walkable, ready for design review.**
 > Scope: `src/hd2d-ohmdal/` only. The legacy Phaser 2D and the `ohmdal-arco1` Canvas2D skeleton are untouched.
 
 ## What's built

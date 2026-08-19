@@ -1,0 +1,2 @@
+import { chromium } from 'playwright';
+const b=await chromium.launch({headless:true});const p=await b.newPage({viewport:{width:960,height:540}});await p.goto('http://localhost:5173/jugar/?from=portal&room=plaza',{waitUntil:'load'});await p.waitForFunction(()=>window.__game?.scene?.getScene('explore')?.activeRoom?.id==='plaza',null,{timeout:25000});console.log(await p.evaluate(()=>{const c=window.__game.scene.getScene('explore').cameras.main; const e=c.fadeEffect; return {fadeEffect:e,keys:e?Object.keys(e):[]};}));await b.close();

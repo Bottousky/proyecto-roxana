@@ -60,6 +60,12 @@ export class SpriteActor {
       alphaTest: pixelArt ? 0.4 : 0.0,
       side: THREE.DoubleSide,
       depthWrite: false,
+      // Keep sprites crisp and fully saturated even when the world fog is
+      // active. Fog still desaturates the *environment* (terrain, walls,
+      // props) to communicate depth; the player + NPCs read as solid
+      // silhouettes on top of it. Without this, far-away characters get
+      // washed into the fog color and look "pale" / desaturated.
+      fog: false,
     });
     if (pixelArt) {
       texture.minFilter = THREE.NearestFilter;

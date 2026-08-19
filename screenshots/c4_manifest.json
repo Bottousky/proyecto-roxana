@@ -1,0 +1,42 @@
+[
+  {
+    "label": "01_spawn_portal_south",
+    "path": "screenshots/c4_01_spawn_portal_south.png"
+  },
+  {
+    "label": "02_centro",
+    "path": "screenshots/c4_02_centro.png"
+  },
+  {
+    "label": "03_extremo_oeste",
+    "path": "screenshots/c4_03_extremo_oeste.png"
+  },
+  {
+    "label": "04_extremo_este",
+    "path": "screenshots/c4_04_extremo_este.png"
+  },
+  {
+    "label": "05_extremo_norte",
+    "path": "screenshots/c4_05_extremo_norte.png"
+  },
+  {
+    "label": "06_extremo_sur",
+    "path": "screenshots/c4_06_extremo_sur.png"
+  },
+  {
+    "label": "07_cuadrante_NW",
+    "path": "screenshots/c4_07_cuadrante_NW.png"
+  },
+  {
+    "label": "08_cuadrante_NE",
+    "path": "screenshots/c4_08_cuadrante_NE.png"
+  },
+  {
+    "label": "09_cuadrante_SW",
+    "path": "screenshots/c4_09_cuadrante_SW.png"
+  },
+  {
+    "label": "10_cuadrante_SE",
+    "path": "screenshots/c4_10_cuadrante_SE.png"
+  }
+]

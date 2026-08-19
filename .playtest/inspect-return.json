@@ -1,0 +1,231 @@
+{
+  "room": "taller",
+  "local": {
+    "x": 482.64,
+    "y": 410
+  },
+  "sprite": {
+    "x": 482.64,
+    "y": 410
+  },
+  "width": 960,
+  "height": 540,
+  "ticks": 101,
+  "requestCount": 1,
+  "cooldown": 650.0266666666668,
+  "lock": "idle",
+  "armed": {
+    "plaza": false
+  },
+  "onEnter": {
+    "plaza": 1,
+    "taller": 1
+  },
+  "fade": {
+    "running": true,
+    "complete": false,
+    "progress": 0.13883333333333325,
+    "alpha": 0.8611666666666667,
+    "direction": false
+  },
+  "camera": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 540
+  }
+}
+[
+  {
+    "t": 0,
+    "room": "taller",
+    "local": {
+      "x": 484.23,
+      "y": 410
+    },
+    "sprite": {
+      "x": 484.23,
+      "y": 410
+    },
+    "width": 960,
+    "height": 540,
+    "ticks": 129,
+    "requestCount": 1,
+    "cooldown": 96.89333333333389,
+    "lock": "idle",
+    "armed": {
+      "plaza": false
+    },
+    "onEnter": {
+      "plaza": 1,
+      "taller": 1
+    },
+    "fade": {
+      "running": false,
+      "complete": true,
+      "progress": 1,
+      "alpha": 0,
+      "direction": false
+    },
+    "camera": {
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 540
+    }
+  },
+  {
+    "t": 170,
+    "room": "taller",
+    "local": {
+      "x": 484.23,
+      "y": 424.38
+    },
+    "sprite": {
+      "x": 484.23,
+      "y": 424.38
+    },
+    "width": 960,
+    "height": 540,
+    "ticks": 136,
+    "requestCount": 1,
+    "cooldown": 0,
+    "lock": "idle",
+    "armed": {
+      "plaza": false
+    },
+    "onEnter": {
+      "plaza": 1,
+      "taller": 1
+    },
+    "fade": {
+      "running": false,
+      "complete": true,
+      "progress": 1,
+      "alpha": 0,
+      "direction": false
+    },
+    "camera": {
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 540
+    }
+  },
+  {
+    "t": 293,
+    "room": "taller",
+    "local": {
+      "x": 484.23,
+      "y": 441.67
+    },
+    "sprite": {
+      "x": 484.23,
+      "y": 441.67
+    },
+    "width": 960,
+    "height": 540,
+    "ticks": 142,
+    "requestCount": 2,
+    "cooldown": 700,
+    "lock": "transitioning",
+    "armed": {
+      "plaza": true
+    },
+    "onEnter": {
+      "plaza": 1,
+      "taller": 1
+    },
+    "fade": {
+      "running": true,
+      "complete": false,
+      "progress": 0,
+      "alpha": 5e-324,
+      "direction": true
+    },
+    "camera": {
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 540
+    }
+  },
+  {
+    "t": 415,
+    "room": "taller",
+    "local": {
+      "x": 484.23,
+      "y": 441.67
+    },
+    "sprite": {
+      "x": 484.23,
+      "y": 441.67
+    },
+    "width": 960,
+    "height": 540,
+    "ticks": 148,
+    "requestCount": 2,
+    "cooldown": 700,
+    "lock": "transitioning",
+    "armed": {
+      "plaza": true
+    },
+    "onEnter": {
+      "plaza": 1,
+      "taller": 1
+    },
+    "fade": {
+      "running": true,
+      "complete": false,
+      "progress": 0.5529545454545459,
+      "alpha": 0.5529545454545459,
+      "direction": true
+    },
+    "camera": {
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 540
+    }
+  },
+  {
+    "t": 545,
+    "room": "plaza",
+    "local": {
+      "x": 1820,
+      "y": 545.18
+    },
+    "sprite": {
+      "x": 1820,
+      "y": 545.18
+    },
+    "width": 1920,
+    "height": 1080,
+    "ticks": 154,
+    "requestCount": 2,
+    "cooldown": 636.67,
+    "lock": "idle",
+    "armed": {
+      "puerta": false,
+      "taller": true,
+      "castle_gate": false
+    },
+    "onEnter": {
+      "plaza": 2,
+      "taller": 1
+    },
+    "fade": {
+      "running": true,
+      "complete": false,
+      "progress": 0.1805416666666667,
+      "alpha": 0.8194583333333333,
+      "direction": false
+    },
+    "camera": {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080
+    }
+  }
+]

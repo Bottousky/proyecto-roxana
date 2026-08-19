@@ -1,0 +1,170 @@
+{
+  "start": {
+    "room": "taller",
+    "local": {
+      "x": 487.1084268827099,
+      "y": 410
+    },
+    "cooldown": 231.71,
+    "armed": {
+      "plaza": false
+    },
+    "request": 1,
+    "onEnter": {
+      "taller": 1
+    },
+    "lock": "idle"
+  },
+  "samples": [
+    {
+      "t": 108,
+      "room": "taller",
+      "local": {
+        "x": 487.1084268827099,
+        "y": 430.4254313935263
+      },
+      "cooldown": 41.68999999999994,
+      "armed": {
+        "plaza": false
+      },
+      "request": 1,
+      "onEnter": {
+        "taller": 1
+      },
+      "lock": "idle"
+    },
+    {
+      "t": 114,
+      "room": "taller",
+      "local": {
+        "x": 487.1084268827099,
+        "y": 441.4386517305624
+      },
+      "cooldown": 700,
+      "armed": {
+        "plaza": true
+      },
+      "request": 2,
+      "onEnter": {
+        "taller": 1
+      },
+      "lock": "transitioning"
+    },
+    {
+      "t": 120,
+      "room": "taller",
+      "local": {
+        "x": 487.1084268827099,
+        "y": 441.4386517305624
+      },
+      "cooldown": 700,
+      "armed": {
+        "plaza": true
+      },
+      "request": 2,
+      "onEnter": {
+        "taller": 1
+      },
+      "lock": "transitioning"
+    },
+    {
+      "t": 125,
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 545.4494787717267
+      },
+      "cooldown": 635.01,
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "request": 2,
+      "onEnter": {
+        "taller": 1,
+        "plaza": 1
+      },
+      "lock": "idle"
+    }
+  ],
+  "around": [
+    {
+      "t": 108,
+      "room": "taller",
+      "local": {
+        "x": 487.1084268827099,
+        "y": 430.4254313935263
+      },
+      "cooldown": 41.68999999999994,
+      "armed": {
+        "plaza": false
+      },
+      "request": 1,
+      "onEnter": {
+        "taller": 1
+      },
+      "lock": "idle"
+    },
+    {
+      "t": 114,
+      "room": "taller",
+      "local": {
+        "x": 487.1084268827099,
+        "y": 441.4386517305624
+      },
+      "cooldown": 700,
+      "armed": {
+        "plaza": true
+      },
+      "request": 2,
+      "onEnter": {
+        "taller": 1
+      },
+      "lock": "transitioning"
+    },
+    {
+      "t": 120,
+      "room": "taller",
+      "local": {
+        "x": 487.1084268827099,
+        "y": 441.4386517305624
+      },
+      "cooldown": 700,
+      "armed": {
+        "plaza": true
+      },
+      "request": 2,
+      "onEnter": {
+        "taller": 1
+      },
+      "lock": "transitioning"
+    },
+    {
+      "t": 125,
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 545.4494787717267
+      },
+      "cooldown": 635.01,
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "request": 2,
+      "onEnter": {
+        "taller": 1,
+        "plaza": 1
+      },
+      "lock": "idle"
+    }
+  ],
+  "requestCountAtEnd": 2,
+  "onEnterAtEnd": {
+    "taller": 1,
+    "plaza": 1
+  },
+  "errors": []
+}

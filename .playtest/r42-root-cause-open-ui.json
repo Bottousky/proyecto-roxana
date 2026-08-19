@@ -1,0 +1,2234 @@
+{
+  "summary": {
+    "before": {
+      "tick": 1,
+      "uiOpen": true,
+      "map": false,
+      "room": "plaza",
+      "local": {
+        "x": 220,
+        "y": 760
+      },
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "cooldown": 0,
+      "armed": {}
+    },
+    "after": {
+      "tick": 46,
+      "requestCount": 0,
+      "room": "plaza",
+      "local": {
+        "x": 220,
+        "y": 760
+      },
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "cooldown": 0,
+      "lock": "idle",
+      "armed": {}
+    },
+    "decisiveFrame": {
+      "tick": 1,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    "nextFrames": [
+      {
+        "tick": 1,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 220,
+          "y": 760
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 220,
+          "y": 760
+        },
+        "clampChanged": true,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": false,
+        "wasInside": false,
+        "exitArmed": false,
+        "doorCooldown": 0,
+        "transitionLock": "idle",
+        "transitionRequestCount": 0,
+        "mapOpen": false,
+        "transitioning": false,
+        "uiOpen": true
+      },
+      {
+        "tick": 2,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 220,
+          "y": 760
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 220,
+          "y": 760
+        },
+        "clampChanged": true,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": false,
+        "wasInside": false,
+        "exitArmed": false,
+        "doorCooldown": 0,
+        "transitionLock": "idle",
+        "transitionRequestCount": 0,
+        "mapOpen": false,
+        "transitioning": false,
+        "uiOpen": true
+      },
+      {
+        "tick": 3,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 220,
+          "y": 760
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 220,
+          "y": 760
+        },
+        "clampChanged": true,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": false,
+        "wasInside": false,
+        "exitArmed": false,
+        "doorCooldown": 0,
+        "transitionLock": "idle",
+        "transitionRequestCount": 0,
+        "mapOpen": false,
+        "transitioning": false,
+        "uiOpen": true
+      },
+      {
+        "tick": 4,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 220,
+          "y": 760
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 220,
+          "y": 760
+        },
+        "clampChanged": true,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": false,
+        "wasInside": false,
+        "exitArmed": false,
+        "doorCooldown": 0,
+        "transitionLock": "idle",
+        "transitionRequestCount": 0,
+        "mapOpen": false,
+        "transitioning": false,
+        "uiOpen": true
+      }
+    ],
+    "errors": []
+  },
+  "fullTrace": [
+    {
+      "tick": 1,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 2,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 3,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 4,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 5,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 6,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 7,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 8,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 9,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 10,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 11,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 12,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 13,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 14,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 15,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 16,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 17,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 18,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 19,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 20,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 21,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 22,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 23,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 24,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 25,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 26,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 27,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 28,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 29,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 30,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 31,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 32,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 33,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 34,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 35,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 36,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 37,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 38,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 39,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 40,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 41,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 42,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 43,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 44,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 45,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    },
+    {
+      "tick": 46,
+      "phase": "before",
+      "activeRoom": "plaza",
+      "playerLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "rawLocal": {
+        "x": 1870,
+        "y": 540
+      },
+      "clampedLocal": {
+        "x": 220,
+        "y": 760
+      },
+      "clampChanged": true,
+      "sprite": {
+        "x": 1870,
+        "y": 540
+      },
+      "triggerRect": {
+        "x": 1820,
+        "y": 500,
+        "w": 100,
+        "h": 80
+      },
+      "zone": {
+        "x": 1806,
+        "y": 486,
+        "w": 128,
+        "h": 108
+      },
+      "inside": false,
+      "wasInside": false,
+      "exitArmed": false,
+      "doorCooldown": 0,
+      "transitionLock": "idle",
+      "transitionRequestCount": 0,
+      "mapOpen": false,
+      "transitioning": false,
+      "uiOpen": true
+    }
+  ]
+}

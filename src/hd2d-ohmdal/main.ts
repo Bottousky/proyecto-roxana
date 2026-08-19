@@ -32,7 +32,7 @@ const debugOpts = readLayoutDebugParams();
 const layoutDebug: LayoutDebug = createLayoutDebug(renderer.scene, debugOpts);
 
 // Top-down review needs the fog pulled far back (the gameplay fog culls at
-// ~95m, but the review camera sits far above the diorama).
+// ~200m, but the review camera sits far above the diorama).
 const setTopView = (on: boolean) => {
   layoutDebug.enableTop();
   camera.setTopView(on, WORLD_BOUNDS);
@@ -40,12 +40,13 @@ const setTopView = (on: boolean) => {
   if (on) {
     renderer.setToneExposure(1.1);
     if (renderer.scene.fog instanceof THREE.Fog) {
-      renderer.setFog(0x3a4a68, 200, 500);
+      renderer.setFog(0x3a4a68, 280, 700);
     }
   } else {
     renderer.setToneExposure(1.45);
     if (renderer.scene.fog instanceof THREE.Fog) {
-      renderer.setFog(0x3a4a68, 28, 75);
+      // Match the wider gameplay fog (60, 200) so the Plaza isn't tinted.
+      renderer.setFog(0x3a4a68, 60, 200);
     }
   }
 };

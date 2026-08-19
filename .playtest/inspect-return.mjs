@@ -1,0 +1,1 @@
+import {readFileSync} from 'node:fs';const r=JSON.parse(readFileSync('.playtest/r42-natural-runtime.json','utf8'));console.log(JSON.stringify(r.keyboard.return.start,null,2));console.log(JSON.stringify(r.keyboard.return.south.samples.slice(0,20),null,2));

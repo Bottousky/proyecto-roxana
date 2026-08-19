@@ -1,0 +1,15 @@
+import { chromium } from 'playwright';
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage({viewport:{width:960,height:540}});
+const errors=[]; page.on('console',m=>{if(m.type()==='error')errors.push(m.text())}); page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://localhost:5173/jugar/?from=portal&room=plaza',{waitUntil:'load'});
+await page.waitForFunction(()=>window.__game?.scene?.getScene('explore')?.activeRoom?.id==='plaza',null,{timeout:25000});
+await page.waitForTimeout(300);
+await page.evaluate(()=>{const s=window.__game.scene.getScene('explore'); window.__roxana.state.flags.ohmAwake=true; s.updateTraceEnabled=true; s.updateTrace=[]; s.updateTickCount=0; s.transitionRequestCount=0;});
+await page.waitForTimeout(250);
+const boot=await page.evaluate(()=>{const s=window.__game.scene.getScene('explore');return {tick:s.updateTickCount,request:s.transitionRequestCount,trace:s.updateTrace.slice(-6),active:s.activeRoom.id,local:s.activeRoom.playerLocal,ui:document.querySelector('#dialog')?.className};});
+await page.evaluate(()=>{const s=window.__game.scene.getScene('explore');const t=s.exitTriggers.find(t=>t.exitId==='taller');const x=t.rect.x+t.rect.w/2,y=t.rect.y+t.rect.h/2;s.player.setPosition(x,y);const p=s.activeLegacyPlacement();s.activeRoom.playerLocal={x:x-p.ox,y:y-p.oy};s.doorCooldown=0;s.exitArmed.clear();});
+await page.waitForTimeout(1000);
+const out=await page.evaluate(()=>{const s=window.__game.scene.getScene('explore');return {tick:s.updateTickCount,request:s.transitionRequestCount,room:s.activeRoom.id,local:s.activeRoom.playerLocal,cooldown:s.doorCooldown,lock:s.transitionLock.phase,armed:Object.fromEntries(s.exitArmed),trace:s.updateTrace};});
+console.log('BOOT',JSON.stringify(boot,null,2)); console.log('OUT',JSON.stringify(out,null,2)); console.log('ERRORS',JSON.stringify(errors));
+await browser.close();

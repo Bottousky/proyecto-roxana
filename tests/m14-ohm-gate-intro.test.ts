@@ -18,8 +18,9 @@ assert(
   'la explicación se muestra y registra solamente en la primera interacción',
 );
 assert(
-  scene.includes('if (Array.isArray(lockedLines) && lockedLines.length > 0)'),
-  'una barrera silenciosa no dispara diálogo ni sonido de puerta cerrada',
+  scene.includes('Array.isArray((evalR.block as { lines?: unknown }).lines)') &&
+    scene.includes('sfxLocked()'),
+  'una barrera silenciosa no dispara diálogo ni sonido de puerta cerrada (R4: barrera evaluada por el grafo)',
 );
 assert(
   state.includes('puertaMecanismoIntro: boolean;') &&

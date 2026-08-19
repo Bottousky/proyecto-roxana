@@ -35,6 +35,14 @@ if [ "$TEST_FILES" -eq 0 ]; then
 else
   FAILED=0
   for t in tests/*.test.ts; do
+    # Los tests `_legacy_*` son del prototipo HD-2D Three.js abandonado por
+    # ADR-001 (2026-08-17). No son parte del runtime de producción; el
+    # runner principal (`scripts/run-tests.mjs`) los filtra. El script
+    # `verify` mantiene el mismo filtro para que refleje exactamente lo
+    # que ejecuta `npm test`.
+    case "$(basename "$t")" in
+      _legacy*) continue ;;
+    esac
     if node --experimental-strip-types "$t" > /tmp/test-output.txt 2>&1; then
       ok "$(basename $t)"
     else

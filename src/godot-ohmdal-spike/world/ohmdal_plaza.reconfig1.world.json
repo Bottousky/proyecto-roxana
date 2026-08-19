@@ -1,0 +1,178 @@
+{
+  "schema": "ohmdal.worldspec.v1.reconfig1",
+  "world": "ohmdal",
+  "level": "plaza",
+  "description": "Ohmdal plaza — reconfiguration 1. Plaza Central +40% area. Lumen Workshop pushed further east. Secondary path added between Plaza and Lumen area. Decor redistributed.",
+  "coordinates": {
+    "system": "godot2d_centered",
+    "units": "world_units",
+    "x_axis": "east_positive",
+    "y_axis": "south_positive",
+    "north": "-y",
+    "south": "+y",
+    "east": "+x",
+    "west": "-x"
+  },
+  "size": {
+    "width": 1800,
+    "height": 1300,
+    "ground_color": "#9bc6a3",
+    "ground_border_color": "#5e8a6b"
+  },
+  "seed": 1729,
+  "landmarks": {
+    "portal_omega": {
+      "kind": "portal",
+      "name": "Portal Omega",
+      "position": { "x": 0, "y": 540 },
+      "size": { "width": 140, "height": 90 },
+      "color": "#5b8cdb",
+      "glow_color": "#aac9ff",
+      "tags": ["entry", "narrative:arrival"],
+      "narrative": "TODO(guion) portal de entrada a Ohmdal",
+      "pedagogical": ["concept:entry_world"]
+    },
+    "edda_marker": {
+      "kind": "npc_marker",
+      "name": "Edda",
+      "position": { "x": 0, "y": 340 },
+      "npc_id": "edda",
+      "tags": ["npc", "narrative:guide"]
+    },
+    "plaza_central": {
+      "kind": "plaza",
+      "name": "Plaza Central",
+      "position": { "x": 0, "y": 0 },
+      "size": { "width": 880, "height": 450 },
+      "color": "#d9c79a",
+      "border_color": "#9b8657",
+      "tags": ["hub", "monumental", "growth:future"]
+    },
+    "lumen_workshop": {
+      "kind": "building",
+      "name": "Taller de Maese Lumen",
+      "position": { "x": 760, "y": 60 },
+      "size": { "width": 280, "height": 200 },
+      "color": "#caa97a",
+      "roof_color": "#7a4a2c",
+      "tags": ["landmark", "workshop"],
+      "interior_scene": "LumenInterior"
+    },
+    "ohm_gate": {
+      "kind": "gate",
+      "name": "Puerta de Ohm",
+      "position": { "x": 0, "y": -560 },
+      "size": { "width": 220, "height": 120 },
+      "color": "#7a85a8",
+      "glow_color": "#b5b6e3",
+      "tags": ["landmark", "objective:ohm_gate", "locked"]
+    }
+  },
+  "lumen_npc": {
+    "npc_id": "lumen",
+    "position": { "x": 760, "y": 90 },
+    "tags": ["npc", "narrative:workshop_master"]
+  },
+  "paths": [
+    {
+      "id": "path_portal_to_plaza",
+      "kind": "main_axis",
+      "from": "portal_omega",
+      "to": "plaza_central",
+      "width": 130,
+      "color": "#c4ad7b",
+      "via": [{ "x": 0, "y": 440 }, { "x": 0, "y": 260 }, { "x": 0, "y": 220 }]
+    },
+    {
+      "id": "path_plaza_to_gate",
+      "kind": "main_axis",
+      "from": "plaza_central",
+      "to": "ohm_gate",
+      "width": 150,
+      "color": "#c4ad7b",
+      "via": [{ "x": 0, "y": -230 }, { "x": 0, "y": -360 }, { "x": 0, "y": -460 }]
+    },
+    {
+      "id": "path_plaza_to_workshop_main",
+      "kind": "primary_axis",
+      "from": "plaza_central",
+      "to": "lumen_workshop",
+      "width": 100,
+      "color": "#c4ad7b",
+      "via": [{ "x": 440, "y": 0 }, { "x": 560, "y": 0 }, { "x": 680, "y": 60 }]
+    },
+    {
+      "id": "path_plaza_to_workshop_secondary",
+      "kind": "secondary_axis",
+      "from": "plaza_central",
+      "to": "lumen_workshop",
+      "width": 70,
+      "color": "#c4ad7b",
+      "via": [{ "x": 420, "y": 140 }, { "x": 540, "y": 200 }, { "x": 660, "y": 180 }]
+    }
+  ],
+  "zones": [
+    {
+      "id": "approach_south",
+      "kind": "approach",
+      "bounds": { "x": -260, "y": 220, "width": 520, "height": 360 },
+      "tags": ["outdoor"]
+    },
+    {
+      "id": "garden_northeast",
+      "kind": "garden",
+      "bounds": { "x": 240, "y": -260, "width": 460, "height": 320 },
+      "tags": ["outdoor", "decor"]
+    },
+    {
+      "id": "garden_southwest",
+      "kind": "garden",
+      "bounds": { "x": -700, "y": -260, "width": 440, "height": 320 },
+      "tags": ["outdoor", "decor"]
+    },
+    {
+      "id": "lumen_yard",
+      "kind": "yard",
+      "bounds": { "x": 600, "y": -120, "width": 460, "height": 320 },
+      "tags": ["outdoor", "associated:lumen_workshop"]
+    },
+    {
+      "id": "corridor_east",
+      "kind": "approach",
+      "bounds": { "x": 320, "y": 100, "width": 360, "height": 220 },
+      "tags": ["outdoor", "pedagogical:secondary_route"]
+    }
+  ],
+  "decor": {
+    "lamp_count": 20,
+    "lamp_color": "#fff1b8",
+    "bench_count": 10,
+    "bench_color": "#8a6a4b",
+    "tree_count": 36,
+    "tree_color_dark": "#3f6a45",
+    "tree_color_light": "#5d8a55",
+    "sign_count": 5,
+    "fence_count": 6
+  },
+  "spawn": {
+    "player": { "x": 0, "y": 600 },
+    "edda": { "x": 0, "y": 340 },
+    "lumen": { "x": 760, "y": 90 }
+  },
+  "progression": [
+    {
+      "id": "ohmdal.current.basic",
+      "trigger": "interact_edda_first_time",
+      "unlocks": ["discovery:electric_current"],
+      "tags": ["pedagogical:basic_concept"]
+    },
+    {
+      "id": "ohm_gate.unlock",
+      "trigger": "objective_completed",
+      "requires": ["ohmdal.current.basic"],
+      "tags": ["locked_for_now"]
+    }
+  ],
+  "narrative_tags": ["ohmdal:arrival", "ohmdal:hub", "ohmdal:first_lesson", "reconfig:phase1"],
+  "pedagogical_tags": ["concept:world_entry", "concept:hub", "concept:workshop", "concept:locked_objective", "concept:secondary_route"]
+}

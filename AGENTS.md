@@ -197,3 +197,76 @@ No copiar bundles externos con provenance dudosa.
 - integración de milestone material.
 
 Un fix técnico local dentro de contrato claro se resuelve y se vuelve a jugar.
+
+## 12. Multi-model setup (Codex CLI + MiniMax)
+
+> **Adenda 2026-08-18.** Esta sección es **aditiva**. No reemplaza la cadena de modelos (§5) ni el workflow (§6). Documenta el harness operativo actual en Windows para que cualquier agente Codex o cualquier modelo bajo Codex trabaje sobre este repo sin reconfigurar nada.
+
+### 12.1 Harness y providers
+
+- **Harness principal:** Codex CLI 0.147+ (`codex` en PATH, `~/.codex/config.toml`).
+- **Provider disponible ahora:** MiniMax Direct (modelo `MiniMax-M3`, base `https://api.minimax.io/v1`, wire API `responses`, env `MINIMAX_API_KEY`).
+- **Provider dormido (cuota agotada):** OpenCode Go vía LiteLLM (port 4000) — DeepSeek V4 Pro/Flash, Kimi K3, Kimi K2.7 Code, GLM, MiMo, Hy3, Qwen. Se reactivan cuando vuelva la cuota, sin reconfigurar.
+- **Provider reservado (cuota declarada como agotada):** OpenAI nativo. Codex Desktop sigue apuntando a OpenAI; eso no cambia.
+- **Multimedia:** `mmx` (mmx-cli 1.0.19). Imagen, visión, voz, música, búsqueda, y video (con confirmación humana explícita por uso).
+
+### 12.2 Perfiles y comandos diarios
+
+| Alias | Comando | Modelo / provider |
+|---|---|---|
+| `codex` | `codex` | OpenAI / Codex (default) |
+| `cx-minimax` | `codex --profile minimax-direct` | MiniMax-M3 directo |
+| `cx-minimax-go` | `codex --profile minimax-go` | MiniMax-M3 vía OpenCode Go (dormido por cuota) |
+| `cx-deepseek` | `codex --profile deepseek` | DeepSeek V4 Pro (dormido por cuota) |
+| `cx-flash` | `codex --profile deepseek-fast` | DeepSeek V4 Flash (dormido por cuota) |
+| `cx-kimi` | `codex --profile kimi` | Kimi K3 (dormido por cuota) |
+| `cx-kimi-code` | `codex --profile kimi-code` | Kimi K2.7 Code (dormido por cuota) |
+| `cx-glm` | `codex --profile glm` | GLM-5.3 (dormido por cuota) |
+| `cx-mimo` | `codex --profile mimo` | MiMo v2.5 Pro (dormido por cuota) |
+| `cx-doctor` | `cx-doctor` | Diagnóstico no destructivo |
+
+Los aliases viven en `C:\Users\manue\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1` dentro de un bloque idempotente `# >>> Codex multi-model aliases >>>`. Son portables; viven en `~` y funcionan en cualquier cwd.
+
+### 12.3 Custom agents de Roxana (Codex subagents)
+
+En `C:\YO\Proyectos\Roxana\.codex\agents\` en formato **TOML** (Codex 0.125+; no Markdown). Heredan modelo del padre salvo que el task lo pida explícitamente:
+
+- `game-explorer.toml` — `sandbox_mode = "read-only"`. Mapea el repo y devuelve un handoff compacto. No edita.
+- `game-worker.toml` — `sandbox_mode = "workspace-write"`. Implementación acotada. Acepta un Task Contract y un handoff; no crece el scope.
+- `browser-playtester.toml` — `sandbox_mode = "workspace-write"` (limita escritura a `.playtest/`). Juega el build con Playwright, devuelve evidencia estructurada. No arregla código de aplicación.
+- `game-reviewer.toml` — `sandbox_mode = "read-only"`. Adversarial read-only. Intenta probar que la milestone no debería entrar.
+
+Los agents pre-existentes en `.opencode/agents/` (`reviewer.md`, `playtester.md`, `implementer.md` en formato OpenCode) se conservan y siguen siendo válidos para OpenCode Go. No se borran. Conviven con los nuevos `.toml` de Codex.
+
+Schema minimo de cada agent TOML: `name`, `description`, `developer_instructions` (requeridos) + `model`/`model_reasoning_effort`/`sandbox_mode` (opcionales). Ninguno declara `model` para heredar del padre.
+
+### 12.4 Skills de Roxana (Codex skills)
+
+En `C:\YO\Proyectos\Roxana\.agents\skills\`. Cada uno tiene `SKILL.md` y referencia la autoridad real del repo:
+
+- `roxana-canon` — cómo localizar docs canónicas, jerarquía de autoridad, no inventar.
+- `game-director` — intención → experiencia → requisito → criterios de aceptación binarios.
+- `ohmdal-room-engine` — derivado de `src/jugar/rooms.ts`, `roomGraph.ts`, `roomScenesData.ts` y `SPATIAL_CONTRACT.md`. Previene reintroducir autoridades paralelas para rooms/área/cámara/navegación.
+- `educational-puzzle-design` — pedagogía por interacción, no por quiz. Respeta lore.
+- `browser-game-playtest` — cuándo aplica y qué evidencia producir.
+- `minimax-media-production` — `mmx` como herramienta; greybox antes que arte.
+
+### 12.5 Lo que NO cambia
+
+- `docs/`, los `AGENTS.md` por scope, los ADRs y `MODEL_ROUTING.md` siguen siendo autoridad. Esta adenda no los modifica.
+- La cadena de modelos por defecto de §5 sigue vigente: el director mantiene la responsabilidad de contrato, el builder escribe, el player agent juega, el reviewer intenta romper. El cambio es de harness, no de roles.
+- `npm run build`, `npm test`, `npm run verify` siguen siendo el mechanical gate. Ningún provider, perfil, o alias los reemplaza.
+- La arquitectura room-based de Ohmdal (ADR-002, `SPATIAL_CONTRACT.md`) sigue siendo no negociable. Ningún modelo bajo Codex puede reescribirla sin ADR.
+
+### 12.6 Procedimiento ante cambio de cuota
+
+- Si vuelve la cuota de OpenCode Go, los profiles `cx-deepseek`, `cx-flash`, `cx-kimi`, `cx-kimi-code`, `cx-glm`, `cx-mimo` quedan utilizables sin reconfigurar.
+- Si vuelve la cuota de OpenAI, `codex` (sin profile) vuelve a ser el harness por defecto para OpenAI nativo.
+- Si vuelve a agotarse una cuota, se documenta en `cx-doctor` y se sigue usando el provider disponible.
+
+### 12.7 Referencias operativas
+
+- `~/.codex/MULTI_MODEL_SETUP.md` — setup global, troubleshooting.
+- `C:\Users\manue\.codex\scripts\cx-doctor.ps1` — diagnóstico no destructivo.
+- `docs/80-production/agentic/WORKFLOW.md` y `MODEL_ROUTING.md` — workflow y routing.
+- `docs/20-worlds/ohmdal/AGENTS.md` — reglas locales de Ohmdal.

@@ -19,7 +19,17 @@ export type SceneEffect =
   | { kind: 'sprite'; flag?: string; x: number; y: number; w: number; h: number; texture: string };
 
 export interface RoomSceneProfile {
-  background: string;
+  /**
+   * Sala cerrada con fondo pintado: clave de textura que llena el
+   * chunk 960×540. Desactiva el pase procedural y el mundo continuo;
+   * las puertas son transición. **Opcional** desde el commit 4
+   * (H3 — Plaza multi-área greybox): un área que no declara
+   * `background` se renderiza con `drawRoomBase` + `renderDecor`
+   * sobre sus `AreaDef` (puede medir varios viewports). El runtime
+   * distingue ambos casos inspeccionando `def.background` y este
+   * campo juntos.
+   */
+  background?: string;
   backgroundWhen?: { flag: string; key: string }[];
   walkable: SceneRect[];
   collision?: SceneRect[];
@@ -35,6 +45,58 @@ export interface RoomSceneProfile {
   /** datos narrativos retirados del runtime porque no tienen correlato visual o función. */
   hiddenThings?: string[];
   effects?: SceneEffect[];
+  /**
+   * Dimensiones lógicas del área en píxeles de diseño. Si están ausentes
+   * (estado heredado / pre-migración multi-área), el runtime asume
+   * `DEFAULT_AREA_WIDTH × DEFAULT_AREA_HEIGHT`. El viewport lógico del
+   * juego (Phaser `W × H`) sigue siendo 960×540 con independencia de
+   * este valor: una área puede medir varios viewports.
+   *
+   * `width` y `height` se introdujeron en el commit 1 de la iteración H2
+   * del refactor multi-área (ver `ADR-001`). Su uso en runtime es
+   * opcional: las 20 rooms existentes siguen funcionando sin cambios.
+   */
+  width?: number;
+  height?: number;
+}
+
+/**
+ * Tamaño por defecto de un área cuando `RoomSceneProfile.width` /
+   `height` están ausentes. Mantiene la conducta heredada
+   (1 viewport = 1 área) para no romper rooms preexistentes.
+ */
+export const DEFAULT_AREA_WIDTH = 960;
+export const DEFAULT_AREA_HEIGHT = 540;
+
+/**
+ * Dimensiones lógicas de un área, con defaults heredados. Útil para que
+ * el runtime consulte el tamaño del chunk sin tener que manejar el caso
+ * "no declarado" en cada punto. Devuelve siempre números positivos.
+ */
+export function areaDimensions(roomId: string): { width: number; height: number } {
+  const scene = ROOM_SCENES[roomId];
+  const w = scene?.width;
+  const h = scene?.height;
+  return {
+    width: typeof w === 'number' && w > 0 ? w : DEFAULT_AREA_WIDTH,
+    height: typeof h === 'number' && h > 0 ? h : DEFAULT_AREA_HEIGHT,
+  };
+}
+
+/**
+ * ¿Un punto en coordenadas locales cae dentro del bounding box del
+ * área? Útil como validador al construir escenas, mover NPCs, o
+ * decidir si un punto de entrada está dentro de los límites esperados.
+ * No reemplaza `collides()` (que evalúa walkable + sólidos), sólo el
+ * bounding box exterior.
+ */
+export function isPointInsideArea(
+  roomId: string,
+  localX: number,
+  localY: number,
+): boolean {
+  const { width, height } = areaDimensions(roomId);
+  return localX >= 0 && localX < width && localY >= 0 && localY < height;
 }
 
 const interior = { far: 0.82, near: 1, farY: 120, nearY: 470 };
@@ -44,66 +106,136 @@ const fixedRpg = { far: 1, near: 1, farY: 0, nearY: 540 };
 
 export const ROOM_SCENES: Record<string, RoomSceneProfile> = {
   plaza: {
-    background: 'room-plaza',
-    // Tras medir los dos caminos de la Campana, el Consejo concede la inspección:
-    // la reja oeste cambia de geometría y el vano queda realmente abierto.
-    backgroundWhen: [{ flag: 'solvedBellPaths', key: 'room-plaza-castle-open' }],
+    // Commit 4 (H3 — Plaza multi-área greybox): la Plaza pasa de
+    // 960×540 a 1920×1080. Se elimina el `background` pintado y
+    // ahora la puesta en escena es procedural: `drawRoomBase` +
+    // `renderDecor` con el `AreaDef` extendido. Los efectos
+    // visuales (luces, glows) se reubican a coordenadas que viven
+    // en el área grande, no en el antiguo cuadrante NW.
+    //
+    // El espacio se organiza como una **cruz + 4 plazas en las
+    // esquinas + anillo perimetral**:
+    //
+    //     ┌────────────────────────────────────┐  ← 0
+    //     │           Anillo N                 │
+    //     │   ╔══════╗   ╔══════╗              │
+    //     │   ║ NW  ║   ║ NE  ║              │
+    //     │   ╚══════╝   ╚══════╝              │
+    //     │            │EJE N-S│               │
+    //     │   ╔══════╗   ╔══════╗              │
+    //     │ ←─│ W  E │───│  E  │─→  (banda)    │
+    //     │   ╚══════╝   ╚══════╝              │
+    //     │   ║ SW  ║   ║ SE  ║              │
+    //     │   ╚══════╝   ╚══════╝              │
+    //     │            │EJE N-S│               │
+    //     │           Anillo S                 │
+    //     └────────────────────────────────────┘  ← 1080
+    //              0                     1920
+    //
+    // La banda E-O cruza la Plaza de oeste a este. El eje N-S la
+    // cruza de norte a sur. Las cuatro plazas en las esquinas
+    // quedan conectadas por la banda E-O. Para ir del NW al SE
+    // hay dos rutas: por la banda E-O y luego por el eje N-S, o
+    // bordeando el medallón central por el otro lado.
+    width: 1920,
+    height: 1080,
     perspective: medium,
     walkable: [
-      // La plaza abierta termina antes de la fachada del Taller. El atrio
-      // inferior conserva el piso transitable frente al edificio sin permitir
-      // caminar por sus paredes.
-      { x: 42, y: 58, w: 738, h: 428 },
-      { x: 760, y: 300, w: 152, h: 186 },
-      // El ingreso coincide con el rectángulo negro de la puerta. El atrio
-      // comienza debajo; no se puede atravesar la fachada por sus costados.
-      { x: 842, y: 238, w: 60, h: 82 },
-      { x: 430, y: 0, w: 105, h: 540 },
-      { x: 0, y: 140, w: 110, h: 210 },
-      { x: 0, y: 320, w: 110, h: 160 },
+      // Anillo perimetral: rutas alternativas alrededor del centro.
+      // Norte (entre el eje N-S y los bordes laterales)
+      { x: 0, y: 0, w: 880, h: 100 },
+      { x: 1040, y: 0, w: 880, h: 100 },
+      // Sur
+      { x: 0, y: 980, w: 880, h: 100 },
+      { x: 1040, y: 980, w: 880, h: 100 },
+      // Eje N-S: corredor central que conecta las 4 conexiones
+      // cardinales. Coincide con el gap del muro norte (puerta)
+      // y con el del muro sur (terrazas).
+      { x: 880, y: 0, w: 160, h: 1080 },
+      // Banda E-O: anillo horizontal que conecta el oeste
+      // (castillo) con el este (taller). Cubre el gap del muro
+      // oeste (castle_gate / forge_yard) y del muro este (taller).
+      { x: 0, y: 460, w: 1920, h: 160 },
+      // Cuatro plazas en las esquinas, conectadas entre sí sólo
+      // por la banda E-O. Crean el "espacio negativo" greybox.
+      { x: 80, y: 100, w: 760, h: 360 },   // NW
+      { x: 1080, y: 100, w: 760, h: 360 }, // NE
+      { x: 80, y: 620, w: 760, h: 360 },   // SW
+      { x: 1080, y: 620, w: 760, h: 360 }, // SE
     ],
     collision: [
-      // La campana no es un bloque rectangular: el cuerpo y los soportes
-      // dejan pasillos laterales y permiten acercarse a la cuerda desde abajo.
-      // El cuerpo sube hasta la corona: nadie puede caminar "sobre" la
-      // campana entrando por el corredor norte.
-      { x: 424, y: 112, w: 112, h: 188 },
-      { x: 390, y: 178, w: 27, h: 118 },
-      { x: 543, y: 178, w: 27, h: 118 },
+      // Medallón central (pedestal de Ohm). Es el landmark
+      // reconocible; alrededor suyo se cruzan los dos ejes.
+      { x: 920, y: 600, w: 80, h: 80 },
+      // Cuatro monolitos diagonales: dividen las plazas en
+      // esquinas y obligan a rodearlos. Son greybox puro
+      // (rectángulos con un marco pintado procedural).
+      { x: 200, y: 200, w: 100, h: 60 },   // monolito NW
+      { x: 1620, y: 200, w: 100, h: 60 },  // monolito NE
+      { x: 200, y: 800, w: 100, h: 60 },   // monolito SW
+      { x: 1620, y: 800, w: 100, h: 60 },  // monolito SE
+      // Campana monumental, reubicada al norte del medallón.
+      // Conserva la lógica de la plaza original: cuerpo central
+      // y dos soportes, dejando pasillos laterales para acceder
+      // a la cuerda desde abajo. El cuerpo termina en y=368 y
+      // el pedestal empieza en y=600: 232 px de espacio
+      // transitable entre ambos, suficiente para rodear.
+      { x: 924, y: 180, w: 72, h: 188 },
+      { x: 890, y: 246, w: 27, h: 118 },
+      { x: 1043, y: 246, w: 27, h: 118 },
     ],
     doors: {
-      taller: { x: 842, y: 238, w: 60, h: 60 },
-      puerta: { x: 420, y: 0, w: 120, h: 55 },
-      castle_gate: { x: 38, y: 190, w: 72, h: 120 },
-      forge_yard: { x: 0, y: 388, w: 34, h: 68 },
-      // El arco sur es el camino a Terrazas; el portal al aula vive en el sello suroeste.
-      terraces_top: { x: 452, y: 504, w: 56, h: 30 },
+      // Arco norte: hacia la Puerta de Ohm.
+      puerta: { x: 880, y: 0, w: 160, h: 60 },
+      // Arco este: hacia el Taller de Lumen.
+      taller: { x: 1820, y: 500, w: 100, h: 80 },
+      // Arco oeste: hacia el Castillo (alto) y la Forja (bajo).
+      castle_gate: { x: 0, y: 460, w: 60, h: 80 },
+      forge_yard: { x: 0, y: 540, w: 60, h: 80 },
+      // Arco sur: hacia las Terrazas.
+      terraces_top: { x: 880, y: 1020, w: 160, h: 60 },
     },
     entries: {
-      aula: { x: 180, y: 382 }, taller: { x: 872, y: 322 }, puerta: { x: 480, y: 90 },
-      castle_gate: { x: 90, y: 260 }, forge_yard: { x: 90, y: 420 }, terraces_top: { x: 480, y: 445 },
-      lighthouse_lantern: { x: 330, y: 445 },
+      // Portal-aula (cosa thing, no door): se reubica en el SW
+      // de la plaza, accesible desde la plaza SW.
+      aula: { x: 220, y: 760 },
+      taller: { x: 1820, y: 540 },
+      puerta: { x: 960, y: 80 },
+      castle_gate: { x: 60, y: 500 },
+      forge_yard: { x: 60, y: 580 },
+      terraces_top: { x: 960, y: 1000 },
     },
-    bakedThings: ['portal-aula', 'campana', 'lampara1', 'lampara2'],
+    // Ya no hay bakedThings: la Plaza se renderiza procedural
+    // con `drawRoomBase` + `renderDecor`. La campana y el portal
+    // dejan de ser horneados y pasan a ser props sólidos /
+    // interactuables gestionados por la `ThingDef` en rooms.ts.
     things: {
-      'portal-aula': { x: 180, y: 382, baked: true },
-      pedestal: { x: 480, y: 342 },
-      // Edda lleva años intentando despertar a Ohm: al llegar, está junto al pedestal.
-      edda: { x: 560, y: 350 },
-      campana: { x: 480, y: 225, baked: true },
-      'edda-campana': { x: 620, y: 340 },
-      'lumen-plaza': { x: 660, y: 300 },
+      // Pedestal central de Ohm.
+      pedestal: { x: 960, y: 540 },
+      // Edda, esperando al protagonista.
+      edda: { x: 1080, y: 540 },
+      // Lumen, ya trabajando en el taller pero visible al este.
+      'lumen-plaza': { x: 1500, y: 540 },
     },
     effects: [
-      // La plataforma está pintada apagada; este pulso es el estado energizado.
-      { kind: 'pulse', x: 180, y: 382, radius: 68, color: 0x55d9d0 },
-      { kind: 'glow', flag: 'puertaDone', x: 290, y: 350, radius: 115, color: 0xffc96b },
-      { kind: 'glow', flag: 'puertaDone', x: 672, y: 340, radius: 115, color: 0xffc96b },
-      { kind: 'glow', flag: 'finished', x: 290, y: 120, radius: 105, color: 0xffc96b },
-      { kind: 'glow', flag: 'finished', x: 672, y: 120, radius: 105, color: 0xffc96b },
-      { kind: 'glow', flag: 'finished', x: 48, y: 350, radius: 95, color: 0xffc96b },
-      { kind: 'glow', flag: 'finished', x: 915, y: 350, radius: 95, color: 0xffc96b },
-      { kind: 'pulse', flag: 'finished', x: 480, y: 225, radius: 175, color: 0xffd77a },
+      // Glow central en el pedestal de Ohm: marca el landmark
+      // principal de la Plaza.
+      { kind: 'pulse', x: 960, y: 540, radius: 120, color: 0x55d9d0 },
+      // Glow del portal al aula, ahora en el SW.
+      { kind: 'pulse', flag: 'ohmAwake', x: 220, y: 760, radius: 100, color: 0x55d9d0 },
+      // Cuando la Puerta se abre, glows de luz cálida
+      // distribuidos por los puntos cardinales.
+      { kind: 'glow', flag: 'puertaDone', x: 320, y: 480, radius: 165, color: 0xffc96b },
+      { kind: 'glow', flag: 'puertaDone', x: 1600, y: 480, radius: 165, color: 0xffc96b },
+      { kind: 'glow', flag: 'puertaDone', x: 960, y: 200, radius: 165, color: 0xffc96b },
+      { kind: 'glow', flag: 'puertaDone', x: 960, y: 880, radius: 165, color: 0xffc96b },
+      // Cuando la plaza se enciende por completo: glows en los
+      // cuatro monolitos de las esquinas.
+      { kind: 'glow', flag: 'finished', x: 250, y: 230, radius: 90, color: 0xffc96b },
+      { kind: 'glow', flag: 'finished', x: 1670, y: 230, radius: 90, color: 0xffc96b },
+      { kind: 'glow', flag: 'finished', x: 250, y: 830, radius: 90, color: 0xffc96b },
+      { kind: 'glow', flag: 'finished', x: 1670, y: 830, radius: 90, color: 0xffc96b },
+      { kind: 'pulse', flag: 'finished', x: 960, y: 540, radius: 220, color: 0xffd77a },
     ],
   },
   puerta: {
@@ -403,7 +535,7 @@ export function roomScene(id: string): RoomSceneProfile | undefined {
   return ROOM_SCENES[id];
 }
 
-export function backgroundKey(profile: RoomSceneProfile, flags: Record<string, unknown>): string {
+export function backgroundKey(profile: RoomSceneProfile, flags: Record<string, unknown>): string | undefined {
   for (const variant of profile.backgroundWhen ?? []) if (flags[variant.flag]) return variant.key;
   return profile.background;
 }

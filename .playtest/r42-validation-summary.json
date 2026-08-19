@@ -1,0 +1,422 @@
+{
+  "pass": true,
+  "browserMode": "headless",
+  "substitutions": {
+    "requestRoomTransition": false,
+    "loadRoom": false,
+    "manualTriggerLoop": false
+  },
+  "injection": {
+    "before": {
+      "room": "plaza",
+      "local": {
+        "x": 220,
+        "y": 760
+      },
+      "ticks": 1,
+      "cooldown": 0,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "transitionRequestCount": 0,
+      "onEnter": {
+        "plaza": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "result": {
+      "room": "taller",
+      "local": {
+        "x": 480,
+        "y": 410
+      },
+      "ticks": 48,
+      "cooldown": 675,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0,
+        "alpha": 1
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "settled": {
+      "room": "taller",
+      "local": {
+        "x": 480,
+        "y": 410
+      },
+      "ticks": 65,
+      "cooldown": 213.3,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "graph": "RoomGraph.resolve(plaza, taller)"
+  },
+  "forward": {
+    "start": {
+      "room": "plaza",
+      "local": {
+        "x": 220,
+        "y": 760
+      },
+      "ticks": 1,
+      "cooldown": 0,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "transitionRequestCount": 0,
+      "onEnter": {
+        "plaza": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "moveStart": {
+      "room": "plaza",
+      "local": {
+        "x": 1700,
+        "y": 540
+      },
+      "ticks": 3,
+      "cooldown": 0,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "transitionRequestCount": 0,
+      "onEnter": {
+        "plaza": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "moveEnd": {
+      "room": "taller",
+      "local": {
+        "x": 480.66,
+        "y": 410
+      },
+      "ticks": 56,
+      "cooldown": 683.4,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0,
+        "alpha": 1
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "result": {
+      "room": "taller",
+      "local": {
+        "x": 482.64,
+        "y": 410
+      },
+      "ticks": 58,
+      "cooldown": 650.1,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.13869444444444418,
+        "alpha": 0.8613055555555558
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "settled": {
+      "room": "taller",
+      "local": {
+        "x": 484.23,
+        "y": 410
+      },
+      "ticks": 75,
+      "cooldown": 350.2,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "graph": "RoomGraph.resolve(plaza, taller)"
+  },
+  "return": {
+    "start": {
+      "room": "taller",
+      "local": {
+        "x": 484.23,
+        "y": 410
+      },
+      "ticks": 75,
+      "cooldown": 350.2,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "moveStart": {
+      "room": "taller",
+      "local": {
+        "x": 484.23,
+        "y": 410
+      },
+      "ticks": 76,
+      "cooldown": 330.2,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "transitionRequestCount": 1,
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540
+      }
+    },
+    "moveEnd": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 540.95
+      },
+      "ticks": 98,
+      "cooldown": 680,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "transitionRequestCount": 2,
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0,
+        "alpha": 1
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "result": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 543.87
+      },
+      "ticks": 100,
+      "cooldown": 638.3,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "transitionRequestCount": 2,
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      },
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.17358333333333312,
+        "alpha": 0.8264166666666669
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "settled": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 545.46
+      },
+      "ticks": 116,
+      "cooldown": 265,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "transitionRequestCount": 2,
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      },
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "graph": "RoomGraph.resolve(taller, plaza)"
+  },
+  "lock": {
+    "afterBothDirections": "idle",
+    "noStuckLock": true
+  },
+  "consoleErrors": []
+}

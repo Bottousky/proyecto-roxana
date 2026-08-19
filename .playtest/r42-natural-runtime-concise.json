@@ -1,0 +1,675 @@
+{
+  "pass": true,
+  "pathA": {
+    "method": "window.__pos(1870, 540) (supported debug hook; no requestRoomTransition, loadRoom, or manual trigger loop)",
+    "before": {
+      "room": "plaza",
+      "local": {
+        "x": 220,
+        "y": 760
+      },
+      "cooldown": 0,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "request": 0,
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0,
+        "direction": false
+      },
+      "onEnter": {
+        "plaza": 1
+      }
+    },
+    "result": {
+      "room": "taller",
+      "local": {
+        "x": 480,
+        "y": 410
+      },
+      "cooldown": 678.3,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "request": 1,
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0,
+        "alpha": 1,
+        "direction": false
+      },
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      }
+    },
+    "frames": {
+      "requestFrame": {
+        "tick": 131,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1870,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1870,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      }
+    },
+    "fade": [
+      {
+        "t": 0,
+        "cooldown": 600,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.32633333333333364,
+          "alpha": 0.6736666666666664,
+          "direction": false
+        }
+      },
+      {
+        "t": 50,
+        "cooldown": 520,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.6595833333333337,
+          "alpha": 0.34041666666666626,
+          "direction": false
+        }
+      },
+      {
+        "t": 100,
+        "cooldown": 441.7,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.9859583333333338,
+          "alpha": 0.014041666666666175,
+          "direction": false
+        }
+      },
+      {
+        "t": 150,
+        "cooldown": 355,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 250,
+        "cooldown": 253.3,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 350,
+        "cooldown": 120,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      }
+    ]
+  },
+  "keyboardForward": {
+    "method": "supported debug staging at (1700, 540), then held keyboard D through Plaza → Taller",
+    "start": {
+      "room": "plaza",
+      "local": {
+        "x": 1700,
+        "y": 540
+      },
+      "cooldown": 0,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": false,
+        "castle_gate": false
+      },
+      "request": 0,
+      "fade": {
+        "running": false,
+        "complete": true,
+        "progress": 1,
+        "alpha": 0,
+        "direction": false
+      },
+      "onEnter": {
+        "plaza": 1
+      }
+    },
+    "move": {
+      "start": {
+        "t": 0,
+        "room": "plaza",
+        "local": {
+          "x": 1700,
+          "y": 540
+        },
+        "cooldown": 0,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": false,
+          "castle_gate": false
+        },
+        "request": 0,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1
+        }
+      },
+      "end": {
+        "room": "taller",
+        "local": {
+          "x": 485.23,
+          "y": 410
+        },
+        "cooldown": 633.4,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.2080555555555552,
+          "alpha": 0.7919444444444448,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        }
+      }
+    },
+    "result": {
+      "room": "taller",
+      "local": {
+        "x": 488.76,
+        "y": 410
+      },
+      "cooldown": 600.1,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "request": 1,
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.34683333333333277,
+        "alpha": 0.6531666666666672,
+        "direction": false
+      },
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      }
+    },
+    "frames": {
+      "requestFrame": {
+        "tick": 93,
+        "phase": "before",
+        "activeRoom": "plaza",
+        "playerLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "rawLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampedLocal": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "clampChanged": false,
+        "sprite": {
+          "x": 1798.28,
+          "y": 540
+        },
+        "triggerRect": {
+          "x": 1820,
+          "y": 500,
+          "w": 100,
+          "h": 80
+        },
+        "zone": {
+          "x": 1806,
+          "y": 486,
+          "w": 128,
+          "h": 108
+        },
+        "inside": true,
+        "wasInside": true,
+        "exitArmed": true,
+        "doorCooldown": 700,
+        "transitionLock": "transitioning",
+        "transitionRequestCount": 1,
+        "mapOpen": false,
+        "transitioning": true,
+        "uiOpen": false
+      }
+    },
+    "fade": [
+      {
+        "t": 0,
+        "cooldown": 498.5,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.770097222222221,
+          "alpha": 0.229902777777779,
+          "direction": false
+        }
+      },
+      {
+        "t": 50,
+        "cooldown": 443.6,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.9990138888888872,
+          "alpha": 0.0009861111111127974,
+          "direction": false
+        }
+      },
+      {
+        "t": 100,
+        "cooldown": 383.6,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 150,
+        "cooldown": 318.7,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 250,
+        "cooldown": 223.7,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 350,
+        "cooldown": 78.7,
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      }
+    ]
+  },
+  "keyboardReturn": {
+    "start": {
+      "room": "taller",
+      "local": {
+        "x": 488.76,
+        "y": 410
+      },
+      "cooldown": 600.1,
+      "lock": "idle",
+      "armed": {
+        "plaza": false
+      },
+      "request": 1,
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.34683333333333277,
+        "alpha": 0.6531666666666672,
+        "direction": false
+      },
+      "onEnter": {
+        "plaza": 1,
+        "taller": 1
+      }
+    },
+    "move": {
+      "start": {
+        "t": 0,
+        "room": "taller",
+        "local": {
+          "x": 491.89,
+          "y": 410
+        },
+        "cooldown": 53.7,
+        "lock": "idle",
+        "armed": {
+          "plaza": false
+        },
+        "request": 1,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 1,
+          "taller": 1
+        }
+      },
+      "end": {
+        "room": "plaza",
+        "local": {
+          "x": 1820,
+          "y": 541.12
+        },
+        "cooldown": 678.3,
+        "lock": "idle",
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0,
+          "alpha": 1,
+          "direction": false
+        },
+        "onEnter": {
+          "plaza": 2,
+          "taller": 1
+        }
+      }
+    },
+    "result": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 544.42
+      },
+      "cooldown": 633.3,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "request": 2,
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.1874583333333332,
+        "alpha": 0.8125416666666668,
+        "direction": false
+      },
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      }
+    },
+    "final": {
+      "room": "plaza",
+      "local": {
+        "x": 1820,
+        "y": 545.14
+      },
+      "cooldown": 611.7,
+      "lock": "idle",
+      "armed": {
+        "puerta": false,
+        "taller": true,
+        "castle_gate": false
+      },
+      "request": 2,
+      "fade": {
+        "running": true,
+        "complete": false,
+        "progress": 0.2777499999999998,
+        "alpha": 0.7222500000000003,
+        "direction": false
+      },
+      "onEnter": {
+        "plaza": 2,
+        "taller": 1
+      }
+    },
+    "fade": [
+      {
+        "t": 0,
+        "cooldown": 588.4,
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.37491666666666673,
+          "alpha": 0.6250833333333332,
+          "direction": false
+        }
+      },
+      {
+        "t": 50,
+        "cooldown": 520,
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.6595833333333337,
+          "alpha": 0.34041666666666626,
+          "direction": false
+        }
+      },
+      {
+        "t": 100,
+        "cooldown": 448.4,
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": true,
+          "complete": false,
+          "progress": 0.9581666666666672,
+          "alpha": 0.041833333333332834,
+          "direction": false
+        }
+      },
+      {
+        "t": 150,
+        "cooldown": 378.4,
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 250,
+        "cooldown": 258.4,
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      },
+      {
+        "t": 350,
+        "cooldown": 135,
+        "armed": {
+          "puerta": false,
+          "taller": true,
+          "castle_gate": false
+        },
+        "request": 2,
+        "fade": {
+          "running": false,
+          "complete": true,
+          "progress": 1,
+          "alpha": 0,
+          "direction": false
+        }
+      }
+    ]
+  },
+  "counts": 2,
+  "onEnter": {
+    "taller": 1,
+    "plaza": 2
+  },
+  "noStuckLock": true,
+  "consoleErrors": []
+}

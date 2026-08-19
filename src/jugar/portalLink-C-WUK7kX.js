@@ -1,0 +1,1 @@
+function t(){return"/src/jugar/?from=portal&room=plaza"}function e(){return"/#aula/electronica"}function o(a){return new URLSearchParams(a).get("from")==="portal"}function l(a){const r=new URLSearchParams(a).get("room");return r==="plaza"?r:"plaza"}export{e as a,o as e,t as p,l as s};

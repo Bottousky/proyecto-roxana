@@ -2,7 +2,34 @@
 
 > **Verbo nuclear:** **CONECTAR**.
 > **Disciplina:** Electrónica (corriente continua).
-> **Estado:** foco principal de producción actual. H1 (Plaza HD-2D) hecho; H2 (Plaza de verdad) en curso; Arco I completo jugable en greybox (`/jugar`) como baseline.
+> **Estado:** foco principal de producción actual.
+> **Dirección vigente (desde 2026-08-17, ver `ADR-001`; forma exacta del
+> modelo espacial desde 2026-08-18, ver `ADR-002`):** Phaser 4
+> **room-based** en `src/jugar/`. Cada room es una escena independiente con
+> coordenadas **locales** (puede medir más que el viewport 960×540); las
+> rooms se conectan por un **grafo** (`RoomGraph`) con transiciones
+> (fade/doorway/cinematic), **no** por un plano mundo continuo. La rama
+> HD-2D Three.js en `src/hd2d-ohmdal/` queda **explícitamente como
+> experimental** y no recibe features nuevas sin un ADR.
+> H1 (baseline Phaser) hecho; la migración room-based en `src/jugar/` se
+> ejecuta según `MIGRATION_PLAN.md` (R1–R7).
+>
+> Antes de iniciar cualquier trabajo sobre Ohmdal, **leer**:
+> 1. `docs/00-governance/ADR-001-phaser-multiarea-arc1.md` (decisión vigente).
+> 2. `docs/00-governance/ADR-002-room-local-spatial-architecture.md`
+>    (modelo espacial vigente: room-based, no plano mundo continuo).
+> 3. `docs/20-worlds/ohmdal/room-based/SPATIAL_CONTRACT.md`
+>    (contratos RoomGraph / ActiveRoom / cámara / transiciones / render).
+> 4. `docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md`
+>    (secuencia R1–R7 y registro de bugs conocidos).
+> 5. `docs/20-worlds/ohmdal/room-based/TEST_TAXONOMY.md`
+>    (tests por invariante de producto).
+> 6. `docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md` (estado del runtime).
+> 7. `docs/20-worlds/ohmdal/room-based/ARC1_ROOM_GRAPH.md` (grafo de áreas).
+> 8. `docs/20-worlds/ohmdal/room-based/ARC1_SPATIAL_MAP.md`
+>    (topología canónica; coordenadas numéricas **esquemáticas**).
+> 9. Las 11 fichas de macroárea en
+>    `docs/20-worlds/ohmdal/room-based/areas/`.
 
 Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Ohmdal. Cualquier agente que trabaje sobre Ohmdal lee ambos.
 
@@ -39,20 +66,62 @@ Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Ohmdal.
 - [`../../arco1/GOLDEN_FRAMES.md`](../../arco1/GOLDEN_FRAMES.md)
 - [`../../arco1/SHOT_DECK.md`](../../arco1/SHOT_DECK.md)
 
+> **Aclaración sobre el rol de estos docs (post `ADR-001` / `ADR-002`).**
+> Los docs en `arco1/` son **referencia visual**: proveen identidad,
+> color script, golden frames y shot deck para la **producción de
+> arte** del Arco I (H8 en adelante). **No** gobiernan la
+> arquitectura del runtime, que es Phaser 4 **room-based** en
+> `src/jugar/` (ver `ADR-002` y `SPATIAL_CONTRACT.md`). La geometría
+> local, el room graph, las transiciones, el world state y los locks
+> viven en `ARC1_ROOM_GRAPH.md`, `SPATIAL_CONTRACT.md` y las 11
+> fichas de macroárea. `ARC1_SPATIAL_MAP.md` aporta topología
+> canónica y un esquema geográfico; sus valores numéricos **no** son
+> coordenadas de runtime.
+
+### Documentos parcialmente superseded por ADR-001 / ADR-002
+
+- [`../world/ohmdal-world-structure_v1.md`](../world/ohmdal-world-structure_v1.md)
+  sigue siendo **CANON** para su **atlas geográfico** (qué
+  territorios existen, qué relaciones hay entre regiones, qué
+  landmarks son identitarios) y para la regla de los tres estados
+  por macroterritorio. La sección §1 "Overworld + dioramas
+  compactos" **queda superseded** por la arquitectura multi-área
+  (`ADR-001`), y el modelo de "áreas contiguas en un único plano
+  mundo" **queda superseded** por el modelo room-based (`ADR-002`):
+  las areas son rooms independientes con coordenadas locales,
+  conectadas por grafo. La geografía sigue siendo input válido; la
+  arquitectura del runtime ya no.
+
 ---
 
 ## 2. Estado de implementación
 
+> **Reorientado por `ADR-001` (2026-08-17) y `ADR-002` (2026-08-18).**
+> H2-H7 ya no son sobre HD-2D; son sobre el refactor **room-based** en
+> `src/jugar/`. El detalle de cada hito vive en `ROADMAP.md` §4, y la
+> secuencia de migración en `MIGRATION_PLAN.md` (R1–R7).
+
 | Hito | Descripción | Estado |
 |---|---|---|
-| H1 | HD-2D fuera del laboratorio | ✅ hecho |
-| H2 | Plaza de verdad en HD-2D | ← **foco actual** |
-| H3 | Primer puzzle en HD-2D (Reactivar a Ohm) | próximo |
-| H4 | El Instituto recuerda la partida | pendiente |
-| H5 | Arte real sobre el blockout | pendiente |
-| H6 | Resto del Arco I (Taller, Puerta, Castillo, Forja, Terrazas, Faro) | pendiente |
+| H1 | Phaser greybox pre-existente | ✅ hecho (baseline de regresión) |
+| H2 | Cimientos multi-área en `src/jugar/` (AreaDef, CameraDirector, WorldState, RenderMode, Cinema) | ← **foco actual** |
+| H3 | Plaza multi-área greybox + Despertar de Ohm | próximo |
+| H4 | Cuenca completa (Calzada + Manantial) + Instituto recuerda | pendiente |
+| H5 | Castillo de la Red (ext + int) | pendiente |
+| H6 | Forja (Patio + Profunda) y Terrazas | pendiente |
+| H7 | Lago y Faro + Epílogo | pendiente |
+| H8 | Pase de arte sobre blockout aprobado | pendiente |
+| H9 | Slice global de integración | pendiente |
 
-**Baseline jugable:** `/jugar` (Phaser top-down, greybox). Se preserva como red de seguridad, contenido y regresión hasta que HD-2D alcance paridad suficiente. No recibe la nueva dirección visual por defecto.
+**Runtime de producción:** `src/jugar/` (Phaser 4) **room-based** (ver
+`ADR-002`, `SPATIAL_CONTRACT.md`, `ARC1_ROOM_GRAPH.md`; `ARC1_SPATIAL_MAP.md`
+aporta topología + esquema, no coordenadas de runtime).
+**Rama experimental:** `src/hd2d-ohmdal/` (Three.js HD-2D). No se borra del repo
+pero no recibe features nuevas sin un ADR.
+**Baseline jugable:** `/jugar` (Phaser top-down, greybox pre-existente). Se
+preserva como red de seguridad, contenido y regresión, y como **insumo del
+refactor** (no como destino de la nueva dirección visual). El refactor
+multi-área parte de este código y lo evoluciona.
 
 ---
 
@@ -66,8 +135,9 @@ Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Ohmdal.
 - ≥2 soluciones cuando el sistema realmente las permite; validar condiciones, no una secuencia fija.
 - Modelos pedagógicos puros/testeables fuera del renderer.
 - Vocabulario diegético: Empuje / Río / Piedra / Camino / Freno / Chispa. Lo técnico (`V`, `I`, `R`, `serie`, `paralelo`, `capacitor`) aparece en formalización, no como spoiler.
-- Cámara casi ortográfica, dioramas/escenario 3D y sprites 2D cuando esa combinación sostenga legibilidad.
-- Producir por capas: greybox → kit modular → materiales/luz → assets identitarios → hero assets → polish.
+- **Cámara 2D top-down con dead zones, encuadre autoral y modo cinemática.** El mundo es **room-based** (`ADR-002`): cada room es una escena independiente con coordenadas **locales**, puede medir más que el viewport 960×540, y se conecta con otras por el **room graph** (transiciones fade / doorway / cinematic). La cámara sigue al jugador dentro de la room activa y la room cambia por transición de grafo, no por continuidad de un plano mundo.
+- **Coordenadas locales por room.** Posición del jugador, entries, doors, walkable, collision, things y NPCs viven en el sistema local de su room (`[0, width) × [0, height)`). No hay coordenadas mundo obligatorias entre rooms. Cambiar `width/height` de una room **nunca** obliga a reposicionar otras rooms.
+- Producir por capas: **GREYBOX multi-área en `src/jugar/`** (H2-H7) → pase de arte sobre greybox aprobado (H8) → polish. La capa "GREYBOX" se evalúa en juego (Portal→Faro jugable) **antes** de invertir en arte.
 
 ### DON'T
 
@@ -75,7 +145,9 @@ Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Ohmdal.
 - Bancos modales como solución por defecto para puzzles nuevos.
 - Mezclar vocabulario técnico y diegético sin transición pedagógica.
 - “Tocar hasta que se ponga verde”.
-- Overlays físicos permanentes que rompan la lectura HD-2D.
+- Asumir "1 sala = 1 viewport 960×540" como invariante global.
+- Asumir un plano mundo continuo (`ox/oy`) como autoridad de runtime; las rooms no se reposicionan unas por otras ni se renderizan todas simultáneamente (ver `ADR-002` / `SPATIAL_CONTRACT.md`).
+- Lockear un área por un puzzle que vive dentro de ella (crea dependencia circular; usar `Requires?` sólo con flags que se setean **fuera** del área destino).
 - Reabrir el engine porque otra herramienta sea nueva/popular; sólo si aparece un bloqueo material reproducible.
 - Exigir hero-art en cada prop secundario.
 
@@ -94,18 +166,39 @@ No usar los antiguos `worker-*` / `m3-*`; fueron retirados.
 | intentar romper milestone antes de integrar | **GLM — Adversarial Reviewer** | OpenCode Go (`reviewer`) |
 | imágenes/audio/video/voz | **MiniMax multimodal** | herramientas nativas MiniMax |
 
-Tooling Three.js específico, Vibe3D, Spector, Blender y skills se cargan **según la tarea**, no globalmente. Ver [`../../80-production/agentic/GAME_DEV_AI_TOOLING.md`](../../80-production/agentic/GAME_DEV_AI_TOOLING.md).
+Tooling Phaser 4 oficial (skills, debug, atlas pipeline) se carga
+**según la tarea**, no globalmente. Tooling Three.js, Vibe3D,
+Spector, Blender y skills HD-2D **no se cargan por defecto** sobre
+Ohmdal en esta fase: sólo si una subtarea concreta lo requiere y
+se justifica. Ver
+[`../../80-production/agentic/GAME_DEV_AI_TOOLING.md`](../../80-production/agentic/GAME_DEV_AI_TOOLING.md).
 
 ---
 
 ## 5. Convenciones de código
 
-- **Runtime HD-2D activo:** `src/hd2d-ohmdal/`.
-- `src/ohmdal/` puede contener piezas de integración/compatibilidad históricas; no asumir que es el árbol principal del world building nuevo.
-- **Baseline:** `src/jugar/` (Phaser top-down greybox).
-- Modelos/tests históricos de puzzles viven en `src/puzzles/` + `tests/`; cualquier modelo nuevo debe seguir siendo renderer-neutral.
-- Manifiestos/routing: `src/experiences/` y `src/shared/portalLink.ts` son contratos de integración; no cambiar silenciosamente.
-- `package.json` es la verdad de versiones instaladas; no actualizar Three/Phaser/Babylon de paso.
+> **Actualizado por `ADR-001` (2026-08-17).**
+
+- **Runtime de producción del Arco I:** `src/jugar/` (Phaser 4) evolucionado a
+  multi-área. **No** se asume "1 sala = 1 viewport 960×540"; cada área puede
+  medir varios viewports. Los cimientos del refactor viven en
+  `src/jugar/areas/`, `src/jugar/camera/`, `src/jugar/transitions/`,
+  `src/jugar/worldState.ts`, `src/jugar/greybox/`, `src/jugar/cinematics/`,
+  `src/jugar/debug/` (creados durante H2).
+- **Rama experimental:** `src/hd2d-ohmdal/` (Three.js HD-2D). No recibe
+  features nuevas. Cualquier desbloqueo requiere un ADR nuevo (ver
+  `ADR-001` §8).
+- `src/ohmdal/` puede contener piezas de integración/compatibilidad históricas;
+  no asumir que es el árbol principal del world building nuevo.
+- **Baseline jugable:** `/jugar` (Phaser top-down greybox pre-existente).
+  Se conserva y se **evoluciona**; no se reemplaza.
+- Modelos/tests históricos de puzzles viven en `src/puzzles/` + `tests/`;
+  cualquier modelo nuevo debe seguir siendo renderer-neutral.
+- Manifiestos/routing: `src/experiences/` y `src/shared/portalLink.ts` son
+  contratos de integración; no cambiar silenciosamente.
+- `package.json` es la verdad de versiones instaladas; no actualizar
+  Three/Phaser/Babylon de paso. El refactor multi-área **no agrega
+  dependencias**.
 
 ---
 
