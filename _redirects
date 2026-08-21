@@ -1,9 +1,6 @@
 # Redirect /jugar/* a /src/jugar/* (manteniendo la URL limpia en el navegador)
 /jugar/*  /src/jugar/:splat  200
-/ohmdal/*  /src/ohmdal/:splat  200
-/ohmdal-arco1/*  /src/ohmdal-arco1/:splat  200
 /physica/*  /src/experiences/physica/:splat  200
-/hd2d-ohmdal/*  /src/hd2d-ohmdal/:splat  200
 
 # SPA fallback: todas las rutas desconocidas van a index.html (para desarrollo)
 /*  /index.html  200

@@ -1,0 +1,7 @@
+Ohmdal Plaza 1920×1080 v2, afternoon, FLAT enclosed courtyard.
+Top-down 3/4 GBA/RPG floor (not isometric cliff diorama).
+Materials: stone, oxidized copper inlay, timber, ceramic teal roof.
+Layout: copper cross, empty medallion (960,640), empty bell dais (960,280),
+north/south arches, west double gate, east workshop in the wall.
+No characters, no bell sprite, no cliff, no ladder, no UI.
+Reference: plaza+campana_portal_piso-v3.png + v1 mood.

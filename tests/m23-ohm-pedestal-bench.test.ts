@@ -1,11 +1,7 @@
 import assert from 'node:assert/strict';
 import { PEDESTAL_RING, readCircuit, type CircuitState } from '../src/puzzles/ohmModel.ts';
 
-// El bench en sí vive en `src/ohmdal/ohmPedestalBench.ts` y depende de three.js; este
-// archivo **no** la importa (sería arrastrar three al proceso de tests). Verifica que la
-// **regla** del puzzle no cambió: las mismas soluciones que descubre `/jugar` las
-// descubre el bench diegético. La fábrica del bench consume `PEDESTAL_RING` directamente,
-// así que validar el modelo es validar el bench.
+// El modelo de circuito de Ohm vive en puzzles/; este test no arrastra renderer.
 
 assert.equal(
   readCircuit(PEDESTAL_RING, new Set<string>()).state,

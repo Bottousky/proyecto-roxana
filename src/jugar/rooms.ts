@@ -1,7 +1,6 @@
 import { state, setFlag, hooks } from '../state';
 import { say, L, type Line } from '../ui/dialog';
 import {
-  showBitacoraButton,
   notifyNewEntry,
   openBitacora,
   wasBitacoraEntryOpened,
@@ -13,7 +12,6 @@ import { abrirBell } from '../puzzles/bell';
 import { abrirChain } from '../puzzles/chain';
 import { abrirBranches } from '../puzzles/branches';
 import { abrirDistributor } from '../puzzles/distributor';
-import { abrirTimbre } from '../puzzles/timbre';
 import { abrirWarmth } from '../puzzles/warmth';
 import { abrirInfirmary } from '../puzzles/infirmary';
 import { abrirLongChannel } from '../puzzles/longchannel';
@@ -22,18 +20,19 @@ import { abrirSteps } from '../puzzles/steps';
 import { abrirFairSplit } from '../puzzles/fairsplit';
 import { abrirSingleStone } from '../puzzles/singlestone';
 import { abrirLadder } from '../puzzles/ladder';
-import { abrirStoredSpark } from '../puzzles/storedspark';
-import { abrirSleepingRiver } from '../puzzles/sleepingriver';
-import { abrirClock } from '../puzzles/clock';
-import { abrirLighthouse } from '../puzzles/lighthouse';
+import { abrirLakeFeedDc } from '../puzzles/lakeFeedDc';
+import { abrirClockDriveDc } from '../puzzles/clockDriveDc';
+import { abrirLighthouseDistributionDc } from '../puzzles/lighthouseDistributionDc';
 import { showEnd } from '../ui/end';
 import { showArcPanorama } from '../ui/arcPanorama';
 import { confirmExitOhmdal } from '../ui/confirmExitOhmdal';
 import { getEntries } from '../content/entries';
-import { sfxBell, sfxPortal, setAmbience } from '../audio';
+import { sfxBell, setAmbience } from '../audio';
 import { syncOhmCompanionButton } from '../ui/ohmCompanion.ts';
 import { portalExitUrl } from '../shared/portalLink.ts';
 import { playAwakening } from './awakening.ts';
+import { announceCinematic } from './cinematics.ts';
+import { esLlegadaPorPortal } from '../shared/portalLink.ts';
 
 export interface ThingDef {
   id: string;
@@ -100,25 +99,10 @@ const f = () => state.flags;
 
 /* ---------- secuencias reutilizadas ---------- */
 
-function pickupBitacora(): void {
-  say(
-    [
-      L('', 'Sobre el escritorio de Dirección hay un solo objeto, como esperando: un cuaderno grueso, encuadernado en cuero gastado.'),
-      L('', 'La tapa dice: «Bitácora de Mundos Aplicados». Adentro, todas las páginas están en blanco.'),
-      L('', '…No. Una se está escribiendo sola, ahora mismo, con una letra que no es la tuya. Todavía.'),
-    ],
-    () => {
-      setFlag('hasBitacora');
-      showBitacoraButton();
-      notifyNewEntry('El hall del Instituto');
-      hooks.refresh();
-    },
-  );
-}
-
 function despertarOhm(): void {
   abrirDespertar(() => {
     setFlag('ohmAwake');
+    announceCinematic('awakening');
     syncOhmCompanionButton();
     // WOW del arco: flash + chispas + cámara + música. Solo si la escena
     // topdown está viva. Si no, saltamos al dialog para no bloquear nada.
@@ -142,14 +126,19 @@ function despertarOhm(): void {
       );
     };
     if (scene && typeof scene.add === 'object') {
-      const x = 480;
-      const y = 342;
-      const handle = playAwakening(scene as unknown as Phaser.Scene, x, y);
+      const pedestal = requireThing('plaza', 'pedestal');
+      const handle = playAwakening(scene as unknown as Phaser.Scene, pedestal.x, pedestal.y);
       void handle.done.then(speak);
     } else {
       speak();
     }
   });
+}
+
+function requireThing(roomId: string, thingId: string): ThingDef {
+  const thing = ROOMS[roomId]?.things.find((candidate) => candidate.id === thingId);
+  if (!thing) throw new Error(`[rooms] la room «${roomId}» no declara el thing «${thingId}»`);
+  return thing;
 }
 
 interface PhaserSceneLike {
@@ -178,6 +167,7 @@ function resolverFreno(): void {
 function resolverPuerta(): void {
   abrirPuerta(() => {
     setFlag('puertaDone');
+    announceCinematic('puerta-apertura');
     // La sala debe contar el resultado antes que los personajes: al aparecer
     // el diálogo de victoria, las hojas ya están visualmente abiertas.
     hooks.refresh();
@@ -212,11 +202,11 @@ function tocarCampana(): void {
     ],
     // El Instituto ya no se representa dentro de Phaser. La continuación
     // vuelve al aula gráfica de la web, que reproduce allí la introducción U2.
-    () => { window.location.href = portalExitUrl(); },
+    () => { announceCinematic('instituto-return'); window.location.href = portalExitUrl(); },
   );
 }
 
-function reproducirIntroUnidad2(activacionAutomatica = false): void {
+export function reproducirIntroUnidad2(activacionAutomatica = false): void {
   say(
     [
       ...(activacionAutomatica
@@ -237,7 +227,7 @@ function reproducirIntroUnidad2(activacionAutomatica = false): void {
   );
 }
 
-function reproducirIntroUnidad3(activacionAutomatica = false): void {
+export function reproducirIntroUnidad3(activacionAutomatica = false): void {
   say(
     [
       ...(activacionAutomatica
@@ -256,7 +246,7 @@ function reproducirIntroUnidad3(activacionAutomatica = false): void {
   );
 }
 
-function reproducirIntroUnidad4(activacionAutomatica = false): void {
+export function reproducirIntroUnidad4(activacionAutomatica = false): void {
   say(
     [
       ...(activacionAutomatica
@@ -275,17 +265,15 @@ function reproducirIntroUnidad4(activacionAutomatica = false): void {
   );
 }
 
-function reproducirIntroUnidad5(activacionAutomatica = false): void {
+export function reproducirIntroUnidad5(activacionAutomatica = false): void {
   say(
     [
       ...(activacionAutomatica
         ? [L('', 'Al entrar al aula, la Bitácora vibra sobre tu costado. El proyector reconoce una nueva entrada y se enciende solo: *clac*.')]
         : []),
       L('Proyector', '*clac* MUNDOS APLICADOS. UNIDAD CINCO.'),
-      L('Proyector', 'El Faro de Ohmdal: la luz que recuerda.'),
-      L('Proyector', 'Recuerde, estudiante: lo que sube y baja… a veces se queda un rato.'),
-      L('', 'La imagen muestra un destello que late —una vez, dos— y se apaga.'),
-      L('', '(¿Se queda? Aprendimos que sin camino no se queda nada. …¿O sí?)'),
+      L('Proyector', 'TODO(guion): El Faro de Ohmdal — tres servicios y una red que debe poder mantenerse.'),
+      L('', 'TODO(guion): la imagen muestra ramas, protecciones y una señal costera aún apagada.'),
     ],
     () => {
       setFlag('playedUnit5Intro');
@@ -303,8 +291,8 @@ function presentarFarero(): void {
     [
       L('Farero', '¿Vienen por la luz? La luz es lo de menos. Este faro no alumbraba: avisaba.'),
       L('Farero', 'Y para avisar hay que latir. La-aaa-tido. La-aaa-tido. Yo me acuerdo. El ritmo lo tengo acá. (se toca la sien)'),
-      L('Edda', 'Nosotros vimos algo imposible, hace tiempo. Una chispa que brilló sin camino. Lo anotamos y no lo entendimos.'),
-      L('Farero', 'Ah. Entonces ya conocen al Estanque. Solo que todavía no sabían su nombre.'),
+      L('Edda', 'TODO(guion): la Bitácora registra que los tres servicios deben sostenerse sin forzar los caminos.'),
+      L('Farero', 'TODO(guion): el Farero señala las protecciones y pide una prueba que también permita mantener cada ramal.'),
     ],
     () => {
       setFlag('metFarero');
@@ -313,56 +301,33 @@ function presentarFarero(): void {
   );
 }
 
-function abrirBancoStoredSpark(): void {
-  if (!f().metFarero) {
-    say(L('', 'La máquina está cuidada, pero no sabés qué espera de vos. El Farero conoce su pulso.'));
-    return;
-  }
-  abrirStoredSpark({
-    practica: f().solvedStoredSpark,
-    onAnomalyNoted: () => setFlag('consejeraNotedAnomaly'),
-    onSolved: () => {
-      setFlag('solvedStoredSpark');
-      notifyNewEntry('La chispa que se queda');
-      hooks.refresh();
-    },
+/** Arc I DC layer 0: observe a two-branch service feed before formalizing it. */
+function abrirBancoLakeFeedDc(): void {
+  abrirLakeFeedDc(() => {
+    setFlag('solvedLakeFeedDc');
+    notifyNewEntry('Dos caminos hacia el Lago');
+    hooks.refresh();
   });
 }
 
-function abrirBancoSleepingRiver(): void {
-  abrirSleepingRiver(
-    () => {
-      setFlag('solvedSleepingRiver');
-      notifyNewEntry('El río que se duerme');
-      hooks.refresh();
-    },
-    f().solvedSleepingRiver,
-  );
+/** Arc I DC layer 1: supply the clock with enough power while keeping current safe. */
+function abrirBancoClockDriveDc(): void {
+  abrirClockDriveDc(() => {
+    setFlag('solvedClockDriveDc');
+    setFlag('clockRestored');
+    notifyNewEntry('El reloj y la entrega');
+    hooks.refresh();
+  });
 }
 
-function abrirBancoClock(): void {
-  abrirClock(
-    () => {
-      setFlag('solvedClock');
-      setFlag('clockRestored');
-      notifyNewEntry('El tic');
-      hooks.refresh();
-    },
-    f().solvedClock,
-  );
-}
-
-function abrirBancoLighthouse(): void {
-  abrirLighthouse(
-    () => {
-      setFlag('solvedLighthouse');
-      setFlag('lighthouseRestored');
-      setFlag('learnedCapacitor');
-      openBitacora('el-arco-del-rio');
-      hooks.refresh();
-    },
-    f().solvedLighthouse,
-  );
+/** Arc I DC layers 2–3: condition-based final, with multiple valid distributions. */
+function abrirBancoLighthouseDistributionDc(): void {
+  abrirLighthouseDistributionDc(() => {
+    setFlag('solvedLighthouseDistributionDc');
+    setFlag('lighthouseRestored');
+    openBitacora('cierre-dc-del-faro');
+    hooks.refresh();
+  });
 }
 
 function hablarFareroLinterna(): void {
@@ -385,38 +350,35 @@ function cerrarArcoUno(): void {
     !fl.unit3Completed ||
     !fl.unit4Completed ||
     !fl.lighthouseRestored ||
-    !fl.learnedCapacitor
+    !fl.solvedLighthouseDistributionDc
   ) return;
+  // Commit the semantic result before presentation so save/reload never loses a restored Faro.
+  setFlag('arcOneCompleted');
+  setFlag('unit5Completed');
+  announceCinematic('faro-closing');
   setAmbience('ohmdal-on');
   showArcPanorama(() => {
     say(
       [
-        L('', 'La cámara se aleja. Ohmdal entero aparece encendido bajo la noche.'),
+        L('', 'TODO(guion): epílogo final pendiente. Ohmdal entero aparece encendido bajo la noche.'),
         L('', 'En la plaza, la campana responde a la Ley de Ohm: empuje y freno en la medida justa.'),
         L('', 'El Castillo sostiene sus tres distritos con la Regla del Cruce: el río no se gasta, se reparte.'),
         L('', 'La Forja trabaja en ritmo con la Entrega: empuje por río, trabajo que llega y peaje que se paga.'),
         L('', 'Las Terrazas brillan regadas por la Regla de la Vuelta: todo lo que sube, baja.'),
-        L('', 'El Reloj marca y el Faro late por la Chispa que se queda: lo guardado espera y vuelve.'),
-        L('Edda', 'Cinco lugares. Cinco lecciones. Y la chispa que «se estaba acabando» encendió todo, sin gastarse.'),
-        L('Edda', '…Quiero estar del otro lado, alguna vez. Quiero que alguien me lo pregunte a MÍ. Con las manos, como hiciste vos.'),
+        L('', 'El Reloj marca y el Faro distribuye luz sin forzar el Camino.'),
+        L('', 'TODO(guion): Edda usa la Bitácora para predecir, operar y verificar la distribución con otra persona.'),
         L('Maese Lumen', 'Yo cuidé esto cuarenta años sin entenderlo. Ustedes lo entendieron en cinco lunas.'),
         L('Maese Lumen', '…Gracias por no decírmelo en voz alta. Mis mártires van al museo de la Forja. Que aprendan los jóvenes lo que era el miedo.'),
-        L('Consejera', 'Inventario final del Consejo: la chispa no disminuyó en cuarenta años. La estábamos guardando para nadie. Caso cerrado.'),
-        L('Ohm', 'Registro: red de Ohmdal completa. Estado: viva en el tiempo. Promesa de la primera lección: cumplida.'),
-        L('', 'En lo alto del Faro, el Farero muestra un ojo de cristal. Cuando la luz lo toca, mueve una aguja sin que nadie lo haya conectado a nada.'),
-        L('Edda', '¿Y a ESE quién lo empuja? Un rayo de luz… ¿empujando un río?'),
-        L('Farero', 'Eso, jóvenes, es de otra noche. La materia que decide. Yo ya tengo bastante con mi latido.'),
+        L('Ohm', 'Registro: red de Ohmdal completa. Estado: servicios distribuidos y documentados.'),
+        L('', 'TODO(guion): la Bitácora conserva la calibración para que otra persona la pueda repetir.'),
       ],
       () => {
         if (!wasBitacoraEntryOpened('el-arco-del-rio')) {
           notifyNewEntry('El Arco del Río');
         }
-        setFlag('arcOneCompleted');
-        setFlag('sawCrystalEye');
-        setFlag('unit5Completed');
         const entradas = getEntries().length;
         showEnd({
-          title: 'Fin del Arco I — «El Río» · Ohmdal, cinco unidades',
+          title: 'Fin del Arco I — Ohmdal',
           variant: 'arc',
           note: `
           Entradas en la Bitácora: ${entradas}<br/><br/>
@@ -424,11 +386,11 @@ function cerrarArcoUno(): void {
           <strong>Unidad 2 · El Castillo:</strong> la Regla del Cruce sostuvo sus tres distritos.<br/>
           <strong>Unidad 3 · La Forja:</strong> la Entrega devolvió el ritmo al trabajo.<br/>
           <strong>Unidad 4 · Las Terrazas:</strong> la Regla de la Vuelta regó el valle.<br/>
-          <strong>Unidad 5 · El Reloj y el Faro:</strong> la Chispa que se queda les devolvió el tiempo.<br/><br/>
-          <em>Semilla de otra historia: un ojo de cristal que responde a la luz.</em>
+          <strong>Unidad 5 · El Faro:</strong> la red distribuyó luz y servicio sin sobrecargar el Camino.<br/><br/>
+          <em>TODO(guion): cierre de transferencia pendiente.</em>
           `,
           continueLabel: 'Continuar',
-          onContinue: () => hooks.goto('hall', { x: 480, y: 300 }),
+          onContinue: () => { announceCinematic('instituto-return'); window.location.href = portalExitUrl(); },
         });
       },
     );
@@ -580,7 +542,7 @@ function cortarTroncoParaActa(): void {
 /* ---------- M8: cierre de unidad ---------- */
 
 function checkUnit2Complete(): void {
-  if (f().fixedSchoolBell && f().sawStoredSpark && !f().unit2Completed) {
+  if (f().sawStoredSpark && !f().unit2Completed) {
     setFlag('unit2Completed');
     const entradas = getEntries().length;
     const martir = f().burnedTrunkFuse
@@ -593,31 +555,9 @@ function checkUnit2Complete(): void {
         …Y algo brilló sin camino. La Bitácora lo registró.
       `,
       continueLabel: 'Regresar al Instituto',
-      onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
+      onContinue: () => { announceCinematic('instituto-return'); window.location.href = portalExitUrl(); },
     });
   }
-}
-
-/* ---------- M8: timbre del Instituto ---------- */
-
-function abrirBancoTimbre(): void {
-  abrirTimbre({
-    practica: f().fixedSchoolBell,
-    onSolved: () => {
-      setFlag('fixedSchoolBell');
-      say(
-        [
-          L('', 'El preceptor se asoma al pasillo. Mira el parlante un rato largo, como a un fantasma educado.'),
-          L('Preceptor', 'Veinte años sin sonar.', 'preceptor-twenty-years'),
-          L('Preceptor', '…Voy a tener que volver a llegar puntual.'),
-        ],
-        () => {
-          hooks.refresh();
-          checkUnit2Complete();
-        },
-      );
-    },
-  });
 }
 
 /* ---------- F1: salas de la Forja ---------- */
@@ -775,7 +715,7 @@ function checkUnit3Complete(): void {
       <em>Las Terrazas esperan: el empuje que baja por escalones.</em>
     `,
     continueLabel: 'Regresar al Instituto',
-    onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
+    onContinue: () => { announceCinematic('instituto-return'); window.location.href = portalExitUrl(); },
   });
 }
 
@@ -894,7 +834,7 @@ function checkUnit4Complete(): void {
           <em>El Faro espera, sobre el lago. Dicen que latía.</em>
         `,
         continueLabel: 'Regresar al Instituto',
-        onContinue: () => hooks.goto('aula', { x: 740, y: 420 }),
+        onContinue: () => { announceCinematic('instituto-return'); window.location.href = portalExitUrl(); },
       });
     },
   );
@@ -903,9 +843,10 @@ function checkUnit4Complete(): void {
 /* ---------- las salas ---------- */
 
 /**
- * Sala de arranque. Es el prólogo: llegás al Instituto y nadie te acompañó hasta la puerta.
+ * Sala de arranque de Ohmdal. El Instituto vive en la home isométrica;
+ * `/jugar` abre la Plaza.
  */
-export const SALA_INICIAL = 'hall';
+export const SALA_INICIAL = 'plaza';
 
 /**
  * Devuelve un id de sala que con seguridad existe.
@@ -913,7 +854,7 @@ export const SALA_INICIAL = 'hall';
  * Existe porque montar una sala inexistente no falla ruidosamente: la escena dibuja el
  * personaje sobre un mundo vacío y quedás en una pantalla negra sin error de consola, que
  * es imposible de diagnosticar jugando. Un save viejo, un flag mal puesto o un destino de
- * viaje que dejó de existir tienen que caer en el prólogo, no en la nada.
+ * viaje que dejó de existir tienen que caer en la Plaza, no en la nada.
  */
 export function resolverSala(id: string | null | undefined): string {
   if (id && Object.prototype.hasOwnProperty.call(ROOMS, id)) return id;
@@ -922,280 +863,14 @@ export function resolverSala(id: string | null | undefined): string {
 }
 
 export const ROOMS: Record<string, RoomDef> = {
-  /* ============ INSTITUTO ROXANA ============ */
-
-  hall: {
-    id: 'hall',
-    name: 'Instituto Roxana — Hall principal',
-    floor: () => 0x1f1b26,
-    wall: () => 0x2c2836,
-    doors: [
-      {
-        x: 0, y: 225, w: 26, h: 100,
-        to: 'despacho', spawn: { x: 860, y: 270 },
-        label: 'Dirección',
-      },
-      {
-        x: 934, y: 225, w: 26, h: 100,
-        to: 'aula', spawn: { x: 95, y: 270 },
-        label: 'Taller de Electrónica',
-        locked: () =>
-          f().hasBitacora
-            ? null
-            : [
-                L('', 'La puerta del Taller de Electrónica está cerrada con llave.'),
-                L('Preceptor', 'Dirección primero. La puerta de la izquierda.'),
-              ],
-      },
-    ],
-    things: [
-      {
-        id: 'preceptor', x: 500, y: 300, w: 36, h: 36, shape: 'circle',
-        label: 'Preceptor', prompt: 'Hablar con el preceptor', color: 0x6a7a8a, solid: true, emoji: '📋',
-        onInteract: () => {
-          const fl = f();
-          if (!fl.talkedPreceptor) {
-            say(
-              [
-                L('Preceptor', '¿El nuevo? Llegas tarde. O temprano. Aquí ya nadie lleva mucho la cuenta.'),
-                L('Preceptor', 'Antes del taller tienes que pasar por Dirección. La puerta de la izquierda. Está abierta; siempre está abierta. No sé por qué la seguimos llamando Dirección.'),
-                L('Preceptor', 'Y una cosa: si algo zumba, no lo toques. …Todavía.'),
-              ],
-              () => setFlag('talkedPreceptor'),
-            );
-          } else if (!fl.hasBitacora) {
-            say(L('Preceptor', 'Dirección. Izquierda. Zumbidos, no.'));
-          } else if (!fl.sawProjector) {
-            say([
-              L('Preceptor', '¿Eso es… una Bitácora? Hacía años que no veía una de esas.'),
-              L('Preceptor', 'El Taller de Electrónica es la puerta de la derecha. Anda: el taller sabe qué hacer. …Es una forma de decir. Creo.'),
-            ]);
-          } else if (fl.fixedSchoolBell) {
-            say([
-              L('Preceptor', 'El timbre. Veinte años sin oírlo.'),
-              L('Preceptor', '…Voy a tener que volver a llegar puntual.'),
-            ]);
-            checkUnit2Complete();
-          } else {
-            say(L('Preceptor', '¿Todavía por aquí? El aula. La derecha. Salúdame a… bah. Tú solo ve.'));
-          }
-        },
-      },
-      {
-        id: 'timbre', x: 690, y: 310, w: 110, h: 60,
-        label: 'Timbre del Instituto', prompt: 'Examinar el timbre',
-        color: () => (f().fixedSchoolBell ? 0x8a7040 : 0x4a4250), solid: true, emoji: '🔔',
-        visible: () => f().castleRestored,
-        onInteract: () => {
-          if (f().fixedSchoolBell) {
-            say(L('', 'El timbre, vivo. Suena a horario ahora.'));
-          } else {
-            abrirBancoTimbre();
-          }
-        },
-      },
-      {
-        id: 'vitrina', x: 230, y: 115, w: 170, h: 50,
-        label: 'Vitrina de trofeos', prompt: 'Mirar la vitrina', color: 0x3a3548, solid: true, emoji: '🏆',
-        onInteract: () =>
-          say(L('', 'Trofeos bajo el polvo: «Feria Técnica Nacional — 1er premio». El más nuevo tiene veinte años.')),
-      },
-      {
-        id: 'cartel', x: 690, y: 115, w: 170, h: 42,
-        label: 'Cuadro de honor', prompt: 'Leer el cuadro de honor', color: 0x3a3548, solid: true, emoji: '📜',
-        onInteract: () =>
-          say(L('', 'Un cuadro de honor con los nombres borrados por el sol. Alguien, hace poco, escribió con el dedo en el polvo: «¿hola?»')),
-      },
-    ],
-    onEnter: () => {
-      // Acá había un rebote a `escuela_hub` para quien ya vio la cinemática de apertura: la
-      // idea era mandarlo al hub caminable del Instituto. Ese hub nunca se registró en el
-      // runtime —`topdownRuntime` sólo monta `ExplorationScene`— así que el rebote dejaba al
-      // jugador en una sala inexistente: pantalla negra con el personaje y nada más.
-      // El Instituto es ahora la maqueta 3D de `/`, no un hub caminable, así que el rebote no
-      // tiene destino: quien vuelve al hall se queda en el hall, que es una sala real.
-      if (!f().introSeen) {
-        say(
-          [
-            L('', 'El Instituto Roxana. Nadie te acompañó hasta la puerta; «queda lejos», dijeron. La verdad es que nadie elige venir aquí. Tú tampoco.'),
-            L('', 'El hall es enorme y huele a cera vieja. Los pasos hacen eco. Junto a la escalera hay un hombre de bata gris.'),
-          ],
-          () => setFlag('introSeen'),
-        );
-      }
-    },
-  },
-
-  despacho: {
-    id: 'despacho',
-    name: 'Dirección — Despacho de Roxana',
-    floor: () => 0x231d28,
-    wall: () => 0x312839,
-    doors: [
-      { x: 934, y: 225, w: 26, h: 100, to: 'hall', spawn: { x: 95, y: 270 }, label: 'Hall' },
-    ],
-    things: [
-      {
-        id: 'escritorio', x: 450, y: 280, w: 150, h: 70,
-        label: 'Escritorio', prompt: 'Examinar el escritorio', color: 0x4a3c30, solid: true, emoji: '📖',
-        onInteract: () => {
-          if (!f().hasBitacora) pickupBitacora();
-          else say(L('', 'El escritorio de Roxana. El polvo dibuja el contorno de cosas que ya no están. Solo queda el hueco donde esperaba la Bitácora.'));
-        },
-      },
-      {
-        id: 'retrato', x: 450, y: 70, w: 130, h: 54,
-        label: 'Retrato', prompt: 'Mirar el retrato', color: 0x52443a, solid: false, emoji: '🖼️',
-        onInteract: () => {
-          setFlag('vioRetrato');
-          say([
-            L('', 'Un retrato enorme: «Prof.ª Roxana — Fundadora». Abajo, una placa de bronce: «El conocimiento no se enseña. Se reconstruye.»'),
-            L('', 'Sus ojos parecen seguirte. No con amenaza: con expectativa.'),
-          ]);
-        },
-      },
-    ],
-  },
-
-  aula: {
-    id: 'aula',
-    name: 'Taller de Electrónica',
-    floor: () => 0x1d2026,
-    wall: () => 0x2a2f38,
-    doors: [
-      { x: 0, y: 225, w: 26, h: 100, to: 'hall', spawn: { x: 860, y: 270 }, label: 'Hall' },
-    ],
-    things: [
-      {
-        id: 'lampara-aula', x: 160, y: 105, w: 30, h: 30, shape: 'circle',
-        label: 'Lámpara', prompt: 'Mirar la lámpara', color: 0xffd34d, solid: true, emoji: '💡',
-        visible: () => f().finished,
-        onInteract: () => say(L('', 'Una de las lámparas del aula ahora funciona.')),
-      },
-      {
-        id: 'pizarron', x: 480, y: 100, w: 280, h: 54,
-        label: 'Pizarrón', prompt: 'Leer el pizarrón', color: 0x24352c, solid: true, emoji: '✏️',
-        onInteract: () =>
-          say(
-            L(
-              '',
-              f().finished
-                ? '«Donde otros ven magia, busca camino»'
-                : 'En el pizarrón, escrito hace mucho y nunca borrado del todo: «Donde otros ven magia, …». El resto se perdió.',
-            ),
-          ),
-      },
-      {
-        id: 'proyector', x: 330, y: 330, w: 90, h: 60,
-        label: 'Proyector', prompt: 'Encender el proyector', color: 0x4a4a55, solid: true, emoji: '📽️',
-        onInteract: () => {
-          const fl = f();
-          if (fl.unit4Completed && !fl.playedUnit5Intro) {
-            reproducirIntroUnidad5();
-            return;
-          }
-          if (fl.unit4Completed) {
-            say(L('Proyector', '*clac* Unidad cinco: en curso. Tenga paciencia. El tiempo es parte del circuito. *clac*'));
-            return;
-          }
-          if (fl.unit3Completed && !fl.playedUnit4Intro) {
-            reproducirIntroUnidad4();
-            return;
-          }
-          if (fl.unit3Completed) {
-            say(L('Proyector', '*clac* Unidad cuatro: en curso. Mida dos veces. Toque una. *clac*'));
-            return;
-          }
-          if (fl.unit2Completed && !fl.playedUnit3Intro) {
-            reproducirIntroUnidad3();
-            return;
-          }
-          if (fl.unit2Completed) {
-            say(L('Proyector', '*clac* Unidad tres: en curso. Abríguese. O no. Ya va a entender. *clac*'));
-            return;
-          }
-          if (fl.finished && !fl.playedUnit2Intro) {
-            reproducirIntroUnidad2();
-            return;
-          }
-          if (fl.finished) {
-            say(L('Proyector', '*clac* Unidad dos: en curso. Consulte su Bitácora. …Y no firme nada sin medirlo antes. *clac*'));
-            return;
-          }
-          if (fl.sawProjector) {
-            say(L('Proyector', '*clac* …Que tenga una buena clase. *clac*'));
-            return;
-          }
-          say(
-            [
-              L('Proyector', '*clac* INSTITUTO ROXANA PRESENTA: MUNDOS APLICADOS. UNIDAD UNO.'),
-              L('Proyector', 'El Mundo Aplicado «Ohmdal» fue construido por este Instituto con un único propósito: que la electricidad se aprenda caminándola.'),
-              L('Proyector', 'Recuerde, estudiante: el mundo responde a su comprensión. La incomprensión también deja huella.'),
-              L('Proyector', 'Último mantenimiento: hace cuarenta años. Que tenga una buena clase. *clac*'),
-              L('', '…¿Construyeron un mundo entero para enseñar? ¿Y después lo olvidaron?'),
-            ],
-            () => {
-              setFlag('sawProjector');
-              hooks.refresh();
-            },
-          );
-        },
-      },
-      {
-        id: 'panel-portal', x: 740, y: 245, w: 100, h: 34,
-        label: 'Panel V/I/R', prompt: 'Examinar el panel V/I/R', color: 0x4fd6c8, solid: true, emoji: '⚡',
-        visible: () => f().finished,
-        onInteract: () => say(L('', 'El panel V/I/R del portal brilla estable, no intermitente.')),
-      },
-      {
-        id: 'portal', x: 740, y: 330, w: 80, h: 100,
-        label: 'Portal', prompt: 'Cruzar el portal',
-        color: () => (f().finished ? 0x45c7bd : 0x2e8b8b),
-        solid: false, emoji: '✨',
-        visible: () => f().sawProjector,
-        onInteract: () => {
-          if (f().finished) {
-            sfxPortal();
-            hooks.goto('plaza', { x: 480, y: 430 });
-            return;
-          }
-          say(
-            [L('', 'El marco del portal zumba, suave, como invitando. Del otro lado se adivina una plaza en penumbra.')],
-            () => {
-              sfxPortal();
-              hooks.goto('plaza', { x: 480, y: 430 });
-            },
-          );
-        },
-      },
-    ],
-    onEnter: () => {
-      if (f().unit4Completed && !f().playedUnit5Intro) {
-        reproducirIntroUnidad5(true);
-      } else if (f().unit3Completed && !f().playedUnit4Intro) {
-        reproducirIntroUnidad4(true);
-      } else if (f().unit2Completed && !f().playedUnit3Intro) {
-        reproducirIntroUnidad3(true);
-      } else if (f().finished && !f().playedUnit2Intro) {
-        reproducirIntroUnidad2(true);
-      }
-    },
-  },
-
-  /* ============ OHMDAL ============ */
-
   plaza: {
     id: 'plaza',
     name: 'Ohmdal — La plaza',
     floor: () => (f().castleRestored ? 0x1e1b2e : f().puertaDone ? 0x262033 : f().ohmAwake ? 0x1a1926 : 0x15141f),
     wall: () => (f().castleRestored ? 0x3a2e44 : f().puertaDone ? 0x3c3144 : 0x2e2a3c),
-    // Commit 4 (H3 — Plaza multi-área greybox): la Plaza pasó de
-    // 960×540 a 1920×1080. Se elimina el `background` pintado y
-    // los `def.collision` de muros perimetrales. La puesta en
-    // escena queda a cargo de `drawRoomBase` + `renderDecor` (que
-    // derivan del `AreaDef` en `roomScenesData`). Los muros
-    // perimetrales se generan automáticamente desde los boundaries
-    // con `pushWallSolids` (ver `ExplorationScene.buildChunk`).
+    // Commit 4 (H3): Plaza 1920×1080. El fondo pintado cubre el rect
+    // local; campana/portal/pedestal son props de runtime. Los muros
+    // perimetrales no son sólidos de colisión (walkable + clamp).
     //
     // Las coordenadas internas de la Plaza viven ahora en un
     // espacio lógico de 1920×1080:
@@ -1297,7 +972,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'edda', x: 1100, y: 640, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda', color: 0xa85f78, solid: true, emoji: '💬',
         visible: () =>
-          (!f().ohmAwake || f().puertaDone) &&
+          (!f().frenoDone || f().puertaDone) &&
           !(f().playedUnit2Intro && !f().solvedBellPaths) &&
           !f().castleRestored,
         walksTo: 'taller',
@@ -1350,9 +1025,8 @@ export const ROOMS: Record<string, RoomDef> = {
           ),
       },
       {
-        // Lámparas distribuidas por la Plaza (ya no están baked:
-        // el área grande no tiene fondo pintado).
-        id: 'lampara1', x: 320, y: 540, w: 26, h: 26, shape: 'circle',
+        // Faroles pintados a ambos lados del eje N-S.
+        id: 'lampara1', x: 820, y: 340, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
         color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
         onInteract: () =>
@@ -1365,33 +1039,32 @@ export const ROOMS: Record<string, RoomDef> = {
           ),
       },
       {
-        id: 'lampara2', x: 1600, y: 540, w: 26, h: 26, shape: 'circle',
+        id: 'lampara2', x: 1100, y: 340, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
         color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
         onInteract: () =>
           say(L('', f().puertaDone ? 'Luz firme. La plaza tiene sombras de nuevo — de las buenas.' : 'Otra lámpara muerta. O dormida. Empieza a parecer que hay una diferencia.')),
       },
       {
-        id: 'lampara3', x: 960, y: 100, w: 26, h: 26, shape: 'circle',
+        id: 'lampara3', x: 820, y: 740, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
         color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
         onInteract: () =>
-          say(L('', f().puertaDone ? 'Luz firme bajo el arco norte.' : 'Lámpara apagada. El arco norte se ve más oscuro sin ella.')),
+          say(L('', f().puertaDone ? 'Luz firme. La plaza tiene sombras de nuevo — de las buenas.' : 'Otra lámpara muerta. O dormida. Empieza a parecer que hay una diferencia.')),
       },
       {
-        id: 'lampara4', x: 960, y: 920, w: 26, h: 26, shape: 'circle',
+        id: 'lampara4', x: 1100, y: 740, w: 26, h: 26, shape: 'circle',
         label: '', prompt: 'Mirar la lámpara', solid: false, emoji: '💡',
         color: () => (f().puertaDone ? 0xffd34d : 0x3a3744),
         onInteract: () =>
-          say(L('', f().puertaDone ? 'Luz firme sobre el camino al sur.' : 'Lámpara apagada. El camino sur se ve más oscuro sin ella.')),
+          say(L('', f().puertaDone ? 'Luz firme sobre el empedrado.' : 'Lámpara apagada junto al camino.')),
       },
       {
         // Campana monumental reubicada al norte del medallón.
-        // El cuerpo sólido está duplicado como bloque de colisión
-        // en roomScenesData.plaza.collision. La thing representa
-        // la zona interactuable (hotspot + prompt).
+        // La ThingDef representa la zona interactuable (hotspot + prompt).
         id: 'campana', x: 960, y: 280, w: 170, h: 180,
         label: 'Campana', prompt: 'La campana de Ohmdal', solid: false, emoji: '🔔',
+        sprite: 'prop_plaza_bell', spriteFit: 'bounds',
         color: () => (f().puertaDone ? 0xb08d2a : 0x4f4a42),
         onInteract: () => {
           const fl = f();
@@ -1481,7 +1154,14 @@ export const ROOMS: Record<string, RoomDef> = {
       },
     ],
     onEnter: () => {
-      if (!f().plazaSeen) {
+      if (esLlegadaPorPortal(location.search) && !f().playedPortalArrival) {
+        setFlag('playedPortalArrival');
+        // La llegada por Portal reemplaza la presentación inicial de la Plaza:
+        // ambas representan el mismo primer encuentro y deben consumirse juntas.
+        setFlag('plazaSeen');
+        announceCinematic('portal-arrival');
+        say(L('', 'TODO(guion): el portal se cierra detrás de ti; la Plaza queda visible y puedes explorarla.'));
+      } else if (!f().plazaSeen) {
         say(
           [
             L('', 'La plaza está apagada. No oscura: apagada. Como si alguien hubiera bajado una palanca hace mucho y nadie recordara dónde.'),
@@ -2743,9 +2423,9 @@ export const ROOMS: Record<string, RoomDef> = {
         to: 'lighthouse_bench', spawn: { x: 95, y: 245 },
         label: 'Taller del Farero',
         locked: () =>
-          f().solvedStoredSpark
+          f().solvedLakeFeedDc
             ? null
-            : [L('Farero', 'Todavía no. Primero vean cómo una chispa se queda cuando el camino ya no está. Después hablamos de tiempo.')],
+            : [L('Farero', 'Todavía no. Primero alimenten los dos caminos del Lago sin perder Empuje.')],
       },
     ],
     things: [
@@ -2763,9 +2443,9 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'banco-chispa', x: 480, y: 395, w: 220, h: 76,
-        label: 'Banco del Estanque', prompt: 'Usar el banco',
+        label: 'Alimentación del Lago', prompt: 'Ajustar la alimentación',
         color: 0x4a3c30, solid: true,
-        onInteract: abrirBancoStoredSpark,
+        onInteract: abrirBancoLakeFeedDc,
       },
       {
         id: 'farero-hall', x: 760, y: 320, w: 40, h: 40, shape: 'circle',
@@ -2803,7 +2483,14 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () => say(L('Ohm', 'Máquina: inmóvil. Cuidado acumulado: cuarenta años. Pregunta acumulada: una.')),
       },
     ],
-    onEnter: () => setAmbience('lighthouse'),
+    onEnter: () => {
+      setAmbience('lighthouse');
+      if (!f().playedFaroReveal) {
+        setFlag('playedFaroReveal');
+        announceCinematic('faro-reveal');
+        say(L('', 'TODO(guion): el Faro aparece como destino; la sala queda disponible para explorar.'));
+      }
+    },
   },
 
   lighthouse_bench: {
@@ -2822,9 +2509,9 @@ export const ROOMS: Record<string, RoomDef> = {
         to: 'clock_tower', spawn: { x: 95, y: 245 },
         label: 'Torre del Reloj',
         locked: () =>
-          f().solvedSleepingRiver
+          f().solvedClockDriveDc
             ? null
-            : [L('Farero', 'El Reloj puede esperar. Primero aprendan a oír cómo el río se duerme mientras el Estanque se llena.')],
+            : [L('Farero', 'El Reloj puede esperar. Primero encuentra una entrega DC estable para su motor.')],
       },
     ],
     things: [
@@ -2835,37 +2522,37 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () => say(L('', 'Calibres, llaves y piedras de freno ordenadas por tamaño. Ninguna tiene polvo.')),
       },
       {
-        id: 'banco-rio-dormido', x: 480, y: 320, w: 250, h: 90,
-        label: 'Banco del Farero', prompt: 'Usar el banco',
+        id: 'banco-motor-reloj', x: 480, y: 320, w: 250, h: 90,
+        label: 'Motor del Reloj', prompt: 'Ajustar el divisor',
         color: 0x4a3c30, solid: true,
-        onInteract: abrirBancoSleepingRiver,
+        onInteract: abrirBancoClockDriveDc,
       },
       {
         id: 'farero-taller', x: 735, y: 205, w: 40, h: 40, shape: 'circle',
         label: 'Farero', prompt: 'Hablar con el Farero',
         color: 0x70818a, solid: true, emoji: '💬',
-        visible: () => f().solvedStoredSpark,
-        onInteract: () => say(L('Farero', 'Mírenlo llenarse. No es magia. Es paciencia con forma de agua.')),
+        visible: () => f().solvedLakeFeedDc,
+        onInteract: () => say(L('Farero', 'TODO(guion): primero observa cómo cambia el motor al ajustar su entrega.')),
       },
       {
         id: 'edda-faro-taller', x: 785, y: 360, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda',
         color: 0xa85f78, solid: true, emoji: '💬',
-        visible: () => f().solvedStoredSpark,
+        visible: () => f().solvedLakeFeedDc,
         onInteract: () => say(L('Edda', 'Quiero ver la aguja moverse sola. Esta vez no pienso parpadear.')),
       },
       {
         id: 'lumen-faro-taller', x: 145, y: 350, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
         color: 0x7a6a3a, solid: true, emoji: '💬',
-        visible: () => f().solvedStoredSpark,
+        visible: () => f().solvedLakeFeedDc,
         onInteract: () => say(L('Maese Lumen', 'Piedras, canales y paciencia. Al fin una liturgia con piezas que puedo señalar.')),
       },
       {
         id: 'ohm-faro-taller', x: 205, y: 420, w: 34, h: 34, shape: 'circle',
         label: 'Ohm', prompt: 'Consultar a Ohm',
         color: 0xc9a437, solid: true,
-        visible: () => f().solvedStoredSpark,
+        visible: () => f().solvedLakeFeedDc,
         onInteract: () => say(L('Ohm', 'Variable nueva detectada: espera. Medición recomendada.')),
       },
     ],
@@ -2888,9 +2575,9 @@ export const ROOMS: Record<string, RoomDef> = {
         to: 'lighthouse_lantern', spawn: { x: 95, y: 245 },
         label: 'Linterna del Faro',
         locked: () =>
-          f().solvedClock
+          f().solvedClockDriveDc
             ? null
-            : [L('Farero', 'Arriba espera el latido grande. Antes devuélvanle a este pueblo un tic justo: ni apurado ni dormido.')],
+            : [L('Farero', 'Arriba espera la distribución final. Primero deja el motor del reloj en régimen seguro.')],
       },
     ],
     things: [
@@ -2904,34 +2591,34 @@ export const ROOMS: Record<string, RoomDef> = {
         id: 'banco-reloj', x: 480, y: 385, w: 230, h: 80,
         label: 'Banco del Reloj', prompt: 'Usar el banco',
         color: 0x4a3c30, solid: true,
-        onInteract: abrirBancoClock,
+        onInteract: () => say(L('', 'El reloj ya recibe una entrega estable. Desde aquí puedes observar su ritmo antes de subir a la linterna.')),
       },
       {
         id: 'farero-reloj', x: 750, y: 260, w: 40, h: 40, shape: 'circle',
         label: 'Farero', prompt: 'Hablar con el Farero',
         color: 0x70818a, solid: true, emoji: '💬',
-        visible: () => f().solvedSleepingRiver,
+        visible: () => f().solvedClockDriveDc,
         onInteract: () => say(L('Farero', 'El Reloj y el Faro son hermanos. Uno cuenta; el otro avisa. Los dos necesitan un latido que no mienta.')),
       },
       {
         id: 'edda-reloj', x: 805, y: 390, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda',
         color: 0xa85f78, solid: true, emoji: '💬',
-        visible: () => f().solvedSleepingRiver,
-        onInteract: () => say(L('Edda', 'Un estanque que cuenta el tiempo. Claro. A esta altura, claro que sí.')),
+        visible: () => f().solvedClockDriveDc,
+        onInteract: () => say(L('Edda', 'Ahora el ritmo se sostiene sin forzar el Camino. Arriba falta distribuir los tres servicios.')),
       },
       {
         id: 'lumen-reloj', x: 145, y: 335, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
         color: 0x7a6a3a, solid: true, emoji: '💬',
-        visible: () => f().solvedSleepingRiver,
+        visible: () => f().solvedClockDriveDc,
         onInteract: () => say(L('Maese Lumen', 'Dábamos cuerda a este reloj todos los meses. Nunca se nos ocurrió preguntarle de dónde salía el tic.')),
       },
       {
         id: 'ohm-reloj', x: 205, y: 410, w: 34, h: 34, shape: 'circle',
         label: 'Ohm', prompt: 'Consultar a Ohm',
         color: 0xc9a437, solid: true,
-        visible: () => f().solvedSleepingRiver,
+        visible: () => f().solvedClockDriveDc,
         onInteract: () => say(L('Ohm', 'Reloj detenido. Tiempo disponible.')),
       },
     ],
@@ -2968,7 +2655,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'Ohmdal de noche', prompt: 'Mirar Ohmdal de noche',
         color: 0x142b3a, solid: false,
         onInteract: () => {
-          if (f().learnedCapacitor && !f().arcOneCompleted) {
+          if (f().solvedLighthouseDistributionDc && !f().arcOneCompleted) {
             cerrarArcoUno();
             return;
           }
@@ -2980,37 +2667,37 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        id: 'banco-latido', x: 480, y: 405, w: 250, h: 80,
-        label: 'Banco del latido', prompt: 'Usar el banco',
+        id: 'banco-distribucion-faro', x: 480, y: 405, w: 250, h: 80,
+        label: 'Distribución del Faro', prompt: 'Distribuir el servicio',
         color: 0x4a3c30, solid: true,
-        onInteract: abrirBancoLighthouse,
+        onInteract: abrirBancoLighthouseDistributionDc,
       },
       {
         id: 'farero-linterna', x: 745, y: 280, w: 40, h: 40, shape: 'circle',
         label: 'Farero', prompt: 'Hablar con el Farero',
         color: 0x70818a, solid: true, emoji: '💬',
-        visible: () => f().solvedClock,
+        visible: () => f().solvedClockDriveDc,
         onInteract: hablarFareroLinterna,
       },
       {
         id: 'edda-linterna', x: 805, y: 385, w: 34, h: 34, shape: 'circle',
         label: 'Edda', prompt: 'Hablar con Edda',
         color: 0xa85f78, solid: true, emoji: '💬',
-        visible: () => f().solvedClock,
+        visible: () => f().solvedClockDriveDc,
         onInteract: () => say(L('Edda', 'Desde acá se ve todo lo que encendimos. Falta que esto responda.')),
       },
       {
         id: 'lumen-linterna', x: 145, y: 335, w: 38, h: 38, shape: 'circle',
         label: 'Maese Lumen', prompt: 'Hablar con Maese Lumen',
         color: 0x7a6a3a, solid: true, emoji: '💬',
-        visible: () => f().solvedClock,
+        visible: () => f().solvedClockDriveDc,
         onInteract: () => say(L('Maese Lumen', 'Toda mi vida vi esta torre apagada. Preferiría estar mirando cuando deje de estarlo.')),
       },
       {
         id: 'ohm-linterna', x: 205, y: 410, w: 34, h: 34, shape: 'circle',
         label: 'Ohm', prompt: 'Consultar a Ohm',
         color: 0xc9a437, solid: true,
-        visible: () => f().solvedClock,
+        visible: () => f().solvedClockDriveDc,
         onInteract: () => say(L('Ohm', 'Lente preparada. Lago preparado. Ritmo: pendiente.')),
       },
     ],

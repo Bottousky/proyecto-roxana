@@ -6,12 +6,12 @@ export const INSTITUTO: ExperienceManifest = {
   discipline: 'Mundo real / memoria del conocimiento',
   status: 'playable',
   runtime: 'topdown-phaser',
-  rooms: ['hall', 'despacho', 'aula'],
+  rooms: [],
   learningVerb: 'reunir',
   fantasy: 'Volver a encender una escuela que olvidó lo que sabía.',
   visualGrammar: {
-    camera: 'cenital continuo',
-    style: 'realismo estilizado, material, antiguo y cuidado',
+    camera: 'isométrica en la home',
+    style: 'maqueta escolar axonométrica; las aulas abren a los mundos',
   },
 };
 

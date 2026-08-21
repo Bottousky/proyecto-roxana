@@ -8,30 +8,66 @@
 > **room-based** en `src/jugar/`. Cada room es una escena independiente con
 > coordenadas **locales** (puede medir más que el viewport 960×540); las
 > rooms se conectan por un **grafo** (`RoomGraph`) con transiciones
-> (fade/doorway/cinematic), **no** por un plano mundo continuo. La rama
-> HD-2D Three.js en `src/hd2d-ohmdal/` queda **explícitamente como
-> experimental** y no recibe features nuevas sin un ADR.
+> (fade/doorway/cinematic), **no** por un plano mundo continuo.
+> El Instituto no se juega en Phaser: es la home isométrica (`/`).
 > H1 (baseline Phaser) hecho; la migración room-based en `src/jugar/` se
 > ejecuta según `MIGRATION_PLAN.md` (R1–R7).
->
-> Antes de iniciar cualquier trabajo sobre Ohmdal, **leer**:
-> 1. `docs/00-governance/ADR-001-phaser-multiarea-arc1.md` (decisión vigente).
-> 2. `docs/00-governance/ADR-002-room-local-spatial-architecture.md`
->    (modelo espacial vigente: room-based, no plano mundo continuo).
-> 3. `docs/20-worlds/ohmdal/room-based/SPATIAL_CONTRACT.md`
->    (contratos RoomGraph / ActiveRoom / cámara / transiciones / render).
-> 4. `docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md`
->    (secuencia R1–R7 y registro de bugs conocidos).
-> 5. `docs/20-worlds/ohmdal/room-based/TEST_TAXONOMY.md`
->    (tests por invariante de producto).
-> 6. `docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md` (estado del runtime).
-> 7. `docs/20-worlds/ohmdal/room-based/ARC1_ROOM_GRAPH.md` (grafo de áreas).
-> 8. `docs/20-worlds/ohmdal/room-based/ARC1_SPATIAL_MAP.md`
->    (topología canónica; coordenadas numéricas **esquemáticas**).
-> 9. Las 11 fichas de macroárea en
->    `docs/20-worlds/ohmdal/room-based/areas/`.
 
 Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Ohmdal. Cualquier agente que trabaje sobre Ohmdal lee ambos.
+
+## 0. Lectura obligatoria mínima (NO más)
+
+Para iniciar **cualquier** trabajo sobre Ohmdal, leer:
+
+1. [`AGENTS.md`](../../../AGENTS.md) raíz.
+2. Este archivo.
+3. [`room-based/CURRENT_STATE.md`](room-based/CURRENT_STATE.md) — estado
+   operativo actual del runtime.
+4. `ADR-002` (resumen) **sólo si** la tarea toca runtime espacial
+   (rooms, cámara, transiciones, render, navegación). Si la tarea es de
+   contenido, balance, copy, puzzle lógico, asset, o test renderer-neutral,
+   NO se carga.
+
+> **El resto se lee on-demand** (ver §0.1 y §0.2 abajo).
+> Por default, un agente que arranca una tarea Ohmdal **NO** lee:
+> las 11 fichas de macroárea, `RECOVERY_AUDIT.md`, `ARC1_SPATIAL_MAP.md`
+> (a menos que la tarea sea de topología/geografía), `TEST_TAXONOMY.md`
+> (a menos que se migren tests), `MIGRATION_PLAN.md` (a menos que la
+> tarea sea de secuenciamiento de recovery), ni la batería completa de
+> docs de GDD/vision/narrative.
+
+### 0.1 Patrones de tarea → qué leer
+
+- **Bug local de runtime / transición / cámara**:
+  `CURRENT_STATE.md` + `SPATIAL_CONTRACT.md` + el/los archivos de
+  `src/jugar/` afectados. Si la transición es entre dos rooms
+  específicas, leer también la ficha de macroárea de cada una.
+- **Bug de Plaza↔Taller (o cualquier par de rooms)**:
+  leer sólo la ficha de las dos macroáreas involucradas + el código
+  de la transición. **No** releer el resto de las 9 fichas.
+- **Puzzle pedagógico / lógica de modelo**:
+  el modelo puro en `src/puzzles/...` + el test asociado en `tests/`.
+  Renderer-neutral: no hace falta cargar el runtime.
+- **Cámara / cinematic**:
+  `SPATIAL_CONTRACT.md` + `src/jugar/camera/` + `src/jugar/cinematics/`.
+- **Narrativa / copy / lore**:
+  el GDD/narrative bible relevante al capítulo, sólo ese.
+- **Planiﬁcación de recovery (R5/R6/R7)**:
+  `MIGRATION_PLAN.md` + el código afectado. No releer `RECOVERY_AUDIT.md`
+  por default.
+- **Arqueología / regresión histórica / disputa de decisión**:
+  `RECOVERY_AUDIT.md` es la fuente, pero es **histórica** y **no se
+  carga por default**.
+
+### 0.2 Prohibido por default
+
+Leer las 11 fichas de macroárea, `RECOVERY_AUDIT.md`,
+`ARC1_SPATIAL_MAP.md`, `TEST_TAXONOMY.md` o `MIGRATION_PLAN.md`
+**por default** está **prohibido**. Cada uno se carga sólo cuando la
+tarea lo justifique.
+
+El propósito es reducir context-load y tool churn sin perder acceso a
+la autoridad cuando hace falta.
 
 ---
 
@@ -116,12 +152,8 @@ Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Ohmdal.
 **Runtime de producción:** `src/jugar/` (Phaser 4) **room-based** (ver
 `ADR-002`, `SPATIAL_CONTRACT.md`, `ARC1_ROOM_GRAPH.md`; `ARC1_SPATIAL_MAP.md`
 aporta topología + esquema, no coordenadas de runtime).
-**Rama experimental:** `src/hd2d-ohmdal/` (Three.js HD-2D). No se borra del repo
-pero no recibe features nuevas sin un ADR.
-**Baseline jugable:** `/jugar` (Phaser top-down, greybox pre-existente). Se
-preserva como red de seguridad, contenido y regresión, y como **insumo del
-refactor** (no como destino de la nueva dirección visual). El refactor
-multi-área parte de este código y lo evoluciona.
+**Instituto:** home isométrica en `/`; no hay hub Phaser.
+**Baseline jugable:** `/jugar` (Phaser top-down). Se conserva y se evoluciona.
 
 ---
 
@@ -181,17 +213,10 @@ se justifica. Ver
 
 - **Runtime de producción del Arco I:** `src/jugar/` (Phaser 4) evolucionado a
   multi-área. **No** se asume "1 sala = 1 viewport 960×540"; cada área puede
-  medir varios viewports. Los cimientos del refactor viven en
-  `src/jugar/areas/`, `src/jugar/camera/`, `src/jugar/transitions/`,
-  `src/jugar/worldState.ts`, `src/jugar/greybox/`, `src/jugar/cinematics/`,
-  `src/jugar/debug/` (creados durante H2).
-- **Rama experimental:** `src/hd2d-ohmdal/` (Three.js HD-2D). No recibe
-  features nuevas. Cualquier desbloqueo requiere un ADR nuevo (ver
-  `ADR-001` §8).
-- `src/ohmdal/` puede contener piezas de integración/compatibilidad históricas;
-  no asumir que es el árbol principal del world building nuevo.
-- **Baseline jugable:** `/jugar` (Phaser top-down greybox pre-existente).
-  Se conserva y se **evoluciona**; no se reemplaza.
+  medir varios viewports.
+- **Instituto:** sólo la home isométrica (`/`). No hay salas Phaser `hall` /
+  `despacho` / `aula`.
+- **Baseline jugable:** `/jugar` (Phaser top-down). Se conserva y se **evoluciona**.
 - Modelos/tests históricos de puzzles viven en `src/puzzles/` + `tests/`;
   cualquier modelo nuevo debe seguir siendo renderer-neutral.
 - Manifiestos/routing: `src/experiences/` y `src/shared/portalLink.ts` son

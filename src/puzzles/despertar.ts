@@ -84,8 +84,10 @@ export function abrirDespertar(onSuccess: () => void): void {
           ${gaps
             .map(
               (g) => `
+            <rect class="gap-slot-hit" data-gap="${g.id}"
+              x="${g.x - 2}" y="${g.y - 22}" width="44" height="44" rx="6" fill="transparent"/>
             <rect class="gap-slot${g.broken ? ' broken' : ''}" data-gap="${g.id}"
-              x="${g.x}" y="${g.y - 9}" width="40" height="18" rx="3"/>
+              x="${g.x}" y="${g.y - 9}" width="40" height="18" rx="3" aria-hidden="true"/>
             ${g.broken ? `<path d="M${g.x + 12} ${g.y - 9} l8 9 l-8 9 M${g.x + 26} ${g.y - 9} l6 9 l-6 9" stroke="#7a4438" stroke-width="2" fill="none"/>` : ''}`,
             )
             .join('')}
@@ -129,7 +131,9 @@ export function abrirDespertar(onSuccess: () => void): void {
         actions['Continuar'].classList.remove('hidden');
       };
 
-      stage.querySelectorAll<SVGRectElement>('.gap-slot').forEach((slot) => {
+      // El click nativo es común a mouse, touch y a la activación de teclado
+      // que `makeInteractive` sintetiza. Un único listener evita dobles pasos.
+      stage.querySelectorAll<SVGRectElement>('.gap-slot-hit').forEach((slot) => {
         slot.addEventListener('click', () => {
           if (solved) return;
           const id = slot.dataset.gap!;
@@ -150,7 +154,7 @@ export function abrirDespertar(onSuccess: () => void): void {
           }
           const retirado = covered.has(id);
           covered = toggleCover(PEDESTAL_RING, covered, id);
-          slot.classList.toggle('bridged', !retirado);
+          stage.querySelector<SVGRectElement>(`.gap-slot[data-gap="${id}"]`)?.classList.toggle('bridged', !retirado);
           const lectura = readCircuit(PEDESTAL_RING, covered);
           if (retirado) {
             sfxClick();

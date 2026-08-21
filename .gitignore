@@ -12,6 +12,31 @@ __pycache__/
 .claude/settings.local.json
 docs/superpowers/
 
+# --- Godot editor/import/cache (generated; never version) ---
+**/.godot/
+
+# --- Playtest evidence (local generated artifacts; only promoted evidence belongs in reports/) ---
+.playtest/
+!.playtest/README.md
+# Transient investigation output — not versioned even if accidentally added:
+*.pid
+.playtest/**/*.out.txt
+.playtest/**/*.stdout.log
+.playtest/**/*.bin
+
+# --- Backup / temp agent / config files ---
+.codex/agents/.backup-*/
+.codex/agents/**/.backup-*/
+AGENTS.md.backup-*
+*.disabled
+
+# --- Source tree under src/ is TS/TSX only. Stale .js that crept in
+#     (e.g. ExplorationScene.js committed by accident) must NOT be tracked.
+#     Build output belongs in dist/. ---
+src/**/*.js
+!src/**/*.config.js
+
+
 # --- Cantera de assets (packs crudos descargados; lo USADO vive en
 #     assets/ohmdal/generated/ y assets/ohmdal/tilesets/) ---
 *.zip

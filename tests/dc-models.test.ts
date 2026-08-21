@@ -1,0 +1,23 @@
+import { evaluateLakeFeedDc } from '../src/puzzles/lakeFeedDcModel.ts';
+import { evaluateLighthouseDistributionDc, recordCommission } from '../src/puzzles/lighthouseDistributionDcModel.ts';
+import { evaluateClockDriveDc } from '../src/puzzles/clockDriveDcModel.ts';
+function ok(v:boolean,m:string){if(!v)throw new Error(m)}
+ok(evaluateLakeFeedDc({sourceVoltage:12,feederResistance:1,sourceLimit:6,branches:[{resistance:6,enabled:true},{resistance:6,enabled:true}]}).valid,'loaded feeder valid');
+ok(evaluateLakeFeedDc({sourceVoltage:12,feederResistance:1,sourceLimit:6,branches:[{resistance:6,enabled:true},{resistance:6,enabled:false}]}).fault==='missing-path','missing path');
+ok(evaluateLakeFeedDc({sourceVoltage:12,feederResistance:20,sourceLimit:6,branches:[{resistance:6,enabled:true},{resistance:6,enabled:true}]}).fault==='voltage-drop','feeder drop');
+ok(evaluateLakeFeedDc({sourceVoltage:12,feederResistance:1,sourceLimit:1,branches:[{resistance:2,enabled:true},{resistance:2,enabled:true}]}).fault==='source-overload','feeder source overload');
+const make=(r:number)=>['lente','reloj','senal'].map(service=>({service:service as 'lente'|'reloj'|'senal',enabled:true,resistance:r,ampacity:12,fuseRating:4,isolatable:true}));
+const clockStable=evaluateClockDriveDc({voltage:36,resistance:6,dividerResistance:26,motorResistance:12,gearLoad:5,currentLimit:1.2});
+ok(clockStable.valid&&clockStable.rhythm==='parejo'&&clockStable.current===36/(6+26+12)&&clockStable.power===clockStable.motorVoltage*clockStable.current,'clock uses series plus motor equations');
+ok(evaluateClockDriveDc({voltage:36,resistance:6,dividerResistance:50,motorResistance:12,gearLoad:5,currentLimit:1.2}).rhythm==='quieto','clock underdrive');
+ok(evaluateClockDriveDc({voltage:36,resistance:6,dividerResistance:3,motorResistance:12,gearLoad:5,currentLimit:1.2}).rhythm==='forzado','clock forced/current limit');
+const a=evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(6)}); const b=evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(12)});
+ok(a.valid&&b.valid,'two physical configurations'); ok(!evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(6).map(x=>({...x,isolatable:false}))}).valid,'isolation fault');
+ok(evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(6).map((x,i)=>({...x,enabled:i!==0}))}).fault==='missing-service','missing service');
+ok(evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(36)}).fault==='underpower','underpower');
+ok(evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(2)}).fault==='source-overload','source overload');
+ok(evaluateLighthouseDistributionDc({voltage:12,sourceLimit:100,branches:make(2)}).fault==='overpower','overpower');
+ok(evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(6).map(x=>({...x,ampacity:1}))}).fault==='ampacity','ampacity');
+ok(evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(6).map(x=>({...x,fuseRating:1}))}).fault==='fuse-undersized','fuse undersized');
+ok(evaluateLighthouseDistributionDc({voltage:12,sourceLimit:12,branches:make(6).map(x=>({...x,fuseRating:18}))}).fault==='fuse-oversized','fuse oversized');
+let p=recordCommission({complete:false},a); ok(!p.complete,'first commissioning does not complete'); p=recordCommission(p,a); ok(!p.complete,'same signature does not complete transfer'); p=recordCommission(p,b); ok(p.complete,'distinct transfer completes'); console.log('DC models: OK');

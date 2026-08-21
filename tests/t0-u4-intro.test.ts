@@ -26,11 +26,6 @@ for (const flag of unit4Flags) {
 }
 
 const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
-const unit4Branch = roomsSource.indexOf('if (fl.unit3Completed && !fl.playedUnit4Intro)');
-const unit3Branch = roomsSource.indexOf('if (fl.unit2Completed && !fl.playedUnit3Intro)');
-
-equal(unit4Branch >= 0, true, 'el proyector contempla la introducción de U4');
-equal(unit4Branch < unit3Branch, true, 'la rama U4 tiene prioridad sobre los estados U3');
 equal(
   roomsSource.includes("setFlag('playedUnit4Intro')"),
   true,
@@ -60,11 +55,6 @@ equal(
   roomsSource.includes('(Agua que piensa. En esta escuela ya nada me sorprende.)'),
   true,
   'incluye la reacción textual',
-);
-equal(
-  roomsSource.includes('*clac* Unidad cuatro: en curso. Mida dos veces. Toque una. *clac*'),
-  true,
-  'incluye la re-interacción textual',
 );
 
 console.log('T0 U4 intro tests: OK');

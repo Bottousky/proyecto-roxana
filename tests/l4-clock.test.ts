@@ -58,10 +58,10 @@ const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.ur
 const puzzleSource = readFileSync(new URL('../src/puzzles/clock.ts', import.meta.url), 'utf8');
 
 equal(CLOCK_UNIT_MS, 250, 'L4 usa 250 ms por unidad');
-equal(roomsSource.includes("import { abrirClock } from '../puzzles/clock';"), true, 'rooms importa L4');
-equal(roomsSource.includes("setFlag('solvedClock')"), true, 'L4 marca solvedClock');
+equal(roomsSource.includes("import { abrirClock } from '../puzzles/clock';"), false, 'L4 RC queda experimental');
+equal(roomsSource.includes("setFlag('solvedClock')"), false, 'L4 RC no marca el camino crítico');
 equal(roomsSource.includes("setFlag('clockRestored')"), true, 'L4 marca clockRestored');
-equal(roomsSource.includes("notifyNewEntry('El tic')"), true, 'L4 notifica la entrada');
+equal(roomsSource.includes("notifyNewEntry('El reloj y la entrega')"), true, 'L4 DC notifica la entrada');
 equal(roomsSource.includes('hooks.refresh()'), true, 'L4 refresca la torre');
 equal(puzzleSource.includes('createSimTick('), true, 'L4 usa el tick compartido');
 equal(puzzleSource.includes('bench.onClose(tick.stop)'), true, 'L4 cancela el tick al cerrar');

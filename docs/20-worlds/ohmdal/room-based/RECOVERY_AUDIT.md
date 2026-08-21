@@ -1,5 +1,27 @@
 # Ohmdal — RECOVERY_AUDIT
 
+> ⚠ **HISTORICAL / DEEP-AUDIT REFERENCE**
+>
+> **NO LOAD BY DEFAULT.**
+>
+> Este documento es una **auditoría histórica** del runtime pre-room-based.
+> No es contexto de implementación. NO debe ser leído por un agente que
+> arranca una tarea Ohmdal. Para el estado operativo actual del runtime,
+> leer [`CURRENT_STATE.md`](CURRENT_STATE.md) en su lugar.
+>
+> **Cuándo SÍ leerlo:**
+> - arqueología de arquitectura (por qué algo es como es);
+> - investigación de regresión (de dónde viene un bug);
+> - disputa histórica sobre una decisión previa.
+>
+> **Cuándo NO leerlo:**
+> - tarea normal de implementación;
+> - bug local reproducible;
+> - decisión de gameplay/contenido;
+> - revisión de código de feature nueva.
+
+---
+
 > Auditoría de la implementación Phaser existente en `src/jugar/` con el
 > objetivo de evaluar qué se conserva, qué se descarta y qué se refactoriza
 > para construir el **Arco I completo como mundo de áreas/rooms con cámara

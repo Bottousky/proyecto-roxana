@@ -4,8 +4,16 @@
  * Valida que la autoridad de gameplay es room-LOCAL:
  *   - `ActiveRoom.playerLocal` es la posición autoritativa;
  *   - cámara, navegación y clamp derivan del rect local (0,0,width,height);
- *   - `world.ts` ox/oy NO son autoridad: sólo el bridge `legacyProjection`
- *     los usa para proyectar al renderer legacy.
+ *   - NO existe un bridge `legacyProjection` (R6 lo retiró); el sprite de
+ *     Phaser (`player.x/y`) y `activeRoom.playerLocal` son la misma
+ *     posición — sin plano mundo paralelo.
+ *
+ * R6 actualizó este test:
+ *   - Eliminó los asserts sobre `legacyProjection` (el bridge ya no existe).
+ *   - La regresión de placement se reemplaza por una invariante de
+ *     identidad: cambiar un offset que NO entra a ActiveRoom no altera
+ *     la autoridad de gameplay (porque ActiveRoom ya no consulta nada
+ *     fuera de su id + dims + spawn).
  *
  * Reemplaza `r4-active-area-semantics.test.ts` (retirado): conserva la
  * semántica valiosa (una room = autoridad, bounds locales, switch atómico)
@@ -22,9 +30,7 @@ import {
   clampLocal,
   isPlayerLocalInside,
   isSameActiveRoom,
-  legacyProjection,
   type ActiveRoom,
-  type LegacyPlacement,
 } from '../src/jugar/activeRoom.ts';
 import { cameraBounds } from '../src/jugar/cameraDirector.ts';
 import {
@@ -109,15 +115,18 @@ test('E: navigation bounds = (0,0,width,height) independiente del placement', ()
 });
 
 // ---------------------------------------------------------------------------
-// F. Cambiar ox/oy NO altera playerLocal / nav / camera / graph / entry.
+// F. R6: la autoridad de ActiveRoom es independiente de cualquier offset
+// externo. El grafo y los bounds locales son funciones puras de
+// (rooms, scenes, spawn) — no de `ox/oy` (R6 extirpó `legacyProjection`).
 // ---------------------------------------------------------------------------
-test('F: cambiar ox/oy no altera playerLocal, bounds ni entry del grafo', () => {
+test('F: la autoridad de ActiveRoom es invariante ante offsets externos (R6)', () => {
   const room = createActiveRoom(PLAZA_ID, { x: 1500, y: 800 });
-  const pA: LegacyPlacement = { ox: 0, oy: 0 };
-  const pB: LegacyPlacement = { ox: 9999, oy: -7777 };
-  assert(room.playerLocal.x === 1500 && room.playerLocal.y === 800, 'playerLocal sin cambio');
+  // playerLocal es el input autoritativo; no depende de nada más.
+  assert(room.playerLocal.x === 1500 && room.playerLocal.y === 800, 'playerLocal preserva spawn');
+  // Bounds locales son una función pura de la room.
   assert(JSON.stringify(activeRoomLocalBounds(room)) === JSON.stringify({ x: 0, y: 0, w: 1920, h: 1080 }),
-    'nav/camera bounds sin cambio');
+    'nav/camera bounds = (0,0,width,height) sin offsets');
+  // El grafo resuelve la misma transición siempre.
   const g = realGraph();
   const eA = g.entryFor('plaza', 'taller');
   const eB = g.entryFor('plaza', 'taller');
@@ -125,22 +134,26 @@ test('F: cambiar ox/oy no altera playerLocal, bounds ni entry del grafo', () => 
   const connA = g.connection('plaza', 'taller');
   const connB = g.connection('plaza', 'taller');
   assert(connA && connB && connA.id === connB.id, 'conexión de grafo idéntica');
-  // El proyecto legacy SÍ difiere (ese es el bridge).
-  const worldA = legacyProjection.localToLegacyWorld(room.playerLocal, pA);
-  const worldB = legacyProjection.localToLegacyWorld(room.playerLocal, pB);
-  assert(worldA.x !== worldB.x || worldA.y !== worldB.y, 'sólo el proyecto legacy difiere');
+  // Construir dos ActiveRooms con el mismo spawn produce estados idénticos.
+  const room2 = createActiveRoom(PLAZA_ID, { x: 1500, y: 800 });
+  assert(isSameActiveRoom(room, room2), 'mismo spawn → mismo ActiveRoom');
 });
 
 // ---------------------------------------------------------------------------
-// G. Proyección legacy reversible.
+// G. R6: la identidad local↔local es trivial — no hay un plano world
+// separado. El sprite de Phaser vive en la misma coord que
+// `activeRoom.playerLocal` (verificado en R6 en runtime).
 // ---------------------------------------------------------------------------
-test('G: legacyProjection es reversible (local ↔ legacy world)', () => {
-  const local = { x: 100, y: 200 };
-  const placement: LegacyPlacement = { ox: 5000, oy: -3000 };
-  const world = legacyProjection.localToLegacyWorld(local, placement);
-  assert(world.x === 5100 && world.y === -2800, 'local (100,200) + (5000,-3000) → world (5100,-2800)');
-  const back = legacyProjection.legacyWorldToLocal(world, placement);
-  assert(back.x === 100 && back.y === 200, 'round trip → local (100,200)');
+test('G: ActiveRoom.playerLocal ES la posición de Phaser (sin bridge)', () => {
+  const room = createActiveRoom(PLAZA_ID, { x: 1500, y: 800 });
+  // Identidad local = (playerLocal.x, playerLocal.y) sin proyección.
+  assert(room.playerLocal.x === 1500 && room.playerLocal.y === 800, 'local = (1500, 800)');
+  // El módulo activeRoom.ts NO exporta legacyProjection.
+  const arSrc = readFileSync(new URL('../src/jugar/activeRoom.ts', import.meta.url), 'utf8');
+  assert(!/export\s+(const|function)\s+legacyProjection\b/.test(arSrc),
+    'R6: legacyProjection no se exporta desde activeRoom.ts');
+  assert(!/LegacyPlacement/.test(arSrc),
+    'R6: LegacyPlacement extirpado de activeRoom.ts');
 });
 
 // ---------------------------------------------------------------------------
@@ -193,6 +206,11 @@ test('K: activeRoom no depende de spatial.ts / unionAreaBounds', () => {
   assert(imports.length > 0, 'activeRoom tiene imports');
   assert(imports.every((p) => p.startsWith('./roomScenesData')), `imports inesperados: ${imports.join(', ')}`);
   assert(!src.includes('unionAreaBounds'), 'sin unionAreaBounds');
+  // R6: ningún export runtime de legacyProjection / LegacyPlacement.
+  assert(!/export\s+(const|function|interface|type)\s+legacyProjection\b/.test(src),
+    'R6: sin export de legacyProjection');
+  assert(!/export\s+(const|function|interface|type)\s+LegacyPlacement\b/.test(src),
+    'R6: sin export de LegacyPlacement');
 });
 
 // ---------------------------------------------------------------------------
@@ -209,22 +227,25 @@ test('L: RoomGraph conserva cero dependencia de world', () => {
 });
 
 // ---------------------------------------------------------------------------
-// REGRESIÓN (ADR-002): Plaza 1920×1080, placement A(0,0) vs B(10000,-7000)
-// → comportamiento de ActiveRoom idéntico. Sólo el proyecto legacy cambia.
+// REGRESIÓN (ADR-002 / R6): dos ActiveRooms con el mismo spawn y la misma
+// room producen estados IDÉNTICOS — sin dependencia de un placement
+// externo. Esto es el reemplazo de la antigua "colocación A vs B
+// sólo cambia el bridge" (que ya no existe).
 // ---------------------------------------------------------------------------
-test('REGRESIÓN ADR-002: placement distinto → ActiveRoom idéntico, sólo cambia el bridge', () => {
-  const pA: LegacyPlacement = { ox: 0, oy: 0 };
-  const pB: LegacyPlacement = { ox: 10000, oy: -7000 };
-  const room = createActiveRoom(PLAZA_ID, { x: 1500, y: 800 });
+test('REGRESIÓN ADR-002 (R6): mismo spawn → mismo ActiveRoom; no hay bridge', () => {
+  // Dos ActiveRooms con el mismo spawn son estructuralmente iguales.
+  const room1 = createActiveRoom(PLAZA_ID, { x: 1500, y: 800 });
+  const room2 = createActiveRoom(PLAZA_ID, { x: 1500, y: 800 });
+  assert(isSameActiveRoom(room1, room2), 'mismo spawn → mismo ActiveRoom');
 
-  // playerLocal idéntico (autoridad local, sin offsets).
-  assert(room.playerLocal.x === 1500 && room.playerLocal.y === 800, 'playerLocal idéntico');
+  // playerLocal idéntico.
+  assert(room1.playerLocal.x === 1500 && room1.playerLocal.y === 800, 'playerLocal idéntico');
 
   // camera / navigation bounds locales idénticos.
-  const camA = cameraLocalRect(room);
-  const camB = cameraLocalRect(room);
+  const camA = cameraLocalRect(room1);
+  const camB = cameraLocalRect(room2);
   assert(JSON.stringify(camA) === JSON.stringify(camB), 'camera local idéntica');
-  assert(JSON.stringify(activeRoomLocalBounds(room)) === JSON.stringify({ x: 0, y: 0, w: 1920, h: 1080 }), 'nav local idéntica');
+  assert(JSON.stringify(activeRoomLocalBounds(room1)) === JSON.stringify({ x: 0, y: 0, w: 1920, h: 1080 }), 'nav local idéntica');
 
   // RoomGraph edges idénticos.
   const g = realGraph();
@@ -232,15 +253,10 @@ test('REGRESIÓN ADR-002: placement distinto → ActiveRoom idéntico, sólo cam
   const eB = g.connection('plaza', 'taller');
   assert(eA && eB && eA.id === eB.id && eA.kind === eB.kind, 'RoomGraph edges idénticos');
 
-  // SÓLO la proyección legacy difiere.
-  const worldA = legacyProjection.localToLegacyWorld(room.playerLocal, pA);
-  const worldB = legacyProjection.localToLegacyWorld(room.playerLocal, pB);
-  assert(worldA.x === 1500 && worldA.y === 800, 'projection A: local (1500,800)');
-  assert(worldB.x === 11500 && worldB.y === -6200, 'projection B: local + (10000,-7000)');
-  assert(worldA.x !== worldB.x, 'sólo el proyecto legacy difiere');
-  const camWorldA = legacyProjection.rectToLegacyWorld(camA, pA);
-  const camWorldB = legacyProjection.rectToLegacyWorld(camB, pB);
-  assert(camWorldA.x === 0 && camWorldB.x === 10000, 'camera world (setBounds) difiere sólo por el bridge');
+  // R6: no existe el bridge. La posición es DIRECTAMENTE (1500, 800)
+  // — sin proyección.
+  assert(room1.playerLocal.x === 1500 && room1.playerLocal.y === 800,
+    'R6: playerLocal = (1500, 800) directamente (sin bridge)');
 });
 
 // ---------------------------------------------------------------------------

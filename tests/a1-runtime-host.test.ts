@@ -76,8 +76,11 @@ async function testFlujoNormal(): Promise<void> {
       loaderCallsTopdown++;
       return topdownModule;
     },
-    'school-webgl': async () => {
-      throw new Error('no usado en este test');
+    'platformer-three': async () => {
+      throw new Error('no usado');
+    },
+    'platformer-babylon': async () => {
+      throw new Error('no usado');
     },
     'dataflow-phaser': async () => {
       loaderCallsDataflow++;
@@ -183,7 +186,10 @@ async function testRequestTravel(): Promise<void> {
 
   const loaders: RuntimeLoaderMap = {
     'topdown-phaser': async () => topdownModule,
-    'school-webgl': async () => {
+    'platformer-three': async () => {
+      throw new Error('no usado');
+    },
+    'platformer-babylon': async () => {
       throw new Error('no usado');
     },
     'dataflow-phaser': async () => dataflowModule,
@@ -215,7 +221,10 @@ async function testLoaderRechaza(): Promise<void> {
 
   const loaders: RuntimeLoaderMap = {
     'topdown-phaser': async () => topdownModule,
-    'school-webgl': async () => {
+    'platformer-three': async () => {
+      throw new Error('no usado');
+    },
+    'platformer-babylon': async () => {
       throw new Error('no usado');
     },
     'dataflow-phaser': async () => {
@@ -245,7 +254,10 @@ async function testStartDosVeces(): Promise<void> {
 
   const loaders: RuntimeLoaderMap = {
     'topdown-phaser': async () => topdownModule,
-    'school-webgl': async () => {
+    'platformer-three': async () => {
+      throw new Error('no usado');
+    },
+    'platformer-babylon': async () => {
       throw new Error('no usado');
     },
     'dataflow-phaser': async () => {

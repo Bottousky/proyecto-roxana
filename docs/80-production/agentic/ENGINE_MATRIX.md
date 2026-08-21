@@ -31,7 +31,7 @@ La cobertura curricular nunca justifica una representación que enseña peor.
 
 - Los cuatro mundos deben sentirse como **juegos distintos**.
 - Desktop y mobile/touch son targets de primera clase.
-- Ohmdal conserva como dirección deseada **HD-2D / 2.5D**.
+- Ohmdal se produce en **Phaser 4 top-down room-based** (`src/jugar/`).
 - Physica usa **2.5D por defecto** y 3D real sólo cuando la tercera dimensión compra comprensión material.
 - Bitland es una **máquina-ciudad: el interior de un microcontrolador**.
 - Arithmos **evoluciona entre representaciones**; un renderer híbrido es válido si sirve a la matemática.
@@ -42,7 +42,7 @@ La cobertura curricular nunca justifica una representación que enseña peor.
 | Scope | Hipótesis | Confianza | Evidencia pendiente |
 |---|---|---:|---|
 | Instituto | Three.js axonométrico + DOM | media-alta | probar hogar/archivo/progreso/transformación, no sólo estética |
-| Ohmdal | Three.js HD-2D + sprites + DOM | alta | legibilidad eléctrica + sostenibilidad del asset/world pipeline |
+| Ohmdal | Phaser 4 top-down room-based (`src/jugar/`) | alta | legibilidad eléctrica en cámara real |
 | Physica | Babylon + analítica TS; 2.5D default, 3D selectivo | alta | validar cada excepción 3D contra 2.5D |
 | Bitland | simulation core TS + DOM; **Pixi vs Phaser por paired spikes** | media-alta | BIT-R-A / BIT-R-B |
 | Arithmos | transformation core TS + vistas Three/Pixi-SVG/DOM | media-alta | ARI-R-A / ARI-R-B definen frontera |

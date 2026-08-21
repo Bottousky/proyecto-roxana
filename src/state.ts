@@ -55,6 +55,9 @@ export interface Flags {
   unit4Completed: boolean;
   playedUnit5Intro: boolean;
   metFarero: boolean;
+  solvedLakeFeedDc: boolean;
+  solvedClockDriveDc: boolean;
+  solvedLighthouseDistributionDc: boolean;
   solvedStoredSpark: boolean;
   consejeraNotedAnomaly: boolean;
   solvedSleepingRiver: boolean;
@@ -66,6 +69,8 @@ export interface Flags {
   arcOneCompleted: boolean;
   sawCrystalEye: boolean;
   unit5Completed: boolean;
+  playedPortalArrival: boolean;
+  playedFaroReveal: boolean;
 
   // Prologue (H1) flags
   /** Opening cinematic viewed. Different from introSeen (Hall monologue). */
@@ -154,6 +159,9 @@ const DEFAULT_FLAGS: Flags = {
   unit4Completed: false,
   playedUnit5Intro: false,
   metFarero: false,
+  solvedLakeFeedDc: false,
+  solvedClockDriveDc: false,
+  solvedLighthouseDistributionDc: false,
   solvedStoredSpark: false,
   consejeraNotedAnomaly: false,
   solvedSleepingRiver: false,
@@ -165,6 +173,8 @@ const DEFAULT_FLAGS: Flags = {
   arcOneCompleted: false,
   sawCrystalEye: false,
   unit5Completed: false,
+  playedPortalArrival: false,
+  playedFaroReveal: false,
 
   // Prologue (H1) defaults
   seenIntro: false,
@@ -192,10 +202,7 @@ export interface GameState {
 
 const KEY = 'roxana-slice-v1';
 
-// `escuela_hub` era el valor por defecto y no es una sala de ninguna experiencia montable:
-// pertenecía al hub caminable de Phaser que nunca se registró en el runtime. Toda partida
-// nueva arrancaba apuntando a la nada. El prólogo empieza en el hall del Instituto.
-const SALA_INICIAL = 'hall';
+const SALA_INICIAL = 'plaza';
 
 export const state: GameState = {
   room: SALA_INICIAL,
@@ -215,11 +222,41 @@ export function load(): void {
   if (!raw) return;
   try {
     const data = JSON.parse(raw) as GameState;
-    state.room = data.room ?? SALA_INICIAL;
-    state.flags = { ...DEFAULT_FLAGS, ...data.flags };
+    state.flags = migrateLoadedFlags(data.flags);
+    state.room = migrateLoadedRoom(data.room, state.flags);
   } catch {
     /* save corrupto: empezar de cero */
   }
+}
+
+/** Pure H7 migration, kept separate so save compatibility is testable without a renderer. */
+export function migrateLoadedFlags(saved: Partial<Flags> | undefined): Flags {
+  const flags = { ...DEFAULT_FLAGS, ...saved };
+  // Despertar a Ohm sólo puede ocurrir después de llegar y explorar la Plaza.
+  // Los primeros saves de la llegada por Portal marcaban su cinemática pero no
+  // `plazaSeen`, por lo que una recarga reabría la presentación inicial de Edda.
+  if (flags.ohmAwake) flags.plazaSeen = true;
+  // H7 switches Arc I's critical path from experimental RC to DC. Never
+  // revoke a completed ending, but clear only the obsolete local RC chain.
+  if (!flags.unit5Completed && !flags.arcOneCompleted && !flags.lighthouseRestored) {
+    flags.solvedStoredSpark = false;
+    flags.solvedSleepingRiver = false;
+    flags.solvedClock = false;
+    flags.clockRestored = false;
+    flags.solvedLighthouse = false;
+    flags.learnedCapacitor = false;
+    flags.lighthouseRestored = false;
+  }
+  return flags;
+}
+
+/** Incomplete pre-DC H7 saves reopen at the safe Faro entry, never inside an obsolete RC station. */
+export function migrateLoadedRoom(room: string | undefined, flags: Flags): string {
+  const institutoPhaser = new Set(['hall', 'despacho', 'aula']);
+  if (room && institutoPhaser.has(room)) return SALA_INICIAL;
+  const legacyH7Rooms = new Set(['lighthouse_hall', 'lighthouse_bench', 'clock_tower', 'lighthouse_lantern']);
+  if (!flags.arcOneCompleted && !flags.lighthouseRestored && room && legacyH7Rooms.has(room)) return 'lighthouse_hall';
+  return room ?? SALA_INICIAL;
 }
 
 export function resetSave(): void {

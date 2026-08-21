@@ -24,11 +24,11 @@ for (const roomId of ['lighthouse_hall', 'lighthouse_bench', 'clock_tower', 'lig
 }
 
 includes(roomsSource, "to: 'lighthouse_bench'", 'el hall conecta con el taller del Farero');
-includes(roomsSource, 'f().solvedStoredSpark', 'el taller abre con solvedStoredSpark');
+includes(roomsSource, 'f().solvedLakeFeedDc', 'el taller abre con la alimentación DC del Lago');
 includes(roomsSource, "to: 'clock_tower'", 'el taller conecta con la torre del Reloj');
-includes(roomsSource, 'f().solvedSleepingRiver', 'la torre abre con solvedSleepingRiver');
+includes(roomsSource, 'f().solvedClockDriveDc', 'la torre abre con la entrega DC del reloj');
 includes(roomsSource, "to: 'lighthouse_lantern'", 'la torre conecta con la linterna');
-includes(roomsSource, 'f().solvedClock', 'la linterna abre con solvedClock');
+includes(roomsSource, 'f().solvedClockDriveDc', 'la linterna abre con el reloj DC');
 
 equal(roomsSource.includes('// TODO(L5)'), false, 'L5 reemplazó su placeholder');
 equal(roomsSource.includes('// TODO(L4)'), false, 'L4 reemplazó su placeholder');
@@ -36,8 +36,8 @@ equal(roomsSource.includes('// TODO(L4)'), false, 'L4 reemplazó su placeholder'
 for (const text of [
   '¿Vienen por la luz? La luz es lo de menos. Este faro no alumbraba: avisaba.',
   'Y para avisar hay que latir. La-aaa-tido. La-aaa-tido. Yo me acuerdo. El ritmo lo tengo acá. (se toca la sien)',
-  'Nosotros vimos algo imposible, hace tiempo. Una chispa que brilló sin camino. Lo anotamos y no lo entendimos.',
-  'Ah. Entonces ya conocen al Estanque. Solo que todavía no sabían su nombre.',
+  'TODO(guion): la Bitácora registra que los tres servicios deben sostenerse sin forzar los caminos.',
+  'TODO(guion): el Farero señala las protecciones y pide una prueba que también permita mantener cada ramal.',
 ]) {
   includes(roomsSource, text, `diálogo textual: ${text.slice(0, 38)}`);
 }

@@ -1,5 +1,4 @@
-// Adaptador Phaser para el runtime cenital de Ohmdal/Instituto. El boot que antes vivía
-// en main.ts se movió acá: main.ts ya no conoce Phaser.
+// Adaptador Phaser para el runtime cenital de Ohmdal.
 import Phaser from 'phaser';
 import { ExplorationScene, W, H } from '../../jugar/ExplorationScene.ts';
 import { resolverSala } from '../../jugar/rooms.ts';

@@ -82,24 +82,20 @@ const puzzleSource = readFileSync(new URL('../src/puzzles/lighthouse.ts', import
 equal(LIGHTHOUSE_UNIT_MS, 250, 'L5 usa 250 ms por unidad');
 equal(
   roomsSource.includes("import { abrirLighthouse } from '../puzzles/lighthouse';"),
-  true,
-  'rooms importa L5',
+  false,
+  'L5 RC queda experimental',
 );
-equal(roomsSource.includes("setFlag('solvedLighthouse')"), true, 'L5 marca solvedLighthouse');
+equal(roomsSource.includes("setFlag('solvedLighthouse')"), false, 'L5 RC no marca solvedLighthouse');
 equal(
   roomsSource.includes("setFlag('lighthouseRestored')"),
   true,
   'L5 marca lighthouseRestored',
 );
+equal(roomsSource.includes("setFlag('learnedCapacitor')"), false, 'L5 no formaliza RC');
 equal(
-  roomsSource.includes("setFlag('learnedCapacitor')"),
+  roomsSource.includes("openBitacora('cierre-dc-del-faro')"),
   true,
-  'L5 marca learnedCapacitor',
-);
-equal(
-  roomsSource.includes("openBitacora('el-arco-del-rio')"),
-  true,
-  'L5 abre la entrada reservada para L6',
+  'L5 abre la entrada de distribución DC',
 );
 equal(roomsSource.includes('// TODO(L5)'), false, 'L5 reemplaza el placeholder de la linterna');
 equal(puzzleSource.includes('createSimTick('), true, 'L5 usa el tick compartido');

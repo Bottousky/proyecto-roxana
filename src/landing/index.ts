@@ -257,16 +257,6 @@ class Landing {
 
 // Init on load
 document.addEventListener('DOMContentLoaded', async () => {
-  if (document.documentElement.dataset.view === 'classic') {
-    const [{ initAulas }, { initVoxelSchool }] = await Promise.all([
-      import('./aulas.ts'),
-      import('./voxelSchool.ts'),
-    ]);
-    new Landing();
-    initAulas();
-    initVoxelSchool();
-  } else {
-    const { initSchool3D } = await import('./school3d.ts');
-    void initSchool3D();
-  }
+  const { initSchool3D } = await import('./school3d.ts');
+  void initSchool3D();
 });

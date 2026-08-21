@@ -11,6 +11,7 @@ import Phaser from 'phaser';
 import { W, H } from './ExplorationScene';
 import { setAmbience, sfxAwakening, playMusicTrack, sfxSpark } from '../audio';
 import { state } from '../state';
+import { pushUI, popUI } from '../ui/overlay';
 
 export interface AwakeningHandle {
   /** Promesa que resuelve cuando la secuencia terminó. */
@@ -21,7 +22,11 @@ export interface AwakeningHandle {
 
 export function playAwakening(scene: Phaser.Scene, pedestalX: number, pedestalY: number): AwakeningHandle {
   let cancelled = false;
-  const cancel = (): void => { cancelled = true; };
+  let settled = false;
+  let resolveDone!: () => void;
+  // Esta cinemática sólo posee el input mientras muestra sus visuales crudos.
+  // No envuelve `say`: el diálogo administra su propio lock.
+  pushUI();
 
   // Asegurar textura de chispa antes de crear sprites.
   ensureSparkTexture(scene);
@@ -64,12 +69,34 @@ export function playAwakening(scene: Phaser.Scene, pedestalX: number, pedestalY:
 
   // Timeline de tweens.
   const timeline: Phaser.Tweens.Tween[] = [];
+  const timers: Phaser.Time.TimerEvent[] = [];
+  let skip: Phaser.GameObjects.Text | undefined;
+  const done = new Promise<void>((resolve) => { resolveDone = resolve; });
+  const restoreAndResolve = (): void => {
+    if (settled) return;
+    settled = true;
+    for (const timer of timers) timer.remove(false);
+    for (const tween of timeline) tween.stop();
+    flash.destroy();
+    halo.destroy();
+    for (const spark of sparks) spark.destroy();
+    skip?.destroy();
+    cam.zoom = startZoom;
+    scene.input.keyboard?.off('keydown-ESC', cancel);
+    scene.input.off('pointerdown', cancel);
+    popUI();
+    resolveDone();
+  };
+  const cancel = (): void => {
+    cancelled = true;
+    restoreAndResolve();
+  };
   // 0ms: chispa audible + flash on + música de "vivo" entrando
-  scene.time.delayedCall(0, () => {
+  timers.push(scene.time.delayedCall(0, () => {
     if (cancelled) return;
     sfxAwakening();
     void playMusicTrack('alive', 2400);
-  });
+  }));
   // 30ms: flash sube a 0.45 (rápido)
   timeline.push(scene.tweens.add({
     targets: flash, alpha: 0.55, duration: 220, ease: 'Quad.easeOut',
@@ -87,11 +114,11 @@ export function playAwakening(scene: Phaser.Scene, pedestalX: number, pedestalY:
     targets: cam, zoom: peakZoom, duration: 380, ease: 'Sine.easeOut',
   }));
   // 120ms: chispas prenden
-  scene.time.delayedCall(120, () => {
+  timers.push(scene.time.delayedCall(120, () => {
     if (cancelled) return;
     for (const s of sparks) s.setAlpha(0.95);
     sfxSpark();
-  });
+  }));
   // 220ms: chispas vuelan hacia afuera y se atenúan
   for (const s of sparks) {
     const angle = Math.atan2(s.y - pedestalY, s.x - pedestalX);
@@ -116,32 +143,33 @@ export function playAwakening(scene: Phaser.Scene, pedestalX: number, pedestalY:
     targets: cam, zoom: startZoom, duration: 540, ease: 'Sine.easeInOut',
   }));
   // 620ms: ambience cambia a "ohmdal-on" (afloja la penumbra)
-  scene.time.delayedCall(620, () => {
+  timers.push(scene.time.delayedCall(620, () => {
     if (cancelled) return;
     setAmbience('ohmdal-on');
     state.flags.ohmAwakeEverSeen = true;
-  });
+  }));
   // 900ms: flash desaparece
   timeline.push(scene.tweens.add({
     targets: flash, alpha: 0, duration: 380, ease: 'Sine.easeIn',
     onComplete: () => flash.destroy(),
   }));
   // 1500ms: limpiar chispas
-  scene.time.delayedCall(1500, () => {
+  timers.push(scene.time.delayedCall(1500, () => {
     for (const s of sparks) s.destroy();
-  });
+  }));
 
-  const done = new Promise<void>((resolve) => {
-    // Esperar al tween más largo.
-    const lastTween = timeline[timeline.length - 1];
-    if (lastTween) {
-      lastTween.once('complete', () => {
-        if (!cancelled) resolve();
-      });
-    } else {
-      scene.time.delayedCall(1600, () => resolve());
-    }
-  });
+  // Escape y un toque durante la visual permiten omitirla sin abandonar la
+  // escena con cámara o input bloqueados. El texto es visible también en touch.
+  skip = scene.add.text(W - 26, H - 20, 'Omitir', { fontFamily: 'monospace', fontSize: '12px', color: '#fff1c2' })
+    .setOrigin(1, 1).setScrollFactor(0).setDepth(10_001).setInteractive({ useHandCursor: true });
+  skip.on('pointerdown', cancel);
+  scene.input.keyboard?.once('keydown-ESC', cancel);
+  timers.push(scene.time.delayedCall(140, () => scene.input.once('pointerdown', cancel)));
+
+  // El último tween añadido es el flash, no la secuencia completa de 1500 ms.
+  // La terminación normal se agenda explícitamente al final del beat; cancelar
+  // u omitir sigue usando el mismo cleanup de inmediato.
+  timers.push(scene.time.delayedCall(1600, restoreAndResolve));
 
   return { done, cancel };
 }

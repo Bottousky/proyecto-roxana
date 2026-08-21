@@ -106,83 +106,43 @@ const fixedRpg = { far: 1, near: 1, farY: 0, nearY: 540 };
 
 export const ROOM_SCENES: Record<string, RoomSceneProfile> = {
   plaza: {
-    // Commit 4 (H3 — Plaza multi-área greybox): la Plaza pasa de
-    // 960×540 a 1920×1080. Se elimina el `background` pintado y
-    // ahora la puesta en escena es procedural: `drawRoomBase` +
-    // `renderDecor` con el `AreaDef` extendido. Los efectos
-    // visuales (luces, glows) se reubican a coordenadas que viven
-    // en el área grande, no en el antiguo cuadrante NW.
-    //
-    // El espacio se organiza como una **cruz + 4 plazas en las
-    // esquinas + anillo perimetral**:
-    //
-    //     ┌────────────────────────────────────┐  ← 0
-    //     │           Anillo N                 │
-    //     │   ╔══════╗   ╔══════╗              │
-    //     │   ║ NW  ║   ║ NE  ║              │
-    //     │   ╚══════╝   ╚══════╝              │
-    //     │            │EJE N-S│               │
-    //     │   ╔══════╗   ╔══════╗              │
-    //     │ ←─│ W  E │───│  E  │─→  (banda)    │
-    //     │   ╚══════╝   ╚══════╝              │
-    //     │   ║ SW  ║   ║ SE  ║              │
-    //     │   ╚══════╝   ╚══════╝              │
-    //     │            │EJE N-S│               │
-    //     │           Anillo S                 │
-    //     └────────────────────────────────────┘  ← 1080
-    //              0                     1920
-    //
-    // La banda E-O cruza la Plaza de oeste a este. El eje N-S la
-    // cruza de norte a sur. Las cuatro plazas en las esquinas
-    // quedan conectadas por la banda E-O. Para ir del NW al SE
-    // hay dos rutas: por la banda E-O y luego por el eje N-S, o
-    // bordeando el medallón central por el otro lado.
+    // H3 agrandó la Plaza a 1920×1080 y retiró el fondo 960×540.
+    // Pintura 1920×1080: patio cerrado. Walkable = piso interior,
+    // no los merlones. Campana/pedestal/portal son props de runtime.
     width: 1920,
     height: 1080,
+    background: 'room-plaza',
     perspective: medium,
     walkable: [
-      // Anillo perimetral: rutas alternativas alrededor del centro.
-      // Norte (entre el eje N-S y los bordes laterales)
-      { x: 0, y: 0, w: 880, h: 100 },
-      { x: 1040, y: 0, w: 880, h: 100 },
-      // Sur
-      { x: 0, y: 980, w: 880, h: 100 },
-      { x: 1040, y: 980, w: 880, h: 100 },
-      // Eje N-S: corredor central que conecta las 4 conexiones
-      // cardinales. Coincide con el gap del muro norte (puerta)
-      // y con el del muro sur (terrazas).
+      // Eje N-S: gap del arco norte (Puerta) y del sur (Terrazas).
       { x: 880, y: 0, w: 160, h: 1080 },
-      // Banda E-O: anillo horizontal que conecta el oeste
-      // (castillo) con el este (taller). Cubre el gap del muro
-      // oeste (castle_gate / forge_yard) y del muro este (taller).
+      // Banda E-O: Castillo/Forja al oeste, Taller al este.
       { x: 0, y: 460, w: 1920, h: 160 },
-      // Cuatro plazas en las esquinas, conectadas entre sí sólo
-      // por la banda E-O. Crean el "espacio negativo" greybox.
-      { x: 80, y: 100, w: 760, h: 360 },   // NW
-      { x: 1080, y: 100, w: 760, h: 360 }, // NE
-      { x: 80, y: 620, w: 760, h: 360 },   // SW
-      { x: 1080, y: 620, w: 760, h: 360 }, // SE
+      // Cuatro plazas interiores. Solapan la cruz ≥24 px para que el
+      // cuerpo del jugador (caja ~24) pueda pasar de una a otra.
+      { x: 96, y: 96, w: 744, h: 380 },    // NW
+      { x: 1080, y: 96, w: 500, h: 380 },  // NE (antes del taller)
+      { x: 96, y: 596, w: 744, h: 388 },    // SW
+      { x: 1080, y: 596, w: 720, h: 388 },  // SE
     ],
     collision: [
-      // Medallón central (pedestal de Ohm). Es el landmark
-      // reconocible; alrededor suyo se cruzan los dos ejes.
-      { x: 920, y: 600, w: 80, h: 80 },
-      // Cuatro monolitos diagonales: dividen las plazas en
-      // esquinas y obligan a rodearlos. Son greybox puro
-      // (rectángulos con un marco pintado procedural).
-      { x: 200, y: 200, w: 100, h: 60 },   // monolito NW
-      { x: 1620, y: 200, w: 100, h: 60 },  // monolito NE
-      { x: 200, y: 800, w: 100, h: 60 },   // monolito SW
-      { x: 1620, y: 800, w: 100, h: 60 },  // monolito SE
-      // Campana monumental, reubicada al norte del medallón.
-      // Conserva la lógica de la plaza original: cuerpo central
-      // y dos soportes, dejando pasillos laterales para acceder
-      // a la cuerda desde abajo. El cuerpo termina en y=368 y
-      // el pedestal empieza en y=600: 232 px de espacio
-      // transitable entre ambos, suficiente para rodear.
+      // Taller pintado en el NE: el jugador no atraviesa el edificio.
+      { x: 1580, y: 70, w: 340, h: 400 },
+      // Obeliscos de las cuatro plazas (alinea con la pintura).
+      { x: 250, y: 175, w: 80, h: 80 },
+      { x: 1360, y: 175, w: 80, h: 80 },
+      { x: 250, y: 800, w: 80, h: 80 },
+      { x: 1360, y: 800, w: 80, h: 80 },
+      // Campana: cuerpo + soportes. Corona en (960,220); cuerda en
+      // (960,400) libre; hueco al arco norte en (960,90).
       { x: 924, y: 180, w: 72, h: 188 },
       { x: 890, y: 246, w: 27, h: 118 },
       { x: 1043, y: 246, w: 27, h: 118 },
+      // Faroles pintados a ambos lados del eje N-S.
+      { x: 808, y: 328, w: 24, h: 24 },
+      { x: 1088, y: 328, w: 24, h: 24 },
+      { x: 808, y: 728, w: 24, h: 24 },
+      { x: 1088, y: 728, w: 24, h: 24 },
     ],
     doors: {
       // Arco norte: hacia la Puerta de Ohm.
@@ -205,22 +165,11 @@ export const ROOM_SCENES: Record<string, RoomSceneProfile> = {
       forge_yard: { x: 60, y: 580 },
       terraces_top: { x: 960, y: 1000 },
     },
-    // Ya no hay bakedThings: la Plaza se renderiza procedural
-    // con `drawRoomBase` + `renderDecor`. La campana y el portal
-    // dejan de ser horneados y pasan a ser props sólidos /
-    // interactuables gestionados por la `ThingDef` en rooms.ts.
-    things: {
-      // Pedestal central de Ohm.
-      pedestal: { x: 960, y: 540 },
-      // Edda, esperando al protagonista.
-      edda: { x: 1080, y: 540 },
-      // Lumen, ya trabajando en el taller pero visible al este.
-      'lumen-plaza': { x: 1500, y: 540 },
-    },
+    bakedThings: ['lampara1', 'lampara2', 'lampara3', 'lampara4'],
     effects: [
       // Glow central en el pedestal de Ohm: marca el landmark
       // principal de la Plaza.
-      { kind: 'pulse', x: 960, y: 540, radius: 120, color: 0x55d9d0 },
+      { kind: 'pulse', x: 960, y: 640, radius: 120, color: 0x55d9d0 },
       // Glow del portal al aula, ahora en el SW.
       { kind: 'pulse', flag: 'ohmAwake', x: 220, y: 760, radius: 100, color: 0x55d9d0 },
       // Cuando la Puerta se abre, glows de luz cálida
@@ -235,38 +184,47 @@ export const ROOM_SCENES: Record<string, RoomSceneProfile> = {
       { kind: 'glow', flag: 'finished', x: 1670, y: 230, radius: 90, color: 0xffc96b },
       { kind: 'glow', flag: 'finished', x: 250, y: 830, radius: 90, color: 0xffc96b },
       { kind: 'glow', flag: 'finished', x: 1670, y: 830, radius: 90, color: 0xffc96b },
-      { kind: 'pulse', flag: 'finished', x: 960, y: 540, radius: 220, color: 0xffd77a },
+      { kind: 'pulse', flag: 'finished', x: 960, y: 640, radius: 220, color: 0xffd77a },
     ],
   },
   puerta: {
-    background: 'room-puerta-closed', backgroundWhen: [{ flag: 'puertaDone', key: 'room-puerta-open' }], perspective: medium,
+    background: 'room-puerta-closed',
+    backgroundWhen: [{ flag: 'puertaDone', key: 'room-puerta-open' }],
+    perspective: medium,
     walkable: [{ x: 76, y: 205, w: 808, h: 335 }, { x: 430, y: 55, w: 105, h: 190 }],
+    collision: [
+      // Fuente pintada al centro; deja paso al umbral norte.
+      { x: 430, y: 270, w: 100, h: 80 },
+    ],
     doors: { plaza: { x: 430, y: 486, w: 105, h: 54 }, manantial_ohm: { x: 430, y: 70, w: 105, h: 95 } },
     entries: { plaza: { x: 480, y: 445 }, manantial_ohm: { x: 480, y: 195 } },
     bakedThings: ['lapuerta'], things: { lapuerta: { x: 480, y: 125, baked: true } },
     effects: [{ kind: 'glow', flag: 'puertaDone', x: 480, y: 125, radius: 180, color: 0x68d9d0 }],
   },
   manantial_ohm: {
-    background: 'room-manantial', perspective: distant,
-    // calzada real del render: plaza circular + calzada diagonal al arco sureste.
-    // La poza y los bordes de acantilado quedan fuera del piso.
+    background: 'room-manantial',
+    perspective: distant,
     walkable: [
-      { x: 335, y: 235, w: 190, h: 150 },
-      { x: 300, y: 275, w: 270, h: 90 },
-      { x: 450, y: 320, w: 190, h: 100 },
-      { x: 525, y: 375, w: 185, h: 165 },
+      { x: 280, y: 300, w: 420, h: 200 },
+      { x: 360, y: 210, w: 240, h: 120 },
+      { x: 400, y: 470, w: 160, h: 70 },
     ],
-    collision: [{ x: 285, y: 150, w: 295, h: 95 }],
-    doors: { puerta: { x: 570, y: 460, w: 100, h: 80 } }, entries: { puerta: { x: 605, y: 430 } },
-    bakedThings: ['cauce-maestro', 'hito-proporciones'],
+    collision: [{ x: 400, y: 145, w: 160, h: 125 }],
+    doors: { puerta: { x: 430, y: 490, w: 100, h: 50 } },
+    entries: { puerta: { x: 480, y: 400 } },
+    bakedThings: ['cauce-maestro', 'hito-proporciones', 'mirador-manantial'],
     things: {
-      'cauce-maestro': { x: 400, y: 225, baked: true }, 'hito-proporciones': { x: 470, y: 285, baked: true },
-      'mirador-manantial': { x: 610, y: 275, baked: true },
-      // NPCs sobre la plaza circular (la calzada angosta no admite cuerpos sólidos)
-      'edda-manantial': { x: 500, y: 385 }, 'ohm-manantial': { x: 590, y: 420 },
+      'cauce-maestro': { x: 480, y: 210, baked: true },
+      'hito-proporciones': { x: 620, y: 300, baked: true },
+      'mirador-manantial': { x: 700, y: 250, baked: true },
+      'edda-manantial': { x: 500, y: 385 },
+      'ohm-manantial': { x: 590, y: 420 },
       'lumen-manantial': { x: 665, y: 385 },
     },
-    effects: [{ kind: 'mist', x: 275, y: 135, w: 360, h: 150, color: 0x8ccfd0 }, { kind: 'water', flag: 'puertaDone', x: 300, y: 175, w: 265, h: 105, color: 0x68d9d0 }],
+    effects: [
+      { kind: 'mist', x: 360, y: 120, w: 240, h: 140, color: 0x8ccfd0 },
+      { kind: 'water', flag: 'puertaDone', x: 400, y: 150, w: 160, h: 110, color: 0x68d9d0 },
+    ],
   },
   taller: {
     background: 'room-taller', perspective: interior,
@@ -353,7 +311,7 @@ export const ROOM_SCENES: Record<string, RoomSceneProfile> = {
     walkable: [{ x: 135, y: 170, w: 700, h: 350 }, { x: 790, y: 330, w: 170, h: 150 }],
     collision: [{ x: 155, y: 95, w: 220, h: 140 }, { x: 360, y: 225, w: 70, h: 55 }, { x: 545, y: 265, w: 70, h: 55 }],
     doors: { plaza: { x: 875, y: 340, w: 85, h: 140 }, forge_infirmary: { x: 185, y: 120, w: 165, h: 125 }, castle_gate: { x: 700, y: 95, w: 120, h: 90 } },
-    entries: { plaza: { x: 825, y: 410 }, forge_infirmary: { x: 350, y: 260 }, castle_gate: { x: 750, y: 220 } }, bakedThings: ['martillos-patio', 'canal-tibio-patio'],
+    entries: { plaza: { x: 825, y: 410 }, forge_infirmary: { x: 330, y: 260 }, castle_gate: { x: 750, y: 220 } }, bakedThings: ['martillos-patio', 'canal-tibio-patio'],
     interactionAliases: { 'canal-tibio-patio': 'banco-canal-tibio' },
     interactionPrompts: { 'canal-tibio-patio': 'Regular el canal tibio' },
     things: {
@@ -478,7 +436,7 @@ export const ROOM_SCENES: Record<string, RoomSceneProfile> = {
     entries: { terraces_aqueduct: { x: 245, y: 420 }, lighthouse_bench: { x: 715, y: 420 } }, bakedThings: ['maquina-faro-muerta', 'lente-lustrada'],
     interactionAliases: { 'maquina-faro-muerta': 'banco-chispa' },
     interactionPrompts: { 'maquina-faro-muerta': 'Cargar la máquina del Faro' },
-    effects: [{ kind: 'pulse', flag: 'solvedStoredSpark', x: 480, y: 300, radius: 240, color: 0x74d9ff }, { kind: 'water', x: 185, y: 55, w: 590, h: 150, color: 0x7acfff }],
+    effects: [{ kind: 'pulse', flag: 'solvedLakeFeedDc', x: 480, y: 300, radius: 240, color: 0x74d9ff }, { kind: 'water', x: 185, y: 55, w: 590, h: 150, color: 0x7acfff }],
   },
   lighthouse_bench: {
     background: 'room-lighthouse-bench', perspective: medium,
@@ -487,7 +445,7 @@ export const ROOM_SCENES: Record<string, RoomSceneProfile> = {
     doors: { lighthouse_hall: { x: 45, y: 190, w: 100, h: 150 }, clock_tower: { x: 815, y: 190, w: 100, h: 150 } },
     entries: { lighthouse_hall: { x: 165, y: 270 }, clock_tower: { x: 795, y: 270 } }, bakedThings: ['estantes-farero'],
     things: { 'farero-taller': { x: 735, y: 270 } },
-    effects: [{ kind: 'pulse', flag: 'solvedSleepingRiver', x: 480, y: 325, radius: 190, color: 0x79d9ff }],
+    effects: [{ kind: 'pulse', flag: 'solvedClockDriveDc', x: 480, y: 325, radius: 190, color: 0x79d9ff }],
   },
   clock_tower: {
     background: 'room-clock-tower', perspective: distant,
@@ -535,7 +493,10 @@ export function roomScene(id: string): RoomSceneProfile | undefined {
   return ROOM_SCENES[id];
 }
 
-export function backgroundKey(profile: RoomSceneProfile, flags: Record<string, unknown>): string | undefined {
+export function backgroundKey(
+  profile: RoomSceneProfile,
+  flags: Record<string, unknown>,
+): string | undefined {
   for (const variant of profile.backgroundWhen ?? []) if (flags[variant.flag]) return variant.key;
   return profile.background;
 }

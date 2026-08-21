@@ -30,7 +30,7 @@ function startGame(): void {
 
   // El host monta el runtime de la experiencia activa; main.ts ya no conoce Phaser.
   const host = createRuntimeHost(el('game'), runtimeLoaders);
-  const experience = experienceOfRoom(state.room) ?? experienceById('instituto');
+  const experience = experienceOfRoom(state.room) ?? experienceById('ohmdal');
   void host.start({ experienceId: experience.id, roomId: state.room });
   if (import.meta.env.DEV) {
     // solo en desarrollo: handle para pruebas E2E desde la consola
@@ -68,6 +68,7 @@ function continueGame(): void {
 
 function newGame(): void {
   resetSave();
+  state.flags.hasBitacora = true;
   startGame();
 }
 
@@ -77,6 +78,7 @@ function enterFromPortal(): void {
   if (hasSave()) load();
   else resetSave();
   state.room = salaLlegadaPortal(location.search);
+  if (!state.flags.hasBitacora) state.flags.hasBitacora = true;
   save();
   startGame();
 }

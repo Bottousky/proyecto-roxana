@@ -7,7 +7,6 @@ export type ExperienceId = 'instituto' | 'ohmdal' | 'bitland' | 'physica' | 'ari
  */
 export type ExperienceRuntime =
   | 'topdown-phaser'
-  | 'hd2d-three'
   | 'dataflow-phaser'
   | 'platformer-phaser'
   | 'platformer-three'
@@ -37,16 +36,7 @@ export interface ExperienceLocation {
   /** Sala destino dentro del runtime (si aplica). */
   roomId?: string;
   spawn?: { x: number; y: number };
-  /**
-   * Qué gramática técnica debe servir esta ubicación. Ausente, gana la del manifest.
-   *
-   * Existe porque Ohmdal convive en dos runtimes durante la migración: `topdown-phaser`
-   * conserva el Arco I jugable mientras `hd2d-three` lo reconstruye con el look definitivo.
-   * El registro de experiencias modela los cinco lenguajes jugables, no cada renderer,
-   * así que la gramática la pide quien abre el viaje.
-   *
-   * Es aditivo: sin el campo, el comportamiento es idéntico al anterior.
-   */
+  /** Qué gramática técnica debe servir esta ubicación. Ausente, gana la del manifest. */
   runtime?: ExperienceRuntime;
 }
 

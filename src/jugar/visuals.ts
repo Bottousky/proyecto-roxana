@@ -141,7 +141,7 @@ export function liftPalette(pal: RoomPalette): RoomPalette {
 }
 
 function authoredPalette(roomId: string, raw: RoomPalette): RoomPalette {
-  if (roomId === 'plaza') return { floor: 0x59654a, wall: 0x6b4b39 };
+  if (roomId === 'plaza') return { floor: 0x71685f, wall: 0x5a534c };
   if (roomId === 'puerta' || roomId === 'manantial_ohm') return { floor: 0x526052, wall: 0x51465d };
   if (roomId.startsWith('castle_')) return { floor: 0x493e58, wall: 0x30283f };
   if (roomId.startsWith('forge_')) return { floor: 0x654737, wall: 0x493026 };
@@ -435,7 +435,7 @@ export function drawRoomBase(
     add(label);
   };
   if (roomId === 'plaza') {
-    plaque('PLAZA DE OHMDAL', '#f4d895');
+    // El nombre vive en el HUD; un cartel en el muro es greybox.
     // Toldos de mercado al borde: población y color sin invadir la ruta central.
     for (const x of [ox + 96, ox + w - 96]) {
       deco.fillStyle(0x38262d, 1); deco.fillRect(x - 42, oy + 64, 84, 40);

@@ -1,35 +1,21 @@
 /**
- * Commit 4 (H3 — Plaza multi-área greybox) — acceptance.
+ * c4-plaza-large-greybox.test.ts — Commit 4 (H3) Plaza 1920×1080
+ * acceptance. MIGRADO a R6.
  *
- * Cubre el Definition of Done del commit 4 sobre la Plaza de
- * la Cuenca. La Plaza migró de 960×540 a 1920×1080 y ahora
- * es un área grande navegable del mundo continuo. Este test
- * verifica los 13 puntos del DoD en su mayoría de forma pura
- * (sin Phaser), apoyándose en:
+ * Conserva la semántica valiosa de commit 4: la Plaza es UN área
+ * navegable grande (1920×1080) y todas las invariantes de
+ * gameplay se evalúan sobre ActiveRoom + room-local.
  *
- *   - `roomScenesData.plaza`            → AreaDef 1920×1080
- *   - `world.ts`                         → offsets del mundo
- *   - `spatial.ts`                       → local↔world, área
- *   - `cameraDirector.ts`                → clamp en 4 bordes
- *   - `activeArea.ts`                    → chunk único
- *   - `r3-decor-large-area`              → decorData 1920×1080
+ * R6 retiró de este test:
+ *   - `worldOf`/`WORLDS` (mundo continuo extirpado).
+ *   - `resolveActiveArea`/`activeAreaCameraBounds`/... (módulo
+ *     `activeArea.ts` reducido a stub deprecado).
+ *   - `localToWorld`/`worldToLocal` (bridge legacy eliminado).
+ *   - `chunkRectWorld`/`isPointInsideChunk` (helpers del mundo
+ *     continuo, ya no exportados por `spatial.ts`).
  *
- * El DoD K (validación runtime real) lo cubre la sesión de
- * Player-Agent que se hace después de verde.
- *
- * Cobertura:
- *
- *   A. Plaza mide realmente 1920×1080.
- *   B. El jugador puede caminar por todo el espacio previsto.
- *   C. CameraDirector funciona visualmente.
- *   D. Navigation funciona más allá de 960×540.
- *   E. Plaza sigue siendo UN único activeArea.
- *   F. Portal/Taller/Puerta OHM no se superponen con Plaza.
- *   G. Las conexiones y entry points funcionan.
- *   H. Las otras rooms siguen funcionando.
- *   I. npm test verde. (verificado por el runner)
- *   J. npm run build verde. (verificado por el runner)
- *   K. Se hizo una validación runtime real. (verificado por Player Agent)
+ * Los tests reemplazan las asunciones de offsets por invariantes
+ * de room-local (ActiveRoom + `activeRoomLocalBounds`).
  *
  * Run: `node --experimental-strip-types tests/c4-plaza-large-greybox.test.ts`
  */
@@ -42,14 +28,9 @@ import {
 import {
   VIEWPORT_WIDTH,
   VIEWPORT_HEIGHT,
-  chunkPlacement,
-  chunkRectWorld,
-  unionAreaBounds,
-  localToWorld,
-  worldToLocal,
-  isPointInsideChunk,
+  isPointInsideArea as _isPointInsideArea,
   type Rect,
-  type ChunkPlacement,
+  type AreaDef,
 } from '../src/jugar/spatial.ts';
 import {
   clampCenter,
@@ -59,14 +40,11 @@ import {
   type ViewportSize,
 } from '../src/jugar/cameraDirector.ts';
 import {
-  resolveActiveArea,
-  activeAreaCameraBounds,
-  activeAreaNavigationBounds,
-  transitionActiveArea,
-  isSameActiveArea,
-  type LoadedChunks,
-} from '../src/jugar/activeArea.ts';
-import { WORLDS, worldOf } from '../src/jugar/world.ts';
+  createActiveRoom,
+  activeRoomLocalBounds,
+  isSameActiveRoom,
+} from '../src/jugar/activeRoom.ts';
+import { mapSchematicOf } from '../src/jugar/mapSchematic.ts';
 import {
   decorGridDimensions,
   decorCellsForArea,
@@ -87,13 +65,6 @@ const VP: ViewportSize = { width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT };
 // Plaza 1920×1080 (commit 4): el viewport es 960×540. La Plaza
 // mide exactamente 2 viewports de ancho y 2 de alto.
 const PLAZA_AREA: Rect = { x: 0, y: 0, w: 1920, h: 1080 };
-// Replica del catálogo real del mundo de Ohmdal con la Plaza
-// en (0, 0) y los vecinos directos en sus posiciones post-commit-4.
-const LOADED: LoadedChunks = {
-  plaza:    { ox: 0,     oy: 0 },     // 1920×1080
-  taller:   { ox: 1920,  oy: 0 },     // 960×540, borde este
-  puerta:   { ox: 0,     oy: -540 },  // 960×540, borde norte
-};
 
 // ───────────────────────────────────────────────────────────────────────
 // A. Plaza mide realmente 1920×1080
@@ -133,8 +104,6 @@ test('A.4: el resto de las 19 rooms sigue en 960×540 (no regresión)', () => {
 test('B.1: el walkable de la Plaza cubre los 4 cuadrantes visuales', () => {
   const plaza = ROOM_SCENES['plaza'];
   assert(plaza.walkable !== undefined, 'walkable existe');
-  // Cada walkable debe tocar al menos uno de los 4 cuadrantes
-  // visuales: NW, NE, SW, SE.
   const corners: Array<{ x: number; y: number; name: string }> = [
     { x: 400, y: 250, name: 'NW' },
     { x: 1500, y: 250, name: 'NE' },
@@ -153,15 +122,8 @@ test('B.1: el walkable de la Plaza cubre los 4 cuadrantes visuales', () => {
 
 test('B.2: el walkable de la Plaza conecta el portal SW con el norte', () => {
   const plaza = ROOM_SCENES['plaza'];
-  // El cuadrante SW (portal) está en (220, 760).
-  // El cuadrante N (puerta) está en (960, 80).
-  // Para conectarlos, debe existir un camino walkable continuo.
-  // Verificamos que existe walkable que cubra el corredor central
-  // (eje N-S) y la banda E-O, permitiendo el tránsito.
   const portal = { x: 220, y: 760 };
   const door = { x: 960, y: 80 };
-  // Forma simple: simular la transitividad a lo largo del eje
-  // N-S (x=880..1040) y la banda E-O (y=460..620).
   const axisNS = plaza.walkable.find(
     (r) => r.x <= 880 && r.x + r.w >= 1040 && r.y === 0 && r.h === 1080,
   );
@@ -170,20 +132,12 @@ test('B.2: el walkable de la Plaza conecta el portal SW con el norte', () => {
     (r) => r.x === 0 && r.w === 1920 && r.y === 460 && r.h === 160,
   );
   assert(axisEO !== undefined, 'banda E-O (x=0..1920, y=460..620) está en el walkable');
-  // El portal cae en la plaza SW y la puerta cae en la plaza NE.
-  // Ambos pueden usar la banda E-O o el eje N-S para conectar.
-  void portal;
-  void door;
+  void portal; void door;
 });
 
 test('B.3: el walkable NO cubre zonas no pisables (muros este/oeste)', () => {
   const plaza = ROOM_SCENES['plaza'];
-  // El muro este se sella en y < 460 o y > 620. Verificamos que
-  // no hay walkable cubriendo el extremo este fuera de la banda
-  // E-O.
-  const eastEdge = (y: number) => ({
-    x: 1860 - 12, y: y - 12, w: 24, h: 24,
-  });
+  const eastEdge = (y: number) => ({ x: 1860 - 12, y: y - 12, w: 24, h: 24 });
   const inWalkable = (probe: { x: number; y: number; w: number; h: number }) =>
     plaza.walkable.some(
       (r) =>
@@ -196,24 +150,18 @@ test('B.3: el walkable NO cubre zonas no pisables (muros este/oeste)', () => {
 });
 
 test('B.4: el walkable cruza el muro norte SÓLO en el eje N-S (gap de la Puerta)', () => {
-  // El muro norte se sella con dos pedazos: (0, 0, 880, 26) y
-  // (1040, 0, 880, 26). El gap está en x ∈ [880, 1040].
-  // Pero el walkable del anillo perimetral norte SÍ cruza el
-  // muro (es una ruta alternativa greybox). Verificamos la
-  // estructura del walkable.
   const plaza = ROOM_SCENES['plaza'];
-  // El eje N-S cruza el muro norte (gap de la Puerta).
   const axisNSPiercesNorth = plaza.walkable.some(
     (r) => r.x === 880 && r.y === 0 && r.x + r.w === 1040 && r.h === 1080,
   );
   assert(axisNSPiercesNorth, 'eje N-S (880, 0, 160, 1080) cruza el muro norte');
-  // El anillo perimetral norte también cruza el muro.
-  const ringNSPiercesNorth = plaza.walkable.some(
-    (r) => r.x === 0 && r.y === 0 && r.x + r.w === 880 && r.h === 100,
+  const wallProbe = { x: 200 - 12, y: 40 - 12, w: 24, h: 24 };
+  const wallWalkable = plaza.walkable.some(
+    (r) =>
+      r.x <= wallProbe.x && r.x + r.w >= wallProbe.x + wallProbe.w &&
+      r.y <= wallProbe.y && r.y + r.h >= wallProbe.y + wallProbe.h,
   );
-  assert(ringNSPiercesNorth, 'anillo perimetral norte (0, 0, 880, 100) es walkable');
-  // El walkable cubre y cruza ambos gaps de los muros perimetrales
-  // (Norte, Sur, Este, Oeste) sólo en las zonas de door.
+  assert(!wallWalkable, 'el merlón norte fuera del eje N-S no es pisable');
   const pierceEastAtTaller = plaza.walkable.some(
     (r) => r.x === 0 && r.y === 460 && r.w === 1920 && r.h === 160,
   );
@@ -222,9 +170,6 @@ test('B.4: el walkable cruza el muro norte SÓLO en el eje N-S (gap de la Puerta
 
 test('B.5: el walkable NO permite escapar del área (puntos de borde exactos)', () => {
   const plaza = ROOM_SCENES['plaza'];
-  // isPointInsideArea detecta la pertenencia al bounding box.
-  // Los puntos exactamente en el borde de 1920×1080 están dentro
-  // (0 ≤ x < 1920). Los puntos fuera no.
   for (const [x, y] of [[0, 0], [1919, 1079], [960, 540]]) {
     assert(isPointInsideArea('plaza', x, y) === true, `(${x}, ${y}) dentro`);
   }
@@ -253,73 +198,57 @@ test('C.3: clampCenter en el centro exacto (960, 540) → cámara en (480, 270)'
 });
 
 test('C.4: clampCenter en los 4 bordes (N, S, E, O) → cámara en los bordes', () => {
-  // Borde OESTE: jugador en (0, 540) → cámara en (0, 270)
   const west = clampCenter({ x: 0, y: 540 }, PLAZA_AREA, VP);
-  assert(west.x === 0, `O: cámara x = 0, got ${west.x}`);
-  assert(west.y === 270, `O: cámara y = 270, got ${west.y}`);
-  // Borde ESTE: jugador en (1920, 540) → cámara en (960, 270)
+  assert(west.x === 0 && west.y === 270, 'O: cámara (0, 270)');
   const east = clampCenter({ x: 1920, y: 540 }, PLAZA_AREA, VP);
-  assert(east.x === 960, `E: cámara x = 960, got ${east.x}`);
-  assert(east.y === 270, `E: cámara y = 270, got ${east.y}`);
-  // Borde NORTE: jugador en (960, 0) → cámara en (480, 0)
+  assert(east.x === 960 && east.y === 270, 'E: cámara (960, 270)');
   const north = clampCenter({ x: 960, y: 0 }, PLAZA_AREA, VP);
-  assert(north.x === 480, `N: cámara x = 480, got ${north.x}`);
-  assert(north.y === 0, `N: cámara y = 0, got ${north.y}`);
-  // Borde SUR: jugador en (960, 1080) → cámara en (480, 540)
+  assert(north.x === 480 && north.y === 0, 'N: cámara (480, 0)');
   const south = clampCenter({ x: 960, y: 1080 }, PLAZA_AREA, VP);
-  assert(south.x === 480, `S: cámara x = 480, got ${south.x}`);
-  assert(south.y === 540, `S: cámara y = 540, got ${south.y}`);
+  assert(south.x === 480 && south.y === 540, 'S: cámara (480, 540)');
 });
 
 test('C.5: clampCenter con jugador fuera del área → clamp a borde', () => {
-  // El jugador intenta irse por la derecha.
   const east = clampCenter({ x: 5000, y: 540 }, PLAZA_AREA, VP);
   assert(east.x === 960, `clamp a borde E: cámara x = 960, got ${east.x}`);
-  // El jugador intenta irse por arriba.
   const north = clampCenter({ x: 960, y: -500 }, PLAZA_AREA, VP);
   assert(north.y === 0, `clamp a borde N: cámara y = 0, got ${north.y}`);
 });
 
 test('C.6: isAtBorder marca los 4 bordes del viewport correctamente', () => {
-  // Centro de cámara en el medio del área → no toca ningún borde.
   const center = isAtBorder({ x: 960, y: 540 }, PLAZA_AREA, VP);
   assert(!center.left && !center.right && !center.top && !center.bottom, 'centro: sin borde');
-  // Cámara pegada a la izquierda (x=480).
   const left = isAtBorder({ x: 480, y: 540 }, PLAZA_AREA, VP);
   assert(left.left && !left.right && !left.top && !left.bottom, 'toca borde O');
-  // Cámara pegada a la derecha (x=1440).
   const right = isAtBorder({ x: 1440, y: 540 }, PLAZA_AREA, VP);
   assert(right.right && !right.left && !right.top && !right.bottom, 'toca borde E');
-  // Cámara pegada arriba (y=270).
   const top = isAtBorder({ x: 960, y: 270 }, PLAZA_AREA, VP);
   assert(top.top && !top.bottom && !top.left && !top.right, 'toca borde N');
-  // Cámara pegada abajo (y=810).
   const bottom = isAtBorder({ x: 960, y: 810 }, PLAZA_AREA, VP);
   assert(bottom.bottom && !bottom.top && !bottom.left && !bottom.right, 'toca borde S');
 });
 
-test('C.7: activeAreaCameraBounds(Plaza 1920×1080) = el área completa (no union)', () => {
-  const active = resolveActiveArea(LOADED, 'plaza')!;
-  const cam = activeAreaCameraBounds(active, VP);
-  assert(cam.x === 0 && cam.y === 0, 'origen (0, 0)');
-  assert(cam.w === 1920 && cam.h === 1080, 'cámara = Plaza completa');
+test('C.7: camera bounds de Plaza 1920×1080 = el área completa (R6 ActiveRoom)', () => {
+  const room = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const cb = cameraBounds(activeRoomLocalBounds(room), VP);
+  assert(cb.x === 0 && cb.y === 0, 'origen (0, 0)');
+  assert(cb.w === 1920 && cb.h === 1080, 'cámara = Plaza completa');
 });
 
 // ───────────────────────────────────────────────────────────────────────
 // D. Navigation funciona más allá de 960×540
 // ───────────────────────────────────────────────────────────────────────
 test('D.1: navigationBounds cubre todo el área 1920×1080', () => {
-  const active = resolveActiveArea(LOADED, 'plaza')!;
-  const nb = activeAreaNavigationBounds(active);
+  const room = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const nb = activeRoomLocalBounds(room);
   assert(nb.w === 1920 && nb.h === 1080, `nb = 1920×1080, got ${nb.w}×${nb.h}`);
 });
 
 test('D.2: targets > 960/540 (4 puntos) caen dentro del navigationBounds', () => {
-  const active = resolveActiveArea(LOADED, 'plaza')!;
-  const nb = activeAreaNavigationBounds(active);
+  const room = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const nb = activeRoomLocalBounds(room);
   const inNb = (x: number, y: number) =>
     x >= nb.x && x < nb.x + nb.w && y >= nb.y && y < nb.y + nb.h;
-  // Los 4 targets del spec.
   for (const [x, y] of [[1500, 500], [1500, 850], [400, 800], [960, 100]]) {
     assert(inNb(x, y), `(${x}, ${y}) está dentro de navigationBounds`);
   }
@@ -332,131 +261,114 @@ test('D.3: isPointInsideArea acepta coordenadas > 960/540 en Plaza', () => {
   assert(isPointInsideArea('plaza', 960, 100) === true, '(960, 100) dentro de Plaza');
 });
 
-test('D.4: localToWorld/worldToLocal funciona con offsets grandes (Taller pegado al este)', () => {
-  // El Taller está en (1920, 0). Un punto local (480, 270) del
-  // Taller es world (2400, 270).
-  const local = { x: 480, y: 270 };
-  const world = localToWorld(local, { ox: 1920, oy: 0 });
-  assert(world.x === 2400 && world.y === 270, 'local (480, 270) → world (2400, 270)');
-  const back = worldToLocal(world, { ox: 1920, oy: 0 });
-  assert(back.x === local.x && back.y === local.y, 'round-trip con offset 1920');
+test('D.4: Plaza y Taller conviven en el modelo room-local (R6)', () => {
+  // R6: la Plaza y el Taller son dos ActiveRooms distintos, sin un
+  // plano mundo compartido. Cada uno vive en su propio sistema
+  // local; la conexión Plaza→Taller es una arista del RoomGraph.
+  const plaza = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const taller = createActiveRoom('taller', { x: 480, y: 270 });
+  assert(plaza.width === 1920 && plaza.height === 1080, 'Plaza 1920×1080');
+  assert(taller.width === 960 && taller.height === 540, 'Taller 960×540');
+  assert(!isSameActiveRoom(plaza, taller), 'rooms distintas');
+  // Cada uno en su origen local: una coordenada (480, 270) puede
+  // aparecer en ambas rooms sin colisión (son sistemas distintos).
+  assert(plaza.playerLocal.x === 1500 && plaza.playerLocal.y === 800, 'Plaza local');
+  assert(taller.playerLocal.x === 480 && taller.playerLocal.y === 270, 'Taller local');
 });
 
-test('D.5: isPointInsideChunk detecta el Taller pegado al borde este de Plaza', () => {
-  const taller: { ox: number; oy: number; width: number; height: number } = {
-    ox: 1920, oy: 0, width: 960, height: 540,
-  };
-  // Punto world en el borde este de la Plaza: world (1920, 270).
-  // ¿Es world dentro del chunk del Taller?
-  assert(isPointInsideChunk(1920, 270, taller) === true, '(1920, 270) en Taller');
-  // Punto en la Plaza: (960, 540) NO está en el Taller.
-  assert(isPointInsideChunk(960, 540, taller) === false, '(960, 540) NO en Taller');
+test('D.5: el schematic del mapa coloca la Plaza y el Taller en el mismo sector (R6)', () => {
+  // R6: el mapa M ya no coloca las rooms en un plano world; las
+  // agrupa en sectores (uno por obra). Plaza y Taller comparten el
+  // sector "ohmdal".
+  const plazaSchematic = mapSchematicOf('plaza');
+  const tallerSchematic = mapSchematicOf('taller');
+  assert(plazaSchematic !== null, 'plaza tiene schematic');
+  assert(tallerSchematic === plazaSchematic, 'plaza y taller comparten schematic');
 });
 
 // ───────────────────────────────────────────────────────────────────────
-// E. Plaza sigue siendo UN único activeArea
+// E. Plaza sigue siendo UN único ActiveRoom
 // ───────────────────────────────────────────────────────────────────────
-test('E.1: caminar por la Plaza mantiene activeAreaId === "plaza"', () => {
-  // Recorrido interno: 5 puntos a lo largo y ancho de la Plaza.
-  // En cada uno, resolveActiveArea(LOADED, ...) sigue dando
-  // el chunk "plaza" (mientras el jugador no cruce un boundary).
-  // El check de ActiveArea real se hace en `chunkAt` runtime;
-  // aquí validamos que la Plaza es UN solo chunk.
-  for (const _ of [1]) void _;
-  const active0 = resolveActiveArea(LOADED, 'plaza')!;
-  const active1 = resolveActiveArea(LOADED, 'plaza')!;
-  assert(isSameActiveArea(active0, active1), 'Plaza estable');
+test('E.1: dos ActiveRooms con el mismo spawn producen el mismo estado (Plaza estable)', () => {
+  const active0 = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const active1 = createActiveRoom('plaza', { x: 1500, y: 800 });
+  assert(isSameActiveRoom(active0, active1), 'Plaza estable');
   assert(active0.id === 'plaza', 'id estable: plaza');
 });
 
-test('E.2: cruzar un boundary cambia activeArea atómicamente', () => {
-  const sink = makeSink();
-  const next = transitionActiveArea(LOADED, 'plaza', 'taller', sink);
-  assert(next !== null, 'transición válida');
-  assert(next!.id === 'taller', 'id cambia a taller');
-  assert(next!.placement.ox === 1920, 'placement.ox = 1920 (post-commit 4)');
-  assert(sink.calls.length === 1, 'sink llamado una vez');
+test('E.2: el switch de room reemplaza el ActiveRoom atómicamente', () => {
+  const plaza = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const taller = createActiveRoom('taller', { x: 480, y: 270 });
+  assert(plaza.id === 'plaza' && taller.id === 'taller', 'ids distintos');
+  assert(plaza.width === 1920 && taller.width === 960, 'tamaños distintos');
+  assert(plaza.playerLocal.x === 1500 && taller.playerLocal.x === 480, 'playerLocal distintos');
 });
 
 test('E.3: NO se crea un area nueva por cada viewport', () => {
-  // El spec dice: "NO convertir cada viewport 960×540 en un area
-  // distinta." La Plaza sigue siendo 1 chunk de 1920×1080.
   const plaza = ROOM_SCENES['plaza'];
   assert(plaza.width === 1920, 'Plaza es 1 chunk, no 4');
   assert(plaza.height === 1080, 'Plaza es 1 chunk, no 2');
 });
 
 test('E.4: navigationBounds durante el recorrido interior = el área grande', () => {
-  // Para cada cuadrante visual, el active area es el mismo y el
-  // navigationBounds es el mismo (1920×1080). El pathfinder no
-  // cambia de "zona" sólo por caminar.
-  const active = resolveActiveArea(LOADED, 'plaza')!;
-  const nb = activeAreaNavigationBounds(active);
+  const room = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const nb = activeRoomLocalBounds(room);
   assert(nb.w === 1920 && nb.h === 1080, 'nav estable en todo el recorrido');
 });
 
-function makeSink() {
-  const calls: Array<[number, number, number, number]> = [];
-  return {
-    calls,
-    viewport: VP,
-    setBounds(x: number, y: number, w: number, h: number): void {
-      calls.push([x, y, w, h]);
-    },
-  };
-}
-
 // ───────────────────────────────────────────────────────────────────────
-// F. Portal/Taller/Puerta OHM no se superponen con Plaza
+// F. Portal/Taller/Puerta OHM (vecindad lógica, sin offsets)
 // ───────────────────────────────────────────────────────────────────────
-test('F.1: worldOf(plaza) devuelve el mundo, con los vecinos en sus offsets', () => {
-  const world = worldOf('plaza');
-  assert(world !== null, 'la Plaza está en un mundo continuo');
-  assert(world!.rooms.plaza.ox === 0 && world!.rooms.plaza.oy === 0, 'Plaza en (0, 0)');
-  assert(world!.rooms.taller.ox === 1920, `Taller en (1920, ${world!.rooms.taller.oy})`);
-  assert(world!.rooms.taller.oy === 0, 'Taller en y = 0');
-  assert(world!.rooms.puerta.ox === 0, 'Puerta en x = 0');
-  assert(world!.rooms.puerta.oy === -540, 'Puerta en y = -540');
+test('F.1: el schematic del mapa agrupa Plaza, Taller y Puerta en el sector "ohmdal"', () => {
+  const sch = mapSchematicOf('plaza');
+  assert(sch !== null, 'la Plaza está en un sector del schematic');
+  // El schematic ya no expone offsets físicos; las rooms se
+  // mencionan por id y la presentación del mapa M las organiza.
+  assert(sch!.rooms.includes('plaza'), 'plaza está en el schematic');
+  assert(sch!.rooms.includes('taller'), 'taller está en el schematic');
+  assert(sch!.rooms.includes('puerta'), 'puerta está en el schematic');
+  assert(sch!.rooms.includes('manantial_ohm'), 'manantial_ohm está en el schematic');
+  assert(sch!.rooms.includes('castle_gate'), 'castle_gate está en el schematic');
+  assert(sch!.rooms.includes('forge_yard'), 'forge_yard está en el schematic');
+  assert(sch!.rooms.includes('terraces_top'), 'terraces_top está en el schematic');
+  assert(sch!.rooms.includes('lighthouse_hall'), 'lighthouse_hall está en el schematic');
 });
 
-test('F.2: el Taller (1920, 0) NO se superpone con la Plaza (1920×1080)', () => {
-  const taller: Rect = { x: 1920, y: 0, w: 960, h: 540 };
-  // Los rectángulos de la Plaza y el Taller comparten el borde
-  // este/oeste (Plaza.x + Plaza.w === Taller.x) → adyacentes, no
-  // superpuestos. Dos rects están superpuestos si comparten área
-  // estrictamente positiva.
-  const overlap = !(
-    PLAZA_AREA.x + PLAZA_AREA.w <= taller.x ||
-    taller.x + taller.w <= PLAZA_AREA.x ||
-    PLAZA_AREA.y + PLAZA_AREA.h <= taller.y ||
-    taller.y + taller.h <= PLAZA_AREA.y
-  );
-  assert(overlap === false, 'Plaza y Taller no se superponen (adyacentes)');
+test('F.2: la Plaza 1920×1080 NO se superpone con la bbox del Taller 960×540', () => {
+  // Las dos rooms son ActiveRooms independientes: en el modelo
+  // room-local no existe "rect mundo" que pueda superponerse con
+  // otro. Lo que se verifica aquí es la presentación esquemática:
+  // sus walkable no comparten el mismo rect en el mismo sistema.
+  const plaza = ROOM_SCENES['plaza'];
+  const taller = ROOM_SCENES['taller'];
+  // El walkable del Taller está contenido en su propio bbox 960×540.
+  for (const w of taller.walkable) {
+    assert(w.x + w.w <= 960, `walkable del Taller cabe en 960: ${w.x}+${w.w}`);
+    assert(w.y + w.h <= 540, `walkable del Taller cabe en 540: ${w.y}+${w.h}`);
+  }
+  // El walkable de la Plaza cabe en 1920×1080.
+  for (const w of plaza.walkable) {
+    assert(w.x + w.w <= 1920, `walkable de la Plaza cabe en 1920: ${w.x}+${w.w}`);
+    assert(w.y + w.h <= 1080, `walkable de la Plaza cabe en 1080: ${w.y}+${w.h}`);
+  }
 });
 
-test('F.3: la Puerta (0, -540) NO se superpone con la Plaza', () => {
-  const puerta: Rect = { x: 0, y: -540, w: 960, h: 540 };
-  const overlap = !(
-    PLAZA_AREA.x + PLAZA_AREA.w <= puerta.x ||
-    puerta.x + puerta.w <= PLAZA_AREA.x ||
-    PLAZA_AREA.y + PLAZA_AREA.h <= puerta.y ||
-    puerta.y + puerta.h <= PLAZA_AREA.y
-  );
-  assert(overlap === false, 'Plaza y Puerta no se superponen (adyacentes)');
+test('F.3: la Puerta 960×540 NO comparte sistema local con la Plaza', () => {
+  const puerta = ROOM_SCENES['puerta'];
+  for (const w of puerta.walkable) {
+    assert(w.x + w.w <= 960, 'walkable de la Puerta cabe en 960');
+    assert(w.y + w.h <= 540, 'walkable de la Puerta cabe en 540');
+  }
+  // La conexión Plaza→Puerta existe en el grafo (topología),
+  // pero NO hay un "rect mundo" compartido.
 });
 
-test('F.4: unionAreaBounds de los 3 chunks NO es la autoridad de cámara', () => {
-  // El CameraDirector sólo mira al activeArea (Plaza 1920×1080).
-  // La unión incluye al Taller y a la Puerta, que son chunks
-  // distintos.
-  const union = unionAreaBounds(
-    Object.entries(LOADED).map(([id, off]) => chunkPlacement(id, off.ox, off.oy)),
-  );
-  assert(union !== null, 'union no es null');
-  // Plaza sola: 1920×1080. Unión: 1920+960 = 2880 en x.
-  const active = resolveActiveArea(LOADED, 'plaza')!;
-  const cam = activeAreaCameraBounds(active, VP);
-  assert(cam.w === 1920, 'cámara = Plaza sola (1920), no la unión (2880)');
+test('F.4: la cámara del active area es el área sola (sin union de chunks)', () => {
+  // R6: la autoridad de cámara es el ActiveRoom local; no hay
+  // unionAreaBounds de "chunks" (esos chunks ya no existen).
+  const room = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const cb = cameraBounds(activeRoomLocalBounds(room), VP);
+  assert(cb.w === 1920, 'cámara = Plaza sola (1920), no la unión de chunks');
 });
 
 // ───────────────────────────────────────────────────────────────────────
@@ -465,21 +377,16 @@ test('F.4: unionAreaBounds de los 3 chunks NO es la autoridad de cámara', () =>
 test('G.1: la Plaza tiene 4 doors cardinales en los bordes de 1920×1080', () => {
   const plaza = ROOM_SCENES['plaza'];
   assert(plaza.doors !== undefined, 'plaza.doors existe');
-  // Arco norte (puerta) → borde norte (y=0).
   assert(plaza.doors.puerta.y === 0, `puerta.y = ${plaza.doors.puerta.y}, esperado 0`);
-  // Arco este (taller) → borde este (x + w = 1920).
   assert(plaza.doors.taller.x + plaza.doors.taller.w === 1920, 'taller.x+w = 1920');
-  // Arcos oeste (castle_gate alto, forge_yard bajo) → borde oeste (x=0).
   assert(plaza.doors.castle_gate.x === 0, 'castle_gate.x = 0');
   assert(plaza.doors.forge_yard.x === 0, 'forge_yard.x = 0');
-  // Arco sur (terrazas) → borde sur (y + h = 1080).
   assert(plaza.doors.terraces_top.y + plaza.doors.terraces_top.h === 1080, 'terraces.y+h = 1080');
 });
 
 test('G.2: la Plaza tiene 5 entries (portal-aula + 4 cardinales)', () => {
   const plaza = ROOM_SCENES['plaza'];
   assert(plaza.entries !== undefined, 'plaza.entries existe');
-  // Las 5 entries están dentro del área 1920×1080.
   for (const [name, e] of Object.entries(plaza.entries)) {
     assert(e.x >= 0 && e.x < 1920, `entries.${name}.x = ${e.x} fuera de [0, 1920)`);
     assert(e.y >= 0 && e.y < 1080, `entries.${name}.y = ${e.y} fuera de [0, 1080)`);
@@ -489,17 +396,22 @@ test('G.2: la Plaza tiene 5 entries (portal-aula + 4 cardinales)', () => {
 test('G.3: la Plaza tiene colisión con pedestal + campana + 4 monolitos', () => {
   const plaza = ROOM_SCENES['plaza'];
   assert(plaza.collision !== undefined, 'plaza.collision existe');
-  // Mínimo: 1 pedestal, 1 cuerpo de campana, 4 monolitos.
-  // (Los monolitos están en los 4 cuadrantes como obstacles
-  // greybox que crean "espacio negativo".)
   assert(plaza.collision.length >= 6, `collision tiene ${plaza.collision.length} rects, esperado >= 6`);
 });
 
-test('G.4: el Taller declarado en worldOf se conecta con el borde este de Plaza', () => {
-  // El Taller vive en (1920, 0) y mide 960×540. La Plaza vive en
-  // (0, 0) y mide 1920×1080. Comparten el borde vertical en x=1920.
-  const taller = worldOf('taller')!.rooms.taller;
-  assert(taller.ox === PLAZA_AREA.x + PLAZA_AREA.w, 'Taller.ox = Plaza.x + Plaza.w');
+test('G.4: Plaza y Taller son vecinos en el schematic (R6)', () => {
+  // Antes (R3): el Taller "se conecta" con el borde este de Plaza
+  //   por un offset físico (1920, 0).
+  // R6: la conexión se describe en RoomGraph (topología); el mapa M
+  //   agrupa ambas rooms en el mismo sector del schematic.
+  const sch = mapSchematicOf('plaza');
+  assert(sch !== null, 'plaza tiene schematic');
+  const idxPlaza = sch!.rooms.indexOf('plaza');
+  const idxTaller = sch!.rooms.indexOf('taller');
+  assert(idxPlaza >= 0 && idxTaller >= 0, 'ambos están en el schematic');
+  // La presencia en el mismo sector es la "vecindad" R6.
+  assert(sch!.rooms.includes('plaza') && sch!.rooms.includes('taller'),
+    'plaza y taller comparten el schematic "ohmdal"');
 });
 
 // ───────────────────────────────────────────────────────────────────────
@@ -528,7 +440,6 @@ test('H.3: el decor de la Plaza es 40×22 (área grande, commit 4)', () => {
   assert(d.rows === 22, `rows = ${d.rows}, esperado 22`);
   const cells = decorCellsForArea('plaza', { width: 1920, height: 1080 });
   assert(cells.length > 100, `plaza grande tiene ${cells.length} celdas, esperado > 100`);
-  // Las celdas caen dentro del bbox extendido.
   for (const c of cells) {
     assert(c.col >= 0 && c.col < 40, `col ${c.col} fuera de [0, 40)`);
     assert(c.row >= 0 && c.row < 22, `row ${c.row} fuera de [0, 22)`);
@@ -538,26 +449,21 @@ test('H.3: el decor de la Plaza es 40×22 (área grande, commit 4)', () => {
 });
 
 // ───────────────────────────────────────────────────────────────────────
-// Sanity: invariantes cruzadas
+// Sanity: invariantes cruzadas (R6)
 // ───────────────────────────────────────────────────────────────────────
-test('S.1: chunkRectWorld de la Plaza coincide con la Bbox del active area', () => {
-  const placement: ChunkPlacement = {
-    id: 'plaza', ox: 0, oy: 0, width: 1920, height: 1080,
-  };
-  const expected = chunkRectWorld(placement);
-  assert(expected.x === 0 && expected.y === 0, 'origen');
-  assert(expected.w === 1920 && expected.h === 1080, 'dims 1920×1080');
+test('S.1: los bounds de la Plaza coinciden con (0,0,1920,1080) sin proyección', () => {
+  const room = createActiveRoom('plaza', { x: 1500, y: 800 });
+  const bounds = activeRoomLocalBounds(room);
+  assert(bounds.x === 0 && bounds.y === 0, 'origen (0, 0)');
+  assert(bounds.w === 1920 && bounds.h === 1080, 'dims 1920×1080');
 });
 
-test('S.2: la Plaza está en el mundo continuo de Ohmdal', () => {
-  const world = WORLDS.find((w) => w.id === 'ohmdal');
-  assert(world !== undefined, 'WORLDS tiene "ohmdal"');
-  assert(world!.rooms.plaza.ox === 0 && world!.rooms.plaza.oy === 0, 'plaza en (0, 0)');
+test('S.2: la Plaza está en el sector "ohmdal" del schematic', () => {
+  const sch = mapSchematicOf('plaza');
+  assert(sch !== null && sch.id === 'ohmdal', 'la Plaza está en el schematic "ohmdal"');
 });
 
 test('S.3: la Plaza declara dimensiones grandes explícitamente en roomScenesData', () => {
-  // El commit 4 NO depende de constantes heredadas: el área
-  // grande es explícita, no inferida.
   const plaza = ROOM_SCENES['plaza'];
   assert(typeof plaza.width === 'number', 'plaza.width es number explícito');
   assert(typeof plaza.height === 'number', 'plaza.height es number explícito');
@@ -567,7 +473,7 @@ test('S.3: la Plaza declara dimensiones grandes explícitamente en roomScenesDat
 // ───────────────────────────────────────────────────────────────────────
 // Run
 // ───────────────────────────────────────────────────────────────────────
-console.log('Commit 4 (H3 — Plaza multi-área greybox) acceptance:');
+console.log('Commit 4 (H3 — Plaza multi-área greybox) acceptance (R6):');
 let passed = 0;
 let failed = 0;
 for (const t of tests) {

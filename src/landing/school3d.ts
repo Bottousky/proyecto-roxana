@@ -202,17 +202,6 @@ function stateOverride(saved: SchoolState, preview: 'save' | 'initial' | 'comple
   };
 }
 
-function classicHref(hash: string): string {
-  return `?view=classic${hash.startsWith('#') ? hash : ''}`;
-}
-
-/**
- * Marca el botón del panel como «esto cruza a Ohmdal».
- *
- * El `href` real queda puesto igual, no como decoración: si el click con transición no llega
- * a correr —JS todavía cargando, clic con rueda, abrir en pestaña nueva— el enlace tiene que
- * llevar al mismo lugar por su cuenta. La transición es un adorno encima, no el mecanismo.
- */
 function setOhmdalAction(action: HTMLAnchorElement, label: string): void {
   action.href = portalGateUrl();
   action.textContent = label;
@@ -225,16 +214,11 @@ function clearOhmdalAction(action: HTMLAnchorElement): void {
 }
 
 /**
- * Muestra la puerta al Ohmdal HD-2D en construcción, sólo en el aula de Electrónica.
- *
- * Existe para que el mundo nuevo se pueda mirar crecer sin tener que escribir `/ohmdal` a
- * mano, y sin tocar el botón de jugar: hoy el HD-2D es blockout sin contenido del Arco I, así
- * que no puede ser la puerta principal. Cuando lo alcance, `portalGateUrl()` apunta ahí y
- * esta puerta sobra.
+ * La puerta WIP del laboratorio Three ya no existe: Ohmdal se juega en `/jugar`.
  */
-function setWipDoor(visible: boolean): void {
+function setWipDoor(_visible: boolean): void {
   const door = document.querySelector<HTMLAnchorElement>('#school3d-action-wip');
-  if (door) door.hidden = !visible;
+  if (door) door.hidden = true;
 }
 
 class School3DExperience {
@@ -862,8 +846,7 @@ class School3DExperience {
       setWipDoor(room.id === 'electronica');
       if (room.id === 'electronica') {
         // «Viajar a Ohmdal» tiene que llegar a Ohmdal. Con `/jugar` a secas el destino se
-        // pierde y caés donde diga el save —el hall del Instituto en 2D— que es justo lo
-        // contrario de lo que promete el botón. `portalGateUrl()` lleva a la Plaza.
+        // pierde y caés donde diga el save. `portalGateUrl()` lleva a la Plaza.
         setOhmdalAction(action, 'Viajar a Ohmdal');
       } else if (room.id === 'hall') {
         // «Continuar el viaje» sí retoma la partida donde haya quedado: destino correcto.
@@ -872,8 +855,8 @@ class School3DExperience {
         action.textContent = 'Continuar el viaje';
       } else {
         clearOhmdalAction(action);
-        action.href = classicHref(room.href ?? '#hall');
-        action.textContent = room.actionLabel ?? 'Ver en la landing';
+        action.href = room.href ?? '#';
+        action.textContent = room.actionLabel ?? 'Explorar';
       }
     }
   }

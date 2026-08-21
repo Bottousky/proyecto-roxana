@@ -1,28 +1,20 @@
 /**
- * ActiveRoom — autoridad de gameplay room-local (ADR-002, R2).
- *
- * Reemplaza la semántica de `activeArea.ts` (que derivaba la autoridad del
- * plano mundo legacy por offsets). Aquí la autoridad es LOCAL:
+ * ActiveRoom — autoridad de gameplay room-local (ADR-002, R2/R6).
  *
  *   ActiveRoom { id, width, height, playerLocal }
  *
  * - `playerLocal` es la ÚNICA posición de gameplay autoritativa.
+ *   El sprite de Phaser (`player.x`, `player.y`) es la misma posición:
+ *   NO existe un puente legacy a un plano mundo de offsets.
  * - La cámara, la navegación y el clamp derivan del rect local
- *   `(0,0,width,height)` — NUNCA de ox/oy.
- * - `width`/`height` se DERIVAN de `AreaDef` (`areaDimensions(id)`), no se
- *   persisten copias.
+ *   `(0, 0, width, height)` — NUNCA de ox/oy.
+ * - `width`/`height` se DERIVAN de `RoomSceneProfile` (`areaDimensions(id)`),
+ *   no se persisten copias.
  *
- * BRIDGE LEGACY (temporal, R2): el renderer actual todavía construye todas
- * las rooms en el plano world de `world.ts` y el sprite de Phaser vive en
- * coordenadas world. `legacyProjection` es el ÚNICO punto que traduce entre
- * local y ese plano legacy:
- *
- *   legacyWorld = local + activeLegacyPlacementOffset
- *   local       = legacyWorld - activeLegacyPlacementOffset
- *
- * Este bridge se elimina en R5/R6 (cuando el renderer construya sólo la room
- * activa y el sprite viva en local). NO debe filtrarse a RoomGraph, a la
- * autoridad de cámara/navegación, ni a la semántica de colisión room-local.
+ * R6: extirpó el bridge `legacyProjection` que traducía entre coordenadas
+ * locales y un plano world heredado. Cualquier necesidad residual de
+ * "placement" debe resolverse vía `RoomGraph` (topología) o vía el mapa
+ * esquemático (`mapSchematic.ts`) — NUNCA vía offsets de mundo continuo.
  */
 
 import { areaDimensions } from './roomScenesData.ts';
@@ -45,7 +37,7 @@ export interface ActiveRoom {
   /** dimensiones LOCALES de la room (derivadas de RoomSceneProfile). */
   width: number;
   height: number;
-  /** posición LOCAL autoritativa del jugador. */
+  /** posición LOCAL autoritativa del jugador (== player.x, player.y). */
   playerLocal: Point;
 }
 
@@ -103,28 +95,3 @@ function clamp(v: number, min: number, max: number): number {
   if (v > max) return max;
   return v;
 }
-
-/* ---------------------------------------------------------------------------
- * BRIDGE LEGACY COMPATIBILITY (R2) — se elimina en R5/R6.
- * ------------------------------------------------------------------------- */
-
-export interface LegacyPlacement {
-  ox: number;
-  oy: number;
-}
-
-export interface LegacyProjection {
-  /** local → plano legacy (world.ts). LEGACY ONLY. */
-  localToLegacyWorld(p: Point, placement: LegacyPlacement): Point;
-  /** plano legacy → local. LEGACY ONLY. */
-  legacyWorldToLocal(p: Point, placement: LegacyPlacement): Point;
-  /** rect local → rect legacy (para camera setBounds mientras el sprite
-   *  siga en world). LEGACY ONLY. */
-  rectToLegacyWorld(r: Rect, placement: LegacyPlacement): Rect;
-}
-
-export const legacyProjection: LegacyProjection = {
-  localToLegacyWorld: (p, placement) => ({ x: p.x + placement.ox, y: p.y + placement.oy }),
-  legacyWorldToLocal: (p, placement) => ({ x: p.x - placement.ox, y: p.y - placement.oy }),
-  rectToLegacyWorld: (r, placement) => ({ x: r.x + placement.ox, y: r.y + placement.oy, w: r.w, h: r.h }),
-};

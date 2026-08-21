@@ -8,7 +8,8 @@ function assert(condition: unknown, label: string): void {
 assert(EXPERIENCES.length === 5, 'el registro contiene los cinco lenguajes de experiencia');
 assert(experienceOfRoom('plaza')?.id === 'ohmdal', 'la plaza conserva la identidad de Ohmdal');
 assert(experienceOfRoom('castle_heart')?.id === 'ohmdal', 'el Castillo sigue siendo parte de Ohmdal');
-assert(experienceOfRoom('hall')?.id === 'instituto', 'el hall pertenece al Instituto');
+assert(experienceOfRoom('hall') === null, 'el Instituto Phaser ya no declara salas');
+assert(experienceById('instituto').rooms.length === 0, 'el Instituto es la home isométrica');
 assert(experienceById('ohmdal').status === 'playable', 'Ohmdal es producto existente, no concepto futuro');
 assert(experienceById('ohmdal').runtime === 'topdown-phaser', 'Ohmdal conserva su motor cenital');
 assert(experienceById('physica').runtime === 'platformer-babylon', 'Physica se juega en su gramática Babylon de plataformero 2.5D');

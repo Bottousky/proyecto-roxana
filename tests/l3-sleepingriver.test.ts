@@ -42,9 +42,9 @@ equal(sleepingRiverReading(state).riverFlow, 0, 'el río es cero con el Estanque
 const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.url), 'utf8');
 const puzzleSource = readFileSync(new URL('../src/puzzles/sleepingriver.ts', import.meta.url), 'utf8');
 
-equal(roomsSource.includes("import { abrirSleepingRiver } from '../puzzles/sleepingriver';"), true, 'rooms importa L3');
-equal(roomsSource.includes("setFlag('solvedSleepingRiver')"), true, 'L3 marca solvedSleepingRiver');
-equal(roomsSource.includes("notifyNewEntry('El río que se duerme')"), true, 'L3 notifica la entrada');
+equal(roomsSource.includes("import { abrirSleepingRiver } from '../puzzles/sleepingriver';"), false, 'L3 RC no bloquea el camino crítico');
+equal(roomsSource.includes("setFlag('solvedSleepingRiver')"), false, 'L3 RC no escribe flags del camino crítico');
+equal(roomsSource.includes("notifyNewEntry('El río que se duerme')"), false, 'L3 RC no formaliza Arc I');
 equal(puzzleSource.includes('createSimTick('), true, 'L3 anima la simulación con el tick compartido');
 equal(puzzleSource.includes('bench.onClose(tick.stop)'), true, 'L3 cancela el tick al cerrar');
 equal(puzzleSource.includes('ohmProbe('), true, 'L3 reutiliza la sonda de Ohm');

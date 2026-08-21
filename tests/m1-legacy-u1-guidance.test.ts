@@ -10,28 +10,28 @@ const roomsSource = readFileSync(new URL('../src/jugar/rooms.ts', import.meta.ur
 
 includes(
   roomsSource,
-  "if (f().finished && !f().playedUnit2Intro)",
-  'el aula reconoce una partida U1 anterior a la introducción de U2',
+  'window.location.href = portalExitUrl()',
+  'el cierre de unidad abandona Phaser hacia la home isométrica',
 );
 includes(
   roomsSource,
-  'reproducirIntroUnidad2(true)',
-  'el proyector inicia U2 automáticamente al regresar',
+  'function reproducirIntroUnidad2',
+  'conserva el copy de introducción U2',
 );
 includes(
   roomsSource,
-  'reproducirIntroUnidad3(true)',
-  'el proyector inicia U3 automáticamente al regresar',
+  'function reproducirIntroUnidad3',
+  'conserva el copy de introducción U3',
 );
 includes(
   roomsSource,
-  'reproducirIntroUnidad4(true)',
-  'el proyector inicia U4 automáticamente al regresar',
+  'function reproducirIntroUnidad4',
+  'conserva el copy de introducción U4',
 );
 includes(
   roomsSource,
-  'reproducirIntroUnidad5(true)',
-  'el proyector inicia U5 automáticamente al regresar',
+  'function reproducirIntroUnidad5',
+  'conserva el copy de introducción U5',
 );
 includes(
   roomsSource,

@@ -269,18 +269,8 @@ test('M: seamless no requiere world placement', () => {
 // ---------------------------------------------------------------------------
 // N. Una arista a una room EXTERNAL rutea por el adapter externo.
 // ---------------------------------------------------------------------------
-test('N: la arista a una room EXTERNAL no requiere RoomSceneProfile', () => {
-  assert(EXTERNAL_ROOMS.has('hall'), 'hall está en EXTERNAL_ROOMS');
-  const source: RoomGraphSource = {
-    rooms: { a: { id: 'a', doors: [{ to: 'hall' }] }, hall: { id: 'hall', doors: [] } },
-    scenes: {}, // hall NO tiene perfil de escena
-    edgeMeta: [],
-  };
-  const g = buildRoomGraph(source);
-  const aRoom = createActiveRoom('a', { x: 0, y: 0 });
-  const resolved = resolveTransition(g, aRoom, 'hall')!;
-  assert(resolved.target.id === 'hall', 'destino = hall');
-  assert(EXTERNAL_ROOMS.has(resolved.target.id), 'el destino es una room externa (adapter del shell)');
+test('N: EXTERNAL_ROOMS está vacío: el Instituto no es una room Phaser', () => {
+  assert(EXTERNAL_ROOMS.size === 0, 'no hay rooms Phaser del Instituto');
 });
 
 // ---------------------------------------------------------------------------

@@ -283,17 +283,11 @@ test('19 rooms heredadas: sus things están dentro del bounding box 960×540', (
   }
 });
 
-// Commit 4: la Plaza 1920×1080 tiene things reubicados al área
-// grande. Validamos que TODOS caen dentro del bbox extendido.
-test('Plaza (commit 4): sus things caben en el bbox 1920×1080', () => {
+// R7: los ThingDef de rooms.ts son la autoridad estable de gameplay.
+// El perfil de escena no debe duplicar ni sobreescribir sus anchors.
+test('Plaza (R7): el perfil de escena no duplica anchors de ThingDef', () => {
   const scene = ROOM_SCENES['plaza'];
-  assert(scene.things !== undefined, 'plaza.things existe');
-  for (const thing of Object.values(scene.things)) {
-    assert(thing.x >= 0, `plaza: thing.x = ${thing.x} debe ser >= 0`);
-    assert(thing.y >= 0, `plaza: thing.y = ${thing.y} debe ser >= 0`);
-    assert(thing.x < 1920, `plaza: thing.x = ${thing.x} debe ser < 1920`);
-    assert(thing.y < 1080, `plaza: thing.y = ${thing.y} debe ser < 1080`);
-  }
+  assert(scene.things === undefined, 'plaza.things debe quedar ausente para no sobreescribir ThingDef');
 });
 
 test('19 rooms heredadas: sus doors están dentro del bounding box 960×540', () => {

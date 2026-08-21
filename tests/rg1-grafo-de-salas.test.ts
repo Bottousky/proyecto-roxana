@@ -37,8 +37,8 @@ const declaredRooms = new Set(
   [...roomsBody.matchAll(/^ {2}([a-z_0-9]+): \{$/gm)].map((match) => match[1]),
 );
 
-assert(declaredRooms.size >= 23, `se detectaron ${declaredRooms.size} salas; el Arco I tiene 23`);
-assert(declaredRooms.has('hall'), 'el hall del Instituto está declarado');
+assert(declaredRooms.size >= 20, `se detectaron ${declaredRooms.size} salas; el Arco I de Ohmdal tiene 20`);
+assert(!declaredRooms.has('hall'), 'el hall del Instituto no vive en Phaser');
 assert(declaredRooms.has('plaza'), 'la Plaza de Ohmdal está declarada');
 
 /** Cada destino con su forma sintáctica, para que el mensaje de fallo diga dónde mirar. */

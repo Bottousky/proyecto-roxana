@@ -88,6 +88,15 @@ body:not(.touch-device) .arc-panorama-continue {
   cursor: default;
 }
 
+/* Los bancos son mecanismos manipulables: teclado y puntero son caminos
+   equivalentes. La política de HUD no puede convertir sus controles en
+   decoración en escritorio. */
+body:not(.touch-device) #bench button,
+body:not(.touch-device) #bench [role='button'] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 #ohm-companion-btn {
   overflow: hidden;
   padding: 0;
@@ -399,10 +408,11 @@ button.bench-btn:disabled { opacity: .4; cursor: default; }
 .wire { stroke: #5d5868; stroke-width: 6; fill: none; stroke-linecap: round; transition: stroke .4s; }
 .wire.live { stroke: var(--accent); filter: drop-shadow(0 0 4px rgba(255,211,77,.8)); }
 .wire.hot { stroke: var(--danger); filter: drop-shadow(0 0 6px rgba(226,86,58,.9)); }
-.gap-slot { fill: #211e29; stroke: #6b6478; stroke-width: 2; stroke-dasharray: 5 4; cursor: pointer; }
-.gap-slot:hover, .gap-slot:focus { stroke: var(--accent); stroke-width: 4; outline: none; }
+.gap-slot { fill: #211e29; stroke: #6b6478; stroke-width: 2; stroke-dasharray: 5 4; pointer-events: none; }
+.gap-slot-hit { fill: transparent; pointer-events: all; touch-action: manipulation; cursor: pointer; }
+.gap-slot-hit:hover + .gap-slot, .gap-slot-hit:focus + .gap-slot { stroke: var(--accent); stroke-width: 4; outline: none; }
 .gap-slot.bridged { fill: #8a7c50; stroke: var(--accent); stroke-dasharray: none; }
-.gap-slot.broken { fill: #2a1d1a; stroke: #7a4438; cursor: not-allowed; }
+.gap-slot.broken { fill: #2a1d1a; stroke: #7a4438; }
 
 /* aguja / medidor */
 .gauge-needle { transition: transform .7s cubic-bezier(.3,1.4,.5,1); transform-origin: var(--pivot); }

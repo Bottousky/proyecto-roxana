@@ -65,6 +65,10 @@ function rectContains(rect: SceneRect, x: number, y: number, inset = 0): boolean
   return x - inset >= rect.x && x + inset <= rect.x + rect.w && y - inset >= rect.y && y + inset <= rect.y + rect.h;
 }
 
+function rectOverlapsBody(rect: SceneRect, x: number, y: number, inset = 12): boolean {
+  return x + inset > rect.x && x - inset < rect.x + rect.w && y + inset > rect.y && y - inset < rect.y + rect.h;
+}
+
 // ---------------------------------------------------------------------------
 // A. Todo target de door de RoomDef existe.
 // ---------------------------------------------------------------------------
@@ -254,14 +258,72 @@ test('K: critical path Arc 1 alcanzable desde plaza (ignorando locks)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// VALIDACIÓN: detección de issues reales (warnings documentados).
+// R7. Ruta dirigida Portal→Faro + entries estrictamente legales para el
+// cuerpo real 24×24. La ida requiere los retornos narrativos entre obras.
 // ---------------------------------------------------------------------------
-test('I/validación: detecta el warning conocido forge_infirmary→forge_yard (entry en colisión)', () => {
+test('R7: ruta dirigida Portal→Faro resuelve hasta lighthouse_lantern con backtracking', () => {
+  const g = realGraph();
+  const route = [
+    'plaza',
+    'taller', 'plaza',
+    'puerta', 'manantial_ohm', 'puerta', 'plaza',
+    'castle_gate', 'castle_gallery', 'castle_branches', 'castle_heart',
+    'castle_branches', 'castle_gallery', 'castle_gate',
+    'forge_yard', 'forge_infirmary', 'forge_longchannel', 'forge_hall',
+    'forge_longchannel', 'forge_infirmary', 'forge_yard', 'plaza',
+    'terraces_top', 'terraces_mid', 'terraces_mural', 'terraces_aqueduct',
+    'lighthouse_hall', 'lighthouse_bench', 'clock_tower', 'lighthouse_lantern',
+  ];
+
+  for (let i = 0; i < route.length - 1; i++) {
+    const from = route[i];
+    const to = route[i + 1];
+    const resolved = g.resolve(from, to);
+    assert(resolved !== null && resolved.connection.to === to, `tramo dirigido ${from}→${to} resuelve`);
+  }
+});
+
+test('R7: toda entry de la ruta Portal→Faro admite cuerpo 24×24 sin colisión ni rescue', () => {
+  const g = realGraph();
+  const route = [
+    'plaza',
+    'taller', 'plaza',
+    'puerta', 'manantial_ohm', 'puerta', 'plaza',
+    'castle_gate', 'castle_gallery', 'castle_branches', 'castle_heart',
+    'castle_branches', 'castle_gallery', 'castle_gate',
+    'forge_yard', 'forge_infirmary', 'forge_longchannel', 'forge_hall',
+    'forge_longchannel', 'forge_infirmary', 'forge_yard', 'plaza',
+    'terraces_top', 'terraces_mid', 'terraces_mural', 'terraces_aqueduct',
+    'lighthouse_hall', 'lighthouse_bench', 'clock_tower', 'lighthouse_lantern',
+  ];
+  const arrivals = [
+    { from: 'portal', to: 'plaza', entry: ROOM_SCENES.plaza.entries?.aula },
+    ...route.slice(0, -1).map((from, i) => {
+      const to = route[i + 1];
+      return { from, to, entry: g.resolve(from, to)?.entry };
+    }),
+  ];
+
+  for (const arrival of arrivals) {
+    assert(arrival.entry !== undefined, `${arrival.from}→${arrival.to} declara entry`);
+    const profile = ROOM_SCENES[arrival.to];
+    const entry = arrival.entry!;
+    assert(profile.walkable.some((rect) => rectContains(rect, entry.x, entry.y, 12)),
+      `${arrival.from}→${arrival.to} entry (${entry.x},${entry.y}) contiene cuerpo 24×24`);
+    assert(!(profile.collision ?? []).some((rect) => rectOverlapsBody(rect, entry.x, entry.y)),
+      `${arrival.from}→${arrival.to} entry (${entry.x},${entry.y}) evita colisión`);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// VALIDACIÓN R7: la entry corregida de Forja no deja warnings.
+// ---------------------------------------------------------------------------
+test('I/validación R7: forge_infirmary→forge_yard no solapa colisión', () => {
   const issues = validateRoomGraph(realGraph());
   const collisionWarnings = issues.filter(
     (i) => i.code === 'entry-overlaps-collision' && i.connectionId === 'forge_infirmary->forge_yard',
   );
-  assert(collisionWarnings.length === 1, `se esperaba el warning entry-overlaps-collision para forge_infirmary→forge_yard (data wart documentado)`);
+  assert(collisionWarnings.length === 0, 'forge_infirmary→forge_yard no debe emitir entry-overlaps-collision');
 });
 
 // ---------------------------------------------------------------------------

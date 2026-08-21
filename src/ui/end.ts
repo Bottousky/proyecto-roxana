@@ -1,6 +1,8 @@
 import { el, pushUI, popUI } from './overlay';
 import { resetSave } from '../state';
 import { sfxWin } from '../audio';
+import { portalExitUrl } from '../shared/portalLink.ts';
+import { announceCinematic } from '../jugar/cinematics.ts';
 
 export interface EndOptions {
   title: string;
@@ -62,7 +64,8 @@ export function showEnd(opts: EndOptions): void {
     location.reload();
   });
   homeButton.addEventListener('click', () => {
-    window.location.href = '/#aula/electronica';
+    announceCinematic('instituto-return');
+    window.location.href = portalExitUrl();
   });
   continueButton.focus();
 }

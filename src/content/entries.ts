@@ -572,6 +572,16 @@ export function getEntries(): EntryView[] {
 
   /* ============ UNIDAD 5 — El Faro ============ */
 
+  if (f.solvedLakeFeedDc) {
+    out.push({ id: 'dos-caminos-lago', title: 'Dos caminos hacia el Lago', fecha: 'El Faro — costa', vivencial: '<p>Dos caminos atendieron dos servicios sin pedirle de más al Tronco.</p>', formal: '<p>Después de observar el reparto: en paralelo, la corriente total es la suma de los ramales. La Bitácora registra la evidencia antes del nombre.</p>' });
+  }
+  if (f.solvedClockDriveDc) {
+    out.push({ id: 'reloj-entrega-dc', title: 'El reloj y la entrega', fecha: 'El Faro — torre', vivencial: '<p>El péndulo avanzó cuando la entrega alcanzó los engranajes sin forzar el Camino.</p>', formal: '<p>La entrega eléctrica se puede leer como potencia: empuje por río. La misma necesidad admite más de una combinación segura.</p>' });
+  }
+  if (f.solvedLighthouseDistributionDc) {
+    out.push({ id: 'cierre-dc-del-faro', title: 'Cierre de distribución', fecha: 'El Faro — linterna', vivencial: '<p>La lente avisó, el reloj mecánico marcó y la señal costera respondió. La primera comisión y su transferencia dejaron dos configuraciones distintas documentadas.</p>', formal: '<p>La interpretación separa la evidencia de la metáfora: cada ramal necesita calibre, fusible coordinado e interruptor para aislarlo. La red se valida por condiciones y admite más de una configuración mantenible.</p>' });
+  }
+
   if (f.solvedStoredSpark) {
     out.push({
       id: 'la-chispa-que-se-queda',

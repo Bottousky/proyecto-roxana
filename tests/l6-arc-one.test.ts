@@ -34,37 +34,24 @@ includes(stylesSource, 'aspect-ratio: 4 / 3', 'el mapa conserva una relación 4:
 includes(stylesSource, '@media (max-aspect-ratio: 4 / 3)', 'el overlay se adapta a pantallas 4:3');
 includes(stylesSource, '@media (prefers-reduced-motion: reduce)', 'CSS elimina animaciones reducidas');
 
-for (const id of [
-  'la-chispa-que-se-queda',
-  'el-rio-que-se-duerme',
-  'el-tic',
-  'el-arco-del-rio',
-]) {
+for (const id of ['dos-caminos-lago', 'reloj-entrega-dc', 'cierre-dc-del-faro']) {
   includes(entriesSource, `id: '${id}'`, `existe la entrada ${id}`);
 }
 
-for (const gate of ['solvedStoredSpark', 'solvedSleepingRiver', 'solvedClock', 'learnedCapacitor']) {
+for (const gate of ['solvedLakeFeedDc', 'solvedClockDriveDc', 'solvedLighthouseDistributionDc']) {
   includes(entriesSource, `f.${gate}`, `la Bitácora usa el gate ${gate}`);
 }
 
-includes(entriesSource, 'El capacitor', 'la capa formal nombra el capacitor');
-includes(entriesSource, 'circuito RC', 'la capa formal incluye la nota RC');
-includes(entriesSource, 'Las cinco reglas del Arco del Río', 'la entrada mayor reúne las reglas');
-includes(
-  entriesSource,
-  'El río ya no es un misterio. Ahora es una herramienta.',
-  'la entrada mayor conserva su última reflexión',
-);
-includes(entriesSource, 'El ojo de cristal', 'la página en blanco planta el Arco II');
+includes(entriesSource, 'distribución', 'la capa formal nombra la distribución');
 
 includes(roomsSource, "prompt: 'Mirar Ohmdal de noche'", 'la linterna ofrece el cierre');
 includes(
   roomsSource,
-  "if (f().learnedCapacitor && !f().arcOneCompleted)",
+  "if (f().solvedLighthouseDistributionDc && !f().arcOneCompleted)",
   'el cierre exige comprensión y no se repite',
 );
 equal(
-  roomsSource.indexOf('showArcPanorama(() => {') < roomsSource.indexOf("L('', 'La cámara se aleja."),
+  roomsSource.indexOf('showArcPanorama(() => {') < roomsSource.indexOf("L('', 'TODO(guion): epílogo final pendiente."),
   true,
   'cerrarArcoUno muestra la panorámica antes del diálogo existente',
 );
@@ -74,34 +61,29 @@ for (const place of [
   'El Castillo sostiene sus tres distritos',
   'La Forja trabaja en ritmo',
   'Las Terrazas brillan regadas',
-  'El Reloj marca y el Faro late',
+  'El Reloj marca y el Faro distribuye luz',
 ]) {
   includes(roomsSource, place, `la noche muestra: ${place}`);
 }
 
 for (const text of [
-  'Cinco lugares. Cinco lecciones. Y la chispa que «se estaba acabando» encendió todo, sin gastarse.',
-  '…Quiero estar del otro lado, alguna vez. Quiero que alguien me lo pregunte a MÍ. Con las manos, como hiciste vos.',
   'Yo cuidé esto cuarenta años sin entenderlo. Ustedes lo entendieron en cinco lunas.',
   '…Gracias por no decírmelo en voz alta. Mis mártires van al museo de la Forja. Que aprendan los jóvenes lo que era el miedo.',
-  'Inventario final del Consejo: la chispa no disminuyó en cuarenta años. La estábamos guardando para nadie. Caso cerrado.',
-  'Registro: red de Ohmdal completa. Estado: viva en el tiempo. Promesa de la primera lección: cumplida.',
-  '¿Y a ESE quién lo empuja? Un rayo de luz… ¿empujando un río?',
-  'Eso, jóvenes, es de otra noche. La materia que decide. Yo ya tengo bastante con mi latido.',
+  'Registro: red de Ohmdal completa. Estado: servicios distribuidos y documentados.',
 ]) {
   includes(roomsSource, text, `diálogo textual: ${text.slice(0, 42)}`);
 }
 
-for (const flag of ['arcOneCompleted', 'sawCrystalEye', 'unit5Completed']) {
+for (const flag of ['arcOneCompleted', 'unit5Completed']) {
   includes(roomsSource, `setFlag('${flag}')`, `el cierre marca ${flag}`);
 }
 
 includes(
   roomsSource,
-  "title: 'Fin del Arco I — «El Río» · Ohmdal, cinco unidades'",
+  "title: 'Fin del Arco I — Ohmdal'",
   'la pantalla final dice Arco I',
 );
 includes(roomsSource, "variant: 'arc'", 'el cierre usa el peso visual de arco');
-includes(roomsSource, "onContinue: () => hooks.goto('hall', { x: 480, y: 300 })", 'Continuar vuelve al hall');
+includes(roomsSource, "onContinue: () => { announceCinematic('instituto-return'); window.location.href = portalExitUrl(); }", 'Continuar anuncia y vuelve al aula isométrica');
 
 console.log('L6 arc one tests: OK');

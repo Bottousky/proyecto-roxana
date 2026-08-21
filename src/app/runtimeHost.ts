@@ -50,9 +50,7 @@ export function createRuntimeHost(hostEl: HTMLElement, loaders: RuntimeLoaderMap
     return result;
   }
 
-  // Qué runtime sirve una ubicación. El manifest decide salvo que la ubicación nombre otro:
-  // durante el slice H3, Ohmdal se juega en `topdown-phaser` y se prototipa en `hd2d-three`
-  // sin que el registro de experiencias gane una entrada falsa (`CP-021`).
+  // Qué runtime sirve una ubicación. El manifest decide salvo override explícito.
   function resolveRuntime(location: ExperienceLocation): ExperienceRuntime {
     return location.runtime ?? experienceById(location.experienceId).runtime;
   }

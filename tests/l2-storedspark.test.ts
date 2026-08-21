@@ -82,10 +82,10 @@ equal(commonSource.includes('export function tankSVG()'), true, 'common exporta 
 equal(commonSource.includes('export function setTankLevel('), true, 'common exporta setTankLevel');
 equal(benchSource.includes('onClose(cleanup: () => void)'), true, 'el bench expone cleanup retrocompatible');
 equal(puzzleSource.includes('bench.onClose(tick.stop)'), true, 'el puzzle cancela el tick al cerrar');
-equal(roomsSource.includes("import { abrirStoredSpark } from '../puzzles/storedspark';"), true, 'rooms importa L2');
-equal(roomsSource.includes("setFlag('solvedStoredSpark')"), true, 'L2 marca solvedStoredSpark');
-equal(roomsSource.includes("setFlag('consejeraNotedAnomaly')"), true, 'L2 registra la anomalía');
-equal(roomsSource.includes("notifyNewEntry('La chispa que se queda')"), true, 'L2 notifica la entrada');
+equal(roomsSource.includes("import { abrirStoredSpark } from '../puzzles/storedspark';"), false, 'L2 RC no bloquea el camino crítico');
+equal(roomsSource.includes("setFlag('solvedStoredSpark')"), false, 'L2 RC no escribe flags del camino crítico');
+equal(roomsSource.includes("setFlag('consejeraNotedAnomaly')"), false, 'L2 no altera el camino crítico');
+equal(roomsSource.includes("notifyNewEntry('La chispa que se queda')"), false, 'L2 no formaliza Arc I');
 
 for (const text of [
   'Ahí está. EXACTAMENTE eso. Tres segundos sin camino.',

@@ -35,9 +35,9 @@
  *   hacia el mismo destino aparezca, esa salida debe declarar su `entry`
  *   (o metadata equivalente) para sobrescribir la entrada keyed por room.
  *
- * BOUNDARY DE RUNTIME EXTERNO (Instituto/hub):
+ * BOUNDARY DE RUNTIME EXTERNO:
  * `EXTERNAL_ROOMS` lista rooms que viven en otro runtime/experiencia
- * (hall/despacho/aula del hub del Instituto) y NO tienen perfil de escena
+ * y NO tienen perfil de escena
  * ni forman parte del grafo jugable de Ohmdal Arc 1. La validación las
  * distingue de rooms malformadas (sin perfil por error). No se crean
  * RoomSceneProfiles falsos para silenciar la validación.
@@ -85,10 +85,9 @@ export function defaultEntryFallback(width: number, height: number): { x: number
   return { x: width / 2, y: height - DEFAULT_ENTRY_FALLBACK_Y_OFFSET };
 }
 
-/** Rooms de otro runtime/experiencia (hub del Instituto) que no pertenecen
- *  al grafo jugable de Ohmdal Arc 1. La validación no las trata como
- *  rooms malformadas por carecer de perfil de escena. */
-export const EXTERNAL_ROOMS: ReadonlySet<string> = new Set(['hall', 'despacho', 'aula']);
+/** Rooms de otro runtime/experiencia que no pertenecen al grafo jugable
+ *  de Ohmdal Arc 1. Vacío: el Instituto es la home isométrica, no Phaser. */
+export const EXTERNAL_ROOMS: ReadonlySet<string> = new Set();
 
 /** ---------------------- buildLocalExitTriggers (R4.2) ---------------------- */
 /**
@@ -202,6 +201,8 @@ export const OHMDAL_EDGE_META: RoomGraphEdgeMeta[] = [
   { from: 'plaza', to: 'taller', kind: 'fade' },
   { from: 'taller', to: 'plaza', kind: 'fade' },
   { from: 'plaza', to: 'puerta', kind: 'cinematic' },
+  { from: 'puerta', to: 'manantial_ohm', kind: 'cinematic', cinematic: 'puerta-apertura' },
+  { from: 'terraces_aqueduct', to: 'lighthouse_hall', kind: 'cinematic', cinematic: 'faro-reveal' },
   { from: 'puerta', to: 'plaza', kind: 'cinematic' },
   { from: 'castle_gate', to: 'castle_gallery', kind: 'fade' },
   { from: 'castle_gallery', to: 'castle_gate', kind: 'fade' },

@@ -5,16 +5,18 @@ description: Work with the room-based spatial architecture of Ohmdal. Use whenev
 
 # ohmdal-room-engine
 
-This skill is derived from the actual runtime in `src/jugar/`. It prevents reintroducing parallel authorities for rooms, areas, camera, or navigation.
+Compact reminder of the room-based architecture for Ohmdal. Derived from
+the actual runtime in `src/jugar/`. Prevents reintroducing parallel
+authorities for rooms, areas, camera, or navigation.
 
-## Source of truth (always re-read first)
-
-- `docs/00-governance/ADR-002-room-local-spatial-architecture.md` — the decision.
-- `docs/20-worlds/ohmdal/room-based/SPATIAL_CONTRACT.md` — the contracts.
-- `docs/20-worlds/ohmdal/room-based/ARC1_ROOM_GRAPH.md` — the 11 macroáreas, 5 regions, chapter mapping, and the edge list.
-- `docs/20-worlds/ohmdal/room-based/ARC1_SPATIAL_MAP.md` — topología canónica y esquema geográfico; sus valores numéricos **no** son coordenadas de runtime.
-- `docs/20-worlds/ohmdal/room-based/areas/*.md` — the 11 fiches de macroárea.
-- The runtime code under `src/jugar/`: `rooms.ts`, `roomGraph.ts`, `roomScenes.ts`, `roomScenesData.ts`, `roomTransitions.ts`, `areas/`, `camera/`, `transitions/`, `worldState.ts`, `cinematics/`, `debug/`.
+> **On-demand, not preload.** This skill is the **first thing** to read
+> for a room-engine task. The full source docs are loaded **only when
+> a specific question cannot be answered from this skill + `CURRENT_STATE.md`
+> + the directly affected code**.
+>
+> **Do NOT load by default:** the 11 area fiches, `RECOVERY_AUDIT.md`,
+> `ARC1_SPATIAL_MAP.md`, `TEST_TAXONOMY.md`, `MIGRATION_PLAN.md`.
+> See `docs/20-worlds/ohmdal/AGENTS.md` §0 for the policy.
 
 ## The non-negotiable rules (from `SPATIAL_CONTRACT.md`)
 
@@ -62,17 +64,18 @@ If you add a second exit from `A` to `B`, you must declare its entry explicitly.
 - **Transition** changes the `ActiveRoom`. The transition kind is read from the graph edge. Lock/visibility predicates are read from `DoorDef`, not duplicated.
 - **Preloading** another room is allowed only as an opt-in optimisation. It must not change camera, nav, collision, or interaction in the current room.
 
-## Tests and observability
+## When in doubt — load order
 
-- Tests live in `tests/` and are organised by invariant. The taxonomy is in `docs/20-worlds/ohmdal/room-based/TEST_TAXONOMY.md`.
-- Do not delete or skip a test to obtain PASS. If a test is wrong, the test migrates with a contract change.
-- The recovery audit (`RECOVERY_AUDIT.md`) tracks the runtime's known gaps. A change that fixes a known gap must update the audit.
-
-## When in doubt
-
-- The contract is in `SPATIAL_CONTRACT.md`. Read it.
-- The graph is in `ARC1_ROOM_GRAPH.md`. Read it.
-- The runtime is in `src/jugar/`. Read it.
-- The ADR is in `ADR-002`. If the contract and the ADR disagree, the ADR wins and the contract migrates.
+1. This skill (always).
+2. `docs/20-worlds/ohmdal/room-based/CURRENT_STATE.md` (operational state).
+3. The directly affected source in `src/jugar/`.
+4. Only if the above is not enough:
+   - `SPATIAL_CONTRACT.md` (contracts);
+   - `ARC1_ROOM_GRAPH.md` (graph topology);
+   - `ADR-002` (decision; wins over the contract if they disagree);
+   - `MIGRATION_PLAN.md` (when planning recovery sequencing);
+   - `RECOVERY_AUDIT.md` (only for archaeology / regression hunting);
+   - the relevant `areas/*.md` fiche (only for the specific area in question).
 
 If a problem seems to require a second authority for rooms, areas, camera, or navigation, stop. Surface the conflict. The fix is a contract change, not a parallel model.
+
