@@ -25,17 +25,17 @@ No permitido:
 
 ## 1. Fuentes obligatorias
 
-Leer únicamente:
+Leer inicialmente sólo:
 
 1. `AGENTS.md`
 2. `docs/20-worlds/ohmdal/AGENTS.md`
 3. `.agents/skills/ohmdal-development/SKILL.md`
 4. `.agents/skills/ohmdal-graphics-quality/SKILL.md`
-5. `OHMDAL_PLAZA_ASSET_ACQUISITION.md`
-6. `OHMDAL_PLAZA_ASSET_CATALOG.json`
-7. `OHMDAL_AGENTIC_3D_STACK.md`
-8. `docs/3d/VISUAL_HARNESS.md`
-9. `docs/3d/BUDGETS.md`
+5. este archivo
+
+Después ejecutar el context audit Gemini de la sección 2. Codex debe usar el
+`CODEX MINIMAL READING SET` resultante para elegir el resto de fuentes, en lugar
+de cargar por defecto todo el corpus de Ohmdal.
 
 No cargar documentación histórica HD-2D/room-based salvo contradicción concreta.
 
@@ -47,15 +47,38 @@ Ejecutar:
 git branch --show-current
 npm run verify
 npm run 3d:validate-manifests
+npm run agent:gemini:check
 ```
 
-Debe estar en `explore/ohmdal-3D` y verde antes de art pass.
+Debe estar en `explore/ohmdal-3D` y verde antes de art pass. Si `agy` no está
+instalado o autenticado, reportar el único paso humano necesario; no sustituirlo
+por Gemini API.
+
+### 2.1 Context distillation con Gemini / Antigravity
+
+Si `npm run agent:gemini:check` pasa, ejecutar:
+
+```bash
+npm run agent:gemini -- \
+  --task agent-work/tasks/gemini/ohmdal-plaza-context-audit.md \
+  --out agent-work/reports/gemini/ohmdal-plaza-context-audit.md \
+  --model gemini-3.1-pro-high \
+  --effort high
+```
+
+Antes de fijar el slug, confirmar que aparece en `agy models`; si cambió, usar el
+Gemini Pro/High más fuerte listado y registrar el slug real. No usar
+`--dangerously-skip-permissions`.
+
+Codex debe leer el informe, verificar los puntos load-bearing y consumir su
+`CODEX MINIMAL READING SET`; no releer todo el árbol sólo por costumbre.
 
 Crear reporte local/artefacto de corrida con:
 
 - commit inicial;
 - browser/OS;
 - viewport desktop/mobile;
+- estado Antigravity `PASS|BLOCKED` y modelo usado;
 - estado de `MESHY_API_KEY=SET|MISSING` sin mostrar valor;
 - estado de Blender/PlayCanvas tooling requerido;
 - fuentes externas usadas.
@@ -283,7 +306,27 @@ Automatic fail si:
 - no hay renderer diagnostics;
 - se reporta SwiftShader FPS como GPU.
 
-Fresh-eyes review obligatorio antes de decir `premium`.
+### 11.1 Fresh-eyes review obligatorio con Gemini
+
+Después de generar el set **completo** de screenshots y métricas, ejecutar:
+
+```bash
+npm run agent:gemini -- \
+  --task agent-work/tasks/gemini/ohmdal-plaza-visual-review.md \
+  --out agent-work/reports/gemini/ohmdal-plaza-visual-review.md \
+  --model gemini-3.1-pro-high \
+  --effort high
+```
+
+Misma regla de modelo: confirmar slug con `agy models` y usar el Pro/High vigente
+si cambió. El reviewer no debe ver sólo screenshots elegidas ni editar código.
+
+Codex debe leer el informe, verificar las observaciones críticas contra las
+capturas y resolver primero el `TOP 5 FIXES` de mayor impacto/costo. Si Gemini
+marca automatic failure visible y Codex discrepa, documentar evidencia concreta;
+no ignorarlo por intuición.
+
+Fresh-eyes review es obligatorio antes de decir `premium`.
 
 ## 12. Budgets iniciales
 
@@ -320,6 +363,11 @@ ART PASS 01: PASS / PARTIAL / FAIL
 Baseline commit:
 Final commit:
 
+Gemini context audit:
+- model:
+- report:
+- minimal reading set consumed:
+
 Assets acquired:
 Hero assets generated:
 Provider/task/credits:
@@ -341,7 +389,11 @@ Mobile:
 Software-rendered?:
 
 Automatic failures remaining:
-Fresh-eyes review:
+Gemini fresh-eyes review:
+- model:
+- report:
+- verdict:
+- top fixes applied:
 
 Files changed:
 Validation:
