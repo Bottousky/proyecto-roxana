@@ -21,6 +21,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: node --check scripts/3d/fetch-polyhaven.mjs
+      - run: node --check scripts/3d/inventory-vendor-pack.mjs
       - run: npm run verify
       - run: npm run 3d:validate-manifests
       - name: Publish validation status
