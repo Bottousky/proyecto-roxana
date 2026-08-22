@@ -66,8 +66,14 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
 - Blender: herramienta primaria para assets/GLB. El MCP oficial requiere el gate
   de seguridad documentado en `docs/80-production/AI_TOOLING.md`.
 - MiniMax: sólo por `mmx`; Codex revisa e integra.
-- Sourcing, Meshy opcional, skills candidatos y pipeline visual de la Plaza:
+- Dirección 3D, Meshy opcional, skills candidatos y quality bar:
   [`production/OHMDAL_3D_PRODUCTION_GUIDE.md`](production/OHMDAL_3D_PRODUCTION_GUIDE.md).
+- Para ambientar la Plaza con assets genéricos, **no hacer una búsqueda abierta primero**:
+  ejecutar [`production/OHMDAL_PLAZA_ASSET_ACQUISITION.md`](production/OHMDAL_PLAZA_ASSET_ACQUISITION.md)
+  y el catálogo machine-readable
+  [`production/OHMDAL_PLAZA_ASSET_CATALOG.json`](production/OHMDAL_PLAZA_ASSET_CATALOG.json).
+  Esos archivos fijan proveedores, IDs/URLs, batches, staging, límites de cantidad,
+  comandos de descarga e integración. Sólo buscar reemplazos si un candidato falla.
 
 ## Validación
 
