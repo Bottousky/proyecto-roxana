@@ -88,11 +88,69 @@ sin datos sensibles y registrar sólo el servidor oficial.
 Hasta entonces, Blender sigue siendo la herramienta primaria de assets mediante
 su UI/CLI y exportación GLB, sin MCP alternativo.
 
+## Meshy
+
+Meshy es un **proveedor de producción 3D opcional**, no otro harness.
+
+Rutas oficiales actuales:
+
+- REST API: text/image/multi-image → 3D, refine, remesh, retexture, rig, animate.
+- MCP oficial: `@meshy-ai/meshy-mcp-server`.
+- Agent skill oficial: `meshy-dev/meshy-3d-agent`.
+
+Usar sólo cuando exista plan/crédito aprobado para un sprint de assets. Guardar
+`MESHY_API_KEY` fuera del repo. MCP/REST consumen el balance de la cuenta; cada
+asset debe registrar task ID, proveedor/modelo, parámetros, créditos y output.
+
+Preferencia:
+
+- **skill/API** para workflows reproducibles generate → poll → download;
+- **MCP oficial** cuando el tool-calling conversacional reduzca pasos de verdad;
+- nunca crear un wrapper/MCP local duplicado.
+
+La política de Ohmdal vive en
+`docs/20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md`.
+
+## Tripo
+
+Tripo es A/B/fallback, no dependencia base. Su CLI oficial puede ser operado por
+Codex desde terminal (`tripo make`, presets game/mobile/print, batch, doctor) y
+también puede exponer `tripo mcp` si una tarea futura lo justifica.
+
+No instalarlo por defecto ni asumir que créditos del webapp pagan la API: el
+billing web/API es separado. Se usa sólo cuando calidad, segmentación, rig,
+low-poly o batch demuestren ventaja concreta frente a Meshy/Blender.
+
 ## Cuándo usar MCP
 
-Usarlo sólo cuando el estado vivo y semántico de una aplicación justifica la
-conexión: PlayCanvas Editor o Blender. Git, npm, Vite, Vitest/tests, `mmx`,
-scripts y transformaciones glTF se ejecutan por terminal.
+MCP no está limitado por dogma a dos aplicaciones; está limitado por **valor
+probado y servidor oficial**.
+
+Default:
+
+- PlayCanvas Editor: sí cuando el estado vivo importa.
+- Blender oficial: sí bajo gate de seguridad.
+- Meshy oficial: opcional en sprint de assets aprobado.
+- Tripo: preferir CLI; MCP sólo si aporta valor concreto.
+- Git, npm, Vite, tests, `mmx`, scripts y transformaciones glTF: terminal.
+
+No crear MCPs propios para envolver herramientas que ya tienen CLI/API/servidor
+oficial suficiente.
+
+## Visual harness
+
+Para trabajo visual premium, el cierre no es `build PASS` sino:
+
+```text
+build → browser → deterministic state → multiview capture
+      → renderer diagnostics → scorecard → critic → fix
+```
+
+Contrato cross-runtime: `docs/3d/VISUAL_HARNESS.md`.
+
+Three.js puede aportar técnicas/checklists/QA desde repos externos, pero no se
+instalan directors/routers Three dentro del harness de Roxana ni se cambia el
+runtime de Ohmdal por ese motivo.
 
 ## Mantener barato el contexto de Codex
 
@@ -102,3 +160,5 @@ scripts y transformaciones glTF se ejecutan por terminal.
 4. Pasar a MiniMax briefs acotados y revisar artefactos, no transcripciones.
 5. Pedir a Gemini informes persistidos cuando el análisis multimodal/extenso
    tenga valor reutilizable.
+6. Para assets, usar catálogo/task packet y registrar outputs; no pedir a Codex
+   que redescubra proveedores y licencias en cada sesión.
