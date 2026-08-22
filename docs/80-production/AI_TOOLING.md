@@ -41,20 +41,38 @@ El wrapper repo-native es:
 scripts/agents/run-antigravity.mjs
 ```
 
-Uso:
+### Routing de modelo
+
+`agy models` siempre manda sobre nombres escritos en documentación. Como regla de
+costo/contexto:
+
+- **Gemini Flash High/Medium**: lectura amplia, clasificación, context
+  distillation, comparación de muchas fuentes y revisiones frecuentes.
+- **Gemini Pro High**: contradicciones difíciles, decisiones ambiguas y
+  fresh-eyes final de una entrega importante.
+
+Al 2026-08-22 los slugs documentados incluyen `gemini-3.7-flash-high` y
+`gemini-3.1-pro-high`; si dejan de aparecer, seleccionar sus equivalentes actuales
+desde `agy models` y registrar el slug real.
+
+Context audit de Plaza:
 
 ```bash
-npm run agent:gemini -- \
-  --task agent-work/tasks/gemini/ohmdal-plaza-context-audit.md \
-  --out agent-work/reports/gemini/ohmdal-plaza-context-audit.md \
+npm run agent:gemini:plaza-context -- \
+  --model gemini-3.7-flash-high \
+  --effort high
+```
+
+Fresh-eyes final:
+
+```bash
+npm run agent:gemini:plaza-review -- \
   --model gemini-3.1-pro-high \
   --effort high
 ```
 
-Antes de fijar un slug, `agy models` es la fuente de verdad. Si el modelo anterior
-ya no aparece, elegir el Gemini Pro/High más fuerte disponible para auditorías
-profundas; usar Flash/Medium para clasificación, síntesis o revisiones frecuentes.
-También se puede definir `ROXANA_GEMINI_MODEL` / `ROXANA_GEMINI_EFFORT`.
+También se puede definir `ROXANA_GEMINI_MODEL` / `ROXANA_GEMINI_EFFORT` para una
+sesión, pero no commitear un modelo global como requisito eterno.
 
 ### Qué hace el wrapper
 
@@ -233,9 +251,11 @@ runtime de Ohmdal por ese motivo.
 1. Leer `AGENTS.md`, el `AGENTS.md` del scope y los archivos directos.
 2. Si la tarea pide muchas fuentes, delegar primero context distillation a
    Gemini/Antigravity y consumir su `CODEX MINIMAL READING SET`.
-3. Cargar una skill concreta sólo cuando cambie decisiones de la tarea.
-4. No cargar recovery/history ni otras áreas por defecto.
-5. Pasar a MiniMax briefs acotados y revisar artefactos, no transcripciones.
-6. Usar Gemini para fresh-eyes/multimodal; Codex valida sólo claims load-bearing.
-7. Para assets, usar catálogo/task packet y registrar outputs; no pedir a Codex
+3. Para exploración masiva, preferir Flash; reservar Pro para conflictos o
+   revisión final de alto valor.
+4. Cargar una skill concreta sólo cuando cambie decisiones de la tarea.
+5. No cargar recovery/history ni otras áreas por defecto.
+6. Pasar a MiniMax briefs acotados y revisar artefactos, no transcripciones.
+7. Usar Gemini para fresh-eyes/multimodal; Codex valida sólo claims load-bearing.
+8. Para assets, usar catálogo/task packet y registrar outputs; no pedir a Codex
    que redescubra proveedores y licencias en cada sesión.
