@@ -59,14 +59,16 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
 
 ## Tooling
 
-- Skill local: `ohmdal-development`.
+- Skills locales: `ohmdal-development` y `ohmdal-graphics-quality`.
 - Skills oficiales de `playcanvas/skills`: cargar sólo la operación necesaria.
 - PlayCanvas MCP: sólo cuando el estado vivo del Editor aporte valor; Engine
   code-first usa terminal.
 - Blender: herramienta primaria para assets/GLB. El MCP oficial requiere el gate
   de seguridad documentado en `docs/80-production/AI_TOOLING.md`.
 - MiniMax: sólo por `mmx`; Codex revisa e integra.
-- Dirección 3D, Meshy opcional, skills candidatos y quality bar:
+- Política actual de authoring/proveedores/Three.js como cantera técnica:
+  [`production/OHMDAL_AGENTIC_3D_STACK.md`](production/OHMDAL_AGENTIC_3D_STACK.md).
+- Dirección 3D, fuentes gratuitas y quality bar:
   [`production/OHMDAL_3D_PRODUCTION_GUIDE.md`](production/OHMDAL_3D_PRODUCTION_GUIDE.md).
 - Para ambientar la Plaza con assets genéricos, **no hacer una búsqueda abierta primero**:
   ejecutar [`production/OHMDAL_PLAZA_ASSET_ACQUISITION.md`](production/OHMDAL_PLAZA_ASSET_ACQUISITION.md)
@@ -74,6 +76,10 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
   [`production/OHMDAL_PLAZA_ASSET_CATALOG.json`](production/OHMDAL_PLAZA_ASSET_CATALOG.json).
   Esos archivos fijan proveedores, IDs/URLs, batches, staging, límites de cantidad,
   comandos de descarga e integración. Sólo buscar reemplazos si un candidato falla.
+- Primera pasada visual ejecutable de la Plaza:
+  [`production/OHMDAL_PLAZA_ART_PASS_01.md`](production/OHMDAL_PLAZA_ART_PASS_01.md).
+- Claims premium/AAA-like requieren el contrato cross-runtime:
+  [`../../3d/VISUAL_HARNESS.md`](../../3d/VISUAL_HARNESS.md).
 
 ## Validación
 
