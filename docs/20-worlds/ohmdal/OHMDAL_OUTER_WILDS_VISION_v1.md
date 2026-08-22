@@ -1,5 +1,5 @@
 # OHMDAL · VISIÓN DE DISEÑO Y ARQUITECTURA TÉCNICA (v1.0)
-**Estado:** PROPOSED (Branch Greenfield: `explore/ohmdal-hd2d-explorable`)  
+**Estado:** PROPOSED (Branch Greenfield: `explore/ohmdal-3D`)  
 **Paradigma:** *Outer Wilds* educativo · Mundo 3D continuo · El conocimiento es la progresión.
 
 ---
@@ -55,12 +55,16 @@ Ohmdal no es una colección de salas aisladas con puertas bloqueadas por llaves 
 | Capa | Elección Técnica | Justificación |
 | :--- | :--- | :--- |
 | **Engine 3D Web** | **PlayCanvas Engine v2** (TypeScript + Vite) | Rendimiento WebGPU con fallback WebGL2, PBR real, audio posicional, rigid bodies y carga de glTF 2.0 optimizado para web/móvil. |
-| **Agentic Workflow** | **PlayCanvas Official Agent Skills** (`.agents/skills/`) | Skills nativos para Codex/Antigravity (`assemble-scene`, `light-scene`, `build-hud`, `inspect-glb`). |
-| **Modelado & DCC** | **Blender 5.1+ con Blender MCP** | Generación y ensamblado de greybox 3D asistido por agentes. |
-| **Asset Pipeline** | **glTF 2.0 + glTF-Transform + Meshopt + KTX2** | Formato universal compacto con compresión drástica para tiempos de carga web instantáneos. |
-| **Kits Base CC0** | Quaternius, Kenney Prototype Kit, Poly Haven PBR | Prototipado rápido y consistente de arquitectura, props y texturas físicas. |
+| **Agentic Workflow** | **PlayCanvas Official Agent Skills** (`.agents/skills/`) | Skills portables para clientes compatibles con Agent Skills, incluido Codex (`assemble-scene`, `light-scene`, `build-hud`, `inspect-glb`). |
+| **Modelado & DCC** | **Blender 5.1+; Blender MCP oficial opcional y gated** | Blender es la herramienta primaria de modelado; el MCP se habilita sólo cuando su estado vivo aporta valor y bajo las reglas de seguridad del harness. |
+| **Asset Pipeline** | **glTF 2.0 + glTF-Transform + Meshopt + KTX2** | Formato universal compacto y optimización orientada a carga web. |
+| **Kits Base CC0** | Quaternius, Kenney, Poly Haven, ambientCG | Prototipado rápido, modularidad y materiales/props con procedencia clara. |
+| **Hero Assets** | **Blender + Meshy opcional** | Generación 3D asistida sólo para piezas propias donde ahorre trabajo; Blender conserva la versión canónica. |
 | **Simulación Física** | `OhmdalCircuitEngine` (TypeScript) | Solucionador determinista validado contra referencia SPICE. |
-| **Infraestructura** | Cloudflare Pages + Cloudflare R2 | Servido web ultrarrápido con CDN global para streaming de GLBs pesados. |
+| **Infraestructura** | Cloudflare Pages + Cloudflare R2 | Servido web y distribución de assets pesados/CDN cuando corresponda. |
+
+Guía de recursos, skills y prueba de calidad de la Plaza:
+[`production/OHMDAL_3D_PRODUCTION_GUIDE.md`](production/OHMDAL_3D_PRODUCTION_GUIDE.md).
 
 ---
 
