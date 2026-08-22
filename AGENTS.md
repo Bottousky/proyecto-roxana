@@ -23,15 +23,19 @@ Human
       ├─ PlayCanvas MCP: estado semántico del Editor cuando haga falta
       ├─ Blender MCP: estado semántico de Blender cuando sea seguro
       ├─ Meshy oficial: MCP/skill/API sólo en sprint 3D aprobado
-      └─ terminal: mmx, tripo opcional, git, npm, Vite, tests y scripts
-  ↔ Gemini: peer multimodal/contextual sobre el mismo repo
+      └─ terminal:
+          ├─ agy: Gemini/Antigravity como peer de contexto/critica, sin API key
+          ├─ mmx: MiniMax como worker
+          ├─ tripo opcional
+          └─ git, npm, Vite, tests y scripts
 ```
 
 - Codex es la única autoridad técnica y el único integrador. Puede delegar una
-  producción a `mmx` o a un proveedor 3D, pero revisa el resultado y decide si cumple.
+  producción a `mmx`, un análisis a Gemini/Antigravity o un asset a un proveedor
+  3D, pero verifica el resultado antes de actuar.
 - ChatGPT web entrega specs o decisiones; no necesita integración local.
-- Gemini produce análisis reproducibles en `agent-work/` cuando se le solicita;
-  no redefine arquitectura ni orquesta el repo.
+- Gemini es peer de **contexto amplio, multimodal y fresh-eyes review**. No
+  redefine arquitectura, no integra código y no aprueba su propio trabajo.
 - No agregar routers de modelos, subagent frameworks, colas, daemons, adapters
   de harness ni MCPs caseros para herramientas que ya tienen ruta oficial/CLI.
 
@@ -52,6 +56,15 @@ AGENTS.md raíz
 No cargar el repo completo, recovery histórico ni catálogos de skills. Por
 default usar como máximo una skill directamente relevante; las skills oficiales
 de PlayCanvas se cargan por necesidad concreta, no como bundle.
+
+**Delegar a Gemini antes de expandir contexto en Codex** cuando la tarea exige
+leer muchas fuentes, reconciliar documentación extensa, revisar múltiples
+capturas/GLBs o hacer una crítica visual independiente. Usar
+`npm run agent:gemini -- --task ... --out ...`; Codex consume después el informe
+compacto y verifica sólo los puntos load-bearing.
+
+No delegar a Gemini fixes locales, edición rutinaria, integración final ni tareas
+que Codex puede resolver leyendo pocos archivos directamente.
 
 ## Direcciones técnicas
 
@@ -86,6 +99,7 @@ npm run build
 npm test
 npm run verify
 npm run smoke:play
+npm run agent:gemini:check
 ```
 
 Durante implementación, correr tests enfocados. El gate mecánico final normal es
@@ -100,6 +114,8 @@ No declarar PASS si un check importante quedó sin ejecutar.
 - `.agents/skills/`: skills oficiales de PlayCanvas y tres reglas locales
   compactas (`ohmdal-development`, `ohmdal-graphics-quality`, `roxana-minimax`).
 - `mmx-cli` y `web-perf`: skills oficiales instaladas globalmente en este host.
+- Gemini/Antigravity se usa por `agy` y el runner repo-native
+  `scripts/agents/run-antigravity.mjs`; **no Gemini API key**.
 - Git, npm, Vite, TypeScript, Playwright y transformaciones glTF: terminal.
 - MCP stateful: PlayCanvas Editor y Blender. Meshy MCP oficial es opcional para
   un sprint de assets aprobado; no crear MCP propio para MiniMax, Tripo o Meshy.
@@ -112,7 +128,9 @@ No declarar PASS si un check importante quedó sin ejecutar.
 - Informes: `agent-work/reports/gemini/`
 
 Son carpetas de intercambio, no una cola. Una tarea debe incluir objetivo,
-archivos permitidos, fuentes y formato de salida. Codex revisa e integra.
+archivos permitidos, fuentes y formato de salida. El runner invoca Antigravity
+en modo headless con el login local, captura su respuesta y persiste el informe.
+Debe rechazar una corrida si el peer modificó el worktree. Codex revisa e integra.
 
 ## Escalación
 
