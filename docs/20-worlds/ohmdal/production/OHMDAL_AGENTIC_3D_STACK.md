@@ -11,6 +11,7 @@ ChatGPT web          diseño / investigación / decisiones
        ↓
      CODEX            único integrador técnico
        │
+       ├─ agy/Gemini  contexto amplio + multimodal + fresh-eyes; NO API
        ├─ PlayCanvas  runtime de Ohmdal + skills oficiales
        ├─ Blender     DCC/master canónico; MCP oficial sólo con gate
        ├─ Meshy       hero assets por REST / MCP / skill cuando haya crédito aprobado
@@ -18,6 +19,9 @@ ChatGPT web          diseño / investigación / decisiones
        ├─ Three.js    biblioteca de técnicas, QA y authoring; NO runtime de Ohmdal
        └─ terminal    git, npm, Playwright, glTF tools, mmx
 ```
+
+Gemini no forma un segundo harness de autoridad: Codex lo invoca o consume sus
+informes. La ruta canónica es Antigravity CLI con login local, no Gemini API.
 
 **Contrato de portabilidad:** el producto de authoring debe terminar como `GLB/glTF + manifiesto + procedencia`, independientemente de que el origen sea Meshy, Tripo, Blender, Three.js procedural o un pack CC0. PlayCanvas consume el resultado; no conoce al proveedor.
 
@@ -28,7 +32,35 @@ ChatGPT web          diseño / investigación / decisiones
 - **Three.js** se aprovecha como ecosistema de conocimiento y tooling: técnicas de materiales, agua, vegetación, arquitectura procedural, cámaras, shaders y QA. Una referencia Three se traduce a PlayCanvas o se bakea/exporta; no introduce `three` dentro del runtime de Ohmdal.
 - `img2threejs` queda como **watchlist/authoring experimental**. Puede entrar cuando su salida estructurada/GLB aporte valor comprobable. No bloquea producción ni define el formato canonical.
 
-## 2. Assets genéricos — prioridad cero de costo
+## 2. Gemini / Antigravity — comprimir contexto, no implementar
+
+Gemini se usa donde su contexto/multimodalidad evita gasto innecesario de Codex:
+
+- reconciliar muchas fuentes de lore/diseño/producción;
+- generar un `CODEX MINIMAL READING SET` antes de una tarea grande;
+- revisar screenshots, mapas, renders GLB y variantes;
+- fresh-eyes review independiente sobre el visual harness;
+- detectar contradicciones/documentación stale.
+
+Ruta:
+
+```text
+agent-work/tasks/gemini/*.md
+        ↓
+npm run agent:gemini -- --task ... --out ...
+        ↓
+Antigravity CLI / cached Google login
+        ↓
+agent-work/reports/gemini/*.md
+        ↓
+Codex verifica puntos load-bearing e implementa
+```
+
+El runner `scripts/agents/run-antigravity.mjs` es read-only por contrato y falla
+si detecta cambios en el worktree durante la corrida. No usar Gemini API,
+`--dangerously-skip-permissions` ni permisos de implementación para esta lane.
+
+## 3. Assets genéricos — prioridad cero de costo
 
 Antes de generar con IA:
 
@@ -40,7 +72,7 @@ Antes de generar con IA:
 
 La Plaza tiene su lista ejecutable en `OHMDAL_PLAZA_ASSET_CATALOG.json`; no abrir marketplaces si el catálogo resuelve la necesidad.
 
-## 3. Meshy — proveedor generativo primario si Pro está activo
+## 4. Meshy — proveedor generativo primario si Pro está activo
 
 ### Por qué encaja
 
@@ -93,7 +125,7 @@ concept / vistas
 - Nunca commitear `MESHY_API_KEY`.
 - Registrar `taskId`, modelo, parámetros, créditos consumidos, outputs y ruta canonical.
 
-## 4. Tripo — A/B y fallback fuerte, no dependencia base
+## 5. Tripo — A/B y fallback fuerte, no dependencia base
 
 Tripo V3 es útil cuando convenga alguno de estos puntos:
 
@@ -115,7 +147,7 @@ El CLI oficial puede ser usado por Codex desde terminal y soporta `tripo make`, 
 
 **Regla de costo:** Tripo webapp y Tripo API tienen billing/créditos separados. No adoptar un plan web esperando que financie automáticamente generación agentic. Usar Tripo cuando una prueba A/B demuestre mejor geometría, segmentación, rig o costo total para un asset concreto.
 
-## 5. Meshy vs Tripo — regla práctica
+## 6. Meshy vs Tripo — regla práctica
 
 No elegir por marca; ejecutar el mismo brief cuando el asset sea importante.
 
@@ -129,7 +161,7 @@ No elegir por marca; ejecutar el mismo brief cuando el asset sea importante.
 | Pieza mecánica con tolerancias reales | CAD/FreeCAD/OpenSCAD, no IA 3D |
 | Figura/prop imprimible no mecánico | Meshy/Tripo → Blender → STL/3MF |
 
-## 6. Three.js como cantera de técnicas
+## 7. Three.js como cantera de técnicas
 
 No instalar routers/directores Three.js en Roxana. Usar repos externos como referencias on-demand:
 
@@ -149,7 +181,7 @@ No instalar routers/directores Three.js en Roxana. Usar repos externos como refe
 
 Regla: **extraer mecanismo, no dependencia**. Si una receta habla de TSL/Three, traducir la intención y la matemática a PlayCanvas o bakearla a un asset.
 
-## 7. Visual feedback loop — obligatorio para calidad premium
+## 8. Visual feedback loop — obligatorio para calidad premium
 
 ```text
 acquire / generate
@@ -162,9 +194,9 @@ MULTI-VIEW VISUAL HARNESS
       ↓
 metrics + screenshots + console
       ↓
-scorecard / critic
+Gemini fresh-eyes critic
       ↓
-fix
+Codex fix
       └───────────────↺
 ```
 
@@ -172,7 +204,7 @@ Contrato común: `docs/3d/VISUAL_HARNESS.md`.
 
 Un agente no puede autoaprobar una escena porque compiló. Para claims `premium/AAA-like` debe existir evidencia desktop/mobile, vistas canónicas, baseline sin post, renderer diagnostics y revisión adversarial/fresh-eyes.
 
-## 8. Customuse — observar, no depender
+## 9. Customuse — observar, no depender
 
 Customuse es interesante como grafo multi-provider (Meshy/Tripo/Hunyuan + retopo/materiales/export), pero no entra al baseline actual:
 
@@ -182,7 +214,7 @@ Customuse es interesante como grafo multi-provider (Meshy/Tripo/Hunyuan + retopo
 
 Reevaluar sólo si Roxana empieza a producir assets en volumen suficiente para que un grafo multi-provider repetible ahorre más tiempo que su costo.
 
-## 9. Orden de decisión para cualquier asset Roxana
+## 10. Orden de decisión para cualquier asset Roxana
 
 ```text
 ¿Existe CC0 usable?
@@ -199,7 +231,7 @@ Meshy primary → Blender → GLB → QA
   └─ falla calidad/estructura → Tripo A/B
 ```
 
-## 10. Definition of Done de un asset agentic
+## 11. Definition of Done de un asset agentic
 
 No está terminado hasta tener:
 
