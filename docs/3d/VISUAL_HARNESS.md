@@ -166,7 +166,27 @@ Preferencia:
 2. pedir puntuación independiente y riesgos;
 3. reconciliar tomando el score menor salvo evidencia concreta.
 
-Si no hay reviewer/subagent disponible, hacer revisión adversarial: por cada categoría escribir primero el argumento más fuerte de por qué merece `1`, y recién después asignar score.
+Para Ohmdal, el reviewer preferido es Gemini/Antigravity por la lane read-only del
+harness. Task canonical:
+
+```text
+agent-work/tasks/gemini/ohmdal-plaza-visual-review.md
+```
+
+Invocación:
+
+```bash
+npm run agent:gemini -- \
+  --task agent-work/tasks/gemini/ohmdal-plaza-visual-review.md \
+  --out agent-work/reports/gemini/ohmdal-plaza-visual-review.md \
+  --model gemini-3.1-pro-high \
+  --effort high
+```
+
+Confirmar el slug con `agy models`; si cambió, usar el Gemini Pro/High vigente.
+El peer no modifica el repo; Codex verifica y aplica fixes.
+
+Si no hay reviewer disponible, hacer revisión adversarial: por cada categoría escribir primero el argumento más fuerte de por qué merece `1`, y recién después asignar score.
 
 Nunca seleccionar sólo las screenshots más lindas para el reviewer.
 
