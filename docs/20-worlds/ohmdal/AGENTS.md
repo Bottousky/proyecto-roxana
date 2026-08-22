@@ -66,6 +66,8 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
 - Blender: herramienta primaria para assets/GLB. El MCP oficial requiere el gate
   de seguridad documentado en `docs/80-production/AI_TOOLING.md`.
 - MiniMax: sólo por `mmx`; Codex revisa e integra.
+- Sourcing, Meshy opcional, skills candidatos y pipeline visual de la Plaza:
+  [`production/OHMDAL_3D_PRODUCTION_GUIDE.md`](production/OHMDAL_3D_PRODUCTION_GUIDE.md).
 
 ## Validación
 
