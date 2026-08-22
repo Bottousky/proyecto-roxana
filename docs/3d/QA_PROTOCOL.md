@@ -4,13 +4,12 @@
 
 - Desktop: 1440×900.
 - Mobile: 390×844.
-- Referencia.
+- Referencia aprobada.
 - Render actual.
 - Comparación lado a lado.
 - Dos ángulos adicionales para un volumen importante.
 
-Usar cámara, seed y estado reproducibles. Esperar la carga de assets y capturar errores de
-consola antes de aprobar.
+Usar cámara, seed y estado reproducibles. Esperar la carga de assets y capturar errores de consola antes de aprobar.
 
 ## Scorecard
 
@@ -32,12 +31,14 @@ No promediar para esconder un fallo obligatorio.
 ## Automatización
 
 1. Servir la app o el build local.
-2. Abrir con Playwright.
+2. Abrir con Playwright o el mecanismo de Launch/verificación del runtime.
 3. Esperar que desaparezca el estado de carga.
-4. Capturar consola, viewport y estado.
-5. Leer `window.__roxanaSchool3D` o un snapshot de `renderer.info`.
-6. Guardar salidas temporales en `output/playwright/`.
+4. Capturar consola, viewport y estado reproducible.
+5. Leer métricas expuestas por el runtime (`PlayCanvas` stats/snapshot en Ohmdal, `window.__roxanaSchool3D` o `renderer.info` sólo para experiencias Three.js heredadas).
+6. Guardar salidas temporales en `output/playwright/` o el staging definido por la tarea.
 7. Versionar sólo baselines aprobadas y evidencia deliberada.
+
+Cuando se use PlayCanvas Editor MCP, la validación debe incluir viewport + Launch + logs/runtime state; inspeccionar la escena fuente no alcanza.
 
 ## Reporte
 
@@ -56,5 +57,4 @@ performance:
   largest_assets: []
 ```
 
-Toda revisión enumera la diferencia principal, la corrección prioritaria y el riesgo de
-rendimiento. Sin captura y métricas, la escena queda `review-required`.
+Toda revisión enumera la diferencia principal, la corrección prioritaria y el riesgo de rendimiento. Sin captura y métricas, la escena queda `review-required`.
