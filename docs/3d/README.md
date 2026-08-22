@@ -10,11 +10,16 @@ Este directorio define el contrato operativo común para producir, integrar y re
 - [BUDGETS.md](BUDGETS.md): objetivos web y baseline medido.
 - [ASSET_PIPELINE.md](ASSET_PIPELINE.md): ciclo de vida, carpetas y comandos.
 - [QA_PROTOCOL.md](QA_PROTOCOL.md): capturas, scorecard y evidencia.
+- [VISUAL_HARNESS.md](VISUAL_HARNESS.md): contrato cross-runtime de hooks deterministas, multivista, métricas y fresh-eyes review.
 - [STATE.md](STATE.md): dirección y deuda técnica vigente.
 
-El harness y las herramientas de IA comunes viven en [`../80-production/AI_TOOLING.md`](../80-production/AI_TOOLING.md); este directorio no mantiene otra lista de skills o MCPs.
+El harness y las herramientas de IA comunes viven en [`../80-production/AI_TOOLING.md`](../80-production/AI_TOOLING.md); este directorio no mantiene otro router de agentes.
 
-Para la prueba 3D actual de Ohmdal, sus fuentes gratuitas, Meshy opcional, skills candidatos y art pass de la Plaza viven en [`../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md`](../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md).
+Para la prueba 3D actual de Ohmdal:
+
+- guía general: [`../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md`](../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md);
+- proveedores/authoring agentic: [`../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md`](../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md);
+- primer art pass ejecutable: [`../20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md`](../20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md).
 
 ## Contratos ejecutables
 
