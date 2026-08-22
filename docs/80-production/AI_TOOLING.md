@@ -9,11 +9,101 @@
 | Humano / Manuel | objetivos, decisiones materiales, canon e integración de milestones |
 | ChatGPT web | diseño, investigación, planificación y specs |
 | Codex | única autoridad técnica; modifica, integra, prueba y valida |
-| Gemini | peer multimodal/contextual; entrega informes reproducibles |
+| Gemini / Antigravity | peer de contexto amplio, multimodal y fresh-eyes review |
 | MiniMax | worker por CLI `mmx`; nunca aprueba su propio resultado |
 
 No existe un router automático ni un meta-framework. El mecanismo normal es
 `archivo + terminal + git`.
+
+## Gemini por Antigravity CLI — sin API
+
+La ruta canónica para aprovechar Gemini desde el repo es **Antigravity CLI
+`agy` con login local de Google**, no `GEMINI_API_KEY`, Vertex ni AI Studio API.
+Antigravity headless reutiliza las credenciales cacheadas del login interactivo.
+
+Instalación oficial en Windows PowerShell:
+
+```powershell
+irm https://antigravity.google/cli/install.ps1 | iex
+agy
+```
+
+La primera ejecución abre el navegador si no existe una sesión válida. Luego:
+
+```bash
+agy models
+npm run agent:gemini:check
+```
+
+El wrapper repo-native es:
+
+```text
+scripts/agents/run-antigravity.mjs
+```
+
+Uso:
+
+```bash
+npm run agent:gemini -- \
+  --task agent-work/tasks/gemini/ohmdal-plaza-context-audit.md \
+  --out agent-work/reports/gemini/ohmdal-plaza-context-audit.md \
+  --model gemini-3.1-pro-high \
+  --effort high
+```
+
+Antes de fijar un slug, `agy models` es la fuente de verdad. Si el modelo anterior
+ya no aparece, elegir el Gemini Pro/High más fuerte disponible para auditorías
+profundas; usar Flash/Medium para clasificación, síntesis o revisiones frecuentes.
+También se puede definir `ROXANA_GEMINI_MODEL` / `ROXANA_GEMINI_EFFORT`.
+
+### Qué hace el wrapper
+
+- llama `agy -p` en headless;
+- pide JSON y captura sólo la respuesta final;
+- usa `--sandbox` y nunca `--dangerously-skip-permissions`;
+- obliga a persistir informes bajo `agent-work/reports/gemini/`;
+- instruye al peer a no ejecutar shell ni tocar archivos;
+- toma fingerprint Git antes/después y **falla si el worktree cambia**;
+- no lee ni imprime tokens, OAuth profiles, `.env` ni claves de proveedores;
+- no contiene ninguna integración API de Gemini.
+
+No usar `--dangerously-skip-permissions` para este flujo. Los peer tasks son de
+lectura/análisis; si Gemini necesita modificar código, el brief está mal
+particionado y la implementación debe volver a Codex.
+
+### Cuándo delegar a Gemini
+
+Delegar antes de ampliar mucho el contexto de Codex cuando haya:
+
+- reconciliación de muchas fuentes/documentos;
+- análisis del mundo completo o cross-document consistency;
+- screenshots, mapas, renders GLB, video o comparación de variantes;
+- fresh-eyes visual review independiente;
+- selección/priorización de un reading set mínimo para Codex.
+
+No delegar:
+
+- fixes locales de pocos archivos;
+- integración final;
+- cambios de engine/dependencias/canon;
+- aprobación del propio trabajo;
+- tareas cuya salida útil sería directamente un diff de implementación.
+
+Dos briefs listos para Ohmdal:
+
+```text
+agent-work/tasks/gemini/ohmdal-plaza-context-audit.md
+agent-work/tasks/gemini/ohmdal-plaza-visual-review.md
+```
+
+El primero destila el contexto antes del art pass; el segundo recibe el set
+completo de capturas/métricas como reviewer independiente.
+
+Fuentes oficiales de operación:
+
+- `https://antigravity.google/docs/cli/getting-started`
+- `https://antigravity.google/docs/cli/headless/`
+- `https://antigravity.google/docs/cli/install`
 
 ## MiniMax por terminal
 
@@ -40,18 +130,6 @@ mmx vision archivo.png --output json
 La skill oficial `mmx-cli` está instalada globalmente. La skill local
 `roxana-minimax` agrega sólo las reglas específicas anteriores.
 
-## Gemini
-
-El intercambio es deliberadamente manual:
-
-```text
-agent-work/tasks/gemini/    brief humano/Codex
-agent-work/reports/gemini/  informe de Gemini
-```
-
-El brief declara objetivo, archivos/fuentes, límites y salida. Gemini puede leer
-el repo y producir informes; Codex verifica hechos, decide cambios e integra.
-
 ## PlayCanvas
 
 - Target de Ohmdal: PlayCanvas Engine v2 + TypeScript + Vite + glTF/GLB.
@@ -65,7 +143,7 @@ el repo y producir informes; Codex verifica hechos, decide cambios e integra.
   `tests/playcanvas-ohmdal.test.ts` quedaron verdes. Logs estáticos antiguos no
   se consideran fuente de verdad.
 - `.github/workflows/validate.yml` valida ramas `explore/**` y PRs; además hace
-  syntax-check de los helpers de adquisición 3D antes del gate del repo.
+  syntax-check de helpers agentic/3D antes del gate del repo.
 - Skills oficiales: las entradas registradas desde `playcanvas/skills` en
   `skills-lock.json`; cargar sólo la que corresponda a la tarea.
 - MCP oficial: `@playcanvas/editor-mcp-server` 0.6.1, registrado en Codex como
@@ -95,8 +173,7 @@ Meshy es un **proveedor de producción 3D opcional**, no otro harness.
 Rutas oficiales actuales:
 
 - REST API: text/image/multi-image → 3D, refine, remesh, retexture, rig, animate.
-- MCP oficial: `@meshy-ai/meshy-mcp-server`.
-- Agent skill oficial: `meshy-dev/meshy-3d-agent`.
+- MCP oficial y Agent Skill oficiales.
 
 Usar sólo cuando exista plan/crédito aprobado para un sprint de assets. Guardar
 `MESHY_API_KEY` fuera del repo. MCP/REST consumen el balance de la cuenta; cada
@@ -114,17 +191,15 @@ La política de Ohmdal vive en
 ## Tripo
 
 Tripo es A/B/fallback, no dependencia base. Su CLI oficial puede ser operado por
-Codex desde terminal (`tripo make`, presets game/mobile/print, batch, doctor) y
-también puede exponer `tripo mcp` si una tarea futura lo justifica.
+Codex desde terminal y también puede exponer MCP si una tarea futura lo justifica.
 
-No instalarlo por defecto ni asumir que créditos del webapp pagan la API: el
-billing web/API es separado. Se usa sólo cuando calidad, segmentación, rig,
-low-poly o batch demuestren ventaja concreta frente a Meshy/Blender.
+No instalarlo por defecto ni asumir que créditos del webapp pagan la API. Se usa
+sólo cuando calidad, segmentación, rig, low-poly o batch demuestren ventaja
+concreta frente a Meshy/Blender.
 
 ## Cuándo usar MCP
 
-MCP no está limitado por dogma a dos aplicaciones; está limitado por **valor
-probado y servidor oficial**.
+MCP está limitado por **valor probado y servidor oficial**, no por moda.
 
 Default:
 
@@ -132,6 +207,7 @@ Default:
 - Blender oficial: sí bajo gate de seguridad.
 - Meshy oficial: opcional en sprint de assets aprobado.
 - Tripo: preferir CLI; MCP sólo si aporta valor concreto.
+- Antigravity/Gemini: **CLI `agy`, no MCP/API**, para el peer flow actual.
 - Git, npm, Vite, tests, `mmx`, scripts y transformaciones glTF: terminal.
 
 No crear MCPs propios para envolver herramientas que ya tienen CLI/API/servidor
@@ -143,7 +219,7 @@ Para trabajo visual premium, el cierre no es `build PASS` sino:
 
 ```text
 build → browser → deterministic state → multiview capture
-      → renderer diagnostics → scorecard → critic → fix
+      → renderer diagnostics → Gemini fresh-eyes critic → Codex fix
 ```
 
 Contrato cross-runtime: `docs/3d/VISUAL_HARNESS.md`.
@@ -155,10 +231,11 @@ runtime de Ohmdal por ese motivo.
 ## Mantener barato el contexto de Codex
 
 1. Leer `AGENTS.md`, el `AGENTS.md` del scope y los archivos directos.
-2. Cargar una skill concreta sólo cuando cambie decisiones de la tarea.
-3. No cargar recovery/history ni otras áreas por defecto.
-4. Pasar a MiniMax briefs acotados y revisar artefactos, no transcripciones.
-5. Pedir a Gemini informes persistidos cuando el análisis multimodal/extenso
-   tenga valor reutilizable.
-6. Para assets, usar catálogo/task packet y registrar outputs; no pedir a Codex
+2. Si la tarea pide muchas fuentes, delegar primero context distillation a
+   Gemini/Antigravity y consumir su `CODEX MINIMAL READING SET`.
+3. Cargar una skill concreta sólo cuando cambie decisiones de la tarea.
+4. No cargar recovery/history ni otras áreas por defecto.
+5. Pasar a MiniMax briefs acotados y revisar artefactos, no transcripciones.
+6. Usar Gemini para fresh-eyes/multimodal; Codex valida sólo claims load-bearing.
+7. Para assets, usar catálogo/task packet y registrar outputs; no pedir a Codex
    que redescubra proveedores y licencias en cada sesión.
