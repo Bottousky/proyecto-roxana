@@ -57,14 +57,11 @@ if (has('--help') || has('-h')) {
 }
 
 if (has('--check')) {
-  const version = run('agy', ['--version']);
-  if (version.error || version.status !== 0) {
+  const models = run('agy', ['models']);
+  if (models.error) {
     console.error('Antigravity CLI (agy) is missing or not runnable. See docs/80-production/AI_TOOLING.md.');
     process.exit(2);
   }
-  console.log(version.stdout.trim() || version.stderr.trim());
-
-  const models = run('agy', ['models']);
   if (models.status !== 0) {
     console.error(models.stderr.trim() || 'agy models failed. Launch `agy` interactively once and complete Google sign-in.');
     process.exit(3);
