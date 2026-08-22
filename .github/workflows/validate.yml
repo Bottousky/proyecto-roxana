@@ -22,6 +22,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --check scripts/agents/run-antigravity.mjs
+      - run: node scripts/agents/run-antigravity.mjs --help
       - run: node --check scripts/3d/fetch-polyhaven.mjs
       - run: node --check scripts/3d/inventory-vendor-pack.mjs
       - run: npm run verify
