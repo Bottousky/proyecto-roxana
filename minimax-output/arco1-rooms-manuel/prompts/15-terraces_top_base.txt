@@ -1,0 +1,14 @@
+# Terraza alta — un escalón
+# Guardar como: terraces_top_base.png
+# Lienzo nativo (1px = 1px de juego): 960x1080
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x1080 — taller than wide: one hillside STEP looking SOUTH down the valley. More sky/valley in the south half.
+
+NORTH path (top) back to Plaza. SOUTH stairs (bottom) down to mid terrace.
+CENTER landmark: high sluice of wood-stone-copper, CLOSED. Dry empty ceramic channels. Dry earth. Afternoon dust. NO flowing water. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (974 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x1080 Terraza alta, one stepped hillside looking south. North path to Plaza, south stairs down. Center high sluice CLOSED, dry channels. Dry earth, afternoon dust. More valley to the south. No flowing water. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

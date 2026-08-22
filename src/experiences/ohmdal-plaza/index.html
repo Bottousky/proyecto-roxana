@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="icon" href="data:," />
+  <title>Ohmdal · Plaza Central (HD-2D Greenfield)</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="plaza-app">
+    <!-- 3D WebGL Canvas Container -->
+    <div id="plaza-game"></div>
+
+    <!-- First-Person Center Reticle -->
+    <div id="plaza-reticle"></div>
+
+    <!-- Title Screen -->
+    <div id="plaza-title">
+      <div class="plaza-title-card">
+        <div class="plaza-emblem">⚡ 🏛️ ⚡</div>
+        <p class="plaza-kicker">PROYECTO ROXANA · GREENFIELD EXPLORATION</p>
+        <h1>La Plaza de Ohmdal</h1>
+        <p class="plaza-sub">HD-2D · Misterio Sistémico · Investigación Diegética</p>
+        <p class="plaza-note">
+          Una civilización medieval que olvidó cómo funcionaba la electricidad y convirtió los circuitos en supersticiones.
+          Caminá, medí con Ohm, investigá reliquias y restablecé el camino de retorno.
+        </p>
+        <div class="plaza-buttons">
+          <button id="plaza-enter" type="button">Entrar a la Plaza</button>
+        </div>
+        <p class="plaza-help">WASD / Flechas / Clic para caminar · <b>M</b> Galvanoscopio · <b>TAB</b> Bitácora · <b>E</b> Interactuar</p>
+      </div>
+    </div>
+
+    <!-- In-Game HUD -->
+    <header id="plaza-hud" class="hidden">
+      <div class="hud-left">
+        <button id="plaza-back" type="button" title="Volver al Instituto">← Instituto</button>
+        <div id="plaza-inventory" class="inventory-pill hidden">
+          <span class="inv-icon">🧰</span> <span id="inventory-text">Sin objetos</span>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <button id="btn-galvanoscope" type="button" class="hud-tool-btn" title="Galvanoscopio de Ohm (M)">
+          ⚡ Galvanoscopio [M]
+        </button>
+        <button id="btn-bitacora" type="button" class="hud-tool-btn" title="Bitácora de Descubrimientos (TAB)">
+          📖 Bitácora [TAB]
+        </button>
+        <button id="btn-mute" type="button" class="hud-tool-btn" title="Sonido">🔊</button>
+      </div>
+    </header>
+
+    <!-- Contextual Prompt (Hover/Proximity) -->
+    <div id="plaza-prompt" class="hidden"></div>
+
+    <!-- Notification Toast -->
+    <div id="plaza-toast" class="hidden"></div>
+
+    <!-- Dialogue Box -->
+    <div id="plaza-dialog" class="hidden">
+      <div class="dialog-avatar-frame">
+        <div id="plaza-dialog-avatar">👤</div>
+      </div>
+      <div class="dialog-content">
+        <div id="plaza-dialog-who"></div>
+        <div id="plaza-dialog-text"></div>
+        <div id="plaza-dialog-choices" class="dialog-choices hidden"></div>
+      </div>
+      <div id="plaza-dialog-next">E / Clic ▾</div>
+    </div>
+
+    <!-- Outer Wilds Style Galvanoscope Tool Overlay -->
+    <aside id="galvanoscope-overlay" class="hidden">
+      <div class="galvano-panel">
+        <div class="galvano-header">
+          <span class="galvano-title">⚡ GALVANOSCOPIO DE OHM</span>
+          <button id="btn-close-galvano" type="button" class="btn-close-tool">✕</button>
+        </div>
+        
+        <!-- Retro Analog Gauge -->
+        <div class="analog-gauge-container">
+          <div class="gauge-dial">
+            <div id="gauge-needle" class="gauge-needle"></div>
+            <div class="gauge-scale">
+              <span>0V</span>
+              <span>12V</span>
+              <span>24V</span>
+              <span>30V</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Digital Readout Display -->
+        <div class="galvano-readouts">
+          <div class="readout-box">
+            <span class="readout-label">TENSIÓN (ΔV)</span>
+            <span id="readout-voltage" class="readout-value">0.0 V</span>
+          </div>
+          <div class="readout-box">
+            <span class="readout-label">RESISTENCIA (R)</span>
+            <span id="readout-resistance" class="readout-value">∞ Ω</span>
+          </div>
+          <div class="readout-box">
+            <span class="readout-label">CORRIENTE (I)</span>
+            <span id="readout-current" class="readout-value">0.00 A</span>
+          </div>
+        </div>
+
+        <!-- Probes Connection Status -->
+        <div class="probe-status-row">
+          <div class="probe-tag probe-a">
+            <span class="probe-dot red-dot"></span> Punta A (+): <b id="probe-a-name">Ninguna</b>
+          </div>
+          <div class="probe-tag probe-b">
+            <span class="probe-dot black-dot"></span> Punta B (-): <b id="probe-b-name">Ninguna</b>
+          </div>
+        </div>
+
+        <div id="galvano-diagnostic" class="galvano-diagnostic">
+          Tocá dos bornes o rieles de la plaza para medir la diferencia de potencial.
+        </div>
+
+        <button id="btn-reset-probes" type="button" class="btn-tool-action">Desconectar Puntas</button>
+      </div>
+    </aside>
+
+    <!-- Outer Wilds Style Bitácora (Rumor Graph) Modal -->
+    <div id="bitacora-modal" class="hidden">
+      <div class="bitacora-container">
+        <div class="bitacora-header">
+          <h2>📖 BITÁCORA DE INVESTIGACIÓN · OHMDAL</h2>
+          <div class="bitacora-stats">
+            <span id="bitacora-progress-text">Progreso: 3 / 7 misterios comprendidos</span>
+          </div>
+          <button id="btn-close-bitacora" type="button" class="btn-close-tool">✕ Cerrar [TAB]</button>
+        </div>
+
+        <div id="bitacora-graph" class="bitacora-graph">
+          <!-- Graph Cards dynamically populated -->
+        </div>
+
+        <div class="bitacora-footer">
+          <span class="legend-item"><span class="legend-badge rumor"></span> Superstición / Relato</span>
+          <span class="legend-item"><span class="legend-badge investigating"></span> En Investigación</span>
+          <span class="legend-item"><span class="legend-badge discovered"></span> Ley Física Comprobada</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Broken Sword Style Close-Up Relic Workbench Modal -->
+    <div id="workbench-modal" class="hidden">
+      <div class="workbench-container">
+        <div class="workbench-header">
+          <h2 id="workbench-title">EXAMEN DE RELIQUIA</h2>
+          <button id="btn-close-workbench" type="button" class="btn-close-tool">✕ Volver a la Plaza</button>
+        </div>
+
+        <div id="workbench-content" class="workbench-content">
+          <!-- Dynamic close-up interactive illustration -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

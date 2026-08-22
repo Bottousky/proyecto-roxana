@@ -10,11 +10,12 @@ alterar el shell, Ohmdal ni los modelos pedagógicos.
 - [SCALE_BIBLE.md](SCALE_BIBLE.md): unidades, orientación y medidas guía.
 - [BUDGETS.md](BUDGETS.md): objetivos web y baseline medido.
 - [ASSET_PIPELINE.md](ASSET_PIPELINE.md): ciclo de vida, carpetas y comandos.
-- [MESHY_POLICY.md](MESHY_POLICY.md): créditos, secretos y aprobación humana.
 - [QA_PROTOCOL.md](QA_PROTOCOL.md): capturas, scorecard y evidencia.
-- [TOOLCHAIN_LOCK.md](TOOLCHAIN_LOCK.md): skills y fuentes fijadas.
-- [STATE.md](STATE.md): estado vigente para el siguiente agente.
-- [SETUP_REPORT.md](SETUP_REPORT.md): ejecución y evidencia de este setup.
+- [STATE.md](STATE.md): estado técnico e histórico vigente.
+
+El harness y las herramientas de IA comunes viven en
+[`../80-production/AI_TOOLING.md`](../80-production/AI_TOOLING.md); este
+directorio no mantiene otra lista de skills o MCPs.
 
 ## Contratos ejecutables
 

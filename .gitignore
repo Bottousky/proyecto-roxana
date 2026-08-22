@@ -24,12 +24,6 @@ docs/superpowers/
 .playtest/**/*.stdout.log
 .playtest/**/*.bin
 
-# --- Backup / temp agent / config files ---
-.codex/agents/.backup-*/
-.codex/agents/**/.backup-*/
-AGENTS.md.backup-*
-*.disabled
-
 # --- Source tree under src/ is TS/TSX only. Stale .js that crept in
 #     (e.g. ExplorationScene.js committed by accident) must NOT be tracked.
 #     Build output belongs in dist/. ---

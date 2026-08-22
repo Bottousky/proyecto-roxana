@@ -1,0 +1,18 @@
+# Taller de Lumen (interior, una pantalla)
+# Guardar como: taller_base.png
+# Lienzo nativo (1px = 1px de juego): 960x540
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x540 — one-screen interior, like a Pokémon house. Closed workshop of Taller de Lumen. Human craft, not a wizard lab.
+
+Implicit ceiling. Warm dusty afternoon from a WEST window. ONLY EXIT: south-center doorway back to Plaza. No extra doors.
+
+Walkable wood+stone floor ~75% clear.
+WEST: worn wood workbench, ceramic trays, glass instruments.
+BACK: shelves of insulators, coiled copper, wooden boxes.
+EAST: dormant wood-copper generator cabinet, unlit. No fire, no glowing copper. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (1053 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x540 Taller de Lumen one-screen interior. West window light. ONLY south-center doorway. Walkable wood-stone floor ~75%. West workbench with ceramic trays and glass instruments. Back shelves of insulators and coiled copper. East dormant generator cabinet. Human craft, not a fantasy lab. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

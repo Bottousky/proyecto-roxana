@@ -1,0 +1,15 @@
+# Torre del Reloj (mapa alto)
+# Guardar como: clock_tower_base.png
+# Lienzo nativo (1px = 1px de juego): 960x1620
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x1620 — TALL tower map, three screens. Not 16:9.
+
+LOWER third: walkable stone platform around the tower base. WEST door from bench. EAST door toward lantern climb.
+UPPER two thirds: HUGE stopped clock face of bronze, glass, and stone. Frozen hands. NO glow. Gears behind glass.
+Twilight sky around the face. The clock IS the silhouette. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (1002 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x1620 tall Torre del Reloj. Lower third walkable platform, west door from bench, east door to lantern. Upper two thirds HUGE stopped clock face bronze-glass-stone, frozen hands, no glow. Gears behind glass. Twilight. Not a square room. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

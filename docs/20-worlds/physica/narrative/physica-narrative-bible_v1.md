@@ -42,7 +42,7 @@ explica lo que el sistema no puede mostrar, y nunca lo duplica.
 > **guion v0.2** (ver `docs/physica/spec-vertical-slice.md` §5).
 > Este documento **no** lo reescribe. Cualquier nuevo texto del
 > juego debe pasar por `TODO(guion)` y aviso a Manuel, según
-> `CLAUDE.md`.
+> `AGENTS.md`.
 
 ---
 

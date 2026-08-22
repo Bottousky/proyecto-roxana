@@ -1,0 +1,13 @@
+# Calzada / Puerta de Ohm — ABIERTA
+# Guardar como: puerta_open.png
+# Lienzo nativo (1px = 1px de juego): 960x1620
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x1620. EXACT SAME tall calzada as the closed version.
+
+ONLY CHANGE: monumental leaves OPEN. The north third is now a walkable calzada toward a dry manantial channel. No cyan glow. No people. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (957 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x1620 same tall Calzada. North monumental leaves OPEN revealing walkable north road toward dry manantial channel. South plaza arch remains. Center still-water basin. No cyan glow. No people. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

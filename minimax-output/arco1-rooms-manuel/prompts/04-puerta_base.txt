@@ -1,0 +1,19 @@
+# Calzada / Puerta de Ohm — CERRADA (mapa alto)
+# Guardar como: puerta_base.png
+# Lienzo nativo (1px = 1px de juego): 960x1620
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x1620 — TALL map, three screens stacked (Pokemon route). This is a NORTH-SOUTH road, not a square courtyard. Do not compose 16:9.
+
+SOUTH third (y~1080..1620): cobble arriving from Plaza. Bottom-center arch back to Plaza.
+
+MIDDLE third (y~540..1080): LANDMARK — monumental stone Puerta de Ohm, leaves CLOSED. Copper in jambs, ceramic seals, NO cyan glow. A small still-water basin SOUTH of the threshold; player walks AROUND it. Water is not floor.
+
+NORTH third (y~0..540): calzada continuing toward the Manantial, still behind the CLOSED leaves — hint of dry channel beyond, but the leaves block the way. Unlit lamps along the road.
+
+Walkable cobble is a N-S strip. Perimeter is stone retaining walls, not plaza merlons. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (1065 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 960x1620 TALL Calzada, three screens high, not 16:9. South third: cobble and bottom-center arch to Plaza. Middle: monumental Puerta de Ohm CLOSED, copper jambs, small still basin with walk-around. North third: calzada toward manantial blocked by closed leaves. Unlit lamps. Gate road, not a courtyard. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

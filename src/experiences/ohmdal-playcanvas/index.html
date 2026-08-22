@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="icon" href="data:," />
+  <title>Ohmdal · PlayCanvas Engine v2 (Outer Wilds Style)</title>
+  <link rel="stylesheet" href="../ohmdal-plaza/styles.css" />
+</head>
+<body>
+  <div id="plaza-app">
+    <!-- PlayCanvas Canvas Host -->
+    <div id="plaza-game"></div>
+    <div id="plaza-reticle"></div>
+
+    <!-- Title Screen -->
+    <div id="plaza-title">
+      <div class="plaza-title-card">
+        <div class="plaza-emblem">🪐 ⚡ 🏛️</div>
+        <p class="plaza-kicker">PLAYCANVAS ENGINE v2 · OUTER WILDS DIRECTION</p>
+        <h1>Ohmdal 3D: La Red Olvidada</h1>
+        <p class="plaza-sub">Mundo Continuo · El Conocimiento es la Progresión</p>
+        <p class="plaza-note">
+          Una civilización medieval que convirtió la electricidad en superstición.
+          Explorá en 1ª persona, medí con el galvanoscopio analógico, investigá reliquias y repara el lazo de corriente.
+        </p>
+        <div class="plaza-buttons">
+          <button id="plaza-enter" type="button">Entrar a Ohmdal</button>
+        </div>
+        <p class="plaza-help">WASD para moverte · Ratón para mirar · <b>Clic / E</b> Interactuar / Medir · <b>M</b> Galvanoscopio · <b>TAB</b> Cuaderno de Edda</p>
+      </div>
+    </div>
+
+    <!-- In-Game HUD -->
+    <header id="plaza-hud" class="hidden">
+      <div class="hud-left">
+        <button id="plaza-back" type="button" title="Volver">← Instituto</button>
+        <div id="plaza-inventory" class="inventory-pill hidden">
+          <span class="inv-icon">🧰</span> <span id="inventory-text">Sin objetos</span>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <button id="btn-galvanoscope" type="button" class="hud-tool-btn" title="Galvanoscopio (M)">
+          ⚡ Galvanoscopio [M]
+        </button>
+        <button id="btn-bitacora" type="button" class="hud-tool-btn" title="Cuaderno de Edda (TAB)">
+          📜 Cuaderno [TAB]
+        </button>
+      </div>
+    </header>
+
+    <!-- Contextual Prompt -->
+    <div id="plaza-prompt" class="hidden"></div>
+
+    <!-- Galvanoscopio Handheld Telemetry HUD -->
+    <div id="galvanoscope-hud" class="hidden">
+      <div class="galv-header">
+        <span class="galv-title">⚡ GALVANOSCOPIO DE LUMEN</span>
+        <span id="galv-status" class="galv-status">Listo</span>
+      </div>
+      <div class="galv-readouts">
+        <div class="galv-box">
+          <span class="galv-lbl">TENSIÓN (V)</span>
+          <span id="galv-voltage" class="galv-val">0.00 V</span>
+        </div>
+        <div class="galv-box">
+          <span class="galv-lbl">RESISTENCIA (Ω)</span>
+          <span id="galv-resistance" class="galv-val">∞ Ω</span>
+        </div>
+        <div class="galv-box">
+          <span class="galv-lbl">CORRIENTE (A)</span>
+          <span id="galv-current" class="galv-val">0.00 A</span>
+        </div>
+      </div>
+      <div class="galv-probes">
+        <span class="probe-tag red">Sonda A (+)</span> <span id="probe-a-text">Desconectada</span>
+        <span class="probe-sep">|</span>
+        <span class="probe-tag black">Sonda B (-)</span> <span id="probe-b-text">Desconectada</span>
+      </div>
+    </div>
+
+    <!-- Dialog Box -->
+    <div id="plaza-dialog" class="hidden">
+      <div class="dialog-card">
+        <div class="dialog-portrait-box">
+          <img id="dialog-portrait" src="" alt="Retrato" />
+        </div>
+        <div class="dialog-body">
+          <h3 id="dialog-speaker">Nombre</h3>
+          <p id="dialog-text">Texto de diálogo...</p>
+          <div id="dialog-choices" class="dialog-choices hidden"></div>
+          <div class="dialog-footer">
+            <span class="dialog-hint">[E / Clic para continuar]</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cuaderno de Edda (Bitácora de Deducciones / Ship Log) -->
+    <div id="bitacora-modal" class="hidden">
+      <div class="bitacora-window">
+        <div class="bitacora-header">
+          <h2>📜 Cuaderno de Edda · Red de Deducciones</h2>
+          <button id="bitacora-close" type="button">Cerrar [TAB]</button>
+        </div>
+        <div class="bitacora-layout">
+          <div id="bitacora-graph" class="bitacora-graph"></div>
+          <div id="bitacora-details" class="bitacora-details">
+            <h3 id="node-title">Seleccioná un nodo</h3>
+            <p id="node-category" class="node-cat"></p>
+            <p id="node-status-text" class="node-st"></p>
+            <hr />
+            <p id="node-lore-text" class="node-desc">Hacé clic en cualquier entrada de la bitácora para leer las deducciones.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Relic Inspection Workbench -->
+    <div id="workbench-modal" class="hidden">
+      <div class="workbench-window">
+        <div class="workbench-header">
+          <h2 id="workbench-title">Inspección de Reliquia</h2>
+          <button id="workbench-close" type="button">Volver a Explorar</button>
+        </div>
+        <div class="workbench-body">
+          <div id="workbench-canvas" class="workbench-canvas">
+            <div id="workbench-visual"></div>
+          </div>
+          <div class="workbench-sidebar">
+            <p id="workbench-desc">Descripción de la reliquia...</p>
+            <div id="workbench-actions" class="workbench-actions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="plaza-toast" class="hidden"></div>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

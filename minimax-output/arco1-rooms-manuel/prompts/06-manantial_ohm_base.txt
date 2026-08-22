@@ -1,0 +1,18 @@
+# Manantial de Ohm (mapa alto icónico)
+# Guardar como: manantial_ohm_base.png
+# Lienzo nativo (1px = 1px de juego): 1080x1620
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1080x1620 — tall iconic spring, not a square room.
+
+SOUTH third: path from the gate, small plaza-circle, walkable stone.
+MIDDLE: approach around the basin rim.
+UPPER-CENTER landmark: circular still basin, stone rim, water DETAINED glassy not flowing. Copper cauce-maestro leaving northwest. Water is NOT floor.
+ENE: stone mirador toward a distant dark inland lake and hinted lighthouse.
+
+Low ceramic markers with NO letters. Misty dusk-cool air. Cooler than Plaza. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (1024 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1080x1620 tall Manantial de Ohm. Upper-center circular still basin, water DETAINED, copper cauce-maestro NW. South path from the gate. ENE mirador toward distant dark lake and hinted lighthouse. Walkable south and east of basin. No letters, no people, no glow. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

@@ -38,6 +38,18 @@ const OVERLAY_MARKUP = `
 
 <div id="bench" class="hidden"></div>
 
+<aside id="field-dock" class="hidden" aria-live="polite">
+  <div class="field-dock-title"></div>
+  <div class="field-dock-ohm"></div>
+  <div class="field-dock-needle hidden">
+    <div class="field-dock-needle-track"><div class="field-dock-needle-fill"></div></div>
+    <div class="field-dock-needle-label"></div>
+  </div>
+  <div class="field-dock-inv"></div>
+  <div class="field-dock-status"></div>
+  <button type="button" id="field-dock-energize" class="hidden">Energizar</button>
+</aside>
+
 <div id="bitacora" class="hidden"></div>
 
 <div id="end-screen" class="hidden"></div>

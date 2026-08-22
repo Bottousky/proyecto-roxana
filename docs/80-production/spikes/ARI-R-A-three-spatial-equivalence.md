@@ -17,10 +17,8 @@ paired_with: ARI-R-B
 
 - Pair: `ARI-R-B`.
 - Mismo baseline y transformation core.
-- Builder: MiniMax M3 / MiniMax Code.
-- Player Agent: GPT-5.6 Luna blind-first.
-- Repair: DeepSeek V4 Flash.
-- Adversarial review: mismo GLM pin de B.
+- Integración técnica: Codex.
+- Mismo protocolo de playtest blind-first y revisión para A y B.
 - Normal loops: 1–3; hard cap: 5.
 - No leer/copiar implementación específica de B.
 - Usar versión Three ya fijada por el baseline del spike salvo que la pregunta del experimento sea explícitamente una actualización.
@@ -81,8 +79,8 @@ No usar perspectiva dramática, sombras o VFX si ocultan conteo/invariantes.
 - [ ] profundidad no requiere rotar cámara para entender el estado principal.
 - [ ] ninguna oclusión crítica impide contar/relacionar objetos.
 - [ ] touch puede seleccionar/agrupar sin precisión motriz fina.
-- [ ] Player Agent sin BLOCKER/MAJOR.
-- [ ] adversarial reviewer sin BLOCKER/MAJOR.
+- [ ] playtest blind-first sin BLOCKER/MAJOR.
+- [ ] revisión comparativa sin BLOCKER/MAJOR.
 
 ## Evidence
 
@@ -90,7 +88,7 @@ No usar perspectiva dramática, sombras o VFX si ocultan conteo/invariantes.
 - loops/intervención humana;
 - screenshots estados clave desktop/mobile;
 - video/sequence de transformación si ayuda;
-- Player Agent report;
+- informe de playtest;
 - errores/ambigüedades de percepción;
 - performance sólo si material;
 - lista de conceptos para los que Three agregó valor y para los que agregó ruido.

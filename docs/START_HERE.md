@@ -1,8 +1,10 @@
 # Proyecto Roxana — norte de producto
 
-**Estado:** actualizado el 16 de agosto de 2026.
+**Estado:** actualizado el 22 de agosto de 2026.
 
-Este archivo responde **qué estamos construyendo**. El orden de ejecución vive en [`../ROADMAP.md`](../ROADMAP.md); cómo trabajan los agentes vive en [`../AGENTS.md`](../AGENTS.md) y [`80-production/agentic/`](80-production/agentic/).
+Este archivo responde **qué estamos construyendo**. El orden de ejecución vive
+en [`../ROADMAP.md`](../ROADMAP.md) y la operación técnica en
+[`../AGENTS.md`](../AGENTS.md).
 
 ## La decisión en una frase
 
@@ -35,14 +37,12 @@ El objetivo no es “cubrir temario” si la representación no enseña. Un conc
 | Scope | Verbo / función | Fantasía / dirección | Tecnología como hipótesis de producción |
 |---|---|---|---|
 | **Instituto** | unir / recordar / transformar | hogar transformable que materializa progreso, personajes, preguntas y memoria | Three.js axonométrico + DOM; todavía debe demostrar que no se convierte en un menú 3D |
-| **Ohmdal** | **CONECTAR** | aventura/RPG HD-2D donde electricidad e infraestructura reaccionan al jugador | **Three.js HD-2D**; confianza alta, riesgo principal = producibilidad de escenarios/assets |
+| **Ohmdal** | **CONECTAR** | aventura explorable donde electricidad e infraestructura reaccionan al jugador | **PlayCanvas Engine v2 + TypeScript**; transición técnica todavía no cerrada |
 | **Physica** | **EXPERIMENTAR** | plataformas/sandbox físico donde el jugador siente relaciones antes de escribirlas | **Babylon.js + modelos analíticos TS**; 2.5D default, 3D sólo cuando compra comprensión real |
 | **Bitland** | **PROGRAMAR** | **máquina-ciudad dentro de un microcontrolador**, visible mientras ejecuta programas | simulation core TS + DOM; **PixiJS y Phaser 4 compiten en spikes separados** |
 | **Arithmos** | **TRANSFORMAR** | mundo cuya representación evoluciona mientras una misma estructura matemática se conserva | transformation core TS + **Three.js / PixiJS-SVG / DOM** según la representación |
 
 El Pilar P12 manda: Roxana une los mundos, **no los uniforma**. Engine, cámara, género y arte no se comparten por conveniencia técnica.
-
-La evaluación detallada está en [`80-production/agentic/ENGINE_MATRIX.md`](80-production/agentic/ENGINE_MATRIX.md).
 
 ---
 
@@ -73,16 +73,18 @@ North Star:
 
 Dirección vigente:
 
-- Three.js;
-- lenguaje HD-2D / 2.5D inspirado en dioramas 3D + sprites 2D;
-- cámara autoral casi ortográfica;
+- PlayCanvas Engine v2 + TypeScript + Vite para web;
+- 3D estilizado de producción contenida, con cámara/representación decididas por
+  evidencia de legibilidad y aprendizaje;
 - iluminación/materiales como feedback del sistema;
 - terreno e interiores sólo con complejidad que aporte navegación, lectura o fantasía;
 - modelos eléctricos TypeScript puros como verdad pedagógica.
 
-El runtime Phaser de `/jugar` conserva el Arco I greybox como **baseline de contenido y regresión**. No define la presentación final y no debe recibir la nueva dirección visual por inercia.
+El spike en `src/experiences/ohmdal-playcanvas/` demuestra integración inicial,
+pero no es todavía una migración completa. El runtime Phaser de `/jugar` y los
+prototipos Three.js conservan contenido y regresiones; no se borran por inercia.
 
-El riesgo de HD-2D se gestiona por producción, no bajando automáticamente la ambición:
+El riesgo visual se gestiona por producción incremental:
 
 ```text
 greybox correcto
@@ -90,16 +92,16 @@ greybox correcto
 → materiales/luz
 → assets identitarios
 → hero assets
-→ polish de golden frames
+→ polish sobre experiencia aprobada
 ```
 
 No se exige arte hero en cada piedra.
 
 ### Asset pipeline
 
-Baseline: Blender → GLB / geometría procedural cuando corresponde.
-
-Vibe3D/vibe-model es experimental y sólo puede ganar un rol después de un spike contra el mismo asset hard-surface no-hero. No reemplaza Blender globalmente.
+Baseline: Blender → GLB / geometría procedural cuando corresponde. MiniMax puede
+producir referencias o medios secundarios por `mmx`; Codex revisa antes de
+integrar.
 
 ---
 
@@ -255,39 +257,12 @@ No existe un “motor global de Roxana”.
 
 ## Producción con IA
 
-La metodología actual está diseñada específicamente para juegos:
+ChatGPT web diseña/investiga; Codex es el único master harness técnico; Gemini
+es peer multimodal/contextual; MiniMax ejecuta producción por CLI `mmx` bajo
+revisión de Codex. PlayCanvas y Blender usan MCP sólo cuando el estado vivo de
+la aplicación lo justifica. Git, npm, Vite, tests y scripts van por terminal.
 
-```text
-Manuel
-  ↓ objetivo
-GPT-5.6 Sol — Director / Loop Owner
-  ↓ Task + Learning Contract
-MiniMax M3 / MiniMax Code — Builder
-  ↓
-build + tests + verify
-  ↓
-GPT-5.6 Luna — Player Agent blind-first
-  ├─ FAIL → DeepSeek V4 Flash — bounded repair → replay
-  └─ PASS
-      ↓
-GLM — adversarial read-only review
-      ↓
-GPT-5.6 Sol — DONE / REPAIR / ESCALATE
-      ↓
-Manuel — integración material
-```
-
-Normal: 1–3 repair loops. Hard cap: 5.
-
-El Player Agent primero **usa el juego como jugador** y recién después inspecciona tests/source para reproducir problemas.
-
-Ver:
-
-- [`80-production/agentic/README.md`](80-production/agentic/README.md)
-- [`80-production/agentic/WORKFLOW.md`](80-production/agentic/WORKFLOW.md)
-- [`80-production/agentic/MODEL_ROUTING.md`](80-production/agentic/MODEL_ROUTING.md)
-- [`80-production/agentic/SPIKE_POLICY.md`](80-production/agentic/SPIKE_POLICY.md)
-- [`80-production/agentic/GAME_DEV_AI_TOOLING.md`](80-production/agentic/GAME_DEV_AI_TOOLING.md)
+Ver [`80-production/AI_TOOLING.md`](80-production/AI_TOOLING.md).
 
 ---
 
@@ -309,7 +284,8 @@ Cuando el scope es pedagógico, debe existir evidencia de que el jugador puede a
 5. transferir la idea a una variante razonable;
 6. formalizar después de la experiencia.
 
-El detalle vive en `TASK_CONTRACT_TEMPLATE.md` y `DEFINITION_OF_DONE.md`.
+La tarea debe convertir estos puntos en criterios observables y declarar la
+evidencia necesaria.
 
 ---
 
@@ -319,4 +295,4 @@ El detalle vive en `TASK_CONTRACT_TEMPLATE.md` y `DEFINITION_OF_DONE.md`.
 - Orden: [`../ROADMAP.md`](../ROADMAP.md)
 - Reglas de agentes: [`../AGENTS.md`](../AGENTS.md)
 - Mundo concreto: `20-worlds/<mundo>/AGENTS.md`
-- Producción IA: [`80-production/agentic/README.md`](80-production/agentic/README.md)
+- Herramientas IA: [`80-production/AI_TOOLING.md`](80-production/AI_TOOLING.md)

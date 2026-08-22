@@ -20,7 +20,7 @@ docs/
 │   └── arithmos/               TRANSFORMAR — campaña PROPOSED; spikes representación autorizados
 ├── 30-integration/             cruces interdisciplinarios
 ├── 80-production/
-│   ├── agentic/                workflow IA, model routing, engine fit, tooling, DoD, spike policy
+│   ├── AI_TOOLING.md           harness técnico mínimo y herramientas disponibles
 │   └── spikes/                 specs A/B aisladas
 ├── ohmdal-biblia/              fuente histórica absorbida progresivamente por Ohmdal v1
 ├── arco1/                      dirección visual viva de Ohmdal Arco I
@@ -28,7 +28,8 @@ docs/
 └── sessions/                   proceso de diseño; no autoridad de producto
 ```
 
-Cada mundo tiene un `AGENTS.md` con fuentes de autoridad, estado, restricciones y routing actual de modelos/harnesses.
+Cada mundo tiene un `AGENTS.md` con fuentes de autoridad, estado y restricciones
+locales. El harness común vive sólo en el `AGENTS.md` raíz.
 
 ## 2. Authority levels
 
@@ -53,17 +54,18 @@ Ante contradicción aplicar [`00-governance/ROXANA_CANON_POLICY_v1.md`](00-gover
 2. [`guia-puzzles.md`](guia-puzzles.md)
 3. `20-worlds/<mundo>/AGENTS.md`
 4. `20-worlds/<mundo>/gameplay/<mundo>-puzzle-grammar_v1.md`
-5. [`80-production/agentic/TASK_CONTRACT_TEMPLATE.md`](80-production/agentic/TASK_CONTRACT_TEMPLATE.md) cuando la milestone requiera coordinación/learning evidence.
+5. La spec/tarea con criterios observables y evidencia de aprendizaje cuando aplique.
 
 ### Trabajar en Ohmdal
 
 1. [`20-worlds/ohmdal/AGENTS.md`](20-worlds/ohmdal/AGENTS.md)
 2. [`../ROADMAP.md`](../ROADMAP.md)
 3. docs de gameplay/content/visual citados por ese `AGENTS.md`
-4. **HD-2D nuevo:** `src/hd2d-ohmdal/`
-5. **baseline de regresión/contenido:** `src/jugar/`
+4. **spike PlayCanvas actual:** `src/experiences/ohmdal-playcanvas/`
+5. **baselines de regresión/contenido:** `src/jugar/` y prototipos históricos
 
-No asumir que `src/ohmdal/` es el árbol principal del world building nuevo; contiene piezas históricas/compatibilidad según el estado del repo.
+No asumir que el spike PlayCanvas ya es una migración terminada ni borrar
+baselines hasta que exista una tarea específica.
 
 ### Trabajar en Physica
 
@@ -76,25 +78,20 @@ Babylon es la dirección de Physica, no un engine global de Roxana.
 ### Investigar Bitland sin abrir la campaña
 
 1. [`20-worlds/bitland/AGENTS.md`](20-worlds/bitland/AGENTS.md)
-2. [`80-production/agentic/SPIKE_POLICY.md`](80-production/agentic/SPIKE_POLICY.md)
-3. `80-production/spikes/BIT-R-A-*` o `BIT-R-B-*`
+2. `80-production/spikes/BIT-R-A-*` o `BIT-R-B-*`
 
 Sólo spikes autorizados; no construir el Arco I completo todavía.
 
 ### Investigar Arithmos sin abrir la campaña
 
 1. [`20-worlds/arithmos/AGENTS.md`](20-worlds/arithmos/AGENTS.md)
-2. [`80-production/agentic/SPIKE_POLICY.md`](80-production/agentic/SPIKE_POLICY.md)
-3. `80-production/spikes/ARI-R-A-*` o `ARI-R-B-*`
+2. `80-production/spikes/ARI-R-A-*` o `ARI-R-B-*`
 
-### Producir con agentes
+### Herramientas de IA
 
-1. [`80-production/agentic/README.md`](80-production/agentic/README.md)
-2. [`80-production/agentic/WORKFLOW.md`](80-production/agentic/WORKFLOW.md)
-3. [`80-production/agentic/MODEL_ROUTING.md`](80-production/agentic/MODEL_ROUTING.md)
-4. [`80-production/agentic/ENGINE_MATRIX.md`](80-production/agentic/ENGINE_MATRIX.md)
-5. [`80-production/agentic/GAME_DEV_AI_TOOLING.md`](80-production/agentic/GAME_DEV_AI_TOOLING.md)
-6. [`80-production/agentic/TASK_CONTRACT_TEMPLATE.md`](80-production/agentic/TASK_CONTRACT_TEMPLATE.md)
+1. [`../AGENTS.md`](../AGENTS.md)
+2. [`80-production/AI_TOOLING.md`](80-production/AI_TOOLING.md)
+3. `.agents/skills/` sólo para la skill concreta que corresponda
 
 ### Entender la visión general
 
@@ -107,7 +104,8 @@ Sólo spikes autorizados; no construir el Arco I completo todavía.
 
 No borrar algo sólo porque sea viejo:
 
-- `/jugar` es legacy visual pero baseline de contenido/regresión mientras HD-2D migra el Arco I;
+- `/jugar` es legacy visual pero baseline de contenido/regresión durante la
+  transición a PlayCanvas;
 - `ohmdal-biblia/` conserva trazabilidad e insumo, pero `20-worlds/ohmdal/` gobierna cuando contradicen;
 - `sessions/` documenta proceso, no decisiones vigentes;
 - prototipos/renders viejos se conservan sólo cuando sirven de evidencia, regresión o referencia explícita.

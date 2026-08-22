@@ -31,7 +31,7 @@
   también permanece `not-run` por falta de una distribución WSL operativa.
 - H3 continúa **sin autorización**. El veredicto sólo habilita preparar un contrato separado con
   nueva base, ownership, presupuesto, gates y aprobación humana; no autoriza producirlo.
-- `/jugar`, Phaser estable, Meshy, generación paga y servicios externos permanecieron intactos.
+- `/jugar`, el baseline Phaser, la generación paga y los servicios externos permanecieron intactos.
 
 ## Biblia canónica de Ohmdal HD-2D — 2026-08-01
 
@@ -88,7 +88,7 @@ El hito Phaser `ohmdal-vnext-spike` conserva sus contratos históricos y su evid
 documental no autoriza ejecutarlo de nuevo ni lo convierte en la dirección final.
 
 La preproducción H1+H2 produjo: fichas educativas V2, blockout Portal–Manantial, comparación A/B de
-cámaras, sprites de 4 y 8 direcciones, y Ohm en versión sprite y procedural. Meshy y generación paga
+cámaras, sprites de 4 y 8 direcciones, y Ohm en versión sprite y procedural. La generación paga
 tuvieron presupuesto cero. El veredicto fue **avanzar**, condicionado a medir Android físico —que
 sigue sin medirse.
 
@@ -105,7 +105,7 @@ con este alcance máximo:
    reales y Android medio de 2022 a 30 fps;
 6. veredicto humano: avanzar, corregir una vez o descartar la dirección.
 
-Sigue sin autorizarse Meshy, producción masiva de assets ni servicios generativos pagos.
+Sigue sin autorizarse producción masiva de assets ni servicios generativos pagos.
 
 **Hecho desde entonces:** el prototipo HD-2D pasó a `src/ohmdal/` y se sirve en `/ohmdal`, con
 cámara frontal y post-procesado (bloom, tilt-shift, grado de color). El canon visual del arco vive

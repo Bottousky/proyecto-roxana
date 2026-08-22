@@ -178,12 +178,12 @@ export function abrirClock(onSolved: () => void, practica = false): void {
 
         predict.classList.remove('hidden');
         predict.innerHTML =
-          '<p class="bench-predict-q"><b>Ohm:</b> «Antes de tocar nada: si agrandás el Estanque, ¿el tic se vuelve más rápido o más lento?»</p>';
+          '<p class="bench-predict-q"><b>Ohm:</b> «Toca el Estanque: si lo agrandás, ¿el tic se vuelve más rápido o más lento?»</p>';
         const row = document.createElement('div');
         row.className = 'bench-predict-row';
         for (const option of [
-          { key: 'rapido' as const, label: 'Más rápido' },
-          { key: 'lento' as const, label: 'Más lento' },
+          { key: 'rapido' as const, label: 'El Estanque late más rápido' },
+          { key: 'lento' as const, label: 'El Estanque late más lento' },
         ]) {
           const button = document.createElement('button');
           button.className = 'bench-predict-btn';
@@ -262,5 +262,6 @@ export function abrirClock(onSolved: () => void, practica = false): void {
       );
       render();
     },
+    { worldCloseup: true },
   );
 }

@@ -115,10 +115,9 @@ y el cierre humano de cámara. La corrección de cámara ya está hecha; el esta
 - **Asset Forge:** sólo produce el asset acotado por el ticket actual y su manifest. No abre lotes.
 - **Evaluador:** observa una integración cerrada y no corrige. La aceptación humana visible sigue
   siendo obligatoria.
-- **Modelo de IA:** se elige por tarea y evidencia disponible, no por reputación. Codex puede
-  dirigir/integrar; Claude Code u OpenCode gratuito pueden ejecutar paquetes acotados si un smoke
-  confirma disponibilidad. Una falla de proveedor bloquea o reasigna el paquete actual, nunca
-  habilita el siguiente ticket.
+- **Herramientas de IA:** Codex dirige e integra; MiniMax puede ejecutar paquetes
+  acotados por `mmx` y Gemini aportar análisis multimodal. Una falla de herramienta
+  bloquea o reasigna el paquete actual, nunca habilita el siguiente ticket.
 
 ## Fuentes primarias
 

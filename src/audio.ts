@@ -296,7 +296,10 @@ let echoIn: DelayNode | null = null;
 let noiseBuf: AudioBuffer | null = null;
 
 /** 0 = silenciado, 1-10 = volumen */
-let volLevel = Math.max(0, Math.min(10, parseInt(localStorage.getItem(VOL_KEY) ?? '7', 10)));
+let volLevel = Math.max(0, Math.min(10, parseInt(
+  (typeof localStorage === 'undefined' ? null : localStorage.getItem(VOL_KEY)) ?? '7',
+  10,
+)));
 let currentMood: Ambience | null = null;
 let pendingMood: Ambience | null = null;
 let moodGen = 0;
@@ -368,7 +371,7 @@ export function getVolume(): number {
 
 export function setVolume(v: number): void {
   volLevel = Math.max(0, Math.min(10, Math.round(v)));
-  localStorage.setItem(VOL_KEY, String(volLevel));
+  if (typeof localStorage !== 'undefined') localStorage.setItem(VOL_KEY, String(volLevel));
   if (ctx && master) master.gain.setTargetAtTime((volLevel / 10) * MAX_GAIN, ctx.currentTime, 0.04);
 }
 

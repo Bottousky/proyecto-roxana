@@ -43,10 +43,9 @@ el control de su posición de reposo para evitar atravesar la malla:
 
 ## Contradicciones detectadas con documentación previa
 
-1. **`CLAUDE.md` declara Phaser 4 + Three.js como stack único.**
+1. **La documentación histórica declaraba Phaser 4 + Three.js como stack único.**
    El nuevo arco (Physica) usa Babylon.js + Havok. La decisión del
-   Director 2026-08-07 manda: Physica va en Babylon, el Instituto/Ohmdal
-   sigue en Phaser + Three. Es un proyecto multi-engine, no una
+   decisión 2026-08-07 manda: Physica va en Babylon. Es un proyecto multi-engine, no una
    sustitución.
 
 2. **`docs/physica/spec-hito1-cascada-babylon.md` prohíbe Havok.**

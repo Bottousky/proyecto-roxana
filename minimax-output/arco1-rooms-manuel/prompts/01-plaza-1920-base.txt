@@ -1,0 +1,28 @@
+# Plaza de la Cuenca de Ohm (hub)
+# Guardar como: plaza-1920-base.png
+# Lienzo nativo (1px = 1px de juego): 1920x1080
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1920x1080. GAMEPLAY FLOORPLAN first. Walled courtyard, Ohmdal's civic heart. Larger than one screen; the player walks a plus-sign of cobble while the camera pans.
+
+PERIMETER: continuous stone merlons. Corners are WALLS, not floor.
+
+PAVED CROSS:
+- North-south paved axis ~160px wide at x=960, FULL height 0..1080.
+- East-west paved band ~160px tall at y=540, FULL width 0..1920.
+Four quieter paved squares NW NE SW SE.
+
+LANDMARK — Ohm pedestal: empty circular ceramic-and-oxidized-copper pedestal, no statue, no character, no hanging bell. On the N-S axis slightly SOUTH of center (x=960, y=640). Walkable ring. Empty air ABOVE the pedestal (runtime bell later).
+
+EXITS:
+- NORTH center: monumental Puerta de Ohm, CLOSED.
+- SOUTH center: arch to dry terraces.
+- EAST: Taller de Lumen as a REAL workshop HOUSE occupying the east third; east-west band ends in a workshop doorway.
+- WEST: TWO stacked arches. Upper = Castillo (cooler stone). Lower = Forja (sootier). Both CLOSED.
+SW: Portal Omega empty stone-copper frame. Four unlit obelisks. Unlit lamps. Copper in paving.
+NOT a generic castle courtyard. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (1208 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1920x1080 Plaza de Ohm walled courtyard, merlons, corners are walls. N-S paved axis 160px at x=960 full height. E-W band 160px at y=540 full width. Empty ceramic-copper Ohm pedestal at x=960 y=640, walkable ring, no statue, no bell. North CLOSED Puerta de Ohm. South terraces arch. East Taller workshop HOUSE. West TWO stacked arches castle-above forge-below CLOSED. SW Portal Omega frame. Four unlit obelisks. Civic hub larger than one screen. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

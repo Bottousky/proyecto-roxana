@@ -269,5 +269,6 @@ export function abrirWarmth(onSolved: () => void, practica = false): void {
       bench.setStatus('Apoye la mano sobre un canal. Ohm medirá uno por vez.');
       render();
     },
+    { worldCloseup: true },
   );
 }

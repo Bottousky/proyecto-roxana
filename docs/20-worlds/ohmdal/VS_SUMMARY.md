@@ -1,7 +1,7 @@
 # Ohmdal — Vertical Slice · resumen del worktree
 
-Trabajo realizado en `C:/Users/manue/orca/workspaces/Roxana/wt-ohmdal-vs`,
-branch `Bottousky/wt-ohmdal-vs` sobre `main@3e5d7025`.
+Trabajo originalmente realizado en un worktree aislado, branch
+`Bottousky/wt-ohmdal-vs` sobre `main@3e5d7025`, e integrado luego al repo.
 
 > El slice se entrega como código. No se promueve documentación de `PROPOSED` a `CANON`
 > (regla dura del brief). No se commitea — Manuel hace el merge.
@@ -90,7 +90,7 @@ Las cinco entradas **no** mencionan "voltaje", "corriente", "resistencia",
 
 ## Cómo se verifica a mano
 
-1. `cd C:/Users/manue/orca/workspaces/Roxana/wt-ohmdal-vs`
+1. `cd C:/YO/Proyectos/Roxana`
 2. `npm install` (si no está hecho)
 3. `npm test` → todos en verde
 4. `npm run build` → sin errores

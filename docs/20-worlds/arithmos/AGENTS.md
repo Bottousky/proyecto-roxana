@@ -12,17 +12,16 @@ Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Arithmo
 
 ### Autoridad vigente (level ≤ 3, PROPOSED salvo ratificación posterior)
 
-- [`../vision/arithmos-vision_v1.md`](../vision/arithmos-vision_v1.md) — North Star y fantasía.
-- [`../vision/arithmos-world-rules_v1.md`](../vision/arithmos-world-rules_v1.md) — reglas del mundo.
-- [`../gameplay/arithmos-representation-system_v1.md`](../gameplay/arithmos-representation-system_v1.md) — representaciones.
-- [`../gameplay/arithmos-transformation-system_v1.md`](../gameplay/arithmos-transformation-system_v1.md) — transformaciones.
-- [`../gameplay/arithmos-puzzle-grammar_v1.md`](../gameplay/arithmos-puzzle-grammar_v1.md) — gramática de puzzles.
-- [`../gameplay/arithmos-mechanics-progression_v1.md`](../gameplay/arithmos-mechanics-progression_v1.md) — progresión mecánica.
-- [`../narrative/arithmos-narrative-bible_v1.md`](../narrative/arithmos-narrative-bible_v1.md) — lore.
-- [`../content/arithmos-arc-01_v1.md`](../content/arithmos-arc-01_v1.md) — Arco I.
-- [`../content/arithmos-vertical-slice_v1.md`](../content/arithmos-vertical-slice_v1.md) — vertical slice.
-- [`../production/arithmos-prototype-evaluation_v1.md`](../production/arithmos-prototype-evaluation_v1.md) — evaluación.
-- [`../../80-production/agentic/ENGINE_MATRIX.md`](../../80-production/agentic/ENGINE_MATRIX.md) — hipótesis de representación/runtime actual.
+- [`vision/arithmos-vision_v1.md`](vision/arithmos-vision_v1.md) — North Star y fantasía.
+- [`vision/arithmos-world-rules_v1.md`](vision/arithmos-world-rules_v1.md) — reglas del mundo.
+- [`gameplay/arithmos-representation-system_v1.md`](gameplay/arithmos-representation-system_v1.md) — representaciones.
+- [`gameplay/arithmos-transformation-system_v1.md`](gameplay/arithmos-transformation-system_v1.md) — transformaciones.
+- [`gameplay/arithmos-puzzle-grammar_v1.md`](gameplay/arithmos-puzzle-grammar_v1.md) — gramática de puzzles.
+- [`gameplay/arithmos-mechanics-progression_v1.md`](gameplay/arithmos-mechanics-progression_v1.md) — progresión mecánica.
+- [`narrative/arithmos-narrative-bible_v1.md`](narrative/arithmos-narrative-bible_v1.md) — lore.
+- [`content/arithmos-arc-01_v1.md`](content/arithmos-arc-01_v1.md) — Arco I.
+- [`content/arithmos-vertical-slice_v1.md`](content/arithmos-vertical-slice_v1.md) — vertical slice.
+- [`production/arithmos-prototype-evaluation_v1.md`](production/arithmos-prototype-evaluation_v1.md) — evaluación.
 
 ---
 
@@ -101,19 +100,12 @@ views/adapters
 
 ---
 
-## 6. Roles y harnesses
+## 6. Herramientas
 
-Los antiguos `worker-*` / `m3-*` fueron retirados.
-
-| Necesidad | Rol por defecto | Harness |
-|---|---|---|
-| definir objeto matemático, invariantes, Learning Contract y Spike Card | **GPT-5.6 Sol — Director** | Codex Desktop / ChatGPT |
-| implementar cada spike bajo el mismo core/contrato | **MiniMax M3 — Builder** | MiniMax Code |
-| jugar blind-first y comprobar si descubre equivalencia/transformación | **GPT-5.6 Luna — Player Agent** | OpenCode Go (`playtester`) |
-| fix técnico acotado | **DeepSeek V4 Flash — Repair** | OpenCode Go (`implementer`) |
-| intentar romper invariantes, undo/redo, mobile o aislamiento del core | **GLM — Adversarial Reviewer** | OpenCode Go (`reviewer`) |
-
-Tooling Three/Pixi/SVG se carga por spike. No contaminar A con la implementación del B. Ver [`../../80-production/agentic/GAME_DEV_AI_TOOLING.md`](../../80-production/agentic/GAME_DEV_AI_TOOLING.md).
+Codex implementa e integra. Tooling Three/Pixi/SVG se carga por spike; no
+contaminar A con la implementación de B. Gemini puede aportar análisis
+multimodal y MiniMax puede producir trabajo delegado por `mmx`, siempre bajo
+revisión de Codex. Ver [`../../80-production/AI_TOOLING.md`](../../80-production/AI_TOOLING.md).
 
 ---
 

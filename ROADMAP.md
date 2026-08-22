@@ -1,28 +1,27 @@
 # Roadmap
 
-> **Actualizado:** 17 de agosto de 2026.
+> **Actualizado:** 22 de agosto de 2026.
 >
-> ⚠ **Cambio de dirección vigente desde 2026-08-17.**
-> Por **ADR-001** (`docs/00-governance/ADR-001-phaser-multiarea-arc1.md`),
-> la campaña 2 (Ohmdal Arco I "La Luz") se produce sobre **Phaser 4 multi-área
-> en `src/jugar/`** (no sobre HD-2D Three.js en `src/hd2d-ohmdal/`, que pasa
-> a rama experimental). El detalle topológico vive en
+> ⚠ **Cambio de dirección técnica vigente desde 2026-08-22.**
+> Ohmdal apunta a **PlayCanvas Engine v2 + TypeScript** para web. El spike en
+> `src/experiences/ohmdal-playcanvas/` es evidencia inicial, no una migración
+> completa. Phaser `/jugar` y los prototipos Three.js se conservan como
+> baselines hasta que una tarea específica defina y verifique la transición.
+> El detalle topológico vigente sigue en
 > `docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md`,
 > `ARC1_ROOM_GRAPH.md`, `ARC1_SPATIAL_MAP.md` y las 11 fichas de macroárea en
-> `docs/20-worlds/ohmdal/room-based/areas/`. Los hitos H2-H7 se reorientan
-> en consecuencia (§4).
+> `docs/20-worlds/ohmdal/room-based/areas/` como insumo de contenido.
 >
 > **Norte:** el Instituto Roxana como hogar que recuerda y cambia, con cinco campañas
 > independientes (Prólogo + Ohmdal + Physica + Bitland + Arithmos) unidas por interludios
 > transversales. Verbo nuclear por mundo: CONECTAR / EXPERIMENTAR / PROGRAMAR / TRANSFORMAR.
 >
-> Los GDD v1 y governance tienen mayor autoridad que este roadmap. Las decisiones de
-> engine/renderer todavía experimentales viven en
-> `docs/80-production/agentic/ENGINE_MATRIX.md` y no se promueven a canon por accidente.
+> Los GDD v1 y governance tienen mayor autoridad que este roadmap. Un spike o
+> runtime no promueve contenido a canon por accidente.
 
 Un hito de producción = algo que se puede abrir en el navegador y jugar/verificar al terminar.
-Los **spikes** son la excepción explícita: existen para retirar una incertidumbre antes de abrir
-una campaña y se ejecutan con la política de `docs/80-production/agentic/SPIKE_POLICY.md`.
+Los **spikes** son la excepción explícita: existen para retirar una incertidumbre
+antes de abrir una campaña y deben compararse desde baselines equivalentes.
 
 ---
 
@@ -82,23 +81,18 @@ como lugar al que vale la pena volver, no por preferencia estética.
 
 ### Campaña 2 — Ohmdal Arco I "La Luz"
 
-**Estado:** foco principal de producción. **Dirección vigente: Phaser 4 multi-área en
-`src/jugar/` (ver `ADR-001`).**
+**Estado:** foco principal de producción. **Target técnico: PlayCanvas Engine v2
++ TypeScript.** La transición todavía no tiene un plan de migración aprobado.
 
-- **Runtime de producción:** Phaser 4 (top-down 2D, ya en `package.json`) evolucionado a
-  **áreas contiguas mayores que el viewport, cámara móvil con dead zones, transiciones
-  controladas, world state por región y cinemáticas**. El viewport lógico se mantiene
-  ≈960×540; el mundo puede medir varios viewports por área.
-- **No** se produce sobre HD-2D Three.js (`src/hd2d-ohmdal/`) en esta campaña. La rama
-  HD-2D queda **explícitamente como experimental** (ver `ADR-001` §2.3) y no recibe
-  features nuevas; reactivarla requiere un ADR nuevo.
+- **Spike actual:** `src/experiences/ohmdal-playcanvas/`, ruta
+  `/ohmdal-playcanvas`; es experimental y reutiliza sistemas del spike Plaza.
+- **Baselines:** `/jugar` (Phaser) conserva contenido/regresiones y los árboles
+  Three.js conservan evidencia visual/técnica. No reciben nuevas features por
+  inercia ni se eliminan incidentalmente.
 - **Topología ratificada:** 11 macroáreas (Plaza Cuenca, Taller, Calzada, Manantial,
   Castillo ext, Castillo int, Forja Patio, Forja Profunda, Terrazas, Lago, Faro). Ver
   `ARC1_ROOM_GRAPH.md` y `ARC1_SPATIAL_MAP.md`.
-- **Render mode default en esta fase:** `GREYBOX` (rectángulos + colores planos +
-  labels). `PAINTED` (fondos pintados existentes) se mantiene como alternativa sin
-  nuevos assets.
-- **Cero nuevas dependencias**, sin upgrade de Phaser.
+- **Cero nuevas dependencias/upgrades** dentro de la limpieza de harness.
 - Los modelos de puzzles renderer-neutral (`src/puzzles/*Model.ts`) y los 70+ tests
   existentes se conservan tal cual.
 
@@ -159,7 +153,8 @@ conceptos.
 
 ### Ohmdal — vertical slice canónico
 
-Objetivo: probar que narrativa, aprendizaje auténtico y presentación HD-2D funcionan juntos.
+Objetivo: probar que narrativa, aprendizaje auténtico y la dirección PlayCanvas
+funcionan juntos antes de escalar la migración.
 
 Beats:
 
@@ -174,7 +169,7 @@ Beats:
 | VS07 | Puerta de Ohm | transferencia sin teoría nueva |
 | VS08 | Manantial / Formalización | cierre emocional + Bitácora |
 
-Compilar no cuenta como aprobación. El Player Agent debe recorrerlo como usuario.
+Compilar no cuenta como aprobación. Un playtest blind-first debe recorrerlo como usuario.
 
 ### Physica
 
@@ -207,11 +202,12 @@ personajes/orgánicos/hero assets.
 
 ---
 
-## 4. Hitos de Ohmdal
+## 4. Hitos históricos de Ohmdal — LEGACY
 
-> **Reorientados por `ADR-001` (2026-08-17).** El árbol `src/hd2d-ohmdal/`
-> queda como rama experimental. La producción del Arco I ocurre en
-> `src/jugar/` evolucionado a multi-área.
+> Esta sección registra el plan Phaser de 2026-08-17 y ya no define el foco
+> actual. Se conserva por trazabilidad y como inventario de requisitos. El
+> próximo plan de hitos debe mapear esos requisitos al target PlayCanvas sin
+> borrar baselines ni iniciar una migración masiva por accidente.
 
 ### H1 — Phaser greybox pre-existente · ✅ hecho
 
@@ -219,7 +215,7 @@ El runtime Phaser top-down de `/jugar` existe y demuestra el contenido del Arco 
 a 960×540. Sirve como baseline de regresión y como insumo del refactor multi-área. **No es
 más el destino de la producción** (ver `ADR-001`).
 
-### H2 — Cimientos multi-área en `src/jugar/` · ← foco actual
+### H2 — Cimientos multi-área en `src/jugar/` · LEGACY
 
 Refactor arquitectónico mínimo para soportar áreas mayores al viewport sin perder el
 contenido existente:
@@ -353,36 +349,27 @@ documentos `LEGACY` del refactor Ohmdal están listados en `ADR-001` §2.3.
 **Permitido:**
 
 - los spikes A/B explícitamente listados en `docs/80-production/spikes/`;
-- benchmarks de modelos/harnesses que no cambien el producto;
 - spikes de asset pipeline que retiren riesgo real de Ohmdal.
 
 ---
 
 ## 8. Forma de trabajo
 
-La forma vigente está en `AGENTS.md` y `docs/80-production/agentic/WORKFLOW.md`.
+La forma vigente está en `AGENTS.md` y `docs/80-production/AI_TOOLING.md`.
 
 ```text
-Manuel — objetivo
-  ↓
-GPT-5.6 Sol — Task + Learning Contract / Loop Owner
-  ↓
-MiniMax Code — Builder
-  ↓
-npm run build + npm test + npm run verify
-  ↓
-GPT-5.6 Luna — Player Agent blind-first
-  ├─ FAIL → DeepSeek V4 Flash — repair → replay
-  └─ PASS
-      ↓
-GLM — adversarial read-only review
-      ↓
-GPT-5.6 Sol — DONE / REPAIR / ESCALATE
-      ↓
-Manuel — integración material
+Manuel / ChatGPT web — objetivo, diseño y decisiones
+  ↓ spec
+Codex — implementación, integración y validación
+  ├─ PlayCanvas / Blender cuando su estado vivo lo justifica
+  ├─ mmx por terminal para producción delegada
+  └─ Gemini como peer multimodal/contextual
+  ↓ evidencia
+Manuel — decisiones materiales e integración de milestone
 ```
 
-Normal: 1–3 repair loops. Hard cap: 5.
+Una tarea player-facing requiere gate mecánico y recorrido real; la reparación
+se basa en evidencia reproducible, no en retries abiertos.
 
 Un defecto que sobrevive a dos reparaciones informadas hace revisar spec/representación antes de
 seguir parcheando.

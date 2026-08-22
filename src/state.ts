@@ -210,14 +210,17 @@ export const state: GameState = {
 };
 
 export function hasSave(): boolean {
+  if (typeof localStorage === 'undefined') return false;
   return localStorage.getItem(KEY) !== null;
 }
 
 export function save(): void {
+  if (typeof localStorage === 'undefined') return;
   localStorage.setItem(KEY, JSON.stringify(state));
 }
 
 export function load(): void {
+  if (typeof localStorage === 'undefined') return;
   const raw = localStorage.getItem(KEY);
   if (!raw) return;
   try {

@@ -228,6 +228,7 @@ export function abrirFairSplit(onSolved: () => void, practica = false): void {
       );
       render();
     },
+    { worldCloseup: true },
   );
 }
 

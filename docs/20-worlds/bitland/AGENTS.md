@@ -12,17 +12,16 @@ Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Bitland
 
 ### Autoridad vigente (level ≤ 3, PROPOSED salvo ratificación posterior)
 
-- [`../vision/bitland-vision_v1.md`](../vision/bitland-vision_v1.md) — North Star y fantasía.
-- [`../vision/bitland-world-metaphor_v1.md`](../vision/bitland-world-metaphor_v1.md) — metáfora del mundo.
-- [`../gameplay/bitland-programming-language-gameplay_v1.md`](../gameplay/bitland-programming-language-gameplay_v1.md) — lenguaje como jugable.
-- [`../gameplay/bitland-automation-system_v1.md`](../gameplay/bitland-automation-system_v1.md) — automatización.
-- [`../gameplay/bitland-puzzle-grammar_v1.md`](../gameplay/bitland-puzzle-grammar_v1.md) — gramática de puzzles.
-- [`../gameplay/bitland-mechanics-progression_v1.md`](../gameplay/bitland-mechanics-progression_v1.md) — progresión mecánica.
-- [`../narrative/bitland-narrative-bible_v1.md`](../narrative/bitland-narrative-bible_v1.md) — lore.
-- [`../content/bitland-arc-01_v1.md`](../content/bitland-arc-01_v1.md) — Arco I.
-- [`../content/bitland-vertical-slice_v1.md`](../content/bitland-vertical-slice_v1.md) — vertical slice.
-- [`../production/bitland-prototype-evaluation_v1.md`](../production/bitland-prototype-evaluation_v1.md) — evaluación.
-- [`../../80-production/agentic/ENGINE_MATRIX.md`](../../80-production/agentic/ENGINE_MATRIX.md) — hipótesis renderer/representación actual.
+- [`vision/bitland-vision_v1.md`](vision/bitland-vision_v1.md) — North Star y fantasía.
+- [`vision/bitland-world-metaphor_v1.md`](vision/bitland-world-metaphor_v1.md) — metáfora del mundo.
+- [`gameplay/bitland-programming-language-gameplay_v1.md`](gameplay/bitland-programming-language-gameplay_v1.md) — lenguaje como jugable.
+- [`gameplay/bitland-automation-system_v1.md`](gameplay/bitland-automation-system_v1.md) — automatización.
+- [`gameplay/bitland-puzzle-grammar_v1.md`](gameplay/bitland-puzzle-grammar_v1.md) — gramática de puzzles.
+- [`gameplay/bitland-mechanics-progression_v1.md`](gameplay/bitland-mechanics-progression_v1.md) — progresión mecánica.
+- [`narrative/bitland-narrative-bible_v1.md`](narrative/bitland-narrative-bible_v1.md) — lore.
+- [`content/bitland-arc-01_v1.md`](content/bitland-arc-01_v1.md) — Arco I.
+- [`content/bitland-vertical-slice_v1.md`](content/bitland-vertical-slice_v1.md) — vertical slice.
+- [`production/bitland-prototype-evaluation_v1.md`](production/bitland-prototype-evaluation_v1.md) — evaluación.
 
 ---
 
@@ -108,19 +107,12 @@ DOM
 
 ---
 
-## 6. Roles y harnesses
+## 6. Herramientas
 
-Los antiguos `worker-*` / `m3-*` fueron retirados.
-
-| Necesidad | Rol por defecto | Harness |
-|---|---|---|
-| definir core, Learning Contract y Spike Card | **GPT-5.6 Sol — Director** | Codex Desktop / ChatGPT |
-| implementar cada spike bajo el mismo contrato | **MiniMax M3 — Builder** | MiniMax Code |
-| jugar blind-first, predecir ticks/estado y evaluar debugging | **GPT-5.6 Luna — Player Agent** | OpenCode Go (`playtester`) |
-| fix reproducible dentro de un spike | **DeepSeek V4 Flash — Repair** | OpenCode Go (`implementer`) |
-| intentar romper aislamiento, determinismo, mobile o state ownership | **GLM — Adversarial Reviewer** | OpenCode Go (`reviewer`) |
-
-Tooling específico de Pixi/Phaser se carga según el spike; no se instala el tooling de ambos en el mismo branch experimental. Ver [`../../80-production/agentic/GAME_DEV_AI_TOOLING.md`](../../80-production/agentic/GAME_DEV_AI_TOOLING.md).
+Codex implementa e integra. Tooling de Pixi/Phaser se carga según el spike y no
+se mezcla entre candidatos. Gemini puede aportar análisis contextual y MiniMax
+puede ejecutar trabajo delegado por `mmx`, siempre bajo revisión de Codex. Ver
+[`../../80-production/AI_TOOLING.md`](../../80-production/AI_TOOLING.md).
 
 ---
 
@@ -130,7 +122,7 @@ Tooling específico de Pixi/Phaser se carga según el spike; no se instala el to
 
 - ejecutar BIT-R-A o BIT-R-B en ramas separadas;
 - implementar un `simulation-core` mínimo compartido si la Spike Card lo declara;
-- medir aprendizaje, legibilidad, performance, touch y producción agentic;
+- medir aprendizaje, legibilidad, performance, touch y coste de producción;
 - documentar evidencia para decidir renderer.
 
 **No:**

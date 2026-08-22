@@ -4,13 +4,13 @@
 
 ```text
 referencia y derechos
-  → roxana-3d-director
-  → procedural/img2threejs | Meshy | sprite | CAD
+  → blockout aprobado
+  → Blender/procedural/CAD | mmx para referencias 2D
   → manifiesto + master
   → variante desktop/mobile
-  → loader Three.js existente
+  → GLB en el runtime correspondiente
   → cámara real
-  → Playwright + renderer.info + crítica
+  → browser QA + métricas del renderer + crítica
   → aprobación
 ```
 
@@ -18,18 +18,19 @@ referencia y derechos
 
 | Necesidad | Ruta primaria |
 |---|---|
-| Arquitectura, escaleras, arcos, barandas | procedural / `img2threejs` |
-| Máquinas y puzzles con piezas móviles | procedural + modelo TypeScript puro |
-| Estatua, personaje, criatura, roca hero | Meshy con referencia suficiente |
-| Personaje de cámara controlada | sprite o impostor antes de asumir rig 3D |
-| Terreno y repetidos | procedural + instancing |
-| Reparación, bake o exportación puntual | Blender automatizado |
-| Pieza física funcional | OpenSCAD/FreeCAD; Meshy sólo capa estética |
+| Arquitectura, escaleras, arcos, barandas | Blender modular/procedural |
+| Máquinas y puzzles con piezas móviles | Blender + modelo TypeScript puro |
+| Estatua, personaje, criatura, roca hero | Blender con referencia aprobada |
+| Personaje de cámara controlada | GLB calibrado; simplificar si el rig no compra legibilidad |
+| Terreno y repetidos | Blender/procedural + instancing |
+| Reparación, bake o exportación puntual | Blender UI/CLI |
+| Pieza física funcional | OpenSCAD/FreeCAD; Blender para presentación |
 
 ## Integración real del repositorio
 
 - `RuntimeHost` y el registro multiruntime permanecen en `src/app` y `src/experiences`.
-- Ohmdal continúa en Phaser.
+- Ohmdal apunta a PlayCanvas Engine v2; Phaser y Three.js permanecen como
+  baselines durante la transición.
 - La experiencia escolar 3D preservada en `feature/school-voxel` vive hoy en la landing:
   `src/landing/school3d.ts`.
 - Esa landing ya reutiliza `GLTFLoader`, `DRACOLoader`, carga lazy mediante Vite y expone
