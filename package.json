@@ -15,7 +15,8 @@
     "3d:validate-glb": "node scripts/3d/validate-glb.mjs",
     "3d:optimize-glb": "node scripts/3d/optimize-glb.mjs",
     "3d:report-budget": "node scripts/3d/report-runtime-budget.mjs",
-    "3d:fetch-polyhaven": "node scripts/3d/fetch-polyhaven.mjs"
+    "3d:fetch-polyhaven": "node scripts/3d/fetch-polyhaven.mjs",
+    "3d:inventory-pack": "node scripts/3d/inventory-vendor-pack.mjs"
   },
   "dependencies": {
     "@babylonjs/core": "^9.20.0",
