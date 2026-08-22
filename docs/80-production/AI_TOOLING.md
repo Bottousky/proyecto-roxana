@@ -58,10 +58,14 @@ el repo y producir informes; Codex verifica hechos, decide cambios e integra.
 - Dependencia actual: `playcanvas` 2.21.x.
 - Spike existente: `src/experiences/ohmdal-playcanvas/` y ruta
   `/ohmdal-playcanvas`; sigue siendo experimental, no una migración terminada.
-- Estado mecánico al 2026-08-22: `tests/playcanvas-ohmdal.test.ts` pasa, pero el
-  build global está bloqueado por referencias a `camPos` no definido en
-  `playcanvasRuntime.ts`. Resolverlo pertenece a la siguiente tarea técnica, no
-  a este reset de harness.
+- Estado mecánico al 2026-08-22 en `explore/ohmdal-3D`: se corrigió el acceso a
+  la posición del jugador dentro de `triggerInteraction()` en
+  `playcanvasRuntime.ts`. El gate CI de la rama ejecutó `npm run verify` y
+  `npm run 3d:validate-manifests` con resultado PASS; el build TypeScript/Vite y
+  `tests/playcanvas-ohmdal.test.ts` quedaron verdes. Logs estáticos antiguos no
+  se consideran fuente de verdad.
+- `.github/workflows/validate.yml` valida ramas `explore/**` y PRs; además hace
+  syntax-check de los helpers de adquisición 3D antes del gate del repo.
 - Skills oficiales: las entradas registradas desde `playcanvas/skills` en
   `skills-lock.json`; cargar sólo la que corresponda a la tarea.
 - MCP oficial: `@playcanvas/editor-mcp-server` 0.6.1, registrado en Codex como
