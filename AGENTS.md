@@ -22,17 +22,18 @@ Human
   → Codex: único master harness técnico; implementa, integra y valida
       ├─ PlayCanvas MCP: estado semántico del Editor cuando haga falta
       ├─ Blender MCP: estado semántico de Blender cuando sea seguro
-      └─ terminal: mmx, git, npm, Vite, tests y scripts
+      ├─ Meshy oficial: MCP/skill/API sólo en sprint 3D aprobado
+      └─ terminal: mmx, tripo opcional, git, npm, Vite, tests y scripts
   ↔ Gemini: peer multimodal/contextual sobre el mismo repo
 ```
 
 - Codex es la única autoridad técnica y el único integrador. Puede delegar una
-  producción a `mmx`, pero revisa el resultado y decide si cumple.
+  producción a `mmx` o a un proveedor 3D, pero revisa el resultado y decide si cumple.
 - ChatGPT web entrega specs o decisiones; no necesita integración local.
 - Gemini produce análisis reproducibles en `agent-work/` cuando se le solicita;
   no redefine arquitectura ni orquesta el repo.
 - No agregar routers de modelos, subagent frameworks, colas, daemons, adapters
-  de harness ni MCPs para herramientas que funcionan bien por terminal.
+  de harness ni MCPs caseros para herramientas que ya tienen ruta oficial/CLI.
 
 Detalles de herramientas: `docs/80-production/AI_TOOLING.md`.
 
@@ -96,11 +97,14 @@ No declarar PASS si un check importante quedó sin ejecutar.
 
 ## Skills y herramientas
 
-- `.agents/skills/`: skills oficiales de PlayCanvas y dos reglas locales
-  compactas (`ohmdal-development`, `roxana-minimax`).
+- `.agents/skills/`: skills oficiales de PlayCanvas y tres reglas locales
+  compactas (`ohmdal-development`, `ohmdal-graphics-quality`, `roxana-minimax`).
 - `mmx-cli` y `web-perf`: skills oficiales instaladas globalmente en este host.
 - Git, npm, Vite, TypeScript, Playwright y transformaciones glTF: terminal.
-- MCP: sólo PlayCanvas Editor y Blender; no crear MCP propio para MiniMax.
+- MCP stateful: PlayCanvas Editor y Blender. Meshy MCP oficial es opcional para
+  un sprint de assets aprobado; no crear MCP propio para MiniMax, Tripo o Meshy.
+- Proveedores 3D deben terminar en GLB/manifiesto portable; nunca se convierten
+  en dependencia del runtime.
 
 ## Intercambio con Gemini
 
