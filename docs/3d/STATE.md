@@ -13,7 +13,9 @@
 - El slice de referencia continúa concentrado en Portal → Plaza → Taller/Lumen → Puerta Ω → Manantial.
 
 Visión específica: [`../20-worlds/ohmdal/OHMDAL_OUTER_WILDS_VISION_v1.md`](../20-worlds/ohmdal/OHMDAL_OUTER_WILDS_VISION_v1.md).  
-Producción Plaza/recursos: [`../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md`](../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md).
+Producción Plaza/recursos: [`../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md`](../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md).  
+Stack agentic/proveedores: [`../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md`](../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md).  
+Art pass ejecutable: [`../20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md`](../20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md).
 
 ## Harness vigente
 
@@ -23,7 +25,9 @@ Producción Plaza/recursos: [`../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTIO
 - MiniMax: worker mediante `mmx` por terminal.
 - PlayCanvas: skills oficiales; MCP sólo cuando el Editor vivo aporta valor.
 - Blender: DCC principal; MCP oficial opcional bajo gate de seguridad.
-- Meshy: acelerador opcional de hero assets cuando exista plan/API aprobados; no master DCC ni autoridad de arte.
+- Meshy: proveedor primario opcional para hero assets si existe plan/API aprobados; usar rutas oficiales MCP/skill/API, no wrappers propios.
+- Tripo: A/B/fallback por CLI/API cuando segmentación, batch, low-poly o calidad lo justifiquen; no dependencia base.
+- Three.js: cantera de técnicas/QA/authoring; no runtime de Ohmdal.
 
 El contrato completo vive en [`../80-production/AI_TOOLING.md`](../80-production/AI_TOOLING.md).
 
@@ -34,6 +38,7 @@ El contrato completo vive en [`../80-production/AI_TOOLING.md`](../80-production
 - Manifiesto, procedencia/licencia, calibración, budget y QA forman parte de la aprobación.
 - `assets/source/` permanece ignorado sin política Git LFS/almacenamiento de binarios; no asumir que un `.blend` local quedó preservado por Git.
 - Los assets históricos de la escuela conservan sus rutas actuales hasta una migración propia.
+- Todo proveedor generativo debe terminar en asset portable; PlayCanvas no conoce Meshy/Tripo.
 
 Documentos comunes:
 
@@ -43,28 +48,21 @@ Documentos comunes:
 - [`BUDGETS.md`](BUDGETS.md)
 - [`ASSET_PIPELINE.md`](ASSET_PIPELINE.md)
 - [`QA_PROTOCOL.md`](QA_PROTOCOL.md)
+- [`VISUAL_HARNESS.md`](VISUAL_HARNESS.md)
 
-## Estado mecánico por validar antes del art pass
+## Gate mecánico
 
-La documentación y los logs estáticos no coinciden completamente sobre el último fallo de build. `AI_TOOLING.md` registra referencias a `camPos` fuera de scope en el runtime PlayCanvas; `tsc-out.txt` conserva errores anteriores de `src/jugar/ExplorationScene.ts`.
+**PASS.** El fallo de `camPos` fuera de scope en `playcanvasRuntime.ts` fue corregido y la rama fue validada en GitHub Actions con el gate normal (`npm ci`, `npm run verify`, build/tests y validación de manifests 3D). Logs estáticos viejos se retiraron para no competir con evidencia reproducible.
 
-La siguiente corrida en el worktree real manda:
-
-```bash
-npm run build
-npm test
-npm run verify
-```
-
-Usar tests enfocados durante el arreglo y el gate normal definido por `AGENTS.md`; no declarar PASS por registros históricos. Después de obtener una corrida actual, actualizar o eliminar logs estáticos obsoletos.
+La corrida actual de CI/worktree manda sobre cualquier texto histórico. Si una regresión aparece, volver a rojo y corregirla antes de un art pass grande.
 
 ## Deuda inmediata
 
-1. Resolver el build/gate mecánico actual antes de una pasada de arte grande.
-2. Medir baseline real de la ruta `/ohmdal-playcanvas` en desktop y mobile.
+1. Implementar/terminar el **Visual Harness** reproducible para `/ohmdal-playcanvas`: hooks, vistas canónicas, desktop/mobile, diagnostics y detección de software renderer.
+2. Ejecutar `OHMDAL_PLAZA_ART_PASS_01.md`: baseline → assets genéricos → gramática propia → 3 hero assets → lighting → scorecard.
 3. Decidir estrategia de preservación de masters 3D (`Git LFS`, storage externo/R2 u otra) antes de producir muchos `.blend`/GLB pesados.
-4. Mantener la Plaza primero como prueba controlada: blockout → materiales → 3–5 hero assets → iluminación → optimización → QA.
-5. No instalar routers generales ni colecciones enormes de skills. Evaluar skills externos uno por uno.
+4. Mantener la Plaza primero como prueba controlada. No producir Castillo/Faro en 3D premium antes de demostrar el loop de producción.
+5. No instalar routers generales ni colecciones enormes de skills. Three.js/skills externos son referencias on-demand.
 
 ## Histórico
 
