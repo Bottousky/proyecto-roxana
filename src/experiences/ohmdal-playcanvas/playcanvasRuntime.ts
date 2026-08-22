@@ -495,6 +495,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       return;
     }
 
+    const camPos = world.playerEntity.getPosition();
+
     // 1. Check proximity interactables first (Ohm pedestal, NPCs, doors)
     const currentInteractables = getActiveInteractables();
     for (const item of currentInteractables) {
