@@ -10,6 +10,8 @@
     "test": "node scripts/run-tests.mjs",
     "verify": "bash scripts/verificar-hito.sh",
     "smoke:play": "node scripts/smoke-play.mjs",
+    "agent:gemini:check": "node scripts/agents/run-antigravity.mjs --check",
+    "agent:gemini": "node scripts/agents/run-antigravity.mjs",
     "3d:validate-manifests": "node scripts/3d/validate-asset-manifests.mjs",
     "3d:asset-index": "node scripts/3d/generate-asset-index.mjs",
     "3d:validate-glb": "node scripts/3d/validate-glb.mjs",
