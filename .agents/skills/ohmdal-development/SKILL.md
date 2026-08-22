@@ -19,6 +19,11 @@ de la tarea.
 - No inventar diálogo/lore; usar `TODO(guion)` y reportar.
 - No actualizar PlayCanvas, Vite ni otras dependencias como efecto lateral.
 
+Si una tarea exige reconciliar muchas fuentes o revisar un set visual grande,
+usar primero el peer Gemini/Antigravity definido en `AGENTS.md` y consumir su
+informe compacto. No gastar contexto de Codex cargando todo Ohmdal si el task
+packet ya ofrece `agent-work/tasks/gemini/` para destilarlo.
+
 Cargar sólo la skill oficial de PlayCanvas que corresponda a la operación
 concreta. Usar el MCP del Editor sólo si la tarea requiere su estado vivo; para
 Engine code-first usar terminal.
