@@ -65,6 +65,9 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
   code-first usa terminal.
 - Blender: herramienta primaria para assets/GLB. El MCP oficial requiere el gate
   de seguridad documentado en `docs/80-production/AI_TOOLING.md`.
+- Gemini/Antigravity: usar `agy` mediante `npm run agent:gemini` para context
+  distillation, reconciliación de muchas fuentes y fresh-eyes visual review. No
+  usar Gemini API y no darle autoridad de implementación.
 - MiniMax: sólo por `mmx`; Codex revisa e integra.
 - Política actual de authoring/proveedores/Three.js como cantera técnica:
   [`production/OHMDAL_AGENTIC_3D_STACK.md`](production/OHMDAL_AGENTIC_3D_STACK.md).
