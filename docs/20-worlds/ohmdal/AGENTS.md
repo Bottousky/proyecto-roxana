@@ -73,6 +73,11 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
 - Gemini/Antigravity: usar `agy` mediante `npm run agent:gemini` para context
   distillation, reconciliación de muchas fuentes y fresh-eyes visual review. No
   usar Gemini API y no darle autoridad de implementación.
+- **Loop visual activo de Plaza:** [`../../../agent-work/loops/ohmdal-plaza/LOOP.md`](../../../agent-work/loops/ohmdal-plaza/LOOP.md)
+  + `state.json`, bajo el contrato cross-Roxana [`../../80-production/BOUNDED_AGENT_LOOP.md`](../../80-production/BOUNDED_AGENT_LOOP.md).
+  Dentro de ese loop el reviewer automático es Gemini 3.7 Flash High; Sol High decide
+  y Luna Max ejecuta sólo trabajo mecánico ya especificado. No usar Pro ni `sol-advisor`
+  automáticamente.
 - MiniMax: sólo por `mmx`; Codex revisa e integra.
 - Hero assets: contrato cross-Roxana
   [`../../3d/HERO_REFERENCE_GATE.md`](../../3d/HERO_REFERENCE_GATE.md). Cada hero
@@ -101,6 +106,10 @@ Una captura o un build verde no bastan para aprobar experiencia/aprendizaje.
 
 Para un hero, además, el reference pack debe estar `approved` y validar antes de
 modelar o generar el candidate final.
+
+Para el loop de Plaza ejecutar además `npm run loop:ohmdal-plaza:validate`; el loop
+puede avanzar entre iteraciones/stages sin aprobación humana mientras no aparezca
+un `HUMAN_GATE` definido en su contrato.
 
 Cambios de experiencia, engine/dependencias, canon, guion, dirección visual o
 migración de runtime se escalan a Manuel.
