@@ -4,57 +4,71 @@
   "world": "ohmdal",
   "name": "Galvanoscopio de Lumen",
   "mode": "design-approved",
-  "status": "blocked-missing-primary-reference",
-  "primaryReference": "",
+  "status": "approved",
+  "primaryReference": "assets/references/hero-packs/galvanoscope/galvanoscope-turnaround-v1.webp",
   "supportingReferences": [
+    "assets/references/hero-packs/galvanoscope/galvanoscope-first-person-v1.webp",
+    "docs/20-worlds/ohmdal/production/GALVANOSCOPE_CANONICAL_BRIEF.md",
     "docs/20-worlds/ohmdal/OHMDAL_OUTER_WILDS_VISION_v1.md",
     "docs/80-production/spikes/ohmdal-greenfield-explorable/SPIKE_REPORT.md",
-    "docs/80-production/spikes/ohmdal-greenfield-explorable/refs/03-first-person-device.jpg",
-    "assets/ohmdal/rooms/pilot-arco1/taller+props_lumen-v2.png",
-    "src/experiences/ohmdal-playcanvas/playcanvasWorld.ts",
-    "src/experiences/ohmdal-plaza/viewmodel/galvanoscopeViewmodel.ts"
+    "assets/ohmdal/rooms/pilot-arco1/taller+props_lumen-v2.png"
   ],
   "physicalAnchors": {
     "unit": "meter",
     "frontAxis": "+Z",
     "upAxis": "+Y",
     "groundedPivot": false,
-    "usage": "diegetic handheld first-person instrument",
+    "heightMeters": 0.24,
+    "heightToleranceMeters": [0.22, 0.28],
+    "usage": "diegetic handheld first-person diagnostic instrument",
     "movingParts": [
       "analog needle",
       "two independent test probes and their leads"
     ]
   },
   "mustPreserve": [
-    "readable analog voltmeter needle",
-    "continuity and resistance measurement function",
-    "two independent physical test probes",
+    "compact rounded-rectangular handheld silhouette",
+    "large dominant circular analog dial under glass",
+    "fine readable mechanical needle",
+    "top carry handle",
+    "large front analog selector",
+    "two clearly differentiated ceramic terminals",
+    "two independent physical test probes and cloth-wrapped leads",
+    "at least one visibly repaired or mismatched local probe/cable element",
+    "dark technical wood with aged brass/copper, pale ceramic, glass and dark secondary metal",
+    "visual contrast between refined original construction and later local maintenance",
     "handheld first-person readability",
     "identity as a diagnostic instrument rather than a weapon"
   ],
   "mayResolve": [
-    "overall silhouette and exact dimensions after visual approval",
-    "housing construction and grip ergonomics",
-    "dial layout and selector mechanism",
-    "wood, brass, copper, ceramic and glass material allocation",
-    "lead routing, storage and attachment points",
-    "hidden fasteners and runtime mesh segmentation"
+    "exact chassis thickness within the approved silhouette",
+    "hidden fasteners and internal construction",
+    "runtime mesh segmentation and topology",
+    "cable routing that does not contradict the references",
+    "minor wear, scratches and maintenance details",
+    "exact selector detents and printed scale values pending gameplay calibration"
   ],
   "forbidden": [
+    "claiming Maese Lumen invented or designed the Galvanoscopio",
+    "making measurements actually depend on superstition, ritual or belief",
+    "treating generated concept-sheet decorative text, serial numbers or exact scale values as canon unless the brief ratifies them",
     "treating the generic Outer Wilds mood image as design authority",
     "treating either procedural runtime placeholder as approved canon",
-    "free text-to-3D redesign before a primary visual reference is approved",
+    "free text-to-3D redesign that departs from the approved primary reference",
     "generic modern digital multimeter styling",
-    "weapon silhouette or weapon controls",
-    "passive neon glow used as the instrument's identity"
+    "LCD or LED screen",
+    "weapon silhouette, trigger or weapon controls",
+    "ornamental steampunk additions without electrical or mechanical function",
+    "passive neon glow used as the instrument's identity",
+    "magical runes or unexplained fantasy symbols"
   ],
   "authoring": {
-    "preferredRoute": "undecided-until-reference-gate-passes",
+    "preferredRoute": "blender-deterministic-first",
     "buildScript": null,
-    "canonicalGlb": null,
+    "canonicalGlb": "assets/runtime/ohmdal/plaza/heroes/galvanoscope/galvanoscope.glb",
     "generativeProviderRequired": false
   },
-  "approvalNote": "HUMAN_GATE: provide or approve a stable primary concept/turnaround that defines silhouette, proportions, material grammar, controls, probes and first-person grip. The listed sources establish function or mood only and are not sufficient visual authority.",
+  "approvalNote": "Human design gate resolved 2026-08-23. Manuel approved the generated turnaround and first-person concepts together with GALVANOSCOPE_CANONICAL_BRIEF.md. Sol must still verify reconstruction fidelity and runtime constraints before Stage 3 PASS. Text printed inside the concept images is decorative unless explicitly ratified by the canonical brief.",
   "referenceAudit": {
     "searchedScopes": [
       "docs/20-worlds/ohmdal",
@@ -68,24 +82,32 @@
     "rejectedAsPrimary": [
       {
         "path": "docs/80-production/spikes/ohmdal-greenfield-explorable/refs/03-first-person-device.jpg",
-        "reason": "generic external mood image; it depicts a different science-fiction handheld device and does not define the Galvanoscopio"
+        "reason": "generic external mood image; different device"
       },
       {
         "path": "assets/ohmdal/rooms/pilot-arco1/taller+props_lumen-v2.png",
-        "reason": "approved-looking environment support only; no identifiable Galvanoscopio concept or multiview"
+        "reason": "environment support only"
       },
       {
         "path": "src/experiences/ohmdal-playcanvas/playcanvasWorld.ts",
-        "reason": "current primitive runtime placeholder; implementation evidence cannot promote itself to canon"
+        "reason": "runtime placeholder cannot promote itself to canon"
       },
       {
         "path": "src/experiences/ohmdal-plaza/viewmodel/galvanoscopeViewmodel.ts",
-        "reason": "legacy procedural placeholder; implementation evidence cannot promote itself to canon"
+        "reason": "legacy procedural placeholder cannot promote itself to canon"
       }
-    ]
+    ],
+    "humanResolution": {
+      "date": "2026-08-23",
+      "narrativeChoice": "functional inherited instrument partially misunderstood and surrounded by superstition",
+      "primaryVisualAuthority": "assets/references/hero-packs/galvanoscope/galvanoscope-turnaround-v1.webp",
+      "firstPersonAuthority": "assets/references/hero-packs/galvanoscope/galvanoscope-first-person-v1.webp"
+    }
   },
   "evidence": {
-    "stageReport": null,
-    "preview": null
+    "canonicalBrief": "docs/20-worlds/ohmdal/production/GALVANOSCOPE_CANONICAL_BRIEF.md",
+    "stageGateReport": "agent-work/reports/gemini/ohmdal-plaza-loop-stage-3-galvanoscope-hero-reference-gate.md",
+    "turnaround": "assets/references/hero-packs/galvanoscope/galvanoscope-turnaround-v1.webp",
+    "firstPerson": "assets/references/hero-packs/galvanoscope/galvanoscope-first-person-v1.webp"
   }
 }
