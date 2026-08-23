@@ -1,7 +1,7 @@
 # Ohmdal 3D — stack agentic y política de proveedores
 
 **Rama:** `explore/ohmdal-3D`  
-**Actualizado:** 2026-08-22  
+**Actualizado:** 2026-08-23  
 **Objetivo:** producir assets y escenas 3D con agentes sin atar el runtime a un proveedor generativo ni convertir el repo en un multi-harness.
 
 ## Decisión
@@ -13,236 +13,231 @@ ChatGPT web          diseño / investigación / decisiones
        │
        ├─ agy/Gemini  contexto amplio + multimodal + fresh-eyes; NO API
        ├─ PlayCanvas  runtime de Ohmdal + skills oficiales
-       ├─ Blender     DCC/master canónico; MCP oficial sólo con gate
-       ├─ Meshy       hero assets por REST / MCP / skill cuando haya crédito aprobado
-       ├─ Tripo       A/B o fallback por CLI/API; no dependencia permanente
-       ├─ Three.js    biblioteca de técnicas, QA y authoring; NO runtime de Ohmdal
+       ├─ Blender     DCC/master canónico
+       ├─ Meshy       candidate generator cuando agrega valor
+       ├─ Tripo       A/B/fallback
+       ├─ Three.js    técnicas, QA y authoring; NO runtime de Ohmdal
        └─ terminal    git, npm, Playwright, glTF tools, mmx
 ```
 
-Gemini no forma un segundo harness de autoridad: Codex lo invoca o consume sus
-informes. La ruta canónica es Antigravity CLI con login local, no Gemini API.
-
-**Contrato de portabilidad:** el producto de authoring debe terminar como `GLB/glTF + manifiesto + procedencia`, independientemente de que el origen sea Meshy, Tripo, Blender, Three.js procedural o un pack CC0. PlayCanvas consume el resultado; no conoce al proveedor.
+Gemini no es segunda autoridad: Codex consume sus informes. Los proveedores 3D
+no definen diseño ni runtime. El contrato final sigue siendo
+`GLB/glTF + manifiesto + procedencia`.
 
 ## 1. Runtime vs authoring
 
-- **PlayCanvas Engine v2 + TypeScript** sigue siendo el target del spike de Ohmdal.
-- **Blender** es el master DCC para escala, pivots, jerarquía, materiales, cleanup, colisiones, sockets, LOD/variantes y export.
-- **Three.js** se aprovecha como ecosistema de conocimiento y tooling: técnicas de materiales, agua, vegetación, arquitectura procedural, cámaras, shaders y QA. Una referencia Three se traduce a PlayCanvas o se bakea/exporta; no introduce `three` dentro del runtime de Ohmdal.
-- `img2threejs` queda como **watchlist/authoring experimental**. Puede entrar cuando su salida estructurada/GLB aporte valor comprobable. No bloquea producción ni define el formato canonical.
+- **PlayCanvas Engine v2 + TypeScript** es el target del spike de Ohmdal.
+- **Blender** es el master DCC para escala, pivots, jerarquía, materiales, cleanup,
+  colisiones, sockets, LOD/variantes y export.
+- **Three.js** se usa como ecosistema de conocimiento/tooling; una técnica se
+  traduce a PlayCanvas o se bakea/exporta.
+- `img2threejs` es authoring experimental/watchlist. No define el formato canonical.
 
-## 2. Gemini / Antigravity — comprimir contexto, no implementar
+## 2. HERO_REFERENCE_GATE — referencia antes que proveedor
 
-Gemini se usa donde su contexto/multimodalidad evita gasto innecesario de Codex:
+Antes de modelar o generar cualquier asset identitario, aplicar:
 
-- reconciliar muchas fuentes de lore/diseño/producción;
-- generar un `CODEX MINIMAL READING SET` antes de una tarea grande;
-- revisar screenshots, mapas, renders GLB y variantes;
-- fresh-eyes review independiente sobre el visual harness;
-- detectar contradicciones/documentación stale.
+`docs/3d/HERO_REFERENCE_GATE.md`
+
+Cada hero necesita un `hero-reference.json` validado:
+
+```bash
+npm run 3d:validate-hero-ref -- path/to/hero-reference.json
+```
+
+Modos:
+
+- `reconstruct`: existe turnaround/concept fuerte; preservar silueta/proporción/paleta.
+- `adapt`: referencia fuerte + libertad técnica acotada para partes ocultas/funcionales.
+- `design-approved`: referencia insuficiente; primero concept pack aprobado por humano.
+
+**Ohm es el golden path:**
+
+```text
+ohmdal/characters/ohm-turnaround-v2.png
++ specs
+→ hero-reference.json
+→ build_ohm_hero.py
+→ Blender determinista
+→ preview
+→ GLB canonical
+→ Visual Harness
+```
+
+Stage 2A obtuvo alta fidelidad con 0 créditos generativos. La lección es:
+**la referencia manda; la herramienta sólo ejecuta**.
+
+## 3. Gemini / Antigravity
+
+Usar Gemini donde su contexto/multimodalidad evita gasto innecesario de Codex:
+
+- reconciliar muchas fuentes;
+- generar `CODEX MINIMAL READING SET`;
+- revisar screenshots/mapas/renders/variantes;
+- fresh-eyes visual review;
+- detectar contradicciones/stale docs.
 
 Ruta:
 
 ```text
 agent-work/tasks/gemini/*.md
-        ↓
-npm run agent:gemini -- --task ... --out ...
-        ↓
-Antigravity CLI / cached Google login
-        ↓
-agent-work/reports/gemini/*.md
-        ↓
-Codex verifica puntos load-bearing e implementa
+→ npm run agent:gemini ...
+→ Antigravity CLI / login Google
+→ agent-work/reports/gemini/*.md
+→ Codex verifica e implementa
 ```
 
-El runner `scripts/agents/run-antigravity.mjs` es read-only por contrato y falla
-si detecta cambios en el worktree durante la corrida. No usar Gemini API,
-`--dangerously-skip-permissions` ni permisos de implementación para esta lane.
+Sin Gemini API y sin permisos de implementación para esta lane.
 
-## 3. Assets genéricos — prioridad cero de costo
+## 4. Assets genéricos — costo cero primero
 
 Antes de generar con IA:
 
-1. **Poly Haven** — CC0, PBR/HDRI/modelos: https://polyhaven.com/
-2. **ambientCG** — CC0, PBR/HDRI: https://ambientcg.com/
-3. **Quaternius** — CC0, modular/props/nature/personajes/animación: https://quaternius.com/
-4. **Kenney** — CC0, blockout/modular: https://kenney.nl/assets
-5. **Mixamo** — rig/animación humanoide cuando aplique: https://www.mixamo.com/
+1. Poly Haven — CC0 PBR/HDRI/modelos: https://polyhaven.com/
+2. ambientCG — CC0 PBR/HDRI: https://ambientcg.com/
+3. Quaternius — CC0 modular/props/nature/personajes/animación: https://quaternius.com/
+4. Kenney — CC0 blockout/modular: https://kenney.nl/assets
+5. Mixamo — rig/animación humanoide cuando aplique: https://www.mixamo.com/
 
-La Plaza tiene su lista ejecutable en `OHMDAL_PLAZA_ASSET_CATALOG.json`; no abrir marketplaces si el catálogo resuelve la necesidad.
+La Plaza usa `OHMDAL_PLAZA_ASSET_CATALOG.json`; no abrir marketplaces si el
+catálogo ya resuelve la necesidad.
 
-## 4. Meshy — proveedor generativo primario si Pro está activo
+## 5. Cómo elegir authoring para un hero
 
-### Por qué encaja
+Después del Hero Reference Gate:
 
-Meshy tiene integración oficial para agentes y API y cubre en la misma cuenta:
+```text
+¿Es mecánico/arquitectónico/simple y controlable?
+  sí → Blender determinista/procedural primero
+  no ↓
+¿Es orgánico/escultórico o costoso manualmente?
+  sí → Meshy primary candidate
+       ↓
+     compare contra reference pack
+       ↓
+     Blender canonicalization
+       │
+       └─ falla → Tripo A/B
+```
 
-- text → 3D;
-- image → 3D;
-- multi-image → 3D;
-- preview → refine/textura;
-- remesh / smart topology;
-- retexture;
-- rig humanoide;
-- animación;
-- generación/edición de imagen;
-- export game/print y utilidades de impresión 3D.
+Esto reemplaza la regla vieja “hero = Meshy por defecto”. Ohm demostró que
+Blender directo puede ser más fiel y barato cuando el turnaround es fuerte.
+
+## 6. Meshy
+
+Meshy sigue siendo el proveedor generativo primario cuando agrega valor:
+
+- text/image/multi-image → 3D;
+- preview/refine;
+- remesh/retexture;
+- rig/animation;
+- export game/print.
 
 Fuentes oficiales:
 
-- AI integration / MCP / skill: https://docs.meshy.ai/en/api/ai
-- Text to 3D: https://docs.meshy.ai/en/api/text-to-3d
-- Image to 3D: https://docs.meshy.ai/en/api/image-to-3d
-- Multi-image to 3D: https://docs.meshy.ai/en/api/multi-image-to-3d
-- API pricing: https://docs.meshy.ai/en/api/pricing
-- MCP server: https://github.com/meshy-dev/meshy-mcp-server
-- Agent skill: https://github.com/meshy-dev/meshy-3d-agent
+- https://docs.meshy.ai/en/api/ai
+- https://docs.meshy.ai/en/api/text-to-3d
+- https://docs.meshy.ai/en/api/image-to-3d
+- https://docs.meshy.ai/en/api/multi-image-to-3d
+- https://docs.meshy.ai/en/api/pricing
+- https://github.com/meshy-dev/meshy-mcp-server
+- https://github.com/meshy-dev/meshy-3d-agent
 
-### Ruta preferida
+Para `reconstruct`, preferir image/multiview; text-to-3D sólo explora forma y no
+puede desplazar la referencia aprobada. Revisar silueta antes de refine/textura
+cara. Descargar GLB y pasar por Blender antes de runtime.
 
-Para un hero asset con diseño aprobado:
+## 7. Tripo
 
-```text
-concept / vistas
-  → Meshy preview o image/multi-image-to-3D
-  → revisar silueta antes de textura cara
-  → refine / smart topology / retexture si aporta valor
-  → descargar GLB inmediatamente
-  → Blender cleanup/canonical
-  → inspect-glb + calibrate-model
-  → PlayCanvas
-  → visual harness
-```
+Tripo es A/B/fallback cuando aporta mejor:
 
-**No usar `text-to-3D` como sustituto de dirección artística** para piezas identitarias. Para Ohm, Galvanoscopio, Puerta Ω o maquinaria pedagógica se prefiere concept aprobado + image/multi-image.
-
-### MCP vs skill/API
-
-- Si Codex necesita tool-calling conversacional y tareas encadenadas: **MCP oficial**.
-- Si sólo necesita un workflow reproducible generate → poll → download: **skill/API**.
-- No crear wrapper/MCP propio mientras estas rutas oficiales cubran el caso.
-- Nunca commitear `MESHY_API_KEY`.
-- Registrar `taskId`, modelo, parámetros, créditos consumidos, outputs y ruta canonical.
-
-## 5. Tripo — A/B y fallback fuerte, no dependencia base
-
-Tripo V3 es útil cuando convenga alguno de estos puntos:
-
-- `text/image/multiview → model`;
-- generación con `model_seed` reproducible;
-- P Series para low-poly/topología limpia;
-- segmentación de malla;
-- completion/repair;
-- decimate/retopology;
-- rig-check, rig y retarget;
-- procesamiento por lotes.
+- multiview → model;
+- segmentación;
+- low-poly/topología;
+- rig/retarget;
+- batch reproducible.
 
 Fuentes:
 
-- API: https://developers.tripo3d.ai/en/
-- CLI: https://developers.tripo3d.ai/en/docs/cli
+- https://developers.tripo3d.ai/en/
+- https://developers.tripo3d.ai/en/docs/cli
 
-El CLI oficial puede ser usado por Codex desde terminal y soporta `tripo make`, presets `game-mobile`, `game-pc`, `print`, batch resumible y `tripo mcp`.
+Webapp y API tienen billing separado; no asumir créditos compartidos.
 
-**Regla de costo:** Tripo webapp y Tripo API tienen billing/créditos separados. No adoptar un plan web esperando que financie automáticamente generación agentic. Usar Tripo cuando una prueba A/B demuestre mejor geometría, segmentación, rig o costo total para un asset concreto.
+## 8. Three.js como cantera
 
-## 6. Meshy vs Tripo — regla práctica
+Referencias on-demand, no dependencias runtime:
 
-No elegir por marca; ejecutar el mismo brief cuando el asset sea importante.
+- https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills
+  - materials, architecture, vegetation, water, exposure, visual validation.
+- https://github.com/majidmanzarpour/threejs-game-skills
+  - scorecard, budgets, deterministic visual harness, browser/canvas QA.
+- `img2threejs`
+  - experimentar sólo cuando su salida estructurada aporte más que Blender/proveedor.
 
-| Caso | Default |
-|---|---|
-| Hero prop de Ohmdal con Meshy Pro activo | Meshy |
-| Multi-view de pieza mecánica/arquitectónica | Meshy primero; Tripo A/B si falla |
-| Necesidad fuerte de segmentación editable | Tripo A/B |
-| Batch low-poly reproducible | Tripo CLI puede ser mejor candidato |
-| Asset genérico ya disponible CC0 | ninguno |
-| Pieza mecánica con tolerancias reales | CAD/FreeCAD/OpenSCAD, no IA 3D |
-| Figura/prop imprimible no mecánico | Meshy/Tripo → Blender → STL/3MF |
+Regla: **extraer mecanismo, no dependencia**.
 
-## 7. Three.js como cantera de técnicas
-
-No instalar routers/directores Three.js en Roxana. Usar repos externos como referencias on-demand:
-
-- `scottstts/Threejs-Awesome-Graphics-Agent-Skills`
-  - procedural materials;
-  - architecture;
-  - vegetation;
-  - water optics;
-  - exposure/color grading;
-  - visual validation.
-- `majidmanzarpour/threejs-game-skills`
-  - visual scorecard;
-  - technical-art budgets;
-  - deterministic visual harness;
-  - Playwright/canvas inspection;
-  - Tripo workflow ideas.
-
-Regla: **extraer mecanismo, no dependencia**. Si una receta habla de TSL/Three, traducir la intención y la matemática a PlayCanvas o bakearla a un asset.
-
-## 8. Visual feedback loop — obligatorio para calidad premium
+## 9. Visual feedback loop
 
 ```text
-acquire / generate
+reference gate
       ↓
-normalize
+author / generate
+      ↓
+normalize in Blender
+      ↓
+reference preview comparison
       ↓
 integrate
       ↓
 MULTI-VIEW VISUAL HARNESS
       ↓
-metrics + screenshots + console
+metrics + screenshots
       ↓
-Gemini fresh-eyes critic
+Gemini fresh-eyes
       ↓
 Codex fix
-      └───────────────↺
+      └──────────────↺
 ```
 
-Contrato común: `docs/3d/VISUAL_HARNESS.md`.
+Contrato: `docs/3d/VISUAL_HARNESS.md`.
 
-Un agente no puede autoaprobar una escena porque compiló. Para claims `premium/AAA-like` debe existir evidencia desktop/mobile, vistas canónicas, baseline sin post, renderer diagnostics y revisión adversarial/fresh-eyes.
-
-## 9. Customuse — observar, no depender
-
-Customuse es interesante como grafo multi-provider (Meshy/Tripo/Hunyuan + retopo/materiales/export), pero no entra al baseline actual:
-
-- agrega otra suscripción;
-- la API/custom integration es una capa de mayor costo/Enterprise;
-- Blender + providers directos ya cubren el loop actual.
-
-Reevaluar sólo si Roxana empieza a producir assets en volumen suficiente para que un grafo multi-provider repetible ahorre más tiempo que su costo.
-
-## 10. Orden de decisión para cualquier asset Roxana
+## 10. Decision tree para cualquier asset
 
 ```text
-¿Existe CC0 usable?
+¿Existe CC0 usable y no es identitario?
   sí → adquirir + adaptar
-  no  ↓
-¿es identitario/hero?
+  no ↓
+¿es hero/identitario?
   no → Blender/procedural simple
   sí ↓
-¿hay concept aprobado?
-  no → generar/aprobar vistas primero
-  sí ↓
-Meshy primary → Blender → GLB → QA
+HERO_REFERENCE_GATE
   │
-  └─ falla calidad/estructura → Tripo A/B
+  ├─ FAIL → producir/aprobar referencias; STOP modelado final
+  └─ PASS
+       ↓
+¿Blender directo reproduce la forma con precisión razonable?
+  sí → Blender
+  no → Meshy candidate → Blender
+          └─ falla → Tripo A/B
 ```
 
-## 11. Definition of Done de un asset agentic
+## 11. Definition of Done hero
 
 No está terminado hasta tener:
 
-- fuente/brief y derechos claros;
-- proveedor/modelo/parámetros/task ID;
-- créditos/costo registrados si aplica;
-- master o fuente preservable;
-- GLB runtime normalizado;
-- escala, pivote, frente y bounds correctos;
-- triángulos/materiales/texturas dentro de budget;
+- `hero-reference.json` aprobado y validado;
+- fuente/brief/derechos claros;
+- ruta de producción registrada;
+- proveedor/modelo/task ID/créditos si aplica;
+- master o script reproducible;
+- preview comparado contra referencia;
+- GLB canonical normalizado;
+- escala/pivot/frente/bounds correctos;
+- partes móviles preservadas;
+- tris/materiales/texturas dentro de budget;
 - screenshot en cámara real;
-- desktop + mobile cuando visible en ambos;
+- desktop/mobile cuando aplica;
 - manifiesto/procedencia;
-- `npm run verify` verde para cambios versionados.
+- Visual Harness/fresh-eyes cuando sea entrega importante;
+- `npm run verify` verde.
