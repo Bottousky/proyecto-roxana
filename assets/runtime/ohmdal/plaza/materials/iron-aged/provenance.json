@@ -1,0 +1,44 @@
+{
+  "id": "roxana-ohmdal-iron-aged-v1",
+  "provider": "Poly Haven",
+  "sourceAsset": "rusty_metal_04",
+  "sourceUrl": "https://polyhaven.com/a/rusty_metal_04",
+  "license": "CC0-1.0",
+  "sourceResolution": "2k",
+  "runtimeResolution": "1k",
+  "processing": "Pillow LANCZOS; JPEG quality 84 or optimized PNG; no displacement",
+  "outputs": [
+    {
+      "map": "diff",
+      "path": "assets/runtime/ohmdal/plaza/materials/iron-aged/diffuse-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 259431,
+      "sha256": "1dadd70d0d39a7958f1dfad56f1ee446c9b729bd9fc132efd82945a019f0d97c"
+    },
+    {
+      "map": "nor_gl",
+      "path": "assets/runtime/ohmdal/plaza/materials/iron-aged/normal-1k.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 1869646,
+      "sha256": "0a893265c9a3712c40d329b536f50d08b23c03ad492cafc3154a16684f295d04"
+    },
+    {
+      "map": "rough",
+      "path": "assets/runtime/ohmdal/plaza/materials/iron-aged/roughness-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 212081,
+      "sha256": "991b3826226899ec08540d8d3867b63d00bfdc165664e774f681a2a08376871a"
+    },
+    {
+      "map": "metal",
+      "path": "assets/runtime/ohmdal/plaza/materials/iron-aged/metalness-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 312195,
+      "sha256": "98577d89e994f34d7c6be7f2cf69ddc8bbf41b4ac1025af422eeae2440e40581"
+    }
+  ]
+}

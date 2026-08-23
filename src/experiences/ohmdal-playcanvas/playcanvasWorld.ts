@@ -1,7 +1,10 @@
 import * as pc from 'playcanvas';
+import { OHM_HERO_TUNING } from './ohmHeroTuning.ts';
+import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
 
 export interface PlayCanvasWorldElements {
   app: pc.Application;
+  ready: Promise<void>;
   cameraEntity: pc.Entity;
   playerEntity: pc.Entity;
   viewmodelRoot: pc.Entity;
@@ -53,6 +56,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   // --- 1. Materials (PBR) ---
   const matStone = new pc.StandardMaterial();
+  matStone.name = 'roxana-ohmdal-stone-primary-v1';
   matStone.diffuse = new pc.Color(0.55, 0.5, 0.44);
   matStone.useMetalness = true;
   matStone.gloss = 0.15;
@@ -60,33 +64,38 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matStone.update();
 
   const matStoneDark = new pc.StandardMaterial();
-  matStoneDark.diffuse = new pc.Color(0.35, 0.3, 0.26);
+  matStoneDark.name = 'roxana-ohmdal-stone-aged-v1';
+  matStoneDark.diffuse = new pc.Color(0.42, 0.37, 0.32);
   matStoneDark.useMetalness = true;
   matStoneDark.gloss = 0.1;
   matStoneDark.metalness = 0.05;
   matStoneDark.update();
 
   const matMountain = new pc.StandardMaterial();
-  matMountain.diffuse = new pc.Color(0.28, 0.26, 0.25);
+  matMountain.diffuse = new pc.Color(0.34, 0.32, 0.3);
   matMountain.useMetalness = true;
   matMountain.gloss = 0.08;
   matMountain.metalness = 0.02;
   matMountain.update();
 
   const matCopperClean = new pc.StandardMaterial();
-  matCopperClean.diffuse = new pc.Color(0.85, 0.52, 0.28);
-  matCopperClean.emissive = new pc.Color(0.9, 0.45, 0.1);
-  matCopperClean.emissiveIntensity = 0.3;
+  matCopperClean.name = 'roxana-ohmdal-copper-aged-v1';
+  matCopperClean.diffuse = new pc.Color(0.62, 0.29, 0.12);
+  matCopperClean.emissive = pc.Color.BLACK;
+  matCopperClean.emissiveIntensity = 0;
   matCopperClean.useMetalness = true;
-  matCopperClean.metalness = 0.9;
-  matCopperClean.gloss = 0.68;
+  // The spike has no image-based lighting yet. Keeping these metals below full
+  // metalness preserves their copper albedo on faces outside the key light.
+  matCopperClean.metalness = 0.58;
+  matCopperClean.gloss = 0.46;
   matCopperClean.update();
 
   const matCopperOxide = new pc.StandardMaterial();
+  matCopperOxide.name = 'roxana-ohmdal-verdigris-v1';
   matCopperOxide.diffuse = new pc.Color(0.32, 0.6, 0.48); // Verdigris green
   matCopperOxide.useMetalness = true;
   matCopperOxide.gloss = 0.2;
-  matCopperOxide.metalness = 0.4;
+  matCopperOxide.metalness = 0.12;
   matCopperOxide.update();
 
   const matBrass = new pc.StandardMaterial();
@@ -106,13 +115,15 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matGlowGold.update();
 
   const matWood = new pc.StandardMaterial();
+  matWood.name = 'roxana-ohmdal-wood-workshop-v1';
   matWood.diffuse = new pc.Color(0.34, 0.24, 0.16);
   matWood.useMetalness = true;
   matWood.gloss = 0.25;
   matWood.update();
 
   const matWoodDark = new pc.StandardMaterial();
-  matWoodDark.diffuse = new pc.Color(0.22, 0.15, 0.1);
+  matWoodDark.name = 'roxana-ohmdal-wood-charred-v1';
+  matWoodDark.diffuse = new pc.Color(0.31, 0.22, 0.15);
   matWoodDark.useMetalness = true;
   matWoodDark.gloss = 0.2;
   matWoodDark.update();
@@ -160,14 +171,166 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matSkin.gloss = 0.25;
   matSkin.update();
 
+  const matPlaster = new pc.StandardMaterial();
+  matPlaster.name = 'roxana-ohmdal-plaster-worn-v1';
+  matPlaster.diffuse = new pc.Color(0.58, 0.5, 0.39);
+  matPlaster.useMetalness = true;
+  matPlaster.metalness = 0;
+  matPlaster.gloss = 0.18;
+  matPlaster.update();
+
+  const matIron = new pc.StandardMaterial();
+  matIron.name = 'roxana-ohmdal-iron-aged-v1';
+  matIron.diffuse = new pc.Color(0.34, 0.28, 0.23);
+  matIron.useMetalness = true;
+  matIron.metalness = 0.46;
+  matIron.gloss = 0.2;
+  matIron.update();
+
+  const matCeramic = new pc.StandardMaterial();
+  matCeramic.name = 'roxana-ohmdal-ceramic-insulator-v1';
+  matCeramic.diffuse = new pc.Color(0.67, 0.58, 0.46);
+  matCeramic.useMetalness = true;
+  matCeramic.metalness = 0;
+  matCeramic.gloss = 0.46;
+  matCeramic.update();
+
+  const matMoss = new pc.StandardMaterial();
+  matMoss.name = 'roxana-ohmdal-moss-v1';
+  matMoss.diffuse = new pc.Color(0.18, 0.28, 0.15);
+  matMoss.useMetalness = true;
+  matMoss.metalness = 0;
+  matMoss.gloss = 0.08;
+  matMoss.update();
+
+  const matPaving = new pc.StandardMaterial();
+  matPaving.name = 'roxana-ohmdal-plaza-cobble-v1';
+  matPaving.diffuse = new pc.Color(0.48, 0.43, 0.36);
+  matPaving.useMetalness = true;
+  matPaving.metalness = 0;
+  matPaving.gloss = 0.16;
+  matPaving.update();
+
+  const matPavingDamp = new pc.StandardMaterial();
+  matPavingDamp.name = 'roxana-ohmdal-plaza-cobble-damp-local-v1';
+  matPavingDamp.diffuse = new pc.Color(0.38, 0.36, 0.31);
+  matPavingDamp.useMetalness = true;
+  matPavingDamp.metalness = 0;
+  matPavingDamp.gloss = 0.62;
+  matPavingDamp.update();
+
+  type TextureSet = {
+    diffuse: string;
+    normal?: string;
+    roughness?: string;
+    ao?: string;
+    metalness?: string;
+  };
+
+  const runtimeMaterialUrl = (set: string, file: string) =>
+    new URL(`../../../assets/runtime/ohmdal/plaza/materials/${set}/${file}`, import.meta.url).href;
+
+  const loadTexture = (name: string, url: string) =>
+    new Promise<pc.Texture>((resolve, reject) => {
+      const asset = new pc.Asset(name, 'texture', { url });
+      app.assets.add(asset);
+      asset.ready((loaded) => resolve(loaded.resource as pc.Texture));
+      asset.once('error', reject);
+      app.assets.load(asset);
+    });
+
+  const loadContainerEntity = (name: string, url: string) =>
+    new Promise<pc.Entity>((resolve, reject) => {
+      const asset = new pc.Asset(name, 'container', { url });
+      app.assets.add(asset);
+      asset.ready((loaded) => {
+        const resource = loaded.resource as pc.ContainerResource;
+        resolve(resource.instantiateRenderEntity());
+      });
+      asset.once('error', reject);
+      app.assets.load(asset);
+    });
+
+  const applyTextureSet = async (
+    material: pc.StandardMaterial,
+    set: string,
+    maps: TextureSet,
+    tiling: pc.Vec2,
+  ) => {
+    const [diffuse, normal, roughness, ao, metalness] = await Promise.all([
+      loadTexture(`${set}-diffuse`, maps.diffuse),
+      maps.normal ? loadTexture(`${set}-normal`, maps.normal) : undefined,
+      maps.roughness ? loadTexture(`${set}-roughness`, maps.roughness) : undefined,
+      maps.ao ? loadTexture(`${set}-ao`, maps.ao) : undefined,
+      maps.metalness ? loadTexture(`${set}-metalness`, maps.metalness) : undefined,
+    ]);
+    material.diffuseMap = diffuse;
+    material.diffuseMapTiling = tiling;
+    if (normal) {
+      material.normalMap = normal;
+      material.normalMapTiling = tiling;
+      material.bumpiness = 0.72;
+    }
+    if (roughness) {
+      material.glossMap = roughness;
+      material.glossMapTiling = tiling;
+      material.glossInvert = true;
+    }
+    if (ao) {
+      material.aoMap = ao;
+      material.aoMapTiling = tiling;
+    }
+    if (metalness) {
+      material.metalnessMap = metalness;
+      material.metalnessMapTiling = tiling;
+    }
+    material.update();
+  };
+
+  const textureSet = (set: string, hasAo = true, hasMetalness = false): TextureSet => ({
+    diffuse: runtimeMaterialUrl(set, 'diffuse-1k.jpg'),
+    normal: runtimeMaterialUrl(set, 'normal-1k.png'),
+    roughness: runtimeMaterialUrl(set, 'roughness-1k.jpg'),
+    ...(hasAo ? { ao: runtimeMaterialUrl(set, 'ao-1k.jpg') } : {}),
+    ...(hasMetalness ? { metalness: runtimeMaterialUrl(set, 'metalness-1k.jpg') } : {}),
+  });
+
+  const pavingReady = applyTextureSet(
+    matPavingDamp,
+    'plaza-cobble-base',
+    textureSet('plaza-cobble-base', false),
+    new pc.Vec2(10, 8),
+  ).then(() => {
+    // Share the stone maps, but deliberately leave the dry base without the
+    // source roughness map whose wet pockets read as plaza-wide standing water.
+    matPaving.diffuseMap = matPavingDamp.diffuseMap;
+    matPaving.diffuseMapTiling = matPavingDamp.diffuseMapTiling;
+    matPaving.normalMap = matPavingDamp.normalMap;
+    matPaving.normalMapTiling = matPavingDamp.normalMapTiling;
+    matPaving.bumpiness = matPavingDamp.bumpiness;
+    matPaving.gloss = 0.08;
+    matPaving.update();
+  });
+
+  const materialReady = Promise.all([
+    pavingReady,
+    applyTextureSet(matStone, 'stone-primary', textureSet('stone-primary'), new pc.Vec2(2.5, 2.5)),
+    applyTextureSet(matStoneDark, 'stone-aged', textureSet('stone-aged'), new pc.Vec2(2, 2)),
+    applyTextureSet(matPlaster, 'plaster-worn', textureSet('plaster-worn'), new pc.Vec2(2, 2)),
+    applyTextureSet(matWood, 'wood-workshop', textureSet('wood-workshop'), new pc.Vec2(2, 2)),
+    applyTextureSet(matWoodDark, 'wood-workshop', textureSet('wood-workshop'), new pc.Vec2(3, 3)),
+    applyTextureSet(matIron, 'iron-aged', textureSet('iron-aged', false, true), new pc.Vec2(2, 2)),
+  ]).then(() => undefined);
+
   // --- 2. Lighting & Environment ---
-  app.scene.ambientLight = new pc.Color(0.3, 0.24, 0.2);
+  app.scene.ambientLight = new pc.Color(0.49, 0.43, 0.38);
+  app.scene.exposure = 1.15;
 
   const sunEntity = new pc.Entity('Sun');
   sunEntity.addComponent('light', {
     type: 'directional',
     color: new pc.Color(1.0, 0.82, 0.58),
-    intensity: 2.2,
+    intensity: 2.75,
     castShadows: true,
     shadowBias: 0.05,
     shadowDistance: 60,
@@ -180,7 +343,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   fillEntity.addComponent('light', {
     type: 'directional',
     color: new pc.Color(0.42, 0.58, 0.8),
-    intensity: 0.7,
+    intensity: 1.18,
   });
   fillEntity.setEulerAngles(-40, 145, 0);
   app.root.addChild(fillEntity);
@@ -192,7 +355,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   const cameraEntity = new pc.Entity('Camera');
   cameraEntity.addComponent('camera', {
-    clearColor: new pc.Color(0.12, 0.1, 0.09),
+    clearColor: new pc.Color(0.17, 0.145, 0.125),
     fov: 72,
     nearClip: 0.05,
     farClip: 160,
@@ -246,13 +409,62 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   // ==========================================
   const plazaRoot = new pc.Entity('PlazaRoot');
   app.root.addChild(plazaRoot);
+  const plazaArtBatch = app.batcher.addGroup('OhmdalPlazaStaticArt', false, 40);
+
+  const addBox = (
+    parent: pc.Entity,
+    name: string,
+    position: [number, number, number],
+    scale: [number, number, number],
+    material: pc.StandardMaterial,
+    euler: [number, number, number] = [0, 0, 0],
+  ) => {
+    const entity = new pc.Entity(name);
+    entity.addComponent('render', { type: 'box', material });
+    entity.render!.batchGroupId = plazaArtBatch.id;
+    entity.render!.castShadows = Math.max(...scale) >= 2 && scale[1] >= 0.25;
+    entity.setPosition(...position);
+    entity.setLocalScale(...scale);
+    entity.setEulerAngles(...euler);
+    parent.addChild(entity);
+    return entity;
+  };
+
+  const addCylinder = (
+    parent: pc.Entity,
+    name: string,
+    position: [number, number, number],
+    scale: [number, number, number],
+    material: pc.StandardMaterial,
+    euler: [number, number, number] = [0, 0, 0],
+  ) => {
+    const entity = new pc.Entity(name);
+    entity.addComponent('render', { type: 'cylinder', material });
+    entity.render!.batchGroupId = plazaArtBatch.id;
+    entity.render!.castShadows = Math.max(...scale) >= 1 && scale[1] >= 0.3;
+    entity.setPosition(...position);
+    entity.setLocalScale(...scale);
+    entity.setEulerAngles(...euler);
+    parent.addChild(entity);
+    return entity;
+  };
 
   // Main Flagstone Ground
   const ground = new pc.Entity('PlazaGround');
-  ground.addComponent('render', { type: 'box', material: matStone });
+  ground.addComponent('render', { type: 'box', material: matPaving });
   ground.setPosition(0, -0.15, 0);
   ground.setLocalScale(36, 0.3, 30);
   plazaRoot.addChild(ground);
+
+  // Moisture is environmental evidence, not a global material treatment:
+  // a narrow fountain apron, its runoff channel and one low drain retain the
+  // wet response while the plaza remains predominantly dry stone.
+  addCylinder(plazaRoot, 'FountainDampApron', [5.5, 0.014, 3.8], [7.2, 0.024, 7.2], matPavingDamp);
+  addBox(plazaRoot, 'FountainRunoff', [5.5, 0.014, 0.35], [0.72, 0.024, 3.1], matPavingDamp);
+  addBox(plazaRoot, 'LowDrainDampApron', [5.5, 0.014, -1.35], [2.5, 0.024, 0.55], matPavingDamp);
+  for (const x of [4.65, 5.05, 5.45, 5.85, 6.25]) {
+    addBox(plazaRoot, `LowDrainBar${x}`, [x, 0.038, -1.35], [0.12, 0.035, 0.46], matIron);
+  }
 
   // The Ancient Institute Portal (South Entrance)
   const portalColL = new pc.Entity('PortalColL');
@@ -273,6 +485,18 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   portalLintel.setLocalScale(5.8, 0.8, 1.2);
   plazaRoot.addChild(portalLintel);
 
+  // P1 — authored southern threshold: stepped masonry, an intact civic arch,
+  // and a restrained conductor band. These pieces do not alter collision.
+  addBox(plazaRoot, 'PortalStepLower', [0, 0.08, -10.15], [6.8, 0.16, 1.8], matStoneDark);
+  addBox(plazaRoot, 'PortalStepUpper', [0, 0.18, -10.7], [5.8, 0.2, 1.2], matStone);
+  addBox(plazaRoot, 'PortalCornice', [0, 5.18, -11], [6.6, 0.28, 1.5], matStoneDark);
+  addBox(plazaRoot, 'PortalCopperBand', [0, 4.75, -10.35], [4.6, 0.12, 0.12], matCopperClean);
+  for (const side of [-1, 1]) {
+    addBox(plazaRoot, `PortalPlinth${side}`, [side * 2.4, 0.35, -11], [1.5, 0.7, 1.55], matStone);
+    addBox(plazaRoot, `PortalButtress${side}`, [side * 3.05, 1.65, -11.15], [0.55, 2.7, 1.7], matStoneDark, [0, 0, side * 4]);
+    addCylinder(plazaRoot, `PortalInsulator${side}`, [side * 1.72, 4.72, -10.22], [0.22, 0.32, 0.22], matCeramic, [90, 0, 0]);
+  }
+
   probeTargets['portal_pos'] = new pc.Vec3(0.9, 1.6, -10.8);
   probeTargets['portal_neg'] = new pc.Vec3(-0.9, 1.6, -10.8);
   addCollider(0, -11.0, 5.8, 1.8);
@@ -284,40 +508,37 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   dais.setLocalScale(5.6, 0.5, 5.6);
   plazaRoot.addChild(dais);
 
+  addCylinder(plazaRoot, 'OhmDaisLowerCourse', [0, 0.05, -2], [6.5, 0.18, 6.5], matStoneDark);
+  addCylinder(plazaRoot, 'OhmDaisUpperCourse', [0, 0.45, -2], [4.9, 0.2, 4.9], matStone);
+  for (const [index, angle] of [0, 90, 180, 270].entries()) {
+    const radians = (angle * Math.PI) / 180;
+    const x = Math.sin(radians) * 2.35;
+    const z = -2 + Math.cos(radians) * 2.35;
+    addCylinder(plazaRoot, `OhmDaisTerminal${index}`, [x, 0.62, z], [0.26, 0.48, 0.26], matCeramic);
+    addCylinder(plazaRoot, `OhmDaisTerminalCap${index}`, [x, 0.9, z], [0.16, 0.1, 0.16], matCopperClean);
+  }
+
   const ohmEntity = new pc.Entity('OhmAutomaton');
-  ohmEntity.setPosition(0, 0.5, -2.0);
+  ohmEntity.setPosition(0, 0.56, -2.0);
   plazaRoot.addChild(ohmEntity);
 
-  const ohmPedestal = new pc.Entity('OhmPedestal');
-  ohmPedestal.addComponent('render', { type: 'cylinder', material: matBrass });
-  ohmPedestal.setPosition(0, 0.4, 0);
-  ohmPedestal.setLocalScale(1.1, 0.8, 1.1);
-  ohmEntity.addChild(ohmPedestal);
-
-  const ohmTorso = new pc.Entity('OhmTorso');
-  ohmTorso.addComponent('render', { type: 'box', material: matCopperClean });
-  ohmTorso.setPosition(0, 1.1, 0);
-  ohmTorso.setLocalScale(0.65, 0.7, 0.5);
-  ohmEntity.addChild(ohmTorso);
-
-  const ohmCoreMesh = new pc.Entity('OhmCoreFilament');
-  ohmCoreMesh.addComponent('render', { type: 'cylinder', material: matGlowGold });
-  ohmCoreMesh.setPosition(0, 1.1, 0.26);
-  ohmCoreMesh.setLocalScale(0.18, 0.35, 0.18);
-  ohmEntity.addChild(ohmCoreMesh);
-
-  const ohmHead = new pc.Entity('OhmHead');
-  ohmHead.addComponent('render', { type: 'box', material: matBrass });
-  ohmHead.setPosition(0, 1.7, 0);
-  ohmHead.setLocalScale(0.45, 0.4, 0.42);
-  ohmEntity.addChild(ohmHead);
-
-  const ohmEye = new pc.Entity('OhmEye');
-  ohmEye.addComponent('render', { type: 'cylinder', material: matGlowGold });
-  ohmEye.setPosition(0, 1.7, 0.22);
-  ohmEye.setEulerAngles(90, 0, 0);
-  ohmEye.setLocalScale(0.15, 0.08, 0.15);
-  ohmEntity.addChild(ohmEye);
+  const ohmHeroUrl = new URL(
+    '../../../assets/runtime/ohmdal/plaza/heroes/ohm/ohm-pedestal.glb',
+    import.meta.url,
+  ).href;
+  const ohmHeroReady = loadContainerEntity('ohm-pedestal-hero', ohmHeroUrl).then((heroVisual) => {
+    heroVisual.name = 'OhmHeroVisual';
+    heroVisual.setLocalScale(OHM_HERO_TUNING.scale, OHM_HERO_TUNING.scale, OHM_HERO_TUNING.scale);
+    heroVisual.setLocalPosition(
+      -OHM_HERO_TUNING.center[0] * OHM_HERO_TUNING.scale,
+      OHM_HERO_TUNING.y,
+      -OHM_HERO_TUNING.center[2] * OHM_HERO_TUNING.scale,
+    );
+    const authoredYaw = new pc.Entity('OhmHeroAuthoredYaw');
+    authoredYaw.setLocalEulerAngles(0, OHM_HERO_TUNING.yaw, 0);
+    authoredYaw.addChild(heroVisual);
+    ohmEntity.addChild(authoredYaw);
+  });
 
   const ohmFilamentLight = new pc.Entity('OhmFilamentLight');
   ohmFilamentLight.addComponent('light', {
@@ -326,7 +547,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     intensity: 0.0,
     range: 6.0,
   });
-  ohmFilamentLight.setPosition(0, 1.3, 0);
+  ohmFilamentLight.setPosition(0, 1.08, 0);
   ohmEntity.addChild(ohmFilamentLight);
 
   probeTargets['ohm_terminal_pos'] = new pc.Vec3(0.35, 0.9, -1.75);
@@ -358,7 +579,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   // --- Lumen's Workshop Exterior (West Building) ---
   const workshopBldg = new pc.Entity('WorkshopBldg');
-  workshopBldg.addComponent('render', { type: 'box', material: matStoneDark });
+  workshopBldg.addComponent('render', { type: 'box', material: matPlaster });
   workshopBldg.setPosition(-10.5, 2.5, -4.0);
   workshopBldg.setLocalScale(6.0, 5.0, 7.5);
   plazaRoot.addChild(workshopBldg);
@@ -368,7 +589,77 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   workshopRoof.setPosition(-10.5, 5.8, -4.0);
   workshopRoof.setEulerAngles(0, 45, 0);
   workshopRoof.setLocalScale(7.5, 2.2, 8.5);
+  workshopRoof.enabled = false;
   plazaRoot.addChild(workshopRoof);
+
+  // P1/P3 — Lumen's workshop receives a legible craft silhouette and a small
+  // support dressing kit. All geometry is project-owned and procedural.
+  addBox(plazaRoot, 'WorkshopStoneBase', [-10.5, 0.38, -4], [6.5, 0.75, 8], matStoneDark);
+  addBox(plazaRoot, 'WorkshopRoofEast', [-9.08, 5.45, -4], [3.85, 0.35, 8.4], matWoodDark, [0, 0, 24]);
+  addBox(plazaRoot, 'WorkshopRoofWest', [-11.92, 5.45, -4], [3.85, 0.35, 8.4], matWoodDark, [0, 0, -24]);
+  addBox(plazaRoot, 'WorkshopRidge', [-10.5, 6.18, -4], [0.32, 0.34, 8.65], matIron);
+  addBox(plazaRoot, 'WorkshopChimney', [-11.4, 6.45, -5.7], [0.85, 2.2, 0.85], matStoneDark);
+  addBox(plazaRoot, 'WorkshopChimneyCap', [-11.4, 7.48, -5.7], [1.1, 0.22, 1.1], matIron);
+  for (const z of [-6.9, -4, -1.1]) {
+    addBox(plazaRoot, `WorkshopFrameEast${z}`, [-7.42, 2.75, z], [0.22, 4.55, 0.3], matWood);
+    addBox(plazaRoot, `WorkshopFrameWest${z}`, [-13.58, 2.75, z], [0.22, 4.55, 0.3], matWood);
+  }
+  addBox(plazaRoot, 'WorkshopDoor', [-7.18, 1.35, -4], [0.18, 2.55, 1.55], matWoodDark);
+  addBox(plazaRoot, 'WorkshopDoorHeader', [-7.08, 2.82, -4], [0.24, 0.28, 2.15], matWood);
+  for (const z of [-6.05, -1.95]) {
+    addBox(plazaRoot, `WorkshopWindowFrame${z}`, [-7.08, 2.75, z], [0.22, 1.55, 1.35], matWood);
+    addBox(plazaRoot, `WorkshopWindowVoid${z}`, [-6.96, 2.75, z], [0.05, 1.12, 0.92], matIron);
+  }
+  addBox(plazaRoot, 'WorkshopWorkbench', [-6.55, 0.72, -1.05], [2.35, 0.18, 0.85], matWood);
+  for (const z of [-1.38, -0.72]) {
+    addBox(plazaRoot, `WorkshopBenchLeg${z}`, [-6.55, 0.35, z], [1.9, 0.7, 0.16], matWoodDark);
+  }
+  for (const [index, z] of [-0.2, 0.7].entries()) {
+    addBox(plazaRoot, `WorkshopCrate${index}`, [-8.2 - index * 0.75, 0.42, z], [0.68, 0.68, 0.68], matWood);
+    addBox(plazaRoot, `WorkshopCrateBand${index}`, [-8.2 - index * 0.75, 0.43, z], [0.75, 0.12, 0.75], matIron);
+  }
+  addCylinder(plazaRoot, 'WorkshopCableSpool', [-6.9, 0.48, 0.55], [0.72, 0.34, 0.72], matWood, [0, 0, 90]);
+  addCylinder(plazaRoot, 'WorkshopCableCoil', [-6.9, 0.48, 0.55], [0.5, 0.42, 0.5], matCopperClean, [0, 0, 90]);
+
+  const vendorPropUrl = (file: string) =>
+    new URL(`../../../assets/runtime/ohmdal/plaza/props/vendor-derived/${file}`, import.meta.url).href;
+  const vendorPropsReady = loadContainerEntity(
+    'quaternius-workshop-props',
+    vendorPropUrl('quaternius-workshop-props.glb'),
+  ).then((vendorRoot) => {
+    const barrel = vendorRoot.findByName('Barrel')!;
+    const crate = vendorRoot.findByName('Crate_Wooden')!;
+    const workbench = vendorRoot.findByName('Workbench')!;
+    plazaRoot.findByName('WorkshopWorkbench')!.enabled = false;
+    plazaRoot.findByName('WorkshopCrate0')!.enabled = false;
+    plazaRoot.findByName('WorkshopCrate1')!.enabled = false;
+
+    vendorRoot.name = 'WorkshopVendorProps';
+    plazaRoot.addChild(vendorRoot);
+
+    workbench.name = 'WorkshopVendorWorkbench';
+    workbench.setPosition(-6.35, 0, -1.2);
+    workbench.setEulerAngles(0, 90, 0);
+
+    barrel.name = 'WorkshopVendorBarrelA';
+    barrel.setPosition(-6.85, -0.0034, 0.72);
+    const barrelB = barrel.clone();
+    barrelB.name = 'WorkshopVendorBarrelB';
+    barrelB.setPosition(-7.55, -0.0034, 1.05);
+    barrelB.setEulerAngles(0, 28, 0);
+    barrelB.setLocalScale(0.92, 0.92, 0.92);
+    plazaRoot.addChild(barrelB);
+
+    crate.name = 'WorkshopVendorCrateA';
+    crate.setPosition(-8.2, 0.0524, 0.12);
+    crate.setEulerAngles(0, -12, 0);
+    const crateB = crate.clone();
+    crateB.name = 'WorkshopVendorCrateB';
+    crateB.setPosition(-8.95, 0.0524, 0.82);
+    crateB.setEulerAngles(0, 24, 0);
+    crateB.setLocalScale(0.86, 0.86, 0.86);
+    plazaRoot.addChild(crateB);
+  });
 
   const workshopDoorArch = new pc.Entity('WorkshopDoorArch');
   workshopDoorArch.addComponent('render', { type: 'box', material: matWood });
@@ -454,72 +745,100 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   corrosionMesh.setLocalScale(0.4, 0.08, 0.8);
   plazaRoot.addChild(corrosionMesh);
 
+  // P4 — reusable electrical language: paired channels read as ida/retorno,
+  // ceramic breaks signal terminals, and iron junction boxes mark decisions.
+  for (const side of [-1, 1]) {
+    for (const [index, z] of [-8.2, -5.1, 1.8, 6.1].entries()) {
+      const length = index === 2 ? 3.2 : 2.5;
+      addBox(plazaRoot, `ConductorChannel${side}-${index}`, [side * 0.9, 0.055, z], [0.2, 0.08, length], matIron);
+      addBox(plazaRoot, `ConductorStrip${side}-${index}`, [side * 0.9, 0.105, z], [0.09, 0.04, length * 0.94], matCopperClean);
+    }
+    for (const [index, z] of [-8, -4, 2.9, 7].entries()) {
+      addCylinder(plazaRoot, `RouteInsulator${side}-${index}`, [side * 0.9, 0.25, z], [0.2, 0.3, 0.2], matCeramic);
+      addCylinder(plazaRoot, `RouteClamp${side}-${index}`, [side * 0.9, 0.42, z], [0.13, 0.08, 0.13], matCopperClean);
+    }
+  }
+  for (const [index, x] of [-2.6, -5.1].entries()) {
+    addBox(plazaRoot, `WorkshopBranchChannel${index}`, [x, 0.06, -4], [2.45, 0.08, 0.2], matIron);
+    addBox(plazaRoot, `WorkshopBranchStrip${index}`, [x, 0.11, -4], [2.3, 0.04, 0.09], matCopperClean);
+  }
+  addBox(plazaRoot, 'WorkshopJunctionBox', [-5.95, 0.42, -4], [0.7, 0.75, 0.62], matIron);
+  addBox(plazaRoot, 'WorkshopJunctionPlate', [-5.95, 0.45, -4.33], [0.45, 0.42, 0.05], matBrass);
+  addBox(plazaRoot, 'EastDrainChannel', [6.9, 0.03, 4], [0.62, 0.06, 8.8], matStoneDark);
+  for (const [index, z] of [0.7, 2.9, 5.1, 7.3].entries()) {
+    addBox(plazaRoot, `EastDrainGrate${index}`, [6.9, 0.1, z], [0.58, 0.08, 0.12], matIron);
+  }
+
   probeTargets['retorno_oxido'] = new pc.Vec3(-0.9, 0.1, -4.0);
   probeTargets['ida_norte'] = new pc.Vec3(0.9, 0.1, -8.0);
   probeTargets['ida_centro'] = new pc.Vec3(0.9, 0.1, -2.0);
   probeTargets['retorno_sur'] = new pc.Vec3(-0.9, 0.1, 7.0);
 
   // --- THE GREAT GATE OF OHM (Ω) (North Exit) ---
-  const gateLeft = new pc.Entity('GatePylonLeft');
-  gateLeft.addComponent('render', { type: 'box', material: matStoneDark });
-  gateLeft.setPosition(-3.2, 3.8, 11.5);
-  gateLeft.setLocalScale(2.2, 7.6, 2.4);
-  plazaRoot.addChild(gateLeft);
+  // Stage 2B replaces the primitive placeholder with the calibrated Blender
+  // asset while retaining the existing gameplay-owned moving wrapper.
+  const omegaGateRoot = new pc.Entity('OmegaGate');
+  omegaGateRoot.setPosition(0, 0, 11.5);
+  plazaRoot.addChild(omegaGateRoot);
 
-  const gateRight = new pc.Entity('GatePylonRight');
-  gateRight.addComponent('render', { type: 'box', material: matStoneDark });
-  gateRight.setPosition(3.2, 3.8, 11.5);
-  gateRight.setLocalScale(2.2, 7.6, 2.4);
-  plazaRoot.addChild(gateRight);
-
-  const gateLintel = new pc.Entity('GateLintel');
-  gateLintel.addComponent('render', { type: 'box', material: matStone });
-  gateLintel.setPosition(0, 6.6, 11.5);
-  gateLintel.setLocalScale(8.6, 1.8, 2.6);
-  plazaRoot.addChild(gateLintel);
-
-  // Monumental Ω (Ohm) Brass Symbol
   const omegaSymbolEntity = new pc.Entity('MonumentalOmegaSymbol');
-  omegaSymbolEntity.setPosition(0, 6.6, 10.1);
-  plazaRoot.addChild(omegaSymbolEntity);
+  omegaGateRoot.addChild(omegaSymbolEntity);
 
-  const omegaArch = new pc.Entity('OmegaArch');
-  omegaArch.addComponent('render', { type: 'cylinder', material: matBrass });
-  omegaArch.setEulerAngles(90, 0, 0);
-  omegaArch.setLocalScale(1.8, 0.15, 1.8);
-  omegaSymbolEntity.addChild(omegaArch);
-
-  const omegaHole = new pc.Entity('OmegaHole');
-  omegaHole.addComponent('render', { type: 'cylinder', material: matStone });
-  omegaHole.setEulerAngles(90, 0, 0);
-  omegaHole.setLocalScale(1.1, 0.18, 1.1);
-  omegaSymbolEntity.addChild(omegaHole);
-
-  const omegaLeftFoot = new pc.Entity('OmegaLeftFoot');
-  omegaLeftFoot.addComponent('render', { type: 'box', material: matBrass });
-  omegaLeftFoot.setLocalPosition(-1.1, -0.7, 0);
-  omegaLeftFoot.setLocalScale(0.6, 0.2, 0.2);
-  omegaSymbolEntity.addChild(omegaLeftFoot);
-
-  const omegaRightFoot = new pc.Entity('OmegaRightFoot');
-  omegaRightFoot.addComponent('render', { type: 'box', material: matBrass });
-  omegaRightFoot.setLocalPosition(1.1, -0.7, 0);
-  omegaRightFoot.setLocalScale(0.6, 0.2, 0.2);
-  omegaSymbolEntity.addChild(omegaRightFoot);
-
-  // Gate Solenoid Barrier
   const solenoidGate = new pc.Entity('SolenoidGate');
-  solenoidGate.addComponent('render', { type: 'box', material: matWoodDark });
-  solenoidGate.setPosition(0, 2.6, 11.5);
-  solenoidGate.setLocalScale(4.2, 5.2, 0.5);
+  solenoidGate.setPosition(0, OMEGA_GATE_TUNING.closedY, 11.5);
+  solenoidGate.setEulerAngles(0, OMEGA_GATE_TUNING.yaw, 0);
   plazaRoot.addChild(solenoidGate);
+
+  const omegaGateUrl = new URL(
+    '../../../assets/runtime/ohmdal/plaza/heroes/omega-gate/omega-gate.glb',
+    import.meta.url,
+  ).href;
+  const omegaGateReady = loadContainerEntity('omega-gate-hero', omegaGateUrl).then((gateVisual) => {
+    const authoredRoot = (gateVisual.findByName('OmegaGate_Root') as pc.Entity | null) ?? gateVisual;
+    const doorLeaves = authoredRoot.findByName('DoorLeaves') as pc.Entity | null;
+    if (!doorLeaves || !doorLeaves.parent) throw new Error('Omega gate GLB is missing DoorLeaves');
+    doorLeaves.parent.removeChild(doorLeaves);
+    doorLeaves.setLocalPosition(
+      -OMEGA_GATE_TUNING.center[0] * OMEGA_GATE_TUNING.scale,
+      0,
+      -OMEGA_GATE_TUNING.center[2] * OMEGA_GATE_TUNING.scale,
+    );
+    doorLeaves.setLocalScale(OMEGA_GATE_TUNING.scale, OMEGA_GATE_TUNING.scale, OMEGA_GATE_TUNING.scale);
+    solenoidGate.addChild(doorLeaves);
+
+    gateVisual.name = 'OmegaGateVisual';
+    gateVisual.setLocalScale(OMEGA_GATE_TUNING.scale, OMEGA_GATE_TUNING.scale, OMEGA_GATE_TUNING.scale);
+    gateVisual.setLocalPosition(
+      -OMEGA_GATE_TUNING.center[0] * OMEGA_GATE_TUNING.scale,
+      OMEGA_GATE_TUNING.y,
+      -OMEGA_GATE_TUNING.center[2] * OMEGA_GATE_TUNING.scale,
+    );
+    const authoredYaw = new pc.Entity('OmegaGateAuthoredYaw');
+    authoredYaw.setLocalEulerAngles(0, OMEGA_GATE_TUNING.yaw, 0);
+    authoredYaw.addChild(gateVisual);
+    omegaGateRoot.addChild(authoredYaw);
+
+    const mechanicalAssembly = authoredRoot.findByName('MechanicalAssembly') as pc.Entity | null;
+    const mechanicalComponents = new Set(
+      (mechanicalAssembly?.findComponents('render') as pc.RenderComponent[] | undefined) ?? [],
+    );
+    for (const component of gateVisual.findComponents('render') as pc.RenderComponent[]) {
+      component.castShadows = true;
+      component.receiveShadows = true;
+      if (!mechanicalComponents.has(component)) component.batchGroupId = plazaArtBatch.id;
+    }
+    for (const component of doorLeaves.findComponents('render') as pc.RenderComponent[]) {
+      component.castShadows = true;
+      component.receiveShadows = true;
+    }
+  });
 
   const gateLightLeft = new pc.Entity('GateLightLeft');
   gateLightLeft.addComponent('light', {
     type: 'point',
     color: new pc.Color(1.0, 0.4, 0.2),
-    intensity: 1.2,
-    range: 5.0,
+    intensity: 0.25,
+    range: 2.4,
   });
   gateLightLeft.setPosition(-2.0, 4.0, 10.8);
   plazaRoot.addChild(gateLightLeft);
@@ -528,14 +847,18 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   gateLightRight.addComponent('light', {
     type: 'point',
     color: new pc.Color(1.0, 0.4, 0.2),
-    intensity: 1.2,
-    range: 5.0,
+    intensity: 0.25,
+    range: 2.4,
   });
   gateLightRight.setPosition(2.0, 4.0, 10.8);
   plazaRoot.addChild(gateLightRight);
 
   probeTargets['puerta_solenoide'] = new pc.Vec3(0, 2.2, 11.0);
   addCollider(0, 11.5, 7.8, 2.4);
+
+  const ready = Promise.all([materialReady, vendorPropsReady, ohmHeroReady, omegaGateReady]).then(() => {
+    app.batcher.generate([plazaArtBatch.id]);
+  });
 
   // ========================================================
   // --- 6. LUMEN'S WORKSHOP INTERIOR (workshopInteriorRoot) -
@@ -719,6 +1042,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   return {
     app,
+    ready,
     cameraEntity,
     playerEntity,
     viewmodelRoot,

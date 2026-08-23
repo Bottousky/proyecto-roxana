@@ -1,0 +1,59 @@
+{
+  "id": "rx_ohm_pedestal_hero_01",
+  "displayName": "Ohm + pedestal — Plaza Stage 2A",
+  "world": "ohmdal",
+  "category": "hero-prop",
+  "sourceMethod": "blender-manual",
+  "status": "integrated",
+  "references": [
+    "assets/ohmdal/characters/ohm-turnaround-v2.png",
+    "assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md",
+    "assets/runtime/ohmdal/plaza/heroes/ohm/provenance.json"
+  ],
+  "generation": {
+    "provider": "blender",
+    "taskId": "OHMDAL-PLAZA-STAGE2A-HERO01",
+    "promptFile": "scripts/3d/build_ohm_hero.py",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-23"
+  },
+  "license": {
+    "owner": "Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Diseño original reconstruido desde el turnaround de cuatro vistas del proyecto; sin Meshy, proveedor externo ni generación paga."
+  },
+  "scale": {
+    "unit": "meter",
+    "height": 1.47,
+    "humanRatio": 0.8547
+  },
+  "frontAxis": "+Z",
+  "pivot": "bottom-center",
+  "collider": {
+    "type": "none"
+  },
+  "sockets": [
+    "sensor_mount",
+    "arm_left",
+    "arm_right",
+    "hatch_top",
+    "emitter_front"
+  ],
+  "runtime": {
+    "desktop": {
+      "path": "assets/runtime/ohmdal/plaza/heroes/ohm/ohm-pedestal.glb",
+      "maxTriangles": 18232,
+      "maxTexture": 1,
+      "maxMaterials": 5,
+      "maxDrawCalls": 8
+    },
+    "mobile": {
+      "path": "assets/runtime/ohmdal/plaza/heroes/ohm/ohm-pedestal.glb",
+      "maxTriangles": 18232,
+      "maxTexture": 1,
+      "maxMaterials": 5,
+      "maxDrawCalls": 8
+    }
+  },
+  "notes": "Exact offline inspection: boundsSource=vertices, static AABB [-0.58,0,-0.58]..[0.58,1.47,0.58], center [0,0.735,0], groundOffset=0, no runtime pose check. Calibration: scale=1, y=0, yaw=180. Existing authored gameplay collider retained."
+}

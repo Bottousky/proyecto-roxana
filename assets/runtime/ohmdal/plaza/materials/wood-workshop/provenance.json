@@ -1,0 +1,44 @@
+{
+  "id": "roxana-ohmdal-wood-workshop-v1",
+  "provider": "Poly Haven",
+  "sourceAsset": "medieval_wood",
+  "sourceUrl": "https://polyhaven.com/a/medieval_wood",
+  "license": "CC0-1.0",
+  "sourceResolution": "2k",
+  "runtimeResolution": "1k",
+  "processing": "Pillow LANCZOS; JPEG quality 84 or optimized PNG; no displacement",
+  "outputs": [
+    {
+      "map": "diff",
+      "path": "assets/runtime/ohmdal/plaza/materials/wood-workshop/diffuse-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 341696,
+      "sha256": "8c5aecac0f8b3338446b3ff42679ed20a2c17cddef5f7d69cafa19811338b8e7"
+    },
+    {
+      "map": "nor_gl",
+      "path": "assets/runtime/ohmdal/plaza/materials/wood-workshop/normal-1k.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 1946774,
+      "sha256": "00911108ec3d40301a69135e23b10c7e332276f3d8b4bc31df8e5b0d85590f20"
+    },
+    {
+      "map": "rough",
+      "path": "assets/runtime/ohmdal/plaza/materials/wood-workshop/roughness-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 174143,
+      "sha256": "e79603f06bab539cb599e090e2099593bf54fd5ad48ef3a2e06e51a4896d2548"
+    },
+    {
+      "map": "ao",
+      "path": "assets/runtime/ohmdal/plaza/materials/wood-workshop/ao-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 206897,
+      "sha256": "beaf326b88d0b5121509d23d2b632d30138df5cdd1264c977a8b3fe41a8ec5e1"
+    }
+  ]
+}

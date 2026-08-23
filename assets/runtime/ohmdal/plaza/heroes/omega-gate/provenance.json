@@ -1,0 +1,60 @@
+{
+  "assetId": "rx_ohmdal_omega_gate_hero_01",
+  "sourceMethod": "blender-manual",
+  "provider": "Proyecto Roxana",
+  "generationRoute": "existing canon and project concepts -> deterministic Blender reconstruction -> GLB",
+  "referenceAuthority": {
+    "canonAndApprovedEvidence": [
+      "docs/20-worlds/ohmdal/content/ohmdal-vertical-slice_v1.md",
+      "docs/ohmdal-biblia/07_NARRATIVE_AND_GAME_SCRIPT.md",
+      "src/experiences/ohmdal-plaza/journal/bitacora.ts"
+    ],
+    "proposedVisualEvidence": [
+      "assets/ohmdal/rooms/prop_puerta_de_ohm.png",
+      "assets/ohmdal/rooms/puerta_de_ohm+prop_de_puerta.png",
+      "assets/ohmdal/rooms/puerta_de_ohm+prop_abierta.png",
+      "assets/ohmdal/hero/door-of-ohm.png"
+    ],
+    "replacedPlaceholder": "src/experiences/ohmdal-playcanvas/playcanvasWorld.ts primitive GatePylon/GateLintel/SolenoidGate blockout",
+    "excludedReference": "assets/ohmdal/hero/portal-omega.png",
+    "excludedReferenceReason": "Its passive luminous portal conflicts with Stage 2B's non-emissive mechanical gate direction."
+  },
+  "generativeAi": {
+    "used": false,
+    "creditsSpent": 0
+  },
+  "canonicalization": {
+    "tool": "Blender 5.2.0 LTS",
+    "executable": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe",
+    "script": "scripts/3d/build_omega_gate.py",
+    "blend": "assets/source/ohmdal/heroes/omega-gate/omega-gate.blend",
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "pivot": "bottom-center",
+    "groundOffset": 0,
+    "boundsSource": "vertices",
+    "bounds": {
+      "min": [-4.89, 0, -1.205],
+      "max": [4.89, 7.36, 1.365],
+      "dims": [9.78, 7.36, 2.57],
+      "center": [0, 3.68, 0.08]
+    },
+    "hierarchy": "OmegaGate_Root/{ArchitecturalFrame,DoorLeaves,MechanicalAssembly,ElectricalTerminals,Insulators,DecorativeDetail}; leaf pivots, solenoid plungers and lock bars remain separate",
+    "collision": "No collision mesh exported; existing authored gameplay collider remains authoritative.",
+    "cleanup": "Rigid siblings consolidated by material inside semantic parents; moving leaves, plungers and lock bars were not merged; no cameras, lights, textures or emission exported."
+  },
+  "runtime": {
+    "path": "assets/runtime/ohmdal/plaza/heroes/omega-gate/omega-gate.glb",
+    "sha256": "D2D5C6126BFE94F1257253DD8F4690C3EB3EB501AB2E61A559D7C4F125CDAEE8",
+    "triangles": 11196,
+    "meshNodes": 19,
+    "materials": 6,
+    "textures": 0,
+    "bytes": 756972
+  },
+  "sourceHashes": {
+    "blendSha256": "9BCA6BE1DA8B553A0078CAAEC0CA99916866780CB262F7B674EF901F4D2B1464",
+    "primaryConceptSha256": "C02533544C16EBBA6A6FBDE23FEB7D6CFB6B49499CC4707F22635930A8E76960"
+  },
+  "license": "Original Proyecto Roxana controlled reconstruction; no external 3D asset and no paid generation."
+}

@@ -189,27 +189,27 @@ const plan = {
 };
 
 console.log(JSON.stringify(plan, null, 2));
-if (dryRun) process.exit(0);
+if (!dryRun) {
+  await mkdir(absoluteOutput, { recursive: true });
+  await writeFile(path.join(absoluteOutput, 'polyhaven-files.json'), JSON.stringify(filesJson, null, 2));
 
-await mkdir(absoluteOutput, { recursive: true });
-await writeFile(path.join(absoluteOutput, 'polyhaven-files.json'), JSON.stringify(filesJson, null, 2));
+  const downloads = [];
+  for (const [mapName, candidate] of Object.entries(selected)) {
+    const originalName = path.basename(new URL(candidate.url).pathname);
+    const extension = path.extname(originalName) || '.bin';
+    const fileName = `${slug}_${mapName}_${resolution}${extension}`;
+    const destination = path.join(absoluteOutput, fileName);
+    const bytes = await download(candidate, destination);
+    downloads.push({ map: mapName, file: fileName, bytes, sourceUrl: candidate.url, md5: candidate.md5 });
+  }
 
-const downloads = [];
-for (const [mapName, candidate] of Object.entries(selected)) {
-  const originalName = path.basename(new URL(candidate.url).pathname);
-  const extension = path.extname(originalName) || '.bin';
-  const fileName = `${slug}_${mapName}_${resolution}${extension}`;
-  const destination = path.join(absoluteOutput, fileName);
-  const bytes = await download(candidate, destination);
-  downloads.push({ map: mapName, file: fileName, bytes, sourceUrl: candidate.url, md5: candidate.md5 });
+  const provenance = {
+    ...plan,
+    downloadedAt: new Date().toISOString(),
+    userAgent: USER_AGENT,
+    downloads,
+    note: 'Raw vendor material. assets/source is intentionally ignored by git; promote only normalized runtime derivatives plus provenance in repo docs/manifests.',
+  };
+  await writeFile(path.join(absoluteOutput, 'provenance.json'), JSON.stringify(provenance, null, 2));
+  console.log(`Descargado en ${plan.output}`);
 }
-
-const provenance = {
-  ...plan,
-  downloadedAt: new Date().toISOString(),
-  userAgent: USER_AGENT,
-  downloads,
-  note: 'Raw vendor material. assets/source is intentionally ignored by git; promote only normalized runtime derivatives plus provenance in repo docs/manifests.',
-};
-await writeFile(path.join(absoluteOutput, 'provenance.json'), JSON.stringify(provenance, null, 2));
-console.log(`Descargado en ${plan.output}`);

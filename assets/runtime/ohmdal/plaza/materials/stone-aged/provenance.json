@@ -1,0 +1,44 @@
+{
+  "id": "roxana-ohmdal-stone-aged-v1",
+  "provider": "Poly Haven",
+  "sourceAsset": "stone_wall_05",
+  "sourceUrl": "https://polyhaven.com/a/stone_wall_05",
+  "license": "CC0-1.0",
+  "sourceResolution": "2k",
+  "runtimeResolution": "1k",
+  "processing": "Pillow LANCZOS; JPEG quality 84 or optimized PNG; no displacement",
+  "outputs": [
+    {
+      "map": "diff",
+      "path": "assets/runtime/ohmdal/plaza/materials/stone-aged/diffuse-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 228612,
+      "sha256": "a934f50d0e09c2834fe1ae67fe09e29b38468f547540cc84dade2d225cb36d92"
+    },
+    {
+      "map": "nor_gl",
+      "path": "assets/runtime/ohmdal/plaza/materials/stone-aged/normal-1k.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 2398199,
+      "sha256": "9e208434ef63cb9c1030ee908f19dadce56113499fed5300b85db47bc87371fc"
+    },
+    {
+      "map": "rough",
+      "path": "assets/runtime/ohmdal/plaza/materials/stone-aged/roughness-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 19785,
+      "sha256": "d618012ad752620e819262dc722e7cc20b16ff6d2c511971fe5305aa80e905db"
+    },
+    {
+      "map": "ao",
+      "path": "assets/runtime/ohmdal/plaza/materials/stone-aged/ao-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 235359,
+      "sha256": "6ba28d3b0c0c1f93b9425d23456c7057e72e6bf58b88343500ce257e3c1ed9a1"
+    }
+  ]
+}

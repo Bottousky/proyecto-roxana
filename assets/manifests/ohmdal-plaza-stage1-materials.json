@@ -1,0 +1,51 @@
+{
+  "id": "rx_ohmdal_plaza_stage1_materials",
+  "displayName": "Materiales PBR de la Plaza — Stage 1",
+  "world": "ohmdal",
+  "category": "architecture",
+  "sourceMethod": "hybrid",
+  "status": "integrated",
+  "references": [
+    "assets/references/ohmdal-plaza-art-pass-stage-1/provenance.md"
+  ],
+  "generation": {
+    "provider": "manual",
+    "taskId": "OHMDAL-PLAZA-ART-PASS-01-P2",
+    "promptFile": "assets/references/ohmdal-plaza-art-pass-stage-1/provenance.md",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-22"
+  },
+  "license": {
+    "owner": "Poly Haven (CC0 1.0) and Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Seven Poly Haven sets verified CC0 and promoted from 2K source to 1K runtime; project-owned copper/verdigris/ceramic complete the material language. Per-map hashes live in each runtime provenance.json."
+  },
+  "scale": {
+    "unit": "meter",
+    "height": 1,
+    "humanRatio": 0.58
+  },
+  "frontAxis": "+Z",
+  "pivot": "center",
+  "collider": {
+    "type": "none"
+  },
+  "sockets": [],
+  "runtime": {
+    "desktop": {
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-base/diffuse-1k.jpg",
+      "maxTriangles": 0,
+      "maxTexture": 1024,
+      "maxMaterials": 7,
+      "maxDrawCalls": 7
+    },
+    "mobile": {
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-base/diffuse-1k.jpg",
+      "maxTriangles": 0,
+      "maxTexture": 1024,
+      "maxMaterials": 7,
+      "maxDrawCalls": 7
+    }
+  },
+  "notes": "Runtime sets: plaza-cobble-base, plaza-cobble-moss (promoted but deferred), stone-primary, stone-aged, plaster-worn, wood-workshop and iron-aged."
+}

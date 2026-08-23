@@ -66,6 +66,18 @@ body {
   display: none !important;
 }
 
+/* Visual Harness: environment-only canonical views. Player-facing captures keep this disabled. */
+.roxana-visual-ui-hidden #plaza-hud,
+.roxana-visual-ui-hidden #plaza-reticle,
+.roxana-visual-ui-hidden #plaza-prompt,
+.roxana-visual-ui-hidden #plaza-toast,
+.roxana-visual-ui-hidden #plaza-dialog,
+.roxana-visual-ui-hidden #galvanoscope-hud,
+.roxana-visual-ui-hidden #bitacora-modal,
+.roxana-visual-ui-hidden #workbench-modal {
+  display: none !important;
+}
+
 /* --- Title Screen --- */
 #plaza-title {
   position: absolute;

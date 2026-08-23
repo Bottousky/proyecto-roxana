@@ -1,0 +1,52 @@
+{
+  "id": "rx_ohmdal_plaza_stage1_quaternius_props",
+  "displayName": "Props funcionales del Taller — Stage 1",
+  "world": "ohmdal",
+  "category": "prop",
+  "sourceMethod": "hybrid",
+  "status": "integrated",
+  "references": [
+    "assets/references/ohmdal-plaza-art-pass-stage-1/provenance.md",
+    "assets/runtime/ohmdal/plaza/props/vendor-derived/provenance.json"
+  ],
+  "generation": {
+    "provider": "manual",
+    "taskId": "OHMDAL-PLAZA-ART-PASS-01-P3",
+    "promptFile": "assets/runtime/ohmdal/plaza/props/vendor-derived/provenance.json",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-22"
+  },
+  "license": {
+    "owner": "Quaternius — Creative Commons CC0 1.0 Universal",
+    "referenceRightsVerified": true,
+    "notes": "Selected from Fantasy Props MegaKit[Standard]. Three source glTF props only; shared atlases downscaled to 1K and deduplicated into one portable GLB."
+  },
+  "scale": {
+    "unit": "meter",
+    "height": 0.954,
+    "humanRatio": 0.555
+  },
+  "frontAxis": "+Z",
+  "pivot": "custom",
+  "collider": {
+    "type": "none"
+  },
+  "sockets": [],
+  "runtime": {
+    "desktop": {
+      "path": "assets/runtime/ohmdal/plaza/props/vendor-derived/quaternius-workshop-props.glb",
+      "maxTriangles": 3768,
+      "maxTexture": 1024,
+      "maxMaterials": 2,
+      "maxDrawCalls": 6
+    },
+    "mobile": {
+      "path": "assets/runtime/ohmdal/plaza/props/vendor-derived/quaternius-workshop-props.glb",
+      "maxTriangles": 3768,
+      "maxTexture": 1024,
+      "maxMaterials": 2,
+      "maxDrawCalls": 6
+    }
+  },
+  "notes": "Exact bounds inspection: dims 2.0191 × 0.9538 × 1.0242 m, center 0 × 0.4245 × -0.0027, groundOffset 0.0524, boundsSource=vertices, static, no runtime pose check required."
+}

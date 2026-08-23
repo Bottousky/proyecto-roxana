@@ -1,0 +1,62 @@
+{
+  "id": "rx_ohmdal_omega_gate_hero_01",
+  "displayName": "Puerta Omega — Plaza Stage 2B",
+  "world": "ohmdal",
+  "category": "mechanism",
+  "sourceMethod": "blender-manual",
+  "status": "integrated",
+  "references": [
+    "assets/ohmdal/rooms/prop_puerta_de_ohm.png",
+    "assets/ohmdal/rooms/puerta_de_ohm+prop_de_puerta.png",
+    "assets/ohmdal/rooms/puerta_de_ohm+prop_abierta.png",
+    "assets/ohmdal/hero/door-of-ohm.png",
+    "assets/runtime/ohmdal/plaza/heroes/omega-gate/provenance.json"
+  ],
+  "generation": {
+    "provider": "blender",
+    "taskId": "OHMDAL-PLAZA-STAGE2B-GATE01",
+    "promptFile": "scripts/3d/build_omega_gate.py",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-23"
+  },
+  "license": {
+    "owner": "Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Geometría controlada del proyecto; sin proveedor 3D externo, IA generativa ni créditos."
+  },
+  "scale": {
+    "unit": "meter",
+    "height": 7.36,
+    "humanRatio": 4.2791
+  },
+  "frontAxis": "+Z",
+  "pivot": "bottom-center",
+  "collider": {
+    "type": "none"
+  },
+  "sockets": [
+    "DoorLeaf_LeftPivot",
+    "DoorLeaf_RightPivot",
+    "SolenoidPlunger_Left",
+    "SolenoidPlunger_Right",
+    "LockBar_Left",
+    "LockBar_Right"
+  ],
+  "runtime": {
+    "desktop": {
+      "path": "assets/runtime/ohmdal/plaza/heroes/omega-gate/omega-gate.glb",
+      "maxTriangles": 11196,
+      "maxTexture": 1,
+      "maxMaterials": 6,
+      "maxDrawCalls": 19
+    },
+    "mobile": {
+      "path": "assets/runtime/ohmdal/plaza/heroes/omega-gate/omega-gate.glb",
+      "maxTriangles": 11196,
+      "maxTexture": 1,
+      "maxMaterials": 6,
+      "maxDrawCalls": 19
+    }
+  },
+  "notes": "Exact offline inspection: vertices, static AABB [-4.89,0,-1.205]..[4.89,7.36,1.365], groundOffset=0. Calibration: scale=1, y=0, yaw=180. Existing gameplay collider and gate-open state remain authoritative."
+}

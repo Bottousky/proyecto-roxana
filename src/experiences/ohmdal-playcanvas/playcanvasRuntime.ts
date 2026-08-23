@@ -8,6 +8,15 @@ import { WorkbenchInspector } from '../ohmdal-plaza/inspect/workbench.ts';
 import { DIALOGUE_DATABASE } from '../ohmdal-plaza/story/dialogueData.ts';
 import type { CircuitState, DialogueLine, DialogueNode, ToolMode } from '../ohmdal-plaza/types.ts';
 import type { PlazaUi, PlazaHandle } from '../ohmdal-plaza/plazaRuntime.ts';
+import {
+  OHMDAL_VISUAL_CAMERA_PRESETS,
+  isSoftwareRenderer,
+  percentile,
+  type OhmdalVisualCameraName,
+  type OhmdalVisualStateName,
+  type RoxanaVisualTestHooks,
+} from './visualHarness.ts';
+import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
 
 export type OhmdalStoryStep =
   | 'portal_arrived'
@@ -45,6 +54,14 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let activeDialogueLineIndex = 0;
   let isToolEquipped = true;
   let isPointerLocked = false;
+  let visualCamera: OhmdalVisualCameraName = 'active-play-desktop';
+  let visualState: OhmdalVisualStateName = 'portal-arrival';
+  let visualPaused = false;
+  let reducedMotion = false;
+  let debugUiHidden = false;
+  let postProcessingEnabled = true;
+  let visualSeed = 1;
+  const frameTimeSamples: number[] = [];
 
   // First-person Controls
   let yaw = 180;
@@ -112,6 +129,178 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     world.playerEntity.setEulerAngles(0, yaw, 0);
     world.cameraEntity.setLocalEulerAngles(0, 0, 0);
   }
+
+  function closeVisualOverlays(): void {
+    activeDialogueNode = null;
+    activeDialogueLineIndex = 0;
+    currentMode = 'explore';
+    ui.setDialog(null, null);
+    ui.setBitacoraView(false);
+    ui.setWorkbenchView(false);
+    ui.setPrompt(null);
+  }
+
+  function setVisualCamera(name: OhmdalVisualCameraName): void {
+    const preset = OHMDAL_VISUAL_CAMERA_PRESETS[name];
+    const [x, y, z] = preset.position;
+    playerPos.set(x, y, z);
+    yaw = preset.yaw;
+    pitch = preset.pitch;
+    world.playerEntity.setPosition(x, y, z);
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+    visualCamera = name;
+  }
+
+  function setVisualState(name: OhmdalVisualStateName): void {
+    closeVisualOverlays();
+    circuit = createInitialCircuit();
+    isOhmAwake = false;
+    storyStep = 'portal_arrived';
+    world.copperJumper.enabled = false;
+    world.corrosionMesh.enabled = true;
+    world.ohmFilamentLight.light!.intensity = 0;
+    world.relayLight.light!.intensity = 0.6;
+    world.solenoidGate.setPosition(0, OMEGA_GATE_TUNING.closedY, 11.5);
+    world.gateLightLeft.light!.color = new pc.Color(1.0, 0.4, 0.2);
+    world.gateLightRight.light!.color = new pc.Color(1.0, 0.4, 0.2);
+
+    if (name === 'restored-plaza') {
+      isOhmAwake = true;
+      storyStep = 'gate_opened';
+      circuit.branches.b_ida_rele.state = 'closed';
+      circuit.branches.b_brecha_retorno.state = 'closed';
+      circuit.branches.b_brecha_a_oxido.state = 'closed';
+      circuit.branches.b_brecha_a_oxido.resistance = 0.05;
+      circuit = solveCircuit(circuit);
+      world.copperJumper.enabled = true;
+      world.corrosionMesh.enabled = false;
+      world.ohmFilamentLight.light!.intensity = 2.8;
+      world.relayLight.light!.intensity = 2.4;
+      world.solenoidGate.setPosition(0, OMEGA_GATE_TUNING.openY, 11.5);
+      world.gateLightLeft.light!.color = new pc.Color(0.2, 1.0, 0.4);
+      world.gateLightRight.light!.color = new pc.Color(0.2, 1.0, 0.4);
+    }
+
+    visualState = name;
+  }
+
+  function collectRenderCounts(): { meshes: number; materials: number; textures: number } {
+    const meshes = new Set<pc.Mesh>();
+    const materials = new Set<pc.Material>();
+    const textures = new Set<pc.Texture>();
+    const renderComponents = world.app.root.findComponents('render') as pc.RenderComponent[];
+
+    for (const component of renderComponents) {
+      for (const meshInstance of component.meshInstances ?? []) {
+        meshes.add(meshInstance.mesh);
+        materials.add(meshInstance.material);
+        for (const value of Object.values(meshInstance.material)) {
+          if (value instanceof pc.Texture) textures.add(value);
+        }
+      }
+    }
+
+    for (const asset of world.app.assets.list()) {
+      if (asset.type === 'texture' && asset.resource instanceof pc.Texture) textures.add(asset.resource);
+    }
+
+    return { meshes: meshes.size, materials: materials.size, textures: textures.size };
+  }
+
+  function collectTransferredAssets(): { transferredMb: number; largestAssets: { name: string; transferredMb: number }[] } {
+    const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+    const resources = entries
+      .map((entry) => ({
+        name: new URL(entry.name, window.location.href).pathname,
+        transferredMb: entry.transferSize / (1024 * 1024),
+      }))
+      .filter((entry) => entry.transferredMb > 0)
+      .sort((a, b) => b.transferredMb - a.transferredMb);
+    return {
+      transferredMb: resources.reduce((total, entry) => total + entry.transferredMb, 0),
+      largestAssets: resources.slice(0, 5),
+    };
+  }
+
+  const visualHooks: RoxanaVisualTestHooks = {
+    seed(value) {
+      visualSeed = value;
+    },
+    setState(name) {
+      if (name !== 'portal-arrival' && name !== 'restored-plaza') throw new Error(`Unknown Ohmdal visual state: ${name}`);
+      setVisualState(name);
+    },
+    setCamera(name) {
+      if (!(name in OHMDAL_VISUAL_CAMERA_PRESETS)) throw new Error(`Unknown Ohmdal visual camera: ${name}`);
+      setVisualCamera(name);
+    },
+    setPausedForScreenshot(paused) {
+      visualPaused = paused;
+    },
+    setReducedMotion(enabled) {
+      reducedMotion = enabled;
+    },
+    hideDebugUi(hidden) {
+      debugUiHidden = hidden;
+      document.documentElement.classList.toggle('roxana-visual-ui-hidden', hidden);
+    },
+    setPostProcessing(enabled) {
+      postProcessingEnabled = enabled;
+      world.cameraEntity.camera!.toneMapping = enabled ? pc.TONEMAP_ACES : pc.TONEMAP_LINEAR;
+    },
+    getDiagnostics() {
+      const device = world.app.graphicsDevice as pc.GraphicsDevice & { unmaskedRenderer?: string; unmaskedVendor?: string };
+      const renderer = device.unmaskedRenderer ?? null;
+      const vendor = device.unmaskedVendor ?? null;
+      const softwareRendered = isSoftwareRenderer(renderer);
+      const counts = collectRenderCounts();
+      const assets = collectTransferredAssets();
+      const fpsSamples = frameTimeSamples.filter((ms) => ms > 0).map((ms) => 1000 / ms);
+      return {
+        browser: {
+          renderer,
+          vendor,
+          deviceType: device.deviceType,
+          softwareRendered,
+        },
+        performance: {
+          fpsP50: percentile(fpsSamples, 0.5),
+          fpsP10: percentile(fpsSamples, 0.1),
+          frameTimeMsP95: percentile(frameTimeSamples, 0.95),
+          note: softwareRendered ? 'Software renderer: FPS is informational and not a GPU benchmark.' : null,
+        },
+        render: {
+          drawCalls: world.app.stats.drawCalls.total,
+          triangles: world.app.stats.frame.triangles,
+          meshesOrGeometries: counts.meshes,
+          materials: counts.materials,
+          textures: counts.textures,
+        },
+        assets,
+        harness: {
+          camera: visualCamera,
+          state: visualState,
+          paused: visualPaused,
+          reducedMotion,
+          debugUiHidden,
+          postProcessing: postProcessingEnabled,
+          seed: visualSeed,
+          randomSeedNote: 'No randomized scene systems are active; seed is a documented no-op.',
+        },
+      };
+    },
+  };
+
+  void world.ready.then(
+    () => {
+      window.__ROXANA_VISUAL_TEST_HOOKS__ = visualHooks;
+    },
+    (error: unknown) => {
+      console.error('[Ohmdal] No se pudieron cargar todos los materiales del art pass.', error);
+      window.__ROXANA_VISUAL_TEST_HOOKS__ = visualHooks;
+    },
+  );
 
   // Awakening Sequence for Ohm
   function triggerOhmAwakening(): void {
@@ -466,7 +655,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     }
 
     if (circuit.gateOpen) {
-      world.solenoidGate.setPosition(0, 5.4, 11.5);
+      world.solenoidGate.setPosition(0, OMEGA_GATE_TUNING.openY, 11.5);
       world.gateLightLeft.light!.color = new pc.Color(0.2, 1.0, 0.4);
       world.gateLightRight.light!.color = new pc.Color(0.2, 1.0, 0.4);
       bitacora.unlock('puerta_ohm');
@@ -565,6 +754,12 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let needleTarget = 60;
 
   world.app.on('update', (dt: number) => {
+    const frameMs = world.app.stats.frame.ms || dt * 1000;
+    if (frameMs > 0 && Number.isFinite(frameMs)) {
+      frameTimeSamples.push(frameMs);
+      if (frameTimeSamples.length > 240) frameTimeSamples.shift();
+    }
+
     // 1. Movement
     let forward = 0;
     let strafe = 0;
@@ -574,7 +769,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     if (keys.d) strafe += 1;
 
     const isMoving = forward !== 0 || strafe !== 0;
-    if (isMoving) {
+    if (isMoving && !visualPaused) {
       const rad = (yaw * Math.PI) / 180;
       const fwdX = -Math.sin(rad);
       const fwdZ = -Math.cos(rad);
@@ -598,13 +793,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       }
     }
 
-    world.playerEntity.setPosition(playerPos.x, 1.68, playerPos.z);
+    world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
 
     // 2. Viewmodel Needle Animation
     const gState = galvanoscope.getState();
     const vFraction = Math.max(0, Math.min(1.0, gState.measuredVoltage / 30));
     needleTarget = 60 - vFraction * 120;
-    currentNeedleAngle += (needleTarget - currentNeedleAngle) * dt * 12.0;
+    if (!visualPaused && !reducedMotion) currentNeedleAngle += (needleTarget - currentNeedleAngle) * dt * 12.0;
     world.viewmodelNeedle.setLocalEulerAngles(0, 0, currentNeedleAngle);
 
     // 3. Prompt detection
@@ -647,6 +842,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       document.removeEventListener('pointerlockchange', onPointerLockChange);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      if (window.__ROXANA_VISUAL_TEST_HOOKS__ === visualHooks) delete window.__ROXANA_VISUAL_TEST_HOOKS__;
+      document.documentElement.classList.remove('roxana-visual-ui-hidden');
       world.app.destroy();
       canvas.remove();
     },

@@ -14,6 +14,7 @@
     "agent:gemini": "node scripts/agents/run-antigravity.mjs",
     "agent:gemini:plaza-context": "node scripts/agents/run-antigravity.mjs --task agent-work/tasks/gemini/ohmdal-plaza-context-audit.md --out agent-work/reports/gemini/ohmdal-plaza-context-audit.md",
     "agent:gemini:plaza-review": "node scripts/agents/run-antigravity.mjs --task agent-work/tasks/gemini/ohmdal-plaza-visual-review.md --out agent-work/reports/gemini/ohmdal-plaza-visual-review.md",
+    "visual:ohmdal-plaza": "node scripts/visual/capture-ohmdal-plaza.mjs",
     "3d:validate-manifests": "node scripts/3d/validate-asset-manifests.mjs",
     "3d:asset-index": "node scripts/3d/generate-asset-index.mjs",
     "3d:validate-glb": "node scripts/3d/validate-glb.mjs",
