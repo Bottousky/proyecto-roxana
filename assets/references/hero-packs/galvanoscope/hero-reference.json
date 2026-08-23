@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_galvanoscope_hero_01",
+  "world": "ohmdal",
+  "name": "Galvanoscopio de Lumen",
+  "mode": "design-approved",
+  "status": "blocked-missing-primary-reference",
+  "primaryReference": "",
+  "supportingReferences": [
+    "docs/20-worlds/ohmdal/OHMDAL_OUTER_WILDS_VISION_v1.md",
+    "docs/80-production/spikes/ohmdal-greenfield-explorable/SPIKE_REPORT.md",
+    "docs/80-production/spikes/ohmdal-greenfield-explorable/refs/03-first-person-device.jpg",
+    "assets/ohmdal/rooms/pilot-arco1/taller+props_lumen-v2.png",
+    "src/experiences/ohmdal-playcanvas/playcanvasWorld.ts",
+    "src/experiences/ohmdal-plaza/viewmodel/galvanoscopeViewmodel.ts"
+  ],
+  "physicalAnchors": {
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "groundedPivot": false,
+    "usage": "diegetic handheld first-person instrument",
+    "movingParts": [
+      "analog needle",
+      "two independent test probes and their leads"
+    ]
+  },
+  "mustPreserve": [
+    "readable analog voltmeter needle",
+    "continuity and resistance measurement function",
+    "two independent physical test probes",
+    "handheld first-person readability",
+    "identity as a diagnostic instrument rather than a weapon"
+  ],
+  "mayResolve": [
+    "overall silhouette and exact dimensions after visual approval",
+    "housing construction and grip ergonomics",
+    "dial layout and selector mechanism",
+    "wood, brass, copper, ceramic and glass material allocation",
+    "lead routing, storage and attachment points",
+    "hidden fasteners and runtime mesh segmentation"
+  ],
+  "forbidden": [
+    "treating the generic Outer Wilds mood image as design authority",
+    "treating either procedural runtime placeholder as approved canon",
+    "free text-to-3D redesign before a primary visual reference is approved",
+    "generic modern digital multimeter styling",
+    "weapon silhouette or weapon controls",
+    "passive neon glow used as the instrument's identity"
+  ],
+  "authoring": {
+    "preferredRoute": "undecided-until-reference-gate-passes",
+    "buildScript": null,
+    "canonicalGlb": null,
+    "generativeProviderRequired": false
+  },
+  "approvalNote": "HUMAN_GATE: provide or approve a stable primary concept/turnaround that defines silhouette, proportions, material grammar, controls, probes and first-person grip. The listed sources establish function or mood only and are not sufficient visual authority.",
+  "referenceAudit": {
+    "searchedScopes": [
+      "docs/20-worlds/ohmdal",
+      "docs/80-production",
+      "assets/ohmdal",
+      "assets/references",
+      "assets/runtime/ohmdal",
+      "src/experiences/ohmdal-playcanvas",
+      "src/experiences/ohmdal-plaza"
+    ],
+    "rejectedAsPrimary": [
+      {
+        "path": "docs/80-production/spikes/ohmdal-greenfield-explorable/refs/03-first-person-device.jpg",
+        "reason": "generic external mood image; it depicts a different science-fiction handheld device and does not define the Galvanoscopio"
+      },
+      {
+        "path": "assets/ohmdal/rooms/pilot-arco1/taller+props_lumen-v2.png",
+        "reason": "approved-looking environment support only; no identifiable Galvanoscopio concept or multiview"
+      },
+      {
+        "path": "src/experiences/ohmdal-playcanvas/playcanvasWorld.ts",
+        "reason": "current primitive runtime placeholder; implementation evidence cannot promote itself to canon"
+      },
+      {
+        "path": "src/experiences/ohmdal-plaza/viewmodel/galvanoscopeViewmodel.ts",
+        "reason": "legacy procedural placeholder; implementation evidence cannot promote itself to canon"
+      }
+    ]
+  },
+  "evidence": {
+    "stageReport": null,
+    "preview": null
+  }
+}
