@@ -1,0 +1,63 @@
+{
+  "id": "rx_ohmdal_galvanoscope_hero_01",
+  "displayName": "Galvanoscopio de Lumen — Plaza Stage 3",
+  "world": "ohmdal",
+  "category": "hero-prop",
+  "sourceMethod": "blender-manual",
+  "status": "integrated",
+  "references": [
+    "assets/references/hero-packs/galvanoscope/hero-reference.json",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-turnaround-v1.webp",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-first-person-v1.webp",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-hero-front-detail-v1.webp",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-dial-detail-v1.webp",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-probes-detail-v1.webp",
+    "assets/source/ohmdal/heroes/galvanoscope/galvanoscope.blend",
+    "assets/runtime/ohmdal/plaza/heroes/galvanoscope/provenance.json"
+  ],
+  "generation": {
+    "provider": "blender",
+    "taskId": "OHMDAL-PLAZA-STAGE3-GALVANOSCOPE01",
+    "promptFile": "scripts/3d/build_galvanoscope_hero.py",
+    "creditsSpent": 0,
+    "generatedAt": "2026-08-23"
+  },
+  "license": {
+    "owner": "Proyecto Roxana",
+    "referenceRightsVerified": true,
+    "notes": "Reconstrucción original del proyecto desde el reference pack aprobado; sin Meshy, Tripo, proveedor 3D externo, IA generativa ni créditos pagos."
+  },
+  "scale": {
+    "unit": "meter",
+    "height": 0.24,
+    "humanRatio": 0.1395
+  },
+  "frontAxis": "+Z",
+  "pivot": "custom",
+  "collider": {
+    "type": "none"
+  },
+  "sockets": [
+    "NeedlePivot",
+    "SelectorPivot",
+    "ProbeRedPivot",
+    "ProbePalePivot"
+  ],
+  "runtime": {
+    "desktop": {
+      "path": "assets/runtime/ohmdal/plaza/heroes/galvanoscope/galvanoscope.glb",
+      "maxTriangles": 5612,
+      "maxTexture": 1,
+      "maxMaterials": 12,
+      "maxDrawCalls": 21
+    },
+    "mobile": {
+      "path": "assets/runtime/ohmdal/plaza/heroes/galvanoscope/galvanoscope.glb",
+      "maxTriangles": 5612,
+      "maxTexture": 1,
+      "maxMaterials": 12,
+      "maxDrawCalls": 21
+    }
+  },
+  "notes": "Exact offline inspection: vertex bounds in authored glTF axes [-0.109786235,0.006918361,-0.037000000]..[0.111963667,0.240000010,0.074163944], dimensions [0.221749902,0.233081649,0.111163944], groundOffset=0 with grounded=false. Viewmodel-only asset with no collision mesh; semantic root GalvanoscopeHero preserves NeedlePivot, SelectorPivot, ProbeRedPivot and ProbePalePivot. Canonical GLB SHA256 1B858B44FDF5D575F4499AD56A3E6F223DEAC4FAF7FD11697D0188342C2293D8 (222572 bytes)."
+}

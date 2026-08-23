@@ -1,0 +1,62 @@
+{
+  "assetId": "rx_ohmdal_galvanoscope_hero_01",
+  "sourceMethod": "blender-manual",
+  "provider": "Proyecto Roxana",
+  "generationRoute": "approved reference pack -> deterministic Blender reconstruction -> multiview preview -> canonical GLB",
+  "sourceReferences": [
+    "assets/references/hero-packs/galvanoscope/galvanoscope-turnaround-v1.webp",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-first-person-v1.webp",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-hero-front-detail-v1.webp",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-dial-detail-v1.webp",
+    "assets/references/hero-packs/galvanoscope/galvanoscope-probes-detail-v1.webp",
+    "docs/20-worlds/ohmdal/production/GALVANOSCOPE_CANONICAL_BRIEF.md"
+  ],
+  "generativeAi": {
+    "used": false,
+    "creditsSpent": 0
+  },
+  "candidateCount": 1,
+  "canonicalization": {
+    "tool": "Blender 4.5.12 LTS",
+    "executable": "C:/Users/manue/AppData/Local/Programs/Blender Portable/blender-4.5.12-windows-x64/blender.exe",
+    "script": "scripts/3d/build_galvanoscope_hero.py",
+    "blend": "assets/source/ohmdal/heroes/galvanoscope/galvanoscope.blend",
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "pivot": "semantic-root-origin (handheld viewmodel; not grounded)",
+    "groundOffset": 0,
+    "grounded": false,
+    "boundsSource": "vertices",
+    "bounds": {
+      "min": [-0.109786235, 0.006918361, -0.037000000],
+      "max": [0.111963667, 0.240000010, 0.074163944],
+      "dims": [0.221749902, 0.233081649, 0.111163944],
+      "center": [0.001088716, 0.123459185, 0.018581972]
+    },
+    "targetHeightMeters": 0.24,
+    "heightToleranceMeters": [0.22, 0.28],
+    "hierarchy": "GalvanoscopeHero/{NeedlePivot,SelectorPivot,ProbeRedPivot,ProbePalePivot}; semantic rigid mesh groups; moving pivots remain separate",
+    "collision": "No collision mesh exported; viewmodel-only; gameplay interaction remains authoritative.",
+    "cleanup": "Applied transforms and bevels, joined rigid geometry by semantic material group, preserved needle/selector/probe pivots, removed cameras and lights from the saved master and export."
+  },
+  "runtime": {
+    "path": "assets/runtime/ohmdal/plaza/heroes/galvanoscope/galvanoscope.glb",
+    "sha256": "1B858B44FDF5D575F4499AD56A3E6F223DEAC4FAF7FD11697D0188342C2293D8",
+    "triangles": 5612,
+    "meshNodes": 12,
+    "materials": 12,
+    "textures": 0,
+    "bytes": 222572
+  },
+  "sourceHashes": {
+    "blendSha256": "C3F60EB472C00F84589570F4BF6BE940CB15241B95FC99352A13F35588414B29",
+    "scriptSha256": "44F566E9FED0E6F0DFD482BF2243ABA921A1E229A845B39B0E31D0D3907BB095",
+    "turnaroundSha256": "2479668E61DDF14E745D57D8A0F176E7F2E129628B2463A211C2AB8060493E27",
+    "firstPersonSha256": "5C1F15B87BDE40A49DE32BBC31C424D50AD198D8FE83511A36FEC1777B48C9EA",
+    "heroFrontDetailSha256": "46ACD3FB9174875ECDA711AFF3BCFAD88F58634E48B0BD9A657094C22D17F0B0",
+    "dialDetailSha256": "582128C1BD46FA0E062DD2BA0C0EA1607A85E09C471B3D02D9B59783970A92E5",
+    "probesDetailSha256": "172A237B0939251C07A749211E4C2CE2428BD4BF52C863056E700A53991DFA7D"
+  },
+  "license": "Original Proyecto Roxana reconstruction from the approved reference pack; no external 3D asset, no generative AI and no paid generation."
+}

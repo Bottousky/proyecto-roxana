@@ -67,7 +67,7 @@
   ],
   "authoring": {
     "preferredRoute": "blender-deterministic-first",
-    "buildScript": null,
+    "buildScript": "scripts/3d/build_galvanoscope_hero.py",
     "canonicalGlb": "assets/runtime/ohmdal/plaza/heroes/galvanoscope/galvanoscope.glb",
     "generativeProviderRequired": false
   },
@@ -114,6 +114,10 @@
     "firstPerson": "assets/references/hero-packs/galvanoscope/galvanoscope-first-person-v1.webp",
     "heroFrontDetail": "assets/references/hero-packs/galvanoscope/galvanoscope-hero-front-detail-v1.webp",
     "dialDetail": "assets/references/hero-packs/galvanoscope/galvanoscope-dial-detail-v1.webp",
-    "probesDetail": "assets/references/hero-packs/galvanoscope/galvanoscope-probes-detail-v1.webp"
+    "probesDetail": "assets/references/hero-packs/galvanoscope/galvanoscope-probes-detail-v1.webp",
+    "previewFront": "output/blender/galvanoscope/candidate-01-front.png",
+    "previewThreeQuarter": "output/blender/galvanoscope/candidate-01-three-quarter.png",
+    "previewSide": "output/blender/galvanoscope/candidate-01-side.png",
+    "previewBack": "output/blender/galvanoscope/candidate-01-back.png"
   }
 }

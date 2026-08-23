@@ -61,6 +61,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let debugUiHidden = false;
   let postProcessingEnabled = true;
   let visualSeed = 1;
+  let compactViewmodelLayout: boolean | null = null;
   const frameTimeSamples: number[] = [];
 
   // First-person Controls
@@ -795,7 +796,23 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
     world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
 
-    // 2. Viewmodel Needle Animation
+    // 2. Viewmodel calibration and needle animation. Portrait keeps the
+    // complete instrument inside the horizontal safe area instead of showing
+    // only a clipped probe at the right edge.
+    const useCompactViewmodelLayout = world.app.graphicsDevice.width <= 600;
+    if (compactViewmodelLayout !== useCompactViewmodelLayout) {
+      compactViewmodelLayout = useCompactViewmodelLayout;
+      if (useCompactViewmodelLayout) {
+        world.viewmodelRoot.setLocalPosition(0.10, -0.20, -0.65);
+        world.viewmodelRoot.setLocalEulerAngles(8, -10, 3);
+        world.viewmodelRoot.setLocalScale(0.72, 0.72, 0.72);
+      } else {
+        world.viewmodelRoot.setLocalPosition(0.25, -0.22, -0.48);
+        world.viewmodelRoot.setLocalEulerAngles(8, -12, 3);
+        world.viewmodelRoot.setLocalScale(1, 1, 1);
+      }
+    }
+
     const gState = galvanoscope.getState();
     const vFraction = Math.max(0, Math.min(1.0, gState.measuredVoltage / 30));
     needleTarget = 60 - vFraction * 120;

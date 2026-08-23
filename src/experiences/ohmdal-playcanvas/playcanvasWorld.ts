@@ -412,33 +412,59 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   // --- 4. Diegetic Handheld Galvanoscope Viewmodel ---
   const viewmodelRoot = new pc.Entity('GalvanoscopeViewmodel');
-  viewmodelRoot.setLocalPosition(0.36, -0.32, -0.6);
-  viewmodelRoot.setLocalEulerAngles(8, -15, 4);
+  viewmodelRoot.setLocalPosition(0.25, -0.22, -0.48);
+  viewmodelRoot.setLocalEulerAngles(8, -12, 3);
+  viewmodelRoot.setLocalScale(1, 1, 1);
   cameraEntity.addChild(viewmodelRoot);
 
-  const vmBox = new pc.Entity('VM_Box');
-  vmBox.addComponent('render', { type: 'box', material: matWood });
-  vmBox.setLocalScale(0.24, 0.32, 0.08);
-  viewmodelRoot.addChild(vmBox);
-
-  const vmBezel = new pc.Entity('VM_Bezel');
-  vmBezel.addComponent('render', { type: 'box', material: matBrass });
-  vmBezel.setLocalPosition(0, 0, 0.04);
-  vmBezel.setLocalScale(0.26, 0.34, 0.02);
-  viewmodelRoot.addChild(vmBezel);
-
-  const viewmodelNeedle = new pc.Entity('VM_Needle');
-  viewmodelNeedle.addComponent('render', { type: 'cone', material: matCopperClean });
-  viewmodelNeedle.setLocalPosition(0, 0.02, 0.055);
-  viewmodelNeedle.setLocalScale(0.008, 0.09, 0.008);
-  viewmodelNeedle.setLocalEulerAngles(0, 0, 60);
+  // Keep the public animation binding alive before the GLB resolves. The
+  // authored needle visual is reparented below this inert entity once the
+  // canonical asset is loaded, so playcanvasRuntime can keep rotating the
+  // same entity around its z axis.
+  const viewmodelNeedle = new pc.Entity('GalvanoscopeNeedleBinding');
   viewmodelRoot.addChild(viewmodelNeedle);
 
-  const viewmodelFilament = new pc.Entity('VM_Filament');
-  viewmodelFilament.addComponent('render', { type: 'cylinder', material: matCopperClean });
-  viewmodelFilament.setLocalPosition(-0.07, -0.09, 0.06);
-  viewmodelFilament.setLocalScale(0.012, 0.06, 0.012);
+  // Compatibility reference retained for the runtime/world interface. The
+  // canonical hero owns all visible viewmodel geometry; this entity must stay
+  // inert and must not recreate the removed filament primitive.
+  const viewmodelFilament = new pc.Entity('GalvanoscopeFilamentCompatibility');
+  viewmodelFilament.enabled = false;
   viewmodelRoot.addChild(viewmodelFilament);
+
+  const galvanoscopeHeroUrl = new URL(
+    '../../../assets/runtime/ohmdal/plaza/heroes/galvanoscope/galvanoscope.glb',
+    import.meta.url,
+  ).href;
+  const galvanoscopeReady = loadContainerEntity('galvanoscope-hero', galvanoscopeHeroUrl).then((heroVisual) => {
+    const authoredRoot =
+      (heroVisual.findByName('GalvanoscopeHero') as pc.Entity | null)
+      ?? (heroVisual.name === 'GalvanoscopeHero' ? heroVisual : null);
+    if (!authoredRoot) throw new Error('Galvanoscope GLB is missing GalvanoscopeHero');
+
+    const needlePivot = authoredRoot.findByName('NeedlePivot') as pc.Entity | null;
+    const needleVisual = authoredRoot.findByName('NeedleVisual') as pc.Entity | null;
+    const selectorPivot = authoredRoot.findByName('SelectorPivot') as pc.Entity | null;
+    const probeRedPivot = authoredRoot.findByName('ProbeRedPivot') as pc.Entity | null;
+    const probePalePivot = authoredRoot.findByName('ProbePalePivot') as pc.Entity | null;
+    if (!needlePivot) throw new Error('Galvanoscope GLB is missing NeedlePivot');
+    if (!needleVisual) throw new Error('Galvanoscope GLB is missing NeedleVisual');
+    if (!selectorPivot) throw new Error('Galvanoscope GLB is missing SelectorPivot');
+    if (!probeRedPivot) throw new Error('Galvanoscope GLB is missing ProbeRedPivot');
+    if (!probePalePivot) throw new Error('Galvanoscope GLB is missing ProbePalePivot');
+
+    // The root is authored front +Z and calibrated at the requested viewmodel
+    // transform above; no additional yaw/scale correction is introduced here.
+    viewmodelRoot.addChild(heroVisual);
+    heroVisual.name = 'GalvanoscopeHeroVisual';
+
+    needlePivot.addChild(viewmodelNeedle);
+    viewmodelNeedle.addChild(needleVisual);
+
+    for (const component of heroVisual.findComponents('render') as pc.RenderComponent[]) {
+      component.castShadows = false;
+      component.receiveShadows = true;
+    }
+  });
 
   // ==========================================
   // --- 5. OUTDOOR PLAZA SCENE (plazaRoot) ---
@@ -943,7 +969,13 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   probeTargets['puerta_solenoide'] = new pc.Vec3(0, 2.2, 11.0);
   addCollider(0, 11.5, 7.8, 2.4);
 
-  const ready = Promise.all([materialReady, vendorPropsReady, ohmHeroReady, omegaGateReady]).then(() => {
+  const ready = Promise.all([
+    materialReady,
+    vendorPropsReady,
+    ohmHeroReady,
+    omegaGateReady,
+    galvanoscopeReady,
+  ]).then(() => {
     app.batcher.generate([plazaArtBatch.id]);
   });
 

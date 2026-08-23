@@ -3,7 +3,7 @@
   "loopId": "ohmdal-plaza",
   "branch": "explore/ohmdal-3D",
   "status": "ready",
-  "currentStage": "stage-3-galvanoscope",
+  "currentStage": "stage-4-world-coherence",
   "iteration": 0,
   "maxIterationsPerStage": 3,
   "maxFixesPerIteration": 5,
@@ -48,20 +48,20 @@
     },
     {
       "id": "stage-3-galvanoscope",
-      "status": "ready",
+      "status": "passed",
       "requiresHeroReferenceGate": true
     },
     {
       "id": "stage-4-world-coherence",
-      "status": "queued"
+      "status": "ready"
     },
     {
       "id": "stage-5-final-plaza-polish",
       "status": "queued"
     }
   ],
-  "lastReviewReport": "agent-work/reports/gemini/ohmdal-plaza-loop-stage-3-galvanoscope-hero-reference-gate.md",
-  "lastCaptureManifest": "output/playwright/ohmdal-plaza/stage-2c/iter-3-after/capture-manifest.json",
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-plaza-loop-stage-3-galvanoscope-iter-1-after.md",
+  "lastCaptureManifest": "output/playwright/ohmdal-plaza/stage-3/iter-1-after/capture-manifest.json",
   "humanGate": null,
   "notes": [
     "Gemini Pro is intentionally not part of the automatic loop.",
@@ -72,6 +72,7 @@
     "Stage 3 originally stopped before modeling because no approved primary visual authority existed.",
     "The human design gate was resolved on 2026-08-23: Manuel approved the canonical Galvanoscope brief, turnaround and first-person concept. hero-reference.json is approved and Stage 3 may resume.",
     "The approved narrative interpretation is an inherited functional instrument from older Ohmdal that Lumen maintains and uses practically but only partially understands; superstition surrounds its interpretation, not its physical operation.",
-    "Stage 3 should default to Blender deterministic reconstruction following the Ohm golden path. Meshy/Tripo remain behind a new economic HUMAN_GATE if later requested."
+    "Stage 3 should default to Blender deterministic reconstruction following the Ohm golden path. Meshy/Tripo remain behind a new economic HUMAN_GATE if later requested.",
+    "Stage 3 passed in iteration 1: Blender-first Galvanoscope reconstruction, canonical GLB, semantic pivots, PlayCanvas viewmodel integration, desktop/mobile framing, manifests and Visual Harness all passed. Gemini Flash High reported PASS with no regressions."
   ]
 }
