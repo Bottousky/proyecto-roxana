@@ -46,6 +46,9 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
 - Validar condiciones; aceptar varias soluciones cuando el sistema lo permite.
 - Diseñar input/cámara/UI para desktop y touch/mobile.
 - Calibrar GLB una vez: escala, suelo, orientación, jerarquía y animaciones.
+- Antes de producir cualquier asset identitario/hero, buscar referencias existentes
+  y pasar `docs/3d/HERO_REFERENCE_GATE.md`. Si hay turnaround aprobado, reconstruir;
+  no rediseñar por conveniencia del generador.
 
 ### No hacer
 
@@ -56,6 +59,8 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
 - Copiar decisiones narrativas del spike greenfield sin ratificación.
 - Reescribir o borrar baselines para forzar una migración limpia.
 - Actualizar PlayCanvas/Vite/dependencias incidentalmente.
+- Empezar un hero con text-to-3D libre si el repo ya contiene una referencia visual
+  fuerte que debe preservarse.
 
 ## Tooling
 
@@ -69,6 +74,10 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
   distillation, reconciliación de muchas fuentes y fresh-eyes visual review. No
   usar Gemini API y no darle autoridad de implementación.
 - MiniMax: sólo por `mmx`; Codex revisa e integra.
+- Hero assets: contrato cross-Roxana
+  [`../../3d/HERO_REFERENCE_GATE.md`](../../3d/HERO_REFERENCE_GATE.md). Cada hero
+  lleva un `hero-reference.json` y debe pasar `npm run 3d:validate-hero-ref -- <archivo>`.
+  Ohm en `assets/references/hero-packs/ohm/hero-reference.json` es el golden example.
 - Política actual de authoring/proveedores/Three.js como cantera técnica:
   [`production/OHMDAL_AGENTIC_3D_STACK.md`](production/OHMDAL_AGENTIC_3D_STACK.md).
 - Dirección 3D, fuentes gratuitas y quality bar:
@@ -89,6 +98,9 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
 Tests enfocados durante el cambio; al cierre `npm run verify`. Si afecta al
 jugador, abrir la ruta real, revisar consola y recorrer desktop + touch/mobile.
 Una captura o un build verde no bastan para aprobar experiencia/aprendizaje.
+
+Para un hero, además, el reference pack debe estar `approved` y validar antes de
+modelar o generar el candidate final.
 
 Cambios de experiencia, engine/dependencias, canon, guion, dirección visual o
 migración de runtime se escalan a Manuel.
