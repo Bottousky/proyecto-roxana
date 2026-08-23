@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_ohm_pedestal_hero_01",
+  "world": "ohmdal",
+  "name": "Ohm + pedestal",
+  "mode": "reconstruct",
+  "status": "approved",
+  "primaryReference": "assets/ohmdal/characters/ohm-turnaround-v2.png",
+  "supportingReferences": [
+    "assets/ohmdal/characters/ohm-atlas-64-v2.png",
+    "assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md",
+    "assets/references/ohmdal-hd2d-preprod/specs/ohm-sprite-spec.md"
+  ],
+  "physicalAnchors": {
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "groundedPivot": true,
+    "ohmHeightMeters": 1.03,
+    "combinedOhmPedestalHeightMeters": 1.47
+  },
+  "mustPreserve": [
+    "compact egg/canister silhouette",
+    "twin circular front visors",
+    "turquoise top emitter dome",
+    "paired side sensor housings",
+    "short paired feet",
+    "front Omega mark",
+    "aged copper / dark metal / turquoise material family"
+  ],
+  "mayResolve": [
+    "hidden fasteners and underside construction",
+    "pedestal mechanical detailing that does not alter Ohm silhouette",
+    "mesh segmentation needed for runtime efficiency"
+  ],
+  "forbidden": [
+    "generic humanoid redesign",
+    "new limbs or weapons",
+    "passive neon/glow as identity",
+    "removal or replacement of the Omega mark",
+    "palette replacement not supported by approved references"
+  ],
+  "authoring": {
+    "preferredRoute": "blender-deterministic",
+    "buildScript": "scripts/3d/build_ohm_hero.py",
+    "canonicalGlb": "assets/runtime/ohmdal/plaza/heroes/ohm/ohm-pedestal.glb",
+    "generativeProviderRequired": false
+  },
+  "evidence": {
+    "stageReport": "agent-work/reports/ohmdal-plaza-art-pass-stage-2a.md",
+    "preview": "output/blender/ohm-pedestal/candidate-01.png"
+  }
+}
