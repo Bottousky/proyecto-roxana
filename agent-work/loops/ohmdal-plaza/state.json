@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "loopId": "ohmdal-plaza",
+  "branch": "explore/ohmdal-3D",
+  "status": "ready",
+  "currentStage": "stage-2c-environment",
+  "iteration": 0,
+  "maxIterationsPerStage": 3,
+  "maxFixesPerIteration": 5,
+  "maxStructuralFixesPerIteration": 1,
+  "maxConcurrentLunaWorkers": 2,
+  "routing": {
+    "reviewer": {
+      "harness": "antigravity-cli",
+      "model": "gemini-3.7-flash-high",
+      "effort": "high",
+      "fallback": "nearest-available-gemini-flash-high-only"
+    },
+    "decision": {
+      "harness": "codex",
+      "modelAlias": "Sol",
+      "effort": "high"
+    },
+    "mechanicalWorker": {
+      "harness": "codex-subagent",
+      "modelAlias": "Luna",
+      "effort": "max",
+      "fallback": "report-routing-fallback-no-custom-wrapper"
+    }
+  },
+  "limits": {
+    "allowPaidGenerativeWithoutHumanGate": false,
+    "allowEngineChange": false,
+    "allowCanonChange": false,
+    "allowLargeDependencyChange": false,
+    "allowNewAgentFramework": false
+  },
+  "baseline": {
+    "stage": "stage-2b-omega-gate",
+    "commit": "4380eb28bfe0ef83c551dbcb54bd04dc53205386",
+    "report": "agent-work/reports/ohmdal-plaza-art-pass-stage-2b.md",
+    "captureManifest": "output/playwright/ohmdal-plaza/stage-2b/current/capture-manifest.json"
+  },
+  "queue": [
+    {
+      "id": "stage-2c-environment",
+      "status": "ready"
+    },
+    {
+      "id": "stage-3-galvanoscope",
+      "status": "queued",
+      "requiresHeroReferenceGate": true
+    },
+    {
+      "id": "stage-4-world-coherence",
+      "status": "queued"
+    },
+    {
+      "id": "stage-5-final-plaza-polish",
+      "status": "queued"
+    }
+  ],
+  "lastReviewReport": null,
+  "lastCaptureManifest": "output/playwright/ohmdal-plaza/stage-2b/current/capture-manifest.json",
+  "humanGate": null,
+  "notes": [
+    "Gemini Pro is intentionally not part of the automatic loop.",
+    "Meshy/Tripo spending always requires a human gate unless separately authorized.",
+    "The loop stops after final Plaza polish; it does not auto-start Manantial or Faro."
+  ]
+}
