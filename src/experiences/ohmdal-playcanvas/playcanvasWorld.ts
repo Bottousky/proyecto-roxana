@@ -72,11 +72,30 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matStoneDark.update();
 
   const matMountain = new pc.StandardMaterial();
+  matMountain.name = 'roxana-ohmdal-mountain-near-v1';
   matMountain.diffuse = new pc.Color(0.34, 0.32, 0.3);
   matMountain.useMetalness = true;
   matMountain.gloss = 0.08;
   matMountain.metalness = 0.02;
   matMountain.update();
+
+  const matMountainFar = new pc.StandardMaterial();
+  matMountainFar.name = 'roxana-ohmdal-mountain-far-v1';
+  matMountainFar.diffuse = new pc.Color(0.22, 0.25, 0.27);
+  matMountainFar.useMetalness = true;
+  matMountainFar.gloss = 0.04;
+  matMountainFar.metalness = 0;
+  matMountainFar.update();
+
+  const matSky = new pc.StandardMaterial();
+  matSky.name = 'roxana-ohmdal-sky-dome-v1';
+  matSky.diffuse = new pc.Color(0.19, 0.26, 0.31);
+  matSky.emissive = new pc.Color(0.19, 0.26, 0.31);
+  matSky.emissiveIntensity = 0.72;
+  matSky.useLighting = false;
+  matSky.cull = pc.CULLFACE_FRONT;
+  matSky.depthWrite = false;
+  matSky.update();
 
   const matCopperClean = new pc.StandardMaterial();
   matCopperClean.name = 'roxana-ohmdal-copper-aged-v1';
@@ -127,6 +146,16 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matWoodDark.useMetalness = true;
   matWoodDark.gloss = 0.2;
   matWoodDark.update();
+
+  const matWorkshopInterior = new pc.StandardMaterial();
+  matWorkshopInterior.name = 'roxana-ohmdal-workshop-interior-v1';
+  matWorkshopInterior.diffuse = new pc.Color(0.19, 0.1, 0.055);
+  matWorkshopInterior.emissive = new pc.Color(0.24, 0.075, 0.018);
+  matWorkshopInterior.emissiveIntensity = 0.42;
+  matWorkshopInterior.useMetalness = true;
+  matWorkshopInterior.metalness = 0;
+  matWorkshopInterior.gloss = 0.08;
+  matWorkshopInterior.update();
 
   const matWater = new pc.StandardMaterial();
   matWater.diffuse = new pc.Color(0.12, 0.52, 0.68);
@@ -348,6 +377,13 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   fillEntity.setEulerAngles(-40, 145, 0);
   app.root.addChild(fillEntity);
 
+  const skyDome = new pc.Entity('PlazaSkyDome');
+  skyDome.addComponent('render', { type: 'sphere', material: matSky });
+  skyDome.render!.castShadows = false;
+  skyDome.render!.receiveShadows = false;
+  skyDome.setLocalScale(140, 140, 140);
+  app.root.addChild(skyDome);
+
   // --- 3. First-Person Player & Camera Rig ---
   const playerEntity = new pc.Entity('Player');
   playerEntity.setPosition(0, 1.68, -8.0);
@@ -447,6 +483,73 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     entity.setEulerAngles(...euler);
     parent.addChild(entity);
     return entity;
+  };
+
+  const addMountainRidge = (
+    parent: pc.Entity,
+    name: string,
+    position: [number, number, number],
+    width: number,
+    depth: number,
+    heights: number[],
+    material: pc.StandardMaterial,
+  ) => {
+    const positions: number[] = [];
+    const indices: number[] = [];
+    const bottom = -4;
+    const frontZ = -depth / 2;
+    const backZ = depth / 2;
+    const last = heights.length - 1;
+
+    for (let index = 0; index < heights.length; index += 1) {
+      const x = -width / 2 + (width * index) / last;
+      positions.push(x, bottom, frontZ, x, heights[index], frontZ);
+      positions.push(x, bottom, backZ, x, heights[index] - 0.8, backZ);
+    }
+
+    const vertex = (index: number, back: boolean, top: boolean) => index * 4 + (back ? 2 : 0) + (top ? 1 : 0);
+    for (let index = 0; index < last; index += 1) {
+      const next = index + 1;
+      const frontBottom = vertex(index, false, false);
+      const frontTop = vertex(index, false, true);
+      const nextFrontBottom = vertex(next, false, false);
+      const nextFrontTop = vertex(next, false, true);
+      const backBottom = vertex(index, true, false);
+      const backTop = vertex(index, true, true);
+      const nextBackBottom = vertex(next, true, false);
+      const nextBackTop = vertex(next, true, true);
+
+      indices.push(frontBottom, frontTop, nextFrontTop, frontBottom, nextFrontTop, nextFrontBottom);
+      indices.push(backBottom, nextBackTop, backTop, backBottom, nextBackBottom, nextBackTop);
+      indices.push(frontTop, backTop, nextBackTop, frontTop, nextBackTop, nextFrontTop);
+    }
+
+    const leftFrontBottom = vertex(0, false, false);
+    const leftFrontTop = vertex(0, false, true);
+    const leftBackBottom = vertex(0, true, false);
+    const leftBackTop = vertex(0, true, true);
+    const rightFrontBottom = vertex(last, false, false);
+    const rightFrontTop = vertex(last, false, true);
+    const rightBackBottom = vertex(last, true, false);
+    const rightBackTop = vertex(last, true, true);
+    indices.push(leftFrontBottom, leftBackTop, leftFrontTop, leftFrontBottom, leftBackBottom, leftBackTop);
+    indices.push(rightFrontBottom, rightFrontTop, rightBackTop, rightFrontBottom, rightBackTop, rightBackBottom);
+
+    const geometry = new pc.Geometry();
+    geometry.positions = positions;
+    geometry.indices = indices;
+    geometry.normals = pc.calculateNormals(positions, indices);
+    const mesh = pc.Mesh.fromGeometry(app.graphicsDevice, geometry);
+    const ridge = new pc.Entity(name);
+    ridge.addComponent('render', {
+      type: 'asset',
+      meshInstances: [new pc.MeshInstance(mesh, material, ridge)],
+    });
+    ridge.render!.castShadows = false;
+    ridge.render!.receiveShadows = true;
+    ridge.setPosition(...position);
+    parent.addChild(ridge);
+    return ridge;
   };
 
   // Main Flagstone Ground
@@ -604,11 +707,23 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     addBox(plazaRoot, `WorkshopFrameEast${z}`, [-7.42, 2.75, z], [0.22, 4.55, 0.3], matWood);
     addBox(plazaRoot, `WorkshopFrameWest${z}`, [-13.58, 2.75, z], [0.22, 4.55, 0.3], matWood);
   }
-  addBox(plazaRoot, 'WorkshopDoor', [-7.18, 1.35, -4], [0.18, 2.55, 1.55], matWoodDark);
-  addBox(plazaRoot, 'WorkshopDoorHeader', [-7.08, 2.82, -4], [0.24, 0.28, 2.15], matWood);
+  // The entrance is a recessed, warm working threshold rather than a black
+  // decal. Stone jambs carry the facade, while copper details keep the craft
+  // language tied to Ohmdal's electrical infrastructure.
+  addBox(plazaRoot, 'WorkshopDoorRecess', [-7.3, 1.36, -4], [0.18, 2.55, 1.55], matWorkshopInterior);
+  for (const [index, z] of [-4.94, -3.06].entries()) {
+    addBox(plazaRoot, `WorkshopDoorJamb${index}`, [-6.98, 1.48, z], [0.42, 2.96, 0.34], matStone);
+    addBox(plazaRoot, `WorkshopDoorConductor${index}`, [-6.74, 1.55, z], [0.06, 2.25, 0.08], matCopperClean);
+  }
+  addBox(plazaRoot, 'WorkshopDoorLintel', [-6.98, 2.96, -4], [0.42, 0.34, 2.22], matStoneDark);
+  addBox(plazaRoot, 'WorkshopDoorHeader', [-6.74, 2.91, -4], [0.06, 0.12, 1.7], matCopperClean);
+  addBox(plazaRoot, 'WorkshopThreshold', [-6.76, 0.13, -4], [0.95, 0.24, 2.18], matStone);
+  addBox(plazaRoot, 'WorkshopThresholdStrip', [-6.62, 0.27, -4], [0.08, 0.06, 1.72], matCopperClean);
   for (const z of [-6.05, -1.95]) {
     addBox(plazaRoot, `WorkshopWindowFrame${z}`, [-7.08, 2.75, z], [0.22, 1.55, 1.35], matWood);
-    addBox(plazaRoot, `WorkshopWindowVoid${z}`, [-6.96, 2.75, z], [0.05, 1.12, 0.92], matIron);
+    addBox(plazaRoot, `WorkshopWindowVoid${z}`, [-6.96, 2.75, z], [0.05, 1.12, 0.92], matWorkshopInterior);
+    addBox(plazaRoot, `WorkshopWindowSill${z}`, [-6.86, 1.92, z], [0.46, 0.16, 1.52], matStoneDark);
+    addBox(plazaRoot, `WorkshopWindowMullion${z}`, [-6.82, 2.75, z], [0.06, 1.02, 0.08], matCopperClean);
   }
   addBox(plazaRoot, 'WorkshopWorkbench', [-6.55, 0.72, -1.05], [2.35, 0.18, 0.85], matWood);
   for (const z of [-1.38, -0.72]) {
@@ -621,61 +736,20 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   addCylinder(plazaRoot, 'WorkshopCableSpool', [-6.9, 0.48, 0.55], [0.72, 0.34, 0.72], matWood, [0, 0, 90]);
   addCylinder(plazaRoot, 'WorkshopCableCoil', [-6.9, 0.48, 0.55], [0.5, 0.42, 0.5], matCopperClean, [0, 0, 90]);
 
-  const vendorPropUrl = (file: string) =>
-    new URL(`../../../assets/runtime/ohmdal/plaza/props/vendor-derived/${file}`, import.meta.url).href;
-  const vendorPropsReady = loadContainerEntity(
-    'quaternius-workshop-props',
-    vendorPropUrl('quaternius-workshop-props.glb'),
-  ).then((vendorRoot) => {
-    const barrel = vendorRoot.findByName('Barrel')!;
-    const crate = vendorRoot.findByName('Crate_Wooden')!;
-    const workbench = vendorRoot.findByName('Workbench')!;
-    plazaRoot.findByName('WorkshopWorkbench')!.enabled = false;
-    plazaRoot.findByName('WorkshopCrate0')!.enabled = false;
-    plazaRoot.findByName('WorkshopCrate1')!.enabled = false;
-
-    vendorRoot.name = 'WorkshopVendorProps';
-    plazaRoot.addChild(vendorRoot);
-
-    workbench.name = 'WorkshopVendorWorkbench';
-    workbench.setPosition(-6.35, 0, -1.2);
-    workbench.setEulerAngles(0, 90, 0);
-
-    barrel.name = 'WorkshopVendorBarrelA';
-    barrel.setPosition(-6.85, -0.0034, 0.72);
-    const barrelB = barrel.clone();
-    barrelB.name = 'WorkshopVendorBarrelB';
-    barrelB.setPosition(-7.55, -0.0034, 1.05);
-    barrelB.setEulerAngles(0, 28, 0);
-    barrelB.setLocalScale(0.92, 0.92, 0.92);
-    plazaRoot.addChild(barrelB);
-
-    crate.name = 'WorkshopVendorCrateA';
-    crate.setPosition(-8.2, 0.0524, 0.12);
-    crate.setEulerAngles(0, -12, 0);
-    const crateB = crate.clone();
-    crateB.name = 'WorkshopVendorCrateB';
-    crateB.setPosition(-8.95, 0.0524, 0.82);
-    crateB.setEulerAngles(0, 24, 0);
-    crateB.setLocalScale(0.86, 0.86, 0.86);
-    plazaRoot.addChild(crateB);
-  });
-
-  const workshopDoorArch = new pc.Entity('WorkshopDoorArch');
-  workshopDoorArch.addComponent('render', { type: 'box', material: matWood });
-  workshopDoorArch.setPosition(-7.4, 1.4, -4.0);
-  workshopDoorArch.setLocalScale(0.4, 2.8, 2.2);
-  plazaRoot.addChild(workshopDoorArch);
+  // Keep the authored workshop props enabled; no vendor GLB is needed at runtime.
+  const vendorPropsReady = Promise.resolve();
 
   const workshopLantern = new pc.Entity('WorkshopLantern');
   workshopLantern.addComponent('light', {
     type: 'point',
     color: new pc.Color(1.0, 0.7, 0.3),
-    intensity: 1.8,
-    range: 6.0,
+    intensity: 2.35,
+    range: 5.5,
   });
-  workshopLantern.setPosition(-7.1, 2.8, -4.0);
+  workshopLantern.setPosition(-6.75, 2.55, -4.0);
   plazaRoot.addChild(workshopLantern);
+  addBox(plazaRoot, 'WorkshopLanternBracket', [-6.7, 2.72, -4], [0.22, 0.12, 0.5], matIron);
+  addCylinder(plazaRoot, 'WorkshopLanternHousing', [-6.56, 2.58, -4], [0.22, 0.35, 0.22], matBrass);
   addCollider(-10.5, -4.0, 6.2, 7.6);
 
   // --- Sacred Bell of Continuity (West Plaza) ---
@@ -684,6 +758,11 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   bellGantry.setPosition(-5.2, 3.6, 2.4);
   bellGantry.setLocalScale(2.4, 0.3, 0.4);
   plazaRoot.addChild(bellGantry);
+  addBox(plazaRoot, 'BellGantryPost0', [-6.15, 2.25, 2.4], [0.3, 2.7, 0.38], matWood);
+  addBox(plazaRoot, 'BellGantryPost1', [-4.25, 2.25, 2.4], [0.3, 2.7, 0.38], matWood);
+  addBox(plazaRoot, 'BellGantryPlinth0', [-6.15, 0.24, 2.4], [0.68, 0.48, 0.72], matStoneDark);
+  addBox(plazaRoot, 'BellGantryPlinth1', [-4.25, 0.24, 2.4], [0.68, 0.48, 0.72], matStoneDark);
+  addBox(plazaRoot, 'BellGantryCopperRail', [-5.2, 3.42, 2.18], [1.85, 0.08, 0.08], matCopperClean);
 
   const bell = new pc.Entity('Bell');
   bell.addComponent('render', { type: 'cylinder', material: matBrass });
@@ -706,10 +785,12 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   // --- Sacred Fountain of Ohm (East Plaza) ---
   const fountainBasin = new pc.Entity('FountainBasin');
-  fountainBasin.addComponent('render', { type: 'cylinder', material: matStoneDark });
+  fountainBasin.addComponent('render', { type: 'cylinder', material: matStone });
   fountainBasin.setPosition(5.5, 0.4, 3.8);
   fountainBasin.setLocalScale(5.8, 0.8, 5.8);
   plazaRoot.addChild(fountainBasin);
+  addCylinder(plazaRoot, 'FountainBasinLowerCourse', [5.5, 0.1, 3.8], [6.35, 0.2, 6.35], matStoneDark);
+  addCylinder(plazaRoot, 'FountainBasinCopperBand', [5.5, 0.5, 3.8], [5.95, 0.12, 5.95], matCopperClean);
 
   const waterEntity = new pc.Entity('FountainWater');
   waterEntity.addComponent('render', { type: 'cylinder', material: matWater });
@@ -722,10 +803,16 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   // --- The 40-Year Mural (South-East) ---
   const mural = new pc.Entity('MuralWall');
-  mural.addComponent('render', { type: 'box', material: matStoneDark });
+  mural.addComponent('render', { type: 'box', material: matStone });
   mural.setPosition(7.8, 1.6, -4.2);
   mural.setLocalScale(4.0, 3.2, 1.0);
   plazaRoot.addChild(mural);
+  addBox(plazaRoot, 'MuralPlinth', [7.8, 0.25, -4.2], [4.55, 0.5, 1.35], matStoneDark);
+  addBox(plazaRoot, 'MuralCap', [7.8, 3.32, -4.2], [4.5, 0.22, 1.3], matCopperClean);
+  addBox(plazaRoot, 'MuralReliefPanel', [7.8, 1.72, -4.73], [3.3, 2.15, 0.06], matStoneDark);
+  addBox(plazaRoot, 'MuralConductor0', [6.8, 1.72, -4.78], [0.06, 1.75, 0.04], matCopperClean);
+  addBox(plazaRoot, 'MuralConductor1', [7.8, 1.72, -4.78], [0.06, 1.75, 0.04], matCopperClean);
+  addBox(plazaRoot, 'MuralConductor2', [8.8, 1.72, -4.78], [0.06, 1.75, 0.04], matCopperClean);
   addCollider(7.8, -4.2, 4.2, 1.6);
 
   // --- Conduits, Jumper & Corrosion ---
@@ -978,25 +1065,62 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   canyonGround.setLocalScale(18.0, 0.4, 30.0);
   mountainRoot.addChild(canyonGround);
 
-  // Towering Mountain Cliffs (Backdrop)
-  const mountainPeakL = new pc.Entity('MountainPeakLeft');
-  mountainPeakL.addComponent('render', { type: 'cone', material: matMountain });
-  mountainPeakL.setPosition(-12.0, 14.0, 42.0);
-  mountainPeakL.setLocalScale(24.0, 28.0, 24.0);
-  mountainRoot.addChild(mountainPeakL);
+  // Layered low-poly ridges replace the two placeholder cones. The central
+  // saddle keeps the distant hydraulic route legible without turning it into
+  // a hard-edged sky cutout from the plaza.
+  addMountainRidge(
+    mountainRoot,
+    'MountainRidgeFar',
+    [0, 0, 49],
+    62,
+    10,
+    [8, 22, 14, 27, 18, 13, 21, 29, 16, 24, 9],
+    matMountainFar,
+  );
+  addMountainRidge(
+    mountainRoot,
+    'MountainRidgeNear',
+    [0, 0, 37],
+    48,
+    8,
+    [4, 14, 9, 20, 12, 7, 13, 19, 10, 16, 5],
+    matMountain,
+  );
 
-  const mountainPeakR = new pc.Entity('MountainPeakRight');
-  mountainPeakR.addComponent('render', { type: 'cone', material: matMountain });
-  mountainPeakR.setPosition(12.0, 15.0, 44.0);
-  mountainPeakR.setLocalScale(26.0, 30.0, 26.0);
-  mountainRoot.addChild(mountainPeakR);
-
-  // Cascading Mountain Waterfall (Flume from height)
+  // Cascading mountain water follows the central saddle as a tapered ribbon.
+  // Keeping it between the ridge layers removes the old hard-edged blue box
+  // while preserving the distant hydraulic route from the plaza.
+  const waterfallSections: Array<[number, number, number]> = [
+    [14.5, 44, 0.65],
+    [12, 42, 0.85],
+    [9, 40, 0.7],
+    [6, 38, 1.0],
+    [4, 37, 0.85],
+  ];
+  const waterfallPositions: number[] = [];
+  const waterfallIndices: number[] = [];
+  for (const [y, z, halfWidth] of waterfallSections) {
+    waterfallPositions.push(-halfWidth, y, z, halfWidth, y, z);
+  }
+  for (let index = 0; index < waterfallSections.length - 1; index += 1) {
+    const left = index * 2;
+    const right = left + 1;
+    const nextLeft = left + 2;
+    const nextRight = left + 3;
+    waterfallIndices.push(left, right, nextRight, left, nextRight, nextLeft);
+  }
+  const waterfallGeometry = new pc.Geometry();
+  waterfallGeometry.positions = waterfallPositions;
+  waterfallGeometry.indices = waterfallIndices;
+  waterfallGeometry.normals = pc.calculateNormals(waterfallPositions, waterfallIndices);
+  const waterfallRibbonMesh = pc.Mesh.fromGeometry(app.graphicsDevice, waterfallGeometry);
   const waterfallMesh = new pc.Entity('MountainWaterfall');
-  waterfallMesh.addComponent('render', { type: 'box', material: matWaterfall });
-  waterfallMesh.setPosition(0, 10.0, 34.0);
-  waterfallMesh.setEulerAngles(35, 0, 0);
-  waterfallMesh.setLocalScale(4.8, 0.6, 22.0);
+  waterfallMesh.addComponent('render', {
+    type: 'asset',
+    meshInstances: [new pc.MeshInstance(waterfallRibbonMesh, matWaterfall, waterfallMesh)],
+  });
+  waterfallMesh.render!.castShadows = false;
+  waterfallMesh.render!.receiveShadows = false;
   mountainRoot.addChild(waterfallMesh);
 
   // Hydroelectric Penstock Steel Pipes
