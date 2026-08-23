@@ -57,8 +57,13 @@ if (!Number.isInteger(state.iteration) || state.iteration < 0 || state.iteration
 const reviewer = state.routing?.reviewer;
 if (!reviewer) fail('routing.reviewer is required');
 if (reviewer.harness !== 'antigravity-cli') fail('reviewer harness must be antigravity-cli');
-if (reviewer.model !== 'gemini-3.7-flash-high') fail('automatic reviewer must be gemini-3.7-flash-high');
-if (!String(reviewer.fallback || '').includes('flash')) fail('reviewer fallback must remain Flash-family only');
+const reviewerModel = String(reviewer.model || '').toLowerCase();
+if (!reviewerModel.includes('gemini') || !reviewerModel.includes('flash')) {
+  fail('automatic reviewer must remain in the Gemini Flash family');
+}
+if (!String(reviewer.fallback || '').toLowerCase().includes('flash')) {
+  fail('reviewer fallback must remain Flash-family only');
+}
 
 const decision = state.routing?.decision;
 if (!decision || decision.harness !== 'codex' || decision.modelAlias !== 'Sol' || decision.effort !== 'high') {
