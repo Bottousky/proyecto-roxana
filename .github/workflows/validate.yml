@@ -29,6 +29,7 @@ jobs:
       - run: node --check scripts/3d/inventory-vendor-pack.mjs
       - run: node --check scripts/3d/validate-hero-reference-pack.mjs
       - run: npm run 3d:validate-hero-ref -- assets/references/hero-packs/ohm/hero-reference.json
+      - run: npm run 3d:validate-hero-ref -- assets/references/hero-packs/galvanoscope/hero-reference.json
       - run: npm run verify
       - run: npm run 3d:validate-manifests
       - name: Publish validation status
@@ -45,4 +46,4 @@ jobs:
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -d "{\"state\":\"${state}\",\"context\":\"roxana/validate\",\"description\":\"verify + 3d manifests + hero gate + bounded loop\"}"
+            -d "{\"state\":\"${state}\",\"context\":\"roxana/validate\",\"description\":\"verify + 3d manifests + hero gates + bounded loop\"}"
