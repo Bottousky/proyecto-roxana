@@ -1,6 +1,7 @@
 import * as pc from 'playcanvas';
 import { OHM_HERO_TUNING } from './ohmHeroTuning.ts';
 import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
+import { PLAZA_CONDUCTOR_LAYOUT } from './plazaConductorLayout.ts';
 
 export interface PlayCanvasWorldElements {
   app: pc.Application;
@@ -77,6 +78,8 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matMountain.useMetalness = true;
   matMountain.gloss = 0.08;
   matMountain.metalness = 0.02;
+  matMountain.emissive = new pc.Color(0.025, 0.028, 0.03);
+  matMountain.emissiveIntensity = 0.35;
   matMountain.update();
 
   const matMountainFar = new pc.StandardMaterial();
@@ -85,6 +88,8 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matMountainFar.useMetalness = true;
   matMountainFar.gloss = 0.04;
   matMountainFar.metalness = 0;
+  matMountainFar.emissive = new pc.Color(0.025, 0.032, 0.038);
+  matMountainFar.emissiveIntensity = 0.5;
   matMountainFar.update();
 
   const matSky = new pc.StandardMaterial();
@@ -137,14 +142,14 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matWood.name = 'roxana-ohmdal-wood-workshop-v1';
   matWood.diffuse = new pc.Color(0.34, 0.24, 0.16);
   matWood.useMetalness = true;
-  matWood.gloss = 0.25;
+  matWood.gloss = 0.14;
   matWood.update();
 
   const matWoodDark = new pc.StandardMaterial();
   matWoodDark.name = 'roxana-ohmdal-wood-charred-v1';
   matWoodDark.diffuse = new pc.Color(0.31, 0.22, 0.15);
   matWoodDark.useMetalness = true;
-  matWoodDark.gloss = 0.2;
+  matWoodDark.gloss = 0.12;
   matWoodDark.update();
 
   const matWorkshopInterior = new pc.StandardMaterial();
@@ -205,15 +210,15 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matPlaster.diffuse = new pc.Color(0.58, 0.5, 0.39);
   matPlaster.useMetalness = true;
   matPlaster.metalness = 0;
-  matPlaster.gloss = 0.18;
+  matPlaster.gloss = 0.1;
   matPlaster.update();
 
   const matIron = new pc.StandardMaterial();
   matIron.name = 'roxana-ohmdal-iron-aged-v1';
   matIron.diffuse = new pc.Color(0.34, 0.28, 0.23);
   matIron.useMetalness = true;
-  matIron.metalness = 0.46;
-  matIron.gloss = 0.2;
+  matIron.metalness = 0.38;
+  matIron.gloss = 0.16;
   matIron.update();
 
   const matCeramic = new pc.StandardMaterial();
@@ -345,7 +350,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     pavingReady,
     applyTextureSet(matStone, 'stone-primary', textureSet('stone-primary'), new pc.Vec2(2.5, 2.5)),
     applyTextureSet(matStoneDark, 'stone-aged', textureSet('stone-aged'), new pc.Vec2(2, 2)),
-    applyTextureSet(matPlaster, 'plaster-worn', textureSet('plaster-worn'), new pc.Vec2(2, 2)),
+    applyTextureSet(matPlaster, 'plaster-worn', textureSet('plaster-worn'), new pc.Vec2(3.5, 3.5)),
     applyTextureSet(matWood, 'wood-workshop', textureSet('wood-workshop'), new pc.Vec2(2, 2)),
     applyTextureSet(matWoodDark, 'wood-workshop', textureSet('wood-workshop'), new pc.Vec2(3, 3)),
     applyTextureSet(matIron, 'iron-aged', textureSet('iron-aged', false, true), new pc.Vec2(2, 2)),
@@ -511,6 +516,66 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     return entity;
   };
 
+  // Authored convex profiles are the lightweight Plaza architecture path:
+  // custom silhouettes without introducing vendor assets or runtime dependencies.
+  const addExtrudedProfile = (
+    parent: pc.Entity,
+    name: string,
+    position: [number, number, number],
+    profile: ReadonlyArray<readonly [number, number]>,
+    depth: number,
+    material: pc.StandardMaterial,
+  ) => {
+    const positions: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
+    const halfDepth = depth / 2;
+    const minX = Math.min(...profile.map(([x]) => x));
+    const maxX = Math.max(...profile.map(([x]) => x));
+    const minY = Math.min(...profile.map(([, y]) => y));
+    const maxY = Math.max(...profile.map(([, y]) => y));
+    const width = Math.max(0.001, maxX - minX);
+    const height = Math.max(0.001, maxY - minY);
+
+    for (const [x, y] of profile) {
+      positions.push(x, y, -halfDepth, x, y, halfDepth);
+      const u = (x - minX) / width;
+      const v = (y - minY) / height;
+      uvs.push(u, v, u, v);
+    }
+
+    for (let index = 1; index < profile.length - 1; index += 1) {
+      indices.push(0, index * 2, (index + 1) * 2);
+      indices.push(1, (index + 1) * 2 + 1, index * 2 + 1);
+    }
+    for (let index = 0; index < profile.length; index += 1) {
+      const next = (index + 1) % profile.length;
+      const front = index * 2;
+      const back = front + 1;
+      const nextFront = next * 2;
+      const nextBack = nextFront + 1;
+      indices.push(front, nextBack, back, front, nextFront, nextBack);
+    }
+
+    const geometry = new pc.Geometry();
+    geometry.positions = positions;
+    geometry.uvs = uvs;
+    geometry.indices = indices;
+    geometry.normals = pc.calculateNormals(positions, indices);
+    const mesh = pc.Mesh.fromGeometry(app.graphicsDevice, geometry);
+    const entity = new pc.Entity(name);
+    entity.addComponent('render', {
+      type: 'asset',
+      meshInstances: [new pc.MeshInstance(mesh, material, entity)],
+    });
+    entity.render!.batchGroupId = plazaArtBatch.id;
+    entity.render!.castShadows = true;
+    entity.render!.receiveShadows = true;
+    entity.setPosition(...position);
+    parent.addChild(entity);
+    return entity;
+  };
+
   const addMountainRidge = (
     parent: pc.Entity,
     name: string,
@@ -595,24 +660,27 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     addBox(plazaRoot, `LowDrainBar${x}`, [x, 0.038, -1.35], [0.12, 0.035, 0.46], matIron);
   }
 
-  // The Ancient Institute Portal (South Entrance)
-  const portalColL = new pc.Entity('PortalColL');
-  portalColL.addComponent('render', { type: 'cylinder', material: matStoneDark });
-  portalColL.setPosition(-2.4, 2.2, -11.0);
-  portalColL.setLocalScale(0.9, 4.4, 0.9);
-  plazaRoot.addChild(portalColL);
-
-  const portalColR = new pc.Entity('PortalColR');
-  portalColR.addComponent('render', { type: 'cylinder', material: matStoneDark });
-  portalColR.setPosition(2.4, 2.2, -11.0);
-  portalColR.setLocalScale(0.9, 4.4, 0.9);
-  plazaRoot.addChild(portalColR);
-
-  const portalLintel = new pc.Entity('PortalLintel');
-  portalLintel.addComponent('render', { type: 'box', material: matStone });
-  portalLintel.setPosition(0, 4.6, -11.0);
-  portalLintel.setLocalScale(5.8, 0.8, 1.2);
-  plazaRoot.addChild(portalLintel);
+  // The Ancient Institute Portal (South Entrance). Tapered masonry and a
+  // segmented arch replace the cylinder/box blockout while retaining bounds.
+  const portalAuthoredArch = new pc.Entity('PortalAuthoredArch');
+  plazaRoot.addChild(portalAuthoredArch);
+  const portalPierProfile: ReadonlyArray<readonly [number, number]> = [
+    [-0.72, 0], [0.72, 0], [0.52, 4.15], [-0.52, 4.15],
+  ];
+  addExtrudedProfile(portalAuthoredArch, 'PortalPierWestAuthored', [-2.4, 0, -11], portalPierProfile, 1.45, matStoneDark);
+  addExtrudedProfile(portalAuthoredArch, 'PortalPierEastAuthored', [2.4, 0, -11], portalPierProfile, 1.45, matStoneDark);
+  const portalArchCenterY = 4.05;
+  for (let segment = 0; segment < 10; segment += 1) {
+    const angle0 = (Math.PI * segment) / 10;
+    const angle1 = (Math.PI * (segment + 1)) / 10;
+    const profile: ReadonlyArray<readonly [number, number]> = [
+      [Math.cos(angle0) * 2.48, portalArchCenterY + Math.sin(angle0) * 2.48],
+      [Math.cos(angle1) * 2.48, portalArchCenterY + Math.sin(angle1) * 2.48],
+      [Math.cos(angle1) * 1.77, portalArchCenterY + Math.sin(angle1) * 1.77],
+      [Math.cos(angle0) * 1.77, portalArchCenterY + Math.sin(angle0) * 1.77],
+    ];
+    addExtrudedProfile(portalAuthoredArch, `PortalArchVoussoir${segment}`, [0, 0, -11], profile, 1.45, segment % 2 ? matStone : matStoneDark);
+  }
 
   // P1 — authored southern threshold: stepped masonry, an intact civic arch,
   // and a restrained conductor band. These pieces do not alter collision.
@@ -707,25 +775,21 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   eddaEntity.addChild(eddaHair);
 
   // --- Lumen's Workshop Exterior (West Building) ---
-  const workshopBldg = new pc.Entity('WorkshopBldg');
-  workshopBldg.addComponent('render', { type: 'box', material: matPlaster });
-  workshopBldg.setPosition(-10.5, 2.5, -4.0);
-  workshopBldg.setLocalScale(6.0, 5.0, 7.5);
-  plazaRoot.addChild(workshopBldg);
-
-  const workshopRoof = new pc.Entity('WorkshopRoof');
-  workshopRoof.addComponent('render', { type: 'cone', material: matWoodDark });
-  workshopRoof.setPosition(-10.5, 5.8, -4.0);
-  workshopRoof.setEulerAngles(0, 45, 0);
-  workshopRoof.setLocalScale(7.5, 2.2, 8.5);
-  workshopRoof.enabled = false;
-  plazaRoot.addChild(workshopRoof);
+  const workshopAuthoredShell = addExtrudedProfile(
+    plazaRoot,
+    'WorkshopAuthoredShell',
+    [-10.5, 0, -4],
+    [[-3, 0], [3, 0], [3, 4.55], [0, 6.15], [-3, 4.55]],
+    7.5,
+    matPlaster,
+  );
+  workshopAuthoredShell.render!.castShadows = true;
 
   // P1/P3 — Lumen's workshop receives a legible craft silhouette and a small
   // support dressing kit. All geometry is project-owned and procedural.
   addBox(plazaRoot, 'WorkshopStoneBase', [-10.5, 0.38, -4], [6.5, 0.75, 8], matStoneDark);
-  addBox(plazaRoot, 'WorkshopRoofEast', [-9.08, 5.45, -4], [3.85, 0.35, 8.4], matWoodDark, [0, 0, 24]);
-  addBox(plazaRoot, 'WorkshopRoofWest', [-11.92, 5.45, -4], [3.85, 0.35, 8.4], matWoodDark, [0, 0, -24]);
+  addExtrudedProfile(plazaRoot, 'WorkshopRoofEastAuthored', [-10.5, 0, -4], [[0, 6.12], [3.38, 4.47], [3.58, 4.67], [0, 6.4]], 8.35, matWoodDark);
+  addExtrudedProfile(plazaRoot, 'WorkshopRoofWestAuthored', [-10.5, 0, -4], [[-3.58, 4.67], [-3.38, 4.47], [0, 6.12], [0, 6.4]], 8.35, matWoodDark);
   addBox(plazaRoot, 'WorkshopRidge', [-10.5, 6.18, -4], [0.32, 0.34, 8.65], matIron);
   addBox(plazaRoot, 'WorkshopChimney', [-11.4, 6.45, -5.7], [0.85, 2.2, 0.85], matStoneDark);
   addBox(plazaRoot, 'WorkshopChimneyCap', [-11.4, 7.48, -5.7], [1.1, 0.22, 1.1], matIron);
@@ -751,16 +815,23 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     addBox(plazaRoot, `WorkshopWindowSill${z}`, [-6.86, 1.92, z], [0.46, 0.16, 1.52], matStoneDark);
     addBox(plazaRoot, `WorkshopWindowMullion${z}`, [-6.82, 2.75, z], [0.06, 1.02, 0.08], matCopperClean);
   }
-  addBox(plazaRoot, 'WorkshopWorkbench', [-6.55, 0.72, -1.05], [2.35, 0.18, 0.85], matWood);
+  const workshopServiceCluster = new pc.Entity('WorkshopServiceCluster');
+  plazaRoot.addChild(workshopServiceCluster);
+  addBox(workshopServiceCluster, 'WorkshopWorkbench', [-6.55, 0.72, -1.05], [2.35, 0.18, 0.85], matWood);
   for (const z of [-1.38, -0.72]) {
-    addBox(plazaRoot, `WorkshopBenchLeg${z}`, [-6.55, 0.35, z], [1.9, 0.7, 0.16], matWoodDark);
+    addBox(workshopServiceCluster, `WorkshopBenchLeg${z}`, [-6.55, 0.35, z], [1.9, 0.7, 0.16], matWoodDark);
   }
   for (const [index, z] of [-0.2, 0.7].entries()) {
-    addBox(plazaRoot, `WorkshopCrate${index}`, [-8.2 - index * 0.75, 0.42, z], [0.68, 0.68, 0.68], matWood);
-    addBox(plazaRoot, `WorkshopCrateBand${index}`, [-8.2 - index * 0.75, 0.43, z], [0.75, 0.12, 0.75], matIron);
+    addBox(workshopServiceCluster, `WorkshopCrate${index}`, [-8.2 - index * 0.75, 0.42, z], [0.68, 0.68, 0.68], matWood);
+    addBox(workshopServiceCluster, `WorkshopCrateBand${index}`, [-8.2 - index * 0.75, 0.43, z], [0.75, 0.12, 0.75], matIron);
   }
-  addCylinder(plazaRoot, 'WorkshopCableSpool', [-6.9, 0.48, 0.55], [0.72, 0.34, 0.72], matWood, [0, 0, 90]);
-  addCylinder(plazaRoot, 'WorkshopCableCoil', [-6.9, 0.48, 0.55], [0.5, 0.42, 0.5], matCopperClean, [0, 0, 90]);
+  addCylinder(workshopServiceCluster, 'WorkshopCableSpool', [-6.9, 0.48, 0.55], [0.72, 0.34, 0.72], matWood, [0, 0, 90]);
+  addCylinder(workshopServiceCluster, 'WorkshopCableCoil', [-6.9, 0.48, 0.55], [0.5, 0.42, 0.5], matCopperClean, [0, 0, 90]);
+  addBox(workshopServiceCluster, 'WorkshopServiceBackboard', [-7.18, 1.2, -1.02], [0.18, 1.35, 2.2], matWoodDark);
+  for (const [index, z] of [-1.72, -1.02, -0.32].entries()) {
+    addCylinder(workshopServiceCluster, `WorkshopServiceInsulator${index}`, [-6.98, 1.2, z], [0.18, 0.28, 0.18], matCeramic, [0, 0, 90]);
+    addCylinder(workshopServiceCluster, `WorkshopServiceTerminal${index}`, [-6.8, 1.2, z], [0.1, 0.12, 0.1], matCopperClean, [0, 0, 90]);
+  }
 
   // Keep the authored workshop props enabled; no vendor GLB is needed at runtime.
   const vendorPropsReady = Promise.resolve();
@@ -860,23 +931,22 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   // P4 — reusable electrical language: paired channels read as ida/retorno,
   // ceramic breaks signal terminals, and iron junction boxes mark decisions.
-  for (const side of [-1, 1]) {
-    for (const [index, z] of [-8.2, -5.1, 1.8, 6.1].entries()) {
-      const length = index === 2 ? 3.2 : 2.5;
-      addBox(plazaRoot, `ConductorChannel${side}-${index}`, [side * 0.9, 0.055, z], [0.2, 0.08, length], matIron);
-      addBox(plazaRoot, `ConductorStrip${side}-${index}`, [side * 0.9, 0.105, z], [0.09, 0.04, length * 0.94], matCopperClean);
-    }
-    for (const [index, z] of [-8, -4, 2.9, 7].entries()) {
-      addCylinder(plazaRoot, `RouteInsulator${side}-${index}`, [side * 0.9, 0.25, z], [0.2, 0.3, 0.2], matCeramic);
-      addCylinder(plazaRoot, `RouteClamp${side}-${index}`, [side * 0.9, 0.42, z], [0.13, 0.08, 0.13], matCopperClean);
-    }
+  PLAZA_CONDUCTOR_LAYOUT.mainSegments.forEach((segment, index) => {
+    addBox(plazaRoot, `ConductorChannel${segment.side}-${index}`, [segment.x, 0.055, segment.z], [0.2, 0.08, segment.length], matIron);
+    addBox(plazaRoot, `ConductorStrip${segment.side}-${index}`, [segment.x, 0.105, segment.z], [0.09, 0.04, segment.length * 0.94], matCopperClean);
+  });
+  for (const side of [-1, 1] as const) {
+    PLAZA_CONDUCTOR_LAYOUT.routeTerminations.forEach((termination, index) => {
+      addCylinder(plazaRoot, `RouteInsulator${side}-${index}`, [side * 0.9, 0.25, termination.z], [0.2, 0.3, 0.2], matCeramic);
+      addCylinder(plazaRoot, `RouteClamp${side}-${index}`, [side * 0.9, 0.42, termination.z], [0.13, 0.08, 0.13], matCopperClean);
+    });
   }
-  for (const [index, x] of [-2.6, -5.1].entries()) {
-    addBox(plazaRoot, `WorkshopBranchChannel${index}`, [x, 0.06, -4], [2.45, 0.08, 0.2], matIron);
-    addBox(plazaRoot, `WorkshopBranchStrip${index}`, [x, 0.11, -4], [2.3, 0.04, 0.09], matCopperClean);
-  }
-  addBox(plazaRoot, 'WorkshopJunctionBox', [-5.95, 0.42, -4], [0.7, 0.75, 0.62], matIron);
-  addBox(plazaRoot, 'WorkshopJunctionPlate', [-5.95, 0.45, -4.33], [0.45, 0.42, 0.05], matBrass);
+  PLAZA_CONDUCTOR_LAYOUT.workshopBranchSegments.forEach((segment, index) => {
+    addBox(plazaRoot, `WorkshopBranchChannel${index}`, [segment.x, 0.06, segment.z], [segment.length, 0.08, 0.2], matIron);
+    addBox(plazaRoot, `WorkshopBranchStrip${index}`, [segment.x, 0.11, segment.z], [segment.length * 0.94, 0.04, 0.09], matCopperClean);
+  });
+  addBox(plazaRoot, 'WorkshopJunctionBox', [PLAZA_CONDUCTOR_LAYOUT.workshopJunction.x, 0.42, PLAZA_CONDUCTOR_LAYOUT.workshopJunction.z], [0.7, 0.75, 0.62], matIron);
+  addBox(plazaRoot, 'WorkshopJunctionPlate', [PLAZA_CONDUCTOR_LAYOUT.workshopJunction.x, 0.45, PLAZA_CONDUCTOR_LAYOUT.workshopJunction.z - 0.33], [0.45, 0.42, 0.05], matBrass);
   addBox(plazaRoot, 'EastDrainChannel', [6.9, 0.03, 4], [0.62, 0.06, 8.8], matStoneDark);
   for (const [index, z] of [0.7, 2.9, 5.1, 7.3].entries()) {
     addBox(plazaRoot, `EastDrainGrate${index}`, [6.9, 0.1, z], [0.58, 0.08, 0.12], matIron);
@@ -1090,6 +1160,17 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   const mountainRoot = new pc.Entity('MountainRoot');
   app.root.addChild(mountainRoot);
 
+  // Plaza-only scenic skirts close the floating slab at the north perimeter
+  // while preserving a broad central opening toward the locked later region.
+  const plazaPerimeterSkirtNear = new pc.Entity('PlazaPerimeterSkirtNear');
+  plazaRoot.addChild(plazaPerimeterSkirtNear);
+  addMountainRidge(plazaPerimeterSkirtNear, 'PlazaPerimeterSkirtNearWest', [-22, 0, 18], 34, 7, [1.8, 2.6, 2.2, 3.8, 3.1, 4.5, 3.4, 4.8, 3.2, 2.5, 1.9], matMountain);
+  addMountainRidge(plazaPerimeterSkirtNear, 'PlazaPerimeterSkirtNearEast', [22, 0, 18], 34, 7, [2.1, 3.4, 2.8, 4.2, 3.5, 4.7, 3.6, 4.1, 2.9, 2.4, 1.8], matMountain);
+  const plazaPerimeterSkirtFar = new pc.Entity('PlazaPerimeterSkirtFar');
+  plazaRoot.addChild(plazaPerimeterSkirtFar);
+  addMountainRidge(plazaPerimeterSkirtFar, 'PlazaPerimeterSkirtFarWest', [-27, 0, 29], 44, 9, [4.5, 6.2, 5.4, 7.8, 6.6, 8.2, 7.1, 8.8, 6.9, 5.8, 4.2], matMountainFar);
+  addMountainRidge(plazaPerimeterSkirtFar, 'PlazaPerimeterSkirtFarEast', [27, 0, 29], 44, 9, [4.2, 5.8, 7.1, 8.5, 6.8, 8.1, 6.4, 7.6, 5.5, 6.0, 4.4], matMountainFar);
+
   // Mountain Gorge Ground Pathway
   const canyonGround = new pc.Entity('CanyonGround');
   canyonGround.addComponent('render', { type: 'box', material: matStoneDark });
@@ -1106,7 +1187,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     [0, 0, 49],
     62,
     10,
-    [8, 22, 14, 27, 18, 13, 21, 29, 16, 24, 9],
+    [8, 12, 15, 13, 17, 14, 12, 15, 18, 16, 13, 17, 14, 11, 8],
     matMountainFar,
   );
   addMountainRidge(
@@ -1115,7 +1196,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     [0, 0, 37],
     48,
     8,
-    [4, 14, 9, 20, 12, 7, 13, 19, 10, 16, 5],
+    [4, 7, 9, 8, 11, 9, 7, 10, 12, 10, 8, 11, 9, 6, 4],
     matMountain,
   );
 
