@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "assetId": "replace-me",
+  "world": "replace-me",
+  "name": "replace-me",
+  "mode": "reconstruct",
+  "status": "draft",
+  "primaryReference": "path/to/approved-turnaround-or-concept.png",
+  "supportingReferences": [],
+  "physicalAnchors": {
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "groundedPivot": true
+  },
+  "mustPreserve": [],
+  "mayResolve": [],
+  "forbidden": [],
+  "authoring": {
+    "preferredRoute": "blender-deterministic",
+    "buildScript": null,
+    "canonicalGlb": null,
+    "generativeProviderRequired": false
+  },
+  "evidence": {
+    "stageReport": null,
+    "preview": null
+  }
+}
