@@ -39,6 +39,18 @@ Si existe turnaround aprobado, el objetivo es **reconstruir**, no rediseñar. Un
 herramienta generativa puede producir candidates, pero no desplaza la referencia
 primaria ni evita Blender/canonicalización.
 
+Para trabajo continuo de la Plaza usar `agent-work/loops/ohmdal-plaza/LOOP.md` y
+su `state.json`; no improvisar otro orchestrator. Routing del loop:
+
+- Gemini 3.7 Flash High / Antigravity: review read-only;
+- Sol High: decisiones, composición, arquitectura e integración compleja;
+- Luna Max: ejecución mecánica cerrada, máximo dos workers disjuntos;
+- humano: sólo `HUMAN_GATE`.
+
+Máximo tres iteraciones por stage y cinco fixes por iteración. Validar el estado
+con `npm run loop:ohmdal-plaza:validate`. No escalar automáticamente a Gemini Pro
+ni instalar `sol-advisor`.
+
 Cargar sólo la skill oficial de PlayCanvas que corresponda a la operación
 concreta. Usar el MCP del Editor sólo si la tarea requiere su estado vivo; para
 Engine code-first usar terminal.
