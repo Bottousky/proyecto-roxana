@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "loopId": "ohmdal-plaza",
   "branch": "explore/ohmdal-3D",
-  "status": "human_gate",
+  "status": "ready",
   "currentStage": "stage-3-galvanoscope",
   "iteration": 0,
   "maxIterationsPerStage": 3,
@@ -48,7 +48,7 @@
     },
     {
       "id": "stage-3-galvanoscope",
-      "status": "human_gate",
+      "status": "ready",
       "requiresHeroReferenceGate": true
     },
     {
@@ -62,24 +62,16 @@
   ],
   "lastReviewReport": "agent-work/reports/gemini/ohmdal-plaza-loop-stage-3-galvanoscope-hero-reference-gate.md",
   "lastCaptureManifest": "output/playwright/ohmdal-plaza/stage-2c/iter-3-after/capture-manifest.json",
-  "humanGate": {
-    "type": "missing_hero_primary_reference",
-    "stage": "stage-3-galvanoscope",
-    "assetId": "rx_galvanoscope_hero_01",
-    "referencePack": "assets/references/hero-packs/galvanoscope/hero-reference.json",
-    "reason": "No approved primary concept, turnaround, multiview or sufficiently anchored single view exists for the Galvanoscopio de Lumen. Functional prose, a generic Outer Wilds mood image, a workshop environment image and procedural runtime placeholders do not define canonical silhouette, proportions, materials, controls, probes or first-person grip.",
-    "requiredHumanAction": "Provide or approve a stable primary visual reference for the Galvanoscopio, resolving its silhouette, proportions, material grammar, dial/controls, two probes and first-person grip. Then set the pack to approved only after Sol verifies it against HERO_REFERENCE_GATE.",
-    "paidProviderRequiredNow": false,
-    "modelingStarted": false
-  },
+  "humanGate": null,
   "notes": [
     "Gemini Pro is intentionally not part of the automatic loop.",
     "Meshy/Tripo spending always requires a human gate unless separately authorized.",
     "The loop stops after final Plaza polish; it does not auto-start Manantial or Faro.",
     "Antigravity print mode soft-denied workspace reads, so reviews use the same Gemini Flash High model in interactive plan+sandbox mode and persist via a no-tool print continuation.",
     "Sol accepted the Stage 2C iteration 3 PASS: all six environment criteria pass; perimeter skirt and mountain-depth refinements remain scoped to Stage 4 rather than blocking Stage 2C.",
-    "Stage 3 stopped before modeling: the Galvanoscope reference audit found functional anchors but no approved primary visual authority. The generic first-person-device mood image, workshop environment image and both procedural viewmodels were explicitly rejected as primary references.",
-    "The repo-native Antigravity print runner exited 1 for the Stage 3 gate review; routing fell back to the exact Gemini 3.7 Flash High model in interactive plan+sandbox read-only mode, conversation cf046cd7-9a0e-4abe-9163-d13dc195a3ae, then persisted a no-tool print continuation.",
-    "Sol accepted Gemini's HUMAN_GATE finding but did not accept placeholder-derived wood/brass/copper/glass details as canon. Of Gemini's five recommendations, only obtaining an approved visual reference is active SOL work; pipeline, metadata, modeling and runtime wiring are SKIP until the gate passes. No Luna work ran in Stage 3."
+    "Stage 3 originally stopped before modeling because no approved primary visual authority existed.",
+    "The human design gate was resolved on 2026-08-23: Manuel approved the canonical Galvanoscope brief, turnaround and first-person concept. hero-reference.json is approved and Stage 3 may resume.",
+    "The approved narrative interpretation is an inherited functional instrument from older Ohmdal that Lumen maintains and uses practically but only partially understands; superstition surrounds its interpretation, not its physical operation.",
+    "Stage 3 should default to Blender deterministic reconstruction following the Ohm golden path. Meshy/Tripo remain behind a new economic HUMAN_GATE if later requested."
   ]
 }
