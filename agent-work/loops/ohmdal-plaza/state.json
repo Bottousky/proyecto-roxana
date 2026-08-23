@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "loopId": "ohmdal-plaza",
   "branch": "explore/ohmdal-3D",
-  "status": "ready",
+  "status": "complete",
   "currentStage": "stage-5-final-plaza-polish",
-  "iteration": 0,
+  "iteration": 1,
   "maxIterationsPerStage": 3,
   "maxFixesPerIteration": 5,
   "maxStructuralFixesPerIteration": 1,
@@ -57,11 +57,11 @@
     },
     {
       "id": "stage-5-final-plaza-polish",
-      "status": "ready"
+      "status": "passed"
     }
   ],
-  "lastReviewReport": "agent-work/reports/gemini/ohmdal-plaza-loop-stage-4-world-coherence-iter-1-after.md",
-  "lastCaptureManifest": "output/playwright/ohmdal-plaza/stage-4/iter-1-after/capture-manifest.json",
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-plaza-loop-stage-5-final-plaza-polish-iter-1-after.md",
+  "lastCaptureManifest": "output/playwright/ohmdal-plaza/stage-5/iter-1-after/capture-manifest.json",
   "humanGate": null,
   "notes": [
     "Gemini Pro is intentionally not part of the automatic loop.",
@@ -74,6 +74,7 @@
     "The approved narrative interpretation is an inherited functional instrument from older Ohmdal that Lumen maintains and uses practically but only partially understands; superstition surrounds its interpretation, not its physical operation.",
     "Stage 3 should default to Blender deterministic reconstruction following the Ohm golden path. Meshy/Tripo remain behind a new economic HUMAN_GATE if later requested.",
     "Stage 3 passed in iteration 1: Blender-first Galvanoscope reconstruction, canonical GLB, semantic pivots, PlayCanvas viewmodel integration, desktop/mobile framing, manifests and Visual Harness all passed. Gemini Flash High reported PASS with no regressions.",
-    "Stage 4 passed in iteration 1: authored Portal and Workshop masses, functional service clustering, continuous conductor routing and layered perimeter scenery passed the eight-view gate. Gemini Flash High reported PASS with zero console/page errors and budgets intact."
+    "Stage 4 passed in iteration 1: authored Portal and Workshop masses, functional service clustering, continuous conductor routing and layered perimeter scenery passed the eight-view gate. Gemini Flash High reported PASS with zero console/page errors and budgets intact.",
+    "Stage 5 passed in iteration 1: Workshop UV/roof/contact polish, secondary platform and mural dressing, perimeter curb, and BellGantry hardware passed the eight-view gate. Gemini Flash High scored 2.62/3.00 with no regressions; final transfer was 21.78 MB, max desktop/mobile draw calls were 159/130, and touch smoke passed. The Plaza loop is complete."
   ]
 }

@@ -1,6 +1,7 @@
 import * as pc from 'playcanvas';
 import { OHM_HERO_TUNING } from './ohmHeroTuning.ts';
 import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
+import { PLAZA_BELL_DETAIL_LAYOUT } from './plazaBellDetailLayout.ts';
 import { PLAZA_CONDUCTOR_LAYOUT } from './plazaConductorLayout.ts';
 
 export interface PlayCanvasWorldElements {
@@ -151,6 +152,14 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matWoodDark.useMetalness = true;
   matWoodDark.gloss = 0.12;
   matWoodDark.update();
+
+  const matWorkshopRoof = new pc.StandardMaterial();
+  matWorkshopRoof.name = 'roxana-ohmdal-workshop-roof-matte-v1';
+  matWorkshopRoof.diffuse = new pc.Color(0.24, 0.15, 0.09);
+  matWorkshopRoof.useMetalness = true;
+  matWorkshopRoof.metalness = 0;
+  matWorkshopRoof.gloss = 0.06;
+  matWorkshopRoof.update();
 
   const matWorkshopInterior = new pc.StandardMaterial();
   matWorkshopInterior.name = 'roxana-ohmdal-workshop-interior-v1';
@@ -548,13 +557,24 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
       indices.push(0, index * 2, (index + 1) * 2);
       indices.push(1, (index + 1) * 2 + 1, index * 2 + 1);
     }
+    // Side faces need their own vertices: sharing the planar front/back UVs
+    // collapses one texture axis and produces long horizontal streaks on deep
+    // extrusions such as the Workshop facade.
     for (let index = 0; index < profile.length; index += 1) {
       const next = (index + 1) % profile.length;
-      const front = index * 2;
-      const back = front + 1;
-      const nextFront = next * 2;
-      const nextBack = nextFront + 1;
-      indices.push(front, nextBack, back, front, nextFront, nextBack);
+      const [x0, y0] = profile[index];
+      const [x1, y1] = profile[next];
+      const edgeU = Math.max(0.25, Math.hypot(x1 - x0, y1 - y0) / 2);
+      const depthV = Math.max(0.25, depth / 2);
+      const side = positions.length / 3;
+      positions.push(
+        x0, y0, -halfDepth,
+        x1, y1, -halfDepth,
+        x1, y1, halfDepth,
+        x0, y0, halfDepth,
+      );
+      uvs.push(0, 0, edgeU, 0, edgeU, depthV, 0, depthV);
+      indices.push(side, side + 2, side + 3, side, side + 1, side + 2);
     }
 
     const geometry = new pc.Geometry();
@@ -649,6 +669,13 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   ground.setPosition(0, -0.15, 0);
   ground.setLocalScale(36, 0.3, 30);
   plazaRoot.addChild(ground);
+
+  // A low retaining course closes the visible slab edge in elevated views.
+  // It remains below gameplay height and does not change Plaza navigation.
+  addBox(plazaRoot, 'PlazaPerimeterCurbNorth', [0, 0.02, 14.82], [36.4, 0.34, 0.42], matStoneDark);
+  addBox(plazaRoot, 'PlazaPerimeterCurbSouth', [0, 0.02, -14.82], [36.4, 0.34, 0.42], matStoneDark);
+  addBox(plazaRoot, 'PlazaPerimeterCurbWest', [-17.82, 0.02, 0], [0.42, 0.34, 29.3], matStoneDark);
+  addBox(plazaRoot, 'PlazaPerimeterCurbEast', [17.82, 0.02, 0], [0.42, 0.34, 29.3], matStoneDark);
 
   // Moisture is environmental evidence, not a global material treatment:
   // a narrow fountain apron, its runoff channel and one low drain retain the
@@ -788,9 +815,9 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   // P1/P3 — Lumen's workshop receives a legible craft silhouette and a small
   // support dressing kit. All geometry is project-owned and procedural.
   addBox(plazaRoot, 'WorkshopStoneBase', [-10.5, 0.38, -4], [6.5, 0.75, 8], matStoneDark);
-  addExtrudedProfile(plazaRoot, 'WorkshopRoofEastAuthored', [-10.5, 0, -4], [[0, 6.12], [3.38, 4.47], [3.58, 4.67], [0, 6.4]], 8.35, matWoodDark);
-  addExtrudedProfile(plazaRoot, 'WorkshopRoofWestAuthored', [-10.5, 0, -4], [[-3.58, 4.67], [-3.38, 4.47], [0, 6.12], [0, 6.4]], 8.35, matWoodDark);
-  addBox(plazaRoot, 'WorkshopRidge', [-10.5, 6.18, -4], [0.32, 0.34, 8.65], matIron);
+  addExtrudedProfile(plazaRoot, 'WorkshopRoofEastAuthored', [-10.5, 0, -4], [[0.1, 6.08], [3.38, 4.47], [3.58, 4.67], [0.1, 6.44]], 8.5, matWorkshopRoof);
+  addExtrudedProfile(plazaRoot, 'WorkshopRoofWestAuthored', [-10.5, 0, -4], [[-3.58, 4.67], [-3.38, 4.47], [-0.1, 6.08], [-0.1, 6.44]], 8.5, matWorkshopRoof);
+  addBox(plazaRoot, 'WorkshopRidge', [-10.5, 6.2, -4], [0.42, 0.5, 8.75], matWorkshopRoof);
   addBox(plazaRoot, 'WorkshopChimney', [-11.4, 6.45, -5.7], [0.85, 2.2, 0.85], matStoneDark);
   addBox(plazaRoot, 'WorkshopChimneyCap', [-11.4, 7.48, -5.7], [1.1, 0.22, 1.1], matIron);
   for (const z of [-6.9, -4, -1.1]) {
@@ -828,6 +855,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   addCylinder(workshopServiceCluster, 'WorkshopCableSpool', [-6.9, 0.48, 0.55], [0.72, 0.34, 0.72], matWood, [0, 0, 90]);
   addCylinder(workshopServiceCluster, 'WorkshopCableCoil', [-6.9, 0.48, 0.55], [0.5, 0.42, 0.5], matCopperClean, [0, 0, 90]);
   addBox(workshopServiceCluster, 'WorkshopServiceBackboard', [-7.18, 1.2, -1.02], [0.18, 1.35, 2.2], matWoodDark);
+  addBox(workshopServiceCluster, 'WorkshopContactFoot', [-7.38, 0.075, -0.68], [4.2, 0.15, 2.75], matStoneDark);
   for (const [index, z] of [-1.72, -1.02, -0.32].entries()) {
     addCylinder(workshopServiceCluster, `WorkshopServiceInsulator${index}`, [-6.98, 1.2, z], [0.18, 0.28, 0.18], matCeramic, [0, 0, 90]);
     addCylinder(workshopServiceCluster, `WorkshopServiceTerminal${index}`, [-6.8, 1.2, z], [0.1, 0.12, 0.1], matCopperClean, [0, 0, 90]);
@@ -840,8 +868,8 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   workshopLantern.addComponent('light', {
     type: 'point',
     color: new pc.Color(1.0, 0.7, 0.3),
-    intensity: 2.35,
-    range: 5.5,
+    intensity: 2.2,
+    range: 3.2,
   });
   workshopLantern.setPosition(-6.75, 2.55, -4.0);
   plazaRoot.addChild(workshopLantern);
@@ -860,6 +888,12 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   addBox(plazaRoot, 'BellGantryPlinth0', [-6.15, 0.24, 2.4], [0.68, 0.48, 0.72], matStoneDark);
   addBox(plazaRoot, 'BellGantryPlinth1', [-4.25, 0.24, 2.4], [0.68, 0.48, 0.72], matStoneDark);
   addBox(plazaRoot, 'BellGantryCopperRail', [-5.2, 3.42, 2.18], [1.85, 0.08, 0.08], matCopperClean);
+  for (const detail of PLAZA_BELL_DETAIL_LAYOUT.brackets) {
+    addBox(plazaRoot, detail.name, [...detail.position], [...detail.scale], matBrass);
+  }
+  for (const detail of PLAZA_BELL_DETAIL_LAYOUT.insulators) {
+    addCylinder(plazaRoot, detail.name, [...detail.position], [...detail.scale], matCeramic);
+  }
 
   const bell = new pc.Entity('Bell');
   bell.addComponent('render', { type: 'cylinder', material: matBrass });
@@ -888,6 +922,13 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   plazaRoot.addChild(fountainBasin);
   addCylinder(plazaRoot, 'FountainBasinLowerCourse', [5.5, 0.1, 3.8], [6.35, 0.2, 6.35], matStoneDark);
   addCylinder(plazaRoot, 'FountainBasinCopperBand', [5.5, 0.5, 3.8], [5.95, 0.12, 5.95], matCopperClean);
+  for (let index = 0; index < 8; index += 1) {
+    const angle = (index / 8) * Math.PI * 2;
+    const x = 5.5 + Math.cos(angle) * 2.78;
+    const z = 3.8 + Math.sin(angle) * 2.78;
+    addBox(plazaRoot, `FountainStoneMount${index}`, [x, 0.56, z], [0.38, 0.32, 0.38], matStoneDark, [0, -(angle * 180) / Math.PI, 0]);
+    addCylinder(plazaRoot, `FountainCeramicMount${index}`, [x, 0.82, z], [0.14, 0.18, 0.14], matCeramic);
+  }
 
   const waterEntity = new pc.Entity('FountainWater');
   waterEntity.addComponent('render', { type: 'cylinder', material: matWater });
@@ -910,6 +951,12 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   addBox(plazaRoot, 'MuralConductor0', [6.8, 1.72, -4.78], [0.06, 1.75, 0.04], matCopperClean);
   addBox(plazaRoot, 'MuralConductor1', [7.8, 1.72, -4.78], [0.06, 1.75, 0.04], matCopperClean);
   addBox(plazaRoot, 'MuralConductor2', [8.8, 1.72, -4.78], [0.06, 1.75, 0.04], matCopperClean);
+  for (const [index, x] of [6.35, 9.25].entries()) {
+    addBox(plazaRoot, `MuralCornerBracket${index}`, [x, 1.72, -4.78], [0.18, 2.25, 0.08], matBrass);
+    for (const [row, y] of [1.05, 2.38].entries()) {
+      addCylinder(plazaRoot, `MuralCeramicMount${index}-${row}`, [x, y, -4.9], [0.16, 0.22, 0.16], matCeramic, [90, 0, 0]);
+    }
+  }
   addCollider(7.8, -4.2, 4.2, 1.6);
 
   // --- Conduits, Jumper & Corrosion ---
