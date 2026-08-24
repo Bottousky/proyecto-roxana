@@ -3,7 +3,13 @@ import { readFileSync } from 'node:fs';
 
 import { PLAZA_CONDUCTOR_LAYOUT } from '../src/experiences/ohmdal-playcanvas/plazaConductorLayout.ts';
 
-const world = readFileSync(new URL('../src/experiences/ohmdal-playcanvas/playcanvasWorld.ts', import.meta.url), 'utf8');
+const world = [
+  readFileSync(new URL('../src/experiences/ohmdal-playcanvas/playcanvasWorld.ts', import.meta.url), 'utf8'),
+  readFileSync(
+    new URL('../src/experiences/ohmdal-playcanvas/world/manantial/buildManantialShell.ts', import.meta.url),
+    'utf8',
+  ),
+].join('\n');
 
 assert.equal(PLAZA_CONDUCTOR_LAYOUT.mainSegments.length, 12, 'Stage 4 has six paired main segments per side');
 assert.deepEqual(

@@ -26,14 +26,16 @@ Es `EXPERIMENTAL/PROPOSED`; no asciende narrativa o mecánicas a canon.
 
 ## Estado técnico
 
-- `src/experiences/ohmdal-playcanvas/` y `/ohmdal-playcanvas` forman un spike
-  jugable de PlayCanvas, todavía no el runtime definitivo.
-- `src/experiences/ohmdal-plaza/` comparte sistemas usados por ese spike.
+- `src/experiences/ohmdal-playcanvas/` y `/ohmdal-playcanvas` forman el runtime
+  3D canónico: PlayCanvas Engine v2 + TypeScript + Vite.
+- Blender es el DCC master. La decisión y su criterio de reapertura viven en
+  `production/OHMDAL_3D_RUNTIME_DECISION.md`.
+- `src/experiences/ohmdal-plaza/` conserva el core pedagógico puro compartido.
 - `/jugar` (`src/jugar/`, Phaser) conserva contenido y regresiones históricas.
 - `src/hd2d-ohmdal/` y otros árboles antiguos son evidencia/prototipos, no el
   norte técnico nuevo.
-- La migración completa a PlayCanvas requiere una spec y tarea propias. No se
-  ejecuta como efecto lateral de otro cambio.
+- Three.js y otros prototipos quedan como evidencia histórica de I+D, no como
+  rutas paralelas de producción.
 
 ## Reglas de juego
 

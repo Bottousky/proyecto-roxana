@@ -38,6 +38,23 @@ describe('Ohmdal PlayCanvas · Outer Wilds Architecture Tests', () => {
     assert.ok(solved.branches.b_oxido_a_portal.current > 1.0, 'La corriente de retorno debe ser > 1A');
   });
 
+  it('Pilar II: Omega permanece cerrada hasta energizar el relé de la Campana', () => {
+    const circuit = createInitialCircuit();
+    circuit.branches.b_brecha_retorno.state = 'closed';
+    circuit.branches.b_brecha_a_oxido.state = 'closed';
+    circuit.branches.b_brecha_a_oxido.resistance = 0.05;
+
+    const returnRestored = solveCircuit(circuit);
+    assert.equal(returnRestored.fountainActive, true, 'el lazo restaurado puede alimentar la fuente');
+    assert.equal(returnRestored.relayEnergized, false, 'el relé sigue abierto antes de la Campana');
+    assert.equal(returnRestored.gateOpen, false, 'Omega no omite la tercera acción del circuito');
+
+    returnRestored.branches.b_ida_rele.state = 'closed';
+    const relayLatched = solveCircuit(returnRestored);
+    assert.equal(relayLatched.relayEnergized, true);
+    assert.equal(relayLatched.gateOpen, true, 'Omega abre cuando el relé queda energizado');
+  });
+
   it('Pilar III: Galvanoscopio de Lumen mide diferencias de potencial y resistencia', () => {
     const circuit = createInitialCircuit();
     const tool = new GalvanoscopeTool();
@@ -121,4 +138,3 @@ describe('Ohmdal PlayCanvas · Outer Wilds Architecture Tests', () => {
     assert.equal(wb.getState().knifeSwitchClosed, true);
   });
 });
-

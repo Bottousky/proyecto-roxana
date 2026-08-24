@@ -17,6 +17,7 @@ import {
   type RoxanaVisualTestHooks,
 } from './visualHarness.ts';
 import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
+import { OhmdalZoneLifecycle } from './systems/zones/zoneLifecycle.ts';
 
 export type OhmdalStoryStep =
   | 'portal_arrived'
@@ -43,6 +44,14 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   const galvanoscope = new GalvanoscopeTool();
   const bitacora = new BitacoraManager();
   const workbench = new WorkbenchInspector();
+  const zones = new OhmdalZoneLifecycle();
+  world.workshopInteriorRoot.enabled = false;
+  zones.register({ id: 'plaza', setActive: (active) => { world.plazaRoot.enabled = active; } });
+  zones.register({ id: 'workshop', setActive: (active) => { world.workshopInteriorRoot.enabled = active; } });
+  // The existing mountain root is Plaza's accepted scenic shell. Future
+  // Manantial payloads register behind this progression-gated load seam.
+  zones.register({ id: 'manantial', load: () => undefined });
+  void zones.initializePlaza();
 
   // State
   let currentMode: ToolMode = 'explore';
@@ -155,6 +164,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
   function setVisualState(name: OhmdalVisualStateName): void {
     closeVisualOverlays();
+    zones.deactivate('workshop');
+    zones.deactivate('manantial');
     circuit = createInitialCircuit();
     isOhmAwake = false;
     storyStep = 'portal_arrived';
@@ -167,6 +178,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     world.gateLightRight.light!.color = new pc.Color(1.0, 0.4, 0.2);
 
     if (name === 'restored-plaza') {
+      void zones.preload('manantial');
       isOhmAwake = true;
       storyStep = 'gate_opened';
       circuit.branches.b_ida_rele.state = 'closed';
@@ -224,6 +236,17 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     };
   }
 
+  function collectShadowCounts(): { lights: number; castingLights: number; castingRenderers: number } {
+    const lights = world.app.root.findComponents('light') as pc.LightComponent[];
+    const renders = world.app.root.findComponents('render') as pc.RenderComponent[];
+    const isEnabled = (component: pc.Component) => component.enabled && component.entity.enabled;
+    return {
+      lights: lights.filter(isEnabled).length,
+      castingLights: lights.filter((light) => isEnabled(light) && light.castShadows).length,
+      castingRenderers: renders.filter((render) => isEnabled(render) && render.castShadows).length,
+    };
+  }
+
   const visualHooks: RoxanaVisualTestHooks = {
     seed(value) {
       visualSeed = value;
@@ -257,6 +280,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       const softwareRendered = isSoftwareRenderer(renderer);
       const counts = collectRenderCounts();
       const assets = collectTransferredAssets();
+      const zoneSnapshot = zones.snapshot();
+      const shadows = collectShadowCounts();
       const fpsSamples = frameTimeSamples.filter((ms) => ms > 0).map((ms) => 1000 / ms);
       return {
         browser: {
@@ -279,6 +304,14 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           textures: counts.textures,
         },
         assets,
+        zones: {
+          loaded: zoneSnapshot.filter((zone) => zone.loaded).map((zone) => zone.id),
+          active: zoneSnapshot.filter((zone) => zone.active).map((zone) => zone.id),
+        },
+        shadows: {
+          ...shadows,
+          mobileMeaningfulLightLimit: 1,
+        },
         harness: {
           camera: visualCamera,
           state: visualState,
@@ -289,6 +322,47 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           seed: visualSeed,
           randomSeedNote: 'No randomized scene systems are active; seed is a documented no-op.',
         },
+      };
+    },
+    getPlaytestSnapshot() {
+      const interactables = getActiveInteractables();
+      const nearest = interactables
+        .map((item) => ({ item, distance: playerPos.distance(item.pos) }))
+        .filter(({ item, distance }) => distance <= item.radius)
+        .sort((a, b) => a.distance - b.distance)[0]?.item.id ?? null;
+      const galvanoscopeState = galvanoscope.getState();
+      return {
+        storyStep,
+        mode: currentMode,
+        position: [playerPos.x, playerPos.y, playerPos.z],
+        yaw,
+        ohmAwake: isOhmAwake,
+        inventory: { jumper: hasJumperItem, brush: hasBrushItem },
+        dialogue: activeDialogueNode
+          ? {
+              id: activeDialogueNode.id,
+              lineIndex: activeDialogueLineIndex,
+              lineCount: activeDialogueNode.lines.length,
+              hasChoices: Boolean(activeDialogueNode.choices?.length),
+            }
+          : null,
+        circuit: {
+          gateOpen: circuit.gateOpen,
+          relayEnergized: circuit.relayEnergized,
+          relayClosed: circuit.branches.b_ida_rele.state === 'closed',
+          jumperClosed: circuit.branches.b_brecha_retorno.state === 'closed',
+          corrosionClosed: circuit.branches.b_brecha_a_oxido.state === 'closed',
+          corrosionResistance: circuit.branches.b_brecha_a_oxido.resistance,
+        },
+        galvanoscope: {
+          probeA: galvanoscopeState.probeA,
+          probeB: galvanoscopeState.probeB,
+          measuredVoltage: galvanoscopeState.measuredVoltage,
+          measuredResistance: galvanoscopeState.measuredResistance,
+          measuredCurrent: galvanoscopeState.measuredCurrent,
+        },
+        nearestInteractable: nearest,
+        zones: zones.snapshot(),
       };
     },
   };
@@ -350,6 +424,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 2.8,
         action: () => {
           teleportPlayer(-7.0, 1.68, -4.0, 90);
+          zones.deactivate('workshop');
           storyStep = 'returned_to_plaza';
           ui.showNotification('Saliste a la Plaza Central de Ohmdal.');
         },
@@ -394,6 +469,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 3.2,
         action: () => {
           teleportPlayer(0, 1.68, 9.2, 180);
+          zones.deactivate('manantial');
           ui.showNotification('Regresaste a la Plaza Central.');
         },
       });
@@ -437,10 +513,12 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         pos: new pc.Vec3(-7.4, 1.2, -4.0),
         radius: 3.0,
         action: () => {
-          teleportPlayer(-60, 1.68, -3.8, 0);
-          storyStep = 'inside_workshop';
-          bitacora.unlock('taller_lumen', 'investigating');
-          ui.showNotification('Entraste al Taller de Lumen.');
+          void zones.activate('workshop').then(() => {
+            teleportPlayer(-60, 1.68, -3.8, 0);
+            storyStep = 'inside_workshop';
+            bitacora.unlock('taller_lumen', 'investigating');
+            ui.showNotification('Entraste al Taller de Lumen.');
+          });
         },
       });
 
@@ -538,6 +616,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 3.8,
         action: () => {
           if (circuit.gateOpen) {
+            void zones.activate('manantial');
             teleportPlayer(0, 1.68, 16.0, 0);
             storyStep = 'inside_manantial';
             bitacora.unlock('manantial_central_hidraulica', 'investigating');
@@ -656,6 +735,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     }
 
     if (circuit.gateOpen) {
+      void zones.preload('manantial');
       world.solenoidGate.setPosition(0, OMEGA_GATE_TUNING.openY, 11.5);
       world.gateLightLeft.light!.color = new pc.Color(0.2, 1.0, 0.4);
       world.gateLightRight.light!.color = new pc.Color(0.2, 1.0, 0.4);

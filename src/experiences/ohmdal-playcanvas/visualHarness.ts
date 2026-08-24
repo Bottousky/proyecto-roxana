@@ -36,6 +36,16 @@ export interface RoxanaVisualDiagnostics {
     transferredMb: number;
     largestAssets: { name: string; transferredMb: number }[];
   };
+  zones: {
+    loaded: string[];
+    active: string[];
+  };
+  shadows: {
+    lights: number;
+    castingLights: number;
+    castingRenderers: number;
+    mobileMeaningfulLightLimit: number;
+  };
   harness: {
     camera: OhmdalVisualCameraName;
     state: OhmdalVisualStateName;
@@ -48,6 +58,33 @@ export interface RoxanaVisualDiagnostics {
   };
 }
 
+export interface RoxanaOhmdalPlaytestSnapshot {
+  storyStep: string;
+  mode: string;
+  position: [number, number, number];
+  yaw: number;
+  ohmAwake: boolean;
+  inventory: { jumper: boolean; brush: boolean };
+  dialogue: { id: string; lineIndex: number; lineCount: number; hasChoices: boolean } | null;
+  circuit: {
+    gateOpen: boolean;
+    relayEnergized: boolean;
+    relayClosed: boolean;
+    jumperClosed: boolean;
+    corrosionClosed: boolean;
+    corrosionResistance: number;
+  };
+  galvanoscope: {
+    probeA: string | null;
+    probeB: string | null;
+    measuredVoltage: number;
+    measuredResistance: number;
+    measuredCurrent: number;
+  };
+  nearestInteractable: string | null;
+  zones: { id: string; loaded: boolean; active: boolean }[];
+}
+
 export interface RoxanaVisualTestHooks {
   seed(value: number): void;
   setState(name: OhmdalVisualStateName): void;
@@ -57,6 +94,7 @@ export interface RoxanaVisualTestHooks {
   hideDebugUi(hidden: boolean): void;
   setPostProcessing(enabled: boolean): void;
   getDiagnostics(): RoxanaVisualDiagnostics;
+  getPlaytestSnapshot(): RoxanaOhmdalPlaytestSnapshot;
 }
 
 declare global {

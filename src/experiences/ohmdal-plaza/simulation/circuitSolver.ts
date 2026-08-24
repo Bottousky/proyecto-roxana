@@ -289,7 +289,10 @@ export function solveCircuit(state: CircuitState): CircuitState {
   state.fountainActive = true;
   state.relayEnergized = isRelaySwitchClosed;
   state.isComplete = true;
-  state.gateOpen = true;
+  // Restoring the return path can run the fountain, but Omega is actuated by
+  // the Bell relay. Requiring the third player-facing action keeps the solver
+  // aligned with the existing dialogue and physical circuit semantics.
+  state.gateOpen = isRelaySwitchClosed;
 
   return state;
 }
