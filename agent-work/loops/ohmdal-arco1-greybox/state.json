@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "loopId": "ohmdal-arco1-greybox",
   "branch": "explore/ohmdal-3D",
-  "status": "ready",
-  "currentStage": "g1-manantial-central-greybox",
-  "iteration": 0,
+  "status": "complete",
+  "currentStage": "g7-end-to-end-golden-path",
+  "iteration": 1,
   "maxIterationsPerStage": 3,
   "maxFixesPerIteration": 5,
   "maxStructuralFixesPerIteration": 1,
@@ -56,35 +56,35 @@
     },
     {
       "id": "g1-manantial-central-greybox",
-      "status": "ready"
+      "status": "passed"
     },
     {
       "id": "g2-plaza-restoration-bell-castle-open",
-      "status": "queued"
+      "status": "passed"
     },
     {
       "id": "g3-castle-network-greybox",
-      "status": "queued"
+      "status": "passed"
     },
     {
       "id": "g4-forge-terraces-greybox",
-      "status": "queued"
+      "status": "passed"
     },
     {
       "id": "g5-lighthouse-lake-greybox",
-      "status": "queued"
+      "status": "passed"
     },
     {
       "id": "g6-return-arc-close-greybox",
-      "status": "queued"
+      "status": "passed"
     },
     {
       "id": "g7-end-to-end-golden-path",
-      "status": "queued"
+      "status": "passed"
     }
   ],
-  "lastReviewReport": "agent-work/reports/gemini/ohmdal-3d-production-hardening-final.md",
-  "lastCaptureManifest": "output/playwright/ohmdal-hardening/final/capture-manifest.json",
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-greybox-final.md",
+  "lastCaptureManifest": "output/playwright/ohmdal-hardening/golden-path/golden-path-run.json",
   "humanGate": null,
   "notes": [
     "This loop targets a complete playable Arco I greybox, not final art.",
@@ -94,6 +94,11 @@
     "Direct-world interaction is preferred; diegetic maintenance close-ups are allowed for precision/density and must use the same electrical model.",
     "Faro RC/time content is not invented: if the content contract is not sufficiently ratified, use the explicitly allowed DC culmination seam and document the future upgrade point.",
     "Missing final dialogue uses TODO(guion) and neutral placeholders rather than inventing lore.",
-    "No Meshy/Tripo spend without a new HUMAN_GATE or explicit authorization."
+    "No Meshy/Tripo spend without a new HUMAN_GATE or explicit authorization.",
+    "Iteration 1 completed G1-G7: Portal, Taller, Manantial, restored Plaza, Castle, Forge/Terraces, Lighthouse/Lake and final return are playable end to end.",
+    "Golden Path PASS: 22 checkpoints, arc1_complete, zero console/page errors, 22.03 MB transfer, peak 145 draw calls / 88836 triangles and one shadow-casting light.",
+    "Gemini 3.7 Flash High independent read-only review PASS with no player-facing blockers; Antigravity print runner exited 1 and the documented interactive plan+sandbox fallback was used.",
+    "MiniMax M3 GMI produced one partially reusable scene-contract test after three Sol repairs, one non-integrated VFX decomposition and one rejected runtime audit; provisional WOULD_PAY is no.",
+    "Final dialogue remains a neutral TODO(guion); RC/transient Lighthouse content is an explicit future seam, not invented for this greybox."
   ]
 }
