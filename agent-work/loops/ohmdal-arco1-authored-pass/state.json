@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "loopId": "ohmdal-arco1-authored-pass",
+  "branch": "explore/ohmdal-3D",
+  "status": "ready",
+  "currentStage": "a0-baseline-capture-readiness",
+  "iteration": 0,
+  "maxIterationsPerStage": 3,
+  "maxFixesPerIteration": 5,
+  "maxStructuralFixesPerIteration": 1,
+  "maxConcurrentLunaWorkers": 2,
+  "maxConcurrentMiniMaxWorkers": 1,
+  "routing": {
+    "reviewer": {
+      "harness": "antigravity-cli",
+      "model": "gemini-3.7-flash-high",
+      "effort": "high",
+      "fallback": "nearest-available-gemini-flash-high-only"
+    },
+    "decision": {
+      "harness": "codex",
+      "modelAlias": "Sol",
+      "effort": "high"
+    },
+    "mechanicalWorker": {
+      "harness": "codex-subagent",
+      "modelAlias": "Luna",
+      "effort": "max",
+      "fallback": "report-routing-fallback-no-custom-wrapper"
+    },
+    "experimentalWorker": {
+      "harness": "gmi-api-sidecar",
+      "model": "MiniMaxAI/MiniMax-M3",
+      "mode": "proposal-only",
+      "runner": "scripts/agents/run-gmi-minimax.mjs",
+      "fallback": "continue-with-sol-luna-no-human-gate"
+    }
+  },
+  "limits": {
+    "allowPaidGenerativeWithoutHumanGate": false,
+    "allowEngineChange": false,
+    "allowCanonChange": false,
+    "allowLargeDependencyChange": false,
+    "allowNewAgentFramework": false
+  },
+  "baseline": {
+    "technicalCommit": "dec2d75abc0adbcddb37988b3955cef4950513f3",
+    "greyboxMilestone": "b8bb4128868fcafd9b5b2083682b2aea7dad1cb9",
+    "greyboxCloseCommit": "74abaadb0b569bdc91171886d6799ba49464b082",
+    "greyboxReport": "agent-work/reports/ohmdal-arco1-greybox-sprint.md",
+    "greyboxState": "agent-work/loops/ohmdal-arco1-greybox/state.json",
+    "plazaState": "agent-work/loops/ohmdal-plaza/state.json"
+  },
+  "queue": [
+    { "id": "a0-baseline-capture-readiness", "status": "ready" },
+    { "id": "a1-reference-planning", "status": "queued" },
+    { "id": "a2-plaza-workshop-authored", "status": "queued" },
+    { "id": "a3-manantial-central-authored", "status": "queued" },
+    { "id": "a4-castle-authored", "status": "queued" },
+    { "id": "a5-forge-terraces-authored", "status": "queued" },
+    { "id": "a6-lighthouse-lake-return-authored", "status": "queued" },
+    { "id": "a7-vfx-audio-ambient", "status": "queued" },
+    { "id": "a8-full-authored-golden-path", "status": "queued" }
+  ],
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-greybox-final.md",
+  "lastCaptureManifest": "output/playwright/ohmdal-hardening/golden-path/golden-path-run.json",
+  "humanGate": null,
+  "notes": [
+    "This loop consumes the complete playable Arco I greybox and must not redesign it casually.",
+    "Plaza is an accepted visual baseline; changes there are integration/polish only unless regression proves otherwise.",
+    "MiniMax M3 via GMI is experimental proposal-only; Sol is the sole integrator and its provisional evaluation remains open.",
+    "Use fast local GPU captures for iteration once available; retain the full deterministic acceptance path and never present SwiftShader FPS as hardware performance.",
+    "World-first electrical interaction remains mandatory; diegetic maintenance close-ups use the same electrical model.",
+    "Hero/identity assets require approved reference packs before Blender/Meshy/Tripo work.",
+    "No Meshy/Tripo spend without HUMAN_GATE or explicit prior authorization.",
+    "No final dialogue is invented; unresolved prose remains TODO(guion) with neutral placeholders."
+  ]
+}

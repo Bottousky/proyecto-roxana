@@ -18,6 +18,7 @@
     "agent:minimax:gmi": "node scripts/agents/run-gmi-minimax.mjs",
     "loop:ohmdal-plaza:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-plaza/state.json",
     "loop:ohmdal-arco1:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-greybox/state.json",
+    "loop:ohmdal-arco1-authored:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-authored-pass/state.json",
     "visual:ohmdal-plaza": "node scripts/visual/capture-ohmdal-plaza.mjs",
     "playtest:ohmdal-golden-path": "node scripts/gameplay/playtest-ohmdal-golden-path.mjs",
     "3d:validate-manifests": "node scripts/3d/validate-asset-manifests.mjs",
