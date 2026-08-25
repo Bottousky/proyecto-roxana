@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "loopId": "ohmdal-arco1-authored-pass",
   "branch": "explore/ohmdal-3D",
-  "status": "planning",
-  "currentStage": "a1-reference-planning",
-  "iteration": 0,
+  "status": "implementing",
+  "currentStage": "a2-plaza-workshop-authored",
+  "iteration": 1,
   "maxIterationsPerStage": 3,
   "maxFixesPerIteration": 5,
   "maxStructuralFixesPerIteration": 1,
@@ -53,8 +53,8 @@
   },
   "queue": [
     { "id": "a0-baseline-capture-readiness", "status": "passed" },
-    { "id": "a1-reference-planning", "status": "active" },
-    { "id": "a2-plaza-workshop-authored", "status": "queued" },
+    { "id": "a1-reference-planning", "status": "passed" },
+    { "id": "a2-plaza-workshop-authored", "status": "active" },
     { "id": "a3-manantial-central-authored", "status": "queued" },
     { "id": "a4-castle-authored", "status": "queued" },
     { "id": "a5-forge-terraces-authored", "status": "queued" },
@@ -62,7 +62,7 @@
     { "id": "a7-vfx-audio-ambient", "status": "queued" },
     { "id": "a8-full-authored-golden-path", "status": "queued" }
   ],
-  "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-greybox-final.md",
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-authored-a1-reference-review.md",
   "lastCaptureManifest": "output/playwright/ohmdal-arco1-authored/a0-fast-sol-verify/capture-manifest.json",
   "humanGate": null,
   "notes": [
@@ -74,6 +74,7 @@
     "Hero/identity assets require approved reference packs before Blender/Meshy/Tripo work.",
     "No Meshy/Tripo spend without HUMAN_GATE or explicit prior authorization.",
     "No final dialogue is invented; unresolved prose remains TODO(guion) with neutral placeholders.",
-    "A0 passed in iteration 0: frozen baseline ancestry verified; greybox/authored loop, Gemini and GMI lanes passed; Golden Path passed all 22 checkpoints; FAST captured five load-bearing Plaza views on Chrome 151 / Intel UHD D3D11 with softwareRendered=false and zero console/page errors; FULL deterministic semantics remain covered and unchanged."
+    "A0 passed in iteration 0: frozen baseline ancestry verified; greybox/authored loop, Gemini and GMI lanes passed; Golden Path passed all 22 checkpoints; FAST captured five load-bearing Plaza views on Chrome 151 / Intel UHD D3D11 with softwareRendered=false and zero console/page errors; FULL deterministic semantics remain covered and unchanged.",
+    "A1 passed in iteration 1: all eight region packs are approved for support authoring, cover exactly 22 canonical shots, and Gemini found no player-facing blocker. Four hero candidates are classified adapt but final modeling remains blocked until each machine-readable Hero Reference Pack passes validation."
   ]
 }

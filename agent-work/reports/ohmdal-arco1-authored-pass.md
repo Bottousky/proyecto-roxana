@@ -69,3 +69,56 @@ El set mobile obligatorio sigue siendo el definido por
   ejecutar en A8.
 - No hubo cambios de gameplay, Plaza, engine, dependencias, canon ni guion.
 - No se usaron proveedores 3D ni gasto pago.
+
+## A1 — referencias y contratos visuales
+
+**Estado:** `PASS` — iteración 1. Sol aceptó el pack después del test mecánico
+de Luna y de una revisión independiente read-only de Gemini 3.7 Flash High.
+
+### Pack aceptado
+
+- `assets/references/region-packs/manifest.json` declara las ocho regiones,
+  briefs existentes y autoridad espacial/visual explícita.
+- La unión de sus rutas cubre exactamente los 22 shots canónicos. Los únicos
+  dos cruces intencionales son `forge-terraces-overview` y
+  `final-return-plaza`.
+- Plaza permanece bloqueada como baseline aceptado; A2 se limita al Taller y a
+  sus seams funcionales. No se demostró ninguna regresión de Plaza.
+- Gemini marcó las ocho regiones `READY_FOR_SUPPORT_AUTHORING` y no encontró
+  blockers player-facing. Su dictamen persistido está en
+  `agent-work/reports/gemini/ohmdal-arco1-authored-a1-reference-review.md`.
+
+### Heroes
+
+Gemini clasificó los cuatro candidatos como `adapt`: turbine-generator
+assembly, central distribution bus landmark, primary load/protection assembly y
+lighthouse calibration mechanism. Sol acepta esa clasificación sólo para crear
+sus Hero Reference Packs. El manifest conserva `autoApproveDesign=false` y
+`finalModelingBlockedUntilHeroPack=true`; ningún modelado final comienza antes
+de un JSON machine-readable que pase `npm run 3d:validate-hero-ref`.
+
+No hay HUMAN_GATE activo: la evidencia local alcanza para `adapt`, el pipeline
+es Blender determinista y no se autorizó Meshy/Tripo ni gasto pago. La deuda de
+los cuatro packs es asset-local y no bloquea environment/support authoring.
+
+### Evidencia
+
+- `node --experimental-strip-types tests/ohmdal-region-packs.test.ts`: PASS,
+  3/3.
+- `npm run 3d:validate-manifests`: PASS.
+- `npm run loop:ohmdal-arco1-authored:validate`: PASS durante A1.
+- Gemini inspeccionó en plan+sandbox sólo los authority docs, ocho briefs, siete
+  imágenes históricas acotadas y ocho capturas Golden Path permitidas. El
+  wrapper repo-native devolvió metadata sin cuerpo y fue descartado; la
+  continuación oficial `agy` de la misma conversación produjo el dictamen
+  auditable, sin escrituras.
+
+### Correcciones load-bearing para producción
+
+1. La paleta nocturna/húmeda 2D no sustituye la tarde cálida y piedra pálida del
+   material bible.
+2. A2 debe resolver el Taller actualmente oscuro con fill/prácticas sin sombras
+   y jerarquía legible de banco/herramientas.
+3. Faro conserva verdad DC; ningún efecto debe sugerir RC/transitorios.
+4. Los cuatro heroes usan Hero Reference Pack → Blender → GLB → inspect/validate.
+5. A8 asigna `arc1-final-pedestal` a `final-return` para evitar doble captura.

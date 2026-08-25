@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "status": "prepared-for-a1-review",
+  "status": "approved-for-support-authoring",
   "spatialAuthority": "current PlayCanvas greybox runtime + closed Golden Path",
   "visualAuthority": "docs/20-worlds/ohmdal/production/OHMDAL_VISUAL_MATERIAL_BIBLE.md",
   "areas": [
     {"id":"plaza","priority":2,"brief":"assets/references/region-packs/plaza/README.md","shots":["portal-arrival","plaza-wide","ohm-landmark","restored-plaza-wide","bell-activation","final-return-plaza"]},
     {"id":"workshop","priority":2,"brief":"assets/references/region-packs/workshop/README.md","shots":["workshop-exterior","workshop-interior-tools","galvanoscope-first-person"]},
-    {"id":"manantial","priority":1,"brief":"assets/references/region-packs/manantial/README.md","shots":["manantial-approach","hydro-central-wide","sluice-gate-interaction","generator-platform","restored-manantial"],"heroGateCandidates":["turbine-generator-assembly"]},
-    {"id":"castillo","priority":1,"brief":"assets/references/region-packs/castillo/README.md","shots":["castle-gate-open","castle-distribution-hall"],"heroGateCandidates":["central-distribution-bus-landmark"]},
-    {"id":"forja","priority":1,"brief":"assets/references/region-packs/forja/README.md","shots":["forge-core","forge-terraces-overview"],"heroGateCandidates":["primary-load-protection-assembly"]},
+    {"id":"manantial","priority":1,"brief":"assets/references/region-packs/manantial/README.md","shots":["manantial-approach","hydro-central-wide","sluice-gate-interaction","generator-platform","restored-manantial"],"heroGateCandidates":[{"id":"turbine-generator-assembly","mode":"adapt","status":"approved-for-reference-pack","autoApproveDesign":false,"finalModelingBlockedUntilHeroPack":true}]},
+    {"id":"castillo","priority":1,"brief":"assets/references/region-packs/castillo/README.md","shots":["castle-gate-open","castle-distribution-hall"],"heroGateCandidates":[{"id":"central-distribution-bus-landmark","mode":"adapt","status":"approved-for-reference-pack","autoApproveDesign":false,"finalModelingBlockedUntilHeroPack":true}]},
+    {"id":"forja","priority":1,"brief":"assets/references/region-packs/forja/README.md","shots":["forge-core","forge-terraces-overview"],"heroGateCandidates":[{"id":"primary-load-protection-assembly","mode":"adapt","status":"approved-for-reference-pack","autoApproveDesign":false,"finalModelingBlockedUntilHeroPack":true}]},
     {"id":"terrazas","priority":1,"brief":"assets/references/region-packs/terrazas/README.md","shots":["terraces-irrigation","forge-terraces-overview"]},
-    {"id":"faro","priority":1,"brief":"assets/references/region-packs/faro/README.md","shots":["lighthouse-approach","lighthouse-lake-wide"],"heroGateCandidates":["lighthouse-calibration-mechanism"]},
+    {"id":"faro","priority":1,"brief":"assets/references/region-packs/faro/README.md","shots":["lighthouse-approach","lighthouse-lake-wide"],"heroGateCandidates":[{"id":"lighthouse-calibration-mechanism","mode":"adapt","status":"approved-for-reference-pack","autoApproveDesign":false,"finalModelingBlockedUntilHeroPack":true}]},
     {"id":"final-return","priority":2,"brief":"assets/references/region-packs/final-return/README.md","shots":["final-return-plaza","arc1-final-pedestal"]}
   ],
   "rules": [
