@@ -1,4 +1,10 @@
-export type OhmdalZoneId = 'plaza' | 'workshop' | 'manantial';
+export type OhmdalZoneId =
+  | 'plaza'
+  | 'workshop'
+  | 'manantial'
+  | 'castle'
+  | 'forge-terraces'
+  | 'lighthouse';
 
 export interface OhmdalZoneDefinition {
   id: OhmdalZoneId;
@@ -18,9 +24,9 @@ interface ZoneRecord extends OhmdalZoneSnapshot {
 }
 
 /**
- * Small runtime boundary for the three known Ohmdal zones. It intentionally
- * owns no assets and no gameplay state: callers decide when progression may
- * preload or activate a registered zone.
+ * Small runtime boundary for the production zones. It intentionally owns no
+ * assets and no gameplay state: callers decide when progression may preload
+ * or activate a registered zone.
  */
 export class OhmdalZoneLifecycle {
   private readonly records = new Map<OhmdalZoneId, ZoneRecord>();

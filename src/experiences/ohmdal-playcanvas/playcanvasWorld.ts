@@ -5,6 +5,7 @@ import { PLAZA_BELL_DETAIL_LAYOUT } from './plazaBellDetailLayout.ts';
 import { PLAZA_CONDUCTOR_LAYOUT } from './plazaConductorLayout.ts';
 import { buildManantialShell } from './world/manantial/buildManantialShell.ts';
 import { buildWorkshopInterior } from './world/workshop/buildWorkshopInterior.ts';
+import { buildArc1Greybox, type Arc1GreyboxElements } from './world/arc1/buildArc1Greybox.ts';
 
 export interface PlayCanvasWorldElements {
   app: pc.Application;
@@ -26,8 +27,15 @@ export interface PlayCanvasWorldElements {
   workshopInteriorRoot: pc.Entity;
   plazaRoot: pc.Entity;
   mountainRoot: pc.Entity;
+  manantialGameplayRoot: pc.Entity;
   waterfallMesh: pc.Entity;
   turbineMesh: pc.Entity;
+  turbineRotor: pc.Entity;
+  manantialIntakeGate: pc.Entity;
+  manantialExciterBridge: pc.Entity;
+  manantialOutputBreaker: pc.Entity;
+  manantialGeneratorLight: pc.Entity;
+  arc1Greybox: Arc1GreyboxElements;
   omegaSymbolEntity: pc.Entity;
   gateLightLeft: pc.Entity;
   gateLightRight: pc.Entity;
@@ -1046,7 +1054,17 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     addCollider,
   });
 
-  const { mountainRoot, waterfallMesh, turbineMesh } = buildManantialShell({
+  const {
+    mountainRoot,
+    gameplayRoot: manantialGameplayRoot,
+    waterfallMesh,
+    turbineMesh,
+    turbineRotor,
+    intakeGate: manantialIntakeGate,
+    exciterBridge: manantialExciterBridge,
+    outputBreaker: manantialOutputBreaker,
+    generatorLight: manantialGeneratorLight,
+  } = buildManantialShell({
     app,
     plazaRoot,
     materials: {
@@ -1056,6 +1074,20 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
       matWaterfall,
       matBrass,
       matCopperClean,
+    },
+    probeTargets,
+    addCollider,
+  });
+
+  const arc1Greybox = buildArc1Greybox({
+    app,
+    materials: {
+      stone: matStone,
+      stoneDark: matStoneDark,
+      copper: matCopperClean,
+      brass: matBrass,
+      water: matWater,
+      glow: matGlowGold,
     },
     probeTargets,
     addCollider,
@@ -1081,8 +1113,15 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     workshopInteriorRoot,
     plazaRoot,
     mountainRoot,
+    manantialGameplayRoot,
     waterfallMesh,
     turbineMesh,
+    turbineRotor,
+    manantialIntakeGate,
+    manantialExciterBridge,
+    manantialOutputBreaker,
+    manantialGeneratorLight,
+    arc1Greybox,
     omegaSymbolEntity,
     gateLightLeft,
     gateLightRight,

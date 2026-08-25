@@ -19,8 +19,14 @@ export interface ManantialShellDependencies {
 
 export interface ManantialShellElements {
   mountainRoot: pc.Entity;
+  gameplayRoot: pc.Entity;
   waterfallMesh: pc.Entity;
   turbineMesh: pc.Entity;
+  turbineRotor: pc.Entity;
+  intakeGate: pc.Entity;
+  exciterBridge: pc.Entity;
+  outputBreaker: pc.Entity;
+  generatorLight: pc.Entity;
 }
 
 export function buildManantialShell({
@@ -104,6 +110,12 @@ export function buildManantialShell({
   // ========================================================
   const mountainRoot = new pc.Entity('MountainRoot');
   app.root.addChild(mountainRoot);
+
+  // The accepted Plaza sees only the scenic mountain shell. G1 gameplay is a
+  // progression-gated child so the dormant Plaza baseline remains unchanged.
+  const gameplayRoot = new pc.Entity('ManantialGameplayRoot');
+  gameplayRoot.enabled = false;
+  mountainRoot.addChild(gameplayRoot);
 
   // Plaza-only scenic skirts close the floating slab at the north perimeter
   // while preserving a broad central opening toward the locked later region.
@@ -210,6 +222,43 @@ export function buildManantialShell({
   turbineRotor.setLocalScale(3.2, 0.8, 3.2);
   mountainRoot.addChild(turbineRotor);
 
+  const addControl = (
+    name: string,
+    position: [number, number, number],
+    material: pc.StandardMaterial,
+  ) => {
+    const pedestal = new pc.Entity(`${name}Pedestal`);
+    pedestal.addComponent('render', { type: 'box', material: matStoneDark });
+    pedestal.setPosition(position[0], 0.6, position[2]);
+    pedestal.setLocalScale(1.2, 1.2, 1.2);
+    gameplayRoot.addChild(pedestal);
+
+    const control = new pc.Entity(name);
+    control.addComponent('render', { type: 'box', material });
+    control.setPosition(...position);
+    control.setLocalScale(0.7, 0.32, 0.34);
+    gameplayRoot.addChild(control);
+    return control;
+  };
+
+  const intakeGate = addControl('ManantialIntakeGate', [-4.2, 1.35, 18.4], matBrass);
+  const exciterBridge = addControl('ManantialExciterBridge', [4.2, 1.35, 18.4], matCopperClean);
+  const outputBreaker = addControl('ManantialOutputBreaker', [2.2, 1.35, 16.0], matBrass);
+
+  const generatorLight = new pc.Entity('ManantialGeneratorIndicator');
+  generatorLight.addComponent('light', {
+    type: 'point',
+    color: new pc.Color(1.0, 0.72, 0.24),
+    intensity: 0,
+    range: 7,
+    castShadows: false,
+  });
+  generatorLight.setPosition(0, 3.0, 20.6);
+  gameplayRoot.addChild(generatorLight);
+
+  probeTargets['manantial_generator_out'] = new pc.Vec3(2.2, 1.35, 16.0);
+  probeTargets['manantial_exciter'] = new pc.Vec3(4.2, 1.35, 18.4);
+
   // Manantial Survey Observation Monument
   const surveyMonument = new pc.Entity('SurveyMonument');
   surveyMonument.addComponent('render', { type: 'cylinder', material: matBrass });
@@ -222,5 +271,15 @@ export function buildManantialShell({
   addCollider(0, 24.0, 9.2, 6.2);
   addCollider(0, 17.5, 1.2, 1.2);
 
-  return { mountainRoot, waterfallMesh, turbineMesh };
+  return {
+    mountainRoot,
+    gameplayRoot,
+    waterfallMesh,
+    turbineMesh,
+    turbineRotor,
+    intakeGate,
+    exciterBridge,
+    outputBreaker,
+    generatorLight,
+  };
 }

@@ -83,6 +83,7 @@ export interface RoxanaOhmdalPlaytestSnapshot {
   };
   nearestInteractable: string | null;
   zones: { id: string; loaded: boolean; active: boolean }[];
+  arc1: Arc1GreyboxSnapshot;
 }
 
 export interface RoxanaVisualTestHooks {
@@ -114,3 +115,4 @@ export function isSoftwareRenderer(renderer: string | null): boolean | null {
   if (!renderer) return null;
   return /(swiftshader|llvmpipe|software rasterizer|microsoft basic render)/i.test(renderer);
 }
+import type { Arc1GreyboxSnapshot } from './systems/campaign/arc1GreyboxModel.ts';

@@ -32,6 +32,8 @@ const inventoryTextEl = document.getElementById('inventory-text')!;
 const btnGalv = document.getElementById('btn-galvanoscope')!;
 const btnBitacora = document.getElementById('btn-bitacora')!;
 const backBtn = document.getElementById('plaza-back')!;
+const touchInteractBtn = document.getElementById('touch-interact')!;
+const touchMoveButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-move-key]'));
 
 let activeWorkbenchActionCb: ((act: string) => void) | null = null;
 let toastTimeout: number | null = null;
@@ -211,6 +213,41 @@ btnGalv.addEventListener('click', () => {
 
 btnBitacora.addEventListener('click', () => {
   handle?.press('tab');
+});
+
+const activeTurnIntervals = new Map<number, number>();
+
+for (const button of touchMoveButtons) {
+  const key = button.dataset.moveKey!;
+  button.addEventListener('contextmenu', (event) => event.preventDefault());
+  button.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    button.setPointerCapture(event.pointerId);
+    if (key === 'q' || key === 'r') {
+      handle?.press(key);
+      const interval = window.setInterval(() => handle?.press(key), 55);
+      activeTurnIntervals.set(event.pointerId, interval);
+      return;
+    }
+    window.dispatchEvent(new KeyboardEvent('keydown', { key }));
+  });
+
+  const release = (event: PointerEvent) => {
+    const interval = activeTurnIntervals.get(event.pointerId);
+    if (interval !== undefined) {
+      window.clearInterval(interval);
+      activeTurnIntervals.delete(event.pointerId);
+    }
+    if (key !== 'q' && key !== 'r') {
+      window.dispatchEvent(new KeyboardEvent('keyup', { key }));
+    }
+  };
+  button.addEventListener('pointerup', release);
+  button.addEventListener('pointercancel', release);
+}
+
+touchInteractBtn.addEventListener('click', () => {
+  handle?.press('e');
 });
 
 bitacoraCloseBtn.addEventListener('click', () => {

@@ -18,6 +18,47 @@ import {
 } from './visualHarness.ts';
 import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
 import { OhmdalZoneLifecycle } from './systems/zones/zoneLifecycle.ts';
+import {
+  type Arc1GreyboxState,
+  type CastleNetworkConfiguration,
+  calibrateLighthouse,
+  configureCastleNetwork,
+  createArc1GreyboxState,
+  documentCastleNetwork,
+  documentForgeTerraces,
+  documentLighthouse,
+  energizeCastleNetwork,
+  energizeForgeTerraces,
+  energizeLighthouse,
+  energizeManantial,
+  enterArc1Region,
+  evaluateCastleNetwork,
+  evaluateForgeTerraces,
+  evaluateLighthouse,
+  evaluateManantial,
+  getArc1Progress,
+  isArcComplete,
+  isCastleRestored,
+  isForgeTerracesRestored,
+  isLighthouseRestored,
+  isManantialRestored,
+  measureCastleNetwork,
+  measureForgeTerraces,
+  measureLighthouse,
+  measureManantial,
+  openCastleGate,
+  pullCampana,
+  repairCastleNetwork,
+  repairForgeTerraces,
+  repairLighthouse,
+  repairManantial,
+  setForgeTerracesConductor,
+  setForgeTerracesPriority,
+  setForgeTerracesProtection,
+  setManantialGate,
+  snapshotArc1Greybox,
+  synchronizeLighthouse,
+} from './systems/campaign/arc1GreyboxModel.ts';
 
 export type OhmdalStoryStep =
   | 'portal_arrived'
@@ -29,7 +70,37 @@ export type OhmdalStoryStep =
   | 'returned_to_plaza'
   | 'circuit_solved'
   | 'gate_opened'
-  | 'inside_manantial';
+  | 'inside_manantial'
+  | 'manantial_restored'
+  | 'restored_plaza'
+  | 'inside_castle'
+  | 'castle_restored'
+  | 'inside_forge_terraces'
+  | 'forge_terraces_restored'
+  | 'inside_lighthouse'
+  | 'lighthouse_restored'
+  | 'returning'
+  | 'arc1_complete';
+
+const CASTLE_PARALLEL_CONFIGURATION: CastleNetworkConfiguration = {
+  topology: 'parallel',
+  returnContinuity: true,
+  branches: {
+    'district-a': { wiring: 'parallel', priority: 'essential', protectionRating: 4 },
+    'district-b': { wiring: 'parallel', priority: 'essential', protectionRating: 5 },
+    'district-c': { wiring: 'parallel', priority: 'support', protectionRating: 2 },
+  },
+};
+
+const CASTLE_MIXED_CONFIGURATION: CastleNetworkConfiguration = {
+  topology: 'mixed',
+  returnContinuity: true,
+  branches: {
+    'district-a': { wiring: 'parallel', priority: 'essential', protectionRating: 4 },
+    'district-b': { wiring: 'parallel', priority: 'essential', protectionRating: 5 },
+    'district-c': { wiring: 'series', priority: 'support', protectionRating: 2 },
+  },
+};
 
 export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHandle {
   const canvas = document.createElement('canvas');
@@ -50,12 +121,29 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   zones.register({ id: 'workshop', setActive: (active) => { world.workshopInteriorRoot.enabled = active; } });
   // The existing mountain root is Plaza's accepted scenic shell. Future
   // Manantial payloads register behind this progression-gated load seam.
-  zones.register({ id: 'manantial', load: () => undefined });
+  zones.register({
+    id: 'manantial',
+    load: () => undefined,
+    setActive: (active) => { world.manantialGameplayRoot.enabled = active; },
+  });
+  zones.register({
+    id: 'castle',
+    setActive: (active) => { world.arc1Greybox.roots.castle.enabled = active; },
+  });
+  zones.register({
+    id: 'forge-terraces',
+    setActive: (active) => { world.arc1Greybox.roots['forge-terraces'].enabled = active; },
+  });
+  zones.register({
+    id: 'lighthouse',
+    setActive: (active) => { world.arc1Greybox.roots.lighthouse.enabled = active; },
+  });
   void zones.initializePlaza();
 
   // State
   let currentMode: ToolMode = 'explore';
   let storyStep: OhmdalStoryStep = 'portal_arrived';
+  let arc1State: Arc1GreyboxState = createArc1GreyboxState();
   let isOhmAwake = false;
   let hasJumperItem = false;
   let hasBrushItem = false;
@@ -104,6 +192,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     if (k === 's' || k === 'arrowdown') keys.s = true;
     if (k === 'a' || k === 'arrowleft') keys.a = true;
     if (k === 'd' || k === 'arrowright') keys.d = true;
+    if (k === 'q') yaw += 7;
+    if (k === 'r') yaw -= 7;
 
     if (k === 'e' || k === 'f' || k === 'enter' || k === ' ') {
       triggerInteraction();
@@ -166,7 +256,11 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     closeVisualOverlays();
     zones.deactivate('workshop');
     zones.deactivate('manantial');
+    zones.deactivate('castle');
+    zones.deactivate('forge-terraces');
+    zones.deactivate('lighthouse');
     circuit = createInitialCircuit();
+    arc1State = createArc1GreyboxState();
     isOhmAwake = false;
     storyStep = 'portal_arrived';
     world.copperJumper.enabled = false;
@@ -363,6 +457,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         },
         nearestInteractable: nearest,
         zones: zones.snapshot(),
+        arc1: snapshotArc1Greybox(arc1State),
       };
     },
   };
@@ -392,6 +487,54 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     }, 500);
   }
 
+  function setEntityLightsEnabled(entity: pc.Entity, enabled: boolean): void {
+    for (const light of entity.findComponents('light') as pc.LightComponent[]) {
+      light.enabled = enabled;
+    }
+  }
+
+  function showArc1Measurement(label: string, voltage: number, current: number, status: string): void {
+    ui.setGalvanoscopeHud(
+      true,
+      voltage,
+      current > 0 ? voltage / current : Number.POSITIVE_INFINITY,
+      current,
+      status,
+      label,
+      'retorno',
+    );
+    ui.showNotification(`${label}: ${voltage.toFixed(1)} V · ${current.toFixed(1)} A · ${status}`);
+  }
+
+  function updateArc1WorldVisuals(): void {
+    const manantial = evaluateManantial(arc1State);
+    world.manantialGeneratorLight.light!.intensity = manantial.restored ? 2.2 : 0;
+    world.manantialIntakeGate.setLocalEulerAngles(0, 0, arc1State.manantial.gateOpen ? -55 : 0);
+    world.manantialExciterBridge.setLocalPosition(4.2, arc1State.manantial.returnBridgeInstalled ? 1.25 : 1.55, 18.4);
+    world.manantialOutputBreaker.setLocalEulerAngles(0, 0, arc1State.manantial.protectiveTrip ? 40 : -18);
+
+    const castle = evaluateCastleNetwork(arc1State);
+    const castleDeliveries = Object.values(castle.branchDelivery);
+    world.arc1Greybox.castleServiceLights.forEach((marker, index) => {
+      const enabled = arc1State.castle.energized && (castleDeliveries[index] ?? 0) > 0;
+      marker.enabled = enabled;
+      setEntityLightsEnabled(marker, enabled && index === 0);
+    });
+    const castleRail = world.arc1Greybox.castleGate.findByName('CastleGateRail') as pc.Entity | null;
+    if (castleRail) castleRail.enabled = !castle.restored;
+
+    const forgeTerraces = evaluateForgeTerraces(arc1State);
+    const forgeCore = world.arc1Greybox.forgeHeater.findByName('ForgeHeaterCore') as pc.Entity | null;
+    if (forgeCore) forgeCore.enabled = forgeTerraces.restored;
+    world.arc1Greybox.forgeProtectionLight.light!.enabled = arc1State.forgeTerraces.protectiveTrip;
+
+    const lighthouse = evaluateLighthouse(arc1State);
+    const lighthouseLamp = world.arc1Greybox.lighthouseBeacon.findByName('LighthouseBeaconLamp') as pc.Entity | null;
+    if (lighthouseLamp) lighthouseLamp.enabled = lighthouse.restored;
+    setEntityLightsEnabled(world.arc1Greybox.lighthouseBeacon, lighthouse.restored);
+    world.arc1Greybox.lighthouseSignal.enabled = lighthouse.restored;
+  }
+
   // Proximity Interactables
   interface Interactable {
     id: string;
@@ -404,7 +547,10 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   function getActiveInteractables(): Interactable[] {
     const list: Interactable[] = [];
     const inWorkshop = playerPos.x < -40;
-    const inManantial = playerPos.z > 14 && playerPos.x > -40;
+    const inCastle = playerPos.x > 40 && playerPos.x < 90;
+    const inForgeTerraces = playerPos.x > 100 && playerPos.x < 150;
+    const inLighthouse = playerPos.x > 160;
+    const inManantial = playerPos.z > 12 && playerPos.x > -20 && playerPos.x < 20;
 
     if (inWorkshop) {
       // Inside Lumen's Workshop Interior
@@ -425,6 +571,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         action: () => {
           teleportPlayer(-7.0, 1.68, -4.0, 90);
           zones.deactivate('workshop');
+          arc1State = enterArc1Region(arc1State, 'taller');
           storyStep = 'returned_to_plaza';
           ui.showNotification('Saliste a la Plaza Central de Ohmdal.');
         },
@@ -441,36 +588,314 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           ui.setWorkbenchView(true, workbench, handleWorkbenchAction);
         },
       });
-    } else if (inManantial) {
-      // Sendero del Manantial & Mountain Hydroelectric
+    } else if (inLighthouse) {
       list.push({
-        id: 'manantial_survey_point',
-        label: 'Examinar Monolito de Cota y Caída de Agua',
-        pos: new pc.Vec3(0, 1.2, 17.5),
-        radius: 3.5,
+        id: 'lighthouse_bus_measure',
+        label: 'Medir alimentación DC del Faro',
+        pos: new pc.Vec3(180, 1.1, -8),
+        radius: 2.2,
         action: () => {
-          startDialogue('manantial_overlook_dialog');
+          arc1State = measureLighthouse(arc1State);
+          const evaluation = evaluateLighthouse(arc1State);
+          showArc1Measurement('Faro · barra DC', evaluation.sourceVoltage, evaluation.sourceCurrent, 'medición registrada');
         },
       });
       list.push({
-        id: 'manantial_turbine_housing',
-        label: 'Diagnosticar Turbina Hidroeléctrica (Generador)',
-        pos: new pc.Vec3(0, 2.0, 21.5),
-        radius: 4.2,
+        id: 'lighthouse_calibration_panel',
+        label: arc1State.lighthouse.protectiveTrip ? 'Rearmar protección del Faro' : 'Calibrar referencia DC del Faro',
+        pos: new pc.Vec3(180, 1.2, 0),
+        radius: 2.4,
         action: () => {
-          bitacora.unlock('analogia_potencial');
-          ui.showNotification('Generador Hidroeléctrico: Caída Δh=18m → Presión ΔP=176 kPa → Tensión inducida ΔV=24.0V.');
+          if (arc1State.lighthouse.protectiveTrip) {
+            arc1State = repairLighthouse(arc1State);
+            ui.showNotification('Protección del Faro rearmada; la evidencia de la falla se conserva.');
+          } else {
+            arc1State = calibrateLighthouse(arc1State, { voltageTrim: 0, phaseOffset: 0 });
+            ui.showNotification('Referencia DC alineada con la red restaurada.');
+          }
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'lighthouse_beacon_control',
+        label: arc1State.lighthouse.energized ? 'Registrar pulso de sincronización' : 'Energizar baliza calibrada',
+        pos: new pc.Vec3(180, 1.25, 8),
+        radius: 2.8,
+        action: () => {
+          arc1State = arc1State.lighthouse.energized
+            ? synchronizeLighthouse(arc1State)
+            : energizeLighthouse(arc1State);
+          const evaluation = evaluateLighthouse(arc1State);
+          ui.showNotification(arc1State.lighthouse.protectiveTrip
+            ? 'La protección actuó: medí y calibrá antes de sincronizar.'
+            : `Sincronización observada: ${arc1State.lighthouse.synchronizationSamples}/2.`);
+          if (evaluation.restored) storyStep = 'lighthouse_restored';
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'lighthouse_return_marker',
+        label: isLighthouseRestored(arc1State) ? 'Iniciar regreso por la red restaurada' : 'Registrar calibración validada',
+        pos: new pc.Vec3(180, 1.0, 14),
+        radius: 2.4,
+        action: () => {
+          if (!isLighthouseRestored(arc1State)) {
+            arc1State = documentLighthouse(arc1State);
+            if (!isLighthouseRestored(arc1State)) {
+              ui.showNotification('Falta observar dos sincronizaciones estables antes de registrar el Faro.');
+              return;
+            }
+          }
+          arc1State = enterArc1Region(arc1State, 'retorno');
+          zones.deactivate('lighthouse');
+          void zones.activate('forge-terraces');
+          teleportPlayer(120, 1.68, 24, 180);
+          storyStep = 'returning';
+          ui.showNotification('Regresá por Terrazas, Castillo y Plaza; los estados restaurados persisten.');
+        },
+      });
+    } else if (inForgeTerraces) {
+      list.push({
+        id: 'forge_bus_measure',
+        label: 'Medir potencia asignada en la barra compartida',
+        pos: new pc.Vec3(120, 1.1, -8),
+        radius: 2.0,
+        action: () => {
+          arc1State = measureForgeTerraces(arc1State);
+          const evaluation = evaluateForgeTerraces(arc1State);
+          showArc1Measurement('Forja/Terrazas', 24, evaluation.allocatedCurrent, `${evaluation.totalPower.toFixed(0)} W`);
+        },
+      });
+      list.push({
+        id: 'forge_heater_allocation',
+        label: 'Priorizar Forja sin cortar riego',
+        pos: new pc.Vec3(124.2, 1.2, -8),
+        radius: 2.3,
+        action: () => {
+          arc1State = setForgeTerracesPriority(arc1State, 'forge-priority');
+          ui.showNotification('Asignación física: Forja 5 A · Terrazas 3 A.');
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'forge_distribution_panel',
+        label: arc1State.forgeTerraces.protectiveTrip ? 'Rearmar protección de Forja/Terrazas' : 'Configurar conductor, protecciones y energizar',
+        pos: new pc.Vec3(120, 1.2, 0),
+        radius: 2.5,
+        action: () => {
+          if (arc1State.forgeTerraces.protectiveTrip) {
+            arc1State = repairForgeTerraces(arc1State);
+            ui.showNotification('Protecciones rearmadas; ajustá la asignación antes de energizar.');
+          } else if (arc1State.forgeTerraces.conductor === 'narrow') {
+            arc1State = setForgeTerracesConductor(arc1State, 'medium');
+            arc1State = setForgeTerracesProtection(arc1State, 'forge', arc1State.forgeTerraces.allocation.forge);
+            arc1State = setForgeTerracesProtection(arc1State, 'terraces', arc1State.forgeTerraces.allocation.terraces);
+            ui.showNotification('Conductor medio y protecciones ajustadas a las cargas físicas.');
+          } else {
+            arc1State = energizeForgeTerraces(arc1State);
+            ui.showNotification(arc1State.forgeTerraces.protectiveTrip
+              ? 'La protección actuó: revisá carga, conductor y medición.'
+              : 'Forja y riego reciben energía dentro del límite.');
+          }
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'terraces_pump_control',
+        label: arc1State.forgeTerraces.energized ? 'Registrar el trade-off observado' : 'Priorizar Terrazas sin apagar la Forja',
+        pos: new pc.Vec3(120, 1.2, 16),
+        radius: 2.7,
+        action: () => {
+          if (!arc1State.visitedRegions.includes('terrazas')) arc1State = enterArc1Region(arc1State, 'terrazas');
+          if (arc1State.forgeTerraces.energized) {
+            arc1State = documentForgeTerraces(arc1State);
+            if (isForgeTerracesRestored(arc1State)) storyStep = 'forge_terraces_restored';
+          } else {
+            arc1State = setForgeTerracesPriority(arc1State, 'terraces-priority');
+          }
+          ui.showNotification(isForgeTerracesRestored(arc1State)
+            ? 'Trade-off documentado: ambas cargas operan dentro de límites.'
+            : 'Asignación física: Forja 3 A · Terrazas 5 A.');
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'terraces_exit',
+        label: arc1State.currentRegion === 'retorno' ? 'Regresar al Castillo restaurado' : 'Continuar hacia el Faro',
+        pos: new pc.Vec3(120, 1.2, 24),
+        radius: 2.6,
+        action: () => {
+          if (arc1State.currentRegion === 'retorno') {
+            zones.deactivate('forge-terraces');
+            void zones.activate('castle');
+            teleportPlayer(60, 1.68, 8, 180);
+            return;
+          }
+          if (!isForgeTerracesRestored(arc1State) || !arc1State.visitedRegions.includes('terrazas')) {
+            ui.showNotification('Forja y Terrazas deben quedar estables y documentadas antes del Faro.');
+            return;
+          }
+          arc1State = enterArc1Region(arc1State, 'faro');
+          zones.deactivate('forge-terraces');
+          void zones.activate('lighthouse');
+          teleportPlayer(180, 1.68, -8, 0);
+          storyStep = 'inside_lighthouse';
+        },
+      });
+    } else if (inCastle) {
+      list.push({
+        id: 'castle_bus_measure',
+        label: 'Medir la barra de distribución',
+        pos: new pc.Vec3(60, 1.1, -8),
+        radius: 2.2,
+        action: () => {
+          arc1State = measureCastleNetwork(arc1State);
+          const evaluation = evaluateCastleNetwork(arc1State);
+          showArc1Measurement('Castillo · barra', 24, evaluation.totalCurrent, evaluation.topology);
+        },
+      });
+      list.push({
+        id: 'castle_parallel_layout',
+        label: 'Conectar tres servicios en paralelo',
+        pos: new pc.Vec3(53.8, 1.15, 0),
+        radius: 2.4,
+        action: () => {
+          arc1State = configureCastleNetwork(arc1State, CASTLE_PARALLEL_CONFIGURATION);
+          ui.showNotification('Topología paralela: tres servicios, aislamiento local disponible.');
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'castle_mixed_layout',
+        label: 'Conectar red mixta con servicio secundario',
+        pos: new pc.Vec3(60, 1.15, 5.8),
+        radius: 1.5,
+        action: () => {
+          arc1State = configureCastleNetwork(arc1State, CASTLE_MIXED_CONFIGURATION);
+          ui.showNotification('Topología mixta: servicio secundario acoplado con coste de mantenimiento.');
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'castle_distribution_panel',
+        label: arc1State.castle.protectiveTrip ? 'Rearmar protección del Castillo' : 'Energizar configuración medida',
+        pos: new pc.Vec3(60, 1.1, 0),
+        radius: 2.2,
+        action: () => {
+          arc1State = arc1State.castle.protectiveTrip
+            ? repairCastleNetwork(arc1State)
+            : energizeCastleNetwork(arc1State);
+          ui.showNotification(arc1State.castle.protectiveTrip
+            ? 'La protección actuó: la configuración no cumple condiciones.'
+            : arc1State.castle.energized ? 'Distribución energizada; verificá y documentá.' : 'Protección rearmada.');
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'castle_document_station',
+        label: 'Registrar esquema medido para mantenimiento',
+        pos: new pc.Vec3(66.2, 1.15, 0),
+        radius: 2.4,
+        action: () => {
+          arc1State = documentCastleNetwork(arc1State);
+          if (isCastleRestored(arc1State)) storyStep = 'castle_restored';
+          ui.showNotification(isCastleRestored(arc1State)
+            ? 'Esquema publicado: el Castillo puede aislar y mantener sus ramas.'
+            : 'Medí y energizá una configuración válida antes de documentarla.');
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'castle_exit_gate',
+        label: arc1State.currentRegion === 'retorno' ? 'Regresar a la Plaza restaurada' : 'Continuar hacia Forja y Terrazas',
+        pos: new pc.Vec3(60, 1.2, 8),
+        radius: 2.6,
+        action: () => {
+          if (arc1State.currentRegion === 'retorno') {
+            zones.deactivate('castle');
+            void zones.activate('plaza');
+            teleportPlayer(0, 1.68, 9.2, 180);
+            ui.showNotification('Volviste a la Plaza por la red restaurada.');
+            return;
+          }
+          if (!isCastleRestored(arc1State)) {
+            ui.showNotification('La distribución debe quedar medida, energizada y documentada.');
+            return;
+          }
+          arc1State = enterArc1Region(arc1State, 'forja');
+          zones.deactivate('castle');
+          void zones.activate('forge-terraces');
+          teleportPlayer(120, 1.68, -16, 0);
+          storyStep = 'inside_forge_terraces';
+        },
+      });
+    } else if (inManantial) {
+      list.push({
+        id: 'manantial_survey_point',
+        label: 'Medir salida del generador con el Galvanoscopio',
+        pos: new pc.Vec3(0, 1.2, 17.5),
+        radius: 1.7,
+        action: () => {
+          arc1State = measureManantial(arc1State, isManantialRestored(arc1State) ? 'load' : 'generator');
+          const evaluation = evaluateManantial(arc1State);
+          showArc1Measurement('Manantial · generador', evaluation.generatorVoltage, evaluation.usefulOutput / 24, evaluation.continuity ? 'retorno continuo' : 'retorno abierto');
+          if (isManantialRestored(arc1State)) storyStep = 'manantial_restored';
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'manantial_intake_gate',
+        label: 'Abrir compuerta de admisión hidráulica',
+        pos: new pc.Vec3(-4.2, 1.35, 18.4),
+        radius: 1.8,
+        action: () => {
+          arc1State = setManantialGate(arc1State, true);
+          ui.showNotification('La compuerta abre: el agua mueve la turbina, pero la salida aún depende del retorno.');
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'manantial_exciter_bridge',
+        label: arc1State.manantial.protectiveTrip ? 'Rearmar protección y revisar retorno' : 'Restablecer continuidad del excitador',
+        pos: new pc.Vec3(4.2, 1.35, 18.4),
+        radius: 1.8,
+        action: () => {
+          const before = arc1State;
+          arc1State = repairManantial(arc1State);
+          ui.showNotification(before === arc1State
+            ? 'Primero medí la salida para localizar la discontinuidad.'
+            : 'Retorno del excitador reparado; la protección quedó rearmada.');
+          updateArc1WorldVisuals();
+        },
+      });
+      list.push({
+        id: 'manantial_output_breaker',
+        label: 'Energizar salida hidroeléctrica',
+        pos: new pc.Vec3(2.2, 1.35, 16),
+        radius: 1.5,
+        action: () => {
+          arc1State = energizeManantial(arc1State);
+          ui.showNotification(arc1State.manantial.protectiveTrip
+            ? 'La protección actuó: falta caudal, continuidad o una medición previa.'
+            : 'El generador entrega energía; verificá la salida con una segunda medición.');
+          updateArc1WorldVisuals();
         },
       });
       list.push({
         id: 'gate_return_to_plaza',
-        label: 'Regresar a la Plaza de Ohmdal (Sur)',
+        label: 'Regresar a la Plaza con la central restaurada',
         pos: new pc.Vec3(0, 1.68, 13.0),
-        radius: 3.2,
+        radius: 2.2,
         action: () => {
+          if (!isManantialRestored(arc1State)) {
+            ui.showNotification('La Plaza todavía no recibe salida útil verificada.');
+            return;
+          }
+          arc1State = enterArc1Region(arc1State, 'plaza');
           teleportPlayer(0, 1.68, 9.2, 180);
           zones.deactivate('manantial');
-          ui.showNotification('Regresaste a la Plaza Central.');
+          storyStep = 'restored_plaza';
+          ui.showNotification('La energía vuelve a la Plaza; la Campana puede accionar la apertura del Castillo.');
         },
       });
     } else {
@@ -499,7 +924,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         pos: new pc.Vec3(0, 1.0, -2.0),
         radius: 3.6,
         action: () => {
-          if (!isOhmAwake) {
+          if (arc1State.currentRegion === 'retorno' && isLighthouseRestored(arc1State)) {
+            arc1State = enterArc1Region(arc1State, 'portal');
+            storyStep = 'arc1_complete';
+            ui.showNotification(isArcComplete(arc1State)
+              ? 'Arco I greybox completo. TODO(guion): cierre final y transferencia.'
+              : 'El retorno aún no refleja todas las intervenciones del Arco I.');
+          } else if (!isOhmAwake) {
             triggerOhmAwakening();
           } else {
             startDialogue('ohm_awakening_event');
@@ -514,6 +945,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 3.0,
         action: () => {
           void zones.activate('workshop').then(() => {
+            arc1State = enterArc1Region(arc1State, 'taller');
             teleportPlayer(-60, 1.68, -3.8, 0);
             storyStep = 'inside_workshop';
             bitacora.unlock('taller_lumen', 'investigating');
@@ -533,9 +965,17 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           workbench.toggleKnifeSwitch();
           circuit.branches.b_ida_rele.state = 'closed';
           circuit = solveCircuit(circuit);
-          updateCircuitStateVisuals();
+          if (isManantialRestored(arc1State)) {
+            arc1State = pullCampana(arc1State);
+            arc1State = openCastleGate(arc1State);
+            updateArc1WorldVisuals();
+          } else {
+            updateCircuitStateVisuals();
+          }
           bitacora.unlock('lengueta_edda');
-          ui.showNotification('¡La campana resonó! El relé de enclavamiento cerró su circuito.');
+          ui.showNotification(isManantialRestored(arc1State)
+            ? 'La Campana cerró el relé alimentado por Manantial; la ruta al Castillo está abierta.'
+            : '¡La campana resonó! El relé de enclavamiento cerró su circuito.');
         },
       });
 
@@ -607,6 +1047,28 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         },
       });
 
+      if (arc1State.returnedToPlaza) {
+        list.push({
+          id: 'castle_route',
+          label: getArc1Progress(arc1State).castleGateOpen
+            ? 'Cruzar la apertura hacia el Castillo de la Red'
+            : 'Examinar la ruta cerrada del Castillo',
+          pos: new pc.Vec3(0, 1.2, 9.2),
+          radius: 2.0,
+          action: () => {
+            if (!getArc1Progress(arc1State).castleGateOpen) {
+              ui.showNotification('La apertura depende de Manantial restaurado y de la Campana física.');
+              return;
+            }
+            arc1State = enterArc1Region(arc1State, 'castillo');
+            zones.deactivate('plaza');
+            void zones.activate('castle');
+            teleportPlayer(60, 1.68, -8, 0);
+            storyStep = 'inside_castle';
+          },
+        });
+      }
+
       list.push({
         id: 'puerta_ohm',
         label: circuit.gateOpen
@@ -617,6 +1079,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         action: () => {
           if (circuit.gateOpen) {
             void zones.activate('manantial');
+            arc1State = enterArc1Region(arc1State, 'manantial');
             teleportPlayer(0, 1.68, 16.0, 0);
             storyStep = 'inside_manantial';
             bitacora.unlock('manantial_central_hidraulica', 'investigating');
@@ -898,6 +1361,15 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     needleTarget = 60 - vFraction * 120;
     if (!visualPaused && !reducedMotion) currentNeedleAngle += (needleTarget - currentNeedleAngle) * dt * 12.0;
     world.viewmodelNeedle.setLocalEulerAngles(0, 0, currentNeedleAngle);
+
+    if (!visualPaused && !reducedMotion) {
+      if (arc1State.manantial.gateOpen) world.turbineRotor.rotateLocal(0, 0, dt * 150);
+      if (isForgeTerracesRestored(arc1State)) {
+        const pumpWheel = world.arc1Greybox.terracesPump.findByName('TerracesPumpWheel') as pc.Entity | null;
+        pumpWheel?.rotateLocal(0, 0, dt * 110);
+      }
+      if (isLighthouseRestored(arc1State)) world.arc1Greybox.lighthouseSignal.rotateLocal(0, dt * 22, 0);
+    }
 
     // 3. Prompt detection
     const camPos = world.playerEntity.getPosition();
