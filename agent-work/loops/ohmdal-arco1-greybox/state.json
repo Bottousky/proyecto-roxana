@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "loopId": "ohmdal-arco1-greybox",
+  "branch": "explore/ohmdal-3D",
+  "status": "ready",
+  "currentStage": "g1-manantial-central-greybox",
+  "iteration": 0,
+  "maxIterationsPerStage": 3,
+  "maxFixesPerIteration": 5,
+  "maxStructuralFixesPerIteration": 1,
+  "maxConcurrentLunaWorkers": 2,
+  "maxConcurrentMiniMaxWorkers": 1,
+  "routing": {
+    "reviewer": {
+      "harness": "antigravity-cli",
+      "model": "gemini-3.7-flash-high",
+      "effort": "high",
+      "fallback": "nearest-available-gemini-flash-high-only"
+    },
+    "decision": {
+      "harness": "codex",
+      "modelAlias": "Sol",
+      "effort": "high"
+    },
+    "mechanicalWorker": {
+      "harness": "codex-subagent",
+      "modelAlias": "Luna",
+      "effort": "max",
+      "fallback": "report-routing-fallback-no-custom-wrapper"
+    },
+    "experimentalWorker": {
+      "harness": "gmi-api-sidecar",
+      "model": "MiniMaxAI/MiniMax-M3",
+      "mode": "proposal-only",
+      "runner": "scripts/agents/run-gmi-minimax.mjs",
+      "fallback": "continue-with-sol-luna-no-human-gate"
+    }
+  },
+  "limits": {
+    "allowPaidGenerativeWithoutHumanGate": false,
+    "allowEngineChange": false,
+    "allowCanonChange": false,
+    "allowLargeDependencyChange": false,
+    "allowNewAgentFramework": false
+  },
+  "baseline": {
+    "technicalCommit": "dec2d75abc0adbcddb37988b3955cef4950513f3",
+    "plazaVisualCommit": "325e11afac8944efef16411c88628974ff9e8d38",
+    "hardeningReport": "agent-work/reports/ohmdal-3d-production-hardening.md",
+    "plazaState": "agent-work/loops/ohmdal-plaza/state.json"
+  },
+  "queue": [
+    {
+      "id": "g0-hardened-baseline",
+      "status": "passed"
+    },
+    {
+      "id": "g1-manantial-central-greybox",
+      "status": "ready"
+    },
+    {
+      "id": "g2-plaza-restoration-bell-castle-open",
+      "status": "queued"
+    },
+    {
+      "id": "g3-castle-network-greybox",
+      "status": "queued"
+    },
+    {
+      "id": "g4-forge-terraces-greybox",
+      "status": "queued"
+    },
+    {
+      "id": "g5-lighthouse-lake-greybox",
+      "status": "queued"
+    },
+    {
+      "id": "g6-return-arc-close-greybox",
+      "status": "queued"
+    },
+    {
+      "id": "g7-end-to-end-golden-path",
+      "status": "queued"
+    }
+  ],
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-3d-production-hardening-final.md",
+  "lastCaptureManifest": "output/playwright/ohmdal-hardening/final/capture-manifest.json",
+  "humanGate": null,
+  "notes": [
+    "This loop targets a complete playable Arco I greybox, not final art.",
+    "The accepted Plaza loop remains complete and is not reopened by this mission.",
+    "MiniMax M3 through GMI is experimental and proposal-only; Sol is the sole integrator.",
+    "MiniMax unavailability never blocks the loop; continue with Sol/Luna/Gemini.",
+    "Direct-world interaction is preferred; diegetic maintenance close-ups are allowed for precision/density and must use the same electrical model.",
+    "Faro RC/time content is not invented: if the content contract is not sufficiently ratified, use the explicitly allowed DC culmination seam and document the future upgrade point.",
+    "Missing final dialogue uses TODO(guion) and neutral placeholders rather than inventing lore.",
+    "No Meshy/Tripo spend without a new HUMAN_GATE or explicit authorization."
+  ]
+}

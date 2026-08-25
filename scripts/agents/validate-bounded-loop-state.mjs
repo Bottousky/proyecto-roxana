@@ -50,6 +50,12 @@ for (const [key, max] of [
   }
 }
 
+if (state.maxConcurrentMiniMaxWorkers != null) {
+  if (!Number.isInteger(state.maxConcurrentMiniMaxWorkers) || state.maxConcurrentMiniMaxWorkers !== 1) {
+    fail('maxConcurrentMiniMaxWorkers must be exactly 1 when present');
+  }
+}
+
 if (!Number.isInteger(state.iteration) || state.iteration < 0 || state.iteration > state.maxIterationsPerStage) {
   fail('iteration is outside bounded range');
 }
@@ -73,6 +79,16 @@ if (!decision || decision.harness !== 'codex' || decision.modelAlias !== 'Sol' |
 const worker = state.routing?.mechanicalWorker;
 if (!worker || worker.harness !== 'codex-subagent' || worker.modelAlias !== 'Luna' || worker.effort !== 'max') {
   fail('mechanical worker routing must be Codex subagent / Luna / max');
+}
+
+const experimentalWorker = state.routing?.experimentalWorker;
+if (experimentalWorker) {
+  if (experimentalWorker.harness !== 'gmi-api-sidecar') fail('experimental worker harness must be gmi-api-sidecar');
+  if (!String(experimentalWorker.model || '').toLowerCase().includes('minimax')) fail('experimental worker must be MiniMax family');
+  if (experimentalWorker.mode !== 'proposal-only') fail('experimental worker must remain proposal-only');
+  if (!String(experimentalWorker.fallback || '').includes('no-human-gate')) {
+    fail('experimental worker fallback must not create a HUMAN_GATE');
+  }
 }
 
 const limits = state.limits || {};
@@ -100,3 +116,4 @@ if (state.status !== 'human_gate' && state.humanGate != null) fail('humanGate mu
 
 console.log(`BOUNDED_LOOP_STATE PASS: ${state.loopId} stage=${state.currentStage} iteration=${state.iteration}/${state.maxIterationsPerStage}`);
 console.log(`reviewer=${reviewer.model} decision=${decision.modelAlias}/${decision.effort} worker=${worker.modelAlias}/${worker.effort}`);
+if (experimentalWorker) console.log(`experimental=${experimentalWorker.model}/${experimentalWorker.mode}`);
