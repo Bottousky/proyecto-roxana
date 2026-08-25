@@ -6,6 +6,14 @@ import {
   percentile,
 } from '../src/experiences/ohmdal-playcanvas/visualHarness.ts';
 import { OHM_HERO_TUNING } from '../src/experiences/ohmdal-playcanvas/ohmHeroTuning.ts';
+import {
+  FAST_CAPTURE_CONTRACT,
+  FAST_STAGE_SHOTS,
+  FULL_CAPTURE_CONTRACT,
+  assertRendererDiagnostics,
+  fastLaunchOptions,
+  resolveCaptureViews,
+} from '../scripts/visual/ohmdal-capture-contract.mjs';
 
 describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
   it('expone las ocho cámaras canónicas de la Plaza', () => {
@@ -42,5 +50,34 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     assert.equal(isSoftwareRenderer('ANGLE (Google, Vulkan 1.3 SwiftShader Device)'), true);
     assert.equal(isSoftwareRenderer('NVIDIA GeForce RTX 4070'), false);
     assert.equal(isSoftwareRenderer(null), null);
+  });
+
+  it('mantiene FULL completo y separa FAST como subconjunto de etapa', () => {
+    const full = resolveCaptureViews({ mode: 'full' });
+    const fast = resolveCaptureViews({ mode: 'fast', stage: 'a0-baseline-capture-readiness' });
+    assert.equal(FULL_CAPTURE_CONTRACT.includesMobile, true);
+    assert.equal(FULL_CAPTURE_CONTRACT.includesNoPost, true);
+    assert.equal(FULL_CAPTURE_CONTRACT.includesTouchSmoke, true);
+    assert.equal(full.length, 8);
+    assert.ok(full.some((view) => view.id === 'active-play-mobile'));
+    assert.ok(full.some((view) => view.id === 'no-post'));
+    assert.deepEqual(fast.map((view) => view.id), FAST_STAGE_SHOTS['a0-baseline-capture-readiness']);
+    assert.equal(FAST_CAPTURE_CONTRACT.currentStageOnly, true);
+    assert.equal(FAST_CAPTURE_CONTRACT.includesMobile, false);
+    assert.equal(FAST_CAPTURE_CONTRACT.includesNoPost, false);
+    assert.ok(fast.length < full.length);
+  });
+
+  it('FAST solicita aceleración GPU sin forzar SwiftShader y exige diagnostics', () => {
+    const launch = fastLaunchOptions({ headless: true, platform: 'win32' });
+    assert.equal(launch.headless, true);
+    assert.ok(launch.args.includes('--enable-gpu'));
+    assert.ok(launch.args.includes('--ignore-gpu-blocklist'));
+    assert.ok(launch.args.includes('--use-angle=d3d11'));
+    assert.equal(launch.args.some((arg) => /swiftshader|disable-gpu/i.test(arg)), false);
+    const diagnostics = assertRendererDiagnostics({
+      browser: { renderer: 'NVIDIA GeForce RTX 4070', softwareRendered: false },
+    }, 'test');
+    assert.equal(diagnostics.browser.softwareRendered, false);
   });
 });

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "loopId": "ohmdal-arco1-authored-pass",
   "branch": "explore/ohmdal-3D",
-  "status": "ready",
-  "currentStage": "a0-baseline-capture-readiness",
+  "status": "planning",
+  "currentStage": "a1-reference-planning",
   "iteration": 0,
   "maxIterationsPerStage": 3,
   "maxFixesPerIteration": 5,
@@ -52,8 +52,8 @@
     "plazaState": "agent-work/loops/ohmdal-plaza/state.json"
   },
   "queue": [
-    { "id": "a0-baseline-capture-readiness", "status": "ready" },
-    { "id": "a1-reference-planning", "status": "queued" },
+    { "id": "a0-baseline-capture-readiness", "status": "passed" },
+    { "id": "a1-reference-planning", "status": "active" },
     { "id": "a2-plaza-workshop-authored", "status": "queued" },
     { "id": "a3-manantial-central-authored", "status": "queued" },
     { "id": "a4-castle-authored", "status": "queued" },
@@ -63,7 +63,7 @@
     { "id": "a8-full-authored-golden-path", "status": "queued" }
   ],
   "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-greybox-final.md",
-  "lastCaptureManifest": "output/playwright/ohmdal-hardening/golden-path/golden-path-run.json",
+  "lastCaptureManifest": "output/playwright/ohmdal-arco1-authored/a0-fast-sol-verify/capture-manifest.json",
   "humanGate": null,
   "notes": [
     "This loop consumes the complete playable Arco I greybox and must not redesign it casually.",
@@ -73,6 +73,7 @@
     "World-first electrical interaction remains mandatory; diegetic maintenance close-ups use the same electrical model.",
     "Hero/identity assets require approved reference packs before Blender/Meshy/Tripo work.",
     "No Meshy/Tripo spend without HUMAN_GATE or explicit prior authorization.",
-    "No final dialogue is invented; unresolved prose remains TODO(guion) with neutral placeholders."
+    "No final dialogue is invented; unresolved prose remains TODO(guion) with neutral placeholders.",
+    "A0 passed in iteration 0: frozen baseline ancestry verified; greybox/authored loop, Gemini and GMI lanes passed; Golden Path passed all 22 checkpoints; FAST captured five load-bearing Plaza views on Chrome 151 / Intel UHD D3D11 with softwareRendered=false and zero console/page errors; FULL deterministic semantics remain covered and unchanged."
   ]
 }
