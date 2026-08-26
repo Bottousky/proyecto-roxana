@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_castle_central_distribution_bus_hero_01",
+  "world": "ohmdal",
+  "name": "Landmark de bus central del Castillo de la Red",
+  "mode": "adapt",
+  "status": "approved",
+  "primaryReference": "assets/ohmdal/rooms/pilot-arco1/prop_castle_master_distributor.png",
+  "supportingReferences": [
+    "assets/ohmdal/rooms/pilot-arco1/castle_heart+prop_castle_master_distributor.png",
+    "assets/ohmdal/rooms/pilot-arco1/prop_castle_trunk_distributor.png",
+    "assets/ohmdal/rooms/pilot-arco1/castle_branches+prop_castle_trunk_distributor.png"
+  ],
+  "physicalAnchors": {
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "groundedPivot": true,
+    "assemblyRole": "central distribution bus and branching service landmark",
+    "scaleSource": "accepted greybox runtime before authoring"
+  },
+  "mustPreserve": [
+    "central bus/distribution spine silhouette from the primary reference",
+    "branching galleries remain physically connected to the central distribution path",
+    "isolators, protections and seals/lockouts remain anchored to real service branches",
+    "service indicators stay attached to the branch they describe",
+    "maintenance balcony/panel relationship to the distribution landmark",
+    "one source feeding several services remains legible at world scale",
+    "branch isolation remains physically readable without detaching the puzzle from the world model",
+    "pale masonry, orderly copper busbars, ceramic standoff insulators and dark technical switchgear hierarchy"
+  ],
+  "mayResolve": [
+    "hidden rear fasteners, busbar supports and cable routing not defined by the references",
+    "maintenance-side construction that preserves the visible silhouette and branch topology",
+    "exact branch spacing and panel detail where the accepted greybox and electrical model leave room",
+    "runtime mesh segmentation, material slots and pivot hierarchy",
+    "exact dimensions after measurement against the accepted greybox runtime"
+  ],
+  "forbidden": [
+    "generic medieval throne-room redesign",
+    "glowing schematic wall or detached puzzle board",
+    "ornamental cables with no electrical or mechanical function",
+    "passive neon, emissive copper or decorative glow as network state",
+    "invented symbols, lore or electrical behavior",
+    "redesign of validated topology, branch consequences or protection behavior",
+    "free text-to-3D redesign that departs from the primary distribution reference",
+    "Meshy or Tripo use without the required HUMAN_GATE"
+  ],
+  "authoring": {
+    "preferredRoute": "blender-deterministic-first",
+    "buildScript": null,
+    "canonicalGlb": null,
+    "generativeProviderRequired": false
+  },
+  "approvalNote": "Approved for the adapt reference-pack gate only. This pack records repo-native visual anchors and does not auto-approve the final hero design, modeling, provider use or canonical GLB; final modeling remains blocked until Sol verifies the reference comparison and runtime constraints.",
+  "referenceAudit": {
+    "searchedScopes": [
+      "assets/ohmdal/rooms/pilot-arco1",
+      "output/playwright/ohmdal-hardening/golden-path"
+    ],
+    "primaryRationale": "prop_castle_master_distributor.png is the repo-native reference that most directly defines the central distribution landmark silhouette; the remaining references provide the monumental room context and trunk/branch routing cues.",
+    "contextOnly": [
+      "assets/ohmdal/rooms/pilot-arco1/castle_heart+prop_castle_master_distributor.png",
+      "assets/ohmdal/rooms/pilot-arco1/prop_castle_trunk_distributor.png",
+      "assets/ohmdal/rooms/pilot-arco1/castle_branches+prop_castle_trunk_distributor.png"
+    ]
+  },
+  "evidence": {
+    "stageReport": null,
+    "preview": null
+  }
+}

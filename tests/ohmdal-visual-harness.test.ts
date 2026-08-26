@@ -104,7 +104,7 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
   it('define el FAST A3 de Manantial con anchors métricos y estado eléctrico explícito', () => {
     const authoredNames = [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES];
     const fast = resolveCaptureViews({ mode: 'fast', stage: 'a3-manantial-central-authored' });
-    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(3));
+    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(3, 8));
 
     const approach = getCaptureShotSpec('manantial-approach');
     assert.equal(approach.runtimeHook, 'setCaptureShot');
@@ -135,6 +135,48 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     assert.equal(restored.world.storyStep, 'manantial_restored');
     assert.equal(restored.world.manantial.restored, true);
     assert.equal(restored.world.manantial.protectiveTrip, false);
+    for (const shot of fast) assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
+  });
+
+  it('define el FAST A4 de Castillo con seam de Plaza y metadata de red determinista', () => {
+    const authoredNames = [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES];
+    const fast = resolveCaptureViews({ mode: 'fast', stage: 'a4-castle-authored' });
+    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(8));
+    assert.equal(fast.length, 4);
+
+    const restoredPlaza = getCaptureShotSpec('restored-plaza-wide');
+    assert.equal(restoredPlaza.runtimeHook, 'setCaptureShot');
+    assert.deepEqual(restoredPlaza.anchor.position, [0, 11.5, -13.2]);
+    assert.equal(restoredPlaza.world.zone, 'plaza');
+    assert.equal(restoredPlaza.world.storyStep, 'restored_plaza');
+    assert.equal(restoredPlaza.world.plaza.bellPulls, 0);
+    assert.equal(restoredPlaza.world.plaza.castleGateOpened, false);
+    assert.equal(restoredPlaza.world.manantial.restored, true);
+
+    const bell = getCaptureShotSpec('bell-activation');
+    assert.deepEqual(bell.anchor.position, [-9, 2.6, 0]);
+    assert.equal(bell.anchor.yaw, 238);
+    assert.equal(bell.world.interaction, 'bell');
+    assert.equal(bell.world.plaza.bellPulls, 1);
+    assert.equal(bell.world.plaza.castleGateOpened, true);
+
+    const gate = getCaptureShotSpec('castle-gate-open');
+    assert.deepEqual(gate.anchor.position, [55, 4, -17]);
+    assert.equal(gate.world.zone, 'castle');
+    assert.equal(gate.world.storyStep, 'inside_castle');
+    assert.equal(gate.anchor.yaw, 222);
+    assert.equal(gate.world.plaza.castleGateOpened, true);
+    assert.equal(gate.world.manantial.restored, true);
+    assert.equal(gate.world.castle.topology, 'unwired');
+
+    const hall = getCaptureShotSpec('castle-distribution-hall');
+    assert.deepEqual(hall.anchor.position, [51.5, 6, -10]);
+    assert.equal(hall.world.zone, 'castle');
+    assert.equal(hall.world.probeTarget, 'castle_bus_in');
+    assert.equal(hall.world.plaza.castleGateOpened, true);
+    assert.equal(hall.world.manantial.restored, true);
+    assert.equal(hall.world.castle.returnContinuity, false);
+    assert.equal(hall.world.castle.protectiveTrip, false);
     for (const shot of fast) assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
   });
 

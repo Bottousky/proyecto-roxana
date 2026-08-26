@@ -22,6 +22,10 @@ export interface Arc1GreyboxElements {
   roots: Record<Arc1GreyboxZoneId, pc.Entity>;
   castleServiceLights: pc.Entity[];
   castleGate: pc.Entity;
+  castleBranchIsolators: pc.Entity[];
+  castleTripPin: pc.Entity;
+  castleReturnLink: pc.Entity;
+  castleEntranceGateRail: pc.Entity;
   forgeHeater: pc.Entity;
   terracesPump: pc.Entity;
   forgeProtectionLight: pc.Entity;
@@ -155,6 +159,9 @@ export function buildArc1Greybox({
   castleRoot.enabled = false;
   app.root.addChild(castleRoot);
 
+  const castleAuthoredRoot = new pc.Entity('CastleAuthoredSupportRoot');
+  castleRoot.addChild(castleAuthoredRoot);
+
   addBox(castleRoot, 'CastlePatioFloor', stone, [0, -0.12, 0], [28, 0.24, 30]);
   addBox(castleRoot, 'CastleWalkway', stoneDark, [0, 0.02, 0], [4.2, 0.08, 23]);
   addConductor(castleRoot, 'CastleMainBus', [0, 0.11, -0.2], [0.28, 0.12, 23], copper);
@@ -164,7 +171,8 @@ export function buildArc1Greybox({
 
   addWall(castleRoot, 'CastleWallWest', stoneDark, [-14, 2, 0], [0.5, 4, 30]);
   addWall(castleRoot, 'CastleWallEast', stoneDark, [14, 2, 0], [0.5, 4, 30]);
-  addWall(castleRoot, 'CastleWallSouth', stoneDark, [0, 2, -15], [28, 4, 0.5]);
+  addWall(castleRoot, 'CastleWallSouthWest', stoneDark, [-9.25, 2, -15], [9.5, 4, 0.5]);
+  addWall(castleRoot, 'CastleWallSouthEast', stoneDark, [9.25, 2, -15], [9.5, 4, 0.5]);
   addWall(castleRoot, 'CastleWallNorth', stoneDark, [0, 2, 15], [28, 4, 0.5]);
 
   const castlePanel = new pc.Entity('CastleDistributionPanel');
@@ -174,10 +182,49 @@ export function buildArc1Greybox({
   addBox(castlePanel, 'CastlePanelFace', brass, [0, 1.05, -0.66], [2.5, 1.2, 0.12]);
   addCylinder(castlePanel, 'CastlePanelBusKnob', copper, [0, 1.05, -0.85], [0.28, 0.16, 0.28]);
   addConductor(castlePanel, 'CastlePanelInput', [0, 0.24, -1.5], [0.22, 0.08, 1.6], copper);
+  const castleTripPin = addCylinder(castlePanel, 'CastlePanelTripPin', copper, [0.72, 1.12, -0.85], [0.14, 0.12, 0.14]);
+  const castleReturnLink = addBox(castlePanel, 'CastlePanelReturnLink', copper, [-0.72, 0.72, -0.85], [0.18, 0.72, 0.12]);
 
   addDistributionLoad(castleRoot, 'CastleServiceLoadA', [-6.2, 0, 0], copper);
   addDistributionLoad(castleRoot, 'CastleServiceLoadB', [6.2, 0, 0], brass);
   addDistributionLoad(castleRoot, 'CastleServiceLoadC', [0, 0, 5.8], copper);
+
+  // A4 support authoring turns the patio into a civic distribution hall while
+  // preserving the accepted open floor and all interaction coordinates.
+  for (const z of [-10, 0, 10]) {
+    addBox(castleAuthoredRoot, `CastlePillarWest${z}`, stone, [-10.5, 3.5, z], [1.6, 7, 1.6]);
+    addBox(castleAuthoredRoot, `CastlePillarEast${z}`, stone, [10.5, 3.5, z], [1.6, 7, 1.6]);
+    addBox(castleAuthoredRoot, `CastleHallLintel${z}`, stone, [0, 7.0, z], [22.6, 1.0, 1.4]);
+  }
+  addBox(castleAuthoredRoot, 'CastleMaintenanceBalconyWest', stone, [-9.1, 2.35, 0], [2.0, 0.35, 23]);
+  addBox(castleAuthoredRoot, 'CastleMaintenanceBalconyEast', stone, [9.1, 2.35, 0], [2.0, 0.35, 23]);
+  addBox(castleAuthoredRoot, 'CastleBalconyRailWest', brass, [-8.0, 3.15, 0], [0.18, 1.35, 22]);
+  addBox(castleAuthoredRoot, 'CastleBalconyRailEast', brass, [8.0, 3.15, 0], [0.18, 1.35, 22]);
+
+  addBox(castleAuthoredRoot, 'CastleRaisedMainBus', copper, [0, 5.25, 0], [0.42, 0.28, 22]);
+  addBox(castleAuthoredRoot, 'CastleRaisedBranchA', copper, [-4.3, 5.25, 0], [8.6, 0.28, 0.34]);
+  addBox(castleAuthoredRoot, 'CastleRaisedBranchB', copper, [4.3, 5.25, 0], [8.6, 0.28, 0.34]);
+  addBox(castleAuthoredRoot, 'CastleRaisedBranchC', copper, [0, 5.25, 5.2], [0.34, 0.28, 10.4]);
+  const insulatorPositions: Array<[number, number, number]> = [
+    [-8.0, 4.35, 0], [-3.0, 4.35, 0], [3.0, 4.35, 0], [8.0, 4.35, 0],
+    [0, 4.35, -8], [0, 4.35, 5.5], [0, 4.35, 9.5],
+  ];
+  insulatorPositions.forEach((position, index) => {
+    addCylinder(castleAuthoredRoot, `CastleBusInsulator${index + 1}`, stone, position, [0.42, 1.45, 0.42]);
+  });
+
+  const castleBranchIsolators = [
+    addBox(castleRoot, 'CastleBranchIsolatorA', copper, [-5.0, 1.35, 0], [2.2, 0.16, 0.22]),
+    addBox(castleRoot, 'CastleBranchIsolatorB', copper, [5.0, 1.35, 0], [2.2, 0.16, 0.22]),
+    addBox(castleRoot, 'CastleBranchIsolatorC', copper, [0, 1.35, 5.0], [0.22, 0.16, 2.2]),
+  ];
+  addBox(castleAuthoredRoot, 'CastleServiceBayWest', stoneDark, [-9.0, 1.5, 0], [2.3, 3.0, 4.2]);
+  addBox(castleAuthoredRoot, 'CastleServiceBayEast', stoneDark, [9.0, 1.5, 0], [2.3, 3.0, 4.2]);
+  addBox(castleAuthoredRoot, 'CastleServiceBayNorth', stoneDark, [0, 1.5, 10.5], [4.2, 3.0, 2.3]);
+  addBox(castleAuthoredRoot, 'CastleEntrancePostWest', stone, [-4.2, 3.0, -11.5], [1.0, 6.0, 1.0]);
+  addBox(castleAuthoredRoot, 'CastleEntrancePostEast', stone, [4.2, 3.0, -11.5], [1.0, 6.0, 1.0]);
+  addBox(castleAuthoredRoot, 'CastleEntranceHeader', stone, [0, 6.0, -11.5], [9.4, 1.0, 1.0]);
+  const castleEntranceGateRail = addBox(castleRoot, 'CastleEntranceGateRail', brass, [0, 2.0, -11.5], [7.2, 0.28, 0.24]);
 
   const castleServiceLights: pc.Entity[] = [];
   const createCastleServiceLight = (
@@ -221,6 +268,12 @@ export function buildArc1Greybox({
   addCollider(74, 0, 0.5, 30);
   addCollider(60, -15, 28, 0.5);
   addCollider(60, 15, 28, 0.5);
+
+  const castleStaticBatch = app.batcher.addGroup('OhmdalCastleStaticArt', false, 45);
+  for (const render of castleAuthoredRoot.findComponents('render') as pc.RenderComponent[]) {
+    render.batchGroupId = castleStaticBatch.id;
+  }
+  app.batcher.generate([castleStaticBatch.id]);
 
   // -----------------------------------------------------------------------
   // G4 — Forge and Terraces share one loaded zone. Stepped slabs distinguish
@@ -370,6 +423,10 @@ export function buildArc1Greybox({
     },
     castleServiceLights,
     castleGate,
+    castleBranchIsolators,
+    castleTripPin,
+    castleReturnLink,
+    castleEntranceGateRail,
     forgeHeater,
     terracesPump,
     forgeProtectionLight,

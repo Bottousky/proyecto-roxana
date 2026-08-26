@@ -20,7 +20,7 @@ export const OHMDAL_PLAZA_CAPTURE_VIEWS = Object.freeze([
 
 /**
  * Keep each stage deliberately small: FAST must not silently become a second
- * full suite. Authored A2/A3 entries use the authored shot hook below because
+ * full suite. Authored A2/A3/A4 entries use the authored shot hook below because
  * they span zone seams; callers may also pass --shots explicitly.
  */
 export const FAST_STAGE_SHOTS = Object.freeze({
@@ -42,6 +42,12 @@ export const FAST_STAGE_SHOTS = Object.freeze({
     'sluice-gate-interaction',
     'generator-platform',
     'restored-manantial',
+  ]),
+  'a4-castle-authored': Object.freeze([
+    'restored-plaza-wide',
+    'bell-activation',
+    'castle-gate-open',
+    'castle-distribution-hall',
   ]),
 });
 
@@ -212,6 +218,121 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
         excitationEnabled: true,
         protectiveTrip: false,
         restored: true,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'restored-plaza-wide': Object.freeze({
+    id: 'restored-plaza-wide',
+    state: 'restored-plaza-wide',
+    camera: 'restored-plaza-wide',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Preserve the accepted Plaza-wide overlook while making the restored
+    // state explicit for the late-route comparison.
+    anchor: Object.freeze({ position: Object.freeze([0, 11.5, -13.2]), yaw: 180, pitch: -33 }),
+    world: Object.freeze({
+      zone: 'plaza',
+      storyStep: 'restored_plaza',
+      comparison: 'before-after',
+      plaza: Object.freeze({ bellPulls: 0, castleGateOpened: false }),
+      manantial: Object.freeze({
+        gateOpen: true,
+        returnBridgeInstalled: true,
+        excitationEnabled: true,
+        protectiveTrip: false,
+        restored: true,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'bell-activation': Object.freeze({
+    id: 'bell-activation',
+    state: 'bell-activation',
+    camera: 'bell-activation',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Three-quarter view avoids hiding the bell behind either gantry post.
+    anchor: Object.freeze({ position: Object.freeze([-9.0, 2.6, 0]), yaw: 238, pitch: -5 }),
+    world: Object.freeze({
+      zone: 'plaza',
+      storyStep: 'restored_plaza',
+      interaction: 'bell',
+      comparison: 'before-after',
+      plaza: Object.freeze({ bellPulls: 1, castleGateOpened: true }),
+      manantial: Object.freeze({
+        gateOpen: true,
+        returnBridgeInstalled: true,
+        excitationEnabled: true,
+        protectiveTrip: false,
+        restored: true,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'castle-gate-open': Object.freeze({
+    id: 'castle-gate-open',
+    state: 'castle-gate-open',
+    camera: 'castle-gate-open',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Outside three-quarter view through the validated south-wall aperture:
+    // the missing rail reads as an open threshold while preserving the hall.
+    anchor: Object.freeze({ position: Object.freeze([55, 4, -17]), yaw: 222, pitch: -8 }),
+    world: Object.freeze({
+      zone: 'castle',
+      storyStep: 'inside_castle',
+      plaza: Object.freeze({ bellPulls: 1, castleGateOpened: true }),
+      manantial: Object.freeze({
+        gateOpen: true,
+        returnBridgeInstalled: true,
+        excitationEnabled: true,
+        protectiveTrip: false,
+        restored: true,
+      }),
+      castle: Object.freeze({
+        topology: 'unwired',
+        returnContinuity: false,
+        energized: false,
+        protectiveTrip: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'castle-distribution-hall': Object.freeze({
+    id: 'castle-distribution-hall',
+    state: 'castle-distribution-hall',
+    camera: 'castle-distribution-hall',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Elevated oblique view keeps the panel, galleries and raised bus legible
+    // without placing the central bus support directly over the composition.
+    anchor: Object.freeze({ position: Object.freeze([51.5, 6, -10]), yaw: 220, pitch: -18 }),
+    world: Object.freeze({
+      zone: 'castle',
+      storyStep: 'inside_castle',
+      probeTarget: 'castle_bus_in',
+      plaza: Object.freeze({ bellPulls: 1, castleGateOpened: true }),
+      manantial: Object.freeze({
+        gateOpen: true,
+        returnBridgeInstalled: true,
+        excitationEnabled: true,
+        protectiveTrip: false,
+        restored: true,
+      }),
+      castle: Object.freeze({
+        topology: 'unwired',
+        returnContinuity: false,
+        energized: false,
+        protectiveTrip: false,
       }),
     }),
     deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),

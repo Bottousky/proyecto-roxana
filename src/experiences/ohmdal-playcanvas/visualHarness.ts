@@ -14,8 +14,8 @@ export type OhmdalVisualStateName = 'portal-arrival' | 'restored-plaza';
 
 /**
  * Authored-pass capture names extend the stable A0 harness without changing
- * the legacy camera/state contract. A2 shots are applied through the optional
- * setCaptureShot hook because they also need zone/story/tool setup.
+ * the legacy camera/state contract. Authored shots are applied through the
+ * optional setCaptureShot hook because they also need zone/story/tool setup.
  */
 export const OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES = [
   'workshop-exterior',
@@ -26,6 +26,10 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES = [
   'sluice-gate-interaction',
   'generator-platform',
   'restored-manantial',
+  'restored-plaza-wide',
+  'bell-activation',
+  'castle-gate-open',
+  'castle-distribution-hall',
 ] as const;
 
 export type OhmdalVisualCaptureShotName =
@@ -54,19 +58,29 @@ export interface RoxanaOhmdalCaptureShot {
     pitch: number;
   } | null;
   world: {
-    zone: 'plaza' | 'workshop' | 'manantial';
+    zone: 'plaza' | 'workshop' | 'manantial' | 'castle';
     storyStep: string;
     tool?: 'galvanoscope';
     probeTarget?: string;
-    interaction?: 'intake-gate';
+    interaction?: 'intake-gate' | 'bell';
     comparison?: 'before-after';
-    measurementPoint?: 'generator' | 'turbine' | 'return' | 'load';
+    measurementPoint?: 'generator' | 'turbine' | 'return' | 'load' | 'castle-bus';
+    plaza?: {
+      bellPulls: number;
+      castleGateOpened: boolean;
+    };
     manantial?: {
       gateOpen: boolean;
       returnBridgeInstalled: boolean;
       excitationEnabled: boolean;
       protectiveTrip: boolean;
       restored: boolean;
+    };
+    castle?: {
+      topology: 'unwired' | 'parallel' | 'mixed' | 'series';
+      returnContinuity: boolean;
+      energized: boolean;
+      protectiveTrip: boolean;
     };
   };
   deterministic: {
@@ -156,7 +170,7 @@ export interface RoxanaVisualTestHooks {
   setState(name: OhmdalVisualStateName): void;
   setCamera(name: OhmdalVisualCameraName): void;
   /**
-   * Optional authored-pass hook. A2 capture must fail closed when this is not
+   * Optional authored-pass hook. Authored capture must fail closed when this is not
    * wired; silently using a Plaza alias would invalidate the evidence.
    */
   setCaptureShot?(shot: RoxanaOhmdalCaptureShot): void | Promise<void>;

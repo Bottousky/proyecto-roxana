@@ -1,5 +1,38 @@
 # MiniMax GMI evaluation log — Ohmdal Arco I
 
+## E2-A4-TA-001 — Castillo branch-state readability
+
+- `TASK_ID`: `E2-A4-TA-001`
+- `MODEL`: `MiniMaxAI/MiniMax-M3`
+- `CONTEXT_FILES`: `buildArc1Greybox.ts`, `playcanvasRuntime.ts`,
+  `arc1GreyboxModel.ts`, `OHMDAL_VISUAL_MATERIAL_BIBLE.md`,
+  `OHMDAL_INTERACTION_POLICY.md`, `ARCO1_AREA_REFERENCE_PLAN.md`
+- `ELAPSED_MS`: `57682`
+- `USAGE_IF_REPORTED`: prompt `35304`, completion `5575`, total `40879`
+- `FIRST_PASS`: `partial`
+- `SOL_REPAIR_COUNT`: `4` load-bearing design repairs: physical isolator poses,
+  simulation-owned stable state, dedicated return/trip entities, and no
+  per-frame shared-material mutation
+- `TEST_RESULT_AFTER_INTEGRATION`: `PASS` focused Castle/harness tests and
+  TypeScript; exact proposal not integrated
+- `GEMINI_SCORE_IF_VISUAL`: pending A4 independent review
+- `REUSABLE`: `yes` for the supplied inventory and physical-state mapping;
+  exact code `no`
+- `HALLUCINATION_OR_SCOPE_ERRORS`: says no new geometry while adding a trip
+  pin; gives an inconsistent target path; relies on an unverified material
+  `.unique` property; proposes per-frame material updates; and makes copper
+  permanently heated/emissive beyond the restrained physical-state contract.
+- `WOULD_PAY_FOR_THIS_OUTPUT`: `no`
+- `NOTES`: The bounded proposal usefully enumerated the actual Castle model and
+  confirmed isolators, return continuity and a trip pin as strong diegetic
+  signals. Sol implemented those signals as dedicated physical entities driven
+  from the existing simulation, preserving the current service lights and
+  avoiding new glow or shadow-casting lights.
+
+Evidence: `authored-castle-branch-readability.md`,
+`src/experiences/ohmdal-playcanvas/world/arc1/buildArc1Greybox.ts`,
+`src/experiences/ohmdal-playcanvas/playcanvasRuntime.ts`.
+
 ## E2-A3-VFX-002 — Manantial authored activation proposal
 
 - `TASK_ID`: `E2-A3-VFX-002`

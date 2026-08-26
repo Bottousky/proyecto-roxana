@@ -320,11 +320,17 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       'sluice-gate-interaction',
       'generator-platform',
       'restored-manantial',
+      'restored-plaza-wide',
+      'bell-activation',
+      'castle-gate-open',
+      'castle-distribution-hall',
     ].includes(shot.id)) {
       throw new Error(`Unknown Ohmdal authored capture shot: ${shot.id}`);
     }
 
-    closeVisualOverlays();
+    const isA4Shot = ['restored-plaza-wide', 'bell-activation', 'castle-gate-open', 'castle-distribution-hall'].includes(shot.id);
+    if (isA4Shot) setVisualState('restored-plaza');
+    else closeVisualOverlays();
     for (const zone of ['workshop', 'manantial', 'castle', 'forge-terraces', 'lighthouse'] as const) {
       zones.deactivate(zone);
     }
@@ -337,6 +343,10 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       await zones.activate('manantial');
       zones.deactivate('plaza');
     }
+    if (shot.world.zone === 'castle') {
+      await zones.activate('castle');
+      zones.deactivate('plaza');
+    }
 
     visualSeed = shot.deterministic.seed;
     reducedMotion = shot.deterministic.reducedMotion;
@@ -345,18 +355,32 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     world.viewmodelRoot.enabled = isToolEquipped;
 
     arc1State = createArc1GreyboxState();
-    if (shot.world.zone === 'manantial') {
+    if (shot.world.zone === 'manantial' || isA4Shot) {
       arc1State = enterArc1Region(arc1State, 'manantial');
       const manantialState = shot.world.manantial;
-      if (manantialState?.gateOpen) arc1State = setManantialGate(arc1State, true);
-      if (manantialState?.returnBridgeInstalled) {
+      if (manantialState?.gateOpen || isA4Shot) arc1State = setManantialGate(arc1State, true);
+      if (manantialState?.returnBridgeInstalled || isA4Shot) {
         arc1State = measureManantial(arc1State, 'generator');
         arc1State = repairManantial(arc1State);
       }
-      if (manantialState?.excitationEnabled) arc1State = energizeManantial(arc1State);
-      if (manantialState?.restored) arc1State = measureManantial(arc1State, 'load');
-      updateArc1WorldVisuals();
+      if (manantialState?.excitationEnabled || isA4Shot) arc1State = energizeManantial(arc1State);
+      if (manantialState?.restored || isA4Shot) arc1State = measureManantial(arc1State, 'load');
     }
+    if (isA4Shot) {
+      arc1State = enterArc1Region(arc1State, 'plaza');
+      if ((shot.world.plaza?.bellPulls ?? 0) > 0 || shot.world.zone === 'castle') arc1State = pullCampana(arc1State);
+      if (shot.world.plaza?.castleGateOpened || shot.world.zone === 'castle') arc1State = openCastleGate(arc1State);
+      if (shot.world.zone === 'castle') {
+        arc1State = enterArc1Region(arc1State, 'castillo');
+        if (shot.world.castle?.topology === 'parallel') arc1State = configureCastleNetwork(arc1State, CASTLE_PARALLEL_CONFIGURATION);
+        if (shot.world.castle?.topology === 'mixed') arc1State = configureCastleNetwork(arc1State, CASTLE_MIXED_CONFIGURATION);
+        if (shot.world.castle?.energized) {
+          arc1State = measureCastleNetwork(arc1State);
+          arc1State = energizeCastleNetwork(arc1State);
+        }
+      }
+    }
+    updateArc1WorldVisuals();
 
     const [x, y, z] = shot.anchor.position;
     playerPos.set(x, y, z);
@@ -603,6 +627,14 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       marker.enabled = enabled;
       setEntityLightsEnabled(marker, enabled && index === 0);
     });
+    const castleBranchIds = ['district-a', 'district-b', 'district-c'] as const;
+    world.arc1Greybox.castleBranchIsolators.forEach((isolator, index) => {
+      const wiring = arc1State.castle.branches[castleBranchIds[index]!].wiring;
+      isolator.setLocalEulerAngles(0, 0, wiring === 'isolated' ? -58 : wiring === 'series' ? 32 : 0);
+    });
+    world.arc1Greybox.castleTripPin.setLocalPosition(0.72, arc1State.castle.protectiveTrip ? 0.92 : 1.12, -0.85);
+    world.arc1Greybox.castleReturnLink.enabled = arc1State.castle.returnContinuity;
+    world.arc1Greybox.castleEntranceGateRail.enabled = !getArc1Progress(arc1State).castleGateOpen;
     const castleRail = world.arc1Greybox.castleGate.findByName('CastleGateRail') as pc.Entity | null;
     if (castleRail) castleRail.enabled = !castle.restored;
 
