@@ -15,7 +15,7 @@ export interface Arc1GreyboxDependencies {
   app: pc.Application;
   materials: Arc1GreyboxMaterials;
   probeTargets: Record<string, pc.Vec3>;
-  addCollider: (x: number, z: number, w: number, d: number) => void;
+  addCollider: (x: number, z: number, w: number, d: number, zone?: Arc1GreyboxZoneId, id?: string) => void;
 }
 
 export interface Arc1GreyboxElements {
@@ -124,7 +124,7 @@ export function buildArc1Greybox({
     material: pc.StandardMaterial,
     position: [number, number, number],
     scale: [number, number, number],
-  ) => addBox(parent, name, material, position, scale, false);
+  ) => addBox(parent, name, material, position, scale, true);
 
   const addConductor = (
     parent: pc.Entity,
@@ -132,21 +132,21 @@ export function buildArc1Greybox({
     position: [number, number, number],
     scale: [number, number, number],
     material = copper,
-  ) => addBox(parent, name, material, position, scale, false);
+  ) => addBox(parent, name, material, position, scale);
 
   const addDistributionLoad = (
     parent: pc.Entity,
     name: string,
     position: [number, number, number],
-    material: pc.StandardMaterial,
-  ): pc.Entity => {
-    const load = new pc.Entity(name);
-    load.setLocalPosition(...position);
-    parent.addChild(load);
-    addBox(load, `${name}Base`, stoneDark, [0, 0.35, 0], [2.2, 0.7, 1.6]);
-    addCylinder(load, `${name}Coil`, material, [0, 1.25, 0], [0.48, 0.7, 0.48]);
-    addCylinder(load, `${name}Terminal`, brass, [0, 1.95, 0], [0.18, 0.12, 0.18]);
-    return load;
+    accentMaterial = brass,
+  ) => {
+    const root = new pc.Entity(name);
+    root.setLocalPosition(...position);
+    parent.addChild(root);
+    addBox(root, `${name}Base`, stoneDark, [0, 0.45, 0], [2.4, 0.9, 2.4]);
+    addCylinder(root, `${name}Core`, accentMaterial, [0, 1.25, 0], [1.1, 0.7, 1.1]);
+    addSphere(root, `${name}Cap`, accentMaterial, [0, 1.75, 0], [0.8, 0.4, 0.8]);
+    return root;
   };
 
   // -----------------------------------------------------------------------
@@ -169,11 +169,21 @@ export function buildArc1Greybox({
   addConductor(castleRoot, 'CastleBranchB', [4.2, 0.14, 0], [4.2, 0.1, 0.22], copper);
   addConductor(castleRoot, 'CastleBranchC', [0, 0.17, 4.8], [0.22, 0.1, 4.8], copper);
 
-  addWall(castleRoot, 'CastleWallWest', stoneDark, [-14, 2, 0], [0.5, 4, 30]);
-  addWall(castleRoot, 'CastleWallEast', stoneDark, [14, 2, 0], [0.5, 4, 30]);
-  addWall(castleRoot, 'CastleWallSouthWest', stoneDark, [-9.25, 2, -15], [9.5, 4, 0.5]);
-  addWall(castleRoot, 'CastleWallSouthEast', stoneDark, [9.25, 2, -15], [9.5, 4, 0.5]);
-  addWall(castleRoot, 'CastleWallNorth', stoneDark, [0, 2, 15], [28, 4, 0.5]);
+  addWall(castleRoot, 'CastleWallWest', stoneDark, [-14, 4, 0], [0.5, 8, 30]);
+  addWall(castleRoot, 'CastleWallEast', stoneDark, [14, 4, 0], [0.5, 8, 30]);
+  addWall(castleRoot, 'CastleWallSouthWest', stoneDark, [-9.25, 4, -15], [9.5, 8, 0.5]);
+  addWall(castleRoot, 'CastleWallSouthEast', stoneDark, [9.25, 4, -15], [9.5, 8, 0.5]);
+  addWall(castleRoot, 'CastleWallNorth', stoneDark, [0, 4, 15], [28, 8, 0.5]);
+
+  // Enclosure: upper headers and roof framing beams to close sky voids
+  addBox(castleAuthoredRoot, 'CastleRoofHeaderWest', stone, [-14, 7.8, 0], [1.2, 0.6, 30]);
+  addBox(castleAuthoredRoot, 'CastleRoofHeaderEast', stone, [14, 7.8, 0], [1.2, 0.6, 30]);
+  addBox(castleAuthoredRoot, 'CastleRoofHeaderNorth', stone, [0, 7.8, 15], [28, 0.6, 1.2]);
+  addBox(castleAuthoredRoot, 'CastleRoofHeaderSouth', stone, [0, 7.8, -15], [28, 0.6, 1.2]);
+  for (const z of [-12, -6, 0, 6, 12]) {
+    addBox(castleAuthoredRoot, `CastleRoofTie${z}`, stoneDark, [0, 7.7, z], [27.6, 0.35, 0.45]);
+  }
+  addBox(castleAuthoredRoot, 'CastleSouthUpperLintel', stoneDark, [0, 6.0, -15], [9.5, 4.0, 0.5]);
 
   const castlePanel = new pc.Entity('CastleDistributionPanel');
   castlePanel.setLocalPosition(0, 0, 0);
@@ -262,12 +272,11 @@ export function buildArc1Greybox({
   probeTargets.castle_service_b = new pc.Vec3(66.2, 1.15, 0);
   probeTargets.castle_service_c = new pc.Vec3(60, 1.15, 5.8);
 
-  // Only the outer shell is solid. Entry, panel, loads and gate remain open to
-  // the interaction ray/close-up layer and are therefore not collider targets.
-  addCollider(46, 0, 0.5, 30);
-  addCollider(74, 0, 0.5, 30);
-  addCollider(60, -15, 28, 0.5);
-  addCollider(60, 15, 28, 0.5);
+  // Outer shell is solid in Castle zone. Interaction panels and walkways remain navigable.
+  addCollider(46, 0, 0.5, 30, 'castle', 'CastleWallWest');
+  addCollider(74, 0, 0.5, 30, 'castle', 'CastleWallEast');
+  addCollider(60, -15, 28, 0.5, 'castle', 'CastleWallSouth');
+  addCollider(60, 15, 28, 0.5, 'castle', 'CastleWallNorth');
 
   const castleStaticBatch = app.batcher.addGroup('OhmdalCastleStaticArt', false, 45);
   for (const render of castleAuthoredRoot.findComponents('render') as pc.RenderComponent[]) {
@@ -295,10 +304,10 @@ export function buildArc1Greybox({
   addBox(forgeTerracesRoot, 'TerracesStepOne', stone, [0, 0.22, 18], [4, 0.22, 1.2]);
   addBox(forgeTerracesRoot, 'TerracesStepTwo', stone, [0, 0.52, 24], [4, 0.22, 1.2]);
 
-  addWall(forgeTerracesRoot, 'ForgeTerracesWallWest', stoneDark, [-14, 2, 12], [0.5, 4, 48]);
-  addWall(forgeTerracesRoot, 'ForgeTerracesWallEast', stoneDark, [14, 2, 12], [0.5, 4, 48]);
-  addWall(forgeTerracesRoot, 'ForgeTerracesWallSouth', stoneDark, [0, 2, -12], [28, 4, 0.5]);
-  addWall(forgeTerracesRoot, 'ForgeTerracesWallNorth', stoneDark, [0, 2, 36], [28, 4, 0.5]);
+  addWall(forgeTerracesRoot, 'ForgeTerracesWallWest', stoneDark, [-14, 3.5, 12], [0.5, 7, 48]);
+  addWall(forgeTerracesRoot, 'ForgeTerracesWallEast', stoneDark, [14, 3.5, 12], [0.5, 7, 48]);
+  addWall(forgeTerracesRoot, 'ForgeTerracesWallSouth', stoneDark, [0, 3.5, -12], [28, 7, 0.5]);
+  addWall(forgeTerracesRoot, 'ForgeTerracesWallNorth', stoneDark, [0, 3.5, 36], [28, 7, 0.5]);
 
   const forgePanel = new pc.Entity('ForgeDistributionPanel');
   forgePanel.setLocalPosition(0, 0, 8);
@@ -346,10 +355,10 @@ export function buildArc1Greybox({
   probeTargets.forge_heater = new pc.Vec3(124.2, 1.2, -8);
   probeTargets.terraces_pump = new pc.Vec3(120, 1.2, 16);
 
-  addCollider(106, 4, 0.5, 48);
-  addCollider(134, 4, 0.5, 48);
-  addCollider(120, -20, 28, 0.5);
-  addCollider(120, 28, 28, 0.5);
+  addCollider(106, 4, 0.5, 48, 'forge-terraces', 'ForgeTerracesWallWest');
+  addCollider(134, 4, 0.5, 48, 'forge-terraces', 'ForgeTerracesWallEast');
+  addCollider(120, -20, 28, 0.5, 'forge-terraces', 'ForgeTerracesWallSouth');
+  addCollider(120, 28, 28, 0.5, 'forge-terraces', 'ForgeTerracesWallNorth');
 
   // -----------------------------------------------------------------------
   // G5/G6 — Lighthouse and return marker. The beacon is physical geometry;
@@ -364,10 +373,10 @@ export function buildArc1Greybox({
   addBox(lighthouseRoot, 'LighthousePath', stoneDark, [0, 0.02, 0], [4.2, 0.08, 23]);
   addConductor(lighthouseRoot, 'LighthouseSignalBus', [0, 0.11, 0], [0.28, 0.12, 23], copper);
   addBox(lighthouseRoot, 'LighthouseWaterEdge', water, [9, 0.02, 5], [8, 0.08, 20]);
-  addWall(lighthouseRoot, 'LighthouseWallWest', stoneDark, [-14, 2, 0], [0.5, 4, 30]);
-  addWall(lighthouseRoot, 'LighthouseWallEast', stoneDark, [14, 2, 0], [0.5, 4, 30]);
-  addWall(lighthouseRoot, 'LighthouseWallSouth', stoneDark, [0, 2, -15], [28, 4, 0.5]);
-  addWall(lighthouseRoot, 'LighthouseWallNorth', stoneDark, [0, 2, 15], [28, 4, 0.5]);
+  addWall(lighthouseRoot, 'LighthouseWallWest', stoneDark, [-14, 3.5, 0], [0.5, 7, 30]);
+  addWall(lighthouseRoot, 'LighthouseWallEast', stoneDark, [14, 3.5, 0], [0.5, 7, 30]);
+  addWall(lighthouseRoot, 'LighthouseWallSouth', stoneDark, [0, 3.5, -15], [28, 7, 0.5]);
+  addWall(lighthouseRoot, 'LighthouseWallNorth', stoneDark, [0, 3.5, 15], [28, 7, 0.5]);
 
   const lighthousePanel = new pc.Entity('LighthouseCalibrationPanel');
   lighthousePanel.setLocalPosition(0, 0, 0);
@@ -410,10 +419,10 @@ export function buildArc1Greybox({
   probeTargets.lighthouse_reference = new pc.Vec3(180, 1.2, 0);
   probeTargets.lighthouse_beacon = new pc.Vec3(180, 1.25, 8);
 
-  addCollider(166, 0, 0.5, 30);
-  addCollider(194, 0, 0.5, 30);
-  addCollider(180, -15, 28, 0.5);
-  addCollider(180, 15, 28, 0.5);
+  addCollider(166, 0, 0.5, 30, 'lighthouse', 'LighthouseWallWest');
+  addCollider(194, 0, 0.5, 30, 'lighthouse', 'LighthouseWallEast');
+  addCollider(180, -15, 28, 0.5, 'lighthouse', 'LighthouseWallSouth');
+  addCollider(180, 15, 28, 0.5, 'lighthouse', 'LighthouseWallNorth');
 
   return {
     roots: {

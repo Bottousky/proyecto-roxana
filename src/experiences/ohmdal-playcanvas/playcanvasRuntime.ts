@@ -18,6 +18,8 @@ import {
   type OhmdalVisualCaptureShotName,
   type RoxanaVisualTestHooks,
 } from './visualHarness.ts';
+import { OHMDAL_SPAWN_ANCHORS, deriveYawFromAnchor } from './navigationAnchors.ts';
+import type { ZoneId } from './collisionRegistry.ts';
 import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
 import { OhmdalZoneLifecycle } from './systems/zones/zoneLifecycle.ts';
 import { createManantialActivationVfx } from './world/manantial/manantialActivationVfx.ts';
@@ -243,6 +245,14 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     pitch = 0;
     world.playerEntity.setEulerAngles(0, yaw, 0);
     world.cameraEntity.setLocalEulerAngles(0, 0, 0);
+  }
+
+  function teleportToAnchor(anchorId: string): void {
+    const anchor = OHMDAL_SPAWN_ANCHORS[anchorId];
+    if (!anchor) throw new Error(`Unknown spawn anchor: ${anchorId}`);
+    const [x, y, z] = anchor.position;
+    const targetYaw = deriveYawFromAnchor(anchor);
+    teleportPlayer(x, y, z, targetYaw);
   }
 
   function closeVisualOverlays(): void {
@@ -564,6 +574,16 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         arc1: snapshotArc1Greybox(arc1State),
       };
     },
+    getCollisionDiagnostics() {
+      const activeZones = zones.snapshot().filter((z) => z.active).map((z) => z.id) as ZoneId[];
+      return world.collisionRegistry.getDiagnostics(activeZones);
+    },
+    getSpawnAnchors() {
+      return OHMDAL_SPAWN_ANCHORS;
+    },
+    teleportToAnchor(anchorId: string) {
+      teleportToAnchor(anchorId);
+    },
   };
 
   void world.ready.then(
@@ -684,7 +704,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         pos: new pc.Vec3(-60, 1.0, -4.6),
         radius: 2.8,
         action: () => {
-          teleportPlayer(-7.0, 1.68, -4.0, 90);
+          teleportToAnchor('workshop-to-plaza');
           void zones.activate('plaza').then(() => zones.deactivate('workshop'));
           arc1State = enterArc1Region(arc1State, 'taller');
           storyStep = 'returned_to_plaza';
@@ -764,7 +784,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           arc1State = enterArc1Region(arc1State, 'retorno');
           zones.deactivate('lighthouse');
           void zones.activate('forge-terraces');
-          teleportPlayer(120, 1.68, 24, 180);
+          teleportToAnchor('lighthouse-to-forge');
           storyStep = 'returning';
           ui.showNotification('Regresá por Terrazas, Castillo y Plaza; los estados restaurados persisten.');
         },
@@ -843,7 +863,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           if (arc1State.currentRegion === 'retorno') {
             zones.deactivate('forge-terraces');
             void zones.activate('castle');
-            teleportPlayer(60, 1.68, 8, 180);
+            teleportToAnchor('forge-to-castle');
             return;
           }
           if (!isForgeTerracesRestored(arc1State) || !arc1State.visitedRegions.includes('terrazas')) {
@@ -853,7 +873,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           arc1State = enterArc1Region(arc1State, 'faro');
           zones.deactivate('forge-terraces');
           void zones.activate('lighthouse');
-          teleportPlayer(180, 1.68, -8, 0);
+          teleportToAnchor('forge-to-lighthouse');
           storyStep = 'inside_lighthouse';
         },
       });
@@ -929,7 +949,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           if (arc1State.currentRegion === 'retorno') {
             zones.deactivate('castle');
             void zones.activate('plaza');
-            teleportPlayer(0, 1.68, 9.2, 180);
+            teleportToAnchor('castle-to-plaza');
             ui.showNotification('Volviste a la Plaza por la red restaurada.');
             return;
           }
@@ -940,7 +960,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           arc1State = enterArc1Region(arc1State, 'forja');
           zones.deactivate('castle');
           void zones.activate('forge-terraces');
-          teleportPlayer(120, 1.68, -16, 0);
+          teleportToAnchor('castle-to-forge');
           storyStep = 'inside_forge_terraces';
         },
       });
@@ -1007,7 +1027,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             return;
           }
           arc1State = enterArc1Region(arc1State, 'plaza');
-          teleportPlayer(0, 1.68, 9.2, 180);
+          teleportToAnchor('manantial-to-plaza');
           zones.deactivate('manantial');
           storyStep = 'restored_plaza';
           ui.showNotification('La energía vuelve a la Plaza; la Campana puede accionar la apertura del Castillo.');
@@ -1062,7 +1082,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           void zones.activate('workshop').then(() => {
             zones.deactivate('plaza');
             arc1State = enterArc1Region(arc1State, 'taller');
-            teleportPlayer(-60, 1.68, -3.8, 0);
+            teleportToAnchor('plaza-to-workshop');
             storyStep = 'inside_workshop';
             bitacora.unlock('taller_lumen', 'investigating');
             ui.showNotification('Entraste al Taller de Lumen.');
@@ -1179,7 +1199,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             arc1State = enterArc1Region(arc1State, 'castillo');
             zones.deactivate('plaza');
             void zones.activate('castle');
-            teleportPlayer(60, 1.68, -8, 0);
+            teleportToAnchor('plaza-to-castle');
             storyStep = 'inside_castle';
           },
         });
@@ -1196,7 +1216,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           if (circuit.gateOpen) {
             void zones.activate('manantial');
             arc1State = enterArc1Region(arc1State, 'manantial');
-            teleportPlayer(0, 1.68, 16.0, 0);
+            teleportToAnchor('plaza-to-manantial');
             storyStep = 'inside_manantial';
             bitacora.unlock('manantial_central_hidraulica', 'investigating');
             ui.showNotification('Avanzaste por el sendero hacia la montaña y el Manantial.');
@@ -1396,17 +1416,12 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   });
 
   const isBlocked = (x: number, z: number) => {
-    const r = 0.4;
-    // When inside mountain area (z > 12), allow passing through the gate if open
-    if (circuit.gateOpen && z > 10.0 && z < 13.0 && Math.abs(x) < 2.0) {
-      return false;
-    }
-    for (const c of world.colliders) {
-      if (x > c.minX - r && x < c.maxX + r && z > c.minZ - r && z < c.maxZ + r) {
-        return true;
-      }
-    }
-    return false;
+    const activeZones = zones.snapshot().filter((z) => z.active).map((z) => z.id) as ZoneId[];
+    const gateOpenPredicate = (testPx: number, testPz: number) => {
+      // When near the Omega gate (z between 10.0 and 13.0), allow passing through if gate is open
+      return circuit.gateOpen && testPz > 10.0 && testPz < 13.0 && Math.abs(testPx) < 2.0;
+    };
+    return world.collisionRegistry.isBlocked(x, z, activeZones, 0.4, gateOpenPredicate);
   };
 
   // PlayCanvas Engine Update Loop

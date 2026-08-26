@@ -16,7 +16,7 @@ export interface WorkshopInteriorDependencies {
   app: pc.Application;
   materials: WorkshopInteriorMaterials;
   probeTargets: Record<string, pc.Vec3>;
-  addCollider: (x: number, z: number, w: number, d: number) => void;
+  addCollider: (x: number, z: number, w: number, d: number, id?: string) => void;
 }
 
 export interface WorkshopInteriorElements {
@@ -257,6 +257,12 @@ export function buildWorkshopInterior({
   probeTargets['lumen_taller_galvanoscope_dock'] = new pc.Vec3(-60, 1.25, 0.38);
   addCollider(-60, 0.8, 4.6, 2.0);
   addCollider(-60, 2.4, 1.2, 1.2);
+  // Workshop perimeter walls
+  addCollider(-60, 5.0, 12.0, 0.6);
+  addCollider(-63.5, -5.0, 5.0, 0.6);
+  addCollider(-56.5, -5.0, 5.0, 0.6);
+  addCollider(-66.0, 0, 0.6, 10.0);
+  addCollider(-54.0, 0, 0.6, 10.0);
 
   // Everything except Lumen is static and zone-local. Batch by material so the
   // authored support pass stays inside the established mobile draw-call envelope.

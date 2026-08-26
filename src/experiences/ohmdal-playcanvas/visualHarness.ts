@@ -165,6 +165,10 @@ export interface RoxanaOhmdalPlaytestSnapshot {
   arc1: Arc1GreyboxSnapshot;
 }
 
+import type { Arc1GreyboxSnapshot } from './systems/campaign/arc1GreyboxModel.ts';
+import type { CollisionDiagnostics } from './collisionRegistry.ts';
+import type { SpawnAnchor } from './navigationAnchors.ts';
+
 export interface RoxanaVisualTestHooks {
   seed(value: number): void;
   setState(name: OhmdalVisualStateName): void;
@@ -180,6 +184,9 @@ export interface RoxanaVisualTestHooks {
   setPostProcessing(enabled: boolean): void;
   getDiagnostics(): RoxanaVisualDiagnostics;
   getPlaytestSnapshot(): RoxanaOhmdalPlaytestSnapshot;
+  getCollisionDiagnostics?(): CollisionDiagnostics;
+  getSpawnAnchors?(): Record<string, SpawnAnchor>;
+  teleportToAnchor?(anchorId: string): void;
 }
 
 declare global {
@@ -199,4 +206,3 @@ export function isSoftwareRenderer(renderer: string | null): boolean | null {
   if (!renderer) return null;
   return /(swiftshader|llvmpipe|software rasterizer|microsoft basic render)/i.test(renderer);
 }
-import type { Arc1GreyboxSnapshot } from './systems/campaign/arc1GreyboxModel.ts';

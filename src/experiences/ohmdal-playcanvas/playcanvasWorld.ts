@@ -5,7 +5,9 @@ import { PLAZA_BELL_DETAIL_LAYOUT } from './plazaBellDetailLayout.ts';
 import { PLAZA_CONDUCTOR_LAYOUT } from './plazaConductorLayout.ts';
 import { buildManantialShell } from './world/manantial/buildManantialShell.ts';
 import { buildWorkshopInterior } from './world/workshop/buildWorkshopInterior.ts';
-import { buildArc1Greybox, type Arc1GreyboxElements } from './world/arc1/buildArc1Greybox.ts';
+import { buildArc1Greybox, type Arc1GreyboxElements, type Arc1GreyboxZoneId } from './world/arc1/buildArc1Greybox.ts';
+
+import { CollisionRegistry, type ZoneId } from './collisionRegistry.ts';
 
 export interface PlayCanvasWorldElements {
   app: pc.Application;
@@ -47,6 +49,7 @@ export interface PlayCanvasWorldElements {
   gateLightRight: pc.Entity;
   probeTargets: Record<string, pc.Vec3>;
   colliders: { minX: number; maxX: number; minZ: number; maxZ: number }[];
+  collisionRegistry: CollisionRegistry;
 }
 
 export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanvasWorldElements {
@@ -65,10 +68,12 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
   app.setCanvasResolution(pc.RESOLUTION_AUTO);
 
+  const collisionRegistry = new CollisionRegistry();
   const colliders: { minX: number; maxX: number; minZ: number; maxZ: number }[] = [];
   const probeTargets: Record<string, pc.Vec3> = {};
 
-  const addCollider = (x: number, z: number, w: number, d: number) => {
+  const addCollider = (x: number, z: number, w: number, d: number, zone: ZoneId = 'plaza', id?: string) => {
+    collisionRegistry.addSolidAABB(zone, x, z, w, d, id);
     colliders.push({ minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2 });
   };
 
@@ -1045,6 +1050,13 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     app.batcher.generate([plazaArtBatch.id]);
   });
 
+  // Plaza perimeter boundaries
+  addCollider(-14.0, 0, 1.0, 24.0, 'plaza', 'PlazaBoundaryWest');
+  addCollider(14.0, 0, 1.0, 24.0, 'plaza', 'PlazaBoundaryEast');
+  addCollider(0, -13.0, 28.0, 1.0, 'plaza', 'PlazaBoundarySouth');
+  addCollider(-10.0, 11.5, 12.0, 1.0, 'plaza', 'PlazaBoundaryNorthWest');
+  addCollider(10.0, 11.5, 12.0, 1.0, 'plaza', 'PlazaBoundaryNorthEast');
+
   const { workshopInteriorRoot, lumenNpcEntity } = buildWorkshopInterior({
     app,
     materials: {
@@ -1059,7 +1071,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
       matSkin,
     },
     probeTargets,
-    addCollider,
+    addCollider: (x: number, z: number, w: number, d: number, id?: string) => addCollider(x, z, w, d, 'workshop', id),
   });
 
   const {
@@ -1092,7 +1104,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
       matCopperClean,
     },
     probeTargets,
-    addCollider,
+    addCollider: (x: number, z: number, w: number, d: number, id?: string) => addCollider(x, z, w, d, 'manantial', id),
   });
 
   const arc1Greybox = buildArc1Greybox({
@@ -1106,7 +1118,8 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
       glow: matGlowGold,
     },
     probeTargets,
-    addCollider,
+    addCollider: (x: number, z: number, w: number, d: number, zone: Arc1GreyboxZoneId = 'castle', id?: string) =>
+      addCollider(x, z, w, d, zone, id),
   });
 
   return {
@@ -1149,5 +1162,6 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     gateLightRight,
     probeTargets,
     colliders,
+    collisionRegistry,
   };
 }
