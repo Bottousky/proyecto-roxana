@@ -351,6 +351,68 @@ export function buildArc1Greybox({
   addBox(terracesExit, 'TerracesExitPostRight', stoneDark, [3.2, 1.6, 0], [0.55, 3.2, 0.5], true);
   addConductor(terracesExit, 'TerracesExitRail', [0, 1.6, -0.3], [5.6, 0.22, 0.18], brass);
 
+  // -----------------------------------------------------------------------
+  // Forge + Terrazas Authored Support Pass: industrial smelting hearth,
+  // distribution standoffs, tools/quenching vat, roof trusses, and stepped
+  // aqueduct/irrigation flumes.
+  // -----------------------------------------------------------------------
+  const forgeTerracesAuthoredRoot = new pc.Entity('ForgeTerracesAuthoredSupportRoot');
+  forgeTerracesRoot.addChild(forgeTerracesAuthoredRoot);
+
+  // Forge Foundry: Smelting Hood, Chimney Flue and Flue Bracing
+  addBox(forgeTerracesAuthoredRoot, 'ForgeSmeltingHood', stoneDark, [4.2, 3.8, 0], [3.2, 0.4, 3.0], true);
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeChimneyFlue', copper, [4.2, 5.5, 0], [1.1, 3.2, 1.1], true);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeHearthFlueBrace', brass, [4.2, 4.4, 0], [2.2, 0.2, 2.2]);
+
+  // Main Bus Standoffs & Ceramic Insulators
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeBusStandoffA', stoneDark, [0, 0.6, -4], [0.35, 0.8, 0.35]);
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeBusStandoffB', stoneDark, [0, 0.6, 4], [0.35, 0.8, 0.35]);
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeInsulatorCapA', brass, [0, 1.05, -4], [0.45, 0.16, 0.45]);
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeInsulatorCapB', brass, [0, 1.05, 4], [0.45, 0.16, 0.45]);
+
+  // Foundry Workstation: Anvil Block, Quenching Vat, Tool Rack
+  addBox(forgeTerracesAuthoredRoot, 'ForgeAnvilStand', stoneDark, [6.5, 0.4, -4.5], [1.2, 0.8, 1.2], true);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeAnvilHead', copper, [6.5, 0.95, -4.5], [1.6, 0.35, 0.8], true);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeQuenchingTrough', stoneDark, [6.8, 0.4, 3.5], [1.8, 0.8, 3.2], true);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeQuenchingWater', water, [6.8, 0.72, 3.5], [1.5, 0.1, 2.9]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeToolRack', stoneDark, [-6.5, 1.5, -4.0], [0.3, 2.2, 3.6]);
+
+  // Foundry Roof Trusses & Enclosure Headers
+  addBox(forgeTerracesAuthoredRoot, 'ForgeRoofTrussWest', stoneDark, [-13.6, 6.6, 0], [0.6, 0.5, 24]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeRoofTrussEast', stoneDark, [13.6, 6.6, 0], [0.6, 0.5, 24]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeRoofTieSouth', stoneDark, [0, 6.8, -11.5], [27, 0.4, 0.6]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeRoofTieMid', stoneDark, [0, 6.8, 0], [27, 0.4, 0.6]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeRoofTieNorth', stoneDark, [0, 6.8, 10.5], [27, 0.4, 0.6]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeClerestoryHeader', stoneDark, [0, 6.9, -0.5], [8.0, 0.35, 22]);
+
+  // Agricultural Terraces: Elevated Aqueduct & Pillar Arches
+  addBox(forgeTerracesAuthoredRoot, 'AqueductPillarWest', stoneDark, [-9.5, 2.5, 20], [1.4, 5.0, 1.4], true);
+  addBox(forgeTerracesAuthoredRoot, 'AqueductPillarEast', stoneDark, [9.5, 2.5, 20], [1.4, 5.0, 1.4], true);
+  addBox(forgeTerracesAuthoredRoot, 'AqueductArchLintel', stone, [0, 4.8, 20], [20, 0.6, 1.6], true);
+  addBox(forgeTerracesAuthoredRoot, 'AqueductWaterChannel', water, [0, 5.05, 20], [18, 0.25, 1.2]);
+
+  // Stepped Retaining Wall Buttresses & Irrigation Flumes
+  addBox(forgeTerracesAuthoredRoot, 'TerraceButtressLevel1Left', stoneDark, [-9.2, 0.35, 15], [0.8, 0.7, 1.6]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceButtressLevel1Right', stoneDark, [9.2, 0.35, 15], [0.8, 0.7, 1.6]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceButtressLevel2Left', stoneDark, [-9.2, 0.65, 21], [0.8, 0.9, 1.6]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceButtressLevel2Right', stoneDark, [9.2, 0.65, 21], [0.8, 0.9, 1.6]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceButtressLevel3Left', stoneDark, [-9.2, 0.95, 27], [0.8, 1.1, 1.6]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceButtressLevel3Right', stoneDark, [9.2, 0.95, 27], [0.8, 1.1, 1.6]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceIrrigationPlotLeft', stoneDark, [-6.0, 0.22, 18], [5.2, 0.1, 4.8]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceIrrigationPlotRight', stoneDark, [6.0, 0.22, 18], [5.2, 0.1, 4.8]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceWaterTroughLeft', water, [-6.0, 0.26, 18], [4.8, 0.08, 0.5]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceWaterTroughRight', water, [6.0, 0.26, 18], [4.8, 0.08, 0.5]);
+
+  // Stairway Railings & Handrails
+  addBox(forgeTerracesAuthoredRoot, 'TerraceStairRailLeft', brass, [-2.2, 0.7, 21], [0.15, 0.8, 12]);
+  addBox(forgeTerracesAuthoredRoot, 'TerraceStairRailRight', brass, [2.2, 0.7, 21], [0.15, 0.8, 12]);
+
+  const forgeTerracesStaticBatch = app.batcher.addGroup('OhmdalForgeTerracesStaticArt', false, 45);
+  for (const render of forgeTerracesAuthoredRoot.findComponents('render') as pc.RenderComponent[]) {
+    render.batchGroupId = forgeTerracesStaticBatch.id;
+  }
+  app.batcher.generate([forgeTerracesStaticBatch.id]);
+
   probeTargets.forge_bus = new pc.Vec3(120, 1.1, -8);
   probeTargets.forge_heater = new pc.Vec3(124.2, 1.2, -8);
   probeTargets.terraces_pump = new pc.Vec3(120, 1.2, 16);

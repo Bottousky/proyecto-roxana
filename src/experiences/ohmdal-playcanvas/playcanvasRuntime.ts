@@ -660,8 +660,14 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
     const forgeTerraces = evaluateForgeTerraces(arc1State);
     const forgeCore = world.arc1Greybox.forgeHeater.findByName('ForgeHeaterCore') as pc.Entity | null;
-    if (forgeCore) forgeCore.enabled = forgeTerraces.restored;
+    if (forgeCore) {
+      forgeCore.enabled = arc1State.forgeTerraces.energized && forgeTerraces.heat > 0;
+    }
     world.arc1Greybox.forgeProtectionLight.light!.enabled = arc1State.forgeTerraces.protectiveTrip;
+    const pumpWheel = world.arc1Greybox.terracesPump.findByName('TerracesPumpWheel') as pc.Entity | null;
+    if (pumpWheel && arc1State.forgeTerraces.energized && arc1State.forgeTerraces.allocation.terraces > 0) {
+      pumpWheel.rotateLocal(0, 0, 4);
+    }
 
     const lighthouse = evaluateLighthouse(arc1State);
     const lighthouseLamp = world.arc1Greybox.lighthouseBeacon.findByName('LighthouseBeaconLamp') as pc.Entity | null;
