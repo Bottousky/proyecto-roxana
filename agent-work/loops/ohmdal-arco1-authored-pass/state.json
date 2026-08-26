@@ -11,29 +11,50 @@
   "maxConcurrentLunaWorkers": 2,
   "maxConcurrentMiniMaxWorkers": 1,
   "routing": {
+    "authority": {
+      "harness": "chatgpt-web",
+      "modelAlias": "Sol",
+      "model": "GPT-5.6 Sol",
+      "role": "technical-design-authority-and-acceptance"
+    },
+    "builder": {
+      "harness": "antigravity-cli",
+      "model": "gemini-3.7-flash-high",
+      "effort": "high",
+      "mode": "workspace-write",
+      "selfApproval": false
+    },
     "reviewer": {
       "harness": "antigravity-cli",
       "model": "gemini-3.7-flash-high",
       "effort": "high",
+      "mode": "read-only",
+      "freshSessionRequired": true,
       "fallback": "nearest-available-gemini-flash-high-only"
     },
     "decision": {
-      "harness": "codex",
+      "harness": "chatgpt-web",
       "modelAlias": "Sol",
       "effort": "high"
     },
     "mechanicalWorker": {
-      "harness": "codex-subagent",
+      "harness": "codex",
       "modelAlias": "Luna",
       "effort": "max",
-      "fallback": "report-routing-fallback-no-custom-wrapper"
+      "fallback": "Terra-then-report"
+    },
+    "breakGlass": {
+      "harness": "codex",
+      "modelAlias": "Sol",
+      "effort": "high",
+      "condition": "strong-local-tool-reasoning-demonstrably-required"
     },
     "experimentalWorker": {
       "harness": "gmi-api-sidecar",
       "model": "MiniMaxAI/MiniMax-M3",
       "mode": "proposal-only",
       "runner": "scripts/agents/run-gmi-minimax.mjs",
-      "fallback": "continue-with-sol-luna-no-human-gate"
+      "fallback": "continue-with-builder-no-human-gate"
     }
   },
   "limits": {
@@ -47,9 +68,8 @@
     "technicalCommit": "dec2d75abc0adbcddb37988b3955cef4950513f3",
     "greyboxMilestone": "b8bb4128868fcafd9b5b2083682b2aea7dad1cb9",
     "greyboxCloseCommit": "74abaadb0b569bdc91171886d6799ba49464b082",
-    "greyboxReport": "agent-work/reports/ohmdal-arco1-greybox-sprint.md",
-    "greyboxState": "agent-work/loops/ohmdal-arco1-greybox/state.json",
-    "plazaState": "agent-work/loops/ohmdal-plaza/state.json"
+    "a3Milestone": "a8682995c60e4a4b620648b692e2ef9833d44463",
+    "a4PartialRecovery": "b923ef7e913ad11d84844c5290a0a1081a7cb3e3"
   },
   "queue": [
     { "id": "a0-baseline-capture-readiness", "status": "passed" },
@@ -57,6 +77,7 @@
     { "id": "a2-plaza-workshop-authored", "status": "passed" },
     { "id": "a3-manantial-central-authored", "status": "passed" },
     { "id": "a4-castle-authored", "status": "active" },
+    { "id": "a4b-navigation-scenic-shell-hardening", "status": "queued" },
     { "id": "a5-forge-terraces-authored", "status": "queued" },
     { "id": "a6-lighthouse-lake-return-authored", "status": "queued" },
     { "id": "a7-vfx-audio-ambient", "status": "queued" },
@@ -66,17 +87,13 @@
   "lastCaptureManifest": "output/playwright/ohmdal-arco1-authored/a3-fast-iteration2/capture-manifest.json",
   "humanGate": null,
   "notes": [
-    "This loop consumes the complete playable Arco I greybox and must not redesign it casually.",
-    "Plaza is an accepted visual baseline; changes there are integration/polish only unless regression proves otherwise.",
-    "MiniMax M3 via GMI is experimental proposal-only; Sol is the sole integrator and its provisional evaluation remains open.",
-    "Use fast local GPU captures for iteration once available; retain the full deterministic acceptance path and never present SwiftShader FPS as hardware performance.",
-    "World-first electrical interaction remains mandatory; diegetic maintenance close-ups use the same electrical model.",
-    "Hero/identity assets require approved reference packs before Blender/Meshy/Tripo work.",
-    "No Meshy/Tripo spend without HUMAN_GATE or explicit prior authorization.",
-    "No final dialogue is invented; unresolved prose remains TODO(guion) with neutral placeholders.",
-    "A0 passed in iteration 0: frozen baseline ancestry verified; greybox/authored loop, Gemini and GMI lanes passed; Golden Path passed all 22 checkpoints; FAST captured five load-bearing Plaza views on Chrome 151 / Intel UHD D3D11 with softwareRendered=false and zero console/page errors; FULL deterministic semantics remain covered and unchanged.",
-    "A1 passed in iteration 1: all eight region packs are approved for support authoring, cover exactly 22 canonical shots, and Gemini found no player-facing blocker. Four hero candidates are classified adapt but final modeling remains blocked until each machine-readable Hero Reference Pack passes validation.",
-    "A2 passed after two bounded iterations: Plaza regression shots are byte-identical to A0; Taller is an authored diagnostic space with static zone batching and exclusive Plaza/Workshop activation; FAST used Intel UHD D3D11 with softwareRendered=false, 33 draw calls for the interior and 60 with Galvanoscopio, one shadow-casting light and zero console/page errors; build and the 22-checkpoint Golden Path passed; Gemini returned PASS with no player-facing blocker and no further A2 iteration.",
-    "A3 passed after two bounded visual iterations: the approved adapt Hero Reference Pack gates Manantial support authoring; water, sluice, turbine-generator, shaft, busbars, insulators and measurement platform form one simulation-driven civic mechanism; a local event-only VFX replaced the unsafe shared-material M3 proposal; FAST used NVIDIA GTX 1660 Ti D3D11 with softwareRendered=false at 31-32 draw calls and 3924-3936 triangles, one shadow-casting light and zero console/page errors; build, focused tests and all 22 Golden Path checkpoints passed; Gemini returned PASS with no player-facing blocker and no further A3 iteration."
+    "A0-A3 are accepted; A3 FAST verified NVIDIA GTX 1660 Ti D3D11 with softwareRendered=false and Golden Path 22/22.",
+    "A4 has partial recovered work in b923ef7: Castle branch-state readability, support Hero Reference Pack, capture contract/tests and an M3 proposal already repaired by Codex/Sol. Do not restart it.",
+    "Human playtest found wall-through collisions, incorrect door/spawn facing and accidental large sky openings; A4B is now mandatory before A5.",
+    "ChatGPT web / GPT-5.6 Sol is now default technical/design authority. Codex Sol is break-glass, not default executor.",
+    "Gemini builder may implement/test/commit in an isolated worktree but may not mark stages passed or loop complete.",
+    "A separate Gemini read-only session may review, but final material acceptance remains external to the builder.",
+    "MiniMax M3 remains experimental proposal-only through the current GMI runner; update EVALUATION.md whenever used.",
+    "No Meshy/Tripo spend, canon changes, final dialogue invention, engine changes or major dependency changes without HUMAN_GATE."
   ]
 }

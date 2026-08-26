@@ -2,138 +2,130 @@
 
 ## Mission
 
-Convert the accepted playable Arco I greybox into a coherent authored vertical slice across the whole route while preserving the validated gameplay, electrical model, zone lifecycle and Plaza baseline.
+Convert the accepted playable Arco I greybox into a coherent authored vertical slice while preserving validated gameplay, electrical model, zone lifecycle and Plaza baseline.
 
-Baseline:
+Baselines:
 
-- technical hardening: `dec2d75abc0adbcddb37988b3955cef4950513f3`
-- complete Arco I playable greybox: `b8bb4128868fcafd9b5b2083682b2aea7dad1cb9`
-- closed greybox loop: `74abaadb0b569bdc91171886d6799ba49464b082`
-- report: `agent-work/reports/ohmdal-arco1-greybox-sprint.md`
+- hardening: `dec2d75`
+- playable Arco I greybox: `b8bb412`
+- closed greybox loop: `74abaad`
 
-This loop is an **authored pass**, not a redesign. The current route, puzzle truth and validated player-facing interactions are load-bearing.
+A0–A3 are accepted. Current implementation is A4 Castillo; commit `b923ef7` contains partial A4 work recovered from the interrupted Codex session.
 
-## Production objective
+## Authority and execution
 
-Produce a coherent authored pass for:
+- **ChatGPT web / GPT-5.6 Sol** — technical/design authority, task shaping and material acceptance.
+- **Gemini 3.7 Flash High / Antigravity builder** — preferred general executor for authored scene work in isolated branch/worktree; workspace-write; cannot self-approve.
+- **Gemini Flash reviewer** — separate read-only session/process only.
+- **Codex Luna Max** — bounded mechanical worker.
+- **Codex Terra** — medium fallback.
+- **Codex Sol** — break-glass only when strong reasoning + local tools are demonstrably required.
+- **MiniMax M3 / GMI** — bounded technical-art specialist; current runner proposal-only; its output must be verified before integration.
 
-`Plaza / Taller → Manantial / Central → Plaza restaurada / Campana → Castillo → Forja / Terrazas → Faro / Lago → retorno final`
-
-The milestone is allowed to remain short of shipping-final animation/VO/cinematics, but it must no longer read as a collection of late greyboxes. Every region needs a distinctive authored identity, readable electrical cause/effect, coherent materials/lighting, and canonical evidence.
-
-## Routing
-
-- **Sol High** — master, visual/gameplay trade-offs, implementation ownership, integration and acceptance.
-- **Luna Max** — mechanical scoped work: wiring, instancing, layouts, manifests, capture plumbing, tests, cleanup.
-- **MiniMax M3 via GMI** — experimental proposal worker for tightly scoped technical-art/VFX, code recombination and art-direction decomposition. Proposal-only; Sol verifies before applying.
-- **Gemini 3.7 Flash High** — independent read-only visual/fresh-eyes review.
-
-Single-integrator rule: only Sol accepts/integrates. Luna and MiniMax must never own the same files in parallel.
+The previous rule “Codex Sol is the single integrator” is retired. A worker may perform an explicitly specified mechanical integration, but **no builder accepts its own work**. Acceptance remains with ChatGPT/Sol plus Manuel where material judgment is needed.
 
 ## Bounds
 
-- max 3 iterations per stage
-- max 5 fixes per iteration
-- max 1 structural fix per iteration
-- max 2 disjoint Luna workers
-- max 1 MiniMax proposal task at a time
-- no engine/dependency/canon change
-- no Meshy/Tripo spend without HUMAN_GATE
-- no reopening the Plaza loop unless a regression is demonstrated
-- no invented final dialogue: `TODO(guion)` + neutral placeholder
+- max 3 visual/fix iterations per stage;
+- max 5 fixes per iteration;
+- max 1 structural fix per iteration;
+- max 2 disjoint Luna workers;
+- max 1 MiniMax task at a time;
+- no engine/dependency/canon change;
+- no Meshy/Tripo spend without HUMAN_GATE;
+- no invented final dialogue;
+- no worker self-approval.
 
 ## Capture policy
 
-Two tiers are required once Sol implements the local GPU iteration mode:
+1. **FAST local GPU** — current stage load-bearing shots. Hardware renderer required for hardware claims.
+2. **FULL acceptance** — canonical shots + desktop/mobile/no-post + Golden Path + console/page errors + performance diagnostics.
+3. SwiftShader is functional fallback only; never hardware FPS evidence.
 
-1. **FAST local iteration** — hardware GPU when available, only the current stage's load-bearing shots, no full cold-start suite. Used for frequent visual iteration.
-2. **FULL acceptance** — canonical shots + desktop/mobile + no-post + gameplay/console/perf diagnostics. Existing reproducible SwiftShader evidence may remain a functional CI fallback, but FPS under SwiftShader is never a hardware benchmark.
-
-If local GPU mode is not yet available, A0 must add it without weakening the existing deterministic gate.
+A3 proved FAST on NVIDIA GTX 1660 Ti / D3D11 with `softwareRendered=false`.
 
 ## Stages
 
-### A0 — Baseline + capture readiness
+### A0 — Baseline + capture readiness — PASS
 
-- freeze `74abaad` as authored-pass input baseline;
-- validate greybox loop remains `complete`;
-- verify GMI and Gemini lanes;
-- add/verify local GPU fast-capture mode without removing deterministic/full mode;
-- record the 22 canonical shots from `ARCO1_CANONICAL_SHOTS.md`.
+### A1 — Reference planning — PASS
 
-PASS: no gameplay regression; fast/full capture paths have explicit contracts.
+### A2 — Plaza + Taller — PASS
 
-### A1 — Reference planning / visual contracts
+### A3 — Manantial / Central — PASS
 
-- inspect repo-native references first;
-- finalize region packs under `assets/references/region-packs/`;
-- identify hero/identity assets that require `HERO_REFERENCE_GATE`;
-- generate no final hero asset from weak references;
-- Gemini reviews the region plan read-only.
+Hydraulic/electrical mechanism authored and simulation-driven; Gemini independent review PASS; Golden Path 22/22.
 
-PASS: every region has approved-for-authoring reference direction or a precise HUMAN_GATE.
+### A4 — Castillo de la Red — ACTIVE
 
-### A2 — Plaza + Taller coherence
+Turn the distribution greybox into a monumental civic distribution hall/substation. Preserve real branch/protection state and accepted parallel/mixed alternatives.
 
-Plaza is already the visual baseline: preserve it. Improve only integration seams, restored-state readability, Taller interior coherence and late-route continuity.
+Current partial work already adds branch-state readability and support reference gating. Do not restart from scratch. First inspect `b923ef7`, focused Castle tests and pending A4 review task.
 
-PASS: accepted Plaza shots do not regress; Taller reads as authored, functional diagnostic space.
+Candidate PASS evidence: authored castle captures, focused tests/build, Golden Path, no page/console errors. Builder can prepare evidence but cannot mark accepted.
 
-### A3 — Manantial / Central hero environment
+### A4B — Navigation + Scenic Shell Hardening — REQUIRED BEFORE A5
 
-Highest authored priority. Build the hydroelectric birthplace of the restored network: stopped/restored water, sluice, turbine/generator, busbars/insulators, measurement points, machinery motion and event-driven electrical response.
+Human playtest exposed production debt that Golden Path did not catch.
 
-MiniMax should be used here for one or more tightly bounded technical-art proposals after gameplay truth is preserved.
+Required:
 
-PASS: before/after state is unmistakable without text; puzzle cause/effect remains readable; mobile is operable.
+- zone-local collision ownership;
+- solid authored geometry cannot silently lack collision;
+- door/transition spawn anchors use `position + lookAt/directionIntoZone`, not memorized yaw constants;
+- initial Portal spawn faces into Plaza/Ohm, not back to Portal;
+- wall-challenge/door-facing automated tests for load-bearing transitions;
+- collision debug visualization or equivalent deterministic diagnostic;
+- interiors close their architectural shell except intentional doors/windows;
+- use the scenic rendering policy: sky/atmosphere → far horizon → cheap 3D scenic shell → gameplay 3D;
+- adjacent-zone portal proxies allowed to prevent void/sky views without eagerly loading full zones.
 
-### A4 — Castillo de la Red
+Do not add a physics engine merely to solve this. Prefer a small deterministic navigation/collision contract.
 
-Turn the distribution greybox into a monumental civic substation/castle. The network topology must remain legible at world scale; use diegetic maintenance close-ups only where density requires it.
-
-PASS: parallel/mixed distribution, protection and service consequences remain visible; no detached circuit minigame.
+PASS requires no known wall-through bugs in load-bearing boundaries, correct facing on every Arco I transition, Golden Path PASS and representative screenshots showing no accidental huge sky holes in interiors.
 
 ### A5 — Forja + Terrazas
 
-Author the contrast between industrial thermal load and irrigated terraces. The region should make the power/safety trade-off spatially and materially obvious.
-
-PASS: load, heat, protection, irrigation and consequence are readable without relying on HUD answers.
+Author industrial heat/current/protection versus irrigation service. Keep the trade-off legible through the world.
 
 ### A6 — Faro + Lago + return
 
-Author the remote culmination and final return. Keep the accepted DC culmination; RC/transient behavior remains a future seam unless ratified. The return must visibly/audibly show a changed world without turning all copper or architecture emissive.
-
-PASS: Faro has a distinct identity, final calibration is readable, restored traversal persists to Plaza.
+Author remote culmination and restored return. Keep current DC truth; RC/transient remains a future seam.
 
 ### A7 — VFX + audio + ambient motion
 
-Compose event-driven electricity, water, machinery, dust/mist, bells, mechanical contacts and ambient beds. MiniMax may propose VFX/audio direction; nothing becomes canonical without Sol review.
-
-PASS: effects communicate physical state; no decorative neon; mobile/overdraw/performance remain inside gate.
+Event-driven, physically meaningful, restrained. M3 may be used on bounded technical-art questions. No permanent copper glow.
 
 ### A8 — Full authored Golden Path / freeze
 
-Run full Portal→Faro→return path with 22 checkpoints or successor contract, canonical captures, desktop/mobile/touch, no-post, console/page errors, transfer/draw-call/triangle/shadow diagnostics and Gemini final review.
+Full Portal→Faro→return, canonical captures, desktop/mobile/touch, no-post, errors/perf, independent review and authority acceptance.
 
-PASS: authored Arco I is coherent end-to-end, no player-facing blocker, no critical regression and loop state becomes `complete`.
+## Worker candidate rule
+
+A builder may continue preparing **candidate** work beyond the current accepted stage only when:
+
+- prior candidate tests/build are green;
+- it commits each candidate milestone separately;
+- it does not mutate `queue[*].status` to `passed` or set loop `complete`;
+- no HUMAN_GATE is present;
+- no material canon/engine/curriculum change is required.
+
+This permits long overnight worker batches without granting self-approval.
 
 ## HUMAN_GATE
 
-Stop only for:
+Stop for contradictory hero references, paid spend, canon/curriculum/engine/major dependency changes, gameplay-topology changes, serious mobile/perf regression, or three failed iterations. Missing final dialogue remains `TODO(guion)` and is not a gate.
 
-- contradictory/insufficient identity reference for a hero asset;
-- paid provider spend or credentials beyond the authorized GMI trial;
-- canon/curriculum/engine/major dependency change;
-- structural change that materially alters validated gameplay;
-- three iterations with no meaningful improvement;
-- serious mobile/performance/accessibility regression;
-- final authored milestone acceptance if Sol/Gemini disagree on a material visual direction.
+## Required evidence
 
-## Required evidence per stage
+For each candidate milestone:
 
-- focused tests/build as applicable;
-- player-facing capture(s) from canonical shot list;
-- diagnostics and console/page errors;
-- Gemini independent review for authored stages A2–A8;
-- Sol acceptance note;
-- MiniMax evaluation entry whenever M3 is used.
+- focused tests + build;
+- relevant FAST captures and renderer diagnostics;
+- zero functional console/page errors;
+- Golden Path when player-facing topology/interactions are touched;
+- commit hash;
+- worker report with known debt;
+- MiniMax evaluation entry when M3 is used.
+
+Final acceptance is separate from worker completion.

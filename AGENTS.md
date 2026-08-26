@@ -1,67 +1,65 @@
 # AGENTS.md — Proyecto Roxana
 
-Manual operativo breve para trabajar en este repositorio. Lore, diseño y
-currícula viven en `docs/`; este archivo no los duplica.
+Manual operativo breve. Lore, diseño y currícula viven en `docs/`; este archivo define autoridad y ejecución.
 
 ## Autoridad
 
 `governance → global → world → content → production → tarea → evidencia`
 
 - `docs/00-governance/ROXANA_CANON_POLICY_v1.md` resuelve contradicciones.
-- `docs/START_HERE.md` define el producto y `ROADMAP.md` ordena el trabajo.
 - El `AGENTS.md` del mundo afectado agrega reglas locales.
 - Código, tests y prototipos aportan evidencia; nunca ascienden una idea a canon.
-- Decisiones de diseño, guion, engine, dependencia o canon material se integran
-  con Manuel.
+- Decisiones materiales de producto, canon, currícula, engine, gasto y dirección visual final se escalan a Manuel.
 
 ## Modelo operativo
 
 ```text
-Human
-  → ChatGPT web: diseño, investigación, planificación y decisiones
-  → Codex / Sol High: único master harness técnico; implementa, integra y valida
-      ├─ Luna Max: worker mecánico en scopes cerrados
-      ├─ Gemini/Antigravity: peer read-only de contexto y fresh-eyes
-      ├─ MiniMax M3: worker experimental proposal-only por GMI durante el trial
-      ├─ PlayCanvas / Blender: tooling de runtime y DCC según necesidad
-      └─ terminal: git, npm, Vite, tests, scripts y validadores
+Human / Manuel
+      ↓
+ChatGPT web / GPT-5.6 Sol
+  diseño · arquitectura · specs · revisión · aceptación
+      ↓
+repo = contrato + evidencia
+      ↓
+┌───────────────────┬───────────────────┬───────────────────┐
+│ Gemini/Antigravity│ MiniMax M3 / GMI  │ Codex Luna/Terra  │
+│ builder general   │ specialist/TA     │ worker mecánico   │
+└───────────────────┴───────────────────┴───────────────────┘
+      ↓
+commits + tests + captures + report
+      ↓
+ChatGPT web / Sol acepta, rechaza o emite fixes exactos
 ```
 
-- Codex/Sol es la única autoridad técnica y el único integrador.
-- Luna y MiniMax nunca editan simultáneamente el mismo scope; Sol asigna un dueño
-  por sub-tarea, verifica el resultado y recién entonces integra.
-- Gemini es peer de contexto amplio, multimodal y fresh-eyes. No integra código ni
-  aprueba su propio trabajo.
-- MiniMax M3 por GMI es una **lane temporal de evaluación** hasta 2026-09-06:
-  devuelve propuestas/patches a `agent-work/reports/minimax-gmi/`; no obtiene
-  acceso directo al filesystem desde el runner repo-native.
-- No agregar routers de modelos, subagent frameworks, colas, daemons ni MCPs
-  caseros para capacidades que ya tienen CLI/API oficial suficiente.
+**GPT-5.6 Sol en ChatGPT web es la autoridad técnica/de diseño por defecto.** No hace falta abrir otra sesión Sol en Codex para repetir análisis ya formalizado en repo.
 
-Detalles de herramientas: `docs/80-production/AI_TOOLING.md`.
+**Codex Sol es break-glass**, no builder por defecto: usar sólo cuando un problema requiere razonamiento fuerte pegado al shell/local state y no puede resolverse de forma económica con un worker.
+
+Un worker puede implementar, correr tests, hacer commits e incluso ejecutar una integración mecánica explícitamente especificada. **Ningún worker se auto-aprueba.** La aceptación material corresponde a ChatGPT/Sol + Manuel cuando aplique.
+
+## Workers
+
+- **Gemini / Antigravity builder:** implementación general, context-heavy repo work, authored scene work, refactors medianos, Playwright/captures. Usar workspace-write en un worktree/branch aislado. Si Gemini implementa, la revisión Gemini posterior debe ser una sesión separada read-only; no cuenta como auto-aprobación.
+- **Codex Luna Max:** wiring, manifests, layouts repetitivos, colliders, fixtures, tests, capture plumbing, cleanup y cambios cerrados. Preferirlo a Sol para trabajo mecánico.
+- **Codex Terra:** fallback intermedio si Luna no alcanza y no se justifica Sol.
+- **MiniMax M3 vía GMI:** durante el trial, specialist para technical art, VFX/shaders, procedural code y recombinación acotada. El runner repo-native actual es proposal-only; cualquier experimento con filesystem debe ocurrir sólo en branch/worktree aislado y jamás auto-integrarse.
+- **Gemini reviewer:** fresh-eyes read-only en sesión distinta de cualquier builder Gemini.
+
+No agregar routers, daemons, colas ni frameworks de agentes. El protocolo es `task.md + git + tests + captures + report`.
 
 ## Contexto mínimo
 
-Leer sólo lo que exige la tarea:
+Leer sólo:
 
 ```text
-AGENTS.md raíz
-  → AGENTS.md del mundo
-  → authority docs directamente relevantes
-  → spec/tarea
-  → archivos afectados
+AGENTS raíz
+→ AGENTS del mundo
+→ task/loop activo
+→ authority docs directamente relevantes
+→ archivos afectados
 ```
 
-No cargar el repo completo ni recovery histórico. Por default usar como máximo
-una skill directamente relevante.
-
-**Delegar a Gemini antes de expandir contexto en Codex** cuando la tarea exige
-leer muchas fuentes, reconciliar documentación extensa, revisar múltiples
-capturas/GLBs o hacer crítica visual independiente.
-
-**Dar a MiniMax contexto explícito y acotado**, no un dump del repo. Durante el
-trial usar `npm run agent:minimax:gmi -- --task ... --context ... --out ...`.
-Sol consume el informe y verifica los puntos load-bearing.
+No cargar recovery histórico ni el repo completo salvo necesidad concreta. Dar a MiniMax archivos explícitos; usar canonical shots/reference packs para evitar redescubrir dirección.
 
 ## Direcciones técnicas
 
@@ -73,27 +71,21 @@ Sol consume el informe y verifica los puntos load-bearing.
 | Bitland | **PROGRAMAR** | core TS + DOM; renderer se decide por spikes |
 | Arithmos | **TRANSFORMAR** | core TS; representación se decide por evidencia |
 
-P12 manda: los mundos comparten producto, no engine, cámara o género.
-
 ## Reglas duras
 
-1. No inventar narrativa. Si falta: `TODO(guion)` + placeholder neutro + reporte.
-2. Formalizar sólo después de evidencia suficiente del jugador.
-3. Validar condiciones y admitir varias soluciones cuando corresponda.
-4. Mantener el core pedagógico puro/testeable; el renderer no es su verdad.
-5. Usar español neutro/tuteo en texto visible.
-6. No hacer upgrades incidentales de dependencia o engine.
-7. No romper baselines ni debilitar tests/acceptance para obtener PASS.
-8. Desktop y mobile/touch son targets de primera clase cuando aplica.
-9. Verificar licencia y procedencia antes de copiar material externo.
-10. Compilar o mostrar una captura no equivale a terminar una experiencia.
-11. Ningún worker o provider se auto-aprueba; Sol acepta con evidencia.
-12. Ningún secreto, API key o token se commitea. Usar `.env.local`/entorno.
+1. No inventar narrativa: `TODO(guion)` + placeholder neutro + reporte.
+2. Mantener core pedagógico puro/testeable; el renderer no es la verdad del dominio.
+3. No romper baselines ni debilitar tests/acceptance para obtener PASS.
+4. Desktop y mobile/touch son targets de primera clase cuando aplica.
+5. No upgrades incidentales de engine/dependencias.
+6. Verificar licencia/procedencia antes de copiar material externo.
+7. Ningún worker/provider aprueba su propio trabajo.
+8. Ningún secreto/API key/token se commitea; usar `.env.local`/entorno.
+9. Ningún gasto pago automático sin HUMAN_GATE/autorización previa.
 
-## Comandos y validación
+## Validación
 
 ```bash
-npm run dev
 npm run build
 npm test
 npm run verify
@@ -102,36 +94,14 @@ npm run agent:gemini:check
 npm run agent:minimax:gmi:check
 ```
 
-Durante implementación, correr tests enfocados. El gate mecánico final normal es
-`npm run verify`; si no existe, usar `npm run build` y `npm test`. Un cambio
-player-facing además se abre y recorre en navegador; verificar consola y
-touch/mobile cuando corresponda.
-
-No declarar PASS si un check importante quedó sin ejecutar.
-
-## Skills y herramientas
-
-- `.agents/skills/`: skills oficiales de PlayCanvas y reglas locales compactas.
-- `roxana-minimax`: MiniMax oficial por `mmx` cuando corresponda y lane GMI
-  temporal para evaluación M3; nunca autoridad de integración.
-- Gemini/Antigravity por `agy` y `scripts/agents/run-antigravity.mjs`; no Gemini API.
-- Git, npm, Vite, TypeScript, Playwright y transformaciones glTF: terminal.
-- MCP stateful: PlayCanvas Editor y Blender cuando aporten valor.
-- Meshy/Tripo: proveedores 3D opcionales detrás de HUMAN_GATE económico; todo
-  resultado termina en Blender canonicalization + GLB/manifiesto portable.
+Un cambio player-facing se recorre además en navegador y se verifica en touch/mobile cuando corresponda. Compilar o mostrar una captura no equivale a terminar una experiencia.
 
 ## Intercambio entre agentes
 
-- Gemini tasks: `agent-work/tasks/gemini/`
-- Gemini reports: `agent-work/reports/gemini/`
-- MiniMax tasks: `agent-work/tasks/minimax/`
-- MiniMax GMI reports: `agent-work/reports/minimax-gmi/`
+- tasks Gemini: `agent-work/tasks/gemini/`
+- tasks workers cross-provider: `agent-work/tasks/workers/`
+- reports Gemini: `agent-work/reports/gemini/`
+- tasks MiniMax: `agent-work/tasks/minimax/`
+- reports MiniMax GMI: `agent-work/reports/minimax-gmi/`
 
-Son carpetas de intercambio, no una cola ni un bus. Las tareas incluyen objetivo,
-archivos/contexto, límites y formato. Sol integra sólo después de revisar.
-
-## Escalación
-
-Escalar a Manuel ante cambios materiales de experiencia, guion, currícula,
-canon, engine/dependencias, dirección visual, gasto pago o integración de
-milestone. Un fix técnico local dentro de una tarea clara se resuelve y verifica.
+El detalle operativo vive en `docs/80-production/AI_TOOLING.md`.

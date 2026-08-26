@@ -1,169 +1,170 @@
 # AI tooling — harness canónico
 
-**Estado:** operativo · **actualizado:** 2026-08-25
+**Estado:** operativo · **actualizado:** 2026-08-26
 
-## Responsabilidades
+## Principio nuevo: Sol decide, workers ejecutan
 
-| Actor | Responsabilidad |
+La cuota de GPT Plus no debe gastarse duplicando en Codex el análisis que ya hizo GPT-5.6 Sol en ChatGPT web.
+
+```text
+ChatGPT web / GPT-5.6 Sol
+  arquitectura · diseño · specs · review · acceptance
+            ↓
+          repo
+            ↓
+Gemini builder / MiniMax M3 / Codex Luna-Terra
+  implementación · tests · captures · commits
+            ↓
+      evidence pack
+            ↓
+ChatGPT web / Sol
+  accept / reject / exact fixes
+```
+
+**Codex Sol queda como break-glass** para problemas que realmente exigen razonamiento fuerte con shell/local state. No es el executor por defecto.
+
+## Roles
+
+| Actor | Rol |
 |---|---|
-| Humano / Manuel | objetivos, canon, gasto pago y decisiones materiales |
-| ChatGPT web | investigación, diseño, planificación y specs |
-| Codex / Sol High | única autoridad técnica; decide, integra, prueba y valida |
-| Codex / Luna Max | worker mecánico sólo con brief cerrado |
-| MiniMax M3 | worker experimental de código/technical-art por GMI durante el trial; propone, no integra |
-| Gemini / Antigravity | contexto amplio, multimodal y fresh-eyes read-only |
-| Meshy / Tripo | generación 3D opcional detrás de HUMAN_GATE económico |
+| Manuel | objetivo, canon, gasto, decisiones materiales |
+| ChatGPT web / GPT-5.6 Sol | autoridad técnica/de diseño, task contracts, revisión, acceptance |
+| Gemini / Antigravity builder | builder general repo-heavy y authored scene work |
+| Gemini / Antigravity reviewer | sesión separada read-only, fresh-eyes multimodal |
+| Codex Luna Max | mechanical worker barato |
+| Codex Terra | middle worker/fallback |
+| Codex Sol | break-glass local reasoning |
+| MiniMax M3 / GMI | technical-art/VFX/procedural specialist experimental |
+| Blender | DCC master Ohmdal |
+| Meshy/Tripo | generación 3D opcional detrás de HUMAN_GATE |
 
-No existe router automático ni meta-framework. El mecanismo normal es `archivo + terminal + git`. Codex/Sol sigue siendo **single integrator**: Luna y MiniMax no compiten editando el mismo scope y ningún worker aprueba su propio resultado.
+Ningún worker se auto-aprueba. Un builder puede editar, testear, commitear y ejecutar una integración mecánica explicitada; la aceptación material vuelve a ChatGPT/Sol y Manuel cuando corresponde.
 
-## Bounded loops
+## Gemini builder vs reviewer
 
-Contrato cross-Roxana: `docs/80-production/BOUNDED_AGENT_LOOP.md`.
+Antigravity puede cumplir dos roles, pero nunca en la misma sesión de autoridad:
 
-Instancias relevantes:
+### Builder
 
-- Plaza: `agent-work/loops/ohmdal-plaza/LOOP.md` — `complete`.
-- Arco I greybox: `agent-work/loops/ohmdal-arco1-greybox/LOOP.md` — `complete`.
-- **Arco I authored pass:** `agent-work/loops/ohmdal-arco1-authored-pass/LOOP.md` — producción actual.
+- abrir `agy` desde un worktree/branch aislado;
+- usar **Gemini 3.7 Flash High + effort high** o el equivalente Flash High disponible;
+- usar modo de implementación/agent con workspace write habilitado, no plan/read-only;
+- leer task/AGENTS/contratos mínimos;
+- editar, correr terminal, Playwright, build/tests y commit/push;
+- producir un report de evidencia;
+- **no marcar su propio stage como accepted/passed**.
 
-Reglas:
+### Reviewer
 
-- máximo 3 iteraciones por stage;
-- máximo 5 fixes por iteración;
-- máximo 1 fix estructural importante por iteración;
-- Sol High decide y acepta;
-- Luna Max ejecuta trabajo mecánico bien especificado;
-- MiniMax M3 puede producir propuestas/patches para scopes aislados durante la evaluación GMI;
-- Gemini Flash revisa evidencia, no implementación;
-- sólo un `HUMAN_GATE` real detiene el avance;
-- no agregar directors, routers, daemons, colas ni agent frameworks nuevos.
+- proceso/sesión distinta;
+- read-only/plan/sandbox;
+- recibe capturas, manifests, task y contracts mínimos;
+- emite findings; no implementa.
 
-## Gemini por Antigravity CLI — sin API
+Runner reviewer existente: `scripts/agents/run-antigravity.mjs`.
 
-Ruta canónica: `agy` con login local de Google. No `GEMINI_API_KEY`, Vertex ni AI Studio API.
-
-```powershell
-irm https://antigravity.google/cli/install.ps1 | iex
-agy
-```
-
-Checks:
-
-```bash
-agy models
-npm run agent:gemini:check
-```
-
-Wrapper: `scripts/agents/run-antigravity.mjs`.
-
-Routing visual/contextual default: **`gemini-3.7-flash-high` + effort high**. Si el slug desaparece, usar el equivalente Gemini Flash High disponible. No escalar automáticamente a Pro.
-
-Usos: context distillation, reconciliación de fuentes, review multimodal, fresh-eyes y selección de reading set mínimo. No usar Gemini para implementar, modificar el repo o aprobar su propio trabajo.
-
-Para authored pass existe la tarea reusable `agent-work/tasks/gemini/ohmdal-arco1-authored-stage-review.md`.
-
-## Codex routing
-
-### Sol High
-
-Reservar para arquitectura, gameplay sistémico, composición/dirección visual, trade-offs, integración compleja, partición de tareas y aceptación de stages.
+## Codex
 
 ### Luna Max
 
-Usar cuando el resultado esperado está cerrado: imports/wiring, manifests, layouts repetitivos, colliders, fixtures, tests, capture plumbing, warnings, cleanup y extracciones mecánicas. Máximo dos workers disjuntos por iteración.
+Default para:
 
-## MiniMax M3 — evaluación GMI hasta 2026-09-06
+- colliders y spawn anchors ya especificados;
+- manifests/provenance;
+- layouts repetitivos;
+- fixtures/tests;
+- capture plumbing;
+- imports/wiring/cleanup;
+- cherry-picks/integración mecánica con instrucciones exactas.
 
-La lane GMI es una evaluación temporal, no una dependencia. La key vive sólo en `.env.local`:
+### Terra
+
+Usar si el scope supera a Luna pero no justifica Sol.
+
+### Sol
+
+Sólo cuando se demuestra necesidad de reasoning fuerte pegado a herramientas locales. No abrir Sol simplemente para “continuar el loop” si el repo ya contiene un task ejecutable.
+
+## MiniMax M3 — trial GMI hasta 2026-09-06
+
+Key sólo en `.env.local`:
 
 ```dotenv
-GMI_API_KEY=PEGAR_LA_KEY_REAL_ACA
+GMI_API_KEY=...
 GMI_BASE_URL=https://api.gmi-serving.com/v1
 GMI_MINIMAX_MODEL=MiniMaxAI/MiniMax-M3
 ```
 
-Checks:
+Runner actual:
 
 ```bash
 npm run agent:minimax:gmi:check
-npm run agent:minimax:gmi -- --task <task.md> --context <file> --out <report.md>
+npm run agent:minimax:gmi -- --task <task> --context <file> --out <report>
 ```
 
-Runner: `scripts/agents/run-gmi-minimax.mjs`.
+El sidecar actual sigue **proposal-only**. La evidencia hasta A4 indica que M3 aporta inventario/ideas/timing pero sus propuestas PlayCanvas han requerido varias reparaciones load-bearing; `WOULD_PAY` sigue provisionalmente `no`.
 
-El runner limita contexto, no expone filesystem/shell al modelo y escribe resultados bajo `agent-work/reports/minimax-gmi/`. Todo output es **proposal-only**.
+Para medirlo de forma justa:
 
-### Lecciones ya medidas
+- tareas pequeñas;
+- interfaces exactas;
+- uno o pocos archivos de contexto;
+- no auditorías globales;
+- no paquetes enormes de shaders;
+- registrar first-pass, repairs, accepted/rejected y `WOULD_PAY`.
 
-El greybox mostró que M3 funciona mejor con tareas pequeñas y exactas que con auditorías amplias o paquetes VFX grandes. Para authored pass:
+Un futuro experimento de M3 con filesystem/tools debe vivir en worktree/branch aislado; no autoriza merge ni canon.
 
-- dar un solo efecto o una sola pregunta visual/técnica;
-- adjuntar interfaces/código exactos y una referencia local;
-- limitar cantidad de archivos/sugerencias;
-- pedir que declare APIs dudosas en vez de inventarlas;
-- registrar first-pass, reparaciones Sol, integración y `WOULD_PAY`.
+## Worktrees / ownership
 
-Tareas nuevas relevantes:
+El repo y Git son el protocolo multi-modelo. Para trabajos largos:
 
-- `agent-work/tasks/minimax/authored-manantial-vfx-v2.md`
-- `agent-work/tasks/minimax/authored-castle-branch-readability.md`
+```text
+Roxana/                         branch canónica
+Roxana-gemini/                  worker Gemini
+Roxana-minimax/                 worker M3 tool-enabled experimental
+```
 
-Si GMI falla o termina, el loop continúa con Sol/Luna/Gemini.
+Un solo owner por archivos load-bearing en cada batch. Workers devuelven:
 
-## PlayCanvas
+- commit(s);
+- tests ejecutados;
+- captures/manifests;
+- report;
+- dudas/HUMAN_GATE si existen.
 
-PlayCanvas Engine v2 + TypeScript + Vite es runtime canónico de Ohmdal. Decisión: `docs/20-worlds/ohmdal/production/OHMDAL_3D_RUNTIME_DECISION.md`.
+No crear buses, daemons, routers ni colas de agentes.
 
-Baselines:
+## Ohmdal authored pass
 
-- hardening `dec2d75`;
-- Arco I greybox `b8bb412`;
-- cierre greybox `74abaad`.
+Loop: `agent-work/loops/ohmdal-arco1-authored-pass/`.
 
-Three.js sigue como cantera técnica/R&D, no runtime paralelo.
+A0–A3 están accepted. A4 Castillo tiene trabajo parcial pusheado. Antes de A5 se agrega **A4B Navigation + Scenic Shell Hardening** para corregir evidencia humana reciente:
 
-## Captura local GPU vs gate full
+- paredes/arquitectura visibles atravesables por colliders manuales incompletos;
+- spawns/teleports con yaw hardcodeado que pueden mirar hacia la puerta;
+- interiores/scenic shells que dejan grandes huecos de sky dome;
+- necesidad de una estrategia consistente de fondo FPS.
 
-El authored pass debe usar dos niveles una vez implementado A0:
+Contratos nuevos:
 
-1. **FAST local GPU** para iteración frecuente. Preferir Chromium/Chrome con hardware acceleration real; capturar sólo shots load-bearing de la etapa.
-2. **FULL acceptance** para canonical shots, desktop/mobile/no-post, errores y diagnósticos completos. El camino reproducible por SwiftShader puede conservarse como fallback funcional.
+- `docs/20-worlds/ohmdal/production/OHMDAL_NAVIGATION_COLLISION_CONTRACT.md`
+- `docs/20-worlds/ohmdal/production/OHMDAL_SCENIC_RENDERING_POLICY.md`
 
-Los manifests deben reportar renderer y `softwareRendered`. Nunca usar FPS de SwiftShader como benchmark de GPU física.
+## Captura/performance
 
-A0 del authored pass debe implementar/verificar este modo sin reescribir el Visual Harness.
+FAST local ya consiguió NVIDIA GTX 1660 Ti / D3D11 / `softwareRendered=false` en A3. Mantener:
 
-## Blender / Hero assets / proveedores
+1. FAST hardware GPU para iteración actual;
+2. FULL acceptance con canonical shots + mobile/no-post/errors/perf;
+3. SwiftShader sólo como evidencia funcional reproducible; nunca como benchmark físico.
 
-Blender 5.2 LTS es DCC master. Todo hero pasa `docs/3d/HERO_REFERENCE_GATE.md`.
+## Contexto barato
 
-Ruta preferida:
-
-`approved references → Blender determinista cuando alcance → canonical GLB → Visual Harness`
-
-Meshy es posibilidad futura, especialmente para image/multiview→3D complejo. Tripo es A/B/fallback. Ambos requieren HUMAN_GATE económico salvo autorización previa, y terminan en Blender canonicalization + GLB + reference validation. `img2threejs` sigue experimental/R&D.
-
-## Authored pass Ohmdal
-
-Contratos:
-
-- `docs/20-worlds/ohmdal/production/ARCO1_CANONICAL_SHOTS.md`
-- `docs/20-worlds/ohmdal/production/ARCO1_AREA_REFERENCE_PLAN.md`
-- `docs/20-worlds/ohmdal/production/ARCO1_AUTHORED_PASS_POLICY.md`
-- `docs/20-worlds/ohmdal/production/OHMDAL_VFX_AUDIO_PLAN.md`
-- `assets/references/region-packs/manifest.json`
-
-Regla resumida: greybox = autoridad de gameplay/topología; authored pass = formas, materiales, luz, motion/VFX/audio y readability. No rediseñar puzzles o rutas para facilitar el arte.
-
-## Interacción y puzzles
-
-`docs/20-worlds/ohmdal/production/OHMDAL_INTERACTION_POLICY.md` sigue mandando: **world-first**. Cables, interruptores, bornes, relés, protecciones, válvulas y máquinas se manipulan en mundo cuando son legibles. Close-up diegético sólo cuando precisión/densidad lo exige y siempre sobre el mismo modelo eléctrico.
-
-## Mantener barato el contexto
-
-1. Leer AGENTS + scope + tarea directa.
-2. Delegar corpus grande a Gemini antes de cargarlo en Sol.
-3. Dar a M3 archivos concretos; no adjuntar el repo entero.
-4. Sol decide, Luna ejecuta mecánico y M3 propone technical-art acotado.
-5. Usar canonical shots y region packs en vez de redescubrir dirección visual.
-6. Respetar límites y HUMAN_GATEs.
+1. Leer AGENTS + loop/state + task directa.
+2. No repetir planeamiento ya ratificado.
+3. Gemini builder implementa; Gemini reviewer separado critica.
+4. M3 recibe contexto acotado.
+5. Luna hace trabajo mecánico.
+6. Escalar a Codex Sol sólo por necesidad demostrada.
+7. ChatGPT/Sol revisa evidence packs y emite el siguiente batch.

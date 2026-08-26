@@ -21,16 +21,8 @@ try {
 }
 
 const validStatuses = new Set([
-  'ready',
-  'reviewing',
-  'planning',
-  'implementing',
-  'validating',
-  'capturing',
-  'stage_pass',
-  'stage_partial',
-  'human_gate',
-  'complete',
+  'ready', 'reviewing', 'planning', 'implementing', 'validating', 'capturing',
+  'stage_pass', 'stage_partial', 'human_gate', 'complete',
 ]);
 
 if (state.schemaVersion !== 1) fail('schemaVersion must be 1');
@@ -50,10 +42,8 @@ for (const [key, max] of [
   }
 }
 
-if (state.maxConcurrentMiniMaxWorkers != null) {
-  if (!Number.isInteger(state.maxConcurrentMiniMaxWorkers) || state.maxConcurrentMiniMaxWorkers !== 1) {
-    fail('maxConcurrentMiniMaxWorkers must be exactly 1 when present');
-  }
+if (state.maxConcurrentMiniMaxWorkers != null && state.maxConcurrentMiniMaxWorkers !== 1) {
+  fail('maxConcurrentMiniMaxWorkers must be exactly 1 when present');
 }
 
 if (!Number.isInteger(state.iteration) || state.iteration < 0 || state.iteration > state.maxIterationsPerStage) {
@@ -65,20 +55,50 @@ if (!reviewer) fail('routing.reviewer is required');
 if (reviewer.harness !== 'antigravity-cli') fail('reviewer harness must be antigravity-cli');
 const reviewerModel = String(reviewer.model || '').toLowerCase();
 if (!reviewerModel.includes('gemini') || !reviewerModel.includes('flash')) {
-  fail('automatic reviewer must remain in the Gemini Flash family');
+  fail('automatic reviewer must remain in Gemini Flash family');
 }
 if (!String(reviewer.fallback || '').toLowerCase().includes('flash')) {
   fail('reviewer fallback must remain Flash-family only');
 }
 
+// Legacy loops used Codex/Sol as decision authority. New loops may use ChatGPT
+// web/Sol as authority while reserving Codex Sol for break-glass local reasoning.
 const decision = state.routing?.decision;
-if (!decision || decision.harness !== 'codex' || decision.modelAlias !== 'Sol' || decision.effort !== 'high') {
-  fail('decision routing must be Codex / Sol / high');
+if (!decision) fail('routing.decision is required');
+const legacyDecision = decision.harness === 'codex' && decision.modelAlias === 'Sol' && decision.effort === 'high';
+const webDecision = decision.harness === 'chatgpt-web' && decision.modelAlias === 'Sol' && decision.effort === 'high';
+if (!legacyDecision && !webDecision) {
+  fail('decision routing must be legacy Codex/Sol/high or ChatGPT-web/Sol/high');
+}
+
+const authority = state.routing?.authority;
+if (authority) {
+  if (authority.harness !== 'chatgpt-web' || authority.modelAlias !== 'Sol') {
+    fail('routing.authority must be ChatGPT-web / Sol when present');
+  }
+}
+
+const builder = state.routing?.builder;
+if (builder) {
+  if (builder.harness !== 'antigravity-cli') fail('builder harness must be antigravity-cli when present');
+  const model = String(builder.model || '').toLowerCase();
+  if (!model.includes('gemini')) fail('builder must be Gemini family when present');
+  if (builder.selfApproval !== false) fail('builder selfApproval must be false');
 }
 
 const worker = state.routing?.mechanicalWorker;
-if (!worker || worker.harness !== 'codex-subagent' || worker.modelAlias !== 'Luna' || worker.effort !== 'max') {
-  fail('mechanical worker routing must be Codex subagent / Luna / max');
+if (!worker) fail('routing.mechanicalWorker is required');
+const legacyWorker = worker.harness === 'codex-subagent' && worker.modelAlias === 'Luna' && worker.effort === 'max';
+const directWorker = worker.harness === 'codex' && worker.modelAlias === 'Luna' && worker.effort === 'max';
+if (!legacyWorker && !directWorker) {
+  fail('mechanical worker must be Codex Luna/max');
+}
+
+const breakGlass = state.routing?.breakGlass;
+if (breakGlass) {
+  if (breakGlass.harness !== 'codex' || breakGlass.modelAlias !== 'Sol' || breakGlass.effort !== 'high') {
+    fail('breakGlass must be Codex / Sol / high');
+  }
 }
 
 const experimentalWorker = state.routing?.experimentalWorker;
@@ -93,11 +113,8 @@ if (experimentalWorker) {
 
 const limits = state.limits || {};
 for (const key of [
-  'allowPaidGenerativeWithoutHumanGate',
-  'allowEngineChange',
-  'allowCanonChange',
-  'allowLargeDependencyChange',
-  'allowNewAgentFramework',
+  'allowPaidGenerativeWithoutHumanGate', 'allowEngineChange', 'allowCanonChange',
+  'allowLargeDependencyChange', 'allowNewAgentFramework',
 ]) {
   if (limits[key] !== false) fail(`${key} must be false`);
 }
@@ -115,5 +132,7 @@ if (state.status === 'human_gate' && !state.humanGate) fail('human_gate status r
 if (state.status !== 'human_gate' && state.humanGate != null) fail('humanGate must be null unless status=human_gate');
 
 console.log(`BOUNDED_LOOP_STATE PASS: ${state.loopId} stage=${state.currentStage} iteration=${state.iteration}/${state.maxIterationsPerStage}`);
-console.log(`reviewer=${reviewer.model} decision=${decision.modelAlias}/${decision.effort} worker=${worker.modelAlias}/${worker.effort}`);
+console.log(`reviewer=${reviewer.model} decision=${decision.harness}/${decision.modelAlias}`);
+if (builder) console.log(`builder=${builder.model}/${builder.mode || 'unspecified'} selfApproval=${builder.selfApproval}`);
+console.log(`worker=${worker.modelAlias}/${worker.effort}`);
 if (experimentalWorker) console.log(`experimental=${experimentalWorker.model}/${experimentalWorker.mode}`);

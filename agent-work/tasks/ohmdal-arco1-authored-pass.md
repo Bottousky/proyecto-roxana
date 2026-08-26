@@ -2,7 +2,7 @@
 
 ## Objective
 
-Execute the next production phase after the closed Arco I greybox. Convert the complete playable route into a coherent authored 3D pass while preserving gameplay truth, pedagogy, zone lifecycle, performance budgets and the accepted Plaza baseline.
+Convert the complete playable Arco I into a coherent authored 3D pass while preserving gameplay truth, pedagogy, zone lifecycle, performance budgets and the accepted Plaza baseline.
 
 Read first:
 
@@ -10,117 +10,103 @@ Read first:
 2. `docs/20-worlds/ohmdal/AGENTS.md`
 3. `agent-work/loops/ohmdal-arco1-authored-pass/LOOP.md`
 4. `agent-work/loops/ohmdal-arco1-authored-pass/state.json`
-5. `agent-work/reports/ohmdal-arco1-greybox-sprint.md`
-6. `docs/20-worlds/ohmdal/production/OHMDAL_VISUAL_MATERIAL_BIBLE.md`
-7. `docs/20-worlds/ohmdal/production/OHMDAL_INTERACTION_POLICY.md`
-8. `docs/20-worlds/ohmdal/production/ARCO1_CANONICAL_SHOTS.md`
-9. `docs/20-worlds/ohmdal/production/ARCO1_AREA_REFERENCE_PLAN.md`
-10. `docs/20-worlds/ohmdal/production/ARCO1_AUTHORED_PASS_POLICY.md`
+5. `docs/20-worlds/ohmdal/production/OHMDAL_VISUAL_MATERIAL_BIBLE.md`
+6. `docs/20-worlds/ohmdal/production/ARCO1_AREA_REFERENCE_PLAN.md`
+7. `docs/20-worlds/ohmdal/production/ARCO1_CANONICAL_SHOTS.md`
+8. `docs/20-worlds/ohmdal/production/OHMDAL_NAVIGATION_COLLISION_CONTRACT.md`
+9. `docs/20-worlds/ohmdal/production/OHMDAL_SCENIC_RENDERING_POLICY.md`
 
-Do not bulk-read historical runtimes unless a concrete question requires them.
+## Authority / execution split
+
+- ChatGPT web / GPT-5.6 Sol owns architecture, direction and acceptance.
+- Gemini 3.7 Flash High / Antigravity is the preferred general builder for authored scene work; use an isolated worktree/branch with workspace write.
+- A separate Gemini session may review read-only; builder cannot accept itself.
+- Codex Luna Max owns bounded mechanical work when needed.
+- Terra is fallback middle worker.
+- Codex Sol is break-glass only.
+- MiniMax M3 via GMI is a bounded technical-art specialist; current runner remains proposal-only.
+
+A worker may commit candidate milestones and continue preparing later candidates while tests stay green, but must not set queue stages to `passed` or loop to `complete` without external acceptance.
+
+## Current state
+
+- A0 PASS.
+- A1 PASS.
+- A2 PASS.
+- A3 PASS; hardware FAST capture verified NVIDIA GTX 1660 Ti / D3D11 / non-software.
+- A4 Castillo ACTIVE.
+- `b923ef7` contains partial A4 work recovered from the interrupted Codex run: Castle branch-state cues, reference gate work, capture contract/tests and M3 evidence. Inspect and continue; do not restart.
 
 ## Absolute priorities
 
-1. Preserve the already-valid Portal→Faro→return Golden Path.
-2. Give every late greybox region a clear authored identity.
-3. Make electrical/hydraulic cause and effect more legible through geometry, materials, motion, sound and event VFX — not through quiz UI.
-4. Finish the whole route coherently before over-polishing one late zone.
-5. Keep desktop and touch/mobile first-class.
-6. Use actual repo evidence and region packs before inventing new visual language.
+1. Preserve Portal→Faro→return Golden Path.
+2. Finish authored identity across the whole route before deep polish.
+3. Keep physical/electrical cause and effect legible in-world.
+4. Fix navigation/collision/enclosure debt before building more late-zone art on top of it.
+5. Keep mobile/touch and GPU/perf budgets first-class.
+6. Do not duplicate already-ratified planning.
 
-## Agent routing
+## Stage expectations
 
-### Sol High
+### A4 — Castillo
 
-Owns architecture, scene composition, integration, acceptance, trade-offs, hero decisions, stage progression and final commits.
+Finish the current candidate. Monumental civic distribution hall, branch/service/protection state legible without detached minigame. Use current partial work; produce FAST captures and focused tests.
 
-### Luna Max
+### A4B — Navigation + Scenic Shell Hardening
 
-Use only for bounded mechanical scopes such as:
+Mandatory before A5 because human playtest found:
 
-- extracting repeated scene helpers;
-- instancing/dressing from an approved layout;
-- manifests/provenance;
-- colliders and non-creative wiring;
-- tests/capture plumbing;
-- warning/cleanup passes.
+- visible walls can be traversed when a manual collider is missing;
+- door/spawn facing is hardcoded with yaws and may face the door just crossed;
+- initial Portal spawn can face back toward the Portal;
+- interiors/scenic areas expose large accidental sky-dome voids.
 
-Never delegate open-ended art direction to Luna.
+Implement the two production contracts. Prefer deterministic lightweight systems over a new physics engine.
 
-### MiniMax M3 via GMI
+Required outcomes:
 
-Use on real authored-pass work, but proposal-only. Best candidates:
+- zone-local collision registry/ownership;
+- solid geometry helpers or equivalent contract so visible load-bearing walls cannot silently omit collision;
+- transition spawn anchors described by `position + lookAt/directionIntoZone`;
+- correct orientation on every Arco I transition and initial Portal spawn;
+- wall-challenge + door-facing tests;
+- collision debug diagnostic;
+- interiors/scenic shells close unintended sky gaps;
+- layered background/scenic rendering rather than one flat image: atmosphere/sky, far horizon, cheap 3D scenic shell, gameplay geometry, optional adjacent-zone proxies.
 
-- procedural electricity/water/mist technical-art decomposition;
-- shader/VFX modules based on existing local examples;
-- scene-parameter or timing proposals;
-- bounded code recombination with exact target files and acceptance tests;
-- text-only audio/ambience design briefs if the current GMI runner cannot call media endpoints directly.
+### A5 — Forja/Terrazas candidate
 
-Every M3 use must update `agent-work/reports/minimax-gmi/EVALUATION.md` with applicability, Sol repairs, accepted/rejected status and WOULD_PAY.
+Industrial thermal load versus irrigation service. Heat/current/protection/water state legible through world consequences.
 
-Do not ask M3 to audit the whole runtime or design a large package without exact interfaces; previous evidence showed poor reliability in those modes.
+### A6 — Faro/Lago/return candidate
 
-### Gemini 3.7 Flash High
+Remote culmination, DC calibration truth, restored return. RC/transients remain future seam.
 
-Fresh-eyes reviewer only. Provide stage-specific screenshots/manifests and the minimum visual contracts. It must remain read-only and never approve its own implementation.
+### A7 — VFX/audio
 
-## A0 first
+Event-driven and physically motivated. M3 can be used on exact scoped questions; no permanent copper glow.
 
-Before authored art work:
+### A8 — Full freeze
 
-- validate `npm run loop:ohmdal-arco1:validate` still reports complete;
-- validate `npm run loop:ohmdal-arco1-authored:validate`;
-- validate GMI and Gemini lanes;
-- implement a **local GPU fast capture mode** if the current capture harness still runs only through SwiftShader. Preserve the existing full/reproducible gate. The fast mode should prefer real Chromium/Chrome hardware acceleration locally, expose renderer/softwareRendered diagnostics, and capture only current-stage load-bearing shots. Do not claim GPU FPS unless diagnostics confirm hardware rendering.
-
-A0 is a small technical prerequisite, not a new harness project.
-
-## A1 references
-
-Populate/finalize region packs from repo-native evidence. The text briefs under `assets/references/region-packs/` are production direction, not permission to redesign validated topology. If an identity-defining hero lacks sufficient approved visual reference, stop only that asset behind HUMAN_GATE and continue other non-blocked work.
-
-## Authored stage expectations
-
-- A2 Plaza/Taller: preserve accepted Plaza; improve late-state seams and authored Taller coherence.
-- A3 Manantial/Central: highest environment priority; hydroelectric causality, stopped/restored water, machinery, conductors, readable generator/sluice chain.
-- A4 Castillo: monumental civic distribution architecture, not generic fantasy castle; visible branch/service logic.
-- A5 Forja/Terrazas: industrial heat/power versus irrigation/water; spatially legible trade-off.
-- A6 Faro/Lago/return: distinct remote culmination, accepted DC calibration, visible/audible restored return.
-- A7 VFX/audio: event-driven, physically meaningful, restrained; no permanent copper glow.
-- A8 full path: 22 canonical checkpoints or stricter successor plus full captures/perf/review.
+Full canonical capture/playtest/mobile/perf/review. Only external authority may mark loop complete.
 
 ## Performance
 
-Treat the existing greybox evidence as the starting envelope, not permission to spend everything:
+Preserve zone loading and material reuse. Existing full greybox envelope was ~22 MB transfer, <=145 draw calls, ~88.8k tris, one shadow light; authored zone-local FAST counts are substantially lower. Do not silently weaken gates.
 
-- transfer baseline ~22.03 MB;
-- peak ~145 draw calls;
-- peak ~88.8k tris;
-- one shadow-casting light.
+## External providers
 
-Authored work should remain mobile-conscious. Prefer batching/instancing/material reuse and zone-local loading. If visual quality requires materially exceeding existing budgets, document the trade-off and escalate instead of silently weakening gates.
+Blender remains DCC master. No Meshy/Tripo spend without HUMAN_GATE. No canon/engine/major dependency changes.
 
-## External 3D providers
+## Worker completion packet
 
-Blender remains canonical DCC. Meshy is a strong future image/multiview→3D option but is not auto-authorized here. Meshy/Tripo require HUMAN_GATE for spend and must still pass reference gate, Blender canonicalization, GLB validation and Visual Harness.
+Every candidate milestone must leave:
 
-## Completion
+- commit hash;
+- focused tests/build commands and results;
+- FAST capture path + renderer diagnostics;
+- Golden Path result if navigation/interactions changed;
+- known debt/blockers;
+- M3 evaluation update when used.
 
-Continue autonomously stage by stage until:
-
-- `complete`, or
-- a real HUMAN_GATE from the loop contract.
-
-Commit/push verified milestones. Do not stop merely because one authored stage is visually decent if later regions remain greyboxes.
-
-Final report must contain:
-
-- stages passed;
-- exact canonical shots/evidence;
-- Golden Path status;
-- mobile status;
-- performance deltas against greybox baseline;
-- MiniMax task outcomes and provisional BUY/DON'T BUY evidence;
-- remaining non-blocking art/VO/animation debt;
-- HUMAN_GATEs if any.
+Do not invent dialogue; use `TODO(guion)` neutral placeholders.
