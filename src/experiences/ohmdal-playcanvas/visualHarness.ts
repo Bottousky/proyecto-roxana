@@ -21,6 +21,11 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES = [
   'workshop-exterior',
   'workshop-interior-tools',
   'galvanoscope-first-person',
+  'manantial-approach',
+  'hydro-central-wide',
+  'sluice-gate-interaction',
+  'generator-platform',
+  'restored-manantial',
 ] as const;
 
 export type OhmdalVisualCaptureShotName =
@@ -49,10 +54,20 @@ export interface RoxanaOhmdalCaptureShot {
     pitch: number;
   } | null;
   world: {
-    zone: 'plaza' | 'workshop';
+    zone: 'plaza' | 'workshop' | 'manantial';
     storyStep: string;
     tool?: 'galvanoscope';
     probeTarget?: string;
+    interaction?: 'intake-gate';
+    comparison?: 'before-after';
+    measurementPoint?: 'generator' | 'turbine' | 'return' | 'load';
+    manantial?: {
+      gateOpen: boolean;
+      returnBridgeInstalled: boolean;
+      excitationEnabled: boolean;
+      protectiveTrip: boolean;
+      restored: boolean;
+    };
   };
   deterministic: {
     seed: number;

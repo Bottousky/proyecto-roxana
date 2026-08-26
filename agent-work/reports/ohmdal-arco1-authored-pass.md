@@ -171,3 +171,64 @@ revisión visual independiente de Gemini 3.7 Flash High.
   y el gate FULL permanece reservado para A8.
 - No se usó MiniMax en A2. Su primer scope obligatorio sigue siendo la propuesta
   technical-art acotada de Manantial en A3.
+
+## A3 — Manantial / Central hero environment
+
+**Estado:** `PASS` — dos iteraciones visuales acotadas. Sol aceptó el authored
+support pass después del Hero Reference Gate, propuesta M3 evaluada, captura GPU,
+Golden Path completo y revisión independiente Gemini 3.7 Flash High.
+
+### Resultado player-facing
+
+- El Manantial ahora lee como una central hidroeléctrica cívica integrada:
+  headworks de piedra pálida, canal de admisión, hoja y bastidor de compuerta,
+  turbina-generador compacto, eje, plataforma de medición, aisladores y barras
+  de salida comparten una jerarquía física.
+- El estado dormido/restaurado es inequívoco desde la misma cámara: cambia el
+  agua retenida/activa, la elevación de la hoja, el rotor gobernado por gameplay
+  y la conexión física de salida. No hay agua luminosa ni cobre globalmente
+  emissive.
+- El authored support vive bajo `ManantialGameplayRoot` y se batch-ea como
+  `OhmdalManantialStaticArt`. La carcasa escénica heredada de Plaza permanece
+  intacta y se sustituye sólo mientras Manantial está activo.
+- La ruta, controles, colliders y modelo eléctrico validados no cambiaron. Una
+  propuesta inicial de exclusividad Plaza↔Manantial se revirtió cuando el gate
+  demostró que Plaza activa junto a Manantial es una expectativa deliberada.
+
+### Hero y VFX
+
+- `assets/references/hero-packs/manantial/hero-reference.json` pasó
+  `HERO_REFERENCE_GATE` en modo `adapt`. Autoriza el support silhouette, no un
+  hero GLB final ni proveedores generativos.
+- MiniMax M3 entregó una propuesta acotada. Sol conservó el FSM determinista y
+  el cleanup explícito, pero rechazó la mutación de materiales compartidos, la
+  doble autoridad del rotor, el merge inseguro de settings y las afirmaciones
+  móviles inconsistentes.
+- La implementación aceptada crea un único trace local durante el evento,
+  anima el indicador sin sombras, respeta reduced motion y devuelve el estado
+  estable a la simulación. La evaluación está en
+  `agent-work/reports/minimax-gmi/EVALUATION.md`.
+
+### Evidencia
+
+- FAST A3:
+  `output/playwright/ohmdal-arco1-authored/a3-fast-iteration2/capture-manifest.json`.
+  Chrome 151 / NVIDIA GTX 1660 Ti D3D11, `softwareRendered=false`, cero errores
+  de consola/página, 31 draw calls / 3,924 tris en estado dormido y 32 / 3,936
+  restaurado, una sola luz con sombras.
+- `npm run build`: PASS; sólo warnings conocidos de Havok URL y chunks grandes.
+- Tests enfocados de harness + authored Manantial: PASS, 13/13.
+- `npm run playtest:ohmdal-golden-path`: PASS, 22 checkpoints, incluidos
+  `manantial-restored-mobile`, desktop y retorno final. Cero page errors; sólo
+  cuatro warnings conocidos de ReadPixels bajo SwiftShader determinista.
+- Gemini: `VERDICT: PASS`, sin `PLAYER_FACING_BLOCKERS`,
+  `ANOTHER_A3_ITERATION: NO`; reporte en
+  `agent-work/reports/gemini/ohmdal-arco1-authored-a3-review.md`.
+
+### Deuda no bloqueante
+
+- El hero GLB de alta densidad sigue detrás de su gate DCC y no bloquea el
+  authored pass completo del Arco I.
+- FAST omite touch smoke por contrato; Golden Path cubrió el checkpoint mobile
+  de Manantial y FULL permanece reservado para A8.
+- Dressing periférico menor puede volver en A7/A8; no justifica demorar A4.

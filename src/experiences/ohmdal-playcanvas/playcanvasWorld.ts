@@ -30,11 +30,17 @@ export interface PlayCanvasWorldElements {
   manantialGameplayRoot: pc.Entity;
   waterfallMesh: pc.Entity;
   turbineMesh: pc.Entity;
+  manantialScenicTurbineRotor: pc.Entity;
   turbineRotor: pc.Entity;
   manantialIntakeGate: pc.Entity;
   manantialExciterBridge: pc.Entity;
   manantialOutputBreaker: pc.Entity;
   manantialGeneratorLight: pc.Entity;
+  manantialSluiceLeaf: pc.Entity;
+  manantialDormantWater: pc.Entity;
+  manantialActiveWater: pc.Entity;
+  manantialActivationTrace: pc.Entity;
+  manantialRestoredOutputMarker: pc.Entity;
   arc1Greybox: Arc1GreyboxElements;
   omegaSymbolEntity: pc.Entity;
   gateLightLeft: pc.Entity;
@@ -1061,18 +1067,26 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     gameplayRoot: manantialGameplayRoot,
     waterfallMesh,
     turbineMesh,
+    scenicTurbineRotor: manantialScenicTurbineRotor,
     turbineRotor,
     intakeGate: manantialIntakeGate,
     exciterBridge: manantialExciterBridge,
     outputBreaker: manantialOutputBreaker,
     generatorLight: manantialGeneratorLight,
+    sluiceLeaf: manantialSluiceLeaf,
+    dormantWater: manantialDormantWater,
+    activeWater: manantialActiveWater,
+    activationTrace: manantialActivationTrace,
+    restoredOutputMarker: manantialRestoredOutputMarker,
   } = buildManantialShell({
     app,
     plazaRoot,
     materials: {
       matMountain,
       matMountainFar,
+      matStone,
       matStoneDark,
+      matWater,
       matWaterfall,
       matBrass,
       matCopperClean,
@@ -1118,11 +1132,17 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     manantialGameplayRoot,
     waterfallMesh,
     turbineMesh,
+    manantialScenicTurbineRotor,
     turbineRotor,
     manantialIntakeGate,
     manantialExciterBridge,
     manantialOutputBreaker,
     manantialGeneratorLight,
+    manantialSluiceLeaf,
+    manantialDormantWater,
+    manantialActiveWater,
+    manantialActivationTrace,
+    manantialRestoredOutputMarker,
     arc1Greybox,
     omegaSymbolEntity,
     gateLightLeft,

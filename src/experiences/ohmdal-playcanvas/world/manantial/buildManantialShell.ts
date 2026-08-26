@@ -3,7 +3,9 @@ import * as pc from 'playcanvas';
 export interface ManantialShellMaterials {
   matMountain: pc.StandardMaterial;
   matMountainFar: pc.StandardMaterial;
+  matStone: pc.StandardMaterial;
   matStoneDark: pc.StandardMaterial;
+  matWater: pc.StandardMaterial;
   matWaterfall: pc.StandardMaterial;
   matBrass: pc.StandardMaterial;
   matCopperClean: pc.StandardMaterial;
@@ -22,11 +24,17 @@ export interface ManantialShellElements {
   gameplayRoot: pc.Entity;
   waterfallMesh: pc.Entity;
   turbineMesh: pc.Entity;
+  scenicTurbineRotor: pc.Entity;
   turbineRotor: pc.Entity;
   intakeGate: pc.Entity;
   exciterBridge: pc.Entity;
   outputBreaker: pc.Entity;
   generatorLight: pc.Entity;
+  sluiceLeaf: pc.Entity;
+  dormantWater: pc.Entity;
+  activeWater: pc.Entity;
+  activationTrace: pc.Entity;
+  restoredOutputMarker: pc.Entity;
 }
 
 export function buildManantialShell({
@@ -36,7 +44,7 @@ export function buildManantialShell({
   probeTargets,
   addCollider,
 }: ManantialShellDependencies): ManantialShellElements {
-  const { matMountain, matMountainFar, matStoneDark, matWaterfall, matBrass, matCopperClean } = materials;
+  const { matMountain, matMountainFar, matStone, matStoneDark, matWater, matWaterfall, matBrass, matCopperClean } = materials;
 
   const addMountainRidge = (
     parent: pc.Entity,
@@ -116,6 +124,47 @@ export function buildManantialShell({
   const gameplayRoot = new pc.Entity('ManantialGameplayRoot');
   gameplayRoot.enabled = false;
   mountainRoot.addChild(gameplayRoot);
+
+  // A3 authored support stays behind the Manantial lifecycle seam. The
+  // accepted Plaza keeps rendering only the established scenic mountain shell.
+  const authoredStaticRoot = new pc.Entity('ManantialAuthoredStaticRoot');
+  gameplayRoot.addChild(authoredStaticRoot);
+
+  const addBox = (
+    parent: pc.Entity,
+    name: string,
+    position: [number, number, number],
+    scale: [number, number, number],
+    material: pc.StandardMaterial,
+  ): pc.Entity => {
+    const entity = new pc.Entity(name);
+    entity.addComponent('render', { type: 'box', material });
+    entity.render!.castShadows = false;
+    entity.render!.receiveShadows = true;
+    entity.setLocalPosition(...position);
+    entity.setLocalScale(...scale);
+    parent.addChild(entity);
+    return entity;
+  };
+
+  const addCylinder = (
+    parent: pc.Entity,
+    name: string,
+    position: [number, number, number],
+    scale: [number, number, number],
+    rotation: [number, number, number],
+    material: pc.StandardMaterial,
+  ): pc.Entity => {
+    const entity = new pc.Entity(name);
+    entity.addComponent('render', { type: 'cylinder', material });
+    entity.render!.castShadows = false;
+    entity.render!.receiveShadows = true;
+    entity.setLocalPosition(...position);
+    entity.setLocalEulerAngles(...rotation);
+    entity.setLocalScale(...scale);
+    parent.addChild(entity);
+    return entity;
+  };
 
   // Plaza-only scenic skirts close the floating slab at the north perimeter
   // while preserving a broad central opening toward the locked later region.
@@ -215,12 +264,12 @@ export function buildManantialShell({
   turbineMesh.setLocalScale(9.0, 4.4, 6.0);
   mountainRoot.addChild(turbineMesh);
 
-  const turbineRotor = new pc.Entity('TurbineRotor');
-  turbineRotor.addComponent('render', { type: 'cylinder', material: matCopperClean });
-  turbineRotor.setPosition(0, 2.5, 20.8);
-  turbineRotor.setEulerAngles(90, 0, 0);
-  turbineRotor.setLocalScale(3.2, 0.8, 3.2);
-  mountainRoot.addChild(turbineRotor);
+  const scenicTurbineRotor = new pc.Entity('ScenicTurbineRotor');
+  scenicTurbineRotor.addComponent('render', { type: 'cylinder', material: matCopperClean });
+  scenicTurbineRotor.setPosition(0, 2.5, 20.8);
+  scenicTurbineRotor.setEulerAngles(90, 0, 0);
+  scenicTurbineRotor.setLocalScale(3.2, 0.8, 3.2);
+  mountainRoot.addChild(scenicTurbineRotor);
 
   const addControl = (
     name: string,
@@ -256,6 +305,70 @@ export function buildManantialShell({
   generatorLight.setPosition(0, 3.0, 20.6);
   gameplayRoot.addChild(generatorLight);
 
+  // Pale-stone headworks make the water route and machine support one readable
+  // civic mechanism. These pieces enrich the validated route without moving
+  // any gameplay anchor, collider or control.
+  addBox(authoredStaticRoot, 'ManantialHeadworksApron', [0, 0.45, 24.4], [15.2, 0.7, 14.2], matStone);
+  addBox(authoredStaticRoot, 'ManantialRetainingWest', [-7.2, 2.5, 25.0], [1.0, 4.8, 15.0], matStone);
+  addBox(authoredStaticRoot, 'ManantialRetainingEast', [7.2, 2.5, 25.0], [1.0, 4.8, 15.0], matStone);
+  addBox(authoredStaticRoot, 'ManantialHeadwall', [0, 3.8, 31.7], [15.2, 6.8, 1.2], matStone);
+  addBox(authoredStaticRoot, 'ManantialHeadwallOpeningLintel', [0, 6.9, 30.8], [6.8, 0.8, 1.0], matStoneDark);
+
+  // Headrace and tailrace expose the actual water path instead of relying on
+  // a blue decorative surface. State-specific water meshes are kept out of
+  // static batching and toggled from the simulation.
+  addBox(authoredStaticRoot, 'ManantialHeadraceBed', [-4.2, 1.0, 25.7], [4.0, 0.35, 10.8], matStoneDark);
+  addBox(authoredStaticRoot, 'ManantialHeadraceWest', [-6.15, 1.65, 25.7], [0.35, 1.6, 10.8], matStone);
+  addBox(authoredStaticRoot, 'ManantialHeadraceEast', [-2.25, 1.65, 25.7], [0.35, 1.6, 10.8], matStone);
+  addBox(authoredStaticRoot, 'ManantialTailraceBed', [0, 0.82, 17.7], [5.0, 0.25, 5.0], matStoneDark);
+
+  const dormantWater = addBox(gameplayRoot, 'ManantialDormantWater', [-4.2, 1.35, 26.0], [3.25, 0.08, 9.2], matWater);
+  const activeWater = addBox(gameplayRoot, 'ManantialActiveWater', [-4.2, 1.43, 23.6], [3.1, 0.10, 13.8], matWaterfall);
+  activeWater.enabled = false;
+
+  // The sluice leaf is physically attached to the intake control. It moves
+  // vertically with gate state; the small control box remains the interaction
+  // affordance at its validated position.
+  addBox(authoredStaticRoot, 'ManantialSluiceFrameWest', [-5.75, 3.1, 20.6], [0.45, 4.2, 0.6], matStone);
+  addBox(authoredStaticRoot, 'ManantialSluiceFrameEast', [-2.65, 3.1, 20.6], [0.45, 4.2, 0.6], matStone);
+  addBox(authoredStaticRoot, 'ManantialSluiceCrossbeam', [-4.2, 5.05, 20.6], [3.55, 0.45, 0.7], matStone);
+  const sluiceLeaf = addBox(gameplayRoot, 'ManantialSluiceLeaf', [-4.2, 2.45, 20.55], [2.75, 2.65, 0.34], matBrass);
+
+  // The existing turbine remains the gameplay-driven rotor. A compact stator,
+  // shaft, maintenance platform and outgoing bus make its electrical path
+  // readable while preserving the approved silhouette and scale.
+  addCylinder(authoredStaticRoot, 'ManantialGeneratorStator', [0, 2.5, 20.85], [3.2, 0.95, 3.2], [90, 0, 0], matStoneDark);
+  addCylinder(authoredStaticRoot, 'ManantialGeneratorEndCap', [0, 2.5, 20.34], [2.82, 0.18, 2.82], [90, 0, 0], matCopperClean);
+  const turbineRotor = addCylinder(gameplayRoot, 'TurbineRotor', [0, 2.5, 20.18], [2.35, 0.32, 2.35], [90, 0, 0], matCopperClean);
+  addCylinder(authoredStaticRoot, 'ManantialGeneratorShaft', [0, 2.5, 18.9], [0.38, 2.4, 0.38], [90, 0, 0], matBrass);
+  addBox(authoredStaticRoot, 'ManantialMeasurementPlatform', [4.7, 1.65, 18.8], [4.6, 0.32, 4.2], matStone);
+  addBox(authoredStaticRoot, 'ManantialPlatformRailNorth', [4.7, 2.55, 20.75], [4.6, 1.45, 0.15], matBrass);
+  addBox(authoredStaticRoot, 'ManantialPlatformRailEast', [6.9, 2.55, 18.8], [0.15, 1.45, 4.0], matBrass);
+  addBox(authoredStaticRoot, 'ManantialOutgoingBusLeft', [2.85, 3.45, 18.0], [0.18, 0.18, 4.7], matCopperClean);
+  addBox(authoredStaticRoot, 'ManantialOutgoingBusRight', [4.0, 3.45, 18.0], [0.18, 0.18, 4.7], matCopperClean);
+  for (const [index, x] of [2.85, 4.0].entries()) {
+    addCylinder(authoredStaticRoot, `ManantialCeramicInsulator${index + 1}`, [x, 2.85, 16.0], [0.38, 0.85, 0.38], [0, 0, 0], matStone);
+  }
+
+  const activationMaterial = new pc.StandardMaterial();
+  activationMaterial.diffuse = new pc.Color(0.95, 0.55, 0.12);
+  activationMaterial.emissive = new pc.Color(0.95, 0.30, 0.04);
+  activationMaterial.emissiveIntensity = 1.2;
+  activationMaterial.update();
+  const activationTrace = addCylinder(gameplayRoot, 'ManantialActivationTrace', [2.2, 2.0, 16.0], [0.22, 0.65, 0.22], [0, 0, 0], activationMaterial);
+  activationTrace.render!.receiveShadows = false;
+  activationTrace.enabled = false;
+
+  const restoredOutputMarker = addBox(gameplayRoot, 'ManantialRestoredOutputMarker', [3.42, 3.48, 15.7], [1.45, 0.24, 0.24], matCopperClean);
+  restoredOutputMarker.render!.receiveShadows = false;
+  restoredOutputMarker.enabled = false;
+
+  const manantialStaticBatch = app.batcher.addGroup('OhmdalManantialStaticArt', false, 40);
+  for (const render of authoredStaticRoot.findComponents('render') as pc.RenderComponent[]) {
+    render.batchGroupId = manantialStaticBatch.id;
+  }
+  app.batcher.generate([manantialStaticBatch.id]);
+
   probeTargets['manantial_generator_out'] = new pc.Vec3(2.2, 1.35, 16.0);
   probeTargets['manantial_exciter'] = new pc.Vec3(4.2, 1.35, 18.4);
 
@@ -270,16 +383,24 @@ export function buildManantialShell({
   probeTargets['manantial_survey'] = new pc.Vec3(0, 1.2, 17.5);
   addCollider(0, 24.0, 9.2, 6.2);
   addCollider(0, 17.5, 1.2, 1.2);
+  addCollider(-7.2, 25.0, 1.0, 15.0);
+  addCollider(7.2, 25.0, 1.0, 15.0);
 
   return {
     mountainRoot,
     gameplayRoot,
     waterfallMesh,
     turbineMesh,
+    scenicTurbineRotor,
     turbineRotor,
     intakeGate,
     exciterBridge,
     outputBreaker,
     generatorLight,
+    sluiceLeaf,
+    dormantWater,
+    activeWater,
+    activationTrace,
+    restoredOutputMarker,
   };
 }

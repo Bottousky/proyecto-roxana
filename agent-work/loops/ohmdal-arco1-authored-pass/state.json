@@ -3,7 +3,7 @@
   "loopId": "ohmdal-arco1-authored-pass",
   "branch": "explore/ohmdal-3D",
   "status": "implementing",
-  "currentStage": "a3-manantial-central-authored",
+  "currentStage": "a4-castle-authored",
   "iteration": 1,
   "maxIterationsPerStage": 3,
   "maxFixesPerIteration": 5,
@@ -55,15 +55,15 @@
     { "id": "a0-baseline-capture-readiness", "status": "passed" },
     { "id": "a1-reference-planning", "status": "passed" },
     { "id": "a2-plaza-workshop-authored", "status": "passed" },
-    { "id": "a3-manantial-central-authored", "status": "active" },
-    { "id": "a4-castle-authored", "status": "queued" },
+    { "id": "a3-manantial-central-authored", "status": "passed" },
+    { "id": "a4-castle-authored", "status": "active" },
     { "id": "a5-forge-terraces-authored", "status": "queued" },
     { "id": "a6-lighthouse-lake-return-authored", "status": "queued" },
     { "id": "a7-vfx-audio-ambient", "status": "queued" },
     { "id": "a8-full-authored-golden-path", "status": "queued" }
   ],
-  "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-authored-a2-review.md",
-  "lastCaptureManifest": "output/playwright/ohmdal-arco1-authored/a2-fast-sol-verify/capture-manifest.json",
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-authored-a3-review.md",
+  "lastCaptureManifest": "output/playwright/ohmdal-arco1-authored/a3-fast-iteration2/capture-manifest.json",
   "humanGate": null,
   "notes": [
     "This loop consumes the complete playable Arco I greybox and must not redesign it casually.",
@@ -76,6 +76,7 @@
     "No final dialogue is invented; unresolved prose remains TODO(guion) with neutral placeholders.",
     "A0 passed in iteration 0: frozen baseline ancestry verified; greybox/authored loop, Gemini and GMI lanes passed; Golden Path passed all 22 checkpoints; FAST captured five load-bearing Plaza views on Chrome 151 / Intel UHD D3D11 with softwareRendered=false and zero console/page errors; FULL deterministic semantics remain covered and unchanged.",
     "A1 passed in iteration 1: all eight region packs are approved for support authoring, cover exactly 22 canonical shots, and Gemini found no player-facing blocker. Four hero candidates are classified adapt but final modeling remains blocked until each machine-readable Hero Reference Pack passes validation.",
-    "A2 passed after two bounded iterations: Plaza regression shots are byte-identical to A0; Taller is an authored diagnostic space with static zone batching and exclusive Plaza/Workshop activation; FAST used Intel UHD D3D11 with softwareRendered=false, 33 draw calls for the interior and 60 with Galvanoscopio, one shadow-casting light and zero console/page errors; build and the 22-checkpoint Golden Path passed; Gemini returned PASS with no player-facing blocker and no further A2 iteration."
+    "A2 passed after two bounded iterations: Plaza regression shots are byte-identical to A0; Taller is an authored diagnostic space with static zone batching and exclusive Plaza/Workshop activation; FAST used Intel UHD D3D11 with softwareRendered=false, 33 draw calls for the interior and 60 with Galvanoscopio, one shadow-casting light and zero console/page errors; build and the 22-checkpoint Golden Path passed; Gemini returned PASS with no player-facing blocker and no further A2 iteration.",
+    "A3 passed after two bounded visual iterations: the approved adapt Hero Reference Pack gates Manantial support authoring; water, sluice, turbine-generator, shaft, busbars, insulators and measurement platform form one simulation-driven civic mechanism; a local event-only VFX replaced the unsafe shared-material M3 proposal; FAST used NVIDIA GTX 1660 Ti D3D11 with softwareRendered=false at 31-32 draw calls and 3924-3936 triangles, one shadow-casting light and zero console/page errors; build, focused tests and all 22 Golden Path checkpoints passed; Gemini returned PASS with no player-facing blocker and no further A3 iteration."
   ]
 }

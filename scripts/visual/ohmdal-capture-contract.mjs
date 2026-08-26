@@ -20,8 +20,8 @@ export const OHMDAL_PLAZA_CAPTURE_VIEWS = Object.freeze([
 
 /**
  * Keep each stage deliberately small: FAST must not silently become a second
- * full suite. A2 entries use the authored shot hook below because they span
- * the Plaza/Workshop zone seam; callers may also pass --shots explicitly.
+ * full suite. Authored A2/A3 entries use the authored shot hook below because
+ * they span zone seams; callers may also pass --shots explicitly.
  */
 export const FAST_STAGE_SHOTS = Object.freeze({
   'a0-baseline-capture-readiness': Object.freeze([
@@ -36,14 +36,22 @@ export const FAST_STAGE_SHOTS = Object.freeze({
     'workshop-interior-tools',
     'galvanoscope-first-person',
   ]),
+  'a3-manantial-central-authored': Object.freeze([
+    'manantial-approach',
+    'hydro-central-wide',
+    'sluice-gate-interaction',
+    'generator-platform',
+    'restored-manantial',
+  ]),
 });
 
 /**
- * Deterministic A2 shot metadata. These coordinates are capture anchors, not
- * a second gameplay layout: the runtime hook must activate the corresponding
- * existing Plaza/Workshop zone and story/tool state before applying them.
+ * Deterministic authored shot metadata. These coordinates are capture
+ * anchors, not a second gameplay layout: the runtime hook must activate the
+ * corresponding existing zone and story/tool/electrical state before applying
+ * them.
  *
- * A2 deliberately uses a dedicated hook instead of mapping interior shots to
+ * Authored shots deliberately use a dedicated hook instead of mapping them to
  * an A0 camera. A fallback to Plaza would produce a valid PNG with invalid
  * evidence, which is worse than a clear wiring failure.
  */
@@ -86,6 +94,125 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
       storyStep: 'tools_received',
       tool: 'galvanoscope',
       probeTarget: 'lumen_taller_banco',
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'manantial-approach': Object.freeze({
+    id: 'manantial-approach',
+    state: 'manantial-approach',
+    camera: 'manantial-approach',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Three-quarter entry view keeps the machine clear of its own foreground.
+    anchor: Object.freeze({ position: Object.freeze([9.0, 3.4, 13.5]), yaw: 138, pitch: -8 }),
+    world: Object.freeze({
+      zone: 'manantial',
+      storyStep: 'inside_manantial',
+      manantial: Object.freeze({
+        gateOpen: false,
+        returnBridgeInstalled: false,
+        excitationEnabled: false,
+        protectiveTrip: false,
+        restored: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'hydro-central-wide': Object.freeze({
+    id: 'hydro-central-wide',
+    state: 'hydro-central-wide',
+    camera: 'hydro-central-wide',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Elevated QA anchor keeps the water ribbon, powerhouse and penstocks in
+    // one causal view without changing the navigable route.
+    anchor: Object.freeze({ position: Object.freeze([-11.0, 8.5, 13.0]), yaw: 225, pitch: -18 }),
+    world: Object.freeze({
+      zone: 'manantial',
+      storyStep: 'inside_manantial',
+      manantial: Object.freeze({
+        gateOpen: false,
+        returnBridgeInstalled: false,
+        excitationEnabled: false,
+        protectiveTrip: false,
+        restored: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'sluice-gate-interaction': Object.freeze({
+    id: 'sluice-gate-interaction',
+    state: 'sluice-gate-interaction',
+    camera: 'sluice-gate-interaction',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Oblique approach shows the interaction control attached to the leaf.
+    anchor: Object.freeze({ position: Object.freeze([-8.0, 3.2, 15.0]), yaw: 225, pitch: -4 }),
+    world: Object.freeze({
+      zone: 'manantial',
+      storyStep: 'inside_manantial',
+      interaction: 'intake-gate',
+      comparison: 'before-after',
+      manantial: Object.freeze({
+        gateOpen: false,
+        returnBridgeInstalled: false,
+        excitationEnabled: false,
+        protectiveTrip: false,
+        restored: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'generator-platform': Object.freeze({
+    id: 'generator-platform',
+    state: 'generator-platform',
+    camera: 'generator-platform',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // East service side frames machine, platform, insulators and outgoing bus.
+    anchor: Object.freeze({ position: Object.freeze([8.5, 4.2, 15.5]), yaw: 135, pitch: -8 }),
+    world: Object.freeze({
+      zone: 'manantial',
+      storyStep: 'inside_manantial',
+      measurementPoint: 'generator',
+      manantial: Object.freeze({
+        gateOpen: true,
+        returnBridgeInstalled: false,
+        excitationEnabled: false,
+        protectiveTrip: false,
+        restored: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'restored-manantial': Object.freeze({
+    id: 'restored-manantial',
+    state: 'restored-manantial',
+    camera: 'restored-manantial',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Reuse the entry overlook so dormant/energized captures compare cleanly.
+    anchor: Object.freeze({ position: Object.freeze([-11.0, 8.5, 13.0]), yaw: 225, pitch: -18 }),
+    world: Object.freeze({
+      zone: 'manantial',
+      storyStep: 'manantial_restored',
+      manantial: Object.freeze({
+        gateOpen: true,
+        returnBridgeInstalled: true,
+        excitationEnabled: true,
+        protectiveTrip: false,
+        restored: true,
+      }),
     }),
     deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
   }),

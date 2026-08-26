@@ -20,6 +20,7 @@ import {
 } from './visualHarness.ts';
 import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
 import { OhmdalZoneLifecycle } from './systems/zones/zoneLifecycle.ts';
+import { createManantialActivationVfx } from './world/manantial/manantialActivationVfx.ts';
 import {
   type Arc1GreyboxState,
   type CastleNetworkConfiguration,
@@ -126,7 +127,11 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   zones.register({
     id: 'manantial',
     load: () => undefined,
-    setActive: (active) => { world.manantialGameplayRoot.enabled = active; },
+    setActive: (active) => {
+      world.manantialGameplayRoot.enabled = active;
+      world.turbineMesh.enabled = !active;
+      world.manantialScenicTurbineRotor.enabled = !active;
+    },
   });
   zones.register({
     id: 'castle',
@@ -158,6 +163,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let visualCaptureShot: OhmdalVisualCaptureShotName | null = null;
   let visualPaused = false;
   let reducedMotion = false;
+  const manantialActivationVfx = createManantialActivationVfx({
+    generatorLight: world.manantialGeneratorLight,
+    activationTrace: world.manantialActivationTrace,
+    restoredOutputMarker: world.manantialRestoredOutputMarker,
+    reducedMotion: () => reducedMotion,
+    paused: () => visualPaused,
+  });
   let debugUiHidden = false;
   let postProcessingEnabled = true;
   let visualSeed = 1;
@@ -299,7 +311,16 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
   async function setVisualCaptureShot(shot: RoxanaOhmdalCaptureShot): Promise<void> {
     if (!shot.anchor) throw new Error(`Ohmdal authored capture shot needs an anchor: ${shot.id}`);
-    if (!['workshop-exterior', 'workshop-interior-tools', 'galvanoscope-first-person'].includes(shot.id)) {
+    if (![
+      'workshop-exterior',
+      'workshop-interior-tools',
+      'galvanoscope-first-person',
+      'manantial-approach',
+      'hydro-central-wide',
+      'sluice-gate-interaction',
+      'generator-platform',
+      'restored-manantial',
+    ].includes(shot.id)) {
       throw new Error(`Unknown Ohmdal authored capture shot: ${shot.id}`);
     }
 
@@ -312,12 +333,30 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       await zones.activate('workshop');
       zones.deactivate('plaza');
     }
+    if (shot.world.zone === 'manantial') {
+      await zones.activate('manantial');
+      zones.deactivate('plaza');
+    }
 
     visualSeed = shot.deterministic.seed;
     reducedMotion = shot.deterministic.reducedMotion;
     storyStep = shot.world.storyStep as OhmdalStoryStep;
     isToolEquipped = shot.world.tool === 'galvanoscope';
     world.viewmodelRoot.enabled = isToolEquipped;
+
+    arc1State = createArc1GreyboxState();
+    if (shot.world.zone === 'manantial') {
+      arc1State = enterArc1Region(arc1State, 'manantial');
+      const manantialState = shot.world.manantial;
+      if (manantialState?.gateOpen) arc1State = setManantialGate(arc1State, true);
+      if (manantialState?.returnBridgeInstalled) {
+        arc1State = measureManantial(arc1State, 'generator');
+        arc1State = repairManantial(arc1State);
+      }
+      if (manantialState?.excitationEnabled) arc1State = energizeManantial(arc1State);
+      if (manantialState?.restored) arc1State = measureManantial(arc1State, 'load');
+      updateArc1WorldVisuals();
+    }
 
     const [x, y, z] = shot.anchor.position;
     playerPos.set(x, y, z);
@@ -549,8 +588,11 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
   function updateArc1WorldVisuals(): void {
     const manantial = evaluateManantial(arc1State);
-    world.manantialGeneratorLight.light!.intensity = manantial.restored ? 2.2 : 0;
+    manantialActivationVfx.setRestored(manantial.restored);
     world.manantialIntakeGate.setLocalEulerAngles(0, 0, arc1State.manantial.gateOpen ? -55 : 0);
+    world.manantialSluiceLeaf.setLocalPosition(-4.2, arc1State.manantial.gateOpen ? 4.15 : 2.45, 20.55);
+    world.manantialDormantWater.enabled = !arc1State.manantial.gateOpen;
+    world.manantialActiveWater.enabled = arc1State.manantial.gateOpen;
     world.manantialExciterBridge.setLocalPosition(4.2, arc1State.manantial.returnBridgeInstalled ? 1.25 : 1.55, 18.4);
     world.manantialOutputBreaker.setLocalEulerAngles(0, 0, arc1State.manantial.protectiveTrip ? 40 : -18);
 
@@ -1412,6 +1454,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       }
       if (isLighthouseRestored(arc1State)) world.arc1Greybox.lighthouseSignal.rotateLocal(0, dt * 22, 0);
     }
+    manantialActivationVfx.update(dt);
 
     // 3. Prompt detection
     const camPos = world.playerEntity.getPosition();
@@ -1455,6 +1498,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       window.removeEventListener('keyup', onKeyUp);
       if (window.__ROXANA_VISUAL_TEST_HOOKS__ === visualHooks) delete window.__ROXANA_VISUAL_TEST_HOOKS__;
       document.documentElement.classList.remove('roxana-visual-ui-hidden');
+      manantialActivationVfx.dispose();
       world.app.destroy();
       canvas.remove();
     },

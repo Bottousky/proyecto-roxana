@@ -73,7 +73,7 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
 
   it('define el FAST A2 del Taller con IDs canónicos y metadata determinista', () => {
     const fast = resolveCaptureViews({ mode: 'fast', stage: 'a2-plaza-workshop-authored' });
-    assert.deepEqual(fast.map((view) => view.id), [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES]);
+    assert.deepEqual(fast.map((view) => view.id), [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES].slice(0, 3));
     assert.deepEqual(Object.keys(OHMDAL_AUTHORED_CAPTURE_SHOTS), [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES]);
 
     const exterior = getCaptureShotSpec('workshop-exterior');
@@ -99,6 +99,43 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     assert.equal(alias.runtimeHook, 'setStateAndCamera');
     assert.equal(alias.state, 'portal-arrival');
     assert.equal(alias.camera, 'workshop-approach');
+  });
+
+  it('define el FAST A3 de Manantial con anchors métricos y estado eléctrico explícito', () => {
+    const authoredNames = [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES];
+    const fast = resolveCaptureViews({ mode: 'fast', stage: 'a3-manantial-central-authored' });
+    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(3));
+
+    const approach = getCaptureShotSpec('manantial-approach');
+    assert.equal(approach.runtimeHook, 'setCaptureShot');
+    assert.deepEqual(approach.anchor.position, [9, 3.4, 13.5]);
+    assert.equal(approach.world.zone, 'manantial');
+    assert.equal(approach.world.storyStep, 'inside_manantial');
+    assert.equal(approach.world.manantial.gateOpen, false);
+    assert.equal(approach.world.manantial.restored, false);
+
+    const wide = getCaptureShotSpec('hydro-central-wide');
+    assert.deepEqual(wide.anchor.position, [-11, 8.5, 13]);
+    assert.equal(wide.anchor.pitch, -18);
+    assert.equal(wide.world.manantial.excitationEnabled, false);
+
+    const sluice = getCaptureShotSpec('sluice-gate-interaction');
+    assert.deepEqual(sluice.anchor.position, [-8, 3.2, 15]);
+    assert.equal(sluice.world.interaction, 'intake-gate');
+    assert.equal(sluice.world.comparison, 'before-after');
+
+    const generator = getCaptureShotSpec('generator-platform');
+    assert.deepEqual(generator.anchor.position, [8.5, 4.2, 15.5]);
+    assert.equal(generator.world.measurementPoint, 'generator');
+    assert.equal(generator.world.manantial.gateOpen, true);
+    assert.equal(generator.world.manantial.restored, false);
+
+    const restored = getCaptureShotSpec('restored-manantial');
+    assert.deepEqual(restored.anchor.position, [-11, 8.5, 13]);
+    assert.equal(restored.world.storyStep, 'manantial_restored');
+    assert.equal(restored.world.manantial.restored, true);
+    assert.equal(restored.world.manantial.protectiveTrip, false);
+    for (const shot of fast) assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
   });
 
   it('FAST solicita aceleración GPU sin forzar SwiftShader y exige diagnostics', () => {

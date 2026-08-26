@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_manantial_turbine_generator_hero_01",
+  "world": "ohmdal",
+  "name": "Conjunto turbina-generador del Manantial",
+  "mode": "adapt",
+  "status": "approved",
+  "primaryReference": "assets/ohmdal/rooms/pilot-arco1/prop_taller_generator.png",
+  "supportingReferences": [
+    "assets/ohmdal/hero/manantial.png",
+    "assets/ohmdal/rooms/pilot-arco1/manantial_ohm+prop_boca_manantial-v2.png",
+    "assets/ohmdal/rooms/pilot-arco1/prop_boca_manantial.png",
+    "assets/ohmdal/rooms/pilot-arco1/prop_terraces_sluice_gate.png",
+    "output/playwright/ohmdal-hardening/golden-path/inside-manantial.png"
+  ],
+  "physicalAnchors": {
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "groundedPivot": true,
+    "assemblyRole": "mounted hydroelectric turbine-generator assembly",
+    "scaleSource": "accepted greybox runtime before authoring"
+  },
+  "mustPreserve": [
+    "compact exposed turbine-generator assembly silhouette from the primary reference",
+    "intake/sluice and visible water path as the physical context of the assembly",
+    "return/ground path and protection relationship",
+    "large ceramic insulators and outgoing copper busbars",
+    "measurement platform relationship to the generator and outgoing path",
+    "old hydroelectric headworks integrated into pale-stone civic infrastructure",
+    "dormant state with held/still water and inert machinery",
+    "restored state with moving water and machinery response; no decorative glow as a substitute for state"
+  ],
+  "mayResolve": [
+    "hidden rotor, stator and coupling geometry not defined by the references",
+    "shaft, terminal and fastening detail that preserves the approved silhouette and electrical path",
+    "mounting, maintenance and underside construction that does not change the validated route",
+    "runtime mesh segmentation, material slots and pivot hierarchy",
+    "exact dimensions after measurement against the accepted greybox runtime"
+  ],
+  "forbidden": [
+    "modern concrete megadam scale",
+    "fantasy waterfall temple or shrine redesign",
+    "blue glowing water, cyberpunk neon or passive emissive copper",
+    "random pipe jungle or ornamental steampunk clutter",
+    "giant scale that breaks the validated Manantial route",
+    "invented symbols, lore or electrical behavior",
+    "redesign of validated topology or electrical state",
+    "free text-to-3D redesign that departs from the primary generator reference",
+    "Meshy or Tripo use without the required HUMAN_GATE"
+  ],
+  "authoring": {
+    "preferredRoute": "blender-deterministic-first",
+    "buildScript": null,
+    "canonicalGlb": null,
+    "generativeProviderRequired": false
+  },
+  "approvalNote": "Approved for the adapt reference-pack gate only. This pack records repo-native visual anchors and does not auto-approve the final hero design, modeling, provider use or canonical GLB; final modeling remains blocked until Sol verifies the reference comparison and runtime constraints.",
+  "referenceAudit": {
+    "searchedScopes": [
+      "assets/ohmdal/hero",
+      "assets/ohmdal/rooms/pilot-arco1",
+      "output/playwright/ohmdal-hardening/golden-path"
+    ],
+    "primaryRationale": "prop_taller_generator.png is the repo-native reference that most directly defines the generator assembly silhouette; the remaining references provide hydro context, intake/sluice cues and accepted runtime scale evidence.",
+    "contextOnly": [
+      "assets/ohmdal/hero/manantial.png",
+      "assets/ohmdal/rooms/pilot-arco1/manantial_ohm+prop_boca_manantial-v2.png",
+      "assets/ohmdal/rooms/pilot-arco1/prop_boca_manantial.png",
+      "assets/ohmdal/rooms/pilot-arco1/prop_terraces_sluice_gate.png",
+      "output/playwright/ohmdal-hardening/golden-path/inside-manantial.png"
+    ]
+  },
+  "evidence": {
+    "stageReport": null,
+    "preview": null
+  }
+}

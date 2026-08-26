@@ -1,5 +1,35 @@
 # MiniMax GMI evaluation log — Ohmdal Arco I
 
+## E2-A3-VFX-002 — Manantial authored activation proposal
+
+- `TASK_ID`: `E2-A3-VFX-002`
+- `MODEL`: `MiniMaxAI/MiniMax-M3`
+- `CONTEXT_FILES`: `buildManantialShell.ts`, `playcanvasRuntime.ts`,
+  `OHMDAL_VISUAL_MATERIAL_BIBLE.md`, `OHMDAL_VFX_AUDIO_PLAN.md`
+- `ELAPSED_MS`: `54457`
+- `USAGE_IF_REPORTED`: prompt `20871`, completion `6133`, total `27004`
+- `FIRST_PASS`: `partial`
+- `SOL_REPAIR_COUNT`: `4` load-bearing design repairs: dedicated local
+  material/entity, reduced-motion settle, single rotor owner, stable simulation
+  handoff
+- `TEST_RESULT_AFTER_INTEGRATION`: `PASS` focused authored/harness tests and
+  TypeScript/build; exact proposal not integrated
+- `GEMINI_SCORE_IF_VISUAL`: `PASS`; no player-facing blocker and no further A3 iteration
+- `REUSABLE`: `yes` for deterministic manual-pump FSM and explicit cleanup;
+  exact code `no`
+- `HALLUCINATION_OR_SCOPE_ERRORS`: mutates Plaza-shared brass/copper materials;
+  claims mobile peak reduction while only scaling phase durations; uses a
+  shallow partial-settings merge; leaves `totalDurationSec` unused; duplicates
+  rotor ownership; substitutes shared emissive for a localized conductor event;
+  and gives inconsistent stable-light handoff values.
+- `WOULD_PAY_FOR_THIS_OUTPUT`: `no`
+- `NOTES`: The bounded proposal helped confirm a compact event-only direction,
+  but Sol replaced its risky shared-material and rotor mutations with a local
+  trace, no-shadow indicator and simulation-owned stable state.
+
+Evidence: `authored-manantial-vfx-v2.md`,
+`src/experiences/ohmdal-playcanvas/world/manantial/manantialActivationVfx.ts`.
+
 ## E2-G1-VFX-001 — Manantial electrical activation
 
 - `TASK_ID`: `E2-G1-VFX-001`
