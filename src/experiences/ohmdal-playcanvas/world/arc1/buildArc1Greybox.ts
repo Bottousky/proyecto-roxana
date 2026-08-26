@@ -477,6 +477,54 @@ export function buildArc1Greybox({
   addCylinder(lighthouseReturn, 'LighthouseReturnPost', brass, [0, 0.7, 0], [0.35, 1.4, 0.35]);
   addBox(lighthouseReturn, 'LighthouseReturnPlate', stoneDark, [0, 0.05, 0], [2.2, 0.1, 1.2]);
 
+  // -----------------------------------------------------------------------
+  // Lighthouse + Lago Authored Support Pass: stone pier / lakeside coping,
+  // DC calibration bench, signal standoff insulators, beacon lens housing,
+  // tower gallery catwalk, and circuit return plinth.
+  // -----------------------------------------------------------------------
+  const lighthouseAuthoredRoot = new pc.Entity('LighthouseAuthoredSupportRoot');
+  lighthouseRoot.addChild(lighthouseAuthoredRoot);
+
+  // Lakeside Pier & Breakwater Riprap
+  addBox(lighthouseAuthoredRoot, 'LighthousePierCoping', stoneDark, [5.5, 0.12, 5], [1.2, 0.24, 20], true);
+  addBox(lighthouseAuthoredRoot, 'LighthousePierPilingLeft', stoneDark, [5.5, -0.6, -2], [0.8, 1.2, 0.8], true);
+  addBox(lighthouseAuthoredRoot, 'LighthousePierPilingRight', stoneDark, [5.5, -0.6, 12], [0.8, 1.2, 0.8], true);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseMooringBollard', brass, [5.5, 0.45, 5], [0.35, 0.45, 0.35]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseBreakwaterStoneA', stoneDark, [10.5, 0.18, 0], [2.6, 0.55, 2.8]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseBreakwaterStoneB', stoneDark, [11.2, 0.18, 9], [2.8, 0.55, 3.2]);
+
+  // DC Calibration Station & Reference Bench
+  addBox(lighthouseAuthoredRoot, 'LighthouseCalibrationBench', stoneDark, [-4.5, 0.45, 0], [2.4, 0.9, 1.4], true);
+  addBox(lighthouseAuthoredRoot, 'LighthouseReferenceResistorBank', copper, [-4.5, 0.96, 0], [1.8, 0.18, 0.9]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseShuntMount', brass, [-4.5, 1.12, 0], [0.4, 0.15, 0.4]);
+
+  // Signal Bus Standoffs & Ceramic Insulators
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseBusStandoffA', stoneDark, [0, 0.6, -7], [0.35, 0.8, 0.35]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseBusStandoffB', stoneDark, [0, 0.6, 4], [0.35, 0.8, 0.35]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseBusInsulatorA', brass, [0, 1.05, -7], [0.45, 0.16, 0.45]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseBusInsulatorB', brass, [0, 1.05, 4], [0.45, 0.16, 0.45]);
+
+  // Beacon Gallery Catwalk & Fresnel Reflector Shield
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseTowerGalleryRing', brass, [0, 6.1, 8], [3.2, 0.14, 3.2]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseReflectorShield', copper, [0, 6.9, 7.2], [1.4, 0.8, 0.15]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseLensHousing', brass, [0, 6.65, 8], [1.1, 0.9, 1.1]);
+
+  // Return Marker Plinth & Terminus Commemoration
+  addBox(lighthouseAuthoredRoot, 'LighthouseReturnPedestal', stoneDark, [0, 0.15, 14], [2.8, 0.3, 1.8], true);
+  addBox(lighthouseAuthoredRoot, 'LighthouseTerminusPlaque', copper, [0, 0.32, 14], [1.6, 0.05, 1.0]);
+
+  // Enclosure Ties & Upper Clerestory
+  addBox(lighthouseAuthoredRoot, 'LighthouseRoofTieSouth', stoneDark, [0, 6.8, -14.5], [27, 0.4, 0.6]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseRoofTieMid', stoneDark, [0, 6.8, 0], [27, 0.4, 0.6]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseRoofTieNorth', stoneDark, [0, 6.8, 14.5], [27, 0.4, 0.6]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseClerestoryHeader', stoneDark, [0, 6.9, 0], [8.0, 0.35, 28]);
+
+  const lighthouseStaticBatch = app.batcher.addGroup('OhmdalLighthouseStaticArt', false, 45);
+  for (const render of lighthouseAuthoredRoot.findComponents('render') as pc.RenderComponent[]) {
+    render.batchGroupId = lighthouseStaticBatch.id;
+  }
+  app.batcher.generate([lighthouseStaticBatch.id]);
+
   probeTargets.lighthouse_bus = new pc.Vec3(180, 1.1, -8);
   probeTargets.lighthouse_reference = new pc.Vec3(180, 1.2, 0);
   probeTargets.lighthouse_beacon = new pc.Vec3(180, 1.25, 8);
