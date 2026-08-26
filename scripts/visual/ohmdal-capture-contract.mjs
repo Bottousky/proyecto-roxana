@@ -19,10 +19,9 @@ export const OHMDAL_PLAZA_CAPTURE_VIEWS = Object.freeze([
 ]);
 
 /**
- * A0 only has the accepted Plaza visual harness cameras available. Keep this
- * list deliberately small: FAST must not silently become a second full suite.
- * Later authored stages can add their own entries once their camera contracts
- * exist; callers may also pass --shots for an explicit bounded subset.
+ * Keep each stage deliberately small: FAST must not silently become a second
+ * full suite. A2 entries use the authored shot hook below because they span
+ * the Plaza/Workshop zone seam; callers may also pass --shots explicitly.
  */
 export const FAST_STAGE_SHOTS = Object.freeze({
   'a0-baseline-capture-readiness': Object.freeze([
@@ -32,6 +31,64 @@ export const FAST_STAGE_SHOTS = Object.freeze({
     'omega-gate',
     'plaza-wide',
   ]),
+  'a2-plaza-workshop-authored': Object.freeze([
+    'workshop-exterior',
+    'workshop-interior-tools',
+    'galvanoscope-first-person',
+  ]),
+});
+
+/**
+ * Deterministic A2 shot metadata. These coordinates are capture anchors, not
+ * a second gameplay layout: the runtime hook must activate the corresponding
+ * existing Plaza/Workshop zone and story/tool state before applying them.
+ *
+ * A2 deliberately uses a dedicated hook instead of mapping interior shots to
+ * an A0 camera. A fallback to Plaza would produce a valid PNG with invalid
+ * evidence, which is worse than a clear wiring failure.
+ */
+export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
+  'workshop-exterior': Object.freeze({
+    id: 'workshop-exterior',
+    state: 'workshop-exterior',
+    camera: 'workshop-exterior',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    anchor: Object.freeze({ position: Object.freeze([-2.8, 1.8, -4.15]), yaw: 90, pitch: -5 }),
+    world: Object.freeze({ zone: 'plaza', storyStep: 'returned_to_plaza' }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'workshop-interior-tools': Object.freeze({
+    id: 'workshop-interior-tools',
+    state: 'workshop-interior-tools',
+    camera: 'workshop-interior-tools',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    anchor: Object.freeze({ position: Object.freeze([-60, 1.9, -2.45]), yaw: 180, pitch: -3 }),
+    world: Object.freeze({ zone: 'workshop', storyStep: 'inside_workshop' }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'galvanoscope-first-person': Object.freeze({
+    id: 'galvanoscope-first-person',
+    state: 'galvanoscope-first-person',
+    camera: 'galvanoscope-first-person',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    anchor: Object.freeze({ position: Object.freeze([-63.8, 1.68, 0.8]), yaw: 270, pitch: -4 }),
+    world: Object.freeze({
+      zone: 'workshop',
+      storyStep: 'tools_received',
+      tool: 'galvanoscope',
+      probeTarget: 'lumen_taller_banco',
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
 });
 
 export const FULL_CAPTURE_CONTRACT = Object.freeze({
@@ -75,6 +132,35 @@ function copyView(view) {
   };
 }
 
+function authoredView(id) {
+  const shot = OHMDAL_AUTHORED_CAPTURE_SHOTS[id];
+  return shot ? {
+    id: shot.id,
+    viewport: { ...shot.viewport },
+    hideUi: shot.hideUi,
+    post: shot.post,
+  } : null;
+}
+
+export function getCaptureShotSpec(id) {
+  const authored = OHMDAL_AUTHORED_CAPTURE_SHOTS[id];
+  if (authored) return structuredClone(authored);
+  const legacy = OHMDAL_PLAZA_CAPTURE_VIEWS.find((view) => view.id === id);
+  if (!legacy) throw new Error(`Unknown Ohmdal capture shot: ${id}`);
+  return {
+    id: legacy.id,
+    state: 'portal-arrival',
+    camera: legacy.id,
+    runtimeHook: 'setStateAndCamera',
+    viewport: { ...legacy.viewport },
+    hideUi: legacy.hideUi,
+    post: legacy.post,
+    anchor: null,
+    world: { zone: 'plaza', storyStep: 'portal_arrived' },
+    deterministic: { seed: 1701, reducedMotion: true, pauseBeforeCapture: true },
+  };
+}
+
 export function resolveCaptureViews({ mode = 'full', stage = null, shots = null } = {}) {
   if (mode === 'full') {
     if (shots?.length) throw new Error('FULL capture does not accept --shots; use FAST for bounded subsets.');
@@ -87,7 +173,10 @@ export function resolveCaptureViews({ mode = 'full', stage = null, shots = null 
     throw new Error(`FAST capture needs a supported --stage or explicit --shots; received stage=${stage ?? 'none'}.`);
   }
 
-  const byId = new Map(OHMDAL_PLAZA_CAPTURE_VIEWS.map((view) => [view.id, view]));
+  const byId = new Map([
+    ...OHMDAL_PLAZA_CAPTURE_VIEWS.map((view) => [view.id, view]),
+    ...Object.keys(OHMDAL_AUTHORED_CAPTURE_SHOTS).map((id) => [id, authoredView(id)]),
+  ]);
   const unknown = ids.filter((id) => !byId.has(id));
   if (unknown.length) throw new Error(`Unknown Ohmdal capture shot(s): ${unknown.join(', ')}`);
   return ids.map((id) => copyView(byId.get(id)));
@@ -112,4 +201,3 @@ export function fastLaunchOptions({ headless = true, platform = process.platform
   if (platform === 'win32') args.push('--use-angle=d3d11');
   return { headless, args };
 }
-

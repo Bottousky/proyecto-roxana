@@ -1042,11 +1042,13 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   const { workshopInteriorRoot, lumenNpcEntity } = buildWorkshopInterior({
     app,
     materials: {
+      matStone,
       matWoodDark,
       matStoneDark,
       matWood,
       matBrass,
       matCopperClean,
+      matWorkshopInterior,
       matLumenApron,
       matSkin,
     },

@@ -122,3 +122,52 @@ los cuatro packs es asset-local y no bloquea environment/support authoring.
 3. Faro conserva verdad DC; ningún efecto debe sugerir RC/transitorios.
 4. Los cuatro heroes usan Hero Reference Pack → Blender → GLB → inspect/validate.
 5. A8 asigna `arc1-final-pedestal` a `final-return` para evitar doble captura.
+
+## A2 — coherencia Plaza + Taller
+
+**Estado:** `PASS` — dos iteraciones acotadas. Sol aceptó el authored support
+pass después de revisión mecánica de Luna, capturas GPU, Golden Path completo y
+revisión visual independiente de Gemini 3.7 Flash High.
+
+### Resultado player-facing
+
+- Plaza no se reabrió: los cinco shots aceptados de
+  `output/playwright/ohmdal-arco1-authored/a2-plaza-regression/` son idénticos
+  byte por byte al baseline A0.
+- El exterior conserva el Taller aceptado y hace legibles puerta, conductores,
+  umbral y servicio lateral sin alterar topología.
+- El interior ya funciona como atelier de diagnóstico: banco principal,
+  contactos, batería, mordaza, tablero de medición, terminales, conductores,
+  herramientas y dock del Galvanoscopio tienen jerarquía física explícita.
+- La iluminación cálida usa prácticas sin sombras; permanece una sola luz con
+  sombras para toda la escena activa. No se agregó neón ni glow pasivo.
+- La geometría estática del Taller se batch-ea por zona. Al entrar, Plaza se
+  retira sólo después de activar Taller; al salir, Plaza vuelve antes de retirar
+  el interior. Esto bajó el shot interior de 136 a 33 draw calls y el shot con
+  Galvanoscopio de 218 a 60, sin cambiar gameplay.
+
+### Evidencia
+
+- FAST A2:
+  `output/playwright/ohmdal-arco1-authored/a2-fast-sol-verify/capture-manifest.json`.
+  Chrome 151 / Intel UHD D3D11, `softwareRendered=false`, cero errores de
+  consola/página, 33 draw calls / 8,676 tris en interior y 60 / 15,028 con
+  Galvanoscopio.
+- Plaza regression: 5/5 hashes SHA-256 exactamente iguales a A0.
+- `npm run build`: PASS; sólo warnings conocidos de Havok URL y chunks grandes.
+- `npm run playtest:ohmdal-golden-path`: PASS, 22 checkpoints en una única
+  corrida posterior al cambio de lifecycle, incluidos desktop/mobile y touch.
+- Tests enfocados y suite repo: PASS, incluidos visual harness, authored Taller
+  y lifecycle de zonas.
+- Gemini: `VERDICT: PASS`, sin `PLAYER_FACING_BLOCKERS`,
+  `ANOTHER_A2_ITERATION: NO`; reporte en
+  `agent-work/reports/gemini/ohmdal-arco1-authored-a2-review.md`.
+
+### Deuda no bloqueante
+
+- Edge fill y dressing periférico menor pueden volver en A7/A8; no justifican
+  sobrepulir Taller antes de authoring de Manantial.
+- FAST omite mobile/touch por contrato; la corrida Golden Path cubrió operabilidad
+  y el gate FULL permanece reservado para A8.
+- No se usó MiniMax en A2. Su primer scope obligatorio sigue siendo la propuesta
+  technical-art acotada de Manantial en A3.

@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES,
   OHMDAL_VISUAL_CAMERA_PRESETS,
   isSoftwareRenderer,
   percentile,
@@ -10,8 +11,10 @@ import {
   FAST_CAPTURE_CONTRACT,
   FAST_STAGE_SHOTS,
   FULL_CAPTURE_CONTRACT,
+  OHMDAL_AUTHORED_CAPTURE_SHOTS,
   assertRendererDiagnostics,
   fastLaunchOptions,
+  getCaptureShotSpec,
   resolveCaptureViews,
 } from '../scripts/visual/ohmdal-capture-contract.mjs';
 
@@ -66,6 +69,36 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     assert.equal(FAST_CAPTURE_CONTRACT.includesMobile, false);
     assert.equal(FAST_CAPTURE_CONTRACT.includesNoPost, false);
     assert.ok(fast.length < full.length);
+  });
+
+  it('define el FAST A2 del Taller con IDs canónicos y metadata determinista', () => {
+    const fast = resolveCaptureViews({ mode: 'fast', stage: 'a2-plaza-workshop-authored' });
+    assert.deepEqual(fast.map((view) => view.id), [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES]);
+    assert.deepEqual(Object.keys(OHMDAL_AUTHORED_CAPTURE_SHOTS), [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES]);
+
+    const exterior = getCaptureShotSpec('workshop-exterior');
+    assert.equal(exterior.runtimeHook, 'setCaptureShot');
+    assert.equal(exterior.state, 'workshop-exterior');
+    assert.equal(exterior.camera, 'workshop-exterior');
+    assert.deepEqual(exterior.anchor.position, [-2.8, 1.8, -4.15]);
+    assert.equal(exterior.world.zone, 'plaza');
+    assert.equal(exterior.deterministic.seed, 1701);
+
+    const interior = getCaptureShotSpec('workshop-interior-tools');
+    assert.equal(interior.world.zone, 'workshop');
+    assert.equal(interior.world.storyStep, 'inside_workshop');
+    assert.deepEqual(interior.anchor.position, [-60, 1.9, -2.45]);
+
+    const galvanoscope = getCaptureShotSpec('galvanoscope-first-person');
+    assert.equal(galvanoscope.world.tool, 'galvanoscope');
+    assert.equal(galvanoscope.world.probeTarget, 'lumen_taller_banco');
+    assert.equal(galvanoscope.anchor.yaw, 270);
+
+    // A0 aliases remain on the existing hook pair and never require A2 wiring.
+    const alias = getCaptureShotSpec('workshop-approach');
+    assert.equal(alias.runtimeHook, 'setStateAndCamera');
+    assert.equal(alias.state, 'portal-arrival');
+    assert.equal(alias.camera, 'workshop-approach');
   });
 
   it('FAST solicita aceleración GPU sin forzar SwiftShader y exige diagnostics', () => {

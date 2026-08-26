@@ -41,6 +41,8 @@ assert.equal(loads.manantial, 1, 'Omega progression may preload Manantial exactl
 assert.equal(lifecycle.snapshot()[2]?.active, false, 'Manantial preload does not cross the boundary');
 assert.deepEqual(activations, ['plaza:true', 'workshop:true', 'workshop:false']);
 assert.match(runtimeSource, /zones\.activate\('workshop'\)/, 'Taller activation is tied to its player-facing door');
+assert.match(runtimeSource, /zones\.activate\('workshop'\)\.then\(\(\) => \{\s*zones\.deactivate\('plaza'\)/, 'Taller entry retires Plaza rendering after its zone is ready');
+assert.match(runtimeSource, /zones\.activate\('plaza'\)\.then\(\(\) => zones\.deactivate\('workshop'\)\)/, 'Taller exit restores Plaza before retiring the interior');
 assert.match(runtimeSource, /zones\.preload\('manantial'\)/, 'Omega progression owns Manantial preload');
 assert.match(runtimeSource, /zones\.activate\('manantial'\)/, 'crossing Omega activates the Manantial boundary');
 assert.doesNotMatch(manantialShellSource, /new URL|assets\/runtime|\.glb/i, 'declared Manantial shell has no future heavy asset request');

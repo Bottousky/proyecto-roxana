@@ -12,6 +12,55 @@ export const OHMDAL_VISUAL_CAMERA_PRESETS = {
 export type OhmdalVisualCameraName = keyof typeof OHMDAL_VISUAL_CAMERA_PRESETS;
 export type OhmdalVisualStateName = 'portal-arrival' | 'restored-plaza';
 
+/**
+ * Authored-pass capture names extend the stable A0 harness without changing
+ * the legacy camera/state contract. A2 shots are applied through the optional
+ * setCaptureShot hook because they also need zone/story/tool setup.
+ */
+export const OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES = [
+  'workshop-exterior',
+  'workshop-interior-tools',
+  'galvanoscope-first-person',
+] as const;
+
+export type OhmdalVisualCaptureShotName =
+  | OhmdalVisualCameraName
+  | typeof OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES[number];
+
+export type OhmdalVisualCaptureStateName =
+  | OhmdalVisualStateName
+  | typeof OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES[number];
+
+export type OhmdalVisualCaptureCameraName =
+  | OhmdalVisualCameraName
+  | typeof OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES[number];
+
+export interface RoxanaOhmdalCaptureShot {
+  id: OhmdalVisualCaptureShotName;
+  state: OhmdalVisualCaptureStateName;
+  camera: OhmdalVisualCaptureCameraName;
+  runtimeHook: 'setCaptureShot' | 'setStateAndCamera';
+  viewport: { width: number; height: number };
+  hideUi: boolean;
+  post: boolean;
+  anchor: {
+    position: readonly [number, number, number];
+    yaw: number;
+    pitch: number;
+  } | null;
+  world: {
+    zone: 'plaza' | 'workshop';
+    storyStep: string;
+    tool?: 'galvanoscope';
+    probeTarget?: string;
+  };
+  deterministic: {
+    seed: number;
+    reducedMotion: boolean;
+    pauseBeforeCapture: boolean;
+  };
+}
+
 export interface RoxanaVisualDiagnostics {
   browser: {
     renderer: string | null;
@@ -49,6 +98,7 @@ export interface RoxanaVisualDiagnostics {
   harness: {
     camera: OhmdalVisualCameraName;
     state: OhmdalVisualStateName;
+    captureShot: OhmdalVisualCaptureShotName | null;
     paused: boolean;
     reducedMotion: boolean;
     debugUiHidden: boolean;
@@ -90,6 +140,11 @@ export interface RoxanaVisualTestHooks {
   seed(value: number): void;
   setState(name: OhmdalVisualStateName): void;
   setCamera(name: OhmdalVisualCameraName): void;
+  /**
+   * Optional authored-pass hook. A2 capture must fail closed when this is not
+   * wired; silently using a Plaza alias would invalidate the evidence.
+   */
+  setCaptureShot?(shot: RoxanaOhmdalCaptureShot): void | Promise<void>;
   setPausedForScreenshot(paused: boolean): void;
   setReducedMotion(enabled: boolean): void;
   hideDebugUi(hidden: boolean): void;

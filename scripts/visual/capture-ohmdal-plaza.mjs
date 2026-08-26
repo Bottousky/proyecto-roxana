@@ -7,6 +7,7 @@ import {
   FULL_CAPTURE_CONTRACT,
   assertRendererDiagnostics,
   fastLaunchOptions,
+  getCaptureShotSpec,
   resolveCaptureViews,
 } from './ohmdal-capture-contract.mjs';
 
@@ -107,6 +108,7 @@ try {
 
   const captures = [];
   for (const view of views) {
+    const shot = mode === 'fast' ? getCaptureShotSpec(view.id) : null;
     let captureContext = null;
     let capturePage = page;
     if (view.id === 'active-play-mobile') {
@@ -124,17 +126,24 @@ try {
         await openExperience(capturePage);
       }
     }
-    await capturePage.evaluate(({ id, hideUi, post }) => {
+    await capturePage.evaluate(async ({ id, hideUi, post, shot }) => {
       const hooks = window.__ROXANA_VISUAL_TEST_HOOKS__;
       if (!hooks) throw new Error('Visual Harness hooks are not installed.');
       hooks.setPausedForScreenshot(false);
-      hooks.seed(1701);
-      hooks.setState('portal-arrival');
-      hooks.setCamera(id);
-      hooks.setReducedMotion(true);
+      if (shot?.runtimeHook === 'setCaptureShot') {
+        if (typeof hooks.setCaptureShot !== 'function') {
+          throw new Error(`Visual Harness hook setCaptureShot is required for FAST shot ${shot.id}.`);
+        }
+        await hooks.setCaptureShot(shot);
+      } else {
+        hooks.seed(shot?.deterministic?.seed ?? 1701);
+        hooks.setState(shot?.state ?? 'portal-arrival');
+        hooks.setCamera(shot?.camera ?? id);
+        hooks.setReducedMotion(shot?.deterministic?.reducedMotion ?? true);
+      }
       hooks.hideDebugUi(hideUi);
       hooks.setPostProcessing(post);
-    }, view);
+    }, { ...view, shot });
     await capturePage.waitForTimeout(500);
     await capturePage.evaluate(() => window.__ROXANA_VISUAL_TEST_HOOKS__?.setPausedForScreenshot(true));
     await capturePage.waitForTimeout(100);
@@ -143,12 +152,14 @@ try {
     await capturePage.screenshot({ path: screenshot, animations: 'disabled' });
     const diagnostics = await capturePage.evaluate(() => window.__ROXANA_VISUAL_TEST_HOOKS__?.getDiagnostics());
     assertRendererDiagnostics(diagnostics, `${mode}/${view.id}`);
-    captures.push({
+    const capture = {
       id: view.id,
       screenshot,
       viewport: view.viewport,
       diagnostics,
-    });
+    };
+    if (shot) capture.shot = shot;
+    captures.push(capture);
     await captureContext?.close();
   }
 

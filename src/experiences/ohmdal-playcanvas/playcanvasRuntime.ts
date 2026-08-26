@@ -14,6 +14,8 @@ import {
   percentile,
   type OhmdalVisualCameraName,
   type OhmdalVisualStateName,
+  type RoxanaOhmdalCaptureShot,
+  type OhmdalVisualCaptureShotName,
   type RoxanaVisualTestHooks,
 } from './visualHarness.ts';
 import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
@@ -153,6 +155,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let isPointerLocked = false;
   let visualCamera: OhmdalVisualCameraName = 'active-play-desktop';
   let visualState: OhmdalVisualStateName = 'portal-arrival';
+  let visualCaptureShot: OhmdalVisualCaptureShotName | null = null;
   let visualPaused = false;
   let reducedMotion = false;
   let debugUiHidden = false;
@@ -250,6 +253,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     world.playerEntity.setEulerAngles(0, yaw, 0);
     world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
     visualCamera = name;
+    visualCaptureShot = null;
   }
 
   function setVisualState(name: OhmdalVisualStateName): void {
@@ -290,6 +294,39 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     }
 
     visualState = name;
+    visualCaptureShot = null;
+  }
+
+  async function setVisualCaptureShot(shot: RoxanaOhmdalCaptureShot): Promise<void> {
+    if (!shot.anchor) throw new Error(`Ohmdal authored capture shot needs an anchor: ${shot.id}`);
+    if (!['workshop-exterior', 'workshop-interior-tools', 'galvanoscope-first-person'].includes(shot.id)) {
+      throw new Error(`Unknown Ohmdal authored capture shot: ${shot.id}`);
+    }
+
+    closeVisualOverlays();
+    for (const zone of ['workshop', 'manantial', 'castle', 'forge-terraces', 'lighthouse'] as const) {
+      zones.deactivate(zone);
+    }
+    await zones.activate('plaza');
+    if (shot.world.zone === 'workshop') {
+      await zones.activate('workshop');
+      zones.deactivate('plaza');
+    }
+
+    visualSeed = shot.deterministic.seed;
+    reducedMotion = shot.deterministic.reducedMotion;
+    storyStep = shot.world.storyStep as OhmdalStoryStep;
+    isToolEquipped = shot.world.tool === 'galvanoscope';
+    world.viewmodelRoot.enabled = isToolEquipped;
+
+    const [x, y, z] = shot.anchor.position;
+    playerPos.set(x, y, z);
+    yaw = shot.anchor.yaw;
+    pitch = shot.anchor.pitch;
+    world.playerEntity.setPosition(x, y, z);
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+    visualCaptureShot = shot.id;
   }
 
   function collectRenderCounts(): { meshes: number; materials: number; textures: number } {
@@ -353,6 +390,9 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       if (!(name in OHMDAL_VISUAL_CAMERA_PRESETS)) throw new Error(`Unknown Ohmdal visual camera: ${name}`);
       setVisualCamera(name);
     },
+    async setCaptureShot(shot) {
+      await setVisualCaptureShot(shot);
+    },
     setPausedForScreenshot(paused) {
       visualPaused = paused;
     },
@@ -409,6 +449,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         harness: {
           camera: visualCamera,
           state: visualState,
+          captureShot: visualCaptureShot,
           paused: visualPaused,
           reducedMotion,
           debugUiHidden,
@@ -570,7 +611,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 2.8,
         action: () => {
           teleportPlayer(-7.0, 1.68, -4.0, 90);
-          zones.deactivate('workshop');
+          void zones.activate('plaza').then(() => zones.deactivate('workshop'));
           arc1State = enterArc1Region(arc1State, 'taller');
           storyStep = 'returned_to_plaza';
           ui.showNotification('Saliste a la Plaza Central de Ohmdal.');
@@ -945,6 +986,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 3.0,
         action: () => {
           void zones.activate('workshop').then(() => {
+            zones.deactivate('plaza');
             arc1State = enterArc1Region(arc1State, 'taller');
             teleportPlayer(-60, 1.68, -3.8, 0);
             storyStep = 'inside_workshop';
