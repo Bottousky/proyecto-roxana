@@ -57,6 +57,18 @@ function latestCommit(ref) {
   return { sha, subject: subject.join('\t') };
 }
 
+function isAncestor(ancestor, descendant) {
+  if (!ancestor || !descendant) return false;
+  return runGit(['merge-base', '--is-ancestor', ancestor, descendant]).status === 0;
+}
+
+function changedFiles(baseSha, headSha) {
+  if (!baseSha || !headSha) return [];
+  const result = runGit(['diff', '--name-only', `${baseSha}..${headSha}`]);
+  if (result.status !== 0) return [];
+  return result.stdout.split(/\r?\n/).filter(Boolean);
+}
+
 function parseWorktrees() {
   const result = runGit(['worktree', 'list', '--porcelain']);
   if (result.status !== 0) return [];
@@ -96,19 +108,66 @@ function worktreeStatus(worktreePath) {
   };
 }
 
+function field(content, name) {
+  if (typeof content !== 'string') return null;
+  const match = content.match(new RegExp(`^\\s*${name}\\s*:\\s*([^\\r\\n]+)`, 'im'));
+  return match ? match[1].trim().replace(/^`|`$/g, '') : null;
+}
+
 function reportSignals(content) {
-  if (typeof content !== 'string') {
-    return {
-      selfAcceptanceFalse: false,
-      candidateCommitMentioned: false,
-      reportsGreenEvidence: false,
-    };
-  }
+  const candidateMode = field(content, 'CANDIDATE_MODE');
+  const baseSha = field(content, 'BASE_SHA');
+  const implementationSha = field(content, 'IMPLEMENTATION_SHA');
+  const evidenceStatus = field(content, 'EVIDENCE_STATUS');
+  const selfAcceptance = field(content, 'SELF_ACCEPTANCE');
   return {
-    selfAcceptanceFalse: /SELF_ACCEPTANCE\s*:\s*false/i.test(content),
-    candidateCommitMentioned: /candidate(?:\s+commit)?(?:\s+sha)?\s*[:=]\s*`?[0-9a-f]{7,40}/i.test(content)
-      || /candidate commit/i.test(content),
-    reportsGreenEvidence: /\bPASS\b|\bgreen\b|22\/22|zero (?:console|page) errors?/i.test(content),
+    protocolV2: ['implementation', 'validation-only'].includes(candidateMode || ''),
+    candidateMode,
+    baseSha,
+    implementationSha,
+    evidenceStatus,
+    selfAcceptanceFalse: /^false$/i.test(selfAcceptance || ''),
+    explicitPass: /^PASS$/i.test(evidenceStatus || ''),
+  };
+}
+
+function validateCandidateProtocol({ canonicalSha, resolved, worker, report, signals }) {
+  const reasons = [];
+  if (!resolved) reasons.push('worker branch/ref missing');
+  if (!report.exists) reasons.push('evidence report missing');
+  if (!signals.protocolV2) reasons.push('report does not use candidate protocol v2');
+  if (!signals.selfAcceptanceFalse) reasons.push('SELF_ACCEPTANCE:false missing');
+  if (!signals.explicitPass) reasons.push('EVIDENCE_STATUS:PASS missing');
+  if (!/^[0-9a-f]{40}$/i.test(signals.baseSha || '')) reasons.push('BASE_SHA must be exact 40-hex SHA');
+
+  if (reasons.length > 0 || !resolved) return { ready: false, reasons, implementationFiles: [] };
+
+  const baseSha = signals.baseSha;
+  if (!isAncestor(baseSha, resolved.ref)) reasons.push('BASE_SHA is not an ancestor of worker branch');
+
+  let implementationFiles = [];
+  if (signals.candidateMode === 'implementation') {
+    if (!/^[0-9a-f]{40}$/i.test(signals.implementationSha || '')) {
+      reasons.push('IMPLEMENTATION_SHA must be exact 40-hex SHA for implementation candidate');
+    } else {
+      if (!isAncestor(baseSha, signals.implementationSha)) reasons.push('implementation SHA is not descended from BASE_SHA');
+      if (!isAncestor(signals.implementationSha, resolved.ref)) reasons.push('implementation SHA is not contained in worker branch');
+      implementationFiles = changedFiles(baseSha, signals.implementationSha);
+      const substantive = implementationFiles.filter((file) => file !== worker.report);
+      if (substantive.length === 0) reasons.push('implementation candidate has no substantive file delta beyond report');
+    }
+  } else if (signals.candidateMode === 'validation-only') {
+    if (!/^NONE$/i.test(signals.implementationSha || '')) reasons.push('validation-only candidate requires IMPLEMENTATION_SHA:NONE');
+    if (baseSha !== canonicalSha) reasons.push('validation-only BASE_SHA must equal current canonical SHA');
+    const branchFiles = changedFiles(baseSha, resolved.ref);
+    const outOfReport = branchFiles.filter((file) => file !== worker.report);
+    if (outOfReport.length > 0) reasons.push(`validation-only branch contains non-report changes: ${outOfReport.join(', ')}`);
+  }
+
+  return {
+    ready: reasons.length === 0,
+    reasons,
+    implementationFiles,
   };
 }
 
@@ -121,7 +180,6 @@ try {
   process.exit(1);
 }
 
-// Best-effort refresh. A network failure must not make the local sensor unusable.
 const fetchResult = runGit(['fetch', 'origin', '--prune']);
 const fetchOk = fetchResult.status === 0;
 
@@ -152,6 +210,13 @@ for (const [workerId, worker] of Object.entries(config.workers || {})) {
   const signals = reportSignals(report.content);
   const worktree = worktrees.find((item) => item.branch === worker.branch) || null;
   const wtStatus = worktreeStatus(worktree?.path || null);
+  const protocol = validateCandidateProtocol({
+    canonicalSha: canonical.sha,
+    resolved,
+    worker,
+    report,
+    signals,
+  });
 
   workerSnapshots[workerId] = {
     branch: worker.branch,
@@ -164,17 +229,13 @@ for (const [workerId, worker] of Object.entries(config.workers || {})) {
     expectedReport: worker.report,
     reportExists: report.exists,
     reportSignals: signals,
+    protocolValidation: protocol,
     worktree: worktree
       ? { ...worktree, status: wtStatus }
       : null,
     blockedUntil: worker.blockedUntil || null,
     candidateReady: Boolean(
-      resolved
-      && relation.ahead != null
-      && relation.ahead > 0
-      && report.exists
-      && signals.selfAcceptanceFalse
-      && signals.candidateCommitMentioned
+      protocol.ready
       && (wtStatus == null || wtStatus.clean === true)
     ),
   };
@@ -188,9 +249,10 @@ try {
 }
 
 const snapshot = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   generatedAt: new Date().toISOString(),
   orchestrator: config.orchestratorId,
+  candidateProtocol: 'v2-explicit',
   canonical: {
     branch: config.canonicalBranch,
     ref: canonical.ref,
