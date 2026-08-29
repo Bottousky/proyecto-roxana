@@ -87,16 +87,41 @@ Use FAST hardware capture for visual iteration and record `softwareRendered`/ren
 - redesign accepted topology;
 - edit MiniMax experimental VFX scope.
 
-## Report
+## Candidate protocol v2 — mandatory
 
-`agent-work/reports/workers/ohmdal-authored-gemini-current.md` must contain:
+The evidence report must begin with exact machine-readable fields.
 
-- base SHA;
+For a normal implementation candidate:
+
+```text
+CANDIDATE_MODE: implementation
+BASE_SHA: <exact 40-hex SHA used as implementation base>
+IMPLEMENTATION_SHA: <exact 40-hex implementation commit SHA>
+EVIDENCE_STATUS: PASS
+SELF_ACCEPTANCE: false
+```
+
+The `IMPLEMENTATION_SHA` must contain substantive changes beyond the evidence report itself and must descend from `BASE_SHA`.
+
+If the canonical branch already contains the implementation and this run only validates it, do NOT invent an implementation commit. Use:
+
+```text
+CANDIDATE_MODE: validation-only
+BASE_SHA: <exact current canonical 40-hex SHA>
+IMPLEMENTATION_SHA: NONE
+EVIDENCE_STATUS: PASS
+SELF_ACCEPTANCE: false
+```
+
+A validation-only worker branch may change only the evidence report. If any required gate fails, use `EVIDENCE_STATUS: FAIL`.
+
+After those fields, include:
+
 - branch;
-- candidate commit SHA;
 - files changed;
 - tests/build/Golden Path results;
 - capture paths and GPU diagnostics;
 - remaining visual/gameplay debt;
-- exact current git status;
-- explicit line: `SELF_ACCEPTANCE: false`.
+- exact current git status.
+
+Never write placeholders such as `will be recorded` in machine-readable SHA fields.
