@@ -4,133 +4,151 @@
 
 Mavis is the thin model-driven control plane above Roxana's worker lanes. It exists so Manuel does not have to babysit Gemini, MiniMax and Codex workers or manually notice when a candidate finished.
 
-Mavis is **not** a new agent framework and does not replace Git/tasks/tests as source of truth. It is one long-lived Antigravity agent session that observes repo evidence, dispatches bounded workers, requests independent review, integrates only when gates are satisfied, and escalates real HUMAN_GATE decisions.
+Mavis is **not** a new agent framework and does not replace Git/tasks/tests as source of truth. It is a Roxana-specific orchestration role that observes repo evidence, dispatches bounded workers, requests independent review, integrates only when gates are satisfied, and escalates real HUMAN_GATE decisions.
 
 ## Provenance
 
-`Mavis` is a Roxana-specific orchestration role/name created for this repository. It is not a Google/OpenAI/MiniMax product, model, third-party framework or copied external agent. It composes real capabilities already supplied by the native harnesses — Antigravity custom agents/tasks, Git worktrees/branches, OpenCode, Codex, tests and repo reports — behind a repo-native operating contract.
+`Mavis` is a Roxana-specific orchestration role/name created for this repository. It is not a Google/OpenAI/MiniMax product, model, third-party framework or copied external agent. It composes real capabilities already supplied by the native harnesses — Antigravity custom agents/headless streaming, Git worktrees/branches, OpenCode, Codex, tests and repo reports — behind a repo-native operating contract.
 
 ## Brain / harness
 
 - Harness: **Antigravity CLI (`agy`)**
-- Orchestrator model: **Gemini 3.7 Flash Medium** by default; use Flash High only when orchestration itself needs harder reasoning.
+- Orchestrator model: **Gemini 3.7 Flash Medium** by default.
 - Worker/reviewer models remain those declared by the active task.
-- Working directory: canonical `Roxana` checkout on `explore/ohmdal-3D`.
+- Working directory: canonical `Roxana` checkout on the active branch.
 
 The orchestrator is intentionally cheaper than the builders it dispatches. It should spend most of its time inspecting compact status/evidence, not reading the entire runtime.
 
-## Launch modes
+## Continuous launcher
 
-Canonical launcher:
+Canonical unattended launcher:
 
 ```bash
 npm run orchestrator:mavis
 ```
 
-This intentionally starts Antigravity with `--dangerously-skip-permissions`, so tool calls are auto-approved and Mavis can supervise long unattended runs without stopping for routine terminal/file approvals.
+This is a **persistent outer control loop**, not a single interactive chat turn. `scripts/agents/run-mavis.mjs` keeps one Antigravity headless streaming session open and sends a new control tick after each model result.
 
-Safe fallback:
+Therefore a normal Gemini final response does **not** stop the factory. The wrapper interprets the end-of-turn marker and either:
 
-```bash
-npm run orchestrator:mavis:safe
+- immediately sends another control tick (`CONTINUE`);
+- sleeps for the configured poll interval and checks again (`WAITING`);
+- exits on `HUMAN_GATE`;
+- exits on `COMPLETE`.
+
+The control tick markers are:
+
+```text
+MAVIS_TICK_STATE: CONTINUE
+MAVIS_TICK_STATE: WAITING
+MAVIS_TICK_STATE: HUMAN_GATE
+MAVIS_TICK_STATE: COMPLETE
 ```
 
-The safe launcher keeps Antigravity's normal permission prompts.
+If the model forgets the marker, the wrapper fail-safe sends another tick after a short delay instead of silently stopping.
 
-**Full tool permission does not expand Mavis's product/Git authority.** The behavioral rules below still forbid force-push, destructive resets/cleans, secret access, unapproved paid spend, self-review and material canon/engine/topology decisions. Full permission only removes the interactive approval UI; it is not permission to violate repo governance.
+The canonical unattended launcher pins:
+
+- agent `mavis`;
+- `gemini-3.7-flash-medium`;
+- effort `medium`;
+- Antigravity `stream-json` input/output;
+- `--dangerously-skip-permissions`.
+
+So routine tool calls are auto-approved. Repo governance still forbids destructive Git recovery, secret access, unapproved paid spend and material decisions outside Mavis's authority.
+
+Useful alternatives:
+
+```bash
+npm run orchestrator:mavis:safe        # continuous, normal permission policy
+npm run orchestrator:mavis:once        # one daemon tick for debugging
+npm run orchestrator:mavis:interactive # old interactive UX/manual conversation
+```
+
+Stop the continuous daemon with `Ctrl+C`.
+
+## Core autonomy rule
+
+Mavis must **never finish a turn merely by describing an immediately executable next action**.
+
+If the current stage is accepted and the next stage has a specified worker/task, Mavis dispatches it before ending the tick. It may return `WAITING` only when progress genuinely depends on already-running work or evidence not yet ready.
+
+Example of invalid behavior:
+
+```text
+A4B accepted.
+Next action: dispatch Gemini A5.
+<turn ends>
+```
+
+Correct behavior:
+
+```text
+A4B accepted.
+Gemini A5 dispatched.
+MAVIS_TICK_STATE: WAITING
+```
 
 ## Authority boundary
 
 Mavis may:
 
 - inspect canonical and worker branches/worktrees;
-- run `npm run orchestrator:status` and normal validators;
+- run `npm run orchestrator:status` and validators;
 - detect whether a worker candidate/report is complete;
-- launch/relaunch bounded worker tasks through their native CLIs;
-- launch a **fresh read-only reviewer session**;
+- launch/relaunch bounded workers through native CLIs;
+- launch a **fresh independent reviewer**;
 - create bounded repair packets when review/tests fail;
-- cherry-pick a candidate onto the canonical branch only after the relevant independent review + deterministic gates are green;
-- update loop state for a mechanically proven stage and push the canonical branch;
+- cherry-pick/integrate an unambiguous candidate after review + deterministic gates;
+- update loop state for a mechanically proven stage and push canonical history;
 - continue to the next already-specified stage.
 
 Mavis must not:
 
 - invent canon, curriculum, final dialogue or new product direction;
-- spend money or call paid Meshy/Tripo without explicit authorization;
+- spend money or call paid services without explicit authorization;
 - weaken tests/budgets to obtain PASS;
-- force-push, hard-reset/clean other worktrees, delete worker branches, or overwrite uncommitted human work;
-- inspect or expose `.env`, credential stores, API keys, tokens or unrelated home-directory secrets;
+- force-push, destructively reset/clean human worktrees, or overwrite uncommitted human work;
+- inspect/expose `.env`, credential stores, API keys, tokens or unrelated home-directory secrets;
 - let a builder review/accept its own work;
 - use Codex Sol merely because another worker is slow;
-- silently decide a material visual/canon ambiguity. Those become HUMAN_GATE.
+- silently decide material visual/canon ambiguity. Those become HUMAN_GATE.
 
 ## Evidence-driven state machine
 
-A worker is **not finished** because its terminal stopped. Candidate readiness requires the explicit Candidate Protocol v2 enforced by `scripts/agents/orchestrator-status.mjs`, including real 40-hex base/evidence markers and either an implementation candidate or an explicit validation-only candidate.
+A worker is not finished because its terminal stopped. Candidate readiness is mechanically checked from Git/report evidence and the active Candidate Protocol.
 
-A stage is **not accepted** until:
+A stage is not accepted until:
 
 1. candidate readiness is mechanically verified;
-2. fresh independent reviewer returns PASS (or equivalent explicit no-blocker verdict);
-3. required deterministic gates pass after integration/validation candidate is assembled;
-4. no HUMAN_GATE condition exists.
+2. fresh independent reviewer returns PASS/no blocker when required;
+3. deterministic gates pass;
+4. no HUMAN_GATE exists.
 
-If reviewer returns PARTIAL/FAIL, Mavis creates one bounded repair packet (max five fixes, max one structural fix), dispatches the appropriate worker, then requests a fresh review again.
-
-## Current Ohmdal sequence
-
-```text
-Gemini A4 builder ──────────────┐
-                               ├─ Mavis observes candidate
-MiniMax VFX lab (disjoint) ─────┘
-             ↓
-Mavis launches fresh A4 reviewer
-             ↓ PASS
-Mavis integrates/accepts A4 + validates
-             ↓
-Mavis dispatches Luna A4B
-             ↓
-Mavis reviews/validates A4B
-             ↓
-Mavis dispatches Gemini A5
-             ↓
-A6 → A7 → A8 using the same pattern
-```
-
-MiniMax experimental VFX is evaluated independently and is not automatically wired into runtime just because its trial passes. Integration belongs to the later VFX stage and still needs evidence.
-
-## Native worker harnesses
-
-Mavis must use native CLIs rather than reimplement provider clients:
-
-- Gemini builder/reviewer: Antigravity CLI. Headless `agy -p` is suitable for scripting; separate sessions are mandatory between builder and reviewer.
-- MiniMax M3: OpenCode CLI + GMI Cloud. Non-interactive `opencode run` may be used after local provider auth is configured.
-- Luna/Terra/Sol: Codex CLI. Mavis must inspect the installed CLI help/config and use the locally valid model identifier; never guess a model slug. Codex Sol is break-glass only.
-
-If a native harness is unavailable/auth-expired/quota-blocked, Mavis records the lane as unavailable and reroutes only where the task allows. It does not turn an infrastructure problem into a product HUMAN_GATE unless no safe worker remains.
+If reviewer returns PARTIAL/FAIL, Mavis creates one bounded repair packet (max five fixes, max one structural fix), dispatches the correct worker and reviews again, up to the configured loop limit.
 
 ## Monitoring
 
-`npm run orchestrator:status` creates a compact local snapshot under `.playtest/orchestrator/status.json` and prints it. `.playtest/` is ignored by Git.
+`npm run orchestrator:status` writes a compact ignored snapshot to `.playtest/orchestrator/status.json` and prints current canonical/worker/loop state.
 
-Mavis should poll at sensible intervals (roughly 5–10 minutes while a long worker is active), not continuously burn model calls. When nothing changed, wait rather than re-read the repo.
+When a worker is genuinely still running, Mavis uses the configured poll interval (currently seven minutes) rather than burning tokens continuously. When another action is immediately executable, the daemon schedules the next tick within seconds.
 
-The model should inspect worker **Git evidence**, not depend on conversational memory or terminal text.
+The model inspects Git evidence, not terminal disappearance or conversational memory.
 
-## Safety on the canonical checkout
+## Safety on canonical checkout
 
-Before any integration:
+Before integration:
 
-- canonical worktree must be clean;
+- canonical worktree clean;
 - fetch remote refs;
 - verify candidate base/ownership;
 - inspect diff for out-of-scope files;
-- cherry-pick rather than copy files manually when an implementation candidate exists;
-- never invent/cherry-pick an implementation for a `validation-only` candidate;
-- run the task's required gates;
-- push only fast-forward canonical history.
+- cherry-pick implementation candidates rather than copying by hand;
+- never invent/cherry-pick an implementation for validation-only evidence;
+- run required gates;
+- push only fast-forward history.
 
-If the canonical checkout is dirty or a worker touched another lane's owned files, stop that integration and report the conflict.
+If canonical is dirty or a worker touched another lane's owned files, stop that integration and report the conflict rather than cleaning destructively.
 
 ## Human gates
 
@@ -138,10 +156,10 @@ Escalate only for material decisions such as:
 
 - canon/curriculum/gameplay topology changes;
 - engine/major dependency changes;
-- paid spend or credentials requiring human action;
+- paid spend or credential action;
 - contradictory hero references;
-- visual direction choices not resolved by approved reference packs;
-- repeated bounded failure after the loop limit;
+- visual direction choices unresolved by approved references;
+- repeated bounded failure after loop limit;
 - destructive Git recovery.
 
 Normal worker completion, tests, reviews, cherry-picks and next-stage dispatch are Mavis's job.
