@@ -18,6 +18,7 @@
     "agent:minimax:gmi": "node scripts/agents/run-gmi-minimax.mjs",
     "orchestrator:status": "node scripts/agents/orchestrator-status.mjs",
     "orchestrator:mavis": "node scripts/agents/run-mavis.mjs",
+    "orchestrator:mavis:safe": "node scripts/agents/run-mavis.mjs --safe",
     "loop:ohmdal-plaza:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-plaza/state.json",
     "loop:ohmdal-arco1:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-greybox/state.json",
     "loop:ohmdal-arco1-authored:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-authored-pass/state.json",
