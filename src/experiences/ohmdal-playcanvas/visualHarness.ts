@@ -118,6 +118,7 @@ export interface RoxanaVisualDiagnostics {
     loaded: string[];
     active: string[];
   };
+  navigation: CollisionDiagnostic;
   shadows: {
     lights: number;
     castingLights: number;
@@ -179,6 +180,7 @@ export interface RoxanaVisualTestHooks {
   hideDebugUi(hidden: boolean): void;
   setPostProcessing(enabled: boolean): void;
   getDiagnostics(): RoxanaVisualDiagnostics;
+  getCollisionDiagnostics(): CollisionDiagnostic;
   getPlaytestSnapshot(): RoxanaOhmdalPlaytestSnapshot;
 }
 
@@ -200,3 +202,4 @@ export function isSoftwareRenderer(renderer: string | null): boolean | null {
   return /(swiftshader|llvmpipe|software rasterizer|microsoft basic render)/i.test(renderer);
 }
 import type { Arc1GreyboxSnapshot } from './systems/campaign/arc1GreyboxModel.ts';
+import type { CollisionDiagnostic } from './systems/navigation/ohmdalNavigation.ts';

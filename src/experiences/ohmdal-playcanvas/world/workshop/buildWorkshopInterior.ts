@@ -16,7 +16,7 @@ export interface WorkshopInteriorDependencies {
   app: pc.Application;
   materials: WorkshopInteriorMaterials;
   probeTargets: Record<string, pc.Vec3>;
-  addCollider: (x: number, z: number, w: number, d: number) => void;
+  addCollider: (x: number, z: number, w: number, d: number, id?: string) => void;
 }
 
 export interface WorkshopInteriorElements {
@@ -92,7 +92,7 @@ export function buildWorkshopInterior({
   const wFloor = new pc.Entity('W_Floor');
   wFloor.addComponent('render', { type: 'box', material: matWoodDark });
   wFloor.setPosition(0, -0.1, 0);
-  wFloor.setLocalScale(12.0, 0.2, 10.0);
+  wFloor.setLocalScale(16.0, 0.2, 14.0);
   workshopInteriorRoot.addChild(wFloor);
 
   // Walls
@@ -102,11 +102,12 @@ export function buildWorkshopInterior({
   wWallN.setLocalScale(12.0, 5.0, 0.4);
   workshopInteriorRoot.addChild(wWallN);
 
-  const wWallS = new pc.Entity('W_WallS');
-  wWallS.addComponent('render', { type: 'box', material: matStoneDark });
-  wWallS.setPosition(0, 2.5, -5.0);
-  wWallS.setLocalScale(12.0, 5.0, 0.4);
-  workshopInteriorRoot.addChild(wWallS);
+  // The south wall owns an intentional central doorway. Keeping the aperture
+  // in the render shell and in the registry prevents a teleport-only door
+  // from becoming an invisible solid wall.
+  addBox(workshopInteriorRoot, 'W_WallSLeft', [-4.4, 2.5, -5.0], [3.2, 5.0, 0.4], matStoneDark);
+  addBox(workshopInteriorRoot, 'W_WallSRight', [4.4, 2.5, -5.0], [3.2, 5.0, 0.4], matStoneDark);
+  addBox(workshopInteriorRoot, 'W_WallSDoorHeader', [0, 4.25, -5.0], [3.2, 1.5, 0.4], matStoneDark);
 
   const wWallE = new pc.Entity('W_WallE');
   wWallE.addComponent('render', { type: 'box', material: matStoneDark });
@@ -139,7 +140,7 @@ export function buildWorkshopInterior({
   addBox(authoredRoot, 'WorkshopNorthPlasterInset', [0, 2.55, 4.76], [10.8, 4.15, 0.1], matStone);
   addBox(authoredRoot, 'WorkshopEastPlasterInset', [5.76, 2.55, 0], [0.1, 4.15, 8.9], matStone);
   addBox(authoredRoot, 'WorkshopWestPlasterInset', [-5.76, 2.55, 0], [0.1, 4.15, 8.9], matStone);
-  addBox(authoredRoot, 'WorkshopCeilingPanel', [0, 4.72, 0], [11.5, 0.12, 9.5], matWoodDark);
+  addBox(authoredRoot, 'WorkshopCeilingPanel', [0, 4.72, 0], [16.0, 0.12, 14.0], matWoodDark);
   for (const z of [-3.6, 0, 3.6]) {
     addBox(authoredRoot, `WorkshopCeilingTie${z}`, [0, 4.45, z], [11.4, 0.22, 0.28], matWoodDark);
   }
@@ -151,6 +152,10 @@ export function buildWorkshopInterior({
   addBox(authoredRoot, 'WorkshopEntryRunner', [0, 0.035, -2.25], [2.2, 0.06, 5.1], matWood);
   addBox(authoredRoot, 'WorkshopEntryConductorLeft', [-0.82, 0.08, -2.25], [0.08, 0.04, 4.8], matCopperClean);
   addBox(authoredRoot, 'WorkshopEntryConductorRight', [0.82, 0.08, -2.25], [0.08, 0.04, 4.8], matCopperClean);
+  // Cheap adjacent-zone proxy: it fills the intentional door view without
+  // loading Plaza into the lazy Workshop zone and remains scenic/non-solid.
+  addBox(authoredRoot, 'WorkshopDoorwayProxyFacade', [0, 2.0, -8.0], [4.8, 4.0, 0.24], matStoneDark);
+  addBox(authoredRoot, 'WorkshopDoorwayProxyGround', [0, 0.02, -6.6], [4.8, 0.08, 3.0], matStone);
 
   // Lumen's Heavy Master Workbench
   const wWorkbench = new pc.Entity('W_MasterWorkbench');
@@ -255,8 +260,13 @@ export function buildWorkshopInterior({
   probeTargets['lumen_taller_banco'] = new pc.Vec3(-60, 1.0, 0.2);
   probeTargets['lumen_taller_bateria'] = new pc.Vec3(-60.62, 1.3, 0.82);
   probeTargets['lumen_taller_galvanoscope_dock'] = new pc.Vec3(-60, 1.25, 0.38);
-  addCollider(-60, 0.8, 4.6, 2.0);
-  addCollider(-60, 2.4, 1.2, 1.2);
+  addCollider(-60, 5.0, 12.0, 0.4, 'workshop.wall-north');
+  addCollider(-66.0, 0, 0.4, 10.0, 'workshop.wall-west');
+  addCollider(-54.0, 0, 0.4, 10.0, 'workshop.wall-east');
+  addCollider(-64.4, -5.0, 3.2, 0.4, 'workshop.wall-south-west');
+  addCollider(-55.6, -5.0, 3.2, 0.4, 'workshop.wall-south-east');
+  addCollider(-60, 0.8, 4.6, 2.0, 'workshop.master-workbench');
+  addCollider(-60, 2.4, 1.2, 1.2, 'workshop.diagnostic-backboard');
 
   // Everything except Lumen is static and zone-local. Batch by material so the
   // authored support pass stays inside the established mobile draw-call envelope.

@@ -15,7 +15,7 @@ export interface Arc1GreyboxDependencies {
   app: pc.Application;
   materials: Arc1GreyboxMaterials;
   probeTargets: Record<string, pc.Vec3>;
-  addCollider: (x: number, z: number, w: number, d: number) => void;
+  addCollider: (zone: Arc1GreyboxZoneId, x: number, z: number, w: number, d: number, id?: string, options?: { enabled?: boolean }) => void;
 }
 
 export interface Arc1GreyboxElements {
@@ -264,10 +264,12 @@ export function buildArc1Greybox({
 
   // Only the outer shell is solid. Entry, panel, loads and gate remain open to
   // the interaction ray/close-up layer and are therefore not collider targets.
-  addCollider(46, 0, 0.5, 30);
-  addCollider(74, 0, 0.5, 30);
-  addCollider(60, -15, 28, 0.5);
-  addCollider(60, 15, 28, 0.5);
+  addCollider('castle', 46, 0, 0.5, 30, 'castle.wall-west', { enabled: true });
+  addCollider('castle', 74, 0, 0.5, 30, 'castle.wall-east');
+  addCollider('castle', 60, -15, 28, 0.5, 'castle.wall-south');
+  addCollider('castle', 60, 15, 28, 0.5, 'castle.wall-north');
+  addCollider('castle', 60, -11.5, 7.2, 0.28, 'castle.entrance-gate', { enabled: false });
+  addCollider('castle', 60, 8, 5.6, 0.22, 'castle.exit-gate', { enabled: true });
 
   const castleStaticBatch = app.batcher.addGroup('OhmdalCastleStaticArt', false, 45);
   for (const render of castleAuthoredRoot.findComponents('render') as pc.RenderComponent[]) {
@@ -346,10 +348,10 @@ export function buildArc1Greybox({
   probeTargets.forge_heater = new pc.Vec3(124.2, 1.2, -8);
   probeTargets.terraces_pump = new pc.Vec3(120, 1.2, 16);
 
-  addCollider(106, 4, 0.5, 48);
-  addCollider(134, 4, 0.5, 48);
-  addCollider(120, -20, 28, 0.5);
-  addCollider(120, 28, 28, 0.5);
+  addCollider('forge-terraces', 106, 4, 0.5, 48, 'forge-terraces.wall-west');
+  addCollider('forge-terraces', 134, 4, 0.5, 48, 'forge-terraces.wall-east');
+  addCollider('forge-terraces', 120, -20, 28, 0.5, 'forge-terraces.wall-south');
+  addCollider('forge-terraces', 120, 28, 28, 0.5, 'forge-terraces.wall-north');
 
   // -----------------------------------------------------------------------
   // G5/G6 — Lighthouse and return marker. The beacon is physical geometry;
@@ -410,10 +412,10 @@ export function buildArc1Greybox({
   probeTargets.lighthouse_reference = new pc.Vec3(180, 1.2, 0);
   probeTargets.lighthouse_beacon = new pc.Vec3(180, 1.25, 8);
 
-  addCollider(166, 0, 0.5, 30);
-  addCollider(194, 0, 0.5, 30);
-  addCollider(180, -15, 28, 0.5);
-  addCollider(180, 15, 28, 0.5);
+  addCollider('lighthouse', 166, 0, 0.5, 30, 'lighthouse.wall-west');
+  addCollider('lighthouse', 194, 0, 0.5, 30, 'lighthouse.wall-east');
+  addCollider('lighthouse', 180, -15, 28, 0.5, 'lighthouse.wall-south');
+  addCollider('lighthouse', 180, 15, 28, 0.5, 'lighthouse.wall-north');
 
   return {
     roots: {
