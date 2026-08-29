@@ -22,17 +22,17 @@ try {
   // Keep the launcher usable even if config parsing temporarily fails.
 }
 
-const command = process.platform === 'win32' ? 'agy.cmd' : 'agy';
-const args = [
+const agyArgs = [
   '--input-format', 'stream-json',
   '--output-format', 'stream-json',
   '--agent', 'mavis',
   '--model', 'gemini-3.7-flash-medium',
   '--effort', 'medium',
+  '--print-timeout', '30m',
 ];
 
 if (!safeMode) {
-  args.push('--dangerously-skip-permissions');
+  agyArgs.push('--dangerously-skip-permissions');
   console.warn('[MAVIS] FULL PERMISSIONS ENABLED: Antigravity will auto-approve all tool calls for this session.');
   console.warn('[MAVIS] Repo-level rules still forbid force-push, destructive resets, secret access and unapproved paid spend.');
 } else {
@@ -42,7 +42,23 @@ if (!safeMode) {
 console.warn(`[MAVIS] CONTINUOUS CONTROL LOOP enabled. Poll interval while waiting: ${pollMinutes} minute(s).`);
 console.warn('[MAVIS] Ctrl+C stops the daemon. A normal model turn ending does NOT stop Mavis.');
 
-const child = spawn(command, args, {
+// On Windows, `agy` is installed as a .cmd shim. Node 24 can throw spawn EINVAL
+// when a .cmd file is spawned directly with shell:false and piped stdio. Launch
+// the shim through the native command processor instead, while keeping shell:false
+// for the actual Node spawn. All arguments below are fixed repo-owned tokens and
+// contain no shell metacharacters.
+let command;
+let spawnArgs;
+if (process.platform === 'win32') {
+  command = process.env.ComSpec || 'C:\\Windows\\System32\\cmd.exe';
+  spawnArgs = ['/d', '/s', '/c', ['agy', ...agyArgs].join(' ')];
+  console.warn(`[MAVIS] Windows launcher: ${command} /d /s /c agy ...`);
+} else {
+  command = 'agy';
+  spawnArgs = agyArgs;
+}
+
+const child = spawn(command, spawnArgs, {
   cwd: root,
   stdio: ['pipe', 'pipe', 'inherit'],
   shell: false,
@@ -202,7 +218,7 @@ rl.on('line', async (line) => {
 child.on('error', (error) => {
   console.error(`[MAVIS] Failed to launch Antigravity CLI: ${error.message}`);
   if (process.platform === 'win32') {
-    console.error('[MAVIS] Expected agy.cmd on PATH. Verify `Get-Command agy`.');
+    console.error('[MAVIS] Windows launch uses cmd.exe -> agy. Verify `Get-Command agy` if this persists.');
   }
   process.exit(1);
 });
