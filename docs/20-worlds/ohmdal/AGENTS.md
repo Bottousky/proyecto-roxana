@@ -60,7 +60,7 @@ Especializa el `AGENTS.md` raíz. Leer ambos y sólo las fuentes directamente re
 - **Codex Luna Max:** worker mecánico para colliders, spawn anchors, tests, manifests, wiring y cleanup.
 - **Codex Terra:** fallback intermedio.
 - **Codex Sol:** break-glass local-tool reasoning solamente.
-- **MiniMax M3 / GMI:** specialist experimental para technical-art/VFX/recombinación acotada; runner actual proposal-only y siempre evaluado contra evidencia.
+- **MiniMax M3 / GMI Cloud / OpenCode:** specialist experimental tool-enabled para technical-art/VFX/recombinación acotada. Sólo worktree/branch aislado, sin tocar el mismo scope load-bearing que Gemini/Luna y sin auto-integrarse. `run-gmi-minimax.mjs` queda como fallback proposal-only.
 - **Meshy/Tripo:** opcionales detrás de HUMAN_GATE económico y siempre canonicalizados en Blender.
 
 Un worker puede commitear e integrar cambios mecánicos explícitos, pero nunca declarar aceptación material de su propio stage. Cuando el builder es Gemini, cualquier review Gemini debe ser una sesión distinta y read-only; la aceptación definitiva vuelve a ChatGPT/Sol/Manuel según corresponda.
@@ -78,6 +78,13 @@ Un worker puede commitear e integrar cambios mecánicos explícitos, pero nunca 
 - A7 VFX/audio/ambient.
 - A8 full authored Golden Path/freeze.
 
+## Ownership para ahorrar cuota
+
+- Gemini termina el authored candidate del stage actual.
+- Luna toma A4B y otros paquetes mecánicos una vez congelado el commit authored anterior.
+- M3/OpenCode sólo trabaja en módulos experimentales o technical-art disjunto mientras otro builder toca runtime load-bearing.
+- Sol web revisa evidence packs/commits; Codex Sol sólo si falla esta división.
+
 ## Validación
 
 ```bash
@@ -90,3 +97,5 @@ npm run smoke:play
 ```
 
 Además, todo stage player-facing debe aportar capturas, renderer diagnostics, cero errores funcionales y pruebas específicas de navegación/collision cuando corresponda.
+
+Runbook: `../../80-production/QUOTA_AWARE_EXECUTION.md`.

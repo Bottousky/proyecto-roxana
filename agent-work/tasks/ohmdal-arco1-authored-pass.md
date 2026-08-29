@@ -15,6 +15,7 @@ Read first:
 7. `docs/20-worlds/ohmdal/production/ARCO1_CANONICAL_SHOTS.md`
 8. `docs/20-worlds/ohmdal/production/OHMDAL_NAVIGATION_COLLISION_CONTRACT.md`
 9. `docs/20-worlds/ohmdal/production/OHMDAL_SCENIC_RENDERING_POLICY.md`
+10. `docs/80-production/QUOTA_AWARE_EXECUTION.md`
 
 ## Authority / execution split
 
@@ -24,7 +25,7 @@ Read first:
 - Codex Luna Max owns bounded mechanical work when needed.
 - Terra is fallback middle worker.
 - Codex Sol is break-glass only.
-- MiniMax M3 via GMI is a bounded technical-art specialist; current runner remains proposal-only.
+- MiniMax M3 via GMI Cloud is a bounded technical-art specialist. Preferred fair trial route is OpenCode native GMI Cloud in an isolated worktree; repo sidecar remains proposal-only fallback.
 
 A worker may commit candidate milestones and continue preparing later candidates while tests stay green, but must not set queue stages to `passed` or loop to `complete` without external acceptance.
 
@@ -45,6 +46,23 @@ A worker may commit candidate milestones and continue preparing later candidates
 4. Fix navigation/collision/enclosure debt before building more late-zone art on top of it.
 5. Keep mobile/touch and GPU/perf budgets first-class.
 6. Do not duplicate already-ratified planning.
+7. Conserve GPT Plus: expensive Sol reasoning is for direction/acceptance, not hours of mechanical execution.
+
+## Dispatch order
+
+### Now: A4
+
+Preferred builder: `agent-work/tasks/workers/ohmdal-authored-primary-gemini.md` using Gemini/Antigravity workspace-write.
+
+MiniMax/OpenCode may run in parallel only on `agent-work/tasks/minimax/opencode-vfx-tool-trial.md`, whose file ownership is intentionally disjoint from A4 runtime work.
+
+### After external A4 acceptance: A4B
+
+Use Codex Luna Max with `agent-work/tasks/workers/ohmdal-a4b-luna.md`. Do not start it while A4 builder is still editing load-bearing runtime/world files.
+
+### After external A4B acceptance
+
+Return authored scene work to Gemini for A5/A6. Use M3 only for disjoint technical-art tasks and Luna for mechanical packets.
 
 ## Stage expectations
 

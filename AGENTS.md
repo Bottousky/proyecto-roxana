@@ -21,10 +21,10 @@ ChatGPT web / GPT-5.6 Sol
       ↓
 repo = contrato + evidencia
       ↓
-┌───────────────────┬───────────────────┬───────────────────┐
-│ Gemini/Antigravity│ MiniMax M3 / GMI  │ Codex Luna/Terra  │
-│ builder general   │ specialist/TA     │ worker mecánico   │
-└───────────────────┴───────────────────┴───────────────────┘
+┌────────────────────┬─────────────────────┬───────────────────┐
+│ Gemini/Antigravity │ MiniMax M3/OpenCode │ Codex Luna/Terra  │
+│ builder general    │ specialist/TA       │ worker mecánico   │
+└────────────────────┴─────────────────────┴───────────────────┘
       ↓
 commits + tests + captures + report
       ↓
@@ -42,7 +42,7 @@ Un worker puede implementar, correr tests, hacer commits e incluso ejecutar una 
 - **Gemini / Antigravity builder:** implementación general, context-heavy repo work, authored scene work, refactors medianos, Playwright/captures. Usar workspace-write en un worktree/branch aislado. Si Gemini implementa, la revisión Gemini posterior debe ser una sesión separada read-only; no cuenta como auto-aprobación.
 - **Codex Luna Max:** wiring, manifests, layouts repetitivos, colliders, fixtures, tests, capture plumbing, cleanup y cambios cerrados. Preferirlo a Sol para trabajo mecánico.
 - **Codex Terra:** fallback intermedio si Luna no alcanza y no se justifica Sol.
-- **MiniMax M3 vía GMI:** durante el trial, specialist para technical art, VFX/shaders, procedural code y recombinación acotada. El runner repo-native actual es proposal-only; cualquier experimento con filesystem debe ocurrir sólo en branch/worktree aislado y jamás auto-integrarse.
+- **MiniMax M3 vía GMI Cloud + OpenCode:** lane experimental tool-enabled para technical art, VFX/shaders, procedural code y recombinación acotada. OpenCode usa su integración nativa GMI Cloud. Sólo en branch/worktree aislado, sin auto-merge ni auto-accept. El runner repo-native `run-gmi-minimax.mjs` queda como fallback proposal-only.
 - **Gemini reviewer:** fresh-eyes read-only en sesión distinta de cualquier builder Gemini.
 
 No agregar routers, daemons, colas ni frameworks de agentes. El protocolo es `task.md + git + tests + captures + report`.
@@ -59,7 +59,7 @@ AGENTS raíz
 → archivos afectados
 ```
 
-No cargar recovery histórico ni el repo completo salvo necesidad concreta. Dar a MiniMax archivos explícitos; usar canonical shots/reference packs para evitar redescubrir dirección.
+No cargar recovery histórico ni el repo completo salvo necesidad concreta. Dar a MiniMax un task cerrado y archivos explícitos; usar canonical shots/reference packs para evitar redescubrir dirección.
 
 ## Direcciones técnicas
 
@@ -80,8 +80,9 @@ No cargar recovery histórico ni el repo completo salvo necesidad concreta. Dar 
 5. No upgrades incidentales de engine/dependencias.
 6. Verificar licencia/procedencia antes de copiar material externo.
 7. Ningún worker/provider aprueba su propio trabajo.
-8. Ningún secreto/API key/token se commitea; usar `.env.local`/entorno.
+8. Ningún secreto/API key/token se commitea; usar `.env.local`/credential store local.
 9. Ningún gasto pago automático sin HUMAN_GATE/autorización previa.
+10. No ejecutar dos builders sobre los mismos archivos load-bearing al mismo tiempo.
 
 ## Validación
 
@@ -104,4 +105,5 @@ Un cambio player-facing se recorre además en navegador y se verifica en touch/m
 - tasks MiniMax: `agent-work/tasks/minimax/`
 - reports MiniMax GMI: `agent-work/reports/minimax-gmi/`
 
-El detalle operativo vive en `docs/80-production/AI_TOOLING.md`.
+Runbook de cuota y dispatch: `docs/80-production/QUOTA_AWARE_EXECUTION.md`.
+Detalle de herramientas: `docs/80-production/AI_TOOLING.md`.

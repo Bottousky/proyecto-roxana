@@ -50,11 +50,13 @@
       "condition": "strong-local-tool-reasoning-demonstrably-required"
     },
     "experimentalWorker": {
-      "harness": "gmi-api-sidecar",
+      "harness": "opencode-cli",
+      "provider": "GMI Cloud",
       "model": "MiniMaxAI/MiniMax-M3",
-      "mode": "proposal-only",
-      "runner": "scripts/agents/run-gmi-minimax.mjs",
-      "fallback": "continue-with-builder-no-human-gate"
+      "mode": "isolated-worktree-write",
+      "selfApproval": false,
+      "task": "agent-work/tasks/minimax/opencode-vfx-tool-trial.md",
+      "fallback": "scripts/agents/run-gmi-minimax.mjs proposal-only"
     }
   },
   "limits": {
@@ -89,11 +91,12 @@
   "notes": [
     "A0-A3 are accepted; A3 FAST verified NVIDIA GTX 1660 Ti D3D11 with softwareRendered=false and Golden Path 22/22.",
     "A4 has partial recovered work in b923ef7: Castle branch-state readability, support Hero Reference Pack, capture contract/tests and an M3 proposal already repaired by Codex/Sol. Do not restart it.",
-    "Human playtest found wall-through collisions, incorrect door/spawn facing and accidental large sky openings; A4B is now mandatory before A5.",
-    "ChatGPT web / GPT-5.6 Sol is now default technical/design authority. Codex Sol is break-glass, not default executor.",
+    "Human playtest found wall-through collisions, incorrect door/spawn facing and accidental large sky openings; A4B is mandatory before A5.",
+    "ChatGPT web / GPT-5.6 Sol is default technical/design authority. Codex Sol is break-glass, not default executor.",
     "Gemini builder may implement/test/commit in an isolated worktree but may not mark stages passed or loop complete.",
     "A separate Gemini read-only session may review, but final material acceptance remains external to the builder.",
-    "MiniMax M3 remains experimental proposal-only through the current GMI runner; update EVALUATION.md whenever used.",
+    "MiniMax M3 now has a fair tool-enabled evaluation route through OpenCode native GMI Cloud integration in an isolated worktree; repo sidecar remains proposal-only fallback.",
+    "Do not run Gemini/Luna/M3 against the same load-bearing files concurrently. Current order: Gemini A4 candidate → external acceptance → Luna A4B → external acceptance → Gemini A5/A6. M3 may run in parallel only on disjoint experimental VFX scope.",
     "No Meshy/Tripo spend, canon changes, final dialogue invention, engine changes or major dependency changes without HUMAN_GATE."
   ]
 }
