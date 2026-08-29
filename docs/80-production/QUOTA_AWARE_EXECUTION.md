@@ -2,27 +2,51 @@
 
 ## Goal
 
-Keep production moving when ChatGPT Plus / Codex Sol hits its rolling window. Expensive frontier reasoning should shape and accept work; cheaper/external workers should perform most implementation.
+Keep production moving when ChatGPT Plus / Codex Sol hits a rolling window without making Manuel babysit every worker.
+
+Expensive frontier reasoning defines contracts/material decisions; **Mavis** supervises execution; cheaper/external workers do most implementation.
 
 ## Core pattern
 
 ```text
-ChatGPT web / GPT-5.6 Sol
-  decide WHAT + acceptance criteria
-            ↓
-        task packet in repo
-            ↓
-   worker in isolated worktree
-            ↓
+Manuel + ChatGPT web / GPT-5.6 Sol
+     direction / material decisions
+                  ↓
+                repo
+                  ↓
+        MAVIS ORCHESTRATOR
+ Gemini Flash Medium / Antigravity
+ monitor · dispatch · gates · integration
+                  ↓
+      ┌───────────┼───────────┐
+      ▼           ▼           ▼
+   Gemini        M3         Luna/Terra
+   builder     OpenCode       Codex
+      └───────────┼───────────┘
+                  ↓
  commit + tests + captures + report
-            ↓
-ChatGPT web / GPT-5.6 Sol
-   accept / reject / exact fixes
+                  ↓
+       fresh independent review
+                  ↓
+ Mavis integrates unambiguous PASS
+ or HUMAN_GATE for material ambiguity
 ```
 
 Do not ask Codex Sol to execute multi-hour loops by default.
 
+Mavis contract: `docs/80-production/MAVIS_ORCHESTRATOR.md`.  
+Mavis task: `agent-work/tasks/orchestrator/ohmdal-authored-mavis.md`.  
+Status sensor: `npm run orchestrator:status`.
+
 ## Current Ohmdal dispatch
+
+### Control plane — Mavis
+
+Harness: **Antigravity CLI**  
+Model: **Gemini 3.7 Flash Medium**  
+Effort: **medium**
+
+Mavis observes Git/worktree/report evidence, detects worker completion, launches fresh reviewers, issues bounded repair packets, runs deterministic gates and cherry-picks mechanically safe PASS candidates. It does not invent canon or make unresolved material visual choices.
 
 ### Lane A — Gemini authored builder
 
@@ -40,7 +64,7 @@ Harness: **Codex**
 Model: **Luna Max**  
 Task: `agent-work/tasks/workers/ohmdal-a4b-luna.md`
 
-Use only after A4 candidate is frozen/accepted. It owns navigation/collision/spawn/test plumbing. Do not run it concurrently with a builder modifying the same runtime/world files.
+Use only after A4 is accepted. It owns navigation/collision/spawn/test plumbing. Do not run it concurrently with a builder modifying the same load-bearing runtime/world files.
 
 ### Lane C — MiniMax tool-enabled specialist
 
@@ -49,63 +73,34 @@ Provider: **GMI Cloud**
 Model: **MiniMax M3 / MiniMaxAI/MiniMax-M3**  
 Task: `agent-work/tasks/minimax/opencode-vfx-tool-trial.md`
 
-OpenCode supports GMI Cloud natively:
+The trial lives in a disjoint worktree/scope. It cannot merge itself or mark a stage passed. If OpenCode/GMI fails, the repo-native GMI sidecar remains proposal-only fallback.
 
-```text
-opencode
-/connect → GMI Cloud → enter local GMI key
-/models  → MiniMax M3
-```
+### Lane D — independent reviewer
 
-This lane must work in an isolated worktree and only in the disjoint experimental VFX scope specified by the task. It cannot merge itself or mark a stage passed.
-
-If OpenCode/GMI fails, fall back to the repo proposal-only sidecar:
-
-```bash
-npm run agent:minimax:gmi:check
-npm run agent:minimax:gmi -- --task <task> --context <file> --out <report>
-```
-
-### Lane D — Gemini reviewer
-
-Harness: **Antigravity CLI**, separate fresh session/process  
+Harness: **Antigravity CLI**, separate fresh process  
 Model: **Gemini 3.7 Flash High**  
-Mode: **read-only / plan / sandbox**
+Mode: **read-only / sandbox**
 
-Use stage-specific task under `agent-work/tasks/gemini/`. A Gemini builder never reviews/accepts its own work in the same session.
+A Gemini builder never reviews its own candidate in the same session. Mavis launches the reviewer as a new process against the candidate evidence.
 
-### Authority — ChatGPT web
+### Material authority — ChatGPT web / Manuel
 
-Model: **GPT-5.6 Sol**.
-
-Review candidate commits and reports through GitHub, compare against contracts/captures and either:
-
-- accept the candidate and advance state;
-- reject with exact bounded fixes;
-- create HUMAN_GATE when a material decision is genuinely needed.
+GPT-5.6 Sol + Manuel enter only when the contracts do not mechanically resolve the choice: canon, curriculum, topology, engine/dependencies, paid spend or genuinely ambiguous player-facing direction.
 
 ### Break-glass — Codex Sol
 
-Only if a blocker requires strong reasoning attached to local tools and Gemini/Luna/M3 cannot resolve it economically. Never use merely because a previous Sol session timed out.
+Only if a blocker requires strong reasoning attached to local tools and Gemini/Luna/M3 cannot resolve it economically. A previous session timing out is not a reason to use Sol again.
 
-## Worktree pattern
+## Worktrees
 
-From the canonical repo, after pulling the latest `explore/ohmdal-3D`:
-
-```powershell
-git fetch origin
-
-git worktree add ..\Roxana-gemini -b worker/gemini-authored origin/explore/ohmdal-3D
-git worktree add ..\Roxana-minimax -b worker/minimax-vfx origin/explore/ohmdal-3D
+```text
+Roxana/             canonical + Mavis
+Roxana-gemini/      Gemini builder
+Roxana-minimax/     M3/OpenCode experiment
+Roxana-luna/        Luna mechanical worker when A4B starts
 ```
 
-Create the Luna worktree only when A4 is frozen and A4B is ready:
-
-```powershell
-git worktree add ..\Roxana-luna -b worker/luna-a4b <ACCEPTED_A4_SHA>
-```
-
-If a branch/worktree already exists, reuse or recreate it deliberately instead of forcing Git.
+Git is the protocol. No provider bus/daemon/router is required.
 
 ## Ownership rule
 
@@ -115,38 +110,39 @@ Current safe sequence:
 
 ```text
 Gemini A4 candidate ───────────────┐
-                                  ├→ Sol web accepts A4
+                                  ├→ Mavis detects completion
 M3 VFX lab (disjoint) ────────────┘
-
-accepted A4
-   ↓
-Luna A4B navigation/collision
-   ↓
-Sol web accepts A4B
-   ↓
-Gemini A5 / A6
+                                  ↓
+                       fresh independent A4 review
+                                  ↓ PASS
+                         Mavis gates + integrates
+                                  ↓
+                         Luna A4B candidate
+                                  ↓
+                         Mavis review + gates
+                                  ↓
+                           Gemini A5 → A6
 ```
+
+The user-launched Gemini/M3 sessions that existed before Mavis was introduced are observed, not duplicated.
 
 ## Evidence packet required from every worker
 
 - base commit;
 - worker branch;
-- commit hash(es);
+- candidate commit hash(es);
 - files changed;
-- tests/build commands and results;
+- tests/build results;
 - capture paths + renderer diagnostics when visual;
 - Golden Path result when player-facing/navigation changes;
 - known debt/blockers;
 - exact git status;
-- no self-acceptance claim.
+- `SELF_ACCEPTANCE: false`.
+
+A stopped terminal is not completion; Git evidence is.
 
 ## When Plus resets
 
-Do not immediately relaunch a multi-hour Sol loop. Use the recovered Sol quota for:
+Do not relaunch a multi-hour Codex Sol loop. Reserve recovered GPT/Codex frontier quota for material decisions and break-glass debugging. Routine monitoring/integration remains Mavis's job.
 
-1. reviewing worker evidence;
-2. resolving architectural ambiguity;
-3. issuing the next bounded packets;
-4. break-glass integration only if needed.
-
-The goal is for GPT quota to be the decision bottleneck, not the total production clock.
+The goal is for paid GPT quota to cease being the production clock.
