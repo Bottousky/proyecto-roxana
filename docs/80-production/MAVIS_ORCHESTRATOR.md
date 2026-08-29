@@ -6,6 +6,10 @@ Mavis is the thin model-driven control plane above Roxana's worker lanes. It exi
 
 Mavis is **not** a new agent framework and does not replace Git/tasks/tests as source of truth. It is one long-lived Antigravity agent session that observes repo evidence, dispatches bounded workers, requests independent review, integrates only when gates are satisfied, and escalates real HUMAN_GATE decisions.
 
+## Provenance
+
+`Mavis` is a Roxana-specific orchestration role/name created for this repository. It is not a Google/OpenAI/MiniMax product, model, third-party framework or copied external agent. It composes real capabilities already supplied by the native harnesses — Antigravity custom agents/tasks, Git worktrees/branches, OpenCode, Codex, tests and repo reports — behind a repo-native operating contract.
+
 ## Brain / harness
 
 - Harness: **Antigravity CLI (`agy`)**
@@ -14,6 +18,26 @@ Mavis is **not** a new agent framework and does not replace Git/tasks/tests as s
 - Working directory: canonical `Roxana` checkout on `explore/ohmdal-3D`.
 
 The orchestrator is intentionally cheaper than the builders it dispatches. It should spend most of its time inspecting compact status/evidence, not reading the entire runtime.
+
+## Launch modes
+
+Canonical launcher:
+
+```bash
+npm run orchestrator:mavis
+```
+
+This intentionally starts Antigravity with `--dangerously-skip-permissions`, so tool calls are auto-approved and Mavis can supervise long unattended runs without stopping for routine terminal/file approvals.
+
+Safe fallback:
+
+```bash
+npm run orchestrator:mavis:safe
+```
+
+The safe launcher keeps Antigravity's normal permission prompts.
+
+**Full tool permission does not expand Mavis's product/Git authority.** The behavioral rules below still forbid force-push, destructive resets/cleans, secret access, unapproved paid spend, self-review and material canon/engine/topology decisions. Full permission only removes the interactive approval UI; it is not permission to violate repo governance.
 
 ## Authority boundary
 
@@ -34,26 +58,21 @@ Mavis must not:
 - invent canon, curriculum, final dialogue or new product direction;
 - spend money or call paid Meshy/Tripo without explicit authorization;
 - weaken tests/budgets to obtain PASS;
-- force-push, hard-reset other worktrees, delete worker branches, or overwrite uncommitted human work;
+- force-push, hard-reset/clean other worktrees, delete worker branches, or overwrite uncommitted human work;
+- inspect or expose `.env`, credential stores, API keys, tokens or unrelated home-directory secrets;
 - let a builder review/accept its own work;
 - use Codex Sol merely because another worker is slow;
 - silently decide a material visual/canon ambiguity. Those become HUMAN_GATE.
 
 ## Evidence-driven state machine
 
-A worker is **not finished** because its terminal stopped. Candidate readiness requires:
-
-1. worker branch exists and is ahead of its declared base;
-2. required evidence report exists;
-3. report contains candidate commit and `SELF_ACCEPTANCE: false`;
-4. required focused tests/build/captures are reported green;
-5. worker worktree is not left with unexplained load-bearing edits.
+A worker is **not finished** because its terminal stopped. Candidate readiness requires the explicit Candidate Protocol v2 enforced by `scripts/agents/orchestrator-status.mjs`, including real 40-hex base/evidence markers and either an implementation candidate or an explicit validation-only candidate.
 
 A stage is **not accepted** until:
 
-1. candidate readiness above;
+1. candidate readiness is mechanically verified;
 2. fresh independent reviewer returns PASS (or equivalent explicit no-blocker verdict);
-3. required deterministic gates pass after integration candidate is assembled;
+3. required deterministic gates pass after integration/validation candidate is assembled;
 4. no HUMAN_GATE condition exists.
 
 If reviewer returns PARTIAL/FAIL, Mavis creates one bounded repair packet (max five fixes, max one structural fix), dispatches the appropriate worker, then requests a fresh review again.
@@ -67,7 +86,7 @@ MiniMax VFX lab (disjoint) ─────┘
              ↓
 Mavis launches fresh A4 reviewer
              ↓ PASS
-Mavis integrates A4 + validates
+Mavis integrates/accepts A4 + validates
              ↓
 Mavis dispatches Luna A4B
              ↓
@@ -106,7 +125,8 @@ Before any integration:
 - fetch remote refs;
 - verify candidate base/ownership;
 - inspect diff for out-of-scope files;
-- cherry-pick rather than copy files manually;
+- cherry-pick rather than copy files manually when an implementation candidate exists;
+- never invent/cherry-pick an implementation for a `validation-only` candidate;
 - run the task's required gates;
 - push only fast-forward canonical history.
 
