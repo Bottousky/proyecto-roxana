@@ -103,10 +103,12 @@ if (breakGlass) {
 
 const experimentalWorker = state.routing?.experimentalWorker;
 if (experimentalWorker) {
-  if (experimentalWorker.harness !== 'gmi-api-sidecar') fail('experimental worker harness must be gmi-api-sidecar');
+  const validHarness = experimentalWorker.harness === 'gmi-api-sidecar' || experimentalWorker.harness === 'opencode-cli';
+  if (!validHarness) fail('experimental worker harness must be gmi-api-sidecar or opencode-cli');
   if (!String(experimentalWorker.model || '').toLowerCase().includes('minimax')) fail('experimental worker must be MiniMax family');
-  if (experimentalWorker.mode !== 'proposal-only') fail('experimental worker must remain proposal-only');
-  if (!String(experimentalWorker.fallback || '').includes('no-human-gate')) {
+  const validMode = experimentalWorker.mode === 'proposal-only' || experimentalWorker.mode === 'isolated-worktree-write';
+  if (!validMode) fail('experimental worker mode must be proposal-only or isolated-worktree-write');
+  if (!String(experimentalWorker.fallback || '').includes('no-human-gate') && !String(experimentalWorker.fallback || '').includes('run-gmi-minimax')) {
     fail('experimental worker fallback must not create a HUMAN_GATE');
   }
 }
