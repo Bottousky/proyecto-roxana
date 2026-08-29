@@ -19,6 +19,8 @@
     "orchestrator:status": "node scripts/agents/orchestrator-status.mjs",
     "orchestrator:mavis": "node scripts/agents/run-mavis.mjs",
     "orchestrator:mavis:safe": "node scripts/agents/run-mavis.mjs --safe",
+    "orchestrator:mavis:once": "node scripts/agents/run-mavis.mjs --once",
+    "orchestrator:mavis:interactive": "node scripts/agents/run-mavis-interactive.mjs",
     "loop:ohmdal-plaza:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-plaza/state.json",
     "loop:ohmdal-arco1:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-greybox/state.json",
     "loop:ohmdal-arco1-authored:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-authored-pass/state.json",
