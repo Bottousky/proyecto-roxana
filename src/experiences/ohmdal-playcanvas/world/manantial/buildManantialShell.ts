@@ -16,7 +16,7 @@ export interface ManantialShellDependencies {
   plazaRoot: pc.Entity;
   materials: ManantialShellMaterials;
   probeTargets: Record<string, pc.Vec3>;
-  addCollider: (x: number, z: number, w: number, d: number) => void;
+  addCollider: (x: number, z: number, w: number, d: number, id?: string) => void;
 }
 
 export interface ManantialShellElements {
@@ -381,10 +381,12 @@ export function buildManantialShell({
 
   probeTargets['manantial_turbina_in'] = new pc.Vec3(0, 2.5, 20.8);
   probeTargets['manantial_survey'] = new pc.Vec3(0, 1.2, 17.5);
-  addCollider(0, 24.0, 9.2, 6.2);
-  addCollider(0, 17.5, 1.2, 1.2);
-  addCollider(-7.2, 25.0, 1.0, 15.0);
-  addCollider(7.2, 25.0, 1.0, 15.0);
+  addCollider(0, 24.0, 9.2, 6.2, 'manantial.powerhouse');
+  addCollider(0, 17.5, 1.2, 1.2, 'manantial.survey-monument');
+  addCollider(-7.2, 25.0, 1.0, 15.0, 'manantial.retaining-west');
+  addCollider(7.2, 25.0, 1.0, 15.0, 'manantial.retaining-east');
+  addCollider(-4.9, 31.7, 4.6, 1.2, 'manantial.headwall-west');
+  addCollider(4.9, 31.7, 4.6, 1.2, 'manantial.headwall-east');
 
   return {
     mountainRoot,

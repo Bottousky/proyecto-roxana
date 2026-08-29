@@ -6,6 +6,15 @@ import { PLAZA_CONDUCTOR_LAYOUT } from './plazaConductorLayout.ts';
 import { buildManantialShell } from './world/manantial/buildManantialShell.ts';
 import { buildWorkshopInterior } from './world/workshop/buildWorkshopInterior.ts';
 import { buildArc1Greybox, type Arc1GreyboxElements } from './world/arc1/buildArc1Greybox.ts';
+import {
+  OhmdalNavigationRegistry,
+  type NavigationSolid,
+  type OhmdalNavigationZone,
+} from './systems/navigation/ohmdalNavigation.ts';
+import {
+  OHMDAL_TRANSITION_ANCHORS,
+  directionForAnchor,
+} from './systems/navigation/ohmdalSpawnAnchors.ts';
 
 export interface PlayCanvasWorldElements {
   app: pc.Application;
@@ -46,7 +55,8 @@ export interface PlayCanvasWorldElements {
   gateLightLeft: pc.Entity;
   gateLightRight: pc.Entity;
   probeTargets: Record<string, pc.Vec3>;
-  colliders: { minX: number; maxX: number; minZ: number; maxZ: number }[];
+  colliders: NavigationSolid[];
+  navigation: OhmdalNavigationRegistry;
 }
 
 export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanvasWorldElements {
@@ -65,12 +75,43 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
   app.setCanvasResolution(pc.RESOLUTION_AUTO);
 
-  const colliders: { minX: number; maxX: number; minZ: number; maxZ: number }[] = [];
+  const navigation = new OhmdalNavigationRegistry();
+  const colliders: NavigationSolid[] = [];
   const probeTargets: Record<string, pc.Vec3> = {};
+  let generatedColliderId = 0;
 
-  const addCollider = (x: number, z: number, w: number, d: number) => {
-    colliders.push({ minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2 });
+  const addCollider = (
+    zone: OhmdalNavigationZone,
+    x: number,
+    z: number,
+    w: number,
+    d: number,
+    id = `${zone}.solid-${generatedColliderId++}`,
+    options: { enabled?: boolean; sharedZones?: OhmdalNavigationZone[]; source?: string } = {},
+  ) => {
+    const solid = navigation.registerSolid({
+      id,
+      zone,
+      x,
+      z,
+      width: w,
+      depth: d,
+      enabled: options.enabled,
+      sharedZones: options.sharedZones,
+      source: options.source ?? id,
+    });
+    colliders.push(solid);
+    return solid;
   };
+
+  const addZoneCollider = (zone: OhmdalNavigationZone) => (
+    x: number,
+    z: number,
+    w: number,
+    d: number,
+    id?: string,
+    options?: { enabled?: boolean; sharedZones?: OhmdalNavigationZone[]; source?: string },
+  ) => addCollider(zone, x, z, w, d, id, options);
 
   // --- 1. Materials (PBR) ---
   const matStone = new pc.StandardMaterial();
@@ -625,6 +666,13 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   addBox(plazaRoot, 'PlazaPerimeterCurbSouth', [0, 0.02, -14.82], [36.4, 0.34, 0.42], matStoneDark);
   addBox(plazaRoot, 'PlazaPerimeterCurbWest', [-17.82, 0.02, 0], [0.42, 0.34, 29.3], matStoneDark);
   addBox(plazaRoot, 'PlazaPerimeterCurbEast', [17.82, 0.02, 0], [0.42, 0.34, 29.3], matStoneDark);
+  // Low visible perimeter curbs are also gameplay boundaries. The north
+  // boundary is split around the intentional Omega/Manantial threshold.
+  addCollider('plaza', -11, 14.82, 14.0, 0.42, 'plaza.perimeter-north-west', { source: 'PlazaPerimeterCurbNorth' });
+  addCollider('plaza', 11, 14.82, 14.0, 0.42, 'plaza.perimeter-north-east', { source: 'PlazaPerimeterCurbNorth' });
+  addCollider('plaza', 0, -14.82, 36.4, 0.42, 'plaza.perimeter-south', { source: 'PlazaPerimeterCurbSouth' });
+  addCollider('plaza', -17.82, 0, 0.42, 29.3, 'plaza.perimeter-west', { source: 'PlazaPerimeterCurbWest' });
+  addCollider('plaza', 17.82, 0, 0.42, 29.3, 'plaza.perimeter-east', { source: 'PlazaPerimeterCurbEast' });
 
   // Moisture is environmental evidence, not a global material treatment:
   // a narrow fountain apron, its runoff channel and one low drain retain the
@@ -672,7 +720,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   probeTargets['portal_pos'] = new pc.Vec3(0.9, 1.6, -10.8);
   probeTargets['portal_neg'] = new pc.Vec3(-0.9, 1.6, -10.8);
-  addCollider(0, -11.0, 5.8, 1.8);
+  addCollider('plaza', 0, -11.0, 5.8, 1.8, 'plaza.portal-pedestal', { source: 'PortalAuthoredArch' });
 
   // --- Central Ohm Dais & Ohm Automaton Entity ---
   const dais = new pc.Entity('OhmDais');
@@ -725,7 +773,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   probeTargets['ohm_terminal_pos'] = new pc.Vec3(0.35, 0.9, -1.75);
   probeTargets['ohm_terminal_neg'] = new pc.Vec3(-0.35, 0.9, -1.75);
-  addCollider(0, -2.0, 2.2, 2.2);
+  addCollider('plaza', 0, -2.0, 2.2, 2.2, 'plaza.ohm-pedestal', { source: 'OhmPedestal' });
 
   // --- Edda NPC Entity (Near Portal) ---
   const eddaEntity = new pc.Entity('EddaNPC');
@@ -824,7 +872,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   plazaRoot.addChild(workshopLantern);
   addBox(plazaRoot, 'WorkshopLanternBracket', [-6.7, 2.72, -4], [0.22, 0.12, 0.5], matIron);
   addCylinder(plazaRoot, 'WorkshopLanternHousing', [-6.56, 2.58, -4], [0.22, 0.35, 0.22], matBrass);
-  addCollider(-10.5, -4.0, 6.2, 7.6);
+  addCollider('plaza', -10.5, -4.0, 6.2, 7.6, 'plaza.workshop-exterior', { source: 'WorkshopAuthoredShell' });
 
   // --- Sacred Bell of Continuity (West Plaza) ---
   const bellGantry = new pc.Entity('BellGantry');
@@ -861,7 +909,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   plazaRoot.addChild(relayLight);
 
   probeTargets['rele_bobina_in'] = new pc.Vec3(-5.2, 0.6, 2.8);
-  addCollider(-5.2, 2.4, 2.4, 2.0);
+  addCollider('plaza', -5.2, 2.4, 2.4, 2.0, 'plaza.bell-gantry', { source: 'BellGantry' });
 
   // --- Sacred Fountain of Ohm (East Plaza) ---
   const fountainBasin = new pc.Entity('FountainBasin');
@@ -886,7 +934,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   plazaRoot.addChild(waterEntity);
 
   probeTargets['fuente_motor_in'] = new pc.Vec3(5.5, 0.8, 3.8);
-  addCollider(5.5, 3.8, 5.8, 5.8);
+  addCollider('plaza', 5.5, 3.8, 5.8, 5.8, 'plaza.fountain-basin', { source: 'FountainBasin' });
 
   // --- The 40-Year Mural (South-East) ---
   const mural = new pc.Entity('MuralWall');
@@ -906,7 +954,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
       addCylinder(plazaRoot, `MuralCeramicMount${index}-${row}`, [x, y, -4.9], [0.16, 0.22, 0.16], matCeramic, [90, 0, 0]);
     }
   }
-  addCollider(7.8, -4.2, 4.2, 1.6);
+  addCollider('plaza', 7.8, -4.2, 4.2, 1.6, 'plaza.mural-wall', { source: 'MuralWall' });
 
   // --- Conduits, Jumper & Corrosion ---
   const copperJumper = new pc.Entity('CopperJumper');
@@ -1033,7 +1081,10 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   plazaRoot.addChild(gateLightRight);
 
   probeTargets['puerta_solenoide'] = new pc.Vec3(0, 2.2, 11.0);
-  addCollider(0, 11.5, 7.8, 2.4);
+  addCollider('plaza', 0, 11.5, 7.8, 2.4, 'plaza.omega-gate', {
+    sharedZones: ['manantial'],
+    source: 'SolenoidGate / Great Gate threshold',
+  });
 
   const ready = Promise.all([
     materialReady,
@@ -1059,7 +1110,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
       matSkin,
     },
     probeTargets,
-    addCollider,
+    addCollider: addZoneCollider('workshop'),
   });
 
   const {
@@ -1092,7 +1143,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
       matCopperClean,
     },
     probeTargets,
-    addCollider,
+    addCollider: addZoneCollider('manantial'),
   });
 
   const arc1Greybox = buildArc1Greybox({
@@ -1108,6 +1159,18 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     probeTargets,
     addCollider,
   });
+
+  for (const transition of Object.values(OHMDAL_TRANSITION_ANCHORS)) {
+    const sourceZone = transition.from;
+    navigation.registerPortal({
+      id: transition.id,
+      zone: sourceZone,
+      to: transition.to,
+      position: transition.anchor.position,
+      directionIntoZone: directionForAnchor(transition.anchor),
+      source: `${sourceZone} → ${transition.to} semantic transition anchor`,
+    });
+  }
 
   return {
     app,
@@ -1149,5 +1212,6 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     gateLightRight,
     probeTargets,
     colliders,
+    navigation,
   };
 }
