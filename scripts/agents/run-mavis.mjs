@@ -3,11 +3,21 @@
 import { spawn } from 'node:child_process';
 import process from 'node:process';
 
+const safeMode = process.argv.includes('--safe');
+
 const args = [
   '--agent', 'mavis',
   '--model', 'gemini-3.7-flash-medium',
   '--effort', 'medium',
 ];
+
+if (!safeMode) {
+  args.push('--dangerously-skip-permissions');
+  console.warn('[MAVIS] FULL PERMISSIONS ENABLED: Antigravity will auto-approve all tool calls for this session.');
+  console.warn('[MAVIS] Repo-level rules still forbid force-push, destructive resets, secret access and unapproved paid spend.');
+} else {
+  console.warn('[MAVIS] SAFE MODE: Antigravity permission prompts remain enabled.');
+}
 
 const child = spawn('agy', args, {
   cwd: process.cwd(),
