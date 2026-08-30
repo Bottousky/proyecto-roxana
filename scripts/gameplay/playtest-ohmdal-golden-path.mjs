@@ -370,7 +370,8 @@ try {
   // centre cannot be reached with real movement. retorno_sur is an exposed
   // probe target with no dominant interactable and exercises the same tool
   // path without teleporting or bypassing collision.
-  await moveTo(-7.0, 7.0, 1.2, 'retorno_sur north waypoint');
+  await moveTo(-3.5, -4.0, 1.2, 'workshop exit corridor waypoint');
+  await moveTo(-3.0, 6.5, 1.2, 'retorno_sur north waypoint');
   await moveTo(-0.8, 6.5, 1.65, 'retorno_sur probe');
   current = await waitForSnapshot((state) => state.nearestInteractable === null, 'probe target sin interactuable dominante');
   await page.keyboard.press('e');
@@ -381,8 +382,8 @@ try {
   assert(Number.isFinite(current.galvanoscope.measuredCurrent), 'Medición de corriente no observable');
   await recordCheckpoint('galvanoscope-measurement', { includeDiagnostics: false });
 
-  await moveTo(-4.0, 6.5, 1.2, 'moho_oxido west waypoint');
-  await moveTo(-4.0, -4.0, 1.2, 'moho_oxido south waypoint');
+  await moveTo(-3.0, 6.5, 1.2, 'moho_oxido west waypoint');
+  await moveTo(-3.0, -4.0, 1.2, 'moho_oxido south waypoint');
   await moveTo(-3.2, -4.4, 0.35, 'moho_oxido interaction edge');
   current = await waitForSnapshot((state) => state.nearestInteractable === 'moho_oxido', 'moho_oxido dominante');
   current = await pressInteraction('moho_oxido');
@@ -408,7 +409,7 @@ try {
   }
   current = await waitForSnapshot((state) => state.dialogue === null, 'diálogo previo a campana cerrado');
 
-  await moveTo(-3.2, 0.5, 0.25, 'campana south waypoint');
+  await moveTo(-3.0, 0.5, 0.45, 'campana south waypoint');
   await moveTo(-5.2, 0.8, 0.45, 'campana interaction edge');
   current = await waitForSnapshot((state) => state.nearestInteractable === 'campana', 'campana dominante');
   await pressInteraction('campana');
@@ -420,7 +421,7 @@ try {
   current = await waitUntilStory('gate_opened');
   assert(zone(current, 'manantial')?.loaded, 'Manantial no fue precargado tras abrir Omega');
 
-  await moveTo(-3.2, 0.5, 0.25, 'puerta_ohm campana exit waypoint');
+  await moveTo(-3.0, 0.5, 0.45, 'puerta_ohm campana exit waypoint');
   await moveTo(-3.0, 6.5, 1.0, 'puerta_ohm west waypoint');
   await moveTo(0, 8.0, 0.8, 'puerta_ohm approach');
   current = await waitForSnapshot((state) => state.nearestInteractable === 'puerta_ohm', 'puerta_ohm dominante');

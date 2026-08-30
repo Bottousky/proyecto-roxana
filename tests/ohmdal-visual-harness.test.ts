@@ -141,7 +141,7 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
   it('define el FAST A4 de Castillo con seam de Plaza y metadata de red determinista', () => {
     const authoredNames = [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES];
     const fast = resolveCaptureViews({ mode: 'fast', stage: 'a4-castle-authored' });
-    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(8));
+    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(8, 12));
     assert.equal(fast.length, 4);
 
     const restoredPlaza = getCaptureShotSpec('restored-plaza-wide');
@@ -177,6 +177,38 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     assert.equal(hall.world.manantial.restored, true);
     assert.equal(hall.world.castle.returnContinuity, false);
     assert.equal(hall.world.castle.protectiveTrip, false);
+    for (const shot of fast) assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
+  });
+
+  it('define el FAST A5 de Forja/Terrazas con trade-off térmico/riego y metadata determinista', () => {
+    const authoredNames = [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES];
+    const fast = resolveCaptureViews({ mode: 'fast', stage: 'a5-forge-terraces-authored' });
+    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(12));
+    assert.equal(fast.length, 3);
+
+    const core = getCaptureShotSpec('forge-core');
+    assert.equal(core.runtimeHook, 'setCaptureShot');
+    assert.deepEqual(core.anchor.position, [121.5, 2.8, -4.5]);
+    assert.equal(core.world.zone, 'forge-terraces');
+    assert.equal(core.world.storyStep, 'inside_forge_terraces');
+    assert.equal(core.world.probeTarget, 'forge_heater');
+    assert.deepEqual(core.world.forgeTerraces.allocation, { forge: 5, terraces: 3 });
+    assert.equal(core.world.forgeTerraces.conductor, 'medium');
+    assert.equal(core.world.forgeTerraces.energized, true);
+    assert.equal(core.world.forgeTerraces.protectiveTrip, false);
+
+    const irrigation = getCaptureShotSpec('terraces-irrigation');
+    assert.deepEqual(irrigation.anchor.position, [114.0, 4.5, 10.0]);
+    assert.equal(irrigation.world.zone, 'forge-terraces');
+    assert.equal(irrigation.world.storyStep, 'forge_terraces_restored');
+    assert.equal(irrigation.world.probeTarget, 'terraces_pump');
+    assert.equal(irrigation.world.forgeTerraces.restored, true);
+
+    const overview = getCaptureShotSpec('forge-terraces-overview');
+    assert.deepEqual(overview.anchor.position, [120.0, 9.5, -13.5]);
+    assert.equal(overview.world.zone, 'forge-terraces');
+    assert.equal(overview.world.comparison, 'before-after');
+    assert.equal(overview.world.probeTarget, 'forge_bus');
     for (const shot of fast) assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
   });
 

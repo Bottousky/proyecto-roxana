@@ -49,6 +49,11 @@ export const FAST_STAGE_SHOTS = Object.freeze({
     'castle-gate-open',
     'castle-distribution-hall',
   ]),
+  'a5-forge-terraces-authored': Object.freeze([
+    'forge-core',
+    'terraces-irrigation',
+    'forge-terraces-overview',
+  ]),
 });
 
 /**
@@ -333,6 +338,79 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
         returnContinuity: false,
         energized: false,
         protectiveTrip: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'forge-core': Object.freeze({
+    id: 'forge-core',
+    state: 'forge-core',
+    camera: 'forge-core',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Three-quarter oblique view framing heavy hearth, furnace hood, conductors and protection
+    anchor: Object.freeze({ position: Object.freeze([121.5, 2.8, -4.5]), yaw: 35, pitch: -10 }),
+    world: Object.freeze({
+      zone: 'forge-terraces',
+      storyStep: 'inside_forge_terraces',
+      probeTarget: 'forge_heater',
+      forgeTerraces: Object.freeze({
+        allocation: Object.freeze({ forge: 5, terraces: 3 }),
+        conductor: 'medium',
+        energized: true,
+        protectiveTrip: false,
+        restored: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'terraces-irrigation': Object.freeze({
+    id: 'terraces-irrigation',
+    state: 'terraces-irrigation',
+    camera: 'terraces-irrigation',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Elevated overlook across stepped stone terraces, pump station and water distribution
+    anchor: Object.freeze({ position: Object.freeze([114.0, 4.5, 10.0]), yaw: 45, pitch: -22 }),
+    world: Object.freeze({
+      zone: 'forge-terraces',
+      storyStep: 'forge_terraces_restored',
+      probeTarget: 'terraces_pump',
+      forgeTerraces: Object.freeze({
+        allocation: Object.freeze({ forge: 3, terraces: 5 }),
+        conductor: 'medium',
+        energized: true,
+        protectiveTrip: false,
+        restored: true,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'forge-terraces-overview': Object.freeze({
+    id: 'forge-terraces-overview',
+    state: 'forge-terraces-overview',
+    camera: 'forge-terraces-overview',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // High wide overview showing trade-off between industrial thermal demand and irrigation demand
+    anchor: Object.freeze({ position: Object.freeze([120.0, 9.5, -13.5]), yaw: 180, pitch: -30 }),
+    world: Object.freeze({
+      zone: 'forge-terraces',
+      storyStep: 'inside_forge_terraces',
+      comparison: 'before-after',
+      probeTarget: 'forge_bus',
+      forgeTerraces: Object.freeze({
+        allocation: Object.freeze({ forge: 5, terraces: 3 }),
+        conductor: 'medium',
+        energized: true,
+        protectiveTrip: false,
+        restored: false,
       }),
     }),
     deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),

@@ -30,6 +30,9 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES = [
   'bell-activation',
   'castle-gate-open',
   'castle-distribution-hall',
+  'forge-core',
+  'terraces-irrigation',
+  'forge-terraces-overview',
 ] as const;
 
 export type OhmdalVisualCaptureShotName =
@@ -58,13 +61,13 @@ export interface RoxanaOhmdalCaptureShot {
     pitch: number;
   } | null;
   world: {
-    zone: 'plaza' | 'workshop' | 'manantial' | 'castle';
+    zone: 'plaza' | 'workshop' | 'manantial' | 'castle' | 'forge-terraces';
     storyStep: string;
     tool?: 'galvanoscope';
     probeTarget?: string;
     interaction?: 'intake-gate' | 'bell';
     comparison?: 'before-after';
-    measurementPoint?: 'generator' | 'turbine' | 'return' | 'load' | 'castle-bus';
+    measurementPoint?: 'generator' | 'turbine' | 'return' | 'load' | 'castle-bus' | 'forge-bus';
     plaza?: {
       bellPulls: number;
       castleGateOpened: boolean;
@@ -81,6 +84,13 @@ export interface RoxanaOhmdalCaptureShot {
       returnContinuity: boolean;
       energized: boolean;
       protectiveTrip: boolean;
+    };
+    forgeTerraces?: {
+      allocation: { forge: number; terraces: number };
+      conductor?: 'narrow' | 'medium' | 'wide';
+      energized: boolean;
+      protectiveTrip: boolean;
+      restored: boolean;
     };
   };
   deterministic: {

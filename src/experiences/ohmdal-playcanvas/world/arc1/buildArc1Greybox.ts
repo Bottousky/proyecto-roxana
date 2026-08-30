@@ -29,6 +29,8 @@ export interface Arc1GreyboxElements {
   forgeHeater: pc.Entity;
   terracesPump: pc.Entity;
   forgeProtectionLight: pc.Entity;
+  forgeTripPin?: pc.Entity;
+  terracesWaterChannels?: pc.Entity[];
   lighthouseBeacon: pc.Entity;
   lighthouseSignal: pc.Entity;
 }
@@ -281,10 +283,17 @@ export function buildArc1Greybox({
   // G4 — Forge and Terraces share one loaded zone. Stepped slabs distinguish
   // the irrigation route from the Forge floor without creating a corridor.
   // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // G4 — Forge and Terraces share one loaded zone. Stepped slabs distinguish
+  // the irrigation route from the Forge floor without creating a corridor.
+  // -----------------------------------------------------------------------
   const forgeTerracesRoot = new pc.Entity('Arc1ForgeTerracesGreyboxRoot');
   forgeTerracesRoot.setPosition(120, 0, -8);
   forgeTerracesRoot.enabled = false;
   app.root.addChild(forgeTerracesRoot);
+
+  const forgeTerracesAuthoredRoot = new pc.Entity('ForgeTerracesAuthoredSupportRoot');
+  forgeTerracesRoot.addChild(forgeTerracesAuthoredRoot);
 
   addBox(forgeTerracesRoot, 'ForgeTerracesFloor', stone, [0, -0.12, 12], [28, 0.24, 48]);
   addBox(forgeTerracesRoot, 'ForgeFloorPad', stoneDark, [0, 0.02, 0], [12, 0.08, 10]);
@@ -309,6 +318,7 @@ export function buildArc1Greybox({
   addBox(forgePanel, 'ForgePanelFace', brass, [0, 1.05, -0.66], [2.8, 1.2, 0.12]);
   addCylinder(forgePanel, 'ForgePanelBreaker', copper, [0, 1.08, -0.86], [0.3, 0.2, 0.3]);
   addConductor(forgePanel, 'ForgePanelInput', [0, 0.24, -1.65], [0.24, 0.08, 1.8], copper);
+  const forgeTripPin = addCylinder(forgePanel, 'ForgePanelTripPin', copper, [0.85, 1.15, -0.86], [0.14, 0.12, 0.14]);
 
   const forgeHeater = new pc.Entity('ForgeHeater');
   forgeHeater.setLocalPosition(4.2, 0, 0);
@@ -334,7 +344,7 @@ export function buildArc1Greybox({
   addBox(terracesPump, 'TerracesPumpBase', stoneDark, [0, 0.5, 0], [4.6, 1, 3.2]);
   addCylinder(terracesPump, 'TerracesPumpHousing', brass, [0, 1.45, 0], [1.1, 1.55, 1.1], true);
   addCylinder(terracesPump, 'TerracesPumpWheel', copper, [0, 1.65, -0.9], [1.3, 0.22, 1.3]);
-  addBox(terracesPump, 'TerracesWaterChannel', water, [0, 0.46, 2.25], [3.2, 0.12, 3.6]);
+  const terracesWaterChannel = addBox(terracesPump, 'TerracesWaterChannel', water, [0, 0.46, 2.25], [3.2, 0.12, 3.6]);
 
   const terracesExit = new pc.Entity('TerracesExitMarker');
   terracesExit.setLocalPosition(0, 0, 32);
@@ -344,6 +354,93 @@ export function buildArc1Greybox({
   addBox(terracesExit, 'TerracesExitPostRight', stoneDark, [3.2, 1.6, 0], [0.55, 3.2, 0.5], true);
   addConductor(terracesExit, 'TerracesExitRail', [0, 1.6, -0.3], [5.6, 0.22, 0.18], brass);
 
+  // A5 Authored support authoring: industrial hearth architecture, metalworking amenities,
+  // heavy overhead conductor gantry, ceramic standoff insulators, fuse enclosure, and stepped irrigation terraces.
+  for (const z of [-8, 0, 8]) {
+    addBox(forgeTerracesAuthoredRoot, `ForgePillarWest${z}`, stone, [-11.0, 3.5, z], [1.6, 7.0, 1.6]);
+    addBox(forgeTerracesAuthoredRoot, `ForgePillarEast${z}`, stone, [11.0, 3.5, z], [1.6, 7.0, 1.6]);
+    addBox(forgeTerracesAuthoredRoot, `ForgeArchLintel${z}`, stone, [0, 7.0, z], [23.6, 1.0, 1.4]);
+  }
+
+  // Industrial hearth hood and chimney flue
+  addBox(forgeTerracesAuthoredRoot, 'ForgeHearthHood', stone, [4.2, 3.5, 0], [3.6, 0.8, 3.2]);
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeChimneyFlue', brass, [4.2, 5.8, 0], [1.4, 3.8, 1.4]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeHeatShieldBack', stoneDark, [6.8, 2.2, 0], [0.6, 4.4, 3.8]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeHeatShieldWingNorth', stoneDark, [4.2, 1.8, 1.8], [3.0, 3.6, 0.4]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeHeatShieldWingSouth', stoneDark, [4.2, 1.8, -1.8], [3.0, 3.6, 0.4]);
+
+  // Workshop metalworking equipment
+  addBox(forgeTerracesAuthoredRoot, 'ForgeAnvilBase', stoneDark, [-4.8, 0.4, -4.0], [1.4, 0.8, 1.4]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeAnvilBody', brass, [-4.8, 1.0, -4.0], [0.8, 0.4, 1.6]);
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeAnvilHorn', copper, [-4.8, 1.0, -4.9], [0.35, 0.4, 0.35]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeQuenchTub', stoneDark, [-4.8, 0.45, 3.5], [1.8, 0.9, 2.8]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeQuenchWater', water, [-4.8, 0.75, 3.5], [1.4, 0.1, 2.4]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeIngotStackPad', stoneDark, [8.5, 0.15, -6.0], [2.4, 0.3, 3.2]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeIngotBar1', copper, [8.5, 0.4, -6.4], [1.8, 0.25, 0.5]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeIngotBar2', brass, [8.5, 0.4, -5.6], [1.8, 0.25, 0.5]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeIngotBar3', copper, [8.5, 0.65, -6.0], [1.4, 0.25, 0.5]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeToolRack', brass, [-8.5, 1.2, 0], [0.4, 2.4, 2.8]);
+
+  // Overhead heavy high-current bus & ceramic standoff insulators
+  addBox(forgeTerracesAuthoredRoot, 'ForgeRaisedBusMain', copper, [0, 5.25, 0], [0.44, 0.28, 20]);
+  addBox(forgeTerracesAuthoredRoot, 'ForgeRaisedBusBranch', copper, [2.1, 5.25, 0], [4.2, 0.28, 0.34]);
+  const forgeInsulatorPositions: Array<[number, number, number]> = [
+    [-4.0, 4.35, -8], [4.0, 4.35, -8], [0, 4.35, -4], [0, 4.35, 4], [2.1, 4.35, 0], [4.2, 4.35, 0],
+  ];
+  forgeInsulatorPositions.forEach((position, index) => {
+    addCylinder(forgeTerracesAuthoredRoot, `ForgeBusInsulator${index + 1}`, stone, position, [0.42, 1.45, 0.42]);
+  });
+
+  // Protection and fuse assembly
+  addBox(forgeTerracesAuthoredRoot, 'ForgeFuseHousing', stoneDark, [-8.5, 2.2, 8.0], [1.4, 2.4, 1.2]);
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeFuseCartridge1', stone, [-8.5, 2.2, 7.6], [0.32, 1.4, 0.32]);
+  addCylinder(forgeTerracesAuthoredRoot, 'ForgeFuseCartridge2', stone, [-8.5, 2.2, 8.4], [0.32, 1.4, 0.32]);
+
+  // Terraces retaining curbs & stepped terrace masonry
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRetainingWest15', stone, [-9.5, 0.35, 15], [1.2, 0.7, 6.0]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRetainingEast15', stone, [9.5, 0.35, 15], [1.2, 0.7, 6.0]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRetainingWest21', stone, [-9.5, 0.65, 21], [1.2, 0.9, 6.0]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRetainingEast21', stone, [9.5, 0.65, 21], [1.2, 0.9, 6.0]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRetainingWest27', stone, [-9.5, 0.95, 27], [1.2, 1.1, 6.0]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRetainingEast27', stone, [9.5, 0.95, 27], [1.2, 1.1, 6.0]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRiserCurb1', stoneDark, [0, 0.38, 18.0], [18, 0.12, 0.4]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRiserCurb2', stoneDark, [0, 0.68, 24.0], [18, 0.12, 0.4]);
+
+  // Terraces feeder aqueduct and active water basins
+  addBox(forgeTerracesAuthoredRoot, 'TerracesFeederAqueduct', stone, [0, 0.75, 18.5], [1.4, 0.3, 7.0]);
+  const terracesWaterChannelMain = addBox(forgeTerracesAuthoredRoot, 'TerracesWaterChannelMain', water, [0, 0.85, 18.5], [0.8, 0.1, 6.8]);
+  const terracesWaterBasin1West = addBox(forgeTerracesAuthoredRoot, 'TerracesWaterBasin1West', water, [-5.5, 0.24, 15], [4.8, 0.08, 3.6]);
+  const terracesWaterBasin1East = addBox(forgeTerracesAuthoredRoot, 'TerracesWaterBasin1East', water, [5.5, 0.24, 15], [4.8, 0.08, 3.6]);
+  const terracesWaterBasin2West = addBox(forgeTerracesAuthoredRoot, 'TerracesWaterBasin2West', water, [-5.5, 0.54, 21], [4.8, 0.08, 3.6]);
+  const terracesWaterBasin2East = addBox(forgeTerracesAuthoredRoot, 'TerracesWaterBasin2East', water, [5.5, 0.54, 21], [4.8, 0.08, 3.6]);
+  const terracesWaterBasin3West = addBox(forgeTerracesAuthoredRoot, 'TerracesWaterBasin3West', water, [-5.5, 0.84, 27], [4.8, 0.08, 3.6]);
+  const terracesWaterBasin3East = addBox(forgeTerracesAuthoredRoot, 'TerracesWaterBasin3East', water, [5.5, 0.84, 27], [4.8, 0.08, 3.6]);
+
+  const terracesWaterChannels = [
+    terracesWaterChannel,
+    terracesWaterChannelMain,
+    terracesWaterBasin1West,
+    terracesWaterBasin1East,
+    terracesWaterBasin2West,
+    terracesWaterBasin2East,
+    terracesWaterBasin3West,
+    terracesWaterBasin3East,
+  ];
+
+  // Pump Station Gantry and Motor Enclosure
+  addBox(forgeTerracesAuthoredRoot, 'TerracesPumpPostWest', stone, [-2.8, 2.0, 24], [0.7, 4.0, 0.7]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesPumpPostEast', stone, [2.8, 2.0, 24], [0.7, 4.0, 0.7]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesPumpLintel', stone, [0, 4.0, 24], [6.3, 0.7, 0.7]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesPumpIntakeFlange', brass, [0, 0.8, 22.2], [1.0, 1.0, 0.6]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesPumpMotorCasing', stoneDark, [0, 1.85, 25.0], [1.5, 1.5, 1.8]);
+
+  // Perimeter Railings and Scenic Overlook
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRailWest', brass, [-9.2, 1.25, 21], [0.15, 0.8, 18]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesRailEast', brass, [9.2, 1.25, 21], [0.15, 0.8, 18]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesVistaColumnWest', stone, [-4.2, 3.2, 31], [1.0, 6.4, 1.0]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesVistaColumnEast', stone, [4.2, 3.2, 31], [1.0, 6.4, 1.0]);
+  addBox(forgeTerracesAuthoredRoot, 'TerracesVistaHeader', stone, [0, 6.4, 31], [9.4, 1.0, 1.0]);
+
   probeTargets.forge_bus = new pc.Vec3(120, 1.1, -8);
   probeTargets.forge_heater = new pc.Vec3(124.2, 1.2, -8);
   probeTargets.terraces_pump = new pc.Vec3(120, 1.2, 16);
@@ -352,6 +449,12 @@ export function buildArc1Greybox({
   addCollider('forge-terraces', 134, 4, 0.5, 48, 'forge-terraces.wall-east');
   addCollider('forge-terraces', 120, -20, 28, 0.5, 'forge-terraces.wall-south');
   addCollider('forge-terraces', 120, 28, 28, 0.5, 'forge-terraces.wall-north');
+
+  const forgeTerracesStaticBatch = app.batcher.addGroup('OhmdalForgeTerracesStaticArt', false, 46);
+  for (const render of forgeTerracesAuthoredRoot.findComponents('render') as pc.RenderComponent[]) {
+    render.batchGroupId = forgeTerracesStaticBatch.id;
+  }
+  app.batcher.generate([forgeTerracesStaticBatch.id]);
 
   // -----------------------------------------------------------------------
   // G5/G6 — Lighthouse and return marker. The beacon is physical geometry;
@@ -432,6 +535,8 @@ export function buildArc1Greybox({
     forgeHeater,
     terracesPump,
     forgeProtectionLight,
+    forgeTripPin,
+    terracesWaterChannels,
     lighthouseBeacon,
     lighthouseSignal,
   };

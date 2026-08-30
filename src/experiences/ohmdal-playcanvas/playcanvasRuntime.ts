@@ -348,11 +348,15 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       'bell-activation',
       'castle-gate-open',
       'castle-distribution-hall',
+      'forge-core',
+      'terraces-irrigation',
+      'forge-terraces-overview',
     ].includes(shot.id)) {
       throw new Error(`Unknown Ohmdal authored capture shot: ${shot.id}`);
     }
 
     const isA4Shot = ['restored-plaza-wide', 'bell-activation', 'castle-gate-open', 'castle-distribution-hall'].includes(shot.id);
+    const isA5Shot = ['forge-core', 'terraces-irrigation', 'forge-terraces-overview'].includes(shot.id);
     if (isA4Shot) setVisualState('restored-plaza');
     else closeVisualOverlays();
     for (const zone of ['workshop', 'manantial', 'castle', 'forge-terraces', 'lighthouse'] as const) {
@@ -371,6 +375,10 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       await zones.activate('castle');
       zones.deactivate('plaza');
     }
+    if (shot.world.zone === 'forge-terraces' || isA5Shot) {
+      await zones.activate('forge-terraces');
+      zones.deactivate('plaza');
+    }
 
     visualSeed = shot.deterministic.seed;
     reducedMotion = shot.deterministic.reducedMotion;
@@ -379,29 +387,51 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     world.viewmodelRoot.enabled = isToolEquipped;
 
     arc1State = createArc1GreyboxState();
-    if (shot.world.zone === 'manantial' || isA4Shot) {
+    if (shot.world.zone === 'manantial' || isA4Shot || isA5Shot) {
       arc1State = enterArc1Region(arc1State, 'manantial');
       const manantialState = shot.world.manantial;
-      if (manantialState?.gateOpen || isA4Shot) arc1State = setManantialGate(arc1State, true);
-      if (manantialState?.returnBridgeInstalled || isA4Shot) {
+      if (manantialState?.gateOpen || isA4Shot || isA5Shot) arc1State = setManantialGate(arc1State, true);
+      if (manantialState?.returnBridgeInstalled || isA4Shot || isA5Shot) {
         arc1State = measureManantial(arc1State, 'generator');
         arc1State = repairManantial(arc1State);
       }
-      if (manantialState?.excitationEnabled || isA4Shot) arc1State = energizeManantial(arc1State);
-      if (manantialState?.restored || isA4Shot) arc1State = measureManantial(arc1State, 'load');
+      if (manantialState?.excitationEnabled || isA4Shot || isA5Shot) arc1State = energizeManantial(arc1State);
+      if (manantialState?.restored || isA4Shot || isA5Shot) arc1State = measureManantial(arc1State, 'load');
     }
-    if (isA4Shot) {
+    if (isA4Shot || isA5Shot) {
       arc1State = enterArc1Region(arc1State, 'plaza');
-      if ((shot.world.plaza?.bellPulls ?? 0) > 0 || shot.world.zone === 'castle') arc1State = pullCampana(arc1State);
-      if (shot.world.plaza?.castleGateOpened || shot.world.zone === 'castle') arc1State = openCastleGate(arc1State);
-      if (shot.world.zone === 'castle') {
+      if ((shot.world.plaza?.bellPulls ?? 0) > 0 || shot.world.zone === 'castle' || isA5Shot) arc1State = pullCampana(arc1State);
+      if (shot.world.plaza?.castleGateOpened || shot.world.zone === 'castle' || isA5Shot) arc1State = openCastleGate(arc1State);
+      if (shot.world.zone === 'castle' || isA5Shot) {
         arc1State = enterArc1Region(arc1State, 'castillo');
-        if (shot.world.castle?.topology === 'parallel') arc1State = configureCastleNetwork(arc1State, CASTLE_PARALLEL_CONFIGURATION);
+        if (shot.world.castle?.topology === 'parallel' || isA5Shot) arc1State = configureCastleNetwork(arc1State, CASTLE_PARALLEL_CONFIGURATION);
         if (shot.world.castle?.topology === 'mixed') arc1State = configureCastleNetwork(arc1State, CASTLE_MIXED_CONFIGURATION);
-        if (shot.world.castle?.energized) {
+        if (shot.world.castle?.energized || isA5Shot) {
           arc1State = measureCastleNetwork(arc1State);
           arc1State = energizeCastleNetwork(arc1State);
+          arc1State = documentCastleNetwork(arc1State);
         }
+      }
+    }
+    if (isA5Shot || shot.world.zone === 'forge-terraces') {
+      arc1State = enterArc1Region(arc1State, 'forja');
+      const ft = shot.world.forgeTerraces;
+      const forgeAlloc = ft?.allocation?.forge ?? 5;
+      const terracesAlloc = ft?.allocation?.terraces ?? 3;
+      arc1State = setForgeTerracesPriority(arc1State, forgeAlloc >= terracesAlloc ? 'forge-priority' : 'terraces-priority');
+      arc1State = setForgeTerracesConductor(arc1State, ft?.conductor ?? 'medium');
+      arc1State = setForgeTerracesProtection(arc1State, 'forge', forgeAlloc);
+      arc1State = setForgeTerracesProtection(arc1State, 'terraces', terracesAlloc);
+      arc1State = measureForgeTerraces(arc1State);
+      if (ft?.energized ?? true) {
+        arc1State = energizeForgeTerraces(arc1State);
+      }
+      if (ft?.restored) {
+        arc1State = enterArc1Region(arc1State, 'terrazas');
+        arc1State = documentForgeTerraces(arc1State);
+      }
+      if (ft?.protectiveTrip) {
+        arc1State = { ...arc1State, forgeTerraces: { ...arc1State.forgeTerraces, protectiveTrip: true } };
       }
     }
     updateArc1WorldVisuals();
@@ -671,8 +701,17 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
     const forgeTerraces = evaluateForgeTerraces(arc1State);
     const forgeCore = world.arc1Greybox.forgeHeater.findByName('ForgeHeaterCore') as pc.Entity | null;
-    if (forgeCore) forgeCore.enabled = forgeTerraces.restored;
+    if (forgeCore) forgeCore.enabled = forgeTerraces.restored || (arc1State.forgeTerraces.energized && arc1State.forgeTerraces.allocation.forge > 0);
     world.arc1Greybox.forgeProtectionLight.light!.enabled = arc1State.forgeTerraces.protectiveTrip;
+    if (world.arc1Greybox.forgeTripPin) {
+      world.arc1Greybox.forgeTripPin.setLocalPosition(0.85, arc1State.forgeTerraces.protectiveTrip ? 0.92 : 1.15, -0.86);
+    }
+    if (world.arc1Greybox.terracesWaterChannels) {
+      const waterActive = forgeTerraces.restored || (arc1State.forgeTerraces.energized && arc1State.forgeTerraces.allocation.terraces > 0);
+      for (const channel of world.arc1Greybox.terracesWaterChannels) {
+        channel.enabled = waterActive;
+      }
+    }
 
     const lighthouse = evaluateLighthouse(arc1State);
     const lighthouseLamp = world.arc1Greybox.lighthouseBeacon.findByName('LighthouseBeaconLamp') as pc.Entity | null;
