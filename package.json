@@ -12,6 +12,7 @@
     "smoke:play": "node scripts/smoke-play.mjs",
     "agent:gemini:check": "node scripts/agents/run-antigravity.mjs --check",
     "agent:gemini": "node scripts/agents/run-antigravity.mjs",
+    "agent:gemini:builder": "node scripts/agents/run-gemini-builder.mjs",
     "agent:gemini:plaza-context": "node scripts/agents/run-antigravity.mjs --task agent-work/tasks/gemini/ohmdal-plaza-context-audit.md --out agent-work/reports/gemini/ohmdal-plaza-context-audit.md",
     "agent:gemini:plaza-review": "node scripts/agents/run-antigravity.mjs --task agent-work/tasks/gemini/ohmdal-plaza-visual-review.md --out agent-work/reports/gemini/ohmdal-plaza-visual-review.md",
     "agent:minimax:gmi:check": "node scripts/agents/run-gmi-minimax.mjs --check",
