@@ -8,7 +8,7 @@ Mavis is **not** a new agent framework and does not replace Git/tasks/tests as s
 
 ## Provenance
 
-`Mavis` is a Roxana-specific orchestration role/name created for this repository. It is not a Google/OpenAI/MiniMax product, model, third-party framework or copied external agent. It composes real capabilities already supplied by the native harnesses — Antigravity custom agents/headless streaming, Git worktrees/branches, OpenCode, Codex, tests and repo reports — behind a repo-native operating contract.
+`Mavis` is a Roxana-specific orchestration role/name created for this repository. It is not a Google/OpenAI/MiniMax product, model, third-party framework or copied external agent. It composes real capabilities already supplied by the native harnesses — Antigravity custom agents/headless execution, Git worktrees/branches, OpenCode, Codex, tests and repo reports — behind a repo-native operating contract.
 
 ## Brain / harness
 
@@ -19,7 +19,7 @@ Mavis is **not** a new agent framework and does not replace Git/tasks/tests as s
 
 The orchestrator is intentionally cheaper than the builders it dispatches. It should spend most of its time inspecting compact status/evidence, not reading the entire runtime.
 
-## Continuous launcher
+## Resilient unattended launcher
 
 Canonical unattended launcher:
 
@@ -27,12 +27,14 @@ Canonical unattended launcher:
 npm run orchestrator:mavis
 ```
 
-This is a **persistent outer control loop**, not a single interactive chat turn. `scripts/agents/run-mavis.mjs` keeps one Antigravity headless streaming session open and sends a new control tick after each model result.
+This is a **persistent outer daemon**, but Antigravity itself is deliberately **not** kept alive forever. `scripts/agents/run-mavis.mjs` starts one fresh headless Antigravity process per control tick, sends exactly one Mavis prompt, captures its result, lets that child process exit, and then schedules the next tick.
 
-Therefore a normal Gemini final response does **not** stop the factory. The wrapper interprets the end-of-turn marker and either:
+This design makes Git/reports/loop state the durable memory and prevents one Antigravity session crash, stream error, provider hiccup or exit code from killing the whole factory.
 
-- immediately sends another control tick (`CONTINUE`);
-- sleeps for the configured poll interval and checks again (`WAITING`);
+A normal model result therefore does **not** stop the daemon. The wrapper interprets the end-of-tick marker and either:
+
+- starts another fresh control tick almost immediately (`CONTINUE`);
+- sleeps for the configured poll interval and starts a fresh control tick (`WAITING`);
 - exits on `HUMAN_GATE`;
 - exits on `COMPLETE`.
 
@@ -45,14 +47,14 @@ MAVIS_TICK_STATE: HUMAN_GATE
 MAVIS_TICK_STATE: COMPLETE
 ```
 
-If the model forgets the marker, the wrapper fail-safe sends another tick after a short delay instead of silently stopping.
+If a tick returns an Antigravity ERROR, exits non-zero, crashes, or forgets the marker, the outer daemon stays alive and schedules a fresh-process retry. A transport/session failure is not automatically a product HUMAN_GATE.
 
 The canonical unattended launcher pins:
 
 - agent `mavis`;
 - `gemini-3.7-flash-medium`;
 - effort `medium`;
-- Antigravity `stream-json` input/output;
+- Antigravity `stream-json` input/output for each tick;
 - `--dangerously-skip-permissions`.
 
 So routine tool calls are auto-approved. Repo governance still forbids destructive Git recovery, secret access, unapproved paid spend and material decisions outside Mavis's authority.
@@ -60,16 +62,16 @@ So routine tool calls are auto-approved. Repo governance still forbids destructi
 Useful alternatives:
 
 ```bash
-npm run orchestrator:mavis:safe        # continuous, normal permission policy
-npm run orchestrator:mavis:once        # one daemon tick for debugging
-npm run orchestrator:mavis:interactive # old interactive UX/manual conversation
+npm run orchestrator:mavis:safe        # resilient daemon, normal permission policy
+npm run orchestrator:mavis:once        # one fresh control tick for debugging
+npm run orchestrator:mavis:interactive # interactive UX/manual conversation
 ```
 
-Stop the continuous daemon with `Ctrl+C`.
+Stop the daemon with `Ctrl+C`.
 
 ## Core autonomy rule
 
-Mavis must **never finish a turn merely by describing an immediately executable next action**.
+Mavis must **never finish a tick merely by describing an immediately executable next action**.
 
 If the current stage is accepted and the next stage has a specified worker/task, Mavis dispatches it before ending the tick. It may return `WAITING` only when progress genuinely depends on already-running work or evidence not yet ready.
 
@@ -78,7 +80,7 @@ Example of invalid behavior:
 ```text
 A4B accepted.
 Next action: dispatch Gemini A5.
-<turn ends>
+<tick ends>
 ```
 
 Correct behavior:
@@ -131,9 +133,9 @@ If reviewer returns PARTIAL/FAIL, Mavis creates one bounded repair packet (max f
 
 `npm run orchestrator:status` writes a compact ignored snapshot to `.playtest/orchestrator/status.json` and prints current canonical/worker/loop state.
 
-When a worker is genuinely still running, Mavis uses the configured poll interval (currently seven minutes) rather than burning tokens continuously. When another action is immediately executable, the daemon schedules the next tick within seconds.
+When a worker is genuinely still running, Mavis uses the configured poll interval (currently seven minutes) rather than burning tokens continuously. When another action is immediately executable, the daemon schedules the next fresh tick within seconds.
 
-The model inspects Git evidence, not terminal disappearance or conversational memory.
+Each tick reconstructs state from the repository. Conversational memory is optional; Git evidence is authoritative.
 
 ## Safety on canonical checkout
 
