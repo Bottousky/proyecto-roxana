@@ -26,6 +26,7 @@ import { createManantialActivationVfx } from './world/manantial/manantialActivat
 import {
   type Arc1GreyboxState,
   type CastleNetworkConfiguration,
+  ARC1_ROUTE,
   calibrateLighthouse,
   configureCastleNetwork,
   createArc1GreyboxState,
@@ -351,13 +352,18 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       'forge-core',
       'terraces-irrigation',
       'forge-terraces-overview',
+      'lighthouse-approach',
+      'lighthouse-lake-wide',
+      'final-return-plaza',
+      'arc1-final-pedestal',
     ].includes(shot.id)) {
       throw new Error(`Unknown Ohmdal authored capture shot: ${shot.id}`);
     }
 
     const isA4Shot = ['restored-plaza-wide', 'bell-activation', 'castle-gate-open', 'castle-distribution-hall'].includes(shot.id);
     const isA5Shot = ['forge-core', 'terraces-irrigation', 'forge-terraces-overview'].includes(shot.id);
-    if (isA4Shot) setVisualState('restored-plaza');
+    const isA6Shot = ['lighthouse-approach', 'lighthouse-lake-wide', 'final-return-plaza', 'arc1-final-pedestal'].includes(shot.id);
+    if (isA4Shot || shot.id === 'final-return-plaza' || shot.id === 'arc1-final-pedestal') setVisualState('restored-plaza');
     else closeVisualOverlays();
     for (const zone of ['workshop', 'manantial', 'castle', 'forge-terraces', 'lighthouse'] as const) {
       zones.deactivate(zone);
@@ -379,6 +385,10 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       await zones.activate('forge-terraces');
       zones.deactivate('plaza');
     }
+    if (shot.world.zone === 'lighthouse') {
+      await zones.activate('lighthouse');
+      zones.deactivate('plaza');
+    }
 
     visualSeed = shot.deterministic.seed;
     reducedMotion = shot.deterministic.reducedMotion;
@@ -387,33 +397,33 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     world.viewmodelRoot.enabled = isToolEquipped;
 
     arc1State = createArc1GreyboxState();
-    if (shot.world.zone === 'manantial' || isA4Shot || isA5Shot) {
+    if (shot.world.zone === 'manantial' || isA4Shot || isA5Shot || isA6Shot) {
       arc1State = enterArc1Region(arc1State, 'manantial');
       const manantialState = shot.world.manantial;
-      if (manantialState?.gateOpen || isA4Shot || isA5Shot) arc1State = setManantialGate(arc1State, true);
-      if (manantialState?.returnBridgeInstalled || isA4Shot || isA5Shot) {
+      if (manantialState?.gateOpen || isA4Shot || isA5Shot || isA6Shot) arc1State = setManantialGate(arc1State, true);
+      if (manantialState?.returnBridgeInstalled || isA4Shot || isA5Shot || isA6Shot) {
         arc1State = measureManantial(arc1State, 'generator');
         arc1State = repairManantial(arc1State);
       }
-      if (manantialState?.excitationEnabled || isA4Shot || isA5Shot) arc1State = energizeManantial(arc1State);
-      if (manantialState?.restored || isA4Shot || isA5Shot) arc1State = measureManantial(arc1State, 'load');
+      if (manantialState?.excitationEnabled || isA4Shot || isA5Shot || isA6Shot) arc1State = energizeManantial(arc1State);
+      if (manantialState?.restored || isA4Shot || isA5Shot || isA6Shot) arc1State = measureManantial(arc1State, 'load');
     }
-    if (isA4Shot || isA5Shot) {
+    if (isA4Shot || isA5Shot || isA6Shot) {
       arc1State = enterArc1Region(arc1State, 'plaza');
-      if ((shot.world.plaza?.bellPulls ?? 0) > 0 || shot.world.zone === 'castle' || isA5Shot) arc1State = pullCampana(arc1State);
-      if (shot.world.plaza?.castleGateOpened || shot.world.zone === 'castle' || isA5Shot) arc1State = openCastleGate(arc1State);
-      if (shot.world.zone === 'castle' || isA5Shot) {
+      if ((shot.world.plaza?.bellPulls ?? 0) > 0 || shot.world.zone === 'castle' || isA5Shot || isA6Shot) arc1State = pullCampana(arc1State);
+      if (shot.world.plaza?.castleGateOpened || shot.world.zone === 'castle' || isA5Shot || isA6Shot) arc1State = openCastleGate(arc1State);
+      if (shot.world.zone === 'castle' || isA5Shot || isA6Shot) {
         arc1State = enterArc1Region(arc1State, 'castillo');
-        if (shot.world.castle?.topology === 'parallel' || isA5Shot) arc1State = configureCastleNetwork(arc1State, CASTLE_PARALLEL_CONFIGURATION);
+        if (shot.world.castle?.topology === 'parallel' || isA5Shot || isA6Shot) arc1State = configureCastleNetwork(arc1State, CASTLE_PARALLEL_CONFIGURATION);
         if (shot.world.castle?.topology === 'mixed') arc1State = configureCastleNetwork(arc1State, CASTLE_MIXED_CONFIGURATION);
-        if (shot.world.castle?.energized || isA5Shot) {
+        if (shot.world.castle?.energized || isA5Shot || isA6Shot) {
           arc1State = measureCastleNetwork(arc1State);
           arc1State = energizeCastleNetwork(arc1State);
           arc1State = documentCastleNetwork(arc1State);
         }
       }
     }
-    if (isA5Shot || shot.world.zone === 'forge-terraces') {
+    if (isA5Shot || isA6Shot || shot.world.zone === 'forge-terraces') {
       arc1State = enterArc1Region(arc1State, 'forja');
       const ft = shot.world.forgeTerraces;
       const forgeAlloc = ft?.allocation?.forge ?? 5;
@@ -426,12 +436,41 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       if (ft?.energized ?? true) {
         arc1State = energizeForgeTerraces(arc1State);
       }
-      if (ft?.restored) {
+      if (ft?.restored || isA6Shot) {
         arc1State = enterArc1Region(arc1State, 'terrazas');
         arc1State = documentForgeTerraces(arc1State);
       }
       if (ft?.protectiveTrip) {
         arc1State = { ...arc1State, forgeTerraces: { ...arc1State.forgeTerraces, protectiveTrip: true } };
+      }
+    }
+    if (isA6Shot || shot.world.zone === 'lighthouse') {
+      arc1State = enterArc1Region(arc1State, 'faro');
+      const lh = shot.world.lighthouse;
+      arc1State = measureLighthouse(arc1State);
+      if (lh?.calibrated ?? (shot.id !== 'lighthouse-approach')) {
+        arc1State = calibrateLighthouse(arc1State, { voltageTrim: 0, phaseOffset: 0 });
+      }
+      if (lh?.energized ?? (shot.id !== 'lighthouse-approach')) {
+        arc1State = energizeLighthouse(arc1State);
+        arc1State = synchronizeLighthouse(arc1State, 0);
+        arc1State = synchronizeLighthouse(arc1State, 0);
+      }
+      if (lh?.restored ?? (shot.id !== 'lighthouse-approach')) {
+        arc1State = documentLighthouse(arc1State);
+      }
+      if (shot.id === 'final-return-plaza') {
+        arc1State = enterArc1Region(arc1State, 'plaza');
+        arc1State = { ...arc1State, returnedToPlaza: true, finalReturnReached: true };
+      }
+      if (shot.id === 'arc1-final-pedestal') {
+        arc1State = enterArc1Region(arc1State, 'plaza');
+        arc1State = {
+          ...arc1State,
+          returnedToPlaza: true,
+          finalReturnReached: true,
+          visitedRegions: [...ARC1_ROUTE],
+        };
       }
     }
     updateArc1WorldVisuals();

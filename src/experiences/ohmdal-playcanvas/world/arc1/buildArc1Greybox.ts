@@ -465,6 +465,9 @@ export function buildArc1Greybox({
   lighthouseRoot.enabled = false;
   app.root.addChild(lighthouseRoot);
 
+  const lighthouseAuthoredRoot = new pc.Entity('LighthouseAuthoredSupportRoot');
+  lighthouseRoot.addChild(lighthouseAuthoredRoot);
+
   addBox(lighthouseRoot, 'LighthouseShoreFloor', stone, [0, -0.12, 0], [28, 0.24, 30]);
   addBox(lighthouseRoot, 'LighthousePath', stoneDark, [0, 0.02, 0], [4.2, 0.08, 23]);
   addConductor(lighthouseRoot, 'LighthouseSignalBus', [0, 0.11, 0], [0.28, 0.12, 23], copper);
@@ -511,6 +514,59 @@ export function buildArc1Greybox({
   addCylinder(lighthouseReturn, 'LighthouseReturnPost', brass, [0, 0.7, 0], [0.35, 1.4, 0.35]);
   addBox(lighthouseReturn, 'LighthouseReturnPlate', stoneDark, [0, 0.05, 0], [2.2, 0.1, 1.2]);
 
+  // A6 Authored support authoring: lake quayside, beacon tower masonry, lantern cage,
+  // DC calibration console and precision instrument station, lake water expanse,
+  // overhead conductor transmission bus, ceramic standoff insulators, and return nexus.
+  for (const z of [-10, 0, 10]) {
+    addBox(lighthouseAuthoredRoot, `LighthousePillarWest${z}`, stone, [-11.0, 3.5, z], [1.6, 7.0, 1.6]);
+    addBox(lighthouseAuthoredRoot, `LighthousePillarEast${z}`, stone, [11.0, 3.5, z], [1.6, 7.0, 1.6]);
+    addBox(lighthouseAuthoredRoot, `LighthouseArchLintel${z}`, stone, [0, 7.0, z], [23.6, 1.0, 1.4]);
+  }
+
+  // Lighthouse Beacon Tower & Lantern superstructure
+  addBox(lighthouseAuthoredRoot, 'LighthouseTowerPlinth', stone, [0, 0.45, 8], [5.4, 0.9, 5.4]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseTowerStep', stoneDark, [0, 1.35, 8], [4.4, 0.9, 4.4]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseLanternDeck', brass, [0, 5.9, 8], [3.2, 0.22, 3.2]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseLanternRail', brass, [0, 6.4, 8], [3.4, 0.8, 3.4]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseFresnelCasing', stoneDark, [0, 6.65, 8], [1.6, 1.2, 1.6]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseCupolaRoof', copper, [0, 7.45, 8], [2.6, 0.6, 2.6]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseSignalFinial', copper, [0, 8.0, 8], [0.2, 0.6, 0.2]);
+
+  // DC Calibration console plinth, galvanometer instrument housing & test terminals
+  addBox(lighthouseAuthoredRoot, 'LighthouseConsolePlinth', stone, [0, 0.2, 0], [5.0, 0.4, 1.8]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseInstrumentStand', stoneDark, [-4.2, 0.75, 0], [1.4, 1.5, 1.4]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseGalvanoHousing', brass, [-4.2, 1.65, 0], [0.9, 0.4, 0.9]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseGalvanoFace', copper, [-4.2, 1.88, 0], [0.75, 0.08, 0.75]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseTerminalLug1', copper, [-3.6, 1.2, -0.6], [0.18, 0.35, 0.18]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseTerminalLug2', copper, [-4.8, 1.2, -0.6], [0.18, 0.35, 0.18]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseObservationStanchion', brass, [4.8, 1.25, 0], [0.3, 2.5, 3.0]);
+
+  // Lake Quayside, Dock Pier, Shore Steps and expansive water basin
+  addBox(lighthouseAuthoredRoot, 'LighthouseQuayWall', stone, [6.8, 0.45, 4.0], [1.4, 0.9, 22]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseQuayCurb', stoneDark, [6.8, 0.95, 4.0], [1.6, 0.12, 22]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseDockPier', stone, [10.5, 0.4, 5.0], [6.4, 0.8, 4.2]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseShoreSteps', stone, [7.8, 0.25, 5.0], [1.4, 0.5, 3.8]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseMooringBollard1', brass, [12.8, 0.95, 3.6], [0.35, 0.45, 0.35]);
+  addCylinder(lighthouseAuthoredRoot, 'LighthouseMooringBollard2', brass, [12.8, 0.95, 6.4], [0.35, 0.45, 0.35]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseLakeWaterExpanse', water, [11.5, 0.18, 4.0], [12.0, 0.1, 26.0]);
+
+  // Overhead high-voltage transmission bus & ceramic standoff insulators
+  addBox(lighthouseAuthoredRoot, 'LighthouseRaisedBusMain', copper, [0, 5.25, 0], [0.42, 0.28, 22]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseRaisedBusFeed', copper, [0, 5.25, 5.2], [0.34, 0.28, 6.0]);
+  const lighthouseInsulatorPositions: Array<[number, number, number]> = [
+    [-4.0, 4.35, -8], [4.0, 4.35, -8], [0, 4.35, -4], [0, 4.35, 4], [0, 4.35, 8],
+  ];
+  lighthouseInsulatorPositions.forEach((position, index) => {
+    addCylinder(lighthouseAuthoredRoot, `LighthouseBusInsulator${index + 1}`, stone, position, [0.42, 1.45, 0.42]);
+  });
+
+  // Return Nexus & Plaza Backtrack Portal Gateway
+  addBox(lighthouseAuthoredRoot, 'LighthouseReturnPlinth', stone, [0, 0.35, 14.0], [3.6, 0.7, 2.4]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseReturnPostWest', stone, [-2.2, 1.8, 14.0], [0.6, 3.6, 0.6]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseReturnPostEast', stone, [2.2, 1.8, 14.0], [0.6, 3.6, 0.6]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseReturnHeader', stone, [0, 3.6, 14.0], [5.0, 0.6, 0.8]);
+  addBox(lighthouseAuthoredRoot, 'LighthouseReturnInscribedPlate', brass, [0, 0.72, 14.0], [2.0, 0.08, 1.4]);
+
   probeTargets.lighthouse_bus = new pc.Vec3(180, 1.1, -8);
   probeTargets.lighthouse_reference = new pc.Vec3(180, 1.2, 0);
   probeTargets.lighthouse_beacon = new pc.Vec3(180, 1.25, 8);
@@ -519,6 +575,12 @@ export function buildArc1Greybox({
   addCollider('lighthouse', 194, 0, 0.5, 30, 'lighthouse.wall-east');
   addCollider('lighthouse', 180, -15, 28, 0.5, 'lighthouse.wall-south');
   addCollider('lighthouse', 180, 15, 28, 0.5, 'lighthouse.wall-north');
+
+  const lighthouseStaticBatch = app.batcher.addGroup('OhmdalLighthouseStaticArt', false, 47);
+  for (const render of lighthouseAuthoredRoot.findComponents('render') as pc.RenderComponent[]) {
+    render.batchGroupId = lighthouseStaticBatch.id;
+  }
+  app.batcher.generate([lighthouseStaticBatch.id]);
 
   return {
     roots: {

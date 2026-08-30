@@ -54,6 +54,12 @@ export const FAST_STAGE_SHOTS = Object.freeze({
     'terraces-irrigation',
     'forge-terraces-overview',
   ]),
+  'a6-lighthouse-lake-return-authored': Object.freeze([
+    'lighthouse-approach',
+    'lighthouse-lake-wide',
+    'final-return-plaza',
+    'arc1-final-pedestal',
+  ]),
 });
 
 /**
@@ -411,6 +417,100 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
         energized: true,
         protectiveTrip: false,
         restored: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'lighthouse-approach': Object.freeze({
+    id: 'lighthouse-approach',
+    state: 'lighthouse-approach',
+    camera: 'lighthouse-approach',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // First approach looking north along the causeway toward calibration bench and beacon tower
+    anchor: Object.freeze({ position: Object.freeze([180.0, 2.8, -10.5]), yaw: 180, pitch: -6 }),
+    world: Object.freeze({
+      zone: 'lighthouse',
+      storyStep: 'inside_lighthouse',
+      probeTarget: 'lighthouse_bus',
+      lighthouse: Object.freeze({
+        mode: 'dc',
+        calibrated: false,
+        energized: false,
+        restored: false,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'lighthouse-lake-wide': Object.freeze({
+    id: 'lighthouse-lake-wide',
+    state: 'lighthouse-lake-wide',
+    camera: 'lighthouse-lake-wide',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Elevated three-quarter view framing calibration bench, lighthouse beacon tower, dock pier and lake expanse
+    anchor: Object.freeze({ position: Object.freeze([172.0, 5.2, 2.0]), yaw: 120, pitch: -16 }),
+    world: Object.freeze({
+      zone: 'lighthouse',
+      storyStep: 'inside_lighthouse',
+      probeTarget: 'lighthouse_beacon',
+      lighthouse: Object.freeze({
+        mode: 'dc',
+        calibrated: true,
+        energized: true,
+        restored: true,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'final-return-plaza': Object.freeze({
+    id: 'final-return-plaza',
+    state: 'final-return-plaza',
+    camera: 'final-return-plaza',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Backtrack view looking south across the restored Plaza toward Ohm and Taller with active lighting and bell
+    anchor: Object.freeze({ position: Object.freeze([0, 6.5, 6.5]), yaw: 0, pitch: -18 }),
+    world: Object.freeze({
+      zone: 'plaza',
+      storyStep: 'returned_to_plaza',
+      comparison: 'before-after',
+      plaza: Object.freeze({ bellPulls: 1, castleGateOpened: true }),
+      lighthouse: Object.freeze({
+        mode: 'dc',
+        calibrated: true,
+        energized: true,
+        restored: true,
+      }),
+    }),
+    deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),
+  }),
+  'arc1-final-pedestal': Object.freeze({
+    id: 'arc1-final-pedestal',
+    state: 'arc1-final-pedestal',
+    camera: 'arc1-final-pedestal',
+    runtimeHook: 'setCaptureShot',
+    viewport: Object.freeze({ width: 1440, height: 900 }),
+    hideUi: true,
+    post: true,
+    // Close view of the Ohm landmark / central pedestal in completed network state
+    anchor: Object.freeze({ position: Object.freeze([0, 1.8, -7.5]), yaw: 180, pitch: -6 }),
+    world: Object.freeze({
+      zone: 'plaza',
+      storyStep: 'arc1_complete',
+      probeTarget: 'plaza_banco',
+      plaza: Object.freeze({ bellPulls: 1, castleGateOpened: true }),
+      lighthouse: Object.freeze({
+        mode: 'dc',
+        calibrated: true,
+        energized: true,
+        restored: true,
       }),
     }),
     deterministic: Object.freeze({ seed: 1701, reducedMotion: true, pauseBeforeCapture: true }),

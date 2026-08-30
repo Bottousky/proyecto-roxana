@@ -341,7 +341,7 @@ const CASTLE_BRANCH_IDS: readonly CastleBranchId[] = [
   'district-c',
 ];
 
-const ARC1_ROUTE: readonly Arc1Region[] = [
+export const ARC1_ROUTE: readonly Arc1Region[] = [
   'portal',
   'taller',
   'manantial',

@@ -33,6 +33,10 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES = [
   'forge-core',
   'terraces-irrigation',
   'forge-terraces-overview',
+  'lighthouse-approach',
+  'lighthouse-lake-wide',
+  'final-return-plaza',
+  'arc1-final-pedestal',
 ] as const;
 
 export type OhmdalVisualCaptureShotName =
@@ -61,7 +65,7 @@ export interface RoxanaOhmdalCaptureShot {
     pitch: number;
   } | null;
   world: {
-    zone: 'plaza' | 'workshop' | 'manantial' | 'castle' | 'forge-terraces';
+    zone: 'plaza' | 'workshop' | 'manantial' | 'castle' | 'forge-terraces' | 'lighthouse';
     storyStep: string;
     tool?: 'galvanoscope';
     probeTarget?: string;
@@ -91,6 +95,12 @@ export interface RoxanaOhmdalCaptureShot {
       energized: boolean;
       protectiveTrip: boolean;
       restored: boolean;
+    };
+    lighthouse?: {
+      mode?: 'dc';
+      calibrated?: boolean;
+      energized?: boolean;
+      restored?: boolean;
     };
   };
   deterministic: {

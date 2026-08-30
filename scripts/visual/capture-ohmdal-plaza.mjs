@@ -1,5 +1,8 @@
 import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { createServer, Socket } from 'node:net';
+import { spawn } from 'node:child_process';
+import { setTimeout as sleep } from 'node:timers/promises';
 import path from 'node:path';
 import process from 'node:process';
 import {
@@ -16,12 +19,88 @@ function valueOf(flag, fallback) {
   return index >= 0 && process.argv[index + 1] ? process.argv[index + 1] : fallback;
 }
 
-const baseUrl = valueOf('--base-url', 'http://127.0.0.1:5173');
-const outDir = path.resolve(valueOf('--out', 'output/playwright/ohmdal-plaza/stage-1/current'));
-const headless = !process.argv.includes('--headed');
-
 const mode = valueOf('--mode', process.argv.includes('--fast') ? 'fast' : 'full');
 const stage = valueOf('--stage', 'a0-baseline-capture-readiness');
+const defaultOutDir = mode === 'fast'
+  ? (stage === 'a0-baseline-capture-readiness'
+      ? 'output/playwright/ohmdal-plaza/stage-1/current'
+      : `output/playwright/ohmdal-arco1-authored/${stage === 'a2-plaza-workshop-authored' ? 'a2-fast-iteration1' : stage === 'a3-manantial-central-authored' ? 'a3-fast-iteration1' : stage === 'a4-castle-authored' ? 'a4-fast-iteration1' : stage === 'a5-forge-terraces-authored' ? 'a5-fast-iteration1' : stage === 'a6-lighthouse-lake-return-authored' ? 'a6-fast-iteration1' : `${stage}-fast-iteration1`}`)
+  : 'output/playwright/ohmdal-plaza/stage-1/current';
+const outDir = path.resolve(valueOf('--out', defaultOutDir));
+const headless = !process.argv.includes('--headed');
+
+function getFreePort() {
+  return new Promise((resolvePort, rejectPort) => {
+    const server = createServer();
+    server.once('error', rejectPort);
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      const port = typeof address === 'object' && address ? address.port : null;
+      server.close((error) => (error ? rejectPort(error) : resolvePort(port)));
+    });
+  });
+}
+
+async function portReachable(port, timeoutMs = 3000) {
+  const started = Date.now();
+  while (Date.now() - started < timeoutMs) {
+    const reachable = await new Promise((resolveReachable) => {
+      const socket = new Socket();
+      let settled = false;
+      const finish = (value) => {
+        if (settled) return;
+        settled = true;
+        socket.destroy();
+        resolveReachable(value);
+      };
+      socket.setTimeout(400);
+      socket.once('connect', () => finish(true));
+      socket.once('timeout', () => finish(false));
+      socket.once('error', () => finish(false));
+      try {
+        socket.connect(port, '127.0.0.1');
+      } catch {
+        finish(false);
+      }
+    });
+    if (reachable) return true;
+    await sleep(200);
+  }
+  return false;
+}
+
+function startVite(port) {
+  const root = path.resolve(process.cwd());
+  const command = process.platform === 'win32'
+    ? `npx.cmd vite --host 127.0.0.1 --port ${port} --strictPort`
+    : `npx vite --host 127.0.0.1 --port ${port} --strictPort`;
+  const vite = spawn(command, {
+    cwd: root,
+    shell: true,
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const log = [];
+  vite.stdout?.on('data', (chunk) => log.push(String(chunk)));
+  vite.stderr?.on('data', (chunk) => log.push(`[stderr] ${String(chunk)}`));
+  return { vite, log };
+}
+
+function stopVite(vite) {
+  if (!vite || vite.killed) return;
+  try {
+    if (process.platform === 'win32' && vite.pid) {
+      spawn('taskkill', ['/pid', String(vite.pid), '/T', '/F'], {
+        stdio: 'ignore',
+        windowsHide: true,
+      });
+    } else {
+      vite.kill('SIGTERM');
+    }
+  } catch {
+    // Cleanup is best effort
+  }
+}
 const requestedShots = valueOf('--shots', null)
   ?.split(',')
   .map((id) => id.trim())
@@ -79,6 +158,20 @@ async function launchCaptureBrowser() {
 }
 
 await mkdir(outDir, { recursive: true });
+
+let managedVite = null;
+let baseUrl = valueOf('--base-url', null);
+if (!baseUrl) {
+  const port = await getFreePort();
+  managedVite = startVite(port);
+  const reachable = await portReachable(port, 30000);
+  if (!reachable) {
+    stopVite(managedVite.vite);
+    throw new Error(`Timeout starting Vite dev server on port ${port}; log: ${managedVite.log.join('').slice(-2000)}`);
+  }
+  baseUrl = `http://127.0.0.1:${port}`;
+}
+
 const { browser, launch } = await launchCaptureBrowser();
 const context = await browser.newContext({ viewport: views[0].viewport, deviceScaleFactor: 1 });
 const page = await context.newPage();
@@ -224,4 +317,5 @@ try {
   console.log(manifestPath);
 } finally {
   await browser.close();
+  if (managedVite) stopVite(managedVite.vite);
 }

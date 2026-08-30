@@ -183,7 +183,7 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
   it('define el FAST A5 de Forja/Terrazas con trade-off térmico/riego y metadata determinista', () => {
     const authoredNames = [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES];
     const fast = resolveCaptureViews({ mode: 'fast', stage: 'a5-forge-terraces-authored' });
-    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(12));
+    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(12, 15));
     assert.equal(fast.length, 3);
 
     const core = getCaptureShotSpec('forge-core');
@@ -209,6 +209,46 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     assert.equal(overview.world.zone, 'forge-terraces');
     assert.equal(overview.world.comparison, 'before-after');
     assert.equal(overview.world.probeTarget, 'forge_bus');
+    for (const shot of fast) assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
+  });
+
+  it('define el FAST A6 de Faro/Lago/Retorno con culminación DC, backtracking a Plaza y cierre de pedestal', () => {
+    const authoredNames = [...OHMDAL_AUTHORED_CAPTURE_SHOT_NAMES];
+    const fast = resolveCaptureViews({ mode: 'fast', stage: 'a6-lighthouse-lake-return-authored' });
+    assert.deepEqual(fast.map((view) => view.id), authoredNames.slice(15));
+    assert.equal(fast.length, 4);
+
+    const approach = getCaptureShotSpec('lighthouse-approach');
+    assert.equal(approach.runtimeHook, 'setCaptureShot');
+    assert.deepEqual(approach.anchor.position, [180.0, 2.8, -10.5]);
+    assert.equal(approach.world.zone, 'lighthouse');
+    assert.equal(approach.world.storyStep, 'inside_lighthouse');
+    assert.equal(approach.world.probeTarget, 'lighthouse_bus');
+    assert.equal(approach.world.lighthouse.mode, 'dc');
+    assert.equal(approach.world.lighthouse.restored, false);
+
+    const lakeWide = getCaptureShotSpec('lighthouse-lake-wide');
+    assert.deepEqual(lakeWide.anchor.position, [172.0, 5.2, 2.0]);
+    assert.equal(lakeWide.anchor.yaw, 120);
+    assert.equal(lakeWide.anchor.pitch, -16);
+    assert.equal(lakeWide.world.zone, 'lighthouse');
+    assert.equal(lakeWide.world.probeTarget, 'lighthouse_beacon');
+    assert.equal(lakeWide.world.lighthouse.restored, true);
+
+    const returnPlaza = getCaptureShotSpec('final-return-plaza');
+    assert.deepEqual(returnPlaza.anchor.position, [0, 6.5, 6.5]);
+    assert.equal(returnPlaza.world.zone, 'plaza');
+    assert.equal(returnPlaza.world.storyStep, 'returned_to_plaza');
+    assert.equal(returnPlaza.world.comparison, 'before-after');
+    assert.equal(returnPlaza.world.plaza.castleGateOpened, true);
+    assert.equal(returnPlaza.world.lighthouse.restored, true);
+
+    const pedestal = getCaptureShotSpec('arc1-final-pedestal');
+    assert.deepEqual(pedestal.anchor.position, [0, 1.8, -7.5]);
+    assert.equal(pedestal.world.zone, 'plaza');
+    assert.equal(pedestal.world.storyStep, 'arc1_complete');
+    assert.equal(pedestal.world.probeTarget, 'plaza_banco');
+    assert.equal(pedestal.world.lighthouse.restored, true);
     for (const shot of fast) assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
   });
 
