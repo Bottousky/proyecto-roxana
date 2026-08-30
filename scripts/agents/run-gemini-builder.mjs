@@ -44,6 +44,15 @@ try {
   log(`Warning: could not read task file at ${taskPath}: ${err.message}`);
 }
 
+const statePath = path.resolve(worktreeDir, 'agent-work/loops/ohmdal-arco1-authored-pass/state.json');
+let activeStage = 'a6-lighthouse-lake-return-authored';
+try {
+  const state = JSON.parse(await readFile(statePath, 'utf8'));
+  if (state.currentStage) activeStage = state.currentStage;
+} catch (err) {
+  log(`Warning: could not read loop state at ${statePath}: ${err.message}`);
+}
+
 const prompt = `
 Follow GEMINI.md in this repository.
 
@@ -52,18 +61,18 @@ Harness: Antigravity CLI. Model: ${model}. Effort: ${effort}. Mode: workspace-wr
 You are running in the isolated worktree Roxana-gemini on branch worker/gemini-authored.
 
 Execute your worker task: ${taskArg}
-Inspect agent-work/loops/ohmdal-arco1-authored-pass/state.json to identify the active stage: a5-forge-terraces-authored.
+Inspect agent-work/loops/ohmdal-arco1-authored-pass/state.json to identify the active stage: ${activeStage}.
 
 TASK DETAILS:
 ${taskContent}
 
 CRITICAL EXECUTION RULES:
-1. Complete the A5 Forja/Terrazas authored pass in this worktree.
+1. Complete the ${activeStage} authored pass in this worktree.
 2. Verify all gates:
    npm run loop:ohmdal-arco1-authored:validate
    npm run build
    npm test
-   npm run visual:ohmdal-plaza:fast -- --stage a5-forge-terraces-authored
+   npm run visual:ohmdal-plaza:fast -- --stage ${activeStage}
    npm run playtest:ohmdal-golden-path
 3. Commit your implementation changes to branch worker/gemini-authored.
 4. Record your evidence in agent-work/reports/workers/ohmdal-authored-gemini-current.md adhering strictly to Candidate Protocol v2 machine-readable headers:
@@ -73,7 +82,7 @@ CRITICAL EXECUTION RULES:
    EVIDENCE_STATUS: PASS
    SELF_ACCEPTANCE: false
 5. Commit the report and push worker/gemini-authored to origin.
-6. Stop after pushing evidence. Do not begin A6.
+6. Stop after pushing evidence. Do not begin next stage without external review and authorization.
 `.trim();
 
 const agyArgs = [
