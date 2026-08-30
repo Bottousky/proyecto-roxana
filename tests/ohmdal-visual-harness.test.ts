@@ -266,6 +266,40 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     }
   });
 
+  it('define el FAST A8 con las 22 vistas canónicas del Arco I completo', () => {
+    const fast = resolveCaptureViews({ mode: 'fast', stage: 'a8-full-authored-golden-path' });
+    assert.equal(fast.length, 22);
+    assert.deepEqual(fast.map((view) => view.id), [
+      'portal-arrival',
+      'plaza-wide',
+      'ohm-landmark',
+      'workshop-exterior',
+      'workshop-interior-tools',
+      'galvanoscope-first-person',
+      'manantial-approach',
+      'hydro-central-wide',
+      'sluice-gate-interaction',
+      'generator-platform',
+      'restored-manantial',
+      'restored-plaza-wide',
+      'bell-activation',
+      'castle-gate-open',
+      'castle-distribution-hall',
+      'forge-core',
+      'terraces-irrigation',
+      'forge-terraces-overview',
+      'lighthouse-approach',
+      'lighthouse-lake-wide',
+      'final-return-plaza',
+      'arc1-final-pedestal',
+    ]);
+    for (const shot of fast) {
+      const spec = getCaptureShotSpec(shot.id);
+      assert.ok(spec.id === shot.id);
+      assert.ok(spec.runtimeHook === 'setCaptureShot' || spec.runtimeHook === 'setStateAndCamera');
+    }
+  });
+
   it('FAST solicita aceleración GPU sin forzar SwiftShader y exige diagnostics', () => {
     const launch = fastLaunchOptions({ headless: true, platform: 'win32' });
     assert.equal(launch.headless, true);
