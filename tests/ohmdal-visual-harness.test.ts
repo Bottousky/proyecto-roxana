@@ -252,6 +252,20 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     for (const shot of fast) assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
   });
 
+  it('define el FAST A7 de VFX, Audio y Ambiental con representatividad de toda la red', () => {
+    const fast = resolveCaptureViews({ mode: 'fast', stage: 'a7-vfx-audio-ambient' });
+    assert.deepEqual(fast.map((view) => view.id), [
+      'restored-manantial',
+      'bell-activation',
+      'forge-core',
+      'lighthouse-lake-wide',
+    ]);
+    assert.equal(fast.length, 4);
+    for (const shot of fast) {
+      assert.equal(getCaptureShotSpec(shot.id).runtimeHook, 'setCaptureShot');
+    }
+  });
+
   it('FAST solicita aceleración GPU sin forzar SwiftShader y exige diagnostics', () => {
     const launch = fastLaunchOptions({ headless: true, platform: 'win32' });
     assert.equal(launch.headless, true);

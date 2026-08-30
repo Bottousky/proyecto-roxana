@@ -60,6 +60,12 @@ export const FAST_STAGE_SHOTS = Object.freeze({
     'final-return-plaza',
     'arc1-final-pedestal',
   ]),
+  'a7-vfx-audio-ambient': Object.freeze([
+    'restored-manantial',
+    'bell-activation',
+    'forge-core',
+    'lighthouse-lake-wide',
+  ]),
 });
 
 /**

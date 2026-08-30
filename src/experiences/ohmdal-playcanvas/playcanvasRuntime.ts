@@ -23,6 +23,7 @@ import { OhmdalZoneLifecycle } from './systems/zones/zoneLifecycle.ts';
 import { OHMDAL_TRANSITION_ANCHORS, yawForAnchor, type SpawnAnchor } from './systems/navigation/ohmdalSpawnAnchors.ts';
 import type { CollisionDiagnostic } from './systems/navigation/ohmdalNavigation.ts';
 import { createManantialActivationVfx } from './world/manantial/manantialActivationVfx.ts';
+import { OhmdalVfxSystem } from './systems/vfx/ohmdalVfxSystem.ts';
 import {
   type Arc1GreyboxState,
   type CastleNetworkConfiguration,
@@ -176,6 +177,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     restoredOutputMarker: world.manantialRestoredOutputMarker,
     reducedMotion: () => reducedMotion,
     paused: () => visualPaused,
+  });
+  const vfx = new OhmdalVfxSystem({
+    app: world.app,
+    vfxRoot: world.vfxRoot,
+    reducedMotion: () => reducedMotion,
+    paused: () => visualPaused,
+    isMobile: () => world.app.graphicsDevice.width <= 600,
   });
   let debugUiHidden = false;
   let postProcessingEnabled = true;
@@ -679,6 +687,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     isOhmAwake = true;
     storyStep = 'ohm_awakened';
     world.ohmFilamentLight.light!.intensity = 2.8;
+    vfx.triggerConductorPulse([0, 1.2, -6.2], [0, 2.5, -6.2]);
+    vfx.triggerTerminalArc([0, 1.4, -6.2], 1.2);
     audio.playDiscoveryChime();
     ui.showNotification('⚡ ¡Terminales de entrada acoplados! El filamento de Ohm se ilumina.');
     bitacora.unlock('despertar_ohm');
@@ -710,6 +720,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   function updateArc1WorldVisuals(): void {
     const manantial = evaluateManantial(arc1State);
     manantialActivationVfx.setRestored(manantial.restored);
+    vfx.setWaterMist('manantial', arc1State.manantial.gateOpen, [-4.2, 1.8, 20.5]);
     world.manantialIntakeGate.setLocalEulerAngles(0, 0, arc1State.manantial.gateOpen ? -55 : 0);
     world.manantialSluiceLeaf.setLocalPosition(-4.2, arc1State.manantial.gateOpen ? 4.15 : 2.45, 20.55);
     world.manantialDormantWater.enabled = !arc1State.manantial.gateOpen;
@@ -745,8 +756,9 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     if (world.arc1Greybox.forgeTripPin) {
       world.arc1Greybox.forgeTripPin.setLocalPosition(0.85, arc1State.forgeTerraces.protectiveTrip ? 0.92 : 1.15, -0.86);
     }
+    const waterActive = forgeTerraces.restored || (arc1State.forgeTerraces.energized && arc1State.forgeTerraces.allocation.terraces > 0);
+    vfx.setWaterMist('terraces', waterActive, [114.0, 4.5, 10.0]);
     if (world.arc1Greybox.terracesWaterChannels) {
-      const waterActive = forgeTerraces.restored || (arc1State.forgeTerraces.energized && arc1State.forgeTerraces.allocation.terraces > 0);
       for (const channel of world.arc1Greybox.terracesWaterChannels) {
         channel.enabled = waterActive;
       }
@@ -757,6 +769,12 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     if (lighthouseLamp) lighthouseLamp.enabled = lighthouse.restored;
     setEntityLightsEnabled(world.arc1Greybox.lighthouseBeacon, lighthouse.restored);
     world.arc1Greybox.lighthouseSignal.enabled = lighthouse.restored;
+
+    // Environmental soundscape updates based on active physical systems
+    audio.setWaterFlow(arc1State.manantial.gateOpen ? (manantial.restored ? 1.0 : 0.6) : 0);
+    audio.setTurbineHum(arc1State.manantial.gateOpen ? 0.9 : 0);
+    const loadFactor = (arc1State.castle.energized ? 0.35 : 0) + (arc1State.forgeTerraces.energized ? 0.35 : 0) + (arc1State.lighthouse.energized ? 0.3 : 0);
+    audio.updateElectricalHum(loadFactor);
   }
 
   // Proximity Interactables
@@ -832,9 +850,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         action: () => {
           if (arc1State.lighthouse.protectiveTrip) {
             arc1State = repairLighthouse(arc1State);
+            audio.playBreakerReset();
+            vfx.triggerTerminalArc([180, 1.2, 0], 1.0);
             ui.showNotification('Protección del Faro rearmada; la evidencia de la falla se conserva.');
           } else {
             arc1State = calibrateLighthouse(arc1State, { voltageTrim: 0, phaseOffset: 0 });
+            audio.playGalvanometerClick();
+            vfx.triggerTerminalArc([180, 1.2, 0], 0.8);
             ui.showNotification('Referencia DC alineada con la red restaurada.');
           }
           updateArc1WorldVisuals();
@@ -850,6 +872,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             ? synchronizeLighthouse(arc1State)
             : energizeLighthouse(arc1State);
           const evaluation = evaluateLighthouse(arc1State);
+          if (arc1State.lighthouse.protectiveTrip) {
+            audio.playBreakerTrip();
+            vfx.triggerTerminalArc([180, 1.25, 8], 1.6);
+          } else {
+            audio.playBeaconSync();
+            vfx.triggerConductorPulse([180, 1.25, 8], [180, 5.0, 8]);
+          }
           ui.showNotification(arc1State.lighthouse.protectiveTrip
             ? 'La protección actuó: medí y calibrá antes de sincronizar.'
             : `Sincronización observada: ${arc1State.lighthouse.synchronizationSamples}/2.`);
@@ -897,6 +926,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 2.3,
         action: () => {
           arc1State = setForgeTerracesPriority(arc1State, 'forge-priority');
+          audio.playForgeRoar(0.8);
+          vfx.triggerConductorPulse([120, 1.1, -8], [124.2, 1.2, -8]);
           ui.showNotification('Asignación física: Forja 5 A · Terrazas 3 A.');
           updateArc1WorldVisuals();
         },
@@ -909,14 +940,26 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         action: () => {
           if (arc1State.forgeTerraces.protectiveTrip) {
             arc1State = repairForgeTerraces(arc1State);
+            audio.playBreakerReset();
+            vfx.triggerTerminalArc([120, 1.2, 0], 1.2);
             ui.showNotification('Protecciones rearmadas; ajustá la asignación antes de energizar.');
           } else if (arc1State.forgeTerraces.conductor === 'narrow') {
             arc1State = setForgeTerracesConductor(arc1State, 'medium');
             arc1State = setForgeTerracesProtection(arc1State, 'forge', arc1State.forgeTerraces.allocation.forge);
             arc1State = setForgeTerracesProtection(arc1State, 'terraces', arc1State.forgeTerraces.allocation.terraces);
+            audio.playSwitchClunk();
+            vfx.triggerContactSnap([120, 1.2, 0]);
             ui.showNotification('Conductor medio y protecciones ajustadas a las cargas físicas.');
           } else {
             arc1State = energizeForgeTerraces(arc1State);
+            if (arc1State.forgeTerraces.protectiveTrip) {
+              audio.playBreakerTrip();
+              vfx.triggerTerminalArc([120, 1.2, 0], 1.8);
+            } else {
+              audio.playHeavyBreakerClunk();
+              audio.playForgeRoar(0.9);
+              vfx.triggerConductorPulse([120, 1.2, 0], [120, 1.2, 16]);
+            }
             ui.showNotification(arc1State.forgeTerraces.protectiveTrip
               ? 'La protección actuó: revisá carga, conductor y medición.'
               : 'Forja y riego reciben energía dentro del límite.');
@@ -931,6 +974,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 2.7,
         action: () => {
           if (!arc1State.visitedRegions.includes('terrazas')) arc1State = enterArc1Region(arc1State, 'terrazas');
+          audio.playPumpRhythm();
+          vfx.triggerContactSnap([120, 1.2, 16]);
           if (arc1State.forgeTerraces.energized) {
             arc1State = documentForgeTerraces(arc1State);
             if (isForgeTerracesRestored(arc1State)) storyStep = 'forge_terraces_restored';
@@ -985,6 +1030,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 2.4,
         action: () => {
           arc1State = configureCastleNetwork(arc1State, CASTLE_PARALLEL_CONFIGURATION);
+          audio.playBranchSwitch();
+          vfx.triggerContactSnap([53.8, 1.15, 0]);
           ui.showNotification('Topología paralela: tres servicios, aislamiento local disponible.');
           updateArc1WorldVisuals();
         },
@@ -996,6 +1043,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 1.5,
         action: () => {
           arc1State = configureCastleNetwork(arc1State, CASTLE_MIXED_CONFIGURATION);
+          audio.playBranchSwitch();
+          vfx.triggerContactSnap([60, 1.15, 5.8]);
           ui.showNotification('Topología mixta: servicio secundario acoplado con coste de mantenimiento.');
           updateArc1WorldVisuals();
         },
@@ -1006,9 +1055,20 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         pos: new pc.Vec3(60, 1.1, 0),
         radius: 2.2,
         action: () => {
-          arc1State = arc1State.castle.protectiveTrip
-            ? repairCastleNetwork(arc1State)
-            : energizeCastleNetwork(arc1State);
+          if (arc1State.castle.protectiveTrip) {
+            arc1State = repairCastleNetwork(arc1State);
+            audio.playBreakerReset();
+            vfx.triggerTerminalArc([60, 1.1, 0], 1.2);
+          } else {
+            arc1State = energizeCastleNetwork(arc1State);
+            if (arc1State.castle.protectiveTrip) {
+              audio.playBreakerTrip();
+              vfx.triggerTerminalArc([60, 1.1, 0], 1.8);
+            } else {
+              audio.playHeavyBreakerClunk();
+              vfx.triggerConductorPulse([51.5, 6, -10], [60, 1.1, 0]);
+            }
+          }
           ui.showNotification(arc1State.castle.protectiveTrip
             ? 'La protección actuó: la configuración no cumple condiciones.'
             : arc1State.castle.energized ? 'Distribución energizada; verificá y documentá.' : 'Protección rearmada.');
@@ -1074,6 +1134,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 1.8,
         action: () => {
           arc1State = setManantialGate(arc1State, true);
+          audio.playHeavyBreakerClunk();
+          vfx.triggerDustWake([-4.2, 2.0, 18.4], 0.9);
           ui.showNotification('La compuerta abre: el agua mueve la turbina, pero la salida aún depende del retorno.');
           updateArc1WorldVisuals();
         },
@@ -1086,6 +1148,9 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         action: () => {
           const before = arc1State;
           arc1State = repairManantial(arc1State);
+          audio.playSwitchClunk();
+          vfx.triggerTerminalArc([4.2, 1.35, 18.4], 1.0);
+          vfx.triggerContactSnap([4.2, 1.35, 18.4]);
           ui.showNotification(before === arc1State
             ? 'Primero medí la salida para localizar la discontinuidad.'
             : 'Retorno del excitador reparado; la protección quedó rearmada.');
@@ -1099,6 +1164,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 1.5,
         action: () => {
           arc1State = energizeManantial(arc1State);
+          if (arc1State.manantial.protectiveTrip) {
+            audio.playBreakerTrip();
+            vfx.triggerTerminalArc([2.2, 1.35, 16], 1.8);
+          } else {
+            audio.playBreakerReset();
+            vfx.triggerConductorPulse([2.2, 1.35, 16], [0, 1.68, 13.0]);
+          }
           ui.showNotification(arc1State.manantial.protectiveTrip
             ? 'La protección actuó: falta caudal, continuidad o una medición previa.'
             : 'El generador entrega energía; verificá la salida con una segunda medición.');
@@ -1187,6 +1259,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         action: () => {
           audio.playBellChime();
           audio.playRelayEngage();
+          vfx.triggerContactSnap([-5.2, 0.8, 2.4]);
+          vfx.triggerDustWake([-4.8, 2.2, 0.5], 1.2);
           workbench.toggleKnifeSwitch();
           circuit.branches.b_ida_rele.state = 'closed';
           circuit = solveCircuit(circuit);
@@ -1228,6 +1302,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             circuit = solveCircuit(circuit);
             world.copperJumper.enabled = true;
             audio.playSwitchClunk();
+            vfx.triggerTerminalArc([-0.9, 0.4, 1.5], 1.0);
+            vfx.triggerContactSnap([-0.9, 0.4, 1.5]);
             bitacora.unlock('brecha_sagrada');
             bitacora.unlock('ley_retorno');
             ui.showNotification('¡Barra puente instalada! Continuidad física restablecida.');
@@ -1251,6 +1327,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             circuit = solveCircuit(circuit);
             world.corrosionMesh.enabled = false;
             audio.playWireScrape();
+            vfx.triggerDustWake([-0.9, 0.4, -4.0], 0.8);
             bitacora.unlock('moho_verde');
             bitacora.unlock('ley_retorno');
             ui.showNotification('¡Óxido retirado! Cobre limpio (0.05Ω).');
@@ -1481,6 +1558,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         const probeRes = galvanoscope.connectProbe(closestNodeId, circuit);
         const gState = galvanoscope.getState();
         audio.playProbeContact(gState.measuredVoltage);
+        vfx.triggerTerminalArc([camPos.x, camPos.y - 0.2, camPos.z], 0.6);
         ui.setGalvanoscopeHud(
           true,
           gState.measuredVoltage,
@@ -1586,6 +1664,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       if (isLighthouseRestored(arc1State)) world.arc1Greybox.lighthouseSignal.rotateLocal(0, dt * 22, 0);
     }
     manantialActivationVfx.update(dt);
+    vfx.update(dt);
 
     // 3. Prompt detection
     const camPos = world.playerEntity.getPosition();
@@ -1630,6 +1709,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       if (window.__ROXANA_VISUAL_TEST_HOOKS__ === visualHooks) delete window.__ROXANA_VISUAL_TEST_HOOKS__;
       document.documentElement.classList.remove('roxana-visual-ui-hidden');
       manantialActivationVfx.dispose();
+      vfx.dispose();
       world.app.destroy();
       canvas.remove();
     },

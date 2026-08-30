@@ -3,6 +3,9 @@ export class PlazaAudioEngine {
   private humGain: GainNode | null = null;
   private humOsc: OscillatorNode | null = null;
   private ambientGain: GainNode | null = null;
+  private waterGain: GainNode | null = null;
+  private turbineGain: GainNode | null = null;
+  private turbineOsc: OscillatorNode | null = null;
   private isMuted = false;
 
   private ensure(): AudioContext | null {
@@ -12,6 +15,7 @@ export class PlazaAudioEngine {
       }
       return this.ctx;
     }
+    if (typeof window === 'undefined') return null;
     const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!Ctor) return null;
     this.ctx = new Ctor();
@@ -39,14 +43,14 @@ export class PlazaAudioEngine {
       this.humGain.connect(this.ctx.destination);
       this.humOsc.start();
 
-      // Ambient Wind & Dusk noise
+      // Ambient Wind & Dusk noise (brown noise approximation)
       const bufferSize = this.ctx.sampleRate * 2;
       const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const output = noiseBuffer.getChannelData(0);
       let lastOut = 0.0;
       for (let i = 0; i < bufferSize; i += 1) {
         const white = Math.random() * 2 - 1;
-        output[i] = (lastOut + 0.02 * white) / 1.02; // Brown noise approximation
+        output[i] = (lastOut + 0.02 * white) / 1.02;
         lastOut = output[i]!;
       }
 
@@ -66,6 +70,34 @@ export class PlazaAudioEngine {
       noiseFilter.connect(this.ambientGain);
       this.ambientGain.connect(this.ctx.destination);
       noiseNode.start();
+
+      // Water channel / hydraulic flow node
+      const waterFilter = this.ctx.createBiquadFilter();
+      waterFilter.type = 'lowpass';
+      waterFilter.frequency.setValueAtTime(320, this.ctx.currentTime);
+
+      this.waterGain = this.ctx.createGain();
+      this.waterGain.gain.setValueAtTime(0, this.ctx.currentTime);
+
+      const waterSource = this.ctx.createBufferSource();
+      waterSource.buffer = noiseBuffer;
+      waterSource.loop = true;
+      waterSource.connect(waterFilter);
+      waterFilter.connect(this.waterGain);
+      this.waterGain.connect(this.ctx.destination);
+      waterSource.start();
+
+      // Turbine generator hum
+      this.turbineOsc = this.ctx.createOscillator();
+      this.turbineOsc.type = 'triangle';
+      this.turbineOsc.frequency.setValueAtTime(60, this.ctx.currentTime);
+
+      this.turbineGain = this.ctx.createGain();
+      this.turbineGain.gain.setValueAtTime(0, this.ctx.currentTime);
+
+      this.turbineOsc.connect(this.turbineGain);
+      this.turbineGain.connect(this.ctx.destination);
+      this.turbineOsc.start();
     } catch {
       // Ignore audio initialization errors
     }
@@ -75,6 +107,21 @@ export class PlazaAudioEngine {
     if (!this.humGain || !this.ctx) return;
     const clamped = Math.max(0, Math.min(0.08, intensity * 0.06));
     this.humGain.gain.setTargetAtTime(clamped, this.ctx.currentTime, 0.2);
+  }
+
+  public setWaterFlow(intensity: number): void {
+    if (!this.waterGain || !this.ctx) return;
+    const clamped = Math.max(0, Math.min(0.06, intensity * 0.05));
+    this.waterGain.gain.setTargetAtTime(clamped, this.ctx.currentTime, 0.3);
+  }
+
+  public setTurbineHum(rpmRatio: number): void {
+    if (!this.turbineGain || !this.turbineOsc || !this.ctx) return;
+    const clampedRatio = Math.max(0, Math.min(1.0, rpmRatio));
+    const targetFreq = 40 + clampedRatio * 180;
+    const targetGain = clampedRatio > 0.05 ? Math.min(0.045, clampedRatio * 0.04) : 0;
+    this.turbineOsc.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.15);
+    this.turbineGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.2);
   }
 
   public playTone(freq: number, dur: number, type: OscillatorType = 'sine', gain = 0.08, start = 0): void {
@@ -101,6 +148,14 @@ export class PlazaAudioEngine {
     this.playTone(65, 0.16, 'triangle', 0.09, 0.02);
   }
 
+  public playHeavyBreakerClunk(): void {
+    const ctx = this.ensure();
+    if (!ctx || this.isMuted) return;
+    this.playTone(95, 0.12, 'square', 0.08);
+    this.playTone(48, 0.22, 'triangle', 0.12, 0.02);
+    this.playTone(320, 0.04, 'sawtooth', 0.04, 0.01);
+  }
+
   public playRelayEngage(): void {
     const ctx = this.ensure();
     if (!ctx || this.isMuted) return;
@@ -109,11 +164,39 @@ export class PlazaAudioEngine {
     this.playTone(840, 0.08, 'sine', 0.03, 0.05);
   }
 
+  public playBreakerTrip(): void {
+    const ctx = this.ensure();
+    if (!ctx || this.isMuted) return;
+    this.playTone(280, 0.06, 'sawtooth', 0.08);
+    this.playTone(85, 0.25, 'triangle', 0.14, 0.02);
+    this.playTone(550, 0.08, 'square', 0.05, 0.04);
+  }
+
+  public playBreakerReset(): void {
+    const ctx = this.ensure();
+    if (!ctx || this.isMuted) return;
+    this.playTone(140, 0.09, 'square', 0.06);
+    this.playTone(280, 0.14, 'triangle', 0.08, 0.03);
+  }
+
+  public playBranchSwitch(): void {
+    const ctx = this.ensure();
+    if (!ctx || this.isMuted) return;
+    this.playTone(210, 0.07, 'square', 0.05);
+    this.playTone(110, 0.12, 'triangle', 0.07, 0.02);
+  }
+
+  public playGalvanometerClick(): void {
+    const ctx = this.ensure();
+    if (!ctx || this.isMuted) return;
+    this.playTone(680, 0.03, 'sine', 0.04);
+    this.playTone(1360, 0.02, 'triangle', 0.02, 0.015);
+  }
+
   public playBellChime(): void {
     const ctx = this.ensure();
     if (!ctx || this.isMuted) return;
-    // Harmonics for a bronze church bell
-    const baseFreq = 440; // A4
+    const baseFreq = 440;
     const partials = [1, 2.02, 2.76, 3.48, 5.2];
     const gains = [0.12, 0.07, 0.05, 0.03, 0.02];
     const durations = [1.8, 1.4, 1.1, 0.9, 0.6];
@@ -142,10 +225,34 @@ export class PlazaAudioEngine {
   public playDiscoveryChime(): void {
     const ctx = this.ensure();
     if (!ctx || this.isMuted) return;
-    // Outer Wilds inspired 3-note ascending motif
-    const notes = [329.63, 440.0, 659.25, 880.0]; // E4, A4, E5, A5
+    const notes = [329.63, 440.0, 659.25, 880.0];
     notes.forEach((freq, i) => {
       this.playTone(freq, 0.6 + i * 0.2, 'sine', 0.07, i * 0.12);
+    });
+  }
+
+  public playForgeRoar(intensity: number): void {
+    const ctx = this.ensure();
+    if (!ctx || this.isMuted) return;
+    const count = Math.max(1, Math.min(4, Math.floor(intensity)));
+    for (let i = 0; i < count; i += 1) {
+      this.playTone(75 + i * 22, 0.45, 'triangle', 0.03 + intensity * 0.01, i * 0.08);
+    }
+  }
+
+  public playPumpRhythm(): void {
+    const ctx = this.ensure();
+    if (!ctx || this.isMuted) return;
+    this.playTone(110, 0.14, 'square', 0.04);
+    this.playTone(55, 0.24, 'triangle', 0.07, 0.04);
+  }
+
+  public playBeaconSync(): void {
+    const ctx = this.ensure();
+    if (!ctx || this.isMuted) return;
+    const notes = [587.33, 739.99, 880.0, 1174.66];
+    notes.forEach((freq, i) => {
+      this.playTone(freq, 0.45 + i * 0.15, 'sine', 0.06, i * 0.09);
     });
   }
 

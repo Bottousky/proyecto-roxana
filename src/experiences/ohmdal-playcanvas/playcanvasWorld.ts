@@ -55,6 +55,7 @@ export interface PlayCanvasWorldElements {
   gateLightLeft: pc.Entity;
   gateLightRight: pc.Entity;
   probeTargets: Record<string, pc.Vec3>;
+  vfxRoot: pc.Entity;
   colliders: NavigationSolid[];
   navigation: OhmdalNavigationRegistry;
 }
@@ -78,6 +79,8 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   const navigation = new OhmdalNavigationRegistry();
   const colliders: NavigationSolid[] = [];
   const probeTargets: Record<string, pc.Vec3> = {};
+  const vfxRoot = new pc.Entity('OhmdalVfxRoot');
+  app.root.addChild(vfxRoot);
   let generatedColliderId = 0;
 
   const addCollider = (
@@ -1211,6 +1214,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     gateLightLeft,
     gateLightRight,
     probeTargets,
+    vfxRoot,
     colliders,
     navigation,
   };
