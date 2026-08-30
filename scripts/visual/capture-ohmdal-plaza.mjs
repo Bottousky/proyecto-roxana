@@ -24,7 +24,7 @@ const stage = valueOf('--stage', 'a0-baseline-capture-readiness');
 const defaultOutDir = mode === 'fast'
   ? (stage === 'a0-baseline-capture-readiness'
       ? 'output/playwright/ohmdal-plaza/stage-1/current'
-      : `output/playwright/ohmdal-arco1-authored/${stage === 'a2-plaza-workshop-authored' ? 'a2-fast-iteration1' : stage === 'a3-manantial-central-authored' ? 'a3-fast-iteration1' : stage === 'a4-castle-authored' ? 'a4-fast-iteration1' : stage === 'a5-forge-terraces-authored' ? 'a5-fast-iteration1' : stage === 'a6-lighthouse-lake-return-authored' ? 'a6-fast-iteration1' : stage === 'a7-vfx-audio-ambient' ? 'a7-fast-iteration1' : `${stage}-fast-iteration1`}`)
+      : `output/playwright/ohmdal-arco1-authored/${stage === 'a2-plaza-workshop-authored' ? 'a2-fast-iteration1' : stage === 'a3-manantial-central-authored' ? 'a3-fast-iteration1' : stage === 'a4-castle-authored' ? 'a4-fast-iteration1' : stage === 'a5-forge-terraces-authored' ? 'a5-fast-iteration1' : stage === 'a6-lighthouse-lake-return-authored' ? 'a6-fast-iteration1' : stage === 'a7-vfx-audio-ambient' ? 'a7-fast-iteration1' : stage === 'a8-full-authored-golden-path' ? 'a8-fast-iteration1' : `${stage}-fast-iteration1`}`)
   : 'output/playwright/ohmdal-plaza/stage-1/current';
 const outDir = path.resolve(valueOf('--out', defaultOutDir));
 const headless = !process.argv.includes('--headed');

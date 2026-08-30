@@ -3,7 +3,7 @@
   "assetId": "rx_ambient_vfx_audio_hero_01",
   "world": "ohmdal",
   "name": "Dirección y capas de VFX, audio y ambiente para Ohmdal Arco I",
-  "mode": "authored",
+  "mode": "design-approved",
   "status": "approved",
   "primaryReference": "docs/20-worlds/ohmdal/production/OHMDAL_VFX_AUDIO_PLAN.md",
   "supportingReferences": [
