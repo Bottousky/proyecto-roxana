@@ -1,47 +1,55 @@
 CANDIDATE_MODE: implementation
-BASE_SHA: 42e31b4a748d1d42aa84c3c238ff94d20b627101
-IMPLEMENTATION_SHA: dfd0bad913e228285c2daa06aedfd3cccdf2e324
+BASE_SHA: 65cbfa7352843d4ecc4cf2459c59c6f603eac862
+IMPLEMENTATION_SHA: 558a51af9b6e9c4267542459055407d52e313311
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 
-# Evidence Report — Ohmdal A5 Forja y Terrazas Authored Pass (Candidate)
+# Evidence Report — Ohmdal A6 Faro, Lago y Retorno Authored Pass (Candidate)
 
 **Worker:** Gemini 3.7 Flash High / Antigravity CLI (Primary Authored Builder)  
 **Task:** `agent-work/tasks/workers/ohmdal-authored-primary-gemini.md`  
 **Loop:** `agent-work/loops/ohmdal-arco1-authored-pass/state.json`  
-**Stage:** `a5-forge-terraces-authored` (iteration 1/3)  
-**Date:** 2026-08-30T05:56:00-03:00  
+**Stage:** `a6-lighthouse-lake-return-authored` (iteration 1/3)  
+**Date:** 2026-08-30T06:56:00-03:00  
 
 ---
 
 ## 1. Candidate Scope & Machine-Readable Identity
 
 - **Candidate Mode:** `implementation`
-- **Base SHA:** `42e31b4a748d1d42aa84c3c238ff94d20b627101` (latest `origin/explore/ohmdal-3D`)
-- **Implementation SHA:** `dfd0bad913e228285c2daa06aedfd3cccdf2e324`
+- **Base SHA:** `65cbfa7352843d4ecc4cf2459c59c6f603eac862` (latest `origin/explore/ohmdal-3D`)
+- **Implementation SHA:** `558a51af9b6e9c4267542459055407d52e313311`
 - **Evidence Status:** `PASS`
 - **Self-Acceptance:** `false`
 - **Branch:** `worker/gemini-authored`
 
 ### Authored Architecture & Systems Implemented
-1. **Industrial Forge Silhouette & Amenities:**
-   - Authored hearth hood, heavy chimney flue, heat shielding wings/backboard.
-   - Metalworking equipment: stone/brass anvil with copper horn, quench tub with water plane, ingot pad with copper/brass stock bars, tool rack.
-2. **High-Current Bus & Insulation:**
-   - Overhead heavy copper busway (`ForgeRaisedBusMain`, `ForgeRaisedBusBranch`).
-   - 6 ceramic standoff insulators (`ForgeBusInsulator1..6`) along the industrial corridor.
-   - Heavy fuse housing with dual ceramic cartridges (`ForgeFuseHousing`, `ForgeFuseCartridge1..2`).
-3. **Stepped Agricultural Terraces & Irrigation:**
-   - Retaining masonry and riser curbs across 3 vertical elevation steps (Z = 15, 21, 27).
-   - Feeder aqueduct and 6 active water basins (`TerracesWaterBasin1..3` West/East).
-   - Pump station structural gantry, motor enclosure, intake flange, and pump wheel.
-   - Scenic perimeter railings and vista overlook columns/header framing the horizon.
-4. **Physical Simulation & State Coupling:**
-   - Real-time thermal load vs irrigation trade-off evaluation via `evaluateForgeTerraces`.
-   - Dynamic trip indicator pin and active water flow reflection based on electrical allocation.
-   - Static art batched under `OhmdalForgeTerracesStaticArt` preserving performance budgets and zero shared-material bugs.
-5. **Hero Reference Pack:**
-   - Recorded `assets/references/hero-packs/forge/hero-reference.json` anchored to repo-native references.
+1. **Lighthouse Beacon Architecture & Optical Housing:**
+   - Authored stepped masonry plinth and dark stone base (`LighthouseTowerPlinth`, `LighthouseTowerStep`).
+   - Brass lantern balcony with perimeter railing (`LighthouseLanternDeck`, `LighthouseLanternRail`).
+   - Dark stone/steel Fresnel casing struts around the lantern (`LighthouseFresnelCasing`).
+   - Copper cupola roof cap and lightning/signal finial (`LighthouseCupolaRoof`, `LighthouseSignalFinial`).
+   - State-coupled beacon lamp, focal point light, and signal director bar.
+2. **DC Calibration Station & Precision Observation Station (Nereo):**
+   - Stone console foundation plinth under the calibration panel (`LighthouseConsolePlinth`).
+   - Dedicated instrument bench and brass galvanometer housing (`LighthouseInstrumentStand`, `LighthouseGalvanoHousing`, `LighthouseGalvanoFace`).
+   - Dual copper terminal lugs for DC calibration test probe attachment (`LighthouseTerminalLug1..2`).
+   - Lakeside observation stanchion and framing rail (`LighthouseObservationStanchion`).
+3. **Lake Quayside, Dock Pier & Shore Water Basin:**
+   - Stone retaining quay along the eastern shore (`LighthouseQuayWall`, `LighthouseQuayCurb`).
+   - Extended stone dock pier with shore access steps (`LighthouseDockPier`, `LighthouseShoreSteps`).
+   - Brass mooring bollards (`LighthouseMooringBollard1..2`).
+   - Expansive calm lake water plane with realistic shore depth (`LighthouseLakeWaterExpanse`).
+4. **Overhead Transmission Bus & Standoff Insulators:**
+   - Elevated heavy copper transmission busway (`LighthouseRaisedBusMain`, `LighthouseRaisedBusFeed`).
+   - 5 ceramic standoff insulators (`LighthouseBusInsulator1..5`) along the causeway approach.
+5. **Plaza Backtrack Nexus & Return Portal:**
+   - Stepped return plinth, framing pillars, lintel header, and inscribed brass nexus plate (`LighthouseReturnPlinth`, `LighthouseReturnPostWest/East`, `LighthouseReturnHeader`, `LighthouseReturnInscribedPlate`).
+   - State-driven backtrack flow cleanly integrating return to Plaza without fake finale UI.
+6. **Hero Reference Pack:**
+   - Recorded `assets/references/hero-packs/lighthouse/hero-reference.json` anchored to repo-native references (`prop_lighthouse_lens_off.png`, etc.).
+7. **Performance & Static Batching:**
+   - Static art batched cleanly under `OhmdalLighthouseStaticArt` (batch group 47) maintaining low draw calls (22-25) and light triangle budget (~5.7k-6k). Zero shared-material bugs.
 
 ---
 
@@ -50,23 +58,26 @@ SELF_ACCEPTANCE: false
 ### Bounded Loop State Validation
 ```text
 > npm run loop:ohmdal-arco1-authored:validate
-BOUNDED_LOOP_STATE PASS: ohmdal-arco1-authored-pass stage=a5-forge-terraces-authored iteration=1/3
+BOUNDED_LOOP_STATE PASS: ohmdal-arco1-authored-pass stage=a6-lighthouse-lake-return-authored iteration=1/3
 reviewer=gemini-3.7-flash-high decision=chatgpt-web/Sol
 builder=gemini-3.7-flash-high/workspace-write selfApproval=false
+worker=Luna/max
+experimental=MiniMaxAI/MiniMax-M3/isolated-worktree-write
 ```
 
 ### TypeScript & Production Build
 ```text
 > npm run build
-✓ built in 21.77s (0 type errors, clean compilation)
+✓ built in 21.49s (0 type errors, clean compilation)
 ```
 
 ### Unit & Domain Test Suites
 ```text
 > npm test
 - All suites passed (R5, R6, R7, R8, RA0, RG0, RG1, RG2, RR0, RT0, T0-T5, W1-W14)
-- tests/ohmdal-visual-harness.test.ts: PASS
-- tests/ohmdal-forge-terraces-authored.test.ts: PASS
+- tests/ohmdal-visual-harness.test.ts: PASS (11/11 tests)
+- tests/ohmdal-forge-terraces-authored.test.ts: PASS (8/8 tests)
+- tests/ohmdal-lighthouse-lake-return-authored.test.ts: PASS (8/8 tests)
 Total: 100% tests passed (0 failures)
 ```
 
@@ -105,36 +116,37 @@ Run artifact: output/playwright/ohmdal-hardening/golden-path/golden-path-run.jso
 
 ## 3. Visual FAST Capture Diagnostics
 
-- **Manifest Path:** `output/playwright/ohmdal-arco1-authored/a5-fast-iteration1/capture-manifest.json`
-- **Stage:** `a5-forge-terraces-authored`
+- **Manifest Path:** `output/playwright/ohmdal-arco1-authored/a6-fast-iteration1/capture-manifest.json`
+- **Stage:** `a6-lighthouse-lake-return-authored`
 - **Mode:** `fast-local-gpu`
 - **Hardware Acceleration:** Active (D3D11 / Direct3D11)
 - **GPU Renderer:** `ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 Ti (0x00002191) Direct3D11 vs_5_0 ps_5_0, D3D11)`
 - **Software Rendered:** `false`
-- **Performance:** 59.88 FPS (P50), 16.9ms – 17.1ms frame time (P95)
+- **Performance:** 59.88 FPS (P50), 17.0ms frame time (P95)
 - **Console / Page Errors:** 0 errors
 
 ### Captured Shots
-1. `forge-core.png`: Three-quarter oblique view framing heavy industrial hearth, furnace hood, conductors, and protection. (26 draw calls, 5,068 triangles)
-2. `terraces-irrigation.png`: Elevated overlook across stepped stone terraces, pump station, and active water distribution. (29 draw calls, 5,180 triangles)
-3. `forge-terraces-overview.png`: High wide overview showing the physical trade-off between industrial thermal demand and irrigation demand. (46 draw calls, 6,704 triangles)
+1. `lighthouse-approach.png`: First approach looking north along the causeway toward calibration bench and beacon tower. (24 draw calls, 5,712 triangles)
+2. `lighthouse-lake-wide.png`: Elevated three-quarter view framing calibration bench, lighthouse beacon tower, dock pier and lake expanse. (25 draw calls, 5,788 triangles)
+3. `final-return-plaza.png`: Backtrack view looking south across the restored Plaza toward Ohm and Taller with active lighting and bell. (24 draw calls, 5,966 triangles)
+4. `arc1-final-pedestal.png`: Close view of the Ohm landmark / central pedestal in completed network state. (22 draw calls, 5,348 triangles)
 
 ---
 
 ## 4. Architectural & Pedagogical Invariants
 
-1. **Industrial Load & Thermal Identity:** The Forge embodies concentrated power, heat, and conductor limits rather than fantasy/lava clichés.
-2. **Social & Service Consequence:** Stepped agricultural terraces visibly show the service cost and distribution impact of allocating electrical power.
-3. **Simulation-Driven State:** Heating coils, protection trip pin, and irrigation water levels respond directly to underlying electrical allocation and network state.
-4. **Performance & Batching Budget:** Static authored geometry is batched under `OhmdalForgeTerracesStaticArt` with low draw calls (~26-46) and small triangle footprint (~5k-6.7k tris).
+1. **Remote Culmination & DC Calibration Truth:** The Lighthouse embodies precise measurement, DC calibration, and quiet culmination without introducing non-ratified RC/transient mechanics.
+2. **Backtracking Integrity:** Full return to Plaza traverses previously energized systems in their working state (water, bell, machinery, lighting).
+3. **Simulation-Driven State:** Beacon lamp, focal illumination, and signal bar respond strictly to `evaluateLighthouse` and real circuit completion.
+4. **Performance & Batching Budget:** Static authored geometry is batched under `OhmdalLighthouseStaticArt` with low draw calls (~22-25) and light triangle footprint (~5.3k-6k tris).
 5. **No Scope Creep:** Zero edits to `src/experiences/ohmdal-playcanvas/experimental-vfx/**`.
 
 ---
 
 ## 5. Remaining Debt & Routing
 
-- **Stage A6 (Lighthouse / Lake / Return Authored Pass):** Queued next in loop queue; awaits external review and Mavis dispatch.
-- **Stage A7 (VFX / Audio Polish):** Reserved for technical art / audio integration.
+- **Stage A7 (VFX / Audio Polish):** Queued next in loop queue; reserved for technical art / audio integration.
+- **Stage A8 (Full Freeze & Canonical Capture):** Final full authored Golden Path freeze.
 
 ---
 
