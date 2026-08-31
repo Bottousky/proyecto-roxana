@@ -3,7 +3,7 @@
   "loopId": "ohmdal-arco1-player-facing",
   "branch": "fix/ohmdal-arco1-player-facing-bseries",
   "status": "ready",
-  "currentStage": "b0-first-minutes-audit",
+  "currentStage": "b1-portal-edda-dialogue-hud",
   "iteration": 0,
   "maxIterationsPerStage": 3,
   "maxFixesPerIteration": 5,
@@ -83,8 +83,8 @@
     "designContract": "docs/20-worlds/ohmdal/production/ARCO1_PLAYER_FACING_CORRECTION_PASS.md"
   },
   "queue": [
-    { "id": "b0-first-minutes-audit", "status": "ready" },
-    { "id": "b1-portal-edda-dialogue-hud", "status": "queued" },
+    { "id": "b0-first-minutes-audit", "status": "passed" },
+    { "id": "b1-portal-edda-dialogue-hud", "status": "ready" },
     { "id": "b2-ohm-continuity-puzzle", "status": "queued" },
     { "id": "b3-dialogue-pedagogy-rewrite", "status": "queued" },
     { "id": "b4-orientation-pointer-lock", "status": "queued" },
