@@ -45,7 +45,7 @@ assert(plaza.background === 'room-plaza', 'Plaza declara el set pintado 1920×10
 assert(areaDimensions('plaza').width === 1920, 'Plaza sigue midiendo 1920 de ancho');
 assert(areaDimensions('plaza').height === 1080, 'Plaza sigue midiendo 1080 de alto');
 assert(
-  backgrounds.includes("plaza-1920-base-v2.png") && backgrounds.includes("'room-plaza': plazaUrl"),
+  backgrounds.includes('plaza-1920-base-v4.png') && backgrounds.includes("'room-plaza': plazaUrl"),
   'room-plaza apunta al set pintado 1920×1080',
 );
 assert(

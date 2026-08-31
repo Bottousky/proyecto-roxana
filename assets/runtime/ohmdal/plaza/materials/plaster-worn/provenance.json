@@ -1,0 +1,44 @@
+{
+  "id": "roxana-ohmdal-plaster-worn-v1",
+  "provider": "Poly Haven",
+  "sourceAsset": "medieval_wall_01",
+  "sourceUrl": "https://polyhaven.com/a/medieval_wall_01",
+  "license": "CC0-1.0",
+  "sourceResolution": "2k",
+  "runtimeResolution": "1k",
+  "processing": "Pillow LANCZOS; JPEG quality 84 or optimized PNG; no displacement",
+  "outputs": [
+    {
+      "map": "diff",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaster-worn/diffuse-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 219967,
+      "sha256": "1c03d3c06eb858984ce254f80510c2a9ad5c6406f835ce7e39e99b2ed415636b"
+    },
+    {
+      "map": "nor_gl",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaster-worn/normal-1k.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 1912612,
+      "sha256": "49bad93ed8275f725bc575041ba0a2528399dc86875656df0d2b9fea136883b4"
+    },
+    {
+      "map": "rough",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaster-worn/roughness-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 96644,
+      "sha256": "6058ae7ef6c6ec7b9e977eb920241ed53b2e0d8670bb3280f7ea30cd1a9e7ee9"
+    },
+    {
+      "map": "ao",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaster-worn/ao-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 203141,
+      "sha256": "28dc31c35222daf345f432fb76285a81c09511277af1850b8ff69912789c4ba6"
+    }
+  ]
+}

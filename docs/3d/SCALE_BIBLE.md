@@ -2,9 +2,9 @@
 
 ## Convención
 
-- Unidades Three.js y Blender de exportación: metros.
-- Eje vertical: `+Y`.
-- Frente preferido: `+Z`; cualquier excepción se declara en el manifiesto.
+- Unidades de Blender y de los runtimes 3D de Roxana: **metros**. PlayCanvas/Three.js deben recibir assets calibrados bajo la misma convención.
+- Eje vertical: `+Y` en runtime; cualquier conversión de ejes del DCC se resuelve una vez en export/calibración.
+- Frente preferido del asset: `+Z`; cualquier excepción se declara en el manifiesto.
 - Origen de personajes y props apoyados: suelo, centro del footprint.
 - Persona adulta de referencia: 1,72 m.
 - No aplicar escalas correctivas distintas por escena: corregir el master o declarar la excepción.
@@ -35,5 +35,7 @@
 - identificador del asset;
 - cámara y coordenadas;
 - FPS, draw calls, triángulos, geometrías y texturas.
+
+Para PlayCanvas, usar `inspect-glb` y `calibrate-model` cuando el asset lo requiera; la escala correctiva no debe repetirse a mano en cada instancia.
 
 Estas medidas son guía artística/arquitectónica. La aprobación se hace en cámara real.

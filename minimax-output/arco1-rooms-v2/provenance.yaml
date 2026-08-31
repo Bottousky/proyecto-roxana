@@ -1,0 +1,31 @@
+schema: 1
+world: ohmdal
+slice: arco1-rooms-v2
+model: image-01
+date: 2026-08-21
+notes: >
+  Lore-only regeneration. Previous room paintings were not used as image
+  references. Overlay sprites (hearth on, lens on, dock, boat) kept.
+assets:
+  - { id: plaza-1920-base-v4, room: plaza, seed: 2101, size: 1920x1080 }
+  - { id: plaza-castillo-abierto-v4, room: plaza, seed: 2121, size: 1920x1080 }
+  - { id: taller_base-v4, room: taller, seed: 2102 }
+  - { id: puerta_base-v4, room: puerta, seed: 2103 }
+  - { id: puerta_open-v4, room: puerta, seed: 2122 }
+  - { id: manantial_ohm_base-v4, room: manantial_ohm, seed: 2104 }
+  - { id: castle_gate_base-v4, room: castle_gate, seed: 2105 }
+  - { id: castle_gallery_base-v4, room: castle_gallery, seed: 2106 }
+  - { id: castle_branches_base-v4, room: castle_branches, seed: 2107 }
+  - { id: castle_heart_base-v4, room: castle_heart, seed: 2108 }
+  - { id: forge_yard_base-v4, room: forge_yard, seed: 2109 }
+  - { id: forge_infirmary_base-v4, room: forge_infirmary, seed: 2110 }
+  - { id: forge_longchannel_base-v4, room: forge_longchannel, seed: 2111 }
+  - { id: forge_hall_base-v4, room: forge_hall, seed: 2112 }
+  - { id: terraces_top_base-v4, room: terraces_top, seed: 2113 }
+  - { id: terraces_mid_base-v4, room: terraces_mid, seed: 2114 }
+  - { id: terraces_mural_base-v4, room: terraces_mural, seed: 2115 }
+  - { id: terraces_aqueduct_base-v4, room: terraces_aqueduct, seed: 2116 }
+  - { id: lighthouse_hall_base-v4, room: lighthouse_hall, seed: 2117 }
+  - { id: lighthouse_bench_base-v4, room: lighthouse_bench, seed: 2118 }
+  - { id: clock_tower_base-v4, room: clock_tower, seed: 4119 }
+  - { id: lighthouse_lantern_base-v4, room: lighthouse_lantern, seed: 2120 }

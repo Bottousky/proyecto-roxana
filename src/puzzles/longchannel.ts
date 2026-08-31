@@ -343,6 +343,7 @@ export function abrirLongChannel(opts: AbrirLongChannelOptions): void {
       );
       render();
     },
+    { worldCloseup: true },
   );
 }
 

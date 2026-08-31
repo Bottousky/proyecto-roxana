@@ -326,7 +326,7 @@ accesible, no obligatoria. Contiene:
   diseña. La gramática de puzzles vive en cada mundo.
 - No es el guion textual de la Bitácora. El copy de cada
   entrada queda en la biblia narrativa de su mundo y se
-  respeta verbatim (regla dura de `CLAUDE.md`).
+  respeta verbatim (regla dura de `AGENTS.md`).
 - No es canon: es `PROPOSED` hasta ratificación por Manuel.
 - No redefine los pilares. Si una sección entra en tensión
   con un pilar, el conflicto se eleva a ADR (Pillars §2).

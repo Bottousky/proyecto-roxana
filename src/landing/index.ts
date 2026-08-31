@@ -257,6 +257,8 @@ class Landing {
 
 // Init on load
 document.addEventListener('DOMContentLoaded', async () => {
+  const { initAulas } = await import('./aulas.ts');
+  initAulas();
   const { initSchool3D } = await import('./school3d.ts');
   void initSchool3D();
 });

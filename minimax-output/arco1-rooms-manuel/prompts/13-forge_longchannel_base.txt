@@ -1,0 +1,15 @@
+# Canal Largo (mapa muy ancho)
+# Guardar como: forge_longchannel_base.png
+# Lienzo nativo (1px = 1px de juego): 2400x540
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 2400x540 — VERY WIDE thin map, one screen tall, 2.5 screens wide. This is a RUN, not a room. Do not compose 16:9.
+
+WEST door from infirmary. EAST door to the hall. Distant unlit furnace silhouette at the far east.
+NORTH wall: LONG cold copper-and-stone heat channel, empty of fire, running almost the full 2400px.
+Narrow walkable band in the lower-middle. Soot, dust, oxidized copper. Embers OFF. Horizontal industry. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (1015 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 2400x540 very wide Canal Largo, one screen tall. West door infirmary, east door hall. Long cold copper-stone heat channel along the entire north wall. Distant unlit furnace at far east. Narrow walkable band lower-middle. Embers OFF. Not a square room. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

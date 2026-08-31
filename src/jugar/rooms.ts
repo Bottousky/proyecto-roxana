@@ -5,7 +5,6 @@ import {
   openBitacora,
   wasBitacoraEntryOpened,
 } from '../ui/bitacora';
-import { abrirDespertar } from '../puzzles/despertar';
 import { abrirFreno } from '../puzzles/freno';
 import { abrirPuerta } from '../puzzles/puerta';
 import { abrirBell } from '../puzzles/bell';
@@ -23,6 +22,16 @@ import { abrirLadder } from '../puzzles/ladder';
 import { abrirLakeFeedDc } from '../puzzles/lakeFeedDc';
 import { abrirClockDriveDc } from '../puzzles/clockDriveDc';
 import { abrirLighthouseDistributionDc } from '../puzzles/lighthouseDistributionDc';
+import {
+  ensureDistributorField,
+  ensureForgeField,
+  ensureFrenoField,
+  ensureLighthouseField,
+  ensureOhmField,
+  ensurePuertaField,
+  fieldColor,
+  pokeField,
+} from './field/index.ts';
 import { showEnd } from '../ui/end';
 import { showArcPanorama } from '../ui/arcPanorama';
 import { confirmExitOhmdal } from '../ui/confirmExitOhmdal';
@@ -85,8 +94,9 @@ export interface RoomDef {
   name: string;
   floor: () => number;
   wall: () => number;
-  /** sala cerrada con fondo pintado: clave de textura que llena el chunk 960×540.
-   *  Desactiva el pase procedural y el mundo continuo; las puertas son transición. */
+  /** sala cerrada con fondo pintado: clave de textura que cubre el rect
+   *  LOCAL de la room (`width`×`height`, no el viewport 960×540).
+   *  Desactiva el pase procedural; las puertas son transición de grafo. */
   background?: string;
   /** colisión manual (muros/props horneados) para salas con `background` */
   collision?: { x: number; y: number; w: number; h: number }[];
@@ -100,9 +110,12 @@ const f = () => state.flags;
 /* ---------- secuencias reutilizadas ---------- */
 
 function despertarOhm(): void {
-  abrirDespertar(() => {
-    setFlag('ohmAwake');
-    announceCinematic('awakening');
+  if (f().ohmAwake) {
+    hooks.refresh();
+    return;
+  }
+  setFlag('ohmAwake');
+  announceCinematic('awakening');
     syncOhmCompanionButton();
     // WOW del arco: flash + chispas + cámara + música. Solo si la escena
     // topdown está viva. Si no, saltamos al dialog para no bloquear nada.
@@ -132,7 +145,16 @@ function despertarOhm(): void {
     } else {
       speak();
     }
-  });
+}
+
+function iniciarDespertarOhm(): void {
+  ensureOhmField(despertarOhm);
+  say(L('', 'El pedestal espera un camino que atraviese a Ohm. Une las bocas. Tocar no basta.'));
+}
+
+function pokeOhm(thingId: string): void {
+  ensureOhmField(despertarOhm);
+  pokeField(thingId);
 }
 
 function requireThing(roomId: string, thingId: string): ThingDef {
@@ -146,44 +168,61 @@ interface PhaserSceneLike {
   cameras: { main: { centerOn(x: number, y: number): void } };
 }
 
+function completarFreno(): void {
+  if (f().frenoDone) {
+    hooks.refresh();
+    return;
+  }
+  setFlag('frenoDone');
+  say(
+    [
+      L('Maese Lumen', '«La piedra justa»… Donde otros ven magia, busca camino. Eso decían los Maestros. Nunca supe qué significaba.', 'lumen-philosophy'),
+      L('Maese Lumen', 'Si entiendes a las piedras… quizás puedas con la Puerta de Ohm. Al norte de la plaza. Nadie la abre desde la época de los Maestros.'),
+      L('Edda', 'Voy con ustedes. Si explota, quiero verlo de cerca.'),
+      L('Maese Lumen', 'Adelántense. Yo junto los fusibles de repuesto. …Mejor llevo seis.'),
+    ],
+    () => {
+      notifyNewEntry('La Piedra de Freno');
+      hooks.refresh();
+    },
+  );
+}
+
 function resolverFreno(): void {
-  abrirFreno(() => {
-    setFlag('frenoDone');
-    say(
-      [
-        L('Maese Lumen', '«La piedra justa»… Donde otros ven magia, busca camino. Eso decían los Maestros. Nunca supe qué significaba.', 'lumen-philosophy'),
-        L('Maese Lumen', 'Si entiendes a las piedras… quizás puedas con la Puerta de Ohm. Al norte de la plaza. Nadie la abre desde la época de los Maestros.'),
-        L('Edda', 'Voy con ustedes. Si explota, quiero verlo de cerca.'),
-        L('Maese Lumen', 'Adelántense. Yo junto los fusibles de repuesto. …Mejor llevo seis.'),
-      ],
-      () => {
-        notifyNewEntry('La Piedra de Freno');
-        hooks.refresh();
-      },
-    );
-  });
+  ensureFrenoField(completarFreno);
+}
+
+function pokeFreno(thingId: string): void {
+  ensureFrenoField(completarFreno);
+  pokeField(thingId);
 }
 
 function resolverPuerta(): void {
-  abrirPuerta(() => {
-    setFlag('puertaDone');
-    announceCinematic('puerta-apertura');
-    // La sala debe contar el resultado antes que los personajes: al aparecer
-    // el diálogo de victoria, las hojas ya están visualmente abiertas.
-    hooks.refresh();
-    say(
-      [
-        L('', 'Las hojas se apartan. Del otro lado no hay una sala: una calzada de cobre sube hacia el manantial y el río de chispa corre por ella hasta la plaza.'),
-        L('Maese Lumen', 'Se abrió… La Puerta regulaba el caudal del pueblo: ni hambrienta ni ahogada. Empuje y freno, medidos el uno contra el otro.', 'lumen-door-opens'),
-        L('Edda', 'Empuje sobre freno. Es… ¿es una CUENTA? ¿Todo este tiempo era una cuenta?', 'edda-realization'),
-        L('', 'Las lámparas despiertan una tras otra a tus espaldas. La Bitácora arde tibia en tu bolsillo, escribiéndose a fuego.'),
-      ],
-      () => {
-        notifyNewEntry('La Ley de Ohm');
-        openBitacora('ley-de-ohm');
-      },
-    );
-  });
+  if (f().puertaDone) return;
+  setFlag('puertaDone');
+  announceCinematic('puerta-apertura');
+  hooks.refresh();
+  say(
+    [
+      L('', 'Las hojas se apartan. Del otro lado no hay una sala: una calzada de cobre sube hacia el manantial y el río de chispa corre por ella hasta la plaza.'),
+      L('Maese Lumen', 'Se abrió… La Puerta regulaba el caudal del pueblo: ni hambrienta ni ahogada. Empuje y freno, medidos el uno contra el otro.', 'lumen-door-opens'),
+      L('Edda', 'Empuje sobre freno. Es… ¿es una CUENTA? ¿Todo este tiempo era una cuenta?', 'edda-realization'),
+      L('', 'Las lámparas despiertan una tras otra a tus espaldas. La Bitácora arde tibia en tu bolsillo, escribiéndose a fuego.'),
+    ],
+    () => {
+      notifyNewEntry('La Ley de Ohm');
+      openBitacora('ley-de-ohm');
+    },
+  );
+}
+
+function iniciarPuerta(): void {
+  ensurePuertaField(resolverPuerta);
+}
+
+function pokePuerta(thingId: string): void {
+  ensurePuertaField(resolverPuerta);
+  pokeField(thingId);
 }
 
 function tocarCampana(): void {
@@ -321,13 +360,28 @@ function abrirBancoClockDriveDc(): void {
 }
 
 /** Arc I DC layers 2–3: condition-based final, with multiple valid distributions. */
-function abrirBancoLighthouseDistributionDc(): void {
-  abrirLighthouseDistributionDc(() => {
-    setFlag('solvedLighthouseDistributionDc');
-    setFlag('lighthouseRestored');
-    openBitacora('cierre-dc-del-faro');
+function completarLighthouseDc(): void {
+  if (f().solvedLighthouseDistributionDc) {
     hooks.refresh();
-  });
+    return;
+  }
+  setFlag('solvedLighthouseDistributionDc');
+  setFlag('lighthouseRestored');
+  openBitacora('cierre-dc-del-faro');
+  hooks.refresh();
+}
+
+function abrirBancoLighthouseDistributionDc(): void {
+  if (f().solvedLighthouseDistributionDc) {
+    abrirLighthouseDistributionDc(() => {});
+    return;
+  }
+  ensureLighthouseField(completarLighthouseDc);
+}
+
+function pokeLighthouse(thingId: string): void {
+  ensureLighthouseField(completarLighthouseDc);
+  pokeField(thingId);
 }
 
 function hablarFareroLinterna(): void {
@@ -502,19 +556,35 @@ function presentarCorazonCastillo(): void {
   ]);
 }
 
+function completarDistributor(): void {
+  if (f().solvedDistributor) {
+    hooks.refresh();
+    return;
+  }
+  setFlag('solvedDistributor');
+  setFlag('castleRestored');
+  setFlag('learnedSeriesParallel');
+  notifyNewEntry('La Regla del Cruce');
+  openBitacora('regla-del-cruce');
+  hooks.refresh();
+}
+
 function abrirBancoDistributor(): void {
-  abrirDistributor({
-    practica: f().solvedDistributor,
-    onBurnedFuse: () => setFlag('burnedTrunkFuse'),
-    onSolved: () => {
-      setFlag('solvedDistributor');
-      setFlag('castleRestored');
-      setFlag('learnedSeriesParallel');
-      notifyNewEntry('La Regla del Cruce');
-      openBitacora('regla-del-cruce');
-      hooks.refresh();
-    },
-  });
+  if (f().solvedDistributor) {
+    abrirDistributor({
+      practica: true,
+      onBurnedFuse: () => setFlag('burnedTrunkFuse'),
+      onSolved: () => {},
+    });
+    return;
+  }
+  ensureDistributorField(completarDistributor);
+}
+
+function pokeDistributor(thingId: string): void {
+  const field = ensureDistributorField(completarDistributor);
+  pokeField(thingId);
+  if (field.snapshot().fuse.burned) setFlag('burnedTrunkFuse');
 }
 
 /* ---------- M8: gancho capacitor (castle_heart) ---------- */
@@ -684,18 +754,33 @@ function hablarForjadoraNave(): void {
   say(L('Yesca', 'Tres máquinas, un tronco, el cobre que hay. Cuando estés listo: el tablero.'));
 }
 
+function completarForge(): void {
+  if (f().solvedForgeNetwork) {
+    hooks.refresh();
+    return;
+  }
+  setFlag('solvedForgeNetwork');
+  setFlag('forgeRestored');
+  setFlag('learnedPower');
+  notifyNewEntry('El Jornal');
+  hooks.refresh();
+  openBitacora('el-jornal');
+}
+
 function abrirBancoForge(): void {
-  abrirForge({
-    practica: f().solvedForgeNetwork,
-    onSolved: () => {
-      setFlag('solvedForgeNetwork');
-      setFlag('forgeRestored');
-      setFlag('learnedPower');
-      notifyNewEntry('El Jornal');
-      hooks.refresh();
-      openBitacora('el-jornal');
-    },
-  });
+  if (f().solvedForgeNetwork) {
+    abrirForge({
+      practica: f().solvedForgeNetwork,
+      onSolved: () => {},
+    });
+    return;
+  }
+  ensureForgeField(completarForge);
+}
+
+function pokeForge(thingId: string): void {
+  ensureForgeField(completarForge);
+  pokeField(thingId);
 }
 
 /* ---------- F6: cierre de la Unidad 3 ---------- */
@@ -961,10 +1046,52 @@ export const ROOMS: Record<string, RoomDef> = {
         color: () => (f().ohmAwake ? 0xc9a437 : 0x4a4a4f),
         onInteract: () => {
           const fl = f();
-          if (!fl.ohmAwake) despertarOhm();
+          if (!fl.ohmAwake) iniciarDespertarOhm();
           else if (fl.puertaDone) say(L('', 'Ohm brilla firme y parejo, como una lámpara con opiniones. La plaza entera parece respirar de nuevo.'));
           else say(L('', 'Ohm zumba bajito y te sigue con los ojos. De cerca, el zumbido parece una canción.'));
         },
+      },
+      {
+        id: 'field-ohm-g1', x: 960, y: 530, w: 48, h: 30,
+        label: 'Boca alta', prompt: 'Tender un tramo', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-ohm-g1', 0x4a4034),
+        visible: () => !f().ohmAwake,
+        onInteract: () => pokeOhm('field-ohm-g1'),
+      },
+      {
+        id: 'field-ohm-g2', x: 1080, y: 700, w: 48, h: 30,
+        label: 'Atajo', prompt: 'Tender un tramo', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-ohm-g2', 0x4a4034),
+        visible: () => !f().ohmAwake,
+        onInteract: () => pokeOhm('field-ohm-g2'),
+      },
+      {
+        id: 'field-ohm-g3', x: 840, y: 700, w: 48, h: 30,
+        label: 'Atajo partido', prompt: 'Probar el atajo partido', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-ohm-g3', 0x5a3030),
+        visible: () => !f().ohmAwake,
+        onInteract: () => pokeOhm('field-ohm-g3'),
+      },
+      {
+        id: 'field-ohm-g5', x: 1040, y: 790, w: 48, h: 30,
+        label: 'Boca baja este', prompt: 'Tender un tramo', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-ohm-g5', 0x4a4034),
+        visible: () => !f().ohmAwake,
+        onInteract: () => pokeOhm('field-ohm-g5'),
+      },
+      {
+        id: 'field-ohm-g4', x: 880, y: 790, w: 48, h: 30,
+        label: 'Boca baja oeste', prompt: 'Tender un tramo', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-ohm-g4', 0x4a4034),
+        visible: () => !f().ohmAwake,
+        onInteract: () => pokeOhm('field-ohm-g4'),
+      },
+      {
+        id: 'field-ohm-lamp', x: 1120, y: 540, w: 36, h: 36, shape: 'circle',
+        label: 'Lámpara de prueba', prompt: 'Designar la lámpara de prueba', solid: false, emoji: '💡',
+        color: () => fieldColor('field-ohm-lamp', 0x3a342c),
+        visible: () => !f().ohmAwake,
+        onInteract: () => pokeOhm('field-ohm-lamp'),
       },
       {
         // Edda junto al pedestal, ligeramente al este para no
@@ -1236,9 +1363,72 @@ export const ROOMS: Record<string, RoomDef> = {
         onInteract: () => {
           const fl = f();
           if (!fl.metLumen) say(L('', 'Mejor hablar primero con el dueño del taller. La túnica impone.'));
-          else if (fl.frenoDone) abrirFreno(() => {}, true); // modo práctica: la Bitácora invita a volver
+          else if (fl.frenoDone) abrirFreno(() => {}, true);
           else resolverFreno();
         },
+      },
+      {
+        id: 'field-freno-lamp', x: 430, y: 200, w: 40, h: 40, shape: 'circle',
+        label: 'Lámpara Eterna', prompt: 'Designar la Lámpara Eterna', solid: false, emoji: '💡',
+        color: () => fieldColor('field-freno-lamp', 0x3a3028),
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-lamp'),
+      },
+      {
+        id: 'field-freno-socket', x: 360, y: 200, w: 44, h: 36,
+        label: 'Zócalo', prompt: 'Poner la piedra en el zócalo', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-freno-socket', 0x6a4030),
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-socket'),
+      },
+      {
+        id: 'field-freno-lever', x: 430, y: 280, w: 50, h: 28,
+        label: 'Palanca', prompt: 'Bajar la palanca', solid: false, emoji: '⚡',
+        color: 0x8a7c50,
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-lever'),
+      },
+      {
+        id: 'field-freno-fuse', x: 500, y: 200, w: 40, h: 28,
+        label: 'Caja de fusibles', prompt: 'Cambiar el fusible', solid: false, emoji: '⚡',
+        color: 0x8a6a40,
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-fuse'),
+      },
+      {
+        id: 'field-freno-piedra-rajada', x: 200, y: 330, w: 28, h: 22,
+        label: 'Piedra rajada', prompt: 'Tomar la piedra rajada', solid: false,
+        color: 0x6a4030,
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-piedra-rajada'),
+      },
+      {
+        id: 'field-freno-piedra-roja', x: 240, y: 360, w: 32, h: 24,
+        label: 'Piedra roja', prompt: 'Tomar la piedra de bandas rojas', solid: false,
+        color: 0xb33a32,
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-piedra-roja'),
+      },
+      {
+        id: 'field-freno-piedra-amarilla', x: 280, y: 390, w: 38, h: 28,
+        label: 'Piedra amarilla', prompt: 'Tomar la piedra de bandas amarillas', solid: false,
+        color: 0xc9a437,
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-piedra-amarilla'),
+      },
+      {
+        id: 'field-freno-piedra-gris', x: 330, y: 410, w: 44, h: 32,
+        label: 'Piedra gris', prompt: 'Tomar la piedra de bandas grises', solid: false,
+        color: 0x8a8a8a,
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-piedra-gris'),
+      },
+      {
+        id: 'field-freno-piedra-marron', x: 180, y: 370, w: 26, h: 20,
+        label: 'Piedra marrón', prompt: 'Tomar la piedra de bandas marrones', solid: false,
+        color: 0x8b5a2b,
+        visible: () => f().metLumen && !f().frenoDone,
+        onInteract: () => pokeFreno('field-freno-piedra-marron'),
       },
       {
         id: 'estantes', x: 210, y: 135, w: 130, h: 90,
@@ -1290,7 +1480,7 @@ export const ROOMS: Record<string, RoomDef> = {
         label: 'La Puerta de Ohm', prompt: 'Usar el mecanismo de la Puerta', solid: false, emoji: '⚡',
         color: () => (f().puertaDone ? 0x8a7c50 : 0x3a3340),
         onInteract: () => {
-          if (f().puertaDone) abrirPuerta(() => {}, true); // modo práctica
+          if (f().puertaDone) abrirPuerta(() => {}, true);
           else if (!f().puertaMecanismoIntro) {
             say(
               [
@@ -1299,11 +1489,81 @@ export const ROOMS: Record<string, RoomDef> = {
               ],
               () => {
                 setFlag('puertaMecanismoIntro');
-                resolverPuerta();
+                iniciarPuerta();
               },
             );
-          } else resolverPuerta();
+          } else iniciarPuerta();
         },
+      },
+      {
+        id: 'field-puerta-ojo', x: 480, y: 110, w: 70, h: 36, shape: 'circle',
+        label: 'Ojo de aguja', prompt: 'Designar el ojo de aguja', solid: false, emoji: '💡',
+        color: () => fieldColor('field-puerta-ojo', 0x3a3340),
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-ojo'),
+      },
+      {
+        id: 'field-puerta-fuente-brasa', x: 300, y: 180, w: 50, h: 36,
+        label: 'Cristal Brasa', prompt: 'Elegir Empuje Brasa', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-puerta-fuente-brasa', 0x6a5840),
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-fuente-brasa'),
+      },
+      {
+        id: 'field-puerta-fuente-corazon', x: 480, y: 180, w: 50, h: 36,
+        label: 'Cristal Corazón', prompt: 'Elegir Empuje Corazón', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-puerta-fuente-corazon', 0x6a5840),
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-fuente-corazon'),
+      },
+      {
+        id: 'field-puerta-fuente-tormenta', x: 660, y: 180, w: 50, h: 36,
+        label: 'Cristal Tormenta', prompt: 'Elegir Empuje Tormenta', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-puerta-fuente-tormenta', 0x6a5840),
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-fuente-tormenta'),
+      },
+      {
+        id: 'field-puerta-piedra-marron', x: 300, y: 250, w: 36, h: 24,
+        label: 'Piedra marrón', prompt: 'Poner piedra marrón', solid: false,
+        color: 0x8b5a2b,
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-piedra-marron'),
+      },
+      {
+        id: 'field-puerta-piedra-roja', x: 400, y: 250, w: 40, h: 26,
+        label: 'Piedra roja', prompt: 'Poner piedra roja', solid: false,
+        color: 0xb33a32,
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-piedra-roja'),
+      },
+      {
+        id: 'field-puerta-piedra-amarilla', x: 560, y: 250, w: 44, h: 28,
+        label: 'Piedra amarilla', prompt: 'Poner piedra amarilla', solid: false,
+        color: 0xc9a437,
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-piedra-amarilla'),
+      },
+      {
+        id: 'field-puerta-piedra-gris', x: 660, y: 250, w: 48, h: 30,
+        label: 'Piedra gris', prompt: 'Poner piedra gris', solid: false,
+        color: 0x8a8a8a,
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-piedra-gris'),
+      },
+      {
+        id: 'field-puerta-lever', x: 480, y: 310, w: 80, h: 32,
+        label: 'Palanca de la Puerta', prompt: 'Bajar la palanca', solid: false, emoji: '⚡',
+        color: 0x8a7c50,
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-lever'),
+      },
+      {
+        id: 'field-puerta-fuse', x: 200, y: 310, w: 50, h: 28,
+        label: 'Fusibles rituales', prompt: 'Cambiar fusible ritual', solid: false,
+        color: 0x8a6a40,
+        visible: () => f().frenoDone && !f().puertaDone,
+        onInteract: () => pokePuerta('field-puerta-fuse'),
       },
       {
         id: 'edda-puerta', x: 420, y: 385, w: 34, h: 34, shape: 'circle',
@@ -1701,8 +1961,9 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'mosaico-corazon', x: 480, y: 390, w: 330, h: 72,
-        label: 'Mosaico del Cruce', prompt: 'Examinar el mosaico',
+        label: 'Mosaico del Cruce', prompt: 'Leer el mosaico',
         color: 0x4f5660, solid: false,
+        visible: () => f().castleRestored,
         onInteract: () =>
           say(
             L(
@@ -1715,9 +1976,80 @@ export const ROOMS: Record<string, RoomDef> = {
       },
       {
         id: 'banco-repartidor', x: 180, y: 315, w: 190, h: 76,
-        label: 'Banco del Repartidor', prompt: 'Usar el banco',
+        label: 'Banco del Repartidor', prompt: 'Practicar el Repartidor',
         color: 0x4a3c30, solid: true,
+        visible: () => f().solvedDistributor,
         onInteract: abrirBancoDistributor,
+      },
+      {
+        id: 'field-dist-lamp-0', x: 300, y: 120, w: 40, h: 40, shape: 'circle',
+        label: 'Lámpara Forja', prompt: 'Designar el barrio de la Forja', solid: false, emoji: '💡',
+        color: () => fieldColor('field-dist-lamp-0', 0x5a4a38),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-lamp-0'),
+      },
+      {
+        id: 'field-dist-lamp-1', x: 480, y: 90, w: 40, h: 40, shape: 'circle',
+        label: 'Lámpara Campanario', prompt: 'Designar el barrio del Campanario', solid: false, emoji: '💡',
+        color: () => fieldColor('field-dist-lamp-1', 0x5a4a38),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-lamp-1'),
+      },
+      {
+        id: 'field-dist-lamp-2', x: 660, y: 120, w: 40, h: 40, shape: 'circle',
+        label: 'Lámpara Biblioteca', prompt: 'Designar el barrio de la Biblioteca', solid: false, emoji: '💡',
+        color: () => fieldColor('field-dist-lamp-2', 0x5a4a38),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-lamp-2'),
+      },
+      {
+        id: 'field-dist-d0', x: 300, y: 205, w: 90, h: 50,
+        label: 'Ramal Forja', prompt: 'Cambiar la Piedra del ramal Forja', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-dist-d0', 0x766247),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-d0'),
+      },
+      {
+        id: 'field-dist-d1', x: 300, y: 360, w: 90, h: 50,
+        label: 'Ramal Campanario', prompt: 'Cambiar la Piedra del ramal Campanario', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-dist-d1', 0x766247),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-d1'),
+      },
+      {
+        id: 'field-dist-d2', x: 660, y: 205, w: 90, h: 50,
+        label: 'Ramal Biblioteca', prompt: 'Cambiar la Piedra del ramal Biblioteca', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-dist-d2', 0x766247),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-d2'),
+      },
+      {
+        id: 'field-dist-push-4', x: 250, y: 430, w: 50, h: 32,
+        label: 'Empuje 4', prompt: 'Elegir Empuje 4', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-dist-push-4', 0x6a5840),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-push-4'),
+      },
+      {
+        id: 'field-dist-push-8', x: 330, y: 430, w: 50, h: 32,
+        label: 'Empuje 8', prompt: 'Elegir Empuje 8', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-dist-push-8', 0x6a5840),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-push-8'),
+      },
+      {
+        id: 'field-dist-push-16', x: 410, y: 430, w: 50, h: 32,
+        label: 'Empuje 16', prompt: 'Elegir Empuje 16', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-dist-push-16', 0x6a5840),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-push-16'),
+      },
+      {
+        id: 'field-dist-fuse', x: 520, y: 430, w: 70, h: 32,
+        label: 'Mártir del Tronco', prompt: 'Cambiar el Mártir', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-dist-fuse', 0x8a7c50),
+        visible: () => !f().solvedDistributor,
+        onInteract: () => pokeDistributor('field-dist-fuse'),
       },
       {
         id: 'consejera-corazon', x: 745, y: 330, w: 38, h: 38, shape: 'circle',
@@ -2022,32 +2354,137 @@ export const ROOMS: Record<string, RoomDef> = {
     things: [
       {
         id: 'martillo-forja', x: 210, y: 150, w: 180, h: 90,
-        label: 'Martillo · ENTREGA 32', prompt: 'Examinar el Martillo',
-        color: 0x70513b, solid: true,
-        onInteract: () => say(L('', 'El Martillo mayor, quieto. Placa de bronce: ENTREGA 32. Hay polvo en toda la nave — en la placa, no: alguien la pule todas las mañanas.')),
+        label: 'Martillo · ENTREGA 32', prompt: 'Designar el Martillo',
+        color: () => fieldColor('field-forge-martillo', 0x70513b), solid: true,
+        onInteract: () => pokeForge('field-forge-martillo'),
       },
       {
         id: 'fuelle-forja', x: 480, y: 150, w: 180, h: 90,
-        label: 'Fuelle · ENTREGA 16', prompt: 'Examinar el Fuelle',
-        color: 0x665046, solid: true,
-        onInteract: () => say(L('', 'El Fuelle, plegado como un animal dormido. Placa: ENTREGA 16.')),
+        label: 'Fuelle · ENTREGA 16', prompt: 'Designar el Fuelle',
+        color: () => fieldColor('field-forge-fuelle', 0x665046), solid: true,
+        onInteract: () => pokeForge('field-forge-fuelle'),
       },
       {
         id: 'lumbre-forja', x: 750, y: 150, w: 180, h: 90,
-        label: 'Lumbre · ENTREGA 8', prompt: 'Examinar la Lumbre',
-        color: 0x704536, solid: true,
-        onInteract: () => say(L('', 'La Lumbre, fría. Placa: ENTREGA 8. En el hollín hay marcas de manos chicas: aquí se calentaban los aprendices.')),
+        label: 'Lumbre · ENTREGA 8', prompt: 'Designar la Lumbre',
+        color: () => fieldColor('field-forge-lumbre', 0x704536), solid: true,
+        onInteract: () => pokeForge('field-forge-lumbre'),
       },
       {
         id: 'tablero-bus', x: 480, y: 285, w: 260, h: 76,
-        label: 'Tablero de bus', prompt: 'Examinar el tablero',
+        label: 'Tablero de bus', prompt: 'Energizar la nave',
         color: 0x6b5944, solid: true,
-        onInteract: () => say(L('', 'El tablero maestro de la Forja: dos engastes de cristal y décadas de hollín. Espera su Empuje.')),
+        onInteract: () => {
+          if (f().solvedForgeNetwork) {
+            say(L('', 'El tablero maestro de la Forja late al ritmo del jornal.'));
+            return;
+          }
+          pokeForge('field-forge-energize');
+        },
+      },
+      {
+        id: 'field-forge-push-8', x: 200, y: 360, w: 48, h: 28,
+        label: 'Empuje 8', prompt: 'Elegir Empuje 8', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-forge-push-8', 0x6a5840),
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-push-8'),
+      },
+      {
+        id: 'field-forge-push-16', x: 260, y: 360, w: 48, h: 28,
+        label: 'Empuje 16', prompt: 'Elegir Empuje 16', solid: false, emoji: '⚡',
+        color: () => fieldColor('field-forge-push-16', 0x6a5840),
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-push-16'),
+      },
+      {
+        id: 'field-forge-piedra-roja', x: 330, y: 360, w: 32, h: 24,
+        label: 'Piedra roja', prompt: 'Añadir piedra roja', solid: false,
+        color: 0xb33a32,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-piedra-roja'),
+      },
+      {
+        id: 'field-forge-piedra-amarilla', x: 370, y: 360, w: 36, h: 26,
+        label: 'Piedra amarilla', prompt: 'Añadir piedra amarilla', solid: false,
+        color: 0xc9a437,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-piedra-amarilla'),
+      },
+      {
+        id: 'field-forge-piedra-gris', x: 420, y: 360, w: 40, h: 28,
+        label: 'Piedra gris', prompt: 'Añadir piedra gris', solid: false,
+        color: 0x8a8a8a,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-piedra-gris'),
+      },
+      {
+        id: 'field-forge-piedra-marron', x: 290, y: 360, w: 28, h: 22,
+        label: 'Piedra marrón', prompt: 'Añadir piedra marrón', solid: false,
+        color: 0x8b5a2b,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-piedra-marron'),
+      },
+      {
+        id: 'field-forge-camino-angosto', x: 620, y: 360, w: 50, h: 24,
+        label: 'Camino angosto', prompt: 'Poner Camino angosto', solid: false,
+        color: 0x7a5a40,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-camino-angosto'),
+      },
+      {
+        id: 'field-forge-camino-medio', x: 680, y: 360, w: 56, h: 26,
+        label: 'Camino medio', prompt: 'Poner Camino medio', solid: false,
+        color: 0x8a6a48,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-camino-medio'),
+      },
+      {
+        id: 'field-forge-camino-ancho', x: 750, y: 360, w: 64, h: 28,
+        label: 'Camino ancho', prompt: 'Poner Camino ancho', solid: false,
+        color: 0x9a7a50,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-camino-ancho'),
+      },
+      {
+        id: 'field-forge-fuse-2', x: 620, y: 400, w: 36, h: 22,
+        label: 'Fusible 2', prompt: 'Poner fusible 2', solid: false,
+        color: 0x8a7c50,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-fuse-2'),
+      },
+      {
+        id: 'field-forge-fuse-4', x: 670, y: 400, w: 36, h: 22,
+        label: 'Fusible 4', prompt: 'Poner fusible 4', solid: false,
+        color: 0x8a7c50,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-fuse-4'),
+      },
+      {
+        id: 'field-forge-fuse-8', x: 720, y: 400, w: 36, h: 22,
+        label: 'Fusible 8', prompt: 'Poner fusible 8', solid: false,
+        color: 0x8a7c50,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-fuse-8'),
+      },
+      {
+        id: 'field-forge-repair', x: 800, y: 400, w: 70, h: 24,
+        label: 'Reparar canal', prompt: 'Reparar el canal cortado', solid: false,
+        color: 0x6a5040,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-repair'),
+      },
+      {
+        id: 'field-forge-quitar', x: 470, y: 360, w: 70, h: 24,
+        label: 'Quitar piedra', prompt: 'Quitar la última piedra', solid: false,
+        color: 0x5a4038,
+        visible: () => !f().solvedForgeNetwork,
+        onInteract: () => pokeForge('field-forge-quitar'),
       },
       {
         id: 'banco-forja-completa', x: 480, y: 405, w: 210, h: 76,
-        label: 'Banco de la Forja', prompt: 'Usar el banco',
+        label: 'Banco de la Forja', prompt: 'Practicar la nave',
         color: 0x4a3c30, solid: true,
+        visible: () => f().solvedForgeNetwork,
         onInteract: abrirBancoForge,
       },
       {
@@ -2645,10 +3082,101 @@ export const ROOMS: Record<string, RoomDef> = {
     ],
     things: [
       {
-        id: 'lente-enorme', x: 480, y: 180, w: 300, h: 220, shape: 'circle',
-        label: 'Lente del Faro', prompt: 'Examinar la lente',
-        color: 0x7698a8, solid: true,
-        onInteract: () => say(L('', 'La lente enorme domina la cima. Más allá del cristal, el lago negro parece no tener orilla.')),
+        id: 'lente-enorme', x: 480, y: 180, w: 220, h: 160, shape: 'circle',
+        label: 'Lente del Faro', prompt: 'Designar la lente',
+        color: () => fieldColor('field-lh-lente', 0x7698a8), solid: true,
+        onInteract: () => pokeLighthouse('field-lh-lente'),
+      },
+      {
+        id: 'field-lh-reloj', x: 220, y: 280, w: 90, h: 70,
+        label: 'Gabinete del reloj', prompt: 'Designar el reloj',
+        color: () => fieldColor('field-lh-reloj', 0x3a4450), solid: true,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-reloj'),
+      },
+      {
+        id: 'field-lh-senal', x: 740, y: 280, w: 90, h: 70,
+        label: 'Gabinete de señal', prompt: 'Designar la señal de costa',
+        color: () => fieldColor('field-lh-senal', 0x3a4450), solid: true,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-senal'),
+      },
+      {
+        id: 'field-lh-toggle', x: 300, y: 400, w: 70, h: 28,
+        label: 'Conectar ramal', prompt: 'Conectar o aislar el gabinete', solid: false, emoji: '⚡',
+        color: 0x8a7c50,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-toggle'),
+      },
+      {
+        id: 'field-lh-isolate', x: 380, y: 400, w: 80, h: 28,
+        label: 'Interruptor', prompt: 'Poner interruptor de aislamiento', solid: false, emoji: '⚡',
+        color: 0x6a7a80,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-isolate'),
+      },
+      {
+        id: 'field-lh-piedra-6', x: 480, y: 400, w: 36, h: 24,
+        label: 'Piedra 6', prompt: 'Poner Piedra 6', solid: false,
+        color: 0xb33a32,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-piedra-6'),
+      },
+      {
+        id: 'field-lh-piedra-12', x: 530, y: 400, w: 40, h: 26,
+        label: 'Piedra 12', prompt: 'Poner Piedra 12', solid: false,
+        color: 0xc9a437,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-piedra-12'),
+      },
+      {
+        id: 'field-lh-piedra-18', x: 580, y: 400, w: 44, h: 28,
+        label: 'Piedra 18', prompt: 'Poner Piedra 18', solid: false,
+        color: 0x8a8a8a,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-piedra-18'),
+      },
+      {
+        id: 'field-lh-calibre-2', x: 640, y: 400, w: 36, h: 22,
+        label: 'Camino 2', prompt: 'Poner calibre 2', solid: false,
+        color: 0x7a5a40,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-calibre-2'),
+      },
+      {
+        id: 'field-lh-calibre-4', x: 690, y: 400, w: 40, h: 24,
+        label: 'Camino 4', prompt: 'Poner calibre 4', solid: false,
+        color: 0x8a6a48,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-calibre-4'),
+      },
+      {
+        id: 'field-lh-calibre-12', x: 740, y: 400, w: 46, h: 26,
+        label: 'Camino 12', prompt: 'Poner calibre 12', solid: false,
+        color: 0x9a7a50,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-calibre-12'),
+      },
+      {
+        id: 'field-lh-fuse-2', x: 300, y: 450, w: 36, h: 22,
+        label: 'Fusible 2', prompt: 'Poner fusible 2', solid: false,
+        color: 0x8a7c50,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-fuse-2'),
+      },
+      {
+        id: 'field-lh-fuse-4', x: 350, y: 450, w: 36, h: 22,
+        label: 'Fusible 4', prompt: 'Poner fusible 4', solid: false,
+        color: 0x8a7c50,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-fuse-4'),
+      },
+      {
+        id: 'field-lh-fuse-8', x: 400, y: 450, w: 36, h: 22,
+        label: 'Fusible 8', prompt: 'Poner fusible 8', solid: false,
+        color: 0x8a7c50,
+        visible: () => !f().solvedLighthouseDistributionDc,
+        onInteract: () => pokeLighthouse('field-lh-fuse-8'),
       },
       {
         id: 'lago-negro', x: 165, y: 150, w: 180, h: 95,
@@ -2667,13 +3195,16 @@ export const ROOMS: Record<string, RoomDef> = {
         },
       },
       {
-        id: 'banco-distribucion-faro', x: 480, y: 405, w: 250, h: 80,
-        label: 'Distribución del Faro', prompt: 'Distribuir el servicio',
+        id: 'banco-distribucion-faro', x: 480, y: 470, w: 180, h: 48,
+        label: 'Interruptor de linterna', prompt: 'Energizar la linterna',
         color: 0x4a3c30, solid: true,
-        onInteract: abrirBancoLighthouseDistributionDc,
+        onInteract: () => {
+          if (f().solvedLighthouseDistributionDc) abrirBancoLighthouseDistributionDc();
+          else pokeLighthouse('field-lh-energize');
+        },
       },
       {
-        id: 'farero-linterna', x: 745, y: 280, w: 40, h: 40, shape: 'circle',
+        id: 'farero-linterna', x: 860, y: 180, w: 40, h: 40, shape: 'circle',
         label: 'Farero', prompt: 'Hablar con el Farero',
         color: 0x70818a, solid: true, emoji: '💬',
         visible: () => f().solvedClockDriveDc,

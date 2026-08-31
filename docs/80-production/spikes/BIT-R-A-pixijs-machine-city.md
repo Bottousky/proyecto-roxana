@@ -11,20 +11,18 @@ paired_with: BIT-R-B
 
 ## Question
 
-¿PixiJS permite representar una **máquina-ciudad dentro de un microcontrolador** de forma más legible, pedagógica y sostenible para agentes que Phaser, bajo exactamente el mismo simulation core?
+¿PixiJS permite representar una **máquina-ciudad dentro de un microcontrolador** de forma más legible, pedagógica y sostenible que Phaser, bajo exactamente el mismo simulation core?
 
 ## Fairness lock
 
 - Pair: `BIT-R-B`.
 - Partir del mismo commit baseline.
-- Builder: MiniMax M3 / MiniMax Code.
-- Player Agent: GPT-5.6 Luna, protocolo blind-first.
-- Repair: DeepSeek V4 Flash.
-- Adversarial review: mismo GLM pin usado por B.
+- Integración técnica: Codex.
+- Mismo protocolo de playtest blind-first y revisión para A y B.
 - Normal loops: 1–3; hard cap: 5.
 - No leer/copiar código del spike B.
 - Resolver y fijar versión exacta de PixiJS al iniciar el spike; registrarla en Result.
-- Instalar/cargar skills oficiales PixiJS v8 relevantes según `GAME_DEV_AI_TOOLING.md`.
+- Cargar tooling oficial PixiJS v8 sólo si el spike lo necesita.
 
 ## Shared core contract
 
@@ -98,8 +96,8 @@ Probar si estas capacidades reducen complejidad y mejoran lectura:
 - [ ] desktop y touch completan el mismo objetivo.
 - [ ] cero errores de consola relevantes.
 - [ ] frame/performance baseline medido bajo fixture fijo.
-- [ ] Player Agent sin BLOCKER/MAJOR.
-- [ ] adversarial reviewer sin BLOCKER/MAJOR.
+- [ ] playtest blind-first sin BLOCKER/MAJOR.
+- [ ] revisión comparativa sin BLOCKER/MAJOR.
 
 ## Evidence
 
@@ -113,7 +111,7 @@ Registrar:
 - loc/archivos de infraestructura específica;
 - FPS/frame time del fixture;
 - bundle delta si es material;
-- Player Agent findings;
+- hallazgos de playtest;
 - screenshots desktop/mobile;
 - repro de bug/trace;
 - residual risks.

@@ -6,6 +6,14 @@ import { parseAulaHash } from './aulaRouter.ts';
 import { startPortalTransition } from './portal.ts';
 import { readSchoolState, type AulaId, type AulaEstado } from './schoolModel.ts';
 import { load, setFlag, state } from '../state.ts';
+import {
+  abortProjectorSequence,
+  playPendingUnitProjector,
+  playUnitProjectorSequence,
+  projectorSequenceBusy,
+  UNIT2_PROJECTOR_LINES,
+  pendingUnitProjector,
+} from './unitProjector.ts';
 
 export { parseAulaHash } from './aulaRouter.ts';
 
@@ -167,7 +175,6 @@ let scrollYBeforeOpen = 0;
 let activePizarronPanel: HTMLElement | null = null;
 let aulaToastTimer: number | null = null;
 let aulaPanX = 0;
-let projectorSequenceCleanup: ((complete: boolean) => void) | null = null;
 // true mientras corre la animación de apertura (el overlay aún puede estar
 // display:none): evita que el handler de hashchange haga un segundo open
 // directo que pise la transición.
@@ -322,11 +329,16 @@ function activateHotspot(hotspot: HTMLElement): void {
     return;
   }
   if (hotspotId === 'proyector') {
-    if (showUnit2ProjectorSequence()) return;
+    if (showPendingAulaProjector()) return;
     load();
-    showAulaToast(state.flags.playedUnit2Intro
-      ? 'UNIDAD DOS · El río se reparte. La Campana espera al otro lado del portal.'
-      : 'La cinta está rebobinada. Pronto habrá función.');
+    const pending = pendingUnitProjector();
+    showAulaToast(
+      pending
+        ? pending.toast
+        : state.flags.playedUnit2Intro
+          ? 'UNIDAD DOS · El río se reparte. La Campana espera al otro lado del portal.'
+          : 'La cinta está rebobinada. Pronto habrá función.',
+    );
     return;
   }
   if (hotspotId === 'portal') {
@@ -334,81 +346,40 @@ function activateHotspot(hotspot: HTMLElement): void {
   }
 }
 
-const UNIT2_PROJECTOR_LINES = [
-  { who: '', text: 'La nota de la Campana todavía vibra en los vidrios del aula. El proyector responde solo: clac.' },
-  { who: 'PROYECTOR', text: 'MUNDOS APLICADOS · UNIDAD DOS: EL RÍO SE REPARTE.' },
-  { who: 'PROYECTOR', text: 'El Castillo de Ohmdal es el corazón de la red. De sus salas parten todos los ríos del reino.' },
-  { who: 'PROYECTOR', text: 'Recuerde, estudiante: un reino no se enciende con un solo camino.' },
-  { who: '', text: 'La imagen se corta. Sobre la lente queda un lacre: CLAUSURADO POR ORDEN DEL CONSEJO DE OHMDAL.' },
-] as const;
-
 function unit2ProjectorPending(): boolean {
   load();
   return state.flags.finished && !state.flags.playedUnit2Intro;
 }
 
-/** Introducción U2 sobre el aula ilustrada; nunca vuelve a montar el aula Phaser. */
+/** Introducción U2 sobre el aula ilustrada; nunca vuelve a montar el aula Phaser.
+ *  Copy vivo: UNIDAD DOS: EL RÍO SE REPARTE — vive en UNIT2_PROJECTOR_LINES. */
 function showUnit2ProjectorSequence(): boolean {
   const overlay = overlayEl;
-  if (!overlay || projectorSequenceCleanup || !unit2ProjectorPending()) return false;
+  if (!overlay || projectorSequenceBusy() || !unit2ProjectorPending()) return false;
   if (overlay.style.display === 'none') return false;
-
-  let index = 0;
-  const layer = document.createElement('section');
-  layer.className = 'rx-projector-sequence';
-  layer.setAttribute('role', 'dialog');
-  layer.setAttribute('aria-modal', 'true');
-  layer.setAttribute('aria-label', 'Proyección de la Unidad 2');
-  layer.tabIndex = -1;
-  layer.innerHTML = `
-    <div class="rx-projector-beam" aria-hidden="true"></div>
-    <div class="rx-projector-dialog">
-      <span class="rx-projector-speaker"></span>
-      <p class="rx-projector-copy"></p>
-      <span class="rx-projector-next">E / Enter</span>
-    </div>`;
-
-  const speaker = layer.querySelector<HTMLElement>('.rx-projector-speaker')!;
-  const copy = layer.querySelector<HTMLElement>('.rx-projector-copy')!;
-  const render = () => {
-    const line = UNIT2_PROJECTOR_LINES[index];
-    speaker.textContent = line.who || 'AULA DE ELECTRÓNICA';
-    copy.textContent = line.text;
-  };
-
-  const cleanup = (complete: boolean) => {
-    window.removeEventListener('keydown', onKeyDown, true);
-    projectorSequenceCleanup = null;
-    layer.remove();
-    if (complete) {
-      setFlag('playedUnit2Intro');
-      syncPizarronThumbnail(overlay);
-      showAulaToast('Unidad 2 disponible. Vuelve a la Campana por el portal.');
-    }
+  return playUnitProjectorSequence(overlay, {
+    unit: 2,
+    flag: 'playedUnit2Intro',
+    ariaLabel: 'Proyección de la Unidad 2',
+    toast: 'Unidad 2 disponible. Vuelve a la Campana por el portal.',
+    lines: UNIT2_PROJECTOR_LINES,
+  }, () => {
+    setFlag('playedUnit2Intro');
+    syncPizarronThumbnail(overlay);
+    showAulaToast('Unidad 2 disponible. Vuelve a la Campana por el portal.');
     overlay.querySelector<HTMLElement>('[data-hotspot="portal"]')?.focus();
-  };
-
-  const advance = () => {
-    index++;
-    if (index >= UNIT2_PROJECTOR_LINES.length) cleanup(true);
-    else render();
-  };
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (!['KeyE', 'Enter', 'Space'].includes(event.code)) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    advance();
-  };
-
-  projectorSequenceCleanup = cleanup;
-  layer.addEventListener('click', () => {
-    if (navigator.maxTouchPoints > 0 || window.matchMedia?.('(pointer: coarse)').matches) advance();
   });
-  window.addEventListener('keydown', onKeyDown, true);
-  overlay.appendChild(layer);
-  render();
-  layer.focus();
-  return true;
+}
+
+function showPendingAulaProjector(): boolean {
+  const overlay = overlayEl;
+  if (!overlay || overlay.style.display === 'none') return false;
+  if (unit2ProjectorPending()) return showUnit2ProjectorSequence();
+  return playPendingUnitProjector(overlay, (cue) => {
+    syncPizarronThumbnail(overlay);
+    showAulaToast(cue.toast);
+    overlay.querySelector<HTMLElement>('[data-hotspot="portal"]')?.focus();
+  });
 }
 
 function openPizarronPanel(): void {
@@ -627,7 +598,7 @@ function openAula(aulaId: AulaId, opts: OpenOptions = {}): void {
   }
 
   if (aulaId === 'electronica') {
-    window.setTimeout(() => showUnit2ProjectorSequence(), opts.fromDoorEl ? 1250 : 350);
+    window.setTimeout(() => showPendingAulaProjector(), opts.fromDoorEl ? 1250 : 350);
   }
 
   if (location.hash !== `#aula/${aulaId}`) {
@@ -644,7 +615,7 @@ function closeAula(): void {
   aulaOpening = false;
   const overlay = overlayEl;
   if (!overlay || overlay.style.display === 'none') return;
-  projectorSequenceCleanup?.(false);
+  abortProjectorSequence();
   closePizarronPanel();
   if (aulaToastTimer !== null) {
     window.clearTimeout(aulaToastTimer);

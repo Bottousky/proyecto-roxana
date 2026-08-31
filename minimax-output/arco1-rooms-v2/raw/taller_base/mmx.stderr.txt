@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": 1,
+    "message": "API error: invalid params, prompt length must be less than 1500 (HTTP 200)"
+  }
+}

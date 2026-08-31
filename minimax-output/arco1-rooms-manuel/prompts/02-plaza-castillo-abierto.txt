@@ -1,0 +1,13 @@
+# Plaza — mismo plano, arco del Castillo ABIERTO
+# Guardar como: plaza-castillo-abierto.png
+# Lienzo nativo (1px = 1px de juego): 1920x1080
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1920x1080. EXACT SAME Plaza floorplan, camera, merlons, paved cross, Taller house, Ohm pedestal at (960,640), Portal Omega SW, closed north Puerta, closed south arch, closed lower west forge arch.
+
+ONLY CHANGE: UPPER west castle arch OPEN. Portcullis raised. Through-view into cooler institutional masonry. No glow, no people, no bell. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (968 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1920x1080 same Plaza de Ohm. Empty Ohm pedestal x=960 y=640. ONLY the upper west castle arch is OPEN with raised portcullis. North Puerta CLOSED. Lower west forge arch CLOSED. No people, no bell, no glow. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

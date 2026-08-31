@@ -1,0 +1,53 @@
+{
+  "assetId": "rx_ohm_pedestal_hero_01",
+  "sourceMethod": "blender-manual",
+  "provider": "Proyecto Roxana",
+  "generationRoute": "approved four-view turnaround -> deterministic Blender reconstruction -> GLB",
+  "sourceReferences": [
+    "assets/ohmdal/characters/ohm-turnaround-v2.png",
+    "assets/references/ohmdal-hd2d-preprod/ohm-original-spec.md",
+    "assets/references/ohmdal-hd2d-preprod/specs/ohm-sprite-spec.md"
+  ],
+  "excludedReference": "docs/generated-reference-pack/robot-multiview.png",
+  "excludedReferenceReason": "Generic humanoid robot conflicts with Ohm's approved low stable ovoid silhouette.",
+  "meshy": {
+    "configured": false,
+    "taskIds": [],
+    "creditsSpent": 0
+  },
+  "candidateCount": 1,
+  "canonicalization": {
+    "tool": "Blender 5.2.0 LTS",
+    "executable": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe",
+    "script": "scripts/3d/build_ohm_hero.py",
+    "blend": "assets/source/ohmdal/heroes/ohm/ohm-pedestal.blend",
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "pivot": "bottom-center",
+    "groundOffset": 0,
+    "boundsSource": "vertices",
+    "bounds": {
+      "min": [-0.58, 0, -0.58],
+      "max": [0.58, 1.47, 0.58],
+      "dims": [1.16, 1.47, 1.16],
+      "center": [0, 0.735, 0]
+    },
+    "hierarchy": "OhmPedestalHero/{OhmRoot,PedestalRoot}; eight material-group meshes; five named sockets",
+    "collision": "No collision mesh exported; the existing authored gameplay collider remains authoritative.",
+    "cleanup": "Applied transforms and bevels, joined geometry by semantic material group, removed cameras/lights from the saved master and export, no unnecessary runtime nodes."
+  },
+  "runtime": {
+    "path": "assets/runtime/ohmdal/plaza/heroes/ohm/ohm-pedestal.glb",
+    "sha256": "2F575E6BFF81943BC3FFB3A2D237A022B59181784E0897C1D71A01E820E62F60",
+    "triangles": 18232,
+    "meshNodes": 8,
+    "materials": 5,
+    "textures": 0,
+    "bytes": 493020
+  },
+  "sourceHashes": {
+    "blendSha256": "15535C31902CE7EFBE0789E1FDD728B45796DD69D08941B696E5151B05730165",
+    "turnaroundSha256": "99997000EC47823F54DA572FF65CA72029FEE2FAD5E69856411134215C56EFC2"
+  },
+  "license": "Original Proyecto Roxana design and reconstruction; no external 3D asset and no paid generation."
+}

@@ -44,6 +44,8 @@ export default defineConfig({
           const destinos: Record<string, string> = {
             '/jugar': '/src/jugar/',
             '/physica': '/src/experiences/physica/',
+            '/ohmdal-plaza': '/src/experiences/ohmdal-plaza/',
+            '/ohmdal-playcanvas': '/src/experiences/ohmdal-playcanvas/',
           };
           for (const [p, target] of Object.entries(destinos)) {
             if (req.url === p || req.url?.startsWith(p + '/') || req.url?.startsWith(p + '?')) {
@@ -66,6 +68,8 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         jugar: resolve(__dirname, 'src/jugar/index.html'),
         physica: resolve(__dirname, 'src/experiences/physica/index.html'),
+        plaza: resolve(__dirname, 'src/experiences/ohmdal-plaza/index.html'),
+        playcanvas: resolve(__dirname, 'src/experiences/ohmdal-playcanvas/index.html'),
       },
     },
   },

@@ -319,5 +319,6 @@ export function abrirSleepingRiver(onSolved: () => void, practica = false): void
       bench.setStatus('Elija un Estanque y un freno. La aguja se moverá sola al llenar.');
       render();
     },
+    { worldCloseup: true },
   );
 }

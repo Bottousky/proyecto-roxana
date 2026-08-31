@@ -202,6 +202,7 @@ export function abrirSingleStone(onSolved: () => void, practica = false): void {
       );
       render();
     },
+    { worldCloseup: true },
   );
 }
 

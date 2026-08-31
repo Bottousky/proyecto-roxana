@@ -20,6 +20,7 @@ import {
 } from './sculpts/installRoxanaStatue.ts';
 import { startPortalTransition } from './portal.ts';
 import { portalGateUrl } from '../shared/portalLink.ts';
+import { playPendingUnitProjector, projectorSequenceBusy } from './unitProjector.ts';
 import { createPostFx, type PostFx } from './school3dPostFx.ts';
 import { createRoomLabels, type LabelLayer } from './school3dLabels.ts';
 import { createSchoolBackdrop, type SchoolBackdrop } from './school3dBackdrop.ts';
@@ -234,7 +235,7 @@ class School3DExperience {
   private readonly rooms = new Map<VoxelZoneId, RoomVisual>();
   private readonly anchors = new Map<VoxelZoneId, THREE.Object3D>();
   private readonly npcs: Array<{ object: THREE.Object3D; phase: number; baseY: number }> = [];
-  private readonly savedSchoolState = readSchoolState();
+  private savedSchoolState = readSchoolState();
   private progressPreview: 'save' | 'initial' | 'complete' =
     new URLSearchParams(location.search).get('progress') === 'complete' ? 'complete' : 'save';
   private readonly progressionRoots = new Map<string, THREE.Object3D>();
@@ -799,6 +800,9 @@ class School3DExperience {
       panel?.setAttribute('aria-hidden', 'false');
     }, prefersReducedMotion() ? 0 : 310);
     this.renderRoomDetails(room);
+    if (id === 'electronica') {
+      window.setTimeout(() => this.playPendingUnitIntro(), prefersReducedMotion() ? 80 : 420);
+    }
     document.querySelectorAll<HTMLElement>('[data-room]').forEach((button) => button.classList.toggle('is-selected', button.dataset.room === id));
 
     const bounds = new THREE.Box3().setFromObject(visual.root);
@@ -808,6 +812,16 @@ class School3DExperience {
     const desiredZoom = Math.min(isCompact() ? 3.0 : 3.8, Math.max(isCompact() ? 2.4 : 2.95, 36 / Math.max(size.x, size.z)));
     this.startTween(target, desiredZoom);
     if (updateHistory && location.hash !== `#sala/${id}`) history.pushState({ room: id }, '', `#sala/${id}`);
+  }
+
+  private playPendingUnitIntro(): void {
+    if (projectorSequenceBusy()) return;
+    const host = document.querySelector<HTMLElement>('#school-experience') ?? document.body;
+    playPendingUnitProjector(host, () => {
+      this.savedSchoolState = readSchoolState();
+      const room = VOXEL_ROOMS.find((candidate) => candidate.id === 'electronica');
+      if (room && this.selected === 'electronica') this.renderRoomDetails(room);
+    });
   }
 
   private renderRoomDetails(room: VoxelRoom): void {

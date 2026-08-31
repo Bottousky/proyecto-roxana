@@ -1,0 +1,234 @@
+# Ohmdal Arco I — authored pass
+
+## A0 — baseline y captura
+
+**Estado:** `PASS` — iteración 0. Sol aceptó el plumbing mecánico de Luna después
+de revisar el contrato, el manifest y los tests enfocados.
+
+### Baseline
+
+- `dec2d75`, `b8bb412` y `74abaad` son ancestros de la rama activa
+  `explore/ohmdal-3D`.
+- `npm run loop:ohmdal-arco1:validate`: PASS, greybox `complete`.
+- `npm run loop:ohmdal-arco1-authored:validate`: PASS.
+- `npm run agent:gemini:check`: PASS, `gemini-3.7-flash-high` disponible.
+- `npm run agent:minimax:gmi:check`: PASS, `MiniMaxAI/MiniMax-M3` disponible.
+- `npm run playtest:ohmdal-golden-path`: PASS, 22 checkpoints, incluyendo
+  desktop/mobile y `arc1-complete`.
+
+### Contrato de captura
+
+- `FAST local GPU`: `npm run visual:ohmdal-plaza:fast -- --stage <stage>
+  --shots <ids> --out <dir>`. Prefiere Chrome, luego Edge y finalmente Chromium;
+  solicita aceleración física, nunca fuerza SwiftShader y registra renderer y
+  `softwareRendered`. Omite deliberadamente mobile, no-post y touch smoke.
+- `FULL deterministic`: `npm run visual:ohmdal-plaza`. Conserva las ocho vistas,
+  contexto mobile frío, no-post, touch smoke y la semántica de lanzamiento
+  reproducible existente. SwiftShader continúa permitido sólo como fallback
+  funcional; su FPS no es benchmark de GPU.
+
+Evidencia FAST verificada por Sol:
+`output/playwright/ohmdal-arco1-authored/a0-fast-sol-verify/capture-manifest.json`.
+Chrome 151 usó Intel UHD Graphics por D3D11, `softwareRendered=false`, produjo
+5/5 capturas y cero errores de consola/página. Los números de frame quedan como
+diagnóstico local, no como presupuesto aceptado.
+
+### Shots canónicos registrados
+
+1. `portal-arrival`
+2. `plaza-wide`
+3. `ohm-landmark`
+4. `workshop-exterior`
+5. `workshop-interior-tools`
+6. `galvanoscope-first-person`
+7. `manantial-approach`
+8. `hydro-central-wide`
+9. `sluice-gate-interaction`
+10. `generator-platform`
+11. `restored-manantial`
+12. `restored-plaza-wide`
+13. `bell-activation`
+14. `castle-gate-open`
+15. `castle-distribution-hall`
+16. `forge-core`
+17. `terraces-irrigation`
+18. `forge-terraces-overview`
+19. `lighthouse-approach`
+20. `lighthouse-lake-wide`
+21. `final-return-plaza`
+22. `arc1-final-pedestal`
+
+El set mobile obligatorio sigue siendo el definido por
+`ARCO1_CANONICAL_SHOTS.md`; FAST no lo reemplaza.
+
+### Deuda y límites
+
+- El FULL local intentado durante A0 agotó el timeout al bootstrap mobile; el
+  código no se cambió para ocultarlo ni se debilitó el gate. El contrato queda
+  cubierto por tests y por la evidencia full aceptada del greybox; se volverá a
+  ejecutar en A8.
+- No hubo cambios de gameplay, Plaza, engine, dependencias, canon ni guion.
+- No se usaron proveedores 3D ni gasto pago.
+
+## A1 — referencias y contratos visuales
+
+**Estado:** `PASS` — iteración 1. Sol aceptó el pack después del test mecánico
+de Luna y de una revisión independiente read-only de Gemini 3.7 Flash High.
+
+### Pack aceptado
+
+- `assets/references/region-packs/manifest.json` declara las ocho regiones,
+  briefs existentes y autoridad espacial/visual explícita.
+- La unión de sus rutas cubre exactamente los 22 shots canónicos. Los únicos
+  dos cruces intencionales son `forge-terraces-overview` y
+  `final-return-plaza`.
+- Plaza permanece bloqueada como baseline aceptado; A2 se limita al Taller y a
+  sus seams funcionales. No se demostró ninguna regresión de Plaza.
+- Gemini marcó las ocho regiones `READY_FOR_SUPPORT_AUTHORING` y no encontró
+  blockers player-facing. Su dictamen persistido está en
+  `agent-work/reports/gemini/ohmdal-arco1-authored-a1-reference-review.md`.
+
+### Heroes
+
+Gemini clasificó los cuatro candidatos como `adapt`: turbine-generator
+assembly, central distribution bus landmark, primary load/protection assembly y
+lighthouse calibration mechanism. Sol acepta esa clasificación sólo para crear
+sus Hero Reference Packs. El manifest conserva `autoApproveDesign=false` y
+`finalModelingBlockedUntilHeroPack=true`; ningún modelado final comienza antes
+de un JSON machine-readable que pase `npm run 3d:validate-hero-ref`.
+
+No hay HUMAN_GATE activo: la evidencia local alcanza para `adapt`, el pipeline
+es Blender determinista y no se autorizó Meshy/Tripo ni gasto pago. La deuda de
+los cuatro packs es asset-local y no bloquea environment/support authoring.
+
+### Evidencia
+
+- `node --experimental-strip-types tests/ohmdal-region-packs.test.ts`: PASS,
+  3/3.
+- `npm run 3d:validate-manifests`: PASS.
+- `npm run loop:ohmdal-arco1-authored:validate`: PASS durante A1.
+- Gemini inspeccionó en plan+sandbox sólo los authority docs, ocho briefs, siete
+  imágenes históricas acotadas y ocho capturas Golden Path permitidas. El
+  wrapper repo-native devolvió metadata sin cuerpo y fue descartado; la
+  continuación oficial `agy` de la misma conversación produjo el dictamen
+  auditable, sin escrituras.
+
+### Correcciones load-bearing para producción
+
+1. La paleta nocturna/húmeda 2D no sustituye la tarde cálida y piedra pálida del
+   material bible.
+2. A2 debe resolver el Taller actualmente oscuro con fill/prácticas sin sombras
+   y jerarquía legible de banco/herramientas.
+3. Faro conserva verdad DC; ningún efecto debe sugerir RC/transitorios.
+4. Los cuatro heroes usan Hero Reference Pack → Blender → GLB → inspect/validate.
+5. A8 asigna `arc1-final-pedestal` a `final-return` para evitar doble captura.
+
+## A2 — coherencia Plaza + Taller
+
+**Estado:** `PASS` — dos iteraciones acotadas. Sol aceptó el authored support
+pass después de revisión mecánica de Luna, capturas GPU, Golden Path completo y
+revisión visual independiente de Gemini 3.7 Flash High.
+
+### Resultado player-facing
+
+- Plaza no se reabrió: los cinco shots aceptados de
+  `output/playwright/ohmdal-arco1-authored/a2-plaza-regression/` son idénticos
+  byte por byte al baseline A0.
+- El exterior conserva el Taller aceptado y hace legibles puerta, conductores,
+  umbral y servicio lateral sin alterar topología.
+- El interior ya funciona como atelier de diagnóstico: banco principal,
+  contactos, batería, mordaza, tablero de medición, terminales, conductores,
+  herramientas y dock del Galvanoscopio tienen jerarquía física explícita.
+- La iluminación cálida usa prácticas sin sombras; permanece una sola luz con
+  sombras para toda la escena activa. No se agregó neón ni glow pasivo.
+- La geometría estática del Taller se batch-ea por zona. Al entrar, Plaza se
+  retira sólo después de activar Taller; al salir, Plaza vuelve antes de retirar
+  el interior. Esto bajó el shot interior de 136 a 33 draw calls y el shot con
+  Galvanoscopio de 218 a 60, sin cambiar gameplay.
+
+### Evidencia
+
+- FAST A2:
+  `output/playwright/ohmdal-arco1-authored/a2-fast-sol-verify/capture-manifest.json`.
+  Chrome 151 / Intel UHD D3D11, `softwareRendered=false`, cero errores de
+  consola/página, 33 draw calls / 8,676 tris en interior y 60 / 15,028 con
+  Galvanoscopio.
+- Plaza regression: 5/5 hashes SHA-256 exactamente iguales a A0.
+- `npm run build`: PASS; sólo warnings conocidos de Havok URL y chunks grandes.
+- `npm run playtest:ohmdal-golden-path`: PASS, 22 checkpoints en una única
+  corrida posterior al cambio de lifecycle, incluidos desktop/mobile y touch.
+- Tests enfocados y suite repo: PASS, incluidos visual harness, authored Taller
+  y lifecycle de zonas.
+- Gemini: `VERDICT: PASS`, sin `PLAYER_FACING_BLOCKERS`,
+  `ANOTHER_A2_ITERATION: NO`; reporte en
+  `agent-work/reports/gemini/ohmdal-arco1-authored-a2-review.md`.
+
+### Deuda no bloqueante
+
+- Edge fill y dressing periférico menor pueden volver en A7/A8; no justifican
+  sobrepulir Taller antes de authoring de Manantial.
+- FAST omite mobile/touch por contrato; la corrida Golden Path cubrió operabilidad
+  y el gate FULL permanece reservado para A8.
+- No se usó MiniMax en A2. Su primer scope obligatorio sigue siendo la propuesta
+  technical-art acotada de Manantial en A3.
+
+## A3 — Manantial / Central hero environment
+
+**Estado:** `PASS` — dos iteraciones visuales acotadas. Sol aceptó el authored
+support pass después del Hero Reference Gate, propuesta M3 evaluada, captura GPU,
+Golden Path completo y revisión independiente Gemini 3.7 Flash High.
+
+### Resultado player-facing
+
+- El Manantial ahora lee como una central hidroeléctrica cívica integrada:
+  headworks de piedra pálida, canal de admisión, hoja y bastidor de compuerta,
+  turbina-generador compacto, eje, plataforma de medición, aisladores y barras
+  de salida comparten una jerarquía física.
+- El estado dormido/restaurado es inequívoco desde la misma cámara: cambia el
+  agua retenida/activa, la elevación de la hoja, el rotor gobernado por gameplay
+  y la conexión física de salida. No hay agua luminosa ni cobre globalmente
+  emissive.
+- El authored support vive bajo `ManantialGameplayRoot` y se batch-ea como
+  `OhmdalManantialStaticArt`. La carcasa escénica heredada de Plaza permanece
+  intacta y se sustituye sólo mientras Manantial está activo.
+- La ruta, controles, colliders y modelo eléctrico validados no cambiaron. Una
+  propuesta inicial de exclusividad Plaza↔Manantial se revirtió cuando el gate
+  demostró que Plaza activa junto a Manantial es una expectativa deliberada.
+
+### Hero y VFX
+
+- `assets/references/hero-packs/manantial/hero-reference.json` pasó
+  `HERO_REFERENCE_GATE` en modo `adapt`. Autoriza el support silhouette, no un
+  hero GLB final ni proveedores generativos.
+- MiniMax M3 entregó una propuesta acotada. Sol conservó el FSM determinista y
+  el cleanup explícito, pero rechazó la mutación de materiales compartidos, la
+  doble autoridad del rotor, el merge inseguro de settings y las afirmaciones
+  móviles inconsistentes.
+- La implementación aceptada crea un único trace local durante el evento,
+  anima el indicador sin sombras, respeta reduced motion y devuelve el estado
+  estable a la simulación. La evaluación está en
+  `agent-work/reports/minimax-gmi/EVALUATION.md`.
+
+### Evidencia
+
+- FAST A3:
+  `output/playwright/ohmdal-arco1-authored/a3-fast-iteration2/capture-manifest.json`.
+  Chrome 151 / NVIDIA GTX 1660 Ti D3D11, `softwareRendered=false`, cero errores
+  de consola/página, 31 draw calls / 3,924 tris en estado dormido y 32 / 3,936
+  restaurado, una sola luz con sombras.
+- `npm run build`: PASS; sólo warnings conocidos de Havok URL y chunks grandes.
+- Tests enfocados de harness + authored Manantial: PASS, 13/13.
+- `npm run playtest:ohmdal-golden-path`: PASS, 22 checkpoints, incluidos
+  `manantial-restored-mobile`, desktop y retorno final. Cero page errors; sólo
+  cuatro warnings conocidos de ReadPixels bajo SwiftShader determinista.
+- Gemini: `VERDICT: PASS`, sin `PLAYER_FACING_BLOCKERS`,
+  `ANOTHER_A3_ITERATION: NO`; reporte en
+  `agent-work/reports/gemini/ohmdal-arco1-authored-a3-review.md`.
+
+### Deuda no bloqueante
+
+- El hero GLB de alta densidad sigue detrás de su gate DCC y no bloquea el
+  authored pass completo del Arco I.
+- FAST omite touch smoke por contrato; Golden Path cubrió el checkpoint mobile
+  de Manantial y FULL permanece reservado para A8.
+- Dressing periférico menor puede volver en A7/A8; no justifica demorar A4.

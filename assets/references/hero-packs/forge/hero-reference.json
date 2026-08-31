@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_forge_primary_load_protection_assembly_hero_01",
+  "world": "ohmdal",
+  "name": "Conjunto de carga térmica principal y protecciones de la Forja",
+  "mode": "adapt",
+  "status": "approved",
+  "primaryReference": "assets/ohmdal/rooms/pilot-arco1/prop_forge_hearth_off.png",
+  "supportingReferences": [
+    "assets/ohmdal/rooms/pilot-arco1/prop_forge_hearth_on.png",
+    "assets/ohmdal/rooms/pilot-arco1/prop_fuses_hanging.png",
+    "assets/ohmdal/rooms/pilot-arco1/prop_forge_gate.png",
+    "assets/ohmdal/rooms/pilot-arco1/forge_hall+prop_forge_hearth_off.png"
+  ],
+  "physicalAnchors": {
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "groundedPivot": true,
+    "assemblyRole": "industrial thermal load hearth and protection assembly",
+    "scaleSource": "accepted greybox runtime before authoring"
+  },
+  "mustPreserve": [
+    "heavy industrial hearth and thermal load silhouette from primary reference",
+    "thermal demand legible through heating elements and material temperature response",
+    "thick high-current conductors and ceramic standoff insulators",
+    "protection and fuse assembly attached to real service branches",
+    "pale stone plinths, dark steel fittings and aged copper conductors",
+    "dormant state with cold hearth and inactive conductors",
+    "energized state with physical heat/glow localized to heating elements without permanent global neon",
+    "trade-off relationship between industrial thermal demand and irrigation allocation"
+  ],
+  "mayResolve": [
+    "internal heating coil winding, terminal connectors and thermal shielding not defined in references",
+    "mounting bracket and maintenance access details",
+    "exact fuse cartridge retention clip and trip indicator geometry",
+    "runtime mesh segmentation, material slots and pivot hierarchy",
+    "exact dimensions after measurement against the accepted greybox runtime"
+  ],
+  "forbidden": [
+    "magical fantasy forge or lava cavern redesign",
+    "permanent blue/red neon glow as a substitute for electrical state",
+    "random steam/pipe clutter without electrical function",
+    "sparks/particles disconnected from physical load and protection state",
+    "invented symbols, lore or electrical behavior",
+    "redesign of validated topology, branch consequences or protection behavior",
+    "free text-to-3D redesign that departs from the primary hearth reference",
+    "Meshy or Tripo use without the required HUMAN_GATE"
+  ],
+  "authoring": {
+    "preferredRoute": "blender-deterministic-first",
+    "buildScript": null,
+    "canonicalGlb": null,
+    "generativeProviderRequired": false
+  },
+  "approvalNote": "Approved for the adapt reference-pack gate only. This pack records repo-native visual anchors and does not auto-approve the final hero design, modeling, provider use or canonical GLB; final modeling remains blocked until Sol verifies the reference comparison and runtime constraints.",
+  "referenceAudit": {
+    "searchedScopes": [
+      "assets/ohmdal/rooms/pilot-arco1",
+      "output/playwright/ohmdal-hardening/golden-path"
+    ],
+    "primaryRationale": "prop_forge_hearth_off.png is the repo-native reference that most directly defines the thermal load hearth silhouette; the supporting references provide on-state thermal response, hanging fuse architecture, and industrial room context.",
+    "contextOnly": [
+      "assets/ohmdal/rooms/pilot-arco1/prop_forge_hearth_on.png",
+      "assets/ohmdal/rooms/pilot-arco1/prop_fuses_hanging.png",
+      "assets/ohmdal/rooms/pilot-arco1/prop_forge_gate.png",
+      "assets/ohmdal/rooms/pilot-arco1/forge_hall+prop_forge_hearth_off.png"
+    ]
+  },
+  "evidence": {
+    "stageReport": null,
+    "preview": null
+  }
+}

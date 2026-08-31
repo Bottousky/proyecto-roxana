@@ -1,0 +1,44 @@
+{
+  "id": "roxana-ohmdal-plaza-cobble-moss-v1",
+  "provider": "Poly Haven",
+  "sourceAsset": "mossy_cobblestone",
+  "sourceUrl": "https://polyhaven.com/a/mossy_cobblestone",
+  "license": "CC0-1.0",
+  "sourceResolution": "2k",
+  "runtimeResolution": "1k",
+  "processing": "Pillow LANCZOS; JPEG quality 84 or optimized PNG; no displacement",
+  "outputs": [
+    {
+      "map": "diff",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-moss/diffuse-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 325010,
+      "sha256": "a8827cc8daa66d664f598d78944edd47567fc1a836fcc81c0713a9ab98aa8d4f"
+    },
+    {
+      "map": "nor_gl",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-moss/normal-1k.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 2028967,
+      "sha256": "4683b87231f1c405d2ea5b5783a654dceccd03c342e1e97d19b8616b5e9fd74c"
+    },
+    {
+      "map": "rough",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-moss/roughness-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 112301,
+      "sha256": "35c08c0cbd47455f57ce339b44fe1bc480a29be5b4916ce8916fa8573a133275"
+    },
+    {
+      "map": "ao",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-moss/ao-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 211594,
+      "sha256": "ea77d894f24b876e31d60dc30025470fecc3c64f1f6c2838d5a8a10449b96023"
+    }
+  ]
+}

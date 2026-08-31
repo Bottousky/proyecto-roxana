@@ -18,23 +18,23 @@
 
 | Familia | Ruta primaria |
 |---|---|
-| Arquitectura, hard-surface, puertas, mecanismos | modular/procedural o `img2threejs` |
-| Humanos | pixel art de cuatro direcciones aprobado en H2 |
-| Ohm | sprite aprobado en H2 |
+| Arquitectura, hard-surface, puertas, mecanismos | Blender modular/procedural → GLB |
+| Humanos | Blender/GLB según dirección visual aprobada; prototipos previos son referencia |
+| Ohm | Blender/GLB o representación aprobada por el slice; no promover un spike por accidente |
 | Props repetidos/vegetación | módulos, atlas e instancing |
-| Concept, retrato, Bitácora, textura 2D | autoría o GPT ImageCreate con procedencia |
-| Orgánico/hero irregular | Meshy sólo con aprobación, balance y presupuesto |
+| Concept, retrato, Bitácora, textura 2D | autoría o `mmx image` con procedencia |
+| Orgánico/hero irregular | Blender; generación externa sólo con decisión explícita |
 | Pieza mecánica funcional | CAD paramétrico; IA sólo concepto/carcasa |
 
-No generar escenas/regiones como una malla única. No reabrir 8 direcciones u Ohm 3D sin una falla
-observable nueva y decisión del Director.
+No generar escenas/regiones como una malla única. No cerrar la representación de
+personajes sin evidencia del slice y decisión de Manuel.
 
-## GPT ImageCreate
+## Producción asistida
 
-Usar después de cerrar blockout, cámara y composición. Conservar imagen fuente, prompt, fecha,
-proveedor, selección humana y manifest. Un builder de OpenCode habilitado puede procesar atlas,
-formatos, materiales e integración, pero no elige la identidad final ni declara una imagen como
-geometría. Kimi sólo puede entrar al routing cuando el CLI reporte un ID real y pase el smoke.
+Usar `mmx` después de cerrar blockout, cámara y composición. Conservar imagen
+fuente, prompt, fecha, proveedor, selección humana y manifest. MiniMax puede
+producir variantes o procesar medios, pero Codex revisa e integra; una imagen no
+se declara geometría ni identidad final por sí sola.
 
 ## Presupuesto inicial
 
@@ -46,5 +46,5 @@ geometría. Kimi sólo puede entrar al routing cuando el CLI reporte un ID real 
 | Triángulos visibles | 150k–300k | 400k–700k |
 | Luces con sombra | 0–1 | 1 principal |
 
-Medir `renderer.info`, peso transferido y los cinco assets principales. Meshy y generación paga
-mantienen presupuesto cero hasta una decisión registrada en `DECISIONS.md` y `tasks.json`.
+Medir estadísticas del renderer, peso transferido y los cinco assets principales.
+Generación paga requiere una decisión explícita y presupuesto conocido.

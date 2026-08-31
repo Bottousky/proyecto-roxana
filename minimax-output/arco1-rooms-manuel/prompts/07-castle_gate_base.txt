@@ -1,0 +1,16 @@
+# Patio del Castillo de la Red
+# Guardar como: castle_gate_base.png
+# Lienzo nativo (1px = 1px de juego): 1920x1080
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1920x1080. Fortified DISTRIBUTION COURT, wider than one screen. Institutional masonry, repeatable modules, oxidized seals, inspection cabinets. NOT a fairy-tale castle, NOT flags.
+
+EAST: monumental portcullis toward Plaza.
+NW: closed gallery door (deeper in).
+SOUTH: sootier path toward Forja.
+Broad walkable court. Copper conduits in pavement split toward neighborhood paths. Unlit work lamps. Cooler grey-taupe than Plaza. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (1038 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1920x1080 Patio of Castillo de la Red, distribution court not a generic castle. East portcullis to Plaza. NW closed gallery door. South path to Forja. Broad walkable court. Copper conduits in pavement. Repeatable institutional masonry, oxidized seals. Unlit lamps. No flags. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

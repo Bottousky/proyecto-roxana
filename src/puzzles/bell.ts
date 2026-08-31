@@ -170,5 +170,6 @@ export function abrirBell(onSolved: () => void, replay = false): void {
       bench.setStatus(stateStatus(currentState));
       sfxBell();
     },
+    { worldCloseup: true },
   );
 }

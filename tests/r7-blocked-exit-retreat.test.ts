@@ -1,7 +1,7 @@
 /**
  * R7 — regresión del bloqueo en un exit sellado.
  *
- * El Player Agent reprodujo que el cuerpo podía quedar dentro del trigger
+ * El playtest reprodujo que el cuerpo podía quedar dentro del trigger
  * de una puerta trabada y reabrir el diálogo al intentar retirarse. Phaser no
  * es importable en este runner Node; este test verifica el wiring runtime
  * exacto sobre el fuente, siguiendo el patrón de rt0/r5/r6.

@@ -68,7 +68,7 @@ Todo asset que entre al Arco I registra en su manifest:
 5. hash del archivo;
 6. presupuesto y coste real.
 
-Un asset sin procedencia completa **no se integra**, aunque se vea bien. Meshy y toda generación paga
+Un asset sin procedencia completa **no se integra**, aunque se vea bien. Toda generación paga
 mantienen presupuesto **cero**; habilitarlos es una decisión de Manuel, no de quien produce el asset.
 
 ## 6. Símbolos técnicos

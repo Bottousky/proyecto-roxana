@@ -1,0 +1,15 @@
+# Enfermería — corredor E–O
+# Guardar como: forge_infirmary_base.png
+# Lienzo nativo (1px = 1px de juego): 1440x540
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1440x540 — WIDE short corridor, one screen tall, 1.5 screens wide. Pokémon-style hallway, not a square room.
+
+WEST door to yard. EAST door to long channel. Both mid-height.
+NORTH WALL landmark: ceramic fuses and copper disconnects (fuse gallery).
+Walkable south/center. Wood benches, ceramic trays. Window slits. Electrical protection, NOT a hospital. No beds, no fire. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (997 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1440x540 wide Enfermeria corridor. West door to yard, east door to long channel. North wall ceramic fuses and copper disconnects. Walkable south/center. Wood benches, ceramic trays. Protection hall not a hospital. No fire, no people. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

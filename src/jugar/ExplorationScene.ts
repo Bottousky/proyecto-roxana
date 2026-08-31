@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { ROOMS, type ThingDef, type DoorDef } from './rooms';
+import { currentField, paintField } from './field/index.ts';
 import { state, hooks, save } from '../state';
 import { uiOpen, el } from '../ui/overlay';
 import { say, type Line } from '../ui/dialog';
@@ -617,6 +618,12 @@ export class ExplorationScene extends Phaser.Scene {
     this.transitionLock.finish();
     this.incomingActorKeys.clear();
     this.incomingFromRoom = null;
+    const field = currentField();
+    if (field && field.roomId === id && field.active()) paintField(false);
+    else if (field && field.roomId !== id) {
+      const dock = document.getElementById('field-dock');
+      dock?.classList.add('hidden');
+    }
   }
 
   /** construye la room activa: base, puertas visuales, cosas y personajes.

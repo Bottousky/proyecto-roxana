@@ -17,10 +17,8 @@ paired_with: ARI-R-A
 
 - Pair: `ARI-R-A`.
 - Partir del mismo baseline y transformation core, no del resultado de A.
-- Builder: MiniMax M3 / MiniMax Code.
-- Player Agent: GPT-5.6 Luna blind-first.
-- Repair: DeepSeek V4 Flash.
-- Adversarial review: mismo GLM pin de A.
+- Integración técnica: Codex.
+- Mismo protocolo de playtest blind-first y revisión para A y B.
 - Normal loops: 1–3; hard cap: 5.
 - No leer/copiar implementación específica de A.
 - Resolver/pinnear versión PixiJS al iniciar; SVG/DOM pueden usarse donde sean claramente mejores que canvas.
@@ -84,8 +82,8 @@ El mismo de A:
 - [ ] agrupaciones/relaciones se leen sin texto técnico previo.
 - [ ] touch no exige precisión motriz fina.
 - [ ] transición a notación final se siente como otra representación del mismo objeto, no una pantalla separada.
-- [ ] Player Agent sin BLOCKER/MAJOR.
-- [ ] adversarial reviewer sin BLOCKER/MAJOR.
+- [ ] playtest blind-first sin BLOCKER/MAJOR.
+- [ ] revisión comparativa sin BLOCKER/MAJOR.
 
 ## Evidence
 
@@ -94,7 +92,7 @@ Registrar las mismas categorías de A:
 - baseline + Pixi version;
 - loops/intervención humana;
 - screenshots/sequence desktop-mobile;
-- Player Agent report;
+- informe de playtest;
 - ambigüedades de percepción;
 - performance si material;
 - lista de conceptos para los que 2D agregó valor y para los que quedó corto.

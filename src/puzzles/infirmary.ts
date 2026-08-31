@@ -317,5 +317,6 @@ export function abrirInfirmary(opts: AbrirInfirmaryOptions): void {
       );
       render();
     },
+    { worldCloseup: true },
   );
 }

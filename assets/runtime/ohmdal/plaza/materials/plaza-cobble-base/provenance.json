@@ -1,0 +1,36 @@
+{
+  "id": "roxana-ohmdal-plaza-cobble-base-v1",
+  "provider": "Poly Haven",
+  "sourceAsset": "cobblestone_floor_001",
+  "sourceUrl": "https://polyhaven.com/a/cobblestone_floor_001",
+  "license": "CC0-1.0",
+  "sourceResolution": "2k",
+  "runtimeResolution": "1k",
+  "processing": "Pillow LANCZOS; JPEG quality 84 or optimized PNG; no displacement",
+  "outputs": [
+    {
+      "map": "diff",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-base/diffuse-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 254542,
+      "sha256": "892145f2fed2a40bfe03ac14c444fffb9c6bd3528ac6fd0248ddd3159551c2bd"
+    },
+    {
+      "map": "nor_gl",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-base/normal-1k.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 2106791,
+      "sha256": "a55ffa8e68bf7abb302950a0f40b4170af6862802f9d0f34e36763ed3281c40b"
+    },
+    {
+      "map": "rough",
+      "path": "assets/runtime/ohmdal/plaza/materials/plaza-cobble-base/roughness-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 229112,
+      "sha256": "76c2815d5907d0b7d1cabbc13f50db76d9ed32b10cd037ce0f0d12560f8d4407"
+    }
+  ]
+}

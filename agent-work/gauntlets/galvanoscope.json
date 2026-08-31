@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_galvanoscope_hero_01",
+  "status": "accepted",
+  "route": "blender-deterministic-first",
+  "heroReference": "assets/references/hero-packs/galvanoscope/hero-reference.json",
+  "buildScript": "scripts/3d/build_galvanoscope_hero.py",
+  "blenderMaster": "assets/source/ohmdal/heroes/galvanoscope/galvanoscope.blend",
+  "canonicalGlb": "assets/runtime/ohmdal/plaza/heroes/galvanoscope/galvanoscope.glb",
+  "previews": {
+    "front": "output/blender/galvanoscope/candidate-01-front.png",
+    "three-quarter": "output/blender/galvanoscope/candidate-01-three-quarter.png",
+    "side": "output/blender/galvanoscope/candidate-01-side.png",
+    "back": "output/blender/galvanoscope/candidate-01-back.png"
+  },
+  "independentReview": "agent-work/reports/gemini/ohmdal-plaza-loop-stage-3-galvanoscope-iter-1-after.md",
+  "provenance": "assets/runtime/ohmdal/plaza/heroes/galvanoscope/provenance.json",
+  "maxFixesPerIteration": 3,
+  "iterations": 1,
+  "paidProvider": null,
+  "creditsSpent": 0
+}

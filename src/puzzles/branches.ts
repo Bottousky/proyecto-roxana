@@ -309,13 +309,17 @@ export function abrirBranches(opts: AbrirBranchesOptions): void {
         if (phase === 'predict-independence') {
           predict.classList.remove('hidden');
           predict.innerHTML =
-            '<p class="bench-predict-q"><b>Ohm:</b> «La primera rama ya corre. Si conecto la segunda, ¿qué crees que le pasa al brillo de la primera?»</p>';
-          appendPredictButtons(predict, INDEPENDENCE_OPTIONS, (key) => chooseIndependence(key));
+            '<p class="bench-predict-q"><b>Ohm:</b> «Toca la lámpara de la primera rama: ¿qué le pasa si conecto la segunda?»</p>';
+          cardRefs[0]?.lamp.addEventListener('click', () => chooseIndependence('igual'), { once: true });
+          cardRefs[1]?.lamp.addEventListener('click', () => chooseIndependence('baja'), { once: true });
+          stage.querySelector('.branches-source')?.addEventListener('click', () => chooseIndependence('sube'), { once: true });
         } else if (phase === 'predict-trunk') {
           predict.classList.remove('hidden');
           predict.innerHTML =
-            '<p class="bench-predict-q"><b>Ohm:</b> «Cada rama cobra lo suyo. Pero si las tres piden mucho a la vez, ¿qué crees que le pasa al Tronco?»</p>';
-          appendPredictButtons(predict, TRUNK_OPTIONS, (key) => chooseTrunk(key));
+            '<p class="bench-predict-q"><b>Ohm:</b> «Toca el Tronco o una lámpara: ¿qué pasa si las tres piden mucho a la vez?»</p>';
+          stage.querySelector('.branches-trunk')?.addEventListener('click', () => chooseTrunk('sobrecarga'), { once: true });
+          cardRefs[0]?.lamp.addEventListener('click', () => chooseTrunk('nada'), { once: true });
+          cardRefs[2]?.lamp.addEventListener('click', () => chooseTrunk('apagan'), { once: true });
         } else {
           predict.classList.add('hidden');
           predict.innerHTML = '';
@@ -386,6 +390,7 @@ export function abrirBranches(opts: AbrirBranchesOptions): void {
       );
       render();
     },
+    { worldCloseup: true },
   );
 }
 
@@ -402,21 +407,4 @@ function canToggleBranch(state: BranchesState, branchIndex: number): boolean {
     return branchIndex === 1 && !state.branches[branchIndex].connected;
   }
   return phase === 'solve';
-}
-
-function appendPredictButtons<K extends string>(
-  host: HTMLElement,
-  options: { key: K; label: string }[],
-  onPick: (key: K) => void,
-): void {
-  const row = document.createElement('div');
-  row.className = 'bench-predict-row';
-  for (const option of options) {
-    const button = document.createElement('button');
-    button.className = 'bench-predict-btn';
-    button.textContent = option.label;
-    button.addEventListener('click', () => onPick(option.key));
-    row.appendChild(button);
-  }
-  host.appendChild(row);
 }

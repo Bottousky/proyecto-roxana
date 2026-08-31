@@ -1,0 +1,44 @@
+{
+  "id": "roxana-ohmdal-stone-primary-v1",
+  "provider": "Poly Haven",
+  "sourceAsset": "stone_tile_wall",
+  "sourceUrl": "https://polyhaven.com/a/stone_tile_wall",
+  "license": "CC0-1.0",
+  "sourceResolution": "2k",
+  "runtimeResolution": "1k",
+  "processing": "Pillow LANCZOS; JPEG quality 84 or optimized PNG; no displacement",
+  "outputs": [
+    {
+      "map": "diff",
+      "path": "assets/runtime/ohmdal/plaza/materials/stone-primary/diffuse-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 162583,
+      "sha256": "7a8f09f675558885b2f73287ba13dcdae1e4b8cc45c1b11a99a88feb36cf63d9"
+    },
+    {
+      "map": "nor_gl",
+      "path": "assets/runtime/ohmdal/plaza/materials/stone-primary/normal-1k.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 1461058,
+      "sha256": "f8a436b71657498f8e414215f44f721dca2d141a860071a2e4863281abaa400d"
+    },
+    {
+      "map": "rough",
+      "path": "assets/runtime/ohmdal/plaza/materials/stone-primary/roughness-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 16702,
+      "sha256": "8dc4d90656cce761508b4e432efb5e9931dbfd6f506b495a6a30f35527c0f575"
+    },
+    {
+      "map": "ao",
+      "path": "assets/runtime/ohmdal/plaza/materials/stone-primary/ao-1k.jpg",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 82583,
+      "sha256": "5889c22011aa949817e2893906af7d13aacfddd23360b47b7deca630d272bc64"
+    }
+  ]
+}

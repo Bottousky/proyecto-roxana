@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_ambient_vfx_audio_hero_01",
+  "world": "ohmdal",
+  "name": "Dirección y capas de VFX, audio y ambiente para Ohmdal Arco I",
+  "mode": "design-approved",
+  "status": "approved",
+  "primaryReference": "docs/20-worlds/ohmdal/production/OHMDAL_VFX_AUDIO_PLAN.md",
+  "supportingReferences": [
+    "docs/20-worlds/ohmdal/production/direccion-ambiental-arco1.md",
+    "docs/20-worlds/ohmdal/production/OHMDAL_VISUAL_MATERIAL_BIBLE.md",
+    "docs/20-worlds/ohmdal/production/ARCO1_CANONICAL_SHOTS.md"
+  ],
+  "physicalAnchors": {
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "groundedPivot": true,
+    "assemblyRole": "event-driven procedural VFX, WebAudio soundscape and zone ambient lighting",
+    "scaleSource": "accepted greybox and authored zone models"
+  },
+  "mustPreserve": [
+    "energy is an event, not wallpaper: copper, stone and machines do not glow passively",
+    "event-driven VFX layers: conductorPulse, terminalArcBurst, contactSnap, heatRamp, waterMist, dustWake, generatorSpinUp, protectionTrip",
+    "procedural WebAudio soundscapes: 50Hz hum, bell overtones, hydraulic flow, turbine spin-up, breaker clunks, forge thermal roar, lake breeze and calibration feedback",
+    "zone-specific ambient lighting reflecting night arrival, sealed castle violet shadows, industrial forge contrast, terraced sunset sheen, and dark lake lighthouse",
+    "quiet/off state when circuits or hydraulic valves are open or inactive",
+    "deterministic parameter tuning with explicit mobile scaling and reduced-motion compliance",
+    "no generic victory shimmer or unmotivated neon saturation on return"
+  ],
+  "mayResolve": [
+    "exact mist quad particle count and lifetime curves",
+    "conductor pulse travel speeds along complex curved bus lines",
+    "micro-arc flash decay curves and spark scatter radius",
+    "WebAudio filter cutoff frequencies and gain envelope timings"
+  ],
+  "forbidden": [
+    "permanent copper glow or full-scene neon emissive wallpaper",
+    "unmotivated persistent particle storms or fireworks",
+    "invented RC pulse timing or non-ratified electrical mechanics",
+    "fantasy spell sparkles detached from physical conductors or switches",
+    "unmuted autoplay audio without user interaction handling",
+    "degradation of mobile performance budgets or GPU fill rate",
+    "inventing new narrative dialogue or changing verified network topology"
+  ],
+  "authoring": {
+    "preferredRoute": "procedural-playcanvas-webaudio-deterministic",
+    "buildScript": "src/experiences/ohmdal-playcanvas/systems/vfx/ohmdalVfxSystem.ts",
+    "canonicalGlb": null,
+    "generativeProviderRequired": false
+  },
+  "approvalNote": "Approved for the A7 VFX, Audio and Ambient authored pass. Defines the canonical rules for event-driven effects, procedural audio, and zone-specific lighting.",
+  "referenceAudit": {
+    "searchedScopes": [
+      "docs/20-worlds/ohmdal/production",
+      "src/experiences/ohmdal-playcanvas"
+    ],
+    "primaryRationale": "OHMDAL_VFX_AUDIO_PLAN.md and direccion-ambiental-arco1.md establish the physical rules of event-driven electricity, water motion, and lighting across all Arco I zones.",
+    "contextOnly": [
+      "docs/20-worlds/ohmdal/production/OHMDAL_VISUAL_MATERIAL_BIBLE.md",
+      "docs/20-worlds/ohmdal/production/ARCO1_CANONICAL_SHOTS.md"
+    ]
+  },
+  "evidence": {
+    "stageReport": null,
+    "preview": null
+  }
+}

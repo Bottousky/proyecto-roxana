@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_lighthouse_mechanism_calibration_hero_01",
+  "world": "ohmdal",
+  "name": "Landmark del mecanismo del Faro y panel de calibración DC",
+  "mode": "adapt",
+  "status": "approved",
+  "primaryReference": "assets/ohmdal/rooms/pilot-arco1/prop_lighthouse_lens_off.png",
+  "supportingReferences": [
+    "assets/ohmdal/rooms/pilot-arco1/prop_lighthouse_lens_on.png",
+    "assets/ohmdal/rooms/pilot-arco1/lighthouse_lantern+prop_lighthouse_lens_off.png",
+    "assets/ohmdal/rooms/pilot-arco1/lighthouse_bench_base.png",
+    "assets/ohmdal/rooms/pilot-arco1/lighthouse_hall_base.png",
+    "assets/ohmdal/rooms/pilot-arco1/prop_lighthouse_dock.png",
+    "assets/ohmdal/rooms/pilot-arco1/prop_lighthouse_boat.png"
+  ],
+  "physicalAnchors": {
+    "unit": "meter",
+    "frontAxis": "+Z",
+    "upAxis": "+Y",
+    "groundedPivot": true,
+    "assemblyRole": "lighthouse beacon mechanism and DC calibration console landmark",
+    "scaleSource": "accepted greybox runtime before authoring"
+  },
+  "mustPreserve": [
+    "austere technical lighthouse and Fresnel lens silhouette from primary reference",
+    "beacon mechanism with stepped masonry base, brass structural framework and copper cupola",
+    "DC calibration console and precision measurement stand attached to network supply",
+    "quayside retaining wall, dock pier and lake water boundary",
+    "overhead transmission conductors and ceramic standoff insulators along the approach",
+    "pale stone plinths, dark steel fittings and aged copper conductors",
+    "dormant state with inert lantern and inactive signal director",
+    "restored state with localized focal light and signal bar without global neon",
+    "quiet narrative culmination and backtracking return path to Plaza without fake finale UI"
+  ],
+  "mayResolve": [
+    "internal lens mounting ring, bracket fasteners and ventilation cowl details not defined in references",
+    "dock pier stone texture and mooring stanchion fastenings",
+    "exact galvanometer dial face markings and terminal clip geometry",
+    "runtime mesh segmentation, material slots and pivot hierarchy",
+    "exact dimensions after measurement against the accepted greybox runtime"
+  ],
+  "forbidden": [
+    "coastal fantasy beacon clichés or giant magical laser redesign",
+    "unexplained pulse timing or inventing non-ratified RC/transient mechanics",
+    "permanent blue/red neon glow as a substitute for electrical calibration state",
+    "decorative steampunk clutter without electrical or structural function",
+    "invented symbols, lore, finale dialogue or victory skins",
+    "redesign of validated topology, calibration rules or return route",
+    "free text-to-3D redesign that departs from the primary lens reference",
+    "Meshy or Tripo use without the required HUMAN_GATE"
+  ],
+  "authoring": {
+    "preferredRoute": "blender-deterministic-first",
+    "buildScript": null,
+    "canonicalGlb": null,
+    "generativeProviderRequired": false
+  },
+  "approvalNote": "Approved for the adapt reference-pack gate only. This pack records repo-native visual anchors and does not auto-approve the final hero design, modeling, provider use or canonical GLB; final modeling remains blocked until Sol verifies the reference comparison and runtime constraints.",
+  "referenceAudit": {
+    "searchedScopes": [
+      "assets/ohmdal/rooms/pilot-arco1",
+      "output/playwright/ohmdal-hardening/golden-path"
+    ],
+    "primaryRationale": "prop_lighthouse_lens_off.png is the repo-native reference that most directly defines the lighthouse beacon lens and lantern silhouette; supporting references provide on-state optical response, calibration bench, hall perspective, dock and lake context.",
+    "contextOnly": [
+      "assets/ohmdal/rooms/pilot-arco1/prop_lighthouse_lens_on.png",
+      "assets/ohmdal/rooms/pilot-arco1/lighthouse_lantern+prop_lighthouse_lens_off.png",
+      "assets/ohmdal/rooms/pilot-arco1/lighthouse_bench_base.png",
+      "assets/ohmdal/rooms/pilot-arco1/lighthouse_hall_base.png",
+      "assets/ohmdal/rooms/pilot-arco1/prop_lighthouse_dock.png",
+      "assets/ohmdal/rooms/pilot-arco1/prop_lighthouse_boat.png"
+    ]
+  },
+  "evidence": {
+    "stageReport": null,
+    "preview": null
+  }
+}

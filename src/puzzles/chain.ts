@@ -214,12 +214,22 @@ export function abrirChain(onSolved: () => void, practica = false): void {
       const renderPredict = (phase: Phase) => {
         if (phase === 'predict-river') {
           predict.classList.remove('hidden');
-          predict.innerHTML = '<p class="bench-predict-q"><b>Ohm:</b> «Antes de medir: ¿dónde crees que corre más río?»</p>';
-          appendPredictButtons(predict, RIVER_OPTIONS, (key) => chooseRiver(key));
+          predict.innerHTML = '<p class="bench-predict-q"><b>Ohm:</b> «Toca el punto del circuito donde crees que corre más río.»</p>';
+          const source = stage.querySelector<HTMLElement>('.chain-source');
+          const slotsEl = stage.querySelector<HTMLElement>('.chain-slots');
+          const ret = stage.querySelector<HTMLElement>('.chain-return');
+          source?.addEventListener('click', () => chooseRiver('antes'), { once: true });
+          slotsEl?.addEventListener('click', () => chooseRiver('igual'), { once: true });
+          ret?.addEventListener('click', () => chooseRiver('despues'), { once: true });
         } else if (phase === 'predict-removal') {
           predict.classList.remove('hidden');
-          predict.innerHTML = '<p class="bench-predict-q"><b>Ohm:</b> «Si saco una lámpara, ¿qué crees que les pasa a las otras?»</p>';
-          appendPredictButtons(predict, REMOVAL_OPTIONS, (key) => chooseRemoval(key));
+          predict.innerHTML = '<p class="bench-predict-q"><b>Ohm:</b> «Toca las otras lámparas, el Empuje o el retorno: ¿qué crees que les pasa si sacas una?»</p>';
+          const source = stage.querySelector<HTMLElement>('.chain-source');
+          const slotsEl = stage.querySelector<HTMLElement>('.chain-slots');
+          const ret = stage.querySelector<HTMLElement>('.chain-return');
+          slotsEl?.addEventListener('click', () => chooseRemoval('iguales'), { once: true });
+          source?.addEventListener('click', () => chooseRemoval('mas'), { once: true });
+          ret?.addEventListener('click', () => chooseRemoval('apagan'), { once: true });
         } else {
           predict.classList.add('hidden');
           predict.innerHTML = '';
@@ -327,13 +337,14 @@ export function abrirChain(onSolved: () => void, practica = false): void {
       );
       render(false);
     },
+    { worldCloseup: true },
   );
 }
 
 const GOAL_TEXT: Record<Phase, string> = {
-  'predict-river': '¿Dónde crees que corre más río? Después, mídelo con Ohm.',
+  'predict-river': 'Toca el punto del circuito donde crees que corre más río. Después, mídelo con Ohm.',
   measure: 'Mide la fila con Ohm, punto por punto.',
-  'predict-removal': '¿Qué crees que les pasa a las otras si sacas una lámpara?',
+  'predict-removal': 'Toca las otras lámparas, el Empuje o el retorno para decir qué les pasa si sacas una.',
   remove: 'Saca una lámpara y mira qué le pasa a la fila.',
   restore: 'Devuelve el brillo a las SEIS lámparas. Sin sacrificar ninguna.',
 };
@@ -344,23 +355,6 @@ function phaseOf(state: ChainState): Phase {
   if (!state.predictions.removal) return 'predict-removal';
   if (!state.experiences.removedLamp) return 'remove';
   return 'restore';
-}
-
-function appendPredictButtons<K extends string>(
-  host: HTMLElement,
-  options: { key: K; label: string }[],
-  onPick: (key: K) => void,
-): void {
-  const row = document.createElement('div');
-  row.className = 'bench-predict-row';
-  for (const option of options) {
-    const button = document.createElement('button');
-    button.className = 'bench-predict-btn';
-    button.textContent = option.label;
-    button.addEventListener('click', () => onPick(option.key));
-    row.appendChild(button);
-  }
-  host.appendChild(row);
 }
 
 function restoreFeedback(state: ChainState): string {

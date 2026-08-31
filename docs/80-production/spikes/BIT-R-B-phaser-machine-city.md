@@ -17,14 +17,12 @@ paired_with: BIT-R-A
 
 - Pair: `BIT-R-A`.
 - Partir del mismo commit baseline, no del resultado de A.
-- Builder: MiniMax M3 / MiniMax Code.
-- Player Agent: GPT-5.6 Luna, protocolo blind-first.
-- Repair: DeepSeek V4 Flash.
-- Adversarial review: mismo GLM pin usado por A.
+- Integración técnica: Codex.
+- Mismo protocolo de playtest blind-first y revisión para A y B.
 - Normal loops: 1–3; hard cap: 5.
 - No leer/copiar código específico del spike A.
 - Resolver y fijar versión exacta de Phaser 4 al iniciar el spike; no actualizar otra dependencia incidentalmente.
-- Cargar skills oficiales Phaser 4 relevantes según `GAME_DEV_AI_TOOLING.md`.
+- Cargar tooling oficial Phaser 4 sólo si el spike lo necesita.
 
 ## Shared core contract
 
@@ -109,8 +107,8 @@ Los mismos que A:
 - [ ] desktop + touch completan objetivo.
 - [ ] cero errores de consola relevantes.
 - [ ] performance medida bajo fixture fijo.
-- [ ] Player Agent sin BLOCKER/MAJOR.
-- [ ] adversarial reviewer sin BLOCKER/MAJOR.
+- [ ] playtest blind-first sin BLOCKER/MAJOR.
+- [ ] revisión comparativa sin BLOCKER/MAJOR.
 
 ## Evidence
 
@@ -124,7 +122,7 @@ Registrar exactamente las mismas categorías de A:
 - infraestructura específica;
 - FPS/frame time;
 - bundle delta si material;
-- Player Agent report;
+- informe de playtest;
 - screenshots desktop/mobile;
 - bug/trace repro;
 - residual risks.

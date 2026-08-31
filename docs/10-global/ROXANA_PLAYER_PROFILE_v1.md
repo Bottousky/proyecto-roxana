@@ -41,7 +41,7 @@ exporta) la Bitácora como material de estudio.
 > jugador** como sistema. No prescribe el formato de
 > almacenamiento, ni la base de datos, ni la implementación
 > técnica. La persistencia actual (`localStorage` con clave
-> `roxana-slice-v1` según `CLAUDE.md`) se cita como
+> `roxana-slice-v1` en el runtime actual) se cita como
 > referencia de implementación, no como canon.
 
 ---
@@ -157,8 +157,7 @@ calculado como promedio ni como puntaje.
 
 Estado actual de implementación (referencia, no canon):
 
-- `localStorage` con clave `roxana-slice-v1` (ver
-  `CLAUDE.md`). El formato incluye `{room, flags, …}` y
+- `localStorage` con clave `roxana-slice-v1`. El formato incluye `{room, flags, …}` y
   permite "spawn directo" para playtest.
 - `localStorage` con clave `roxana_cart` para el carrito
   de la landing (ver `src/landing/README.md`). El carrito

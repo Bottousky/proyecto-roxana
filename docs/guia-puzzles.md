@@ -208,6 +208,6 @@ Marcá cada punto. Un «no» es un hallazgo a corregir o justificar.
 
 - Pipeline e implementación: `docs/estandar-implementacion.md`.
 - Reglas duras de ejecución (vocabulario spoiler, ≥2 soluciones, modelo testeable):
-  `CLAUDE.md` §5.
+  `AGENTS.md` raíz y el `AGENTS.md` del mundo.
 - Referencia de oro del patrón predecir-observar + brillo-primero + cuenta visible:
   los tres puzzles del Castillo (`chain.ts`, `branches.ts`, `distributor.ts`).

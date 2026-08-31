@@ -344,6 +344,7 @@ export function abrirLadder(options: AbrirLadderOptions): void {
       render();
       predictionPage.focus();
     },
+    { worldCloseup: true },
   );
 }
 

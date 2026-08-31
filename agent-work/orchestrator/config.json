@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "orchestratorId": "mavis",
+  "harness": "antigravity-cli",
+  "model": "gemini-3.7-flash-medium",
+  "effort": "medium",
+  "canonicalBranch": "explore/ohmdal-3D",
+  "activeLoop": "agent-work/loops/ohmdal-arco1-authored-pass/state.json",
+  "pollMinutes": 7,
+  "workers": {
+    "geminiAuthored": {
+      "branch": "worker/gemini-authored",
+      "worktreeHint": "../Roxana-gemini",
+      "task": "agent-work/tasks/workers/ohmdal-authored-primary-gemini.md",
+      "report": "agent-work/reports/workers/ohmdal-authored-gemini-current.md",
+      "writeScope": "authored-stage-specific"
+    },
+    "minimaxVfx": {
+      "branch": "worker/minimax-vfx",
+      "worktreeHint": "../Roxana-minimax",
+      "task": "agent-work/tasks/minimax/opencode-vfx-tool-trial.md",
+      "report": "agent-work/reports/minimax-gmi/opencode-tool-trial.md",
+      "writeScope": "src/experiences/ohmdal-playcanvas/experimental-vfx/**"
+    },
+    "lunaA4b": {
+      "branch": "worker/luna-a4b",
+      "worktreeHint": "../Roxana-luna",
+      "task": "agent-work/tasks/workers/ohmdal-a4b-luna.md",
+      "report": "agent-work/reports/workers/ohmdal-a4b-luna.md",
+      "writeScope": "navigation-collision-hardening",
+      "blockedUntil": "a4-castle-authored accepted"
+    }
+  },
+  "review": {
+    "model": "gemini-3.7-flash-high",
+    "effort": "high",
+    "freshSession": true,
+    "readOnly": true
+  },
+  "integration": {
+    "requireCleanCanonicalWorktree": true,
+    "requireIndependentReview": true,
+    "requireSelfAcceptanceFalse": true,
+    "preferCherryPick": true,
+    "allowForcePush": false,
+    "allowHardReset": false,
+    "allowWorkerSelfMerge": false
+  },
+  "limits": {
+    "maxFixesPerRepairPacket": 5,
+    "maxStructuralFixesPerRepairPacket": 1,
+    "maxReviewRepairCyclesPerStage": 3,
+    "allowPaidSpend": false,
+    "allowCanonChange": false,
+    "allowEngineChange": false
+  }
+}

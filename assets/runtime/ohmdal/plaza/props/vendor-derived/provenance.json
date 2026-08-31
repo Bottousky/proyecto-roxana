@@ -1,0 +1,23 @@
+{
+  "provider": "Quaternius",
+  "pack": "Fantasy Props MegaKit[Standard]",
+  "sourcePage": "https://quaternius.com/packs/fantasypropsmegakit.html",
+  "downloadPage": "https://quaternius.itch.io/fantasy-props-megakit",
+  "license": "CC0-1.0",
+  "licenseVerifiedAt": "2026-08-22",
+  "selectedOriginals": [
+    "Barrel.gltf",
+    "Crate_Wooden.gltf",
+    "Workbench.gltf"
+  ],
+  "runtimeFiles": ["quaternius-workshop-props.glb"],
+  "modifications": [
+    "Selected only three functional workshop props from the Standard pack.",
+    "Resized referenced shared texture atlases from source resolution to a maximum of 1024 px.",
+    "Packed external glTF buffers and textures into portable GLB containers with glTF Transform 4.4.2 copy.",
+    "Merged and deduplicated the three selected props into one 4.4 MB portable GLB so their shared atlases transfer only once.",
+    "Generated tangent attributes for Crate_Wooden and Workbench; retained runtime-generated tangents for Barrel because the source has degenerate UV vertices and generated zero-length tangents fail Khronos validation.",
+    "Blender normalization was not performed because Blender was not available in PATH; exact offline bounds were inspected before placement."
+  ],
+  "integration": "Midground workshop dressing only; repeated by function and regraded by scene lighting. No vendor geometry replaces Ohmdal landmarks or electrical grammar."
+}

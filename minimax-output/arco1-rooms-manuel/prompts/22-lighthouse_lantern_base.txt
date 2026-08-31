@@ -1,0 +1,16 @@
+# Linterna del Faro — lente + lago
+# Guardar como: lighthouse_lantern_base.png
+# Lienzo nativo (1px = 1px de juego): 1920x1080
+# Viewport del juego: 960x540 — NO es el tamaño de esta sala
+# Carpeta: minimax-output/arco1-rooms-manuel/
+
+===== FULL =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1920x1080. High balcony. Twilight.
+WEST-LOWER door from clock tower.
+CENTER-LEFT: ENORMOUS glass-bronze Fresnel lens OFF, still the brightest material. No beam, no UI, no text.
+RIGHT HALF: vast dark inland lake and distant basin skyline.
+SOUTH-LOWER: empty stone landing (no boat).
+Walkable balcony on the LEFT two-fifths. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.
+
+===== MMX (1028 chars) =====
+16-bit SNES/GBA RPG pixel art, top-down three-quarter camera, ~48px tiles, empty gameplay map of Ohmdal. Electrical city detained not ruined. Six materials only: pale eroded stone, oxidized copper with NO glow, still detained water, ceramic insulators, workshop wood, instrument glass. Afternoon light, taupe stone, brown copper, umber wood, dusty sky. Clear walkable floor, not a clutter maze. The image IS the whole map: 1 pixel = 1 game pixel. Camera will pan. Do not compose a single TV screenshot with letterboxing. CANVAS 1920x1080 Linterna del Faro. West-lower door from clock tower. Center-left enormous glass-bronze lens OFF. Right half vast inland lake and distant skyline. South-lower empty landing, no boat. Walkable balcony left two-fifths. Twilight. No beam, no text, no people. Avoid: people, animals, Ohm character, hanging bell, text, letters, UI, HUD, watermark, neon, lightning, magic glow, cyberpunk, isometric 3D, photoreal, oil painting, HD-2D cinematic, generic medieval castle flags, 16:9 letterbox bars.

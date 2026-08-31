@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "loopId": "ohmdal-plaza",
+  "branch": "explore/ohmdal-3D",
+  "status": "complete",
+  "currentStage": "stage-5-final-plaza-polish",
+  "iteration": 1,
+  "maxIterationsPerStage": 3,
+  "maxFixesPerIteration": 5,
+  "maxStructuralFixesPerIteration": 1,
+  "maxConcurrentLunaWorkers": 2,
+  "routing": {
+    "reviewer": {
+      "harness": "antigravity-cli",
+      "model": "gemini-3.7-flash-high",
+      "effort": "high",
+      "fallback": "nearest-available-gemini-flash-high-only"
+    },
+    "decision": {
+      "harness": "codex",
+      "modelAlias": "Sol",
+      "effort": "high"
+    },
+    "mechanicalWorker": {
+      "harness": "codex-subagent",
+      "modelAlias": "Luna",
+      "effort": "max",
+      "fallback": "report-routing-fallback-no-custom-wrapper"
+    }
+  },
+  "limits": {
+    "allowPaidGenerativeWithoutHumanGate": false,
+    "allowEngineChange": false,
+    "allowCanonChange": false,
+    "allowLargeDependencyChange": false,
+    "allowNewAgentFramework": false
+  },
+  "baseline": {
+    "stage": "stage-2b-omega-gate",
+    "commit": "4380eb28bfe0ef83c551dbcb54bd04dc53205386",
+    "report": "agent-work/reports/ohmdal-plaza-art-pass-stage-2b.md",
+    "captureManifest": "output/playwright/ohmdal-plaza/stage-2b/current/capture-manifest.json"
+  },
+  "queue": [
+    {
+      "id": "stage-2c-environment",
+      "status": "passed"
+    },
+    {
+      "id": "stage-3-galvanoscope",
+      "status": "passed",
+      "requiresHeroReferenceGate": true
+    },
+    {
+      "id": "stage-4-world-coherence",
+      "status": "passed"
+    },
+    {
+      "id": "stage-5-final-plaza-polish",
+      "status": "passed"
+    }
+  ],
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-plaza-loop-stage-5-final-plaza-polish-iter-1-after.md",
+  "lastCaptureManifest": "output/playwright/ohmdal-plaza/stage-5/iter-1-after/capture-manifest.json",
+  "humanGate": null,
+  "notes": [
+    "Gemini Pro is intentionally not part of the automatic loop.",
+    "Meshy/Tripo spending always requires a human gate unless separately authorized.",
+    "The loop stops after final Plaza polish; it does not auto-start Manantial or Faro.",
+    "Antigravity print mode soft-denied workspace reads, so reviews use the same Gemini Flash High model in interactive plan+sandbox mode and persist via a no-tool print continuation.",
+    "Sol accepted the Stage 2C iteration 3 PASS: all six environment criteria pass; perimeter skirt and mountain-depth refinements remain scoped to Stage 4 rather than blocking Stage 2C.",
+    "Stage 3 originally stopped before modeling because no approved primary visual authority existed.",
+    "The human design gate was resolved on 2026-08-23: Manuel approved the canonical Galvanoscope brief, turnaround and first-person concept. hero-reference.json is approved and Stage 3 may resume.",
+    "The approved narrative interpretation is an inherited functional instrument from older Ohmdal that Lumen maintains and uses practically but only partially understands; superstition surrounds its interpretation, not its physical operation.",
+    "Stage 3 should default to Blender deterministic reconstruction following the Ohm golden path. Meshy/Tripo remain behind a new economic HUMAN_GATE if later requested.",
+    "Stage 3 passed in iteration 1: Blender-first Galvanoscope reconstruction, canonical GLB, semantic pivots, PlayCanvas viewmodel integration, desktop/mobile framing, manifests and Visual Harness all passed. Gemini Flash High reported PASS with no regressions.",
+    "Stage 4 passed in iteration 1: authored Portal and Workshop masses, functional service clustering, continuous conductor routing and layered perimeter scenery passed the eight-view gate. Gemini Flash High reported PASS with zero console/page errors and budgets intact.",
+    "Stage 5 passed in iteration 1: Workshop UV/roof/contact polish, secondary platform and mural dressing, perimeter curb, and BellGantry hardware passed the eight-view gate. Gemini Flash High scored 2.62/3.00 with no regressions; final transfer was 21.78 MB, max desktop/mobile draw calls were 159/130, and touch smoke passed. The Plaza loop is complete."
+  ]
+}
