@@ -25,6 +25,7 @@ jobs:
       - run: node --check scripts/agents/run-antigravity.mjs
       - run: node scripts/agents/run-antigravity.mjs --help
       - run: node --check scripts/agents/run-mavis.mjs
+      - run: node --check scripts/agents/run-gemini-builder.mjs
       - run: node --check scripts/agents/validate-bounded-loop-state.mjs
       - run: npm run loop:ohmdal-plaza:validate
       - run: npm run loop:ohmdal-arco1-player-facing:validate
