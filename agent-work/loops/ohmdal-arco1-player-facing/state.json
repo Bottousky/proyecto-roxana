@@ -3,7 +3,7 @@
   "loopId": "ohmdal-arco1-player-facing",
   "branch": "fix/ohmdal-arco1-player-facing-bseries",
   "status": "ready",
-  "currentStage": "b1-portal-edda-dialogue-hud",
+  "currentStage": "b2-ohm-continuity-puzzle",
   "iteration": 0,
   "maxIterationsPerStage": 3,
   "maxFixesPerIteration": 5,
@@ -84,14 +84,14 @@
   },
   "queue": [
     { "id": "b0-first-minutes-audit", "status": "passed" },
-    { "id": "b1-portal-edda-dialogue-hud", "status": "ready" },
-    { "id": "b2-ohm-continuity-puzzle", "status": "queued" },
+    { "id": "b1-portal-edda-dialogue-hud", "status": "passed" },
+    { "id": "b2-ohm-continuity-puzzle", "status": "ready" },
     { "id": "b3-dialogue-pedagogy-rewrite", "status": "queued" },
     { "id": "b4-orientation-pointer-lock", "status": "queued" },
     { "id": "b5-mobile-landscape-touch", "status": "queued" },
     { "id": "b6-first-minutes-golden-path", "status": "queued" }
   ],
-  "lastReviewReport": null,
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-player-facing-b1-review.md",
   "lastCaptureManifest": null,
   "humanGate": null,
   "notes": [
