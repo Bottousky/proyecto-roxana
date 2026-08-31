@@ -25,6 +25,7 @@
     "loop:ohmdal-plaza:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-plaza/state.json",
     "loop:ohmdal-arco1:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-greybox/state.json",
     "loop:ohmdal-arco1-authored:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-authored-pass/state.json",
+    "loop:ohmdal-arco1-player-facing:validate": "node scripts/agents/validate-bounded-loop-state.mjs agent-work/loops/ohmdal-arco1-player-facing/state.json",
     "visual:ohmdal-plaza": "node scripts/visual/capture-ohmdal-plaza.mjs",
     "visual:ohmdal-plaza:fast": "node scripts/visual/capture-ohmdal-plaza.mjs --mode fast",
     "playtest:ohmdal-golden-path": "node scripts/gameplay/playtest-ohmdal-golden-path.mjs",
