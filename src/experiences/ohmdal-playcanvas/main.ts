@@ -2,6 +2,22 @@ import { mountPlayCanvasOhmdal } from './playcanvasRuntime.ts';
 import type { PlazaUi } from '../ohmdal-plaza/plazaRuntime.ts';
 import type { BitacoraManager } from '../ohmdal-plaza/journal/bitacora.ts';
 import type { WorkbenchInspector } from '../ohmdal-plaza/inspect/workbench.ts';
+import { portraitKey } from '../../ui/portrait.ts';
+
+const PORTRAIT_MAP: Record<string, string> = {
+  student: new URL('../../../assets/ohmdal/generated/portraits/student-portrait.png', import.meta.url).href,
+  edda: new URL('../../../assets/ohmdal/generated/portraits/edda-portrait.png', import.meta.url).href,
+  lumen: new URL('../../../assets/ohmdal/generated/portraits/lumen-portrait.png', import.meta.url).href,
+  ohm: new URL('../../../assets/ohmdal/generated/portraits/ohm-portrait.png', import.meta.url).href,
+  consejera: new URL('../../../assets/ohmdal/generated/portraits/consejera-portrait.png', import.meta.url).href,
+  guardiana: new URL('../../../assets/ohmdal/generated/portraits/guardiana-portrait.png', import.meta.url).href,
+  yesca: new URL('../../../assets/ohmdal/generated/portraits/yesca-portrait.png', import.meta.url).href,
+  farero: new URL('../../../assets/ohmdal/generated/portraits/farero-portrait.png', import.meta.url).href,
+  preceptor: new URL('../../../assets/ohmdal/generated/portraits/preceptor-portrait.png', import.meta.url).href,
+  nino: new URL('../../../assets/ohmdal/generated/portraits/nino-portrait.png', import.meta.url).href,
+  proyector: new URL('../../../assets/ohmdal/portraits/proyector.png', import.meta.url).href,
+  ciudadano: new URL('../../../assets/ohmdal/portraits/ciudadano.png', import.meta.url).href,
+};
 
 const gameEl = document.getElementById('plaza-game')!;
 const titleEl = document.getElementById('plaza-title')!;
@@ -10,10 +26,13 @@ const hudEl = document.getElementById('plaza-hud')!;
 const promptEl = document.getElementById('plaza-prompt')!;
 const toastEl = document.getElementById('plaza-toast')!;
 const dialogEl = document.getElementById('plaza-dialog')!;
+const dialogCardEl = document.querySelector<HTMLElement>('.dialog-card')!;
 const speakerEl = document.getElementById('dialog-speaker')!;
 const dialogTextEl = document.getElementById('dialog-text')!;
 const portraitEl = document.getElementById('dialog-portrait') as HTMLImageElement;
 const choicesEl = document.getElementById('dialog-choices')!;
+const cinematicOverlayEl = document.getElementById('plaza-cinematic-overlay');
+const skipCinematicBtn = document.getElementById('btn-skip-cinematic');
 const galvHudEl = document.getElementById('galvanoscope-hud')!;
 const galvVEl = document.getElementById('galv-voltage')!;
 const galvREl = document.getElementById('galv-resistance')!;
@@ -48,11 +67,16 @@ const ui: PlazaUi = {
     speakerEl.textContent = who ?? 'Desconocido';
     dialogTextEl.textContent = text;
 
-    if (portrait) {
-      portraitEl.src = portrait;
-      portraitEl.classList.remove('hidden');
+    const pKey = who ? portraitKey(who) : '';
+    const resolvedPortrait = portrait || (pKey && PORTRAIT_MAP[pKey] ? PORTRAIT_MAP[pKey] : '');
+
+    if (resolvedPortrait) {
+      portraitEl.src = resolvedPortrait;
+      portraitEl.alt = who ? `Retrato de ${who}` : 'Retrato';
+      portraitEl.parentElement?.classList.remove('hidden');
     } else {
-      portraitEl.classList.add('hidden');
+      portraitEl.src = '';
+      portraitEl.parentElement?.classList.add('hidden');
     }
 
     choicesEl.innerHTML = '';
@@ -70,6 +94,14 @@ const ui: PlazaUi = {
       }
     } else {
       choicesEl.classList.add('hidden');
+    }
+  },
+
+  setCinematicOverlay(visible) {
+    if (visible) {
+      cinematicOverlayEl?.classList.remove('hidden');
+    } else {
+      cinematicOverlayEl?.classList.add('hidden');
     }
   },
 
@@ -204,6 +236,8 @@ let handle: ReturnType<typeof mountPlayCanvasOhmdal> | null = null;
 enterBtn.addEventListener('click', () => {
   titleEl.classList.add('hidden');
   hudEl.classList.remove('hidden');
+  (document.activeElement as HTMLElement)?.blur();
+  backBtn.tabIndex = -1;
   handle = mountPlayCanvasOhmdal(gameEl, ui);
 });
 
@@ -213,6 +247,24 @@ btnGalv.addEventListener('click', () => {
 
 btnBitacora.addEventListener('click', () => {
   handle?.press('tab');
+});
+
+// Click / tap on dialog card advances when no choices are active
+dialogCardEl?.addEventListener('click', (e) => {
+  if (choicesEl && !choicesEl.classList.contains('hidden') && choicesEl.children.length > 0) {
+    return;
+  }
+  e.stopPropagation();
+  handle?.press('e');
+});
+
+dialogCardEl?.addEventListener('pointerdown', (e) => {
+  e.stopPropagation();
+});
+
+skipCinematicBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  handle?.press(' ');
 });
 
 const activeTurnIntervals = new Map<number, number>();

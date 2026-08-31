@@ -780,8 +780,10 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
 
   // --- Edda NPC Entity (Near Portal) ---
   const eddaEntity = new pc.Entity('EddaNPC');
-  eddaEntity.setPosition(1.8, 0, -8.0);
+  eddaEntity.setPosition(1.1, 0, -5.5);
+  eddaEntity.setEulerAngles(0, -156, 0);
   plazaRoot.addChild(eddaEntity);
+  addCollider('plaza', 1.1, -5.5, 0.8, 0.8, 'plaza.edda-npc', { source: 'EddaNPC' });
 
   const eddaBody = new pc.Entity('EddaBody');
   eddaBody.addComponent('render', { type: 'cylinder', material: matEddaCoat });

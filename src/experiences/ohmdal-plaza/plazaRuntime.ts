@@ -21,6 +21,7 @@ export interface PlazaUi {
   setWorkbenchView(visible: boolean, inspector?: WorkbenchInspector, onAction?: (action: string) => void): void;
   setInventoryItem(name: string | null): void;
   showNotification(text: string): void;
+  setCinematicOverlay?(visible: boolean): void;
 }
 
 export interface PlazaHandle {

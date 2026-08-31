@@ -72,6 +72,7 @@ body {
 .roxana-visual-ui-hidden #plaza-prompt,
 .roxana-visual-ui-hidden #plaza-toast,
 .roxana-visual-ui-hidden #plaza-dialog,
+.roxana-visual-ui-hidden #plaza-cinematic-overlay,
 .roxana-visual-ui-hidden #galvanoscope-hud,
 .roxana-visual-ui-hidden #bitacora-modal,
 .roxana-visual-ui-hidden #workbench-modal {
@@ -727,3 +728,204 @@ h1 {
     bottom: 7.4rem;
   }
 }
+
+/* ==========================================================================
+   RPG Dialogue HUD (Compact, Bottom-Anchored, Portrait-Framed)
+   ========================================================================== */
+#plaza-dialog {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(780px, calc(100vw - 32px));
+  z-index: 30;
+  pointer-events: auto;
+}
+
+.dialog-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 16px;
+  padding: 14px 18px;
+  background: linear-gradient(180deg, rgba(32, 24, 18, 0.95) 0%, rgba(18, 14, 11, 0.97) 100%);
+  border: 1px solid var(--pl-copper);
+  border-radius: 6px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(224, 148, 72, 0.2), inset 0 1px 0 rgba(255, 235, 200, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, border-color 0.15s ease;
+}
+
+.dialog-card:hover {
+  border-color: var(--pl-copper-glow);
+}
+
+.dialog-card:active {
+  transform: scale(0.995);
+}
+
+.dialog-portrait-box {
+  flex-shrink: 0;
+  width: 84px;
+  height: 84px;
+  border-radius: 6px;
+  border: 1px solid var(--pl-border);
+  background: radial-gradient(circle at 50% 30%, #3a2b1f 0%, #120e0b 100%);
+  overflow: hidden;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
+  align-self: flex-start;
+}
+
+#dialog-portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  image-rendering: auto;
+}
+
+.dialog-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#dialog-speaker {
+  align-self: flex-start;
+  margin: 0 0 6px 0;
+  padding: 3px 10px;
+  font-family: var(--pl-font-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffe2a4;
+  background: rgba(224, 148, 72, 0.18);
+  border: 1px solid var(--pl-border);
+  border-radius: 3px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+#dialog-text {
+  margin: 0 0 10px 0;
+  font-family: var(--pl-font-serif);
+  font-size: 1.08rem;
+  line-height: 1.45;
+  color: var(--pl-text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.dialog-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.dialog-choice-btn {
+  appearance: none;
+  background: rgba(224, 148, 72, 0.12);
+  border: 1px solid var(--pl-border);
+  color: var(--pl-text);
+  padding: 8px 14px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.dialog-choice-btn:hover {
+  background: rgba(224, 148, 72, 0.3);
+  border-color: var(--pl-copper-glow);
+  box-shadow: 0 0 12px rgba(224, 148, 72, 0.3);
+  transform: translateX(4px);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.dialog-hint {
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: var(--pl-muted);
+  animation: dialogPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes dialogPulse {
+  0%, 100% { opacity: 0.65; transform: translateY(0); }
+  50% { opacity: 1; color: var(--pl-copper-glow); transform: translateY(2px); }
+}
+
+/* --- Cinematic Skip Button --- */
+#plaza-cinematic-overlay {
+  position: absolute;
+  bottom: 28px;
+  right: 28px;
+  z-index: 35;
+  pointer-events: auto;
+}
+
+.cinematic-skip-btn {
+  appearance: none;
+  background: rgba(28, 22, 18, 0.85);
+  border: 1px solid var(--pl-border);
+  color: var(--pl-muted);
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  border-radius: 4px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.cinematic-skip-btn:hover {
+  background: rgba(224, 148, 72, 0.25);
+  border-color: var(--pl-copper);
+  color: var(--pl-text);
+  box-shadow: 0 0 14px rgba(224, 148, 72, 0.35);
+}
+
+@media (max-width: 600px) {
+  #plaza-dialog {
+    bottom: 12px;
+    width: calc(100vw - 16px);
+  }
+  .dialog-card {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .dialog-portrait-box {
+    width: 62px;
+    height: 62px;
+  }
+  #dialog-speaker {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+  }
+  #dialog-text {
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+  .dialog-hint {
+    font-size: 0.72rem;
+  }
+  #plaza-cinematic-overlay {
+    bottom: 14px;
+    right: 14px;
+  }
+}
+
