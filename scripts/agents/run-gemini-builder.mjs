@@ -15,12 +15,28 @@ function valueOf(flag, fallback = null) {
   return index >= 0 && args[index + 1] ? args[index + 1] : fallback;
 }
 
-const worktreeArg = valueOf('--worktree', path.resolve(root, '../Roxana-gemini'));
+let orchestratorConfig = {};
+try {
+  orchestratorConfig = JSON.parse(await readFile(path.join(root, 'agent-work', 'orchestrator', 'config.json'), 'utf8'));
+} catch {
+  // Explicit CLI args and historical defaults keep this runner usable.
+}
+
+const configuredWorkers = Object.values(orchestratorConfig.workers || {});
+const configuredGeminiWorker = configuredWorkers.find((worker) => String(worker.task || '').includes('gemini')) || configuredWorkers[0] || {};
+
+const configuredWorktree = configuredGeminiWorker.worktreeHint
+  ? path.resolve(root, configuredGeminiWorker.worktreeHint)
+  : path.resolve(root, '../Roxana-gemini');
+const worktreeArg = valueOf('--worktree', configuredWorktree);
 const worktreeDir = path.resolve(root, worktreeArg);
 const model = valueOf('--model', 'gemini-3.7-flash-high');
 const effort = valueOf('--effort', 'high');
 const timeout = valueOf('--timeout', '45m');
-const taskArg = valueOf('--task', 'agent-work/tasks/workers/ohmdal-authored-primary-gemini.md');
+const taskArg = valueOf('--task', configuredGeminiWorker.task || 'agent-work/tasks/workers/ohmdal-authored-primary-gemini.md');
+const loopArg = valueOf('--loop', orchestratorConfig.activeLoop || 'agent-work/loops/ohmdal-arco1-authored-pass/state.json');
+const workerBranch = valueOf('--branch', configuredGeminiWorker.branch || 'worker/gemini-authored');
+const reportArg = valueOf('--report', configuredGeminiWorker.report || 'agent-work/reports/workers/ohmdal-authored-gemini-current.md');
 const logArg = valueOf('--log', path.join(root, '.playtest', 'orchestrator', 'gemini-builder.log'));
 
 const logDir = path.dirname(path.resolve(root, logArg));
@@ -35,6 +51,7 @@ function log(msg) {
 
 log(`Starting Gemini builder in ${worktreeDir}`);
 log(`Model: ${model}, effort: ${effort}, task: ${taskArg}`);
+log(`Loop: ${loopArg}, branch: ${workerBranch}, report: ${reportArg}`);
 
 const taskPath = path.resolve(worktreeDir, taskArg);
 let taskContent = '';
@@ -44,8 +61,8 @@ try {
   log(`Warning: could not read task file at ${taskPath}: ${err.message}`);
 }
 
-const statePath = path.resolve(worktreeDir, 'agent-work/loops/ohmdal-arco1-authored-pass/state.json');
-let activeStage = 'a6-lighthouse-lake-return-authored';
+const statePath = path.resolve(worktreeDir, loopArg);
+let activeStage = 'unknown-stage';
 try {
   const state = JSON.parse(await readFile(statePath, 'utf8'));
   if (state.currentStage) activeStage = state.currentStage;
@@ -56,33 +73,28 @@ try {
 const prompt = `
 Follow GEMINI.md in this repository.
 
-You are the Primary Authored Builder for Proyecto Roxana.
+You are the primary implementation builder for the active Proyecto Roxana production loop.
 Harness: Antigravity CLI. Model: ${model}. Effort: ${effort}. Mode: workspace-write.
-You are running in the isolated worktree Roxana-gemini on branch worker/gemini-authored.
+You are running in an isolated worktree on branch ${workerBranch}.
 
 Execute your worker task: ${taskArg}
-Inspect agent-work/loops/ohmdal-arco1-authored-pass/state.json to identify the active stage: ${activeStage}.
+Inspect ${loopArg} and implement exactly the active stage: ${activeStage}.
 
 TASK DETAILS:
 ${taskContent}
 
 CRITICAL EXECUTION RULES:
-1. Complete the ${activeStage} authored pass in this worktree.
-2. Verify all gates:
-   npm run loop:ohmdal-arco1-authored:validate
-   npm run build
-   npm test
-   npm run visual:ohmdal-plaza:fast -- --stage ${activeStage}
-   npm run playtest:ohmdal-golden-path
-3. Commit your implementation changes to branch worker/gemini-authored.
-4. Record your evidence in agent-work/reports/workers/ohmdal-authored-gemini-current.md adhering strictly to Candidate Protocol v2 machine-readable headers:
-   CANDIDATE_MODE: implementation
-   BASE_SHA: <40-hex base commit SHA>
-   IMPLEMENTATION_SHA: <40-hex commit SHA of your implementation>
-   EVIDENCE_STATUS: PASS
+1. Complete exactly the current ${activeStage} candidate described by the task; do not skip ahead without orchestrator acceptance.
+2. Run the task-required validation. At minimum validate the loop state, build and tests; run player-facing Golden Path/browser evidence when the task requires it.
+3. Commit substantive implementation changes to branch ${workerBranch}.
+4. Record evidence in ${reportArg} using Candidate Protocol v2 machine-readable headers:
+   CANDIDATE_MODE: implementation|validation-only
+   BASE_SHA: <exact 40-hex base commit SHA>
+   IMPLEMENTATION_SHA: <exact 40-hex implementation SHA>|NONE
+   EVIDENCE_STATUS: PASS|FAIL
    SELF_ACCEPTANCE: false
-5. Commit the report and push worker/gemini-authored to origin.
-6. Stop after pushing evidence. Do not begin next stage without external review and authorization.
+5. Commit the report and push ${workerBranch} to origin.
+6. Stop after pushing evidence. Do not accept your own work or mutate canonical acceptance state.
 `.trim();
 
 const agyArgs = [
