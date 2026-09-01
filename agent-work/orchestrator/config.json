@@ -24,7 +24,7 @@
       "writeScope": "current-b-series-stage-only",
       "runner": "npm run agent:minimax:builder",
       "provider": "GMI Cloud",
-      "model": "gmi/MiniMaxAI/MiniMax-M3",
+      "model": "gmicloud/MiniMaxAI/MiniMax-M3",
       "priority": 1,
       "costPolicy": "free-promo-only"
     },
