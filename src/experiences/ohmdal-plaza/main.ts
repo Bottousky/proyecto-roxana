@@ -204,6 +204,7 @@ const ui: PlazaUi = {
 
     workbenchModal.classList.remove('hidden');
   },
+  setOhmPuzzleView() {},
 
   setInventoryItem(name) {
     if (!name) {

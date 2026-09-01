@@ -11,6 +11,7 @@ import { GalvanoscopeTool } from './tools/galvanoscope.ts';
 import { BitacoraManager } from './journal/bitacora.ts';
 import { WorkbenchInspector } from './inspect/workbench.ts';
 import type { CircuitState, DialogueLine, DialogueNode, ToolMode } from './types.ts';
+import type { CircuitDef, CircuitReading } from '../../puzzles/ohmModel.ts';
 
 export interface PlazaUi {
   setDialog(who: string | null, text: string | null, portrait?: string, choices?: { label: string; action: () => void }[]): void;
@@ -19,6 +20,7 @@ export interface PlazaUi {
   setGalvanoscopeHud(visible: boolean, v: number, r: number, i: number, status: string, probeA: string | null, probeB: string | null): void;
   setBitacoraView(visible: boolean, manager?: BitacoraManager): void;
   setWorkbenchView(visible: boolean, inspector?: WorkbenchInspector, onAction?: (action: string) => void): void;
+  setOhmPuzzleView(visible: boolean, def?: CircuitDef, reading?: CircuitReading, covered?: ReadonlySet<string>, onAction?: (segment: string) => void): void;
   setInventoryItem(name: string | null): void;
   showNotification(text: string): void;
   setCinematicOverlay?(visible: boolean): void;

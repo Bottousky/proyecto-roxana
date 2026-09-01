@@ -2,6 +2,7 @@ import { mountPlayCanvasOhmdal } from './playcanvasRuntime.ts';
 import type { PlazaUi } from '../ohmdal-plaza/plazaRuntime.ts';
 import type { BitacoraManager } from '../ohmdal-plaza/journal/bitacora.ts';
 import type { WorkbenchInspector } from '../ohmdal-plaza/inspect/workbench.ts';
+import type { CircuitDef, CircuitReading } from '../../puzzles/ohmModel.ts';
 import { portraitKey } from '../../ui/portrait.ts';
 
 const PORTRAIT_MAP: Record<string, string> = {
@@ -47,6 +48,10 @@ const workbenchModal = document.getElementById('workbench-modal')!;
 const workbenchCloseBtn = document.getElementById('workbench-close')!;
 const inventoryEl = document.getElementById('plaza-inventory')!;
 const inventoryTextEl = document.getElementById('inventory-text')!;
+const ohmPuzzleModal = document.getElementById('ohm-puzzle-modal')!;
+const ohmPuzzleStatus = document.getElementById('ohm-puzzle-status')!;
+const ohmPuzzleActions = document.getElementById('ohm-puzzle-actions')!;
+const ohmPuzzleClose = document.getElementById('ohm-puzzle-close')!;
 
 const btnGalv = document.getElementById('btn-galvanoscope')!;
 const btnBitacora = document.getElementById('btn-bitacora')!;
@@ -147,6 +152,11 @@ const ui: PlazaUi = {
     activeWorkbenchActionCb = onAction ?? null;
     workbenchModal.classList.remove('hidden');
     renderWorkbench(inspector);
+  },
+  setOhmPuzzleView(visible, _def?: CircuitDef, reading?: CircuitReading, covered?: ReadonlySet<string>, onAction?: (segment: string) => void) {
+    if (!visible || !reading || !covered || !onAction) { ohmPuzzleModal.classList.add('hidden'); return; }
+    ohmPuzzleModal.classList.remove('hidden'); ohmPuzzleStatus.textContent = reading.complete ? 'Continuidad cerrada · Ohm responde' : reading.state === 'tocando' ? 'Hay contacto, pero el camino sigue abierto.' : 'El camino está interrumpido.'; ohmPuzzleActions.innerHTML = '';
+    for (const id of ['g1', 'g5', 'g4']) { const button = document.createElement('button'); button.className = 'workbench-btn'; button.textContent = `${covered.has(id) ? 'Retirar' : 'Tender'} cable ${id.toUpperCase()}`; button.onclick = () => onAction(id); ohmPuzzleActions.appendChild(button); }
   },
 
   setInventoryItem(name) {
@@ -301,6 +311,7 @@ for (const button of touchMoveButtons) {
 touchInteractBtn.addEventListener('click', () => {
   handle?.press('e');
 });
+ohmPuzzleClose.addEventListener('click', () => handle?.press('ohm-puzzle-close'));
 
 bitacoraCloseBtn.addEventListener('click', () => {
   ui.setBitacoraView(false);

@@ -25,6 +25,7 @@ import { OHMDAL_TRANSITION_ANCHORS, yawForAnchor, type SpawnAnchor } from './sys
 import type { CollisionDiagnostic } from './systems/navigation/ohmdalNavigation.ts';
 import { createManantialActivationVfx } from './world/manantial/manantialActivationVfx.ts';
 import { OhmdalVfxSystem } from './systems/vfx/ohmdalVfxSystem.ts';
+import { PEDESTAL_RING, readCircuit, toggleCover } from '../../puzzles/ohmModel.ts';
 import {
   type Arc1GreyboxState,
   type CastleNetworkConfiguration,
@@ -172,6 +173,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let visualCaptureShot: OhmdalVisualCaptureShotName | null = null;
   let visualPaused = false;
   let reducedMotion = false;
+  let ohmPuzzleCovered = new Set<string>();
 
   // Arrival Cinematic State & Persistence
   const INTRO_SEEN_KEY = 'ohmdal_intro_seen';
@@ -249,6 +251,11 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   // Key Handlers
   const onKeyDown = (e: KeyboardEvent) => {
     const k = e.key.toLowerCase();
+    if (k === 'ohm-puzzle-close') {
+      currentMode = 'explore';
+      ui.setOhmPuzzleView(false);
+      return;
+    }
     if (isCinematicActive) {
       if (k === ' ' || k === 'enter' || k === 'e' || k === 'f' || k === 'escape') {
         e.preventDefault();
@@ -741,6 +748,19 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     setTimeout(() => {
       startDialogue('ohm_awakening_event');
     }, 500);
+  }
+
+  function openOhmInspection(): void {
+    if (isOhmAwake) { startDialogue('ohm_awakening_event'); return; }
+    currentMode = 'inspect'; document.exitPointerLock?.();
+    const render = () => ui.setOhmPuzzleView(true, PEDESTAL_RING, readCircuit(PEDESTAL_RING, ohmPuzzleCovered), ohmPuzzleCovered, (id) => {
+      ohmPuzzleCovered = new Set(toggleCover(PEDESTAL_RING, ohmPuzzleCovered, id));
+      const reading = readCircuit(PEDESTAL_RING, ohmPuzzleCovered);
+      audio.playSwitchClunk();
+      if (reading.complete) { ui.setOhmPuzzleView(false); currentMode = 'explore'; triggerOhmAwakening(); }
+      else render();
+    });
+    render();
   }
 
   function setEntityLightsEnabled(entity: pc.Entity, enabled: boolean): void {
@@ -1272,7 +1292,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
               ? 'Arco I greybox completo. TODO(guion): cierre final y transferencia.'
               : 'El retorno aún no refleja todas las intervenciones del Arco I.');
           } else if (!isOhmAwake) {
-            triggerOhmAwakening();
+            openOhmInspection();
           } else {
             startDialogue('ohm_awakening_event');
           }
@@ -1570,6 +1590,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   }
 
   function triggerInteraction(): void {
+    if (currentMode === 'inspect') return;
     if (isCinematicActive) {
       finishArrivalCinematic();
       return;
