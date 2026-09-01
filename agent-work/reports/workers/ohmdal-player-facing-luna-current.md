@@ -21,4 +21,11 @@ Gate evidence:
 - `npm run playtest:ohmdal-golden-path`: BLOCKED because local package `playwright` is missing.
 - Browser desktop/touch evidence: NOT AVAILABLE due missing Playwright dependency.
 
+Revalidation (2026-08-31):
+- `npm run loop:ohmdal-arco1-player-facing:validate`: PASS.
+- Focused `m19-ohm-model.test.ts` and `m23-ohm-pedestal-bench.test.ts`: PASS.
+- `npm run build`: BLOCKED by missing `vite/client` type definitions.
+- `npm test`: BLOCKED at authored PlayCanvas tests because package `playcanvas` is missing.
+- `npm run playtest:ohmdal-golden-path`: BLOCKED because package `playwright` is missing.
+
 No loop state was advanced and no acceptance was declared.
