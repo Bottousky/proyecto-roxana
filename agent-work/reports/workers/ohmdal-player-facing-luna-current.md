@@ -1,6 +1,6 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: b50077ab58fe3f5c48e14b516f90448d334df70a
-IMPLEMENTATION_SHA: 3dab2c9f9c87736a1c92f9368fa2eaf3525bc511
+IMPLEMENTATION_SHA: 10794635a8824abbbcaee42ab5c61273a16eb42c
 EVIDENCE_STATUS: FAIL
 SELF_ACCEPTANCE: false
 
@@ -28,4 +28,15 @@ Revalidation (2026-08-31):
 - `npm test`: BLOCKED at authored PlayCanvas tests because package `playcanvas` is missing.
 - `npm run playtest:ohmdal-golden-path`: BLOCKED because package `playwright` is missing.
 
+Implementation follow-up (2026-09-01):
+- Exposed all physical gap terminals in the ZoomIn panel, including the broken decoy, with touch-sized controls and live continuity feedback.
+- Added explicit modal layering/safe-area styling so the inspection controls receive pointer/touch input above the PlayCanvas canvas.
+- Updated the Golden Path harness to solve G1/G5/G4 through the same UI; run reaches the B2 modal but times out afterward under the current harness, leaving `golden-path-run.json` as `RUNNING`.
+- `npm run loop:ohmdal-arco1-player-facing:validate`: PASS.
+- `npm run build`: PASS.
+- `npm test`: PASS.
+- `npm run playtest:ohmdal-golden-path`: FAIL (timeout after entering B2 inspection; no page errors; software-rendered Chromium).
+- Desktop/touch acceptance and independent review remain outstanding; this is a candidate only.
+
 No loop state was advanced and no acceptance was declared.
+
