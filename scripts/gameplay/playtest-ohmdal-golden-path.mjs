@@ -334,6 +334,10 @@ try {
 
   await moveTo(0, -2, 1.7, 'Ohm pedestal');
   await pressInteraction('Ohm awakening');
+  await page.locator('#ohm-puzzle-modal').waitFor({ state: 'visible', timeout: NAV_TIMEOUT_MS });
+  for (const cable of ['G1', 'G5', 'G4']) {
+    await page.getByRole('button', { name: new RegExp(`Tender cable ${cable}`, 'i') }).click();
+  }
   await waitForDialogue('ohm_awakening_event');
   current = await waitUntilStory('ohm_awakened');
   assert(current.ohmAwake, 'Ohm no quedó despierto');
