@@ -67,8 +67,7 @@ const prompt = [
   'Do not use paid generation. If GMI indicates the promotional/free route is unavailable or would charge, stop and report the provider failure instead of spending.',
 ].join('\n');
 
-const command = process.platform === 'win32' ? 'opencode.cmd' : 'opencode';
-const args = [
+const openCodeArgs = [
   'run',
   '--model', model,
   '--format', 'json',
@@ -76,17 +75,35 @@ const args = [
   prompt,
 ];
 
+function openCodeInvocation(args) {
+  if (process.platform !== 'win32') return { command: 'opencode', args, description: 'opencode ...' };
+  const command = process.env.ComSpec || 'C:\\Windows\\System32\\cmd.exe';
+  return {
+    command,
+    args: ['/d', '/s', '/c', 'opencode', ...args],
+    description: `${command} /d /s /c opencode ...`,
+  };
+}
+
 console.warn(`[MINIMAX_BUILDER] worktree=${worktreeDir}`);
 console.warn(`[MINIMAX_BUILDER] model=${model}`);
 console.warn(`[MINIMAX_BUILDER] stage=${stage}`);
+const invocation = openCodeInvocation(openCodeArgs);
+if (process.platform === 'win32') console.warn(`[MINIMAX_BUILDER] Windows launcher: ${invocation.description}`);
 
-const child = spawn(command, args, {
-  cwd: worktreeDir,
-  stdio: 'inherit',
-  shell: false,
-  windowsHide: false,
-  env: process.env,
-});
+let child;
+try {
+  child = spawn(invocation.command, invocation.args, {
+    cwd: worktreeDir,
+    stdio: 'inherit',
+    shell: false,
+    windowsHide: false,
+    env: process.env,
+  });
+} catch (error) {
+  console.error(`[MINIMAX_BUILDER] launch failed synchronously: ${error.message}`);
+  process.exit(1);
+}
 
 child.on('error', (error) => {
   console.error(`[MINIMAX_BUILDER] launch failed: ${error.message}`);
