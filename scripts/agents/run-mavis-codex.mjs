@@ -87,6 +87,29 @@ function promptFor(firstTick) {
   return `You are Mavis, the operational orchestrator for Proyecto Roxana.\n\nExecute ${activeTask}. Reconstruct durable state from the repository, especially ${activeLoop}; do not depend on conversational memory.\n\nThis is ${firstTick ? 'the first' : 'a fresh'} control tick in a resilient daemon. Start with npm run orchestrator:status. If the next action is safe and specified, execute it now: dispatch the configured worker, launch a fresh independent reviewer, run gates, integrate an unambiguous PASS, update state, commit/push, or advance the stage. Do not duplicate active workers. Do not self-approve builder work. Respect Git safety and all HUMAN_GATE rules.\n\nImportant temporary routing: Gemini/Antigravity quota is exhausted. Follow the Codex Luna + MiniMax GMI/OpenCode routing in config/task. Do not invoke Antigravity while that routing is active.\n\nEnd with exactly one marker on its own line: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: WAITING, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
 }
 
+function codexInvocation(args) {
+  if (process.platform !== 'win32') {
+    return { command: 'codex', args, description: 'codex ...' };
+  }
+  const command = process.env.ComSpec || 'C:\\Windows\\System32\\cmd.exe';
+  return {
+    command,
+    args: ['/d', '/s', '/c', 'codex', ...args],
+    description: `${command} /d /s /c codex ...`,
+  };
+}
+
+async function handleLaunchFailure(error) {
+  consecutiveErrors += 1;
+  console.error(`[MAVIS/CODEX] Launch failed: ${error.message} consecutive=${consecutiveErrors}/${maxConsecutiveErrors}`);
+  if (consecutiveErrors >= maxConsecutiveErrors) {
+    console.error('[MAVIS/CODEX] CIRCUIT BREAKER OPEN. Stopping instead of retrying forever. Repository state is preserved.');
+    stopped = true;
+    return;
+  }
+  schedule(60_000, 'recoverable Codex launcher error');
+}
+
 async function runTick(firstTick) {
   if (stopped || currentChild) return;
 
@@ -106,8 +129,7 @@ async function runTick(firstTick) {
   await writeFile(lastMessagePath, '', 'utf8');
   console.warn(`\n[MAVIS/CODEX] >>> control tick ${tick} model=${model} effort=${effort}`);
 
-  const command = process.platform === 'win32' ? 'codex.cmd' : 'codex';
-  const args = [
+  const codexArgs = [
     'exec',
     '--model', model,
     '--ephemeral',
@@ -117,14 +139,24 @@ async function runTick(firstTick) {
     '-c', `model_reasoning_effort="${effort}"`,
     '-',
   ];
+  const invocation = codexInvocation(codexArgs);
+  if (process.platform === 'win32') {
+    console.warn(`[MAVIS/CODEX] Windows launcher: ${invocation.description}`);
+  }
 
   let stderr = '';
-  const child = spawn(command, args, {
-    cwd: root,
-    stdio: ['pipe', 'inherit', 'pipe'],
-    shell: false,
-    windowsHide: false,
-  });
+  let child;
+  try {
+    child = spawn(invocation.command, invocation.args, {
+      cwd: root,
+      stdio: ['pipe', 'inherit', 'pipe'],
+      shell: false,
+      windowsHide: false,
+    });
+  } catch (error) {
+    await handleLaunchFailure(error);
+    return;
+  }
   currentChild = child;
 
   child.stderr.on('data', (chunk) => {
