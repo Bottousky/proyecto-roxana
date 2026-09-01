@@ -40,7 +40,7 @@ if (!worker) throw new Error('config.workers.minimaxPlayerFacing is missing');
 const worktreeDir = path.resolve(root, worker.worktreeHint || '../Roxana-minimax-player-facing');
 const task = worker.task;
 const report = worker.report;
-const model = process.env.ROXANA_MINIMAX_OPENCODE_MODEL || worker.model || 'gmi/MiniMaxAI/MiniMax-M3';
+const model = process.env.ROXANA_MINIMAX_OPENCODE_MODEL || worker.model || 'gmicloud/MiniMaxAI/MiniMax-M3';
 const statePath = path.join(worktreeDir, config.activeLoop);
 
 if (!existsSync(worktreeDir)) {
@@ -72,6 +72,7 @@ const args = [
   'run',
   '--model', model,
   '--format', 'json',
+  '--auto',
   prompt,
 ];
 
