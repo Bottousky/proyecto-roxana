@@ -153,10 +153,23 @@ const ui: PlazaUi = {
     workbenchModal.classList.remove('hidden');
     renderWorkbench(inspector);
   },
-  setOhmPuzzleView(visible, _def?: CircuitDef, reading?: CircuitReading, covered?: ReadonlySet<string>, onAction?: (segment: string) => void) {
+  setOhmPuzzleView(visible, def?: CircuitDef, reading?: CircuitReading, covered?: ReadonlySet<string>, onAction?: (segment: string) => void) {
     if (!visible || !reading || !covered || !onAction) { ohmPuzzleModal.classList.add('hidden'); return; }
-    ohmPuzzleModal.classList.remove('hidden'); ohmPuzzleStatus.textContent = reading.complete ? 'Continuidad cerrada · Ohm responde' : reading.state === 'tocando' ? 'Hay contacto, pero el camino sigue abierto.' : 'El camino está interrumpido.'; ohmPuzzleActions.innerHTML = '';
-    for (const id of ['g1', 'g5', 'g4']) { const button = document.createElement('button'); button.className = 'workbench-btn'; button.textContent = `${covered.has(id) ? 'Retirar' : 'Tender'} cable ${id.toUpperCase()}`; button.onclick = () => onAction(id); ohmPuzzleActions.appendChild(button); }
+    ohmPuzzleModal.classList.remove('hidden');
+    ohmPuzzleStatus.textContent = reading.complete ? 'Continuidad cerrada · Ohm responde' : reading.state === 'tocando' ? 'Hay contacto, pero el camino sigue abierto.' : 'El camino está interrumpido.';
+    ohmPuzzleActions.innerHTML = '';
+    const segments = def?.segments.filter((segment) => segment.gap) ?? [];
+    for (const segment of segments) {
+      const button = document.createElement('button');
+      button.className = 'workbench-btn';
+      button.disabled = segment.broken === true;
+      button.textContent = segment.broken === true
+        ? `Tramo ${segment.id.toUpperCase()} · partido`
+        : `${covered.has(segment.id) ? 'Retirar' : 'Tender'} cable ${segment.id.toUpperCase()}`;
+      button.setAttribute('aria-label', button.textContent);
+      button.onclick = () => onAction(segment.id);
+      ohmPuzzleActions.appendChild(button);
+    }
   },
 
   setInventoryItem(name) {
