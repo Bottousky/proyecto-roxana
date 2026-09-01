@@ -24,8 +24,7 @@ const model = worker.model || 'gpt-5.6-luna';
 const effort = worker.effort || 'low';
 const prompt = `Read and execute ${worker.task}. Active stage: ${stage}. Work only in branch ${worker.branch} based on origin/${config.canonicalBranch}. Implement exactly the current stage, run required gates, commit implementation, write Candidate Protocol v2 evidence to ${worker.report}, commit evidence, push, then stop. Never self-approve or advance canonical loop state.`;
 
-const command = process.platform === 'win32' ? 'codex.cmd' : 'codex';
-const args = [
+const codexArgs = [
   'exec',
   '--model', model,
   '--ephemeral',
@@ -35,14 +34,33 @@ const args = [
   '-',
 ];
 
+function codexInvocation(args) {
+  if (process.platform !== 'win32') return { command: 'codex', args, description: 'codex ...' };
+  const command = process.env.ComSpec || 'C:\\Windows\\System32\\cmd.exe';
+  return {
+    command,
+    args: ['/d', '/s', '/c', 'codex', ...args],
+    description: `${command} /d /s /c codex ...`,
+  };
+}
+
 console.warn(`[LUNA_BUILDER] worktree=${worktreeDir}`);
 console.warn(`[LUNA_BUILDER] model=${model} effort=${effort} stage=${stage}`);
-const child = spawn(command, args, {
-  cwd: worktreeDir,
-  stdio: ['pipe', 'inherit', 'inherit'],
-  shell: false,
-  windowsHide: false,
-});
+const invocation = codexInvocation(codexArgs);
+if (process.platform === 'win32') console.warn(`[LUNA_BUILDER] Windows launcher: ${invocation.description}`);
+
+let child;
+try {
+  child = spawn(invocation.command, invocation.args, {
+    cwd: worktreeDir,
+    stdio: ['pipe', 'inherit', 'inherit'],
+    shell: false,
+    windowsHide: false,
+  });
+} catch (error) {
+  console.error(`[LUNA_BUILDER] launch failed synchronously: ${error.message}`);
+  process.exit(1);
+}
 
 child.on('error', (error) => {
   console.error(`[LUNA_BUILDER] launch failed: ${error.message}`);
