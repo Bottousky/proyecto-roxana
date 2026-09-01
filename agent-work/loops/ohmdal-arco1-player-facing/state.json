@@ -31,7 +31,7 @@
     "builder": {
       "harness": "opencode-cli",
       "provider": "GMI Cloud",
-      "model": "MiniMaxAI/MiniMax-M3",
+      "model": "gmicloud/MiniMaxAI/MiniMax-M3",
       "mode": "isolated-worktree-write",
       "selfApproval": false,
       "fallback": "Codex Luna low in isolated worktree"
