@@ -1,27 +1,64 @@
 {
   "schemaVersion": 1,
   "orchestratorId": "mavis",
-  "harness": "antigravity-cli",
-  "model": "gemini-3.7-flash-medium",
-  "effort": "medium",
+  "harness": "codex-cli",
+  "model": "gpt-5.6-luna",
+  "effort": "low",
   "canonicalBranch": "fix/ohmdal-arco1-player-facing-bseries",
   "activeLoop": "agent-work/loops/ohmdal-arco1-player-facing/state.json",
   "activeTask": "agent-work/tasks/orchestrator/ohmdal-player-facing-mavis.md",
   "pollMinutes": 7,
+  "orchestratorRuntime": {
+    "provider": "codex",
+    "model": "gpt-5.6-luna",
+    "effort": "low",
+    "maxConsecutiveErrors": 3,
+    "reason": "Temporary fallback while Antigravity individual quota is exhausted"
+  },
   "workers": {
+    "minimaxPlayerFacing": {
+      "branch": "worker/minimax-player-facing",
+      "worktreeHint": "../Roxana-minimax-player-facing",
+      "task": "agent-work/tasks/workers/ohmdal-player-facing-minimax.md",
+      "report": "agent-work/reports/workers/ohmdal-player-facing-minimax-current.md",
+      "writeScope": "current-b-series-stage-only",
+      "runner": "npm run agent:minimax:builder",
+      "provider": "GMI Cloud",
+      "model": "gmi/MiniMaxAI/MiniMax-M3",
+      "priority": 1,
+      "costPolicy": "free-promo-only"
+    },
+    "lunaPlayerFacing": {
+      "branch": "worker/luna-player-facing",
+      "worktreeHint": "../Roxana-luna-player-facing",
+      "task": "agent-work/tasks/workers/ohmdal-player-facing-luna.md",
+      "report": "agent-work/reports/workers/ohmdal-player-facing-luna-current.md",
+      "writeScope": "current-b-series-stage-only",
+      "runner": "npm run agent:luna:builder",
+      "model": "gpt-5.6-luna",
+      "effort": "low",
+      "priority": 2,
+      "useWhen": "MiniMax unavailable, provider preflight fails, or bounded repair is cheaper in Codex"
+    },
     "geminiPlayerFacing": {
       "branch": "worker/gemini-player-facing",
       "worktreeHint": "../Roxana-gemini-player-facing",
       "task": "agent-work/tasks/workers/ohmdal-player-facing-primary-gemini.md",
       "report": "agent-work/reports/workers/ohmdal-player-facing-gemini-current.md",
-      "writeScope": "current-b-series-stage-only"
+      "writeScope": "current-b-series-stage-only",
+      "priority": 3,
+      "disabledReason": "Antigravity individual quota exhausted; re-enable after quota reset"
     }
   },
   "review": {
-    "model": "gemini-3.7-flash-high",
-    "effort": "high",
+    "harness": "codex",
+    "model": "gpt-5.6-luna",
+    "modelAlias": "Luna",
+    "effort": "medium",
     "freshSession": true,
-    "readOnly": true
+    "readOnly": true,
+    "finalFallbackModel": "gpt-5.6-terra",
+    "finalFallbackEffort": "medium"
   },
   "integration": {
     "requireCleanCanonicalWorktree": true,
