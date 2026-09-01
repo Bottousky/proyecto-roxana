@@ -19,28 +19,31 @@
     },
     "orchestrator": {
       "name": "Mavis",
-      "harness": "antigravity-cli",
-      "model": "gemini-3.7-flash-medium",
-      "effort": "medium",
+      "harness": "codex",
+      "modelAlias": "Luna",
+      "model": "gpt-5.6-luna",
+      "effort": "low",
       "task": "agent-work/tasks/orchestrator/ohmdal-player-facing-mavis.md",
       "config": "agent-work/orchestrator/config.json",
       "role": "monitor-dispatch-independent-review-gates-mechanical-integration",
       "materialAuthority": false
     },
     "builder": {
-      "harness": "antigravity-cli",
-      "model": "gemini-3.7-flash-high",
-      "effort": "high",
-      "mode": "workspace-write",
-      "selfApproval": false
+      "harness": "opencode-cli",
+      "provider": "GMI Cloud",
+      "model": "MiniMaxAI/MiniMax-M3",
+      "mode": "isolated-worktree-write",
+      "selfApproval": false,
+      "fallback": "Codex Luna low in isolated worktree"
     },
     "reviewer": {
-      "harness": "antigravity-cli",
-      "model": "gemini-3.7-flash-high",
-      "effort": "high",
+      "harness": "codex",
+      "modelAlias": "Luna",
+      "model": "gpt-5.6-luna",
+      "effort": "medium",
       "mode": "read-only",
       "freshSessionRequired": true,
-      "fallback": "nearest-available-gemini-flash-high-only"
+      "fallback": "Codex Terra medium for final B6 or when Luna review is insufficient"
     },
     "decision": {
       "harness": "chatgpt-web",
@@ -59,15 +62,6 @@
       "modelAlias": "Sol",
       "effort": "high",
       "condition": "strong-local-tool-reasoning-demonstrably-required"
-    },
-    "experimentalWorker": {
-      "harness": "opencode-cli",
-      "provider": "GMI Cloud",
-      "model": "MiniMaxAI/MiniMax-M3",
-      "mode": "proposal-only",
-      "selfApproval": false,
-      "task": "agent-work/tasks/minimax/opencode-vfx-tool-trial.md",
-      "fallback": "scripts/agents/run-gmi-minimax.mjs proposal-only; no-human-gate"
     }
   },
   "limits": {
@@ -105,6 +99,7 @@
     "Normal desktop dialogue completion must restore camera control without an extra meaningless click; explicit Escape/menu unlock remains respected.",
     "Mobile/touch is first-class and landscape-first with progressive orientation lock plus rotate-device fallback.",
     "Bounded copy polish inside the approved dialogue intent is authorized and is not a HUMAN_GATE.",
-    "B6 requires human-style first-minutes Golden Path evidence on desktop and touch/mobile, not only build/unit checks."
+    "B6 requires human-style first-minutes Golden Path evidence on desktop and touch/mobile, not only build/unit checks.",
+    "Temporary routing activated 2026-08-31 because Antigravity returned Individual quota reached. Mavis runs on Codex Luna; MiniMax M3/GMI OpenCode is primary builder while its free promotion is available; Codex Luna is fallback."
   ]
 }
