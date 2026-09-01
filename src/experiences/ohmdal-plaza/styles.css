@@ -634,6 +634,43 @@ h1 {
   z-index: 16;
 }
 
+#ohm-puzzle-modal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background: rgba(14, 10, 8, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 20;
+  pointer-events: auto;
+}
+
+#ohm-puzzle-modal .workbench-window {
+  width: min(52rem, 100%);
+  max-height: 100%;
+  overflow: auto;
+  background: var(--pl-panel-solid);
+  border: 1px solid var(--pl-border);
+  border-radius: 4px;
+  padding: 1.25rem;
+}
+
+#ohm-puzzle-modal .workbench-canvas {
+  min-height: 10rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--pl-copper);
+  background: #18120e;
+  border: 1px solid var(--pl-border);
+  padding: 1rem;
+}
+
+#ohm-puzzle-modal .workbench-btn {
+  min-height: 3rem;
+}
+
 .workbench-container {
   width: min(48rem, calc(100% - 2rem));
   background: var(--pl-panel-solid);
