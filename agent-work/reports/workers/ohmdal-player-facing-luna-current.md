@@ -1,6 +1,6 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: b50077ab58fe3f5c48e14b516f90448d334df70a
-IMPLEMENTATION_SHA: 10794635a8824abbbcaee42ab5c61273a16eb42c
+IMPLEMENTATION_SHA: 10794635a8824abbbca42ab5c61273a16eb42c
 EVIDENCE_STATUS: FAIL
 SELF_ACCEPTANCE: false
 
@@ -37,6 +37,13 @@ Implementation follow-up (2026-09-01):
 - `npm test`: PASS.
 - `npm run playtest:ohmdal-golden-path`: FAIL (timeout after entering B2 inspection; no page errors; software-rendered Chromium).
 - Desktop/touch acceptance and independent review remain outstanding; this is a candidate only.
+
+Revalidation (2026-09-02):
+- `npm run loop:ohmdal-arco1-player-facing:validate`: PASS (`b2-ohm-continuity-puzzle`, iteration 0).
+- `npm run build`: PASS.
+- `npm test`: PASS (all suites, 0 failures).
+- `npm run playtest:ohmdal-golden-path`: FAIL/timeout (runner remains `RUNNING` after the `portal` checkpoint while moving toward `Ohm pedestal`; no completed B2 desktop/touch evidence was produced).
+- Browser run artifact: `output/playwright/ohmdal-hardening/golden-path/golden-path-run.json` (`result: RUNNING`, last checkpoint `portal`).
 
 No loop state was advanced and no acceptance was declared.
 
