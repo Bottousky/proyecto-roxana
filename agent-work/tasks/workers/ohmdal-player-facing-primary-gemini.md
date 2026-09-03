@@ -2,7 +2,7 @@
 
 ## Worker
 
-Primary executor: **Gemini 3.7 Flash High / Antigravity CLI / effort high / workspace-write**.
+Primary executor: **Gemini 3.8 Flash High / Antigravity CLI / effort high / workspace-write**.
 
 Run in an isolated worktree/branch based on latest `origin/fix/ohmdal-arco1-player-facing-bseries`.
 
