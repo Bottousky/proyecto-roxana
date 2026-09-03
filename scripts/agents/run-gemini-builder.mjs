@@ -30,8 +30,8 @@ const configuredWorktree = configuredGeminiWorker.worktreeHint
   : path.resolve(root, '../Roxana-gemini');
 const worktreeArg = valueOf('--worktree', configuredWorktree);
 const worktreeDir = path.resolve(root, worktreeArg);
-const model = valueOf('--model', 'gemini-3.7-flash-high');
-const effort = valueOf('--effort', 'high');
+const model = valueOf('--model', configuredGeminiWorker.model || 'gemini-3.8-flash-high');
+const effort = valueOf('--effort', configuredGeminiWorker.effort || 'high');
 const timeout = valueOf('--timeout', '45m');
 const taskArg = valueOf('--task', configuredGeminiWorker.task || 'agent-work/tasks/workers/ohmdal-authored-primary-gemini.md');
 const loopArg = valueOf('--loop', orchestratorConfig.activeLoop || 'agent-work/loops/ohmdal-arco1-authored-pass/state.json');
