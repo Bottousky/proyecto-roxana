@@ -77,9 +77,9 @@ Before dispatch:
 
 1. `git fetch origin --prune`;
 2. ensure canonical worktree is clean;
-3. create/safely resync isolated worktree `../Roxana-gemini-player-facing` on branch `worker/gemini-player-facing` from the current canonical SHA;
+3. create/safely sync isolated worktree `../Roxana-gemini38-player-facing` on branch `worker/gemini38-player-facing` from the current canonical SHA;
 4. never hard-reset/clean unexplained human work;
-5. if the existing worker branch/worktree is stale and clean, recreate or fast-forward it safely from canonical;
+5. this Gemini 3.8 lane is intentionally new: do not reuse or mutate the historical `worker/gemini-player-facing` branch/worktree;
 6. dispatch `npm run agent:gemini:builder` using configured `gemini-3.8-flash-high`, effort high.
 
 Do not run a redundant provider preflight every tick after a healthy Gemini 3.8 session has already been established. If Antigravity reports quota/auth/provider failure, classify it and move to the fallback lane instead of retrying indefinitely.
@@ -90,7 +90,7 @@ Use `workers.lunaPlayerFacing` only when Gemini 3.8 is unavailable/quota-limited
 
 Prepare `../Roxana-luna-player-facing` / `worker/luna-player-facing` from the current canonical SHA and dispatch `npm run agent:luna:builder`.
 
-A dirty Luna worktree created by a previous failed candidate must not silently block the factory. Inspect its diff. If it is clearly worker-owned current-stage repair work, continue/commit it through one bounded worker action; otherwise leave it untouched and route the stage through a clean Gemini worker. Never destructively discard unexplained edits.
+A dirty Luna worktree created by a previous failed candidate must not silently block the factory. Inspect its diff. If it is clearly worker-owned current-stage repair work, continue/commit it through one bounded worker action; otherwise leave it untouched and route the stage through the clean Gemini 3.8 lane. Never destructively discard unexplained edits.
 
 ### MiniMax M3 / GMI
 
