@@ -6,7 +6,8 @@ Primary executor: **Gemini 3.8 Flash High / Antigravity CLI / effort high / work
 
 Run in an isolated worktree/branch based on latest `origin/fix/ohmdal-arco1-player-facing-bseries`.
 
-Worker branch: `worker/gemini-player-facing`.
+Worker branch: `worker/gemini38-player-facing`.
+Worker worktree: `../Roxana-gemini38-player-facing`.
 
 ## Authority
 
@@ -70,6 +71,8 @@ Implement:
 - touch-operable puzzle controls.
 
 Do not convert this into multiple choice, arithmetic or a glowing one-button tutorial.
+
+For B2 browser automation, do not require the avatar to enter Ohm's physical collider. The Golden Path must approach a reachable interaction position and use the same interaction radius a human player uses.
 
 ### B3 — dialogue pedagogy rewrite
 
@@ -146,7 +149,7 @@ Use real browser evidence for pointer-lock and touch claims. CSS inspection alon
 
 Write/update:
 
-`agent-work/reports/workers/ohmdal-player-facing-gemini-current.md`
+`agent-work/reports/workers/ohmdal-player-facing-gemini38-current.md`
 
 It must begin with exact Candidate Protocol v2 fields:
 
