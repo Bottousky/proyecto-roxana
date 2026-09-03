@@ -27,6 +27,10 @@ const pollMinutes = Number.isFinite(config.pollMinutes) && config.pollMinutes > 
 const model = runtime.model || 'gpt-5.6-luna';
 const effort = runtime.effort || 'low';
 const maxConsecutiveErrors = Number.isInteger(runtime.maxConsecutiveErrors) ? runtime.maxConsecutiveErrors : 3;
+const configuredWorkers = Object.entries(config.workers || {})
+  .map(([id, worker]) => ({ id, ...worker }))
+  .sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
+const primaryWorker = configuredWorkers[0] || null;
 
 await mkdir(path.dirname(lastMessagePath), { recursive: true });
 
@@ -84,7 +88,10 @@ function schedule(delayMs, reason) {
 }
 
 function promptFor(firstTick) {
-  return `You are Mavis, the operational orchestrator for Proyecto Roxana.\n\nExecute ${activeTask}. Reconstruct durable state from the repository, especially ${activeLoop}; do not depend on conversational memory.\n\nThis is ${firstTick ? 'the first' : 'a fresh'} control tick in a resilient daemon. Start with npm run orchestrator:status. If the next action is safe and specified, execute it now: dispatch the configured worker, launch a fresh independent reviewer, run gates, integrate an unambiguous PASS, update state, commit/push, or advance the stage. Do not duplicate active workers. Do not self-approve builder work. Respect Git safety and all HUMAN_GATE rules.\n\nImportant temporary routing: Gemini/Antigravity quota is exhausted. Follow the Codex Luna + MiniMax GMI/OpenCode routing in config/task. Do not invoke Antigravity while that routing is active.\n\nEnd with exactly one marker on its own line: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: WAITING, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
+  const primary = primaryWorker
+    ? `${primaryWorker.id}: ${primaryWorker.model || primaryWorker.provider || 'configured worker'} via ${primaryWorker.runner || 'configured runner'}`
+    : 'none configured';
+  return `You are Mavis, the operational orchestrator for Proyecto Roxana.\n\nExecute ${activeTask}. Reconstruct durable state from the repository, especially ${activeLoop}; do not depend on conversational memory.\n\nThis is ${firstTick ? 'the first' : 'a fresh'} control tick in a resilient daemon. Start with npm run orchestrator:status. If the next action is safe and specified, execute it now: dispatch the configured worker, launch a fresh independent reviewer, run gates, integrate an unambiguous PASS, update state, commit/push, or advance the stage. Do not duplicate active workers. Do not self-approve builder work. Respect Git safety and all HUMAN_GATE rules.\n\nLive routing is authoritative. Primary configured worker: ${primary}. Read ${configPath.replaceAll('\\', '/')} and ${activeTask} every tick; do not rely on stale provider/quota assumptions from previous runs. A stale FAIL report or dirty worker worktree is not WAITING if a bounded repair or alternate clean worker can act now.\n\nEnd with exactly one marker on its own line: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: WAITING, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
 }
 
 function codexInvocation(args) {
@@ -235,5 +242,6 @@ process.on('SIGINT', () => {
 
 console.warn(`[MAVIS/CODEX] Active task: ${activeTask}`);
 console.warn(`[MAVIS/CODEX] Active loop: ${activeLoop}`);
+console.warn(`[MAVIS/CODEX] Primary worker: ${primaryWorker?.model || primaryWorker?.id || 'none'}`);
 console.warn(`[MAVIS/CODEX] Circuit breaker: ${maxConsecutiveErrors} consecutive failures.`);
 void runTick(true);
