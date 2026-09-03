@@ -13,20 +13,21 @@
     "model": "gpt-5.6-luna",
     "effort": "low",
     "maxConsecutiveErrors": 3,
-    "reason": "Temporary fallback while Antigravity individual quota is exhausted"
+    "reason": "Cheap stable control plane; Gemini 3.8 Flash High is the healthy primary implementation lane"
   },
   "workers": {
-    "minimaxPlayerFacing": {
-      "branch": "worker/minimax-player-facing",
-      "worktreeHint": "../Roxana-minimax-player-facing",
-      "task": "agent-work/tasks/workers/ohmdal-player-facing-minimax.md",
-      "report": "agent-work/reports/workers/ohmdal-player-facing-minimax-current.md",
+    "geminiPlayerFacing": {
+      "branch": "worker/gemini-player-facing",
+      "worktreeHint": "../Roxana-gemini-player-facing",
+      "task": "agent-work/tasks/workers/ohmdal-player-facing-primary-gemini.md",
+      "report": "agent-work/reports/workers/ohmdal-player-facing-gemini-current.md",
       "writeScope": "current-b-series-stage-only",
-      "runner": "npm run agent:minimax:builder",
-      "provider": "GMI Cloud",
-      "model": "gmicloud/MiniMaxAI/MiniMax-M3",
+      "runner": "npm run agent:gemini:builder",
+      "provider": "Google Antigravity",
+      "model": "gemini-3.8-flash-high",
+      "effort": "high",
       "priority": 1,
-      "costPolicy": "free-promo-only"
+      "useWhen": "default primary implementation and bounded repair lane"
     },
     "lunaPlayerFacing": {
       "branch": "worker/luna-player-facing",
@@ -38,16 +39,20 @@
       "model": "gpt-5.6-luna",
       "effort": "low",
       "priority": 2,
-      "useWhen": "MiniMax unavailable, provider preflight fails, or bounded repair is cheaper in Codex"
+      "useWhen": "Gemini 3.8 is unavailable, quota-limited, or a bounded Codex repair is cheaper"
     },
-    "geminiPlayerFacing": {
-      "branch": "worker/gemini-player-facing",
-      "worktreeHint": "../Roxana-gemini-player-facing",
-      "task": "agent-work/tasks/workers/ohmdal-player-facing-primary-gemini.md",
-      "report": "agent-work/reports/workers/ohmdal-player-facing-gemini-current.md",
+    "minimaxPlayerFacing": {
+      "branch": "worker/minimax-player-facing",
+      "worktreeHint": "../Roxana-minimax-player-facing",
+      "task": "agent-work/tasks/workers/ohmdal-player-facing-minimax.md",
+      "report": "agent-work/reports/workers/ohmdal-player-facing-minimax-current.md",
       "writeScope": "current-b-series-stage-only",
+      "runner": "npm run agent:minimax:builder",
+      "provider": "GMI Cloud",
+      "model": "gmicloud/MiniMaxAI/MiniMax-M3",
       "priority": 3,
-      "disabledReason": "Antigravity individual quota exhausted; re-enable after quota reset"
+      "costPolicy": "free-promo-only",
+      "useWhen": "manual/explicit fallback only; do not block normal ticks on GMI preflight"
     }
   },
   "review": {
@@ -57,6 +62,10 @@
     "effort": "medium",
     "freshSession": true,
     "readOnly": true,
+    "alternateHarness": "antigravity-cli",
+    "alternateModel": "gemini-3.8-flash-high",
+    "alternateEffort": "high",
+    "useAlternateWhen": "candidate was built by Luna or Luna independence is otherwise compromised",
     "finalFallbackModel": "gpt-5.6-terra",
     "finalFallbackEffort": "medium"
   },
