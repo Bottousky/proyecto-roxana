@@ -1,6 +1,6 @@
 CANDIDATE_MODE: implementation
-BASE_SHA: b50077ab58fe3f5c48e14b516f90448d334df70a
-IMPLEMENTATION_SHA: 10794635a8824abbbca42ab5c61273a16eb42c
+BASE_SHA: 310c456f6562cf8b87087e7ae16848b99f8c2591
+IMPLEMENTATION_SHA: 2fbb1c03b141ebea8d9e8d0d6086f0c4c20743b6
 EVIDENCE_STATUS: FAIL
 SELF_ACCEPTANCE: false
 
@@ -46,4 +46,11 @@ Revalidation (2026-09-02):
 - Browser run artifact: `output/playwright/ohmdal-hardening/golden-path/golden-path-run.json` (`result: RUNNING`, last checkpoint `portal`).
 
 No loop state was advanced and no acceptance was declared.
+
+Revalidation (2026-09-03):
+- `npm run loop:ohmdal-arco1-player-facing:validate`: PASS (B2 remains active, iteration 0).
+- `npm run build`: PASS.
+- `npm test`: PASS (39 suites, 0 failures; focused M19/M23 also PASS).
+- `npm run playtest:ohmdal-golden-path`: FAIL/timeout after reaching the Ohm pedestal; the artifact records final position `z=-3.68`, but no B2 modal checkpoint or awakening evidence is produced. Page errors: 0; Chromium reports SwiftShader/software rendering.
+- Implementation candidate `2fbb1c03b141ebea8d9e8d0d6086f0c4c20743b6` adjusts the harness approach to stop at the pedestal collider's front edge while remaining inside the interaction radius. No canonical loop state was changed and no acceptance was declared.
 
