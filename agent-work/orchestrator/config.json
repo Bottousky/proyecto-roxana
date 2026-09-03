@@ -17,10 +17,10 @@
   },
   "workers": {
     "geminiPlayerFacing": {
-      "branch": "worker/gemini-player-facing",
-      "worktreeHint": "../Roxana-gemini-player-facing",
+      "branch": "worker/gemini38-player-facing",
+      "worktreeHint": "../Roxana-gemini38-player-facing",
       "task": "agent-work/tasks/workers/ohmdal-player-facing-primary-gemini.md",
-      "report": "agent-work/reports/workers/ohmdal-player-facing-gemini-current.md",
+      "report": "agent-work/reports/workers/ohmdal-player-facing-gemini38-current.md",
       "writeScope": "current-b-series-stage-only",
       "runner": "npm run agent:gemini:builder",
       "provider": "Google Antigravity",
