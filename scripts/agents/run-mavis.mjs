@@ -35,7 +35,7 @@ const agyArgs = [
   '--input-format', 'stream-json',
   '--output-format', 'stream-json',
   '--agent', 'mavis',
-  '--model', 'gemini-3.7-flash-medium',
+  '--model', 'gemini-3.8-flash-medium',
   '--effort', 'medium',
   '--print-timeout', '30m',
 ];
@@ -182,9 +182,6 @@ async function decideAfterTick({ response, resultStatus, exitCode, signal, launc
     return;
   }
 
-  // The Antigravity CLI has occasionally returned code 1 after emitting a useful
-  // result. Treat process failure as recoverable transport failure, never as a
-  // reason to kill the Mavis daemon. If we got a valid marker, trust the marker.
   if (marker === 'WAITING') {
     scheduleNext(pollMinutes * 60_000, 'waiting for worker/evidence');
     return;
@@ -199,7 +196,6 @@ async function decideAfterTick({ response, resultStatus, exitCode, signal, launc
     return;
   }
 
-  // Fail-safe: missing marker must not silently stop the factory.
   scheduleNext(10_000, 'missing tick marker; fail-safe continuation');
 }
 
@@ -300,8 +296,6 @@ async function runTick(firstTick) {
 
   const prompt = firstTick ? bootstrapPrompt : followupPrompt;
   child.stdin.write(`${JSON.stringify({ event: 'user', message: { content: prompt } })}\n`);
-  // One prompt per Antigravity process. Closing stdin makes the CLI finish this
-  // tick and exit; the daemon then starts a clean process for the next tick.
   child.stdin.end();
 }
 
