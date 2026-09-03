@@ -332,7 +332,9 @@ try {
   assert(!zone(current, 'manantial')?.loaded, 'Manantial cargado antes de abrir Omega');
   await recordCheckpoint('portal', { includeDiagnostics: true });
 
-  await moveTo(0, -2, 1.7, 'Ohm pedestal');
+  // The pedestal collider intentionally stops the player at its front edge;
+  // the interaction radius is the gameplay contract for opening inspection.
+  await moveTo(0, -2, 1.9, 'Ohm pedestal');
   await pressInteraction('Ohm awakening');
   await page.locator('#ohm-puzzle-modal').waitFor({ state: 'visible', timeout: NAV_TIMEOUT_MS });
   for (const cable of ['G1', 'G5', 'G4']) {
