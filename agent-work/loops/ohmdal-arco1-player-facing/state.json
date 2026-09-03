@@ -29,12 +29,12 @@
       "materialAuthority": false
     },
     "builder": {
-      "harness": "opencode-cli",
-      "provider": "GMI Cloud",
-      "model": "gmicloud/MiniMaxAI/MiniMax-M3",
+      "harness": "antigravity-cli",
+      "provider": "Google Antigravity",
+      "model": "gemini-3.8-flash-high",
       "mode": "isolated-worktree-write",
       "selfApproval": false,
-      "fallback": "Codex Luna low in isolated worktree"
+      "fallback": "Codex Luna low in isolated worktree; MiniMax M3 only manual/explicit fallback"
     },
     "reviewer": {
       "harness": "codex",
@@ -43,7 +43,7 @@
       "effort": "medium",
       "mode": "read-only",
       "freshSessionRequired": true,
-      "fallback": "Codex Terra medium for final B6 or when Luna review is insufficient"
+      "fallback": "Gemini 3.8 Flash High when Luna built the candidate; Codex Terra medium for final B6 if needed"
     },
     "decision": {
       "harness": "chatgpt-web",
@@ -100,6 +100,6 @@
     "Mobile/touch is first-class and landscape-first with progressive orientation lock plus rotate-device fallback.",
     "Bounded copy polish inside the approved dialogue intent is authorized and is not a HUMAN_GATE.",
     "B6 requires human-style first-minutes Golden Path evidence on desktop and touch/mobile, not only build/unit checks.",
-    "Temporary routing activated 2026-08-31 because Antigravity returned Individual quota reached. Mavis runs on Codex Luna; MiniMax M3/GMI OpenCode is primary builder while its free promotion is available; Codex Luna is fallback."
+    "Routing refreshed 2026-09-03 after successful local smoke test of gemini-3.8-flash-high. Mavis remains Codex Luna low; Gemini 3.8 Flash High is primary builder; Luna is fallback; MiniMax no longer blocks automatic ticks."
   ]
 }
