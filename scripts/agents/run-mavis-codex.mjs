@@ -27,6 +27,7 @@ const pollMinutes = Number.isFinite(config.pollMinutes) && config.pollMinutes > 
 const model = runtime.model || 'gpt-5.6-luna';
 const effort = runtime.effort || 'low';
 const maxConsecutiveErrors = Number.isInteger(runtime.maxConsecutiveErrors) ? runtime.maxConsecutiveErrors : 3;
+const maxTickMinutes = Number.isFinite(runtime.maxTickMinutes) && runtime.maxTickMinutes > 0 ? runtime.maxTickMinutes : 20;
 const configuredWorkers = Object.entries(config.workers || {})
   .map(([id, worker]) => ({ id, ...worker }))
   .sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
@@ -37,6 +38,7 @@ await mkdir(path.dirname(lastMessagePath), { recursive: true });
 let stopped = false;
 let currentChild = null;
 let timer = null;
+let tickWatchdog = null;
 let tick = 0;
 let consecutiveErrors = 0;
 
@@ -72,6 +74,26 @@ async function repoState() {
   }
 }
 
+function clearTickWatchdog() {
+  clearTimeout(tickWatchdog);
+  tickWatchdog = null;
+}
+
+function terminateProcessTree(child) {
+  if (!child) return;
+  if (process.platform === 'win32' && child.pid) {
+    try {
+      const killer = spawn('taskkill', ['/PID', String(child.pid), '/T', '/F'], {
+        stdio: 'ignore',
+        windowsHide: true,
+      });
+      killer.unref();
+      return;
+    } catch {}
+  }
+  try { child.kill('SIGTERM'); } catch {}
+}
+
 function schedule(delayMs, reason) {
   if (stopped) return;
   if (onceMode) {
@@ -91,7 +113,7 @@ function promptFor(firstTick) {
   const primary = primaryWorker
     ? `${primaryWorker.id}: ${primaryWorker.model || primaryWorker.provider || 'configured worker'} via ${primaryWorker.runner || 'configured runner'}`
     : 'none configured';
-  return `You are Mavis, the operational orchestrator for Proyecto Roxana.\n\nExecute ${activeTask}. Reconstruct durable state from the repository, especially ${activeLoop}; do not depend on conversational memory.\n\nThis is ${firstTick ? 'the first' : 'a fresh'} control tick in a resilient daemon. Start with npm run orchestrator:status. If the next action is safe and specified, execute it now: dispatch the configured worker, launch a fresh independent reviewer, run gates, integrate an unambiguous PASS, update state, commit/push, or advance the stage. Do not duplicate active workers. Do not self-approve builder work. Respect Git safety and all HUMAN_GATE rules.\n\nLive routing is authoritative. Primary configured worker: ${primary}. Read ${configPath.replaceAll('\\', '/')} and ${activeTask} every tick; do not rely on stale provider/quota assumptions from previous runs. A stale FAIL report or dirty worker worktree is not WAITING if a bounded repair or alternate clean worker can act now.\n\nEnd with exactly one marker on its own line: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: WAITING, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
+  return `You are Mavis, the operational orchestrator for Proyecto Roxana.\n\nExecute ${activeTask}. Reconstruct durable state from the repository, especially ${activeLoop}; do not depend on conversational memory.\n\nThis is ${firstTick ? 'the first' : 'a fresh'} control tick in a resilient daemon. Start with npm run orchestrator:status. If the next action is safe and specified, execute it now: dispatch the configured worker, launch a fresh independent reviewer, run gates, integrate an unambiguous PASS, update state, commit/push, or advance the stage. Do not duplicate active workers. Do not self-approve builder work. Respect Git safety and all HUMAN_GATE rules.\n\nLive routing is authoritative. Primary configured worker: ${primary}. Read ${configPath.replaceAll('\\', '/')} and ${activeTask} every tick; do not rely on stale provider/quota assumptions from previous runs. A stale FAIL report or dirty worker worktree is not WAITING if a bounded repair or alternate clean worker can act now. Before returning WAITING, re-check that the worker process is still alive and that no newer report/commit has appeared; if the worker already finished, process its evidence in this tick instead.\n\nEnd with exactly one marker on its own line: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: WAITING, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
 }
 
 function codexInvocation(args) {
@@ -133,8 +155,9 @@ async function runTick(firstTick) {
   }
 
   tick += 1;
+  const thisTick = tick;
   await writeFile(lastMessagePath, '', 'utf8');
-  console.warn(`\n[MAVIS/CODEX] >>> control tick ${tick} model=${model} effort=${effort}`);
+  console.warn(`\n[MAVIS/CODEX] >>> control tick ${thisTick} model=${model} effort=${effort}`);
 
   const codexArgs = [
     'exec',
@@ -153,6 +176,7 @@ async function runTick(firstTick) {
 
   let stderr = '';
   let child;
+  let watchdogExpired = false;
   try {
     child = spawn(invocation.command, invocation.args, {
       cwd: root,
@@ -166,6 +190,17 @@ async function runTick(firstTick) {
   }
   currentChild = child;
 
+  clearTickWatchdog();
+  tickWatchdog = setTimeout(() => {
+    if (stopped || currentChild !== child) return;
+    watchdogExpired = true;
+    console.error(`[MAVIS/CODEX] Tick ${thisTick} exceeded ${maxTickMinutes} minute(s). Terminating the stuck Codex process tree and re-evaluating durable repo state.`);
+    terminateProcessTree(child);
+    currentChild = null;
+    clearTickWatchdog();
+    schedule(10_000, 'stuck control tick watchdog');
+  }, maxTickMinutes * 60_000);
+
   child.stderr.on('data', (chunk) => {
     const text = String(chunk);
     stderr += text;
@@ -177,6 +212,8 @@ async function runTick(firstTick) {
   });
 
   child.on('exit', async (code, signal) => {
+    clearTickWatchdog();
+    if (watchdogExpired) return;
     currentChild = null;
     let lastMessage = '';
     try { lastMessage = await readFile(lastMessagePath, 'utf8'); } catch {}
@@ -234,9 +271,11 @@ process.on('SIGINT', () => {
   stopped = true;
   clearTimeout(timer);
   timer = null;
+  clearTickWatchdog();
   if (currentChild) {
     try { currentChild.stdin.end(); } catch {}
-    try { currentChild.kill('SIGINT'); } catch {}
+    terminateProcessTree(currentChild);
+    currentChild = null;
   }
 });
 
@@ -244,4 +283,5 @@ console.warn(`[MAVIS/CODEX] Active task: ${activeTask}`);
 console.warn(`[MAVIS/CODEX] Active loop: ${activeLoop}`);
 console.warn(`[MAVIS/CODEX] Primary worker: ${primaryWorker?.model || primaryWorker?.id || 'none'}`);
 console.warn(`[MAVIS/CODEX] Circuit breaker: ${maxConsecutiveErrors} consecutive failures.`);
+console.warn(`[MAVIS/CODEX] Tick watchdog: ${maxTickMinutes} minute(s).`);
 void runTick(true);
