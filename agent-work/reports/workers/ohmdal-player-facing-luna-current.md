@@ -1,5 +1,5 @@
 CANDIDATE_MODE: implementation
-BASE_SHA: 310c456f6562cf8b87087e7ae16848b99f8c2591
+BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
 IMPLEMENTATION_SHA: 2fbb1c03b141ebea8d9e8d0d6086f0c4c20743b6
 EVIDENCE_STATUS: FAIL
 SELF_ACCEPTANCE: false
@@ -47,10 +47,11 @@ Revalidation (2026-09-02):
 
 No loop state was advanced and no acceptance was declared.
 
-Revalidation (2026-09-03):
+Revalidation (2026-09-04):
 - `npm run loop:ohmdal-arco1-player-facing:validate`: PASS (B2 remains active, iteration 0).
 - `npm run build`: PASS.
 - `npm test`: PASS (39 suites, 0 failures; focused M19/M23 also PASS).
-- `npm run playtest:ohmdal-golden-path`: FAIL/timeout after reaching the Ohm pedestal; the artifact records final position `z=-3.68`, but no B2 modal checkpoint or awakening evidence is produced. Page errors: 0; Chromium reports SwiftShader/software rendering.
+- `npm run playtest:ohmdal-golden-path`: FAIL/timeout later in the route, after B2. The artifact records the desktop B2 path reaching `ohm-awakened` with `ohmAwake: true`, `storyStep: invited_to_workshop`, and position `z=-3.68`; it then times out during workshop movement. Page errors: 0; Chromium reports SwiftShader/software rendering.
+- B2 browser evidence: desktop continuity interaction and awakening checkpoint reached; touch-specific B2 evidence remains outstanding because the full runner did not reach its mobile phase.
 - Implementation candidate `2fbb1c03b141ebea8d9e8d0d6086f0c4c20743b6` adjusts the harness approach to stop at the pedestal collider's front edge while remaining inside the interaction radius. No canonical loop state was changed and no acceptance was declared.
 
