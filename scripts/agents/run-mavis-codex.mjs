@@ -94,12 +94,24 @@ async function refreshSnapshot() {
   return JSON.parse(await readFile(statusPath, 'utf8'));
 }
 
+function currentStageSignals(snapshot) {
+  const stage = snapshot?.loop?.currentStage || null;
+  const relevant = (ids) => (ids || []).filter((id) => snapshot?.workers?.[id]?.runtime?.stage === stage);
+  return {
+    stage,
+    passCandidates: relevant(snapshot?.control?.passCandidates),
+    activeWorkers: relevant(snapshot?.control?.activeWorkers),
+    failedWorkers: relevant(snapshot?.control?.failedWorkers),
+  };
+}
+
 function classify(snapshot) {
   if (snapshot?.loop?.status === 'complete') return 'COMPLETE';
   if (snapshot?.loop?.humanGate) return 'HUMAN_GATE';
-  if ((snapshot?.control?.passCandidates || []).length > 0) return 'PROCESS_PASS';
-  if ((snapshot?.control?.activeWorkers || []).length > 0) return 'WAIT_ACTIVE';
-  if ((snapshot?.control?.failedWorkers || []).length > 0) return 'REPAIR';
+  const signals = currentStageSignals(snapshot);
+  if (signals.passCandidates.length > 0) return 'PROCESS_PASS';
+  if (signals.activeWorkers.length > 0) return 'WAIT_ACTIVE';
+  if (signals.failedWorkers.length > 0) return 'REPAIR';
   return 'DISPATCH';
 }
 
@@ -108,6 +120,7 @@ function workerSummary(snapshot) {
     id,
     model: config.workers?.[id]?.model || null,
     runtime: worker.runtime?.classification || 'UNKNOWN',
+    runtimeStage: worker.runtime?.stage || null,
     evidence: worker.reportSignals?.evidenceStatus || null,
     candidateReady: Boolean(worker.candidateReady),
     branch: worker.branch,
@@ -122,18 +135,19 @@ function actionPrompt(action, snapshot) {
   const primary = primaryWorker
     ? `${primaryWorker.id}: ${primaryWorker.model || primaryWorker.provider || 'configured worker'} via ${primaryWorker.runner || 'configured runner'}`
     : 'none configured';
+  const stageSignals = currentStageSignals(snapshot);
   const compact = {
-    stage: snapshot?.loop?.currentStage || null,
+    stage: stageSignals.stage,
     iteration: snapshot?.loop?.iteration ?? null,
     canonicalSha: snapshot?.canonical?.sha || null,
     action,
-    activeWorkers: snapshot?.control?.activeWorkers || [],
-    passCandidates: snapshot?.control?.passCandidates || [],
-    failedWorkers: snapshot?.control?.failedWorkers || [],
+    activeWorkers: stageSignals.activeWorkers,
+    passCandidates: stageSignals.passCandidates,
+    failedWorkers: stageSignals.failedWorkers,
     workers: workerSummary(snapshot),
   };
 
-  return `You are Mavis, the cheap operational control plane for Proyecto Roxana.\n\nSTATE_MACHINE_ACTION: ${action}\nThis action was classified deterministically by the harness. Do not replace it with a different high-level action.\n\nDurable task: ${activeTask}\nDurable loop: ${activeLoop}\nPrimary configured worker: ${primary}\nCurrent machine snapshot:\n${JSON.stringify(compact, null, 2)}\n\nRead config/task/reports needed for this action only. Keep this control tick short and operational. Do not implement gameplay yourself. Do not wait for long-running workers inside this tick.\n\nAction rules:\n- DISPATCH: prepare/sync one safe isolated worker lane and start exactly one configured builder asynchronously. Prefer the primary Gemini lane. If a fresh provider attempt immediately proves quota/auth unavailable, start the permitted Luna fallback in the same tick. After a successful async launch, stop; do not poll the worker or tail logs repeatedly.\n- REPAIR: inspect the newest FAIL/ERROR/STALE evidence, create one bounded repair packet (max 5 fixes, max 1 structural fix), and start exactly one permitted worker asynchronously. Prefer Gemini when usable; use Luna when Gemini is quota-limited or the bounded Codex repair is cheaper. Do not wait for completion.\n- PROCESS_PASS: validate Candidate Protocol v2, ancestry, cleanliness and required gates. Launch/use a fresh independent reviewer that did not build the candidate. Only integrate mechanically if review and required gates are PASS. If review cannot finish safely inside this bounded tick, persist/launch the review rather than doing implementation work.\n\nNever return WAITING merely because you launched a worker: the outer state machine owns waiting. Never duplicate a RUNNING worker. Never self-approve builder work. Respect no-force/no-hard-reset/no-paid-spend/HUMAN_GATE rules. If a real human gate exists, record it in the loop state.\n\nEnd with one concise status line describing what you executed, then one marker: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
+  return `You are Mavis, the cheap operational control plane for Proyecto Roxana.\n\nSTATE_MACHINE_ACTION: ${action}\nThis action was classified deterministically by the harness for the CURRENT stage only. Do not replace it with a different high-level action and do not revive historical FAIL/PASS artifacts from older stages.\n\nDurable task: ${activeTask}\nDurable loop: ${activeLoop}\nPrimary configured worker: ${primary}\nCurrent machine snapshot:\n${JSON.stringify(compact, null, 2)}\n\nRead config/task/reports needed for this action only. Keep this control tick short and operational. Do not implement gameplay yourself. Do not wait for long-running workers inside this tick.\n\nAction rules:\n- DISPATCH: prepare/sync one safe isolated worker lane and start exactly one configured builder asynchronously. Prefer the primary Gemini lane. If a fresh provider attempt immediately proves quota/auth unavailable, start the permitted Luna fallback in the same tick. After a successful async launch, stop; do not poll the worker or tail logs repeatedly.\n- REPAIR: inspect the newest CURRENT-STAGE FAIL/ERROR/STALE evidence, create one bounded repair packet (max 5 fixes, max 1 structural fix), and start exactly one permitted worker asynchronously. Prefer Gemini when usable; use Luna when Gemini is quota-limited or the bounded Codex repair is cheaper. Do not wait for completion.\n- PROCESS_PASS: validate Candidate Protocol v2, ancestry, cleanliness and required gates for the CURRENT stage. Launch/use a fresh independent reviewer that did not build the candidate. Only integrate mechanically if review and required gates are PASS. If review cannot finish safely inside this bounded tick, persist/launch the review rather than doing implementation work.\n\nNever return WAITING merely because you launched a worker: the outer state machine owns waiting. Never duplicate a RUNNING worker. Never self-approve builder work. Respect no-force/no-hard-reset/no-paid-spend/HUMAN_GATE rules. If a real human gate exists, record it in the loop state.\n\nEnd with one concise status line describing what you executed, then one marker: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
 }
 
 function codexInvocation(args) {
@@ -175,7 +189,7 @@ async function scheduleFromFreshState(reasonPrefix = 'fresh state') {
     return;
   }
   if (next === 'WAIT_ACTIVE') {
-    schedule(activePollSeconds * 1000, `${reasonPrefix}: worker runtime RUNNING`);
+    schedule(activePollSeconds * 1000, `${reasonPrefix}: current-stage worker runtime RUNNING`);
     return;
   }
   schedule(postActionPollSeconds * 1000, `${reasonPrefix}: ${next.toLowerCase()} remains executable`);
@@ -200,6 +214,7 @@ async function runTick() {
   }
 
   const action = classify(snapshot);
+  const stageSignals = currentStageSignals(snapshot);
   console.warn(`\n[MAVIS/CODEX] State machine action=${action} stage=${snapshot.loop?.currentStage || 'unknown'}`);
 
   if (action === 'COMPLETE') {
@@ -212,9 +227,9 @@ async function runTick() {
     return;
   }
   if (action === 'WAIT_ACTIVE') {
-    const active = (snapshot.control?.activeWorkers || []).join(', ');
-    console.warn(`[MAVIS/CODEX] Mechanical wait: active worker(s)=${active || 'unknown'}. No model tick spent.`);
-    schedule(activePollSeconds * 1000, 'worker runtime RUNNING');
+    const active = stageSignals.activeWorkers.join(', ');
+    console.warn(`[MAVIS/CODEX] Mechanical wait: current-stage worker(s)=${active || 'unknown'}. No model tick spent.`);
+    schedule(activePollSeconds * 1000, 'current-stage worker runtime RUNNING');
     return;
   }
 
