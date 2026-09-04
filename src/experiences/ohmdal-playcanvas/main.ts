@@ -2,6 +2,7 @@ import { mountPlayCanvasOhmdal } from './playcanvasRuntime.ts';
 import type { PlazaUi } from '../ohmdal-plaza/plazaRuntime.ts';
 import type { BitacoraManager } from '../ohmdal-plaza/journal/bitacora.ts';
 import type { WorkbenchInspector } from '../ohmdal-plaza/inspect/workbench.ts';
+import type { OhmContinuityPuzzle } from './systems/puzzles/ohmContinuityPuzzle.ts';
 import { portraitKey } from '../../ui/portrait.ts';
 
 const PORTRAIT_MAP: Record<string, string> = {
@@ -45,6 +46,15 @@ const bitacoraGraphEl = document.getElementById('bitacora-graph')!;
 const bitacoraCloseBtn = document.getElementById('bitacora-close')!;
 const workbenchModal = document.getElementById('workbench-modal')!;
 const workbenchCloseBtn = document.getElementById('workbench-close')!;
+const ohmInspectionModal = document.getElementById('ohm-inspection-modal');
+const ohmInspectionCloseBtn = document.getElementById('ohm-inspection-close');
+const ohmResetBtn = document.getElementById('ohm-reset-btn');
+const ohmSupplyCount = document.getElementById('ohm-supply-count');
+const ohmSupplyBars = document.getElementById('ohm-supply-bars');
+const ohmStatusBanner = document.getElementById('ohm-status-banner');
+const ohmStatusIcon = document.getElementById('ohm-status-icon');
+const ohmStatusText = document.getElementById('ohm-status-text');
+const ohmCoreLamp = document.getElementById('ohm-core-lamp');
 const inventoryEl = document.getElementById('plaza-inventory')!;
 const inventoryTextEl = document.getElementById('inventory-text')!;
 
@@ -55,6 +65,9 @@ const touchInteractBtn = document.getElementById('touch-interact')!;
 const touchMoveButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-move-key]'));
 
 let activeWorkbenchActionCb: ((act: string) => void) | null = null;
+let activeOhmToggleGapCb: ((gapId: string) => void) | null = null;
+let activeOhmResetCb: (() => void) | null = null;
+let activeOhmCloseCb: (() => void) | null = null;
 let toastTimeout: number | null = null;
 
 const ui: PlazaUi = {
@@ -149,6 +162,21 @@ const ui: PlazaUi = {
     renderWorkbench(inspector);
   },
 
+  setOhmInspectionView(visible, puzzle, onToggleGap, onReset, onClose) {
+    if (!visible || !puzzle) {
+      ohmInspectionModal?.classList.add('hidden');
+      activeOhmToggleGapCb = null;
+      activeOhmResetCb = null;
+      activeOhmCloseCb = null;
+      return;
+    }
+    activeOhmToggleGapCb = onToggleGap ?? null;
+    activeOhmResetCb = onReset ?? null;
+    activeOhmCloseCb = onClose ?? null;
+    ohmInspectionModal?.classList.remove('hidden');
+    renderOhmInspection(puzzle as OhmContinuityPuzzle);
+  },
+
   setInventoryItem(name) {
     if (!name) {
       inventoryEl.classList.add('hidden');
@@ -227,6 +255,108 @@ function renderWorkbench(inspector: WorkbenchInspector): void {
       }
     };
     actionsEl.appendChild(btn);
+  }
+}
+
+function renderOhmInspection(puzzle: OhmContinuityPuzzle): void {
+  const snapshot = puzzle.getSnapshot();
+
+  if (ohmSupplyCount) {
+    ohmSupplyCount.textContent = `${snapshot.supplyLeft} / ${snapshot.supplyTotal}`;
+  }
+  if (ohmSupplyBars) {
+    const bars = Array.from(ohmSupplyBars.querySelectorAll<HTMLElement>('.supply-bar'));
+    bars.forEach((bar, idx) => {
+      if (idx < snapshot.supplyLeft) {
+        bar.classList.add('active');
+      } else {
+        bar.classList.remove('active');
+      }
+    });
+  }
+
+  if (ohmStatusBanner) {
+    ohmStatusBanner.className = `ohm-status-banner status-${snapshot.state}`;
+  }
+  if (ohmStatusIcon) {
+    ohmStatusIcon.textContent = snapshot.state === 'cerrado' ? '🟢' : snapshot.state === 'tocando' ? '🟡' : '⚪';
+  }
+  if (ohmStatusText) {
+    ohmStatusText.textContent =
+      snapshot.state === 'cerrado'
+        ? '¡Circuito cerrado! Camino continuo restablecido entre la fuente y el núcleo de Ohm.'
+        : snapshot.state === 'tocando'
+          ? 'Contacto parcial: Hay tensión en los bornes, pero el camino no regresa a la fuente (tocar no es unir).'
+          : 'Circuito abierto: La fuente zumba pero no hay continuidad hacia Ohm.';
+  }
+
+  if (ohmCoreLamp) {
+    if (snapshot.complete || snapshot.energizedNodes.includes('OHM')) {
+      ohmCoreLamp.classList.add('energized');
+    } else {
+      ohmCoreLamp.classList.remove('energized');
+    }
+  }
+
+  const wireFeedIn = document.getElementById('ohm-wire-feed-in');
+  const wireFeedOut = document.getElementById('ohm-wire-feed-out');
+  const wireCoreOut = document.getElementById('ohm-wire-core-out');
+  const wireShortcutIn = document.getElementById('ohm-wire-shortcut-in');
+  const wireShortcutOut = document.getElementById('ohm-wire-shortcut-out');
+  const wireLongIn = document.getElementById('ohm-wire-long-in');
+  const wireLongMid = document.getElementById('ohm-wire-long-mid');
+  const wireLongOut = document.getElementById('ohm-wire-long-out');
+
+  wireFeedIn?.classList.toggle('energized', snapshot.energizedNodes.includes('FUENTE_MAS'));
+  wireFeedOut?.classList.toggle('energized', snapshot.energizedNodes.includes('CRUCE_ALTO'));
+  wireCoreOut?.classList.toggle('energized', snapshot.energizedNodes.includes('OHM'));
+  wireShortcutIn?.classList.toggle('energized', snapshot.energizedNodes.includes('NUDO'));
+  wireShortcutOut?.classList.toggle('energized', snapshot.energizedNodes.includes('OESTE_ALTO'));
+  wireLongIn?.classList.toggle('energized', snapshot.energizedNodes.includes('NUDO'));
+  wireLongMid?.classList.toggle('energized', snapshot.energizedNodes.includes('ABAJO_MEDIO'));
+  wireLongOut?.classList.toggle('energized', snapshot.energizedNodes.includes('ABAJO_OESTE'));
+
+  for (const gap of snapshot.gaps) {
+    const btn = document.getElementById(`ohm-gap-${gap.id}`);
+    const svgRect = document.getElementById(`ohm-svg-rect-${gap.id}`);
+    const svgText = document.getElementById(`ohm-svg-text-${gap.id}`);
+
+    if (btn) {
+      const indicator = btn.querySelector('.btn-indicator');
+      if (gap.broken) {
+        btn.classList.add('broken');
+        if (indicator) indicator.textContent = '✕';
+      } else if (gap.covered) {
+        btn.classList.add('covered');
+        if (indicator) indicator.textContent = '✓';
+      } else {
+        btn.classList.remove('covered');
+        if (indicator) indicator.textContent = '○';
+      }
+    }
+
+    if (svgRect) {
+      if (gap.broken) {
+        svgRect.setAttribute('fill', '#2d1612');
+        svgRect.setAttribute('stroke', '#883322');
+      } else if (gap.covered) {
+        svgRect.setAttribute('fill', '#d47a32');
+        svgRect.setAttribute('stroke', '#ffae62');
+      } else {
+        svgRect.setAttribute('fill', '#18120e');
+        svgRect.setAttribute('stroke', '#5a402d');
+      }
+    }
+
+    if (svgText) {
+      if (gap.covered) {
+        svgText.setAttribute('fill', '#fff');
+      } else if (gap.broken) {
+        svgText.setAttribute('fill', '#e07766');
+      } else {
+        svgText.setAttribute('fill', '#c8b6a2');
+      }
+    }
   }
 }
 
@@ -310,6 +440,29 @@ workbenchCloseBtn.addEventListener('click', () => {
   activeWorkbenchActionCb?.('close');
 });
 
+ohmInspectionCloseBtn?.addEventListener('click', () => {
+  activeOhmCloseCb?.();
+});
+
+ohmResetBtn?.addEventListener('click', () => {
+  activeOhmResetCb?.();
+});
+
+const gapIds = ['g1', 'g2', 'g3', 'g4', 'g5'] as const;
+for (const gapId of gapIds) {
+  const btn = document.getElementById(`ohm-gap-${gapId}`);
+  btn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    activeOhmToggleGapCb?.(gapId);
+  });
+  const svgGroup = document.getElementById(`ohm-svg-gap-${gapId}`);
+  svgGroup?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    activeOhmToggleGapCb?.(gapId);
+  });
+}
+
 backBtn.addEventListener('click', () => {
   window.location.href = '/';
 });
+

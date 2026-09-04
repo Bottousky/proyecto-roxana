@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { createServer, Socket } from 'node:net';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
 import { setTimeout as sleep } from 'node:timers/promises';
@@ -12,7 +13,7 @@ const OUT = resolve(ROOT, 'output/playwright/ohmdal-hardening/golden-path');
 const VIEWPORT = { width: 1440, height: 900 };
 const MOBILE_VIEWPORT = { width: 390, height: 844 };
 const ROUTE = '/ohmdal-playcanvas';
-const NAV_TIMEOUT_MS = 30_000;
+const NAV_TIMEOUT_MS = 60_000;
 const STEP_TIMEOUT_MS = 20_000;
 
 await mkdir(OUT, { recursive: true });
@@ -37,7 +38,7 @@ function getFreePort() {
   });
 }
 
-async function portReachable(port, timeoutMs = 30_000) {
+async function portReachable(port, timeoutMs = 60_000) {
   const started = Date.now();
   while (Date.now() - started < timeoutMs) {
     const reachable = await new Promise((resolveReachable) => {
@@ -68,8 +69,11 @@ async function portReachable(port, timeoutMs = 30_000) {
 function startVite(port) {
   // .cmd is required on Windows; shell=true keeps the invocation compatible
   // with both npm's Windows shims and POSIX shells.
+  const localViteCmd = resolve(ROOT, 'node_modules/.bin/vite.cmd');
   const command = process.platform === 'win32'
-    ? `npx.cmd vite --host 127.0.0.1 --port ${port} --strictPort`
+    ? (existsSync(localViteCmd)
+      ? `"${localViteCmd}" --host 127.0.0.1 --port ${port} --strictPort`
+      : `npx.cmd vite --host 127.0.0.1 --port ${port} --strictPort`)
     : `npx vite --host 127.0.0.1 --port ${port} --strictPort`;
   const vite = spawn(command, {
     cwd: ROOT,
@@ -305,7 +309,7 @@ function zone(current, id) {
 }
 
 async function assertNoBlockingModals(label) {
-  const modals = await page.evaluate(() => ['#plaza-dialog', '#workbench-modal', '#bitacora-modal']
+  const modals = await page.evaluate(() => ['#plaza-dialog', '#workbench-modal', '#bitacora-modal', '#ohm-inspection-modal']
     .map((selector) => ({ selector, hidden: document.querySelector(selector)?.classList.contains('hidden') ?? true })));
   assert(modals.every((modal) => modal.hidden), `${label}: modal bloqueante activo: ${JSON.stringify(modals)}`);
 }
@@ -313,7 +317,22 @@ async function assertNoBlockingModals(label) {
 try {
   assert(await portReachable(port), `Vite no se levantó en ${port}; log: ${viteLog.join('').slice(-2000)}`);
 
-  browser = await chromium.launch({ headless: true });
+  for (const candidate of ['chrome', 'msedge', undefined]) {
+    try {
+      const launchOptions = {
+        headless: true,
+        args: process.platform === 'win32' ? ['--enable-gpu', '--use-angle=d3d11'] : [],
+      };
+      if (candidate) launchOptions.channel = candidate;
+      browser = await chromium.launch(launchOptions);
+      break;
+    } catch {
+      // try next candidate
+    }
+  }
+  if (!browser) {
+    browser = await chromium.launch({ headless: true });
+  }
   artifact.browser = `chromium ${browser.version()}`;
   context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 1 });
   page = await context.newPage();
@@ -332,8 +351,19 @@ try {
   assert(!zone(current, 'manantial')?.loaded, 'Manantial cargado antes de abrir Omega');
   await recordCheckpoint('portal', { includeDiagnostics: true });
 
-  await moveTo(0, -2, 1.7, 'Ohm pedestal');
-  await pressInteraction('Ohm awakening');
+  await moveTo(0, -3.4, 0.4, 'Ohm rear inspection position');
+  await pressInteraction('Ohm rear inspection');
+  await waitForSnapshot((state) => state.ohmInspecting, 'Ohm inspection open');
+  await page.locator('#ohm-inspection-modal').waitFor({ state: 'visible', timeout: STEP_TIMEOUT_MS });
+  await sleep(150);
+
+  await page.locator('#ohm-gap-g1').click({ noWaitAfter: true });
+  await sleep(150);
+  await page.locator('#ohm-gap-g5').click({ noWaitAfter: true });
+  await sleep(150);
+  await page.locator('#ohm-gap-g4').click({ noWaitAfter: true });
+  await sleep(350);
+
   await waitForDialogue('ohm_awakening_event');
   current = await waitUntilStory('ohm_awakened');
   assert(current.ohmAwake, 'Ohm no quedó despierto');
@@ -350,9 +380,11 @@ try {
   assert(zone(current, 'workshop')?.active, 'Workshop no activo dentro');
   await recordCheckpoint('inside-workshop', { includeDiagnostics: true });
 
-  // The workbench collider occupies the direct centre approach. Stop just
-  // outside its west edge, still inside Lumen's 3.5m interaction radius.
-  await moveTo(-63.0, -0.6, 0.8, 'Lumen workshop bench approach');
+  // The workbench collider occupies the direct centre approach. Move west
+  // of the bench, then step north alongside it into Lumen's interaction radius.
+  await moveTo(-63.0, -1.5, 0.7, 'Lumen workshop west corridor');
+  await moveTo(-62.8, 0.2, 0.5, 'Lumen workshop bench approach');
+  await waitForSnapshot((state) => state.nearestInteractable === 'lumen_npc_inside', 'Lumen interactuable dominante');
   await pressInteraction('Lumen workshop dialogue');
   await waitForDialogue('lumen_workshop_interior');
   await drainDialogue('lumen_workshop_interior');
@@ -481,6 +513,7 @@ try {
   current = await waitForSnapshot((state) => state.arc1.progress.castleGateOpen, 'apertura Castle derivada');
   assert(current.arc1.plaza.bellPulls === 1, 'G2 no registró la Campana física');
 
+  await moveTo(-3.0, 0.5, 0.45, 'restored campana exit waypoint');
   await moveTo(-3.0, 6.5, 0.8, 'Castle route west waypoint');
   await moveTo(0, 8.0, 0.75, 'Castle route');
   current = await waitForSnapshot((state) => state.nearestInteractable === 'castle_route', 'ruta Castle dominante');

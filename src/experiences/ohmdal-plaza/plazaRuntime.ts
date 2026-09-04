@@ -22,6 +22,13 @@ export interface PlazaUi {
   setInventoryItem(name: string | null): void;
   showNotification(text: string): void;
   setCinematicOverlay?(visible: boolean): void;
+  setOhmInspectionView?(
+    visible: boolean,
+    puzzle?: unknown,
+    onToggleGap?: (gapId: string) => void,
+    onReset?: () => void,
+    onClose?: () => void,
+  ): void;
 }
 
 export interface PlazaHandle {

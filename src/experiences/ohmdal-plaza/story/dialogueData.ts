@@ -71,17 +71,22 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Edda',
-        text: '¡¿Lo DESPERTASTE?! ¡Por todos los esquemas! ¿Qué hiciste? ¡No encendiste sahumerios ni cantaste el himno de los tres golpes!',
+        text: 'No... no puede ser.',
+        emotion: 'concerned',
+      },
+      {
+        who: 'Edda',
+        text: '¡Despertaste a Ohm! ¡Por todos los esquemas, está emitiendo luz y zumbando!',
         emotion: 'eureka',
       },
       {
         who: 'Estudiante',
-        text: 'Solo acoplé los terminales de contacto. El acumulador del portal tenía potencial suficiente para energizar su circuito primario.',
-        emotion: 'eureka',
+        text: 'Había un circuito interrumpido en su escotilla trasera. Coloqué los puentes de cobre y la corriente volvió a circular.',
+        emotion: 'neutral',
       },
       {
         who: 'Edda',
-        text: '¡Lo sabía! ¡Es pura continuidad y diferencia de potencial! Lumen TIENE que ver esto de inmediato.',
+        text: '¡Cerraste el lazo! ¡Tenemos que contárselo a Lumen!',
         emotion: 'eureka',
       },
       {

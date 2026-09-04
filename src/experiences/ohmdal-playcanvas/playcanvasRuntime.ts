@@ -25,6 +25,7 @@ import { OHMDAL_TRANSITION_ANCHORS, yawForAnchor, type SpawnAnchor } from './sys
 import type { CollisionDiagnostic } from './systems/navigation/ohmdalNavigation.ts';
 import { createManantialActivationVfx } from './world/manantial/manantialActivationVfx.ts';
 import { OhmdalVfxSystem } from './systems/vfx/ohmdalVfxSystem.ts';
+import { OhmContinuityPuzzle } from './systems/puzzles/ohmContinuityPuzzle.ts';
 import {
   type Arc1GreyboxState,
   type CastleNetworkConfiguration,
@@ -255,6 +256,20 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         finishArrivalCinematic();
         return;
       }
+    }
+    if (isOhmInspecting) {
+      if (k === 'escape') {
+        e.preventDefault();
+        closeOhmInspection();
+        return;
+      }
+      const gapMap: Record<string, string> = { '1': 'g1', '2': 'g2', '3': 'g3', '4': 'g5', '5': 'g4' };
+      if (gapMap[k]) {
+        e.preventDefault();
+        handleOhmPuzzleToggle(gapMap[k]);
+        return;
+      }
+      return;
     }
     if (k === 'w' || k === 'arrowup') keys.w = true;
     if (k === 's' || k === 'arrowdown') keys.s = true;
@@ -712,6 +727,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         nearestInteractable: nearest,
         zones: zones.snapshot(),
         arc1: snapshotArc1Greybox(arc1State),
+        ohmInspecting: isOhmInspecting,
+        ohmPuzzle: ohmPuzzle.getSnapshot(),
       };
     },
   };
@@ -726,21 +743,121 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     },
   );
 
+  // --- Ohm Continuity Puzzle & ZoomIn Service Hatch (Stage B2) ---
+  const ohmPuzzle = new OhmContinuityPuzzle();
+  let isOhmInspecting = false;
+  const inspectionPrevPos = new pc.Vec3();
+  let inspectionPrevYaw = 180;
+  let inspectionPrevPitch = 0;
+  let ohmCuriosityTimer = 0;
+
+  function openOhmInspection(): void {
+    if (isOhmAwake || isOhmInspecting) return;
+    isOhmInspecting = true;
+    inspectionPrevPos.copy(playerPos);
+    inspectionPrevYaw = yaw;
+    inspectionPrevPitch = pitch;
+
+    // ZoomIn inspection camera framing on Ohm's rear service panel
+    playerPos.set(0, 1.25, -2.85);
+    yaw = 180;
+    pitch = -4;
+    world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+
+    world.viewmodelRoot.enabled = false;
+    document.exitPointerLock?.();
+    audio.playSwitchClunk();
+
+    ui.setOhmInspectionView?.(
+      true,
+      ohmPuzzle,
+      handleOhmPuzzleToggle,
+      handleOhmPuzzleReset,
+      closeOhmInspection,
+    );
+  }
+
+  function closeOhmInspection(): void {
+    if (!isOhmInspecting) return;
+    isOhmInspecting = false;
+    world.viewmodelRoot.enabled = isToolEquipped;
+    ui.setOhmInspectionView?.(false);
+
+    playerPos.copy(inspectionPrevPos);
+    yaw = inspectionPrevYaw;
+    pitch = inspectionPrevPitch;
+    world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+  }
+
+  function handleOhmPuzzleToggle(gapId: string): void {
+    if (!isOhmInspecting) return;
+    const result = ohmPuzzle.toggleGap(gapId);
+    if (result.success) {
+      if (result.action === 'placed') {
+        audio.playRelayEngage();
+        vfx.triggerContactSnap([0, 1.0, -2.4]);
+      } else {
+        audio.playSwitchClunk();
+      }
+    } else {
+      audio.playSwitchClunk();
+      if (result.reason === 'broken') {
+        vfx.triggerTerminalArc([0, 1.0, -2.4], 0.5);
+      }
+    }
+    ui.showNotification(result.message);
+    ui.setOhmInspectionView?.(
+      true,
+      ohmPuzzle,
+      handleOhmPuzzleToggle,
+      handleOhmPuzzleReset,
+      closeOhmInspection,
+    );
+
+    if (ohmPuzzle.isComplete()) {
+      audio.playRelayEngage();
+      audio.playDiscoveryChime();
+      vfx.triggerConductorPulse([0, 0.8, -2.6], [0, 1.8, -2.0]);
+      setTimeout(() => {
+        closeOhmInspection();
+        triggerOhmAwakening();
+      }, 700);
+    }
+  }
+
+  function handleOhmPuzzleReset(): void {
+    if (!isOhmInspecting) return;
+    ohmPuzzle.reset();
+    audio.playSwitchClunk();
+    ui.showNotification('Puentes retirados a la bandeja de material.');
+    ui.setOhmInspectionView?.(
+      true,
+      ohmPuzzle,
+      handleOhmPuzzleToggle,
+      handleOhmPuzzleReset,
+      closeOhmInspection,
+    );
+  }
+
   // Awakening Sequence for Ohm
   function triggerOhmAwakening(): void {
     if (isOhmAwake) return;
     isOhmAwake = true;
     storyStep = 'ohm_awakened';
     world.ohmFilamentLight.light!.intensity = 2.8;
-    vfx.triggerConductorPulse([0, 1.2, -6.2], [0, 2.5, -6.2]);
-    vfx.triggerTerminalArc([0, 1.4, -6.2], 1.2);
+    vfx.triggerConductorPulse([0, 0.8, -2.6], [0, 1.8, -2.0]);
+    vfx.triggerTerminalArc([0, 1.1, -2.0], 1.2);
     audio.playDiscoveryChime();
-    ui.showNotification('⚡ ¡Terminales de entrada acoplados! El filamento de Ohm se ilumina.');
+    ui.showNotification('⚡ ¡Lazo de corriente cerrado! El filamento de Ohm despierta.');
     bitacora.unlock('despertar_ohm');
 
     setTimeout(() => {
       startDialogue('ohm_awakening_event');
-    }, 500);
+    }, 450);
   }
 
   function setEntityLightsEnabled(entity: pc.Entity, enabled: boolean): void {
@@ -1259,25 +1376,48 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         },
       });
 
-      list.push({
-        id: 'ohm_automaton_pedestal',
-        label: isOhmAwake ? 'Consultar telemetría con Ohm' : 'Acoplar contactos y Despertar a Ohm',
-        pos: new pc.Vec3(0, 1.0, -2.0),
-        radius: 3.6,
-        action: () => {
-          if (arc1State.currentRegion === 'retorno' && isLighthouseRestored(arc1State)) {
-            arc1State = enterArc1Region(arc1State, 'portal');
-            storyStep = 'arc1_complete';
-            ui.showNotification(isArcComplete(arc1State)
-              ? 'Arco I greybox completo. TODO(guion): cierre final y transferencia.'
-              : 'El retorno aún no refleja todas las intervenciones del Arco I.');
-          } else if (!isOhmAwake) {
-            triggerOhmAwakening();
-          } else {
-            startDialogue('ohm_awakening_event');
-          }
-        },
-      });
+      if (!isOhmAwake) {
+        // Rear inspection hatch (ZoomIn puzzle entry)
+        list.push({
+          id: 'ohm_rear_inspection',
+          label: 'Inspeccionar escotilla de servicio de Ohm',
+          pos: new pc.Vec3(0, 1.0, -2.6),
+          radius: 2.6,
+          action: () => {
+            openOhmInspection();
+          },
+        });
+
+        // Front observation (guides player around to the rear panel)
+        list.push({
+          id: 'ohm_front_inert',
+          label: 'Examinar a Ohm (Inerte)',
+          pos: new pc.Vec3(0, 1.0, -1.1),
+          radius: 2.0,
+          action: () => {
+            audio.playSwitchClunk();
+            ui.showNotification('Ohm está completamente inerte. Hay una escotilla de servicio en la parte trasera del pedestal.');
+          },
+        });
+      } else {
+        list.push({
+          id: 'ohm_automaton_pedestal',
+          label: 'Consultar telemetría con Ohm',
+          pos: new pc.Vec3(0, 1.0, -2.0),
+          radius: 3.6,
+          action: () => {
+            if (arc1State.currentRegion === 'retorno' && isLighthouseRestored(arc1State)) {
+              arc1State = enterArc1Region(arc1State, 'portal');
+              storyStep = 'arc1_complete';
+              ui.showNotification(isArcComplete(arc1State)
+                ? 'Arco I greybox completo. TODO(guion): cierre final y transferencia.'
+                : 'El retorno aún no refleja todas las intervenciones del Arco I.');
+            } else {
+              startDialogue('ohm_awakening_event');
+            }
+          },
+        });
+      }
 
       list.push({
         id: 'workshop_exterior_door',
@@ -1484,6 +1624,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           bitacora.unlock('taller_lumen', 'discovered');
         } else if (activeDialogueNode.onComplete === 'unlock_rumor_portal') {
           bitacora.unlock('portal_origen');
+          ui.showNotification('Objetivo: Investigá qué le pasa a Ohm.');
         } else if (activeDialogueNode.onComplete === 'complete_ohm_awakening') {
           bitacora.unlock('despertar_ohm');
           startDialogue('edda_surprised_awakening');
@@ -1492,6 +1633,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           bitacora.unlock('asombro_edda');
           bitacora.unlock('taller_lumen', 'rumor');
           storyStep = 'invited_to_workshop';
+          ui.showNotification('Objetivo: Ve al taller de Lumen al oeste de la plaza.');
         } else if (activeDialogueNode.onComplete === 'unlock_rumor_mural') {
           bitacora.unlock('ley_retorno');
         } else if (activeDialogueNode.onComplete === 'unlock_rumor_manantial') {
@@ -1577,6 +1719,10 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
     if (activeDialogueNode) {
       advanceDialogue();
+      return;
+    }
+
+    if (isOhmInspecting) {
       return;
     }
 
@@ -1692,6 +1838,32 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
       }
       return;
+    }
+
+    // Ohm ZoomIn inspection camera freeze
+    if (isOhmInspecting) {
+      playerPos.set(0, 1.25, -2.85);
+      yaw = 180;
+      pitch = -4;
+      world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
+      world.playerEntity.setEulerAngles(0, yaw, 0);
+      world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+      ui.setPrompt(null);
+      return;
+    }
+
+    // Ohm curiosity cue (subtle failed-life pulse on dormant Ohm)
+    if (!isOhmAwake && !isCinematicActive && playerPos.x > -40 && playerPos.x < 40 && playerPos.z < 12) {
+      ohmCuriosityTimer += dt;
+      if (ohmCuriosityTimer >= 4.0) {
+        ohmCuriosityTimer = 0;
+        world.ohmFilamentLight.light!.intensity = 0.5;
+        setTimeout(() => {
+          if (!isOhmAwake) world.ohmFilamentLight.light!.intensity = 0;
+        }, 130);
+        vfx.triggerTerminalArc([0, 0.95, -2.35], 0.25);
+        audio.playRelayEngage();
+      }
     }
 
     // 1. Movement
