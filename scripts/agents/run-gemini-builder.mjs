@@ -6,8 +6,10 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import readline from 'node:readline';
+import { evidenceStatusFromFile, writeWorkerRuntime } from './orchestrator-runtime.mjs';
 
 const root = process.cwd();
+const workerId = 'geminiPlayerFacing';
 const args = process.argv.slice(2);
 
 function valueOf(flag, fallback = null) {
@@ -22,21 +24,22 @@ try {
   // Explicit CLI args and historical defaults keep this runner usable.
 }
 
-const configuredWorkers = Object.values(orchestratorConfig.workers || {});
-const configuredGeminiWorker = configuredWorkers.find((worker) => String(worker.task || '').includes('gemini')) || configuredWorkers[0] || {};
+const configuredWorker = orchestratorConfig.workers?.[workerId]
+  || Object.values(orchestratorConfig.workers || {}).find((worker) => String(worker.task || '').includes('gemini'))
+  || {};
 
-const configuredWorktree = configuredGeminiWorker.worktreeHint
-  ? path.resolve(root, configuredGeminiWorker.worktreeHint)
+const configuredWorktree = configuredWorker.worktreeHint
+  ? path.resolve(root, configuredWorker.worktreeHint)
   : path.resolve(root, '../Roxana-gemini');
 const worktreeArg = valueOf('--worktree', configuredWorktree);
 const worktreeDir = path.resolve(root, worktreeArg);
-const model = valueOf('--model', configuredGeminiWorker.model || 'gemini-3.8-flash-high');
-const effort = valueOf('--effort', configuredGeminiWorker.effort || 'high');
+const model = valueOf('--model', configuredWorker.model || 'gemini-3.8-flash-high');
+const effort = valueOf('--effort', configuredWorker.effort || 'high');
 const timeout = valueOf('--timeout', '45m');
-const taskArg = valueOf('--task', configuredGeminiWorker.task || 'agent-work/tasks/workers/ohmdal-authored-primary-gemini.md');
+const taskArg = valueOf('--task', configuredWorker.task || 'agent-work/tasks/workers/ohmdal-authored-primary-gemini.md');
 const loopArg = valueOf('--loop', orchestratorConfig.activeLoop || 'agent-work/loops/ohmdal-arco1-authored-pass/state.json');
-const workerBranch = valueOf('--branch', configuredGeminiWorker.branch || 'worker/gemini-authored');
-const reportArg = valueOf('--report', configuredGeminiWorker.report || 'agent-work/reports/workers/ohmdal-authored-gemini-current.md');
+const workerBranch = valueOf('--branch', configuredWorker.branch || 'worker/gemini-authored');
+const reportArg = valueOf('--report', configuredWorker.report || 'agent-work/reports/workers/ohmdal-authored-gemini-current.md');
 const logArg = valueOf('--log', path.join(root, '.playtest', 'orchestrator', 'gemini-builder.log'));
 
 const logDir = path.dirname(path.resolve(root, logArg));
@@ -116,12 +119,45 @@ const childArgs = process.platform === 'win32'
 
 log(`Spawning command: ${command} ${childArgs.join(' ')}`);
 
-const child = spawn(command, childArgs, {
-  cwd: worktreeDir,
-  stdio: ['pipe', 'pipe', 'inherit'],
-  shell: false,
-  windowsHide: false,
+await writeWorkerRuntime(root, workerId, {
+  status: 'RUNNING',
+  startedAt: new Date().toISOString(),
+  finishedAt: null,
+  stage: activeStage,
+  branch: workerBranch,
+  model,
+  effort,
+  worktree: worktreeDir,
+  report: reportArg,
+  pid: process.pid,
+  childPid: null,
+  exitCode: null,
+  signal: null,
+  evidenceStatus: null,
+  error: null,
 });
+
+let launchError = null;
+let child;
+try {
+  child = spawn(command, childArgs, {
+    cwd: worktreeDir,
+    stdio: ['pipe', 'pipe', 'inherit'],
+    shell: false,
+    windowsHide: false,
+  });
+  await writeWorkerRuntime(root, workerId, { childPid: child.pid || null });
+} catch (error) {
+  launchError = error;
+  await writeWorkerRuntime(root, workerId, {
+    status: 'ERROR',
+    finishedAt: new Date().toISOString(),
+    error: error.message,
+  });
+  log(`Process launch failed: ${error.message}`);
+  logStream.end();
+  process.exit(1);
+}
 
 const rl = readline.createInterface({ input: child.stdout });
 
@@ -148,11 +184,27 @@ rl.on('line', (line) => {
 });
 
 child.on('error', (err) => {
+  launchError = err;
   log(`Process error: ${err.message}`);
 });
 
-child.on('exit', (code, signal) => {
-  log(`Process exited with code=${code}, signal=${signal}`);
+child.on('exit', async (code, signal) => {
+  const evidenceStatus = await evidenceStatusFromFile(path.join(worktreeDir, reportArg));
+  let status = 'FINISHED';
+  if (evidenceStatus === 'PASS') status = 'PASS';
+  else if (evidenceStatus === 'FAIL') status = 'FAIL';
+  else if (launchError || signal || (code ?? 0) !== 0) status = 'ERROR';
+
+  await writeWorkerRuntime(root, workerId, {
+    status,
+    finishedAt: new Date().toISOString(),
+    exitCode: code ?? null,
+    signal: signal || null,
+    evidenceStatus,
+    error: launchError?.message || null,
+  });
+
+  log(`Process exited with code=${code}, signal=${signal}, runtime=${status}, evidence=${evidenceStatus || 'NONE'}`);
   logStream.end();
   process.exit(code ?? 0);
 });
