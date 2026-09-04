@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -8,6 +8,7 @@ import process from 'node:process';
 const root = process.cwd();
 const onceMode = process.argv.includes('--once');
 const configPath = path.join(root, 'agent-work', 'orchestrator', 'config.json');
+const statusPath = path.join(root, '.playtest', 'orchestrator', 'status.json');
 const lastMessageRel = path.join('.playtest', 'orchestrator', 'mavis-codex-last.txt');
 const lastMessagePath = path.join(root, lastMessageRel);
 
@@ -20,14 +21,16 @@ try {
 }
 
 const runtime = config.orchestratorRuntime || {};
+const control = config.controlPlane || {};
 const activeLoop = config.activeLoop;
 const activeTask = config.activeTask;
-const loopPath = path.join(root, activeLoop);
-const pollMinutes = Number.isFinite(config.pollMinutes) && config.pollMinutes > 0 ? config.pollMinutes : 7;
 const model = runtime.model || 'gpt-5.6-luna';
 const effort = runtime.effort || 'low';
 const maxConsecutiveErrors = Number.isInteger(runtime.maxConsecutiveErrors) ? runtime.maxConsecutiveErrors : 3;
-const maxTickMinutes = Number.isFinite(runtime.maxTickMinutes) && runtime.maxTickMinutes > 0 ? runtime.maxTickMinutes : 20;
+const maxTickMinutes = Number.isFinite(runtime.maxTickMinutes) && runtime.maxTickMinutes > 0 ? runtime.maxTickMinutes : 8;
+const activePollSeconds = Number(control.activePollSeconds || 45);
+const idlePollSeconds = Number(control.idlePollSeconds || 15);
+const postActionPollSeconds = Number(control.postActionPollSeconds || 10);
 const configuredWorkers = Object.entries(config.workers || {})
   .map(([id, worker]) => ({ id, ...worker }))
   .sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
@@ -41,38 +44,6 @@ let timer = null;
 let tickWatchdog = null;
 let tick = 0;
 let consecutiveErrors = 0;
-
-function markerFrom(text) {
-  const match = String(text || '').match(/MAVIS_TICK_STATE:\s*(CONTINUE|WAITING|HUMAN_GATE|COMPLETE)/i);
-  return match ? match[1].toUpperCase() : null;
-}
-
-function terminalError(text) {
-  const value = String(text || '').toLowerCase();
-  return [
-    'quota reached',
-    'usage limit',
-    'rate limit exceeded',
-    'insufficient_quota',
-    'authentication',
-    'unauthorized',
-    'forbidden',
-    'please login',
-  ].some((needle) => value.includes(needle));
-}
-
-async function repoState() {
-  try {
-    const state = JSON.parse(await readFile(loopPath, 'utf8'));
-    return {
-      complete: state.status === 'complete',
-      humanGate: state.humanGate ?? null,
-      stage: state.currentStage ?? null,
-    };
-  } catch (error) {
-    return { complete: false, humanGate: null, stage: null, error: error.message };
-  }
-}
 
 function clearTickWatchdog() {
   clearTimeout(tickWatchdog);
@@ -105,21 +76,68 @@ function schedule(delayMs, reason) {
   console.warn(`[MAVIS/CODEX] Next control tick in ${Math.round(delayMs / 1000)}s (${reason}).`);
   timer = setTimeout(() => {
     timer = null;
-    void runTick(false);
+    void runTick();
   }, delayMs);
 }
 
-function promptFor(firstTick) {
+async function refreshSnapshot() {
+  const result = spawnSync(process.execPath, ['scripts/agents/orchestrator-status.mjs'], {
+    cwd: root,
+    encoding: 'utf8',
+    stdio: ['ignore', 'ignore', 'pipe'],
+    timeout: 120_000,
+    windowsHide: true,
+  });
+  if (result.status !== 0) {
+    throw new Error((result.stderr || result.error?.message || 'orchestrator-status failed').trim());
+  }
+  return JSON.parse(await readFile(statusPath, 'utf8'));
+}
+
+function classify(snapshot) {
+  if (snapshot?.loop?.status === 'complete') return 'COMPLETE';
+  if (snapshot?.loop?.humanGate) return 'HUMAN_GATE';
+  if ((snapshot?.control?.passCandidates || []).length > 0) return 'PROCESS_PASS';
+  if ((snapshot?.control?.activeWorkers || []).length > 0) return 'WAIT_ACTIVE';
+  if ((snapshot?.control?.failedWorkers || []).length > 0) return 'REPAIR';
+  return 'DISPATCH';
+}
+
+function workerSummary(snapshot) {
+  return Object.entries(snapshot?.workers || {}).map(([id, worker]) => ({
+    id,
+    model: config.workers?.[id]?.model || null,
+    runtime: worker.runtime?.classification || 'UNKNOWN',
+    evidence: worker.reportSignals?.evidenceStatus || null,
+    candidateReady: Boolean(worker.candidateReady),
+    branch: worker.branch,
+    sha: worker.sha,
+    baseSha: worker.reportSignals?.baseSha || null,
+    implementationSha: worker.reportSignals?.implementationSha || null,
+    dirty: worker.worktree?.status?.clean === false,
+  }));
+}
+
+function actionPrompt(action, snapshot) {
   const primary = primaryWorker
     ? `${primaryWorker.id}: ${primaryWorker.model || primaryWorker.provider || 'configured worker'} via ${primaryWorker.runner || 'configured runner'}`
     : 'none configured';
-  return `You are Mavis, the operational orchestrator for Proyecto Roxana.\n\nExecute ${activeTask}. Reconstruct durable state from the repository, especially ${activeLoop}; do not depend on conversational memory.\n\nThis is ${firstTick ? 'the first' : 'a fresh'} control tick in a resilient daemon. Start with npm run orchestrator:status. If the next action is safe and specified, execute it now: dispatch the configured worker, launch a fresh independent reviewer, run gates, integrate an unambiguous PASS, update state, commit/push, or advance the stage. Do not duplicate active workers. Do not self-approve builder work. Respect Git safety and all HUMAN_GATE rules.\n\nLive routing is authoritative. Primary configured worker: ${primary}. Read ${configPath.replaceAll('\\', '/')} and ${activeTask} every tick; do not rely on stale provider/quota assumptions from previous runs. A stale FAIL report or dirty worker worktree is not WAITING if a bounded repair or alternate clean worker can act now. Before returning WAITING, re-check that the worker process is still alive and that no newer report/commit has appeared; if the worker already finished, process its evidence in this tick instead.\n\nEnd with exactly one marker on its own line: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: WAITING, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
+  const compact = {
+    stage: snapshot?.loop?.currentStage || null,
+    iteration: snapshot?.loop?.iteration ?? null,
+    canonicalSha: snapshot?.canonical?.sha || null,
+    action,
+    activeWorkers: snapshot?.control?.activeWorkers || [],
+    passCandidates: snapshot?.control?.passCandidates || [],
+    failedWorkers: snapshot?.control?.failedWorkers || [],
+    workers: workerSummary(snapshot),
+  };
+
+  return `You are Mavis, the cheap operational control plane for Proyecto Roxana.\n\nSTATE_MACHINE_ACTION: ${action}\nThis action was classified deterministically by the harness. Do not replace it with a different high-level action.\n\nDurable task: ${activeTask}\nDurable loop: ${activeLoop}\nPrimary configured worker: ${primary}\nCurrent machine snapshot:\n${JSON.stringify(compact, null, 2)}\n\nRead config/task/reports needed for this action only. Keep this control tick short and operational. Do not implement gameplay yourself. Do not wait for long-running workers inside this tick.\n\nAction rules:\n- DISPATCH: prepare/sync one safe isolated worker lane and start exactly one configured builder asynchronously. Prefer the primary Gemini lane. If a fresh provider attempt immediately proves quota/auth unavailable, start the permitted Luna fallback in the same tick. After a successful async launch, stop; do not poll the worker or tail logs repeatedly.\n- REPAIR: inspect the newest FAIL/ERROR/STALE evidence, create one bounded repair packet (max 5 fixes, max 1 structural fix), and start exactly one permitted worker asynchronously. Prefer Gemini when usable; use Luna when Gemini is quota-limited or the bounded Codex repair is cheaper. Do not wait for completion.\n- PROCESS_PASS: validate Candidate Protocol v2, ancestry, cleanliness and required gates. Launch/use a fresh independent reviewer that did not build the candidate. Only integrate mechanically if review and required gates are PASS. If review cannot finish safely inside this bounded tick, persist/launch the review rather than doing implementation work.\n\nNever return WAITING merely because you launched a worker: the outer state machine owns waiting. Never duplicate a RUNNING worker. Never self-approve builder work. Respect no-force/no-hard-reset/no-paid-spend/HUMAN_GATE rules. If a real human gate exists, record it in the loop state.\n\nEnd with one concise status line describing what you executed, then one marker: MAVIS_TICK_STATE: CONTINUE, MAVIS_TICK_STATE: HUMAN_GATE, or MAVIS_TICK_STATE: COMPLETE.`;
 }
 
 function codexInvocation(args) {
-  if (process.platform !== 'win32') {
-    return { command: 'codex', args, description: 'codex ...' };
-  }
+  if (process.platform !== 'win32') return { command: 'codex', args, description: 'codex ...' };
   const command = process.env.ComSpec || 'C:\\Windows\\System32\\cmd.exe';
   return {
     command,
@@ -128,36 +146,82 @@ function codexInvocation(args) {
   };
 }
 
-async function handleLaunchFailure(error) {
-  consecutiveErrors += 1;
-  console.error(`[MAVIS/CODEX] Launch failed: ${error.message} consecutive=${consecutiveErrors}/${maxConsecutiveErrors}`);
-  if (consecutiveErrors >= maxConsecutiveErrors) {
-    console.error('[MAVIS/CODEX] CIRCUIT BREAKER OPEN. Stopping instead of retrying forever. Repository state is preserved.');
+async function scheduleFromFreshState(reasonPrefix = 'fresh state') {
+  let snapshot;
+  try {
+    snapshot = await refreshSnapshot();
+  } catch (error) {
+    consecutiveErrors += 1;
+    console.error(`[MAVIS/CODEX] status refresh failed: ${error.message}`);
+    if (consecutiveErrors >= maxConsecutiveErrors) {
+      console.error('[MAVIS/CODEX] CIRCUIT BREAKER OPEN. Repository state is preserved.');
+      stopped = true;
+      return;
+    }
+    schedule(60_000, `${reasonPrefix}: status refresh retry`);
+    return;
+  }
+
+  const next = classify(snapshot);
+  console.warn(`[MAVIS/CODEX] State machine => ${next}`);
+  if (next === 'COMPLETE') {
+    console.warn(`[MAVIS/CODEX] Loop COMPLETE at ${snapshot.loop?.currentStage || 'unknown'}.`);
     stopped = true;
     return;
   }
-  schedule(60_000, 'recoverable Codex launcher error');
+  if (next === 'HUMAN_GATE') {
+    console.warn(`[MAVIS/CODEX] HUMAN_GATE: ${JSON.stringify(snapshot.loop?.humanGate)}`);
+    stopped = true;
+    return;
+  }
+  if (next === 'WAIT_ACTIVE') {
+    schedule(activePollSeconds * 1000, `${reasonPrefix}: worker runtime RUNNING`);
+    return;
+  }
+  schedule(postActionPollSeconds * 1000, `${reasonPrefix}: ${next.toLowerCase()} remains executable`);
 }
 
-async function runTick(firstTick) {
+async function runTick() {
   if (stopped || currentChild) return;
 
-  const before = await repoState();
-  if (before.complete) {
-    console.warn(`[MAVIS/CODEX] Loop COMPLETE at ${before.stage || 'unknown'}.`);
+  let snapshot;
+  try {
+    snapshot = await refreshSnapshot();
+  } catch (error) {
+    consecutiveErrors += 1;
+    console.error(`[MAVIS/CODEX] Cannot refresh state: ${error.message}`);
+    if (consecutiveErrors >= maxConsecutiveErrors) {
+      console.error('[MAVIS/CODEX] CIRCUIT BREAKER OPEN. Repository state is preserved.');
+      stopped = true;
+      return;
+    }
+    schedule(60_000, 'recoverable status refresh error');
+    return;
+  }
+
+  const action = classify(snapshot);
+  console.warn(`\n[MAVIS/CODEX] State machine action=${action} stage=${snapshot.loop?.currentStage || 'unknown'}`);
+
+  if (action === 'COMPLETE') {
     stopped = true;
     return;
   }
-  if (before.humanGate) {
-    console.warn(`[MAVIS/CODEX] HUMAN_GATE already recorded: ${JSON.stringify(before.humanGate)}`);
+  if (action === 'HUMAN_GATE') {
+    console.warn(`[MAVIS/CODEX] HUMAN_GATE: ${JSON.stringify(snapshot.loop?.humanGate)}`);
     stopped = true;
+    return;
+  }
+  if (action === 'WAIT_ACTIVE') {
+    const active = (snapshot.control?.activeWorkers || []).join(', ');
+    console.warn(`[MAVIS/CODEX] Mechanical wait: active worker(s)=${active || 'unknown'}. No model tick spent.`);
+    schedule(activePollSeconds * 1000, 'worker runtime RUNNING');
     return;
   }
 
   tick += 1;
   const thisTick = tick;
   await writeFile(lastMessagePath, '', 'utf8');
-  console.warn(`\n[MAVIS/CODEX] >>> control tick ${thisTick} model=${model} effort=${effort}`);
+  console.warn(`[MAVIS/CODEX] >>> model control tick ${thisTick} action=${action} model=${model} effort=${effort}`);
 
   const codexArgs = [
     'exec',
@@ -170,22 +234,21 @@ async function runTick(firstTick) {
     '-',
   ];
   const invocation = codexInvocation(codexArgs);
-  if (process.platform === 'win32') {
-    console.warn(`[MAVIS/CODEX] Windows launcher: ${invocation.description}`);
-  }
+  if (process.platform === 'win32') console.warn(`[MAVIS/CODEX] Windows launcher: ${invocation.description}`);
 
-  let stderr = '';
   let child;
   let watchdogExpired = false;
   try {
     child = spawn(invocation.command, invocation.args, {
       cwd: root,
-      stdio: ['pipe', 'inherit', 'pipe'],
+      stdio: ['pipe', 'inherit', 'inherit'],
       shell: false,
       windowsHide: false,
     });
   } catch (error) {
-    await handleLaunchFailure(error);
+    consecutiveErrors += 1;
+    console.error(`[MAVIS/CODEX] Launch failed: ${error.message}`);
+    schedule(60_000, 'recoverable Codex launch error');
     return;
   }
   currentChild = child;
@@ -194,80 +257,48 @@ async function runTick(firstTick) {
   tickWatchdog = setTimeout(() => {
     if (stopped || currentChild !== child) return;
     watchdogExpired = true;
-    console.error(`[MAVIS/CODEX] Tick ${thisTick} exceeded ${maxTickMinutes} minute(s). Terminating the stuck Codex process tree and re-evaluating durable repo state.`);
+    console.error(`[MAVIS/CODEX] Model tick ${thisTick} exceeded ${maxTickMinutes} minute(s). Killing only the control tick; worker processes remain independently tracked.`);
     terminateProcessTree(child);
     currentChild = null;
     clearTickWatchdog();
-    schedule(10_000, 'stuck control tick watchdog');
+    schedule(idlePollSeconds * 1000, 'control tick watchdog');
   }, maxTickMinutes * 60_000);
 
-  child.stderr.on('data', (chunk) => {
-    const text = String(chunk);
-    stderr += text;
-    process.stderr.write(text);
-  });
-
   child.on('error', (error) => {
-    stderr += `\n${error.message}`;
+    console.error(`[MAVIS/CODEX] Process error: ${error.message}`);
   });
 
   child.on('exit', async (code, signal) => {
     clearTickWatchdog();
     if (watchdogExpired) return;
     currentChild = null;
+
     let lastMessage = '';
     try { lastMessage = await readFile(lastMessagePath, 'utf8'); } catch {}
-
-    const after = await repoState();
-    if (after.complete) {
-      console.warn(`[MAVIS/CODEX] Loop COMPLETE at ${after.stage || 'unknown'}.`);
-      stopped = true;
-      return;
-    }
-    if (after.humanGate) {
-      console.warn(`[MAVIS/CODEX] HUMAN_GATE recorded: ${JSON.stringify(after.humanGate)}`);
-      stopped = true;
-      return;
-    }
+    if (lastMessage.trim()) console.log(`\n${lastMessage.trim()}\n`);
 
     if (signal || code !== 0) {
       consecutiveErrors += 1;
-      const reason = [stderr.trim(), lastMessage.trim()].filter(Boolean).join('\n');
-      console.error(`[MAVIS/CODEX] Tick failed code=${code ?? 'null'} signal=${signal || 'none'} consecutive=${consecutiveErrors}/${maxConsecutiveErrors}`);
-      if (reason) console.error(`[MAVIS/CODEX] Error detail:\n${reason.slice(-5000)}`);
-      if (terminalError(reason) || consecutiveErrors >= maxConsecutiveErrors) {
-        console.error('[MAVIS/CODEX] CIRCUIT BREAKER OPEN. Stopping instead of retrying forever. Repository state is preserved.');
+      console.error(`[MAVIS/CODEX] Model tick failed code=${code ?? 'null'} signal=${signal || 'none'} consecutive=${consecutiveErrors}/${maxConsecutiveErrors}`);
+      if (consecutiveErrors >= maxConsecutiveErrors) {
+        console.error('[MAVIS/CODEX] CIRCUIT BREAKER OPEN. Repository state is preserved.');
         stopped = true;
         return;
       }
-      schedule(60_000, 'recoverable Codex execution error');
+      schedule(60_000, 'recoverable model tick failure');
       return;
     }
 
     consecutiveErrors = 0;
-    if (lastMessage.trim()) console.log(`\n${lastMessage.trim()}\n`);
-    const marker = markerFrom(lastMessage);
-    if (marker === 'COMPLETE' || marker === 'HUMAN_GATE') {
-      stopped = true;
-      return;
-    }
-    if (marker === 'WAITING') {
-      schedule(pollMinutes * 60_000, 'waiting for worker/evidence');
-      return;
-    }
-    if (marker === 'CONTINUE') {
-      schedule(2_000, 'immediately executable next action');
-      return;
-    }
-    schedule(10_000, 'missing tick marker; fail-safe continuation');
+    await scheduleFromFreshState(`after ${action}`);
   });
 
-  child.stdin.write(promptFor(firstTick));
+  child.stdin.write(actionPrompt(action, snapshot));
   child.stdin.end();
 }
 
 process.on('SIGINT', () => {
-  console.warn('\n[MAVIS/CODEX] Ctrl+C received. Stopping daemon...');
+  console.warn('\n[MAVIS/CODEX] Ctrl+C received. Stopping control plane...');
   stopped = true;
   clearTimeout(timer);
   timer = null;
@@ -281,7 +312,7 @@ process.on('SIGINT', () => {
 
 console.warn(`[MAVIS/CODEX] Active task: ${activeTask}`);
 console.warn(`[MAVIS/CODEX] Active loop: ${activeLoop}`);
+console.warn(`[MAVIS/CODEX] Control plane: state-machine; model=${model}/${effort}`);
 console.warn(`[MAVIS/CODEX] Primary worker: ${primaryWorker?.model || primaryWorker?.id || 'none'}`);
-console.warn(`[MAVIS/CODEX] Circuit breaker: ${maxConsecutiveErrors} consecutive failures.`);
-console.warn(`[MAVIS/CODEX] Tick watchdog: ${maxTickMinutes} minute(s).`);
-void runTick(true);
+console.warn(`[MAVIS/CODEX] Worker TTL=${control.workerTtlMinutes || 90}m; active poll=${activePollSeconds}s; model tick watchdog=${maxTickMinutes}m.`);
+void runTick();
