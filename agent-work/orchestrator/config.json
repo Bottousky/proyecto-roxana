@@ -13,6 +13,7 @@
     "model": "gpt-5.6-luna",
     "effort": "low",
     "maxConsecutiveErrors": 3,
+    "maxTickMinutes": 20,
     "reason": "Cheap stable control plane; Gemini 3.8 Flash High is the healthy primary implementation lane"
   },
   "workers": {
