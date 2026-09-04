@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { classifyWorkerRuntime, readWorkerRuntime } from './orchestrator-runtime.mjs';
 
 const root = process.cwd();
 const configPath = path.join(root, 'agent-work', 'orchestrator', 'config.json');
@@ -200,6 +201,7 @@ const canonicalEntries = canonicalStatusResult.status === 0
 
 const worktrees = parseWorktrees();
 const workerSnapshots = {};
+const ttlMinutes = Number(config.controlPlane?.workerTtlMinutes || 90);
 
 for (const [workerId, worker] of Object.entries(config.workers || {})) {
   const localRef = `refs/heads/${worker.branch}`;
@@ -217,6 +219,8 @@ for (const [workerId, worker] of Object.entries(config.workers || {})) {
     report,
     signals,
   });
+  const runtime = await readWorkerRuntime(root, workerId);
+  const runtimeClassification = classifyWorkerRuntime(runtime, ttlMinutes);
 
   workerSnapshots[workerId] = {
     branch: worker.branch,
@@ -233,9 +237,15 @@ for (const [workerId, worker] of Object.entries(config.workers || {})) {
     worktree: worktree
       ? { ...worktree, status: wtStatus }
       : null,
+    runtime: runtime
+      ? { ...runtime, classification: runtimeClassification }
+      : { classification: 'UNKNOWN' },
+    active: runtimeClassification === 'RUNNING',
+    stale: runtimeClassification === 'STALE',
     blockedUntil: worker.blockedUntil || null,
     candidateReady: Boolean(
       protocol.ready
+      && runtimeClassification !== 'RUNNING'
       && (wtStatus == null || wtStatus.clean === true)
     ),
   };
@@ -248,8 +258,19 @@ try {
   // Keep sensor useful even if the state file is temporarily unavailable.
 }
 
+const activeWorkers = Object.entries(workerSnapshots)
+  .filter(([, worker]) => worker.active)
+  .map(([workerId]) => workerId);
+const passCandidates = Object.entries(workerSnapshots)
+  .filter(([, worker]) => worker.candidateReady)
+  .map(([workerId]) => workerId);
+const failedWorkers = Object.entries(workerSnapshots)
+  .filter(([, worker]) => ['FAIL', 'ERROR', 'STALE'].includes(worker.runtime?.classification)
+    || /^FAIL$/i.test(worker.reportSignals?.evidenceStatus || ''))
+  .map(([workerId]) => workerId);
+
 const snapshot = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   generatedAt: new Date().toISOString(),
   orchestrator: config.orchestratorId,
   candidateProtocol: 'v2-explicit',
@@ -274,6 +295,12 @@ const snapshot = {
         queue: loopState.queue,
       }
     : null,
+  control: {
+    workerTtlMinutes: ttlMinutes,
+    activeWorkers,
+    passCandidates,
+    failedWorkers,
+  },
   workers: workerSnapshots,
   worktrees,
 };
