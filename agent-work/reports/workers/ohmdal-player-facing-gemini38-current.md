@@ -1,17 +1,17 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: 2bacef01601e7cbc8f7e29e87fb13d50082e7351
+IMPLEMENTATION_SHA: 52cab5a0d1bad21203f84f3dc262441538698131
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 
-# Evidence Report — Ohmdal Player-Facing B2 Ohm Continuity Puzzle (Iteration 0 Repair Packet)
+# Evidence Report — Ohmdal Player-Facing B2 Ohm Continuity Puzzle (Iteration 1 Repair Candidate)
 
 **Worker:** Gemini 3.8 Flash High / Antigravity CLI (Primary Player-Facing Builder)
 **Task:** `agent-work/tasks/workers/ohmdal-player-facing-primary-gemini.md`
 **Loop:** `agent-work/loops/ohmdal-arco1-player-facing/state.json`
-**Stage:** `b2-ohm-continuity-puzzle` (iteration 0/3)
+**Stage:** `b2-ohm-continuity-puzzle` (iteration 1/3)
 **Branch:** `worker/gemini38-player-facing`
-**Date:** 2026-09-05T04:50:00-03:00
+**Date:** 2026-09-05T05:01:00-03:00
 
 ---
 
@@ -20,22 +20,22 @@ SELF_ACCEPTANCE: false
 ```text
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: 2bacef01601e7cbc8f7e29e87fb13d50082e7351
+IMPLEMENTATION_SHA: 52cab5a0d1bad21203f84f3dc262441538698131
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 ```
 
 - **Candidate Mode:** `implementation`
 - **Base Commit:** `4d55de4be50432c7445065cfd42162658a3dfe3d`
-- **Implementation Commit:** `2bacef01601e7cbc8f7e29e87fb13d50082e7351`
+- **Implementation Commit:** `52cab5a0d1bad21203f84f3dc262441538698131`
 - **Evidence Status:** `PASS`
 - **Self-Acceptance:** `false` (Builder does not self-accept; awaiting Mavis orchestrator & independent reviewer gate)
 
 ---
 
-## 2. Repair Packet Scope Addressed (B2 Iteration 0)
+## 2. Repair Scope Addressed (B2 Iteration 0 & Iteration 1)
 
-In response to the Mavis repair packet issued 2026-09-05:
+In response to the Mavis repair packets and independent reviewer findings:
 
 1. **Real Browser Touch Evidence for B2:**
    - Created dedicated bounded touch smoke test: `scripts/gameplay/smoke-ohmdal-b2-touch.mjs` (registered in `package.json` as `npm run smoke:ohmdal-b2-touch`).
