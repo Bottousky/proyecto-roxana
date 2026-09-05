@@ -241,3 +241,25 @@ existing clean Gemini lane and address only these bounded findings:
 
 Do not modify loop authority, redesign the puzzle, or expand into B3-B6. Commit the
 repair candidate and leave acceptance to the fresh independent reviewer.
+
+## CURRENT REPAIR PACKET — B2 iteration 2 (Mavis, 2026-09-05)
+
+The latest independent review was run against an older candidate identity and reported
+FAIL. Before any new acceptance review, refresh the candidate on this same Gemini lane
+from the current implementation and publish evidence whose SHA identity matches the
+committed tree. Address only these bounded items:
+
+1. Verify the committed touch-smoke script and artifacts are present at the new
+   IMPLEMENTATION_SHA, and ensure the report names that exact SHA and machine-readable
+   PASS artifact for rear inspection, continuity manipulation, solve, and awakening.
+2. Verify no player-facing B2 introductory label or dialogue exposes numeric voltage or
+   resistance values; preserve phenomenon-first wording without changing later-stage
+   curriculum.
+3. Run `git diff --check` against BASE_SHA and fix only candidate-scope whitespace/EOF
+   findings, with no broad formatting churn.
+4. Re-run focused puzzle tests, build, Golden Path, and dedicated touch smoke. Commit a
+   clean candidate and update the report with exact Candidate Protocol v2 fields,
+   `SELF_ACCEPTANCE: false`, current stage, SHA, and artifact paths.
+
+Do not modify loop authority, redesign the puzzle, or expand into B3-B6. Do not wait for
+review or self-approve; leave acceptance to a fresh independent Luna reviewer.
