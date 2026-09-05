@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "route": "/ohmdal-playcanvas",
+  "startedAt": "2026-09-05T08:18:27.093Z",
+  "baseUrl": "http://127.0.0.1:59799",
+  "viewport": {
+    "width": 844,
+    "height": 390
+  },
+  "device": "mobile-landscape (touch enabled)",
+  "browser": "chromium 152.0.7977.82",
+  "checkpoints": [
+    {
+      "id": "01-rear-approach",
+      "filename": "b2-touch-01-rear-approach.png",
+      "recordedAt": "2026-09-05T08:18:40.224Z"
+    },
+    {
+      "id": "02-inspection-open",
+      "filename": "b2-touch-02-inspection-open.png",
+      "recordedAt": "2026-09-05T08:18:40.721Z"
+    },
+    {
+      "id": "03-partial-progress",
+      "filename": "b2-touch-03-partial-progress.png",
+      "recordedAt": "2026-09-05T08:18:41.691Z"
+    },
+    {
+      "id": "04-puzzle-solved",
+      "filename": "b2-touch-04-puzzle-solved.png",
+      "recordedAt": "2026-09-05T08:18:42.606Z"
+    },
+    {
+      "id": "05-ohm-awakened",
+      "filename": "b2-touch-05-ohm-awakened.png",
+      "recordedAt": "2026-09-05T08:18:47.281Z"
+    }
+  ],
+  "touchActions": [
+    {
+      "action": "tap",
+      "target": "#plaza-enter",
+      "label": "enter plaza",
+      "timestamp": 1788596312164
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "intro_portal_edda #1",
+      "timestamp": 1788596315054
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "intro_portal_edda #2",
+      "timestamp": 1788596315533
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "intro_portal_edda #3",
+      "timestamp": 1788596316034
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "intro_portal_edda #4",
+      "timestamp": 1788596316533
+    },
+    {
+      "action": "tap",
+      "target": "#touch-interact",
+      "label": "open rear inspection",
+      "timestamp": 1788596320315
+    },
+    {
+      "action": "tap",
+      "target": "#ohm-gap-g1",
+      "label": "place g1 bridge",
+      "timestamp": 1788596320792
+    },
+    {
+      "action": "tap",
+      "target": "#ohm-gap-g3",
+      "label": "attempt broken g3",
+      "timestamp": 1788596321128
+    },
+    {
+      "action": "tap",
+      "target": "#ohm-gap-g2",
+      "label": "place g2 decoy bridge",
+      "timestamp": 1788596321385
+    },
+    {
+      "action": "tap",
+      "target": "#ohm-gap-g2",
+      "label": "remove g2 bridge",
+      "timestamp": 1788596321750
+    },
+    {
+      "action": "tap",
+      "target": "#ohm-svg-gap-g5",
+      "label": "place g5 via SVG tap",
+      "timestamp": 1788596322001
+    },
+    {
+      "action": "tap",
+      "target": "#ohm-gap-g4",
+      "label": "place g4 bridge (solve)",
+      "timestamp": 1788596322264
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "ohm_awakening_event #1",
+      "timestamp": 1788596323517
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "ohm_awakening_event #2",
+      "timestamp": 1788596323983
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "ohm_awakening_event #3",
+      "timestamp": 1788596324466
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "edda_surprised_awakening #1",
+      "timestamp": 1788596324949
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "edda_surprised_awakening #2",
+      "timestamp": 1788596325449
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "edda_surprised_awakening #3",
+      "timestamp": 1788596325933
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "edda_surprised_awakening #4",
+      "timestamp": 1788596326416
+    },
+    {
+      "action": "tap",
+      "target": ".dialog-card",
+      "label": "edda_surprised_awakening #5",
+      "timestamp": 1788596326899
+    }
+  ],
+  "errors": {
+    "console": [],
+    "page": []
+  },
+  "result": "PASS",
+  "finishedAt": "2026-09-05T08:18:47.283Z"
+}

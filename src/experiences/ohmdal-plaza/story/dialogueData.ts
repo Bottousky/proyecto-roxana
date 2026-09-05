@@ -38,7 +38,7 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
       },
       {
         who: 'Estudiante',
-        text: 'Los bornes de alimentación reciben 24V desde el acumulador del portal, pero el interruptor de entrada está desacoplado.',
+        text: 'Los bornes de alimentación vibran con un zumbido tenue desde el portal, pero el circuito de entrada está interrumpido.',
         emotion: 'eureka',
       },
     ],
