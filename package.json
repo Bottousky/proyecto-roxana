@@ -33,6 +33,7 @@
     "visual:ohmdal-plaza": "node scripts/visual/capture-ohmdal-plaza.mjs",
     "visual:ohmdal-plaza:fast": "node scripts/visual/capture-ohmdal-plaza.mjs --mode fast",
     "playtest:ohmdal-golden-path": "node scripts/gameplay/playtest-ohmdal-golden-path.mjs",
+    "smoke:ohmdal-b2-touch": "node scripts/gameplay/smoke-ohmdal-b2-touch.mjs",
     "3d:validate-manifests": "node scripts/3d/validate-asset-manifests.mjs",
     "3d:validate-hero-ref": "node scripts/3d/validate-hero-reference-pack.mjs",
     "3d:validate-blender-gauntlet": "node scripts/3d/validate-blender-gauntlet.mjs",

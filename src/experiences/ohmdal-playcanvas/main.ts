@@ -465,4 +465,3 @@ for (const gapId of gapIds) {
 backBtn.addEventListener('click', () => {
   window.location.href = '/';
 });
-

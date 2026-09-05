@@ -194,3 +194,20 @@ Then include:
 - use permanent copper glow as generic feedback;
 - redesign later Arco I regions;
 - run overlapping concurrent edits with another implementation worker on the same files.
+
+## CURRENT REPAIR PACKET — B2 iteration 0 (Mavis, 2026-09-05)
+
+Fresh independent review found the implementation structurally sound but B2
+acceptance is blocked by missing touch evidence, premature technical copy, and
+whitespace hygiene. Treat these as the only repair scope:
+
+1. Add real browser touch evidence for B2: open rear inspection, manipulate the
+   continuity controls, complete the deterministic puzzle, and capture/report the
+   result. Fix only B2 touch input if the smoke path proves it broken.
+2. Remove the premature numeric/technical `(24 V Zumbando)` presentation from the
+   introductory B2 UI while preserving the approved phenomenon-first intent.
+3. Fix all whitespace/EOF issues reported by `git diff --check` in the candidate
+   scope, without broad formatting churn.
+4. Re-run focused tests, build, Golden Path, and the bounded touch smoke; update
+   the Gemini38 current report with exact evidence and Candidate Protocol v2.
+   Do not self-accept or modify loop authority.
