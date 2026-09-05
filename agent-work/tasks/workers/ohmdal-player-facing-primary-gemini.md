@@ -222,3 +222,22 @@ do not redesign the puzzle or expand into B3–B6:
 
 Structural-fix budget: 1 maximum (only if required for the transition race). If the
 timeout is outside B2, document it precisely and leave unrelated behavior unchanged.
+
+## CURRENT REPAIR PACKET — B2 iteration 1 (Mavis, 2026-09-05)
+
+The independent Luna review still blocks acceptance on this candidate. Continue on the
+existing clean Gemini lane and address only these bounded findings:
+
+1. Preserve or repair the real Chromium touch smoke so it opens rear inspection,
+   manipulates continuity controls, solves the puzzle, and records screenshots plus a
+   machine-readable PASS artifact.
+2. Keep the B2 introductory UI phenomenon-first by removing numeric/technical values
+   such as `24 V` from the player-facing source label.
+3. Resolve all candidate-scope `git diff --check` whitespace/EOF findings without broad
+   formatting churn.
+4. Re-run focused tests, build, Golden Path, and dedicated touch smoke; publish exact
+   artifacts in the current report with Candidate Protocol v2 and
+   `SELF_ACCEPTANCE: false`.
+
+Do not modify loop authority, redesign the puzzle, or expand into B3-B6. Commit the
+repair candidate and leave acceptance to the fresh independent reviewer.
