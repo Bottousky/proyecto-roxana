@@ -115,6 +115,14 @@ function field(content, name) {
   return match ? match[1].trim().replace(/^`|`$/g, '') : null;
 }
 
+function stageFromReport(content) {
+  if (typeof content !== 'string') return null;
+  const markdown = content.match(/^\s*(?:\*\*)?Stage(?:\*\*)?\s*:\s*`?([a-z0-9-]+)`?/im);
+  if (markdown) return markdown[1];
+  const inline = content.match(/\bStage\s*:\s*`?([a-z0-9-]+)`?/i);
+  return inline ? inline[1] : null;
+}
+
 function reportSignals(content) {
   const candidateMode = field(content, 'CANDIDATE_MODE');
   const baseSha = field(content, 'BASE_SHA');
@@ -127,6 +135,7 @@ function reportSignals(content) {
     baseSha,
     implementationSha,
     evidenceStatus,
+    stage: stageFromReport(content),
     selfAcceptanceFalse: /^false$/i.test(selfAcceptance || ''),
     explicitPass: /^PASS$/i.test(evidenceStatus || ''),
   };
@@ -199,6 +208,14 @@ const canonicalEntries = canonicalStatusResult.status === 0
   ? canonicalStatusResult.stdout.split(/\r?\n/).filter(Boolean)
   : [];
 
+let loopState = null;
+try {
+  loopState = JSON.parse(await readFile(path.join(root, config.activeLoop), 'utf8'));
+} catch {
+  // Keep sensor useful if the state file is temporarily unavailable.
+}
+const currentStage = loopState?.currentStage || null;
+
 const worktrees = parseWorktrees();
 const workerSnapshots = {};
 const ttlMinutes = Number(config.controlPlane?.workerTtlMinutes || 90);
@@ -221,6 +238,8 @@ for (const [workerId, worker] of Object.entries(config.workers || {})) {
   });
   const runtime = await readWorkerRuntime(root, workerId);
   const runtimeClassification = classifyWorkerRuntime(runtime, ttlMinutes);
+  const evidenceStage = runtime?.stage || signals.stage || null;
+  const belongsToCurrentStage = Boolean(currentStage && evidenceStage === currentStage);
 
   workerSnapshots[workerId] = {
     branch: worker.branch,
@@ -240,22 +259,18 @@ for (const [workerId, worker] of Object.entries(config.workers || {})) {
     runtime: runtime
       ? { ...runtime, classification: runtimeClassification }
       : { classification: 'UNKNOWN' },
-    active: runtimeClassification === 'RUNNING',
-    stale: runtimeClassification === 'STALE',
+    evidenceStage,
+    belongsToCurrentStage,
+    active: belongsToCurrentStage && runtimeClassification === 'RUNNING',
+    stale: belongsToCurrentStage && runtimeClassification === 'STALE',
     blockedUntil: worker.blockedUntil || null,
     candidateReady: Boolean(
-      protocol.ready
+      belongsToCurrentStage
+      && protocol.ready
       && runtimeClassification !== 'RUNNING'
       && (wtStatus == null || wtStatus.clean === true)
     ),
   };
-}
-
-let loopState = null;
-try {
-  loopState = JSON.parse(await readFile(path.join(root, config.activeLoop), 'utf8'));
-} catch {
-  // Keep sensor useful even if the state file is temporarily unavailable.
 }
 
 const activeWorkers = Object.entries(workerSnapshots)
@@ -265,12 +280,13 @@ const passCandidates = Object.entries(workerSnapshots)
   .filter(([, worker]) => worker.candidateReady)
   .map(([workerId]) => workerId);
 const failedWorkers = Object.entries(workerSnapshots)
-  .filter(([, worker]) => ['FAIL', 'ERROR', 'STALE'].includes(worker.runtime?.classification)
-    || /^FAIL$/i.test(worker.reportSignals?.evidenceStatus || ''))
+  .filter(([, worker]) => worker.belongsToCurrentStage
+    && (['FAIL', 'ERROR', 'STALE'].includes(worker.runtime?.classification)
+      || /^FAIL$/i.test(worker.reportSignals?.evidenceStatus || '')))
   .map(([workerId]) => workerId);
 
 const snapshot = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   generatedAt: new Date().toISOString(),
   orchestrator: config.orchestratorId,
   candidateProtocol: 'v2-explicit',
@@ -297,6 +313,7 @@ const snapshot = {
     : null,
   control: {
     workerTtlMinutes: ttlMinutes,
+    currentStage,
     activeWorkers,
     passCandidates,
     failedWorkers,
