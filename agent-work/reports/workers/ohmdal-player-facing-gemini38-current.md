@@ -1,17 +1,17 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: cd741cc6574f601c75e842be4322354378ac91df
+IMPLEMENTATION_SHA: 82c9c260f5ddac3949a454354dc2f807b76232eb
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 
-# Evidence Report — Ohmdal Player-Facing B2 Ohm Continuity Puzzle (Iteration 1 Repair Candidate)
+# Evidence Report — Ohmdal Player-Facing B2 Ohm Continuity Puzzle (Iteration 2 Repair Candidate)
 
 **Worker:** Gemini 3.8 Flash High / Antigravity CLI (Primary Player-Facing Builder)
 **Task:** `agent-work/tasks/workers/ohmdal-player-facing-primary-gemini.md`
 **Loop:** `agent-work/loops/ohmdal-arco1-player-facing/state.json`
-**Stage:** `b2-ohm-continuity-puzzle` (iteration 1/3)
+**Stage:** `b2-ohm-continuity-puzzle` (iteration 2/3)
 **Branch:** `worker/gemini38-player-facing`
-**Date:** 2026-09-05T07:19:00-03:00
+**Date:** 2026-09-05T07:28:00-03:00
 
 ---
 
@@ -20,20 +20,20 @@ SELF_ACCEPTANCE: false
 ```text
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: cd741cc6574f601c75e842be4322354378ac91df
+IMPLEMENTATION_SHA: 82c9c260f5ddac3949a454354dc2f807b76232eb
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 ```
 
 - **Candidate Mode:** `implementation`
 - **Base Commit:** `4d55de4be50432c7445065cfd42162658a3dfe3d`
-- **Implementation Commit:** `cd741cc6574f601c75e842be4322354378ac91df`
+- **Implementation Commit:** `82c9c260f5ddac3949a454354dc2f807b76232eb`
 - **Evidence Status:** `PASS`
 - **Self-Acceptance:** `false` (Builder does not self-accept; awaiting Mavis orchestrator & independent reviewer gate)
 
 ---
 
-## 2. Repair Scope Addressed (B2 Iteration 0 & Iteration 1)
+## 2. Repair Scope Addressed (B2 Iterations 0, 1 & 2)
 
 In response to the Mavis repair packets and independent reviewer findings:
 
@@ -72,7 +72,7 @@ In response to the Mavis repair packets and independent reviewer findings:
 
 4. **Comprehensive Revalidation:**
    - Re-validated bounded loop state.
-   - Re-compiled production TypeScript/Vite bundle with 0 errors (`npm run build` in 19.63s).
+   - Re-compiled production TypeScript/Vite bundle with 0 errors (`npm run build` in 19.64s).
    - Re-ran all unit and domain test suites (`npm test` 100% PASS).
    - Re-ran the full full-scale Arco I Golden Path playtest regression (22 checkpoints, PASS).
    - Re-ran the dedicated B2 touch smoke test (5 checkpoints, 20 touch actions, PASS).
@@ -81,6 +81,7 @@ In response to the Mavis repair packets and independent reviewer findings:
 
 ## 3. Files Changed in Implementation Scope
 
+- `agent-work/tasks/workers/ohmdal-player-facing-primary-gemini.md` (recorded B2 iteration 2 repair packet)
 - `src/experiences/ohmdal-plaza/story/dialogueData.ts` (phenomenon-first copy in `ohm_dormant_inspect`, removed pre-puzzle `24V`)
 - `output/playwright/ohmdal-hardening/touch-smoke/b2-touch-run.json` (committed machine-readable touch artifact)
 - `output/playwright/ohmdal-hardening/touch-smoke/*.png` (5 committed touch checkpoint captures)
