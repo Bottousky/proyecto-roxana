@@ -1,6 +1,6 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: 52cab5a0d1bad21203f84f3dc262441538698131
+IMPLEMENTATION_SHA: ff649ab3b7f2bc13e96360498f6a0d3f50c6bc77
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 
@@ -11,7 +11,7 @@ SELF_ACCEPTANCE: false
 **Loop:** `agent-work/loops/ohmdal-arco1-player-facing/state.json`
 **Stage:** `b2-ohm-continuity-puzzle` (iteration 1/3)
 **Branch:** `worker/gemini38-player-facing`
-**Date:** 2026-09-05T05:01:00-03:00
+**Date:** 2026-09-05T05:22:00-03:00
 
 ---
 
@@ -20,14 +20,14 @@ SELF_ACCEPTANCE: false
 ```text
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: 52cab5a0d1bad21203f84f3dc262441538698131
+IMPLEMENTATION_SHA: ff649ab3b7f2bc13e96360498f6a0d3f50c6bc77
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 ```
 
 - **Candidate Mode:** `implementation`
 - **Base Commit:** `4d55de4be50432c7445065cfd42162658a3dfe3d`
-- **Implementation Commit:** `52cab5a0d1bad21203f84f3dc262441538698131`
+- **Implementation Commit:** `ff649ab3b7f2bc13e96360498f6a0d3f50c6bc77`
 - **Evidence Status:** `PASS`
 - **Self-Acceptance:** `false` (Builder does not self-accept; awaiting Mavis orchestrator & independent reviewer gate)
 
@@ -37,8 +37,8 @@ SELF_ACCEPTANCE: false
 
 In response to the Mavis repair packets and independent reviewer findings:
 
-1. **Real Browser Touch Evidence for B2:**
-   - Created dedicated bounded touch smoke test: `scripts/gameplay/smoke-ohmdal-b2-touch.mjs` (registered in `package.json` as `npm run smoke:ohmdal-b2-touch`).
+1. **Real Browser Touch Evidence for B2 Committed in Target Tree:**
+   - Dedicated bounded touch smoke test: `scripts/gameplay/smoke-ohmdal-b2-touch.mjs` (registered in `package.json` as `npm run smoke:ohmdal-b2-touch`).
    - Runs in real Chromium with mobile landscape touch emulation (`viewport: { width: 844, height: 390 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true`).
    - Drains initial arrival dialogue with `.dialog-card` touch taps.
    - Approaches Ohm rear service panel within reachable radius (`(0, -3.4, 0.4)`).
@@ -51,22 +51,29 @@ In response to the Mavis repair packets and independent reviewer findings:
      - Taps interactive SVG gap `#ohm-svg-gap-g5` directly via SVG group touch tap.
      - Taps button `#ohm-gap-g4` to close the complete loop.
    - Confirms automatic modal dismissal, Ohm awakening (`ohmAwake: true`), and advances subsequent dialogue (`ohm_awakening_event` and `edda_surprised_awakening`) via touch taps to reach `invited_to_workshop`.
-   - Executed 20 touch actions with 0 console errors and 0 page errors. Recorded 5 checkpoint screenshots.
+   - Executed 20 touch actions with 0 console errors and 0 page errors.
+   - **Committed directly into the candidate git tree:**
+     - `output/playwright/ohmdal-hardening/touch-smoke/b2-touch-run.json` (machine-readable run artifact, PASS)
+     - `output/playwright/ohmdal-hardening/touch-smoke/b2-touch-01-rear-approach.png`
+     - `output/playwright/ohmdal-hardening/touch-smoke/b2-touch-02-inspection-open.png`
+     - `output/playwright/ohmdal-hardening/touch-smoke/b2-touch-03-partial-progress.png`
+     - `output/playwright/ohmdal-hardening/touch-smoke/b2-touch-04-puzzle-solved.png`
+     - `output/playwright/ohmdal-hardening/touch-smoke/b2-touch-05-ohm-awakened.png`
+     - `output/playwright/ohmdal-hardening/golden-path/golden-path-run.json` (22 checkpoints, PASS)
+     - `output/playwright/ohmdal-hardening/golden-path/*.png` (22 checkpoint captures)
 
 2. **Phenomenon-First Copy Correction:**
-   - Removed the premature numeric/technical `(24 V Zumbando)` text from the power source in `src/experiences/ohmdal-playcanvas/index.html`.
-   - Replaced with phenomenon-first `(Zumbando)`, preserving the buzzing/humming sensory feedback without unearned voltage or formula recital.
+   - In `src/experiences/ohmdal-playcanvas/index.html`: power source label uses phenomenon-first `(Zumbando)` without numeric voltage or formula recital.
+   - In `src/experiences/ohmdal-plaza/story/dialogueData.ts`: updated `ohm_dormant_inspect` to remove the pre-puzzle `24V` recital, replacing it with phenomenon-first sensory observation: `"Los bornes de alimentación vibran con un zumbido tenue desde el portal, pero el circuito de entrada está interrumpido."`
 
 3. **Whitespace & EOF Hygiene:**
-   - Removed trailing whitespace in `src/experiences/ohmdal-playcanvas/index.html` (lines 177, 193).
-   - Removed extra blank line at EOF in `src/experiences/ohmdal-playcanvas/main.ts`.
-   - Removed markdown trailing whitespace from report headers.
-   - Verified `git diff --check 4d55de4..HEAD` returns exit code 0 with no whitespace errors.
+   - Clean whitespace verified across the entire commit range (`git diff --check 4d55de4be50432c7445065cfd42162658a3dfe3d..HEAD` returns exit code 0).
+   - Removed trailing whitespace in candidate files and report.
 
 4. **Comprehensive Revalidation:**
    - Re-validated bounded loop state.
-   - Re-compiled production TypeScript/Vite bundle with 0 errors.
-   - Re-ran all unit and domain test suites (100% PASS).
+   - Re-compiled production TypeScript/Vite bundle with 0 errors (`npm run build` in 19.63s).
+   - Re-ran all unit and domain test suites (`npm test` 100% PASS).
    - Re-ran the full full-scale Arco I Golden Path playtest regression (22 checkpoints, PASS).
    - Re-ran the dedicated B2 touch smoke test (5 checkpoints, 20 touch actions, PASS).
 
@@ -74,18 +81,21 @@ In response to the Mavis repair packets and independent reviewer findings:
 
 ## 3. Files Changed in Implementation Scope
 
-- `scripts/gameplay/smoke-ohmdal-b2-touch.mjs` (new bounded touch smoke harness)
-- `package.json` (added `smoke:ohmdal-b2-touch` npm script)
+- `src/experiences/ohmdal-plaza/story/dialogueData.ts` (phenomenon-first copy in `ohm_dormant_inspect`, removed pre-puzzle `24V`)
+- `output/playwright/ohmdal-hardening/touch-smoke/b2-touch-run.json` (committed machine-readable touch artifact)
+- `output/playwright/ohmdal-hardening/touch-smoke/*.png` (5 committed touch checkpoint captures)
+- `output/playwright/ohmdal-hardening/golden-path/golden-path-run.json` (committed Golden Path run artifact)
+- `output/playwright/ohmdal-hardening/golden-path/*.png` (22 committed Golden Path checkpoint captures)
+- `scripts/gameplay/smoke-ohmdal-b2-touch.mjs` (bounded touch smoke harness)
+- `package.json` (registered `smoke:ohmdal-b2-touch` npm script)
 - `src/experiences/ohmdal-playcanvas/index.html` (phenomenon-first `(Zumbando)` copy, whitespace cleanup)
 - `src/experiences/ohmdal-playcanvas/main.ts` (EOF whitespace cleanup)
-- `agent-work/tasks/workers/ohmdal-player-facing-primary-gemini.md` (retained Mavis task packet)
-- `src/experiences/ohmdal-playcanvas/systems/puzzles/ohmContinuityPuzzle.ts` (pure domain model, previous commit `3040456`)
-- `tests/ohm-continuity-puzzle.test.ts` (pure domain tests, previous commit `3040456`)
-- `src/experiences/ohmdal-playcanvas/playcanvasRuntime.ts` (curiosity cue, inspection mode, awakening sequence, previous commit `3040456`)
-- `src/experiences/ohmdal-plaza/plazaRuntime.ts` (PlazaUi setOhmInspectionView contract, previous commit `3040456`)
-- `src/experiences/ohmdal-plaza/story/dialogueData.ts` (approved dialogue for awakening, previous commit `3040456`)
-- `src/experiences/ohmdal-plaza/styles.css` (inspection modal, responsive layout, previous commit `3040456`)
-- `scripts/gameplay/playtest-ohmdal-golden-path.mjs` (reachable rear approach and B2 puzzle solution, previous commit `3040456`)
+- `src/experiences/ohmdal-playcanvas/systems/puzzles/ohmContinuityPuzzle.ts` (pure domain model)
+- `tests/ohm-continuity-puzzle.test.ts` (pure domain tests)
+- `src/experiences/ohmdal-playcanvas/playcanvasRuntime.ts` (curiosity cue, inspection mode, awakening sequence)
+- `src/experiences/ohmdal-plaza/plazaRuntime.ts` (PlazaUi setOhmInspectionView contract)
+- `src/experiences/ohmdal-plaza/styles.css` (inspection modal, responsive layout)
+- `scripts/gameplay/playtest-ohmdal-golden-path.mjs` (reachable rear approach and B2 puzzle solution)
 
 ---
 
