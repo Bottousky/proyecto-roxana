@@ -1,6 +1,6 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: fa11383ce8c2aed63e7bb711475cec6609a991ed
+IMPLEMENTATION_SHA: cd741cc6574f601c75e842be4322354378ac91df
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 
@@ -11,7 +11,7 @@ SELF_ACCEPTANCE: false
 **Loop:** `agent-work/loops/ohmdal-arco1-player-facing/state.json`
 **Stage:** `b2-ohm-continuity-puzzle` (iteration 1/3)
 **Branch:** `worker/gemini38-player-facing`
-**Date:** 2026-09-05T07:08:00-03:00
+**Date:** 2026-09-05T07:19:00-03:00
 
 ---
 
@@ -20,14 +20,14 @@ SELF_ACCEPTANCE: false
 ```text
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: fa11383ce8c2aed63e7bb711475cec6609a991ed
+IMPLEMENTATION_SHA: cd741cc6574f601c75e842be4322354378ac91df
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 ```
 
 - **Candidate Mode:** `implementation`
 - **Base Commit:** `4d55de4be50432c7445065cfd42162658a3dfe3d`
-- **Implementation Commit:** `fa11383ce8c2aed63e7bb711475cec6609a991ed`
+- **Implementation Commit:** `cd741cc6574f601c75e842be4322354378ac91df`
 - **Evidence Status:** `PASS`
 - **Self-Acceptance:** `false` (Builder does not self-accept; awaiting Mavis orchestrator & independent reviewer gate)
 
