@@ -197,9 +197,17 @@ Then include:
 
 ## CURRENT REPAIR PACKET — B2 iteration 0 (Mavis, 2026-09-05)
 
-Fresh independent review found the implementation structurally sound but B2
-acceptance is blocked by missing touch evidence, premature technical copy, and
-whitespace hygiene. Treat these as the only repair scope:
+Dispatch note: repair is routed to Gemini 3.8 on its isolated lane because the
+configured Luna lane is the current-stage FAIL lane and has no durable report
+available for safe continuation. The fresh independent review found the
+implementation structurally sound but B2 acceptance is blocked by missing touch
+evidence, premature technical copy, and whitespace hygiene. Treat the concrete
+findings below as the only repair scope.
+
+The current Luna candidate reached `ohm-awakened` on desktop, but its Golden Path
+runner later timed out during workshop movement; touch-specific B2 evidence is still
+missing. Repair only the following bounded items on the existing B2 implementation;
+do not redesign the puzzle or expand into B3–B6:
 
 1. Add real browser touch evidence for B2: open rear inspection, manipulate the
    continuity controls, complete the deterministic puzzle, and capture/report the
@@ -211,3 +219,6 @@ whitespace hygiene. Treat these as the only repair scope:
 4. Re-run focused tests, build, Golden Path, and the bounded touch smoke; update
    the Gemini38 current report with exact evidence and Candidate Protocol v2.
    Do not self-accept or modify loop authority.
+
+Structural-fix budget: 1 maximum (only if required for the transition race). If the
+timeout is outside B2, document it precisely and leave unrelated behavior unchanged.
