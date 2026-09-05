@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "route": "/ohmdal-playcanvas",
-  "startedAt": "2026-09-05T22:35:17.522Z",
-  "baseUrl": "http://127.0.0.1:64623",
+  "startedAt": "2026-09-05T22:48:33.387Z",
+  "baseUrl": "http://127.0.0.1:57513",
   "viewport": {
     "width": 844,
     "height": 390
@@ -13,27 +13,27 @@
     {
       "id": "01-rear-approach",
       "filename": "b2-touch-01-rear-approach.png",
-      "recordedAt": "2026-09-05T22:35:31.855Z"
+      "recordedAt": "2026-09-05T22:48:49.191Z"
     },
     {
       "id": "02-inspection-open",
       "filename": "b2-touch-02-inspection-open.png",
-      "recordedAt": "2026-09-05T22:35:32.391Z"
+      "recordedAt": "2026-09-05T22:48:49.752Z"
     },
     {
       "id": "03-partial-progress",
       "filename": "b2-touch-03-partial-progress.png",
-      "recordedAt": "2026-09-05T22:35:33.330Z"
+      "recordedAt": "2026-09-05T22:48:50.993Z"
     },
     {
       "id": "04-puzzle-solved",
       "filename": "b2-touch-04-puzzle-solved.png",
-      "recordedAt": "2026-09-05T22:35:34.199Z"
+      "recordedAt": "2026-09-05T22:48:51.882Z"
     },
     {
       "id": "05-ohm-awakened",
       "filename": "b2-touch-05-ohm-awakened.png",
-      "recordedAt": "2026-09-05T22:35:38.683Z"
+      "recordedAt": "2026-09-05T22:48:56.617Z"
     }
   ],
   "touchActions": [
@@ -41,121 +41,121 @@
       "action": "tap",
       "target": "#plaza-enter",
       "label": "enter plaza",
-      "timestamp": 1788647723005
+      "timestamp": 1788648519977
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "intro_portal_edda #1",
-      "timestamp": 1788647726652
+      "timestamp": 1788648523826
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "intro_portal_edda #2",
-      "timestamp": 1788647727133
+      "timestamp": 1788648524337
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "intro_portal_edda #3",
-      "timestamp": 1788647727616
+      "timestamp": 1788648524820
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "intro_portal_edda #4",
-      "timestamp": 1788647728100
+      "timestamp": 1788648525304
     },
     {
       "action": "tap",
       "target": "#touch-interact",
       "label": "open rear inspection",
-      "timestamp": 1788647731947
+      "timestamp": 1788648529296
     },
     {
       "action": "tap",
       "target": "#ohm-gap-g1",
       "label": "place g1 bridge",
-      "timestamp": 1788647732460
+      "timestamp": 1788648530099
     },
     {
       "action": "tap",
       "target": "#ohm-gap-g3",
       "label": "attempt broken g3",
-      "timestamp": 1788647732770
+      "timestamp": 1788648530405
     },
     {
       "action": "tap",
       "target": "#ohm-gap-g2",
       "label": "place g2 decoy bridge",
-      "timestamp": 1788647733033
+      "timestamp": 1788648530672
     },
     {
       "action": "tap",
       "target": "#ohm-gap-g2",
       "label": "remove g2 bridge",
-      "timestamp": 1788647733383
+      "timestamp": 1788648531055
     },
     {
       "action": "tap",
       "target": "#ohm-svg-gap-g5",
       "label": "place g5 via SVG tap",
-      "timestamp": 1788647733617
+      "timestamp": 1788648531289
     },
     {
       "action": "tap",
       "target": "#ohm-gap-g4",
       "label": "place g4 bridge (solve)",
-      "timestamp": 1788647733863
+      "timestamp": 1788648531535
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "ohm_awakening_event #1",
-      "timestamp": 1788647735117
+      "timestamp": 1788648532803
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "ohm_awakening_event #2",
-      "timestamp": 1788647735598
+      "timestamp": 1788648533270
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "ohm_awakening_event #3",
-      "timestamp": 1788647736083
+      "timestamp": 1788648533754
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "edda_surprised_awakening #1",
-      "timestamp": 1788647736449
+      "timestamp": 1788648534236
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "edda_surprised_awakening #2",
-      "timestamp": 1788647736916
+      "timestamp": 1788648534737
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "edda_surprised_awakening #3",
-      "timestamp": 1788647737382
+      "timestamp": 1788648535236
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "edda_surprised_awakening #4",
-      "timestamp": 1788647737849
+      "timestamp": 1788648535737
     },
     {
       "action": "tap",
       "target": ".dialog-card",
       "label": "edda_surprised_awakening #5",
-      "timestamp": 1788647738315
+      "timestamp": 1788648536236
     }
   ],
   "errors": {
@@ -163,5 +163,5 @@
     "page": []
   },
   "result": "PASS",
-  "finishedAt": "2026-09-05T22:35:38.683Z"
+  "finishedAt": "2026-09-05T22:48:56.618Z"
 }
