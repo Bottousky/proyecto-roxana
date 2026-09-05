@@ -1,6 +1,6 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: 8772af7a4107265e0afeeab0232bface071495e6
+IMPLEMENTATION_SHA: af99c268201ace96ff035d4a4dc9b2a1a679ccd3
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 
@@ -11,7 +11,7 @@ SELF_ACCEPTANCE: false
 **Loop:** `agent-work/loops/ohmdal-arco1-player-facing/state.json`
 **Stage:** `b2-ohm-continuity-puzzle` (iteration 2/3)
 **Branch:** `worker/gemini38-player-facing`
-**Date:** 2026-09-05T07:38:00-03:00
+**Date:** 2026-09-05T07:47:00-03:00
 
 ---
 
@@ -20,14 +20,14 @@ SELF_ACCEPTANCE: false
 ```text
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: 8772af7a4107265e0afeeab0232bface071495e6
+IMPLEMENTATION_SHA: af99c268201ace96ff035d4a4dc9b2a1a679ccd3
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 ```
 
 - **Candidate Mode:** `implementation`
 - **Base Commit:** `4d55de4be50432c7445065cfd42162658a3dfe3d`
-- **Implementation Commit:** `8772af7a4107265e0afeeab0232bface071495e6`
+- **Implementation Commit:** `af99c268201ace96ff035d4a4dc9b2a1a679ccd3`
 - **Evidence Status:** `PASS`
 - **Self-Acceptance:** `false` (Builder does not self-accept; awaiting Mavis orchestrator & independent reviewer gate)
 
@@ -113,7 +113,7 @@ worker=Luna/max
 
 ### Whitespace / EOF Hygiene (`git diff --check`)
 ```text
-> git diff --check 4d55de4be50432c7445065cfd42162658a3dfe3d..HEAD
+> git diff --check 4d55de4be50432c7445065cfd42162658a3dfe3d..af99c268201ace96ff035d4a4dc9b2a1a679ccd3
 Clean exit (code 0), 0 whitespace errors reported.
 ```
 
@@ -138,7 +138,7 @@ All test suites passed, 0 failures.
 ### Dedicated B2 Touch Smoke Test (`smoke:ohmdal-b2-touch`)
 ```text
 > npm run smoke:ohmdal-b2-touch
-[touch-smoke] navigating to http://127.0.0.1:54079/ohmdal-playcanvas in mobile touch context
+[touch-smoke] navigating to http://127.0.0.1:50934/ohmdal-playcanvas in mobile touch context
 [touch-smoke] drain dialogue by touch: intro_portal_edda
 [touch-smoke] tap dialogue card: intro_portal_edda #1
 [touch-smoke] tap dialogue card: intro_portal_edda #2
@@ -146,7 +146,7 @@ All test suites passed, 0 failures.
 [touch-smoke] tap dialogue card: intro_portal_edda #4
 [touch-smoke] portal arrival dialogue cleared via touch
 [touch-smoke] move Ohm rear inspection position
-[touch-smoke] arrived Ohm rear inspection position at [-0.24096000000000345,1.68,-3.5182399999999983]
+[touch-smoke] arrived Ohm rear inspection position at [-0.24,1.68,-3.5182399999999827]
 [touch-smoke] checkpoint 01-rear-approach -> b2-touch-01-rear-approach.png
 [touch-smoke] tapping #touch-interact to enter rear inspection
 [touch-smoke] checkpoint 02-inspection-open -> b2-touch-02-inspection-open.png
