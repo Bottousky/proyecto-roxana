@@ -263,3 +263,20 @@ committed tree. Address only these bounded items:
 
 Do not modify loop authority, redesign the puzzle, or expand into B3-B6. Do not wait for
 review or self-approve; leave acceptance to a fresh independent Luna reviewer.
+# B2 REVIEW REPAIR PACKET — 2026-09-05
+
+Fresh Luna review is FAIL. Perform one bounded repair in this isolated
+worktree; do not redesign gameplay or alter canon, topology, engine, or deps.
+
+1. Publish final Candidate Protocol v2 identity: exact BASE_SHA
+   `4d55de4be50432c7445065cfd42162658a3dfe3d`, stage
+   `b2-ohm-continuity-puzzle`, and IMPLEMENTATION_SHA equal to the final
+   committed repair SHA.
+2. Add/commit real mobile/touch B2 evidence at that exact SHA: rear inspection,
+   cable/terminal manipulation, deterministic solve, and Ohm awakening, with
+   captures plus machine-readable touch artifact listed in the report.
+3. Fix all candidate-owned `git diff --check` issues and leave the worktree
+   clean. Run targeted B2 tests, build, desktop Golden Path regression, touch
+   smoke, and `git diff --check`. Report PASS only when all genuinely pass,
+   with `EVIDENCE_STATUS: PASS` and `SELF_ACCEPTANCE: false`; otherwise report
+   FAIL. Commit and push the candidate branch only; never mutate canonical.
