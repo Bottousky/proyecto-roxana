@@ -29,6 +29,7 @@ jobs:
       - run: node --check scripts/agents/orchestrator-runtime.mjs
       - run: node --check scripts/agents/orchestrator-status.mjs
       - run: node --check scripts/agents/run-orchestrator-supervisor.mjs
+      - run: node --check scripts/agents/dispatch-worker-detached.mjs
       - run: node --check scripts/agents/run-gemini-builder.mjs
       - run: node --check scripts/agents/run-minimax-builder.mjs
       - run: node --check scripts/agents/run-luna-builder.mjs
