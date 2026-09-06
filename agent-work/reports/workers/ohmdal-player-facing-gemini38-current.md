@@ -1,6 +1,6 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: c19b0aa7d5d7522398b3dd1d96ccb82f9ab32f1f
+IMPLEMENTATION_SHA: facea26812da4c7e896e186dddc69fa8565e0fce
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 
@@ -11,7 +11,7 @@ SELF_ACCEPTANCE: false
 **Loop:** `agent-work/loops/ohmdal-arco1-player-facing/state.json`
 **Stage:** `b2-ohm-continuity-puzzle`
 **Branch:** `worker/gemini38-player-facing`
-**Date:** 2026-09-05T22:15:00-03:00
+**Date:** 2026-09-05T22:26:30-03:00
 
 ---
 
@@ -20,14 +20,14 @@ SELF_ACCEPTANCE: false
 ```text
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: c19b0aa7d5d7522398b3dd1d96ccb82f9ab32f1f
+IMPLEMENTATION_SHA: facea26812da4c7e896e186dddc69fa8565e0fce
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 ```
 
 - **Candidate Mode:** `implementation`
 - **Base Commit:** `4d55de4be50432c7445065cfd42162658a3dfe3d`
-- **Implementation Commit:** `c19b0aa7d5d7522398b3dd1d96ccb82f9ab32f1f`
+- **Implementation Commit:** `facea26812da4c7e896e186dddc69fa8565e0fce`
 - **Evidence Status:** `PASS`
 - **Self-Acceptance:** `false` (Builder does not self-accept; awaiting Mavis orchestrator & independent reviewer gate)
 
@@ -113,7 +113,7 @@ worker=Luna/max
 
 ### Whitespace / EOF Hygiene (`git diff --check`)
 ```text
-> git diff --check 4d55de4be50432c7445065cfd42162658a3dfe3d..c19b0aa7d5d7522398b3dd1d96ccb82f9ab32f1f
+> git diff --check 4d55de4be50432c7445065cfd42162658a3dfe3d..facea26812da4c7e896e186dddc69fa8565e0fce
 Clean exit (code 0), 0 whitespace errors reported.
 ```
 
@@ -122,7 +122,7 @@ Clean exit (code 0), 0 whitespace errors reported.
 > npm run build
 ✓ 1479 modules transformed.
 dist/assets/playcanvas-CRdyqCe1.js                           2,135.21 kB │ gzip:   554.58 kB
-✓ built in 21.03s
+✓ built in 21.20s
 0 type errors, clean compilation.
 ```
 
@@ -138,7 +138,7 @@ All test suites passed, 0 failures.
 ### Dedicated B2 Touch Smoke Test (`smoke:ohmdal-b2-touch`)
 ```text
 > npm run smoke:ohmdal-b2-touch
-[touch-smoke] navigating to http://127.0.0.1:64713/ohmdal-playcanvas in mobile touch context
+[touch-smoke] navigating to http://127.0.0.1:53224/ohmdal-playcanvas in mobile touch context
 [touch-smoke] drain dialogue by touch: intro_portal_edda
 [touch-smoke] tap dialogue card: intro_portal_edda #1
 [touch-smoke] tap dialogue card: intro_portal_edda #2
@@ -146,7 +146,7 @@ All test suites passed, 0 failures.
 [touch-smoke] tap dialogue card: intro_portal_edda #4
 [touch-smoke] portal arrival dialogue cleared via touch
 [touch-smoke] move Ohm rear inspection position
-[touch-smoke] arrived Ohm rear inspection position at [-0.23951999999999815,1.68,-3.516799999999991]
+[touch-smoke] arrived Ohm rear inspection position at [-0.32016000000000355,1.68,-3.5215999999999994]
 [touch-smoke] checkpoint 01-rear-approach -> b2-touch-01-rear-approach.png
 [touch-smoke] tapping #touch-interact to enter rear inspection
 [touch-smoke] checkpoint 02-inspection-open -> b2-touch-02-inspection-open.png
