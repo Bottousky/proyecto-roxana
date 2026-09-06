@@ -10,23 +10,32 @@ const root = process.cwd();
 const safeMode = process.argv.includes('--safe');
 const onceMode = process.argv.includes('--once');
 const configPath = path.join(root, 'agent-work', 'orchestrator', 'config.json');
-const loopPath = path.join(root, 'agent-work', 'loops', 'ohmdal-arco1-authored-pass', 'state.json');
 
 let pollMinutes = 7;
+let activeLoop = 'agent-work/loops/ohmdal-arco1-authored-pass/state.json';
+let activeTask = 'agent-work/tasks/orchestrator/ohmdal-authored-mavis.md';
 try {
   const config = JSON.parse(await readFile(configPath, 'utf8'));
   if (Number.isFinite(config.pollMinutes) && config.pollMinutes > 0) {
     pollMinutes = config.pollMinutes;
   }
+  if (typeof config.activeLoop === 'string' && config.activeLoop.trim()) {
+    activeLoop = config.activeLoop.trim();
+  }
+  if (typeof config.activeTask === 'string' && config.activeTask.trim()) {
+    activeTask = config.activeTask.trim();
+  }
 } catch {
   // Keep the daemon usable even if config parsing temporarily fails.
 }
+
+const loopPath = path.join(root, activeLoop);
 
 const agyArgs = [
   '--input-format', 'stream-json',
   '--output-format', 'stream-json',
   '--agent', 'mavis',
-  '--model', 'gemini-3.7-flash-medium',
+  '--model', 'gemini-3.8-flash-medium',
   '--effort', 'medium',
   '--print-timeout', '30m',
 ];
@@ -40,12 +49,14 @@ if (!safeMode) {
 }
 
 console.warn(`[MAVIS] RESILIENT CONTROL DAEMON enabled. Worker poll interval: ${pollMinutes} minute(s).`);
+console.warn(`[MAVIS] Active task: ${activeTask}`);
+console.warn(`[MAVIS] Active loop: ${activeLoop}`);
 console.warn('[MAVIS] Each control tick gets a fresh Antigravity process; repo state is the durable memory.');
 console.warn('[MAVIS] Ctrl+C stops the daemon. An Antigravity crash/error only restarts the next tick.');
 
 const bootstrapPrompt = `
 You are Mavis, the operational orchestrator for Proyecto Roxana.
-Execute agent-work/tasks/orchestrator/ohmdal-authored-mavis.md and use the repository as the durable source of truth.
+Execute ${activeTask} and use the repository as the durable source of truth.
 
 You are running inside a resilient control daemon. This Antigravity process is only ONE control tick and may be replaced by a fresh process on the next tick. Persist meaningful state in Git/reports/loop state, not conversational memory.
 
@@ -72,7 +83,7 @@ const followupPrompt = `
 AUTONOMOUS MAVIS CONTROL TICK.
 This is a fresh Antigravity process. Reconstruct state from the repository; do not depend on prior conversational memory.
 
-Run npm run orchestrator:status and continue agent-work/tasks/orchestrator/ohmdal-authored-mavis.md from the current canonical state.
+Run npm run orchestrator:status and continue ${activeTask} from the current canonical state.
 
 Do not merely report an immediately executable next action: execute it now. Dispatch workers/reviewers, run gates, integrate mechanical PASS candidates, advance state and push when repo governance allows it. Do not duplicate active workers. Stop only for a real HUMAN_GATE or loop COMPLETE.
 
@@ -171,9 +182,6 @@ async function decideAfterTick({ response, resultStatus, exitCode, signal, launc
     return;
   }
 
-  // The Antigravity CLI has occasionally returned code 1 after emitting a useful
-  // result. Treat process failure as recoverable transport failure, never as a
-  // reason to kill the Mavis daemon. If we got a valid marker, trust the marker.
   if (marker === 'WAITING') {
     scheduleNext(pollMinutes * 60_000, 'waiting for worker/evidence');
     return;
@@ -188,7 +196,6 @@ async function decideAfterTick({ response, resultStatus, exitCode, signal, launc
     return;
   }
 
-  // Fail-safe: missing marker must not silently stop the factory.
   scheduleNext(10_000, 'missing tick marker; fail-safe continuation');
 }
 
@@ -289,8 +296,6 @@ async function runTick(firstTick) {
 
   const prompt = firstTick ? bootstrapPrompt : followupPrompt;
   child.stdin.write(`${JSON.stringify({ event: 'user', message: { content: prompt } })}\n`);
-  // One prompt per Antigravity process. Closing stdin makes the CLI finish this
-  // tick and exit; the daemon then starts a clean process for the next tick.
   child.stdin.end();
 }
 

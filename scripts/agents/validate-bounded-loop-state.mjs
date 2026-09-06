@@ -52,13 +52,22 @@ if (!Number.isInteger(state.iteration) || state.iteration < 0 || state.iteration
 
 const reviewer = state.routing?.reviewer;
 if (!reviewer) fail('routing.reviewer is required');
-if (reviewer.harness !== 'antigravity-cli') fail('reviewer harness must be antigravity-cli');
 const reviewerModel = String(reviewer.model || '').toLowerCase();
-if (!reviewerModel.includes('gemini') || !reviewerModel.includes('flash')) {
-  fail('automatic reviewer must remain in Gemini Flash family');
+const geminiReviewer = reviewer.harness === 'antigravity-cli'
+  && reviewerModel.includes('gemini')
+  && reviewerModel.includes('flash');
+const codexLunaReviewer = reviewer.harness === 'codex'
+  && reviewer.modelAlias === 'Luna'
+  && reviewerModel.includes('luna')
+  && ['low', 'medium', 'high', 'max'].includes(String(reviewer.effort || '').toLowerCase());
+if (!geminiReviewer && !codexLunaReviewer) {
+  fail('automatic reviewer must be Gemini Flash/Antigravity or Codex Luna');
 }
-if (!String(reviewer.fallback || '').toLowerCase().includes('flash')) {
-  fail('reviewer fallback must remain Flash-family only');
+if (geminiReviewer && !String(reviewer.fallback || '').toLowerCase().includes('flash')) {
+  fail('Gemini reviewer fallback must remain Flash-family only');
+}
+if (codexLunaReviewer && reviewer.freshSessionRequired !== true) {
+  fail('Codex Luna reviewer must require a fresh independent session');
 }
 
 // Legacy loops used Codex/Sol as decision authority. New loops may use ChatGPT
@@ -80,9 +89,17 @@ if (authority) {
 
 const builder = state.routing?.builder;
 if (builder) {
-  if (builder.harness !== 'antigravity-cli') fail('builder harness must be antigravity-cli when present');
   const model = String(builder.model || '').toLowerCase();
-  if (!model.includes('gemini')) fail('builder must be Gemini family when present');
+  const geminiBuilder = builder.harness === 'antigravity-cli' && model.includes('gemini');
+  const minimaxBuilder = builder.harness === 'opencode-cli'
+    && model.includes('minimax')
+    && builder.mode === 'isolated-worktree-write';
+  const codexLunaBuilder = builder.harness === 'codex'
+    && builder.modelAlias === 'Luna'
+    && model.includes('luna');
+  if (!geminiBuilder && !minimaxBuilder && !codexLunaBuilder) {
+    fail('builder must be Gemini/Antigravity, MiniMax/OpenCode isolated worktree, or Codex Luna');
+  }
   if (builder.selfApproval !== false) fail('builder selfApproval must be false');
 }
 

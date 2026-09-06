@@ -6,22 +6,22 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Edda',
-        text: '¡Por fin cruzaste el portal! Bienvenida a la Plaza Central de Ohmdal.',
+        text: '¡Alguien cruzó el portal! ¡Desde que nací no vi cruzarlo a nadie, a nadie!',
         emotion: 'eureka',
       },
       {
         who: 'Estudiante',
-        text: 'Hola, Edda. El portal del Instituto vibraba con fuerza... pero aquí todo parece en silencio.',
+        text: 'Eh... hola. El portal del Instituto vibraba con fuerza... pero aquí todo parece en silencio.',
         emotion: 'curious',
       },
       {
         who: 'Edda',
-        text: 'Así es. Desde hace cuarenta años la red está dormida. Mira el pedestal en el centro de la plaza: allí descansa Ohm, la antigua reliquia de medición.',
-        emotion: 'neutral',
+        text: '¡Sabía que los sahumerios estaban funcionando! Mira el pedestal en el centro de la plaza: allí descansa Ohm, la antigua reliquia de medición.',
+        emotion: 'eureka',
       },
       {
         who: 'Edda',
-        text: 'Nadie ha logrado reactivarlo. La gente del pueblo dice que hace falta rezarle al Espíritu del Rayo... pero yo creo que es un problema físico. Acércate y examínalo.',
+        text: 'Lleva años dormido. La gente del pueblo dice que hace falta rezarle al Espíritu del Rayo... pero yo sospecho que es algo físico. Acércate e investigá qué le pasa.',
         emotion: 'curious',
       },
     ],

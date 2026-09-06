@@ -8,6 +8,7 @@ import { WorkbenchInspector } from '../ohmdal-plaza/inspect/workbench.ts';
 import { DIALOGUE_DATABASE } from '../ohmdal-plaza/story/dialogueData.ts';
 import type { CircuitState, DialogueLine, DialogueNode, ToolMode } from '../ohmdal-plaza/types.ts';
 import type { PlazaUi, PlazaHandle } from '../ohmdal-plaza/plazaRuntime.ts';
+import { announceCinematic } from '../../jugar/cinematics.ts';
 import {
   OHMDAL_VISUAL_CAMERA_PRESETS,
   isSoftwareRenderer,
@@ -171,6 +172,36 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let visualCaptureShot: OhmdalVisualCaptureShotName | null = null;
   let visualPaused = false;
   let reducedMotion = false;
+
+  // Arrival Cinematic State & Persistence
+  const INTRO_SEEN_KEY = 'ohmdal_intro_seen';
+  function isIntroSeen(): boolean {
+    try {
+      return localStorage.getItem(INTRO_SEEN_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  }
+  function markIntroSeen(): void {
+    try {
+      localStorage.setItem(INTRO_SEEN_KEY, 'true');
+    } catch {}
+  }
+
+  let isCinematicActive = false;
+  let cinematicTime = 0;
+  let lastCinematicTimestamp = performance.now();
+  const CINEMATIC_DURATION = 2.4;
+
+  function finishArrivalCinematic(): void {
+    if (!isCinematicActive) return;
+    isCinematicActive = false;
+    markIntroSeen();
+    ui.setCinematicOverlay?.(false);
+    spawnAtAnchor(OHMDAL_TRANSITION_ANCHORS['portal-to-plaza'].anchor);
+    startDialogue('intro_portal_edda');
+  }
+
   const manantialActivationVfx = createManantialActivationVfx({
     generatorLight: world.manantialGeneratorLight,
     activationTrace: world.manantialActivationTrace,
@@ -199,7 +230,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
   // Mouse Look
   const onMouseMove = (e: MouseEvent) => {
-    if (!isPointerLocked) return;
+    if (!isPointerLocked || isCinematicActive) return;
     yaw -= e.movementX * 0.15;
     pitch -= e.movementY * 0.15;
     pitch = Math.max(-80, Math.min(80, pitch));
@@ -218,6 +249,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   // Key Handlers
   const onKeyDown = (e: KeyboardEvent) => {
     const k = e.key.toLowerCase();
+    if (isCinematicActive) {
+      if (k === ' ' || k === 'enter' || k === 'e' || k === 'f' || k === 'escape') {
+        e.preventDefault();
+        finishArrivalCinematic();
+        return;
+      }
+    }
     if (k === 'w' || k === 'arrowup') keys.w = true;
     if (k === 's' || k === 'arrowdown') keys.s = true;
     if (k === 'a' || k === 'arrowleft') keys.a = true;
@@ -275,6 +313,10 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   spawnAtAnchor(OHMDAL_TRANSITION_ANCHORS['portal-to-plaza'].anchor);
 
   function closeVisualOverlays(): void {
+    if (isCinematicActive) {
+      isCinematicActive = false;
+      ui.setCinematicOverlay?.(false);
+    }
     activeDialogueNode = null;
     activeDialogueLineIndex = 0;
     currentMode = 'explore';
@@ -562,6 +604,9 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     },
     setReducedMotion(enabled) {
       reducedMotion = enabled;
+      if (enabled && isCinematicActive) {
+        finishArrivalCinematic();
+      }
     },
     hideDebugUi(hidden) {
       debugUiHidden = hidden;
@@ -1199,8 +1244,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       list.push({
         id: 'edda_npc',
         label: isOhmAwake ? 'Hablar con Edda sobre el taller' : 'Hablar con Edda (Estudiosa)',
-        pos: new pc.Vec3(1.8, 1.0, -8.0),
-        radius: 3.2,
+        pos: world.eddaEntity.getPosition(),
+        radius: 2.0,
         action: () => {
           if (!isOhmAwake) {
             startDialogue('intro_portal_edda');
@@ -1318,7 +1363,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       list.push({
         id: 'moho_oxido',
         label: hasBrushItem ? 'Limpiar el Moho Verde con el Cepillo' : 'Examinar el Contacto Sulfatado',
-        pos: new pc.Vec3(-0.9, 0.4, -4.0),
+        pos: new pc.Vec3(-2.2, 0.4, -4.4),
         radius: 2.8,
         action: () => {
           if (hasBrushItem) {
@@ -1525,6 +1570,11 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   }
 
   function triggerInteraction(): void {
+    if (isCinematicActive) {
+      finishArrivalCinematic();
+      return;
+    }
+
     if (activeDialogueNode) {
       advanceDialogue();
       return;
@@ -1532,13 +1582,20 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
     const camPos = world.playerEntity.getPosition();
 
-    // 1. Check proximity interactables first (Ohm pedestal, NPCs, doors)
+    // 1. Check proximity interactables first (find closest within radius)
     const currentInteractables = getActiveInteractables();
+    let bestItem: typeof currentInteractables[0] | null = null;
+    let minItemDist = Number.POSITIVE_INFINITY;
     for (const item of currentInteractables) {
-      if (camPos.distance(item.pos) <= item.radius) {
-        item.action();
-        return;
+      const d = camPos.distance(item.pos);
+      if (d <= item.radius && d < minItemDist) {
+        minItemDist = d;
+        bestItem = item;
       }
+    }
+    if (bestItem) {
+      bestItem.action();
+      return;
     }
 
     // 2. Check probe targets if Galvanoscope tool is equipped or near terminals
@@ -1575,6 +1632,10 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   }
 
   canvas.addEventListener('click', () => {
+    if (isCinematicActive) {
+      finishArrivalCinematic();
+      return;
+    }
     if (!isPointerLocked && !activeDialogueNode && currentMode === 'explore') {
       canvas.requestPointerLock?.();
     } else {
@@ -1595,6 +1656,42 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     if (frameMs > 0 && Number.isFinite(frameMs)) {
       frameTimeSamples.push(frameMs);
       if (frameTimeSamples.length > 240) frameTimeSamples.shift();
+    }
+
+    // 0. Arrival Cinematic Camera Progression
+    if (isCinematicActive && !visualPaused) {
+      const now = performance.now();
+      const wallDt = Math.max(0, (now - lastCinematicTimestamp) / 1000);
+      lastCinematicTimestamp = now;
+      cinematicTime += Math.max(dt, Math.min(0.5, wallDt));
+
+      if (cinematicTime >= CINEMATIC_DURATION) {
+        finishArrivalCinematic();
+      } else {
+        if (cinematicTime < 0.7) {
+          const t = Math.min(1, cinematicTime / 0.7);
+          const ease = t * t * (3 - 2 * t);
+          playerPos.set(0, 1.8 + ease * 0.3, -7.2 + ease * 0.4);
+          yaw = 0; // facing north toward portal
+          pitch = 4 - ease * 4;
+        } else if (cinematicTime < 1.7) {
+          const t = Math.min(1, (cinematicTime - 0.7) / 1.0);
+          const ease = t * t * (3 - 2 * t);
+          playerPos.set(Math.sin(ease * Math.PI) * 0.5, 2.0 + Math.sin(ease * Math.PI) * 0.3, -6.8 - ease * 1.2);
+          yaw = ease * 180; // smoothly rotate south
+          pitch = Math.sin(ease * Math.PI) * 6;
+        } else {
+          const t = Math.min(1, (cinematicTime - 1.7) / 0.7);
+          playerPos.set(0, 1.68, -8.0);
+          yaw = 180;
+          pitch = 0;
+          world.eddaEntity.setLocalEulerAngles(0, -156 + Math.sin(t * Math.PI * 2) * 5, 0);
+        }
+        world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
+        world.playerEntity.setEulerAngles(0, yaw, 0);
+        world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+      }
+      return;
     }
 
     // 1. Movement
@@ -1671,11 +1768,17 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     let prompt: string | null = null;
     if (currentMode === 'explore' && !activeDialogueNode) {
       const currentInteractables = getActiveInteractables();
+      let bestItem: typeof currentInteractables[0] | null = null;
+      let minItemDist = Number.POSITIVE_INFINITY;
       for (const item of currentInteractables) {
-        if (camPos.distance(item.pos) <= item.radius) {
-          prompt = `[E] ${item.label}`;
-          break;
+        const d = camPos.distance(item.pos);
+        if (d <= item.radius && d < minItemDist) {
+          minItemDist = d;
+          bestItem = item;
         }
+      }
+      if (bestItem) {
+        prompt = `[E] ${bestItem.label}`;
       }
       if (!prompt && isToolEquipped) {
         for (const [nodeId, pos] of Object.entries(world.probeTargets)) {
@@ -1689,10 +1792,19 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     ui.setPrompt(prompt);
   });
 
-  // Start with portal arrival dialogue
-  setTimeout(() => {
-    startDialogue('intro_portal_edda');
-  }, 400);
+  // Start with portal arrival cinematic (first entry) or direct dialogue
+  if (!isIntroSeen()) {
+    isCinematicActive = true;
+    cinematicTime = 0;
+    announceCinematic('portal-arrival');
+    ui.setCinematicOverlay?.(true);
+  } else {
+    isCinematicActive = false;
+    ui.setCinematicOverlay?.(false);
+    setTimeout(() => {
+      startDialogue('intro_portal_edda');
+    }, 350);
+  }
 
   return {
     press(key: string) {

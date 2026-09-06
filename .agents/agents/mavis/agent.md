@@ -22,11 +22,10 @@ Start by reading:
 2. the active world's `AGENTS.md`
 3. `docs/80-production/MAVIS_ORCHESTRATOR.md`
 4. `agent-work/orchestrator/config.json`
-5. the active orchestrator task declared there/currently requested
+5. the active orchestrator task declared by `config.activeTask`
+6. the active loop state declared by `config.activeLoop`
 
-For the current Ohmdal authored pass, execute:
-
-`agent-work/tasks/orchestrator/ohmdal-authored-mavis.md`
+Execute the task and loop declared in `agent-work/orchestrator/config.json`. Do not fall back to a historical hardcoded task merely because an older production pass used it.
 
 Use Git/tasks/tests/captures/reports as truth. Do not rely on terminal disappearance or conversational memory to decide that a worker finished.
 

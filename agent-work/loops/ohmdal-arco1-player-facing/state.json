@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "loopId": "ohmdal-arco1-player-facing",
+  "branch": "fix/ohmdal-arco1-player-facing-bseries",
+  "status": "ready",
+  "currentStage": "b2-ohm-continuity-puzzle",
+  "iteration": 0,
+  "maxIterationsPerStage": 3,
+  "maxFixesPerIteration": 5,
+  "maxStructuralFixesPerIteration": 1,
+  "maxConcurrentLunaWorkers": 1,
+  "maxConcurrentMiniMaxWorkers": 1,
+  "routing": {
+    "authority": {
+      "harness": "chatgpt-web",
+      "modelAlias": "Sol",
+      "model": "GPT-5.6 Sol",
+      "role": "technical-design-authority-and-material-decisions"
+    },
+    "orchestrator": {
+      "name": "Mavis",
+      "harness": "codex",
+      "modelAlias": "Luna",
+      "model": "gpt-5.6-luna",
+      "effort": "low",
+      "task": "agent-work/tasks/orchestrator/ohmdal-player-facing-mavis.md",
+      "config": "agent-work/orchestrator/config.json",
+      "role": "monitor-dispatch-independent-review-gates-mechanical-integration",
+      "materialAuthority": false
+    },
+    "builder": {
+      "harness": "antigravity-cli",
+      "provider": "Google Antigravity",
+      "model": "gemini-3.8-flash-high",
+      "mode": "isolated-worktree-write",
+      "selfApproval": false,
+      "fallback": "Codex Luna low in isolated worktree; MiniMax M3 only manual/explicit fallback"
+    },
+    "reviewer": {
+      "harness": "codex",
+      "modelAlias": "Luna",
+      "model": "gpt-5.6-luna",
+      "effort": "medium",
+      "mode": "read-only",
+      "freshSessionRequired": true,
+      "fallback": "Gemini 3.8 Flash High when Luna built the candidate; Codex Terra medium for final B6 if needed"
+    },
+    "decision": {
+      "harness": "chatgpt-web",
+      "modelAlias": "Sol",
+      "effort": "high",
+      "condition": "material-ambiguity-or-contract-change"
+    },
+    "mechanicalWorker": {
+      "harness": "codex",
+      "modelAlias": "Luna",
+      "effort": "max",
+      "fallback": "Terra-then-report"
+    },
+    "breakGlass": {
+      "harness": "codex",
+      "modelAlias": "Sol",
+      "effort": "high",
+      "condition": "strong-local-tool-reasoning-demonstrably-required"
+    }
+  },
+  "limits": {
+    "allowPaidGenerativeWithoutHumanGate": false,
+    "allowEngineChange": false,
+    "allowCanonChange": false,
+    "allowLargeDependencyChange": false,
+    "allowNewAgentFramework": false
+  },
+  "baseline": {
+    "aSeriesMerge": "fcc49441c9bb403a0c51d68c78638ee7215f2c52",
+    "aSeriesHead": "795d0e516e6ab460f2d6f109b6062470d5d6c303",
+    "designContract": "docs/20-worlds/ohmdal/production/ARCO1_PLAYER_FACING_CORRECTION_PASS.md"
+  },
+  "queue": [
+    { "id": "b0-first-minutes-audit", "status": "passed" },
+    { "id": "b1-portal-edda-dialogue-hud", "status": "passed" },
+    { "id": "b2-ohm-continuity-puzzle", "status": "ready" },
+    { "id": "b3-dialogue-pedagogy-rewrite", "status": "queued" },
+    { "id": "b4-orientation-pointer-lock", "status": "queued" },
+    { "id": "b5-mobile-landscape-touch", "status": "queued" },
+    { "id": "b6-first-minutes-golden-path", "status": "queued" }
+  ],
+  "lastReviewReport": "agent-work/reports/gemini/ohmdal-arco1-player-facing-b1-review.md",
+  "lastCaptureManifest": null,
+  "humanGate": null,
+  "notes": [
+    "This loop is a player-facing correction pass over the merged A0-A8 baseline; do not reopen room topology or authored regional scope.",
+    "Teaching rule: phenomenon -> interaction -> consequence -> name -> later reuse.",
+    "Edda must be visibly staged before first dialogue and preserve the superstition/incense comic core.",
+    "The student is curious/non-expert; remove premature exam-like technical answers.",
+    "Ohm awakening requires a physical ZoomIn continuity/cable puzzle; it cannot be bypassed by plain interaction.",
+    "Dialogue HUD must use NPC portraits and support click/tap on the dialogue box to advance.",
+    "West references require a restrained compass/orientation affordance.",
+    "Normal desktop dialogue completion must restore camera control without an extra meaningless click; explicit Escape/menu unlock remains respected.",
+    "Mobile/touch is first-class and landscape-first with progressive orientation lock plus rotate-device fallback.",
+    "Bounded copy polish inside the approved dialogue intent is authorized and is not a HUMAN_GATE.",
+    "B6 requires human-style first-minutes Golden Path evidence on desktop and touch/mobile, not only build/unit checks.",
+    "Routing refreshed 2026-09-03 after successful local smoke test of gemini-3.8-flash-high. Mavis remains Codex Luna low; Gemini 3.8 Flash High is primary builder; Luna is fallback; MiniMax no longer blocks automatic ticks."
+  ]
+}
