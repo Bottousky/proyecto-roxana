@@ -16,7 +16,8 @@ Validation:
 - `npm run build`: PASS after CSS cleanup. Vite still reports the pre-existing Havok wasm resolution warning and large-chunk warnings; no CSS syntax warning remains.
 - `npm test`: PASS; all discovered suites passed, 0 failures.
 - `git diff --check`: PASS.
-- `npm run playtest:ohmdal-golden-path`: FAIL/UNRESOLVED due local runner timeout (185s). The browser reached `portal` and `ohm-awakened` checkpoints with `ohmAwake: true`, `storyStep: invited_to_workshop`, no page errors; the run remained `RUNNING` while movement continued under SwiftShader software rendering (~1 FPS). No full Golden Path PASS claim is made.
+- `npm run playtest:ohmdal-golden-path`: FAIL/UNRESOLVED due local runner timeout (245s command limit). No full Golden Path PASS claim is made; the runner remains unsuitable for a complete browser acceptance claim in this environment (SwiftShader/software-rendering limitation observed in the prior candidate run).
+- `git diff --check`: PASS.
 
 Acceptance boundary:
 This is an implementation candidate only. Golden Path browser evidence remains unresolved in this environment; no stage state was advanced and no self-approval was performed.
