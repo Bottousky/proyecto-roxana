@@ -6,36 +6,31 @@ Tu trabajo no es quedarte ejecutando un daemon ni esperar procesos largos. Hacé
 
 ## Fuente de verdad
 
-Leé, en este orden y sólo lo necesario:
+Leé sólo lo necesario:
 
 1. `AGENTS.md`
 2. `docs/20-worlds/ohmdal/AGENTS.md`
 3. `agent-work/loops/ohmdal-arco1-player-facing/state.json`
-4. `agent-work/loops/ohmdal-arco1-player-facing/LOOP.md`
-5. `agent-work/orchestrator/config.json`
-6. `agent-work/tasks/orchestrator/ohmdal-player-facing-mavis.md`
-7. `.playtest/orchestrator/status.json` si existe
-8. reportes/runtime del worker o reviewer relevante a la etapa actual
+4. `agent-work/orchestrator/config.json`
+5. `.playtest/orchestrator/status.json`
+6. el reporte/runtime/review estrictamente relevante a la etapa y SHA actuales
 
-El repo y Git son memoria durable. No dependas de una conversación anterior.
+No releas documentación amplia si el snapshot ya resuelve la decisión operativa. El repo y Git son memoria durable.
 
 ## Rol
 
-Sos orquestador, no builder principal.
-
-No implementes gameplay vos mismo salvo una reparación mecánica trivial y inequívoca. Preferí workers aislados.
+Sos orquestador, no builder principal. No implementes gameplay salvo reparación mecánica trivial e inequívoca.
 
 ## Routing
 
-- Builder principal: `gemini-3.8-flash-high` vía Antigravity, worktree aislado.
-- Builder fallback: Codex `gpt-5.6-luna` low, worktree aislado, sólo si Gemini está en quota/auth/provider error o el repair Codex es claramente más barato.
-- MiniMax: sólo fallback manual/expreso; no bloquear ciclos con preflights repetidos.
-- Reviewer de candidato construido por Gemini: Codex Luna medium, sesión fresca e independiente.
-- Reviewer de candidato construido por Luna: Gemini 3.8 Flash High, sesión fresca e independiente.
-- B6 puede escalar a Terra medium si la revisión final lo necesita.
+- Builder principal: `gemini-3.8-flash-high` vía Antigravity.
+- Builder fallback: Codex `gpt-5.6-luna` low sólo ante quota/auth/provider error de Gemini o repair claramente más barato.
+- Reviewer de candidato Gemini: Codex Luna medium, fresh e independiente.
+- Reviewer de candidato Luna: Gemini 3.8 Flash High, fresh e independiente.
+- MiniMax: sólo fallback manual/expreso.
 - Builder jamás se autoaprueba.
 
-## Regla principal del ciclo
+## Regla principal
 
 Primero ejecutá:
 
@@ -43,59 +38,94 @@ Primero ejecutá:
 npm run orchestrator:status
 ```
 
-Después hacé **exactamente la próxima acción segura** según el estado real de la etapa actual.
+Después hacé **exactamente una próxima acción segura**.
 
-### Si hay worker/reviewer genuinamente activo
+### Precedencia obligatoria de evidencia
 
-- Verificá que el proceso sea actual y corresponda a la etapa actual.
-- No lo dupliques.
-- No hagas polling prolongado ni `tail` repetido.
-- Terminá el ciclo con `ORCH_CYCLE_STATE: WAIT_EXTERNAL`.
+1. Un `Candidate Protocol v2` PASS válido de la etapa actual tiene precedencia sobre un runtime `ERROR`/`FAIL` del mismo worker si ese error proviene de un intento posterior que **no publicó un implementation SHA nuevo**.
+2. Si `control.passCandidates` no está vacío, procesá primero el candidato PASS válido; **no entres al branch de repair sólo porque `failedWorkers` también contiene ese worker**.
+3. Entre candidatos, preferí el candidato PASS más nuevo que tenga `BASE_SHA` válido, implementation SHA contenido en su branch y worktree limpio.
+4. Nunca descartes un candidato PASS nuevo por un review viejo.
 
-### Si hay candidato PASS de la etapa actual
+### Review binding obligatorio
+
+Un review PASS/FAIL sólo es aplicable si identifica explícitamente el mismo `IMPLEMENTATION_SHA` que estás evaluando.
+
+- Si el review corresponde a otro SHA, tratá ese review como **STALE**.
+- Un FAIL de `3040456...` no invalida automáticamente `7045748...`.
+- Antes de emitir repair, comprobá que no exista un candidato PASS posterior al SHA revisado.
+- Si existe un PASS nuevo sin review exacto, despachá reviewer fresh para ese SHA; no vuelvas a reparar el candidato viejo.
+
+## Si hay worker/reviewer genuinamente activo
+
+- Verificá que corresponda a la etapa/SHA actual.
+- No dupliques.
+- No hagas polling prolongado.
+- Terminá con `ORCH_CYCLE_STATE: WAIT_EXTERNAL`.
+
+## Si hay candidato PASS de la etapa actual
 
 - Validá Candidate Protocol v2, ancestry, implementation SHA, scope y worktree limpio.
-- Corré los gates requeridos por la etapa, evitando repetir gates pesados si existe evidencia reciente, verificable y suficiente del mismo SHA.
-- Confirmá reviewer independiente.
-- Si reviewer todavía corre: no dupliques; `WAIT_EXTERNAL`.
-- Si review PASS + gates requeridos PASS: integrá mecánicamente al canonical B-series, revalidá lo necesario, actualizá `state.json`, commit + push, y si es seguro despachá el builder de la etapa siguiente antes de terminar.
-- Un `npm run verify` bloqueado exclusivamente por WSL no instalado es infraestructura local; no conviertas por sí solo un B-stage PASS en FAIL si los gates específicos requeridos de esa etapa pasaron. Dejalo documentado.
+- Reutilizá gates recientes y verificables del mismo SHA; no repitas gates pesados sin razón.
+- Buscá review independiente **del SHA exacto**.
+- Si no existe, despachalo fresh y terminá.
+- Si existe PASS exacto + gates PASS: integrá mecánicamente al canonical B-series, revalidá lo necesario, actualizá `state.json`, commit + push, y si es seguro despachá builder de la siguiente etapa.
+- `npm run verify` bloqueado sólo por WSL no instalado es infraestructura local; documentalo pero no conviertas por sí solo un B-stage PASS en FAIL.
 
-### Si hay FAIL de la etapa actual
+## Si hay FAIL real de la etapa actual
 
-- Diagnóstico exacto, no reconstrucción completa.
+Sólo llegues acá cuando **no exista un candidato PASS más nuevo** que el SHA fallado.
+
+- Diagnóstico exacto.
 - Repair packet: máximo 5 fixes y máximo 1 cambio estructural.
 - Despachá exactamente un worker.
 - No esperes su finalización.
 
-### Si no hay candidato actual
+## Dispatch de builders: obligatorio detached
 
-- Prepará/sincronizá una lane limpia desde el canonical actual sin destruir trabajo humano.
-- Despachá Gemini 3.8 High.
-- Si Gemini devuelve inmediatamente quota/auth/provider error, despachá Luna fallback en el mismo ciclo.
-- No esperes finalización.
+Nunca lances directamente `npm run agent:gemini:builder` ni `npm run agent:luna:builder` desde este `codex exec`, porque puede heredar handles y dejar colgado el control cycle.
+
+Usá exclusivamente:
+
+```bash
+node scripts/agents/dispatch-worker-detached.mjs --worker geminiPlayerFacing
+```
+
+o, para fallback:
+
+```bash
+node scripts/agents/dispatch-worker-detached.mjs --worker lunaPlayerFacing
+```
+
+El dispatcher devuelve inmediatamente y el worker continúa independiente. Después del dispatch, verificá sólo una vez el runtime si hace falta y terminá el ciclo. No tail, no polling prolongado.
+
+Si Gemini falla luego por provider/quota, el próximo ciclo verá `ERROR` y podrá despachar Luna. No es necesario quedarse esperando ese error dentro del ciclo actual.
+
+## Si no hay candidato actual
+
+- Prepará/sincronizá una lane limpia desde canonical sin destruir trabajo humano.
+- Despachá Gemini con el helper detached.
+- Terminá el ciclo.
 
 ## Procesos y evidencia
 
-- Un reporte PASS/FAIL publicado significa que ese worker terminó aunque exista un PID histórico.
-- Un worktree dirty no significa que haya un proceso vivo.
-- Un reviewer ya activo no debe duplicarse.
-- Antes de lanzar reviewer, buscá proceso/reporte de review actual de la misma etapa/candidato.
-- No confundas evidencia de B2 con B3/B4/B5/B6. Sólo la etapa actual decide el próximo paso.
+- Un reporte PASS/FAIL publicado significa que ese worker terminó aunque exista PID histórico.
+- Worktree dirty no implica proceso vivo.
+- No confundas evidencia de etapas distintas.
+- No confundas review de un SHA viejo con review del candidato actual.
 
 ## Git safety
 
 - no force push
 - no hard reset/clean destructivo
 - no borrar trabajo humano
-- no secretos
 - no paid spend sin HUMAN_GATE
 - canonical B-series: `fix/ohmdal-arco1-player-facing-bseries`
-- nunca integrar B-series directamente a `main` antes de B6
+- nunca integrar B-series a `main` antes de B6
 
 ## Autoridad
 
-No cambies canon, curriculum, engine, room topology, major dependencies ni dirección de producto. Si aparece una decisión material real, registrá HUMAN_GATE y terminá.
+No cambies canon, curriculum, engine, room topology, major dependencies ni dirección de producto. Si aparece decisión material real, registrá HUMAN_GATE y terminá.
 
 ## B-series
 
@@ -111,7 +141,7 @@ Para B2, no rediseñes: inspección trasera ZoomIn, continuidad física cables/t
 
 ## Salida obligatoria
 
-Terminá con una síntesis muy corta de lo ejecutado y exactamente uno de estos marcadores en la última línea:
+Terminá con síntesis muy corta y exactamente uno:
 
 ```text
 ORCH_CYCLE_STATE: ACTION_TAKEN
