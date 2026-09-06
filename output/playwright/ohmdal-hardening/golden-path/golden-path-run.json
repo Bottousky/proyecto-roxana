@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "route": "/ohmdal-playcanvas",
-  "startedAt": "2026-09-05T23:43:30.537Z",
-  "baseUrl": "http://127.0.0.1:53782",
+  "startedAt": "2026-09-05T23:58:03.743Z",
+  "baseUrl": "http://127.0.0.1:60921",
   "browser": "chromium 152.0.7977.82",
   "checkpoints": [
     {
       "id": "portal",
-      "at": "2026-09-05T23:43:41.415Z",
+      "at": "2026-09-05T23:58:12.110Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\portal.png",
       "snapshot": {
         "storyStep": "portal_arrived",
@@ -230,8 +230,8 @@
         },
         "performance": {
           "fpsP50": 59.88023952095874,
-          "fpsP10": 58.8235294117647,
-          "frameTimeMsP95": 266.90000000000055,
+          "fpsP10": 59.17159763313737,
+          "frameTimeMsP95": 300.10000000000036,
           "note": null
         },
         "render": {
@@ -242,7 +242,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 23.641775131225586,
+          "transferredMb": 23.641786575317383,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -661,15 +661,15 @@
     },
     {
       "id": "ohm-awakened",
-      "at": "2026-09-05T23:43:46.311Z",
+      "at": "2026-09-05T23:58:16.763Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\ohm-awakened.png",
       "snapshot": {
         "storyStep": "invited_to_workshop",
         "mode": "explore",
         "position": [
-          -5.192894315360493e-16,
+          -5.194657806751266e-16,
           1.68,
-          -3.7596800000000092
+          -3.7582400000000105
         ],
         "yaw": 180,
         "ohmAwake": true,
@@ -891,7 +891,7 @@
     },
     {
       "id": "inside-workshop",
-      "at": "2026-09-05T23:43:48.253Z",
+      "at": "2026-09-05T23:58:18.689Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\inside-workshop.png",
       "snapshot": {
         "storyStep": "inside_workshop",
@@ -1128,7 +1128,7 @@
         "performance": {
           "fpsP50": 59.880239520962,
           "fpsP10": 59.52380952380566,
-          "frameTimeMsP95": 16.899999999999636,
+          "frameTimeMsP95": 16.80000000000109,
           "note": null
         },
         "render": {
@@ -1139,7 +1139,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 25.56711769104004,
+          "transferredMb": 25.567129135131836,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -1485,15 +1485,15 @@
     },
     {
       "id": "tools-received",
-      "at": "2026-09-05T23:43:55.473Z",
+      "at": "2026-09-05T23:58:21.988Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\tools-received.png",
       "snapshot": {
         "storyStep": "tools_received",
         "mode": "explore",
         "position": [
-          -62.72208000000004,
+          -62.72064000000001,
           1.68,
-          -0.1975999999999819
+          0.04191999999998945
         ],
         "yaw": 180,
         "ohmAwake": true,
@@ -1716,7 +1716,7 @@
     },
     {
       "id": "returned-to-plaza",
-      "at": "2026-09-05T23:43:57.276Z",
+      "at": "2026-09-05T23:58:23.944Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\returned-to-plaza.png",
       "snapshot": {
         "storyStep": "returned_to_plaza",
@@ -1947,15 +1947,15 @@
     },
     {
       "id": "galvanoscope-measurement",
-      "at": "2026-09-05T23:44:03.617Z",
+      "at": "2026-09-05T23:58:30.229Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\galvanoscope-measurement.png",
       "snapshot": {
         "storyStep": "returned_to_plaza",
         "mode": "explore",
         "position": [
-          -1.9995199999999869,
+          -1.8382399999999959,
           1.68,
-          5.683999999999964
+          5.59904000000003
         ],
         "yaw": 270,
         "ohmAwake": true,
@@ -2178,15 +2178,15 @@
     },
     {
       "id": "corrosion-cleaned",
-      "at": "2026-09-05T23:44:07.122Z",
+      "at": "2026-09-05T23:58:33.790Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\corrosion-cleaned.png",
       "snapshot": {
         "storyStep": "returned_to_plaza",
         "mode": "explore",
         "position": [
-          -2.9595199999999693,
+          -3.2801599999999853,
           1.68,
-          -4.15264000000003
+          -4.08303999999998
         ],
         "yaw": 270,
         "ohmAwake": true,
@@ -2409,15 +2409,15 @@
     },
     {
       "id": "jumper-installed",
-      "at": "2026-09-05T23:44:10.261Z",
+      "at": "2026-09-05T23:58:36.887Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\jumper-installed.png",
       "snapshot": {
         "storyStep": "returned_to_plaza",
         "mode": "explore",
         "position": [
-          -0.9593599999999823,
+          -1.2809599999999843,
           1.68,
-          3.2873599999999703
+          3.3608000000000353
         ],
         "yaw": 270,
         "ohmAwake": true,
@@ -2640,15 +2640,15 @@
     },
     {
       "id": "after-gate-open",
-      "at": "2026-09-05T23:44:12.997Z",
+      "at": "2026-09-05T23:58:39.661Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\after-gate-open.png",
       "snapshot": {
         "storyStep": "gate_opened",
         "mode": "explore",
         "position": [
-          -4.8017599999999465,
+          -5.203039999999975,
           1.68,
-          0.6483199999999555
+          0.481279999999993
         ],
         "yaw": 270,
         "ohmAwake": true,
@@ -2882,7 +2882,7 @@
         "performance": {
           "fpsP50": 59.880239520968516,
           "fpsP10": 59.523809523799216,
-          "frameTimeMsP95": 16.900000000001455,
+          "frameTimeMsP95": 16.80000000000291,
           "note": null
         },
         "render": {
@@ -2893,7 +2893,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -3314,7 +3314,7 @@
     },
     {
       "id": "inside-manantial",
-      "at": "2026-09-05T23:44:17.391Z",
+      "at": "2026-09-05T23:58:44.137Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\inside-manantial.png",
       "snapshot": {
         "storyStep": "inside_manantial",
@@ -3552,7 +3552,7 @@
         "performance": {
           "fpsP50": 59.880239520968516,
           "fpsP10": 59.523809523799216,
-          "frameTimeMsP95": 16.900000000001455,
+          "frameTimeMsP95": 16.89999999999418,
           "note": null
         },
         "render": {
@@ -3563,7 +3563,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -4058,15 +4058,15 @@
     },
     {
       "id": "manantial-restored-mobile",
-      "at": "2026-09-05T23:44:29.040Z",
+      "at": "2026-09-05T23:58:52.517Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\manantial-restored-mobile.png",
       "snapshot": {
         "storyStep": "manantial_restored",
         "mode": "explore",
         "position": [
-          0.08352000000007555,
+          0.07679999999996613,
           1.68,
-          16.08400000000003
+          16.39840000000007
         ],
         "yaw": 180,
         "ohmAwake": true,
@@ -4323,14 +4323,14 @@
           "note": null
         },
         "render": {
-          "drawCalls": 119,
-          "triangles": 52312,
+          "drawCalls": 116,
+          "triangles": 51776,
           "meshesOrGeometries": 73,
           "materials": 49,
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -4825,15 +4825,15 @@
     },
     {
       "id": "manantial-restored-desktop",
-      "at": "2026-09-05T23:44:29.575Z",
+      "at": "2026-09-05T23:58:52.953Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\manantial-restored-desktop.png",
       "snapshot": {
         "storyStep": "manantial_restored",
         "mode": "explore",
         "position": [
-          0.08352000000007555,
+          0.07679999999996613,
           1.68,
-          16.08400000000003
+          16.39840000000007
         ],
         "yaw": 180,
         "ohmAwake": true,
@@ -5090,14 +5090,14 @@
           "note": null
         },
         "render": {
-          "drawCalls": 118,
-          "triangles": 52076,
+          "drawCalls": 115,
+          "triangles": 51540,
           "meshesOrGeometries": 73,
           "materials": 49,
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -5592,7 +5592,7 @@
     },
     {
       "id": "plaza-restored-mobile",
-      "at": "2026-09-05T23:44:31.160Z",
+      "at": "2026-09-05T23:58:54.383Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\plaza-restored-mobile.png",
       "snapshot": {
         "storyStep": "restored_plaza",
@@ -5865,7 +5865,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -6286,7 +6286,7 @@
     },
     {
       "id": "plaza-restored-desktop",
-      "at": "2026-09-05T23:44:31.665Z",
+      "at": "2026-09-05T23:58:54.787Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\plaza-restored-desktop.png",
       "snapshot": {
         "storyStep": "restored_plaza",
@@ -6559,7 +6559,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -6980,15 +6980,15 @@
     },
     {
       "id": "castle-restored-mobile",
-      "at": "2026-09-05T23:44:51.907Z",
+      "at": "2026-09-05T23:59:16.642Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\castle-restored-mobile.png",
       "snapshot": {
         "storyStep": "castle_restored",
         "mode": "explore",
         "position": [
-          65.60640000000012,
+          65.68319999999993,
           1.68,
-          -0.2383999999997175
+          -0.4822400000000836
         ],
         "yaw": 180,
         "ohmAwake": true,
@@ -7256,19 +7256,19 @@
         },
         "performance": {
           "fpsP50": 59.880239520968516,
-          "fpsP10": 59.17159763315647,
-          "frameTimeMsP95": 17,
+          "fpsP10": 59.523809523799216,
+          "frameTimeMsP95": 16.80000000000291,
           "note": null
         },
         "render": {
-          "drawCalls": 56,
-          "triangles": 10356,
+          "drawCalls": 57,
+          "triangles": 10592,
           "meshesOrGeometries": 73,
           "materials": 49,
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -7580,15 +7580,15 @@
     },
     {
       "id": "castle-restored-desktop",
-      "at": "2026-09-05T23:44:52.373Z",
+      "at": "2026-09-05T23:59:17.007Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\castle-restored-desktop.png",
       "snapshot": {
         "storyStep": "castle_restored",
         "mode": "explore",
         "position": [
-          65.60640000000012,
+          65.68319999999993,
           1.68,
-          -0.2383999999997175
+          -0.4822400000000836
         ],
         "yaw": 180,
         "ohmAwake": true,
@@ -7856,19 +7856,19 @@
         },
         "performance": {
           "fpsP50": 59.880239520968516,
-          "fpsP10": 59.17159763315647,
-          "frameTimeMsP95": 16.90000000000873,
+          "fpsP10": 59.523809523799216,
+          "frameTimeMsP95": 16.80000000000291,
           "note": null
         },
         "render": {
-          "drawCalls": 56,
-          "triangles": 10356,
+          "drawCalls": 57,
+          "triangles": 10592,
           "meshesOrGeometries": 73,
           "materials": 49,
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -8180,15 +8180,15 @@
     },
     {
       "id": "forge-terraces-restored-mobile",
-      "at": "2026-09-05T23:45:13.173Z",
+      "at": "2026-09-05T23:59:38.029Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\forge-terraces-restored-mobile.png",
       "snapshot": {
         "storyStep": "forge_terraces_restored",
         "mode": "explore",
         "position": [
-          120.2404800000002,
+          120.16128000000002,
           1.68,
-          15.68576000000033
+          15.36320000000039
         ],
         "yaw": 180,
         "ohmAwake": true,
@@ -8472,18 +8472,18 @@
         "performance": {
           "fpsP50": 59.880239520968516,
           "fpsP10": 59.523809523799216,
-          "frameTimeMsP95": 16.90000000000873,
+          "frameTimeMsP95": 16.80000000000291,
           "note": null
         },
         "render": {
-          "drawCalls": 53,
-          "triangles": 11532,
+          "drawCalls": 54,
+          "triangles": 12044,
           "meshesOrGeometries": 73,
           "materials": 50,
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -8796,15 +8796,15 @@
     },
     {
       "id": "forge-terraces-restored-desktop",
-      "at": "2026-09-05T23:45:13.803Z",
+      "at": "2026-09-05T23:59:38.315Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\forge-terraces-restored-desktop.png",
       "snapshot": {
         "storyStep": "forge_terraces_restored",
         "mode": "explore",
         "position": [
-          120.2404800000002,
+          120.16128000000002,
           1.68,
-          15.68576000000033
+          15.36320000000039
         ],
         "yaw": 180,
         "ohmAwake": true,
@@ -9088,7 +9088,7 @@
         "performance": {
           "fpsP50": 59.880239520968516,
           "fpsP10": 59.523809523799216,
-          "frameTimeMsP95": 16.90000000000873,
+          "frameTimeMsP95": 16.89999999999418,
           "note": null
         },
         "render": {
@@ -9099,7 +9099,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -9412,7 +9412,7 @@
     },
     {
       "id": "lighthouse-restored-return-mobile",
-      "at": "2026-09-05T23:45:24.006Z",
+      "at": "2026-09-05T23:59:48.548Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\lighthouse-restored-return-mobile.png",
       "snapshot": {
         "storyStep": "returning",
@@ -9717,8 +9717,8 @@
         },
         "performance": {
           "fpsP50": 59.880239520968516,
-          "fpsP10": 59.17159763315647,
-          "frameTimeMsP95": 16.90000000000873,
+          "fpsP10": 59.523809523799216,
+          "frameTimeMsP95": 16.80000000000291,
           "note": null
         },
         "render": {
@@ -9729,7 +9729,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -10043,7 +10043,7 @@
     },
     {
       "id": "lighthouse-restored-return-desktop",
-      "at": "2026-09-05T23:45:24.312Z",
+      "at": "2026-09-05T23:59:48.843Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\lighthouse-restored-return-desktop.png",
       "snapshot": {
         "storyStep": "returning",
@@ -10348,8 +10348,8 @@
         },
         "performance": {
           "fpsP50": 59.880239520968516,
-          "fpsP10": 59.17159763315647,
-          "frameTimeMsP95": 16.90000000000873,
+          "fpsP10": 59.523809523799216,
+          "frameTimeMsP95": 16.80000000000291,
           "note": null
         },
         "render": {
@@ -10360,7 +10360,7 @@
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -10674,15 +10674,15 @@
     },
     {
       "id": "arc1-complete-mobile",
-      "at": "2026-09-05T23:45:29.452Z",
+      "at": "2026-09-05T23:59:54.097Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\arc1-complete-mobile.png",
       "snapshot": {
         "storyStep": "arc1_complete",
         "mode": "explore",
         "position": [
-          -1.9171199999999728,
+          -1.5192000000000703,
           1.68,
-          -1.6052800000001706
+          -1.4387199999999043
         ],
         "yaw": 0,
         "ohmAwake": true,
@@ -10979,19 +10979,19 @@
         },
         "performance": {
           "fpsP50": 59.880239520968516,
-          "fpsP10": 59.17159763315647,
-          "frameTimeMsP95": 16.90000000000873,
+          "fpsP10": 59.523809523799216,
+          "frameTimeMsP95": 16.80000000000291,
           "note": null
         },
         "render": {
-          "drawCalls": 98,
-          "triangles": 57944,
+          "drawCalls": 106,
+          "triangles": 76176,
           "meshesOrGeometries": 73,
           "materials": 49,
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -11415,15 +11415,15 @@
     },
     {
       "id": "arc1-complete-desktop",
-      "at": "2026-09-05T23:45:29.885Z",
+      "at": "2026-09-05T23:59:54.513Z",
       "screenshot": "C:\\YO\\Proyectos\\Roxana-gemini38-player-facing\\output\\playwright\\ohmdal-hardening\\golden-path\\arc1-complete-desktop.png",
       "snapshot": {
         "storyStep": "arc1_complete",
         "mode": "explore",
         "position": [
-          -1.9171199999999728,
+          -1.5192000000000703,
           1.68,
-          -1.6052800000001706
+          -1.4387199999999043
         ],
         "yaw": 0,
         "ohmAwake": true,
@@ -11720,19 +11720,19 @@
         },
         "performance": {
           "fpsP50": 59.880239520968516,
-          "fpsP10": 59.17159763315647,
-          "frameTimeMsP95": 16.90000000000873,
+          "fpsP10": 59.523809523799216,
+          "frameTimeMsP95": 16.80000000000291,
           "note": null
         },
         "render": {
-          "drawCalls": 98,
-          "triangles": 57944,
+          "drawCalls": 106,
+          "triangles": 76176,
           "meshesOrGeometries": 73,
           "materials": 49,
           "textures": 23
         },
         "assets": {
-          "transferredMb": 26.301114082336426,
+          "transferredMb": 26.301125526428223,
           "largestAssets": [
             {
               "name": "/node_modules/.vite/deps/playcanvas.js",
@@ -12173,9 +12173,9 @@
         -8
       ],
       "end": [
-        -5.192894315360493e-16,
+        -5.194657806751266e-16,
         1.68,
-        -3.7596800000000092
+        -3.7582400000000105
       ]
     },
     {
@@ -12186,14 +12186,14 @@
       },
       "pulses": 8,
       "start": [
-        -5.192894315360493e-16,
+        -5.194657806751266e-16,
         1.68,
-        -3.7596800000000092
+        -3.7582400000000105
       ],
       "end": [
-        -5.678880000000001,
+        -5.601120000000007,
         1.68,
-        -3.7596800000000092
+        -3.7582400000000105
       ]
     },
     {
@@ -12209,9 +12209,9 @@
         -3.8
       ],
       "end": [
-        -62.64144000000003,
+        -62.72064000000001,
         1.68,
-        -1.7984000000000167
+        -1.879519999999998
       ]
     },
     {
@@ -12220,16 +12220,16 @@
         "x": -62.8,
         "z": 0.2
       },
-      "pulses": 30,
+      "pulses": 4,
       "start": [
-        -62.64144000000003,
+        -62.72064000000001,
         1.68,
-        -1.7984000000000167
+        -1.879519999999998
       ],
       "end": [
-        -62.72208000000004,
+        -62.72064000000001,
         1.68,
-        -0.1975999999999819
+        0.04191999999998945
       ]
     },
     {
@@ -12238,16 +12238,16 @@
         "x": -60,
         "z": -4.6
       },
-      "pulses": 8,
+      "pulses": 9,
       "start": [
-        -62.72208000000004,
+        -62.72064000000001,
         1.68,
-        -0.1975999999999819
+        0.04191999999998945
       ],
       "end": [
-        -61.20192000000003,
+        -61.122239999999984,
         1.68,
-        -3.3190399999999602
+        -3.6416000000000524
       ]
     },
     {
@@ -12263,7 +12263,7 @@
         -4
       ],
       "end": [
-        -4.317920000000005,
+        -4.238239999999995,
         1.68,
         -4
       ]
@@ -12276,14 +12276,14 @@
       },
       "pulses": 22,
       "start": [
-        -4.317920000000005,
+        -4.238239999999995,
         1.68,
         -4
       ],
       "end": [
-        -3.438079999999991,
+        -3.2787200000000056,
         1.68,
-        5.683999999999964
+        5.59904000000003
       ]
     },
     {
@@ -12294,14 +12294,14 @@
       },
       "pulses": 3,
       "start": [
-        -3.438079999999991,
+        -3.2787200000000056,
         1.68,
-        5.683999999999964
+        5.59904000000003
       ],
       "end": [
-        -1.9995199999999869,
+        -1.8382399999999959,
         1.68,
-        5.683999999999964
+        5.59904000000003
       ]
     },
     {
@@ -12312,14 +12312,14 @@
       },
       "pulses": 1,
       "start": [
-        -1.9995199999999869,
+        -1.8382399999999959,
         1.68,
-        5.683999999999964
+        5.59904000000003
       ],
       "end": [
-        -2.4785599999999834,
+        -2.3196799999999924,
         1.68,
-        5.683999999999964
+        5.59904000000003
       ]
     },
     {
@@ -12330,14 +12330,14 @@
       },
       "pulses": 12,
       "start": [
-        -2.4785599999999834,
+        -2.3196799999999924,
         1.68,
-        5.683999999999964
+        5.59904000000003
       ],
       "end": [
-        -2.4785599999999834,
+        -2.3196799999999924,
         1.68,
-        -3.1921600000000376
+        -3.1235199999999734
       ]
     },
     {
@@ -12346,16 +12346,16 @@
         "x": -3.2,
         "z": -4.4
       },
-      "pulses": 3,
+      "pulses": 4,
       "start": [
-        -2.4785599999999834,
+        -2.3196799999999924,
         1.68,
-        -3.1921600000000376
+        -3.1235199999999734
       ],
       "end": [
-        -2.9595199999999693,
+        -3.2801599999999853,
         1.68,
-        -4.15264000000003
+        -4.08303999999998
       ]
     },
     {
@@ -12366,14 +12366,14 @@
       },
       "pulses": 15,
       "start": [
-        -2.9595199999999693,
+        -3.2801599999999853,
         1.68,
-        -4.15264000000003
+        -4.08303999999998
       ],
       "end": [
-        -0.9593599999999823,
+        -1.2809599999999843,
         1.68,
-        3.2873599999999703
+        3.3608000000000353
       ]
     },
     {
@@ -12384,14 +12384,14 @@
       },
       "pulses": 9,
       "start": [
-        -0.9593599999999823,
+        -1.2809599999999843,
         1.68,
-        3.2873599999999703
+        3.3608000000000353
       ],
       "end": [
-        -2.9609599999999476,
+        -2.802559999999984,
         1.68,
-        0.6483199999999555
+        0.481279999999993
       ]
     },
     {
@@ -12400,16 +12400,16 @@
         "x": -5.2,
         "z": 0.8
       },
-      "pulses": 4,
+      "pulses": 5,
       "start": [
-        -2.9609599999999476,
+        -2.802559999999984,
         1.68,
-        0.6483199999999555
+        0.481279999999993
       ],
       "end": [
-        -4.8017599999999465,
+        -5.203039999999975,
         1.68,
-        0.6483199999999555
+        0.481279999999993
       ]
     },
     {
@@ -12418,16 +12418,16 @@
         "x": -3,
         "z": 0.5
       },
-      "pulses": 3,
+      "pulses": 4,
       "start": [
-        -4.8017599999999465,
+        -5.203039999999975,
         1.68,
-        0.6483199999999555
+        0.481279999999993
       ],
       "end": [
-        -3.281119999999932,
+        -3.204319999999967,
         1.68,
-        0.6483199999999555
+        0.481279999999993
       ]
     },
     {
@@ -12438,14 +12438,14 @@
       },
       "pulses": 9,
       "start": [
-        -3.281119999999932,
+        -3.204319999999967,
         1.68,
-        0.6483199999999555
+        0.481279999999993
       ],
       "end": [
-        -3.281119999999932,
+        -3.204319999999967,
         1.68,
-        5.930719999999921
+        5.840959999999983
       ]
     },
     {
@@ -12456,14 +12456,14 @@
       },
       "pulses": 9,
       "start": [
-        -3.281119999999932,
+        -3.204319999999967,
         1.68,
-        5.930719999999921
+        5.840959999999983
       ],
       "end": [
-        -0.16111999999993187,
+        -0.6425599999999805,
         1.68,
-        7.451359999999933
+        7.762879999999988
       ]
     },
     {
@@ -12472,14 +12472,14 @@
         "x": -4.2,
         "z": 16
       },
-      "pulses": 7,
+      "pulses": 6,
       "start": [
         0,
         1.68,
         16
       ],
       "end": [
-        -3.681119999999973,
+        -3.2016,
         1.68,
         16
       ]
@@ -12490,16 +12490,16 @@
         "x": -4.2,
         "z": 18.4
       },
-      "pulses": 4,
+      "pulses": 5,
       "start": [
-        -3.681119999999973,
+        -3.2016,
         1.68,
         16
       ],
       "end": [
-        -3.681119999999973,
+        -3.6014400000000144,
         1.68,
-        17.999679999999948
+        17.92192000000003
       ]
     },
     {
@@ -12510,14 +12510,14 @@
       },
       "pulses": 3,
       "start": [
-        -3.681119999999973,
+        -3.6014400000000144,
         1.68,
-        17.999679999999948
+        17.92192000000003
       ],
       "end": [
-        -3.681119999999973,
+        -3.6014400000000144,
         1.68,
-        16.559199999999997
+        16.400800000000068
       ]
     },
     {
@@ -12526,16 +12526,16 @@
         "x": 2.2,
         "z": 16
       },
-      "pulses": 19,
+      "pulses": 10,
       "start": [
-        -3.681119999999973,
+        -3.6014400000000144,
         1.68,
-        16.559199999999997
+        16.400800000000068
       ],
       "end": [
-        1.8412800000000276,
+        2.0779199999999376,
         1.68,
-        16.083520000000007
+        16.400800000000068
       ]
     },
     {
@@ -12544,16 +12544,16 @@
         "x": 4.2,
         "z": 16
       },
-      "pulses": 4,
+      "pulses": 3,
       "start": [
-        1.8412800000000276,
+        2.0779199999999376,
         1.68,
-        16.083520000000007
+        16.400800000000068
       ],
       "end": [
-        3.763679999999993,
+        3.518399999999932,
         1.68,
-        16.083520000000007
+        16.400800000000068
       ]
     },
     {
@@ -12564,14 +12564,14 @@
       },
       "pulses": 4,
       "start": [
-        3.763679999999993,
+        3.518399999999932,
         1.68,
-        16.083520000000007
+        16.400800000000068
       ],
       "end": [
-        3.763679999999993,
+        3.9983999999999322,
         1.68,
-        18.005440000000004
+        17.84032000000007
       ]
     },
     {
@@ -12582,14 +12582,14 @@
       },
       "pulses": 3,
       "start": [
-        3.763679999999993,
+        3.9983999999999322,
         1.68,
-        18.005440000000004
+        17.84032000000007
       ],
       "end": [
-        3.763679999999993,
+        3.9983999999999322,
         1.68,
-        16.564960000000017
+        16.39840000000007
       ]
     },
     {
@@ -12600,14 +12600,14 @@
       },
       "pulses": 3,
       "start": [
-        3.763679999999993,
+        3.9983999999999322,
         1.68,
-        16.564960000000017
+        16.39840000000007
       ],
       "end": [
-        2.325120000000041,
+        2.5574399999999455,
         1.68,
-        16.564960000000017
+        16.39840000000007
       ]
     },
     {
@@ -12616,16 +12616,16 @@
         "x": 0,
         "z": 16
       },
-      "pulses": 14,
+      "pulses": 5,
       "start": [
-        2.325120000000041,
+        2.5574399999999455,
         1.68,
-        16.564960000000017
+        16.39840000000007
       ],
       "end": [
-        0.08352000000007555,
+        0.07679999999996613,
         1.68,
-        16.08400000000003
+        16.39840000000007
       ]
     },
     {
@@ -12636,14 +12636,14 @@
       },
       "pulses": 5,
       "start": [
-        0.08352000000007555,
+        0.07679999999996613,
         1.68,
-        16.08400000000003
+        16.39840000000007
       ],
       "end": [
-        0.08352000000007595,
+        0.07679999999996656,
         1.68,
-        13.76512000000001
+        13.920160000000061
       ]
     },
     {
@@ -12659,9 +12659,9 @@
         9.2
       ],
       "end": [
-        -2.5593599999999856,
+        -2.6414399999999443,
         1.68,
-        7.041920000000014
+        7.200799999999969
       ]
     },
     {
@@ -12672,14 +12672,14 @@
       },
       "pulses": 11,
       "start": [
-        -2.5593599999999856,
+        -2.6414399999999443,
         1.68,
-        7.041920000000014
+        7.200799999999969
       ],
       "end": [
-        -3.119039999999979,
+        -3.1214399999999443,
         1.68,
-        0.8019200000000188
+        1.0414399999999844
       ]
     },
     {
@@ -12688,16 +12688,16 @@
         "x": -5.2,
         "z": 0.8
       },
-      "pulses": 3,
+      "pulses": 14,
       "start": [
-        -3.119039999999979,
+        -3.1214399999999443,
         1.68,
-        0.8019200000000188
+        1.0414399999999844
       ],
       "end": [
-        -4.56143999999998,
+        -4.481759999999952,
         1.68,
-        0.8019200000000188
+        0.7212800000000331
       ]
     },
     {
@@ -12708,14 +12708,14 @@
       },
       "pulses": 3,
       "start": [
-        -4.56143999999998,
+        -4.481759999999952,
         1.68,
-        0.8019200000000188
+        0.7212800000000331
       ],
       "end": [
-        -3.041279999999995,
+        -3.0412799999999587,
         1.68,
-        0.8019200000000188
+        0.7212800000000331
       ]
     },
     {
@@ -12726,14 +12726,14 @@
       },
       "pulses": 9,
       "start": [
-        -3.041279999999995,
+        -3.0412799999999587,
         1.68,
-        0.8019200000000188
+        0.7212800000000331
       ],
       "end": [
-        -3.041279999999995,
+        -3.0412799999999587,
         1.68,
-        6.080480000000077
+        5.92160000000004
       ]
     },
     {
@@ -12742,16 +12742,16 @@
         "x": 0,
         "z": 8
       },
-      "pulses": 8,
+      "pulses": 9,
       "start": [
-        -3.041279999999995,
+        -3.0412799999999587,
         1.68,
-        6.080480000000077
+        5.92160000000004
       ],
       "end": [
-        -0.4804800000001349,
+        -0.5615999999999651,
         1.68,
-        7.520960000000106
+        7.762880000000032
       ]
     },
     {
@@ -12767,9 +12767,9 @@
         -8
       ],
       "end": [
-        54.40176000000002,
+        54.24143999999993,
         1.68,
-        -4.476319999999969
+        -4.562240000000051
       ]
     },
     {
@@ -12780,14 +12780,14 @@
       },
       "pulses": 8,
       "start": [
-        54.40176000000002,
+        54.24143999999993,
         1.68,
-        -4.476319999999969
+        -4.562240000000051
       ],
       "end": [
-        54.40176000000002,
+        54.24143999999993,
         1.68,
-        -0.31519999999992687
+        -0.4803200000000781
       ]
     },
     {
@@ -12796,16 +12796,16 @@
         "x": 60,
         "z": -4
       },
-      "pulses": 13,
+      "pulses": 14,
       "start": [
-        54.40176000000002,
+        54.24143999999993,
         1.68,
-        -0.31519999999992687
+        -0.4803200000000781
       ],
       "end": [
-        59.28240000000008,
+        59.68127999999997,
         1.68,
-        -3.6742399999999416
+        -3.521120000000112
       ]
     },
     {
@@ -12816,14 +12816,14 @@
       },
       "pulses": 8,
       "start": [
-        59.28240000000008,
+        59.68127999999997,
         1.68,
-        -3.6742399999999416
+        -3.521120000000112
       ],
       "end": [
-        59.7628800000001,
+        59.68127999999997,
         1.68,
-        -7.4369599999998455
+        -7.764320000000044
       ]
     },
     {
@@ -12834,14 +12834,14 @@
       },
       "pulses": 11,
       "start": [
-        59.7628800000001,
+        59.68127999999997,
         1.68,
-        -7.4369599999998455
+        -7.764320000000044
       ],
       "end": [
-        59.7628800000001,
+        59.68127999999997,
         1.68,
-        -0.2383999999997175
+        -0.4822400000000836
       ]
     },
     {
@@ -12852,14 +12852,14 @@
       },
       "pulses": 10,
       "start": [
-        59.7628800000001,
+        59.68127999999997,
         1.68,
-        -0.2383999999997175
+        -0.4822400000000836
       ],
       "end": [
-        65.60640000000012,
+        65.68319999999993,
         1.68,
-        -0.2383999999997175
+        -0.4822400000000836
       ]
     },
     {
@@ -12868,16 +12868,16 @@
         "x": 63,
         "z": 4
       },
-      "pulses": 11,
+      "pulses": 12,
       "start": [
-        65.60640000000012,
+        65.68319999999993,
         1.68,
-        -0.2383999999997175
+        -0.4822400000000836
       ],
       "end": [
-        63.6854400000001,
+        63.28079999999988,
         1.68,
-        3.764320000000324
+        3.5161599999997764
       ]
     },
     {
@@ -12886,16 +12886,16 @@
         "x": 60,
         "z": 8
       },
-      "pulses": 12,
+      "pulses": 13,
       "start": [
-        63.6854400000001,
+        63.28079999999988,
         1.68,
-        3.764320000000324
+        3.5161599999997764
       ],
       "end": [
-        60.24384000000011,
+        60.40127999999976,
         1.68,
-        7.363360000000271
+        7.676799999999793
       ]
     },
     {
@@ -12911,9 +12911,9 @@
         -16
       ],
       "end": [
-        123.68160000000012,
+        123.51984000000007,
         1.68,
-        -12.640960000000057
+        -12.560800000000004
       ]
     },
     {
@@ -12922,16 +12922,16 @@
         "x": 124.2,
         "z": -8
       },
-      "pulses": 8,
+      "pulses": 9,
       "start": [
-        123.68160000000012,
+        123.51984000000007,
         1.68,
-        -12.640960000000057
+        -12.560800000000004
       ],
       "end": [
-        123.68160000000012,
+        124.00080000000007,
         1.68,
-        -8.321440000000162
+        -8.319519999999986
       ]
     },
     {
@@ -12942,14 +12942,14 @@
       },
       "pulses": 13,
       "start": [
-        123.68160000000012,
+        124.00080000000007,
         1.68,
-        -8.321440000000162
+        -8.319519999999986
       ],
       "end": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        -4.402240000000089
+        -4.638879999999969
       ]
     },
     {
@@ -12958,16 +12958,16 @@
         "x": 120,
         "z": 0
       },
-      "pulses": 7,
+      "pulses": 8,
       "start": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        -4.402240000000089
+        -4.638879999999969
       ],
       "end": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        -0.6380800000000326
+        -0.6380799999999696
       ]
     },
     {
@@ -12978,14 +12978,14 @@
       },
       "pulses": 11,
       "start": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        -0.6380800000000326
+        -0.6380799999999696
       ],
       "end": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        -7.755039999999952
+        -7.760319999999846
       ]
     },
     {
@@ -12996,14 +12996,14 @@
       },
       "pulses": 11,
       "start": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        -7.755039999999952
+        -7.760319999999846
       ],
       "end": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        -0.3923199999996978
+        -0.5583999999998004
       ]
     },
     {
@@ -13014,14 +13014,14 @@
       },
       "pulses": 19,
       "start": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        -0.3923199999996978
+        -0.5583999999998004
       ],
       "end": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        15.68576000000033
+        15.36320000000039
       ]
     },
     {
@@ -13030,16 +13030,16 @@
         "x": 120,
         "z": 24
       },
-      "pulses": 11,
+      "pulses": 12,
       "start": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        15.68576000000033
+        15.36320000000039
       ],
       "end": [
-        120.2404800000002,
+        120.16128000000002,
         1.68,
-        23.369120000000237
+        23.60432000000033
       ]
     },
     {
@@ -13057,7 +13057,7 @@
       "end": [
         180,
         1.68,
-        -0.5547199999999699
+        -0.6416000000000671
       ]
     },
     {
@@ -13066,16 +13066,16 @@
         "x": 180,
         "z": 8
       },
-      "pulses": 12,
+      "pulses": 11,
       "start": [
         180,
         1.68,
-        -0.5547199999999699
+        -0.6416000000000671
       ],
       "end": [
         180,
         1.68,
-        7.446879999999892
+        7.27695999999999
       ]
     },
     {
@@ -13088,12 +13088,12 @@
       "start": [
         180,
         1.68,
-        7.446879999999892
+        7.27695999999999
       ],
       "end": [
         180,
         1.68,
-        13.604800000000068
+        13.59615999999998
       ]
     },
     {
@@ -13109,9 +13109,9 @@
         9.2
       ],
       "end": [
-        -2.3971199999999726,
+        -2.480160000000056,
         1.68,
-        6.636799999999999
+        6.719840000000013
       ]
     },
     {
@@ -13122,14 +13122,14 @@
       },
       "pulses": 12,
       "start": [
-        -2.3971199999999726,
+        -2.480160000000056,
         1.68,
-        6.636799999999999
+        6.719840000000013
       ],
       "end": [
-        -2.3971199999999726,
+        -2.480160000000056,
         1.68,
-        -1.6052800000001706
+        -1.4387199999999043
       ]
     },
     {
@@ -13138,20 +13138,20 @@
         "x": 0,
         "z": -2
       },
-      "pulses": 1,
+      "pulses": 2,
       "start": [
-        -2.3971199999999726,
+        -2.480160000000056,
         1.68,
-        -1.6052800000001706
+        -1.4387199999999043
       ],
       "end": [
-        -1.9171199999999728,
+        -1.5192000000000703,
         1.68,
-        -1.6052800000001706
+        -1.4387199999999043
       ]
     }
   ],
   "result": "PASS",
-  "finishedAt": "2026-09-05T23:45:30.110Z",
-  "viteLogTail": "\n  \u001b[32m\u001b[1mVITE\u001b[22m v6.4.3\u001b[39m  \u001b[2mready in \u001b[0m\u001b[1m325\u001b[22m\u001b[2m\u001b[0m ms\u001b[22m\n\n  \u001b[32m➜\u001b[39m  \u001b[1mLocal\u001b[22m:   \u001b[36mhttp://127.0.0.1:\u001b[1m53782\u001b[22m/\u001b[39m\n"
+  "finishedAt": "2026-09-05T23:59:54.738Z",
+  "viteLogTail": "\n  \u001b[32m\u001b[1mVITE\u001b[22m v6.4.3\u001b[39m  \u001b[2mready in \u001b[0m\u001b[1m270\u001b[22m\u001b[2m\u001b[0m ms\u001b[22m\n\n  \u001b[32m➜\u001b[39m  \u001b[1mLocal\u001b[22m:   \u001b[36mhttp://127.0.0.1:\u001b[1m60921\u001b[22m/\u001b[39m\n"
 }
