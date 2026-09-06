@@ -265,18 +265,51 @@ Do not modify loop authority, redesign the puzzle, or expand into B3-B6. Do not 
 review or self-approve; leave acceptance to a fresh independent Luna reviewer.
 # B2 REVIEW REPAIR PACKET — 2026-09-05
 
-Fresh Luna review is FAIL. Perform one bounded repair in this isolated
-worktree; do not redesign gameplay or alter canon, topology, engine, or deps.
+The fresh independent Luna review returned `REVIEW_STATUS: FAIL`. Perform one
+bounded repair on the existing Gemini B2 candidate in this isolated worktree.
+Do not redesign gameplay, change canon, topology, engine, or dependencies.
 
-1. Publish final Candidate Protocol v2 identity: exact BASE_SHA
-   `4d55de4be50432c7445065cfd42162658a3dfe3d`, stage
-   `b2-ohm-continuity-puzzle`, and IMPLEMENTATION_SHA equal to the final
-   committed repair SHA.
-2. Add/commit real mobile/touch B2 evidence at that exact SHA: rear inspection,
-   cable/terminal manipulation, deterministic solve, and Ohm awakening, with
-   captures plus machine-readable touch artifact listed in the report.
-3. Fix all candidate-owned `git diff --check` issues and leave the worktree
-   clean. Run targeted B2 tests, build, desktop Golden Path regression, touch
-   smoke, and `git diff --check`. Report PASS only when all genuinely pass,
-   with `EVIDENCE_STATUS: PASS` and `SELF_ACCEPTANCE: false`; otherwise report
-   FAIL. Commit and push the candidate branch only; never mutate canonical.
+Fixes (maximum 3; no structural fix):
+
+1. Rebase/synchronize the candidate evidence identity so the report's exact
+   `IMPLEMENTATION_SHA` is the final commit you publish, with exact
+   `BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d` and stage
+   `b2-ohm-continuity-puzzle`.
+2. Ensure real mobile/touch B2 evidence is present and committed at that exact
+   implementation SHA: rear inspection opens, cable/terminal manipulation is
+   possible, continuity solves deterministically, and Ohm awakening follows.
+   Include the machine-readable touch artifact and captures in the candidate
+   report's implementation/evidence list.
+3. Resolve every `git diff --check` issue in the candidate-owned diff, then
+   publish a clean worktree and concise Candidate Protocol v2 report with
+   `EVIDENCE_STATUS: PASS` and `SELF_ACCEPTANCE: false` only if all required
+   gates genuinely pass. Do not claim PASS otherwise.
+
+Required verification before finishing: targeted B2 tests, build, desktop
+Golden Path regression, touch smoke, and `git diff --check`. Commit all repair
+changes and update the worker report/runtime evidence. Do not modify the
+canonical branch or integrate anything.
+
+# B2 REVIEW REPAIR PACKET — iteration 3 / cycle 32 (Mavis, 2026-09-06)
+
+The fresh Luna review for candidate `382e2ec3bb1f7f132bb82377fc0539a31dcef979`
+returned FAIL. Perform exactly one bounded repair on the existing Gemini lane.
+Do not redesign gameplay or touch canon, topology, engine, dependencies, or loop
+authority.
+
+1. Make the committed candidate identity and report agree: final
+   `IMPLEMENTATION_SHA` must equal the final commit, with
+   `BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d` and stage
+   `b2-ohm-continuity-puzzle`.
+2. Provide committed real Chromium touch B2 evidence at that exact final SHA:
+   rear inspection, cable/terminal manipulation, deterministic solve, and Ohm
+   awakening; include the machine-readable PASS artifact and captures in the
+   report. Fix touch input only if this bounded smoke proves it broken.
+3. Remove any player-facing introductory B2 voltage/resistance numeric label and
+   resolve all candidate-scope `git diff --check` issues without formatting churn.
+4. Re-run targeted B2 tests, build, desktop Golden Path, and dedicated touch
+   smoke. Publish concise Candidate Protocol v2 with `EVIDENCE_STATUS: PASS` and
+   `SELF_ACCEPTANCE: false` only when genuinely green; otherwise report FAIL.
+
+Commit the clean candidate and update the worker report/runtime. Do not wait for
+review or integrate anything.
