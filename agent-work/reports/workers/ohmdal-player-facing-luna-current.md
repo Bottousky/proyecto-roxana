@@ -5,19 +5,19 @@ EVIDENCE_STATUS: FAIL
 SELF_ACCEPTANCE: false
 
 Stage: b2-ohm-continuity-puzzle
+Branch: worker/luna-player-facing
 
-Implementation:
-- Candidate implementation commit `6ece1849e796c43dd27c7fa7717a327f601dd407` adds the physical rear-panel Ohm continuity puzzle, pure deterministic `PEDESTAL_RING` state model, touch-sized cable actions, continuity feedback, awakening gate, physical response and Edda reaction.
-- Follow-up implementation commit `834e0b846b946d8f8745e50a93681c964a872729` removes malformed duplicate CSS declarations that produced a CSS parser warning during build.
-- No engine, dependency, topology, canon, curriculum, or test weakening changes.
+Implementation commits already present on this worker branch:
+
+- `6ece1849e796c43dd27c7fa7717a327f601dd407` adds the physical rear-panel Ohm continuity puzzle, deterministic `PEDESTAL_RING` state model, touch-sized cable actions, continuity feedback, awakening gate, physical response, and Edda reaction.
+- `834e0b846b946d8f8745e50a93681c964a872729` removes malformed duplicate B2 modal CSS declarations.
 
 Validation:
-- `npm run loop:ohmdal-arco1-player-facing:validate`: PASS; stage remains `b2-ohm-continuity-puzzle`, iteration 0/3.
-- `npm run build`: PASS after CSS cleanup. Vite still reports the pre-existing Havok wasm resolution warning and large-chunk warnings; no CSS syntax warning remains.
-- `npm test`: PASS; all discovered suites passed, 0 failures.
-- `git diff --check`: PASS.
-- `npm run playtest:ohmdal-golden-path`: FAIL/UNRESOLVED due local runner timeout (245s command limit). No full Golden Path PASS claim is made; the runner remains unsuitable for a complete browser acceptance claim in this environment (SwiftShader/software-rendering limitation observed in the prior candidate run).
-- `git diff --check`: PASS.
 
-Acceptance boundary:
-This is an implementation candidate only. Golden Path browser evidence remains unresolved in this environment; no stage state was advanced and no self-approval was performed.
+- `npm run loop:ohmdal-arco1-player-facing:validate`: PASS; stage remains B2, iteration 0/3.
+- `npm run build`: PASS; only existing Havok wasm resolution and large-chunk warnings remain.
+- `npm test`: PASS; all repository suites passed.
+- `npm run playtest:ohmdal-golden-path`: FAIL/UNRESOLVED; the local browser runner timed out after 305 seconds before completion. No Golden Path PASS claim is made.
+- No canonical loop state was modified or advanced.
+
+Acceptance boundary: implementation candidate only. Fresh independent review and player-facing acceptance remain external gates; this worker does not self-approve.
