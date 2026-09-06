@@ -2,6 +2,7 @@ import './styles.css';
 import { mountPlaza, type PlazaHandle, type PlazaUi } from './plazaRuntime.ts';
 import type { BitacoraManager } from './journal/bitacora.ts';
 import type { WorkbenchInspector } from './inspect/workbench.ts';
+import type { CircuitDef, CircuitReading } from '../../puzzles/ohmModel.ts';
 
 // DOM Elements
 const gameEl = document.getElementById('plaza-game')!;
@@ -204,7 +205,36 @@ const ui: PlazaUi = {
 
     workbenchModal.classList.remove('hidden');
   },
-  setOhmPuzzleView() {},
+  setOhmPuzzleView(visible, def?: CircuitDef, reading?: CircuitReading, covered?: ReadonlySet<string>, onAction?: (segment: string) => void) {
+    const modal = document.getElementById('ohm-puzzle-modal');
+    const content = document.getElementById('ohm-puzzle-content');
+    if (!modal || !content || !visible || !def || !reading || !covered) {
+      modal?.classList.add('hidden');
+      return;
+    }
+    content.replaceChildren();
+    const heading = document.createElement('p');
+    heading.className = 'ohm-puzzle-instruction';
+    heading.textContent = reading.complete ? 'El camino vibra: Ohm vuelve a respirar.' : 'Seguí el camino luminoso y cubrí los cortes con los cables de la bandeja.';
+    content.appendChild(heading);
+    const board = document.createElement('div');
+    board.className = 'ohm-puzzle-board';
+    for (const segment of def.segments) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `ohm-segment ${covered.has(segment.id) ? 'covered' : ''} ${segment.broken ? 'broken' : ''}`;
+      button.disabled = Boolean(segment.broken) || reading.complete;
+      button.textContent = segment.gap ? `${covered.has(segment.id) ? '✓ Cable conectado' : '＋ Tender cable'} · ${segment.from} → ${segment.to}` : `— Camino continuo · ${segment.from} → ${segment.to}`;
+      button.onclick = () => onAction?.(segment.id);
+      board.appendChild(button);
+    }
+    content.appendChild(board);
+    const status = document.createElement('p');
+    status.className = `ohm-puzzle-status ${reading.state}`;
+    status.textContent = reading.complete ? 'CONTINUIDAD CERRADA · Ohm responde' : `${reading.state.toUpperCase()} · Cables disponibles: ${reading.supplyLeft}`;
+    content.appendChild(status);
+    modal.classList.remove('hidden');
+  },
 
   setInventoryItem(name) {
     if (!name) {
@@ -271,6 +301,8 @@ btnCloseBitacora.addEventListener('click', () => {
 btnCloseWorkbench.addEventListener('click', () => {
   ui.setWorkbenchView(false);
 });
+
+document.getElementById('btn-close-ohm-puzzle')?.addEventListener('click', () => handle?.press('escape'));
 
 dialogEl.addEventListener('click', () => {
   handle?.press('e');

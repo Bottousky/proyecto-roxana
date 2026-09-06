@@ -11,6 +11,7 @@ import { GalvanoscopeTool } from './tools/galvanoscope.ts';
 import { BitacoraManager } from './journal/bitacora.ts';
 import { WorkbenchInspector } from './inspect/workbench.ts';
 import type { CircuitState, DialogueLine, DialogueNode, ToolMode } from './types.ts';
+import { PEDESTAL_RING, readCircuit, toggleCover } from '../../puzzles/ohmModel.ts';
 import type { CircuitDef, CircuitReading } from '../../puzzles/ohmModel.ts';
 
 export interface PlazaUi {
@@ -108,6 +109,8 @@ export function mountPlaza(host: HTMLElement, ui: PlazaUi): PlazaHandle {
   let activeDialogueNode: DialogueNode | null = null;
   let activeDialogueLineIndex = 0;
   let isToolEquipped = true;
+  let ohmCovered = new Set<string>();
+  let ohmAwake = false;
 
   const onResize = () => {
     const w = host.clientWidth;
@@ -129,6 +132,13 @@ export function mountPlaza(host: HTMLElement, ui: PlazaUi): PlazaHandle {
   }
 
   const interactables: Interactable[] = [
+    {
+      id: 'ohm_rear',
+      label: 'Inspeccionar la compuerta trasera de Ohm',
+      pos: new THREE.Vector3(0, 1.0, -2.0),
+      radius: 2.8,
+      action: () => { if (!ohmAwake) { currentMode = 'inspect'; fpsController.unlock(); renderOhmPuzzle(); } },
+    },
     {
       id: 'lumen',
       label: 'Hablar con Lumen (Taller)',
@@ -250,6 +260,21 @@ export function mountPlaza(host: HTMLElement, ui: PlazaUi): PlazaHandle {
     renderCurrentDialogueLine();
   }
 
+  function renderOhmPuzzle(): void {
+    const reading = readCircuit(PEDESTAL_RING, ohmCovered);
+    ui.setOhmPuzzleView(true, PEDESTAL_RING, reading, ohmCovered, (segmentId) => {
+      const next = toggleCover(PEDESTAL_RING, ohmCovered, segmentId);
+      if (next === ohmCovered) { ui.showNotification('Ese tramo está partido: el cable no puede salvarlo.'); return; }
+      ohmCovered = new Set(next);
+      const nextReading = readCircuit(PEDESTAL_RING, ohmCovered);
+      audio.playProbeContact(nextReading.complete ? 24 : 0);
+      ui.showNotification(nextReading.complete ? '¡El camino volvió a la fuente! Ohm responde.' : nextReading.state === 'tocando' ? 'Hay contacto, pero el camino todavía está abierto.' : 'Cable retirado.');
+      if (nextReading.complete) {
+        ohmAwake = true; currentMode = 'explore'; ui.setOhmPuzzleView(false); audio.playDiscoveryChime(); startDialogue('ohm_awakening_event');
+      } else renderOhmPuzzle();
+    });
+  }
+
   function renderCurrentDialogueLine(): void {
     if (!activeDialogueNode) return;
     const line: DialogueLine = activeDialogueNode.lines[activeDialogueLineIndex]!;
@@ -288,6 +313,13 @@ export function mountPlaza(host: HTMLElement, ui: PlazaUi): PlazaHandle {
           bitacora.unlock('lengueta_edda');
         } else if (activeDialogueNode.onComplete === 'unlock_rumor_mural') {
           bitacora.unlock('ley_retorno');
+        }
+
+        if (activeDialogueNode.id === 'ohm_awakening_event') {
+          activeDialogueNode = null;
+          ui.setDialog(null, null);
+          startDialogue('edda_surprised_awakening');
+          return;
         }
 
         activeDialogueNode = null;
@@ -424,6 +456,12 @@ export function mountPlaza(host: HTMLElement, ui: PlazaUi): PlazaHandle {
   // Keyboard Handlers
   const onKeyDown = (e: KeyboardEvent) => {
     const k = e.key.toLowerCase();
+    if (k === 'escape' && currentMode === 'inspect') {
+      currentMode = 'explore';
+      ui.setOhmPuzzleView(false);
+      ui.setWorkbenchView(false);
+      return;
+    }
     if (k === 'e' || k === 'f' || k === 'enter' || k === ' ') {
       triggerReticleAction();
     }

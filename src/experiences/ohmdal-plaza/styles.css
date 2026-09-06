@@ -635,6 +635,17 @@ h1 {
 }
 
 #ohm-puzzle-modal {
+  position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(12,8,5,.82);
+}
+#ohm-puzzle-modal.hidden { display: none; }
+.ohm-puzzle-container { width: min(760px, calc(100vw - 2rem)); max-height: 86vh; overflow: auto; padding: 1rem; background: #241c16; border: 2px solid var(--pl-copper); color: #f5e6c8; border-radius: 12px; }
+.ohm-puzzle-instruction { color: #f6c76b; }
+.ohm-puzzle-board { display: grid; gap: .55rem; }
+.ohm-segment { min-height: 3.2rem; padding: .7rem; text-align: left; border: 1px solid #806044; border-radius: 8px; background: #33261d; color: #f5e6c8; cursor: pointer; }
+.ohm-segment.covered { border-color: #78d6b0; background: #203d36; }
+.ohm-segment.broken { opacity: .45; cursor: not-allowed; }
+.ohm-puzzle-status { font-weight: 700; letter-spacing: .08em; }
+.ohm-puzzle-status.cerrado { color: #8ff0c5; }
   position: absolute;
   inset: 0;
   display: grid;
