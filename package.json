@@ -19,6 +19,7 @@
     "agent:minimax:gmi": "node scripts/agents/run-gmi-minimax.mjs",
     "agent:minimax:builder": "node scripts/agents/run-minimax-builder.mjs",
     "agent:luna:builder": "node scripts/agents/run-luna-builder.mjs",
+    "agent:dispatch": "node scripts/agents/dispatch-worker-detached.mjs",
     "orchestrator:status": "node scripts/agents/orchestrator-status.mjs",
     "orchestrator:supervisor": "node scripts/agents/run-orchestrator-supervisor.mjs",
     "orchestrator:overnight": "node scripts/agents/run-orchestrator-supervisor.mjs --hours 8 --max-cycles 40",
