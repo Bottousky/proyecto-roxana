@@ -646,16 +646,6 @@ h1 {
 .ohm-segment.broken { opacity: .45; cursor: not-allowed; }
 .ohm-puzzle-status { font-weight: 700; letter-spacing: .08em; }
 .ohm-puzzle-status.cerrado { color: #8ff0c5; }
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-  background: rgba(14, 10, 8, 0.9);
-  backdrop-filter: blur(8px);
-  z-index: 20;
-  pointer-events: auto;
-}
 
 #ohm-puzzle-modal .workbench-window {
   width: min(52rem, 100%);
