@@ -1,6 +1,6 @@
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: c887e2c05cd60325bcb5ae7dd87abbbc6f6006da
+IMPLEMENTATION_SHA: 9784df04d36ddaa817270449b8f248a06ecede3a
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 
@@ -11,7 +11,7 @@ SELF_ACCEPTANCE: false
 **Loop:** `agent-work/loops/ohmdal-arco1-player-facing/state.json`
 **Stage:** `b2-ohm-continuity-puzzle`
 **Branch:** `worker/gemini38-player-facing`
-**Date:** 2026-09-05T21:55:00-03:00
+**Date:** 2026-09-05T22:05:00-03:00
 
 ---
 
@@ -20,14 +20,14 @@ SELF_ACCEPTANCE: false
 ```text
 CANDIDATE_MODE: implementation
 BASE_SHA: 4d55de4be50432c7445065cfd42162658a3dfe3d
-IMPLEMENTATION_SHA: c887e2c05cd60325bcb5ae7dd87abbbc6f6006da
+IMPLEMENTATION_SHA: 9784df04d36ddaa817270449b8f248a06ecede3a
 EVIDENCE_STATUS: PASS
 SELF_ACCEPTANCE: false
 ```
 
 - **Candidate Mode:** `implementation`
 - **Base Commit:** `4d55de4be50432c7445065cfd42162658a3dfe3d`
-- **Implementation Commit:** `c887e2c05cd60325bcb5ae7dd87abbbc6f6006da`
+- **Implementation Commit:** `9784df04d36ddaa817270449b8f248a06ecede3a`
 - **Evidence Status:** `PASS`
 - **Self-Acceptance:** `false` (Builder does not self-accept; awaiting Mavis orchestrator & independent reviewer gate)
 
@@ -113,7 +113,7 @@ worker=Luna/max
 
 ### Whitespace / EOF Hygiene (`git diff --check`)
 ```text
-> git diff --check 4d55de4be50432c7445065cfd42162658a3dfe3d..c887e2c05cd60325bcb5ae7dd87abbbc6f6006da
+> git diff --check 4d55de4be50432c7445065cfd42162658a3dfe3d..9784df04d36ddaa817270449b8f248a06ecede3a
 Clean exit (code 0), 0 whitespace errors reported.
 ```
 
