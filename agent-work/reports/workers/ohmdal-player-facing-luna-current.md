@@ -55,3 +55,11 @@ Revalidation (2026-09-04):
 - B2 browser evidence: desktop continuity interaction and awakening checkpoint reached; touch-specific B2 evidence remains outstanding because the full runner did not reach its mobile phase.
 - Implementation candidate `2fbb1c03b141ebea8d9e8d0d6086f0c4c20743b6` adjusts the harness approach to stop at the pedestal collider's front edge while remaining inside the interaction radius. No canonical loop state was changed and no acceptance was declared.
 
+Revalidation (2026-09-06):
+- `npm run loop:ohmdal-arco1-player-facing:validate`: PASS (B2 remains active, iteration 0).
+- `npm run build`: PASS (`tsc` + Vite production build; existing chunk/Havok resolution warnings only).
+- `npm test`: PASS (39 suites, 0 failures).
+- `npm run playtest:ohmdal-golden-path`: FAIL by timeout during later workshop movement; artifact remains `result: RUNNING`.
+- Desktop B2 reached `ohm-awakened` with `ohmAwake: true`, `storyStep: invited_to_workshop`, position `[0, 1.68, -3.68]`, and zero page errors. Chromium used SwiftShader/software rendering and emitted only GPU-stall warnings.
+- Touch/mobile B2 evidence was not produced because the runner did not reach its mobile phase. Candidate remains `EVIDENCE_STATUS: FAIL`; no acceptance or loop-state advancement was made.
+
