@@ -1,0 +1,93 @@
+{
+  "asset": "workshop-exterior.glb",
+  "sourceScript": "scripts/3d/build-workshop-exterior.py",
+  "assemblyOrigin": {
+    "name": "Plaza workshop root",
+    "position": [
+      -10.5,
+      0.0,
+      -4.0
+    ]
+  },
+  "localOrigin": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "scale": 1.0,
+  "yawDegrees": 0.0,
+  "upAxis": "+Y",
+  "frontAxis": "+Z",
+  "doorLocalCenter": [
+    3.2,
+    1.4,
+    0.0
+  ],
+  "benchLocalCenter": [
+    3.95,
+    0.72,
+    2.95
+  ],
+  "footprintContract": {
+    "existingColliderWorldCenter": [
+      -10.5,
+      0.0,
+      -4.0
+    ],
+    "existingColliderSize": [
+      6.2,
+      7.6
+    ],
+    "existingDoorWorldCenter": [
+      -7.3,
+      1.4,
+      -4.0
+    ],
+    "existingBenchWorldCenter": [
+      -6.55,
+      0.72,
+      -1.05
+    ]
+  },
+  "metrics": {
+    "boundsSource": "vertices",
+    "aabb": {
+      "min": [
+        -3.5399997234344482,
+        0.0,
+        -4.21999979019165
+      ],
+      "max": [
+        5.125,
+        7.159999847412109,
+        4.21999979019165
+      ]
+    },
+    "dims": [
+      8.664999723434448,
+      7.159999847412109,
+      8.4399995803833
+    ],
+    "center": [
+      0.7925001382827759,
+      3.5799999237060547,
+      0.0
+    ],
+    "groundOffset": -0.0,
+    "triangles": 4408,
+    "meshes": 7,
+    "materials": [
+      "WorkshopCopperAged",
+      "WorkshopInteriorRecess",
+      "WorkshopIronSatin",
+      "WorkshopLimestoneWarm",
+      "WorkshopPlasterWarm",
+      "WorkshopRoofWood",
+      "WorkshopWoodDark"
+    ]
+  },
+  "runtime": {
+    "bytes": 496504,
+    "sha256": "ac4512e31c24be63b14eda673364f302d8a0a4ff58b4c0bbf50366db7c610d53"
+  }
+}

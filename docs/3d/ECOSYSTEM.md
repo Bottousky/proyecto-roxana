@@ -89,7 +89,7 @@ Recursos y flujo específico para la Plaza de Ohmdal:
 [`../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md`](../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md).
 
 Política detallada de proveedores para el spike:
-[`../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md`](../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md).
+[`../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md` (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md).
 
 ## Principio de estabilidad
 

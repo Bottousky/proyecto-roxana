@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { classifyWorkerRuntime, readWorkerRuntime } from './orchestrator-runtime.mjs';
 
 const root = process.cwd();
 const configPath = path.join(root, 'agent-work', 'orchestrator', 'config.json');
@@ -114,6 +115,14 @@ function field(content, name) {
   return match ? match[1].trim().replace(/^`|`$/g, '') : null;
 }
 
+function stageFromReport(content) {
+  if (typeof content !== 'string') return null;
+  const markdown = content.match(/^\s*(?:\*\*)?Stage(?:\*\*)?\s*:\s*`?([a-z0-9-]+)`?/im);
+  if (markdown) return markdown[1];
+  const inline = content.match(/\bStage\s*:\s*`?([a-z0-9-]+)`?/i);
+  return inline ? inline[1] : null;
+}
+
 function reportSignals(content) {
   const candidateMode = field(content, 'CANDIDATE_MODE');
   const baseSha = field(content, 'BASE_SHA');
@@ -126,6 +135,7 @@ function reportSignals(content) {
     baseSha,
     implementationSha,
     evidenceStatus,
+    stage: stageFromReport(content),
     selfAcceptanceFalse: /^false$/i.test(selfAcceptance || ''),
     explicitPass: /^PASS$/i.test(evidenceStatus || ''),
   };
@@ -180,6 +190,55 @@ try {
   process.exit(1);
 }
 
+if (config.enabled !== true) {
+  const canonical = resolveRef([
+    `refs/remotes/origin/${config.canonicalBranch}`,
+    `refs/heads/${config.canonicalBranch}`,
+    config.canonicalBranch,
+  ]);
+  const canonicalStatusResult = runGit(['status', '--porcelain=v1', '--untracked-files=all']);
+  const canonicalEntries = canonicalStatusResult.status === 0
+    ? canonicalStatusResult.stdout.split(/\r?\n/).filter(Boolean)
+    : [];
+  const snapshot = {
+    schemaVersion: 4,
+    generatedAt: new Date().toISOString(),
+    enabled: false,
+    orchestrator: config.orchestratorId,
+    candidateProtocol: 'v2-explicit',
+    canonical: {
+      branch: config.canonicalBranch,
+      ref: canonical?.ref ?? null,
+      sha: canonical?.sha ?? null,
+      latestCommit: canonical ? latestCommit(canonical.ref) : null,
+      localWorktreeClean: canonicalStatusResult.status === 0 ? canonicalEntries.length === 0 : null,
+      localWorktreeChanges: canonicalEntries.slice(0, 30),
+    },
+    fetch: {
+      ok: false,
+      error: 'orchestrator disabled; remote fetch skipped',
+    },
+    loop: null,
+    control: {
+      disabled: true,
+      workerTtlMinutes: Number(config.controlPlane?.workerTtlMinutes || 90),
+      currentStage: null,
+      activeWorkers: [],
+      passCandidates: [],
+      failedWorkers: [],
+    },
+    workers: {},
+    worktrees: parseWorktrees(),
+  };
+  const outDir = path.join(root, '.playtest', 'orchestrator');
+  const outPath = path.join(outDir, 'status.json');
+  await mkdir(outDir, { recursive: true });
+  await writeFile(outPath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
+  console.log(JSON.stringify(snapshot, null, 2));
+  console.error(`ORCHESTRATOR_STATUS ${path.relative(root, outPath)}`);
+  process.exit(0);
+}
+
 const fetchResult = runGit(['fetch', 'origin', '--prune']);
 const fetchOk = fetchResult.status === 0;
 
@@ -198,8 +257,17 @@ const canonicalEntries = canonicalStatusResult.status === 0
   ? canonicalStatusResult.stdout.split(/\r?\n/).filter(Boolean)
   : [];
 
+let loopState = null;
+try {
+  loopState = JSON.parse(await readFile(path.join(root, config.activeLoop), 'utf8'));
+} catch {
+  // Keep sensor useful if the state file is temporarily unavailable.
+}
+const currentStage = loopState?.currentStage || null;
+
 const worktrees = parseWorktrees();
 const workerSnapshots = {};
+const ttlMinutes = Number(config.controlPlane?.workerTtlMinutes || 90);
 
 for (const [workerId, worker] of Object.entries(config.workers || {})) {
   const localRef = `refs/heads/${worker.branch}`;
@@ -217,6 +285,10 @@ for (const [workerId, worker] of Object.entries(config.workers || {})) {
     report,
     signals,
   });
+  const runtime = await readWorkerRuntime(root, workerId);
+  const runtimeClassification = classifyWorkerRuntime(runtime, ttlMinutes);
+  const evidenceStage = runtime?.stage || signals.stage || null;
+  const belongsToCurrentStage = Boolean(currentStage && evidenceStage === currentStage);
 
   workerSnapshots[workerId] = {
     branch: worker.branch,
@@ -233,23 +305,37 @@ for (const [workerId, worker] of Object.entries(config.workers || {})) {
     worktree: worktree
       ? { ...worktree, status: wtStatus }
       : null,
+    runtime: runtime
+      ? { ...runtime, classification: runtimeClassification }
+      : { classification: 'UNKNOWN' },
+    evidenceStage,
+    belongsToCurrentStage,
+    active: belongsToCurrentStage && runtimeClassification === 'RUNNING',
+    stale: belongsToCurrentStage && runtimeClassification === 'STALE',
     blockedUntil: worker.blockedUntil || null,
     candidateReady: Boolean(
-      protocol.ready
+      belongsToCurrentStage
+      && protocol.ready
+      && runtimeClassification !== 'RUNNING'
       && (wtStatus == null || wtStatus.clean === true)
     ),
   };
 }
 
-let loopState = null;
-try {
-  loopState = JSON.parse(await readFile(path.join(root, config.activeLoop), 'utf8'));
-} catch {
-  // Keep sensor useful even if the state file is temporarily unavailable.
-}
+const activeWorkers = Object.entries(workerSnapshots)
+  .filter(([, worker]) => worker.active)
+  .map(([workerId]) => workerId);
+const passCandidates = Object.entries(workerSnapshots)
+  .filter(([, worker]) => worker.candidateReady)
+  .map(([workerId]) => workerId);
+const failedWorkers = Object.entries(workerSnapshots)
+  .filter(([, worker]) => worker.belongsToCurrentStage
+    && (['FAIL', 'ERROR', 'STALE'].includes(worker.runtime?.classification)
+      || /^FAIL$/i.test(worker.reportSignals?.evidenceStatus || '')))
+  .map(([workerId]) => workerId);
 
 const snapshot = {
-  schemaVersion: 2,
+  schemaVersion: 4,
   generatedAt: new Date().toISOString(),
   orchestrator: config.orchestratorId,
   candidateProtocol: 'v2-explicit',
@@ -274,6 +360,13 @@ const snapshot = {
         queue: loopState.queue,
       }
     : null,
+  control: {
+    workerTtlMinutes: ttlMinutes,
+    currentStage,
+    activeWorkers,
+    passCandidates,
+    failedWorkers,
+  },
   workers: workerSnapshots,
   worktrees,
 };

@@ -1,8 +1,11 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 # Ohmdal Arco I — Room Graph (11 macroáreas)
 
 > **Estado:** `CANON` (ratificado por `ADR-001`).
 > **Generado:** 2026-08-17.
-> **Acompaña:** `ARC1_SPATIAL_MAP.md`, `RECOVERY_AUDIT.md`, las 11
+> **Acompaña:** `ARC1_SPATIAL_MAP.md`, [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md), las 11
 > fichas en `areas/`, y `ohmdal-arc-01_v1.md`.
 >
 > Este documento define el **grafo de áreas jugables** del Arco I. Es
@@ -458,7 +461,7 @@ Phaser:
 - `ADR-001-phaser-multiarea-arc1.md` — decisión de governance.
 - `ARC1_SPATIAL_MAP.md` — posiciones y dimensiones de las
   regiones.
-- `RECOVERY_AUDIT.md` — auditoría del runtime.
+- [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md) — auditoría del runtime.
 - `areas/*.md` — 11 fichas de macroárea.
 - `docs/20-worlds/ohmdal/content/ohmdal-arc-01_v1.md` —
   contenido del Arco I (vigente).

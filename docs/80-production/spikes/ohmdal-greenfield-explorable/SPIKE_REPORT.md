@@ -1,3 +1,6 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 # Spike Report: Ohmdal Greenfield Exploration (HD-2D · Outer Wilds · Broken Sword)
 
 **Rama de trabajo:** `explore/ohmdal-hd2d-explorable`  

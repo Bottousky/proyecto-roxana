@@ -19,8 +19,16 @@ export interface PlazaUi {
   setGalvanoscopeHud(visible: boolean, v: number, r: number, i: number, status: string, probeA: string | null, probeB: string | null): void;
   setBitacoraView(visible: boolean, manager?: BitacoraManager): void;
   setWorkbenchView(visible: boolean, inspector?: WorkbenchInspector, onAction?: (action: string) => void): void;
+  setOhmInspectionView?(
+    visible: boolean,
+    puzzle?: unknown,
+    onToggleGap?: (gapId: string) => void,
+    onReset?: () => void,
+    onClose?: () => void,
+  ): void;
   setInventoryItem(name: string | null): void;
   showNotification(text: string): void;
+  setCinematicOverlay?(visible: boolean): void;
 }
 
 export interface PlazaHandle {

@@ -1,0 +1,107 @@
+{
+  "asset": "castle-distributor.glb",
+  "sourceScript": "scripts/3d/build-castle-distributor.py",
+  "assembly": {
+    "parent": "castleRoot",
+    "localPosition": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "worldPosition": [
+      60.0,
+      0.0,
+      0.0
+    ],
+    "scale": 1.0,
+    "yawDegrees": 0.0,
+    "sourceAnchor": "CastleDistributionPanel local [0, 0, 0]"
+  },
+  "localOrigin": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "upAxis": "+Y",
+  "frontAxis": "+Z",
+  "groundedPivot": true,
+  "footprintContract": {
+    "housingWidth": 3.8,
+    "housingDepth": 1.2,
+    "housingHeight": 1.8,
+    "existingPanelBody": "CastlePanelBody",
+    "existingPanelFace": "CastlePanelFace",
+    "existingWorldCenter": [
+      60.0,
+      0.0,
+      0.0
+    ]
+  },
+  "branchStubs": {
+    "west": {
+      "localEndpoint": [
+        -2.38,
+        0.38,
+        0.0
+      ],
+      "existingBranch": "CastleBranchA"
+    },
+    "east": {
+      "localEndpoint": [
+        2.38,
+        0.38,
+        0.0
+      ],
+      "existingBranch": "CastleBranchB"
+    },
+    "north": {
+      "localEndpoint": [
+        0.0,
+        0.38,
+        1.42
+      ],
+      "existingBranch": "CastleBranchC"
+    }
+  },
+  "stateNeutralIndicators": true,
+  "metrics": {
+    "boundsSource": "vertices",
+    "aabb": {
+      "min": [
+        -2.440000057220459,
+        0.0,
+        -0.7775000333786011
+      ],
+      "max": [
+        2.440000057220459,
+        2.1449997425079346,
+        1.4399999380111694
+      ]
+    },
+    "dims": [
+      4.880000114440918,
+      2.1449997425079346,
+      2.2174999713897705
+    ],
+    "center": [
+      0.0,
+      1.0724998712539673,
+      0.3312499523162842
+    ],
+    "groundOffset": 0.0,
+    "triangles": 8100,
+    "meshes": 6,
+    "materials": [
+      "CastleDistributorCeramic",
+      "CastleDistributorCopperAged",
+      "CastleDistributorEnamelGreen",
+      "CastleDistributorIndicatorGlass",
+      "CastleDistributorIronDark",
+      "CastleDistributorTrimSteel"
+    ]
+  },
+  "runtime": {
+    "bytes": 1018676,
+    "sha256": "c48893c649fca7fd2dd56fffffe0651e6717a0bf8be40caa974147ad4ff3c392"
+  }
+}

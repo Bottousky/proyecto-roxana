@@ -6,22 +6,22 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Edda',
-        text: '¡Por fin cruzaste el portal! Bienvenida a la Plaza Central de Ohmdal.',
+        text: '¡Alguien cruzó el portal! ¡Desde que nací no vi cruzarlo a nadie, a nadie!',
         emotion: 'eureka',
       },
       {
         who: 'Estudiante',
-        text: 'Hola, Edda. El portal del Instituto vibraba con fuerza... pero aquí todo parece en silencio.',
+        text: 'Eh... hola. El portal del Instituto vibraba con fuerza... pero aquí todo parece en silencio.',
         emotion: 'curious',
       },
       {
         who: 'Edda',
-        text: 'Así es. Desde hace cuarenta años la red está dormida. Mira el pedestal en el centro de la plaza: allí descansa Ohm, la antigua reliquia de medición.',
-        emotion: 'neutral',
+        text: '¡Sabía que los sahumerios estaban funcionando! Mira el pedestal en el centro de la plaza: allí descansa Ohm, la antigua reliquia de medición.',
+        emotion: 'eureka',
       },
       {
         who: 'Edda',
-        text: 'Nadie ha logrado reactivarlo. La gente del pueblo dice que hace falta rezarle al Espíritu del Rayo... pero yo creo que es un problema físico. Acércate y examínalo.',
+        text: 'Lleva años dormido. La gente del pueblo dice que hace falta rezarle al Espíritu del Rayo... Lumen nos pidió que no lo tocáramos. ¿Qué le habrá pasado?',
         emotion: 'curious',
       },
     ],
@@ -33,13 +33,13 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Estudiante',
-        text: 'Es un autómata de latón y cobre con terminales de contacto en su base. El filamento central está frío.',
+        text: 'Parece una máquina de latón y cobre. Tiene unos contactos en la base, y el filamento del centro está frío.',
         emotion: 'curious',
       },
       {
         who: 'Estudiante',
-        text: 'Los bornes de alimentación reciben 24V desde el acumulador del portal, pero el interruptor de entrada está desacoplado.',
-        emotion: 'eureka',
+        text: 'Hay una conexión de entrada que quedó separada. La fuente zumba, pero aquí dentro no se enciende nada. ¿Será ese el corte?',
+        emotion: 'curious',
       },
     ],
   },
@@ -49,12 +49,12 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Ohm',
-        text: '⚡ [PULSO DE AUTO-CALIBRACIÓN] ...Inicializando núcleos galvánicos... Tensión de referencia: 24.0 V.',
+        text: '⚡ [PULSO DE ARRANQUE] ...La energía vuelve a mis conexiones... Mi núcleo responde.',
         emotion: 'eureka',
       },
       {
         who: 'Ohm',
-        text: 'Sensores de lazo en línea. Diagnóstico preliminar de la Cuenca: Lazo de ida continuo (0.25 Ω). Lazo de retorno: ABIERTO. Resistencia: INFINITA.',
+        text: 'Percibo mis sensores. El camino de ida responde, pero el camino de regreso todavía está abierto.',
         emotion: 'neutral',
       },
       {
@@ -71,17 +71,17 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Edda',
-        text: '¡¿Lo DESPERTASTE?! ¡Por todos los esquemas! ¿Qué hiciste? ¡No encendiste sahumerios ni cantaste el himno de los tres golpes!',
+        text: '¡¿Lo despertaste?! ¡Por todos los esquemas, está emitiendo luz y zumbando! Yo iba a probar con otro sahumerio...',
         emotion: 'eureka',
       },
       {
         who: 'Estudiante',
-        text: 'Solo acoplé los terminales de contacto. El acumulador del portal tenía potencial suficiente para energizar su circuito primario.',
-        emotion: 'eureka',
+        text: 'Había un contacto separado. Lo uní y la luz volvió.',
+        emotion: 'neutral',
       },
       {
         who: 'Edda',
-        text: '¡Lo sabía! ¡Es pura continuidad y diferencia de potencial! Lumen TIENE que ver esto de inmediato.',
+        text: '¡El camino volvió a responder! ¡Tenemos que contárselo a Lumen!',
         emotion: 'eureka',
       },
       {
@@ -103,7 +103,7 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
       },
       {
         who: 'Ohm',
-        text: 'Afirmativo, Maestro Lumen. Unidad Ohm plenamente operativa. Estado de la red comunitaria: 0% de corriente.',
+        text: 'Afirmativo, Maestro Lumen. Unidad Ohm plenamente operativa. Los servicios de la red comunitaria siguen sin responder.',
         emotion: 'neutral',
       },
       {
@@ -113,22 +113,22 @@ export const DIALOGUE_DATABASE: Record<string, DialogueNode> = {
       },
       {
         who: 'Estudiante',
-        text: 'Lumen, quitar la barra puente interrumpió el lazo completo. Sin camino de retorno, los electrones no pueden circular.',
+        text: 'Lumen, la barra puente quedó retirada y el camino de vuelta está cortado. ¿Puede ser por eso que la red no responde?',
         emotion: 'eureka',
       },
       {
         who: 'Lumen',
-        text: 'Creíamos que la chispa se «acumulaba» en el aire... Tomá esta Barra Puente de Cobre macizo y mi Cepillo de Alambre de cerdas duras.',
+        text: 'Creíamos que la chispa se «acumulaba» en el aire... Toma esta Barra Puente de Cobre macizo y mi Cepillo de Alambre de cerdas duras.',
         emotion: 'neutral',
       },
       {
         who: 'Lumen',
-        text: 'Salí a la Plaza. Instalá la barra puente en la brecha del suelo, limpiá el moho verde del contacto norte y hacé sonar la campana para enclavar el relé.',
+        text: 'Sal a la Plaza. Instala la barra puente en la brecha del suelo, limpia el moho verde del contacto norte y haz sonar la campana para enclavar el relé.',
         emotion: 'neutral',
       },
       {
         who: 'Lumen',
-        text: 'Si la corriente vuelve a circular, la Gran Puerta con el símbolo de Ohm al norte se abrirá y podremos llegar al Manantial en la montaña.',
+        text: 'Si la red vuelve a responder, la Gran Puerta con el símbolo de Ohm al norte se abrirá y podremos llegar al Manantial en la montaña.',
         emotion: 'eureka',
       },
     ],

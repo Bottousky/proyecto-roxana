@@ -107,16 +107,16 @@ Para validar el inicio de Stage 4:
 
 ### EVIDENCE INSPECTED
 
-- `agent-work/tasks/gemini/ohmdal-plaza-loop-review.md`
-- `agent-work/loops/ohmdal-plaza/state.json`
-- `agent-work/loops/ohmdal-plaza/LOOP.md`
+- [histórico: ohmdal-plaza-loop-review.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/agent-work/tasks/gemini/ohmdal-plaza-loop-review.md)
+- [histórico: state.json](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/agent-work/loops/ohmdal-plaza/state.json)
+- [histórico: LOOP.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/agent-work/loops/ohmdal-plaza/LOOP.md)
 - `docs/3d/HERO_REFERENCE_GATE.md`
 - `docs/3d/BUDGETS.md`
 - `docs/20-worlds/ohmdal/production/GALVANOSCOPE_CANONICAL_BRIEF.md`
 - `assets/references/hero-packs/galvanoscope/hero-reference.json`
 - five approved Galvanoscope reference images
 - four `output/blender/galvanoscope/candidate-01-*.png` previews
-- `agent-work/reports/gemini/ohmdal-plaza-loop-stage-3-galvanoscope-iter-1-before.md`
+- [histórico: ohmdal-plaza-loop-stage-3-galvanoscope-iter-1-before.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/agent-work/reports/gemini/ohmdal-plaza-loop-stage-3-galvanoscope-iter-1-before.md)
 - all eight Stage 3 iteration 1 before/after captures and both capture manifests
 
 ---

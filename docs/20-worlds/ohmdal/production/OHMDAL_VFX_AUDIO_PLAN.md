@@ -83,7 +83,7 @@ During GMI trial, M3 is most useful when given:
 
 Avoid prompts asking M3 to design an eight-file VFX framework from scratch. Prefer one module or one effect decomposition at a time.
 
-Every result is proposal-only and recorded in `agent-work/reports/minimax-gmi/EVALUATION.md`.
+Every result is proposal-only and recorded in [histórico: EVALUATION.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/agent-work/reports/minimax-gmi/EVALUATION.md).
 
 ## Audio generation
 

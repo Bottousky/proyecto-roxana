@@ -1,3 +1,6 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 # Macroárea `area-plaza-cuenca` — Plaza de Cuenca de Ohm
 
 > ⚠ **`ADR-002` (2026-08-18):** las secciones "World position" / `x0/y0` /
@@ -11,7 +14,7 @@
 > **Estado:** `CANON` (ratificado por `ADR-001`).
 > **Generado:** 2026-08-17.
 > **Acompaña:** `ARC1_ROOM_GRAPH.md`, `ARC1_SPATIAL_MAP.md`,
-> `RECOVERY_AUDIT.md`, `ohmdal-arc-01_v1.md` (Prólogo + Cap 1),
+> [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md), `ohmdal-arc-01_v1.md` (Prólogo + Cap 1),
 > `ohmdal-world-structure_v1.md`.
 
 ---

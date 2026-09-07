@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import { buildArc1AuthoredDetails, type Arc1AuthoredDetails } from './authoredArc1Details.ts';
 
 export type Arc1GreyboxZoneId = 'castle' | 'forge-terraces' | 'lighthouse';
 
@@ -33,6 +34,7 @@ export interface Arc1GreyboxElements {
   terracesWaterChannels?: pc.Entity[];
   lighthouseBeacon: pc.Entity;
   lighthouseSignal: pc.Entity;
+  authoredDetails?: Arc1AuthoredDetails;
 }
 
 type PrimitiveType = 'box' | 'cylinder' | 'sphere';
@@ -328,6 +330,7 @@ export function buildArc1Greybox({
   addCylinder(forgeHeater, 'ForgeHeaterRing', brass, [0, 2.35, 0], [1.55, 0.16, 1.55]);
   const forgeHeaterCore = addSphere(forgeHeater, 'ForgeHeaterCore', glow, [0, 2.55, 0], [0.6, 0.6, 0.6]);
   forgeHeaterCore.enabled = false;
+  addPointLight(forgeHeater, 'ForgeThermalSpill', [0, 1.65, 0], new pc.Color(1, 0.3, 0.06), 9, 0);
 
   const forgeProtectionLight = addPointLight(
     forgeTerracesRoot,
@@ -449,6 +452,7 @@ export function buildArc1Greybox({
   addCollider('forge-terraces', 134, 4, 0.5, 48, 'forge-terraces.wall-east');
   addCollider('forge-terraces', 120, -20, 28, 0.5, 'forge-terraces.wall-south');
   addCollider('forge-terraces', 120, 28, 28, 0.5, 'forge-terraces.wall-north');
+  addCollider('forge-terraces', 124.2, -8, 4.6, 4.6, 'forge-terraces.hearth');
 
   const forgeTerracesStaticBatch = app.batcher.addGroup('OhmdalForgeTerracesStaticArt', false, 46);
   for (const render of forgeTerracesAuthoredRoot.findComponents('render') as pc.RenderComponent[]) {
@@ -582,6 +586,44 @@ export function buildArc1Greybox({
   }
   app.batcher.generate([lighthouseStaticBatch.id]);
 
+  // The zone roots start disabled, so BatchManager's scene traversal cannot
+  // clear their batch ids when the groups are removed. Clear each source
+  // component while its group still exists, then remove the generated batch;
+  // otherwise PlayCanvas reports an invalid batch removal on the next render
+  // component lifecycle and can leave stale legacy geometry references.
+  const clearAndRemoveBatch = (root: pc.Entity, groupId: number): void => {
+    if (!app.batcher.getGroupById(groupId)) return;
+    for (const render of root.findComponents('render') as pc.RenderComponent[]) {
+      if (render.batchGroupId === groupId) render.batchGroupId = -1;
+    }
+    if (app.batcher.getGroupById(groupId)) app.batcher.removeGroup(groupId);
+  };
+  clearAndRemoveBatch(castleAuthoredRoot, castleStaticBatch.id);
+  clearAndRemoveBatch(forgeTerracesAuthoredRoot, forgeTerracesStaticBatch.id);
+  clearAndRemoveBatch(lighthouseAuthoredRoot, lighthouseStaticBatch.id);
+
+  // C3 authored pass: replace the primitive focal shells while preserving all
+  // semantic roots, stateful child names, probes and navigation colliders.
+  const authoredDetails = buildArc1AuthoredDetails({
+    app,
+    materials: { stone, stoneDark, copper, brass, water, glow },
+    castleRoot,
+    castleLegacyRoot: castleAuthoredRoot,
+    castleBranchIsolators,
+    forgeTerracesRoot,
+    forgeTerracesLegacyRoot: forgeTerracesAuthoredRoot,
+    forgeHeater,
+    terracesPump,
+    terracesWaterChannels,
+    lighthouseRoot,
+    lighthouseLegacyRoot: lighthouseAuthoredRoot,
+    lighthouseBeacon,
+  });
+
+  // Authored details have replaced the temporary support roots at this point.
+  // Retile only the remaining static stone boxes while preserving every
+  // semantic root, local transform and stateful render component.
+
   return {
     roots: {
       castle: castleRoot,
@@ -601,5 +643,6 @@ export function buildArc1Greybox({
     terracesWaterChannels,
     lighthouseBeacon,
     lighthouseSignal,
+    authoredDetails,
   };
 }

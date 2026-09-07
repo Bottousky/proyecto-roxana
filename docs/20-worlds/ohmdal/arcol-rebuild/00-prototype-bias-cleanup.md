@@ -1,3 +1,6 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 # Ohmdal Arco I — Rebuild: clean-room boundary
 
 > Documento de trabajo. Identifica explícitamente qué se descarta del prototipo

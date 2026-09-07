@@ -1,0 +1,300 @@
+{
+  "edda": {
+    "boundsSource": "vertices",
+    "boundsPose": "bind",
+    "aabb": {
+      "min": [
+        -0.8319,
+        -0.004,
+        -0.1815
+      ],
+      "max": [
+        0.8319,
+        1.7772,
+        0.1675
+      ]
+    },
+    "dims": [
+      1.6639,
+      1.7812,
+      0.3491
+    ],
+    "center": [
+      0,
+      0.8866,
+      -0.007
+    ],
+    "groundOffset": 0.004,
+    "clips": [
+      {
+        "name": "Idle",
+        "duration": 5
+      },
+      {
+        "name": "Observe",
+        "duration": 5
+      },
+      {
+        "name": "Explain",
+        "duration": 5
+      },
+      {
+        "name": "Record",
+        "duration": 5
+      },
+      {
+        "name": "Listen",
+        "duration": 5
+      },
+      {
+        "name": "Operate",
+        "duration": 3.75
+      }
+    ]
+  },
+  "lumen": {
+    "boundsSource": "vertices",
+    "boundsPose": "bind",
+    "aabb": {
+      "min": [
+        -0.8994,
+        -0.004,
+        -0.206
+      ],
+      "max": [
+        0.8994,
+        1.8397,
+        0.1675
+      ]
+    },
+    "dims": [
+      1.7988,
+      1.8437,
+      0.3735
+    ],
+    "center": [
+      0,
+      0.9179,
+      -0.0192
+    ],
+    "groundOffset": 0.004,
+    "clips": [
+      {
+        "name": "Idle",
+        "duration": 5
+      },
+      {
+        "name": "Observe",
+        "duration": 5
+      },
+      {
+        "name": "Explain",
+        "duration": 5
+      },
+      {
+        "name": "Record",
+        "duration": 5
+      },
+      {
+        "name": "Listen",
+        "duration": 5
+      }
+    ]
+  },
+  "consejera": {
+    "boundsSource": "vertices",
+    "boundsPose": "bind",
+    "aabb": {
+      "min": [
+        -0.8319,
+        -0.004,
+        -0.1815
+      ],
+      "max": [
+        0.8319,
+        1.7792,
+        0.1675
+      ]
+    },
+    "dims": [
+      1.6639,
+      1.7831,
+      0.3491
+    ],
+    "center": [
+      0,
+      0.8876,
+      -0.007
+    ],
+    "groundOffset": 0.004,
+    "clips": [
+      {
+        "name": "Idle",
+        "duration": 5
+      },
+      {
+        "name": "Observe",
+        "duration": 5
+      },
+      {
+        "name": "Explain",
+        "duration": 5
+      },
+      {
+        "name": "Record",
+        "duration": 5
+      },
+      {
+        "name": "Listen",
+        "duration": 5
+      }
+    ]
+  },
+  "yesca": {
+    "boundsSource": "vertices",
+    "boundsPose": "bind",
+    "aabb": {
+      "min": [
+        -0.8319,
+        -0.0067,
+        -0.1673
+      ],
+      "max": [
+        0.8319,
+        1.7792,
+        0.1675
+      ]
+    },
+    "dims": [
+      1.6639,
+      1.7859,
+      0.3348
+    ],
+    "center": [
+      0,
+      0.8862,
+      0.0001
+    ],
+    "groundOffset": 0.0067,
+    "clips": [
+      {
+        "name": "Idle",
+        "duration": 5
+      },
+      {
+        "name": "Observe",
+        "duration": 5
+      },
+      {
+        "name": "Explain",
+        "duration": 5
+      },
+      {
+        "name": "Record",
+        "duration": 5
+      },
+      {
+        "name": "Listen",
+        "duration": 5
+      }
+    ]
+  },
+  "vega": {
+    "boundsSource": "vertices",
+    "boundsPose": "bind",
+    "aabb": {
+      "min": [
+        -0.8319,
+        -0.0067,
+        -0.1673
+      ],
+      "max": [
+        0.8319,
+        1.8397,
+        0.1675
+      ]
+    },
+    "dims": [
+      1.6639,
+      1.8465,
+      0.3348
+    ],
+    "center": [
+      0,
+      0.9165,
+      0.0001
+    ],
+    "groundOffset": 0.0067,
+    "clips": [
+      {
+        "name": "Idle",
+        "duration": 5
+      },
+      {
+        "name": "Observe",
+        "duration": 5
+      },
+      {
+        "name": "Explain",
+        "duration": 5
+      },
+      {
+        "name": "Record",
+        "duration": 5
+      },
+      {
+        "name": "Listen",
+        "duration": 5
+      }
+    ]
+  },
+  "nereo": {
+    "boundsSource": "vertices",
+    "boundsPose": "bind",
+    "aabb": {
+      "min": [
+        -0.8994,
+        -0.004,
+        -0.206
+      ],
+      "max": [
+        0.8994,
+        1.8397,
+        0.1675
+      ]
+    },
+    "dims": [
+      1.7988,
+      1.8437,
+      0.3735
+    ],
+    "center": [
+      0,
+      0.9179,
+      -0.0192
+    ],
+    "groundOffset": 0.004,
+    "clips": [
+      {
+        "name": "Idle",
+        "duration": 5
+      },
+      {
+        "name": "Observe",
+        "duration": 5
+      },
+      {
+        "name": "Explain",
+        "duration": 5
+      },
+      {
+        "name": "Record",
+        "duration": 5
+      },
+      {
+        "name": "Listen",
+        "duration": 5
+      }
+    ]
+  }
+}

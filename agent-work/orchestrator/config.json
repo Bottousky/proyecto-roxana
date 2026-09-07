@@ -1,41 +1,49 @@
 {
   "schemaVersion": 1,
   "orchestratorId": "mavis",
-  "harness": "antigravity-cli",
-  "model": "gemini-3.7-flash-medium",
-  "effort": "medium",
-  "canonicalBranch": "explore/ohmdal-3D",
-  "activeLoop": "agent-work/loops/ohmdal-arco1-authored-pass/state.json",
+  "harness": "codex-cli",
+  "enabled": false,
+  "model": "gpt-5.6-luna",
+  "effort": "low",
+  "canonicalBranch": "main",
+  "activeLoop": null,
+  "activeTask": null,
   "pollMinutes": 7,
-  "workers": {
-    "geminiAuthored": {
-      "branch": "worker/gemini-authored",
-      "worktreeHint": "../Roxana-gemini",
-      "task": "agent-work/tasks/workers/ohmdal-authored-primary-gemini.md",
-      "report": "agent-work/reports/workers/ohmdal-authored-gemini-current.md",
-      "writeScope": "authored-stage-specific"
-    },
-    "minimaxVfx": {
-      "branch": "worker/minimax-vfx",
-      "worktreeHint": "../Roxana-minimax",
-      "task": "agent-work/tasks/minimax/opencode-vfx-tool-trial.md",
-      "report": "agent-work/reports/minimax-gmi/opencode-tool-trial.md",
-      "writeScope": "src/experiences/ohmdal-playcanvas/experimental-vfx/**"
-    },
-    "lunaA4b": {
-      "branch": "worker/luna-a4b",
-      "worktreeHint": "../Roxana-luna",
-      "task": "agent-work/tasks/workers/ohmdal-a4b-luna.md",
-      "report": "agent-work/reports/workers/ohmdal-a4b-luna.md",
-      "writeScope": "navigation-collision-hardening",
-      "blockedUntil": "a4-castle-authored accepted"
-    }
+  "controlPlane": {
+    "mode": "state-machine",
+    "workerTtlMinutes": 90,
+    "activePollSeconds": 45,
+    "idlePollSeconds": 15,
+    "postActionPollSeconds": 10,
+    "rules": [
+      "workers publish RUNNING/PASS/FAIL/ERROR runtime state",
+      "WAIT is mechanical and never inferred by the model",
+      "model ticks execute one bounded action and never wait on child workers",
+      "repository reports and canonical Git state remain durable authority"
+    ]
   },
+  "orchestratorRuntime": {
+    "provider": "codex",
+    "model": "gpt-5.6-luna",
+    "effort": "low",
+    "maxConsecutiveErrors": 3,
+    "maxTickMinutes": 8,
+    "reason": "Cheap stable control plane; Gemini 3.8 Flash High is the primary implementation lane"
+  },
+  "workers": {},
   "review": {
-    "model": "gemini-3.7-flash-high",
-    "effort": "high",
+    "harness": "codex",
+    "model": "gpt-5.6-luna",
+    "modelAlias": "Luna",
+    "effort": "medium",
     "freshSession": true,
-    "readOnly": true
+    "readOnly": true,
+    "alternateHarness": "antigravity-cli",
+    "alternateModel": "gemini-3.8-flash-high",
+    "alternateEffort": "high",
+    "useAlternateWhen": "candidate was built by Luna or Luna independence is otherwise compromised",
+    "finalFallbackModel": "gpt-5.6-terra",
+    "finalFallbackEffort": "medium"
   },
   "integration": {
     "requireCleanCanonicalWorktree": true,

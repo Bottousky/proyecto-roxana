@@ -170,7 +170,7 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     assert.equal(gate.world.castle.topology, 'unwired');
 
     const hall = getCaptureShotSpec('castle-distribution-hall');
-    assert.deepEqual(hall.anchor.position, [51.5, 6, -10]);
+    assert.deepEqual(hall.anchor.position, [53.5, 3.1, -9]);
     assert.equal(hall.world.zone, 'castle');
     assert.equal(hall.world.probeTarget, 'castle_bus_in');
     assert.equal(hall.world.plaza.castleGateOpened, true);
@@ -188,7 +188,7 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
 
     const core = getCaptureShotSpec('forge-core');
     assert.equal(core.runtimeHook, 'setCaptureShot');
-    assert.deepEqual(core.anchor.position, [121.5, 2.8, -4.5]);
+    assert.deepEqual(core.anchor.position, [120.5, 3.5, -3.0]);
     assert.equal(core.world.zone, 'forge-terraces');
     assert.equal(core.world.storyStep, 'inside_forge_terraces');
     assert.equal(core.world.probeTarget, 'forge_heater');
@@ -198,14 +198,14 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
     assert.equal(core.world.forgeTerraces.protectiveTrip, false);
 
     const irrigation = getCaptureShotSpec('terraces-irrigation');
-    assert.deepEqual(irrigation.anchor.position, [114.0, 4.5, 10.0]);
+    assert.deepEqual(irrigation.anchor.position, [112.0, 6.8, 1.0]);
     assert.equal(irrigation.world.zone, 'forge-terraces');
     assert.equal(irrigation.world.storyStep, 'forge_terraces_restored');
     assert.equal(irrigation.world.probeTarget, 'terraces_pump');
     assert.equal(irrigation.world.forgeTerraces.restored, true);
 
     const overview = getCaptureShotSpec('forge-terraces-overview');
-    assert.deepEqual(overview.anchor.position, [120.0, 9.5, -13.5]);
+    assert.deepEqual(overview.anchor.position, [111.0, 5.8, -12.0]);
     assert.equal(overview.world.zone, 'forge-terraces');
     assert.equal(overview.world.comparison, 'before-after');
     assert.equal(overview.world.probeTarget, 'forge_bus');
@@ -229,7 +229,7 @@ describe('Ohmdal PlayCanvas · Visual Harness contract', () => {
 
     const lakeWide = getCaptureShotSpec('lighthouse-lake-wide');
     assert.deepEqual(lakeWide.anchor.position, [172.0, 5.2, 2.0]);
-    assert.equal(lakeWide.anchor.yaw, 120);
+    assert.equal(lakeWide.anchor.yaw, 235);
     assert.equal(lakeWide.anchor.pitch, -16);
     assert.equal(lakeWide.world.zone, 'lighthouse');
     assert.equal(lakeWide.world.probeTarget, 'lighthouse_beacon');

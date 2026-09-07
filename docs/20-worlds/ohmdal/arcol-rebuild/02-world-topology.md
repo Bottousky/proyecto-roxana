@@ -1,3 +1,6 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 # Ohmdal Arco I — Topología del mundo (rebuild)
 
 > ⚠ **ESTADO: `LEGACY` desde 2026-08-17.**

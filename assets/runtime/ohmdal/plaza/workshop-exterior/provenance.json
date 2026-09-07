@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_ohmdal_workshop_exterior_01",
+  "provider": "Proyecto Roxana",
+  "sourceMethod": "deterministic Blender-authored architecture",
+  "script": "scripts/3d/build-workshop-exterior.py",
+  "license": "Original Proyecto Roxana geometry; no external asset or paid generation.",
+  "canonicalization": {
+    "tool": "Blender 5.2",
+    "unit": "meter",
+    "upAxis": "+Y",
+    "frontAxis": "+Z",
+    "pivot": "WorkshopExteriorRoot local origin",
+    "worldAssemblyOrigin": [
+      -10.5,
+      0.0,
+      -4.0
+    ]
+  },
+  "runtimeFile": "workshop-exterior.glb",
+  "runtimeSha256": "ac4512e31c24be63b14eda673364f302d8a0a4ff58b4c0bbf50366db7c610d53",
+  "runtimeBytes": 496504,
+  "metrics": {
+    "boundsSource": "vertices",
+    "aabb": {
+      "min": [
+        -3.5399997234344482,
+        0.0,
+        -4.21999979019165
+      ],
+      "max": [
+        5.125,
+        7.159999847412109,
+        4.21999979019165
+      ]
+    },
+    "dims": [
+      8.664999723434448,
+      7.159999847412109,
+      8.4399995803833
+    ],
+    "center": [
+      0.7925001382827759,
+      3.5799999237060547,
+      0.0
+    ],
+    "groundOffset": -0.0,
+    "triangles": 4408,
+    "meshes": 7,
+    "materials": [
+      "WorkshopCopperAged",
+      "WorkshopInteriorRecess",
+      "WorkshopIronSatin",
+      "WorkshopLimestoneWarm",
+      "WorkshopPlasterWarm",
+      "WorkshopRoofWood",
+      "WorkshopWoodDark"
+    ]
+  },
+  "semanticAnchors": [
+    "WorkshopDoorwayAnchor",
+    "WorkshopBenchAnchor",
+    "WorkshopRoofAnchor",
+    "WorkshopRearFacadeAnchor"
+  ],
+  "sourceBindingsToHideBeforeBatchGenerate": [
+    "WorkshopAuthoredShell",
+    "WorkshopStoneBase",
+    "WorkshopRoofEastAuthored",
+    "WorkshopRoofWestAuthored",
+    "WorkshopRidge",
+    "WorkshopChimney",
+    "WorkshopChimneyCap",
+    "WorkshopFrameEast-6.9",
+    "WorkshopFrameEast-4",
+    "WorkshopFrameEast-1.1",
+    "WorkshopFrameWest-6.9",
+    "WorkshopFrameWest-4",
+    "WorkshopFrameWest-1.1",
+    "WorkshopDoorRecess",
+    "WorkshopDoorJamb0",
+    "WorkshopDoorJamb1",
+    "WorkshopDoorConductor0",
+    "WorkshopDoorConductor1",
+    "WorkshopDoorLintel",
+    "WorkshopDoorHeader",
+    "WorkshopThreshold",
+    "WorkshopThresholdStrip",
+    "WorkshopWindowFrame-6.05",
+    "WorkshopWindowFrame-1.95",
+    "WorkshopWindowVoid-6.05",
+    "WorkshopWindowVoid-1.95",
+    "WorkshopWindowSill-6.05",
+    "WorkshopWindowSill-1.95",
+    "WorkshopWindowMullion-6.05",
+    "WorkshopWindowMullion-1.95",
+    "WorkshopServiceCluster",
+    "WorkshopLanternBracket",
+    "WorkshopLanternHousing"
+  ],
+  "notes": [
+    "The asset is visual-only and introduces no collider or gameplay state.",
+    "The east doorway remains open and matches the existing door/threshold landmark.",
+    "The service bench remains at the existing world-space landmark for future visual replacement.",
+    "Materials are authored matte PBR with localized aged copper; no passive emission or new symbols."
+  ]
+}

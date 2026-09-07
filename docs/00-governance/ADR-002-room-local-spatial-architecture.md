@@ -1,3 +1,6 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 ---
 adr_id: ADR-002
 title: "Room-Local Spatial Architecture para Ohmdal; el runtime es un grafo de rooms con coordenadas locales independientes, no un plano mundo continuo"
@@ -41,7 +44,7 @@ depends_on:
 >
 > **Estado de la decisión:** `CANON` ratificado por Manuel en sesión de
 > arquitectura. Rige la migración de recovery documentada en
-> `MIGRATION_PLAN.md`. Ningún código runtime se modifica en esta fase;
+> [MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md). Ningún código runtime se modifica en esta fase;
 > este ADR congela la arquitectura objetivo.
 
 ---
@@ -50,7 +53,7 @@ depends_on:
 
 ### 1.1 El estado actual (híbrido continuo + active-area)
 
-La auditoría de recuperación (sesión previa, `RECOVERY_AUDIT.md` + audit
+La auditoría de recuperación (sesión previa, [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md) + audit
 de spatial architecture) encontró que el runtime evolucionó hacia un
 modelo **híbrido**:
 
@@ -84,7 +87,7 @@ RPGs (Pokémon FireRed/LeafGreen). Esa referencia **no** requiere un plano
 mundo continuo: requiere rooms más grandes que el viewport y transiciones
 controladas. La elección de implementar continuidad física por offsets fue
 una decisión de código, no de producto, y arrastra los defectos listados
-en el registro de bugs (`MIGRATION_PLAN.md` §0).
+en el registro de bugs ([MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md) §0).
 
 ### 1.3 Lo que ya es correcto y se conserva
 
@@ -163,7 +166,7 @@ El runtime de Ohmdal es **room-based**:
 12. **Recuperación directa.** No se aplicará un parche intermedio para que
     la conexión física Plaza→Taller funcione (gapRect). La física de muros
     compartidos es la dirección equivocada y se elimina. La migración va
-    directa al modelo room-based (`MIGRATION_PLAN.md`).
+    directa al modelo room-based ([MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md)).
 
 ---
 
@@ -247,11 +250,11 @@ junto con este ADR:
 | Documento | Contenido |
 |---|---|
 | `docs/20-worlds/ohmdal/room-based/SPATIAL_CONTRACT.md` | Contrato espacial room-based: glosario, RoomGraph, ActiveRoom, cámara, transiciones, render, mapa esquemático, matriz de responsabilidades, validación. |
-| `docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md` | Plan de migración R1–R7 (commits reversibles), registro de bugs conocidos con fase propietaria, DoD de la migración. |
+| [histórico: MIGRATION_PLAN.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md) | Plan de migración R1–R7 (commits reversibles), registro de bugs conocidos con fase propietaria, DoD de la migración. |
 | `docs/20-worlds/ohmdal/room-based/TEST_TAXONOMY.md` | Taxonomía de tests por invariante de producto y tabla KEEP/REWRITE/RETIRE/UN-LEGACY. |
 
 Los bugs detectados en la auditoría se documentan como **issues de
-migración** con fase propietaria en `MIGRATION_PLAN.md` §0 y **no** se
+migración** con fase propietaria en [MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md) §0 y **no** se
 parchean en esta fase:
 
 | Bug | Fase propietaria |
@@ -271,7 +274,7 @@ parchean en esta fase:
 |---|---|
 | `docs/20-worlds/ohmdal/room-based/ARC1_SPATIAL_MAP.md` | Banner de democión: las coordenadas son esquemáticas y **no** se interpretan como coordenadas mundo obligatorias de Phaser; "cambiar `width/height` de una room no debe reposicionar rooms no relacionadas". Topología intacta. |
 | `docs/20-worlds/ohmdal/room-based/areas/*.md` | Banner idéntico en las 11 fichas: secciones "World position" y "Continuidad con vecinos" pasan a contexto esquemático. |
-| `docs/20-worlds/ohmdal/AGENTS.md` | §1 y encabezado: añadir `ADR-002`, `SPATIAL_CONTRACT.md`, `MIGRATION_PLAN.md`, `TEST_TAXONOMY.md` a las lecturas obligatorias. §3: reescribir la frase "El mundo son áreas contiguas..." a room-based. |
+| `docs/20-worlds/ohmdal/AGENTS.md` | §1 y encabezado: añadir `ADR-002`, `SPATIAL_CONTRACT.md`, [MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md), `TEST_TAXONOMY.md` a las lecturas obligatorias. §3: reescribir la frase "El mundo son áreas contiguas..." a room-based. |
 | `docs/00-governance/ADR-001-phaser-multiarea-arc1.md` | Añadir `refined_by: ADR-002` y una nota de puntero (§2.1) para que ADR-002 defina la forma exacta del modelo multi-área. |
 
 ---
@@ -288,7 +291,7 @@ parchean en esta fase:
 - ✅ La documentación ya no implica que el tamaño de una room fuerce el
   reposicionamiento de vecinos.
 - ✅ Migración dividida en commits pequeños y reversibles
-  (`MIGRATION_PLAN.md`).
+  ([MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md)).
 - ✅ Estrategia de tests por invariantes de producto, no por valores de
   `ox/oy` (`TEST_TAXONOMY.md`).
 - ✅ **No se modificó código runtime** en esta fase.
@@ -300,9 +303,9 @@ parchean en esta fase:
 - `ADR-001-phaser-multiarea-arc1.md` — dirección de producción multi-área
   que este ADR refina.
 - `SPATIAL_CONTRACT.md` — contrato espacial room-based.
-- `MIGRATION_PLAN.md` — plan de migración y registro de bugs.
+- [MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md) — plan de migración y registro de bugs.
 - `TEST_TAXONOMY.md` — taxonomía de tests.
-- `RECOVERY_AUDIT.md` — auditoría del runtime (origen de la migración).
+- [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md) — auditoría del runtime (origen de la migración).
 - `ARC1_ROOM_GRAPH.md` — grafo canónico de áreas (se conserva íntegro).
 - `ARC1_SPATIAL_MAP.md` — topología canónica; valores numéricos ahora
   esquemáticos.

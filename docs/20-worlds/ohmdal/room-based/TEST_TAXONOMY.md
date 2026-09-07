@@ -1,8 +1,11 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 # Ohmdal — Test Taxonomy (Room-Based)
 
 > **Estado:** `CANON` (ratificado por `ADR-002`, 2026-08-18).
 > **Rige:** la estrategia de tests del runtime de `src/jugar/` a partir de
-> la migración room-based (`MIGRATION_PLAN.md`).
+> la migración room-based ([MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md)).
 > **Acompaña:** `SPATIAL_CONTRACT.md`, `ARC1_ROOM_GRAPH.md`.
 >
 > Regla de oro: **los tests validan invariantes de producto, no accidentes
@@ -27,7 +30,7 @@
 ## 2. Tabla de migración de tests existentes
 
 > Estado = qué hacer con el archivo en la migración. Las fases referencian
-> `MIGRATION_PLAN.md`.
+> [MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md).
 
 | Archivo de test | Estado | Acción |
 |---|---|---|

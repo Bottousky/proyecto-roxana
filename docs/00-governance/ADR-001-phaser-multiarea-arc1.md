@@ -1,3 +1,6 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 ---
 adr_id: ADR-001
 title: "Phaser 4 multi-área gana como dirección de producción del Arco I de Ohmdal; HD-2D Three.js queda como rama experimental"
@@ -89,7 +92,7 @@ overworld.
 
 ### 1.3 La auditoría
 
-El `RECOVERY_AUDIT.md` (este mismo paquete, en
+El [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md) (este mismo paquete, en
 `docs/20-worlds/ohmdal/room-based/`) establece que el runtime
 existente en `src/jugar/` ya tiene **semillas** del modelo pedido:
 
@@ -130,7 +133,7 @@ La inversión del foco afecta:
 
 Se adopta la **dirección de producción del Arco I de Ohmdal** como
 **Phaser 4 multi-área**, sobre el runtime existente en `src/jugar/`,
-evolucionado según el brief y el `RECOVERY_AUDIT.md`. La rama
+evolucionado según el brief y el [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md). La rama
 HD-2D Three.js (`src/hd2d-ohmdal/`) **no se descarta del repo**
 queda explícitamente como **rama experimental sin promoción a
 canon por accidente**.
@@ -143,7 +146,7 @@ canon por accidente**.
 > un **room graph** con transiciones (fade/doorway/cinematic). Los
 > contratos detallados viven en `SPATIAL_CONTRACT.md`; la migración desde
 > el estado híbrido actual (mundo continuo `ox/oy` + active-area) en
-> `MIGRATION_PLAN.md`; la estrategia de tests en `TEST_TAXONOMY.md`.
+> [MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md); la estrategia de tests en `TEST_TAXONOMY.md`.
 
 - 11 macroáreas (ratificadas en este paquete, ver
   `ARC1_ROOM_GRAPH.md`): Plaza Cuenca, Taller, Calzada, Manantial,
@@ -357,7 +360,7 @@ dentro de este paquete):
 
 - Brief de Manuel del 17 de agosto de 2026 (sesión que origina este
   ADR).
-- `docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md` — auditoría
+- [histórico: RECOVERY_AUDIT.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md) — auditoría
   del runtime existente.
 - `docs/20-worlds/ohmdal/room-based/ARC1_ROOM_GRAPH.md` — grafo de
   las 11 macroáreas.
