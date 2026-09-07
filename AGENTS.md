@@ -17,6 +17,7 @@ actual es completar y pulir Ohmdal Arco I, desde la llegada hasta el faro.
   reúne build, tests y checks de contenido. No debilites checks para pasar.
 - Puedes delegar partes independientes y pedir revisión fresca. Evita dos
   implementadores sobre los mismos archivos y conserva el trabajo ajeno.
+  Una revisión independiente no puede ser la autoaprobación del implementador.
 - Verifica licencias antes de incorporar assets. No publiques secretos ni generes
   gastos sin autorización. No uses force-push ni descartes trabajo único.
 - Documenta sólo lo necesario para continuar: actualiza una fuente existente.

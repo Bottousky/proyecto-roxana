@@ -1,3 +1,6 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 # 03 — HD-2D Greybox Build (Arc I)
 
 > ⚠ **ESTADO: `LEGACY` desde 2026-08-17.**

@@ -1,11 +1,14 @@
+> Referencia del prototipo histórico. Sus restricciones técnicas y tareas no
+> rigen el runtime PlayCanvas actual; consulta `docs/20-worlds/ohmdal/AGENTS.md`.
+
 # Ohmdal — Room-Local Spatial Contract
 
 > **Estado:** `CANON` (ratificado por `ADR-002`, 2026-08-18).
 > **Rige:** la migración de recovery del runtime de `src/jugar/` al modelo
-> room-based (`MIGRATION_PLAN.md`) y toda arquitectura espacial futura de
+> room-based ([MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md)) y toda arquitectura espacial futura de
 > Ohmdal.
 > **Acompaña:** `ADR-002`, `ARC1_ROOM_GRAPH.md`, `ARC1_SPATIAL_MAP.md`,
-> `RECOVERY_AUDIT.md`, `TEST_TAXONOMY.md`.
+> [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md), `TEST_TAXONOMY.md`.
 >
 > ⚠ **Lectura obligatoria antes de tocar cualquier archivo de
 > `src/jugar/` o de `tests/`.** Este documento define los contratos de
@@ -291,7 +294,7 @@ requestTransition(connection)
 | Reset de cámara | `ExplorationScene` → `CameraDirector` |
 
 - Toda transición **commitea** el estado antes de iniciar y **restaura** la
-  cámara después (regla de `RECOVERY_AUDIT.md` §9).
+  cámara después (regla de [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md) §9).
 - Toda cinemática tiene **skip** (Esc/Space) y **fallback** obligatorio.
 - `seamless` (futuro) **no** implica plano mundo global: se implementa como
   una doorway/fade disfrazada que cambia de sistema local con continuidad
@@ -379,6 +382,6 @@ requestTransition(connection)
 - `ARC1_ROOM_GRAPH.md` — grafo canónico (topología, locks, cinemáticas).
 - `ARC1_SPATIAL_MAP.md` — topología canónica; valores numéricos
   esquemáticos.
-- `RECOVERY_AUDIT.md` — auditoría del runtime existente.
-- `MIGRATION_PLAN.md` — plan de migración R1–R7 y registro de bugs.
+- [RECOVERY_AUDIT.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md) — auditoría del runtime existente.
+- [MIGRATION_PLAN.md (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md) — plan de migración R1–R7 y registro de bugs.
 - `TEST_TAXONOMY.md` — taxonomía de tests por invariante.

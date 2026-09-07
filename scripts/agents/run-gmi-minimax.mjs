@@ -212,12 +212,17 @@ async function runTask(args) {
 }
 
 async function main() {
-  await loadLocalEnv();
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     usage();
     return;
   }
+  const orchestration = JSON.parse(await readFile(path.join(ROOT, 'agent-work/orchestrator/config.json'), 'utf8'));
+  if (orchestration.enabled !== true) {
+    console.log('GMI_MINIMAX DISABLED: historical trial retired; no API request made.');
+    return;
+  }
+  await loadLocalEnv();
   if (args.check) {
     await check(args);
     return;
