@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#172e30" />
+  <title>Ohmdal · La pregunta vuelve</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23172e30'/%3E%3Cpath d='M9 23h5v-4c-8-3-5-13 2-13s10 10 2 13v4h5' fill='none' stroke='%23e9c782' stroke-width='3'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <canvas id="world" aria-label="Plaza de Ohmdal. Usá las flechas o WASD para caminar, E para interactuar." tabindex="0"></canvas>
+  <div class="cinema-grain" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="brand"><span class="brand-symbol">Ω</span><div><h1>OHMDAL</h1><p>LA PREGUNTA VUELVE</p></div></div>
+    <div class="header-actions"><button id="journal-button" aria-label="Abrir bitácora"><span>▤</span><span class="button-word"> Bitácora</span><kbd>B</kbd></button><button id="sound-button" aria-label="Activar sonido" aria-pressed="false">♪<span class="button-word"> Sonido</span></button><button id="pause-button" aria-label="Pausar">Ⅱ</button></div>
+  </header>
+  <aside class="chapter"><span class="eyebrow">PRÓLOGO · LA LUZ</span><h2>La plaza de los oficios</h2><p id="objective">Un autómata espera junto a la fuente.</p><div class="chapter-line"></div></aside>
+  <div id="world-labels" aria-hidden="true"></div>
+  <div id="prompt" class="prompt" hidden><button id="interact-button"><kbd>E</kbd><span id="prompt-label"></span><span class="prompt-chevron">↗</span></button></div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <footer class="travel-help"><span class="location-diamond">◇</span><span>PLAZA · OHMDAL</span><i></i><span class="desktop-help">WASD / flechas para caminar · clic para ir</span><span class="touch-help">Tocá el suelo para caminar</span></footer>
+  <div class="touch-controls"><div id="joystick" aria-label="Control de movimiento"><div id="joystick-knob"></div></div></div>
+  <section id="dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="speaker" hidden><div class="portrait-wrap"><canvas id="portrait" width="64" height="80"></canvas></div><div class="dialog-copy"><p id="speaker" class="eyebrow"></p><p id="dialog-text"></p><div id="dialog-actions"></div></div><div class="dialog-corner" aria-hidden="true">✧</div></section>
+  <section id="journal" class="panel" role="dialog" aria-modal="true" aria-labelledby="journal-title" hidden><button class="close" id="journal-close" aria-label="Cerrar bitácora">×</button><span class="eyebrow">CUADERNO DE CAMPO · 01</span><h2 id="journal-title">Lo que empieza a volver</h2><p class="journal-intro">No hace falta saber el nombre de algo para empezar a observarlo.</p><div id="journal-entries"></div><p class="journal-foot">Las marcas también cuentan una historia.</p></section>
+  <section id="pause" class="panel pause-panel" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden><span class="eyebrow">OHMDAL</span><h2 id="pause-title">Un momento en la plaza</h2><p>Tu recorrido se guarda en este navegador.</p><button class="primary" id="resume-button">Volver al mundo</button><button class="quiet" id="reset-button">Comenzar un recorrido nuevo</button><p class="small-note">Estudio independiente de dirección HD-2D.<br>Primer encuentro jugable, previo a La Calzada.</p></section>
+  <section id="arrival" class="arrival" aria-label="Comienzo"><div class="arrival-rule"></div><p>CUARENTA AÑOS DESPUÉS</p><h2>Una pregunta<br>cruza el umbral.</h2><span>En Ohmdal todavía se cuidan las cosas.<br>Aunque ya no siempre se recuerde por qué.</span><button id="begin-button">Entrar en la plaza <span>→</span></button></section>
+  <div id="fade" aria-hidden="true"></div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

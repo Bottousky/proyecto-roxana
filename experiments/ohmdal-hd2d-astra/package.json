@@ -1,0 +1,15 @@
+{
+  "name": "ohmdal-hd2d-astra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 54322 --strictPort",
+    "build": "vite build",
+    "test": "node --test circuit.test.js",
+    "qa:desktop": "node qa.mjs",
+    "qa:touch": "node qa.mjs --mobile"
+  },
+  "dependencies": { "three": "0.177.0" },
+  "devDependencies": { "vite": "6.4.3", "playwright": "1.62.1" }
+}
