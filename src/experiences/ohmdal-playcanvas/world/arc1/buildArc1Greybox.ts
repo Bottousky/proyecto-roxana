@@ -37,6 +37,19 @@ export interface Arc1GreyboxElements {
   authoredDetails?: Arc1AuthoredDetails;
 }
 
+/**
+ * World-space navigation footprints for the load-bearing Lighthouse details.
+ * Kept beside the builder so runtime registration and navigation contracts use
+ * one measured source of dimensions.
+ */
+export const LIGHTHOUSE_NAVIGATION_FOOTPRINTS = [
+  { id: 'lighthouse.calibration-panel', x: 180, z: 0, width: 4.2, depth: 1.2 },
+  { id: 'lighthouse.beacon-base-east-west', x: 180, z: 8, width: 3.6, depth: 2.6 },
+  { id: 'lighthouse.beacon-base-north-south', x: 180, z: 8, width: 2.6, depth: 3.6 },
+  { id: 'lighthouse.quay-wall', x: 186.8, z: 0, width: 1.55, depth: 30 },
+  { id: 'lighthouse.dock-pier', x: 190.5, z: 5, width: 6.4, depth: 4.2 },
+] as const;
+
 type PrimitiveType = 'box' | 'cylinder' | 'sphere';
 
 /**
@@ -574,6 +587,22 @@ export function buildArc1Greybox({
   probeTargets.lighthouse_bus = new pc.Vec3(180, 1.1, -8);
   probeTargets.lighthouse_reference = new pc.Vec3(180, 1.2, 0);
   probeTargets.lighthouse_beacon = new pc.Vec3(180, 1.25, 8);
+
+  // Load-bearing Lighthouse details are solid across their authored
+  // footprints. The movement path approaches the instrument faces from
+  // outside their AABBs, where the interaction radius can still reach them.
+  // The octagonal beacon plinth is represented by a two-AABB cross. Its
+  // centre stays solid while the small corner gaps follow the chamfered mesh.
+  for (const footprint of LIGHTHOUSE_NAVIGATION_FOOTPRINTS) {
+    addCollider(
+      'lighthouse',
+      footprint.x,
+      footprint.z,
+      footprint.width,
+      footprint.depth,
+      footprint.id,
+    );
+  }
 
   addCollider('lighthouse', 166, 0, 0.5, 30, 'lighthouse.wall-west');
   addCollider('lighthouse', 194, 0, 0.5, 30, 'lighthouse.wall-east');

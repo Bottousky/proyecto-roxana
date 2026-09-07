@@ -77,7 +77,7 @@ const FORGE_LOADS: readonly { id: ForgeTerracesLoadId; label: string }[] = [
 ];
 const FORGE_CONDUCTORS: readonly ForgeTerracesConductor[] = ['narrow', 'medium', 'wide'];
 const FORGE_FUSES: readonly (number | null)[] = [null, 2, 3, 4, 5, 6, 8];
-const LIGHTHOUSE_DEFAULT_TRIM = 4;
+const LIGHTHOUSE_DEFAULT_TRIM = 0;
 const LIGHTHOUSE_MIN_TRIM = -12;
 const LIGHTHOUSE_MAX_TRIM = 12;
 
@@ -431,6 +431,7 @@ export function createRegionalMaintenancePanel(
       'Panel de calibración del Faro',
       'Ajusta únicamente la referencia de tensión continua de la baliza.',
     );
+    const measurement = latestLighthouseMeasurement(state);
     const currentTrim = state.lighthouse.calibration?.voltageTrim ?? LIGHTHOUSE_DEFAULT_TRIM;
     createNumberStepper(
       section,
@@ -442,16 +443,25 @@ export function createRegionalMaintenancePanel(
       'V',
       (value) => dispatch({ type: 'lighthouse-trim', value }),
     );
+    const registerTrim = createElement('button', 'ohmdal-regional-panel__select');
+    registerTrim.type = 'button';
+    registerTrim.textContent = 'Registrar este ajuste';
+    registerTrim.dataset.focusKey = 'lighthouse-register-trim';
+    registerTrim.dataset.testid = 'lighthouse-register-trim';
+    registerTrim.setAttribute('aria-label', 'Registrar este ajuste de referencia DC');
+    registerTrim.addEventListener('click', () => dispatch({ type: 'lighthouse-trim', value: currentTrim }));
+    section.appendChild(registerTrim);
     const plate = createElement('p', 'ohmdal-regional-panel__plate');
     plate.textContent = `Placa del Faro: ${LIGHTHOUSE_TARGET_VOLTAGE} V DC · ajuste actual: ${currentTrim >= 0 ? '+' : ''}${currentTrim} V`;
     section.appendChild(plate);
     if (!state.lighthouse.calibration) {
       const defaultNotice = createElement('p', 'ohmdal-regional-panel__hint');
-      defaultNotice.textContent = 'Sin calibración registrada: ajuste inicial pendiente de contrastar con la placa.';
+      defaultNotice.textContent = measurement
+        ? 'Compara la lectura de alimentación con la placa antes de registrar este ajuste.'
+        : `Sin calibración registrada: contrasta la alimentación con la placa de ${LIGHTHOUSE_TARGET_VOLTAGE} V DC antes de registrar este ajuste.`;
       section.appendChild(defaultNotice);
     }
 
-    const measurement = latestLighthouseMeasurement(state);
     const evaluation = evaluateLighthouse(state);
     if (!measurement) {
       appendMeasurementNotice(section, 'Aún no hay una medición real del Faro.', true);
@@ -464,7 +474,18 @@ export function createRegionalMaintenancePanel(
     }
     const points = state.lighthouse.verificationPoints ?? [];
     const status = createElement('p', 'ohmdal-regional-panel__hint');
-    status.textContent = `${isLighthouseEmitting(state) ? 'Baliza encendida' : 'Baliza apagada'} · Alimentación: ${points.includes('feed') ? 'verificada' : 'pendiente'} · Baliza: ${points.includes('beacon') ? 'verificada' : 'pendiente'}. ${evaluation.synchronizationValid ? 'Las dos comprobaciones están registradas; puedes documentar el circuito.' : 'Después de energizar, contrasta la lectura en la alimentación y observa la baliza. Recalibrar reinicia ambas comprobaciones.'}`;
+    const hasFeedVerification = points.includes('feed');
+    const hasBeaconVerification = points.includes('beacon');
+    const verificationHint = evaluation.synchronizationValid
+      ? 'Las dos comprobaciones están registradas; puedes documentar el circuito.'
+      : state.lighthouse.energized
+        ? !hasFeedVerification && !hasBeaconVerification
+          ? 'Con la baliza encendida, verifica la tensión junto a la baliza y repite la medición en la alimentación.'
+          : !hasFeedVerification
+            ? 'Falta repetir la medición en la alimentación con la baliza encendida.'
+            : 'Falta contrastar la tensión junto a la baliza.'
+        : 'Después de energizar, contrasta la lectura en la alimentación y observa la baliza.';
+    status.textContent = `${isLighthouseEmitting(state) ? 'Baliza encendida' : 'Baliza apagada'} · Alimentación: ${hasFeedVerification ? 'verificada' : 'pendiente'} · Baliza: ${hasBeaconVerification ? 'verificada' : 'pendiente'}. ${verificationHint} Recalibrar reinicia ambas comprobaciones.`;
     section.appendChild(status);
   };
 

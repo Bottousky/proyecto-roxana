@@ -162,7 +162,7 @@ export function buildArc1CommunityActors({
       id: 'nereo',
       name: 'Nereo',
       parent: lighthouseRoot,
-      localPosition: [7.4, 0, -7.0],
+      localPosition: [4.2, 0, -7.0],
       bodyMaterial: brass,
       propMaterial: glow,
       propShape: 'lantern',

@@ -85,6 +85,19 @@ export function createLighthouseWater(app: pc.Application, root: pc.Entity, came
     scale.y = 1.1; position.y = 0.55;
     wall.setLocalScale(scale); wall.setLocalPosition(position);
   }
+  // The maintenance berth opens into the lake. A continuous outer parapet
+  // would enclose the boat in a pool; the landward quay remains the physical
+  // player boundary, while two breakwaters frame a navigable water opening.
+  const eastWall = root.findByName('LighthouseWallEast') as pc.Entity | null;
+  if (eastWall?.render) {
+    eastWall.setLocalPosition(14, 0.55, -9.4);
+    eastWall.setLocalScale(0.5, 1.1, 11.2);
+    const northernBreakwater = new pc.Entity('LighthouseNorthernBreakwater');
+    northernBreakwater.addComponent('render', { type: 'box', material: eastWall.render.material, castShadows: false });
+    northernBreakwater.setLocalPosition(14, 0.55, 8.5);
+    northernBreakwater.setLocalScale(0.5, 1.1, 13);
+    root.addChild(northernBreakwater);
+  }
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const setPaused = (paused: boolean) => {
     water.motionPaused = paused || reducedMotion.matches;

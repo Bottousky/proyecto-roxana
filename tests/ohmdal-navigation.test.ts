@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
+import { LIGHTHOUSE_NAVIGATION_FOOTPRINTS } from '../src/experiences/ohmdal-playcanvas/world/arc1/buildArc1Greybox.ts';
 import { OhmdalNavigationRegistry } from '../src/experiences/ohmdal-playcanvas/systems/navigation/ohmdalNavigation.ts';
 import {
   OHMDAL_TRANSITION_ANCHORS,
@@ -70,6 +71,24 @@ navigation.setZoneActive('plaza', false);
 navigation.setZoneActive('workshop', true);
 assert.equal(navigation.collides(-60, 5, 0.4), true, 'el muro del Taller bloquea al activar su zona');
 
+// Lighthouse load-bearing details preserve a clear approach to each probe.
+// These specs mirror the authored world-coordinate footprints so this test
+// exercises the same AABB semantics used by the runtime registry.
+const lighthouseNavigation = new OhmdalNavigationRegistry();
+for (const solid of LIGHTHOUSE_NAVIGATION_FOOTPRINTS) {
+  lighthouseNavigation.registerSolid({ ...solid, zone: 'lighthouse' });
+}
+lighthouseNavigation.setZoneActive('lighthouse', true);
+assert.equal(lighthouseNavigation.collides(180, -8, 0.4), false, 'la barra DC Faro queda accesible');
+assert.equal(lighthouseNavigation.collides(180, -1.1, 0.4), false, 'el frente del panel deja un punto de aproximación');
+assert.equal(lighthouseNavigation.collides(180, 0, 0.4), true, 'el cuerpo del panel no se puede atravesar');
+assert.equal(lighthouseNavigation.collides(180, 5.5, 0.4), false, 'el frente de la baliza deja un punto de aproximación');
+assert.equal(lighthouseNavigation.collides(180, 8, 0.4), true, 'el centro de la base de la baliza es sólido');
+assert.equal(lighthouseNavigation.collides(178.2, 8, 0.4), true, 'el ala de la base de la baliza es sólida');
+assert.equal(lighthouseNavigation.collides(177.3, 8, 0.4), false, 'el borde exterior de la base deja paso');
+assert.equal(lighthouseNavigation.collides(186.8, 0, 0.4), true, 'el muro de la dársena es sólido');
+assert.equal(lighthouseNavigation.collides(190.5, 5, 0.4), true, 'el muelle elevado es sólido');
+
 function advanceUntilBlocked(x: number, z: number, dx: number, dz: number): [number, number] {
   for (let step = 0; step < 200; step += 1) {
     const nextX = x + dx;
@@ -94,6 +113,9 @@ for (const id of [
   'castle.wall-west', 'castle.wall-east', 'castle.exit-gate',
   'forge-terraces.wall-west', 'forge-terraces.wall-east',
   'lighthouse.wall-west', 'lighthouse.wall-east',
+  'lighthouse.calibration-panel', 'lighthouse.beacon-base-east-west',
+  'lighthouse.beacon-base-north-south',
+  'lighthouse.quay-wall', 'lighthouse.dock-pier',
 ]) assert.match(`${workshopSource}\n${manantialSource}\n${arc1Source}`, new RegExp(id.replace(/[.-]/g, '\\$&')), `${id} debe estar registrado`);
 
 assert.match(runtimeSource, /world\.navigation\.collides\(x, z, 0\.4\)/, 'movimiento usa navegación por zona');

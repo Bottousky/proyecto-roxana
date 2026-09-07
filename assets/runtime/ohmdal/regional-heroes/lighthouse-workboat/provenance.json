@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_ohmdal_lighthouse_workboat_01",
+  "provider": "Proyecto Roxana",
+  "sourceMethod": "deterministic Blender-authored original geometry",
+  "script": "scripts/3d/build-lighthouse-workboat.py",
+  "license": "Original Proyecto Roxana geometry; no external asset, texture, provider or paid generation.",
+  "referencePack": {
+    "region": "assets/references/region-packs/faro/README.md",
+    "hero": "assets/references/hero-packs/lighthouse/hero-reference.json"
+  },
+  "canonicalization": {
+    "tool": "Blender 5.2",
+    "unit": "meter",
+    "upAxis": "+Y",
+    "frontAxis": "+Z (bow)",
+    "pivot": "LighthouseWorkboatRoot local origin",
+    "waterlineLocalY": 0.0,
+    "runtimePlacementTarget": [
+      10.5,
+      0.2,
+      -0.4
+    ],
+    "runtimeYawDegrees": 90
+  },
+  "runtimeFile": "lighthouse-workboat.glb",
+  "runtimeSha256": "8fc96d0dafec4895014272c21f9129b0776c6d643c0405d1bbac47e23df6654b",
+  "runtimeBytes": 517240,
+  "metrics": {
+    "boundsSource": "vertices",
+    "aabb": {
+      "min": [
+        -0.947397,
+        -0.45,
+        -2.744421
+      ],
+      "max": [
+        0.947397,
+        0.796,
+        2.706665
+      ]
+    },
+    "dims": [
+      1.894794,
+      1.246,
+      5.451087
+    ],
+    "center": [
+      0.0,
+      0.173,
+      -0.018878
+    ],
+    "groundOffset": 0.45,
+    "waterlineLocalY": 0.0,
+    "triangles": 4680,
+    "vertices": 2512,
+    "meshes": 6,
+    "materials": [
+      "LighthouseWorkboatAgedOak",
+      "LighthouseWorkboatCanvas",
+      "LighthouseWorkboatDarkPlank",
+      "LighthouseWorkboatHempRope",
+      "LighthouseWorkboatKeelTar",
+      "LighthouseWorkboatMutedGreenTrim"
+    ],
+    "drawCallEstimate": 6
+  },
+  "materials": {
+    "oak": "aged oak planks and seats",
+    "oak_dark": "plank seams, ribs and oars",
+    "tar": "keel/belly below waterline",
+    "trim": "muted green gunwales and cleats",
+    "canvas": "rolled maintenance canvas",
+    "rope": "hemp lashings and coil"
+  },
+  "notes": [
+    "Open hollow hull with pointed +Z bow, stern transom, keel, seats and ribs.",
+    "Two oars are lashed inside; canvas bundle and rope coil are visual maintenance props.",
+    "No emissive material, electric fake glow, collider, interaction or puzzle state is authored.",
+    "Static meshes are merged by material for an estimated six material batches."
+  ]
+}

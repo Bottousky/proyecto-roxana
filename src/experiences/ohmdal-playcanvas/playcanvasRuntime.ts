@@ -1587,6 +1587,11 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       });
     } else if (inLighthouse) {
       const nereo = world.communityActors.actors.nereo.root;
+      const lighthouseVerificationPoints = arc1State.lighthouse.verificationPoints ?? [];
+      const lighthouseNeedsFeedVerification = arc1State.lighthouse.energized
+        && !lighthouseVerificationPoints.includes('feed');
+      const lighthouseNeedsBeaconVerification = arc1State.lighthouse.energized
+        && !lighthouseVerificationPoints.includes('beacon');
       list.push({
         id: 'community_nereo',
         label: isLighthouseRestored(arc1State) ? 'Hablar con Nereo sobre el Faro restaurado' : 'Hablar con Nereo sobre la alimentación del Faro',
@@ -1596,7 +1601,9 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       });
       list.push({
         id: 'lighthouse_bus_measure',
-        label: 'Medir alimentación DC del Faro',
+        label: lighthouseNeedsFeedVerification
+          ? 'Verificar alimentación DC con la baliza encendida'
+          : 'Medir alimentación DC del Faro',
         pos: new pc.Vec3(180, 1.1, -8),
         radius: 2.2,
         action: () => {
@@ -1626,7 +1633,9 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       });
       list.push({
         id: 'lighthouse_beacon_control',
-        label: arc1State.lighthouse.energized ? 'Comprobar tensión en la baliza' : 'Energizar baliza calibrada',
+        label: arc1State.lighthouse.energized
+          ? lighthouseNeedsBeaconVerification ? 'Verificar tensión en la baliza' : 'Repetir verificación de la baliza'
+          : 'Energizar baliza calibrada',
         pos: new pc.Vec3(180, 1.25, 8),
         radius: 2.8,
         action: () => {
@@ -1641,18 +1650,35 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             audio.playBeaconSync();
             vfx.triggerConductorPulse([180, 1.25, 8], [180, 5.0, 8]);
           }
+          const verificationPoints = arc1State.lighthouse.verificationPoints ?? [];
+          const missingFeedVerification = !verificationPoints.includes('feed');
+          const missingBeaconVerification = !verificationPoints.includes('beacon');
           ui.showNotification(arc1State.lighthouse.protectiveTrip
             ? 'La protección actuó: mide y calibra antes de sincronizar.'
-            : arc1State.lighthouse.synchronizationSamples >= 2
-              ? 'Alimentación y baliza comprobadas. El registro puede repetirse.'
-              : 'La baliza recibe energía. Contrasta la lectura aquí y en la barra de alimentación.');
+              : arc1State.lighthouse.synchronizationSamples >= 2
+                ? 'Alimentación y baliza comprobadas. El registro puede repetirse.'
+                : missingFeedVerification && missingBeaconVerification
+                  ? 'La baliza recibe energía. Verifica la tensión junto a la baliza y repite la medición en la barra de alimentación.'
+                  : missingFeedVerification
+                    ? 'La baliza está verificada. Repite la medición en la barra de alimentación con la baliza encendida.'
+                    : missingBeaconVerification
+                      ? 'La alimentación está verificada. Contrasta ahora la tensión junto a la baliza.'
+                      : 'La baliza recibe energía. Contrasta la lectura aquí y en la barra de alimentación.');
           if (evaluation.restored) storyStep = 'lighthouse_restored';
           updateArc1WorldVisuals();
         },
       });
       list.push({
         id: 'lighthouse_return_marker',
-        label: isLighthouseRestored(arc1State) ? 'Iniciar regreso por la red restaurada' : 'Registrar calibración validada',
+        label: isLighthouseRestored(arc1State)
+          ? 'Iniciar regreso por la red restaurada'
+          : lighthouseNeedsFeedVerification && lighthouseNeedsBeaconVerification
+            ? 'Registrar: verificar alimentación y baliza'
+            : lighthouseNeedsFeedVerification
+              ? 'Registrar: verificar alimentación DC'
+              : lighthouseNeedsBeaconVerification
+                ? 'Registrar: verificar tensión en la baliza'
+                : 'Registrar calibración validada',
         pos: new pc.Vec3(180, 1.0, 14),
         radius: 2.4,
         action: () => {

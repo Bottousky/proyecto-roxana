@@ -3,9 +3,9 @@ import type { DialogueNode } from '../../../ohmdal-plaza/types.ts';
 /**
  * Production copy for the Arc I community beats.
  *
- * Progression remains owned by the runtime. These nodes deliberately carry
- * dialogue only; the line-level source map lives in
- * agent-work/reports/workers/ohmdal-community-c1-c4-20260906.md.
+ * Narrative voice and scene intent follow the canonical character and script
+ * bibles. Progression remains owned by the runtime; these nodes carry dialogue
+ * only, while the first-class phase truth remains in firstClassPracticeModel.
  */
 export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
   castle_councillor_arrival: {
@@ -13,17 +13,17 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Consejera',
-        text: 'Hay barrios esperando y un tramo que todavía no responde.',
+        text: 'No volveré a abrir todos los sellos a la vez. Hay barrios al otro lado.',
         emotion: 'concerned',
       },
       {
         who: 'Consejera',
-        text: 'Antes de abrir un sello, mide las ramas y muéstrame qué cambia.',
+        text: 'Un tramo averiado no debería condenar también a los que siguen enteros.',
         emotion: 'neutral',
       },
       {
         who: 'Consejera',
-        text: 'La evidencia queda escrita; después decidimos qué carga priorizar.',
+        text: 'Encuentra dónde termina la falla. Yo me encargo de que el miedo no vuelva a cerrarlo todo.',
         emotion: 'neutral',
       },
     ],
@@ -34,17 +34,17 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Consejera',
-        text: 'Los barrios vuelven a recibir suministro y las lecturas quedan a la vista.',
+        text: 'La red vuelve por ramas; si una falla, no tiene que caer toda la comunidad.',
         emotion: 'eureka',
       },
       {
         who: 'Consejera',
-        text: 'El sello se abre con la evidencia a la vista.',
+        text: 'Ahora sé qué rama puedo aislar sin apagar a todos.',
         emotion: 'neutral',
       },
       {
         who: 'Consejera',
-        text: 'La red queda documentada; podemos mantener el servicio sin apagar a toda la comunidad.',
+        text: 'Voy a dejar la copia en el Castillo. Que el próximo turno no dependa de mi memoria.',
         emotion: 'neutral',
       },
     ],
@@ -55,17 +55,17 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Yesca',
-        text: 'La Forja tiene que producir y las Terrazas tienen que seguir regando.',
+        text: 'Cuando enciendo todo de golpe, salta la protección: se quedan fríos el horno y la bomba.',
         emotion: 'concerned',
       },
       {
         who: 'Yesca',
-        text: 'Mira el calor y la respuesta de la red antes de cambiar la carga.',
+        text: 'Necesito calor suficiente y Vega necesita agua. ¿Hay sitio para los dos?',
         emotion: 'neutral',
       },
       {
         who: 'Yesca',
-        text: 'Dime qué esperas que pase; una predicción puede evitar un accidente.',
+        text: 'Con que el horno haga su trabajo me alcanza. No necesito que arda como un sol.',
         emotion: 'curious',
       },
     ],
@@ -76,17 +76,17 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Yesca',
-        text: 'La Forja sigue trabajando y el riego vuelve a alcanzar sus niveles.',
+        text: 'La Forja trabaja y Vega no perdió el agua.',
         emotion: 'eureka',
       },
       {
         who: 'Yesca',
-        text: 'La red ya no se sobrecarga cuando la carga entra.',
+        text: 'La protección no nos quitó el turno; nos mostró cuánto podíamos pedir.',
         emotion: 'neutral',
       },
       {
         who: 'Yesca',
-        text: 'El esquema queda para el próximo turno.',
+        text: 'Voy a marcar esta posición. Mañana alguien tendrá que relevarme.',
         emotion: 'neutral',
       },
     ],
@@ -97,17 +97,17 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Vega',
-        text: 'El agua se reparte por niveles; aquí cada cambio se siente más arriba.',
+        text: 'El agua sube por niveles; si toco aquí, arriba lo sienten.',
         emotion: 'concerned',
       },
       {
         who: 'Vega',
-        text: 'No muevo una pieza hasta saber qué va a cambiar.',
+        text: 'Llevo treinta años cuidando estos niveles. El de arriba siempre es el primero que me preocupa.',
         emotion: 'neutral',
       },
       {
         who: 'Vega',
-        text: 'Muéstrame la lectura y deja un esquema para el siguiente turno.',
+        text: 'Mira hasta dónde llega el agua cuando cambia la bomba. Las marcas están para eso.',
         emotion: 'curious',
       },
     ],
@@ -118,17 +118,17 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Vega',
-        text: 'El agua alcanza niveles que habían quedado abandonados.',
+        text: 'El agua llegó al nivel que esperábamos; arriba también se nota.',
         emotion: 'eureka',
       },
       {
         who: 'Vega',
-        text: 'La lectura quedó verificada y el esquema queda para el siguiente turno.',
+        text: 'Ya no tengo que elegir qué terraza dejamos esperando.',
         emotion: 'neutral',
       },
       {
         who: 'Vega',
-        text: 'Ahora sé antes de tocar.',
+        text: 'Dejemos el ajuste junto a las marcas. Quien venga mañana también tiene que entenderlo.',
         emotion: 'neutral',
       },
     ],
@@ -139,17 +139,17 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Nereo',
-        text: 'La alimentación llega, pero la salida todavía no comunica con el Lago.',
+        text: 'El Faro recibe energía. Y, sin embargo, el Lago sigue esperando su luz.',
         emotion: 'concerned',
       },
       {
         who: 'Nereo',
-        text: 'Conservo el patrón en el cuerpo. Mira la salida antes de cambiarla.',
+        text: 'Cuarenta años recordando cada ajuste con las manos. Ven; comparemos lo que llega con lo que sale.',
         emotion: 'curious',
       },
       {
         who: 'Nereo',
-        text: 'Registra la alimentación, la salida y la calibración.',
+        text: 'Quiero que mi memoria tenga compañía antes de mover nada.',
         emotion: 'neutral',
       },
     ],
@@ -160,17 +160,17 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Nereo',
-        text: 'La alimentación se mantiene y la salida llega al Lago.',
+        text: 'Ahí está. La luz vuelve a alcanzar el Lago.',
         emotion: 'eureka',
       },
       {
         who: 'Nereo',
-        text: 'El registro conserva la calibración sin borrar la variación.',
+        text: 'Los ajustes siguen siendo los mismos. La diferencia es que ahora alguien más puede entenderlos.',
         emotion: 'neutral',
       },
       {
         who: 'Nereo',
-        text: 'Ahora el Faro comunica un método, no sólo una señal.',
+        text: 'Qué descanso... que el Faro pueda seguir cuando estas manos necesiten parar.',
         emotion: 'neutral',
       },
     ],
@@ -181,12 +181,12 @@ export const ARC1_COMMUNITY_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       {
         who: 'Edda',
-        text: 'Lumen, mira qué cambia antes de tocar.',
+        text: 'Lumen, antes de mover el puente: ¿qué te dice la aguja con el retorno abierto?',
         emotion: 'curious',
       },
       {
         who: 'Lumen',
-        text: 'Lo dejo registrado: observación primero, procedimiento después.',
+        text: 'Lo anoto: el retorno estaba abierto. Edda, cierra el puente; después miramos de nuevo.',
         emotion: 'neutral',
       },
       {

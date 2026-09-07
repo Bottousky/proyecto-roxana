@@ -1,0 +1,82 @@
+{
+  "asset": "lighthouse-workboat.glb",
+  "sourceScript": "scripts/3d/build-lighthouse-workboat.py",
+  "assembly": {
+    "parent": "lighthouseRoot",
+    "localPosition": [
+      10.5,
+      0.2,
+      -0.4
+    ],
+    "scale": 1.0,
+    "yawDegrees": 90,
+    "sourceAnchor": "LighthouseWorkboatCenterAnchor",
+    "runtimeNote": "Integration target beside lighthouse pier; visual prop only."
+  },
+  "localOrigin": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "upAxis": "+Y",
+  "frontAxis": "+Z (bow)",
+  "waterlineLocalY": 0.0,
+  "targetDimensions": {
+    "length": 5.5,
+    "width": 1.9,
+    "bottomY": -0.45,
+    "rimY": 0.7
+  },
+  "groundedPivot": false,
+  "semanticAnchors": [
+    "LighthouseWorkboatCenterAnchor",
+    "LighthouseWorkboatBowAnchor",
+    "LighthouseWorkboatSternAnchor",
+    "LighthouseWorkboatOarPortAnchor",
+    "LighthouseWorkboatOarStarboardAnchor",
+    "LighthouseWorkboatRopeAnchor"
+  ],
+  "metrics": {
+    "boundsSource": "vertices",
+    "aabb": {
+      "min": [
+        -0.947397,
+        -0.45,
+        -2.744421
+      ],
+      "max": [
+        0.947397,
+        0.796,
+        2.706665
+      ]
+    },
+    "dims": [
+      1.894794,
+      1.246,
+      5.451087
+    ],
+    "center": [
+      0.0,
+      0.173,
+      -0.018878
+    ],
+    "groundOffset": 0.45,
+    "waterlineLocalY": 0.0,
+    "triangles": 4680,
+    "vertices": 2512,
+    "meshes": 6,
+    "materials": [
+      "LighthouseWorkboatAgedOak",
+      "LighthouseWorkboatCanvas",
+      "LighthouseWorkboatDarkPlank",
+      "LighthouseWorkboatHempRope",
+      "LighthouseWorkboatKeelTar",
+      "LighthouseWorkboatMutedGreenTrim"
+    ],
+    "drawCallEstimate": 6
+  },
+  "runtime": {
+    "bytes": 517240,
+    "sha256": "8fc96d0dafec4895014272c21f9129b0776c6d643c0405d1bbac47e23df6654b"
+  }
+}

@@ -2,6 +2,7 @@ import * as pc from 'playcanvas';
 import type { Arc1GreyboxElements } from './buildArc1Greybox.ts';
 import { loadLighthouseTower, type LighthouseTowerHandle } from './lighthouseTower.ts';
 import { loadCastleDistributor, type CastleDistributorHandle } from './castleDistributor.ts';
+import { loadLighthouseWorkboat } from './lighthouseWorkboat.ts';
 
 type HeroId = 'forge' | 'lighthouse' | 'manantial';
 const urls: Record<HeroId, string> = {
@@ -23,6 +24,17 @@ export function createRegionalHeroVisuals(app: pc.Application, world: Arc1Greybo
   let generatorRotor: pc.GraphNode | null = null;
   let tower: LighthouseTowerHandle | null = null;
   let towerReady: Promise<void> | null = null;
+  let workboat: ReturnType<typeof loadLighthouseWorkboat> | null = null;
+  let workboatReady: Promise<void> | null = null;
+  const ensureWorkboat = (): Promise<void> => {
+    if (workboatReady) return workboatReady;
+    workboat = loadLighthouseWorkboat(app, world.roots.lighthouse);
+    workboatReady = workboat.ready.catch(error => {
+      workboat?.dispose(); workboat = null; workboatReady = null;
+      throw error;
+    });
+    return workboatReady;
+  };
   let distributor: CastleDistributorHandle | null = null;
   let distributorReady: Promise<void> | null = null;
   const ensureDistributor = (): Promise<void> => {
@@ -228,6 +240,7 @@ export function createRegionalHeroVisuals(app: pc.Application, world: Arc1Greybo
     destroyed = true;
     distributor?.dispose(); distributor = null;
     tower?.dispose(); tower = null;
+    workboat?.dispose(); workboat = null;
     for (const finish of settleOnDestroy) finish();
     for (const root of visualRoots) root.destroy();
     for (const asset of assets) { asset.off(); asset.unload(); app.assets.remove(asset); }
@@ -236,7 +249,8 @@ export function createRegionalHeroVisuals(app: pc.Application, world: Arc1Greybo
   return { ensure(id: HeroId | 'castle') {
     if (destroyed) return Promise.resolve();
     if (id === 'castle') return ensureDistributor();
-    return Promise.all([ensure(id), id === 'lighthouse' ? ensureTower() : undefined]).then(() => undefined);
+    return Promise.all([ensure(id), id === 'lighthouse' ? ensureTower() : undefined,
+      id === 'lighthouse' ? ensureWorkboat() : undefined]).then(() => undefined);
   }, animateManantial(dt: number) {
     if (!manantial.root.enabled) return;
     // The imported root retains +90 X; rotor local Y is the shaft's world Z.

@@ -477,6 +477,10 @@ function buildCastleDetails(
   addBeam(distributor, 'CastleBusBranchB', materials.copper, [0, 0], [8.0, 0], 1.08, 0.24, 0.28);
   addBeam(distributor, 'CastleBusBranchC', materials.copper, [0, 0], [0, 8.0], 1.08, 0.24, 0.28);
   for (const [index, position] of [[1, [-4, 0]], [2, [4, 0]], [3, [0, 4]]] as Array<[number, Point2]>) {
+    addChamferedPrism(app, distributor, `CastleDistributorSupportBase${index}`, materials.stoneDark, [position[0], 0, position[1]], 0.72, 0.72, 0.16, 0.08);
+    addChamferedPrism(app, distributor, `CastleDistributorSupportColumn${index}`, materials.stoneDark, [position[0], 0.16, position[1]], 0.3, 0.3, 0.54, 0.06);
+    addRing(app, distributor, `CastleDistributorSupportCollar${index}`, materials.brass, [position[0], 0.64, position[1]], 8, 0.13, 0.2, 0.08);
+    addChamferedPrism(app, distributor, `CastleDistributorSupportSeat${index}`, materials.stoneDark, [position[0], 0.7, position[1]], 0.52, 0.52, 0.12, 0.06);
     addPrism(app, distributor, `CastleCeramicStandoff${index}`, materials.stone, [position[0], 0.78, position[1]], 8, 0.42, 0.5);
   }
   for (const [index, position] of [[1, [-8, 0]], [2, [8, 0]], [3, [0, 8]]] as Array<[number, Point2]>) {
@@ -485,9 +489,43 @@ function buildCastleDetails(
   }
 
   for (const [index, isolator] of branchIsolators.entries()) {
+    // Keep the supplied entity as the stateful Z pivot; the mount is static.
     isolator.setLocalScale(1, 1, 1);
-    replaceRenderWithMesh(app, isolator, chamferedPrismMesh(app, 2.2, 0.34, 0.18, 0.06), materials.copper);
-    addPrism(app, isolator, `CastleIsolatorCeramic${index + 1}`, materials.stone, [0, 0.08, 0], 8, 0.24, 0.34);
+    const mount = new pc.Entity(`CastleSwitchMount${index + 1}`);
+    mount.setLocalPosition(isolator.getLocalPosition());
+    root.addChild(mount);
+    addChamferedPrism(app, mount, `CastleSwitchSupportBase${index + 1}`, materials.stoneDark, [0, -1.35, 0], 0.72, 0.62, 0.16, 0.08);
+    addChamferedPrism(app, mount, `CastleSwitchSupportColumn${index + 1}`, materials.stoneDark, [0, -1.19, 0], 0.28, 0.28, 0.9, 0.05);
+    addRing(app, mount, `CastleSwitchSupportCollar${index + 1}`, materials.brass, [0, -0.31, 0], 8, 0.12, 0.19, 0.1);
+    addChamferedPrism(app, mount, `CastleSwitchSupportSeat${index + 1}`, materials.stoneDark, [0, -0.25, 0], 0.52, 0.5, 0.14, 0.06);
+    addChamferedPrism(app, mount, `CastleSwitchBase${index + 1}`, materials.stoneDark, [0, -0.18, 0], 0.78, 0.58, 0.16, 0.08);
+    addPrism(app, mount, `CastleIsolatorCeramic${index + 1}`, regionalMaterials.ceramicPorcelain, [0, -0.10, 0], 8, 0.22, 0.3);
+
+    // The transverse axle keeps the support upright under Z-state rotation.
+    addMesh(
+      mount,
+      `CastleSwitchAxle${index + 1}`,
+      prismMesh(app, 10, 0.14, 0.26),
+      materials.brass,
+      [0, 0, -0.13],
+      [90, 0, 0],
+    );
+    for (const [boltIndex, x] of [-0.25, 0.25].entries()) {
+      addPrism(app, mount, `CastleSwitchBolt${index + 1}-${boltIndex + 1}`, materials.brass, [x, -0.02, 0], 8, 0.045, 0.07);
+    }
+
+    // Only the handle children rotate with the gameplay pivot.
+    isolator.removeComponent('render');
+    addMesh(
+      isolator,
+      `CastleSwitchPivotCap${index + 1}`,
+      prismMesh(app, 10, 0.13, 0.2),
+      materials.brass,
+      [0, 0, -0.1],
+      [90, 0, 0],
+    );
+    addChamferedPrism(app, isolator, `CastleSwitchLever${index + 1}`, regionalMaterials.agedConductor, [0.34, 0, 0], 0.68, 0.12, 0.12, 0.035);
+    addChamferedPrism(app, isolator, `CastleSwitchCeramicGrip${index + 1}`, regionalMaterials.ceramicPorcelain, [0.68, 0, 0], 0.18, 0.2, 0.18, 0.04);
   }
 
   regionalMaterials.applyCeramicBySemanticName(castleRoot);
@@ -695,13 +733,13 @@ function buildLighthouseDetails(
   addRing(app, root, 'LighthouseCalibrationDialRing', materials.copper, [0, 1.2, -0.88], 12, 0.48, 0.66, 0.12);
   addBeam(root, 'LighthouseCalibrationNeedle', materials.brass, [-0.42, -0.88], [0.28, -0.88], 1.34, 0.08, 0.08);
 
-  addChamferedPrism(app, root, 'LighthouseQuayWallAuthored', materials.stone, [6.8, 0.45, 4], 1.55, 22, 0.9, 0.22);
+  addChamferedPrism(app, root, 'LighthouseQuayWallAuthored', materials.stone, [6.8, -0.1, 0], 1.55, 30, 0.9, 0.22);
   addChamferedPrism(app, root, 'LighthouseDockPierAuthored', materials.stone, [10.5, 0.42, 5], 6.4, 4.2, 0.84, 0.3);
   addChamferedPrism(app, root, 'LighthouseDockWater', materials.water, [11.6, 0.16, 4], 11.5, 25.5, 0.08, 0.4);
   addBeam(root, 'LighthouseShoreStepOne', materials.stoneDark, [7.55, 3.3], [9.0, 3.3], 0.24, 0.2, 1.2);
   addBeam(root, 'LighthouseShoreStepTwo', materials.stoneDark, [7.55, 5.2], [9.0, 5.2], 0.42, 0.2, 1.2);
-  addPrism(app, root, 'LighthouseMooringBollardWest', materials.brass, [12.8, 0.9, 3.6], 8, 0.34, 0.8);
-  addPrism(app, root, 'LighthouseMooringBollardEast', materials.brass, [12.8, 0.9, 6.4], 8, 0.34, 0.8);
+  addPrism(app, root, 'LighthouseMooringBollardWest', materials.stoneDark, [8.3, 1.26, 3.6], 8, 0.18, 0.44);
+  addPrism(app, root, 'LighthouseMooringBollardEast', materials.stoneDark, [12.8, 1.26, 3.6], 8, 0.18, 0.44);
 
   addBeam(root, 'LighthouseTransmissionBus', materials.copper, [-4, -9], [-4, 8], 5.25, 0.16, 0.22);
   addBeam(root, 'LighthouseTransmissionFeed', materials.copper, [-4, 8], [-1, 8], 5.25, 0.16, 0.22);

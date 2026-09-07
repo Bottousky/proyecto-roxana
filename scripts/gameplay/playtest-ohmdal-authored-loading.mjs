@@ -12,7 +12,7 @@ const errors = [], requests = {}, results = [];
 const failing = new Set(['castle-distributor', 'lighthouse-tower']);
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 page.on('pageerror', e => errors.push(e.message));
-for (const asset of ['workshop-exterior', 'manantial-gorge', 'castle-distributor', 'lighthouse-tower']) {
+for (const asset of ['workshop-exterior', 'manantial-gorge', 'castle-distributor', 'lighthouse-tower', 'lighthouse-workboat']) {
   requests[asset] = 0;
   await page.route(`**/${asset}.glb`, async route => {
     requests[asset]++;
@@ -52,9 +52,35 @@ try {
     results.push({ asset, first, evidence, passed: true });
   }
   assert(requests['workshop-exterior'] === 2 && requests['manantial-gorge'] === 2, 'Startup retry did not recover');
+  // A later failure in scenic content must remain retryable without
+  // duplicating the already loaded beacon, tower or mooring lines.
+  failing.add('lighthouse-workboat');
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.locator('#plaza-enter').click();
+  await page.waitForFunction(() => Boolean(window.__ROXANA_VISUAL_TEST_HOOKS__));
+  const shot = getCaptureShotSpec('lighthouse-lake-wide');
+  const first = await page.evaluate(async s => {
+    try { await window.__ROXANA_VISUAL_TEST_HOOKS__.setCaptureShot(s); return 'unexpected-success'; }
+    catch { return 'expected-load-failure'; }
+  }, shot);
+  assert(first === 'expected-load-failure', 'Workboat failure was not propagated');
+  failing.delete('lighthouse-workboat');
+  await page.evaluate(s => window.__ROXANA_VISUAL_TEST_HOOKS__.setCaptureShot(s), shot);
+  const boat = await page.evaluate(async () => {
+    const url = performance.getEntriesByType('resource').find(e => /\/playcanvas\.js\?/.test(e.name)).name;
+    const pc = await import(url), root = pc.Application.getApplication().root;
+    return {
+      boats: root.find(e => e.name === 'LighthouseMooredWorkboat').length,
+      lines: root.find(e => e.name === 'LighthouseMooringLines').length,
+      towers: root.find(e => e.name === 'LighthouseTowerCandidate').length,
+      lenses: root.find(e => e.name === 'RegionalHero-lighthouse').length,
+    };
+  });
+  assert(Object.values(boat).every(count => count === 1), `Workboat retry duplicated content: ${JSON.stringify(boat)}`);
+  results.push({ asset: 'lighthouse-workboat', first, evidence: boat, passed: true });
   assert(errors.length === 0, errors.join('\n'));
 } finally {
   await writeFile(resolve(out, 'authored-loading-run.json'), JSON.stringify({ requests, results, errors }, null, 2));
   await browser.close();
 }
-console.log('PASS: transient failures recover for all four authored assets; late zones retry without duplicate roots.');
+console.log('PASS: transient failures recover for all five authored assets; late zones retry without duplicate roots.');
