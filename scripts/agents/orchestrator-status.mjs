@@ -196,11 +196,6 @@ if (config.enabled !== true) {
     `refs/heads/${config.canonicalBranch}`,
     config.canonicalBranch,
   ]);
-  if (!canonical) {
-    console.error(`Cannot resolve canonical branch ${config.canonicalBranch}`);
-    process.exit(2);
-  }
-
   const canonicalStatusResult = runGit(['status', '--porcelain=v1', '--untracked-files=all']);
   const canonicalEntries = canonicalStatusResult.status === 0
     ? canonicalStatusResult.stdout.split(/\r?\n/).filter(Boolean)
@@ -213,9 +208,9 @@ if (config.enabled !== true) {
     candidateProtocol: 'v2-explicit',
     canonical: {
       branch: config.canonicalBranch,
-      ref: canonical.ref,
-      sha: canonical.sha,
-      latestCommit: latestCommit(canonical.ref),
+      ref: canonical?.ref ?? null,
+      sha: canonical?.sha ?? null,
+      latestCommit: canonical ? latestCommit(canonical.ref) : null,
       localWorktreeClean: canonicalStatusResult.status === 0 ? canonicalEntries.length === 0 : null,
       localWorktreeChanges: canonicalEntries.slice(0, 30),
     },
