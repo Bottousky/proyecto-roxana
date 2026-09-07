@@ -247,7 +247,7 @@ junto con este ADR:
 | Documento | Contenido |
 |---|---|
 | `docs/20-worlds/ohmdal/room-based/SPATIAL_CONTRACT.md` | Contrato espacial room-based: glosario, RoomGraph, ActiveRoom, cámara, transiciones, render, mapa esquemático, matriz de responsabilidades, validación. |
-| `docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md` | Plan de migración R1–R7 (commits reversibles), registro de bugs conocidos con fase propietaria, DoD de la migración. |
+| [histórico: MIGRATION_PLAN.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/MIGRATION_PLAN.md) | Plan de migración R1–R7 (commits reversibles), registro de bugs conocidos con fase propietaria, DoD de la migración. |
 | `docs/20-worlds/ohmdal/room-based/TEST_TAXONOMY.md` | Taxonomía de tests por invariante de producto y tabla KEEP/REWRITE/RETIRE/UN-LEGACY. |
 
 Los bugs detectados en la auditoría se documentan como **issues de

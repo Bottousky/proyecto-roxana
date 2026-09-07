@@ -11,8 +11,8 @@ Leer:
 
 1. `AGENTS.md`
 2. `docs/20-worlds/ohmdal/AGENTS.md`
-3. `docs/20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md` si la tarea es la Plaza
-4. `docs/3d/VISUAL_HARNESS.md`
+3. El contrato visual que afecte al cambio, sólo cuando sea necesario.
+4. `docs/3d/VISUAL_HARNESS.md` para usar el harness.
 
 ## Regla central
 
@@ -69,6 +69,7 @@ Antes de cerrar:
 
 Automatic fail si la escena sigue dominada por primitivas, si glow/fog esconden falta de authored geometry, si un hero asset no fue calibrado o si performance se juzga sólo por sensación.
 
-## Reporte
+## Evidencia
 
-Entregar: assets/fuentes usados, cambios visibles, capturas, diagnostics, scorecard, automatic failures restantes y próximo pass exacto. No declarar `AAA-like` si queda un gate bloqueante.
+No crear un Markdown por iteración. Conservar capturas y datos en `output/`,
+y explicar en la respuesta los cambios y límites. Incluir: assets/fuentes usados, cambios visibles, capturas, diagnostics, scorecard, automatic failures restantes y próximo pass exacto. No declarar `AAA-like` si queda un gate bloqueante.

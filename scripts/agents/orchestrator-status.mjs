@@ -190,6 +190,60 @@ try {
   process.exit(1);
 }
 
+if (config.enabled !== true) {
+  const canonical = resolveRef([
+    `refs/remotes/origin/${config.canonicalBranch}`,
+    `refs/heads/${config.canonicalBranch}`,
+    config.canonicalBranch,
+  ]);
+  if (!canonical) {
+    console.error(`Cannot resolve canonical branch ${config.canonicalBranch}`);
+    process.exit(2);
+  }
+
+  const canonicalStatusResult = runGit(['status', '--porcelain=v1', '--untracked-files=all']);
+  const canonicalEntries = canonicalStatusResult.status === 0
+    ? canonicalStatusResult.stdout.split(/\r?\n/).filter(Boolean)
+    : [];
+  const snapshot = {
+    schemaVersion: 4,
+    generatedAt: new Date().toISOString(),
+    enabled: false,
+    orchestrator: config.orchestratorId,
+    candidateProtocol: 'v2-explicit',
+    canonical: {
+      branch: config.canonicalBranch,
+      ref: canonical.ref,
+      sha: canonical.sha,
+      latestCommit: latestCommit(canonical.ref),
+      localWorktreeClean: canonicalStatusResult.status === 0 ? canonicalEntries.length === 0 : null,
+      localWorktreeChanges: canonicalEntries.slice(0, 30),
+    },
+    fetch: {
+      ok: false,
+      error: 'orchestrator disabled; remote fetch skipped',
+    },
+    loop: null,
+    control: {
+      disabled: true,
+      workerTtlMinutes: Number(config.controlPlane?.workerTtlMinutes || 90),
+      currentStage: null,
+      activeWorkers: [],
+      passCandidates: [],
+      failedWorkers: [],
+    },
+    workers: {},
+    worktrees: parseWorktrees(),
+  };
+  const outDir = path.join(root, '.playtest', 'orchestrator');
+  const outPath = path.join(outDir, 'status.json');
+  await mkdir(outDir, { recursive: true });
+  await writeFile(outPath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
+  console.log(JSON.stringify(snapshot, null, 2));
+  console.error(`ORCHESTRATOR_STATUS ${path.relative(root, outPath)}`);
+  process.exit(0);
+}
+
 const fetchResult = runGit(['fetch', 'origin', '--prune']);
 const fetchOk = fetchResult.status === 0;
 

@@ -17,11 +17,16 @@ function valueOf(flag, fallback = null) {
   return index >= 0 && args[index + 1] ? args[index + 1] : fallback;
 }
 
-let orchestratorConfig = {};
+let orchestratorConfig;
 try {
   orchestratorConfig = JSON.parse(await readFile(path.join(root, 'agent-work', 'orchestrator', 'config.json'), 'utf8'));
-} catch {
-  // Explicit CLI args and historical defaults keep this runner usable.
+} catch (error) {
+  console.error(`[GEMINI_BUILDER] Cannot read orchestrator config: ${error.message}`);
+  process.exit(1);
+}
+if (orchestratorConfig.enabled !== true) {
+  console.warn('[GEMINI_BUILDER] Orchestrator is disabled; no provider was launched.');
+  process.exit(0);
 }
 
 const configuredWorker = orchestratorConfig.workers?.[workerId]
@@ -36,11 +41,18 @@ const worktreeDir = path.resolve(root, worktreeArg);
 const model = valueOf('--model', configuredWorker.model || 'gemini-3.8-flash-high');
 const effort = valueOf('--effort', configuredWorker.effort || 'high');
 const timeout = valueOf('--timeout', '45m');
-const taskArg = valueOf('--task', configuredWorker.task || 'agent-work/tasks/workers/ohmdal-authored-primary-gemini.md');
-const loopArg = valueOf('--loop', orchestratorConfig.activeLoop || 'agent-work/loops/ohmdal-arco1-authored-pass/state.json');
-const workerBranch = valueOf('--branch', configuredWorker.branch || 'worker/gemini-authored');
-const reportArg = valueOf('--report', configuredWorker.report || 'agent-work/reports/workers/ohmdal-authored-gemini-current.md');
+const taskArg = valueOf('--task', configuredWorker.task || null);
+const loopArg = valueOf('--loop', orchestratorConfig.activeLoop || null);
+const workerBranch = valueOf('--branch', configuredWorker.branch || null);
+const reportArg = valueOf('--report', configuredWorker.report || null);
 const logArg = valueOf('--log', path.join(root, '.playtest', 'orchestrator', 'gemini-builder.log'));
+
+for (const [name, value] of [['--task', taskArg], ['--loop', loopArg], ['--branch', workerBranch], ['--report', reportArg]]) {
+  if (!value) {
+    console.error(`[GEMINI_BUILDER] Missing ${name}; configure an enabled worker or pass it explicitly.`);
+    process.exit(2);
+  }
+}
 
 const logDir = path.dirname(path.resolve(root, logArg));
 mkdirSync(logDir, { recursive: true });

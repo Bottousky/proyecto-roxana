@@ -32,6 +32,10 @@ if (!runnerScript) {
 }
 
 const config = JSON.parse(await readFile(path.join(root, 'agent-work', 'orchestrator', 'config.json'), 'utf8'));
+if (config.enabled !== true) {
+  console.warn('[ORCH/DISPATCH] Orchestrator is disabled; no worker was launched.');
+  process.exit(0);
+}
 const worker = config.workers?.[workerId];
 if (!worker) {
   console.error(`Worker ${workerId} is not configured.`);

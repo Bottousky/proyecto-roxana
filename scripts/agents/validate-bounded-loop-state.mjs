@@ -5,7 +5,11 @@ import path from 'node:path';
 import process from 'node:process';
 
 const root = process.cwd();
-const arg = process.argv[2] || 'agent-work/loops/ohmdal-plaza/state.json';
+const arg = process.argv[2];
+if (!arg) {
+  console.error('Usage: node scripts/agents/validate-bounded-loop-state.mjs <state.json>');
+  process.exit(2);
+}
 const file = path.resolve(root, arg);
 
 function fail(message) {

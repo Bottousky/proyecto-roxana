@@ -34,6 +34,10 @@ for (const relative of ['.env.local', '.env']) {
 }
 
 const config = JSON.parse(await readFile(configPath, 'utf8'));
+if (config.enabled !== true) {
+  console.warn('[MINIMAX_BUILDER] Orchestrator is disabled; no provider was launched.');
+  process.exit(0);
+}
 const worker = config.workers?.minimaxPlayerFacing;
 if (!worker) throw new Error('config.workers.minimaxPlayerFacing is missing');
 

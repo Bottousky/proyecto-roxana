@@ -20,6 +20,15 @@ try {
   process.exit(1);
 }
 
+if (config.enabled !== true) {
+  console.warn('[MAVIS/CODEX] Orchestrator is disabled; no control model was launched.');
+  process.exit(0);
+}
+if (typeof config.activeLoop !== 'string' || typeof config.activeTask !== 'string') {
+  console.error('[MAVIS/CODEX] Enabled orchestrator requires activeLoop and activeTask.');
+  process.exit(1);
+}
+
 const runtime = config.orchestratorRuntime || {};
 const control = config.controlPlane || {};
 const activeLoop = config.activeLoop;

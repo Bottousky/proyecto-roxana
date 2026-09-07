@@ -357,7 +357,7 @@ dentro de este paquete):
 
 - Brief de Manuel del 17 de agosto de 2026 (sesión que origina este
   ADR).
-- `docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md` — auditoría
+- [histórico: RECOVERY_AUDIT.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/room-based/RECOVERY_AUDIT.md) — auditoría
   del runtime existente.
 - `docs/20-worlds/ohmdal/room-based/ARC1_ROOM_GRAPH.md` — grafo de
   las 11 macroáreas.

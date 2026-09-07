@@ -1,6 +1,6 @@
 # Proyecto Roxana — norte de producto
 
-**Estado:** actualizado el 22 de agosto de 2026.
+**Estado:** actualizado el 7 de septiembre de 2026.
 
 Este archivo responde **qué estamos construyendo**. El orden de ejecución vive
 en [`../ROADMAP.md`](../ROADMAP.md) y la operación técnica en
@@ -37,7 +37,7 @@ El objetivo no es “cubrir temario” si la representación no enseña. Un conc
 | Scope | Verbo / función | Fantasía / dirección | Tecnología como hipótesis de producción |
 |---|---|---|---|
 | **Instituto** | unir / recordar / transformar | hogar transformable que materializa progreso, personajes, preguntas y memoria | Three.js axonométrico + DOM; todavía debe demostrar que no se convierte en un menú 3D |
-| **Ohmdal** | **CONECTAR** | aventura explorable donde electricidad e infraestructura reaccionan al jugador | **PlayCanvas Engine v2 + TypeScript**; transición técnica todavía no cerrada |
+| **Ohmdal** | **CONECTAR** | aventura explorable donde electricidad e infraestructura reaccionan al jugador | **PlayCanvas Engine v2 + TypeScript**; runtime vigente del Arco I |
 | **Physica** | **EXPERIMENTAR** | plataformas/sandbox físico donde el jugador siente relaciones antes de escribirlas | **Babylon.js + modelos analíticos TS**; 2.5D default, 3D sólo cuando compra comprensión real |
 | **Bitland** | **PROGRAMAR** | **máquina-ciudad dentro de un microcontrolador**, visible mientras ejecuta programas | simulation core TS + DOM; **PixiJS y Phaser 4 compiten en spikes separados** |
 | **Arithmos** | **TRANSFORMAR** | mundo cuya representación evoluciona mientras una misma estructura matemática se conserva | transformation core TS + **Three.js / PixiJS-SVG / DOM** según la representación |
@@ -80,8 +80,8 @@ Dirección vigente:
 - terreno e interiores sólo con complejidad que aporte navegación, lectura o fantasía;
 - modelos eléctricos TypeScript puros como verdad pedagógica.
 
-El spike en `src/experiences/ohmdal-playcanvas/` demuestra integración inicial,
-pero no es todavía una migración completa. El runtime Phaser de `/jugar` y los
+El Arco I jugable vive en `src/experiences/ohmdal-playcanvas/`, desde la llegada
+hasta el Faro. El foco actual es elevar su calidad artística, narrativa y jugable. El runtime Phaser de `/jugar` y los
 prototipos Three.js conservan contenido y regresiones; no se borran por inercia.
 
 El riesgo visual se gestiona por producción incremental:

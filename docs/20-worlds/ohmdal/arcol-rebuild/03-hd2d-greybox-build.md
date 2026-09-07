@@ -86,7 +86,7 @@ States: `dormant` → `awakening` → `powered_basic` → `powered_full`. Transi
 - `npm run build` green (~28s).
 - `npm test` green — 77 test files passing, 0 failures.
 - Visual walkthrough of all 8 spawn points at `http://localhost:5173/src/hd2d-ohmdal/?spawn=<region>`.
-- Harsh verifier sub-agent review (see `reports/hd2d-review.md`): 2 BLOCKERs and 4 MAJORs found and fixed.
+- Harsh verifier sub-agent review (see [histórico: hd2d-review.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/reports/hd2d-review.md)): 2 BLOCKERs and 4 MAJORs found and fixed.
 
 ### BLOCKERs fixed in this iteration
 
@@ -169,4 +169,4 @@ src/hd2d-ohmdal/
 - `docs/20-worlds/ohmdal/arcol-rebuild/02-world-topology.md`
 - `docs/20-worlds/ohmdal/world/mapa-jugabilidad-arco1.md`
 - `docs/20-worlds/ohmdal/world/ohmdal-world-structure_v1.md`
-- `reports/hd2d-review.md` — the verifier sub-agent's read-only review that drove the blocker fixes
+- [histórico: hd2d-review.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/reports/hd2d-review.md) — the verifier sub-agent's read-only review that drove the blocker fixes

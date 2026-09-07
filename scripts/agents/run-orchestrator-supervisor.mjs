@@ -50,6 +50,15 @@ try {
   process.exit(1);
 }
 
+if (config.enabled !== true) {
+  console.warn('[ORCH/SUPERVISOR] Orchestrator is disabled; no control model was launched.');
+  process.exit(0);
+}
+if (typeof config.activeLoop !== 'string' || typeof config.activeTask !== 'string') {
+  console.error('[ORCH/SUPERVISOR] Enabled orchestrator requires activeLoop and activeTask.');
+  process.exit(1);
+}
+
 const startedAt = Date.now();
 const deadline = startedAt + hours * 60 * 60 * 1000;
 let smartCycles = 0;

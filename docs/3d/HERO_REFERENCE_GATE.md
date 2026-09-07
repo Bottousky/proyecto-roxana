@@ -48,7 +48,7 @@ Archivos de ejemplo:
 - `assets/references/hero-packs/ohm/hero-reference.json`
 - `scripts/3d/build_ohm_hero.py`
 - `assets/runtime/ohmdal/plaza/heroes/ohm/ohm-pedestal.glb`
-- `agent-work/reports/ohmdal-plaza-art-pass-stage-2a.md`
+- [histórico: ohmdal-plaza-art-pass-stage-2a.md](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/agent-work/reports/ohmdal-plaza-art-pass-stage-2a.md)
 
 ## Contenido mínimo del Hero Reference Pack
 

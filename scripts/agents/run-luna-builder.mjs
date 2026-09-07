@@ -10,6 +10,10 @@ import { evidenceStatusFromFile, writeWorkerRuntime } from './orchestrator-runti
 const root = process.cwd();
 const workerId = 'lunaPlayerFacing';
 const config = JSON.parse(await readFile(path.join(root, 'agent-work', 'orchestrator', 'config.json'), 'utf8'));
+if (config.enabled !== true) {
+  console.warn('[LUNA_BUILDER] Orchestrator is disabled; no provider was launched.');
+  process.exit(0);
+}
 const worker = config.workers?.[workerId];
 if (!worker) throw new Error(`config.workers.${workerId} is missing`);
 

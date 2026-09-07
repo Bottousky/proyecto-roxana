@@ -18,8 +18,8 @@ El harness y las herramientas de IA comunes viven en [`../80-production/AI_TOOLI
 Para la prueba 3D actual de Ohmdal:
 
 - guía general: [`../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md`](../20-worlds/ohmdal/production/OHMDAL_3D_PRODUCTION_GUIDE.md);
-- proveedores/authoring agentic: [`../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md`](../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md);
-- primer art pass ejecutable: [`../20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md`](../20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md).
+- proveedores/authoring agentic: [`../20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md` (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/production/OHMDAL_AGENTIC_3D_STACK.md);
+- primer art pass ejecutable: [`../20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md` (histórico)](https://github.com/Bottousky/proyecto-roxana/blob/cdd4630/docs/20-worlds/ohmdal/production/OHMDAL_PLAZA_ART_PASS_01.md).
 
 ## Contratos ejecutables
 

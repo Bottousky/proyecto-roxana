@@ -12,10 +12,20 @@ const onceMode = process.argv.includes('--once');
 const configPath = path.join(root, 'agent-work', 'orchestrator', 'config.json');
 
 let pollMinutes = 7;
-let activeLoop = 'agent-work/loops/ohmdal-arco1-authored-pass/state.json';
-let activeTask = 'agent-work/tasks/orchestrator/ohmdal-authored-mavis.md';
+let activeLoop = null;
+let activeTask = null;
+let config;
 try {
-  const config = JSON.parse(await readFile(configPath, 'utf8'));
+  config = JSON.parse(await readFile(configPath, 'utf8'));
+} catch (error) {
+  console.error(`[MAVIS] Cannot read orchestrator config: ${error.message}`);
+  process.exit(1);
+}
+if (config.enabled !== true) {
+  console.warn('[MAVIS] Orchestrator is disabled; no control model was launched.');
+  process.exit(0);
+}
+try {
   if (Number.isFinite(config.pollMinutes) && config.pollMinutes > 0) {
     pollMinutes = config.pollMinutes;
   }
@@ -25,8 +35,13 @@ try {
   if (typeof config.activeTask === 'string' && config.activeTask.trim()) {
     activeTask = config.activeTask.trim();
   }
-} catch {
-  // Keep the daemon usable even if config parsing temporarily fails.
+} catch (error) {
+  console.error(`[MAVIS] Invalid orchestrator config: ${error.message}`);
+  process.exit(1);
+}
+if (!activeLoop || !activeTask) {
+  console.error('[MAVIS] Enabled orchestrator requires activeLoop and activeTask.');
+  process.exit(1);
 }
 
 const loopPath = path.join(root, activeLoop);
