@@ -245,6 +245,10 @@ try {
     await capturePage.screenshot({ path: screenshot, animations: 'disabled' });
     const diagnostics = await capturePage.evaluate(() => window.__ROXANA_VISUAL_TEST_HOOKS__?.getDiagnostics());
     assertRendererDiagnostics(diagnostics, `${mode}/${view.id}`);
+    const expectedZone = shot?.world?.zone ?? 'plaza';
+    if (!diagnostics.zones?.active?.includes(expectedZone)) {
+      throw new Error(`${view.id}: expected visible zone ${expectedZone}, got ${JSON.stringify(diagnostics.zones?.active)}. Refusing mislabeled capture.`);
+    }
     const capture = {
       id: view.id,
       screenshot,
@@ -303,6 +307,13 @@ try {
     captureMode: captureContract.id,
     stage: mode === 'fast' ? stage : null,
     contract: captureContract,
+    actualCoverage: {
+      shotIds: captures.map((capture) => capture.id),
+      includesMobileViewport: captures.some((capture) => capture.viewport.width < 600),
+      includesNoPost: captures.some((capture) => capture.id === 'no-post'),
+      includesTouchSmoke: touchSmoke?.bitacoraOpened === true,
+      note: 'Contract flags describe the selected capture profile; this section describes this run. A mobile viewport is not touch gameplay evidence.',
+    },
     launch,
     requestedShots: views.map((view) => view.id),
     captures,

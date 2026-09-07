@@ -1,4 +1,8 @@
 import * as pc from 'playcanvas';
+// Version-matched Engine script: infinite sky and prefiltered image-based lighting.
+// @ts-expect-error The bundled Engine scripts ship JavaScript without declarations.
+import { ProceduralSky } from 'playcanvas/scripts/esm/sky/procedural-sky.mjs';
+import { createCharacterVisuals, type CharacterVisuals } from './world/characters/characterVisuals.ts';
 import { OHM_HERO_TUNING } from './ohmHeroTuning.ts';
 import { OMEGA_GATE_TUNING } from './omegaGateTuning.ts';
 import { PLAZA_BELL_DETAIL_LAYOUT } from './plazaBellDetailLayout.ts';
@@ -6,6 +10,15 @@ import { PLAZA_CONDUCTOR_LAYOUT } from './plazaConductorLayout.ts';
 import { buildManantialShell } from './world/manantial/buildManantialShell.ts';
 import { buildWorkshopInterior } from './world/workshop/buildWorkshopInterior.ts';
 import { buildArc1Greybox, type Arc1GreyboxElements } from './world/arc1/buildArc1Greybox.ts';
+import { buildArc1CommunityActors, type Arc1CommunityActors } from './world/arc1/communityActors.ts';
+import { createLighthouseWater } from './world/arc1/lighthouseWater.ts';
+import { applyArchitecturalBoxUv } from './world/arc1/architecturalBoxUv.ts';
+import { createRegionalHeroVisuals } from './world/arc1/regionalHeroVisuals.ts';
+import { loadPlazaSurroundings } from './world/plaza/plazaSurroundings.ts';
+import { loadManantialGorge } from './world/manantial/manantialGorge.ts';
+import { loadWorkshopExterior, WORKSHOP_EXTERIOR_SOURCE_ENTITIES_TO_HIDE } from './world/plaza/workshopExterior.ts';
+import { createFountainAssembly } from './world/plaza/fountainAssembly.ts';
+import { createContactAffordance, createContactResidueGeometry, CONTACT_AFFORDANCE_CENTER } from './world/plaza/contactAffordance.ts';
 import {
   OhmdalNavigationRegistry,
   type NavigationSolid,
@@ -19,12 +32,17 @@ import {
 export interface PlayCanvasWorldElements {
   app: pc.Application;
   ready: Promise<void>;
+  characterVisuals: CharacterVisuals;
+  regionalHeroVisuals: ReturnType<typeof createRegionalHeroVisuals>;
+  setAmbientMotionPaused: (paused: boolean) => void;
+  setPostProcessing: (enabled: boolean) => void;
   cameraEntity: pc.Entity;
   playerEntity: pc.Entity;
   viewmodelRoot: pc.Entity;
   viewmodelNeedle: pc.Entity;
   viewmodelFilament: pc.Entity;
   waterEntity: pc.Entity;
+  updateFountain: (dt: number, powered: boolean, paused: boolean, reduced: boolean) => void;
   solenoidGate: pc.Entity;
   copperJumper: pc.Entity;
   corrosionMesh: pc.Entity;
@@ -51,6 +69,7 @@ export interface PlayCanvasWorldElements {
   manantialActivationTrace: pc.Entity;
   manantialRestoredOutputMarker: pc.Entity;
   arc1Greybox: Arc1GreyboxElements;
+  communityActors: Arc1CommunityActors;
   omegaSymbolEntity: pc.Entity;
   gateLightLeft: pc.Entity;
   gateLightRight: pc.Entity;
@@ -153,41 +172,31 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matMountainFar.emissiveIntensity = 0.5;
   matMountainFar.update();
 
-  const matSky = new pc.StandardMaterial();
-  matSky.name = 'roxana-ohmdal-sky-dome-v1';
-  matSky.diffuse = new pc.Color(0.19, 0.26, 0.31);
-  matSky.emissive = new pc.Color(0.19, 0.26, 0.31);
-  matSky.emissiveIntensity = 0.72;
-  matSky.useLighting = false;
-  matSky.cull = pc.CULLFACE_FRONT;
-  matSky.depthWrite = false;
-  matSky.update();
-
   const matCopperClean = new pc.StandardMaterial();
   matCopperClean.name = 'roxana-ohmdal-copper-aged-v1';
   matCopperClean.diffuse = new pc.Color(0.62, 0.29, 0.12);
   matCopperClean.emissive = pc.Color.BLACK;
   matCopperClean.emissiveIntensity = 0;
   matCopperClean.useMetalness = true;
-  // The spike has no image-based lighting yet. Keeping these metals below full
-  // metalness preserves their copper albedo on faces outside the key light.
-  matCopperClean.metalness = 0.58;
-  matCopperClean.gloss = 0.46;
+  matCopperClean.metalness = 0.8;
+  matCopperClean.gloss = 0.35;
   matCopperClean.update();
 
   const matCopperOxide = new pc.StandardMaterial();
   matCopperOxide.name = 'roxana-ohmdal-verdigris-v1';
-  matCopperOxide.diffuse = new pc.Color(0.32, 0.6, 0.48); // Verdigris green
+  matCopperOxide.diffuse = new pc.Color(0.24, 0.40, 0.24); // Matte, mottled verdigris
+  matCopperOxide.diffuseVertexColor = true;
   matCopperOxide.useMetalness = true;
-  matCopperOxide.gloss = 0.2;
+  matCopperOxide.gloss = 0.06;
   matCopperOxide.metalness = 0.12;
   matCopperOxide.update();
 
   const matBrass = new pc.StandardMaterial();
-  matBrass.diffuse = new pc.Color(0.86, 0.68, 0.26);
+  matBrass.name = 'roxana-ohmdal-brass-satin-v2';
+  matBrass.diffuse = new pc.Color(0.52, 0.38, 0.19);
   matBrass.useMetalness = true;
   matBrass.metalness = 0.88;
-  matBrass.gloss = 0.72;
+  matBrass.gloss = 0.4;
   matBrass.update();
 
   const matGlowGold = new pc.StandardMaterial();
@@ -203,6 +212,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matWood.name = 'roxana-ohmdal-wood-workshop-v1';
   matWood.diffuse = new pc.Color(0.34, 0.24, 0.16);
   matWood.useMetalness = true;
+  matWood.metalness = 0;
   matWood.gloss = 0.14;
   matWood.update();
 
@@ -210,6 +220,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matWoodDark.name = 'roxana-ohmdal-wood-charred-v1';
   matWoodDark.diffuse = new pc.Color(0.31, 0.22, 0.15);
   matWoodDark.useMetalness = true;
+  matWoodDark.metalness = 0;
   matWoodDark.gloss = 0.12;
   matWoodDark.update();
 
@@ -247,30 +258,35 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   matWaterfall.opacity = 0.75;
   matWaterfall.blendType = pc.BLEND_NORMAL;
   matWaterfall.useMetalness = true;
+  matWaterfall.metalness = 0;
   matWaterfall.gloss = 0.95;
   matWaterfall.update();
 
   const matEddaCoat = new pc.StandardMaterial();
   matEddaCoat.diffuse = new pc.Color(0.58, 0.32, 0.18);
   matEddaCoat.useMetalness = true;
+  matEddaCoat.metalness = 0;
   matEddaCoat.gloss = 0.2;
   matEddaCoat.update();
 
   const matEddaHair = new pc.StandardMaterial();
   matEddaHair.diffuse = new pc.Color(0.22, 0.12, 0.08);
   matEddaHair.useMetalness = true;
+  matEddaHair.metalness = 0;
   matEddaHair.gloss = 0.3;
   matEddaHair.update();
 
   const matLumenApron = new pc.StandardMaterial();
   matLumenApron.diffuse = new pc.Color(0.42, 0.38, 0.32);
   matLumenApron.useMetalness = true;
+  matLumenApron.metalness = 0;
   matLumenApron.gloss = 0.2;
   matLumenApron.update();
 
   const matSkin = new pc.StandardMaterial();
   matSkin.diffuse = new pc.Color(0.86, 0.72, 0.62);
   matSkin.useMetalness = true;
+  matSkin.metalness = 0;
   matSkin.gloss = 0.25;
   matSkin.update();
 
@@ -377,6 +393,9 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     if (roughness) {
       material.glossMap = roughness;
       material.glossMapTiling = tiling;
+      // PlayCanvas multiplies the map by gloss BEFORE glossInvert. Preserve
+      // the authored roughness: 1 - map, not 1 - (map * fallback gloss).
+      material.gloss = 1;
       material.glossInvert = true;
     }
     if (ao) {
@@ -423,40 +442,46 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     applyTextureSet(matWood, 'wood-workshop', textureSet('wood-workshop'), new pc.Vec2(2, 2)),
     applyTextureSet(matWoodDark, 'wood-workshop', textureSet('wood-workshop'), new pc.Vec2(3, 3)),
     applyTextureSet(matIron, 'iron-aged', textureSet('iron-aged', false, true), new pc.Vec2(2, 2)),
-  ]).then(() => undefined);
+  ]).then(() => {
+    // Reuse the licensed cast-metal microstructure without tinting brass as iron.
+    for (const metal of [matCopperClean, matBrass]) {
+      metal.normalMap = matIron.normalMap;
+      metal.normalMapTiling = new pc.Vec2(2, 2);
+      metal.bumpiness = 0.18;
+      metal.glossMap = matIron.glossMap;
+      metal.glossMapTiling = new pc.Vec2(2, 2);
+      metal.gloss = 1;
+      metal.glossInvert = true;
+      metal.update();
+    }
+  });
 
   // --- 2. Lighting & Environment ---
-  app.scene.ambientLight = new pc.Color(0.49, 0.43, 0.38);
-  app.scene.exposure = 1.15;
+  app.scene.ambientLight = new pc.Color(0.08, 0.09, 0.11);
+  app.scene.exposure = 1;
 
   const sunEntity = new pc.Entity('Sun');
   sunEntity.addComponent('light', {
     type: 'directional',
     color: new pc.Color(1.0, 0.82, 0.58),
-    intensity: 2.75,
+    intensity: 1.3,
     castShadows: true,
     shadowBias: 0.05,
     shadowDistance: 60,
-    shadowResolution: 1024,
+    shadowResolution: 2048,
+    normalOffsetBias: 0.05,
   });
   sunEntity.setEulerAngles(48, -32, 0);
   app.root.addChild(sunEntity);
 
-  const fillEntity = new pc.Entity('SkyFill');
-  fillEntity.addComponent('light', {
-    type: 'directional',
-    color: new pc.Color(0.42, 0.58, 0.8),
-    intensity: 1.18,
-  });
-  fillEntity.setEulerAngles(-40, 145, 0);
-  app.root.addChild(fillEntity);
-
-  const skyDome = new pc.Entity('PlazaSkyDome');
-  skyDome.addComponent('render', { type: 'sphere', material: matSky });
-  skyDome.render!.castShadows = false;
-  skyDome.render!.receiveShadows = false;
-  skyDome.setLocalScale(140, 140, 140);
-  app.root.addChild(skyDome);
+  const skyEntity = new pc.Entity('OhmdalAtmosphere');
+  skyEntity.addComponent('script');
+  skyEntity.script!.create(ProceduralSky, { properties: {
+    sunLight: sunEntity, elevation: 35, azimuth: 145,
+    luminance: 0.4, turbidity: 3, rayleigh: 1.5,
+    lightingResolution: 128, atlasSize: 256,
+  } });
+  app.root.addChild(skyEntity);
 
   // --- 3. First-Person Player & Camera Rig ---
   const playerEntity = new pc.Entity('Player');
@@ -468,10 +493,23 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     clearColor: new pc.Color(0.17, 0.145, 0.125),
     fov: 72,
     nearClip: 0.05,
-    farClip: 160,
+    farClip: 600,
     toneMapping: pc.TONEMAP_ACES,
   });
   playerEntity.addChild(cameraEntity);
+  const cameraFrame = new pc.CameraFrame(app, cameraEntity.camera!);
+  cameraFrame.rendering.toneMapping = pc.TONEMAP_ACES;
+  cameraFrame.rendering.sceneDepthMap = true;
+  cameraFrame.rendering.samples = window.matchMedia('(pointer: coarse)').matches ? 2 : 4;
+  cameraFrame.bloom.intensity = 0;
+  cameraFrame.ssao.type = pc.SSAOTYPE_LIGHTING;
+  cameraFrame.ssao.radius = 1.5;
+  cameraFrame.ssao.intensity = 0.3;
+  cameraFrame.ssao.power = 1.5;
+  cameraFrame.ssao.samples = 8;
+  cameraFrame.ssao.scale = 0.5;
+  cameraFrame.update();
+  app.once('destroy', () => cameraFrame.destroy());
 
   const flashEntity = new pc.Entity('InspectionBeam');
   flashEntity.addComponent('light', {
@@ -781,7 +819,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   // --- Edda NPC Entity (Near Portal) ---
   const eddaEntity = new pc.Entity('EddaNPC');
   eddaEntity.setPosition(1.1, 0, -5.5);
-  eddaEntity.setEulerAngles(0, -156, 0);
+  eddaEntity.setEulerAngles(0, 20, 0);
   plazaRoot.addChild(eddaEntity);
   addCollider('plaza', 1.1, -5.5, 0.8, 0.8, 'plaza.edda-npc', { source: 'EddaNPC' });
 
@@ -937,6 +975,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   waterEntity.setPosition(5.5, 0.68, 3.8);
   waterEntity.setLocalScale(5.0, 0.05, 5.0);
   plazaRoot.addChild(waterEntity);
+  const updateFountain = createFountainAssembly(app, plazaRoot, fountainBasin, waterEntity, matStone, matBrass);
 
   probeTargets['fuente_motor_in'] = new pc.Vec3(5.5, 0.8, 3.8);
   addCollider('plaza', 5.5, 3.8, 5.8, 5.8, 'plaza.fountain-basin', { source: 'FountainBasin' });
@@ -973,10 +1012,19 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
   probeTargets['retorno_brecha_b'] = new pc.Vec3(-0.9, 0.1, 1.0);
 
   const corrosionMesh = new pc.Entity('CorrosionJoint');
-  corrosionMesh.addComponent('render', { type: 'box', material: matCopperOxide });
-  corrosionMesh.setPosition(-0.9, 0.07, -4.0);
-  corrosionMesh.setLocalScale(0.4, 0.08, 0.8);
+  const residueGeometry = createContactResidueGeometry(app);
+  corrosionMesh.addComponent('render', { meshInstances: [new pc.MeshInstance(residueGeometry, matCopperOxide, corrosionMesh)] });
+  corrosionMesh.setPosition(CONTACT_AFFORDANCE_CENTER[0], 0.13, CONTACT_AFFORDANCE_CENTER[2]);
+  corrosionMesh.setLocalScale(0.28, 0.025, 0.34);
   plazaRoot.addChild(corrosionMesh);
+  const contactAffordance = createContactAffordance({
+    parent: plazaRoot, corrosionMesh,
+    materials: { copper: matCopperClean, ceramic: matCeramic, metal: matIron },
+  });
+  for (const render of contactAffordance.root.findComponents('render') as pc.RenderComponent[]) {
+    render.batchGroupId = plazaArtBatch.id;
+  }
+  app.once('destroy', () => contactAffordance.dispose());
 
   // P4 — reusable electrical language: paired channels read as ida/retorno,
   // ceramic breaks signal terminals, and iron junction boxes mark decisions.
@@ -1001,7 +1049,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     addBox(plazaRoot, `EastDrainGrate${index}`, [6.9, 0.1, z], [0.58, 0.08, 0.12], matIron);
   }
 
-  probeTargets['retorno_oxido'] = new pc.Vec3(-0.9, 0.1, -4.0);
+  probeTargets['retorno_oxido'] = new pc.Vec3(CONTACT_AFFORDANCE_CENTER[0], 0.15, CONTACT_AFFORDANCE_CENTER[2]);
   probeTargets['ida_norte'] = new pc.Vec3(0.9, 0.1, -8.0);
   probeTargets['ida_centro'] = new pc.Vec3(0.9, 0.1, -2.0);
   probeTargets['retorno_sur'] = new pc.Vec3(-0.9, 0.1, 7.0);
@@ -1091,8 +1139,26 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     source: 'SolenoidGate / Great Gate threshold',
   });
 
+  const workshopExteriorReady = (async () => {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const candidate = loadWorkshopExterior(app, plazaRoot);
+      try {
+        await candidate.ready;
+        for (const name of WORKSHOP_EXTERIOR_SOURCE_ENTITIES_TO_HIDE) {
+          const legacy = plazaRoot.findByName(name) as pc.Entity | null;
+          if (legacy) legacy.enabled = false;
+        }
+        return;
+      } catch (error) {
+        candidate.dispose();
+        if (attempt === 1) throw error;
+      }
+    }
+  })();
   const ready = Promise.all([
     materialReady,
+    workshopExteriorReady,
+    loadPlazaSurroundings(app, plazaRoot, { stone: matStone, stoneDark: matStoneDark, plaster: matPlaster, wood: matWoodDark }),
     vendorPropsReady,
     ohmHeroReady,
     omegaGateReady,
@@ -1165,6 +1231,23 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     addCollider,
   });
 
+  const setAmbientMotionPaused = createLighthouseWater(app, arc1Greybox.roots.lighthouse, cameraEntity, sunEntity, matMoss);
+  // The shoreline pass lowers parapets; map stone only after those final dimensions.
+  applyArchitecturalBoxUv(app, Object.values(arc1Greybox.roots), [matStone, matStoneDark]);
+  const regionalHeroVisuals = createRegionalHeroVisuals(app, arc1Greybox, { root: manantialGameplayRoot, rotor: turbineRotor });
+  const communityActors = buildArc1CommunityActors({
+    castleRoot: arc1Greybox.roots.castle,
+    forgeTerracesRoot: arc1Greybox.roots['forge-terraces'],
+    lighthouseRoot: arc1Greybox.roots.lighthouse,
+    materials: {
+      stone: matStone,
+      stoneDark: matStoneDark,
+      copper: matCopperClean,
+      brass: matBrass,
+      glow: matGlowGold,
+    },
+  });
+
   for (const transition of Object.values(OHMDAL_TRANSITION_ANCHORS)) {
     const sourceZone = transition.from;
     navigation.registerPortal({
@@ -1177,15 +1260,25 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     });
   }
 
+  const characterVisuals = createCharacterVisuals(app, eddaEntity, lumenNpcEntity, communityActors);
   return {
     app,
-    ready,
+    ready: Promise.all([ready, characterVisuals.ensure('edda'), loadManantialGorge(app, mountainRoot)]).then(() => undefined),
+    characterVisuals,
+    regionalHeroVisuals,
+    setAmbientMotionPaused,
+    setPostProcessing(enabled: boolean) {
+      cameraFrame.rendering.toneMapping = enabled ? pc.TONEMAP_ACES : pc.TONEMAP_LINEAR;
+      cameraFrame.ssao.type = enabled ? pc.SSAOTYPE_LIGHTING : pc.SSAOTYPE_NONE;
+      cameraFrame.update();
+    },
     cameraEntity,
     playerEntity,
     viewmodelRoot,
     viewmodelNeedle,
     viewmodelFilament,
     waterEntity,
+    updateFountain,
     solenoidGate,
     copperJumper,
     corrosionMesh,
@@ -1212,6 +1305,7 @@ export function buildPlayCanvasOhmdalWorld(canvas: HTMLCanvasElement): PlayCanva
     manantialActivationTrace,
     manantialRestoredOutputMarker,
     arc1Greybox,
+    communityActors,
     omegaSymbolEntity,
     gateLightLeft,
     gateLightRight,

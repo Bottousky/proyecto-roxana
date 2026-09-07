@@ -6,6 +6,7 @@ import process from 'node:process';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { chromium } from 'playwright';
 import { fileURLToPath } from 'node:url';
+import { fastLaunchOptions } from '../visual/ohmdal-capture-contract.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const OUT = resolve(ROOT, 'output/playwright/ohmdal-hardening/golden-path');
@@ -115,6 +116,7 @@ const artifact = {
   baseUrl,
   browser: null,
   checkpoints,
+  reloadChecks: [],
   errors: { console: consoleMessages, page: pageErrors },
   movement: [],
   result: 'RUNNING',
@@ -172,6 +174,21 @@ async function recordCheckpoint(id, options = {}) {
   };
   checkpoints.push(entry);
   await persistRun();
+  if (process.argv.includes('--reload-checkpoints') && [
+    'tools-received', 'after-gate-open', 'manantial-restored-desktop',
+    'castle-restored-desktop', 'forge-terraces-restored-desktop', 'arc1-complete-desktop',
+  ].includes(id)) {
+    await page.reload({ waitUntil: 'networkidle', timeout: NAV_TIMEOUT_MS });
+    await page.locator('#plaza-enter').click();
+    const restored = await waitForSnapshot((state) => state.storyStep === current.storyStep && !state.dialogue, `reload ${id}`);
+    assert(restored.ohmAwake === current.ohmAwake, `${id}: Ohm se perdió tras reload`);
+    assert(JSON.stringify(restored.inventory) === JSON.stringify(current.inventory), `${id}: inventario distinto tras reload`);
+    assert(JSON.stringify(restored.arc1.progress) === JSON.stringify(current.arc1.progress), `${id}: progreso regional distinto tras reload`);
+    assert(restored.circuit.gateOpen === current.circuit.gateOpen, `${id}: estado de puerta perdido`);
+    assert(restored.zones.filter((item) => item.active).map((item) => item.id).join() === current.zones.filter((item) => item.active).map((item) => item.id).join(), `${id}: zona distinta tras reload`);
+    artifact.reloadChecks.push({ id, storyStep: restored.storyStep, passed: true });
+    await persistRun();
+  }
   return current;
 }
 
@@ -313,7 +330,9 @@ async function assertNoBlockingModals(label) {
 try {
   assert(await portReachable(port), `Vite no se levantó en ${port}; log: ${viteLog.join('').slice(-2000)}`);
 
-  browser = await chromium.launch({ headless: true });
+  browser = await chromium.launch(process.argv.includes('--gpu')
+    ? fastLaunchOptions()
+    : { headless: true });
   artifact.browser = `chromium ${browser.version()}`;
   context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 1 });
   page = await context.newPage();
@@ -332,8 +351,17 @@ try {
   assert(!zone(current, 'manantial')?.loaded, 'Manantial cargado antes de abrir Omega');
   await recordCheckpoint('portal', { includeDiagnostics: true });
 
-  await moveTo(0, -2, 1.7, 'Ohm pedestal');
-  await pressInteraction('Ohm awakening');
+  await moveTo(2.9, -4.3, 0.45, 'Ohm east aisle');
+  await moveTo(2.9, -1.1, 0.35, 'Ohm service panel');
+  await waitForSnapshot((state) => state.nearestInteractable === 'ohm_contact_panel', 'panel de contactos dominante');
+  await pressInteraction('Ohm service inspection');
+  current = await waitForSnapshot((state) => state.ohmInspecting === true, 'inspección de Ohm');
+  assert(!current.ohmAwake, 'Inspeccionar no debe despertar a Ohm');
+  await page.locator('#ohm-gap-g1').click();
+  await page.locator('#ohm-gap-g5').click();
+  current = await snapshot();
+  assert(!current.ohmAwake, 'El retorno incompleto no debe despertar a Ohm');
+  await page.locator('#ohm-gap-g4').click();
   await waitForDialogue('ohm_awakening_event');
   current = await waitUntilStory('ohm_awakened');
   assert(current.ohmAwake, 'Ohm no quedó despierto');
@@ -344,6 +372,11 @@ try {
   assert(current.ohmAwake, 'Ohm perdió estado despierto tras diálogo de Edda');
   await recordCheckpoint('ohm-awakened', { includeDiagnostics: false });
 
+  await moveTo(2.9, -4.5, 0.3, 'Ohm exit east aisle');
+  // Edda stands on the southern approach. Walk around her actual collider;
+  // the old direct diagonal could clip her corner depending on frame timing.
+  await moveTo(3.0, -7.0, 0.3, 'Edda south-east clearance');
+  await moveTo(-4.0, -7.0, 0.35, 'Edda south-west clearance');
   await moveTo(-7.4, -4.0, 1.9, 'workshop_exterior_door');
   await pressInteraction('workshop exterior door');
   current = await waitUntilStory('inside_workshop');
@@ -352,7 +385,9 @@ try {
 
   // The workbench collider occupies the direct centre approach. Stop just
   // outside its west edge, still inside Lumen's 3.5m interaction radius.
-  await moveTo(-63.0, -0.6, 0.8, 'Lumen workshop bench approach');
+  await moveTo(-63.0, -1.0, 0.2, 'Lumen workshop west aisle');
+  await moveTo(-63.0, 0.4, 0.15, 'Lumen workshop bench approach');
+  await waitForSnapshot((state) => state.nearestInteractable === 'lumen_npc_inside', 'Lumen dentro del alcance');
   await pressInteraction('Lumen workshop dialogue');
   await waitForDialogue('lumen_workshop_interior');
   await drainDialogue('lumen_workshop_interior');
@@ -384,7 +419,7 @@ try {
 
   await moveTo(-3.0, 6.5, 1.2, 'moho_oxido west waypoint');
   await moveTo(-3.0, -4.0, 1.2, 'moho_oxido south waypoint');
-  await moveTo(-3.2, -4.4, 0.35, 'moho_oxido interaction edge');
+  await moveTo(-2.6, -6.1, 0.35, 'moho_oxido interaction edge');
   current = await waitForSnapshot((state) => state.nearestInteractable === 'moho_oxido', 'moho_oxido dominante');
   current = await pressInteraction('moho_oxido');
   current = await waitForSnapshot((state) => state.circuit.corrosionClosed && Math.abs(state.circuit.corrosionResistance - 0.05) < 0.001, 'moho_oxido limpiado');
@@ -481,6 +516,7 @@ try {
   current = await waitForSnapshot((state) => state.arc1.progress.castleGateOpen, 'apertura Castle derivada');
   assert(current.arc1.plaza.bellPulls === 1, 'G2 no registró la Campana física');
 
+  await moveTo(-3.0, 0.5, 0.4, 'Castle route clear bell gantry');
   await moveTo(-3.0, 6.5, 0.8, 'Castle route west waypoint');
   await moveTo(0, 8.0, 0.75, 'Castle route');
   current = await waitForSnapshot((state) => state.nearestInteractable === 'castle_route', 'ruta Castle dominante');
@@ -489,11 +525,21 @@ try {
   assert(zone(current, 'castle')?.active, 'Castle no está active al entrar');
   assert(!zone(current, 'plaza')?.active, 'Plaza sigue active durante Castle');
 
-  // G3 — choose one of two model-valid layouts, measure that exact layout,
-  // energize, document and leave through the physical gate.
+  // G3 — wire each physical branch; no complete-layout preset exists in play.
   await moveTo(53.8, -4.0, 0.9, 'Castle parallel south waypoint');
   await moveTo(53.8, 0, 0.75, 'Castle parallel layout');
-  await pressTouchInteraction('configurar paralelo Castle');
+  await pressTouchInteraction('abrir placa del Castillo');
+  await page.setViewportSize({ width: 844, height: 390 });
+  await waitForSnapshot((state) => state.regionalInspection === 'castle', 'panel Castle');
+  for (const [id, fuse] of [['a', '4'], ['b', '5'], ['c', '2']]) {
+    await page.getByTestId(`castle-district-${id}-wiring`).selectOption('parallel');
+    await page.getByTestId(`castle-district-${id}-priority`).selectOption(id === 'c' ? 'support' : 'essential');
+    await page.getByTestId(`castle-district-${id}-protection`).selectOption(fuse);
+  }
+  await page.getByTestId('castle-return-continuity').check();
+  await page.screenshot({ path: resolve(OUT, 'castle-panel-operated.png') });
+  await page.getByTestId('regional-maintenance-close').click();
+  await page.setViewportSize(MOBILE_VIEWPORT);
   await moveTo(60, -4.0, 0.8, 'Castle bus south waypoint');
   await moveTo(60, -8.0, 0.65, 'Castle bus measure');
   await pressTouchInteraction('medir Castle configurado');
@@ -515,11 +561,20 @@ try {
 
   // G4 — explicit 5A/3A trade-off, medium conductor and matched protection.
   await moveTo(124.2, -12.0, 0.9, 'Forge heater south waypoint');
-  await moveTo(124.2, -8.0, 0.75, 'Forge heater allocation');
-  await pressTouchInteraction('priorizar Forja');
+  await moveTo(124.2, -10.85, 0.12, 'Forge heater allocation from outside its solid base');
+  await pressTouchInteraction('abrir placa de la Forja');
+  await page.setViewportSize({ width: 844, height: 390 });
+  await waitForSnapshot((state) => state.regionalInspection === 'forge', 'panel Forge');
+  for (let step = 0; step < 5; step++) await page.getByTestId('forge-allocation-forge-plus').click();
+  for (let step = 0; step < 3; step++) await page.getByTestId('forge-allocation-terraces-plus').click();
+  await page.getByTestId('forge-conductor').selectOption('medium');
+  await page.getByTestId('forge-protection-forge').selectOption('5');
+  await page.getByTestId('forge-protection-terraces').selectOption('3');
+  await page.screenshot({ path: resolve(OUT, 'forge-panel-operated.png') });
+  await page.getByTestId('regional-maintenance-close').click();
+  await page.setViewportSize(MOBILE_VIEWPORT);
+  await moveTo(120, -11.0, 0.35, 'Walk around the hearth south side');
   await moveTo(120, -4.0, 0.8, 'Forge panel south waypoint');
-  await moveTo(120, 0, 0.7, 'Forge distribution panel');
-  await pressTouchInteraction('dimensionar conductor y protecciones');
   await moveTo(120, -8.0, 0.65, 'Forge bus measure');
   await pressTouchInteraction('medir Forja/Terrazas');
   current = await waitForSnapshot((state) => state.arc1.forgeTerraces.measurements.length > 0, 'medición Forja/Terrazas');
@@ -542,11 +597,21 @@ try {
   current = await waitForSnapshot((state) => state.arc1.lighthouse.measurements.length === 1, 'medición Faro');
   await moveTo(180, 0, 0.7, 'Lighthouse calibration panel');
   await pressTouchInteraction('calibrar Faro');
+  await page.setViewportSize({ width: 844, height: 390 });
+  await waitForSnapshot((state) => state.regionalInspection === 'lighthouse', 'panel Faro');
+  for (let step = 0; step < 4; step++) await page.getByTestId('lighthouse-trim-minus').click();
+  await page.screenshot({ path: resolve(OUT, 'lighthouse-panel-operated.png') });
+  await page.getByTestId('regional-maintenance-close').click();
+  await page.setViewportSize(MOBILE_VIEWPORT);
   await moveTo(180, 8, 0.75, 'Lighthouse beacon control');
   await pressTouchInteraction('energizar Faro');
-  await pressTouchInteraction('sincronización Faro 1');
-  await pressTouchInteraction('sincronización Faro 2');
-  current = await waitForSnapshot((state) => state.arc1.lighthouse.synchronizationSamples === 2, 'dos sincronizaciones Faro');
+  await pressTouchInteraction('comprobar baliza Faro');
+  await pressTouchInteraction('repetir comprobación de baliza');
+  current = await snapshot();
+  assert(current.arc1.lighthouse.synchronizationSamples === 1, 'repetir una estación no sustituye la verificación espacial');
+  await moveTo(180, -8.0, 0.65, 'Lighthouse powered feed verification');
+  await pressTouchInteraction('comprobar alimentación con baliza encendida');
+  current = await waitForSnapshot((state) => state.arc1.lighthouse.synchronizationSamples === 2, 'alimentación y baliza verificadas');
   await moveTo(180, 14, 0.7, 'Lighthouse return marker');
   await pressTouchInteraction('registrar Faro e iniciar retorno');
   current = await waitUntilStory('returning');
@@ -554,8 +619,7 @@ try {
   assert(current.arc1.lighthouse.mode === 'dc', 'Faro inventó una capa distinta de la culminación DC');
   await recordResponsiveCheckpoint('lighthouse-restored-return');
 
-  // G6 — physically backtrack through restored loaded zones, then close at
-  // the Portal marker without fabricated epilogue dialogue.
+  // G6 — physically return, witness Edda's first class, then close the arc.
   await pressTouchInteraction('retorno por Terrazas');
   current = await waitForSnapshot((state) => zone(state, 'castle')?.active, 'retorno Castle active');
   await pressTouchInteraction('retorno por Castillo');
@@ -564,7 +628,11 @@ try {
   await moveTo(-3.0, -2.0, 0.8, 'final Portal south waypoint');
   await moveTo(0, -2.0, 2.0, 'final Ohm marker');
   await waitForSnapshot((state) => state.nearestInteractable === 'ohm_automaton_pedestal', 'marcador final de Ohm');
-  await pressTouchInteraction('cerrar Arco I greybox');
+  await pressTouchInteraction('presenciar primera clase');
+  current = await waitForDialogue('arc1_first_class');
+  assert(current.storyStep === 'returning', 'el arco no debe completar antes de la clase');
+  await page.screenshot({ path: resolve(OUT, 'first-class-dialogue.png') });
+  await drainDialogue('arc1_first_class');
   current = await waitUntilStory('arc1_complete');
   assert(current.arc1.progress.arcComplete, 'El cierre no deriva de todos los estados y el retorno');
   assert(current.arc1.finalReturnReached, 'El retorno final no quedó registrado');

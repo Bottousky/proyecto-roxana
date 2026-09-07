@@ -73,9 +73,12 @@ describe('Ohmdal A6 · Faro, Lago y Retorno authored support pass', () => {
 
   it('acopla evaluacion de faro, lampara de baliza, luz focal y barra de senal con el modelo electrico real', () => {
     assert.match(runtimeSource, /evaluateLighthouse/);
-    assert.match(runtimeSource, /lighthouseLamp\.enabled = lighthouse\.restored/);
-    assert.match(runtimeSource, /setEntityLightsEnabled\(world\.arc1Greybox\.lighthouseBeacon, lighthouse\.restored\)/);
-    assert.match(runtimeSource, /world\.arc1Greybox\.lighthouseSignal\.enabled = lighthouse\.restored/);
+    // The light must be observable before the player verifies and documents it.
+    // The pure predicate additionally rejects an interrupted upstream supply.
+    assert.match(runtimeSource, /const beaconWorking = isLighthouseEmitting\(arc1State\)/);
+    assert.match(runtimeSource, /lighthouseLamp\.enabled = beaconWorking/);
+    assert.match(runtimeSource, /setEntityLightsEnabled\(world\.arc1Greybox\.lighthouseBeacon, beaconWorking\)/);
+    assert.match(runtimeSource, /world\.arc1Greybox\.lighthouseSignal\.enabled = beaconWorking/);
   });
 
   it('batch-ea sólo la geometría estática authored bajo OhmdalLighthouseStaticArt', () => {

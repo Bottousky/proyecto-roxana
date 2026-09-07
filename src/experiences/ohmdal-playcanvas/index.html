@@ -2,14 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <link rel="icon" href="data:," />
-  <title>Ohmdal · PlayCanvas Engine v2 (Outer Wilds Style)</title>
+  <title>Ohmdal · La Luz</title>
   <link rel="stylesheet" href="../ohmdal-plaza/styles.css" />
 </head>
 <body>
   <div id="plaza-app">
-    <!-- PlayCanvas Canvas Host -->
+    <!-- Game Canvas Host -->
     <div id="plaza-game"></div>
     <div id="plaza-reticle"></div>
 
@@ -17,17 +17,18 @@
     <div id="plaza-title">
       <div class="plaza-title-card">
         <div class="plaza-emblem">🪐 ⚡ 🏛️</div>
-        <p class="plaza-kicker">PLAYCANVAS ENGINE v2 · OUTER WILDS DIRECTION</p>
-        <h1>Ohmdal 3D: La Red Olvidada</h1>
-        <p class="plaza-sub">Mundo Continuo · El Conocimiento es la Progresión</p>
+        <p class="plaza-kicker">ARCO I · LA LUZ</p>
+        <h1>Ohmdal · La Luz</h1>
+        <p class="plaza-sub">Explora, conecta y devuelve la luz a Ohmdal.</p>
         <p class="plaza-note">
           Una civilización medieval que convirtió la electricidad en superstición.
-          Explorá en 1ª persona, medí con el galvanoscopio analógico, investigá reliquias y repara el lazo de corriente.
+          Explora en primera persona, observa lo que cambia, investiga las reliquias y sigue tus preguntas hasta entender qué hace volver la luz.
         </p>
         <div class="plaza-buttons">
           <button id="plaza-enter" type="button">Entrar a Ohmdal</button>
+          <button id="plaza-new-game" type="button" hidden>Nueva partida</button>
         </div>
-        <p class="plaza-help">WASD para moverte · Ratón para mirar · <b>Clic / E</b> Interactuar / Medir · <b>M</b> Galvanoscopio · <b>TAB</b> Cuaderno de Edda</p>
+        <p class="plaza-help">WASD para moverte · Ratón para mirar · <b>Clic / E</b> para interactuar y medir · <b>M</b> para el galvanoscopio · <b>TAB</b> para el cuaderno de Edda · Táctil: juega en horizontal, usa las flechas para moverte y arrastra sobre la mitad derecha para mirar. Toca <b>Conectar</b> para interactuar.</p>
       </div>
     </div>
 
@@ -41,6 +42,9 @@
       </div>
 
       <div class="hud-right">
+        <button id="ohmdal-audio-toggle" type="button" class="hud-tool-btn" title="Silenciar sonido" aria-label="Silenciar sonido" aria-pressed="false" style="min-width:44px;min-height:44px;padding:.45rem .65rem">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true" style="pointer-events:none;vertical-align:middle"><path d="M11 5 6 9H3v6h3l5 4Z"/><path data-sound-waves d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/><path data-sound-muted d="m15 9 6 6m0-6-6 6" style="display:none"/></svg>
+        </button>
         <button id="btn-galvanoscope" type="button" class="hud-tool-btn" title="Galvanoscopio (M)">
           ⚡ Galvanoscopio [M]
         </button>
@@ -126,11 +130,11 @@
         <div class="bitacora-layout">
           <div id="bitacora-graph" class="bitacora-graph"></div>
           <div id="bitacora-details" class="bitacora-details">
-            <h3 id="node-title">Seleccioná un nodo</h3>
+            <h3 id="node-title">Selecciona un nodo</h3>
             <p id="node-category" class="node-cat"></p>
             <p id="node-status-text" class="node-st"></p>
             <hr />
-            <p id="node-lore-text" class="node-desc">Hacé clic en cualquier entrada de la bitácora para leer las deducciones.</p>
+            <p id="node-lore-text" class="node-desc">Haz clic en cualquier entrada de la bitácora para leer las deducciones.</p>
           </div>
         </div>
       </div>
@@ -150,6 +154,126 @@
           <div class="workbench-sidebar">
             <p id="workbench-desc">Descripción de la reliquia...</p>
             <div id="workbench-actions" class="workbench-actions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de contactos de Ohm (Arco I · B2) -->
+    <div id="ohm-inspection-modal" class="hidden" role="dialog" aria-modal="true" aria-label="Panel de contactos de Ohm">
+      <div class="ohm-inspection-window">
+        <div class="ohm-inspection-header">
+          <div class="ohm-header-title-box">
+            <span class="ohm-header-badge">⚡</span>
+            <div>
+              <h2 id="ohm-inspection-title">Panel de contactos de Ohm</h2>
+              <p class="ohm-inspection-subtitle">Bornes de alimentación · continuidad observada</p>
+            </div>
+          </div>
+          <button id="ohm-inspection-close" type="button" class="ohm-close-btn" title="Cerrar panel [ESC]">Cerrar [ESC]</button>
+        </div>
+
+        <div class="ohm-inspection-body">
+          <div class="ohm-schematic-column">
+            <div id="ohm-schematic-container" class="ohm-schematic-container">
+              <svg id="ohm-circuit-svg" viewBox="0 0 540 320" aria-label="Diagrama físico de contactos y conductores de Ohm">
+                <rect x="10" y="10" width="520" height="300" rx="8" fill="#1e1713" stroke="#5a402d" stroke-width="2" />
+
+                <!-- Fuente y bornes observados -->
+                <rect x="25" y="75" width="100" height="160" rx="6" fill="#36291e" stroke="#8a6840" stroke-width="2" />
+                <text x="75" y="140" fill="#f5ebe0" font-size="14" font-weight="bold" text-anchor="middle">FUENTE</text>
+                <text x="75" y="160" fill="#c8b6a2" font-size="11" text-anchor="middle">(Zumbando)</text>
+                <text x="110" y="102" fill="#f8c050" font-size="18" font-weight="bold">+</text>
+                <text x="110" y="215" fill="#70d8e8" font-size="20" font-weight="bold">−</text>
+
+                <!-- Conductores del panel -->
+                <path id="ohm-wire-feed-in" class="ohm-wire" d="M125 96 H160 V45 H230" stroke="#8a6840" stroke-width="5" fill="none" stroke-linecap="round" />
+                <path id="ohm-wire-feed-out" class="ohm-wire" d="M300 45 H450 V115" stroke="#8a6840" stroke-width="5" fill="none" stroke-linecap="round" />
+                <circle cx="450" cy="145" r="30" fill="#2d221c" stroke="#8a6840" stroke-width="3" />
+                <circle id="ohm-core-lamp" cx="450" cy="145" r="18" fill="#18120e" stroke="#5a402d" stroke-width="2" />
+                <text x="450" y="150" fill="#f5ebe0" font-size="10" font-weight="bold" text-anchor="middle">NÚCLEO</text>
+                <path id="ohm-wire-core-out" class="ohm-wire" d="M450 175 V200" stroke="#8a6840" stroke-width="5" fill="none" stroke-linecap="round" />
+
+                <!-- Atajo con tramo roto -->
+                <path id="ohm-wire-shortcut-in" class="ohm-wire" d="M450 200 H400" stroke="#8a6840" stroke-width="4" fill="none" />
+                <path class="ohm-wire broken-path" d="M330 200 H290" stroke="#5a402d" stroke-width="4" stroke-dasharray="4,4" fill="none" />
+                <path id="ohm-wire-shortcut-out" class="ohm-wire" d="M220 200 H160" stroke="#8a6840" stroke-width="4" fill="none" />
+
+                <!-- Retorno largo -->
+                <path id="ohm-wire-long-in" class="ohm-wire" d="M450 200 V275 H400" stroke="#8a6840" stroke-width="5" fill="none" stroke-linecap="round" />
+                <path id="ohm-wire-long-mid" class="ohm-wire" d="M330 275 H270" stroke="#8a6840" stroke-width="5" fill="none" stroke-linecap="round" />
+                <path id="ohm-wire-long-out" class="ohm-wire" d="M200 275 H160 V210 H125" stroke="#8a6840" stroke-width="5" fill="none" stroke-linecap="round" />
+
+                <!-- Puntos interactivos del panel -->
+                <g id="ohm-svg-gap-g1" class="ohm-svg-gap" data-gap="g1" style="cursor: pointer;">
+                  <rect id="ohm-svg-rect-g1" class="gap-socket" x="230" y="30" width="70" height="30" rx="4" fill="#18120e" stroke="#5a402d" stroke-width="2" />
+                  <text id="ohm-svg-text-g1" x="265" y="50" fill="#c8b6a2" font-size="11" text-anchor="middle" pointer-events="none">Ida</text>
+                </g>
+                <g id="ohm-svg-gap-g2" class="ohm-svg-gap" data-gap="g2" style="cursor: pointer;">
+                  <rect id="ohm-svg-rect-g2" class="gap-socket" x="330" y="185" width="70" height="30" rx="4" fill="#18120e" stroke="#5a402d" stroke-width="2" />
+                  <text id="ohm-svg-text-g2" x="365" y="205" fill="#c8b6a2" font-size="11" text-anchor="middle" pointer-events="none">Atajo</text>
+                </g>
+                <g id="ohm-svg-gap-g3" class="ohm-svg-gap broken" data-gap="g3" style="cursor: not-allowed;">
+                  <rect id="ohm-svg-rect-g3" class="gap-socket" x="220" y="185" width="70" height="30" rx="4" fill="#2d1612" stroke="#883322" stroke-width="2" stroke-dasharray="3,3" />
+                  <text id="ohm-svg-text-g3" x="255" y="205" fill="#e07766" font-size="11" text-anchor="middle" pointer-events="none">Roto</text>
+                </g>
+                <g id="ohm-svg-gap-g5" class="ohm-svg-gap" data-gap="g5" style="cursor: pointer;">
+                  <rect id="ohm-svg-rect-g5" class="gap-socket" x="330" y="260" width="70" height="30" rx="4" fill="#18120e" stroke="#5a402d" stroke-width="2" />
+                  <text id="ohm-svg-text-g5" x="365" y="280" fill="#c8b6a2" font-size="11" text-anchor="middle" pointer-events="none">Retorno E</text>
+                </g>
+                <g id="ohm-svg-gap-g4" class="ohm-svg-gap" data-gap="g4" style="cursor: pointer;">
+                  <rect id="ohm-svg-rect-g4" class="gap-socket" x="200" y="260" width="70" height="30" rx="4" fill="#18120e" stroke="#5a402d" stroke-width="2" />
+                  <text id="ohm-svg-text-g4" x="235" y="280" fill="#c8b6a2" font-size="11" text-anchor="middle" pointer-events="none">Retorno O</text>
+                </g>
+              </svg>
+            </div>
+
+            <div id="ohm-status-banner" class="ohm-status-banner status-abierto" aria-live="polite">
+              <span id="ohm-status-icon" class="status-icon">⚪</span>
+              <span id="ohm-status-text">Circuito abierto: la fuente zumba, pero no hay continuidad hacia Ohm.</span>
+            </div>
+          </div>
+
+          <div class="ohm-controls-column">
+            <div class="ohm-tray-card">
+              <div class="ohm-tray-header">
+                <h3>Bandeja de puentes</h3>
+                <span id="ohm-supply-count" class="ohm-supply-badge">3 / 3</span>
+              </div>
+              <div id="ohm-supply-bars" class="ohm-supply-bars" aria-label="Puentes disponibles">
+                <span class="supply-bar active"></span>
+                <span class="supply-bar active"></span>
+                <span class="supply-bar active"></span>
+              </div>
+              <p class="ohm-tray-hint">Toca un borne para acoplar o retirar una barra de puente.</p>
+            </div>
+
+            <div class="ohm-terminal-buttons" id="ohm-terminal-buttons">
+              <button id="ohm-gap-g1" type="button" class="ohm-terminal-btn" data-gap="g1">
+                <span class="btn-indicator">○</span>
+                <span class="btn-text"><strong class="btn-label">Alimentación superior</strong><small class="btn-desc">Salida (+) hacia el núcleo</small></span>
+              </button>
+              <button id="ohm-gap-g2" type="button" class="ohm-terminal-btn" data-gap="g2">
+                <span class="btn-indicator">○</span>
+                <span class="btn-text"><strong class="btn-label">Atajo central</strong><small class="btn-desc">Ramal corto hacia el retorno</small></span>
+              </button>
+              <button id="ohm-gap-g3" type="button" class="ohm-terminal-btn broken" data-gap="g3">
+                <span class="btn-indicator">✕</span>
+                <span class="btn-text"><strong class="btn-label">Tramo calcinado</strong><small class="btn-desc">Fracturado: no admite puente</small></span>
+              </button>
+              <button id="ohm-gap-g5" type="button" class="ohm-terminal-btn" data-gap="g5">
+                <span class="btn-indicator">○</span>
+                <span class="btn-text"><strong class="btn-label">Retorno este</strong><small class="btn-desc">Primer tramo por la base</small></span>
+              </button>
+              <button id="ohm-gap-g4" type="button" class="ohm-terminal-btn" data-gap="g4">
+                <span class="btn-indicator">○</span>
+                <span class="btn-text"><strong class="btn-label">Retorno oeste</strong><small class="btn-desc">Cierra hacia el borne (−)</small></span>
+              </button>
+            </div>
+
+            <div class="ohm-panel-footer">
+              <button id="ohm-reset-btn" type="button" class="ohm-reset-btn">Retirar todos los puentes</button>
+            </div>
           </div>
         </div>
       </div>

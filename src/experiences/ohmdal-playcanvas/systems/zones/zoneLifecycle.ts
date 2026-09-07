@@ -50,10 +50,27 @@ export class OhmdalZoneLifecycle {
     const record = this.require(id);
     if (record.loaded) return;
     if (!record.loading) {
-      record.loading = Promise.resolve(record.definition.load?.()).then(() => {
-        record.loaded = true;
+      let result: void | Promise<void>;
+      try {
+        result = record.definition.load?.();
+      } catch (error) {
+        // A synchronous loader failure must leave the record retryable too.
         record.loading = null;
-      });
+        throw error;
+      }
+      const loading = Promise.resolve(result).then(
+        () => {
+          record.loaded = true;
+          record.loading = null;
+        },
+        (error) => {
+          // Failed visual/zone loads are recoverable. Do not retain a
+          // rejected promise that would make every later activation fail.
+          record.loading = null;
+          throw error;
+        },
+      );
+      record.loading = loading;
     }
     await record.loading;
   }

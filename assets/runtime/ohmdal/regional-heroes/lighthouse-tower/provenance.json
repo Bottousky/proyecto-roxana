@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rx_ohmdal_lighthouse_tower_01",
+  "provider": "Proyecto Roxana",
+  "sourceMethod": "deterministic Blender-authored architecture",
+  "script": "scripts/3d/build-lighthouse-tower.py",
+  "license": "Original Proyecto Roxana geometry; no external asset or paid generation.",
+  "referencePack": {
+    "region": "assets/references/region-packs/faro/README.md",
+    "hero": "assets/references/hero-packs/lighthouse/hero-reference.json",
+    "primaryReference": "assets/ohmdal/rooms/pilot-arco1/prop_lighthouse_lens_off.png",
+    "supportingReferences": [
+      "assets/ohmdal/rooms/pilot-arco1/lighthouse_lantern+prop_lighthouse_lens_off.png",
+      "assets/ohmdal/rooms/pilot-arco1/lighthouse_hall_base.png"
+    ]
+  },
+  "canonicalization": {
+    "tool": "Blender 5.2",
+    "unit": "meter",
+    "upAxis": "+Y",
+    "frontAxis": "+Z",
+    "pivot": "LighthouseTowerRoot local ground origin",
+    "parent": "lighthouseRoot",
+    "localAssemblyPosition": [
+      0.0,
+      0.0,
+      8.0
+    ],
+    "worldAssemblyPosition": [
+      180.0,
+      0.0,
+      8.0
+    ]
+  },
+  "runtimeFile": "lighthouse-tower.glb",
+  "runtimeSha256": "c5f1ef4e2f25600bf715ab79ad83a3d7f127fa1963baf6aea74e4b5fc81e7b39",
+  "runtimeBytes": 1156384,
+  "metrics": {
+    "boundsSource": "vertices",
+    "aabb": {
+      "min": [
+        -1.7999999523162842,
+        0.0,
+        -1.7999999523162842
+      ],
+      "max": [
+        1.7999999523162842,
+        7.987222194671631,
+        1.7999999523162842
+      ]
+    },
+    "dims": [
+      3.5999999046325684,
+      7.987222194671631,
+      3.5999999046325684
+    ],
+    "center": [
+      0.0,
+      3.9936110973358154,
+      0.0
+    ],
+    "groundOffset": 0.0,
+    "triangles": 11968,
+    "meshes": 5,
+    "materials": [
+      "LighthouseCopperAged",
+      "LighthouseIronDark",
+      "LighthouseLimestoneShadow",
+      "LighthouseLimestoneWarm",
+      "LighthouseMasonryJoint"
+    ]
+  },
+  "semanticAnchors": [
+    "LighthouseTowerGroundAnchor",
+    "LighthouseTowerLensAnchor",
+    "LighthouseTowerServiceRailAnchor",
+    "LighthouseTowerHatchAnchor",
+    "LighthouseTowerCanopyAnchor"
+  ],
+  "sourceBindingsToHideAfterLoadReady": [
+    "LighthouseBeaconBase",
+    "LighthouseBeaconTower",
+    "LighthouseBeaconCap",
+    "LighthouseLanternLowerRing",
+    "LighthouseLanternUpperRing",
+    "LighthouseLanternBrace1",
+    "LighthouseLanternBrace2",
+    "LighthouseLanternBrace3",
+    "LighthouseLanternBrace4",
+    "LighthouseLanternBrace5",
+    "LighthouseLanternBrace6",
+    "LighthouseLanternBrace7",
+    "LighthouseLanternBrace8",
+    "LighthouseCupolaAuthored",
+    "LighthouseFinialAuthored"
+  ],
+  "sourceBindingsPreserved": [
+    "LighthouseFresnelLens",
+    "LighthouseBeaconLamp",
+    "LighthouseBeaconPoint",
+    "LighthouseOpticalSweep",
+    "LighthouseSignalBar"
+  ],
+  "notes": [
+    "Visual-only tower candidate; no collider, light, lens or gameplay state is introduced.",
+    "The copper canopy is annular so the separate Fresnel mechanism remains visible and state-controlled.",
+    "The service rail is a closed geometry loop at local y=5.2 inside the existing base footprint.",
+    "The technical hatch is a closed visual panel and does not create a new access route.",
+    "Materials are matte PBR with localized aged copper; no passive emission, neon or new symbols."
+  ]
+}

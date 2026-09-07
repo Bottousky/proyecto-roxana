@@ -1,5 +1,15 @@
 import * as pc from 'playcanvas';
+import { createPlayerControls } from './systems/controls/playerControls.ts';
+import './systems/controls/playerControls.css';
 import { buildPlayCanvasOhmdalWorld, type PlayCanvasWorldElements } from './playcanvasWorld.ts';
+import { CONTACT_AFFORDANCE_CENTER } from './world/plaza/contactAffordance.ts';
+import {
+  createContactTargetLabel,
+  getContactTargetLabelText,
+  projectContactTargetLabel,
+  shouldShowContactTargetLabel,
+  type ContactTargetLabelHandle,
+} from './systems/controls/contactTargetLabel.ts';
 import { PlazaAudioEngine } from '../ohmdal-plaza/audio/soundscape.ts';
 import { createInitialCircuit, solveCircuit } from '../ohmdal-plaza/simulation/circuitSolver.ts';
 import { GalvanoscopeTool } from '../ohmdal-plaza/tools/galvanoscope.ts';
@@ -25,6 +35,23 @@ import { OHMDAL_TRANSITION_ANCHORS, yawForAnchor, type SpawnAnchor } from './sys
 import type { CollisionDiagnostic } from './systems/navigation/ohmdalNavigation.ts';
 import { createManantialActivationVfx } from './world/manantial/manantialActivationVfx.ts';
 import { OhmdalVfxSystem } from './systems/vfx/ohmdalVfxSystem.ts';
+import { Arc1WorldAmbience } from './systems/audio/arc1WorldAmbience.ts';
+import { OhmContinuityPuzzle } from './systems/puzzles/ohmContinuityPuzzle.ts';
+import { ARC1_COMMUNITY_DIALOGUES } from './systems/story/arc1CommunityScenes.ts';
+import { createFirstClassDemonstration } from './world/arc1/firstClassDemonstration.ts';
+import { createRegionalMaintenancePanel, type RegionPanelKind } from './systems/puzzles/regionalMaintenancePanel.ts';
+import { applyRegionalIntervention } from './systems/puzzles/regionalInterventions.ts';
+import './systems/puzzles/regionalMaintenancePanel.css';
+import {
+  ARC1_SAVE_STORAGE_KEY,
+  applyArc1CircuitSave,
+  captureArc1CircuitState,
+  createArc1SaveData,
+  readArc1Save,
+  writeArc1Save,
+  type Arc1SafeAnchorId,
+  type Arc1SafeZone,
+} from './systems/campaign/arc1Save.ts';
 import {
   type Arc1GreyboxState,
   type CastleNetworkConfiguration,
@@ -45,10 +72,10 @@ import {
   evaluateLighthouse,
   evaluateManantial,
   getArc1Progress,
-  isArcComplete,
   isCastleRestored,
   isForgeTerracesRestored,
   isLighthouseRestored,
+  isLighthouseEmitting,
   isManantialRestored,
   measureCastleNetwork,
   measureForgeTerraces,
@@ -118,7 +145,36 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   host.appendChild(canvas);
 
   const world: PlayCanvasWorldElements = buildPlayCanvasOhmdalWorld(canvas);
-  const audio = new PlazaAudioEngine();
+  const contactLabelHost = host.parentElement ?? host;
+  const contactTargetLabel: ContactTargetLabelHandle = createContactTargetLabel(contactLabelHost);
+  const touchInteractionButton = document.getElementById('touch-interact');
+  const contactLabelWorldPosition = new pc.Vec3(
+    CONTACT_AFFORDANCE_CENTER[0],
+    CONTACT_AFFORDANCE_CENTER[1] + 0.2,
+    CONTACT_AFFORDANCE_CENTER[2],
+  );
+  const contactLabelScreenPosition = new pc.Vec3();
+  const worldAmbience = new Arc1WorldAmbience({ visibilityTarget: document });
+  const audio = new PlazaAudioEngine({ ambientBed: false, worldAmbience });
+  const audioToggle = document.getElementById('ohmdal-audio-toggle');
+  try { if (localStorage.getItem('ohmdal.audio.muted') === 'true') audio.toggleMute(); } catch { /* Optional preference storage. */ }
+  const syncAudioToggle = () => {
+    const label = audio.isMuted ? 'Activar sonido' : 'Silenciar sonido';
+    audioToggle?.setAttribute('aria-label', label);
+    audioToggle?.setAttribute('title', label);
+    audioToggle?.setAttribute('aria-pressed', String(audio.isMuted));
+    const waves = audioToggle?.querySelector<SVGElement>('[data-sound-waves]');
+    const muted = audioToggle?.querySelector<SVGElement>('[data-sound-muted]');
+    if (waves) waves.style.display = audio.isMuted ? 'none' : '';
+    if (muted) muted.style.display = audio.isMuted ? '' : 'none';
+  };
+  const toggleWorldSound = (event: Event) => {
+    event.stopPropagation();
+    audio.toggleMute(); syncAudioToggle();
+    try { localStorage.setItem('ohmdal.audio.muted', String(audio.isMuted)); } catch { /* Optional preference storage. */ }
+  };
+  syncAudioToggle();
+  audioToggle?.addEventListener('click', toggleWorldSound);
   let circuit: CircuitState = createInitialCircuit();
   const galvanoscope = new GalvanoscopeTool();
   const bitacora = new BitacoraManager();
@@ -130,12 +186,12 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   };
   world.workshopInteriorRoot.enabled = false;
   zones.register({ id: 'plaza', setActive: (active) => setZoneActive('plaza', active, () => { world.plazaRoot.enabled = active; }) });
-  zones.register({ id: 'workshop', setActive: (active) => setZoneActive('workshop', active, () => { world.workshopInteriorRoot.enabled = active; }) });
+  zones.register({ id: 'workshop', load: () => world.characterVisuals.ensure('lumen'), setActive: (active) => setZoneActive('workshop', active, () => { world.workshopInteriorRoot.enabled = active; }) });
   // The existing mountain root is Plaza's accepted scenic shell. Future
   // Manantial payloads register behind this progression-gated load seam.
   zones.register({
     id: 'manantial',
-    load: () => undefined,
+    load: () => world.regionalHeroVisuals.ensure('manantial'),
     setActive: (active) => setZoneActive('manantial', active, () => {
       world.manantialGameplayRoot.enabled = active;
       world.turbineMesh.enabled = !active;
@@ -144,14 +200,17 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   });
   zones.register({
     id: 'castle',
+    load: () => Promise.all([world.characterVisuals.ensure('consejera'), world.regionalHeroVisuals.ensure('castle')]).then(() => undefined),
     setActive: (active) => setZoneActive('castle', active, () => { world.arc1Greybox.roots.castle.enabled = active; }),
   });
   zones.register({
     id: 'forge-terraces',
+    load: () => Promise.all([world.characterVisuals.ensure('yesca'), world.characterVisuals.ensure('vega'), world.regionalHeroVisuals.ensure('forge')]).then(() => undefined),
     setActive: (active) => setZoneActive('forge-terraces', active, () => { world.arc1Greybox.roots['forge-terraces'].enabled = active; }),
   });
   zones.register({
     id: 'lighthouse',
+    load: () => Promise.all([world.characterVisuals.ensure('nereo'), world.regionalHeroVisuals.ensure('lighthouse')]).then(() => undefined),
     setActive: (active) => setZoneActive('lighthouse', active, () => { world.arc1Greybox.roots.lighthouse.enabled = active; }),
   });
   void zones.initializePlaza();
@@ -170,8 +229,26 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let visualCamera: OhmdalVisualCameraName = 'active-play-desktop';
   let visualState: OhmdalVisualStateName = 'portal-arrival';
   let visualCaptureShot: OhmdalVisualCaptureShotName | null = null;
+  let visualHarnessActive = false;
   let visualPaused = false;
   let reducedMotion = false;
+  let runtimeDestroyed = false;
+  let campaignHydrating = false;
+  let campaignLoadFailed = false;
+  let transitionPending = false;
+  let campaignResumed = false;
+  let startupDialogueTimer: number | null = null;
+  let campaignSaveTimer: number | null = null;
+  let safeAnchorId: Arc1SafeAnchorId = 'portal-to-plaza';
+
+  const campaignStorage = {
+    getItem(key: string): string | null {
+      return localStorage.getItem(key);
+    },
+    setItem(key: string, value: string): void {
+      localStorage.setItem(key, value);
+    },
+  };
 
   // Arrival Cinematic State & Persistence
   const INTRO_SEEN_KEY = 'ohmdal_intro_seen';
@@ -194,7 +271,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   const CINEMATIC_DURATION = 2.4;
 
   function finishArrivalCinematic(): void {
-    if (!isCinematicActive) return;
+    if (!isCinematicActive || runtimeDestroyed || campaignResumed) return;
     isCinematicActive = false;
     markIntroSeen();
     ui.setCinematicOverlay?.(false);
@@ -219,7 +296,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   let debugUiHidden = false;
   let postProcessingEnabled = true;
   let visualSeed = 1;
-  let compactViewmodelLayout: boolean | null = null;
+  let viewmodelLayoutKey = '';
   const frameTimeSamples: number[] = [];
 
   // First-person Controls
@@ -228,50 +305,419 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   const playerPos = new pc.Vec3(0, 1.68, -8.0);
   const keys = { w: false, a: false, s: false, d: false };
 
-  // Mouse Look
-  const onMouseMove = (e: MouseEvent) => {
-    if (!isPointerLocked || isCinematicActive) return;
-    yaw -= e.movementX * 0.15;
-    pitch -= e.movementY * 0.15;
-    pitch = Math.max(-80, Math.min(80, pitch));
+  // The authored GLB faces south after its calibrated 180° yaw (the visible
+  // emitter is on +Z in the asset). Keep the inspection on the clear east
+  // side, slightly behind the body, outside the real pedestal collider.
+  const ohmBodyCenter = new pc.Vec3(0, 1.16, -2.0);
+  const ohmInspectionPosition = new pc.Vec3(1.7, 1.25, -1.1);
+  const ohmPuzzle = new OhmContinuityPuzzle();
+  let isOhmInspecting = false;
+  let ohmCompletionPending = false;
+  let ohmCompletionTimer: number | null = null;
+  let ohmAwakeningDialogueTimer: number | null = null;
+  let firstClassVisible = false;
+  let firstClassLessonTime = 0;
+  const firstClassEddaOrigin = world.eddaEntity.getPosition().clone();
+  let firstClassCameraRestore: { position: pc.Vec3; rotation: pc.Quat; yaw: number; pitch: number } | null = null;
+  const firstClassEddaHead = world.eddaEntity.findByName('EddaHead') as pc.Entity | null;
+  const firstClassLumenHead = world.lumenNpcEntity.findByName('LumenHead') as pc.Entity | null;
+  const firstClassRecord = new pc.Entity('LumenFirstClassRecord');
+  const firstClassRecordMaterial = (world.lumenNpcEntity.findByName('LumenGoggles') as pc.Entity | null)
+    ?.render?.meshInstances[0]?.material;
+  if (firstClassRecordMaterial) {
+    firstClassRecord.addComponent('render', { type: 'box', material: firstClassRecordMaterial });
+    firstClassRecord.setLocalScale(0.42, 0.62, 0.08);
+    firstClassRecord.setLocalPosition(0.48, 1.12, 0.2);
+    firstClassRecord.setLocalEulerAngles(10, 0, -16);
+    firstClassRecord.render!.castShadows = false;
+    firstClassRecord.render!.receiveShadows = true;
+  }
+  world.lumenNpcEntity.addChild(firstClassRecord);
+  firstClassRecord.enabled = false;
+  const firstClassDemonstration = createFirstClassDemonstration(world.app, world.plazaRoot);
+  firstClassDemonstration.root.enabled = false;
+  const inspectionPrevPos = new pc.Vec3();
+  let inspectionPrevYaw = 180;
+  let inspectionPrevPitch = 0;
 
+  function clearCampaignSaveTimer(): void {
+    if (campaignSaveTimer !== null) {
+      window.clearTimeout(campaignSaveTimer);
+      campaignSaveTimer = null;
+    }
+  }
+
+  /** Save only campaign sources; visual harness mutations never enter this path. */
+  function saveCampaign(): boolean {
+    if (runtimeDestroyed || campaignHydrating || campaignLoadFailed || visualHarnessActive) return false;
+    const circuitSave = captureArc1CircuitState(circuit);
+    const transition = OHMDAL_TRANSITION_ANCHORS[safeAnchorId];
+    if (!circuitSave || !transition) return false;
+    try {
+      const save = createArc1SaveData({
+        storyStep,
+        ohmAwake: isOhmAwake,
+        inventory: { jumper: hasJumperItem, brush: hasBrushItem },
+        arc1: arc1State,
+        circuit: circuitSave,
+        bitacora: bitacora.getStatuses(),
+        safeAnchor: {
+          zone: transition.to as Arc1SafeZone,
+          anchorId: safeAnchorId,
+        },
+        b2: { coveredIds: [...ohmPuzzle.getCovered()] },
+      });
+      return writeArc1Save(campaignStorage, save, ARC1_SAVE_STORAGE_KEY);
+    } catch {
+      return false;
+    }
+  }
+
+  /** Coalesce accepted interactions so a save does not occur each frame. */
+  function queueCampaignSave(): void {
+    if (runtimeDestroyed || campaignHydrating || visualHarnessActive) return;
+    clearCampaignSaveTimer();
+    campaignSaveTimer = window.setTimeout(() => {
+      campaignSaveTimer = null;
+      if (!activeDialogueNode) saveCampaign();
+    }, 80);
+  }
+
+  async function hydrateCampaign(save: ReturnType<typeof readArc1Save>): Promise<boolean> {
+    if (!save) return false;
+    campaignHydrating = true;
+    campaignLoadFailed = false;
+    try {
+      const hydratedCircuit = applyArc1CircuitSave(createInitialCircuit(), save.circuit);
+      if (!hydratedCircuit) return false;
+      const anchor = OHMDAL_TRANSITION_ANCHORS[save.safeAnchor.anchorId];
+      if (!anchor || anchor.to !== save.safeAnchor.zone) return false;
+      const resumeZones = save.safeAnchor.zone === 'manantial'
+        ? ['plaza', 'manantial'] as const : [save.safeAnchor.zone];
+      // Fetch before modifying any campaign source or moving the player.
+      for (const zone of resumeZones) await zones.preload(zone);
+      if (runtimeDestroyed) return false;
+
+      closeVisualOverlays();
+      clearCampaignSaveTimer();
+      clearOhmCompletionTimer();
+      ohmCompletionPending = false;
+      circuit = solveCircuit(hydratedCircuit);
+      arc1State = save.arc1;
+      storyStep = save.storyStep;
+      isOhmAwake = save.ohmAwake;
+      hasJumperItem = save.inventory.jumper;
+      hasBrushItem = save.inventory.brush;
+      bitacora.restoreStatuses(save.bitacora);
+      safeAnchorId = save.safeAnchor.anchorId;
+
+      // OhmContinuityPuzzle intentionally has immutable topology; rebuild its
+      // source coverage through its public reducer rather than restoring a
+      // snapshot or reaching into private state.
+      ohmPuzzle.reset();
+      for (const gapId of save.b2?.coveredIds ?? (isOhmAwake ? ['g1', 'g5', 'g4'] : [])) ohmPuzzle.toggleGap(gapId);
+
+      const inspectorState = workbench.getState();
+      inspectorState.knifeSwitchClosed = circuit.branches.b_ida_rele.state === 'closed';
+      inspectorState.corrosionScraped = circuit.branches.b_brecha_a_oxido.state === 'closed'
+        || circuit.branches.b_brecha_a_oxido.resistance < 1;
+      inspectorState.jumperInstalled = circuit.branches.b_brecha_retorno.state === 'closed';
+      workbench.close();
+
+      world.copperJumper.enabled = inspectorState.jumperInstalled;
+      world.corrosionMesh.enabled = !inspectorState.corrosionScraped;
+      world.ohmFilamentLight.light!.intensity = isOhmAwake ? 2.8 : 0;
+      updateArc1WorldVisuals();
+      updateCircuitStateVisuals({ showDialogue: false, deriveStory: false });
+      ui.setInventoryItem(hasJumperItem || hasBrushItem ? 'Puente de Cobre + Cepillo' : '');
+
+      spawnAtAnchor(anchor.anchor);
+
+      // Manantial is reached along the open northern path and keeps Plaza
+      // visible behind it during normal play. Resume that same composition.
+      for (const zone of resumeZones) await zones.activate(zone);
+      if (runtimeDestroyed) return false;
+      for (const zone of ['plaza', 'workshop', 'manantial', 'castle', 'forge-terraces', 'lighthouse'] as const) {
+        if (!(resumeZones as readonly string[]).includes(zone)) zones.deactivate(zone);
+      }
+      if (storyStep === 'arc1_complete' || (storyStep === 'returning' && safeAnchorId === 'castle-to-plaza')) {
+        placeFirstClassActors();
+      } else {
+        restoreLumenToWorkshop();
+      }
+      updateArc1WorldVisuals();
+      // A pagehide may flush the closed circuit during its 700ms settling
+      // animation. Resume its earned awakening rather than a stranded panel.
+      if (!isOhmAwake && ohmPuzzle.isComplete()) triggerOhmAwakening();
+      else if (isOhmAwake && storyStep === 'ohm_awakened') startDialogue('ohm_awakening_event');
+      else if (isOhmAwake && storyStep === 'edda_surprised') startDialogue('edda_surprised_awakening');
+      return true;
+    } catch {
+      campaignLoadFailed = true;
+      return false;
+    } finally {
+      campaignHydrating = false;
+    }
+  }
+
+  function clearHeldMovement(): void {
+    keys.w = false;
+    keys.a = false;
+    keys.s = false;
+    keys.d = false;
+    window.dispatchEvent(new Event('ohmdal:release-controls'));
+  }
+
+  function restoreLumenToWorkshop(): void {
+    world.characterVisuals.setAction('edda', 'Idle');
+    world.characterVisuals.setAction('lumen', 'Idle');
+    if (world.lumenNpcEntity.parent !== world.workshopInteriorRoot) {
+      world.lumenNpcEntity.reparent(world.workshopInteriorRoot);
+    }
+    world.lumenNpcEntity.setLocalPosition(0, 0, 2.4);
+    world.lumenNpcEntity.setLocalEulerAngles(0, 180, 0);
+    world.eddaEntity.setLocalEulerAngles(0, 20, 0);
+    world.eddaEntity.setPosition(firstClassEddaOrigin);
+    firstClassEddaHead?.setLocalEulerAngles(0, 0, 0);
+    firstClassLumenHead?.setLocalEulerAngles(0, 0, 0);
+    firstClassRecord.setLocalEulerAngles(10, 0, -16);
+    firstClassVisible = false;
+    firstClassLessonTime = 0;
+    firstClassRecord.enabled = false;
+    firstClassDemonstration.reset();
+    firstClassDemonstration.root.enabled = false;
+  }
+
+  function placeFirstClassActors(): void {
+    void world.characterVisuals.ensure('lumen').catch((error) => console.error('Lumen character load failed', error));
+    if (world.lumenNpcEntity.parent !== world.plazaRoot) {
+      world.lumenNpcEntity.reparent(world.plazaRoot);
+    }
+    world.lumenNpcEntity.setPosition(3.8, 0, -5.5);
+    world.lumenNpcEntity.setEulerAngles(0, 90, 0);
+    world.eddaEntity.setPosition(1.55, 0, -5.05);
+    world.eddaEntity.setEulerAngles(0, -90, 0);
+    world.characterVisuals.setAction('edda', 'Explain');
+    world.characterVisuals.setAction('lumen', 'Record');
+    firstClassVisible = true;
+    firstClassLessonTime = 0;
+    firstClassRecord.enabled = true;
+    firstClassDemonstration.root.enabled = true;
+    if (storyStep === 'arc1_complete') {
+      firstClassDemonstration.setPhase('operate');
+      firstClassDemonstration.update(0, true);
+      firstClassDemonstration.setPhase('verify');
+    }
+  }
+
+  function firstClassReady(): boolean {
+    return storyStep === 'returning'
+      && arc1State.currentRegion === 'retorno'
+      && isLighthouseRestored(arc1State);
+  }
+
+  function startCommunityDialogue(actor: 'councillor' | 'yesca' | 'vega' | 'nereo', restored: boolean): void {
+    const root = world.communityActors.roots[actor];
+    const player = world.playerEntity.getPosition();
+    root.lookAt(player.x, root.getPosition().y, player.z);
+    faceConversation(root.getPosition().clone().add(new pc.Vec3(0, 1.4, 0)));
+    world.characterVisuals.setAction(actor === 'councillor' ? 'consejera' : actor, 'Explain');
+    const nodeId = {
+      councillor: restored ? 'castle_councillor_restored' : 'castle_councillor_arrival',
+      yesca: restored ? 'forge_yesca_restored' : 'forge_yesca_arrival',
+      vega: restored ? 'terraces_vega_restored' : 'terraces_vega_arrival',
+      nereo: restored ? 'lighthouse_nereo_restored' : 'lighthouse_nereo_arrival',
+    }[actor];
+    startDialogue(nodeId);
+  }
+
+  function syncViewmodelVisibility(): void {
+    // Keep the equipment choice in `isToolEquipped`, but hide the camera child
+    // while authored dialogue/cinematics own the frame.
+    world.viewmodelRoot.enabled = isToolEquipped && !isCinematicActive && !activeDialogueNode && currentMode !== 'inspect';
+  }
+
+  canvas.style.touchAction = 'none';
+  const playerControls = createPlayerControls({
+    lookSurface: canvas,
+    initialYaw: yaw,
+    initialPitch: pitch,
+    // Existing directional buttons retain their cancellation-safe listeners;
+    // only the camera and browser presentation are owned by this adapter.
+    isEnabled: () => !runtimeDestroyed && !campaignHydrating && !campaignLoadFailed && !transitionPending && !isCinematicActive
+      && !activeDialogueNode && currentMode === 'explore' && !visualPaused,
+    onLook: ({ deltaYaw, deltaPitch }) => {
+      yaw = (yaw + deltaYaw + 360) % 360;
+      pitch = Math.max(-80, Math.min(80, pitch + deltaPitch));
+      world.playerEntity.setEulerAngles(0, yaw, 0);
+      world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+      playerControls.setLook({ yaw, pitch });
+    },
+    pointerLock: {
+      element: canvas,
+      onChange: (locked) => {
+        isPointerLocked = locked;
+        if (!locked) clearHeldMovement();
+      },
+    },
+    compass: { mount: document.getElementById('plaza-hud') ?? host.parentElement ?? host },
+    orientationGate: {
+      mount: host.parentElement ?? host,
+      onChange: (blocked) => { if (blocked) clearHeldMovement(); },
+    },
+  });
+  function restoreMouseCapture(): void {
+    if (!visualHarnessActive && !runtimeDestroyed && !activeDialogueNode
+      && currentMode === 'explore' && !playerControls.orientationGate?.isBlocked()) {
+      playerControls.pointerLock?.restoreFromGesture();
+    }
+  }
+
+  let regionalInspection: { kind: RegionPanelKind; yaw: number; pitch: number } | null = null;
+  const regionalPanel = createRegionalMaintenancePanel(host.parentElement ?? host, {
+    onAction: (action) => {
+      if (!regionalInspection || runtimeDestroyed) return;
+      arc1State = applyRegionalIntervention(arc1State, action);
+      if (action.type === 'lighthouse-trim') audio.playGalvanometerClick();
+      else audio.playSwitchClunk();
+      updateArc1WorldVisuals();
+      regionalPanel.refresh(arc1State);
+      queueCampaignSave();
+    },
+    onClose: () => closeRegionalInspection(),
+  });
+
+  function openRegionalInspection(kind: RegionPanelKind, target: readonly [number, number, number]): void {
+    if (currentMode !== 'explore' || activeDialogueNode) return;
+    regionalInspection = { kind, yaw, pitch };
+    currentMode = 'inspect';
+    clearHeldMovement();
+    document.exitPointerLock?.();
+    // Keep the feet at the collision-validated approach. Only turn the view to
+    // put the physical cabinet on the exposed left side of the maintenance UI.
+    yaw = Math.atan2(-(target[0] - playerPos.x), -(target[2] - playerPos.z)) * 180 / Math.PI - 24;
+    pitch = kind === 'forge' ? -12 : -8;
     world.playerEntity.setEulerAngles(0, yaw, 0);
     world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+    world.cameraEntity.setLocalPosition(0, 0, kind === 'forge' ? 2.5 : 1.6);
+    regionalPanel.open(kind, arc1State);
+    syncViewmodelVisibility();
+  }
+
+  function closeRegionalInspection(): void {
+    if (!regionalInspection) return;
+    yaw = regionalInspection.yaw;
+    pitch = regionalInspection.pitch;
+    regionalInspection = null;
+    regionalPanel.close();
+    currentMode = 'explore';
+    clearHeldMovement();
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+    world.cameraEntity.setLocalPosition(0, 0, 0);
+    syncViewmodelVisibility();
+    restoreMouseCapture();
+  }
+
+  const onWindowBlur = () => {
+    clearHeldMovement();
   };
 
-  const onPointerLockChange = () => {
-    isPointerLocked = document.pointerLockElement === canvas;
+  const onVisibilityChange = () => {
+    if (document.visibilityState !== 'visible') clearHeldMovement();
   };
 
-  document.addEventListener('mousemove', onMouseMove);
-  document.addEventListener('pointerlockchange', onPointerLockChange);
+  const onAudioGesture = () => {
+    audio.unlockForGesture();
+  };
+
+  window.addEventListener('blur', onWindowBlur);
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  window.addEventListener('pointerdown', onAudioGesture, { passive: true });
+  window.addEventListener('keydown', onAudioGesture);
 
   // Key Handlers
   const onKeyDown = (e: KeyboardEvent) => {
     const k = e.key.toLowerCase();
+    if (campaignHydrating || transitionPending || playerControls.orientationGate?.isBlocked()) return;
+    if (campaignLoadFailed) {
+      if (!e.repeat && ['e', 'f', 'enter', ' '].includes(k)) void resumeCampaign();
+      return;
+    }
     if (isCinematicActive) {
-      if (k === ' ' || k === 'enter' || k === 'e' || k === 'f' || k === 'escape') {
+      if (!e.repeat && (k === ' ' || k === 'enter' || k === 'e' || k === 'f' || k === 'escape')) {
         e.preventDefault();
         finishArrivalCinematic();
-        return;
       }
+      return;
     }
+
+    if (isOhmInspecting) {
+      if (!e.repeat && k === 'escape') {
+        e.preventDefault();
+        closeOhmInspection();
+      } else if (!e.repeat) {
+        const gapMap: Record<string, string> = { '1': 'g1', '2': 'g2', '3': 'g3', '4': 'g5', '5': 'g4' };
+        const gapId = gapMap[k];
+        if (gapId) {
+          e.preventDefault();
+          handleOhmPuzzleToggle(gapId);
+        }
+      }
+      return;
+    }
+
+    if (regionalInspection) {
+      if (!e.repeat && k === 'escape') {
+        e.preventDefault();
+        closeRegionalInspection();
+      }
+      return;
+    }
+
+    if (activeDialogueNode) {
+      if (!e.repeat && (k === 'e' || k === 'f' || k === 'enter' || k === ' ')) {
+        e.preventDefault();
+        triggerInteraction();
+      }
+      return;
+    }
+
+    if (currentMode === 'bitacora') {
+      if (!e.repeat && (k === 'tab' || k === 'escape')) {
+        e.preventDefault();
+        toggleBitacora();
+      }
+      return;
+    }
+
+    if (currentMode === 'inspect') {
+      if (!e.repeat && k === 'escape') {
+        e.preventDefault();
+        handleWorkbenchAction('close');
+      }
+      return;
+    }
+
     if (k === 'w' || k === 'arrowup') keys.w = true;
     if (k === 's' || k === 'arrowdown') keys.s = true;
     if (k === 'a' || k === 'arrowleft') keys.a = true;
     if (k === 'd' || k === 'arrowright') keys.d = true;
-    if (k === 'q') yaw += 7;
-    if (k === 'r') yaw -= 7;
+    if (k === 'q' || k === 'r') {
+      yaw = (yaw + (k === 'q' ? 7 : -7) + 360) % 360;
+      world.playerEntity.setEulerAngles(0, yaw, 0);
+      playerControls.setLook({ yaw, pitch });
+    }
 
-    if (k === 'e' || k === 'f' || k === 'enter' || k === ' ') {
+    if (!e.repeat && (k === 'e' || k === 'f' || k === 'enter' || k === ' ')) {
       triggerInteraction();
     }
-    if (k === 'm') {
+    if (!e.repeat && k === 'm') {
       isToolEquipped = !isToolEquipped;
-      world.viewmodelRoot.enabled = isToolEquipped;
+      syncViewmodelVisibility();
       ui.showNotification(isToolEquipped ? 'Galvanoscopio equipado' : 'Galvanoscopio guardado');
     }
-    if (k === 'tab') {
+    if (!e.repeat && k === 'tab') {
       e.preventDefault();
       toggleBitacora();
     }
@@ -306,13 +752,41 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   function teleportPlayer(transitionId: keyof typeof OHMDAL_TRANSITION_ANCHORS): void {
     const transition = OHMDAL_TRANSITION_ANCHORS[transitionId];
     if (!transition) throw new Error(`Unknown Ohmdal transition anchor: ${transitionId}`);
+    safeAnchorId = transitionId as Arc1SafeAnchorId;
     spawnAtAnchor(transition.anchor);
+  }
+
+  async function enterLoadedZone(
+    destination: Parameters<typeof zones.activate>[0],
+    commit: () => void,
+  ): Promise<void> {
+    if (transitionPending || runtimeDestroyed) return;
+    transitionPending = true;
+    clearHeldMovement();
+    try {
+      // Keep the current room and progression intact until every payload is ready.
+      await zones.preload(destination);
+      if (runtimeDestroyed) return;
+      await zones.activate(destination);
+      if (runtimeDestroyed) return;
+      commit();
+      queueCampaignSave();
+    } catch {
+      if (!runtimeDestroyed) ui.showNotification('No se pudo cargar la siguiente zona. Acércate de nuevo al acceso para reintentar.');
+    } finally {
+      transitionPending = false;
+      clearHeldMovement();
+    }
   }
 
   // Portal arrival is an actual destination anchor, including its facing.
   spawnAtAnchor(OHMDAL_TRANSITION_ANCHORS['portal-to-plaza'].anchor);
 
   function closeVisualOverlays(): void {
+    restoreFirstClassCamera();
+    world.cameraEntity.setLocalPosition(0, 0, 0);
+    clearHeldMovement();
+    if (isOhmInspecting) closeOhmInspection();
     if (isCinematicActive) {
       isCinematicActive = false;
       ui.setCinematicOverlay?.(false);
@@ -324,6 +798,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     ui.setBitacoraView(false);
     ui.setWorkbenchView(false);
     ui.setPrompt(null);
+    syncViewmodelVisibility();
   }
 
   function setVisualCamera(name: OhmdalVisualCameraName): void {
@@ -340,14 +815,20 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   }
 
   function setVisualState(name: OhmdalVisualStateName): void {
+    visualHarnessActive = true;
     closeVisualOverlays();
+    restoreLumenToWorkshop();
     zones.deactivate('workshop');
     zones.deactivate('manantial');
     zones.deactivate('castle');
     zones.deactivate('forge-terraces');
     zones.deactivate('lighthouse');
+    void zones.activate('plaza');
     circuit = createInitialCircuit();
     arc1State = createArc1GreyboxState();
+    clearOhmCompletionTimer();
+    ohmCompletionPending = false;
+    ohmPuzzle.reset();
     isOhmAwake = false;
     storyStep = 'portal_arrived';
     world.copperJumper.enabled = false;
@@ -385,6 +866,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   }
 
   async function setVisualCaptureShot(shot: RoxanaOhmdalCaptureShot): Promise<void> {
+    visualHarnessActive = true;
+    restoreLumenToWorkshop();
     if (!shot.anchor) throw new Error(`Ohmdal authored capture shot needs an anchor: ${shot.id}`);
     if (![
       'workshop-exterior',
@@ -444,7 +927,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     reducedMotion = shot.deterministic.reducedMotion;
     storyStep = shot.world.storyStep as OhmdalStoryStep;
     isToolEquipped = shot.world.tool === 'galvanoscope';
-    world.viewmodelRoot.enabled = isToolEquipped;
+    syncViewmodelVisibility();
 
     arc1State = createArc1GreyboxState();
     if (shot.world.zone === 'manantial' || isA4Shot || isA5Shot || isA6Shot) {
@@ -601,9 +1084,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     },
     setPausedForScreenshot(paused) {
       visualPaused = paused;
+      world.characterVisuals.setPaused(paused || reducedMotion);
+      world.setAmbientMotionPaused(paused || reducedMotion);
     },
     setReducedMotion(enabled) {
       reducedMotion = enabled;
+      world.characterVisuals.setPaused(visualPaused || enabled);
+      world.setAmbientMotionPaused(visualPaused || enabled);
       if (enabled && isCinematicActive) {
         finishArrivalCinematic();
       }
@@ -614,7 +1101,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     },
     setPostProcessing(enabled) {
       postProcessingEnabled = enabled;
-      world.cameraEntity.camera!.toneMapping = enabled ? pc.TONEMAP_ACES : pc.TONEMAP_LINEAR;
+      world.setPostProcessing(enabled);
     },
     getDiagnostics() {
       const device = world.app.graphicsDevice as pc.GraphicsDevice & { unmaskedRenderer?: string; unmaskedVendor?: string };
@@ -646,6 +1133,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           materials: counts.materials,
           textures: counts.textures,
         },
+        characters: world.characterVisuals.diagnostics(),
         assets,
         zones: {
           loaded: zoneSnapshot.filter((zone) => zone.loaded).map((zone) => zone.id),
@@ -657,7 +1145,9 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           mobileMeaningfulLightLimit: 1,
         },
         harness: {
-          camera: visualCamera,
+          // Authored captures use their own camera ids; keep diagnostics from
+          // reporting the previous base camera after a regional shot.
+          camera: (visualCaptureShot ?? visualCamera) as OhmdalVisualCameraName,
           state: visualState,
           captureShot: visualCaptureShot,
           paused: visualPaused,
@@ -712,6 +1202,14 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         nearestInteractable: nearest,
         zones: zones.snapshot(),
         arc1: snapshotArc1Greybox(arc1State),
+        ohmInspecting: isOhmInspecting,
+        regionalInspection: regionalInspection?.kind ?? null,
+        ohmPuzzle: ohmPuzzle.getSnapshot(),
+        firstClass: {
+          ...firstClassDemonstration.getReadout(),
+          readyToVerify: firstClassDemonstration.readyToVerify,
+          verified: firstClassDemonstration.verified,
+        },
       };
     },
   };
@@ -726,21 +1224,173 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     },
   );
 
+  function clearOhmCompletionTimer(): void {
+    if (ohmCompletionTimer !== null) {
+      window.clearTimeout(ohmCompletionTimer);
+      ohmCompletionTimer = null;
+    }
+  }
+
+  function setOhmInspectionCamera(): boolean {
+    const safePosition: readonly [number, number, number] = [
+      ohmInspectionPosition.x,
+      ohmInspectionPosition.y,
+      ohmInspectionPosition.z,
+    ];
+    if (!world.navigation.isSpawnSafe(safePosition)) {
+      ui.showNotification('El panel de contactos no está accesible desde este lado.');
+      return false;
+    }
+
+    playerPos.copy(ohmInspectionPosition);
+    const dx = ohmBodyCenter.x - playerPos.x;
+    const dz = ohmBodyCenter.z - playerPos.z;
+    yaw = (Math.atan2(-dx, -dz) * 180) / Math.PI;
+    yaw = (yaw + 360 - 32) % 360;
+    pitch = -4;
+    world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+    return true;
+  }
+
+  function openOhmInspection(): void {
+    if (isOhmAwake || isOhmInspecting || ohmCompletionPending) return;
+    inspectionPrevPos.copy(playerPos);
+    inspectionPrevYaw = yaw;
+    inspectionPrevPitch = pitch;
+    if (!setOhmInspectionCamera()) return;
+
+    isOhmInspecting = true;
+    currentMode = 'inspect';
+    clearHeldMovement();
+    // The camera is intentionally tied to the real Ohm body and collider.
+    // Save the exploration pose before applying the inspection pose.
+    document.exitPointerLock?.();
+    syncViewmodelVisibility();
+    audio.playSwitchClunk();
+    ui.setOhmInspectionView?.(
+      true,
+      ohmPuzzle,
+      handleOhmPuzzleToggle,
+      handleOhmPuzzleReset,
+      closeOhmInspection,
+    );
+  }
+
+  function closeOhmInspection(options: { commit?: boolean } = {}): void {
+    if (!options.commit) {
+      clearOhmCompletionTimer();
+      ohmCompletionPending = false;
+    }
+    if (!isOhmInspecting) return;
+
+    isOhmInspecting = false;
+    currentMode = 'explore';
+    clearHeldMovement();
+    ui.setOhmInspectionView?.(false);
+
+    const previous: readonly [number, number, number] = [inspectionPrevPos.x, inspectionPrevPos.y, inspectionPrevPos.z];
+    if (world.navigation.isSpawnSafe(previous)) {
+      playerPos.copy(inspectionPrevPos);
+      yaw = inspectionPrevYaw;
+      pitch = inspectionPrevPitch;
+    } else {
+      // A transition may have changed active solids while the panel was open;
+      // keep the player in the validated side waypoint rather than restoring
+      // into geometry.
+      setOhmInspectionCamera();
+    }
+    world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+    syncViewmodelVisibility();
+    if (!options.commit) restoreMouseCapture();
+  }
+
+  function handleOhmPuzzleToggle(gapId: string): void {
+    if (!isOhmInspecting) return;
+    if (ohmCompletionPending) {
+      ui.showNotification('El contacto está estabilizándose; espera un momento.');
+      return;
+    }
+
+    const result = ohmPuzzle.toggleGap(gapId);
+    if (result.success) {
+      if (result.action === 'placed') {
+        audio.playRelayEngage();
+        vfx.triggerContactSnap([ohmBodyCenter.x, ohmBodyCenter.y - 0.16, ohmBodyCenter.z]);
+      } else {
+        audio.playSwitchClunk();
+      }
+    } else {
+      audio.playSwitchClunk();
+      if (result.reason === 'broken') {
+        vfx.triggerTerminalArc([ohmBodyCenter.x, ohmBodyCenter.y - 0.16, ohmBodyCenter.z], 0.5);
+      }
+    }
+    ui.showNotification(result.message);
+    ui.setOhmInspectionView?.(
+      true,
+      ohmPuzzle,
+      handleOhmPuzzleToggle,
+      handleOhmPuzzleReset,
+      closeOhmInspection,
+    );
+    if (result.success) queueCampaignSave();
+
+    if (ohmPuzzle.isComplete()) {
+      ohmCompletionPending = true;
+      audio.playRelayEngage();
+      audio.playDiscoveryChime();
+      vfx.triggerConductorPulse([ohmBodyCenter.x, ohmBodyCenter.y - 0.36, ohmBodyCenter.z], [ohmBodyCenter.x, ohmBodyCenter.y + 0.62, ohmBodyCenter.z]);
+      clearOhmCompletionTimer();
+      ohmCompletionTimer = window.setTimeout(() => {
+        ohmCompletionTimer = null;
+        if (runtimeDestroyed || !ohmCompletionPending || !ohmPuzzle.isComplete()) return;
+        ohmCompletionPending = false;
+        closeOhmInspection({ commit: true });
+        triggerOhmAwakening();
+      }, 700);
+    }
+  }
+
+  function handleOhmPuzzleReset(): void {
+    if (!isOhmInspecting) return;
+    clearOhmCompletionTimer();
+    ohmCompletionPending = false;
+    ohmPuzzle.reset();
+    audio.playSwitchClunk();
+    ui.showNotification('Puentes retirados a la bandeja de material.');
+    ui.setOhmInspectionView?.(
+      true,
+      ohmPuzzle,
+      handleOhmPuzzleToggle,
+      handleOhmPuzzleReset,
+      closeOhmInspection,
+    );
+    queueCampaignSave();
+  }
+
   // Awakening Sequence for Ohm
   function triggerOhmAwakening(): void {
-    if (isOhmAwake) return;
+    if (isOhmAwake || !ohmPuzzle.isComplete()) return;
     isOhmAwake = true;
     storyStep = 'ohm_awakened';
     world.ohmFilamentLight.light!.intensity = 2.8;
-    vfx.triggerConductorPulse([0, 1.2, -6.2], [0, 2.5, -6.2]);
-    vfx.triggerTerminalArc([0, 1.4, -6.2], 1.2);
+    vfx.triggerConductorPulse([ohmBodyCenter.x, ohmBodyCenter.y - 0.36, ohmBodyCenter.z], [ohmBodyCenter.x, ohmBodyCenter.y + 0.62, ohmBodyCenter.z]);
+    vfx.triggerTerminalArc([ohmBodyCenter.x, ohmBodyCenter.y - 0.06, ohmBodyCenter.z], 1.2);
     audio.playDiscoveryChime();
-    ui.showNotification('⚡ ¡Terminales de entrada acoplados! El filamento de Ohm se ilumina.');
+    ui.showNotification('⚡ ¡Lazo de corriente cerrado! El filamento de Ohm despierta.');
     bitacora.unlock('despertar_ohm');
+    queueCampaignSave();
 
-    setTimeout(() => {
+    if (ohmAwakeningDialogueTimer !== null) window.clearTimeout(ohmAwakeningDialogueTimer);
+    ohmAwakeningDialogueTimer = window.setTimeout(() => {
+      ohmAwakeningDialogueTimer = null;
+      if (runtimeDestroyed) return;
       startDialogue('ohm_awakening_event');
-    }, 500);
+    }, 450);
   }
 
   function setEntityLightsEnabled(entity: pc.Entity, enabled: boolean): void {
@@ -760,6 +1410,54 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       'retorno',
     );
     ui.showNotification(`${label}: ${voltage.toFixed(1)} V · ${current.toFixed(1)} A · ${status}`);
+  }
+
+  function getWorldAmbienceRegion(): Arc1GreyboxState['currentRegion'] {
+    const active = new Set(zones.snapshot().filter((zone) => zone.active).map((zone) => zone.id));
+    if (active.has('lighthouse')) return 'faro';
+    if (active.has('forge-terraces')) return playerPos.z >= 8 ? 'terrazas' : 'forja';
+    if (active.has('castle')) return 'castillo';
+    if (active.has('manantial')) return 'manantial';
+    if (active.has('workshop')) return 'taller';
+    if (active.has('plaza')) {
+      return arc1State.currentRegion === 'retorno' ? 'retorno'
+        : arc1State.currentRegion === 'portal' ? 'portal' : 'plaza';
+    }
+    return 'portal';
+  }
+
+  function getWorldAmbienceElectricalState() {
+    const manantial = evaluateManantial(arc1State);
+    const forge = evaluateForgeTerraces(arc1State);
+    const forgePowered = arc1State.forgeTerraces.energized && forge.structurallyValid;
+    return {
+      // CircuitState is the source of truth for this physical Plaza load.
+      fountainPowered: circuit.fountainActive,
+      manantialWaterFlow: manantial.flowRate / 10,
+      // The turbine hum requires the complete gated output, not merely an
+      // excitation switch left on while the return path is open.
+      manantialMachinePower: manantial.usefulOutput > 0 ? 1 : 0,
+      forgeHeaterPower: forgePowered ? Math.max(0, Math.min(1, arc1State.forgeTerraces.allocation.forge / 5)) : 0,
+      terracesPumpPower: forgePowered ? Math.max(0, Math.min(1, arc1State.forgeTerraces.allocation.terraces / 5)) : 0,
+      lighthouseBeaconPower: isLighthouseEmitting(arc1State) ? 1 : 0,
+    };
+  }
+
+  let worldAmbienceAccumulator = 0;
+  function updateWorldAmbience(dt: number): void {
+    worldAmbienceAccumulator += Number.isFinite(dt) ? Math.max(0, dt) : 0;
+    if (worldAmbienceAccumulator < 1 / 12) return;
+    worldAmbienceAccumulator = 0;
+    audio.updateWorldAmbience({
+      position: [playerPos.x, playerPos.y, playerPos.z],
+      headingDegrees: yaw,
+      region: getWorldAmbienceRegion(),
+      electrical: getWorldAmbienceElectricalState(),
+      paused: visualPaused || isCinematicActive || isOhmInspecting || regionalInspection !== null
+        || Boolean(playerControls.orientationGate?.isBlocked()),
+      hidden: document.visibilityState !== 'visible',
+      reducedMotion,
+    });
   }
 
   function updateArc1WorldVisuals(): void {
@@ -801,7 +1499,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     if (world.arc1Greybox.forgeTripPin) {
       world.arc1Greybox.forgeTripPin.setLocalPosition(0.85, arc1State.forgeTerraces.protectiveTrip ? 0.92 : 1.15, -0.86);
     }
-    const waterActive = forgeTerraces.restored || (arc1State.forgeTerraces.energized && arc1State.forgeTerraces.allocation.terraces > 0);
+    const waterActive = arc1State.forgeTerraces.energized && forgeTerraces.structurallyValid
+      && arc1State.forgeTerraces.allocation.terraces > 0;
     vfx.setWaterMist('terraces', waterActive, [114.0, 4.5, 10.0]);
     if (world.arc1Greybox.terracesWaterChannels) {
       for (const channel of world.arc1Greybox.terracesWaterChannels) {
@@ -809,16 +1508,23 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       }
     }
 
-    const lighthouse = evaluateLighthouse(arc1State);
     const lighthouseLamp = world.arc1Greybox.lighthouseBeacon.findByName('LighthouseBeaconLamp') as pc.Entity | null;
-    if (lighthouseLamp) lighthouseLamp.enabled = lighthouse.restored;
-    setEntityLightsEnabled(world.arc1Greybox.lighthouseBeacon, lighthouse.restored);
-    world.arc1Greybox.lighthouseSignal.enabled = lighthouse.restored;
+    const beaconWorking = isLighthouseEmitting(arc1State);
+    world.regionalHeroVisuals.setPower(arc1State.forgeTerraces.energized && forgeTerraces.structurallyValid
+      ? arc1State.forgeTerraces.allocation.forge / 5 : 0, beaconWorking);
+    const thermalSpill = world.arc1Greybox.forgeHeater.findByName('ForgeThermalSpill') as pc.Entity | null;
+    if (thermalSpill?.light) thermalSpill.light.intensity = arc1State.forgeTerraces.energized && forgeTerraces.structurallyValid
+      ? arc1State.forgeTerraces.allocation.forge * 0.8 : 0;
+    if (lighthouseLamp) lighthouseLamp.enabled = beaconWorking;
+    setEntityLightsEnabled(world.arc1Greybox.lighthouseBeacon, beaconWorking);
+    world.arc1Greybox.lighthouseSignal.enabled = beaconWorking;
 
-    // Environmental soundscape updates based on active physical systems
+    // Legacy global calls remain for the shared API, but PlayCanvas creates
+    // PlazaAudioEngine with ambientBed:false; Arc1WorldAmbience owns the
+    // spatial water/machine bed without doubling these layers.
     audio.setWaterFlow(arc1State.manantial.gateOpen ? (manantial.restored ? 1.0 : 0.6) : 0);
     audio.setTurbineHum(arc1State.manantial.gateOpen ? 0.9 : 0);
-    const loadFactor = (arc1State.castle.energized ? 0.35 : 0) + (arc1State.forgeTerraces.energized ? 0.35 : 0) + (arc1State.lighthouse.energized ? 0.3 : 0);
+    const loadFactor = (arc1State.castle.energized ? 0.35 : 0) + (arc1State.forgeTerraces.energized ? 0.35 : 0) + (beaconWorking ? 0.3 : 0);
     audio.updateElectricalHum(loadFactor);
   }
 
@@ -856,11 +1562,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         pos: new pc.Vec3(-60, 1.0, -4.6),
         radius: 2.8,
         action: () => {
+          void enterLoadedZone('plaza', () => {
           teleportPlayer('workshop-to-plaza');
-          void zones.activate('plaza').then(() => zones.deactivate('workshop'));
+          zones.deactivate('workshop');
           arc1State = enterArc1Region(arc1State, 'taller');
           storyStep = 'returned_to_plaza';
           ui.showNotification('Saliste a la Plaza Central de Ohmdal.');
+          });
         },
       });
       list.push({
@@ -869,13 +1577,23 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         pos: new pc.Vec3(-60, 1.0, 0.4),
         radius: 2.8,
         action: () => {
+          clearHeldMovement();
           currentMode = 'inspect';
           document.exitPointerLock?.();
           workbench.open('cuadro_rele');
           ui.setWorkbenchView(true, workbench, handleWorkbenchAction);
+          syncViewmodelVisibility();
         },
       });
     } else if (inLighthouse) {
+      const nereo = world.communityActors.actors.nereo.root;
+      list.push({
+        id: 'community_nereo',
+        label: isLighthouseRestored(arc1State) ? 'Hablar con Nereo sobre el Faro restaurado' : 'Hablar con Nereo sobre la alimentación del Faro',
+        pos: nereo.getPosition().clone(),
+        radius: 2.4,
+        action: () => startCommunityDialogue('nereo', isLighthouseRestored(arc1State)),
+      });
       list.push({
         id: 'lighthouse_bus_measure',
         label: 'Medir alimentación DC del Faro',
@@ -883,13 +1601,15 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 2.2,
         action: () => {
           arc1State = measureLighthouse(arc1State);
+          if (arc1State.lighthouse.energized) arc1State = synchronizeLighthouse(arc1State, 0, 'feed');
           const evaluation = evaluateLighthouse(arc1State);
-          showArc1Measurement('Faro · barra DC', evaluation.sourceVoltage, evaluation.sourceCurrent, 'medición registrada');
+          showArc1Measurement('Faro · barra DC', evaluation.sourceVoltage, evaluation.sourceCurrent,
+            arc1State.lighthouse.energized ? 'alimentación comprobada con la baliza encendida' : 'medición registrada con la baliza apagada');
         },
       });
       list.push({
         id: 'lighthouse_calibration_panel',
-        label: arc1State.lighthouse.protectiveTrip ? 'Rearmar protección del Faro' : 'Calibrar referencia DC del Faro',
+        label: arc1State.lighthouse.protectiveTrip ? 'Rearmar protección del Faro' : 'Examinar ajuste de referencia del Faro',
         pos: new pc.Vec3(180, 1.2, 0),
         radius: 2.4,
         action: () => {
@@ -899,22 +1619,19 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             vfx.triggerTerminalArc([180, 1.2, 0], 1.0);
             ui.showNotification('Protección del Faro rearmada; la evidencia de la falla se conserva.');
           } else {
-            arc1State = calibrateLighthouse(arc1State, { voltageTrim: 0, phaseOffset: 0 });
-            audio.playGalvanometerClick();
-            vfx.triggerTerminalArc([180, 1.2, 0], 0.8);
-            ui.showNotification('Referencia DC alineada con la red restaurada.');
+            openRegionalInspection('lighthouse', [180, 1.2, 0]);
           }
           updateArc1WorldVisuals();
         },
       });
       list.push({
         id: 'lighthouse_beacon_control',
-        label: arc1State.lighthouse.energized ? 'Registrar pulso de sincronización' : 'Energizar baliza calibrada',
+        label: arc1State.lighthouse.energized ? 'Comprobar tensión en la baliza' : 'Energizar baliza calibrada',
         pos: new pc.Vec3(180, 1.25, 8),
         radius: 2.8,
         action: () => {
           arc1State = arc1State.lighthouse.energized
-            ? synchronizeLighthouse(arc1State)
+            ? synchronizeLighthouse(arc1State, 0, 'beacon')
             : energizeLighthouse(arc1State);
           const evaluation = evaluateLighthouse(arc1State);
           if (arc1State.lighthouse.protectiveTrip) {
@@ -925,8 +1642,10 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             vfx.triggerConductorPulse([180, 1.25, 8], [180, 5.0, 8]);
           }
           ui.showNotification(arc1State.lighthouse.protectiveTrip
-            ? 'La protección actuó: medí y calibrá antes de sincronizar.'
-            : `Sincronización observada: ${arc1State.lighthouse.synchronizationSamples}/2.`);
+            ? 'La protección actuó: mide y calibra antes de sincronizar.'
+            : arc1State.lighthouse.synchronizationSamples >= 2
+              ? 'Alimentación y baliza comprobadas. El registro puede repetirse.'
+              : 'La baliza recibe energía. Contrasta la lectura aquí y en la barra de alimentación.');
           if (evaluation.restored) storyStep = 'lighthouse_restored';
           updateArc1WorldVisuals();
         },
@@ -940,19 +1659,36 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           if (!isLighthouseRestored(arc1State)) {
             arc1State = documentLighthouse(arc1State);
             if (!isLighthouseRestored(arc1State)) {
-              ui.showNotification('Falta observar dos sincronizaciones estables antes de registrar el Faro.');
+              ui.showNotification('Comprueba la alimentación y la baliza encendida antes de registrar el Faro.');
               return;
             }
           }
+          void enterLoadedZone('forge-terraces', () => {
           arc1State = enterArc1Region(arc1State, 'retorno');
           zones.deactivate('lighthouse');
-          void zones.activate('forge-terraces');
           teleportPlayer('lighthouse-to-forge-terraces');
           storyStep = 'returning';
-          ui.showNotification('Regresá por Terrazas, Castillo y Plaza; los estados restaurados persisten.');
+          ui.showNotification('Regresa por Terrazas, Castillo y Plaza; la red sigue restaurada.');
+          });
         },
       });
     } else if (inForgeTerraces) {
+      const yesca = world.communityActors.actors.yesca.root;
+      const vega = world.communityActors.actors.vega.root;
+      list.push({
+        id: 'community_yesca',
+        label: isForgeTerracesRestored(arc1State) ? 'Hablar con Yesca sobre la Forja estable' : 'Hablar con Yesca sobre la carga de la Forja',
+        pos: yesca.getPosition().clone(),
+        radius: 2.4,
+        action: () => startCommunityDialogue('yesca', isForgeTerracesRestored(arc1State)),
+      });
+      list.push({
+        id: 'community_vega',
+        label: isForgeTerracesRestored(arc1State) ? 'Hablar con Vega sobre el riego restablecido' : 'Hablar con Vega sobre los niveles de riego',
+        pos: vega.getPosition().clone(),
+        radius: 2.4,
+        action: () => startCommunityDialogue('vega', isForgeTerracesRestored(arc1State)),
+      });
       list.push({
         id: 'forge_bus_measure',
         label: 'Medir potencia asignada en la barra compartida',
@@ -966,20 +1702,16 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       });
       list.push({
         id: 'forge_heater_allocation',
-        label: 'Priorizar Forja sin cortar riego',
+        label: 'Examinar regulación de la Forja',
         pos: new pc.Vec3(124.2, 1.2, -8),
-        radius: 2.3,
+        radius: 3.1,
         action: () => {
-          arc1State = setForgeTerracesPriority(arc1State, 'forge-priority');
-          audio.playForgeRoar(0.8);
-          vfx.triggerConductorPulse([120, 1.1, -8], [124.2, 1.2, -8]);
-          ui.showNotification('Asignación física: Forja 5 A · Terrazas 3 A.');
-          updateArc1WorldVisuals();
+          openRegionalInspection('forge', [124.2, 1.2, -8]);
         },
       });
       list.push({
         id: 'forge_distribution_panel',
-        label: arc1State.forgeTerraces.protectiveTrip ? 'Rearmar protección de Forja/Terrazas' : 'Configurar conductor, protecciones y energizar',
+        label: arc1State.forgeTerraces.protectiveTrip ? 'Rearmar protección de Forja/Terrazas' : 'Energizar las cargas configuradas',
         pos: new pc.Vec3(120, 1.2, 0),
         radius: 2.5,
         action: () => {
@@ -987,14 +1719,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             arc1State = repairForgeTerraces(arc1State);
             audio.playBreakerReset();
             vfx.triggerTerminalArc([120, 1.2, 0], 1.2);
-            ui.showNotification('Protecciones rearmadas; ajustá la asignación antes de energizar.');
-          } else if (arc1State.forgeTerraces.conductor === 'narrow') {
-            arc1State = setForgeTerracesConductor(arc1State, 'medium');
-            arc1State = setForgeTerracesProtection(arc1State, 'forge', arc1State.forgeTerraces.allocation.forge);
-            arc1State = setForgeTerracesProtection(arc1State, 'terraces', arc1State.forgeTerraces.allocation.terraces);
-            audio.playSwitchClunk();
-            vfx.triggerContactSnap([120, 1.2, 0]);
-            ui.showNotification('Conductor medio y protecciones ajustadas a las cargas físicas.');
+            ui.showNotification('Protecciones rearmadas; ajusta la asignación antes de energizar.');
           } else {
             arc1State = energizeForgeTerraces(arc1State);
             if (arc1State.forgeTerraces.protectiveTrip) {
@@ -1006,7 +1731,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
               vfx.triggerConductorPulse([120, 1.2, 0], [120, 1.2, 16]);
             }
             ui.showNotification(arc1State.forgeTerraces.protectiveTrip
-              ? 'La protección actuó: revisá carga, conductor y medición.'
+              ? 'La protección actuó: revisa carga, conductor y medición.'
               : 'Forja y riego reciben energía dentro del límite.');
           }
           updateArc1WorldVisuals();
@@ -1014,7 +1739,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       });
       list.push({
         id: 'terraces_pump_control',
-        label: arc1State.forgeTerraces.energized ? 'Registrar el trade-off observado' : 'Priorizar Terrazas sin apagar la Forja',
+        label: arc1State.forgeTerraces.energized ? 'Registrar el servicio de riego observado' : 'Examinar regulación de la bomba',
         pos: new pc.Vec3(120, 1.2, 16),
         radius: 2.7,
         action: () => {
@@ -1025,11 +1750,11 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
             arc1State = documentForgeTerraces(arc1State);
             if (isForgeTerracesRestored(arc1State)) storyStep = 'forge_terraces_restored';
           } else {
-            arc1State = setForgeTerracesPriority(arc1State, 'terraces-priority');
+            openRegionalInspection('forge', [120, 1.2, 16]);
           }
           ui.showNotification(isForgeTerracesRestored(arc1State)
-            ? 'Trade-off documentado: ambas cargas operan dentro de límites.'
-            : 'Asignación física: Forja 3 A · Terrazas 5 A.');
+            ? 'Servicio documentado: calor y riego se sostienen dentro de los límites.'
+            : arc1State.forgeTerraces.energized ? 'La evidencia aún no permite documentar ambas cargas.' : 'Observa cuánto reciben la Forja y las Terrazas antes de repartir la energía.');
           updateArc1WorldVisuals();
         },
       });
@@ -1040,23 +1765,33 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 2.6,
         action: () => {
           if (arc1State.currentRegion === 'retorno') {
+            void enterLoadedZone('castle', () => {
             zones.deactivate('forge-terraces');
-            void zones.activate('castle');
             teleportPlayer('forge-terraces-to-castle');
+            });
             return;
           }
           if (!isForgeTerracesRestored(arc1State) || !arc1State.visitedRegions.includes('terrazas')) {
             ui.showNotification('Forja y Terrazas deben quedar estables y documentadas antes del Faro.');
             return;
           }
+          void enterLoadedZone('lighthouse', () => {
           arc1State = enterArc1Region(arc1State, 'faro');
           zones.deactivate('forge-terraces');
-          void zones.activate('lighthouse');
           teleportPlayer('forge-terraces-to-lighthouse');
           storyStep = 'inside_lighthouse';
+          });
         },
       });
     } else if (inCastle) {
+      const councillor = world.communityActors.actors.councillor.root;
+      list.push({
+        id: 'community_councillor',
+        label: isCastleRestored(arc1State) ? 'Hablar con la Consejera sobre el Castillo estable' : 'Hablar con la Consejera sobre la distribución',
+        pos: councillor.getPosition().clone(),
+        radius: 2.4,
+        action: () => startCommunityDialogue('councillor', isCastleRestored(arc1State)),
+      });
       list.push({
         id: 'castle_bus_measure',
         label: 'Medir la barra de distribución',
@@ -1070,28 +1805,20 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       });
       list.push({
         id: 'castle_parallel_layout',
-        label: 'Conectar tres servicios en paralelo',
+        label: 'Examinar conexiones de los ramales',
         pos: new pc.Vec3(53.8, 1.15, 0),
         radius: 2.4,
         action: () => {
-          arc1State = configureCastleNetwork(arc1State, CASTLE_PARALLEL_CONFIGURATION);
-          audio.playBranchSwitch();
-          vfx.triggerContactSnap([53.8, 1.15, 0]);
-          ui.showNotification('Topología paralela: tres servicios, aislamiento local disponible.');
-          updateArc1WorldVisuals();
+          openRegionalInspection('castle', [53.8, 1.15, 0]);
         },
       });
       list.push({
         id: 'castle_mixed_layout',
-        label: 'Conectar red mixta con servicio secundario',
+        label: 'Examinar conexiones desde la galería',
         pos: new pc.Vec3(60, 1.15, 5.8),
         radius: 1.5,
         action: () => {
-          arc1State = configureCastleNetwork(arc1State, CASTLE_MIXED_CONFIGURATION);
-          audio.playBranchSwitch();
-          vfx.triggerContactSnap([60, 1.15, 5.8]);
-          ui.showNotification('Topología mixta: servicio secundario acoplado con coste de mantenimiento.');
-          updateArc1WorldVisuals();
+          openRegionalInspection('castle', [60, 1.15, 5.8]);
         },
       });
       list.push({
@@ -1116,7 +1843,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           }
           ui.showNotification(arc1State.castle.protectiveTrip
             ? 'La protección actuó: la configuración no cumple condiciones.'
-            : arc1State.castle.energized ? 'Distribución energizada; verificá y documentá.' : 'Protección rearmada.');
+            : arc1State.castle.energized ? 'Distribución energizada; verifica y documenta.' : 'Protección rearmada.');
           updateArc1WorldVisuals();
         },
       });
@@ -1129,8 +1856,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           arc1State = documentCastleNetwork(arc1State);
           if (isCastleRestored(arc1State)) storyStep = 'castle_restored';
           ui.showNotification(isCastleRestored(arc1State)
-            ? 'Esquema publicado: el Castillo puede aislar y mantener sus ramas.'
-            : 'Medí y energizá una configuración válida antes de documentarla.');
+            ? 'Esquema publicado: los barrios reciben suministro y las lecturas quedan disponibles para mantenimiento.'
+            : 'Mide y energiza una configuración válida antes de documentarla.');
           updateArc1WorldVisuals();
         },
       });
@@ -1141,21 +1868,24 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 2.6,
         action: () => {
           if (arc1State.currentRegion === 'retorno') {
+            void enterLoadedZone('plaza', () => {
             zones.deactivate('castle');
-            void zones.activate('plaza');
             teleportPlayer('castle-to-plaza');
+            placeFirstClassActors();
             ui.showNotification('Volviste a la Plaza por la red restaurada.');
+            });
             return;
           }
           if (!isCastleRestored(arc1State)) {
             ui.showNotification('La distribución debe quedar medida, energizada y documentada.');
             return;
           }
+          void enterLoadedZone('forge-terraces', () => {
           arc1State = enterArc1Region(arc1State, 'forja');
           zones.deactivate('castle');
-          void zones.activate('forge-terraces');
           teleportPlayer('castle-to-forge-terraces');
           storyStep = 'inside_forge_terraces';
+          });
         },
       });
     } else if (inManantial) {
@@ -1197,7 +1927,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           vfx.triggerTerminalArc([4.2, 1.35, 18.4], 1.0);
           vfx.triggerContactSnap([4.2, 1.35, 18.4]);
           ui.showNotification(before === arc1State
-            ? 'Primero medí la salida para localizar la discontinuidad.'
+            ? 'Primero mide la salida para localizar la discontinuidad.'
             : 'Retorno del excitador reparado; la protección quedó rearmada.');
           updateArc1WorldVisuals();
         },
@@ -1218,7 +1948,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           }
           ui.showNotification(arc1State.manantial.protectiveTrip
             ? 'La protección actuó: falta caudal, continuidad o una medición previa.'
-            : 'El generador entrega energía; verificá la salida con una segunda medición.');
+            : 'El generador entrega energía; verifica la salida con una segunda medición.');
           updateArc1WorldVisuals();
         },
       });
@@ -1241,13 +1971,19 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       });
     } else {
       // Outdoor Plaza
+      if (firstClassReady() && !firstClassVisible) placeFirstClassActors();
       list.push({
         id: 'edda_npc',
-        label: isOhmAwake ? 'Hablar con Edda sobre el taller' : 'Hablar con Edda (Estudiosa)',
+        label: firstClassReady()
+          ? 'Asistir a la primera clase de Edda y Lumen'
+          : isOhmAwake ? 'Hablar con Edda sobre el taller' : 'Hablar con Edda (Estudiosa)',
         pos: world.eddaEntity.getPosition(),
         radius: 2.0,
         action: () => {
-          if (!isOhmAwake) {
+          if (firstClassReady()) {
+            placeFirstClassActors();
+            startDialogue('arc1_first_class');
+          } else if (!isOhmAwake) {
             startDialogue('intro_portal_edda');
           } else if (storyStep === 'ohm_awakened' || storyStep === 'edda_surprised') {
             startDialogue('edda_surprised_awakening');
@@ -1259,25 +1995,49 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         },
       });
 
-      list.push({
-        id: 'ohm_automaton_pedestal',
-        label: isOhmAwake ? 'Consultar telemetría con Ohm' : 'Acoplar contactos y Despertar a Ohm',
-        pos: new pc.Vec3(0, 1.0, -2.0),
-        radius: 3.6,
-        action: () => {
-          if (arc1State.currentRegion === 'retorno' && isLighthouseRestored(arc1State)) {
-            arc1State = enterArc1Region(arc1State, 'portal');
-            storyStep = 'arc1_complete';
-            ui.showNotification(isArcComplete(arc1State)
-              ? 'Arco I greybox completo. TODO(guion): cierre final y transferencia.'
-              : 'El retorno aún no refleja todas las intervenciones del Arco I.');
-          } else if (!isOhmAwake) {
-            triggerOhmAwakening();
-          } else {
-            startDialogue('ohm_awakening_event');
-          }
-        },
-      });
+      if (!isOhmAwake) {
+        // The GLB exposes a top hatch node but no rear panel mesh. Keep the
+        // interaction grounded in the authored body and call it a contact
+        // panel rather than claiming an unbuilt hatch or cable puzzle.
+        list.push({
+          id: 'ohm_contact_panel',
+          label: 'Inspeccionar panel de contactos de Ohm',
+          pos: new pc.Vec3(1.7, 1.0, -1.1),
+          radius: 1.9,
+          action: openOhmInspection,
+        });
+        list.push({
+          id: 'ohm_front_inert',
+          label: 'Examinar a Ohm (Inerte)',
+          pos: new pc.Vec3(0, 1.0, -2.95),
+          radius: 1.65,
+          action: () => {
+            audio.playSwitchClunk();
+            ui.showNotification('Ohm está completamente inerte. Observa el panel de contactos del pedestal.');
+          },
+        });
+      } else {
+        list.push({
+          id: 'ohm_automaton_pedestal',
+          label: 'Consultar telemetría con Ohm',
+          pos: new pc.Vec3(0, 1.0, -2.0),
+          radius: 3.6,
+          action: () => {
+            if (firstClassReady()) {
+              placeFirstClassActors();
+              startDialogue('arc1_first_class');
+            } else if (storyStep === 'arc1_complete') {
+              ui.showNotification('La red del Arco I está restaurada.');
+            } else if (arc1State.currentRegion === 'retorno' && isLighthouseRestored(arc1State)) {
+              storyStep = 'returning';
+              placeFirstClassActors();
+              startDialogue('arc1_first_class');
+            } else {
+              startDialogue('ohm_awakening_event');
+            }
+          },
+        });
+      }
 
       list.push({
         id: 'workshop_exterior_door',
@@ -1285,7 +2045,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         pos: new pc.Vec3(-7.4, 1.2, -4.0),
         radius: 3.0,
         action: () => {
-          void zones.activate('workshop').then(() => {
+          void enterLoadedZone('workshop', () => {
             zones.deactivate('plaza');
             arc1State = enterArc1Region(arc1State, 'taller');
             teleportPlayer('plaza-to-workshop');
@@ -1329,10 +2089,12 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         pos: new pc.Vec3(-5.2, 0.8, 2.4),
         radius: 3.0,
         action: () => {
+          clearHeldMovement();
           currentMode = 'inspect';
           document.exitPointerLock?.();
           workbench.open('cuadro_rele');
           ui.setWorkbenchView(true, workbench, handleWorkbenchAction);
+          syncViewmodelVisibility();
         },
       });
 
@@ -1360,22 +2122,27 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         },
       });
 
-      list.push({
+      if (circuit.branches.b_brecha_a_oxido.state === 'corroded') list.push({
         id: 'moho_oxido',
-        label: hasBrushItem ? 'Limpiar el Moho Verde con el Cepillo' : 'Examinar el Contacto Sulfatado',
-        pos: new pc.Vec3(-2.2, 0.4, -4.4),
+        label: hasBrushItem
+          ? 'Limpiar contacto sulfatado con el cepillo'
+          : 'Examinar contacto sulfatado · necesita cepillo de alambre',
+        pos: new pc.Vec3(CONTACT_AFFORDANCE_CENTER[0], 0.4, CONTACT_AFFORDANCE_CENTER[2]),
         radius: 2.8,
         action: () => {
+          // Examining a low floor fitting should show the fitting being
+          // discussed, including when it begins below the player's view.
+          faceConversation(world.probeTargets['retorno_oxido']);
           if (hasBrushItem) {
             circuit.branches.b_brecha_a_oxido.state = 'closed';
             circuit.branches.b_brecha_a_oxido.resistance = 0.05;
             circuit = solveCircuit(circuit);
             world.corrosionMesh.enabled = false;
             audio.playWireScrape();
-            vfx.triggerDustWake([-0.9, 0.4, -4.0], 0.8);
+            vfx.triggerDustWake([CONTACT_AFFORDANCE_CENTER[0], 0.2, CONTACT_AFFORDANCE_CENTER[2]], 0.8);
             bitacora.unlock('moho_verde');
             bitacora.unlock('ley_retorno');
-            ui.showNotification('¡Óxido retirado! Cobre limpio (0.05Ω).');
+            ui.showNotification('¡Contacto limpio! Cobre expuesto (0.05Ω).');
             updateCircuitStateVisuals();
           } else {
             bitacora.unlock('moho_verde', 'rumor');
@@ -1407,11 +2174,12 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
               ui.showNotification('La apertura depende de Manantial restaurado y de la Campana física.');
               return;
             }
+            void enterLoadedZone('castle', () => {
             arc1State = enterArc1Region(arc1State, 'castillo');
             zones.deactivate('plaza');
-            void zones.activate('castle');
             teleportPlayer('plaza-to-castle');
             storyStep = 'inside_castle';
+            });
           },
         });
       }
@@ -1425,12 +2193,13 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         radius: 3.8,
         action: () => {
           if (circuit.gateOpen) {
-            void zones.activate('manantial');
+            void enterLoadedZone('manantial', () => {
             arc1State = enterArc1Region(arc1State, 'manantial');
             teleportPlayer('plaza-to-manantial');
             storyStep = 'inside_manantial';
             bitacora.unlock('manantial_central_hidraulica', 'investigating');
             ui.showNotification('Avanzaste por el sendero hacia la montaña y el Manantial.');
+            });
           } else {
             ui.showNotification('Los solenoides magnéticos de la Gran Puerta necesitan corriente de retorno activa.');
           }
@@ -1441,17 +2210,157 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     return list;
   }
 
+  function hideContactTargetLabel(): void {
+    contactTargetLabel.update({ visible: false });
+  }
+
+  function renderContactTargetLabel(nearestInteractable: string | null): boolean {
+    const camera = world.cameraEntity.camera;
+    if (!camera) {
+      hideContactTargetLabel();
+      return false;
+    }
+
+    const probeState = galvanoscope.getState();
+    const toContact = contactLabelWorldPosition.clone().sub(world.cameraEntity.getPosition());
+    const pointInFront = toContact.dot(world.cameraEntity.forward) > 0.05;
+    const allowed = shouldShowContactTargetLabel({
+      nearestInteractable,
+      // The campaign still calls the opening chapter 'portal'. Visibility
+      // follows the active rendered zone, including that first Plaza visit.
+      currentRegion: world.plazaRoot.enabled ? 'plaza' : arc1State.currentRegion,
+      currentMode,
+      dialogueOpen: activeDialogueNode !== null,
+      loading: campaignHydrating || campaignLoadFailed || transitionPending || isCinematicActive,
+      modalOpen: isOhmInspecting || regionalInspection !== null || Boolean(playerControls.orientationGate?.isBlocked()),
+        // A connected probe is retained in the Galvanoscope state after the
+        // player puts the tool away. Only an equipped tool should suppress the
+        // contact affordance while the player is actively probing.
+        probeActive: isToolEquipped && Boolean(probeState.probeA || probeState.probeB),
+      residueVisible: world.corrosionMesh.enabled,
+      pointInFront,
+    });
+    if (!allowed) {
+      hideContactTargetLabel();
+      return false;
+    }
+
+    contactTargetLabel.setText(getContactTargetLabelText(hasBrushItem));
+    const labelSize = contactTargetLabel.measure();
+    const canvasRect = canvas.getBoundingClientRect();
+    const overlayRect = contactLabelHost.getBoundingClientRect();
+    const deviceRect = world.app.graphicsDevice.clientRect;
+    if (canvasRect.width <= 0 || canvasRect.height <= 0 || deviceRect.width <= 0 || deviceRect.height <= 0) {
+      hideContactTargetLabel();
+      return false;
+    }
+    camera.worldToScreen(contactLabelWorldPosition, contactLabelScreenPosition);
+    const cssX = canvasRect.left - overlayRect.left
+      + contactLabelScreenPosition.x * (canvasRect.width / deviceRect.width);
+    const cssY = canvasRect.top - overlayRect.top
+      + contactLabelScreenPosition.y * (canvasRect.height / deviceRect.height);
+    const projection = projectContactTargetLabel({
+      screenX: cssX,
+      screenY: cssY,
+      viewportWidth: overlayRect.width,
+      viewportHeight: overlayRect.height,
+      labelWidth: labelSize.width || 280,
+      labelHeight: labelSize.height || 28,
+    });
+    if (!projection) {
+      hideContactTargetLabel();
+      return false;
+    }
+    contactTargetLabel.update({ visible: true, left: projection.left, top: projection.top });
+    return true;
+  }
+
+  function faceConversation(target: pc.Vec3, backoff = 0): void {
+    const dx = target.x - playerPos.x, dz = target.z - playerPos.z;
+    yaw = Math.atan2(-dx, -dz) * 180 / Math.PI;
+    pitch = Math.atan2(target.y - playerPos.y, Math.hypot(dx, dz) + backoff) * 180 / Math.PI;
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+    world.cameraEntity.setLocalPosition(0, 0, backoff);
+    playerControls.setLook({ yaw, pitch });
+  }
+
+  function faceCharacterToPlayer(root: pc.Entity): void {
+    // Character GLBs are wrapped with a 180° local heading so their authored
+    // +Z face follows the gameplay root's semantic -Z.  Keep that wrapper
+    // untouched and rotate only the semantic root toward the player.
+    const position = root.getPosition();
+    root.lookAt(playerPos.x, position.y, playerPos.z);
+  }
+
+  function frameFirstClass(): void {
+    if (!firstClassCameraRestore) firstClassCameraRestore = {
+      position: world.cameraEntity.getLocalPosition().clone(),
+      rotation: world.cameraEntity.getLocalRotation().clone(), yaw, pitch,
+    };
+    // A scene camera brings the instrument and both faces into view without
+    // teleporting the player's feet or changing their resume anchor.
+    yaw = 0;
+    pitch = Math.atan2(1.05 - 1.7, 2.55) * 180 / Math.PI;
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+    world.cameraEntity.setPosition(2.45, 1.7, -2.65);
+    playerControls.setLook({ yaw, pitch });
+  }
+
+  function restoreFirstClassCamera(): void {
+    if (!firstClassCameraRestore) return;
+    const previous = firstClassCameraRestore;
+    firstClassCameraRestore = null;
+    yaw = previous.yaw; pitch = previous.pitch;
+    world.playerEntity.setEulerAngles(0, yaw, 0);
+    world.cameraEntity.setLocalPosition(previous.position);
+    world.cameraEntity.setLocalRotation(previous.rotation);
+    playerControls.setLook({ yaw, pitch });
+  }
+
   function startDialogue(nodeId: string): void {
-    const node = DIALOGUE_DATABASE[nodeId];
+    const node = ARC1_COMMUNITY_DIALOGUES[nodeId] ?? DIALOGUE_DATABASE[nodeId];
     if (!node) return;
+    // Keep the ordinary Edda/Lumen conversations readable after a cinematic
+    // or zone transition.  The first-class scene owns its own choreography
+    // and community dialogues already face their selected actor before this
+    // function is called.
+    if (nodeId !== 'arc1_first_class') {
+      const speakerRoot = nodeId === 'lumen_workshop_interior'
+        ? world.lumenNpcEntity
+        : nodeId === 'intro_portal_edda'
+          || nodeId === 'edda_surprised_awakening'
+          || nodeId === 'circuit_solved_dialog'
+          ? world.eddaEntity
+          : null;
+      if (speakerRoot) {
+        faceCharacterToPlayer(speakerRoot);
+        faceConversation(speakerRoot.getPosition().clone().add(new pc.Vec3(0, 1.45, 0)));
+      }
+    }
     activeDialogueNode = node;
+    document.getElementById('plaza-dialog')?.toggleAttribute('data-first-class', nodeId === 'arc1_first_class');
+    if (nodeId === 'arc1_first_class') {
+      firstClassDemonstration.reset();
+      firstClassDemonstration.root.enabled = true;
+      frameFirstClass();
+    }
     activeDialogueLineIndex = 0;
+    clearHeldMovement();
     document.exitPointerLock?.();
+    syncViewmodelVisibility();
     renderCurrentDialogueLine();
   }
 
   function renderCurrentDialogueLine(): void {
     if (!activeDialogueNode) return;
+    if (activeDialogueNode.id === 'arc1_first_class') {
+      const phase = (['observe', 'operate', 'verify'] as const)[activeDialogueLineIndex]!;
+      firstClassDemonstration.setPhase(phase);
+      world.characterVisuals.setAction('edda', phase === 'operate' ? 'Operate' : 'Observe');
+      world.characterVisuals.setAction('lumen', phase === 'observe' ? 'Listen' : 'Record');
+    }
     const line: DialogueLine = activeDialogueNode.lines[activeDialogueLineIndex]!;
     audio.playVocalChirp(line.who);
 
@@ -1466,15 +2375,27 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     }
 
     ui.setDialog(line.who, line.text, line.portrait, choices);
+    const hint = document.querySelector<HTMLElement>('#plaza-dialog .dialog-hint');
+    if (hint) hint.textContent = window.matchMedia('(pointer: coarse)').matches
+      ? 'Toca para continuar' : '[E / Clic para continuar]';
   }
 
   function advanceDialogue(): void {
     if (!activeDialogueNode) return;
+    if (activeDialogueNode.id === 'arc1_first_class' && activeDialogueLineIndex === 1
+      && !firstClassDemonstration.readyToVerify) return;
     if (activeDialogueLineIndex < activeDialogueNode.lines.length - 1) {
       activeDialogueLineIndex += 1;
       renderCurrentDialogueLine();
     } else {
       if (!activeDialogueNode.choices) {
+        if (activeDialogueNode.id === 'arc1_first_class') {
+          if (!firstClassDemonstration.verified) return;
+          restoreFirstClassCamera();
+          arc1State = enterArc1Region(arc1State, 'portal');
+          storyStep = 'arc1_complete';
+          ui.showNotification('La red del Arco I está restaurada.');
+        }
         if (activeDialogueNode.onComplete === 'grant_jumper_item') {
           hasJumperItem = true;
           hasBrushItem = true;
@@ -1486,6 +2407,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
           bitacora.unlock('portal_origen');
         } else if (activeDialogueNode.onComplete === 'complete_ohm_awakening') {
           bitacora.unlock('despertar_ohm');
+          storyStep = 'edda_surprised';
+          saveCampaign();
           startDialogue('edda_surprised_awakening');
           return;
         } else if (activeDialogueNode.onComplete === 'unlock_rumor_taller') {
@@ -1501,6 +2424,9 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
         activeDialogueNode = null;
         ui.setDialog(null, null);
+        syncViewmodelVisibility();
+        restoreMouseCapture();
+        queueCampaignSave();
       }
     }
   }
@@ -1513,6 +2439,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       audio.playSwitchClunk();
       if (closed) audio.playRelayEngage();
       updateCircuitStateVisuals();
+      queueCampaignSave();
     } else if (actionName === 'scrape_corrosion') {
       workbench.scrapeCorrosion();
       circuit.branches.b_brecha_a_oxido.state = 'closed';
@@ -1522,6 +2449,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       audio.playWireScrape();
       bitacora.unlock('moho_verde');
       updateCircuitStateVisuals();
+      queueCampaignSave();
     } else if (actionName === 'install_jumper') {
       workbench.installJumper();
       circuit.branches.b_brecha_retorno.state = 'closed';
@@ -1530,14 +2458,20 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       audio.playSwitchClunk();
       bitacora.unlock('brecha_sagrada');
       updateCircuitStateVisuals();
+      queueCampaignSave();
     } else if (actionName === 'close') {
       workbench.close();
+      clearHeldMovement();
       currentMode = 'explore';
       ui.setWorkbenchView(false);
+      syncViewmodelVisibility();
+      restoreMouseCapture();
     }
   }
 
-  function updateCircuitStateVisuals(): void {
+  function updateCircuitStateVisuals(options: { showDialogue?: boolean; deriveStory?: boolean } = {}): void {
+    const showDialogue = options.showDialogue ?? true;
+    const deriveStory = options.deriveStory ?? true;
     if (circuit.relayEnergized) {
       world.relayLight.light!.intensity = 2.4;
     } else {
@@ -1547,29 +2481,45 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     if (circuit.gateOpen) {
       void zones.preload('manantial');
       world.solenoidGate.setPosition(0, OMEGA_GATE_TUNING.openY, 11.5);
+      world.navigation.setSolidEnabled('plaza.omega-gate', false);
+      world.navigation.setPortalOpen('plaza-to-manantial', true);
       world.gateLightLeft.light!.color = new pc.Color(0.2, 1.0, 0.4);
       world.gateLightRight.light!.color = new pc.Color(0.2, 1.0, 0.4);
       bitacora.unlock('puerta_ohm');
-      storyStep = 'gate_opened';
-      if (activeDialogueNode === null) {
+      if (deriveStory) storyStep = 'gate_opened';
+      if (showDialogue && !campaignHydrating && activeDialogueNode === null) {
         startDialogue('circuit_solved_dialog');
         audio.playDiscoveryChime();
       }
+    } else {
+      world.solenoidGate.setPosition(0, OMEGA_GATE_TUNING.closedY, 11.5);
+      world.navigation.setSolidEnabled('plaza.omega-gate', true);
+      world.navigation.setPortalOpen('plaza-to-manantial', false);
     }
   }
 
   function toggleBitacora(): void {
     if (currentMode === 'bitacora') {
+      clearHeldMovement();
       currentMode = 'explore';
       ui.setBitacoraView(false);
-    } else {
-      currentMode = 'bitacora';
-      document.exitPointerLock?.();
-      ui.setBitacoraView(true, bitacora);
+      syncViewmodelVisibility();
+      restoreMouseCapture();
+      return;
     }
+
+    if (currentMode !== 'explore' || activeDialogueNode || isCinematicActive) return;
+
+    clearHeldMovement();
+    currentMode = 'bitacora';
+    document.exitPointerLock?.();
+    ui.setBitacoraView(true, bitacora);
+    syncViewmodelVisibility();
   }
 
   function triggerInteraction(): void {
+    if (campaignHydrating || transitionPending || playerControls.orientationGate?.isBlocked()) return;
+    if (campaignLoadFailed) { void resumeCampaign(); return; }
     if (isCinematicActive) {
       finishArrivalCinematic();
       return;
@@ -1579,6 +2529,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       advanceDialogue();
       return;
     }
+
+    if (currentMode !== 'explore') return;
 
     const camPos = world.playerEntity.getPosition();
 
@@ -1595,6 +2547,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     }
     if (bestItem) {
       bestItem.action();
+      queueCampaignSave();
       return;
     }
 
@@ -1631,17 +2584,21 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     }
   }
 
-  canvas.addEventListener('click', () => {
+  const onCanvasClick = (event: MouseEvent) => {
+    // Touch look gestures must never become a synthesized world interaction.
+    if ('pointerType' in event && event.pointerType && event.pointerType !== 'mouse') return;
+    if (playerControls.orientationGate?.isBlocked() || campaignHydrating || transitionPending) return;
     if (isCinematicActive) {
       finishArrivalCinematic();
       return;
     }
     if (!isPointerLocked && !activeDialogueNode && currentMode === 'explore') {
-      canvas.requestPointerLock?.();
+      playerControls.pointerLock?.requestFromGesture(event);
     } else {
       triggerInteraction();
     }
-  });
+  };
+  canvas.addEventListener('click', onCanvasClick);
 
   const isBlocked = (x: number, z: number) => {
     return world.navigation.collides(x, z, 0.4);
@@ -1650,8 +2607,20 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
   // PlayCanvas Engine Update Loop
   let currentNeedleAngle = 60;
   let needleTarget = 60;
+  let dormantPilotTime = 0;
 
   world.app.on('update', (dt: number) => {
+    world.updateFountain(dt, circuit.fountainActive, visualPaused, reducedMotion);
+    updateWorldAmbience(dt);
+    if (!isOhmAwake && !isCinematicActive && !activeDialogueNode && !visualPaused && !reducedMotion) {
+      dormantPilotTime += dt;
+      // Approved B2 failed-life cue: the existing pilot briefly tries to light.
+      world.ohmFilamentLight.light!.intensity = dormantPilotTime % 5 < 0.25 ? 0.55 : 0;
+    }
+    const controlsLook = playerControls.getLook();
+    if (controlsLook.yaw !== ((yaw % 360) + 360) % 360 || controlsLook.pitch !== pitch) {
+      playerControls.setLook({ yaw, pitch });
+    }
     const frameMs = world.app.stats.frame.ms || dt * 1000;
     if (frameMs > 0 && Number.isFinite(frameMs)) {
       frameTimeSamples.push(frameMs);
@@ -1659,7 +2628,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     }
 
     // 0. Arrival Cinematic Camera Progression
-    if (isCinematicActive && !visualPaused) {
+    if (isCinematicActive && !visualPaused && !playerControls.orientationGate?.isBlocked()) {
       const now = performance.now();
       const wallDt = Math.max(0, (now - lastCinematicTimestamp) / 1000);
       lastCinematicTimestamp = now;
@@ -1691,6 +2660,17 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         world.playerEntity.setEulerAngles(0, yaw, 0);
         world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
       }
+      hideContactTargetLabel();
+      return;
+    }
+
+    if (isOhmInspecting) {
+      // Freeze the exploration camera while the contact panel owns input.
+      world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
+      world.playerEntity.setEulerAngles(0, yaw, 0);
+      world.cameraEntity.setLocalEulerAngles(pitch, 0, 0);
+      ui.setPrompt(null);
+      hideContactTargetLabel();
       return;
     }
 
@@ -1703,7 +2683,8 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     if (keys.d) strafe += 1;
 
     const isMoving = forward !== 0 || strafe !== 0;
-    if (isMoving && !visualPaused) {
+    if (currentMode === 'explore' && !activeDialogueNode && isMoving && !visualPaused
+      && !campaignHydrating && !campaignLoadFailed && !transitionPending && !playerControls.orientationGate?.isBlocked()) {
       const rad = (yaw * Math.PI) / 180;
       const fwdX = -Math.sin(rad);
       const fwdZ = -Math.cos(rad);
@@ -1729,21 +2710,21 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
 
     world.playerEntity.setPosition(playerPos.x, playerPos.y, playerPos.z);
 
-    // 2. Viewmodel calibration and needle animation. Portrait keeps the
-    // complete instrument inside the horizontal safe area instead of showing
-    // only a clipped probe at the right edge.
-    const useCompactViewmodelLayout = world.app.graphicsDevice.width <= 600;
-    if (compactViewmodelLayout !== useCompactViewmodelLayout) {
-      compactViewmodelLayout = useCompactViewmodelLayout;
-      if (useCompactViewmodelLayout) {
-        world.viewmodelRoot.setLocalPosition(0.10, -0.20, -0.65);
-        world.viewmodelRoot.setLocalEulerAngles(8, -10, 3);
-        world.viewmodelRoot.setLocalScale(0.72, 0.72, 0.72);
-      } else {
-        world.viewmodelRoot.setLocalPosition(0.25, -0.22, -0.48);
-        world.viewmodelRoot.setLocalEulerAngles(8, -12, 3);
-        world.viewmodelRoot.setLocalScale(1, 1, 1);
-      }
+    // 2. Rest at the edge while exploring; bring the dial up when a probe is
+    // attached. CSS width, rather than DPR-scaled pixels, defines touch layout.
+    const compact = world.app.graphicsDevice.canvas.clientWidth <= 900;
+    const measuring = Boolean(galvanoscope.getState().probeA || galvanoscope.getState().probeB);
+    const layoutKey = `${compact}:${measuring}`;
+    if (viewmodelLayoutKey !== layoutKey) {
+      viewmodelLayoutKey = layoutKey;
+      const scale = compact ? (measuring ? 0.72 : 0.64) : (measuring ? 0.92 : 0.82);
+      world.viewmodelRoot.setLocalPosition(
+        compact ? 0.14 : 0.30,
+        measuring ? -0.20 : -0.25,
+        measuring ? -0.58 : -0.62,
+      );
+      world.viewmodelRoot.setLocalEulerAngles(8, -12, 3);
+      world.viewmodelRoot.setLocalScale(scale, scale, scale);
     }
 
     const gState = galvanoscope.getState();
@@ -1753,20 +2734,32 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
     world.viewmodelNeedle.setLocalEulerAngles(0, 0, currentNeedleAngle);
 
     if (!visualPaused && !reducedMotion) {
-      if (arc1State.manantial.gateOpen) world.turbineRotor.rotateLocal(0, 0, dt * 150);
-      if (isForgeTerracesRestored(arc1State)) {
+      if (arc1State.manantial.gateOpen) world.regionalHeroVisuals.animateManantial(dt);
+      if (arc1State.forgeTerraces.energized && evaluateForgeTerraces(arc1State).structurallyValid) {
         const pumpWheel = world.arc1Greybox.terracesPump.findByName('TerracesPumpWheel') as pc.Entity | null;
-        pumpWheel?.rotateLocal(0, 0, dt * 110);
+        pumpWheel?.rotateLocal(0, 0, dt * arc1State.forgeTerraces.allocation.terraces * 22);
       }
-      if (isLighthouseRestored(arc1State)) world.arc1Greybox.lighthouseSignal.rotateLocal(0, dt * 22, 0);
+      if (isLighthouseEmitting(arc1State)) world.arc1Greybox.lighthouseSignal.rotateLocal(0, dt * 22, 0);
+    }
+    if (firstClassVisible && !visualPaused) firstClassDemonstration.update(dt, reducedMotion);
+    if (firstClassVisible && !visualPaused && !reducedMotion) {
+      firstClassLessonTime += dt;
+      const gesture = Math.sin(firstClassLessonTime * 2.4) * 9;
+      // Loading fallbacks use a simple nod. Loaded GLBs perform the authored
+      // Explain/Record clips; never overwrite their animated Head transforms.
+      if (!world.eddaEntity.findByName('CharacterVisual-edda')) firstClassEddaHead?.setLocalEulerAngles(0, gesture, 0);
+      if (!world.lumenNpcEntity.findByName('CharacterVisual-lumen')) firstClassLumenHead?.setLocalEulerAngles(0, -gesture * 0.55, 0);
+      firstClassRecord.setLocalEulerAngles(10, 0, -16 + Math.sin(firstClassLessonTime * 1.7) * 3);
     }
     manantialActivationVfx.update(dt);
     vfx.update(dt);
 
     // 3. Prompt detection
     const camPos = world.playerEntity.getPosition();
-    let prompt: string | null = null;
-    if (currentMode === 'explore' && !activeDialogueNode) {
+    let nearestInteractableId: string | null = null;
+    let prompt: string | null = campaignLoadFailed ? '[E] Reintentar carga de tu partida'
+      : transitionPending || campaignHydrating ? 'Preparando la siguiente zona…' : null;
+    if (currentMode === 'explore' && !activeDialogueNode && !transitionPending && !campaignLoadFailed && !campaignHydrating) {
       const currentInteractables = getActiveInteractables();
       let bestItem: typeof currentInteractables[0] | null = null;
       let minItemDist = Number.POSITIVE_INFINITY;
@@ -1778,6 +2771,7 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         }
       }
       if (bestItem) {
+        nearestInteractableId = bestItem.id;
         prompt = `[E] ${bestItem.label}`;
       }
       if (!prompt && isToolEquipped) {
@@ -1789,22 +2783,61 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
         }
       }
     }
-    ui.setPrompt(prompt);
+    const contactLabelVisible = renderContactTargetLabel(nearestInteractableId);
+    // On a short touch viewport the duplicate bottom prompt covered the
+    // fitting. Keep the localized text and name the actual touch action.
+    ui.setPrompt(contactLabelVisible && window.matchMedia('(pointer: coarse)').matches ? null : prompt);
+    const touchAction = nearestInteractableId === 'moho_oxido' ? (hasBrushItem ? 'Limpiar' : 'Examinar') : 'Conectar';
+    if (touchInteractionButton && touchInteractionButton.textContent !== touchAction) {
+      touchInteractionButton.textContent = touchAction;
+      touchInteractionButton.setAttribute('aria-label', touchAction);
+    }
   });
 
-  // Start with portal arrival cinematic (first entry) or direct dialogue
-  if (!isIntroSeen()) {
-    isCinematicActive = true;
-    cinematicTime = 0;
-    announceCinematic('portal-arrival');
-    ui.setCinematicOverlay?.(true);
-  } else {
+  function clearStartupDialogueTimer(): void {
+    if (startupDialogueTimer !== null) {
+      window.clearTimeout(startupDialogueTimer);
+      startupDialogueTimer = null;
+    }
+  }
+
+  function startInitialPresentation(): void {
+    if (runtimeDestroyed || campaignResumed || visualHarnessActive) return;
+    // Start with the portal arrival cinematic on first entry or the intro
+    // dialogue for returning players from before campaign saves existed.
+    if (!isIntroSeen()) {
+      isCinematicActive = true;
+      cinematicTime = 0;
+      announceCinematic('portal-arrival');
+      ui.setCinematicOverlay?.(true);
+      syncViewmodelVisibility();
+      return;
+    }
     isCinematicActive = false;
     ui.setCinematicOverlay?.(false);
-    setTimeout(() => {
+    clearStartupDialogueTimer();
+    startupDialogueTimer = window.setTimeout(() => {
+      startupDialogueTimer = null;
+      if (runtimeDestroyed || campaignResumed || visualHarnessActive) return;
       startDialogue('intro_portal_edda');
     }, 350);
   }
+
+  const savedCampaign = readArc1Save(campaignStorage, ARC1_SAVE_STORAGE_KEY);
+  const onPageHide = () => {
+    clearCampaignSaveTimer();
+    saveCampaign();
+  };
+  window.addEventListener('pagehide', onPageHide);
+  async function resumeCampaign(): Promise<void> {
+    if (campaignHydrating) return;
+    const resumed = await hydrateCampaign(savedCampaign);
+    if (runtimeDestroyed) return;
+    campaignResumed = resumed;
+    if (campaignLoadFailed) ui.showNotification('No se pudo cargar tu partida. Se conserva el guardado; pulsa interactuar para reintentar.');
+    else if (!resumed) startInitialPresentation();
+  }
+  void resumeCampaign();
 
   return {
     press(key: string) {
@@ -1814,14 +2847,37 @@ export function mountPlayCanvasOhmdal(host: HTMLElement, ui: PlazaUi): PlazaHand
       triggerInteraction();
     },
     destroy() {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('pointerlockchange', onPointerLockChange);
+      clearCampaignSaveTimer();
+      saveCampaign();
+      runtimeDestroyed = true;
+      audioToggle?.removeEventListener('click', toggleWorldSound);
+      clearStartupDialogueTimer();
+      clearOhmCompletionTimer();
+      ohmCompletionPending = false;
+      if (ohmAwakeningDialogueTimer !== null) {
+        window.clearTimeout(ohmAwakeningDialogueTimer);
+        ohmAwakeningDialogueTimer = null;
+      }
+      if (isOhmInspecting) closeOhmInspection();
+      else ui.setOhmInspectionView?.(false);
+      playerControls.dispose();
+      regionalPanel.dispose();
+      window.removeEventListener('blur', onWindowBlur);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pointerdown', onAudioGesture);
+      window.removeEventListener('keydown', onAudioGesture);
+      window.removeEventListener('pagehide', onPageHide);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      canvas.removeEventListener('click', onCanvasClick);
+      clearHeldMovement();
       if (window.__ROXANA_VISUAL_TEST_HOOKS__ === visualHooks) delete window.__ROXANA_VISUAL_TEST_HOOKS__;
       document.documentElement.classList.remove('roxana-visual-ui-hidden');
+      contactTargetLabel.dispose();
       manantialActivationVfx.dispose();
       vfx.dispose();
+      firstClassDemonstration.dispose();
+      audio.dispose();
       world.app.destroy();
       canvas.remove();
     },

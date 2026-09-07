@@ -354,9 +354,9 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
     viewport: Object.freeze({ width: 1440, height: 900 }),
     hideUi: true,
     post: true,
-    // Elevated oblique view keeps the panel, galleries and raised bus legible
-    // without placing the central bus support directly over the composition.
-    anchor: Object.freeze({ position: Object.freeze([51.5, 6, -10]), yaw: 220, pitch: -18 }),
+    // Inside the aisle, below the arch springing: the earlier high camera sat
+    // in the z=-10 arch and its near face covered the right side of the image.
+    anchor: Object.freeze({ position: Object.freeze([53.5, 3.1, -9]), yaw: 216, pitch: -10 }),
     world: Object.freeze({
       zone: 'castle',
       storyStep: 'inside_castle',
@@ -386,8 +386,8 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
     viewport: Object.freeze({ width: 1440, height: 900 }),
     hideUi: true,
     post: true,
-    // Three-quarter oblique view framing heavy hearth, furnace hood, conductors and protection
-    anchor: Object.freeze({ position: Object.freeze([121.5, 2.8, -4.5]), yaw: 35, pitch: -10 }),
+    // Grounded bowl and ceramic terminals, viewed from outside the physical footprint.
+    anchor: Object.freeze({ position: Object.freeze([120.5, 3.5, -3.0]), yaw: -36, pitch: -20 }),
     world: Object.freeze({
       zone: 'forge-terraces',
       storyStep: 'inside_forge_terraces',
@@ -411,7 +411,7 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
     hideUi: true,
     post: true,
     // Elevated overlook across stepped stone terraces, pump station and water distribution
-    anchor: Object.freeze({ position: Object.freeze([114.0, 4.5, 10.0]), yaw: 45, pitch: -22 }),
+    anchor: Object.freeze({ position: Object.freeze([112.0, 6.8, 1.0]), yaw: -146, pitch: -23 }),
     world: Object.freeze({
       zone: 'forge-terraces',
       storyStep: 'forge_terraces_restored',
@@ -435,7 +435,7 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
     hideUi: true,
     post: true,
     // High wide overview showing trade-off between industrial thermal demand and irrigation demand
-    anchor: Object.freeze({ position: Object.freeze([120.0, 9.5, -13.5]), yaw: 180, pitch: -30 }),
+    anchor: Object.freeze({ position: Object.freeze([111.0, 5.8, -12.0]), yaw: 215, pitch: -8 }),
     world: Object.freeze({
       zone: 'forge-terraces',
       storyStep: 'inside_forge_terraces',
@@ -483,7 +483,7 @@ export const OHMDAL_AUTHORED_CAPTURE_SHOTS = Object.freeze({
     hideUi: true,
     post: true,
     // Elevated three-quarter view framing calibration bench, lighthouse beacon tower, dock pier and lake expanse
-    anchor: Object.freeze({ position: Object.freeze([172.0, 5.2, 2.0]), yaw: 120, pitch: -16 }),
+    anchor: Object.freeze({ position: Object.freeze([172.0, 5.2, 2.0]), yaw: 235, pitch: -16 }),
     world: Object.freeze({
       zone: 'lighthouse',
       storyStep: 'inside_lighthouse',

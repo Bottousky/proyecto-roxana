@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import { buildManantialScenicPolish } from './manantialScenicPolish.ts';
 
 export interface ManantialShellMaterials {
   matMountain: pc.StandardMaterial;
@@ -325,6 +326,23 @@ export function buildManantialShell({
   const dormantWater = addBox(gameplayRoot, 'ManantialDormantWater', [-4.2, 1.35, 26.0], [3.25, 0.08, 9.2], matWater);
   const activeWater = addBox(gameplayRoot, 'ManantialActiveWater', [-4.2, 1.43, 23.6], [3.1, 0.10, 13.8], matWaterfall);
   activeWater.enabled = false;
+
+  buildManantialScenicPolish({
+    app,
+    staticRoot: authoredStaticRoot,
+    dormantWater,
+    activeWater,
+    penstockPipeLeft: penstockPipeL,
+    penstockPipeRight: penstockPipeR,
+    materials: {
+      stone: matStone,
+      stoneDark: matStoneDark,
+      water: matWater,
+      waterfall: matWaterfall,
+      brass: matBrass,
+      copperClean: matCopperClean,
+    },
+  });
 
   // The sluice leaf is physically attached to the intake control. It moves
   // vertically with gate state; the small control box remains the interaction

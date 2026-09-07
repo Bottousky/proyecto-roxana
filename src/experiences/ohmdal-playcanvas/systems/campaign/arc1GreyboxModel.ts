@@ -181,6 +181,11 @@ export interface ForgeTerracesProtection {
 
 export interface ForgeTerracesMeasurement {
   readonly instrument: 'galvanoscopio';
+  /**
+   * Physical configuration and upstream supply context observed by the
+   * measurement. Legacy snapshots may omit it; such readings are stale.
+   */
+  readonly configurationSignature?: string;
   readonly allocation: ForgeTerracesAllocation;
   readonly totalCurrent: number;
   readonly totalPower: number;
@@ -239,6 +244,8 @@ export interface LighthouseState {
   readonly calibration: LighthouseCalibration | null;
   readonly measurements: readonly LighthouseMeasurement[];
   readonly synchronizationSamples: number;
+  /** Spatial DC checks, not a timing minigame. Optional for v1 save migration. */
+  readonly verificationPoints?: readonly ('feed' | 'beacon')[];
   readonly documented: boolean;
   readonly energized: boolean;
   readonly protectiveTrip: boolean;
@@ -400,6 +407,7 @@ export function createArc1GreyboxState(): Arc1GreyboxState {
       calibration: null,
       measurements: [],
       synchronizationSamples: 0,
+      verificationPoints: [],
       documented: false,
       energized: false,
       protectiveTrip: false,
@@ -577,6 +585,25 @@ export function castleNetworkSignature(state: Arc1GreyboxState): string {
   ].join('|');
 }
 
+/**
+ * A Forge/Terraces reading is valid only for the complete physical setup it
+ * observed. Allocation alone is insufficient: conductor and protections
+ * affect the safe operating envelope, while the upstream setup determines
+ * the current available to the loads.
+ */
+export function forgeTerracesConfigurationSignature(state: Arc1GreyboxState): string {
+  const forgeTerraces = state.forgeTerraces;
+  const manantial = state.manantial;
+  const castle = state.castle;
+  return [
+    `manantial:${manantial.gateOpen ? 'open' : 'closed'}:${manantial.returnBridgeInstalled ? 'return' : 'open-return'}:${manantial.excitationEnabled ? 'excited' : 'idle'}:${manantial.protectiveTrip ? 'trip' : 'ready'}`,
+    `castle:${castleNetworkSignature(state)}:${castle.energized ? 'energized' : 'off'}:${castle.protectiveTrip ? 'trip' : 'ready'}`,
+    `allocation:${forgeTerraces.allocation.forge},${forgeTerraces.allocation.terraces}`,
+    `conductor:${forgeTerraces.conductor}`,
+    `protection:${forgeTerraces.protection.forge ?? 'none'},${forgeTerraces.protection.terraces ?? 'none'}`,
+  ].join('|');
+}
+
 export function evaluateCastleNetwork(state: Arc1GreyboxState): CastleEvaluation {
   const castle = state.castle;
   const topologySignature = castleNetworkSignature(state);
@@ -626,6 +653,7 @@ export function evaluateCastleNetwork(state: Arc1GreyboxState): CastleEvaluation
     activeBranches >= 2 &&
     totalCurrent <= CASTLE_SOURCE_CURRENT_LIMIT &&
     essentialService &&
+    fullService &&
     protectionsValid &&
     !castle.protectiveTrip;
   const configuration: CastleConfigurationOutcome = parallelShape && fullService
@@ -777,7 +805,7 @@ export function repairCastleNetwork(state: Arc1GreyboxState): Arc1GreyboxState {
 
 export function documentCastleNetwork(state: Arc1GreyboxState): Arc1GreyboxState {
   const evaluation = evaluateCastleNetwork(state);
-  if (!evaluation.structurallyValid || !evaluation.measuredCurrentConfiguration) return state;
+  if (!state.castle.energized || !evaluation.structurallyValid || !evaluation.measuredCurrentConfiguration) return state;
   return withEvent({
     ...state,
     castle: { ...state.castle, documented: true },
@@ -789,9 +817,7 @@ export function evaluateForgeTerraces(state: Arc1GreyboxState): ForgeTerracesEva
   const castle = evaluateCastleNetwork(state);
   const allocation = forgeTerraces.allocation;
   const latestMeasurement = forgeTerraces.measurements[forgeTerraces.measurements.length - 1];
-  const measuredCurrentAllocation = latestMeasurement !== undefined &&
-    latestMeasurement.allocation.forge === allocation.forge &&
-    latestMeasurement.allocation.terraces === allocation.terraces;
+  const measuredCurrentAllocation = latestMeasurement?.configurationSignature === forgeTerracesConfigurationSignature(state);
   const allocatedCurrent = allocation.forge + allocation.terraces;
   const availableCurrent = Math.max(0, CASTLE_SOURCE_CURRENT_LIMIT - castle.totalCurrent);
   const totalPower = allocatedCurrent * FORGE_TERRACES_SOURCE_VOLTAGE;
@@ -915,6 +941,7 @@ export function measureForgeTerraces(state: Arc1GreyboxState): Arc1GreyboxState 
   const evaluation = evaluateForgeTerraces(state);
   const measurement: ForgeTerracesMeasurement = {
     instrument: 'galvanoscopio',
+    configurationSignature: forgeTerracesConfigurationSignature(state),
     allocation: { ...evaluation.allocation },
     totalCurrent: evaluation.allocatedCurrent,
     totalPower: evaluation.totalPower,
@@ -964,7 +991,7 @@ export function repairForgeTerraces(state: Arc1GreyboxState): Arc1GreyboxState {
 
 export function documentForgeTerraces(state: Arc1GreyboxState): Arc1GreyboxState {
   const evaluation = evaluateForgeTerraces(state);
-  if (!evaluation.structurallyValid || !evaluation.measuredCurrentAllocation) return state;
+  if (!state.forgeTerraces.energized || !evaluation.structurallyValid || !evaluation.measuredCurrentAllocation) return state;
   return withEvent({
     ...state,
     forgeTerraces: { ...state.forgeTerraces, documented: true },
@@ -990,6 +1017,8 @@ export function evaluateLighthouse(state: Arc1GreyboxState): LighthouseEvaluatio
     sourcePower <= CASTLE_SOURCE_CURRENT_LIMIT * CASTLE_SOURCE_VOLTAGE;
   const synchronizationValid =
     lighthouse.synchronizationSamples >= 2 &&
+    (!lighthouse.verificationPoints ||
+      (lighthouse.verificationPoints.includes('feed') && lighthouse.verificationPoints.includes('beacon'))) &&
     lighthouse.calibration?.phaseOffset === LIGHTHOUSE_PHASE_TOLERANCE;
   const structurallyValid =
     lighthouse.mode === 'dc' &&
@@ -1022,6 +1051,14 @@ export function evaluateLighthouse(state: Arc1GreyboxState): LighthouseEvaluatio
 
 export function isLighthouseRestored(state: Arc1GreyboxState): boolean {
   return evaluateLighthouse(state).restored;
+}
+
+/** Physical light precedes documentation, but can never outlive its supply. */
+export function isLighthouseEmitting(state: Arc1GreyboxState): boolean {
+  const evaluation = evaluateLighthouse(state);
+  return state.lighthouse.energized && !state.lighthouse.protectiveTrip
+    && isManantialRestored(state) && isCastleRestored(state) && isForgeTerracesRestored(state)
+    && evaluation.calibrationValid && evaluation.topologyReused && evaluation.powerReused;
 }
 
 export function measureLighthouse(state: Arc1GreyboxState): Arc1GreyboxState {
@@ -1058,6 +1095,7 @@ export function calibrateLighthouse(
         phaseOffset: clamp(calibration.phaseOffset, -4, 4),
       },
       synchronizationSamples: 0,
+      verificationPoints: [],
       documented: false,
       energized: false,
     },
@@ -1066,7 +1104,16 @@ export function calibrateLighthouse(
 
 export function energizeLighthouse(state: Arc1GreyboxState): Arc1GreyboxState {
   const evaluation = evaluateLighthouse(state);
-  if (!evaluation.calibrationValid || !evaluation.topologyReused || !evaluation.powerReused) {
+  const upstreamReady =
+    evaluation.mode === 'dc' &&
+    isManantialRestored(state) &&
+    isCastleRestored(state) &&
+    isForgeTerracesRestored(state) &&
+    evaluation.calibrationValid &&
+    evaluation.topologyReused &&
+    evaluation.powerReused &&
+    !state.lighthouse.protectiveTrip;
+  if (!upstreamReady) {
     return withEvent({
       ...state,
       lighthouse: {
@@ -1086,27 +1133,45 @@ export function energizeLighthouse(state: Arc1GreyboxState): Arc1GreyboxState {
 export function synchronizeLighthouse(
   state: Arc1GreyboxState,
   observedPhase = LIGHTHOUSE_PHASE_TOLERANCE,
+  point: 'feed' | 'beacon' = state.lighthouse.verificationPoints?.includes('feed') ? 'beacon' : 'feed',
 ): Arc1GreyboxState {
   const evaluation = evaluateLighthouse(state);
+  const upstreamReady =
+    evaluation.mode === 'dc' &&
+    isManantialRestored(state) &&
+    isCastleRestored(state) &&
+    isForgeTerracesRestored(state) &&
+    evaluation.calibrationValid &&
+    evaluation.topologyReused &&
+    evaluation.powerReused &&
+    !state.lighthouse.protectiveTrip;
   if (
     !state.lighthouse.energized ||
-    !evaluation.calibrationValid ||
+    !upstreamReady ||
+    !Number.isFinite(observedPhase) ||
     Math.abs(observedPhase - LIGHTHOUSE_PHASE_TOLERANCE) > LIGHTHOUSE_PHASE_TOLERANCE
   ) {
     return withEvent({
       ...state,
       lighthouse: {
         ...state.lighthouse,
+        energized: false,
         protectiveTrip: true,
         recoverableFaults: state.lighthouse.recoverableFaults + 1,
       },
     }, 'lighthouse-protection-trip');
   }
+  const priorPoints = state.lighthouse.verificationPoints ??
+    (state.lighthouse.synchronizationSamples >= 2 ? ['feed', 'beacon'] as const
+      : state.lighthouse.synchronizationSamples === 1 ? ['feed'] as const : []);
+  if (priorPoints.includes(point)) return state;
+  const verificationPoints = [...priorPoints, point];
   return withEvent({
     ...state,
     lighthouse: {
       ...state.lighthouse,
-      synchronizationSamples: state.lighthouse.synchronizationSamples + 1,
+      synchronizationSamples: verificationPoints.length,
+      verificationPoints,
     },
   }, 'lighthouse-synchronized');
 }
@@ -1117,6 +1182,7 @@ export function repairLighthouse(state: Arc1GreyboxState): Arc1GreyboxState {
     ...state,
     lighthouse: {
       ...state.lighthouse,
+      verificationPoints: state.lighthouse.verificationPoints ? [...state.lighthouse.verificationPoints] : undefined,
       protectiveTrip: false,
       repairs: state.lighthouse.repairs + 1,
     },
@@ -1125,7 +1191,7 @@ export function repairLighthouse(state: Arc1GreyboxState): Arc1GreyboxState {
 
 export function documentLighthouse(state: Arc1GreyboxState): Arc1GreyboxState {
   const evaluation = evaluateLighthouse(state);
-  if (!evaluation.structurallyValid) return state;
+  if (!state.lighthouse.energized || !evaluation.structurallyValid) return state;
   return withEvent({
     ...state,
     lighthouse: { ...state.lighthouse, documented: true },
@@ -1263,6 +1329,7 @@ export function snapshotArc1Greybox(state: Arc1GreyboxState): Arc1GreyboxSnapsho
     lighthouse: {
       ...state.lighthouse,
       calibration: state.lighthouse.calibration ? { ...state.lighthouse.calibration } : null,
+      ...(state.lighthouse.verificationPoints ? { verificationPoints: [...state.lighthouse.verificationPoints] } : {}),
       measurements: state.lighthouse.measurements.map((measurement) => ({ ...measurement })),
     },
   };

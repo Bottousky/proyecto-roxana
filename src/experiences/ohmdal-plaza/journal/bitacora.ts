@@ -1,4 +1,6 @@
-import type { RumorNode } from '../types.ts';
+import type { RumorNode, RumorStatus } from '../types.ts';
+
+const RUMOR_STATUSES: readonly RumorStatus[] = ['unknown', 'rumor', 'investigating', 'discovered'];
 
 export class BitacoraManager {
   private rumors: Record<string, RumorNode> = {
@@ -6,7 +8,7 @@ export class BitacoraManager {
       id: 'portal_origen',
       title: 'El Portal del Instituto',
       category: 'mecanismo',
-      description: 'Generador de potencial electromotriz constante de 24 voltios directos.',
+      description: 'El portal por el que llegaste a Ohmdal.',
       superstition: '«El Altar de Cristal donde duermen los antiguos maestros».',
       physicalTruth: 'Fuente de tensión continua con borne positivo (+24V) y retorno a masa (0V).',
       status: 'discovered',
@@ -151,6 +153,25 @@ export class BitacoraManager {
     return this.rumors;
   }
 
+  /** Return a detached status map suitable for campaign persistence. */
+  public getStatuses(): Record<string, RumorStatus> {
+    return Object.fromEntries(
+      Object.entries(this.rumors).map(([id, rumor]) => [id, rumor.status]),
+    );
+  }
+
+  /**
+   * Restore only known rumor ids and allowed statuses. Unknown or malformed
+   * entries are ignored so untrusted storage cannot add graph nodes.
+   */
+  public restoreStatuses(statuses: Readonly<Record<string, unknown>>): void {
+    for (const [id, status] of Object.entries(statuses)) {
+      if (this.rumors[id] && RUMOR_STATUSES.includes(status as RumorStatus)) {
+        this.rumors[id].status = status as RumorStatus;
+      }
+    }
+  }
+
   public unlock(id: string, status: 'rumor' | 'investigating' | 'discovered' = 'discovered'): void {
     if (this.rumors[id]) {
       this.rumors[id].status = status;
@@ -167,4 +188,3 @@ export class BitacoraManager {
     };
   }
 }
-

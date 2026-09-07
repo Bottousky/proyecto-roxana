@@ -1,0 +1,31 @@
+{
+  "source": "Original Blender geometry, Roxana project; no third-party content",
+  "runtime": "manantial-gorge.glb",
+  "sha256": "ef381668dd2a1055088577f125d73d2b4e7fefbef0136664e669b73e89a9f3d0",
+  "bytes": 878532,
+  "placement": {
+    "origin": "Plaza world origin, not AABB minimum",
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "scale": 1,
+    "yaw": 0
+  },
+  "bounds": {
+    "min": [
+      -180.0,
+      -0.6499999761581421,
+      30.0
+    ],
+    "max": [
+      180.0,
+      63.43757629394531,
+      258.0
+    ]
+  },
+  "triangles": 34056,
+  "meshes": 20,
+  "navigation": "L2 only; x inside gameplay clear through z=30; no collider changes"
+}
