@@ -1,6 +1,28 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type PreviewServer, type ViteDevServer } from 'vite';
 import { resolve } from 'path';
 import fs from 'node:fs';
+
+// Keep the same playable entry points in development and a local production preview.
+function installEntryRoutes(server: ViteDevServer | PreviewServer): void {
+  server.middlewares.use((req, res, next) => {
+    const destinations: Record<string, string> = {
+      '/jugar': '/src/jugar/',
+      '/physica': '/src/experiences/physica/',
+      '/ohmdal-plaza': '/src/experiences/ohmdal-plaza/',
+      '/ohmdal-playcanvas': '/src/experiences/ohmdal-playcanvas/',
+    };
+    for (const [path, target] of Object.entries(destinations)) {
+      if (req.url === path || req.url?.startsWith(path + '/') || req.url?.startsWith(path + '?')) {
+        const suffix = req.url.slice(path.length).replace(/^\//, '');
+        res.statusCode = 302;
+        res.setHeader('Location', `${target}${suffix}`);
+        res.end();
+        return;
+      }
+    }
+    next();
+  });
+}
 
 export default defineConfig({
   base: './',
@@ -34,30 +56,11 @@ export default defineConfig({
       },
     },
     {
-      name: 'rewrite-jugar-dev',
-      // En desarrollo: redirige /jugar/* a /src/jugar/* con 302, para que el
-      // navegador quede en /src/jugar/ y los paths relativos del HTML
-      // (p ej. ../main.ts) resuelvan solos.
-      // (en producción este rewrite lo hace _redirects, no tocar eso)
-      configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          const destinos: Record<string, string> = {
-            '/jugar': '/src/jugar/',
-            '/physica': '/src/experiences/physica/',
-            '/ohmdal-plaza': '/src/experiences/ohmdal-plaza/',
-            '/ohmdal-playcanvas': '/src/experiences/ohmdal-playcanvas/',
-          };
-          for (const [p, target] of Object.entries(destinos)) {
-            if (req.url === p || req.url?.startsWith(p + '/') || req.url?.startsWith(p + '?')) {
-              const suffix = req.url.slice(p.length).replace(/^\//, '');
-              res.statusCode = 302;
-              res.setHeader('Location', `${target}${suffix}`);
-              res.end();
-              return;
-            }
-          }
-          next();
-        });
+      name: 'playable-entry-routes',
+      configureServer: installEntryRoutes,
+      configurePreviewServer: installEntryRoutes,
+      generateBundle() {
+        this.emitFile({ type: 'asset', fileName: '_redirects', source: fs.readFileSync(resolve(__dirname, '_redirects'), 'utf8') });
       },
     },
   ],

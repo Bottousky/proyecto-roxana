@@ -12,7 +12,7 @@ export function portalTransitionProgress(now: number, start: number, duration = 
 }
 
 function reduced(): boolean {
-  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+  return document.documentElement.dataset.motion === 'reduced' || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
 }
 
 function ctx(): AudioContext | null {
@@ -27,6 +27,7 @@ function ctx(): AudioContext | null {
 }
 
 function playPortalCrossing(short = false): void {
+  if (document.documentElement.dataset.sound !== 'true') return;
   const audio = ctx();
   if (!audio) return;
   try {
