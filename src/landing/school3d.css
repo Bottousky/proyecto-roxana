@@ -1,28 +1,51 @@
-/* The scene lives inside the landing; scrolling and the native document remain available. */
+/* The Institute is the interface: a full viewport diorama with rooms as destinations. */
 .rx-school3d {
   isolation: isolate;
   position: relative;
+  width: 100%;
+  height: 100dvh;
   overflow: hidden;
+  background:
+    radial-gradient(ellipse at 58% 43%, #33515470, transparent 61%),
+    linear-gradient(160deg, #101b24, #19292e 65%, #111d24);
 }
 .rx-school3d__parallax {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  background-image: radial-gradient(#d4c6a00f 0.6px, transparent 0.6px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse, #000, transparent 80%);
 }
-.rx-school3d__parallax::after {
+.rx-school3d__parallax:after {
   content: '';
   position: absolute;
   inset: 0;
+  background: linear-gradient(
+    125deg,
+    transparent 15%,
+    #abc9c605 30%,
+    transparent 45%
+  );
 }
-.school-stage::before {
-  content: '';
-  pointer-events: none;
+.school-stage {
   position: absolute;
-  inset: 8% 2% 12%;
-  background: radial-gradient(ellipse at 50% 60%, #8e9b5e12, transparent 65%);
-  border: 1px solid #cfb4800b;
+  inset: 80px 0 75px;
+  z-index: 2;
+  transition:
+    left 0.7s,
+    right 0.7s,
+    top 0.7s,
+    bottom 0.7s;
+}
+.school-stage:before {
+  content: '';
+  position: absolute;
+  inset: 12% 13% 6%;
+  border: 1px solid #b4ae870e;
   border-radius: 50%;
-  transform: rotate(-12deg) scaleY(0.72);
+  transform: scaleY(0.7);
+  pointer-events: none;
 }
 .rx-school3d__canvas {
   position: absolute;
@@ -30,20 +53,30 @@
   width: 100%;
   height: 100%;
   display: block;
-  touch-action: pan-y;
-  outline: none;
+  outline: 0;
+  touch-action: none;
   z-index: 2;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 4%,
-    #000 96%,
-    transparent
-  );
 }
 .rx-school3d__canvas:focus-visible {
-  outline: 1px solid #cfb480;
-  outline-offset: -8px;
+  outline: 1px solid #cab17b66;
+  outline-offset: -9px;
+}
+.school-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 1;
+}
+html[data-scene='ready'] .school-poster {
+  opacity: 0;
+  transition: opacity 0.7s;
+}
+html[data-scene='failed'] .school-poster {
+  opacity: 0.35;
 }
 .rx-school3d__labels {
   position: absolute;
@@ -59,11 +92,12 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 11px;
-  border: 1px solid #cbb88c40;
+  min-height: 32px;
+  padding: 7px 11px;
+  border: 1px solid #c1b48a5c;
   border-radius: 3px;
-  color: #ece6d8;
-  background: #122125e8;
+  color: #eee8d8;
+  background: #12252aea;
   backdrop-filter: blur(12px);
   font:
     500 10px/1.2 'DM Sans',
@@ -73,6 +107,7 @@
   visibility: hidden;
   pointer-events: none;
   cursor: pointer;
+  box-shadow: 0 5px 15px #0003;
   transition:
     opacity 0.3s,
     background 0.2s,
@@ -86,60 +121,49 @@
 .rx-school3d__label:hover,
 .rx-school3d__label.is-hovered {
   border-color: #ddc598;
-  background: #243635;
+  background: #354942;
+  color: #fff7dc;
 }
-.rx-school3d__label::after {
+.rx-school3d__label:after {
   content: '';
   position: absolute;
   top: 100%;
   left: 50%;
+  height: 16px;
   width: 1px;
-  height: 12px;
-  background: linear-gradient(#cfb48080, transparent);
+  background: linear-gradient(#d6be8ac9, transparent);
 }
 .rx-school3d__label-dot {
   width: 5px;
   height: 5px;
-  border: 1px solid #9ba5a5;
   border-radius: 50%;
-}
-.rx-school3d__label[data-state='open'] .rx-school3d__label-dot {
-  background: #b7cab7;
-  border-color: #b7cab7;
-}
-.rx-school3d__label[data-state='active'] .rx-school3d__label-dot,
-.rx-school3d__label[data-state='restored'] .rx-school3d__label-dot {
-  background: #f2cb7c;
-  border-color: #f2cb7c;
-  box-shadow: 0 0 9px #eccc8650;
+  background: var(--room-accent, #b7cab7);
+  box-shadow: 0 0 10px var(--room-accent, #b7cab7);
 }
 .rx-school3d__label-state {
+  display: none;
+}
+.rx-school3d__label.is-selected {
   display: none;
 }
 html[data-labels='false'] .rx-school3d__labels {
   display: none;
 }
-.rx-school3d__label[data-room='biblioteca'],
-.rx-school3d__label[data-room='audiovisual'],
-.rx-school3d__label[data-room='logros'] {
-  display: none;
-}
-
 .rx-school3d__rooms {
   position: absolute;
-  z-index: 20;
-  bottom: 88px;
-  left: clamp(24px, 4.4vw, 72px);
-  width: min(500px, calc(100% - 48px));
-  max-height: 420px;
+  z-index: 35;
+  left: 30px;
+  bottom: 91px;
+  width: min(495px, calc(100% - 40px));
+  max-height: calc(100dvh - 210px);
   overflow-y: auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: 12px;
+  padding: 13px;
   gap: 5px;
   border: 1px solid #ccb78e55;
   border-radius: 6px;
-  background: #122125f5;
+  background: #15272cf7;
   backdrop-filter: blur(24px);
   box-shadow: 0 20px 70px #0008;
   opacity: 0;
@@ -149,6 +173,7 @@ html[data-labels='false'] .rx-school3d__labels {
     opacity 0.2s,
     transform 0.2s,
     visibility 0.2s;
+  scrollbar-width: thin;
 }
 .rx-school3d__rooms.is-open {
   opacity: 1;
@@ -157,18 +182,22 @@ html[data-labels='false'] .rx-school3d__labels {
 }
 .rx-school3d__room-button {
   display: grid;
-  grid-template-columns: 8px 1fr;
-  gap: 5px 9px;
-  align-content: center;
+  grid-template-columns: 7px 1fr;
+  gap: 5px 10px;
   align-items: center;
+  align-content: center;
   text-align: left;
-  min-height: 64px;
-  padding: 10px 12px;
+  min-height: 60px;
+  padding: 11px 13px;
   border: 1px solid transparent;
   background: transparent;
-  color: #ece3d0;
-  cursor: pointer;
+  color: #eee4d0;
   border-radius: 3px;
+}
+.rx-school3d__room-button:hover,
+.rx-school3d__room-button.is-selected {
+  background: #bda77318;
+  border-color: #bea87c44;
 }
 .rx-school3d__room-button strong {
   font-size: 12px;
@@ -176,331 +205,156 @@ html[data-labels='false'] .rx-school3d__labels {
 }
 .rx-school3d__room-button small {
   grid-column: 2;
-  color: #a1afa9;
-  font-size: 10px;
+  color: #9aafa9;
+  font-size: 9px;
 }
 .rx-school3d__room-button i {
-  width: 5px;
   height: 5px;
-  border: 1px solid #96a49d;
+  width: 5px;
+  background: var(--room-accent, #cbb888);
   border-radius: 50%;
 }
-.rx-school3d__room-button[data-state='open'] i {
-  background: #a8c5b4;
-  border-color: #a8c5b4;
-}
-.rx-school3d__room-button.is-selected,
-.rx-school3d__room-button:hover {
-  background: #cfb48010;
-  border-color: #cfb48040;
-}
-.rx-school3d__room-button:focus-visible {
-  outline: 2px solid #cfb480;
-  outline-offset: -2px;
-}
-
-.rx-school3d__panel {
-  position: absolute;
-  z-index: 8;
-  top: 50%;
-  left: clamp(24px, 4.4vw, 72px);
-  width: min(34%, 450px);
-  padding: 26px 0;
-  color: #ede3cf;
-  transform: translateY(-46%);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition:
-    opacity 0.32s,
-    transform 0.4s,
-    visibility 0.32s;
-}
-.rx-school3d__panel.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateY(-50%);
-}
-.rx-school3d > .rx-projector-sequence {
-  z-index: 50;
-}
-#school3d-panel-close {
-  margin-bottom: 34px;
-  color: #bdc3b7;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  background: none;
-  border: 0;
-  padding: 8px 0;
-  cursor: pointer;
-}
-.rx-school3d__panel .eyebrow {
-  margin: 0 0 14px;
-}
-.rx-school3d__panel h2 {
-  font:
-    500 clamp(36px, 4vw, 58px) / 0.98 'Cormorant Garamond',
-    Georgia,
-    serif;
-  letter-spacing: -0.035em;
-  margin: 0 0 18px;
-  outline: 0;
-}
-.rx-school3d__status {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  color: #b7c9b9;
-  font-size: 10px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-.rx-school3d__status::before {
-  content: '';
-  width: 5px;
-  height: 5px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-}
-.rx-school3d__status[data-state='open']::before,
-.rx-school3d__status[data-state='restored']::before {
-  background: currentColor;
-}
-#school3d-description {
-  color: #b4c0b9;
-  font:
-    400 14px/1.85 'DM Sans',
-    sans-serif;
-  margin: 26px 0;
-  max-width: 380px;
-}
-.rx-school3d__room-meta {
-  display: flex;
-  gap: 28px;
-}
-.rx-school3d__room-meta > span {
-  display: grid;
-  gap: 8px;
-}
-.rx-school3d__room-meta small {
-  font-size: 8px;
-  color: #a9b4ab;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-.rx-school3d__room-meta strong {
-  font-size: 11px;
-  font-weight: 400;
-  color: #e6decd;
-}
-.rx-school3d__progress {
-  height: 2px;
-  background: #cfb48020;
-  margin: 20px 0 28px;
-  max-width: 370px;
-}
-.rx-school3d__progress i {
-  display: block;
-  height: 100%;
-  background: #d4bf94;
-  transition: width 0.4s;
-}
-#school3d-action {
-  display: inline-flex;
-  text-decoration: none;
-}
-#school3d-intro {
-  transition:
-    opacity 0.28s,
-    visibility 0.28s,
-    transform 0.35s;
-}
-#school3d-intro.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(8px);
-}
-
-.rx-school3d__loading {
+.scene-loading {
   position: absolute;
   z-index: 4;
-  inset: auto 20% 22%;
-  display: grid;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  color: #ede3cf;
-  text-align: center;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  padding: 22px;
-  border: 1px solid #cfb48030;
-  background: #112025ef;
-  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  background: #14232bc9;
+  color: #d7c295;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   transition:
-    opacity 0.5s,
-    visibility 0.5s;
+    opacity 0.6s,
+    visibility 0.6s;
 }
-.rx-school3d__loading.is-ready {
+.loading-seal {
+  font:
+    54px 'Cormorant Garamond',
+    serif;
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 90px;
+  border: 1px solid #cfb78866;
+  border-radius: 50% 50% 3px 3px;
+}
+.loading-track {
+  width: 150px;
+  height: 2px;
+  background: #a3a38933;
+}
+.loading-track i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.3s;
+}
+.scene-loading.is-ready {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-}
-.loading-track {
-  height: 2px;
-  background: #cfb48020;
-}
-#school3d-loading-bar {
-  display: block;
-  width: 0;
-  height: 2px;
-  background: #cfb480;
-  transition: width 0.2s;
 }
 .scene-fallback {
   position: absolute;
-  inset: auto 8% 20%;
-  z-index: 5;
-  padding: 26px;
-  border: 1px solid #cdb58755;
-  background: #102026f5;
-  color: #e4dfd0;
+  z-index: 6;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(360px, calc(100% - 45px));
+  padding: 25px;
+  background: #182b2feb;
+  border: 1px solid var(--line);
+  border-radius: 5px;
   text-align: center;
-  box-shadow: 0 10px 80px #0008;
+}
+.scene-fallback h2 {
+  font-size: 32px;
 }
 .scene-fallback p {
-  font-size: 14px;
-  line-height: 1.7;
-  margin-bottom: 18px;
+  font-size: 12px;
+  margin: 16px 0;
+  color: var(--muted);
 }
 .scene-fallback .button {
-  margin: 6px;
-  font-size: 12px;
-}
-.scene-fallback[hidden] {
-  display: none;
-}
-html[data-scene='ready'] .school-poster {
-  opacity: 0;
-  visibility: hidden;
-}
-html[data-scene='failed'] .rx-school3d__canvas,
-html[data-scene='failed'] .rx-school3d__labels {
-  visibility: hidden;
-}
-html[data-scene='failed'] .school-poster {
-  opacity: 0.5;
-}
-#sound-toggle[aria-pressed='false'] {
-  color: #9aaba5;
-}
-#sound-toggle[aria-pressed='false']::after {
-  content: '';
-  position: absolute;
-  height: 1px;
-  width: 24px;
-  background: currentColor;
-  transform: rotate(-45deg);
-}
-#sound-toggle[aria-pressed='true'] {
-  color: #ddc592;
-}
-.progress-count {
-  font:
-    500 28px 'Cormorant Garamond',
-    serif;
-  color: #cfb480;
-}
-#progress-content progress {
   width: 100%;
-  height: 5px;
-  accent-color: #cfb480;
-  margin: 8px 0 20px;
+  margin-bottom: 10px;
 }
-.notice {
-  padding: 16px;
-  border-left: 1px solid #cfb48070;
-  background: #cfb48008;
-  font-size: 12px !important;
+.rx-school3d[data-mode='room'] .school-stage {
+  right: 440px;
+  left: 0;
 }
-
-@media (max-width: 900px) {
-  #school-experience.hero[data-mode='room'] {
-    height: auto;
-    min-height: 0;
-    padding-top: 12px;
-    padding-bottom: 80px;
+.rx-school3d[data-mode='room'] .campus-marker {
+  opacity: 0.25;
+}
+.rx-school3d > .rx-projector-sequence {
+  z-index: 60;
+}
+@media (min-width: 1700px) {
+  .rx-school3d[data-mode='room'] .school-stage {
+    right: 480px;
   }
-  #school-experience.hero[data-mode='room'] .school-stage {
-    position: relative;
-    top: auto;
-    right: auto;
-    bottom: auto;
-    left: 0;
-    width: 100%;
-    height: clamp(300px, 70vw, 500px);
-  }
-  .rx-school3d__rooms {
-    bottom: 80px;
-    left: 20px;
-    width: calc(100% - 40px);
-    max-height: 360px;
+}
+@media (max-width: 1100px) {
+  .rx-school3d[data-mode='room'] .school-stage {
+    right: 370px;
   }
   .rx-school3d__label {
     font-size: 9px;
-    padding: 8px;
+    padding: 7px 8px;
+  }
+}
+@media (max-width: 700px) {
+  .school-stage {
+    inset: 180px -4% 100px;
+  }
+  .rx-school3d[data-mode='room'] .school-stage {
+    inset: 72px 0 55%;
+  }
+  .rx-school3d__label {
+    font-size: 8px;
+    padding: 7px 8px;
     gap: 5px;
+    min-height: 30px;
   }
-  .rx-school3d__label[data-room='preceptoria'],
-  .rx-school3d__label[data-room='visitantes'],
-  .rx-school3d__label[data-room='direccion'] {
-    display: none;
+  .rx-school3d__label[data-room='hall'] {
+    transform-origin: center;
   }
-  .rx-school3d__panel {
-    display: none;
-    position: relative;
-    top: auto;
-    left: auto;
-    width: auto;
-    margin: 0 24px;
-    padding: 10px 0 35px;
-    transform: none;
+  .rx-school3d__label:after {
+    height: 9px;
   }
-  .rx-school3d__panel.is-open {
-    display: block;
-    transform: none;
+  .rx-school3d__rooms {
+    left: 14px;
+    bottom: 86px;
+    width: calc(100% - 28px);
+    padding: 9px;
+    max-height: calc(100dvh - 180px);
   }
-  .rx-school3d[data-mode='room'] #school3d-intro {
-    display: none;
+  .rx-school3d__room-button {
+    min-height: 58px;
+    padding: 10px;
   }
-  #school3d-panel-close {
-    margin-bottom: 20px;
+  .rx-school3d__room-button strong {
+    font-size: 11px;
   }
-  #school3d-description {
-    max-width: none;
-    margin: 18px 0;
-  }
-  .rx-school3d__loading {
-    inset: auto 12% 25%;
-    padding: 18px;
+  .rx-school3d__room-button small {
+    font-size: 8px;
   }
   .scene-fallback {
-    inset: auto 6% 12%;
-    padding: 18px;
+    top: 55%;
+  }
+  .scene-loading {
+    background: #14232b7a;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .rx-school3d *,
-  .rx-school3d *::before,
-  .rx-school3d *::after {
-    animation: none !important;
-    transition: none !important;
+  .school-stage,
+  .scene-loading,
+  .rx-school3d__label {
+    transition: none;
   }
-}
-html[data-motion='reduced'] .rx-school3d *,
-html[data-motion='reduced'] .rx-school3d *::after {
-  animation: none !important;
-  transition: none !important;
 }

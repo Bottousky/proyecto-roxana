@@ -54,12 +54,12 @@ export const SCHOOL_GRID = { width: 48, depth: 29 } as const;
 export const VOXEL_ROOMS: readonly VoxelRoom[] = [
   {
     id: 'programacion', title: 'Aula de Programación', shortTitle: 'Programación', eyebrow: 'Mundo Aplicado',
-    description: 'Un aula de terminales apagadas. Bitland espera detrás de una puerta todavía sellada.',
+    description: 'Programá secuencias y explorá los fundamentos de Bitland. Las prácticas están abiertas; su aventura continúa en preparación.',
     kind: 'classroom', x: 34, y: 11, width: 14, depth: 10, presentationLevel: 1, floor: '#263442', accent: '#62a7d9', href: '#aulas', actionLabel: 'Ver las aulas',
   },
   {
-    id: 'audiovisual', title: 'Sala Audiovisual', shortTitle: 'Audiovisual', eyebrow: 'Archivo audiovisual',
-    description: 'La sala donde se conservan las proyecciones, escenas y testimonios recuperados durante el viaje.',
+    id: 'audiovisual', title: 'Sala Audiovisual', shortTitle: 'Audiovisual', eyebrow: 'Cómo se hizo Roxana',
+    description: 'Descubrí cómo se construye Roxana: del primer plano de la escuela al mundo interactivo, sus personajes y su sonido.',
     kind: 'theater', x: 14, y: 20, width: 1, depth: 2, presentationLevel: 1, embedded: true, floor: '#342b3d', accent: '#c1779e', href: '#anfiteatro', actionLabel: 'Ir al anfiteatro',
   },
   {
@@ -69,12 +69,12 @@ export const VOXEL_ROOMS: readonly VoxelRoom[] = [
   },
   {
     id: 'matematica', title: 'Aula de Matemática', shortTitle: 'Matemática', eyebrow: 'Arithmos',
-    description: 'Patrones, proporciones y estructuras aguardan detrás de una puerta aún cerrada.',
+    description: 'Investigá patrones, proporciones y estructuras con prácticas de Arithmos. Su aventura continúa en preparación.',
     kind: 'classroom', x: 0, y: 1, width: 14, depth: 10, presentationLevel: 2, floor: '#3d3326', accent: '#e0a84f', href: '#aulas', actionLabel: 'Ver las aulas',
   },
   {
     id: 'biblioteca', title: 'Biblioteca y Bitácora', shortTitle: 'Biblioteca', eyebrow: 'Memoria del Instituto',
-    description: 'Los estantes reúnen lo vivido y la Bitácora convierte cada experiencia en conocimiento formal.',
+    description: 'Abrí el catálogo de Roxana: libros educativos, historias, documentación y lecturas para acompañar cada mundo. Guardá tus favoritos.',
     kind: 'library', x: 14, y: 12.5, width: 1, depth: 2, presentationLevel: 1, embedded: true, floor: '#382f2d', accent: '#c89b68', href: '#biblioteca', actionLabel: 'Ir a la biblioteca',
   },
   {
@@ -89,22 +89,22 @@ export const VOXEL_ROOMS: readonly VoxelRoom[] = [
   },
   {
     id: 'fisica', title: 'Aula de Física', shortTitle: 'Física', eyebrow: 'Physica',
-    description: 'Instrumentos inmóviles esperan que alguien vuelva a preguntar cómo se mueve el mundo.',
+    description: 'Experimentá con fuerzas y movimiento en el prototipo jugable de Physica y consultá sus materiales educativos.',
     kind: 'classroom', x: 34, y: 1, width: 14, depth: 10, presentationLevel: 2, floor: '#2d3040', accent: '#8d91e8', href: '#aulas', actionLabel: 'Ver las aulas',
   },
   {
     id: 'direccion', title: 'Dirección', shortTitle: 'Dirección', eyebrow: 'Archivo de Roxana',
-    description: 'El despacho conserva rastros de la directora y del propósito original de los Mundos Aplicados.',
+    description: 'Conocé el propósito de Roxana, sus principios educativos y la documentación del proyecto desde el despacho de Dirección.',
     kind: 'office', x: 18.5, y: 0, width: 11, depth: 7, presentationLevel: 2, floor: '#392c2c', accent: '#d87c66',
   },
   {
-    id: 'visitantes', title: 'Anfiteatro', shortTitle: 'Anfiteatro', eyebrow: 'Archivo y encuentros',
-    description: 'La sala de actos conserva proyecciones y recibe a quienes regresan de otros mundos para compartir lo aprendido.',
+    id: 'visitantes', title: 'Anfiteatro', shortTitle: 'Anfiteatro', eyebrow: 'Novedades y newsletter',
+    description: 'Enterate de lo que sucede en Roxana y suscribite al newsletter para recibir novedades del Instituto.',
     kind: 'theater', x: 34, y: 21, width: 12, depth: 8, presentationLevel: 0, floor: '#343028', accent: '#d6a55c', href: '#anfiteatro', actionLabel: 'Ir al anfiteatro',
   },
   {
-    id: 'preceptoria', title: 'Preceptoría', shortTitle: 'Preceptoría', eyebrow: 'Punto de partida',
-    description: 'El lugar de bienvenida, orientación y perfil del estudiante antes de cruzar a los mundos.',
+    id: 'preceptoria', title: 'Preceptoría', shortTitle: 'Preceptoría', eyebrow: 'Tu cuenta en Roxana',
+    description: 'Registrate, ingresá a tu cuenta o actualizá tu perfil y contraseña. Tu recorrido por Roxana empieza aquí.',
     kind: 'reception', x: 2, y: 21, width: 12, depth: 8, presentationLevel: 0, floor: '#2d3535', accent: '#75b8a4', href: '#preceptoria', actionLabel: 'Ir a preceptoría',
   },
 ] as const;

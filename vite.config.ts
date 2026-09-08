@@ -1,6 +1,7 @@
 import { defineConfig, type PreviewServer, type ViteDevServer } from 'vite';
 import { resolve } from 'path';
 import fs from 'node:fs';
+import { roxanaServicesPlugin } from './server/vite-plugin.mjs';
 
 // Keep the same playable entry points in development and a local production preview.
 function installEntryRoutes(server: ViteDevServer | PreviewServer): void {
@@ -12,7 +13,11 @@ function installEntryRoutes(server: ViteDevServer | PreviewServer): void {
       '/ohmdal-playcanvas': '/src/experiences/ohmdal-playcanvas/',
     };
     for (const [path, target] of Object.entries(destinations)) {
-      if (req.url === path || req.url?.startsWith(path + '/') || req.url?.startsWith(path + '?')) {
+      if (
+        req.url === path ||
+        req.url?.startsWith(path + '/') ||
+        req.url?.startsWith(path + '?')
+      ) {
         const suffix = req.url.slice(path.length).replace(/^\//, '');
         res.statusCode = 302;
         res.setHeader('Location', `${target}${suffix}`);
@@ -30,12 +35,16 @@ export default defineConfig({
     exclude: ['@babylonjs/havok'],
   },
   plugins: [
+    roxanaServicesPlugin(),
     {
       name: 'havok-wasm',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
           if (req.url && req.url.includes('HavokPhysics.wasm')) {
-            const wasmPath = resolve(__dirname, 'node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm');
+            const wasmPath = resolve(
+              __dirname,
+              'node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm',
+            );
             res.setHeader('Content-Type', 'application/wasm');
             fs.createReadStream(wasmPath).pipe(res);
             return;
@@ -44,7 +53,10 @@ export default defineConfig({
         });
       },
       generateBundle() {
-        const wasmPath = resolve(__dirname, 'node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm');
+        const wasmPath = resolve(
+          __dirname,
+          'node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm',
+        );
         if (fs.existsSync(wasmPath)) {
           const wasmBuffer = fs.readFileSync(wasmPath);
           this.emitFile({
@@ -60,7 +72,11 @@ export default defineConfig({
       configureServer: installEntryRoutes,
       configurePreviewServer: installEntryRoutes,
       generateBundle() {
-        this.emitFile({ type: 'asset', fileName: '_redirects', source: fs.readFileSync(resolve(__dirname, '_redirects'), 'utf8') });
+        this.emitFile({
+          type: 'asset',
+          fileName: '_redirects',
+          source: fs.readFileSync(resolve(__dirname, '_redirects'), 'utf8'),
+        });
       },
     },
   ],
@@ -72,7 +88,10 @@ export default defineConfig({
         jugar: resolve(__dirname, 'src/jugar/index.html'),
         physica: resolve(__dirname, 'src/experiences/physica/index.html'),
         plaza: resolve(__dirname, 'src/experiences/ohmdal-plaza/index.html'),
-        playcanvas: resolve(__dirname, 'src/experiences/ohmdal-playcanvas/index.html'),
+        playcanvas: resolve(
+          __dirname,
+          'src/experiences/ohmdal-playcanvas/index.html',
+        ),
       },
     },
   },

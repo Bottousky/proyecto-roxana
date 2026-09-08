@@ -1,756 +1,325 @@
 <!doctype html>
-<html lang="es-AR">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#101c20" />
-    <title>Instituto Roxana — El conocimiento vuelve a la vida</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101b21" />
+    <title>Instituto Roxana · Una escuela, cuatro mundos</title>
     <meta
       name="description"
-      content="Una escuela olvidó lo que sabía. Vos vas a recordarlo jugando. Explorá el Instituto Roxana y descubrí aventuras donde aprender transforma el mundo."
+      content="Entrá al Instituto Roxana. Explorá sus aulas, viajá a los Mundos Aplicados, leé en la Biblioteca y construí tu propio recorrido de aprendizaje."
     />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="es_AR" />
     <meta
       property="og:title"
-      content="Instituto Roxana — El conocimiento vuelve a la vida"
+      content="Instituto Roxana · Una escuela, cuatro mundos"
     />
     <meta
       property="og:description"
-      content="Una escuela olvidó lo que sabía. Vos vas a recordarlo jugando."
+      content="Cada sala abre una posibilidad. Una escuela interactiva para aprender actuando sobre el mundo."
     />
     <meta property="og:image" content="/instituto-social.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="El Instituto Roxana en 3D. El conocimiento vuelve a la vida." />
+    <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Roxana — El conocimiento vuelve a la vida" />
-    <meta name="twitter:description" content="Una escuela olvidó lo que sabía. Vos vas a recordarlo jugando." />
-    <meta name="twitter:image" content="/instituto-social.png" />
-    <meta name="color-scheme" content="dark" />
-    <link rel="preload" href="/src/landing/fonts/CormorantGaramond.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="icon" type="image/svg+xml" href="/roxana.svg" />
+    <link rel="icon" href="/roxana.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="/src/landing/fonts/DMSans.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="stylesheet" href="/src/landing/landing.css" />
     <link rel="stylesheet" href="/src/landing/experience.css" />
     <link rel="stylesheet" href="/src/landing/school3d.css" />
   </head>
   <body>
-    <a class="skip-link" href="#inicio">Saltar al contenido</a>
-    <svg
-      class="icon-library"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
+    <a class="skip-link" href="#school3d-rooms-toggle"
+      >Ir al directorio de salas</a
     >
-      <defs>
-        <symbol id="i-arrow" viewBox="0 0 24 24">
-          <path d="M5 12h14m-6-6 6 6-6 6" />
-        </symbol>
-        <symbol id="i-book" viewBox="0 0 24 24">
-          <path
-            d="M12 5v15M3 4c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 2-3-3-6-3-9-2Z"
-          />
-        </symbol>
-        <symbol id="i-compass" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="9" />
-          <path d="m16 8-2 6-6 2 2-6Z" />
-        </symbol>
-        <symbol id="i-close" viewBox="0 0 24 24">
-          <path d="m6 6 12 12M6 18 18 6" />
-        </symbol>
-        <symbol id="i-sound" viewBox="0 0 24 24">
-          <path d="M11 5 6 9H3v6h3l5 4ZM15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14" />
-        </symbol>
-        <symbol id="i-settings" viewBox="0 0 24 24">
-          <path d="M4 7h16M4 17h16M8 4v6m8 4v6" />
-        </symbol>
-      </defs>
-    </svg>
-    <header class="site-header">
-      <a class="brand" href="#inicio" aria-label="Instituto Roxana, inicio"
-        ><span class="brand-seal" aria-hidden="true">R<span>✦</span></span
-        ><span class="brand-name"><small>INSTITUTO</small>ROXANA</span></a
-      >
-      <button
-        class="menu-toggle"
-        type="button"
-        aria-controls="site-nav"
-        aria-expanded="false"
-        aria-label="Abrir menú"
-      >
-        <span></span><span></span>
-      </button>
-      <nav id="site-nav" class="site-nav" aria-label="Navegación principal">
-        <a href="#instituto">El Instituto</a><a href="#mundos">Los mundos</a
-        ><a href="#aventura">La experiencia</a
-        ><a href="#preguntas">Preguntas</a>
-      </nav>
-      <a class="header-play" data-play href="/jugar?from=portal&amp;room=plaza"
-        >Empezar a jugar <svg class="icon"><use href="#i-arrow" /></svg
-      ></a>
-    </header>
-    <main id="inicio">
-      <noscript
-        ><p class="noscript-notice">
-          Para explorar el Instituto en 3D y jugar necesitás activar JavaScript.
-          Podés conocer la aventura y sus mundos a continuación.
-        </p></noscript
-      >
-      <section
-        id="school-experience"
-        class="rx-school3d hero"
-        aria-labelledby="hero-title"
-      >
-        <div class="rx-school3d__parallax hero-grid" aria-hidden="true"></div>
-        <div id="school3d-intro" class="hero-copy">
-          <p class="eyebrow">
-            <span class="status-dot"></span> UNA AVENTURA PARA MENTES CURIOSAS
-          </p>
-          <h1 id="hero-title">
-            El conocimiento<br /><em>vuelve a la vida.</em>
-          </h1>
-          <p class="hero-lead">
-            Una escuela olvidó lo que sabía.<br />Vos vas a recordarlo jugando.
-          </p>
-          <div class="hero-actions">
-            <a
-              class="button button-gold"
-              data-play
-              href="/jugar?from=portal&amp;room=plaza"
-              >Comenzar la aventura
-              <svg class="icon"><use href="#i-arrow" /></svg></a
-            ><button id="explore-institute" class="text-button" type="button">
-              <svg class="icon"><use href="#i-compass" /></svg> Explorar el
-              Instituto
-            </button>
-          </div>
-          <p class="hero-note">En tu navegador. Sin registro. A tu ritmo.</p>
-        </div>
-        <div
-          id="instituto"
-          class="school-stage"
-          aria-label="Instituto Roxana en 3D"
+    <main id="school-experience" class="rx-school3d" data-mode="overview">
+      <div class="rx-school3d__parallax" aria-hidden="true"></div>
+      <header class="institute-header">
+        <button
+          class="brand"
+          data-overview
+          aria-label="Roxana, vista general del Instituto"
         >
-          <img
-            id="school3d-poster"
-            class="school-poster"
-            src="/instituto-poster.png"
-            alt="El Instituto Roxana: una escuela en miniatura, con talleres y una gran escalera alrededor de su hall central."
-            fetchpriority="high"
-          /><canvas
-            id="school3d-canvas"
-            class="rx-school3d__canvas"
-            tabindex="0"
-            aria-label="Escuela interactiva. Seleccioná una sala o usá el botón Ver salas para navegar con teclado."
-            aria-describedby="scene-instructions"
-          ></canvas>
-          <div
-            id="school3d-labels"
-            class="rx-school3d__labels"
-            aria-hidden="true"
-          ></div>
-          <div id="school3d-loading" class="rx-school3d__loading" role="status">
-            <span id="school3d-loading-label"
-              >Abriendo las puertas del Instituto…</span
-            >
-            <div class="loading-track"><i id="school3d-loading-bar"></i></div>
-          </div>
-          <div id="school3d-fallback" class="scene-fallback" hidden>
-            <p>La visita 3D no pudo abrirse. La aventura sigue a tu alcance.</p>
-            <a class="text-link" href="#mundos">Conocer los mundos</a
-            ><button
-              id="retry-scene"
-              class="button button-outline"
-              type="button"
-            >
-              Volver a cargar la escena
-            </button>
-          </div>
-          <span class="scene-coordinate" aria-hidden="true"
-            >FIG. 01 / EL INSTITUTO</span
+          <img src="/roxana.svg" alt="" /><span
+            ><small>INSTITUTO</small><strong>ROXANA</strong></span
           >
-        </div>
-        <div class="scene-toolbar">
-          <div class="scene-controls">
-            <button
-              id="school3d-home"
-              class="icon-button"
-              type="button"
-              aria-label="Volver a la vista general"
-            >
-              <svg class="icon"><use href="#i-compass" /></svg></button
-            ><button
-              id="school3d-rooms-toggle"
-              class="rooms-toggle"
-              type="button"
-              aria-controls="school3d-room-list"
-              aria-expanded="false"
-            >
-              <svg class="icon"><use href="#i-book" /></svg> Ver salas
-              <span aria-hidden="true">＋</span>
-            </button>
-          </div>
-          <p id="scene-instructions">
-            Elegí una sala. Cada puerta es un comienzo.
-          </p>
-          <div class="scene-controls">
-            <button
-              id="sound-toggle"
-              class="icon-button"
-              type="button"
-              aria-label="Activar sonido"
-              aria-pressed="false"
-            >
-              <svg class="icon"><use href="#i-sound" /></svg></button
-            ><button
-              class="icon-button"
-              data-open-dialog="settings-dialog"
-              type="button"
-              aria-label="Ajustes de la experiencia"
-            >
-              <svg class="icon"><use href="#i-settings" /></svg>
-            </button>
-          </div>
-        </div>
-        <nav
-          id="school3d-room-list"
-          class="rx-school3d__room-list rx-school3d__rooms"
-          aria-label="Salas del Instituto"
-          inert
-        ></nav>
-        <aside
-          id="school3d-panel"
-          class="rx-school3d__panel"
-          aria-live="polite"
-          aria-hidden="true"
-          inert
-        >
-          <button
-            id="school3d-panel-close"
-            class="rx-school3d__panel-close"
-            type="button"
-          >
-            <span aria-hidden="true">←</span> Volver al Instituto
-          </button>
-          <div class="rx-school3d__panel-heading">
-            <div
-              id="school3d-eyebrow"
-              class="rx-school3d__eyebrow eyebrow"
-            ></div>
-            <h2 id="school3d-title" tabindex="-1"></h2>
-            <span id="school3d-status" class="rx-school3d__status"></span>
-          </div>
-          <div class="rx-school3d__panel-body">
-            <p id="school3d-description"></p>
-            <div class="rx-school3d__room-meta">
-              <span
-                ><small>Actividad</small
-                ><strong id="school3d-activity"></strong></span
-              ><span
-                ><small>Progreso</small
-                ><strong id="school3d-progress-label"></strong
-              ></span>
-            </div>
-            <div class="rx-school3d__progress" aria-hidden="true">
-              <i id="school3d-progress-bar"></i>
-            </div>
-          </div>
-          <div class="rx-school3d__panel-actions">
-            <a
-              id="school3d-action"
-              class="rx-school3d__panel-action button button-gold"
-              href="/#sala/electronica"
-              >Entrar</a
-            >
-          </div>
-        </aside>
-      </section>
-      <div class="chapter-divider">
-        <span>LA CURIOSIDAD ES EL PRIMER PASO</span
-        ><span aria-hidden="true">↓</span><span>EL MUNDO HACE EL RESTO</span>
-      </div>
-      <section
-        id="aventura"
-        class="editorial-section experience-section"
-        aria-labelledby="experience-title"
-      >
-        <div class="section-heading">
-          <p class="eyebrow">01 / LA EXPERIENCIA</p>
-          <h2 id="experience-title">
-            No aprendés para jugar.<br /><em>Aprendés jugando.</em>
-          </h2>
-          <p>
-            Acá, una pregunta abre una puerta. Una idea enciende una luz. Y cada
-            descubrimiento deja una marca en el mundo.
-          </p>
-        </div>
-        <div class="principles">
-          <article>
-            <span class="principle-number">I</span>
-            <h3>Observá.</h3>
-            <p>
-              Un pueblo a oscuras. Una máquina que espera. El mundo te habla
-              antes de pedirte una respuesta.
-            </p>
-            <span class="principle-foot">LA CURIOSIDAD TE GUÍA</span>
-          </article>
-          <article>
-            <span class="principle-number">II</span>
-            <h3>Probá.</h3>
-            <p>
-              Conectá, ajustá, volvé a intentar. Entendé lo que pasa viendo las
-              consecuencias de tus decisiones.
-            </p>
-            <span class="principle-foot">CADA INTENTO ENSEÑA</span>
-          </article>
-          <article>
-            <span class="principle-number">III</span>
-            <h3>Hacé memoria.</h3>
-            <p>
-              Tu Bitácora reúne lo que descubrís. El conocimiento empieza en la
-              aventura y se queda con vos.
-            </p>
-            <span class="principle-foot">LO VIVIDO SE VUELVE SABER</span>
-          </article>
-        </div>
-      </section>
-      <section
-        id="mundos"
-        class="editorial-section worlds-section"
-        aria-labelledby="worlds-title"
-      >
-        <div class="section-heading section-heading-row">
-          <div>
-            <p class="eyebrow">02 / LOS MUNDOS APLICADOS</p>
-            <h2 id="worlds-title">Una puerta.<br /><em>Todo un mundo.</em></h2>
-          </div>
-          <p>
-            Más allá de las aulas, el conocimiento toma forma de lugares,
-            habitantes y problemas que necesitan de vos.
-          </p>
-        </div>
-        <article class="featured-world">
-          <div class="ohmdal-art" aria-hidden="true">
-            <div class="orbital orbital-one"></div>
-            <div class="orbital orbital-two"></div>
-            <div class="orbital orbital-three"></div>
-            <span class="orbital-symbol">Ω</span
-            ><span class="orbital-node node-one"></span
-            ><span class="orbital-node node-two"></span
-            ><span class="art-label">MUNDO APLICADO Nº 01</span
-            ><span class="art-coordinate">LA ENERGÍA BUSCA SU CAMINO</span>
-          </div>
-          <div class="world-copy">
-            <p class="eyebrow">
-              <span class="status-dot"></span> AVENTURA DISPONIBLE · EN
-              DESARROLLO
-            </p>
-            <h3>Ohmdal</h3>
-            <p class="world-subtitle">Arco I · La Luz</p>
-            <p>
-              Un pueblo perdió su luz. Sus habitantes todavía recuerdan cómo
-              era. Con Ohm a tu lado, recorré talleres, canales y torres hasta
-              devolverle el pulso al faro.
-            </p>
-            <div class="world-topics">
-              <span>Electricidad</span><span>Exploración</span
-              ><span>Circuitos</span>
-            </div>
-            <a
-              class="button button-gold"
-              data-play
-              href="/jugar?from=portal&amp;room=plaza"
-              >Viajar a Ohmdal <svg class="icon"><use href="#i-arrow" /></svg
-            ></a>
-          </div>
-        </article>
-        <div class="world-grid">
-          <article class="world-card">
-            <span class="world-glyph" aria-hidden="true">↗</span>
-            <p class="eyebrow">FÍSICA · PROTOTIPO</p>
-            <h3>Physica</h3>
-            <p>Fuerzas, movimiento y un mundo que responde a lo que hacés.</p>
-            <a class="text-link" href="/physica/"
-              >Explorar el prototipo
-              <svg class="icon"><use href="#i-arrow" /></svg
-            ></a>
-          </article>
-          <article class="world-card">
-            <span class="world-glyph" aria-hidden="true">{ }</span>
-            <p class="eyebrow">PROGRAMACIÓN · EN EL HORIZONTE</p>
-            <h3>Bitland</h3>
-            <p>
-              Sistemas que esperan instrucciones. Ideas que se convierten en
-              acciones.
-            </p>
-            <button class="text-link" data-world="bitland" type="button">
-              Conocer el mundo <svg class="icon"><use href="#i-arrow" /></svg>
-            </button>
-          </article>
-          <article class="world-card">
-            <span class="world-glyph" aria-hidden="true">∞</span>
-            <p class="eyebrow">MATEMÁTICA · EN EL HORIZONTE</p>
-            <h3>Arithmos</h3>
-            <p>
-              Patrones, relaciones y las estructuras invisibles que sostienen
-              todo.
-            </p>
-            <button class="text-link" data-world="arithmos" type="button">
-              Conocer el mundo <svg class="icon"><use href="#i-arrow" /></svg>
-            </button>
-          </article>
-        </div>
-      </section>
-      <section
-        id="memoria"
-        class="editorial-section memory-section"
-        aria-labelledby="memory-title"
-      >
-        <div class="memory-emblem" aria-hidden="true">
-          <span>R</span><small>LA CURIOSIDAD PERMANECE</small>
-        </div>
-        <div class="memory-copy">
-          <p class="eyebrow">03 / UNA ESCUELA CON MEMORIA</p>
-          <h2 id="memory-title">
-            Hay lugares que esperan<br /><em>volver a encenderse.</em>
-          </h2>
-          <p>
-            El Instituto Roxana guarda talleres en silencio, libros por abrir y
-            una silla vacía en Dirección. Cada aula es una promesa. Cada viaje,
-            una forma de recuperar lo que esta escuela fue.
-          </p>
-          <p>
-            El hall es tu punto de encuentro. Volvé para mirar lo que cambió,
-            consultar tu Bitácora y elegir el próximo paso.
-          </p>
-          <div class="memory-actions">
-            <button class="text-link" data-select-room="hall" type="button">
-              Entrar al hall
-              <svg class="icon"><use href="#i-arrow" /></svg></button
-            ><button
-              class="text-link muted-link"
-              data-open-dialog="progress-dialog"
-              type="button"
-            >
-              Ver mi recorrido <svg class="icon"><use href="#i-book" /></svg>
-            </button>
-          </div>
-        </div>
-      </section>
-      <section
-        id="preguntas"
-        class="editorial-section faq-section"
-        aria-labelledby="faq-title"
-      >
-        <div class="section-heading">
-          <p class="eyebrow">ANTES DE CRUZAR</p>
-          <h2 id="faq-title">La curiosidad<br /><em>también pregunta.</em></h2>
-          <button
-            class="text-link"
-            data-open-dialog="guide-dialog"
-            type="button"
-          >
-            Guía para empezar <svg class="icon"><use href="#i-arrow" /></svg>
-          </button>
-        </div>
-        <div class="faq-list">
-          <details>
-            <summary>¿Qué es Roxana?<span aria-hidden="true">+</span></summary>
-            <p>
-              Una aventura narrativa donde aprendés ciencia y técnica actuando
-              sobre el mundo. El Instituto conecta sus aulas con mundos
-              aplicados. Ohmdal es la primera aventura disponible.
-            </p>
-          </details>
-          <details>
-            <summary>
-              ¿Necesito una cuenta o pagar?<span aria-hidden="true">+</span>
-            </summary>
-            <p>
-              No. Podés jugar la versión actual gratis, sin crear una cuenta y
-              directamente desde este sitio. No necesitás instalar el juego.
-            </p>
-          </details>
-          <details>
-            <summary>
-              ¿Tengo que saber electricidad?<span aria-hidden="true">+</span>
-            </summary>
-            <p>
-              No hace falta conocimiento previo. Observás, experimentás y
-              descubrís las relaciones a medida que avanzás. La Bitácora te
-              ayuda a poner en palabras lo que viviste.
-            </p>
-          </details>
-          <details>
-            <summary>
-              ¿Se guarda mi progreso?<span aria-hidden="true">+</span>
-            </summary>
-            <p>
-              Sí, en este navegador y dispositivo. Borrar los datos del sitio o
-              usar navegación privada puede hacer que lo pierdas. El progreso no
-              se sincroniza entre dispositivos y cada versión del juego conserva
-              su propio guardado.
-            </p>
-          </details>
-          <details>
-            <summary>
-              ¿Puedo jugar en el teléfono?<span aria-hidden="true">+</span>
-            </summary>
-            <p>
-              La experiencia tiene controles táctiles. El rendimiento de la
-              escena 3D depende del dispositivo; podés reducir la calidad desde
-              Ajustes y usar el menú Ver salas. Una pantalla grande ofrece más
-              espacio para explorar.
-            </p>
-          </details>
-          <details>
-            <summary>
-              ¿Está terminado el juego?<span aria-hidden="true">+</span>
-            </summary>
-            <p>
-              Roxana está en desarrollo. Podés recorrer Ohmdal y probar Physica.
-              Bitland y Arithmos son mundos en preparación. El contenido, el
-              arte y el comportamiento pueden cambiar mientras crece la
-              aventura.
-            </p>
-          </details>
-        </div>
-      </section>
-      <section class="closing-section" aria-labelledby="closing-title">
-        <p class="eyebrow">EL INSTITUTO TE ESTÁ ESPERANDO</p>
-        <h2 id="closing-title">
-          Toda gran idea empieza<br /><em>con un «¿y si…?».</em>
-        </h2>
-        <a
-          class="button button-gold"
-          data-play
-          href="/jugar?from=portal&amp;room=plaza"
-          >Entrar a la aventura <svg class="icon"><use href="#i-arrow" /></svg
-        ></a>
-        <p>Tu primera puerta está abierta.</p>
-      </section>
-    </main>
-    <footer class="site-footer">
-      <a class="brand footer-brand" href="#inicio"
-        ><span class="brand-seal" aria-hidden="true">R<span>✦</span></span
-        ><span class="brand-name"><small>INSTITUTO</small>ROXANA</span></a
-      >
-      <p>Aprender es transformar el mundo.</p>
-      <nav aria-label="Información del sitio">
-        <button data-open-dialog="privacy-dialog" type="button">
-          Privacidad</button
-        ><button data-open-dialog="credits-dialog" type="button">
-          Créditos</button
-        ><button data-open-dialog="settings-dialog" type="button">
-          Ajustes
         </button>
-      </nav>
-      <small
-        >© <span id="year">2026</span> Proyecto Roxana · Una aventura en
-        construcción.</small
-      >
-    </footer>
+        <div class="header-location">
+          <span class="live-dot"></span
+          ><span id="current-location">El conocimiento vuelve a la vida</span>
+        </div>
+        <div class="header-actions">
+          <button
+            class="icon-button"
+            id="search-school"
+            aria-label="Buscar en el Instituto"
+            title="Buscar salas y libros"
+          >
+            ⌕</button
+          ><button class="account-entry" data-select-room="preceptoria">
+            <span class="avatar" aria-hidden="true">R</span
+            ><span id="account-name">Ingresar al Instituto</span
+            ><span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </header>
+      <div id="school3d-intro" class="institute-welcome">
+        <span class="eyebrow">TU PRÓXIMA AVENTURA EMPIEZA ACÁ</span>
+        <h1>Una escuela.<br /><em>Infinitas preguntas.</em></h1>
+        <p>Elegí una sala. El resto se descubre adentro.</p>
+      </div>
+      <div class="school-stage" id="instituto">
+        <img
+          id="school3d-poster"
+          class="school-poster"
+          src="/instituto-poster.png"
+          alt="Vista del Instituto Roxana, con cuatro aulas alrededor de su hall central."
+        />
+        <canvas
+          id="school3d-canvas"
+          class="rx-school3d__canvas"
+          tabindex="0"
+          aria-label="Escuela interactiva. Seleccioná una sala o usá las flechas izquierda y derecha para recorrerlas."
+        ></canvas>
+        <div
+          id="school3d-labels"
+          class="rx-school3d__labels"
+          aria-hidden="true"
+        ></div>
+        <div id="school3d-loading" class="scene-loading" role="status">
+          <span class="loading-seal">R</span
+          ><span id="school3d-loading-label">Abriendo el Instituto…</span
+          ><span class="loading-track"><i id="school3d-loading-bar"></i></span>
+        </div>
+        <div id="school3d-fallback" class="scene-fallback" hidden>
+          <h2>El Instituto sigue abierto.</h2>
+          <p>
+            No pudimos mostrar la escena 3D. Podés usar todas las salas desde el
+            directorio.
+          </p>
+          <button class="button" id="fallback-directory">
+            Explorar las salas</button
+          ><button class="text-button" id="retry-scene">
+            Reintentar la escena
+          </button>
+        </div>
+      </div>
+      <div class="campus-marker" aria-hidden="true">
+        <span>✧</span><small>APRENDER<br />ES EXPLORAR</small>
+      </div>
+      <aside id="school3d-panel" class="room-panel" aria-hidden="true" inert>
+        <div class="room-panel-header">
+          <span id="school3d-eyebrow" class="eyebrow"></span
+          ><button
+            id="school3d-panel-close"
+            class="icon-button"
+            aria-label="Volver a la escuela"
+          >
+            ×
+          </button>
+        </div>
+        <h2 id="school3d-title" tabindex="-1"></h2>
+        <span id="school3d-status" class="room-status"></span>
+        <p id="school3d-description" class="room-description"></p>
+        <div id="room-content"></div>
+        <div class="legacy-room-progress" hidden>
+          <span id="school3d-activity"></span
+          ><span id="school3d-progress-label"></span>
+          <div><i id="school3d-progress-bar"></i></div>
+        </div>
+        <a id="school3d-action" class="button" href="/jugar" hidden>Entrar</a>
+      </aside>
+      <nav
+        id="school3d-room-list"
+        class="rx-school3d__rooms"
+        aria-label="Directorio de salas"
+        inert
+      ></nav>
+      <div class="scene-toolbar">
+        <div class="toolbar-left">
+          <button
+            id="school3d-home"
+            class="icon-button"
+            aria-label="Vista general"
+            title="Vista general"
+          >
+            ⌂</button
+          ><span class="toolbar-divider"></span
+          ><button
+            id="school3d-rooms-toggle"
+            class="directory-button"
+            aria-expanded="false"
+            aria-controls="school3d-room-list"
+          >
+            <span aria-hidden="true">▦</span> Directorio
+            <span aria-hidden="true">＋</span>
+          </button>
+        </div>
+        <p id="scene-hint">
+          <span class="live-dot"></span> Hacé clic en una sala para entrar
+        </p>
+        <div class="toolbar-right">
+          <button id="tour-toggle" class="text-button" title="Recorrido guiado">
+            Primera visita <span aria-hidden="true">↗</span></button
+          ><button
+            id="sound-toggle"
+            class="icon-button"
+            aria-pressed="false"
+            aria-label="Activar sonido ambiente"
+          >
+            ♫</button
+          ><button
+            data-open-dialog="settings-dialog"
+            class="icon-button"
+            aria-label="Ajustes de la visita"
+          >
+            ⚙
+          </button>
+        </div>
+      </div>
+      <div id="tour-card" class="tour-card" hidden>
+        <span class="eyebrow" id="tour-step"></span
+        ><button
+          id="tour-close"
+          class="icon-button"
+          aria-label="Cerrar recorrido"
+        >
+          ×
+        </button>
+        <h3 id="tour-title"></h3>
+        <p id="tour-description"></p>
+        <button id="tour-next" class="button">Siguiente sala →</button>
+      </div>
+    </main>
     <dialog
       id="settings-dialog"
-      class="site-dialog"
+      class="institute-dialog"
       aria-labelledby="settings-title"
     >
       <button
         class="dialog-close icon-button"
         data-close-dialog
-        type="button"
         aria-label="Cerrar ajustes"
       >
-        <svg class="icon"><use href="#i-close" /></svg>
-      </button>
-      <p class="eyebrow">A TU RITMO</p>
-      <h2 id="settings-title">Tu experiencia</h2>
-      <p>
-        Ajustá la escena del Instituto a tu dispositivo y a tu forma de
-        explorar.
-      </p>
+        ×</button
+      ><span class="eyebrow">TU VISITA</span>
+      <h2 id="settings-title">A tu ritmo.</h2>
       <form id="settings-form">
-        <label class="setting-select" for="setting-quality"
-          >Calidad visual<select id="setting-quality" name="quality">
+        <label
+          >Calidad de la escena<select id="setting-quality">
             <option value="auto">Automática</option>
             <option value="high">Alta</option>
             <option value="low">Ligera</option>
           </select></label
-        ><label class="setting-row" for="setting-motion"
+        ><label class="switch-row"
           ><span
             >Reducir movimiento<small
-              >Menos animaciones y transiciones.</small
+              >Cámaras y ambiente más tranquilos</small
             ></span
-          ><input id="setting-motion" name="motion" type="checkbox" /></label
-        ><label class="setting-row" for="setting-labels"
+          ><input type="checkbox" id="setting-motion" /></label
+        ><label class="switch-row"
           ><span
-            >Mostrar nombres de las salas<small
-              >Orientación dentro del Instituto.</small
+            >Rótulos de las salas<small
+              >El directorio siempre está disponible</small
             ></span
-          ><input
-            id="setting-labels"
-            name="labels"
-            type="checkbox"
-            checked /></label
-        ><label class="setting-row" for="setting-sound"
+          ><input type="checkbox" id="setting-labels" /></label
+        ><label class="switch-row"
           ><span
             >Sonido ambiente<small
-              >Activar el paisaje sonoro del Instituto.</small
+              >Un ambiente original del Instituto</small
             ></span
-          ><input id="setting-sound" name="sound" type="checkbox"
+          ><input type="checkbox" id="setting-sound"
         /></label>
-        <p id="settings-status" class="dialog-status" role="status"></p>
-        <button class="text-link" id="reset-settings" type="reset">
-          Restablecer ajustes
-        </button>
+        <p id="settings-status" class="form-status" role="status"></p>
+        <button class="text-button" type="reset">Restablecer ajustes</button>
       </form>
     </dialog>
     <dialog
-      id="progress-dialog"
-      class="site-dialog"
-      aria-labelledby="progress-title"
+      id="reader-dialog"
+      class="reader-dialog"
+      aria-labelledby="reader-title"
+    >
+      <div id="reader-content"></div>
+    </dialog>
+    <dialog
+      id="search-dialog"
+      class="institute-dialog search-dialog"
+      aria-labelledby="search-title"
     >
       <button
         class="dialog-close icon-button"
         data-close-dialog
-        type="button"
-        aria-label="Cerrar recorrido"
+        aria-label="Cerrar búsqueda"
       >
-        <svg class="icon"><use href="#i-close" /></svg>
-      </button>
-      <p class="eyebrow">TU BITÁCORA</p>
-      <h2 id="progress-title">Cada paso deja una luz.</h2>
-      <div id="progress-content"></div>
-      <a
-        id="progress-play"
-        class="button button-gold"
-        href="/jugar?from=portal&amp;room=plaza"
-        >Comenzar la aventura <svg class="icon"><use href="#i-arrow" /></svg
-      ></a>
-      <p class="dialog-fineprint">
-        Progreso guardado en este navegador. No se sincroniza entre
-        dispositivos.
-      </p>
-    </dialog>
-    <dialog id="guide-dialog" class="site-dialog" aria-labelledby="guide-title">
-      <button
-        class="dialog-close icon-button"
-        data-close-dialog
-        type="button"
-        aria-label="Cerrar guía"
-      >
-        <svg class="icon"><use href="#i-close" /></svg>
-      </button>
-      <p class="eyebrow">TU PRIMER DÍA</p>
-      <h2 id="guide-title">Dejá que la curiosidad te guíe.</h2>
-      <ol class="guide-steps">
-        <li>
-          <strong>Recorré el Instituto.</strong> Elegí una sala en la escena o
-          abrí Ver salas. Podés navegar por los controles con Tab y activarlos
-          con Enter.
-        </li>
-        <li>
-          <strong>Cruzá a Ohmdal.</strong> Comenzar la aventura te lleva a la
-          plaza. Dentro del juego encontrarás sus controles y personajes.
-        </li>
-        <li>
-          <strong>Observá y experimentá.</strong> Mirá cómo responde el mundo.
-          Tu Bitácora guarda los descubrimientos que hacés durante el viaje.
-        </li>
-      </ol>
-      <a
-        class="button button-gold"
-        data-play
-        href="/jugar?from=portal&amp;room=plaza"
-        >Estoy listo para explorar
-        <svg class="icon"><use href="#i-arrow" /></svg
-      ></a>
-    </dialog>
-    <dialog id="world-dialog" class="site-dialog" aria-labelledby="world-title">
-      <button
-        class="dialog-close icon-button"
-        data-close-dialog
-        type="button"
-        aria-label="Cerrar mundo"
-      >
-        <svg class="icon"><use href="#i-close" /></svg>
-      </button>
-      <p id="world-category" class="eyebrow">EN EL HORIZONTE</p>
-      <h2 id="world-title">Un mundo por descubrir</h2>
-      <p id="world-description"></p>
-      <p class="dialog-fineprint">
-        Este mundo está en preparación y todavía no tiene una fecha de
-        lanzamiento.
-      </p>
-      <button class="button button-outline" data-close-dialog type="button">
-        Volver al Instituto
-      </button>
+        ×</button
+      ><span class="eyebrow">DIRECTORIO DEL INSTITUTO</span>
+      <h2 id="search-title">¿Qué querés descubrir?</h2>
+      <label class="search-field"
+        ><span aria-hidden="true">⌕</span
+        ><input
+          id="institute-search"
+          type="search"
+          placeholder="Una sala, un mundo, un libro…"
+          aria-label="Buscar salas y libros"
+      /></label>
+      <div id="search-results"></div>
     </dialog>
     <dialog
       id="privacy-dialog"
-      class="site-dialog"
+      class="institute-dialog"
       aria-labelledby="privacy-title"
     >
       <button
         class="dialog-close icon-button"
         data-close-dialog
-        type="button"
         aria-label="Cerrar privacidad"
       >
-        <svg class="icon"><use href="#i-close" /></svg>
-      </button>
-      <p class="eyebrow">TUS DATOS</p>
-      <h2 id="privacy-title">Tu aventura, en este navegador.</h2>
+        ×</button
+      ><span class="eyebrow">PRECEPTORÍA</span>
+      <h2 id="privacy-title">Tus datos en el Instituto</h2>
       <p>
-        No necesitás crear una cuenta ni proporcionar datos personales para
-        jugar. El progreso y los ajustes se almacenan localmente en tu
-        navegador.
+        Podés explorar y leer sin crear una cuenta. Los ajustes y la actividad
+        de visitante se conservan en este navegador cuando permite
+        almacenamiento.
       </p>
       <p>
-        Podés eliminarlos desde la configuración de datos de sitios de tu
-        navegador. Hacerlo borra el progreso guardado. La navegación privada
-        puede impedir que se conserve al cerrar la ventana.
+        Al registrarte se guardan tu nombre, correo y una contraseña protegida
+        mediante hash. La sesión usa una cookie necesaria, inaccesible desde
+        JavaScript. Tus lecturas, favoritos y prácticas del Instituto se asocian
+        a tu cuenta; las partidas de Ohmdal conservan su guardado local.
       </p>
       <p>
-        El proveedor que aloja el sitio puede procesar datos técnicos necesarios
-        para entregar sus archivos, como la dirección IP y los registros de
-        acceso. Esta versión no ofrece sincronización de partidas en la nube.
-      </p>
-    </dialog>
-    <dialog
-      id="credits-dialog"
-      class="site-dialog"
-      aria-labelledby="credits-title"
-    >
-      <button
-        class="dialog-close icon-button"
-        data-close-dialog
-        type="button"
-        aria-label="Cerrar créditos"
-      >
-        <svg class="icon"><use href="#i-close" /></svg>
-      </button>
-      <p class="eyebrow">DETRÁS DE LAS PUERTAS</p>
-      <h2 id="credits-title">Proyecto Roxana</h2>
-      <p>Aventuras en las que se aprende actuando sobre el mundo.</p>
-      <p>
-        El Instituto combina arte del proyecto con una escena interactiva
-        construida con Three.js. Las distintas experiencias jugables conservan
-        sus propios motores y recorridos.
+        La suscripción al boletín es opcional y puede cancelarse desde el
+        Anfiteatro. Esta instalación registra tu preferencia; no envía correos
+        ni utiliza seguimiento publicitario.
       </p>
       <p>
-        Tipografías: Cormorant Garamond y DM Sans, distribuidas bajo SIL Open
-        Font License y servidas desde este sitio.
-      </p>
-      <p class="dialog-fineprint">
-        Una obra en desarrollo. Gracias por explorarla mientras toma forma.
+        No se solicitan datos de pago. Cerrá tu sesión al terminar si usás un
+        equipo compartido.
       </p>
     </dialog>
     <div
       id="landing-announcement"
       class="sr-only"
+      role="status"
       aria-live="polite"
-      aria-atomic="true"
     ></div>
+    <noscript
+      ><div class="noscript-notice">
+        <h1>Instituto Roxana</h1>
+        <p>
+          La escuela interactiva necesita JavaScript. Podés visitar los accesos
+          disponibles:
+        </p>
+        <a href="/jugar">Ohmdal · Electricidad</a
+        ><a href="/physica">Physica · Prototipo de física</a>
+        <p>Bitland y Arithmos están en preparación.</p>
+      </div></noscript
+    >
     <script type="module" src="/src/landing/index.ts"></script>
   </body>
 </html>
