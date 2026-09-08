@@ -1,0 +1,1 @@
+{"name":"bitland-pixi-spike","private":true,"type":"module","scripts":{"dev":"vite --host 127.0.0.1 --port 4311 --strictPort","build":"tsc --noEmit && vite build"},"dependencies":{"pixi.js":"8.20.1"},"devDependencies":{"vite":"6.3.5","typescript":"5.6.3"}}
