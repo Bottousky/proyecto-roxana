@@ -25,6 +25,7 @@ import { abortProjectorSequence, playPendingUnitProjector, projectorSequenceBusy
 import { createPostFx, type PostFx } from './school3dPostFx.ts';
 import { createRoomLabels, type LabelLayer } from './school3dLabels.ts';
 import { createSchoolBackdrop, type SchoolBackdrop } from './school3dBackdrop.ts';
+import { installSchoolAtmosphere, type SchoolAtmosphere } from './schoolAtmosphere.ts';
 import { installSchoolRoomTerrace, SCHOOL_TIER_RISE } from './school3dTerraces.ts';
 import {
   VOXEL_ROOMS,
@@ -36,7 +37,7 @@ import {
   type VoxelZoneId,
 } from './voxelSchoolModel.ts';
 
-const OVERVIEW_TARGET = new THREE.Vector3(0, 4.8, 1.0);
+const OVERVIEW_TARGET = new THREE.Vector3(0, 5.5, 1.0);
 // Axonometría a 45°: entrada, estatua y reloj conservan el eje central, mientras
 // la componente cenital expone las terrazas sin alterar sus huellas X/Z.
 const CAMERA_DIRECTION = new THREE.Vector3(0, 1, 1).normalize();
@@ -48,8 +49,8 @@ const TINT_IDLE = new THREE.Color(1, 1, 1);
 const TINT_HOVER = new THREE.Color(1.24, 1.15, 1.0);
 const TINT_SELECTED = new THREE.Color(1.14, 1.09, 1.0);
 const TINT_DIMMED = new THREE.Color(0.34, 0.36, 0.46);
-const TINT_SLEEPING = new THREE.Color(0.60, 0.65, 0.72);
-const TINT_QUIET = new THREE.Color(0.76, 0.77, 0.80);
+const TINT_SLEEPING = new THREE.Color(0.83, 0.87, 0.93);
+const TINT_QUIET = new THREE.Color(0.91, 0.92, 0.95);
 const TINT_ELECTRONICS_IDLE = new THREE.Color(0.94, 1.0, 0.96);
 
 const LIFT_HOVER = 0.42;
@@ -142,8 +143,19 @@ const ELECTRONICS_OBJECTS: Record<string, { title: string; body: string }> = {
   },
 };
 
+function roomServiceLabel(id: VoxelZoneId, state: ReturnType<typeof voxelZoneState>): string {
+  const services: Partial<Record<VoxelZoneId, string>> = {
+    hall: 'Todas las salas', biblioteca: 'Catálogo y lecturas', logros: 'Tu recorrido',
+    preceptoria: 'Registro y cuenta', visitantes: 'Novedades y newsletter',
+    direccion: 'Documentación de Roxana', audiovisual: 'El detrás de escena',
+    programacion: 'Práctica disponible · aventura en preparación',
+    matematica: 'Práctica disponible · aventura en preparación', fisica: 'Prototipo jugable',
+  };
+  return services[id] ?? voxelStateLabel(state);
+}
+
 function isCompact(): boolean {
-  return window.matchMedia('(max-width: 900px)').matches;
+  return window.matchMedia('(max-width: 700px)').matches;
 }
 
 function prefersReducedMotion(): boolean {
@@ -228,12 +240,14 @@ class School3DExperience {
   private readonly scene = new THREE.Scene();
   private readonly camera: THREE.OrthographicCamera;
   private readonly backdrop: SchoolBackdrop;
+  private atmosphere: SchoolAtmosphere | null = null;
   private readonly renderer: THREE.WebGLRenderer;
   private readonly cameraTarget = OVERVIEW_TARGET.clone();
   private readonly raycaster = new THREE.Raycaster();
   private readonly pointer = new THREE.Vector2(2, 2);
   private readonly clock = new THREE.Clock();
   private readonly rooms = new Map<VoxelZoneId, RoomVisual>();
+  private readonly framingBounds = new Map<THREE.Object3D, { bounds: THREE.Box3; position: THREE.Vector3 }>();
   private readonly anchors = new Map<VoxelZoneId, THREE.Object3D>();
   private readonly npcs: Array<{ object: THREE.Object3D; phase: number; baseY: number }> = [];
   private savedSchoolState = readSchoolState();
@@ -266,6 +280,9 @@ class School3DExperience {
   private visibilityObserver: IntersectionObserver | null = null;
   private postFxCompact: boolean | null = null;
   private lastSizeKey = '';
+  private hoveredObject: string | null = null;
+  private objectLabelHost: HTMLElement | null = null;
+  private readonly objectLabels: Array<{ element: HTMLButtonElement; anchor: THREE.Vector3; root: THREE.Object3D }> = [];
 
   private get schoolState(): SchoolState {
     return stateOverride(this.savedSchoolState, this.progressPreview);
@@ -279,6 +296,9 @@ class School3DExperience {
     return JSON.stringify({
       mode: this.selected ? 'room' : 'overview',
       selectedRoom: this.selected,
+      selectedRoomBounds: this.selected && this.rooms.get(this.selected)
+        ? this.visibleRoomBounds(this.rooms.get(this.selected)!.root).getSize(new THREE.Vector3()).toArray()
+        : null,
       hoveredRoom: this.hovered,
       progressPreview: this.progressPreview,
       rooms: VOXEL_ROOMS.map((room) => ({
@@ -390,6 +410,7 @@ class School3DExperience {
   }
 
   private applyProgressionState(): void {
+    this.framingBounds.clear();
     for (const root of this.progressionRoots.values()) {
       root.visible = this.arcOneComplete;
     }
@@ -400,7 +421,7 @@ class School3DExperience {
     }
     for (const room of VOXEL_ROOMS) {
       const state = voxelZoneState(room.id, this.schoolState);
-      this.labels?.setState(room.id, state, voxelStateLabel(state));
+      this.labels?.setState(room.id, state, roomServiceLabel(room.id, state));
     }
     const stage = document.querySelector<HTMLElement>('#school-experience');
     if (stage) stage.dataset.progress = this.arcOneComplete ? 'electronics-arc-1-complete' : 'initial';
@@ -511,6 +532,8 @@ class School3DExperience {
 
       this.prepareModel(gltf.scene, roxanaStatue);
       this.scene.add(gltf.scene);
+      gltf.scene.updateMatrixWorld(true);
+      this.atmosphere = installSchoolAtmosphere(this.scene, new Map([...this.rooms].map(([id, room]) => [id, room.root])));
       if (location.pathname === '/dev/scene-editor') this.setupSceneEditor(gltf.scene);
       draco.dispose();
 
@@ -656,6 +679,21 @@ class School3DExperience {
   private buildLabels(): void {
     const container = document.querySelector<HTMLElement>('#school3d-labels');
     if (!container) return;
+    // The original GLB omitted sign anchors for the three hall thresholds.
+    // Give each embedded service its own real, selectable projected label.
+    for (const definition of VOXEL_ROOMS) {
+      if (this.anchors.has(definition.id)) continue;
+      const room = this.rooms.get(definition.id)?.root;
+      if (!room) continue;
+      room.updateWorldMatrix(true, true);
+      const center = this.visibleRoomBounds(room).getCenter(new THREE.Vector3());
+      center.y = room.getWorldPosition(new THREE.Vector3()).y;
+      const anchor = new THREE.Object3D();
+      anchor.name = `ANCHOR_${definition.id}`;
+      anchor.position.copy(room.worldToLocal(center));
+      room.add(anchor);
+      this.anchors.set(definition.id, anchor);
+    }
     this.labels = createRoomLabels(
       container,
       VOXEL_ROOMS,
@@ -665,7 +703,69 @@ class School3DExperience {
     );
     for (const room of VOXEL_ROOMS) {
       const state = voxelZoneState(room.id, this.schoolState);
-      this.labels.setState(room.id, state, voxelStateLabel(state));
+      this.labels.setState(room.id, state, roomServiceLabel(room.id, state));
+    }
+    this.buildObjectLabels();
+  }
+
+  private buildObjectLabels(): void {
+    const electronics = this.rooms.get('electronica')?.root;
+    const stage = this.canvas.parentElement;
+    if (!electronics || !stage) return;
+    const host = document.createElement('div');
+    host.className = 'rx-school3d__labels';
+    host.setAttribute('aria-label', 'Objetos del aula de Electrónica');
+    host.hidden = true;
+    stage.append(host);
+    this.objectLabelHost = host;
+    const objects = [
+      { id: 'pizarron', label: '▤ Lecturas' },
+      { id: 'mesa', label: '◇ Practicar' },
+      { id: 'portal', label: '↗ Viajar' },
+    ];
+    for (const { id, label } of objects) {
+      const candidates: THREE.Object3D[] = [];
+      electronics.traverse((candidate) => { if (candidate.userData.interactiveId === id) candidates.push(candidate); });
+      const object = candidates[0];
+      if (!object) continue;
+      object.updateWorldMatrix(true, true);
+      const anchor = new THREE.Box3().setFromObject(object, true).getCenter(new THREE.Vector3());
+      anchor.y += .4;
+      object.worldToLocal(anchor);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'rx-school3d__label is-visible';
+      button.dataset.object = id;
+      button.textContent = label;
+      button.setAttribute('aria-label', `${ELECTRONICS_OBJECTS[id].title}: ${label.slice(2)}`);
+      Object.assign(button.style, { minHeight: '38px', width: '86px', justifyContent: 'center', borderColor: '#76c8c0a0', color: '#c0eee6' });
+      button.addEventListener('click', (event) => { event.stopPropagation(); this.showObjectDetail(id); });
+      host.append(button);
+      this.objectLabels.push({ element: button, anchor, root: object });
+    }
+  }
+
+  private updateObjectLabels(width: number, height: number): void {
+    if (!this.objectLabelHost) return;
+    const visible = this.selected === 'electronica';
+    this.objectLabelHost.hidden = !visible;
+    this.objectLabelHost.inert = !visible;
+    if (!visible) return;
+    const occupied: Array<{ x: number; y: number }> = [];
+    const point = new THREE.Vector3();
+    for (const entry of this.objectLabels) {
+      entry.root.updateWorldMatrix(true, false);
+      point.copy(entry.anchor).applyMatrix4(entry.root.matrixWorld).project(this.camera);
+      let x = THREE.MathUtils.clamp((point.x * .5 + .5) * width, 50, width - 50);
+      let y = THREE.MathUtils.clamp((-point.y * .5 + .5) * height - 9, 44, height - 10);
+      for (const previous of occupied) {
+        if (Math.abs(x - previous.x) < 93 && Math.abs(y - previous.y) < 44) {
+          y = THREE.MathUtils.clamp(previous.y + 46, 44, height - 10);
+          if (Math.abs(y - previous.y) < 44) x = THREE.MathUtils.clamp(previous.x + 94, 50, width - 50);
+        }
+      }
+      occupied.push({ x, y });
+      entry.element.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0) translate(-50%,-100%)`;
     }
   }
 
@@ -736,9 +836,11 @@ class School3DExperience {
         'is-object-hovered',
         this.selected === 'electronica' && Boolean(target?.interactiveId),
       );
+      this.setObjectHover(this.selected === 'electronica' && target?.roomId === 'electronica' ? target.interactiveId : null);
     });
     this.canvas.addEventListener('pointerleave', () => {
       this.setHover(null);
+      this.setObjectHover(null);
     });
 
     // El cruce a Ohmdal usa la misma transición que la landing clásica, en vez de saltar de
@@ -779,7 +881,8 @@ class School3DExperience {
       if (event.persisted) return;
       this.loaded = false; this.updateRunning();
       this.resizeObserver?.disconnect(); this.visibilityObserver?.disconnect();
-      this.postFx?.dispose(); this.backdrop.dispose(); this.labels?.dispose();
+      this.postFx?.dispose(); this.backdrop.dispose(); this.labels?.dispose(); this.atmosphere?.dispose();
+      this.objectLabelHost?.remove(); this.objectLabels.length = 0;
       this.scene.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
         object.geometry.dispose();
@@ -828,7 +931,7 @@ class School3DExperience {
       button.className = 'rx-school3d__room-button';
       button.dataset.room = room.id;
       button.dataset.state = state;
-      button.innerHTML = `<i></i><strong>${room.shortTitle}</strong><small>${voxelStateLabel(state)}</small>`;
+      button.innerHTML = `<i></i><strong>${room.shortTitle}</strong><small>${roomServiceLabel(room.id, state)}</small>`;
       button.addEventListener('click', () => {
         this.selectRoom(room.id);
         this.setRoomMenu(false);
@@ -845,7 +948,16 @@ class School3DExperience {
     this.pointer.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
     this.raycaster.setFromCamera(this.pointer, this.camera);
     const hits = this.raycaster.intersectObjects(this.interactiveRoots, true);
-    const object = hits[0]?.object ?? null;
+    const object = hits.find((hit) => {
+      const id = zoneIdFromRoot(roomFromObject(hit.object));
+      if (!id || (this.rooms.get(id)?.opacity ?? 0) < .2) return false;
+      let ancestor: THREE.Object3D | null = hit.object;
+      while (ancestor) {
+        if (!ancestor.visible) return false;
+        ancestor = ancestor.parent;
+      }
+      return true;
+    })?.object ?? null;
     const roomId = zoneIdFromRoot(roomFromObject(object));
     return roomId ? { roomId, interactiveId: interactiveIdFromObject(object) } : null;
   }
@@ -875,6 +987,7 @@ class School3DExperience {
         if (candidate && selectedRoom && schoolRoomOccludes(candidate, selectedRoom)) {
           opacity = OCCLUDER_OPACITY;
         }
+        if (selectedRoom?.embedded && id !== 'hall') opacity = OCCLUDER_OPACITY;
       } else if (this.hovered === id) {
         tint = this.tintForRoom(id).clone().multiply(TINT_HOVER);
         lift = LIFT_HOVER;
@@ -910,7 +1023,7 @@ class School3DExperience {
       panel?.setAttribute('aria-hidden', 'false');
       if (panel) panel.inert = false;
       document.querySelector<HTMLElement>('#school3d-title')?.focus({ preventScroll: true });
-      if (isCompact()) panel?.scrollIntoView({ block: 'nearest', behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
+
     }, prefersReducedMotion() ? 0 : 310);
     this.renderRoomDetails(room);
     if (id === 'electronica') {
@@ -918,13 +1031,12 @@ class School3DExperience {
     }
     document.querySelectorAll<HTMLElement>('[data-room]').forEach((button) => button.classList.toggle('is-selected', button.dataset.room === id));
 
-    const bounds = new THREE.Box3().setFromObject(visual.root);
-    const target = bounds.getCenter(new THREE.Vector3());
-    target.y = Math.max(.42, target.y * .34);
-    const size = bounds.getSize(new THREE.Vector3());
-    const viewWidth = this.camera.right - this.camera.left;
-    const desiredZoom = Math.min(3.5, viewWidth / (Math.max(size.x, size.z) + 7), 2.6);
-    this.startTween(target, desiredZoom);
+    const locationLabel = document.querySelector('#current-location');
+    if (locationLabel) locationLabel.textContent = room.shortTitle;
+    const hint = document.querySelector('#scene-hint');
+    if (hint) hint.textContent = 'Esc para volver al Instituto';
+    const framing = this.roomFraming(visual);
+    this.startTween(framing.target, framing.zoom);
     if (updateHistory && location.hash !== `#sala/${id}`) history.pushState({ room: id }, '', `#sala/${id}`);
   }
 
@@ -952,7 +1064,7 @@ class School3DExperience {
     if (eyebrow) eyebrow.textContent = room.eyebrow;
     if (title) title.textContent = room.title;
     if (status) {
-      status.textContent = voxelStateLabel(state);
+      status.textContent = roomServiceLabel(room.id, state);
       status.dataset.state = state;
     }
     if (description) description.textContent = room.description;
@@ -972,39 +1084,11 @@ class School3DExperience {
     if (progressBar) progressBar.style.width = `${Math.round(progress * 100)}%`;
     if (progressBar?.parentElement) progressBar.parentElement.hidden = !['electronica', 'logros', 'biblioteca', 'visitantes'].includes(room.id);
     if (action) {
+      action.hidden = true;
       delete action.dataset.dialog;
-      setWipDoor(room.id === 'electronica');
-      if (room.id === 'electronica') {
-        // «Viajar a Ohmdal» tiene que llegar a Ohmdal. Con `/jugar` a secas el destino se
-        // pierde y caés donde diga el save. `portalGateUrl()` lleva a la Plaza.
-        setOhmdalAction(action, 'Viajar a Ohmdal');
-      } else if (room.id === 'hall') {
-        // «Continuar el viaje» sí retoma la partida donde haya quedado: destino correcto.
-        clearOhmdalAction(action);
-        action.href = '/jugar';
-        action.textContent = 'Continuar el viaje';
-        if (this.schoolState.aulas.electronica === 'off') {
-          action.href = portalGateUrl(); action.textContent = 'Comenzar la aventura';
-        }
-      } else {
-        clearOhmdalAction(action);
-        const destinations: Partial<Record<VoxelZoneId, { href: string; label: string; dialog?: string }>> = {
-          programacion: { href: '#mundos', label: 'Conocer los mundos' },
-          matematica: { href: '#mundos', label: 'Conocer los mundos' },
-          fisica: { href: '/physica/', label: 'Explorar el prototipo' },
-          biblioteca: { href: '#memoria', label: 'Abrir mi Bitácora', dialog: 'progress-dialog' },
-          logros: { href: '#memoria', label: 'Ver mi recorrido', dialog: 'progress-dialog' },
-          audiovisual: { href: '#aventura', label: 'Descubrir la experiencia' },
-          visitantes: { href: '#aventura', label: 'Descubrir la experiencia' },
-          direccion: { href: '#memoria', label: 'La memoria de Roxana' },
-          preceptoria: { href: '#preguntas', label: 'Guía para empezar', dialog: 'guide-dialog' },
-        };
-        const destination = destinations[room.id] ?? { href: '#memoria', label: 'Conocer el Instituto' };
-        action.href = destination.href;
-        action.textContent = destination.label;
-        if (destination.dialog) action.dataset.dialog = destination.dialog;
-      }
+      clearOhmdalAction(action);
     }
+    window.dispatchEvent(new CustomEvent('roxana:room-enter', { detail: { id: room.id } }));
   }
 
   private showObjectDetail(interactiveId: string): void {
@@ -1029,10 +1113,12 @@ class School3DExperience {
     setWipDoor(true);
     if (action) {
       setOhmdalAction(action, 'Practicar en Ohmdal');
+      action.hidden = true;
     }
     panel?.classList.add('is-open', 'is-object');
     panel?.setAttribute('aria-hidden', 'false');
     if (panel) panel.inert = false;
+    window.dispatchEvent(new CustomEvent('roxana:object-enter', { detail: { id: interactiveId } }));
   }
 
   private showOverview(updateHistory = true): void {
@@ -1053,9 +1139,14 @@ class School3DExperience {
     panel?.setAttribute('aria-hidden', 'true');
     if (panel) panel.inert = true;
     if (updateHistory) this.canvas.focus({ preventScroll: true });
-    if (updateHistory && isCompact()) document.querySelector('#school-experience')?.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
+
     document.querySelectorAll('[data-room]').forEach((button) => button.classList.remove('is-selected'));
-    this.startTween(OVERVIEW_TARGET, this.overviewZoom);
+    const locationLabel = document.querySelector('#current-location');
+    if (locationLabel) locationLabel.textContent = 'Instituto Roxana';
+    const hint = document.querySelector('#scene-hint');
+    if (hint) hint.textContent = 'Elegí una sala para entrar';
+    this.startTween(this.overviewTarget(), this.overviewZoom);
+    window.dispatchEvent(new CustomEvent('roxana:room-enter', { detail: { id: null } }));
     if (updateHistory && location.hash.startsWith('#sala/')) {
       const url = new URL(location.href);
       url.hash = '';
@@ -1080,6 +1171,83 @@ class School3DExperience {
     };
   }
 
+  private setObjectHover(id: string | null): void {
+    if (this.hoveredObject === id) return;
+    this.hoveredObject = id;
+    const detail = id ? ELECTRONICS_OBJECTS[id] : null;
+    this.canvas.title = detail ? `Inspeccionar: ${detail.title}` : '';
+    const hint = document.querySelector('#scene-hint');
+    if (hint) hint.textContent = detail
+      ? `Inspeccionar ${detail.title.toLowerCase()}`
+      : this.selected ? 'Esc para volver al Instituto' : 'Elegí una sala para entrar';
+  }
+
+  private overviewTarget(): THREE.Vector3 {
+    const target = OVERVIEW_TARGET.clone();
+    // Give the welcome title its own air to the left of the upper classrooms.
+    // Portrait has its title above the canvas and stays perfectly centered.
+    if (!isCompact()) {
+      const worldWidth = (this.camera.right - this.camera.left) / this.overviewZoom;
+      target.x = -Math.min(5.7, Math.max(0, (worldWidth - 54) / 2 - .5));
+    }
+    return target;
+  }
+
+  /** Fit the full selected room in both screen axes, including its terrace. */
+  private visibleRoomBounds(root: THREE.Object3D): THREE.Box3 {
+    root.updateWorldMatrix(true, true);
+    const position = root.getWorldPosition(new THREE.Vector3());
+    let measured = this.framingBounds.get(root);
+    if (!measured) {
+      const bounds = new THREE.Box3();
+      // The GLB contains rotated, globally baked meshes and hidden future
+      // props. Approximate transformed AABBs can double the room dimensions.
+      // Measure visible vertices once, then just translate during room lifts.
+      root.traverseVisible((object) => {
+        if (object instanceof THREE.Mesh) bounds.expandByObject(object, true);
+      });
+      if (bounds.isEmpty()) bounds.setFromObject(root, true);
+      measured = { bounds, position: position.clone() };
+      this.framingBounds.set(root, measured);
+    }
+    return measured.bounds.clone().translate(position.sub(measured.position));
+  }
+
+  private roomFraming(visual: RoomVisual): { target: THREE.Vector3; zoom: number } {
+    visual.root.updateWorldMatrix(true, true);
+    const embedded = VOXEL_ROOMS.find((room) => room.id === this.selected)?.embedded;
+    const hall = embedded ? this.rooms.get('hall') : null;
+    // Embedded doors are part of the Hall: frame that architecture as context,
+    // with the selected service lit, instead of magnifying a one-metre shelf.
+    const bounds = this.visibleRoomBounds(hall?.root ?? visual.root);
+    // Bounds were measured during the lift; frame their final settled position.
+    const remainingLift = hall ? 0 : LIFT_SELECTED - visual.lift;
+    bounds.min.y += remainingLift;
+    bounds.max.y += remainingLift;
+    const target = bounds.getCenter(new THREE.Vector3());
+    const up = new THREE.Vector3(0, CAMERA_DIRECTION.z, -CAMERA_DIRECTION.y).normalize();
+    const right = new THREE.Vector3(1, 0, 0);
+    let left = Infinity, rightEdge = -Infinity, bottom = Infinity, top = -Infinity;
+    const corner = new THREE.Vector3();
+    for (const x of [bounds.min.x, bounds.max.x]) {
+      for (const y of [bounds.min.y, bounds.max.y]) {
+        for (const z of [bounds.min.z, bounds.max.z]) {
+          corner.set(x, y, z).sub(target);
+          const horizontal = corner.dot(right), vertical = corner.dot(up);
+          left = Math.min(left, horizontal); rightEdge = Math.max(rightEdge, horizontal);
+          bottom = Math.min(bottom, vertical); top = Math.max(top, vertical);
+        }
+      }
+    }
+    const minimumSpan = embedded ? 18 : 0;
+    const zoom = Math.min(
+      (this.camera.right - this.camera.left) / (Math.max(rightEdge - left, minimumSpan) + 4),
+      (this.camera.top - this.camera.bottom) / (Math.max(top - bottom, minimumSpan) + 4),
+      5.4,
+    );
+    return { target, zoom };
+  }
+
   private resize(): void {
     this.needsRender = true;
     const width = Math.max(1, this.canvas.clientWidth || window.innerWidth);
@@ -1093,9 +1261,23 @@ class School3DExperience {
     this.camera.bottom = -viewHeight / 2;
     // Las terrazas amplían la silueta vertical; esta apertura conserva reloj,
     // zócalos y acceso completo sin modificar los zooms de cada sala.
-    this.overviewZoom = Math.min(isCompact() ? 1.12 : 1.34, (viewHeight * aspect) / 55);
-    if (this.tween && !this.selected) this.tween.toZoom = this.overviewZoom;
-    if (!this.selected && !this.tween) this.camera.zoom = this.overviewZoom;
+    this.overviewZoom = Math.min(viewHeight / (isCompact() ? 40 : 43), (viewHeight * aspect) / 57);
+    if (this.selected) {
+      const visual = this.rooms.get(this.selected);
+      if (visual) {
+        const framing = this.roomFraming(visual);
+        if (this.tween) { this.tween.toZoom = framing.zoom; this.tween.toTarget.copy(framing.target); }
+        else { this.camera.zoom = framing.zoom; this.cameraTarget.copy(framing.target); }
+      }
+    }
+    if (this.tween && !this.selected) {
+      this.tween.toZoom = this.overviewZoom;
+      this.tween.toTarget.copy(this.overviewTarget());
+    }
+    if (!this.selected && !this.tween) {
+      this.camera.zoom = this.overviewZoom;
+      this.cameraTarget.copy(this.overviewTarget());
+    }
     this.camera.updateProjectionMatrix();
     const ratio = this.pixelRatio();
     if (this.loaded) this.rebuildPostFx();
@@ -1167,6 +1349,8 @@ class School3DExperience {
       }
     }
 
+    this.atmosphere?.update(elapsed, prefersReducedMotion(), this.selected);
+
     if (this.tween) {
       const progress = Math.min(1, (performance.now() - this.tween.startedAt) / this.tween.duration);
       const eased = easeInOut(progress);
@@ -1184,6 +1368,7 @@ class School3DExperience {
     const width = this.canvas.clientWidth || window.innerWidth;
     const height = this.canvas.clientHeight || window.innerHeight;
     this.labels?.update(this.camera, width, height, this.selected);
+    this.updateObjectLabels(width, height);
 
     this.renderer.info.reset();
     if (this.postFx) this.postFx.composer.render(delta);

@@ -1,5 +1,4 @@
-import { readSchoolState } from './schoolModel.ts';
-import { portalGateUrl } from '../shared/portalLink.ts';
+import { initSchoolApp } from './schoolApp.ts';
 import { InstituteAmbience } from './ambience.ts';
 import {
   defaultPreferences,
@@ -104,54 +103,13 @@ window
     applyPreferences();
   });
 
-function renderProgress(): void {
-  const school = readSchoolState();
-  const {
-    unidadesCompletadas: completed,
-    totalUnidades: total,
-    arcoCompleto,
-  } = school.electronica;
-  const started = school.aulas.electronica !== 'off';
-  const content = $('#progress-content');
-  if (content) {
-    content.replaceChildren();
-    const lead = document.createElement('p');
-    lead.textContent = arcoCompleto
-      ? 'La luz volvió a Ohmdal. Tu recorrido sigue en la memoria del Instituto.'
-      : started
-        ? 'El Instituto conserva lo que descubriste en Ohmdal.'
-        : 'Tu Bitácora todavía tiene sus páginas en blanco. La primera aventura te espera en Ohmdal.';
-    const count = document.createElement('p');
-    count.className = 'progress-count';
-    count.textContent = `${completed} / ${total} unidades recuperadas`;
-    const progress = document.createElement('progress');
-    progress.max = total;
-    progress.value = completed;
-    progress.setAttribute('aria-label', 'Unidades recuperadas en Ohmdal');
-    const note = document.createElement('p');
-    note.className = 'notice';
-    note.textContent =
-      'Este recorrido corresponde al guardado de Ohmdal del portal escolar en este navegador. Las versiones experimentales tienen partidas independientes.';
-    content.append(lead, count, progress, note);
-  }
-  const action = $<HTMLAnchorElement>('#progress-play');
-  if (action) {
-    action.href = started ? '/jugar' : portalGateUrl();
-    action.textContent = started
-      ? 'Continuar mi recorrido →'
-      : 'Entrar a Ohmdal →';
-  }
-}
-
 function openDialog(id: string): void {
   const dialog = $<HTMLDialogElement>(`#${id}`);
   if (!dialog) return;
-  if (id === 'progress-dialog') renderProgress();
   if (id === 'settings-dialog') applyPreferences();
   document
     .querySelectorAll<HTMLDialogElement>('dialog[open]')
     .forEach((other) => other.close());
-  closeMenu(false);
   dialog.showModal();
   html.classList.add('modal-open');
   window.dispatchEvent(new CustomEvent('roxana:dialog', { detail: true }));
@@ -204,107 +162,23 @@ document.querySelectorAll<HTMLDialogElement>('dialog').forEach((dialog) => {
     window.dispatchEvent(new CustomEvent('roxana:dialog', { detail: open }));
   });
 });
-document
-  .querySelectorAll<HTMLElement>('[data-open-dialog]')
-  .forEach((button) =>
-    button.addEventListener('click', () =>
-      openDialog(button.dataset.openDialog!),
-    ),
-  );
 window.addEventListener('roxana:open-dialog', (event) =>
   openDialog((event as CustomEvent<string>).detail),
 );
 
-const worlds: Record<
-  string,
-  { title: string; category: string; description: string }
-> = {
-  bitland: {
-    title: 'Bitland',
-    category: 'PROGRAMACIÓN / EN EL HORIZONTE',
-    description:
-      'Un mundo para descubrir cómo una secuencia, una condición o una repetición pueden transformar lo que ocurre. El aula de Programación todavía espera su primer viaje.',
-  },
-  arithmos: {
-    title: 'Arithmos',
-    category: 'MATEMÁTICA / EN EL HORIZONTE',
-    description:
-      'Patrones, proporciones y estructuras: el lenguaje que conecta lo que parece distinto. El aula de Matemática conserva la puerta a este mundo todavía por despertar.',
-  },
-};
-document.querySelectorAll<HTMLElement>('[data-world]').forEach((button) =>
-  button.addEventListener('click', () => {
-    const world = worlds[button.dataset.world!];
-    if (!world) return;
-    const title = $('#world-title'),
-      category = $('#world-category'),
-      description = $('#world-description');
-    if (title) title.textContent = world.title;
-    if (category) category.textContent = world.category;
-    if (description) description.textContent = world.description;
-    openDialog('world-dialog');
-  }),
-);
-
-function selectRoom(id: string): void {
-  $('#school-experience')?.scrollIntoView({
-    behavior: preferences.motion ? 'instant' : 'smooth',
-    block: 'start',
-  });
-  if (location.hash === `#sala/${id}`)
-    window.dispatchEvent(new CustomEvent('roxana:select-room', { detail: id }));
-  else location.hash = `sala/${id}`;
-}
-$('#explore-institute')?.addEventListener('click', () => selectRoom('hall'));
-document
-  .querySelectorAll<HTMLElement>('[data-select-room]')
-  .forEach((button) =>
-    button.addEventListener('click', () =>
-      selectRoom(button.dataset.selectRoom!),
-    ),
-  );
-
-const menuToggle = $('.menu-toggle');
-const menu = $('#site-nav');
-const mobileMenu = window.matchMedia('(max-width: 900px)');
-function closeMenu(restoreFocus = false): void {
-  menuToggle?.setAttribute('aria-expanded', 'false');
-  menuToggle?.setAttribute('aria-label', 'Abrir menú');
-  menu?.classList.remove('is-open');
-  if (menu) menu.inert = mobileMenu.matches;
-  if (restoreFocus) menuToggle?.focus();
-}
-menuToggle?.addEventListener('click', () => {
-  const open = menuToggle.getAttribute('aria-expanded') !== 'true';
-  menuToggle.setAttribute('aria-expanded', String(open));
-  menuToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
-  menu?.classList.toggle('is-open', open);
-  if (menu) menu.inert = !open && mobileMenu.matches;
-});
-mobileMenu.addEventListener('change', () => closeMenu());
-closeMenu();
-menu
-  ?.querySelectorAll('a')
-  .forEach((a) => a.addEventListener('click', () => closeMenu()));
 document.addEventListener('click', (event) => {
-  if (!(event.target as Element).closest('.site-header')) closeMenu();
+  const target = (event.target as Element).closest<HTMLElement>(
+    '[data-close-dialog], [data-open-dialog]',
+  );
+  if (target?.hasAttribute('data-close-dialog'))
+    target.closest<HTMLDialogElement>('dialog')?.close();
+  if (target?.dataset.openDialog) openDialog(target.dataset.openDialog);
 });
-document.addEventListener('keydown', (event) => {
-  if (
-    event.key === 'Escape' &&
-    menuToggle?.getAttribute('aria-expanded') === 'true'
-  ) {
-    event.preventDefault();
-    closeMenu(true);
-  }
-});
-
-const year = $('#year');
-if (year) year.textContent = String(new Date().getFullYear());
-document.querySelectorAll<HTMLAnchorElement>('[data-play]').forEach((link) => {
-  link.href = portalGateUrl();
-});
+$('#search-school')?.addEventListener('click', () =>
+  openDialog('search-dialog'),
+);
 $('#retry-scene')?.addEventListener('click', () => location.reload());
+initSchoolApp();
 
 // Preserve canonical classroom deep links and the graphical unit projector.
 let aulasReady = false;
@@ -335,6 +209,10 @@ async function startScene(): Promise<void> {
     const fallback = $('#school3d-fallback');
     if (fallback) fallback.hidden = false;
     html.dataset.scene = 'failed';
+  } finally {
+    if (roomToggle) roomToggle.disabled = false;
+    if (html.dataset.scene === 'failed')
+      window.dispatchEvent(new CustomEvent('roxana:scene-unavailable'));
   }
 }
 void startScene();
@@ -344,19 +222,3 @@ document.addEventListener('visibilitychange', () =>
 window.addEventListener('pagehide', (event) => {
   if (!event.persisted) ambience.dispose();
 });
-
-const sections = document.querySelectorAll<HTMLElement>('main section[id]');
-const navObserver = new IntersectionObserver(
-  (entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      menu?.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => {
-        if (link.hash === `#${entry.target.id}`)
-          link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      });
-    }
-  },
-  { rootMargin: '-15% 0px -55% 0px' },
-);
-sections.forEach((section) => navObserver.observe(section));

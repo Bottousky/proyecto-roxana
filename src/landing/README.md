@@ -1,36 +1,61 @@
-# Instituto Roxana — portada y visita 3D
+# Instituto Roxana — la escuela es la interfaz
 
-El entry real es `../../index.html`. La portada presenta el proyecto, sus mundos,
-la forma de aprender, preguntas frecuentes y acceso al juego. La escuela Three.js
-se carga por separado; el texto y los enlaces no esperan al GLB.
+El entry real es `../../index.html`. La landing ocupa una sola pantalla: el
+Instituto 3D es la navegación. Las once salas se abren al tocar el edificio, sus
+rótulos o el directorio accesible. Una cámara enfoca el espacio y un panel permite
+usar sus servicios. En móvil, la sala queda arriba y el panel se desplaza debajo.
 
-- `index.ts`: navegación, diálogos nativos, preferencias, Bitácora y arranque.
-- `experience.css`: identidad editorial y responsive. `school3d.css`: escena,
-  etiquetas, menú de salas y panel. `landing.css` conserva el aula gráfica anterior.
-- `school3d.ts`, `school3dPostFx.ts`: modelo existente, cámaras por sala, grado de
-  color con alfa conservado, calidad automática/alta/ligera y pausa fuera de vista.
-- `preferences.ts`: validación y persistencia tolerante a almacenamiento bloqueado.
-- `ambience.ts`: audio sintetizado original, sólo después de una activación explícita.
+## Salas y funciones
 
-## Recorridos y datos
+- **Hall:** orientación, cuatro Mundos Aplicados y acceso al resto de la escuela.
+- **Electrónica / Ohmdal:** portal jugable existente, continuar partida, banco de
+  circuitos y lecturas. Pizarrón, instrumentos y portal del modelo son interactivos.
+- **Programación / Bitland y Matemática / Arithmos:** bancos de práctica y materiales;
+  sus aventuras completas siguen en preparación y se identifican como tales.
+- **Física / Physica:** entrada al prototipo existente y banco de movimiento.
+- **Preceptoría:** registro, login/logout, perfil y cambio de contraseña actual.
+- **Biblioteca:** trece lecturas originales sobre proyecto, historia, creación y
+  cuatro disciplinas. Búsqueda, categorías, favoritos, lector con índice,
+  descarga de texto y registro de lectura completada.
+- **Logros:** prácticas y lecturas del Instituto, más progreso real de la partida
+  local del portal de Ohmdal. No se confunden prácticas con unidades de la aventura.
+- **Dirección:** documentación de Roxana. **Audiovisual:** historias y cómo se hizo.
+- **Anfiteatro:** alta/baja del boletín asociada a una cuenta. Persiste la preferencia;
+  todavía no hay un proveedor de envío ni se manda un correo.
 
-El CTA usa `portalGateUrl()` → `/jugar?from=portal&room=plaza`; continuar una partida
-usa `/jugar`. Son las entradas jugables versionadas en la base de este worktree.
-La versión nueva de Ohmdal que estaba sin commit en el checkout original no se
-copió ni modificó: al integrarla, centralizar su destino y adaptador de guardado.
-Physica se identifica como prototipo; Bitland y Arithmos, como mundos en preparación.
+La búsqueda global encuentra salas y lecturas. Primera visita recorre cuatro
+paradas. Ajustes controla calidad, movimiento reducido, rótulos y audio original
+optativo. El audio comienza silenciado en cada visita. Sin WebGL, el directorio
+abre los mismos servicios; sin JavaScript quedan enlaces a las aventuras existentes.
 
-`#sala/electronica` abre una sala y admite historial, recarga, puntero y teclado.
-`#aula/electronica` conserva el aula gráfica y sus proyecciones. Las once salas
-tienen destinos existentes o abren la guía/Bitácora. La página puede desplazarse
-en touch sobre el canvas; las flechas sólo se capturan con foco en la escena.
+## Código y datos
 
-Preferencias: `roxana-visit-v1`. La Bitácora lee `roxana-slice-v1` y `roxana-web-v1`
-sin modificar partidas. Los guardados de versiones experimentales son independientes.
-El audio empieza silenciado en cada visita aunque antes se hubiera activado.
-No hay registro, pagos, suscripciones ni sincronización remota. No se simulan envíos.
+- `index.ts`: ajustes, diálogos, arranque y compatibilidad del aula anterior.
+- `schoolApp.ts`: interfaces de las salas, lector, búsqueda, prácticas y logros.
+- `account.ts`, `serviceClient.ts`: formularios reales, sesión y cliente HTTP.
+- `library.ts`, `worldActivities.ts`: contenido tipado y dominio de las prácticas.
+- `experience.css`, `school3d.css`: interfaz del Instituto y escena responsive.
+- `school3d.ts`: GLB existente, selección de objetos y encuadres por sala.
+- `schoolAtmosphere.ts`: plinto biselado, bronce, umbrales y polvo original.
+- `school3dLabels.ts`: once rótulos proyectados con separación para touch.
+- `school3dPostFx.ts`: color, bloom con alfa conservado y calidad adaptativa.
 
-## Verificar
+Las APIs se implementan en `../../server/`; ver su README para contrato y despliegue.
+Node 24 y SQLite guardan cuentas reales; cookies HttpOnly, CSRF y hashes scrypt.
+El correo identifica la cuenta pero no se verifica; no hay recuperación por email.
+La biblioteca y las prácticas se sincronizan por cuenta. El archivo de visitante
+es independiente: `roxana-institute-guest-v1`. No se incorpora automáticamente al
+entrar con otra identidad. Los PUT reemplazan cada recurso, con última escritura
+ganadora entre dispositivos; no se ofrece edición concurrente colaborativa.
+
+La partida se lee de `roxana-slice-v1` y `roxana-web-v1` sin modificarla.
+`portalGateUrl()` dirige a `/jugar?from=portal&room=plaza`. `/jugar` continúa el
+recorrido existente. La nueva versión Three.js de Ohmdal que estaba sin commit
+en el checkout original no se copió ni modificó: al integrarla hay que centralizar
+su destino y adaptador de guardado. `#aula/electronica` conserva el aula gráfica y
+sus proyecciones; `#sala/electronica` es el nuevo espacio de la escuela.
+
+## Ejecutar y verificar
 
 ```sh
 npm run dev -- --host 127.0.0.1 --port 5186
@@ -38,23 +63,22 @@ node scripts/landing/playtest-landing.mjs
 npm run build
 npm test
 npm run verify
+npm start
 ```
 
-El playtest usa Chrome mediante Playwright, recorre desktop y touch 390 px, salas,
-diálogos, teclado, historial, ajustes, audio, progreso, entrada real a Ohmdal y
-fallas de WebGL/almacenamiento/JavaScript. `LANDING_URL` permite apuntar a otro
-servidor. `npm run preview` también resuelve las entradas de los juegos. La build
-incluye `_redirects` para el hosting estático compatible.
+Dev, preview y `npm start` sirven las APIs en el mismo origen. Publicar sólo `dist`
+en hosting estático no ejecuta el servicio de cuentas. Para producción se requiere
+Node y una ubicación persistente para `ROXANA_DB_PATH`, fuera de `dist` y Git.
+`ROXANA_PUBLIC_ORIGIN` define el origen HTTPS canónico detrás del proxy.
 
-`node scripts/landing/capture-landing.mjs` guarda capturas y métricas en `output/playwright/`.
-`--promote` actualiza únicamente los dos assets de presentación en `public/`: el
-poster de respaldo y la tarjeta social de 1200 × 630. Se renderizan desde el modelo
-real; las capturas de QA se guardan aparte, sin cambios de composición.
+El playtest recorre desktop y touch, cuenta, biblioteca, newsletter, prácticas,
+logros, entradas jugables y fallos del renderer/almacenamiento. `LANDING_URL`
+permite probar la build servida por Node. Evidencia y capturas van en `output/`.
+`npm run test:services` prueba la API con bases temporales aisladas.
 
 ## Recursos
 
 Se reutilizan los GLB del Instituto y la estatua del proyecto. La marca SVG,
-ornamentos CSS y ambiente son originales de esta portada. Three.js utiliza MIT.
-Las fuentes Cormorant Garamond y DM Sans se sirven localmente como WOFF2; conservan
-todos sus glifos y las licencias SIL OFL en `fonts/`. Las imágenes de respaldo se
-producen con el renderer propio; no se añadieron assets remotos ni dependencias.
+ornamentos, geometría añadida y ambiente son originales. Three.js usa MIT.
+Cormorant Garamond y DM Sans se sirven como WOFF2 locales con todos sus glifos y
+licencias SIL OFL en `fonts/`. No se añadieron assets remotos ni dependencias.
