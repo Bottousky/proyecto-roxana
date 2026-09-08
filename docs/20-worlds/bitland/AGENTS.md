@@ -10,6 +10,14 @@ Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Bitland
 
 ## 1. Fuentes de verdad
 
+### Misión AAA — 2026-09-08
+
+Leer completo `production/GPT6_ASTRA_BITLAND_AAA_MASTER_PROMPT.md` y respetar su
+orden. `BITLAND_MASTER_GDD_AAA_v2-candidate.md` es la dirección autoral actual,
+todavía PROPOSED. La resolución operativa de conflictos y los gates se registran
+en [ADR P0](../../00-governance/adr/2026-09-08-bitland-aaa-p0.md) y en
+`production/bitland-prototype-evaluation_v1.md`. Esta misión no activa la campaña.
+
 ### Autoridad vigente (level ≤ 3, PROPOSED salvo ratificación posterior)
 
 - [`vision/bitland-vision_v1.md`](vision/bitland-vision_v1.md) — North Star y fantasía.

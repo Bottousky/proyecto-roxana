@@ -29,6 +29,99 @@ open_questions:
 
 # BITLAND — PROTOTYPE EVALUATION · v1
 
+## Auditoría AAA — primera entrega, 2026-09-08
+
+Lectura completa: master prompt; después AGENTS raíz, AGENTS Bitland, pilares,
+lenguaje de diseño, política vigente, GDD v2 completo, visión, metáfora,
+lenguaje jugable, automatización, gramática, progresión, narrativa, Arco I,
+slice, evaluación y cards A/B, en ese orden. Baseline de código: `983128c`.
+Los dos documentos nuevos provienen de `origin/docs/bitland-aaa-master-gdd`
+(`4fa52d0`); no estaban en el checkout de Ohmdal. Trabajo aislado en
+`C:/YO/Proyectos/Roxana-bitland-aaa`, rama `codex/bitland-aaa`.
+
+### Matriz de conflictos
+
+| Área / fuentes | Anterior PROPOSED | Dirección v2 / resolución operativa | Estado / evidencia pendiente |
+|---|---|---|---|
+| Compañero, narrativa §5 / v2 §7 | PATCH, incluso «aprendió a no interrumpir» | Null tras primera ejecución; habla de hechos; PATCH retirado del target | PROPOSED; reacción de usuarios |
+| Acceso, narrativa §4 / v2 §10 | terminal, relés, rack sin elegir | placa sobre mesa → escala urbana; sin menú de mundo | Dirección elegida para pruebas |
+| Topología, metáfora §2 / v2 §4 | calles y edificios abstractos | cobre, vías, pads y encapsulados estructuran la ciudad | P0 compara misma topología |
+| Deadlock / carrera, metáfora §2 | callejón / multitud | espera circular por recursos / lecturas intercaladas antes de actuar | Corrección técnica; fuera de P0 |
+| GC, metáfora §2 | barrer datos sin consumidor | alcanzabilidad, sólo al introducir ese modelo | No confundir con barredor municipal |
+| Narrativa §3 / v2 §9 | «no hay virus» | código dañino contextual sin voluntad ni inmunidad universal de Null | Arco V PROPOSED; no implementado |
+| Progresión / automatización / gramática | tablas incompatibles de cinco o seis arcos | Boot; I instrucciones; II estado; III abstracción; IV concurrencia; V seguridad; VI arquitectura | Mapa v2 manda; no producir campaña |
+| Slice v1 §3 / master §12 | 16 min; automatización ajena al fondo | 24 min; automatización creada por jugador y GPIO visible | P1 definido; duración no probada |
+| Arco I / v2 | cien cajas, REPEAT cambia según lote | tres entregas primero; transferencia 0/1/3/5; WHILE observa entrada | Repetición no acelera por arte de magia |
+| Lenguaje §14 / pilares P02, P06 | formalización vista obligatoriamente | Bitácora opt-in después de evidencia; nunca requisito | Decisión UX reversible |
+| Evaluación H8.3, H10 / v2 | no ganas de seguir, no misterio, no cariño | deseo de explorar; Null memorable; sin atribuir intención a procesos | Sustituye hipótesis contraproducentes |
+| Energía / narrativa | menos tarjetas = más velocidad, memoria = aprendizaje | coste de instrucciones ejecutadas separado del tamaño del programa; estado no implica aprendizaje | No mostrar métricas inventadas |
+| Gobernanza vieja / política vigente | ADR para cada ajuste y firmas ausentes | un ADR de alcance; ninguna promoción CANON automática | ADR P0 enlazado |
+| Engine / manifiesto | etiqueta dataflow-phaser, runtime placeholder | etiqueta no es selección por evidencia; ejecutar A/B | Sin decisión de producción aún |
+
+### Decision log
+
+| ID | Decisión | Razón / reversibilidad |
+|---|---|---|
+| D01 | Un solo distrito Boot Yard con borde GPIO y dispositivo externo | Recorrer causa completa sin diluir foco; reversible |
+| D02 | Diorama electrónico cálido como dirección a contrastar | Materiales PCB y encanto; debe ganar prueba de estados |
+| D03 | Proyección axonométrica estable; vista de sistema y foco contextual | Evita rotación que cambie lectura de rutas; zoom no cambia semántica |
+| D04 | Null: contorno marfil y centro ausente; courier compacto cobre | Siluetas separadas sin glitch ni caras que sugieran deliberación |
+| D05 | Tick lógico, interpreter puro, traza factual, snapshots completos | Renderer es proyección; rewind restaura también colas y entradas |
+| D06 | Validación por entregas, seguridad y terminación observadas | Aceptar espera extra y repetición literal cuando funcionan |
+| D07 | P0 autorizado; P1 condicionado por cards | Ningún renderer elegido por preferencia ni campaña accidental |
+| D08 | Arte procedural original; audio sintetizado de eventos reales | Sin licencias dudosas ni compras; no sustituye QA de audio |
+
+### Dirección visual y alternativas
+
+Elección de dirección: **diorama electrónico cálido**, placa petróleo, cobre
+mate, cerámica marfil, encapsulados tinta, LEDs ámbar. Luz lateral cálida;
+sombra de contacto y caras de paquetes definen altura. El laboratorio tiene
+tono papel; el borde de la placa queda visible para diferenciar GPIO del exterior.
+No hay torres urbanas independientes: un IC de pocas plantas conserva patas,
+muesca, pads y serigrafía; un cristal es un hito bajo, largo y metálico.
+
+Se contrastarán tres tratamientos con misma geometría, cámara, tick, courier,
+paquete, bus y LED. Las siguientes son razones de dirección, **no resultados
+medidos todavía**:
+
+| Tratamiento | Lectura / encanto / escala / estado | Performance / producción / touch / identidad | Decisión inicial |
+|---|---|---|---|
+| Diorama cálido | cobre ordena rutas; objetos dan escala; luz reservada para estado | geometría vectorial; sombras simples; targets DOM; distinto de Ohmdal | Elegido sujeto a capturas comparables |
+| Cuento técnico limpio | siluetas muy claras, amable; riesgo de diagrama plano | barato y rápido, excelente contraste potencial; menor sensación material | Rechazado como identidad final; conservar claridad |
+| Máquina-ciudad cinematográfica | profundidad y escala; riesgo de oscuridad y señal perdida | mayor coste de iluminación, efectos y contraste touch | Rechazado como identidad final; conservar encuadre de restauración |
+
+No se propone tercer engine: primero medir si Pixi/Phaser resuelven esta imagen.
+No confundir captura atractiva con prueba de aprendizaje o rendimiento escolar.
+
+### Scope exacto P1 (24 min objetivo, tolerancia 20–30)
+
+1. 0:00–1:00: mesa del Instituto → placa → Boot Yard, entrada por interacción.
+2. 1:00–5:00: leer courier, ordenar recogida / recorrido / entrega; fallar sin perder estado.
+3. 5:00–6:00: paquete cruza GPIO, LED externo enciende; cámara conserva causalidad.
+4. 6:00–7:00: Null entra después de actuar; una observación, sin explicación.
+5. 7:00–12:00: entrada cambia, condición controla entrega/espera; probar ambas ramas.
+6. 12:00–16:00: tres viajes repetidos; reemplazar copia por repetición; lote de transferencia.
+7. 16:00–21:00: «Última vuelta» con condición estable; inspeccionar, rebobinar y reparar terminación.
+8. 21:00–24:00: llegada nueva activa rutina propia; alejarse, regresar y ver servicio continuar; apertura de ciudad.
+
+Una placa, un circuito de reparto, un sensor de presencia, un GPIO y LED,
+un courier programable, un mantenedor heredado y Null. Sin variables de usuario,
+funciones, carreras, seguridad, arquitectura, campaña global, editor textual,
+economía ni sincronización obligatoria. El estado necesario existe en el core
+desde el inicio; «sin variables de usuario» no significa simulación sin estado.
+
+### Gobernanza y primer target de implementación
+
+[ADR P0](../../../00-governance/adr/2026-09-08-bitland-aaa-p0.md) registra el
+encargo y la ampliación acotada para comparación visual, loop, Null y LED.
+Se implementan los dos spikes; el slice P1 sigue especificado, no proclamado
+producido. Los textos v1 de abajo son antecedentes de evaluación: para la misión
+actual prevalecen esta matriz, v2 y el beat sheet actualizado.
+
+Desbloqueador de P1: recorrido blind-first y comparación independiente sin
+BLOCKER/MAJOR, evidencia en hardware escolar, decisión de renderer registrada
+y actualización explícita de este gate. Un test automatizado no suplanta personas.
+
 > Documento de autoridad nivel 4. Diseño de contenido. Define **qué se
 > valida en el primer prototipo de Bitland**, cómo se mide, qué
 > umbrales se exigen y qué decisiones se toman a partir del resultado.
