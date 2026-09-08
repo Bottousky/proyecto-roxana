@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { surface, texture, foliage, character, glowTexture, shadowTexture, random } from './art.js';
+import { createRegionScene } from './regions.js';
 
 export function createWorld(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
@@ -16,7 +17,7 @@ export function createWorld(canvas) {
   const cameraFocus = new THREE.Vector3(0,1.2,0);
   const cameraOffset = new THREE.Vector3(18,27,34);
   camera.position.copy(cameraFocus).add(cameraOffset); camera.lookAt(cameraFocus);
-  scene.add(new THREE.HemisphereLight('#d6e5d9','#67745c',1.65));
+  const ambient=new THREE.HemisphereLight('#d6e5d9','#67745c',1.65);scene.add(ambient);
   const sun = new THREE.DirectionalLight('#ffddb0',2.45);sun.position.set(-16,27,8);sun.target.position.set(0,0,0);scene.add(sun,sun.target);
   sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);Object.assign(sun.shadow.camera,{left:-27,right:27,top:27,bottom:-27,near:1,far:80});sun.shadow.bias=-.0007;sun.shadow.normalBias=.06;
   const mats = {};
@@ -217,23 +218,26 @@ export function createWorld(canvas) {
   for(const [key,geos] of buckets){const geo=mergeGeometries(geos,false);const mesh=new THREE.Mesh(geo,mats[key]);mesh.castShadow=key!=='grass'&&key!=='dark';mesh.receiveShadow=key!=='dark';scene.add(mesh);for(const g of geos)g.dispose();}
   const shadows=new THREE.Mesh(mergeGeometries(shadowGeos),shadowMat);scene.add(shadows);
   function actor(kind,x,z){
-    const maps=[];for(let back=0;back<2;back++)for(let frame=0;frame<4;frame++)maps.push(texture(character(kind,frame,!!back)));
+    const maps=[];for(const facing of ['front','back','left','right'])for(let frame=0;frame<4;frame++)maps.push(texture(character(kind,frame,facing)));
     const mat=new THREE.SpriteMaterial({map:maps[0],alphaTest:.2,transparent:true,depthWrite:true});
     const sprite=new THREE.Sprite(mat);sprite.position.set(x,kind==='ohm'?1.85:.95,z);sprite.scale.set(kind==='ohm'?1.12:1.04,kind==='ohm'?1.68:1.56,1);scene.add(sprite);
     const s=new THREE.Mesh(new THREE.PlaneGeometry(.9,.65),shadowMat);s.rotation.x=-Math.PI/2;s.position.set(x,.06,z);scene.add(s);
     return {sprite,maps,shadow:s,kind};
   }
   const player=actor('player',-6,7),edda=actor('edda',3.1,3.2),lumen=actor('lumen',-5.2,-3.1),ohm=actor('ohm',1.35,.2);
+  const apprentice=actor('apprentice',3.9,3.7);apprentice.sprite.visible=false;apprentice.shadow.visible=false;
+  const fountainFlow=new THREE.Mesh(new THREE.CylinderGeometry(.04,.09,1.15,7),new THREE.MeshBasicMaterial({color:'#bad2b9',transparent:true,opacity:.65}));fountainFlow.position.set(5.8,1.22,-3.1);fountainFlow.visible=false;scene.add(fountainFlow);
   const targets=[{id:'ohm',name:'El autómata',x:1.35,z:.2,y:2.6,range:2.25},{id:'return',name:'Un puente partido',x:-.35,z:-1.66,y:1.5,range:1.8},{id:'source',name:'La pila del taller',x:-2.35,z:.1,y:1.8,range:1.7},{id:'switch',name:'La palanca',x:-2.35,z:2.15,y:1.5,range:1.7},{id:'lumen',name:'Maese Lumen',x:-5.2,z:-3.1,y:2.4,range:2},{id:'edda',name:'Edda',x:3.1,z:3.2,y:2.3,range:2},{id:'fountain',name:'La fuente',x:5.8,z:-3.7,y:2.6,range:2.4},{id:'bridge',name:'Hacia La Calzada',x:11.6,z:2.9,y:1.8,range:2.1}];
   const pointer=new THREE.Mesh(new THREE.RingGeometry(.18,.25,24),new THREE.MeshBasicMaterial({color:'#f2d393',transparent:true,opacity:.8,side:THREE.DoubleSide,depthWrite:false}));pointer.rotation.x=-Math.PI/2;pointer.position.y=.065;pointer.visible=false;scene.add(pointer);
   const particleGeo=new THREE.BufferGeometry();const motes=new Float32Array(90*3);for(let i=0;i<90;i++){motes[i*3]=-17+r()*40;motes[i*3+1]=.5+r()*7;motes[i*3+2]=-12+r()*28;}particleGeo.setAttribute('position',new THREE.BufferAttribute(motes,3));const particles=new THREE.Points(particleGeo,new THREE.PointsMaterial({color:'#f2d79b',size:.05,transparent:true,opacity:.5,depthWrite:false}));scene.add(particles);
   const flowDots=[];for(let i=0;i<12;i++){const dot=new THREE.Mesh(new THREE.SphereGeometry(.055,5,4),new THREE.MeshBasicMaterial({color:'#ffe0a0'}));scene.add(dot);flowDots.push(dot);}
   const smokeMap=glowTexture();const smoke=[];
   for(const d of decorations)for(let i=0;i<3;i++){const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:smokeMap,color:'#aeb9a7',transparent:true,opacity:.3,depthWrite:false}));scene.add(sprite);smoke.push({sprite,d,phase:i/3});}
-  let width=1,height=1,lastFrame=0,lastPowered=null,frame=0;
+  let width=1,height=1,lastFrame=0,lastPowered=null,frame=0,activeRegion=null,activeRegionId='plaza';
   function resize(){width=innerWidth;height=innerHeight;renderer.setSize(width,height,false);const aspect=width/height;const h=aspect<.8?26:aspect<1.25?25:25;camera.left=-h*aspect/2;camera.right=h*aspect/2;camera.top=h/2;camera.bottom=-h/2;camera.updateProjectionMatrix();}
   window.addEventListener('resize',resize);resize();
   function canWalk(x,z,powered){
+    if(activeRegion)return activeRegion.canWalk(x,z);
     if(!Number.isFinite(x)||!Number.isFinite(z))return false;
     if(x< -12.4||x>22.4||z< -6.1||z>12.2)return false;
     if(x>12.15&&x<20.55&&(!powered||z<1.75||z>4.05))return false;
@@ -251,14 +255,24 @@ export function createWorld(canvas) {
   const viewRight=new THREE.Vector3(cameraOffset.z,0,-cameraOffset.x).normalize();
   const viewDown=new THREE.Vector3(cameraOffset.x,0,cameraOffset.z).normalize();
   function update(time,dt,state,moving,dir){
+    if(activeRegion){
+      const focus=new THREE.Vector3(state.player[0]*.52,1.4,state.player[1]*.42);
+      if(width/height<.8)focus.set(state.player[0]*.88,1.2,state.player[1]*.83-1);
+      cameraFocus.lerp(focus,1-Math.exp(-dt*2));camera.position.copy(cameraFocus).add(cameraOffset);camera.lookAt(cameraFocus);camera.zoom=THREE.MathUtils.damp(camera.zoom,1,3,dt);camera.updateProjectionMatrix();
+      activeRegion.update(time,dt,state,moving,dir,camera,screenPoint,viewRight,viewDown);renderer.render(scene,camera);return;
+    }
     const powered=state.returnRepaired&&state.switchClosed;
     targets.find(t=>t.id==='return').name=state.returnRepaired?'La unión de cobre':'Un puente partido';
     targets.find(t=>t.id==='bridge').name=state.verified?'Cruzar el puente':'Hacia La Calzada';
     if(powered!==lastPowered){strap.visible=state.returnRepaired;for(const lamp of lamps)lamp.material.color.set(powered?'#ffe0a1':'#a0aa7e');for(const glow of glows)glow.visible=powered;for(const p of windowLights)p.material.opacity=powered?.63:.08;for(const wire of liveWires)wire.material.color.set(powered?'#dcb370':'#9b8861');lastPowered=powered;}
     strap.visible=state.returnRepaired;switchPivot.rotation.z=THREE.MathUtils.damp(switchPivot.rotation.z,state.switchClosed?0:.95,12,dt);
     player.sprite.position.set(state.player[0],.98+(moving?Math.sin(time*13)*.026:0),state.player[1]);player.shadow.position.set(state.player[0],.065,state.player[1]);
-    if(moving){frame=Math.floor(time*8)%4;lastFrame=dir.z<-.1?4:0;}else frame=0;player.sprite.material.map=player.maps[lastFrame+frame];player.sprite.material.rotation=moving?Math.sin(time*9)*.018:0;
-    ohm.sprite.material.color.set(powered?'#fff6d9':'#9ca38e');ohm.sprite.position.y=1.85+(powered?Math.sin(time*2)*.028:0);
+    if(moving){frame=Math.floor(time*8)%4;const h=dir.dot(viewRight),v=dir.dot(viewDown);lastFrame=Math.abs(h)>Math.abs(v)?h>0?12:8:v<0?4:0;}else frame=0;player.sprite.material.map=player.maps[lastFrame+frame];player.sprite.material.rotation=moving?Math.sin(time*9)*.018:0;
+    apprentice.sprite.visible=apprentice.shadow.visible=!!state.arc?.faro.verified;
+    fountainFlow.visible=!!state.arc?.calzada.on&&!!state.arc?.calzada.repaired;fountainFlow.scale.x=1+Math.sin(time*6)*.1;
+    if(state.lessonTime!==undefined){const t=state.lessonTime,walk=t<6?Math.min(1,t/2):Math.max(0,1-(t-6)/2);edda.sprite.position.x=THREE.MathUtils.lerp(3.1,-1.6,walk);edda.sprite.position.z=THREE.MathUtils.lerp(3.2,2.7,walk);edda.shadow.position.set(edda.sprite.position.x,.065,edda.sprite.position.z);edda.sprite.material.map=edda.maps[t<2?8+Math.floor(time*8)%4:t>6?12+Math.floor(time*8)%4:4];}
+    else{edda.sprite.position.x=3.1;edda.sprite.position.z=3.2;edda.shadow.position.set(3.1,.065,3.2);edda.sprite.material.map=edda.maps[0];}
+    ohm.sprite.material.color.set(powered||state.crossed?'#fff6d9':'#9ca38e');ohm.sprite.position.y=1.85+(powered||state.crossed?Math.sin(time*2)*.028:0);
     edda.sprite.position.y=.98+Math.sin(time*1.8)*.018;lumen.sprite.position.y=.98+Math.sin(time*1.4)*.014;
     const targetFocus=new THREE.Vector3(THREE.MathUtils.clamp(state.player[0]*.52,-3.4,12),1.2,THREE.MathUtils.clamp(state.player[1]*.42,-1.7,4));
     if(width/height<.8){targetFocus.set(state.player[0]*.88,1.2,state.player[1]*.83-1);}
@@ -278,5 +292,17 @@ export function createWorld(canvas) {
     renderer.render(scene,camera);
   }
   renderer.shadowMap.needsUpdate=true;
-  return {renderer,scene,camera,player,targets,canWalk,groundPoint,screenPoint,viewRight,viewDown,update,pointer};
+  const plazaObjects=scene.children.filter(o=>!o.isLight&&o!==sun.target);
+  function setRegion(id,position){
+    if(id===activeRegionId)return;
+    if(activeRegion){scene.remove(activeRegion.group);activeRegion.dispose();activeRegion=null;}
+    activeRegionId=id;for(const o of plazaObjects)o.visible=id==='plaza';
+    lastPowered=null;pointer.visible=false;
+    if(id!=='plaza'){activeRegion=createRegionScene(id);scene.add(activeRegion.group);}
+    const night=id==='faro',warm=id==='forja';scene.background.set(night?'#23384d':warm?'#b0b4a0':'#94b1b0');scene.fog.color.copy(scene.background);
+    ambient.color.set(night?'#8faabe':'#d6e5d9');ambient.groundColor.set(night?'#405967':'#67745c');ambient.intensity=night?1.25:1.65;
+    sun.color.set(night?'#abc6d3':warm?'#ffe0b6':'#ffddb0');sun.intensity=night?.8:2.45;
+    cameraFocus.set(position[0]*.52,1.2,position[1]*.42);renderer.shadowMap.needsUpdate=true;
+  }
+  return {renderer,scene,camera,player,get targets(){return activeRegion?activeRegion.targets:targets;},canWalk,groundPoint,screenPoint,viewRight,viewDown,update,pointer,setRegion};
 }

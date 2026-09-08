@@ -1,19 +1,50 @@
 import './style.css';
+import './journey.css';
 import * as THREE from 'three';
 import { createWorld } from './world.js';
 import { character } from './art.js';
 import { initialState, transition, electricalState, readSave, SAVE_KEY } from './circuit.js';
+import { arcAction, machineReading, accessible, journeyReady, REGIONS } from './arc-state.js';
+import { JOURNEY } from './journey.js';
+import { apparatusView } from './apparatus.js';
 
 const $ = id => document.getElementById(id);
 let state;
 try { state = readSave(localStorage.getItem(SAVE_KEY)); } catch { state = initialState(); }
 const world = createWorld($('world'));
+world.setRegion(state.arc.region,state.player);
 if (!world.canWalk(...state.player,electricalState(state).closed)) state.player = [-6,7];
 let modal = null, nearest = null, walking = [], pendingTarget = null, toastTimer, saveTimer = 0;
 let lastTime = performance.now(),elapsed = 0,active = true,failedSwitch = false;
 const keys = new Set(), stick = {x:0,y:0}, direction = new THREE.Vector3();
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const frames=[];
+let travelToken=0,ribbonTimer;
+const mechanism=apparatusView($('machine'),()=>state.arc,(region,action,value)=>{state.arc=arcAction(state.arc,region,action,value);save();updateUI();tone(240,.08,.025);},region=>{
+  state.arc=arcAction(state.arc,region,'verify');save();updateUI();setModal(null);chime(true);const j=JOURNEY[region];
+  showDialog(j.speaker,j.npc,j.after,[{label:region==='faro'?'Volver a la plaza':'Volver al camino',action:()=>{setModal(null);if(region==='faro')travel('plaza');}}, {label:'Anotar la experiencia',action:openJournal}]);
+},()=>setModal(null));
+
+function travel(region,fromMap=false){
+  if(!accessible(state.arc,region,state.crossed)){toast('Primero hay una reparación que completar en el camino.');return;}
+  const firstVisit=!state.arc.visited.includes(region),token=++travelToken;
+  setModal('travel');$('fade').style.opacity='1';
+  setTimeout(()=>{
+    if(token!==travelToken)return;
+    const old=state.arc.region;state.arc.region=region;if(firstVisit)state.arc.visited.push(region);
+    state.player=region==='plaza'?[6.5,4.5]:REGIONS.indexOf(old)>REGIONS.indexOf(region)?[7,6]:[...JOURNEY[region].spawn];
+    world.setRegion(region,state.player);rebuildLabels();frames.length=0;save();setModal(null);updateUI();$('fade').style.opacity='0';
+    $('region-ribbon').querySelector('p').textContent=JOURNEY[region].chapter;$('region-ribbon').querySelector('h2').textContent=JOURNEY[region].title;$('region-ribbon').hidden=false;clearTimeout(ribbonTimer);ribbonTimer=setTimeout(()=>$('region-ribbon').hidden=true,2200);
+    if(firstVisit&&region!=='plaza')showDialog('EN EL CAMINO','player',JOURNEY[region].arrival);
+    else if(region==='plaza'&&state.arc.faro.verified&&!state.arc.complete)toast('Edda espera junto a la fuente. Esta vez, quiere mostrarte algo.');
+  },280);
+}
+function openMap(){
+  if(state.lessonTime!==undefined){toast('Edda está haciendo la demostración. El camino puede esperar un momento.');return;}
+  setModal('map');$('map-places').replaceChildren();
+  for(const region of REGIONS){const button=document.createElement('button'),j=JOURNEY[region],allowed=accessible(state.arc,region,state.crossed);button.disabled=!allowed;button.setAttribute('aria-current',String(state.arc.region===region));button.textContent=j.name;const label=document.createElement('span');label.textContent=state.arc.region===region?'ESTÁS ACÁ':state.arc[region]?.verified?'REPARACIÓN COMPARTIDA':state.arc.visited.includes(region)?'CAMINO CONOCIDO':allowed?'CAMINO ABIERTO':'POR DESCUBRIR';button.append(label);button.onclick=()=>travel(region,true);$('map-places').append(button);}
+}
+$('map-button').onclick=()=>modal==='map'?setModal(null):openMap();$('map-close').onclick=()=>setModal(null);
 
 // Quiet, synthesized ambient sound: no downloads, samples, or external services.
 let audioContext, master, audioOn=false, musicTimer, ambientSources=[];
@@ -43,11 +74,11 @@ function dispatch(action){const before=state.awakened;state=transition(state,act
 function toast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,4400);}
 function setModal(value){
   modal=value;keys.clear();stick.x=stick.y=0;walking=[];pendingTarget=null;$('joystick-knob').style.transform='';
-  for(const id of ['dialog','journal','pause'])$(id).hidden=value!==id;
+  for(const id of ['dialog','journal','pause','machine','map'])$(id).hidden=value!==id;
   $('prompt').hidden=true;
   if(value==='pause'&&master)master.gain.setTargetAtTime(.05,audioContext.currentTime,.1);
   if(value===null&&master&&audioOn)master.gain.setTargetAtTime(.35,audioContext.currentTime,.2);
-  if(value)requestAnimationFrame(()=>$(value).querySelector('button')?.focus({preventScroll:true}));
+  if(value)requestAnimationFrame(()=>$(value)?.querySelector('button')?.focus({preventScroll:true}));
   else $('world').focus({preventScroll:true});
 }
 let dialogPages=[],dialogIndex=0,dialogEnd=null;
@@ -65,13 +96,27 @@ function showDialogPage(){
 const closeChoice={label:'Volver a la plaza',action:()=>setModal(null)};
 function interact(id){
   if(modal||!state.started)return;
+  const region=state.arc.region;
+  if(region!=='plaza'){
+    const j=JOURNEY[region],s=state.arc[region],r=machineReading(state.arc,region);
+    if(id==='machine'){setModal('machine');mechanism.open(region);return;}
+    if(id==='resident'){showDialog(j.speaker,j.npc,s.verified?j.after:j.before,s.verified&&region==='faro'?[{label:'Volver a la plaza',action:()=>travel('plaza')},closeChoice]:null);return;}
+    if(id==='clue'){showDialog('LAS MARCAS DEL OFICIO','ohm',j.clue);return;}
+    if(id==='memory'){showDialog('LO QUE QUEDÓ A LA VISTA','player',[j.observation]);return;}
+    if(id==='previous'){travel(j.previous);return;}
+    if(id==='next'){
+      if(!s.verified||!r.ready){showDialog(j.speaker,j.npc,[!s.verified?'Antes de seguir, probemos la reparación juntos. Tiene que funcionar con su carga conectada.':'Antes de irte, dejá el mecanismo en funcionamiento. Ya sabemos cómo hacerlo.']);return;}
+      travel(j.next||'plaza');return;
+    }
+    return;
+  }
   const powered=electricalState(state).closed;
   if(id==='ohm'){
     if(!state.awakened){dispatch('inspect');showDialog('UN AUTÓMATA EN SILENCIO','ohm',[
       'La placa dice «Ohm». Alguien pulió las letras hace poco. Los ojos siguen apagados.',
       'Dos cables llegan al pedestal: uno viene de la pila; el otro rodea la base y termina en un puente de cobre partido. La rotura brilla entre los bordes verdes.'
     ]);}
-    else if(!powered)showDialog('OHM','ohm',['La luz de sus ojos se apaga cuando levantás la palanca. El recorrido volvió a quedar abierto.']);
+    else if(!powered)showDialog('OHM','ohm',state.crossed?['Mi celda conserva la carga del viaje. Esta palanca abre el circuito de las lámparas; ahora tengo mi propia fuente.']:['La luz de sus ojos se apaga cuando levantás la palanca. El recorrido volvió a quedar abierto.']);
     else if(!state.verified)showDialog('OHM','ohm',[
       '…Continuidad restablecida. Cuarenta años sin una conversación nueva. Eso explica el polvo.',
       'Antes había energía en la pila. Ahora también hay corriente por mi circuito. ¿Qué cambió entre las dos observaciones?'
@@ -79,6 +124,9 @@ function interact(id){
     else showDialog('OHM','ohm',['Dato nuevo: alguien se quedó a comprobar la reparación. Me parece un buen comienzo.','La Calzada está del otro lado del puente. Lumen dice que allí también dejaron de responder las cosas.']);
   }
   if(id==='edda'){
+    if(state.arc.faro.verified&&!state.arc.complete&&!journeyReady(state.arc)){const pending=REGIONS.slice(1).find(r=>!state.arc[r].verified||!machineReading(state.arc,r).ready);showDialog('EDDA','edda',[`Antes de empezar, dejemos funcionando lo que vamos a contar. En ${JOURNEY[pending].name} todavía hay un mecanismo pendiente de comprobar.`,`La bitácora conserva lo que probamos. Podemos volver, repetirlo y después mostrarlo acá.`]);return;}
+    if(state.arc.faro.verified&&!state.arc.complete){showDialog('EDDA','edda',['Lumen me pidió que se lo explique a alguien que no estuvo cuando llegaste. ¿Te quedás a mirar?','Esta vez no me digas dónde está la falla. Quiero mostrarle qué cambia cuando el camino se abre.'],[{label:'Observar la primera clase',action:()=>{setModal('lesson');state.lessonTime=0;state.switchClosed=true;toast('Edda se acerca a la palanca. Su aprendiz sigue los dos cables.');}}]);return;}
+    if(state.arc.complete){showDialog('EDDA','edda',['Ahora sabemos por dónde empezar. Y si aparece algo distinto, sabemos qué comparar.','No volvió solamente la luz. Volvió la pregunta.']);return;}
     dispatch('edda');
     showDialog('EDDA','edda',state.verified?['Pensé que la pila se había gastado. Estaba siguiendo un solo cable.','Dejá la unión a la vista. Quiero probar la palanca yo también… y después mostrársela a Lumen.']:state.awakened?['¡Se movió! Esperá… no cambiamos la pila. Entonces era el recorrido.','Preguntale qué pudo observar. Quiero estar segura antes de contarlo.']:['Lo limpiamos todas las semanas. Lumen dice que antes saludaba a quien cruzaba la plaza.','Yo pensé en cambiar la pila. Pero él la probó en el taller y todavía sirve. ¿Vos qué mirarías?']);
   }
@@ -103,8 +151,9 @@ function interact(id){
     else toast(state.returnRepaired?'Al abrir el camino, la corriente se interrumpe.':'La palanca deja separados sus contactos.');
   }
   if(id==='source')showDialog('LA PILA DEL TALLER','player',['Dos bornes, dos cables. Una marca grabada distingue el positivo del negativo.','La etiqueta de Lumen dice «probada». La pila puede dar energía, pero eso solo no alcanza para que Ohm responda.']);
-  if(id==='fountain')showDialog('LA FUENTE','player',['El borde tiene surcos de baldes y manchas de agua. Alguien sigue dejando un vaso de lata al alcance de los chicos.','Ohm volvió a tener un camino. El agua todavía no. El conducto sigue hacia La Calzada.']);
+  if(id==='fountain')showDialog('LA FUENTE','player',machineReading(state.arc,'calzada').ready?['El agua vuelve a tocar las mismas piedras. Los surcos de los baldes siguen ahí.','Ahora el vaso de lata puede llenarse en la plaza. Una reparación del otro lado del canal cambió una costumbre de este lado.']:['El borde tiene surcos de baldes y manchas de agua. Alguien sigue dejando un vaso de lata al alcance de los chicos.',state.arc.calzada.verified?'La bomba del manantial está detenida. El conducto trae hasta acá sus consecuencias.':'El conducto sigue hacia La Calzada. El silencio de la fuente también tiene un camino.']);
   if(id==='bridge'){
+    if(state.crossed){travel('calzada');return;}
     if(!state.awakened)showDialog('EL PUENTE DE LA CALZADA','player',['Desde aquí se ve el camino que sigue el canal. Antes de irte, el autómata de la plaza merece una segunda mirada.']);
     else if(!powered)showDialog('EL PUENTE DE LA CALZADA','player',['La plaza volvió a quedar apagada. Dejá cerrado el recorrido para que Ohm pueda acompañarte.']);
     else if(!state.verified)showDialog('EDDA','edda',['Antes de irnos, hablá con Ohm. Quiero entender qué acabamos de cambiar.']);
@@ -114,12 +163,14 @@ function interact(id){
     dispatch('cross');showDialog('LA PREGUNTA VUELVE','edda',[
       'Lumen ya está dibujando la unión en un pedazo de papel. Me pidió que le muestre cómo supimos dónde mirar.',
       'Andá. Esta vez, si vuelve a apagarse, no vamos a empezar de cero.'
-    ],[{label:'Seguir explorando la plaza',action:()=>{setModal(null);toast('Primer encuentro completo · la historia continúa hacia La Calzada.');}}, {label:'Leer lo que aprendimos',action:()=>{setModal(null);openJournal();}}]);
+    ],[{label:'Seguir hacia La Calzada',action:()=>travel('calzada')},{label:'Seguir explorando la plaza',action:()=>setModal(null)}, {label:'Leer lo que aprendimos',action:()=>{setModal(null);openJournal();}}]);
   }
 }
 function updateUI(){
+  const j=JOURNEY[state.arc.region];$('chapter-title').textContent=j.title;$('chapter-caption').textContent=j.chapter;$('location-label').textContent=`${j.name.toUpperCase()} · OHMDAL`;
   $('arrival').hidden=state.started;document.body.classList.toggle('arriving',!state.started);
-  $('objective').textContent=state.crossed?'Una reparación que otros pueden repetir.':state.verified?'Seguí el canal hacia La Calzada.':state.awakened?'Ohm tiene algo que decir.':state.returnRepaired?'El camino está unido. Probá la palanca.':state.hasStrap?'La tira de cobre puede cubrir la rotura.':state.inspected?'Buscá a Lumen bajo el toldo del taller.':'Un autómata espera junto a la fuente.';
+  if(state.arc.region!=='plaza'){$('objective').textContent=state.arc[state.arc.region].verified?state.arc.region==='faro'?'Volvé a la plaza para escuchar a Edda.':`El camino hacia ${JOURNEY[j.next].name} está abierto.`:machineReading(state.arc,state.arc.region).ready?j.done:j.objective;return;}
+  $('objective').textContent=state.arc.complete?'La luz volvió. La pregunta quedó en otras manos.':state.arc.faro.verified?'Edda quiere mostrarte la primera clase.':state.crossed?'El camino hacia La Calzada está abierto.':state.verified?'Seguí el canal hacia La Calzada.':state.awakened?'Ohm tiene algo que decir.':state.returnRepaired?'El camino está unido. Probá la palanca.':state.hasStrap?'La tira de cobre puede cubrir la rotura.':state.inspected?'Buscá a Lumen bajo el toldo del taller.':'Un autómata espera junto a la fuente.';
 }
 function openJournal(){
   setModal('journal');const entries=[];
@@ -129,12 +180,14 @@ function openJournal(){
   if(state.awakened)entries.push(['03 · Un camino de ida y vuelta','Con la unión reparada y la palanca cerrada, Ohm respondió. Si abrimos la palanca, la corriente se interrumpe. La pila sigue siendo la misma.','pila ─── Ohm ─── regreso ↩']);
   if(state.verified)entries.push(['Lo que ahora podemos nombrar','Un circuito cerrado permite que circule corriente. La fuente aporta energía; el recorrido tiene que volver a ella. No basta con conectar un solo cable.','']);
   if(state.crossed)entries.push(['La primera explicación compartida','Edda se queda para mostrarle a Lumen el recorrido. La reparación deja de depender de quien llegó de afuera.','']);
+  for(const region of REGIONS.slice(1))if(state.arc[region].verified)entries.push([...JOURNEY[region].journal,'']);
+  if(state.arc.complete)entries.push(['La primera clase','Edda abrió el circuito, dejó observar el cambio y volvió a cerrarlo. Su aprendiz pudo seguir la corriente de ida y vuelta. Una reparación que otros pueden explicar ya no depende de quien llegó de afuera.','']);
   $('journal-entries').replaceChildren();for(const [title,body,sketch]of entries){const entry=document.createElement('div');entry.className='journal-entry';const h=document.createElement('h3');h.textContent=title;const p=document.createElement('p');p.textContent=body;entry.append(h,p);if(sketch){const s=document.createElement('div');s.className='sketch';s.textContent=sketch;entry.append(s);}$('journal-entries').append(entry);}
 }
 $('journal-button').onclick=()=>modal==='journal'?setModal(null):openJournal();$('journal-close').onclick=()=>setModal(null);
 $('pause-button').onclick=()=>modal==='pause'?setModal(null):setModal('pause');$('resume-button').onclick=()=>setModal(null);
 let resetArmed=false;
-$('reset-button').onclick=()=>{if(!resetArmed){resetArmed=true;$('reset-button').textContent='Borrar este recorrido y comenzar';return;}state=initialState();failedSwitch=false;resetArmed=false;$('reset-button').textContent='Comenzar un recorrido nuevo';save();setModal(null);updateUI();};
+$('reset-button').onclick=()=>{if(!resetArmed){resetArmed=true;$('reset-button').textContent='Borrar este recorrido y comenzar';return;}travelToken++;state=initialState();world.setRegion('plaza',state.player);rebuildLabels();failedSwitch=false;resetArmed=false;$('reset-button').textContent='Comenzar un recorrido nuevo';save();setModal(null);updateUI();};
 $('begin-button').onclick=()=>{dispatch('start');$('world').focus();toast('Acercate al autómata, o hablá con Edda.');};
 $('interact-button').onclick=()=>nearest&&interact(nearest.id);
 
@@ -180,9 +233,10 @@ $('world').addEventListener('pointerup',e=>{
   else{const p=world.groundPoint(e.clientX,e.clientY);if(p)routeTo(p.x,p.z);}
 });
 document.addEventListener('keydown',e=>{
-  if(e.code==='Tab'&&modal){const controls=[...$(modal).querySelectorAll('button:not(:disabled)')];if(controls.length){const first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}return;}
+  if(e.code==='Tab'&&modal&&$(modal)){const controls=[...$(modal).querySelectorAll('button:not(:disabled),input')];if(controls.length){const first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}return;}
   if(e.code==='Escape'){e.preventDefault();if(!state.started)return;setModal(modal?null:'pause');return;}
   if(e.code==='KeyB'&&state.started){e.preventDefault();if(!e.repeat){if(modal==='journal')setModal(null);else if(!modal)openJournal();}return;}
+  if(e.code==='KeyM'&&state.started&&!e.repeat){e.preventDefault();if(modal==='map')setModal(null);else if(!modal)openMap();return;}
   if(modal||!state.started)return;
   if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE'].includes(e.code)){e.preventDefault();if(!e.repeat&&(e.code==='KeyE'||e.code==='Space')){if(nearest)interact(nearest.id);}else keys.add(e.code);}
 });
@@ -195,12 +249,12 @@ joystick.addEventListener('pointerdown',e=>{if(modal)return;e.preventDefault();s
 joystick.addEventListener('pointermove',e=>{if(e.pointerId===stickPointer)moveStick(e);});
 for(const event of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(event,()=>{stickPointer=null;stick.x=stick.y=0;$('joystick-knob').style.transform='';});
 
-const labels=new Map();for(const t of world.targets){const el=document.createElement('div');el.className='world-label';el.innerHTML='<span class="marker"></span><small></small>';el.querySelector('small').textContent=t.name;$('world-labels').append(el);labels.set(t.id,el);}
+const labels=new Map();function rebuildLabels(){labels.clear();$('world-labels').replaceChildren();for(const t of world.targets){const el=document.createElement('div');el.className='world-label';el.innerHTML='<span class="marker"></span><small></small>';el.querySelector('small').textContent=t.name;$('world-labels').append(el);labels.set(t.id,el);}}rebuildLabels();
 function updateLabels(){
   nearest=null;let best=Infinity;
   for(const t of world.targets){const d=Math.hypot(state.player[0]-t.x,state.player[1]-t.z);if(d<t.range&&d<best){nearest=t;best=d;}}
   for(const t of world.targets){
-    const important=t.id===(state.verified?'bridge':state.awakened?'ohm':state.returnRepaired?'switch':state.hasStrap?'return':state.inspected?'lumen':'ohm');
+    const important=t.id===(state.arc.region!=='plaza'?state.arc[state.arc.region].verified?'next':'machine':state.arc.faro.verified?'edda':state.verified?'bridge':state.awakened?'ohm':state.returnRepaired?'switch':state.hasStrap?'return':state.inspected?'lumen':'ohm');
     const visible=state.started&&!modal&&(nearest?.id===t.id||important);
     const label=labels.get(t.id);label.hidden=!visible;if(visible){const p=world.screenPoint(t.x,t.y,t.z);const offLeft=p.x<65,offRight=p.x>innerWidth-65;label.style.left=`${Math.max(65,Math.min(innerWidth-65,p.x))}px`;label.style.top=`${Math.max(230,Math.min(innerHeight-190,p.y))}px`;label.style.opacity=nearest?.id===t.id?'1':'.78';label.querySelector('small').textContent=`${offLeft?'← ':''}${t.id==='ohm'&&state.awakened?'Ohm':t.name}${offRight?' →':''}`;}
   }
@@ -212,7 +266,7 @@ function tick(now){
   const rawDt=(now-lastTime)/1000,dt=Math.min(rawDt,.05);lastTime=now;elapsed+=dt;
   if(rawDt>0&&rawDt<.5){frames.push(rawDt*1000);if(frames.length>600)frames.shift();}
   let moving=false;direction.set(0,0,0);
-  if(state.started&&!modal){
+  if(state.started&&!modal&&state.lessonTime===undefined){
     const dx=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+stick.x;
     const dz=(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-(keys.has('KeyW')||keys.has('ArrowUp')?1:0)+stick.y;
     if(Math.hypot(dx,dz)>.12){walking=[];pendingTarget=null;world.pointer.visible=false;direction.copy(world.viewRight).multiplyScalar(dx).addScaledVector(world.viewDown,dz).normalize();}
@@ -225,11 +279,17 @@ function tick(now){
     }
   }
   saveTimer+=dt;if(saveTimer>2){save();saveTimer=0;}
-  if(!modal&&state.verified&&!state.crossed&&state.player[0]>20.4&&Math.abs(state.player[1]-2.9)<1.5)interact('calzada');
+  if(state.lessonTime!==undefined&&(!modal||modal==='lesson')){
+    const before=state.lessonTime;state.lessonTime+=dt;
+    if(before<2.4&&state.lessonTime>=2.4){state.switchClosed=false;toast('La palanca abre el camino. Las lámparas del circuito se apagan.');}
+    if(before<5.5&&state.lessonTime>=5.5){state.switchClosed=true;toast('Edda cierra el recorrido. La misma pila; una consecuencia distinta.');chime(true);}
+    if(state.lessonTime>=8){delete state.lessonTime;state.arc.complete=true;state.switchClosed=true;save();updateUI();showDialog('EDDA','edda',['No le dije qué tenía que contestar. Le mostré algo que podía cambiar, y esperamos a ver qué pasaba.','En el taller ya guardaron el dibujo de la unión. En el faro, Nereo dejó la calibración al lado de la manivela.','No volvió solamente la luz. Volvió la pregunta.'],[{label:'Seguir habitando Ohmdal',action:()=>setModal(null)},{label:'Leer la bitácora del viaje',action:openJournal}]);}
+  }
+  if(state.arc.region==='plaza'&&!modal&&state.verified&&!state.crossed&&state.player[0]>20.4&&Math.abs(state.player[1]-2.9)<1.5)interact('calzada');
   world.update(reducedMotion?0:elapsed,dt,state,moving,direction);updateLabels();
 }
 updateUI();requestAnimationFrame(tick);
 // Read-only observability for reproducible visual and interaction checks.
 Object.defineProperty(window,'__ohmdal',{value:Object.freeze({
-  snapshot(){const sorted=[...frames].sort((a,b)=>a-b);return{state:structuredClone(state),modal,nearest:nearest?.id||null,walking:walking.length,electrical:electricalState(state),render:{calls:world.renderer.info.render.calls,triangles:world.renderer.info.render.triangles,textures:world.renderer.info.memory.textures,frameMsMedian:sorted[Math.floor(sorted.length*.5)]||0,frameMsP95:sorted[Math.floor(sorted.length*.95)]||0,samples:sorted.length,pixelRatio:world.renderer.getPixelRatio()},targets:world.targets.map(t=>({...t,screen:world.screenPoint(t.x,t.y*.65,t.z)}))};}
+  snapshot(){const sorted=[...frames].sort((a,b)=>a-b);return{state:structuredClone(state),modal,nearest:nearest?.id||null,walking:walking.length,electrical:electricalState(state),machine:machineReading(state.arc,state.arc.region),render:{calls:world.renderer.info.render.calls,triangles:world.renderer.info.render.triangles,textures:world.renderer.info.memory.textures,frameMsMedian:sorted[Math.floor(sorted.length*.5)]||0,frameMsP95:sorted[Math.floor(sorted.length*.95)]||0,samples:sorted.length,pixelRatio:world.renderer.getPixelRatio()},targets:world.targets.map(t=>({...t,screen:world.screenPoint(t.x,t.y*.65,t.z)}))};}
 }),writable:false});

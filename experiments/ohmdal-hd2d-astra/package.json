@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 54322 --strictPort",
     "build": "vite build",
-    "test": "node --test circuit.test.js",
+    "test": "node --test circuit.test.js arc-state.test.js",
     "qa:desktop": "node qa.mjs",
-    "qa:touch": "node qa.mjs --mobile"
+    "qa:touch": "node qa.mjs --mobile",
+    "qa:arc": "node qa-arc.mjs",
+    "qa:arc:touch": "node qa-arc.mjs --mobile"
   },
   "dependencies": { "three": "0.177.0" },
   "devDependencies": { "vite": "6.4.3", "playwright": "1.62.1" }
