@@ -31,6 +31,27 @@ open_questions:
 
 ## Auditoría AAA — primera entrega, 2026-09-08
 
+### Corrección autoral durante la ejecución: metrópolis interior
+
+Manuel precisó que imaginaba **una ciudad dentro del microcontrolador**, una
+metrópolis saturada de movimiento, vida y caos, vista cenital como el primer GTA,
+con colores saturados y un tono neocyberpunk. Esta instrucción posterior
+**reemplaza la elección del diorama cálido** documentada abajo. Esa comparación
+se conserva como evidencia del camino rechazado, no como dirección vigente.
+
+**D09 — dirección vigente:** ciudad cenital densa, dentro del encapsulado;
+avenidas/buses, manzanas de memoria y núcleos de procesamiento, puertos en el
+perímetro y flujos intensos. Cian, magenta, violeta y ámbar saturados sobre silicio
+oscuro. La cámara se habita a escala urbana; la lectura global del chip es un
+encuadre secundario. Se admite neocyberpunk por instrucción expresa, evitando
+que la lógica electrónica se vuelva una textura de fondo.
+
+El fallo de la primera dirección fue de fantasía: la placa era legible pero
+demasiado escasa y quieta para la metrópolis imaginada. No se corrige agregando
+temario. Se rehace la presentación del mismo fixture P0 y se mantiene la
+separación de simulación. Las mediciones anteriores corresponden al diorama;
+la densidad nueva requiere nueva evidencia antes de extrapolar rendimiento.
+
 Lectura completa: master prompt; después AGENTS raíz, AGENTS Bitland, pilares,
 lenguaje de diseño, política vigente, GDD v2 completo, visión, metáfora,
 lenguaje jugable, automatización, gramática, progresión, narrativa, Arco I,
@@ -63,17 +84,34 @@ Los dos documentos nuevos provienen de `origin/docs/bitland-aaa-master-gdd`
 | ID | Decisión | Razón / reversibilidad |
 |---|---|---|
 | D01 | Un solo distrito Boot Yard con borde GPIO y dispositivo externo | Recorrer causa completa sin diluir foco; reversible |
-| D02 | Diorama electrónico cálido como dirección a contrastar | Materiales PCB y encanto; debe ganar prueba de estados |
-| D03 | Proyección axonométrica estable; vista de sistema y foco contextual | Evita rotación que cambie lectura de rutas; zoom no cambia semántica |
+| D02 | Diorama cálido, descartado por D09 | Legible pero escaso, distante y demasiado quieto para la intención autoral |
+| D03 | Axonometría reemplazada por cenital en D09 | Vista urbana y paneo; vista global del microcontrolador opcional |
 | D04 | Null: contorno marfil y centro ausente; courier compacto cobre | Siluetas separadas sin glitch ni caras que sugieran deliberación |
 | D05 | Tick lógico, interpreter puro, traza factual, snapshots completos | Renderer es proyección; rewind restaura también colas y entradas |
 | D06 | Validación por entregas, seguridad y terminación observadas | Aceptar espera extra y repetición literal cuando funcionan |
 | D07 | P0 autorizado; P1 condicionado por cards | Ningún renderer elegido por preferencia ni campaña accidental |
 | D08 | Arte procedural original; audio sintetizado de eventos reales | Sin licencias dudosas ni compras; no sustituye QA de audio |
+| D09 | Metrópolis neocyberpunk dentro del microcontrolador, cenital tipo primer GTA | Corrección expresa de Manuel; cambia dirección de arte y cámara; conserva core y scope |
 
-### Dirección visual y alternativas
+### Dirección visual vigente y dos alternativas rechazadas
 
-Elección de dirección: **diorama electrónico cálido**, placa petróleo, cobre
+**Metrópolis interior cenital.** Silicio azul casi negro, manzanas densas de
+memoria y procesamiento, buses de varias vías, puertos en el perímetro. Cian,
+magenta y violeta saturados para distritos; ámbar y silueta blanca para la cadena
+que el jugador programa. Movimiento continuo visible antes de abrir el programa.
+La cámara permite recorrer la ciudad por paneo, con lectura global opcional.
+La electrónica da función y estructura a la ciudad, no sólo su textura.
+
+Se rechazan **diorama cálido axonométrico** (escala de maqueta, vacío y quietud)
+y **cuento técnico limpio** (se acerca a una lámina explicativa, sin densidad
+urbana). Del primero se conserva causalidad visible; del segundo, claridad de
+silueta. La comparación anterior se documenta abajo como historia de decisión.
+Esta dirección está elegida para continuar P0; el acabado comercial todavía no
+está demostrado. No se declara un gusto autoral como resultado de usuarios.
+
+### Comparación inicial sustituida por D09
+
+Elección inicial descartada: **diorama electrónico cálido**, placa petróleo, cobre
 mate, cerámica marfil, encapsulados tinta, LEDs ámbar. Luz lateral cálida;
 sombra de contacto y caras de paquetes definen altura. El laboratorio tiene
 tono papel; el borde de la placa queda visible para diferenciar GPIO del exterior.
@@ -121,6 +159,232 @@ actual prevalecen esta matriz, v2 y el beat sheet actualizado.
 Desbloqueador de P1: recorrido blind-first y comparación independiente sin
 BLOCKER/MAJOR, evidencia en hardware escolar, decisión de renderer registrada
 y actualización explícita de este gate. Un test automatizado no suplanta personas.
+
+### Arquitectura entregada y límites
+
+`src/experiments/bitland/simulation.ts` no importa motor, DOM, reloj real ni
+aleatoriedad. `tick(previous)` devuelve estado nuevo; orden fijo: entrada
+periódica → entrega FIFO al periférico → una instrucción del courier. Un mensaje
+se crea al entregar, existe durante tres ticks y enciende LED al consumirse.
+El apagado también deja traza. La cola, carga, mensajes y entregas conservan
+identidades: ninguna acción duplica paquetes. 120 fixtures de ambiente son
+presentación neutra sin autoridad en validación ni paquetes de gameplay.
+
+Traza: `{tick, process, instruction, pc, reads, writes, result, detail}`.
+La rama conserva el valor leído, no consulta retrospectivamente el sensor.
+Una espera no borra ciclos completados. Estado incluye programa, PC, carga,
+cola, próximo ID, entregas, mensajes en tránsito, sensor, modo, estado LED y
+deadline, ciclos, halt/fault y presencia de Null. `Machine` retiene 64 snapshots;
+la traza retiene 128 eventos. Rewind restaura la totalidad del estado capturado,
+incluidas entradas, programa y eventos. El historial de edición UI es distinto.
+
+Modos del fixture: una ejecución, tres vueltas, mientras quede entrada y
+repetición permanente. Llegadas periódicas cada 14 ticks, cola máxima 8; si la
+entrada está llena, el productor no emite otra identidad. P0 no modela pérdida
+de entradas externas ni backpressure de red. El patrón vacío con guardia termina
+sin intentar recoger. La espera entre llegadas automáticas es explícita.
+
+`setTimeout` en cada shell pide el siguiente tick; los renderers sólo proyectan
+estado e interpolan. Cambiar FPS nunca salta instrucciones. Foco perdido pausa;
+no simula tiempo transcurrido con la pestaña oculta. El mismo número de steps y
+entradas produce el mismo estado a cualquier cadencia. No hay código textual,
+eval de programas, Python/Lua, persistencia entre sesiones ni telemetría remota.
+
+### Evidencia visual inicial, anterior a la corrección autoral
+
+Se inspeccionaron capturas a tick 8, sensor cerrado, entrega completada, misma
+geometría, 1440×960, y reproducciones touch 390×844. Evidencia regenerable:
+`output/playwright/bitland/{pixi,phaser}-{warm,clean,cinema,touch,accessible}.png`.
+
+Se había elegido **diorama electrónico cálido**; D09 reemplaza esta elección.
+El cobre distingue mejor la ruta y el marfil conserva la silueta hueca de Null.
+El tratamiento limpio se rechaza: en esta implementación la serigrafía y Null
+pierden contraste sobre la placa pálida; conserva mérito como referencia de
+simplificación. El tratamiento cinematográfico se rechaza: las rutas y patas
+se acercan demasiado al valor del sustrato oscuro; se conserva su intención de
+enmarcar el encendido. Son evaluaciones de estas realizaciones, no pruebas de
+que el estilo limpio u oscuro sea universalmente inferior. Los tratamientos
+comparan paleta y contraste sobre un mismo diorama; no son tres pipelines de
+arte final ni una validación de gusto de la audiencia.
+
+Hallazgo de QA visual: el encuadre completo reducía demasiado el courier en
+teléfono. Se agregó foco cercano y alternancia placa/recorrido; también texto
+de ambas ramas bajo la tarjeta IF, altura de barra adaptable y panel scrollable
+con texto aumentado. Un recorrido touch completado no prueba que el mundo sea
+suficientemente legible para baja visión; sigue pendiente el test humano.
+
+### Comparación de renderers sobre el diorama inicial
+
+Baseline común final de simulación: `59b75119` (primer baseline `e0cbc6ab`).
+Ramas separadas `codex/bitland-renderer-a` y `codex/bitland-renderer-b`.
+No imports de renderer entre candidatos. No Phaser Editor. Dependencias
+específicas en paquetes/lockfiles aislados; dependencias raíz sin modificaciones.
+Ambos engines declaran MIT en npm; assets propios procedurales, fuentes del
+sistema, sin material remoto incorporado. No gastos ni compras.
+
+| Criterio | A: PixiJS 8.20.1 | B: Phaser 4.1.0 | Lectura |
+|---|---|---|---|
+| Cámara/composición | Container axonométrico, resize y foco propios | Container + Scene/Scale lifecycle | Misma topología y encuadre |
+| Layering | Graphics / Containers; escena fija y dinámica | Graphics / Container; escena fija y dinámica | P0 evita oclusión de rutas; falta depth sorting general |
+| Animación | interpolación de snapshots | interpolación de snapshots | Ninguno gobierna semántica |
+| DOM/touch | editor accesible independiente | editor equivalente independiente | Recorrido completado en ambos |
+| Bundle | medir suma de todos los chunks JS, no sólo entry | un chunk JS mayor | Ver medición abajo; no ocultar chunks opcionales de A |
+| Mantenimiento | más infraestructura explícita | Scene simplifica ciclo de vida | No hay proyecto grande para extrapolar |
+| Velocidad de desarrollo | no medida con autores independientes | no medida con autores independientes | El mismo implementador es una limitación, no blind review |
+| Production startup | se detectó bloqueo de chunks por await de entrada; corregido con boot async sin await de módulo | inicializa Scene normalmente | QA del build descubre un riesgo que dev no mostró |
+| Tooling | documentación oficial Pixi | documentación oficial Phaser | Sin skills específicas disponibles/cargadas |
+
+Las APIs se contrastaron con [Pixi Application](https://pixijs.com/8.x/guides/components/application)
+y [Phaser Scene lifecycle](https://docs.phaser.io/phaser/concepts/scenes).
+El prototipo sólo demuestra el uso concreto de esas APIs; no declara superioridad general.
+
+**Recomendación técnica provisional del fixture anterior:** Pixi para Graphics + DOM,
+si la medición final de producción mantiene la ventaja de descarga y el playtest
+no muestra desventaja. **Renderer de campaña: sin ratificar.** Phaser conserva
+el candidato reproducible; sus capacidades de Scene no deben descartarse por
+una comparación exclusivamente de bytes.
+
+**Después de D09:** ambos incorporan su propio `metropolis.ts`; conservan el
+renderer del diorama como fuente histórica. Comparten exclusivamente core y
+`metropolis-fixture.ts` (paletas, lotes y trayectoria ambiental sin autoridad).
+La cámara cenital, 120 fixtures y grafo son equivalentes; DOM y renderers se
+implementan por separado. Sigue siendo el mismo autor, no revisión independiente.
+Los resultados del diorama no eligen motor para la metrópolis; sus builds y QA
+se registran por separado de esta revisión.
+
+### Resultado verificable de la iteración metrópolis
+
+Se implementó cámara cenital, paneo con pointer/touch, vista de encapsulado,
+manzanas de células de memoria/procesamiento, 120 vehículos ambientales
+con gráficos reutilizados y calles de ejecución reservadas al courier real.
+El tráfico ambiental usa tiempo de presentación y se congela con movimiento
+reducido; no representa entregas ni altera cola, sensor, programa o GPIO.
+No es todavía una simulación urbana de 120 procesos programables.
+
+El recorrido automatizado de navegador pasa: fallo por paso cerrado, reparación
+con condición, ambas ramas, alternativa con espera, rewind exacto, lotes y
+guardia, cinco entregas con llegada periódica, teclado y ejecución touch a
+390×844 sin overflow. Cero errores de página/consola en el recorrido desktop.
+Capturas actuales: `pixi-metro.png`, `pixi-touch.png`, `pixi-accessible.png`,
+en `output/playwright/bitland/`; log `pixi-metropolis-playtest.txt`.
+
+Muestra local de 180 frames pausados: p50 16.7 ms / p95 17.2 ms,
+1440×960/DPR1, GTX 1660 Ti, 12 hilos lógicos. No mide el presupuesto con
+simulación activa ni demuestra rendimiento escolar. El build de A pasa.
+El diorama anterior en producción activa registró A p95 18 ms, B 33.3 ms;
+CPU throttle 4×: A 116.6 ms, B 516.9 ms, con carga local no controlada.
+Esa muestra falla el presupuesto bajo throttle y no aísla causalidad por engine.
+
+Deuda visual observable: hay repetición geométrica, faltan habitantes con roles
+distintos y animación authored, el teléfono necesita seguimiento de la
+consecuencia exterior y el slice aún no transforma un barrio completo.
+La nueva imagen es una prueba jugable de dirección; no se etiqueta AAA terminado.
+
+La primera grabación sin cortes de D09 (`metropolis-video.txt`) **no pasa**:
+449862 ms de recorrido y LED apagado al cierre. Hubo una entrega real, pero
+la latencia de acciones y captura impide presentarla como prueba de 30 segundos.
+No se aceleró ni recortó para simular aceptación. El script de grabación ahora
+informa explícitamente si excede 33 segundos o termina sin actuador encendido.
+El build B de esa sesión demoró 8m23s; no es una medida controlada de velocidad
+de desarrollo ni evidencia para comparar engines. La primera invocación QA de
+B quedó en `about:blank`; se corrigió la navegación antes de repetir.
+
+### Pruebas implementadas y aceptación
+
+`tests/bitland-simulation.test.ts`: precondiciones de recoger/entregar/mover,
+IF verdadero/falso, fallo por barrera, lotes 0/1/3/5, repetición acotada y
+permanente, terminación, variantes y espera extra válidas, mensajes FIFO,
+conservación de identidades, deadline LED, ciclos, no mutación de entrada,
+replay determinista y rewind exacto. Funciones, locks, permisos, resolución
+hostil de null y scheduling multiagente se difieren a sus slices: **no existen
+tests ficticios de funcionalidades ausentes**.
+
+`scripts/gameplay/playtest-bitland-spikes.js`: recorrido mediante controles DOM
+reales; reproduce bug, lee traza, modifica condición, prueba ambas ramas,
+rebobina, acepta alternativa con espera, deshace edición, termina lote vacío,
+repara guardia de loop y recibe al menos cinco entregas con panel cerrado.
+Comprueba play/pause, activación por teclado, touch real emulado, ausencia de
+overflow horizontal, texto grande/contraste y errores de consola. Es QA guiado,
+no playtest externo ni prueba integral con lector de pantalla.
+
+`scripts/gameplay/profile-bitland-spikes.js`: builds de producción, 180 frames
+activos por muestra, CPU normal y throttle 4×, misma escena. Throttle es proxy
+de CPU, **no simulador de GPU ni prueba de hardware escolar**. Duraciones de
+carga localhost con cache no deben extrapolarse a una conexión escolar.
+
+Checks globales: `npm run build` y `npm test` pasaron. `npm run verify` invocó
+Bash de WSL sin distribución; el mismo `scripts/verificar-hito.sh` pasó mediante
+Git Bash, sin cambios de checks. El script registra TODOs de guion preexistentes
+en otros mundos; no se editaron. Nuevas correcciones del core tienen tests
+dirigidos adicionales. Builds A/B también pasan; warning de tamaño de Phaser
+permanece visible, sin elevar su umbral para esconderlo.
+
+### Accesibilidad / deuda precisa
+
+| Affordance | P0 | Antes de P1 completo |
+|---|---|---|
+| Texto + forma además de color | UI, barrera y estado LED | validar con perfiles visuales |
+| Pausa / step / velocidad / rewind | funcional | remapeo de atajos y 0.25× |
+| Sin drag ni hover obligatorio | selects, botones, DOM | editor espacial con paridad teclado |
+| Texto aumentado / contraste | ajuste y layout inspeccionados | auditoría de contraste WCAG por componente |
+| Reduced motion / efectos simples | preferencia SO y toggle | test humano sensible al movimiento |
+| Subtítulos / equivalente visual de audio | Null textual y estado factual | mezcla, volumen independiente, caption de ambiente |
+| Screen reader | labels, regions, focus, status | recorrido completo con lector real |
+| Localización | vocabulario semántico estable del core; UI española | extraer todas las cadenas UI/trace a catálogos versionados |
+| Touch | objetivo completado a 390×844 | tablet física, targets espaciales y manos distintas |
+
+### Presupuesto y playtest pendiente
+
+Presupuesto propuesto P1: p95 ≤ 20 ms en equipo objetivo a 1440×900/DPR1,
+modo simplificado ≤ 33 ms; JS inicial comprimido ≤ 250 kB; escena ≤ 2 MB de assets
+comprimidos; input visible ≤ 100 ms; cualquier pausa inmediata. Medir GPU, RAM,
+red fría y tiempos de interacción en equipo escolar real antes de cerrar.
+
+Blind-first: mínimo 5 no programadores, 3 programadores, un perfil de
+accesibilidad y 2 reviewers, como evaluación original. No entregar solución
+ni nombrar engine. Contrabalancear orden A/B; registrar qué ruta predicen,
+si encuentran causa en la traza, si usan la variante y si ven consecuencia
+fuera de la placa. Preguntar «¿qué cambió?»; no sugerir «programaste la ciudad».
+No penalizar curiosidad, afecto por Null ni ganas de seguir. P0 dura una prueba
+de interacción, no los 24 min de P1. La grabación es opt-in y no se envía aquí.
+
+### Revisión T1–T9 / decisión de gate
+
+| Test | Evidencia actual | Resultado |
+|---|---|---|
+| T1 mundo ejecutable | courier, carga, mensaje y LED corresponden a estado | demostrado técnicamente en fixture |
+| T2 no editor + fondo | programa controla objeto y recorrido en placa | falta aventura/cámara de P1 y evaluación humana |
+| T3 semántica primero | instrucciones en lenguaje natural, sin código textual | falta onboarding escalonado |
+| T4 error informativo | barrera/trace/carga conservadas | QA pasa |
+| T5 intención humana | procesos sólo ejecutan; Null cita eventos | revisión autoral pendiente de diálogo completo |
+| T6 metáfora honesta | GPIO periférico y modelo lógico separados | revisión pedagógica independiente pendiente |
+| T7 consecuencia | LED exterior consume mensaje real | QA pasa |
+| T8 soluciones abiertas | rodeo + espera, condición y variantes válidas | core + navegador pasan |
+| T9 juego por sí mismo | diorama, humor y circuito funcional | no demostrado por test automatizado |
+
+**Stop del spike: ESCALATE para promoción, no PASS de campaña.** Falta revisión
+independiente y blind-first, hardware escolar y la prueba de fantasía de 30 s
+con observadores. El implementador no firma su propia revisión como independiente.
+Pendiente P1: inmersión desde laboratorio, caminar, staging del mantenedor
+«Última vuelta», animación authored, sonido final, aprendizaje escalonado,
+persistencia y transformación urbana mayor. No se agregó currículo para
+disimular estas carencias. Lore íntegro continúa PROPOSED.
+
+### Continuación reproducible
+
+Desde el worktree coordinador, instalar cada paquete por separado:
+`npm --prefix experiments/bitland-pixi ci` y
+`npm --prefix experiments/bitland-phaser ci`. Luego ejecutar sus scripts `dev`
+(puertos 4311/4312) o `build`. No iniciar en la raíz de otro worktree.
+Para preview, entrar al directorio del candidato y ejecutar
+`node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4313 --strictPort`
+(4314 para B).
+
+Abrir cada URL con Playwright CLI y ejecutar
+`run-code --filename scripts/gameplay/playtest-bitland-spikes.js` desde la raíz
+del coordinador. Crear `output/playwright/bitland/` antes de capturar. El archivo
+es un snippet para CLI, no un test de `@playwright/test`. El profiler usa previews
+4313/4314. Evidencia generada queda en `output/`, fuera de Git.
 
 > Documento de autoridad nivel 4. Diseño de contenido. Define **qué se
 > valida en el primer prototipo de Bitland**, cómo se mide, qué

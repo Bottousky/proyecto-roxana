@@ -23,6 +23,83 @@ open_questions:
 
 # BITLAND — NARRATIVE BIBLE · v1
 
+## Null — biblia de producción AAA (2026-09-08, PROPOSED)
+
+El GDD v2 y el encargo actual sustituyen a PATCH como compañero principal.
+Los pasajes v1 posteriores se conservan como antecedente, no como instrucción
+para reintroducirlo. Null no resuelve puzzles; identifica hechos que el jugador
+ya puede inspeccionar. Máximo una línea por consecuencia distinta; cooldown
+de 12 s, silencio si el jugador reitera el mismo intento. Subtítulos legibles,
+sin voz glitch. P0 usa un subconjunto; la tabla es producción de diálogo para P1+
+y **no** pretende que todos esos conceptos estén ya implementados.
+
+### Veinte reacciones breves, con disparador factual
+
+| ID | Evidencia requerida | Línea |
+|---|---|---|
+| N01 | primera instrucción completada | «Una instrucción. Ninguna suposición.» |
+| N02 | primer PICK con carga | «Ahora sí lleva algo.» |
+| N03 | PICK con cola vacía | «El muelle estaba vacío.» |
+| N04 | DROP con carga ausente | «Llegó. El paquete, no.» |
+| N05 | movimiento bloqueado | «La barrera sigue cerrada.» |
+| N06 | rama verdadera registrada | «El sensor dio sí. Tomó esa calle.» |
+| N07 | rama falsa registrada | «Dio no. El rodeo también llega.» |
+| N08 | sensor cambió después del IF | «Eso cambió después de la lectura.» |
+| N09 | mensaje pendiente en bus | «Salió del puerto. Todavía no llegó.» |
+| N10 | GPIO confirma recepción | «La luz recibió el paquete.» |
+| N11 | dos ciclos, guardia idéntica | «La condición no cambió entre vueltas.» |
+| N12 | loop finaliza con cola vacía | «No queda trabajo. Esta vez terminó.» |
+| N13 | REPEAT acaba con paquete restante | «Quedó uno esperando.» |
+| N14 | rewind restaura carga | «El paquete volvió con ese instante.» |
+| N15 | programa contiene espera ejecutada | «Él esperó. El resto siguió.» |
+| N16 | tres entregas con panel cerrado | «Sigue entregando mientras mirás otra cosa.» |
+| N17 | entrada nueva despierta servicio | «Llegó otro. La rutina seguía instalada.» |
+| N18 | solución alternativa validada | «Otro camino. El mismo destino.» |
+| N19 | cambio de versión aplicado | «Ahora está ejecutando la nueva versión.» |
+| N20 | variable sin inicializar, Arco II | «Esa casilla todavía no tiene un valor.» |
+
+### Ocho chistes de concepto (no anticipar vocabulario)
+
+| ID / alcance | Situación comprobada | Línea / precisión |
+|---|---|---|
+| J01 · P1 | SAY «Última vuelta» es la última instrucción del cuerpo, guardia vuelve true | «No miente. Es la última instrucción. Después vuelve al principio.» |
+| J02 · P1 | faltó una repetición de diez | «Dejó exactamente una para mañana. El programa no menciona mañana.» |
+| J03 · II | owner:null visible | «No soy yo. No todo lo que no tiene dueño soy yo.» |
+| J04 · II | cadena "true" no coincide con booleano en este perfil tipado | «Lo dice. No lo es.» |
+| J05 · IV | ambos leen libre antes de escribir | «Los dos tenían razón. Al mismo tiempo.» |
+| J06 · IV | A posee X/espera Y y B posee Y/espera X | «Están siendo extremadamente pacientes.» |
+| J07 · V | lookup de rutina hostil devuelve null y rama skip | «Me buscaron. No encontraron nada.» Nunca inmunidad universal. |
+| J08 · III | retorno llega exactamente al llamador | «Volvió al lugar desde donde lo llamaron. Una cortesía programada.» |
+
+### Cinco reacciones sin diálogo
+
+1. Primer fallo: Null mira las manos vacías y luego el puerto; mantiene distancia.
+2. Step: posa un pie junto a la marca del tick; permanece quieto durante pausa.
+3. Rewind: retrocede un paso hasta la misma marca, sin alterar colisiones.
+4. LED: se gira hacia fuera de la placa; el centro de su silueta encuadra la luz.
+5. Automatización: se sienta al borde del muelle mientras el courier completa otra vuelta.
+
+Las poses son presentación de hechos; no alteran clock, paquetes ni sensores.
+En reduced motion se usan poses discretas sin desplazamiento.
+
+### Tres payoffs diferidos
+
+| Siembra | Comprensión necesaria | Resolución |
+|---|---|---|
+| Boot: mochila cerrada. «Nada.» | Arco II: distinguir ausencia de objeto de objeto vacío | inspección no resuelve contenido; «Te había dicho.» No usar 0 como sinónimo de null. |
+| Boot: placa «propietario pendiente», Null pasa sin adjudicársela | Arco II: owner:null | «Ves. No era mi nombre.» |
+| II: Null evita prometer que todas las puertas lo dejarán pasar | V: registro, lookup y defaults seguros | rutina hostil omite por ausencia, puerta legítima deniega por ausencia. «Cada uno siguió su regla.» |
+
+### Verdad narrativa y arco completo
+
+Boot descubre ejecución y consecuencia exterior. I restaura una ruta. II
+estabiliza fan/temperatura con estado e histéresis. III comparte funciones entre
+estaciones. IV hace visibles intercalado, carreras y espera circular. V contiene
+código dañino mediante validación, permisos y defaults seguros. VI conserva
+servicios durante fallos parciales y reconecta la placa. El epílogo reconoce
+mantenimiento y responsabilidad humanos; la ciudad no adquirió comprensión.
+Estos desenlaces son dirección de campaña, no contenido autorizado para construir ahora.
+
 > Documento de autoridad nivel 3. Biblia de mundo y sistemas. Reúne el
 > lore, los personajes, el tono y los temas narrativos de Bitland.
 >

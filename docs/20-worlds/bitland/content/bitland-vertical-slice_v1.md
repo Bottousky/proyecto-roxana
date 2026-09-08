@@ -27,6 +27,161 @@ open_questions:
 
 # BITLAND — VERTICAL SLICE · v1
 
+## Target AAA P1 — 2026-09-08 (PROPOSED, sustituye el slice v1 de abajo)
+
+Dirección autoral: GDD v2-candidate. Duración objetivo 24 minutos, rango 20–30,
+no medida. Se entra y sale de un único distrito continuo. El primer target
+implementado es P0 A/B, no estos ocho beats completos. Gate y evidencia viven
+en `production/bitland-prototype-evaluation_v1.md` y el ADR P0.
+
+### Beat sheet y contrato pedagógico
+
+| Beat / tiempo | Conocimiento previo | Fenómeno inicial | Predicción posible | Manipulación / fallo que deja evidencia |
+|---|---|---|---|---|
+| 1 · inmersión · 1 min | tocar/click, sin programación | placa del laboratorio con un pulso | seguir visualmente qué ruta alcanzará | acercarse a la placa; se puede omitir movimiento de cámara, sin penalidad |
+| 2 · courier · 4 min | causa y orden de acciones | agente detenido y paquete al alcance | señalar dónde estará luego de recoger / avanzar | ordenar 3 acciones semánticas; entrega sin carga muestra manos vacías y paso exacto |
+| 3 · afuera · 1 min | recorrido del paquete | paquete sale por GPIO; LED aún apagado | anticipar qué dispositivo recibe | step/rewind del tránsito; pausar muestra mensaje pendiente y su llegada futura |
+| 4 · Null · 1 min | primera ejecución observada | contorno vacío aparece junto al resultado | inspeccionar qué cambió realmente | abrir/cerrar registro; Null cita hechos disponibles, no evalúa respuestas |
+| 5 · cruce · 5 min | secuencia y step | barrera cambia con sensor externo | señalar rama antes de ejecutar | cambiar regla de ruta; sensor cerrado bloquea ruta fija; traza conserva lectura |
+| 6 · repetición · 4 min | misma secuencia, entrada observable | tres viajes descritos por copias de tarjetas | anticipar cuántos paquetes quedarán | envolver recorrido en repetición o conservar copias; una iteración de menos deja paquete visible |
+| 7 · última vuelta · 5 min | condición y repetición | mantenedor vuelve a un marcador retirado; emite la misma frase desde instrucción SAY | predecir si el siguiente ciclo terminará y señalar guardia | inspeccionar condición estable; cambiar guardia que observa trabajo pendiente, no apagar a ciegas |
+| 8 · automatización · 3 min | ruta robusta y guardia | nueva entrada después de terminar primer lote | anticipar si actuará sin intervención | instalar rutina, alejarse y volver; fallo vacío muestra PICK sin paquete; espera legítima visible |
+
+| Beat | Nombre formal posterior (opt-in) | Transferencia | Consecuencia aplicada | Riesgo de misconception |
+|---|---|---|---|---|
+| 1 | modelo de ejecución | reconocer pads como puertos en otra placa | alcanzar el muelle | es modelo espacial, no anatomía literal del MCU |
+| 2 | secuencia / precondición | espera extra o ruta más larga válida | entregar al puerto | el courier ejecuta, no infiere destino |
+| 3 | entrada/salida, GPIO | cambiar LED por indicador de un brazo fuera de la placa en próximo slice | luz externa recibe señal real del core | el paquete visual modela dato; no afirmar que GPIO transporta cajitas físicas |
+| 4 | traza | comparar otro intento sin pedir solución | evidencia accesible | Null-personaje no equivale a todos los valores null |
+| 5 | condición | sensor verdadero, falso y cambio antes de lectura | dispositivo recibe por ruta alternativa | el IF lee en su tick; no predice futuros cambios del sensor |
+| 6 | iteración / condición de fin | lotes 0,1,3,5; REPEAT fijo falla si cambia lote y no se adapta | muelle se vacía con N entregas reales | menos código no garantiza menos ticks ni energía |
+| 7 | bucle no terminante / depuración | marcador presente y ausente | cesa trabajo obsoleto; vuelve disponibilidad del mantenedor | barrido no es GC; no atribuir aburrimiento; no prometer detectar toda no terminación |
+| 8 | automatización | entradas separadas por espera vacía; tres ciclos al regresar | LED responde a nuevas entregas; ciudad permanece activa | espera de entrada no es deadlock ni proceso consciente |
+
+Hint ladder común, siempre solicitada: (1) affordance espacial; (2) replay del
+último efecto; (3) subrayar lectura relevante; (4) Null cita ese valor;
+(5) pregunta local sobre la relación causa/efecto; (6) ejemplo separado, sólo
+tras segunda solicitud explícita. Ninguna opción de respuesta bloquea avance.
+En 2 la lectura relevante es carga; en 3 mensaje pendiente; en 5 sensor; en 6
+cola restante; en 7 guardia idéntica en dos vueltas; en 8 ausencia de entrada.
+En 1 y 4 no se exige resolver un puzzle ni se despliega ayuda escalonada artificial.
+
+### Biblia visual operativa
+
+**Actualización autoral posterior:** la dirección vigente es una metrópolis
+interior al microcontrolador, cenital tipo primer GTA, saturada, concurrida y
+neocyberpunk. Sustituye la paleta/escala cálida siguiente, que queda como
+alternativa rechazada. Mantener funciones urbanas derivadas de buses, memoria,
+procesamiento y GPIO; cámara cercana entre manzanas y vista global opcional.
+Prioridad inmediata: densidad y tránsito inteligibles, sin ampliar contenido.
+
+**Imagen elegida:** metrópolis cenital interior. Silicio `#080d23`, estructuras
+`#162041`, distritos cian `#33f5e4`, magenta `#fc409d`, violeta `#8964ff`;
+consecuencia activa ámbar `#ffc54a`. Memorias forman manzanas densas; buses,
+avenidas; GPIO, límites y accesos al exterior. Courier: chasis claro, visor oscuro
+y carga ámbar separada; Null: contorno marfil/violeta con centro abierto.
+La señal añade forma y movimiento además de color. Silueta mínima en juego:
+24 px; hit area mínima 44 px. El spike todavía debe superar la miniaturización
+en teléfono antes de considerarse experiencia espacial final.
+
+Jerarquía: ciudad densa y viva desde el inicio, ruta programada distinguible
+por silueta, marcas y movimiento. 120 fixtures de tránsito ambiental en P0,
+sin autoridad sobre gameplay; nunca contarlos como entregas. La vida urbana
+sistémica completa sigue pendiente. Capas: silicio → buses → células y contactos
+→ tráfico → courier/carga/Null → mensaje factual → DOM. Los buses no atraviesan
+fachadas como una textura; reservar espacio real a circulación y puertos.
+
+Cámara de producción: cenital tipo primer GTA; encuadre urbano cercano y vista
+del encapsulado, con paneo. Programa ocupa hasta 30% del ancho en desktop; tablet
+usa hoja contextual; teléfono necesita encuadre cercano con navegación visible.
+No girar la ciudad al abrir el programa. Restauración: 2.5 s de pullback a la
+misma placa, saltables y sustituidos por corte bajo reduced motion.
+
+Animación target: recogida 120 ms de anticipación, 240 ms acción, 120 ms reposo;
+entrega al pad con separación visible; mensaje viaja durante tres ticks; LED
+responde sólo al consumir mensaje. Pose de fallo apunta al obstáculo, sin daño
+ni vibración compulsiva. Límite de densidad: sólo un evento héroe a la vez.
+
+Assets P0: geometría y tipografía del sistema, procedural original, sin terceros.
+Assets P1 faltantes: mesa de laboratorio y lupa de inmersión; courier con manos,
+giro y carga; Null con cinco poses silenciosas; mantenimiento con herramienta
+que no parezca GC; actuador LED con soporte/cableado legible. Producir variantes
+apagado/activo/fallo por estado, misma silueta, sin texto incrustado. No comprar
+ni incorporar referencias gráficas como assets sin comprobar licencia.
+
+### UI / estados
+
+```mermaid
+stateDiagram-v2
+  Explorar --> Inspeccionar: tocar proceso / acceso DOM
+  Inspeccionar --> Borrador: editar tarjeta (pausa)
+  Borrador --> Ejecutar: probar desde muelle + archivar intento
+  Inspeccionar --> Ejecutar: ejecutar
+  Ejecutar --> Pausa: pausa / foco perdido
+  Pausa --> Pausa: step / rewind
+  Ejecutar --> Evidencia: precondición fallida
+  Evidencia --> Borrador: modificar regla
+  Pausa --> Explorar: cerrar panel
+  Ejecutar --> Explorar: alejarse (servicio sigue)
+```
+
+P0 permite ordenar, cambiar, añadir espera y quitar; deshacer edición difiere
+de rewind lógico. Una modificación crea borrador, se aplica al iniciar intento
+explícito y conserva traza anterior. No hay edición caliente peligrosa.
+P1: separar «observar un servicio» de «instalar una nueva versión» sin perder
+estado de mundo; guardar programas de usuario y ajustes con versión de esquema.
+P0 no implementa persistencia entre cargas; no ofrecer icono de guardado falso.
+
+### Audio
+
+Reloj: click blando, 240 Hz, corto, volumen bajo. Rama: 390 Hz; entrega confirmada:
+660 Hz; fallo: 140 Hz sin sirena. P0 usa síntesis local opt-in. Todo sonido nace
+de tick/resultado y tiene indicador visual y texto equivalentes. P1 necesita
+motivos más orgánicos con envolvente de madera/cerámica y silencio para Null;
+sin voz robótica distorsionada. El ambiente crece por servicios realmente
+activos, no por un contador de «progreso educativo». Validar mezcla sin audio
+y con un solo canal; volumen y mute independientes antes de publicar.
+
+### Crosswalk fundamentado, no pacing escolar
+
+PRIMM orienta predicción, ejecución, inspección, modificación y creación de
+rutina; es apoyo de diseño, no evidencia de que Bitland ya enseñe eficazmente.
+[Sue Sentance](https://suesentance.net/primm-project/).
+Use–Modify–Create se concreta en rutina heredada → reparación → servicio propio;
+la construcción es un artefacto que queda activo. El intento fallido se conserva
+y se compara antes de formalizar, consistente con Productive Failure;
+no todo fracaso es automáticamente productivo.
+[ETH Zürich](https://lse.ethz.ch/research/productive-failure.html).
+Mirar es pasivo, manipular activo, predecir/explicar puede ser constructivo;
+el juego individual no justifica afirmar interacción colaborativa ICAP.
+[ICAP / ASU](https://icap.education.asu.edu/research).
+
+UDL se aplica con texto, forma, ritmo ajustable y acciones sin arrastre;
+screen reader requiere recorrido humano, no basta con aria-labels.
+[CAST](https://udlguidelines.cast.org/).
+Crosswalk 2026 verificado en fuente oficial: Algorithms & Design (2,5,6,7,8),
+Programming (2–8), Data & Analysis (3,5,7), Systems & Security (I/O en 3,8;
+seguridad se difiere), Computing & Society (responsabilidad de automatizar en 8).
+Es una correspondencia de conceptos, no certificación ni cobertura completa.
+[CSTA 2026](https://csteachers.org/pk12standards/).
+
+### Estudio de referencias: tomar principio, rechazar copia
+
+| Fuente consultada | Tomar | Rechazar | Firma propia de Bitland |
+|---|---|---|---|
+| [SHENZHEN I/O](https://zachtronics.itch.io/shenzhen-io) | programa controla circuito / señal | assembly y manual como entrada obligatoria | caminar el MCU y editar comportamiento físico |
+| [Human Resource Machine](https://tomorrowcorporation.com/humanresourcemachine) | carga visible, entrada y salida | despacho de niveles y jefe evaluador | servicio persistente de ciudad |
+| [Factorio circuit network](https://wiki.factorio.com/Circuit_network), [combinators](https://wiki.factorio.com/Combinator_Tutorial) | sensor controla dispositivo continuo | densidad industrial al inicio | una cadena pequeña, legible y habitable |
+| [Opus Magnum](https://www.zachtronics.com/opus-magnum/) | ejecución hermosa y soluciones abiertas | mecánica alquímica literal | cobre y GPIO como soporte espacial |
+| [Baba Is You](https://www.hempuli.com/baba/) | consecuencia inmediata de cambiar reglas | reescribir ontología universal | modificar programa de un proceso delimitado |
+| [MakeCode simulator](https://makecode.microbit.org/device/simulator) | I/O aplicado y feedback inmediato | simulador aislado como juego completo | dispositivo externo responde a ciudad interior |
+| [Ben Eater](https://eater.net/8bit) | hacer visible clock, bus y pasos | temario de lógica digital obligatorio | modelo de programación con límites explícitos |
+| [North star autoral](https://x.com/techartist_/status/2091207824160534554) | geometría de placa como ciudad según brief humano | no inferir detalles del video inaccesible | composición original; fuente X no pudo abrirse en esta sesión |
+
+Las páginas oficiales se consultaron; no se afirma haber jugado los juegos ni
+visionado íntegramente sus trailers. El estudio de ritmo audiovisual queda
+pendiente de material reproducible. No se descargaron assets de referencia.
+
 > Documento de autoridad nivel 4. Diseño de contenido. Define el
 > **vertical slice jugable** de Bitland: una experiencia de **15–20
 > minutos** que debe demostrar la identidad del mundo y validar las

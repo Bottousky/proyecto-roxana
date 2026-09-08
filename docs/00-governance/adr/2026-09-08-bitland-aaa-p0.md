@@ -5,6 +5,13 @@ Autoridad: encargo actual de Manuel; no constituye ratificación de CANON.
 
 ## Decisión
 
+La aclaración posterior de Manuel durante esta misión cambia la dirección
+visual de diorama cálido a metrópolis dentro del microcontrolador, cenital
+tipo primer GTA, saturada y neocyberpunk. Autoriza rehacer la presentación de
+P0; no altera determinismo ni convierte el spike en campaña. El rechazo
+anterior del neocyberpunk genérico se interpreta como exigencia de estructura
+computacional, no como prohibición de los colores y densidad ahora pedidos.
+
 El GDD v2-candidate es la dirección autoral de esta misión. Se conservan sus
 invariantes y se resuelven contradicciones en la evaluación y el beat sheet.
 P0 ejecuta BIT-R-A y BIT-R-B desde el mismo baseline de core, en ramas separadas.
