@@ -29,6 +29,7 @@ assert.equal(run(['wait'], true, 0, 'pending').halted, true);
 const lit = run(conditional, true, 1, 'once', 8);
 assert.equal(lit.led, true); assert.equal(lit.trace.at(-1)?.process, 'GPIO → LED');
 assert.equal(run(conditional, true, 1, 'once', 14).led, false);
+assert.equal(run(conditional, true, 1, 'once', 14).trace.at(-1)?.writes.led, false);
 const base = initial(conditional); const frozen = structuredClone(base); tick(base); assert.deepEqual(base, frozen);
 const a = new Machine(initial(conditional, false, 5, 'pending'));
 const b = new Machine(initial(conditional, false, 5, 'pending'));
@@ -36,6 +37,8 @@ for (let i = 0; i < 40; i++) { a.step(); b.step(); assert.deepEqual(a.state, b.s
 const snapshot = structuredClone(a.state); a.step(); a.rewind(); assert.deepEqual(a.state, snapshot);
 a.apply(setInput(a.state, true)); a.rewind(); assert.deepEqual(a.state, snapshot);
 let live = setInput(initial(conditional, true, 1, 'pending'), true, true);
+for (let i = 0; i < 8; i++) live = tick(live);
+assert.equal(live.cycles, 1, 'Waiting for input must not erase a completed cycle');
 for (let i = 0; i < 100; i++) live = tick(live);
 assert.equal(live.fault, null); assert.equal(live.halted, false); assert.ok(live.delivered.length >= 6);
 assert.equal(validate(live, 6).conserved, true);

@@ -42,6 +42,8 @@ export function tick(previous: State): State {
     record(s, {process: 'GPIO → LED', pc: null, instruction: 'receive', reads: {packet: packet.id}, writes: {led: true}, result: 'ok', detail: `El LED recibió paquete ${packet.id}.`});
   }
   s.led = s.tick < s.ledUntil;
+  if (previous.led && !s.led) record(s, {process:'GPIO → LED',pc:null,instruction:'pulse-end',
+    reads:{ledUntil:s.ledUntil},writes:{led:false},result:'ok',detail:'Terminó el pulso del LED.'});
   if (s.halted || s.fault) return s;
   if (s.pc === 0 && s.mode === 'pending' && !s.queue.length && s.carrying === null) {
     s.halted = !s.autoInput;
@@ -50,12 +52,11 @@ export function tick(previous: State): State {
     return s;
   }
   if (s.pc >= s.program.length) {
-    s.cycles++;
     const again = s.mode === 'forever' || (s.mode === 'three' && s.cycles < 3) || (s.mode === 'pending' && s.queue.length > 0);
     const waiting = s.mode === 'pending' && s.autoInput && !again;
     record(s, {process: 'courier', pc: null, instruction: 'loop', reads: {mode: s.mode, pending: s.queue.length, cycles: s.cycles},
       writes: {repeat: again}, result: waiting ? 'waiting' : 'branch', detail: again ? 'La condición sigue verdadera. Vuelve al principio.' : waiting ? 'Sin paquetes. Espera la próxima entrada.' : 'La condición de repetición terminó.'});
-    if (waiting) { s.cycles--; return s; }
+    if (waiting) return s;
     if (again) s.pc = 0;
     else s.halted = true;
     return s;
@@ -99,7 +100,7 @@ export function tick(previous: State): State {
     case 'wait': row.detail = 'Esperó un pulso. El mundo siguió ejecutando.'; break;
     default: fail('Instrucción desconocida.');
   }
-  if (!s.fault) s.pc++;
+  if (!s.fault) { s.pc++; if (s.pc === s.program.length) s.cycles++; }
   record(s, row);
   return s;
 }
