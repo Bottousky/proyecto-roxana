@@ -14,13 +14,14 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import schoolUrl from '../../assets/school3d/instituto-roxana.glb?url';
 import roxanaStatueUrl from '../../assets/school3d/roxana-statue.glb?url';
 import { readSchoolState, type SchoolState } from './schoolModel.ts';
+import { readPreferences, type VisitPreferences } from './preferences.ts';
 import {
   installRoxanaStatue,
   ROXANA_HALL_MONUMENT,
 } from './sculpts/installRoxanaStatue.ts';
 import { startPortalTransition } from './portal.ts';
 import { portalGateUrl } from '../shared/portalLink.ts';
-import { playPendingUnitProjector, projectorSequenceBusy } from './unitProjector.ts';
+import { abortProjectorSequence, playPendingUnitProjector, projectorSequenceBusy } from './unitProjector.ts';
 import { createPostFx, type PostFx } from './school3dPostFx.ts';
 import { createRoomLabels, type LabelLayer } from './school3dLabels.ts';
 import { createSchoolBackdrop, type SchoolBackdrop } from './school3dBackdrop.ts';
@@ -47,9 +48,9 @@ const TINT_IDLE = new THREE.Color(1, 1, 1);
 const TINT_HOVER = new THREE.Color(1.24, 1.15, 1.0);
 const TINT_SELECTED = new THREE.Color(1.14, 1.09, 1.0);
 const TINT_DIMMED = new THREE.Color(0.34, 0.36, 0.46);
-const TINT_SLEEPING = new THREE.Color(0.34, 0.37, 0.44);
-const TINT_QUIET = new THREE.Color(0.58, 0.58, 0.62);
-const TINT_ELECTRONICS_IDLE = new THREE.Color(0.76, 0.80, 0.76);
+const TINT_SLEEPING = new THREE.Color(0.60, 0.65, 0.72);
+const TINT_QUIET = new THREE.Color(0.76, 0.77, 0.80);
+const TINT_ELECTRONICS_IDLE = new THREE.Color(0.94, 1.0, 0.96);
 
 const LIFT_HOVER = 0.42;
 const LIFT_SELECTED = 0.6;
@@ -142,11 +143,11 @@ const ELECTRONICS_OBJECTS: Record<string, { title: string; body: string }> = {
 };
 
 function isCompact(): boolean {
-  return window.matchMedia('(max-width: 720px)').matches;
+  return window.matchMedia('(max-width: 900px)').matches;
 }
 
 function prefersReducedMotion(): boolean {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return document.documentElement.dataset.motion === 'reduced';
 }
 
 function easeInOut(t: number): number {
@@ -256,6 +257,15 @@ class School3DExperience {
   private metricsStartedAt = performance.now();
   private metricsFrames = 0;
   private exteriorVisible = true;
+  private preferences = readPreferences();
+  private inViewport = true;
+  private dialogOpen = false;
+  private loaded = false;
+  private needsRender = true;
+  private resizeObserver: ResizeObserver | null = null;
+  private visibilityObserver: IntersectionObserver | null = null;
+  private postFxCompact: boolean | null = null;
+  private lastSizeKey = '';
 
   private get schoolState(): SchoolState {
     return stateOverride(this.savedSchoolState, this.progressPreview);
@@ -288,8 +298,11 @@ class School3DExperience {
     this.camera.lookAt(OVERVIEW_TARGET);
     this.scene.add(this.camera);
     this.backdrop = createSchoolBackdrop(this.camera, prefersReducedMotion());
+    // A quiet atmospheric backdrop lets the building carry the composition.
+    // The original pattern stays available to the scene editor.
+    this.backdrop.root.visible = location.pathname === '/dev/scene-editor';
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(this.pixelRatio());
     this.renderer.setSize(window.innerWidth, window.innerHeight, false);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -314,7 +327,35 @@ class School3DExperience {
   }
 
   private pixelRatio(): number {
-    return Math.min(window.devicePixelRatio, isCompact() ? 1.5 : 1.85);
+    const cap = this.preferences.quality === 'low' ? 1 : this.preferences.quality === 'high' ? 2 : isCompact() ? 1.25 : 1.65;
+    return Math.min(window.devicePixelRatio || 1, cap);
+  }
+
+  private rebuildPostFx(): void {
+    const compact = this.preferences.quality === 'low' || (this.preferences.quality === 'auto' && isCompact());
+    if (this.postFx && compact === this.postFxCompact) return;
+    this.postFx?.dispose();
+    this.postFxCompact = compact;
+    this.postFx = createPostFx(this.renderer, this.scene, this.camera, {
+      compact,
+      width: this.canvas.clientWidth,
+      height: this.canvas.clientHeight,
+    });
+  }
+
+  private updateRunning(): void {
+    this.running = this.loaded && this.inViewport && !document.hidden && !this.dialogOpen;
+    if (this.running && !this.animationFrame) { this.clock.getDelta(); this.needsRender = true; this.animate(); }
+    if (!this.running && this.animationFrame) { cancelAnimationFrame(this.animationFrame); this.animationFrame = 0; }
+  }
+
+  private setRoomMenu(open: boolean, restoreFocus = false): void {
+    const list = document.querySelector<HTMLElement>('#school3d-room-list');
+    list?.classList.toggle('is-open', open);
+    if (list) list.inert = !open;
+    const toggle = document.querySelector<HTMLElement>('#school3d-rooms-toggle');
+    toggle?.setAttribute('aria-expanded', String(open));
+    if (restoreFocus) toggle?.focus();
   }
 
   private setupProgressToggle(): void {
@@ -473,22 +514,24 @@ class School3DExperience {
       if (location.pathname === '/dev/scene-editor') this.setupSceneEditor(gltf.scene);
       draco.dispose();
 
-      this.postFx = createPostFx(this.renderer, this.scene, this.camera, {
-        compact: isCompact(),
-        width: this.canvas.clientWidth || window.innerWidth,
-        height: this.canvas.clientHeight || window.innerHeight,
-      });
+      this.rebuildPostFx();
       this.buildLabels();
 
       if (loadingBar) loadingBar.style.width = '100%';
       document.querySelector('#school3d-loading')?.classList.add('is-ready');
-      this.animate();
+      document.documentElement.dataset.scene = 'ready';
+      const roomToggle = document.querySelector<HTMLButtonElement>('#school3d-rooms-toggle');
+      if (roomToggle) roomToggle.disabled = false;
+      this.loaded = true;
+      this.updateRunning();
       window.setTimeout(() => this.syncRoomFromLocation(), 120);
     } catch (error) {
       console.error('No se pudo abrir la escuela 3D', error);
       document.querySelector<HTMLElement>('#school3d-loading')?.classList.add('is-ready');
       const fallback = document.querySelector<HTMLElement>('#school3d-fallback');
       if (fallback) fallback.hidden = false;
+      document.documentElement.dataset.scene = 'failed';
+      draco.dispose();
     }
   }
 
@@ -628,9 +671,43 @@ class School3DExperience {
 
   private setupEvents(): void {
     window.addEventListener('resize', () => this.resize());
+    this.resizeObserver = new ResizeObserver(() => this.resize());
+    this.resizeObserver.observe(this.canvas);
+    this.visibilityObserver = new IntersectionObserver(([entry]) => {
+      this.inViewport = entry.isIntersecting;
+      this.updateRunning();
+    }, { threshold: .01 });
+    this.visibilityObserver.observe(this.canvas);
     document.addEventListener('visibilitychange', () => {
-      this.running = !document.hidden;
-      if (this.running && !this.animationFrame) this.animate();
+      this.updateRunning();
+    });
+    window.addEventListener('roxana:dialog', (event) => {
+      this.dialogOpen = (event as CustomEvent<boolean>).detail;
+      this.updateRunning();
+    });
+    window.addEventListener('roxana:preferences', (event) => {
+      this.preferences = (event as CustomEvent<VisitPreferences>).detail;
+      if (this.loaded) this.rebuildPostFx();
+      if (prefersReducedMotion() && this.tween) {
+        this.cameraTarget.copy(this.tween.toTarget); this.camera.zoom = this.tween.toZoom; this.tween = null;
+      }
+      this.resize();
+    });
+    window.addEventListener('storage', () => {
+      this.savedSchoolState = readSchoolState();
+      this.applyProgressionState();
+      const room = VOXEL_ROOMS.find((r) => r.id === this.selected);
+      if (room) this.renderRoomDetails(room);
+    });
+    window.addEventListener('roxana:select-room', (event) => {
+      const room = VOXEL_ROOMS.find((r) => r.id === (event as CustomEvent<string>).detail);
+      if (room) this.selectRoom(room.id);
+    });
+    this.canvas.addEventListener('webglcontextlost', (event) => {
+      event.preventDefault(); this.loaded = false; this.updateRunning();
+      document.documentElement.dataset.scene = 'failed';
+      const fallback = document.querySelector<HTMLElement>('#school3d-fallback');
+      if (fallback) fallback.hidden = false;
     });
     this.canvas.addEventListener('pointerdown', (event) => {
       this.pointerDown = { x: event.clientX, y: event.clientY };
@@ -669,6 +746,12 @@ class School3DExperience {
     // para todas las salas: quién cruza y quién no lo dice `dataset.portal`.
     const panelAction = document.querySelector<HTMLAnchorElement>('#school3d-action');
     panelAction?.addEventListener('click', (event) => {
+      const dialogId = panelAction.dataset.dialog;
+      if (dialogId && !event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0) {
+        event.preventDefault();
+        window.dispatchEvent(new CustomEvent('roxana:open-dialog', { detail: dialogId }));
+        return;
+      }
       if (panelAction.dataset.portal !== 'ohmdal') return;
       // Un click con modificador es «abrilo aparte»: ahí el href hace su trabajo y la
       // transición sobraría, porque esta pestaña no se va a ninguna parte.
@@ -680,26 +763,50 @@ class School3DExperience {
     document.querySelector('#school3d-home')?.addEventListener('click', () => this.showOverview());
     document.querySelector('#school3d-panel-close')?.addEventListener('click', () => this.showOverview());
     window.addEventListener('popstate', () => this.syncRoomFromLocation());
+    window.addEventListener('hashchange', () => this.syncRoomFromLocation());
     window.addEventListener('keydown', (event) => this.onKeyDown(event));
 
     const roomsToggle = document.querySelector<HTMLButtonElement>('#school3d-rooms-toggle');
     const roomList = document.querySelector<HTMLElement>('#school3d-room-list');
     roomsToggle?.addEventListener('click', () => {
-      const open = roomList?.classList.toggle('is-open') ?? false;
-      roomsToggle.setAttribute('aria-expanded', String(open));
+      this.setRoomMenu(!roomList?.classList.contains('is-open'));
     });
+    document.addEventListener('click', (event) => {
+      const target = event.target as Element;
+      if (!target.closest('#school3d-room-list, #school3d-rooms-toggle')) this.setRoomMenu(false);
+    });
+    window.addEventListener('pagehide', (event) => {
+      if (event.persisted) return;
+      this.loaded = false; this.updateRunning();
+      this.resizeObserver?.disconnect(); this.visibilityObserver?.disconnect();
+      this.postFx?.dispose(); this.backdrop.dispose(); this.labels?.dispose();
+      this.scene.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        object.geometry.dispose();
+        (Array.isArray(object.material) ? object.material : [object.material]).forEach((material) => material.dispose());
+      });
+      this.renderer.dispose();
+    });
+    window.addEventListener('pageshow', () => this.updateRunning());
   }
 
   /** Escape sale de la sala; las flechas recorren el plano sin usar el ratón. */
   private onKeyDown(event: KeyboardEvent): void {
     const target = event.target as HTMLElement | null;
+    if (this.dialogOpen || document.querySelector('dialog[open]') || projectorSequenceBusy()) return;
     if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+
+    if (event.key === 'Escape' && document.querySelector('#school3d-room-list.is-open')) {
+      event.preventDefault(); this.setRoomMenu(false, true); return;
+    }
 
     if (event.key === 'Escape' && this.selected) {
       this.showOverview();
       return;
     }
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    // Arrow keys remain native outside the scene, including on the long page.
+    if (target !== this.canvas && !target?.closest('#school3d-room-list')) return;
     event.preventDefault();
     const order = VOXEL_ROOMS.map((room) => room.id);
     const current = this.selected ? order.indexOf(this.selected) : -1;
@@ -724,8 +831,7 @@ class School3DExperience {
       button.innerHTML = `<i></i><strong>${room.shortTitle}</strong><small>${voxelStateLabel(state)}</small>`;
       button.addEventListener('click', () => {
         this.selectRoom(room.id);
-        list.classList.remove('is-open');
-        document.querySelector('#school3d-rooms-toggle')?.setAttribute('aria-expanded', 'false');
+        this.setRoomMenu(false);
       });
       button.addEventListener('pointerenter', () => this.setHover(room.id));
       button.addEventListener('pointerleave', () => this.setHover(null));
@@ -754,6 +860,7 @@ class School3DExperience {
 
   /** Un único punto donde se decide cómo se ve cada sala. */
   private refreshRoomTargets(): void {
+    this.needsRender = true;
     const selectedRoom = VOXEL_ROOMS.find((candidate) => candidate.id === this.selected);
     for (const [id, room] of this.rooms) {
       let tint = this.tintForRoom(id);
@@ -782,6 +889,7 @@ class School3DExperience {
     const visual = this.rooms.get(id);
     const room = VOXEL_ROOMS.find((candidate) => candidate.id === id);
     if (!visual || !room) return;
+    this.setRoomMenu(false);
     this.selected = id;
     this.hovered = null;
     this.labels?.setHovered(null);
@@ -792,16 +900,21 @@ class School3DExperience {
       stage.dataset.room = id;
     }
     document.querySelector('#school3d-intro')?.classList.add('is-hidden');
+    const intro = document.querySelector<HTMLElement>('#school3d-intro');
+    if (intro) intro.inert = true;
     const panel = document.querySelector<HTMLElement>('#school3d-panel');
     panel?.classList.remove('is-open');
     window.clearTimeout(this.panelRevealTimer);
     this.panelRevealTimer = window.setTimeout(() => {
       panel?.classList.add('is-open');
       panel?.setAttribute('aria-hidden', 'false');
+      if (panel) panel.inert = false;
+      document.querySelector<HTMLElement>('#school3d-title')?.focus({ preventScroll: true });
+      if (isCompact()) panel?.scrollIntoView({ block: 'nearest', behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
     }, prefersReducedMotion() ? 0 : 310);
     this.renderRoomDetails(room);
     if (id === 'electronica') {
-      window.setTimeout(() => this.playPendingUnitIntro(), prefersReducedMotion() ? 80 : 420);
+      window.setTimeout(() => { if (this.selected === 'electronica') this.playPendingUnitIntro(); }, prefersReducedMotion() ? 80 : 420);
     }
     document.querySelectorAll<HTMLElement>('[data-room]').forEach((button) => button.classList.toggle('is-selected', button.dataset.room === id));
 
@@ -809,13 +922,14 @@ class School3DExperience {
     const target = bounds.getCenter(new THREE.Vector3());
     target.y = Math.max(.42, target.y * .34);
     const size = bounds.getSize(new THREE.Vector3());
-    const desiredZoom = Math.min(isCompact() ? 3.0 : 3.8, Math.max(isCompact() ? 2.4 : 2.95, 36 / Math.max(size.x, size.z)));
+    const viewWidth = this.camera.right - this.camera.left;
+    const desiredZoom = Math.min(3.5, viewWidth / (Math.max(size.x, size.z) + 7), 2.6);
     this.startTween(target, desiredZoom);
     if (updateHistory && location.hash !== `#sala/${id}`) history.pushState({ room: id }, '', `#sala/${id}`);
   }
 
   private playPendingUnitIntro(): void {
-    if (projectorSequenceBusy()) return;
+    if (projectorSequenceBusy() || this.schoolState.aulas.electronica === 'off') return;
     const host = document.querySelector<HTMLElement>('#school-experience') ?? document.body;
     playPendingUnitProjector(host, () => {
       this.savedSchoolState = readSchoolState();
@@ -844,8 +958,8 @@ class School3DExperience {
     if (description) description.textContent = room.description;
     const completed = this.schoolState.electronica.unidadesCompletadas;
     const total = this.schoolState.electronica.totalUnidades;
-    let progress = state === 'restored' ? 1 : state === 'active' ? .62 : state === 'open' ? .24 : 0;
-    let progressText = state === 'closed' ? 'Próximamente' : voxelStateLabel(state);
+    let progress = 0;
+    let progressText = state === 'closed' ? 'En preparación' : 'Por explorar';
     if (room.id === 'electronica') {
       progress = total > 0 ? completed / total : 0;
       progressText = `${completed} de ${total} unidades`;
@@ -856,7 +970,9 @@ class School3DExperience {
     if (activity) activity.textContent = room.kind === 'classroom' ? 'Aula aplicada' : room.eyebrow;
     if (progressLabel) progressLabel.textContent = progressText;
     if (progressBar) progressBar.style.width = `${Math.round(progress * 100)}%`;
+    if (progressBar?.parentElement) progressBar.parentElement.hidden = !['electronica', 'logros', 'biblioteca', 'visitantes'].includes(room.id);
     if (action) {
+      delete action.dataset.dialog;
       setWipDoor(room.id === 'electronica');
       if (room.id === 'electronica') {
         // «Viajar a Ohmdal» tiene que llegar a Ohmdal. Con `/jugar` a secas el destino se
@@ -867,10 +983,26 @@ class School3DExperience {
         clearOhmdalAction(action);
         action.href = '/jugar';
         action.textContent = 'Continuar el viaje';
+        if (this.schoolState.aulas.electronica === 'off') {
+          action.href = portalGateUrl(); action.textContent = 'Comenzar la aventura';
+        }
       } else {
         clearOhmdalAction(action);
-        action.href = room.href ?? '#';
-        action.textContent = room.actionLabel ?? 'Explorar';
+        const destinations: Partial<Record<VoxelZoneId, { href: string; label: string; dialog?: string }>> = {
+          programacion: { href: '#mundos', label: 'Conocer los mundos' },
+          matematica: { href: '#mundos', label: 'Conocer los mundos' },
+          fisica: { href: '/physica/', label: 'Explorar el prototipo' },
+          biblioteca: { href: '#memoria', label: 'Abrir mi Bitácora', dialog: 'progress-dialog' },
+          logros: { href: '#memoria', label: 'Ver mi recorrido', dialog: 'progress-dialog' },
+          audiovisual: { href: '#aventura', label: 'Descubrir la experiencia' },
+          visitantes: { href: '#aventura', label: 'Descubrir la experiencia' },
+          direccion: { href: '#memoria', label: 'La memoria de Roxana' },
+          preceptoria: { href: '#preguntas', label: 'Guía para empezar', dialog: 'guide-dialog' },
+        };
+        const destination = destinations[room.id] ?? { href: '#memoria', label: 'Conocer el Instituto' };
+        action.href = destination.href;
+        action.textContent = destination.label;
+        if (destination.dialog) action.dataset.dialog = destination.dialog;
       }
     }
   }
@@ -900,9 +1032,11 @@ class School3DExperience {
     }
     panel?.classList.add('is-open', 'is-object');
     panel?.setAttribute('aria-hidden', 'false');
+    if (panel) panel.inert = false;
   }
 
   private showOverview(updateHistory = true): void {
+    abortProjectorSequence();
     this.selected = null;
     this.refreshRoomTargets();
     window.clearTimeout(this.panelRevealTimer);
@@ -912,9 +1046,14 @@ class School3DExperience {
       delete stage.dataset.room;
     }
     document.querySelector('#school3d-intro')?.classList.remove('is-hidden');
+    const intro = document.querySelector<HTMLElement>('#school3d-intro');
+    if (intro) intro.inert = false;
     const panel = document.querySelector<HTMLElement>('#school3d-panel');
     panel?.classList.remove('is-open', 'is-object');
     panel?.setAttribute('aria-hidden', 'true');
+    if (panel) panel.inert = true;
+    if (updateHistory) this.canvas.focus({ preventScroll: true });
+    if (updateHistory && isCompact()) document.querySelector('#school-experience')?.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
     document.querySelectorAll('[data-room]').forEach((button) => button.classList.remove('is-selected'));
     this.startTween(OVERVIEW_TARGET, this.overviewZoom);
     if (updateHistory && location.hash.startsWith('#sala/')) {
@@ -926,8 +1065,8 @@ class School3DExperience {
 
   private syncRoomFromLocation(): void {
     const id = schoolRoomFromHash(location.hash);
-    if (id) this.selectRoom(id, false);
-    else if (this.selected) this.showOverview(false);
+    if (id && id !== this.selected) this.selectRoom(id, false);
+    else if (!id && this.selected) this.showOverview(false);
   }
 
   private startTween(target: THREE.Vector3, zoom: number): void {
@@ -942,6 +1081,7 @@ class School3DExperience {
   }
 
   private resize(): void {
+    this.needsRender = true;
     const width = Math.max(1, this.canvas.clientWidth || window.innerWidth);
     const height = Math.max(1, this.canvas.clientHeight || window.innerHeight);
     const aspect = width / height;
@@ -953,10 +1093,15 @@ class School3DExperience {
     this.camera.bottom = -viewHeight / 2;
     // Las terrazas amplían la silueta vertical; esta apertura conserva reloj,
     // zócalos y acceso completo sin modificar los zooms de cada sala.
-    this.overviewZoom = isCompact() ? Math.min(.86, (viewHeight * aspect) / 58) : 1.42;
+    this.overviewZoom = Math.min(isCompact() ? 1.12 : 1.34, (viewHeight * aspect) / 55);
+    if (this.tween && !this.selected) this.tween.toZoom = this.overviewZoom;
     if (!this.selected && !this.tween) this.camera.zoom = this.overviewZoom;
     this.camera.updateProjectionMatrix();
     const ratio = this.pixelRatio();
+    if (this.loaded) this.rebuildPostFx();
+    const sizeKey = `${width}x${height}@${ratio}`;
+    if (sizeKey === this.lastSizeKey) return;
+    this.lastSizeKey = sizeKey;
     this.renderer.setPixelRatio(ratio);
     this.renderer.setSize(width, height, false);
     this.postFx?.composer.setPixelRatio(ratio);
@@ -969,8 +1114,10 @@ class School3DExperience {
       return;
     }
     this.animationFrame = requestAnimationFrame(this.animate);
+    if (prefersReducedMotion() && !this.needsRender && !this.tween) return;
+    this.needsRender = false;
     const delta = Math.min(this.clock.getDelta(), .1);
-    const elapsed = this.clock.getElapsedTime();
+    const elapsed = prefersReducedMotion() ? 0 : this.clock.getElapsedTime();
     this.backdrop.update(elapsed);
 
     this.npcs.forEach(({ object, phase, baseY }, index) => {
@@ -985,7 +1132,7 @@ class School3DExperience {
     }
 
     if (this.portal && this.schoolState.aulas.electronica !== 'off') {
-      this.portal.rotation.z += this.arcOneComplete ? .004 : .0015;
+      if (!prefersReducedMotion()) this.portal.rotation.z += delta * (this.arcOneComplete ? .24 : .09);
       const pulse = 1 + Math.sin(elapsed * 2.2) * (this.arcOneComplete ? .035 : .012);
       this.portal.scale.setScalar(pulse);
       if (this.portalMaterial) {
@@ -1000,6 +1147,9 @@ class School3DExperience {
 
     // Salas: tinte y elevación siempre van hacia su objetivo, nunca saltan.
     for (const room of this.rooms.values()) {
+      if (prefersReducedMotion()) {
+        room.tint.copy(room.targetTint); room.lift = room.targetLift; room.opacity = room.targetOpacity;
+      }
       room.tint.r = damp(room.tint.r, room.targetTint.r, 9, delta);
       room.tint.g = damp(room.tint.g, room.targetTint.g, 9, delta);
       room.tint.b = damp(room.tint.b, room.targetTint.b, 9, delta);
@@ -1090,5 +1240,6 @@ export async function initSchool3D(): Promise<void> {
     document.querySelector<HTMLElement>('#school3d-loading')?.classList.add('is-ready');
     const fallback = document.querySelector<HTMLElement>('#school3d-fallback');
     if (fallback) fallback.hidden = false;
+    document.documentElement.dataset.scene = 'failed';
   }
 }

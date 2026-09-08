@@ -15,10 +15,10 @@ const GradeShader = {
   name: 'RoxanaGradeShader',
   uniforms: {
     tDiffuse: { value: null as THREE.Texture | null },
-    uSaturation: { value: 1.08 },
-    uContrast: { value: 1.07 },
-    uTint: { value: new THREE.Color(1.0, 0.985, 0.95) },
-    uVignette: { value: 0.65 },
+    uSaturation: { value: 0.83 },
+    uContrast: { value: 1.02 },
+    uTint: { value: new THREE.Color(0.96, 1.0, 1.035) },
+    uVignette: { value: 0.22 },
     uLift: { value: 0.0 },
   },
   vertexShader: /* glsl */ `
@@ -58,7 +58,7 @@ const GradeShader = {
 };
 
 export interface PostFxOptions {
-  /** En móvil se apagan bloom y SMAA para sostener los 60 fps. */
+  /** En modo ligero se apagan bloom y SMAA para reducir carga de GPU. */
   compact: boolean;
   width: number;
   height: number;
@@ -85,7 +85,14 @@ export function createPostFx(
   if (!options.compact) {
     // El bake deja lámparas, pantallas y el portal cerca de 1.0; el umbral alto
     // hace que sólo florezcan esos, no las paredes claras.
-    bloom = new UnrealBloomPass(new THREE.Vector2(options.width, options.height), 0.52, 0.62, 0.78);
+    bloom = new UnrealBloomPass(new THREE.Vector2(options.width, options.height), 0.24, 0.48, 0.90);
+    // Add light to RGB while retaining the scene's original alpha. Additive
+    // blending's default alpha turns a transparent canvas into a black tile.
+    bloom.blendMaterial.blending = THREE.CustomBlending;
+    bloom.blendMaterial.blendSrc = THREE.OneFactor;
+    bloom.blendMaterial.blendDst = THREE.OneFactor;
+    bloom.blendMaterial.blendSrcAlpha = THREE.ZeroFactor;
+    bloom.blendMaterial.blendDstAlpha = THREE.OneFactor;
     composer.addPass(bloom);
   }
 
@@ -101,6 +108,7 @@ export function createPostFx(
       bloom?.setSize(width, height);
     },
     dispose() {
+      for (const pass of composer.passes) pass.dispose();
       composer.dispose();
     },
   };

@@ -54,6 +54,7 @@ function getAudioCtx(): AudioContext | null {
 
 /** Crujido de puerta (ruido filtrado con barrido) + thunk grave de pestillo. */
 export function playDoorOpen(short = false): void {
+  if (document.documentElement.dataset.sound === 'false') return;
   const ctx = getAudioCtx();
   if (!ctx) return;
   try {
