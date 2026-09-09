@@ -2,7 +2,11 @@
 
 > **Verbo nuclear:** **TRANSFORMAR**.
 > **Disciplina:** Matemática.
-> **Estado:** GDD **PROPOSED**; campaña todavía no está en producción. Se permiten únicamente los **spikes de representación aprobados** en `docs/80-production/spikes/`.
+> **Estado actual (2026-09-08):** Manuel autorizó desarrollar Arco I completo
+> mediante `ASTRA_ARITHMOS_AAA_EXECUTION_PROMPT.md`. El documento rector es
+> `ARITHMOS_AAA_OUTCOME_GDD_v1.md`. La implementación vive en
+> `src/experiences/arithmos/` y se abre en `/arithmos/`. Esta autorización supera
+> las restricciones antiguas a sólo spikes; no convierte el lore PROPOSED en CANON.
 
 Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Arithmos. Cualquier agente que trabaje sobre Arithmos lee ambos.
 
@@ -27,7 +31,9 @@ Este archivo especializa el [`AGENTS.md`](../../../AGENTS.md) raíz para Arithmo
 
 ## 2. Estado
 
-- Campaña: **sin implementación**; runtime `planned` mientras el roadmap no la active.
+- Campaña: Arco I implementado como `cosmos-web` con Three.js y TypeScript puro;
+  registro `playable`. El estado de validación y las decisiones de esta versión
+  están al comienzo de `content/arithmos-arc-01_v1.md`.
 - Investigación permitida: spikes aislados de representación.
 - Primeros spikes autorizados:
   - [`../../80-production/spikes/ARI-R-A-three-spatial-equivalence.md`](../../80-production/spikes/ARI-R-A-three-spatial-equivalence.md)
@@ -109,7 +115,15 @@ revisión de Codex. Ver [`../../80-production/AI_TOOLING.md`](../../80-productio
 
 ---
 
-## 7. Qué se puede hacer ahora
+## 7. Alcance autorizado vigente
+
+El encargo del 2026-09-08 autoriza campaña, dirección creativa y cambios de
+representación, cámara, personajes y estructura. Las hipótesis PROPOSED siguientes
+son antecedentes. No limitar el encargo nuevo por las autorizaciones de spikes.
+Conservar dominio puro, validación por condiciones, manipulación antes de símbolo,
+transferencia, restauración persistente y controles verificados en navegador/touch.
+
+### Autorización histórica de spikes (superada para este encargo)
 
 **Sí:**
 

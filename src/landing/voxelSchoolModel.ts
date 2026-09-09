@@ -69,8 +69,8 @@ export const VOXEL_ROOMS: readonly VoxelRoom[] = [
   },
   {
     id: 'matematica', title: 'Aula de Matemática', shortTitle: 'Matemática', eyebrow: 'Arithmos',
-    description: 'Patrones, proporciones y estructuras aguardan detrás de una puerta aún cerrada.',
-    kind: 'classroom', x: 0, y: 1, width: 14, depth: 10, presentationLevel: 2, floor: '#3d3326', accent: '#e0a84f', href: '#aulas', actionLabel: 'Ver las aulas',
+    description: 'Un puerto ha olvidado cómo dejar partir sus barcos. En Arithmos, transformar la materia devuelve al mundo sus posibilidades.',
+    kind: 'classroom', x: 0, y: 1, width: 14, depth: 10, presentationLevel: 2, floor: '#3d3326', accent: '#e0a84f', href: '/arithmos/', actionLabel: 'Viajar a Arithmos',
   },
   {
     id: 'biblioteca', title: 'Biblioteca y Bitácora', shortTitle: 'Biblioteca', eyebrow: 'Memoria del Instituto',

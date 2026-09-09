@@ -19,6 +19,32 @@ Abre `/ohmdal-playcanvas` en la URL que indique Vite. El runtime está en
 `src/experiences/ohmdal-playcanvas/`; reutiliza sistemas de `ohmdal-plaza`.
 `/jugar` y los prototipos de otros mundos siguen disponibles como baselines.
 
+### Arithmos · Las formas del regreso
+
+Abre `/arithmos/` o entra por Matemática en el Instituto. Arco I recorre seis
+lugares de un puerto sobre una ballena: transformar pasarelas, repartir carga,
+desplegar velas, restaurar jardines y devolver el vuelo a la ciudad. Three.js
+presenta la materia; un dominio TypeScript puro conserva sus unidades y valida
+las relaciones. El progreso y la Bitácora se guardan en este navegador.
+
+Arrastra las piezas y usa sus herramientas para cambiar su forma, separar y
+reunir. También puedes usar C para seleccionar, flechas para mover, R para girar,
+[ / ] para cambiar el ancho, X para separar, J y luego C para reunir, Z/Y para
+deshacer/rehacer y V para mirar en planta. En touch hay ampliación, desplazamiento
+con dos dedos y controles por pasos. Esc abre pausa, sonido y movimiento reducido.
+Para cortar, marca el comienzo de la segunda parte en la miniatura, revisa los
+dos contornos y confirma «Separar lo marcado».
+
+```bash
+node scripts/gameplay/playtest-arithmos.mjs
+node scripts/gameplay/playtest-arithmos-touch.mjs
+node scripts/gameplay/playtest-arithmos-gestures.mjs
+```
+
+Los recorridos usan por defecto `http://127.0.0.1:5197/arithmos/`; configura
+`ARITHMOS_URL` si Vite está en otro puerto. Evidencia local: `output/arithmos-*`.
+Diseño rector: [GDD de resultados](docs/20-worlds/arithmos/ARITHMOS_AAA_OUTCOME_GDD_v1.md).
+
 ## Verificar
 
 ```bash

@@ -27,6 +27,75 @@ open_questions:
 
 # ARITHMOS · ARC 01 — CANTIDAD · v1
 
+## Implementación activa · Las formas del regreso · 2026-09-08
+
+El encargo de Manuel y el GDD AAA de resultados gobiernan esta implementación;
+las regiones y duraciones propuestas más abajo son antecedentes, no el recorrido
+actual. Código: `src/experiences/arithmos/`. Entrada: `/arithmos/` y aula de
+Matemática del Instituto. No se modificaron los baselines de otros mundos.
+
+**Dirección.** Una aventura de manipulación en un puerto sobre una ballena-ciudad.
+Briz, barquero plegable que quiere volver a casa, acompaña seis restauraciones.
+Cerámica, canales, paños y plumas hacen material la estructura. El gesto conserva
+identidades de unidades, no sólo una suma calculada al final. Las nuevas formas
+cambian huellas, cargas, continuidad de paños y relaciones de mezcla.
+
+| Lugar | Acción y consecuencia | Condición; alternativas |
+|---|---|---|
+| Puerto de las formas | Reorganizar materia para devolver el paso | Cubrir la huella; cualquier partición que la cubra sirve |
+| Dos orillas | Descomponer un equipaje y reconstruir dos muelles | Cobertura sin solapamiento; no secuencia prescrita |
+| Esclusa | Repartir carga para nivelar dos bandejas | Ocho unidades por lado; la silueta y la partición son libres |
+| Bosque de mástiles | Componer paños que despliegan un bosque navegante | Huella rectangular continua de igual área por mástil; 1×4, 2×2, 4×1 y particiones internas |
+| Jardines | Mezclar luz y agua para hacer crecer jardines | Razón 1:2, mínimo seis unidades por jardín; 6/12, 9/9 o 12/6 |
+| Ballena-ciudad | Distribuir plumas y despertar el vuelo | Razón 1:2 en tres alas y extremos equilibrados; 6/12/6 o 9/6/9 |
+
+La última situación cambia materia y efecto, y combina proporción con equilibrio.
+La Bitácora se escribe sólo después de resolver y muestra la configuración
+real guardada junto a su formalización. Deshacer, rehacer y ensayar otra forma
+conservan el descubrimiento; la última solución válida permite recuperar la
+restauración incluso si se cierra el navegador durante una nueva exploración.
+
+**Representación y control.** La vista espacial conserva el contexto del puerto;
+la lente de planta permite inspeccionar filas y encastres. Se comparan sobre la
+misma materia durante el playtest, sin bifurcar el dominio. El zoom es explícito
+para que la cámara no mueva el objeto bajo el dedo; touch añade pan con dos dedos
+y desplazamiento por pasos. No hay tiempo límite ni cuentas como contraseña.
+
+**Fuentes y derechos.** Las geometrías, marcas, personajes y audio WebAudio son
+originales de esta implementación. Three.js ya era dependencia del repositorio
+(MIT, licencia en el paquete); no se añadieron assets externos, dependencias ni
+servicios de pago. La estructura como juguete se contrastó con la descripción
+primaria de [Patrick's Parabox](https://www.patricksparabox.com/) y reglas como
+materia con [Baba Is You](https://hempuli.com/gamelist/index.php?rule=id&ruleid=3).
+La construcción por exploración toma como lente
+[Lifelong Kindergarten](https://www.media.mit.edu/publications/lifelong-kindergarten/).
+Son decisiones de diseño, no evidencia de eficacia pedagógica.
+
+**Validación reproducible.** `tests/arithmos-core.test.ts` comprueba conservación,
+rotación de identidades, colisiones, 500 acciones exploratorias, soluciones
+alternativas, proporción, transferencia y guardados corruptos. Una revisión
+independiente detectó y corrigió la aceptación de velas con huecos. Los scripts
+`scripts/gameplay/playtest-arithmos*.mjs` operan la UI real y guardan evidencia
+en `output/`. La superficie de QA es sólo lectura y existe únicamente en dev.
+El playtest independiente, sin consultar soluciones, recorrió los dos primeros
+lugares: observó conservación y usó un fallo de cobertura para corregir la forma.
+Su confusión con el corte motivó una previsualización de las dos partes antes de
+confirmar. La revisión fresca también corrigió el vuelo persistente al reentrar.
+Touch comprueba retrato 390×844, paisaje 844×390, cortes altos accesibles, arrastre
+real, zoom y pan con dos dedos, deshacer y preferencias tras recargar.
+La pasada final completó los seis lugares, Bitácora, recarga y regreso por la
+entrada visible de Matemática del Instituto, sin errores de navegador. El bundle
+de producción también pasó transformación, deshacer/rehacer y persistencia, sin
+exponer QA. Pasaron `npm run build`, `npm test` (124 archivos) y `npm run verify`;
+los avisos del verificador corresponden a guion y bundles preexistentes de otros
+mundos. Los registros completos quedan en `output/` y no se incorporan a Git.
+El indicador humano de comprensión y deseo de seguir jugando exige playtest con
+personas; no se deduce de que el recorrido automatizado o un agente terminen.
+
+---
+
+## Propuesta histórica de contenido
+
 > **Estado del documento.** `PROPOSED` en v1. Nace de la sesión P5.
 > Es `authority_level` 4 (diseño de contenido). Toda región,
 > capítulo y puzzle detallado aquí es **PROPOSED** y se valida en

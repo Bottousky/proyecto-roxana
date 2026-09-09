@@ -14,7 +14,10 @@ assert(experienceById('ohmdal').status === 'playable', 'Ohmdal es producto exist
 assert(experienceById('ohmdal').runtime === 'topdown-phaser', 'Ohmdal conserva su motor cenital');
 assert(experienceById('physica').runtime === 'platformer-babylon', 'Physica se juega en su gramática Babylon de plataformero 2.5D');
 assert(experienceById('bitland').learningVerb === 'ejecutar', 'Bitland se define por su modelo mental');
-assert(experienceById('arithmos').learningVerb === 'contemplar', 'Arithmos evita copiar el loop de Ohmdal');
+assert(experienceById('arithmos').learningVerb === 'transformar', 'Arithmos aprende al transformar la estructura del mundo');
+assert(experienceById('arithmos').status === 'playable', 'Arithmos Arco I está disponible como experiencia jugable');
+assert(experienceById('arithmos').rooms.length === 6, 'Arithmos registra los seis encuentros de Arco I');
+assert(experienceById('arithmos').rooms.every(room => experienceOfRoom(room)?.id === 'arithmos'), 'los seis encuentros conservan la identidad de Arithmos');
 
 const assignedRooms = EXPERIENCES.flatMap((experience) => experience.rooms);
 assert(new Set(assignedRooms).size === assignedRooms.length, 'ninguna sala pertenece a dos experiencias');

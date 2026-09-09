@@ -1,6 +1,7 @@
 // Modelo puro de la escuela (landing). Sin DOM. Deriva estado de la web a partir
 // de dos fuentes de localStorage crudas: el save del juego (read-only) y el
 // estado propio de la web.
+import { readSave as readArithmosSave } from '../experiences/arithmos/save.ts';
 
 export type AulaId = 'electronica' | 'programacion' | 'fisica' | 'matematica';
 export type AulaEstado = 'cerrada' | 'off' | 'enCurso' | 'completada';
@@ -81,7 +82,7 @@ export function deriveSchoolState(saveRaw: string | null, webRaw: string | null)
       electronica: electronicaEstado,
       programacion: 'cerrada',
       fisica: 'off',
-      matematica: 'cerrada',
+      matematica: 'off',
     },
     electronica: {
       unidadesCompletadas,
@@ -98,5 +99,8 @@ const WEB_KEY = 'roxana-web-v1';
 export function readSchoolState(): SchoolState {
   const saveRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(SAVE_KEY) : null;
   const webRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(WEB_KEY) : null;
-  return deriveSchoolState(saveRaw, webRaw);
+  const school = deriveSchoolState(saveRaw, webRaw);
+  const arithmos = readArithmosSave();
+  school.aulas.matematica = arithmos.restored.length === 6 ? 'completada' : arithmos.restored.length ? 'enCurso' : 'off';
+  return school;
 }

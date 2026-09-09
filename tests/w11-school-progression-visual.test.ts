@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { deriveSchoolState } from '../src/landing/schoolModel.ts';
-import { voxelZoneState } from '../src/landing/voxelSchoolModel.ts';
+import { VOXEL_ROOMS, voxelZoneState } from '../src/landing/voxelSchoolModel.ts';
 
 function assert(condition: boolean, message: string): void {
   if (!condition) throw new Error(message);
@@ -9,9 +9,9 @@ function assert(condition: boolean, message: string): void {
 const initial = deriveSchoolState(null, null);
 assert(initial.electronica.arcoCompleto === false, 'la escuela nueva empieza antes del cierre de Arco 1');
 assert(voxelZoneState('electronica', initial) === 'open', 'Electrónica conserva actividad parcial');
-for (const id of ['matematica', 'programacion'] as const) {
-  assert(voxelZoneState(id, initial) === 'closed', `${id} empieza dormida`);
-}
+assert(voxelZoneState('programacion', initial) === 'closed', 'programacion empieza dormida');
+assert(voxelZoneState('matematica', initial) === 'open', 'Arithmos está abierto desde el inicio');
+assert(VOXEL_ROOMS.find(room => room.id === 'matematica')?.href === '/arithmos/', 'el aula de Matemática conduce al juego de Arithmos');
 // Fisica es 'off' en `deriveSchoolState` (el slice M0..M0.7 ya está mergeado, gateado
 // por `arcOneCompleted`), lo que el voxel mapea a 'open'. La distinción es interna:
 // 'off' = el aula existe pero el recorrido espera al cierre de Arco I.
@@ -29,6 +29,8 @@ const complete = deriveSchoolState(JSON.stringify({
 }), null);
 assert(complete.electronica.arcoCompleto, 'el save puede activar la variante completa');
 assert(voxelZoneState('electronica', complete) === 'restored', 'Electrónica se restaura');
+assert(voxelZoneState('matematica', complete) === 'open', 'la restauración de Ohmdal no sustituye el progreso propio de Arithmos');
+assert(voxelZoneState('programacion', complete) === 'closed', 'la restauración de Ohmdal conserva el cierre de programación');
 
 const builder = readFileSync(new URL('../scripts/blender/build_school.py', import.meta.url), 'utf8');
 for (const node of [

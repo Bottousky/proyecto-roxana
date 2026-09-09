@@ -44,6 +44,7 @@ export default defineConfig({
           const destinos: Record<string, string> = {
             '/jugar': '/src/jugar/',
             '/physica': '/src/experiences/physica/',
+            '/arithmos': '/src/experiences/arithmos/',
             '/ohmdal-plaza': '/src/experiences/ohmdal-plaza/',
             '/ohmdal-playcanvas': '/src/experiences/ohmdal-playcanvas/',
           };
@@ -68,6 +69,7 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         jugar: resolve(__dirname, 'src/jugar/index.html'),
         physica: resolve(__dirname, 'src/experiences/physica/index.html'),
+        arithmos: resolve(__dirname, 'src/experiences/arithmos/index.html'),
         plaza: resolve(__dirname, 'src/experiences/ohmdal-plaza/index.html'),
         playcanvas: resolve(__dirname, 'src/experiences/ohmdal-playcanvas/index.html'),
       },

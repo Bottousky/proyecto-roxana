@@ -14,7 +14,7 @@ function equal<T>(actual: T, expected: T, label: string): void {
   equal(s.aulas.electronica, 'off', 'null/null: aula electronica');
   equal(s.aulas.programacion, 'cerrada', 'null/null: aula programacion');
   equal(s.aulas.fisica, 'off', 'null/null: aula fisica (abierta a Physica)');
-  equal(s.aulas.matematica, 'cerrada', 'null/null: aula matematica');
+  equal(s.aulas.matematica, 'off', 'null/null: aula matematica abierta a Arithmos');
   equal(s.electronica.unidadesCompletadas, 0, 'null/null: unidades completadas');
   equal(s.electronica.totalUnidades, 5, 'null/null: total unidades');
   equal(s.electronica.arcoCompleto, false, 'null/null: arco completo');
@@ -24,6 +24,8 @@ function equal<T>(actual: T, expected: T, label: string): void {
 {
   const s = deriveSchoolState('{oops', null);
   equal(s.aulas.electronica, 'off', 'save corrupto: aula electronica');
+  equal(s.aulas.matematica, 'off', 'save corrupto: Arithmos sigue abierto');
+  equal(s.aulas.programacion, 'cerrada', 'save corrupto: programacion conserva su cierre');
   equal(s.electronica.unidadesCompletadas, 0, 'save corrupto: unidades completadas');
   equal(s.electronica.arcoCompleto, false, 'save corrupto: arco completo');
 }
@@ -54,6 +56,8 @@ function equal<T>(actual: T, expected: T, label: string): void {
   equal(s.aulas.electronica, 'completada', 'arco completo: aula electronica');
   equal(s.electronica.unidadesCompletadas, 5, 'arco completo: unidades completadas');
   equal(s.electronica.arcoCompleto, true, 'arco completo: arco completo');
+  equal(s.aulas.matematica, 'off', 'completar Ohmdal no completa Arithmos');
+  equal(s.aulas.programacion, 'cerrada', 'completar Ohmdal no abre programacion');
 }
 
 // Caso 5: webRaw con introVista y nombre de perfil

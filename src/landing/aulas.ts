@@ -29,7 +29,7 @@ export const AULAS: Aula[] = [
   { id: 'electronica', motif: 'Ω', disciplina: 'Electrónica', nombre: 'Ohmdal', desc: 'Corriente, resistencia, la chispa que lo mueve.' },
   { id: 'programacion', motif: '{ }', disciplina: 'Programación', nombre: 'Bitland', desc: 'Lógica, bucles, estructuras de pensamiento.' },
   { id: 'fisica', motif: 'Δ', disciplina: 'Física', nombre: 'Physica', desc: 'Movimiento, energía y las leyes que lo gobiernan.' },
-  { id: 'matematica', motif: '∑', disciplina: 'Matemática', nombre: 'Arithmos', desc: 'Números como fuerzas, ecuaciones como equilibrio.' },
+  { id: 'matematica', motif: '◈', disciplina: 'Matemática', nombre: 'Arithmos', desc: 'Muchas formas para una misma materia. Un puerto que vuelve a partir.' },
 ];
 
 function prefersReducedMotion(): boolean {
@@ -655,6 +655,10 @@ export function initAulas(): void {
     const aulaId = doorEl.dataset.aulaId as AulaId;
 
     const activate = () => {
+      if (aulaId === 'matematica') {
+        window.location.href = '/arithmos/';
+        return;
+      }
       if (!activa) {
         rattleDoor(doorEl);
         return;
@@ -690,6 +694,10 @@ export function initAulas(): void {
   window.addEventListener('hashchange', () => {
     const aulaId = parseAulaHash(location.hash);
     if (aulaId) {
+      if (aulaId === 'matematica') {
+        window.location.href = '/arithmos/';
+        return;
+      }
       const estado = readSchoolState().aulas[aulaId];
       if (estado !== 'cerrada') {
         if (aulaId === 'fisica') {
@@ -708,6 +716,10 @@ export function initAulas(): void {
   // Estado inicial desde el hash (carga directa): sin puerta de origen → crossfade.
   const initialAulaId = parseAulaHash(location.hash);
   if (initialAulaId) {
+    if (initialAulaId === 'matematica') {
+      window.location.href = '/arithmos/';
+      return;
+    }
     const estado = readSchoolState().aulas[initialAulaId];
     if (estado !== 'cerrada') {
       if (initialAulaId === 'fisica') {

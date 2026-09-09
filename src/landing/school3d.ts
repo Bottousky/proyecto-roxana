@@ -193,7 +193,7 @@ function stateOverride(saved: SchoolState, preview: 'save' | 'initial' | 'comple
       electronica: completed ? 'completada' : 'off',
       programacion: 'cerrada',
       fisica: 'cerrada',
-      matematica: 'cerrada',
+      matematica: saved.aulas.matematica,
     },
     electronica: {
       ...saved.electronica,

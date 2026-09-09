@@ -13,5 +13,5 @@ export const runtimeLoaders: RuntimeLoaderMap = {
   'platformer-phaser': () =>
     import('./placeholderRuntime.ts').then((m) => m.placeholderRuntime('platformer-phaser', 'physica')),
   'cosmos-web': () =>
-    import('./placeholderRuntime.ts').then((m) => m.placeholderRuntime('cosmos-web', 'arithmos')),
+    import('./arithmos/runtime.ts').then((m) => m.arithmosRuntime),
 };
