@@ -104,6 +104,8 @@ REQUIRED_CONNECTIONS = {
 
 
 DOORS: tuple[DoorPlan, ...] = (
+    DoorPlan("matematica", "hall", "vertical", -10.0, 7.2, 1.8),
+    DoorPlan("fisica", "hall", "vertical", 10.0, 7.2, 1.8),
     DoorPlan("matematica", "electronica", "horizontal", 6.0, -17.0),
     DoorPlan("electronica", "hall", "vertical", -10.0, 1.0, 2.2),
     DoorPlan("electronica", "preceptoria", "horizontal", -4.0, -16.0),

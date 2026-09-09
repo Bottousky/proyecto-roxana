@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 export interface SchoolAtmosphere {
   /** Time is elapsed seconds; reduced motion freezes all decorative animation. */
@@ -80,9 +79,8 @@ function softTexture(): THREE.DataTexture {
 }
 
 /**
- * Additive dressing for the original cutaway school, after its room terraces
- * are installed. Thirteen draw calls, no lights, external assets or picking
- * targets. Portal ornaments follow the room's world position while it lifts.
+ * A restrained model base and floor markers at the four real classroom doors.
+ * No standalone decorative portals compete with the teaching apparatus.
  */
 export function installSchoolAtmosphere(
   scene: THREE.Scene,
@@ -144,19 +142,10 @@ export function installSchoolAtmosphere(
   root.add(brackets);
   const platformObjects = [...root.children];
 
-  const archParts = [
-    new THREE.TorusGeometry(.91, .09, 6, 40).translate(0, 1.16, 0),
-    new THREE.BoxGeometry(2.15, .16, .8).translate(0, .11, 0),
-    new THREE.BoxGeometry(.2, .7, .32).translate(-.79, .46, 0),
-    new THREE.BoxGeometry(.2, .7, .32).translate(.79, .46, 0),
-  ];
-  const archGeometry = retainGeometry(mergeGeometries(archParts));
-  archParts.forEach((part) => part.dispose());
-  const openingGeometry = retainGeometry(new THREE.CircleGeometry(.79, 40).translate(0, 1.16, .015));
-  const haloGeometry = retainGeometry(new THREE.RingGeometry(1.02, 1.07, 48));
+  const haloGeometry = retainGeometry(new THREE.RingGeometry(.48, .52, 36));
   haloGeometry.rotateX(-Math.PI / 2);
   const haloMaterial = retainMaterial(new THREE.MeshBasicMaterial({
-    color: 0xffffff, transparent: true, opacity: .57, depthWrite: false,
+    color: 0xffffff, transparent: true, opacity: .32, depthWrite: false,
     blending: THREE.AdditiveBlending,
   }));
   const halos = new THREE.InstancedMesh(haloGeometry, haloMaterial, WORLD_ACCENTS.length);
@@ -170,8 +159,6 @@ export function installSchoolAtmosphere(
     id: string;
     room: THREE.Object3D;
     point: THREE.Vector3;
-    ornament: THREE.Group | null;
-    glow: THREE.MeshBasicMaterial | null;
     index: number;
   }> = [];
   WORLD_ACCENTS.forEach(({ id, color }, index) => {
@@ -184,31 +171,13 @@ export function installSchoolAtmosphere(
       return;
     }
     room.updateWorldMatrix(true, true);
-    // Measure the floor, not bounds including terrace foundations or clock.
-    const floor = room.getObjectByName(`ROOM_${id}__click_floor`) ?? room;
-    const bounds = new THREE.Box3().setFromObject(floor);
-    const point = bounds.getCenter(new THREE.Vector3());
-    point.x += (id === 'matematica' || id === 'electronica' ? 1 : -1) * 4.65;
-    point.y = floor === room ? room.getWorldPosition(new THREE.Vector3()).y + .36 : bounds.max.y + .08;
-    point.z += 1.75;
+    const side = id === 'matematica' || id === 'electronica' ? -1 : 1;
+    const doorNorth = id === 'matematica' || id === 'fisica' ? 7.2 : 1;
+    const point = new THREE.Vector3(side * 10.7, room.getWorldPosition(new THREE.Vector3()).y + .37, -doorNorth);
     room.worldToLocal(point);
-    let ornament: THREE.Group | null = null;
-    let glow: THREE.MeshBasicMaterial | null = null;
-    // Ohmdal already has a modeled portal. Its floor accent alone is enough.
-    if (id !== 'electronica') {
-      ornament = new THREE.Group();
-      ornament.name = `RX_world_threshold_${id}`;
-      ornament.add(new THREE.Mesh(archGeometry, gold));
-      glow = retainMaterial(new THREE.MeshBasicMaterial({
-        color, map: texture, transparent: true, opacity: .42,
-        blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
-      }));
-      ornament.add(new THREE.Mesh(openingGeometry, glow));
-      root.add(ornament);
-    }
     const tint = new THREE.Color(color);
     halos.setColorAt(index, tint);
-    anchors.push({ id, room, point, ornament, glow, index });
+    anchors.push({ id, room, point, index });
   });
 
   // Sparse slow dust in the warm interior air; deterministic on every visit.
@@ -250,13 +219,6 @@ export function installSchoolAtmosphere(
       transform.scale.setScalar(visible ? 1 : 0);
       transform.updateMatrix();
       halos.setMatrixAt(anchor.index, transform.matrix);
-      if (anchor.ornament) {
-        anchor.ornament.position.copy(worldPosition);
-        anchor.ornament.visible = visible;
-      }
-      if (anchor.glow) {
-        anchor.glow.opacity = (selected === anchor.id ? .64 : .4) + Math.sin(t * .75 + anchor.index) * .035;
-      }
     }
     halos.instanceMatrix.needsUpdate = true;
   };
