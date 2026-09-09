@@ -116,7 +116,8 @@ export function createRoomLabels(
         const onScreen =
           projected.z < 1 && x > -80 && x < width + 80 && y > -60 && y < height + 60;
         // Con una sala abierta, el resto de rótulos estorban la lectura.
-        const visible = onScreen && (selected === null || selected === entry.id);
+        const overviewLabel = !compact || ['electronica', 'programacion', 'matematica', 'fisica', 'hall'].includes(entry.id);
+        const visible = onScreen && (selected === entry.id || (selected === null && overviewLabel));
 
         entry.element.classList.toggle('is-visible', visible);
         entry.connector.style.display = 'none';

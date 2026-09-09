@@ -35,7 +35,9 @@ abre los mismos servicios; sin JavaScript quedan enlaces a las aventuras existen
 - `account.ts`, `serviceClient.ts`: formularios reales, sesión y cliente HTTP.
 - `library.ts`, `worldActivities.ts`: contenido tipado y dominio de las prácticas.
 - `experience.css`, `school3d.css`: interfaz del Instituto y escena responsive.
-- `school3d.ts`: GLB existente, selección de objetos y encuadres por sala.
+- `school3d.ts`: GLB, selección de objetos y foco con las salas vecinas ocultas.
+- `school3dFraming.ts`: encuadre ortográfico oblicuo medido desde la geometría,
+  con dirección más alta en móvil para leer las superficies de trabajo.
 - `schoolAtmosphere.ts`: plinto biselado, bronce, umbrales y polvo original.
 - `school3dLabels.ts`: once rótulos proyectados con separación para touch.
 - `school3dPostFx.ts`: color, bloom con alfa conservado y calidad adaptativa.
@@ -75,6 +77,22 @@ El playtest recorre desktop y touch, cuenta, biblioteca, newsletter, prácticas,
 logros, entradas jugables y fallos del renderer/almacenamiento. `LANDING_URL`
 permite probar la build servida por Node. Evidencia y capturas van en `output/`.
 `npm run test:services` prueba la API con bases temporales aisladas.
+
+## Arquitectura y modelado
+
+La planta de `scripts/blender/school_plan.py` se construye en
+`scripts/blender/build_school.py`. Las aulas y los servicios comparten cota de
+piso; Dirección está elevada 1,14 m y conectada al desembarco del Hall. Las cotas
+se hornean en el modelo: el runtime no agrega terrazas ni levanta habitaciones
+al pasar el puntero. El modelo usa paredes de corte bajas para exponer puertas,
+aparatos y superficies de trabajo desde la cámara oblicua.
+
+El generador verifica el apoyo y la separación de las sillas, el encuentro de
+la escalera con Dirección y los pasillos de los NPC antes de exportar. `--blockout`
+permite revisar geometría con Eevee; `--fast` reduce muestras para iteración.
+La exportación final conserva colores de iluminación horneados y nombres de
+salas, objetos interactivos y estados de progreso. Evidencia de composición y
+recorridos se guarda en `output/playwright/`.
 
 ## Recursos
 

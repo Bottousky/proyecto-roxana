@@ -30,7 +30,7 @@
 }
 .school-stage {
   position: absolute;
-  inset: 80px 0 75px;
+  inset: 94px 12px 82px;
   z-index: 2;
   transition:
     left 0.7s,
@@ -285,6 +285,7 @@ html[data-labels='false'] .rx-school3d__labels {
   margin-bottom: 10px;
 }
 .rx-school3d[data-mode='room'] .school-stage {
+  top: 80px;
   right: 440px;
   left: 0;
 }
@@ -310,7 +311,7 @@ html[data-labels='false'] .rx-school3d__labels {
 }
 @media (max-width: 700px) {
   .school-stage {
-    inset: 180px -4% 100px;
+    inset: 154px 0 84px;
   }
   .rx-school3d[data-mode='room'] .school-stage {
     inset: 72px 0 55%;

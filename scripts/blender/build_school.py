@@ -20,6 +20,7 @@ the whole school.
 from __future__ import annotations
 
 import math
+import json
 import shutil
 import sys
 import time
@@ -31,7 +32,8 @@ from mathutils import Vector
 
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "assets" / "school3d"
+OUT = (Path(sys.argv[sys.argv.index("--output-dir") + 1]).resolve()
+       if "--output-dir" in sys.argv else ROOT / "assets" / "school3d")
 OUT.mkdir(parents=True, exist_ok=True)
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
@@ -39,6 +41,7 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from school_plan import (  # noqa: E402
     ANNEX_ROOM_IDS,
+    DOORS,
     HALL_CENTER,
     HALL_SIZE,
     PRIMARY_BY_ID,
@@ -53,6 +56,11 @@ DRAFT = "--draft" in sys.argv
 FAST = "--fast" in sys.argv
 BLOCKOUT = "--blockout" in sys.argv
 BAKE_SAMPLES = 4 if DRAFT else 24 if FAST else 220
+DIRECTION_FLOOR_RISE = 1.14
+HALL_LANDING_NORTH = 10.1
+HALL_LANDING_SURFACE = 1.47
+AMPHITHEATRE_ROW_COUNT = 3
+AMPHITHEATRE_SEAT_OFFSETS = (-3.0, -1.7, 1.7, 3.0)
 
 
 def log(stage: str, message: str) -> None:
@@ -121,6 +129,7 @@ DENSIFY_RULES = (
     ("__click_floor", 0.65),
     ("__floor_inset", 0.65),
     ("__back_wall", 0.7),
+    ("_wainscot", 0.6),
     ("__left_wall", 0.7),
     ("__right_wall", 0.7),
     ("__front_curb", 0.9),
@@ -173,11 +182,19 @@ def assign(obj, material):
 
 
 def box(name, loc, scale, material, parent=None, bevel=0.10):
-    bpy.ops.mesh.primitive_cube_add(location=loc)
-    obj = bpy.context.object
-    obj.name = name
-    obj.scale = (scale[0] / 2, scale[1] / 2, scale[2] / 2)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    # Direct mesh creation avoids a dependency-graph update for every plank.
+    # Dimensions are already baked into the vertices, preserving the old API.
+    hx, hy, hz = (value / 2 for value in scale)
+    vertices = ((-hx, -hy, -hz), (hx, -hy, -hz), (hx, hy, -hz), (-hx, hy, -hz),
+                (-hx, -hy, hz), (hx, -hy, hz), (hx, hy, hz), (-hx, hy, hz))
+    faces = ((0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4),
+             (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7))
+    mesh = bpy.data.meshes.new(f"{name}__geometry")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.location = loc
     assign(obj, material)
     if bevel:
         modifier = obj.modifiers.new("Soft edges", "BEVEL")
@@ -187,74 +204,74 @@ def box(name, loc, scale, material, parent=None, bevel=0.10):
     return obj
 
 
-def cylinder(name, loc, radius, depth, material, parent=None, vertices=16):
-    bpy.ops.mesh.primitive_cylinder_add(vertices=vertices, radius=radius, depth=depth, location=loc)
-    obj = bpy.context.object
-    obj.name = name
-    assign(obj, material)
-    bevel = obj.modifiers.new("Soft edges", "BEVEL")
-    bevel.width = min(0.08, radius * 0.18)
-    bevel.segments = 2
+def primitive_mesh(name, loc, vertices, faces, material, parent):
+    mesh = bpy.data.meshes.new(f"{name}__geometry")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.location = loc
     obj.parent = parent
+    assign(obj, material)
     return obj
 
 
+def cylinder(name, loc, radius, depth, material, parent=None, vertices=16):
+    return cone(name, loc, radius, radius, depth, material, parent, vertices)
+
+
 def polygon_prism(name, loc, radius_x, radius_y, depth, material, parent=None, vertices=8, rotation=math.pi / 8):
-    """Low-sided oval prism used for the octagonal hall, rugs and clock trim."""
-    bpy.ops.mesh.primitive_cylinder_add(
-        vertices=vertices,
-        radius=1.0,
-        depth=depth,
-        location=loc,
-        rotation=(0, 0, rotation),
-    )
-    obj = bpy.context.object
-    obj.name = name
-    obj.scale = (radius_x, radius_y, 1.0)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    assign(obj, material)
-    bevel = obj.modifiers.new("Soft edges", "BEVEL")
-    bevel.width = min(.08, depth * .22)
-    bevel.segments = 2
-    obj.parent = parent
+    obj = cylinder(name, loc, 1.0, depth, material, parent, vertices)
+    for vertex in obj.data.vertices:
+        vertex.co.x *= radius_x
+        vertex.co.y *= radius_y
+    obj.rotation_euler.z = rotation
+    obj.modifiers[0].width = min(.08, depth * .22)
     return obj
 
 
 def sphere(name, loc, radius, material, parent=None, segments=14, rings=7):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=segments, ring_count=rings, radius=radius, location=loc)
-    obj = bpy.context.object
-    obj.name = name
-    assign(obj, material)
-    obj.parent = parent
-    return obj
+    points = [(0, 0, radius)]
+    for ring in range(1, rings):
+        phi = math.pi * ring / rings
+        for segment in range(segments):
+            theta = math.tau * segment / segments
+            points.append((radius * math.sin(phi) * math.cos(theta), radius * math.sin(phi) * math.sin(theta), radius * math.cos(phi)))
+    bottom = len(points)
+    points.append((0, 0, -radius))
+    faces = []
+    for segment in range(segments):
+        nxt = (segment + 1) % segments
+        faces.append((0, 1 + segment, 1 + nxt))
+        for ring in range(rings - 2):
+            start = 1 + ring * segments
+            faces.append((start + segment, start + segments + segment, start + segments + nxt, start + nxt))
+        start = 1 + (rings - 2) * segments
+        faces.append((bottom, start + nxt, start + segment))
+    return primitive_mesh(name, loc, points, faces, material, parent)
 
 
 def ellipsoid(name, loc, scale, material, parent=None, segments=14, rings=7):
     obj = sphere(name, loc, 1.0, material, parent, segments, rings)
-    obj.scale = scale
-    bpy.context.view_layer.objects.active = obj
-    obj.select_set(True)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    for vertex in obj.data.vertices:
+        for axis in range(3): vertex.co[axis] *= scale[axis]
     return obj
 
 
 def cone(name, loc, radius_bottom, radius_top, depth, material, parent=None, vertices=16, y_scale=1.0):
-    bpy.ops.mesh.primitive_cone_add(
-        vertices=vertices,
-        radius1=radius_bottom,
-        radius2=radius_top,
-        depth=depth,
-        location=loc,
-    )
-    obj = bpy.context.object
-    obj.name = name
-    obj.scale.y = y_scale
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    assign(obj, material)
-    bevel = obj.modifiers.new("Soft edges", "BEVEL")
-    bevel.width = .045
-    bevel.segments = 2
-    obj.parent = parent
+    points = []
+    for z, radius in ((-depth / 2, radius_bottom), (depth / 2, radius_top)):
+        for index in range(vertices):
+            angle = math.tau * index / vertices
+            points.append((math.cos(angle) * radius, math.sin(angle) * radius * y_scale, z))
+    faces = [tuple(reversed(range(vertices))), tuple(range(vertices, 2 * vertices))]
+    for index in range(vertices):
+        nxt = (index + 1) % vertices
+        faces.append((index, nxt, vertices + nxt, vertices + index))
+    obj = primitive_mesh(name, loc, points, faces, material, parent)
+    modifier = obj.modifiers.new("Soft edges", "BEVEL")
+    modifier.width = min(.08, min(radius_bottom, radius_top) * .18)
+    modifier.segments = 2
     return obj
 
 
@@ -268,14 +285,18 @@ def cylinder_between(name, start, end, radius, material, parent=None, vertices=1
 
 
 def ico_ellipsoid(name, loc, scale, material, parent=None, subdivisions=2):
-    """Angular volume for carved anatomy and hair; deliberately flat shaded."""
-    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=subdivisions, radius=1.0, location=loc)
-    obj = bpy.context.object
-    obj.name = name
-    obj.scale = scale
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    assign(obj, material)
+    mesh = bpy.data.meshes.new(f"{name}__geometry")
+    bm = bmesh.new()
+    bmesh.ops.create_icosphere(bm, subdivisions=subdivisions, radius=1.0)
+    for vertex in bm.verts:
+        for axis in range(3): vertex.co[axis] *= scale[axis]
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.location = loc
     obj.parent = parent
+    assign(obj, material)
     return obj
 
 
@@ -317,18 +338,9 @@ def faceted_limb(name, start, end, radius_start, radius_end, material, parent=No
     start_v = Vector(start)
     end_v = Vector(end)
     direction = end_v - start_v
-    bpy.ops.mesh.primitive_cone_add(
-        vertices=vertices,
-        radius1=radius_start,
-        radius2=radius_end,
-        depth=direction.length,
-        location=(start_v + end_v) / 2,
-    )
-    obj = bpy.context.object
-    obj.name = name
+    obj = cone(name, (start_v + end_v) / 2, radius_start, radius_end, direction.length, material, parent, vertices)
+    obj.modifiers.clear()
     obj.rotation_euler = direction.to_track_quat("Z", "Y").to_euler()
-    assign(obj, material)
-    obj.parent = parent
     return obj
 
 
@@ -367,14 +379,17 @@ def plant(name, x, y, z, parent, scale=1.0):
         sphere(f"{name}__leaf_{index}", (x + dx * scale, y + dy * scale, z + dz * scale), .30 * scale, M["leaf"], parent, 10, 5)
 
 
-def chair(name, x, y, z, parent, material=None, rotation=0.0):
+def chair(name, x, y, z, parent, material=None, rotation=math.pi):
+    """One grounded chair, authored around its own pivot; default faces +Y."""
     material = material or M["teal"]
-    root = empty(name, parent=parent)
-    seat = box(f"{name}__seat", (x, y, z + .55), (.72, .72, .18), material, root, .08)
-    back = box(f"{name}__back", (x, y + .31, z + 1.05), (.72, .16, .95), material, root, .08)
+    root = empty(name, (x, y, z), parent)
+    box(f"{name}__seat", (0, 0, .48), (.68, .67, .14), material, root, .06)
+    box(f"{name}__back", (0, .27, .85), (.68, .12, .57), material, root, .05)
+    for dx in (-.24, .24):
+        for dy in (-.23, .23):
+            box(f"{name}__leg", (dx, dy, .22), (.075, .075, .44), M["stone_dark"], root, .02)
     for dx in (-.25, .25):
-        for dy in (-.25, .25):
-            box(f"{name}__leg", (x + dx, y + dy, z + .26), (.10, .10, .52), M["stone_dark"], root, 0)
+        box(f"{name}__back_support", (dx, .27, .58), (.07, .07, .72), M["wood"], root, .02)
     root.rotation_euler[2] = rotation
     return root
 
@@ -454,7 +469,7 @@ def wall_sconce_side(name, x, y, z, side, parent):
 def side_arch(name, x, y, z, side, parent, label_material):
     """Open classroom threshold: keeps circulation while making the door legible."""
     root = empty(name, parent=parent)
-    box(f"{name}__opening", (x - side * .31, y, z + 1.43), (.04, 2.38, 2.62), M["black"], root, .01)
+    # The opening is empty space: no black plane closes the circulation path.
     box(f"{name}__post_front", (x, y - 1.36, z + 1.54), (.58, .48, 3.08), M["stone"], root, .08)
     box(f"{name}__post_back", (x, y + 1.36, z + 1.54), (.58, .48, 3.08), M["stone"], root, .08)
     box(f"{name}__lintel", (x, y, z + 3.04), (.62, 3.20, .42), M["cream"], root, .07)
@@ -586,38 +601,24 @@ def projector_cart(name, x, y, z, parent):
     return root
 
 
-def person(name, x, y, z, parent, shirt, skin, hair=None, scale=1.0, visitor=False, adult=False):
+def person(name, x, y, z, parent, shirt, skin, hair=None, scale=1.0, visitor=False, adult=True):
+    """Human-scale figure with a local foot pivot, stable under idle rotation."""
     hair = hair or M["black"]
-    root = empty(name, parent=parent)
-    root["role"] = "visitor" if visitor else "student"
+    root = empty(name, (x, y, z), parent)
+    root["role"] = "visitor" if visitor else "teacher" if "teacher" in name else "student"
     root["animation"] = "idle-wander"
-    if adult:
-        # Hall: silueta humana más esbelta y cabeza menos chibi. El default se
-        # conserva intacto para no alterar todavía los personajes de otras salas.
-        body_radius, body_z, body_height = .25, 1.08, 1.03
-        head_radius, head_z = .25, 1.78
-        hair_radius, hair_z = .26, 1.92
-        leg_x, leg_z, leg_size = .12, .35, (.15, .18, .70)
-        hand_x, hand_z, hand_radius = .31, 1.15, .095
-    else:
-        body_radius, body_z, body_height = .32, 1.12, .92
-        head_radius, head_z = .36, 1.92
-        hair_radius, hair_z = .37, 2.10
-        leg_x, leg_z, leg_size = .15, .37, (.19, .22, .72)
-        hand_x, hand_z, hand_radius = .40, 1.18, .13
-    cylinder(f"{name}__body", (x, y, z + body_z * scale), body_radius * scale, body_height * scale, shirt, root, 12)
-    sphere(f"{name}__head", (x, y, z + head_z * scale), head_radius * scale, skin, root, 12, 6)
-    sphere(f"{name}__hair", (x, y + .02 * scale, z + hair_z * scale), hair_radius * scale, hair, root, 10, 5)
+    # All rooms share the Hall's adult proportions: no giant chibi heads.
+    body_radius, body_z, body_height = .25, 1.08, 1.03
+    head_z = 1.78
+    cylinder(f"{name}__body", (0, 0, body_z * scale), body_radius * scale, body_height * scale, shirt, root, 12)
+    ellipsoid(f"{name}__head", (0, 0, head_z * scale), (.23 * scale, .22 * scale, .27 * scale), skin, root, 12, 8)
+    ellipsoid(f"{name}__hair", (0, .035 * scale, 1.98 * scale), (.24 * scale, .22 * scale, .13 * scale), hair, root, 12, 6)
     for side in (-1, 1):
-        box(
-            f"{name}__leg",
-            (x + side * leg_x * scale, y, z + leg_z * scale),
-            tuple(value * scale for value in leg_size),
-            M["stone_dark"],
-            root,
-            .04 if adult else .05,
-        )
-        sphere(f"{name}__hand", (x + side * hand_x * scale, y, z + hand_z * scale), hand_radius * scale, skin, root, 8, 4)
+        box(f"{name}__leg", (side * .12 * scale, 0, .35 * scale), (.15 * scale, .18 * scale, .70 * scale), M["stone_dark"], root, .035)
+        ellipsoid(f"{name}__shoe", (side * .12 * scale, -.055 * scale, .06 * scale), (.10 * scale, .16 * scale, .065 * scale), M["black"], root, 10, 5)
+        cylinder_between(f"{name}__arm", (side * .22 * scale, 0, 1.44 * scale), (side * .31 * scale, -.035 * scale, .97 * scale), .075 * scale, shirt, root, 8)
+        sphere(f"{name}__hand", (side * .31 * scale, -.035 * scale, .95 * scale), .082 * scale, skin, root, 8, 5)
+        sphere(f"{name}__eye", (side * .077 * scale, -.208 * scale, 1.81 * scale), .026 * scale, M["black"], root, 8, 4)
     return root
 
 
@@ -641,43 +642,34 @@ def room_shell(room_id, label, center, size, accent):
     floor_mat = M.get(accent, M["stone"])
 
     if room_id in ANNEX_ROOM_IDS:
-        # Secondary programmes live as deep side-wall thresholds inside the
-        # Hall. They remain clickable rooms, but no longer add three unrelated
-        # boxes to the overview silhouette.
-        side = -1 if x < 0 else 1
-        box(f"ROOM_{room_id}__click_floor", (x - side * .72, y, .34), (1.45, 2.05, .10), floor_mat, root, .08)
-        box(f"ROOM_{room_id}__recess", (x + side * .05, y, 1.86), (.12, 1.72, 2.95), M["black"], root, .02)
-        box(f"ROOM_{room_id}__post_front", (x, y - 1.10, 1.88), (.54, .38, 3.35), M["stone"], root, .07)
-        box(f"ROOM_{room_id}__post_back", (x, y + 1.10, 1.88), (.54, .38, 3.35), M["stone"], root, .07)
-        box(f"ROOM_{room_id}__lintel", (x, y, 3.48), (.58, 2.55, .42), M["cream"], root, .07)
-        box(f"ROOM_{room_id}__accent", (x - side * .34, y, 3.12), (.08, 1.55, .30), floor_mat, root, .03)
-        face_x = x - side * .14
-        if room_id == "audiovisual":
-            box(f"ROOM_{room_id}__screen", (face_x, y, 2.05), (.08, 1.28, 1.18), M["screen"], root, .02)
-            cylinder(f"ROOM_{room_id}__projector_lens", (face_x - side * .18, y, 1.08), .13, .28, M["paper"], root, 10).rotation_euler[1] = math.radians(90)
-        elif room_id == "biblioteca":
-            palette = (M["paper"], M["wine"], M["teal"], M["gold"], M["blue"])
-            for shelf_index in range(3):
-                shelf_z = 1.22 + shelf_index * .72
-                box(f"ROOM_{room_id}__shelf_{shelf_index}", (face_x, y, shelf_z), (.12, 1.42, .09), M["wood_light"], root, .02)
-                for book_index in range(5):
-                    book_y = y - .50 + book_index * .25
-                    book_height = .36 + .07 * ((shelf_index + book_index) % 3)
-                    box(
-                        f"ROOM_{room_id}__book_{shelf_index}_{book_index}",
-                        (face_x - side * .07, book_y, shelf_z + .24),
-                        (.08, .16, book_height),
-                        palette[(shelf_index + book_index) % len(palette)],
-                        root,
-                        .01,
-                    )
+        # Hall services are actual furnished alcoves, oriented towards the
+        # visitor, instead of thin plaques embedded in an opaque side wall.
+        alcove_x = -8.15 if x < 0 else 8.15
+        alcove_y = -4.5 if room_id == "audiovisual" else 3.5
+        box(f"ROOM_{room_id}__click_floor", (alcove_x, alcove_y, .345), (3.0, 3.1, .04), floor_mat, root, .035)
+        if room_id == "biblioteca":
+            bookshelf("ROOM_biblioteca__reading_shelf", alcove_x, alcove_y + 1.15, .37, root, 2.65, 2.55)
+            desk("ROOM_biblioteca__reading_table", alcove_x, alcove_y - .30, .24, root, 1.8, .90)
+            box("ROOM_biblioteca__open_book", (alcove_x, alcove_y - .30, 1.29), (.74, .48, .07), M["paper"], root, .025)
+            chair("ROOM_biblioteca__reading_chair", alcove_x, alcove_y - 1.18, .37, root, M["green"])
+        elif room_id == "logros":
+            box("ROOM_logros__case_base", (alcove_x, alcove_y + .65, .94), (2.65, .70, 1.12), M["wood"], root, .07)
+            box("ROOM_logros__case_back", (alcove_x, alcove_y + .96, 1.94), (2.65, .12, 1.14), M["green"], root, .045)
+            for side in (-1, 1):
+                box(f"ROOM_logros__case_post_{side}", (alcove_x + side * 1.25, alcove_y + .65, 1.94), (.10, .70, 1.2), M["gold"], root, .025)
+            box("ROOM_logros__case_cap", (alcove_x, alcove_y + .65, 2.59), (2.75, .80, .13), M["wood_light"], root, .04)
+            for index in range(3):
+                cylinder(f"ROOM_logros__display_plinth_{index}", (alcove_x - .78 + index * .78, alcove_y + .55, 1.55), .25, .13, M["stone"], root, 12)
+                box(f"ROOM_logros__medal_support_{index}", (alcove_x - .78 + index * .78, alcove_y + .585, 1.77), (.07, .07, .32), M["gold"], root, .01)
+                polygon_prism(f"ROOM_logros__empty_medal_{index}", (alcove_x - .78 + index * .78, alcove_y + .55, 1.95), .23, .23, .06, M["stone_dark"], root, 8, 0).rotation_euler[0] = math.pi / 2
         else:
-            for trophy_index in range(3):
-                trophy_y = y - .48 + trophy_index * .48
-                cylinder(f"ROOM_{room_id}__trophy_{trophy_index}", (face_x - side * .08, trophy_y, 1.55), .10, .62, M["gold"], root, 10)
-                cone(f"ROOM_{room_id}__cup_{trophy_index}", (face_x - side * .08, trophy_y, 1.96), .22, .10, .28, M["gold"], root, 10)
-        # Intentionally no overview anchor: these annexes remain available in
-        # the room menu without adding three labels over the central monument.
+            box("ROOM_audiovisual__screen_frame", (alcove_x, alcove_y + 1.05, 1.96), (2.7, .14, 1.8), M["wood"], root, .055)
+            box("ROOM_audiovisual__screen", (alcove_x, alcove_y + .95, 1.96), (2.42, .035, 1.52), M["screen"], root, .025)
+            for side in (-1, 1):
+                box(f"ROOM_audiovisual__screen_leg_{side}", (alcove_x + side * 1.08, alcove_y + 1.05, .83), (.10, .12, .92), M["wood"], root, .025)
+            projector_cart("ROOM_audiovisual__projector", alcove_x, alcove_y - 1.0, .35, root)
+        anchor = empty(f"ANCHOR_{room_id}", (alcove_x, alcove_y, .35), root)
+        anchor["anchorType"] = "room-focus"
         return root
 
     if room_id == "hall":
@@ -711,89 +703,44 @@ def room_shell(room_id, label, center, size, accent):
             root,
             .015,
         )
-    # Tall rear/outer walls and a low front curb. At 4.8 units the rooms read
-    # like horizontal strips from overview instead of architectural volumes.
-    wall_height = 5.65
+    # A deliberate cutaway: exterior north/west walls remain architectural;
+    # shared classroom partitions and the near eastern facade are knee walls.
     back_y = y + d / 2
-    box(f"ROOM_{room_id}__back_wall", (x, back_y, wall_height / 2 + .24), (w, .44, wall_height), M["cream"], root, .14)
-    box(f"ROOM_{room_id}__back_wainscot", (x, back_y - .25, 1.02), (w - .55, .10, 1.52), M["wood"], root, .05)
-    wall_accent = {
-        "matematica": M["green"],
-        "fisica": M["indigo"],
-        "electronica": M["green"],
-        "programacion": M["indigo"],
-        "direccion": M["wood"],
-        "preceptoria": M["wine"],
-        "visitantes": M["wine"],
-    }.get(room_id, floor_mat)
-    box(
-        f"ROOM_{room_id}__back_field",
-        (x, back_y - .255, 3.35),
-        (w - .86, .07, 3.62),
-        wall_accent,
-        root,
-        .035,
-    )
+    rear_height = 3.65 if room_id in {"matematica", "fisica", "direccion"} else .92
     side_x = x - w / 2 if x < -.5 else x + w / 2
     side_name = "left" if x < -.5 else "right"
-    box(f"ROOM_{room_id}__{side_name}_wall", (side_x, y, wall_height / 2 + .24), (.44, d, wall_height), M["cream"], root, .14)
-    box(f"ROOM_{room_id}__{side_name}_wainscot", (side_x + (.25 if x < 0 else -.25), y, 1.02), (.10, d - .55, 1.52), M["wood"], root, .05)
-    box(
-        f"ROOM_{room_id}__{side_name}_field",
-        (side_x + (.255 if x < 0 else -.255), y, 3.35),
-        (.07, d - .86, 3.62),
-        wall_accent,
-        root,
-        .035,
-    )
-    # The northern room owns each shared horizontal boundary. A front curb is
-    # emitted only where the south edge is exposed, never over a neighbour's
-    # back wall.
+    side_height = 3.65 if x < -.5 else 1.05
+    rear_openings = sorted((door.center - door.width / 2, door.center + door.width / 2)
+                           for door in DOORS if door.axis == "horizontal" and abs(door.coordinate - back_y) < .001
+                           and room_id in (door.room_a, door.room_b))
+    rear_segments, segment_start = [], x - w / 2
+    for opening_start, opening_end in rear_openings:
+        if opening_start > segment_start: rear_segments.append((segment_start, opening_start))
+        segment_start = opening_end
+    if segment_start < x + w / 2: rear_segments.append((segment_start, x + w / 2))
+    for segment_index, (start, end) in enumerate(rear_segments):
+        suffix = f"_{segment_index}" if rear_openings else ""
+        box(f"ROOM_{room_id}__back_wall{suffix}", ((start + end) / 2, back_y, .24 + rear_height / 2), (end - start, .36, rear_height), M["cream"], root, .08)
+        box(f"ROOM_{room_id}__back_wainscot{suffix}", ((start + end) / 2, back_y - .21, .69), (end - start - .10, .08, .86), M["wood"], root, .03)
+        box(f"ROOM_{room_id}__back_cap{suffix}", ((start + end) / 2, back_y, .26 + rear_height), (end - start, .48, .13), M["stone"], root, .035)
+    wall_accent = M["indigo"] if room_id in {"fisica", "programacion"} else M["green"] if room_id in {"matematica", "electronica"} else M["wood"]
+    if rear_height > 2:
+        box(f"ROOM_{room_id}__back_field", (x, back_y - .215, 2.42), (w - .86, .045, 2.48), wall_accent, root, .025)
+    box(f"ROOM_{room_id}__{side_name}_wall", (side_x, y, .24 + side_height / 2), (.36, d, side_height), M["cream"], root, .08)
+    box(f"ROOM_{room_id}__{side_name}_wainscot", (side_x + (.21 if x < 0 else -.21), y, .69), (.08, d - .55, .86), M["wood"], root, .035)
+    box(f"ROOM_{room_id}__side_cap", (side_x, y, .26 + side_height), (.48, d, .13), M["stone"], root, .035)
     for segment_index, (x0, x1) in enumerate(exposed_front_segments(room_id)):
-        box(
-            f"ROOM_{room_id}__front_curb_{segment_index}",
-            ((x0 + x1) / 2, y - d / 2, .56),
-            (x1 - x0, .40, .90),
-            M["stone"],
-            root,
-            .12,
-        )
-    # The sign is a plate only: the readable label lives in the DOM, projected
-    # from ANCHOR_<id>, where it can be styled, translated and read by a11y tools.
-    plaque_width = min(w - 2.0, max(2.8, len(label) * .28))
-    box(f"ROOM_{room_id}__sign", (x, back_y - .27, 4.82), (plaque_width, .10, .54), M["black"], root, .08)
-    # Warm sconces are emissive meshes rather than dozens of runtime lights.
-    for sconce_index, sx in enumerate((-plaque_width * .62, plaque_width * .62)):
-        box(f"ROOM_{room_id}__sconce_arm_{sconce_index}", (x + sx, back_y - .34, 4.23), (.08, .20, .46), M["gold"], root, .03)
-        sphere(f"ROOM_{room_id}__lamp_{sconce_index}", (x + sx, back_y - .46, 4.06), .18, M["lamp"], root, 10, 5)
-
-    cap_count = max(5, int(w / 1.25))
-    for index in range(cap_count):
-        bx = x - w / 2 + (index + .5) * (w / cap_count)
-        tone = M["stone"] if index % 2 else M["cream"]
-        box(f"ROOM_{room_id}__back_cap_{index}", (bx, back_y, 5.68), (w / cap_count - .06, .72, .42), tone, root, .06)
-    side_count = max(4, int(d / 1.25))
-    for index in range(side_count):
-        by = y - d / 2 + (index + .5) * (d / side_count)
-        tone = M["stone"] if index % 2 else M["cream"]
-        box(f"ROOM_{room_id}__side_cap_{index}", (side_x, by, 5.68), (.72, d / side_count - .06, .42), tone, root, .06)
-    if room_id == "direccion":
-        # The clock house is the only centred rectangular room; unlike a side
-        # wing, it needs both jamb walls to read as a symmetrical tower.
-        other_x = x - w / 2
-        box(f"ROOM_{room_id}__left_wall", (other_x, y, wall_height / 2 + .24), (.44, d, wall_height), M["cream"], root, .14)
-        box(f"ROOM_{room_id}__left_wainscot", (other_x + .25, y, 1.02), (.10, d - .55, 1.52), M["wood"], root, .05)
-        box(f"ROOM_{room_id}__left_field", (other_x + .255, y, 3.35), (.07, d - .86, 3.62), wall_accent, root, .035)
-        for index in range(side_count):
-            by = y - d / 2 + (index + .5) * (d / side_count)
-            tone = M["stone"] if index % 2 else M["cream"]
-            box(f"ROOM_{room_id}__left_cap_{index}", (other_x, by, 5.68), (.72, d / side_count - .06, .42), tone, root, .06)
+        box(f"ROOM_{room_id}__front_curb_{segment_index}", ((x0 + x1) / 2, y - d / 2, .38), (x1 - x0, .30, .36), M["stone"], root, .06)
+    # Sparse piers show where the cut walls continue, without a crenellated lid.
     for pier_index, px in enumerate((x - w / 2, x + w / 2)):
-        box(f"ROOM_{room_id}__rear_pier_{pier_index}", (px, back_y, 3.01), (.68, .72, 5.90), M["stone"], root, .09)
-
-    if room_id in {"direccion", "biblioteca", "preceptoria", "logros", "visitantes"}:
+        pier_height = 3.85 if rear_height > 2 else 2.5
+        box(f"ROOM_{room_id}__rear_pier_{pier_index}", (px, back_y, .20 + pier_height / 2), (.48, .50, pier_height), M["stone"], root, .07)
+        cylinder_between(f"ROOM_{room_id}__lamp_arm_{pier_index}", (px, back_y, min(3.25, pier_height - .12)), (px + (.42 if pier_index == 0 else -.42), back_y - .28, min(3.25, pier_height - .12)), .035, M["gold"], root, 7)
+        sphere(f"ROOM_{room_id}__lamp_{pier_index}", (px + (.42 if pier_index == 0 else -.42), back_y - .28, min(3.25, pier_height - .12)), .13, M["lamp"], root, 10, 5)
+    if room_id == "direccion":
+        box(f"ROOM_{room_id}__left_wall", (x - w / 2, y, 1.1), (.36, d, 1.72), M["cream"], root, .07)
         for window_index, wx in enumerate((-w * .28, w * .28)):
-            back_window(f"ROOM_{room_id}__window_{window_index}", x + wx, back_y - .28, 2.45, root, 1.35, 1.75)
+            back_window(f"ROOM_{room_id}__window_{window_index}", x + wx, back_y - .24, 2.25, root, 1.2, 1.5)
     anchor = empty(f"ANCHOR_{room_id}", (x, y, .25), root)
     anchor["anchorType"] = "room-focus"
     return root
@@ -991,18 +938,13 @@ def add_hall(root, center):
     # the same coordinate.
     for side in (-1, 1):
         wall_x = hall_plan.x0 if side < 0 else hall_plan.x1
-        box(
-            f"HALL__gallery_wall_{side}",
-            (wall_x, y, 2.92),
-            (.52, hall_plan.size[1], 5.25),
-            M["wood"],
-            root,
-            .12,
-        )
-        box(f"HALL__gallery_rail_{side}", (wall_x - side * .18, y + .9, 2.15), (.22, 5.3, .25), M["wood_light"], root, .07)
-        for post_index in range(6):
-            post_y = y - 1.7 + post_index * 1.05
-            box(f"HALL__gallery_post_{side}_{post_index}", (wall_x - side * .18, post_y, 1.42), (.24, .24, 1.65), M["wood"], root, .05)
+        for segment_index, (start, end) in enumerate(((-12, -9.25), (-6.75, -5.8), (-2.8, -.45), (5.2, 6.3), (8.1, 10))):
+            box(f"HALL__gallery_wall_{side}_{segment_index}", (wall_x, (start + end) / 2, .58), (.36, end - start, .50), M["wood"], root, .055)
+        # Direct 1.8 m passage to each rear classroom, clear of the archive at y8.78.
+        for post_index, post_y in enumerate((6.20, 8.20)):
+            box(f"HALL__rear_classroom_post_{side}_{post_index}", (wall_x, post_y, 1.50), (.40, .20, 2.40), M["stone"], root, .04)
+        box(f"HALL__rear_classroom_lintel_{side}", (wall_x, 7.2, 2.82), (.44, 2.20, .24), M["cream"], root, .04)
+        box(f"HALL__rear_classroom_threshold_{side}", (wall_x, 7.2, .272), (2.20, 1.80, .15), M["wood_light"], root, .025)
         side_arch(
             f"HALL__classroom_arch_{side}",
             wall_x,
@@ -1021,16 +963,8 @@ def add_hall(root, center):
             root,
             M["green"] if side < 0 else M["coral"],
         )
-        mural_side(
-            f"HALL__technical_mural_{side}",
-            wall_x - side * .33,
-            5.15,
-            2.85,
-            side,
-            root,
-            "transmission" if side < 0 else "motor",
-        )
-        for sconce_index, sconce_y in enumerate((-5.2, 4.0)):
+        for sconce_index, sconce_y in enumerate((-6.1, 5.9)):
+            box(f"HALL__gallery_pier_{side}_{sconce_index}", (wall_x, sconce_y, 1.99), (.42, .44, 3.35), M["wood"], root, .07)
             wall_sconce_side(
                 f"HALL__sconce_{side}_{sconce_index}",
                 wall_x - side * .31,
@@ -1051,10 +985,14 @@ def add_hall(root, center):
         step_z = .41 + index * step_rise
         # 7,4→6,98 u / 1,744 u por NPC = 4,24→4,00 NPC de ancho útil.
         step_width = 8.65 - index * .07
+        box(f"HALL__step_support_{index}", (x, step_y, (.30 + step_z) / 2), (step_width, .50, step_z - .30), M["wood"], root, .025)
         box(f"HALL__step_{index}", (x, step_y, step_z), (step_width, .60, .14), M["wood_light"], root, .045)
-    landing_y = stair_start + (step_count - 1) * step_run + .67
+    landing_start = stair_start + (step_count - 1) * step_run + .25
+    landing_end = HALL_LANDING_NORTH
+    landing_y = (landing_start + landing_end) / 2
     landing_z = .41 + (step_count - 1) * step_rise
-    box("HALL__upper_landing", (x, landing_y, landing_z), (8.15, 1.15, .16), M["wood"], root, .05)
+    box("HALL__landing_support", (x, landing_y, (.30 + landing_z) / 2), (8.15, landing_end - landing_start, landing_z - .30), M["wood"], root, .03)
+    box("HALL__upper_landing", (x, landing_y, landing_z), (8.15, landing_end - landing_start, .16), M["wood_light"], root, .04)
     for side in (-1, 1):
         rail_x = x + side * 3.98
         post_count = 7
@@ -1225,8 +1163,8 @@ def add_hall(root, center):
         (x + 8.72, y + 4.55),
     )):
         plant(f"HALL__plant_{plant_index}", px, py, .32, root, .78)
-    person("NPC_student_hall_1", x - 3.45, y - 2.55, .25, root, M["blue"], M["skin3"], scale=.80, adult=True)
-    person("NPC_student_hall_2", x + 2.75, y - 2.45, .25, root, M["pink"], M["skin1"], scale=.80, adult=True)
+    person("NPC_student_hall_1", x - 3.45, y - 2.55, .52, root, M["blue"], M["skin3"], scale=.80, adult=True)
+    person("NPC_student_hall_2", x + 2.75, y - 2.45, .52, root, M["pink"], M["skin1"], scale=.80, adult=True)
 
 
 def add_classroom(root, center, programming=False, physics=False, math_room=False):
@@ -1234,13 +1172,15 @@ def add_classroom(root, center, programming=False, physics=False, math_room=Fals
     board_mat = M["screen"] if programming else M["chalk"]
     box("CLASS__board_frame", (x, y + 3.70, 2.15), (5.3, .20, 2.1), M["wood"], root, .08)
     box("CLASS__board", (x, y + 3.56, 2.15), (4.85, .06, 1.68), board_mat, root, .02)
+    for side in (-1, 1):
+        box(f"CLASS__board_support_{side}", (x + side * 2.42, y + 3.70, .94), (.12, .18, 1.22), M["wood"], root, .03)
     if programming:
         for row in range(2):
             for col in range(2):
                 dx = (col - .5) * 3.0
                 dy = -1.5 + row * 2.1
                 desk(f"PROGRAM__desk_{row}_{col}", x + dx, y + dy, .24, root, 2.25, 1.05, True)
-                chair(f"PROGRAM__chair_{row}_{col}", x + dx, y + dy - .72, .24, root, M["teal"])
+                chair(f"PROGRAM__chair_{row}_{col}", x + dx, y + dy - .95, .35, root, M["teal"])
         # Screen wall and server towers create the cool, dense visual block on
         # the right side of the reference.
         for col in range(5):
@@ -1252,29 +1192,34 @@ def add_classroom(root, center, programming=False, physics=False, math_room=Fals
             for led in range(4):
                 box(f"PROGRAM__server_led_{side}_{led}", (x + side * 4.35, y + 1.38, .78 + led * .48), (.55, .03, .09), M["screen"], root, .01)
     else:
-        for row in range(2):
+        for row in range(1):
             desk(f"CLASS__desk_{row}", x, y - 1.7 + row * 2.1, .24, root, 5.2, .88, False)
             for col in (-1.6, 0, 1.6):
-                chair(f"CLASS__chair_{row}_{col}", x + col, y - 2.25 + row * 2.1, .24, root, M["indigo"] if physics else M["amber"])
+                chair(f"CLASS__chair_{row}_{col}", x + col, y - 2.60 + row * 2.1, .35, root, M["indigo"] if physics else M["amber"])
     if physics:
-        box("PHYSICS__rail", (x, y + 1.8, 1.24), (7.2, .38, .30), M["wood_light"], root, .05)
+        desk("PHYSICS__demonstration_bench", x, y + 1.9, .24, root, 7.2, 1.9)
+        extruded_xz_polygon("PHYSICS__ramp", ((x - 2.9, 1.26), (x + 1.0, 1.26), (x + 1.0, 1.85)), y + .98, y + 1.58, M["wood_light"], root)
+        sphere("PHYSICS__ramp_ball", (x + .1, y + 1.28, 1.90), .19, M["gold"], root, 16, 10)
+        for side in (-1, 1):
+            cylinder_between(f"PHYSICS__frame_post_{side}", (x + side * 3.05, y + 2.5, 1.25), (x + side * 3.05, y + 2.5, 2.65), .07, M["gold"], root, 10)
+        cylinder_between("PHYSICS__frame_beam", (x - 3.10, y + 2.5, 2.65), (x + 3.10, y + 2.5, 2.65), .07, M["gold"], root, 10)
         for index in range(4):
-            cylinder(f"PHYSICS__apparatus_{index}", (x - 2.8 + index * 1.8, y + 2.5, 1.12), .11, 1.55, M["gold"], root, 12)
-            sphere(f"PHYSICS__orb_{index}", (x - 2.8 + index * 1.8, y + 2.5, 1.95), .24, M["screen"], root)
-            cylinder_between(
-                f"PHYSICS__pendulum_{index}",
-                (x - 2.8 + index * 1.8, y + 1.8, 2.75),
-                (x - 2.55 + index * 1.8, y + 1.8, 1.48),
-                .045,
-                M["gold"],
-                root,
-                8,
-            )
+            px = x - 2.25 + index * 1.5
+            cylinder_between(f"PHYSICS__pendulum_{index}", (px, y + 2.5, 2.60), (px + .18, y + 2.5, 1.54), .022, M["paper"], root, 7)
+            sphere(f"PHYSICS__orb_{index}", (px + .18, y + 2.5, 1.54), .20, M["teal"], root, 14, 8)
     if math_room:
-        for index in range(3):
-            cylinder(f"MATH__geometry_{index}", (x + 2.5 - index * .65, y + 2.75, 1.08 + index * .18), .32 - index * .06, .82 + index * .35, M["gold"], root, 3 + index)
-    person("NPC_teacher", x + 2.6, y + 2.05, .24, root, M["wine"], M["skin2"], scale=1.05)
-    person("NPC_student", x - 1.4, y - 1.8, .24, root, M["blue"], M["skin3"], scale=.92)
+        desk("MATH__display_table", x, y + 1.90, .24, root, 6.6, 1.85)
+        cylinder_between("MATH__balance_post", (x - 1.65, y + 1.90, 1.25), (x - 1.65, y + 1.90, 2.75), .07, M["gold"], root, 10)
+        cylinder_between("MATH__balance_beam", (x - 2.85, y + 1.90, 2.69), (x - .45, y + 1.90, 2.69), .055, M["gold"], root, 10)
+        for side in (-1, 1):
+            px = x - 1.65 + side * .93
+            cylinder_between(f"MATH__balance_chain_{side}", (px, y + 1.90, 2.66), (px, y + 1.90, 1.79), .019, M["paper"], root, 6)
+            cylinder(f"MATH__balance_pan_{side}", (px, y + 1.90, 1.77), .38, .065, M["gold"], root, 16)
+            box(f"MATH__balance_weight_{side}", (px, y + 1.90, 1.93), (.28, .28, .25), M["wood"], root, .025)
+        for index, height in enumerate((1.02, 1.35)):
+            cylinder(f"MATH__geometry_{index}", (x + 1.1 + index * 1.3, y + 1.90, 1.25 + height / 2), .47, height, M["teal"] if index == 0 else M["gold"], root, 3 + index)
+    person("NPC_teacher", x + (3.55 if programming else 4.35), y + (-.1 if programming else 2.0), .35, root, M["wine"], M["skin2"], scale=.88)
+    person("NPC_student", x - 4.35, y - 1.25, .35, root, M["blue"], M["skin3"], scale=.82)
 
 
 def add_library(root, center):
@@ -1290,9 +1235,10 @@ def add_library(root, center):
 
 def add_office(root, center):
     x, y = center
-    back_y = y + 4.0
+    back_y = y + 3.15
 
     # Raised clock house: the main vertical landmark from the reference.
+    box("OFFICE__tower_support", (x, back_y + .02, 4.20), (6.65, .76, .84), M["wood"], root, .08)
     box("OFFICE__tower", (x, back_y + .02, 6.18), (6.5, .72, 3.25), M["wood"], root, .14)
     box("OFFICE__tower_cap", (x, back_y + .02, 7.96), (7.35, 1.02, .42), M["stone"], root, .08)
     for cap_index in range(7):
@@ -1332,7 +1278,7 @@ def add_office(root, center):
     # The office remains explorable behind the monumental front.
     bookshelf("OFFICE__archive", x - 3.6, y + 2.8, .24, root, 2.2, 2.9)
     desk("OFFICE__desk", x, y - .3, .24, root, 4.0, 1.4, False)
-    chair("OFFICE__chair", x, y + .8, .24, root, M["wine"])
+    chair("OFFICE__chair", x, y + .8, .35, root, M["wine"], rotation=0)
     box("OFFICE__rug", (x, y - .6, .29), (5.8, 3.7, .06), M["wine"], root, .18)
     plant("OFFICE__plant", x + 3.8, y + 2.3, .24, root, 1.05)
 
@@ -1353,6 +1299,8 @@ def add_electronics(root, center):
     box("ELECTRO__board_frame", (x - 2.10, y + 3.62, 2.28), (4.75, .18, 1.88), M["wood"], root, .06)
     board = box("ELECTRO__board", (x - 2.10, y + 3.50, 2.28), (4.42, .05, 1.58), M["chalk"], root, .015)
     board["interactiveId"] = "pizarron"
+    for side in (-1, 1):
+        box(f"ELECTRO__board_support_{side}", (x - 2.10 + side * 2.18, y + 3.62, .96), (.12, .18, 1.28), M["wood"], root, .025)
     # Baseline diagram: sparse geometry, large enough to survive the overview.
     diagram_y = y + 3.465
     for line_index, (line_x, line_z, line_w) in enumerate((
@@ -1750,53 +1698,106 @@ def add_achievements(root, center):
 
 def add_reception(root, center):
     x, y = center
-    box("RECEPTION__desk", (x, y + .6, 1.0), (6.2, 1.25, 1.52), M["wood"], root, .16)
-    box("RECEPTION__counter", (x, y - .08, 1.65), (6.7, .45, .22), M["wood_light"], root, .09)
-    box("RECEPTION__book", (x - 1.1, y - .37, 1.82), (1.0, .7, .08), M["paper"], root, .03)
-    person("NPC_preceptor", x, y + 1.5, .24, root, M["green"], M["skin2"], scale=1.03)
-    person("NPC_new_student", x + 2.7, y - 1.7, .24, root, M["blue"], M["skin3"], scale=.92)
+    box("RECEPTION__desk", (x, y + .6, .80), (6.2, 1.25, .92), M["wood"], root, .16)
+    box("RECEPTION__counter", (x, y + .58, 1.31), (6.7, 1.40, .18), M["wood_light"], root, .09)
+    box("RECEPTION__book", (x - 1.1, y + .30, 1.44), (1.0, .7, .08), M["paper"], root, .03)
+    person("NPC_preceptor", x, y + 1.75, .35, root, M["green"], M["skin2"], scale=.86)
+    person("NPC_new_student", x + 2.7, y - 1.7, .35, root, M["blue"], M["skin3"], scale=.82)
     plant("RECEPTION__plant_1", x - 3.9, y + 2.6, .24, root, .9)
     plant("RECEPTION__plant_2", x + 3.9, y + 2.6, .24, root, .9)
 
 
 def add_visitors(root, center):
     x, y = center
-    box("VISITORS__screen_frame", (x, y + 3.68, 2.25), (5.7, .18, 2.35), M["wood"], root, .08)
-    box("VISITORS__screen", (x, y + 3.55, 2.25), (5.25, .05, 1.95), M["paper"], root, .03)
-    desk("VISITORS__lectern", x, y + 1.95, .24, root, 2.0, .9, False)
+    box("VISITORS__screen_frame", (x, y + 3.30, 2.1), (5.1, .18, 2.05), M["wood"], root, .08)
+    box("VISITORS__screen", (x, y + 3.18, 2.1), (4.7, .04, 1.69), M["paper"], root, .03)
+    for side in (-1, 1):
+        box(f"VISITORS__screen_support_{side}", (x + side * 2.2, y + 3.3, .97), (.12, .16, 1.24), M["wood"], root, .03)
+    desk("VISITORS__lectern", x - 2.2, y + 2.05, .24, root, 1.55, .8)
+    # Three continuous, supported terraces with a broad centre aisle. Every
+    # chair has a local pivot, four legs and clear space to its neighbours.
+    for row in range(AMPHITHEATRE_ROW_COUNT):
+        seat_y = y + .05 - row * 1.38
+        surface = .36 + row * .22
+        height = surface - .20
+        box(f"VISITORS__tier_{row}", (x, seat_y, .20 + height / 2), (8.5, 1.38, height), M["wood"], root, .035)
+        box(f"VISITORS__tier_nosing_{row}", (x, seat_y + .67, surface + .015), (8.45, .055, .03), M["gold"], root, .01)
+        for column, offset in enumerate(AMPHITHEATRE_SEAT_OFFSETS):
+            chair(f"VISITORS__seat_{row}_{column}", x + offset, seat_y, surface, root, M["wine"])
+    person("NPC_world_visitor_0", x + 2.8, y + 2.1, .35, root, M["violet"], M["skin1"], scale=.85, visitor=True)
+    plant("VISITORS__plant", x + 4.6, y + 2.65, .35, root, .8)
 
-    # Three segmented arcs reproduce the stepped lecture theatre in the
-    # front-right of the target image.
-    focus_y = y + 2.25
-    seat_index = 0
-    for row, radius in enumerate((2.4, 3.45, 4.5)):
-        for angle_deg in (-52, -26, 0, 26, 52):
-            angle = math.radians(angle_deg)
-            px = x + math.sin(angle) * radius
-            py = focus_y - math.cos(angle) * radius
-            tier_z = .28 + row * .22
-            bench = box(
-                f"VISITORS__bench_{seat_index}",
-                (px, py, tier_z + .55),
-                (1.35, .68, .18),
-                M["wood_light"],
-                root,
-                .06,
-            )
-            bench.rotation_euler[2] = -angle
-            back = box(
-                f"VISITORS__bench_back_{seat_index}",
-                (px, py + .27, tier_z + .92),
-                (1.35, .16, .72),
-                M["wine"],
-                root,
-                .05,
-            )
-            back.rotation_euler[2] = -angle
-            box(f"VISITORS__tier_{seat_index}", (px, py, tier_z), (1.55, .95, .22), M["stone_dark"], root, .04)
-            seat_index += 1
-    person("NPC_world_visitor_0", x - 1.2, y + 1.35, .24, root, M["violet"], M["skin1"], scale=.88, visitor=True)
-    plant("VISITORS__plant", x + 4.4, y + 2.7, .24, root, .9)
+
+def validate_school_geometry():
+    bpy.context.view_layer.update()
+    issues = []
+    def extent(obj):
+        points = [obj.matrix_world @ Vector(corner) for corner in obj.bound_box]
+        return ([min(point[axis] for point in points) for axis in range(3)],
+                [max(point[axis] for point in points) for axis in range(3)])
+    direction = bpy.data.objects["ROOM_direccion"]
+    if abs(direction.location.z - DIRECTION_FLOOR_RISE) > .001:
+        issues.append("Dirección no coincide con su cota arquitectónica")
+    landing_min, landing_max = extent(bpy.data.objects["HALL__upper_landing"])
+    if abs(landing_max[1] - HALL_LANDING_NORTH) > .001 or abs(landing_max[2] - HALL_LANDING_SURFACE) > .001:
+        issues.append("El desembarco no alcanza la puerta/cota de Dirección")
+    direction_floor = extent(bpy.data.objects["ROOM_direccion__floor_inner"])[1][2]
+    if abs(direction_floor - landing_max[2]) > .025:
+        issues.append("Hay un desnivel entre desembarco y Dirección")
+    tower_bottom = extent(bpy.data.objects["OFFICE__tower"])[0][2]
+    support_min, support_max = extent(bpy.data.objects["OFFICE__tower_support"])
+    wall_top = extent(bpy.data.objects["ROOM_direccion__back_wall"])[1][2]
+    if support_max[2] < tower_bottom or support_min[2] > wall_top:
+        issues.append("La torre del reloj no apoya sobre Dirección")
+    counter_top = extent(bpy.data.objects["RECEPTION__counter"])[1][2]
+    book_bottom = extent(bpy.data.objects["RECEPTION__book"])[0][2]
+    if counter_top > 1.41 or abs(book_bottom - counter_top) > .001:
+        issues.append("Mostrador fuera de escala o libro sin apoyo")
+    direct_passages = []
+    for room_id, side in (("matematica", -1), ("fisica", 1)):
+        door = next(door for door in DOORS if {door.room_a, door.room_b} == {room_id, "hall"})
+        # Audit the actual walk-through volume, including both sides of the shared wall.
+        volume_min = (side * 10 - 1.05, door.center - door.width / 2 + .015, .36)
+        volume_max = (side * 10 + 1.05, door.center + door.width / 2 - .015, 2.35)
+        for obj in bpy.data.objects:
+            if obj.type != "MESH" or obj.name.startswith("SCHOOL__"): continue
+            lower, upper = extent(obj)
+            if all(min(upper[axis], volume_max[axis]) - max(lower[axis], volume_min[axis]) > .002 for axis in range(3)):
+                issues.append(f"Paso Hall/{room_id} obstruido: {obj.name}")
+        direct_passages.append({"room": room_id, "width": door.width, "centerY": door.center})
+    theatre_seats = []
+    for row in range(AMPHITHEATRE_ROW_COUNT):
+        support_z = extent(bpy.data.objects[f"VISITORS__tier_{row}"])[1][2]
+        for column in range(len(AMPHITHEATRE_SEAT_OFFSETS)):
+            chair_root = bpy.data.objects[f"VISITORS__seat_{row}_{column}"]
+            legs = [child for child in chair_root.children if "__leg" in child.name]
+            if len(legs) != 4 or any(abs(extent(leg)[0][2] - support_z) > .001 for leg in legs):
+                issues.append(f"Silla {row}/{column} sin cuatro patas apoyadas")
+            forward = chair_root.matrix_world.to_quaternion() @ Vector((0, -1, 0))
+            if forward.y < .99:
+                issues.append(f"Silla {row}/{column} no mira al atril")
+            theatre_seats.append(chair_root)
+    for index, first in enumerate(theatre_seats):
+        for second in theatre_seats[index + 1:]:
+            delta = first.matrix_world.translation - second.matrix_world.translation
+            if abs(delta.x) < .85 and abs(delta.y) < .85:
+                issues.append(f"Sillas superpuestas: {first.name}/{second.name}")
+    # Every classroom NPC occupies a circulation aisle, not a desk or server.
+    for npc in [o for o in bpy.data.objects if o.name.startswith("NPC_") and o.type == "EMPTY"]:
+        room = npc.parent
+        if room is None: continue
+        center = npc.matrix_world.translation
+        for prop in room.children_recursive:
+            if prop.type != "MESH" or not (prop.name.endswith("__top") or "PROGRAM__server_" in prop.name and "led" not in prop.name):
+                continue
+            lower, upper = extent(prop)
+            if lower[0] - .28 < center.x < upper[0] + .28 and lower[1] - .24 < center.y < upper[1] + .24:
+                issues.append(f"NPC invade mobiliario: {npc.name}/{prop.name}")
+    report = {"directionFloorRise": DIRECTION_FLOOR_RISE, "landingSurface": landing_max[2],
+              "landingNorth": landing_max[1], "theatreSeats": len(theatre_seats), "counterHeight": counter_top, "clockSupported": support_max[2] >= tower_bottom, "directPassages": direct_passages, "issues": issues}
+    (OUT / "geometry-checks.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    if issues: raise RuntimeError("Geometría escolar inválida: " + "; ".join(issues))
+    log("validate", "desembarco continuo, 12 sillas apoyadas, aulas sin NPC dentro de muebles")
 
 
 def add_school_base():
@@ -1884,18 +1885,17 @@ def densify(obj, edge_length):
 
 
 def apply_modifiers_and_densify():
-    view_layer = bpy.context.view_layer
     meshes = [obj for obj in bpy.data.objects if obj.type == "MESH"]
-    for obj in meshes:
-        if obj.modifiers:
-            bpy.ops.object.select_all(action="DESELECT")
-            obj.select_set(True)
-            view_layer.objects.active = obj
-            for modifier in list(obj.modifiers):
-                try:
-                    bpy.ops.object.modifier_apply(modifier=modifier.name)
-                except RuntimeError:
-                    obj.modifiers.remove(modifier)
+    # Evaluate the graph once and materialize its meshes in a separate pass.
+    # Per-object operators rebuild the entire school thousands of times.
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    evaluated = [(obj, bpy.data.meshes.new_from_object(obj.evaluated_get(depsgraph), depsgraph=depsgraph))
+                 for obj in meshes if obj.modifiers]
+    for obj, mesh in evaluated:
+        original = obj.data
+        obj.modifiers.clear()
+        obj.data = mesh
+        if original.users == 0: bpy.data.meshes.remove(original)
     log("densify", f"modificadores aplicados en {len(meshes)} mallas")
 
     touched = 0
@@ -1984,16 +1984,30 @@ def bake_vertex_colours():
 
     # glTF COLOR_0 is expected in [0,1]; emissive props bake far above that.
     clamped = 0
+    ambient_repaired = 0
     for obj in meshes:
         data = obj.data.color_attributes.get(BAKE_ATTR)
         if data is None:
             continue
+        # Contact corners of intersecting trim can receive no Cycles rays at
+        # all. Preserve a modest, albedo-coloured ambient floor per face rather
+        # than interpolating those invalid black samples across visible wood.
+        for polygon in obj.data.polygons:
+            albedo = obj.data.materials[polygon.material_index].diffuse_color
+            minimum = tuple(float(albedo[channel]) * .12 for channel in range(3))
+            for loop_index in polygon.loop_indices:
+                element = data.data[loop_index]
+                colour = element.color
+                if any(colour[channel] < minimum[channel] for channel in range(3)):
+                    element.color = (*(max(colour[channel], minimum[channel]) for channel in range(3)), 1.0)
+                    ambient_repaired += 1
         for element in data.data:
             colour = element.color
             if colour[0] > 1 or colour[1] > 1 or colour[2] > 1:
                 clamped += 1
                 element.color = (min(colour[0], 1.0), min(colour[1], 1.0), min(colour[2], 1.0), 1.0)
     log("bake", f"{clamped} vértices sobreexpuestos recortados a [0,1]")
+    log("bake", f"{ambient_repaired} muestras de contacto con mínimo ambiente de albedo")
 
 
 # ---------------------------------------------------------------------------
@@ -2124,12 +2138,12 @@ def setup_camera_and_lights():
     # Centred 45-degree overview. This is the Blender counterpart of the
     # browser's fixed camera direction; the extra elevation separates the three
     # rows on screen without moving rooms away from their shared boundaries.
-    bpy.ops.object.camera_add(location=(0, -64, 68.8))
+    bpy.ops.object.camera_add(location=(32, -64, 79.8))
     camera = bpy.context.object
     camera.name = "CAMERA_school_overview"
     camera.data.type = "ORTHO"
-    camera.data.ortho_scale = 52
-    point_at(camera, Vector((0, 0, 4.8)))
+    camera.data.ortho_scale = 64
+    point_at(camera, Vector((0, 0, 3.0)))
     bpy.context.scene.camera = camera
 
     # Clave cálida y bastante concentrada: es la que talla el volumen. Los
@@ -2138,16 +2152,16 @@ def setup_camera_and_lights():
     bpy.ops.object.light_add(type="AREA", location=(-22, -22, 40))
     key = bpy.context.object
     key.name = "LIGHT_key"
-    key.data.energy = 3900
+    key.data.energy = 3400
     key.data.shape = "DISK"
     key.data.size = 13
-    key.data.color = (1.0, .72, .46)
+    key.data.color = (1.0, .78, .58)
     point_at(key, Vector((0, -3, 0)))
 
     bpy.ops.object.light_add(type="AREA", location=(28, 12, 30))
     fill = bpy.context.object
     fill.name = "LIGHT_fill"
-    fill.data.energy = 1050
+    fill.data.energy = 1800
     fill.data.size = 26
     fill.data.color = (.34, .50, 1.0)
     point_at(fill, Vector((0, 0, 0)))
@@ -2163,7 +2177,7 @@ def setup_camera_and_lights():
     bpy.ops.object.light_add(type="SUN", location=(0, 0, 30), rotation=(math.radians(24), math.radians(-18), math.radians(-32)))
     sun = bpy.context.object
     sun.name = "LIGHT_sun_soft"
-    sun.data.energy = 3.1
+    sun.data.energy = 2.4
     sun.data.angle = math.radians(11)
     sun.data.color = (1.0, .86, .70)
 
@@ -2179,8 +2193,8 @@ def configure_scene():
     world = scene.world
     world.use_nodes = True
     background = world.node_tree.nodes.get("Background")
-    background.inputs["Color"].default_value = (0.045, 0.058, 0.105, 1)
-    background.inputs["Strength"].default_value = .42
+    background.inputs["Color"].default_value = (0.18, 0.22, 0.25, 1)
+    background.inputs["Strength"].default_value = .70
     # Standard view transform: the bake IS the look, so Blender and the browser
     # agree pixel for pixel (Three.js renders with NoToneMapping).
     scene.view_settings.view_transform = "Standard"
@@ -2294,6 +2308,8 @@ def render_previews():
         obj.data.materials.clear()
         obj.data.materials.append(unlit)
 
+    campus = bpy.data.objects.get("SCHOOL__campus")
+    if campus: campus.hide_render = True
     set_progress_render_visibility(False)
     scene.render.filepath = str(OUT / "school-preview-initial.png")
     bpy.ops.render.render(write_still=True)
@@ -2326,6 +2342,9 @@ def render_blockout():
     scene.render.resolution_x = 1600
     scene.render.resolution_y = 1000
     scene.render.resolution_percentage = 100
+    for obj in bpy.data.objects:
+        if obj.name.startswith("SCHOOL__"): obj.hide_render = True
+    bpy.ops.wm.save_as_mainfile(filepath=str(OUT / "school-blockout.blend"))
     scene.render.filepath = str(OUT / "school-blockout.png")
     bpy.ops.render.render(write_still=True)
     log("blockout", "school-blockout.png")
@@ -2387,6 +2406,8 @@ for room_id, label, center, size, accent in ROOMS:
 
 centers = {room_id: center for room_id, _, center, _, _ in ROOMS}
 add_office(room_roots["direccion"], centers["direccion"])
+room_roots["direccion"].location.z = DIRECTION_FLOOR_RISE
+box("ROOM_direccion__foundation", (0, centers["direccion"][1], -.43), (11.0, 7.0, 1.06), M["stone_dark"], room_roots["direccion"], .08)
 add_electronics(room_roots["electronica"], centers["electronica"])
 add_hall(room_roots["hall"], centers["hall"])
 add_classroom(room_roots["programacion"], centers["programacion"], programming=True)
@@ -2395,6 +2416,7 @@ add_reception(room_roots["preceptoria"], centers["preceptoria"])
 add_visitors(room_roots["visitantes"], centers["visitantes"])
 add_classroom(room_roots["matematica"], centers["matematica"], math_room=True)
 
+validate_school_geometry()
 setup_camera_and_lights()
 configure_scene()
 if BLOCKOUT:

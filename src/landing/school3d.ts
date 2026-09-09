@@ -26,10 +26,10 @@ import { createPostFx, type PostFx } from './school3dPostFx.ts';
 import { createRoomLabels, type LabelLayer } from './school3dLabels.ts';
 import { createSchoolBackdrop, type SchoolBackdrop } from './school3dBackdrop.ts';
 import { installSchoolAtmosphere, type SchoolAtmosphere } from './schoolAtmosphere.ts';
-import { installSchoolRoomTerrace, SCHOOL_TIER_RISE } from './school3dTerraces.ts';
+import { frameSchoolBounds, SCHOOL_VIEW_DIRECTION, SCHOOL_MOBILE_DIRECTION } from './school3dFraming.ts';
 import {
   VOXEL_ROOMS,
-  schoolRoomOccludes,
+  schoolRoomInFocus,
   schoolRoomFromHash,
   voxelStateLabel,
   voxelZoneState,
@@ -37,10 +37,8 @@ import {
   type VoxelZoneId,
 } from './voxelSchoolModel.ts';
 
-const OVERVIEW_TARGET = new THREE.Vector3(0, 5.5, 1.0);
-// Axonometría a 45°: entrada, estatua y reloj conservan el eje central, mientras
-// la componente cenital expone las terrazas sin alterar sus huellas X/Z.
-const CAMERA_DIRECTION = new THREE.Vector3(0, 1, 1).normalize();
+const OVERVIEW_TARGET = new THREE.Vector3(0, 3, -2);
+// The geometry owns every floor height; the camera exposes the connected plan.
 const CAMERA_DISTANCE = 90;
 
 // Tintes multiplicados sobre el color horneado. El blanco devuelve el bake
@@ -53,8 +51,9 @@ const TINT_SLEEPING = new THREE.Color(0.83, 0.87, 0.93);
 const TINT_QUIET = new THREE.Color(0.91, 0.92, 0.95);
 const TINT_ELECTRONICS_IDLE = new THREE.Color(0.94, 1.0, 0.96);
 
-const LIFT_HOVER = 0.42;
-const LIFT_SELECTED = 0.6;
+// Hover changes light, never the architectural alignment of floors and doors.
+const LIFT_HOVER = 0;
+const LIFT_SELECTED = 0;
 // Las salas que se interponen se disuelven por completo. alphaHash conserva
 // la transición tramada durante el fundido, pero evita dejar una placa de
 // píxeles permanente delante del aula enfocada.
@@ -98,9 +97,9 @@ type SchoolDebugMetrics = {
     exteriorVisible: boolean;
     parallaxLayers: number;
   };
-  terraces: {
-    tierRise: number;
-    maxLevel: number;
+  architecture: {
+    runtimeElevation: number;
+    directionFloorRise: number;
   };
   camera: {
     position: [number, number, number];
@@ -239,6 +238,7 @@ class School3DExperience {
   private readonly canvas: HTMLCanvasElement;
   private readonly scene = new THREE.Scene();
   private readonly camera: THREE.OrthographicCamera;
+  private readonly cameraDirection = (isCompact() ? SCHOOL_MOBILE_DIRECTION : SCHOOL_VIEW_DIRECTION).clone();
   private readonly backdrop: SchoolBackdrop;
   private atmosphere: SchoolAtmosphere | null = null;
   private readonly renderer: THREE.WebGLRenderer;
@@ -265,6 +265,8 @@ class School3DExperience {
   private running = true;
   private animationFrame = 0;
   private overviewZoom = 1;
+  private readonly overviewBounds = new THREE.Box3(new THREE.Vector3(-26.2, -1.6, -19.6), new THREE.Vector3(26.2, 10, 14.8));
+  private overviewCenter = OVERVIEW_TARGET.clone();
   private portal: THREE.Object3D | null = null;
   private portalMaterial: THREE.MeshBasicMaterial | null = null;
   private statueBounce: THREE.PointLight | null = null;
@@ -314,7 +316,7 @@ class School3DExperience {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.camera = new THREE.OrthographicCamera(-20, 20, 20, -20, .1, 400);
-    this.camera.position.copy(CAMERA_DIRECTION).multiplyScalar(CAMERA_DISTANCE);
+    this.camera.position.copy(this.cameraDirection).multiplyScalar(CAMERA_DISTANCE);
     this.camera.lookAt(OVERVIEW_TARGET);
     this.scene.add(this.camera);
     this.backdrop = createSchoolBackdrop(this.camera, prefersReducedMotion());
@@ -546,6 +548,9 @@ class School3DExperience {
       const roomToggle = document.querySelector<HTMLButtonElement>('#school3d-rooms-toggle');
       if (roomToggle) roomToggle.disabled = false;
       this.loaded = true;
+      this.overviewBounds.set(new THREE.Vector3(-26.2, -1.6, -19.6), new THREE.Vector3(26.2, .2, 14.8));
+      for (const visual of this.rooms.values()) this.overviewBounds.union(this.visibleRoomBounds(visual.root));
+      this.resize();
       this.updateRunning();
       window.setTimeout(() => this.syncRoomFromLocation(), 120);
     } catch (error) {
@@ -638,14 +643,10 @@ class School3DExperience {
         if (!id) return;
         const roomDefinition = VOXEL_ROOMS.find((room) => room.id === id);
         if (!roomDefinition) return;
-        const terrace = installSchoolRoomTerrace(object, roomDefinition);
         this.rooms.set(id, {
           root: object,
-          materials: [
-            ...(roomMaterials.get(object.name) ?? []),
-            ...terrace.materials,
-          ],
-          baseY: terrace.baseY,
+          materials: roomMaterials.get(object.name) ?? [],
+          baseY: object.position.y,
           tint: TINT_IDLE.clone(),
           targetTint: TINT_IDLE.clone(),
           lift: 0,
@@ -984,10 +985,11 @@ class School3DExperience {
       } else if (this.selected !== null) {
         tint = TINT_DIMMED;
         const candidate = VOXEL_ROOMS.find((definition) => definition.id === id);
-        if (candidate && selectedRoom && schoolRoomOccludes(candidate, selectedRoom)) {
+        if (candidate && selectedRoom && !schoolRoomInFocus(candidate, selectedRoom)) {
           opacity = OCCLUDER_OPACITY;
+        } else {
+          tint = this.tintForRoom(id).clone().multiplyScalar(.78);
         }
-        if (selectedRoom?.embedded && id !== 'hall') opacity = OCCLUDER_OPACITY;
       } else if (this.hovered === id) {
         tint = this.tintForRoom(id).clone().multiply(TINT_HOVER);
         lift = LIFT_HOVER;
@@ -1183,17 +1185,10 @@ class School3DExperience {
   }
 
   private overviewTarget(): THREE.Vector3 {
-    const target = OVERVIEW_TARGET.clone();
-    // Give the welcome title its own air to the left of the upper classrooms.
-    // Portrait has its title above the canvas and stays perfectly centered.
-    if (!isCompact()) {
-      const worldWidth = (this.camera.right - this.camera.left) / this.overviewZoom;
-      target.x = -Math.min(5.7, Math.max(0, (worldWidth - 54) / 2 - .5));
-    }
-    return target;
+    return this.overviewCenter.clone();
   }
 
-  /** Fit the full selected room in both screen axes, including its terrace. */
+  /** Measure the complete visible architecture, including furniture and sculpture. */
   private visibleRoomBounds(root: THREE.Object3D): THREE.Box3 {
     root.updateWorldMatrix(true, true);
     const position = root.getWorldPosition(new THREE.Vector3());
@@ -1224,28 +1219,9 @@ class School3DExperience {
     const remainingLift = hall ? 0 : LIFT_SELECTED - visual.lift;
     bounds.min.y += remainingLift;
     bounds.max.y += remainingLift;
-    const target = bounds.getCenter(new THREE.Vector3());
-    const up = new THREE.Vector3(0, CAMERA_DIRECTION.z, -CAMERA_DIRECTION.y).normalize();
-    const right = new THREE.Vector3(1, 0, 0);
-    let left = Infinity, rightEdge = -Infinity, bottom = Infinity, top = -Infinity;
-    const corner = new THREE.Vector3();
-    for (const x of [bounds.min.x, bounds.max.x]) {
-      for (const y of [bounds.min.y, bounds.max.y]) {
-        for (const z of [bounds.min.z, bounds.max.z]) {
-          corner.set(x, y, z).sub(target);
-          const horizontal = corner.dot(right), vertical = corner.dot(up);
-          left = Math.min(left, horizontal); rightEdge = Math.max(rightEdge, horizontal);
-          bottom = Math.min(bottom, vertical); top = Math.max(top, vertical);
-        }
-      }
-    }
-    const minimumSpan = embedded ? 18 : 0;
-    const zoom = Math.min(
-      (this.camera.right - this.camera.left) / (Math.max(rightEdge - left, minimumSpan) + 4),
-      (this.camera.top - this.camera.bottom) / (Math.max(top - bottom, minimumSpan) + 4),
-      5.4,
-    );
-    return { target, zoom };
+    const frame = frameSchoolBounds(bounds, this.camera.right - this.camera.left, this.camera.top - this.camera.bottom, isCompact() ? .08 : .10, this.cameraDirection);
+    frame.zoom = Math.min(frame.zoom, 5.4);
+    return frame;
   }
 
   private resize(): void {
@@ -1254,14 +1230,15 @@ class School3DExperience {
     const height = Math.max(1, this.canvas.clientHeight || window.innerHeight);
     const aspect = width / height;
     const viewHeight = isCompact() ? 64 : 58;
+    this.cameraDirection.copy(isCompact() ? SCHOOL_MOBILE_DIRECTION : SCHOOL_VIEW_DIRECTION);
     this.backdrop.setCompact(isCompact());
     this.camera.left = -viewHeight * aspect / 2;
     this.camera.right = viewHeight * aspect / 2;
     this.camera.top = viewHeight / 2;
     this.camera.bottom = -viewHeight / 2;
-    // Las terrazas amplían la silueta vertical; esta apertura conserva reloj,
-    // zócalos y acceso completo sin modificar los zooms de cada sala.
-    this.overviewZoom = Math.min(viewHeight / (isCompact() ? 40 : 43), (viewHeight * aspect) / 57);
+    const overview = frameSchoolBounds(this.overviewBounds, viewHeight * aspect, viewHeight, isCompact() ? .02 : .055, this.cameraDirection);
+    this.overviewZoom = overview.zoom;
+    this.overviewCenter.copy(overview.target);
     if (this.selected) {
       const visual = this.rooms.get(this.selected);
       if (visual) {
@@ -1338,6 +1315,9 @@ class School3DExperience {
       room.lift = damp(room.lift, room.targetLift, 9, delta);
       room.opacity = damp(room.opacity, room.targetOpacity, 7, delta);
       room.root.position.y = room.baseY + room.lift;
+      // Include imported sculptures and props in the room's final visibility.
+      // Their own materials need not belong to the baked-material collection.
+      room.root.visible = room.opacity > .01;
       for (const material of room.materials) {
         const baseColor = material.userData.roomBaseColor;
         if (typeof baseColor === 'number') {
@@ -1361,7 +1341,7 @@ class School3DExperience {
     }
 
     this.camera.position.copy(this.cameraTarget).add(
-      CAMERA_DIRECTION.clone().multiplyScalar(CAMERA_DISTANCE),
+      this.cameraDirection.clone().multiplyScalar(CAMERA_DISTANCE),
     );
     this.camera.lookAt(this.cameraTarget);
 
@@ -1389,9 +1369,9 @@ class School3DExperience {
           exteriorVisible: this.exteriorVisible,
           parallaxLayers: this.backdrop.layers,
         },
-        terraces: {
-          tierRise: SCHOOL_TIER_RISE,
-          maxLevel: Math.max(...VOXEL_ROOMS.map((room) => room.presentationLevel)),
+        architecture: {
+          runtimeElevation: 0,
+          directionFloorRise: 1.14,
         },
         camera: {
           position: [

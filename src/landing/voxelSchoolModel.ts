@@ -34,7 +34,7 @@ export interface VoxelRoom {
   y: number;
   width: number;
   depth: number;
-  presentationLevel: 0 | 1 | 2;
+  floorElevation: number;
   floor: string;
   accent: string;
   embedded?: boolean;
@@ -50,62 +50,64 @@ export type VoxelZoneState = 'open' | 'active' | 'restored' | 'closed' | 'quiet'
 //   x_grilla = x_mundo + 24        y_grilla = 17 - y_mundo
 // (el norte del plano queda arriba, como en pantalla).
 export const SCHOOL_GRID = { width: 48, depth: 29 } as const;
+// Horizontal camera direction in the X/Z plane; used for occlusion as well as framing.
+export const SCHOOL_VIEW_X = .5;
 
 export const VOXEL_ROOMS: readonly VoxelRoom[] = [
   {
     id: 'programacion', title: 'Aula de Programación', shortTitle: 'Programación', eyebrow: 'Mundo Aplicado',
     description: 'Programá secuencias y explorá los fundamentos de Bitland. Las prácticas están abiertas; su aventura continúa en preparación.',
-    kind: 'classroom', x: 34, y: 11, width: 14, depth: 10, presentationLevel: 1, floor: '#263442', accent: '#62a7d9', href: '#aulas', actionLabel: 'Ver las aulas',
+    kind: 'classroom', x: 34, y: 11, width: 14, depth: 10, floorElevation: 0, floor: '#263442', accent: '#62a7d9', href: '#aulas', actionLabel: 'Ver las aulas',
   },
   {
     id: 'audiovisual', title: 'Sala Audiovisual', shortTitle: 'Audiovisual', eyebrow: 'Cómo se hizo Roxana',
     description: 'Descubrí cómo se construye Roxana: del primer plano de la escuela al mundo interactivo, sus personajes y su sonido.',
-    kind: 'theater', x: 14, y: 20, width: 1, depth: 2, presentationLevel: 1, embedded: true, floor: '#342b3d', accent: '#c1779e', href: '#anfiteatro', actionLabel: 'Ir al anfiteatro',
+    kind: 'theater', x: 14, y: 20, width: 1, depth: 2, floorElevation: 0, embedded: true, floor: '#342b3d', accent: '#c1779e', href: '#anfiteatro', actionLabel: 'Ir al anfiteatro',
   },
   {
     id: 'electronica', title: 'Aula de Electrónica', shortTitle: 'Electrónica', eyebrow: 'Ohmdal',
     description: 'La primera aula viva. Su proyector abre el paso a Ohmdal, el mundo de la corriente.',
-    kind: 'classroom', x: 0, y: 11, width: 14, depth: 10, presentationLevel: 1, floor: '#2a3c3b', accent: '#4fd1c5', href: '#aula/electronica', actionLabel: 'Entrar al aula',
+    kind: 'classroom', x: 0, y: 11, width: 14, depth: 10, floorElevation: 0, floor: '#2a3c3b', accent: '#4fd1c5', href: '#aula/electronica', actionLabel: 'Entrar al aula',
   },
   {
     id: 'matematica', title: 'Aula de Matemática', shortTitle: 'Matemática', eyebrow: 'Arithmos',
     description: 'Investigá patrones, proporciones y estructuras con prácticas de Arithmos. Su aventura continúa en preparación.',
-    kind: 'classroom', x: 0, y: 1, width: 14, depth: 10, presentationLevel: 2, floor: '#3d3326', accent: '#e0a84f', href: '#aulas', actionLabel: 'Ver las aulas',
+    kind: 'classroom', x: 0, y: 1, width: 14, depth: 10, floorElevation: 0, floor: '#3d3326', accent: '#e0a84f', href: '#aulas', actionLabel: 'Ver las aulas',
   },
   {
     id: 'biblioteca', title: 'Biblioteca y Bitácora', shortTitle: 'Biblioteca', eyebrow: 'Memoria del Instituto',
     description: 'Abrí el catálogo de Roxana: libros educativos, historias, documentación y lecturas para acompañar cada mundo. Guardá tus favoritos.',
-    kind: 'library', x: 14, y: 12.5, width: 1, depth: 2, presentationLevel: 1, embedded: true, floor: '#382f2d', accent: '#c89b68', href: '#biblioteca', actionLabel: 'Ir a la biblioteca',
+    kind: 'library', x: 14, y: 12.5, width: 1, depth: 2, floorElevation: 0, embedded: true, floor: '#382f2d', accent: '#c89b68', href: '#biblioteca', actionLabel: 'Ir a la biblioteca',
   },
   {
     id: 'hall', title: 'Hall central', shortTitle: 'Hall', eyebrow: 'Instituto Roxana',
     description: 'El corazón de la escuela: conecta las aulas, los servicios y los mundos que vuelven a despertar.',
-    kind: 'hall', x: 14, y: 7, width: 20, depth: 22, presentationLevel: 1, floor: '#302e38', accent: '#ffd34d',
+    kind: 'hall', x: 14, y: 7, width: 20, depth: 22, floorElevation: 0, floor: '#302e38', accent: '#ffd34d',
   },
   {
     id: 'logros', title: 'Sala de Logros', shortTitle: 'Logros', eyebrow: 'Progreso',
     description: 'Una vitrina que se completa con las unidades restauradas y los descubrimientos del jugador.',
-    kind: 'achievements', x: 33, y: 12.5, width: 1, depth: 2, presentationLevel: 1, embedded: true, floor: '#3b3328', accent: '#efc45b', href: '#trofeos', actionLabel: 'Ver los logros',
+    kind: 'achievements', x: 33, y: 12.5, width: 1, depth: 2, floorElevation: 0, embedded: true, floor: '#3b3328', accent: '#efc45b', href: '#trofeos', actionLabel: 'Ver los logros',
   },
   {
     id: 'fisica', title: 'Aula de Física', shortTitle: 'Física', eyebrow: 'Physica',
     description: 'Experimentá con fuerzas y movimiento en el prototipo jugable de Physica y consultá sus materiales educativos.',
-    kind: 'classroom', x: 34, y: 1, width: 14, depth: 10, presentationLevel: 2, floor: '#2d3040', accent: '#8d91e8', href: '#aulas', actionLabel: 'Ver las aulas',
+    kind: 'classroom', x: 34, y: 1, width: 14, depth: 10, floorElevation: 0, floor: '#2d3040', accent: '#8d91e8', href: '#aulas', actionLabel: 'Ver las aulas',
   },
   {
     id: 'direccion', title: 'Dirección', shortTitle: 'Dirección', eyebrow: 'Archivo de Roxana',
     description: 'Conocé el propósito de Roxana, sus principios educativos y la documentación del proyecto desde el despacho de Dirección.',
-    kind: 'office', x: 18.5, y: 0, width: 11, depth: 7, presentationLevel: 2, floor: '#392c2c', accent: '#d87c66',
+    kind: 'office', x: 18.5, y: 0, width: 11, depth: 7, floorElevation: 1.14, floor: '#392c2c', accent: '#d87c66',
   },
   {
     id: 'visitantes', title: 'Anfiteatro', shortTitle: 'Anfiteatro', eyebrow: 'Novedades y newsletter',
     description: 'Enterate de lo que sucede en Roxana y suscribite al newsletter para recibir novedades del Instituto.',
-    kind: 'theater', x: 34, y: 21, width: 12, depth: 8, presentationLevel: 0, floor: '#343028', accent: '#d6a55c', href: '#anfiteatro', actionLabel: 'Ir al anfiteatro',
+    kind: 'theater', x: 34, y: 21, width: 12, depth: 8, floorElevation: 0, floor: '#343028', accent: '#d6a55c', href: '#anfiteatro', actionLabel: 'Ir al anfiteatro',
   },
   {
     id: 'preceptoria', title: 'Preceptoría', shortTitle: 'Preceptoría', eyebrow: 'Tu cuenta en Roxana',
     description: 'Registrate, ingresá a tu cuenta o actualizá tu perfil y contraseña. Tu recorrido por Roxana empieza aquí.',
-    kind: 'reception', x: 2, y: 21, width: 12, depth: 8, presentationLevel: 0, floor: '#2d3535', accent: '#75b8a4', href: '#preceptoria', actionLabel: 'Ir a preceptoría',
+    kind: 'reception', x: 2, y: 21, width: 12, depth: 8, floorElevation: 0, floor: '#2d3535', accent: '#75b8a4', href: '#preceptoria', actionLabel: 'Ir a preceptoría',
   },
 ] as const;
 
@@ -132,16 +134,23 @@ export function zoneAtCell(x: number, y: number): VoxelRoom | null {
 }
 
 /**
- * Devuelve true cuando `candidate` queda entre la cámara frontal y `target`.
- * Como la planta es ortogonal, el solape horizontal y una fila más cercana
- * bastan para derivar el obstáculo sin mantener pares manuales.
+ * Tests projected overlap and camera depth on the actual oblique school view.
  */
 export function schoolRoomOccludes(candidate: VoxelRoom, target: VoxelRoom): boolean {
   if (candidate.id === target.id || candidate.embedded) return false;
-  const horizontalOverlap =
-    Math.min(candidate.x + candidate.width, target.x + target.width)
-    - Math.max(candidate.x, target.x);
-  return horizontalOverlap > .5 && candidate.y > target.y + .5;
+  const horizontal = (room: VoxelRoom) => ({
+    min: room.x - SCHOOL_VIEW_X * (room.y + room.depth),
+    max: room.x + room.width - SCHOOL_VIEW_X * room.y,
+  });
+  const depth = (room: VoxelRoom) => SCHOOL_VIEW_X * (room.x + room.width / 2) + room.y + room.depth / 2;
+  const a = horizontal(candidate), b = horizontal(target);
+  return Math.min(a.max, b.max) - Math.max(a.min, b.min) > .5 && depth(candidate) > depth(target) + .5;
+}
+
+/** A focused classroom is a clean cutaway; hall services retain their shared architecture. */
+export function schoolRoomInFocus(candidate: VoxelRoom, target: VoxelRoom): boolean {
+  if (candidate.id === target.id) return true;
+  return (target.id === 'hall' || !!target.embedded) && (candidate.id === 'hall' || !!candidate.embedded);
 }
 
 function stateForAula(state: AulaEstado): VoxelZoneState {
