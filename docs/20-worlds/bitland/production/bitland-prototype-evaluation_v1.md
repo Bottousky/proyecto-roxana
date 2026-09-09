@@ -289,6 +289,55 @@ El build B de esa sesión demoró 8m23s; no es una medida controlada de velocida
 de desarrollo ni evidencia para comparar engines. La primera invocación QA de
 B quedó en `about:blank`; se corrigió la navegación antes de repetir.
 
+La repetición sobre producción de B (`phaser-metropolis-production-playtest.txt`)
+pasa todas las verificaciones funcionales, cinco entregas desktop y una entrega
+touch a 390×844, sin overflow ni errores de consola. Registró p50 66.7 ms y
+p95 266.5 ms bajo la carga concurrente de esta sesión: **no pasa rendimiento**.
+No compararlo causalmente con la muestra anterior de A tomada en otro momento.
+Ambos builds pasan; el warning de bundle B permanece. La revisión de dirección
+y el gate de producción siguen abiertos pese a las pruebas funcionales verdes.
+
+Descarga aproximada de todos los chunks JS de producción (suma gzip por archivo,
+incluidos chunks opcionales): A 559 kB sin comprimir / 169 kB gzip, B 1.68 MB /
+385 kB gzip. No es una medición de transferencia inicial real con red fría.
+Las fuentes y rutas experimentales se integraron únicamente en el coordinador,
+conservando ramas A/B y lockfiles propios. La landing y Ohmdal no se modificaron.
+
+El smoke de arranque frío de A encontró un bug adicional: el DOM exponía botones
+activos antes de terminar `await createWorld` y conectar sus handlers. La traza
+mostró tres pasos con sensor todavía abierto y ninguna entrada `setInput`: se
+había perdido el click inicial, no el paquete ni el determinismo. Se deshabilitan
+los controles hasta terminar la inicialización, con `aria-busy` y texto de carga;
+el usuario y Playwright esperan controles realmente operativos.
+
+**Cierre de QA de esta entrega:** el smoke de producción corregido de A pasa:
+fallo con carga conservada, condición reparada, tick 8, una entrega y LED
+encendido, sin errores de página (`pixi-production-smoke-fixed.txt`). La
+verificación global final pasó build, 124 archivos de tests y checks de contenido
+(`verify-final.txt`); sólo permanecen TODOs de guion preexistentes de otros mundos.
+
+La segunda grabación ya pasa el criterio técnico: **30649 ms, sin cortes, una
+entrega, LED encendido al cierre**, desde la vista global hasta fallo, reparación,
+ejecución y consecuencia. Archivo `output/playwright/bitland/bitland-metropolis-30s.webm`,
+log `metropolis-video-final.txt`. La primera toma fallida se conserva como fallo.
+Este resultado no valida que un observador comprenda la cadena sin narración:
+esa evaluación humana y la transformación de un barrio completo siguen pendientes.
+
+Medición final de producción con ambos candidatos sobre D09, después de terminar
+los builds (`metropolis-performance-final.txt`, 180 frames por muestra):
+
+| Candidato | Interactivo localhost | p50 / p95 normal | p50 / p95 CPU 4× |
+|---|---:|---:|---:|
+| Pixi | 647 ms | 16.7 / 16.8 ms | 33.3 / 99.9 ms |
+| Phaser | 1660 ms | 16.7 / 66.7 ms | 66.7 / 83.5 ms |
+
+A cumple el presupuesto normal en este equipo; B no. Ninguno cumple el de modo
+simplificado bajo throttle; esta muestra no es hardware escolar. A se recomienda
+para continuar la iteración de presentación P0 por esta realización y descarga,
+sin ratificar renderer de campaña. B se conserva y su p95 bajo throttle menor
+impide declarar superioridad universal de A. Falta medir GPU/red fría/latencia
+de input y repetir en equipo objetivo; no extrapolar tiempos de localhost.
+
 ### Pruebas implementadas y aceptación
 
 `tests/bitland-simulation.test.ts`: precondiciones de recoger/entregar/mover,
