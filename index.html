@@ -1,468 +1,325 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="data:," />
-  <meta name="description" content="Instituto Roxana — Juego narrativo educativo. Aprende ciencia y técnica jugando en cuatro Mundos Aplicados." />
-  <meta property="og:title" content="Instituto Roxana" />
-  <meta property="og:description" content="Una escuela olvidó lo que sabía. Tú vas a recordarlo jugando." />
-  <meta property="og:image" content="/assets/hero-asignacion.png" />
-  <title>Instituto Roxana — Juego narrativo educativo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Caveat:wght@500;600;700&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="./src/landing/landing.css" />
-  <link rel="stylesheet" href="./src/landing/school3d.css" />
-</head>
-<body>
-  <section id="school-experience" class="rx-school3d" aria-label="Escuela interactiva del Instituto Roxana">
-    <div class="rx-school3d__parallax" aria-hidden="true">
-      <svg class="rx-school3d__parallax-layer rx-school3d__parallax-layer--far" data-parallax-depth="far" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <pattern id="school-dot-grid" width="54" height="54" patternUnits="userSpaceOnUse">
-            <circle cx="2" cy="2" r="1.2" fill="currentColor" />
-          </pattern>
-        </defs>
-        <rect width="1600" height="1000" fill="url(#school-dot-grid)" class="is-grid" />
-        <g class="is-code">
-          <text x="78" y="100">01001010 01110101 01100101 01100111 01101111</text>
-          <text x="1130" y="92">const recuerdo = true;</text>
-          <text x="1240" y="760">1011 · 0010 · 1101</text>
-          <text x="84" y="860">if (luz) { avanzar(); }</text>
-        </g>
-        <g class="is-math">
-          <text x="20" y="340">x² + y² = r²</text>
-          <text x="1430" y="360">Σ n²</text>
-          <text x="1050" y="910">∠α + ∠β = 180°</text>
-        </g>
-        <g class="is-physics">
-          <text x="1480" y="560">Δx / Δt</text>
-          <text x="20" y="620">F = m · a</text>
-        </g>
-      </svg>
-
-      <svg class="rx-school3d__parallax-layer rx-school3d__parallax-layer--mid" data-parallax-depth="mid" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
-        <g class="is-electronics">
-          <text x="70" y="225">V = I · R</text>
-          <path d="M20 700 H64 l12 -22 22 44 22 -44 22 44 12 -22 H210" />
-          <circle cx="20" cy="700" r="7" />
-          <circle cx="210" cy="700" r="7" />
-          <text x="1275" y="665">Ω 220</text>
-        </g>
-        <g class="is-geometry">
-          <path d="M1290 190 L1425 190 L1357 72 Z" />
-          <circle cx="140" cy="470" r="64" />
-          <path d="M76 470 H204 M140 406 V534" />
-          <path d="M1378 820 h112 v112 h-112 z" />
-          <path d="M1378 932 l112 -112" />
-        </g>
-        <g class="is-code">
-          <text x="1370" y="270">[ 1, 0, 1, 1 ]</text>
-          <text x="140" y="940">BITLAND // SECUENCIA 04</text>
-        </g>
-        <g class="is-roxana">
-          <text x="1370" y="470">R · O · X · A · N · A</text>
-          <text x="610" y="96">INSTITUTO / ARCHIVO 01</text>
-        </g>
-      </svg>
-
-      <svg class="rx-school3d__parallax-layer rx-school3d__parallax-layer--near" data-parallax-depth="near" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
-        <g class="is-electronics">
-          <path d="M18 300 H95 M18 318 H62" />
-          <path d="M1505 510 h76 M1538 474 v73" />
-          <circle cx="1538" cy="510" r="38" />
-        </g>
-        <g class="is-math">
-          <text x="32" y="520">√2</text>
-          <text x="1450" y="250">φ</text>
-          <path d="M70 90 h110 M70 90 v110" />
-        </g>
-        <g class="is-roxana rx-school3d__parallax-seal">
-          <circle cx="1510" cy="885" r="56" />
-          <circle cx="1510" cy="885" r="43" />
-          <text x="1510" y="902" text-anchor="middle">R</text>
-        </g>
-        <g class="is-physics">
-          <path d="M45 930 C120 820 205 1020 290 900" />
-          <text x="55" y="970">señal / tiempo</text>
-        </g>
-      </svg>
-    </div>
-    <canvas id="school3d-canvas" class="rx-school3d__canvas" aria-label="Escuela 3D interactiva"></canvas>
-    <div class="rx-school3d__atmosphere" aria-hidden="true"></div>
-
-    <header class="rx-school3d__topbar">
-      <button id="school3d-home" class="rx-school3d__brand" type="button" aria-label="Volver a la vista completa de la escuela">
-        <span class="rx-school3d__crest">R</span>
-        <span><small>Instituto</small> Roxana</span>
-      </button>
-      <div class="rx-school3d__top-actions">
-        <button id="school3d-progress-preview" class="rx-school3d__button rx-school3d__button--progress" type="button" aria-pressed="false">Simular Arco 1</button>
-        <button id="school3d-rooms-toggle" class="rx-school3d__button rx-school3d__button--quiet" type="button" aria-expanded="false" aria-controls="school3d-room-list">Salas</button>
-        <a class="rx-school3d__button rx-school3d__button--primary" href="/#sala/electronica">Continuar viaje <span aria-hidden="true">→</span></a>
-      </div>
-    </header>
-
-    <nav id="school3d-room-list" class="rx-school3d__rooms" aria-label="Salas del Instituto"></nav>
-
-    <!-- Rótulos proyectados desde las anclas 3D. Decorativos: el mismo contenido,
-         con el mismo estado, ya está en el menú «Salas» de arriba. -->
-    <div id="school3d-labels" class="rx-school3d__labels" aria-hidden="true"></div>
-
-    <div class="rx-school3d__intro" id="school3d-intro">
-      <p>El núcleo de Proyecto Roxana</p>
-      <h1>Una escuela que<br /><em>recuerda contigo.</em></h1>
-      <span>Explora sus aulas, sigue tu progreso y descubre quién volvió de cada mundo.</span>
-    </div>
-
-    <aside id="school3d-panel" class="rx-school3d__panel" aria-live="polite" aria-hidden="true">
-      <button id="school3d-panel-close" class="rx-school3d__panel-close" type="button" aria-label="Volver a la escuela"><span aria-hidden="true">←</span> Escuela</button>
-      <div class="rx-school3d__panel-heading">
-        <div id="school3d-eyebrow" class="rx-school3d__eyebrow"></div>
-        <h2 id="school3d-title"></h2>
-        <span id="school3d-status" class="rx-school3d__status"></span>
-      </div>
-      <div class="rx-school3d__panel-body">
-        <p id="school3d-description"></p>
-        <div class="rx-school3d__room-meta">
-          <span><small>Actividad</small><strong id="school3d-activity"></strong></span>
-          <span><small>Progreso</small><strong id="school3d-progress-label"></strong></span>
-        </div>
-        <div class="rx-school3d__progress" aria-hidden="true"><i id="school3d-progress-bar"></i></div>
-      </div>
-      <div class="rx-school3d__panel-actions">
-        <a id="school3d-action" class="rx-school3d__panel-action" href="/#sala/electronica">Entrar</a>
-      </div>
-    </aside>
-
-    <div class="rx-school3d__help" aria-hidden="true">
-      <span class="rx-school3d__live-dot"></span>
-      Escuela viva
-      <i></i>
-      <span class="rx-school3d__help-copy">Elige una sala para acercarte · vuelve a Escuela para regresar</span>
-    </div>
-
-    <div id="school3d-loading" class="rx-school3d__loading" role="status">
-      <span class="rx-school3d__loader-mark">R</span>
-      <p>Abriendo el Instituto</p>
-      <div><i id="school3d-loading-bar"></i></div>
-      <small id="school3d-loading-label">Preparando la escuela…</small>
-    </div>
-
-    <div id="school3d-fallback" class="rx-school3d__fallback" hidden>
-      <strong>La vista 3D no está disponible en este dispositivo.</strong>
-      <span>Recargá la página o usá un navegador más reciente para entrar al Instituto.</span>
-    </div>
-  </section>
-  <div
-    id="root"
-    style="
-      --bg: #0e0d12;
-      --bg2: #16141c;
-      --panel: #1c1a22;
-      --panel2: #221f2a;
-      --border: #34303d;
-      --text: #e8e2d4;
-      --muted: #a89c86;
-      --accent: #ffd34d;
-      --accent-dim: #b08d2a;
-      --paper: #f0e6d2;
-      --ink: #3a2f25;
-      --ember: #e2563a;
-      position: relative;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Hanken Grotesk', system-ui, sans-serif;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    "
-  >
-    <header style="position: sticky; top: 0; z-index: 60; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); background: color-mix(in srgb, var(--bg) 78%, transparent); border-bottom: 1px solid var(--border);">
-      <nav style="max-width: 1240px; margin: 0 auto; padding: 13px 24px; display: flex; align-items: center; gap: 22px; flex-wrap: wrap;">
-        <a href="#hall" style="display: flex; align-items: baseline; gap: 11px; text-decoration: none; color: var(--text);">
-          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.1em; color: var(--accent);">Ω</span>
-          <span style="font-family: 'Spectral', serif; font-weight: 600; font-size: 19px; letter-spacing: 0.01em;">Instituto Roxana</span>
-        </a>
-        <div style="flex: 1;"></div>
-        <div style="display: flex; align-items: center; gap: 18px; font-size: 14px; font-weight: 500; flex-wrap: wrap;">
-          <a href="#hall" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Hall</a>
-          <a href="?view=school" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Escuela 3D</a>
-          <a href="#cartelera" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Cartelera</a>
-          <a href="#aulas" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Aulas</a>
-          <a href="#biblioteca" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Biblioteca</a>
-          <a href="#anfiteatro" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Anfiteatro</a>
-          <a href="#trofeos" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Sala de Trofeos</a>
-          <a href="#preceptoria" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Preceptoría</a>
-          <a href="#kiosco" style="color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer;">Kiosco</a>
-        </div>
-        <button id="cart-btn" style="display: flex; align-items: center; gap: 8px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 8px 13px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: border-color 0.15s;">
-          <span style="font-size: 15px;">◷</span><span>Cesta · <span id="cart-count">0</span></span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101b21" />
+    <title>Instituto Roxana · Una escuela, cuatro mundos</title>
+    <meta
+      name="description"
+      content="Entrá al Instituto Roxana. Explorá sus aulas, viajá a los Mundos Aplicados, leé en la Biblioteca y construí tu propio recorrido de aprendizaje."
+    />
+    <meta
+      property="og:title"
+      content="Instituto Roxana · Una escuela, cuatro mundos"
+    />
+    <meta
+      property="og:description"
+      content="Cada sala abre una posibilidad. Una escuela interactiva para aprender actuando sobre el mundo."
+    />
+    <meta property="og:image" content="/instituto-social.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/roxana.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="/src/landing/fonts/DMSans.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/src/landing/landing.css" />
+    <link rel="stylesheet" href="/src/landing/experience.css" />
+    <link rel="stylesheet" href="/src/landing/school3d.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#school3d-rooms-toggle"
+      >Ir al directorio de salas</a
+    >
+    <main id="school-experience" class="rx-school3d" data-mode="overview">
+      <div class="rx-school3d__parallax" aria-hidden="true"></div>
+      <header class="institute-header">
+        <button
+          class="brand"
+          data-overview
+          aria-label="Roxana, vista general del Instituto"
+        >
+          <img src="/roxana.svg" alt="" /><span
+            ><small>INSTITUTO</small><strong>ROXANA</strong></span
+          >
         </button>
-        <a href="/#sala/electronica" style="background: var(--accent); color: #1a1408; text-decoration: none; border-radius: 9px; padding: 9px 18px; font-weight: 700; font-size: 14.5px; box-shadow: 0 0 0 1px var(--accent-dim);">Jugar</a>
-      </nav>
-    </header>
-
-    <main>
-      <!-- Hall (hero) -->
-      <section
-        id="hall"
-        data-screen-label="Hall"
-        style="
-          position: relative;
-          overflow: hidden;
-          min-height: 90vh;
-          display: flex;
-          align-items: center;
-          border-bottom: 1px solid var(--border);
-        "
-      >
-        <div style="position: absolute; inset: 0; background-image: url(assets/hero-asignacion.png); background-size: cover; background-position: 62% center; filter: saturate(0.92);"></div>
-        <div style="position: absolute; inset: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--bg) 97%, transparent) 0%, color-mix(in srgb, var(--bg) 90%, transparent) 38%, color-mix(in srgb, var(--bg) 42%, transparent) 78%, color-mix(in srgb, var(--bg) 20%, transparent) 100%);"></div>
-        <div style="position: absolute; inset: 0; background: linear-gradient(0deg, var(--bg) 0%, transparent 26%);"></div>
+        <div class="header-location">
+          <span class="live-dot"></span
+          ><span id="current-location">El conocimiento vuelve a la vida</span>
+        </div>
+        <div class="header-actions">
+          <button
+            class="icon-button"
+            id="search-school"
+            aria-label="Buscar en el Instituto"
+            title="Buscar salas y libros"
+          >
+            ⌕</button
+          ><button class="account-entry" data-select-room="preceptoria">
+            <span class="avatar" aria-hidden="true">R</span
+            ><span id="account-name">Ingresar al Instituto</span
+            ><span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </header>
+      <div id="school3d-intro" class="institute-welcome">
+        <span class="eyebrow">TU PRÓXIMA AVENTURA EMPIEZA ACÁ</span>
+        <h1>Una escuela.<br /><em>Infinitas preguntas.</em></h1>
+        <p>Elegí una sala. El resto se descubre adentro.</p>
+      </div>
+      <div class="school-stage" id="instituto">
+        <img
+          id="school3d-poster"
+          class="school-poster"
+          src="/instituto-poster.png"
+          alt="Vista del Instituto Roxana, con cuatro aulas alrededor de su hall central."
+        />
+        <canvas
+          id="school3d-canvas"
+          class="rx-school3d__canvas"
+          tabindex="0"
+          aria-label="Escuela interactiva. Seleccioná una sala o usá las flechas izquierda y derecha para recorrerlas."
+        ></canvas>
         <div
-          style="
-            position: absolute;
-            top: -12%;
-            left: 18%;
-            width: 520px;
-            height: 520px;
-            border-radius: 50%;
-            background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 66%);
-            filter: blur(8px);
-            animation: rx-pulse 6s ease-in-out infinite;
-            pointer-events: none;
-          "
+          id="school3d-labels"
+          class="rx-school3d__labels"
+          aria-hidden="true"
         ></div>
-        <div style="position: relative; max-width: 1240px; margin: 0 auto; padding: 80px 24px; width: 100%;">
-          <div style="max-width: 760px;">
-            <div id="hall-greeting" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--accent); margin-bottom: 26px;">Juego narrativo educativo</div>
-            <h1 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(48px, 7.4vw, 98px); line-height: 0.98; letter-spacing: -0.015em; margin: 0 0 8px;">Instituto<br />Roxana</h1>
-            <p style="font-family: 'Spectral', serif; font-style: italic; font-size: clamp(20px, 2.5vw, 30px); line-height: 1.32; color: var(--paper); max-width: 620px; margin: 18px 0 0;">«Una escuela olvidó lo que sabía. Tú vas a recordarlo jugando.»</p>
-            <p style="font-size: clamp(16px, 1.5vw, 18.5px); line-height: 1.6; color: var(--muted); max-width: 560px; margin: 22px 0 0;">Cuatro Mundos Aplicados — Matemática, Física, Electrónica y Programación — donde el conocimiento sobrevive degradado en ritual. <strong style="color: var(--text); font-weight: 600;">Ohmdal</strong>, el mundo de la corriente, está en greybox de desarrollo.</p>
-            <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px;">
-              <a href="/#sala/electronica" style="display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #1a1408; text-decoration: none; border-radius: 11px; padding: 15px 26px; font-weight: 700; font-size: 16.5px; box-shadow: 0 8px 30px color-mix(in srgb, var(--accent) 34%, transparent);">Jugar Ohmdal <span style="font-size: 18px;">→</span></a>
-              <a href="#aulas" style="display: inline-flex; align-items: center; gap: 9px; background: transparent; color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 11px; padding: 15px 24px; font-weight: 600; font-size: 16.5px; transition: border-color 0.15s; cursor: pointer;">Recorrer el instituto</a>
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 30px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.04em; color: var(--muted);">
-              <span>Gratis en el navegador</span><span style="color: var(--border);">·</span><span>Sin instalación</span><span style="color: var(--border);">·</span><span>Greybox en desarrollo</span>
-            </div>
-          </div>
+        <div id="school3d-loading" class="scene-loading" role="status">
+          <span class="loading-seal">R</span
+          ><span id="school3d-loading-label">Abriendo el Instituto…</span
+          ><span class="loading-track"><i id="school3d-loading-bar"></i></span>
         </div>
-        <div style="position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 22px; animation: rx-float 2.4s ease-in-out infinite;">↓</div>
-      </section>
-
-      <!-- Escuela voxel isométrica -->
-      <section id="instituto-voxel" class="rx-voxel-school" data-screen-label="Mapa voxel del Instituto">
-        <div class="rx-voxel-school__heading">
-          <div>
-            <div class="rx-voxel-school__kicker">El Instituto completo</div>
-            <h2>Una escuela que puedes recorrer</h2>
-            <p>Explora el plano isométrico, selecciona cada sala y descubre qué partes de Roxana ya despertaron. Arrastra para mover el mapa y usa la rueda para acercarte.</p>
-          </div>
-          <div class="rx-voxel-school__legend" aria-label="Ayuda del mapa">
-            <span><i class="is-open"></i> Abierta</span>
-            <span><i class="is-active"></i> En restauración</span>
-            <span><i class="is-closed"></i> Cerrada</span>
-          </div>
+        <div id="school3d-fallback" class="scene-fallback" hidden>
+          <h2>El Instituto sigue abierto.</h2>
+          <p>
+            No pudimos mostrar la escena 3D. Podés usar todas las salas desde el
+            directorio.
+          </p>
+          <button class="button" id="fallback-directory">
+            Explorar las salas</button
+          ><button class="text-button" id="retry-scene">
+            Reintentar la escena
+          </button>
         </div>
-        <div class="rx-voxel-school__shell">
-          <div class="rx-voxel-school__viewport">
-            <canvas id="voxel-school-canvas" aria-label="Mapa isométrico interactivo del Instituto Roxana"></canvas>
-            <div class="rx-voxel-school__hint" aria-hidden="true">Arrastrar · Rueda para zoom · Tocar una sala</div>
-          </div>
-          <aside class="rx-voxel-school__panel" aria-live="polite">
-            <div id="voxel-zone-eyebrow" class="rx-voxel-school__eyebrow"></div>
-            <h3 id="voxel-zone-title"></h3>
-            <span id="voxel-zone-status" class="rx-voxel-school__status"></span>
-            <p id="voxel-zone-description"></p>
-            <a id="voxel-zone-action" class="rx-voxel-school__action" href="#"></a>
-            <div class="rx-voxel-school__rooms-label">Todas las salas</div>
-            <div id="voxel-zone-list" class="rx-voxel-school__rooms" aria-label="Seleccionar sala"></div>
-          </aside>
+      </div>
+      <div class="campus-marker" aria-hidden="true">
+        <span>✧</span><small>APRENDER<br />ES EXPLORAR</small>
+      </div>
+      <aside id="school3d-panel" class="room-panel" aria-hidden="true" inert>
+        <div class="room-panel-header">
+          <span id="school3d-eyebrow" class="eyebrow"></span
+          ><button
+            id="school3d-panel-close"
+            class="icon-button"
+            aria-label="Volver a la escuela"
+          >
+            ×
+          </button>
         </div>
-      </section>
-
-      <!-- Cartelera -->
-      <section id="cartelera" data-screen-label="Cartelera" style="padding: clamp(72px, 9vw, 128px) 24px; background: var(--bg2); border-bottom: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Cartelera</div>
-          <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 32px;">El tablón de anuncios</h2>
-          <!-- Cork board container -->
-          <div style="position: relative; background: linear-gradient(135deg, #b9895a 0%, #a6763f 50%, #9a6b35 100%), radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.08) 1px, transparent 1px), radial-gradient(circle at 42% 67%, rgba(0, 0, 0, 0.15) 1.5px, transparent 1.5px), radial-gradient(circle at 73% 35%, rgba(255, 255, 255, 0.06) 1px, transparent 1px), radial-gradient(circle at 28% 82%, rgba(0, 0, 0, 0.12) 2px, transparent 2px), radial-gradient(circle at 61% 11%, rgba(255, 255, 255, 0.07) 1.5px, transparent 1.5px); border: 8px solid #6b4a2a; border-radius: 5px; padding: clamp(32px, 5vw, 48px); box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 12px 40px rgba(0, 0, 0, 0.4); max-width: 900px;">
-            <!-- Notes grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(20px, 3vw, 36px);">
-              <!-- Note 1: Novedad (Ember) -->
-              <div style="position: relative; background: var(--paper); color: var(--ink); padding: 24px 20px; border-radius: 3px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); transform: rotate(-1.5deg);">
-                <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; border-radius: 50%; background: var(--ember); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset -1px -1px 3px rgba(0, 0, 0, 0.3), inset 1px 1px 3px rgba(255, 255, 255, 0.2); border: 2px solid #a83a26;"></div>
-                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 12px; font-weight: 600;">Novedad</div>
-                <p style="font-family: 'Spectral', serif; font-weight: 500; font-size: 17px; line-height: 1.5; margin: 0;">Ohmdal, el mundo de la electricidad, ya abre sus puertas.</p>
-              </div>
-              <!-- Note 2: En obras (Blue) -->
-              <div style="position: relative; background: var(--paper); color: var(--ink); padding: 24px 20px; border-radius: 3px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); transform: rotate(0.8deg);">
-                <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; border-radius: 50%; background: #4a7ba7; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset -1px -1px 3px rgba(0, 0, 0, 0.3), inset 1px 1px 3px rgba(255, 255, 255, 0.15); border: 2px solid #2a5280;"></div>
-                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 12px; font-weight: 600;">En obras</div>
-                <p style="font-family: 'Spectral', serif; font-weight: 500; font-size: 17px; line-height: 1.5; margin: 0;">Tres mundos más esperan su turno: Programación, Física y Matemática.</p>
-              </div>
-              <!-- Note 3: Bitácora (Amber) -->
-              <div style="position: relative; background: var(--paper); color: var(--ink); padding: 24px 20px; border-radius: 3px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); transform: rotate(1.2deg);">
-                <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; border-radius: 50%; background: var(--accent-dim); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset -1px -1px 3px rgba(0, 0, 0, 0.3), inset 1px 1px 3px rgba(255, 255, 255, 0.2); border: 2px solid #8a6f1f;"></div>
-                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 12px; font-weight: 600;">Bitácora</div>
-                <p style="font-family: 'Spectral', serif; font-weight: 500; font-size: 17px; line-height: 1.5; margin: 0;">Todo lo que descubras queda escrito. Buscalo en la Biblioteca.</p>
-              </div>
-            </div>
-          </div>
+        <h2 id="school3d-title" tabindex="-1"></h2>
+        <span id="school3d-status" class="room-status"></span>
+        <p id="school3d-description" class="room-description"></p>
+        <div id="room-content"></div>
+        <div class="legacy-room-progress" hidden>
+          <span id="school3d-activity"></span
+          ><span id="school3d-progress-label"></span>
+          <div><i id="school3d-progress-bar"></i></div>
         </div>
-      </section>
-
-      <!-- Aulas -->
-      <section id="aulas" data-screen-label="Aulas" style="padding: clamp(72px, 9vw, 128px) 24px; border-bottom: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Aulas</div>
-          <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 14px; max-width: 680px;">Cuatro disciplinas, cuatro aulas por restaurar</h2>
-          <p style="font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 600px; margin: 0 0 48px;">Cada aula del Instituto abre a un mundo. Electrónica — Ohmdal está abierta y jugable; las demás están en diseño.</p>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); gap: 18px;" id="aulas-grid"></div>
+        <a id="school3d-action" class="button" href="/jugar" hidden>Entrar</a>
+      </aside>
+      <nav
+        id="school3d-room-list"
+        class="rx-school3d__rooms"
+        aria-label="Directorio de salas"
+        inert
+      ></nav>
+      <div class="scene-toolbar">
+        <div class="toolbar-left">
+          <button
+            id="school3d-home"
+            class="icon-button"
+            aria-label="Vista general"
+            title="Vista general"
+          >
+            ⌂</button
+          ><span class="toolbar-divider"></span
+          ><button
+            id="school3d-rooms-toggle"
+            class="directory-button"
+            aria-expanded="false"
+            aria-controls="school3d-room-list"
+          >
+            <span aria-hidden="true">▦</span> Directorio
+            <span aria-hidden="true">＋</span>
+          </button>
         </div>
-      </section>
-
-      <!-- Biblioteca -->
-      <section id="biblioteca" data-screen-label="Biblioteca" style="padding: clamp(72px, 9vw, 128px) 24px; background: var(--bg2); border-bottom: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Biblioteca</div>
-          <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 24px;">Biblioteca</h2>
-          <div class="rx-puerta-cerrada" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px; max-width: 620px; text-align: center;">
-            <div style="font-size: 40px; color: var(--muted); margin-bottom: 18px;">🔒</div>
-            <p style="font-size: 16px; line-height: 1.6; color: var(--muted); margin: 0;">La biblioteca está cerrada. Los estantes esperan a quien traiga algo que contar.</p>
-          </div>
+        <p id="scene-hint">
+          <span class="live-dot"></span> Hacé clic en una sala para entrar
+        </p>
+        <div class="toolbar-right">
+          <button id="tour-toggle" class="text-button" title="Recorrido guiado">
+            Primera visita <span aria-hidden="true">↗</span></button
+          ><button
+            id="sound-toggle"
+            class="icon-button"
+            aria-pressed="false"
+            aria-label="Activar sonido ambiente"
+          >
+            ♫</button
+          ><button
+            data-open-dialog="settings-dialog"
+            class="icon-button"
+            aria-label="Ajustes de la visita"
+          >
+            ⚙
+          </button>
         </div>
-      </section>
-
-      <!-- Anfiteatro -->
-      <section id="anfiteatro" data-screen-label="Anfiteatro" style="padding: clamp(72px, 9vw, 128px) 24px; border-bottom: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Anfiteatro</div>
-          <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 24px;">Anfiteatro</h2>
-          <div class="rx-puerta-cerrada" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px; max-width: 620px; text-align: center;">
-            <div style="font-size: 40px; color: var(--muted); margin-bottom: 18px;">🔒</div>
-            <p style="font-size: 16px; line-height: 1.6; color: var(--muted); margin: 0;">El anfiteatro está en silencio. Pronto habrá función.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Sala de Trofeos -->
-      <section id="trofeos" data-screen-label="Sala de Trofeos" style="padding: clamp(72px, 9vw, 128px) 24px; background: var(--bg2); border-bottom: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Sala de Trofeos</div>
-          <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 24px;">Sala de Trofeos</h2>
-          <div class="rx-puerta-cerrada" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px; max-width: 620px; text-align: center;">
-            <div style="font-size: 40px; color: var(--muted); margin-bottom: 18px;">🔒</div>
-            <p style="font-size: 16px; line-height: 1.6; color: var(--muted); margin: 0;">La vitrina está vacía. Todavía.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Preceptoría -->
-      <section id="preceptoria" data-screen-label="Preceptoría" style="padding: clamp(72px, 9vw, 128px) 24px; border-bottom: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Preceptoría</div>
-          <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 24px;">Preceptoría</h2>
-          <div class="rx-puerta-cerrada" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px; max-width: 620px; text-align: center;">
-            <div style="font-size: 40px; color: var(--muted); margin-bottom: 18px;">🔒</div>
-            <p style="font-size: 16px; line-height: 1.6; color: var(--muted); margin: 0;">La preceptoría está cerrada. Vuelve más tarde para inscribirte.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Kiosco -->
-      <section id="kiosco" data-screen-label="Kiosco" style="padding: clamp(72px, 9vw, 128px) 24px; background: var(--bg2); border-bottom: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Kiosco</div>
-          <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 48px;">Kiosco</h2>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px;" id="store-grid"></div>
-        </div>
-      </section>
-
-      <!-- Ficha técnica (meta-información, fuera de la metáfora) -->
-      <section id="ficha-tecnica" data-screen-label="Ficha técnica" style="padding: clamp(72px, 9vw, 128px) 24px; border-bottom: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(36px, 5vw, 72px); align-items: start;">
-          <div>
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 20px;">Sobre el proyecto</div>
-            <h2 style="font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.06; letter-spacing: -0.01em; margin: 0 0 24px;">Una escuela que aprende a recordar</h2>
-            <p style="font-size: 17px; line-height: 1.66; color: var(--muted); margin: 0 0 18px;">El Instituto Roxana conserva las formas del conocimiento pero perdió la comprensión. Sus aulas abren puertas a <strong style="color: var(--text); font-weight: 600;">Mundos Aplicados</strong>: lugares donde cada disciplina sobrevive degradada en ritual y superstición.</p>
-            <p style="font-size: 17px; line-height: 1.66; color: var(--muted); margin: 0 0 18px;">Juegas reactivando esos mundos. No hay clase pegada encima: primero ves el <em style="color: var(--paper); font-style: italic;">fenómeno</em>, lo manipulas, sufres la consecuencia — y solo entonces el conocimiento se vuelve fórmula. Restaurar cada mundo restaura, de a poco, a la escuela.</p>
-            <p style="font-size: 17px; line-height: 1.66; color: var(--muted); margin: 0;"><strong style="color: var(--text); font-weight: 600;">¿Para qué?</strong> Para aprender ciencia y técnica haciéndolas, no memorizándolas. Para que un centro lo abra con un clic en un Chromebook y un alumno salga sabiendo enunciar la Ley de Ohm con sus propias palabras.</p>
-          </div>
-          <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 8px 28px;">
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); padding: 22px 0 4px;">Ficha técnica</div>
-            <div id="ficha-rows"></div>
-            <div style="padding: 18px 0 22px;">
-              <a href="/#sala/electronica" style="display: block; text-align: center; background: transparent; color: var(--accent); text-decoration: none; border: 1px solid var(--accent-dim); border-radius: 10px; padding: 13px; font-weight: 600; font-size: 15px; transition: background 0.15s; cursor: pointer;">Abrir el juego →</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Footer -->
-      <footer style="padding: clamp(72px, 9vw, 128px) 24px; background: var(--bg2); border-top: 1px solid var(--border);">
-        <div style="max-width: 1180px; margin: 0 auto;">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 48px; margin-bottom: 48px;">
-            <div>
-              <div style="display: flex; align-items: baseline; gap: 11px; margin-bottom: 22px;">
-                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.1em; color: var(--accent);">Ω</span>
-                <span style="font-family: 'Spectral', serif; font-weight: 600; font-size: 19px; letter-spacing: 0.01em;">Instituto Roxana</span>
-              </div>
-              <p style="font-size: 14.5px; line-height: 1.6; color: var(--muted); margin: 0;">Un juego narrativo educativo donde aprendes ciencia y técnica haciéndolas, no memorizándolas.</p>
-            </div>
-            <div>
-              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px;">Jugar</div>
-              <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;">
-                <li><a href="/#sala/electronica" style="color: var(--text); text-decoration: none; transition: color 0.15s;">Abrir Ohmdal</a></li>
-                <li><a href="#aulas" style="color: var(--text); text-decoration: none; transition: color 0.15s;">Ver aulas</a></li>
-              </ul>
-            </div>
-            <div>
-              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px;">Más</div>
-              <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;">
-                <li><a href="#kiosco" style="color: var(--text); text-decoration: none; transition: color 0.15s;">Kiosco</a></li>
-                <li><a href="#ficha-tecnica" style="color: var(--text); text-decoration: none; transition: color 0.15s;">Sobre el proyecto</a></li>
-              </ul>
-            </div>
-          </div>
-          <div style="padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 18px; font-size: 13px; color: var(--muted);">
-            <span>© 2026 Proyecto Roxana</span>
-            <span>Phaser 4 · TypeScript · web-first</span>
-          </div>
-        </div>
-      </footer>
+      </div>
+      <div id="tour-card" class="tour-card" hidden>
+        <span class="eyebrow" id="tour-step"></span
+        ><button
+          id="tour-close"
+          class="icon-button"
+          aria-label="Cerrar recorrido"
+        >
+          ×
+        </button>
+        <h3 id="tour-title"></h3>
+        <p id="tour-description"></p>
+        <button id="tour-next" class="button">Siguiente sala →</button>
+      </div>
     </main>
-
-    <!-- Cart drawer (hidden by default) -->
-    <div id="cart-drawer" style="display: none; position: fixed; right: 0; top: 0; bottom: 0; width: min(420px, 92vw); background: var(--panel); border-left: 1px solid var(--border); z-index: 100; overflow-y: auto; box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);">
-      <div style="padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0; font-family: 'Spectral', serif; font-weight: 600; font-size: 20px;">Tu cesta</h3>
-        <button id="close-cart" style="background: transparent; border: none; font-size: 20px; color: var(--text); cursor: pointer;">×</button>
-      </div>
-      <div id="cart-items" style="padding: 24px; font-size: 14px; color: var(--muted);">Cesta vacía</div>
-      <div id="cart-footer" style="padding: 24px; border-top: 1px solid var(--border); display: none;">
-        <div style="margin-bottom: 18px; text-align: right; font-size: 16px;">
-          <span style="color: var(--muted);">Subtotal:</span> <strong id="cart-total" style="color: var(--text);">€0</strong>
-        </div>
-        <button id="checkout-btn" style="width: 100%; background: var(--accent); color: #1a1408; border: none; border-radius: 10px; padding: 12px; font-weight: 600; font-size: 15px; cursor: pointer; margin-bottom: 10px;">Finalizar pedido</button>
-        <button id="clear-cart-btn" style="width: 100%; background: transparent; color: var(--accent); border: 1px solid var(--accent-dim); border-radius: 10px; padding: 12px; font-weight: 600; font-size: 15px; cursor: pointer;">Vaciar cesta</button>
-      </div>
-    </div>
-
-    <!-- Toast -->
-    <div id="toast" style="display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--paper); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-size: 14px; z-index: 101; animation: rx-rise 0.25s ease-out;"></div>
-
-    <!-- Backdrop for cart -->
-    <div id="cart-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 99; backdrop-filter: blur(4px);"></div>
-  </div>
-
-  <script type="module" src="./src/landing/index.ts"></script>
-</body>
+    <dialog
+      id="settings-dialog"
+      class="institute-dialog"
+      aria-labelledby="settings-title"
+    >
+      <button
+        class="dialog-close icon-button"
+        data-close-dialog
+        aria-label="Cerrar ajustes"
+      >
+        ×</button
+      ><span class="eyebrow">TU VISITA</span>
+      <h2 id="settings-title">A tu ritmo.</h2>
+      <form id="settings-form">
+        <label
+          >Calidad de la escena<select id="setting-quality">
+            <option value="auto">Automática</option>
+            <option value="high">Alta</option>
+            <option value="low">Ligera</option>
+          </select></label
+        ><label class="switch-row"
+          ><span
+            >Reducir movimiento<small
+              >Cámaras y ambiente más tranquilos</small
+            ></span
+          ><input type="checkbox" id="setting-motion" /></label
+        ><label class="switch-row"
+          ><span
+            >Rótulos de las salas<small
+              >El directorio siempre está disponible</small
+            ></span
+          ><input type="checkbox" id="setting-labels" /></label
+        ><label class="switch-row"
+          ><span
+            >Sonido ambiente<small
+              >Un ambiente original del Instituto</small
+            ></span
+          ><input type="checkbox" id="setting-sound"
+        /></label>
+        <p id="settings-status" class="form-status" role="status"></p>
+        <button class="text-button" type="reset">Restablecer ajustes</button>
+      </form>
+    </dialog>
+    <dialog
+      id="reader-dialog"
+      class="reader-dialog"
+      aria-labelledby="reader-title"
+    >
+      <div id="reader-content"></div>
+    </dialog>
+    <dialog
+      id="search-dialog"
+      class="institute-dialog search-dialog"
+      aria-labelledby="search-title"
+    >
+      <button
+        class="dialog-close icon-button"
+        data-close-dialog
+        aria-label="Cerrar búsqueda"
+      >
+        ×</button
+      ><span class="eyebrow">DIRECTORIO DEL INSTITUTO</span>
+      <h2 id="search-title">¿Qué querés descubrir?</h2>
+      <label class="search-field"
+        ><span aria-hidden="true">⌕</span
+        ><input
+          id="institute-search"
+          type="search"
+          placeholder="Una sala, un mundo, un libro…"
+          aria-label="Buscar salas y libros"
+      /></label>
+      <div id="search-results"></div>
+    </dialog>
+    <dialog
+      id="privacy-dialog"
+      class="institute-dialog"
+      aria-labelledby="privacy-title"
+    >
+      <button
+        class="dialog-close icon-button"
+        data-close-dialog
+        aria-label="Cerrar privacidad"
+      >
+        ×</button
+      ><span class="eyebrow">PRECEPTORÍA</span>
+      <h2 id="privacy-title">Tus datos en el Instituto</h2>
+      <p>
+        Podés explorar y leer sin crear una cuenta. Los ajustes y la actividad
+        de visitante se conservan en este navegador cuando permite
+        almacenamiento.
+      </p>
+      <p>
+        Al registrarte se guardan tu nombre, correo y una contraseña protegida
+        mediante hash. La sesión usa una cookie necesaria, inaccesible desde
+        JavaScript. Tus lecturas, favoritos y prácticas del Instituto se asocian
+        a tu cuenta; las partidas de Ohmdal conservan su guardado local.
+      </p>
+      <p>
+        La suscripción al boletín es opcional y puede cancelarse desde el
+        Anfiteatro. Esta instalación registra tu preferencia; no envía correos
+        ni utiliza seguimiento publicitario.
+      </p>
+      <p>
+        No se solicitan datos de pago. Cerrá tu sesión al terminar si usás un
+        equipo compartido.
+      </p>
+    </dialog>
+    <div
+      id="landing-announcement"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+    ></div>
+    <noscript
+      ><div class="noscript-notice">
+        <h1>Instituto Roxana</h1>
+        <p>
+          La escuela interactiva necesita JavaScript. Podés visitar los accesos
+          disponibles:
+        </p>
+        <a href="/jugar">Ohmdal · Electricidad</a
+        ><a href="/physica">Physica · Prototipo de física</a>
+        <p>Bitland y Arithmos están en preparación.</p>
+      </div></noscript
+    >
+    <script type="module" src="/src/landing/index.ts"></script>
+  </body>
 </html>

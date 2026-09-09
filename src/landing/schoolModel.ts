@@ -96,7 +96,12 @@ const WEB_KEY = 'roxana-web-v1';
 
 /** Único punto de lectura de localStorage para el estado de la escuela. */
 export function readSchoolState(): SchoolState {
-  const saveRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(SAVE_KEY) : null;
-  const webRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(WEB_KEY) : null;
-  return deriveSchoolState(saveRaw, webRaw);
+  try {
+    const saveRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(SAVE_KEY) : null;
+    const webRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(WEB_KEY) : null;
+    return deriveSchoolState(saveRaw, webRaw);
+  } catch {
+    // Private/blocked storage must not prevent the Institute from opening.
+    return deriveSchoolState(null, null);
+  }
 }
