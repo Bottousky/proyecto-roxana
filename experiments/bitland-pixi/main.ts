@@ -26,6 +26,14 @@ async function boot() {
 <section class="sensor-bar" aria-label="Entradas del mundo"><button id="gate" aria-pressed="false">Paso corto: abierto</button><label>Paquetes<select id="count"><option>1</option><option>0</option><option>3</option><option>5</option></select></label><label><input id="auto" type="checkbox"> Llegadas periódicas</label></section>
 <div id="null" role="status" hidden><span class="null-mark">∅</span><div><small>NULL</small><p id="nullLine"></p></div></div>
 <footer><div class="clock"><span class="clock-symbol">◴</span><div><small>CLOCK</small><strong id="tick">000</strong></div></div><div class="transport"><button id="rewind" aria-label="Retroceder un pulso">↶</button><button id="play" class="primary">▶ Ejecutar</button><button id="step">Un paso →</button><label class="speed-label"><span class="sr-only">Velocidad</span><select id="speed"><option value="1400">0.5×</option><option value="700" selected>1×</option><option value="350">2×</option></select></label></div><div id="state" role="status">Muelle · sin carga · LED apagado</div></footer>`;
+  // Renderer initialization is asynchronous. Do not expose live-looking
+  // controls before their handlers exist: early input would be lost.
+  const bootControls = app.querySelectorAll<HTMLButtonElement | HTMLSelectElement>(
+    "button, select",
+  );
+  bootControls.forEach((control) => { control.disabled = true; });
+  app.setAttribute("aria-busy", "true");
+  $("objective").textContent = "Abriendo la ciudad…";
   let machine = new Machine(),
     draft: Op[] = [...inherited],
     mode: Mode = "once",
@@ -333,6 +341,9 @@ async function boot() {
     },
   });
   sync();
+  $("objective").textContent = "Un paquete. Un courier. Una luz al otro lado de la placa.";
+  bootControls.forEach((control) => { control.disabled = false; });
+  app.setAttribute("aria-busy", "false");
   performance.mark("bitland-interactive");
 }
 void boot().catch((error: unknown) => {
