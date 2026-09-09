@@ -1,0 +1,125 @@
+.ari { color-scheme: dark; }
+body:has(.ari) { margin: 0; background: #102f38; }
+.ari { --ink:#fff3dc; --quiet:#c4d1c8; --gold:#eac58a; --glass:rgba(12,35,41,.9); width:100%; height:100dvh; min-height:420px; position:relative; overflow:hidden; color:var(--ink); font-family:'Segoe UI',system-ui,sans-serif; font-size:14px; isolation:isolate; }
+.ari *, .ari *::before, .ari *::after { box-sizing:border-box; }
+.ari [hidden] { display:none!important; }
+.ari button, .ari a { -webkit-tap-highlight-color:transparent; }
+.ari button { font:inherit; color:inherit; cursor:pointer; border:1px solid #d6c39742; background:#13353bd9; border-radius:6px; min-height:44px; padding:10px 16px; transition:background .16s,border-color .16s,transform .16s; touch-action:manipulation; }
+.ari button:hover:not(:disabled) { background:#2c4d50; border-color:#eac58a; }
+.ari button:active:not(:disabled) { transform:translateY(1px); }
+.ari button:disabled { opacity:.32; cursor:default; }
+.ari button:focus-visible,.ari a:focus-visible { outline:3px solid #ffde96; outline-offset:4px; }
+.ari button[aria-pressed=true] { background:#916738; border-color:#ffda93; }
+.ari button.ari-primary,.ari .ari-next { background:var(--gold); color:#173339; border-color:var(--gold); font-weight:650; padding:15px 25px; }
+.ari button.ari-primary:hover,.ari .ari-next:hover { background:#ffe3b0; }
+.ari-world { position:absolute; inset:0; touch-action:none; }
+.ari-world canvas { display:block; width:100%;height:100%; touch-action:none; }
+.ari-vignette { position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,#0b283f60,transparent 22%,transparent 72%,#092b3990); }
+.ari-kicker { font-size:10px; font-weight:600; letter-spacing:2.6px; line-height:1.7; color:var(--gold); }
+.ari-hud { position:absolute; top:max(24px,env(safe-area-inset-top)); left:28px; right:28px; display:flex; align-items:center; gap:18px; z-index:3; pointer-events:none; }
+.ari-hud button { pointer-events:auto; }
+.ari-home { width:46px; padding:8px!important; font-size:20px!important; }
+.ari-heading h1 { margin:2px 0 0; font:400 clamp(18px,2.1vw,28px)/1.2 Georgia,serif; text-shadow:0 2px 10px #061c26; }
+.ari-heading .ari-kicker { font-size:9px; }
+.ari-top-actions { margin-left:auto; display:flex; gap:8px; }
+.ari-top-actions button { font-size:17px; }
+.ari-top-actions span { font-size:12px; margin-left:6px; }
+.ari-objective { position:absolute; left:30px; top:112px; width:260px; pointer-events:none; text-shadow:0 2px 8px #102f38; }
+.ari-objective p { margin:6px 0; line-height:1.6; color:#ede9d7; }
+.ari-camera { position:absolute;right:28px;top:100px;display:flex;gap:4px; }
+.ari-camera button { width:44px;padding:5px;font-size:20px; }
+.ari-nudge { display:flex;justify-content:center;gap:4px;margin-top:8px; }
+.ari-nudge button { min-width:38px;padding:6px;font-size:14px; }
+.ari-nudge button:last-child { font-size:9px; }
+.ari-dialogue { position:absolute; left:30px; bottom:112px; max-width:360px; display:flex; align-items:center; gap:14px; background:linear-gradient(100deg,#102f38f5,#102f38a0); border-left:2px solid #e7c28c; border-radius:0 10px 10px 0; padding:17px 14px 17px 19px; pointer-events:auto; }
+.ari-dialogue b { font-size:9px; letter-spacing:2px; color:#e9bc76; }
+.ari-dialogue p { margin:7px 0 0; font:400 15px/1.5 Georgia,serif; }
+.ari-dialogue button { align-self:flex-start; border:0; background:none; padding:0 7px; min-height:28px; }
+.ari-portrait { position:relative; width:38px; height:48px; flex-shrink:0; background:#dcc49d; clip-path:polygon(50% 0,95% 36%,77% 84%,50% 100%,20% 83%,5% 35%); }
+.ari-portrait::before { content:''; position:absolute; left:7px; top:18px; width:25px; height:10px; background:#295463; clip-path:polygon(0 0,100% 0,72% 100%,28% 100%); }
+.ari-portrait::after { content:'••'; position:absolute; left:12px; top:14px; font-size:13px; color:#fff4ca; letter-spacing:3px; }
+.ari-feedback { position:absolute; bottom:91px; left:50%; transform:translateX(-50%); max-width:min(650px,70vw); color:#f5eddc; text-align:center; font-size:12px; line-height:1.5; text-shadow:0 1px 5px #092731; pointer-events:none; }
+.ari-workbench { position:absolute; right:28px; bottom:110px; width:274px; border:1px solid #ccb78c40; border-radius:12px; background:var(--glass); padding:12px; box-shadow:0 10px 40px #061e2640; backdrop-filter:blur(14px); }
+.ari-tool-top { display:flex; align-items:center; justify-content:space-between; }
+.ari-tool-top button { padding:0; min-height:24px; width:24px; border:0; background:none; font-size:20px; }
+.ari-tool-top .ari-kicker { font-size:8px; letter-spacing:1.6px; }
+.ari-piece-preview { display:grid; grid-template-columns:repeat(var(--cols),minmax(8px,26px)); gap:3px; justify-content:center; padding:12px 0; max-height:138px; overflow:auto; }
+.ari .ari-unit { min-height:24px; height:24px; width:100%; padding:0; border-radius:3px; font-size:16px; line-height:1; border:1px solid #ffefd470; color:#132e38; }
+.ari .amber { background:#edb65f; color:#513a24; }
+.ari .teal { background:#79c6c4; color:#17474d; }
+.ari .ari-unit:hover { background:#f7ebca; border-color:#fff; }
+.ari-tools { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; }
+.ari-tools button { display:flex; flex-direction:column; gap:3px; align-items:center; justify-content:center; padding:6px; min-width:73px; font-size:10px; }
+.ari-tools button span { font-size:21px; line-height:1; }
+.ari-mode-help { margin:10px 0 1px; font-size:10px; color:var(--quiet); text-align:center; line-height:1.5; }
+.ari-bottom { position:absolute; bottom:max(24px,env(safe-area-inset-bottom)); left:28px; right:28px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.ari-history { display:flex; gap:5px; }
+.ari-history button { font-size:13px; }
+.ari-history button:first-child,.ari-history button:nth-child(2) { font-size:22px; padding:5px 13px; }
+.ari-input-hint { font-size:11px; letter-spacing:.3px; color:#d7dece; text-shadow:0 1px 6px #143842; }
+.ari-next span,.ari-primary span { display:inline-block; margin-left:20px; }
+.ari-title { position:absolute; inset:0; display:flex; align-items:center; padding:7vw; background:linear-gradient(90deg,#0b253bef, #0b2d416b 56%,transparent); }
+.ari-title-content { max-width:630px; z-index:1; }
+.ari-title h1 { font:400 clamp(50px,8vw,116px)/1 Georgia,serif; letter-spacing:clamp(5px,1vw,15px); margin:30px 0 8px; }
+.ari-title h2 { font:400 clamp(20px,2.6vw,33px)/1.4 Georgia,serif; letter-spacing:1px; color:#e6cba4; margin:0 0 36px; }
+.ari-title-copy { font:400 20px/1.65 Georgia,serif; color:#d0e0d8; margin-bottom:30px; }
+.ari-title-note { font-size:12px; line-height:1.8; color:#afc6c7; margin-top:24px; }
+.ari-title a { display:inline-block; color:#cfb998; font-size:11px; margin-top:22px; text-underline-offset:5px; }
+.ari-title-mark { position:absolute; right:9vw; bottom:8vh; width:92px; height:92px; border:1px solid #eac58a80; display:grid; place-items:center; transform:rotate(45deg); color:#eac58a80; font:40px Georgia,serif; }
+.ari-modal { width:min(650px,calc(100% - 30px)); max-height:88dvh; color:var(--ink); background:linear-gradient(145deg,#193e46,#0d2934); border:1px solid #b99b6277; border-radius:14px; padding:40px; box-shadow:0 25px 100px #041d2bd9; }
+.ari-modal::backdrop { background:#061c2ab0; backdrop-filter:blur(6px); }
+.ari-modal h2 { margin:12px 0 24px; font:400 36px/1.18 Georgia,serif; }
+.ari-modal h3 { margin-top:28px; font:400 22px Georgia,serif; }
+.ari-modal p { line-height:1.7; color:#d4dbd0; }
+.ari-modal .ari-close { position:absolute; right:14px; top:12px; background:none; border:0; font-size:24px; }
+.ari-menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.ari-menu-grid button { text-align:left; }
+.ari-routes { display:grid; gap:6px; }
+.ari-routes button { text-align:left; border:0; background:#ffffff08; }
+.ari-routes span { display:inline-block; width:32px; color:var(--gold); }
+.ari-small { font-size:11px; color:#aabfbd!important; }
+.ari-entry { padding:23px 0; border-top:1px solid #d2bc8540; }
+.ari-entry h3 { margin:10px 0 18px; }
+.ari-journal-shapes { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.ari-journal-shapes>div { display:grid; grid-template-columns:repeat(var(--cols),10px); gap:2px; }
+.ari-journal-shapes i { width:10px; height:10px; font:9px/10px sans-serif; text-align:center; border-radius:1px; }
+.ari-formal { color:#e6c58a!important; font-family:Georgia,serif; }
+.ari-modal blockquote { font:22px/1.6 Georgia,serif; margin:30px 0; padding-left:24px; border-left:1px solid #c6a967; }
+.ari-modal cite { display:block; font:11px/2 'Segoe UI',sans-serif; color:#c9b691; margin-top:12px; }
+.ari-fatal { margin:20vh auto 20px; padding:25px; max-width:500px; font:18px/1.6 system-ui; color:white; }
+@media(max-width:900px) { .ari-heading .ari-kicker { display:none; }.ari-hud { left:16px;right:16px;gap:10px; }.ari-workbench { right:16px;width:235px; }.ari-dialogue { left:16px;max-width:280px; }.ari-objective { left:18px;top:91px;width:220px; }.ari-input-hint { display:none; }.ari-top-actions span { display:none; }.ari-bottom { left:16px;right:16px; }.ari-feedback { bottom:84px;max-width:80vw; }.ari-title { padding:6vw; } }
+@media(max-width:600px) { .ari { min-height:500px; }.ari-hud { top:14px; }.ari-heading h1 { font-size:17px;max-width:180px; }.ari-home { width:40px; }.ari-top-actions { gap:4px; }.ari-top-actions button { padding:9px; }.ari-objective { top:75px;width:70%;font-size:12px; }.ari-objective .ari-kicker { font-size:8px; }.ari-workbench { bottom:82px;left:12px;right:12px;width:auto;padding:8px 10px;display:grid;grid-template-columns:85px 1fr;gap:4px 8px; }.ari-tool-top { grid-column:1/-1; }.ari-piece-preview { padding:0;align-content:center;max-height:95px;gap:2px;grid-template-columns:repeat(var(--cols),minmax(5px,18px)); }.ari .ari-unit { min-height:18px;height:18px;font-size:12px; }.ari-tools { gap:4px;align-content:center; }.ari-tools button { min-width:55px;min-height:44px;font-size:9px;padding:4px; }.ari-tools button span { font-size:17px; }.ari-mode-help { grid-column:1/-1;margin:1px; }.ari-dialogue { left:14px;bottom:auto;top:145px;max-width:235px;padding:10px; }.ari-dialogue p { font-size:12px; }.ari-portrait { width:27px;height:35px; }.ari-portrait::after { left:8px;top:8px; }.ari-portrait::before { left:3px;top:12px; }.ari-bottom { bottom:15px;left:12px;right:12px;gap:5px; }.ari-history button { padding:6px 9px;font-size:10px; }.ari-history button:first-child,.ari-history button:nth-child(2) { padding:4px 10px; }.ari .ari-next { padding:12px;font-size:11px; }.ari-next span { margin-left:5px; }.ari-feedback { bottom:63px;max-width:95%;width:95%;font-size:10px; }.ari-title { align-items:center;background:linear-gradient(90deg,#0b253bde,#0b2d416b); }.ari-title h1 { font-size:12vw;letter-spacing:5px; }.ari-title h2 { font-size:23px; }.ari-title-copy { font-size:18px; }.ari-title .ari-kicker { font-size:9px; }.ari-title-mark { display:none; }.ari-modal { padding:30px 22px; }.ari-modal h2 { font-size:28px; }.ari-menu-grid { grid-template-columns:1fr; }.ari-modal button { font-size:12px; } }
+@media(max-height:600px) and (min-width:601px) { .ari-hud { top:12px; }.ari-objective { top:76px;font-size:12px; }.ari-workbench { bottom:75px; }.ari-piece-preview { max-height:65px; }.ari-dialogue { bottom:80px;max-width:280px;padding:10px; }.ari-bottom { bottom:12px; }.ari-feedback { bottom:65px; }.ari-title h1 { margin-top:15px; }.ari-title h2 { margin-bottom:12px; }.ari-title-copy { margin:12px 0;font-size:16px; }.ari-title-note { margin:12px 0;font-size:10px; }.ari-title a { margin-top:5px; } }
+@media(prefers-reduced-motion:reduce) { .ari *, .ari *::before, .ari *::after { transition:none!important;scroll-behavior:auto!important; } }
+@media(max-width:600px) { .ari-camera { top:112px;right:14px; }.ari-camera button { width:40px; }.ari-nudge { grid-column:1/-1;margin-top:2px; }.ari-nudge button { min-height:40px;flex:1; }.ari-nudge button:last-child { flex:2; }.ari-dialogue { max-width:215px; }.ari-workbench { bottom:78px; }.ari-mode-help { font-size:9px; } }
+
+/* Every part stays inspectable; cutting previews a partition before applying it. */
+.ari { min-height:0; }
+.ari-workbench { max-height:calc(100dvh - 215px); overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; }
+.ari-piece-preview { grid-auto-rows:24px; min-height:48px; flex-shrink:0; overflow:scroll; scrollbar-gutter:stable; justify-content:safe center; }
+.ari-piece-preview::-webkit-scrollbar,.ari-workbench::-webkit-scrollbar { width:10px;height:10px; }
+.ari-piece-preview::-webkit-scrollbar-track,.ari-workbench::-webkit-scrollbar-track { background:#0b2630; border-radius:6px; }
+.ari-piece-preview::-webkit-scrollbar-thumb,.ari-workbench::-webkit-scrollbar-thumb { background:#a99168; border:2px solid #0b2630; border-radius:6px; }
+.ari-cut-confirm { grid-column:1/-1; padding:5px 0; }
+.ari-preview-scroll { grid-column:1/-1;margin:3px 0;color:var(--gold);font-size:10px;text-align:center;line-height:1.5; }
+.ari-cut-confirm>button { width:100%;font-size:12px; }
+.ari-cut-legend { display:flex;gap:8px;justify-content:center;font-size:10px;line-height:1.5;margin:2px 0 10px; }
+.ari-cut-legend>span { padding:3px 5px;border:2px solid #fff3dc;border-radius:3px; }
+.ari-cut-legend>.ari-cut-away { border-style:dashed; }
+.ari .ari-unit.ari-cut-stay { border:3px solid #fff3dc;box-shadow:inset 0 0 0 1px #21333c; }
+.ari .ari-unit.ari-cut-away { border:3px dashed #153743;box-shadow:0 0 0 1px #fff3dc; }
+.ari-cutting .ari-piece-preview { grid-column:1/-1;grid-template-columns:repeat(var(--cols),44px);grid-auto-rows:44px;gap:6px;padding:7px;max-height:220px;min-height:72px; }
+.ari .ari-cutting .ari-unit { width:44px;height:44px;min-height:44px;font-size:20px; }
+@media(max-width:600px) {
+  .ari-workbench { max-height:calc(100dvh - 190px); }
+  .ari-piece-preview { grid-auto-rows:18px; }
+  .ari-cutting .ari-tools { grid-column:1/-1;justify-content:center; }
+  .ari-cutting .ari-mode-help { font-size:11px;line-height:1.5; }
+}
+@media(max-height:600px) and (min-width:601px) {
+  .ari-workbench { top:77px;bottom:77px;max-height:calc(100dvh - 154px);width:270px; }
+  .ari-cutting .ari-piece-preview { max-height:126px; }
+  .ari-dialogue { max-height:calc(100dvh - 205px);overflow-y:auto; }
+  .ari-objective { max-width:calc(100vw - 355px); }
+  .ari-title { overflow-y:auto; }
+}
