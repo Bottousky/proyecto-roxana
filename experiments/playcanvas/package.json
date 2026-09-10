@@ -1,1 +1,24 @@
-{"name":"ohmdal-playcanvas-slice","private":true,"type":"module","scripts":{"dev":"vite --host 127.0.0.1 --port 4190 --strictPort","build":"vite build","check":"tsc --noEmit"},"dependencies":{"playcanvas":"^2.0.0"},"devDependencies":{"typescript":"^5.9.0","vite":"^7.3.6"}}
+{
+  "name": "ohmdal-playcanvas",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4190 --strictPort",
+    "build": "vite build",
+    "check": "tsc --noEmit && node --check src/world.js",
+    "test": "node --test arc.test.mjs tests/*.test.js",
+    "test:journey": "node scripts/playthrough.mjs",
+    "export:world": "node export-scene.mjs",
+    "sync:canon": "node sync-game.mjs"
+  },
+  "dependencies": {
+    "playcanvas": "2.22.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.3.6"
+  },
+  "version": "0.2.0",
+  "description": "Ohmdal — La Luz. Arco I completo en PlayCanvas."
+}

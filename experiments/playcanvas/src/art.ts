@@ -1,5 +1,5 @@
 import {Asset,Application,Texture,TextureAtlas,Sprite,Vec2,Vec4,FILTER_LINEAR,FILTER_LINEAR_MIPMAP_LINEAR,FILTER_NEAREST,ADDRESS_REPEAT,ADDRESS_CLAMP_TO_EDGE,PIXELFORMAT_RGBA8} from 'playcanvas';
-import {opaqueBounds,actorFrameLayout} from './actor-animation.js';
+import {opaqueBounds,actorFrameLayout} from './game/actor-animation.js';
 export const textures=new Map<string,Texture>();
 const images=new Map<string,Promise<HTMLImageElement>>();
 function image(url:string){if(!images.has(url))images.set(url,new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error('No se pudo cargar '+url));i.src=url;}));return images.get(url)!;}
@@ -13,6 +13,7 @@ function texture(app:Application,name:string,source:HTMLImageElement|HTMLCanvasE
 }
 export async function surface(app:Application,name:string){
   if(textures.has(name))return textures.get(name)!;
+  if(name==='glow'){const c=canvas(128,128),x=c.getContext('2d')!,g=x.createRadialGradient(64,64,2,64,64,64);g.addColorStop(0,'#ffffff');g.addColorStop(.22,'#ffffffb0');g.addColorStop(.65,'#ffffff30');g.addColorStop(1,'#ffffff00');x.fillStyle=g;x.fillRect(0,0,128,128);return texture(app,name,c);}
   const cells:Record<string,number[]>={cobble:[0,0],stone:[1,0],wood:[2,0],roof:[0,1]};
   if(cells[name]){const [x,y]=cells[name];return texture(app,name,crop(await image('/assets/materials.png'),x,y,3,2),true);}
   if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image('/assets/trees.png'),i%3,Math.floor(i/3),3,2,true));}

@@ -2,7 +2,7 @@
 // the route. Obstacle w/d are half-extents, matching the world collision model.
 import { isPositionClear, isSegmentClear } from './collision.js';
 
-export function findPath(start,goal,bounds,obstacles=[],{radius=.36,cell=.6,isWalkable=(x,z)=>Boolean(true)}={}){
+export function findPath(start,goal,bounds,obstacles=[],{radius=.36,cell=.6,isWalkable=()=>true}={}){
   const collision={radius,isWalkable};
   if(!Number.isFinite(cell)||cell<=0||!isPositionClear(start,bounds,obstacles,collision)||!goal?.every(Number.isFinite))return [];
   const margin=.6,minX=-bounds[0]/2+margin,minZ=-bounds[1]/2+margin,maxX=-minX,maxZ=-minZ;

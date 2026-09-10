@@ -1,7 +1,7 @@
 // Shared 2D collision rules. World obstacles use half-extents, and a moving
 // actor is conservatively represented by the same expanded AABBs as canStand.
 const finitePoint = point => Array.isArray(point) && point.length >= 2 && Number.isFinite(point[0]) && Number.isFinite(point[1]);
-const walkableEverywhere = (x,z) => Boolean(true);
+const walkableEverywhere = () => true;
 const CONTACT_SKIN = 1e-8;
 const MIN_PARTIAL_ADVANCE = .0001;
 

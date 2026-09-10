@@ -1,80 +1,112 @@
-# Ohmdal · Prueba PlayCanvas
+# Ohmdal · La Luz — PlayCanvas
 
-Rama: `codex/playcanvas-slice`. URL local: **http://127.0.0.1:4190/**.
-La versión principal sigue en http://127.0.0.1:4180/.
+Arco I jugable en la rama **codex/playcanvas-slice**.
 
-Prueba acotada de Plaza → Calzada → Puerta de Ohm, con acceso al interior del
-taller. PlayCanvas Engine 2.22.1 + TypeScript + Vite. Los sprites, retratos y
-superficies proceden de Ohmdal actual. El navegador no ejecuta Three.js.
+- Jugar: http://127.0.0.1:4190/
+- Versión anterior para comparar: http://127.0.0.1:4180/
+- Iniciar localmente: abrir **Jugar PlayCanvas.cmd**, o ejecutar npm run dev.
+- En un checkout nuevo: npm ci antes de iniciar.
 
-## Jugar
+## El viaje
 
-`Jugar prueba.cmd`, o `npm run dev` desde esta carpeta. Si es un checkout nuevo,
-instalar primero con `npm ci`. Se incluyen lockfile y assets propios. WASD/flechas,
-Shift para correr, clic para caminar, E para interactuar y Escape para pausar.
-También hay controles táctiles.
+Portal Ω → Plaza → Taller de Lumen → Calzada y Puerta de Ohm → Manantial →
+Castillo de la Red → Terrazas → Lago de las Señales → Faro.
 
-Las opciones permiten cambiar día/noche, caminar al taller, recorrer Plaza ↔
-Calzada automáticamente y mostrar tiempos de cuadro. La entrada del taller está
-en la fachada sur; acercarse y pulsar E. Dentro se puede conversar con Lumen y
-volver a la Plaza por la entrada. Recargar conserva posición, interior y luz.
-Guardado aislado: `ohmdal-playcanvas-slice-v1`, además de un origen distinto.
+Incluye los nueve circuitos con simulación eléctrica, mandos físicos previos a
+cada banco, medición con Ohm, conversaciones y retratos, descubrimientos,
+Bitácora con experimentos e hipótesis personales, mapa local y del reino,
+cinemáticas de restauración, final y epílogo. Se puede seguir explorando y
+volver a medir las instalaciones terminadas.
 
-## Qué se está comparando
+WASD/flechas para caminar, Shift para correr, clic para ir o seleccionar un
+objeto, E para interactuar, Q para medir, J para la Bitácora, M para el mapa,
+Escape para opciones. Hay controles táctiles, lectura instantánea, reducción
+de movimiento, volumen y calidad gráfica.
 
-- Un espacio exterior en coordenadas globales, sin carga o promoción de rooms
-  al pasar de Plaza a Calzada.
-- Renderizado, materiales, sombras, cámara ortográfica, entidades y componentes
-  Sprite/Script de PlayCanvas. Atlas con cuatro direcciones y pose de reposo.
-- Escenario estático agrupado por material, conservando entidades identificadas
-  para los edificios. El taller tiene su entidad propia.
-- Navegación por clic, movimiento con barrido contra obstáculos y seguimiento
-  de Ohm. Se conservaron los algoritmos 2D independientes del renderer para
-  comparar el mismo comportamiento; **esta prueba no evalúa Bullet/Ammo**.
-- HUD ligero, diálogos breves de prueba con retratos, pausa y persistencia.
+El día avanza con el viaje: mañana en el Portal, tarde al Manantial y Castillo,
+atardecer en las Terrazas, crepúsculo en el Lago y noche en el Faro. Volver sobre
+el camino conserva la hora. El epílogo abre la mañana siguiente. No hay un
+reloj que apure al jugador.
 
-`export-scene.mjs` convierte en tiempo de desarrollo la geometría del proyecto
-actual a datos. Requiere la carpeta fuente de Ohmdal para regenerarlos, pero no
-para instalar, compilar ni ejecutar esta carpeta: `src/data/scene.json` ya está
-incluido. No es una captura de pantalla ni un fondo: hay mallas, profundidad,
-sombras y oclusión reales. La conversión no equivale a autoría con PlayCanvas
-Editor; ese flujo todavía debe evaluarse por separado.
+## Un mundo que responde
 
-## Límites de la comparación
+Los vecinos conservan pequeños recorridos y cambian de actividad con la
+historia. Ohm busca caminos alrededor de obstáculos. La rueda del Manantial,
+los engranajes, mandos, portón y óptica responden a sus instalaciones. El agua
+vuelve a las fuentes y bancales; las luces necesitan suministro y respetan la
+hora. Hay agua animada, polen, telas, barcas, resplandores y la señal giratoria
+del Faro. El sonido ambiental sigue fuentes situadas en la geografía compartida.
 
-La prueba incluye tres lugares, no el Arco I completo. El agua utiliza un material
-animado simple; no replica el shader principal ni su iluminación completa.
-La vegetación se conserva en buena parte, pero algunas capas procedurales,
-partículas y luces puntuales no se trasladaron. No se migraron circuitos,
-Bitácora, mapa completo, narrativa, audio ni cinemáticas.
+Los exteriores ocupan coordenadas globales en un único mundo residente. Cruzar
+un límite narrativo cambia contexto e interacciones, conservando cámara y
+posiciones físicas. El taller mantiene su entrada y salida de interior.
 
-El agrupamiento de mallas es una optimización de este exportador; una mejora de
-draw calls no puede atribuirse exclusivamente al cambio de motor. Tampoco sería
-justo comparar su carga con la preparación de los nueve lugares del juego actual.
-La geometría JSON es una representación de ensayo grande: 27,3 MB sin comprimir,
-2,69 MB con gzip. El bundle JS de producción es 1,99 MB, 517 kB con gzip. Antes de
-una migración conviene un formato binario/GLB y evaluar memoria y carga en móvil.
+## Arquitectura
 
-La pasada final Plaza–Calzada–Plaza registró 18 ms de máximo, p99 de 17 ms y cero
-cuadros superiores a 50 ms en este equipo (WebGL2, escala 1×). Es una observación del prototipo, no un
-benchmark de motores. El panel muestra el p99 de los últimos 600 cuadros y el
-máximo desde la carga o el inicio del recorrido automático.
+PlayCanvas Engine **2.22.1**, entidades, materiales, mallas, sprites y scripts
+nativos. No se ejecuta Three.js en el navegador. Las colisiones conservan el
+modelo 2D de obstáculos y barrido; no se utiliza Bullet/Ammo.
 
-## Validación
+- src/world.js: adaptación del mundo y presentación en PlayCanvas.
+- src/game/: instantánea independiente del canon, progresión y sistemas del juego.
+- src/terrain.js: reglas de terreno compartidas con las pruebas.
+- src/art.ts: texturas, atlas y alineación de sprites.
+- src/data/: manifiesto y geometría binaria comprimida (aproximadamente 9,5 MB).
+- public/: imágenes y fuentes locales; no se necesitan servicios externos.
 
-`node --test slice.test.mjs`, `npm run check` y `npm run build`.
-Las pruebas cubren los caminos contra los obstáculos exportados, las paredes y
-el canal, el desvío de Ohm alrededor de la fuente y la separación del runtime.
-También se verificaron en el navegador la entrada y salida del taller, el
-diálogo con retrato de Lumen, el cambio de luz, la recarga dentro del taller y
-el recorrido de ida y vuelta con Ohm. La iluminación nocturna es sólo una
-prueba ambiental; aún faltan las luces locales del juego principal.
+La conversión preserva materiales agrupados, costas con varios materiales,
+pivotes de mecanismos y huellas de colisión. Las mallas se preparan al inicio;
+los cambios de zona no construyen ni descargan otro escenario.
 
-## Guía utilizada
+sync-game.mjs actualiza la instantánea desde el proyecto original y aplica las
+adaptaciones declaradas de esta rama. export-scene.mjs utiliza los constructores
+Three.js sólo fuera del juego para regenerar la geometría. Estos dos comandos
+requieren el proyecto fuente; instalar, compilar y jugar esta carpeta no.
 
-- [Skill oficial build-app](https://github.com/playcanvas/skills/blob/main/skills/build-app/SKILL.md).
-- [Aplicación directa](https://github.com/playcanvas/skills/blob/main/skills/build-app/references/direct-engine.md).
+Se corrigieron en esta rama el acceso al recuerdo del Lago y la desembocadura
+del canal junto al muelle. El mundo no se editó ni publicó mediante PlayCanvas
+Editor: es una aplicación con la API directa del motor.
 
-La instancia de Application posee el renderer, las entidades y el ciclo de vida.
-Las APIs se contrastaron con los tipos instalados. No se instaló un editor ni un
-servicio externo, y no se reemplazó la aplicación principal.
+## Guardado
+
+La partida usa **ohmdal.playcanvas.arc1.v1**, separada de la demostración anterior
+y de la versión Three.js. Incluye puzzles sin terminar, notas, hora, diálogos,
+cinemáticas pendientes y final. Las opciones permiten exportar/importar una
+Bitácora. La demostración anterior no se convierte en una partida avanzada:
+el arco empieza en el Portal.
+
+## Verificación
+
+- npm test: pruebas del modelo eléctrico, progresión, guardado, Bitácora,
+  cinemáticas, accesibilidad de objetos y correspondencia de los caminos.
+- npm run check: TypeScript de los assets y sintaxis del adaptador.
+- npm run build: versión de producción.
+- npm run test:journey: partida automatizada usando teclado y clics, con guardado
+  separado en un navegador de prueba. Requiere Chrome instalado; la ruta usada
+  por el script es C:/Program Files/Google/Chrome/Application/chrome.exe.
+
+El recorrido de prueba conserva capturas, reporte y Bitácora en
+output/playcanvas-playthrough (no se incluyen en Git). La inspección interna
+se usa sólo para observar y planificar entradas; las reparaciones se realizan
+a través de los controles del juego.
+
+Validado el 10 de septiembre de 2026: **64 pruebas aprobadas**, comprobación
+estática y compilación correctas. La partida completa recorrió los nueve
+lugares, resolvió los nueve circuitos, encontró los nueve recuerdos, encendió
+el Faro, abrió el epílogo y recargó el guardado final sin errores de navegador.
+La versión compilada también se comprobó importando esa Bitácora, regresando
+al Lago y la Plaza, abriendo mapa y diario y revisando el diseño a 390 × 844.
+Esto verifica la interfaz estrecha; no sustituye una medición en móvil real.
+Para repetir esa segunda comprobación: iniciar `vite preview` en el puerto
+4191 y ejecutar `node scripts/production-smoke.mjs` después de la partida
+automatizada. `GAME_URL` permite usar otra dirección.
+
+## Alcance de esta versión
+
+El contenido del Arco I está trasladado; no es una reproducción idéntica de
+cada shader de Three.js ni una medición comparativa entre motores. La navegación
+y el modelo eléctrico se conservaron deliberadamente. La carga inicial todavía
+prepara todo el arco, y los assets raster dominan la descarga. Antes de publicar
+conviene medir móviles y optimizar texturas según los dispositivos objetivo.
+
+Guía de referencia: https://github.com/playcanvas/skills/tree/main/skills/build-app
