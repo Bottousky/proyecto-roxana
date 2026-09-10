@@ -1,0 +1,1 @@
+{"name":"ohmdal-playcanvas-slice","private":true,"type":"module","scripts":{"dev":"vite --host 127.0.0.1 --port 4190 --strictPort","build":"vite build","check":"tsc --noEmit"},"dependencies":{"playcanvas":"^2.0.0"},"devDependencies":{"typescript":"^5.9.0","vite":"^7.3.6"}}
