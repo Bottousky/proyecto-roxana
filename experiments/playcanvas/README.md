@@ -3,6 +3,7 @@
 Arco I jugable en la rama **codex/playcanvas-slice**.
 
 - Jugar: http://127.0.0.1:4190/
+- Producción: https://bottousky.github.io/proyecto-roxana/
 - Versión anterior para comparar: http://127.0.0.1:4180/
 - Iniciar localmente: abrir **Jugar PlayCanvas.cmd**, o ejecutar npm run dev.
 - En un checkout nuevo: npm ci antes de iniciar.
@@ -76,6 +77,11 @@ Bitácora. La demostración anterior no se convierte en una partida avanzada:
 el arco empieza en el Portal.
 
 ## Verificación
+
+GitHub Pages publica los archivos compilados desde la rama `gh-pages`,
+con `node node_modules/vite/bin/vite.js build --base=/proyecto-roxana/ --outDir dist-pages`.
+La rama `main` conserva el reinicio del canon. Los assets y el mapa admiten
+la subruta del repositorio. Publicar el contenido de `dist-pages` con `.nojekyll`.
 
 - npm test: pruebas del modelo eléctrico, progresión, guardado, Bitácora,
   cinemáticas, accesibilidad de objetos y correspondencia de los caminos.

@@ -2,7 +2,7 @@ import {Asset,Application,Texture,TextureAtlas,Sprite,Vec2,Vec4,FILTER_LINEAR,FI
 import {opaqueBounds,actorFrameLayout} from './game/actor-animation.js';
 export const textures=new Map<string,Texture>();
 const images=new Map<string,Promise<HTMLImageElement>>();
-function image(url:string){if(!images.has(url))images.set(url,new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error('No se pudo cargar '+url));i.src=url;}));return images.get(url)!;}
+function image(url:string){if(!images.has(url))images.set(url,new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error('No se pudo cargar '+url));i.src=new URL('.'+url,document.baseURI).href;}));return images.get(url)!;}
 function canvas(w:number,h:number){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
 function crop(img:HTMLImageElement,col:number,row:number,cols:number,rows:number,key=false){
   const x=Math.round(col*img.width/cols),y=Math.round(row*img.height/rows),w=Math.round((col+1)*img.width/cols)-x,h=Math.round((row+1)*img.height/rows)-y,c=canvas(w,h),ctx=c.getContext('2d',{willReadFrequently:true})!;ctx.drawImage(img,x,y,w,h,0,0,w,h);
