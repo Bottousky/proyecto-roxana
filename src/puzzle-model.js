@@ -148,3 +148,33 @@ export function evaluatePuzzle(id, state) {
   return { network, solution, overloaded, requestedCurrent, current, power: current * p.voltage, voltage: powered ? p.voltage : 0, operating, constraintsMet, solved };
 }
 
+/** Terminals joined by copper alone: wires, never through a component. It is what a
+ * student can follow with a finger along the bench, so it reveals no voltage. */
+export function wireNodes(id, state) {
+  const p = PUZZLES[id];
+  const parent = new Map(p.ports.map(n => [n.id, n.id]));
+  const find = a => { while (parent.get(a) !== a) { parent.set(a, parent.get(parent.get(a))); a = parent.get(a); } return a; };
+  for (const [a, b] of state.wires) if (parent.has(a) && parent.has(b)) parent.set(find(a), find(b));
+  const nodeOf = Object.fromEntries(p.ports.map(n => [n.id, find(n.id)]));
+  const members = {};
+  for (const n of p.ports) (members[nodeOf[n.id]] ??= []).push(n.id);
+  return { nodeOf, members };
+}
+
+/** Workshop colour convention, decided only by a wire's own ends: copper leaves the
+ * source's positive terminal and blue returns to its negative one. */
+export function wireRole([a, b]) {
+  const supply = a === 'positive' || b === 'positive';
+  const back = a === 'negative' || b === 'negative';
+  return supply && back ? 'short' : supply ? 'supply' : back ? 'return' : 'link';
+}
+
+/** Conventional current along one bench wire, for the flow shown on the copper.
+ * Direction follows the wire as drawn (first terminal → second). */
+export function wireFlow(result, index, powered) {
+  const current = powered && !result.overloaded ? result.solution.branches[`wire${index}`]?.current ?? 0 : 0;
+  if (!Number.isFinite(current) || Math.abs(current) < .004) return null;
+  const magnitude = Math.min(Math.abs(current), 1.5);
+  return { forward: current > 0, current, seconds: +(2.4 - 1.7 * magnitude / 1.5).toFixed(2) };
+}
+

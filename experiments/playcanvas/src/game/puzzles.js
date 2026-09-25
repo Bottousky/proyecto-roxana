@@ -1,5 +1,5 @@
 import { measureVoltage, measureResistance } from './electrical.js';
-import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle } from './puzzle-model.js';
+import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow } from './puzzle-model.js';
 import { appendBenchEvidence, getBenchEvidence } from './bench-evidence.js';
 export { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, getBenchEvidence };
 import './puzzles.css';
@@ -48,6 +48,8 @@ export function observePuzzle(id, state, result = evaluatePuzzle(id, state)) {
 const escapeHtml = text => String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (n, decimals = 2) => Number.isFinite(n) ? (Math.abs(n) < .5 * 10 ** -decimals ? 0 : n).toLocaleString('es-AR', { maximumFractionDigits: decimals, minimumFractionDigits: decimals }) : '—';
 const copy = value => JSON.parse(JSON.stringify(value));
+// Leads to the source follow its terminals; other wires alternate two neutral tones.
+const wireTone = (w, i) => { const role = wireRole(w); return role === 'link' ? `wire-link-${i % 2}` : `wire-${role}`; };
 
 export class PuzzleWorkbench {
   constructor(container, callbacks = {}) {
@@ -62,6 +64,8 @@ export class PuzzleWorkbench {
     this.handleInput = this.handleInput.bind(this);
     this.handleSliderCommit = this.handleSliderCommit.bind(this);
     this.handleKey = this.handleKey.bind(this);
+    this.handleTrace = this.handleTrace.bind(this);
+    this.handleTraceEnd = this.handleTraceEnd.bind(this);
   }
 
   open(id, savedSnapshot) {
@@ -86,6 +90,10 @@ export class PuzzleWorkbench {
     this.shell.addEventListener('click', this.handleClick);
     this.shell.addEventListener('input', this.handleInput);
     this.shell.addEventListener('change', this.handleSliderCommit);
+    this.shell.addEventListener('pointerover', this.handleTrace);
+    this.shell.addEventListener('focusin', this.handleTrace);
+    this.shell.addEventListener('pointerout', this.handleTraceEnd);
+    this.shell.addEventListener('focusout', this.handleTraceEnd);
     document.addEventListener('keydown', this.handleKey, true);
     this.evaluate(false);
     if (!this.state.evidence.length) this.recordObservation('observation');
@@ -366,6 +374,39 @@ export class PuzzleWorkbench {
     return `<details class="wb-notes wb-experiments" data-drawer="experiments"><summary>Comparar mis pruebas</summary>${entries.length ? entries.map(entry => `<p><small>${entry.kind === 'prediction' ? 'Lo que pensé' : entry.kind === 'measurement' ? 'Lo que medí' : 'Lo que pasó'}</small><br>${escapeHtml(entry.text)}${entry.value ? ` <strong>${escapeHtml(entry.value)}</strong>` : ''}${entry.reference ? `<br><small>${escapeHtml(entry.reference)}</small>` : ''}</p>`).join('') : '<p>Las pruebas que hagas quedarán aquí y en la Bitácora.</p>'}${!this.state.completed ? '<label for="wb-prediction">Antes de cambiar algo, podés anotar qué esperás.</label><textarea id="wb-prediction" data-prediction maxlength="180" rows="2" placeholder="Creo que al…"></textarea><button class="wb-numbers" data-action="prediction">Anotar mi idea</button>' : ''}</details>`;
   }
 
+  // Following the copper: pointing at a terminal or a wire lights every terminal
+  // joined to it by wires alone. It teaches what a node is without showing voltages.
+  handleTrace(event) {
+    const node = event.target?.closest?.('[data-node]')?.dataset.node;
+    if (!node || !this.shell) return;
+    if (node === this.tracedNode) return;
+    this.clearTrace();
+    this.tracedNode = node;
+    const selector = `[data-node="${(globalThis.CSS?.escape ?? String)(node)}"]`;
+    this.shell.querySelectorAll(selector).forEach(el => el.classList.add('traced'));
+    this.shell.querySelector('.wb-board')?.classList.add('tracing');
+    const members = wireNodes(this.id, this.state).members[node] ?? [node];
+    const caption = this.shell.querySelector('.wb-node-caption');
+    if (caption) caption.textContent = members.length > 1
+      ? `Unidos por cobre: ${members.map(id => this.portLabel(id)).join(' · ')}`
+      : `${this.portLabel(node)}: ningún cable lo une a otro borne.`;
+  }
+
+  handleTraceEnd(event) {
+    const next = event.relatedTarget?.closest?.('[data-node]')?.dataset.node;
+    if (next && next === this.tracedNode) return;
+    this.clearTrace();
+  }
+
+  clearTrace() {
+    this.tracedNode = null;
+    if (!this.shell) return;
+    this.shell.querySelectorAll('.traced').forEach(el => el.classList.remove('traced'));
+    this.shell.querySelector('.wb-board')?.classList.remove('tracing');
+    const caption = this.shell.querySelector('.wb-node-caption');
+    if (caption) caption.textContent = '';
+  }
+
   wirePath(a, b, index) {
     const pa = this.puzzle.ports.find(p => p.id === a), pb = this.puzzle.ports.find(p => p.id === b);
     const sag = 30 + (index % 4) * 17;
@@ -431,6 +472,7 @@ export class PuzzleWorkbench {
 
   render() {
     if (!this.active || !this.shell) return;
+    this.tracedNode = null;
     const focus = document.activeElement;
     const previous = this.shell.contains(focus) ? { ...focus.dataset } : null;
     const predictionDraft = this.shell.querySelector('[data-prediction]')?.value ?? '';
@@ -445,7 +487,8 @@ export class PuzzleWorkbench {
     const power = `<button class="wb-power ${powered ? 'on' : ''} ${s.tripped ? 'tripped' : ''}" data-action="${s.tripped ? 'rearm' : 'power'}" aria-pressed="${powered}"><span>⏻</span>${s.tripped ? 'Volver a encender' : powered ? 'Apagar alimentación' : 'Encender alimentación'}</button>`;
     const compactReading = this.mode !== 'wire' ? this.presentedReading() : null;
     const compactMeter = compactReading ? `<div class="wb-compact-meter" role="status"><strong>${escapeHtml(compactReading.value)} <small>${compactReading.unit}</small></strong><span>${escapeHtml(compactReading.caption)}</span></div>` : '';
-    const portMarkup = (n, rail = false) => `<button class="${rail ? 'wb-rail-port' : 'wb-terminal'} ${this.selected === n.id ? 'selected' : ''} ${this.mode !== 'wire' && s.meter.a === n.id ? 'probe-red' : ''} ${this.mode !== 'wire' && s.meter.b === n.id ? 'probe-black' : ''}" ${rail ? `data-terminal="${n.id}"` : `data-port="${n.id}" style="left:${n.x/10}%;top:${n.y/5}%"`} aria-label="${rail ? 'Conector' : 'Borne'} ${escapeHtml(this.portLabel(n.id))}${this.selected === n.id ? ', seleccionado' : ''}" aria-pressed="${this.selected === n.id}"><span class="wb-terminal-hole"></span><span class="${rail ? '' : 'wb-terminal-label'}">${escapeHtml(this.portLabel(n.id))}</span></button>`;
+    const topo = wireNodes(this.id, s);
+    const portMarkup = (n, rail = false) => `<button class="${rail ? 'wb-rail-port' : 'wb-terminal'} ${this.selected === n.id ? 'selected' : ''} ${this.mode !== 'wire' && s.meter.a === n.id ? 'probe-red' : ''} ${this.mode !== 'wire' && s.meter.b === n.id ? 'probe-black' : ''}" data-node="${topo.nodeOf[n.id]}" ${rail ? `data-terminal="${n.id}"` : `data-port="${n.id}" style="left:${n.x/10}%;top:${n.y/5}%"`} aria-label="${rail ? 'Conector' : 'Borne'} ${escapeHtml(this.portLabel(n.id))}${this.selected === n.id ? ', seleccionado' : ''}" aria-pressed="${this.selected === n.id}"><span class="wb-terminal-hole"></span><span class="${rail ? '' : 'wb-terminal-label'}">${escapeHtml(this.portLabel(n.id))}</span></button>`;
     const knobs = (p.knobs ?? []).map(k => {
       const label = k.label.replace('Resistencia del lecho', 'Mando del calor').replace('Resistencia del riego', 'Mando del agua').replace('Brazo superior del divisor', 'Mando de la lente');
       return `<div class="wb-dial-control"><div class="wb-dial" style="--angle:${-135+(s.values[k.key]-k.min)/(k.max-k.min)*270}deg" aria-hidden="true"><i></i></div><div class="wb-dial-details"><label for="wb-${k.key}">${escapeHtml(label)}</label><div class="wb-knob-row"><button data-action="knob" data-key="${k.key}" data-delta="-1" aria-label="Girar ${escapeHtml(label)} a la izquierda">−</button><output>${this.knobValue(k)}</output><button data-action="knob" data-key="${k.key}" data-delta="1" aria-label="Girar ${escapeHtml(label)} a la derecha">+</button></div><input id="wb-${k.key}" data-knob="${k.key}" type="range" min="${k.min}" max="${k.max}" step="${k.step}" value="${s.values[k.key]}" aria-label="${escapeHtml(label)}" aria-valuetext="${this.showNumbers ? `${s.values[k.key]} ${k.unit}` : `Posición ${Math.round((s.values[k.key]-k.min)/k.step)+1}`}"/><p>Giralo un poco y observá qué cambia.</p></div></div>`;
@@ -457,10 +500,11 @@ export class PuzzleWorkbench {
       <div class="wb-layout"><main class="wb-main">
         ${available.length ? `<div class="wb-toolstrip"><div class="wb-tools">${toolButton('wire')}${toolButton(available[0])}</div>${power}</div>${available.length > 1 ? `<details class="wb-extra-tools" data-drawer="tools"><summary>Otros instrumentos de Ohm</summary><div class="wb-tools">${available.slice(1).map(toolButton).join('')}</div></details>` : ''}` : s.tripped ? `<div class="wb-toolstrip">${power}</div>` : ''}
         <p class="wb-instruction"><span aria-hidden="true">${this.mode === 'wire' ? '⌁' : '⌖'}</span>${instruction}</p>
-        <div class="wb-board ${powered ? 'powered' : ''}"><span class="wb-corner tl"></span><span class="wb-corner tr"></span><span class="wb-corner bl"></span><span class="wb-corner br"></span><svg class="wb-schematic" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-label="Mesa con piezas y cables. Las piezas redondas se pueden tocar."><defs>${this.materialDefs()}<radialGradient id="wb-glass" cx=".35" cy=".25"><stop stop-color="#98b5ab" stop-opacity=".65"/><stop offset=".42" stop-color="#283e3b"/><stop offset="1" stop-color="#0c1919"/></radialGradient><radialGradient id="wb-steel"><stop stop-color="#697c70"/><stop offset="1" stop-color="#24362e"/></radialGradient><pattern id="wb-cloth" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#5a4933"/><path d="M0 2H8 M2 0V8" stroke="#756044" stroke-width="1"/></pattern></defs><rect width="1000" height="500" filter="url(#wb-grain)" opacity=".05" pointer-events="none"/><path d="M85 125 V180 M85 320 V375" stroke="#b89b66" stroke-width="6"/><rect x="43" y="185" width="84" height="128" rx="13" fill="#242f2b" stroke="#ac8a53" stroke-width="4"/><rect x="57" y="210" width="56" height="65" rx="4" fill="#111e1b" stroke="#6d714e"/>${this.showNumbers ? `<text x="85" y="238" class="wb-source-value">${p.voltage}</text><text x="85" y="260" class="wb-spec">VOLTIOS</text>` : `<path d="M68 243 h34 M85 226 v34" stroke="#d2b57b" stroke-width="4"/>`}<text x="85" y="299" class="wb-source-mark">Ω</text><circle cx="85" cy="198" r="4" fill="${powered ? '#cfedab' : '#786845'}"/>${p.components.map(c => this.componentSvg(c)).join('')}${s.wires.map((w,i) => `<g class="wb-wire" data-wire="${i}"><title>Retirar cable: ${escapeHtml(this.portLabel(w[0]))} → ${escapeHtml(this.portLabel(w[1]))}</title><path d="${this.wirePath(...w,i)}" class="wb-wire-shadow"/><path d="${this.wirePath(...w,i)}" class="wb-wire-casing wire-${i%4}"/><path d="${this.wirePath(...w,i)}" class="wb-wire-highlight"/></g>`).join('')}</svg>${p.ports.map(n => portMarkup(n)).join('')}</div>
+        <div class="wb-board ${powered ? 'powered' : ''}"><span class="wb-corner tl"></span><span class="wb-corner tr"></span><span class="wb-corner bl"></span><span class="wb-corner br"></span><svg class="wb-schematic" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-label="Mesa con piezas y cables. Las piezas redondas se pueden tocar."><defs>${this.materialDefs()}<radialGradient id="wb-glass" cx=".35" cy=".25"><stop stop-color="#98b5ab" stop-opacity=".65"/><stop offset=".42" stop-color="#283e3b"/><stop offset="1" stop-color="#0c1919"/></radialGradient><radialGradient id="wb-steel"><stop stop-color="#697c70"/><stop offset="1" stop-color="#24362e"/></radialGradient><pattern id="wb-cloth" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#5a4933"/><path d="M0 2H8 M2 0V8" stroke="#756044" stroke-width="1"/></pattern></defs><rect width="1000" height="500" filter="url(#wb-grain)" opacity=".05" pointer-events="none"/><path d="M85 125 V180 M85 320 V375" stroke="#b89b66" stroke-width="6"/><rect x="43" y="185" width="84" height="128" rx="13" fill="#242f2b" stroke="#ac8a53" stroke-width="4"/><rect x="57" y="210" width="56" height="65" rx="4" fill="#111e1b" stroke="#6d714e"/>${this.showNumbers ? `<text x="85" y="238" class="wb-source-value">${p.voltage}</text><text x="85" y="260" class="wb-spec">VOLTIOS</text>` : `<path d="M68 243 h34 M85 226 v34" stroke="#d2b57b" stroke-width="4"/>`}<text x="85" y="299" class="wb-source-mark">Ω</text><circle cx="85" cy="198" r="4" fill="${powered ? '#cfedab' : '#786845'}"/>${p.components.map(c => this.componentSvg(c)).join('')}${s.wires.map((w,i) => { const path = this.wirePath(...w,i), flow = wireFlow(r, i, powered); return `<g class="wb-wire" data-wire="${i}" data-node="${topo.nodeOf[w[0]]}"><title>Retirar cable: ${escapeHtml(this.portLabel(w[0]))} → ${escapeHtml(this.portLabel(w[1]))}</title><path d="${path}" class="wb-wire-shadow"/><path d="${path}" class="wb-wire-casing ${wireTone(w,i)}"/><path d="${path}" class="wb-wire-highlight"/>${flow ? `<path d="${path}" class="wb-wire-flow${flow.forward ? '' : ' reverse'}" style="--flow-seconds:${flow.seconds}s"/>` : ''}</g>`; }).join('')}</svg>${p.ports.map(n => portMarkup(n)).join('')}</div>
+        <p class="wb-node-caption" aria-live="polite"></p>
         <details class="wb-terminal-drawer" data-drawer="terminals" open><summary>Tocar las conexiones <span>Las mismas piezas, más cerca</span></summary><div class="wb-terminal-rail">${p.ports.map(n => portMarkup(n, true)).join('')}</div></details>
         ${knobs || switches ? `<div class="wb-controls">${knobs}${switches}</div>` : ''}
-        <details class="wb-wire-drawer" data-drawer="cables"><summary>Cambiar o deshacer una prueba</summary><div class="wb-wire-list">${s.wires.map((w,i) => `<button data-wire="${i}" aria-label="Retirar cable entre ${escapeHtml(this.portLabel(w[0]))} y ${escapeHtml(this.portLabel(w[1]))}"><i class="wire-${i%4}"></i>${escapeHtml(this.portLabel(w[0]))}<span>↔</span>${escapeHtml(this.portLabel(w[1]))}<b>×</b></button>`).join('') || '<p>No hay cables instalados.</p>'}</div><div class="wb-reset-row"><button data-action="undo" ${!this.history.length ? 'disabled' : ''}>↶ Deshacer</button><button data-action="reset">↺ Restablecer mesa</button>${!available.length ? power : ''}<span>Podés probar sin perder nada.</span></div></details>
+        <details class="wb-wire-drawer" data-drawer="cables"><summary>Cambiar o deshacer una prueba</summary><div class="wb-wire-list">${s.wires.map((w,i) => `<button data-wire="${i}" aria-label="Retirar cable entre ${escapeHtml(this.portLabel(w[0]))} y ${escapeHtml(this.portLabel(w[1]))}"><i class="${wireTone(w,i)}"></i>${escapeHtml(this.portLabel(w[0]))}<span>↔</span>${escapeHtml(this.portLabel(w[1]))}<b>×</b></button>`).join('') || '<p>No hay cables instalados.</p>'}</div><div class="wb-reset-row"><button data-action="undo" ${!this.history.length ? 'disabled' : ''}>↶ Deshacer</button><button data-action="reset">↺ Restablecer mesa</button>${!available.length ? power : ''}<span>Podés probar sin perder nada.</span></div></details>
       </main><aside class="wb-aside">
         <section class="wb-observation" aria-live="polite"><p class="wb-eyebrow">${r.solved ? 'ALGO CAMBIÓ' : 'MIRÁ Y ESCUCHÁ'}</p>${observePuzzle(this.id,s,r).map(o => `<div><h2>${escapeHtml(o.label)}</h2><p>${escapeHtml(o.text)}</p></div>`).join('')}</section>
         ${this.renderMeter()}
