@@ -32,6 +32,14 @@ const power={portal:'awaken',plaza:'workshop',workshop:'workshop',road:'gate',sp
 // Colour grade per moment of the journey: [saturation, r, g, b tint, brightness].
 const GRADES={morning:[1,1,1,1,1],afternoon:[1.02,1.02,1,.97,1],sunset:[.95,1.08,.95,.85,1],dusk:[.8,.94,.9,1.04,.97],night:[.66,.8,.9,1.1,.96],'next-morning':[1.03,1,1.01,1.02,1.02],inside:[1,1,1,1,1]};
 const DRY_CROP=new Color(1.5,1.02,.4); // multiplies the green leaf cards toward straw
+let paneMap=null;
+function paneTexture(app){
+  // Dark glass that catches the sky: a cool gradient and two diagonal streaks of light.
+  if(paneMap)return paneMap;const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,64);
+  g.addColorStop(0,'#9fb4ba');g.addColorStop(.55,'#56707a');g.addColorStop(1,'#2e434c');x.fillStyle=g;x.fillRect(0,0,64,64);
+  x.globalAlpha=.55;x.fillStyle='#e8f1ee';x.beginPath();x.moveTo(8,64);x.lineTo(22,64);x.lineTo(50,0);x.lineTo(36,0);x.fill();x.globalAlpha=.3;x.beginPath();x.moveTo(26,64);x.lineTo(31,64);x.lineTo(59,0);x.lineTo(54,0);x.fill();
+  paneMap=new Texture(app.graphicsDevice,{width:64,height:64,format:PIXELFORMAT_RGBA8,mipmaps:true});paneMap.setSource(c);return paneMap;
+}
 function beamTexture(app){
   // Bright at the lens, fading with distance; soft across its width.
   const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d'),img=x.createImageData(256,64);
@@ -93,6 +101,7 @@ export class PlayCanvasWorld {
       if(b.dynamic){e.setPosition(...b.dynamic.pivot);this.dynamics.push({...b.dynamic,area:b.area,entity:e,material:m,angle:0,progress:0,rotation:new Quat(),axle:new Vec3(...(b.dynamic.spinAxis||[0,0,1]))});}
       if(d.glass)this.glasses.push({area:b.area,material:m});
       if(d.crop)(this.crops??=[]).push({material:m,lush:m.diffuse.clone()});
+      if(d.pane){m.diffuse=color('#5d7780');m.diffuseMap=paneTexture(this.app);m.gloss=.8;m.metalness=.1;m.update();}
       if(d.receiver)this.receivers.push({area:b.area,material:m,...d.receiver});
       if(++count%15===0){const text=document.getElementById('transition-name');if(text)text.textContent=`Tejiendo Ohmdal · ${Math.round(count/data.meshes.length*100)}%`;await new Promise(r=>setTimeout(r,0));}
     }
@@ -191,6 +200,8 @@ export class PlayCanvasWorld {
     const inside=this.area.id==='workshop';for(const a of [...this.allActors,this.playerActor,this.ohmActor,this.sleeping]){const active=a===this.playerActor||a===this.ohmActor,id=active?this.area.id:a.area,[ox,oz]=this.data.areas[id].offset,p=a.g.position;
       a.entity.enabled=a.g.visible&&(active||(inside?id==='workshop':id!=='workshop'))&&(a!==this.sleeping||!this.state.flags.awaken);
       a.entity.setPosition(p.x+ox,p.y,p.z+oz);
+      // Idle breathing: feet stay planted (bottom pivot), each actor on its own phase.
+      const breathe=this.state.settings?.reducedMotion||a.animation?.moving?0:Math.sin(this.clock*2.1+a.phase)*.014;a.entity.setLocalScale(1-breathe*.4,1+breathe,1);
       const night=inside?0:(this.lampLevel||0),sleep=a===this.sleeping?.52:1;a.entity.sprite.color=new Color((1-night*.22)*sleep,(1-night*.14)*sleep,(1-night*.03)*sleep);
       if(a.shadow){a.shadow.enabled=a.entity.enabled;a.shadow.setPosition(p.x+ox,.105,p.z+oz+.06);}
     }

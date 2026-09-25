@@ -170,7 +170,7 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
   if (h > 3.7) {
     const transomY = mainWorkshop ? 3.23 : 2.88;
     world.box(0, transomY, .055, mainWorkshop ? 1.08 : .78, .28, .15, world.m.darkwood, doorFrame);
-    world.box(0, transomY, .145, mainWorkshop ? .9 : .62, .17, .05, world.m.glass, doorFrame);
+    world.box(0, transomY, .145, mainWorkshop ? .9 : .62, .17, .05, world.m.glass, doorFrame).name = 'window-pane';
     for (const side of [-1, 1]) world.box(side * (mainWorkshop ? .24 : .16), transomY, .18, .035, .18, .03, world.m.brass, doorFrame);
   }
   for (const side of [-1, 1]) {
@@ -206,7 +206,7 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
     if (mainWorkshop) dormer.scale.setScalar(1.18);
     world.box(0, .33, 0, 1.55, .8, 1.05, wall, dormer);
     world.box(0, .23, .57, .78, .72, .12, world.m.darkwood, dormer);
-    world.box(0, .23, .65, .62, .56, .06, world.m.glass, dormer);
+    world.box(0, .23, .65, .62, .56, .06, world.m.glass, dormer).name = 'window-pane';
     world.box(0, .23, .70, .055, .6, .045, world.m.darkwood, dormer);
     world.box(0, .23, .70, .66, .055, .045, world.m.darkwood, dormer);
     roof(world, dormer, 1.55, 1.15, .72, .56, covering, wall, { ridge: 'z', overhang: .14, name: 'dormer-roof' });

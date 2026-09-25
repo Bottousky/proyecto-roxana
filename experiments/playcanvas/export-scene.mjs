@@ -60,6 +60,7 @@ function capture(world,id,offset=[0,0],landscape=false){
     if(object.name==='kingdom-distant-mountain')return;
     if(PAVING.has(object.name))descriptor.paving=true;
     if(object.name==='terrace-crop')descriptor.crop=true;
+    if(['window-pane','workshop-window-glass'].includes(object.name))descriptor.pane=true;
     const batchKey=id+owner+(dynamic?.id||'')+JSON.stringify(descriptor);let batch=batches.get(batchKey);
     if(!batch){batch={area:id,owner,dynamic,material:descriptor,positions:[],normals:[],uvs:[],colors:[],indices:[]};batches.set(batchKey,batch);}
     const instances=object.isInstancedMesh?object.count:1;
