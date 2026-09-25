@@ -417,6 +417,11 @@ export class World {
     for(let x=-w*.4;x<w*.41;x+=1.25)this.box(x,8.7,-d*.4,.65,1.0,3.7,this.m.stone);
     for(let x of [-w*.36,w*.36]){this.cylinder(x,5,-d*.34,2.8,10,this.m.stone);this.cylinder(x,10.0,-d*.34,3.1,.55,this.m.stoneDark);this.mesh('cone',this.m.roof,x,12,-d*.34,3.5,4,3.5);this.window(x,6.5,-d*.34+2.8,this.root);this.banner(x-1,-d*.34+2.9,9);this.solid(x,-d*.34,5.6,5.6,"castle-tower");}
     for(let x of [-7,7]){this.window(x,5.7,-d*.4+1.8,this.root);this.banner(x,-d*.4+2,7);}
+    // Gatehouse: an arched passage (spandrels fill the square opening) with a raised portcullis.
+    {const shape=new THREE.Shape();shape.moveTo(-2,3.3);shape.lineTo(-2,5.35);shape.lineTo(2,5.35);shape.lineTo(2,3.3);shape.absarc(0,3.3,2,0,Math.PI,false);
+      const arch=new THREE.ExtrudeGeometry(shape,{depth:3.5,bevelEnabled:false,curveSegments:16});this.localGeometries.push(arch);this.mesh(arch,this.m.stone,0,0,-d*.4-1.75).name='castle-gate-arch';
+      for(let i=0;i<=8;i++){const a=Math.PI*i/8,v=this.box(Math.cos(a)*2.12,3.3+Math.sin(a)*2.12,-d*.4+1.78,.34,.5,.1,this.m.cream);v.rotation.z=a-Math.PI/2;}
+      const grid=this.group(0,0,-d*.4+.6);grid.name='castle-portcullis';for(let x=-1.75;x<=1.76;x+=.5){this.box(x,4.55,0,.09,1.5,.09,this.m.metal,grid);this.mesh('cone',this.m.metal,x,3.72,0,.07,.18,.07,grid).rotation.x=Math.PI;}for(const y of [4.15,4.75])this.box(0,y,0,3.7,.08,.08,this.m.metal,grid);}
     this.box(-2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.box(2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.gear(-3,3.2,-d*.4+1.9,.7);this.gear(3,3.2,-d*.4+1.9,.7);
     for(let i=0;i<4;i++){for(const side of [-1,1])this.solid(side*w*.43,i*3-4,1.1,2.7,"castle-buttress");this.box(-w*.43,1.3,i*3-4,1.1,2.6,2.7,this.m.stone);this.box(w*.43,1.3,i*3-4,1.1,2.6,2.7,this.m.stone);}
     for(const x of [-11,11]){this.lamp(x,6,4);this.lamp(x,-4,4);this.pot(x,9,.65);}
