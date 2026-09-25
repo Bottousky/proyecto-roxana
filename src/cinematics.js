@@ -14,8 +14,10 @@ const copyPose=p=>({focus:[...p.focus],offset:[...p.offset],zoom:p.zoom});
 const pose=(focus,zoom,offset=GAME_CAMERA_OFFSET)=>({focus:[...focus],zoom,offset:[...offset]});
 const key=(at,p)=>({at,pose:copyPose(p)});
 
+// Interiors are framed as a whole diorama that only drifts with the player; exteriors follow.
 export function gameplayCameraPose(areaId,player){
-  return pose([player[0],areaId==='workshop'?0:1.5,player[2]-5.5],areaId==='workshop'?1.08:.93);
+  if(areaId==='workshop')return pose([player[0]*.35,0,-5.5+player[2]*.15],1.2);
+  return pose([player[0],1.5,player[2]-5.5],.93);
 }
 
 export function createCinematic(id,context,{reducedMotion=false}={}){

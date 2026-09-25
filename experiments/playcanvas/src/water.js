@@ -16,6 +16,7 @@ uniform vec3 uWaterShallow;
 uniform vec3 uWaterFoam;
 uniform sampler2D uShoreMap;
 uniform vec4 uShoreRect;
+uniform float uShoreEnabled;
 float wHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float wNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
   return mix(mix(wHash(i),wHash(i+vec2(1,0)),f.x),mix(wHash(i+vec2(0,1)),wHash(i+vec2(1,1)),f.x),f.y);}
@@ -41,7 +42,7 @@ void getAlbedo(){
   dAlbedo=mix(uWaterDeep,uWaterShallow,smoothstep(0.3,0.8,body))*material_diffuse;
   dAlbedo*=0.9+wHeight*2.2;
   // Baked distance to the shore, in metres.
-  wShore=texture2D(uShoreMap,(p-uShoreRect.xy)/uShoreRect.zw).r*6.0;
+  wShore=mix(6.0,texture2D(uShoreMap,(p-uShoreRect.xy)/uShoreRect.zw).r*6.0,uShoreEnabled);
   float wobble=(wNoise(p*1.7+vec2(t*0.3,t*0.2))-0.5)*0.35;
   float d=max(0.0,wShore+wobble);
   dAlbedo=mix(uWaterShallow*1.12,dAlbedo,smoothstep(0.0,1.1,d));
@@ -91,8 +92,9 @@ export async function loadShore(app){
   shoreTexture=new Texture(app.graphicsDevice,{name:'shore-distance',width:image.width,height:image.height,format:PIXELFORMAT_RGBA8,mipmaps:false,flipY:false,minFilter:FILTER_LINEAR,magFilter:FILTER_LINEAR,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});
   shoreTexture.setSource(image);return shoreTexture;
 }
-export function bindShore(material,texture){
-  material.setParameter('uShoreMap',texture);material.setParameter('uShoreRect',[shore.x0,shore.z0,shore.width,shore.depth]);
+// Fountains and basins are local pivoted meshes outside the baked map: no shoreline.
+export function bindShore(material,texture,enabled=true){
+  material.setParameter('uShoreEnabled',enabled?1:0);material.setParameter('uShoreMap',texture);material.setParameter('uShoreRect',[shore.x0,shore.z0,shore.width,shore.depth]);
 }
 
 // Uniforms are consumed in linear space; palette values are authored in sRGB.

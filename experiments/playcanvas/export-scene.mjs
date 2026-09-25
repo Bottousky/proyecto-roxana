@@ -9,6 +9,7 @@ import {buildKingdomLandscape} from '../../src/kingdom-landscape.js';
 import {AREAS} from './src/game/content.js';
 const output={version:2,areas:{},meshes:[],actors:[],lights:[]},batches=new Map();
 const round=n=>Math.round(n*10000)/10000;
+const PAVING=new Set(['authored-connected-paving','continuous-road','road-threshold']);
 // The converter and the playable snapshot share exactly the same river course.
 sourceWatercourse.splice(0,sourceWatercourse.length,...WATERCOURSE.map(p=>[...p]));
 function capture(world,id,offset=[0,0],landscape=false){
@@ -51,7 +52,12 @@ function capture(world,id,offset=[0,0],landscape=false){
     const descriptor={texture:isWater?'water':texture,color:material.color?.getHexString()||'4b8a88',emissive:material.emissive?.getHexString()||'000000',emission:material.emissiveIntensity||0,glass:material===world.m?.glass,alpha:material.alphaTest||0,opacity:material.opacity??1,double:material.side===T.DoubleSide,unlit:!!material.isMeshBasicMaterial,shadow:!!object.castShadow};
     if(receivers.has(material))descriptor.receiver=receivers.get(material);
     // Avoid hand-drawn transparent contact glows becoming black rectangles.
-    if(texture==='glow'||texture==='foliage'||texture==='fern')return;
+    if(texture==='glow')return;
+    // Paving is painted by the ground shader from a baked mask (scripts/bake-shore.mjs);
+    // its meshes only carry the outline, and the kerb stones followed the old stepped edge.
+    if(object.name==='paving-garden-edging')return;
+    if(PAVING.has(object.name))descriptor.paving=true;
+    if(object.name==='terrace-crop')descriptor.crop=true;
     const batchKey=id+owner+(dynamic?.id||'')+JSON.stringify(descriptor);let batch=batches.get(batchKey);
     if(!batch){batch={area:id,owner,dynamic,material:descriptor,positions:[],normals:[],uvs:[],colors:[],indices:[]};batches.set(batchKey,batch);}
     const instances=object.isInstancedMesh?object.count:1;

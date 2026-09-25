@@ -11,9 +11,23 @@ function crop(img:HTMLImageElement,col:number,row:number,cols:number,rows:number
 function texture(app:Application,name:string,source:HTMLImageElement|HTMLCanvasElement,repeat=false,nearest=false){
   const t=new Texture(app.graphicsDevice,{name,width:source.width,height:source.height,format:PIXELFORMAT_RGBA8,srgb:true,flipY:!nearest,mipmaps:!nearest,minFilter:nearest?FILTER_LINEAR:FILTER_LINEAR_MIPMAP_LINEAR,magFilter:nearest?FILTER_NEAREST:FILTER_LINEAR,addressU:repeat?ADDRESS_REPEAT:ADDRESS_CLAMP_TO_EDGE,addressV:repeat?ADDRESS_REPEAT:ADDRESS_CLAMP_TO_EDGE,anisotropy:4});t.setSource(source);const asset=new Asset(name,'texture');asset.resource=t;asset.loaded=true;app.assets.add(asset);textures.set(name,t);return t;
 }
+function seeded(seed:string){let n=[...seed].reduce((a,c)=>(a*31+c.charCodeAt(0))|0,17);return()=>{n|=0;n=n+0x6D2B79F5|0;let t=Math.imul(n^n>>>15,1|n);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+// Leaf cards drawn like the source renderer's: crops, ground ferns and conifer tiers.
+function foliage(){
+  const rand=seeded('Ohmdal foliage'),s=256,c=canvas(s,s),x=c.getContext('2d')!,branches:number[][]=[];x.strokeStyle='#626b3d';x.lineWidth=2;
+  for(let i=0;i<21;i++){const angle=i*2.4,r=35+rand()*66,bx=128+Math.cos(angle)*r,by=136+Math.sin(angle)*r;x.beginPath();x.moveTo(128,158);x.quadraticCurveTo(120+(bx-128)*.5,145+(by-145)*.5,bx,by);x.stroke();branches.push([bx,by]);}
+  for(let i=0;i<640;i++){const b=branches[Math.floor(rand()*branches.length)],lx=b[0]+(rand()-.5)*55,ly=b[1]+(rand()-.5)*46,v=80+rand()*75;x.fillStyle=`rgb(${v+13},${v+34},${v*.63})`;x.save();x.translate(lx,ly);x.rotate(rand()*6);x.beginPath();x.ellipse(0,0,2.5+rand()*4.5,1.5+rand()*2.5,0,0,Math.PI*2);x.fill();if(i%4===0){x.strokeStyle='rgba(220,222,133,.36)';x.lineWidth=.8;x.beginPath();x.moveTo(-3,0);x.lineTo(3,0);x.stroke();}x.restore();}
+  return c;
+}
+function fern(){
+  const s=128,c=canvas(s,s),x=c.getContext('2d')!;x.strokeStyle='#536d43';x.lineWidth=2;
+  for(let k=0;k<9;k++){const a=-Math.PI*.95+k*Math.PI*.115,endX=64+Math.cos(a)*55,endY=102+Math.sin(a)*90;x.beginPath();x.moveTo(64,120);x.quadraticCurveTo(64,82,endX,endY);x.stroke();for(let j=1;j<10;j++){const f=j/10,fx=64+(endX-64)*f,fy=120+(endY-120)*f,w=(1-f)*15;x.fillStyle=k%2?'#91a773':'#638c58';for(const side of [-1,1]){x.beginPath();x.ellipse(fx+side*w*.4,fy-2,w*.7,2,-side*.4,0,Math.PI*2);x.fill();}}}
+  return c;
+}
 export async function surface(app:Application,name:string){
   if(textures.has(name))return textures.get(name)!;
   if(name==='glow'){const c=canvas(128,128),x=c.getContext('2d')!,g=x.createRadialGradient(64,64,2,64,64,64);g.addColorStop(0,'#ffffff');g.addColorStop(.22,'#ffffffb0');g.addColorStop(.65,'#ffffff30');g.addColorStop(1,'#ffffff00');x.fillStyle=g;x.fillRect(0,0,128,128);return texture(app,name,c);}
+  if(name==='foliage'||name==='fern')return texture(app,name,name==='foliage'?foliage():fern());
   const cells:Record<string,number[]>={cobble:[0,0],stone:[1,0],wood:[2,0],roof:[0,1]};
   if(cells[name]){const [x,y]=cells[name];return texture(app,name,crop(await image('/assets/materials.webp'),x,y,3,2),true);}
   if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image('/assets/trees.webp'),i%3,Math.floor(i/3),3,2,true));}

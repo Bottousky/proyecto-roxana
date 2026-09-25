@@ -359,7 +359,9 @@ export class World {
     this.solid(-w*.41,3,2.7,4,"workshop-hearth");this.solid(-w*.41,2,1.25,1.2);
     this.solid(-w*.44,d*.38,2.3,2.7,"workshop-entry-cabinet");
     const floor=this.mat('#ac946f','wood');this.worldMapped(floor,4);this.box(0,-.18,0,w+2,.4,d+2,this.m.darkwood);this.box(0,.02,0,w,.06,d,floor).name='workshop-wood-floor';
-    this.box(0,3.4,-d/2,w,6.8,.7,this.m.stone);this.box(-w/2,2.7,0,.6,5.4,d,this.m.stone);this.box(w/2,1.0,0,.6,2,d,this.m.stone);
+    this.box(0,3.4,-d/2,w,6.8,.7,this.m.stone);this.box(-w/2,2.7,0,.6,5.4,d,this.m.stone);this.box(w/2,2.7,0,.6,5.4,d,this.m.stone);
+    // A waist-high cutaway front wall frames the room as a diorama; the door gap stays on the exit.
+    for(const side of [-1,1]){const inner=1.6,outer=w/2+.3,cx=side*(inner+outer)/2,len=outer-inner;this.box(cx,.4,d/2+.35,len,.8,.7,this.m.stone).name='workshop-front-cutaway';this.box(cx,.84,d/2+.35,len+.1,.09,.82,this.m.darkwood);this.box(side*(inner+.12),.5,d/2+.35,.26,1,.84,this.m.darkwood);}
     for(let x=-w/2+1;x<w/2;x+=4){this.box(x,3.2,-d/2+.4,.35,6.4,.35,this.m.darkwood);this.beam([x,5.8,-d/2+.6],[x,6.8,-d/2+3],.22,this.m.darkwood);}
     for(let x of [-w*.32,0,w*.32])this.window(x,4.35,-d/2+.45,this.root);
     for(let x of [-w*.32,0,w*.32])this.windowRay(x,4.35,-d/2+.7);
@@ -373,7 +375,7 @@ export class World {
     const rug=this.mesh('plane',this.mat('#d9ccb1',null,{map:this.textures.workshopRug||this.textures.ground}),0,.091,2,6,7,1);rug.rotation.x=-Math.PI/2;rug.name='woven-workshop-rug';rug.castShadow=false;
     for(let i=0;i<4;i++){this.barrel(w*.41,-d*.1+i*1.2,.8);this.crate(-w*.42,d*.32+i*.3,.8);}
     this.hangingLamp(-3,0,5.5);this.hangingLamp(5,-4,5.6);this.hangingLamp(-7,6,5.2);
-    for(const side of [-1,1]){const x=side*(w/2-1.5);this.solid(x,-3,1.4,9,"workshop-shelves");for(let y=1.2;y<4.4;y+=1.0){this.box(x,y,-3.0,1.4,.14,9,this.m.darkwood);for(let k=0;k<11;k++){const z=-6.8+k*.76;this.box(x+(this.rand()-.5)*.55,y+.2,z,.18+this.rand()*.2,.25+this.rand()*.35,.32,k%4===0?this.m.blue:k%3?this.m.brass:this.m.roofRed);}}}
+    for(const side of [-1,1]){const x=side*(w/2-1.5);this.solid(x,-3,1.4,9,"workshop-shelves");for(let y=1.2;y<4.4;y+=1.0){this.box(x,y,-3.0,1.4,.14,9,this.m.darkwood);for(let k=0;k<11;k++){const z=-6.8+k*.76;this.box(x+(this.rand()-.5)*.55,y+.2,z,.18+this.rand()*.2,.25+this.rand()*.35,.32,k%4===0?this.m.leaf:k%3?this.m.redcloth:this.m.brass);}}}
     for(let k=0;k<4;k++){const x=-5.5+k*2.1;this.box(x,2.45,-d/2+.75,1.6,1.0,.06,this.m.darkwood);for(let j=0;j<4;j++){this.beam([x-.5+j*.3,2.5,-d/2+.88],[x-.5+j*.3,2.12,-d/2+.88],.05,this.m.metal);this.torus(x-.5+j*.3,2.65,-d/2+.9,.1,.025,this.m.brass);}}
     for(const pos of [[-3,-4],[5,0],[-6,5],[6,6]])this.stool(...pos);
     for(let i=0;i<6;i++){const x=-8+i*2.5;this.cable([[x,5.6,-11],[x,5.4,-7],[x+.7,4.8,-5]],i%2?this.m.metal:this.m.brass);}
@@ -417,7 +419,7 @@ export class World {
     this.irrigationWater=[];
     for(const side of [-1,1])for(let row=0;row<3;row++){
       const x=side*w*.36,z=-d*.28+2.9+row*5.5;this.solid(x,z,8,3.5,"terrace-bed");this.box(x,.3+row*.18,z,8,.65,3.5,this.m.stone);this.box(x,.67+row*.18,z,7.6,.1,3.1,this.m.darkwood);
-      for(let k=0;k<20;k++){const xx=x-3.3+(k%10)*.72,zz=z-.8+Math.floor(k/10)*1.5;this.beam([xx,.8,zz],[xx,1.55+row*.18,zz],.025,this.m.darkwood);const leaf=this.mesh('plane',row%2?this.m.foliage:this.m.fern,xx,1.25+row*.18,zz,.72,.85,1);leaf.rotation.y=.3;const leaf2=this.mesh('plane',this.m.fern,xx,1.1+row*.18,zz,.75,.65,1);leaf2.rotation.y=1.8;if(row===1&&k%2===0)this.sphere(xx+.1,1.1+row*.18,zz+.2,.065,this.m.roofRed);}
+      for(let k=0;k<20;k++){const xx=x-3.3+(k%10)*.72,zz=z-.8+Math.floor(k/10)*1.5;this.beam([xx,.8,zz],[xx,1.55+row*.18,zz],.025,this.m.darkwood);const leaf=this.mesh('plane',row%2?this.m.foliage:this.m.fern,xx,1.25+row*.18,zz,.72,.85,1);leaf.rotation.y=.3;leaf.name='terrace-crop';const leaf2=this.mesh('plane',this.m.fern,xx,1.1+row*.18,zz,.75,.65,1);leaf2.rotation.y=1.8;leaf2.name='terrace-crop';if(row===1&&k%2===0)this.sphere(xx+.1,1.1+row*.18,zz+.2,.065,this.m.roofRed);}
       for(let k=0;k<5;k++){this.cylinder(x-3.3+k*1.65,1.45+row*.18,z-.7,.035,1.7,this.m.wood);}for(let y of [1.4,2.0])this.beam([x-3.5,y+row*.18,z-.7],[x+3.5,y+row*.18,z-.7],.025,this.m.darkwood);
       const channel=this.water(x,.73+row*.18,z+1.1,7.6,.35);this.irrigationWater.push(channel);
     }
@@ -721,7 +723,7 @@ export class World {
     for(const wire of this.conductors){if(wire.active){const t=reduced?.5:(this.clock*(.1+Math.min(Math.abs(wire.current),2)*.1))%1;wire.particle.position.copy(wire.curve.getPoint(wire.isReturn?1-t:t));}}
     updateDaylight(this,state,dt);
     if(this.dust){this.dust.rotation.y=Math.sin(this.clock*.02)*.025*motion;this.dust.position.y=Math.sin(this.clock*.2)*.1*motion;}
-    const wanted=this.player.position.clone();wanted.y=this.area.id==='workshop'?0:1.5;wanted.z-=5.5;let zoom=this.area.id==='workshop'?1.08:.93;
+    const rest=gameplayCameraPose(this.area.id,this.player.position.toArray()),wanted=new THREE.Vector3().fromArray(rest.focus);let zoom=rest.zoom;
     if(this.inspect){const near=this.getNearby();if(near){wanted.set(near.x,1,near.z);zoom=1.55;}}
     if(this.cinematic){const active=this.cinematic;active.elapsed+=elapsed;const sample=sampleCinematic(active.timeline,active.elapsed);this.focus.fromArray(sample.pose.focus);this.cameraOffset.fromArray(sample.pose.offset);this.currentZoom=sample.pose.zoom;if(sample.done)this.cinematic=null;}
     else{this.focus.lerp(wanted,1-Math.exp(-dt*(this.inspect?2:3.6)));this.currentZoom=THREE.MathUtils.lerp(this.currentZoom,zoom,1-Math.exp(-dt*2.6));this.cameraOffset.lerp(new THREE.Vector3(0,13.5,25),1-Math.exp(-dt*2.6));}
