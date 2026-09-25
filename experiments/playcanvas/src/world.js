@@ -116,7 +116,7 @@ export class PlayCanvasWorld {
     this.playerActor=await this.makeActor('player',0,0,'player');this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
-    this.buildAtmosphere();await this.buildLightEffects();this.app.start();
+    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.app.start();
   }
   async makeActor(name,x,z,area,object){
     if(!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
@@ -217,7 +217,7 @@ export class PlayCanvasWorld {
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
-    this.syncActors();this.speakingBounce(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
+    this.syncActors();this.speakingBounce(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
     else{const rest=gameplayCameraPose(this.area.id,p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
       // Conversations: frame both speakers above the dialogue panel and lean in slightly.
@@ -241,6 +241,23 @@ export class PlayCanvasWorld {
     // The restored Faro sweeps a soft wedge of light across land and sea.
     this.beacon=new Entity('Señal del Faro');const m2=new StandardMaterial(),ray=beamTexture(this.app);m2.diffuse=color('#000000');m2.emissive=color('#ffe3a8');m2.emissiveMap=ray;m2.opacityMap=ray;m2.opacityMapChannel='a';m2.emissiveIntensity=1.6;m2.opacity=.5;m2.blendType=BLEND_ADDITIVEALPHA;m2.depthWrite=false;m2.cull=CULLFACE_NONE;m2.useLighting=false;m2.update();this.beaconMaterial=m2;
     const sweep=new Entity('Haz');sweep.addComponent('render',{type:'plane'});sweep.render.material=m2;sweep.render.castShadows=false;sweep.setLocalPosition(32,0,0);sweep.setLocalScale(64,1,14);this.beacon.addChild(sweep);this.app.root.addChild(this.beacon);
+  }
+  // A soft golden ring on the ground under the object the player can use right now.
+  buildFocusRing(){
+    const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,34,64,64,62);
+    g.addColorStop(0,'#ffe2a000');g.addColorStop(.35,'#ffe2a0ff');g.addColorStop(.55,'#ffe2a0aa');g.addColorStop(1,'#ffe2a000');x.fillStyle=g;x.fillRect(0,0,128,128);
+    const t=new Texture(this.app.graphicsDevice,{width:128,height:128,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);
+    const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffd98f');m.emissiveMap=t;m.opacityMap=t;m.opacityMapChannel='a';m.emissiveIntensity=1.3;m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.useLighting=false;m.update();
+    this.focusRing=new Entity('Anillo de interacción');this.focusRing.addComponent('render',{type:'plane'});this.focusRing.render.material=m;this.focusRing.render.castShadows=false;this.focusRing.enabled=false;this.app.root.addChild(this.focusRing);this.focusRingMaterial=m;this.focusRingLevel=0;
+  }
+  updateFocusRing(dt,paused,reduced){
+    if(!this.focusRing)return;const near=paused||this.cinematic?null:this.getNearby(),[ox,oz]=this.data.areas[this.area.id].offset;
+    if(near&&near!==this.focusTarget){this.focusTarget=near;this.focusRingLevel=0;}
+    this.focusRingLevel+=((near?1:0)-this.focusRingLevel)*Math.min(1,dt*8);
+    this.focusRing.enabled=this.focusRingLevel>.02&&!!this.focusTarget;if(!this.focusRing.enabled){if(!near)this.focusTarget=null;return;}
+    const o=this.focusTarget,size=(o.character?1.5:1.9)*(reduced?1:1+Math.sin(this.clock*3.2)*.06);
+    this.focusRing.setPosition(o.x+ox,this.groundHeight(o.x,o.z)+.04,o.z+oz);this.focusRing.setLocalScale(size,1,size);
+    this.focusRingMaterial.opacity=this.focusRingLevel*(reduced?.7:.55+Math.sin(this.clock*3.2)*.15);this.focusRingMaterial.update();
   }
   async buildLightEffects(){
     const texture=await surface(this.app,'glow');
