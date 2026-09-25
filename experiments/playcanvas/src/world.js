@@ -157,9 +157,16 @@ export class PlayCanvasWorld {
     return this.audioSnapshot={area:'kingdom',listener:{x,z},emitters:emitters.sort((a,b)=>Math.hypot(a.x-x,a.z-z)-Math.hypot(b.x-x,b.z-z)).slice(0,12)};
   }
   beginInhabitantConversation(t){beginInhabitantConversation(this,t);}
-  faceInhabitantSpeaker(s){faceInhabitantSpeaker(this,s);}
-  endInhabitantConversation(){endInhabitantConversation(this);}
-  updateFlags(state){this.state=state;if(this.area)this.obstacles=this.localObstacles(this.area.id);this.ohm&&(this.ohm.visible=!!state.flags.awaken);this.signature=JSON.stringify([state.flags,state.puzzles]);for(const d of this.dynamics){if(d.kind==='visible')d.entity.enabled=!!(state.flags[d.flag]??state.flags[d.or]);if(d.kind==='indicator'){const active=!!state.flags[d.flag];d.material.emissive=color(active?'#62d7ae':'#675430');d.material.emissiveIntensity=active?1.1:.25;d.material.update();}if(d.receiver)d.feedback=readReceiverFeedback(d.area,state,d.receiver);}for(const r of this.receivers||[]){r.material.emissiveIntensity=r.intensity*readReceiverFeedback(r.area,state,r.object).level;r.material.update();}}
+  faceInhabitantSpeaker(s){faceInhabitantSpeaker(this,s);const a=this.speakerActor(s);if(a)this.speaking={actor:a,t:0};}
+  speakerActor(s){if(!s||s==='narrator')return null;if(s==='player')return this.playerActor;if(s==='ohm'||s==='ohm_companion')return this.ohm.visible?this.ohmActor:null;return this.regions.get(this.area.id)?.actors.find(a=>a.name===s&&a.entity.enabled)||null;}
+  endInhabitantConversation(){endInhabitantConversation(this);this.speaking=null;}
+  updateFlags(state){this.state=state;if(this.area)this.obstacles=this.localObstacles(this.area.id);this.ohm&&(this.ohm.visible=!!state.flags.awaken);this.wakeOhm(state);this.signature=JSON.stringify([state.flags,state.puzzles]);for(const d of this.dynamics){if(d.kind==='visible')d.entity.enabled=!!(state.flags[d.flag]??state.flags[d.or]);if(d.kind==='indicator'){const active=!!state.flags[d.flag];d.material.emissive=color(active?'#62d7ae':'#675430');d.material.emissiveIntensity=active?1.1:.25;d.material.update();}if(d.receiver)d.feedback=readReceiverFeedback(d.area,state,d.receiver);}for(const r of this.receivers||[]){r.material.emissiveIntensity=r.intensity*readReceiverFeedback(r.area,state,r.object).level;r.material.update();}}
+  // Ohm wakes where he slept: he stays on the pedestal through the scene, then hops down.
+  wakeOhm(state){
+    const awake=!!state.flags.awaken,was=this.ohmWasAwake;this.ohmWasAwake=awake;
+    if(was!==false||!awake||this.area?.id!=='portal'||!this.sleeping)return;
+    const p=this.sleeping.g.position;this.ohm.position.set(p.x,p.y,p.z);this.ohmHop={t:0,from:[p.x,p.y,p.z],to:this.nearestWalkable([p.x,p.z+1])};this.companionRoute=[];
+  }
   setInspection(v){this.inspect=v;if(v){this.target=null;this.route=[];}}
   cameraPose(){const [ox,oz]=this.data.areas[this.area.id].offset;return {focus:[this.focus.x-ox,this.focus.y,this.focus.z-oz],offset:this.cameraOffset.toArray(),zoom:this.currentZoom};}
   startCinematic(id,{reducedMotion=false}={}){const p=this.area.objects.find(o=>o.puzzle===id);if(!p)return false;const timeline=createCinematic(id,{areaId:this.area.id,flags:this.state.flags,player:this.player.position.toArray(),companion:this.ohm.position.toArray(),puzzle:[p.x,1.4,p.z],bounds:this.area.bounds,start:this.cameraPose()},{reducedMotion});if(!timeline)return false;this.cinematic={timeline,elapsed:0};this.target=null;this.route=[];return true;}
@@ -187,13 +194,21 @@ export class PlayCanvasWorld {
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
-    this.syncActors();this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
+    this.syncActors();this.speakingBounce(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
-    else{const rest=gameplayCameraPose(this.area.id,p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
+    else{const rest=gameplayCameraPose(this.area.id,p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
+      // Conversations: frame both speakers above the dialogue panel and lean in slightly.
+      const talk=this.inhabitantConversation&&this.area.id!=='workshop'&&!this.inspect?this.speaking?.actor||this.speakerActor(this.inhabitantConversation.target):null;
+      if(talk&&talk!==this.playerActor){const q=talk.g.position;wanted.set((p.x+q.x)/2+ox,1.5,(p.z+q.z)/2+2.4+oz);rest.zoom=1.1;}this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
     this.positionCamera();this.focusFrame();
   }
+  // The current speaker gives a small hop as each of their lines begins.
+  speakingBounce(dt,reduced){const s=this.speaking;if(!s||reduced)return;s.t+=dt;if(s.t>.32)return;const e=s.actor.entity,pos=e.getPosition();e.setPosition(pos.x,pos.y+Math.sin(s.t/.32*Math.PI)*.12,pos.z);}
   updateCompanion(dt,paused,reduced){
     const o=this.ohm.position,p=this.player.position,old=[o.x,o.z],distance=Math.hypot(p.x-o.x,p.z-o.z);this.companionAge+=dt;
+    if(this.ohmHop){if(paused)return this.animateActor(this.ohmActor,0,0,dt,{paused,reducedMotion:reduced});
+      const h=this.ohmHop,k=Math.min(1,(h.t+=dt)/.55),ground=this.groundHeight(...h.to);o.x=h.from[0]+(h.to[0]-h.from[0])*k;o.z=h.from[2]+(h.to[1]-h.from[2])*k;o.y=ground+(h.from[1]-ground)*(1-k)+Math.sin(k*Math.PI)*.45;
+      if(k>=1){o.y=ground;this.ohmHop=null;}return this.animateActor(this.ohmActor,0,.01,dt,{paused,reducedMotion:reduced});}
     if(!paused&&this.ohm.visible&&distance>1.4){if(this.companionAge>.7||!this.companionRoute.length){this.companionRoute=findPath(old,[p.x,p.z],this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});this.companionAge=0;}while(this.companionRoute.length&&Math.hypot(this.companionRoute[0][0]-o.x,this.companionRoute[0][1]-o.z)<.12)this.companionRoute.shift();const q=this.companionRoute[0];if(q){const d=Math.hypot(q[0]-o.x,q[1]-o.z),step=Math.min(d,distance-1.15,7.5*dt),next=moveWithCollisions(old,[(q[0]-o.x)/d*step,(q[1]-o.z)/d*step],this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});o.set(next[0],this.groundHeight(...next),next[1]);}}
     this.animateActor(this.ohmActor,o.x-old[0],o.z-old[1],dt,{paused,reducedMotion:reduced});
   }
