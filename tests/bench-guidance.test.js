@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
-import { PUZZLES, initialPuzzleSnapshot } from '../src/puzzle-model.js';
+import { PUZZLES, initialPuzzleSnapshot, evaluatePuzzle } from '../src/puzzle-model.js';
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
@@ -86,4 +86,18 @@ test('a protection trip explains what usually causes it', () => {
   const s = initialPuzzleSnapshot('distribution');
   s.tripped = true;
   assert.match(observePuzzle('distribution', s)[0].text, /une \+ y − sin atravesar ningún receptor/);
+});
+
+test('the Faro lens needs its divider: the series shortcut would contradict the journal lesson', () => {
+  // Series dropper with the initial knob: the lens alone is in range, but the lower arm is idle.
+  const shortcut = { ...initialPuzzleSnapshot('beacon_lens'), wires: [['positive', 'upperA'], ['tap', 'lensIn'], ['lensOut', 'negative']] };
+  const r = evaluatePuzzle('beacon_lens', shortcut);
+  assert.equal(r.operating.lens, true);
+  assert.equal(r.solved, false);
+  assert.ok(observePuzzle('beacon_lens', shortcut).some(o => o.label === 'El divisor' && /dos brazos/.test(o.text)));
+
+  const divider = { ...initialPuzzleSnapshot('beacon_lens'), wires: [['positive', 'upperA'], ['lowerB', 'negative'], ['tap', 'lensIn'], ['lensOut', 'negative']] };
+  divider.values.upper = 12;
+  assert.equal(evaluatePuzzle('beacon_lens', divider).solved, true);
+  assert.ok(observePuzzle('beacon_lens', divider).every(o => o.label !== 'El divisor'));
 });

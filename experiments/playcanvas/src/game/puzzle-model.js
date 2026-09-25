@@ -88,6 +88,7 @@ export const PUZZLES = {
     title: 'III · La luz que sabe volver', place: 'FARO · CORAZÓN DE LA LENTE', subtitle: "La lente encandila. Nereo busca una luz que pueda durar.", voltage: 18, protection: 2.4,
     ports: [...sourcePorts, port('upperA', 'Divisor · entrada', 320, 115), port('tap', 'Toma intermedia', 575, 115), port('lowerB', 'Divisor · retorno', 835, 115), port('lensIn', 'Lente +', 525, 350), port('lensOut', 'Lente −', 815, 350)],
     components: [component('upper', 'Brazo superior', 'upperA', 'tap', 24, { kind: 'resistor', valueKey: 'upper' }), component('lower', 'Brazo inferior · 24 Ω', 'tap', 'lowerB', 24, { kind: 'resistor' }), component('lens', 'Cristal del horizonte · 24 Ω', 'lensIn', 'lensOut', 24, { kind: 'lens', goal: goal(8.7, 9.3, .362, .388) })],
+    constraints: [{ branch: 'lower', minCurrent: .05 }],
     knobs: [{ key: 'upper', label: 'Brazo superior del divisor', min: 2, max: 40, step: 1, initial: 24, unit: 'Ω', description: 'Calibrá con la lente conectada. Ella también forma parte de la red.' }],
     initialWires: [['positive', 'upperA'], ['lowerB', 'negative'], ['positive', 'lensIn'], ['lensOut', 'negative']],
     lesson: 'La carga cambia un divisor: la lente y el brazo inferior quedan en paralelo. Calibrar con la carga conectada permite obtener la tensión que el sistema necesita en funcionamiento.',
@@ -143,7 +144,8 @@ export function evaluatePuzzle(id, state) {
     const operatingBranch = ['lamp', 'heater'].includes(c.kind) && branch.voltage !== null ? { ...branch, voltage: Math.abs(branch.voltage), current: Math.abs(branch.current) } : branch;
     return [c.id, powered && checkOperatingRange(operatingBranch, c.goal)];
   }));
-  const constraintsMet = (p.constraints ?? []).every(c => (solution.branches[c.branch]?.power ?? Infinity) <= c.maxPower);
+  // maxPower limits losses on a line; minCurrent keeps a part in service (the lens divider needs both arms).
+  const constraintsMet = (p.constraints ?? []).every(c => { const b = solution.branches[c.branch]; return (c.maxPower === undefined || (b?.power ?? Infinity) <= c.maxPower) && Math.abs(b?.current ?? 0) >= (c.minCurrent ?? 0); });
   const solved = powered && solution.valid && Object.values(operating).every(Boolean) && constraintsMet;
   return { network, solution, overloaded, requestedCurrent, current, power: current * p.voltage, voltage: powered ? p.voltage : 0, operating, constraintsMet, solved };
 }

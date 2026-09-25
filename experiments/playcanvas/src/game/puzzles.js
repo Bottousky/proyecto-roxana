@@ -46,7 +46,12 @@ export function observePuzzle(id, state, result = evaluatePuzzle(id, state)) {
     if (id === 'beacon_network' && c.kind === 'motor') text = result.operating[c.id] ? 'La cúpula gira sin detenerse.' : strong ? 'La cúpula gira a los golpes.' : nearLow ? 'La cúpula casi completa sus vueltas.' : 'La cúpula apenas consigue moverse.';
     return { label: simpleLabel(c.label), text };
   });
-  for (const constraint of p.constraints ?? []) if ((result.solution.branches[constraint.branch]?.power ?? 0) > constraint.maxPower) observations.push({ label: 'El tendido', text: 'El cobre se está calentando demasiado. Este pulso no puede sostenerse así.' });
+  for (const constraint of p.constraints ?? []) {
+    const branch = result.solution.branches[constraint.branch];
+    if (constraint.maxPower !== undefined && (branch?.power ?? 0) > constraint.maxPower) observations.push({ label: 'El tendido', text: 'El cobre se está calentando demasiado. Este pulso no puede sostenerse así.' });
+    // A lens fed without the lower arm drifts with its own heat: the divider holds the tap steadier.
+    if (constraint.minCurrent !== undefined && Math.abs(branch?.current ?? 0) < constraint.minCurrent) observations.push({ label: 'El divisor', text: 'El brazo inferior quedó fuera del camino. Así la luz depende sólo del cristal: cuando se calienta y cambia, la luz cambia con él. Con los dos brazos trabajando, la toma se sostiene más firme.' });
+  }
   return observations;
 }
 
@@ -376,7 +381,7 @@ export class PuzzleWorkbench {
   renderDetails() {
     if (!this.showNumbers) return '';
     const p = this.puzzle, r = this.result, s = this.state;
-    return `<details class="wb-notes" data-drawer="ratings"><summary>Leer las marcas de las piezas</summary><p>Son referencias para comparar con tus mediciones. No hace falta memorizarlas.</p>${p.components.map(c => `<p><strong>${escapeHtml(simpleLabel(c.label))}</strong> · ${fmt(c.valueKey ? s.values[c.valueKey] : c.resistance, 1)} Ω${c.goal ? `<br>Marca de trabajo: ${fmt(c.goal.minVoltage, 1)}–${fmt(c.goal.maxVoltage, 1)} V.` : ''}</p>`).join('')}${(p.constraints ?? []).map(c => `<p>Tendido: ${fmt(r.solution.branches[c.branch]?.power ?? 0,1)} W · marca máxima ${fmt(c.maxPower,1)} W.</p>`).join('')}<details data-drawer="model"><summary>Cómo funciona este instrumento</summary><p>Red resistiva en corriente continua; los receptores representan su carga nominal. Los cables tienen 0,035 Ω. El voltímetro ideal compara dos puntos. El amperímetro ideal ocupa un tramo de la rama elegida en serie: toda su corriente lo atraviesa. Su resistencia es cero y no altera esta red nominal. En un instrumento real hay que escoger conexión y rango adecuados; aquí el rango es automático. La prueba de continuidad mide toda la red conectada, con la alimentación apagada.</p></details></details>`;
+    return `<details class="wb-notes" data-drawer="ratings"><summary>Leer las marcas de las piezas</summary><p>Son referencias para comparar con tus mediciones. No hace falta memorizarlas.</p>${p.components.map(c => `<p><strong>${escapeHtml(simpleLabel(c.label))}</strong> · ${fmt(c.valueKey ? s.values[c.valueKey] : c.resistance, 1)} Ω${c.goal ? `<br>Marca de trabajo: ${fmt(c.goal.minVoltage, 1)}–${fmt(c.goal.maxVoltage, 1)} V.` : ''}</p>`).join('')}${(p.constraints ?? []).filter(c => c.maxPower !== undefined).map(c => `<p>Tendido: ${fmt(r.solution.branches[c.branch]?.power ?? 0,1)} W · marca máxima ${fmt(c.maxPower,1)} W.</p>`).join('')}<details data-drawer="model"><summary>Cómo funciona este instrumento</summary><p>Red resistiva en corriente continua; los receptores representan su carga nominal. Los cables tienen 0,035 Ω. El voltímetro ideal compara dos puntos. El amperímetro ideal ocupa un tramo de la rama elegida en serie: toda su corriente lo atraviesa. Su resistencia es cero y no altera esta red nominal. En un instrumento real hay que escoger conexión y rango adecuados; aquí el rango es automático. La prueba de continuidad mide toda la red conectada, con la alimentación apagada.</p></details></details>`;
   }
 
   renderExperiments() {
