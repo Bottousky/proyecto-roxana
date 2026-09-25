@@ -16,7 +16,7 @@ import sceneUrl from './data/scene.json?url';
 import geometryUrl from './data/geometry.bin.gz?url';
 import {walkableTerrain} from './terrain.js';
 import {makeWater,updateWater,loadShore,bindShore} from './water.js';
-import {makeGround} from './ground.js';
+import {makeGround,makeRock} from './ground.js';
 
 // Small coordinate value adapter for the existing renderer-independent game rules.
 class Position extends Vec3 {
@@ -101,6 +101,7 @@ export class PlayCanvasWorld {
       if(b.dynamic){e.setPosition(...b.dynamic.pivot);this.dynamics.push({...b.dynamic,area:b.area,entity:e,material:m,angle:0,progress:0,rotation:new Quat(),axle:new Vec3(...(b.dynamic.spinAxis||[0,0,1]))});}
       if(d.glass)this.glasses.push({area:b.area,material:m});
       if(d.crop)(this.crops??=[]).push({material:m,lush:m.diffuse.clone()});
+      if(d.rock)makeRock(m);
       if(d.pane){m.diffuse=color('#5d7780');m.diffuseMap=paneTexture(this.app);m.gloss=.8;m.metalness=.1;m.update();}
       if(d.receiver)this.receivers.push({area:b.area,material:m,...d.receiver});
       if(++count%15===0){const text=document.getElementById('transition-name');if(text)text.textContent=`Tejiendo Ohmdal · ${Math.round(count/data.meshes.length*100)}%`;await new Promise(r=>setTimeout(r,0));}

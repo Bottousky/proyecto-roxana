@@ -319,7 +319,14 @@ export class World {
     this.animations.push({kind:'tree',obj:g,phase:this.rand()*6,speed:.4});this.solid(x,z,.7,.7);return g;
   }
   pine(x,z,size=1){const g=this.group(x,0,z);if(!this.onLand(x,z)||this.sceneryBlocksFacade(x,z,size))return g;this.solid(x,z,.35*size,.35*size);this.cylinder(0,2.4*size,0,.13*size,4.8*size,this.m.darkwood,g);const leaves=new THREE.InstancedMesh(this.geo.plane,this.m.foliage,32),dummy=new THREE.Object3D();for(let i=0;i<32;i++){const tier=Math.floor(i/8),angle=i*2.4,r=(1.2-tier*.24)*size;dummy.position.set(Math.cos(angle)*r*.35,(1.35+tier*.9)*size,Math.sin(angle)*r*.35);dummy.rotation.set(-.35,angle,0);dummy.scale.set(r*2.3,r*1.35,1);dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix);leaves.setColorAt(i,new THREE.Color('#79a097'));}leaves.castShadow=true;leaves.receiveShadow=true;g.add(leaves);return g;}
-  rock(x,z,size=1){this.solid(x,z,size*1.7,size*1.7);const m=this.mesh('ico',this.m.stoneDark,x,.32*size,z,size,.65*size,.8*size);m.rotation.set(this.rand()*.5,this.rand()*6,this.rand()*.2);return m;}
+  rock(x,z,size=1){
+    this.solid(x,z,size*1.7,size*1.7);
+    // Each boulder gets its own faceted shape: shared vertices pushed in and out.
+    const geo=new THREE.IcosahedronGeometry(1,1),pos=geo.attributes.position,seen=new Map(),jitter=seeded(`rock ${x.toFixed(2)} ${z.toFixed(2)}`);
+    for(let i=0;i<pos.count;i++){const key=[pos.getX(i),pos.getY(i),pos.getZ(i)].map(v=>v.toFixed(3)).join();if(!seen.has(key))seen.set(key,.82+jitter()*.3);const k=seen.get(key);pos.setXYZ(i,pos.getX(i)*k,pos.getY(i)*k,pos.getZ(i)*k);}
+    geo.computeVertexNormals();this.localGeometries.push(geo);
+    const m=this.mesh(geo,this.m.stoneDark,x,.32*size,z,size,.65*size,.8*size);m.rotation.set(this.rand()*.5,this.rand()*6,this.rand()*.2);m.name='field-rock';return m;
+  }
   gear(x,y,z,r=.7,parent=this.root,axis='z') {const g=this.group(x,y,z,parent);this.cylinder(0,0,0,r*.78,.14,this.m.brass,g).rotation.x=Math.PI/2;this.torus(0,0,0,r*.65,r*.13,this.m.metal,null,g);for(let i=0;i<12;i++){const a=i/12*Math.PI*2;const tooth=this.box(Math.cos(a)*r,Math.sin(a)*r,0,r*.28,r*.28,.18,this.m.brass,g);tooth.rotation.z=a;}this.cylinder(0,0,0,r*.2,.22,this.m.metal,g).rotation.x=Math.PI/2;if(axis==='y')g.rotation.x=Math.PI/2;this.animations.push({kind:'gear',obj:g,speed:(this.rand()>.5?1:-1)*.18});return g;}
   cable(points,color=this.m.brass,parent=this.root){const curve=new THREE.CatmullRomCurve3(points.map(a=>new THREE.Vector3(...a)));const geo=new THREE.TubeGeometry(curve,Math.max(8,points.length*6),.04,5,false);this.localGeometries.push(geo);return this.mesh(geo,color,0,0,0,1,1,1,parent);}
   sign(x,z){this.solid(x,z,.2,.2);this.cylinder(x,1.0,z,.07,2,this.m.darkwood);this.box(x,1.7,z,1.45,.45,.16,this.m.wood);this.box(x+.15,1.12,z,1.1,.38,.15,this.m.darkwood);}

@@ -51,3 +51,22 @@ export function makeGround(material,{shoreMap,meadow,cobble}){
   material.update();
   return material;
 }
+
+// Field boulders: faceted grey stone, darker at the foot, moss on the faces turned to the sky.
+const rockPS=`
+uniform vec3 material_diffuse;
+float rHash(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
+float rNoise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
+  return mix(mix(mix(rHash(i),rHash(i+vec3(1,0,0)),f.x),mix(rHash(i+vec3(0,1,0)),rHash(i+vec3(1,1,0)),f.x),f.y),
+             mix(mix(rHash(i+vec3(0,0,1)),rHash(i+vec3(1,0,1)),f.x),mix(rHash(i+vec3(0,1,1)),rHash(i+vec3(1,1,1)),f.x),f.y),f.z);}
+void getAlbedo(){
+  vec3 p=vPositionW;float n=rNoise(p*2.6)*0.6+rNoise(p*7.0)*0.4,facet=rHash(floor(p*1.7));
+  vec3 stone=mix(vec3(0.075,0.08,0.07),vec3(0.17,0.175,0.15),n)*(0.8+0.4*facet);
+  stone*=mix(0.62,1.0,smoothstep(0.0,0.55,p.y));
+  float moss=smoothstep(0.5,0.85,dVertexNormalW.y+(rNoise(p*3.3)-0.5)*0.5);
+  dAlbedo=mix(stone,vec3(0.07,0.12,0.035)*(0.8+0.4*n),moss*0.85)*material_diffuse;
+}`;
+export function makeRock(material){
+  material.shaderChunksVersion='2.22';material.diffuseMap=null;material.diffuse.set(1,1,1);material.flatShading=true;
+  material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',rockPS);material.update();return material;
+}
