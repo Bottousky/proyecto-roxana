@@ -8,7 +8,9 @@
     "check": "tsc --noEmit && node --check src/world.js",
     "test": "node --test arc.test.mjs tests/*.test.js",
     "test:journey": "node scripts/playthrough.mjs",
-    "export:world": "node export-scene.mjs",
+    "export:world": "node export-scene.mjs && node scripts/bake-shore.mjs",
+    "bake:shore": "node scripts/bake-shore.mjs",
+    "art:review": "node scripts/art-review.mjs",
     "sync:canon": "node sync-game.mjs"
   },
   "dependencies": {

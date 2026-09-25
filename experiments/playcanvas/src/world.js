@@ -15,6 +15,7 @@ import {createCinematic,sampleCinematic,returningCinematic,gameplayCameraPose} f
 import sceneUrl from './data/scene.json?url';
 import geometryUrl from './data/geometry.bin.gz?url';
 import {walkableTerrain} from './terrain.js';
+import {makeWater,updateWater,loadShore,bindShore} from './water.js';
 
 // Small coordinate value adapter for the existing renderer-independent game rules.
 class Position extends Vec3 {
@@ -47,12 +48,12 @@ export class PlayCanvasWorld {
     const [data,binary]=await Promise.all([fetch(sceneUrl).then(r=>{if(!r.ok)throw new Error('Falta el mundo');return r.json();}),fetch(geometryUrl).then(async r=>{if(!r.ok)throw new Error('Falta la geometría');const buffer=await r.arrayBuffer(),magic=new Uint8Array(buffer,0,2);return magic[0]===31&&magic[1]===139?new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;})]);this.data=data;
     for(const id of [...Object.keys(AREAS),'landscape']){const root=new Entity(id==='landscape'?'Ohmdal · geografía compartida':AREAS[id].name);this.app.root.addChild(root);this.regions.set(id,{root,actors:[]});}
     const needed=[...new Set(data.meshes.flatMap(m=>m.material.texture?[m.material.texture]:[]))];for(const name of needed)await surface(this.app,name);
-    const owners=new Map();this.receivers=[];let count=0;
+    const owners=new Map(),shore=await loadShore(this.app);this.receivers=[];let count=0;
     for(const b of data.meshes){
       const d=b.material,e=new Entity(b.owner||`${b.area} · ${count}`),m=new StandardMaterial();m.diffuse=color('#'+d.color);m.emissive=color('#'+d.emissive);m.emissiveIntensity=d.emission;m.shininess=10;m.useMetalness=true;m.metalness=0;m.diffuseVertexColor=true;m.alphaTest=d.alpha;m.opacity=d.opacity;m.cull=d.double?CULLFACE_NONE:CULLFACE_BACK;
       if(d.texture){m.diffuseMap=await surface(this.app,d.texture);if(d.alpha){m.opacityMap=m.diffuseMap;m.opacityMapChannel='a';}}
       if(d.opacity<1){m.blendType=BLEND_NORMAL;m.depthWrite=false;}
-      if(d.texture==='water'){m.diffuse.set(.72,.96,.91);m.diffuseMapTiling=new Vec2(3,10);this.waters.push(m);}
+      if(d.texture==='water'){makeWater(m);bindShore(m,shore);this.waters.push(m);}
       m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>new (key==='indices'?Uint32Array:Float32Array)(binary,b[key].offset,b[key].length);
       mesh.setPositions(attr('positions'));mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
       const instance=new MeshInstance(mesh,m,e);instance.castShadow=d.shadow&&d.opacity===1;instance.receiveShadow=true;e.addComponent('render',{meshInstances:[instance]});let parent=this.regions.get(b.area).root;
@@ -206,7 +207,8 @@ export class PlayCanvasWorld {
         if(d.lastSignature!==this.signature){const object=AREAS[d.area].objects.find(o=>o.id===d.object),signal=readControlFeedback(d.area,this.state,object);d.lastSignature=this.signature;d.material.emissive=color(signal.flowing?(d.return?'#609ebd':'#d9a252'):'#000000');d.material.emissiveIntensity=signal.flowing?.5:0;d.material.diffuse=color(d.kind==='conductor'?(d.return?'#73999a':'#ba844d'):signal.mechanical?'#b6a075':signal.overloaded?'#b5724d':signal.flowing?'#abc59b':'#968666');d.material.update();}
       }
     }
-    for(const m of this.waters){m.diffuseMapOffset=new Vec2(Math.sin(this.clock*.07)*.008,reduced?0:this.clock*.008);m.update();}
+    const sky=this.camera.camera.clearColor,horizon=new Color().lerp(sky,color('#f3e7cf'),inside?0:.45);
+    updateWater(this.waters,{time:this.clock,motion:reduced?.15:1,sky,horizon,sunDir:this.sun.up,sunColor:this.sun.light.color,night:n});
     for(const p of this.motes){p.entity.enabled=!inside&&!reduced;p.entity.setPosition(this.focus.x+p.x+Math.sin(this.clock*.2+p.phase)*.5,p.y+Math.sin(this.clock*.6+p.phase)*.15,this.focus.z+p.z);}
     this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*.18;this.beacon.setPosition(KINGDOM.lighthouse.x+Math.cos(a)*27.5,18,KINGDOM.lighthouse.z-25.08+Math.sin(a)*27.5);this.beacon.setEulerAngles(0,-a*57.3,90);
   }
