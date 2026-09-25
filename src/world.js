@@ -129,7 +129,7 @@ export class World {
       }));
     };
     const crop=(img,col,row,cols,rows,key=false)=>{const width=Math.floor(img.width/cols),height=Math.floor(img.height/rows),c=document.createElement('canvas');c.width=width;c.height=height;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,col*width,row*height,width,height,0,0,width,height);if(key){const data=ctx.getImageData(0,0,width,height),p=data.data;for(let i=0;i<p.length;i+=4){const magenta=Math.min(p[i],p[i+2])-p[i+1];if(magenta>50&&p[i]>95&&p[i+2]>90){p[i+3]=Math.max(0,255-(magenta-50)*5);if(p[i+3]<30)p[i+3]=0;}}ctx.putImageData(data,0,0);}return c;};
-    load('/assets/materials.png',(img,own)=>{
+    load('/assets/materials.webp',(img,own)=>{
       const prepared=[];
       for(const [key,col,row] of [['cobble',0,0],['stone',1,0],['wood',2,0],['roof',0,1]]){
         const tile=crop(img,col,row,3,2),height=document.createElement('canvas');height.width=height.height=512;
@@ -145,13 +145,13 @@ export class World {
         for(const m of this.sharedMaterials){if(m.bumpMap===this.textures[key]){m.bumpMap=t;m.bumpScale={stone:.10,wood:.03,roof:.08,cobble:.045,ground:.015}[key];m.needsUpdate=true;}}
       }
     });
-    load('/assets/art-polish/meadow.png',img=>{this.textures.ground.image=img;this.textures.ground.needsUpdate=true;});
-    load('/assets/art-polish/workshop-rug.png',(img,own)=>{const t=own(new THREE.Texture(img));t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;t.needsUpdate=true;this.textures.workshopRug=t;});
-    load('/assets/art-polish/kingdom-banner.png',(img,own)=>{const t=own(new THREE.Texture(img));t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;t.needsUpdate=true;this.textures.kingdomBanner=t;});
-    load('/assets/trees.png',(img,own)=>{const textures=[];for(let i=0;i<6;i++){const t=own(new THREE.CanvasTexture(crop(img,i%3,Math.floor(i/3),3,2,true)));t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;textures.push(t);}this.treeTextures=textures;for(const entry of this.treeModels||[])this.applyTreeArt(entry);});
-    for(const set of ['main','north','village'])load(`/assets/art-polish/portraits-${set}.png`);
-    load('/assets/art-polish/waterside-plants.png',(img,own)=>{this.bankTextures=[];for(let i=0;i<3;i++){const t=own(new THREE.CanvasTexture(crop(img,i,0,3,1)));t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;this.bankTextures.push(t);}});
-    load('/assets/ohm.png',(img,own)=>{
+    load('/assets/art-polish/meadow.webp',img=>{this.textures.ground.image=img;this.textures.ground.needsUpdate=true;});
+    load('/assets/art-polish/workshop-rug.webp',(img,own)=>{const t=own(new THREE.Texture(img));t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;t.needsUpdate=true;this.textures.workshopRug=t;});
+    load('/assets/art-polish/kingdom-banner.webp',(img,own)=>{const t=own(new THREE.Texture(img));t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;t.needsUpdate=true;this.textures.kingdomBanner=t;});
+    load('/assets/trees.webp',(img,own)=>{const textures=[];for(let i=0;i<6;i++){const t=own(new THREE.CanvasTexture(crop(img,i%3,Math.floor(i/3),3,2,true)));t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;textures.push(t);}this.treeTextures=textures;for(const entry of this.treeModels||[])this.applyTreeArt(entry);});
+    for(const set of ['main','north','village'])load(`/assets/art-polish/portraits-${set}.webp`);
+    load('/assets/art-polish/waterside-plants.webp',(img,own)=>{this.bankTextures=[];for(let i=0;i<3;i++){const t=own(new THREE.CanvasTexture(crop(img,i,0,3,1)));t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;this.bankTextures.push(t);}});
+    load('/assets/ohm.webp',(img,own)=>{
       const directions=[];
       for(let row=0;row<4;row++){
         const frames=[];
@@ -170,8 +170,8 @@ export class World {
       }
       this.ohmFrames=directions;
     });
-    load('/assets/art-polish/portrait-ohm.png');
-    for(const name of HUMAN_ACTORS)load(`/assets/actors/${name}.png`,(img,own)=>{
+    load('/assets/art-polish/portrait-ohm.webp');
+    for(const name of HUMAN_ACTORS)load(`/assets/actors/${name}.webp`,(img,own)=>{
       const tiles=[],bounds=[],width=img.naturalWidth||img.width,height=img.naturalHeight||img.height;
       for(let row=0;row<ACTOR_ATLAS.rows;row++)for(let col=0;col<ACTOR_ATLAS.columns;col++){
         const x=Math.round(col*width/ACTOR_ATLAS.columns),y=Math.round(row*height/ACTOR_ATLAS.rows),w=Math.round((col+1)*width/ACTOR_ATLAS.columns)-x,h=Math.round((row+1)*height/ACTOR_ATLAS.rows)-y;

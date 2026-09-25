@@ -74,7 +74,7 @@ function regionalSvg(state, objectiveArea) {
   // The workshop shares the village cluster; a second illustration would cover its label.
   const sketches=[...nodes.values()].filter(node=>visited.has(node.id)&&node.id!=='workshop').map(node=>{
     const index=artOrder.indexOf(node.id),col=index%3,row=Math.floor(index/3),x=node.id==='workshop'?42:node.sx-35,y=node.sy-36;
-    return `<svg class="journey-landmark-art" x="${x}" y="${y}" width="38" height="38" viewBox="${col*100} ${row*100} 100 100" aria-hidden="true"><image href="/assets/art-polish/map-landmarks.png" width="300" height="300"/></svg>`;
+    return `<svg class="journey-landmark-art" x="${x}" y="${y}" width="38" height="38" viewBox="${col*100} ${row*100} 100 100" aria-hidden="true"><image href="/assets/art-polish/map-landmarks.webp" width="300" height="300"/></svg>`;
   }).join('');
   const waterPoints=WATERCOURSE.map(p=>project(p).map(n).join(',')).join(' ');
   const districts=graph.nodes.filter(node=>node.id!=='workshop').map(node=>{const [x,y]=project([node.x,node.z]),layout=AREA_LAYOUTS[node.id];return `<g class="kingdom-district" opacity="${visited.has(node.id)?1:.4}">${layout.buildings.map(b=>`<rect x="${n(x+(b.x-b.w/2)*scale)}" y="${n(y+(b.z-b.d/2)*scale)}" width="${n(b.w*scale)}" height="${n(b.d*scale)}"/>`).join('')}</g>`;}).join('');

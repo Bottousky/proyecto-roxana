@@ -15,15 +15,15 @@ export async function surface(app:Application,name:string){
   if(textures.has(name))return textures.get(name)!;
   if(name==='glow'){const c=canvas(128,128),x=c.getContext('2d')!,g=x.createRadialGradient(64,64,2,64,64,64);g.addColorStop(0,'#ffffff');g.addColorStop(.22,'#ffffffb0');g.addColorStop(.65,'#ffffff30');g.addColorStop(1,'#ffffff00');x.fillStyle=g;x.fillRect(0,0,128,128);return texture(app,name,c);}
   const cells:Record<string,number[]>={cobble:[0,0],stone:[1,0],wood:[2,0],roof:[0,1]};
-  if(cells[name]){const [x,y]=cells[name];return texture(app,name,crop(await image('/assets/materials.png'),x,y,3,2),true);}
-  if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image('/assets/trees.png'),i%3,Math.floor(i/3),3,2,true));}
-  if(name.startsWith('bank'))return texture(app,name,crop(await image('/assets/art-polish/waterside-plants.png'),Number(name.slice(4)),0,3,1));
+  if(cells[name]){const [x,y]=cells[name];return texture(app,name,crop(await image('/assets/materials.webp'),x,y,3,2),true);}
+  if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image('/assets/trees.webp'),i%3,Math.floor(i/3),3,2,true));}
+  if(name.startsWith('bank'))return texture(app,name,crop(await image('/assets/art-polish/waterside-plants.webp'),Number(name.slice(4)),0,3,1));
   if(name==='water'){const c=canvas(256,256),x=c.getContext('2d')!;x.fillStyle='#356e70';x.fillRect(0,0,256,256);for(let i=0;i<40;i++){const y=(i*61)%256,xx=(i*97)%256;x.strokeStyle=i%3?'#669b922a':'#b7c9a63a';x.lineWidth=1;x.beginPath();x.moveTo(xx,y);x.quadraticCurveTo(xx+9,y-2,xx+18,y);x.stroke();}return texture(app,name,c,true);}
-  const urls:Record<string,string>={ground:'meadow.png',workshopRug:'workshop-rug.png',kingdomBanner:'kingdom-banner.png'};
+  const urls:Record<string,string>={ground:'meadow.webp',workshopRug:'workshop-rug.webp',kingdomBanner:'kingdom-banner.webp'};
   return texture(app,name,await image('/assets/art-polish/'+urls[name]),name==='ground');
 }
 export async function actorArt(app:Application,name:string){
-  const ohm=name==='ohm',cols=ohm?6:5,rows=4,img=await image(ohm?'/assets/ohm.png':`/assets/actors/${name}.png`),tiles:HTMLCanvasElement[]=[],bounds:ReturnType<typeof opaqueBounds>[]=[];
+  const ohm=name==='ohm',cols=ohm?6:5,rows=4,img=await image(ohm?'/assets/ohm.webp':`/assets/actors/${name}.webp`),tiles:HTMLCanvasElement[]=[],bounds:ReturnType<typeof opaqueBounds>[]=[];
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const tile=crop(img,c,r,cols,rows,true);tiles.push(tile);bounds.push(opaqueBounds(tile.getContext('2d')!.getImageData(0,0,tile.width,tile.height).data,tile.width,tile.height));}
   const sheet=canvas(cols*256,rows*256),ctx=sheet.getContext('2d')!,layout=actorFrameLayout(bounds);
   tiles.forEach((tile,i)=>{const b=bounds[i],p=ohm?{x:128-b.width/2,y:244-b.height,width:b.width,height:b.height}:layout.placements[i];ctx.drawImage(tile,b.x,b.y,b.width,b.height,(i%cols)*256+p.x,Math.floor(i/cols)*256+p.y,p.width,p.height);});

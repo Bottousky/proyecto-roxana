@@ -11,7 +11,7 @@ for(const name of modules){
  if(name==='world-inhabitants')text=text.replace('if (actor.g === world.player || !object?.character) continue;', 'if (actor.g === world.player || !object?.character || actor.inhabitant) continue;');
  // The river mouth is now authored with the shared geography.
  if(name==='main')text=text.replace("if(world && started && mode!=='title'", "if(world && !world.disposed && started && mode!=='title'");
- if(name==='world-map')text=text.replace('href="/assets/art-polish/map-landmarks.png"','href="./assets/art-polish/map-landmarks.png"');
+ if(name==='world-map')text=text.replace('href="/assets/art-polish/map-landmarks.webp"','href="./assets/art-polish/map-landmarks.webp"');
  fs.writeFileSync(new URL(name+'.js',out),text);
 }
 // Layout only needs the footprints, never the Three.js builder.

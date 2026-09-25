@@ -2,7 +2,7 @@
 // Start the production server on 4180, then run this script and open 4181.
 import http from 'node:http';
 import {Readable} from 'node:stream';
-const failOnce=new Set(['/assets/actors/player.png','/assets/portraits.png']);
+const failOnce=new Set(['/assets/actors/player.webp','/assets/portraits.webp']);
 http.createServer(async(req,res)=>{
   const requestURL=new URL(req.url,'http://qa.local');
   const target=new URL('http://127.0.0.1:4180');target.pathname=requestURL.pathname;target.search=requestURL.search;
