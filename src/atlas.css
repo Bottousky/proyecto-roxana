@@ -1,0 +1,46 @@
+/* Folded field atlas: the same geometry and people as the playable place. */
+.map-modal{width:min(1160px,100%);background:linear-gradient(100deg,#413627,#302a21);padding:24px 28px 18px}
+.map-modal h2{font-size:37px;line-height:1.1;margin-top:6px}
+.map-modal .modal-intro{font:17px/1.25 'Cormorant Garamond',Georgia,serif;margin-top:9px}
+.map-modal .world-map-layout{margin-top:18px;background:linear-gradient(90deg,#d5c49c,#ecdfba 35%,#b8a580 36%,#e9ddba 38%,#dfcfaa);box-shadow:0 3px 0 #96815c,0 7px 0 -2px #e6d7b2}
+.map-modal .journey-section,.map-modal .local-map-section{background:none;padding:19px 21px 16px}
+.map-modal .journey-section{border-color:#8c795d55}
+.map-modal .world-map-layout h3{color:#514d38;font-size:27px}
+.map-modal .world-map-layout .eyebrow{color:#807449}
+.map-modal .journey-map{max-height:390px;margin:0 auto}
+.map-modal .local-map{max-height:350px;margin:2px 0 3px}
+.map-modal .journey-edge path{stroke:#857753}.map-modal .journey-edge.unknown path{stroke:#b3a27e}
+.map-modal .journey-edge.locked path,.map-modal .journey-edge .journey-bar{stroke:#935d42}
+.map-modal .journey-node circle{fill:#d9c9a5;stroke:#9b8a62}.map-modal .journey-node.visited circle{fill:#85734b;stroke:#53482e}
+.map-modal .journey-node.current circle{fill:#7a4337;stroke:#552f25}.map-modal .journey-node .journey-current-ring{stroke:#8d4f3699!important}
+.map-modal .journey-node text{fill:#554d38;font-size:19px}.map-modal .journey-node.unvisited text{fill:#9a8b64}
+.map-modal .journey-node .journey-you{fill:#8c5138;font-size:8px}
+.map-modal .map-compass{fill:#7c6245}.map-modal .map-north{stroke:#7c6245}
+.map-modal .local-ground{fill:#d7cfac}.map-modal .local-court{fill:#b6a37c66}.map-modal .local-path{stroke:#af966c;stroke-opacity:.75}
+.map-modal .local-exclusion{fill:#bebf9b;stroke:#93957599}.map-modal .local-water,.map-modal .local-exclusion.water{fill:#90aaa0;stroke:#658b88}
+.map-modal .local-surface{fill:#b7a276;stroke:#816f4f}.map-modal .local-border{stroke:#877655}
+.map-modal .local-building rect,.map-modal .local-building circle{fill:#bcb18d;stroke:#756342}
+.map-modal .local-building text{fill:#4b4938;stroke:#d5c9a5;stroke-width:2;font-size:13px}
+.map-modal .local-landmark text{fill:#6b5a3d;stroke:#d7cfac}.map-modal .local-landmark circle{fill:#776346}
+.map-modal .local-mark{fill:#7e563a;stroke:#dfd1a8}.map-modal .local-mark text{fill:#664b36;stroke:#e3d5b0;font-size:16px}
+.map-modal .local-mark.place{fill:#5c7157}.map-modal .local-mark.memory{fill:#795e74}
+.map-modal .local-mark .local-person-leader{fill:none;stroke:#806348;stroke-width:1;opacity:.8}
+.map-modal .local-exit path{stroke:#596d46}.map-modal .local-exit.locked path{stroke:#915539}
+.map-modal .local-exit text{fill:#514d39;stroke:#e5d8b4;stroke-width:4;font-size:18px}
+.map-modal .local-player{fill:#914d3c;stroke:#edd9ad}.map-modal .local-player text{fill:#8a4432;stroke:#e4d3aa}
+.map-modal .local-player .local-player-halo{fill:#9e4f3320;stroke:#9c654a88}
+.map-modal .world-map-key,.map-modal .local-map-note,.map-modal .local-map-zoom-label,.map-modal .local-map-zoom-help{color:#706445}
+.map-modal .key-current{background:#914d3c;box-shadow:0 0 0 2px #914d3c25}.map-modal .key-visited{background:#85734b}
+.map-modal .key-person{background:#7e563a}.map-modal .key-place{background:#5c7157}.map-modal .key-path{background:#af966c}
+.map-modal .world-map-key .key-door{border-color:#596d46}.map-modal .world-map-key .key-locked{color:#915539}
+.map-modal .local-map-note{margin-top:8px;font:15px/1.25 'Cormorant Garamond',Georgia,serif}
+.map-modal .map-destinations{margin-top:14px;padding-top:10px;gap:4px}.map-modal .map-destination{padding:8px 12px;min-height:44px}
+.map-modal .map-destination span{font-size:18px}
+@media(max-width:760px){
+  .map-modal{padding:23px 14px 15px}.map-modal .world-map-layout{background:linear-gradient(100deg,#dfcfaa,#ecdfbd 45%,#d9c49d)}
+  .map-modal .local-map{max-height:none}.map-modal .journey-map{max-height:425px}
+  .map-modal .local-map-section,.map-modal .journey-section{padding:18px 12px}.map-modal .local-building text{font-size:15px}
+  .map-modal .local-mark text{font-size:12px}.map-modal .local-map-zoom-toggle:checked~.local-map-viewport .local-map{max-height:none}
+  .map-modal .local-map-zoom-toggle:checked~.local-map-zoom-help{color:#514d38;font-size:12px}
+  .map-modal .local-map-zoom-toggle:checked~.local-map-viewport{scrollbar-color:#887957 #ddcda8;border-color:#9a876244}
+}

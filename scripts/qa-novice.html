@@ -1,0 +1,15 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ohmdal · Revisión de bancos</title>
+<style>body{margin:0;background:#0c1d22;color:#edddba;font-family:system-ui}nav{position:fixed;top:0;left:0;right:0;display:flex;gap:8px;flex-wrap:wrap;padding:8px;background:#132d32;z-index:100}button,select{min-height:44px;padding:8px;font:inherit}#bench{position:fixed;inset:65px 0 0}iframe{position:fixed;top:75px;left:calc(50% - 195px);width:390px;height:calc(100vh - 80px);border:0}#status{margin:85px 20px}</style>
+<nav><label>Banco <select id="choose"></select></label><button id="open">Abrir banco</button><button id="mobile">Vista móvil</button><button id="desktop">Vista amplia</button></nav><p id="status" role="status">Revisión aislada; no usa ni modifica partidas guardadas.</p><div id="bench"></div>
+<script type="module">
+import '@fontsource/cormorant-garamond/latin-500.css';
+import '@fontsource/inter/latin-400.css';
+import '../src/style.css';
+import {PuzzleWorkbench,PUZZLES} from '../src/puzzles.js';
+const choice=document.querySelector('#choose');for(const [id,p] of Object.entries(PUZZLES)){const o=document.createElement('option');o.value=id;o.textContent=p.title;choice.append(o)}
+const params=new URLSearchParams(location.search);choice.value=params.get('puzzle')||'workshop';
+const workbench=new PuzzleWorkbench(document.querySelector('#bench'),{onClose(){document.querySelector('#status').textContent='Banco cerrado. Las pruebas no modifican una partida.'},onSolve(id){document.querySelector('#status').textContent=`Resuelto: ${id}`}});
+function open(){document.querySelector('iframe')?.remove();document.querySelector('#bench').hidden=false;workbench.close(false);workbench.open(choice.value)}
+document.querySelector('#open').onclick=open;document.querySelector('#desktop').onclick=open;document.querySelector('#mobile').onclick=()=>{workbench.close(false);document.querySelector('#bench').hidden=true;document.querySelector('iframe')?.remove();const frame=document.createElement('iframe');frame.title='Banco en pantalla de 390 píxeles';frame.src=`?compact=1&puzzle=${choice.value}`;document.body.append(frame)};
+if(params.has('compact')){document.querySelector('nav').remove();document.querySelector('#bench').style.inset='0';}open();
+</script></html>

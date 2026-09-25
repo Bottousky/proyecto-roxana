@@ -1,0 +1,34 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ohmdal · Revisión de escenas</title>
+<style>body{margin:0;background:#102b32;color:#ecddbc;font:13px system-ui}nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px}button,select{min-height:40px;background:#29454b;color:#ecddbc;border:1px solid #cbb37660;padding:8px;font:inherit}#frame-wrap{display:flex;justify-content:center}iframe{border:1px solid #b9a57240;width:100%;height:calc(100vh - 100px);background:#0d1e26}iframe.mobile{width:390px;height:700px}#status{margin:0;padding:5px 12px;font-size:11px}</style>
+<nav><label>Escena <select id="scene"><option value="awaken">Despertar de Ohm</option><option value="workshop">Lámpara de Lumen</option><option value="pump">La bomba</option><option value="irrigation">Los bancales</option><option value="beacon_network">La corona</option><option value="beacon_lens">La primera luz</option></select></label><button id="prepare">Preparar escena</button><button id="reload">Recargar juego</button><button id="fresh">Partida nueva</button><label><input id="reduced" type="checkbox"> Movimiento reducido</label><label><input id="mobile" type="checkbox"> Marco móvil</label></nav>
+<p><label style="padding:0 12px">Reloj de revisión <select id="speed"><option value="1">Tiempo real</option><option value="0.15">Cámara lenta</option><option value="0">Congelar plano</option></select></label><label><input type="checkbox" id="hold-reveal" checked> Detener en plano del haz</label></p><p id="status" role="status">Visor de desarrollo: escenarios preparados, separados de la partida de 4180.</p><div id="frame-wrap"><iframe id="game" title="Juego de prueba"></iframe></div>
+<script type="module">
+import {freshState,SAVE_KEY,SETTINGS_KEY} from '../src/state.js';
+import {AREAS,WORLD_SYSTEMS,PUZZLE_STORY} from '../src/content.js';
+import {RESTORATION_SCENES,prepareCinematic} from '../src/cinematic-progress.js';
+const frame=document.querySelector('#game'),originalSave=localStorage.getItem(SAVE_KEY),originalSettings=localStorage.getItem(SETTINGS_KEY);
+const settings=()=>({muted:true,textSpeed:9999,reducedMotion:document.querySelector('#reduced').checked});
+document.querySelector('#fresh').insertAdjacentHTML('afterend','<button id="bench">Banco de Ohm sin resolver</button>');
+const clockWrapped=new WeakSet();
+async function openGame(state){await new Promise(resolve=>{frame.onload=resolve;frame.src='about:blank';});if(state)localStorage.setItem(SAVE_KEY,JSON.stringify(state));else localStorage.removeItem(SAVE_KEY);localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings()));frame.src='/?qa-cinematics='+Date.now();}
+document.querySelector('#prepare').onclick=()=>{
+  const id=document.querySelector('#scene').value,scene=RESTORATION_SCENES[id],state=freshState(settings());state.area=scene.area;
+  const order=['awaken','workshop','gate','pump','distribution','irrigation','beacon_supply','beacon_network','beacon_lens'];
+  for(const flag of order.slice(0,order.indexOf(id)+1))state.flags[flag]=true;
+  for(let pass=0;pass<3;pass++)for(const system of WORLD_SYSTEMS)if(state.flags[system.latch]){state.flags[system.flag]=true;for(const flag of system.requires||[])state.flags[flag]=true;for(const flag of system.off||[])state.flags[flag]=false;}
+  const area=AREAS[state.area],panel=area.objects.find(o=>o.puzzle===id);state.position=panel?[panel.x,panel.z+3]:area.spawn;
+  state.visited=[state.area];state.seen=[area.entryDialogue,...WORLD_SYSTEMS.map(s=>'world:'+s.flag)].filter(Boolean);
+  prepareCinematic(state,id);openGame(state);
+};
+document.querySelector('#reload').onclick=()=>frame.contentWindow.location.reload();
+document.querySelector('#fresh').onclick=()=>openGame(null);
+document.querySelector('#bench').onclick=()=>{const state=freshState(settings());state.position=[3.5,3];state.visited=['portal'];state.seen=[AREAS.portal.entryDialogue,PUZZLE_STORY.awaken.arrival];openGame(state);};
+document.querySelector('#mobile').onchange=e=>frame.classList.toggle('mobile',e.target.checked);
+setInterval(()=>{
+  const game=frame.contentWindow?.__ohmdal;if(!game?.world)return;
+  if(!clockWrapped.has(game.world)){const update=game.world.update;game.world.update=function(dt,...args){let step=dt*Number(document.querySelector('#speed').value);if(this.cinematic?.timeline.id==='beacon_lens'&&document.querySelector('#hold-reveal').checked&&!this.getCinematicState().returning)step=Math.min(step,Math.max(0,7.1-this.cinematic.elapsed));return update.call(this,step,...args);};clockWrapped.add(game.world);}
+  const view=game.world.getCinematicState(),saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+  document.querySelector('#status').textContent=`Modo: ${game.mode} · escena: ${view?.id||'ninguna'}${view?.returning?' (regreso)':''} · pendiente guardado: ${saved?.activeCinematic?.id||'ninguna'} · diálogo: ${saved?.activeDialogue?.id||'ninguno'} · cámara X: ${game.world.cameraOffset.x.toFixed(2)} · jugador: ${game.world.getPlayerPosition().map(n=>n.toFixed(2)).join(', ')} · final pendiente: ${!!saved?.endingPending}`;
+},100);
+addEventListener('beforeunload',()=>{for(const [key,value] of [[SAVE_KEY,originalSave],[SETTINGS_KEY,originalSettings]])if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);});
+</script></html>

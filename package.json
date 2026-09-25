@@ -1,0 +1,26 @@
+{
+  "name": "ohmdal-la-luz",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Ohmdal — La Luz. Una aventura sobre volver a comprender el mundo.",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4173 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "start": "node scripts/server.mjs",
+    "test": "node --test tests/*.test.js",
+    "test:journey": "node tests/playthrough.mjs",
+    "test:ui": "node tests/ui-checks.mjs",
+    "test:workbenches": "node scripts/qa-workbench-ergonomics.mjs"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0",
+    "vite": "^7.1.0"
+  }
+}

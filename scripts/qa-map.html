@@ -1,0 +1,32 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ohmdal · Revisión del mapa</title>
+<style>body{margin:0;background:#102b32;color:#ecddbc;font:13px system-ui}nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px}button,select{min-height:40px;background:#29454b;color:#ecddbc;border:1px solid #cbb37660;padding:8px;font:inherit}#frame-wrap{display:flex;justify-content:center}iframe{border:1px solid #b9a57240;width:100%;height:calc(100vh - 85px);background:#0d1e26}iframe.mobile{width:390px;height:700px}p{margin:0;padding:5px 12px}</style>
+<nav><label>Zona <select id="area"></select></label><button id="prepare">Preparar visita</button><label><input id="explored" type="checkbox" checked> Valle visitado</label><label><input id="mobile" type="checkbox"> Marco móvil</label><label>Tamaño <select id="size"><option value="390,700">390 × 700</option><option value="360,640">360 × 640</option><option value="844,390">844 × 390</option></select></label><label><input id="touch" type="checkbox"> Simular controles táctiles</label></nav>
+<p>Visor de desarrollo. Retomar y abrir M dentro del juego. La partida de 4180 queda separada.</p><div id="frame-wrap"><iframe id="game" title="Juego de prueba del mapa"></iframe></div>
+<script type="module">
+import {freshState,SAVE_KEY,SETTINGS_KEY} from '../src/state.js';
+import {AREAS,WORLD_SYSTEMS,PUZZLE_STORY,DIALOGUES,CHARACTERS} from '../src/content.js';
+const frame=document.querySelector('#game'),select=document.querySelector('#area'),originalSave=localStorage.getItem(SAVE_KEY),originalSettings=localStorage.getItem(SETTINGS_KEY);
+select.innerHTML=Object.values(AREAS).map(a=>`<option value="${a.id}" ${a.id==='plaza'?'selected':''}>${a.name}</option>`).join('');
+const portraitLabel=document.createElement('label');portraitLabel.textContent='Retrato ';const portraitSelect=document.createElement('select');portraitSelect.id='portrait-review';portraitLabel.append(portraitSelect);document.querySelector('nav').append(portraitLabel);
+const report=document.createElement('p');report.id='art-report';document.querySelector('nav').after(report);setInterval(()=>{const doc=frame.contentDocument,portrait=doc?.querySelector('#portrait');if(!portrait)return;const style=frame.contentWindow.getComputedStyle(portrait),bounds=portrait.getBoundingClientRect();report.textContent=`Retrato: ${portrait.className} · ${Math.round(bounds.width)} × ${Math.round(bounds.height)} · ${style.backgroundImage} · ${style.backgroundSize}`;},1000);
+portraitSelect.add(new Option('Sin conversación',''));for(const [id,c] of Object.entries(CHARACTERS))if(id!=='narrator')portraitSelect.add(new Option(c.name,id));
+document.querySelector('#prepare').onclick=async()=>{
+  await new Promise(resolve=>{frame.onload=resolve;frame.src='about:blank'});
+  const settings={muted:true,textSpeed:9999,reducedMotion:true},state=freshState(settings),area=AREAS[select.value];
+  state.area=area.id;state.position=area.id==='plaza'?[-13,10]:area.spawn;state.flags.awaken=true;state.flags.workshop=true;
+  state.visited=document.querySelector('#explored').checked?Object.keys(AREAS):['portal',area.id];
+  state.seen=[...Object.values(AREAS).map(a=>a.entryDialogue),...Object.values(PUZZLE_STORY).map(s=>s.arrival),...WORLD_SYSTEMS.map(s=>'world:'+s.flag)].filter(Boolean);
+  if(portraitSelect.value){for(const [id,lines] of Object.entries(DIALOGUES)){const index=Array.isArray(lines)?lines.findIndex(line=>line.speaker===portraitSelect.value):-1;if(index>=0){state.activeDialogue={id,index};break;}}}
+  localStorage.setItem(SAVE_KEY,JSON.stringify(state));localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));frame.src='/?qa-map='+Date.now();
+};
+function viewport(){
+  const mobile=document.querySelector('#mobile').checked,[width,height]=document.querySelector('#size').value.split(',');
+  frame.classList.toggle('mobile',mobile);frame.style.width=mobile?width+'px':'';frame.style.height=mobile?height+'px':'';
+  const doc=frame.contentDocument;if(!doc?.head)return;
+  doc.querySelector('#qa-touch-preview')?.remove();
+  if(document.querySelector('#touch').checked){const style=doc.createElement('style');style.id='qa-touch-preview';style.textContent='#touch-controls{display:flex}.hud-bottom{visibility:hidden}.objective{bottom:145px}.interaction button{min-height:44px}.interaction .field-measure{min-height:44px}.hud-tools .icon-button{min-width:44px}@media(max-height:500px){.objective{bottom:20px}}';doc.head.append(style);}
+}
+for(const id of ['mobile','size','touch'])document.querySelector('#'+id).onchange=viewport;
+frame.addEventListener('load',viewport);
+addEventListener('beforeunload',()=>{for(const [key,value] of [[SAVE_KEY,originalSave],[SETTINGS_KEY,originalSettings]])if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value)});
+</script></html>

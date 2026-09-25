@@ -1,0 +1,15 @@
+# Ohm: forma y futura figura
+
+Ohm es un pequeño instrumento vivo, no un humanoide. Su silueta consiste en una sola carcasa ovoide de latón, una lente ocular cian empotrada y dos patines anchos integrados. No tiene cabeza separada, torso, brazos, dedos, antena ni bufanda. La expresión se comunica con la lente, una inclinación mínima y el ritmo del movimiento.
+
+El modelo del pedestal usa la misma carcasa, franja inferior verde petróleo y apoyos que el compañero ilustrado. La base de ambos patines es plana y la carcasa los solapa; los detalles del ojo son relieves bajos, unidos al cuerpo. La franja y la lente pueden pintarse sobre una figura de un solo material.
+
+El compañero usa el arte original `public/assets/ohm.png`: seis poses en cada una de cuatro direcciones (frente, derecha, espalda e izquierda). Los recortes mantienen su escala y alinean los pies para evitar saltos al girar. Se elige la dirección del desplazamiento y se animan ocho poses por segundo durante la marcha; al detenerse, pausar o activar movimiento reducido se usa la pose de reposo de esa dirección.
+
+Para una futura figura de sobremesa se propone una altura aproximada de 55 mm. Al preparar el archivo imprimible se unificarán carcasa, patines y aro del ojo en un sólido cerrado, conservando la base plana y redondeando las uniones. El modelo de escena actual es una referencia visual de varias mallas superpuestas, todavía no un STL preparado para impresión. El grosor final de relieves y tolerancias se ajustará al tamaño y al proceso de impresión elegidos.
+
+La cámara de exploración mira por el eje Z, con una elevación de unos 28°. Derecha/izquierda corresponden al eje X y arriba/abajo al eje Z: las colisiones y rutas mantienen sus coordenadas. La revelación del Faro recupera suavemente su encuadre diagonal; las ilustraciones de árboles acompañan ese giro.
+
+Comprobación del apoyo (9 de septiembre de 2026): la caja envolvente del modelo del pedestal va de Y=0 a Y=1,37, con ocho mallas para carcasa, color inferior, apoyos y ocular. El compañero usa un sprite y una sombra, sin geometría humanoide. Los 24 recortes se anclan en la fila 244 de un lienzo de 256 píxeles; `Sprite.center.y=12/256` hace coincidir esa línea con el punto de apoyo. En coordenadas locales ese punto está en Y=0,025 y la sombra en Y=0,022 para evitar interferencias con el terreno. Se comprobaron estas posiciones y la proyección recta mediante aserciones de Three.js, además del contrato de carga y reintento de los ocho PNG críticos.
+
+El Portal registra las cotas de sus escalones (0,17, 0,26 y 0,35) y eleva a ambos viajeros hasta la superficie que pisan. El pedestal es un obstáculo real con una distancia de aproximación compatible con la interacción. Ohm sigue rutas transitables y valida cada paso; no cruza el pedestal en línea recta. Al restaurar una partida dentro de ese volumen se busca una posición libre cercana, conservando el progreso. Las cuatro regresiones de `tests/world-navigation.test.js` verifican aproximación, recuperación del guardado, alturas y seguimiento alrededor del mecanismo, incluida la pausa.

@@ -1,0 +1,7 @@
+{
+  "mode": "built-in image_gen",
+  "prompt": "Precise object edit for the title screen of Ohmdal. Image 1 is the edit target: preserve its exact wide landscape composition, kingdom, sunset, architecture, mountains, water, human traveler, painterly style and all surrounding details. Replace ONLY the tiny old humanoid brass robot standing just left of the traveler on the lower-right cliff. Image 2 is the canonical Ohm design reference: a simple single round spherical brass and dark teal body, one luminous cyan circular lens set directly into that sphere, circular side caps, two tiny low rounded feet. NO separate head, NO neck, NO arms or hands, NO humanoid torso. Match this silhouette at the original little companion's location and roughly original scale (knee-height to the traveler), three-quarter orientation toward the kingdom, with a hint of the cyan lens visible. Render the new Ohm in the same detailed painterly sunset light as the target, grounded on the cliff with correct contact shadow, not a pasted cartoon. No lettering, no new objects, no changes elsewhere. Maintain landscape aspect ratio.",
+  "source": "public/assets/cover.png",
+  "reference": "public/assets/art-polish/portrait-ohm.png",
+  "output": "public/assets/cover-ohm-canonical.png"
+}

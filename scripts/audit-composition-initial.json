@@ -1,0 +1,1354 @@
+{
+  "capturedAt": "2026-09-09T18:08:40.143Z",
+  "reports": [
+    {
+      "area": "portal",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "portal-keeper",
+          "label": "Casa del Portal",
+          "position": [
+            -10.36,
+            -7.199999999999999
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 3,
+            "fraction": 0.2,
+            "blockers": [
+              "CylinderGeometry@-9.2,-5",
+              "BoxGeometry@-9.2,-5"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  -9.352,
+                  1.15,
+                  -5.14
+                ],
+                "blocker": "CylinderGeometry@-9.2,-5",
+                "hit": [
+                  -9.352,
+                  1.436,
+                  -4.61
+                ]
+              },
+              {
+                "sample": [
+                  -9.352,
+                  2.2,
+                  -5.14
+                ],
+                "blocker": "CylinderGeometry@-9.2,-5",
+                "hit": [
+                  -9.352,
+                  2.486,
+                  -4.61
+                ]
+              },
+              {
+                "sample": [
+                  -9.352,
+                  3.25,
+                  -5.14
+                ],
+                "blocker": "BoxGeometry@-9.2,-5",
+                "hit": [
+                  -9.352,
+                  3.609,
+                  -4.475
+                ]
+              }
+            ]
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 6,
+            "fraction": 0.6666666666666666,
+            "blockers": [
+              "alpha-billboard@-13.014,3.116"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  -10.654,
+                  0.387,
+                  -4.973
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -10.654,
+                  4.755,
+                  3.116
+                ]
+              },
+              {
+                "sample": [
+                  -10.36,
+                  0.387,
+                  -4.973
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -10.36,
+                  4.755,
+                  3.116
+                ]
+              },
+              {
+                "sample": [
+                  -10.654,
+                  1.15,
+                  -4.973
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -10.654,
+                  5.518,
+                  3.116
+                ]
+              },
+              {
+                "sample": [
+                  -10.36,
+                  1.15,
+                  -4.973
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -10.36,
+                  5.518,
+                  3.116
+                ]
+              },
+              {
+                "sample": [
+                  -10.654,
+                  1.913,
+                  -4.973
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -10.654,
+                  6.281,
+                  3.116
+                ]
+              },
+              {
+                "sample": [
+                  -10.36,
+                  1.913,
+                  -4.973
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -10.36,
+                  6.281,
+                  3.116
+                ]
+              }
+            ]
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 6,
+            "fraction": 0.4,
+            "blockers": [
+              "alpha-billboard@-15.248,4.532",
+              "alpha-billboard@-13.014,3.116"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  -12.376,
+                  1.15,
+                  -5.14
+                ],
+                "blocker": "alpha-billboard@-15.248,4.532",
+                "hit": [
+                  -12.376,
+                  6.373,
+                  4.532
+                ]
+              },
+              {
+                "sample": [
+                  -11.368,
+                  1.15,
+                  -5.14
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -11.368,
+                  5.608,
+                  3.116
+                ]
+              },
+              {
+                "sample": [
+                  -10.36,
+                  1.15,
+                  -5.14
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -10.36,
+                  5.608,
+                  3.116
+                ]
+              },
+              {
+                "sample": [
+                  -12.376,
+                  2.2,
+                  -5.14
+                ],
+                "blocker": "alpha-billboard@-15.248,4.532",
+                "hit": [
+                  -12.376,
+                  7.423,
+                  4.532
+                ]
+              },
+              {
+                "sample": [
+                  -11.368,
+                  2.2,
+                  -5.14
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -11.368,
+                  6.658,
+                  3.116
+                ]
+              },
+              {
+                "sample": [
+                  -10.36,
+                  2.2,
+                  -5.14
+                ],
+                "blocker": "alpha-billboard@-13.014,3.116",
+                "hit": [
+                  -10.36,
+                  6.658,
+                  3.116
+                ]
+              }
+            ]
+          },
+          "screen": {
+            "left": -13.255,
+            "right": -7.464999999999999,
+            "bottom": 2.066897779096745,
+            "top": 9.420311182587785
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": []
+    },
+    {
+      "area": "plaza",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "plaza-bakery",
+          "label": "Panadería",
+          "position": [
+            -12.54,
+            -10.24
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 9,
+            "fraction": 1,
+            "blockers": [
+              "plaza-workshop"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  -12.834,
+                  0.387,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.834,
+                  7.501,
+                  6.161
+                ]
+              },
+              {
+                "sample": [
+                  -12.54,
+                  0.387,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.54,
+                  7.501,
+                  6.161
+                ]
+              },
+              {
+                "sample": [
+                  -12.246,
+                  0.387,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.246,
+                  7.501,
+                  6.161
+                ]
+              },
+              {
+                "sample": [
+                  -12.834,
+                  1.15,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.834,
+                  8.082,
+                  5.823
+                ]
+              },
+              {
+                "sample": [
+                  -12.54,
+                  1.15,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.54,
+                  8.015,
+                  5.7
+                ]
+              },
+              {
+                "sample": [
+                  -12.246,
+                  1.15,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.246,
+                  7.926,
+                  5.535
+                ]
+              },
+              {
+                "sample": [
+                  -12.834,
+                  1.913,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.834,
+                  8.899,
+                  5.924
+                ]
+              },
+              {
+                "sample": [
+                  -12.54,
+                  1.913,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.54,
+                  8.867,
+                  5.865
+                ]
+              },
+              {
+                "sample": [
+                  -12.246,
+                  1.913,
+                  -7.013
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.246,
+                  8.636,
+                  5.436
+                ]
+              }
+            ]
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 10,
+            "fraction": 0.6666666666666666,
+            "blockers": [
+              "plaza-workshop"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  -15.48,
+                  1.39,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -15.48,
+                  8.101,
+                  5.278
+                ]
+              },
+              {
+                "sample": [
+                  -14.01,
+                  1.39,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -14.01,
+                  8.329,
+                  5.7
+                ]
+              },
+              {
+                "sample": [
+                  -12.54,
+                  1.39,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.54,
+                  8.329,
+                  5.7
+                ]
+              },
+              {
+                "sample": [
+                  -11.07,
+                  1.39,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -11.07,
+                  8.101,
+                  5.278
+                ]
+              },
+              {
+                "sample": [
+                  -9.6,
+                  1.39,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -9.6,
+                  8.101,
+                  5.278
+                ]
+              },
+              {
+                "sample": [
+                  -15.48,
+                  2.8,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -15.48,
+                  8.887,
+                  4.122
+                ]
+              },
+              {
+                "sample": [
+                  -14.01,
+                  2.8,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -14.01,
+                  8.887,
+                  4.122
+                ]
+              },
+              {
+                "sample": [
+                  -12.54,
+                  2.8,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -12.54,
+                  8.887,
+                  4.122
+                ]
+              },
+              {
+                "sample": [
+                  -11.07,
+                  2.8,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -11.07,
+                  8.887,
+                  4.122
+                ]
+              },
+              {
+                "sample": [
+                  -9.6,
+                  2.8,
+                  -7.15
+                ],
+                "blocker": "plaza-workshop",
+                "hit": [
+                  -9.6,
+                  8.887,
+                  4.122
+                ]
+              }
+            ]
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -16.535,
+            "right": -8.544999999999998,
+            "bottom": 2.675088389957397,
+            "top": 12.41845683929502
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        },
+        {
+          "id": "plaza-civic-house",
+          "label": "Casa de la Plaza",
+          "position": [
+            12.16,
+            -10.56
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 1,
+            "fraction": 0.06666666666666667,
+            "blockers": [
+              "ConeGeometry@10.6,-4.5"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  10.522,
+                  1.57,
+                  -7.47
+                ],
+                "blocker": "ConeGeometry@10.6,-4.5",
+                "hit": [
+                  10.522,
+                  3.3,
+                  -4.266
+                ]
+              }
+            ]
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": 7.764999999999999,
+            "right": 16.555,
+            "bottom": 3.1882492178710717,
+            "top": 13.362419349901657
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        },
+        {
+          "id": "plaza-workshop",
+          "label": "Taller de Lumen",
+          "position": [
+            -13.25,
+            3.8
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -18.345,
+            "right": -8.155,
+            "bottom": -4.157553003930235,
+            "top": 7.639655428402902
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        },
+        {
+          "id": "plaza-market",
+          "label": "Mercado",
+          "position": [
+            16.72,
+            3
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 9,
+            "fraction": 1,
+            "blockers": [
+              "alpha-billboard@17.629,14.448"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  16.426,
+                  0.387,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  16.426,
+                  4.826,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  16.72,
+                  0.387,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  16.72,
+                  4.826,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  17.014,
+                  0.387,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  17.014,
+                  4.826,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  16.426,
+                  1.15,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  16.426,
+                  5.589,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  16.72,
+                  1.15,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  16.72,
+                  5.589,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  17.014,
+                  1.15,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  17.014,
+                  5.589,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  16.426,
+                  1.913,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  16.426,
+                  6.352,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  16.72,
+                  1.913,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  16.72,
+                  6.352,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  17.014,
+                  1.913,
+                  6.227
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  17.014,
+                  6.352,
+                  14.448
+                ]
+              }
+            ]
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 4,
+            "fraction": 0.26666666666666666,
+            "blockers": [
+              "alpha-billboard@17.629,14.448"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  15.565,
+                  1.29,
+                  6.09
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  15.565,
+                  5.803,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  16.72,
+                  1.29,
+                  6.09
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  16.72,
+                  5.803,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  17.875,
+                  1.29,
+                  6.09
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  17.875,
+                  5.803,
+                  14.448
+                ]
+              },
+              {
+                "sample": [
+                  19.03,
+                  1.29,
+                  6.09
+                ],
+                "blocker": "alpha-billboard@17.629,14.448",
+                "hit": [
+                  19.03,
+                  5.803,
+                  14.448
+                ]
+              }
+            ]
+          },
+          "screen": {
+            "left": 13.474999999999998,
+            "right": 19.965,
+            "bottom": -3.6158832411324666,
+            "top": 5.537948591774838
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [
+        {
+          "a": "plaza-bakery",
+          "b": "plaza-workshop",
+          "fraction": 0.51,
+          "width": 7.99,
+          "height": 4.965,
+          "advisory": "Projected bounding envelopes, not opaque pixel coverage"
+        },
+        {
+          "a": "plaza-civic-house",
+          "b": "plaza-market",
+          "fraction": 0.122,
+          "width": 3.08,
+          "height": 2.35,
+          "advisory": "Projected bounding envelopes, not opaque pixel coverage"
+        }
+      ],
+      "roofBoundsOverlaps": []
+    },
+    {
+      "area": "workshop",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": []
+    },
+    {
+      "area": "road",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "road-inn",
+          "label": "Puesto de la Calzada",
+          "position": [
+            -12.92,
+            5.44
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -15.765,
+            "right": -10.075,
+            "bottom": -4.3476125698241885,
+            "top": 3.5008620075507175
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": []
+    },
+    {
+      "area": "spring",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "wheel-house",
+          "label": "Casa de la rueda",
+          "position": [
+            11.56,
+            -9
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 1,
+            "fraction": 0.06666666666666667,
+            "blockers": [
+              "alpha-billboard@15.676,2.466"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  14.08,
+                  1.29,
+                  -6.167
+                ],
+                "blocker": "alpha-billboard@15.676,2.466",
+                "hit": [
+                  14.08,
+                  5.952,
+                  2.466
+                ]
+              }
+            ]
+          },
+          "screen": {
+            "left": 8.065,
+            "right": 15.055000000000001,
+            "bottom": 2.5658041395683737,
+            "top": 11.201723655414655
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": []
+    },
+    {
+      "area": "castle",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": []
+    },
+    {
+      "area": "terraces",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "terrace-forge",
+          "label": "Casa de la forja",
+          "position": [
+            -13.600000000000001,
+            -15.48
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -17.345000000000002,
+            "right": -9.855,
+            "bottom": 5.40244316053563,
+            "top": 14.533045490944787
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0.31999991416931195,
+            "south": 0
+          }
+        },
+        {
+          "id": "terrace-mill",
+          "label": "Casa del molino",
+          "position": [
+            13.600000000000001,
+            -15.84
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 1,
+            "fraction": 0.06666666666666667,
+            "blockers": [
+              "BoxGeometry@12.75,-10.78"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  12.445,
+                  3.65,
+                  -13.265
+                ],
+                "blocker": "BoxGeometry@12.75,-10.78",
+                "hit": [
+                  12.445,
+                  5.014,
+                  -10.74
+                ]
+              }
+            ]
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": 10.355,
+            "right": 16.845000000000002,
+            "bottom": 5.934609945038701,
+            "top": 14.08816532188931
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0.6799999141693114,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": []
+    },
+    {
+      "area": "lake",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "lake-house",
+          "label": "Casa del lago",
+          "position": [
+            -14,
+            -10.88
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 1,
+            "fraction": 0.06666666666666667,
+            "blockers": [
+              "alpha-billboard@-19.174,0.829"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  -16.94,
+                  1.33,
+                  -7.79
+                ],
+                "blocker": "alpha-billboard@-19.174,0.829",
+                "hit": [
+                  -16.94,
+                  5.984,
+                  0.829
+                ]
+              }
+            ]
+          },
+          "screen": {
+            "left": -17.995,
+            "right": -10.004999999999999,
+            "bottom": 2.9791836953877233,
+            "top": 12.45858052542819
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": []
+    },
+    {
+      "area": "lighthouse",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "lighthouse-keeper",
+          "label": "Casa del farero",
+          "position": [
+            -15.48,
+            15.96
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -18.474999999999998,
+            "right": -12.485,
+            "bottom": -8.937551086163166,
+            "top": -1.4961471429064082
+          },
+          "outside": {
+            "west": 0.47499999999999787,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": []
+    }
+  ]
+}

@@ -1,0 +1,718 @@
+{
+  "capturedAt": "2026-09-09T18:40:08.343Z",
+  "reports": [
+    {
+      "area": "portal",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "portal-keeper",
+          "label": "Casa del Portal",
+          "position": [
+            -10.36,
+            -7.2
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 3,
+            "fraction": 0.2,
+            "blockers": [
+              "CylinderGeometry@-9.2,-5",
+              "BoxGeometry@-9.2,-5"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  -9.352,
+                  1.15,
+                  -5.14
+                ],
+                "blocker": "CylinderGeometry@-9.2,-5",
+                "hit": [
+                  -9.352,
+                  1.436,
+                  -4.61
+                ]
+              },
+              {
+                "sample": [
+                  -9.352,
+                  2.2,
+                  -5.14
+                ],
+                "blocker": "CylinderGeometry@-9.2,-5",
+                "hit": [
+                  -9.352,
+                  2.486,
+                  -4.61
+                ]
+              },
+              {
+                "sample": [
+                  -9.352,
+                  3.25,
+                  -5.14
+                ],
+                "blocker": "BoxGeometry@-9.2,-5",
+                "hit": [
+                  -9.352,
+                  3.609,
+                  -4.475
+                ]
+              }
+            ]
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -13.255,
+            "right": -7.464999999999999,
+            "bottom": 2.0668977790967453,
+            "top": 9.420311182587787
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    },
+    {
+      "area": "plaza",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "plaza-bakery",
+          "label": "Panadería",
+          "position": [
+            -5.15,
+            -10.3
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 2,
+            "fraction": 0.13333333333333333,
+            "blockers": [
+              "SphereGeometry@-6.207,-5.029",
+              "TubeGeometry@-6.207,-5.028"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  -6.158,
+                  1.19,
+                  -8.24
+                ],
+                "blocker": "SphereGeometry@-6.207,-5.029",
+                "hit": [
+                  -6.158,
+                  2.976,
+                  -4.933
+                ]
+              },
+              {
+                "sample": [
+                  -5.15,
+                  1.19,
+                  -8.24
+                ],
+                "blocker": "TubeGeometry@-6.207,-5.028",
+                "hit": [
+                  -5.15,
+                  3.018,
+                  -4.855
+                ]
+              }
+            ]
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -8.045000000000002,
+            "right": -2.2550000000000003,
+            "bottom": 3.178746239576374,
+            "top": 10.816677053399868
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        },
+        {
+          "id": "plaza-civic-house",
+          "label": "Casa de la Plaza",
+          "position": [
+            7.2,
+            -10.1
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": 3.705,
+            "right": 10.695000000000002,
+            "bottom": 3.3022849574074438,
+            "top": 11.386714966218104
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        },
+        {
+          "id": "plaza-workshop",
+          "label": "Taller de Lumen",
+          "position": [
+            -13.25,
+            3.8
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -18.345,
+            "right": -8.155,
+            "bottom": -4.157553003930235,
+            "top": 7.639655428402902
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        },
+        {
+          "id": "plaza-market",
+          "label": "Mercado",
+          "position": [
+            14.8,
+            3
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": 11.905,
+            "right": 17.695,
+            "bottom": -3.2832790008180477,
+            "top": 4.634320944596807
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    },
+    {
+      "area": "workshop",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    },
+    {
+      "area": "road",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "road-inn",
+          "label": "Puesto de la Calzada",
+          "position": [
+            -12.92,
+            5.44
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -15.765,
+            "right": -10.075,
+            "bottom": -4.3476125698241885,
+            "top": 3.5008620075507175
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    },
+    {
+      "area": "spring",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "wheel-house",
+          "label": "Casa de la rueda",
+          "position": [
+            11.56,
+            -9
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 2,
+            "fraction": 0.13333333333333333,
+            "blockers": [
+              "spring-waterwheel@8.686,-5.58",
+              "spring-waterwheel@7.82,-5.7"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  9.04,
+                  1.29,
+                  -6.167
+                ],
+                "blocker": "spring-waterwheel@8.686,-5.58",
+                "hit": [
+                  9.04,
+                  1.634,
+                  -5.53
+                ]
+              },
+              {
+                "sample": [
+                  9.04,
+                  3.81,
+                  -6.167
+                ],
+                "blocker": "spring-waterwheel@7.82,-5.7",
+                "hit": [
+                  9.04,
+                  4.108,
+                  -5.616
+                ]
+              }
+            ]
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": 8.065,
+            "right": 15.055000000000001,
+            "bottom": 2.5658041395683737,
+            "top": 11.201723655414655
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    },
+    {
+      "area": "castle",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    },
+    {
+      "area": "terraces",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "terrace-forge",
+          "label": "Casa de la forja",
+          "position": [
+            -13.6,
+            -14.5
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -16.994999999999997,
+            "right": -10.204999999999998,
+            "bottom": 5.269401464409863,
+            "top": 13.494616336845674
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        },
+        {
+          "id": "terrace-mill",
+          "label": "Casa del molino",
+          "position": [
+            13.6,
+            -14.6
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 1,
+            "fraction": 0.06666666666666667,
+            "blockers": [
+              "mill-sails@13.6,-12.35"
+            ],
+            "samples": [
+              {
+                "sample": [
+                  13.6,
+                  4.05,
+                  -12.746
+                ],
+                "blocker": "mill-sails@13.6,-12.35",
+                "hit": [
+                  13.6,
+                  4.29,
+                  -12.302
+                ]
+              }
+            ]
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": 10.704999999999998,
+            "right": 16.494999999999997,
+            "bottom": 5.678029531081863,
+            "top": 13.668494442476712
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    },
+    {
+      "area": "lake",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [
+        {
+          "id": "lake-house",
+          "label": "Casa del lago",
+          "position": [
+            -14,
+            -10.88
+          ],
+          "door": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "facade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaDoor": {
+            "total": 9,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "alphaFacade": {
+            "total": 15,
+            "blocked": 0,
+            "fraction": 0,
+            "blockers": [],
+            "samples": []
+          },
+          "screen": {
+            "left": -17.995,
+            "right": -10.004999999999999,
+            "bottom": 2.9791836953877233,
+            "top": 12.45858052542819
+          },
+          "outside": {
+            "west": 0,
+            "east": 0,
+            "north": 0,
+            "south": 0
+          }
+        }
+      ],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    },
+    {
+      "area": "lighthouse",
+      "cameraOffset": [
+        0,
+        13.5,
+        25
+      ],
+      "buildings": [],
+      "silhouetteOverlaps": [],
+      "roofBoundsOverlaps": [],
+      "roofSurfaceIntersections": []
+    }
+  ]
+}

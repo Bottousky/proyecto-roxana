@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ohmdal · Revisión de composición</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#102c32;color:#efe4ca;font:13px system-ui}canvas{position:fixed;inset:0;width:100%;height:100%;outline:none}
+    #toolbar{position:fixed;z-index:2;top:10px;left:10px;right:10px;padding:9px 12px;background:#102b32f0;border:1px solid #c6af7755}fieldset{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:7px;align-items:center}legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}label{display:inline-flex;align-items:center;gap:6px}button,select{font:inherit;min-height:36px;background:#29454b;color:#f0e6cf;border:1px solid #bba87866;padding:6px 9px}button{cursor:pointer}button:disabled,select:disabled{opacity:.45;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #a1dec4;outline-offset:2px}select{max-width:260px}input{accent-color:#a1dec4}#camera-toggle[aria-pressed=true]{background:#5a4836;border-color:#d6b580}#toolbar p{margin:7px 0 0;font-size:11px;color:#aec3b7}
+    #readout{position:fixed;z-index:2;left:12px;bottom:12px;max-width:min(700px,calc(100vw - 24px));background:#102b32f0;border:1px solid #c6af7740;padding:10px 12px;pointer-events:none}#readout p{margin:3px 0;line-height:1.5}#notice{color:#e6c894}#safety-status[data-safe=false]{color:#ffb4a0}#camera-status{font-size:11px;color:#b5cbbb}#composition-badge{position:fixed;z-index:3;right:12px;bottom:12px;background:#523e29ed;color:#f5dfb3;padding:7px 10px;font-size:10px;letter-spacing:.04em;pointer-events:none}body[data-camera=game] #composition-badge{display:none}body.controls-hidden #toolbar,body.controls-hidden #readout{display:none}@media(max-width:700px){#toolbar{top:6px;left:6px;right:6px;padding:8px}fieldset{gap:5px}select{max-width:210px}#toolbar p{font-size:10px}#readout{font-size:11px;bottom:9px}#composition-badge{bottom:5px;right:6px;font-size:9px}}
+  </style>
+</head>
+<body data-camera="game" data-ready="false">
+  <canvas id="world" aria-label="Mundo real para revisar composición y fachadas" tabindex="0"></canvas>
+  <nav id="toolbar" aria-label="Revisión de composición">
+    <fieldset id="controls" disabled>
+      <legend>Controles del visor</legend>
+      <label>Zona <select id="area"></select></label>
+      <button id="arrival">Llegada</button>
+      <button id="previous-facade">Fachada anterior</button>
+      <button id="next-facade">Fachada siguiente</button>
+      <label>Punto <select id="point"></select></label>
+      <button id="visit-point">Ir al punto</button>
+      <label><input id="restored" type="checkbox" checked> Restaurado</label>
+      <button id="camera-toggle" aria-pressed="false">Vista general · composición</button>
+      <button id="hide-controls">Ocultar controles [H]</button>
+    </fieldset>
+    <p>Partida de revisión en memoria. WASD/flechas y clic para caminar. H oculta o recupera los controles. La vista general sirve para revisar el conjunto.</p>
+  </nav>
+  <aside id="readout" aria-label="Datos de revisión">
+    <p id="area-status">Cargando arte…</p>
+    <p id="point-status">Punto: —</p>
+    <p id="position-status">Jugador: —</p>
+    <p id="safety-status" data-safe="false">Seguridad pendiente</p>
+    <p id="camera-status">Cámara jugable</p>
+    <p id="performance-status">Rendimiento: esperando muestras de cuadros visibles.</p>
+    <p id="notice" role="status" aria-live="polite"></p>
+  </aside>
+  <div id="composition-badge">VISTA GENERAL · REVISIÓN DE COMPOSICIÓN</div>
+  <script type="module">
+    import * as THREE from 'three';
+    import {World} from '../src/world.js';
+    import {AREAS,WORLD_SYSTEMS} from '../src/content.js';
+    import {freshState} from '../src/state.js';
+    import {findPath} from '../src/navigation.js';
+
+    const $=selector=>document.querySelector(selector),ids=Object.keys(AREAS),query=new URLSearchParams(location.search);
+    const state=freshState({muted:true,reducedMotion:true}),held=new Set();
+    let world,points=[],facades=[],selected=null,overview=false,last=0,lastReadout=0,overviewBounds,frameTimes=[];
+    const coordinates=point=>point.map(value=>value.toFixed(2)).join(', ');
+    $('#area').replaceChildren(...ids.map(id=>new Option(AREAS[id].name,id)));
+    $('#restored').checked=query.get('restored')!=='0';
+
+    function prepareState(id){
+      state.area=id;state.visited=[id];state.position=null;state.flags={...AREAS[id].initialFlags,awaken:true};
+      if(!$('#restored').checked)return;
+      for(const area of Object.values(AREAS))for(const object of [...area.objects,...area.exits]){
+        for(const flag of object.requires||[])state.flags[flag]=true;
+        if(object.puzzle)state.flags[object.puzzle]=true;
+        if(object.flag)state.flags[object.flag]=true;
+      }
+      for(const system of WORLD_SYSTEMS){state.flags[system.flag]=true;if(system.latch)state.flags[system.latch]=true;for(const flag of system.requires||[])state.flags[flag]=true;}
+      for(const system of WORLD_SYSTEMS)for(const flag of system.off||[])state.flags[flag]=false;
+    }
+    function stop(){held.clear();world.target=null;world.route=[];}
+    function resetFrameSamples(){frameTimes=[];last=0;lastReadout=0;$('#performance-status').textContent='Rendimiento: esperando muestras de cuadros visibles.';}
+    function canReach(position){
+      const start=world.nearestWalkable(world.area.spawn);
+      return Math.hypot(position[0]-start[0],position[1]-start[1])<.05||findPath(start,position,world.bounds,world.obstacles,{radius:.34,isWalkable:(x,z)=>world.walkableLand(x,z)}).length>0;
+    }
+    function onPaving(position){
+      const grid=world.pavingGrid;if(!grid)return world.area.id==='workshop';
+      const col=Math.floor((position[0]+grid.halfX)/grid.dx),row=Math.floor((position[1]+grid.halfZ)/grid.dz);
+      return col>=0&&row>=0&&col<grid.cols&&row<grid.rows&&Boolean(grid.filled[row*grid.cols+col]);
+    }
+    function resolvePoint(point){
+      const safe=position=>world.canStand(...position,.34)&&onPaving(position);
+      if(point.kind!=='object'&&safe(point.position))return {position:point.position,adjusted:false};
+      if(point.direction){
+        for(let distance=.2;distance<=2.01;distance+=.2){const p=[point.position[0]+point.direction[0]*distance,point.position[1]+point.direction[1]*distance];if(safe(p))return {position:p,adjusted:true};}
+      }else{
+        for(const radius of [1.1,1.6,2.1,2.6])for(const angle of [0,Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2,Math.PI]){
+          const p=[point.position[0]+Math.sin(angle)*radius,point.position[1]+Math.cos(angle)*radius];
+          if(safe(p)&&canReach(p))return {position:p,adjusted:true};
+        }
+      }
+      return null;
+    }
+    function collectPoints(){
+      facades=[];world.root.updateMatrixWorld(true);
+      world.root.traverse(group=>{
+        const architecture=group.userData.architecture;if(!architecture)return;
+        const building=world.layout.buildings.find(item=>Math.hypot(item.x-architecture.footprint.x,item.z-architecture.footprint.z)<.05);
+        facades.push({id:building?.id||`facade-${facades.length+1}`,label:building?.label||`Fachada ${facades.length+1}`,kind:'facade',group,position:[architecture.entrance.approach.x,architecture.entrance.approach.z],direction:architecture.entrance.direction});
+      });
+      points=[{id:'arrival',label:'Llegada',kind:'arrival',position:[...world.area.spawn]},...facades,
+        ...world.area.exits.map(exit=>({id:exit.id,label:`Acceso · ${exit.label}`,kind:'exit',position:[exit.x,exit.z]})),
+        ...world.area.objects.filter(object=>!object.hidden&&!object.secret).map(object=>({id:object.id,label:`Observar · ${object.label}`,kind:'object',position:[object.x,object.z]}))];
+      $('#point').replaceChildren(...points.map(point=>new Option(point.label,point.id)));
+      $('#previous-facade').disabled=$('#next-facade').disabled=!facades.length;
+    }
+    function fitBounds(){
+      const [w,d]=world.bounds;
+      overviewBounds=new THREE.Box3(new THREE.Vector3(-w/2,0,-d/2),new THREE.Vector3(w/2,4,d/2));
+      for(const facade of facades)overviewBounds.union(new THREE.Box3().setFromObject(facade.group));
+      // Fortifications also have authored height although they are not houses.
+      world.root.traverse(mesh=>{
+        if(!mesh.isMesh||mesh.material?.isShaderMaterial)return;
+        const box=new THREE.Box3().setFromObject(mesh),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
+        if(Math.abs(center.x)<w/2&&Math.abs(center.z)<d/2&&size.x<w&&size.z<d&&box.max.y>overviewBounds.max.y)overviewBounds.max.y=box.max.y;
+      });
+      // Include the actual main tower, excluding its luminous beam and halo.
+      for(const animation of world.animations)if(animation.kind==='beacon'&&animation.main){
+        animation.obj.parent.traverse(mesh=>{if(mesh.isMesh&&!mesh.material?.isShaderMaterial)overviewBounds.union(new THREE.Box3().setFromObject(mesh));});
+      }
+    }
+    function applyOverview(){
+      const center=overviewBounds.getCenter(new THREE.Vector3());
+      world.focus.copy(center);world.cameraOffset.set(0,38,30);world.camera.position.copy(center).add(world.cameraOffset);world.camera.lookAt(center);world.camera.updateMatrixWorld(true);
+      const projected=new THREE.Box3();
+      for(const x of [overviewBounds.min.x,overviewBounds.max.x])for(const y of [overviewBounds.min.y,overviewBounds.max.y])for(const z of [overviewBounds.min.z,overviewBounds.max.z])projected.expandByPoint(new THREE.Vector3(x,y,z).applyMatrix4(world.camera.matrixWorldInverse));
+      const size=projected.getSize(new THREE.Vector3());
+      world.currentZoom=.86*Math.min((world.camera.right-world.camera.left)/Math.max(1,size.x),(world.camera.top-world.camera.bottom)/Math.max(1,size.y));
+      world.camera.zoom=world.currentZoom;world.camera.updateProjectionMatrix();
+    }
+    function cameraMode(general){
+      stop();overview=general;world.cancelCinematic();
+      document.body.dataset.camera=overview?'composition':'game';
+      $('#camera-toggle').setAttribute('aria-pressed',String(overview));
+      $('#camera-toggle').textContent=overview?'Volver a cámara jugable':'Vista general · composición';
+      if(overview)applyOverview();
+      $('#world').focus({preventScroll:true});updateReadout();
+    }
+    function visit(point){
+      cameraMode(false);selected=point;$('#point').value=point.id;
+      const resolved=resolvePoint(point);
+      if(!resolved){$('#notice').textContent=`Sin aproximación exterior libre para ${point.label}. Se conserva la posición anterior.`;updateReadout();return;}
+      world.setPlayerPosition(resolved.position);world.cancelCinematic();
+      const reachable=canReach(resolved.position);
+      $('#notice').textContent=[resolved.adjusted?(point.kind==='facade'?'Aproximación declarada obstruida; colocado más adelante para observar.':'Colocado en el pavimento próximo al punto.'):'Aproximación declarada libre.',reachable?'Ruta desde la llegada disponible.':'No hay ruta desde la llegada en este estado.'].join(' ');
+      document.body.dataset.approachAdjusted=String(resolved.adjusted);document.body.dataset.reachable=String(reachable);
+      updateReadout();
+    }
+    function load(id,pointId='arrival'){
+      stop();overview=false;prepareState(id);$('#area').value=id;world.loadArea(AREAS[id],state);world.cancelCinematic();collectPoints();fitBounds();visit(points.find(point=>point.id===pointId)||points[0]);
+      resetFrameSamples();
+    }
+    function stepFacade(direction){
+      if(!facades.length)return;
+      const current=facades.indexOf(selected),index=current<0?(direction>0?0:facades.length-1):(current+direction+facades.length)%facades.length;
+      visit(facades[index]);
+    }
+    function updateReadout(){
+      if(!world?.player)return;
+      const position=world.getPlayerPosition(),safe=world.canStand(...position,.34),ohm=world.ohm.position,ohmSafe=world.canStand(ohm.x,ohm.z,.42),pose=world.cameraPose();
+      $('#area-status').textContent=`Zona: ${world.area.name} (${world.area.id}) · ${facades.length} fachadas · ${$('#restored').checked?'Restaurado':'Estado inicial'}`;
+      $('#point-status').textContent=`Punto: ${selected?.label||'Recorrido libre'} · Casa: ${selected?.kind==='facade'?selected.label:'—'}${selected?` · referencia ${coordinates(selected.position)}`:''}`;
+      $('#position-status').textContent=`Jugador: X ${position[0].toFixed(2)} · Z ${position[1].toFixed(2)} · Cerca: ${world.getNearby()?.label||'—'}`;
+      $('#safety-status').dataset.safe=String(safe&&ohmSafe);$('#safety-status').textContent=`Jugador ${safe?'seguro':'EN COLISIÓN'} · Ohm ${ohmSafe?'seguro':'EN COLISIÓN'} · Pavimento ${onPaving(position)?'sí':'no'}`;
+      $('#camera-status').textContent=`${overview?'Vista general de composición':'Cámara jugable'} · offset ${coordinates(pose.offset)} · zoom ${pose.zoom.toFixed(3)}`;
+      if(frameTimes.length>30){const sorted=[...frameTimes].sort((a,b)=>a-b),avg=frameTimes.reduce((a,b)=>a+b,0)/frameTimes.length;$('#performance-status').textContent=`Últimos ${frameTimes.length} cuadros visibles: ${(1000/avg).toFixed(1)} FPS · p95 ${sorted[Math.floor(sorted.length*.95)].toFixed(1)} ms · ${world.renderer.info.render.calls} llamadas · ${world.renderer.info.memory.geometries} geometrías · ${world.renderer.info.memory.textures} texturas`;}
+      document.body.dataset.area=world.area.id;document.body.dataset.point=selected?.id||'';document.body.dataset.playerSafe=String(safe);document.body.dataset.ohmSafe=String(ohmSafe);document.body.dataset.cameraOffset=pose.offset.join(',');document.body.dataset.cameraZoom=String(pose.zoom);
+    }
+    function hideControls(){document.body.classList.toggle('controls-hidden');$('#world').focus({preventScroll:true});}
+
+    $('#area').onchange=()=>load($('#area').value);
+    $('#arrival').onclick=()=>visit(points[0]);
+    $('#previous-facade').onclick=()=>stepFacade(-1);$('#next-facade').onclick=()=>stepFacade(1);
+    $('#visit-point').onclick=()=>visit(points.find(point=>point.id===$('#point').value));
+    $('#restored').onchange=()=>load(world.area.id,selected?.id);
+    $('#camera-toggle').onclick=()=>cameraMode(!overview);$('#hide-controls').onclick=hideControls;
+    $('#world').onclick=event=>{if(!world?.area||overview||event.button!==0)return;const point=world.pick(event.clientX,event.clientY);if(point){selected=null;world.setTarget(point);}};
+    addEventListener('keydown',event=>{
+      if(!world?.area||event.target.matches('input,select,textarea'))return;
+      const key=event.key.toLowerCase();
+      if(key==='h'){event.preventDefault();if(!event.repeat)hideControls();return;}
+      if(overview)return;
+      if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift'].includes(key)){held.add(key);if(key.startsWith('arrow'))event.preventDefault();selected=null;}
+    });
+    addEventListener('keyup',event=>held.delete(event.key.toLowerCase()));addEventListener('blur',()=>held.clear());
+    document.addEventListener('visibilitychange',resetFrameSamples);
+    addEventListener('resize',()=>{if(!world?.area)return;world.resize();if(overview)applyOverview();else world.cancelCinematic();});
+    addEventListener('beforeunload',()=>world?.dispose());
+    function frame(now){
+      if(document.hidden){last=0;requestAnimationFrame(frame);return;}
+      const elapsed=last?Math.max(0,now-last):0;
+      if(last&&elapsed>0){frameTimes.push(elapsed);if(frameTimes.length>180)frameTimes.shift();}
+      const dt=Math.min(.05,elapsed/1000);last=now;
+      world.renderer.info.reset();
+      world.update(dt,state,{x:Number(held.has('d')||held.has('arrowright'))-Number(held.has('a')||held.has('arrowleft')),z:Number(held.has('s')||held.has('arrowdown'))-Number(held.has('w')||held.has('arrowup')),run:held.has('shift'),paused:overview});
+      if(now-lastReadout>120){updateReadout();lastReadout=now;}requestAnimationFrame(frame);
+    }
+    async function boot(){
+      world=new World($('#world'));const assets=await world.assetsReady;
+      world.renderer.info.autoReset=false;
+      if(!assets.ok)throw new Error(`Falta arte: ${assets.missing.join(', ')}`);
+      const render=world.composer.render.bind(world.composer);
+      world.composer.render=(...args)=>{if(overview)applyOverview();return render(...args);};
+      $('#controls').disabled=false;load(ids.includes(query.get('area'))?query.get('area'):'plaza',query.get('point')||'arrival');
+      document.body.dataset.ready='true';requestAnimationFrame(frame);
+    }
+    boot().catch(error=>{$('#area-status').textContent='No se pudo iniciar el visor';$('#notice').textContent=error.message;document.body.dataset.ready='error';});
+  </script>
+</body>
+</html>

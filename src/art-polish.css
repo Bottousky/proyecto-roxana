@@ -1,0 +1,23 @@
+/* Dialogue illustrations use the same costume and silhouette as the walking cast. */
+.portrait.portrait-ohm{background-image:url('/assets/art-polish/portrait-ohm.png')}
+.portrait:is(.portrait-edda,.portrait-lumen,.portrait-nereo,.portrait-player,.portrait-vega,.portrait-consejera,.portrait-yesca,.portrait-marin,.portrait-tala){background-size:300% 100%;background-position-y:center;aspect-ratio:1;align-self:center;width:172px;flex-basis:172px;height:172px;min-height:172px;margin:8px 0 8px 8px;border-radius:3px;mask-image:linear-gradient(90deg,#000 90%,transparent)}
+.portrait-edda,.portrait-lumen,.portrait-nereo{background-image:url('/assets/art-polish/portraits-main.png')}.portrait-player,.portrait-vega,.portrait-consejera{background-image:url('/assets/art-polish/portraits-north.png')}.portrait-yesca,.portrait-marin,.portrait-tala{background-image:url('/assets/art-polish/portraits-village.png')}
+.portrait:is(.portrait-edda,.portrait-player,.portrait-yesca){background-position-x:0%}.portrait:is(.portrait-lumen,.portrait-vega,.portrait-marin){background-position-x:50%}.portrait:is(.portrait-nereo,.portrait-consejera,.portrait-tala){background-position-x:100%}
+@media(max-width:640px){.portrait:is(.portrait-edda,.portrait-lumen,.portrait-nereo,.portrait-player,.portrait-vega,.portrait-consejera,.portrait-yesca,.portrait-marin,.portrait-tala){width:85px;flex-basis:85px;height:85px;min-height:85px;align-self:flex-start;margin-top:18px;mask-image:none}}
+
+/* A pocket instrument: the place leads, the question unfolds on demand. */
+#travel-instrument{inset:16px auto auto 16px;width:316px;max-width:calc(100vw - 32px);grid-template-columns:50px minmax(0,1fr) 30px;gap:0 10px;padding:8px 10px 6px 7px;border-radius:30px 5px 5px 5px;background:linear-gradient(115deg,#203936e8,#162e2cd9);box-shadow:0 3px 12px #091b2338}
+#travel-compass{width:50px;height:50px}
+#travel-instrument .place h2{font-size:21px;margin:3px 0 5px}
+#travel-instrument .place .eyebrow{font-size:7px;letter-spacing:.06em}
+#travel-instrument .hud-tools{gap:0}
+#travel-instrument .icon-button{width:30px;height:24px;min-height:24px;padding:3px}
+#travel-instrument .icon-button svg{width:17px;height:17px}
+#travel-instrument .objective{margin-top:5px;padding-top:4px;gap:7px}
+#travel-instrument #objective-title{font-size:15px;line-height:1.15}
+#travel-instrument #objective-toggle{min-height:23px}
+#travel-instrument .objective-glyph{font-size:13px}
+#travel-instrument .objective small{font-size:11px;line-height:1.5}
+.travel-time{font-size:9px;gap:5px}#travel-sky{font-size:13px}#travel-day{font-size:8px}
+@media(max-width:640px),(pointer:coarse){#travel-instrument{grid-template-columns:44px minmax(0,1fr) 132px;gap:0 6px;width:350px;inset:10px auto auto 10px;max-width:calc(100vw - 20px);padding:6px;border-radius:26px 5px 5px 5px}#travel-compass{width:44px;height:44px}#travel-instrument .hud-tools{flex-direction:row}#travel-instrument .icon-button{width:44px;height:44px;min-height:44px}#travel-instrument #chapter-label{display:none}#travel-instrument .place h2{font-size:18px;margin:2px 0 4px}#travel-instrument #objective-toggle{min-height:32px}#travel-instrument .objective{margin-top:2px;padding-top:2px}#travel-instrument #objective-title{font-size:14px}}
+.title-art{background-image:url('/assets/cover-ohm-canonical.png')}
