@@ -8,6 +8,8 @@ import {mountTravelInstrument,updateTravelInstrument} from './travel-instrument.
 import {advanceJourneyTime} from './story-time.js';
 import './travel-instrument.css';
 import './art-polish.css';
+import './journey-ui.css';
+import {renderJourneyGuide,bindMapViews} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
 import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
@@ -30,13 +32,13 @@ document.querySelector('#app').innerHTML=`
     <nav class="title-menu" aria-label="Menú principal"><button id="continue" class="primary hidden">Continuar el viaje ${svg('arrow')}</button><button id="new-game" class="primary">Cruzar el Portal ${svg('arrow')}</button><button id="title-settings" class="quiet">Opciones</button></nav>
     <p id="save-description" class="save-description"></p></div><div class="title-foot"><span>ARCO I · LA PREGUNTA OLVIDADA</span><span>Explorá. Escuchá. Experimentá.</span></div>
   </section>
-  <div id="hud" class="hidden"><header class="hud-top"><div class="place"><span class="eyebrow" id="chapter-label">OHMDAL · LA LUZ</span><h2 id="area-name"></h2><p id="area-subtitle"></p></div><nav class="hud-tools"><button id="journal-button" class="icon-button" aria-label="Bitácora (J)" title="Bitácora · J">${svg('book')}<kbd>J</kbd><i id="journal-dot" class="hidden"></i></button><button id="map-button" class="icon-button" aria-label="Mapa (M)" title="Mapa · M">${svg('map')}<kbd>M</kbd></button><button id="pause-button" class="icon-button" aria-label="Pausa y opciones (Escape)">${svg('menu')}<kbd>Esc</kbd></button></nav></header>
+  <div id="hud" class="hidden"><header class="hud-top"><div class="place"><span class="eyebrow" id="chapter-label">OHMDAL · LA LUZ</span><h2 id="area-name"></h2><p id="area-subtitle"></p></div><nav class="hud-tools" aria-label="Herramientas de viaje"><button id="journal-button" class="icon-button" aria-label="Bitácora (J)" title="Bitácora · J">${svg('book')}<span class="tool-label">Bitácora</span><kbd>J</kbd><i id="journal-dot" class="hidden"></i></button><button id="map-button" class="icon-button" aria-label="Mapa (M)" title="Mapa · M">${svg('map')}<span class="tool-label">Mapa</span><kbd>M</kbd></button><button id="guide-button" class="icon-button" aria-label="Guía de viaje (H)" title="Guía de viaje · H">${svg('star')}<span class="tool-label">Guía</span></button><button id="pause-button" class="icon-button" aria-label="Pausa y opciones (Escape)">${svg('menu')}<span class="tool-label">Pausa</span><kbd>Esc</kbd></button></nav></header>
     <div class="objective" id="objective"><span class="objective-glyph" aria-hidden="true">◇</span><div><button id="objective-toggle" aria-expanded="true" aria-controls="objective-detail"><span class="eyebrow">UNA PREGUNTA ABIERTA</span><span id="objective-title"></span><span class="objective-fold" aria-hidden="true">⌄</span></button><small id="objective-detail"></small></div></div>
     <div id="interaction" class="interaction hidden"><button id="interact-button"><kbd>E</kbd><span id="interaction-label"></span></button><button id="field-measure" class="field-measure hidden"><kbd>Q</kbd> Mirar con Ohm</button></div>
     <aside id="field-meter" class="field-meter hidden" aria-label="Observación de Ohm" aria-live="polite"><button id="close-field-meter" aria-label="Guardar instrumento">×</button><span class="eyebrow">OHM · UNA OBSERVACIÓN</span><h3 id="field-title"></h3><p id="field-observation"></p><details id="field-details"><summary>Ver las lecturas</summary><div class="field-readings"><div><strong id="field-voltage"></strong><small>V · TENSIÓN</small></div><div><strong id="field-current"></strong><small>A · CORRIENTE</small></div></div><p id="field-reference" class="field-reference"></p><p class="field-guide">La tensión compara dos puntos. La corriente indica cuánto circula por un camino. Una raya significa que Ohm no puede fijar esa lectura; no significa cero.</p></details></aside>
     <div id="ohm-bubble" class="ohm-bubble hidden"><span class="ohm-eye"></span><p></p></div>
     <div class="hud-bottom"><span id="control-reminder"><kbd>W A S D</kbd> caminar <span>·</span> <kbd>Shift</kbd> correr <span>·</span> clic para ir</span><span id="save-indicator" role="status">◈ Bitácora al día</span></div>
-    <div id="touch-controls"><div class="dpad"><button data-dir="up" aria-label="Caminar hacia arriba">↑</button><button data-dir="left" aria-label="Caminar a la izquierda">←</button><button data-dir="down" aria-label="Caminar hacia abajo">↓</button><button data-dir="right" aria-label="Caminar a la derecha">→</button></div><button id="touch-interact" aria-label="Interactuar">E</button></div>
+    <div id="touch-controls"><div class="dpad"><button data-dir="up" aria-label="Caminar hacia arriba">↑</button><button data-dir="left" aria-label="Caminar a la izquierda">←</button><button data-dir="down" aria-label="Caminar hacia abajo">↓</button><button data-dir="right" aria-label="Caminar a la derecha">→</button></div><button id="touch-interact" aria-label="Interactuar" disabled>Acercate</button></div>
   </div>
   <div id="arrival" class="arrival hidden"><div class="eyebrow">OHMDAL</div><h2></h2><p></p><div class="arrival-line"></div></div>
   <section id="dialogue" class="dialogue hidden" aria-label="Conversación"><div id="portrait" class="portrait"><span></span></div><div class="dialogue-copy"><div class="dialogue-who"><h3 id="speaker"></h3><span id="speaker-role"></span></div><p id="dialogue-text"></p><button id="dialogue-next" aria-label="Continuar conversación">Continuar <kbd>↵</kbd><span>▾</span></button></div></section>
@@ -108,7 +110,7 @@ function refreshHUD(){
   const objective=getObjective(state)||{title:'Un mundo que vuelve a preguntar',detail:'Todavía quedan historias por descubrir.'};
   $('#objective-title').textContent=objective.title;$('#objective-detail').textContent=objective.detail||'';
   const signature=objective.title+'|'+objective.detail;
-  if(signature!==objectiveSignature){objectiveSignature=signature;objectiveUntil=performance.now()+11000;$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');}
+  if(signature!==objectiveSignature){objectiveSignature=signature;objectiveUntil=Infinity;$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');}
   $('#chapter-label').textContent=state.flags.beacon_lens?'OHMDAL · LA PRIMERA LUZ':'OHMDAL · LA LUZ';
   updateTravelInstrument(document,state,world?.getPlayerPosition?.()||state.position||a.spawn,objective);
   if(activeMeasurement)renderFieldMeasurement();
@@ -195,7 +197,7 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   state.area=id;state.position=spawn||AREAS[id].spawn;
   activeMeasurement=null;show('#field-meter',false);
   chatterClock=0;
-  hudUntil=performance.now()+11000;objectiveUntil=hudUntil;
+  hudUntil=performance.now()+11000;objectiveUntil=Infinity;
   $('#hud').classList.remove('settled');$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');
   for(const [key,value] of Object.entries(AREAS[id].initialFlags||{}))if(!(key in state.flags))state.flags[key]=value;
   refreshWorldSystems(true);
@@ -289,10 +291,10 @@ function interact(obj=nearby){
 }
 function openPuzzle(id){mode='puzzle';held.clear();show('#hud',false);show('#arrival',false);world.setInspection(true);show('#workbench');workbench.open(id,state.puzzles[id]);}
 
-function closeModal(){if($('.ending-modal')){recordEndingDismissed(state);persist();}show('#modal-layer',false);$('#modal-layer').innerHTML='';mode=modalReturn;held.clear();if(mode==='world')$('#world').focus({preventScroll:true});else if(modalFocus?.isConnected)modalFocus.focus({preventScroll:true});}
+function closeModal(){for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=false;if($('.ending-modal')){recordEndingDismissed(state);persist();}show('#modal-layer',false);$('#modal-layer').innerHTML='';mode=modalReturn;held.clear();if(modalFocus?.isConnected&&!modalFocus.closest('.hidden'))modalFocus.focus({preventScroll:true});else if(mode==='world')$('#world').focus({preventScroll:true});}
 function modal(html,kind='standard'){
   if(mode!=='modal'){modalReturn=mode;modalFocus=document.activeElement;}
-  mode='modal';held.clear();show('#interaction',false);
+  mode='modal';held.clear();show('#interaction',false);for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=true;
   $('#modal-layer').innerHTML=`<section class="modal ${kind}" role="dialog" aria-modal="true"><button class="modal-close icon-button" aria-label="Cerrar">${svg('close')}</button>${html}</section>`;
   const heading=$('.modal h2');if(heading){heading.id='modal-title';$('.modal').setAttribute('aria-labelledby','modal-title');}
   show('#modal-layer');$('.modal-close').onclick=closeModal;$('.modal-close').focus();
@@ -305,9 +307,18 @@ function openJournal(selected){
   $('#personal-journal-note')?.addEventListener('input',event=>{state.personalNotes||={};state.personalNotes[event.target.dataset.noteFor]=event.target.value.slice(0,1200);persist();});
 }
 
+function openGuide(){
+  if(!started||!['world','modal'].includes(mode))return;
+  modal(renderJourneyGuide(state),'guide-modal');
+  $('[data-guide-map]').onclick=openMap;
+  $('[data-guide-journal]').onclick=openJournal;
+}
+
 function openMap(){
   if(!started||!['world','modal'].includes(mode))return;
   modal(`<style>${mapStyles}</style>${renderWorldMap(state,{position:world.getPlayerPosition(),inhabitants:world.getInteractions().filter(o=>o.kind==='npc'),objectiveArea:getObjective(state)?.area})}`,'map-modal');
+  bindMapViews($('#modal-layer'));
+  $('[data-map-guide]').onclick=openGuide;
   document.querySelectorAll('[data-area]').forEach(button=>button.onclick=()=>{const id=button.dataset.area;if(!state.visited.includes(id)||!AREAS[id])return;closeModal();if(id!==state.area)enterArea(id);});
 }
 
@@ -368,7 +379,7 @@ $('#new-game').onclick=()=>{
   else startGame(false);
 };
 $('#continue').onclick=()=>startGame(true);$('#title-settings').onclick=openOptions;$('#pause-button').onclick=openOptions;
-$('#journal-button').onclick=openJournal;$('#map-button').onclick=openMap;$('#interact-button').onclick=()=>interact();$('#touch-interact').onclick=()=>interact();$('#dialogue-next').onclick=nextLine;
+$('#guide-button').onclick=openGuide;$('#journal-button').onclick=openJournal;$('#map-button').onclick=openMap;$('#interact-button').onclick=()=>interact();$('#touch-interact').onclick=()=>interact();$('#dialogue-next').onclick=nextLine;
 $('#field-measure').onclick=fieldMeasure;$('#close-field-meter').onclick=()=>{activeMeasurement=null;show('#field-meter',false);};
 $('#objective-toggle').onclick=()=>{const folded=$('#objective').classList.toggle('folded');$('#objective-toggle').setAttribute('aria-expanded',String(!folded));objectiveUntil=folded?0:Infinity;};
 $('#dialogue-text').onclick=nextLine;
@@ -383,7 +394,7 @@ $('#world').addEventListener('pointerdown',event=>{
 document.querySelectorAll('[data-dir]').forEach(button=>{
   const key={up:'ArrowUp',left:'ArrowLeft',down:'ArrowDown',right:'ArrowRight'}[button.dataset.dir];
   button.onpointerdown=e=>{e.preventDefault();button.setPointerCapture(e.pointerId);held.add(key);};
-  button.onpointerup=button.onpointercancel=()=>held.delete(key);
+  button.onpointerup=button.onpointercancel=button.onlostpointercapture=()=>held.delete(key);
 });
 window.addEventListener('keydown',event=>{
   if(mode==='cinematic'){
@@ -395,7 +406,7 @@ window.addEventListener('keydown',event=>{
   if(mode==='modal'){
     if(event.key==='Escape'){event.preventDefault();if(!event.repeat)closeModal();return;}
     if(event.key==='Tab'){
-      const controls=[...$('#modal-layer').querySelectorAll('button,input,select,summary,[tabindex]')].filter(x=>!x.disabled&&x.tabIndex>=0&&x.getClientRects().length);
+      const controls=[...$('#modal-layer').querySelectorAll('button,input,select,textarea,summary,a[href],[tabindex]')].filter(x=>!x.disabled&&x.tabIndex>=0&&x.getClientRects().length);
       if(controls.length){const first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
     }
     return;
@@ -410,6 +421,7 @@ window.addEventListener('keydown',event=>{
   if(mode==='dialogue'){if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
   if(mode!=='world')return;
   if(['e','E','Enter',' '].includes(event.key)){if(!event.repeat)interact();return;}
+  if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}
   if(['q','Q'].includes(event.key)){fieldMeasure();return;}
@@ -448,6 +460,8 @@ function loop(now){
     if(mode==='world'){
       state.playtime+=dt;autosave+=dt;
       nearby=world.getNearby();
+      $('#touch-interact').disabled=!nearby;$('#touch-interact').textContent=nearby?'Interactuar':'Acercate';
+      $('#touch-interact').setAttribute('aria-label',nearby?.label||'Acercate a una persona o instalación');
       if(intendedInteraction){const object=world.getInteractions().find(o=>o.id===intendedInteraction);if(!object)intendedInteraction=null;else if(world.canInteractWith(object)){intendedInteraction=null;world.target=null;world.route=[];interact(object);}else if(!world.target&&!world.route.length){if(!world.approachInteraction(object))intendedInteraction=null;}}
       show('#interaction',mode==='world'&&!!nearby);
       if(nearby&&mode==='world'){

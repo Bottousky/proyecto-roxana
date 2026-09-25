@@ -1,0 +1,59 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><base href="../"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ohmdal · Territorio e instalaciones</title>
+<style>body{margin:0;background:#183b3e;color:#e6d5b5;font:13px Inter,system-ui}canvas{position:fixed;inset:0;width:100%;height:100%}body>nav,body>aside{position:fixed;z-index:2;background:#193b3eee;border:1px solid #b9a47666;border-radius:12px;padding:12px;box-shadow:0 5px 25px #0004}body>nav{top:12px;left:12px;right:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}body>nav button,body>nav select{font:inherit;padding:9px;color:#f0dec0;border:1px solid #af9a7466;background:#284e4e;border-radius:6px}body>aside{bottom:12px;left:12px;max-width:720px}#report{white-space:pre-line;max-height:140px;overflow:auto;font-size:11px}#map{position:fixed;inset:0;z-index:30}#map[hidden]{display:none!important}.qa-controls-hidden>nav,.qa-controls-hidden>aside{display:none}</style>
+<canvas id="world" tabindex="0" aria-label="Mundo de revisión"></canvas>
+<nav><label>Lugar <select id="area"></select></label><button id="visit">Visitar</button><label>Instalación <select id="condition"><option value="broken">Antes de reparar</option><option value="ready">Mandos preparados</option><option value="repaired">En servicio</option></select></label><label>Hora <select id="phase"><option value="0">Día</option><option value="3">Crepúsculo</option><option value="4">Noche</option></select></label><button id="forward">Seguir el camino</button><button id="tour">Probar 14 cruces</button><button id="show-map">Mapa</button><button id="hide">Ocultar [H]</button></nav>
+<aside><strong id="status">Preparando Ohmdal…</strong><p>Revisión independiente: no lee ni modifica partidas. Clic / WASD para caminar. H muestra los controles.</p><div id="report" role="status"></div></aside><div id="map" class="modal-layer" hidden></div>
+<script type="module">
+import {PlayCanvasWorld} from '../src/world.js';
+import {AREAS,PUZZLE_STORY,WORLD_SYSTEMS} from '../src/game/content.js';
+import {freshState} from '../src/game/state.js';
+import {EXTERIORS,passagesFor,toKingdom} from '../src/game/kingdom-geography.js';
+import {renderWorldMap,mapStyles} from '../src/game/world-map.js';
+import {bindMapViews,renderJourneyGuide} from '../src/game/journey-guide.js';
+import '../src/fonts.css';
+import '../src/game/style.css';
+import '../src/game/interface.css';
+import '../src/game/atlas.css';
+import '../src/game/journey-ui.css';
+const $=s=>document.querySelector(s),world=new PlayCanvasWorld($('#world')),state=freshState(),held=new Set();
+const fixed=Object.fromEntries([...Object.keys(PUZZLE_STORY),...WORLD_SYSTEMS.flatMap(s=>[s.flag,...(s.requires||[])])].map(f=>[f,true]));
+Object.assign(fixed,{road_bypass:false,castle_branch_closed:false});
+let ready=false,last=performance.now(),tour=null,tick=0;
+$('#area').replaceChildren(...Object.values(AREAS).map(a=>new Option(a.name,a.id)));$('#area').value='plaza';
+const style=document.createElement('style');style.textContent=mapStyles;document.head.append(style);
+function condition(){state.flags={...fixed};for(const o of AREAS[state.area].objects){if(o.puzzle&&$('#condition').value!=='repaired')state.flags[o.puzzle]=false;if(o.action&&$('#condition').value==='broken')state.flags[o.action.flag]=AREAS[state.area].initialFlags?.[o.action.flag]??false;}state.journeyTime={phase:Number($('#phase').value)};world.updateFlags(state);}
+function visit(){tour=null;state.area=$('#area').value;state.visited=Object.keys(AREAS);condition();world.loadArea(AREAS[state.area],state);$('#world').focus();}
+$('#visit').onclick=visit;$('#condition').onchange=condition;$('#phase').onchange=condition;
+function walk(direction){const index=EXTERIORS.indexOf(state.area),exit=passagesFor(state.area).find(e=>e.target===EXTERIORS[index+direction]);if(exit)world.followPassage(exit);}
+$('#forward').onclick=()=>walk(1);$('#hide').onclick=()=>document.body.classList.add('qa-controls-hidden');
+function closeMap(){ $('#map').hidden=true;held.clear();for(const node of document.querySelectorAll('body>nav,body>aside,#world'))node.inert=false;$('#show-map').focus(); }
+function mapPage(html,kind){
+  const root=$('#map');root.hidden=false;held.clear();tour=null;
+  for(const node of document.querySelectorAll('body>nav,body>aside,#world'))node.inert=true;
+  root.innerHTML=`<section class="modal ${kind}" role="dialog" aria-modal="true" aria-labelledby="review-map-title"><button class="modal-close icon-button" aria-label="Cerrar mapa">×</button>${html}</section>`;
+  root.querySelector('h2').id='review-map-title';root.querySelector('.modal-close').onclick=closeMap;root.querySelector('.modal-close').focus();
+}
+function showMap(){
+  mapPage(renderWorldMap(state,{position:world.getPlayerPosition(),inhabitants:world.getInteractions().filter(o=>o.kind==='npc')}),'map-modal');
+  const root=$('#map');bindMapViews(root);
+  root.querySelector('[data-map-guide]').onclick=()=>{mapPage(renderJourneyGuide(state),'guide-modal');root.querySelector('[data-guide-map]').onclick=showMap;root.querySelector('[data-guide-journal]').hidden=true;};
+}
+$('#show-map').onclick=showMap;
+$('#map').onclick=e=>{const id=e.target.closest('[data-area]')?.dataset.area;if(AREAS[id]){$('#area').value=id;closeMap();visit();}};
+$('#tour').onclick=()=>{$('#condition').value='repaired';$('#area').value='portal';visit();tour={direction:1,count:0,at:performance.now(),due:0};$('#report').textContent='Recorriendo…';};
+addEventListener('keydown',e=>{
+  if(!$('#map').hidden){
+    if(e.key==='Escape'){e.preventDefault();closeMap();}
+    if(e.key==='Tab'){const controls=[...$('#map').querySelectorAll('button,input,summary,[tabindex]')].filter(node=>!node.disabled&&node.tabIndex>=0&&node.getClientRects().length);const first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}
+    return;
+  }
+  if(e.key.toLowerCase()==='h')document.body.classList.toggle('qa-controls-hidden');else held.add(e.key.toLowerCase());
+});addEventListener('keyup',e=>held.delete(e.key.toLowerCase()));addEventListener('blur',()=>held.clear());addEventListener('resize',()=>world.resize());$('#world').onclick=e=>world.setTarget(world.pick(e.clientX,e.clientY));
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(ready&&$('#map').hidden){world.update(dt,state,{x:Number(held.has('d'))-Number(held.has('a')),z:Number(held.has('s'))-Number(held.has('w')),run:!!tour});const event=world.getTravelEvent();if(event?.target){const old=toKingdom(state.area,world.getPlayerPosition()),focus=world.focus.clone(),from=state.area;state.area=event.target;world.loadArea(AREAS[state.area],state,null,{continuous:true});const after=toKingdom(state.area,world.getPlayerPosition()),shift=Math.hypot(old[0]-after[0],old[1]-after[1]),camera=Math.hypot(focus.x-world.focus.x,focus.z-world.focus.z);$('#area').value=state.area;$('#report').textContent+=`\n${from} → ${state.area}: Δ ${shift.toFixed(3)}, cámara ${camera.toFixed(3)}, suelo ${world.canStand(...world.getPlayerPosition())?'seguro':'ERROR'}`;if(tour){tour.count++;tour.at=now;tour.due=now+100;}}
+if(tour&&now>tour.due){if(state.area==='lighthouse'&&tour.direction===1)tour.direction=-1;else if(state.area==='portal'&&tour.direction===-1){$('#report').textContent+=`\nFINAL: ${tour.count} cruces`;tour=null;}if(tour){walk(tour.direction);tour.due=now+2500;}}
+if(tour&&now-tour.at>45000){$('#report').textContent+='\nERROR: recorrido detenido';tour=null;}
+if(now-tick>500){tick=now;$('#status').textContent=`${AREAS[state.area].name} · ${world.getPlayerPosition().map(v=>v.toFixed(1)).join(', ')} · ${world.canStand(...world.getPlayerPosition())?'suelo seguro':'colisión'}`;}}
+requestAnimationFrame(loop);}
+const controls=[...document.querySelectorAll('body>nav button,body>nav select')];controls.forEach(c=>c.disabled=true);
+const result=await world.assetsReady;if(result.ok){visit();await world.prepareJourney();ready=true;controls.forEach(c=>c.disabled=false);last=performance.now();requestAnimationFrame(loop);}else $('#status').textContent=result.missing.join(', ');
+</script></html>

@@ -1,4 +1,4 @@
-import {Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Script,PROJECTION_ORTHOGRAPHIC,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
+import {Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
 import {surface,actorArt} from './art.ts';
 import {AREAS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
@@ -47,7 +47,7 @@ export class PlayCanvasWorld {
     const [data,binary]=await Promise.all([fetch(sceneUrl).then(r=>{if(!r.ok)throw new Error('Falta el mundo');return r.json();}),fetch(geometryUrl).then(async r=>{if(!r.ok)throw new Error('Falta la geometría');const buffer=await r.arrayBuffer(),magic=new Uint8Array(buffer,0,2);return magic[0]===31&&magic[1]===139?new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;})]);this.data=data;
     for(const id of [...Object.keys(AREAS),'landscape']){const root=new Entity(id==='landscape'?'Ohmdal · geografía compartida':AREAS[id].name);this.app.root.addChild(root);this.regions.set(id,{root,actors:[]});}
     const needed=[...new Set(data.meshes.flatMap(m=>m.material.texture?[m.material.texture]:[]))];for(const name of needed)await surface(this.app,name);
-    const owners=new Map();let count=0;
+    const owners=new Map();this.receivers=[];let count=0;
     for(const b of data.meshes){
       const d=b.material,e=new Entity(b.owner||`${b.area} · ${count}`),m=new StandardMaterial();m.diffuse=color('#'+d.color);m.emissive=color('#'+d.emissive);m.emissiveIntensity=d.emission;m.shininess=10;m.useMetalness=true;m.metalness=0;m.diffuseVertexColor=true;m.alphaTest=d.alpha;m.opacity=d.opacity;m.cull=d.double?CULLFACE_NONE:CULLFACE_BACK;
       if(d.texture){m.diffuseMap=await surface(this.app,d.texture);if(d.alpha){m.opacityMap=m.diffuseMap;m.opacityMapChannel='a';}}
@@ -58,12 +58,13 @@ export class PlayCanvasWorld {
       const instance=new MeshInstance(mesh,m,e);instance.castShadow=d.shadow&&d.opacity===1;instance.receiveShadow=true;e.addComponent('render',{meshInstances:[instance]});let parent=this.regions.get(b.area).root;
       if(b.owner&&!b.dynamic){if(!owners.has(b.owner)){const owner=new Entity(b.owner);parent.addChild(owner);owners.set(b.owner,owner);}parent=owners.get(b.owner);}
       parent.addChild(e);
-      if(b.dynamic){e.setPosition(...b.dynamic.pivot);this.dynamics.push({...b.dynamic,area:b.area,entity:e,material:m,angle:0,progress:0});}
+      if(b.dynamic){e.setPosition(...b.dynamic.pivot);this.dynamics.push({...b.dynamic,area:b.area,entity:e,material:m,angle:0,progress:0,rotation:new Quat(),axle:new Vec3(...(b.dynamic.spinAxis||[0,0,1]))});}
       if(d.glass)this.glasses.push({area:b.area,material:m});
+      if(d.receiver)this.receivers.push({area:b.area,material:m,...d.receiver});
       if(++count%15===0){const text=document.getElementById('transition-name');if(text)text.textContent=`Tejiendo Ohmdal · ${Math.round(count/data.meshes.length*100)}%`;await new Promise(r=>setTimeout(r,0));}
     }
     // The far countryside continues behind the authored region surfaces.
-    for(const [z,depth] of [[-95,390]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(30,65);m.update();e.render.material=m;e.setPosition(-45,-.15,z);e.setLocalScale(140,1,depth);this.regions.get('landscape').root.addChild(e);}
+    for(const [z,depth] of [[-95,390]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(42,65);m.update();e.render.material=m;e.setPosition(-42.5,-.15,z);e.setLocalScale(175,1,depth);this.regions.get('landscape').root.addChild(e);}
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
     }
@@ -134,7 +135,7 @@ export class PlayCanvasWorld {
   beginInhabitantConversation(t){beginInhabitantConversation(this,t);}
   faceInhabitantSpeaker(s){faceInhabitantSpeaker(this,s);}
   endInhabitantConversation(){endInhabitantConversation(this);}
-  updateFlags(state){this.state=state;if(this.area)this.obstacles=this.localObstacles(this.area.id);this.ohm&&(this.ohm.visible=!!state.flags.awaken);this.signature=JSON.stringify([state.flags,state.puzzles]);for(const d of this.dynamics){if(d.kind==='visible')d.entity.enabled=!!(state.flags[d.flag]||state.flags[d.or]);if(d.kind==='indicator'){const active=!!state.flags[d.flag];d.material.emissive=color(active?'#62d7ae':'#675430');d.material.emissiveIntensity=active?1.1:.25;d.material.update();}if(d.receiver)d.feedback=readReceiverFeedback(d.area,state,d.receiver);}}
+  updateFlags(state){this.state=state;if(this.area)this.obstacles=this.localObstacles(this.area.id);this.ohm&&(this.ohm.visible=!!state.flags.awaken);this.signature=JSON.stringify([state.flags,state.puzzles]);for(const d of this.dynamics){if(d.kind==='visible')d.entity.enabled=!!(state.flags[d.flag]??state.flags[d.or]);if(d.kind==='indicator'){const active=!!state.flags[d.flag];d.material.emissive=color(active?'#62d7ae':'#675430');d.material.emissiveIntensity=active?1.1:.25;d.material.update();}if(d.receiver)d.feedback=readReceiverFeedback(d.area,state,d.receiver);}for(const r of this.receivers||[]){r.material.emissiveIntensity=r.intensity*readReceiverFeedback(r.area,state,r.object).level;r.material.update();}}
   setInspection(v){this.inspect=v;if(v){this.target=null;this.route=[];}}
   cameraPose(){const [ox,oz]=this.data.areas[this.area.id].offset;return {focus:[this.focus.x-ox,this.focus.y,this.focus.z-oz],offset:this.cameraOffset.toArray(),zoom:this.currentZoom};}
   startCinematic(id,{reducedMotion=false}={}){const p=this.area.objects.find(o=>o.puzzle===id);if(!p)return false;const timeline=createCinematic(id,{areaId:this.area.id,flags:this.state.flags,player:this.player.position.toArray(),companion:this.ohm.position.toArray(),puzzle:[p.x,1.4,p.z],bounds:this.area.bounds,start:this.cameraPose()},{reducedMotion});if(!timeline)return false;this.cinematic={timeline,elapsed:0};this.target=null;this.route=[];return true;}
@@ -156,8 +157,8 @@ export class PlayCanvasWorld {
     if(this.disposed||!this.booted||!this.area||this.preparingJourney)return;dt=Math.min(.05,Math.max(0,dt));this.clock+=dt;this.state=state;
     if(JSON.stringify([state.flags,state.puzzles])!==this.signature)this.updateFlags(state);
     const paused=input.paused||!!this.cinematic||this.inspect,reduced=state.settings?.reducedMotion,p=this.player.position,old=[p.x,p.z];
-    let dx=input.x||0,dz=input.z||0;if(paused){this.target=null;this.route=[];dx=dz=0;}else if(dx||dz){this.target=null;this.route=[];const l=Math.hypot(dx,dz);dx/=Math.max(1,l);dz/=Math.max(1,l);}else if(this.target){const x=this.target[0]-p.x,z=this.target[1]-p.z,d=Math.hypot(x,z);if(d<.14)this.target=this.route.shift()||null;else{dx=x/d;dz=z/d;}}
-    if(dx||dz){const speed=input.run?7:4.2,next=moveWithCollisions([p.x,p.z],[dx*speed*dt,dz*speed*dt],this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});p.set(next[0],this.groundHeight(...next),next[1]);}
+    let dx=input.x||0,dz=input.z||0,stepLimit=Infinity;if(paused){this.target=null;this.route=[];dx=dz=0;}else if(dx||dz){this.target=null;this.route=[];const l=Math.hypot(dx,dz);dx/=Math.max(1,l);dz/=Math.max(1,l);}else if(this.target){const x=this.target[0]-p.x,z=this.target[1]-p.z,d=Math.hypot(x,z);if(d<.04)this.target=this.route.shift()||null;else{dx=x/d;dz=z/d;stepLimit=d;}}
+    if(dx||dz){const step=Math.min((input.run?7:4.2)*dt,stepLimit),next=moveWithCollisions([p.x,p.z],[dx*step,dz*step],this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});p.set(next[0],this.groundHeight(...next),next[1]);}
     this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
@@ -182,10 +183,10 @@ export class PlayCanvasWorld {
     const contact=new StandardMaterial();contact.diffuse=color('#081817');contact.diffuseMap=texture;contact.opacityMap=texture;contact.opacityMapChannel='a';contact.opacity=.4;contact.blendType=BLEND_NORMAL;contact.depthWrite=false;contact.update();
     for(const actor of [...this.allActors,this.playerActor,this.ohmActor,this.sleeping]){const e=new Entity('Sombra de '+actor.name);e.addComponent('render',{type:'plane'});e.render.material=contact;e.render.castShadows=false;e.setLocalScale(actor.name==='ohm'?1.3:.95,1,.65);this.app.root.addChild(e);actor.shadow=e;}
     const glow=(name,position,scale,tint,parent)=>{const e=new Entity(name),m=new StandardMaterial();m.diffuse=color(tint);m.emissive=color(tint);m.emissiveIntensity=1.2;m.diffuseMap=texture;m.opacityMap=texture;m.opacityMapChannel='a';m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update();e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(...position);e.setEulerAngles(62,0,0);e.setLocalScale(scale,1,scale);parent.addChild(e);return {entity:e,material:m};};
-    this.portalGlow=glow('La luz del Portal Ω',[0,2.8,38.55],5.2,'#73cbd3',this.regions.get('portal').root);
+    this.portalGlow=glow('La luz del Portal Ω',[KINGDOM.portal.x,2.8,KINGDOM.portal.z-5.45],5.2,'#73cbd3',this.regions.get('portal').root);
     this.lampGlows=[];for(const l of this.data.lights)this.lampGlows.push({...glow('Resplandor de farol',l.position,2.2,'#ffd092',this.regions.get(l.area).root),area:l.area});
-    this.beaconGlow=glow('Cristal del Faro',[30,18,-322.08],9,'#ffe2a7',this.regions.get('lighthouse').root);
-    this.beaconLight=new Entity('Luz restaurada del Faro');this.beaconLight.addComponent('light',{type:'omni',range:40,color:color('#ffdf9f'),intensity:0});this.beaconLight.setPosition(30,18,-322.08);this.regions.get('lighthouse').root.addChild(this.beaconLight);
+    this.beaconGlow=glow('Cristal del Faro',[KINGDOM.lighthouse.x,18,KINGDOM.lighthouse.z-25.08],9,'#ffe2a7',this.regions.get('lighthouse').root);
+    this.beaconLight=new Entity('Luz restaurada del Faro');this.beaconLight.addComponent('light',{type:'omni',range:40,color:color('#ffdf9f'),intensity:0});this.beaconLight.setPosition(KINGDOM.lighthouse.x,18,KINGDOM.lighthouse.z-25.08);this.regions.get('lighthouse').root.addChild(this.beaconLight);
   }
   updateEnvironment(dt,reduced){
     const f=this.state.flags,phase=journeyPhase(this.state),inside=this.area.id==='workshop',mix=1-Math.exp(-dt*.8);this.lampLevel??=phase.lamps;this.lampLevel+=(phase.lamps-this.lampLevel)*mix;
@@ -197,17 +198,17 @@ export class PlayCanvasWorld {
     for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color('#ffc57d');g.material.emissiveIntensity=level;g.material.update();}
     for(const d of this.dynamics){const e=d.entity,flag=!!f[d.flag],motion=reduced?0:1;
       if(d.kind==='gate'){const wanted=f.gate?1:0;d.progress+=(wanted-d.progress)*Math.min(1,dt*1.2);e.setPosition(d.pivot[0],d.pivot[1]+d.progress*5.8,d.pivot[2]);}
-      if(d.kind==='lever'){d.angle+=((flag?-37:37)-d.angle)*Math.min(1,dt*8);e.setEulerAngles(d.angle,0,0);}
-      if(['wheel','gear','optic'].includes(d.kind)){const enabled=d.receiver?d.feedback?.moving:d.flag?flag:d.area==='spring'?(d.kind==='wheel'?f.spring_sluice||f.pump:f.spring_drive||f.pump):d.kind==='optic'?f.beacon_network&&f.tower_lens_free:true;if(enabled)d.angle+=dt*d.speed*57.3*motion;e.setEulerAngles(0,d.kind==='optic'?d.angle:0,d.kind==='optic'?0:d.angle);}
+      if(d.kind==='lever'){d.angle+=((flag?-37:37)-d.angle)*Math.min(1,dt*8);e.setEulerAngles(d.axis==='z'?0:d.angle,0,d.axis==='z'?d.angle:0);}
+      if(['wheel','gear','optic'].includes(d.kind)){const enabled=d.receiver?d.feedback?.moving:d.flag?flag:d.area==='spring'?(d.kind==='wheel'?(f.spring_sluice??f.pump):(f.spring_sluice??f.pump)&&(f.spring_coupling??f.pump)):d.kind==='optic'?f.beacon_network&&f.tower_lens_free:true;if(enabled)d.angle+=dt*d.speed*57.3*motion;e.setRotation(d.rotation.setFromAxisAngle(d.axle,d.angle));}
       if(d.kind==='boat'){e.setPosition(d.pivot[0],d.pivot[1]+Math.sin(this.clock*.8)*.055*motion,d.pivot[2]);}
       if(d.kind==='banner')e.setEulerAngles(0,Math.sin(this.clock*1.1+d.pivot[0])*3*motion,0);
       if(d.kind==='control'||d.kind==='conductor'){
-        if(d.lastSignature!==this.signature){const object=AREAS[d.area].objects.find(o=>o.id===d.object),signal=readControlFeedback(d.area,this.state,object);d.lastSignature=this.signature;d.material.emissive=color(signal.flowing?(d.return?'#609ebd':'#d9a252'):'#000000');d.material.emissiveIntensity=signal.flowing?.5:0;d.material.diffuse=color(signal.mechanical?'#b6a075':signal.overloaded?'#b5724d':signal.flowing?'#abc59b':'#968666');d.material.update();}
+        if(d.lastSignature!==this.signature){const object=AREAS[d.area].objects.find(o=>o.id===d.object),signal=readControlFeedback(d.area,this.state,object);d.lastSignature=this.signature;d.material.emissive=color(signal.flowing?(d.return?'#609ebd':'#d9a252'):'#000000');d.material.emissiveIntensity=signal.flowing?.5:0;d.material.diffuse=color(d.kind==='conductor'?(d.return?'#73999a':'#ba844d'):signal.mechanical?'#b6a075':signal.overloaded?'#b5724d':signal.flowing?'#abc59b':'#968666');d.material.update();}
       }
     }
     for(const m of this.waters){m.diffuseMapOffset=new Vec2(Math.sin(this.clock*.07)*.008,reduced?0:this.clock*.008);m.update();}
     for(const p of this.motes){p.entity.enabled=!inside&&!reduced;p.entity.setPosition(this.focus.x+p.x+Math.sin(this.clock*.2+p.phase)*.5,p.y+Math.sin(this.clock*.6+p.phase)*.15,this.focus.z+p.z);}
-    this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*.18;this.beacon.setPosition(30+Math.cos(a)*27.5,18,-322.08+Math.sin(a)*27.5);this.beacon.setEulerAngles(0,-a*57.3,90);
+    this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*.18;this.beacon.setPosition(KINGDOM.lighthouse.x+Math.cos(a)*27.5,18,KINGDOM.lighthouse.z-25.08+Math.sin(a)*27.5);this.beacon.setEulerAngles(0,-a*57.3,90);
   }
   resize(){const low=this.state.settings?.quality==='low';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;}
   dispose(){if(this.disposed)return;this.disposed=true;removeEventListener('beforeunload',this.destroy);this.app.destroy();}

@@ -3,7 +3,9 @@
 import { isPositionClear, isSegmentClear } from './collision.js';
 
 export function findPath(start,goal,bounds,obstacles=[],{radius=.36,cell=.6,isWalkable=()=>true}={}){
-  const collision={radius,isWalkable};
+  // Curved region joins can leave very short unwalkable wedges beside a grid
+  // corner. Check planned segments more finely than the movement stride.
+  const collision={radius,isWalkable,surfaceStep:.02};
   if(!Number.isFinite(cell)||cell<=0||!isPositionClear(start,bounds,obstacles,collision)||!goal?.every(Number.isFinite))return [];
   const margin=.6,minX=-bounds[0]/2+margin,minZ=-bounds[1]/2+margin,maxX=-minX,maxZ=-minZ;
   const cols=Math.ceil((maxX-minX)/cell)+1,rows=Math.ceil((maxZ-minZ)/cell)+1;

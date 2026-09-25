@@ -141,6 +141,13 @@ lo que conoce por experiencia. Habla con calidez, pausas y humor de oficio.
 
 ## Lugares y vida cotidiana
 
+El estudiante lleva un instrumento de viaje del Instituto: brújula, registro del
+momento del día y acceso a su mapa y Bitácora. La aguja roja conserva el norte;
+una marca en el aro orienta hacia la pregunta anotada. No reemplaza la observación
+ni diagnostica por el estudiante. Su registro acompaña el día narrativo definido
+en el Arco I: la restauración del Faro culmina de noche y la primera clase abre
+la mañana siguiente. El regreso a un lugar conserva el tiempo transcurrido.
+
 | Lugar | Sentido en el mundo |
 |---|---|
 | Portal y Plaza de Ohm | Llegada, encuentro y memoria pública; el despertar de Ohm vuelve a abrir preguntas. |

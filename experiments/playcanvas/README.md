@@ -42,6 +42,11 @@ Los exteriores ocupan coordenadas globales en un único mundo residente. Cruzar
 un límite narrativo cambia contexto e interacciones, conservando cámara y
 posiciones físicas. El taller mantiene su entrada y salida de interior.
 
+La [iteración de territorio e instalaciones](DIRECCION-VISUAL.md) amplía los
+desplazamientos este/oeste, agrega dos senderos secundarios y vincula el brillo
+y movimiento de los receptores con su circuito. Para compararlos sin tocar
+partidas, abrir `http://127.0.0.1:4190/scripts/qa-direction.html`.
+
 ## Arquitectura
 
 PlayCanvas Engine **2.22.1**, entidades, materiales, mallas, sprites y scripts

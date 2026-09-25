@@ -1,7 +1,8 @@
 import {AREAS, getObjective} from './content.js';
 import {AREA_LAYOUTS} from './world-layout.js';
 import {inhabitantPlan} from './world-inhabitants.js';
-import {KINGDOM,WATERCOURSE,isExterior,passagesFor,passageGeometry,fromKingdom,corridorX,travelBounds} from './kingdom-geography.js';
+import {KINGDOM,WATERCOURSE,nextPassage,isExterior,passagesFor,passageGeometry,fromKingdom,corridorX,travelBounds} from './kingdom-geography.js';
+import {journeyGuidance} from './journey-guide.js';
 import {journeyPhase} from './story-time.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -57,18 +58,21 @@ function regionalSvg(state, objectiveArea) {
     const explored = visited.has(a.id) || visited.has(b.id), accessible = passageState(edge, state, visited);
     const status = !explored ? 'unknown' : accessible ? 'open' : 'locked';
     const title = !explored ? 'Camino por explorar' : accessible ? 'Paso abierto' : 'Paso cerrado';
-    return `<g class="journey-edge ${status}" data-connection="${esc(edge.id)}" data-passage="${status}"><title>${title}</title><path d="M${a.sx} ${n(a.sy)}L${b.sx} ${n(b.sy)}"/>${status === 'locked' ? `<path class="journey-bar" d="M${n((a.sx+b.sx)/2-4)} ${n((a.sy+b.sy)/2-4)}l8 8m-8 0 8-8"/>` : ''}</g>`;
+    const passage=passageGeometry(edge.from,edge.to),route=passage?[[a.x,a.z],...passage.points,[b.x,b.z]]:[[a.x,a.z],[b.x,b.z]];
+    const path=route.map((p,i)=>`${i?'L':'M'}${project(p).map(n).join(' ')}`).join('')+(passage?.routes.slice(1).map(r=>r.points.map((p,i)=>`${i?'L':'M'}${project(p).map(n).join(' ')}`).join('')).join('')||'');
+    return `<g class="journey-edge ${status}" data-connection="${esc(edge.id)}" data-passage="${status}"><title>${title}</title><path d="${path}"/>${status === 'locked' ? `<path class="journey-bar" d="M${n((a.sx+b.sx)/2-4)} ${n((a.sy+b.sy)/2-4)}l8 8m-8 0 8-8"/>` : ''}</g>`;
   }).join('');
   const marks = [...nodes.values()].map(node => {
     const current = node.id === state.area, seen = visited.has(node.id), named = known.has(node.id);
     const label = named ? AREAS[node.id].name : '· · ·';
     const isWest = node.id === 'workshop';
-    const labelX = isWest ? node.sx-50 : node.sx + 20, labelY = node.sy + (isWest ? -17 : 4);
+    const labelX = isWest ? node.sx-58 : node.sx + 20, labelY = node.sy + (isWest ? -17 : 4);
     const labelMarkup = isWest && named ? `<tspan x="${labelX}" dy="0">El taller</tspan><tspan x="${labelX}" dy="16">de Lumen</tspan>` : esc(label);
     return `<g class="journey-node ${seen?'visited':'unvisited'} ${current?'current':''}" data-map-area="${esc(node.id)}" transform="translate(0 0)"><title>${named?esc(label):'Lugar todavía desconocido'}${current?' · Estás aquí':seen?' · Visitado':''}</title>${current?`<circle class="journey-current-ring" cx="${node.sx}" cy="${n(node.sy)}" r="13"/>`:''}<circle cx="${node.sx}" cy="${n(node.sy)}" r="${current?7:5}"/><text x="${labelX}" y="${n(labelY)}" text-anchor="${isWest?'middle':'start'}">${labelMarkup}</text>${current?`<text class="journey-you" x="${isWest?labelX:labelX}" y="${n(node.sy+(isWest?25:20))}" text-anchor="${isWest?'middle':'start'}">ESTÁS AQUÍ</text>`:''}</g>`;
   }).join('');
   const artOrder=['portal','plaza','workshop','road','spring','castle','terraces','lake','lighthouse'];
-  const sketches=[...nodes.values()].filter(node=>visited.has(node.id)).map(node=>{
+  // The workshop shares the village cluster; a second illustration would cover its label.
+  const sketches=[...nodes.values()].filter(node=>visited.has(node.id)&&node.id!=='workshop').map(node=>{
     const index=artOrder.indexOf(node.id),col=index%3,row=Math.floor(index/3),x=node.id==='workshop'?42:node.sx-35,y=node.sy-36;
     return `<svg class="journey-landmark-art" x="${x}" y="${y}" width="38" height="38" viewBox="${col*100} ${row*100} 100 100" aria-hidden="true"><image href="./assets/art-polish/map-landmarks.png" width="300" height="300"/></svg>`;
   }).join('');
@@ -180,24 +184,36 @@ export function renderLocalMap(area, layout = AREA_LAYOUTS[area?.id], position, 
     const labelY = y + (south ? 23 : -14), labelX = Math.max(70,Math.min(490,x));
     return `<g class="local-exit ${open?'open':'locked'}" data-map-exit="${esc(exit.id)}" data-passage="${open?'open':'locked'}"><title>${esc(destination)} · ${open?'Paso abierto':'Paso cerrado'}</title><path d="M${x-6} ${y+6}V${y-6}H${x+6}V${y+6}"/>${open?'':`<path class="local-exit-bar" d="M${x-4} ${y-3}l8 8m-8 0 8-8"/>`}<text x="${labelX}" y="${n(labelY)}" text-anchor="middle">${esc(destination)}</text></g>`;
   }).join('');
+  const objective = getObjective(state);
+  const nextExit = nextPassage(area.id, objective.area);
+  const target = nextExit || (area.id === objective.area && [...people,...(area.objects || [])].find(object => object.id === objective.object));
+  const objectiveMarker = target && !target.hidden && !target.secret && inside(target) ? (() => {
+    const [x,y] = project(target.x,target.z);
+    return `<g class="local-objective" data-map-objective="${esc(target.id)}"><title>${esc(nextExit ? 'Siguiente acceso: ' + (nextExit.label || AREAS[nextExit.target].name) : objective.title)}</title><path d="M${x} ${y-16}l16 16-16 16-16-16Z"/></g>`;
+  })() : '';
   const playerMarker = `<g class="local-player" data-map-player="true" data-world-x="${n(player[0])}" data-world-z="${n(player[1])}" transform="translate(${px} ${py})"><title>Estás aquí</title><circle class="local-player-halo" r="11"/><circle r="5"/><text y="24" text-anchor="middle">Vos</text></g>`;
-  return `<svg class="local-map" viewBox="0 0 560 510" role="img" aria-label="${esc(`Mapa de ${area.name}. Norte arriba. Tu posición, caminos y accesos.`)}"><defs>${clip}</defs><rect class="local-ground" x="${left}" y="${top}" width="${bounds.w}" height="${bounds.h}"/><g clip-path="url(#${prefix}-bounds)">${water}${surfaces}${courts}${paths}${exclusions}${buildings}${landmarks}${objects}</g><rect class="local-border" x="${left}" y="${top}" width="${bounds.w}" height="${bounds.h}"/>${exits}${playerMarker}<text class="map-compass" x="522" y="27">N</text><path class="map-north" d="M527 54V35m-5 7 5-7 5 7"/></svg>`;
+  return `<svg class="local-map" viewBox="0 0 560 510" role="img" aria-label="${esc(`Mapa de ${area.name}. Norte arriba. Tu posición, caminos y accesos.`)}"><defs>${clip}</defs><rect class="local-ground" x="${left}" y="${top}" width="${bounds.w}" height="${bounds.h}"/><g clip-path="url(#${prefix}-bounds)">${water}${surfaces}${courts}${paths}${exclusions}${buildings}${landmarks}${objects}</g><rect class="local-border" x="${left}" y="${top}" width="${bounds.w}" height="${bounds.h}"/>${exits}${objectiveMarker}${playerMarker}<text class="map-compass" x="522" y="27">N</text><path class="map-north" d="M527 54V35m-5 7 5-7 5 7"/></svg>`;
 }
 
 export function renderWorldMap(state, {position, inhabitants, objectiveArea = getObjective(state)?.area} = {}) {
   if (!validArea(state.area)) return '';
   const area = AREAS[state.area];
   const visited = new Set((state.visited || []).filter(validArea));
-  const destinations = [...visited].map(id => `<button type="button" class="map-destination ${id===state.area?'selected':''}" data-area="${id}" ${id===state.area?'disabled aria-current="location"':''}><span>${esc(AREAS[id].name)}</span><small>${id===state.area?'Lugar actual':'Volver a este lugar'}</small></button>`).join('');
+  const destinations = [...visited].map(id => `<button type="button" class="map-destination ${id===state.area?'selected':''}" data-area="${id}" ${id===state.area?'disabled aria-current="location"':''}><span>${esc(AREAS[id].name)}</span><small>${id===state.area?'Lugar actual':'Viajar a este lugar'}</small></button>`).join('');
+  const guide=journeyGuidance(state);
   const phase=journeyPhase(state);
   const orientation = `Día ${phase.day} · ${phase.label}. Norte arriba. Pueblo al sur, loma al oeste y costa al noreste.`;
   let localLayout=AREA_LAYOUTS[area.id];
   if(isExterior(area.id)){
-    const extensions=passagesFor(area.id).map(e=>{const p=passageGeometry(area.id,e.target),points=[[e.x,e.z]];for(let i=0;i<=12;i++){const z=p.a[1]+(p.mid[1]-p.a[1])*i/12;points.push(fromKingdom(area.id,[corridorX(p,z),z]));}return {id:`journey-${e.id}`,width:3.5,points};});
-    localLayout={...localLayout,bounds:travelBounds(area.id),paths:[...localLayout.paths,...extensions]};
+    const extensions=passagesFor(area.id).flatMap(e=>passageGeometry(area.id,e.target).routes.map(route=>({id:`journey-${e.id}-${route.id}`,width:route.width,points:[[e.x,e.z],...route.points.slice(0,21).map(p=>fromKingdom(area.id,p))]})));
+    // The local sheet frames this place, expanding only when the traveller is on a connector.
+    // The kingdom view retains the complete geography instead of shrinking village labels.
+    const player=point(position)?position:point(state.position)?state.position:area.spawn;
+    const bounds=(localLayout.bounds||area.bounds).map((size,index)=>Math.max(size,Math.abs(player[index])*2+8));
+    localLayout={...localLayout,bounds,paths:[...localLayout.paths,...extensions]};
   }
   const localView = `<div class="local-map-viewer"><input type="checkbox" class="local-map-zoom-toggle" id="local-map-zoom-${area.id}" aria-controls="local-map-view-${area.id}"><label class="local-map-zoom-label" for="local-map-zoom-${area.id}">Ampliar mapa</label><p class="local-map-zoom-help">Deslizá el plano para leer los nombres.</p><div class="local-map-viewport" id="local-map-view-${area.id}" tabindex="0" role="region" aria-label="${esc(`Plano de ${area.name}`)}">${renderLocalMap(area,localLayout,position,state,inhabitants)}</div></div>`;
-  return `<div class="eyebrow">EL VALLE Y LA COSTA</div><h2>Caminos de Ohmdal</h2><p class="modal-intro">${orientation}</p><div class="world-map-layout"><section class="journey-section" aria-labelledby="journey-map-title"><h3 id="journey-map-title">El camino recorrido</h3>${regionalSvg(state,objectiveArea)}<div class="world-map-key"><span><i class="key-current"></i>Estás aquí</span><span><i class="key-visited"></i>Visitado</span><span><i class="key-locked">×</i>Paso cerrado</span></div></section><section class="local-map-section" aria-labelledby="local-map-title"><div class="local-map-heading"><span class="eyebrow">A TU ALREDEDOR</span><h3 id="local-map-title">${esc(area.name)}</h3></div>${localView}<div class="world-map-key"><span><i class="key-path"></i>Camino</span><span><i class="key-person"></i>Persona</span><span><i class="key-place"></i>Banco</span><span><i class="key-door"></i>Acceso</span></div><p class="local-map-note">Las marcas de acceso señalan dónde pasar de un lugar a otro.</p></section></div>${destinations?`<nav class="map-destinations" aria-label="Volver a lugares visitados">${destinations}</nav>`:''}`;
+  return `<div class="eyebrow">EL VALLE Y LA COSTA</div><h2>Caminos de Ohmdal</h2><p class="modal-intro">${orientation}</p><div class="map-context"><p><strong>${esc(guide.title)}</strong><br>${esc(guide.direction)}</p><button class="quiet" data-map-guide>Ver guía →</button></div><div class="map-view-tabs" role="tablist" aria-label="Vista del mapa"><button id="map-tab-local" role="tab" data-map-view="local" aria-controls="map-panel-local" aria-selected="true">Zona actual</button><button id="map-tab-kingdom" role="tab" data-map-view="kingdom" aria-controls="map-panel-kingdom" aria-selected="false" tabindex="-1">Todo el reino</button></div><div class="world-map-layout"><section id="map-panel-kingdom" role="tabpanel" tabindex="0" hidden class="journey-section" aria-labelledby="map-tab-kingdom"><h3 id="journey-map-title">El camino recorrido</h3>${regionalSvg(state,objectiveArea)}<div class="world-map-key"><span><i class="key-current"></i>Estás aquí</span><span><i class="key-visited"></i>Visitado</span><span><i class="key-locked">×</i>Paso cerrado</span></div></section><section id="map-panel-local" role="tabpanel" tabindex="0" class="local-map-section" aria-labelledby="map-tab-local"><div class="local-map-heading"><span class="eyebrow">A TU ALREDEDOR</span><h3 id="local-map-title">${esc(area.name)}</h3></div>${localView}<div class="world-map-key"><span><i class="key-path"></i>Camino</span><span><i class="key-person"></i>Persona</span><span><i class="key-place"></i>Banco</span><span><i class="key-door"></i>Acceso</span><span><i class="key-objective"></i>Siguiente paso</span></div><p class="local-map-note">Las marcas de acceso señalan dónde pasar de un lugar a otro.</p></section></div>${destinations?`<details class="map-return"><summary>Viajar a un lugar visitado · ${visited.size}</summary><nav class="map-destinations" aria-label="Volver a lugares visitados">${destinations}</nav></details>`:''}`;
 }
 
 export const mapStyles = `

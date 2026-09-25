@@ -1,7 +1,7 @@
 import { measureWorld } from './world-circuits.js';
 import { PUZZLES } from './puzzle-model.js';
 
-const RECEIVERS={beacon_supply_panel:['beacon_supply','core'],beacon_network_panel:['beacon_network','optic'],tower_motor:['beacon_network','bearing'],beacon_lens_panel:['beacon_lens','lens']};
+const RECEIVERS={pump_panel:['pump','pump'],irrigation_panel:['irrigation','flow'],beacon_supply_panel:['beacon_supply','core'],beacon_network_panel:['beacon_network','optic'],tower_motor:['beacon_network','bearing'],beacon_lens_panel:['beacon_lens','lens']};
 
 /** Receiver brightness and movement follow the same saved branch as the meter. */
 export function readReceiverFeedback(area,state,id){
@@ -12,7 +12,9 @@ export function readReceiverFeedback(area,state,id){
   const power=reading.sourceAvailable&&!reading.overloaded?Math.abs((reading.voltage||0)*(reading.current||0)):0;
   const level=Math.min(2,power/nominalPower);
   const ready=id==='beacon_lens_panel'?(state.flags?.tower_lens_free??state.flags?.beacon_lens):reading.mechanicalReady!==false;
-  return {level,moving:level>1e-7&&Boolean(ready)};
+  const hydraulic=id==='pump_panel'||id==='irrigation_panel';
+  const canDrive=hydraulic?Math.abs(reading.voltage||0)>=goal.minVoltage&&Math.abs(reading.current||0)>=goal.minCurrent:level>1e-7;
+  return {level,moving:canDrive&&Boolean(ready)};
 }
 
 // These handles move water, shafts or shutters. They are not electrical contacts.

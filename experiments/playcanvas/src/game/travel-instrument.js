@@ -16,7 +16,7 @@ export function mountTravelInstrument(document){
   header.querySelector('.place').append(phase);
   const objective=document.querySelector('#objective');header.append(objective);
   document.querySelector('#area-subtitle').classList.add('screen-reader-only');
-  const bearing=document.createElement('span');bearing.id='travel-bearing';bearing.className='screen-reader-only';header.append(bearing);compass.setAttribute('aria-describedby','travel-bearing');
+  const bearing=document.createElement('span');bearing.id='travel-bearing';bearing.className='travel-bearing';header.append(bearing);compass.setAttribute('aria-describedby','travel-bearing');
 }
 export function updateTravelInstrument(document,state,position,objective){
   const phase=advanceJourneyTime(state),bearing=travelBearing(state,position,objective);

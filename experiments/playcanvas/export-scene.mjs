@@ -9,7 +9,7 @@ import {buildKingdomLandscape} from '../../src/kingdom-landscape.js';
 import {AREAS} from './src/game/content.js';
 const output={version:2,areas:{},meshes:[],actors:[],lights:[]},batches=new Map();
 const round=n=>Math.round(n*10000)/10000;
-// The converter uses this branch's river mouth without editing the original game.
+// The converter and the playable snapshot share exactly the same river course.
 sourceWatercourse.splice(0,sourceWatercourse.length,...WATERCOURSE.map(p=>[...p]));
 function capture(world,id,offset=[0,0],landscape=false){
   const mapNames=new Map(Object.entries(world.textures).map(([name,texture])=>[texture,name]));
@@ -18,11 +18,16 @@ function capture(world,id,offset=[0,0],landscape=false){
   const excluded=new Set([world.player,world.ohm,world.dormantOhm,...(world.actors||[]).map(a=>a.g)]);
   if(!landscape)for(const a of world.actors)if(a.name!=='player')output.actors.push({area:id,name:a.name,x:a.g.position.x+offset[0],z:a.g.position.z+offset[1]});
   world.root.updateMatrixWorld(true);
-  const dynamics=new Map();let serial=0;
+  const dynamics=new Map(),receivers=new Map();let serial=0;
+  for(const machine of world.machines||[])for(const receiver of machine.receiverMaterials||[])receivers.set(receiver.material,{object:machine.obj.id,intensity:receiver.intensity});
   const tag=(node,meta)=>{if(!node)return;const p=node.getWorldPosition(new T.Vector3());dynamics.set(node,{id:id+'-'+serial++,pivot:[p.x+offset[0],p.y,p.z+offset[1]],...meta});};
-  for(const a of world.animations||[])if(['gear','optic','wheel','boat','banner'].includes(a.kind))tag(a.obj,{kind:a.kind,speed:a.speed||.2,flag:a.activationFlag,receiver:a.receiverId});
+  for(const a of world.animations||[])if(['gear','optic','wheel','boat','banner'].includes(a.kind)){
+    // Geometry is baked in world space: rotate around the baked axle, not global Z.
+    const axis=new T.Vector3(0,a.kind==='optic'?1:0,a.kind==='optic'?0:1).applyQuaternion(a.obj.getWorldQuaternion(new T.Quaternion()));
+    tag(a.obj,{kind:a.kind,speed:a.speed||.2,flag:a.activationFlag,receiver:a.receiverId,spinAxis:axis.toArray().map(round)});
+  }
   tag(world.gateLeaf,{kind:'gate'});
-  for(const l of world.levers||[])tag(l.pivot,{kind:'lever',flag:l.obj.action?.flag||l.obj.flag});
+  for(const l of world.levers||[])tag(l.pivot,{kind:'lever',flag:l.obj.action?.flag||l.obj.flag,axis:l.waterHandle?'z':'x'});
   for(const l of world.levers||[])tag(l.indicator,{kind:'control',object:l.obj.id});
   world.root.traverse(o=>{if(o.isMesh){const wire=world.conductors?.find(w=>w.mat===o.material);if(wire)tag(o,{kind:'conductor',object:wire.obj.id,return:wire.isReturn});}});
   for(const m of world.machines||[])tag(m.ring,{kind:'indicator',flag:m.obj.puzzle||m.obj.flag});
@@ -44,6 +49,7 @@ function capture(world,id,offset=[0,0],landscape=false){
     if(material.isShaderMaterial&&!isWater)return;
     const key=material.customProgramCacheKey?.()||'',mapping=key.match(/world(surface|stone)-([\d.]+)/);
     const descriptor={texture:isWater?'water':texture,color:material.color?.getHexString()||'4b8a88',emissive:material.emissive?.getHexString()||'000000',emission:material.emissiveIntensity||0,glass:material===world.m?.glass,alpha:material.alphaTest||0,opacity:material.opacity??1,double:material.side===T.DoubleSide,unlit:!!material.isMeshBasicMaterial,shadow:!!object.castShadow};
+    if(receivers.has(material))descriptor.receiver=receivers.get(material);
     // Avoid hand-drawn transparent contact glows becoming black rectangles.
     if(texture==='glow'||texture==='foliage'||texture==='fern')return;
     const batchKey=id+owner+(dynamic?.id||'')+JSON.stringify(descriptor);let batch=batches.get(batchKey);

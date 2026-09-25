@@ -2,23 +2,24 @@ import {AREAS} from './content.js';
 
 // Metres in a shared, north-up territory. Workshops are interiors of real buildings.
 export const KINGDOM = Object.freeze({
-  portal:{x:0,z:44,region:'El umbral del valle'},
+  portal:{x:-24,z:44,region:'El umbral del valle'},
   plaza:{x:0,z:0,region:'Pueblo de Ohm'},
   workshop:{x:-13.25,z:3.8,region:'Pueblo de Ohm · interior'},
-  road:{x:6,z:-48,region:'Calzada del agua'},
-  spring:{x:0,z:-95,region:'Cabecera del agua'},
-  castle:{x:-10,z:-142,region:'Loma de la Red'},
-  terraces:{x:6,z:-192,region:'Ladera de los bancales'},
-  lake:{x:18,z:-243,region:'Ribera de las Señales'},
-  lighthouse:{x:30,z:-297,region:'Espigón del Faro'},
+  road:{x:34,z:-48,region:'Calzada del agua'},
+  spring:{x:12,z:-95,region:'Cabecera del agua'},
+  castle:{x:-40,z:-142,region:'Loma de la Red'},
+  terraces:{x:-8,z:-192,region:'Ladera de los bancales'},
+  lake:{x:38,z:-243,region:'Ribera de las Señales'},
+  lighthouse:{x:76,z:-297,region:'Espigón del Faro'},
 });
 export const EXTERIORS=Object.keys(KINGDOM).filter(id=>id!=='workshop');
 // The gate stands on the western embankment; the canal passes OUTSIDE its bastion.
 export const ROAD_CANAL_X=19.8;
-export const WATERCOURSE=[[22,110],[22,16],[22,-16],[25.8,-32],[25.8,-64],[20,-80],[20,-110],[18,-126],[18,-158],[28,-174],[28,-210],[28,-226],[34,-245]];
+// Keep the canal on the east bank of each settlement, including the river mouth.
+export const WATERCOURSE=[[-2,110],[-2,56],[-2,32],[22,16],[22,-16],[53.8,-32],[53.8,-64],[32,-80],[32,-110],[-12,-126],[-12,-158],[14,-174],[14,-210],[54,-226],[54,-245]];
 export function inKingdomWater(id,x,z,margin=0){
   if(!isExterior(id))return false;const [wx,wz]=toKingdom(id,[x,z]);
-  for(let i=1;i<WATERCOURSE.length;i++){const a=WATERCOURSE[i-1],b=WATERCOURSE[i];if(wz>Math.max(a[1],b[1])||wz<Math.min(a[1],b[1]))continue;const t=(wz-a[1])/(b[1]-a[1]),cx=a[0]+(b[0]-a[0])*t;if(Math.abs(wx-cx)<2.3+margin)return true;}
+  for(let i=1;i<WATERCOURSE.length;i++)if(segmentDistance([wx,wz],WATERCOURSE[i-1],WATERCOURSE[i])<2.3+margin)return true;
   return false;
 }
 export const isExterior=id=>EXTERIORS.includes(id);
@@ -26,23 +27,31 @@ export const toKingdom=(id,[x,z])=>[KINGDOM[id].x+x,KINGDOM[id].z+z];
 export const fromKingdom=(id,[x,z])=>[x-KINGDOM[id].x,z-KINGDOM[id].z];
 export const geographicDelta=(from,to)=>[KINGDOM[to].x-KINGDOM[from].x,KINGDOM[to].z-KINGDOM[from].z];
 export function passagesFor(id){return isExterior(id)?AREAS[id].exits.filter(e=>isExterior(e.target)):[];}
+const passageCache=new Map();
 export function passageGeometry(id,target){
+  const key=id+':'+target;if(passageCache.has(key))return passageCache.get(key);
   if(!isExterior(id)||!isExterior(target))return null;
   const exit=AREAS[id].exits.find(e=>e.target===target),back=AREAS[target].exits.find(e=>e.target===id);
   if(!exit||!back)return null;
   const a=toKingdom(id,[exit.x,Math.sign(exit.z)*AREAS[id].bounds[1]/2]);
   const b=toKingdom(target,[back.x,Math.sign(back.z)*AREAS[target].bounds[1]/2]);
-  return {id:[id,target].sort().join(':'),from:id,to:target,a,b,mid:[(a[0]+b[0])/2,(a[1]+b[1])/2],exit,back,bridge:[id,target].includes('lighthouse')};
+  const p={id:[id,target].sort().join(':'),from:id,to:target,a,b,exit,back,bridge:[id,target].includes('lighthouse')};
+  const z=(a[1]+b[1])/2;p.mid=[corridorX(p,z),z];
+  p.points=Array.from({length:41},(_,i)=>{const z=a[1]+(b[1]-a[1])*i/40;return [corridorX(p,z),z];});
+  p.routes=[{id:'main',width:4.1,points:p.points}];
+  if(['plaza:portal','castle:terraces'].includes(p.id))p.routes.push({id:'woodland-loop',width:2.7,points:p.points.map(([x,z],i)=>[x-9*Math.sin(Math.PI*i/40)**2,z])});
+  passageCache.set(key,p);return p;
 }
 export function corridorX(p,z){
   const t=Math.max(0,Math.min(1,(z-p.a[1])/(p.b[1]-p.a[1])));
   return p.a[0]+(p.b[0]-p.a[0])*t*t*(3-2*t);
 }
+function segmentDistance(p,a,b){const dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dz);}
 export function inTravelCorridor(id,x,z,margin=0){
   const pos=toKingdom(id,[x,z]);
-  return passagesFor(id).some(e=>{const p=passageGeometry(id,e.target);return pos[1]>=Math.min(p.a[1],p.b[1])-3&&pos[1]<=Math.max(p.a[1],p.b[1])+3&&Math.abs(pos[0]-corridorX(p,pos[1]))<2.05-margin;});
+  return passagesFor(id).some(e=>passageGeometry(id,e.target).routes.some(route=>route.points.some((b,i)=>i>0&&segmentDistance(pos,route.points[i-1],b)<route.width/2-margin)));
 }
-export function travelBounds(id){const [w,d]=AREAS[id].bounds;return isExterior(id)?[w+12,d+24]:[w,d];}
+export function travelBounds(id){const [w,d]=AREAS[id].bounds;if(!isExterior(id))return [w,d];const points=passagesFor(id).flatMap(e=>passageGeometry(id,e.target).routes.flatMap(route=>route.points.slice(0,23).map(p=>fromKingdom(id,p))));return [Math.max(w+12,...points.map(p=>Math.abs(p[0])*2+6)),Math.max(d+24,...points.map(p=>Math.abs(p[1])*2+6))];}
 export function nextPassage(from,to){
   const queue=[[from,[]]],seen=new Set([from]);
   while(queue.length){const [id,path]=queue.shift();if(id===to)return path[0]||null;

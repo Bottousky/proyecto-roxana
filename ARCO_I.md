@@ -95,6 +95,10 @@ es una posibilidad de profundización, no un atajo explicativo.
 
 ## Epílogo: la primera clase
 
+La reparación culmina de noche. La primera clase sucede a la mañana siguiente:
+Nereo ya pudo volver a casa y Tala llega con Lumen. Ese amanecer es el inicio
+del segundo día, también al regresar a los lugares recorridos.
+
 Edda enseña a otra persona con ayuda de la Bitácora. Lumen presta instrumentos;
 Vega opera; Nereo contrasta una medición con su memoria. El estudiante presencia
 algo que ya puede continuar sin él.
@@ -106,3 +110,33 @@ con Ohmdal. El horizonte conserva otros problemas y otros territorios.
 El logro del viaje se reconoce en tres cambios: las instalaciones cumplen su
 función, los habitantes pueden mantenerlas y el estudiante puede explicar y
 transferir lo aprendido. El regreso de la luz hace visible esa transformación.
+
+## Tiempo y territorio del viaje
+
+El Arco I ocupa un día narrativo y la mañana siguiente. El Portal, la Plaza y
+el taller se visitan por la mañana; al alcanzar el Manantial comienza la tarde.
+La llegada a las Terrazas marca el atardecer, el Lago el crepúsculo y el Faro
+la noche. La iluminación cambia de manera gradual. Estos hitos describen el
+tiempo del viaje, sin exigir que el jugador termine una reparación antes de
+una hora límite. Leer, experimentar, detenerse o cerrar el juego no adelanta
+el día. Volver sobre los pasos nunca hace retroceder la hora.
+
+El instrumento de viaje forma parte del equipo del Instituto que el estudiante
+lleva al cruzar el Portal. Reúne orientación, registro del momento del día,
+ubicación, pregunta pendiente, Bitácora y mapa. Registra el recorrido; no
+diagnostica instalaciones ni revela secretos. No muestra minutos ficticios.
+
+Ohmdal ocupa un valle que se abre hacia la costa noreste. El Portal queda al
+sur del pueblo. El taller ocupa el lado oeste de la Plaza, con puerta al sur;
+es un interior del pueblo y no un paso obligatorio hacia la Calzada. La calle
+del norte sale entre las últimas casas, acompaña el canal y atraviesa la Puerta
+de Ohm. El Manantial alimenta la conducción del pueblo y la distribución hacia
+los bancales. El camino bordea la cabecera, gana la loma oeste del Castillo,
+gira al noreste por las Terrazas y desciende hacia el Lago. Un espigón transitable
+une la ribera con la galería del Faro. Las reparaciones permanecen visibles y
+audibles cuando el jugador vuelve.
+
+Las divisiones de producción no son fronteras dentro de la ficción. Las
+coordenadas regionales, senderos de enlace y mapa proceden de una geografía
+compartida. En exteriores el jugador continúa andando al cruzar entre sectores;
+el taller se atraviesa mediante su puerta.
