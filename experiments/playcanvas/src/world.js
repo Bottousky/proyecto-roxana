@@ -1,4 +1,4 @@
-import {Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
+import {CameraFrame,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
 import {surface,actorArt} from './art.ts';
 import {AREAS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
@@ -37,10 +37,27 @@ export class PlayCanvasWorld {
     this.canvas=canvas;this.state={flags:{},settings:{}};this.clock=0;this.route=[];this.target=null;this.actors=[];this.regions=new Map();this.allActors=[];this.dynamics=[];this.waters=[];this.glasses=[];this.lights=[];this.sprites=new Map();this.focus=new Position();this.cameraOffset=new Position(0,13.5,25);this.currentZoom=.93;this.companionRoute=[];this.companionAge=0;this.walking=false;
     this.app=new Application(canvas,{graphicsDeviceOptions:{alpha:false,antialias:true}});
     this.app.setCanvasFillMode(FILLMODE_FILL_WINDOW);this.app.setCanvasResolution(RESOLUTION_AUTO);
-    this.camera=new Entity('Cámara de viaje');this.camera.addComponent('camera',{projection:PROJECTION_ORTHOGRAPHIC,orthoHeight:12/.93,nearClip:.1,farClip:250,clearColor:color('#8fa5a6')});this.camera.camera.toneMapping=TONEMAP_ACES;this.app.root.addChild(this.camera);
+    this.camera=new Entity('Cámara de viaje');this.camera.addComponent('camera',{projection:PROJECTION_ORTHOGRAPHIC,orthoHeight:12/.93,nearClip:.1,farClip:250,clearColor:color('#8fa5a6')});this.camera.camera.toneMapping=TONEMAP_ACES;this.app.root.addChild(this.camera);this.buildFrame();
     this.sun=new Entity('Sol de Ohmdal');this.sun.addComponent('light',{type:'directional',color:color('#ffe6bc'),intensity:1.6,castShadows:true,shadowResolution:2048,shadowDistance:100,normalOffsetBias:.04,shadowBias:.2});this.sun.setEulerAngles(50,-35,0);this.app.root.addChild(this.sun);
     this.app.scene.ambientLight=color('#8eaaad');this.resize();this.assetsReady=this.loadArtAssets();
     this.destroy=()=>this.dispose();addEventListener('beforeunload',this.destroy,{once:true});
+  }
+  // HD-2D finish: depth of field focused on the player reads as tilt-shift on the tilted
+  // orthographic view, with a soft bloom on lamps and water glints and a gentle vignette.
+  buildFrame(){
+    const f=this.frame=new CameraFrame(this.app,this.camera.camera);
+    f.rendering.toneMapping=TONEMAP_ACES;f.rendering.samples=4;
+    f.bloom.intensity=.018;f.bloom.blurLevel=12;
+    f.vignette.intensity=.32;f.vignette.inner=.6;f.vignette.outer=1.35;f.vignette.curvature=.7;
+    f.colorEnhance.enabled=true;f.colorEnhance.vibrance=.12;f.colorEnhance.shadows=.15;
+    f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=57;f.dof.focusRange=12;f.dof.blurRadius=3.5;f.dof.blurRings=4;f.dof.blurRingPoints=5;f.dof.highQuality=true;
+    f.update();
+  }
+  focusFrame(){
+    if(!this.frame?.enabled||!this.player)return;
+    const [ox,oz]=this.data.areas[this.area.id].offset,p=this.player.position,wanted=this.camera.getPosition().distance(new Vec3(p.x+ox,p.y+1,p.z+oz));
+    const range=this.inspect||this.cinematic?16:this.area.id==='workshop'?18:12;
+    if(Math.abs(wanted-this.frame.dof.focusDistance)>.05||range!==this.frame.dof.focusRange){this.frame.dof.focusDistance=wanted;this.frame.dof.focusRange=range;this.frame.update();}
   }
   async loadArtAssets(){
     if(this.booted)return {ok:true,missing:[]};
@@ -173,7 +190,7 @@ export class PlayCanvasWorld {
     this.syncActors();this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
     else{const rest=gameplayCameraPose(this.area.id,p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
-    this.positionCamera();
+    this.positionCamera();this.focusFrame();
   }
   updateCompanion(dt,paused,reduced){
     const o=this.ohm.position,p=this.player.position,old=[o.x,o.z],distance=Math.hypot(p.x-o.x,p.z-o.z);this.companionAge+=dt;
@@ -197,7 +214,7 @@ export class PlayCanvasWorld {
   }
   updateEnvironment(dt,reduced){
     const f=this.state.flags,phase=journeyPhase(this.state),inside=this.area.id==='workshop',mix=1-Math.exp(-dt*.8);this.lampLevel??=phase.lamps;this.lampLevel+=(phase.lamps-this.lampLevel)*mix;
-    const n=this.lampLevel;this.sun.light.intensity+=((inside?.85:phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,color(phase.sun),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?'#7c7967':n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#0f0c09':phase.sky),mix);
+    const n=this.lampLevel;if(this.wasInside!==inside){this.wasInside=inside;if(inside)this.camera.camera.clearColor=color('#000000');}this.sun.light.intensity+=((inside?.85:phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,color(phase.sun),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?'#7c7967':n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#000000':phase.sky),mix);
     for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?1.6:n*2.2):0;}
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.55:n*.7)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
     if(this.portalGlow){this.portalGlow.material.opacity=.4+(reduced?0:Math.sin(this.clock*.9)*.08);this.portalGlow.material.update();}
@@ -221,6 +238,6 @@ export class PlayCanvasWorld {
     for(const p of this.motes){p.entity.enabled=!reduced&&(!inside||Math.abs(p.x)<11&&p.z<16);p.entity.setPosition(this.focus.x+p.x+Math.sin(this.clock*.2+p.phase)*.5,p.y+Math.sin(this.clock*.6+p.phase)*.15,this.focus.z+p.z);}
     this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*.18;this.beacon.setPosition(KINGDOM.lighthouse.x+Math.cos(a)*27.5,18,KINGDOM.lighthouse.z-25.08+Math.sin(a)*27.5);this.beacon.setEulerAngles(0,-a*57.3,90);
   }
-  resize(){const low=this.state.settings?.quality==='low';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;}
+  resize(){const low=this.state.settings?.quality==='low';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;if(this.frame)this.frame.enabled=!low;}
   dispose(){if(this.disposed)return;this.disposed=true;removeEventListener('beforeunload',this.destroy);this.app.destroy();}
 }
