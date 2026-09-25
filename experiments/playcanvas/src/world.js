@@ -29,6 +29,8 @@ class ActorSprite extends Script {
 }
 const color=s=>new Color().fromString(s);
 const power={portal:'awaken',plaza:'workshop',workshop:'workshop',road:'gate',spring:'pump',castle:'distribution',terraces:'irrigation',lake:'beacon_link',lighthouse:'beacon_network'};
+// Colour grade per moment of the journey: [saturation, r, g, b tint, brightness].
+const GRADES={morning:[1,1,1,1,1],afternoon:[1.02,1.02,1,.97,1],sunset:[.95,1.08,.95,.85,1],dusk:[.8,.94,.9,1.04,.97],night:[.66,.8,.9,1.1,.96],'next-morning':[1.03,1,1.01,1.02,1.02],inside:[1,1,1,1,1]};
 const DRY_CROP=new Color(1.5,1.02,.4); // multiplies the green leaf cards toward straw
 const waitFrame=()=>new Promise(r=>requestAnimationFrame(r));
 
@@ -50,6 +52,7 @@ export class PlayCanvasWorld {
     f.bloom.intensity=.018;f.bloom.blurLevel=12;
     f.vignette.intensity=.32;f.vignette.inner=.6;f.vignette.outer=1.35;f.vignette.curvature=.7;
     f.colorEnhance.enabled=true;f.colorEnhance.vibrance=.12;f.colorEnhance.shadows=.15;
+    f.grading.enabled=true;this.grade=[...GRADES.morning];
     f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=57;f.dof.focusRange=12;f.dof.blurRadius=3.5;f.dof.blurRings=4;f.dof.blurRingPoints=5;f.dof.highQuality=true;
     f.update();
   }
@@ -230,8 +233,10 @@ export class PlayCanvasWorld {
   updateEnvironment(dt,reduced){
     const f=this.state.flags,phase=journeyPhase(this.state),inside=this.area.id==='workshop',mix=1-Math.exp(-dt*.8);this.lampLevel??=phase.lamps;this.lampLevel+=(phase.lamps-this.lampLevel)*mix;
     const n=this.lampLevel;if(this.wasInside!==inside){this.wasInside=inside;if(inside)this.camera.camera.clearColor=color('#000000');}this.sun.light.intensity+=((inside?.85:phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,color(phase.sun),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?'#7c7967':n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#000000':phase.sky),mix);
+    if(this.frame?.enabled){const target=GRADES[inside?'inside':phase.id]||GRADES.morning,g=this.grade;let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
+      if(moved>.0005||!this.gradeApplied){this.gradeApplied=true;const f=this.frame.grading;f.saturation=g[0];f.tint=new Color(g[1],g[2],g[3]);f.brightness=g[4];this.frame.update();}}
     for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?1.6:n*2.2):0;}
-    for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.55:n*.7)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
+    for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
     if(this.portalGlow){this.portalGlow.material.opacity=.4+(reduced?0:Math.sin(this.clock*.9)*.08);this.portalGlow.material.update();}
     if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?4:0;}
     for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color('#ffc57d');g.material.emissiveIntensity=level;g.material.update();}
