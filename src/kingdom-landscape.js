@@ -88,7 +88,7 @@ export function buildKingdomLandscape(owner){
   }
   // One distant mountain range, fixed in the same territory for every viewpoint.
   for(let i=0;i<14;i++){
-    const mountain=owner.mesh('cone',dark,-68+i*12,6,-347-(i%3)*8,14,16+i%4*3,17);mountain.castShadow=false;
+    const mountain=owner.mesh('cone',dark,-68+i*12,6,-347-(i%3)*8,14,16+i%4*3,17);mountain.castShadow=false;mountain.name='kingdom-distant-mountain';
   }
   owner.root=root;
   return {connections,water};

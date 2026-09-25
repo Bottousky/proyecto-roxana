@@ -17,6 +17,7 @@ uniform vec3 uWaterFoam;
 uniform sampler2D uShoreMap;
 uniform vec4 uShoreRect;
 uniform float uShoreEnabled;
+uniform float uWaterOpen;
 float wHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float wNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
   return mix(mix(wHash(i),wHash(i+vec2(1,0)),f.x),mix(wHash(i+vec2(0,1)),wHash(i+vec2(1,1)),f.x),f.y);}
@@ -42,10 +43,13 @@ void getAlbedo(){
   dAlbedo=mix(uWaterDeep,uWaterShallow,smoothstep(0.3,0.8,body))*material_diffuse;
   dAlbedo*=0.9+wHeight*2.2;
   // Baked distance to the shore, in metres.
-  wShore=mix(6.0,texture2D(uShoreMap,(p-uShoreRect.xy)/uShoreRect.zw).r*6.0,uShoreEnabled);
+  vec2 shoreUv=(p-uShoreRect.xy)/uShoreRect.zw;float inMap=step(0.0,shoreUv.x)*step(shoreUv.x,1.0)*step(0.0,shoreUv.y)*step(shoreUv.y,1.0);
+  wShore=mix(6.0,texture2D(uShoreMap,shoreUv).r*6.0,uShoreEnabled*inMap);
   float wobble=(wNoise(p*1.7+vec2(t*0.3,t*0.2))-0.5)*0.35;
   float d=max(0.0,wShore+wobble);
   dAlbedo=mix(uWaterShallow*1.12,dAlbedo,smoothstep(0.0,1.1,d));
+  // Open water deepens toward navy away from the coast.
+  dAlbedo*=mix(vec3(1.0),vec3(0.42,0.62,0.95),uWaterOpen*smoothstep(1.5,6.0,wShore));
   // A solid lip against the bank and thinner swash lines that travel toward it.
   float lip=1.0-smoothstep(0.06,0.24,d);
   float swash=smoothstep(0.86,1.0,sin(d*6.5-t*1.4)*0.5+0.5)*(1.0-smoothstep(0.25,0.9,d));
@@ -93,8 +97,8 @@ export async function loadShore(app){
   shoreTexture.setSource(image);return shoreTexture;
 }
 // Fountains and basins are local pivoted meshes outside the baked map: no shoreline.
-export function bindShore(material,texture,enabled=true){
-  material.setParameter('uShoreEnabled',enabled?1:0);material.setParameter('uShoreMap',texture);material.setParameter('uShoreRect',[shore.x0,shore.z0,shore.width,shore.depth]);
+export function bindShore(material,texture,enabled=true,open=0){
+  material.setParameter('uWaterOpen',open);material.setParameter('uShoreEnabled',enabled?1:0);material.setParameter('uShoreMap',texture);material.setParameter('uShoreRect',[shore.x0,shore.z0,shore.width,shore.depth]);
 }
 
 // Uniforms are consumed in linear space; palette values are authored in sRGB.

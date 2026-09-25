@@ -444,7 +444,7 @@ export class World {
     this.solid(-12.7,-1.2,.65,36,"lighthouse-west-wall");this.solid(12.7,-1.2,.65,36,"lighthouse-east-wall");
     this.box(-12.7,1.8,-1.2,.65,3.6,36,this.m.stone);this.box(12.7,.6,-1.2,.65,1.2,36,this.m.stone);
     for(const z of [15,6,-2,-10,-18]){for(const side of [-1,1]){const x=side*11.9;this.solid(x,z,1.6,1.6,"lighthouse-column");this.box(x,.25,z,1.6,.5,1.6,this.m.stoneDark);this.cylinder(x,2.7,z,.48,4.8,this.m.stone);this.box(x,5.15,z,1.2,.32,1.2,this.m.cream);this.gear(x,3.4,z+.54,.43);}
-      if(z<14){const geom=new THREE.TorusGeometry(11.9,.22,8,48,Math.PI);this.localGeometries.push(geom);this.mesh(geom,this.m.stone,-0,5.3,z,1,.28,1);this.beam([-12,5.3,z],[12,5.3,z],.14,this.m.brass);}
+      if(z<14){const geom=new THREE.TorusGeometry(11.9,.22,8,48,Math.PI);this.localGeometries.push(geom);this.mesh(geom,this.m.stone,-0,5.3,z,1,.28,1);}
     }
     for(const side of [-1,1]){for(let z=-16;z<15;z+=5){this.box(side*12.35,2.45,z,.12,2.8,2.6,this.m.darkwood);this.box(side*12.25,2.45,z,.1,2.5,2.3,this.m.glass);for(let y=1.4;y<3.8;y+=.8)this.box(side*12.17,y,z,.12,.07,2.4,this.m.brass);}
       this.cable([[side*10.8,.45,15],[side*10.8,.45,6],[side*10.8,.45,-2],[side*10.8,.45,-10],[side*10.8,.45,-18]],this.m.brass);

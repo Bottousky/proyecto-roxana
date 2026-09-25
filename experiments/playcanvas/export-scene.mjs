@@ -56,6 +56,8 @@ function capture(world,id,offset=[0,0],landscape=false){
     // Paving is painted by the ground shader from a baked mask (scripts/bake-shore.mjs);
     // its meshes only carry the outline, and the kerb stones followed the old stepped edge.
     if(object.name==='paving-garden-edging')return;
+    // Seen from above, a cone range 50 m behind the Faro reads as rocks floating over the islet.
+    if(object.name==='kingdom-distant-mountain')return;
     if(PAVING.has(object.name))descriptor.paving=true;
     if(object.name==='terrace-crop')descriptor.crop=true;
     const batchKey=id+owner+(dynamic?.id||'')+JSON.stringify(descriptor);let batch=batches.get(batchKey);

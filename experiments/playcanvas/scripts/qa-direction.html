@@ -15,7 +15,7 @@ import '../src/game/style.css';
 import '../src/game/interface.css';
 import '../src/game/atlas.css';
 import '../src/game/journey-ui.css';
-const $=s=>document.querySelector(s),world=new PlayCanvasWorld($('#world')),state=freshState(),held=new Set();
+const $=s=>document.querySelector(s),world=window.__qaWorld=new PlayCanvasWorld($('#world')),state=freshState(),held=new Set();
 const fixed=Object.fromEntries([...Object.keys(PUZZLE_STORY),...WORLD_SYSTEMS.flatMap(s=>[s.flag,...(s.requires||[])])].map(f=>[f,true]));
 Object.assign(fixed,{road_bypass:false,castle_branch_closed:false});
 let ready=false,last=performance.now(),tour=null,tick=0;

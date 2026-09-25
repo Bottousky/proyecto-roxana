@@ -1,5 +1,5 @@
 // Captura cada lugar desde la página de revisión, sin leer ni escribir partidas.
-// Uso: node scripts/art-review.mjs [lugar,lugar…] [fase 0|3|4] [condición broken|ready|repaired]
+// Uso: node scripts/art-review.mjs [lugar,lugar…] [fase 0|3|4] [condición broken|ready|repaired] [x,z]
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -8,6 +8,7 @@ const base = process.env.GAME_URL || 'http://127.0.0.1:4190/';
 const areas = (process.argv[2] || 'portal,plaza,workshop,road,spring,castle,terraces,lake,lighthouse').split(',');
 const phase = process.argv[3] || '0';
 const condition = process.argv[4] || 'repaired';
+const at = process.argv[5]?.split(',').map(Number);
 const out = fileURLToPath(new URL('../output/art-review/', import.meta.url));
 mkdirSync(out, { recursive: true });
 
@@ -22,8 +23,9 @@ for (const area of areas) {
     const set = (id, v) => { const s = document.querySelector(id); s.value = v; s.dispatchEvent(new Event('change')); };
     set('#area', area); set('#phase', phase); set('#condition', condition); document.querySelector('#visit').click();
   }, [area, condition, phase]);
+  if (at) await page.evaluate(([x, z]) => window.__qaWorld?.setPlayerPosition([x, z]), at);
   await page.waitForTimeout(3500);
-  const file = out + `${area}-${phase}.png`;
+  const file = out + `${area}-${phase}${at ? '-' + at.join('_') : ''}.png`;
   await page.screenshot({ path: file });
   console.log('captura', file);
 }

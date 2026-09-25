@@ -1,4 +1,4 @@
-import {CameraFrame,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
+import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
 import {surface,actorArt} from './art.ts';
 import {AREAS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
@@ -32,6 +32,12 @@ const power={portal:'awaken',plaza:'workshop',workshop:'workshop',road:'gate',sp
 // Colour grade per moment of the journey: [saturation, r, g, b tint, brightness].
 const GRADES={morning:[1,1,1,1,1],afternoon:[1.02,1.02,1,.97,1],sunset:[.95,1.08,.95,.85,1],dusk:[.8,.94,.9,1.04,.97],night:[.66,.8,.9,1.1,.96],'next-morning':[1.03,1,1.01,1.02,1.02],inside:[1,1,1,1,1]};
 const DRY_CROP=new Color(1.5,1.02,.4); // multiplies the green leaf cards toward straw
+function beamTexture(app){
+  // Bright at the lens, fading with distance; soft across its width.
+  const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d'),img=x.createImageData(256,64);
+  for(let j=0;j<64;j++)for(let i=0;i<256;i++){const u=i/255,v=Math.abs(j/63-.5)*2,edge=Math.max(0,1-v/(.25+u*.75)),a=Math.pow(1-u,1.4)*Math.pow(edge,1.6),k=(j*256+i)*4;img.data[k]=img.data[k+1]=img.data[k+2]=255;img.data[k+3]=Math.round(a*255);}
+  x.putImageData(img,0,0);const t=new Texture(app.graphicsDevice,{width:256,height:64,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);return t;
+}
 const waitFrame=()=>new Promise(r=>requestAnimationFrame(r));
 
 export class PlayCanvasWorld {
@@ -77,7 +83,7 @@ export class PlayCanvasWorld {
       const d=b.material,e=new Entity(b.owner||`${b.area} · ${count}`),m=new StandardMaterial();m.diffuse=color('#'+d.color);m.emissive=color('#'+d.emissive);m.emissiveIntensity=d.emission;m.shininess=10;m.useMetalness=true;m.metalness=0;m.diffuseVertexColor=true;m.alphaTest=d.alpha;m.opacity=d.opacity;m.cull=d.double?CULLFACE_NONE:CULLFACE_BACK;
       if(d.texture){m.diffuseMap=await surface(this.app,d.texture);if(d.alpha){m.opacityMap=m.diffuseMap;m.opacityMapChannel='a';}}
       if(d.opacity<1){m.blendType=BLEND_NORMAL;m.depthWrite=false;}
-      if(d.texture==='water'){makeWater(m);bindShore(m,shore,!b.dynamic);this.waters.push(m);}
+      if(d.texture==='water'){makeWater(m);bindShore(m,shore,!b.dynamic,{lighthouse:1,lake:.6}[b.area]||0);this.waters.push(m);}
       if(d.texture==='ground')makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble});
       m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>new (key==='indices'?Uint32Array:Float32Array)(binary,b[key].offset,b[key].length);
       mesh.setPositions(attr('positions'));mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
@@ -92,6 +98,8 @@ export class PlayCanvasWorld {
     }
     // The far countryside continues behind the authored region surfaces.
     for(const [z,depth] of [[-95,390]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(42,65);m.update();e.render.material=m;e.setPosition(-42.5,-.15,z);e.setLocalScale(175,1,depth);this.regions.get('landscape').root.addChild(e);}
+    // Open sea to the horizon north of the Faro: the authored planes stop 20 m past the islet.
+    {const e=new Entity('Mar abierto'),m=makeWater(new StandardMaterial());bindShore(m,shore,true,1);e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(75,-.45,-540);e.setLocalScale(760,1,530);this.regions.get('landscape').root.addChild(e);this.waters.push(m);}
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
     }
@@ -218,7 +226,9 @@ export class PlayCanvasWorld {
   buildAtmosphere(){
     const m=new StandardMaterial();m.diffuse=color('#e8c994');m.emissive=color('#d6be82');m.emissiveIntensity=.65;m.blendType=BLEND_ADDITIVEALPHA;m.opacity=.26;m.depthWrite=false;m.update();this.motes=[];
     for(let i=0;i<45;i++){const e=new Entity('Polen en la luz');e.addComponent('render',{type:'sphere'});e.render.material=m;e.render.castShadows=false;e.setLocalScale(.025,.025,.025);this.app.root.addChild(e);this.motes.push({entity:e,phase:i*2.399,x:(i*7.33)%38-19,z:(i*11.27)%40-20,y:.4+(i%9)*.42});}
-    this.beacon=new Entity('Señal del Faro');const m2=new StandardMaterial();m2.diffuse=color('#ffe1a5');m2.emissive=color('#ffe1a5');m2.emissiveIntensity=2;m2.opacity=.11;m2.blendType=BLEND_ADDITIVEALPHA;m2.depthWrite=false;m2.cull=CULLFACE_NONE;m2.update();this.beacon.addComponent('render',{type:'cone'});this.beacon.render.material=m2;this.beacon.render.castShadows=false;this.beacon.setLocalScale(12,55,12);this.app.root.addChild(this.beacon);
+    // The restored Faro sweeps a soft wedge of light across land and sea.
+    this.beacon=new Entity('Señal del Faro');const m2=new StandardMaterial(),ray=beamTexture(this.app);m2.diffuse=color('#000000');m2.emissive=color('#ffe3a8');m2.emissiveMap=ray;m2.opacityMap=ray;m2.opacityMapChannel='a';m2.emissiveIntensity=1.6;m2.opacity=.5;m2.blendType=BLEND_ADDITIVEALPHA;m2.depthWrite=false;m2.cull=CULLFACE_NONE;m2.useLighting=false;m2.update();this.beaconMaterial=m2;
+    const sweep=new Entity('Haz');sweep.addComponent('render',{type:'plane'});sweep.render.material=m2;sweep.render.castShadows=false;sweep.setLocalPosition(32,0,0);sweep.setLocalScale(64,1,14);this.beacon.addChild(sweep);this.app.root.addChild(this.beacon);
   }
   async buildLightEffects(){
     const texture=await surface(this.app,'glow');
@@ -228,7 +238,7 @@ export class PlayCanvasWorld {
     this.portalGlow=glow('La luz del Portal Ω',[KINGDOM.portal.x,2.8,KINGDOM.portal.z-5.45],5.2,'#73cbd3',this.regions.get('portal').root);
     this.lampGlows=[];for(const l of this.data.lights)this.lampGlows.push({...glow('Resplandor de farol',l.position,2.2,'#ffd092',this.regions.get(l.area).root),area:l.area});
     this.beaconGlow=glow('Cristal del Faro',[KINGDOM.lighthouse.x,18,KINGDOM.lighthouse.z-25.08],9,'#ffe2a7',this.regions.get('lighthouse').root);
-    this.beaconLight=new Entity('Luz restaurada del Faro');this.beaconLight.addComponent('light',{type:'omni',range:40,color:color('#ffdf9f'),intensity:0});this.beaconLight.setPosition(KINGDOM.lighthouse.x,18,KINGDOM.lighthouse.z-25.08);this.regions.get('lighthouse').root.addChild(this.beaconLight);
+    this.beaconLight=new Entity('Luz restaurada del Faro');this.beaconLight.addComponent('light',{type:'omni',range:55,color:color('#ffdf9f'),intensity:0});this.beaconLight.setPosition(KINGDOM.lighthouse.x,18,KINGDOM.lighthouse.z-25.08);this.regions.get('lighthouse').root.addChild(this.beaconLight);
   }
   updateEnvironment(dt,reduced){
     const f=this.state.flags,phase=journeyPhase(this.state),inside=this.area.id==='workshop',mix=1-Math.exp(-dt*.8);this.lampLevel??=phase.lamps;this.lampLevel+=(phase.lamps-this.lampLevel)*mix;
@@ -238,7 +248,7 @@ export class PlayCanvasWorld {
     for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?1.6:n*2.2):0;}
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
     if(this.portalGlow){this.portalGlow.material.opacity=.4+(reduced?0:Math.sin(this.clock*.9)*.08);this.portalGlow.material.update();}
-    if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?4:0;}
+    if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?1.5+2.2*n:0;}
     for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color('#ffc57d');g.material.emissiveIntensity=level;g.material.update();}
     for(const d of this.dynamics){const e=d.entity,flag=!!f[d.flag],motion=reduced?0:1;
       if(d.kind==='gate'){const wanted=f.gate?1:0;d.progress+=(wanted-d.progress)*Math.min(1,dt*1.2);e.setPosition(d.pivot[0],d.pivot[1]+d.progress*5.8,d.pivot[2]);}
@@ -256,7 +266,7 @@ export class PlayCanvasWorld {
     this.cropLife??=f.irrigation?1:0;const life=this.cropLife+=((f.irrigation?1:0)-this.cropLife)*Math.min(1,dt*(reduced?4:.6));
     if(this.crops&&Math.abs(life-(this.cropShown??-1))>.002){this.cropShown=life;for(const c of this.crops){c.material.diffuse.lerp(DRY_CROP,c.lush,life);c.material.update();}}
     for(const p of this.motes){p.entity.enabled=!reduced&&(!inside||Math.abs(p.x)<11&&p.z<16);p.entity.setPosition(this.focus.x+p.x+Math.sin(this.clock*.2+p.phase)*.5,p.y+Math.sin(this.clock*.6+p.phase)*.15,this.focus.z+p.z);}
-    this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*.18;this.beacon.setPosition(KINGDOM.lighthouse.x+Math.cos(a)*27.5,18,KINGDOM.lighthouse.z-25.08+Math.sin(a)*27.5);this.beacon.setEulerAngles(0,-a*57.3,90);
+    this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*(reduced?.05:.18);this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
   }
   resize(){const low=this.state.settings?.quality==='low';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;if(this.frame)this.frame.enabled=!low;}
   dispose(){if(this.disposed)return;this.disposed=true;removeEventListener('beforeunload',this.destroy);this.app.destroy();}
