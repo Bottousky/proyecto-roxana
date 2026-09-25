@@ -7,15 +7,15 @@ import './puzzles.css';
 // The mechanism comes first. Instruments are optional, and each encounter
 // introduces just one way of looking before offering previously used tools.
 export const BENCH_GUIDANCE = {
-  awaken: { subtitle: 'Hay un cable suelto junto al pequeño cuerpo de bronce.', tools: [], question: 'Escuchar a Edda', voice: 'EDDA, A TU LADO', hints: ['Ese extremo quedó solo… ¿se habrá soltado al caer?', 'Yo miraría las dos piezas redondas de bronce que quedaron libres. Pero es una sospecha.', 'Tocá una pieza redonda y después otra para probar un cable. Si no pasa nada, podés retirarlo.'] },
-  workshop: { subtitle: 'Lumen ya cambió la lámpara. Sigue sin prender.', tools: ['continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['La tela parece entera. Eso solo no demuestra que el camino de cobre esté completo.', 'El instrumento puede comprobar si hay un camino entre sus dos puntas. La máquina debe estar apagada.', 'Podemos comparar el camino antes y después de un cambio. Las dos observaciones quedan en la Bitácora.'] },
-  gate: { subtitle: 'El cerrojo se mueve, pero empuja hacia el lado equivocado.', tools: ['voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['El movimiento del cerrojo permite distinguir su sentido de su fuerza.', 'Las dos marcas del cerrojo miran hacia adelante. Los cables pueden conectarse de más de una manera.', 'El mando cambia la fuerza. No cambia el sentido. Son dos observaciones distintas.'] },
-  pump: { subtitle: 'La rueda gira con fuerza. El agua apenas sale.', tools: ['voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Podemos mirar el empalme y la bomba después de cada prueba. Si algo cambia, conviene dejarlo anotado.', 'Puedo comparar lo que llega a la bomba con lo que sale del generador. La explicación sigue pendiente.', 'Un cable puede dejar pasar algo y, aun así, estorbar. El instrumento del taller permite comprobar si hay camino; no cuánto trabaja la bomba.'] },
-  distribution: { subtitle: 'Dos habitaciones necesitan luz. El archivo está inundado.', tools: ['current', 'voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['El archivo se aisló desde el patio. Todavía podemos observar cómo se reparten los dos servicios sanos.', 'Podemos seguir el camino de cada luz. ¿Alguna necesita atravesar la otra para volver a la fuente?', 'Puedo medir cada camino por separado. Tener dos lámparas no garantiza tener dos caminos.'] },
-  irrigation: { subtitle: 'Vega quiere agua suave y raíces tibias. Una cosa por vez.', tools: ['current', 'voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Las hojas y el agua responden al montaje actual. Ambas cosas son observables sin instrumentos.', 'Al girar un mando, puedo registrar qué cambia y qué permanece igual.', 'Más no significa mejor. Tampoco significa peor en todas las posiciones. Conviene comparar.'] },
-  beacon_supply: { subtitle: 'El núcleo debe sostener su pulso sin que el cobre se caliente.', tools: ['voltage', 'current', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Podemos mirar cómo responde el núcleo y comparar el tendido antes y después de mover el mando.', 'Puedo mirar el núcleo y el tendido después de cada ajuste. Una mejora puede traer otra dificultad.', 'Puede haber más de una posición que el mecanismo sostenga. Las marcas permiten comparar lo que observamos.'] },
-  beacon_network: { subtitle: 'Luz, giro y campana. Ninguno debería depender de los otros.', tools: ['current', 'voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Podemos seguir los tres caminos. ¿Alguno atraviesa otro receptor antes de regresar?', 'En el castillo encontramos dos luces que podían funcionar por su cuenta. La torre tiene tres servicios.', 'Puedo comparar sus caminos y medirlos. No todos necesitan que pase la misma cantidad.'] },
-  beacon_lens: { subtitle: 'La lente encandila. Nereo busca una luz que pueda durar.', tools: ['voltage', 'current', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Podemos seguir el cable que alimenta la lente y mirar si pasa por el mando. No hace falta adivinarlo.', 'Hay una toma entre las dos piezas de cerámica. Podemos comparar cómo responde con otro punto de alimentación.', 'La lente cambia la lectura cuando está conectada. Conviene ajustar mientras funciona, no mientras falta.'] },
+  awaken: { subtitle: 'Hay un cable suelto junto al pequeño cuerpo de bronce.', tools: [], question: 'Escuchar a Edda', voice: 'EDDA, A TU LADO', hints: ['Ese extremo quedó solo… ¿se habrá soltado al caer?', 'Yo miraría las dos piezas redondas de bronce que quedaron libres. Pero es una sospecha.', 'Tocá una pieza redonda y después otra para probar un cable. Si no pasa nada, podés retirarlo.','Probá unir «Ohm −» con «Celda −». Así el camino puede volver a la celda.'] },
+  workshop: { subtitle: 'Lumen ya cambió la lámpara. Sigue sin prender.', tools: ['continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['La tela parece entera. Eso solo no demuestra que el camino de cobre esté completo.', 'El instrumento puede comprobar si hay un camino entre sus dos puntas. La máquina debe estar apagada.', 'Podemos comparar el camino antes y después de un cambio. Las dos observaciones quedan en la Bitácora.','Un paso para probar: apagá la alimentación y tendé un cable de «Costura A» a «Costura B». Si la tela esconde un corte, ese cable hace de puente. Después encendé y mirá la lámpara.'] },
+  gate: { subtitle: 'El cerrojo se mueve, pero empuja hacia el lado equivocado.', tools: ['voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['El movimiento del cerrojo permite distinguir su sentido de su fuerza.', 'Las dos marcas del cerrojo miran hacia adelante. Los cables pueden conectarse de más de una manera.', 'El mando cambia la fuerza. No cambia el sentido. Son dos observaciones distintas.','Un paso para probar: con la alimentación apagada, tocá los dos cables que llegan al cerrojo para retirarlos. Después uní «Freno B» con «Avance +» y «Avance −» con «Retorno −». El mando puede quedar donde está.'] },
+  pump: { subtitle: 'La rueda gira con fuerza. El agua apenas sale.', tools: ['voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Podemos mirar el empalme y la bomba después de cada prueba. Si algo cambia, conviene dejarlo anotado.', 'Puedo comparar lo que llega a la bomba con lo que sale del generador. La explicación sigue pendiente.', 'Un cable puede dejar pasar algo y, aun así, estorbar. El instrumento del taller permite comprobar si hay camino; no cuánto trabaja la bomba.','Un paso para probar: con la alimentación encendida, compará «Línea · entrada» con «Línea · salida». Si ahí se pierde tensión, apagá y tendé un cable entre esos dos bornes para puentear el empalme.'] },
+  distribution: { subtitle: 'Dos habitaciones necesitan luz. El archivo está inundado.', tools: ['current', 'voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['El archivo se aisló desde el patio. Todavía podemos observar cómo se reparten los dos servicios sanos.', 'Podemos seguir el camino de cada luz. ¿Alguna necesita atravesar la otra para volver a la fuente?', 'Puedo medir cada camino por separado. Tener dos lámparas no garantiza tener dos caminos.','Un paso para probar: apagá y tocá el cable que une «Enfermería −» con «Cocina +» para retirarlo. Después dale a cada luz su propio camino: «Enfermería −» a «Retorno −» y «Fuente +» a «Cocina +».'] },
+  irrigation: { subtitle: 'Vega quiere agua suave y raíces tibias. Una cosa por vez.', tools: ['current', 'voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Las hojas y el agua responden al montaje actual. Ambas cosas son observables sin instrumentos.', 'Al girar un mando, puedo registrar qué cambia y qué permanece igual.', 'Más no significa mejor. Tampoco significa peor en todas las posiciones. Conviene comparar.','Un paso para probar: cada mando es un freno; hacia la derecha frena más y pasa menos. Subí de a poco el freno del calor hasta que el lecho quede tibio. Después, el del agua hasta que salga pareja.'] },
+  beacon_supply: { subtitle: 'El núcleo debe sostener su pulso sin que el cobre se caliente.', tools: ['voltage', 'current', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Podemos mirar cómo responde el núcleo y comparar el tendido antes y después de mover el mando.', 'Puedo mirar el núcleo y el tendido después de cada ajuste. Una mejora puede traer otra dificultad.', 'Puede haber más de una posición que el mecanismo sostenga. Las marcas permiten comparar lo que observamos.','Un paso para probar: bajá el regulador de a una marca y mirá el núcleo después de cada paso. Si empieza a golpear o el cobre se calienta, volvé una marca atrás.'] },
+  beacon_network: { subtitle: 'Luz, giro y campana. Ninguno debería depender de los otros.', tools: ['current', 'voltage', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Podemos seguir los tres caminos. ¿Alguno atraviesa otro receptor antes de regresar?', 'En el castillo encontramos dos luces que podían funcionar por su cuenta. La torre tiene tres servicios.', 'Puedo comparar sus caminos y medirlos. No todos necesitan que pase la misma cantidad.','Un paso para probar: apagá y retirá los cables que pasan de un receptor al siguiente. Después uní el borne + de cada receptor con «Fuente +» y su borne − con «Retorno −», como en el Castillo, pero con tres.'] },
+  beacon_lens: { subtitle: 'La lente encandila. Nereo busca una luz que pueda durar.', tools: ['voltage', 'current', 'continuity'], question: 'Pedir una observación', voice: 'OHM, A TU LADO', hints: ['Podemos seguir el cable que alimenta la lente y mirar si pasa por el mando. No hace falta adivinarlo.', 'Hay una toma entre las dos piezas de cerámica. Podemos comparar cómo responde con otro punto de alimentación.', 'La lente cambia la lectura cuando está conectada. Conviene ajustar mientras funciona, no mientras falta.','Un paso para probar: apagá, retirá el cable de «Fuente +» a «Lente +» y uní la «Toma intermedia» con «Lente +». Encendé y aflojá el freno de la lente de a una marca hasta que la luz sea dorada.'] },
 };
 
 const simpleLabel = label => label.replace(/\s*·\s*\d[\d,.]*\s*Ω/g, '').replace('Freno resistivo', 'Mando del cerrojo');
@@ -25,20 +25,25 @@ const TOOL_NAMES = { wire: 'Mover cables', continuity: 'Comprobar el camino', vo
 // memorized answer. They remain useful for unexpected but valid experiments.
 export function observePuzzle(id, state, result = evaluatePuzzle(id, state)) {
   const p = PUZZLES[id];
-  if (state.tripped || result.overloaded) return [{ label: 'Se oyó un clic', text: 'La protección cortó la alimentación. Nada se rompió. Podés cambiar el montaje y volver a encender.' }];
+  if (state.tripped || result.overloaded) return [{ label: 'Se oyó un clic', text: 'La protección cortó la alimentación: se pedía demasiada corriente. Suele pasar cuando un camino une + y − sin atravesar ningún receptor. Nada se rompió.' }];
   if (!state.sourceOn) return [{ label: 'La mesa está en silencio', text: 'La alimentación está apagada. Podés revisar los cables o comprobar si hay camino.' }];
   const observations = p.components.filter(c => c.goal).map(c => {
     const branch = result.solution.branches[c.id];
     const magnitude = Math.abs(branch?.voltage ?? 0);
     const reverse = !['lamp', 'heater'].includes(c.kind) && (branch?.voltage ?? 0) < -.1;
     const strong = magnitude > c.goal.maxVoltage || Math.abs(branch?.current ?? 0) > c.goal.maxCurrent || (branch?.power ?? 0) > (c.goal.maxPower ?? Infinity);
+    // Close to the working band, the description says so: a knob sweep should feel like progress.
+    const nearLow = !strong && magnitude >= .8 * c.goal.minVoltage;
+    const nearHigh = strong && magnitude <= 1.12 * c.goal.maxVoltage && Math.abs(branch?.current ?? 0) <= 1.12 * c.goal.maxCurrent && (branch?.power ?? 0) <= (c.goal.maxPower ?? Infinity);
     let text;
     if (result.operating[c.id]) text = ({ orb: 'Una luz tibia late bajo el vidrio. El ojo se abre.', lamp: 'La luz se sostiene, clara y pareja.', motor: 'Gira sin golpes. El agua sale pareja.', heater: 'El lecho está tibio. Las hojas vuelven a abrirse.', lens: 'La luz es dorada y se sostiene. Ya no encandila.', coil: id === 'gate' ? 'El cerrojo avanza sin golpear y deja libre el paso.' : 'El pulso se sostiene sin sacudidas.' })[c.kind];
     else if (reverse) text = c.kind === 'coil' ? 'Se mueve hacia atrás, contra la marca de avance.' : 'Responde en el sentido contrario al marcado.';
     else if (magnitude < .1 || Math.abs(branch?.current ?? 0) < .001) text = c.kind === 'orb' ? 'El ojo sigue cerrado. Bajo el vidrio no hay latido.' : 'No responde. Todo permanece quieto.';
+    else if (nearHigh) text = ({ lamp: 'La luz es un poco más blanca de lo que conviene.', motor: 'Gira un poco apurada; el agua sale con algo de fuerza de más.', heater: 'El lecho está algo más caliente de lo necesario.', lens: 'La luz es un poco dura; casi dorada.', coil: 'Empuja un poco de más.', orb: 'El latido es un poco brusco.' })[c.kind];
+    else if (nearLow) text = ({ lamp: 'La luz ya se sostiene, pero todavía le falta un poco.', motor: 'Casi alcanza: el agua sale, aunque sin fuerza pareja.', heater: 'El lecho empieza a entibiarse; todavía le falta.', lens: 'La luz asoma dorada, todavía tenue.', coil: 'Casi se sostiene; le falta un poco de fuerza.', orb: 'El latido está por aparecer.' })[c.kind];
     else if (strong) text = ({ lamp: 'La luz es demasiado blanca. El vidrio se calienta.', motor: 'Gira a los golpes. El agua sale demasiado fuerte.', heater: 'El lecho está caliente. Las hojas se encogen.', lens: 'La luz blanca encandila; el cristal se calienta.', coil: 'Golpea con fuerza. El metal empieza a calentarse.', orb: 'El brillo es brusco; todavía no encuentra un latido parejo.' })[c.kind];
     else text = ({ lamp: 'Hay un brillo débil. Apenas ilumina.', motor: 'Se esfuerza, pero apenas mueve el agua.', heater: 'El lecho sigue frío. Las hojas están caídas.', lens: 'La luz apenas atraviesa el cristal.', coil: 'Tiembla, pero no consigue sostener el movimiento.', orb: 'Algo tiembla bajo el vidrio. Todavía no despierta.' })[c.kind];
-    if (id === 'beacon_network' && c.kind === 'motor') text = result.operating[c.id] ? 'La cúpula gira sin detenerse.' : strong ? 'La cúpula gira a los golpes.' : 'La cúpula apenas consigue moverse.';
+    if (id === 'beacon_network' && c.kind === 'motor') text = result.operating[c.id] ? 'La cúpula gira sin detenerse.' : strong ? 'La cúpula gira a los golpes.' : nearLow ? 'La cúpula casi completa sus vueltas.' : 'La cúpula apenas consigue moverse.';
     return { label: simpleLabel(c.label), text };
   });
   for (const constraint of p.constraints ?? []) if ((result.solution.branches[constraint.branch]?.power ?? 0) > constraint.maxPower) observations.push({ label: 'El tendido', text: 'El cobre se está calentando demasiado. Este pulso no puede sostenerse así.' });
@@ -79,6 +84,8 @@ export class PuzzleWorkbench {
     this.selected = null;
     this.history = [];
     this.feedback = '';
+    this.blockedBySupply = false;
+    this.pendingTest = false;
     this.showNumbers = false;
     this.reading = '';
     this.shell = document.createElement('section');
@@ -124,7 +131,7 @@ export class PuzzleWorkbench {
     this.result = evaluatePuzzle(this.id, this.state);
     if (this.result.overloaded) {
       this.state.tripped = true;
-      this.feedback = 'Se oyó un clic. La protección cortó la alimentación. Podés cambiar el montaje y volver a encender; nada se rompió.';
+      this.feedback = 'Se oyó un clic: la protección cortó la alimentación porque pedía demasiada corriente. Suele pasar cuando un camino une + y − sin atravesar ningún receptor. Nada se rompió: cambiá el montaje y volvé a encender.';
       this.callbacks.onSound?.('error');
       this.result = evaluatePuzzle(this.id, this.state);
     }
@@ -177,6 +184,7 @@ export class PuzzleWorkbench {
 
   requireIsolated() {
     if (this.id === 'awaken' || !this.state.sourceOn || this.state.tripped) return true;
+    this.blockedBySupply = true;
     this.feedback = 'Primero apagá la alimentación. Después podés cambiar los cables y encender para probar.';
     appendBenchEvidence(this.state, { kind: 'observation', text: 'Dejé pendiente un cambio de conexión para apagar primero la alimentación.' });
     this.callbacks.onChange?.(this.id, copy(this.state));
@@ -243,6 +251,7 @@ export class PuzzleWorkbench {
       if (this.mode !== 'wire' && el.tagName.toLowerCase() !== 'button') return;
       if (!this.requireIsolated()) return;
       this.feedback = 'Cable retirado. Los dos bornes vuelven a quedar disponibles.';
+      this.pendingTest = !this.state.sourceOn;
       return this.change(s => { s.wires.splice(i, 1); }, { sound: 'disconnect' });
     }
     if (el.dataset.branch) {
@@ -259,6 +268,7 @@ export class PuzzleWorkbench {
       this.mode = el.dataset.mode; this.selected = null; this.feedback = '';
       return this.change(s => { if (this.mode !== 'wire') s.meter.mode = this.mode; s.meter.a = null; s.meter.b = null; s.meter.branch = null; }, { history: false });
     }
+    if (action === 'power' || action === 'rearm') { this.blockedBySupply = false; this.pendingTest = false; }
     if (action === 'power') { this.feedback = ''; return this.change(s => { s.sourceOn = !s.sourceOn; if (!s.sourceOn) s.tripped = false; }, { sound: 'switch' }); }
     if (action === 'rearm') { this.feedback = ''; return this.change(s => { s.tripped = false; s.sourceOn = true; }, { sound: 'switch' }); }
     if (action === 'switch' && this.puzzle.switches?.find(sw => sw.key === el.dataset.key)?.external) return;
@@ -300,6 +310,7 @@ export class PuzzleWorkbench {
       const a = this.selected; this.selected = null;
       if (this.state.wires.some(w => w.includes(a) && w.includes(id))) { this.feedback = 'Esos bornes ya están unidos. Tocá su cable para retirarlo.'; this.render(); return; }
       this.feedback = `Conectaste ${this.portLabel(a)} con ${this.portLabel(id)}.`;
+      this.pendingTest = !this.state.sourceOn;
       this.change(s => { s.wires.push([a, id]); }, { sound: 'connect' });
       return;
     }
@@ -484,17 +495,24 @@ export class PuzzleWorkbench {
     const powered = s.sourceOn && !s.tripped;
     const available = s.completed ? ['voltage'] : guidance.tools;
     const toolButton = mode => `<button data-action="mode" data-mode="${mode}" class="${this.mode === mode ? 'active' : ''}" aria-pressed="${this.mode === mode}">${TOOL_NAMES[mode]}</button>`;
-    const power = `<button class="wb-power ${powered ? 'on' : ''} ${s.tripped ? 'tripped' : ''}" data-action="${s.tripped ? 'rearm' : 'power'}" aria-pressed="${powered}"><span>⏻</span>${s.tripped ? 'Volver a encender' : powered ? 'Apagar alimentación' : 'Encender alimentación'}</button>`;
+    const powerNext = !s.completed && this.id !== 'awaken' && this.mode === 'wire' && ((this.blockedBySupply && powered) || (this.pendingTest && !powered) || s.tripped);
+    const power = `<button class="wb-power ${powered ? 'on' : ''} ${s.tripped ? 'tripped' : ''} ${powerNext ? 'wb-next-step' : ''}" data-action="${s.tripped ? 'rearm' : 'power'}" aria-pressed="${powered}"><span>⏻</span>${s.tripped ? 'Volver a encender' : powered ? 'Apagar alimentación' : 'Encender alimentación'}</button>`;
     const compactReading = this.mode !== 'wire' ? this.presentedReading() : null;
     const compactMeter = compactReading ? `<div class="wb-compact-meter" role="status"><strong>${escapeHtml(compactReading.value)} <small>${compactReading.unit}</small></strong><span>${escapeHtml(compactReading.caption)}</span></div>` : '';
     const topo = wireNodes(this.id, s);
     const portMarkup = (n, rail = false) => `<button class="${rail ? 'wb-rail-port' : 'wb-terminal'} ${this.selected === n.id ? 'selected' : ''} ${this.mode !== 'wire' && s.meter.a === n.id ? 'probe-red' : ''} ${this.mode !== 'wire' && s.meter.b === n.id ? 'probe-black' : ''}" data-node="${topo.nodeOf[n.id]}" ${rail ? `data-terminal="${n.id}"` : `data-port="${n.id}" style="left:${n.x/10}%;top:${n.y/5}%"`} aria-label="${rail ? 'Conector' : 'Borne'} ${escapeHtml(this.portLabel(n.id))}${this.selected === n.id ? ', seleccionado' : ''}" aria-pressed="${this.selected === n.id}"><span class="wb-terminal-hole"></span><span class="${rail ? '' : 'wb-terminal-label'}">${escapeHtml(this.portLabel(n.id))}</span></button>`;
     const knobs = (p.knobs ?? []).map(k => {
-      const label = k.label.replace('Resistencia del lecho', 'Mando del calor').replace('Resistencia del riego', 'Mando del agua').replace('Brazo superior del divisor', 'Mando de la lente');
-      return `<div class="wb-dial-control"><div class="wb-dial" style="--angle:${-135+(s.values[k.key]-k.min)/(k.max-k.min)*270}deg" aria-hidden="true"><i></i></div><div class="wb-dial-details"><label for="wb-${k.key}">${escapeHtml(label)}</label><div class="wb-knob-row"><button data-action="knob" data-key="${k.key}" data-delta="-1" aria-label="Girar ${escapeHtml(label)} a la izquierda">−</button><output>${this.knobValue(k)}</output><button data-action="knob" data-key="${k.key}" data-delta="1" aria-label="Girar ${escapeHtml(label)} a la derecha">+</button></div><input id="wb-${k.key}" data-knob="${k.key}" type="range" min="${k.min}" max="${k.max}" step="${k.step}" value="${s.values[k.key]}" aria-label="${escapeHtml(label)}" aria-valuetext="${this.showNumbers ? `${s.values[k.key]} ${k.unit}` : `Posición ${Math.round((s.values[k.key]-k.min)/k.step)+1}`}"/><p>Giralo un poco y observá qué cambia.</p></div></div>`;
+      const label = k.label.replace('Resistencia del lecho', 'Freno del calor').replace('Resistencia del riego', 'Freno del agua').replace('Brazo superior del divisor', 'Freno de la lente');
+      return `<div class="wb-dial-control"><div class="wb-dial" style="--angle:${-135+(s.values[k.key]-k.min)/(k.max-k.min)*270}deg" aria-hidden="true"><i></i></div><div class="wb-dial-details"><label for="wb-${k.key}">${escapeHtml(label)}</label><div class="wb-knob-row"><button data-action="knob" data-key="${k.key}" data-delta="-1" aria-label="Girar ${escapeHtml(label)} a la izquierda">−</button><output>${this.knobValue(k)}</output><button data-action="knob" data-key="${k.key}" data-delta="1" aria-label="Girar ${escapeHtml(label)} a la derecha">+</button></div><input id="wb-${k.key}" data-knob="${k.key}" type="range" min="${k.min}" max="${k.max}" step="${k.step}" value="${s.values[k.key]}" aria-label="${escapeHtml(label)}" aria-valuetext="${this.showNumbers ? `${s.values[k.key]} ${k.unit}` : `Posición ${Math.round((s.values[k.key]-k.min)/k.step)+1}`}"/><p>Hacia la derecha frena más: pasa menos. Giralo de a poco y observá.</p></div></div>`;
     }).join('');
     const switches = (p.switches ?? []).map(sw => `<button class="wb-switch ${s.switches[sw.key] ? 'on' : ''}" data-action="switch" data-key="${sw.key}" aria-pressed="${s.switches[sw.key]}" ${sw.external ? 'disabled title="Esta rama se aisló en el patio"' : ''}><span class="wb-toggle"><i></i></span><span>${escapeHtml(sw.label)}<small>${sw.external ? 'AISLADA EN EL PATIO' : s.switches[sw.key] ? 'CONECTADA' : 'AISLADA'}</small></span></button>`).join('');
-    const instruction = this.mode === 'wire' ? (this.selected ? 'Ahora tocá otra pieza redonda para apoyar el otro extremo.' : 'Tocá dos piezas redondas para unirlas con un cable.') : this.mode === 'current' ? 'Elegí una pieza en el instrumento para mirar su camino.' : 'Tocá dos piezas redondas para apoyar las puntas del instrumento.';
+    // With the source on, terminals do not accept changes: say so where the student is looking.
+    const lockedBySupply = powered && this.id !== 'awaken' && !s.completed;
+    const instruction = this.mode === 'wire' ? (this.selected ? 'Ahora tocá otra pieza redonda para apoyar el otro extremo.'
+      : lockedBySupply ? 'La mesa está encendida: apagá la alimentación para mover cables. Después, encendela para probar.'
+      : s.completed ? 'Tocá dos piezas redondas para unirlas con un cable.'
+      : this.pendingTest ? 'Cuando termines de cambiar cables, encendé la alimentación para probar.'
+      : 'Tocá dos piezas redondas para unirlas con un cable. Tocá un cable para retirarlo.') : this.mode === 'current' ? 'Elegí una pieza en el instrumento para mirar su camino.' : 'Tocá dos piezas redondas para apoyar las puntas del instrumento.';
     this.shell.innerHTML = `<div class="wb-case wb-discovery ${this.id === 'awaken' ? 'wb-first' : ''} ${this.showNumbers ? 'wb-with-numbers' : ''} ${s.completed ? 'completed' : ''}">
       <header class="wb-header"><div><p class="wb-eyebrow">${p.place}</p><h1>${p.title}</h1>${!getBenchEvidence(this.id,s).some(e => e.kind === 'intervention') ? `<p class="wb-subtitle">${guidance.subtitle}</p>` : ''}${compactMeter}</div>${r.solved && !s.completed ? `<button class="wb-commission-top" data-action="close">${leaveLabel}</button>` : ''}<button class="wb-close" data-action="close" aria-label="Volver al mundo">✕ <span>Volver</span></button></header>
       <div class="wb-layout"><main class="wb-main">
@@ -508,7 +526,7 @@ export class PuzzleWorkbench {
       </main><aside class="wb-aside">
         <section class="wb-observation" aria-live="polite"><p class="wb-eyebrow">${r.solved ? 'ALGO CAMBIÓ' : 'MIRÁ Y ESCUCHÁ'}</p>${observePuzzle(this.id,s,r).map(o => `<div><h2>${escapeHtml(o.label)}</h2><p>${escapeHtml(o.text)}</p></div>`).join('')}</section>
         ${this.renderMeter()}
-        ${!s.completed && !r.solved ? `<div class="wb-ohm wb-question">${s.hints ? `<div><span>${guidance.voice}</span><p>${escapeHtml(guidance.hints[s.hints-1])}</p></div>` : ''}<button data-action="hint" ${s.hints >= guidance.hints.length ? 'disabled' : ''}>${s.hints ? s.hints >= guidance.hints.length ? 'Eso es lo que observamos' : 'Otra observación' : guidance.question} <span>↗</span></button></div>` : ''}
+        ${!s.completed && !r.solved ? `<div class="wb-ohm wb-question">${s.hints ? `<div><span>${guidance.voice}</span><p>${escapeHtml(guidance.hints[s.hints-1])}</p></div>` : ''}<button data-action="hint" ${s.hints >= guidance.hints.length ? 'disabled' : ''}>${s.hints ? s.hints >= guidance.hints.length ? 'Eso es lo que observamos' : s.hints === guidance.hints.length - 1 ? 'Mostrame un paso para probar' : 'Otra observación' : guidance.question} <span>↗</span></button></div>` : ''}
         ${r.solved || s.completed ? `<div class="wb-success" role="status"><div><strong>${this.id === 'awaken' ? 'Un pequeño latido' : this.id === 'beacon_lens' ? 'La luz encuentra su ritmo' : 'Ahora puede sostenerse'}</strong><p>${s.completed ? 'La instalación sigue en servicio. Podés observarla.' : 'Podés seguir probando o dejarlo funcionando.'}</p></div><button data-action="close">${s.completed ? 'Volver al mundo →' : leaveLabel}</button></div>` : ''}
         ${this.renderDetails()}${this.renderExperiments()}<p class="wb-feedback" role="status">${escapeHtml(this.feedback)}</p>
       </aside></div><footer class="wb-footer"><span>UN CAMBIO · UNA OBSERVACIÓN</span><span>Tab para recorrer · Enter para actuar · Esc para volver</span>${available.length && this.mode === 'wire' ? `<button class="wb-numbers" data-action="numbers" aria-pressed="${this.showNumbers}">${this.showNumbers ? 'Ocultar números' : 'Leer las marcas numéricas'}</button>` : ''}</footer>

@@ -143,3 +143,8 @@
 @keyframes wb-flow{from{stroke-dashoffset:17}to{stroke-dashoffset:0}}
 .reduced-motion .wb-wire-flow{animation:none}
 @media (prefers-reduced-motion:reduce){.wb-wire-flow{animation:none}}
+/* El siguiente paso es la alimentación: apagar para cablear o encender para probar. */
+.wb-power.wb-next-step{border-color:#f1d59a;box-shadow:0 0 0 2px #f1d59a66,0 0 18px #f5d18a55;animation:wb-next 1.6s ease-in-out infinite}
+@keyframes wb-next{50%{box-shadow:0 0 0 4px #f1d59a99,0 0 26px #f5d18a88}}
+.reduced-motion .wb-power.wb-next-step{animation:none}
+@media (prefers-reduced-motion:reduce){.wb-power.wb-next-step{animation:none}}

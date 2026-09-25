@@ -13,7 +13,7 @@ export const PUZZLES = {
     components: [component('heart', 'Corazón de Ohm', 'heartIn', 'heartOut', 12, { kind: 'orb', goal: goal(5.6, 6.1, .45, .52) })],
     initialWires: [['positive', 'heartIn']],
     lesson: 'Un receptor necesita un camino completo: desde un borne de la fuente, a través de él, hasta el otro borne.',
-    hints: ["Ese extremo quedó solo… ¿se habrá soltado al caer?","Yo miraría las dos piezas redondas de bronce que quedaron libres. Pero es una sospecha.","Tocá una pieza redonda y después otra para probar un cable. Si no pasa nada, podés retirarlo."],
+    hints: ["Ese extremo quedó solo… ¿se habrá soltado al caer?","Yo miraría las dos piezas redondas de bronce que quedaron libres. Pero es una sospecha.","Tocá una pieza redonda y después otra para probar un cable. Si no pasa nada, podés retirarlo.","Probá unir «Ohm −» con «Celda −». Así el camino puede volver a la celda."],
     observation: 'Un filamento dorado tiembla bajo el vidrio. Todavía no hay latido.',
   },
   workshop: {
@@ -22,7 +22,7 @@ export const PUZZLES = {
     components: [component('splice', 'Costura de tela', 'spliceA', 'spliceB', Infinity, { kind: 'fault' }), component('lamp', 'Luz del banco', 'lampIn', 'lampOut', 24, { kind: 'lamp', goal: goal(5.5, 6.1, .22, .27) })],
     initialWires: [['positive', 'spliceA'], ['spliceB', 'lampIn'], ['lampOut', 'negative']],
     lesson: 'Una cubierta sana puede esconder un conductor cortado. La continuidad se mide con la fuente apagada; un puente conductor restablece el camino.',
-    hints: ["La tela parece entera. Eso solo no demuestra que el camino de cobre esté completo.","El instrumento puede comprobar si hay un camino entre sus dos puntas. La máquina debe estar apagada.","Podemos comparar el camino antes y después de un cambio. Las dos observaciones quedan en la Bitácora."],
+    hints: ["La tela parece entera. Eso solo no demuestra que el camino de cobre esté completo.","El instrumento puede comprobar si hay un camino entre sus dos puntas. La máquina debe estar apagada.","Podemos comparar el camino antes y después de un cambio. Las dos observaciones quedan en la Bitácora.","Un paso para probar: apagá la alimentación y tendé un cable de «Costura A» a «Costura B». Si la tela esconde un corte, ese cable hace de puente. Después encendé y mirá la lámpara."],
     observation: 'Lumen dejó una nota: «No culpes al vidrio antes de seguir el cobre».',
   },
   gate: {
@@ -32,7 +32,7 @@ export const PUZZLES = {
     knobs: [{ key: 'brake', label: 'Freno de la bobina', min: 0, max: 30, step: 2, initial: 8, unit: 'Ω', description: 'Más resistencia deja pasar menos corriente.' }],
     initialWires: [['positive', 'trimA'], ['trimB', 'latchOut'], ['latchIn', 'negative']],
     lesson: 'La polaridad determina el sentido de esta bobina. La resistencia en serie permite regular su corriente sin cambiar el camino.',
-    hints: ["El movimiento del cerrojo permite distinguir su sentido de su fuerza.","Las dos marcas del cerrojo miran hacia adelante. Los cables pueden conectarse de más de una manera.","El mando cambia la fuerza. No cambia el sentido. Son dos observaciones distintas."],
+    hints: ["El movimiento del cerrojo permite distinguir su sentido de su fuerza.","Las dos marcas del cerrojo miran hacia adelante. Los cables pueden conectarse de más de una manera.","El mando cambia la fuerza. No cambia el sentido. Son dos observaciones distintas.","Un paso para probar: con la alimentación apagada, tocá los dos cables que llegan al cerrojo para retirarlos. Después uní «Freno B» con «Avance +» y «Avance −» con «Retorno −». El mando puede quedar donde está."],
     observation: 'Las marcas del cerrojo dicen AVANCE →. Ahora el metal empuja hacia atrás.',
   },
   pump: {
@@ -41,7 +41,7 @@ export const PUZZLES = {
     components: [component('line', 'Empalme oxidado', 'lineA', 'lineB', 18, { kind: 'fault' }), component('pump', 'Bomba del manantial', 'pumpIn', 'pumpOut', 12, { kind: 'motor', goal: goal(10.5, 12.2, .87, 1.05) })],
     initialWires: [['positive', 'lineA'], ['lineB', 'pumpIn'], ['pumpOut', 'negative']],
     lesson: 'Un conductor con demasiada resistencia puede tener continuidad y aun así perder tensión y calentarse bajo carga. Medir ambos extremos permite localizar la pérdida.',
-    hints: ["Podemos mirar el empalme y la bomba después de cada prueba. Si algo cambia, conviene dejarlo anotado.","Puedo comparar lo que llega a la bomba con lo que sale del generador. La explicación sigue pendiente.","Un cable puede dejar pasar algo y, aun así, estorbar. El instrumento del taller permite comprobar si hay camino; no cuánto trabaja la bomba."],
+    hints: ["Podemos mirar el empalme y la bomba después de cada prueba. Si algo cambia, conviene dejarlo anotado.","Puedo comparar lo que llega a la bomba con lo que sale del generador. La explicación sigue pendiente.","Un cable puede dejar pasar algo y, aun así, estorbar. El instrumento del taller permite comprobar si hay camino; no cuánto trabaja la bomba.","Un paso para probar: con la alimentación encendida, compará «Línea · entrada» con «Línea · salida». Si ahí se pierde tensión, apagá y tendé un cable entre esos dos bornes para puentear el empalme."],
     observation: 'La rueda del generador gira, pero la bomba apenas impulsa agua. El empalme viejo está tibio.',
   },
   distribution: {
@@ -51,7 +51,7 @@ export const PUZZLES = {
     switches: [{ key: 'archive', label: 'Rama del archivo', initial: false, external: true, description: 'Aislá esta rama para intervenir sin apagar las demás.' }],
     initialWires: [['positive', 'clinicIn'], ['clinicOut', 'kitchenIn'], ['kitchenOut', 'negative'], ['positive', 'archiveIn'], ['archiveOut', 'negative']],
     lesson: 'En paralelo, los servicios comparten los dos nodos de la fuente. Cada rama funciona de manera independiente; se puede aislar una falla sin interrumpir las otras.',
-    hints: ["El archivo se aisló desde el patio. Todavía podemos observar cómo se reparten los dos servicios sanos.","Podemos seguir el camino de cada luz. ¿Alguna necesita atravesar la otra para volver a la fuente?","Puedo medir cada camino por separado. Tener dos lámparas no garantiza tener dos caminos."],
+    hints: ["El archivo se aisló desde el patio. Todavía podemos observar cómo se reparten los dos servicios sanos.","Podemos seguir el camino de cada luz. ¿Alguna necesita atravesar la otra para volver a la fuente?","Puedo medir cada camino por separado. Tener dos lámparas no garantiza tener dos caminos.","Un paso para probar: apagá y tocá el cable que une «Enfermería −» con «Cocina +» para retirarlo. Después dale a cada luz su propio camino: «Enfermería −» a «Retorno −» y «Fuente +» a «Cocina +»."],
     observation: 'El archivo está aislado desde el patio. Los dos servicios sanos todavía se iluminan poco.',
   },
   irrigation: {
@@ -61,7 +61,7 @@ export const PUZZLES = {
     knobs: [{ key: 'warmth', label: 'Resistencia del lecho', min: 0, max: 36, step: 2, initial: 0, unit: 'Ω', description: 'La franja fértil requiere entre 4 y 7 W en las raíces.' }, { key: 'flow', label: 'Resistencia del riego', min: 0, max: 36, step: 2, initial: 0, unit: 'Ω', description: 'Una corriente entre 0,52 y 0,66 A mantiene el caudal suave.' }],
     initialWires: [['positive', 'warmA'], ['warmB', 'rootIn'], ['rootOut', 'negative'], ['positive', 'flowA'], ['flowB', 'flowIn'], ['flowOut', 'negative']],
     lesson: 'La potencia eléctrica se transforma en calor o trabajo. Regular cada rama permite cuidar a la vez dos receptores con necesidades diferentes.',
-    hints: ["Las hojas y el agua responden al montaje actual. Ambas cosas son observables sin instrumentos.","Al girar un mando, puedo registrar qué cambia y qué permanece igual.","Más no significa mejor. Tampoco significa peor en todas las posiciones. Conviene comparar."],
+    hints: ["Las hojas y el agua responden al montaje actual. Ambas cosas son observables sin instrumentos.","Al girar un mando, puedo registrar qué cambia y qué permanece igual.","Más no significa mejor. Tampoco significa peor en todas las posiciones. Conviene comparar.","Un paso para probar: cada mando es un freno; hacia la derecha frena más y pasa menos. Subí de a poco el freno del calor hasta que el lecho quede tibio. Después, el del agua hasta que salga pareja."],
     observation: 'Las hojas se repliegan con el calor. El agua golpea la tierra demasiado fuerte.',
   },
   beacon_supply: {
@@ -72,7 +72,7 @@ export const PUZZLES = {
     constraints: [{ branch: 'line', maxPower: 5.2 }],
     initialWires: [['positive', 'lineA'], ['lineB', 'ballastA'], ['ballastB', 'coreIn'], ['coreOut', 'negative']],
     lesson: 'La tensión de la fuente se reparte entre tendido, regulador y carga. Una alimentación útil mantiene la carga en su rango y limita las pérdidas del recorrido.',
-    hints: ["Podemos mirar cómo responde el núcleo y comparar el tendido antes y después de mover el mando.","Puedo mirar el núcleo y el tendido después de cada ajuste. Una mejora puede traer otra dificultad.","Puede haber más de una posición que el mecanismo sostenga. Las marcas permiten comparar lo que observamos."],
+    hints: ["Podemos mirar cómo responde el núcleo y comparar el tendido antes y después de mover el mando.","Puedo mirar el núcleo y el tendido después de cada ajuste. Una mejora puede traer otra dificultad.","Puede haber más de una posición que el mecanismo sostenga. Las marcas permiten comparar lo que observamos.","Un paso para probar: bajá el regulador de a una marca y mirá el núcleo después de cada paso. Si empieza a golpear o el cobre se calienta, volvé una marca atrás."],
     observation: 'Por debajo del piso, los cables esperan como raíces dormidas.',
   },
   beacon_network: {
@@ -81,7 +81,7 @@ export const PUZZLES = {
     components: [component('optic', 'Cámara óptica · 18 Ω', 'opticIn', 'opticOut', 18, { kind: 'lamp', goal: goal(16.5, 18.2, .91, 1.03) }), component('bearing', 'Giro de la cúpula · 36 Ω', 'bearingIn', 'bearingOut', 36, { kind: 'motor', goal: goal(16.5, 18.2, .45, .52) }), component('signal', 'Señal de la costa · 72 Ω', 'signalIn', 'signalOut', 72, { kind: 'coil', goal: goal(16.5, 18.2, .22, .26) })],
     initialWires: [['positive', 'opticIn'], ['opticOut', 'bearingIn'], ['bearingOut', 'signalIn'], ['signalOut', 'negative']],
     lesson: 'Tres resistencias diferentes en paralelo reciben la misma tensión y conducen corrientes distintas. La corriente de la fuente es la suma de las corrientes de sus ramas.',
-    hints: ["Podemos seguir los tres caminos. ¿Alguno atraviesa otro receptor antes de regresar?","En el castillo encontramos dos luces que podían funcionar por su cuenta. La torre tiene tres servicios.","Puedo comparar sus caminos y medirlos. No todos necesitan que pase la misma cantidad."],
+    hints: ["Podemos seguir los tres caminos. ¿Alguno atraviesa otro receptor antes de regresar?","En el castillo encontramos dos luces que podían funcionar por su cuenta. La torre tiene tres servicios.","Puedo comparar sus caminos y medirlos. No todos necesitan que pase la misma cantidad.","Un paso para probar: apagá y retirá los cables que pasan de un receptor al siguiente. Después uní el borne + de cada receptor con «Fuente +» y su borne − con «Retorno −», como en el Castillo, pero con tres."],
     observation: 'Una inscripción: «Que ninguna voz tenga que atravesar a las otras para llegar al mar».',
   },
   beacon_lens: {
@@ -91,7 +91,7 @@ export const PUZZLES = {
     knobs: [{ key: 'upper', label: 'Brazo superior del divisor', min: 2, max: 40, step: 1, initial: 24, unit: 'Ω', description: 'Calibrá con la lente conectada. Ella también forma parte de la red.' }],
     initialWires: [['positive', 'upperA'], ['lowerB', 'negative'], ['positive', 'lensIn'], ['lensOut', 'negative']],
     lesson: 'La carga cambia un divisor: la lente y el brazo inferior quedan en paralelo. Calibrar con la carga conectada permite obtener la tensión que el sistema necesita en funcionamiento.',
-    hints: ["Podemos seguir el cable que alimenta la lente y mirar si pasa por el mando. No hace falta adivinarlo.","Hay una toma entre las dos piezas de cerámica. Podemos comparar cómo responde con otro punto de alimentación.","La lente cambia la lectura cuando está conectada. Conviene ajustar mientras funciona, no mientras falta."],
+    hints: ["Podemos seguir el cable que alimenta la lente y mirar si pasa por el mando. No hace falta adivinarlo.","Hay una toma entre las dos piezas de cerámica. Podemos comparar cómo responde con otro punto de alimentación.","La lente cambia la lectura cuando está conectada. Conviene ajustar mientras funciona, no mientras falta.","Un paso para probar: apagá, retirá el cable de «Fuente +» a «Lente +» y uní la «Toma intermedia» con «Lente +». Encendé y aflojá el freno de la lente de a una marca hasta que la luz sea dorada."],
     observation: 'La lente devuelve una luz blanca, demasiado dura. El mar espera una luz que pueda sostenerse.',
   },
 };
