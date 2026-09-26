@@ -385,7 +385,7 @@ try {
   await interact('plaza_bell');
   await travel('plaza_to_workshop', 'workshop');
   await interact('lumen');
-  await operate('workshop_feed', true); await fieldToggle('workshop_return', true);
+  assert.equal((await inspect()).flags.workshop_feed, true, 'Lumen closes his own left latch'); await fieldToggle('workshop_return', true);
   await solvePanel('workbench', 'workshop');
   await interact('workshop_cup');
   await travel('workshop_to_plaza', 'plaza');
@@ -414,7 +414,7 @@ try {
   await interact('terraces_secret');
   await travel('terraces_to_lake', 'lake');
   await interact('nereo_lake');
-  await operate('lake_cable', true); await operate('lake_return', true);
+  assert.ok((await inspect()).flags.lake_cable && (await inspect()).flags.lake_return, 'Nereo makes the dock joins');
   await interact('lake_secret');
   await travel('lake_to_lighthouse', 'lighthouse');
   await interact('nereo_tower');

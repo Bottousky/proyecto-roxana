@@ -101,7 +101,8 @@ export const DIALOGUES = {
     ['player', '¿Por qué tres?'],
     ['lumen', 'Mi padre hacía tres. Yo también. Hasta ayer alcanzaba.'],
     ['player', '¿Y si la lámpara no era lo que fallaba?'],
-    ['lumen', 'Hacía años que nadie venía a molestarme con una pregunta de ésas. Acercá el instrumento.']),
+    ['lumen', 'Hacía años que nadie venía a molestarme con una pregunta de ésas. Acercá el instrumento.'],
+    ['narrator', 'Lumen encaja el cierre izquierdo de la mesa con un clic seco, sin mirarlo. El derecho queda para vos.']),
   workshop_ready: d(
     ['narrator', 'La mesa recupera un zumbido bajo. La lámpara sigue oscura.'],
     ['lumen', 'Escuchá. Ese ruido sí lo conozco. Ahora podemos mirar el banco.']),
@@ -302,7 +303,9 @@ export const DIALOGUES = {
     ['player', '¿Cuánto dura la pausa?'],
     ['nereo', 'Lo que tiene que durar.'],
     ['ohm', 'Unidad no reconocida.'],
-    ['nereo', 'Cuarenta años y recién ahora viene alguien a quejarse. Antes de subir, faltan las uniones del muelle: una junto a las bobinas, otra entre las cañas.']),
+    ['nereo', 'Cuarenta años y recién ahora viene alguien a quejarse. Las uniones del muelle las hago yo: las hice más veces que ustedes años.'],
+    ['narrator', 'Nereo fija la bornera junto a las bobinas y, entre las cañas, une el retorno sin mirar. En el agua, una baliza tarda un momento y contesta.'],
+    ['nereo', 'Miren las balizas, no a mí. Si una se apaga, ahí está la pregunta.']),
   lake_link_complete: d(
     ['narrator', 'La línea sumergida vibra bajo el muelle. Tres balizas marcan el camino hacia el Faro.'],
     ['nereo', 'Ahora sí. Yo llevo la llave. Ustedes, esa costumbre nueva de mirar dos veces.']),
@@ -702,6 +705,12 @@ export function journalText(entry, state = {}) {
   return entry.text;
 }
 
+// Routine preparations the inhabitants do themselves once a conversation ends.
+export const DIALOGUE_EFFECTS = {
+  lumen_before: { flags: ['workshop_feed'] },
+  nereo_lake: { flags: ['lake_cable', 'lake_return'] },
+};
+
 export const JOURNAL = [
   { id: 'arrival', title: 'Al otro lado del Portal', text: 'Entré por una pared. Edda no pareció tan sorprendida como yo. Junto al arco hay un pequeño de bronce que no responde. Empiezo por mirar.', requires: [] },
   { id: 'circuit', title: 'El retorno también es camino', text: 'Ohm necesitaba las dos conexiones. Dibujé el camino entero, incluido el que vuelve. Edda quiere guardar también el dibujo de cuando no funcionaba.', explanation: 'El cristal es una fuente: aporta energía. El cobre permite el paso y Ohm la utiliza. Para que haya corriente eléctrica hace falta una trayectoria completa entre los dos extremos de la fuente, pasando por Ohm. A esa trayectoria la llamamos circuito cerrado. Un corte en cualquier parte puede interrumpirla.', requires: ['awaken'] },
@@ -723,7 +732,7 @@ const objectives = [
   ['pump', { title: 'Donde empieza el agua', detail: 'Hablá con Vega en el Manantial y ayudala a mirar la bomba.', area: 'spring', object: 'pump_panel' }],
   ['distribution', { title: 'Una red que se puede comprender', detail: 'En el Castillo, buscá con la Consejera una forma de recuperar servicios sin poner en riesgo a sus vecinos.', area: 'castle', object: 'distribution_panel' }],
   ['irrigation', { title: 'Lo que compartimos', detail: 'Visitá las Terrazas. Yesca necesita trabajar; Vega necesita regar.', area: 'terraces', object: 'irrigation_panel' }],
-  ['beacon_link', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Completá el suministro y el retorno del muelle.', area: 'lake', object: 'lake_return' }],
+  ['beacon_link', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Él conoce las uniones del muelle; vos mirá cómo responden las balizas.', area: 'lake', object: 'nereo_lake' }],
   ['beacon_supply', { title: 'El Faro · I / III', detail: 'Conectá las dos manivelas de la base y verificá la fuente en el primer panel.', area: 'lighthouse', object: 'beacon_supply_panel' }],
   ['beacon_network', { title: 'El Faro · II / III', detail: 'Con Nereo, buscá el giro y las luces que faltan en la galería del medio.', area: 'lighthouse', object: 'beacon_network_panel' }],
   ['beacon_lens', { title: 'El Faro · III / III', detail: 'Abrí el obturador, liberá el freno óptico y ajustá la linterna hasta sostener la señal.', area: 'lighthouse', object: 'beacon_lens_panel' }],

@@ -16,7 +16,7 @@ import './journey-ui.css';
 import {renderJourneyGuide,bindMapViews} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
 import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
@@ -265,6 +265,7 @@ function nextLine(){
   if(++dialogue.index<dialogue.lines.length){renderLine();return;}
   if(dialogue.id==='lighthouse_epilogue'){state.flags.epilogue_shared=true;refreshHUD();}
   world?.endInhabitantConversation?.();
+  const effect=typeof dialogue.id==='string'&&DIALOGUE_EFFECTS[dialogue.id];if(effect){for(const f of effect.flags)state.flags[f]=true;world?.updateFlags?.(state);refreshWorldSystems();}
   show('#dialogue',false);dialogue=null;state.activeDialogue=null;mode='world';$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
 }
 

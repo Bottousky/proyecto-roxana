@@ -39,7 +39,7 @@ function startupHarness(imported){
     state:freshState(),settings:{...freshState().settings},started:true,startingGame:false,
     mode:'world',held:new Set(['ArrowRight']),assetLoadFailed:false,
     playingCinematic:false,pendingPuzzleResult:null,dialogue:null,dialogueEnd:null,
-    dialogueQueue:[],typing:0,typed:0,portraits:{},CHARACTERS,DIALOGUES,PUZZLE_STORY,resolveDialogue,resolveDialogueId,
+    dialogueQueue:[],typing:0,typed:0,portraits:{},CHARACTERS,DIALOGUES,PUZZLE_STORY,DIALOGUE_EFFECTS:{},resolveDialogue,resolveDialogueId,
     audio:{unlock:()=>audio.promise},
     world:{assetsReady:art.promise,cancelCinematic(){},getPlayerPosition:()=>[...position]},
     loadState:()=>loadState(db),saveState:value=>saveState(value,db),freshState,
