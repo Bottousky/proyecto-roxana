@@ -123,7 +123,7 @@ export class PlayCanvasWorld {
     this.playerActor=await this.makeActor('player',0,0,'player');this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
-    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.app.start();
+    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.buildShafts();this.app.start();
   }
   async makeActor(name,x,z,area,object){
     if(!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
@@ -268,6 +268,20 @@ export class PlayCanvasWorld {
     this.positionCamera();this.focusFrame();
   }
   // The current speaker gives a small hop as each of their lines begins.
+  // Morning light shafts: a few soft diagonal beams drifting near the player, daylight only.
+  buildShafts(){
+    const c=document.createElement('canvas');c.width=64;c.height=256;const x=c.getContext('2d'),img=x.createImageData(64,256);
+    for(let j=0;j<256;j++)for(let i=0;i<64;i++){const u=Math.abs(i/63-.5)*2,v=j/255,a=Math.pow(Math.max(0,1-u),2.2)*Math.pow(1-v,1.3)*Math.min(1,v*6),k=(j*64+i)*4;img.data[k]=img.data[k+1]=img.data[k+2]=255;img.data[k+3]=Math.round(a*255);}
+    x.putImageData(img,0,0);const t=new Texture(this.app.graphicsDevice,{width:64,height:256,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);
+    const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#fff0cc');m.emissiveMap=t;m.opacityMap=t;m.opacityMapChannel='a';m.opacity=0;m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.useLighting=false;m.update();this.shaftMaterial=m;
+    this.shafts=[[-10,1,3.4],[-4,-2,2.4],[4,0,3.8],[11,2,2.6],[0,-5,3]].map(([x,z,w],i)=>{const e=new Entity('Rayo de luz');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;this.app.root.addChild(e);return {entity:e,x,z,w,phase:i*1.7};});
+  }
+  updateShafts(dt,inside,day,reduced){
+    if(!this.shafts)return;const level=inside?0:day;this.shaftLevel=(this.shaftLevel??level)+(level-(this.shaftLevel??level))*Math.min(1,dt*.6);
+    const on=this.shaftLevel>.02;for(const s of this.shafts){s.entity.enabled=on;if(!on)continue;const drift=reduced?0:Math.sin(this.clock*.05+s.phase)*1.5;
+      s.entity.setPosition(this.focus.x+s.x+drift,4.2,this.focus.z+s.z);s.entity.setEulerAngles(62,0,-24);s.entity.setLocalScale(s.w,1,13);}
+    this.shaftMaterial.opacity=this.shaftLevel*(reduced?.13:.11+.04*Math.sin(this.clock*.4));this.shaftMaterial.update();
+  }
   celebrate(dt,reduced){
     const c=this.celebration;if(!c)return;c.t+=dt;if(c.t>3.4||reduced){this.celebration=null;return;}
     c.actors.forEach((a,i)=>{const u=c.t-.35-i*.14;if(u<0||u>1.1)return;const hop=Math.abs(Math.sin(u/.55*Math.PI))*(a===this.ohmActor?.34:.24),e=a.entity,p=e.getPosition();e.setPosition(p.x,p.y+hop,p.z);});
@@ -358,6 +372,7 @@ export class PlayCanvasWorld {
     if(this.crops&&Math.abs(life-(this.cropShown??-1))>.002){this.cropShown=life;for(const c of this.crops){c.material.diffuse.lerp(DRY_CROP,c.lush,life);c.material.update();}}
     // Clouds only cast shadows under a real sun: none indoors or at night.
     updateClouds(this.grounds||[],reduced?0:this.clock,inside?0:.36*(1-n)*Math.min(1,this.sun.light.intensity));
+    this.updateShafts(dt,inside,Math.max(0,1-n*1.6)*Math.min(1,this.sun.light.intensity),reduced);
     updateWind(this.windy||[],this.clock,reduced);updateGrid(this.gridSpans||[],f,this.clock,dt,reduced);
     // Daylight pollen becomes fireflies at dusk: lower, warmer, each blinking on its own rhythm.
     const dusk=inside?0:Math.max(0,Math.min(1,(n-.35)/.5));
