@@ -133,7 +133,9 @@ export class PlayCanvasWorld {
   loadArea(area,state,spawn,{continuous=false}={}){
     const old=this.area?.id,preserve=continuous&&old&&isExterior(old)&&isExterior(area.id),global=preserve?toKingdom(old,this.getPlayerPosition()):null,companion=preserve?toKingdom(old,[this.ohm.position.x,this.ohm.position.z]):null;
     this.area=area;this.state=state;this.coreBounds=area.bounds;this.bounds=travelBounds(area.id);this.obstacles=this.localObstacles(area.id);this.actors=[this.playerActor,...this.regions.get(area.id).actors];
-    if(preserve){const p=fromKingdom(area.id,global),o=fromKingdom(area.id,companion);this.player.position.set(p[0],0,p[1]);this.ohm.position.set(o[0],0,o[1]);this.route=[];this.target=null;this.companionRoute=[];if(this.travelIntent===area.id){this.setTarget(area.spawn);this.travelIntent=null;}}
+    if(preserve){let p=fromKingdom(area.id,global);const o=fromKingdom(area.id,companion);
+      // A point walkable on one side of a boundary can sit in the other place's wall skin; step out of it.
+      if(!this.canStand(...p))p=this.nearestWalkable(p);this.player.position.set(p[0],0,p[1]);this.ohm.position.set(o[0],0,o[1]);this.route=[];this.target=null;this.companionRoute=[];if(this.travelIntent===area.id){this.setTarget(area.spawn);this.travelIntent=null;}}
     else{this.setPlayerPosition(spawn||area.spawn);this.cancelCinematic();}
     initializeInhabitants(this);this.updateFlags(state);this.arrange();this.syncActors();
   }
@@ -247,7 +249,7 @@ export class PlayCanvasWorld {
     const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,34,64,64,62);
     g.addColorStop(0,'#ffe2a000');g.addColorStop(.35,'#ffe2a0ff');g.addColorStop(.55,'#ffe2a0aa');g.addColorStop(1,'#ffe2a000');x.fillStyle=g;x.fillRect(0,0,128,128);
     const t=new Texture(this.app.graphicsDevice,{width:128,height:128,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);
-    const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffd98f');m.emissiveMap=t;m.opacityMap=t;m.opacityMapChannel='a';m.emissiveIntensity=1.3;m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.useLighting=false;m.update();
+    const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffd98f');m.emissiveMap=t;m.opacityMap=t;m.opacityMapChannel='a';m.emissiveIntensity=1.3;m.opacity=.6;m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.useLighting=false;m.update();
     this.focusRing=new Entity('Anillo de interacción');this.focusRing.addComponent('render',{type:'plane'});this.focusRing.render.material=m;this.focusRing.render.castShadows=false;this.focusRing.enabled=false;this.app.root.addChild(this.focusRing);this.focusRingMaterial=m;this.focusRingLevel=0;
   }
   updateFocusRing(dt,paused,reduced){
@@ -255,9 +257,9 @@ export class PlayCanvasWorld {
     if(near&&near!==this.focusTarget){this.focusTarget=near;this.focusRingLevel=0;}
     this.focusRingLevel+=((near?1:0)-this.focusRingLevel)*Math.min(1,dt*8);
     this.focusRing.enabled=this.focusRingLevel>.02&&!!this.focusTarget;if(!this.focusRing.enabled){if(!near)this.focusTarget=null;return;}
-    const o=this.focusTarget,size=(o.character?1.5:1.9)*(reduced?1:1+Math.sin(this.clock*3.2)*.06);
+    // Fade by scale: changing the material every frame is costly on slow devices.
+    const o=this.focusTarget,size=(o.character?1.5:1.9)*(.6+.4*this.focusRingLevel)*(reduced?1:1+Math.sin(this.clock*3.2)*.06);
     this.focusRing.setPosition(o.x+ox,this.groundHeight(o.x,o.z)+.04,o.z+oz);this.focusRing.setLocalScale(size,1,size);
-    this.focusRingMaterial.opacity=this.focusRingLevel*(reduced?.7:.55+Math.sin(this.clock*3.2)*.15);this.focusRingMaterial.update();
   }
   async buildLightEffects(){
     const texture=await surface(this.app,'glow');
