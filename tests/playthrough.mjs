@@ -340,7 +340,7 @@ async function solvePanel(objectId, id) {
   assert.equal((await inspect()).puzzle.result.solved, true, `${id}: electrical model verifies UI repair`);
   if (id === 'beacon_lens') await measure('voltage', 'lensIn', 'lensOut');
   await screenshot(`${id}-operating`);
-  await page.locator('.wb-success [data-action="close"]').first().click();
+  await page.locator('.wb-success [data-action="commission"]').first().click();
   await settle({ timeout: 40000 });
   assert.equal((await inspect()).flags[id], true, `${id}: putting in service persists the repair`);
   log('commissioned', { id });

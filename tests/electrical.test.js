@@ -151,7 +151,9 @@ test('commissioning only commits a currently operating network and never repeats
       assert.equal(events.length, 0, 'stable readings alone must not commission');
       if (condition === 'broken-after-working') state.wires.pop();
       if (condition === 'already-commissioned') state.completed = true;
-      bench.close(condition !== 'replace-open-panel');
+      // Leaving never commissions; only the explicit decision does.
+      if (condition === 'working') { bench.close(true); assert.equal(state.completed, false, 'leaving must not put the installation into service'); events.length = 0; bench.active = true; bench.shell = { remove() {} }; }
+      bench.close(condition !== 'replace-open-panel', { commission: true });
       assert.deepEqual(events, condition === 'working' ? ['solve', 'save', 'close'] : condition === 'replace-open-panel' ? [] : ['close']);
       if (condition === 'working') assert.equal(state.completed, true);
       bench.close();

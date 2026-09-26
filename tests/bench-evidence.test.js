@@ -130,7 +130,7 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0, 'successful operation must not invent a measurement or require a quiz');
   const previousDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
-  try { bench.close(); bench.close(); } finally { globalThis.document = previousDocument; }
+  try { bench.close(true, { commission: true }); bench.close(true, { commission: true }); } finally { globalThis.document = previousDocument; }
   assert.deepEqual(solved, [id]);
 });
 
