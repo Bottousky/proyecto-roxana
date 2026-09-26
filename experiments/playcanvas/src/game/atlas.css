@@ -44,3 +44,9 @@
   .map-modal .local-map-zoom-toggle:checked~.local-map-zoom-help{color:#514d38;font-size:12px}
   .map-modal .local-map-zoom-toggle:checked~.local-map-viewport{scrollbar-color:#887957 #ddcda8;border-color:#9a876244}
 }
+
+/* Restored links of the grid: copper current running along the road on the map. */
+.map-modal .journey-edge path.journey-power,.journey-power{fill:none;stroke:#f08a2a;stroke-width:3.4;stroke-linecap:round;stroke-dasharray:3.5 7.5;animation:journey-current 1.6s linear infinite;filter:drop-shadow(0 0 3px #ffb45c)}
+@keyframes journey-current{to{stroke-dashoffset:-22}}
+@media(prefers-reduced-motion:reduce){.journey-power{animation:none}}
+.reduced-motion .journey-power{animation:none}
