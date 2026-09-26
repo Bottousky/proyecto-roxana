@@ -36,3 +36,4 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}#hud,#dial
 .dialogue-copy .dialogue-choices button:hover,.dialogue-copy .dialogue-choices button:focus-visible{background:#2d4a47;border-color:#e4c68c}
 .dialogue-choices kbd{flex:0 0 auto;color:#203b3a;background:#e4c68c;border:0;font-weight:600;padding:2px 7px}
 .end-gift{font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;color:#e8d6ac;margin:-4px 0 18px;font-style:italic}
+@media(pointer:coarse){.dialogue-choices kbd{display:none}}
