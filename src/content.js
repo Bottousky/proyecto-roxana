@@ -107,6 +107,7 @@ export const DIALOGUES = {
     ['narrator', 'La mesa recupera un zumbido bajo. La lámpara sigue oscura.'],
     ['lumen', 'Escuchá. Ese ruido sí lo conozco. Ahora podemos mirar el banco.']),
   workshop_locked: d(['lumen', 'Los dos cierres de la mesa siguen sueltos. Uno a cada costado, al final de los cables del piso.']),
+  workshop_locked_right: d(['lumen', 'El izquierdo ya está. Falta el derecho, al final del cable del piso. Que Ohm lo mida antes y después de unirlo.']),
   workshop_arrival_puzzle: d(
     ['lumen', 'La cubierta está entera. La lámpara, recién cambiada. Y sin embargo…'],
     ['player', '¿Podemos mirar lo de adentro sin romperlo?'],
@@ -262,7 +263,7 @@ export const DIALOGUES = {
   yesca_before: d(
     ['yesca', 'Necesitaba más calor. Subí la palanca. Funcionó.'],
     ['player', '¿Y ese cable ennegrecido?'],
-    ['yesca', 'Funcionó primero. La posición baja tarda más, pero puedo trabajar así. Quiero diez azadas terminadas, no once empezadas.']),
+    ['yesca', 'Funcionó primero. Si el horno tiene que compartir el cable con el riego, que sea en la mesa de Vega, donde se ve lo que toma cada uno. Quiero diez azadas terminadas, no once empezadas.']),
   vega_terraces: d(
     ['vega', '¿Ves la parcela del fondo? Antes recibía agua primero. Ahora la de arriba bebe de más y la última espera.'],
     ['player', 'Podemos abrir el canal y mirar hasta dónde llega.'],
@@ -766,6 +767,7 @@ export function resolveDialogueId(id, state = {}) {
   if (id === 'vega_spring' && f.spring_drive) context = 'vega_spring_ready';
   if (id === 'consejera_before' && f.castle_ready) context = 'castle_ready';
   if (id === 'yesca_before' && f.forge_limited) context = 'yesca_limited';
+  if (id === 'workshop_locked' && f.workshop_feed && !f.workshop_return) context = 'workshop_locked_right';
   if (id === 'vega_terraces' && f.irrigation_open) context = 'vega_channel_open';
   if (id === 'nereo_lake' && f.beacon_link) context = 'nereo_lake_linked';
   if (id === 'nereo_tower') context = f.beacon_network ? 'nereo_tower_network' : f.beacon_supply ? 'nereo_tower_source' : id;
