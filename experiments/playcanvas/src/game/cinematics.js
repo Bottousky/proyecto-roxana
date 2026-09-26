@@ -6,7 +6,7 @@ export const CINEMATIC_DEFINITIONS = {
   pump:{area:'spring',duration:5.5,returnAt:4.4,captions:[{at:0,text:'El agua vuelve a encontrar la Plaza.'}]},
   irrigation:{area:'terraces',duration:5.8,returnAt:4.7,captions:[{at:0,text:'El agua alcanza el último bancal.'}]},
   beacon_network:{area:'lighthouse',duration:5.5,returnAt:4.4,captions:[{at:0,text:'La torre recupera su viejo sonido.'}]},
-  beacon_lens:{area:'lighthouse',duration:12,returnAt:10.2,captions:[{at:0,text:'La luz se sostiene detrás del cristal.'},{at:3,text:'Una vuelta. Una pausa.'},{at:7,text:'Desde la Plaza, una campana responde.'}]},
+  beacon_lens:{area:'lighthouse',duration:17,returnAt:15,captions:[{at:0,text:'La luz se sostiene detrás del cristal.'},{at:3,text:'Una vuelta. Una pausa.'},{at:7.6,text:'El haz cruza el lago y sube por las Terrazas.'},{at:11.6,text:'Desde la Plaza, una campana responde.'}]},
 };
 
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -51,7 +51,10 @@ export function createCinematic(id,context,{reducedMotion=false}={}){
     shots=[key(1,crown),key(2.4,crown),key(3.5,gallery),key(definition.returnAt,gallery)];
   }else{
     const lens=pose([puzzle[0],3,puzzle[2]],1.55,[0,15,25]),rise=pose([0,7.8,-18],.93,[2.3,16,25]),beacon=pose([0,9,-14],.65,[7,13.5,24]);
-    shots=[key(1.3,lens),key(2.4,lens),key(4.5,rise),key(5.1,rise),key(7,beacon),key(definition.returnAt,beacon)];
+    // The beam leaves the island: the camera follows it over the night lake and up the terraces,
+    // whose lamps are lit again, before the bell answers from the Plaza.
+    const lake=pose([-38,1.5,50],.82,[0,15,25]),terraces=pose([-80,2,98],.7,[0,17,25]);
+    shots=[key(1.3,lens),key(2.4,lens),key(4.5,rise),key(5.1,rise),key(7,beacon),key(7.6,beacon),key(9.6,lake),key(10.6,lake),key(12.8,terraces),key(definition.returnAt,terraces)];
   }
   return{id,duration:definition.duration,returnAt:definition.returnAt,captions:definition.captions.map(c=>({...c})),frames:[key(0,context.start),...shots,key(definition.duration,game)]};
 }

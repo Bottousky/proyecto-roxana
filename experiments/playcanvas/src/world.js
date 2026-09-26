@@ -74,7 +74,8 @@ export class PlayCanvasWorld {
   }
   focusFrame(){
     if(!this.frame?.enabled||!this.player)return;
-    const [ox,oz]=this.data.areas[this.area.id].offset,p=this.player.position,wanted=this.camera.getPosition().distance(new Vec3(p.x+ox,p.y+1,p.z+oz));
+    // In a cinematic the camera may leave the player behind: focus where it looks.
+    const [ox,oz]=this.data.areas[this.area.id].offset,p=this.player.position,wanted=this.camera.getPosition().distance(this.cinematic?this.focus:new Vec3(p.x+ox,p.y+1,p.z+oz));
     const range=this.inspect||this.cinematic?16:this.area.id==='workshop'?18:12;
     if(Math.abs(wanted-this.frame.dof.focusDistance)>.05||range!==this.frame.dof.focusRange){this.frame.dof.focusDistance=wanted;this.frame.dof.focusRange=range;this.frame.update();}
   }
@@ -287,7 +288,7 @@ export class PlayCanvasWorld {
     for(let i=0;i<45;i++){const e=new Entity('Polen en la luz');e.addComponent('render',{type:'sphere'});e.render.material=m;e.render.castShadows=false;e.setLocalScale(.025,.025,.025);this.app.root.addChild(e);this.motes.push({entity:e,phase:i*2.399,x:(i*7.33)%38-19,z:(i*11.27)%40-20,y:.4+(i%9)*.42});}
     // The restored Faro sweeps a soft wedge of light across land and sea.
     this.beacon=new Entity('Señal del Faro');const m2=new StandardMaterial(),ray=beamTexture(this.app);m2.diffuse=color('#000000');m2.emissive=color('#ffe3a8');m2.emissiveMap=ray;m2.opacityMap=ray;m2.opacityMapChannel='a';m2.emissiveIntensity=1.6;m2.opacity=.5;m2.blendType=BLEND_ADDITIVEALPHA;m2.depthWrite=false;m2.cull=CULLFACE_NONE;m2.useLighting=false;m2.update();this.beaconMaterial=m2;
-    const sweep=new Entity('Haz');sweep.addComponent('render',{type:'plane'});sweep.render.material=m2;sweep.render.castShadows=false;sweep.setLocalPosition(32,0,0);sweep.setLocalScale(64,1,14);this.beacon.addChild(sweep);this.app.root.addChild(this.beacon);
+    const sweep=new Entity('Haz');sweep.addComponent('render',{type:'plane'});sweep.render.material=m2;sweep.render.castShadows=false;sweep.setLocalPosition(70,0,0);sweep.setLocalScale(140,1,26);this.beacon.addChild(sweep);this.app.root.addChild(this.beacon);
   }
   // A soft golden ring on the ground under the object the player can use right now.
   buildFocusRing(){
@@ -356,7 +357,11 @@ export class PlayCanvasWorld {
     for(const p of this.motes){p.entity.enabled=!reduced&&(!inside||Math.abs(p.x)<11&&p.z<16);const t=this.clock,y=p.y*(1-.6*dusk)+(.25+Math.sin(t*.9+p.phase*1.3)*.2)*dusk;
       p.entity.setPosition(this.focus.x+p.x+Math.sin(t*(.2+.25*dusk)+p.phase)*(.5+.8*dusk),y+Math.sin(t*.6+p.phase)*.15,this.focus.z+p.z+Math.cos(t*.3*dusk+p.phase)*.6*dusk);
       const blink=dusk?Math.max(0,Math.sin(t*(.7+(p.phase%1.3))+p.phase*3))**3:1,size=(.025+.075*dusk)*(dusk?.2+.8*blink:1);p.entity.setLocalScale(size,size,size);}
-    this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*(reduced?.05:.18);this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
+    this.beacon.enabled=!!f.beacon_lens&&!inside;
+    // The beam turns on its own; in the finale it swings to follow the camera across the kingdom.
+    this.beamAngle=(this.beamAngle??0)+dt*(reduced?.05:.18);
+    if(this.cinematic?.timeline.id==='beacon_lens'&&this.cinematic.elapsed>7){const aim=Math.atan2(this.focus.z-(KINGDOM.lighthouse.z-25.08),this.focus.x-KINGDOM.lighthouse.x);let d=aim-this.beamAngle;d=Math.atan2(Math.sin(d),Math.cos(d));this.beamAngle+=d*Math.min(1,dt*1.6);}
+    const a=this.beamAngle;this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
   }
   resize(){const low=this.state.settings?.quality==='low';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;if(this.frame)this.frame.enabled=!low;}
   dispose(){if(this.disposed)return;this.disposed=true;removeEventListener('beforeunload',this.destroy);this.app.destroy();}
