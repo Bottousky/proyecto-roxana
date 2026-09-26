@@ -186,7 +186,9 @@ async function walkTo(id) {
       if (!await clickGround(partial)) await keyboardNudge(info.position, partial);
     }
     if (Date.now() - lastProgress > 6500) {
-      if (++replans > 2) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
+      if (++replans > 3) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
+      // A player caught in a corner steps back the way they came before trying again.
+      await page.keyboard.up('Shift'); await keyboardNudge(target, info.position); await keyboardNudge(target, info.position);
       const fresh = await worldGeometry(id); path = fresh.path?.length ? fresh.path : [goal]; goal = path.at(-1); waypoint = 0; lastProgress = Date.now();
       log('navigation-replan', { id, position: info.position });
     }
