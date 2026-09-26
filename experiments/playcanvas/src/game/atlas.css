@@ -8,7 +8,7 @@
 .map-modal .world-map-layout h3{color:#514d38;font-size:27px}
 .map-modal .world-map-layout .eyebrow{color:#807449}
 .map-modal .journey-map{max-height:390px;margin:0 auto}
-.map-modal .local-map{max-height:350px;margin:2px 0 3px}
+.map-modal .local-map{max-height:min(54vh,470px);margin:2px 0 3px}
 .map-modal .journey-edge path{stroke:#857753}.map-modal .journey-edge.unknown path{stroke:#b3a27e}
 .map-modal .journey-edge.locked path,.map-modal .journey-edge .journey-bar{stroke:#935d42}
 .map-modal .journey-node circle{fill:#d9c9a5;stroke:#9b8a62}.map-modal .journey-node.visited circle{fill:#85734b;stroke:#53482e}
