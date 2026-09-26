@@ -250,6 +250,8 @@ export class PlayCanvasWorld {
   }
   update(dt,state,input={}){
     if(this.disposed||!this.booted||!this.area||this.preparingJourney)return;dt=Math.min(.05,Math.max(0,dt));this.clock+=dt;this.state=state;
+    // Apply the saved detail level as soon as the journey's settings arrive, not only on a window resize.
+    if(this.appliedQuality!==(state.settings?.quality||'high'))this.resize();
     if(JSON.stringify([state.flags,state.puzzles])!==this.signature)this.updateFlags(state);
     const paused=input.paused||!!this.cinematic||this.inspect,reduced=state.settings?.reducedMotion,p=this.player.position,old=[p.x,p.z];
     let dx=input.x||0,dz=input.z||0,stepLimit=Infinity;if(paused){this.target=null;this.route=[];dx=dz=0;}else if(dx||dz){this.target=null;this.route=[];const l=Math.hypot(dx,dz);dx/=Math.max(1,l);dz/=Math.max(1,l);}else if(this.target){const x=this.target[0]-p.x,z=this.target[1]-p.z,d=Math.hypot(x,z);if(d<.04)this.target=this.route.shift()||null;else{dx=x/d;dz=z/d;stepLimit=d;}}
@@ -386,6 +388,6 @@ export class PlayCanvasWorld {
     if(this.cinematic?.timeline.id==='beacon_lens'&&this.cinematic.elapsed>7){const aim=Math.atan2(this.focus.z-(KINGDOM.lighthouse.z-25.08),this.focus.x-KINGDOM.lighthouse.x);let d=aim-this.beamAngle;d=Math.atan2(Math.sin(d),Math.cos(d));this.beamAngle+=d*Math.min(1,dt*1.6);}
     const a=this.beamAngle;this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
   }
-  resize(){const low=this.state.settings?.quality==='low';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;if(this.frame)this.frame.enabled=!low;}
+  resize(){const low=this.state.settings?.quality==='low';this.appliedQuality=low?'low':'high';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;if(this.frame)this.frame.enabled=!low;}
   dispose(){if(this.disposed)return;this.disposed=true;removeEventListener('beforeunload',this.destroy);this.app.destroy();}
 }
