@@ -283,7 +283,7 @@ export class PlayCanvasWorld {
     this.animateActor(this.ohmActor,o.x-old[0],o.z-old[1],dt,{paused,reducedMotion:reduced});
   }
   buildAtmosphere(){
-    const m=new StandardMaterial();m.diffuse=color('#e8c994');m.emissive=color('#d6be82');m.emissiveIntensity=.65;m.blendType=BLEND_ADDITIVEALPHA;m.opacity=.26;m.depthWrite=false;m.update();this.motes=[];
+    const m=new StandardMaterial();m.diffuse=color('#e8c994');m.emissive=color('#d6be82');m.emissiveIntensity=.65;m.blendType=BLEND_ADDITIVEALPHA;m.opacity=.26;m.depthWrite=false;m.update();this.moteMaterial=m;this.motes=[];
     for(let i=0;i<45;i++){const e=new Entity('Polen en la luz');e.addComponent('render',{type:'sphere'});e.render.material=m;e.render.castShadows=false;e.setLocalScale(.025,.025,.025);this.app.root.addChild(e);this.motes.push({entity:e,phase:i*2.399,x:(i*7.33)%38-19,z:(i*11.27)%40-20,y:.4+(i%9)*.42});}
     // The restored Faro sweeps a soft wedge of light across land and sea.
     this.beacon=new Entity('Señal del Faro');const m2=new StandardMaterial(),ray=beamTexture(this.app);m2.diffuse=color('#000000');m2.emissive=color('#ffe3a8');m2.emissiveMap=ray;m2.opacityMap=ray;m2.opacityMapChannel='a';m2.emissiveIntensity=1.6;m2.opacity=.5;m2.blendType=BLEND_ADDITIVEALPHA;m2.depthWrite=false;m2.cull=CULLFACE_NONE;m2.useLighting=false;m2.update();this.beaconMaterial=m2;
@@ -350,7 +350,12 @@ export class PlayCanvasWorld {
     // Clouds only cast shadows under a real sun: none indoors or at night.
     updateClouds(this.grounds||[],reduced?0:this.clock,inside?0:.36*(1-n)*Math.min(1,this.sun.light.intensity));
     updateWind(this.windy||[],this.clock,reduced);
-    for(const p of this.motes){p.entity.enabled=!reduced&&(!inside||Math.abs(p.x)<11&&p.z<16);p.entity.setPosition(this.focus.x+p.x+Math.sin(this.clock*.2+p.phase)*.5,p.y+Math.sin(this.clock*.6+p.phase)*.15,this.focus.z+p.z);}
+    // Daylight pollen becomes fireflies at dusk: lower, warmer, each blinking on its own rhythm.
+    const dusk=inside?0:Math.max(0,Math.min(1,(n-.35)/.5));
+    if(this.moteDusk===undefined||Math.abs(dusk-this.moteDusk)>.01){this.moteDusk=dusk;const m=this.moteMaterial;m.emissive.lerp(color('#d6be82'),color('#c8f07a'),dusk);m.emissiveIntensity=.65+7*dusk;m.opacity=.26+.7*dusk;m.update();}
+    for(const p of this.motes){p.entity.enabled=!reduced&&(!inside||Math.abs(p.x)<11&&p.z<16);const t=this.clock,y=p.y*(1-.6*dusk)+(.25+Math.sin(t*.9+p.phase*1.3)*.2)*dusk;
+      p.entity.setPosition(this.focus.x+p.x+Math.sin(t*(.2+.25*dusk)+p.phase)*(.5+.8*dusk),y+Math.sin(t*.6+p.phase)*.15,this.focus.z+p.z+Math.cos(t*.3*dusk+p.phase)*.6*dusk);
+      const blink=dusk?Math.max(0,Math.sin(t*(.7+(p.phase%1.3))+p.phase*3))**3:1,size=(.025+.075*dusk)*(dusk?.2+.8*blink:1);p.entity.setLocalScale(size,size,size);}
     this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*(reduced?.05:.18);this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
   }
   resize(){const low=this.state.settings?.quality==='low';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;if(this.frame)this.frame.enabled=!low;}
