@@ -339,7 +339,15 @@ async function solvePanel(objectId, id) {
   info = await inspect();
   if (info.puzzle.state.tripped) await page.locator('[data-action="rearm"]').click();
   else if (!info.puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
-  await page.locator('.wb-success').waitFor({ state: 'visible' });
+  if (id === 'distribution') {
+    // Ivara's request: show the infirmary lit while the kitchen is isolated, then reopen it.
+    await page.locator('.wb-proof').waitFor({ state: 'visible' });
+    await page.locator('[data-action="switch"][data-key="kitchen"]').click();
+    assert.equal((await inspect()).puzzle.state.proofs.clinicAlone, true, 'The infirmary stays lit with the kitchen isolated');
+    await page.locator('[data-action="switch"][data-key="kitchen"]').click();
+    log('proof', { id, proof: 'clinicAlone' });
+  }
+  await page.locator('.wb-success:not(.wb-proof)').waitFor({ state: 'visible' });
   assert.equal((await inspect()).puzzle.result.solved, true, `${id}: electrical model verifies UI repair`);
   if (id === 'beacon_lens') await measure('voltage', 'lensIn', 'lensOut');
   await screenshot(`${id}-operating`);

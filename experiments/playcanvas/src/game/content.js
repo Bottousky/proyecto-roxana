@@ -225,14 +225,14 @@ export const DIALOGUES = {
   distribution_locked: d(['consejera', 'Aíslen primero la rama oeste dañada. El otro seccionador conecta el troncal de servicio. Las placas identifican ambos.']),
   distribution_arrival: d(
     ['consejera', 'El indicador confirma que el archivo quedó separado en el patio. Debe seguir así durante la prueba.'],
-    ['player', 'Los otros dos servicios están uno detrás del otro. ¿Y si cada uno tuviera su camino?'],
-    ['edda', 'Esperaría que uno siguiera encendido aunque separemos el otro.'],
-    ['consejera', '«Esperaría».'],
+    ['consejera', 'Y una cosa más. Algún día alguien va a tener que reparar la cocina. Ese día, la enfermería no se puede apagar.'],
+    ['edda', '¿Nos pide que lo probemos?'],
+    ['consejera', 'Les pido que me lo muestren. En el tablero hay una llave para aislar la cocina. Quiero ver la enfermería encendida mientras tanto.'],
     ['ohm', 'Puede comprobarse.'],
     ['consejera', 'Esa es la primera palabra tranquilizadora que escucho hoy.']),
   distribution_complete: d(
     ['narrator', 'Las ventanas de la enfermería y la cocina encienden sus faroles por separado. El archivo clausurado permanece oscuro.'],
-    ['consejera', 'El archivo sigue aislado. Los dos servicios funcionan. Ahora puedo retirar el sello.'],
+    ['consejera', 'La cocina aislada y la enfermería encendida. Lo vi. El archivo sigue separado y los dos servicios funcionan. Ahora puedo retirar el sello.'],
     ['player', '¿Confía en nosotros?'],
     ['consejera', 'Ahora tenemos una forma de comprobarlo. Eso vale más que una promesa.'],
     ['edda', 'Dejemos el plano a la vista.'],

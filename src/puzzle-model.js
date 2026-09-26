@@ -47,8 +47,10 @@ export const PUZZLES = {
   distribution: {
     title: 'Dos luces, un refugio', place: 'CASTILLO · DISTRIBUIDOR DEL PATIO', subtitle: "Dos habitaciones necesitan luz. El archivo está inundado.", voltage: 12, protection: 3.1,
     ports: [...sourcePorts, port('clinicIn', 'Enfermería +', 530, 115), port('clinicOut', 'Enfermería −', 795, 115), port('kitchenIn', 'Cocina +', 530, 270), port('kitchenOut', 'Cocina −', 795, 270), port('archiveIn', 'Archivo +', 330, 410), port('archiveOut', 'Archivo −', 620, 410)],
-    components: [component('clinic', 'Enfermería', 'clinicIn', 'clinicOut', 12, { kind: 'lamp', goal: goal(10.7, 12.2, .89, 1.03) }), component('kitchen', 'Cocina', 'kitchenIn', 'kitchenOut', 12, { kind: 'lamp', goal: goal(10.7, 12.2, .89, 1.03) }), component('archive', 'Archivo anegado', 'archiveIn', 'archiveOut', 3, { kind: 'switch', switchKey: 'archive' })],
-    switches: [{ key: 'archive', label: 'Rama del archivo', initial: false, external: true, description: 'Aislá esta rama para intervenir sin apagar las demás.' }],
+    components: [component('clinic', 'Enfermería', 'clinicIn', 'clinicOut', 12, { kind: 'lamp', goal: goal(10.7, 12.2, .89, 1.03) }), component('kitchen', 'Cocina', 'kitchenIn', 'kitchenOut', 12, { kind: 'lamp', switchKey: 'kitchen', goal: goal(10.7, 12.2, .89, 1.03) }), component('archive', 'Archivo anegado', 'archiveIn', 'archiveOut', 3, { kind: 'switch', switchKey: 'archive' })],
+    switches: [{ key: 'archive', label: 'Rama del archivo', initial: false, external: true, description: 'Aislá esta rama para intervenir sin apagar las demás.' }, { key: 'kitchen', label: 'Llave de la cocina', initial: true, description: 'Aislá la cocina, como si hubiera que repararla. ¿Qué le pasa a la enfermería?' }],
+    // Ivara reopens the services only after seeing the infirmary stay lit while the kitchen is isolated.
+    proof: { id: 'clinicAlone', component: 'clinic', when: s => !s.switches.kitchen, request: 'Ivara quiere verlo antes de reabrir: la enfermería encendida mientras la cocina está aislada.', recorded: 'Con la cocina aislada, la enfermería siguió encendida.' },
     initialWires: [['positive', 'clinicIn'], ['clinicOut', 'kitchenIn'], ['kitchenOut', 'negative'], ['positive', 'archiveIn'], ['archiveOut', 'negative']],
     lesson: 'En paralelo, los servicios comparten los dos nodos de la fuente. Cada rama funciona de manera independiente; se puede aislar una falla sin interrumpir las otras.',
     hints: ["El archivo se aisló desde el patio. Todavía podemos observar cómo se reparten los dos servicios sanos.","Podemos seguir el camino de cada luz. ¿Alguna necesita atravesar la otra para volver a la fuente?","Puedo medir cada camino por separado. Tener dos lámparas no garantiza tener dos caminos.","Un paso para probar: apagá y tocá el cable que une «Enfermería −» con «Cocina +» para retirarlo. Después dale a cada luz su propio camino: «Enfermería −» a «Retorno −» y «Fuente +» a «Cocina +»."],
@@ -100,7 +102,7 @@ export const PUZZLES = {
 export function initialPuzzleSnapshot(id) {
   const p = PUZZLES[id];
   if (!p) throw new Error(`Unknown puzzle: ${id}`);
-  return { version: 1, id, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], completed: false };
+  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], completed: false };
 }
 
 export function normalizePuzzleSnapshot(id, saved) {
@@ -115,6 +117,8 @@ export function normalizePuzzleSnapshot(id, saved) {
     hints: Number.isFinite(saved.hints) ? Math.max(0, Math.min(p.hints.length, Math.floor(saved.hints))) : 0,
     meter: { mode: ['voltage', 'continuity', 'current'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) ? saved.meter.branch : null },
   };
+  // A proof counts once seen. Installations commissioned before a proof was required keep it.
+  normalized.proofs = p.proof && (saved.proofs?.[p.proof.id] === true || saved.completed === true) ? { [p.proof.id]: true } : {};
   // Saves from before the trace existed stay unknown (null): nothing may be claimed about them.
   normalized.trace = saved.trace && typeof saved.trace === 'object' ? Object.fromEntries((p.knobs ?? []).map(k => { const t = saved.trace[k.key], v = normalized.values[k.key];
     return [k.key, Number.isFinite(t?.min) && Number.isFinite(t?.max) ? { min: Math.max(k.min, Math.min(t.min, v)), max: Math.min(k.max, Math.max(t.max, v)) } : { min: v, max: v }]; })) : null;
@@ -150,7 +154,10 @@ export function evaluatePuzzle(id, state) {
   // maxPower limits losses on a line; minCurrent keeps a part in service (the lens divider needs both arms).
   const constraintsMet = (p.constraints ?? []).every(c => { const b = solution.branches[c.branch]; return (c.maxPower === undefined || (b?.power ?? Infinity) <= c.maxPower) && Math.abs(b?.current ?? 0) >= (c.minCurrent ?? 0); });
   const solved = powered && solution.valid && Object.values(operating).every(Boolean) && constraintsMet;
-  return { network, solution, overloaded, requestedCurrent, current, power: current * p.voltage, voltage: powered ? p.voltage : 0, operating, constraintsMet, solved };
+  // «solved» is physics. Commissioning may also need a proof the community asked to see.
+  const proofMet = !!p.proof && powered && solution.valid && constraintsMet && p.proof.when(state) && operating[p.proof.component];
+  const proven = !p.proof || state.proofs?.[p.proof.id] === true || proofMet;
+  return { network, solution, overloaded, requestedCurrent, current, power: current * p.voltage, voltage: powered ? p.voltage : 0, operating, constraintsMet, solved, proofMet, proven, commissionable: solved && proven };
 }
 
 /** Terminals joined by copper alone: wires, never through a component. It is what a

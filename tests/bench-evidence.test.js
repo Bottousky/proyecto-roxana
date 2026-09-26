@@ -126,6 +126,11 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   }
   click({ action: 'power' });
   assert.equal(bench.result.solved, true, id);
+  if (PUZZLES[id].proof) {
+    assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the requested proof`);
+    click({ action: 'switch', key: 'kitchen' }); click({ action: 'switch', key: 'kitchen' });
+    assert.equal(bench.state.proofs.clinicAlone, true); assert.equal(bench.result.commissionable, true);
+  }
   assert.ok(bench.state.evidence.some(e => e.kind === 'result'));
   assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0, 'successful operation must not invent a measurement or require a quiz');
   const previousDocument = globalThis.document;
@@ -162,4 +167,15 @@ test('the gate closing and its journal page only claim the brake tests the playe
   // A save from before the trace existed claims nothing either way.
   const legacy = normalizePuzzleSnapshot('gate', { ...fresh, trace: undefined });
   assert.equal(legacy.trace, null); assert.doesNotMatch(said({ puzzles: { gate: legacy } }), /rueda/);
+});
+
+test('the castle proof: series wiring cannot show the infirmary alone; parallel can, and old commissions keep it', () => {
+  const series = { ...initialPuzzleSnapshot('distribution'), sourceOn: true };
+  series.switches = { ...series.switches, kitchen: false };
+  assert.equal(evaluatePuzzle('distribution', series).proofMet, false, 'in series, isolating the kitchen darkens the infirmary');
+  const parallel = { ...series, wires: [['positive','clinicIn'], ['clinicOut','negative'], ['positive','kitchenIn'], ['kitchenOut','negative']] };
+  assert.equal(evaluatePuzzle('distribution', parallel).proofMet, true);
+  assert.equal(evaluatePuzzle('distribution', { ...parallel, switches: { ...parallel.switches, kitchen: true } }).commissionable, false);
+  const legacy = normalizePuzzleSnapshot('distribution', { ...parallel, switches: { archive: false, kitchen: true }, completed: true, proofs: undefined });
+  assert.equal(legacy.proofs.clinicAlone, true); assert.equal(legacy.completed, true);
 });

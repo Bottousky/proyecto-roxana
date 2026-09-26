@@ -120,7 +120,7 @@ export class PuzzleWorkbench {
   close(notify = true, { commission = false } = {}) {
     if (!this.active) return;
     if (this.practice) this.endPractice();
-    if (notify && commission && !this.state.completed && evaluatePuzzle(this.id, this.state).solved) {
+    if (notify && commission && !this.state.completed && evaluatePuzzle(this.id, this.state).commissionable) {
       this.state.completed = true;
       appendBenchEvidence(this.state, { kind: 'result', text: 'Dejé la instalación funcionando con este montaje.' });
       this.callbacks.onSound?.('solve');
@@ -160,6 +160,13 @@ export class PuzzleWorkbench {
       this.feedback = 'Se oyó un clic: la protección cortó la alimentación porque pedía demasiada corriente. Suele pasar cuando un camino une + y − sin atravesar ningún receptor. Nada se rompió: cambiá el montaje y volvé a encender.';
       this.callbacks.onSound?.('error');
       this.result = evaluatePuzzle(this.id, this.state);
+    }
+    const proof = this.puzzle.proof;
+    if (proof && this.result.proofMet && !this.state.proofs?.[proof.id] && !this.practice) {
+      (this.state.proofs ??= {})[proof.id] = true;
+      appendBenchEvidence(this.state, { kind: 'result', text: proof.recorded });
+      this.feedback = `${proof.recorded} Ivara lo vio.`;
+      if (notify) this.callbacks.onSound?.('success');
     }
     if (notify && this.result.solved && !this.wasOperating && !this.state.completed) this.callbacks.onSound?.('success');
     this.wasOperating = this.result.solved;
@@ -545,7 +552,7 @@ export class PuzzleWorkbench {
       : this.pendingTest ? 'Cuando termines de cambiar cables, encendé la alimentación para probar.'
       : 'Tocá dos piezas redondas para unirlas con un cable. Tocá un cable para retirarlo.') : this.mode === 'current' ? 'Elegí una pieza en el instrumento para mirar su camino.' : 'Tocá dos piezas redondas para apoyar las puntas del instrumento.';
     this.shell.innerHTML = `<div class="wb-case wb-discovery ${this.id === 'awaken' ? 'wb-first' : ''} ${this.showNumbers ? 'wb-with-numbers' : ''} ${s.completed ? 'completed' : ''}">
-      <header class="wb-header"><div><p class="wb-eyebrow">${p.place}${this.practice ? ' · PRÁCTICA CON UNA COPIA' : ''}</p><h1>${p.title}</h1>${!getBenchEvidence(this.id,s).some(e => e.kind === 'intervention') ? `<p class="wb-subtitle">${guidance.subtitle}</p>` : ''}${compactMeter}</div>${this.practice ? '<button class="wb-commission-top" data-action="end-practice">Terminar la práctica</button>' : r.solved && !s.completed ? `<button class="wb-commission-top" data-action="commission">${leaveLabel}</button>` : ''}<button class="wb-close" data-action="close" aria-label="Volver al mundo">✕ <span>Volver</span></button></header>
+      <header class="wb-header"><div><p class="wb-eyebrow">${p.place}${this.practice ? ' · PRÁCTICA CON UNA COPIA' : ''}</p><h1>${p.title}</h1>${!getBenchEvidence(this.id,s).some(e => e.kind === 'intervention') ? `<p class="wb-subtitle">${guidance.subtitle}</p>` : ''}${compactMeter}</div>${this.practice ? '<button class="wb-commission-top" data-action="end-practice">Terminar la práctica</button>' : r.commissionable && !s.completed ? `<button class="wb-commission-top" data-action="commission">${leaveLabel}</button>` : ''}<button class="wb-close" data-action="close" aria-label="Volver al mundo">✕ <span>Volver</span></button></header>
       <div class="wb-layout"><main class="wb-main">
         ${available.length ? `<div class="wb-toolstrip"><div class="wb-tools">${toolButton('wire')}${toolButton(available[0])}</div>${power}</div>${available.length > 1 ? `<details class="wb-extra-tools" data-drawer="tools"><summary>Otros instrumentos de Ohm</summary><div class="wb-tools">${available.slice(1).map(toolButton).join('')}</div></details>` : ''}` : s.tripped ? `<div class="wb-toolstrip">${power}</div>` : ''}
         <p class="wb-instruction"><span aria-hidden="true">${this.mode === 'wire' ? '⌁' : '⌖'}</span>${instruction}</p>
@@ -558,7 +565,8 @@ export class PuzzleWorkbench {
         <section class="wb-observation" aria-live="polite"><p class="wb-eyebrow">${r.solved ? 'ALGO CAMBIÓ' : 'MIRÁ Y ESCUCHÁ'}</p>${observePuzzle(this.id,s,r).map(o => `<div><h2>${escapeHtml(o.label)}</h2><p>${escapeHtml(o.text)}</p></div>`).join('')}</section>
         ${this.renderMeter()}
         ${!s.completed && !r.solved ? `<div class="wb-ohm wb-question">${s.hints ? `<div><span>${guidance.voice}</span><p>${escapeHtml(guidance.hints[s.hints-1])}</p></div>` : ''}<button data-action="hint" ${s.hints >= guidance.hints.length ? 'disabled' : ''}>${s.hints ? s.hints >= guidance.hints.length ? 'Eso es lo que observamos' : s.hints === guidance.hints.length - 1 ? 'Mostrame un paso para probar' : 'Otra observación' : guidance.question} <span>↗</span></button></div>` : ''}
-        ${r.solved || s.completed ? `<div class="wb-success" role="status"><div><strong>${this.id === 'awaken' ? 'Un pequeño latido' : this.id === 'beacon_lens' ? 'La luz encuentra su ritmo' : 'Ahora puede sostenerse'}</strong><p>${s.completed ? 'La instalación sigue en servicio. Podés medirla, o practicar con una copia sin tocarla.' : this.practice ? 'En la copia también funciona. La instalación real sigue como la dejaste.' : 'Podés seguir probando o ponerlo en servicio. «Volver» lo deja armado sin encenderlo para el pueblo.'}</p></div>${s.completed ? '<button data-action="practice">Practicar con una copia</button><button data-action="close">Volver al mundo →</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : `<button data-action="commission">${leaveLabel}</button>`}</div>` : ''}
+        ${r.solved && !r.proven && !s.completed && !this.practice ? `<div class="wb-success wb-proof" role="status"><div><strong>Funciona. Falta lo que pidió Ivara</strong><p>${escapeHtml(p.proof.request)}</p></div></div>` : ''}
+        ${(r.solved && r.proven) || s.completed ? `<div class="wb-success" role="status"><div><strong>${this.id === 'awaken' ? 'Un pequeño latido' : this.id === 'beacon_lens' ? 'La luz encuentra su ritmo' : 'Ahora puede sostenerse'}</strong><p>${s.completed ? 'La instalación sigue en servicio. Podés medirla, o practicar con una copia sin tocarla.' : this.practice ? 'En la copia también funciona. La instalación real sigue como la dejaste.' : 'Podés seguir probando o ponerlo en servicio. «Volver» lo deja armado sin encenderlo para el pueblo.'}</p></div>${s.completed ? '<button data-action="practice">Practicar con una copia</button><button data-action="close">Volver al mundo →</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : `<button data-action="commission">${leaveLabel}</button>`}</div>` : ''}
         ${this.renderDetails()}${this.renderExperiments()}<p class="wb-feedback" role="status">${escapeHtml(this.feedback)}</p>
       </aside></div><footer class="wb-footer"><span>UN CAMBIO · UNA OBSERVACIÓN</span><span>Tab para recorrer · Enter para actuar · Esc para volver</span>${available.length && this.mode === 'wire' ? `<button class="wb-numbers" data-action="numbers" aria-pressed="${this.showNumbers}">${this.showNumbers ? 'Ocultar números' : 'Leer las marcas numéricas'}</button>` : ''}</footer>
     </div>`;
