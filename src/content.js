@@ -151,9 +151,9 @@ export const DIALOGUES = {
   gate_locked: d(['edda', 'Todavía no responden las balizas. Hay cierres en los dos postes y un puente en el centro. El dibujo viejo no tiene ese puente.']),
   gate_arrival: d(
     ['edda', 'El cerrojo hace fuerza… pero para abajo. ¿No tendría que levantar?'],
-    ['player', 'Capaz conectamos algo al revés.'],
+    ['player', '¿Qué cambia entre empujar para arriba y para abajo?'],
     ['ohm', 'Puedo mostrar el sentido de la lectura. La placa conserva las marcas de trabajo del cerrojo.'],
-    ['edda', 'Bueno. Una sospecha que podemos probar.']),
+    ['edda', 'Bueno. Algo para comparar.']),
   gate_complete: d(
     ['narrator', 'El cerrojo asciende. Por primera vez en años, la Calzada no termina en una pared.'],
     ['player', 'Cambió el sentido. Y al ajustar la rueda, levantó sin atascarse.'],
@@ -349,8 +349,9 @@ export const DIALOGUES = {
   beacon_network_locked: d(['nereo', 'Primero tiene que sostenerse la base. Después, las manivelas del medio apartan el puente gastado y acoplan el motor.']),
   beacon_network_arrival: d(
     ['nereo', 'Cuando una lámpara fallaba, nos quedábamos sin giro y sin galería. Yo hacía dos trabajos a oscuras.'],
-    ['player', 'Como en el Castillo. ¿Podemos darles caminos separados?'],
-    ['edda', 'Probemos esa idea. Voy a anotar qué esperamos de cada uno antes de tocarlo.'],
+    ['nereo', 'Quiero que si una se apaga, las otras sigan. Una noche sin giro es una noche sin faro.'],
+    ['player', '¿Qué comparte ahora cada una con las otras?'],
+    ['edda', 'Voy a anotar qué esperamos de cada una antes de tocarlas.'],
     ['ohm', 'Hay tres servicios. Dispongo de tres espacios en el registro. Coincidencia muy práctica.']),
   beacon_network_complete: d(
     ['narrator', 'La corona de engranajes comienza a girar. Lámparas sucesivas iluminan la galería y el enorme cristal.'],
