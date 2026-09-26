@@ -333,6 +333,10 @@ async function solvePanel(objectId, id) {
       await wire('opticOut', 'negative'); await wire('positive', 'bearingIn');
       await wire('bearingOut', 'negative'); await wire('positive', 'signalIn'); break;
     case 'beacon_lens':
+      // Nereo's comparison, first half: the tap with the lens elsewhere.
+      if (!(await inspect()).puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
+      await measure('voltage', 'tap', 'negative');
+      await page.locator('[data-action="power"]').click(); await setMode('wire');
       await removeWire('positive', 'lensIn'); await wire('tap', 'lensIn'); await knob('upper', 12); break;
     default: throw new Error(`No UI repair sequence for ${id}`);
   }
@@ -346,6 +350,12 @@ async function solvePanel(objectId, id) {
     assert.equal((await inspect()).puzzle.state.proofs.clinicAlone, true, 'The infirmary stays lit with the kitchen isolated');
     await page.locator('[data-action="switch"][data-key="kitchen"]').click();
     log('proof', { id, proof: 'clinicAlone' });
+  }
+  if (id === 'beacon_lens') {
+    await page.locator('.wb-proof').waitFor({ state: 'visible' });
+    await measure('voltage', 'tap', 'negative');
+    assert.equal((await inspect()).puzzle.state.proofs.loadEffect, true, 'The tap was read unloaded and loaded');
+    log('proof', { id, proof: 'loadEffect' });
   }
   await page.locator('.wb-success:not(.wb-proof)').waitFor({ state: 'visible' });
   assert.equal((await inspect()).puzzle.result.solved, true, `${id}: electrical model verifies UI repair`);

@@ -50,7 +50,7 @@ export const PUZZLES = {
     components: [component('clinic', 'Enfermería', 'clinicIn', 'clinicOut', 12, { kind: 'lamp', goal: goal(10.7, 12.2, .89, 1.03) }), component('kitchen', 'Cocina', 'kitchenIn', 'kitchenOut', 12, { kind: 'lamp', switchKey: 'kitchen', goal: goal(10.7, 12.2, .89, 1.03) }), component('archive', 'Archivo anegado', 'archiveIn', 'archiveOut', 3, { kind: 'switch', switchKey: 'archive' })],
     switches: [{ key: 'archive', label: 'Rama del archivo', initial: false, external: true, description: 'Aislá esta rama para intervenir sin apagar las demás.' }, { key: 'kitchen', label: 'Llave de la cocina', initial: true, description: 'Aislá la cocina, como si hubiera que repararla. ¿Qué le pasa a la enfermería?' }],
     // Ivara reopens the services only after seeing the infirmary stay lit while the kitchen is isolated.
-    proof: { id: 'clinicAlone', component: 'clinic', when: s => !s.switches.kitchen, request: 'Ivara quiere verlo antes de reabrir: la enfermería encendida mientras la cocina está aislada.', recorded: 'Con la cocina aislada, la enfermería siguió encendida.' },
+    proof: { id: 'clinicAlone', who: 'Ivara', component: 'clinic', when: s => !s.switches.kitchen, request: 'Ivara quiere verlo antes de reabrir: la enfermería encendida mientras la cocina está aislada.', recorded: 'Con la cocina aislada, la enfermería siguió encendida.' },
     initialWires: [['positive', 'clinicIn'], ['clinicOut', 'kitchenIn'], ['kitchenOut', 'negative'], ['positive', 'archiveIn'], ['archiveOut', 'negative']],
     lesson: 'En paralelo, los servicios comparten los dos nodos de la fuente. Cada rama funciona de manera independiente; se puede aislar una falla sin interrumpir las otras.',
     hints: ["El archivo se aisló desde el patio. Todavía podemos observar cómo se reparten los dos servicios sanos.","Podemos seguir el camino de cada luz. ¿Alguna necesita atravesar la otra para volver a la fuente?","Puedo medir cada camino por separado. Tener dos lámparas no garantiza tener dos caminos.","Un paso para probar: apagá y tocá el cable que une «Enfermería −» con «Cocina +» para retirarlo. Después dale a cada luz su propio camino: «Enfermería −» a «Retorno −» y «Fuente +» a «Cocina +»."],
@@ -91,6 +91,8 @@ export const PUZZLES = {
     ports: [...sourcePorts, port('upperA', 'Divisor · entrada', 320, 115), port('tap', 'Toma intermedia', 575, 115), port('lowerB', 'Divisor · retorno', 835, 115), port('lensIn', 'Lente +', 525, 350), port('lensOut', 'Lente −', 815, 350)],
     components: [component('upper', 'Brazo superior', 'upperA', 'tap', 24, { kind: 'resistor', valueKey: 'upper' }), component('lower', 'Brazo inferior · 24 Ω', 'tap', 'lowerB', 24, { kind: 'resistor' }), component('lens', 'Cristal del horizonte · 24 Ω', 'lensIn', 'lensOut', 24, { kind: 'lens', goal: goal(8.7, 9.3, .362, .388) })],
     constraints: [{ branch: 'lower', minCurrent: .05 }],
+    // Nereo needs a rule the next keeper can check: how much the tap drops when the lens is connected.
+    proof: { id: 'loadEffect', who: 'Nereo', parts: ['tapUnloaded', 'tapLoaded'], measure: { between: ['tap', 'negative'], load: ['lensIn', 'tap'] }, request: 'Nereo quiere dejar escrito cuánto cambia la toma al conectar la lente: medila sin la lente y con la lente.', recorded: 'Medí la toma sin la lente y con la lente conectada: al cargarla, la tensión baja.' },
     knobs: [{ key: 'upper', label: 'Brazo superior del divisor', min: 2, max: 40, step: 1, initial: 24, unit: 'Ω', description: 'Calibrá con la lente conectada. Ella también forma parte de la red.' }],
     initialWires: [['positive', 'upperA'], ['lowerB', 'negative'], ['positive', 'lensIn'], ['lensOut', 'negative']],
     lesson: 'La carga cambia un divisor: la lente y el brazo inferior quedan en paralelo. Calibrar con la carga conectada permite obtener la tensión que el sistema necesita en funcionamiento.',
@@ -118,7 +120,8 @@ export function normalizePuzzleSnapshot(id, saved) {
     meter: { mode: ['voltage', 'continuity', 'current'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) ? saved.meter.branch : null },
   };
   // A proof counts once seen. Installations commissioned before a proof was required keep it.
-  normalized.proofs = p.proof && (saved.proofs?.[p.proof.id] === true || saved.completed === true) ? { [p.proof.id]: true } : {};
+  normalized.proofs = !p.proof ? {} : Object.fromEntries([p.proof.id, ...(p.proof.parts ?? [])].filter(k => saved.proofs?.[k] === true).map(k => [k, true]));
+  if (p.proof && saved.completed === true) normalized.proofs[p.proof.id] = true;
   // Saves from before the trace existed stay unknown (null): nothing may be claimed about them.
   normalized.trace = saved.trace && typeof saved.trace === 'object' ? Object.fromEntries((p.knobs ?? []).map(k => { const t = saved.trace[k.key], v = normalized.values[k.key];
     return [k.key, Number.isFinite(t?.min) && Number.isFinite(t?.max) ? { min: Math.max(k.min, Math.min(t.min, v)), max: Math.min(k.max, Math.max(t.max, v)) } : { min: v, max: v }]; })) : null;
@@ -155,7 +158,7 @@ export function evaluatePuzzle(id, state) {
   const constraintsMet = (p.constraints ?? []).every(c => { const b = solution.branches[c.branch]; return (c.maxPower === undefined || (b?.power ?? Infinity) <= c.maxPower) && Math.abs(b?.current ?? 0) >= (c.minCurrent ?? 0); });
   const solved = powered && solution.valid && Object.values(operating).every(Boolean) && constraintsMet;
   // «solved» is physics. Commissioning may also need a proof the community asked to see.
-  const proofMet = !!p.proof && powered && solution.valid && constraintsMet && p.proof.when(state) && operating[p.proof.component];
+  const proofMet = !!p.proof?.when && powered && solution.valid && constraintsMet && p.proof.when(state) && operating[p.proof.component];
   const proven = !p.proof || state.proofs?.[p.proof.id] === true || proofMet;
   return { network, solution, overloaded, requestedCurrent, current, power: current * p.voltage, voltage: powered ? p.voltage : 0, operating, constraintsMet, solved, proofMet, proven, commissionable: solved && proven };
 }

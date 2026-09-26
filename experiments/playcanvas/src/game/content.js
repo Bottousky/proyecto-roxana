@@ -363,8 +363,8 @@ export const DIALOGUES = {
   beacon_lens_locked: d(['nereo', 'Falta el trabajo de la galería. Cuando gire la corona, podemos abrir el obturador y liberar el freno de la lente.']),
   beacon_lens_arrival: d(
     ['nereo', 'Una luz que encandila un segundo y se apaga no es una señal. Necesitamos que vuelva, siempre reconocible.'],
-    ['player', '¿Y si el ajuste cambia cuando conectamos la lente? En las Terrazas pasaba algo parecido al pedir agua.'],
-    ['edda', 'Entonces la probamos trabajando. Si mi dibujo no alcanza, lo corrijo. Ya le hice lugar.'],
+    ['nereo', 'Y quiero dejarle algo al que venga después de mí: cuánto cambia la toma cuando la lente se conecta. Medido, no recordado.'],
+    ['edda', 'Sin la lente y con la lente. Si mi dibujo no alcanza, lo corrijo. Ya le hice lugar.'],
     ['nereo', 'Yo miro el lago. Esta vez, sin adornar la respuesta.']),
   beacon_lens_complete: d(
     ['narrator', 'Una línea de luz cruza el cristal. El cobre responde desde la base hasta la corona. El Faro toma aire.'],

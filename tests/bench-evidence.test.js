@@ -128,11 +128,20 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   assert.equal(bench.result.solved, true, id);
   if (PUZZLES[id].proof) {
     assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the requested proof`);
-    click({ action: 'switch', key: 'kitchen' }); click({ action: 'switch', key: 'kitchen' });
-    assert.equal(bench.state.proofs.clinicAlone, true); assert.equal(bench.result.commissionable, true);
+    if (id === 'distribution') { click({ action: 'switch', key: 'kitchen' }); click({ action: 'switch', key: 'kitchen' }); }
+    if (id === 'beacon_lens') {
+      const measureTap = () => { bench.mode = 'voltage'; bench.state.meter = { ...bench.state.meter, a: null, b: null }; bench.touchPort('tap'); bench.touchPort('negative'); bench.mode = 'wire'; };
+      measureTap();
+      assert.equal(bench.state.proofs.tapLoaded, true); assert.equal(bench.result.commissionable, false, 'one side of the comparison is not enough');
+      click({ action: 'power' }); click({ wire: String(bench.state.wires.findIndex(w => w.includes('lensIn') && w.includes('tap'))) });
+      click({ action: 'power' }); measureTap();
+      click({ action: 'power' }); bench.touchPort('tap'); bench.touchPort('lensIn'); click({ action: 'power' });
+    }
+    assert.equal(bench.state.proofs[PUZZLES[id].proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.commissionable, true, id);
   }
   assert.ok(bench.state.evidence.some(e => e.kind === 'result'));
-  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0, 'successful operation must not invent a measurement or require a quiz');
+  // Only the lens asks for measurements (Nereo's comparison); they are the two the player took, never invented.
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, PUZZLES[id].proof?.measure ? 2 : 0, 'successful operation must not invent a measurement or require a quiz');
   const previousDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
   try { bench.close(true, { commission: true }); bench.close(true, { commission: true }); } finally { globalThis.document = previousDocument; }

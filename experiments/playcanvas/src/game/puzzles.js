@@ -165,7 +165,7 @@ export class PuzzleWorkbench {
     if (proof && this.result.proofMet && !this.state.proofs?.[proof.id] && !this.practice) {
       (this.state.proofs ??= {})[proof.id] = true;
       appendBenchEvidence(this.state, { kind: 'result', text: proof.recorded });
-      this.feedback = `${proof.recorded} Ivara lo vio.`;
+      this.feedback = `${proof.recorded} ${proof.who} lo vio.`;
       if (notify) this.callbacks.onSound?.('success');
     }
     if (notify && this.result.solved && !this.wasOperating && !this.state.completed) this.callbacks.onSound?.('success');
@@ -214,6 +214,18 @@ export class PuzzleWorkbench {
       ? `Medidor en serie con ${simpleLabel(this.puzzle.components.find(c => c.id === m.branch)?.label ?? '')}; sentido ${this.portLabel(this.puzzle.components.find(c => c.id === m.branch)?.a)} → ${this.portLabel(this.puzzle.components.find(c => c.id === m.branch)?.b)}.`
       : `Punta roja: ${this.portLabel(m.a)}; punta negra: ${this.portLabel(m.b)}.`;
     appendBenchEvidence(this.state, { kind: blocked ? 'observation' : 'measurement', text: blocked ? 'La prueba de continuidad quedó pendiente: la alimentación estaba encendida.' : TOOL_NAMES[this.mode], value: `${reading.value}${reading.unit ? ` ${reading.unit}` : ''}`, reference: `${reference} Alimentación ${this.state.sourceOn && !this.state.tripped ? 'encendida' : 'apagada'}.` });
+    if (!blocked) this.recordProofMeasurement(reading);
+  }
+
+  // A measured proof: the same two points read once unloaded and once loaded.
+  recordProofMeasurement(reading) {
+    const proof = this.puzzle.proof?.measure && this.puzzle.proof, m = this.state.meter;
+    if (!proof || this.practice || this.mode !== 'voltage' || !m.a || !m.b || !this.state.sourceOn || this.state.tripped) return;
+    const { nodeOf } = wireNodes(this.id, this.state), [x, y] = proof.measure.between.map(n => nodeOf[n]), probe = [nodeOf[m.a], nodeOf[m.b]];
+    if (x === y || !probe.includes(x) || !probe.includes(y)) return;
+    const loaded = nodeOf[proof.measure.load[0]] === nodeOf[proof.measure.load[1]], proofs = this.state.proofs ??= {};
+    proofs[loaded ? 'tapLoaded' : 'tapUnloaded'] = true;
+    if (!proofs[proof.id] && proof.parts.every(k => proofs[k])) { proofs[proof.id] = true; appendBenchEvidence(this.state, { kind: 'result', text: proof.recorded }); this.feedback = `${proof.recorded} ${proof.who} lo anota.`; this.callbacks.onSound?.('success'); this.result = evaluatePuzzle(this.id, this.state); }
   }
 
   requireIsolated() {
@@ -565,7 +577,7 @@ export class PuzzleWorkbench {
         <section class="wb-observation" aria-live="polite"><p class="wb-eyebrow">${r.solved ? 'ALGO CAMBIÓ' : 'MIRÁ Y ESCUCHÁ'}</p>${observePuzzle(this.id,s,r).map(o => `<div><h2>${escapeHtml(o.label)}</h2><p>${escapeHtml(o.text)}</p></div>`).join('')}</section>
         ${this.renderMeter()}
         ${!s.completed && !r.solved ? `<div class="wb-ohm wb-question">${s.hints ? `<div><span>${guidance.voice}</span><p>${escapeHtml(guidance.hints[s.hints-1])}</p></div>` : ''}<button data-action="hint" ${s.hints >= guidance.hints.length ? 'disabled' : ''}>${s.hints ? s.hints >= guidance.hints.length ? 'Eso es lo que observamos' : s.hints === guidance.hints.length - 1 ? 'Mostrame un paso para probar' : 'Otra observación' : guidance.question} <span>↗</span></button></div>` : ''}
-        ${r.solved && !r.proven && !s.completed && !this.practice ? `<div class="wb-success wb-proof" role="status"><div><strong>Funciona. Falta lo que pidió Ivara</strong><p>${escapeHtml(p.proof.request)}</p></div></div>` : ''}
+        ${r.solved && !r.proven && !s.completed && !this.practice ? `<div class="wb-success wb-proof" role="status"><div><strong>Funciona. Falta lo que pidió ${escapeHtml(p.proof.who)}</strong><p>${escapeHtml(p.proof.request)}</p></div></div>` : ''}
         ${(r.solved && r.proven) || s.completed ? `<div class="wb-success" role="status"><div><strong>${this.id === 'awaken' ? 'Un pequeño latido' : this.id === 'beacon_lens' ? 'La luz encuentra su ritmo' : 'Ahora puede sostenerse'}</strong><p>${s.completed ? 'La instalación sigue en servicio. Podés medirla, o practicar con una copia sin tocarla.' : this.practice ? 'En la copia también funciona. La instalación real sigue como la dejaste.' : 'Podés seguir probando o ponerlo en servicio. «Volver» lo deja armado sin encenderlo para el pueblo.'}</p></div>${s.completed ? '<button data-action="practice">Practicar con una copia</button><button data-action="close">Volver al mundo →</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : `<button data-action="commission">${leaveLabel}</button>`}</div>` : ''}
         ${this.renderDetails()}${this.renderExperiments()}<p class="wb-feedback" role="status">${escapeHtml(this.feedback)}</p>
       </aside></div><footer class="wb-footer"><span>UN CAMBIO · UNA OBSERVACIÓN</span><span>Tab para recorrer · Enter para actuar · Esc para volver</span>${available.length && this.mode === 'wire' ? `<button class="wb-numbers" data-action="numbers" aria-pressed="${this.showNumbers}">${this.showNumbers ? 'Ocultar números' : 'Leer las marcas numéricas'}</button>` : ''}</footer>
