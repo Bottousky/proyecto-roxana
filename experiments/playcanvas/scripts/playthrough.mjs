@@ -276,7 +276,7 @@ async function removeWire(a, b) {
   await page.locator(`button[data-wire="${index}"]`).click();
 }
 async function knob(key, value) {
-  const input = page.locator(`input[data-knob="${key}"]`);
+  const input = page.locator(`input[data-knob="${key}"]:visible`);
   const min = Number(await input.getAttribute('min')), step = Number(await input.getAttribute('step'));
   await input.press('Home');
   for (let i = 0; i < Math.round((value - min) / step); i++) await input.press('ArrowRight');
@@ -346,9 +346,9 @@ async function solvePanel(objectId, id) {
   if (id === 'distribution') {
     // Ivara's request: show the infirmary lit while the kitchen is isolated, then reopen it.
     await page.locator('.wb-proof').waitFor({ state: 'visible' });
-    await page.locator('[data-action="switch"][data-key="kitchen"]').click();
+    await page.locator('[data-action="switch"][data-key="kitchen"]:visible').click();
     assert.equal((await inspect()).puzzle.state.proofs.clinicAlone, true, 'The infirmary stays lit with the kitchen isolated');
-    await page.locator('[data-action="switch"][data-key="kitchen"]').click();
+    await page.locator('[data-action="switch"][data-key="kitchen"]:visible').click();
     log('proof', { id, proof: 'clinicAlone' });
   }
   if (id === 'beacon_lens') {
