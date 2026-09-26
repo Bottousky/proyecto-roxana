@@ -5,7 +5,7 @@ import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passages
 import {lakeShoreX,AREA_LAYOUTS,pointOnPaving} from './game/world-layout.js';
 import {findPath} from './game/navigation.js';
 import {moveWithCollisions,isPositionClear} from './game/collision.js';
-import {advanceActor,idleActor} from './game/actor-animation.js';
+import {advanceActor,idleActor,actorDirection} from './game/actor-animation.js';
 import {initializeInhabitants,updateInhabitants,getInhabitantInteractions,beginInhabitantConversation,faceInhabitantSpeaker,endInhabitantConversation} from './game/world-inhabitants.js';
 import {inInteractionReach,approachInteraction} from './game/world-interaction.js';
 import {describeWorldAudio} from './game/world-audio.js';
@@ -216,6 +216,9 @@ export class PlayCanvasWorld {
   playRestoration(id){
     this.updateFlags(this.state);this.restoration=3;
     const objects=(this.area?.objects||[]).filter(o=>!o.character&&o.kind!=='npc'),o=objects.find(o=>o.puzzle===id)||objects.find(o=>o.id===id||o.action?.flag===id)||objects.find(o=>o.flag===id);if(!o||!this.burst)return;
+    // The neighbours react: everyone nearby turns to the installation and jumps, one after another.
+    this.celebration={t:0,x:o.x,z:o.z,actors:[this.playerActor,this.ohmActor,...(this.regions.get(this.area.id)?.actors||[])].filter(a=>a.entity.enabled&&Math.hypot(a.g.position.x-o.x,a.g.position.z-o.z)<22)};
+    for(const a of this.celebration.actors)if(a!==this.playerActor)a.animation=idleActor(actorDirection(o.x-a.g.position.x,o.z-a.g.position.z,a.animation.direction));
     const [ox,oz]=this.data.areas[this.area.id].offset,y=this.groundHeight(o.x,o.z);this.burst.origin=[o.x+ox,y,o.z+oz];this.burst.t=0;this.burst.root.enabled=true;
     this.burst.sparks.forEach((p,i)=>{p.angle=i*2.399;p.radius=.2+(i%7)*.12;p.speed=1.2+(i%5)*.35;p.delay=(i%10)*.05;});
   }
@@ -256,7 +259,7 @@ export class PlayCanvasWorld {
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
-    this.syncActors();this.speakingBounce(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
+    this.syncActors();this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
     else{const rest=gameplayCameraPose(this.area.id,p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
       // Conversations: frame both speakers above the dialogue panel and lean in slightly.
@@ -265,6 +268,10 @@ export class PlayCanvasWorld {
     this.positionCamera();this.focusFrame();
   }
   // The current speaker gives a small hop as each of their lines begins.
+  celebrate(dt,reduced){
+    const c=this.celebration;if(!c)return;c.t+=dt;if(c.t>3.4||reduced){this.celebration=null;return;}
+    c.actors.forEach((a,i)=>{const u=c.t-.35-i*.14;if(u<0||u>1.1)return;const hop=Math.abs(Math.sin(u/.55*Math.PI))*(a===this.ohmActor?.34:.24),e=a.entity,p=e.getPosition();e.setPosition(p.x,p.y+hop,p.z);});
+  }
   speakingBounce(dt,reduced){const s=this.speaking;if(!s||reduced)return;s.t+=dt;if(s.t>.32)return;const e=s.actor.entity,pos=e.getPosition();e.setPosition(pos.x,pos.y+Math.sin(s.t/.32*Math.PI)*.12,pos.z);}
   // Running kicks up small puffs that swell and settle behind the player.
   async buildDust(){
