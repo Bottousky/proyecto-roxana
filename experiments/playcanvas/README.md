@@ -42,6 +42,34 @@ Los exteriores ocupan coordenadas globales en un único mundo residente. Cruzar
 un límite narrativo cambia contexto e interacciones, conservando cámara y
 posiciones físicas. El taller mantiene su entrada y salida de interior.
 
+### El reino recupera su luz
+
+- **Lugares olvidados.** Un lugar cuya instalación no se restauró se ve con
+  menos color y un tinte frío. Al ponerla en servicio el color vuelve, con una
+  onda de luz, chispas y un pulso de bloom sobre el tablero.
+- **El tendido.** Postes y cobre acompañan cada camino entre lugares. Un tramo
+  se enciende, con pulsos que corren por el cable, cuando los dos lugares que
+  une están restaurados (`src/grid.js`).
+- **Escenas que viajan.** La bomba del Manantial baja hasta la fuente de la
+  Plaza; al encender la lente, el haz del Faro cruza el Lago y sube a las
+  Terrazas antes de que responda la campana.
+- **Final.** Tras el Faro, «A la mañana siguiente» lleva a la primera clase. El
+  jugador elige qué le deja a Tala y el cierre del arco lo recuerda.
+- **Luz y clima.** Agua con reflejo, espuma y mar abierto (`src/water.js`);
+  caminos pintados sobre el pasto y sombras de nubes (`src/ground.js`); viento en
+  árboles y cultivos (`src/wind.js`); vórtice del Portal (`src/portal.js`);
+  tilt-shift, bloom y gradación por momento del día; luciérnagas al anochecer.
+
+### Comprobar, no sólo ajustar
+
+- Ivara pone en servicio el distribuidor después de ver la enfermería encendida
+  con la cocina aislada. Nereo pide medir la toma de la lente sin carga y con
+  carga. Lo registrado describe las lecturas reales.
+- «Volver» deja el montaje armado; ponerlo en servicio es una decisión. Una
+  instalación en servicio admite práctica con una copia.
+- Cierres y Bitácora sólo afirman lo que la traza del banco muestra que el
+  jugador hizo; la evidencia conserva todas las mediciones.
+
 La [iteración de territorio e instalaciones](DIRECCION-VISUAL.md) amplía los
 desplazamientos este/oeste, agrega dos senderos secundarios y vincula el brillo
 y movimiento de los receptores con su circuito. Para compararlos sin tocar
