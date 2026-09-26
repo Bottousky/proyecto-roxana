@@ -372,7 +372,7 @@ export class PlayCanvasWorld {
     if(this.crops&&Math.abs(life-(this.cropShown??-1))>.002){this.cropShown=life;for(const c of this.crops){c.material.diffuse.lerp(DRY_CROP,c.lush,life);c.material.update();}}
     // Clouds only cast shadows under a real sun: none indoors or at night.
     updateClouds(this.grounds||[],reduced?0:this.clock,inside?0:.36*(1-n)*Math.min(1,this.sun.light.intensity));
-    this.updateShafts(dt,inside,Math.max(0,1-n*1.6)*Math.min(1,this.sun.light.intensity),reduced);
+    this.updateShafts(dt,inside,Math.max(0,1-n*1.6)*Math.min(1,this.sun.light.intensity)*(.25+.75*(this.vitality??1)),reduced);
     updateWind(this.windy||[],this.clock,reduced);updateGrid(this.gridSpans||[],f,this.clock,dt,reduced);
     // Daylight pollen becomes fireflies at dusk: lower, warmer, each blinking on its own rhythm.
     const dusk=inside?0:Math.max(0,Math.min(1,(n-.35)/.5));
