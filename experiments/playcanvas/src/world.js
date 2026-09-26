@@ -16,7 +16,7 @@ import sceneUrl from './data/scene.json?url';
 import geometryUrl from './data/geometry.bin.gz?url';
 import {walkableTerrain} from './terrain.js';
 import {makeWater,updateWater,loadShore,bindShore} from './water.js';
-import {makeGround,makeRock} from './ground.js';
+import {makeGround,makeRock,updateClouds} from './ground.js';
 import {makeWind,updateWind,windKind} from './wind.js';
 import {makePortalSurface} from './portal.js';
 
@@ -94,7 +94,7 @@ export class PlayCanvasWorld {
       if(d.texture){m.diffuseMap=await surface(this.app,d.texture);if(d.alpha){m.opacityMap=m.diffuseMap;m.opacityMapChannel='a';}}
       if(d.opacity<1){m.blendType=BLEND_NORMAL;m.depthWrite=false;}
       if(d.texture==='water'){makeWater(m);bindShore(m,shore,!b.dynamic,{lighthouse:1,lake:.6}[b.area]||0);this.waters.push(m);}
-      if(d.texture==='ground')makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble});
+      if(d.texture==='ground')(this.grounds??=[]).push(makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble}));
       m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>new (key==='indices'?Uint32Array:Float32Array)(binary,b[key].offset,b[key].length);
       mesh.setPositions(attr('positions'));mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
       const instance=new MeshInstance(mesh,m,e);instance.castShadow=d.shadow&&d.opacity===1;instance.receiveShadow=true;e.addComponent('render',{meshInstances:[instance]});let parent=this.regions.get(b.area).root;
@@ -347,6 +347,8 @@ export class PlayCanvasWorld {
     // Terrace crops wilt without irrigation and green up over a few seconds once it runs.
     this.cropLife??=f.irrigation?1:0;const life=this.cropLife+=((f.irrigation?1:0)-this.cropLife)*Math.min(1,dt*(reduced?4:.6));
     if(this.crops&&Math.abs(life-(this.cropShown??-1))>.002){this.cropShown=life;for(const c of this.crops){c.material.diffuse.lerp(DRY_CROP,c.lush,life);c.material.update();}}
+    // Clouds only cast shadows under a real sun: none indoors or at night.
+    updateClouds(this.grounds||[],reduced?0:this.clock,inside?0:.36*(1-n)*Math.min(1,this.sun.light.intensity));
     updateWind(this.windy||[],this.clock,reduced);
     for(const p of this.motes){p.entity.enabled=!reduced&&(!inside||Math.abs(p.x)<11&&p.z<16);p.entity.setPosition(this.focus.x+p.x+Math.sin(this.clock*.2+p.phase)*.5,p.y+Math.sin(this.clock*.6+p.phase)*.15,this.focus.z+p.z);}
     this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*(reduced?.05:.18);this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
