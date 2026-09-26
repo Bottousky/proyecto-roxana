@@ -8,7 +8,7 @@ test('all restoration timelines include a complete return to the gameplay camera
   for(const [id,definition] of Object.entries(CINEMATIC_DEFINITIONS)){
     const ctx=context(id),original=JSON.stringify(ctx),timeline=createCinematic(id,ctx);
     assert.equal(timeline.duration,definition.duration);assert.deepEqual(sampleCinematic(timeline,0).pose,ctx.start);
-    if(id==='beacon_lens')assert.equal(timeline.duration,17);else assert.ok(timeline.duration>=4&&timeline.duration<=6);
+    if(id==='beacon_lens')assert.equal(timeline.duration,17);else if(id==='pump')assert.equal(timeline.duration,9);else assert.ok(timeline.duration>=4&&timeline.duration<=6);
     const returning=sampleCinematic(timeline,timeline.returnAt+.1);assert.equal(returning.returning,true);assert.equal(returning.done,false);
     const end=sampleCinematic(timeline,timeline.duration+20);assert.equal(end.done,true);assert.deepEqual(end.pose,gameplayCameraPose(ctx.areaId,ctx.player));assert.equal(end.caption,'');assert.equal(JSON.stringify(ctx),original);
     for(let t=0;t<=timeline.duration;t+=.1){const sample=sampleCinematic(timeline,t);assert.ok([...sample.pose.focus,...sample.pose.offset,sample.pose.zoom].every(Number.isFinite));assert.ok(sample.pose.zoom>=.65&&sample.pose.zoom<1.8);}

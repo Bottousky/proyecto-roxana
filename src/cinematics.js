@@ -3,7 +3,7 @@ export const CINEMATIC_DEFINITIONS = {
   awaken:{area:'portal',duration:5.3,returnAt:4.2,captions:[{at:0,text:'Una pequeña luz despierta bajo el vidrio.'}]},
   workshop:{area:'workshop',duration:5.2,returnAt:4.1,captions:[{at:0,text:'La misma lámpara ilumina otra vez la mesa.'}]},
   gate:{area:'road',duration:6,returnAt:4.8,captions:[{at:0,text:'El cerrojo libera la Puerta de Ohm.'},{at:2.3,text:'La Calzada vuelve a abrirse al valle.'}]},
-  pump:{area:'spring',duration:5.5,returnAt:4.4,captions:[{at:0,text:'El agua vuelve a encontrar la Plaza.'}]},
+  pump:{area:'spring',duration:9,returnAt:7.6,captions:[{at:0,text:'La bomba vuelve a empujar el agua.'},{at:4.4,text:'Más abajo, el agua vuelve a encontrar la Plaza.'}]},
   irrigation:{area:'terraces',duration:5.8,returnAt:4.7,captions:[{at:0,text:'El agua alcanza el último bancal.'}]},
   beacon_network:{area:'lighthouse',duration:5.5,returnAt:4.4,captions:[{at:0,text:'La torre recupera su viejo sonido.'}]},
   beacon_lens:{area:'lighthouse',duration:17,returnAt:15,captions:[{at:0,text:'La luz se sostiene detrás del cristal.'},{at:3,text:'Una vuelta. Una pausa.'},{at:7.6,text:'El haz cruza el lago y sube por las Terrazas.'},{at:11.6,text:'Desde la Plaza, una campana responde.'}]},
@@ -41,8 +41,9 @@ export function createCinematic(id,context,{reducedMotion=false}={}){
     const mechanism=pose([puzzle[0],2,puzzle[2]],1.45),gateway=pose([0,4.3,-(context.bounds?.[1]||32)*.32],.94,[0,15,25]);
     shots=[key(.85,mechanism),key(1.5,mechanism),key(3.5,gateway),key(definition.returnAt,gateway)];
   }else if(id==='pump'){
-    const pump=pose([puzzle[0],1.7,puzzle[2]],1.48),water=pose([2,1.4,-3.8],1.62,[0,16,25]);
-    shots=[key(1,pump),key(2,pump),key(3.3,water),key(definition.returnAt,water)];
+    // The water travels: from the pump down to the Plaza's fountain, 95 m south.
+    const pump=pose([puzzle[0],1.7,puzzle[2]],1.48),water=pose([2,1.4,-3.8],1.62,[0,16,25]),fountain=pose([-12,1.2,92.2],1.35,[0,15,25]);
+    shots=[key(1,pump),key(2,pump),key(3.3,water),key(3.9,water),key(5.4,fountain),key(definition.returnAt,fountain)];
   }else if(id==='irrigation'){
     const panel=pose([puzzle[0],1.7,puzzle[2]],1.38),canal=pose([(context.bounds?.[0]||40)*.36,1.5,-(context.bounds?.[1]||36)*.28+6.1],1.28,[0,17,25]);
     shots=[key(.9,panel),key(1.5,panel),key(3.3,canal),key(definition.returnAt,canal)];
