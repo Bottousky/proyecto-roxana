@@ -19,6 +19,7 @@ import {makeWater,updateWater,loadShore,bindShore} from './water.js';
 import {makeGround,makeRock,updateClouds} from './ground.js';
 import {makeWind,updateWind,windKind} from './wind.js';
 import {makePortalSurface} from './portal.js';
+import {buildGrid,updateGrid} from './grid.js';
 
 // Small coordinate value adapter for the existing renderer-independent game rules.
 class Position extends Vec3 {
@@ -122,7 +123,7 @@ export class PlayCanvasWorld {
     this.playerActor=await this.makeActor('player',0,0,'player');this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
-    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.app.start();
+    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.app.start();
   }
   async makeActor(name,x,z,area,object){
     if(!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
@@ -350,7 +351,7 @@ export class PlayCanvasWorld {
     if(this.crops&&Math.abs(life-(this.cropShown??-1))>.002){this.cropShown=life;for(const c of this.crops){c.material.diffuse.lerp(DRY_CROP,c.lush,life);c.material.update();}}
     // Clouds only cast shadows under a real sun: none indoors or at night.
     updateClouds(this.grounds||[],reduced?0:this.clock,inside?0:.36*(1-n)*Math.min(1,this.sun.light.intensity));
-    updateWind(this.windy||[],this.clock,reduced);
+    updateWind(this.windy||[],this.clock,reduced);updateGrid(this.gridSpans||[],f,this.clock,dt,reduced);
     // Daylight pollen becomes fireflies at dusk: lower, warmer, each blinking on its own rhythm.
     const dusk=inside?0:Math.max(0,Math.min(1,(n-.35)/.5));
     if(this.moteDusk===undefined||Math.abs(dusk-this.moteDusk)>.01){this.moteDusk=dusk;const m=this.moteMaterial;m.emissive.lerp(color('#d6be82'),color('#c8f07a'),dusk);m.emissiveIntensity=.65+7*dusk;m.opacity=.26+.7*dusk;m.update();}
