@@ -850,7 +850,8 @@ export const OHM_CHATTER = {
     { id: 'ohm_portal_3', text: 'Si tropiezo, estoy comprobando la gravedad. Con bastante compromiso.', requires: ['awaken'] },
   ],
   plaza: [
-    { id: 'ohm_plaza_1', text: 'Conservaron las cintas de la fiesta. Me parece una forma muy humana de hacer una predicción.' },
+    { id: 'ohm_plaza_fiesta', text: 'Colgaron las cintas. Una predicción guardada durante años, confirmada. Voy a necesitar un instrumento para medir esto.', requires: ['epilogue_shared'] },
+    { id: 'ohm_plaza_1', text: 'Conservaron las cintas de la fiesta. Me parece una forma muy humana de hacer una predicción.', unless: ['epilogue_shared'] },
     { id: 'ohm_plaza_2', text: 'Percibo pan caliente. No necesito comer, pero considero injusto perderme la parte social.' },
     { id: 'ohm_plaza_3', text: 'El agua volvió a la fuente. Esta consecuencia empezó detrás de una colina.', requires: ['pump'] },
   ],
