@@ -85,6 +85,7 @@ export class PuzzleWorkbench {
     this.puzzle = PUZZLES[id];
     this.state = normalizePuzzleSnapshot(id, savedSnapshot);
     this.practice = null;
+    this.proofReadings = {};
     this.active = true;
     this.mode = 'wire';
     this.selected = null;
@@ -224,8 +225,17 @@ export class PuzzleWorkbench {
     const { nodeOf } = wireNodes(this.id, this.state), [x, y] = proof.measure.between.map(n => nodeOf[n]), probe = [nodeOf[m.a], nodeOf[m.b]];
     if (x === y || !probe.includes(x) || !probe.includes(y)) return;
     const loaded = nodeOf[proof.measure.load[0]] === nodeOf[proof.measure.load[1]], proofs = this.state.proofs ??= {};
-    proofs[loaded ? 'tapLoaded' : 'tapUnloaded'] = true;
-    if (!proofs[proof.id] && proof.parts.every(k => proofs[k])) { proofs[proof.id] = true; appendBenchEvidence(this.state, { kind: 'result', text: proof.recorded }); this.feedback = `${proof.recorded} ${proof.who} lo anota.`; this.callbacks.onSound?.('success'); this.result = evaluatePuzzle(this.id, this.state); }
+    const volts = Math.abs(measureVoltage(this.result.solution, m.a, m.b) ?? 0), key = loaded ? 'tapLoaded' : 'tapUnloaded';
+    proofs[key] = true; (this.proofReadings ??= {})[key] = { volts, values: JSON.stringify(this.state.values) };
+    if (!proofs[proof.id] && proof.parts.every(k => proofs[k])) {
+      // Say only what these two readings show: a drop, no change, or a comparison made after recalibrating.
+      const u = this.proofReadings.tapUnloaded, l = this.proofReadings.tapLoaded, fmt = v => `${v.toFixed(2).replace('.', ',')} V`;
+      const text = !u || !l ? proof.recorded
+        : u.values !== l.values ? `Medí la toma sin la lente (${fmt(u.volts)}) y con la lente, después de mover el mando (${fmt(l.volts)}). Con el mismo ajuste todavía no las comparé.`
+        : l.volts < u.volts - .05 ? `Medí la toma sin la lente (${fmt(u.volts)}) y con la lente (${fmt(l.volts)}): al cargarla, la tensión baja.`
+        : `Medí la toma sin la lente (${fmt(u.volts)}) y con la lente (${fmt(l.volts)}): no cambió.`;
+      proofs[proof.id] = true; appendBenchEvidence(this.state, { kind: 'result', text }); this.feedback = `${text} ${proof.who} lo anota.`; this.callbacks.onSound?.('success'); this.result = evaluatePuzzle(this.id, this.state);
+    }
   }
 
   requireIsolated() {
