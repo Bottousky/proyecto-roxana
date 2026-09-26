@@ -17,6 +17,7 @@ import geometryUrl from './data/geometry.bin.gz?url';
 import {walkableTerrain} from './terrain.js';
 import {makeWater,updateWater,loadShore,bindShore} from './water.js';
 import {makeGround,makeRock} from './ground.js';
+import {makeWind,updateWind,windKind} from './wind.js';
 
 // Small coordinate value adapter for the existing renderer-independent game rules.
 class Position extends Vec3 {
@@ -102,6 +103,7 @@ export class PlayCanvasWorld {
       if(d.glass)this.glasses.push({area:b.area,material:m});
       if(d.crop)(this.crops??=[]).push({material:m,lush:m.diffuse.clone()});
       if(d.rock)makeRock(m);
+      if(windKind(d.texture)&&!b.dynamic)(this.windy??=[]).push(makeWind(m,windKind(d.texture)));
       if(d.pane){m.diffuse=color('#5d7780');m.diffuseMap=paneTexture(this.app);m.gloss=.8;m.metalness=.1;m.update();}
       if(d.receiver)this.receivers.push({area:b.area,material:m,...d.receiver});
       if(++count%15===0){const text=document.getElementById('transition-name');if(text)text.textContent=`Tejiendo Ohmdal · ${Math.round(count/data.meshes.length*100)}%`;await new Promise(r=>setTimeout(r,0));}
@@ -336,6 +338,7 @@ export class PlayCanvasWorld {
     // Terrace crops wilt without irrigation and green up over a few seconds once it runs.
     this.cropLife??=f.irrigation?1:0;const life=this.cropLife+=((f.irrigation?1:0)-this.cropLife)*Math.min(1,dt*(reduced?4:.6));
     if(this.crops&&Math.abs(life-(this.cropShown??-1))>.002){this.cropShown=life;for(const c of this.crops){c.material.diffuse.lerp(DRY_CROP,c.lush,life);c.material.update();}}
+    updateWind(this.windy||[],this.clock,reduced);
     for(const p of this.motes){p.entity.enabled=!reduced&&(!inside||Math.abs(p.x)<11&&p.z<16);p.entity.setPosition(this.focus.x+p.x+Math.sin(this.clock*.2+p.phase)*.5,p.y+Math.sin(this.clock*.6+p.phase)*.15,this.focus.z+p.z);}
     this.beacon.enabled=!!f.beacon_lens&&!inside;const a=this.clock*(reduced?.05:.18);this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
   }
