@@ -388,15 +388,19 @@ export class AudioDirector {
   play(name) {
     if (!this.context || this.context.state !== 'running' || this.muted || this.disposed) return;
     const time = this.context.currentTime + 0.005;
-    const effect = String(name || '').toLowerCase();
+    const [effect, surface, pace] = String(name || '').toLowerCase().split(':');
     switch (effect) {
       case 'step':
-      case 'footstep':
-        if (time - this.lastStep < 0.23) return;
+      case 'footstep': {
+        // Cadence follows the pace; the ground decides the colour of each step.
+        if (time - this.lastStep < (pace === 'run' ? 0.17 : 0.26)) return;
         this.lastStep = time;
-        this._noise(time, 0.055, this.area === 'workshop' ? 0.085 : 0.065, 450);
-        this._wood(100 + this._random() * 45, time, 0.014);
+        const ground = surface || (this.area === 'workshop' ? 'wood' : 'stone'), jitter = 0.85 + this._random() * 0.3;
+        if (ground === 'grass') this._noise(time, 0.09, 0.05 * jitter, 320);
+        else if (ground === 'wood') { this._noise(time, 0.04, 0.06 * jitter, 700); this._wood(130 + this._random() * 40, time, 0.024); }
+        else { this._noise(time, 0.035, 0.07 * jitter, 1500, true); this._wood(210 + this._random() * 60, time, 0.01); }
         break;
+      }
       case 'success':
       case 'solve':
       case 'complete':

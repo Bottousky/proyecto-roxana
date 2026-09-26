@@ -447,7 +447,7 @@ function loop(now){
       if(!scene)finishCinematic();
       else if($('#cinematic-caption').textContent!==scene.caption)$('#cinematic-caption').textContent=scene.caption;
     }
-    if(world.walking&&mode==='world')sound('step');
+    if(world.walking&&mode==='world')sound(`step:${world.groundKind?.()||'stone'}${held.has('Shift')?':run':''}`);
     if(mode==='world'){
       if(now-travelTick>250){travelTick=now;updateTravelInstrument(document,state,world.getPlayerPosition(),getObjective(state));}
       const crossing=world.getTravelEvent();

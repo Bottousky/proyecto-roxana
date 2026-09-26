@@ -2,7 +2,7 @@ import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,
 import {surface,actorArt} from './art.ts';
 import {AREAS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
-import {lakeShoreX} from './game/world-layout.js';
+import {lakeShoreX,AREA_LAYOUTS,pointOnPaving} from './game/world-layout.js';
 import {findPath} from './game/navigation.js';
 import {moveWithCollisions,isPositionClear} from './game/collision.js';
 import {advanceActor,idleActor} from './game/actor-animation.js';
@@ -116,7 +116,7 @@ export class PlayCanvasWorld {
     this.playerActor=await this.makeActor('player',0,0,'player');this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
-    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();this.app.start();
+    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.app.start();
   }
   async makeActor(name,x,z,area,object){
     if(!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
@@ -157,6 +157,13 @@ export class PlayCanvasWorld {
   canStand(x,z,radius=.34){return isPositionClear([x,z],this.bounds,this.obstacles,{radius,isWalkable:(x,z)=>this.walkableLand(x,z)});}
   nearestWalkable(p,radius=.34){if(this.canStand(...p,radius))return [...p];for(let d=.15;d<15;d+=.15)for(let i=0;i<32;i++){const x=p[0]+Math.cos(i*Math.PI/16)*d,z=p[1]+Math.sin(i*Math.PI/16)*d;if(this.canStand(x,z,radius))return [x,z];}return [...this.area.spawn];}
   groundHeight(x,z){if(this.area.id==='lake'&&Math.abs(x-9.2)<4.5&&Math.abs(z-3)<2.25)return .24;let height=.08;for(const s of this.data.areas[this.area.id].walkSurfaces||[]){if(s.r!=null?Math.hypot(x-s.x,z-s.z)<=s.r:Math.abs(x-s.x)<=s.w/2&&Math.abs(z-s.z)<=s.d/2)height=Math.max(height,s.y+.02);}return height;}
+  // What the player stands on, for footsteps and dust: wood, stone paving or grass/earth.
+  groundKind(){
+    if(!this.area||!this.player)return 'stone';if(this.area.id==='workshop')return 'wood';
+    const [x,z]=this.getPlayerPosition();if(this.area.id==='lake'&&Math.abs(x-9.2)<4.5&&Math.abs(z-3)<2.25)return 'wood';
+    if(Math.abs(z)>this.area.bounds[1]/2-.2)return 'stone';
+    return pointOnPaving(AREA_LAYOUTS[this.area.id],x,z)?'stone':'grass';
+  }
   getPlayerPosition(){return this.player?[this.player.position.x,this.player.position.z]:[0,0];}
   setPlayerPosition(p){const q=this.nearestWalkable(p);this.player.position.set(q[0],this.groundHeight(...q),q[1]);const o=this.nearestWalkable([q[0]-1,q[1]+.7]);this.ohm.position.set(o[0],this.groundHeight(...o),o[1]);this.route=[];this.target=null;this.companionRoute=[];}
   setTarget(p){this.route=findPath(this.getPlayerPosition(),p,this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});this.target=this.route.shift()||null;}
@@ -238,6 +245,7 @@ export class PlayCanvasWorld {
     let dx=input.x||0,dz=input.z||0,stepLimit=Infinity;if(paused){this.target=null;this.route=[];dx=dz=0;}else if(dx||dz){this.target=null;this.route=[];const l=Math.hypot(dx,dz);dx/=Math.max(1,l);dz/=Math.max(1,l);}else if(this.target){const x=this.target[0]-p.x,z=this.target[1]-p.z,d=Math.hypot(x,z);if(d<.04)this.target=this.route.shift()||null;else{dx=x/d;dz=z/d;stepLimit=d;}}
     if(dx||dz){const step=Math.min((input.run?7:4.2)*dt,stepLimit),next=moveWithCollisions([p.x,p.z],[dx*step,dz*step],this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});p.set(next[0],this.groundHeight(...next),next[1]);}
     this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
+    this.updateDust(dt,!!input.run&&this.walking&&!paused,reduced);
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
@@ -251,6 +259,16 @@ export class PlayCanvasWorld {
   }
   // The current speaker gives a small hop as each of their lines begins.
   speakingBounce(dt,reduced){const s=this.speaking;if(!s||reduced)return;s.t+=dt;if(s.t>.32)return;const e=s.actor.entity,pos=e.getPosition();e.setPosition(pos.x,pos.y+Math.sin(s.t/.32*Math.PI)*.12,pos.z);}
+  // Running kicks up small puffs that swell and settle behind the player.
+  async buildDust(){
+    const texture=await surface(this.app,'glow'),m=new StandardMaterial();m.diffuse=color('#efe4c8');m.emissive=color('#6d6450');m.diffuseMap=texture;m.opacityMap=texture;m.opacityMapChannel='a';m.opacity=.7;m.blendType=BLEND_NORMAL;m.depthWrite=false;m.update();
+    this.dust=Array.from({length:12},()=>{const e=new Entity('Polvo');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.enabled=false;this.app.root.addChild(e);return {entity:e,t:9};});this.dustClock=0;
+  }
+  updateDust(dt,running,reduced){
+    if(!this.dust)return;const [ox,oz]=this.data.areas[this.area.id].offset;this.dustClock+=dt;
+    if(running&&!reduced&&this.groundKind()!=='wood'&&this.dustClock>.11){this.dustClock=0;const d=this.dust.find(d=>d.t>.7);if(d){const p=this.player.position;d.t=0;d.x=p.x+ox+(Math.random()-.5)*.3;d.z=p.z+oz+.1+(Math.random()-.5)*.2;d.y=p.y+.06;d.entity.enabled=true;}}
+    for(const d of this.dust){if(d.t>.7)continue;d.t+=dt;const k=d.t/.7,size=(.45+k*.9)*(1-k*k);d.entity.setPosition(d.x,d.y+.12+k*.25,d.z);d.entity.setLocalScale(size,1,size);if(d.t>.7)d.entity.enabled=false;}
+  }
   updateCompanion(dt,paused,reduced){
     const o=this.ohm.position,p=this.player.position,old=[o.x,o.z],distance=Math.hypot(p.x-o.x,p.z-o.z);this.companionAge+=dt;
     if(this.ohmHop){if(paused)return this.animateActor(this.ohmActor,0,0,dt,{paused,reducedMotion:reduced});
