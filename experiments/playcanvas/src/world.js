@@ -116,7 +116,7 @@ export class PlayCanvasWorld {
     this.playerActor=await this.makeActor('player',0,0,'player');this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
-    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.app.start();
+    this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();this.app.start();
   }
   async makeActor(name,x,z,area,object){
     if(!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
@@ -197,7 +197,29 @@ export class PlayCanvasWorld {
   skipCinematic(){if(!this.cinematic)return false;this.cinematic={timeline:returningCinematic(this.cinematic.timeline.id,this.cameraPose(),gameplayCameraPose(this.area.id,this.player.position.toArray())),elapsed:0};return true;}
   cancelCinematic(){this.cinematic=null;this.inspect=false;this.route=[];this.target=null;if(!this.area||!this.player)return;const p=gameplayCameraPose(this.area.id,this.player.position.toArray()),[ox,oz]=this.data.areas[this.area.id].offset;this.focus.set(p.focus[0]+ox,p.focus[1],p.focus[2]+oz);this.cameraOffset.fromArray(p.offset);this.currentZoom=p.zoom;this.positionCamera();}
   endCinematic(){this.cancelCinematic();}
-  playRestoration(){this.updateFlags(this.state);this.restoration=3;}
+  // The moment an installation returns: a ring of light runs over the ground, sparks rise
+  // from the object and the bloom swells, then everything settles over three seconds.
+  playRestoration(id){
+    this.updateFlags(this.state);this.restoration=3;
+    const objects=(this.area?.objects||[]).filter(o=>!o.character&&o.kind!=='npc'),o=objects.find(o=>o.puzzle===id)||objects.find(o=>o.id===id||o.action?.flag===id)||objects.find(o=>o.flag===id);if(!o||!this.burst)return;
+    const [ox,oz]=this.data.areas[this.area.id].offset,y=this.groundHeight(o.x,o.z);this.burst.origin=[o.x+ox,y,o.z+oz];this.burst.t=0;this.burst.root.enabled=true;
+    this.burst.sparks.forEach((p,i)=>{p.angle=i*2.399;p.radius=.2+(i%7)*.12;p.speed=1.2+(i%5)*.35;p.delay=(i%10)*.05;});
+  }
+  buildBurst(){
+    const root=new Entity('Restauración');root.enabled=false;this.app.root.addChild(root);
+    const wm=this.focusRingMaterial.clone();wm.emissiveIntensity=3;wm.opacity=1;wm.update();const wave=new Entity('Onda');wave.addComponent('render',{type:'plane'});wave.render.material=wm;wave.render.castShadows=false;root.addChild(wave);
+    const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffd98f');m.emissiveIntensity=2.4;m.blendType=BLEND_ADDITIVEALPHA;m.opacity=.9;m.depthWrite=false;m.useLighting=false;m.update();
+    const sparks=Array.from({length:36},()=>{const e=new Entity('Chispa');e.addComponent('render',{type:'sphere'});e.render.material=m;e.render.castShadows=false;root.addChild(e);return {entity:e};});
+    this.burst={root,wave,sparks,t:9};
+  }
+  updateBurst(dt,reduced){
+    const b=this.burst;if(!b||b.t>3.2)return;b.t+=dt;const t=b.t,[x,y,z]=b.origin;
+    if(this.frame?.enabled){this.frame.bloom.intensity=.018+.045*Math.max(0,1-t/2.4)*Math.min(1,t*4);this.frame.update();}
+    if(t>3.2){b.root.enabled=false;return;}
+    const w=reduced?2.5:1.5+t*9,k=Math.max(0,1-t/1.6);b.wave.setPosition(x,y+.05,z);b.wave.setLocalScale(w*k+.001,1,w*k+.001);
+    for(const p of b.sparks){const u=Math.max(0,t-p.delay),life=Math.max(0,1-u/2.4),r=p.radius+u*.35,s=reduced?0:.17*life*(.6+.4*Math.sin(u*9+p.angle)**2);
+      p.entity.setPosition(x+Math.cos(p.angle+u*.8)*r,y+.4+u*p.speed,z+Math.sin(p.angle+u*.8)*r);p.entity.setLocalScale(s,s,s);}
+  }
   positionCamera(){this.camera.setPosition(this.focus.x+this.cameraOffset.x*2,this.focus.y+this.cameraOffset.y*2,this.focus.z+this.cameraOffset.z*2);this.camera.lookAt(this.focus);this.camera.camera.orthoHeight=12/this.currentZoom;}
   syncActors(){
     const inside=this.area.id==='workshop';for(const a of [...this.allActors,this.playerActor,this.ohmActor,this.sleeping]){const active=a===this.playerActor||a===this.ohmActor,id=active?this.area.id:a.area,[ox,oz]=this.data.areas[id].offset,p=a.g.position;
@@ -219,7 +241,7 @@ export class PlayCanvasWorld {
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
-    this.syncActors();this.speakingBounce(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
+    this.syncActors();this.speakingBounce(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
     else{const rest=gameplayCameraPose(this.area.id,p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
       // Conversations: frame both speakers above the dialogue panel and lean in slightly.
