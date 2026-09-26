@@ -774,8 +774,33 @@ export function resolveDialogueId(id, state = {}) {
   return context;
 }
 
+// The first lesson has one moment the player shapes: what to leave Tala before she starts.
+// None of the gifts is wrong; each changes how the three of them begin.
+export const LESSON_GIFTS = [
+  { id: 'sketch', label: 'El dibujo del taller: la tela entera sobre el cobre cortado.', memory: 'el dibujo del taller', lines: d(
+    ['tala', '¿La tela puede estar sana y el cobre no?'],
+    ['lumen', 'A mí me costó tres lámparas aprenderlo. A vos, un dibujo.'],
+    ['edda', 'No le creas al dibujo. Probalo.']) },
+  { id: 'failures', label: 'Las pruebas que me salieron mal.', memory: 'las pruebas que salieron mal', lines: d(
+    ['tala', 'Acá dice que no funcionó. ¿Para qué lo guardaste?'],
+    ['player', 'Porque sin eso, lo que funcionó parece suerte.'],
+    ['edda', 'Eso se lo robé a Lumen.'],
+    ['lumen', 'Te lo presté. Todavía lo quiero de vuelta.']) },
+  { id: 'silence', label: 'Nada todavía. Que mire primero.', memory: 'tiempo para mirar', lines: d(
+    ['narrator', 'Nadie dice nada. Tala pasa el dedo por la costura de la lámpara, despacio, dos veces.'],
+    ['edda', 'Eso era lo más difícil de darle.'],
+    ['ohm', 'Silencio registrado. Útil, por lo visto.']) },
+];
+export const lessonGift = state => LESSON_GIFTS.find(g => state?.flags?.[`lesson_gift_${g.id}`]) || null;
+function lessonLines(state) {
+  const lines = DIALOGUES.lighthouse_epilogue, split = lines.findIndex(l => l.speaker === 'tala' && /reparación vieja/.test(l.text)), gift = lessonGift(state);
+  const choice = { speaker: 'player', text: 'Antes de que empiece… ¿qué le dejo a Tala?', choices: LESSON_GIFTS.map(g => ({ id: g.id, label: g.label })) };
+  return [...lines.slice(0, split), ...(gift ? gift.lines : [choice]), ...lines.slice(split)];
+}
+
 export function resolveDialogue(id, state = {}) {
   const resolved = resolveDialogueId(id, state);
+  if (resolved === 'lighthouse_epilogue') return lessonLines(state);
   if (resolved === PUZZLE_STORY.gate.complete) return completionLines('gate', state);
   return DIALOGUES[resolved] || [];
 }

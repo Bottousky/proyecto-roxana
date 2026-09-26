@@ -12,7 +12,7 @@ import './journey-ui.css';
 import {renderJourneyGuide,bindMapViews} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
 import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
@@ -52,7 +52,7 @@ let settings=loadSettings();
 let loaded=loadState();
 let state=loaded.state||freshState(settings);
 let world,audio=new AudioDirector(),workbench;
-let mode='title',started=false,nearby=null,dialogue=null,dialogueEnd=null,typing=0,typed=0,transitioning=false,startingGame=false,assetLoadFailed=false;
+let lessonStarting=false,mode='title',started=false,nearby=null,dialogue=null,dialogueEnd=null,typing=0,typed=0,transitioning=false,startingGame=false,assetLoadFailed=false;
 let lastTime=performance.now(),autosave=0,bubbleUntil=0,arrivalTimeout,toastTimeout,modalReturn='world',modalFocus=null;
 const held=new Set();
 let activePointer=null;
@@ -182,7 +182,8 @@ async function startGame(resume=false){
   persist();
   if(state.activeCinematic)playPendingCinematic();
   else if(state.flags.beacon_lens&&!state.flags.finale_seen)runFinale();
-  else if(resume&&state.activeDialogue){const saved={...state.activeDialogue};speak(saved.id,saved.id===PUZZLE_STORY.beacon_lens.complete?showEnding:null);if(dialogue){dialogue.index=Math.min(saved.index,dialogue.lines.length-1);renderLine();}}
+  else if(resume&&state.activeDialogue){const saved={...state.activeDialogue};speak(saved.id,saved.id===PUZZLE_STORY.beacon_lens.complete?startLesson:saved.id==='lighthouse_epilogue'&&!state.flags.epilogue_shared?showEnding:null);if(dialogue){dialogue.index=Math.min(saved.index,dialogue.lines.length-1);renderLine();}}
+  else if(state.flags.finale_seen&&!state.flags.epilogue_shared)startLesson();
   else if(state.endingPending)showEnding();
   }finally{startingGame=false;}
 }
@@ -236,11 +237,22 @@ function renderLine(){
   $('#dialogue-text').textContent='';typing=0;typed=0;
   $('#dialogue-announcement').textContent=`${character.name}: ${line.text}`;
   $('#dialogue-next').innerHTML=`${dialogue.index===dialogue.lines.length-1?'Seguir':'Continuar'} <kbd>↵</kbd><span>▾</span>`;
+  removeChoices();$('#dialogue-next').hidden=!!line.choices;
+  if(line.choices){const box=document.createElement('div');box.id='dialogue-choices';box.className='dialogue-choices';box.setAttribute('role','group');box.setAttribute('aria-label',line.text);
+    line.choices.forEach((choice,i)=>{const b=document.createElement('button');b.innerHTML=`<kbd>${i+1}</kbd>${choice.label}`;b.onclick=()=>chooseInDialogue(choice.id);box.append(b);});
+    $('#dialogue-text').after(box);setTimeout(()=>box.querySelector('button')?.focus({preventScroll:true}),0);}
   sound('voice');
   state.activeDialogue=typeof dialogue.id==='string'?{id:dialogue.id,index:dialogue.index}:null;persist();
 }
+function removeChoices(){if(typeof document!=='undefined')document.getElementById('dialogue-choices')?.remove();}
+function chooseInDialogue(id){
+  if(!dialogue?.lines[dialogue.index]?.choices)return;
+  if(LESSON_GIFTS.some(g=>g.id===id)){for(const g of LESSON_GIFTS)delete state.flags[`lesson_gift_${g.id}`];state.flags[`lesson_gift_${id}`]=true;}
+  sound('click');dialogue.lines=linesFor(dialogue.id);removeChoices();$('#dialogue-next').hidden=false;renderLine();$('#dialogue-next').focus({preventScroll:true});persist();
+}
 function nextLine(){
   if(!dialogue)return;
+  if(dialogue.lines[dialogue.index]?.choices){const focused=document.activeElement?.closest?.('#dialogue-choices button');if(focused)focused.click();return;}
   const text=dialogue.lines[dialogue.index].text;
   if(typed<text.length){typed=text.length;typing=typed;$('#dialogue-text').textContent=text;return;}
   if(++dialogue.index<dialogue.lines.length){renderLine();return;}
@@ -361,18 +373,32 @@ function finishCinematic(){
   if(!playingCinematic)return;
   playingCinematic=false;const next=recordCinematicComplete(state);
   show('#cinematic',false);show('#hud');mode='world';held.clear();chatterClock=0;persist();
-  if(next){for(let i=dialogueQueue.length-1;i>=0;i--)if(dialogueQueue[i].id===next)dialogueQueue.splice(i,1);speak(next,next===PUZZLE_STORY.beacon_lens.complete?showEnding:null);}
+  if(next){for(let i=dialogueQueue.length-1;i>=0;i--)if(dialogueQueue[i].id===next)dialogueQueue.splice(i,1);speak(next,next===PUZZLE_STORY.beacon_lens.complete?startLesson:null);}
   else $('#world').focus({preventScroll:true});
 }
 function runFinale(){
   if(state.flags.finale_seen){speak('lighthouse_epilogue');return;}
   state.flags.beacon_lens=true;refreshWorldSystems(true);prepareCinematic(state,'beacon_lens');
   if(state.activeCinematic)playPendingCinematic();
-  else {state.flags.finale_seen=true;persist();speak(PUZZLE_STORY.beacon_lens.complete,showEnding);}
+  else {state.flags.finale_seen=true;persist();speak(PUZZLE_STORY.beacon_lens.complete,startLesson);}
+}
+// The Faro is lit, but the arc ends with the first lesson: a night passes, the three of
+// them gather at the lantern and the player decides what to leave Tala.
+async function startLesson(){
+  if(lessonStarting||state.flags.epilogue_shared)return;lessonStarting=true;
+  try{
+    mode='lesson';held.clear();show('#hud',false);show('#interaction',false);
+    $('#transition-name').textContent='A la mañana siguiente';show('#transition');await wait(1700);
+    advanceJourneyTime(state,{epilogue:true});
+    if(state.area!=='lighthouse'){mode='world';await enterArea('lighthouse',[-2.2,-9.4]);}else world.setPlayerPosition([-2.2,-9.4]);
+    state.position=world.getPlayerPosition();refreshHUD();persist();await wait(500);
+    show('#transition',false);show('#hud');mode='world';
+    speak('lighthouse_epilogue',showEnding);
+  }finally{lessonStarting=false;}
 }
 function showEnding(){
     state.endingPending=true;persist();
-    modalReturn='world';modal(`<div class="eyebrow">ARCO I · COMPLETO</div><div class="end-sigil">Ω</div><h2>La primera luz</h2><p class="end-copy">El Faro vuelve a orientar a quienes lo necesitan.<br>Ahora el conocimiento también sabe encontrar el camino de vuelta.</p><div class="end-stats"><span><strong>${state.visited.length}</strong>lugares compartidos</span><span><strong>${JOURNAL.filter(e=>hasRequirements(state,e.requires)).length}</strong>observaciones</span><span><strong>${state.secrets.length}</strong>recuerdos recuperados</span></div><button class="primary" id="keep-exploring">Seguir en Ohmdal ${svg('arrow')}</button><p class="end-note">Todavía quedan conversaciones, rincones y preguntas.<br>Tu viaje está guardado.</p>`,'ending-modal');$('#keep-exploring').onclick=()=>{world.endCinematic?.();closeModal();bubble('No voy a olvidar esto. Hice una copia. Y otra por si acaso.');};
+    modalReturn='world';modal(`<div class="eyebrow">ARCO I · COMPLETO</div><div class="end-sigil">Ω</div><h2>La primera luz</h2><p class="end-copy">El Faro vuelve a orientar a quienes lo necesitan.<br>Ahora el conocimiento también sabe encontrar el camino de vuelta.</p>${lessonGift(state)?`<p class="end-gift">A Tala le dejaste ${lessonGift(state).memory}.</p>`:''}<div class="end-stats"><span><strong>${state.visited.length}</strong>lugares compartidos</span><span><strong>${JOURNAL.filter(e=>hasRequirements(state,e.requires)).length}</strong>observaciones</span><span><strong>${state.secrets.length}</strong>recuerdos recuperados</span></div><button class="primary" id="keep-exploring">Seguir en Ohmdal ${svg('arrow')}</button><p class="end-note">Todavía quedan conversaciones, rincones y preguntas.<br>Tu viaje está guardado.</p>`,'ending-modal');$('#keep-exploring').onclick=()=>{world.endCinematic?.();closeModal();bubble('No voy a olvidar esto. Hice una copia. Y otra por si acaso.');};
 }
 
 $('#new-game').onclick=()=>{
@@ -419,7 +445,7 @@ window.addEventListener('keydown',event=>{
     if(event.repeat)return;
     if(mode==='dialogue')nextLine();else if(mode==='world')openOptions();return;
   }
-  if(mode==='dialogue'){if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
+  if(mode==='dialogue'){const pick=dialogue?.lines[dialogue.index]?.choices?.[Number(event.key)-1];if(pick&&!event.repeat){chooseInDialogue(pick.id);return;}if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
   if(mode!=='world')return;
   if(['e','E','Enter',' '].includes(event.key)){if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
