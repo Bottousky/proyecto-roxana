@@ -37,3 +37,8 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}#hud,#dial
 .dialogue-choices kbd{flex:0 0 auto;color:#203b3a;background:#e4c68c;border:0;font-weight:600;padding:2px 7px}
 .end-gift{font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;color:#e8d6ac;margin:-4px 0 18px;font-style:italic}
 @media(pointer:coarse){.dialogue-choices kbd{display:none}}
+/* The arrival title sits on a soft dark band so it reads over bright scenery (the Portal's vortex, water, sky). */
+.arrival{padding:16px 64px 20px;background:radial-gradient(ellipse at 50% 50%,#0b1a22cc 0%,#0b1a2299 45%,#0b1a2200 72%)}
+.arrival h2{text-shadow:0 2px 14px #06121a,0 0 3px #06121a}
+.arrival p{text-shadow:0 1px 8px #06121a,0 0 2px #06121a}
+@media(max-width:640px){.arrival{top:max(40%,262px);padding:12px 28px 16px}}
