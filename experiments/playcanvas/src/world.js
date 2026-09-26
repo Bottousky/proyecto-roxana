@@ -338,6 +338,22 @@ export class PlayCanvasWorld {
     const glow=(name,position,scale,tint,parent)=>{const e=new Entity(name),m=new StandardMaterial();m.diffuse=color(tint);m.emissive=color(tint);m.emissiveIntensity=1.2;m.diffuseMap=texture;m.opacityMap=texture;m.opacityMapChannel='a';m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update();e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(...position);e.setEulerAngles(62,0,0);e.setLocalScale(scale,1,scale);parent.addChild(e);return {entity:e,material:m};};
     {const e=new Entity('Superficie del Portal Ω');this.portalSurface=makePortalSurface(texture);e.addComponent('render',{type:'plane'});e.render.material=this.portalSurface;e.render.castShadows=false;e.setPosition(KINGDOM.portal.x,3.5,KINGDOM.portal.z-5.65);e.setEulerAngles(90,0,0);e.setLocalScale(5.5,1,5.5);this.regions.get('portal').root.addChild(e);}
     this.portalGlow=glow('La luz del Portal Ω',[KINGDOM.portal.x,2.8,KINGDOM.portal.z-5.45],5.2,'#73cbd3',this.regions.get('portal').root);
+    // The festival the village kept waiting for: after the first lesson the Plaza's festoons
+    // light up and the ribbons they bought "anyway" hang in the morning wind.
+    const plaza=this.regions.get('plaza').root,festoons=[t=>[-7.5+18.1*t,3.2-Math.sin(t*Math.PI)*.5,-5.2+2.4*t],t=>[10.6-18.2*t,3.1-Math.sin(t*Math.PI)*.6,-2.8+14.5*t],t=>[-7.6+17.6*t,3.1-Math.sin(t*Math.PI)*.5,11.7-3.2*t]];
+    this.festival={root:new Entity('La fiesta de la Plaza'),glows:[]};plaza.addChild(this.festival.root);this.festival.root.enabled=false;
+    {const pos=[],col=[],idx=[],tints=[[.62,.1,.07],[.85,.5,.05],[.05,.34,.36],[.9,.84,.66],[.3,.14,.42]];let k=0;
+      festoons.forEach((f,fi)=>{for(let i=0;i<=26;i++){const t=(i+.5)/27,[x,y,z]=f(t),[x2,,z2]=f(t+.012),dx=x2-x,dz=z2-z,l=Math.hypot(dx,dz)||1,ux=dx/l*.21,uz=dz/l*.21,c=tints[(i+fi*2)%tints.length];
+        pos.push(x-ux,y,z-uz, x+ux,y,z+uz, x+ux*.15,y-.55,z+uz*.15);for(let v=0;v<3;v++)col.push(...c,1);idx.push(k,k+1,k+2);k+=3;}
+        if(fi)for(let i=0;i<7;i++){const [x,y,z]=f((i+.5)/7);const b=new Entity('Bombilla de fiesta');b.addComponent('render',{type:'sphere'});b.render.material=this.festivalBulb??=(()=>{const m=new StandardMaterial();m.diffuse=color('#fff0c8');m.emissive=color('#ffd48a');m.emissiveIntensity=1.6;m.update();return m;})();b.setPosition(x,y-.12,z);b.setLocalScale(.2,.2,.2);this.festival.root.addChild(b);}
+        for(let i=0;i<7;i++){const [x,y,z]=f((i+.5)/7);this.festival.glows.push(glow('Bombilla encendida',[x,y-.12,z],.9,'#ffd48a',this.festival.root));}});
+      const cords=festoons.slice(1).map(f=>{const pts=Array.from({length:21},(_,i)=>f(i/20));return pts;});
+      const mesh=new Mesh(this.app.graphicsDevice);mesh.setPositions(pos);mesh.setColors(col);mesh.setNormals(pos.map((_,i)=>i%3===1?1:0));mesh.setIndices(idx);mesh.update();
+      const m=new StandardMaterial();m.diffuse=color('#ffffff');m.diffuseVertexColor=true;m.cull=CULLFACE_NONE;m.update();makeWind(m,'plant');
+      const e=new Entity('Cintas de la fiesta');e.addComponent('render',{meshInstances:[new MeshInstance(mesh,m)]});e.render.castShadows=true;this.festival.root.addChild(e);(this.windy??=[]).push(m);
+      const cordMat=new StandardMaterial();cordMat.diffuse=color('#3b2c20');cordMat.update();
+      for(const pts of cords)for(let i=1;i<pts.length;i++){const a=new Vec3(...pts[i-1]),b=new Vec3(...pts[i]),mid=a.clone().add(b).mulScalar(.5),seg=new Entity('Cuerda');seg.addComponent('render',{type:'box',material:cordMat});seg.setPosition(mid);seg.lookAt(b);seg.setLocalScale(.03,.03,a.distance(b));this.festival.root.addChild(seg);}
+    }
     this.lampGlows=[];for(const l of this.data.lights)this.lampGlows.push({...glow('Resplandor de farol',l.position,2.2,'#ffd092',this.regions.get(l.area).root),area:l.area});
     this.beaconGlow=glow('Cristal del Faro',[KINGDOM.lighthouse.x,18,KINGDOM.lighthouse.z-25.08],9,'#ffe2a7',this.regions.get('lighthouse').root);
     this.beaconLight=new Entity('Luz restaurada del Faro');this.beaconLight.addComponent('light',{type:'omni',range:55,color:color('#ffdf9f'),intensity:0});this.beaconLight.setPosition(KINGDOM.lighthouse.x,18,KINGDOM.lighthouse.z-25.08);this.regions.get('lighthouse').root.addChild(this.beaconLight);
@@ -354,6 +370,7 @@ export class PlayCanvasWorld {
     for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?1.6:n*2.2):0;}
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
     this.portalSurface?.setParameter('uPortalTime',reduced?0:this.clock);
+    if(this.festival){const on=!!f.epilogue_shared&&!inside;this.festival.root.enabled=on;if(on)for(const g of this.festival.glows){g.material.opacity=(.35+.45*n)*(reduced?1:.9+Math.sin(this.clock*2.3+g.entity.getPosition().x)*.1);g.material.update();}}
     if(this.portalGlow){this.portalGlow.material.opacity=.14+(reduced?0:Math.sin(this.clock*.9)*.04);this.portalGlow.material.update();}
     if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?1.5+2.2*n:0;}
     for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color('#ffc57d');g.material.emissiveIntensity=level;g.material.update();}
