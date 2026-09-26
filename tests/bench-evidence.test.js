@@ -115,7 +115,7 @@ const solvedWires = {
   beacon_network: [['positive','opticIn'], ['opticOut','negative'], ['positive','bearingIn'], ['bearingOut','negative'], ['positive','signalIn'], ['signalOut','negative']],
   beacon_lens: [['positive','upperA'], ['lowerB','negative'], ['tap','lensIn'], ['lensOut','negative']],
 };
-const settings = { irrigation: { warmth: 12, flow: 12 }, beacon_supply: { ballast: 3 }, beacon_lens: { upper: 12 } };
+const settings = { irrigation: { warmth: 12, flow: 12, forge: 8 }, beacon_supply: { ballast: 3 }, beacon_lens: { upper: 12 } };
 for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still permits a novice repair, records it and commissions once`, () => {
   const { bench, click, solved } = controller(id);
   click({ action: 'power' });

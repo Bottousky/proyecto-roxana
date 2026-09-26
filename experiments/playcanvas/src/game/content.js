@@ -1,3 +1,4 @@
+import { terracesAgreement as TERRACES_AGREEMENT } from './puzzle-model.js';
 // Ohmdal · La Luz. All progress is expressed as observable, persistent world state.
 const line = (speaker, text, emotion) => ({ speaker, text, ...(emotion ? { emotion } : {}) });
 const d = (...lines) => lines.map(([speaker, text, emotion]) => line(speaker, text, emotion));
@@ -266,13 +267,13 @@ export const DIALOGUES = {
     ['player', 'Podemos abrir el canal y mirar hasta dónde llega.'],
     ['vega', 'La rueda está junto a mi puesto. Después miramos el tablero. Quiero saber quién paga cada cambio que hacemos acá arriba.']),
   water_ready: d(
-    ['narrator', 'El horno baja a un resplandor constante. La compuerta abre el camino a los bancales.'],
-    ['yesca', 'La forja puede trabajar así. Ahora demos a la bomba lo que necesita, sin malgastar el resto.']),
-  irrigation_locked: d(['vega', 'Primero acordemos el uso de la fuente: horno en régimen moderado y canal de riego abierto. Las dos manivelas están junto a nuestros puestos.']),
+    ['narrator', 'El horno queda en el tablero compartido. La compuerta abre el camino a los bancales.'],
+    ['yesca', 'Lo que me toque, que alcance. Ahora repartamos el cable, sin malgastarlo.']),
+  irrigation_locked: d(['vega', 'Primero, todo a la misma mesa: el horno de Yesca pasa al tablero compartido y el canal se abre. Las dos manivelas están junto a nuestros puestos.']),
   irrigation_arrival: d(
-    ['vega', 'El agua sale con demasiada fuerza y el lecho de raíces está demasiado caliente. Son dos trabajos distintos en este tablero.'],
-    ['player', 'Podemos bajar uno, mirar qué cambió y después probar el otro.'],
-    ['vega', 'Con la bomba trabajando. Una altura en un canal vacío no me dice cómo va a regar.']),
+    ['vega', 'El agua sale con demasiada fuerza y el lecho está demasiado caliente. Y el horno de Yesca tira del mismo cable.'],
+    ['yesca', 'El cable de la ladera aguanta lo que aguanta. Si me dan menos calor, hago menos por tanda. Si no me dan nada, no hay azadas.'],
+    ['vega', 'Y si las raíces se enfrían, la última parcela no llega. Decidámoslo con la bomba trabajando: una altura en un canal vacío no me dice nada.']),
   irrigation_complete: d(
     ['narrator', 'El primer bancal se llena. Luego el segundo. En la forja, Yesca retoma su martillo al ritmo de la rueda.'],
     ['yesca', 'Diez azadas. Y tomates para quien hace las azadas. Me parece un trato bastante bueno.'],
@@ -443,7 +444,7 @@ export const DIALOGUES = {
   edda_tower_network: d(['edda', 'Ese golpecito que señaló Nereo vuelve cada vuelta. Lo anoté junto a mi dibujo.'], ['player', 'Todavía falta la señal.'], ['edda', 'Sí. Voy a mirar la linterna mientras él mira el lago. Dos lugares para la misma prueba.']),
   edda_after_lesson: d(['edda', 'Tala encontró la reparación sin que yo se la señalara. Casi se la señalo igual.'], ['ohm', 'Contención registrada.'], ['edda', 'No pongas eso en letras grandes. Ahora quiero copiar las cartas del Instituto. Esa pregunta sigue abierta.']),
   vega_spring_ready: d(['vega', 'La rueda ya transmite movimiento. El indicador respondió.'], ['vega', 'Voy a mirar la bomba antes de pedirle más. Aquel empalme tibio todavía me preocupa.']),
-  yesca_limited: d(['yesca', 'Dejé el horno en la posición baja. El hierro sigue cediendo.'], ['yesca', 'Ahora miren qué pasa del lado de Vega. El almuerzo depende de que este acuerdo sirva para las dos.']),
+  yesca_limited: d(['yesca', 'Pasé el horno a la mesa de Vega. Ahí se decide cuánto calor me toca.'], ['yesca', 'Ahora miren qué pasa del lado de Vega. El almuerzo depende de que este acuerdo sirva para las dos.']),
   vega_channel_open: d(['vega', 'El canal está abierto. Ahora quiero mirar cómo trabaja con agua, no sólo cómo quedó la manivela.'], ['vega', 'La última parcela también cuenta. Que llegue al principio no me alcanza.']),
   nereo_lake_linked: d(['nereo', 'Las balizas ya contestan. Tengo la llave y una excusa menos para quedarme acá.'], ['nereo', 'Los espero en la galería. Vayan mirando: yo conozco el camino demasiado bien.']),
   nereo_tower_source: d(['nereo', 'La base recuperó su voz. La corona todavía no.'], ['nereo', 'Voy a escuchar cerca del segundo tablero. A veces uno reconoce mejor lo que falta que lo que está.']),
@@ -503,7 +504,7 @@ const reverseLabels = {
   workshop_feed: 'Soltar el cierre izquierdo', workshop_return: 'Soltar el cierre derecho',
   road_send: 'Soltar el cierre del poste oeste', road_return: 'Soltar el cierre del poste este',
   spring_sluice: 'Desviar el agua fuera de la rueda', spring_coupling: 'Separar el generador de la rueda',
-  castle_service: 'Desconectar el troncal sano', forge_limited: 'Subir el horno a demanda alta',
+  castle_service: 'Desconectar el troncal sano', forge_limited: 'Devolver el horno a su palanca propia',
   irrigation_open: 'Cerrar el canal de los bancales', lake_cable: 'Abrir el suministro del muelle',
   lake_return: 'Desconectar el retorno de la orilla', tower_feed: 'Abrir la alimentación de la base',
   tower_return: 'Abrir el retorno de la base', tower_isolated: 'Reconectar el puente gastado',
@@ -597,7 +598,7 @@ export const AREAS = {
     objects: [
       npc('yesca', -5.5, 5, 'yesca', 'yesca_before', { flag: 'irrigation', afterDialogue: 'yesca_after' }),
       npc('vega_terraces', 5.5, 5, 'vega', 'vega_terraces', { flag: 'irrigation', afterDialogue: 'vega_after' }),
-      lever('forge_limited', -8, 0, 'Poner el horno en régimen moderado', 'forge_limited', 'El horno mantiene calor útil con menor demanda. Queda capacidad para el riego.', 'El horno vuelve a la demanda alta; la reserva para riego se reduce.'),
+      lever('forge_limited', -8, 0, 'Pasar el horno a la mesa compartida', 'forge_limited', 'El horno queda en el tablero de Vega: su calor se reparte junto con el riego.', 'El horno vuelve a su palanca propia, a demanda alta.'),
       lever('irrigation_open', 8, 0, 'Abrir el canal de los bancales', 'irrigation_open', 'El agua puede alcanzar los bancales cuando la bomba sostenga su trabajo.', 'El canal de los bancales queda cerrado.'),
       panel('irrigation_panel', 1, -6, 'Tablero de calor y riego', 'irrigation', ['water_routed'], 'irrigation_locked', 'vega_after'),
       lore('terraces_marker', -9, -6.5, 'Un turno para cada nombre', 'terraces_marker'),
@@ -687,6 +688,12 @@ export function completionLines(puzzle, state = {}) {
   return lines.map(l => l.speaker === 'player' ? { ...l, text } : l);
 }
 export function journalText(entry, state = {}) {
+  if (entry.id === 'power') {
+    const agreement = TERRACES_AGREEMENT(state.puzzles?.irrigation);
+    if (agreement === 'forja') return 'Elegimos que el horno de Yesca siguiera fuerte. Las raíces y el riego quedaron justos, dentro de lo que el cable de la ladera sostiene. Vega va a vigilar la última parcela.';
+    if (agreement === 'riego') return 'Elegimos que el agua llegara primero. El horno de Yesca trabaja más bajo, a tandas más cortas, y el cable de la ladera no se calienta. La última parcela volvió a recibir agua.';
+    return entry.text;
+  }
   if (entry.id !== 'operating_window') return entry.text;
   const brake = gateBrake(state);
   if (!brake) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó.';
@@ -799,8 +806,26 @@ function lessonLines(state) {
   return [...lines.slice(0, split), ...(gift ? gift.lines : [choice]), ...lines.slice(split)];
 }
 
+// Terraces: two defensible agreements on the shared line; the closing names the one chosen.
+const TERRACES_CLOSE = {
+  forja: d(
+    ['narrator', 'El primer bancal se llena, más despacio. En la forja, el horno vuelve a rugir.'],
+    ['yesca', 'Tandas grandes. Doce azadas antes del mediodía. Vega, te debo tomates.'],
+    ['vega', 'Las raíces van justas. Alcanzan, pero la última parcela la voy a mirar todos los días.']),
+  riego: d(
+    ['narrator', 'El primer bancal se llena. Luego el segundo. En la forja, Yesca retoma su martillo al ritmo de la rueda.'],
+    ['yesca', 'Menos por tanda. Más tandas sin parar. Odio cuando algo razonable suena tan poco espectacular.'],
+    ['vega', 'El agua llega a la última parcela. Esa era la que nunca llegaba.']),
+};
+function terracesClose(state) {
+  const lines = DIALOGUES.irrigation_complete, agreement = TERRACES_AGREEMENT(state?.puzzles?.irrigation);
+  if (!agreement) return lines;
+  return [...TERRACES_CLOSE[agreement], ...lines.filter(l => /anotar|sendero del lago/.test(l.text))];
+}
+
 export function resolveDialogue(id, state = {}) {
   const resolved = resolveDialogueId(id, state);
+  if (resolved === 'irrigation_complete') return terracesClose(state);
   if (resolved === 'lighthouse_epilogue') return lessonLines(state);
   if (resolved === PUZZLE_STORY.gate.complete) return completionLines('gate', state);
   return DIALOGUES[resolved] || [];

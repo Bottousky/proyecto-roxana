@@ -57,13 +57,15 @@ export const PUZZLES = {
     observation: 'El archivo está aislado desde el patio. Los dos servicios sanos todavía se iluminan poco.',
   },
   irrigation: {
-    title: 'La paciencia del invernadero', place: 'TERRAZAS · MESA DE REGULACIÓN', subtitle: "Vega quiere agua suave y raíces tibias. Una cosa por vez.", voltage: 18, protection: 2.6,
-    ports: [...sourcePorts, port('warmA', 'Regulador térmico A', 290, 135), port('warmB', 'Regulador térmico B', 505, 135), port('rootIn', 'Raíces +', 635, 135), port('rootOut', 'Raíces −', 860, 135), port('flowA', 'Regulador de agua A', 290, 345), port('flowB', 'Regulador de agua B', 505, 345), port('flowIn', 'Riego +', 635, 345), port('flowOut', 'Riego −', 860, 345)],
-    components: [component('warmTrim', 'Regulador de calor', 'warmA', 'warmB', 0, { valueKey: 'warmth', kind: 'resistor' }), component('roots', 'Lecho de raíces', 'rootIn', 'rootOut', 24, { kind: 'heater', goal: { ...goal(10, 13, .4, .55), maxPower: 7 } }), component('flowTrim', 'Regulador de caudal', 'flowA', 'flowB', 0, { valueKey: 'flow', kind: 'resistor' }), component('flow', 'Bomba de riego', 'flowIn', 'flowOut', 18, { kind: 'motor', goal: goal(9.5, 11.8, .52, .66) })],
-    knobs: [{ key: 'warmth', label: 'Resistencia del lecho', min: 0, max: 36, step: 2, initial: 0, unit: 'Ω', description: 'La franja fértil requiere entre 4 y 7 W en las raíces.' }, { key: 'flow', label: 'Resistencia del riego', min: 0, max: 36, step: 2, initial: 0, unit: 'Ω', description: 'Una corriente entre 0,52 y 0,66 A mantiene el caudal suave.' }],
-    initialWires: [['positive', 'warmA'], ['warmB', 'rootIn'], ['rootOut', 'negative'], ['positive', 'flowA'], ['flowB', 'flowIn'], ['flowOut', 'negative']],
-    lesson: 'La potencia eléctrica se transforma en calor o trabajo. Regular cada rama permite cuidar a la vez dos receptores con necesidades diferentes.',
-    hints: ["Las hojas y el agua responden al montaje actual. Ambas cosas son observables sin instrumentos.","Al girar un mando, puedo registrar qué cambia y qué permanece igual.","Más no significa mejor. Tampoco significa peor en todas las posiciones. Conviene comparar.","Un paso para probar: cada mando es un freno; hacia la derecha frena más y pasa menos. Subí de a poco el freno del calor hasta que el lecho quede tibio. Después, el del agua hasta que salga pareja."],
+    title: 'La paciencia del invernadero', place: 'TERRAZAS · MESA DE REGULACIÓN', subtitle: "Horno, raíces y riego tiran del mismo cable de la ladera.", voltage: 18, protection: 4,
+    ports: [...sourcePorts, port('warmA', 'Regulador térmico A', 290, 105), port('warmB', 'Regulador térmico B', 505, 105), port('rootIn', 'Raíces +', 635, 105), port('rootOut', 'Raíces −', 860, 105), port('flowA', 'Regulador de agua A', 290, 250), port('flowB', 'Regulador de agua B', 505, 250), port('flowIn', 'Riego +', 635, 250), port('flowOut', 'Riego −', 860, 250), port('forgeA', 'Regulador del horno A', 290, 395), port('forgeB', 'Regulador del horno B', 505, 395), port('forgeIn', 'Horno +', 635, 395), port('forgeOut', 'Horno −', 860, 395)],
+    components: [component('warmTrim', 'Regulador de calor', 'warmA', 'warmB', 0, { valueKey: 'warmth', kind: 'resistor' }), component('roots', 'Lecho de raíces', 'rootIn', 'rootOut', 24, { kind: 'heater', goal: { ...goal(10, 13, .4, .55), maxPower: 7 } }), component('flowTrim', 'Regulador de caudal', 'flowA', 'flowB', 0, { valueKey: 'flow', kind: 'resistor' }), component('flow', 'Bomba de riego', 'flowIn', 'flowOut', 18, { kind: 'motor', goal: goal(9.5, 11.8, .52, .66) }), component('forgeTrim', 'Regulador del horno', 'forgeA', 'forgeB', 0, { valueKey: 'forge', kind: 'resistor' }), component('forge', 'Horno de Yesca · 12 Ω', 'forgeIn', 'forgeOut', 12, { kind: 'forge', goal: goal(8.4, 18.5, .7, 1.6) })],
+    // The hillside line is shared: forge, roots and pump together may draw at most 2.2 A.
+    constraints: [{ source: true, maxCurrent: 2.2 }],
+    knobs: [{ key: 'warmth', label: 'Resistencia del lecho', min: 0, max: 36, step: 2, initial: 0, unit: 'Ω', description: 'La franja fértil requiere entre 4 y 7 W en las raíces.' }, { key: 'flow', label: 'Resistencia del riego', min: 0, max: 36, step: 2, initial: 0, unit: 'Ω', description: 'Una corriente entre 0,52 y 0,66 A mantiene el caudal suave.' }, { key: 'forge', label: 'Freno del horno', min: 0, max: 24, step: 2, initial: 0, unit: 'Ω', description: 'Hacia la derecha frena más: el horno calienta menos y deja línea para el riego. Yesca necesita al menos 6 W.' }],
+    initialWires: [['positive', 'warmA'], ['warmB', 'rootIn'], ['rootOut', 'negative'], ['positive', 'flowA'], ['flowB', 'flowIn'], ['flowOut', 'negative'], ['positive', 'forgeA'], ['forgeB', 'forgeIn'], ['forgeOut', 'negative']],
+    lesson: 'La potencia eléctrica se transforma en calor o trabajo. Una línea compartida tiene un límite: lo que toma una rama no lo toman las otras. Hay más de un reparto que funciona; elegir uno es decidir quién cede.',
+    hints: ["Las hojas, el agua y el horno responden al montaje. Todo se ve sin instrumentos.","Al girar un mando, puedo registrar qué cambia y qué permanece igual.","El cable de la ladera tiene un límite. Lo que toma el horno no lo toman las raíces ni la bomba.","Un paso para probar: cada mando es un freno; hacia la derecha frena más y pasa menos. Frená el horno hasta que el tendido deje de calentarse. Después ajustá raíces y agua, y mirá si Yesca todavía puede trabajar."],
     observation: 'Las hojas se repliegan con el calor. El agua golpea la tierra demasiado fuerte.',
   },
   beacon_supply: {
@@ -100,6 +102,14 @@ export const PUZZLES = {
     observation: 'La lente devuelve una luz blanca, demasiado dura. El mar espera una luz que pueda sostenerse.',
   },
 };
+
+/** Which agreement the terraces bench settled on: the forge keeps its strength (>= 12 W) or the water comes first. */
+export function terracesAgreement(state) {
+  if (!state) return null;
+  const r = evaluatePuzzle('irrigation', state);
+  if (!r.solved) return null;
+  return Math.abs(r.solution.branches.forge?.power ?? 0) >= 11.5 ? 'forja' : 'riego';
+}
 
 export function initialPuzzleSnapshot(id) {
   const p = PUZZLES[id];
@@ -151,11 +161,11 @@ export function evaluatePuzzle(id, state) {
     const branch = solution.branches[c.id];
     // Filament lamps and heating elements are not polarized. Actuators and
     // the active optical crystal do depend on the marked operating direction.
-    const operatingBranch = ['lamp', 'heater'].includes(c.kind) && branch.voltage !== null ? { ...branch, voltage: Math.abs(branch.voltage), current: Math.abs(branch.current) } : branch;
+    const operatingBranch = ['lamp', 'heater', 'forge'].includes(c.kind) && branch.voltage !== null ? { ...branch, voltage: Math.abs(branch.voltage), current: Math.abs(branch.current) } : branch;
     return [c.id, powered && checkOperatingRange(operatingBranch, c.goal)];
   }));
   // maxPower limits losses on a line; minCurrent keeps a part in service (the lens divider needs both arms).
-  const constraintsMet = (p.constraints ?? []).every(c => { const b = solution.branches[c.branch]; return (c.maxPower === undefined || (b?.power ?? Infinity) <= c.maxPower) && Math.abs(b?.current ?? 0) >= (c.minCurrent ?? 0); });
+  const constraintsMet = (p.constraints ?? []).every(c => { if (c.source) return !powered || requestedCurrent <= c.maxCurrent; const b = solution.branches[c.branch]; return (c.maxPower === undefined || (b?.power ?? Infinity) <= c.maxPower) && Math.abs(b?.current ?? 0) >= (c.minCurrent ?? 0); });
   const solved = powered && solution.valid && Object.values(operating).every(Boolean) && constraintsMet;
   // «solved» is physics. Commissioning may also need a proof the community asked to see.
   const proofMet = !!p.proof?.when && powered && solution.valid && constraintsMet && p.proof.when(state) && operating[p.proof.component];

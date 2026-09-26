@@ -328,7 +328,7 @@ async function solvePanel(objectId, id) {
       assert.equal((await inspect()).puzzle.state.switches.archive,false,'The archive was isolated in the courtyard');
       await removeWire('clinicOut', 'kitchenIn');
       await wire('clinicOut', 'negative'); await wire('positive', 'kitchenIn'); break;
-    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); break;
+    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); await knob('forge', 8); break;
     case 'beacon_supply': await knob('ballast', 3); break;
     case 'beacon_network':
       await removeWire('opticOut', 'bearingIn'); await removeWire('bearingOut', 'signalIn');
