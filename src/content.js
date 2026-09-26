@@ -47,7 +47,7 @@ export const DIALOGUES = {
     ['ohm', 'Energía detectada. Desplazamiento… funcional.', 'surprised'],
     ['edda', '¿Eso significa que estás bien?'],
     ['ohm', 'Significa que puedo desplazarme. Soy Ohm.'],
-    ['player', 'Con la primera conexión no pasó nada. Con la otra, sí.'],
+    ['player', 'Con una sola conexión no pasaba nada. Con las dos, sí.'],
     ['edda', 'Entonces necesitaba las dos. Quiero dibujarlo antes de olvidarme.'],
     ['ohm', 'Observación registrada. No dispongo de una explicación para haber pasado tanto tiempo mirando musgo.'],
     ['edda', 'Lumen va a querer conocerte. Su taller está en la Plaza. Vení con nosotros.']),
@@ -675,6 +675,25 @@ export const PUZZLE_STORY = Object.fromEntries([
   ['beacon_lens', 'beacon_lens_arrival', 'beacon_lens_complete'],
 ].map(([id, arrival, complete]) => [id, { arrival, complete }]));
 
+// A closing line or a Bitácora page may only claim what the bench trace shows the
+// player actually tried. Saves without a trace get wording that claims nothing.
+const gateBrake = state => { const t = state.puzzles?.gate?.trace; return t === undefined || t === null ? null : t.brake || null; };
+export function completionLines(puzzle, state = {}) {
+  const lines = DIALOGUES[PUZZLE_STORY[puzzle]?.complete] || [];
+  if (puzzle !== 'gate') return lines;
+  const brake = gateBrake(state), text = !brake ? 'Cambió el sentido, y el cerrojo levantó.'
+    : brake.min === brake.max ? 'Cambió el sentido. La rueda quedó como estaba, y aun así levantó.' : 'Cambió el sentido. Y al ajustar la rueda, levantó sin atascarse.';
+  return lines.map(l => l.speaker === 'player' ? { ...l, text } : l);
+}
+export function journalText(entry, state = {}) {
+  if (entry.id !== 'operating_window') return entry.text;
+  const brake = gateBrake(state);
+  if (!brake) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó.';
+  if (brake.min === brake.max) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó. No toqué la rueda del freno: qué hace todavía está por probar.';
+  if (brake.min > 0 && brake.max < 30) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido. Moví la rueda del freno y cambió cuánto empujaba; no la llevé a los extremos.';
+  return entry.text;
+}
+
 export const JOURNAL = [
   { id: 'arrival', title: 'Al otro lado del Portal', text: 'Entré por una pared. Edda no pareció tan sorprendida como yo. Junto al arco hay un pequeño de bronce que no responde. Empiezo por mirar.', requires: [] },
   { id: 'circuit', title: 'El retorno también es camino', text: 'Ohm necesitaba las dos conexiones. Dibujé el camino entero, incluido el que vuelve. Edda quiere guardar también el dibujo de cuando no funcionaba.', explanation: 'El cristal es una fuente: aporta energía. El cobre permite el paso y Ohm la utiliza. Para que haya corriente eléctrica hace falta una trayectoria completa entre los dos extremos de la fuente, pasando por Ohm. A esa trayectoria la llamamos circuito cerrado. Un corte en cualquier parte puede interrumpirla.', requires: ['awaken'] },
@@ -756,7 +775,9 @@ export function resolveDialogueId(id, state = {}) {
 }
 
 export function resolveDialogue(id, state = {}) {
-  return DIALOGUES[resolveDialogueId(id, state)] || [];
+  const resolved = resolveDialogueId(id, state);
+  if (resolved === PUZZLE_STORY.gate.complete) return completionLines('gate', state);
+  return DIALOGUES[resolved] || [];
 }
 
 /** Small observations while travelling. These never contain required instructions. */

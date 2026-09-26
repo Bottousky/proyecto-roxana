@@ -167,6 +167,7 @@ export class PuzzleWorkbench {
     const sameWire = (a, b) => a.length === b.length && a.every(n => b.includes(n));
     for (const wire of before.wires) if (!s.wires.some(w => sameWire(w, wire))) note(`Retiré el cable entre ${this.portLabel(wire[0])} y ${this.portLabel(wire[1])}.`);
     for (const wire of s.wires) if (!before.wires.some(w => sameWire(w, wire))) note(`Uní ${this.portLabel(wire[0])} con ${this.portLabel(wire[1])}.`);
+    for (const knob of this.puzzle.knobs ?? []) if (s.trace?.[knob.key]) { const t = s.trace[knob.key], v = s.values[knob.key]; t.min = Math.min(t.min, v); t.max = Math.max(t.max, v); }
     for (const knob of this.puzzle.knobs ?? []) if (before.values[knob.key] !== s.values[knob.key]) {
       const position = value => Math.round((value - knob.min) / knob.step) + 1;
       note(`${simpleLabel(knob.label)}: pasé de la posición ${position(before.values[knob.key])} a la ${position(s.values[knob.key])}.`);
@@ -217,6 +218,7 @@ export class PuzzleWorkbench {
     const value = Number(target.value);
     if (!this.sliderStart) this.sliderStart = copy(this.state);
     this.state.values[focusKey] = value;
+    const t = this.state.trace?.[focusKey]; if (t) { t.min = Math.min(t.min, value); t.max = Math.max(t.max, value); }
     this.evaluate(false);
     this.callbacks.onChange?.(this.id, copy(this.state));
     const knob = this.puzzle.knobs.find(k => k.key === focusKey);
@@ -294,7 +296,7 @@ export class PuzzleWorkbench {
       if (!this.requireIsolated()) return;
       const completed = this.state.completed;
       const before = copy(this.state), evidence = this.state.evidence;
-      this.state = this.history.pop(); this.state.completed = completed; this.state.sourceOn = false; this.state.tripped = false; this.state.evidence = evidence;
+      const trace = this.state.trace; this.state = this.history.pop(); this.state.completed = completed; this.state.sourceOn = false; this.state.tripped = false; this.state.evidence = evidence; this.state.trace = trace;
       this.feedback = 'Volviste un paso atrás.'; this.selected = null;
       this.evaluate(false); this.recordChanges(before); this.callbacks.onChange?.(this.id, copy(this.state)); this.render(); return;
     }
@@ -302,7 +304,7 @@ export class PuzzleWorkbench {
       if (!this.requireIsolated()) return;
       this.feedback = 'La mesa volvió a su disposición inicial. Podés probar otro camino.'; this.selected = null;
       const completed = this.state.completed;
-      return this.change(s => Object.assign(s, initialPuzzleSnapshot(this.id), { completed, evidence: s.evidence, sourceOn: false }), { sound: 'switch' });
+      return this.change(s => Object.assign(s, initialPuzzleSnapshot(this.id), { completed, evidence: s.evidence, trace: s.trace, sourceOn: false }), { sound: 'switch' });
     }
   }
 

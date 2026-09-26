@@ -100,7 +100,7 @@ export const PUZZLES = {
 export function initialPuzzleSnapshot(id) {
   const p = PUZZLES[id];
   if (!p) throw new Error(`Unknown puzzle: ${id}`);
-  return { version: 1, id, wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], completed: false };
+  return { version: 1, id, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], completed: false };
 }
 
 export function normalizePuzzleSnapshot(id, saved) {
@@ -115,6 +115,9 @@ export function normalizePuzzleSnapshot(id, saved) {
     hints: Number.isFinite(saved.hints) ? Math.max(0, Math.min(p.hints.length, Math.floor(saved.hints))) : 0,
     meter: { mode: ['voltage', 'continuity', 'current'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) ? saved.meter.branch : null },
   };
+  // Saves from before the trace existed stay unknown (null): nothing may be claimed about them.
+  normalized.trace = saved.trace && typeof saved.trace === 'object' ? Object.fromEntries((p.knobs ?? []).map(k => { const t = saved.trace[k.key], v = normalized.values[k.key];
+    return [k.key, Number.isFinite(t?.min) && Number.isFinite(t?.max) ? { min: Math.max(k.min, Math.min(t.min, v)), max: Math.min(k.max, Math.max(t.max, v)) } : { min: v, max: v }]; })) : null;
   // A corrupt completed marker must never make a broken installation uneditable.
   normalized.completed = normalized.completed && evaluatePuzzle(id, normalized).solved;
   return normalized;

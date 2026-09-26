@@ -28,7 +28,8 @@ test('legacy and malformed evidence cannot manufacture journal history', () => {
   const snapshot = initialPuzzleSnapshot('gate');
   for (let i = 0; i < 100; i++) appendBenchEvidence(snapshot, { kind: 'intervention', text: `change ${i}` });
   appendBenchEvidence(snapshot, { kind: 'intervention', text: 'change 99' });
-  assert.equal(snapshot.evidence.length, 40); assert.equal(snapshot.evidence[0].text, 'change 60');
+  // The first entry survives trimming; routine steps after it roll over.
+  assert.equal(snapshot.evidence.length, 40); assert.equal(snapshot.evidence[0].text, 'change 0'); assert.equal(snapshot.evidence[1].text, 'change 61');
   assert.deepEqual(normalizePuzzleSnapshot('gate', snapshot).evidence, snapshot.evidence);
 });
 
@@ -131,4 +132,34 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   globalThis.document = { removeEventListener() {} };
   try { bench.close(); bench.close(); } finally { globalThis.document = previousDocument; }
   assert.deepEqual(solved, [id]);
+});
+
+test('measurements survive long experiments and one knob turned step by step is one intervention', () => {
+  const snapshot = initialPuzzleSnapshot('beacon_lens');
+  appendBenchEvidence(snapshot, { kind: 'observation', text: 'first look' });
+  appendBenchEvidence(snapshot, { kind: 'measurement', text: 'Tensión', value: '9,00 V', reference: 'toma sin carga' });
+  appendBenchEvidence(snapshot, { kind: 'measurement', text: 'Tensión', value: '5,99 V', reference: 'toma con la lente' });
+  for (let i = 0; i < 60; i++) { appendBenchEvidence(snapshot, { kind: 'intervention', text: `Uní A${i} con B${i}.` }); appendBenchEvidence(snapshot, { kind: 'result', text: `r${i}` }); }
+  const values = snapshot.evidence.filter(e => e.kind === 'measurement').map(e => e.value);
+  assert.deepEqual(values, ['9,00 V', '5,99 V']); assert.equal(snapshot.evidence[0].text, 'first look'); assert.equal(snapshot.evidence.length, 40);
+  const knob = initialPuzzleSnapshot('gate');
+  for (let p = 5; p < 12; p++) { appendBenchEvidence(knob, { kind: 'intervention', text: `Freno: pasé de la posición ${p} a la ${p + 1}.` }); appendBenchEvidence(knob, { kind: 'result', text: `pos ${p + 1}` }); }
+  assert.deepEqual(knob.evidence.map(e => e.text), ['Freno: pasé de la posición 5 a la 12.', 'pos 12']);
+  appendBenchEvidence(knob, { kind: 'intervention', text: 'Freno: pasé de la posición 12 a la 5.' });
+  assert.equal(knob.evidence.at(-1).text, 'Freno: probé otras posiciones y volví a la 5.');
+});
+
+test('the gate closing and its journal page only claim the brake tests the player made', async () => {
+  const { completionLines, JOURNAL, journalText } = await import('../src/content.js');
+  const page = JOURNAL.find(e => e.id === 'operating_window');
+  const said = state => completionLines('gate', state).find(l => l.speaker === 'player').text;
+  const fresh = initialPuzzleSnapshot('gate');
+  assert.doesNotMatch(said({ puzzles: { gate: fresh } }), /ajustar/); assert.doesNotMatch(journalText(page, { puzzles: { gate: fresh } }), /extremo no fue/);
+  const moved = { ...fresh, trace: { brake: { min: 6, max: 12 } } };
+  assert.match(said({ puzzles: { gate: moved } }), /ajustar la rueda/); assert.match(journalText(page, { puzzles: { gate: moved } }), /no la llevé a los extremos/);
+  const extreme = { ...fresh, trace: { brake: { min: 0, max: 30 } } };
+  assert.equal(journalText(page, { puzzles: { gate: extreme } }), page.text);
+  // A save from before the trace existed claims nothing either way.
+  const legacy = normalizePuzzleSnapshot('gate', { ...fresh, trace: undefined });
+  assert.equal(legacy.trace, null); assert.doesNotMatch(said({ puzzles: { gate: legacy } }), /rueda/);
 });
