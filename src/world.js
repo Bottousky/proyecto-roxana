@@ -449,7 +449,12 @@ export class World {
     for(let i=0;i<3;i++){this.barrel(-12+i*.95,7,.9);this.crate(-13+i*.8,9,.7);}
     this.fence(-w*.42,4,10,false);
   }
-  boat(x,z,s){const g=this.group(x,.18,z);const hull=this.mesh('sphere',this.m.darkwood,0,0,0,s*1.0,.3*s,s*2.3,g);this.box(0,.2,0,1.3*s,.15,3.5*s,this.m.wood,g);for(let zz of [-1,0,1])this.box(0,.37,zz*s,1.2*s,.13,.27*s,this.m.wood,g);this.cylinder(0,1.65,0,.055,3.3,this.m.darkwood,g);const sail=this.mesh('plane',this.m.cloth,.63,2.0,0,1.25,2,1,g);sail.rotation.y=.2;this.animations.push({kind:'boat',obj:g,phase:this.rand()*6});}
+  boat(x,z,s){const g=this.group(x,.18,z);const hull=this.mesh('sphere',this.m.darkwood,0,0,0,s*1.0,.3*s,s*2.3,g);this.box(0,.2,0,1.3*s,.15,3.5*s,this.m.wood,g);for(let zz of [-1,0,1])this.box(0,.37,zz*s,1.2*s,.13,.27*s,this.m.wood,g);this.cylinder(0,1.65,0,.055,3.3,this.m.darkwood,g);// A bellied triangular sail on a boom, cut from the kingdom's standard cloth.
+    const cols=8,rows=10,pos=[],uv=[],idx=[];for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){const v=j/rows,u=i/cols*(1-v),x=u*1.55,y=.55+v*2.75;pos.push(x+.06,y,Math.sin(Math.PI*u/(1-v+1e-4))*Math.sin(Math.PI*Math.min(1,v*1.2+.1))*.28);uv.push(x/1.55,v);}
+    for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=j*(cols+1)+i,b=a+1,c=a+cols+1,d=c+1;idx.push(a,b,c,b,d,c);}
+    const sailGeo=new THREE.BufferGeometry();sailGeo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));sailGeo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));sailGeo.setIndex(idx);sailGeo.computeVertexNormals();this.localGeometries.push(sailGeo);
+    const cloth=this.textures.kingdomBanner?this.mat('#efe6cc',null,{map:this.textures.kingdomBanner,side:THREE.DoubleSide}):this.m.cloth;
+    const sail=this.mesh(sailGeo,cloth,0,0,0,1,1,1,g);sail.rotation.y=.25;sail.name='boat-sail';this.beam([0,.55,0],[1.5,.6,.35],.05,this.m.darkwood,g);this.animations.push({kind:'boat',obj:g,phase:this.rand()*6});}
   buildLighthouse(w,d){
     this.lighthouse(0,-d*.57,1.5,true);
     
