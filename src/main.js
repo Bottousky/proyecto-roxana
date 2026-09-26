@@ -307,6 +307,7 @@ function openJournal(selected){
   if(!started||!['world','modal'].includes(mode))return;
   show('#journal-dot',false);
   modal(renderJournal(state,{selected:typeof selected==='string'?selected:undefined,puzzles:PUZZLES,evidenceFor:getBenchEvidence}),'journal-modal');
+  const current=document.querySelector('.book-index [aria-current=page]');if(current){const list=current.parentElement;list.scrollTop=current.offsetTop-list.clientHeight/2+current.offsetHeight/2;}
   document.querySelectorAll('button[data-journal-page]').forEach(button=>button.onclick=()=>{openJournal(button.dataset.journalPage);$('.book-leaf')?.scrollIntoView({block:'nearest'});});
   $('#personal-journal-note')?.addEventListener('input',event=>{state.personalNotes||={};state.personalNotes[event.target.dataset.noteFor]=event.target.value.slice(0,1200);persist();});
 }
