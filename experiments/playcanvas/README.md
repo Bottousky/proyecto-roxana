@@ -8,6 +8,43 @@ Arco I jugable en la rama **codex/playcanvas-slice**.
 - Iniciar localmente: abrir **Jugar PlayCanvas.cmd**, o ejecutar npm run dev.
 - En un checkout nuevo: npm ci antes de iniciar.
 
+## Instituto Roxana (landing)
+
+`escuela.html` es la escuela-diorama que recibe al estudiante: una isla flotante con el
+Instituto que se navega con clics (sin personaje). Tocar un edificio, su rótulo o el
+directorio acerca la cámara, levanta el techo, baja las paredes hacia la cámara y abre
+el panel de la sala:
+
+- **Dirección:** registro del estudiante (nombre, emblema), bitácoras (exportar,
+  importar, borrar) y preferencias. Vive en este navegador (`roxana.escuela.v1`).
+- **Cuatro talleres, uno por Mundo Aplicado y del mismo tamaño alrededor del patio:**
+  Electrónica (Ohmdal), Física (Physica), Programación (Bitland) y Matemática (Arithmos).
+  Cada uno tiene su entrada, estandartes, medallón e interior propio. Solo Ohmdal es un
+  portal (lleva al juego); a Bitland se entra con un casco de realidad virtual conectado a un
+  microcontrolador con una ciudad sobre el chip; Physica es un mundo subatómico en una pecera
+  con su consola de leyes; Arithmos, una inmersión en un pizarrón: "Ver la entrada" muestra la tiza trazando una puerta,
+  al estudiante achicándose al cruzarla y el plano infinito de ecuaciones del otro lado.
+- **Sala de Trofeos:** una grada de doce lugares por mundo, bajo su estandarte.
+- **Anfiteatro:** las cinemáticas filmadas del juego se proyectan en la pantalla 3D
+  (subtítulos incluidos) al vivirlas, agrupadas por mundo; explicaciones de YouTube y
+  animaciones se declaran en `src/escuela/videos.js`.
+
+La escuela lee la partida de Ohmdal sin modificarla. Cada restauración cambia algo del
+diorama (farol a los pies de Roxana y ventana del Taller, portón, fuente, faroles, canteros, estandartes, campana,
+linterna de la torre, visitantes); el reloj de la torre sigue detenido para Bitland. Al volver, una secuencia con letterbox recorre lo
+nuevo. Hora del día (mañana, tarde, noche), sonido procedural opcional y vista previa de
+cualquier etapa sin tocar partidas: `escuela.html?etapa=0..10&hora=manana|tarde|noche`.
+
+- `src/escuela/school.js`: arquitectura por código (receta aprobada: facetas, UV de mundo,
+  color de vértice como multiplicador). `kit.js` fusiona piezas por parte y material.
+- `public/escuela/modelos/roxana-estatua.glb`: la estatua del patio (Meshy, solo geometría);
+  `src/escuela/statue.js` le da normales, UV de mundo, mármol y oclusión en los pliegues.
+- `src/escuela/diorama.js`: render, cámara, recorte de salas, etapas, partículas, IBL.
+- `src/escuela/progress.js`: etapa, trofeos y cinemáticas desde el guardado (con pruebas).
+- `node scripts/film-cinematics.mjs` vuelve a filmar las escenas en `public/escuela/cine/`.
+- `node scripts/escuela-review.mjs vista,taller,... <etapa> <hora>` captura revisiones;
+  `escuela-news.mjs` y `escuela-welcome.mjs` recorren novedades, bienvenida y Portal.
+
 ## El viaje
 
 Portal Ω → Plaza → Taller de Lumen → Calzada y Puerta de Ohm → Manantial →
