@@ -338,10 +338,27 @@ export class World {
     for(let i=0;i<16;i++){const a=i/16*Math.PI*2;const block=this.box(Math.cos(a)*3.15,3.5+Math.sin(a)*3.15,0,.54,.64,1.1,i%3?this.m.stone:this.m.stoneDark,arch);block.rotation.z=a;this.sphere(Math.cos(a)*2.85,3.5+Math.sin(a)*2.85,.35,.065,this.m.blue,arch);}
     const mat=new THREE.ShaderMaterial({transparent:true,side:THREE.DoubleSide,depthWrite:false,uniforms:{time:{value:0}},vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`varying vec2 vUv;uniform float time;void main(){vec2 p=(vUv-.5)*2.;float r=length(p);float a=atan(p.y,p.x);float swirl=sin(a*4.+r*14.-time)*.5+.5;vec3 col=mix(vec3(.12,.37,.57),vec3(.36,.86,.91),swirl*.6+pow(r,4.)*.5);float edge=1.-smoothstep(.94,1.,r);gl_FragColor=vec4(col,edge*(.28+.45*pow(r,3.)));}`});
     this.sharedMaterials.add(mat);this.waterMaterials.push(mat);const disk=this.mesh('plane',mat,0,3.5,.05,5.5,5.5,1,arch);disk.castShadow=false;
-    this.box(-3.25,1.5,0,.85,3,1.25,this.m.stone,arch);this.box(3.25,1.5,0,.85,3,1.25,this.m.stone,arch);this.solid(-3.25,-5.7,1,1.2);this.solid(3.25,-5.7,1,1.2);
+    this.box(-3.25,1.5,0,.85,3,1.25,this.m.stone,arch);this.box(3.25,1.5,0,.85,3,1.25,this.m.stone,arch);this.solid(-3.25,-5.7,1,1.2);this.solid(3.25,-5.7,1,1.2);this.solid(0,-5.7,5.5,.6,'portal-surface');
     for(const x of [-9.2,9.2]){this.ruinPillar(x,-5,3.2);this.ruinPillar(x,5,2.1);this.lamp(x*.8,1,2.8);}
-    this.fence(-w*.35,d*.33,7);this.fence(w*.35,d*.33,7);
+    // The Porteros' punt, moored on the canal that once carried visitors down to the village.
+    this.portersLanding(15.2,1.6);
+    for(const [x,z,s] of [[11.6,-8.6,1.25],[12.2,8.8,1.1],[20.4,-10.5,1.5],[20.8,9.5,1.6]])this.tree(x,z,s);
     for(let side of [-1,1]){for(let j=0;j<4;j++){this.box(side*(6.9+j*.9),.35,-2.4+j*.13,.75,.6+this.rand()*.35,.9,this.m.stoneDark);this.solid(side*(6.9+j*.9),-2.4+j*.13,.75,.9);this.rock(side*(7.5+j*.9),-1.5,.3+this.rand()*.35);}this.tree(side*9,d*.64,1.7);this.tree(side*14,d*.7,1.9);}
+  }
+  portersLanding(x,z){
+    const g=this.group(x,.16,z);g.name='porteros-punt';
+    // Hull outline seen from above: a pointed bow upstream, a square stern.
+    const outline=(k)=>{const s=new THREE.Shape();s.moveTo(0,-1.75*k);s.quadraticCurveTo(.55*k,-1.05*k,.55*k,-.2*k);s.lineTo(.5*k,1.25*k);s.lineTo(-.5*k,1.25*k);s.lineTo(-.55*k,-.2*k);s.quadraticCurveTo(-.55*k,-1.05*k,0,-1.75*k);return s;};
+    const hull=new THREE.ExtrudeGeometry(outline(1),{depth:.3,bevelEnabled:false}),deck=new THREE.ExtrudeGeometry(outline(.84),{depth:.05,bevelEnabled:false});this.localGeometries.push(hull,deck);
+    const h=this.mesh(hull,this.m.darkwood,0,-.12,0,1,1,1,g);h.rotation.x=Math.PI/2;h.position.y=.18;const k=this.mesh(deck,this.m.wood,0,.17,0,1,1,1,g);k.rotation.x=Math.PI/2;k.position.y=.2;
+    for(const zz of [-.55,.6])this.box(0,.24,zz,.9,.07,.26,this.m.cream,g);
+    this.beam([.3,.35,-1.2],[-.1,.5,1.5],.035,this.m.darkwood,g);
+    this.animations.push({kind:'boat',obj:g,phase:1.3});
+    // A short plank landing on the west bank, with its mooring post and a coil of rope.
+    for(let i=0;i<5;i++)this.box(x-1.15,.5,z-.8+i*.4,1.3,.07,.34,i%2?this.m.darkwood:this.m.wood);
+    for(const zz of [-.95,.95])this.cylinder(x-.55,.2,z+zz,.07,.7,this.m.darkwood);
+    this.cylinder(x-1.55,.55,z+1.15,.08,.8,this.m.darkwood);this.torus(x-1.55,.36,z+1.15,.16,.045,this.m.cream,[Math.PI/2,0,0]);
+    this.cable([[x-1.55,.8,z+1.15],[x-.9,.4,z+.9],[x-.3,.42,z+.4]],this.m.cream);
   }
   ruinPillar(x,z,h){this.solid(x,z,1.3,1.3);this.box(x,.18,z,1.3,.35,1.3,this.m.stoneDark);this.cylinder(x,h/2+.35,z,.42,h,this.m.stone);this.box(x,h+.38,z,1.05,.3,1.05,this.m.stone);for(let i=0;i<3;i++)this.box(x+.45+this.rand()*.7,.1,z+.4+this.rand(),.4,.2,.4,this.m.stone);}
   buildPlaza(w,d){
@@ -508,11 +525,11 @@ export class World {
   }
   buildNature(w,d){
     const footprints=[];this.root.traverse(o=>{if(o.userData.architecture)footprints.push(o.userData.architecture.footprint)});
-    const clearScenery=(x,z,r)=>(!this.continuous||Math.abs(z)<d/2-1&&!inTravelCorridor(this.area.id,x,z,-r))&&!pointOnPaving(this.layout,x,z,r)&&!this.nearObject(x,z,Math.max(1.4,r))&&!footprints.some(b=>Math.abs(x-b.x)<b.w/2+r&&Math.abs(z-b.z)<b.d/2+r);
+    const clearScenery=(x,z,r)=>(!this.continuous||Math.abs(z)<d/2-1&&!inTravelCorridor(this.area.id,x,z,-r))&&!inKingdomWater(this.area.id,x,z,Math.min(r,1))&&!pointOnPaving(this.layout,x,z,r)&&!this.nearObject(x,z,Math.max(1.4,r))&&!footprints.some(b=>Math.abs(x-b.x)<b.w/2+r&&Math.abs(z-b.z)<b.d/2+r);
     const positions=[];
     buildGardenArt(this,clearScenery);
-    for(let i=0;i<24;i++){const side=i%2?-1:1,x=side*(w*.4+this.rand()*5),z=(this.rand()-.5)*(d+7);if(!clearScenery(x,z,3.4))continue;positions.push([x,z]);if(i%4===0)this.pine(x,z,.85+this.rand()*.45);else this.tree(x,z,.72+this.rand()*.5,this.area.id==='terraces');}
-    for(let i=0;i<22;i++){const side=i%2?-1:1,x=side*(w*.48+4+this.rand()*9),z=(this.rand()-.5)*(d+21);if((this.area.id==='lake'&&side>0)||!clearScenery(x,z,2.6))continue;this.tree(x,z,1.15+this.rand()*.7,this.area.id==='terraces');}
+    for(let i=0;i<24;i++){const side=i%2?-1:1,x=side*(w*.4+this.rand()*5),z=(this.rand()-.5)*(d+7);if((this.area.id==='portal'&&side>0)||!clearScenery(x,z,3.4))continue;positions.push([x,z]);if(i%4===0)this.pine(x,z,.85+this.rand()*.45);else this.tree(x,z,.72+this.rand()*.5,this.area.id==='terraces');}
+    for(let i=0;i<22;i++){const side=i%2?-1:1,x=side*(w*.48+4+this.rand()*9),z=(this.rand()-.5)*(d+21);if(((this.area.id==='lake'||this.area.id==='portal')&&side>0)||!clearScenery(x,z,2.6))continue;this.tree(x,z,1.15+this.rand()*.7,this.area.id==='terraces');}
     const ferns=new THREE.InstancedMesh(this.geo.plane,this.m.fern,220),fernDummy=new THREE.Object3D();
     for(let i=0;i<220;i++){let x=(this.rand()-.5)*(w+15),z=(this.rand()-.5)*(d+15);const s=this.onLand(x,z)&&clearScenery(x,z,.45)?.7+this.rand()*.8:0;fernDummy.position.set(x,s*.42,z);fernDummy.rotation.set(-.14,this.rand()*6,0);fernDummy.scale.set(s,s,1);fernDummy.updateMatrix();ferns.setMatrixAt(i,fernDummy.matrix);}ferns.receiveShadow=true;this.root.add(ferns);
     // Dense instanced undergrowth, with open navigation lanes and clear interactables.

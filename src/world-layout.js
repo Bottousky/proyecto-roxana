@@ -17,18 +17,19 @@ export function lakeShoreX(z) {
 
 export const AREA_LAYOUTS = {
   portal: {
-    identity: 'Un claro entre ruinas, con el arco al norte y dos pequeños desvíos de exploración.',
+    identity: 'Un claro entre ruinas: se llega por el arco, que mira al valle; el camino al pueblo lo rodea por el este.',
     paths: [
-      path('arrival-and-arch', 2.7, [0, 8], [0, 4], [-1.25, 1.2], [-1.25, -2.8], [0, -5.7], [0, -10]),
+      path('arrival-and-arch', 2.7, [0, 4], [-1.25, 1.2], [-1.25, -2.8], [0, -3.2]),
+      path('valley-road', 2.7, [0, -3.2], [3.8, -3.9], [6.2, -6.2], [6.6, -12]),
       path('ohm-approach', 2.15, [-1.25, 1.2], [1.2, 2.75], [3.5, 2.75]),
       path('western-ruins', 2.1, [0, 4], [-4, 3.4], [-5.25, 0], [-5.25, -3.65], [-8, -3.65]),
       path('keeper-house', 1.55, [-8, -3.65], [-10.36, -3.65], [-10.36, -4.3]),
       path('root-observation', 1.9, [0, 4], [5.5, 5.8], [8.5, 6.2]),
     ],
-    courts: [circle('arch-court', 0, -3, 4.2), circle('ohm-court', 3.5, 0, 2.85), circle('arrival-clearance', 0, 6.8, 2.3)],
-    buildings: [{ ...building('portal-keeper', 'Casa del Portal', -10.36, -7.2, 4.8, 4, 3.5, {stone:true}), composition: 'Conserva la escala baja junto al arco; su puerta se abre al claro, sin invadir el pilar occidental.' }],
+    courts: [circle('arch-court', 0, -3, 4.2), circle('ohm-court', 3.5, 0, 2.85), circle('garden-rest', 0, 5.2, 1.8)],
+    buildings: [{ ...building('portal-keeper', 'Casa de los Porteros', -10.36, -7.2, 4.8, 4, 3.5, {stone:true}), composition: 'La casa de Edda y su familia, que reciben a quien cruza. Escala baja junto al arco; su puerta se abre al claro, sin invadir el pilar occidental.' }],
     landmarks: [{ id: 'portal', label: 'Portal Ω', x: 0, z: -5.7 }],
-    exclusions: [rect('portal-pier-west', -3.25, -5.7, 1, 1.2), rect('portal-pier-east', 3.25, -5.7, 1, 1.2)],
+    exclusions: [rect('portal-pier-west', -3.25, -5.7, 1, 1.2), rect('portal-pier-east', 3.25, -5.7, 1, 1.2), rect('portal-surface', 0, -5.7, 5.5, .6)],
   },
   plaza: {
     identity: 'Un circuito alrededor de la fuente y calles cortas que terminan en puertas visibles.',

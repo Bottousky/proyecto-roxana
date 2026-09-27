@@ -6,7 +6,7 @@ const d = (...lines) => lines.map(([speaker, text, emotion]) => line(speaker, te
 export const CHARACTERS = {
   player: { name: 'Vos', role: 'Un viaje que acaba de empezar', color: '#8ad1df' },
   narrator: { name: 'Bitácora', role: 'Observaciones de viaje', color: '#c8bb91' },
-  edda: { name: 'Edda', role: 'Exploradora de Ohmdal', color: '#ecaa78' },
+  edda: { name: 'Edda', role: 'Cuidadora del Portal', color: '#ecaa78' },
   ohm: { name: 'Ohm', role: 'Compañero e instrumento de medida', color: '#81dfe5' },
   lumen: { name: 'Maese Lumen', role: 'Reparador de la Plaza', color: '#e3be79' },
   consejera: { name: 'Consejera Ivara', role: 'Custodia de la Red', color: '#c1aceb' },
@@ -19,23 +19,25 @@ export const CHARACTERS = {
 
 export const DIALOGUES = {
   portal_arrival: d(
-    ['narrator', 'Al otro lado del Portal Ω, la mañana huele a lluvia sobre piedra caliente. El instrumento de viaje del Instituto conserva el norte; tu Bitácora todavía está en blanco. Una luz azul tiembla en el musgo.'],
-    ['edda', 'Vos no sos de acá.', 'surprised'],
-    ['player', '¿Tan evidente es?'],
-    ['edda', 'Entraste por una pared. Soy Edda. Venía a investigar eso, pero me distrajo aquel pequeño de bronce.'],
-    ['player', '¿Está dormido?'],
-    ['edda', 'Buena pregunta. Lo saludé. No me contestó. Vení, capaz entre los dos encontramos algo.']),
+    ['narrator', 'El Portal Ω te suelta sobre la piedra tibia. De este lado, la mañana huele a lluvia. El instrumento de viaje del Instituto conserva el norte; tu Bitácora todavía está en blanco.'],
+    ['edda', '¡Cruzaste! ¡Alguien cruzó!', 'surprised'],
+    ['player', '¿Eso no pasa seguido?'],
+    ['edda', 'No desde antes de que yo naciera. Soy Edda. En el valle a mi familia le dicen «los Porteros»: mi abuela recibía acá a los Maestros del Instituto y a sus alumnos.'],
+    ['player', '¿Y vos?'],
+    ['edda', 'Yo lo barro todas las mañanas, por si acaso. Hoy fue el «por si acaso».'],
+    ['edda', 'Y justo hoy el pequeño de bronce del pedestal no me contesta. Vení: capaz entre los dos encontramos algo.']),
   edda_portal: d(
     ['edda', 'Limpié el polvo. Giré esa manivela. Hasta le dije por favor.'],
     ['player', '¿Y nada?'],
     ['edda', 'Ahora está limpio. No confundamos resultados. El cristal brilla y él no; eso es lo que tengo.']),
   edda_portal_after: d(
-    ['edda', 'Mi cuaderno dice: «Una pared se abrió. Una cajita me discutió». Buen día de trabajo.'],
+    ['edda', 'Mi cuaderno dice: «El Portal dejó pasar a alguien. Una cajita me discutió». Buen día de trabajo.'],
     ['ohm', 'Instrumento de campo.'],
     ['edda', 'Lo anoto entre paréntesis. Los espero en la Plaza.']),
   portal_arch: d(
-    ['narrator', 'En el arco: «INSTITUTO ROXANA · MUNDOS APLICADOS». Debajo, otra mano grabó: «Dejen el dibujo junto a la máquina».'],
-    ['edda', 'Mi abuela decía que por ahí venían los Maestros. No dijo que trajeran mochilas.']),
+    ['narrator', 'Junto a la puerta de los Porteros, un libro de llegadas descansa en su atril. La tapa copia la inscripción del arco: «INSTITUTO ROXANA · MUNDOS APLICADOS». En el margen, otra mano: «Dejen el dibujo junto a la máquina».'],
+    ['narrator', 'Las primeras páginas están llenas de firmas: docentes, alumnos, fechas, una mancha de té. Después, años de hojas en blanco. En la última, con letra nueva: «Hoy: alguien».'],
+    ['edda', 'Mi abuela anotaba a todos los que cruzaban. Decía que por ahí venían los Maestros. No dijo que trajeran mochilas.']),
   portal_seed: d(
     ['narrator', 'Entre dos raíces hay una placa doblada. El dibujo muestra dos caminos entre una fuente y una pequeña lámpara.'],
     ['narrator', 'Al dorso: «El retorno también es camino». Alguien subrayó «también» tres veces.']),
@@ -51,7 +53,8 @@ export const DIALOGUES = {
     ['player', 'Con una sola conexión no pasaba nada. Con las dos, sí.'],
     ['edda', 'Entonces necesitaba las dos. Quiero dibujarlo antes de olvidarme.'],
     ['ohm', 'Observación registrada. No dispongo de una explicación para haber pasado tanto tiempo mirando musgo.'],
-    ['edda', 'Lumen va a querer conocerte. Su taller está en la Plaza. Vení con nosotros.']),
+    ['edda', 'Lumen va a querer conocerte. Su taller está en la Plaza, siguiendo el canal.'],
+    ['edda', 'Mi abuela llevaba a los visitantes en bote por el canal hasta el pueblo. El bote sigue atado; ahora junta hojas. Vamos a pie: canal arriba, remar cansa el doble.']),
   ohm_pedestal_after: d(
     ['narrator', 'El asiento de bronce conserva la huella de Ohm. Dos caminos de cobre unen el cristal con el lugar donde descansaba.'],
     ['ohm', 'Cuarenta años mirando la misma pared. Tu compañía mejora sensiblemente el paisaje.']),
@@ -458,7 +461,7 @@ export const DIALOGUES = {
   tala_epilogue: d(['tala', 'Edda dice que primero mire. Estoy mirando.'], ['player', '¿Y qué encontraste?'], ['tala', 'Esta tela no tiene el mismo color. Todavía no sé qué hay debajo.']),
   tala_epilogue_after: d(['tala', 'Quiero guardar también el dibujo de cuando no funcionaba.'], ['player', '¿Por qué?'], ['tala', 'Porque si sólo guardo el otro, parece que ya lo sabía. Edda hizo una cara rara cuando se lo dije.']),
   lake_boat_after: d(['narrator', 'La señal del Faro vuelve sobre las tres maderas de la barca. Las marcas de nombres y estaturas siguen en su banco.'], ['nereo', 'Mañana puedo traerla hasta el muelle. Hay gente que creció mientras esperaba.']),
-  portal_arch_without_edda: d(['narrator', 'En el arco: «INSTITUTO ROXANA · MUNDOS APLICADOS». Debajo, otra mano grabó: «Dejen el dibujo junto a la máquina».'], ['narrator', 'Edda dejó una flecha a lápiz hacia la Plaza. Junto a ella: «Preguntar por los Maestros».']),
+  portal_arch_without_edda: d(['narrator', 'El libro de llegadas sigue abierto en la última hoja. Debajo de «Hoy: alguien», Edda agregó con letra prolija: «Del Instituto. Despertó a Ohm».'], ['narrator', 'Al lado dejó una flecha a lápiz hacia la Plaza y una nota: «Preguntar por los Maestros».']),
   plaza_statue_without_edda: d(['narrator', 'La Primera Maestra sostiene un cuaderno abierto. El nombre gastado empieza por «ROX…».'], ['narrator', 'A los pies quedó una nota de Edda: «El abuelo dice que ella nunca se quedaba quieta. Buscar otro retrato».']),
   castle_archive_without_edda: d(['narrator', 'Las cartas siguen ordenadas por fecha. La última solicitud de un docente no tiene respuesta.'], ['ohm', 'Instituto Roxana. Esa era nuestra dirección.'], ['narrator', 'Edda dejó una copia junto al legajo. En el margen: «¿Quién las recibía?».']),
   spring_levels_without_vega: d(['narrator', 'Las fechas de sequía y abundancia siguen en el muro. Una marca reciente lleva la letra de Vega.'], ['narrator', 'En su tablilla: «Anotar también lo que no salió como esperábamos. Voy a revisar los bancales».']),
@@ -522,14 +525,14 @@ const exit = (id, x, z, target, label, requires = [], lockedDialogue, spawn) => 
 
 export const AREAS = {
   portal: {
-    id: 'portal', name: 'Portal Ω', subtitle: 'Donde una pregunta vuelve a cruzar', theme: 'portal', bounds: [28, 24], spawn: [0, 8], entryDialogue: 'portal_arrival',
+    id: 'portal', name: 'Portal Ω', subtitle: 'Donde una pregunta vuelve a cruzar', theme: 'portal', bounds: [28, 24], spawn: [0, -2.4], entryDialogue: 'portal_arrival',
     objects: [
-      npc('edda_portal', -4, 2, 'edda', 'edda_portal', { flag: 'awaken', afterDialogue: 'edda_portal_after' }),
+      npc('edda_portal', -3.6, 0.6, 'edda', 'edda_portal', { flag: 'awaken', afterDialogue: 'edda_portal_after' }),
       panel('ohm_pedestal', 3.5, 0, 'El pedestal de Ohm', 'awaken', [], null, 'ohm_pedestal_after'),
-      lore('portal_arch', -7.5, -5, 'Inscripción del Instituto', 'portal_arch'),
+      lore('portal_arch', -7.5, -5, 'El libro de llegadas', 'portal_arch'),
       secret('portal_seed', 8.5, 5, 'Una placa entre las raíces', 'portal_seed'),
     ],
-    exits: [exit('portal_to_plaza', 0, -10, 'plaza', 'Plaza de Ohm', ['awaken'], 'portal_locked')],
+    exits: [exit('portal_to_plaza', 6.6, -10, 'plaza', 'Plaza de Ohm', ['awaken'], 'portal_locked')],
   },
   plaza: {
     id: 'plaza', name: 'Plaza de Ohm', subtitle: 'Las cosas que una comunidad conserva', theme: 'plaza', bounds: [40, 32], spawn: [0, 11], entryDialogue: 'plaza_arrival',
@@ -542,7 +545,7 @@ export const AREAS = {
       secret('plaza_bell', 11, -7, 'Las marcas de la campana', 'plaza_bell'),
     ],
     exits: [
-      exit('plaza_to_portal', 0, 14, 'portal', 'Portal Ω', [], null, [0, -7]),
+      exit('plaza_to_portal', 0, 14, 'portal', 'Portal Ω', [], null, [6.4, -8]),
       exit('plaza_to_workshop', -13.25, 7.9, 'workshop', 'Taller de Lumen'),
       exit('plaza_to_road', 0, -14, 'road', 'La Calzada', ['workshop'], 'plaza_road_locked'),
     ],
@@ -713,7 +716,7 @@ export const DIALOGUE_EFFECTS = {
 };
 
 export const JOURNAL = [
-  { id: 'arrival', title: 'Al otro lado del Portal', text: 'Entré por una pared. Edda no pareció tan sorprendida como yo. Junto al arco hay un pequeño de bronce que no responde. Empiezo por mirar.', requires: [] },
+  { id: 'arrival', title: 'Al otro lado del Portal', text: 'Crucé el Portal. Del otro lado estaba Edda, de la familia que lo cuida; hacía años que nadie llegaba. Junto al arco hay un pequeño de bronce que no responde. Empiezo por mirar.', requires: [] },
   { id: 'circuit', title: 'El retorno también es camino', text: 'Ohm necesitaba las dos conexiones. Dibujé el camino entero, incluido el que vuelve. Edda quiere guardar también el dibujo de cuando no funcionaba.', explanation: 'El cristal es una fuente: aporta energía. El cobre permite el paso y Ohm la utiliza. Para que haya corriente eléctrica hace falta una trayectoria completa entre los dos extremos de la fuente, pasando por Ohm. A esa trayectoria la llamamos circuito cerrado. Un corte en cualquier parte puede interrumpirla.', requires: ['awaken'] },
   { id: 'diagnosis', title: 'La lámpara era la misma', text: 'Lumen había cambiado la lámpara tres veces. Al reparar el camino de cobre, encendió la que ya estaba. Conservamos el tramo viejo para compararlo con el nuevo.', explanation: 'La tela era una cubierta aislante. Debajo, el conductor de cobre estaba cortado. Con el banco apagado, la prueba de continuidad permite comprobar si hay paso entre los extremos de ese tramo. Una cubierta entera no demuestra que el conductor también lo esté. Esta prueba se hace sin alimentación; no sirve para afirmar que toda la máquina funcionará.', requires: ['workshop'] },
   { id: 'operating_window', title: 'Lo suficiente para levantar una puerta', text: 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido. Ajustar la rueda permitió que levantara; llevarla al extremo no fue la solución.', explanation: 'La polaridad describe el sentido de una tensión entre dos puntos. La tensión se mide en voltios (V); la corriente que pasa por un tramo, en amperios (A). La resistencia del regulador se mide en ohmios (Ω). En un resistor óhmico se relacionan mediante V = I × R. El cerrojo tiene un intervalo de trabajo: más corriente no equivale siempre a mejor funcionamiento.', requires: ['gate'] },

@@ -83,7 +83,7 @@ export function buildKingdomLandscape(owner){
   for(let x=10.25;x<18.1;x+=.22)owner.box(KINGDOM.spring.x+x,.087,drainZ,.095,.055,.85,wood).name='walkable-culvert-grate';
   buildWatersideArt(owner);
   // The Portal's garden is surrounded by the valley, rather than perched on a level edge.
-  for(const [x,z,type,size] of [[-13,66,0,6.2],[-20,70,2,7.4],[12,69,1,6.5],[16,62,4,5.5]]){
+  for(const [x,z,type,size] of [[-13,66,0,6.2],[-20,70,2,7.4],[11,69,1,6.5],[22,63,4,5.5]]){
     const tree=owner.mesh('plane',trees[type],KINGDOM.portal.x+x,size*.5,z,size*.85,size,1);tree.name='portal-foreground-grove';
   }
   // One distant mountain range, fixed in the same territory for every viewpoint.

@@ -16,7 +16,7 @@ export const EXTERIORS=Object.keys(KINGDOM).filter(id=>id!=='workshop');
 // The gate stands on the western embankment; the canal passes OUTSIDE its bastion.
 export const ROAD_CANAL_X=19.8;
 // Keep the canal on the east bank of each settlement, including the river mouth.
-export const WATERCOURSE=[[-2,110],[-2,56],[-2,32],[22,16],[22,-16],[53.8,-32],[53.8,-64],[32,-80],[32,-110],[-12,-126],[-12,-158],[14,-174],[14,-210],[54,-226],[54,-245]];
+export const WATERCOURSE=[[-8,110],[-8,56],[-8,32],[22,16],[22,-16],[53.8,-32],[53.8,-64],[32,-80],[32,-110],[-12,-126],[-12,-158],[14,-174],[14,-210],[54,-226],[54,-245]];
 export function inKingdomWater(id,x,z,margin=0){
   if(!isExterior(id))return false;const [wx,wz]=toKingdom(id,[x,z]);
   for(let i=1;i<WATERCOURSE.length;i++)if(segmentDistance([wx,wz],WATERCOURSE[i-1],WATERCOURSE[i])<2.3+margin)return true;

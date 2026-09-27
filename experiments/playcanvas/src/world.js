@@ -219,15 +219,35 @@ export class PlayCanvasWorld {
     // The neighbours react: everyone nearby turns to the installation and jumps, one after another.
     this.celebration={t:0,x:o.x,z:o.z,actors:[this.playerActor,this.ohmActor,...(this.regions.get(this.area.id)?.actors||[])].filter(a=>a.entity.enabled&&Math.hypot(a.g.position.x-o.x,a.g.position.z-o.z)<22)};
     for(const a of this.celebration.actors)if(a!==this.playerActor)a.animation=idleActor(actorDirection(o.x-a.g.position.x,o.z-a.g.position.z,a.animation.direction));
-    const [ox,oz]=this.data.areas[this.area.id].offset,y=this.groundHeight(o.x,o.z);this.burst.origin=[o.x+ox,y,o.z+oz];this.burst.t=0;this.burst.root.enabled=true;
-    this.burst.sparks.forEach((p,i)=>{p.angle=i*2.399;p.radius=.2+(i%7)*.12;p.speed=1.2+(i%5)*.35;p.delay=(i%10)*.05;});
+    const [ox,oz]=this.data.areas[this.area.id].offset,y=this.groundHeight(o.x,o.z);this.fireBurst([o.x+ox,y,o.z+oz],'#ffd98f');
+  }
+  fireBurst(origin,tint){
+    const b=this.burst;b.origin=origin;b.t=0;b.root.enabled=true;b.material.emissive=color(tint);b.material.update();
+    b.sparks.forEach((p,i)=>{p.angle=i*2.399;p.radius=.2+(i%7)*.12;p.speed=1.2+(i%5)*.35;p.delay=(i%10)*.05;});
+  }
+  // A new journey: the Portal flares and the player steps out of it onto the dais, facing the valley.
+  playPortalArrival(){
+    if(this.area?.id!=='portal'||!this.burst)return;
+    const [ox,oz]=this.data.areas.portal.offset,to=this.player.position.toArray(),from=[to[0],to[2]-1.7];
+    this.portalArrival={t:0,from,to:[to[0],to[2]]};this.player.position.set(from[0],this.groundHeight(...from),from[1]);
+    this.fireBurst([ox,this.groundHeight(0,-4.4),-4.4+oz],'#9ff2ff');
+  }
+  updatePortalArrival(dt,reduced){
+    const a=this.portalArrival;if(!a)return;a.t+=dt;const t=a.t,p=this.player.position,sprite=this.playerActor.entity.sprite;
+    const flare=Math.max(0,Math.min(1,t/.25))*Math.max(0,1-(t-.5)/1.6);this.portalSurface?.setParameter('uPortalFlare',reduced?flare*.4:flare);
+    if(this.portalGlow){this.portalGlow.material.opacity=.14+.5*flare;this.portalGlow.material.update();}
+    // The traveller appears inside the light and walks two steps out of it.
+    const k=reduced?1:Math.max(0,Math.min(1,(t-.45)/.9)),e=k*k*(3-2*k),old=[p.x,p.z],x=a.from[0]+(a.to[0]-a.from[0])*e,z=a.from[1]+(a.to[1]-a.from[1])*e;
+    p.set(x,this.groundHeight(x,z),z);if(sprite)sprite.opacity=reduced?1:Math.max(0,Math.min(1,(t-.3)/.5));
+    this.animateActor(this.playerActor,x-old[0],z-old[1],dt,{paused:false,reducedMotion:reduced});
+    if(t>2.1){this.portalArrival=null;if(sprite)sprite.opacity=1;this.portalSurface?.setParameter('uPortalFlare',0);}
   }
   buildBurst(){
     const root=new Entity('Restauración');root.enabled=false;this.app.root.addChild(root);
     const wm=this.focusRingMaterial.clone();wm.emissiveIntensity=3;wm.opacity=1;wm.update();const wave=new Entity('Onda');wave.addComponent('render',{type:'plane'});wave.render.material=wm;wave.render.castShadows=false;root.addChild(wave);
     const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffd98f');m.emissiveIntensity=2.4;m.blendType=BLEND_ADDITIVEALPHA;m.opacity=.9;m.depthWrite=false;m.useLighting=false;m.update();
     const sparks=Array.from({length:36},()=>{const e=new Entity('Chispa');e.addComponent('render',{type:'sphere'});e.render.material=m;e.render.castShadows=false;root.addChild(e);return {entity:e};});
-    this.burst={root,wave,sparks,t:9};
+    this.burst={root,wave,sparks,material:m,t:9};
   }
   updateBurst(dt,reduced){
     const b=this.burst;if(!b||b.t>3.2)return;b.t+=dt;const t=b.t,[x,y,z]=b.origin;
@@ -253,10 +273,15 @@ export class PlayCanvasWorld {
     // Apply the saved detail level as soon as the journey's settings arrive, not only on a window resize.
     if(this.appliedQuality!==(state.settings?.quality||'high'))this.resize();
     if(JSON.stringify([state.flags,state.puzzles])!==this.signature)this.updateFlags(state);
-    const paused=input.paused||!!this.cinematic||this.inspect,reduced=state.settings?.reducedMotion,p=this.player.position,old=[p.x,p.z];
+    const paused=input.paused||!!this.cinematic||this.inspect||!!this.portalArrival,reduced=state.settings?.reducedMotion,p=this.player.position,old=[p.x,p.z];
     let dx=input.x||0,dz=input.z||0,stepLimit=Infinity;if(paused){this.target=null;this.route=[];dx=dz=0;}else if(dx||dz){this.target=null;this.route=[];const l=Math.hypot(dx,dz);dx/=Math.max(1,l);dz/=Math.max(1,l);}else if(this.target){const x=this.target[0]-p.x,z=this.target[1]-p.z,d=Math.hypot(x,z);if(d<.04)this.target=this.route.shift()||null;else{dx=x/d;dz=z/d;stepLimit=d;}}
-    if(dx||dz){const step=Math.min((input.run?7:4.2)*dt,stepLimit),next=moveWithCollisions([p.x,p.z],[dx*step,dz*step],this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});p.set(next[0],this.groundHeight(...next),next[1]);}
-    this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
+    if(dx||dz){const step=Math.min((input.run?7:4.2)*dt,stepLimit),walk=(x,z)=>moveWithCollisions([p.x,p.z],[x*step,z*step],this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});let next=walk(dx,dz);
+      // Corner assist: a keyboard walker who clips the edge of a post slides around it instead of stopping dead.
+      // Only when a short sidestep (under half a metre) opens the way ahead; flat walls still stop the walker.
+      if(!this.target&&Math.hypot(next[0]-p.x,next[1]-p.z)<step*.25){const l=Math.hypot(dx,dz),ux=dx/l,uz=dz/l;
+        find:for(const o of [.15,.3,.45])for(const side of [1,-1]){const sx=p.x-uz*side*o,sz=p.z+ux*side*o;if(this.canStand(sx,sz)&&this.canStand(sx+ux*.35,sz+uz*.35)){const alt=walk(-uz*side,ux*side);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.3)next=alt;break find;}}}
+      p.set(next[0],this.groundHeight(...next),next[1]);}
+    this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;if(this.portalArrival)this.updatePortalArrival(dt,reduced);else this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
     this.updateDust(dt,!!input.run&&this.walking&&!paused,reduced);
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
@@ -371,7 +396,7 @@ export class PlayCanvasWorld {
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
     this.portalSurface?.setParameter('uPortalTime',reduced?0:this.clock);
     if(this.festival){const on=!!f.epilogue_shared&&!inside;this.festival.root.enabled=on;if(on)for(const g of this.festival.glows){g.material.opacity=(.35+.45*n)*(reduced?1:.9+Math.sin(this.clock*2.3+g.entity.getPosition().x)*.1);g.material.update();}}
-    if(this.portalGlow){this.portalGlow.material.opacity=.14+(reduced?0:Math.sin(this.clock*.9)*.04);this.portalGlow.material.update();}
+    if(this.portalGlow&&!this.portalArrival){this.portalGlow.material.opacity=.14+(reduced?0:Math.sin(this.clock*.9)*.04);this.portalGlow.material.update();}
     if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?1.5+2.2*n:0;}
     for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color('#ffc57d');g.material.emissiveIntensity=level;g.material.update();}
     for(const d of this.dynamics){const e=d.entity,flag=!!f[d.flag],motion=reduced?0:1;

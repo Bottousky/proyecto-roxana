@@ -13,6 +13,7 @@ import {advanceJourneyTime,journeyPhase} from './story-time.js';
 import './travel-instrument.css';
 import './art-polish.css';
 import './journey-ui.css';
+import './hud.css';
 import {renderJourneyGuide,bindMapViews} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
@@ -117,7 +118,7 @@ function refreshHUD(){
   const objective=getObjective(state)||{title:'Un mundo que vuelve a preguntar',detail:'Todavía quedan historias por descubrir.'};
   $('#objective-title').textContent=objective.title;$('#objective-detail').textContent=objective.detail||'';
   const signature=objective.title+'|'+objective.detail;
-  if(signature!==objectiveSignature){objectiveSignature=signature;objectiveUntil=Infinity;$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');}
+  if(signature!==objectiveSignature){objectiveSignature=signature;objectiveUntil=performance.now()+12000;$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');}
   $('#chapter-label').textContent=state.flags.beacon_lens?'OHMDAL · LA PRIMERA LUZ':'OHMDAL · LA LUZ';
   updateTravelInstrument(document,state,world?.getPlayerPosition?.()||state.position||a.spawn,objective);
   if(activeMeasurement)renderFieldMeasurement();
@@ -205,7 +206,7 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   state.area=id;state.position=spawn||AREAS[id].spawn;
   activeMeasurement=null;show('#field-meter',false);
   chatterClock=0;
-  hudUntil=performance.now()+11000;objectiveUntil=Infinity;
+  hudUntil=performance.now()+11000;objectiveUntil=performance.now()+12000;
   $('#hud').classList.remove('settled');$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');
   for(const [key,value] of Object.entries(AREAS[id].initialFlags||{}))if(!(key in state.flags))state.flags[key]=value;
   refreshWorldSystems(true);

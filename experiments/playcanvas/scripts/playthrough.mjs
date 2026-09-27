@@ -134,19 +134,6 @@ async function worldGeometry(id) {
   }, id);
 }
 
-async function clickGround(point) {
-  const screen = await page.evaluate(point => {
-    const world = window.__ohmdal.world;
-    const projected = world.getScreenPosition({x:point[0],z:point[1],ground:true});
-    const rect = world.canvas.getBoundingClientRect();
-    const x = rect.left + projected.x, y = rect.top + projected.y;
-    return { x, y, unobscured: document.elementFromPoint(x, y) === world.canvas && !world.pickInteraction(x,y) };
-  }, point);
-  if (!screen.unobscured || !(screen.x > 10 && screen.x < 1430 && screen.y > 120 && screen.y < 855)) return false;
-  await page.mouse.click(screen.x, screen.y);
-  return true;
-}
-
 async function keyboardNudge(from, toward) {
   const dx = toward[0] - from[0], dz = toward[1] - from[1];
   const screenX = dx, screenZ = dz;
@@ -159,6 +146,18 @@ async function keyboardNudge(from, toward) {
   for (const key of keys) await page.keyboard.up(key);
 }
 
+// Walking is done like a player with a keyboard: arrow keys held toward the next waypoint.
+const heldKeys = new Set();
+async function steer(from, to, run) {
+  const dx = to[0] - from[0], dz = to[1] - from[1], scale = Math.max(Math.abs(dx), Math.abs(dz), 0.001), want = new Set();
+  if (Math.abs(dx) > scale * 0.4) want.add(dx > 0 ? 'ArrowRight' : 'ArrowLeft');
+  if (Math.abs(dz) > scale * 0.4) want.add(dz > 0 ? 'ArrowDown' : 'ArrowUp');
+  if (run) want.add('Shift');
+  for (const key of [...heldKeys]) if (!want.has(key)) { await page.keyboard.up(key); heldKeys.delete(key); }
+  for (const key of want) if (!heldKeys.has(key)) { await page.keyboard.down(key); heldKeys.add(key); }
+}
+async function releaseKeys() { for (const key of [...heldKeys]) await page.keyboard.up(key); heldKeys.clear(); }
+
 async function walkTo(id) {
   stage = `walk:${id}`;
   await settle({ stable: 160 });
@@ -166,6 +165,8 @@ async function walkTo(id) {
   assert.ok(geometry.object, `${id} exists in the current physical area`);
   let goal = geometry.path?.at(-1) || [geometry.object.x, geometry.object.z];
   let info = await inspect();
+  // A crossing walks the traveller onto the new ground by itself; wait for it like a player would.
+  for (const until = Date.now() + 8000; info.target && Date.now() < until; info = await inspect()) await page.waitForTimeout(100);
   const startingArea = info.area;
   let path = geometry.path?.length ? geometry.path : [goal];
   let waypoint = 0, lastProgress = Date.now(), best = distance(info.position, goal), replans = 0;
@@ -173,33 +174,36 @@ async function walkTo(id) {
   while (Date.now() - started < 65000) {
     info = await inspect();
     assert.equal(info.area, startingArea, `Walking toward ${id} must remain in its authored area`);
-    if (info.mode !== 'world') { await page.keyboard.up('Shift'); await settle({ stable: 180 }); continue; }
-    if (info.nearby === id || await page.evaluate(id => {const w=window.__ohmdal.world;return w.canInteractWith(w.getInteractions().find(o=>o.id===id));},id)) { await page.keyboard.up('Shift'); return geometry.object; }
+    if (info.mode !== 'world') { await releaseKeys(); await settle({ stable: 180 }); continue; }
+    if (info.nearby === id || await page.evaluate(id => {const w=window.__ohmdal.world;return w.canInteractWith(w.getInteractions().find(o=>o.id===id));},id)) { await releaseKeys(); return geometry.object; }
     if (distance(info.position, goal) < best - 0.12) { best = distance(info.position, goal); lastProgress = Date.now(); }
-    if (waypoint < path.length - 1 && distance(info.position, path[waypoint]) < 0.5) waypoint++;
+    while (waypoint < path.length - 1 && distance(info.position, path[waypoint]) < 0.6) waypoint++;
     const target = path[waypoint];
-    const dist = distance(info.position, target);
-    const step = Math.min(3.4, dist);
-    const partial = dist < 0.01 ? target : [info.position[0] + (target[0] - info.position[0]) / dist * step, info.position[1] + (target[1] - info.position[1]) / dist * step];
-    await page.keyboard.down('Shift');
-    if (!info.target || distance(info.target, partial) > 0.85) {
-      if (!await clickGround(partial)) await keyboardNudge(info.position, partial);
-    }
+    await steer(info.position, target, distance(info.position, target) > 2);
     if (Date.now() - lastProgress > 6500) {
       if (++replans > 3) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
       // A player caught in a corner steps back the way they came before trying again.
-      await page.keyboard.up('Shift'); await keyboardNudge(target, info.position); await keyboardNudge(target, info.position);
+      await releaseKeys(); await keyboardNudge(target, info.position); await keyboardNudge(target, info.position);
+      // …and sidesteps, alternating sides, as someone would around a post.
+      const side = replans % 2 ? 1 : -1, dx = target[0] - info.position[0], dz = target[1] - info.position[1];
+      for (let i = 0; i < 3; i++) await keyboardNudge(info.position, [info.position[0] - dz * side, info.position[1] + dx * side]);
       const fresh = await worldGeometry(id); path = fresh.path?.length ? fresh.path : [goal]; goal = path.at(-1); waypoint = 0; lastProgress = Date.now();
       log('navigation-replan', { id, position: info.position });
     }
-    await page.waitForTimeout(160);
+    await page.waitForTimeout(60);
   }
+  await releaseKeys();
   throw new Error(`Walking timed out for ${id}: ${JSON.stringify(await inspect())}`);
 }
 
 async function interact(id, { settleAfter = true } = {}) {
   const object = await walkTo(id);
   stage = `interact:${id}`;
+  // Step closer until this, and not a neighbouring object, is what E would use.
+  for (const until = Date.now() + 2500; (await inspect()).nearby !== id && Date.now() < until;) {
+    const info = await inspect(); await steer(info.position, [object.x, object.z], false); await page.waitForTimeout(60);
+  }
+  await releaseKeys();
   if((await inspect()).nearby===id) await page.keyboard.press('e');
   else {const p=await page.evaluate(id=>{const w=window.__ohmdal.world,o=w.getInteractions().find(o=>o.id===id),p=w.getScreenPosition(o),r=w.canvas.getBoundingClientRect();return {x:p.x+r.left,y:p.y+r.top};},id);await page.mouse.click(p.x,p.y);}
   log('interact', { area: (await inspect()).area, id });

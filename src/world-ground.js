@@ -87,7 +87,7 @@ function subtractIntervals(start,end,cuts){
 export function buildPlayableBoundary(world) {
   if(world.area.id==='workshop')return;
   const [w,d]=world.bounds,segment=.8,barriers=[],buildings=architectureClearances(world),runs=[];
-  const doorways=(world.area.exits||[]).filter(e=>Math.abs(e.z)>d/2-3.5&&Math.abs(e.x)<4);
+  const doorways=(world.area.exits||[]).filter(e=>Math.abs(e.z)>d/2-3.5&&Math.abs(e.x)<w/2-3);
   const append=(x,z,width,depth,alongX)=>{
     const previous=runs.at(-1),gap=previous?(alongX?x-width/2-previous.x-previous.w/2:z-depth/2-previous.z-previous.d/2):Infinity;
     if(previous&&previous.alongX===alongX&&gap<=1e-7&&gap>-.03&&((alongX&&Math.abs(previous.z-z)<1e-7)||(!alongX&&Math.abs(previous.x-x)<1e-7))){
@@ -118,7 +118,8 @@ export function buildPlayableBoundary(world) {
   for(const side of [-1,1]){
     const nx=Math.ceil(w/segment),nz=Math.ceil(d/segment);
     if(!world.continuous||!doorways.some(e=>Math.sign(e.z)===side))for(let i=0;i<nx;i++)add(-w/2+(i+.5)*w/nx,side*(d/2-.45),w/nx+.01,.34);
-    for(let i=0;i<nz;i++)add(side*(w/2-.45),-d/2+(i+.5)*d/nz,.34,d/nz+.01);
+    // The Portal's garden ends at the canal: its coping is the eastern edge, not another wall.
+    if(!(world.area.id==='portal'&&side>0))for(let i=0;i<nz;i++)add(side*(w/2-.45),-d/2+(i+.5)*d/nz,.34,d/nz+.01);
   }
   for(const b of runs){const height=b.z>d/2-1?.55:.9;world.box(b.x,height/2,b.z,b.w,height,b.d,world.m.stoneDark).name='playable-garden-wall';world.box(b.x,height+.035,b.z,b.w+.035,.09,b.d+.035,world.m.stone).name='garden-wall-cap';barriers.push(world.solid(b.x,b.z,b.w,b.d,'playable-boundary'));}
   // Paired short piers make each actual passage read as an entrance, not a cut road.

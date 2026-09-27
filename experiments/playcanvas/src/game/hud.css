@@ -1,0 +1,59 @@
+/* The travelling HUD: a brass instrument and a few words over the world, no web panels.
+   Loaded last; #hud-scoped selectors outrank the earlier layout experiments. */
+#hud #travel-instrument{inset:max(18px,env(safe-area-inset-top)) auto auto max(20px,env(safe-area-inset-left));width:auto;max-width:min(430px,calc(100vw - 180px));grid-template-columns:92px minmax(0,1fr);gap:0 14px;padding:0;align-items:center;background:none;border:0;border-radius:0;box-shadow:none;pointer-events:none}
+#hud #travel-instrument::before{content:'';position:absolute;inset:-40px -90px -30px -40px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 22% 38%,#0b1c1ecc 0%,#0b1c1e80 38%,transparent 72%)}
+#hud #travel-compass{width:92px;height:92px;pointer-events:auto;filter:drop-shadow(0 4px 10px #0009)}
+#hud .compass-rim{fill:#8a6d3b;stroke:#f0d79a;stroke-width:1.4}
+#hud .compass-face{fill:#e8dcbc}
+#hud #travel-daymark circle{fill:#f6cf6f;stroke:#7a5a22;stroke-width:1}
+#hud #travel-daymark[data-night] circle{fill:#dfe8f5;stroke:#51607a}
+#hud .day-arc{fill:none;stroke:#f3dca1;stroke-width:2.2;stroke-dasharray:1 3.2;opacity:.55}
+#hud #travel-instrument .place{text-shadow:0 2px 8px #061416,0 0 2px #061416}
+#hud #travel-instrument .place .eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#e0cf9f;opacity:1}
+#hud #travel-instrument .place h2{font-size:33px;line-height:1.02;margin:2px 0 5px;color:#fff3da;opacity:1}
+#hud #travel-instrument .travel-time{font-size:12px;color:#e9dfc6;gap:6px}
+#hud #travel-instrument #travel-sky{font-size:14px}
+#hud #travel-instrument #travel-day{font-size:11px;color:#c9d2c4}
+#hud #travel-instrument .objective{grid-column:1/-1;margin:12px 0 0;padding:0;border:0;gap:8px;align-items:flex-start;pointer-events:auto;text-shadow:0 2px 7px #061416,0 0 2px #061416}
+#hud #travel-instrument .objective-glyph{font-size:15px;padding-top:3px;color:#f0cf86}
+#hud #travel-instrument #objective-toggle{min-height:32px;gap:10px;justify-content:flex-start}
+#hud #travel-instrument #objective-title{font-size:20px;line-height:1.15;color:#fbeed2}
+#hud #travel-instrument .objective-fold{font-size:13px;color:#e0c68d}
+#hud #travel-instrument .objective small{font-size:13px;line-height:1.55;margin:3px 0 0;max-width:340px;color:#eee6d3}
+#hud #travel-instrument .objective.folded{opacity:.9}
+#hud #travel-instrument #travel-bearing{grid-column:1/-1;font-size:12px;padding:2px 0 0 23px;color:#bfe3d3;text-shadow:0 1px 6px #061416}
+#hud.settled #travel-instrument #travel-bearing{opacity:0;transition:opacity 1.2s}
+#hud.settled #travel-instrument{opacity:1}
+
+/* Tools: four small brass buttons in the top-right corner, each with its key. */
+#hud-tools{position:absolute;top:max(20px,env(safe-area-inset-top));right:max(22px,env(safe-area-inset-right));display:flex;gap:10px;pointer-events:auto}
+#hud-tools .icon-button{width:42px;height:42px;min-height:42px;padding:0;border-radius:50%;clip-path:none;display:grid;place-items:center;color:#f1dcaa;background:radial-gradient(circle at 35% 30%,#2f4a44,#142826 70%);border:1.5px solid #c9a868;box-shadow:0 3px 10px #0008,inset 0 0 0 2px #0b1a1a66}
+#hud-tools .icon-button::before{display:none}
+#hud-tools .icon-button:hover,#hud-tools .icon-button:focus-visible{background:radial-gradient(circle at 35% 30%,#46655b,#1d3834 70%);color:#fff2cf}
+#hud-tools .icon-button svg{width:19px;height:19px;margin:0}
+#hud-tools .tool-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#hud-tools .icon-button kbd{display:block;position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);border:0;padding:0;font-size:9px;color:#e9dfc6;text-shadow:0 1px 4px #000}
+#hud-tools .icon-button i{top:1px;right:1px}
+.conversing #hud-tools{visibility:hidden;pointer-events:none}
+#hud.settled #hud-tools{opacity:.85}#hud.settled #hud-tools:hover,#hud.settled #hud-tools:focus-within{opacity:1}
+
+/* The key reminder fades once the traveller has settled in. */
+#hud .hud-bottom #control-reminder,#hud .hud-bottom #save-indicator{background:none;padding:0;text-shadow:0 1px 5px #061416}
+#hud.settled .hud-bottom #control-reminder{opacity:0;transition:opacity 1.5s}
+
+@media(max-width:640px),(pointer:coarse){
+  #hud #travel-instrument{max-width:calc(100vw - 120px);grid-template-columns:64px minmax(0,1fr);gap:0 10px;inset:max(10px,env(safe-area-inset-top)) auto auto 10px}
+  #hud #travel-compass{width:64px;height:64px}
+  #hud #travel-instrument .place h2{font-size:24px}
+  #hud #travel-instrument .place .eyebrow{display:none}
+  #hud #travel-instrument #objective-title{font-size:17px}
+  #hud #travel-instrument .objective small{font-size:12px}
+  #hud #travel-instrument #travel-bearing{display:none}
+  #hud-tools{display:grid;grid-template-columns:repeat(2,44px);gap:8px;top:max(10px,env(safe-area-inset-top));right:10px}
+  #hud-tools .icon-button{width:44px;height:44px}
+  #hud-tools .icon-button kbd{display:none}
+}
+@media(max-height:520px) and (min-width:641px){
+  #hud #travel-compass{width:66px;height:66px}#hud #travel-instrument{grid-template-columns:66px minmax(0,1fr)}
+  #hud #travel-instrument .place h2{font-size:24px}#hud #travel-instrument .objective small{display:none}
+}
