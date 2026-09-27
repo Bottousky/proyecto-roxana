@@ -121,7 +121,15 @@ export function buildPlayableBoundary(world) {
     // The Portal's garden ends at the canal: its coping is the eastern edge, not another wall.
     if(!(world.area.id==='portal'&&side>0))for(let i=0;i<nz;i++)add(side*(w/2-.45),-d/2+(i+.5)*d/nz,.34,d/nz+.01);
   }
-  for(const b of runs){const height=b.z>d/2-1?.55:.9;world.box(b.x,height/2,b.z,b.w,height,b.d,world.m.stoneDark).name='playable-garden-wall';world.box(b.x,height+.035,b.z,b.w+.035,.09,b.d+.035,world.m.stone).name='garden-wall-cap';barriers.push(world.solid(b.x,b.z,b.w,b.d,'playable-boundary'));}
+  // A village edge is a rustic fence; elsewhere the low garden wall remains.
+  const fenced=world.layout?.boundary==='fence';
+  for(const b of runs){
+    if(fenced){const length=Math.max(b.w,b.d),along=b.w>b.d,steps=Math.max(1,Math.round(length/1.6));
+      for(let i=0;i<=steps;i++){const t=(i/steps-.5)*length;world.box(b.x+(along?t:0),.42,b.z+(along?0:t),.13,.84,.13,world.m.darkwood).name='playable-fence-post';}
+      for(const h of [.34,.66])world.box(b.x,h,b.z,along?b.w:.07,.07,along?.07:b.d,world.m.wood).name='playable-fence-rail';
+      world.box(b.x,.05,b.z,b.w,.1,b.d,world.m.darkwood).name='playable-fence-sill';
+      barriers.push(world.solid(b.x,b.z,b.w,b.d,'playable-boundary'));continue;}
+    const height=b.z>d/2-1?.55:.9;world.box(b.x,height/2,b.z,b.w,height,b.d,world.m.stoneDark).name='playable-garden-wall';world.box(b.x,height+.035,b.z,b.w+.035,.09,b.d+.035,world.m.stone).name='garden-wall-cap';barriers.push(world.solid(b.x,b.z,b.w,b.d,'playable-boundary'));}
   // Paired short piers make each actual passage read as an entrance, not a cut road.
   for(const e of world.continuous?[]:doorways)for(const side of [-1,1]){
     const x=e.x+side*2.65,z=Math.sign(e.z)*(d/2-.45);

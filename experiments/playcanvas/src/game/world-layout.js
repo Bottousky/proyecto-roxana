@@ -33,6 +33,7 @@ export const AREA_LAYOUTS = {
   },
   plaza: {
     identity: 'Un circuito alrededor de la fuente y calles cortas que terminan en puertas visibles.',
+    boundary: 'fence',
     paths: [
       path('south-arrival', 2.8, [0, 14], [0, 8.5], [0, 3.5]),
       path('fountain-circuit', 2.65, [0, 3.5], [-4.3, .1], [-4.3, -4.5], [0, -7.15], [4.3, -4.5], [4.3, .1], [0, 3.5]),
@@ -57,6 +58,15 @@ export const AREA_LAYOUTS = {
       { ...building('plaza-market', 'Mercado', 14.8, 3, 4.8, 4.6, 3.6, {awning:true,red:true}), composition: 'Pabellón bajo del este, enteramente dentro del jardín; la puerta mira al paseo sur y las provisiones quedan al costado.' },
     ],
     landmarks: [{ id: 'fountain', label: 'Fuente de Ohm', x: 0, z: -2 }],
+    // The rest of the village, beyond the playable square: low houses facing the Plaza, off every road.
+    backdrop: [
+      { x: -28, z: -5, w: 5, d: 4.2, h: 3.6, options: { stone: true, rotation: Math.PI / 2 } },
+      { x: -29, z: 7, w: 4.6, d: 4, h: 3.4, options: { red: true, rotation: Math.PI / 2 } },
+      { x: -34, z: -14, w: 4.4, d: 3.8, h: 3.3, options: { rotation: Math.PI / 2 } },
+      { x: -24, z: -19, w: 5.2, d: 4.4, h: 3.8, options: { red: true } },
+      { x: -12, z: -25, w: 4.6, d: 4, h: 3.5, options: { stone: true } },
+      { x: -1, z: -28, w: 5, d: 4.2, h: 3.6, options: {} },
+    ],
     exclusions: [],
     adjustments: [
       { id: 'plaza-crates', reason: 'Almacén junto al costado este, fuera de la fachada y su explanada', positions: [[-7.7, 0], [-7.7, .8], [-6.9, 0], [-6.9, .8]] },

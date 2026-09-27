@@ -29,6 +29,7 @@ export function buildCollisionWorld(id,{flags={},spawn,state:savedState,continuo
   };
   world.loadArea(AREAS[id],state,spawn??savedState?.position,{continuous});
   world.root.updateMatrixWorld(true);
-  world.auditBuildings=buildings;
+  // Backdrop houses beyond the playable ground are scenery, not audited buildings.
+  world.auditBuildings=buildings.filter(b=>b.group.userData.architecture);
   return world;
 }
