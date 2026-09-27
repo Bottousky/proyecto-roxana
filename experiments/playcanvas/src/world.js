@@ -289,9 +289,8 @@ export class PlayCanvasWorld {
     this.syncActors();this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
     else{const rest=gameplayCameraPose(this.area.id,p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
-      // Conversations: frame both speakers above the dialogue panel and lean in slightly.
-      const talk=this.inhabitantConversation&&this.area.id!=='workshop'&&!this.inspect?this.speaking?.actor||this.speakerActor(this.inhabitantConversation.target):null;
-      if(talk&&talk!==this.playerActor){const q=talk.g.position;wanted.set((p.x+q.x)/2+ox,1.5,(p.z+q.z)/2+2.4+oz);rest.zoom=1.1;}this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
+      // Conversations keep the camera where the interaction began: the portrait says who speaks.
+      this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
     this.positionCamera();this.focusFrame();
   }
   // The current speaker gives a small hop as each of their lines begins.
