@@ -578,7 +578,7 @@ export const AREAS = {
   spring: {
     id: 'spring', name: 'El Manantial', subtitle: 'Lo que comienza lejos de su consecuencia', theme: 'spring', bounds: [34, 30], spawn: [0, 10], entryDialogue: 'spring_arrival',
     objects: [
-      npc('vega_spring', 4, 5, 'vega', 'vega_spring', { flag: 'pump', afterDialogue: 'spring_after' }),
+      npc('vega_spring', -4.2, -1.4, 'vega', 'vega_spring', { flag: 'pump', afterDialogue: 'spring_after' }),
       lever('spring_sluice', -6.5, 2, 'Desviar el agua hacia la rueda', 'spring_sluice', 'El canal conduce el agua hacia los álabes de la rueda.', 'El agua vuelve al desvío y deja de impulsar la rueda.'),
       lever('spring_coupling', 7.5, -1, 'Acoplar la rueda al generador', 'spring_coupling', 'El eje de la rueda queda unido al generador.', 'El generador queda separado de la rueda.'),
       panel('pump_panel', 2.5, -5.5, 'Caja de conexiones de la bomba', 'pump', ['spring_drive'], 'pump_locked', 'spring_after'),
@@ -590,7 +590,7 @@ export const AREAS = {
   castle: {
     id: 'castle', name: 'Castillo de la Red', subtitle: 'La confianza también necesita evidencia', theme: 'castle', bounds: [40, 32], spawn: [0, 11], entryDialogue: 'castle_arrival', initialFlags: { castle_branch_closed: true },
     objects: [
-      npc('consejera', 4, 3, 'consejera', 'consejera_before', { flag: 'distribution', afterDialogue: 'consejera_after' }),
+      npc('consejera', 4.2, -6.4, 'consejera', 'consejera_before', { flag: 'distribution', afterDialogue: 'consejera_after' }),
       npc('edda_castle', -9.2, -3.6, 'edda', 'castle_edda'),
       { id: 'castle_isolated', kind: 'lever', x: -8, z: -1, label: 'Conexión del archivo oeste', flag: 'castle_branch_closed', action: { type: 'toggle', flag: 'castle_branch_closed', onLabel: 'Conectar el archivo oeste', offLabel: 'Separar el archivo oeste', onText: 'El cierre une de nuevo el archivo con la red. El indicador del tablero queda oscuro.', offText: 'Los contactos del archivo quedan separados a la vista.' } },
       lever('castle_service', 8, -1, 'Conectar los servicios del Castillo', 'castle_service', 'El cierre de enfermería y cocina queda unido.', 'El cierre de enfermería y cocina queda separado.'),
@@ -604,7 +604,7 @@ export const AREAS = {
     id: 'terraces', name: 'Las Terrazas', subtitle: 'La luz alcanza a quienes están aguas abajo', theme: 'terraces', bounds: [40, 36], spawn: [0, 13], entryDialogue: 'terraces_arrival',
     objects: [
       npc('yesca', -11.4, -11.2, 'yesca', 'yesca_before', { flag: 'irrigation', afterDialogue: 'yesca_after' }),
-      npc('vega_terraces', 5.5, 5, 'vega', 'vega_terraces', { flag: 'irrigation', afterDialogue: 'vega_after' }),
+      npc('vega_terraces', 7.6, 4.2, 'vega', 'vega_terraces', { flag: 'irrigation', afterDialogue: 'vega_after' }),
       lever('forge_limited', -9.4, -12.3, 'Pasar el horno a la mesa compartida', 'forge_limited', 'El horno queda en el tablero de Vega: su calor se reparte junto con el riego.', 'El horno vuelve a su palanca propia, a demanda alta.'),
       lever('irrigation_open', 9.8, -12.3, 'Abrir el canal de los bancales', 'irrigation_open', 'El agua puede alcanzar los bancales cuando la bomba sostenga su trabajo.', 'El canal de los bancales queda cerrado.'),
       panel('irrigation_panel', 1, -6, 'Tablero de calor y riego', 'irrigation', ['water_routed'], 'irrigation_locked', 'vega_after'),
