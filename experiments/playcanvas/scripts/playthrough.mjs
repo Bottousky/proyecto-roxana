@@ -196,14 +196,18 @@ async function walkTo(id) {
   throw new Error(`Walking timed out for ${id}: ${JSON.stringify(await inspect())}`);
 }
 
-async function interact(id, { settleAfter = true } = {}) {
-  const object = await walkTo(id);
-  stage = `interact:${id}`;
-  // Step closer until this, and not a neighbouring object, is what E would use.
+// Step closer until this, and not a neighbouring object, is what E would use.
+async function approach(id, object) {
   for (const until = Date.now() + 2500; (await inspect()).nearby !== id && Date.now() < until;) {
     const info = await inspect(); await steer(info.position, [object.x, object.z], false); await page.waitForTimeout(60);
   }
   await releaseKeys();
+}
+
+async function interact(id, { settleAfter = true } = {}) {
+  const object = await walkTo(id);
+  stage = `interact:${id}`;
+  await approach(id, object);
   if((await inspect()).nearby===id) await page.keyboard.press('e');
   else {const p=await page.evaluate(id=>{const w=window.__ohmdal.world,o=w.getInteractions().find(o=>o.id===id),p=w.getScreenPosition(o),r=w.canvas.getBoundingClientRect();return {x:p.x+r.left,y:p.y+r.top};},id);await page.mouse.click(p.x,p.y);}
   log('interact', { area: (await inspect()).area, id });
@@ -220,6 +224,7 @@ async function operate(id, desired) {
 
 async function fieldToggle(id, desired) {
   const object = await walkTo(id);
+  await approach(id, object);
   stage = `field-measurement:${id}`;
   assert.notEqual(Boolean((await inspect()).flags[object.action.flag]), desired, 'The field probe observes a real change of control');
   await page.keyboard.press('q');

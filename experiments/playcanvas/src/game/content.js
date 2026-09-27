@@ -554,8 +554,8 @@ export const AREAS = {
     id: 'workshop', name: 'El taller de Lumen', subtitle: 'Una receta aprende a explicar sus motivos', theme: 'workshop', bounds: [24, 24], spawn: [0, 8], entryDialogue: 'workshop_arrival',
     objects: [
       npc('lumen', -3.5, 1.5, 'lumen', 'lumen_before', { flag: 'workshop', afterDialogue: 'lumen_after' }),
-      lever('workshop_feed', -7, 4, 'Ajustar el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo encaja con un clic.', 'El cierre izquierdo queda separado.'),
-      lever('workshop_return', 7, 4, 'Ajustar el cierre derecho', 'workshop_return', 'El cierre derecho encaja con un clic.', 'El cierre derecho queda separado.'),
+      lever('workshop_feed', -.9, -.5, 'Ajustar el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo encaja con un clic.', 'El cierre izquierdo queda separado.'),
+      lever('workshop_return', 6.9, -.5, 'Ajustar el cierre derecho', 'workshop_return', 'El cierre derecho encaja con un clic.', 'El cierre derecho queda separado.'),
       panel('workbench', 3, -3, 'La lámpara del banco', 'workshop', ['bench_ready'], 'workshop_locked', 'workshop_bench_after'),
       lore('workshop_note', -7, -4.5, 'Cuatro manos sobre un esquema', 'workshop_note'),
       secret('workshop_cup', 8, -6, 'La taza que espera', 'workshop_cup'),
@@ -591,10 +591,10 @@ export const AREAS = {
     id: 'castle', name: 'Castillo de la Red', subtitle: 'La confianza también necesita evidencia', theme: 'castle', bounds: [40, 32], spawn: [0, 11], entryDialogue: 'castle_arrival', initialFlags: { castle_branch_closed: true },
     objects: [
       npc('consejera', 4, 3, 'consejera', 'consejera_before', { flag: 'distribution', afterDialogue: 'consejera_after' }),
-      npc('edda_castle', -4, 6, 'edda', 'castle_edda'),
+      npc('edda_castle', -9.2, -3.6, 'edda', 'castle_edda'),
       { id: 'castle_isolated', kind: 'lever', x: -8, z: -1, label: 'Conexión del archivo oeste', flag: 'castle_branch_closed', action: { type: 'toggle', flag: 'castle_branch_closed', onLabel: 'Conectar el archivo oeste', offLabel: 'Separar el archivo oeste', onText: 'El cierre une de nuevo el archivo con la red. El indicador del tablero queda oscuro.', offText: 'Los contactos del archivo quedan separados a la vista.' } },
       lever('castle_service', 8, -1, 'Conectar los servicios del Castillo', 'castle_service', 'El cierre de enfermería y cocina queda unido.', 'El cierre de enfermería y cocina queda separado.'),
-      panel('distribution_panel', 0, -6, 'Tablero de los servicios del Castillo', 'distribution', ['castle_ready'], 'distribution_locked', 'consejera_after'),
+      panel('distribution_panel', 6.4, -9.5, 'Tablero de los servicios del Castillo', 'distribution', ['castle_ready'], 'distribution_locked', 'consejera_after'),
       lore('castle_archive', -11, -6, 'Cartas sin respuesta', 'castle_archive'),
       secret('castle_hidden', 11, -6.5, 'El reverso del estandarte', 'castle_hidden'),
     ],
@@ -603,10 +603,10 @@ export const AREAS = {
   terraces: {
     id: 'terraces', name: 'Las Terrazas', subtitle: 'La luz alcanza a quienes están aguas abajo', theme: 'terraces', bounds: [40, 36], spawn: [0, 13], entryDialogue: 'terraces_arrival',
     objects: [
-      npc('yesca', -5.5, 5, 'yesca', 'yesca_before', { flag: 'irrigation', afterDialogue: 'yesca_after' }),
+      npc('yesca', -11.4, -11.2, 'yesca', 'yesca_before', { flag: 'irrigation', afterDialogue: 'yesca_after' }),
       npc('vega_terraces', 5.5, 5, 'vega', 'vega_terraces', { flag: 'irrigation', afterDialogue: 'vega_after' }),
-      lever('forge_limited', -8, 0, 'Pasar el horno a la mesa compartida', 'forge_limited', 'El horno queda en el tablero de Vega: su calor se reparte junto con el riego.', 'El horno vuelve a su palanca propia, a demanda alta.'),
-      lever('irrigation_open', 8, 0, 'Abrir el canal de los bancales', 'irrigation_open', 'El agua puede alcanzar los bancales cuando la bomba sostenga su trabajo.', 'El canal de los bancales queda cerrado.'),
+      lever('forge_limited', -9.4, -12.3, 'Pasar el horno a la mesa compartida', 'forge_limited', 'El horno queda en el tablero de Vega: su calor se reparte junto con el riego.', 'El horno vuelve a su palanca propia, a demanda alta.'),
+      lever('irrigation_open', 9.8, -12.3, 'Abrir el canal de los bancales', 'irrigation_open', 'El agua puede alcanzar los bancales cuando la bomba sostenga su trabajo.', 'El canal de los bancales queda cerrado.'),
       panel('irrigation_panel', 1, -6, 'Tablero de calor y riego', 'irrigation', ['water_routed'], 'irrigation_locked', 'vega_after'),
       lore('terraces_marker', -9, -6.5, 'Un turno para cada nombre', 'terraces_marker'),
       secret('terraces_secret', 11, 7.5, 'El octavo intento', 'terraces_secret'),
@@ -616,12 +616,12 @@ export const AREAS = {
   lake: {
     id: 'lake', name: 'Lago de las Señales', subtitle: 'Una luz para encontrar el regreso', theme: 'lake', bounds: [40, 34], spawn: [0, 12], entryDialogue: 'lake_arrival',
     objects: [
-      npc('nereo_lake', 4, 5, 'nereo', 'nereo_lake'),
+      npc('nereo_lake', 9.5, 3.2, 'nereo', 'nereo_lake'),
       npc('edda_lake', -5, 6, 'edda', 'lake_edda'),
       lever('lake_cable', -8, 0, 'Fijar el suministro del muelle', 'lake_cable', 'La línea que alimenta el Faro queda asegurada en su bornera.', 'El suministro del Faro queda abierto en el muelle.'),
       lever('lake_return', 8, -3, 'Conectar el retorno entre las cañas', 'lake_return', 'El retorno se une a la línea sumergida. Su baliza responde.', 'El retorno del Faro queda interrumpido en la orilla.'),
       lore('lake_boat', -10, -6, 'La barca de las tres maderas', 'lake_boat'),
-      secret('lake_secret', 3, 9.5, 'Una luz hacia tierra', 'lake_secret'),
+      secret('lake_secret', 5.4, 5.2, 'Una luz hacia tierra', 'lake_secret'),
     ],
     exits: [exit('lake_to_terraces', 0, 15, 'terraces', 'Las Terrazas', [], null, [0, -13]), exit('lake_to_lighthouse', 0, -15, 'lighthouse', 'El Faro', ['beacon_link'], 'lake_exit_locked')],
   },

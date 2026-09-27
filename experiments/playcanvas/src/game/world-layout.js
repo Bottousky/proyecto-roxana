@@ -122,7 +122,7 @@ export const AREA_LAYOUTS = {
     waters: [{ id: 'spring-channel', label: 'Manantial', points: [[-14.81, -14.5], [-8.31, -14.5], [-8.31, 10.5], [-14.81, 10.5]] }],
   },
   castle: {
-    identity: 'Un patio de servicio se abre en dos recorridos antes de reunirse en la puerta del Castillo.',
+    identity: 'Un patio de servicio se abre en dos recorridos antes de reunirse en la puerta del Castillo; el tablero cuelga de la muralla, junto al portón.',
     paths: [
       path('castle-arrival', 2.8, [0, 14], [0, 8], [0, 2]),
       path('west-courtyard-loop', 2.65, [0, 2], [-4.3, -1], [-4.3, -8.8], [0, -9.6]),
@@ -130,14 +130,13 @@ export const AREA_LAYOUTS = {
       path('castle-gate', 2.8, [0, -9.6], [0, -14]),
       path('west-service', 2.1, [-4.3, -1], [-8, .4], [-9.5, -2.3], [-9.5, -4.7], [-11, -7.25]),
       path('east-service', 2.1, [4.3, -1], [8, .4], [9.5, -2.3], [9.5, -5.3], [11, -7.75]),
-      path('distribution-approach', 2, [-4.3, -3.9], [0, -4.45], [4.3, -3.9]),
     ],
     courts: [rect('arrival-court', 0, 4.4, 17, 7.6), rect('service-court', 0, -2.9, 18.6, 8.2), rect('gate-forecourt', 0, -9.1, 16, 2.8)],
     buildings: [], landmarks: [{ id: 'castle', label: 'Castillo de la Red', x: 0, z: -12.8 }],
     exclusions: [rect('west-castle-wall', -9.3, -12.8, 14.6, 3.5), rect('east-castle-wall', 9.3, -12.8, 14.6, 3.5), rect('west-castle-tower', -14.4, -10.88, 5.6, 5.6), rect('east-castle-tower', 14.4, -10.88, 5.6, 5.6)],
   },
   terraces: {
-    identity: 'Los corredores de los bancales explican el riego; la calle alta une ambas casas.',
+    identity: 'Bancales en escalón bajan de la loma; arriba, la forja y el molino comparten la mesa del medio.',
     paths: [
       path('terrace-spine', 2.65, [0, 16], [0, 10], [-1, 5], [-2.6, 1.5], [-2.6, -8.8], [0, -11], [0, -16]),
       path('west-work-lane', 2.1, [-1, 5], [-5.5, 5], [-6.5, 2], [-6.5, -9], [-7, -10.25]),
@@ -149,7 +148,6 @@ export const AREA_LAYOUTS = {
       path('east-upper-bed-aisle', 1.55, [6.5, -4.43], [17.2, -4.43]),
       path('west-lower-bed-aisle', 1.55, [-6.5, 1.2], [-11.6, 1.07], [-17.2, 1.07]),
       path('east-lower-bed-aisle', 1.55, [6.5, 1.2], [11.6, 1.07], [17.2, 1.07]),
-      path('control-apron', 1.8, [-8, 1.4], [-6.5, 2], [0, 2], [6.5, 2], [8, 1.4]),
       path('irrigation-panel-approach', 1.9, [-2.6, -3.6], [1, -3.9]),
       path('trial-garden', 2, [5.5, 5], [8.5, 6.6], [11, 8.8]),
     ],

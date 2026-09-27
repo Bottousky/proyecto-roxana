@@ -419,7 +419,6 @@ export class World {
     this.gateway=buildGateway(this,w,d);
     this.banner(-4,-d*.31,5.4);this.banner(4,-d*.31,5.4);
     for(let z=-3;z<d*.43;z+=8)this.lamp(-5.4,z);
-    for(let z=-3;z<d*.43;z+=4)this.fence(w*.31,z,3,false);
     // The canal continues into the landscape; its water cannot end as a rectangle on grass.
     this.water(ROAD_CANAL_X,.065,0,4,150).name='road-continuous-canal';
     for(const side of [-1,1]){
@@ -445,31 +444,30 @@ export class World {
       for(let i=0;i<=8;i++){const a=Math.PI*i/8,v=this.box(Math.cos(a)*2.12,3.3+Math.sin(a)*2.12,-d*.4+1.78,.34,.5,.1,this.m.cream);v.rotation.z=a-Math.PI/2;}
       const grid=this.group(0,0,-d*.4+.6);grid.name='castle-portcullis';for(let x=-1.75;x<=1.76;x+=.5){this.box(x,4.55,0,.09,1.5,.09,this.m.metal,grid);this.mesh('cone',this.m.metal,x,3.72,0,.07,.18,.07,grid).rotation.x=Math.PI;}for(const y of [4.15,4.75])this.box(0,y,0,3.7,.08,.08,this.m.metal,grid);}
     this.box(-2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.box(2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.gear(-3,3.2,-d*.4+1.9,.7);this.gear(3,3.2,-d*.4+1.9,.7);
-    for(let i=0;i<4;i++){for(const side of [-1,1])this.solid(side*w*.43,i*3-4,1.1,2.7,"castle-buttress");this.box(-w*.43,1.3,i*3-4,1.1,2.6,2.7,this.m.stone);this.box(w*.43,1.3,i*3-4,1.1,2.6,2.7,this.m.stone);}
     for(const x of [-11,11]){this.lamp(x,6,4);this.lamp(x,-4,4);this.pot(x,9,.65);}
     this.banner(-6,8,4);this.banner(6,8,4);this.cable([[-12,.17,-5],[0,.17,-5],[12,.17,-5]],this.m.brass);
   }
   buildTerraces(w,d){
     this.irrigationWater=[];
     for(const side of [-1,1])for(let row=0;row<3;row++){
-      const x=side*w*.36,z=-d*.28+2.9+row*5.5;this.solid(x,z,8,3.5,"terrace-bed");this.box(x,.3+row*.18,z,8,.65,3.5,this.m.stone);this.box(x,.67+row*.18,z,7.6,.1,3.1,this.m.darkwood);
-      for(let k=0;k<20;k++){const xx=x-3.3+(k%10)*.72,zz=z-.8+Math.floor(k/10)*1.5;this.beam([xx,.8,zz],[xx,1.55+row*.18,zz],.025,this.m.darkwood);const leaf=this.mesh('plane',row%2?this.m.foliage:this.m.fern,xx,1.25+row*.18,zz,.72,.85,1);leaf.rotation.y=.3;leaf.name='terrace-crop';const leaf2=this.mesh('plane',this.m.fern,xx,1.1+row*.18,zz,.75,.65,1);leaf2.rotation.y=1.8;leaf2.name='terrace-crop';if(row===1&&k%2===0)this.sphere(xx+.1,1.1+row*.18,zz+.2,.065,this.m.roofRed);}
-      for(let k=0;k<5;k++){this.cylinder(x-3.3+k*1.65,1.45+row*.18,z-.7,.035,1.7,this.m.wood);}for(let y of [1.4,2.0])this.beam([x-3.5,y+row*.18,z-.7],[x+3.5,y+row*.18,z-.7],.025,this.m.darkwood);
-      const channel=this.water(x,.73+row*.18,z+1.1,7.6,.35);this.irrigationWater.push(channel);
+      const x=side*w*.36,z=-d*.28+2.9+row*5.5,lift=row*.42;this.solid(x,z,8,3.5,"terrace-bed");this.box(x,(.65+lift)/2,z,8,.65+lift,3.5,this.m.stone).name='terrace-retaining-wall';this.box(x,.67+lift,z,7.6,.1,3.1,this.m.darkwood);
+      for(let k=0;k<20;k++){const xx=x-3.3+(k%10)*.72,zz=z-.8+Math.floor(k/10)*1.5;this.beam([xx,.8,zz],[xx,1.55+lift,zz],.025,this.m.darkwood);const leaf=this.mesh('plane',row%2?this.m.foliage:this.m.fern,xx,1.25+lift,zz,.72,.85,1);leaf.rotation.y=.3;leaf.name='terrace-crop';const leaf2=this.mesh('plane',this.m.fern,xx,1.1+lift,zz,.75,.65,1);leaf2.rotation.y=1.8;leaf2.name='terrace-crop';if(row===1&&k%2===0)this.sphere(xx+.1,1.1+lift,zz+.2,.065,this.m.roofRed);}
+      for(let k=0;k<5;k++){this.cylinder(x-3.3+k*1.65,1.45+lift,z-.7,.035,1.7,this.m.wood);}for(let y of [1.4,2.0])this.beam([x-3.5,y+lift,z-.7],[x+3.5,y+lift,z-.7],.025,this.m.darkwood);
+      const channel=this.water(x,.73+lift,z+1.1,7.6,.35);this.irrigationWater.push(channel);
     }
     for(const [x,z] of [[-4.7,-10.8],[4.7,-2.8],[-4.7,5.2],[4.7,13.2]])this.lamp(x,z,2.8);
-    for(let z=-d*.3;z<d*.4;z+=5)this.fence(w*.46,z,4,false);
     const mill=this.layout.buildings.find(b=>b.id==='terrace-mill');
     this.beam([mill.x,mill.height+1.05,mill.z+mill.d/2-.1],[mill.x,mill.height+1.05,mill.z+mill.d/2+.52],.18,this.m.metal).name='mill-drive-shaft';
     const blades=this.group(mill.x,mill.height+1.05,mill.z+mill.d/2+.45);blades.name='mill-sails';blades.scale.setScalar(.68);this.cylinder(0,0,0,.22,.35,this.m.brass,blades).rotation.x=Math.PI/2;for(let i=0;i<4;i++){const g=this.group(0,0,0,blades);g.rotation.z=i*Math.PI/2;this.box(0,1.9,0,.15,3.8,.14,this.m.darkwood,g);this.box(.43,2.65,-.05,.82,1.5,.045,this.m.cloth,g);for(let j=0;j<6;j++)this.box(.45,.7+j*.45,0,.85,.2,.08,this.m.wood,g);}this.animations.push({kind:'wheel',obj:blades,speed:.23});
   }
   buildLake(w,d){
     this.box(w*.23,.10,3,9,.24,4.5,this.m.wood);this.fence(w*.23,5.1,9,true);this.fence(w*.23,.9,9,true);
-    for(let z=-d*.45;z<d*.46;z+=2.2){if(!pointOnPaving(this.layout,w*.17,z,1))this.rock(w*.17,z,.6);}
+    // Rocks follow the real shoreline, irregularly, and leave the dock's landfall free.
+    for(let z=-d*.45,k=0;z<d*.46;z+=1.7+(k%3)*.6,k++){const x=lakeShoreX(z)-.7-(k%4)*.35;if(Math.abs(z-3)<3.2||pointOnPaving(this.layout,x,z,1))continue;this.rock(x,z,.35+(k%5)*.1);}
     if(!this.continuous){buildLighthouseIslet(this,w*.39,-d*.48,1.05);this.lighthouse(w*.39,-d*.48,1.05,false);}
     for(let x of [-6,5])this.lamp(x,6,3.6);this.boat(w*.37,6,1.2);this.boat(w*.38,-6,.9);
     for(let i=0;i<3;i++){this.barrel(-12+i*.95,7,.9);this.crate(-13+i*.8,9,.7);}
-    this.fence(-w*.42,4,10,false);
+
   }
   boat(x,z,s){const g=this.group(x,.18,z);const hull=this.mesh('sphere',this.m.darkwood,0,0,0,s*1.0,.3*s,s*2.3,g);this.box(0,.2,0,1.3*s,.15,3.5*s,this.m.wood,g);for(let zz of [-1,0,1])this.box(0,.37,zz*s,1.2*s,.13,.27*s,this.m.wood,g);this.cylinder(0,1.65,0,.055,3.3,this.m.darkwood,g);// A bellied triangular sail on a boom, cut from the kingdom's standard cloth.
     const cols=8,rows=10,pos=[],uv=[],idx=[];for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){const v=j/rows,u=i/cols*(1-v),x=u*1.55,y=.55+v*2.75;pos.push(x+.06,y,Math.sin(Math.PI*u/(1-v+1e-4))*Math.sin(Math.PI*Math.min(1,v*1.2+.1))*.28);uv.push(x/1.55,v);}
