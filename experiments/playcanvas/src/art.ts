@@ -1,5 +1,5 @@
 import {Asset,Application,Texture,TextureAtlas,Sprite,Vec2,Vec4,FILTER_LINEAR,FILTER_LINEAR_MIPMAP_LINEAR,FILTER_NEAREST,ADDRESS_REPEAT,ADDRESS_CLAMP_TO_EDGE,PIXELFORMAT_RGBA8} from 'playcanvas';
-import {opaqueBounds,actorFrameLayout} from './game/actor-animation.js';
+import {opaqueBounds,actorFrameLayout,isolateFigure} from './game/actor-animation.js';
 export const textures=new Map<string,Texture>();
 const images=new Map<string,Promise<HTMLImageElement>>();
 function image(url:string){if(!images.has(url))images.set(url,new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error('No se pudo cargar '+url));i.src=new URL('.'+url,document.baseURI).href;}));return images.get(url)!;}
@@ -36,9 +36,18 @@ export async function surface(app:Application,name:string){
   const urls:Record<string,string>={ground:'meadow.webp',workshopRug:'workshop-rug.webp',kingdomBanner:'kingdom-banner.webp'};
   return texture(app,name,await image('/assets/art-polish/'+urls[name]),name==='ground');
 }
+// A wider window than the grid cell, keyed, keeping only this cell's figure (see isolateFigure).
+function cropFigure(img:HTMLImageElement,col:number,row:number,cols:number,rows:number,margin=48){
+  const x0=Math.round(col*img.width/cols),y0=Math.round(row*img.height/rows),x1=Math.round((col+1)*img.width/cols),y1=Math.round((row+1)*img.height/rows);
+  const X0=Math.max(0,x0-margin),Y0=Math.max(0,y0-margin),w=Math.min(img.width,x1+margin)-X0,h=Math.min(img.height,y1+margin)-Y0;
+  const c=canvas(w,h),ctx=c.getContext('2d',{willReadFrequently:true})!;ctx.drawImage(img,X0,Y0,w,h,0,0,w,h);
+  const d=ctx.getImageData(0,0,w,h),p=d.data;
+  for(let i=0;i<p.length;i+=4){const m=Math.min(p[i],p[i+2])-p[i+1];if(m>50&&p[i]>95&&p[i+2]>90)p[i+3]=Math.min(p[i+3],Math.max(0,255-(m-50)*5));if(p[i+3]<30)p[i+3]=0;}
+  isolateFigure(p,w,h,{x0:x0-X0,x1:x1-X0,y0:y0-Y0,y1:y1-Y0});ctx.putImageData(d,0,0);return c;
+}
 export async function actorArt(app:Application,name:string){
   const ohm=name==='ohm',cols=ohm?6:5,rows=4,img=await image(ohm?'/assets/ohm.webp':`/assets/actors/${name}.webp`),tiles:HTMLCanvasElement[]=[],bounds:ReturnType<typeof opaqueBounds>[]=[];
-  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const tile=crop(img,c,r,cols,rows,true);tiles.push(tile);bounds.push(opaqueBounds(tile.getContext('2d')!.getImageData(0,0,tile.width,tile.height).data,tile.width,tile.height));}
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const tile=ohm?crop(img,c,r,cols,rows,true):cropFigure(img,c,r,cols,rows);tiles.push(tile);bounds.push(opaqueBounds(tile.getContext('2d')!.getImageData(0,0,tile.width,tile.height).data,tile.width,tile.height));}
   const sheet=canvas(cols*256,rows*256),ctx=sheet.getContext('2d')!,layout=actorFrameLayout(bounds);
   tiles.forEach((tile,i)=>{const b=bounds[i],p=ohm?{x:128-b.width/2,y:244-b.height,width:b.width,height:b.height}:layout.placements[i];ctx.drawImage(tile,b.x,b.y,b.width,b.height,(i%cols)*256+p.x,Math.floor(i/cols)*256+p.y,p.width,p.height);});
   const atlas=new TextureAtlas();atlas.frames={};atlas.texture=texture(app,name+'-atlas',sheet,false,true);

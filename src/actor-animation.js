@@ -22,6 +22,27 @@ export function advanceActor(previous,dx,dz,dt,{paused=false,reducedMotion=false
   return{direction,frame:1+Math.floor(phase),phase,moving:true};
 }
 
+// Character sheets are drawn loosely on a 5×4 grid: a head can rise into the cell above.
+// Given a window wider than the cell, keep only the connected parts whose centre lies inside
+// the cell (in window pixels), so no pose carries a neighbour's hair or loses its own.
+export function isolateFigure(pixels,width,height,cell){
+  const count=width*height,label=new Int32Array(count),keep=[0],stack=[];
+  for(let start=0;start<count;start++){if(label[start]||pixels[start*4+3]<=48)continue;
+    const id=keep.length;let n=0,sx=0,sy=0;label[start]=id;stack.push(start);
+    while(stack.length){const i=stack.pop(),x=i%width,y=(i-x)/width;n++;sx+=x;sy+=y;
+      if(x>0&&!label[i-1]&&pixels[(i-1)*4+3]>48){label[i-1]=id;stack.push(i-1);}
+      if(x<width-1&&!label[i+1]&&pixels[(i+1)*4+3]>48){label[i+1]=id;stack.push(i+1);}
+      if(y>0&&!label[i-width]&&pixels[(i-width)*4+3]>48){label[i-width]=id;stack.push(i-width);}
+      if(y<height-1&&!label[i+width]&&pixels[(i+width)*4+3]>48){label[i+width]=id;stack.push(i+width);}}
+    const cx=sx/n,cy=sy/n;keep.push(n>=12&&cx>=cell.x0&&cx<cell.x1&&cy>=cell.y0&&cy<cell.y1?1:0);}
+  // Faint edges (alpha ≤ 48) survive only within two pixels of a kept figure.
+  const kept=i=>label[i]&&keep[label[i]];
+  for(let i=0;i<count;i++){if(label[i]){if(!keep[label[i]])pixels[i*4+3]=0;continue;}if(!pixels[i*4+3])continue;
+    const x=i%width;let near=false;for(let dy=-2;dy<=2&&!near;dy++)for(let dx=-2;dx<=2;dx++){const xx=x+dx,j=i+dy*width+dx;if(xx>=0&&xx<width&&j>=0&&j<count&&kept(j)){near=true;break;}}
+    if(!near)pixels[i*4+3]=0;}
+  return pixels;
+}
+
 export function opaqueBounds(pixels,width,height){
   let minX=width,minY=height,maxX=-1,maxY=-1;
   for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(pixels[(y*width+x)*4+3]>48){minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);}

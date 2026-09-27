@@ -11,7 +11,7 @@ import { AREA_LAYOUTS, pointOnPaving, lakeShoreX } from './world-layout.js';
 import { buildPaving, buildPlayableBoundary } from './world-ground.js';
 import { buildSpringWaterworks, buildLighthouseIslet } from './world-waterworks.js';
 import { moveWithCollisions, isPositionClear, isSegmentClear } from './collision.js';
-import { HUMAN_ACTORS, ACTOR_ATLAS, idleActor, advanceActor, opaqueBounds, actorFrameLayout } from './actor-animation.js';
+import { HUMAN_ACTORS, ACTOR_ATLAS, idleActor, advanceActor, opaqueBounds, actorFrameLayout, isolateFigure } from './actor-animation.js';
 import { createCinematic, sampleCinematic, returningCinematic, gameplayCameraPose } from './cinematics.js';
 import { isMechanicalControl, readControlFeedback, readReceiverFeedback, worldFeedbackSignature } from './world-feedback.js';
 import { buildGateway } from './world-gateway.js';
@@ -174,10 +174,13 @@ export class World {
     for(const name of HUMAN_ACTORS)load(`/assets/actors/${name}.webp`,(img,own)=>{
       const tiles=[],bounds=[],width=img.naturalWidth||img.width,height=img.naturalHeight||img.height;
       for(let row=0;row<ACTOR_ATLAS.rows;row++)for(let col=0;col<ACTOR_ATLAS.columns;col++){
-        const x=Math.round(col*width/ACTOR_ATLAS.columns),y=Math.round(row*height/ACTOR_ATLAS.rows),w=Math.round((col+1)*width/ACTOR_ATLAS.columns)-x,h=Math.round((row+1)*height/ACTOR_ATLAS.rows)-y;
+        // Cut a window wider than the cell and keep only this cell's figure: sheets are drawn loosely.
+        const cx0=Math.round(col*width/ACTOR_ATLAS.columns),cy0=Math.round(row*height/ACTOR_ATLAS.rows),cx1=Math.round((col+1)*width/ACTOR_ATLAS.columns),cy1=Math.round((row+1)*height/ACTOR_ATLAS.rows);
+        const x=Math.max(0,cx0-48),y=Math.max(0,cy0-48),w=Math.min(width,cx1+48)-x,h=Math.min(height,cy1+48)-y;
         const tile=document.createElement('canvas');tile.width=w;tile.height=h;const ctx=tile.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,x,y,w,h,0,0,w,h);
         const data=ctx.getImageData(0,0,w,h),pixels=data.data;
         for(let i=0;i<pixels.length;i+=4){const magenta=Math.min(pixels[i],pixels[i+2])-pixels[i+1];if(magenta>50&&pixels[i]>95&&pixels[i+2]>90){pixels[i+3]=Math.min(pixels[i+3],Math.max(0,255-(magenta-50)*5));if(pixels[i+3]<30)pixels[i+3]=0;}}
+        isolateFigure(pixels,w,h,{x0:cx0-x,x1:cx1-x,y0:cy0-y,y1:cy1-y});
         ctx.putImageData(data,0,0);tiles.push(tile);bounds.push(opaqueBounds(pixels,w,h));
       }
       const {placements}=actorFrameLayout(bounds),directions=Array.from({length:4},()=>[]);
