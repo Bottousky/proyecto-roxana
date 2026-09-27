@@ -12,9 +12,12 @@ uniform vec2 uShoreSize;
 uniform sampler2D uMeadow;
 uniform sampler2D uCobble;
 uniform vec3 uPave[${shore.paving.length}];
+uniform vec3 uClouds;
 float gHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float gNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
   return mix(mix(gHash(i),gHash(i+vec2(1,0)),f.x),mix(gHash(i+vec2(0,1)),gHash(i+vec2(1,1)),f.x),f.y);}
+// Soft cloud shadows drifting over the valley (uClouds: time, strength, scale).
+float cloudShade(vec2 p){vec2 q=p*uClouds.z+vec2(uClouds.x*0.012,uClouds.x*0.005);float c=gNoise(q)*0.62+gNoise(q*2.3+4.1)*0.38;return 1.0-uClouds.y*smoothstep(0.44,0.66,c);}
 void getAlbedo(){
   vec2 p=vPositionW.xz;
   vec3 grass=texture2D(uMeadow,p/6.0).rgb*material_diffuse;
@@ -30,14 +33,15 @@ void getAlbedo(){
   float paved=smoothstep(0.44,0.56,cover+(edge-0.5)*0.42);
   float worn=smoothstep(0.06,0.42,cover+(edge-0.5)*0.3)*(1.0-paved);
   grass=mix(grass,grass*vec3(0.86,0.76,0.56),worn*0.8);
-  if(cover<0.01){dAlbedo=grass;return;}
+  float shade=cloudShade(p);
+  if(cover<0.01){dAlbedo=grass*shade;return;}
   int tone=int(texture2D(uShoreMap,(floor(uv*uShoreSize)+0.5)/uShoreSize).b*255.0+0.5);
   vec3 tint=uPave[0];
   for(int i=1;i<${shore.paving.length};i++)if(i==tone)tint=uPave[i];
   vec3 stone=texture2D(uCobble,p/5.0).rgb*tint;
   // Loose, sunken stones where the paving gives way to earth.
   stone*=mix(0.8,1.0,smoothstep(0.5,0.8,cover+(edge-0.5)*0.2));
-  dAlbedo=mix(grass,stone,paved);
+  dAlbedo=mix(grass,stone,paved)*shade;
 }`;
 
 const lin=v=>Math.pow(v,2.2);
@@ -48,9 +52,10 @@ export function makeGround(material,{shoreMap,meadow,cobble}){
   material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',diffusePS);
   material.setParameter('uShoreMap',shoreMap);material.setParameter('uShoreRect',[shore.x0,shore.z0,shore.width,shore.depth]);material.setParameter('uShoreSize',shore.pixels);
   material.setParameter('uMeadow',meadow);material.setParameter('uCobble',cobble);material.setParameter('uPave[0]',tones);
-  material.update();
+  material.setParameter('uClouds',[0,0,.035]);material.update();
   return material;
 }
+export function updateClouds(materials,time,strength){for(const m of materials)m.setParameter('uClouds',[time,strength,.035]);}
 
 // Field boulders: faceted grey stone, darker at the foot, moss on the faces turned to the sky.
 const rockPS=`

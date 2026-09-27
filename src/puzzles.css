@@ -148,3 +148,36 @@
 @keyframes wb-next{50%{box-shadow:0 0 0 4px #f1d59a99,0 0 26px #f5d18a88}}
 .reduced-motion .wb-power.wb-next-step{animation:none}
 @media (prefers-reduced-motion:reduce){.wb-power.wb-next-step{animation:none}}
+/* The controls sit right under what they change: turning a knob and reading its effect
+   never needs scrolling apart. */
+.wb-controls-aside{flex-direction:column;align-items:stretch;gap:10px;margin:2px 0 16px}
+.wb-controls-aside .wb-dial-control{width:100%;box-sizing:border-box}
+.wb-controls-aside .wb-switch{width:100%;box-sizing:border-box}
+.wb-controls-aside .wb-dial-control{padding:8px 10px;gap:10px}
+.wb-controls-aside .wb-dial{width:46px;height:46px}
+.wb-controls-aside .wb-dial i{transform-origin:50% 14px}
+.wb-controls-aside .wb-dial-details p{font-size:10px;line-height:1.35;margin-top:4px}
+/* Desktop: controls beside their effect. Narrow screens: under the schematic, as before. */
+.wb-controls-main{display:none}
+@media(max-width:820px){.wb-controls-aside{display:none}.wb-controls-main{display:flex}}
+/* Piece names are drawn once more above the wires, with a dark halo; the original stays for layout. */
+.wb-component .wb-engraving{visibility:hidden}
+.wb-engraving-top{paint-order:stroke;stroke:#1a2119;stroke-width:5px;stroke-linejoin:round}
+/* With three or more controls, the aside keeps just the dials: their descriptions are in the hints. */
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-dial-details p{display:none}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-dial-control{padding:6px 10px}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-dial{display:none}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)){gap:6px}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row{min-height:0}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row button{height:34px;width:34px;font-size:18px}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row{margin:4px 0 2px}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row output>span{font-size:14px;letter-spacing:2px;white-space:nowrap}
+.wb-discovery .wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-dial-control{padding:6px 12px!important}
+/* Compact dial: name above, then − · slider · + on one line. */
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-dial-details{display:grid;grid-template-columns:34px 1fr 34px;align-items:center;column-gap:8px;row-gap:4px;width:100%}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-dial-details label{grid-column:1/-1}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row{display:contents}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row output{display:none}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row button:first-child{grid-column:1;grid-row:2}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row button:last-child{grid-column:3;grid-row:2}
+.wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-dial-details input[type=range]{grid-column:2;grid-row:2;width:100%;margin:0}

@@ -73,7 +73,7 @@ try {
     await page.evaluate(() => bench.open('irrigation'));
     if (!mobile) assert.ok((await page.locator('.wb-board').boundingBox()).width >= 550, '720p must not shrink a regulated machine into a tiny thumbnail');
     for (const key of ['warmth','flow']) {
-      const slider = page.locator(`[data-knob="${key}"]`);
+      const slider = page.locator(`[data-knob="${key}"]:visible`);
       await slider.fill('12');
       await slider.dispatchEvent('change');
     }

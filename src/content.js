@@ -1,3 +1,4 @@
+import { terracesAgreement as TERRACES_AGREEMENT } from './puzzle-model.js';
 // Ohmdal · La Luz. All progress is expressed as observable, persistent world state.
 const line = (speaker, text, emotion) => ({ speaker, text, ...(emotion ? { emotion } : {}) });
 const d = (...lines) => lines.map(([speaker, text, emotion]) => line(speaker, text, emotion));
@@ -5,7 +6,7 @@ const d = (...lines) => lines.map(([speaker, text, emotion]) => line(speaker, te
 export const CHARACTERS = {
   player: { name: 'Vos', role: 'Un viaje que acaba de empezar', color: '#8ad1df' },
   narrator: { name: 'Bitácora', role: 'Observaciones de viaje', color: '#c8bb91' },
-  edda: { name: 'Edda', role: 'Exploradora de Ohmdal', color: '#ecaa78' },
+  edda: { name: 'Edda', role: 'Cuidadora del Portal', color: '#ecaa78' },
   ohm: { name: 'Ohm', role: 'Compañero e instrumento de medida', color: '#81dfe5' },
   lumen: { name: 'Maese Lumen', role: 'Reparador de la Plaza', color: '#e3be79' },
   consejera: { name: 'Consejera Ivara', role: 'Custodia de la Red', color: '#c1aceb' },
@@ -18,23 +19,25 @@ export const CHARACTERS = {
 
 export const DIALOGUES = {
   portal_arrival: d(
-    ['narrator', 'Al otro lado del Portal Ω, la mañana huele a lluvia sobre piedra caliente. El instrumento de viaje del Instituto conserva el norte; tu Bitácora todavía está en blanco. Una luz azul tiembla en el musgo.'],
-    ['edda', 'Vos no sos de acá.', 'surprised'],
-    ['player', '¿Tan evidente es?'],
-    ['edda', 'Entraste por una pared. Soy Edda. Venía a investigar eso, pero me distrajo aquel pequeño de bronce.'],
-    ['player', '¿Está dormido?'],
-    ['edda', 'Buena pregunta. Lo saludé. No me contestó. Vení, capaz entre los dos encontramos algo.']),
+    ['narrator', 'El Portal Ω te suelta sobre la piedra tibia. De este lado, la mañana huele a lluvia. El instrumento de viaje del Instituto conserva el norte; tu Bitácora todavía está en blanco.'],
+    ['edda', '¡Cruzaste! ¡Alguien cruzó!', 'surprised'],
+    ['player', '¿Eso no pasa seguido?'],
+    ['edda', 'No desde antes de que yo naciera. Soy Edda. En el valle a mi familia le dicen «los Porteros»: mi abuela recibía acá a los Maestros del Instituto y a sus alumnos.'],
+    ['player', '¿Y vos?'],
+    ['edda', 'Yo lo barro todas las mañanas, por si acaso. Hoy fue el «por si acaso».'],
+    ['edda', 'Y justo hoy el pequeño de bronce del pedestal no me contesta. Vení: capaz entre los dos encontramos algo.']),
   edda_portal: d(
     ['edda', 'Limpié el polvo. Giré esa manivela. Hasta le dije por favor.'],
     ['player', '¿Y nada?'],
     ['edda', 'Ahora está limpio. No confundamos resultados. El cristal brilla y él no; eso es lo que tengo.']),
   edda_portal_after: d(
-    ['edda', 'Mi cuaderno dice: «Una pared se abrió. Una cajita me discutió». Buen día de trabajo.'],
+    ['edda', 'Mi cuaderno dice: «El Portal dejó pasar a alguien. Una cajita me discutió». Buen día de trabajo.'],
     ['ohm', 'Instrumento de campo.'],
     ['edda', 'Lo anoto entre paréntesis. Los espero en la Plaza.']),
   portal_arch: d(
-    ['narrator', 'En el arco: «INSTITUTO ROXANA · MUNDOS APLICADOS». Debajo, otra mano grabó: «Dejen el dibujo junto a la máquina».'],
-    ['edda', 'Mi abuela decía que por ahí venían los Maestros. No dijo que trajeran mochilas.']),
+    ['narrator', 'Junto a la puerta de los Porteros, un libro de llegadas descansa en su atril. La tapa copia la inscripción del arco: «INSTITUTO ROXANA · MUNDOS APLICADOS». En el margen, otra mano: «Dejen el dibujo junto a la máquina».'],
+    ['narrator', 'Las primeras páginas están llenas de firmas: docentes, alumnos, fechas, una mancha de té. Después, años de hojas en blanco. En la última, con letra nueva: «Hoy: alguien».'],
+    ['edda', 'Mi abuela anotaba a todos los que cruzaban. Decía que por ahí venían los Maestros. No dijo que trajeran mochilas.']),
   portal_seed: d(
     ['narrator', 'Entre dos raíces hay una placa doblada. El dibujo muestra dos caminos entre una fuente y una pequeña lámpara.'],
     ['narrator', 'Al dorso: «El retorno también es camino». Alguien subrayó «también» tres veces.']),
@@ -47,10 +50,11 @@ export const DIALOGUES = {
     ['ohm', 'Energía detectada. Desplazamiento… funcional.', 'surprised'],
     ['edda', '¿Eso significa que estás bien?'],
     ['ohm', 'Significa que puedo desplazarme. Soy Ohm.'],
-    ['player', 'Con la primera conexión no pasó nada. Con la otra, sí.'],
+    ['player', 'Con una sola conexión no pasaba nada. Con las dos, sí.'],
     ['edda', 'Entonces necesitaba las dos. Quiero dibujarlo antes de olvidarme.'],
     ['ohm', 'Observación registrada. No dispongo de una explicación para haber pasado tanto tiempo mirando musgo.'],
-    ['edda', 'Lumen va a querer conocerte. Su taller está en la Plaza. Vení con nosotros.']),
+    ['edda', 'Lumen va a querer conocerte. Su taller está en la Plaza, siguiendo el canal.'],
+    ['edda', 'Mi abuela llevaba a los visitantes en bote por el canal hasta el pueblo. El bote sigue atado; ahora junta hojas. Vamos a pie: canal arriba, remar cansa el doble.']),
   ohm_pedestal_after: d(
     ['narrator', 'El asiento de bronce conserva la huella de Ohm. Dos caminos de cobre unen el cristal con el lugar donde descansaba.'],
     ['ohm', 'Cuarenta años mirando la misma pared. Tu compañía mejora sensiblemente el paisaje.']),
@@ -100,11 +104,13 @@ export const DIALOGUES = {
     ['player', '¿Por qué tres?'],
     ['lumen', 'Mi padre hacía tres. Yo también. Hasta ayer alcanzaba.'],
     ['player', '¿Y si la lámpara no era lo que fallaba?'],
-    ['lumen', 'Hacía años que nadie venía a molestarme con una pregunta de ésas. Acercá el instrumento.']),
+    ['lumen', 'Hacía años que nadie venía a molestarme con una pregunta de ésas. Acercá el instrumento.'],
+    ['narrator', 'Lumen encaja el cierre izquierdo de la mesa con un clic seco, sin mirarlo. El derecho queda para vos.']),
   workshop_ready: d(
     ['narrator', 'La mesa recupera un zumbido bajo. La lámpara sigue oscura.'],
     ['lumen', 'Escuchá. Ese ruido sí lo conozco. Ahora podemos mirar el banco.']),
   workshop_locked: d(['lumen', 'Los dos cierres de la mesa siguen sueltos. Uno a cada costado, al final de los cables del piso.']),
+  workshop_locked_right: d(['lumen', 'El izquierdo ya está. Falta el derecho, al final del cable del piso. Que Ohm lo mida antes y después de unirlo.']),
   workshop_arrival_puzzle: d(
     ['lumen', 'La cubierta está entera. La lámpara, recién cambiada. Y sin embargo…'],
     ['player', '¿Podemos mirar lo de adentro sin romperlo?'],
@@ -151,9 +157,9 @@ export const DIALOGUES = {
   gate_locked: d(['edda', 'Todavía no responden las balizas. Hay cierres en los dos postes y un puente en el centro. El dibujo viejo no tiene ese puente.']),
   gate_arrival: d(
     ['edda', 'El cerrojo hace fuerza… pero para abajo. ¿No tendría que levantar?'],
-    ['player', 'Capaz conectamos algo al revés.'],
+    ['player', '¿Qué cambia entre empujar para arriba y para abajo?'],
     ['ohm', 'Puedo mostrar el sentido de la lectura. La placa conserva las marcas de trabajo del cerrojo.'],
-    ['edda', 'Bueno. Una sospecha que podemos probar.']),
+    ['edda', 'Bueno. Algo para comparar.']),
   gate_complete: d(
     ['narrator', 'El cerrojo asciende. Por primera vez en años, la Calzada no termina en una pared.'],
     ['player', 'Cambió el sentido. Y al ajustar la rueda, levantó sin atascarse.'],
@@ -225,14 +231,14 @@ export const DIALOGUES = {
   distribution_locked: d(['consejera', 'Aíslen primero la rama oeste dañada. El otro seccionador conecta el troncal de servicio. Las placas identifican ambos.']),
   distribution_arrival: d(
     ['consejera', 'El indicador confirma que el archivo quedó separado en el patio. Debe seguir así durante la prueba.'],
-    ['player', 'Los otros dos servicios están uno detrás del otro. ¿Y si cada uno tuviera su camino?'],
-    ['edda', 'Esperaría que uno siguiera encendido aunque separemos el otro.'],
-    ['consejera', '«Esperaría».'],
+    ['consejera', 'Y una cosa más. Algún día alguien va a tener que reparar la cocina. Ese día, la enfermería no se puede apagar.'],
+    ['edda', '¿Nos pide que lo probemos?'],
+    ['consejera', 'Les pido que me lo muestren. En el tablero hay una llave para aislar la cocina. Quiero ver la enfermería encendida mientras tanto.'],
     ['ohm', 'Puede comprobarse.'],
     ['consejera', 'Esa es la primera palabra tranquilizadora que escucho hoy.']),
   distribution_complete: d(
     ['narrator', 'Las ventanas de la enfermería y la cocina encienden sus faroles por separado. El archivo clausurado permanece oscuro.'],
-    ['consejera', 'El archivo sigue aislado. Los dos servicios funcionan. Ahora puedo retirar el sello.'],
+    ['consejera', 'La cocina aislada y la enfermería encendida. Lo vi. El archivo sigue separado y los dos servicios funcionan. Ahora puedo retirar el sello.'],
     ['player', '¿Confía en nosotros?'],
     ['consejera', 'Ahora tenemos una forma de comprobarlo. Eso vale más que una promesa.'],
     ['edda', 'Dejemos el plano a la vista.'],
@@ -260,19 +266,19 @@ export const DIALOGUES = {
   yesca_before: d(
     ['yesca', 'Necesitaba más calor. Subí la palanca. Funcionó.'],
     ['player', '¿Y ese cable ennegrecido?'],
-    ['yesca', 'Funcionó primero. La posición baja tarda más, pero puedo trabajar así. Quiero diez azadas terminadas, no once empezadas.']),
+    ['yesca', 'Funcionó primero. Si el horno tiene que compartir el cable con el riego, que sea en la mesa de Vega, donde se ve lo que toma cada uno. Quiero diez azadas terminadas, no once empezadas.']),
   vega_terraces: d(
     ['vega', '¿Ves la parcela del fondo? Antes recibía agua primero. Ahora la de arriba bebe de más y la última espera.'],
     ['player', 'Podemos abrir el canal y mirar hasta dónde llega.'],
     ['vega', 'La rueda está junto a mi puesto. Después miramos el tablero. Quiero saber quién paga cada cambio que hacemos acá arriba.']),
   water_ready: d(
-    ['narrator', 'El horno baja a un resplandor constante. La compuerta abre el camino a los bancales.'],
-    ['yesca', 'La forja puede trabajar así. Ahora demos a la bomba lo que necesita, sin malgastar el resto.']),
-  irrigation_locked: d(['vega', 'Primero acordemos el uso de la fuente: horno en régimen moderado y canal de riego abierto. Las dos manivelas están junto a nuestros puestos.']),
+    ['narrator', 'El horno queda en el tablero compartido. La compuerta abre el camino a los bancales.'],
+    ['yesca', 'Lo que me toque, que alcance. Ahora repartamos el cable, sin malgastarlo.']),
+  irrigation_locked: d(['vega', 'Primero, todo a la misma mesa: el horno de Yesca pasa al tablero compartido y el canal se abre. Las dos manivelas están junto a nuestros puestos.']),
   irrigation_arrival: d(
-    ['vega', 'El agua sale con demasiada fuerza y el lecho de raíces está demasiado caliente. Son dos trabajos distintos en este tablero.'],
-    ['player', 'Podemos bajar uno, mirar qué cambió y después probar el otro.'],
-    ['vega', 'Con la bomba trabajando. Una altura en un canal vacío no me dice cómo va a regar.']),
+    ['vega', 'El agua sale con demasiada fuerza y el lecho está demasiado caliente. Y el horno de Yesca tira del mismo cable.'],
+    ['yesca', 'El cable de la ladera aguanta lo que aguanta. Si me dan menos calor, hago menos por tanda. Si no me dan nada, no hay azadas.'],
+    ['vega', 'Y si las raíces se enfrían, la última parcela no llega. Decidámoslo con la bomba trabajando: una altura en un canal vacío no me dice nada.']),
   irrigation_complete: d(
     ['narrator', 'El primer bancal se llena. Luego el segundo. En la forja, Yesca retoma su martillo al ritmo de la rueda.'],
     ['yesca', 'Diez azadas. Y tomates para quien hace las azadas. Me parece un trato bastante bueno.'],
@@ -301,7 +307,9 @@ export const DIALOGUES = {
     ['player', '¿Cuánto dura la pausa?'],
     ['nereo', 'Lo que tiene que durar.'],
     ['ohm', 'Unidad no reconocida.'],
-    ['nereo', 'Cuarenta años y recién ahora viene alguien a quejarse. Antes de subir, faltan las uniones del muelle: una junto a las bobinas, otra entre las cañas.']),
+    ['nereo', 'Cuarenta años y recién ahora viene alguien a quejarse. Las uniones del muelle las hago yo: las hice más veces que ustedes años.'],
+    ['narrator', 'Nereo fija la bornera junto a las bobinas y, entre las cañas, une el retorno sin mirar. En el agua, una baliza tarda un momento y contesta.'],
+    ['nereo', 'Miren las balizas, no a mí. Si una se apaga, ahí está la pregunta.']),
   lake_link_complete: d(
     ['narrator', 'La línea sumergida vibra bajo el muelle. Tres balizas marcan el camino hacia el Faro.'],
     ['nereo', 'Ahora sí. Yo llevo la llave. Ustedes, esa costumbre nueva de mirar dos veces.']),
@@ -349,8 +357,9 @@ export const DIALOGUES = {
   beacon_network_locked: d(['nereo', 'Primero tiene que sostenerse la base. Después, las manivelas del medio apartan el puente gastado y acoplan el motor.']),
   beacon_network_arrival: d(
     ['nereo', 'Cuando una lámpara fallaba, nos quedábamos sin giro y sin galería. Yo hacía dos trabajos a oscuras.'],
-    ['player', 'Como en el Castillo. ¿Podemos darles caminos separados?'],
-    ['edda', 'Probemos esa idea. Voy a anotar qué esperamos de cada uno antes de tocarlo.'],
+    ['nereo', 'Quiero que si una se apaga, las otras sigan. Una noche sin giro es una noche sin faro.'],
+    ['player', '¿Qué comparte ahora cada una con las otras?'],
+    ['edda', 'Voy a anotar qué esperamos de cada una antes de tocarlas.'],
     ['ohm', 'Hay tres servicios. Dispongo de tres espacios en el registro. Coincidencia muy práctica.']),
   beacon_network_complete: d(
     ['narrator', 'La corona de engranajes comienza a girar. Lámparas sucesivas iluminan la galería y el enorme cristal.'],
@@ -363,8 +372,8 @@ export const DIALOGUES = {
   beacon_lens_locked: d(['nereo', 'Falta el trabajo de la galería. Cuando gire la corona, podemos abrir el obturador y liberar el freno de la lente.']),
   beacon_lens_arrival: d(
     ['nereo', 'Una luz que encandila un segundo y se apaga no es una señal. Necesitamos que vuelva, siempre reconocible.'],
-    ['player', '¿Y si el ajuste cambia cuando conectamos la lente? En las Terrazas pasaba algo parecido al pedir agua.'],
-    ['edda', 'Entonces la probamos trabajando. Si mi dibujo no alcanza, lo corrijo. Ya le hice lugar.'],
+    ['nereo', 'Y quiero dejarle algo al que venga después de mí: cuánto cambia la toma cuando la lente se conecta. Medido, no recordado.'],
+    ['edda', 'Sin la lente y con la lente. Si mi dibujo no alcanza, lo corrijo. Ya le hice lugar.'],
     ['nereo', 'Yo miro el lago. Esta vez, sin adornar la respuesta.']),
   beacon_lens_complete: d(
     ['narrator', 'Una línea de luz cruza el cristal. El cobre responde desde la base hasta la corona. El Faro toma aire.'],
@@ -442,7 +451,7 @@ export const DIALOGUES = {
   edda_tower_network: d(['edda', 'Ese golpecito que señaló Nereo vuelve cada vuelta. Lo anoté junto a mi dibujo.'], ['player', 'Todavía falta la señal.'], ['edda', 'Sí. Voy a mirar la linterna mientras él mira el lago. Dos lugares para la misma prueba.']),
   edda_after_lesson: d(['edda', 'Tala encontró la reparación sin que yo se la señalara. Casi se la señalo igual.'], ['ohm', 'Contención registrada.'], ['edda', 'No pongas eso en letras grandes. Ahora quiero copiar las cartas del Instituto. Esa pregunta sigue abierta.']),
   vega_spring_ready: d(['vega', 'La rueda ya transmite movimiento. El indicador respondió.'], ['vega', 'Voy a mirar la bomba antes de pedirle más. Aquel empalme tibio todavía me preocupa.']),
-  yesca_limited: d(['yesca', 'Dejé el horno en la posición baja. El hierro sigue cediendo.'], ['yesca', 'Ahora miren qué pasa del lado de Vega. El almuerzo depende de que este acuerdo sirva para las dos.']),
+  yesca_limited: d(['yesca', 'Pasé el horno a la mesa de Vega. Ahí se decide cuánto calor me toca.'], ['yesca', 'Ahora miren qué pasa del lado de Vega. El almuerzo depende de que este acuerdo sirva para las dos.']),
   vega_channel_open: d(['vega', 'El canal está abierto. Ahora quiero mirar cómo trabaja con agua, no sólo cómo quedó la manivela.'], ['vega', 'La última parcela también cuenta. Que llegue al principio no me alcanza.']),
   nereo_lake_linked: d(['nereo', 'Las balizas ya contestan. Tengo la llave y una excusa menos para quedarme acá.'], ['nereo', 'Los espero en la galería. Vayan mirando: yo conozco el camino demasiado bien.']),
   nereo_tower_source: d(['nereo', 'La base recuperó su voz. La corona todavía no.'], ['nereo', 'Voy a escuchar cerca del segundo tablero. A veces uno reconoce mejor lo que falta que lo que está.']),
@@ -452,7 +461,7 @@ export const DIALOGUES = {
   tala_epilogue: d(['tala', 'Edda dice que primero mire. Estoy mirando.'], ['player', '¿Y qué encontraste?'], ['tala', 'Esta tela no tiene el mismo color. Todavía no sé qué hay debajo.']),
   tala_epilogue_after: d(['tala', 'Quiero guardar también el dibujo de cuando no funcionaba.'], ['player', '¿Por qué?'], ['tala', 'Porque si sólo guardo el otro, parece que ya lo sabía. Edda hizo una cara rara cuando se lo dije.']),
   lake_boat_after: d(['narrator', 'La señal del Faro vuelve sobre las tres maderas de la barca. Las marcas de nombres y estaturas siguen en su banco.'], ['nereo', 'Mañana puedo traerla hasta el muelle. Hay gente que creció mientras esperaba.']),
-  portal_arch_without_edda: d(['narrator', 'En el arco: «INSTITUTO ROXANA · MUNDOS APLICADOS». Debajo, otra mano grabó: «Dejen el dibujo junto a la máquina».'], ['narrator', 'Edda dejó una flecha a lápiz hacia la Plaza. Junto a ella: «Preguntar por los Maestros».']),
+  portal_arch_without_edda: d(['narrator', 'El libro de llegadas sigue abierto en la última hoja. Debajo de «Hoy: alguien», Edda agregó con letra prolija: «Del Instituto. Despertó a Ohm».'], ['narrator', 'Al lado dejó una flecha a lápiz hacia la Plaza y una nota: «Preguntar por los Maestros».']),
   plaza_statue_without_edda: d(['narrator', 'La Primera Maestra sostiene un cuaderno abierto. El nombre gastado empieza por «ROX…».'], ['narrator', 'A los pies quedó una nota de Edda: «El abuelo dice que ella nunca se quedaba quieta. Buscar otro retrato».']),
   castle_archive_without_edda: d(['narrator', 'Las cartas siguen ordenadas por fecha. La última solicitud de un docente no tiene respuesta.'], ['ohm', 'Instituto Roxana. Esa era nuestra dirección.'], ['narrator', 'Edda dejó una copia junto al legajo. En el margen: «¿Quién las recibía?».']),
   spring_levels_without_vega: d(['narrator', 'Las fechas de sequía y abundancia siguen en el muro. Una marca reciente lleva la letra de Vega.'], ['narrator', 'En su tablilla: «Anotar también lo que no salió como esperábamos. Voy a revisar los bancales».']),
@@ -502,7 +511,7 @@ const reverseLabels = {
   workshop_feed: 'Soltar el cierre izquierdo', workshop_return: 'Soltar el cierre derecho',
   road_send: 'Soltar el cierre del poste oeste', road_return: 'Soltar el cierre del poste este',
   spring_sluice: 'Desviar el agua fuera de la rueda', spring_coupling: 'Separar el generador de la rueda',
-  castle_service: 'Desconectar el troncal sano', forge_limited: 'Subir el horno a demanda alta',
+  castle_service: 'Desconectar el troncal sano', forge_limited: 'Devolver el horno a su palanca propia',
   irrigation_open: 'Cerrar el canal de los bancales', lake_cable: 'Abrir el suministro del muelle',
   lake_return: 'Desconectar el retorno de la orilla', tower_feed: 'Abrir la alimentación de la base',
   tower_return: 'Abrir el retorno de la base', tower_isolated: 'Reconectar el puente gastado',
@@ -516,14 +525,14 @@ const exit = (id, x, z, target, label, requires = [], lockedDialogue, spawn) => 
 
 export const AREAS = {
   portal: {
-    id: 'portal', name: 'Portal Ω', subtitle: 'Donde una pregunta vuelve a cruzar', theme: 'portal', bounds: [28, 24], spawn: [0, 8], entryDialogue: 'portal_arrival',
+    id: 'portal', name: 'Portal Ω', subtitle: 'Donde una pregunta vuelve a cruzar', theme: 'portal', bounds: [28, 24], spawn: [0, -2.4], entryDialogue: 'portal_arrival',
     objects: [
-      npc('edda_portal', -4, 2, 'edda', 'edda_portal', { flag: 'awaken', afterDialogue: 'edda_portal_after' }),
+      npc('edda_portal', -3.6, 0.6, 'edda', 'edda_portal', { flag: 'awaken', afterDialogue: 'edda_portal_after' }),
       panel('ohm_pedestal', 3.5, 0, 'El pedestal de Ohm', 'awaken', [], null, 'ohm_pedestal_after'),
-      lore('portal_arch', -7.5, -5, 'Inscripción del Instituto', 'portal_arch'),
+      lore('portal_arch', -7.5, -5, 'El libro de llegadas', 'portal_arch'),
       secret('portal_seed', 8.5, 5, 'Una placa entre las raíces', 'portal_seed'),
     ],
-    exits: [exit('portal_to_plaza', 0, -10, 'plaza', 'Plaza de Ohm', ['awaken'], 'portal_locked')],
+    exits: [exit('portal_to_plaza', 6.6, -10, 'plaza', 'Plaza de Ohm', ['awaken'], 'portal_locked')],
   },
   plaza: {
     id: 'plaza', name: 'Plaza de Ohm', subtitle: 'Las cosas que una comunidad conserva', theme: 'plaza', bounds: [40, 32], spawn: [0, 11], entryDialogue: 'plaza_arrival',
@@ -536,7 +545,7 @@ export const AREAS = {
       secret('plaza_bell', 11, -7, 'Las marcas de la campana', 'plaza_bell'),
     ],
     exits: [
-      exit('plaza_to_portal', 0, 14, 'portal', 'Portal Ω', [], null, [0, -7]),
+      exit('plaza_to_portal', 0, 14, 'portal', 'Portal Ω', [], null, [6.4, -8]),
       exit('plaza_to_workshop', -13.25, 7.9, 'workshop', 'Taller de Lumen'),
       exit('plaza_to_road', 0, -14, 'road', 'La Calzada', ['workshop'], 'plaza_road_locked'),
     ],
@@ -545,8 +554,8 @@ export const AREAS = {
     id: 'workshop', name: 'El taller de Lumen', subtitle: 'Una receta aprende a explicar sus motivos', theme: 'workshop', bounds: [24, 24], spawn: [0, 8], entryDialogue: 'workshop_arrival',
     objects: [
       npc('lumen', -3.5, 1.5, 'lumen', 'lumen_before', { flag: 'workshop', afterDialogue: 'lumen_after' }),
-      lever('workshop_feed', -7, 4, 'Ajustar el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo encaja con un clic.', 'El cierre izquierdo queda separado.'),
-      lever('workshop_return', 7, 4, 'Ajustar el cierre derecho', 'workshop_return', 'El cierre derecho encaja con un clic.', 'El cierre derecho queda separado.'),
+      lever('workshop_feed', -.9, -.5, 'Ajustar el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo encaja con un clic.', 'El cierre izquierdo queda separado.'),
+      lever('workshop_return', 6.9, -.5, 'Ajustar el cierre derecho', 'workshop_return', 'El cierre derecho encaja con un clic.', 'El cierre derecho queda separado.'),
       panel('workbench', 3, -3, 'La lámpara del banco', 'workshop', ['bench_ready'], 'workshop_locked', 'workshop_bench_after'),
       lore('workshop_note', -7, -4.5, 'Cuatro manos sobre un esquema', 'workshop_note'),
       secret('workshop_cup', 8, -6, 'La taza que espera', 'workshop_cup'),
@@ -569,7 +578,7 @@ export const AREAS = {
   spring: {
     id: 'spring', name: 'El Manantial', subtitle: 'Lo que comienza lejos de su consecuencia', theme: 'spring', bounds: [34, 30], spawn: [0, 10], entryDialogue: 'spring_arrival',
     objects: [
-      npc('vega_spring', 4, 5, 'vega', 'vega_spring', { flag: 'pump', afterDialogue: 'spring_after' }),
+      npc('vega_spring', -4.2, -1.4, 'vega', 'vega_spring', { flag: 'pump', afterDialogue: 'spring_after' }),
       lever('spring_sluice', -6.5, 2, 'Desviar el agua hacia la rueda', 'spring_sluice', 'El canal conduce el agua hacia los álabes de la rueda.', 'El agua vuelve al desvío y deja de impulsar la rueda.'),
       lever('spring_coupling', 7.5, -1, 'Acoplar la rueda al generador', 'spring_coupling', 'El eje de la rueda queda unido al generador.', 'El generador queda separado de la rueda.'),
       panel('pump_panel', 2.5, -5.5, 'Caja de conexiones de la bomba', 'pump', ['spring_drive'], 'pump_locked', 'spring_after'),
@@ -581,11 +590,11 @@ export const AREAS = {
   castle: {
     id: 'castle', name: 'Castillo de la Red', subtitle: 'La confianza también necesita evidencia', theme: 'castle', bounds: [40, 32], spawn: [0, 11], entryDialogue: 'castle_arrival', initialFlags: { castle_branch_closed: true },
     objects: [
-      npc('consejera', 4, 3, 'consejera', 'consejera_before', { flag: 'distribution', afterDialogue: 'consejera_after' }),
-      npc('edda_castle', -4, 6, 'edda', 'castle_edda'),
+      npc('consejera', 4.2, -6.4, 'consejera', 'consejera_before', { flag: 'distribution', afterDialogue: 'consejera_after' }),
+      npc('edda_castle', -9.2, -3.6, 'edda', 'castle_edda'),
       { id: 'castle_isolated', kind: 'lever', x: -8, z: -1, label: 'Conexión del archivo oeste', flag: 'castle_branch_closed', action: { type: 'toggle', flag: 'castle_branch_closed', onLabel: 'Conectar el archivo oeste', offLabel: 'Separar el archivo oeste', onText: 'El cierre une de nuevo el archivo con la red. El indicador del tablero queda oscuro.', offText: 'Los contactos del archivo quedan separados a la vista.' } },
       lever('castle_service', 8, -1, 'Conectar los servicios del Castillo', 'castle_service', 'El cierre de enfermería y cocina queda unido.', 'El cierre de enfermería y cocina queda separado.'),
-      panel('distribution_panel', 0, -6, 'Tablero de los servicios del Castillo', 'distribution', ['castle_ready'], 'distribution_locked', 'consejera_after'),
+      panel('distribution_panel', 6.4, -9.5, 'Tablero de los servicios del Castillo', 'distribution', ['castle_ready'], 'distribution_locked', 'consejera_after'),
       lore('castle_archive', -11, -6, 'Cartas sin respuesta', 'castle_archive'),
       secret('castle_hidden', 11, -6.5, 'El reverso del estandarte', 'castle_hidden'),
     ],
@@ -594,10 +603,10 @@ export const AREAS = {
   terraces: {
     id: 'terraces', name: 'Las Terrazas', subtitle: 'La luz alcanza a quienes están aguas abajo', theme: 'terraces', bounds: [40, 36], spawn: [0, 13], entryDialogue: 'terraces_arrival',
     objects: [
-      npc('yesca', -5.5, 5, 'yesca', 'yesca_before', { flag: 'irrigation', afterDialogue: 'yesca_after' }),
-      npc('vega_terraces', 5.5, 5, 'vega', 'vega_terraces', { flag: 'irrigation', afterDialogue: 'vega_after' }),
-      lever('forge_limited', -8, 0, 'Poner el horno en régimen moderado', 'forge_limited', 'El horno mantiene calor útil con menor demanda. Queda capacidad para el riego.', 'El horno vuelve a la demanda alta; la reserva para riego se reduce.'),
-      lever('irrigation_open', 8, 0, 'Abrir el canal de los bancales', 'irrigation_open', 'El agua puede alcanzar los bancales cuando la bomba sostenga su trabajo.', 'El canal de los bancales queda cerrado.'),
+      npc('yesca', -11.4, -11.2, 'yesca', 'yesca_before', { flag: 'irrigation', afterDialogue: 'yesca_after' }),
+      npc('vega_terraces', 7.6, 4.2, 'vega', 'vega_terraces', { flag: 'irrigation', afterDialogue: 'vega_after' }),
+      lever('forge_limited', -9.4, -12.3, 'Pasar el horno a la mesa compartida', 'forge_limited', 'El horno queda en el tablero de Vega: su calor se reparte junto con el riego.', 'El horno vuelve a su palanca propia, a demanda alta.'),
+      lever('irrigation_open', 9.8, -12.3, 'Abrir el canal de los bancales', 'irrigation_open', 'El agua puede alcanzar los bancales cuando la bomba sostenga su trabajo.', 'El canal de los bancales queda cerrado.'),
       panel('irrigation_panel', 1, -6, 'Tablero de calor y riego', 'irrigation', ['water_routed'], 'irrigation_locked', 'vega_after'),
       lore('terraces_marker', -9, -6.5, 'Un turno para cada nombre', 'terraces_marker'),
       secret('terraces_secret', 11, 7.5, 'El octavo intento', 'terraces_secret'),
@@ -607,12 +616,12 @@ export const AREAS = {
   lake: {
     id: 'lake', name: 'Lago de las Señales', subtitle: 'Una luz para encontrar el regreso', theme: 'lake', bounds: [40, 34], spawn: [0, 12], entryDialogue: 'lake_arrival',
     objects: [
-      npc('nereo_lake', 4, 5, 'nereo', 'nereo_lake'),
+      npc('nereo_lake', 9.5, 3.2, 'nereo', 'nereo_lake'),
       npc('edda_lake', -5, 6, 'edda', 'lake_edda'),
       lever('lake_cable', -8, 0, 'Fijar el suministro del muelle', 'lake_cable', 'La línea que alimenta el Faro queda asegurada en su bornera.', 'El suministro del Faro queda abierto en el muelle.'),
       lever('lake_return', 8, -3, 'Conectar el retorno entre las cañas', 'lake_return', 'El retorno se une a la línea sumergida. Su baliza responde.', 'El retorno del Faro queda interrumpido en la orilla.'),
       lore('lake_boat', -10, -6, 'La barca de las tres maderas', 'lake_boat'),
-      secret('lake_secret', 11, 7.5, 'Una luz hacia tierra', 'lake_secret'),
+      secret('lake_secret', 5.4, 5.2, 'Una luz hacia tierra', 'lake_secret'),
     ],
     exits: [exit('lake_to_terraces', 0, 15, 'terraces', 'Las Terrazas', [], null, [0, -13]), exit('lake_to_lighthouse', 0, -15, 'lighthouse', 'El Faro', ['beacon_link'], 'lake_exit_locked')],
   },
@@ -675,8 +684,39 @@ export const PUZZLE_STORY = Object.fromEntries([
   ['beacon_lens', 'beacon_lens_arrival', 'beacon_lens_complete'],
 ].map(([id, arrival, complete]) => [id, { arrival, complete }]));
 
+// A closing line or a Bitácora page may only claim what the bench trace shows the
+// player actually tried. Saves without a trace get wording that claims nothing.
+const gateBrake = state => { const t = state.puzzles?.gate?.trace; return t === undefined || t === null ? null : t.brake || null; };
+export function completionLines(puzzle, state = {}) {
+  const lines = DIALOGUES[PUZZLE_STORY[puzzle]?.complete] || [];
+  if (puzzle !== 'gate') return lines;
+  const brake = gateBrake(state), text = !brake ? 'Cambió el sentido, y el cerrojo levantó.'
+    : brake.min === brake.max ? 'Cambió el sentido. La rueda quedó como estaba, y aun así levantó.' : 'Cambió el sentido. Y al ajustar la rueda, levantó sin atascarse.';
+  return lines.map(l => l.speaker === 'player' ? { ...l, text } : l);
+}
+export function journalText(entry, state = {}) {
+  if (entry.id === 'power') {
+    const agreement = TERRACES_AGREEMENT(state.puzzles?.irrigation);
+    if (agreement === 'forja') return 'Elegimos que el horno de Yesca siguiera fuerte. Las raíces y el riego quedaron justos, dentro de lo que el cable de la ladera sostiene. Vega va a vigilar la última parcela.';
+    if (agreement === 'riego') return 'Elegimos que el agua llegara primero. El horno de Yesca trabaja más bajo, a tandas más cortas, y el cable de la ladera no se calienta. La última parcela volvió a recibir agua.';
+    return entry.text;
+  }
+  if (entry.id !== 'operating_window') return entry.text;
+  const brake = gateBrake(state);
+  if (!brake) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó.';
+  if (brake.min === brake.max) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó. No toqué la rueda del freno: qué hace todavía está por probar.';
+  if (brake.min > 0 && brake.max < 30) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido. Moví la rueda del freno y cambió cuánto empujaba; no la llevé a los extremos.';
+  return entry.text;
+}
+
+// Routine preparations the inhabitants do themselves once a conversation ends.
+export const DIALOGUE_EFFECTS = {
+  lumen_before: { flags: ['workshop_feed'] },
+  nereo_lake: { flags: ['lake_cable', 'lake_return'] },
+};
+
 export const JOURNAL = [
-  { id: 'arrival', title: 'Al otro lado del Portal', text: 'Entré por una pared. Edda no pareció tan sorprendida como yo. Junto al arco hay un pequeño de bronce que no responde. Empiezo por mirar.', requires: [] },
+  { id: 'arrival', title: 'Al otro lado del Portal', text: 'Crucé el Portal. Del otro lado estaba Edda, de la familia que lo cuida; hacía años que nadie llegaba. Junto al arco hay un pequeño de bronce que no responde. Empiezo por mirar.', requires: [] },
   { id: 'circuit', title: 'El retorno también es camino', text: 'Ohm necesitaba las dos conexiones. Dibujé el camino entero, incluido el que vuelve. Edda quiere guardar también el dibujo de cuando no funcionaba.', explanation: 'El cristal es una fuente: aporta energía. El cobre permite el paso y Ohm la utiliza. Para que haya corriente eléctrica hace falta una trayectoria completa entre los dos extremos de la fuente, pasando por Ohm. A esa trayectoria la llamamos circuito cerrado. Un corte en cualquier parte puede interrumpirla.', requires: ['awaken'] },
   { id: 'diagnosis', title: 'La lámpara era la misma', text: 'Lumen había cambiado la lámpara tres veces. Al reparar el camino de cobre, encendió la que ya estaba. Conservamos el tramo viejo para compararlo con el nuevo.', explanation: 'La tela era una cubierta aislante. Debajo, el conductor de cobre estaba cortado. Con el banco apagado, la prueba de continuidad permite comprobar si hay paso entre los extremos de ese tramo. Una cubierta entera no demuestra que el conductor también lo esté. Esta prueba se hace sin alimentación; no sirve para afirmar que toda la máquina funcionará.', requires: ['workshop'] },
   { id: 'operating_window', title: 'Lo suficiente para levantar una puerta', text: 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido. Ajustar la rueda permitió que levantara; llevarla al extremo no fue la solución.', explanation: 'La polaridad describe el sentido de una tensión entre dos puntos. La tensión se mide en voltios (V); la corriente que pasa por un tramo, en amperios (A). La resistencia del regulador se mide en ohmios (Ω). En un resistor óhmico se relacionan mediante V = I × R. El cerrojo tiene un intervalo de trabajo: más corriente no equivale siempre a mejor funcionamiento.', requires: ['gate'] },
@@ -696,7 +736,7 @@ const objectives = [
   ['pump', { title: 'Donde empieza el agua', detail: 'Hablá con Vega en el Manantial y ayudala a mirar la bomba.', area: 'spring', object: 'pump_panel' }],
   ['distribution', { title: 'Una red que se puede comprender', detail: 'En el Castillo, buscá con la Consejera una forma de recuperar servicios sin poner en riesgo a sus vecinos.', area: 'castle', object: 'distribution_panel' }],
   ['irrigation', { title: 'Lo que compartimos', detail: 'Visitá las Terrazas. Yesca necesita trabajar; Vega necesita regar.', area: 'terraces', object: 'irrigation_panel' }],
-  ['beacon_link', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Completá el suministro y el retorno del muelle.', area: 'lake', object: 'lake_return' }],
+  ['beacon_link', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Él conoce las uniones del muelle; vos mirá cómo responden las balizas.', area: 'lake', object: 'nereo_lake' }],
   ['beacon_supply', { title: 'El Faro · I / III', detail: 'Conectá las dos manivelas de la base y verificá la fuente en el primer panel.', area: 'lighthouse', object: 'beacon_supply_panel' }],
   ['beacon_network', { title: 'El Faro · II / III', detail: 'Con Nereo, buscá el giro y las luces que faltan en la galería del medio.', area: 'lighthouse', object: 'beacon_network_panel' }],
   ['beacon_lens', { title: 'El Faro · III / III', detail: 'Abrí el obturador, liberá el freno óptico y ajustá la linterna hasta sostener la señal.', area: 'lighthouse', object: 'beacon_lens_panel' }],
@@ -730,6 +770,7 @@ export function resolveDialogueId(id, state = {}) {
   if (id === 'vega_spring' && f.spring_drive) context = 'vega_spring_ready';
   if (id === 'consejera_before' && f.castle_ready) context = 'castle_ready';
   if (id === 'yesca_before' && f.forge_limited) context = 'yesca_limited';
+  if (id === 'workshop_locked' && f.workshop_feed && !f.workshop_return) context = 'workshop_locked_right';
   if (id === 'vega_terraces' && f.irrigation_open) context = 'vega_channel_open';
   if (id === 'nereo_lake' && f.beacon_link) context = 'nereo_lake_linked';
   if (id === 'nereo_tower') context = f.beacon_network ? 'nereo_tower_network' : f.beacon_supply ? 'nereo_tower_source' : id;
@@ -755,8 +796,53 @@ export function resolveDialogueId(id, state = {}) {
   return context;
 }
 
+// The first lesson has one moment the player shapes: what to leave Tala before she starts.
+// None of the gifts is wrong; each changes how the three of them begin.
+export const LESSON_GIFTS = [
+  { id: 'sketch', label: 'El dibujo del taller: la tela entera sobre el cobre cortado.', memory: 'el dibujo del taller', lines: d(
+    ['tala', '¿La tela puede estar sana y el cobre no?'],
+    ['lumen', 'A mí me costó tres lámparas aprenderlo. A vos, un dibujo.'],
+    ['edda', 'No le creas al dibujo. Probalo.']) },
+  { id: 'failures', label: 'Las pruebas que me salieron mal.', memory: 'las pruebas que salieron mal', lines: d(
+    ['tala', 'Acá dice que no funcionó. ¿Para qué lo guardaste?'],
+    ['player', 'Porque sin eso, lo que funcionó parece suerte.'],
+    ['edda', 'Eso se lo robé a Lumen.'],
+    ['lumen', 'Te lo presté. Todavía lo quiero de vuelta.']) },
+  { id: 'silence', label: 'Nada todavía. Que mire primero.', memory: 'tiempo para mirar', lines: d(
+    ['narrator', 'Nadie dice nada. Tala pasa el dedo por la costura de la lámpara, despacio, dos veces.'],
+    ['edda', 'Eso era lo más difícil de darle.'],
+    ['ohm', 'Silencio registrado. Útil, por lo visto.']) },
+];
+export const lessonGift = state => LESSON_GIFTS.find(g => state?.flags?.[`lesson_gift_${g.id}`]) || null;
+function lessonLines(state) {
+  const lines = DIALOGUES.lighthouse_epilogue, split = lines.findIndex(l => l.speaker === 'tala' && /reparación vieja/.test(l.text)), gift = lessonGift(state);
+  const choice = { speaker: 'player', text: 'Antes de que empiece… ¿qué le dejo a Tala?', choices: LESSON_GIFTS.map(g => ({ id: g.id, label: g.label })) };
+  return [...lines.slice(0, split), ...(gift ? gift.lines : [choice]), ...lines.slice(split)];
+}
+
+// Terraces: two defensible agreements on the shared line; the closing names the one chosen.
+const TERRACES_CLOSE = {
+  forja: d(
+    ['narrator', 'El primer bancal se llena, más despacio. En la forja, el horno vuelve a rugir.'],
+    ['yesca', 'Tandas grandes. Doce azadas antes del mediodía. Vega, te debo tomates.'],
+    ['vega', 'Las raíces van justas. Alcanzan, pero la última parcela la voy a mirar todos los días.']),
+  riego: d(
+    ['narrator', 'El primer bancal se llena. Luego el segundo. En la forja, Yesca retoma su martillo al ritmo de la rueda.'],
+    ['yesca', 'Menos por tanda. Más tandas sin parar. Odio cuando algo razonable suena tan poco espectacular.'],
+    ['vega', 'El agua llega a la última parcela. Esa era la que nunca llegaba.']),
+};
+function terracesClose(state) {
+  const lines = DIALOGUES.irrigation_complete, agreement = TERRACES_AGREEMENT(state?.puzzles?.irrigation);
+  if (!agreement) return lines;
+  return [...TERRACES_CLOSE[agreement], ...lines.filter(l => /anotar|sendero del lago/.test(l.text))];
+}
+
 export function resolveDialogue(id, state = {}) {
-  return DIALOGUES[resolveDialogueId(id, state)] || [];
+  const resolved = resolveDialogueId(id, state);
+  if (resolved === 'irrigation_complete') return terracesClose(state);
+  if (resolved === 'lighthouse_epilogue') return lessonLines(state);
+  if (resolved === PUZZLE_STORY.gate.complete) return completionLines('gate', state);
+  return DIALOGUES[resolved] || [];
 }
 
 /** Small observations while travelling. These never contain required instructions. */
@@ -767,7 +853,8 @@ export const OHM_CHATTER = {
     { id: 'ohm_portal_3', text: 'Si tropiezo, estoy comprobando la gravedad. Con bastante compromiso.', requires: ['awaken'] },
   ],
   plaza: [
-    { id: 'ohm_plaza_1', text: 'Conservaron las cintas de la fiesta. Me parece una forma muy humana de hacer una predicción.' },
+    { id: 'ohm_plaza_fiesta', text: 'Colgaron las cintas. Una predicción guardada durante años, confirmada. Voy a necesitar un instrumento para medir esto.', requires: ['epilogue_shared'] },
+    { id: 'ohm_plaza_1', text: 'Conservaron las cintas de la fiesta. Me parece una forma muy humana de hacer una predicción.', unless: ['epilogue_shared'] },
     { id: 'ohm_plaza_2', text: 'Percibo pan caliente. No necesito comer, pero considero injusto perderme la parte social.' },
     { id: 'ohm_plaza_3', text: 'El agua volvió a la fuente. Esta consecuencia empezó detrás de una colina.', requires: ['pump'] },
   ],

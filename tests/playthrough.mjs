@@ -186,7 +186,9 @@ async function walkTo(id) {
       if (!await clickGround(partial)) await keyboardNudge(info.position, partial);
     }
     if (Date.now() - lastProgress > 6500) {
-      if (++replans > 2) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
+      if (++replans > 3) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
+      // A player caught in a corner steps back the way they came before trying again.
+      await page.keyboard.up('Shift'); await keyboardNudge(target, info.position); await keyboardNudge(target, info.position);
       path = navigationPath(info.position, goal, geometry.bounds, geometry.obstacles); waypoint = 0; lastProgress = Date.now();
       log('navigation-replan', { id, position: info.position });
     }
@@ -273,7 +275,7 @@ async function removeWire(a, b) {
   await page.locator(`button[data-wire="${index}"]`).click();
 }
 async function knob(key, value) {
-  const input = page.locator(`input[data-knob="${key}"]`);
+  const input = page.locator(`input[data-knob="${key}"]:visible`);
   const min = Number(await input.getAttribute('min')), step = Number(await input.getAttribute('step'));
   await input.press('Home');
   for (let i = 0; i < Math.round((value - min) / step); i++) await input.press('ArrowRight');
@@ -320,27 +322,45 @@ async function solvePanel(objectId, id) {
       await wire('trimB', 'latchIn'); await wire('latchOut', 'negative'); break;
     case 'pump': await wire('lineA', 'lineB'); break;
     case 'distribution':
-      await page.locator('[data-action="switch"][data-key="archive"]').click();
+      await page.locator('[data-action="switch"][data-key="archive"]:visible').click();
       await removeWire('clinicOut', 'kitchenIn');
       await wire('clinicOut', 'negative'); await wire('positive', 'kitchenIn'); break;
-    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); break;
+    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); await knob('forge', 8); break;
     case 'beacon_supply': await knob('ballast', 3); break;
     case 'beacon_network':
       await removeWire('opticOut', 'bearingIn'); await removeWire('bearingOut', 'signalIn');
       await wire('opticOut', 'negative'); await wire('positive', 'bearingIn');
       await wire('bearingOut', 'negative'); await wire('positive', 'signalIn'); break;
     case 'beacon_lens':
+      // Nereo's comparison, first half: the tap with the lens elsewhere.
+      if (!(await inspect()).puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
+      await measure('voltage', 'tap', 'negative');
+      await page.locator('[data-action="power"]').click(); await setMode('wire');
       await removeWire('positive', 'lensIn'); await wire('tap', 'lensIn'); await knob('upper', 12); break;
     default: throw new Error(`No UI repair sequence for ${id}`);
   }
   info = await inspect();
   if (info.puzzle.state.tripped) await page.locator('[data-action="rearm"]').click();
   else if (!info.puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
-  await page.locator('.wb-success').waitFor({ state: 'visible' });
+  if (id === 'distribution') {
+    // Ivara's request: show the infirmary lit while the kitchen is isolated, then reopen it.
+    await page.locator('.wb-proof').waitFor({ state: 'visible' });
+    await page.locator('[data-action="switch"][data-key="kitchen"]:visible').click();
+    assert.equal((await inspect()).puzzle.state.proofs.clinicAlone, true, 'The infirmary stays lit with the kitchen isolated');
+    await page.locator('[data-action="switch"][data-key="kitchen"]:visible').click();
+    log('proof', { id, proof: 'clinicAlone' });
+  }
+  if (id === 'beacon_lens') {
+    await page.locator('.wb-proof').waitFor({ state: 'visible' });
+    await measure('voltage', 'tap', 'negative');
+    assert.equal((await inspect()).puzzle.state.proofs.loadEffect, true, 'The tap was read unloaded and loaded');
+    log('proof', { id, proof: 'loadEffect' });
+  }
+  await page.locator('.wb-success:not(.wb-proof)').waitFor({ state: 'visible' });
   assert.equal((await inspect()).puzzle.result.solved, true, `${id}: electrical model verifies UI repair`);
   if (id === 'beacon_lens') await measure('voltage', 'lensIn', 'lensOut');
   await screenshot(`${id}-operating`);
-  await page.locator('.wb-success [data-action="close"]').first().click();
+  await page.locator('.wb-success [data-action="commission"]').first().click();
   await settle({ timeout: 40000 });
   assert.equal((await inspect()).flags[id], true, `${id}: putting in service persists the repair`);
   log('commissioned', { id });
@@ -362,7 +382,7 @@ try {
   await interact('plaza_bell');
   await travel('plaza_to_workshop', 'workshop');
   await interact('lumen');
-  await operate('workshop_feed', true); await fieldToggle('workshop_return', true);
+  assert.equal((await inspect()).flags.workshop_feed, true, 'Lumen closes his own left latch'); await fieldToggle('workshop_return', true);
   await solvePanel('workbench', 'workshop');
   await interact('workshop_cup');
   await travel('workshop_to_plaza', 'plaza');
@@ -391,7 +411,7 @@ try {
   await interact('terraces_secret');
   await travel('terraces_to_lake', 'lake');
   await interact('nereo_lake');
-  await operate('lake_cable', true); await operate('lake_return', true);
+  assert.ok((await inspect()).flags.lake_cable && (await inspect()).flags.lake_return, 'Nereo makes the dock joins');
   await interact('lake_secret');
   await travel('lake_to_lighthouse', 'lighthouse');
   await interact('nereo_tower');

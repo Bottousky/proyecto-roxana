@@ -5,14 +5,15 @@ import './atlas.css';
 import {PlayCanvasWorld as World} from '../world.js';
 import '../fonts.css';
 import {mountTravelInstrument,updateTravelInstrument} from './travel-instrument.js';
-import {advanceJourneyTime} from './story-time.js';
+import {advanceJourneyTime,journeyPhase} from './story-time.js';
 import './travel-instrument.css';
 import './art-polish.css';
 import './journey-ui.css';
+import './hud.css';
 import {renderJourneyGuide,bindMapViews} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
 import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
@@ -37,7 +38,7 @@ document.querySelector('#app').innerHTML=`
     <div id="interaction" class="interaction hidden"><button id="interact-button"><kbd>E</kbd><span id="interaction-label"></span></button><button id="field-measure" class="field-measure hidden"><kbd>Q</kbd> Mirar con Ohm</button></div>
     <aside id="field-meter" class="field-meter hidden" aria-label="Observación de Ohm" aria-live="polite"><button id="close-field-meter" aria-label="Guardar instrumento">×</button><span class="eyebrow">OHM · UNA OBSERVACIÓN</span><h3 id="field-title"></h3><p id="field-observation"></p><details id="field-details"><summary>Ver las lecturas</summary><div class="field-readings"><div><strong id="field-voltage"></strong><small>V · TENSIÓN</small></div><div><strong id="field-current"></strong><small>A · CORRIENTE</small></div></div><p id="field-reference" class="field-reference"></p><p class="field-guide">La tensión compara dos puntos. La corriente indica cuánto circula por un camino. Una raya significa que Ohm no puede fijar esa lectura; no significa cero.</p></details></aside>
     <div id="ohm-bubble" class="ohm-bubble hidden"><span class="ohm-eye"></span><p></p></div>
-    <div class="hud-bottom"><span id="control-reminder"><kbd>W A S D</kbd> caminar <span>·</span> <kbd>Shift</kbd> correr <span>·</span> clic para ir</span><span id="save-indicator" role="status">◈ Bitácora al día</span></div>
+    <div class="hud-bottom"><span id="control-reminder"><kbd>W A S D</kbd> caminar <span>·</span> <kbd>Shift</kbd> correr <span>·</span> <kbd>E</kbd> usar</span><span id="save-indicator" role="status">◈ Bitácora al día</span></div>
     <div id="touch-controls"><div class="dpad"><button data-dir="up" aria-label="Caminar hacia arriba">↑</button><button data-dir="left" aria-label="Caminar a la izquierda">←</button><button data-dir="down" aria-label="Caminar hacia abajo">↓</button><button data-dir="right" aria-label="Caminar a la derecha">→</button></div><button id="touch-interact" aria-label="Interactuar" disabled>Acercate</button></div>
   </div>
   <div id="arrival" class="arrival hidden"><div class="eyebrow">OHMDAL</div><h2></h2><p></p><div class="arrival-line"></div></div>
@@ -52,7 +53,7 @@ let settings=loadSettings();
 let loaded=loadState();
 let state=loaded.state||freshState(settings);
 let world,audio=new AudioDirector(),workbench;
-let mode='title',started=false,nearby=null,dialogue=null,dialogueEnd=null,typing=0,typed=0,transitioning=false,startingGame=false,assetLoadFailed=false;
+let lessonStarting=false,mode='title',started=false,nearby=null,dialogue=null,dialogueEnd=null,typing=0,typed=0,transitioning=false,startingGame=false,assetLoadFailed=false;
 let lastTime=performance.now(),autosave=0,bubbleUntil=0,arrivalTimeout,toastTimeout,modalReturn='world',modalFocus=null;
 const held=new Set();
 let activePointer=null;
@@ -76,7 +77,10 @@ function refreshTitle(){
   show('#continue',!!loaded.state);
   $('#new-game').className=loaded.state?'quiet':'primary';
   $('#new-game').innerHTML=loaded.state?'Comenzar otro viaje':`Cruzar el Portal ${svg('arrow')}`;
-  $('#save-description').textContent=loaded.state?`${AREAS[loaded.state.area]?.name||'Ohmdal'} · ${minutes(loaded.state.playtime)} min de viaje`:loaded.error||'Sin prisa. Sin combate. Con curiosidad.';
+  // The saved journey in one line: where, when, and how much of the kingdom already shines.
+  const describe=s=>{const lit=Object.keys(PUZZLE_STORY).filter(id=>s.flags?.[id]).length,phase=journeyPhase(s);
+    return [AREAS[s.area]?.name||'Ohmdal',`${phase.label}, día ${phase.day}`,s.flags?.epilogue_shared?'Arco completo':`${lit} de ${Object.keys(PUZZLE_STORY).length} luces encendidas`,`${minutes(s.playtime)} min de viaje`].join(' · ');};
+  $('#save-description').textContent=loaded.state?describe(loaded.state):loaded.error||'Sin prisa. Sin combate. Con curiosidad.';
 }
 refreshTitle();
 
@@ -110,7 +114,7 @@ function refreshHUD(){
   const objective=getObjective(state)||{title:'Un mundo que vuelve a preguntar',detail:'Todavía quedan historias por descubrir.'};
   $('#objective-title').textContent=objective.title;$('#objective-detail').textContent=objective.detail||'';
   const signature=objective.title+'|'+objective.detail;
-  if(signature!==objectiveSignature){objectiveSignature=signature;objectiveUntil=Infinity;$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');}
+  if(signature!==objectiveSignature){objectiveSignature=signature;objectiveUntil=performance.now()+12000;$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');}
   $('#chapter-label').textContent=state.flags.beacon_lens?'OHMDAL · LA PRIMERA LUZ':'OHMDAL · LA LUZ';
   updateTravelInstrument(document,state,world?.getPlayerPosition?.()||state.position||a.spawn,objective);
   if(activeMeasurement)renderFieldMeasurement();
@@ -182,7 +186,8 @@ async function startGame(resume=false){
   persist();
   if(state.activeCinematic)playPendingCinematic();
   else if(state.flags.beacon_lens&&!state.flags.finale_seen)runFinale();
-  else if(resume&&state.activeDialogue){const saved={...state.activeDialogue};speak(saved.id,saved.id===PUZZLE_STORY.beacon_lens.complete?showEnding:null);if(dialogue){dialogue.index=Math.min(saved.index,dialogue.lines.length-1);renderLine();}}
+  else if(resume&&state.activeDialogue){const saved={...state.activeDialogue};speak(saved.id,saved.id===PUZZLE_STORY.beacon_lens.complete?startLesson:saved.id==='lighthouse_epilogue'&&!state.flags.epilogue_shared?showEnding:null);if(dialogue){dialogue.index=Math.min(saved.index,dialogue.lines.length-1);renderLine();}}
+  else if(state.flags.finale_seen&&!state.flags.epilogue_shared)startLesson();
   else if(state.endingPending)showEnding();
   }finally{startingGame=false;}
 }
@@ -197,7 +202,7 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   state.area=id;state.position=spawn||AREAS[id].spawn;
   activeMeasurement=null;show('#field-meter',false);
   chatterClock=0;
-  hudUntil=performance.now()+11000;objectiveUntil=Infinity;
+  hudUntil=performance.now()+11000;objectiveUntil=performance.now()+12000;
   $('#hud').classList.remove('settled');$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');
   for(const [key,value] of Object.entries(AREAS[id].initialFlags||{}))if(!(key in state.flags))state.flags[key]=value;
   refreshWorldSystems(true);
@@ -206,9 +211,10 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   world.loadArea(AREAS[id],state,state.position,{continuous});audio.restored=Boolean(state.flags.beacon_lens);audio.setArea(id,{continuous});refreshHUD();
   if(!continuous){await world.prepareJourney((done,total)=>{$('#transition-name').textContent=`Abriendo los caminos · ${Math.round(done/total*100)}%`;});await wait(settings.reducedMotion?0:110);}show('#transition',false);transitioning=false;mode='world';
   clearTimeout(arrivalTimeout);
+  if(initial&&first&&id==='portal'){world.playPortalArrival();sound('portal');}
   if(initial&&first){$('#arrival h2').textContent=AREAS[id].name;$('#arrival p').textContent=AREAS[id].subtitle||'';show('#arrival');arrivalTimeout=setTimeout(()=>show('#arrival',false),2400);}
   $('#world').focus({preventScroll:true});persist();
-  if(first && AREAS[id].entryDialogue)queueDialogue(AREAS[id].entryDialogue,initial?1400:1200,id);
+  if(first && AREAS[id].entryDialogue)queueDialogue(AREAS[id].entryDialogue,initial?(id==='portal'?2500:1400):1200,id);
 }
 
 function linesFor(id){
@@ -236,16 +242,28 @@ function renderLine(){
   $('#dialogue-text').textContent='';typing=0;typed=0;
   $('#dialogue-announcement').textContent=`${character.name}: ${line.text}`;
   $('#dialogue-next').innerHTML=`${dialogue.index===dialogue.lines.length-1?'Seguir':'Continuar'} <kbd>↵</kbd><span>▾</span>`;
+  removeChoices();$('#dialogue-next').hidden=!!line.choices;
+  if(line.choices){const box=document.createElement('div');box.id='dialogue-choices';box.className='dialogue-choices';box.setAttribute('role','group');box.setAttribute('aria-label',line.text);
+    line.choices.forEach((choice,i)=>{const b=document.createElement('button');b.innerHTML=`<kbd>${i+1}</kbd>${choice.label}`;b.onclick=()=>chooseInDialogue(choice.id);box.append(b);});
+    $('#dialogue-text').after(box);setTimeout(()=>box.querySelector('button')?.focus({preventScroll:true}),0);}
   sound('voice');
   state.activeDialogue=typeof dialogue.id==='string'?{id:dialogue.id,index:dialogue.index}:null;persist();
 }
+function removeChoices(){if(typeof document!=='undefined')document.getElementById('dialogue-choices')?.remove();}
+function chooseInDialogue(id){
+  if(!dialogue?.lines[dialogue.index]?.choices)return;
+  if(LESSON_GIFTS.some(g=>g.id===id)){for(const g of LESSON_GIFTS)delete state.flags[`lesson_gift_${g.id}`];state.flags[`lesson_gift_${id}`]=true;}
+  sound('click');dialogue.lines=linesFor(dialogue.id);removeChoices();$('#dialogue-next').hidden=false;renderLine();$('#dialogue-next').focus({preventScroll:true});persist();
+}
 function nextLine(){
   if(!dialogue)return;
+  if(dialogue.lines[dialogue.index]?.choices){const focused=document.activeElement?.closest?.('#dialogue-choices button');if(focused)focused.click();return;}
   const text=dialogue.lines[dialogue.index].text;
   if(typed<text.length){typed=text.length;typing=typed;$('#dialogue-text').textContent=text;return;}
   if(++dialogue.index<dialogue.lines.length){renderLine();return;}
   if(dialogue.id==='lighthouse_epilogue'){state.flags.epilogue_shared=true;refreshHUD();}
   world?.endInhabitantConversation?.();
+  const effect=typeof dialogue.id==='string'&&DIALOGUE_EFFECTS[dialogue.id];if(effect){for(const f of effect.flags)state.flags[f]=true;world?.updateFlags?.(state);refreshWorldSystems();}
   show('#dialogue',false);dialogue=null;state.activeDialogue=null;mode='world';$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
 }
 
@@ -325,10 +343,11 @@ function openMap(){
 
 function openOptions(){
   const titleMode=mode==='title';
-  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa</p><p><kbd>Q</kbd> Medir junto a una instalación</p><p>Clic en el suelo para caminar. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
+  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label><label><span>Caminar con clic<span class="setting-note">Con el mouse. En pantallas táctiles siempre se puede tocar para ir</span></span><input id="click-walk" aria-label="Caminar con clic" type="checkbox" ${settings.clickToWalk?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic sobre algo cercano para usarlo. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
   $('#volume').oninput=e=>{settings.volume=Number(e.target.value);storeSettings();};
   $('#mute').onchange=e=>{settings.muted=e.target.checked;storeSettings();};
   $('#motion').onchange=e=>{settings.reducedMotion=e.target.checked;storeSettings();};
+  $('#click-walk').onchange=e=>{settings.clickToWalk=e.target.checked;storeSettings();};
   $('#quality').onchange=e=>{settings.quality=e.target.value;storeSettings();world?.resize();};
   $('#text-speed').onchange=e=>{settings.textSpeed=e.target.checked?9999:36;storeSettings();};
   $('#resume-option').onclick=closeModal;
@@ -361,18 +380,32 @@ function finishCinematic(){
   if(!playingCinematic)return;
   playingCinematic=false;const next=recordCinematicComplete(state);
   show('#cinematic',false);show('#hud');mode='world';held.clear();chatterClock=0;persist();
-  if(next){for(let i=dialogueQueue.length-1;i>=0;i--)if(dialogueQueue[i].id===next)dialogueQueue.splice(i,1);speak(next,next===PUZZLE_STORY.beacon_lens.complete?showEnding:null);}
+  if(next){for(let i=dialogueQueue.length-1;i>=0;i--)if(dialogueQueue[i].id===next)dialogueQueue.splice(i,1);speak(next,next===PUZZLE_STORY.beacon_lens.complete?startLesson:null);}
   else $('#world').focus({preventScroll:true});
 }
 function runFinale(){
   if(state.flags.finale_seen){speak('lighthouse_epilogue');return;}
   state.flags.beacon_lens=true;refreshWorldSystems(true);prepareCinematic(state,'beacon_lens');
   if(state.activeCinematic)playPendingCinematic();
-  else {state.flags.finale_seen=true;persist();speak(PUZZLE_STORY.beacon_lens.complete,showEnding);}
+  else {state.flags.finale_seen=true;persist();speak(PUZZLE_STORY.beacon_lens.complete,startLesson);}
+}
+// The Faro is lit, but the arc ends with the first lesson: a night passes, the three of
+// them gather at the lantern and the player decides what to leave Tala.
+async function startLesson(){
+  if(lessonStarting||state.flags.epilogue_shared)return;lessonStarting=true;
+  try{
+    mode='lesson';held.clear();show('#hud',false);show('#interaction',false);
+    $('#transition-name').textContent='A la mañana siguiente';show('#transition');await wait(1700);
+    advanceJourneyTime(state,{epilogue:true});
+    if(state.area!=='lighthouse'){mode='world';await enterArea('lighthouse',[-2.2,-9.4]);}else world.setPlayerPosition([-2.2,-9.4]);
+    state.position=world.getPlayerPosition();refreshHUD();persist();await wait(500);
+    show('#transition',false);show('#hud');mode='world';
+    speak('lighthouse_epilogue',showEnding);
+  }finally{lessonStarting=false;}
 }
 function showEnding(){
     state.endingPending=true;persist();
-    modalReturn='world';modal(`<div class="eyebrow">ARCO I · COMPLETO</div><div class="end-sigil">Ω</div><h2>La primera luz</h2><p class="end-copy">El Faro vuelve a orientar a quienes lo necesitan.<br>Ahora el conocimiento también sabe encontrar el camino de vuelta.</p><div class="end-stats"><span><strong>${state.visited.length}</strong>lugares compartidos</span><span><strong>${JOURNAL.filter(e=>hasRequirements(state,e.requires)).length}</strong>observaciones</span><span><strong>${state.secrets.length}</strong>recuerdos recuperados</span></div><button class="primary" id="keep-exploring">Seguir en Ohmdal ${svg('arrow')}</button><p class="end-note">Todavía quedan conversaciones, rincones y preguntas.<br>Tu viaje está guardado.</p>`,'ending-modal');$('#keep-exploring').onclick=()=>{world.endCinematic?.();closeModal();bubble('No voy a olvidar esto. Hice una copia. Y otra por si acaso.');};
+    modalReturn='world';modal(`<div class="eyebrow">ARCO I · COMPLETO</div><div class="end-sigil">Ω</div><h2>La primera luz</h2><p class="end-copy">El Faro vuelve a orientar a quienes lo necesitan.<br>Ahora el conocimiento también sabe encontrar el camino de vuelta.</p>${lessonGift(state)?`<p class="end-gift">A Tala le dejaste ${lessonGift(state).memory}.</p>`:''}<div class="end-stats"><span><strong>${state.visited.length}</strong>lugares compartidos</span><span><strong>${JOURNAL.filter(e=>hasRequirements(state,e.requires)).length}</strong>observaciones</span><span><strong>${state.secrets.length}</strong>recuerdos recuperados</span></div><button class="primary" id="keep-exploring">Seguir en Ohmdal ${svg('arrow')}</button><p class="end-note">Todavía quedan conversaciones, rincones y preguntas.<br>Tu viaje está guardado.</p>`,'ending-modal');$('#keep-exploring').onclick=()=>{world.endCinematic?.();closeModal();bubble('No voy a olvidar esto. Hice una copia. Y otra por si acaso.');};
 }
 
 $('#new-game').onclick=()=>{
@@ -389,7 +422,10 @@ $('#world').addEventListener('pointerdown',event=>{
   if(mode!=='world'||event.button!==0)return;
   const object=world.pickInteraction(event.clientX,event.clientY);
   intendedInteraction=null;
-  if(object){if(world.canInteractWith(object))interact(object);else if(world.approachInteraction(object))intendedInteraction=object.id;return;}
+  // With a mouse the keyboard walks; a click only uses what is within reach. Touch keeps tap-to-go.
+  const walk=event.pointerType!=='mouse'||settings.clickToWalk;
+  if(object){if(world.canInteractWith(object))interact(object);else if(walk&&world.approachInteraction(object))intendedInteraction=object.id;return;}
+  if(!walk)return;
   const point=world.pick(event.clientX,event.clientY);if(point)world.setTarget(point);activePointer={x:event.clientX,y:event.clientY};
 });
 document.querySelectorAll('[data-dir]').forEach(button=>{
@@ -419,7 +455,7 @@ window.addEventListener('keydown',event=>{
     if(event.repeat)return;
     if(mode==='dialogue')nextLine();else if(mode==='world')openOptions();return;
   }
-  if(mode==='dialogue'){if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
+  if(mode==='dialogue'){const pick=dialogue?.lines[dialogue.index]?.choices?.[Number(event.key)-1];if(pick&&!event.repeat){chooseInDialogue(pick.id);return;}if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
   if(mode!=='world')return;
   if(['e','E','Enter',' '].includes(event.key)){if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}

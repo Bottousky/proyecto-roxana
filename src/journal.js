@@ -1,4 +1,4 @@
-import {AREAS, JOURNAL} from './content.js';
+import {AREAS, JOURNAL, journalText} from './content.js';
 import {hasRequirements} from './state.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -13,7 +13,7 @@ export function journalPages(state) {
   return JOURNAL.filter(entry => hasRequirements(state, entry.requires)).map(entry => {
     const puzzle = RECORDS[entry.id]?.puzzle || entry.requires?.find(flag => state.puzzles?.[flag]);
     const area = RECORDS[entry.id]?.area || Object.values(AREAS).find(area => area.objects.some(obj => obj.puzzle === puzzle))?.id || 'lighthouse';
-    return {...entry, area, puzzle};
+    return {...entry, text: journalText(entry, state), area, puzzle};
   });
 }
 
@@ -60,6 +60,6 @@ export function renderJournal(state, {selected, puzzles={}, evidenceFor=()=>[]}=
   return `<div class="book-heading"><span class="eyebrow">INSTITUTO ROXANA · CUADERNO DE CAMPO</span><h2>La Bitácora</h2><p>Lo que vi. Lo que probé. Lo que todavía no sé.</p></div>
     <div class="fieldbook" data-journal-page="${esc(page.id)}"><nav class="book-index" aria-label="Páginas de la Bitácora"><span class="book-binding-mark">Ω</span><span class="book-index-title">Rastros del viaje</span>${pages.map((item,i)=>`<button data-journal-page="${esc(item.id)}" aria-current="${item.id===page.id?'page':'false'}"><span>${String(i+1).padStart(2,'0')}</span>${esc(item.title)}${item.experiment?'<small>en estudio</small>':''}</button>`).join('')}</nav>
     <article class="book-leaf"><header><span class="eyebrow">${esc(AREAS[page.area]?.name || 'Ohmdal')} · ${page.experiment?'UNA PRUEBA ABIERTA':'MEMORIA DEL ENCUENTRO'}</span><h3>${esc(page.title)}</h3></header><p class="book-experience">${esc(page.text)}</p>${renderCircuitSketch(puzzles[page.puzzle],snapshot)}${page.explanation?`<details class="book-explanation"><summary>La idea que pudimos explicar</summary><p>${esc(page.explanation)}</p></details>`:''}${page.question?`<blockquote>${esc(page.question)}</blockquote>`:''}<details class="book-own-note" ${state.personalNotes?.[page.id]?'open':''}><summary>Dejar mi pregunta o hipótesis</summary><label class="screen-reader-only" for="personal-journal-note">Mi pregunta o hipótesis</label><textarea id="personal-journal-note" data-note-for="${esc(page.id)}" maxlength="1200" rows="3" placeholder="Creo que… / Me pregunto qué pasaría si…">${esc(state.personalNotes?.[page.id]||'')}</textarea><small>Una idea puede cambiar. No hace falta tener la respuesta.</small></details></article>
-    <aside class="book-evidence"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3>${notes.length?`<ol>${notes.slice(-12).map(note=>`<li><strong>${esc(note.title)}</strong><p>${esc(note.text)}</p>${note.reading?`<span class="book-reading">${esc(note.reading)}</span>`:''}${note.reference?`<small>${esc(note.reference)}</small>`:''}</li>`).join('')}</ol>`:'<p class="book-empty">Todavía no registré una lectura aquí. Cuando use el instrumento, conservaré los puntos y el resultado.</p>'}<div class="book-marginalia">No borres lo que falló.<br>También cuenta el camino.<span>— anotación de Edda</span></div></aside></div>
+    <aside class="book-evidence"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3>${notes.length?`<ol>${notes.map(note=>`<li><strong>${esc(note.title)}</strong><p>${esc(note.text)}</p>${note.reading?`<span class="book-reading">${esc(note.reading)}</span>`:''}${note.reference?`<small>${esc(note.reference)}</small>`:''}</li>`).join('')}</ol>`:'<p class="book-empty">Todavía no registré una lectura aquí. Cuando use el instrumento, conservaré los puntos y el resultado.</p>'}<div class="book-marginalia">No borres lo que falló.<br>También cuenta el camino.<span>— anotación de Edda</span></div></aside></div>
     <footer class="book-footer"><button data-journal-page="${esc(previous?.id||page.id)}" ${!previous?'disabled':''} aria-label="Página anterior">← Hoja anterior</button><span>${Math.max(1,index+1)} / ${Math.max(1,pages.length)}</span><button data-journal-page="${esc(next?.id||page.id)}" ${!next?'disabled':''} aria-label="Página siguiente">Hoja siguiente →</button></footer>`;
 }

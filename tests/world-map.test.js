@@ -151,3 +151,14 @@ test('mobile map enlargement controls the same readable map without duplicating 
   assert.match(html,new RegExp(`data-world-x="${returnPosition[0]}" data-world-z="${returnPosition[1]}"`));
   assert.deepEqual([...html.matchAll(/data-area="([^"]+)"/g)].map(match=>match[1]),['portal','plaza']);
 });
+
+test('the kingdom map carries current only on links whose two places are restored', async () => {
+  const {freshState} = await import('../src/state.js');
+  const state = freshState(); state.area = 'spring'; state.visited = ['portal','plaza','workshop','road','spring'];
+  const count = s => (renderWorldMap(s).match(/class="journey-power"/g) || []).length;
+  assert.equal(count(state), 0, 'nothing restored, no current');
+  Object.assign(state.flags, { awaken: true, workshop: true, gate: true });
+  assert.equal(count(state), 3, 'portal–plaza, plaza–workshop and plaza–road');
+  state.flags.pump = true;
+  assert.equal(count(state), 4, 'road–spring joins once the pump runs');
+});

@@ -17,21 +17,23 @@ export function lakeShoreX(z) {
 
 export const AREA_LAYOUTS = {
   portal: {
-    identity: 'Un claro entre ruinas, con el arco al norte y dos pequeños desvíos de exploración.',
+    identity: 'Un claro entre ruinas: se llega por el arco, que mira al valle; el camino al pueblo lo rodea por el este.',
     paths: [
-      path('arrival-and-arch', 2.7, [0, 8], [0, 4], [-1.25, 1.2], [-1.25, -2.8], [0, -5.7], [0, -10]),
+      path('arrival-and-arch', 2.7, [0, 4], [-1.25, 1.2], [-1.25, -2.8], [0, -3.2]),
+      path('valley-road', 2.7, [0, -3.2], [3.8, -3.9], [6.2, -6.2], [6.6, -12]),
       path('ohm-approach', 2.15, [-1.25, 1.2], [1.2, 2.75], [3.5, 2.75]),
       path('western-ruins', 2.1, [0, 4], [-4, 3.4], [-5.25, 0], [-5.25, -3.65], [-8, -3.65]),
       path('keeper-house', 1.55, [-8, -3.65], [-10.36, -3.65], [-10.36, -4.3]),
       path('root-observation', 1.9, [0, 4], [5.5, 5.8], [8.5, 6.2]),
     ],
-    courts: [circle('arch-court', 0, -3, 4.2), circle('ohm-court', 3.5, 0, 2.85), circle('arrival-clearance', 0, 6.8, 2.3)],
-    buildings: [{ ...building('portal-keeper', 'Casa del Portal', -10.36, -7.2, 4.8, 4, 3.5, {stone:true}), composition: 'Conserva la escala baja junto al arco; su puerta se abre al claro, sin invadir el pilar occidental.' }],
+    courts: [circle('arch-court', 0, -3, 4.2), circle('ohm-court', 3.5, 0, 2.85), circle('garden-rest', 0, 5.2, 1.8)],
+    buildings: [{ ...building('portal-keeper', 'Casa de los Porteros', -10.36, -7.2, 4.8, 4, 3.5, {stone:true}), composition: 'La casa de Edda y su familia, que reciben a quien cruza. Escala baja junto al arco; su puerta se abre al claro, sin invadir el pilar occidental.' }],
     landmarks: [{ id: 'portal', label: 'Portal Ω', x: 0, z: -5.7 }],
-    exclusions: [rect('portal-pier-west', -3.25, -5.7, 1, 1.2), rect('portal-pier-east', 3.25, -5.7, 1, 1.2)],
+    exclusions: [rect('portal-pier-west', -3.25, -5.7, 1, 1.2), rect('portal-pier-east', 3.25, -5.7, 1, 1.2), rect('portal-surface', 0, -5.7, 5.5, .6)],
   },
   plaza: {
     identity: 'Un circuito alrededor de la fuente y calles cortas que terminan en puertas visibles.',
+    boundary: 'fence',
     paths: [
       path('south-arrival', 2.8, [0, 14], [0, 8.5], [0, 3.5]),
       path('fountain-circuit', 2.65, [0, 3.5], [-4.3, .1], [-4.3, -4.5], [0, -7.15], [4.3, -4.5], [4.3, .1], [0, 3.5]),
@@ -56,6 +58,15 @@ export const AREA_LAYOUTS = {
       { ...building('plaza-market', 'Mercado', 14.8, 3, 4.8, 4.6, 3.6, {awning:true,red:true}), composition: 'Pabellón bajo del este, enteramente dentro del jardín; la puerta mira al paseo sur y las provisiones quedan al costado.' },
     ],
     landmarks: [{ id: 'fountain', label: 'Fuente de Ohm', x: 0, z: -2 }],
+    // The rest of the village, beyond the playable square: low houses facing the Plaza, off every road.
+    backdrop: [
+      { x: -28, z: -5, w: 5, d: 4.2, h: 3.6, options: { stone: true, rotation: Math.PI / 2 } },
+      { x: -29, z: 7, w: 4.6, d: 4, h: 3.4, options: { red: true, rotation: Math.PI / 2 } },
+      { x: -34, z: -14, w: 4.4, d: 3.8, h: 3.3, options: { rotation: Math.PI / 2 } },
+      { x: -24, z: -19, w: 5.2, d: 4.4, h: 3.8, options: { red: true } },
+      { x: -12, z: -25, w: 4.6, d: 4, h: 3.5, options: { stone: true } },
+      { x: -1, z: -28, w: 5, d: 4.2, h: 3.6, options: {} },
+    ],
     exclusions: [],
     adjustments: [
       { id: 'plaza-crates', reason: 'Almacén junto al costado este, fuera de la fachada y su explanada', positions: [[-7.7, 0], [-7.7, .8], [-6.9, 0], [-6.9, .8]] },
@@ -111,7 +122,7 @@ export const AREA_LAYOUTS = {
     waters: [{ id: 'spring-channel', label: 'Manantial', points: [[-14.81, -14.5], [-8.31, -14.5], [-8.31, 10.5], [-14.81, 10.5]] }],
   },
   castle: {
-    identity: 'Un patio de servicio se abre en dos recorridos antes de reunirse en la puerta del Castillo.',
+    identity: 'Un patio de servicio se abre en dos recorridos antes de reunirse en la puerta del Castillo; el tablero cuelga de la muralla, junto al portón.',
     paths: [
       path('castle-arrival', 2.8, [0, 14], [0, 8], [0, 2]),
       path('west-courtyard-loop', 2.65, [0, 2], [-4.3, -1], [-4.3, -8.8], [0, -9.6]),
@@ -119,14 +130,13 @@ export const AREA_LAYOUTS = {
       path('castle-gate', 2.8, [0, -9.6], [0, -14]),
       path('west-service', 2.1, [-4.3, -1], [-8, .4], [-9.5, -2.3], [-9.5, -4.7], [-11, -7.25]),
       path('east-service', 2.1, [4.3, -1], [8, .4], [9.5, -2.3], [9.5, -5.3], [11, -7.75]),
-      path('distribution-approach', 2, [-4.3, -3.9], [0, -4.45], [4.3, -3.9]),
     ],
     courts: [rect('arrival-court', 0, 4.4, 17, 7.6), rect('service-court', 0, -2.9, 18.6, 8.2), rect('gate-forecourt', 0, -9.1, 16, 2.8)],
     buildings: [], landmarks: [{ id: 'castle', label: 'Castillo de la Red', x: 0, z: -12.8 }],
     exclusions: [rect('west-castle-wall', -9.3, -12.8, 14.6, 3.5), rect('east-castle-wall', 9.3, -12.8, 14.6, 3.5), rect('west-castle-tower', -14.4, -10.88, 5.6, 5.6), rect('east-castle-tower', 14.4, -10.88, 5.6, 5.6)],
   },
   terraces: {
-    identity: 'Los corredores de los bancales explican el riego; la calle alta une ambas casas.',
+    identity: 'Bancales en escalón bajan de la loma; arriba, la forja y el molino comparten la mesa del medio.',
     paths: [
       path('terrace-spine', 2.65, [0, 16], [0, 10], [-1, 5], [-2.6, 1.5], [-2.6, -8.8], [0, -11], [0, -16]),
       path('west-work-lane', 2.1, [-1, 5], [-5.5, 5], [-6.5, 2], [-6.5, -9], [-7, -10.25]),
@@ -138,7 +148,6 @@ export const AREA_LAYOUTS = {
       path('east-upper-bed-aisle', 1.55, [6.5, -4.43], [17.2, -4.43]),
       path('west-lower-bed-aisle', 1.55, [-6.5, 1.2], [-11.6, 1.07], [-17.2, 1.07]),
       path('east-lower-bed-aisle', 1.55, [6.5, 1.2], [11.6, 1.07], [17.2, 1.07]),
-      path('control-apron', 1.8, [-8, 1.4], [-6.5, 2], [0, 2], [6.5, 2], [8, 1.4]),
       path('irrigation-panel-approach', 1.9, [-2.6, -3.6], [1, -3.9]),
       path('trial-garden', 2, [5.5, 5], [8.5, 6.6], [11, 8.8]),
     ],

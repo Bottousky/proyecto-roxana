@@ -129,7 +129,8 @@ function terraces(state, object) {
   const repaired = readFlag(state, 'irrigation');
   const limited = readFlag(state, 'forge_limited', repaired), channel = readFlag(state, 'irrigation_open', repaired);
   const model = makeSupply(18, readFlag(state, 'distribution'), 4.3);
-  model.resistors.push(resistor('forge', 'bus', 'source−', limited ? 24 : 6),
+  // On the shared board the forge draws what the bench's brake leaves it (12 Ω + brake).
+  model.resistors.push(resistor('forge', 'bus', 'source−', limited ? 12 + value(state, 'irrigation', 'forge', 12) : 6),
     resistor('root-regulator', 'bus', 'roots+', value(state, 'irrigation', 'warmth', repaired ? 12 : 0)), resistor('roots', 'roots+', 'source−', 24),
     resistor('flow-regulator', 'bus', 'flow+', value(state, 'irrigation', 'flow', repaired ? 12 : 0)), resistor('flow', 'flow+', 'source−', 18));
   const probes = {

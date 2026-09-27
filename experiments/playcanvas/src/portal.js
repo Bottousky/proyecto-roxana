@@ -4,6 +4,7 @@ import {SHADERLANGUAGE_GLSL,StandardMaterial,Color,BLEND_NORMAL,CULLFACE_NONE} f
 // the source renderer's shader (which the scene export cannot carry over).
 const emissivePS=`
 uniform float uPortalTime;
+uniform float uPortalFlare;
 void getEmission(){
   vec2 p=(vUv0-0.5)*2.0;float r=length(p),a=atan(p.y,p.x),t=uPortalTime;
   // Two counter-rotating spiral arms over a deep centre that brightens to a luminous rim.
@@ -14,7 +15,7 @@ void getEmission(){
   col+=bright*(arm*0.55+arm2*0.3)*smoothstep(0.05,0.6,r);
   col+=bright*smoothstep(0.78,0.97,r)*0.9;
   col+=vec3(0.9,1.0,1.0)*(1.0-smoothstep(0.0,0.18,r))*(0.25+0.15*sin(t*1.7));
-  dEmission=col*0.78;
+  dEmission=col*(0.78+uPortalFlare*1.5)+vec3(0.6,0.95,1.0)*uPortalFlare*0.35;
 }`;
 const opacityPS=`
 void getOpacity(){vec2 p=(vUv0-0.5)*2.0;dAlpha=(1.0-smoothstep(0.96,1.0,length(p)))*0.94;}`;
@@ -23,5 +24,5 @@ export function makePortalSurface(texture){
   const m=new StandardMaterial();m.diffuse=new Color(0,0,0);m.emissive=new Color(1,1,1);m.emissiveMap=texture;m.opacityMap=texture;
   m.blendType=BLEND_NORMAL;m.depthWrite=false;m.cull=CULLFACE_NONE;m.useLighting=false;m.shaderChunksVersion='2.22';
   const chunks=m.getShaderChunks(SHADERLANGUAGE_GLSL);chunks.set('emissivePS',emissivePS);chunks.set('opacityPS',opacityPS);
-  m.setParameter('uPortalTime',0);m.update();return m;
+  m.setParameter('uPortalTime',0);m.setParameter('uPortalFlare',0);m.update();return m;
 }

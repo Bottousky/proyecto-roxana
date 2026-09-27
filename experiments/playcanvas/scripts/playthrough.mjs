@@ -134,19 +134,6 @@ async function worldGeometry(id) {
   }, id);
 }
 
-async function clickGround(point) {
-  const screen = await page.evaluate(point => {
-    const world = window.__ohmdal.world;
-    const projected = world.getScreenPosition({x:point[0],z:point[1],ground:true});
-    const rect = world.canvas.getBoundingClientRect();
-    const x = rect.left + projected.x, y = rect.top + projected.y;
-    return { x, y, unobscured: document.elementFromPoint(x, y) === world.canvas && !world.pickInteraction(x,y) };
-  }, point);
-  if (!screen.unobscured || !(screen.x > 10 && screen.x < 1430 && screen.y > 120 && screen.y < 855)) return false;
-  await page.mouse.click(screen.x, screen.y);
-  return true;
-}
-
 async function keyboardNudge(from, toward) {
   const dx = toward[0] - from[0], dz = toward[1] - from[1];
   const screenX = dx, screenZ = dz;
@@ -159,6 +146,18 @@ async function keyboardNudge(from, toward) {
   for (const key of keys) await page.keyboard.up(key);
 }
 
+// Walking is done like a player with a keyboard: arrow keys held toward the next waypoint.
+const heldKeys = new Set();
+async function steer(from, to, run) {
+  const dx = to[0] - from[0], dz = to[1] - from[1], scale = Math.max(Math.abs(dx), Math.abs(dz), 0.001), want = new Set();
+  if (Math.abs(dx) > scale * 0.4) want.add(dx > 0 ? 'ArrowRight' : 'ArrowLeft');
+  if (Math.abs(dz) > scale * 0.4) want.add(dz > 0 ? 'ArrowDown' : 'ArrowUp');
+  if (run) want.add('Shift');
+  for (const key of [...heldKeys]) if (!want.has(key)) { await page.keyboard.up(key); heldKeys.delete(key); }
+  for (const key of want) if (!heldKeys.has(key)) { await page.keyboard.down(key); heldKeys.add(key); }
+}
+async function releaseKeys() { for (const key of [...heldKeys]) await page.keyboard.up(key); heldKeys.clear(); }
+
 async function walkTo(id) {
   stage = `walk:${id}`;
   await settle({ stable: 160 });
@@ -166,6 +165,8 @@ async function walkTo(id) {
   assert.ok(geometry.object, `${id} exists in the current physical area`);
   let goal = geometry.path?.at(-1) || [geometry.object.x, geometry.object.z];
   let info = await inspect();
+  // A crossing walks the traveller onto the new ground by itself; wait for it like a player would.
+  for (const until = Date.now() + 8000; info.target && Date.now() < until; info = await inspect()) await page.waitForTimeout(100);
   const startingArea = info.area;
   let path = geometry.path?.length ? geometry.path : [goal];
   let waypoint = 0, lastProgress = Date.now(), best = distance(info.position, goal), replans = 0;
@@ -173,31 +174,40 @@ async function walkTo(id) {
   while (Date.now() - started < 65000) {
     info = await inspect();
     assert.equal(info.area, startingArea, `Walking toward ${id} must remain in its authored area`);
-    if (info.mode !== 'world') { await page.keyboard.up('Shift'); await settle({ stable: 180 }); continue; }
-    if (info.nearby === id || await page.evaluate(id => {const w=window.__ohmdal.world;return w.canInteractWith(w.getInteractions().find(o=>o.id===id));},id)) { await page.keyboard.up('Shift'); return geometry.object; }
+    if (info.mode !== 'world') { await releaseKeys(); await settle({ stable: 180 }); continue; }
+    if (info.nearby === id || await page.evaluate(id => {const w=window.__ohmdal.world;return w.canInteractWith(w.getInteractions().find(o=>o.id===id));},id)) { await releaseKeys(); return geometry.object; }
     if (distance(info.position, goal) < best - 0.12) { best = distance(info.position, goal); lastProgress = Date.now(); }
-    if (waypoint < path.length - 1 && distance(info.position, path[waypoint]) < 0.5) waypoint++;
+    while (waypoint < path.length - 1 && distance(info.position, path[waypoint]) < 0.6) waypoint++;
     const target = path[waypoint];
-    const dist = distance(info.position, target);
-    const step = Math.min(3.4, dist);
-    const partial = dist < 0.01 ? target : [info.position[0] + (target[0] - info.position[0]) / dist * step, info.position[1] + (target[1] - info.position[1]) / dist * step];
-    await page.keyboard.down('Shift');
-    if (!info.target || distance(info.target, partial) > 0.85) {
-      if (!await clickGround(partial)) await keyboardNudge(info.position, partial);
-    }
+    await steer(info.position, target, distance(info.position, target) > 2);
     if (Date.now() - lastProgress > 6500) {
-      if (++replans > 2) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
+      if (++replans > 3) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
+      // A player caught in a corner steps back the way they came before trying again.
+      await releaseKeys(); await keyboardNudge(target, info.position); await keyboardNudge(target, info.position);
+      // …and sidesteps, alternating sides, as someone would around a post.
+      const side = replans % 2 ? 1 : -1, dx = target[0] - info.position[0], dz = target[1] - info.position[1];
+      for (let i = 0; i < 3; i++) await keyboardNudge(info.position, [info.position[0] - dz * side, info.position[1] + dx * side]);
       const fresh = await worldGeometry(id); path = fresh.path?.length ? fresh.path : [goal]; goal = path.at(-1); waypoint = 0; lastProgress = Date.now();
       log('navigation-replan', { id, position: info.position });
     }
-    await page.waitForTimeout(160);
+    await page.waitForTimeout(60);
   }
+  await releaseKeys();
   throw new Error(`Walking timed out for ${id}: ${JSON.stringify(await inspect())}`);
+}
+
+// Step closer until this, and not a neighbouring object, is what E would use.
+async function approach(id, object) {
+  for (const until = Date.now() + 2500; (await inspect()).nearby !== id && Date.now() < until;) {
+    const info = await inspect(); await steer(info.position, [object.x, object.z], false); await page.waitForTimeout(60);
+  }
+  await releaseKeys();
 }
 
 async function interact(id, { settleAfter = true } = {}) {
   const object = await walkTo(id);
   stage = `interact:${id}`;
+  await approach(id, object);
   if((await inspect()).nearby===id) await page.keyboard.press('e');
   else {const p=await page.evaluate(id=>{const w=window.__ohmdal.world,o=w.getInteractions().find(o=>o.id===id),p=w.getScreenPosition(o),r=w.canvas.getBoundingClientRect();return {x:p.x+r.left,y:p.y+r.top};},id);await page.mouse.click(p.x,p.y);}
   log('interact', { area: (await inspect()).area, id });
@@ -214,6 +224,7 @@ async function operate(id, desired) {
 
 async function fieldToggle(id, desired) {
   const object = await walkTo(id);
+  await approach(id, object);
   stage = `field-measurement:${id}`;
   assert.notEqual(Boolean((await inspect()).flags[object.action.flag]), desired, 'The field probe observes a real change of control');
   await page.keyboard.press('q');
@@ -276,7 +287,7 @@ async function removeWire(a, b) {
   await page.locator(`button[data-wire="${index}"]`).click();
 }
 async function knob(key, value) {
-  const input = page.locator(`input[data-knob="${key}"]`);
+  const input = page.locator(`input[data-knob="${key}"]:visible`);
   const min = Number(await input.getAttribute('min')), step = Number(await input.getAttribute('step'));
   await input.press('Home');
   for (let i = 0; i < Math.round((value - min) / step); i++) await input.press('ArrowRight');
@@ -326,24 +337,42 @@ async function solvePanel(objectId, id) {
       assert.equal((await inspect()).puzzle.state.switches.archive,false,'The archive was isolated in the courtyard');
       await removeWire('clinicOut', 'kitchenIn');
       await wire('clinicOut', 'negative'); await wire('positive', 'kitchenIn'); break;
-    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); break;
+    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); await knob('forge', 8); break;
     case 'beacon_supply': await knob('ballast', 3); break;
     case 'beacon_network':
       await removeWire('opticOut', 'bearingIn'); await removeWire('bearingOut', 'signalIn');
       await wire('opticOut', 'negative'); await wire('positive', 'bearingIn');
       await wire('bearingOut', 'negative'); await wire('positive', 'signalIn'); break;
     case 'beacon_lens':
+      // Nereo's comparison, first half: the tap with the lens elsewhere.
+      if (!(await inspect()).puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
+      await measure('voltage', 'tap', 'negative');
+      await page.locator('[data-action="power"]').click(); await setMode('wire');
       await removeWire('positive', 'lensIn'); await wire('tap', 'lensIn'); await knob('upper', 12); break;
     default: throw new Error(`No UI repair sequence for ${id}`);
   }
   info = await inspect();
   if (info.puzzle.state.tripped) await page.locator('[data-action="rearm"]').click();
   else if (!info.puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
-  await page.locator('.wb-success').waitFor({ state: 'visible' });
+  if (id === 'distribution') {
+    // Ivara's request: show the infirmary lit while the kitchen is isolated, then reopen it.
+    await page.locator('.wb-proof').waitFor({ state: 'visible' });
+    await page.locator('[data-action="switch"][data-key="kitchen"]:visible').click();
+    assert.equal((await inspect()).puzzle.state.proofs.clinicAlone, true, 'The infirmary stays lit with the kitchen isolated');
+    await page.locator('[data-action="switch"][data-key="kitchen"]:visible').click();
+    log('proof', { id, proof: 'clinicAlone' });
+  }
+  if (id === 'beacon_lens') {
+    await page.locator('.wb-proof').waitFor({ state: 'visible' });
+    await measure('voltage', 'tap', 'negative');
+    assert.equal((await inspect()).puzzle.state.proofs.loadEffect, true, 'The tap was read unloaded and loaded');
+    log('proof', { id, proof: 'loadEffect' });
+  }
+  await page.locator('.wb-success:not(.wb-proof)').waitFor({ state: 'visible' });
   assert.equal((await inspect()).puzzle.result.solved, true, `${id}: electrical model verifies UI repair`);
   if (id === 'beacon_lens') await measure('voltage', 'lensIn', 'lensOut');
   await screenshot(`${id}-operating`);
-  await page.locator('.wb-success [data-action="close"]').first().click();
+  await page.locator('.wb-success [data-action="commission"]').first().click();
   await settle({ timeout: 40000 });
   assert.equal((await inspect()).flags[id], true, `${id}: putting in service persists the repair`);
   log('commissioned', { id });
@@ -365,7 +394,7 @@ try {
   await interact('plaza_bell');
   await travel('plaza_to_workshop', 'workshop');
   await interact('lumen');
-  await operate('workshop_feed', true); await fieldToggle('workshop_return', true);
+  assert.equal((await inspect()).flags.workshop_feed, true, 'Lumen closes his own left latch'); await fieldToggle('workshop_return', true);
   await solvePanel('workbench', 'workshop');
   await interact('workshop_cup');
   await travel('workshop_to_plaza', 'plaza');
@@ -394,7 +423,7 @@ try {
   await interact('terraces_secret');
   await travel('terraces_to_lake', 'lake');
   await interact('nereo_lake');
-  await operate('lake_cable', true); await operate('lake_return', true);
+  assert.ok((await inspect()).flags.lake_cable && (await inspect()).flags.lake_return, 'Nereo makes the dock joins');
   await interact('lake_secret');
   await travel('lake_to_lighthouse', 'lighthouse');
   await interact('nereo_tower');

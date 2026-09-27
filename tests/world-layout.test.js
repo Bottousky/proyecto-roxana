@@ -93,9 +93,9 @@ test('exterior garden walls are visible and have matching physical boundaries',(
     if(area.id==='workshop')continue;
     const world=buildCollisionWorld(area.id,{flags:restored});
     try{
-      const walls=[];world.root.traverse(mesh=>{if(mesh.name==='playable-garden-wall')walls.push(mesh);});
+      const walls=[];world.root.traverse(mesh=>{if(['playable-garden-wall','playable-fence-sill','playable-hedge'].includes(mesh.name))walls.push(mesh);});
       const barriers=world.boundaryObstacles.filter(o=>o.id==='playable-boundary');
-      assert.ok(walls.length>0&&barriers.length>0,`${area.id}: the playable edge has no visible physical wall`);
+      assert.ok(walls.length>0&&barriers.length>0,`${area.id}: the playable edge has no visible physical wall or fence`);
       for(const barrier of barriers){
         assert.ok(world.obstacles.includes(barrier),`${area.id}: boundary is absent from collision geometry`);
         assert.ok(walls.some(mesh=>{
@@ -175,7 +175,7 @@ test('perimeter walls and their caps stop outside complete building and porch fo
     world.root.updateMatrixWorld(true);
     const architecture=[],walls=[],caps=[];
     world.root.traverse(object=>{
-      if(object.name==='playable-garden-wall'||object.name==='exit-pier')walls.push(object);
+      if(['playable-garden-wall','playable-fence-sill','playable-hedge','exit-pier'].includes(object.name))walls.push(object);
       if(object.name==='garden-wall-cap'||object.name==='exit-pier-cap')caps.push(object);
       if(!object.userData.architecture)return;
       const data=object.userData.architecture;

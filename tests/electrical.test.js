@@ -79,7 +79,7 @@ const solutions = {
   gate(s) { s.wires = [['positive','trimA'], ['trimB','latchIn'], ['latchOut','negative']]; },
   pump(s) { s.wires.push(['lineA','lineB']); },
   distribution(s) { s.switches.archive = false; s.wires = [['positive','clinicIn'], ['clinicOut','negative'], ['positive','kitchenIn'], ['kitchenOut','negative'], ['positive','archiveIn'], ['archiveOut','negative']]; },
-  irrigation(s) { s.values.warmth = 12; s.values.flow = 12; },
+  irrigation(s) { s.values.warmth = 12; s.values.flow = 12; s.values.forge = 8; },
   beacon_supply(s) { s.values.ballast = 3; },
   beacon_network(s) { s.wires = [['positive','opticIn'], ['opticOut','negative'], ['positive','bearingIn'], ['bearingOut','negative'], ['positive','signalIn'], ['signalOut','negative']]; },
   beacon_lens(s) { s.wires = [['positive','upperA'], ['lowerB','negative'], ['tap','lensIn'], ['lensOut','negative']]; s.values.upper = 12; },
@@ -102,7 +102,7 @@ for (const [id, solve] of Object.entries(solutions)) {
 test('solutions are operating ranges, not memorized control combinations', () => {
   for (const resistance of [10, 12, 14]) {
     const s = initialPuzzleSnapshot('irrigation');
-    s.values.warmth = resistance; s.values.flow = 12;
+    s.values.warmth = resistance; s.values.flow = 12; s.values.forge = 8;
     assert.equal(evaluatePuzzle('irrigation', s).solved, true);
   }
   for (const resistance of [2, 3]) {
@@ -126,7 +126,7 @@ test('restoring snapshots rejects nonexistent terminals and clamps corrupted set
   s.meter = { mode: 'teleport', a: 'missing', b: 'positive' };
   const repaired = normalizePuzzleSnapshot('irrigation', s);
   assert.equal(repaired.values.warmth, 36); assert.equal(repaired.values.flow, 0);
-  assert.equal(repaired.wires.length, 6); assert.equal(repaired.meter.mode, 'voltage'); assert.equal(repaired.meter.a, null);
+  assert.equal(repaired.wires.length, 9); assert.equal(repaired.meter.mode, 'voltage'); assert.equal(repaired.meter.a, null);
 });
 
 test('saved completed state never bypasses electrical validation', () => {
@@ -151,7 +151,9 @@ test('commissioning only commits a currently operating network and never repeats
       assert.equal(events.length, 0, 'stable readings alone must not commission');
       if (condition === 'broken-after-working') state.wires.pop();
       if (condition === 'already-commissioned') state.completed = true;
-      bench.close(condition !== 'replace-open-panel');
+      // Leaving never commissions; only the explicit decision does.
+      if (condition === 'working') { bench.close(true); assert.equal(state.completed, false, 'leaving must not put the installation into service'); events.length = 0; bench.active = true; bench.shell = { remove() {} }; }
+      bench.close(condition !== 'replace-open-panel', { commission: true });
       assert.deepEqual(events, condition === 'working' ? ['solve', 'save', 'close'] : condition === 'replace-open-panel' ? [] : ['close']);
       if (condition === 'working') assert.equal(state.completed, true);
       bench.close();
@@ -223,4 +225,33 @@ test('comparison requires two valid points and preserves polarity without mandat
   bench.showNumbers = true;
   assert.ok(bench.presentedReading().value.startsWith('-'));
   assert.equal(bench.presentedReading().unit, 'V');
+});
+
+test('terraces share one hillside line: over the limit nothing commissions, and two agreements both work', async () => {
+  const { terracesAgreement } = await import('../src/puzzle-model.js');
+  const base = { ...initialPuzzleSnapshot('irrigation'), sourceOn: true };
+  const withValues = values => ({ ...base, values: { ...base.values, ...values } });
+  const greedy = withValues({ warmth: 12, flow: 12, forge: 0 });
+  const r = evaluatePuzzle('irrigation', greedy);
+  assert.equal(r.overloaded, false, 'the shared line heats, it does not trip like a short');
+  assert.equal(r.constraintsMet, false); assert.equal(r.solved, false);
+  assert.ok(observePuzzle('irrigation', greedy, r).some(o => /Alguien tiene que ceder/.test(o.text)));
+  // The forge keeps its strength: roots and water at their lean end.
+  const forge = withValues({ warmth: 18, flow: 16, forge: 4 });
+  assert.equal(evaluatePuzzle('irrigation', forge).solved, true); assert.equal(terracesAgreement(forge), 'forja');
+  // Water first: a gentler forge.
+  const water = withValues({ warmth: 12, flow: 12, forge: 10 });
+  assert.equal(evaluatePuzzle('irrigation', water).solved, true); assert.equal(terracesAgreement(water), 'riego');
+  // Too little heat and Yesca cannot work at all.
+  assert.equal(evaluatePuzzle('irrigation', withValues({ warmth: 12, flow: 12, forge: 24 })).solved, false);
+});
+
+test('the terraces closing and journal page name the agreement that was chosen', async () => {
+  const { resolveDialogue, JOURNAL, journalText } = await import('../src/content.js');
+  const snap = values => ({ ...initialPuzzleSnapshot('irrigation'), sourceOn: true, values: { ...initialPuzzleSnapshot('irrigation').values, ...values } });
+  const forge = { puzzles: { irrigation: snap({ warmth: 18, flow: 16, forge: 4 }) } }, water = { puzzles: { irrigation: snap({ warmth: 12, flow: 12, forge: 10 }) } };
+  const said = st => resolveDialogue('irrigation_complete', st).map(l => l.text).join(' ');
+  assert.match(said(forge), /Doce azadas/); assert.match(said(water), /Menos por tanda/);
+  const page = JOURNAL.find(e => e.id === 'power');
+  assert.match(journalText(page, forge), /horno de Yesca siguiera fuerte/); assert.match(journalText(page, water), /agua llegara primero/);
 });

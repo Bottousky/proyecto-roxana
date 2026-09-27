@@ -5,7 +5,7 @@ import {normalizeJourneyTime} from './story-time.js';
 export const SAVE_KEY = 'ohmdal.playcanvas.arc1.v1';
 export const SETTINGS_KEY = 'ohmdal.playcanvas.settings.v1';
 export const AREA_IDS = ['portal','plaza','workshop','road','spring','castle','terraces','lake','lighthouse'];
-export const DEFAULT_SETTINGS = {volume:0.55, muted:false, reducedMotion:false, quality:'high', textSpeed:36};
+export const DEFAULT_SETTINGS = {volume:0.55, muted:false, reducedMotion:false, quality:'high', textSpeed:36, clickToWalk:false};
 
 export function freshState(settings = {}) {
   return {version:1,area:'portal',position:null,flags:{},seen:[],secrets:[],visited:[],puzzles:{},fieldNotes:[],personalNotes:{},journeyTime:{phase:0},activeDialogue:null,activeCinematic:null,endingPending:false,playtime:0,createdAt:Date.now(),savedAt:Date.now(),settings:{...DEFAULT_SETTINGS,...settings}};
@@ -15,7 +15,7 @@ function settingsFrom(value) {
   const result={...DEFAULT_SETTINGS};
   if(!record(value))return result;
   if(Number.isFinite(value.volume))result.volume=Math.max(0,Math.min(1,value.volume));
-  for(const key of ['muted','reducedMotion'])if(typeof value[key]==='boolean')result[key]=value[key];
+  for(const key of ['muted','reducedMotion','clickToWalk'])if(typeof value[key]==='boolean')result[key]=value[key];
   if(['high','low'].includes(value.quality))result.quality=value.quality;
   if(Number.isFinite(value.textSpeed)&&value.textSpeed>0)result.textSpeed=Math.min(9999,value.textSpeed);
   return result;

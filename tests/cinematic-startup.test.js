@@ -34,12 +34,12 @@ function startupHarness(imported){
   const data=new Map(),nodes=new Map(),audio=deferred(),art=deferred();
   const db={getItem:key=>data.get(key)||null,setItem:(key,value)=>data.set(key,value)};
   saveState(imported,db);
-  let position=[-9,-8],endingCalls=0;
+  let position=[-9,-8],endingCalls=0,lessonCalls=0;
   const context={
     state:freshState(),settings:{...freshState().settings},started:true,startingGame:false,
     mode:'world',held:new Set(['ArrowRight']),assetLoadFailed:false,
     playingCinematic:false,pendingPuzzleResult:null,dialogue:null,dialogueEnd:null,
-    dialogueQueue:[],typing:0,typed:0,portraits:{},CHARACTERS,DIALOGUES,PUZZLE_STORY,resolveDialogue,resolveDialogueId,
+    dialogueQueue:[],typing:0,typed:0,portraits:{},CHARACTERS,DIALOGUES,PUZZLE_STORY,DIALOGUE_EFFECTS:{},resolveDialogue,resolveDialogueId,
     audio:{unlock:()=>audio.promise},
     world:{assetsReady:art.promise,cancelCinematic(){},getPlayerPosition:()=>[...position]},
     loadState:()=>loadState(db),saveState:value=>saveState(value,db),freshState,
@@ -51,9 +51,10 @@ function startupHarness(imported){
     },
     enterArea:async (area,spawn)=>{position=[...spawn];},
     showEnding:()=>{endingCalls++;context.mode='modal';},
+    startLesson:()=>{lessonCalls++;},
   };
   vm.createContext(context);vm.runInContext(controller,context,{filename:'main-controller-startup.js'});
-  return {context,db,audio,art,get endingCalls(){return endingCalls;}};
+  return {context,db,audio,art,get endingCalls(){return endingCalls;},get lessonCalls(){return lessonCalls;}};
 }
 
 test('importing during a running journey preserves the final conversation through deferred audio and art loading',async()=>{
@@ -79,7 +80,9 @@ test('importing during a running journey preserves the final conversation throug
   assert.equal(context.dialogue.index,3);
 
   while(context.dialogue){context.typed=Infinity;context.nextLine();}
-  assert.equal(h.endingCalls,1,'the restored final conversation retains its ending callback');
+  // The arc now closes after the first lesson: the Faro conversation leads into it.
+  assert.equal(h.lessonCalls,1,'the restored final conversation continues into the first lesson');
+  assert.equal(h.endingCalls,0,'the arc card waits for the lesson');
   assert.equal(loadState(h.db).state.activeDialogue,null);
   assert.equal(loadState(h.db).state.endingPending,true,'the card is still recoverable until the player dismisses it');
 });

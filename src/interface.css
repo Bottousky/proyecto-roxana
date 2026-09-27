@@ -29,3 +29,16 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}#hud,#dial
 .interaction.companion-prompt button{min-height:32px;padding:4px 8px;font-size:9px;border-color:#bca47635;background:#15211de0;box-shadow:none}.interaction.companion-prompt kbd{font-size:9px;padding:2px 4px}.interaction.companion-prompt:after{display:none}
 .interaction{width:max-content}.interaction.offset-prompt:after{display:none}
 @media(pointer:coarse),(max-width:640px){.interaction.companion-prompt button{min-height:44px;min-width:44px}.modal-close,.dialogue-copy button,.book-footer button{min-height:44px;min-width:44px}.dialogue-copy{padding-bottom:54px}.interaction .field-measure{min-height:44px}}
+/* Choices inside a conversation: the player's own decision, never a quiz. */
+.dialogue-copy #dialogue-next[hidden]{display:none}
+.dialogue-choices{display:flex;flex-direction:column;gap:7px;margin:14px 0 4px}
+.dialogue-copy .dialogue-choices button{position:static;justify-content:flex-start;text-align:left;gap:12px;min-height:44px;padding:9px 14px;font-size:13px;line-height:1.4;color:#f3e7cc;background:#1b3134d9;border:1px solid #d3b17545;border-radius:6px;transition:background .15s,border-color .15s}
+.dialogue-copy .dialogue-choices button:hover,.dialogue-copy .dialogue-choices button:focus-visible{background:#2d4a47;border-color:#e4c68c}
+.dialogue-choices kbd{flex:0 0 auto;color:#203b3a;background:#e4c68c;border:0;font-weight:600;padding:2px 7px}
+.end-gift{font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;color:#e8d6ac;margin:-4px 0 18px;font-style:italic}
+@media(pointer:coarse){.dialogue-choices kbd{display:none}}
+/* The arrival title sits on a soft dark band so it reads over bright scenery (the Portal's vortex, water, sky). */
+.arrival{padding:16px 64px 20px;background:radial-gradient(ellipse at 50% 50%,#0b1a22cc 0%,#0b1a2299 45%,#0b1a2200 72%)}
+.arrival h2{text-shadow:0 2px 14px #06121a,0 0 3px #06121a}
+.arrival p{text-shadow:0 1px 8px #06121a,0 0 2px #06121a}
+@media(max-width:640px){.arrival{top:max(40%,262px);padding:12px 28px 16px}}

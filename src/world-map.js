@@ -46,6 +46,10 @@ function passageState(edge, state, visited) {
   return openExit(passage.exit, state);
 }
 
+// The kingdom's grid on the map: a link carries current once both places it joins are restored.
+const POWER = { portal:'awaken', plaza:'workshop', workshop:'workshop', road:'gate', spring:'pump', castle:'distribution', terraces:'irrigation', lake:'beacon_link', lighthouse:'beacon_network' };
+const powered = (edge, state) => [edge.from, edge.to].every(id => state.flags?.[POWER[id]]);
+
 function regionalSvg(state, objectiveArea) {
   const graph = buildRegionalMap(), visited = knownAreas(state);
   const known = new Set([...visited, objectiveArea].filter(validArea));
@@ -60,7 +64,7 @@ function regionalSvg(state, objectiveArea) {
     const title = !explored ? 'Camino por explorar' : accessible ? 'Paso abierto' : 'Paso cerrado';
     const passage=passageGeometry(edge.from,edge.to),route=passage?[[a.x,a.z],...passage.points,[b.x,b.z]]:[[a.x,a.z],[b.x,b.z]];
     const path=route.map((p,i)=>`${i?'L':'M'}${project(p).map(n).join(' ')}`).join('')+(passage?.routes.slice(1).map(r=>r.points.map((p,i)=>`${i?'L':'M'}${project(p).map(n).join(' ')}`).join('')).join('')||'');
-    return `<g class="journey-edge ${status}" data-connection="${esc(edge.id)}" data-passage="${status}"><title>${title}</title><path d="${path}"/>${status === 'locked' ? `<path class="journey-bar" d="M${n((a.sx+b.sx)/2-4)} ${n((a.sy+b.sy)/2-4)}l8 8m-8 0 8-8"/>` : ''}</g>`;
+    return `<g class="journey-edge ${status}" data-connection="${esc(edge.id)}" data-passage="${status}"><title>${title}</title><path d="${path}"/>${powered(edge, state) ? `<path class="journey-power" d="${path}"><title>Tendido restaurado</title></path>` : ''}${status === 'locked' ? `<path class="journey-bar" d="M${n((a.sx+b.sx)/2-4)} ${n((a.sy+b.sy)/2-4)}l8 8m-8 0 8-8"/>` : ''}</g>`;
   }).join('');
   const marks = [...nodes.values()].map(node => {
     const current = node.id === state.area, seen = visited.has(node.id), named = known.has(node.id);

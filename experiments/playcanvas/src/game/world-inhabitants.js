@@ -23,7 +23,7 @@ export function inhabitantPlan(area, object, state = {}) {
         f.gate ? [[-2.3, -7.5], [-.9, -9]] : f.bridge_ready ? [[-4.5, -3.5], [-3.4, -4.4]] : [[-4.5, 5], [-4.2, 2.4]], f.gate ? [0, -14] : [0, 3.5]); break;
     case 'edda_castle':
       plan.present = !f.irrigation;
-      set(f.distribution ? 'copying-the-public-plan' : 'comparing-the-archive', f.distribution ? [[-4.8, -3], [-6.1, -3.5]] : [[-4, 6], [-4.8, 2.2]], [-11, -6]); break;
+      set(f.distribution ? 'copying-the-public-plan' : 'comparing-the-archive', f.distribution ? [[-4.8, -3], [-6.1, -3.5]] : [[-9.2, -3.6], [-8.4, -2.4]], [-11, -6]); break;
     case 'edda_lake':
       plan.present = !f.beacon_supply;
       set(f.beacon_link ? 'toward-the-tower' : 'watching-the-markers', f.beacon_link ? [[-3.8, .8], [-2.8, -1]] : [[-5, 6], [-5.8, 3.8]], [8, -3]); break;
@@ -39,17 +39,17 @@ export function inhabitantPlan(area, object, state = {}) {
       set(f.workshop ? 'comparing-old-and-new' : 'sorting-parts', f.workshop ? [[-2.7, -2.2], [-3.7, -3.2]] : [[-3.5, 1.5], [-4, -.4]], [3, -3], 7); break;
     case 'vega_spring':
       plan.present = !f.distribution;
-      set(f.pump ? 'checking-the-restored-pump' : 'watching-the-level', f.pump ? [[4.6, -1], [5.2, .5]] : [[4, 5], [4.5, 3.7]], f.pump ? [2.5, -5.5] : [-6.5, 2], 6); break;
+      set(f.pump ? 'checking-the-restored-pump' : 'watching-the-level', f.pump ? [[4.6, -1], [5.2, .5]] : [[-4.2, -1.4], [-4.6, .8]], f.pump ? [2.5, -5.5] : [-9, -2], 6); break;
     case 'consejera':
       set(f.distribution ? 'checking-public-services' : f.castle_ready ? 'witnessing-the-test' : 'guarding-the-seal',
-        f.distribution ? [[5.2, -3.2], [5.2, -4.8]] : [[4, 3], [4.6, 1]], [0, -6], 8); break;
+        f.distribution ? [[3.2, -5.2], [2.4, -6.6]] : [[4.2, -6.4], [3.4, -7.4]], [6.4, -9.5], 8); break;
     case 'yesca':
-      set(f.irrigation ? 'working-a-sustainable-shift' : 'checking-the-forge', f.irrigation ? [[-5.3, .9], [-5.3, 2.3]] : [[-5.5, 5], [-5.7, 3]], [-8, 0], 5); break;
+      set(f.irrigation ? 'working-a-sustainable-shift' : 'checking-the-forge', f.irrigation ? [[-12.2, -11.3], [-10.6, -11.4]] : [[-11.4, -11.2], [-12.6, -11.4]], [-13.6, -14.5], 5); break;
     case 'vega_terraces':
-      set(f.irrigation ? 'checking-the-beds' : 'watching-the-last-parcel', f.irrigation ? [[6, 1.8], [6, -1]] : [[5.5, 5], [5.3, 3]], [8, 0], 6); break;
+      set(f.irrigation ? 'checking-the-beds' : 'watching-the-last-parcel', f.irrigation ? [[7.4, 1.8], [7.4, -3.2]] : [[7.6, 4.2], [7.4, 1.8]], [14.4, 3.8], 6); break;
     case 'nereo_lake':
       set(final ? 'resting-by-the-lake' : f.beacon_link ? 'ready-to-go' : 'listening-to-the-water',
-        final ? [[3.8, 4.7], [4.1, 6.1]] : f.beacon_link ? [[2.3, -10], [-.5, -11.5]] : [[4, 5], [3.8, 7]], [10, 3], 8); break;
+        final ? [[8.2, 3.4], [10.6, 2.8]] : f.beacon_link ? [[2.3, -10], [-.5, -11.5]] : [[9.5, 3.2], [11.2, 3.4]], final ? [16, 3] : f.beacon_link ? [0, -15] : [16, 2], 8); break;
     case 'nereo_tower':
       set(final ? 'recognizing-the-signal' : f.beacon_network ? 'listening-to-the-crown' : f.beacon_supply ? 'checking-the-gallery' : 'listening-to-the-base',
         final ? [[3.6, -10.4], [3.8, -9.2]] : f.beacon_network ? [[3.4, -7], [3.8, -6.2]] : f.beacon_supply ? [[3.4, 1], [3.8, 2]] : [[3.5, 11], [3.6, 9.7]], [0, final ? -12 : f.beacon_network ? -4 : 4], 8); break;

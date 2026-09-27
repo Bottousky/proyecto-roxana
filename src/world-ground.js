@@ -87,7 +87,7 @@ function subtractIntervals(start,end,cuts){
 export function buildPlayableBoundary(world) {
   if(world.area.id==='workshop')return;
   const [w,d]=world.bounds,segment=.8,barriers=[],buildings=architectureClearances(world),runs=[];
-  const doorways=(world.area.exits||[]).filter(e=>Math.abs(e.z)>d/2-3.5&&Math.abs(e.x)<4);
+  const doorways=(world.area.exits||[]).filter(e=>Math.abs(e.z)>d/2-3.5&&Math.abs(e.x)<w/2-3);
   const append=(x,z,width,depth,alongX)=>{
     const previous=runs.at(-1),gap=previous?(alongX?x-width/2-previous.x-previous.w/2:z-depth/2-previous.z-previous.d/2):Infinity;
     if(previous&&previous.alongX===alongX&&gap<=1e-7&&gap>-.03&&((alongX&&Math.abs(previous.z-z)<1e-7)||(!alongX&&Math.abs(previous.x-x)<1e-7))){
@@ -118,9 +118,26 @@ export function buildPlayableBoundary(world) {
   for(const side of [-1,1]){
     const nx=Math.ceil(w/segment),nz=Math.ceil(d/segment);
     if(!world.continuous||!doorways.some(e=>Math.sign(e.z)===side))for(let i=0;i<nx;i++)add(-w/2+(i+.5)*w/nx,side*(d/2-.45),w/nx+.01,.34);
-    for(let i=0;i<nz;i++)add(side*(w/2-.45),-d/2+(i+.5)*d/nz,.34,d/nz+.01);
+    // The Portal's garden ends at the canal: its coping is the eastern edge, not another wall.
+    if(!(world.area.id==='portal'&&side>0))for(let i=0;i<nz;i++)add(side*(w/2-.45),-d/2+(i+.5)*d/nz,.34,d/nz+.01);
   }
-  for(const b of runs){const height=b.z>d/2-1?.55:.9;world.box(b.x,height/2,b.z,b.w,height,b.d,world.m.stoneDark).name='playable-garden-wall';world.box(b.x,height+.035,b.z,b.w+.035,.09,b.d+.035,world.m.stone).name='garden-wall-cap';barriers.push(world.solid(b.x,b.z,b.w,b.d,'playable-boundary'));}
+  // A village edge is a rustic fence. The long side edges, which this camera sees end-on as
+  // poles, are low painted hedges; front edges keep the low garden wall.
+  const fenced=world.layout?.boundary==='fence',hedgeSides=world.layout?.sideBoundary!=='wall'&&!!world.bankTextures;
+  const hedgeMaterials=hedgeSides?[0,1,2].map(i=>world.mat('#cfd6b4',null,{map:world.bankTextures[i],alphaTest:.4,side:THREE.DoubleSide})):[];
+  let hedgeSeed=0;
+  for(const b of runs){
+    if(hedgeSides&&!fenced&&b.d>b.w){
+      world.box(b.x,.04,b.z,b.w,.08,b.d,world.m.stoneDark).name='playable-hedge';
+      for(let t=-b.d/2+.4;t<=b.d/2-.3;t+=.95){const k=hedgeSeed++,size=1.25+((k*37)%10)/22;
+        const plant=world.mesh('plane',hedgeMaterials[k%3],b.x+(((k*13)%5)-2)*.05,.05+size*.42,b.z+t,size,size,1);plant.name='playable-hedge-plant';plant.castShadow=false;plant.receiveShadow=true;}
+      barriers.push(world.solid(b.x,b.z,b.w,b.d,'playable-boundary'));continue;}
+    if(fenced){const length=Math.max(b.w,b.d),along=b.w>b.d,steps=Math.max(1,Math.round(length/1.6));
+      for(let i=0;i<=steps;i++){const t=(i/steps-.5)*length;world.box(b.x+(along?t:0),.42,b.z+(along?0:t),.13,.84,.13,world.m.darkwood).name='playable-fence-post';}
+      for(const h of [.34,.66])world.box(b.x,h,b.z,along?b.w:.07,.07,along?.07:b.d,world.m.wood).name='playable-fence-rail';
+      world.box(b.x,.05,b.z,b.w,.1,b.d,world.m.darkwood).name='playable-fence-sill';
+      barriers.push(world.solid(b.x,b.z,b.w,b.d,'playable-boundary'));continue;}
+    const height=b.z>d/2-1?.55:.9;world.box(b.x,height/2,b.z,b.w,height,b.d,world.m.stoneDark).name='playable-garden-wall';world.box(b.x,height+.035,b.z,b.w+.035,.09,b.d+.035,world.m.stone).name='garden-wall-cap';barriers.push(world.solid(b.x,b.z,b.w,b.d,'playable-boundary'));}
   // Paired short piers make each actual passage read as an entrance, not a cut road.
   for(const e of world.continuous?[]:doorways)for(const side of [-1,1]){
     const x=e.x+side*2.65,z=Math.sign(e.z)*(d/2-.45);

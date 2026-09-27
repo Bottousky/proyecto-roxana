@@ -28,7 +28,8 @@ test('legacy and malformed evidence cannot manufacture journal history', () => {
   const snapshot = initialPuzzleSnapshot('gate');
   for (let i = 0; i < 100; i++) appendBenchEvidence(snapshot, { kind: 'intervention', text: `change ${i}` });
   appendBenchEvidence(snapshot, { kind: 'intervention', text: 'change 99' });
-  assert.equal(snapshot.evidence.length, 40); assert.equal(snapshot.evidence[0].text, 'change 60');
+  // The first entry survives trimming; routine steps after it roll over.
+  assert.equal(snapshot.evidence.length, 40); assert.equal(snapshot.evidence[0].text, 'change 0'); assert.equal(snapshot.evidence[1].text, 'change 61');
   assert.deepEqual(normalizePuzzleSnapshot('gate', snapshot).evidence, snapshot.evidence);
 });
 
@@ -114,7 +115,7 @@ const solvedWires = {
   beacon_network: [['positive','opticIn'], ['opticOut','negative'], ['positive','bearingIn'], ['bearingOut','negative'], ['positive','signalIn'], ['signalOut','negative']],
   beacon_lens: [['positive','upperA'], ['lowerB','negative'], ['tap','lensIn'], ['lensOut','negative']],
 };
-const settings = { irrigation: { warmth: 12, flow: 12 }, beacon_supply: { ballast: 3 }, beacon_lens: { upper: 12 } };
+const settings = { irrigation: { warmth: 12, flow: 12, forge: 8 }, beacon_supply: { ballast: 3 }, beacon_lens: { upper: 12 } };
 for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still permits a novice repair, records it and commissions once`, () => {
   const { bench, click, solved } = controller(id);
   click({ action: 'power' });
@@ -125,10 +126,65 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   }
   click({ action: 'power' });
   assert.equal(bench.result.solved, true, id);
+  if (PUZZLES[id].proof) {
+    assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the requested proof`);
+    if (id === 'distribution') { click({ action: 'switch', key: 'kitchen' }); click({ action: 'switch', key: 'kitchen' }); }
+    if (id === 'beacon_lens') {
+      const measureTap = () => { bench.mode = 'voltage'; bench.state.meter = { ...bench.state.meter, a: null, b: null }; bench.touchPort('tap'); bench.touchPort('negative'); bench.mode = 'wire'; };
+      measureTap();
+      assert.equal(bench.state.proofs.tapLoaded, true); assert.equal(bench.result.commissionable, false, 'one side of the comparison is not enough');
+      click({ action: 'power' }); click({ wire: String(bench.state.wires.findIndex(w => w.includes('lensIn') && w.includes('tap'))) });
+      click({ action: 'power' }); measureTap();
+      click({ action: 'power' }); bench.touchPort('tap'); bench.touchPort('lensIn'); click({ action: 'power' });
+    }
+    assert.equal(bench.state.proofs[PUZZLES[id].proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.commissionable, true, id);
+  }
   assert.ok(bench.state.evidence.some(e => e.kind === 'result'));
-  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0, 'successful operation must not invent a measurement or require a quiz');
+  // Only the lens asks for measurements (Nereo's comparison); they are the two the player took, never invented.
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, PUZZLES[id].proof?.measure ? 2 : 0, 'successful operation must not invent a measurement or require a quiz');
   const previousDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
-  try { bench.close(); bench.close(); } finally { globalThis.document = previousDocument; }
+  try { bench.close(true, { commission: true }); bench.close(true, { commission: true }); } finally { globalThis.document = previousDocument; }
   assert.deepEqual(solved, [id]);
+});
+
+test('measurements survive long experiments and one knob turned step by step is one intervention', () => {
+  const snapshot = initialPuzzleSnapshot('beacon_lens');
+  appendBenchEvidence(snapshot, { kind: 'observation', text: 'first look' });
+  appendBenchEvidence(snapshot, { kind: 'measurement', text: 'Tensión', value: '9,00 V', reference: 'toma sin carga' });
+  appendBenchEvidence(snapshot, { kind: 'measurement', text: 'Tensión', value: '5,99 V', reference: 'toma con la lente' });
+  for (let i = 0; i < 60; i++) { appendBenchEvidence(snapshot, { kind: 'intervention', text: `Uní A${i} con B${i}.` }); appendBenchEvidence(snapshot, { kind: 'result', text: `r${i}` }); }
+  const values = snapshot.evidence.filter(e => e.kind === 'measurement').map(e => e.value);
+  assert.deepEqual(values, ['9,00 V', '5,99 V']); assert.equal(snapshot.evidence[0].text, 'first look'); assert.equal(snapshot.evidence.length, 40);
+  const knob = initialPuzzleSnapshot('gate');
+  for (let p = 5; p < 12; p++) { appendBenchEvidence(knob, { kind: 'intervention', text: `Freno: pasé de la posición ${p} a la ${p + 1}.` }); appendBenchEvidence(knob, { kind: 'result', text: `pos ${p + 1}` }); }
+  assert.deepEqual(knob.evidence.map(e => e.text), ['Freno: pasé de la posición 5 a la 12.', 'pos 12']);
+  appendBenchEvidence(knob, { kind: 'intervention', text: 'Freno: pasé de la posición 12 a la 5.' });
+  assert.equal(knob.evidence.at(-1).text, 'Freno: probé otras posiciones y volví a la 5.');
+});
+
+test('the gate closing and its journal page only claim the brake tests the player made', async () => {
+  const { completionLines, JOURNAL, journalText } = await import('../src/content.js');
+  const page = JOURNAL.find(e => e.id === 'operating_window');
+  const said = state => completionLines('gate', state).find(l => l.speaker === 'player').text;
+  const fresh = initialPuzzleSnapshot('gate');
+  assert.doesNotMatch(said({ puzzles: { gate: fresh } }), /ajustar/); assert.doesNotMatch(journalText(page, { puzzles: { gate: fresh } }), /extremo no fue/);
+  const moved = { ...fresh, trace: { brake: { min: 6, max: 12 } } };
+  assert.match(said({ puzzles: { gate: moved } }), /ajustar la rueda/); assert.match(journalText(page, { puzzles: { gate: moved } }), /no la llevé a los extremos/);
+  const extreme = { ...fresh, trace: { brake: { min: 0, max: 30 } } };
+  assert.equal(journalText(page, { puzzles: { gate: extreme } }), page.text);
+  // A save from before the trace existed claims nothing either way.
+  const legacy = normalizePuzzleSnapshot('gate', { ...fresh, trace: undefined });
+  assert.equal(legacy.trace, null); assert.doesNotMatch(said({ puzzles: { gate: legacy } }), /rueda/);
+});
+
+test('the castle proof: series wiring cannot show the infirmary alone; parallel can, and old commissions keep it', () => {
+  const series = { ...initialPuzzleSnapshot('distribution'), sourceOn: true };
+  series.switches = { ...series.switches, kitchen: false };
+  assert.equal(evaluatePuzzle('distribution', series).proofMet, false, 'in series, isolating the kitchen darkens the infirmary');
+  const parallel = { ...series, wires: [['positive','clinicIn'], ['clinicOut','negative'], ['positive','kitchenIn'], ['kitchenOut','negative']] };
+  assert.equal(evaluatePuzzle('distribution', parallel).proofMet, true);
+  assert.equal(evaluatePuzzle('distribution', { ...parallel, switches: { ...parallel.switches, kitchen: true } }).commissionable, false);
+  const legacy = normalizePuzzleSnapshot('distribution', { ...parallel, switches: { archive: false, kitchen: true }, completed: true, proofs: undefined });
+  assert.equal(legacy.proofs.clinicAlone, true); assert.equal(legacy.completed, true);
 });
