@@ -181,3 +181,16 @@
 .wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row button:first-child{grid-column:1;grid-row:2}
 .wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-knob-row button:last-child{grid-column:3;grid-row:2}
 .wb-controls-aside:has(.wb-dial-control:nth-child(3)) .wb-dial-details input[type=range]{grid-column:2;grid-row:2;width:100%;margin:0}
+/* The brief: what this bench asks for, and a checklist read from the physics. */
+.wb-brief{padding:0 0 16px;margin-bottom:14px;border-bottom:1px solid #d4b57a33}.wb-brief>p:not(.wb-eyebrow){font-size:13px;line-height:1.65;color:#eee5cf;margin:6px 0 12px}
+.wb-checks{list-style:none;margin:0;padding:0;display:grid;gap:7px}.wb-checks li{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.4;color:#cfc6b0}.wb-checks li span{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1.5px solid #b39a66;color:#b39a66;font-size:12px;line-height:1}
+.wb-checks li.met{color:#f3ead2}.wb-checks li.met span{background:#8fc79a;border-color:#8fc79a;color:#12261f;font-weight:700}
+.wb-instruction .wb-hand{margin-left:auto;padding:3px 10px;border:1px solid #d4b57a66;border-radius:12px;font-weight:500;font-size:12px;color:#f0dcaa;white-space:nowrap}.wb-instruction{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+/* Soldered wires belong to the installation: darker, riveted, not removable. */
+.wb-wire-sealed{cursor:not-allowed}.wb-wire-sealed .wb-wire-casing{filter:saturate(.55) brightness(.8)}.wb-solder{fill:none;stroke:#c9ae6e;stroke-width:3;stroke-dasharray:3 4;opacity:.75;pointer-events:none}
+.wb-zone rect{fill:#e8d6a50c;stroke:#d8c08855;stroke-width:2;stroke-dasharray:8 7}.wb-zone text{font:600 13px Inter,sans-serif;fill:#d8c088;opacity:.8;letter-spacing:.06em}
+.wb-heat{animation:wb-heat 2.4s ease-in-out infinite alternate}@keyframes wb-heat{from{opacity:.4}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.wb-heat{animation:none}}
+/* The first bench keeps its single row, with the brief as a full-width line above it. */
+.wb-first .wb-aside{flex-wrap:wrap}.wb-first .wb-brief{flex:1 0 100%;display:flex;align-items:center;gap:18px;padding:10px 0 12px;margin:0}.wb-first .wb-brief>p:not(.wb-eyebrow){flex:1;margin:0}.wb-first .wb-brief .wb-eyebrow{flex:none}.wb-first .wb-checks{flex:none}
+.wb-first .wb-observation{min-width:260px}

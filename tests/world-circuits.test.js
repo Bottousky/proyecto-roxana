@@ -29,7 +29,7 @@ test('archive isolation survives entering the panel and all saved wiring changes
   snapshot.wires = [['positive','clinicIn'], ['clinicOut','negative'], ['positive','kitchenIn'], ['kitchenOut','negative']];
   assert.equal(saved.flags.distribution, undefined, 'measurement cannot depend on commissioning');
   const connected = measureWorld('castle', saved, 'distribution_panel');
-  assert.equal(connected.current, evaluatePuzzle('distribution', snapshot).current);
+  near(connected.current, evaluatePuzzle('distribution', snapshot).current, 1e-9);
   assert.ok(connected.current > 1.9);
   snapshot.wires.push(['positive', 'negative']);
   const short = measureWorld('castle', saved, 'distribution_panel');
@@ -43,7 +43,7 @@ test('field cache follows physical mutations while journal and probe changes do 
   snapshot.evidence.push({ kind: 'observation', text: 'The player looked.' });
   snapshot.meter.a = 'pumpIn';
   assert.equal(measureWorld('spring', saved, 'pump_panel'), first);
-  snapshot.wires.push(['lineA', 'lineB']);
+  snapshot.wires.push(['e2a', 'e2b']);
   const repaired = measureWorld('spring', saved, 'pump_panel');
   assert.notEqual(repaired, first);
   assert.equal(repaired.voltage, evaluatePuzzle('pump', snapshot).solution.branches.pump.voltage);
@@ -204,8 +204,10 @@ test('the first Faro stage needs both exterior connections and includes regulato
   near(open.voltage, 0); near(open.current, 0);
   s.flags.tower_return = true;
   const unregulated = measureWorld('lighthouse', s, 'beacon_supply_panel');
-  assert.ok(unregulated.voltage > 8.3 && unregulated.voltage < 8.5);
-  s.puzzles.beacon_supply = { values: { ballast: 3 } };
+  assert.ok(unregulated.voltage > 13.4 && unregulated.voltage < 13.8, 'one line and the regulator leave the core weak');
+  s.puzzles.beacon_supply = { values: { ballast: 0 } };
+  assert.ok(measureWorld('lighthouse', s, 'beacon_supply_panel').voltage < 16.2, 'with a single line, not even an open regulator is enough');
+  s.flags.beacon_supply = true; s.puzzles.beacon_supply = { values: { ballast: 1 } };
   const calibrated = measureWorld('lighthouse', s, 'beacon_supply_panel');
   assert.ok(calibrated.voltage > 16.2 && calibrated.voltage < 18.2);
   near(calibrated.voltage, calibrated.current * 12);

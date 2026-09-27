@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { appendBenchEvidence, getBenchEvidence, normalizeBenchEvidence } from '../src/bench-evidence.js';
-import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, evaluatePuzzle } from '../src/puzzle-model.js';
+import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, evaluatePuzzle, isSealed } from '../src/puzzle-model.js';
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
@@ -39,7 +39,7 @@ test('a completed marker on a broken imported montage cannot lock its controls',
   bench.state = normalizePuzzleSnapshot('workshop', broken);
   assert.equal(bench.state.completed, false);
   bench.state.sourceOn = false;
-  bench.touchPort('spliceA'); bench.touchPort('spliceB');
+  bench.touchPort('s2a'); bench.touchPort('s2b');
   bench.state.sourceOn = true;
   assert.equal(evaluatePuzzle('workshop', bench.state).solved, true);
 });
@@ -47,30 +47,30 @@ test('a completed marker on a broken imported montage cannot lock its controls',
 test('wiring waits for isolation and the journal preserves the actual failed attempt', () => {
   const { bench, click, saves } = controller('workshop');
   const original = structuredClone(bench.state.wires);
-  bench.touchPort('spliceA');
+  bench.touchPort('s2a');
   assert.deepEqual(bench.state.wires, original); assert.equal(bench.selected, null);
   assert.match(bench.feedback, /apagá/);
   assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0);
   click({ action: 'power' });
-  bench.touchPort('spliceA'); bench.touchPort('spliceB');
+  bench.touchPort('s2a'); bench.touchPort('s2b');
   click({ action: 'power' });
   assert.equal(bench.result.solved, true);
-  assert.ok(saves.at(-1).evidence.some(e => e.kind === 'intervention' && /Uní Costura A con Costura B/.test(e.text)));
+  assert.ok(saves.at(-1).evidence.some(e => e.kind === 'intervention' && /Uní Tramo 2 · A con Tramo 2 · B/.test(e.text)));
   assert.ok(saves.at(-1).evidence.some(e => e.kind === 'result' && /clara y pareja/.test(e.text)));
 });
 
 test('only an actual probe reading becomes a measurement, and numeric disclosure is respected', () => {
   const { bench, click } = controller('workshop');
   click({ action: 'mode', mode: 'continuity' });
-  bench.touchPort('spliceA'); bench.touchPort('spliceB');
+  bench.touchPort('s2a'); bench.touchPort('s2b');
   assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0);
   click({ action: 'power' });
-  const plain = bench.state.evidence.at(-1);
+  const plain = bench.state.evidence.filter(e => e.kind === 'measurement').at(-1);
   assert.equal(plain.kind, 'measurement'); assert.equal(plain.value, 'Sin camino');
-  assert.match(plain.reference, /Punta roja: Costura A; punta negra: Costura B/);
+  assert.match(plain.reference, /Punta roja: Tramo 2 · A; punta negra: Tramo 2 · B/);
   assert.doesNotMatch(plain.value, /\d|Ω|V|A/);
   click({ action: 'numbers' });
-  assert.equal(bench.state.evidence.at(-1).value, 'ABIERTO');
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').at(-1).value, 'ABIERTO');
 });
 
 test('current insertion is in series, requires isolation and shares the selected branch current', () => {
@@ -94,7 +94,7 @@ test('current insertion is in series, requires isolation and shares the selected
 test('undo and reset retain experiment history instead of rewriting the past', () => {
   const { bench, click } = controller('workshop');
   click({ action: 'power' });
-  bench.touchPort('spliceA'); bench.touchPort('spliceB');
+  bench.touchPort('s2a'); bench.touchPort('s2b');
   const prior = structuredClone(bench.state.evidence);
   click({ action: 'undo' });
   assert.deepEqual(bench.state.evidence.slice(0, prior.length), prior);
@@ -104,48 +104,62 @@ test('undo and reset retain experiment history instead of rewriting the past', (
   assert.equal(bench.state.sourceOn, false);
 });
 
-const solvedWires = {
-  awaken: [['positive', 'heartIn'], ['heartOut', 'negative']],
-  workshop: [...PUZZLES.workshop.initialWires, ['spliceA', 'spliceB']],
-  gate: [['positive','trimA'], ['trimB','latchIn'], ['latchOut','negative']],
-  pump: [...PUZZLES.pump.initialWires, ['lineA','lineB']],
-  distribution: [['positive','clinicIn'], ['clinicOut','negative'], ['positive','kitchenIn'], ['kitchenOut','negative']],
-  irrigation: PUZZLES.irrigation.initialWires,
-  beacon_supply: PUZZLES.beacon_supply.initialWires,
-  beacon_network: [['positive','opticIn'], ['opticOut','negative'], ['positive','bearingIn'], ['bearingOut','negative'], ['positive','signalIn'], ['signalOut','negative']],
-  beacon_lens: [['positive','upperA'], ['lowerB','negative'], ['tap','lensIn'], ['lensOut','negative']],
-};
-const settings = { irrigation: { warmth: 12, flow: 12, forge: 8 }, beacon_supply: { ballast: 3 }, beacon_lens: { upper: 12 } };
+// The canonical repair, played through the real controller: only movable wires change, within the cables in hand.
+const canonical = id => { const s = initialPuzzleSnapshot(id); PUZZLES[id].solve(s); return s; };
 for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still permits a novice repair, records it and commissions once`, () => {
-  const { bench, click, solved } = controller(id);
+  const { bench, click, solved } = controller(id), target = canonical(id), proof = PUZZLES[id].proof;
+  const probe = (mode, a, b) => { bench.mode = mode; bench.state.meter = { ...bench.state.meter, mode, a: null, b: null }; bench.touchPort(a); bench.touchPort(b); bench.mode = 'wire'; };
+  // The pump's loss only shows while it works: Vega sees it before the joint is bridged.
+  if (proof?.voltageAcross) probe('voltage', ...proof.voltageAcross);
   click({ action: 'power' });
-  while (bench.state.wires.length) click({ wire: '0' });
-  for (const [a, b] of solvedWires[id]) { bench.touchPort(a); bench.touchPort(b); }
-  for (const [key, target] of Object.entries(settings[id] ?? {})) {
-    while (bench.state.values[key] !== target) click({ action: 'knob', key, delta: String(Math.sign(target - bench.state.values[key])) });
+  // Lumen's break only shows with the bench off, before the bridge closes it.
+  if (proof?.continuityOpen) probe('continuity', ...proof.continuityOpen);
+  const movable = () => bench.state.wires.findIndex(w => !isSealed(id, w));
+  while (movable() >= 0) click({ wire: String(movable()) });
+  for (const [a, b] of target.wires.filter(w => !isSealed(id, w))) { bench.touchPort(a); bench.touchPort(b); }
+  for (const [key, value] of Object.entries(target.values)) {
+    while (bench.state.values[key] !== value) click({ action: 'knob', key, delta: String(Math.sign(value - bench.state.values[key])) });
   }
   click({ action: 'power' });
   assert.equal(bench.result.solved, true, id);
-  if (PUZZLES[id].proof) {
-    assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the requested proof`);
+  if (proof) {
+    if (proof.when || proof.measure) assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the requested proof`);
     if (id === 'distribution') { click({ action: 'switch', key: 'kitchen' }); click({ action: 'switch', key: 'kitchen' }); }
     if (id === 'beacon_lens') {
-      const measureTap = () => { bench.mode = 'voltage'; bench.state.meter = { ...bench.state.meter, a: null, b: null }; bench.touchPort('tap'); bench.touchPort('negative'); bench.mode = 'wire'; };
+      const measureTap = () => probe('voltage', 'tap', 'negative');
       measureTap();
       assert.equal(bench.state.proofs.tapLoaded, true); assert.equal(bench.result.commissionable, false, 'one side of the comparison is not enough');
       click({ action: 'power' }); click({ wire: String(bench.state.wires.findIndex(w => w.includes('lensIn') && w.includes('tap'))) });
       click({ action: 'power' }); measureTap();
       click({ action: 'power' }); bench.touchPort('tap'); bench.touchPort('lensIn'); click({ action: 'power' });
     }
-    assert.equal(bench.state.proofs[PUZZLES[id].proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.commissionable, true, id);
+    assert.equal(bench.state.proofs[proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.commissionable, true, id);
   }
+  assert.ok(bench.result.checks.every(c => c.met), `${id}: every item of the brief is ticked`);
   assert.ok(bench.state.evidence.some(e => e.kind === 'result'));
-  // Only the lens asks for measurements (Nereo's comparison); they are the two the player took, never invented.
-  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, PUZZLES[id].proof?.measure ? 2 : 0, 'successful operation must not invent a measurement or require a quiz');
+  // Measurements are only the ones the player took for a requested proof, never invented.
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, proof?.measure ? 2 : proof?.continuityOpen || proof?.voltageAcross ? 1 : 0, 'successful operation must not invent a measurement or require a quiz');
   const previousDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
   try { bench.close(true, { commission: true }); bench.close(true, { commission: true }); } finally { globalThis.document = previousDocument; }
   assert.deepEqual(solved, [id]);
+});
+
+test('soldered wires stay, cables in hand run out, and a hand cable cannot span the lighthouse lines', () => {
+  const { bench, click } = controller('workshop');
+  click({ action: 'power' });
+  click({ wire: '0' });
+  assert.equal(bench.state.wires.length, PUZZLES.workshop.sealed.length, 'a soldered wire is not removed');
+  assert.match(bench.feedback, /soldado/);
+  bench.touchPort('s1a'); bench.touchPort('s1b');
+  bench.touchPort('s3a'); bench.touchPort('s3b');
+  assert.equal(bench.state.wires.length, PUZZLES.workshop.sealed.length + 1, 'one cable in hand, one cable placed');
+  assert.match(bench.feedback, /No te quedan cables/);
+  const supply = controller('beacon_supply');
+  supply.click({ action: 'power' });
+  supply.bench.touchPort('positive'); supply.bench.touchPort('lineAb');
+  assert.equal(supply.bench.state.wires.length, PUZZLES.beacon_supply.sealed.length, 'the generator end and the core end are too far apart');
+  assert.match(supply.bench.feedback, /no llega tan lejos/);
 });
 
 test('measurements survive long experiments and one knob turned step by step is one intervention', () => {

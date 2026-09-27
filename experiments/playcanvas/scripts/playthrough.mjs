@@ -317,28 +317,37 @@ async function solvePanel(objectId, id) {
     assert.match(reading, /[−-]/, 'The reversed actuator has negative voltage');
   }
   if (id === 'pump') {
+    // Continuity would pass all three joints; the loss shows only as a difference while the pump works.
     await measure('voltage', 'positive', 'negative');
     await measure('voltage', 'pumpIn', 'pumpOut');
+    await measure('voltage', 'e1a', 'e1b');
+    await measure('voltage', 'e2a', 'e2b');
+    assert.equal((await inspect()).puzzle.state.proofs.foundLoss, true, 'Vega saw where the pressure is lost');
+    log('proof', { id, proof: 'foundLoss' });
   }
   if (id === 'awaken') assert.equal(await page.locator('[data-action="mode"]').count(), 0, 'The first encounter does not introduce instrument modes');
   if (id !== 'awaken' && info.puzzle.state.sourceOn && !info.puzzle.state.tripped) await page.locator('[data-action="power"]').click();
   if (id === 'workshop') {
-    assert.match(await measure('continuity', 'spliceA', 'spliceB'), /ABIERTO/, 'Continuity exposes the concealed break');
+    // Section by section: two have a path, one does not.
+    assert.doesNotMatch(await measure('continuity', 's1a', 's1b'), /ABIERTO/, 'The first cloth section is whole');
+    assert.match(await measure('continuity', 's2a', 's2b'), /ABIERTO/, 'Continuity exposes the concealed break');
+    assert.equal((await inspect()).puzzle.state.proofs.foundBreak, true, 'Lumen saw where the break is');
+    log('proof', { id, proof: 'foundBreak' });
     await screenshot('workshop-continuity-open');
   }
   switch (id) {
     case 'awaken': await wire('heartOut', 'negative'); break;
-    case 'workshop': await wire('spliceA', 'spliceB'); break;
+    case 'workshop': await wire('s2a', 's2b'); break;
     case 'gate':
       await removeWire('trimB', 'latchOut'); await removeWire('latchIn', 'negative');
-      await wire('trimB', 'latchIn'); await wire('latchOut', 'negative'); break;
-    case 'pump': await wire('lineA', 'lineB'); break;
+      await wire('trimB', 'latchIn'); await wire('latchOut', 'negative'); await knob('brake', 8); break;
+    case 'pump': await wire('e2a', 'e2b'); break;
     case 'distribution':
       assert.equal((await inspect()).puzzle.state.switches.archive,false,'The archive was isolated in the courtyard');
       await removeWire('clinicOut', 'kitchenIn');
       await wire('clinicOut', 'negative'); await wire('positive', 'kitchenIn'); break;
-    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); await knob('forge', 8); break;
-    case 'beacon_supply': await knob('ballast', 3); break;
+    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); await knob('forge', 6); break;
+    case 'beacon_supply': await wire('positive', 'lineBa'); await wire('lineBb', 'ballastA'); await knob('ballast', 1); break;
     case 'beacon_network':
       await removeWire('opticOut', 'bearingIn'); await removeWire('bearingOut', 'signalIn');
       await wire('opticOut', 'negative'); await wire('positive', 'bearingIn');

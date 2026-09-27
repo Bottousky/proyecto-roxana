@@ -73,17 +73,8 @@ test('a source short trips protection and removes supply current before operatin
   assert.equal(r.solved, false);
 });
 
-const solutions = {
-  awaken(s) { s.wires.push(['heartOut', 'negative']); },
-  workshop(s) { s.wires.push(['spliceA', 'spliceB']); },
-  gate(s) { s.wires = [['positive','trimA'], ['trimB','latchIn'], ['latchOut','negative']]; },
-  pump(s) { s.wires.push(['lineA','lineB']); },
-  distribution(s) { s.switches.archive = false; s.wires = [['positive','clinicIn'], ['clinicOut','negative'], ['positive','kitchenIn'], ['kitchenOut','negative'], ['positive','archiveIn'], ['archiveOut','negative']]; },
-  irrigation(s) { s.values.warmth = 12; s.values.flow = 12; s.values.forge = 8; },
-  beacon_supply(s) { s.values.ballast = 3; },
-  beacon_network(s) { s.wires = [['positive','opticIn'], ['opticOut','negative'], ['positive','bearingIn'], ['bearingOut','negative'], ['positive','signalIn'], ['signalOut','negative']]; },
-  beacon_lens(s) { s.wires = [['positive','upperA'], ['lowerB','negative'], ['tap','lensIn'], ['lensOut','negative']]; s.values.upper = 12; },
-};
+// Each bench's canonical repair lives with the puzzle itself.
+const solutions = Object.fromEntries(Object.keys(PUZZLES).map(id => [id, s => PUZZLES[id].solve(s)]));
 
 for (const [id, solve] of Object.entries(solutions)) {
   test(`${id}: initial fault is meaningful and a physical repair reaches operating ranges`, () => {
@@ -100,13 +91,15 @@ for (const [id, solve] of Object.entries(solutions)) {
 }
 
 test('solutions are operating ranges, not memorized control combinations', () => {
-  for (const resistance of [10, 12, 14]) {
+  // Terraces: two agreements (a strong or a gentle forge), each with either warm-bed notch.
+  for (const [warmth, forge] of [[12, 6], [18, 6], [12, 12], [18, 12]]) {
     const s = initialPuzzleSnapshot('irrigation');
-    s.values.warmth = resistance; s.values.flow = 12; s.values.forge = 8;
+    s.values.warmth = warmth; s.values.flow = 12; s.values.forge = forge;
     assert.equal(evaluatePuzzle('irrigation', s).solved, true);
   }
-  for (const resistance of [2, 3]) {
-    const s = initialPuzzleSnapshot('beacon_supply'); s.values.ballast = resistance;
+  // Lighthouse supply: with both lines sharing the load, two regulator notches hold the core.
+  for (const ballast of [1, 2]) {
+    const s = initialPuzzleSnapshot('beacon_supply'); PUZZLES.beacon_supply.solve(s); s.values.ballast = ballast;
     assert.equal(evaluatePuzzle('beacon_supply', s).solved, true);
   }
 });
@@ -125,7 +118,7 @@ test('restoring snapshots rejects nonexistent terminals and clamps corrupted set
   s.values.warmth = 999; s.values.flow = -10; s.wires.push(['missing','positive']); s.wires.push([...s.wires[0]].reverse());
   s.meter = { mode: 'teleport', a: 'missing', b: 'positive' };
   const repaired = normalizePuzzleSnapshot('irrigation', s);
-  assert.equal(repaired.values.warmth, 36); assert.equal(repaired.values.flow, 0);
+  assert.equal(repaired.values.warmth, 24); assert.equal(repaired.values.flow, 0);
   assert.equal(repaired.wires.length, 9); assert.equal(repaired.meter.mode, 'voltage'); assert.equal(repaired.meter.a, null);
 });
 
@@ -183,8 +176,8 @@ test('observations describe real operation for alternative valid repairs and dis
   const supply = initialPuzzleSnapshot('beacon_supply');
   supply.values.ballast = 0;
   assert.ok(observePuzzle('beacon_supply', supply).some(o => /cobre.*calentando/.test(o.text)));
-  supply.values.ballast = 3;
-  assert.ok(observePuzzle('beacon_supply', supply).every(o => !/calentando/.test(o.text)));
+  PUZZLES.beacon_supply.solve(supply);
+  assert.ok(observePuzzle('beacon_supply', supply).every(o => !/calentando/.test(o.text)), 'two lines share the load and neither overheats');
 });
 
 test('a novice can observe a safe failure without receiving an unexplained numeric diagnosis', () => {
@@ -200,7 +193,7 @@ test('a novice can observe a safe failure without receiving an unexplained numer
 test('plain continuity reads the actual connected network and numbers are explicitly optional', () => {
   const state = initialPuzzleSnapshot('workshop');
   state.sourceOn = false;
-  state.meter = { mode: 'continuity', a: 'spliceA', b: 'spliceB', branch: null };
+  state.meter = { mode: 'continuity', a: 's2a', b: 's2b', branch: null };
   const bench = Object.assign(Object.create(PuzzleWorkbench.prototype), { id: 'workshop', puzzle: PUZZLES.workshop, state, result: evaluatePuzzle('workshop', state), mode: 'continuity', showNumbers: false });
   assert.equal(bench.presentedReading().value, 'Sin camino');
   solutions.workshop(state);
@@ -225,4 +218,13 @@ test('comparison requires two valid points and preserves polarity without mandat
   bench.showNumbers = true;
   assert.ok(bench.presentedReading().value.startsWith('-'));
   assert.equal(bench.presentedReading().unit, 'V');
+});
+
+test('an installation put in service before its bench was redesigned stays in service', () => {
+  const old = { ...initialPuzzleSnapshot('workshop'), wires: [['positive', 'spliceA'], ['spliceA', 'spliceB'], ['spliceB', 'lampIn'], ['lampOut', 'negative']], completed: true };
+  const restored = normalizePuzzleSnapshot('workshop', old);
+  assert.equal(restored.completed, true);
+  assert.equal(evaluatePuzzle('workshop', restored).commissionable, true);
+  const unfinished = normalizePuzzleSnapshot('workshop', { ...old, completed: false });
+  assert.equal(unfinished.completed, false, 'an unfinished old bench simply starts over');
 });

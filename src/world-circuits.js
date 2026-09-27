@@ -162,7 +162,7 @@ function lighthouse(state, object) {
   if (['tower_feed', 'tower_return', 'beacon_supply_panel'].includes(object)) {
     const feed = readFlag(state, 'tower_feed', supplyFixed), back = readFlag(state, 'tower_return', supplyFixed);
     const model = makeSupply(24, readFlag(state, 'beacon_link') || (readFlag(state,'irrigation') && readFlag(state,'lake_cable') && readFlag(state,'lake_return')), 2.2);
-    model.resistors.push(resistor('feed', 'bus', 'line+', CONTACT, feed), resistor('line', 'line+', 'regulator+', 2), resistor('regulator', 'regulator+', 'core+', value(state, 'beacon_supply', 'ballast', supplyFixed ? 3 : 20)), resistor('core', 'core+', 'core−', 12), resistor('return', 'core−', 'source−', CONTACT, back));
+    model.resistors.push(resistor('feed', 'bus', 'line+', CONTACT, feed), resistor('line', 'line+', 'regulator+', supplyFixed ? 3 : 6), resistor('regulator', 'regulator+', 'core+', value(state, 'beacon_supply', 'ballast', supplyFixed ? 1 : 3)), resistor('core', 'core+', 'core−', 12), resistor('return', 'core−', 'source−', CONTACT, back));
     const probes = {
       tower_feed: { title: 'Faro I · manivela de alimentación', positive: 'bus', branch: 'feed', reference: 'Tensión: salida protegida de la fuente de la base respecto de su retorno. Corriente: ida al núcleo, antes del tendido y su regulador.' },
       tower_return: { title: 'Faro I · manivela de retorno', positive: 'core−', branch: 'return', reference: 'Tensión: lado del núcleo del contacto de retorno respecto del terminal negativo de la fuente. Corriente: regreso desde el núcleo.' },

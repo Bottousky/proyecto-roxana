@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
-import { PUZZLES, initialPuzzleSnapshot, evaluatePuzzle } from '../src/puzzle-model.js';
+import { PUZZLES, HINT_STEPS, initialPuzzleSnapshot, evaluatePuzzle } from '../src/puzzle-model.js';
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
@@ -23,7 +23,7 @@ const instruction = html => html.match(/class="wb-instruction">.*?<\/span>(.*?)<
 test('every bench ends its hints with a concrete step that names real terminals', () => {
   for (const id of Object.keys(PUZZLES)) {
     const hints = BENCH_GUIDANCE[id].hints;
-    assert.equal(PUZZLES[id].hints.length, hints.length, `${id}: both hint lists agree, so a saved hint count survives reloads`);
+    assert.equal(hints.length, HINT_STEPS, `${id}: every bench offers the same steps, so a saved hint count survives reloads`);
     const step = hints.at(-1);
     assert.match(step, /Probá|paso para probar/, `${id}: the last hint proposes an action`);
     const b = bench(id);
@@ -70,9 +70,9 @@ test('knobs read as brakes, so turning right has an honest meaning', () => {
 
 test('observations mark the approach to the working band on both sides', () => {
   const supply = initialPuzzleSnapshot('beacon_supply');
-  supply.values.ballast = 6;
+  supply.values.ballast = 0;
   assert.match(observePuzzle('beacon_supply', supply)[0].text, /Casi se sostiene/);
-  supply.values.ballast = 20;
+  supply.values.ballast = 5;
   assert.match(observePuzzle('beacon_supply', supply)[0].text, /Tiembla/);
 
   const lens = { ...initialPuzzleSnapshot('beacon_lens'), wires: [['positive', 'upperA'], ['lowerB', 'negative'], ['tap', 'lensIn'], ['lensOut', 'negative']] };
