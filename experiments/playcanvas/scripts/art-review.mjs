@@ -15,7 +15,7 @@ mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ headless: true, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 page.on('console', m => { if (m.type() === 'error') console.log('console:', m.text()); });
-await page.goto(base + 'scripts/qa-direction.html');
+await page.goto(base + 'scripts/qa-direction.html' + (process.env.LENS ? '?lens=' + process.env.LENS : ''));
 await page.waitForFunction(() => !document.querySelector('#visit').disabled, null, { timeout: 180000 });
 await page.evaluate(() => document.body.classList.add('qa-controls-hidden'));
 for (const area of areas) {
@@ -25,7 +25,7 @@ for (const area of areas) {
   }, [area, condition, phase]);
   if (at) await page.evaluate(([x, z]) => window.__qaWorld?.setPlayerPosition([x, z]), at);
   await page.waitForTimeout(3500);
-  const file = out + `${area}-${phase}${at ? '-' + at.join('_') : ''}.png`;
+  const file = out + `${area}-${phase}${at ? '-' + at.join('_') : ''}${process.env.LENS ? '-lens' + process.env.LENS.replace(',', '_') : ''}.png`;
   await page.screenshot({ path: file });
   console.log('captura', file);
 }

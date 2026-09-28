@@ -1,4 +1,4 @@
-import {SHADERLANGUAGE_GLSL} from 'playcanvas';
+import {SHADERLANGUAGE_GLSL,Texture,PIXELFORMAT_RGBA8,FILTER_LINEAR,ADDRESS_CLAMP_TO_EDGE} from 'playcanvas';
 import shore from './data/shore.json';
 
 // The meadow and every paved square or road are one surface. The paving outline comes
@@ -11,6 +11,7 @@ uniform vec4 uShoreRect;
 uniform vec2 uShoreSize;
 uniform sampler2D uMeadow;
 uniform sampler2D uCobble;
+uniform sampler2D uGroundAo;
 uniform vec3 uPave[${shore.paving.length}];
 uniform vec3 uClouds;
 float gHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -33,7 +34,8 @@ void getAlbedo(){
   float paved=smoothstep(0.44,0.56,cover+(edge-0.5)*0.42);
   float worn=smoothstep(0.06,0.42,cover+(edge-0.5)*0.3)*(1.0-paved);
   grass=mix(grass,grass*vec3(0.86,0.76,0.56),worn*0.8);
-  float shade=cloudShade(p);
+  // Oclusión horneada en Blender (scripts/blender/bake-ao.py): el pie de muros, casas y árboles.
+  float shade=cloudShade(p)*(1.0-0.55*(1.0-texture2D(uGroundAo,uv).r));
   if(cover<0.01){dAlbedo=grass*shade;return;}
   int tone=int(texture2D(uShoreMap,(floor(uv*uShoreSize)+0.5)/uShoreSize).b*255.0+0.5);
   vec3 tint=uPave[0];
@@ -47,13 +49,20 @@ void getAlbedo(){
 const lin=v=>Math.pow(v,2.2);
 const tones=new Float32Array(shore.paving.flatMap(h=>[0,2,4].map(i=>lin(parseInt(h.slice(i,i+2),16)/255))));
 
-export function makeGround(material,{shoreMap,meadow,cobble}){
+export function makeGround(material,{shoreMap,meadow,cobble,ao}){
   material.shaderChunksVersion='2.22';
   material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',diffusePS);
   material.setParameter('uShoreMap',shoreMap);material.setParameter('uShoreRect',[shore.x0,shore.z0,shore.width,shore.depth]);material.setParameter('uShoreSize',shore.pixels);
-  material.setParameter('uMeadow',meadow);material.setParameter('uCobble',cobble);material.setParameter('uPave[0]',tones);
+  material.setParameter('uMeadow',meadow);material.setParameter('uGroundAo',ao);material.setParameter('uCobble',cobble);material.setParameter('uPave[0]',tones);
   material.setParameter('uClouds',[0,0,.035]);material.update();
   return material;
+}
+let aoTexture=null;
+export async function loadGroundAo(app){
+  if(aoTexture)return aoTexture;
+  const image=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error('No se pudo cargar la oclusión del suelo'));i.src=new URL('./assets/ground-ao.png',document.baseURI).href;});
+  aoTexture=new Texture(app.graphicsDevice,{name:'ground-ao',width:image.width,height:image.height,format:PIXELFORMAT_RGBA8,mipmaps:false,flipY:false,minFilter:FILTER_LINEAR,magFilter:FILTER_LINEAR,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});
+  aoTexture.setSource(image);return aoTexture;
 }
 export function updateClouds(materials,time,strength){for(const m of materials)m.setParameter('uClouds',[time,strength,.035]);}
 

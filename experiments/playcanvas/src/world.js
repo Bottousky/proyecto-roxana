@@ -1,4 +1,4 @@
-import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
+import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
 import {surface,actorArt} from './art.ts';
 import {AREAS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
@@ -16,7 +16,7 @@ import sceneUrl from './data/scene.json?url';
 import geometryUrl from './data/geometry.bin.gz?url';
 import {walkableTerrain} from './terrain.js';
 import {makeWater,updateWater,loadShore,bindShore} from './water.js';
-import {makeGround,makeRock,updateClouds} from './ground.js';
+import {makeGround,makeRock,updateClouds,loadGroundAo} from './ground.js';
 import {makeWind,updateWind,windKind} from './wind.js';
 import {makePortalSurface} from './portal.js';
 import {buildGrid,updateGrid} from './grid.js';
@@ -50,13 +50,17 @@ function beamTexture(app){
   x.putImageData(img,0,0);const t=new Texture(app.graphicsDevice,{width:256,height:64,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);return t;
 }
 const waitFrame=()=>new Promise(r=>requestAnimationFrame(r));
+// A long lens, low over the diorama: the perspective recedes to the top of the frame and the
+// depth of field blurs near and far like a tilt-shift photograph. ?lens=0 restores the old
+// orthographic view; ?lens=distance,pitch tries another framing.
+const LENS=(()=>{const q=new URLSearchParams(globalThis.location?.search||'').get('lens');if(q==='0')return {fov:false,distance:1,pitch:0};const [distance,pitch]=(q||'1.3,26').split(',').map(Number);return {fov:true,distance:distance||1.3,pitch:pitch||26};})();
 
 export class PlayCanvasWorld {
   constructor(canvas){
     this.canvas=canvas;this.state={flags:{},settings:{}};this.clock=0;this.route=[];this.target=null;this.actors=[];this.regions=new Map();this.allActors=[];this.dynamics=[];this.waters=[];this.glasses=[];this.lights=[];this.sprites=new Map();this.focus=new Position();this.cameraOffset=new Position(0,13.5,25);this.currentZoom=.93;this.companionRoute=[];this.companionAge=0;this.walking=false;
     this.app=new Application(canvas,{graphicsDeviceOptions:{alpha:false,antialias:true}});
     this.app.setCanvasFillMode(FILLMODE_FILL_WINDOW);this.app.setCanvasResolution(RESOLUTION_AUTO);
-    this.camera=new Entity('Cámara de viaje');this.camera.addComponent('camera',{projection:PROJECTION_ORTHOGRAPHIC,orthoHeight:12/.93,nearClip:.1,farClip:250,clearColor:color('#8fa5a6')});this.camera.camera.toneMapping=TONEMAP_ACES;this.app.root.addChild(this.camera);this.buildFrame();
+    this.camera=new Entity('Cámara de viaje');this.camera.addComponent('camera',{projection:LENS.fov?PROJECTION_PERSPECTIVE:PROJECTION_ORTHOGRAPHIC,orthoHeight:12/.93,nearClip:.1,farClip:LENS.fov?600:250,clearColor:color('#8fa5a6')});this.camera.camera.toneMapping=TONEMAP_ACES;this.app.root.addChild(this.camera);this.buildFrame();
     this.sun=new Entity('Sol de Ohmdal');this.sun.addComponent('light',{type:'directional',color:color('#ffe6bc'),intensity:1.6,castShadows:true,shadowResolution:2048,shadowDistance:100,normalOffsetBias:.04,shadowBias:.2});this.sun.setEulerAngles(50,-35,0);this.app.root.addChild(this.sun);
     this.app.scene.ambientLight=color('#8eaaad');this.resize();this.assetsReady=this.loadArtAssets();
     this.destroy=()=>this.dispose();addEventListener('beforeunload',this.destroy,{once:true});
@@ -88,7 +92,7 @@ export class PlayCanvasWorld {
     const [data,binary]=await Promise.all([fetch(sceneUrl).then(r=>{if(!r.ok)throw new Error('Falta el mundo');return r.json();}),fetch(geometryUrl).then(async r=>{if(!r.ok)throw new Error('Falta la geometría');const buffer=await r.arrayBuffer(),magic=new Uint8Array(buffer,0,2);return magic[0]===31&&magic[1]===139?new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;})]);this.data=data;
     for(const id of [...Object.keys(AREAS),'landscape']){const root=new Entity(id==='landscape'?'Ohmdal · geografía compartida':AREAS[id].name);this.app.root.addChild(root);this.regions.set(id,{root,actors:[]});}
     const needed=[...new Set(data.meshes.flatMap(m=>m.material.texture?[m.material.texture]:[]))];for(const name of needed)await surface(this.app,name);
-    const owners=new Map(),shore=await loadShore(this.app);this.receivers=[];let count=0;
+    const owners=new Map(),shore=await loadShore(this.app),groundAo=await loadGroundAo(this.app);this.receivers=[];let count=0;
     const cobble=await surface(this.app,'cobble');
     for(const b of data.meshes){
       if(b.material.paving)continue; // painted by the ground shader
@@ -96,7 +100,7 @@ export class PlayCanvasWorld {
       if(d.texture){m.diffuseMap=await surface(this.app,d.texture);if(d.alpha){m.opacityMap=m.diffuseMap;m.opacityMapChannel='a';}}
       if(d.opacity<1){m.blendType=BLEND_NORMAL;m.depthWrite=false;}
       if(d.texture==='water'){makeWater(m);bindShore(m,shore,!b.dynamic,{lighthouse:1,lake:.6}[b.area]||0);this.waters.push(m);}
-      if(d.texture==='ground')(this.grounds??=[]).push(makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble}));
+      if(d.texture==='ground')(this.grounds??=[]).push(makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble,ao:groundAo}));
       m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>new (key==='indices'?Uint32Array:Float32Array)(binary,b[key].offset,b[key].length);
       mesh.setPositions(attr('positions'));mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
       const instance=new MeshInstance(mesh,m,e);instance.castShadow=d.shadow&&d.opacity===1;instance.receiveShadow=true;e.addComponent('render',{meshInstances:[instance]});let parent=this.regions.get(b.area).root;
@@ -127,7 +131,7 @@ export class PlayCanvasWorld {
   }
   async makeActor(name,x,z,area,object){
     if(!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
-    const e=new Entity(name);e.addComponent('sprite',{type:'simple',sprite:this.sprites.get(name),frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.setEulerAngles(-28.37,0,0);this.app.root.addChild(e);e.addComponent('script');const script=e.script.create(ActorSprite);
+    const e=new Entity(name);e.addComponent('sprite',{type:'simple',sprite:this.sprites.get(name),frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.setEulerAngles(-(LENS.pitch||28.37),0,0);this.app.root.addChild(e);e.addComponent('script');const script=e.script.create(ActorSprite);
     return {name,area,entity:e,script,phase:this.allActors.length*.71,animation:idleActor(),g:{position:new Position(x,0,z),visible:true,userData:{interaction:object}}};
   }
   animateActor(a,dx,dz,dt,{paused=false,reducedMotion=false}={}){
@@ -257,7 +261,10 @@ export class PlayCanvasWorld {
     for(const p of b.sparks){const u=Math.max(0,t-p.delay),life=Math.max(0,1-u/2.4),r=p.radius+u*.35,s=reduced?0:.17*life*(.6+.4*Math.sin(u*9+p.angle)**2);
       p.entity.setPosition(x+Math.cos(p.angle+u*.8)*r,y+.4+u*p.speed,z+Math.sin(p.angle+u*.8)*r);p.entity.setLocalScale(s,s,s);}
   }
-  positionCamera(){this.camera.setPosition(this.focus.x+this.cameraOffset.x*2,this.focus.y+this.cameraOffset.y*2,this.focus.z+this.cameraOffset.z*2);this.camera.lookAt(this.focus);this.camera.camera.orthoHeight=12/this.currentZoom;}
+  positionCamera(){
+    const lens=LENS,o=this.cameraOffset,len=Math.hypot(o.x,o.y,o.z)||1,d=len*2*(lens.fov?lens.distance:1),pitch=lens.pitch*Math.PI/180,flat=Math.hypot(o.x,o.z)||1,dir=lens.pitch?[o.x/flat*Math.cos(pitch),Math.sin(pitch),o.z/flat*Math.cos(pitch)]:[o.x/len,o.y/len,o.z/len];
+    this.camera.setPosition(this.focus.x+dir[0]*d,this.focus.y+dir[1]*d,this.focus.z+dir[2]*d);this.camera.lookAt(this.focus);
+    if(lens.fov){this.camera.camera.fov=2*Math.atan(12/this.currentZoom/d)*180/Math.PI;}else this.camera.camera.orthoHeight=12/this.currentZoom;}
   syncActors(){
     const inside=this.area.id==='workshop';for(const a of [...this.allActors,this.playerActor,this.ohmActor,this.sleeping]){const active=a===this.playerActor||a===this.ohmActor,id=active?this.area.id:a.area,[ox,oz]=this.data.areas[id].offset,p=a.g.position;
       a.entity.enabled=a.g.visible&&(active||(inside?id==='workshop':id!=='workshop'))&&(a!==this.sleeping||!this.state.flags.awaken);
