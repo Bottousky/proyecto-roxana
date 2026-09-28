@@ -23,7 +23,7 @@ Object.assign(DIALOGUES,{
   home_lake_nets:[n('narrator','Redes colgadas a secar, remendadas con hilo de otro color. Huelen a lago y a sol.')],
 });
 
-const WALLS={stone:['stone','#ffffff',4],plaster:['plaster','#fffaf0',3],timber:['timber','#ffffff',4.5]};
+const WALLS={stone:['stone','#ffffff',4],plaster:['plaster','#fffaf0',3],timber:['timber','#fff4e2',2.7]};
 async function textured(app,name,tint,repeat){const m=new StandardMaterial();m.diffuseMap=await surface(app,name);m.diffuse=new Color().fromString(tint);m.diffuseMapTiling=new Vec2(...repeat);m.update();return m;}
 function flat(hex,emissive=0){const m=new StandardMaterial();m.diffuse=new Color().fromString(hex);if(emissive){m.emissive=new Color().fromString(hex);m.emissiveIntensity=emissive;}m.update();return m;}
 function slab(parent,material,x,y,z,sx,sy,sz){const e=new Entity();e.addComponent('render',{type:'box',castShadows:true,receiveShadows:true});e.render.material=material;e.setLocalPosition(x,y,z);e.setLocalScale(sx,sy,sz);parent.addChild(e);return e;}
@@ -41,13 +41,16 @@ export async function buildHomes(world,template){
       for(const side of [-1,1])slab(root,await textured(app,wall,tint,[d/tile,h/tile]),side*w/2,h/2,0,.3,h,d);
       const low=await textured(app,wall,tint,[w/2/tile,.9/tile]);for(const side of [-1,1])slab(root,low,side*(w/4+.75),.45,d/2,w/2-1.5,.9,.3);
       const beam=flat('#4a3526');for(const x of [-3.5,3.5])slab(root,beam,x,h/2,-d/2+.2,.35,h,.25);slab(root,beam,0,h-.2,-d/2+.22,w,.3,.3);slab(root,beam,0,.08,-d/2+.17,w,.16,.08);
-      const pane=flat('#e4ecd6',.9),frame=flat('#5a4230');for(const x of [-1.9,1.9]){slab(root,frame,x,3.55,-d/2+.16,1.35,1.55,.1);slab(root,pane,x,3.55,-d/2+.2,1.1,1.3,.04);}
+      const pane=flat('#9cc3d8',.55),frame=flat('#5a4230');for(const x of [-1.9,1.9]){slab(root,frame,x,3.55,-d/2+.16,1.35,1.55,.1);slab(root,pane,x,3.55,-d/2+.2,1.1,1.3,.04);
+        // Mullions and a deep sill: a window, not a lit rectangle.
+        slab(root,frame,x,3.55,-d/2+.24,.07,1.3,.04);slab(root,frame,x,3.55,-d/2+.24,1.1,.07,.04);slab(root,frame,x,2.74,-d/2+.3,1.45,.1,.3);}
+
       // Luz de día que entra por las ventanas: fría, suave, desde arriba.
-      for(const x of [-1.9,1.9]){const l=new Entity('Ventana');l.addComponent('light',{type:'omni',color:new Color(.75,.85,1),intensity:1.1,range:9,castShadows:false});l.setLocalPosition(x,3.4,-d/2+1.6);root.addChild(l);}
+      for(const x of [-1.9,1.9]){const l=new Entity('Ventana');l.addComponent('light',{type:'omni',color:new Color(.75,.85,1),intensity:.7,range:7,castShadows:false});l.setLocalPosition(x,3.4,-d/2+1.6);root.addChild(l);}
       const obstacles=[];
       for(const [kind,x,z,rotation,y] of placements(def.kind,props)){
         const source=template.findByName(kind);if(!source)continue;const e=source.clone();e.setLocalPosition(x,y,z);e.setLocalEulerAngles(0,rotation,0);root.addChild(e);
-        if(kind==='candle'||kind==='hearth'||kind==='oven'){const l=new Entity('Vela');l.addComponent('light',{type:'omni',color:new Color(1,.7,.38),intensity:kind==='candle'?1.6:2.4,range:kind==='candle'?6:8,castShadows:false});l.setLocalPosition(x,y+(kind==='candle'?.5:1.2),z+(kind==='candle'?0:.9));root.addChild(l);}
+        if(kind==='candle'||kind==='hearth'||kind==='oven'){const l=new Entity('Vela');l.addComponent('light',{type:'omni',color:new Color(1,.7,.38),intensity:kind==='candle'?2.4:3.4,range:kind==='candle'?5.5:9,castShadows:false});l.setLocalPosition(x,y+(kind==='candle'?.5:1.2),z+(kind==='candle'?0:.9));root.addChild(l);}
         if(y>0||kind==='rug'||kind==='candle')continue;const f=footprint(kind,rotation,props);if(f)obstacles.push({x:x+f.x,z:z+f.z,w:f.w,d:f.d});
       }
       const [lx,lz,label,dialogue]=def.look;

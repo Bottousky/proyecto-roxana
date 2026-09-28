@@ -424,7 +424,7 @@ export class PlayCanvasWorld {
   }
   updateEnvironment(dt,reduced){
     const f=this.state.flags,phase=journeyPhase(this.state),inside=this.indoors(),mix=1-Math.exp(-dt*.8);this.lampLevel??=phase.lamps;this.lampLevel+=(phase.lamps-this.lampLevel)*mix;
-    const n=this.lampLevel;if(this.wasInside!==inside){this.wasInside=inside;if(inside)this.camera.camera.clearColor=color('#000000');}const lit=!inside||!!this.home||f.workshop;this.sun.light.intensity+=((inside?(this.home?.3:lit?.85:.5):phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,color(phase.sun),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?(this.home?'#4a4036':lit?'#7c7967':'#4d5a63'):n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#000000':phase.sky),mix);
+    const n=this.lampLevel;if(this.wasInside!==inside){this.wasInside=inside;if(inside)this.camera.camera.clearColor=color('#000000');}const lit=!inside||!!this.home||f.workshop;this.sun.light.intensity+=((inside?(this.home?.16:lit?.85:.5):phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,color(phase.sun),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?(this.home?'#3a2e26':lit?'#7c7967':'#4d5a63'):n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#000000':phase.sky),mix);
     // A place nobody has restored yet is literally dimmer: muted and cool. Its colour floods
     // back with the restoration, and crossing into a forgotten place drains it again.
     const alive=f[power[this.area.id]]?1:0;this.vitality??=alive;
