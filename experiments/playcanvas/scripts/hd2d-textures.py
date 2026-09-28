@@ -9,7 +9,10 @@ ROOT = os.path.join(os.path.dirname(__file__), '..')
 SRC, OUT = os.path.join(ROOT, 'art-src', 'hd2d'), os.path.join(ROOT, 'public', 'assets', 'hd2d')
 os.makedirs(OUT, exist_ok=True)
 # nombre: (lado lógico, colores de la paleta)
-SPEC = {'cobble': (128, 40), 'stone': (128, 40), 'wood': (128, 32), 'roof': (128, 32), 'meadow': (128, 40)}
+SPEC = {'cobble': (128, 40), 'stone': (128, 40), 'wood': (128, 32), 'roof': (128, 32), 'meadow': (128, 40),
+        'burlap': (96, 24), 'hay': (96, 24), 'iron': (96, 24), 'plaster': (128, 24), 'awning': (96, 16), 'endgrain': (64, 24), 'flagstone': (128, 32)}
+# La rodaja de tronco es una sola imagen, no un mosaico: no se recorta.
+WHOLE = {'endgrain'}
 def period(a, axis):
     # El generador entrega un mosaico de ~1017 px con un borde que no empalma: se recorta
     # donde la imagen vuelve a parecerse a su primera franja.
@@ -20,7 +23,8 @@ def period(a, axis):
 for name, (side, colors) in SPEC.items():
     im = Image.open(os.path.join(SRC, name + '.png')).convert('RGB')
     a = np.asarray(im, dtype=np.float32)
-    im = im.crop((0, 0, period(a, 1), period(a, 0))).resize((side, side), Image.BOX)
+    if name not in WHOLE: im = im.crop((0, 0, period(a, 1), period(a, 0)))
+    im = im.resize((side, side), Image.BOX)
     if name == 'meadow':
         # El verde generado es de pradera de catálogo: se lo lleva hacia el oliva de las
         # referencias (menos saturado, un poco hacia el amarillo, algo más oscuro).

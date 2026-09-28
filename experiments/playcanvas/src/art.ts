@@ -30,7 +30,7 @@ export async function surface(app:Application,name:string){
   if(name==='glow'){const c=canvas(128,128),x=c.getContext('2d')!,g=x.createRadialGradient(64,64,2,64,64,64);g.addColorStop(0,'#ffffff');g.addColorStop(.22,'#ffffffb0');g.addColorStop(.65,'#ffffff30');g.addColorStop(1,'#ffffff00');x.fillStyle=g;x.fillRect(0,0,128,128);return texture(app,name,c);}
   if(name==='foliage'||name==='fern')return texture(app,name,name==='foliage'?foliage():fern());
   // Pixel-art surfaces generated for HD-2D (art-src/hd2d → scripts/hd2d-textures.py).
-  const pixelArt:Record<string,string>={cobble:'cobble',stone:'stone',wood:'wood',roof:'roof',ground:'meadow'};
+  const pixelArt:Record<string,string>={cobble:'cobble',stone:'stone',wood:'wood',roof:'roof',ground:'meadow',burlap:'burlap',hay:'hay',iron:'iron',plaster:'plaster',awning:'awning',endgrain:'endgrain',flagstone:'flagstone'};
   if(pixelArt[name])return texture(app,name,await image(`/assets/hd2d/${pixelArt[name]}.png`),true,false,true);
   if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image('/assets/trees.webp'),i%3,Math.floor(i/3),3,2,true));}
   if(name.startsWith('bank'))return texture(app,name,crop(await image('/assets/art-polish/waterside-plants.webp'),Number(name.slice(4)),0,3,1));

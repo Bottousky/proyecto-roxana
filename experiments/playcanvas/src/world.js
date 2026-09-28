@@ -20,6 +20,7 @@ import {makeGround,makeRock,updateClouds,loadGroundAo} from './ground.js';
 import {makeWind,updateWind,windKind} from './wind.js';
 import {makePortalSurface} from './portal.js';
 import {buildGrid,updateGrid} from './grid.js';
+import {placeDressing,propObstacles} from './props.js';
 
 // Small coordinate value adapter for the existing renderer-independent game rules.
 class Position extends Vec3 {
@@ -121,6 +122,7 @@ export class PlayCanvasWorld {
     for(const [z,depth] of [[-95,390]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(42,65);m.update();e.render.material=m;e.setPosition(-42.5,-.15,z);e.setLocalScale(175,1,depth);this.regions.get('landscape').root.addChild(e);}
     // Open sea to the horizon north of the Faro: the authored planes stop 20 m past the islet.
     {const e=new Entity('Mar abierto'),m=makeWater(new StandardMaterial());bindShore(m,shore,true,1);e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(75,-.45,-540);e.setLocalScale(760,1,530);this.regions.get('landscape').root.addChild(e);this.waters.push(m);}
+    await placeDressing(this);
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
     }
@@ -140,7 +142,7 @@ export class PlayCanvasWorld {
   context(id){
     const context=Object.create(this);context.area=AREAS[id];context.coreBounds=context.area.bounds;context.bounds=travelBounds(id);context.obstacles=this.localObstacles(id);context.actors=this.regions.get(id).actors;return context;
   }
-  localObstacles(id){const [ox,oz]=this.data.areas[id].offset;return this.data.areas[id].obstacles.filter(o=>!o.gate||!this.state.flags.gate).map(o=>({...o,x:o.x-ox,z:o.z-oz}));}
+  localObstacles(id){const [ox,oz]=this.data.areas[id].offset;return [...this.data.areas[id].obstacles.filter(o=>!o.gate||!this.state.flags.gate).map(o=>({...o,x:o.x-ox,z:o.z-oz})),...propObstacles(id)];}
   loadArea(area,state,spawn,{continuous=false}={}){
     const old=this.area?.id,preserve=continuous&&old&&isExterior(old)&&isExterior(area.id),global=preserve?toKingdom(old,this.getPlayerPosition()):null,companion=preserve?toKingdom(old,[this.ohm.position.x,this.ohm.position.z]):null;
     this.area=area;this.state=state;this.coreBounds=area.bounds;this.bounds=travelBounds(area.id);this.obstacles=this.localObstacles(area.id);this.actors=[this.playerActor,...this.regions.get(area.id).actors];
