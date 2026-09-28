@@ -116,7 +116,7 @@ export const AREA_LAYOUTS = {
       path('vega-garden', 2.0, [0, 5], [4, 4.5], [7, 6], [10, 7.3]),
     ],
     courts: [rect('pump-apron', 3, -2.7, 5.2, 3.6), circle('source-basin-apron', -2, -4.5, 2.8), rect('vega-work-court', 4, 4.3, 6.5, 3.6)],
-    buildings: [{ ...building('wheel-house', 'Casa de la rueda', 11.56, -9, 6, 5.5, 4.2, {stone:true}), composition: 'La rueda se separa del flanco oeste para mostrar sus apoyos y eje; la puerta conserva el acceso por la margen seca.' }],
+    buildings: [{ ...building('wheel-house', 'Casa de la rueda', 11.56, -9, 6, 5.5, 4.2, {stone:true,eave:.34}), composition: 'La rueda se separa del flanco oeste para mostrar sus apoyos y eje; la puerta conserva el acceso por la margen seca.' }],
     landmarks: [{ id: 'spring-wheel', label: 'Rueda del Manantial', x: 7.82, z: -5.7 }, { id: 'aqueduct', label: 'Acueducto', x: -6, z: -12.6 }],
     exclusions: [rect('spring-water', -11.56, -2, 6.5, 25, 'Manantial'), rect('spring-wheel', 7.82, -5.7, 4.5, .75), rect('source-basin', -2, -4.5, 3.6, 3.6), ...SPRING_WATERWORKS_FOOTPRINTS],
     waters: [{ id: 'spring-channel', label: 'Manantial', points: [[-14.81, -14.5], [-8.31, -14.5], [-8.31, 10.5], [-14.81, 10.5]] }],
