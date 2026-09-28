@@ -10,7 +10,8 @@ SRC, OUT = os.path.join(ROOT, 'art-src', 'hd2d'), os.path.join(ROOT, 'public', '
 os.makedirs(OUT, exist_ok=True)
 # nombre: (lado lógico, colores de la paleta)
 SPEC = {'cobble': (128, 40), 'stone': (128, 40), 'wood': (128, 32), 'roof': (128, 32), 'meadow': (128, 40),
-        'burlap': (96, 24), 'hay': (96, 24), 'iron': (96, 24), 'plaster': (128, 24), 'awning': (96, 16), 'endgrain': (64, 24), 'flagstone': (128, 32)}
+        'burlap': (96, 24), 'hay': (96, 24), 'iron': (96, 24), 'plaster': (128, 24), 'awning': (96, 16), 'endgrain': (64, 24), 'flagstone': (128, 32),
+        'rock': (128, 32), 'moss': (96, 24), 'timber': (128, 24)}
 # La rodaja de tronco es una sola imagen, no un mosaico: no se recorta.
 WHOLE = {'endgrain'}
 def period(a, axis):

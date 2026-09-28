@@ -111,7 +111,7 @@ export class PlayCanvasWorld {
       if(b.dynamic){e.setPosition(...b.dynamic.pivot);this.dynamics.push({...b.dynamic,area:b.area,entity:e,material:m,angle:0,progress:0,rotation:new Quat(),axle:new Vec3(...(b.dynamic.spinAxis||[0,0,1]))});}
       if(d.glass)this.glasses.push({area:b.area,material:m});
       if(d.crop)(this.crops??=[]).push({material:m,lush:m.diffuse.clone()});
-      if(d.rock)makeRock(m);
+      if(d.rock)makeRock(m,{rock:await surface(this.app,'rock'),moss:await surface(this.app,'moss')});
       if(windKind(d.texture)&&!b.dynamic)(this.windy??=[]).push(makeWind(m,windKind(d.texture)));
       if(d.pane){m.diffuse=color('#5d7780');m.diffuseMap=paneTexture(this.app);m.gloss=.8;m.metalness=.1;m.update();}
       if(d.receiver)this.receivers.push({area:b.area,material:m,...d.receiver});

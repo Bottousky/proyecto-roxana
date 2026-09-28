@@ -66,21 +66,26 @@ export async function loadGroundAo(app){
 }
 export function updateClouds(materials,time,strength){for(const m of materials)m.setParameter('uClouds',[time,strength,.035]);}
 
-// Field boulders: faceted grey stone, darker at the foot, moss on the faces turned to the sky.
+// Field boulders: pixel-art granite on the faceted sides, moss cushions on the faces turned
+// to the sky, darker at the foot. Each flat facet samples along its dominant axis so the
+// texture keeps its crisp pixels instead of a triplanar blur.
 const rockPS=`
 uniform vec3 material_diffuse;
+uniform sampler2D uRock;
+uniform sampler2D uMoss;
 float rHash(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
 float rNoise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
   return mix(mix(mix(rHash(i),rHash(i+vec3(1,0,0)),f.x),mix(rHash(i+vec3(0,1,0)),rHash(i+vec3(1,1,0)),f.x),f.y),
              mix(mix(rHash(i+vec3(0,0,1)),rHash(i+vec3(1,0,1)),f.x),mix(rHash(i+vec3(0,1,1)),rHash(i+vec3(1,1,1)),f.x),f.y),f.z);}
 void getAlbedo(){
-  vec3 p=vPositionW;float n=rNoise(p*2.6)*0.6+rNoise(p*7.0)*0.4,facet=rHash(floor(p*1.7));
-  vec3 stone=mix(vec3(0.075,0.08,0.07),vec3(0.17,0.175,0.15),n)*(0.8+0.4*facet);
+  vec3 p=vPositionW,n=abs(dVertexNormalW);
+  vec2 uv=n.x>n.y&&n.x>n.z?p.zy:n.y>n.z?p.xz:p.xy;
+  vec3 stone=texture2D(uRock,uv/2.4).rgb;
   stone*=mix(0.62,1.0,smoothstep(0.0,0.55,p.y));
-  float moss=smoothstep(0.5,0.85,dVertexNormalW.y+(rNoise(p*3.3)-0.5)*0.5);
-  dAlbedo=mix(stone,vec3(0.07,0.12,0.035)*(0.8+0.4*n),moss*0.85)*material_diffuse;
+  float moss=smoothstep(0.55,0.85,dVertexNormalW.y+(rNoise(p*2.1)-0.5)*0.45);
+  dAlbedo=mix(stone,texture2D(uMoss,p.xz/2.0).rgb,moss*0.9)*material_diffuse;
 }`;
-export function makeRock(material){
-  material.shaderChunksVersion='2.22';material.diffuseMap=null;material.diffuse.set(1,1,1);material.flatShading=true;
-  material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',rockPS);material.update();return material;
+export function makeRock(material,{rock,moss}){
+  material.shaderChunksVersion='2.22';material.diffuseMap=null;material.diffuse.set(.92,.92,.9);material.flatShading=true;
+  material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',rockPS);material.setParameter('uRock',rock);material.setParameter('uMoss',moss);material.update();return material;
 }

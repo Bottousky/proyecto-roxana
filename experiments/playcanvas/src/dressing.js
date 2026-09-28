@@ -26,6 +26,12 @@ export const DRESSING = {
     // Fuente: un banco para mirar el agua.
     ['bench', 3.6, 0.8, -35],
   ],
+  workshop: [
+    // Lumen guarda repuestos en el rincón del este: cajones, un barril de aceite y sacos.
+    ['crate', 10.4, 4.0, 6], ['crate_small', 10.5, 5.5, -12], ['barrel', 10.5, 7.1, 0], ['sacks', 9.6, 9.3, 90],
+    // Leña junto al hogar y un barril de agua a la entrada.
+    ['logs', -9.4, 5.9, 0], ['barrel', -8.6, 9.3, 0],
+  ],
 };
 
 export const dressingOf = id => DRESSING[id] || [];
