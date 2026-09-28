@@ -122,7 +122,8 @@ export class PlayCanvasWorld {
     // The far countryside continues behind the authored region surfaces.
     // Eastern slopes south of the lake, so the valley never ends in the clear colour.
     {const e=new Entity('Laderas del este'),m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(37,78);m.update();e.addComponent('render',{type:'plane'});e.render.material=m;e.setPosition(122.5,-.15,-63);e.setLocalScale(155,1,326);this.regions.get('landscape').root.addChild(e);}
-    for(const [z,depth] of [[-95,390]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(42,65);m.update();e.render.material=m;e.setPosition(-42.5,-.15,z);e.setLocalScale(175,1,depth);this.regions.get('landscape').root.addChild(e);}
+    // It stops 20 m short of the Faro's sea: past there only the open water remains.
+    for(const [z,depth] of [[-85,370]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(42,65);m.update();e.render.material=m;e.setPosition(-42.5,-.15,z);e.setLocalScale(175,1,depth);this.regions.get('landscape').root.addChild(e);}
     // Open sea to the horizon north of the Faro: the authored planes stop 20 m past the islet.
     {const e=new Entity('Mar abierto'),m=makeWater(new StandardMaterial());bindShore(m,shore,true,1);e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(75,-.45,-540);e.setLocalScale(760,1,530);this.regions.get('landscape').root.addChild(e);this.waters.push(m);}
     await placeDressing(this);await raiseRelief(this);await sowFlora(this);await buildHomes(this,this.kit);

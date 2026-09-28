@@ -51,6 +51,7 @@ export async function sowFlora(world){
   const batches={a:{positions:[],uvs:[],colors:[],indices:[]},b:{positions:[],uvs:[],colors:[],indices:[]}};
   const claimed=new Set();let count=0;
   const exteriors=Object.keys(AREAS).filter(isExterior).map(id=>{const [ox,oz]=world.data.areas[id].offset,[tw,td]=travelBounds(id);return {id,ox,oz,tw,td};});
+  const seaLine=world.data.areas.lighthouse.offset[1]-8;
   const corridor=(X,Z)=>exteriors.some(a=>inTravelCorridor(a.id,X-a.ox,Z-a.oz,-.6));
   const walkable=(X,Z)=>exteriors.some(a=>{const x=X-a.ox,z=Z-a.oz;return Math.abs(x)<=a.tw/2&&Math.abs(z)<=a.td/2&&walkableTerrain(a.id,x,z);});
   const border=(X,Z)=>!walkable(X,Z)&&[[1.1,0],[-1.1,0],[0,1.1],[0,-1.1],[.8,.8],[-.8,.8],[.8,-.8],[-.8,-.8]].some(([dx,dz])=>walkable(X+dx,Z+dz));
@@ -66,6 +67,7 @@ export async function sowFlora(world){
       const shoreline=s.water>0&&s.water<.07,inside=Math.abs(x)<aw/2-.5&&Math.abs(z)<ad/2-.5;
       if(s.water>0&&!shoreline)continue;
       if(corridor(X,Z))continue; // los caminos entre lugares quedan libres
+      if(Z<seaLine&&!walkable(X,Z)&&!border(X,Z))continue; // al norte del Faro solo hay mar
       if(near(x,z,.05))continue;
       if(!shoreline&&s.water===0&&border(X,Z)){
         // Dos o tres matas altas por celda, apretadas, para que el borde se lea como seto.

@@ -58,7 +58,8 @@ for (const m of scene.meshes) {
 
 // Exact Euclidean distance transform (Felzenszwalb) from every water pixel to the shore.
 const INF = 1e20, f = new Float64Array(W * H);
-for (let i = 0; i < W * H; i++) f[i] = water[i] === -Infinity || land[i] > water[i] + .03 ? 0 : INF;
+// Sin agua ni tierra horneada es mar abierto (el plano del mar sigue más allá): no es costa.
+for (let i = 0; i < W * H; i++) f[i] = water[i] === -Infinity ? (land[i] === -Infinity ? INF : 0) : land[i] > water[i] + .03 ? 0 : INF;
 function edt1d(src, n) {
   const d = new Float64Array(n), v = new Int32Array(n), z = new Float64Array(n + 1); let k = 0; v[0] = 0; z[0] = -INF; z[1] = INF;
   for (let q = 1; q < n; q++) { let s; do { const r = v[k]; s = ((src[q] + q * q) - (src[r] + r * r)) / (2 * q - 2 * r); } while (s <= z[k] && --k >= 0); k++; v[k] = q; z[k] = s; z[k + 1] = INF; }
