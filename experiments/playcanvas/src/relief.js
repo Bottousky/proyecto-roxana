@@ -23,12 +23,14 @@ float tHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float tNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(tHash(i),tHash(i+vec2(1,0)),f.x),mix(tHash(i+vec2(0,1)),tHash(i+vec2(1,1)),f.x),f.y);}
 void getAlbedo(){
   vec3 p=vPositionW,n=normalize(dVertexNormalW),a=abs(n);
-  vec3 grass=texture2D(uMeadow,p.xz/6.0).rgb;
+  // Each face samples along its dominant axis: a slope never stretches the grass.
+  vec2 top=a.y>max(a.x,a.z)*.8?p.xz:(a.x>a.z?p.zy:p.xy);
+  vec3 grass=texture2D(uMeadow,top/6.0).rgb;
   float broad=tNoise(p.xz*0.045)*0.65+tNoise(p.xz*0.11+7.3)*0.35;
   grass*=mix(vec3(0.84,0.95,0.86),vec3(1.12,1.05,0.8),smoothstep(0.25,0.8,broad));
   vec2 side=a.x>a.z?p.zy:p.xy;
   vec3 rock=texture2D(uRock,side/2.6).rgb;
-  float cliff=smoothstep(0.62,0.38,n.y);
+  float cliff=smoothstep(0.78,0.55,n.y);
   vec3 ledge=mix(grass,texture2D(uMoss,p.xz/2.2).rgb,smoothstep(0.55,0.8,tNoise(p.xz*0.3))*0.5);
   vec3 c=mix(ledge,rock,cliff);
   // Pie de cada frente en sombra, cumbres un poco más claras y cálidas.

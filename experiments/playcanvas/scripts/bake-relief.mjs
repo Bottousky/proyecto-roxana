@@ -72,7 +72,7 @@ const height = new Float32Array(W * H);
 for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
   const X = x0 + i * CELL, Z = z0 + j * CELL, d = Math.sqrt(f[idx(i, j)]) * CELL;
   // El pie de la ladera ondula: el valle no copia el rectángulo del lugar.
-  const foot = 1.5 + 3.5 * fbm(X * .05, Z * .05, 11);
+  const foot = 1.5 + 5 * fbm(X * .09, Z * .09, 11) + 4 * fbm(X * .03, Z * .03, 12);
   if (d < foot) continue;
   const peak = 5 + 13 * fbm(X * .018, Z * .018, 7);
   let h = (smooth(ramp(foot, foot + 7, d)) * .55 + smooth(ramp(foot + 5, foot + 26, d)) * .45) * peak;

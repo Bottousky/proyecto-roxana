@@ -99,6 +99,16 @@ export async function sowFlora(world){
     for(const k of [.55,.55,1,1])b.colors.push(tint*k,tint*k,tint*k*.95,1);
     b.indices.push(base,base+1,base+2,base,base+2,base+3);count++;
   }
+  // Sotobosque en todas las lomas: pasto alto y matas donde no llegó la siembra de los lugares.
+  for(let j=0;j<grid.rows;j+=2)for(let i=0;i<grid.cols;i+=2){
+    const X=grid.x0+(i+hash(i,j,70)*2)*grid.cell,Z=grid.z0+(j+hash(i,j,71)*2)*grid.cell,y=reliefHeight(X,Z);
+    if(y<.4||reliefSlope(X,Z)>.8||claimed.has(Math.floor(X/SPACING)+','+Math.floor(Z/SPACING)))continue;
+    if(hash(i,j,72)>.25+noise(X*.05,Z*.05)*.55)continue;
+    const [sheet,row,height]=pick(WILD,hash(i,j,73)),cell=plants[sheet][row*4+Math.floor(hash(i,j,74)*4)];if(!cell)continue;
+    const h=height*(.9+hash(i,j,75)*.5),w=h*cell.aspect,b=batches[sheet],base=b.positions.length/3,tint=.8+hash(i,j,76)*.2,[u0,v0,u1,v1]=cell.uv;
+    b.positions.push(X-w/2,y,Z, X+w/2,y,Z, X+w/2,y+h,Z, X-w/2,y+h,Z);b.uvs.push(u0,v1,u1,v1,u1,v0,u0,v0);
+    for(const k of [.55,.55,1,1])b.colors.push(tint*k,tint*k,tint*k*.95,1);b.indices.push(base,base+1,base+2,base,base+2,base+3);count++;
+  }
   const root=world.regions.get('landscape').root;
   // Bosque en las colinas: árboles del reino apretados en manchas, claros en las cumbres,
   // nunca sobre un frente de roca. Enmarcan cada valle como en las referencias.
@@ -106,8 +116,8 @@ export async function sowFlora(world){
   for(let j=0;j<grid.rows;j+=3)for(let i=0;i<grid.cols;i+=3){
     const X=grid.x0+(i+hash(i,j,60)*3)*grid.cell,Z=grid.z0+(j+hash(i,j,61)*3)*grid.cell,y=reliefHeight(X,Z);
     if(y<2.2||reliefSlope(X,Z)>.55)continue;
-    // Ni un árbol entre la cámara y un valle: el llano más cercano al norte no debe estar a menos de 26 m.
-    let shields=false;for(let k=2;k<=26;k+=2)if(reliefHeight(X,Z-k)<.05){shields=true;break;}if(shields)continue;
+    // Ni un árbol entre la cámara y un valle: el llano más cercano al norte no debe estar a menos de 14 m.
+    let shields=false;for(let k=2;k<=14;k+=2)if(reliefHeight(X,Z-k)<.05){shields=true;break;}if(shields)continue;
     const patch=noise(X*.035,Z*.035);if(hash(i,j,62)>patch*1.25-.05)continue;
     const t=Math.floor(hash(i,j,63)*6),size=(6.5+hash(i,j,64)*4.5)*(y>9?.85:1),f=forest[t],base=f.positions.length/3,tint=.78+hash(i,j,65)*.2;
     f.positions.push(X-size*.45,y-.15,Z, X+size*.45,y-.15,Z, X+size*.45,y-.15+size,Z, X-size*.45,y-.15+size,Z);f.uvs.push(0,1,1,1,1,0,0,0);
