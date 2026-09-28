@@ -338,13 +338,14 @@ export class PlayCanvasWorld {
     for(let j=0;j<256;j++)for(let i=0;i<64;i++){const u=Math.abs(i/63-.5)*2,v=j/255,a=Math.pow(Math.max(0,1-u),2.2)*Math.pow(1-v,1.3)*Math.min(1,v*6),k=(j*64+i)*4;img.data[k]=img.data[k+1]=img.data[k+2]=255;img.data[k+3]=Math.round(a*255);}
     x.putImageData(img,0,0);const t=new Texture(this.app.graphicsDevice,{width:64,height:256,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);
     const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#fff0cc');m.emissiveMap=t;m.opacityMap=t;m.opacityMapChannel='a';m.opacity=0;m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.useLighting=false;m.update();this.shaftMaterial=m;
-    this.shafts=[[-10,1,3.4],[-4,-2,2.4],[4,0,3.8],[11,2,2.6],[0,-5,3]].map(([x,z,w],i)=>{const e=new Entity('Rayo de luz');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;this.app.root.addChild(e);return {entity:e,x,z,w,phase:i*1.7};});
+    // Behind the player, never between the lens and the scene: with perspective a near shaft reads as fog.
+    this.shafts=[[-10,-7,2.6],[-4,-9,1.8],[4,-8,2.8],[11,-6,2],[0,-11,2.2]].map(([x,z,w],i)=>{const e=new Entity('Rayo de luz');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;this.app.root.addChild(e);return {entity:e,x,z,w,phase:i*1.7};});
   }
   updateShafts(dt,inside,day,reduced){
     if(!this.shafts)return;const level=inside?0:day;this.shaftLevel=(this.shaftLevel??level)+(level-(this.shaftLevel??level))*Math.min(1,dt*.6);
     const on=this.shaftLevel>.02;for(const s of this.shafts){s.entity.enabled=on;if(!on)continue;const drift=reduced?0:Math.sin(this.clock*.05+s.phase)*1.5;
       s.entity.setPosition(this.focus.x+s.x+drift,4.2,this.focus.z+s.z);s.entity.setEulerAngles(62,0,-24);s.entity.setLocalScale(s.w,1,13);}
-    this.shaftMaterial.opacity=this.shaftLevel*(reduced?.13:.11+.04*Math.sin(this.clock*.4));this.shaftMaterial.update();
+    this.shaftMaterial.opacity=this.shaftLevel*(reduced?.09:.08+.03*Math.sin(this.clock*.4));this.shaftMaterial.update();
   }
   celebrate(dt,reduced){
     const c=this.celebration;if(!c)return;c.t+=dt;if(c.t>3.4||reduced){this.celebration=null;return;}
@@ -429,13 +430,13 @@ export class PlayCanvasWorld {
     this.restoration=Math.max(0,(this.restoration||0)-dt);this.vitality+=(alive-this.vitality)*Math.min(1,dt*(this.restoration>0?.75:alive?.5:1.2));const v=this.vitality;
     if(this.frame?.enabled){const base=GRADES[inside?'inside':phase.id]||GRADES.morning,g=this.grade,target=[base[0]*(.58+.42*v),base[1]*(.94+.06*v),base[2]*(.97+.03*v),base[3]*(1.05-.05*v),base[4]*(.93+.07*v)];let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
       if(moved>.0005||!this.gradeApplied){this.gradeApplied=true;const f=this.frame.grading;f.saturation=g[0];f.tint=new Color(g[1],g[2],g[3]);f.brightness=g[4];this.frame.update();}}
-    for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?1.6:n*2.2):0;}
+    for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?1.6:n*3.2):0;if(light.area!=='workshop')light.entity.light.range=9;}
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
     this.portalSurface?.setParameter('uPortalTime',reduced?0:this.clock);
     if(this.festival){const on=!!f.epilogue_shared&&!inside;this.festival.root.enabled=on;if(on)for(const g of this.festival.glows){g.material.opacity=(.35+.45*n)*(reduced?1:.9+Math.sin(this.clock*2.3+g.entity.getPosition().x)*.1);g.material.update();}}
     if(this.portalGlow&&!this.portalArrival){this.portalGlow.material.opacity=.14+(reduced?0:Math.sin(this.clock*.9)*.04);this.portalGlow.material.update();}
     if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?1.5+2.2*n:0;}
-    for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color('#ffc57d');g.material.emissiveIntensity=level;g.material.update();}
+    for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color(g.area==='workshop'?'#ffc57d':'#ff9f45');g.material.emissiveIntensity=g.area==='workshop'?level:level*1.5;g.material.update();}
     for(const d of this.dynamics){const e=d.entity,flag=!!f[d.flag],motion=reduced?0:1;
       if(d.kind==='gate'){const wanted=f.gate?1:0;d.progress+=(wanted-d.progress)*Math.min(1,dt*1.2);e.setPosition(d.pivot[0],d.pivot[1]+d.progress*5.8,d.pivot[2]);}
       if(d.kind==='lever'){d.angle+=((flag?-37:37)-d.angle)*Math.min(1,dt*8);e.setEulerAngles(d.axis==='z'?0:d.angle,0,d.axis==='z'?d.angle:0);}

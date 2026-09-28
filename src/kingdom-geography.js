@@ -16,7 +16,23 @@ export const EXTERIORS=Object.keys(KINGDOM).filter(id=>id!=='workshop');
 // The gate stands on the western embankment; the canal passes OUTSIDE its bastion.
 export const ROAD_CANAL_X=19.8;
 // Keep the canal on the east bank of each settlement, including the river mouth.
-export const WATERCOURSE=[[-8,110],[-8,56],[-8,32],[22,16],[22,-16],[53.8,-32],[53.8,-64],[32,-80],[32,-110],[-12,-126],[-12,-158],[14,-174],[14,-210],[54,-226],[54,-245]];
+export const WATERCOURSE_BENDS=[[-8,110],[-8,56],[-8,32],[22,16],[22,-16],[53.8,-32],[53.8,-64],[32,-80],[32,-110],[-12,-126],[-12,-158],[14,-174],[14,-210],[54,-226],[54,-245]];
+// A river never turns on a set square: every bend becomes an arc of up to 6 m radius. The
+// rounded course is the one drawn AND the one that stops a walker, so both always agree.
+// The Calzada builds its own straight canal between bends 5 and 6: those two stay exact.
+function roundBends(points,radius=6,steps=5,exact=new Set([5,6])){
+  const out=[points[0]];
+  for(let i=1;i<points.length-1;i++){
+    if(exact.has(i)){out.push(points[i]);continue;}
+    const [a,b,c]=[points[i-1],points[i],points[i+1]],l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]),r=Math.min(radius,l1*.45,l2*.45);
+    const p=[b[0]+(a[0]-b[0])/l1*r,b[1]+(a[1]-b[1])/l1*r],q=[b[0]+(c[0]-b[0])/l2*r,b[1]+(c[1]-b[1])/l2*r];
+    for(let k=0;k<=steps;k++){const t=k/steps,u=1-t;out.push([+(u*u*p[0]+2*u*t*b[0]+t*t*q[0]).toFixed(3),+(u*u*p[1]+2*u*t*b[1]+t*t*q[1]).toFixed(3)]);}
+  }
+  out.push(points.at(-1));return out;
+}
+export const WATERCOURSE=roundBends(WATERCOURSE_BENDS);
+// The irrigation run begins at bend 6; the village canal ends at bend 5 (see kingdom-landscape).
+export const WATERCOURSE_SPLIT=WATERCOURSE.findIndex(p=>p[0]===WATERCOURSE_BENDS[6][0]&&p[1]===WATERCOURSE_BENDS[6][1]);
 export function inKingdomWater(id,x,z,margin=0){
   if(!isExterior(id))return false;const [wx,wz]=toKingdom(id,[x,z]);
   for(let i=1;i<WATERCOURSE.length;i++)if(segmentDistance([wx,wz],WATERCOURSE[i-1],WATERCOURSE[i])<2.3+margin)return true;

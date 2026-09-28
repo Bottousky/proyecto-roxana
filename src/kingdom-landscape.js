@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {EXTERIORS,KINGDOM,WATERCOURSE,passageGeometry,corridorX} from './kingdom-geography.js';
+import {EXTERIORS,KINGDOM,WATERCOURSE,WATERCOURSE_SPLIT,passageGeometry,corridorX} from './kingdom-geography.js';
 import {buildWatersideArt} from './waterside-art.js';
 
 function ribbon(owner,points,width,material,y=.073){
@@ -73,8 +73,8 @@ export function buildKingdomLandscape(owner){
   const bed=ribbon(owner,river,4.6,dark,.032);bed.name='kingdom-watercourse-bed';
   const waterTemplate=owner.water(0,0,0,.01,.01),water=waterTemplate.material;owner.root.remove(waterTemplate);
   water.uniforms.channel.value=1;
-  ribbon(owner,river.slice(0,6),3.95,water,.065).name='kingdom-village-canal';
-  ribbon(owner,river.slice(6),3.95,water,.065).name='kingdom-irrigation-channel';
+  ribbon(owner,river.slice(0,WATERCOURSE_SPLIT),3.95,water,.065).name='kingdom-village-canal';
+  ribbon(owner,river.slice(WATERCOURSE_SPLIT),3.95,water,.065).name='kingdom-irrigation-channel';
   // The aqueduct is elevated. Its wheel discharges through the LOWER basin,
   // into a covered culvert under the house's approach and then the valley canal.
   const drainZ=KINGDOM.spring.z-5.58;
