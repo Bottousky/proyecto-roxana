@@ -22,6 +22,7 @@ import {makePortalSurface} from './portal.js';
 import {buildGrid,updateGrid} from './grid.js';
 import {placeDressing,propObstacles} from './props.js';
 import {sowFlora} from './flora.js';
+import {raiseRelief} from './relief.js';
 import {buildHomes} from './homes.js';
 
 // Small coordinate value adapter for the existing renderer-independent game rules.
@@ -124,7 +125,7 @@ export class PlayCanvasWorld {
     for(const [z,depth] of [[-95,390]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(42,65);m.update();e.render.material=m;e.setPosition(-42.5,-.15,z);e.setLocalScale(175,1,depth);this.regions.get('landscape').root.addChild(e);}
     // Open sea to the horizon north of the Faro: the authored planes stop 20 m past the islet.
     {const e=new Entity('Mar abierto'),m=makeWater(new StandardMaterial());bindShore(m,shore,true,1);e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(75,-.45,-540);e.setLocalScale(760,1,530);this.regions.get('landscape').root.addChild(e);this.waters.push(m);}
-    await placeDressing(this);await sowFlora(this);await buildHomes(this,this.kit);
+    await placeDressing(this);await raiseRelief(this);await sowFlora(this);await buildHomes(this,this.kit);
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
     }
