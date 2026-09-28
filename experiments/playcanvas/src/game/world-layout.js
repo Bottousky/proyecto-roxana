@@ -29,7 +29,7 @@ export const AREA_LAYOUTS = {
     courts: [circle('arch-court', 0, -3, 4.2), circle('ohm-court', 3.5, 0, 2.85), circle('garden-rest', 0, 5.2, 1.8)],
     buildings: [{ ...building('portal-keeper', 'Casa de los Porteros', -10.36, -7.2, 4.8, 4, 3.5, {stone:true}), composition: 'La casa de Edda y su familia, que reciben a quien cruza. Escala baja junto al arco; su puerta se abre al claro, sin invadir el pilar occidental.' }],
     landmarks: [{ id: 'portal', label: 'Portal Ω', x: 0, z: -5.7 }],
-    exclusions: [rect('portal-pier-west', -3.25, -5.7, 1, 1.2), rect('portal-pier-east', 3.25, -5.7, 1, 1.2), rect('portal-surface', 0, -5.7, 5.5, .6)],
+    exclusions: [rect('portal-pier-west', -3.25, -5.7, 1, 1.2), rect('portal-pier-east', 3.25, -5.7, 1, 1.2), rect('portal-surface', 0, -5.7, 5.5, 1.2)],
   },
   plaza: {
     identity: 'Un circuito alrededor de la fuente y calles cortas que terminan en puertas visibles.',

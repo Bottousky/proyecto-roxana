@@ -191,6 +191,7 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
     world.window(0, 1.98, front + .075, windowGroup);
     // A flower box under each ground-floor window.
     world.box(0, 1.08, front + .36, 1.25, .26, .34, world.m.darkwood, windowGroup).name = 'window-flower-box';
+    blockers.push(rectangle(side * w * .30, front + .36, 1.25 * (opts.workshop ? 1.12 : 1) + .1, .44, 'flower-box'));
     for (let i = 0; i < 7; i++) world.sphere(-.5 + i * .167, 1.3 + (i % 2) * .05, front + .36 + (i % 3 - 1) * .06, .12, i % 3 === 1 ? world.m.leafLight : i % 2 ? world.m.leaf : world.m.flower, windowGroup, .8);
     if (fullStorey) world.window(0, h - .4, front + .075, windowGroup, true);
   }
