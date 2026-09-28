@@ -22,7 +22,7 @@ import {placeInteractionPrompt} from './interaction-prompt.js';
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const icon={book:'<path d="M3 4h6q3 0 3 3v14q-1-3-4-3H3zm18 0h-6q-3 0-3 3v14q1-3 4-3h5z"/>',map:'<path d="m3 5 6-2 6 3 6-2v15l-6 2-6-3-6 2zM9 3v15M15 6v15"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',sound:'<path d="m3 9 4 0 5-5v16l-5-5H3zM16 8q5 4 0 8M19 4q9 8 0 16"/>',star:'<path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/>',arrow:'<path d="M4 12h16m-6-6 6 6-6 6"/>',close:'<path d="m6 6 12 12M6 18 18 6"/>'};
+const icon={ohm:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2"/>',book:'<path d="M3 4h6q3 0 3 3v14q-1-3-4-3H3zm18 0h-6q-3 0-3 3v14q1-3 4-3h5z"/>',map:'<path d="m3 5 6-2 6 3 6-2v15l-6 2-6-3-6 2zM9 3v15M15 6v15"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',sound:'<path d="m3 9 4 0 5-5v16l-5-5H3zM16 8q5 4 0 8M19 4q9 8 0 16"/>',star:'<path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/>',arrow:'<path d="M4 12h16m-6-6 6 6-6 6"/>',close:'<path d="m6 6 12 12M6 18 18 6"/>'};
 const svg=name=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icon[name]||icon.star}</svg>`;
 document.querySelector('#app').innerHTML=`
   <canvas id="world" aria-label="Mundo de Ohmdal. Movete con WASD o flechas, e interactuá con E." tabindex="0"></canvas>
@@ -33,7 +33,7 @@ document.querySelector('#app').innerHTML=`
     <nav class="title-menu" aria-label="Menú principal"><button id="continue" class="primary hidden">Continuar el viaje ${svg('arrow')}</button><button id="new-game" class="primary">Cruzar el Portal ${svg('arrow')}</button><button id="title-settings" class="quiet">Opciones</button></nav>
     <p id="save-description" class="save-description"></p></div><div class="title-foot"><span>ARCO I · LA PREGUNTA OLVIDADA</span><span>Explorá. Escuchá. Experimentá.</span></div>
   </section>
-  <div id="hud" class="hidden"><header class="hud-top"><div class="place"><span class="eyebrow" id="chapter-label">OHMDAL · LA LUZ</span><h2 id="area-name"></h2><p id="area-subtitle"></p></div><nav class="hud-tools" aria-label="Herramientas de viaje"><button id="journal-button" class="icon-button" aria-label="Bitácora (J)" title="Bitácora · J">${svg('book')}<span class="tool-label">Bitácora</span><kbd>J</kbd><i id="journal-dot" class="hidden"></i></button><button id="map-button" class="icon-button" aria-label="Mapa (M)" title="Mapa · M">${svg('map')}<span class="tool-label">Mapa</span><kbd>M</kbd></button><button id="guide-button" class="icon-button" aria-label="Guía de viaje (H)" title="Guía de viaje · H">${svg('star')}<span class="tool-label">Guía</span></button><button id="pause-button" class="icon-button" aria-label="Pausa y opciones (Escape)">${svg('menu')}<span class="tool-label">Pausa</span><kbd>Esc</kbd></button></nav></header>
+  <div id="hud" class="hidden"><header class="hud-top"><div class="place"><span class="eyebrow" id="chapter-label">OHMDAL · LA LUZ</span><h2 id="area-name"></h2><p id="area-subtitle"></p></div><nav class="hud-tools" aria-label="Herramientas de viaje"><button id="ohm-button" class="icon-button" hidden aria-label="Hablar con Ohm (O)" title="Hablar con Ohm · O">${svg('ohm')}<span class="tool-label">Ohm</span><kbd>O</kbd></button><button id="journal-button" class="icon-button" aria-label="Bitácora (J)" title="Bitácora · J">${svg('book')}<span class="tool-label">Bitácora</span><kbd>J</kbd><i id="journal-dot" class="hidden"></i></button><button id="map-button" class="icon-button" aria-label="Mapa (M)" title="Mapa · M">${svg('map')}<span class="tool-label">Mapa</span><kbd>M</kbd></button><button id="guide-button" class="icon-button" aria-label="Guía de viaje (H)" title="Guía de viaje · H">${svg('star')}<span class="tool-label">Guía</span></button><button id="pause-button" class="icon-button" aria-label="Pausa y opciones (Escape)">${svg('menu')}<span class="tool-label">Pausa</span><kbd>Esc</kbd></button></nav></header>
     <div class="objective" id="objective"><span class="objective-glyph" aria-hidden="true">◇</span><div><button id="objective-toggle" aria-expanded="true" aria-controls="objective-detail"><span class="eyebrow">UNA PREGUNTA ABIERTA</span><span id="objective-title"></span><span class="objective-fold" aria-hidden="true">⌄</span></button><small id="objective-detail"></small></div></div>
     <div id="interaction" class="interaction hidden"><button id="interact-button"><kbd>E</kbd><span id="interaction-label"></span></button><button id="field-measure" class="field-measure hidden"><kbd>Q</kbd> Mirar con Ohm</button></div>
     <aside id="field-meter" class="field-meter hidden" aria-label="Observación de Ohm" aria-live="polite"><button id="close-field-meter" aria-label="Guardar instrumento">×</button><span class="eyebrow">OHM · UNA OBSERVACIÓN</span><h3 id="field-title"></h3><p id="field-observation"></p><details id="field-details"><summary>Ver las lecturas</summary><div class="field-readings"><div><strong id="field-voltage"></strong><small>V · TENSIÓN</small></div><div><strong id="field-current"></strong><small>A · CORRIENTE</small></div></div><p id="field-reference" class="field-reference"></p><p class="field-guide">La tensión compara dos puntos. La corriente indica cuánto circula por un camino. Una raya significa que Ohm no puede fijar esa lectura; no significa cero.</p></details></aside>
@@ -86,7 +86,7 @@ refreshTitle();
 
 function persist(){
   if(!started)return;
-  if(world)state.position=world.getPlayerPosition();
+  if(world)state.position=world.getSavePosition?.()||world.getPlayerPosition();
   state.settings={...settings};
   const ok=saveState(state);
   $('#save-indicator').textContent=ok?'◈ Bitácora al día':'Guardado no disponible · exportá tu bitácora';
@@ -269,10 +269,19 @@ function nextLine(){
 
 function bubble(text){if(mode!=='world'||!$('#field-meter').classList.contains('hidden'))return;$('#ohm-bubble p').textContent=text;show('#ohm-bubble');bubbleUntil=performance.now()+6500;}
 
+// Doors of the houses: a short curtain, then the room (or the street) on the other side.
+async function useDoor(door){
+  if(transitioning||!world||mode!=='world')return;transitioning=true;mode='transition';held.clear();sound('interact');
+  $('#transition-name').textContent=door.leave?(door.label||AREAS[state.area].name):door.label;show('#transition');await wait(settings.reducedMotion?0:260);
+  if(door.leave)world.leaveHome();else world.enterHome(door.enter);
+  await wait(settings.reducedMotion?0:120);show('#transition',false);transitioning=false;mode='world';persist();
+}
+function talkToOhm(){if(mode!=='world')return;const ohm=world?.getCompanion?.();if(ohm)interact(ohm);}
 function interact(obj=nearby){
   if(mode!=='world'||!obj)return;
   intendedInteraction=null;
   sound('interact');held.clear();
+  if(obj.door){useDoor(obj.door.leave?{leave:true,label:AREAS[state.area].name}:obj.door);return;}
   if(!hasRequirements(state,obj.requires)){
     if(obj.lockedDialogue)speak(obj.lockedDialogue);else bubble('Todavía hay algo que observar antes de seguir.');return;
   }
@@ -343,7 +352,7 @@ function openMap(){
 
 function openOptions(){
   const titleMode=mode==='title';
-  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label><label><span>Caminar con clic<span class="setting-note">Con el mouse. En pantallas táctiles siempre se puede tocar para ir</span></span><input id="click-walk" aria-label="Caminar con clic" type="checkbox" ${settings.clickToWalk?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic sobre algo cercano para usarlo. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
+  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label><label><span>Caminar con clic<span class="setting-note">Con el mouse. En pantallas táctiles siempre se puede tocar para ir</span></span><input id="click-walk" aria-label="Caminar con clic" type="checkbox" ${settings.clickToWalk?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>O</kbd> Hablar con Ohm <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic sobre algo cercano para usarlo. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
   $('#volume').oninput=e=>{settings.volume=Number(e.target.value);storeSettings();};
   $('#mute').onchange=e=>{settings.muted=e.target.checked;storeSettings();};
   $('#motion').onchange=e=>{settings.reducedMotion=e.target.checked;storeSettings();};
@@ -413,7 +422,7 @@ $('#new-game').onclick=()=>{
   else startGame(false);
 };
 $('#continue').onclick=()=>startGame(true);$('#title-settings').onclick=openOptions;$('#pause-button').onclick=openOptions;
-$('#guide-button').onclick=openGuide;$('#journal-button').onclick=openJournal;$('#map-button').onclick=openMap;$('#interact-button').onclick=()=>interact();$('#touch-interact').onclick=()=>interact();$('#dialogue-next').onclick=nextLine;
+$('#ohm-button').onclick=()=>talkToOhm();$('#guide-button').onclick=openGuide;$('#journal-button').onclick=openJournal;$('#map-button').onclick=openMap;$('#interact-button').onclick=()=>interact();$('#touch-interact').onclick=()=>interact();$('#dialogue-next').onclick=nextLine;
 $('#field-measure').onclick=fieldMeasure;$('#close-field-meter').onclick=()=>{activeMeasurement=null;show('#field-meter',false);};
 $('#objective-toggle').onclick=()=>{const folded=$('#objective').classList.toggle('folded');$('#objective-toggle').setAttribute('aria-expanded',String(!folded));objectiveUntil=folded?0:Infinity;};
 $('#dialogue-text').onclick=nextLine;
@@ -462,6 +471,7 @@ window.addEventListener('keydown',event=>{
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}
   if(['q','Q'].includes(event.key)){fieldMeasure();return;}
+  if(['o','O'].includes(event.key)&&!event.repeat){talkToOhm();return;}
   held.add(event.key);
 });
 window.addEventListener('keyup',event=>held.delete(event.key));
@@ -496,7 +506,8 @@ function loop(now){
     }
     if(mode==='world'){
       state.playtime+=dt;autosave+=dt;
-      nearby=world.getNearby();
+      {const door=world.getDoorEvent?.();if(door){useDoor(door.leave?{leave:true,label:AREAS[state.area].name}:door);}}
+      nearby=world.getNearby();$('#ohm-button').hidden=!world.getCompanion();
       $('#touch-interact').disabled=!nearby;$('#touch-interact').textContent=nearby?'Interactuar':'Acercate';
       $('#touch-interact').setAttribute('aria-label',nearby?.label||'Acercate a una persona o instalación');
       if(intendedInteraction){const object=world.getInteractions().find(o=>o.id===intendedInteraction);if(!object)intendedInteraction=null;else if(world.canInteractWith(object)){intendedInteraction=null;world.target=null;world.route=[];interact(object);}else if(!world.target&&!world.route.length){if(!world.approachInteraction(object))intendedInteraction=null;}}

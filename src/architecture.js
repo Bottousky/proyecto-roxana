@@ -156,22 +156,26 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
     }
   }
 
-  const door = world.group(0, 0, front + .045, group);
-  door.name = 'building-entrance-door';
-  if (mainWorkshop) door.scale.set(1.22, 1.14, 1);
-  world.door(0, 0, 0, door);
-  const doorFrame = world.group(0, 0, front + .02, group);
-  doorFrame.name = 'building-entrance-frame';
-  for (const side of [-1, 1]) {
-    world.box(side * (mainWorkshop ? .89 : .7), mainWorkshop ? 1.48 : 1.29, 0, mainWorkshop ? .22 : .18, mainWorkshop ? 2.9 : 2.52, .25, opts.stone ? world.m.stone : world.m.darkwood, doorFrame);
-  }
-  // A lintel and a warm transom make the usable entrance legible below the eave.
-  world.box(0, mainWorkshop ? 2.99 : 2.61, .04, mainWorkshop ? 2.08 : 1.62, .21, .33, world.m.stone, doorFrame);
-  if (h > 3.7) {
-    const transomY = mainWorkshop ? 3.23 : 2.88;
-    world.box(0, transomY, .055, mainWorkshop ? 1.08 : .78, .28, .15, world.m.darkwood, doorFrame);
-    world.box(0, transomY, .145, mainWorkshop ? .9 : .62, .17, .05, world.m.glass, doorFrame).name = 'window-pane';
-    for (const side of [-1, 1]) world.box(side * (mainWorkshop ? .24 : .16), transomY, .18, .035, .18, .03, world.m.brass, doorFrame);
+  // A door promises a room you can enter; houses that cannot be entered show a window instead.
+  if (opts.noDoor) world.window(0, 1.98, front + .075, group);
+  else {
+    const door = world.group(0, 0, front + .045, group);
+    door.name = 'building-entrance-door';
+    if (mainWorkshop) door.scale.set(1.22, 1.14, 1);
+    world.door(0, 0, 0, door);
+    const doorFrame = world.group(0, 0, front + .02, group);
+    doorFrame.name = 'building-entrance-frame';
+    for (const side of [-1, 1]) {
+      world.box(side * (mainWorkshop ? .89 : .7), mainWorkshop ? 1.48 : 1.29, 0, mainWorkshop ? .22 : .18, mainWorkshop ? 2.9 : 2.52, .25, opts.stone ? world.m.stone : world.m.darkwood, doorFrame);
+    }
+    // A lintel and a warm transom make the usable entrance legible below the eave.
+    world.box(0, mainWorkshop ? 2.99 : 2.61, .04, mainWorkshop ? 2.08 : 1.62, .21, .33, world.m.stone, doorFrame);
+    if (h > 3.7) {
+      const transomY = mainWorkshop ? 3.23 : 2.88;
+      world.box(0, transomY, .055, mainWorkshop ? 1.08 : .78, .28, .15, world.m.darkwood, doorFrame);
+      world.box(0, transomY, .145, mainWorkshop ? .9 : .62, .17, .05, world.m.glass, doorFrame).name = 'window-pane';
+      for (const side of [-1, 1]) world.box(side * (mainWorkshop ? .24 : .16), transomY, .18, .035, .18, .03, world.m.brass, doorFrame);
+    }
   }
   for (const side of [-1, 1]) {
     if (mainWorkshop) {
@@ -317,7 +321,7 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
 
   group.userData.architecture = {
     footprint,
-    entrance: { ...transform(0, front + .29), direction: [sine, cosine], approach: transform(0, front + .9) },
+    entrance: opts.noDoor ? null : { ...transform(0, front + .29), direction: [sine, cosine], approach: transform(0, front + .9) },
     blockers,
     dimensions: { width: w, depth: d, height: h, foundation: .3 },
     roof: { ridge, rise, overhang: .34 },

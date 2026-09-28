@@ -4,6 +4,7 @@ import plants from './data/plants.json';
 import {AREAS} from './game/content.js';
 import {isExterior,travelBounds} from './game/kingdom-geography.js';
 import {makeWind} from './wind.js';
+import {walkableTerrain} from './terrain.js';
 
 // Pasto, flores, matas y juncos pixel art (art-src/plants → scripts/plants.py) sembrados
 // sobre el suelo de cada lugar exterior. Nada crece sobre el empedrado, el agua, los
@@ -34,6 +35,9 @@ const GARDEN=[['b',3,1.15,3],['b',1,1.3,3],['a',2,.65,3],['b',0,1.2,2],['a',1,1.
 const EDGE=[['a',1,1.05,5],['a',3,.8,4],['b',0,1.3,3],['a',0,.6,3],['a',2,.6,1]];
 const WILD=[['a',1,1.15,6],['a',0,.6,4],['a',3,.85,3],['b',0,1.55,2],['a',2,.65,1],['b',1,1.4,.3]];
 const REEDS=[['b',2,1.5,1]];
+// Donde termina lo caminable y no hay agua ni muro que lo diga, un seto tupido lo dice:
+// ningún pasto abierto debe parecer un camino que después no deja pasar.
+const HEDGE=[['b',0,1.9,5],['b',1,1.8,1],['a',1,1.3,2]];
 const pick=(pool,r)=>{const total=pool.reduce((n,p)=>n+p[3],0);let t=r*total;for(const p of pool){t-=p[3];if(t<=0)return p;}return pool.at(-1);};
 
 export async function sowFlora(world){
@@ -43,6 +47,10 @@ export async function sowFlora(world){
   const sample=(X,Z)=>{const u=Math.floor((X-shore.x0)/shore.width*map.width),v=Math.floor((Z-shore.z0)/shore.depth*map.height);if(u<0||v<0||u>=map.width||v>=map.height)return null;const i=(v*map.width+u)*4;return {water:map.data[i]/255,paved:map.data[i+1]/255};};
   const batches={a:{positions:[],uvs:[],colors:[],indices:[]},b:{positions:[],uvs:[],colors:[],indices:[]}};
   const claimed=new Set();let count=0;
+  const exteriors=Object.keys(AREAS).filter(isExterior).map(id=>{const [ox,oz]=world.data.areas[id].offset,[tw,td]=travelBounds(id);return {id,ox,oz,tw,td};});
+  const walkable=(X,Z)=>exteriors.some(a=>{const x=X-a.ox,z=Z-a.oz;return Math.abs(x)<=a.tw/2&&Math.abs(z)<=a.td/2&&walkableTerrain(a.id,x,z);});
+  const border=(X,Z)=>!walkable(X,Z)&&[[1.1,0],[-1.1,0],[0,1.1],[0,-1.1],[.8,.8],[-.8,.8],[.8,-.8],[-.8,-.8]].some(([dx,dz])=>walkable(X+dx,Z+dz));
+  const hedges={positions:[]};
   for(const id of Object.keys(AREAS)){
     if(!isExterior(id)||!FLAT.has(id))continue;
     const [ox,oz]=world.data.areas[id].offset,[tw,td]=travelBounds(id),bw=tw+36,bd=td+24,[aw,ad]=AREAS[id].bounds,obstacles=world.localObstacles(id),surfaces=world.data.areas[id].walkSurfaces||[];
@@ -54,6 +62,11 @@ export async function sowFlora(world){
       const shoreline=s.water>0&&s.water<.07,inside=Math.abs(x)<aw/2-.5&&Math.abs(z)<ad/2-.5;
       if(s.water>0&&!shoreline)continue;
       if(near(x,z,.05))continue;
+      if(!shoreline&&s.water===0&&border(X,Z)){
+        // Dos o tres matas altas por celda, apretadas, para que el borde se lea como seto.
+        for(let k=0;k<3;k++){const hx=X+(hash(gx,gz,20+k)-.5)*SPACING,hz=Z+(hash(gx,gz,30+k)-.5)*SPACING;if(walkable(hx,hz))continue;hedges.positions.push([hx,hz,pick(HEDGE,hash(gx,gz,40+k)),Math.floor(hash(gx,gz,50+k)*4)]);}
+        continue;
+      }
       const garden=near(x,z,1.3,'building'),edge=near(x,z,.9),patch=noise(X*.16,Z*.16),r=hash(gx,gz,3);
       let pool;
       if(shoreline)pool=REEDS;
@@ -70,6 +83,14 @@ export async function sowFlora(world){
       for(const k of [.62,.62,1,1])b.colors.push(tint*k,tint*k,tint*k*.96,1);
       b.indices.push(base,base+1,base+2,base,base+2,base+3);count++;
     }
+  }
+  for(const [X,Z,[sheet,row,height],col] of hedges.positions){
+    const cell=plants[sheet][row*4+col];if(!cell)continue;
+    const h=height*(.85+hash(Math.round(X*10),Math.round(Z*10),8)*.35),w=h*cell.aspect,b=batches[sheet],base=b.positions.length/3,tint=.8+hash(Math.round(X*7),Math.round(Z*7),9)*.18;
+    const [u0,v0,u1,v1]=cell.uv;
+    b.positions.push(X-w/2,.02,Z, X+w/2,.02,Z, X+w/2,.02+h,Z, X-w/2,.02+h,Z);b.uvs.push(u0,v1,u1,v1,u1,v0,u0,v0);
+    for(const k of [.55,.55,1,1])b.colors.push(tint*k,tint*k,tint*k*.95,1);
+    b.indices.push(base,base+1,base+2,base,base+2,base+3);count++;
   }
   const root=world.regions.get('landscape').root;
   for(const [key,b] of Object.entries(batches)){

@@ -12,6 +12,8 @@ const round=n=>Math.round(n*10000)/10000;
 const PAVING=new Set(['authored-connected-paving','continuous-road','road-threshold']);
 // The converter and the playable snapshot share exactly the same river course.
 sourceWatercourse.splice(0,sourceWatercourse.length,...WATERCOURSE.map(p=>[...p]));
+// Doors that lead somewhere: every authored building keeps its entrance (local coordinates).
+function entrancesOf(world){const doors=[];world.root.traverse(o=>{const a=o.userData?.architecture;if(a?.id&&a.entrance)doors.push({id:a.id,label:a.label,x:round(a.entrance.x),z:round(a.entrance.z),approach:[round(a.entrance.approach.x),round(a.entrance.approach.z)],direction:a.entrance.direction.map(round),width:round(a.dimensions.width),depth:round(a.dimensions.depth)});});return doors;}
 function capture(world,id,offset=[0,0],landscape=false){
   const mapNames=new Map(Object.entries(world.textures).map(([name,texture])=>[texture,name]));
   world.treeTextures.forEach((t,i)=>mapNames.set(t,'tree'+i));
@@ -103,7 +105,7 @@ for(const id of Object.keys(AREAS)){
   w.bankTextures=Array.from({length:3},()=>new T.Texture());w.treeTextures=Array.from({length:6},()=>new T.Texture());
   w.loadArea(AREAS[id],w.state,AREAS[id].spawn,{continuous:id!=='workshop',deferRender:true});
   const offset=id==='workshop'?[0,0]:[KINGDOM[id].x,KINGDOM[id].z];
-  output.areas[id]={offset,bounds:AREAS[id].bounds,spawn:AREAS[id].spawn,walkSurfaces:w.walkSurfaces||[],obstacles:w.obstacles.map(o=>({...o,gate:o===w.gateObstacle,x:o.x+offset[0],z:o.z+offset[1]}))};
+  output.areas[id]={offset,bounds:AREAS[id].bounds,spawn:AREAS[id].spawn,walkSurfaces:w.walkSurfaces||[],entrances:entrancesOf(w),obstacles:w.obstacles.map(o=>({...o,gate:o===w.gateObstacle,x:o.x+offset[0],z:o.z+offset[1]}))};
   capture(w,id,offset);
   if(id==='plaza'){
     const original=w.root;w.root=new T.Group();w.localGeometries=[];w.waterMaterials=[];buildKingdomLandscape(w);capture(w,'landscape',[0,0],true);w.root=original;

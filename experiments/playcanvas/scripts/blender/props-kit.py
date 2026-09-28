@@ -24,6 +24,8 @@ FAMILIES = {
     'hay': ('#e6c877', 1.2), 'endgrain': ('#c9a574', .4), 'awning': ('#ffffff', 2.4), 'stone': ('#b9ad98', 2.0),
     'soil': ('#4a3526', 0), 'clay': ('#b8674a', 0), 'leaf': ('#5d8a3c', 0), 'leafdark': ('#3f6b31', 0),
     'red': ('#c8423a', 0), 'yellow': ('#f0c64a', 0), 'white': ('#f2eee0', 0), 'pink': ('#e58aa6', 0), 'violet': ('#8c6cc8', 0),
+    'fire': ('#ff9a3a', 0), 'linen': ('#eee6d2', 0), 'blanket': ('#a8443a', 0), 'rug': ('#7d3b33', 0), 'rugtrim': ('#d9a54a', 0),
+    'plate': ('#e8e2d0', 0), 'bookred': ('#8e3b32', 0), 'bookblue': ('#35557a', 0), 'bookgreen': ('#4a6b3a', 0), 'bookochre': ('#b88a3a', 0), 'wax': ('#f4ecd0', 0),
     'apple': ('#c23b2e', 0), 'pear': ('#b9c24a', 0), 'orange': ('#e08a2e', 0), 'cabbage': ('#8fbf5a', 0), 'bread': ('#c98a44', 0),
 }
 MATS = {}
@@ -219,6 +221,120 @@ def cabbages(name='cabbages'):
     for i in range(6): parts.append(blob(name, .12, ((i % 3 - 1) * .38, (i // 3 - .5) * .24, .14), 'cabbage', (1, 1, .8), 2, .25))
     return join(name, parts)
 
+
+# ---------------------------------------------------------------- mobiliario de interiores
+def table(name='table', w=1.4, d=.8):
+    parts = [box(name, (w, d, .06), (0, 0, .74), 'wood', .01)]
+    for x in (-1, 1):
+        for y in (-1, 1): parts.append(box(name, (.07, .07, .71), (x * (w / 2 - .08), y * (d / 2 - .08), .355), 'darkwood', .006))
+    for x in (-1, 1): parts.append(box(name, (.05, d - .2, .06), (x * (w / 2 - .08), 0, .2), 'darkwood', .005))
+    parts.append(cylinder(name, .12, .02, (-.3, .05, .78), 'plate', 12))
+    parts.append(lathe(name, [(.05, .77), (.06, .86), (.04, .92)], (.35, -.1, 0), 'clay', 10))
+    return join(name, parts)
+
+def chair(name='chair'):
+    parts = [box(name, (.44, .44, .05), (0, 0, .46), 'wood', .006)]
+    for x in (-1, 1):
+        for y in (-1, 1): parts.append(box(name, (.05, .05, .46 if y > 0 else .95), (x * .18, y * .18, (.46 if y > 0 else .95) / 2), 'darkwood', .004))
+    for z in (.7, .88): parts.append(box(name, (.4, .04, .06), (0, -.18, z), 'wood', .004))
+    return join(name, parts)
+
+def bed(name='bed'):
+    parts = [box(name, (1.0, 2.0, .3), (0, 0, .3), 'darkwood', .01), box(name, (.94, 1.9, .16), (0, .02, .5), 'linen', .03),
+             box(name, (.96, 1.25, .08), (0, .35, .6), 'blanket', .02), box(name, (.6, .32, .12), (0, -.72, .64), 'linen', .04),
+             box(name, (1.06, .08, 1.0), (0, -1.0, .5), 'darkwood', .01), box(name, (1.06, .08, .6), (0, 1.0, .3), 'darkwood', .01)]
+    return join(name, parts)
+
+def hearth(name='hearth'):
+    parts = [box(name, (1.8, .7, .25), (0, 0, .125), 'stone', .02), box(name, (.35, .6, 1.1), (-.72, 0, .8), 'stone', .02),
+             box(name, (.35, .6, 1.1), (.72, 0, .8), 'stone', .02), box(name, (1.8, .7, .3), (0, 0, 1.5), 'stone', .02),
+             box(name, (1.3, .55, 1.1), (0, .1, 2.2), 'stone', .02), box(name, (2.0, .8, .1), (0, 0, 1.68), 'darkwood', .01),
+             box(name, (1.1, .1, 1.0), (0, .3, .8), 'soil', 0)]
+    for i in range(3): parts.append(cylinder(name, .07, .7, (0, .05 - i * .06, .3 + i * .06), 'darkwood', 8, 'X'))
+    for i in range(5): parts.append(blob(name, .12 + rng.random() * .08, ((rng.random() - .5) * .5, -.05, .45 + rng.random() * .25), 'fire', (1, .6, 1.6), 1, .3))
+    parts.append(lathe(name, [(.14, .72), (.2, .9), (.18, 1.05), (.12, 1.08)], (-.35, -.05, -.4), 'iron', 12))
+    return join(name, parts)
+
+def oven(name='oven'):
+    parts = [box(name, (1.8, 1.4, .8), (0, 0, .4), 'stone', .03)]
+    parts.append(blob(name, .85, (0, 0, .8), 'stone', (1, .8, .75), 3, .04))
+    parts.append(box(name, (.6, .1, .45), (0, -.72, 1.0), 'soil', .02))
+    for i in range(3): parts.append(blob(name, .1, ((i - 1) * .16, -.62, .96), 'fire', (1, .6, .9), 1, .3))
+    parts.append(cylinder(name, .18, 1.2, (.2, .25, 1.9), 'stone', 10))
+    return join(name, parts)
+
+def counter(name='counter', w=2.0):
+    parts = [box(name, (w, .6, .9), (0, 0, .45), 'wood', .01), box(name, (w + .1, .7, .06), (0, 0, .93), 'darkwood', .01)]
+    for x in (-1, 0, 1): parts.append(box(name, (.06, .02, .8), (x * w * .33, -.31, .45), 'darkwood', .004))
+    return join(name, parts)
+
+def rug(name='rug', w=2.4, d=1.6):
+    return join(name, [box(name, (w, d, .015), (0, 0, .008), 'rugtrim', 0), box(name, (w - .2, d - .2, .018), (0, 0, .01), 'rug', 0)])
+
+def wardrobe(name='wardrobe'):
+    parts = [box(name, (1.1, .6, 2.0), (0, 0, 1.0), 'darkwood', .02), box(name, (1.2, .66, .1), (0, 0, 2.05), 'wood', .01)]
+    for x in (-.27, .27): parts.append(box(name, (.5, .02, 1.8), (x, -.31, 1.0), 'wood', .006))
+    for x in (-.05, .05): parts.append(box(name, (.03, .04, .12), (x, -.34, 1.05), 'iron', .004))
+    return join(name, parts)
+
+def anvil(name='anvil'):
+    parts = [cylinder(name, .3, .5, (0, 0, .25), 'darkwood', 12), box(name, (.35, .22, .14), (0, 0, .56), 'iron', .02),
+             box(name, (.6, .25, .14), (0, 0, .72), 'iron', .02), blob(name, .09, (.36, 0, .72), 'iron', (1.4, .8, .7), 1, 0)]
+    return join(name, parts)
+
+def millstone(name='millstone'):
+    parts = [cylinder(name, .9, .4, (0, 0, .2), 'stone', 20), cylinder(name, .75, .25, (0, 0, .52), 'stone', 20),
+             cylinder(name, .08, .9, (0, 0, .9), 'darkwood', 8), box(name, (1.6, .1, .1), (.4, 0, 1.2), 'darkwood', .01)]
+    return join(name, parts)
+
+def candle(name='candle'):
+    parts = [cylinder(name, .08, .03, (0, 0, .015), 'iron', 10), cylinder(name, .03, .18, (0, 0, .12), 'wax', 8), blob(name, .025, (0, 0, .24), 'fire', (1, 1, 1.8), 1, 0)]
+    return join(name, parts)
+
+def stool(name='stool'):
+    parts = [cylinder(name, .2, .05, (0, 0, .46), 'wood', 12)]
+    for k in range(3):
+        a = k * math.tau / 3; parts.append(box(name, (.04, .04, .46), (math.cos(a) * .13, math.sin(a) * .13, .23), 'darkwood', .004))
+    return join(name, parts)
+
+
+def open_frame(name, w, d, h, boards, mat='darkwood'):
+    # Estante abierto: fondo, laterales, techo y tablas; lo que se apoya queda a la vista.
+    t = .04
+    parts = [box(name, (w, t, h), (0, d / 2 - t / 2, h / 2), mat, .004)]
+    for x in (-1, 1): parts.append(box(name, (t, d, h), (x * (w / 2 - t / 2), 0, h / 2), mat, .004))
+    parts.append(box(name, (w, d, t), (0, 0, h - t / 2), mat, .004))
+    for z in boards: parts.append(box(name, (w - 2 * t, d - t, .03), (0, -t / 2, z), 'wood', .004))
+    return parts
+
+def cupboard(name='cupboard'):
+    parts = [box(name, (1.2, .5, .95), (0, 0, .475), 'darkwood', .01)]
+    upper = open_frame(name, 1.2, .3, 1.0, (.02, .35, .7))
+    for piece in upper: piece.data.transform(Matrix.Translation((0, .1, .95)))
+    parts += upper
+    for i in range(5): parts.append(cylinder(name, .1, .02, (-.45 + i * .22, .16, 1.1), 'plate', 12, 'Y'))
+    for i in range(4): parts.append(lathe(name, [(.05, 1.31), (.07, 1.42), (.04, 1.5)], (-.4 + i * .27, .05, 0), 'clay', 10))
+    for i in range(3): parts.append(lathe(name, [(.06, 1.66), (.08, 1.76), (.05, 1.84)], (-.3 + i * .3, .05, 0), 'plate', 10))
+    for x in (-.3, .3): parts.append(box(name, (.5, .02, .8), (x, -.26, .48), 'wood', .004))
+    return join(name, parts)
+
+def bookshelf(name='bookshelf'):
+    parts = open_frame(name, 1.2, .35, 2.0, (.08, .55, 1.05, 1.52))
+    colors = ['bookred', 'bookblue', 'bookgreen', 'bookochre']
+    for z in (.1, .57, 1.07, 1.54):
+        x = -.54
+        while x < .5:
+            t = .04 + rng.random() * .04; hgt = .26 + rng.random() * .14
+            if rng.random() < .08: x += .08; continue
+            parts.append(box(name, (t, .24, hgt), (x + t / 2, -.02, z + hgt / 2), rng.choice(colors), .004)); x += t + .006
+    return join(name, parts)
+
+def shelf_bread(name='shelf_bread'):
+    parts = open_frame(name, 1.4, .4, 1.7, (.08, .6, 1.12))
+    for z in (.1, .62, 1.14):
+        for i in range(5): parts.append(blob(name, .09, (-.52 + i * .26, -.03, z + .07), 'bread', (1.5, 1, .8), 1, .15))
+    return join(name, parts)
+
 KIT = {
     'crate': crate, 'crate_small': lambda: crate('crate_small', .5), 'crate_apples': lambda: crate_produce('crate_apples', 'apple'),
     'crate_pears': lambda: crate_produce('crate_pears', 'pear'), 'barrel': barrel, 'sack': sack, 'sacks': sacks,
@@ -226,6 +342,9 @@ KIT = {
     'pot': pot, 'pot_white': lambda: pot('pot_white', 'white'), 'cart': cart, 'stall': stall,
     'stall_bread': lambda: stall('stall_bread', ('bread', 'cabbage', 'apple')), 'hay': hay, 'logs': logs,
     'basket': basket, 'basket_apples': lambda: basket('basket_apples', 'apple'), 'bench': bench, 'cabbages': cabbages,
+    'table': table, 'chair': chair, 'bed': bed, 'cupboard': cupboard, 'bookshelf': bookshelf, 'hearth': hearth, 'oven': oven,
+    'counter': counter, 'rug': rug, 'wardrobe': wardrobe, 'anvil': anvil, 'millstone': millstone, 'candle': candle, 'stool': stool,
+    'shelf_bread': shelf_bread,
 }
 built = [fn() for fn in KIT.values()]
 # El mundo de Ohmdal está a escala de sus figuras (casi 3 unidades de alto): la utilería,

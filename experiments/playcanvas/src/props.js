@@ -17,13 +17,14 @@ async function familyMaterial(app,name,source){
   if(map){m.diffuseMap=map;m.diffuse=new Color().fromString(t[1]);}
   else if(FLAT[name])m.diffuse=new Color().fromString(FLAT[name]);
   else m.diffuse=source?.diffuse?.clone()||new Color(1,1,1);
+  if(name==='fire'){m.emissive=new Color(1,.55,.2);m.emissiveIntensity=2.2;}
   m.update();return m;
 }
 
 export async function placeDressing(world){
   const app=world.app,url=new URL('./assets/props/kit.glb',document.baseURI).href;
   const asset=await new Promise((resolve,reject)=>app.assets.loadFromUrlAndFilename(url,'kit.glb','container',(error,a)=>error?reject(error):resolve(a)));
-  const template=asset.resource.instantiateRenderEntity(),materials=new Map();
+  const template=asset.resource.instantiateRenderEntity(),materials=new Map();world.kit=template;
   for(const r of template.findComponents('render'))for(const mi of r.meshInstances){
     const name=(mi.material.name||'').replace(/\.\d+$/,'');
     if(!materials.has(name))materials.set(name,await familyMaterial(app,name,mi.material));

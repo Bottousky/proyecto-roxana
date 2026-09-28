@@ -148,11 +148,16 @@ export function getInhabitantInteractions(world, state = world.state) {
     ...actor.inhabitant.object, x: actor.g.position.x, z: actor.g.position.z,
     inhabitant: true, activity: actor.inhabitant.plan.stage,
   }));
-  if (world.ohm?.visible && has(state, 'awaken')) interactions.push({
-    id: 'ohm_companion', kind: 'npc', character: 'ohm', label: 'Hablar con Ohm', dialogue: 'ohm_companion',
-    x: world.ohm.position.x, z: world.ohm.position.z, inhabitant: true, interactionPriority: -1, radius: 2,
-  });
   return interactions;
+}
+
+/** Ohm walks at the player's heels: talking to him has its own key (O), never a proximity prompt. */
+export function companionInteraction(world, state = world.state) {
+  if (!world.ohm?.visible || !has(state, 'awaken')) return null;
+  return {
+    id: 'ohm_companion', kind: 'npc', character: 'ohm', label: 'Hablar con Ohm', dialogue: 'ohm_companion',
+    x: world.ohm.position.x, z: world.ohm.position.z, inhabitant: true,
+  };
 }
 
 function conversationActor(world, target) {

@@ -292,7 +292,7 @@ export class World {
   buildAuthoredBuildings(){
     // Backdrop houses: no interaction, only a yard fence and a tree so each reads as someone's home.
     for(const b of this.layout.backdrop||[]){
-      const g=this.building(b.x,b.z,b.w,b.d,b.h,b.options);g.name='village-backdrop-house';delete g.userData.architecture;const r=b.options.rotation||0,fx=Math.sin(r),fz=Math.cos(r),reach=b.d/2+1.6;
+      const g=this.building(b.x,b.z,b.w,b.d,b.h,{...b.options,noDoor:true});g.name='village-backdrop-house';delete g.userData.architecture;const r=b.options.rotation||0,fx=Math.sin(r),fz=Math.cos(r),reach=b.d/2+1.6;
       this.fence(b.x+fx*reach,b.z+fz*reach,b.w*.7,!r);this.tree(b.x-fx*(b.d/2+2)+fz*(b.w/2+1.2),b.z-fz*(b.d/2+2)-fx*(b.w/2+1.2),.9+(Math.abs(b.x)%3)*.12);
     }
     for(const b of this.layout.buildings){
