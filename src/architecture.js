@@ -222,6 +222,29 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
     roof(world, dormer, 1.55, 1.15, .72, .56, covering, wall, { ridge: 'z', overhang: .14, name: 'dormer-roof' });
   }
 
+  // A two-storey framed house carries a small timber balcony under its upper middle bay.
+  if (fullStorey && !opts.stone && !opts.workshop) {
+    const balcony = world.group(0, storeyLine + .05, front, group);
+    balcony.name = 'front-balcony';
+    world.box(0, 0, .42, 1.9, .12, .84, world.m.darkwood, balcony);
+    for (const side of [-1, 1]) world.beam([side * .8, -.7, .04], [side * .8, -.06, .78], .08, world.m.darkwood, balcony);
+    world.box(0, .52, .82, 1.9, .07, .07, world.m.wood, balcony);
+    world.box(0, .08, .82, 1.9, .05, .05, world.m.wood, balcony);
+    for (let i = 0; i < 9; i++) world.box(-.88 + i * .22, .3, .82, .05, .44, .05, world.m.wood, balcony);
+    for (const side of [-1, 1]) world.box(side * .92, .3, .43, .05, .44, .8, world.m.wood, balcony);
+    for (let i = 0; i < 5; i++) world.sphere(-.6 + i * .3, .62, .78, .13, i % 2 ? world.m.flower : world.m.leafLight, balcony, .75);
+  }
+  // A trade hangs its sign from a wrought bracket at the corner, above head height.
+  if (opts.service || opts.awning) {
+    const sign = world.group(w / 2 + .06, -.9, front - .25, group);
+    sign.name = 'trade-sign';
+    sign.scale.setScalar(1.3);
+    world.box(.42, 3.05, 0, .9, .06, .06, world.m.metal, sign);
+    world.beam([.04, 2.62, 0], [.62, 3.03, 0], .035, world.m.metal, sign);
+    for (const x of [.22, .72]) world.box(x, 2.9, 0, .02, .26, .02, world.m.metal, sign);
+    world.box(.47, 2.55, 0, .74, .52, .07, world.m.wood, sign);
+    world.box(.47, 2.55, .045, .6, .38, .02, opts.red ? world.m.roofRed : world.m.brass, sign);
+  }
   const chimneyX = opts.workshop ? w * .31 : w * .29, chimneyZ = -d * .16;
   const chimneyTop = wallTop + rise + (opts.service === 'forge' ? 1.15 : opts.workshop ? .76 : .48);
   const chimney = world.group(chimneyX, 0, chimneyZ, group);
