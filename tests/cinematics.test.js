@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {CINEMATIC_DEFINITIONS,createCinematic,sampleCinematic,returningCinematic,gameplayCameraPose} from '../src/cinematics.js';
+import {WATERCOURSE} from '../src/kingdom-geography.js';
 
 function context(id){const areaId=CINEMATIC_DEFINITIONS[id].area,player=[4,0,2];return{areaId,flags:{[id]:true},player,companion:[2,0,2.7],puzzle:[3.5,1.4,0],bounds:[36,36],start:gameplayCameraPose(areaId,player)};}
 
@@ -44,4 +45,7 @@ test('restoring the pump follows the water down to the Plaza fountain before ret
   assert.equal(sampleCinematic(timeline,5).caption,'Más abajo, el agua vuelve a encontrar la Plaza.');
   assert.deepEqual(sampleCinematic(timeline,6.5).pose.focus,[-12,1.2,92.2]);
   assert.equal(sampleCinematic(timeline,timeline.returnAt+.1).returning,true);
+  // On the way down the camera rests over the canal itself (spring origin at kingdom 12,-95).
+  const nearWater=([x,,z])=>{const p=[x+12,z-95];let best=Infinity;for(let i=1;i<WATERCOURSE.length;i++){const a=WATERCOURSE[i-1],b=WATERCOURSE[i],dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dz)/(dx*dx+dz*dz)));best=Math.min(best,Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dz));}return best;};
+  for(const t of [4,4.8,5.6])assert.ok(nearWater(sampleCinematic(timeline,t).pose.focus)<4,`at ${t}s the camera looks at the water`);
 });

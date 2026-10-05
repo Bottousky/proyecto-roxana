@@ -48,6 +48,12 @@ function paneTexture(app){
   x.globalAlpha=.55;x.fillStyle='#e8f1ee';x.beginPath();x.moveTo(8,64);x.lineTo(22,64);x.lineTo(50,0);x.lineTo(36,0);x.fill();x.globalAlpha=.3;x.beginPath();x.moveTo(26,64);x.lineTo(31,64);x.lineTo(59,0);x.lineTo(54,0);x.fill();
   paneMap=new Texture(app.graphicsDevice,{width:64,height:64,format:PIXELFORMAT_RGBA8,mipmaps:true});paneMap.setSource(c);return paneMap;
 }
+function poolTexture(app){
+  // Where the beam touches down: nothing under the island, a long band over water and fields.
+  const c=document.createElement('canvas');c.width=256;c.height=32;const x=c.getContext('2d'),img=x.createImageData(256,32),s=(a,b,t)=>{const k=Math.max(0,Math.min(1,(t-a)/(b-a)));return k*k*(3-2*k);};
+  for(let j=0;j<32;j++)for(let i=0;i<256;i++){const u=i/255,v=Math.abs(j/31-.5)*2,a=s(.22,.45,u)*(1-s(.7,1,u))*Math.pow(Math.max(0,1-v*v),2.6),k=(j*256+i)*4;img.data[k]=img.data[k+1]=img.data[k+2]=255;img.data[k+3]=Math.round(a*255);}
+  x.putImageData(img,0,0);const t=new Texture(app.graphicsDevice,{width:256,height:32,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);return t;
+}
 function beamTexture(app){
   // Bright at the lens, fading with distance; soft across its width.
   const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d'),img=x.createImageData(256,64);
@@ -414,6 +420,10 @@ export class PlayCanvasWorld {
     // The restored Faro sweeps a soft wedge of light across land and sea.
     this.beacon=new Entity('Señal del Faro');const m2=new StandardMaterial(),ray=beamTexture(this.app);m2.diffuse=color('#000000');m2.emissive=color('#ffe3a8');m2.emissiveMap=ray;m2.opacityMap=ray;m2.opacityMapChannel='a';m2.emissiveIntensity=1.6;m2.opacity=.5;m2.blendType=BLEND_ADDITIVEALPHA;m2.depthWrite=false;m2.cull=CULLFACE_NONE;m2.useLighting=false;m2.update();this.beaconMaterial=m2;
     const sweep=new Entity('Haz');sweep.addComponent('render',{type:'plane'});sweep.render.material=m2;sweep.render.castShadows=false;sweep.setLocalPosition(70,0,0);sweep.setLocalScale(140,1,26);this.beacon.addChild(sweep);this.app.root.addChild(this.beacon);
+    // Seen from above, the beam itself passes over the camera: what reads is where it lands. A band
+    // of light laid on the water and the fields turns with it, away from the island it leaves.
+    {const m=new StandardMaterial(),pool=poolTexture(this.app);m.diffuse=color('#000000');m.emissive=color('#ffd08a');m.emissiveMap=pool;m.opacityMap=pool;m.opacityMapChannel='a';m.emissiveIntensity=1.3;m.opacity=0;m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.useLighting=false;m.update();
+      const e=new Entity('Donde llega el haz');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setLocalPosition(80,-16.6,0);e.setLocalScale(160,1,22);this.beacon.addChild(e);this.beaconPool=m;}
   }
   // A soft golden ring on the ground under the object the player can use right now.
   buildFocusRing(){
@@ -507,7 +517,7 @@ export class PlayCanvasWorld {
     // The beam turns on its own; in the finale it swings to follow the camera across the kingdom.
     this.beamAngle=(this.beamAngle??0)+dt*(reduced?.05:.18);
     if(this.cinematic?.timeline.id==='beacon_lens'&&this.cinematic.elapsed>7){const aim=Math.atan2(this.focus.z-(KINGDOM.lighthouse.z-25.08),this.focus.x-KINGDOM.lighthouse.x);let d=aim-this.beamAngle;d=Math.atan2(Math.sin(d),Math.cos(d));this.beamAngle+=d*Math.min(1,dt*1.6);}
-    const a=this.beamAngle;this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
+    const a=this.beamAngle;this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();if(this.beaconPool){this.beaconPool.opacity=.3*n;this.beaconPool.update();}
   }
   resize(){const low=this.state.settings?.quality==='low';this.appliedQuality=low?'low':'high';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;if(this.frame)this.frame.enabled=!low;}
   dispose(){if(this.disposed)return;this.disposed=true;removeEventListener('beforeunload',this.destroy);this.app.destroy();}

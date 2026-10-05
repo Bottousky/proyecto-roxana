@@ -39,12 +39,15 @@ export function createCinematic(id,context,{reducedMotion=false}={}){
     const lamp=pose([puzzle[0],1.8,puzzle[2]],1.68),room=pose([.3,1.7,-1],1.22);
     shots=[key(1,lamp),key(2.3,lamp),key(3.5,room),key(definition.returnAt,room)];
   }else if(id==='gate'){
-    const mechanism=pose([puzzle[0],2,puzzle[2]],1.45),gateway=pose([0,4.3,-(context.bounds?.[1]||32)*.32],.94,[0,15,25]);
-    shots=[key(.85,mechanism),key(1.5,mechanism),key(3.5,gateway),key(definition.returnAt,gateway)];
+    // The latch, then the Ω over the open gate up close, then the valley it opens onto.
+    const mechanism=pose([puzzle[0],2,puzzle[2]],1.45),gateZ=-(context.bounds?.[1]||32)*.32,sign=pose([0,4.8,gateZ-1.5],1.4,[0,15,25]),gateway=pose([0,4.3,gateZ],.94,[0,15,25]);
+    shots=[key(.85,mechanism),key(1.4,mechanism),key(2.6,sign),key(3.4,sign),key(definition.returnAt,gateway)];
   }else if(id==='pump'){
-    // The water travels: from the pump down to the Plaza's fountain, 95 m south.
+    // The water travels: from the pump down the canal it really runs in (the Manantial's east bank,
+    // the Calzada's canal, the Plaza's) to the fountain, 95 m south. Spring-local coordinates.
     const pump=pose([puzzle[0],1.7,puzzle[2]],1.48),water=pose([2,1.4,-3.8],1.62,[0,16,25]),fountain=pose([-12,1.2,92.2],1.35,[0,15,25]);
-    shots=[key(1,pump),key(2,pump),key(3.3,water),key(3.9,water),key(5.4,fountain),key(definition.returnAt,fountain)];
+    const springCanal=pose([20,.6,6],1.12,[0,16,25]),roadCanal=pose([41.8,.6,47],1.05,[0,16,25]),plazaCanal=pose([10,.6,86],1.12,[0,16,25]);
+    shots=[key(1,pump),key(2,pump),key(2.9,water),key(3.3,water),key(4,springCanal),key(4.8,roadCanal),key(5.6,plazaCanal),key(6.3,fountain),key(definition.returnAt,fountain)];
   }else if(id==='irrigation'){
     const panel=pose([puzzle[0],1.7,puzzle[2]],1.38),canal=pose([(context.bounds?.[0]||40)*.36,1.5,-(context.bounds?.[1]||36)*.28+6.1],1.28,[0,17,25]);
     shots=[key(.9,panel),key(1.5,panel),key(3.3,canal),key(definition.returnAt,canal)];

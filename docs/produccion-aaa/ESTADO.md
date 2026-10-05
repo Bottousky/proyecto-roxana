@@ -227,6 +227,28 @@ raíz provee ahora `nearby`), `npm run check` correcto, partida completa
 (`output/playthrough-cycle6/`, 399 s, 0 errores) y `qa-dialogue-input` correcto. Sonido de los
 latidos: NO VERIFICADO de oído (sin escucha en esta sesión).
 
+## Ciclo 7 · El agua baja por su canal, el Ω se lee y el haz se ve llegar (5 oct 2026)
+
+- **Faro:** visto desde arriba, el haz del Faro pasaba por encima de la cámara; en los cuadros
+  del Lago y las Terrazas no había ninguna luz que «cruzara el lago». Ahora una franja de luz
+  cálida gira con el haz sobre el agua y los campos, empezando donde termina la isla
+  (`poolTexture` en `src/world.js`); sólo de noche (escala con el nivel de faroles), nunca de
+  día. Primer intento descartado: una luz puntual cónica iluminaba la propia isla del Faro y
+  ensuciaba la galería; segundo, una franja demasiado blanca que aplanaba el terreno.
+- **Manantial:** el vuelo hasta la Plaza pasaba por cuadros de sólo copas de árboles. Ahora la
+  cámara baja por el canal real (orilla este del Manantial, canal de la Calzada, canal de la
+  Plaza) hasta la fuente. Prueba nueva: durante la bajada el foco queda a menos de 4 m del
+  curso de agua (falla con el recorrido anterior).
+- **Puerta:** plano cercano del Ω sobre la puerta abierta antes de abrir al valle.
+- Herramienta: `scripts/qa-finale-scene.mjs` reproduce la escena real del Faro de noche desde
+  una bitácora terminada (revisión visual, no aceptación).
+
+Verificación (runtime idéntico a la copia evaluada): `npm test` 83/83 y 285/285,
+`npm run check` correcto, partida completa con captura de todas las escenas
+(`output/scenes-cycle7/`, 416 s, 0 errores). Antes/después del Faro en `output/finale-sheet.png`.
+Pendiente menor: el regreso de la cámara desde la fuente al Manantial (1,4 s) vuelve a cruzar
+copas de árboles.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -239,7 +261,7 @@ latidos: NO VERIFICADO de oído (sin escucha en esta sesión).
 | 5 | Presentación | Profundidad de campo: el destino de cada llegada (fuente, rueda del Manantial, Castillo) queda borroso en el tercio superior | Hecho (ciclo 5) |
 | 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano (torre de la Puerta al entrar al Manantial, torre del Castillo en Terrazas) | Pendiente |
 | 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía, la escena clave más pobre | Pendiente |
-| 8 | Momentos | Despertar de Ohm sin luz visible (hecho, ciclo 6). Pendiente: vuelo del Manantial por copas de árboles; haz del Faro que no se ve cruzar el lago; Ω pequeño en la Puerta | En curso |
+| 8 | Momentos | Despertar (ciclo 6), canal del Manantial, Ω de la Puerta y haz del Faro (ciclo 7). Menor: regreso de cámara del Manantial sobre copas | Hecho salvo detalle |
 | 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep; fichas y coherencia del modelo | Hecho en lo verificable (ciclos 2 y 4): relato según traza, Ivara/Nereo exigen comprobación, volver ≠ poner en servicio, primera clase antes del cierre y acuerdo forja/riego en Terrazas están en el código y la partida los recorre; fichas y modelo en ciclo 4. El hallazgo 5 (estructura predecible por zona) es de ritmo: queda para revisión humana de diversión |
 | 10 | UI | Banco: tomaba un cable sin tener ninguno y la indicación «Ahora tocá otra pieza…» quedaba tras resolver | Hecho (ciclo 2) |
 | 11 | UI | Título a 800×600 recorta «OHMDAL» | Pendiente |
@@ -262,9 +284,10 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 7: momentos construidos, segunda parte (8): el vuelo del Manantial debe seguir el agua
-(canal) y no las copas; el haz del Faro debe verse cruzar el lago en la escena; acercar el Ω de
-la Puerta. Después: interior del taller (7) y ocluyentes borrosos de primer plano (6).
+Ciclo 8: interior del taller de Lumen (7), la escena clave más pobre en presentación (caja
+oscura casi vacía). Revisar con la misma cámara antes/después, a oscuras y restaurado. Después:
+ocluyentes borrosos en primer plano de algunas llegadas (6), detalles atravesables (16), y
+preparar la medición de rendimiento en build de producción (12).
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`
