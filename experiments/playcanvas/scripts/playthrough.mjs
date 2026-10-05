@@ -5,14 +5,15 @@
  * observe positions and state; every game change is a keyboard or DOM click.
  */
 import { chromium } from 'playwright';
+import { chromePath, gpuArgs } from './chrome.mjs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
 
-const output = resolve('output/playcanvas-playthrough');
+const output = resolve(process.env.PLAYTHROUGH_OUTPUT || 'output/playcanvas-playthrough');
 await mkdir(output, { recursive: true });
 const report = { startedAt: new Date().toISOString(), inputPolicy: 'UI input only; read-only game inspection for navigation and assertions', stages: [], measurements: [], errors: [], completed: false };
-const browser = await chromium.launch({ headless: true, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', args: ['--disable-background-timer-throttling', '--disable-renderer-backgrounding'] });
+const browser = await chromium.launch({ headless: true, executablePath: chromePath, args: ['--disable-background-timer-throttling', '--disable-renderer-backgrounding'] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 const page = await context.newPage();
 page.setDefaultTimeout(12000);
@@ -388,7 +389,7 @@ async function solvePanel(objectId, id) {
 }
 
 try {
-  await page.goto('http://127.0.0.1:4190/', { waitUntil: 'networkidle' });
+  await page.goto(process.env.GAME_URL || 'http://127.0.0.1:4190/', { waitUntil: 'networkidle' });
   await page.locator('#title-settings').click();
   await page.locator('#text-speed').check();
   await page.locator('#resume-option').click();

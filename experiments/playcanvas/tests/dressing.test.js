@@ -6,6 +6,7 @@ import { AREAS } from '../src/game/content.js';
 import { travelBounds } from '../src/game/kingdom-geography.js';
 import { findPath } from '../src/game/navigation.js';
 import { walkableTerrain } from '../src/terrain.js';
+import { AREA_LAYOUTS } from '../src/game/world-layout.js';
 
 const scene = JSON.parse(readFileSync(new URL('../src/data/scene.json', import.meta.url)));
 const props = JSON.parse(readFileSync(new URL('../src/data/props.json', import.meta.url)));
@@ -27,4 +28,23 @@ test('la utilería no se acerca a lo que se usa ni cierra caminos', () => {
       assert.ok(!before || after, `${id}: la utilería corta el camino hasta ${name}`);
     }
   }
+});
+
+// Distancia de un rectángulo (centro, medias medidas) al eje de un tramo de camino.
+function axisGap(o, a, b) {
+  const dx = b[0] - a[0], dz = b[1] - a[1], length = dx * dx + dz * dz;
+  let best = Infinity;
+  for (let i = -4; i <= 4; i++) for (let j = -4; j <= 4; j++) {
+    const p = [o.x + o.w * i / 4, o.z + o.d * j / 4], t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / length));
+    best = Math.min(best, Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dz));
+  }
+  return best;
+}
+
+test('la utilería deja libre el eje de cada camino: a lo sumo roza su borde', () => {
+  for (const id of Object.keys(DRESSING)) for (const path of AREA_LAYOUTS[id]?.paths || []) for (const o of dressingObstacles(id, props))
+    for (let i = 0; i < path.points.length - 1; i++) {
+      const gap = axisGap(o, path.points[i], path.points[i + 1]);
+      assert.ok(gap >= path.width / 2 - .6, `${id}: ${o.dressing} a ${gap.toFixed(2)} m del eje de ${path.id} (ancho ${path.width})`);
+    }
 });

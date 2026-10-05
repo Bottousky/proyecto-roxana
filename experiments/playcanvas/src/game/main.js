@@ -62,6 +62,9 @@ let playingCinematic=false;
 let chatterClock=0;
 let objectiveSignature='',objectiveUntil=0,hudUntil=0,travelTick=0;
 let intendedInteraction=null;
+// The key that closes a conversation must not reopen it: talking again needs a short pause,
+// and every press during that pause (a hurried reader) extends it.
+let interactAfter=0;
 let activeMeasurement=null,measurementAvailable=false,lastMeasuredFlags='',lastMeasurementCandidate='';
 const dialogueQueue=[];
 function queueDialogue(id,delay=0,area=state.area){if(id)dialogueQueue.push({id,due:performance.now()+delay,area});}
@@ -264,7 +267,7 @@ function nextLine(){
   if(dialogue.id==='lighthouse_epilogue'){state.flags.epilogue_shared=true;refreshHUD();}
   world?.endInhabitantConversation?.();
   const effect=typeof dialogue.id==='string'&&DIALOGUE_EFFECTS[dialogue.id];if(effect){for(const f of effect.flags)state.flags[f]=true;world?.updateFlags?.(state);refreshWorldSystems();}
-  show('#dialogue',false);dialogue=null;state.activeDialogue=null;mode='world';$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
+  show('#dialogue',false);dialogue=null;state.activeDialogue=null;mode='world';interactAfter=performance.now()+450;$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
 }
 
 function bubble(text){if(mode!=='world'||!$('#field-meter').classList.contains('hidden'))return;$('#ohm-bubble p').textContent=text;show('#ohm-bubble');bubbleUntil=performance.now()+6500;}
@@ -466,7 +469,7 @@ window.addEventListener('keydown',event=>{
   }
   if(mode==='dialogue'){const pick=dialogue?.lines[dialogue.index]?.choices?.[Number(event.key)-1];if(pick&&!event.repeat){chooseInDialogue(pick.id);return;}if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
   if(mode!=='world')return;
-  if(['e','E','Enter',' '].includes(event.key)){if(!event.repeat)interact();return;}
+  if(['e','E','Enter',' '].includes(event.key)){if(performance.now()<interactAfter)interactAfter=performance.now()+450;else if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}

@@ -18,6 +18,7 @@ import {walkableTerrain} from './terrain.js';
 import {makeWater,updateWater,loadShore,bindShore} from './water.js';
 import {makeGround,makeRock,updateClouds,loadGroundAo} from './ground.js';
 import {makeWind,updateWind,windKind} from './wind.js';
+import {occludes,makeSeeThrough,seeThroughFrame,applySeeThrough} from './see-through.js';
 import {makePortalSurface} from './portal.js';
 import {buildGrid,updateGrid} from './grid.js';
 import {placeDressing,propObstacles} from './props.js';
@@ -88,6 +89,14 @@ export class PlayCanvasWorld {
     const range=this.inspect||this.cinematic?16:this.indoors()?18:12;
     if(Math.abs(wanted-this.frame.dof.focusDistance)>.05||range!==this.frame.dof.focusRange){this.frame.dof.focusDistance=wanted;this.frame.dof.focusRange=range;this.frame.update();}
   }
+  // Quien juega nunca se pierde detrás del primer plano (src/see-through.js).
+  updateSeeThrough(){
+    const device=this.app.graphicsDevice,a=this.playerActor;
+    if(!a?.entity?.enabled||this.inspect){applySeeThrough(device,null);return;}
+    const feet=this.seeFeet??=new Vec3(),head=this.seeHead??=new Vec3();
+    feet.copy(a.entity.getPosition());head.copy(a.entity.up).mulScalar(2.5).add(feet);
+    applySeeThrough(device,seeThroughFrame(this.camera.camera,this.camera.getPosition(),feet,head,device.width,device.height));
+  }
   async loadArtAssets(){
     if(this.booted)return {ok:true,missing:[]};
     try{await this.build();this.booted=true;return {ok:true,missing:[]};}catch(error){console.error(error);return {ok:false,missing:[error.message]};}
@@ -115,6 +124,7 @@ export class PlayCanvasWorld {
       if(d.crop)(this.crops??=[]).push({material:m,lush:m.diffuse.clone()});
       if(d.rock)makeRock(m,{rock:await surface(this.app,'rock'),moss:await surface(this.app,'moss')});
       if(windKind(d.texture)&&!b.dynamic)(this.windy??=[]).push(makeWind(m,windKind(d.texture)));
+      if(occludes(d))makeSeeThrough(m);
       if(d.pane){m.diffuse=color('#5d7780');m.diffuseMap=paneTexture(this.app);m.gloss=.8;m.metalness=.1;m.update();}
       if(d.receiver)this.receivers.push({area:b.area,material:m,...d.receiver});
       if(++count%15===0){const text=document.getElementById('transition-name');if(text)text.textContent=`Tejiendo Ohmdal · ${Math.round(count/data.meshes.length*100)}%`;await new Promise(r=>setTimeout(r,0));}
@@ -330,7 +340,7 @@ export class PlayCanvasWorld {
     else{const rest=this.restPose(p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
       // Conversations keep the camera where the interaction began: the portrait says who speaks.
       this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
-    this.positionCamera();this.focusFrame();
+    this.positionCamera();this.focusFrame();this.updateSeeThrough();
   }
   // The current speaker gives a small hop as each of their lines begins.
   // Morning light shafts: a few soft diagonal beams drifting near the player, daylight only.

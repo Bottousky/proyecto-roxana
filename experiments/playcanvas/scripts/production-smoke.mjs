@@ -1,9 +1,10 @@
 import {chromium} from 'playwright';
+import { chromePath, gpuArgs } from './chrome.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const out='output/production';fs.mkdirSync(out,{recursive:true});
-const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+const browser=await chromium.launch({headless:true,executablePath:chromePath});
 const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()} ${r.url()}`);});

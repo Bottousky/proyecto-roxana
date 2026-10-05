@@ -44,7 +44,7 @@ function startupHarness(imported){
     world:{assetsReady:art.promise,cancelCinematic(){},getPlayerPosition:()=>[...position]},
     loadState:()=>loadState(db),saveState:value=>saveState(value,db),freshState,
     storeSettings(){},initWorld(){},refreshWorldSystems(){},show(){},sound(){},toast(){},
-    console,
+    console,performance,
     $:selector=>{
       if(!nodes.has(selector))nodes.set(selector,{textContent:'',innerHTML:'',className:'',style:{setProperty(){}},focus(){}});
       return nodes.get(selector);

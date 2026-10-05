@@ -9,22 +9,24 @@ export const DRESSING = {
     // Casa de los Porteros: leña en el patio, una maceta junto a la puerta, huerta al oeste.
     ['logs', -12.3, -3.4, 0], ['pot', -11.3, -4.6, 0], ['cabbages', -11.4, 2.6, 0],
     ['barrel', -7.2, -7.9, 0], ['basket_apples', -6.5, -8.5, 0],
-    // Equipaje de quienes llegan por el Portal: baúles y sacos junto a la escalinata.
-    ['crate', 5.2, -4.3, 12], ['crate_small', 5.9, -3.5, -20], ['sacks', 6.3, -5.0, 30],
+    // Equipaje de quienes llegan por el Portal: baúles y sacos contra la cerca, fuera de la curva
+    // del camino al pueblo.
+    ['crate', 8.0, -3.75, 12], ['crate_small', 9.45, -3.55, -20], ['sacks', 11.3, -3.9, 30],
   ],
   plaza: [
     // Panadería: harina a un lado del mostrador, pan del día al otro.
     ['sacks', -9.1, -7.7, 0], ['barrel', -8.3, -6.8, 0], ['basket', -1.9, -7.7, 0],
-    // Casa de la Plaza: maceta junto a la puerta; un puesto de fruta frente a la fuente.
-    ['pot_white', 6.1, -7.05, 0], ['stall', 4.6, -4.6, 0], ['pot', 13.4, -6.7, 0],
+    // Casa de la Plaza: maceta junto a la puerta. El puesto de fruta mira a la fuente desde el
+    // este, entre la calle de la campana y el Mercado, sin cortar el circuito.
+    ['pot_white', 6.1, -7.05, 0], ['stall', 9.8, -0.9, -90], ['pot', 13.4, -6.7, 0],
     // Taller de Lumen: cajones de piezas junto al porche, barriles contra el muro, leña al costado.
     ['crate', -16.4, 8.4, 8], ['crate_small', -16.0, 9.3, -15], ['barrel', -7.9, 6.6, 0], ['barrel', -7.85, 5.8, 0],
     ['logs', -18.1, 9.4, 90],
     // Mercado: cajones de fruta a los lados del mostrador, la carreta de reparto y sacos.
-    ['crate_apples', 12.4, 8.4, 0], ['crate_pears', 17.8, 8.3, 0], ['cart', 16.3, 10.5, 0],
+    ['crate_apples', 12.4, 10.4, 0], ['crate_pears', 17.8, 8.3, 0], ['cart', 16.3, 10.5, 0],
     ['sacks', 18.1, -1.6, 0], ['basket_apples', 11.8, 3.6, 0],
-    // Fuente: un banco para mirar el agua.
-    ['bench', 3.6, 0.8, -35],
+    // Fuente: un banco para mirar el agua, al borde del circuito y no sobre él.
+    ['bench', 5.9, 2.3, -35],
   ],
   workshop: [
     // Lumen guarda repuestos en el rincón del este: cajones, un barril de aceite y sacos.

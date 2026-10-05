@@ -1,13 +1,14 @@
 // Captura el HUD al comenzar un viaje nuevo, en escritorio y en teléfono, con un guardado aparte.
 // Uso: node scripts/hud-review.mjs
 import { chromium } from 'playwright';
+import { chromePath, gpuArgs } from './chrome.mjs';
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const base = process.env.GAME_URL || 'http://127.0.0.1:4190/';
 const out = fileURLToPath(new URL('../output/hud-review/', import.meta.url));
 mkdirSync(out, { recursive: true });
-const browser = await chromium.launch({ headless: true, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist'] });
+const browser = await chromium.launch({ headless: true, executablePath: chromePath, args: gpuArgs });
 for (const [name, viewport, touch] of [['desktop', { width: 1440, height: 900 }, false], ['phone', { width: 390, height: 844 }, true]]) {
   const page = await browser.newPage({ viewport, hasTouch: touch, isMobile: touch });
   page.on('console', m => { if (m.type() === 'error') console.log('console:', m.text()); });
