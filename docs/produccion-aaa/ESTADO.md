@@ -184,6 +184,21 @@ seis intentos con mandos equivocados no resueltos, 9 zonas y recarga final). `pu
 sin intentos silenciosos. Límite: la batería evalúa el modelo, no a personas; que estas señales
 basten para que un principiante entienda queda para la prueba con jugadores (NO VERIFICADO).
 
+## Ciclo 5 · Lo que se busca al llegar, en foco (5 oct 2026)
+
+La profundidad de campo enfocaba sólo 12 m alrededor del jugador: la fuente de la Plaza, la
+rueda del Manantial, la Puerta de Ohm con su Ω, la forja y el molino de Terrazas y la galería
+del Faro llegaban como manchas en el tercio superior. Se probaron cuatro ajustes con la misma
+bitácora, el mismo viaje por mapa y la misma cámara (`?dof=rango,radio`, parámetro de prueba
+nuevo en `src/world.js`): 12/3,5 (anterior), 20/3,5, 28/3 y 36/2,5. Con 36 el fondo se
+aplana; con 28 y radio 3 los destinos se leen y el borde lejano y el primer plano conservan el
+desenfoque de maqueta. Quedó 28/3 para exteriores; interiores, bancos y escenas no cambian.
+
+Evidencia: `output/dof-cycle5/cmp-*.png` (ocho llegadas, antes/después). Calzada: el Ω de la
+Puerta pasa a ser legible desde la llegada. Rendimiento sin cambios en Plaza y Faro (16,6 ms
+de media, topado por la sincronía vertical). `npm test` 83/83, `npm run check` correcto. Es un
+cambio de una constante de presentación: no se repitió la partida completa.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -193,7 +208,7 @@ basten para que un principiante entienda queda para la prueba con jugadores (NO 
 | 2 | Interacción | Enter reabre conversaciones | Hecho (ciclo 1) |
 | 3 | Navegación | Utilería sobre caminos | Hecho (ciclo 1) |
 | 4 | Navegación | Faroles de la escena sobre caminos (Mercado y Terrazas) | Hecho (ciclo 2) |
-| 5 | Presentación | Profundidad de campo: el destino de cada llegada (fuente, rueda del Manantial, Castillo) queda borroso en el tercio superior | Pendiente |
+| 5 | Presentación | Profundidad de campo: el destino de cada llegada (fuente, rueda del Manantial, Castillo) queda borroso en el tercio superior | Hecho (ciclo 5) |
 | 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano (torre de la Puerta al entrar al Manantial, torre del Castillo en Terrazas) | Pendiente |
 | 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía, la escena clave más pobre | Pendiente |
 | 8 | Momentos | Despertar de Ohm: 5,3 s y una línea; revisar los cuatro momentos construidos | Pendiente |
@@ -219,10 +234,10 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 5: presentación. Primero profundidad de campo (5): el destino de cada llegada queda
-borroso; comparar llegadas con el mismo recorrido antes/después. Luego los cuatro momentos
-construidos (8: despertar de Ohm, apertura de la Puerta, Manantial, Faro: preparación,
-interacción, cambio audiovisual, consecuencia persistente) y el interior del taller (7).
+Ciclo 6: los cuatro momentos construidos (8): despertar de Ohm, apertura de la Puerta,
+Manantial y Faro. Para cada uno: preparación, interacción, cambio audiovisual y consecuencia
+persistente, revisados en movimiento (capturas en secuencia de cada escena). Luego el interior
+del taller (7) y los ocluyentes borrosos en primer plano de algunas llegadas (6).
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`

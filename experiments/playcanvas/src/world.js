@@ -60,6 +60,9 @@ const waitFrame=()=>new Promise(r=>requestAnimationFrame(r));
 // orthographic view; ?lens=distance,pitch tries another framing.
 const LENS=(()=>{const q=new URLSearchParams(globalThis.location?.search||'').get('lens');if(q==='0')return {fov:false,distance:1,pitch:0};const [distance,pitch]=(q||'1.3,26').split(',').map(Number);return {fov:true,distance:distance||1.3,pitch:pitch||26};})();
 
+// ?dof=range,radius tries another depth of field on the same camera (comparisons for QA).
+const DOF=(()=>{const q=new URLSearchParams(globalThis.location?.search||'').get('dof');if(!q)return null;const [range,radius]=q.split(',').map(Number);return {range:range||null,radius:radius||null};})();
+
 export class PlayCanvasWorld {
   constructor(canvas){
     this.canvas=canvas;this.state={flags:{},settings:{}};this.clock=0;this.route=[];this.target=null;this.actors=[];this.regions=new Map();this.allActors=[];this.dynamics=[];this.waters=[];this.glasses=[];this.lights=[];this.sprites=new Map();this.focus=new Position();this.cameraOffset=new Position(0,13.5,25);this.currentZoom=.93;this.companionRoute=[];this.companionAge=0;this.walking=false;
@@ -79,14 +82,16 @@ export class PlayCanvasWorld {
     f.vignette.intensity=.32;f.vignette.inner=.6;f.vignette.outer=1.35;f.vignette.curvature=.7;
     f.colorEnhance.enabled=true;f.colorEnhance.vibrance=.12;f.colorEnhance.shadows=.15;
     f.grading.enabled=true;this.grade=[...GRADES.morning];
-    f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=57;f.dof.focusRange=12;f.dof.blurRadius=3.5;f.dof.blurRings=4;f.dof.blurRingPoints=5;f.dof.highQuality=true;
+    f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=57;f.dof.focusRange=12;f.dof.blurRadius=DOF?.radius??3;f.dof.blurRings=4;f.dof.blurRingPoints=5;f.dof.highQuality=true;
     f.update();
   }
   focusFrame(){
     if(!this.frame?.enabled||!this.player)return;
     // In a cinematic the camera may leave the player behind: focus where it looks.
     const [ox,oz]=this.data.areas[this.area.id].offset,p=this.player.position,wanted=this.camera.getPosition().distance(this.cinematic?this.focus:new Vec3(p.x+ox,p.y+1,p.z+oz));
-    const range=this.inspect||this.cinematic?16:this.indoors()?18:12;
+    // Wide enough that each place's landmark (fountain, wheel, gate, forge) reads in focus on arrival;
+    // only the far rim and the nearest foliage keep the miniature blur.
+    const range=this.inspect||this.cinematic?16:this.indoors()?18:DOF?.range??28;
     if(Math.abs(wanted-this.frame.dof.focusDistance)>.05||range!==this.frame.dof.focusRange){this.frame.dof.focusDistance=wanted;this.frame.dof.focusRange=range;this.frame.update();}
   }
   // Quien juega y Ohm nunca se pierden detrás del primer plano (src/see-through.js).
