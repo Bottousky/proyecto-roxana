@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#14281f">
+  <meta name="description" content="Arithmos: una aventura dibujada con tiza para comprender por qué funcionan las ideas matemáticas. Instituto Roxana, Taller de Matemática.">
+  <title>Arithmos · Instituto Roxana</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="stage" aria-label="Arithmos">
+    <canvas id="board" aria-hidden="true"></canvas>
+    <canvas id="overlay" aria-hidden="true"></canvas>
+    <div id="spots" role="group" aria-label="Cosas que podés tocar en la escena"></div>
+
+    <section id="caption" hidden aria-hidden="true">
+      <div class="who"></div>
+      <p class="line"></p>
+      <button class="next" type="button" aria-label="Continuar">›</button>
+    </section>
+    <div id="choices" role="group" hidden></div>
+    <p id="describe" hidden></p>
+
+    <nav id="corner" aria-label="Controles">
+      <button id="hint-btn" type="button" hidden aria-label="Pedir una ayuda">?</button>
+      <button id="menu-btn" type="button" aria-label="Pausa y opciones" aria-haspopup="dialog"><span aria-hidden="true">≡</span></button>
+    </nav>
+    <button id="skip-btn" type="button" hidden>saltar animación ››</button>
+    <p id="toast" role="status" hidden></p>
+    <div id="sr-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+    <section id="title" aria-labelledby="title-name">
+      <h1 id="title-name" class="sr-only">Arithmos</h1>
+      <p class="sub">Instituto Roxana · Taller de Matemática</p>
+      <div class="actions">
+        <button type="button" data-act="continue" hidden>Continuar</button>
+        <button type="button" data-act="new">Empezar</button>
+        <button type="button" data-act="options">Opciones</button>
+      </div>
+      <p class="note">Con sonido se disfruta más; se juega completo sin él.</p>
+    </section>
+
+    <div id="pause" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
+      <div class="sheet">
+        <h2 id="pause-title">Pausa</h2>
+        <div class="tabs" role="tablist">
+          <button role="tab" data-tab="menu" aria-selected="true">Menú</button>
+          <button role="tab" data-tab="journal">Bitácora</button>
+          <button role="tab" data-tab="moments">Volver a ver</button>
+          <button role="tab" data-tab="history">Lo dicho</button>
+          <button role="tab" data-tab="options">Opciones</button>
+        </div>
+        <div class="panel" data-panel="menu">
+          <button type="button" data-act="resume">Seguir</button>
+          <button type="button" data-act="restart-seg">Repetir esta escena</button>
+          <button type="button" data-act="title">Volver al título</button>
+          <p class="small where"></p>
+        </div>
+        <div class="panel" data-panel="journal" hidden></div>
+        <div class="panel" data-panel="moments" hidden></div>
+        <div class="panel" data-panel="history" hidden><ol class="history"></ol></div>
+        <div class="panel" data-panel="options" hidden>
+          <label>Tamaño del texto <input type="range" min="0.8" max="1.8" step="0.1" data-opt="textScale"></label>
+          <label class="check"><input type="checkbox" data-opt="clean"> Lectura limpia (letra nítida, sin textura)</label>
+          <label>Velocidad del texto
+            <select data-opt="textSpeed">
+              <option value="slow">Pausada</option>
+              <option value="normal">Normal</option>
+              <option value="fast">Rápida</option>
+              <option value="instant">Inmediata</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" data-opt="autoAdvance"> Avanzar el texto solo</label>
+          <label class="check"><input type="checkbox" data-opt="describe"> Describir lo que pasa en escena</label>
+          <label class="check"><input type="checkbox" data-opt="reducedMotion"> Movimiento reducido</label>
+          <label>Volumen general <input type="range" min="0" max="1" step="0.05" data-opt="master"></label>
+          <label>Música <input type="range" min="0" max="1" step="0.05" data-opt="music"></label>
+          <label>Efectos <input type="range" min="0" max="1" step="0.05" data-opt="sfx"></label>
+          <p class="small">Teclado: Tab recorre lo que se puede tocar, Enter o Espacio elige y avanza el texto, Escape pausa.</p>
+        </div>
+        <button type="button" class="close" data-act="resume" aria-label="Cerrar pausa">×</button>
+      </div>
+    </div>
+
+    <div id="fatal" role="alert" hidden></div>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

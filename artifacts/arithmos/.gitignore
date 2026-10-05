@@ -1,0 +1,5 @@
+# Películas y corridas temporales: se regeneran con scripts/playthrough.mjs
+film/
+*/film/
+*/*/film/
+tmp/
