@@ -361,6 +361,53 @@ de la Plaza: era un error de la prueba, no del juego, y se reprodujo y comprobó
 La misión **no se declara cumplida**. Quedan pendientes tres comprobaciones que no se pueden
 hacer en este equipo: móvil real, escucha del audio y prueba con personas.
 
+## Ciclo 14 · Bancos en una sola vista, y pendientes de la crítica que eran accionables (5 oct 2026)
+
+Reabierto tras la entrega parcial: el usuario señaló que los bancos estaban sobrecargados. En la
+aceptación los había dejado como «legibles, pero densos» para la revisión humana; era trabajo
+accionable dentro del alcance y la crítica del 25 sep ya lo marcaba.
+
+- **Medición** (`scripts/qa-bench-load.mjs`, cada banco recién abierto): a 1280×720 los nueve
+  bancos obligaban a desplazar y en siete el tablero quedaba cortado; lo que cada pieza «dice»
+  (MIRÁ Y ESCUCHÁ) aparecía en la columna derecha, debajo del encargo y de los mandos, lejos de lo
+  que se tocaba; en el tablero de Terrazas siete nombres quedaban pisados por cables.
+- **Cambio:** lo que se observa en cada pieza pasa justo debajo del tablero, en formato compacto
+  (nombre y estado en una línea, en dos columnas); el tablero se dimensiona por la altura
+  disponible; herramientas, alimentación e «Otros instrumentos» en una fila; encabezado sin
+  subtítulo (el encargo ya lo dice); columna del encargo y mandos más ancha. En los bancos de muchas
+  piezas, los bornes dicen sólo A/B/+/− bajo el nombre grabado de la pieza (como ya hacían el taller
+  y el Manantial); el nombre completo sigue en la lista táctil y en el lector de pantalla.
+- **Resultado:** tablero, observaciones, encargo y mandos a la vista a la vez en 9/9 bancos a
+  1440×900 y a 1280×720 (antes: el tablero cortado en 7/9 a 1280×720); nombres pisados 19 → 15–16;
+  piso de lectura intacto. Antes/después: `output/bench-load/cmp-*.png`. En el teléfono el banco
+  sigue siendo una columna con desplazamiento, ahora con las observaciones bajo el tablero.
+- **Ohm menos previsible:** la fórmula «… registrado/a» aparecía 9 veces; quedan 5 (las que
+  presentan la fórmula, dialogan con otra línea o se responden entre el taller y el Faro). Las otras
+  cuatro pasan a una observación concreta, una pregunta cotidiana (el pan de Marin) y una pausa
+  («Ohm no anota nada.»).
+- **Edda se equivoca:** antes de reparar el Castillo apuesta, con su nombre, que la enfermería va
+  a brillar menos si la cocina tiene su propio camino; después reconoce que perdió (en paralelo
+  brilla igual que sola). La línea final sólo afirma lo que la prueba de Ivara ya exige; una prueba
+  ata el diálogo al modelo.
+- **Faro con menos trámite:** Nereo hace las uniones de la base y abre el obturador y el freno
+  óptico (como hace las del muelle); el jugador conserva las decisiones (aislar el puente gastado,
+  acoplar el motor) y los tres bancos. Los mandos siguen operables por si no se habla con Nereo.
+
+Verificación (runtime idéntico a la copia evaluada): `npm test` 83/83 y 287/287, `npm run check`,
+piso de lectura en 3 tamaños; ruta principal (`output/playthrough-cycle14/`, comprueba que Nereo
+hace las preparaciones), adversarial (`output/adversarial-cycle14/`, 696 s, 16 habitantes),
+táctil y diálogos: completas y sin errores.
+
+- La primera adversarial se trabó en el rincón del acueducto del Manantial, como ya había
+  ocurrido (y se había recuperado) en dos corridas anteriores. Reproducido: el robot sólo pulsaba
+  ↓ y empujaba contra el borde del estanque. Ahora, si está bloqueado, pulsa la diagonal y se
+  desliza, como haría una persona. Es un ajuste del guion, no del juego.
+- Las siguientes corridas fallaron por **contención del equipo**: otra sesión de Claude Code
+  trabajaba en paralelo (carga de 6 a 10). El juego seguía respondiendo a consultas, pero no
+  procesaba teclas ni clics, porque Chrome no producía cuadros. La reproducción enfocada pasa
+  limpia en condiciones normales. El guion ahora registra los estados que ve mientras espera.
+  La adversarial se repitió con baja carga y pasó.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |

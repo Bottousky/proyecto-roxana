@@ -72,6 +72,8 @@ export const PUZZLES = {
     title: 'Dos luces, un refugio', place: 'CASTILLO · DISTRIBUIDOR DEL PATIO', subtitle: 'Enfermería y cocina comparten un solo camino: las dos brillan a medias.', voltage: 12, protection: 3.1,
     brief: 'Enfermería y cocina deben brillar a pleno, cada una por su cuenta. Tenés tres cables; los soldados son de la instalación. Ivara lo comprobará aislando la cocina.',
     ports: [...sourcePorts, port('clinicIn', 'Enfermería +', 530, 115), port('clinicOut', 'Enfermería −', 795, 115), port('kitchenIn', 'Cocina +', 530, 270), port('kitchenOut', 'Cocina −', 795, 270), port('archiveIn', 'Archivo +', 330, 410), port('archiveOut', 'Archivo −', 620, 410)],
+    // Each piece's name is engraved above it; its terminals only say which end.
+    boardLabels: { clinicIn: '+', clinicOut: '−', kitchenIn: '+', kitchenOut: '−', archiveIn: '+', archiveOut: '−' },
     components: [component('clinic', 'Enfermería', 'clinicIn', 'clinicOut', 12, { kind: 'lamp', goal: goal(10.7, 12.2, .89, 1.03) }), component('kitchen', 'Cocina', 'kitchenIn', 'kitchenOut', 12, { kind: 'lamp', switchKey: 'kitchen', goal: goal(10.7, 12.2, .89, 1.03) }), component('archive', 'Archivo anegado', 'archiveIn', 'archiveOut', 3, { kind: 'switch', switchKey: 'archive' })],
     switches: [{ key: 'archive', label: 'Rama del archivo', initial: false, external: true, description: 'Aislada desde el patio.' }, { key: 'kitchen', label: 'Llave de la cocina', initial: true, description: 'Aislá la cocina, como si hubiera que repararla.' }],
     // Ivara reopens the services only after seeing the infirmary stay lit while the kitchen is isolated.
@@ -87,6 +89,8 @@ export const PUZZLES = {
     title: 'La paciencia del invernadero', place: 'TERRAZAS · MESA DE REGULACIÓN', subtitle: 'Horno, raíces y riego tiran del mismo cable de la ladera.', voltage: 18, protection: 4,
     brief: 'Tres frenos y un solo cable de la ladera. Encontrá un reparto en el que las raíces estén tibias, el riego salga parejo y Yesca pueda forjar, sin que el cable se caliente. Hay más de un acuerdo posible.',
     ports: [...sourcePorts, port('warmA', 'Regulador térmico A', 290, 105), port('warmB', 'Regulador térmico B', 505, 105), port('rootIn', 'Raíces +', 635, 105), port('rootOut', 'Raíces −', 860, 105), port('flowA', 'Regulador de agua A', 290, 250), port('flowB', 'Regulador de agua B', 505, 250), port('flowIn', 'Riego +', 635, 250), port('flowOut', 'Riego −', 860, 250), port('forgeA', 'Regulador del horno A', 290, 395), port('forgeB', 'Regulador del horno B', 505, 395), port('forgeIn', 'Horno +', 635, 395), port('forgeOut', 'Horno −', 860, 395)],
+    // Each piece's name is engraved above it; its terminals only say which end.
+    boardLabels: { warmA: 'A', warmB: 'B', flowA: 'A', flowB: 'B', forgeA: 'A', forgeB: 'B', rootIn: '+', rootOut: '−', flowIn: '+', flowOut: '−', forgeIn: '+', forgeOut: '−' },
     components: [component('warmTrim', 'Regulador de calor', 'warmA', 'warmB', 0, { valueKey: 'warmth', kind: 'resistor' }), component('roots', 'Lecho de raíces', 'rootIn', 'rootOut', 24, { kind: 'heater', goal: { ...goal(10, 13, .4, .55), maxPower: 7 } }), component('flowTrim', 'Regulador de caudal', 'flowA', 'flowB', 0, { valueKey: 'flow', kind: 'resistor' }), component('flow', 'Bomba de riego', 'flowIn', 'flowOut', 18, { kind: 'motor', goal: goal(9.5, 11.8, .52, .66) }), component('forgeTrim', 'Regulador del horno', 'forgeA', 'forgeB', 0, { valueKey: 'forge', kind: 'resistor' }), component('forge', 'Horno de Yesca · 12 Ω', 'forgeIn', 'forgeOut', 12, { kind: 'forge', goal: goal(8.4, 18.5, .7, 1.6) })],
     // The hillside line is shared: forge, roots and pump together may draw at most 2.2 A.
     constraints: [{ source: true, maxCurrent: 2.2 }],
@@ -104,6 +108,8 @@ export const PUZZLES = {
     // The two lines run up the tower: a hand cable only joins terminals at the same end of them.
     zones: { generator: 'Junto al generador', core: 'Junto al núcleo' },
     ports: [port('positive', 'Fuente +', 85, 125, 'generator'), port('negative', 'Retorno −', 85, 375, 'generator'), port('lineAa', 'Tendido norte · A', 250, 125, 'generator'), port('lineAb', 'Tendido norte · B', 470, 125, 'core'), port('lineBa', 'Tendido sur · A', 250, 275, 'generator'), port('lineBb', 'Tendido sur · B', 470, 275, 'core'), port('ballastA', 'Regulador A', 610, 125, 'core'), port('ballastB', 'Regulador B', 850, 125, 'core'), port('coreIn', 'Núcleo +', 560, 370, 'core'), port('coreOut', 'Núcleo −', 820, 370, 'core')],
+    // Each piece's name is engraved above it; its terminals only say which end.
+    boardLabels: { lineAa: 'A', lineAb: 'B', lineBa: 'A', lineBb: 'B', ballastA: 'A', ballastB: 'B', coreIn: '+', coreOut: '−' },
     components: [component('lineA', 'Tendido norte · 6 Ω', 'lineAa', 'lineAb', 6, { kind: 'resistor' }), component('lineB', 'Tendido sur · 6 Ω', 'lineBa', 'lineBb', 6, { kind: 'resistor' }), component('ballast', 'Regulador del generador', 'ballastA', 'ballastB', 3, { kind: 'resistor', valueKey: 'ballast' }), component('core', 'Núcleo de alimentación', 'coreIn', 'coreOut', 12, { kind: 'coil', goal: goal(16.2, 18.2, 1.35, 1.52) })],
     knobs: [{ key: 'ballast', label: 'Regulador del generador', min: 0, max: 5, step: 1, initial: 3, unit: 'Ω', description: 'Menos freno, más fuerza para el núcleo… y más corriente por los tendidos.' }],
     constraints: [{ branch: 'lineA', maxPower: 5.2 }, { branch: 'lineB', maxPower: 5.2 }],
@@ -118,6 +124,8 @@ export const PUZZLES = {
     title: 'II · Tres voces en la torre', place: 'FARO · GALERÍA DE DISTRIBUCIÓN', subtitle: 'Luz, giro y campana, encadenadas: ninguna recibe lo que necesita.', voltage: 18, protection: 2.3,
     brief: 'Luz, giro y campana deben funcionar cada una por su cuenta, sin atravesar a las otras. Tenés cuatro cables; los soldados son de la torre.',
     ports: [...sourcePorts, port('opticIn', 'Óptica +', 520, 105), port('opticOut', 'Óptica −', 800, 105), port('bearingIn', 'Giro +', 520, 255), port('bearingOut', 'Giro −', 800, 255), port('signalIn', 'Señales +', 520, 405), port('signalOut', 'Señales −', 800, 405)],
+    // Each piece's name is engraved above it; its terminals only say which end.
+    boardLabels: { opticIn: '+', opticOut: '−', bearingIn: '+', bearingOut: '−', signalIn: '+', signalOut: '−' },
     components: [component('optic', 'Cámara óptica · 18 Ω', 'opticIn', 'opticOut', 18, { kind: 'lamp', goal: goal(16.5, 18.2, .91, 1.03) }), component('bearing', 'Giro de la cúpula · 36 Ω', 'bearingIn', 'bearingOut', 36, { kind: 'motor', goal: goal(16.5, 18.2, .45, .52) }), component('signal', 'Señal de la costa · 72 Ω', 'signalIn', 'signalOut', 72, { kind: 'coil', goal: goal(16.5, 18.2, .22, .26) })],
     initialWires: [['positive', 'opticIn'], ['opticOut', 'bearingIn'], ['bearingOut', 'signalIn'], ['signalOut', 'negative']],
     sealed: [['positive', 'opticIn'], ['signalOut', 'negative']], cables: 4,

@@ -170,7 +170,7 @@ export const DIALOGUES = {
   road_memorial: d(
     ['narrator', 'Un viejo cartel ordena: «GOLPEAR TRES VECES ANTES DE ACCIONAR». Debajo del poste, las vibraciones han dejado un contacto pulido.'],
     ['player', '¿Los golpes movían esa unión?'],
-    ['ohm', 'Hipótesis registrada. El cartel no adjunta resultados.']),
+    ['ohm', 'El cartel da la orden. No dice qué pasaba cuando nadie golpeaba.']),
   road_nest: d(
     ['narrator', 'Un nido ocupa la antigua caja de fusibles. Está vacío, salvo por una pluma y un alambre brillante.'],
     ['ohm', 'La comunidad local encontró un uso alternativo para una instalación fuera de servicio. Bien por la comunidad.']),
@@ -223,7 +223,10 @@ export const DIALOGUES = {
   castle_edda: d(
     ['edda', 'Encontré planos debajo del decreto de clausura. El sello tapaba justo el punto donde el circuito se divide.'],
     ['player', 'Si separamos el camino al archivo, ¿podrían seguir los demás?'],
-    ['edda', 'Eso creo. Antes lo habría escrito como un descubrimiento. Ahora le voy a poner un signo de pregunta.']),
+    ['edda', 'Eso creo. Antes lo habría escrito como un descubrimiento. Ahora le voy a poner un signo de pregunta.'],
+    ['edda', 'Y apuesto algo más: si la cocina tiene su propio camino, la enfermería va a brillar menos. Van a tener que repartirse la luz.'],
+    ['player', '¿Lo anotamos?'],
+    ['edda', 'Con mi nombre. Si me equivoco, quiero saberlo.']),
   castle_ready: d(
     ['consejera', 'Puedo seguir el cierre hasta el archivo. La enfermería y la cocina quedan de este lado.'],
     ['player', '¿Podemos mirar el tablero ahora?'],
@@ -262,7 +265,7 @@ export const DIALOGUES = {
     ['vega', 'Cuando sube tu horno, baja mi bomba. Lo vi otra vez esta mañana.'],
     ['yesca', 'Mi forja hace las herramientas que cultivan tu comida.'],
     ['vega', 'Y mi comida fabrica herreros.'],
-    ['ohm', 'Conversación circular registrada.']),
+    ['ohm', 'Las dos tienen razón. El cable de la ladera es uno solo.']),
   yesca_before: d(
     ['yesca', 'Necesitaba más calor. Subí la palanca. Funcionó.'],
     ['player', '¿Y ese cable ennegrecido?'],
@@ -285,7 +288,7 @@ export const DIALOGUES = {
     ['yesca', 'Menos por tanda. Más tandas sin parar. Odio cuando algo razonable suena tan poco espectacular.'],
     ['vega', 'Voy a anotar las alturas y las lecturas. Si mañana cambian, tenemos con qué comparar.'],
     ['vega', 'El sendero del lago está abierto. Nereo los espera. Si dice que no, miren cuántas tazas puso.']),
-  yesca_after: d(['yesca', 'El hierro tarda lo que tarda. Antes discutía con él. Ahora uso ese rato para almorzar.'], ['ohm', 'Mejora de eficiencia personal registrada.']),
+  yesca_after: d(['yesca', 'El hierro tarda lo que tarda. Antes discutía con él. Ahora uso ese rato para almorzar.'], ['ohm', '¿Y qué se almuerza mientras el hierro se calienta?'], ['yesca', 'Pan de Marin. Hoy salió entero.']),
   vega_after: d(['vega', 'Durante años pensé que ser prudente era no tocar nada.'], ['player', '¿Y ahora?'], ['vega', 'Ahora sé qué mirar después de tocarlo. Todavía voy a recorrer los canales. Pero ya no sólo para lamentarme.']),
   terraces_marker: d(
     ['narrator', 'Las marcas del poste indican caudal, turnos y nombres. Bajo una pintura reciente asoma: «Preguntar a Vega».'],
@@ -337,11 +340,12 @@ export const DIALOGUES = {
     ['player', '¿Cómo sabés cuándo corregir el ritmo?'],
     ['nereo', 'Escucho el lago.'],
     ['player', '¿No el mecanismo?'],
-    ['nereo', 'También. Uno aprende a adornar las respuestas cuando envejece. La manivela conservó el movimiento; para guiar un barco nos faltaba la luz.']),
+    ['nereo', 'También. Uno aprende a adornar las respuestas cuando envejece. La manivela conservó el movimiento; para guiar un barco nos faltaba la luz.'],
+    ['nereo', 'Las dos manivelas de la base las uno yo, como en el muelle. Lo que no sé es si la fuente va a aguantar lo que le pidamos.']),
   beacon_supply_ready: d(
     ['narrator', 'El anillo inferior se ilumina. El sonido de la fuente sube por el suelo, grave y regular.'],
     ['nereo', 'El suelo. ¿Lo sentís? Ya tiene algo para contar. Miremos el panel inferior.']),
-  beacon_supply_locked: d(['nereo', 'Las dos manivelas de la base unen la torre con la línea del lago. Voy a esperarlos junto al primer panel.']),
+  beacon_supply_locked: d(['nereo', 'Las dos manivelas de la base unen la torre con la línea del lago. Vení a contarme qué vieron en el muelle y las uno.']),
   beacon_supply_arrival: d(
     ['nereo', 'El núcleo debería sostener aquel sonido grave. A veces conseguía un susurro. Si apuraba la rueda, empezaba el olor a cobre caliente.'],
     ['player', 'En el Manantial medimos mientras la bomba trabajaba. Podemos hacer eso acá y mirar también el cable.'],
@@ -365,7 +369,7 @@ export const DIALOGUES = {
     ['narrator', 'La corona de engranajes comienza a girar. Lámparas sucesivas iluminan la galería y el enorme cristal.'],
     ['nereo', 'Ese golpecito al terminar cada vuelta… sigue ahí. Lo conozco hasta dormido.'],
     ['edda', '¡La corona gira! Pero el haz se queda adentro.'],
-    ['nereo', 'Arriba quedan el obturador y el freno de la lente. Los cerré para trabajar. Después veremos qué luz puede dar.']),
+    ['nereo', 'Arriba abro el obturador y suelto el freno de la lente; los cerré para trabajar. Lo que no sé es qué luz va a dar.']),
   beacon_lens_ready: d(
     ['narrator', 'Las hojas de bronce se abren sobre el lago. El conjunto óptico gira sin freno; su lámpara arroja una luz blanca, demasiado intensa.'],
     ['nereo', 'El camino de la luz está libre. Ahora su intensidad debe sostenerse durante cada vuelta.']),
@@ -444,7 +448,7 @@ export const DIALOGUES = {
   tala_finale: d(['tala', 'Edda me mostró una reparación vieja. Primero me dejó mirarla. Después me dejó equivocarme.'], ['player', '¿Y ahora?'], ['tala', 'Ahora quiero preguntarle a Marín por las luces de su horno. Una cosa por vez, dijo. Tengo una lista.']),
   lumen_gate_after: d(['lumen', 'Escuché la Puerta desde acá. Ese cerrojo llevaba años guardándose el ruido.'], ['lumen', 'Dejé dos tramos sobre el banco. Parecen iguales por fuera; el instrumento cuenta otra historia. El próximo aprendiz los va a comparar.']),
   edda_road_ready: d(['edda', 'Las balizas responden. Mi dibujo del puente tiene una corrección nueva.'], ['edda', 'Todavía falta el cerrojo. Voy a mirar desde acá: si se mueve, quiero ver hacia dónde.']),
-  edda_castle_after: d(['edda', 'Copié el plano que dejó la Consejera. También el sector que sigue cerrado.'], ['player', '¿Para llevarlo al lago?'], ['edda', 'Para ver si allá me sirve. Todavía no lo sé. Eso es lo interesante.']),
+  edda_castle_after: d(['edda', 'Perdí mi apuesta. Con la cocina en su propio camino, la enfermería brilla igual que cuando está sola. No se reparten nada.'], ['edda', 'Lo dejé escrito con mi nombre, al lado de la apuesta.'], ['edda', 'Copié el plano que dejó la Consejera. También el sector que sigue cerrado.'], ['player', '¿Para llevarlo al lago?'], ['edda', 'Para ver si allá me sirve. Todavía no lo sé. Eso es lo interesante.']),
   edda_lake_linked: d(['edda', 'Las dos balizas respondieron. Mi dibujo acertó esta parte.'], ['edda', 'Voy hacia la galería. Quiero ver cuánto del esquema del Castillo se reconoce en una torre.']),
   edda_tower_before: d(['edda', 'Marqué la base, la corona y la linterna en hojas separadas.'], ['player', '¿Ya sabés cómo se unen?'], ['edda', 'Tengo flechas a lápiz. Nereo tiene cuarenta años de oído. Vamos a comparar.']),
   edda_tower_source: d(['edda', 'La base responde. Ahora sigo los caminos que salen de ella.'], ['edda', 'En el Castillo pudimos separar dos servicios. Quiero comprobar qué cambiaría si hacemos eso acá.']),
@@ -713,6 +717,10 @@ export function journalText(entry, state = {}) {
 export const DIALOGUE_EFFECTS = {
   lumen_before: { flags: ['workshop_feed'] },
   nereo_lake: { flags: ['lake_cable', 'lake_return'] },
+  // In the Faro Nereo does the routine joins and the mechanical preparation; the player keeps
+  // the decisions (isolating the worn bridge, coupling the motor) and the three benches.
+  nereo_tower: { flags: ['tower_feed', 'tower_return'] },
+  beacon_network_complete: { flags: ['tower_shutter', 'tower_lens_free'] },
 };
 
 export const JOURNAL = [
@@ -737,9 +745,9 @@ const objectives = [
   ['distribution', { title: 'Una red que se puede comprender', detail: 'En el Castillo, buscá con la Consejera una forma de recuperar servicios sin poner en riesgo a sus vecinos.', area: 'castle', object: 'distribution_panel' }],
   ['irrigation', { title: 'Lo que compartimos', detail: 'Visitá las Terrazas. Yesca necesita trabajar; Vega necesita regar.', area: 'terraces', object: 'irrigation_panel' }],
   ['beacon_link', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Él conoce las uniones del muelle; vos mirá cómo responden las balizas.', area: 'lake', object: 'nereo_lake' }],
-  ['beacon_supply', { title: 'El Faro · I / III', detail: 'Conectá las dos manivelas de la base y verificá la fuente en el primer panel.', area: 'lighthouse', object: 'beacon_supply_panel' }],
+  ['beacon_supply', { title: 'El Faro · I / III', detail: 'Hablá con Nereo junto a la base y verificá la fuente en el primer panel.', area: 'lighthouse', object: 'beacon_supply_panel' }],
   ['beacon_network', { title: 'El Faro · II / III', detail: 'Con Nereo, buscá el giro y las luces que faltan en la galería del medio.', area: 'lighthouse', object: 'beacon_network_panel' }],
-  ['beacon_lens', { title: 'El Faro · III / III', detail: 'Abrí el obturador, liberá el freno óptico y ajustá la linterna hasta sostener la señal.', area: 'lighthouse', object: 'beacon_lens_panel' }],
+  ['beacon_lens', { title: 'El Faro · III / III', detail: 'Con el obturador abierto, ajustá la linterna hasta sostener la señal.', area: 'lighthouse', object: 'beacon_lens_panel' }],
 ];
 
 export function getObjective(state) {
@@ -811,7 +819,7 @@ export const LESSON_GIFTS = [
   { id: 'silence', label: 'Nada todavía. Que mire primero.', memory: 'tiempo para mirar', lines: d(
     ['narrator', 'Nadie dice nada. Tala pasa el dedo por la costura de la lámpara, despacio, dos veces.'],
     ['edda', 'Eso era lo más difícil de darle.'],
-    ['ohm', 'Silencio registrado. Útil, por lo visto.']) },
+    ['narrator', 'Ohm no anota nada.']) },
 ];
 export const lessonGift = state => LESSON_GIFTS.find(g => state?.flags?.[`lesson_gift_${g.id}`]) || null;
 function lessonLines(state) {

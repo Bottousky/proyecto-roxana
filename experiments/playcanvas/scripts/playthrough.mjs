@@ -60,10 +60,12 @@ async function screenshot(name) {
 }
 
 async function settle({ stable = 1300, allowPuzzle = true, timeout = 35000 } = {}) {
-  const start = Date.now();
+  const start = Date.now(), seen = [];
   let quietSince = null;
   while (Date.now() - start < timeout) {
-    const info = await inspect();
+    const asked = Date.now(), info = await inspect();
+    // What the wait saw, for a diagnosis if it never settles.
+    if (seen.at(-1)?.mode !== info?.mode) seen.push({ mode: info?.mode ?? null, at: asked - start, took: Date.now() - asked });
     if (!info) { await page.waitForTimeout(100); continue; }
     if (info.mode === 'dialogue') {
       quietSince = null;
@@ -85,7 +87,7 @@ async function settle({ stable = 1300, allowPuzzle = true, timeout = 35000 } = {
       await page.waitForTimeout(120);
     }
   }
-  throw new Error(`Timed out settling after ${stage}: ${JSON.stringify(await inspect())}`);
+  throw new Error(`Timed out settling after ${stage}: ${JSON.stringify({ seen: seen.slice(-12), now: await inspect() })}`);
 }
 
 const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
@@ -161,10 +163,11 @@ async function keyboardNudge(from, toward) {
 
 // Walking is done like a player with a keyboard: arrow keys held toward the next waypoint.
 const heldKeys = new Set();
-async function steer(from, to, run) {
-  const dx = to[0] - from[0], dz = to[1] - from[1], scale = Math.max(Math.abs(dx), Math.abs(dz), 0.001), want = new Set();
-  if (Math.abs(dx) > scale * 0.4) want.add(dx > 0 ? 'ArrowRight' : 'ArrowLeft');
-  if (Math.abs(dz) > scale * 0.4) want.add(dz > 0 ? 'ArrowDown' : 'ArrowUp');
+// Blocked against an edge, a player presses the diagonal toward the goal and slides along it.
+async function steer(from, to, run, diagonal = false) {
+  const dx = to[0] - from[0], dz = to[1] - from[1], scale = Math.max(Math.abs(dx), Math.abs(dz), 0.001), want = new Set(), share = diagonal ? 0.05 : 0.4;
+  if (Math.abs(dx) > scale * share) want.add(dx > 0 ? 'ArrowRight' : 'ArrowLeft');
+  if (Math.abs(dz) > scale * share) want.add(dz > 0 ? 'ArrowDown' : 'ArrowUp');
   if (run) want.add('Shift');
   for (const key of [...heldKeys]) if (!want.has(key)) { await page.keyboard.up(key); heldKeys.delete(key); }
   for (const key of want) if (!heldKeys.has(key)) { await page.keyboard.down(key); heldKeys.add(key); }
@@ -192,7 +195,7 @@ async function walkTo(id) {
     if (distance(info.position, goal) < best - 0.12) { best = distance(info.position, goal); lastProgress = Date.now(); }
     while (waypoint < path.length - 1 && distance(info.position, path[waypoint]) < 0.6) waypoint++;
     const target = path[waypoint];
-    await steer(info.position, target, distance(info.position, target) > 2);
+    await steer(info.position, target, distance(info.position, target) > 2, Date.now() - lastProgress > 1500);
     if (Date.now() - lastProgress > 6500) {
       if (++replans > 3) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
       // A player caught in a corner steps back the way they came before trying again.
@@ -581,10 +584,12 @@ try {
   await interact('lake_secret');
   await travel('lake_to_lighthouse', 'lighthouse');
   await interact('nereo_tower');
+  assert.ok((await inspect()).flags.tower_feed && (await inspect()).flags.tower_return, 'Nereo joins the base cranks himself');
   await operate('tower_feed', true); await operate('tower_return', true);
   await solvePanel('beacon_supply_panel', 'beacon_supply');
   await operate('tower_isolated', true); await operate('tower_motor', true);
   await solvePanel('beacon_network_panel', 'beacon_network');
+  assert.ok((await inspect()).flags.tower_shutter && (await inspect()).flags.tower_lens_free, 'Nereo opens the shutter and frees the lens after the crown turns');
   await operate('tower_shutter', true); await operate('tower_lens_free', true);
   await solvePanel('beacon_lens_panel', 'beacon_lens');
   assert.equal(finishModalSeen, true, 'The full audiovisual finale reached its ending card');

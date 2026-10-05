@@ -142,3 +142,13 @@ test('only parts with a reason to care about direction are polarized: plain coil
     assert.equal(evaluatePuzzle(id, s).operating[cid], true, `${id}/${cid} works with its two wires swapped`);
   }
 });
+
+test("Edda's lost bet in the Castillo is what the model shows: the infirmary does not dim when the kitchen gets its own path", async () => {
+  const { DIALOGUES } = await import('../src/content.js');
+  assert.match(DIALOGUES.edda_castle_after.map(l => l.text).join(' '), /brilla igual/);
+  const s = initialPuzzleSnapshot('distribution'); PUZZLES.distribution.solve(s); s.sourceOn = true; s.tripped = false;
+  const together = evaluatePuzzle('distribution', s).solution.branches.clinic.voltage;
+  s.switches.kitchen = false;
+  const alone = evaluatePuzzle('distribution', s).solution.branches.clinic.voltage;
+  assert.ok(Math.abs(together - alone) < .05, `infirmary ${together.toFixed(2)} V with the kitchen, ${alone.toFixed(2)} V alone`);
+});
