@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
-import { PUZZLES, HINT_STEPS, initialPuzzleSnapshot, evaluatePuzzle } from '../src/puzzle-model.js';
+import { PUZZLES, HINT_STEPS, initialPuzzleSnapshot, evaluatePuzzle, isPolarized } from '../src/puzzle-model.js';
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
@@ -118,4 +118,27 @@ test('with no cable in hand, touching a terminal does not pick up a cable that i
     assert.equal(b.selected, null);
     assert.match(b.feedback, /practicá con una copia/, 'an installation in service only changes in a practice copy');
   } finally { globalThis.document = previous; }
+});
+
+test('a polarized part wired backwards is described as reversed, never as missing strength', () => {
+  for (const [id, p] of Object.entries(PUZZLES)) for (const c of p.components.filter(c => isPolarized(c) && c.goal)) {
+    const s = initialPuzzleSnapshot(id); p.solve(s); s.sourceOn = true; s.tripped = false;
+    s.wires = s.wires.map(w => w.map(n => n === c.a ? c.b : n === c.b ? c.a : n));
+    const said = observePuzzle(id, s).find(o => o.label && c.label.startsWith(o.label.split(' ·')[0]))?.text ?? '';
+    assert.match(said, /revés|contrario|hacia atrás/, `${id}/${c.id}: «${said}»`);
+    assert.doesNotMatch(said, /casi|apenas|falta/, `${id}/${c.id} reversed must not read as too weak: «${said}»`);
+    if (id !== 'gate') assert.doesNotMatch(said, /marca de avance/, `${id}/${c.id} has no advance mark`);
+  }
+});
+
+test('only parts with a reason to care about direction are polarized: plain coils work either way round', () => {
+  assert.equal(isPolarized(PUZZLES.gate.components.find(c => c.id === 'latch')), true, 'the gate latch carries a magnet');
+  assert.match(PUZZLES.gate.lesson, /imán/, 'the bench says why its coil is polarized');
+  for (const [id, cid] of [['beacon_supply', 'core'], ['beacon_network', 'signal']]) {
+    const p = PUZZLES[id], c = p.components.find(c => c.id === cid);
+    assert.equal(isPolarized(c), false, `${id}/${cid} is a plain coil`);
+    const s = initialPuzzleSnapshot(id); p.solve(s); s.sourceOn = true; s.tripped = false;
+    s.wires = s.wires.map(w => w.map(n => n === c.a ? c.b : n === c.b ? c.a : n));
+    assert.equal(evaluatePuzzle(id, s).operating[cid], true, `${id}/${cid} works with its two wires swapped`);
+  }
 });

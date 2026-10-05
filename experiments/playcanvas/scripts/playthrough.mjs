@@ -317,6 +317,17 @@ async function measure(mode, a, b) {
 }
 
 // ── Adversarial route ────────────────────────────────────────────────────────────────
+async function wrongDials(id, settings) {
+  if (!(await inspect()).puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
+  for (const values of settings) {
+    for (const [key, value] of Object.entries(values)) await knob(key, value);
+    const info = await inspect();
+    assert.equal(info.puzzle.result.solved, false, `${id}: ${JSON.stringify(values)} is not the repair`);
+    log('wrong-dials', { id, values, tripped: info.puzzle.state.tripped });
+    if (info.puzzle.state.tripped) await page.locator('[data-action="rearm"]').click();
+  }
+  await screenshot(`${id}-wrong-dials`);
+}
 const activeFlags = flags => Object.keys(flags).filter(key => flags[key]).sort();
 async function reloadAndContinue(label) {
   stage = `reload:${label}`;
@@ -429,8 +440,12 @@ async function solvePanel(objectId, id) {
       assert.equal((await inspect()).puzzle.state.switches.archive,false,'The archive was isolated in the courtyard');
       await removeWire('clinicOut', 'kitchenIn');
       await wire('clinicOut', 'negative'); await wire('positive', 'kitchenIn'); break;
-    case 'irrigation': await knob('warmth', 12); await knob('flow', 12); await knob('forge', 6); break;
-    case 'beacon_supply': await wire('positive', 'lineBa'); await wire('lineBb', 'ballastA'); await knob('ballast', 1); break;
+    case 'irrigation':
+      if (adversarial) await wrongDials(id, [{ warmth: 0, flow: 0, forge: 0 }, { warmth: 24, flow: 24, forge: 18 }]);
+      await knob('warmth', 12); await knob('flow', 12); await knob('forge', 6); break;
+    case 'beacon_supply': await wire('positive', 'lineBa'); await wire('lineBb', 'ballastA');
+      if (adversarial) await wrongDials(id, [{ ballast: 0 }, { ballast: 5 }]);
+      await knob('ballast', 1); break;
     case 'beacon_network':
       await removeWire('opticOut', 'bearingIn'); await removeWire('bearingOut', 'signalIn');
       await wire('opticOut', 'negative'); await wire('positive', 'bearingIn');
@@ -440,7 +455,9 @@ async function solvePanel(objectId, id) {
       if (!(await inspect()).puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
       await measure('voltage', 'tap', 'negative');
       await page.locator('[data-action="power"]').click(); await setMode('wire');
-      await removeWire('positive', 'lensIn'); await wire('tap', 'lensIn'); await knob('upper', 12); break;
+      await removeWire('positive', 'lensIn'); await wire('tap', 'lensIn');
+      if (adversarial) await wrongDials(id, [{ upper: 6 }, { upper: 36 }]);
+      await knob('upper', 12); break;
     default: throw new Error(`No UI repair sequence for ${id}`);
   }
   info = await inspect();

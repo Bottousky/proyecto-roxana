@@ -154,6 +154,36 @@ desplazamiento a 720 px de alto para «Pantalla completa» (como antes). El tabl
 el teléfono no muestra un indicio explícito de que hay más a la derecha además del corte.
 Emulación de teléfono, no hardware real.
 
+## Ciclo 4 · Comprensión de los bancos y coherencia del modelo (5 oct 2026)
+
+- **Fichas por banco** (`docs/produccion-aaa/PUZZLES.md`, generadas con
+  `node scripts/puzzle-sheet.mjs --md`): comprensión buscada, pista, acción, comprobación pedida,
+  primera ayuda, descubrimiento, consecuencia y una batería de intentos equivocados evaluados
+  con el modelo del juego (quitar cada cable, mandos en sus extremos, atajo + a −, receptor
+  invertido). Los 9 bancos dan una señal distinta ante cada error; ninguno queda en silencio.
+- **Dos textos que enseñaban algo falso**, encontrados por la batería:
+  la cúpula del Faro II conectada al revés decía «casi completa sus vueltas» (falta de fuerza en
+  vez de polaridad), y «contra la marca de avance» aparecía en el núcleo y la señal del Faro,
+  que no tienen esa marca. Ahora la inversión se describe como inversión, con las palabras de
+  cada pieza.
+- **Polaridad declarada, no implícita**: el juego decía «la polaridad determina el sentido de
+  esta bobina» sin razón física; un solenoide común atrae con cualquier sentido. El pestillo de
+  la Puerta es ahora un imán, dicho en el banco, la lección y la Bitácora. El núcleo del Faro I
+  y la señal del Faro II son bobinas comunes y funcionan con sus cables invertidos.
+  `isPolarized()` en el modelo; motores, pestillo imantado, corazón de Ohm y cristal de la lente
+  dependen del sentido. Simplificaciones declaradas al inicio de `PUZZLES.md` (sin tocar el canon).
+- Pruebas nuevas (raíz): toda pieza polarizada invertida se describe como inversión y nunca como
+  falta de fuerza; el pestillo es imán y las bobinas comunes funcionan invertidas. Fallan con el
+  texto y el modelo anteriores.
+- Ruta adversarial ampliada: mandos equivocados con la alimentación encendida en Terrazas
+  (todo al mínimo, todo al máximo), Faro I (regulador en 0 y 5 Ω) y Faro III (freno en 6 y 36 Ω).
+
+Verificación (runtime idéntico a la copia evaluada): `npm test` 83/83 y 285/285, `npm run check`
+correcto; ruta adversarial ampliada completa (`output/adversarial-cycle4/`, 554 s, 0 errores,
+seis intentos con mandos equivocados no resueltos, 9 zonas y recarga final). `puzzle-sheet`
+sin intentos silenciosos. Límite: la batería evalúa el modelo, no a personas; que estas señales
+basten para que un principiante entienda queda para la prueba con jugadores (NO VERIFICADO).
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -167,7 +197,7 @@ Emulación de teléfono, no hardware real.
 | 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano (torre de la Puerta al entrar al Manantial, torre del Castillo en Terrazas) | Pendiente |
 | 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía, la escena clave más pobre | Pendiente |
 | 8 | Momentos | Despertar de Ohm: 5,3 s y una línea; revisar los cuatro momentos construidos | Pendiente |
-| 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep | Pendiente |
+| 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep; fichas y coherencia del modelo | Hecho en lo verificable (ciclos 2 y 4): relato según traza, Ivara/Nereo exigen comprobación, volver ≠ poner en servicio, primera clase antes del cierre y acuerdo forja/riego en Terrazas están en el código y la partida los recorre; fichas y modelo en ciclo 4. El hallazgo 5 (estructura predecible por zona) es de ritmo: queda para revisión humana de diversión |
 | 10 | UI | Banco: tomaba un cable sin tener ninguno y la indicación «Ahora tocá otra pieza…» quedaba tras resolver | Hecho (ciclo 2) |
 | 11 | UI | Título a 800×600 recorta «OHMDAL» | Pendiente |
 | 12 | Rendimiento | Medir build de producción en el M2: FPS, carga, memoria por zona | Pendiente |

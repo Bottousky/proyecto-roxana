@@ -46,13 +46,13 @@ export const PUZZLES = {
     title: 'El cerrojo que escucha', place: 'CALZADA · MECANISMO DE LA PUERTA', subtitle: 'El cerrojo golpea hacia el lado equivocado.', voltage: 12, protection: 1.5,
     brief: 'Hacé que el cerrojo avance hacia la marca → con fuerza firme. Podés mover los dos cables de la bobina y girar su freno. Sentido y fuerza son dos cosas distintas.',
     ports: [...sourcePorts, port('trimA', 'Freno A', 300, 165), port('trimB', 'Freno B', 525, 165), port('latchIn', 'Avance +', 635, 325), port('latchOut', 'Avance −', 860, 325)],
-    components: [component('trim', 'Freno resistivo', 'trimA', 'trimB', 8, { valueKey: 'brake', kind: 'resistor' }), component('latch', 'Bobina del cerrojo', 'latchIn', 'latchOut', 16, { kind: 'coil', goal: goal(7.3, 9.1, .46, .57) })],
+    components: [component('trim', 'Freno resistivo', 'trimA', 'trimB', 8, { valueKey: 'brake', kind: 'resistor' }), component('latch', 'Bobina del cerrojo', 'latchIn', 'latchOut', 16, { kind: 'coil', polarized: true, goal: goal(7.3, 9.1, .46, .57) })],
     knobs: [{ key: 'brake', label: 'Freno de la bobina', min: 0, max: 20, step: 4, initial: 0, unit: 'Ω', description: 'Más freno deja pasar menos corriente: el cerrojo empuja con menos fuerza.' }],
     initialWires: [['positive', 'trimA'], ['trimB', 'latchOut'], ['latchIn', 'negative']], sealed: [['positive', 'trimA']], cables: 2,
     criteria: [{ text: 'Empuja hacia la marca de avance →', met: (r, s) => on(r, s) && branchOf(r, 'latch').current > .05 }, { text: 'Con fuerza firme: ni tiembla ni golpea', met: (r, s) => { const i = Math.abs(branchOf(r, 'latch').current); return on(r, s) && i >= .46 && i <= .57; } }],
     solve: s => { s.wires = [['positive', 'trimA'], ['trimB', 'latchIn'], ['latchOut', 'negative']]; s.values.brake = 8; },
-    lesson: 'La polaridad determina el sentido de esta bobina. La resistencia en serie regula su corriente sin cambiar el camino.',
-    observation: 'Las marcas del cerrojo dicen AVANCE →. Ahora el metal golpea hacia atrás.',
+    lesson: 'El pestillo de este cerrojo es un imán: por eso el sentido de la corriente en la bobina decide si lo empuja o lo atrae. Una bobina que sólo mueve hierro atrae igual con cualquier sentido. La resistencia en serie regula la fuerza sin cambiar el camino.',
+    observation: 'Las marcas del cerrojo dicen AVANCE →. Su pestillo es un imán, y ahora golpea hacia atrás.',
   },
   pump: {
     title: 'Lo que se pierde en el camino', place: 'MANANTIAL · ALIMENTACIÓN DE LA BOMBA', subtitle: 'La rueda gira con fuerza. El agua apenas sale.', voltage: 12, protection: 1.6,
@@ -146,6 +146,8 @@ export const PUZZLES = {
 
 const samePair = (a, b) => (a[0] === b[0] && a[1] === b[1]) || (a[0] === b[1] && a[1] === b[0]);
 /** A wire soldered into the installation: it cannot be removed and does not use a cable in hand. */
+/** Declared simplification: only parts with a reason to care about direction are polarized. */
+export function isPolarized(component) { return component.polarized ?? ['motor', 'orb', 'lens'].includes(component.kind); }
 export function isSealed(id, wire) { return (PUZZLES[id].sealed ?? []).some(w => samePair(w, wire)); }
 /** A hand cable is short: where a bench has zones, it only joins terminals in the same one. */
 export function canJoin(id, a, b) { const p = PUZZLES[id], za = p.ports.find(n => n.id === a)?.zone, zb = p.ports.find(n => n.id === b)?.zone; return !za || !zb || za === zb; }
@@ -219,9 +221,9 @@ export function evaluatePuzzle(id, state) {
   const powered = state.sourceOn && !state.tripped && !overloaded;
   const operating = Object.fromEntries(p.components.filter(c => c.goal).map(c => {
     const branch = solution.branches[c.id];
-    // Filament lamps and heating elements are not polarized. Actuators and
-    // the active optical crystal do depend on the marked operating direction.
-    const operatingBranch = ['lamp', 'heater', 'forge'].includes(c.kind) && branch.voltage !== null ? { ...branch, voltage: Math.abs(branch.voltage), current: Math.abs(branch.current) } : branch;
+    // Filament lamps, heating elements and plain coils work either way round. Motors, the gate's
+    // magnet latch and the active optical crystal depend on the marked direction (isPolarized).
+    const operatingBranch = !isPolarized(c) && branch.voltage !== null ? { ...branch, voltage: Math.abs(branch.voltage), current: Math.abs(branch.current) } : branch;
     return [c.id, powered && checkOperatingRange(operatingBranch, c.goal)];
   }));
   // maxPower limits losses on a line; minCurrent keeps a part in service (the lens divider needs both arms).

@@ -1,5 +1,5 @@
 import { measureVoltage, measureResistance } from './electrical.js';
-import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin } from './puzzle-model.js';
+import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized } from './puzzle-model.js';
 import { appendBenchEvidence, getBenchEvidence } from './bench-evidence.js';
 export { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, getBenchEvidence };
 import './puzzles.css';
@@ -30,21 +30,22 @@ export function observePuzzle(id, state, result = evaluatePuzzle(id, state)) {
   const observations = p.components.filter(c => c.goal).map(c => {
     const branch = result.solution.branches[c.id];
     const magnitude = Math.abs(branch?.voltage ?? 0);
-    const reverse = !['lamp', 'heater', 'forge'].includes(c.kind) && (branch?.voltage ?? 0) < -.1;
+    const reverse = isPolarized(c) && (branch?.voltage ?? 0) < -.1;
     const strong = magnitude > c.goal.maxVoltage || Math.abs(branch?.current ?? 0) > c.goal.maxCurrent || (branch?.power ?? 0) > (c.goal.maxPower ?? Infinity);
     // Close to the working band, the description says so: a knob sweep should feel like progress.
     const nearLow = !strong && magnitude >= .8 * c.goal.minVoltage;
     const nearHigh = strong && magnitude <= 1.12 * c.goal.maxVoltage && Math.abs(branch?.current ?? 0) <= 1.12 * c.goal.maxCurrent && (branch?.power ?? 0) <= (c.goal.maxPower ?? Infinity);
     let text;
     if (result.operating[c.id]) text = ({ orb: 'Una luz tibia late bajo el vidrio. El ojo se abre.', lamp: 'La luz se sostiene, clara y pareja.', motor: 'Gira sin golpes. El agua sale pareja.', heater: 'El lecho está tibio. Las hojas vuelven a abrirse.', lens: 'La luz es dorada y se sostiene. Ya no encandila.', coil: id === 'gate' ? 'El cerrojo avanza sin golpear y deja libre el paso.' : 'El pulso se sostiene sin sacudidas.' })[c.kind];
-    else if (reverse) text = c.kind === 'coil' ? 'Se mueve hacia atrás, contra la marca de avance.' : 'Responde en el sentido contrario al marcado.';
+    // Reversed polarity reads as reversal, in the words of what each piece does: only the gate has an advance mark.
+    else if (reverse) text = c.kind === 'coil' ? (id === 'gate' ? 'Se mueve hacia atrás, contra la marca de avance.' : 'El pulso late al revés de lo marcado.') : c.kind === 'motor' ? 'Gira al revés de lo marcado: empuja hacia el otro lado.' : 'Responde en el sentido contrario al marcado.';
     else if (magnitude < .1 || Math.abs(branch?.current ?? 0) < .001) text = c.kind === 'orb' ? 'El ojo sigue cerrado. Bajo el vidrio no hay latido.' : 'No responde. Todo permanece quieto.';
     else if (nearHigh) text = ({ lamp: 'La luz es un poco más blanca de lo que conviene.', motor: 'Gira un poco apurada; el agua sale con algo de fuerza de más.', heater: 'El lecho está algo más caliente de lo necesario.', lens: 'La luz es un poco dura; casi dorada.', coil: 'Empuja un poco de más.', orb: 'El latido es un poco brusco.' })[c.kind];
     else if (nearLow) text = ({ lamp: 'La luz ya se sostiene, pero todavía le falta un poco.', motor: 'Casi alcanza: el agua sale, aunque sin fuerza pareja.', heater: 'El lecho empieza a entibiarse; todavía le falta.', lens: 'La luz asoma dorada, todavía tenue.', coil: 'Casi se sostiene; le falta un poco de fuerza.', orb: 'El latido está por aparecer.' })[c.kind];
     else if (strong) text = ({ lamp: 'La luz es demasiado blanca. El vidrio se calienta.', motor: 'Gira a los golpes. El agua sale demasiado fuerte.', heater: 'El lecho está caliente. Las hojas se encogen.', lens: 'La luz blanca encandila; el cristal se calienta.', coil: 'Golpea con fuerza. El metal empieza a calentarse.', orb: 'El brillo es brusco; todavía no encuentra un latido parejo.' })[c.kind];
     else text = ({ lamp: 'Hay un brillo débil. Apenas ilumina.', motor: 'Se esfuerza, pero apenas mueve el agua.', heater: 'El lecho sigue frío. Las hojas están caídas.', lens: 'La luz apenas atraviesa el cristal.', coil: 'Tiembla, pero no consigue sostener el movimiento.', orb: 'Algo tiembla bajo el vidrio. Todavía no despierta.' })[c.kind];
     if (c.kind === 'forge') text = result.operating[c.id] ? (Math.abs(branch?.power ?? 0) >= 11.5 ? 'El horno ruge parejo. Yesca puede forjar a tandas grandes.' : 'El horno sostiene un calor más bajo. Yesca puede trabajar, más despacio.') : magnitude < .1 ? 'El horno está frío. Así no hay azadas.' : 'El horno apenas entibia el hierro. Así Yesca no puede trabajar.';
-    if (id === 'beacon_network' && c.kind === 'motor') text = result.operating[c.id] ? 'La cúpula gira sin detenerse.' : strong ? 'La cúpula gira a los golpes.' : nearLow ? 'La cúpula casi completa sus vueltas.' : 'La cúpula apenas consigue moverse.';
+    if (id === 'beacon_network' && c.kind === 'motor') text = result.operating[c.id] ? 'La cúpula gira sin detenerse.' : reverse ? 'La cúpula gira al revés de lo marcado.' : strong ? 'La cúpula gira a los golpes.' : nearLow ? 'La cúpula casi completa sus vueltas.' : 'La cúpula apenas consigue moverse.';
     return { label: simpleLabel(c.label), text };
   });
   // Something along the line warms while the pump works; which joint, the instrument has to say.
