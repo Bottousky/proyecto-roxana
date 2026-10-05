@@ -48,3 +48,16 @@ test('la utilería deja libre el eje de cada camino: a lo sumo roza su borde', (
       assert.ok(gap >= path.width / 2 - .6, `${id}: ${o.dressing} a ${gap.toFixed(2)} m del eje de ${path.id} (ancho ${path.width})`);
     }
 });
+
+test('faroles, postes y jardineras de la escena tampoco se plantan en el eje de un camino', () => {
+  for (const [id, layout] of Object.entries(AREA_LAYOUTS)) {
+    if (!scene.areas[id]) continue;
+    const used = new Set(AREAS[id].objects.map(o => o.id));
+    // Muros y edificios son bordes; los puntos de interacción son el destino del camino.
+    const small = local(id).filter(o => !used.has(o.id) && o.w <= 3 && o.d <= 3);
+    for (const path of layout.paths || []) for (const o of small) for (let i = 0; i < path.points.length - 1; i++) {
+      const gap = axisGap(o, path.points[i], path.points[i + 1]);
+      assert.ok(gap >= path.width / 2 - .6, `${id}: ${o.id || 'poste'} en (${o.x.toFixed(1)}, ${o.z.toFixed(1)}) a ${gap.toFixed(2)} m del eje de ${path.id}`);
+    }
+  }
+});

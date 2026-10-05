@@ -101,3 +101,21 @@ test('the Faro lens needs its divider: the series shortcut would contradict the 
   assert.equal(evaluatePuzzle('beacon_lens', divider).solved, true);
   assert.ok(observePuzzle('beacon_lens', divider).every(o => o.label !== 'El divisor'));
 });
+
+test('with no cable in hand, touching a terminal does not pick up a cable that is not there', () => {
+  const previous = globalThis.document;
+  globalThis.document = { activeElement: null };
+  try {
+    const b = bench('awaken');
+    b.touchPort('heartOut'); b.touchPort('negative');
+    assert.equal(b.result.solved, true, 'the only cable woke Ohm');
+    b.touchPort('positive');
+    assert.equal(b.selected, null, 'nothing is held after the last cable is placed');
+    assert.match(b.feedback, /No te quedan cables en la mano/);
+    assert.doesNotMatch(instruction(b.html()), /apoyar el otro extremo/);
+    b.state.completed = true;
+    b.touchPort('positive');
+    assert.equal(b.selected, null);
+    assert.match(b.feedback, /practicá con una copia/, 'an installation in service only changes in a practice copy');
+  } finally { globalThis.document = previous; }
+});

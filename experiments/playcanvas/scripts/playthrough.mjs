@@ -1,6 +1,10 @@
 /**
- * Real-input Arc I gauntlet. Run with the development server on port 4173:
- *   node tests/playthrough.mjs
+ * Real-input Arc I gauntlet. Run with the development server on port 4190:
+ *   node scripts/playthrough.mjs
+ * ROUTE=adversarial takes a different journey through the same arc: a locked exit tried early,
+ * a wrong wire undone and a bench abandoned, reloads mid-bench, mid-scene and mid-journey,
+ * interfaces opened and closed in a row, wrong dials, a physical walk back from the Castillo to
+ * the Plaza and forward again, and the inhabitants spoken to again after the ending.
  * Uses fresh browser storage. Reads the development inspection surface only to
  * observe positions and state; every game change is a keyboard or DOM click.
  */
@@ -12,12 +16,19 @@ import assert from 'node:assert/strict';
 
 const output = resolve(process.env.PLAYTHROUGH_OUTPUT || 'output/playcanvas-playthrough');
 await mkdir(output, { recursive: true });
-const report = { startedAt: new Date().toISOString(), inputPolicy: 'UI input only; read-only game inspection for navigation and assertions', stages: [], measurements: [], errors: [], completed: false };
+const ROUTE = process.env.ROUTE || 'main', adversarial = ROUTE === 'adversarial';
+const report = { route: ROUTE, startedAt: new Date().toISOString(), inputPolicy: 'UI input only; read-only game inspection for navigation and assertions', stages: [], measurements: [], errors: [], dialogue: [], completed: false };
 const browser = await chromium.launch({ headless: true, executablePath: chromePath, args: ['--disable-background-timer-throttling', '--disable-renderer-backgrounding'] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 const page = await context.newPage();
 page.setDefaultTimeout(12000);
 await page.routeWebSocket('**', socket => socket.close());
+// Every spoken line, across reloads, so the report can show what the game actually narrated.
+await page.exposeFunction('__recordLine', text => { if (report.dialogue.at(-1) !== text) report.dialogue.push(text); });
+await page.addInitScript(() => addEventListener('DOMContentLoaded', () => {
+  const node = document.querySelector('#dialogue-announcement');
+  if (node) new MutationObserver(() => node.textContent && window.__recordLine(node.textContent)).observe(node, { childList: true, characterData: true, subtree: true });
+}));
 page.on('pageerror', error => report.errors.push({ type: 'pageerror', message: error.message }));
 page.on('console', message => { if (message.type() === 'error' && !/WebSocket|ERR_CONNECTION_CLOSED/.test(message.text())) report.errors.push({ type: 'console', message: message.text() }); });
 let stage = 'launch';
@@ -44,7 +55,8 @@ function log(event, data = {}) {
 async function screenshot(name) {
   const file = `playthrough-${String(++shots).padStart(2, '0')}-${name}.png`;
   await page.screenshot({ path: resolve(output, file), animations: 'disabled' });
-  report.stages.push({ event: 'screenshot', file });
+  const where = await inspect();
+  report.stages.push({ event: 'screenshot', file, area: where?.area, position: where?.position });
 }
 
 async function settle({ stable = 1300, allowPuzzle = true, timeout = 35000 } = {}) {
@@ -304,6 +316,60 @@ async function measure(mode, a, b) {
   return reading;
 }
 
+// ── Adversarial route ────────────────────────────────────────────────────────────────
+const activeFlags = flags => Object.keys(flags).filter(key => flags[key]).sort();
+async function reloadAndContinue(label) {
+  stage = `reload:${label}`;
+  const before = await inspect();
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.locator('#continue').click();
+  await settle({ stable: 1400 });
+  const after = await inspect();
+  assert.equal(after.area, before.area, `${label}: reload returns to the same place`);
+  for (const flag of activeFlags(before.flags)) assert.ok(after.flags[flag], `${label}: «${flag}» survives the reload`);
+  assert.ok(distance(before.position, after.position) < 2, `${label}: reload keeps the traveller where they stood (${before.position} → ${after.position})`);
+  log('reload', { label, area: after.area, position: after.position });
+}
+async function lockedExit(id) {
+  const before = (await inspect()).area;
+  await interact(id);
+  const after = await inspect();
+  assert.equal(after.area, before, `${id} stays closed before its story is ready`);
+  assert.equal(after.mode, 'world', `${id}: the locked passage gives control back`);
+  log('locked-exit', { id });
+}
+async function interfacesRoundTrip() {
+  stage = 'interfaces';
+  for (const key of ['j', 'Escape', 'm', 'Escape', 'h', 'Escape', 'Escape', 'Escape', 'j', 'm', 'Escape']) { await page.keyboard.press(key); await page.waitForTimeout(220); }
+  if ((await inspect()).mode !== 'world') await page.keyboard.press('Escape');
+  await page.waitForTimeout(250);
+  const start = await inspect();
+  assert.equal(start.mode, 'world', 'Opening and closing interfaces in a row returns to the world');
+  for (const key of ['ArrowLeft', 'ArrowDown']) { await page.keyboard.down(key); await page.waitForTimeout(450); await page.keyboard.up(key); }
+  const moved = await inspect();
+  assert.ok(distance(start.position, moved.position) > .4, 'Movement still responds after the interfaces');
+  log('interfaces-round-trip', { from: start.position, to: moved.position });
+}
+async function wrongWireThenAbandon() {
+  await interact('ohm_pedestal');
+  stage = 'adversarial:awaken';
+  assert.equal((await inspect()).mode, 'puzzle');
+  await wire('heartOut', 'positive');
+  assert.equal((await inspect()).puzzle.result.solved, false, 'Both ends of the heart on one terminal do not wake Ohm');
+  await screenshot('awaken-wrong-wire');
+  await removeWire('heartOut', 'positive');
+  await page.locator('.wb-close[data-action="close"]').first().click();
+  await settle();
+  assert.equal(Boolean((await inspect()).flags.awaken), false, 'Leaving an unfinished bench does not commission it');
+  log('bench-abandoned', { id: 'awaken' });
+}
+async function walkBackAndForth() {
+  for (const [exit, area] of [['castle_to_spring', 'spring'], ['spring_to_road', 'road'], ['road_to_plaza', 'plaza']]) await travel(exit, area);
+  await interact('marin');
+  for (const [exit, area] of [['plaza_to_road', 'road'], ['road_to_spring', 'spring'], ['spring_to_castle', 'castle']]) await travel(exit, area);
+  log('walked-back-and-forth', { from: 'castle', to: 'plaza' });
+}
+
 async function solvePanel(objectId, id) {
   await interact(objectId);
   stage = `puzzle:${id}`;
@@ -335,13 +401,29 @@ async function solvePanel(objectId, id) {
     assert.equal((await inspect()).puzzle.state.proofs.foundBreak, true, 'Lumen saw where the break is');
     log('proof', { id, proof: 'foundBreak' });
     await screenshot('workshop-continuity-open');
+    if (adversarial) {
+      await page.locator('.wb-close[data-action="close"]').first().click();
+      await settle();
+      assert.equal(Boolean((await inspect()).flags.workshop), false, 'Leaving the workshop bench does not commission it');
+      await reloadAndContinue('workshop-bench-abandoned');
+      await interact(objectId);
+      assert.equal((await inspect()).puzzle.state.proofs.foundBreak, true, 'Lumen still remembers where the break was');
+      if ((await inspect()).puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
+      log('bench-resumed', { id });
+    }
   }
   switch (id) {
     case 'awaken': await wire('heartOut', 'negative'); break;
     case 'workshop': await wire('s2a', 's2b'); break;
     case 'gate':
       await removeWire('trimB', 'latchOut'); await removeWire('latchIn', 'negative');
-      await wire('trimB', 'latchIn'); await wire('latchOut', 'negative'); await knob('brake', 8); break;
+      await wire('trimB', 'latchIn'); await wire('latchOut', 'negative');
+      if (adversarial) {
+        await page.locator('[data-action="power"]').click();
+        for (const value of [0, 20]) { await knob('brake', value); assert.equal((await inspect()).puzzle.result.solved, false, `brake ${value} Ω is not the firm push`); }
+        await screenshot('gate-wrong-brake');
+      }
+      await knob('brake', 8); break;
     case 'pump': await wire('e2a', 'e2b'); break;
     case 'distribution':
       assert.equal((await inspect()).puzzle.state.switches.archive,false,'The archive was isolated in the courtyard');
@@ -367,6 +449,7 @@ async function solvePanel(objectId, id) {
   if (id === 'distribution') {
     // Ivara's request: show the infirmary lit while the kitchen is isolated, then reopen it.
     await page.locator('.wb-proof').waitFor({ state: 'visible' });
+    if (adversarial) assert.equal(await page.locator('.wb-success:not(.wb-proof) [data-action="commission"]').count(), 0, 'Nothing can be commissioned before Ivara sees the infirmary alone');
     await page.locator('[data-action="switch"][data-key="kitchen"]:visible').click();
     assert.equal((await inspect()).puzzle.state.proofs.clinicAlone, true, 'The infirmary stays lit with the kitchen isolated');
     await page.locator('[data-action="switch"][data-key="kitchen"]:visible').click();
@@ -383,6 +466,13 @@ async function solvePanel(objectId, id) {
   if (id === 'beacon_lens') await measure('voltage', 'lensIn', 'lensOut');
   await screenshot(`${id}-operating`);
   await page.locator('.wb-success [data-action="commission"]').first().click();
+  if (adversarial && ['awaken', 'gate', 'beacon_lens'].includes(id)) {
+    await page.waitForFunction(() => window.__ohmdal?.mode === 'cinematic', {}, { timeout: 6000 });
+    await page.waitForTimeout(1500);
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.locator('#continue').click();
+    log('reload-during-scene', { id });
+  }
   await settle({ timeout: 40000 });
   assert.equal((await inspect()).flags[id], true, `${id}: putting in service persists the repair`);
   log('commissioned', { id });
@@ -397,10 +487,12 @@ try {
   await page.locator('#new-game').click();
   await settle({ stable: 1600 });
   await screenshot('portal-arrival');
+  if (adversarial) { await lockedExit('portal_to_plaza'); await wrongWireThenAbandon(); await reloadAndContinue('portal-after-abandoned-bench'); }
   await solvePanel('ohm_pedestal', 'awaken');
   await interact('portal_seed');
   await travel('portal_to_plaza', 'plaza');
   await interact('marin');
+  if (adversarial) await interfacesRoundTrip();
   await interact('plaza_bell');
   await travel('plaza_to_workshop', 'workshop');
   await interact('lumen');
@@ -415,6 +507,9 @@ try {
   await screenshot('road-bypass-inhibits');
   await operate('road_bypass', false);
   await solvePanel('gate_panel', 'gate');
+  // The closing line may only claim what the bench trace shows: here the brake was turned.
+  assert.ok(report.dialogue.some(line => line.includes('al ajustar la rueda')), 'The gate closing line reports the brake that was turned');
+  assert.ok(!report.dialogue.some(line => line.includes('La rueda quedó como estaba')), 'No line claims an untouched brake');
   await interact('road_nest');
   await travel('road_to_spring', 'spring');
   await operate('spring_sluice', true); await operate('spring_coupling', true);
@@ -426,12 +521,14 @@ try {
   await operate('castle_isolated', false);
   await solvePanel('distribution_panel', 'distribution');
   await interact('castle_hidden');
+  if (adversarial) await walkBackAndForth();
   await travel('castle_to_terraces', 'terraces');
   await interact('yesca');
   await operate('forge_limited', true); await operate('irrigation_open', true);
   await solvePanel('irrigation_panel', 'irrigation');
   await interact('terraces_secret');
   await travel('terraces_to_lake', 'lake');
+  if (adversarial) await reloadAndContinue('lake-arrival');
   await interact('nereo_lake');
   assert.ok((await inspect()).flags.lake_cable && (await inspect()).flags.lake_return, 'Nereo makes the dock joins');
   await interact('lake_secret');
@@ -476,6 +573,12 @@ try {
   assert.equal(finished.secrets.length, 9, 'Optional discoveries survive reload');
   assert.ok(finished.seen.includes('lighthouse_epilogue'), 'Epilogue progress survives reload');
   await screenshot('resumed-completed-save');
+  if (adversarial) {
+    const heard = report.dialogue.length;
+    await interact('edda_tower');
+    assert.ok(report.dialogue.length > heard, 'Edda still answers after the ending and a reload');
+    assert.equal((await inspect()).mode, 'world');
+  }
   assert.equal(report.errors.length, 0, `No browser errors: ${JSON.stringify(report.errors)}`);
   report.completed = true;
   report.final = finished;

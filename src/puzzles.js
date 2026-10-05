@@ -380,6 +380,9 @@ export class PuzzleWorkbench {
     if (this.mode === 'current') { this.feedback = 'Elegí una pieza en el instrumento. Ohm medirá cuánto pasa por ese camino.'; this.render(); return; }
     if (this.mode === 'wire') {
       if (!this.requireIsolated()) return;
+      // Taking a cable needs one in hand, and an installation in service only changes in a practice copy.
+      if (!this.selected && this.state.completed) { this.feedback = 'La instalación está en servicio: para cambiar cables, practicá con una copia.'; this.render(); return; }
+      if (!this.selected && cablesInHand(this.id, this.state) <= 0) { this.feedback = 'No te quedan cables en la mano. Tocá uno de los que tendiste para retirarlo y usarlo en otro lugar.'; this.callbacks.onSound?.('error'); this.render(); return; }
       if (!this.selected) { this.selected = id; this.feedback = `Tomaste un cable. Elegí dónde apoyar el otro extremo.`; this.callbacks.onSound?.('connect'); this.render(); return; }
       if (this.selected === id) { this.selected = null; this.feedback = ''; this.render(); return; }
       const a = this.selected; this.selected = null;

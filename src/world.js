@@ -373,7 +373,8 @@ export class World {
   ruinPillar(x,z,h){this.solid(x,z,1.3,1.3);this.box(x,.18,z,1.3,.35,1.3,this.m.stoneDark);this.cylinder(x,h/2+.35,z,.42,h,this.m.stone);this.box(x,h+.38,z,1.05,.3,1.05,this.m.stone);for(let i=0;i<3;i++)this.box(x+.45+this.rand()*.7,.1,z+.4+this.rand(),.4,.2,.4,this.m.stone);}
   buildPlaza(w,d){
     
-    for(const [x,z] of [[-7.5,-5.2],[10.6,-2.8],[-7.6,11.7],[10,8.5]])this.lamp(x,z);
+    // The Mercado lamp stands at the edge of its street, not on it.
+    for(const [x,z] of [[-7.5,-5.2],[10.6,-2.8],[-7.6,11.7],[10,10.1]])this.lamp(x,z);
     this.banner(-2.65,-15.2,3.2);this.banner(2.65,-15.2,3.2);
     const festoon=t=>[-7.5+18.1*t,3.2-Math.sin(t*Math.PI)*.5,-5.2+2.4*t];
     for(let i=0;i<7;i++){const a=festoon(i/7),b=festoon((i+.5)/7),c=festoon((i+1)/7);this.cable([a,b,c],this.m.darkwood);const bulb=this.sphere(b[0],b[1]-.12,b[2],.11,this.m.glass);bulb.castShadow=false;}
@@ -460,7 +461,8 @@ export class World {
       for(let k=0;k<5;k++){this.cylinder(x-3.3+k*1.65,1.45+lift,z-.7,.035,1.7,this.m.wood);}for(let y of [1.4,2.0])this.beam([x-3.5,y+lift,z-.7],[x+3.5,y+lift,z-.7],.025,this.m.darkwood);
       const channel=this.water(x,.73+lift,z+1.1,7.6,.35);this.irrigationWater.push(channel);
     }
-    for(const [x,z] of [[-4.7,-10.8],[4.7,-2.8],[-4.7,5.2],[4.7,13.2]])this.lamp(x,z,2.8);
+    // Lamps flank the upper street and the west work lane from outside their paving.
+    for(const [x,z] of [[-4.7,-12],[4.7,-2.8],[-4.7,6.5],[4.7,13.2]])this.lamp(x,z,2.8);
     const mill=this.layout.buildings.find(b=>b.id==='terrace-mill');
     this.beam([mill.x,mill.height+1.05,mill.z+mill.d/2-.1],[mill.x,mill.height+1.05,mill.z+mill.d/2+.52],.18,this.m.metal).name='mill-drive-shaft';
     const blades=this.group(mill.x,mill.height+1.05,mill.z+mill.d/2+.45);blades.name='mill-sails';blades.scale.setScalar(.68);this.cylinder(0,0,0,.22,.35,this.m.brass,blades).rotation.x=Math.PI/2;for(let i=0;i<4;i++){const g=this.group(0,0,0,blades);g.rotation.z=i*Math.PI/2;this.box(0,1.9,0,.15,3.8,.14,this.m.darkwood,g);this.box(.43,2.65,-.05,.82,1.5,.045,this.m.cloth,g);for(let j=0;j<6;j++)this.box(.45,.7+j*.45,0,.85,.2,.08,this.m.wood,g);}this.animations.push({kind:'wheel',obj:blades,speed:.23});

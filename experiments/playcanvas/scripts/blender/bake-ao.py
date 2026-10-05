@@ -26,7 +26,7 @@ for o in list(bpy.data.objects): bpy.data.objects.remove(o)
 sc.render.engine = 'CYCLES'
 try:
     prefs = bpy.context.preferences.addons['cycles'].preferences
-    for kind in ('OPTIX', 'CUDA'):
+    for kind in ('OPTIX', 'CUDA', 'METAL'):
         try:
             prefs.compute_device_type = kind; prefs.get_devices()
             if any(d.type == kind for d in prefs.devices):

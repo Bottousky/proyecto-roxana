@@ -89,13 +89,15 @@ export class PlayCanvasWorld {
     const range=this.inspect||this.cinematic?16:this.indoors()?18:12;
     if(Math.abs(wanted-this.frame.dof.focusDistance)>.05||range!==this.frame.dof.focusRange){this.frame.dof.focusDistance=wanted;this.frame.dof.focusRange=range;this.frame.update();}
   }
-  // Quien juega nunca se pierde detrás del primer plano (src/see-through.js).
+  // Quien juega y Ohm nunca se pierden detrás del primer plano (src/see-through.js).
   updateSeeThrough(){
-    const device=this.app.graphicsDevice,a=this.playerActor;
-    if(!a?.entity?.enabled||this.inspect){applySeeThrough(device,null);return;}
-    const feet=this.seeFeet??=new Vec3(),head=this.seeHead??=new Vec3();
-    feet.copy(a.entity.getPosition());head.copy(a.entity.up).mulScalar(2.5).add(feet);
-    applySeeThrough(device,seeThroughFrame(this.camera.camera,this.camera.getPosition(),feet,head,device.width,device.height));
+    const device=this.app.graphicsDevice;
+    for(const [actor,tall,name] of [[this.playerActor,2.5,'uSeeThrough'],[this.ohmActor,1.35,'uSeeThroughOhm']]){
+      if(!actor?.entity?.enabled||this.inspect){applySeeThrough(device,null,name);continue;}
+      const feet=this.seeFeet??=new Vec3(),head=this.seeHead??=new Vec3();
+      feet.copy(actor.entity.getPosition());head.copy(actor.entity.up).mulScalar(tall).add(feet);
+      applySeeThrough(device,seeThroughFrame(this.camera.camera,this.camera.getPosition(),feet,head,device.width,device.height),name);
+    }
   }
   async loadArtAssets(){
     if(this.booted)return {ok:true,missing:[]};

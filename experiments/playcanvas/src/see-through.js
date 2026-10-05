@@ -8,16 +8,22 @@ const alphaTestPS=`
 uniform float alpha_ref;
 uniform vec4 uSeeThrough;
 uniform vec2 uSeeThroughShape;
+uniform vec4 uSeeThroughOhm;
+uniform vec2 uSeeThroughOhmShape;
 float seeThroughBayer2(vec2 a){a=floor(a);return fract(dot(a,vec2(.5,a.y*.75)));}
 float seeThroughBayer4(vec2 a){return seeThroughBayer2(.5*a)*.25+seeThroughBayer2(a);}
+// 0 fuera de la cápsula; crece hacia su eje.
+float seeThroughOpen(vec4 ends,vec2 shape){
+  if(shape.y<=0.0||gl_FragCoord.z>=shape.y)return 0.0;
+  vec2 ab=ends.zw-ends.xy,ap=gl_FragCoord.xy-ends.xy;
+  float r=length(ap-ab*clamp(dot(ap,ab)/max(dot(ab,ab),1.),0.,1.))/shape.x;
+  return r<1.0?1.0-smoothstep(.45,1.,r):0.0;
+}
 void alphaTest(float a){
   if(a<alpha_ref)discard;
 #if !defined(SHADOW_PASS) && !defined(PICK_PASS)
-  if(uSeeThroughShape.y>0.0&&gl_FragCoord.z<uSeeThroughShape.y){
-    vec2 ab=uSeeThrough.zw-uSeeThrough.xy,ap=gl_FragCoord.xy-uSeeThrough.xy;
-    float r=length(ap-ab*clamp(dot(ap,ab)/max(dot(ab,ab),1.),0.,1.))/uSeeThroughShape.x;
-    if(r<1.0&&seeThroughBayer4(gl_FragCoord.xy)>=mix(.24,1.,smoothstep(.45,1.,r)))discard;
-  }
+  float open=max(seeThroughOpen(uSeeThrough,uSeeThroughShape),seeThroughOpen(uSeeThroughOhm,uSeeThroughOhmShape));
+  if(open>0.0&&seeThroughBayer4(gl_FragCoord.xy)>=mix(1.,.24,open))discard;
 #endif
 }
 `;
@@ -52,9 +58,12 @@ export function seeThroughFrame(camera,cameraPosition,feet,head,width,height,mar
   return {from:at(.18),to:at(.82),radius:tall*.42,depth:near[2]};
 }
 
-const ends=new Float32Array(4),shape=new Float32Array(2);
-export function applySeeThrough(device,frame){
+// Una cápsula por figura: quien juega ('uSeeThrough') y Ohm ('uSeeThroughOhm').
+const buffers=new Map();
+export function applySeeThrough(device,frame,name='uSeeThrough'){
+  if(!buffers.has(name))buffers.set(name,{ends:new Float32Array(4),shape:new Float32Array(2)});
+  const {ends,shape}=buffers.get(name);
   shape[0]=frame?.radius||1;shape[1]=frame?.depth||0;
-  if(frame){ends.set(frame.from,0);ends.set(frame.to,2);device.scope.resolve('uSeeThrough').setValue(ends);}
-  device.scope.resolve('uSeeThroughShape').setValue(shape);
+  if(frame){ends.set(frame.from,0);ends.set(frame.to,2);device.scope.resolve(name).setValue(ends);}
+  device.scope.resolve(name+'Shape').setValue(shape);
 }
