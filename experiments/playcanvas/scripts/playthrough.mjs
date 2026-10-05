@@ -483,6 +483,13 @@ async function solvePanel(objectId, id) {
   if (id === 'beacon_lens') await measure('voltage', 'lensIn', 'lensOut');
   await screenshot(`${id}-operating`);
   await page.locator('.wb-success [data-action="commission"]').first().click();
+  // SCENE_FRAMES=1: a sequence of frames through each restoration scene, to judge it in motion.
+  if (process.env.SCENE_FRAMES && !adversarial) {
+    if (await page.waitForFunction(() => window.__ohmdal?.mode === 'cinematic', {}, { timeout: 6000 }).then(() => true, () => false)) {
+      for (let i = 0; i < 40 && (await inspect())?.mode === 'cinematic'; i++) { await page.screenshot({ path: resolve(output, `scene-${id}-${String(i).padStart(2, '0')}.png`) }); await page.waitForTimeout(450); }
+      log('scene-frames', { id });
+    }
+  }
   if (adversarial && ['awaken', 'gate', 'beacon_lens'].includes(id)) {
     await page.waitForFunction(() => window.__ohmdal?.mode === 'cinematic', {}, { timeout: 6000 });
     await page.waitForTimeout(1500);

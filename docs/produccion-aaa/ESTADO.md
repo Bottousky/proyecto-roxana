@@ -199,6 +199,34 @@ Puerta pasa a ser legible desde la llegada. Rendimiento sin cambios en Plaza y F
 de media, topado por la sincronía vertical). `npm test` 83/83, `npm run check` correcto. Es un
 cambio de una constante de presentación: no se repitió la partida completa.
 
+## Ciclo 6 · El primer latido de Ohm (5 oct 2026)
+
+Los momentos construidos se revisaron en movimiento: la partida captura cada escena de
+restauración (`SCENE_FRAMES=1`, hojas en `output/scenes-cycle6/sheet-*.png`; herramienta
+`scripts/contact-sheet.mjs`).
+
+- **Despertar de Ohm (el más débil, y el primero que vive el jugador):** la escena decía «Una
+  pequeña luz despierta bajo el vidrio» y no se veía ninguna luz; Ohm pasaba de apagado a
+  encendido de golpe, diminuto en el encuadre. Ahora: una luz cian titila, crece, late dos veces
+  y se asienta dentro de Ohm (con su luz puntual sobre el pedestal); Ohm pasa de la penumbra al
+  color a medida que llega la luz; el sonido suma dos latidos graves con los dos pulsos; la
+  cámara se acerca más (zoom máx. 1,75, dentro del límite que fija la prueba de escenas). Con
+  movimiento reducido la luz aparece sin parpadeos ni pulsos. Primera versión descartada: el
+  resplandor tapaba a Ohm entero; se achicó. Evidencia: `output/awaken-before/sheet.png` y
+  `output/awaken-after/sheet.png` (`scripts/qa-awaken-scene.mjs`, misma partida y recorrido).
+- **Regresión propia corregida:** la pausa tras cerrar un diálogo (ciclo 1) también tragaba E
+  sobre otro objeto si se apretaba en menos de 450 ms; la partida automatizada lo encontró al
+  fallar en el pedestal. Ahora sólo bloquea volver a abrir lo que estaba al alcance al cerrar.
+  `qa-dialogue-input` lo comprueba de forma determinista (falla con la versión anterior).
+- Puerta: la reja sube y la cámara recorre el arco; correcto, el Ω queda chico. Manantial: el
+  vuelo hasta la Plaza pasa por cuadros de sólo copas de árboles. Faro: torre, haz, Lago y
+  Terrazas; el haz se ve en un solo cuadro y no cruzando el lago como dice el texto.
+
+Verificación (runtime idéntico a la copia evaluada): `npm test` 83/83 y 285/285 (el arnés de la
+raíz provee ahora `nearby`), `npm run check` correcto, partida completa
+(`output/playthrough-cycle6/`, 399 s, 0 errores) y `qa-dialogue-input` correcto. Sonido de los
+latidos: NO VERIFICADO de oído (sin escucha en esta sesión).
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -211,7 +239,7 @@ cambio de una constante de presentación: no se repitió la partida completa.
 | 5 | Presentación | Profundidad de campo: el destino de cada llegada (fuente, rueda del Manantial, Castillo) queda borroso en el tercio superior | Hecho (ciclo 5) |
 | 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano (torre de la Puerta al entrar al Manantial, torre del Castillo en Terrazas) | Pendiente |
 | 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía, la escena clave más pobre | Pendiente |
-| 8 | Momentos | Despertar de Ohm: 5,3 s y una línea; revisar los cuatro momentos construidos | Pendiente |
+| 8 | Momentos | Despertar de Ohm sin luz visible (hecho, ciclo 6). Pendiente: vuelo del Manantial por copas de árboles; haz del Faro que no se ve cruzar el lago; Ω pequeño en la Puerta | En curso |
 | 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep; fichas y coherencia del modelo | Hecho en lo verificable (ciclos 2 y 4): relato según traza, Ivara/Nereo exigen comprobación, volver ≠ poner en servicio, primera clase antes del cierre y acuerdo forja/riego en Terrazas están en el código y la partida los recorre; fichas y modelo en ciclo 4. El hallazgo 5 (estructura predecible por zona) es de ritmo: queda para revisión humana de diversión |
 | 10 | UI | Banco: tomaba un cable sin tener ninguno y la indicación «Ahora tocá otra pieza…» quedaba tras resolver | Hecho (ciclo 2) |
 | 11 | UI | Título a 800×600 recorta «OHMDAL» | Pendiente |
@@ -234,10 +262,9 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 6: los cuatro momentos construidos (8): despertar de Ohm, apertura de la Puerta,
-Manantial y Faro. Para cada uno: preparación, interacción, cambio audiovisual y consecuencia
-persistente, revisados en movimiento (capturas en secuencia de cada escena). Luego el interior
-del taller (7) y los ocluyentes borrosos en primer plano de algunas llegadas (6).
+Ciclo 7: momentos construidos, segunda parte (8): el vuelo del Manantial debe seguir el agua
+(canal) y no las copas; el haz del Faro debe verse cruzar el lago en la escena; acercar el Ω de
+la Puerta. Después: interior del taller (7) y ocluyentes borrosos de primer plano (6).
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`

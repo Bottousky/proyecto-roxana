@@ -233,7 +233,8 @@ export class AudioDirector {
       case 'beacon_network':
         for (let i = 0; i < 9; i++) { tone(120 + i * 3, i * .17, .2, .04);noise(i * .17, .09, .035, 700); }
         tone(96, 1.2, 1.6, .045);break;
-      case 'awaken': tone(520, 0, .3, .03);tone(780, .22, 1.1, .045);break;
+      // A spark, a rising note, then two soft heartbeats with the light's two pulses.
+      case 'awaken': tone(520, 0, .3, .03);tone(780, .22, 1.1, .045);tone(68, 1.2, .2, .09);tone(68, 1.55, .18, .07);break;
       case 'beacon_lens': this.finale();break;
       default: return false;
     }

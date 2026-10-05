@@ -254,7 +254,7 @@ export class PlayCanvasWorld {
   wakeOhm(state){
     const awake=!!state.flags.awaken,was=this.ohmWasAwake;this.ohmWasAwake=awake;
     if(was!==false||!awake||this.area?.id!=='portal'||!this.sleeping)return;
-    const p=this.sleeping.g.position;this.ohm.position.set(p.x,p.y,p.z);this.ohmHop={t:0,from:[p.x,p.y,p.z],to:this.nearestWalkable([p.x,p.z+1])};this.companionRoute=[];
+    const p=this.sleeping.g.position;this.ohm.position.set(p.x,p.y,p.z);this.ohmAwaiting=true;this.ohmHop={t:0,from:[p.x,p.y,p.z],to:this.nearestWalkable([p.x,p.z+1])};this.companionRoute=[];
   }
   setInspection(v){this.inspect=v;if(v){this.target=null;this.route=[];}}
   cameraPose(){const [ox,oz]=this.data.areas[this.area.id].offset;return {focus:[this.focus.x-ox,this.focus.y,this.focus.z-oz],offset:this.cameraOffset.toArray(),zoom:this.currentZoom};}
@@ -267,12 +267,32 @@ export class PlayCanvasWorld {
   // The moment an installation returns: a ring of light runs over the ground, sparks rise
   // from the object and the bloom swells, then everything settles over three seconds.
   playRestoration(id){
-    this.updateFlags(this.state);this.restoration=3;
+    this.updateFlags(this.state);this.restoration=3;if(id==='awaken')this.awakening={t:0};
     const objects=(this.area?.objects||[]).filter(o=>!o.character&&o.kind!=='npc'),o=objects.find(o=>o.puzzle===id)||objects.find(o=>o.id===id||o.action?.flag===id)||objects.find(o=>o.flag===id);if(!o||!this.burst)return;
     // The neighbours react: everyone nearby turns to the installation and jumps, one after another.
     this.celebration={t:0,x:o.x,z:o.z,actors:[this.playerActor,this.ohmActor,...(this.regions.get(this.area.id)?.actors||[])].filter(a=>a.entity.enabled&&Math.hypot(a.g.position.x-o.x,a.g.position.z-o.z)<22)};
     for(const a of this.celebration.actors)if(a!==this.playerActor)a.animation=idleActor(actorDirection(o.x-a.g.position.x,o.z-a.g.position.z,a.animation.direction));
     const [ox,oz]=this.data.areas[this.area.id].offset,y=this.groundHeight(o.x,o.z);this.fireBurst([o.x+ox,y,o.z+oz],'#ffd98f');
+  }
+  // How lit the waking Ohm looks: dim like the sleeping figure until the light reaches him.
+  ohmWake(){if(!this.ohmAwaiting)return 1;const t=this.awakening?.t??0;return .52+.48*Math.max(0,Math.min(1,(t-.55)/.8));}
+  // «Una pequeña luz despierta bajo el vidrio»: it flickers, swells, beats twice and settles.
+  awakeningLevel(t,reduced){
+    if(reduced)return Math.min(1,t/.6)*.7*(t<2.2?1:Math.max(0,1-(t-2.2)/.8));
+    const flicker=t<.55?(t/.55)*(.18+.14*Math.sin(t*46)):0,swell=Math.max(0,Math.min(1,(t-.5)/.6)),beat=(at,w)=>Math.max(0,1-Math.abs(t-at)/w);
+    const hold=t<3.1?1:Math.max(0,1-(t-3.1)/1.4);
+    return Math.max(flicker,(swell*.62+.38*beat(1.2,.16)+.3*beat(1.55,.14))*hold);
+  }
+  updateAwakening(dt,reduced){
+    const w=this.awakening;if(!w||!this.ohmSpark)return;w.t+=dt;
+    const level=this.awakeningLevel(w.t,reduced),e=this.ohmSpark.entity,light=this.ohmSparkLight,a=this.ohmActor.entity;
+    const p=a.getPosition(),toward=this.camera.getPosition().clone().sub(p).normalize().mulScalar(.35);
+    e.enabled=level>.01;light.enabled=level>.01;
+    e.setPosition(p.x+toward.x,p.y+.78+toward.y,p.z+toward.z);// Small: it lights Ohm from inside, it does not hide him.
+    const size=.35+1.25*level;e.setLocalScale(size,1,size);
+    this.ohmSpark.material.opacity=Math.min(.7,level*.85);this.ohmSpark.material.update();
+    light.setPosition(p.x,p.y+.9,p.z+.4);light.light.intensity=4*level;
+    if(w.t>(reduced?3.1:4.6)){this.awakening=null;this.ohmAwaiting=false;e.enabled=false;light.enabled=false;}
   }
   fireBurst(origin,tint){
     const b=this.burst;b.origin=origin;b.t=0;b.root.enabled=true;b.material.emissive=color(tint);b.material.update();
@@ -320,7 +340,7 @@ export class PlayCanvasWorld {
       a.entity.setPosition(p.x+ox,p.y,p.z+oz);
       // Idle breathing: feet stay planted (bottom pivot), each actor on its own phase.
       const breathe=this.state.settings?.reducedMotion||a.animation?.moving?0:Math.sin(this.clock*2.1+a.phase)*.014;a.entity.setLocalScale(1-breathe*.4,1+breathe,1);
-      const night=inside?0:(this.lampLevel||0),sleep=a===this.sleeping?.52:1;a.entity.sprite.color=new Color((1-night*.22)*sleep,(1-night*.14)*sleep,(1-night*.03)*sleep);
+      const night=inside?0:(this.lampLevel||0),sleep=a===this.sleeping?.52:a===this.ohmActor?this.ohmWake():1;a.entity.sprite.color=new Color((1-night*.22)*sleep,(1-night*.14)*sleep,(1-night*.03)*sleep);
       if(a.shadow){a.shadow.enabled=a.entity.enabled;a.shadow.setPosition(p.x+ox,.105,p.z+oz+.06);}
     }
   }
@@ -342,7 +362,7 @@ export class PlayCanvasWorld {
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
-    this.syncActors();this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
+    this.syncActors();this.updateAwakening(dt,reduced);this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
     else{const rest=this.restPose(p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
       // Conversations keep the camera where the interaction began: the portrait says who speaks.
@@ -418,6 +438,9 @@ export class PlayCanvasWorld {
     for(const actor of [...this.allActors,this.playerActor,this.ohmActor,this.sleeping]){const e=new Entity('Sombra de '+actor.name);e.addComponent('render',{type:'plane'});e.render.material=contact;e.render.castShadows=false;e.setLocalScale(actor.name==='ohm'?1.3:.95,1,.65);this.app.root.addChild(e);actor.shadow=e;}
     const glow=(name,position,scale,tint,parent)=>{const e=new Entity(name),m=new StandardMaterial();m.diffuse=color(tint);m.emissive=color(tint);m.emissiveIntensity=1.2;m.diffuseMap=texture;m.opacityMap=texture;m.opacityMapChannel='a';m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update();e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(...position);e.setEulerAngles(62,0,0);e.setLocalScale(scale,1,scale);parent.addChild(e);return {entity:e,material:m};};
     {const e=new Entity('Superficie del Portal Ω');this.portalSurface=makePortalSurface(texture);e.addComponent('render',{type:'plane'});e.render.material=this.portalSurface;e.render.castShadows=false;e.setPosition(KINGDOM.portal.x,3.5,KINGDOM.portal.z-5.65);e.setEulerAngles(90,0,0);e.setLocalScale(5.5,1,5.5);this.regions.get('portal').root.addChild(e);}
+    // Ohm's first heartbeat: a cyan light under the glass, and its glow on the pedestal.
+    this.ohmSpark=glow('El primer latido de Ohm',[0,0,0],1,'#86ecff',this.app.root);this.ohmSpark.entity.enabled=false;
+    {const e=new Entity('Luz del primer latido');e.addComponent('light',{type:'omni',color:color('#9ff0ff'),intensity:0,range:5,castShadows:false});e.enabled=false;this.app.root.addChild(e);this.ohmSparkLight=e;}
     this.portalGlow=glow('La luz del Portal Ω',[KINGDOM.portal.x,2.8,KINGDOM.portal.z-5.45],5.2,'#73cbd3',this.regions.get('portal').root);
     // The festival the village kept waiting for: after the first lesson the Plaza's festoons
     // light up and the ribbons they bought "anyway" hang in the morning wind.

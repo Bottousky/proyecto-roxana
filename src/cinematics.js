@@ -31,7 +31,8 @@ export function createCinematic(id,context,{reducedMotion=false}={}){
     if(!context.companion)return null;
     const companion=context.companion,points=[player,companion,puzzle],xs=points.map(p=>p[0]),zs=points.map(p=>p[2]);
     const x=(Math.min(...xs)+Math.max(...xs))/2,z=(Math.min(...zs)+Math.max(...zs))/2,span=Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...zs)-Math.min(...zs));
-    const close=pose([x,1.1+companion[1]*.5,z],clamp(14/(span+6),1.1,1.62),[0,18,25]);
+    // Close enough to see the light come on under the glass.
+    const close=pose([x,1.1+companion[1]*.5,z],clamp(20/(span+6),1.35,1.75),[0,18,25]);
     const reveal=pose([x*.8,1.6,z-.7],1.28,[0,16.5,25]);
     shots=[key(1,close),key(2.4,close),key(3.5,reveal),key(definition.returnAt,reveal)];
   }else if(id==='workshop'){
