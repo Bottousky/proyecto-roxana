@@ -47,7 +47,8 @@ export function createCinematic(id,context,{reducedMotion=false}={}){
     // the Calzada's canal, the Plaza's) to the fountain, 95 m south. Spring-local coordinates.
     const pump=pose([puzzle[0],1.7,puzzle[2]],1.48),water=pose([2,1.4,-3.8],1.62,[0,16,25]),fountain=pose([-12,1.2,92.2],1.35,[0,15,25]);
     const springCanal=pose([20,.6,6],1.12,[0,16,25]),roadCanal=pose([41.8,.6,47],1.05,[0,16,25]),plazaCanal=pose([10,.6,86],1.12,[0,16,25]);
-    shots=[key(1,pump),key(2,pump),key(2.9,water),key(3.3,water),key(4,springCanal),key(4.8,roadCanal),key(5.6,plazaCanal),key(6.3,fountain),key(definition.returnAt,fountain)];
+    // Back from the Plaza by a cut to the wheel, not a 95 m flight over the treetops.
+    shots=[key(1,pump),key(2,pump),key(2.9,water),key(3.3,water),key(4,springCanal),key(4.8,roadCanal),key(5.6,plazaCanal),key(6.3,fountain),key(definition.returnAt,fountain),key(definition.returnAt+.04,water)];
   }else if(id==='irrigation'){
     const panel=pose([puzzle[0],1.7,puzzle[2]],1.38),canal=pose([(context.bounds?.[0]||40)*.36,1.5,-(context.bounds?.[1]||36)*.28+6.1],1.28,[0,17,25]);
     shots=[key(.9,panel),key(1.5,panel),key(3.3,canal),key(definition.returnAt,canal)];

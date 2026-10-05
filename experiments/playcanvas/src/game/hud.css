@@ -105,3 +105,5 @@
 /* Brújula del instrumento (100 unidades, dibujada de 92 px en escritorio a 64 px en el teléfono). */
 #hud #travel-compass text{font-size:13.5px!important;font-weight:600}
 @media (max-width:640px),(max-height:500px){#hud #travel-compass text{font-size:19px!important}}
+/* Teléfono apaisado: el título no cabe con sus rótulos decorativos; quedan nombre, frase y menú. */
+@media (max-height:450px){.title-eyebrow,.title-foot{display:none!important}.title-sigil{font-size:30px!important;margin:0!important}.title-content h1{font-size:52px!important;line-height:1.05}.title-rule{margin-top:6px!important}.title-tagline{font-size:17px!important;margin:10px 0 14px!important}.title-menu{gap:2px}.save-description{margin-top:6px!important}}

@@ -268,7 +268,9 @@ export class PlayCanvasWorld {
   startCinematic(id,{reducedMotion=false}={}){const p=this.area.objects.find(o=>o.puzzle===id);if(!p)return false;const timeline=createCinematic(id,{areaId:this.area.id,flags:this.state.flags,player:this.player.position.toArray(),companion:this.ohm.position.toArray(),puzzle:[p.x,1.4,p.z],bounds:this.area.bounds,start:this.cameraPose()},{reducedMotion});if(!timeline)return false;this.cinematic={timeline,elapsed:0};this.target=null;this.route=[];return true;}
   getCinematicState(){if(!this.cinematic)return null;return sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);}
   skipCinematic(){if(!this.cinematic)return false;this.cinematic={timeline:returningCinematic(this.cinematic.timeline.id,this.cameraPose(),gameplayCameraPose(this.area.id,this.player.position.toArray())),elapsed:0};return true;}
-  restPose(player){return this.home?{focus:[player[0]*.25,.4,-1.3+player[2]*.15],offset:[0,13.5,25],zoom:1.85}:gameplayCameraPose(this.area.id,player);}
+  // Interiors are framed as a whole room that only drifts with the player. On a tall screen the
+  // room does not fit across, so the camera follows the player further to bring each side in.
+  restPose(player){const tall=this.canvas.clientWidth<this.canvas.clientHeight;if(this.home)return {focus:[player[0]*(tall?.75:.25),.4,-1.3+player[2]*.15],offset:[0,13.5,25],zoom:1.85};const pose=gameplayCameraPose(this.area.id,player);if(tall&&this.area.id==='workshop')pose.focus[0]=player[0]*.85;return pose;}
   cancelCinematic(){this.cinematic=null;this.inspect=false;this.route=[];this.target=null;if(!this.area||!this.player)return;const p=this.restPose(this.player.position.toArray()),[ox,oz]=this.data.areas[this.area.id].offset;this.focus.set(p.focus[0]+ox,p.focus[1],p.focus[2]+oz);this.cameraOffset.fromArray(p.offset);this.currentZoom=p.zoom;this.positionCamera();}
   endCinematic(){this.cancelCinematic();}
   // The moment an installation returns: a ring of light runs over the ground, sparks rise

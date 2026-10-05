@@ -214,7 +214,7 @@ export class AudioDirector {
   playRestoration(id) {
     if (!this.context || this.context.state !== 'running' || this.muted || this.disposed) return false;
     const time = this.context.currentTime + .01;
-    const kinds = { gate: 'gate', pump: 'pump', irrigation: 'water', workshop: 'electrical', beacon_network: 'motor', awaken: 'electrical' };
+    const kinds = { gate: 'gate', pump: 'pump', irrigation: 'water', workshop: 'electrical', beacon_network: 'motor', awaken: 'electrical', distribution: 'electrical', beacon_supply: 'electrical' };
     const emitter = this.worldScene?.emitters?.find(item => item.kind === kinds[id]);
     const mix = emitter ? spatialMix(this.worldScene.listener, emitter) : { gain: 1, pan: 0 };
     const level = Math.max(.4, mix.gain), pan = mix.pan;
@@ -234,6 +234,10 @@ export class AudioDirector {
         for (let i = 0; i < 9; i++) { tone(120 + i * 3, i * .17, .2, .04);noise(i * .17, .09, .035, 700); }
         tone(96, 1.2, 1.6, .045);break;
       // A spark, a rising note, then two soft heartbeats with the light's two pulses.
+      // The Castillo: the infirmary lights, then the kitchen on its own branch, then the seal comes off.
+      case 'distribution': noise(0, .06, .07, 900);tone(330, .05, 1, .032);noise(.5, .06, .07, 900);tone(392, .55, 1, .03);noise(1.25, .14, .1, 420);tone(140, 1.3, .35, .045);break;
+      // The Faro's supply: a low generator hum that swells and settles under the tower.
+      case 'beacon_supply': tone(55, 0, 2, .07);tone(110, .25, 1.7, .035);noise(0, 1.6, .05, 260);break;
       case 'awaken': tone(520, 0, .3, .03);tone(780, .22, 1.1, .045);tone(68, 1.2, .2, .09);tone(68, 1.55, .18, .07);break;
       case 'beacon_lens': this.finale();break;
       default: return false;

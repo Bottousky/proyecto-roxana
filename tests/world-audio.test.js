@@ -76,3 +76,10 @@ for(const installation of [
     snapshot.tripped=false;assert.ok(audible(),'restoring the saved supply and protection restores its sound');
   }
 });
+
+test('every installation answers its restoration with its own sound', async ()=>{
+  const {PUZZLES}=await import('../src/puzzle-model.js');
+  const director=new AudioDirector(),played=[];
+  Object.assign(director,{context:{state:'running',currentTime:1},muted:false,disposed:false,effects:{},_tone:()=>played.push('tone'),_noise:()=>played.push('noise'),finale:()=>played.push('finale')});
+  for(const id of Object.keys(PUZZLES)){played.length=0;assert.equal(director.playRestoration(id),true,`${id} has an authored restoration sound`);assert.ok(played.length>0,`${id} plays something`);}
+});

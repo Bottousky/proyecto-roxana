@@ -48,4 +48,6 @@ test('restoring the pump follows the water down to the Plaza fountain before ret
   // On the way down the camera rests over the canal itself (spring origin at kingdom 12,-95).
   const nearWater=([x,,z])=>{const p=[x+12,z-95];let best=Infinity;for(let i=1;i<WATERCOURSE.length;i++){const a=WATERCOURSE[i-1],b=WATERCOURSE[i],dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dz)/(dx*dx+dz*dz)));best=Math.min(best,Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dz));}return best;};
   for(const t of [4,4.8,5.6])assert.ok(nearWater(sampleCinematic(timeline,t).pose.focus)<4,`at ${t}s the camera looks at the water`);
+  // The way back is a cut to the wheel: no frame of the return looks far from the Manantial.
+  for(let t=timeline.returnAt+.05;t<=timeline.duration;t+=.05){const [x,,z]=sampleCinematic(timeline,t).pose.focus;assert.ok(Math.hypot(x,z)<15,`at ${t.toFixed(2)}s the return camera stays at the Manantial`);}
 });

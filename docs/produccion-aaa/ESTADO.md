@@ -319,6 +319,34 @@ El circuito completo reproduce el archivo byte a byte. Detalle en
 atravesables sin casos y **partida completa contra la build de producción minificada**
 (`dist-perf`, `output/playthrough-cycle11-prod/`, 364 s, 0 errores).
 
+## Ciclo 12 · Jugar con el dedo, título apaisado, el regreso del Manantial y el audio (5 oct 2026)
+
+- **Táctil (13):** `scripts/qa-touch.mjs` juega en un teléfono emulado (390×844) sólo con toques
+  del protocolo de Chrome: título, lectura, cruceta, tocar suelo y objetos (acercarse y usar),
+  botón de interactuar, mapa, Bitácora y pausa, cruce a la Plaza, taller, medición con Ohm y dos
+  bancos resueltos por toque. Encontró un defecto real: en vertical, la cámara del taller (y de
+  las casas) se desplaza sólo el 35 % (25 %) de lo que se mueve el jugador; en 390 px el cierre
+  derecho y la taza quedaban fuera de cuadro y no se podían tocar. En pantallas verticales la
+  cámara de interiores ahora sigue más al jugador. Lo demás que falló en el camino eran errores
+  del guion (toques en el borde, conversaciones demoradas, la regla «tocar = acercarse y usar»),
+  corregidos en el guion sin cambiar el juego; queda registrado en sus comentarios.
+- **Título (11):** a 800×600 ya no se recorta. Sí se encimaba en teléfono apaisado (844×390):
+  rótulo cortado arriba y pie encima de «Opciones». En pantallas bajas se ocultan los rótulos
+  decorativos y se compacta el bloque.
+- **Manantial (8):** la cámara volvía de la fuente de la Plaza volando 95 m sobre copas; ahora
+  corta a la rueda y se acerca a la cámara de juego. Prueba: ningún cuadro del regreso sale del
+  Manantial (falla con el regreso anterior).
+- **Audio (14, por código):** el Castillo y la alimentación del Faro no tenían sonido propio de
+  restauración (sólo el clic genérico). Ahora: dos luces que se encienden una tras otra y el sello
+  que se retira; un zumbido grave de generador. Prueba: cada instalación tiene su respuesta
+  (falla con el audio anterior). Mute, volumen y silencio con la pestaña oculta están en el
+  código. Escucha real: NO VERIFICADA.
+
+Verificación (runtime idéntico a la copia evaluada): `npm test` 83/83 y 286/286, `npm run check`
+correcto; ruta principal (`output/playthrough-cycle12/`, 395 s), adversarial
+(`output/adversarial-cycle12/`, 562 s), táctil (`output/qa-touch-cycle12/`) y diálogos: todas
+completas y sin errores.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -331,14 +359,14 @@ atravesables sin casos y **partida completa contra la build de producción minif
 | 5 | Presentación | Profundidad de campo: el destino de cada llegada (fuente, rueda del Manantial, Castillo) queda borroso en el tercio superior | Hecho (ciclo 5) |
 | 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano | Revisado (ciclo 10): son el lugar anterior (continuidad), ya en foco; sin cambios |
 | 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía | Mejorado (ciclo 8): luz de lámparas al restaurar, mesa de dibujo y mostrador. Pendiente: objetos propios del oficio (cobre, vidrio, herramientas) |
-| 8 | Momentos | Despertar (ciclo 6), canal del Manantial, Ω de la Puerta y haz del Faro (ciclo 7). Menor: regreso de cámara del Manantial sobre copas | Hecho salvo detalle |
+| 8 | Momentos | Despertar (6), canal del Manantial, Ω de la Puerta y haz del Faro (7), regreso del Manantial (12) | Hecho |
 | 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep; fichas y coherencia del modelo | Hecho en lo verificable (ciclos 2 y 4): relato según traza, Ivara/Nereo exigen comprobación, volver ≠ poner en servicio, primera clase antes del cierre y acuerdo forja/riego en Terrazas están en el código y la partida los recorre; fichas y modelo en ciclo 4. El hallazgo 5 (estructura predecible por zona) es de ritmo: queda para revisión humana de diversión |
 | 10 | UI | Banco: tomaba un cable sin tener ninguno y la indicación «Ahora tocá otra pieza…» quedaba tras resolver | Hecho (ciclo 2) |
-| 11 | UI | Título a 800×600 recorta «OHMDAL» | Pendiente |
+| 11 | UI | Título recortado | Hecho (ciclo 12): 800×600 ya bien; corregido el teléfono apaisado |
 | 12 | Rendimiento | Medir build de producción en el M2: FPS, carga, memoria por zona | Hecho (ciclo 9): 60 FPS con margen en escritorio; móvil NO VERIFICADO |
 | 12b | Rendimiento | Descarga de 19,3 MB | Hecho (ciclo 11): 16,8 MB; geometría 11,3 → 8,8 MB |
-| 13 | Móvil | Controles táctiles y 390×844 (emulación; hardware real NO VERIFICADO) | Pendiente |
-| 14 | Audio | Sin escucha posible en esta sesión: revisar mezcla por código | Pendiente |
+| 13 | Móvil | Controles táctiles y 390×844 | Hecho en emulación (ciclo 12, `qa-touch.mjs`); hardware real NO VERIFICADO |
+| 14 | Audio | Revisión por código | Hecho (ciclo 12): sonidos de restauración completos; escucha NO VERIFICADA |
 | 15 | Presentación | (Hecho, ciclo 3) Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Pendiente |
 | 16 | Navegación | Detalles atravesables a la altura del pecho | Hecho (ciclo 10): 13 eran falsos positivos (margen menor que el cuerpo); 3 reales corregidos |
 | 17 | Assets | `portraits.webp` y `portraits-2.webp` (semirrealistas) ya no se usan: los retratos activos están en `art-polish/` y coinciden con los sprites | Limpieza |
@@ -355,10 +383,11 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 12: detalles restantes antes de la aceptación: título recortado a 800×600 (11), regreso
-de cámara del Manantial sobre copas (8), partida con controles táctiles emulados (13: cruceta,
-botón de interactuar, bancos por toque) y revisión del audio por código (14). Después:
-aceptación final con la misma build candidata y entrega.
+Ciclo 13: aceptación final con una build candidata fija (producción minificada, `dist-perf`
+del mismo commit): recorrido completo, adversarial, táctil y diálogos sobre esa build; revisión
+visual de las mejores y peores escenas; consola y recursos; actualizar README y producción con
+instrucciones de juego. Si sólo quedan bloqueos externos (móvil real, escucha, prueba con
+personas), entregar parcial exacta y detener el loop sin declarar cumplida la misión.
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`
