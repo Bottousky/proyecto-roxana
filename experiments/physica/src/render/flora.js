@@ -108,7 +108,8 @@ export class Plumbs extends Chains {
     return c;
   }
   update(dt, time) {
-    this.step(dt, time, 0.05);
+    // Instruments feel the field only: no wind, so their reading never contradicts it.
+    this.step(dt, time, 0);
     for (const c of this.chains) {
       const r = c.pts[0], b = c.pts[1];
       const dx = b.x - r.x, dy = b.y - r.y, l = Math.hypot(dx, dy) || 1;

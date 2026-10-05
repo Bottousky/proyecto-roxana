@@ -160,7 +160,7 @@ export function buildScene(world, { quality = 'high' } = {}) {
 
   // Supports, table and test spheres.
   const stands = world.stands.map(st => {
-    const s = new Stand({ ...st, z: -1.0, laneZ: LANE_Z[1], ruler: st.id === 'A' ? { x: st.x + 1.15, y0: 0, y1: 3, z: -0.75 } : null }, M);
+    const s = new Stand({ ...st, z: -1.0, laneZ: LANE_Z[1], ruler: st.id === 'A' ? { x: st.x + 0.5, y0: 0, y1: 3, z: -0.75 } : null }, M);
     scene.add(s.group); return s;
   });
   const table = new THREE.Group();

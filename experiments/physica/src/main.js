@@ -39,13 +39,14 @@ const cam = { x: world.avatar.x, y: 1.2, dist: 11.5 };
 const input = new Input(app);
 const sound = new Sound();
 const journal = new Journal(app, world);
+if (journal.footing && !params.has('fresh')) { const f = journal.footing, av = world.avatar; av.x = av.px = f.x; av.y = av.py = f.y; av.lastSupport = { ...f }; }
 
 // ---------- HUD ----------
 const hud = document.createElement('div'); hud.className = 'hud';
 hud.innerHTML = `
   <div class="title" id="title"><span class="eyebrow">Physica</span><b>La cascada ascendente</b></div>
   <div class="prompt" id="prompt" hidden><kbd id="prompt-key">E</kbd><span id="prompt-verb"></span></div>
-  <div class="hint" id="hint"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar experimento · <kbd>J</kbd> Bitácora</div>
+  <div class="hint" id="hint"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar (en el aire: volver a pisar firme) · <kbd>J</kbd> Bitácora</div>
   <div class="legend" id="legend" hidden><i></i> una marca cada 0,1 s · anillo cada 0,5 s</div>
   <div class="pause" id="pause" hidden><div><b>En pausa</b><p>El experimento quedó detenido donde estaba.</p><button id="resume">Seguir</button></div></div>
   ${debug ? '<pre class="debug" id="debug"></pre>' : ''}`;
@@ -166,7 +167,7 @@ function frame(now) {
     $('prompt-key').textContent = input.lastDevice === 'gamepad' ? 'A' : input.lastDevice === 'touch' ? 'E' : 'E';
     $('prompt-verb').textContent = it.verb;
   } else promptEl.hidden = true;
-  $('legend').hidden = !world.traces.length;
+  $('legend').hidden = !world.traces.length || journal.open;
   if (moved) { hintTimer -= dt; if (hintTimer < 0) $('hint').classList.add('gone'); }
   if (time > 4) $('title').classList.add('gone');
   if (debug) $('debug').textContent = `x ${av.x.toFixed(2)} y ${av.y.toFixed(2)} vx ${av.vx.toFixed(2)} vy ${av.vy.toFixed(2)}\ng ${(av.gy ?? 0).toFixed(2)} w ${zw.toFixed(2)} step ${world.stepCount}`;

@@ -22,7 +22,7 @@ export class Input {
     const pad = document.createElement('div');
     pad.className = 'touch';
     pad.innerHTML = `<div class="touch-move"><button data-axis="-1" aria-label="Izquierda">◀</button><button data-axis="1" aria-label="Derecha">▶</button></div>
-      <div class="touch-act"><button data-act="reset" aria-label="Reiniciar experimento">↺</button><button data-act="act" class="big" aria-label="Usar">E</button></div>`;
+      <div class="touch-act"><button data-act="journal" aria-label="Bitácora">✎</button><button data-act="reset" aria-label="Reiniciar">↺</button><button data-act="act" class="big" aria-label="Usar">E</button></div>`;
     root.appendChild(pad);
     const held = new Map();
     const upd = () => { let a = 0; for (const v of held.values()) a += v; this.touchAxis = Math.max(-1, Math.min(1, a)); };

@@ -96,7 +96,7 @@ export class Explorer {
     this.scarfMesh = new THREE.Mesh(this.scarfGeo, m.scarf); this.scarfMesh.frustumCulled = false; this.scarfMesh.castShadow = true;
     this.tuftMesh = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.14, 8), m.hair); this.tuftMesh.castShadow = true;
 
-    this.state = { yaw: Math.PI / 2, walk: 0, squash: 0, surprise: 0, blink: 0, nextBlink: 2, look: 0, armUp: 0, tuck: 0, lean: 0, carry: 0, push: 0 };
+    this.state = { yaw: -0.6, walk: 0, squash: 0, surprise: 0, blink: 0, nextBlink: 2, look: 0, armUp: 0, tuck: 0, lean: 0, carry: 0, push: 0 };
     this._a = { x: 0, y: 0 };
   }
 
@@ -105,6 +105,7 @@ export class Explorer {
   onEvent(e, avatarId) {
     if (e.body !== avatarId) return;
     if (e.type === 'enter') this.state.surprise = 1;
+    if (e.type === 'mantle') { this.state.armUp = 1.2; this.state.squash = 0.12; }
     if (e.type === 'impact' && e.speed > 1.2) this.state.squash = Math.min(0.28, e.speed * 0.05);
   }
 
@@ -114,8 +115,10 @@ export class Explorer {
     this.root.position.set(p.x, feetY, 0);
     const g = { x: s.gx ?? 0, y: s.gy ?? -9.8 }, gUp = g.y > 0.8;
     const air = !s.grounded;
-    // Facing: three-quarter toward the camera.
-    const yawT = s.facing > 0 ? Math.PI / 2 - 0.6 : -Math.PI / 2 + 0.6;
+    // Facing: three-quarter toward the camera. rotation.y = θ sends the face (+x local) to
+    // (cos θ, 0, −sin θ): θ = −0.6 looks right and a little toward the camera (+z);
+    // θ = −(π − 0.6) looks left the same way. Turning passes through facing the camera.
+    const yawT = s.facing > 0 ? -0.6 : -(Math.PI - 0.6);
     st.yaw += (yawT - st.yaw) * Math.min(1, dt * 10);
     this.body.rotation.y = st.yaw;
 

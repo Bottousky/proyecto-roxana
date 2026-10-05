@@ -11,18 +11,21 @@ primero.
 | A1 | Campo regional con banda, superposición y prioridad | Pruebas `field.test.js` | hecho (iter 1) |
 | A2 | Integración reproducible e independiente del render | Exacto para *a* constante; 30/60/144 Hz y frecuencia irregular dan la misma historia; sin bombeo de energía | hecho (iter 1) |
 | A3 | Soportes A y B con traza cada 0,1 s, carrete y repetición | Recorrido con teclado: la traza B repetida es idéntica | hecho (iter 1) |
-| A4 | Cruce del explorador sin salto, sin atasco | Prueba de ruta + `03-cruce` | hecho (iter 1) |
+| A4 | Cruce del explorador sin salto, sin atasco (también volviendo desde la Terraza) | Prueba de ruta + 7 tiempos de reacción + R en el aire + `03-cruce` | hecho (iter 1, tras revisión) |
 | A5 | Agua derivada del campo (arco, caídas familiares) | `ballisticPath` y prueba del arco; patrón a la velocidad de la parcela | hecho (iter 1) |
-| A6 | Borde descubrible sin color: plomadas, musgo, polen, sonido | `07-plomadas` muestra la inversión; falta verificar el musgo (se ve quebrado) y el sonido (no escuchado) | incompleto |
-| A7 | 60 FPS en escritorio en la cascada | p95 y p99 ≤ 17 ms en 4 s (M2, headless, 720p) | hecho (iter 1, tras textura de ruido; ver ESTADO) |
+| A6 | Borde descubrible sin color: plomadas, musgo, polen, sonido | `07-plomadas` y `08-musgo-sima` muestran la inversión; el sonido no se escuchó | incompleto (sonido) |
+| A7 | 60 FPS en escritorio en la cascada | p95 y p99 ≤ 17 ms en reposo y durante el cruce (M2, headless, 720p) | hecho (iter 1; falta el peor caso con varias trazas activas) |
 | A8 | **Anticipar antes de probar** | El jugador puede comprometer una predicción sin texto: por ejemplo, colocar un receptor o una canasta donde cree que va a llegar la esfera antes de soltarla. El resultado se compara con la predicción en la traza. | pendiente |
 | A9 | **Transferencia**: la misma regla en otra geometría, sin repetir la explicación | Segunda configuración en la misma escena (por ejemplo, una región alta con techo, o un saliente donde la esfera llevada por la mano debe llegar a un receptor), resoluble sólo usando la regla | pendiente |
 | A10 | Acabado de roca: detalle de cerca, estratos con relieve legible | Primer plano a 5 m sin manchas borrosas; comparación antes/después | pendiente |
-| A11 | Musgo sin quiebres: barbas suaves que cuelgan y se invierten | Primer plano de la sima: hebras continuas, abajo de y = −3,4 cuelgan y arriba suben | pendiente |
-| A12 | Avatar: animaciones de esfuerzo, deslizamiento, sorpresa legibles | Secuencia del cruce con pose distinguible por estado | incompleto (hay pose de suspensión y sorpresa; falta revisarla en movimiento) |
+| A11 | Musgo sin quiebres: barbas suaves que cuelgan y se invierten | Primer plano de la sima: hebras continuas, abajo de y = −3,4 cuelgan y arriba suben | hecho (iter 1, `08-musgo-sima`) |
+| A12 | Avatar: animaciones de esfuerzo, deslizamiento, sorpresa legibles | Secuencia del cruce con pose distinguible por estado | incompleto (orientación corregida: ahora se le ve la cara; faltan esfuerzo y deslizamiento) |
 | A13 | Sonido verificado por una persona | Pedido explícito a un humano | bloqueado (no se puede escuchar) |
 | A14 | Táctil y mando probados en dispositivo | Recorrido en un teléfono real y con un mando | bloqueado (sin dispositivo) |
 | A15 | Modo móvil ≥ 30 FPS medido en un dispositivo representativo | Tiempos de cuadro reportados con dispositivo y navegador | bloqueado (sin dispositivo) |
+| A17 | **Modificar**: la energía del campo viene de un aparato que el jugador puede afectar | La caída familiar de la izquierda mueve una rueda visible que alimenta las anclas. Desviar el agua baja `power`, el arco cambia y la región se debilita gradualmente. Las anclas responden a la carga. Prueba: el arco recalculado con `power` < 1 no cruza. | pendiente |
+| A18 | Plano de establecimiento que reúna las dos caídas familiares y el arco | Al entrar, una toma que deja ver la composición completa | pendiente |
+| A19 | El arco se rompe en la cresta (gotas, sección variable) y salpica con volumen al aterrizar | Secuencia comparable antes/después | pendiente |
 | A16 | Accesibilidad: movimiento reducido, texto legible, señales redundantes, remapeo | `?reduced` existe y no hay menú; falta un menú de opciones con volumen, movimiento reducido y tamaño de texto | pendiente |
 
 ## Hito B — primer episodio (no empezado)

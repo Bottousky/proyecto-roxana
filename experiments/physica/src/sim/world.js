@@ -28,6 +28,8 @@ export const AVATAR = {
   aGround: 22,          // m/s² locomotion authority while supported
   aAir: 3.5,            // m/s² air steering: a declared control assist, horizontal only
   reach: 1.05,          // m, interaction distance
+  mantle: 0.45,         // m: an edge this far above the feet can be climbed (declared assist)
+  mantleTime: 0.28,     // s the climb takes; the climb, not the field, moves the body meanwhile
 };
 export const SPHERE = { r: 0.17, mass: 1.2, restitution: 0.35, friction: 0.32 };
 const BOUNCE_MIN = 0.7;  // m/s: slower normal impacts settle instead of bouncing
@@ -92,10 +94,16 @@ export class World {
   step() {
     const inp = this.input;
     for (const b of this.bodies) this.snapshotPrev(b);
-    if (inp.reset) { inp.reset = false; this.resetExperiment(); }
+    if (inp.reset) {
+      inp.reset = false;
+      // R restarts what is at stake: the explorer if it has been adrift, otherwise the experiment.
+      if (this.avatar.airSteps > 1.5 / DT && this.avatar.lastSupport) this.returnToFooting();
+      else this.resetExperiment();
+    }
     if (inp.act) { inp.act = false; this.interact(); }
 
     const av = this.avatar;
+    if (av.heldBy?.type === 'mantle') this.updateMantle(av);
     for (const b of this.bodies) {
       if (b.heldBy) continue;
       const a0 = this.fieldOn(b, this._a);
@@ -119,6 +127,11 @@ export class World {
     for (const b of this.bodies) {
       if (b.heldBy) continue;
       b.supportSteps = b.support ? b.supportSteps + 1 : 0;
+      if (b === av) {
+        av.airSteps = av.supportSteps ? 0 : (av.airSteps || 0) + 1;
+        const sd = av.support?.solid;
+        if (av.supportSteps > 30 && sd && av.x - av.hw >= sd.x0 + 0.3 && av.x + av.hw <= sd.x1 - 0.3) av.lastSupport = { x: av.x, y: av.y };
+      }
       if (b.y < -30 || b.y > 60 || Math.abs(b.x) > 200) this.recover(b);
     }
     if (inp.x > 0.1) av.facing = 1; else if (inp.x < -0.1) av.facing = -1;
@@ -133,6 +146,40 @@ export class World {
 
   fieldOn(b, out) {
     return b.shape === 'box' ? this.field.onBody(b.x, b.y, b.hw, b.hh, out) : this.field.onBody(b.x, b.y, b.r * 0.7, b.r * 0.7, out);
+  }
+
+  /**
+   * Climbing an edge: pressing against a wall whose top is just above the feet, with no
+   * support, the explorer grabs the edge and pulls itself onto it. A declared assist (it acts
+   * through the explorer's own hands, not through the field) with a fixed duration.
+   */
+  tryMantle(av, s, nx) {
+    const ix = this.input.x;
+    if (av.supportSteps > 0 || av.heldBy || ix * nx >= -0.1) return;
+    const feet = av.y - av.hh, rise = s.y1 - feet;
+    if (rise < -0.02 || rise > AVATAR.mantle || Math.abs(av.vy) > 3) return;
+    const to = { x: (nx < 0 ? s.x0 : s.x1) - nx * (av.hw + 0.06), y: s.y1 + av.hh + 0.002 };
+    for (const o of this.solids) {
+      if (o === s || (o.only && o.only !== 'box')) continue;
+      if (to.x + av.hw > o.x0 && to.x - av.hw < o.x1 && to.y + av.hh > o.y0 && to.y - av.hh < o.y1) return;
+    }
+    av.heldBy = { type: 'mantle', from: { x: av.x, y: av.y }, to, t: 0 };
+    av.vx = 0; av.vy = 0;
+    this.emit('mantle', { body: av.id, x: to.x, y: to.y });
+  }
+
+  updateMantle(av) {
+    const m = av.heldBy; m.t += DT;
+    const k = Math.min(1, m.t / AVATAR.mantleTime), up = Math.min(1, k * 1.6), across = Math.max(0, (k - 0.35) / 0.65);
+    av.x = m.from.x + (m.to.x - m.from.x) * across; av.y = m.from.y + (m.to.y - m.from.y) * up;
+    if (k >= 1) { av.heldBy = null; av.vx = 0; av.vy = 0; }
+  }
+
+  returnToFooting() {
+    const av = this.avatar, p = av.lastSupport;
+    if (av.holding) { av.holding.heldBy = null; av.holding.vx = av.holding.vy = 0; av.holding = null; }
+    av.heldBy = null; av.x = p.x; av.y = p.y; av.vx = av.vy = 0; av.airSteps = 0; this.snapshotPrev(av);
+    this.emit('footing', { body: av.id, x: p.x, y: p.y });
   }
 
   /** Horizontal acceleration the explorer applies to itself. Declared assist, never vertical. */
@@ -152,9 +199,9 @@ export class World {
     return -(nx * b.gx + ny * b.gy) / g > 0.6;
   }
 
-  contact(b, nx, ny, mu, other = null, record = true) {
+  contact(b, nx, ny, mu, other = null, record = true, solid = null) {
     const vn = b.vx * nx + b.vy * ny;
-    if (this.supportsAgainst(b, nx, ny)) b.support = { nx, ny, other };
+    if (this.supportsAgainst(b, nx, ny)) b.support = { nx, ny, other, solid };
     if (vn >= 0) return;
     const e = -vn > BOUNCE_MIN ? b.restitution : 0;
     b.vx -= (1 + e) * vn * nx; b.vy -= (1 + e) * vn * ny;
@@ -189,7 +236,8 @@ export class World {
         let nx = 0, ny = 0;
         if (oy <= ox) { ny = b.y > (s.y0 + s.y1) / 2 ? 1 : -1; b.y += ny * oy; }
         else { nx = b.x > (s.x0 + s.x1) / 2 ? 1 : -1; b.x += nx * ox; }
-        this.contact(b, nx, ny, 0, null, record);
+        this.contact(b, nx, ny, 0, null, record, s);
+        if (nx && b === this.avatar) this.tryMantle(b, s, nx);
       }
     }
   }
@@ -335,7 +383,13 @@ export class World {
       const b = this.bodies.find(x => x.id === tr.body);
       tr.marks.push(this.mark(b, n * DT));
       const resting = b.supportSteps > 30 && Math.hypot(b.vx, b.vy) < 0.05;
-      if (tr.marks.length >= TRACE_MAX_MARKS || resting || b.heldBy) { tr.done = true; tr.end = resting ? 'reposo' : b.heldBy ? 'tomada' : 'límite'; }
+      const last = tr.marks[tr.marks.length - 1], prev = tr.marks[tr.marks.length - 2];
+      if (prev && prev.vy < -0.05) tr.descended = true;
+      // One excursion: the trace closes when a descent turns into a rise (a bounce or a return).
+      const turned = tr.descended && prev && prev.vy < 0 && last.vy >= 0;
+      if (tr.marks.length >= TRACE_MAX_MARKS || resting || b.heldBy || turned) {
+        tr.done = true; tr.end = resting ? 'reposo' : b.heldBy ? 'tomada' : turned ? 'vuelta' : 'límite';
+      }
     }
   }
 

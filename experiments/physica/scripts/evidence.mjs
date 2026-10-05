@@ -74,22 +74,23 @@ await sleep(600);
 writeFileSync(join(out, '00-inicio.png'), await page.screenshot());
 step('inicio', { state: await state() });
 
+const standX = await page.evaluate(() => Object.fromEntries(window.__physica.world.stands.map(s => [s.id, s.x])));
 // 1 — familiar fall at support A.
-let s = await walkTo(-11.1);
+let s = await walkTo(standX.A - 0.05);
 step('en soporte A', { x: s.avatar.x });
 await page.keyboard.press('e');
 const fallA = await capture(8, 70, (st, i) => `A t≈${(st.t).toFixed(2)}s y=${st.stands[0].y.toFixed(2)}`);
-await sheet('01-caida-familiar', fallA.shots, 4, 'Soporte A, fuera de la región: la esfera cae (marcas cada 0,1 s)');
+await sheet('01-caida-familiar', fallA.shots, 4, 'Soporte A, fuera de la región, a 1,8 m: la esfera cae (marcas cada 0,1 s)');
 await sleep(800);
 const trA = await page.evaluate(() => window.__physica.world.traces.find(t => t.source === 'A'));
 step('traza A', { marks: trA.marks.length, end: trA.end, y: trA.marks.map(m => +m.y.toFixed(3)) });
 
 // 2 — release inside the region at support B.
-s = await walkTo(-1.15);
+s = await walkTo(standX.B + 0.05);
 step('en soporte B', { x: s.avatar.x });
 await page.keyboard.press('e');
 const riseB = await capture(12, 180, st => `B t≈${st.t.toFixed(2)}s y=${st.stands[1].y.toFixed(2)} vy=${st.stands[1].vy.toFixed(2)}`);
-await sheet('02-subida-en-region', riseB.shots, 4, 'Soporte B, dentro de la región: soltada en reposo, sube, sale por arriba, frena y vuelve a entrar');
+await sheet('02-subida-en-region', riseB.shots, 4, 'Soporte B, dentro de la región, a la misma altura y a 2,95 m de A: sube, sale por arriba, frena y vuelve');
 const trB = await page.evaluate(() => window.__physica.world.traces.find(t => t.source === 'B'));
 step('traza B', { marks: trB.marks.length, y: trB.marks.map(m => +m.y.toFixed(3)), vy: trB.marks.map(m => +m.vy.toFixed(3)) });
 // Reel back.
@@ -104,8 +105,9 @@ const trB2 = await page.evaluate(() => { const ts = window.__physica.world.trace
 const same = trB2.marks.slice(0, 15).every((m, i) => Math.abs(m.y - trB.marks[i].y) < 1e-9);
 step('repetición B', { identicalFirst15: same });
 
-// 3 — the explorer's own crossing, walking off the lip.
+// 3 — the explorer's own crossing, walking off the lip (frame times recorded meanwhile).
 s = await walkTo(-2.0);
+await page.evaluate(() => window.__physica.resetFrames());
 await page.keyboard.down('ArrowRight');
 const traj = [], crossShots = [];
 const t0 = Date.now();
@@ -120,7 +122,19 @@ await page.keyboard.up('ArrowRight');
 await sleep(800);
 await sheet('03-cruce', crossShots, 4, 'Cruce: caminar fuera del borde, la región eleva al explorador, sale por arriba y baja en la Terraza');
 s = await state();
-step('cruce', { final: s.avatar, landedOnTerrace: s.avatar.x > 4.6 && Math.abs(s.avatar.y - 0.55 - 3) < 0.02 && s.avatar.grounded });
+step('cruce', { final: s.avatar, landedOnTerrace: s.avatar.x > 4.6 && Math.abs(s.avatar.y - 0.55 - 3) < 0.02 && s.avatar.grounded,
+  framesDuringCrossing: await page.evaluate(() => window.__physica.stats()), note: 'includes 16 screenshots taken during the crossing' });
+
+// 3b — reviewer's case: step back into the region from the Terraza, float, then hold ▶.
+await walkTo(5.6);
+await page.keyboard.down('ArrowLeft'); await sleep(450); await page.keyboard.up('ArrowLeft');
+await sleep(900);
+await page.keyboard.down('ArrowRight');
+const back = [];
+for (let i = 0; i < 160; i++) { const st = await state(); back.push(st.avatar); if (st.avatar.x > 4.7 && st.avatar.grounded) break; await sleep(25); }
+await page.keyboard.up('ArrowRight');
+const bl = back[back.length - 1];
+step('volver a la Terraza', { samples: back.length, final: bl, onTerrace: bl.x > 4.7 && bl.grounded && Math.abs(bl.y - 3.55) < 0.02, mantle: (await page.evaluate(() => window.__physica.events.filter(e => e.type === 'mantle').length)) });
 writeFileSync(join(out, 'trayectoria-cruce.json'), JSON.stringify(traj));
 
 // 4 — Bitácora and save/load.
@@ -131,8 +145,9 @@ await page.keyboard.press('j');
 const before = (await state()).journal;
 await page.reload();
 await page.waitForFunction(() => window.__physica && window.__physica.world.stepCount > 30);
-const after = (await state()).journal;
-step('guardado', { before, after, persisted: JSON.stringify(before) === JSON.stringify(after) });
+const reloaded = await state();
+const after = reloaded.journal;
+step('guardado', { before, after, persisted: JSON.stringify(before) === JSON.stringify(after), explorerAfterReload: reloaded.avatar, resumedOnTerrace: reloaded.avatar.x > 4.6 && reloaded.avatar.y > 3 });
 
 // 5 — pause and resume: the simulation must not jump.
 await page.evaluate(() => window.__physica.setPaused(true));
@@ -142,7 +157,7 @@ await sleep(300); const p2 = (await state()).step;
 step('pausa', { stepsWhilePaused: p1 - p0, stepsAfterResume300ms: p2 - p1 });
 
 // 6 — frame times at the cascade, idle, 6 s.
-await page.evaluate(() => { const w = window.__physica.world; w.avatar.x = -1.2; w.avatar.px = -1.2; w.avatar.y = 0.55; });
+await page.evaluate(() => { const w = window.__physica.world; w.avatar.x = -1.2; w.avatar.px = -1.2; w.avatar.y = 0.55; w.avatar.py = 0.55; });
 await sleep(1500);
 await page.evaluate(() => window.__physica.resetFrames());
 await sleep(6000);
@@ -150,6 +165,12 @@ const stats = await page.evaluate(() => window.__physica.stats());
 const gl = await page.evaluate(() => { const c = document.createElement('canvas').getContext('webgl2'); const d = c.getExtension('WEBGL_debug_renderer_info'); return d ? c.getParameter(d.UNMASKED_RENDERER_WEBGL) : 'unknown'; });
 step('rendimiento', { stats, renderer: gl, viewport: '1280x720', note: 'headless Chrome; frame interval includes vsync wait' });
 writeFileSync(join(out, '06-cascada.png'), await page.screenshot());
+// 6b — frame times during a real crossing with no screenshots (worst case of this scene).
+await page.evaluate(() => { const w = window.__physica.world, a = w.avatar; a.x = a.px = -3; a.y = a.py = 0.55; a.vx = a.vy = 0; });
+await sleep(800);
+await page.evaluate(() => window.__physica.resetFrames());
+await page.keyboard.down('ArrowRight'); await sleep(4500); await page.keyboard.up('ArrowRight');
+step('rendimiento-cruce', { stats: await page.evaluate(() => window.__physica.stats()), traces: (await state()).traces.length, final: (await state()).avatar });
 // Close-ups (inspection camera): instruments at the lip, moss on the chasm walls.
 await page.evaluate(() => window.__physica.inspect(0.3, 2.6, 5.5)); await sleep(2500);
 writeFileSync(join(out, '07-plomadas.png'), await page.screenshot());

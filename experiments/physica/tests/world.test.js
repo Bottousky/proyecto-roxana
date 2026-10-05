@@ -240,8 +240,9 @@ test('traces sample the experiment itself at equal time intervals', () => {
 test('the route is never blocked: release A, release B, then cross (no jam on instruments)', () => {
   const w = fresh(), av = w.avatar;
   const walkTo = (x, max = 15) => { let n = 0; while (Math.abs(av.x - x) > 0.12 && n++ < max / DT) { w.input.x = Math.sign(x - av.x); w.step(); } w.input.x = 0; run(w, 0.3); };
-  walkTo(-11); w.input.act = true; w.step(); run(w, 1.5);
-  walkTo(-1.1); assert.ok(Math.abs(av.x + 1.1) < 0.2, `reached support B (x=${av.x})`);
+  walkTo(stand(w, 'A').x); w.input.act = true; w.step(); run(w, 1.5);
+  assert.equal(stand(w, 'A').state, 'free', 'A released');
+  walkTo(stand(w, 'B').x + 0.05); assert.ok(Math.abs(av.x - stand(w, 'B').x) < 0.25, `reached support B (x=${av.x})`);
   w.input.act = true; w.step(); run(w, 0.5);
   let n = 0; while (n++ < 12 / DT && !(av.x > 5 && av.supportSteps > 10)) { w.input.x = 1; w.step(); }
   assert.ok(av.x > 5 && Math.abs(av.y - AVATAR.hh - 3) < 0.01, `on the terrace (x=${av.x}, y=${av.y})`);
@@ -261,4 +262,28 @@ test('taking a sphere from the table, carrying it and letting go at the lip send
   assert.equal(av.holding, null);
   run(w, 5);
   assert.ok(b.x > 4.5 && Math.abs(b.y - (3 + SPHERE.r)) < 0.06, `sphere ended at ${b.x.toFixed(2)},${b.y.toFixed(2)}`);
+});
+
+test('returning from the Terraza: stepping back into the region and holding ▶ gets back onto it', () => {
+  // Reviewer's case: walk left off the terrace, float, then hold right at various reaction times.
+  for (const react of [0.3, 0.6, 1.0, 1.3, 1.8, 2.5, 3.2]) {
+    const w = fresh(), av = w.avatar;
+    av.x = 6; av.y = 3 + AVATAR.hh; av.px = av.x; av.py = av.y;
+    run(w, 0.3);
+    let n = 0; while (av.x > 4.3 && n++ < 600) { w.input.x = -1; w.step(); }
+    run(w, react, { x: 0 });
+    let ok = false;
+    for (let i = 0; i < 10 / DT && !ok; i++) { w.input.x = 1; w.step(); ok = av.x > 4.6 && av.supportSteps > 10 && Math.abs(av.y - AVATAR.hh - 3) < 0.02; }
+    assert.ok(ok, `reaction ${react}s: stuck at x=${av.x.toFixed(2)} y=${(av.y - AVATAR.hh).toFixed(2)}`);
+  }
+});
+
+test('R while floating with no support returns the explorer to its last firm footing', () => {
+  const w = fresh(), av = w.avatar;
+  av.x = -1; run(w, 1.8, { x: 0.35 }); run(w, 0.4, { x: 0 });
+  assert.equal(av.supportSteps, 0, 'floating');
+  run(w, 2, { x: 0 });
+  w.input.reset = true; w.step();
+  run(w, 0.3);
+  assert.ok(av.supportSteps > 0 && av.x < 0 && Math.abs(av.y - AVATAR.hh) < 0.01, `back on the Orilla at ${av.x.toFixed(2)},${av.y.toFixed(2)}`);
 });

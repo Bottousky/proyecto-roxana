@@ -28,9 +28,11 @@ export const CASCADA = {
     { id: 'pared-este', x0: 23, x1: 25, y0: -9, y1: 14 },
   ],
   // Release supports: the sphere hangs from a clamp; a reel keeps a slack thread on it.
+  // A and B release from the same height, 2.95 m apart, on either side of the boundary:
+  // only the place changes between the two experiments.
   stands: [
-    { id: 'A', label: 'Soporte de la orilla', x: -11, baseY: 0, clampX: -10.35, clampY: 2.6, threadMax: 9 },
-    { id: 'B', label: 'Soporte del borde', x: -1.0, baseY: 0, clampX: 1.1, clampY: 1.1, threadMax: 9 },
+    { id: 'A', label: 'Soporte de la orilla', x: -2.9, baseY: 0, clampX: -1.85, clampY: 1.8, threadMax: 9 },
+    { id: 'B', label: 'Soporte del borde', x: -1.0, baseY: 0, clampX: 1.1, clampY: 1.8, threadMax: 9 },
   ],
   // Loose spheres rest on a table behind the path until the explorer takes one.
   loose: [

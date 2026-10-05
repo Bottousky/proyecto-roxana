@@ -139,45 +139,50 @@ export function conduit(M, pts, { r = 0.06 } = {}) {
   return g;
 }
 
-/** Trace marks of experiments: equal-interval dots joined by a hairline. */
+/** Trace marks of experiments: equal-interval dots joined by a hairline (one draw per kind). */
 export class Traces {
   constructor(scene) {
     this.scene = scene; this.items = new Map();
     this.dot = new THREE.CircleGeometry(0.045, 14);
     this.big = new THREE.RingGeometry(0.05, 0.085, 18);
     this.colors = { A: '#fff4d8', B: '#a9fff1', mano: '#ffc35a' };
+    this.m4 = new THREE.Matrix4();
   }
   sync(traces, zOf = () => 0.3) {
     const alive = new Set();
-    traces.forEach((tr, i) => {
+    for (const tr of traces) {
       alive.add(tr.id);
       let it = this.items.get(tr.id);
       if (!it) {
         const col = new THREE.Color(this.colors[tr.source] || '#ffffff');
-        it = { group: new THREE.Group(), count: 0, mat: new THREE.MeshBasicMaterial({ color: col, transparent: true, depthWrite: false }),
-          ring: new THREE.MeshBasicMaterial({ color: col, transparent: true, depthWrite: false }) };
+        it = { group: new THREE.Group(), count: 0, z: zOf(tr.body),
+          mat: new THREE.MeshBasicMaterial({ color: col, transparent: true, depthWrite: false }),
+          ringMat: new THREE.MeshBasicMaterial({ color: col, transparent: true, depthWrite: false }) };
+        it.dots = new THREE.InstancedMesh(this.dot, it.mat, TRACE_CAP); it.dots.count = 0; it.dots.frustumCulled = false;
+        it.rings = new THREE.InstancedMesh(this.big, it.ringMat, Math.ceil(TRACE_CAP / 5) + 1); it.rings.count = 0; it.rings.frustumCulled = false;
         const lg = new THREE.BufferGeometry();
         lg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(TRACE_CAP * 3), 3)); lg.setDrawRange(0, 0);
         it.line = new THREE.Line(lg, new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.5 })); it.line.frustumCulled = false;
-        it.group.add(it.line); it.group.renderOrder = 8; this.scene.add(it.group); this.items.set(tr.id, it);
+        it.group.add(it.line, it.dots, it.rings); it.group.renderOrder = 8; this.scene.add(it.group); this.items.set(tr.id, it);
       }
       const newer = traces.filter(t => t.source === tr.source && t.id > tr.id).length;
       const fade = newer === 0 ? 1 : newer === 1 ? 0.45 : 0.22;
-      it.mat.opacity = 0.95 * fade; it.ring.opacity = 0.9 * fade; it.line.material.opacity = 0.45 * fade;
-      while (it.count < tr.marks.length) {
-        const m = tr.marks[it.count];
-        const z = it.z ?? (it.z = zOf(tr.body));
-        const d = new THREE.Mesh(this.dot, it.mat); d.position.set(m.x, m.y, z + 0.01); it.group.add(d);
-        if (it.count % 5 === 0) { const r = new THREE.Mesh(this.big, it.ring); r.position.set(m.x, m.y, z); it.group.add(r); }
-        it.count++;
-      }
-      if (it.lineCount !== tr.marks.length) {
-        const a = it.line.geometry.attributes.position, n = Math.min(TRACE_CAP, tr.marks.length);
-        for (let i = 0; i < n; i++) a.setXYZ(i, tr.marks[i].x, tr.marks[i].y, (it.z ?? 0.3) - 0.01);
+      it.mat.opacity = 0.95 * fade; it.ringMat.opacity = 0.9 * fade; it.line.material.opacity = 0.45 * fade;
+      const n = Math.min(TRACE_CAP, tr.marks.length);
+      if (it.count !== n) {
+        const a = it.line.geometry.attributes.position;
+        for (let i = it.count; i < n; i++) {
+          const m = tr.marks[i];
+          this.m4.makeTranslation(m.x, m.y, it.z + 0.01); it.dots.setMatrixAt(i, this.m4);
+          if (i % 5 === 0) { this.m4.makeTranslation(m.x, m.y, it.z); it.rings.setMatrixAt(i / 5, this.m4); }
+          a.setXYZ(i, m.x, m.y, it.z - 0.01);
+        }
+        it.dots.count = n; it.rings.count = Math.floor((n - 1) / 5) + 1;
+        it.dots.instanceMatrix.needsUpdate = true; it.rings.instanceMatrix.needsUpdate = true;
         a.needsUpdate = true; it.line.geometry.setDrawRange(0, n);
-        it.lineCount = tr.marks.length;
+        it.count = n;
       }
-    });
-    for (const [id, it] of this.items) if (!alive.has(id)) { this.scene.remove(it.group); this.items.delete(id); }
+    }
+    for (const [id, it] of this.items) if (!alive.has(id)) { this.scene.remove(it.group); it.dots.dispose(); it.rings.dispose(); it.line.geometry.dispose(); this.items.delete(id); }
   }
 }

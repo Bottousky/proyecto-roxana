@@ -1,10 +1,26 @@
 // La Bitácora formalises after the experience. Every number in a note is read from the
 // experiment that just happened (its trace marks and contact events), never written ahead.
 // Notes never block play and nothing asks the player to answer anything.
-import { SPHERE, DT } from './sim/world.js';
+import { DT } from './sim/world.js';
 
 const KEY = 'physica.v1';
 const fmt = (v, d = 1) => v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+/** Height where a rising trace stops accelerating upward: its second differences change sign. */
+export function boundaryFromMarks(marks) {
+  const d = i => marks[i + 1].y - 2 * marks[i].y + marks[i - 1].y;
+  for (let i = 2; i < marks.length - 1; i++) {
+    if (marks[i].vy > 0 && d(i - 1) > 0 && d(i) <= 0) return marks[i].y;
+  }
+  return null;
+}
+
+/** The marks of the first rise, up to just below where the acceleration changed. */
+export function firstRise(marks, yb) {
+  const out = [];
+  for (const m of marks) { if (yb != null && m.y >= yb - 0.25) break; out.push(m); }
+  return out;
+}
 
 /** Least-squares a for y = y0 + v0·t + ½·a·t² over marks (t relative to the first). */
 export function fitAcceleration(marks) {
@@ -28,13 +44,13 @@ export class Journal {
     this.toastEl = document.createElement('div'); this.toastEl.className = 'toast'; this.toastEl.hidden = true;
     root.append(this.panel, this.toastEl);
     this.toastT = 0;
-    try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s?.notes) { this.notes = s.notes; this.flags = s.flags || {}; } } catch { /* storage unavailable: start empty */ }
+    try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s?.notes) { this.notes = s.notes; this.flags = s.flags || {}; this.footing = s.footing || null; } } catch { /* storage unavailable: start empty */ }
     this.render();
   }
 
   ids() { return this.notes.map(n => n.id); }
   has(id) { return this.notes.some(n => n.id === id); }
-  save() { try { localStorage.setItem(KEY, JSON.stringify({ notes: this.notes, flags: this.flags })); } catch { /* not persisted */ } }
+  save() { try { localStorage.setItem(KEY, JSON.stringify({ notes: this.notes, flags: this.flags, footing: this.world.avatar.lastSupport || this.footing })); } catch { /* not persisted */ } }
 
   add(id, title, body, data = null) {
     if (this.has(id)) return;
@@ -64,8 +80,12 @@ export class Journal {
     if (e.type === 'exit' && e.zone === 'cascada' && !this.has('subida')) {
       const tr = w.traces.find(t => t.source === 'B' && t.body === e.body && !t.done);
       if (tr && tr.marks.length >= 4) {
-        const z = w.field.zones[0], inside = tr.marks.filter(m => m.y < z.y1 - z.band / 2 - SPHERE.r);
+        // Fit only the stretch before the measured acceleration changed: read from the marks,
+        // not from the scene's configuration.
+        const yb = boundaryFromMarks(tr.marks);
+        const inside = firstRise(tr.marks, yb);
         this.flags.aB = fitAcceleration(inside);
+        this.flags.yB = yb;
         this.flags.pendingB = tr.id;
       }
     }
@@ -73,19 +93,24 @@ export class Journal {
       const tr = w.traces.find(t => t.id === this.flags.pendingB);
       if (tr && tr.body === e.body) {
         const h0 = tr.marks[0].y, peak = Math.max(...tr.marks.map(m => m.y));
+        const yb = this.flags.yB;
         this.add('subida', 'Soltada, subió',
-          `Desde el soporte del borde la esfera no cayó: sin que nadie la empujara, salió hacia arriba y cada marca quedó más lejos de la anterior. Pasó el borde de la región, a ${fmt(w.field.zones[0].y1, 1)} m, frenó, llegó a ${fmt(peak, 2)} m y volvió a entrar bajando. Adentro frena y vuelve a subir.`,
-          { h0, peak, a: this.flags.aB });
+          `Desde el soporte del borde, a la misma altura que el de la orilla, la esfera no cayó: sin que nadie la empujara salió hacia arriba y cada marca quedó más lejos de la anterior.${yb != null ? ` Cerca de ${fmt(yb, 1)} m dejó de acelerar hacia arriba` : ' Más arriba dejó de acelerar hacia arriba'}, frenó, llegó a ${fmt(peak, 2)} m y volvió a bajar. Adentro frena y vuelve a subir.`,
+          { h0, peak, yb, a: this.flags.aB });
       }
     }
+    if (e.type === 'enter' && e.body === w.avatar.id && e.zone === 'cascada' && this.flags.climbFrom == null) this.flags.climbFrom = w.avatar.y - w.avatar.hh;
     if (e.type === 'exit' && e.body === w.avatar.id && e.zone === 'cascada') this.flags.wasInside = true;
   }
 
   update(dt) {
     const w = this.world, av = w.avatar;
+    if (this.flags.climbFrom != null && !this.has('cruce')) this.flags.climbTop = Math.max(this.flags.climbTop ?? -Infinity, av.y - av.hh);
     if (!this.has('cruce') && this.flags.wasInside && av.x > 4.7 && av.supportSteps > 20 && Math.abs(av.y - av.hh - 3) < 0.05) {
+      const rise = this.flags.climbTop - this.flags.climbFrom;
       this.add('cruce', 'Por el camino del agua',
-        `Caminaste fuera del borde y la región te levantó como al agua: subiste más de tres metros sin saltar y bajaste en la Terraza. Afuera de la región todo vuelve a caer como siempre.`);
+        `Caminaste fuera del borde y la región te levantó como al agua: tus pies subieron ${fmt(rise, 1)} m sin saltar y bajaste en la Terraza. Afuera de la región todo vuelve a caer como siempre.`,
+        { rise });
     }
     if (!this.has('medida') && this.has('caida') && this.has('subida') && this.flags.aA != null && this.flags.aB != null) {
       this.add('medida', 'Dos condiciones, dos aceleraciones',
@@ -93,6 +118,9 @@ export class Journal {
         { aA: this.flags.aA, aB: this.flags.aB, formula: 'y = y₀ + ½·a·t²' });
     }
     if (this.toastT > 0) { this.toastT -= dt; if (this.toastT <= 0) this.toastEl.hidden = true; }
+    // Keep the last firm footing saved so a reload resumes where the explorer stood.
+    const ls = av.lastSupport;
+    if (ls && (!this.footing || Math.abs(ls.x - this.footing.x) > 0.5 || Math.abs(ls.y - this.footing.y) > 0.1)) { this.footing = { ...ls }; this.save(); }
   }
 
   render() {
