@@ -30,7 +30,9 @@ test('Exterior passages agree in world coordinates and have traversable midpoint
  for(const [id,area] of Object.entries(AREAS))for(const exit of area.exits){const p=passageGeometry(id,exit.target);if(!p)continue;const back=passageGeometry(exit.target,id);assert.deepEqual(p.mid,back.mid);for(const side of [id,exit.target]){const q=fromKingdom(side,p.mid);assert.ok(walkableTerrain(side,...q),`${side} corridor`);}}
 });
 test('Gate collision responds to commissioning; fast movement cannot tunnel through masonry',()=>{
- const closed=world('road'),open=world('road',{gate:true});assert.equal(closed.obstacles.length,open.obstacles.length+1);
+ const closed=world('road'),open=world('road',{gate:true});
+ // Opening removes the leaf and the lifting chains that hang to the ground only while it is shut; nothing else.
+ const gateParts=closed.obstacles.filter(o=>o.gate);assert.ok(gateParts.some(o=>o.w>=10),'the leaf blocks the passage while shut');assert.equal(gateParts.length,3);assert.equal(closed.obstacles.length,open.obstacles.length+gateParts.length);assert.ok(!open.obstacles.some(o=>o.gate));
  const w=world('plaza');const hit=moveWithCollisions([-13.25,9],[0,-15],w.bounds,w.obstacles,{isWalkable:w.walkableLand});assert.ok(hit[1]>7,'workshop facade blocks a high-speed step');
  assert.equal(walkableTerrain('spring',-11,0),false);assert.equal(walkableTerrain('lake',18,0),false);
 });

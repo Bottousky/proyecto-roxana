@@ -13,7 +13,7 @@ const buf = raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength);
 const view = (m, k) => new (k === 'indices' ? Uint32Array : Float32Array)(buf, m[k].offset, m[k].length);
 for (const id of Object.keys(AREAS).filter(isExterior)) {
   const [ox, oz] = scene.areas[id].offset, [bw, bd] = AREAS[id].bounds, obs = [...scene.areas[id].obstacles.map(o => ({ ...o, x: o.x - ox, z: o.z - oz })), ...dressingObstacles(id, props)];
-  const cells = new Map();
+  const cells = new Map(), names = {};
   for (const m of scene.meshes) {
     if (m.area !== id || m.material.alpha > 0 || m.material.opacity < 1 || m.material.texture === 'water' || m.dynamic) continue;
     const p = view(m, 'positions'), t = view(m, 'indices');
@@ -25,12 +25,14 @@ for (const id of Object.keys(AREAS).filter(isExterior)) {
       if (Math.max(...xs) - Math.min(...xs) > 3 || Math.max(...zs) - Math.min(...zs) > 3) continue;
       const cx = xs.reduce((a, b) => a + b) / 3, cz = zs.reduce((a, b) => a + b) / 3;
       if (Math.abs(cx) > bw / 2 || Math.abs(cz) > bd / 2 || !walkableTerrain(id, cx, cz)) continue;
-      if (obs.some(o => Math.abs(cx - o.x) < o.w + .15 && Math.abs(cz - o.z) < o.d + .15)) continue;
+      // The traveller's body (radius .34, as in navigation) never gets closer than that to a collider.
+      if (obs.some(o => Math.abs(cx - o.x) < o.w + .34 && Math.abs(cz - o.z) < o.d + .34)) continue;
       const k2 = Math.round(cx * 2) + ',' + Math.round(cz * 2); cells.set(k2, (cells.get(k2) || 0) + 1);
+      (names[k2] ??= new Set()).add(`${m.owner || '·'}/${m.material.texture || m.material.color}`);
     }
   }
   // cluster
   const seen = new Set(), groups = [];
   for (const k of cells.keys()) { if (seen.has(k)) continue; const stack = [k], g = []; seen.add(k); while (stack.length) { const c = stack.pop(); g.push(c); const [a, b] = c.split(',').map(Number); for (const [da, db] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const n = (a + da) + ',' + (b + db); if (cells.has(n) && !seen.has(n)) { seen.add(n); stack.push(n); } } } groups.push(g); }
-  for (const g of groups) { const pts = g.map(c => c.split(',').map(v => v / 2)); const x = pts.reduce((s, p) => s + p[0], 0) / pts.length, z = pts.reduce((s, p) => s + p[1], 0) / pts.length; console.log(id, 'walk-through at', x.toFixed(1), z.toFixed(1), 'cells', g.length); }
+  for (const g of groups) { const pts = g.map(c => c.split(',').map(v => v / 2)); const x = pts.reduce((s, p) => s + p[0], 0) / pts.length, z = pts.reduce((s, p) => s + p[1], 0) / pts.length; console.log(id, 'walk-through at', x.toFixed(1), z.toFixed(1), 'cells', g.length, [...new Set(g.flatMap(c => [...(names[c] || [])]))].join(' ')); }
 }

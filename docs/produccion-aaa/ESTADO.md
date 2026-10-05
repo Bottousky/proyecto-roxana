@@ -281,6 +281,33 @@ calidad alta); memoria estable tras tres vueltas; sin errores. Carga local de 2,
 referencia NO VERIFICADO (sin dispositivo). Para medir sin abrir la build entregada se agregó
 `VITE_INSPECT=1` (acceso de inspección en una build aparte) y `scripts/perf.mjs`.
 
+## Ciclo 10 · Nada que se atraviese y la Puerta que se mueve entera (5 oct 2026)
+
+- **Auditoría de atravesables con el radio real:** `scripts/audit-walkthrough.mjs` daba 16 casos
+  usando 0,15 m de margen; el cuerpo mide 0,34 m (el mismo radio de la navegación) y no llega a
+  esas celdas. Con el radio real quedaban tres casos verdaderos, y ahora informa qué pieza es.
+- **Calzada:** las cadenas que levantan el rastrillo colgaban hasta el suelo delante de la Puerta
+  sin colisión. Ahora frenan mientras la Puerta está cerrada y desaparecen al abrirse, con el
+  mismo mecanismo que la reja (`gateObstacles`, raíz y exportador). Además, en PlayCanvas sólo
+  subía la reja: cadenas, contrapesos y engranajes quedaban fijos en la pose cerrada (la cadena
+  colgaba hasta el suelo con la Puerta abierta). Se exportan como piezas móviles y responden con
+  la reja, como en el original: la cadena se recoge, los contrapesos bajan, los engranajes giran.
+- **Manantial:** un cable bajaba en diagonal desde 3,5 m hasta el suelo cruzando la altura del
+  pecho; ahora baja vertical a un borne con colisión.
+- **Taller:** dos carretes de alambre de cobre envejecido (no luminoso), con colisión.
+- La auditoría de atravesables queda sin casos. La prueba de la Puerta (`arc.test.mjs`) exigía
+  que abrir quitara un solo obstáculo; ahora quita la reja y las dos cadenas. Se actualizó con
+  la misma intención: al abrir desaparecen sólo las piezas de la Puerta.
+- **Ocluyentes de primer plano (6):** revisadas las ocho llegadas (`output/arrivals-cycle8.png`).
+  Las torres que aparecen delante al entrar al Manantial y a Terrazas son el lugar que se acaba
+  de dejar: muestran la continuidad del reino. Con el foco del ciclo 5 ya no salen borrosas y la
+  transparencia mantiene visible al jugador. Sin cambios.
+
+Verificación (runtime idéntico a la copia evaluada): `npm test` 83/83 y 285/285, `npm run check`
+correcto, auditoría de atravesables sin casos, ruta principal (`output/playthrough-cycle10/`,
+404 s) y adversarial (`output/adversarial-cycle10/`, 551 s) completas y sin errores. Revisión
+visual de la Puerta abierta, los carretes y el borne (`output/cycle10-visits.png`).
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -291,7 +318,7 @@ referencia NO VERIFICADO (sin dispositivo). Para medir sin abrir la build entreg
 | 3 | Navegación | Utilería sobre caminos | Hecho (ciclo 1) |
 | 4 | Navegación | Faroles de la escena sobre caminos (Mercado y Terrazas) | Hecho (ciclo 2) |
 | 5 | Presentación | Profundidad de campo: el destino de cada llegada (fuente, rueda del Manantial, Castillo) queda borroso en el tercio superior | Hecho (ciclo 5) |
-| 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano (torre de la Puerta al entrar al Manantial, torre del Castillo en Terrazas) | Pendiente |
+| 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano | Revisado (ciclo 10): son el lugar anterior (continuidad), ya en foco; sin cambios |
 | 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía | Mejorado (ciclo 8): luz de lámparas al restaurar, mesa de dibujo y mostrador. Pendiente: objetos propios del oficio (cobre, vidrio, herramientas) |
 | 8 | Momentos | Despertar (ciclo 6), canal del Manantial, Ω de la Puerta y haz del Faro (ciclo 7). Menor: regreso de cámara del Manantial sobre copas | Hecho salvo detalle |
 | 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep; fichas y coherencia del modelo | Hecho en lo verificable (ciclos 2 y 4): relato según traza, Ivara/Nereo exigen comprobación, volver ≠ poner en servicio, primera clase antes del cierre y acuerdo forja/riego en Terrazas están en el código y la partida los recorre; fichas y modelo en ciclo 4. El hallazgo 5 (estructura predecible por zona) es de ritmo: queda para revisión humana de diversión |
@@ -302,7 +329,7 @@ referencia NO VERIFICADO (sin dispositivo). Para medir sin abrir la build entreg
 | 13 | Móvil | Controles táctiles y 390×844 (emulación; hardware real NO VERIFICADO) | Pendiente |
 | 14 | Audio | Sin escucha posible en esta sesión: revisar mezcla por código | Pendiente |
 | 15 | Presentación | (Hecho, ciclo 3) Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Pendiente |
-| 16 | Navegación | 16 detalles a la altura del pecho sin colisión (postes de porche y toldo, marcos), ya presentes en la base (`scripts/audit-walkthrough.mjs`) | Pendiente |
+| 16 | Navegación | Detalles atravesables a la altura del pecho | Hecho (ciclo 10): 13 eran falsos positivos (margen menor que el cuerpo); 3 reales corregidos |
 | 17 | Assets | `portraits.webp` y `portraits-2.webp` (semirrealistas) ya no se usan: los retratos activos están en `art-polish/` y coinciden con los sprites | Limpieza |
 
 ## Comandos útiles (desde `experiments/playcanvas`)
@@ -317,10 +344,11 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 10: navegación y presentación restante: ocluyentes borrosos de primer plano en llegadas
-(6), los 16 detalles atravesables de la auditoría (16) y objetos de oficio en el taller (7).
-Después: reducir la descarga (12b) y la pasada de aceptación final (recorrido + adversarial,
-revisión visual de mejores y peores escenas).
+Ciclo 11: reducir la descarga (12b): cuantizar colores (RGBA8), normales (Int8) e índices
+(Uint16 donde alcanza) como último paso de `export:world`, con lector compatible; medir bytes,
+memoria y tiempo de carga antes/después y comparar capturas (los colores llevan la oclusión).
+Después: pasada de aceptación final con la misma build candidata (recorrido completo +
+adversarial + revisión visual de mejores y peores escenas) y preparar la entrega.
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`

@@ -219,7 +219,7 @@ export class World {
 
   loadArea(area,state={},spawn,{deferRender=false,continuous=false}={}) {
     if(!this.lastAssetResult?.ok)throw new Error(`Required artwork is not ready. Await assetsReady and retry loadArtAssets if needed. Missing: ${(this.lastAssetResult?.missing||[]).join(', ')}`);
-    this.clearArea();this.area=area;this.layout=AREA_LAYOUTS[area.id];this.pavingGrid=null;this.boundaryObstacles=[];this.state=state;this.rand=seeded(area.id);this.root=new THREE.Group();this.scene.add(this.root);this.localGeometries=[];this.obstacles=[];this.walkSurfaces=[];this.animations=[];this.lamps=[];this.hangingLamps=[];this.machines=[];this.actors=[];this.waterMaterials=[];this.restorationParticles=[];this.objectModels=new Map();this.levers=[];this.conductors=[];this.treeModels=[];this.fountainStreams=[];this.fountainWater=[];this.irrigationWater=[];this.springWaterworks=null;this.dormantOhm=null;this.gateLeaf=null;this.gateObstacle=null;this.gateway=null;this.cinematic=null;this.target=null;
+    this.clearArea();this.area=area;this.layout=AREA_LAYOUTS[area.id];this.pavingGrid=null;this.boundaryObstacles=[];this.state=state;this.rand=seeded(area.id);this.root=new THREE.Group();this.scene.add(this.root);this.localGeometries=[];this.obstacles=[];this.walkSurfaces=[];this.animations=[];this.lamps=[];this.hangingLamps=[];this.machines=[];this.actors=[];this.waterMaterials=[];this.restorationParticles=[];this.objectModels=new Map();this.levers=[];this.conductors=[];this.treeModels=[];this.fountainStreams=[];this.fountainWater=[];this.irrigationWater=[];this.springWaterworks=null;this.dormantOhm=null;this.gateLeaf=null;this.gateObstacle=null;this.gateObstacles=[];this.gateway=null;this.cinematic=null;this.target=null;
     this.continuous=continuous&&area.id!=='workshop';this.coreBounds=area.bounds;
     const p=PALETTES[area.id]||PALETTES.plaza;this.palette=p;this.scene.background=new THREE.Color(p.sky);this.scene.fog=new THREE.FogExp2(p.fog,area.id==='workshop'?.0015:.004);
     this.m={stone:this.mat(p.stone,'stone'),stoneDark:this.mat('#6d786c','stone'),cream:this.mat('#d5c2a0','stone'),timber:this.mat('#ffffff','timber'),wood:this.mat('#ad8150','wood'),darkwood:this.mat('#5e4837','wood'),roof:this.mat('#648b89','roof'),roofRed:this.mat('#ba7858','roof'),metal:this.mat('#4c655f',null,{metalness:.72,roughness:.5}),brass:this.mat('#bc9857',null,{metalness:.65,roughness:.36}),grass:this.mat(p.grass,'ground'),path:this.mat('#d0bd96','cobble'),leaf:this.mat('#518557'),leafLight:this.mat('#8c9a52'),flower:this.mat('#e0c27c'),blue:this.mat('#56c7c6',null,{emissive:'#42bdbc',emissiveIntensity:.75}),dark:this.mat('#233d41'),cloth:this.mat('#c6a365',null,{side:THREE.DoubleSide}),redcloth:this.mat('#a85f4d',null,{side:THREE.DoubleSide}),glass:this.mat('#edca8a',null,{emissive:'#fdb966',emissiveIntensity:.45}),white:this.mat('#e3d2a1')};
@@ -413,6 +413,9 @@ export class World {
     for(const side of [-1,1]){const x=side*(w/2-1.5);this.solid(x,-3,1.4,9,"workshop-shelves");for(let y=1.2;y<4.4;y+=1.0){this.box(x,y,-3.0,1.4,.14,9,this.m.darkwood);for(let k=0;k<11;k++){const z=-6.8+k*.76;this.box(x+(this.rand()-.5)*.55,y+.2,z,.18+this.rand()*.2,.25+this.rand()*.35,.32,k%4===0?this.m.leaf:k%3?this.m.redcloth:this.m.brass);}}}
     for(let k=0;k<4;k++){const x=-5.5+k*2.1;this.box(x,2.45,-d/2+.75,1.6,1.0,.06,this.m.darkwood);for(let j=0;j<4;j++){this.beam([x-.5+j*.3,2.5,-d/2+.88],[x-.5+j*.3,2.12,-d/2+.88],.05,this.m.metal);this.torus(x-.5+j*.3,2.65,-d/2+.9,.1,.025,this.m.brass);}}
     for(const pos of [[-3,-4],[5,0],[-6,5],[6,6]])this.stool(...pos);
+    // Copper wire on spools, the raw material of every repair: aged copper, never glowing.
+    const copper=this.mat('#9c5f3c',null,{metalness:.55,roughness:.55});
+    for(const [x,z] of [[-8.2,-3.3],[7.6,2.6]]){this.cylinder(x,.06,z,.6,.12,this.m.darkwood);this.cylinder(x,.46,z,.42,.7,copper);this.cylinder(x,.86,z,.6,.12,this.m.darkwood);this.solid(x,z,1.2,1.2,'workshop-copper-spool');}
     for(let i=0;i<6;i++){const x=-8+i*2.5;this.cable([[x,5.6,-11],[x,5.4,-7],[x+.7,4.8,-5]],i%2?this.m.metal:this.m.brass);}
     const warm=new THREE.PointLight('#ffd4a1',17,20,1.5);warm.position.set(-7,4,3);this.root.add(warm);
     this.box(-w*.44,2.2,d*.38,1.6,4.4,2.5,this.m.darkwood);for(let y of [1,2.1,3.2,4.3]){this.box(-w*.42,y,d*.38,1.9,.13,2.7,this.m.wood);for(let k=0;k<4;k++)this.box(-w*.42,y+.22,d*.30+k*.5,.6,.4,.28,k%2?this.m.brass:this.m.roofRed);}
@@ -436,7 +439,7 @@ export class World {
   }
   buildSpring(w,d){
     this.springWaterworks=buildSpringWaterworks(this);
-    this.cable([[3,3.5,-10],[3,3.5,-4],[6,.6,-4]],this.m.metal);
+    this.cable([[3,3.5,-10],[3,3.5,-4],[6,3.5,-4],[6,.75,-4]],this.m.metal);this.box(6,.38,-4,.36,.76,.36,this.m.darkwood);this.solid(6,-4,.22,.22,'spring-line-drop');
     this.fountain(-2,-4.5,1.5);this.lamp(5,7,3);this.lamp(-5,7,3);
   }
   buildCastle(w,d){
@@ -727,7 +730,7 @@ export class World {
     for(const water of this.irrigationWater||[])water.visible=!!f.irrigation;
     for(const stream of this.fountainStreams)stream.visible=!!f.pump;
     for(const water of this.fountainWater)water.visible=!!f.pump;
-    if(this.gateObstacle){const present=this.obstacles.includes(this.gateObstacle);if(f.gate&&present)this.obstacles.splice(this.obstacles.indexOf(this.gateObstacle),1);if(!f.gate&&!present)this.obstacles.push(this.gateObstacle);}
+    for(const o of this.gateObstacles||[]){const present=this.obstacles.includes(o);if(f.gate&&present)this.obstacles.splice(this.obstacles.indexOf(o),1);if(!f.gate&&!present)this.obstacles.push(o);}
     this.renderer.shadowMap.needsUpdate=true;
   }
   update(dt,state=this.state,input={x:0,z:0,run:false}){

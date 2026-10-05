@@ -489,7 +489,13 @@ export class PlayCanvasWorld {
     if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?1.5+2.2*n:0;}
     for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color(g.area==='workshop'?'#ffc57d':'#ff9f45');g.material.emissiveIntensity=g.area==='workshop'?level:level*1.5;g.material.update();}
     for(const d of this.dynamics){const e=d.entity,flag=!!f[d.flag],motion=reduced?0:1;
-      if(d.kind==='gate'){const wanted=f.gate?1:0;d.progress+=(wanted-d.progress)*Math.min(1,dt*1.2);e.setPosition(d.pivot[0],d.pivot[1]+d.progress*5.8,d.pivot[2]);}
+      if(d.kind==='gate'){const wanted=f.gate?1:0;d.progress+=(wanted-d.progress)*Math.min(1,dt*1.2);e.setPosition(d.pivot[0],d.pivot[1]+d.progress*5.8,d.pivot[2]);this.gateProgress=d.progress;}
+      // The lifting gear follows the leaf (src/world-gateway.js setPose): the chain winds from the
+      // leaf's top up to the drive, the counterweight drops, the drive turns.
+      if(['gate-chain','gate-weight','gate-drive'].includes(d.kind)){const k=this.gateProgress??(f.gate?1:0);
+        if(d.kind==='gate-chain'){const bottom=k*5.8+.55,top=8.35;e.setPosition(d.pivot[0],(bottom+top)/2,d.pivot[2]);e.setLocalScale(1,Math.max(.01,(top-bottom)/7.8),1);}
+        if(d.kind==='gate-weight')e.setPosition(d.pivot[0],d.pivot[1]-k*5,d.pivot[2]);
+        if(d.kind==='gate-drive')e.setRotation(d.rotation.setFromAxisAngle(d.axle,d.side*k*414));}
       if(d.kind==='lever'){d.angle+=((flag?-37:37)-d.angle)*Math.min(1,dt*8);e.setEulerAngles(d.axis==='z'?0:d.angle,0,d.axis==='z'?d.angle:0);}
       if(['wheel','gear','optic'].includes(d.kind)){const enabled=d.receiver?d.feedback?.moving:d.flag?flag:d.area==='spring'?(d.kind==='wheel'?(f.spring_sluice??f.pump):(f.spring_sluice??f.pump)&&(f.spring_coupling??f.pump)):d.kind==='optic'?f.beacon_network&&f.tower_lens_free:true;if(enabled)d.angle+=dt*d.speed*57.3*motion;e.setRotation(d.rotation.setFromAxisAngle(d.axle,d.angle));}
       if(d.kind==='boat'){e.setPosition(d.pivot[0],d.pivot[1]+Math.sin(this.clock*.8)*.055*motion,d.pivot[2]);}

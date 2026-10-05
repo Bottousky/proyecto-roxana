@@ -30,6 +30,8 @@ function capture(world,id,offset=[0,0],landscape=false){
     tag(a.obj,{kind:a.kind,speed:a.speed||.2,flag:a.activationFlag,receiver:a.receiverId,spinAxis:axis.toArray().map(round)});
   }
   tag(world.gateLeaf,{kind:'gate'});
+  // The gate's lifting gear answers with the leaf: chains wind up, counterweights drop, drives turn.
+  if(world.gateway){for(const c of world.gateway.chains)tag(c,{kind:'gate-chain'});for(const w of world.gateway.weights)tag(w,{kind:'gate-weight'});for(const {mesh,side} of world.gateway.drives)tag(mesh,{kind:'gate-drive',side,spinAxis:[0,0,1]});}
   for(const l of world.levers||[])tag(l.pivot,{kind:'lever',flag:l.obj.action?.flag||l.obj.flag,axis:l.waterHandle?'z':'x'});
   for(const l of world.levers||[])tag(l.indicator,{kind:'control',object:l.obj.id});
   world.root.traverse(o=>{if(o.isMesh){const wire=world.conductors?.find(w=>w.mat===o.material);if(wire)tag(o,{kind:'conductor',object:wire.obj.id,return:wire.isReturn});}});
@@ -106,7 +108,7 @@ for(const id of Object.keys(AREAS)){
   w.bankTextures=Array.from({length:3},()=>new T.Texture());w.treeTextures=Array.from({length:6},()=>new T.Texture());
   w.loadArea(AREAS[id],w.state,AREAS[id].spawn,{continuous:id!=='workshop',deferRender:true});
   const offset=id==='workshop'?[0,0]:[KINGDOM[id].x,KINGDOM[id].z];
-  output.areas[id]={offset,bounds:AREAS[id].bounds,spawn:AREAS[id].spawn,walkSurfaces:w.walkSurfaces||[],entrances:entrancesOf(w),obstacles:w.obstacles.map(o=>({...o,gate:o===w.gateObstacle,x:o.x+offset[0],z:o.z+offset[1]}))};
+  output.areas[id]={offset,bounds:AREAS[id].bounds,spawn:AREAS[id].spawn,walkSurfaces:w.walkSurfaces||[],entrances:entrancesOf(w),obstacles:w.obstacles.map(o=>({...o,gate:(w.gateObstacles||[w.gateObstacle]).includes(o),x:o.x+offset[0],z:o.z+offset[1]}))};
   capture(w,id,offset);
   if(id==='plaza'){
     const original=w.root;w.root=new T.Group();w.localGeometries=[];w.waterMaterials=[];buildKingdomLandscape(w);capture(w,'landscape',[0,0],true);w.root=original;
