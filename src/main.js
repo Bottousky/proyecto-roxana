@@ -538,4 +538,5 @@ function loop(now){
 }
 requestAnimationFrame(loop);
 // Development-only inspection of the actual game; excluded from production.
-if(import.meta.env.DEV)window.__ohmdal={get state(){return state},get world(){return world},get mode(){return mode},get nearby(){return nearby},get workbench(){return workbench}};
+// Read-only inspection for tests: development, or a measurement build (VITE_INSPECT=1), never the shipped one.
+if(import.meta.env.DEV||import.meta.env.VITE_INSPECT==='1')window.__ohmdal={get state(){return state},get world(){return world},get mode(){return mode},get nearby(){return nearby},get workbench(){return workbench}};

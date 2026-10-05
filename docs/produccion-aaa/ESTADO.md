@@ -272,6 +272,15 @@ Autocrítica: a oscuras la mesa de dibujo se lee pequeña y oscura; los respland
 lámparas son discos algo grandes. Faltan objetos propios del oficio (bobinas de cobre, frascos,
 herramientas): el kit no los tiene y no se fabricaron.
 
+## Ciclo 9 · Rendimiento medido en la build de producción (5 oct 2026)
+
+Resultados y método en [RENDIMIENTO.md](RENDIMIENTO.md). En el M2 con Chrome, los nueve lugares
+caben en 60 FPS en las tres configuraciones medidas (peor cuadro: 15,2 ms a 2448×1530 px en
+calidad alta); memoria estable tras tres vueltas; sin errores. Carga local de 2,6 s al mundo y
+19,3 MB transferidos: la descarga es la debilidad (geometría en coma flotante). Móvil de
+referencia NO VERIFICADO (sin dispositivo). Para medir sin abrir la build entregada se agregó
+`VITE_INSPECT=1` (acceso de inspección en una build aparte) y `scripts/perf.mjs`.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -288,7 +297,8 @@ herramientas): el kit no los tiene y no se fabricaron.
 | 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep; fichas y coherencia del modelo | Hecho en lo verificable (ciclos 2 y 4): relato según traza, Ivara/Nereo exigen comprobación, volver ≠ poner en servicio, primera clase antes del cierre y acuerdo forja/riego en Terrazas están en el código y la partida los recorre; fichas y modelo en ciclo 4. El hallazgo 5 (estructura predecible por zona) es de ritmo: queda para revisión humana de diversión |
 | 10 | UI | Banco: tomaba un cable sin tener ninguno y la indicación «Ahora tocá otra pieza…» quedaba tras resolver | Hecho (ciclo 2) |
 | 11 | UI | Título a 800×600 recorta «OHMDAL» | Pendiente |
-| 12 | Rendimiento | Medir build de producción en el M2: FPS, carga, memoria por zona | Pendiente |
+| 12 | Rendimiento | Medir build de producción en el M2: FPS, carga, memoria por zona | Hecho (ciclo 9): 60 FPS con margen en escritorio; móvil NO VERIFICADO |
+| 12b | Rendimiento | Descarga de 19,3 MB: cuantizar colores, normales e índices de la geometría (≈4 MB menos) | Pendiente |
 | 13 | Móvil | Controles táctiles y 390×844 (emulación; hardware real NO VERIFICADO) | Pendiente |
 | 14 | Audio | Sin escucha posible en esta sesión: revisar mezcla por código | Pendiente |
 | 15 | Presentación | (Hecho, ciclo 3) Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Pendiente |
@@ -307,10 +317,10 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 9: rendimiento en build de producción (12): medir FPS/tiempo de cuadro por zona, carga
-inicial y memoria al recorrer, en el M2 con Chrome, contra el objetivo de 60 FPS en escritorio.
-La medición headless está topada por vsync: usar una métrica sin tope (tiempo de CPU/GPU por
-cuadro o rAF sin vsync) y declararlo. Después: ocluyentes de primer plano (6), atravesables (16).
+Ciclo 10: navegación y presentación restante: ocluyentes borrosos de primer plano en llegadas
+(6), los 16 detalles atravesables de la auditoría (16) y objetos de oficio en el taller (7).
+Después: reducir la descarga (12b) y la pasada de aceptación final (recorrido + adversarial,
+revisión visual de mejores y peores escenas).
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`
