@@ -444,14 +444,15 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-**Entrega parcial y loop detenido (5 oct 2026).** Sólo quedan bloqueos externos:
-- móvil de referencia y tacto real (no hay dispositivo);
+**Entrega parcial, candidata `6abad80` (5 oct 2026).** Aceptación repetida tras el ciclo 14
+([ACEPTACION.md](ACEPTACION.md)). Siguen pendientes y fuera del alcance de este equipo:
+- móvil real (tacto y 30 FPS);
 - escucha del audio;
-- revisión humana de diversión y aprendizaje, que también debe juzgar el ritmo de las zonas y
-  las escenas menos logradas de ACEPTACION.md.
+- revisión humana de diversión y aprendizaje;
+- rendimiento absoluto de esta revisión en un equipo sin otras sesiones.
 
-Para retomar con esos resultados, abrir `/loop` con este encargo. El punto de partida es la
-build `9b5cd5e`, con las pruebas y los guiones de este directorio.
+Siguen accionables y discutibles con el usuario: la oscuridad de la llegada al Faro de noche, el
+Lago al crepúsculo (dominan las copas) y el taller a oscuras, todos pedidos así por el canon.
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`

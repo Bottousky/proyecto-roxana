@@ -1,4 +1,36 @@
-# Aceptación del Arco I · build candidata `9b5cd5e` (5 oct 2026)
+# Aceptación del Arco I
+
+## Candidata vigente: `6abad80` (5 oct 2026)
+
+Reemplaza a `9b5cd5e` (sección siguiente). Después de la primera entrega, el usuario señaló que los
+bancos estaban sobrecargados; también eran accionables otros pendientes de la crítica (ciclo 14 en
+[ESTADO.md](ESTADO.md)). Mismo método: `dist/` entregable y `dist-perf/` con inspección de sólo
+lectura, recursos idénticos byte a byte.
+
+| Comprobación | Resultado | Evidencia |
+|---|---|---|
+| Pasada 1 · recorrido completo desde una partida nueva, con escenas cuadro a cuadro | Completa, 0 errores (389 s); comprueba que Nereo hace las preparaciones del Faro | `output/acceptance-6abad80/1-recorrido/` |
+| Pasada 2 · adversarial (errores, abandonos, recargas, regreso físico, todos los habitantes) | Completa, 0 errores (716 s); 16 habitantes respondieron | `output/acceptance-6abad80/2-adversarial/` |
+| Táctil (390×844 emulado) y diálogos | Correctas | `output/acceptance-6abad80/3-tactil/` |
+| Prueba de humo de la build entregable `dist/` | Correcta | `output/production/` |
+| Bancos (`qa-bench-load.mjs`) | Tablero, observaciones, encargo y mandos a la vista en 9/9 bancos a 1440×900 y 1280×720 | `output/bench-load/` |
+| Pruebas automáticas | PlayCanvas 83/83, raíz 287/287, `npm run check` correcto | — |
+| Rendimiento | Sin regresión detectable; valor absoluto NO VERIFICADO para esta revisión (ver abajo) | `output/perf/` |
+
+**Rendimiento:** con el equipo compartido, la medición sin contención no se pudo repetir. Se midieron
+la candidata anterior y la nueva intercaladas, dos rondas cada una, bajo la misma carga (promedio
+de 4 a 8): las dos dan entre 17 y 50 ms por cuadro (la anterior medía 3,6 ms en un equipo tranquilo)
+y se alternan sin una diferencia consistente. Este ciclo no tocó el dibujado del mundo: estilos de
+los bancos, textos y efectos de diálogo. Lo verificado en condiciones normales sigue siendo el de
+`9b5cd5e` (60 FPS con margen); repetirlo con esta revisión en un equipo libre queda pendiente.
+
+**Condiciones de esta pasada:** el equipo estaba compartido con al menos otras tres sesiones de
+Claude Code (Bitland, Physica, Arithmos), una de ellas con su propia partida automatizada en un
+navegador con GPU. Cada paso esperó a que bajara la carga; aun así, hubo corridas que fallaron
+porque el navegador dejó de procesar teclas y clics (no producía cuadros). Esas corridas se
+repitieron y no se cuentan como fallos del juego. Las que figuran arriba son las válidas.
+
+## Candidata anterior: `9b5cd5e` (5 oct 2026)
 
 **Build candidata:** commit `9b5cd5e` de `codex/playcanvas-slice`, árbol limpio.
 
