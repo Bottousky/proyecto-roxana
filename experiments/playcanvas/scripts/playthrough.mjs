@@ -266,6 +266,7 @@ async function travel(id, target) {
   await settle({stable:1400});
   assert.equal((await inspect()).area, target, `The ${id} passage enters ${target}`);
   await screenshot(`${target}-arrival`);
+  if (adversarial) await talkToEveryone(`arrival:${target}`);
 }
 
 async function setMode(mode) {
@@ -317,6 +318,27 @@ async function measure(mode, a, b) {
 }
 
 // ── Adversarial route ────────────────────────────────────────────────────────────────
+// Every inhabitant present can be reached on foot and answers; their answers are recorded.
+const spoken = new Map();
+async function talkToEveryone(label) {
+  const here = await page.evaluate(() => window.__ohmdal.world.getInteractions().filter(o => o.kind === 'npc').map(o => o.id));
+  for (const id of here) {
+    const heard = report.dialogue.length;
+    await interact(id);
+    assert.ok(report.dialogue.length > heard, `${id} answers (${label})`);
+    assert.equal((await inspect()).mode, 'world', `${id}: the conversation gives control back`);
+    spoken.set(id, (spoken.get(id) || 0) + 1);
+  }
+  log('talked-to-everyone', { label, inhabitants: here });
+}
+async function mapTravel(area) {
+  if ((await inspect()).area === area) return;
+  await page.keyboard.press('m');
+  const list = page.locator('details:has([data-area]) > summary').first(); if (await list.count()) await list.click();
+  await page.locator(`[data-area="${area}"]`).first().click();
+  await page.waitForFunction(a => window.__ohmdal.state.area === a && window.__ohmdal.mode !== 'transition', area, { timeout: 60000 });
+  await settle({ stable: 1400 });
+}
 async function wrongDials(id, settings) {
   if (!(await inspect()).puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
   for (const values of settings) {
@@ -598,10 +620,10 @@ try {
   assert.ok(finished.seen.includes('lighthouse_epilogue'), 'Epilogue progress survives reload');
   await screenshot('resumed-completed-save');
   if (adversarial) {
-    const heard = report.dialogue.length;
-    await interact('edda_tower');
-    assert.ok(report.dialogue.length > heard, 'Edda still answers after the ending and a reload');
-    assert.equal((await inspect()).mode, 'world');
+    // After the ending and a reload, every inhabitant of the kingdom still answers.
+    for (const area of ['lighthouse', 'lake', 'terraces', 'castle', 'spring', 'road', 'plaza', 'workshop', 'portal']) { await mapTravel(area); await talkToEveryone(`after-ending:${area}`); }
+    report.inhabitants = Object.fromEntries(spoken);
+    log('inhabitants-answered', { count: spoken.size, ids: [...spoken.keys()] });
   }
   assert.equal(report.errors.length, 0, `No browser errors: ${JSON.stringify(report.errors)}`);
   report.completed = true;
