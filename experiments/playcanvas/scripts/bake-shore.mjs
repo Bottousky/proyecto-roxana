@@ -4,6 +4,7 @@
 // del agua hay costa (terreno, muelles, puentes, pilotes). El resultado es un PNG en
 // escala de grises en coordenadas de reino que el shader de agua usa para la espuma y
 // el gradiente de profundidad. Uso: node scripts/bake-shore.mjs
+import { channel } from '../src/geometry-format.js';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { gunzipSync, deflateSync } from 'node:zlib';
 
@@ -12,7 +13,7 @@ const scene = JSON.parse(readFileSync(new URL('src/data/scene.json', root)));
 const raw = gunzipSync(readFileSync(new URL('src/data/geometry.bin.gz', root)));
 const buffer = raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength);
 const PX = 4, MAX = 6; // píxeles por metro, metros representados
-const view = (m, key) => new (key === 'indices' ? Uint32Array : Float32Array)(buffer, m[key].offset, m[key].length);
+const view = (m, key) => channel(buffer, m, key);
 
 const waters = scene.meshes.filter(m => m.material.texture === 'water' && !m.dynamic); // fountains are pivoted, local meshes
 let x0 = Infinity, z0 = Infinity, x1 = -Infinity, z1 = -Infinity;

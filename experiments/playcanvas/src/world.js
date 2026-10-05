@@ -1,4 +1,4 @@
-import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
+import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES,SEMANTIC_NORMAL,SEMANTIC_COLOR,TYPE_INT8,TYPE_UINT8} from 'playcanvas';
 import {surface,actorArt} from './art.ts';
 import {AREAS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
@@ -19,6 +19,7 @@ import {makeWater,updateWater,loadShore,bindShore} from './water.js';
 import {makeGround,makeRock,updateClouds,loadGroundAo} from './ground.js';
 import {makeWind,updateWind,windKind} from './wind.js';
 import {occludes,makeSeeThrough,seeThroughFrame,applySeeThrough} from './see-through.js';
+import {channel} from './geometry-format.js';
 import {makePortalSurface} from './portal.js';
 import {buildGrid,updateGrid} from './grid.js';
 import {placeDressing,propObstacles} from './props.js';
@@ -127,8 +128,8 @@ export class PlayCanvasWorld {
       if(d.opacity<1){m.blendType=BLEND_NORMAL;m.depthWrite=false;}
       if(d.texture==='water'){makeWater(m);bindShore(m,shore,!b.dynamic,{lighthouse:1,lake:.6}[b.area]||0);this.waters.push(m);}
       if(d.texture==='ground')(this.grounds??=[]).push(makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble,ao:groundAo}));
-      m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>new (key==='indices'?Uint32Array:Float32Array)(binary,b[key].offset,b[key].length);
-      mesh.setPositions(attr('positions'));mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
+      m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>channel(binary,b,key);
+      mesh.setPositions(attr('positions'));if(b.normals.type==='i8')mesh.setVertexStream(SEMANTIC_NORMAL,attr('normals'),4,undefined,TYPE_INT8,true);else mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));if(b.colors.type==='u8')mesh.setVertexStream(SEMANTIC_COLOR,attr('colors'),4,undefined,TYPE_UINT8,true);else mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
       const instance=new MeshInstance(mesh,m,e);instance.castShadow=d.shadow&&d.opacity===1;instance.receiveShadow=true;e.addComponent('render',{meshInstances:[instance]});let parent=this.regions.get(b.area).root;
       if(b.owner&&!b.dynamic){if(!owners.has(b.owner)){const owner=new Entity(b.owner);parent.addChild(owner);owners.set(b.owner,owner);}parent=owners.get(b.owner);}
       parent.addChild(e);

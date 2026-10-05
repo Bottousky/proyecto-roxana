@@ -4,6 +4,7 @@
 // escalones de roca como los acantilados de las referencias HD-2D. Resultado: alturas en
 // metros (Float32, gzip) en src/data/relief.bin.gz y su rejilla en src/data/relief.json.
 // Uso: node scripts/bake-relief.mjs  (después de exportar el mundo y hornear la orilla)
+import { channel } from '../src/geometry-format.js';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { gunzipSync, gzipSync } from 'node:zlib';
 import { AREAS } from '../src/game/content.js';
@@ -14,7 +15,7 @@ const root = new URL('../', import.meta.url);
 const scene = JSON.parse(readFileSync(new URL('src/data/scene.json', root)));
 const raw = gunzipSync(readFileSync(new URL('src/data/geometry.bin.gz', root)));
 const buffer = raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength);
-const view = (m, key) => new (key === 'indices' ? Uint32Array : Float32Array)(buffer, m[key].offset, m[key].length);
+const view = (m, key) => channel(buffer, m, key);
 const shore = JSON.parse(readFileSync(new URL('src/data/shore.json', root)));
 
 const MARGIN = 60, CELL = 1;

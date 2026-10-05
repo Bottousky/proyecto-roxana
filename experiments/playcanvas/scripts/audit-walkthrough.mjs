@@ -1,5 +1,6 @@
 // Busca geometría sólida a la altura del pecho, dentro de lo caminable, sin colisión que la
 // respalde: cosas que el jugador atravesaría. Uso: node scripts/audit-walkthrough.mjs
+import { channel } from '../src/geometry-format.js';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { walkableTerrain } from '../src/terrain.js';
@@ -10,7 +11,7 @@ const scene = JSON.parse(readFileSync(new URL('../src/data/scene.json', import.m
 const props = JSON.parse(readFileSync(new URL('../src/data/props.json', import.meta.url)));
 const raw = gunzipSync(readFileSync(new URL('../src/data/geometry.bin.gz', import.meta.url)));
 const buf = raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength);
-const view = (m, k) => new (k === 'indices' ? Uint32Array : Float32Array)(buf, m[k].offset, m[k].length);
+const view = (m, key) => channel(buf, m, key);
 for (const id of Object.keys(AREAS).filter(isExterior)) {
   const [ox, oz] = scene.areas[id].offset, [bw, bd] = AREAS[id].bounds, obs = [...scene.areas[id].obstacles.map(o => ({ ...o, x: o.x - ox, z: o.z - oz })), ...dressingObstacles(id, props)];
   const cells = new Map(), names = {};

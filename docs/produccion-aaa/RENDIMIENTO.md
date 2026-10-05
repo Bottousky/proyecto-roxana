@@ -58,9 +58,29 @@ Detalle por lugar a 1440×900 DPR 2, calidad alta (ms):
   manera; un Mac con ProMotion pediría 120 Hz.
 - **Móvil de referencia (30 FPS): NO VERIFICADO.** No hay dispositivo; la emulación de pantalla
   no mide una GPU móvil.
-- La descarga es la debilidad: en una red de 25 Mbps los 19,3 MB tardarían unos 6 s. Colores y
-  normales en coma flotante y los índices en 32 bits se pueden cuantizar (estimado: unos 4 MB
-  menos de descarga y la mitad de la memoria de geometría). Pendiente en el backlog.
+- La descarga era la debilidad: 19,3 MB. Ver la actualización del ciclo 11 abajo.
 
 Repetir: `VITE_INSPECT=1 npx vite build --outDir dist-perf`, `npx vite preview --outDir dist-perf --port 4194`,
 `GAME_URL=http://127.0.0.1:4194/ SIZE=1440x900 DPR=2 QUALITY=high node scripts/perf.mjs`.
+
+## Actualización · geometría empaquetada (ciclo 11)
+
+`scripts/pack-geometry.mjs`, último paso de `npm run export:world`, guarda normales en Int8 y
+colores en Uint8 (normalizados) e índices en 16 bits en 502 de 503 mallas; posiciones y
+coordenadas de textura siguen en coma flotante por precisión. El circuito completo reproduce el
+mismo archivo byte a byte. Misma medición, 1440×900 DPR 2, calidad alta:
+
+| | Antes (ciclo 9) | Empaquetada |
+|---|---|---|
+| Geometría comprimida | 11,3 MB | 8,8 MB |
+| Geometría descomprimida | 73,7 MB | 42,3 MB |
+| Transferido en la carga | 19,3 MB | 16,8 MB |
+| Decodificado en la carga | 84,6 MB | 53,3 MB |
+| Memoria JS tras la primera vuelta / tras tres | 113,4 / 113,7 MB | 92,6 / 92,8 MB |
+| De «Continuar» al mundo (local) | 2,63 s | 2,56–2,58 s |
+| Peor costo por cuadro (p95, Faro) | 14,7 ms | 14,5 ms |
+
+Comparación visual con la misma bitácora y cámara en Plaza, Taller, Castillo y Faro sin
+diferencias apreciables (`output/pack-cycle11/sheet.png`). El ahorro fue menor que el estimado
+(2,5 MB en vez de 4): las posiciones dominan y no conviene reducir su precisión. En una red de
+25 Mbps la carga pasaría de unos 6,2 s a 5,4 s (cálculo, no medido).

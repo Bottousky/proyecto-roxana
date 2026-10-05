@@ -308,6 +308,17 @@ correcto, auditoría de atravesables sin casos, ruta principal (`output/playthro
 404 s) y adversarial (`output/adversarial-cycle10/`, 551 s) completas y sin errores. Revisión
 visual de la Puerta abierta, los carretes y el borne (`output/cycle10-visits.png`).
 
+## Ciclo 11 · Geometría empaquetada: menos descarga y menos memoria (5 oct 2026)
+
+`scripts/pack-geometry.mjs` (último paso de `export:world`) y `src/geometry-format.js` (lector
+con tipo por canal, usado por el juego, la auditoría y los horneados). Normales Int8, colores
+Uint8, índices de 16 bits en 502/503 mallas. Transferido 19,3 → 16,8 MB, decodificado 84,6 →
+53,3 MB, memoria JS 113,4 → 92,6 MB; sin cambio visual apreciable ni en el costo por cuadro.
+El circuito completo reproduce el archivo byte a byte. Detalle en
+[RENDIMIENTO.md](RENDIMIENTO.md). Verificación: `npm test` 83/83, `npm run check`, auditoría de
+atravesables sin casos y **partida completa contra la build de producción minificada**
+(`dist-perf`, `output/playthrough-cycle11-prod/`, 364 s, 0 errores).
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -325,7 +336,7 @@ visual de la Puerta abierta, los carretes y el borne (`output/cycle10-visits.png
 | 10 | UI | Banco: tomaba un cable sin tener ninguno y la indicación «Ahora tocá otra pieza…» quedaba tras resolver | Hecho (ciclo 2) |
 | 11 | UI | Título a 800×600 recorta «OHMDAL» | Pendiente |
 | 12 | Rendimiento | Medir build de producción en el M2: FPS, carga, memoria por zona | Hecho (ciclo 9): 60 FPS con margen en escritorio; móvil NO VERIFICADO |
-| 12b | Rendimiento | Descarga de 19,3 MB: cuantizar colores, normales e índices de la geometría (≈4 MB menos) | Pendiente |
+| 12b | Rendimiento | Descarga de 19,3 MB | Hecho (ciclo 11): 16,8 MB; geometría 11,3 → 8,8 MB |
 | 13 | Móvil | Controles táctiles y 390×844 (emulación; hardware real NO VERIFICADO) | Pendiente |
 | 14 | Audio | Sin escucha posible en esta sesión: revisar mezcla por código | Pendiente |
 | 15 | Presentación | (Hecho, ciclo 3) Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Pendiente |
@@ -344,11 +355,10 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 11: reducir la descarga (12b): cuantizar colores (RGBA8), normales (Int8) e índices
-(Uint16 donde alcanza) como último paso de `export:world`, con lector compatible; medir bytes,
-memoria y tiempo de carga antes/después y comparar capturas (los colores llevan la oclusión).
-Después: pasada de aceptación final con la misma build candidata (recorrido completo +
-adversarial + revisión visual de mejores y peores escenas) y preparar la entrega.
+Ciclo 12: detalles restantes antes de la aceptación: título recortado a 800×600 (11), regreso
+de cámara del Manantial sobre copas (8), partida con controles táctiles emulados (13: cruceta,
+botón de interactuar, bancos por toque) y revisión del audio por código (14). Después:
+aceptación final con la misma build candidata y entrega.
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`
