@@ -219,10 +219,10 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 4: comprensión de puzzles (9): ficha breve por banco (comprensión buscada, pista, acción,
-reacción al error, descubrimiento, consecuencia) derivada del modelo, auditoría de coherencia
-eléctrica y ampliar la ruta adversarial a errores en Terrazas y las tres etapas del Faro.
-Después: profundidad de campo (5), interior del taller (7), momentos clave (8).
+Ciclo 5: presentación. Primero profundidad de campo (5): el destino de cada llegada queda
+borroso; comparar llegadas con el mismo recorrido antes/después. Luego los cuatro momentos
+construidos (8: despertar de Ohm, apertura de la Puerta, Manantial, Faro: preparación,
+interacción, cambio audiovisual, consecuencia persistente) y el interior del taller (7).
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`
