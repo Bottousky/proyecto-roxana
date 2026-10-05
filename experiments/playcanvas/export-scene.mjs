@@ -38,6 +38,7 @@ function capture(world,id,offset=[0,0],landscape=false){
   for(const mesh of world.irrigationWater||[])tag(mesh,{kind:'visible',flag:'irrigation'});
   if(world.springWaterworks)for(const key of ['flume','basin','fall'])tag(world.springWaterworks[key],{kind:'visible',flag:'spring_sluice',or:'pump'});
   for(const lamp of world.lamps||[]){const p=lamp.bulb.getWorldPosition(new T.Vector3());output.lights.push({area:id,position:[p.x+offset[0],p.y,p.z+offset[1]]});}
+  for(const h of world.hangingLamps||[])output.lights.push({area:id,position:[h.x+offset[0],h.y,h.z+offset[1]],hanging:true});
   const captureMesh=(object,override=null,group=null)=>{
     if(!object.isMesh)return;
     if(!override&&Array.isArray(object.material)){for(const g of object.geometry.groups)captureMesh(object,object.material[g.materialIndex],g);return;}

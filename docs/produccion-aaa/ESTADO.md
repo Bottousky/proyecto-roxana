@@ -249,6 +249,29 @@ Verificación (runtime idéntico a la copia evaluada): `npm test` 83/83 y 285/28
 Pendiente menor: el regreso de la cámara desde la fuente al Manantial (1,4 s) vuelve a cruzar
 copas de árboles.
 
+## Ciclo 8 · El taller de Lumen se enciende de verdad (5 oct 2026)
+
+- **La luz que vuelve se ve:** el taller (y la galería del Faro) tienen lámparas colgantes
+  eléctricas cuya luz el exportador no llevaba a PlayCanvas: al restaurar sólo subía el brillo
+  general. Ahora `hangingLamp` registra su punto de luz y `export-scene.mjs` lo exporta con los
+  faroles. Al restaurar el taller, tres círculos cálidos caen sobre la mesa y el piso; al
+  restaurar la red de la torre, dos lámparas iluminan la galería de noche. Antes de restaurar
+  quedan apagadas (consecuencia persistente). Reexportación verificada: sólo 5 luces nuevas,
+  geometría y colisiones idénticas.
+- **Menos piso vacío:** la mesa donde Lumen dibuja sus esquemas (sillas, vela, cesto) junto al
+  hogar, y el mostrador de reparaciones junto a la puerta. La utilería admite ahora una altura
+  para apoyar piezas sobre muebles sin que cuenten como obstáculo.
+- Evidencia, misma partida y cámara: `output/workshop-cmp.png` (llegada y restaurado, ciclo 7
+  contra ciclo 8) y `output/lighthouse-night-cmp.png`.
+
+Verificación (runtime idéntico a la copia evaluada): `npm test` 83/83 y 285/285, `npm run check`
+correcto, pruebas de utilería (cercanía a lo que se usa, caminos y ejes), partida completa con
+escenas (`output/scenes-cycle8/`, 409 s, 0 errores).
+
+Autocrítica: a oscuras la mesa de dibujo se lee pequeña y oscura; los resplandores de las
+lámparas son discos algo grandes. Faltan objetos propios del oficio (bobinas de cobre, frascos,
+herramientas): el kit no los tiene y no se fabricaron.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -260,7 +283,7 @@ copas de árboles.
 | 4 | Navegación | Faroles de la escena sobre caminos (Mercado y Terrazas) | Hecho (ciclo 2) |
 | 5 | Presentación | Profundidad de campo: el destino de cada llegada (fuente, rueda del Manantial, Castillo) queda borroso en el tercio superior | Hecho (ciclo 5) |
 | 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano (torre de la Puerta al entrar al Manantial, torre del Castillo en Terrazas) | Pendiente |
-| 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía, la escena clave más pobre | Pendiente |
+| 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía | Mejorado (ciclo 8): luz de lámparas al restaurar, mesa de dibujo y mostrador. Pendiente: objetos propios del oficio (cobre, vidrio, herramientas) |
 | 8 | Momentos | Despertar (ciclo 6), canal del Manantial, Ω de la Puerta y haz del Faro (ciclo 7). Menor: regreso de cámara del Manantial sobre copas | Hecho salvo detalle |
 | 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep; fichas y coherencia del modelo | Hecho en lo verificable (ciclos 2 y 4): relato según traza, Ivara/Nereo exigen comprobación, volver ≠ poner en servicio, primera clase antes del cierre y acuerdo forja/riego en Terrazas están en el código y la partida los recorre; fichas y modelo en ciclo 4. El hallazgo 5 (estructura predecible por zona) es de ritmo: queda para revisión humana de diversión |
 | 10 | UI | Banco: tomaba un cable sin tener ninguno y la indicación «Ahora tocá otra pieza…» quedaba tras resolver | Hecho (ciclo 2) |
@@ -284,10 +307,10 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 8: interior del taller de Lumen (7), la escena clave más pobre en presentación (caja
-oscura casi vacía). Revisar con la misma cámara antes/después, a oscuras y restaurado. Después:
-ocluyentes borrosos en primer plano de algunas llegadas (6), detalles atravesables (16), y
-preparar la medición de rendimiento en build de producción (12).
+Ciclo 9: rendimiento en build de producción (12): medir FPS/tiempo de cuadro por zona, carga
+inicial y memoria al recorrer, en el M2 con Chrome, contra el objetivo de 60 FPS en escritorio.
+La medición headless está topada por vsync: usar una métrica sin tope (tiempo de CPU/GPU por
+cuadro o rAF sin vsync) y declararlo. Después: ocluyentes de primer plano (6), atravesables (16).
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`

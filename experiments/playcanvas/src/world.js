@@ -481,7 +481,7 @@ export class PlayCanvasWorld {
     this.restoration=Math.max(0,(this.restoration||0)-dt);this.vitality+=(alive-this.vitality)*Math.min(1,dt*(this.restoration>0?.75:alive?.5:1.2));const v=this.vitality;
     if(this.frame?.enabled){const base=GRADES[inside?'inside':phase.id]||GRADES.morning,g=this.grade,target=[base[0]*(.58+.42*v),base[1]*(.94+.06*v),base[2]*(.97+.03*v),base[3]*(1.05-.05*v),base[4]*(.93+.07*v)];let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
       if(moved>.0005||!this.gradeApplied){this.gradeApplied=true;const f=this.frame.grading;f.saturation=g[0];f.tint=new Color(g[1],g[2],g[3]);f.brightness=g[4];this.frame.update();}}
-    for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?1.6:n*3.2):0;if(light.area!=='workshop')light.entity.light.range=9;}
+    for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?2.4:n*3.2):0;light.entity.light.range=light.area==='workshop'?11:9;}
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
     this.portalSurface?.setParameter('uPortalTime',reduced?0:this.clock);
     if(this.festival){const on=!!f.epilogue_shared&&!inside;this.festival.root.enabled=on;if(on)for(const g of this.festival.glows){g.material.opacity=(.35+.45*n)*(reduced?1:.9+Math.sin(this.clock*2.3+g.entity.getPosition().x)*.1);g.material.update();}}

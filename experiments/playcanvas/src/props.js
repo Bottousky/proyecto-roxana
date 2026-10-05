@@ -33,11 +33,11 @@ export async function placeDressing(world){
   let placed=0;
   for(const [id,region] of world.regions){
     const area=world.data.areas[id];if(!area)continue;const [ox,oz]=area.offset;
-    for(const [kind,x,z,rotation] of dressingOf(id)){
+    for(const [kind,x,z,rotation,lift=0] of dressingOf(id)){
       const source=template.findByName(kind);if(!source){console.warn('Falta la pieza',kind);continue;}
       const e=source.clone();e.name='Utilería · '+kind;
       let y=0;for(const s of area.walkSurfaces||[])if(s.r!=null?Math.hypot(x-s.x,z-s.z)<=s.r:Math.abs(x-s.x)<=s.w/2&&Math.abs(z-s.z)<=s.d/2)y=Math.max(y,s.y);
-      e.setLocalPosition(x+ox,y,z+oz);e.setLocalEulerAngles(0,rotation,0);region.root.addChild(e);placed++;
+      e.setLocalPosition(x+ox,y+lift,z+oz);e.setLocalEulerAngles(0,rotation,0);region.root.addChild(e);placed++;
     }
   }
   for(const [id,list] of Object.entries(BUNTING)){const region=world.regions.get(id),[ox,oz]=world.data.areas[id].offset;for(const [a,b,sag] of list)region.root.addChild(bunting(app,[a[0]+ox,a[1],a[2]+oz],[b[0]+ox,b[1],b[2]+oz],sag));}

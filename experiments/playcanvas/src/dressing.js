@@ -1,7 +1,8 @@
 // Utilería de cada lugar, piezas del kit de Blender (scripts/blender/props-kit.py).
 // Cada cosa está donde su dueño la usa: la leña contra la casa de los Porteros, los sacos
 // de harina junto a la Panadería, la carga del Mercado a su puerta, los cajones del Taller
-// a los lados del portón. Coordenadas locales del lugar: [pieza, x, z, giro en grados].
+// a los lados del portón. Coordenadas locales del lugar: [pieza, x, z, giro en grados, altura]. Lo que lleva
+// altura descansa sobre otro mueble: no ocupa el suelo.
 // Nada se apoya en el eje de paso ni a menos de 1,4 m de algo con qué interactuar
 // (tests/dressing.test.js lo comprueba contra los caminos reales).
 export const DRESSING = {
@@ -33,6 +34,10 @@ export const DRESSING = {
     ['crate', 10.4, 4.0, 6], ['crate_small', 10.5, 5.5, -12], ['barrel', 10.5, 7.1, 0], ['sacks', 9.6, 9.3, 90],
     // Leña junto al hogar y un barril de agua a la entrada.
     ['logs', -9.4, 5.9, 0], ['barrel', -8.6, 9.3, 0],
+    // La mesa donde Lumen dibuja sus esquemas, a la luz de una vela mientras la lámpara no anda.
+    ['table', -6.3, -1.3, 0], ['chair', -7.75, -1.3, 90], ['chair', -4.85, -1.3, -90], ['candle', -6.85, -1.15, 0, 1.48], ['basket', -5.8, -1.4, 0, 1.48],
+    // El mostrador donde los vecinos dejan lo que hay que arreglar, junto a la puerta.
+    ['counter', 4.9, 9.7, 0], ['basket', 5.7, 9.7, 0, 1.54], ['candle', 4, 9.65, 0, 1.54], ['crate_small', 7.4, 10.1, 15],
   ],
 };
 
@@ -57,7 +62,8 @@ export function footprint(kind, rotation, props) {
 }
 
 export function dressingObstacles(id, props) {
-  return dressingOf(id).flatMap(([kind, x, z, rotation]) => {
+  return dressingOf(id).flatMap(([kind, x, z, rotation, lift = 0]) => {
+    if (lift > 0) return [];
     const f = footprint(kind, rotation, props);
     return f ? [{ x: x + f.x, z: z + f.z, w: f.w, d: f.d, dressing: kind }] : [];
   });
