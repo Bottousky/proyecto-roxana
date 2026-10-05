@@ -321,7 +321,8 @@ async function measure(mode, a, b) {
 // Every inhabitant present can be reached on foot and answers; their answers are recorded.
 const spoken = new Map();
 async function talkToEveryone(label) {
-  const here = await page.evaluate(() => window.__ohmdal.world.getInteractions().filter(o => o.kind === 'npc').map(o => o.id));
+  // Someone leaving the place (their story moved on) walks out and is not chased.
+  const here = await page.evaluate(() => { const w = window.__ohmdal.world, staying = new Set(w.actors.filter(a => a.inhabitant?.plan?.present && a.g.visible).map(a => a.inhabitant.id)); return w.getInteractions().filter(o => o.kind === 'npc' && staying.has(o.id)).map(o => o.id); });
   for (const id of here) {
     const heard = report.dialogue.length;
     await interact(id);
@@ -630,7 +631,7 @@ try {
   report.final = finished;
   log('arc-complete-and-reloaded', { areas: finished.visited.length, secrets: finished.secrets.length });
 } catch (error) {
-  report.failure = { stage, message: error.message, stack: error.stack, state: await inspect().catch(() => null) };
+  report.failure = { stage, message: error.message, stack: error.stack, state: await inspect().catch(() => null), inhabitants: await page.evaluate(() => window.__ohmdal.world.actors?.filter(a => a.inhabitant).map(a => ({ id: a.inhabitant.id, visible: a.g.visible, at: [+a.g.position.x.toFixed(2), +a.g.position.z.toFixed(2)], present: a.inhabitant.plan?.present, stage: a.inhabitant.plan?.stage, stops: a.inhabitant.stops, route: a.inhabitant.route, wait: a.inhabitant.wait }))).catch(e => String(e)) };
   await screenshot('failure').catch(() => {});
   process.stderr.write(`${error.stack}\n`);
   process.exitCode = 1;

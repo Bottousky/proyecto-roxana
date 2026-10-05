@@ -19,6 +19,8 @@ try {
  for(const area of ['lake','plaza']){
   await page.locator('#map-button').click();
   await page.screenshot({path:`${out}/map-${area}.png`});
+  // Travel destinations live in a fold of the map: open it, as a player would.
+  const fold=page.locator('details:has(.map-destination) > summary').first();if(await fold.count()&&!(await fold.evaluate(e=>e.parentElement.open)))await fold.click();
   await page.locator(`.map-destination[data-area="${area}"]`).click();
   await page.locator('#transition').waitFor({state:'hidden',timeout:90000});await page.waitForTimeout(1300);
   await page.keyboard.down('ArrowDown');await page.waitForTimeout(350);await page.keyboard.up('ArrowDown');

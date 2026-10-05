@@ -347,6 +347,20 @@ correcto; ruta principal (`output/playthrough-cycle12/`, 395 s), adversarial
 (`output/adversarial-cycle12/`, 562 s), táctil (`output/qa-touch-cycle12/`) y diálogos: todas
 completas y sin errores.
 
+## Ciclo 13 · Aceptación final sobre la candidata `9b5cd5e` (5 oct 2026)
+
+Ver [ACEPTACION.md](ACEPTACION.md). Pasadas sobre la build de producción minificada:
+- recorrido completo, adversarial, táctil y diálogos: completas y sin errores;
+- prueba de humo de la build entregable: correcta;
+- rendimiento: dentro del objetivo de escritorio.
+
+La ruta adversarial ahora habla con cada habitante presente al llegar a cada lugar y en todo
+el reino después del final. En la primera corrida exigió alcanzar a Edda mientras se retiraba
+de la Plaza: era un error de la prueba, no del juego, y se reprodujo y comprobó aparte.
+
+La misión **no se declara cumplida**. Quedan pendientes tres comprobaciones que no se pueden
+hacer en este equipo: móvil real, escucha del audio y prueba con personas.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -383,11 +397,14 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 13: aceptación final con una build candidata fija (producción minificada, `dist-perf`
-del mismo commit): recorrido completo, adversarial, táctil y diálogos sobre esa build; revisión
-visual de las mejores y peores escenas; consola y recursos; actualizar README y producción con
-instrucciones de juego. Si sólo quedan bloqueos externos (móvil real, escucha, prueba con
-personas), entregar parcial exacta y detener el loop sin declarar cumplida la misión.
+**Entrega parcial y loop detenido (5 oct 2026).** Sólo quedan bloqueos externos:
+- móvil de referencia y tacto real (no hay dispositivo);
+- escucha del audio;
+- revisión humana de diversión y aprendizaje, que también debe juzgar el ritmo de las zonas y
+  las escenas menos logradas de ACEPTACION.md.
+
+Para retomar con esos resultados, abrir `/loop` con este encargo. El punto de partida es la
+build `9b5cd5e`, con las pruebas y los guiones de este directorio.
 Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`
