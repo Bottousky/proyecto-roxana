@@ -32,6 +32,8 @@ for (const stop of stops) {
     if ((await game()).mode !== 'world') await settle();
   }
   await page.waitForTimeout(1200);
+  // OPEN=1: usar lo que está a mano (E) y esperar el banco, para mirar su tablero.
+  if (process.env.OPEN) { await page.keyboard.press('e'); for (let i = 0; i < 80 && (await game()).mode !== 'puzzle'; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(90); } await page.waitForTimeout(700); }
   if (process.env.FRAMES) {
     const frames = await page.evaluate(n => new Promise(done => { const t = []; let last = performance.now(); const step = now => { t.push(now - last); last = now; if (t.length < n) requestAnimationFrame(step); else done(t); }; requestAnimationFrame(step); }), Number(process.env.FRAMES));
     const sorted = [...frames].sort((a, b) => a - b), mean = frames.reduce((a, b) => a + b) / frames.length;

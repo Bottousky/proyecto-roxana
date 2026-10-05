@@ -57,3 +57,51 @@
   #hud #travel-compass{width:66px;height:66px}#hud #travel-instrument{grid-template-columns:66px minmax(0,1fr)}
   #hud #travel-instrument .place h2{font-size:24px}#hud #travel-instrument .objective small{display:none}
 }
+
+/* Piso de lectura (scripts/qa-type-sizes.mjs): nada que informe baja de 12 px y ningún rótulo
+   en versalitas de 11 px, tampoco en el teléfono. Va al final de las hojas del recorrido y con
+   !important sólo en el tamaño, porque capas anteriores fijan de 6 a 10 px con selectores fuertes. */
+#speaker-role,.dialogue-who span{font-size:12px!important;letter-spacing:.06em!important}
+#dialogue-next,#dialogue-next kbd,.dialogue-copy kbd{font-size:12px!important}
+#hud .hud-bottom,#hud #control-reminder,#hud #save-indicator,#hud .hud-bottom kbd{font-size:12px!important}
+#hud .hud-tools kbd,#hud .icon-button kbd{font-size:12px!important}
+#hud #travel-instrument #travel-day,#hud #travel-instrument .travel-time{font-size:12px!important}
+#chapter-label,#hud #travel-instrument .place .eyebrow{font-size:11px!important}
+.title-eyebrow,.title-foot{font-size:11px!important}
+.save-description{font-size:12px!important}
+.modal .eyebrow,.modal-layer .eyebrow{font-size:11px!important}
+.setting-note,.controls-guide,.controls-guide p,.controls-guide kbd,.options-list kbd{font-size:12px!important}
+.modal small,.journal-modal small,.book-leaf small,.fieldbook small{font-size:12px!important}
+.entry-number,.book-index button>span:first-child{font-size:12px!important}
+.guide-footer,.guide-footer span{font-size:12px!important}
+.guide-modal .eyebrow{font-size:11px!important}
+.guide-modal kbd,.modal kbd{font-size:12px!important}
+.world-map-key,.world-map-key span,.local-map-note,.local-map-zoom-label,.local-map-zoom-help,.map-destination small,.map-modal summary{font-size:12px!important}
+.wb-eyebrow{font-size:11px!important}
+.wb-subtitle,.wb-instruction,.wb-feedback,.wb-constraint,.wb-supply-status,.wb-numbers,.wb-footer,.wb-node-caption{font-size:12px!important}
+/* puzzles.css se carga después de esta hoja: el id del banco asegura el piso. */
+#workbench .wb-power,#workbench .wb-discovery .wb-power{font-size:12px!important}
+.wb-terminal-label{font-size:12px!important}
+.wb-reset-row,.wb-reset-row button,.wb-reset-row span,.wb-wire-drawer p,.wb-terminal-drawer summary,.wb-terminal-drawer summary span,.wb-close span{font-size:12px!important}
+/* El plano local se encoge para caber: sus rótulos crecen en unidades del dibujo. */
+.local-building text,.local-landmark text{font-size:17px!important}
+.local-mark text,.local-player text{font-size:16px!important}
+.journey-you{font-size:19px!important}
+@media (max-height:500px){.map-compass{font-size:30px!important}}
+/* En el teléfono el plano se dibuja más chico: sus rótulos crecen un poco más. */
+@media (max-width:640px){.local-building text,.local-landmark text,.local-mark text,.local-player text,.local-exit text{font-size:23px!important}.map-compass{font-size:24px!important}}
+/* Teléfono: el encargo ocupa todo el ancho (antes quedaba en una columna de una palabra por
+   línea entre el rótulo y la lista) y los bornes conservan su nombre en una sola línea. */
+#workbench .wb-terminal-label{white-space:nowrap!important}
+@media (max-width:640px){#workbench .wb-brief{flex-wrap:wrap;gap:8px 14px}#workbench .wb-brief>*{flex:1 1 100%!important;max-width:none!important}}
+/* Los grabados nombran las piezas del tablero (1000×500 unidades, dibujado a ~0,6 en escritorio
+   y ~0,35 en el teléfono): crecen en unidades del dibujo para llegar al piso de lectura. */
+#workbench .wb-engraving{font-size:21px!important}
+@media (max-width:640px){#workbench .wb-first .wb-engraving{font-size:36px!important}}
+/* Teléfono: el tablero conserva el ancho con que se lee en escritorio y se desplaza de costado
+   dentro de su marco, en lugar de encoger nombres y grabados hasta encimarlos. */
+.wb-board-frame{max-width:100%}
+@media (max-width:640px){.wb-board-frame{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;padding-bottom:4px}.wb-board-frame .wb-board{width:600px!important;max-width:none!important}.wb-first .wb-board-frame .wb-board{width:100%!important}}
+/* Brújula del instrumento (100 unidades, dibujada de 92 px en escritorio a 64 px en el teléfono). */
+#hud #travel-compass text{font-size:13.5px!important;font-weight:600}
+@media (max-width:640px),(max-height:500px){#hud #travel-compass text{font-size:19px!important}}

@@ -115,6 +115,45 @@ Verificación (runtime idéntico a la copia evaluada; comparación archivo por a
 - Pendiente de esta pasada: la ruta adversarial todavía no cubre equivocarse en Terrazas ni en
   las tres etapas del Faro, ni las pantallas táctiles.
 
+## Ciclo 3 · Piso de lectura (5 oct 2026)
+
+Medición con `scripts/qa-type-sizes.mjs` (título, diálogo, mundo, Bitácora, mapa, guía, pausa
+y primer banco; el texto SVG se mide con su escala en pantalla y cuenta aunque esté oculto a
+lectores de pantalla; sólo se eximen glifos sueltos como Ω o +). Piso: 12 px para lo que
+informa, 11 px para rótulos en versalitas.
+
+| Tamaño | Base `2397b6f` | Ciclo 3 |
+|---|---|---|
+| 1280×720 | 140 textos bajo el piso (rol del hablante 8 px, teclas 8–10 px, guardado 9 px, «Vos» 7,6 px, grabados 8,7 px, brújula 8,3 px) | 0 |
+| 390×844 | 96 (pie del título 6 px, rol 7 px, «Vos» 5,3 px, bornes 8 px, grabados 5,1 px) | 0 |
+| 844×390 | 76 | 0 |
+
+Cambios (todos en `src/game/hud.css`, salvo dos marcas en `puzzles.js`):
+
+- Piso de tamaño para HUD, diálogo, título, Bitácora, mapa, guía, pausa y banco. Va al final de
+  las hojas del recorrido con `!important` sólo en el tamaño; `puzzles.css` se carga después,
+  por eso las reglas del banco llevan `#workbench`.
+- Plano local, mapa del reino y brújula: los rótulos crecen en unidades del dibujo (con valores
+  propios para teléfono y pantallas bajas).
+- Teléfono: el encargo del banco quedaba en una columna de una o dos palabras por línea (ya en
+  la base); ahora ocupa todo el ancho. El tablero de los bancos densos conserva 600 px de ancho
+  y se desplaza de costado dentro de un marco (`.wb-board-frame`, en ambas copias de
+  `puzzles.js`), en vez de encimar nombres y grabados. El primer banco sigue a ancho completo.
+- Ω decorativos del banco marcados `aria-hidden`.
+
+Verificación: capturas antes/después de las 8 pantallas en 3 tamaños
+(`output/type-cycle3/cmp-*.png`) revisadas una por una. Se corrigió una regresión propia: la
+regla del número de entrada achicaba el título del índice de la Bitácora. Bancos densos
+(Castillo, Terrazas) revisados en escritorio y teléfono. En teléfono, quitar un cable desde la
+lista y volver a unirlo tocando dos bornes del tablero desplazado funciona (6 → 5 → 6 cables).
+`npm test` 83/83 y 283/283, `npm run check` correcto, partida completa sobre la copia del ciclo
+(`output/playthrough-cycle3/`, 392 s, 0 errores) y `qa-dialogue-input` correcto.
+
+Autocrítica: «Celda +» roza el marco de la celda en el primer banco; la pausa sigue necesitando
+desplazamiento a 720 px de alto para «Pantalla completa» (como antes). El tablero desplazable en
+el teléfono no muestra un indicio explícito de que hay más a la derecha además del corte.
+Emulación de teléfono, no hardware real.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -134,7 +173,7 @@ Verificación (runtime idéntico a la copia evaluada; comparación archivo por a
 | 12 | Rendimiento | Medir build de producción en el M2: FPS, carga, memoria por zona | Pendiente |
 | 13 | Móvil | Controles táctiles y 390×844 (emulación; hardware real NO VERIFICADO) | Pendiente |
 | 14 | Audio | Sin escucha posible en esta sesión: revisar mezcla por código | Pendiente |
-| 15 | Presentación | Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Pendiente |
+| 15 | Presentación | (Hecho, ciclo 3) Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Pendiente |
 | 16 | Navegación | 16 detalles a la altura del pecho sin colisión (postes de porche y toldo, marcos), ya presentes en la base (`scripts/audit-walkthrough.mjs`) | Pendiente |
 | 17 | Assets | `portraits.webp` y `portraits-2.webp` (semirrealistas) ya no se usan: los retratos activos están en `art-polish/` y coinciden con los sprites | Limpieza |
 
@@ -150,10 +189,11 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-Ciclo 3: legibilidad (15): piso de 12 px para texto informativo y 11 px para rótulos, en
-escritorio y en 390×844, con `scripts/qa-type-sizes.mjs` antes/después (incluir un banco).
-Después: ficha breve por puzzle y auditoría del modelo eléctrico (9), profundidad de campo (5),
-interior del taller (7). Reexportar el mundo ya es posible: `npm run export:world` (4 min).
+Ciclo 4: comprensión de puzzles (9): ficha breve por banco (comprensión buscada, pista, acción,
+reacción al error, descubrimiento, consecuencia) derivada del modelo, auditoría de coherencia
+eléctrica y ampliar la ruta adversarial a errores en Terrazas y las tres etapas del Faro.
+Después: profundidad de campo (5), interior del taller (7), momentos clave (8).
+Reexportar el mundo ya es posible: `npm run export:world` (4 min).
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`
 (copia congelada para partidas largas), base `2397b6f` en un worktree en 4193 para comparar.
