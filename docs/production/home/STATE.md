@@ -141,8 +141,8 @@ son ambiente, no progreso (sin integración de esos mundos).
 - **Portada de escritorio**: título en una línea, columnas más angostas y campus más a la derecha; el patio ya no
   queda bajo el texto (Física sigue parcialmente cubierta en 1440×900; se ve al explorar).
 - **Medición** (`PERF.md`, `scripts/home-perf.mjs`, build de producción, GPU compartida con otros agentes):
-  60 FPS con p99 16,8 ms en reposo, sala abierta y tras 10 ciclos; LCP 252 ms; CLS 0; interactivo en 2,0 s;
-  sin fugas de entidades. Draw calls 856–1233: anotado como presupuesto pendiente.
+  60 FPS con p99 16,8 ms en reposo y sala abierta a 1440; LCP 252 ms; CLS 0; interactivo en 2,0 s; entidades
+  estables. **Corregido en el ciclo 7:** a 390×844 DPR 2, tras 10 ciclos, el JSON registra 16,4 FPS (omitido por error). Draw calls 856–1233: anotado como presupuesto pendiente.
 - **Peso inicial 6,74 → 5,30 MB**: visitantes de Ohmdal se descargan al llegar a su etapa; estandarte en copia
   reducida. Etapa 10 verificada con los visitantes en el patio. QA de interacción 26/26, `npm test` 93/93.
 - Corregido: rectángulo duro detrás del texto en la versión ligera.

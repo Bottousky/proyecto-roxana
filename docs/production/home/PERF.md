@@ -12,11 +12,14 @@ automatizadas de otros agentes (`playthrough.mjs`); los números son un piso, no
 | Viewport | FCP / LCP | CLS | Campus listo | Reposo (8 s) | Sala abierta (5 s) | Tras 10 ciclos |
 |---|---|---|---|---|---|---|
 | 1440×900 DPR 1 | 252 ms | 0 | 2,0 s | 60,1 FPS · p95 16,7 · p99 16,8 ms · 0 >33 ms | 60,2 FPS · p99 16,8 | 60,4 FPS |
-| 390×844 DPR 2 (emulación, **no** teléfono real) | 84 ms | 0 | 1,7 s | 60,1 FPS · p99 16,8 | 60,2 FPS | — |
+| 390×844 DPR 2 (emulación, **no** teléfono real) | 84 ms | 0 | 1,7 s | 60,1 FPS · p99 16,8 | 60,2 FPS | **16,4 FPS · p50 66,6 · p99 83,4 ms · 81/82 >33 ms** |
 
 - **LCP** es la imagen fija del campus (`public/escuela/campus-tarde.jpg`, 140 KB) que pinta antes del 3D.
+- **Corrección (ciclo 7, por la revisión independiente):** la versión anterior de este documento ponía «—» en
+  «Tras 10 ciclos» para 390×844 y STATE afirmaba 60 FPS tras los ciclos. El JSON (`evidence/c06/perf-390.json`)
+  registraba 16,4 FPS. El error fue de reporte: el resumen impreso omitía `idleAfter`. Se investiga abajo.
 - **Fugas:** 10 ciclos de cuatro salas + Novedades + gesto de artefacto: entidades 302 → 302, heap JS 56 → 31 MB
-  tras GC. Texturas de GPU no expuestas en la build de release (`device.textures` = null): no verificado.
+  tras GC. Texturas de GPU no expuestas en la build de release (`device.textures` = null): **memoria de GPU no verificada; no se puede afirmar «sin fugas»**.
 - **Draw calls por cuadro:** 856–1233 según el estado (incluye sombra, SSAO y pases de postproceso). Alto para
   móvil medio: candidato a presupuesto (ver abajo). Triángulos: no expuestos en release.
 - **INP:** no medido (no hay interacción real de usuario en laboratorio). Selección y paneles responden en el mismo
