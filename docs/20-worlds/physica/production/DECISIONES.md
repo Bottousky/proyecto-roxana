@@ -231,3 +231,15 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
   - el aviso de recoger con el carrete queda en el poste, donde está el carrete.
 - **La cadena con las manos ocupadas:** el aviso de soltar suma una **causa** con otro estilo (azafrán, en dos líneas), distinta de las ayudas de control: «Manos ocupadas: soltá la esfera para bajar por la cadena.»
 - **El aviso de «Bajar por la cadena»** va sobre el explorador en el labio, no sobre la sima: ahí sube la esfera recién soltada.
+
+## D16 · Suelo pintado y musgo en flecos (iteración 10)
+
+**El problema:** al lado de las plantas pintadas (D14), los altos eran manchas planas de verde y marrón generadas con ruido, y el musgo eran cintas escalonadas que se leían como púas verdes.
+
+**Elegido:**
+- **Suelo:** una textura pintada (generada, `art/PROCEDENCIA.md`), hecha sin costura y muestreada a dos escalas, una rotada, con un poco de grano propio de la roca.
+- **Musgo:** la cadena sigue siendo la física (cuelga a lo largo del campo, pruebas en `flora.test.js`); cambia sólo el dibujo.
+  - **Forma:** una tira suave que pasa por los puntos de la cadena (Catmull-Rom), de ancho constante.
+  - **Textura:** hebras finas que se deshilachan, con prueba alfa. La silueta la da la textura, no la tira.
+  - **En cada labio:** un fleco continuo de piezas superpuestas, de largo desigual y con algunos huecos.
+  - **En las paredes de la sima:** dos capas atrás y una detrás del plano de medición. En la primera versión, una capa delante tapaba la regla, como ya lo hacía el musgo anterior.

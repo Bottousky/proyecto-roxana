@@ -209,18 +209,37 @@ export function buildScene(world, { quality = 'high' } = {}) {
   // Moss beards on the chasm walls and along the lips: they hang along the local pull.
   const moss = new Moss(field);
   let ms = 77; const mr = () => (ms = (ms * 16807) % 2147483647) / 2147483647;
-  const mossCols = ['#6f8f45', '#86a356', '#56743a', '#9bb466'];
-  for (let y = -0.25; y > -4.5; y -= 0.32) for (const z of [-3.3, -2.9, 0.9, 1.4]) {
-    moss.add({ root: [0.02, y + (mr() - 0.5) * 0.15, z + (mr() - 0.5) * 0.2], n: 6, len: 0.09 + mr() * 0.05, dir: [0.2, -1], wall: { value: 0.03, side: 1 }, width: 0.06, color: mossCols[Math.floor(mr() * 4)] });
-    moss.add({ root: [4.48, y + TERRACE_Y + (mr() - 0.5) * 0.15, z + (mr() - 0.5) * 0.2], n: 6, len: 0.09 + mr() * 0.05, dir: [-0.2, -1], wall: { value: 4.47, side: -1 }, width: 0.06, color: mossCols[Math.floor(mr() * 4)] });
+  // Olive and sage, close together: wide differences made tonal steps between neighbouring pieces.
+  const mossCols = ['#7d8f4e', '#87985a', '#74874a', '#8fa062'];
+  // Instruments first: no root within 0.55 m (height) of an anchor ring on the same wall.
+  const zc = field.zones[0];
+  const ringsAt = (x, z) => (z < -2 ? [[0, zc.y0], [4.5, zc.y0], [0, zc.y1], [4.5, zc.y1]]
+    : [[WELL.x0, WELL.regionY0], [WELL.x1, WELL.regionY0], [WELL.x0, TERRACE_Y - 0.25], [WELL.x1, TERRACE_Y - 0.25]]).filter(r => Math.abs(r[0] - x) < 0.2);
+  const clear = (x, y, z) => !ringsAt(x, z).some(r => Math.abs(r[1] - y) < 0.55);
+  // Two layers at the back, at uneven heights (four at a fixed step stacked into a solid band; one
+  // near the measuring plane sat right behind the ruler's labels).
+  for (let y = -0.25; y > -4.5; y -= 0.36 + mr() * 0.22) for (const z of [-3.3, -2.9]) {
+    const y0 = y + (mr() - 0.5) * 0.15, y1 = y + TERRACE_Y + (mr() - 0.5) * 0.15, zz = z + (mr() - 0.5) * 0.2;
+    if (clear(0, y0, zz)) moss.add({ root: [0.02, y0, zz], n: 6, len: 0.07 + mr() * 0.07, dir: [0.2, -1], wall: { value: 0.03, side: 1 }, width: 0.22, color: mossCols[Math.floor(mr() * 4)] });
+    if (clear(4.5, y1, zz)) moss.add({ root: [4.48, y1, zz], n: 6, len: 0.07 + mr() * 0.07, dir: [-0.2, -1], wall: { value: 4.47, side: -1 }, width: 0.22, color: mossCols[Math.floor(mr() * 4)] });
   }
-  for (let y = 2.75 - 3; y > -4.5; y -= 0.32) { /* right wall below the terrace already covered */ }
-  for (let x = -14; x < -0.2; x += 0.45 + mr() * 0.3) moss.add({ root: [x, -0.12, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
-  for (let x = 4.8; x < 18.5; x += 0.45 + mr() * 0.3) moss.add({ root: [x, TERRACE_Y - 0.12, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
-  for (let x = WELL.x1 + 0.2; x < 16.3; x += 0.45 + mr() * 0.3) moss.add({ root: [x, MIRADOR_Y - 0.12, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
-  for (let y = TERRACE_Y - 0.3; y > WELL.floorY + 0.4; y -= 0.38) for (const z of [-3.2, 1.3]) {
-    moss.add({ root: [WELL.x0 + 0.02, y, z], n: 5, len: 0.09, dir: [0.2, -1], wall: { value: WELL.x0 + 0.03, side: 1 }, width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
-    moss.add({ root: [WELL.x1 - 0.02, y, z], n: 5, len: 0.09, dir: [-0.2, -1], wall: { value: WELL.x1 - 0.03, side: -1 }, width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
+  // Along each lip a continuous fringe: pieces close together, overlapping, of uneven length,
+  // with a few gaps; the fringe is thicker in some stretches than in others.
+  const fringe = (x0, x1, y) => {
+    for (let x = x0; x < x1; x += 0.13 + mr() * 0.12) {
+      if (mr() < 0.2) { x += 0.4 + mr() * 0.9; continue; }
+      // mostly short, now and then a long beard (lengths up to ~3:1), so it is not a trim
+      const long = mr() < 0.14, len = long ? 0.09 + mr() * 0.05 : 0.03 + mr() * 0.04;
+      moss.add({ root: [x, y - 0.1, Z_FRONT + 0.12 + mr() * 0.03], n: 5, len, dir: [0, -1], width: (long ? 0.24 : 0.18) + mr() * 0.1, color: mossCols[Math.floor(mr() * 4)] });
+    }
+  };
+  fringe(-14, -0.2, 0); fringe(4.8, 18.5, TERRACE_Y); fringe(WELL.x1 + 0.2, 16.3, MIRADOR_Y);
+  // In the Pozo: behind the measuring plane (in front, it covered the numbers), clear of its anchors.
+  // (From 0.6 m under the lip: a beard rising in the Pozo's region from higher up stuck out of
+  // the shaft's mouth into the air.)
+  for (let y = TERRACE_Y - 0.6; y > WELL.floorY + 0.4; y -= 0.38) for (const z of [-3.2, -1.5]) {
+    if (clear(WELL.x0, y, z)) moss.add({ root: [WELL.x0 + 0.02, y, z], n: 5, len: 0.08, dir: [0.2, -1], wall: { value: WELL.x0 + 0.03, side: 1 }, width: 0.15, color: mossCols[Math.floor(mr() * 4)] });
+    if (clear(WELL.x1, y, z)) moss.add({ root: [WELL.x1 - 0.02, y, z], n: 5, len: 0.08, dir: [-0.2, -1], wall: { value: WELL.x1 - 0.03, side: -1 }, width: 0.15, color: mossCols[Math.floor(mr() * 4)] });
   }
   scene.add(moss.build());
 

@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 09 (la Orilla se lee; ver `evidence/iter-09`).
+**Actualizado:** 2026-10-06 · iteración 10 (suelo pintado y musgo en flecos; ver `evidence/iter-10`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,15 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 09):** la Orilla se lee (A22, D15).
+**Último cambio aceptado (iteración 10):** suelo pintado y musgo en flecos (D16).
+- **Suelo:** los altos tienen una textura pintada repetible, en lugar de manchas de ruido.
+- **Musgo:** matas entintadas con puntas ocres, despejadas de anclajes y reglas; sigue el campo (dos pruebas nuevas).
+- **Prueba de resistencia nueva:** halló un tirón de 250 ms por minuto, anterior a esta iteración (A25).
+- **Revisión independiente:** dos pasadas.
+
+  Ver `evidence/iter-10`.
+
+**Iteración 09:** la Orilla se lee (A22, D15).
 - **El mástil de plomadas** ya no es una escalera y enmarca el borde de la región.
 - **Cada soporte** muestra su esfera (aviso junto a ella, anillo, brazo encendido).
 - **La cadena con las manos ocupadas** explica la causa.
@@ -136,14 +144,18 @@
 
 ## Próximo resultado
 
-**El suelo y el musgo a la altura de las plantas pintadas.**
-- **Suelo:** las manchas planas de verde de los altos se reemplazan por un suelo pintado (imagen generada para el proyecto, con su procedencia).
-- **Musgo:** las barbas escalonadas, por hebras suaves que sigan marcando el campo (cuelgan y se invierten).
+**Cerrar el Hito A como candidata para evaluación humana, o lo que la impida.**
+- **Lo que hay:** el recorrido de la escena insignia está completo y probado con teclado, y el acabado visible pasó por revisiones de arte en cada pieza.
+- **Antes de pasar al Hito B:**
+  1. Identificar el tirón de 250 ms por minuto (A25): perfil de rendimiento de Chrome durante la prueba de resistencia.
+  2. Escribir el paquete de evaluación humana del Hito A (apartado 11 del contrato): recorrido, controles, fallas conocidas y preguntas concretas sobre claridad y diversión.
+  3. Revisar si queda algún impedimento de juego en el Hito A antes de abrir el Hito B (entrada desde el Instituto).
 - **Criterio:**
-  - antes/después en las mismas tomas;
-  - el musgo responde al campo (prueba);
-  - recorrido con teclado sin regresiones;
-  - revisión independiente centrada en arte.
+  - el tirón identificado y corregido o explicado con datos;
+  - el paquete de evaluación escrito en `docs/20-worlds/physica/production/`;
+  - el recorrido sin regresiones.
+
+*Plan cumplido en la iteración 10:* suelo pintado y musgo coherente con las plantas, sin tapar instrumentos y siguiendo el campo.
 
 *Plan cumplido en la iteración 09:* la Orilla se lee (A22): el mástil no es una escalera y cada soporte muestra su esfera, según la revisión independiente.
 

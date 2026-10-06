@@ -51,40 +51,104 @@ class Chains {
   }
 }
 
-/** Moss beards as tapered ribbons in the xy-plane. */
+/** A piece of moss: a lumpy cushion where it grips the rock and, under it, a few clumps of short
+ *  curling strands in two or three lengths, each clump inked like the painted plants (a dark
+ *  underlay, then the strands), alpha-tested. Strands start at staggered depths under the
+ *  cushion, so a piece has no straight edge. Grey values multiply the vertex colour. */
+function mossTexture() {
+  if (typeof document === 'undefined') return null;
+  const W = 128, H = 256, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  let s = 5; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const strands = [], blobs = [];
+  for (let c = 0; c < 5; c++) { // clumps
+    const cu = 0.2 + 0.6 * (c / 4) + (rnd() - 0.5) * 0.12, tier = [0.4, 0.62, 0.9][Math.floor(rnd() * 3)];
+    for (let i = 0; i < 16; i++) {
+      const x0 = W * (cu + (rnd() - 0.5) * 0.16), y0 = H * (0.03 + rnd() * 0.1), len = H * tier * (0.6 + rnd() * 0.4);
+      const curl = (rnd() - 0.5) * 26, x1 = x0 + (rnd() - 0.5) * 14;
+      strands.push({ x0, y0, x1, y1: y0 + len, curl, w: 2.2 + rnd() * 1.6, shade: 150 + rnd() * 105 });
+    }
+  }
+  for (let i = 0; i < 9; i++) blobs.push({ x: W * (0.14 + 0.72 * rnd()), y: H * (0.02 + rnd() * 0.05), r: 9 + rnd() * 10 });
+  const path = st => { g.beginPath(); g.moveTo(st.x0, st.y0); g.bezierCurveTo(st.x0, st.y0 + (st.y1 - st.y0) * 0.45, st.x1 + st.curl, st.y1 - (st.y1 - st.y0) * 0.3, st.x1 + st.curl * 0.4, st.y1); };
+  g.lineCap = 'round';
+  // ink underlay
+  g.strokeStyle = 'rgb(38,30,18)'; g.fillStyle = 'rgb(38,30,18)';
+  for (const st of strands) { g.lineWidth = st.w + 2.6; path(st); g.stroke(); }
+  for (const b of blobs) { g.beginPath(); g.arc(b.x, b.y, b.r + 1.6, 0, Math.PI * 2); g.fill(); }
+  // strands, then the cushion over their roots
+  for (const st of strands) { g.strokeStyle = `rgb(${st.shade},${st.shade},${st.shade})`; g.lineWidth = st.w; path(st); g.stroke(); }
+  for (const b of blobs) { const v = 140 + rnd() * 60; g.fillStyle = `rgb(${v},${v},${v})`; g.beginPath(); g.arc(b.x, b.y, b.r, 0, Math.PI * 2); g.fill(); }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+/** Moss beards: smooth strips through each chain's points (Catmull-Rom), tapered and frayed.
+ *  The chains are the physics (they hang along the local field); the strip only draws them. */
 export class Moss extends Chains {
-  constructor(field) { super(field, { damping: 0.14, iterations: 5, bend: 0.12 }); this.mesh = null; }
+  constructor(field) { super(field, { damping: 0.14, iterations: 5, bend: 0.12 }); this.mesh = null; this.sub = 3; }
   build() {
-    const segs = this.chains.reduce((s, c) => s + c.n, 0);
-    const g = new THREE.BufferGeometry();
-    this.pos = new Float32Array(segs * 4 * 3);
-    const col = new Float32Array(segs * 4 * 3), idx = [];
+    const g = new THREE.BufferGeometry(), sub = this.sub;
+    const verts = this.chains.reduce((s, c) => s + 2 * (c.n * sub + 1), 0);
+    this.pos = new Float32Array(verts * 3);
+    const col = new Float32Array(verts * 3), uv = new Float32Array(verts * 2), idx = [];
     let v = 0;
-    for (const c of this.chains) for (let i = 0; i < c.n; i++) {
-      const t = i / c.n, k = 0.8 + 0.35 * t;
-      for (let j = 0; j < 4; j++) { col[(v + j) * 3] = c.color.r * k; col[(v + j) * 3 + 1] = c.color.g * k; col[(v + j) * 3 + 2] = c.color.b * k; }
-      idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2); v += 4;
+    let seed = 9; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (const c of this.chains) {
+      const S = c.n * sub; c.flip = rnd() < 0.5; c.vScale = 0.8 + rnd() * 0.2;
+      for (let k = 0; k <= S; k++) {
+        // Darker at the root, lighter and warmer (ochre) toward the tips: the gradient shows which
+        // way a beard points, down outside a region and up inside it.
+        const t = k / S, sh = 0.85 + 0.3 * t, w = 0.45 * t;
+        const r = (c.color.r * (1 - w) + 0.8 * w) * sh, gg = (c.color.g * (1 - w) + 0.66 * w) * sh, bb = (c.color.b * (1 - w) + 0.36 * w) * sh;
+        for (let j = 0; j < 2; j++) {
+          col.set([r, gg, bb], (v + j) * 3);
+          // each piece mirrored or not, and the texture shifted along it: stacked pieces did not
+          // repeat the same root lump at a steady interval (it read as a rope)
+          uv.set([c.flip ? 1 - j : j, 1 - t * c.vScale], (v + j) * 2);
+        }
+        if (k < S) idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2);
+        v += 2;
+      }
     }
     g.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage));
     g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
     g.setIndex(idx);
-    this.mesh = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+    // The strips lie in the xy-plane: their normal is +z (double-sided), set once.
+    const nrm = new Float32Array(verts * 3); for (let i = 0; i < verts; i++) nrm[i * 3 + 2] = 1;
+    g.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
+    const map = mossTexture();
+    this.mesh = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide, map, alphaTest: map ? 0.5 : 0, alphaToCoverage: !!map }));
     this.mesh.frustumCulled = false;
     return this.mesh;
   }
   update(dt, time) {
     this.step(dt, time, 0.18);
+    // No allocation per sample (thousands per frame): three scratch points, reused.
+    const P = this.pos, sub = this.sub, pt = this._p1 ||= { x: 0, y: 0 }, pt2 = this._p2 ||= { x: 0, y: 0 }, pt3 = this._p3 ||= { x: 0, y: 0 };
+    // Catmull-Rom through the chain's points (the ends repeated), sampled `sub` times per link.
+    const cr = (ps, i, u, o) => {
+      const a = ps[Math.max(0, i - 1)], b = ps[i], c = ps[Math.min(ps.length - 1, i + 1)], d = ps[Math.min(ps.length - 1, i + 2)];
+      const u2 = u * u, u3 = u2 * u;
+      o.x = 0.5 * (2 * b.x + (c.x - a.x) * u + (2 * a.x - 5 * b.x + 4 * c.x - d.x) * u2 + (3 * b.x - a.x - 3 * c.x + d.x) * u3);
+      o.y = 0.5 * (2 * b.y + (c.y - a.y) * u + (2 * a.y - 5 * b.y + 4 * c.y - d.y) * u2 + (3 * b.y - a.y - 3 * c.y + d.y) * u3);
+      return o;
+    };
     let o = 0;
-    for (const c of this.chains) for (let i = 0; i < c.n; i++) {
-      const p = c.pts[i], q = c.pts[i + 1];
-      const dx = q.x - p.x, dy = q.y - p.y, l = Math.hypot(dx, dy) || 1;
-      const w0 = c.width * (1 - i / c.n) * 0.5, w1 = c.width * (1 - (i + 1) / c.n) * 0.5 + 0.004;
-      const nx = -dy / l, ny = dx / l;
-      const P = this.pos;
-      P[o++] = p.x + nx * w0; P[o++] = p.y + ny * w0; P[o++] = c.root[2];
-      P[o++] = p.x - nx * w0; P[o++] = p.y - ny * w0; P[o++] = c.root[2];
-      P[o++] = q.x + nx * w1; P[o++] = q.y + ny * w1; P[o++] = c.root[2] + 0.01;
-      P[o++] = q.x - nx * w1; P[o++] = q.y - ny * w1; P[o++] = c.root[2] + 0.01;
+    for (const c of this.chains) {
+      const ps = c.pts, S = c.n * sub;
+      for (let k = 0; k <= S; k++) {
+        const t = k / S, i = Math.min(c.n - 1, Math.floor(k / sub)), u = k / sub - i;
+        cr(ps, i, u, pt);
+        // tangent from a nearby sample
+        const k2 = Math.min(S, k + 1), k1 = Math.max(0, k - 1);
+        const i2 = Math.min(c.n - 1, Math.floor(k2 / sub)), i1 = Math.min(c.n - 1, Math.floor(k1 / sub));
+        const pa = cr(ps, i1, k1 / sub - i1, pt3), pb = cr(ps, i2, k2 / sub - i2, pt2);
+        const dx = pb.x - pa.x, dy = pb.y - pa.y, l = Math.hypot(dx, dy) || 1;
+        const w = c.width * 0.5, nx = -dy / l * w, ny = dx / l * w, z = c.root[2] + 0.01 * t;
+        P[o++] = pt.x + nx; P[o++] = pt.y + ny; P[o++] = z;
+        P[o++] = pt.x - nx; P[o++] = pt.y - ny; P[o++] = z;
+      }
     }
     this.mesh.geometry.attributes.position.needsUpdate = true;
   }

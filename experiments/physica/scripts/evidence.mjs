@@ -18,12 +18,26 @@ const page = await ctx.newPage();
 const errors = [], logs = [];
 page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') logs.push(`${m.type()}: ${m.text()}`); });
 page.on('pageerror', e => errors.push(String(e)));
-const report = { url, started: new Date().toISOString(), steps: [], machine: { cores: cpus().length, loadavgAtStart: loadavg() } };
+const report = { url, started: new Date().toISOString(), steps: [], machine: { cores: cpus().length, loadavgAtStart: loadavg() }, captureTimeouts: [] };
+// Captures are illustrations; the route's assertions come from the game's state. Headless Chrome's
+// capture pipeline on this machine sometimes hangs for 30 s and more while the game keeps running
+// (measured: 122 simulation steps/s during a hung capture; scripts/capturas-estres.mjs, also on
+// iteration 09's code). A capture is retried once and, if it hangs again, skipped and recorded.
+async function snap(what = '') {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try { return await page.screenshot({ timeout: 8000 }); }
+    catch (e) { if (!/Timeout/.test(String(e))) throw e; report.captureTimeouts.push({ what, attempt, t: (await state()).t }); }
+  }
+  return null;
+}
+const save = (file, buf) => { if (buf) writeFileSync(file, buf); };
 const step = (name, data = {}) => { report.steps.push({ name, ...data }); console.log('·', name, JSON.stringify(data).slice(0, 220)); };
 const state = () => page.evaluate(() => window.__physica.state());
 const sleep = ms => page.waitForTimeout(ms);
 
 async function sheet(name, shots, cols = 4, label = '') {
+  shots = shots.filter(s => s.buf); // a skipped capture leaves no frame
+  if (!shots.length) return;
   const w = 1280 / 2, h = 720 / 2, rows = Math.ceil(shots.length / cols);
   const b64 = shots.map(s => s.buf.toString('base64'));
   const p2 = await ctx.newPage();
@@ -67,7 +81,7 @@ async function capture(n, every, labelFn) {
   for (let i = 0; i < n; i++) {
     const s = await state();
     samples.push(s);
-    shots.push({ buf: await page.screenshot(), label: labelFn(s, i) });
+    shots.push({ buf: await snap('secuencia'), label: labelFn(s, i) });
     await sleep(every);
   }
   return { shots, samples };
@@ -79,10 +93,10 @@ await page.evaluate(() => { localStorage.removeItem('physica.v1'); localStorage.
 await page.reload();
 await page.waitForFunction(() => window.__physica && window.__physica.world.stepCount > 30);
 await sleep(900);
-writeFileSync(join(out, '00a-plano-de-establecimiento.png'), await page.screenshot());
+save(join(out, '00a-plano-de-establecimiento.png'), await snap('00a-plano-de-establecimiento.png'));
 await page.mouse.click(640, 360);
 await sleep(3400);
-writeFileSync(join(out, '00-inicio.png'), await page.screenshot());
+save(join(out, '00-inicio.png'), await snap('00-inicio.png'));
 step('inicio', { state: await state() });
 
 const standX = await page.evaluate(() => Object.fromEntries(window.__physica.world.stands.map(s => [s.id, s.x])));
@@ -131,14 +145,14 @@ let t0 = Date.now(), k = 0, simStart = (await state()).t;
 // Windows are measured in simulated time: screenshots stall the page, the simulation does not catch up.
 while ((await state()).t - simStart < 3.6 && Date.now() - t0 < 30000) {
   const st = await state(); shortTraj.push({ ms: Date.now() - t0, simT: st.t - simStart, ...st.avatar });
-  if (k++ % 4 === 0 && shortShots.length < 10) shortShots.push({ buf: await page.screenshot(), label: `pies=${(st.avatar.y - 0.55).toFixed(2)} vy=${st.avatar.vy.toFixed(2)}` });
+  if (k++ % 4 === 0 && shortShots.length < 10) shortShots.push({ buf: await snap('secuencia'), label: `pies=${(st.avatar.y - 0.55).toFixed(2)} vy=${st.avatar.vy.toFixed(2)}` });
   await sleep(20);
 }
 await page.keyboard.up('ArrowRight');
 await sheet('03a-desde-el-borde-no-alcanza', shortShots, 5, 'Desde el borde: la región levanta al explorador, pero sus pies no llegan a la Terraza (4,4 m); queda una marca de tiza');
 const apexes = await page.evaluate(() => window.__physica.events.filter(e => e.type === 'apex').map(e => ({ feet: +e.y.toFixed(2), centre: +e.centre.toFixed(2), from: e.from })));
 await page.evaluate(() => window.__physica.inspect(3.6, 3.6, 6)); await sleep(1800);
-writeFileSync(join(out, '03a2-tiza-y-linea-de-campana.png'), await page.screenshot());
+save(join(out, '03a2-tiza-y-linea-de-campana.png'), await snap('03a2-tiza-y-linea-de-campana.png'));
 await page.evaluate(() => window.__physica.inspect(null));
 await sleep(300);
 await page.keyboard.press('r'); await sleep(700);
@@ -156,7 +170,7 @@ t0 = Date.now(); while (Date.now() - t0 < 4000) { const st = await state(); if (
 await page.keyboard.up('ArrowDown');
 await sleep(200);
 const letGoAt = (await state()).avatar.y;
-writeFileSync(join(out, '03b-en-la-cadena.png'), await page.screenshot());
+save(join(out, '03b-en-la-cadena.png'), await snap('03b-en-la-cadena.png'));
 await page.keyboard.press('e');
 await page.keyboard.down('ArrowRight');
 const traj = [], crossShots = [];
@@ -164,7 +178,7 @@ t0 = Date.now(); k = 0; simStart = (await state()).t;
 while ((await state()).t - simStart < 6 && Date.now() - t0 < 40000) {
   const st = await state();
   traj.push({ ms: Date.now() - t0, simT: st.t - simStart, ...st.avatar });
-  if (k++ % 4 === 0 && crossShots.length < 15) crossShots.push({ buf: await page.screenshot(), label: `x=${st.avatar.x.toFixed(2)} pies=${(st.avatar.y - 0.55).toFixed(2)} vy=${st.avatar.vy.toFixed(2)}` });
+  if (k++ % 4 === 0 && crossShots.length < 15) crossShots.push({ buf: await snap('secuencia'), label: `x=${st.avatar.x.toFixed(2)} pies=${(st.avatar.y - 0.55).toFixed(2)} vy=${st.avatar.vy.toFixed(2)}` });
   if (st.avatar.x > 6 && st.avatar.grounded) break;
   await sleep(20);
 }
@@ -199,7 +213,7 @@ async function wellAttempt(letGo, name, label) {
   await page.keyboard.down('ArrowRight');
   while ((await state()).t - t0s < 6) {
     const st = await state(), on = await solidUnder();
-    if (k2++ % 5 === 0 && shots.length < 10) shots.push({ buf: await page.screenshot(), label: `${label} hebilla=${st.avatar.y.toFixed(2)}` });
+    if (k2++ % 5 === 0 && shots.length < 10) shots.push({ buf: await snap('secuencia'), label: `${label} hebilla=${st.avatar.y.toFixed(2)}` });
     if (on === 'mirador' || on === 'pozo-fondo') { outcome = on; break; }
     await sleep(20);
   }
@@ -216,12 +230,12 @@ await walkTo(10.1);
 const pShots = [];
 for (let i = 0; i < 2; i++) { await page.keyboard.press('ArrowDown'); await sleep(120); }
 await page.keyboard.press('e');
-let t0p = (await state()).t; while ((await state()).t - t0p < 1.6) { pShots.push({ buf: await page.screenshot(), label: `P desde 2,0 · y=${(await page.evaluate(() => window.__physica.world.stands.find(s => s.id === 'P').body.y)).toFixed(2)}` }); await sleep(250); if (pShots.length >= 5) break; }
+let t0p = (await state()).t; while ((await state()).t - t0p < 1.6) { pShots.push({ buf: await snap('secuencia'), label: `P desde 2,0 · y=${(await page.evaluate(() => window.__physica.world.stands.find(s => s.id === 'P').body.y)).toFixed(2)}` }); await sleep(250); if (pShots.length >= 5) break; }
 const pBell = await page.evaluate(() => window.__physica.events.filter(e => e.type === 'bell' && e.bell === 'pozo').length);
 await page.keyboard.press('e'); await sleep(2600);
 for (let i = 0; i < 2; i++) { await page.keyboard.press('ArrowDown'); await sleep(120); }
 await page.keyboard.press('e');
-t0p = (await state()).t; while ((await state()).t - t0p < 1.6) { pShots.push({ buf: await page.screenshot(), label: `P desde 1,0 · y=${(await page.evaluate(() => window.__physica.world.stands.find(s => s.id === 'P').body.y)).toFixed(2)}` }); await sleep(250); if (pShots.length >= 10) break; }
+t0p = (await state()).t; while ((await state()).t - t0p < 1.6) { pShots.push({ buf: await snap('secuencia'), label: `P desde 1,0 · y=${(await page.evaluate(() => window.__physica.world.stands.find(s => s.id === 'P').body.y)).toFixed(2)}` }); await sleep(250); if (pShots.length >= 10) break; }
 const pEnd = await page.evaluate(() => window.__physica.world.stands.find(s => s.id === 'P').body.y);
 await sheet('10-0-soporte-del-pozo', pShots, 5, 'Soporte P: desde 2,0 m sube y toca la campana del Mirador; desde 1,0 m cae al agua');
 step('pozo: soporte P', { bellFrom2: pBell, endFrom1: pEnd, fellIntoWater: pEnd < -0.5 });
@@ -238,7 +252,7 @@ step('pozo: demasiado arriba', wb);
 const wc = await wellAttempt(1.5, '10c-pozo-en-la-ventana', 'soltarse a 1,5 m');
 step('pozo: en la ventana', wc);
 await sleep(2800);
-writeFileSync(join(out, '10d-vista-desde-el-mirador.png'), await page.screenshot());
+save(join(out, '10d-vista-desde-el-mirador.png'), await snap('10d-vista-desde-el-mirador.png'));
 await sleep(5000);
 // No dead end: down the steps and back up.
 const down = await holdUntil('ArrowRight', async () => (await state()).avatar.x > 18.2, 8);
@@ -256,13 +270,13 @@ await page.keyboard.up('ArrowRight');
 const bl = back[back.length - 1];
 step('volver a la Terraza', { samples: back.length, final: bl, onTerrace: bl.x > 4.7 && bl.grounded && Math.abs(bl.y - 0.55 - 4.4) < 0.02 });
 await page.evaluate(() => window.__physica.inspect(12.0, 2.2, 9)); await sleep(2200);
-writeFileSync(join(out, '11-pozo-instrumentos.png'), await page.screenshot());
+save(join(out, '11-pozo-instrumentos.png'), await snap('11-pozo-instrumentos.png'));
 await page.evaluate(() => window.__physica.inspect(null));
 
 // 4 — Bitácora and save/load.
-writeFileSync(join(out, '04-terraza.png'), await page.screenshot());
+save(join(out, '04-terraza.png'), await snap('04-terraza.png'));
 await page.keyboard.press('j'); await sleep(400);
-writeFileSync(join(out, '05-bitacora.png'), await page.screenshot());
+save(join(out, '05-bitacora.png'), await snap('05-bitacora.png'));
 await page.keyboard.press('j');
 const before = (await state()).journal;
 await page.reload();
@@ -286,7 +300,7 @@ await sleep(6000);
 const stats = await page.evaluate(() => window.__physica.stats());
 const gl = await page.evaluate(() => { const c = document.createElement('canvas').getContext('webgl2'); const d = c.getExtension('WEBGL_debug_renderer_info'); return d ? c.getParameter(d.UNMASKED_RENDERER_WEBGL) : 'unknown'; });
 step('rendimiento', { stats, renderer: gl, viewport: '1280x720', note: 'headless Chrome; frame interval includes vsync wait' });
-writeFileSync(join(out, '06-cascada.png'), await page.screenshot());
+save(join(out, '06-cascada.png'), await snap('06-cascada.png'));
 // 6b — frame times during a real crossing with no screenshots (worst case of this scene).
 await page.evaluate(() => { const w = window.__physica.world, a = w.avatar; a.x = a.px = -3; a.y = a.py = 0.55; a.vx = a.vy = 0; });
 await sleep(800);
@@ -295,11 +309,11 @@ await page.keyboard.down('ArrowRight'); await sleep(4500); await page.keyboard.u
 step('rendimiento-cruce', { stats: await page.evaluate(() => window.__physica.stats()), traces: (await state()).traces.length, final: (await state()).avatar, note: 'walk off the lip with no screenshots (the failing branch; the camera follows the full rise)' });
 // Close-ups (inspection camera): instruments at the lip, moss on the chasm walls.
 await page.evaluate(() => window.__physica.inspect(0.3, 2.6, 5.5)); await sleep(2500);
-writeFileSync(join(out, '07-plomadas.png'), await page.screenshot());
+save(join(out, '07-plomadas.png'), await snap('07-plomadas.png'));
 await page.evaluate(() => window.__physica.inspect(2.2, -1.2, 9)); await sleep(2500);
-writeFileSync(join(out, '08-sima-cadena-riel.png'), await page.screenshot());
+save(join(out, '08-sima-cadena-riel.png'), await snap('08-sima-cadena-riel.png'));
 await page.evaluate(() => window.__physica.inspect(2.5, 1.5, 22)); await sleep(2500);
-writeFileSync(join(out, '09-plano-general.png'), await page.screenshot());
+save(join(out, '09-plano-general.png'), await snap('09-plano-general.png'));
 await page.evaluate(() => window.__physica.inspect(null));
 
 report.errors = errors; report.consoleWarnings = logs; report.finished = new Date().toISOString(); report.machine.loadavgAtEnd = loadavg();

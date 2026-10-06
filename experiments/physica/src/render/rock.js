@@ -63,6 +63,16 @@ export function setWetZones(boxes) {
   boxes.slice(0, WET_MAX).forEach((b, i) => { wetMin[i].set(b[0], b[1], b[2]); wetMax[i].set(b[3], b[4], b[5]); });
 }
 
+/** The walkable tops' painted soil (art-source/physica/ground-top-v1.png, made seamless), shared. */
+let groundTex = null;
+function groundTexture() {
+  if (groundTex) return groundTex;
+  groundTex = new THREE.TextureLoader().load('textures/ground.jpg');
+  groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping; groundTex.colorSpace = THREE.SRGBColorSpace;
+  groundTex.anisotropy = 16; // the camera sees the tops nearly edge-on (clamped to the GPU's maximum)
+  return groundTex;
+}
+
 export function rockMaterial({ fogFade = 0, mossAmount = 1, tint = '#ffffff', shade = 0, shadeColor = '#6e5652', detail = 1 } = {}) {
   const m = new THREE.MeshStandardMaterial({ color: tint, roughness: 0.92, metalness: 0 });
   const strata = colorArray(PALETTE.strata);
@@ -70,6 +80,7 @@ export function rockMaterial({ fogFade = 0, mossAmount = 1, tint = '#ffffff', sh
     sh.uniforms.uStrata = { value: strata };
     sh.uniforms.uNoise = { value: noiseTexture() };
     sh.uniforms.uDetail = { value: strataTexture() };
+    sh.uniforms.uGround = { value: groundTexture() };
     sh.uniforms.uDetailAmt = { value: detail };
     sh.uniforms.uBands = { value: BANDS };
     sh.uniforms.uWetMin = { value: wetMin };
@@ -89,7 +100,7 @@ export function rockMaterial({ fogFade = 0, mossAmount = 1, tint = '#ffffff', sh
 varying vec3 vWPos; varying vec3 vWNor; varying float vTop; varying float vAxis;
 uniform vec3 uStrata[8]; uniform vec3 uMoss,uMossDeep,uSoil;
 uniform float uMossAmount,uFade,uShade,uDetailAmt; uniform vec3 uShadeCol;
-uniform sampler2D uNoise; uniform sampler2D uDetail;
+uniform sampler2D uNoise; uniform sampler2D uDetail; uniform sampler2D uGround;
 uniform vec3 uWetMin[${WET_MAX}]; uniform vec3 uWetMax[${WET_MAX}];
 float hDetail; float wetness;
 ${BAND_GLSL}
@@ -130,9 +141,17 @@ vec3 perturbBump(vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float fd){
         float grain=texture2D(uNoise,F*.22).g;
         // only the block's real walkable top: the narrow ledge tops inside a face stay rock
         float up=smoothstep(.78,.92,N.y)*(1.-smoothstep(.06,.2,depth));
-        float mossN=texture2D(uNoise,P.xz*.07+.5).a;
-        vec3 top=mix(uSoil*(.85+.3*grain),mix(uMossDeep,uMoss,grain),smoothstep(.42,.55,mossN)*uMossAmount);
-        top*=1.+lum*.8;
+        // painted soil and grass, 3.6 m per tile, mixed with a larger rotated sample of itself so
+        // the repetition does not line up along the long tops
+        vec3 soil1=texture2D(uGround,P.xz*.28).rgb;
+        vec3 soil2=texture2D(uGround,mat2(.8,-.6,.6,.8)*P.xz*.115+vec2(.37,.11)).rgb;
+        // far away (and so at a grazing angle) the coarse sample takes over: the fine one smears
+        float far=smoothstep(7.,20.,distance(cameraPosition,P));
+        vec3 top=mix(soil1,soil2,max(.45*smoothstep(.3,.7,texture2D(uNoise,P.xz*.045).b),.8*far));
+        // the grass patches a little duller and darker, so the painted plants stand out against them
+        float grassy=smoothstep(.0,.07,top.g-top.r);
+        top=mix(top,vec3(dot(top,vec3(.299,.587,.114))),.2*grassy)*mix(1.,.9,grassy);
+        top*=.92+.16*grain;
         vec3 col=mix(base,top,up);
         // faces under an overhang sit in shadow
         col*=mix(1.,.55,smoothstep(.3,.9,-N.y));
@@ -153,7 +172,7 @@ vec3 perturbBump(vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float fd){
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
         normal=perturbBump(-vViewPosition, normal, vec2(dFdx(hDetail), dFdy(hDetail))*.9*uDetailAmt, faceDirection);`);
   };
-  m.customProgramCacheKey = () => `rock4-${fogFade}-${mossAmount}-${shade}-${detail}`;
+  m.customProgramCacheKey = () => `rock6-${fogFade}-${mossAmount}-${shade}-${detail}`;
   return m;
 }
 

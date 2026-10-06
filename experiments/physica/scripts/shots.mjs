@@ -25,6 +25,14 @@ SETS.flora = [
   { name: 'v5-terraza-arriba', explorer: [7, 4.4], cam: [8, 5.0, 6] },
   { name: 'v6-juego-orilla', explorer: [-12, 0], cam: null },
 ];
+SETS.suelo = [
+  { name: 's1-orilla-juego', explorer: [-12, 0], cam: null },
+  { name: 's2-orilla-cerca', explorer: [-8, 0], cam: [-8.5, 0.7, 4.5] },
+  { name: 's3-terraza-juego', explorer: [7, 4.4], cam: null },
+  { name: 's4-musgo-sima', explorer: [-1.2, 0], cam: [0.3, -1.6, 4.2] },
+  { name: 's5-musgo-terraza-borde', explorer: [-1.2, 0], cam: [4.3, 2.4, 4.2] },
+  { name: 's6-mirador', explorer: [14, 5.15], cam: null },
+];
 const SHOTS = SETS[process.argv[4]] || [
   { name: 'a-inicio', explorer: [-16, 0], cam: null },
   { name: 'b-cascada', explorer: [-1.2, 0], cam: null },
