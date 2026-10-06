@@ -59,4 +59,6 @@ test('restored benches and found memories show as such; the workshop interior st
   assert.ok(marks.some(m => m.kind === 'bench' && m.restored));
   assert.ok(marks.some(m => m.kind === 'memory'));
   assert.deepEqual(marks.find(m => m.kind === 'player').at, [KINGDOM.workshop.x, KINGDOM.workshop.z]);
+  const travel = renderKingdomMap({ ...state, area: 'plaza', position: [0, 0] }, { position: [0, 0] });
+  assert.match(travel, /data-area="workshop"/, 'the workshop interior stays reachable from the travel list');
 });

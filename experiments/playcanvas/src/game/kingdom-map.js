@@ -96,7 +96,7 @@ export function renderKingdomMap(state, options = {}) {
   const { marks, route, visited } = kingdomMapMarks(state, options);
   const guide = journeyGuidance(state), phase = journeyPhase(state);
   const routePath = route.length > 1 ? route.map((p, i) => `${i ? 'L' : 'M'}${mapPoint(p).join(' ')}`).join(' ') : '';
-  const destinations = [...visited].filter(id => id !== 'workshop').map(id => `<button type="button" class="map-destination ${id === state.area ? 'selected' : ''}" data-area="${id}" ${id === state.area ? 'disabled aria-current="location"' : ''}><span>${esc(AREAS[id].name)}</span><small>${id === state.area ? 'Estás acá' : 'Viajar'}</small></button>`).join('');
+  const destinations = [...visited].map(id => `<button type="button" class="map-destination ${id === state.area ? 'selected' : ''}" data-area="${id}" ${id === state.area ? 'disabled aria-current="location"' : ''}><span>${esc(AREAS[id].name)}</span><small>${id === state.area ? 'Estás acá' : 'Viajar'}</small></button>`).join('');
   const fog = JSON.stringify([...visited].filter(isExterior));
   return `<div class="kmap" data-kmap data-fog='${esc(fog)}'>
     <div class="kmap-viewport" data-kmap-viewport tabindex="0" role="application" aria-roledescription="mapa" aria-label="Mapa del reino de Ohmdal, norte arriba. Arrastrá o usá las flechas para mover; rueda, pellizco o + y − para acercar; C para centrar en vos.">
@@ -114,7 +114,7 @@ export function renderKingdomMap(state, options = {}) {
     <div class="kmap-compass" aria-hidden="true"><svg viewBox="-50 -50 100 100"><circle r="44" class="ring"/><circle r="38" class="ring thin"/><path class="needle-n" d="M0 -40 L7 0 L0 6 L-7 0Z"/><path class="needle-s" d="M0 40 L7 0 L0 -6 L-7 0Z"/><path class="needle-ew" d="M-34 0 L0 5 L34 0 L0 -5Z"/><text y="-30">N</text></svg></div>
     <div class="kmap-scale" data-kmap-scale aria-hidden="true"><i></i><span>50 m</span></div>
     <div class="kmap-controls" role="group" aria-label="Zoom del mapa"><button type="button" data-kmap-zoom="1" aria-label="Acercar">+</button><button type="button" data-kmap-zoom="-1" aria-label="Alejar">−</button><button type="button" data-kmap-center aria-label="Centrar en vos">◎</button></div>
-    ${destinations ? `<details class="map-return kmap-travel"><summary>Viajar a un lugar visitado · ${visited.size - (visited.has('workshop') ? 1 : 0)}</summary><nav class="map-destinations" aria-label="Volver a lugares visitados">${destinations}</nav></details>` : ''}
+    ${destinations ? `<details class="map-return kmap-travel"><summary>Viajar a un lugar visitado · ${visited.size}</summary><nav class="map-destinations" aria-label="Volver a lugares visitados">${destinations}</nav></details>` : ''}
     <ul class="kmap-legend" aria-label="Referencias"><li><i class="lg-player"></i>Vos</li><li><i class="lg-objective"></i>Siguiente paso</li><li><i class="lg-bench restored"></i>Restaurado</li><li><i class="lg-bench"></i>Por restaurar</li><li><i class="lg-fog"></i>Sin recorrer</li></ul>
   </div>`;
 }
