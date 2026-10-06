@@ -12,7 +12,7 @@ con la GPU libre.
 | 1 | ALTO | Versión ligera sin salida tras «Ver la entrada» (sin WebGL o con el contexto perdido) | **Corregido**: la vista previa no se ofrece ni corre en la versión ligera; `lightVersion` limpia sus estados; Escape sale siempre. QA §8 |
 | 2 | ALTO | Volver con Atrás (bfcache) no relee la partida ni cuenta el cambio; cámara en primer plano del Portal | **Corregido**: `pageshow` persistido relee la partida, ubica la cámara según la URL y llama a `showChanges`. QA §7 **simulado** (evento sintético); bfcache real NO VERIFICADO |
 | 3 | ALTO | Árboles que desaparecen de golpe en cada acercamiento | **Corregido**: se decide con la pose de destino y se desvanecen (~0,3 s, material propio por árbol). QA §6 |
-| 4 | ALTO | Sin FPS válidos con la GPU libre | **Bloqueado por el entorno**: la GPU estuvo ocupada todo el ciclo por la partida automatizada del agente de Bitland; no se mide con contención |
+| 4 | ALTO | Sin FPS válidos con la GPU libre | **Resuelto en escritorio (c11)**: 1440 alto con GPU libre → 53,3 FPS en la vista general; con DOF en calidad normal, 60,1 FPS p99 16,8 ms (`PERF.md`). 390 DPR 2 sigue sin corrida limpia (GPU compartida con otros agentes) |
 | 5 | MEDIO | Rótulo del gesto que cae al terminar | **Corregido**: el rótulo se vacía antes de quitar el estado |
 | 6 | MEDIO | Pantallas de lámparas encendidas en etapa 0 | **Corregido**: material propio que sigue a `workshop` real (`evidence/c11/electronica-0` vs `-10`) |
 | 7 | MEDIO | Evidencia de bancos con cámara inalcanzable; sin capturas 390 | **Corregido**: capturas con la cámara real de la sala (etapas 0/10) y a 390×844 |
