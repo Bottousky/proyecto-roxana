@@ -1,0 +1,27 @@
+[0.0s] escena → c10.flechas
+[1.0s] lee: Punto, traeme la soga. Estás en el pozo, en el cero del mapa; mi casa está en (4, −2). Mara sólo te deja moverte con estas flechas.
+[4.1s] elige «Al mismo lugar.» (Si Punto hace las mismas dos flechas en el otro orden, ¿adónde llega?)
+[4.5s] lee: —Punto: el camino cambia, el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde.
+[5.3s] escena → c10.cuarto
+[5.7s] lee: En la Terraza de las Vueltas, cuando te dan media vuelta, se escribe × (−1). Así lo anotamos desde la piedra. ¿Y un cuarto de vuelta, cómo se escribe?
+[9.0s] lee: Dos cuartos: (−3, −1). La flecha da vuelta entera hacia el otro lado: es la de antes por −1.
+[9.5s] elige «Uno nuevo, que no está en la recta: el que gira un cuarto.» (¿Qué número, multiplicado dos veces, da media vuelta, × (−1)?)
+[10.0s] lee: —Mara: al cuarto de vuelta le decimos i. Dos cuartos son media vuelta: i · i = −1. No es un número de la recta: es un número que gira.
+[10.1s] lee: ¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?
+[10.2s] lee: —Con los números de la recta no se podía. Con éstos sí: 2i · 2i = −4. Dos cuartos de vuelta y el doble de largo, dos veces.
+[11.0s] escena → c10.pistas
+[11.5s] lee: Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7.
+[11.5s] lee: Con una sola pista hay ocho pares posibles: toda una recta.
+[12.4s] lee: Segunda pista: el de Cornisa le lleva 1 al de Balcón.
+[13.4s] lee: —Mara: Cornisa 4, Balcón 3. Cada pista es una recta de pares; las dos a la vez, donde se cruzan.
+[13.5s] lee: ¿Y si te digo «suman 7» y «suman 3»?
+[14.0s] elige «Ningún par: esas dos rectas no se cruzan.» (Con «suman 7» y «suman 3», ¿qué par cumple las dos?)
+[14.5s] lee: Paralelas: ningún par cumple las dos.
+[14.7s] lee: Mara anota sólo los números de cada pista, en filas: una tabla así se llama matriz. Sirve para no escribir las letras todo el tiempo.
+[15.5s] escena → c10.a-veces
+[16.5s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[21.3s] elige «No se sabe seguro; lo más probable, llena.» (El balde número 7, ¿cómo va a subir?)
+[21.7s] lee: Ni la rueda ni el balde avisan. Lo que pasó dice qué es más común, no qué va a pasar.
+[22.5s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[23.8s] lee: El capítulo 11 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[25.0s] {"ended":true,"final":{"mode":"title","seg":"c10.a-veces"},"journal":["Vueltas y flechas"],"evidenceKinds":["vector-step","vector-order","vector","quarter","i-predict","complex","system-try","system-parallel","system","pull","chance-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":24.974,"size":"1600x900","touch":false,"route":"directa","watch":false}

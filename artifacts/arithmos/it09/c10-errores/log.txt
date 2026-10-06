@@ -1,0 +1,51 @@
+[0.0s] escena → c10.rueda
+[1.0s] lee: La rueda del pozo perdió la soga. Tengo pedazos del largo del rayo de la rueda, de la punta al centro. ¿Cuántos hacen falta para dar toda la vuelta?
+[1.6s] elige «Tres, como de punta a punta pasando por el centro.» (¿Cuántos pedazos del largo del rayo entran alrededor de la rueda?)
+[3.5s] lee: Todavía queda rueda sin soga.
+[5.5s] lee: Tres pedazos son media vuelta y un poco más. La vuelta entera: seis y un pedacito.
+[5.5s] lee: —Balcón: una vuelta entera son 6 rayos y un poco más: 6,28… Ese número no termina; se lo llama 2π. Media vuelta, π, unos 3,14 rayos.
+[5.6s] lee: Medir un giro por cuántos rayos recorre el borde: eso es medir en radianes. Sirve para cualquier rueda: con una más grande, los pedazos también son más largos.
+[6.5s] escena → c10.alto
+[7.5s] lee: Ato el balde a la manija de la rueda. Si giro la rueda, ¿a qué altura queda la manija?
+[8.8s] elige «A un tercio de rayo: 30 es un tercio de 90.» (Si la rueda gira 30°, ¿a qué altura sobre el centro queda la manija?)
+[12.0s] lee: A 30° la manija sube medio rayo, no un tercio: la altura no crece parejo con el giro.
+[12.9s] lee: —Balcón: con la manija a 30° y su reflejo a −30°, el triángulo tiene tres ángulos de 60°: los tres lados miden un rayo. La altura es la mitad de ese lado: medio rayo.
+[12.9s] lee: —Con la rueda de un rayo, a la altura de la manija se le dice seno del ángulo; al costado, coseno. Y como en el tirante, alto² + costado² = 1.
+[13.0s] escena → c10.repite
+[13.4s] lee: ¿Y si la rueda sigue girando? Pongamos las alturas en el mapa, como mi sombra.
+[18.4s] elige «Más que 1: siguió girando.» (Girada 390°, ¿a qué altura queda la manija?)
+[18.8s] lee: 390° es una vuelta entera, 360°, y 30° más: la manija está donde estaba a los 30°. Medio rayo.
+[19.7s] lee: —Cornisa: la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.
+[20.4s] escena → c10.rampa
+[20.8s] lee: Mis rampas de carga tienen todas la misma inclinación: 30°. Una corta, de 2 tablones de largo, sube 1. La larga, de 4, sube 2. Quiero una de 6: ¿cuánto va a subir?
+[22.1s] elige «Sube 4: dos más que la de 4.» (La rampa de largo 6, con la misma inclinación, ¿cuánto sube?)
+[23.4s] lee: No se suma: se multiplica. Las rampas son semejantes; alto ÷ largo es siempre 1/2. Con largo 6, sube 3.
+[24.3s] lee: —Rampa: con la misma inclinación, alto ÷ largo es siempre el mismo número, y es el seno del ángulo: sen 30° = 0,5. Con la tabla de la rueda, sabés cuánto sube cualquier rampa sin construirla.
+[25.0s] escena → c10.flechas
+[25.4s] lee: Punto, traeme la soga. Estás en el pozo, en el cero del mapa; mi casa está en (4, −2). Mara sólo te deja moverte con estas flechas.
+[31.2s] elige «A otro lugar: cambia el camino.» (Si Punto hace las mismas dos flechas en el otro orden, ¿adónde llega?)
+[31.6s] lee: —Punto: el camino cambia, pero el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde.
+[32.4s] escena → c10.cuarto
+[32.7s] lee: En la Terraza de las Vueltas, cuando te dan media vuelta, se escribe × (−1). Así lo anotamos desde la piedra. ¿Y un cuarto de vuelta, cómo se escribe?
+[36.1s] lee: Dos cuartos: (−3, −1). La flecha da vuelta entera hacia el otro lado: es la de antes por −1.
+[36.7s] elige «−1.» (¿Qué número, multiplicado dos veces, da media vuelta, × (−1)?)
+[37.1s] lee: −1 por −1 es 1: dos medias vueltas, vuelta entera. Hace falta uno que sea medio camino: un cuarto.
+[37.2s] lee: —Mara: al cuarto de vuelta le decimos i. Dos cuartos son media vuelta: i · i = −1. No es un número de la recta: es un número que gira.
+[37.3s] lee: ¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?
+[37.3s] lee: —Con los números de la recta no se podía. Con éstos sí: 2i · 2i = −4. Dos cuartos de vuelta y el doble de largo, dos veces.
+[38.2s] escena → c10.pistas
+[38.6s] lee: Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7.
+[38.7s] lee: Con una sola pista hay ocho pares posibles: toda una recta.
+[39.5s] lee: Segunda pista: el de Cornisa le lleva 1 al de Balcón.
+[40.5s] lee: —Mara: Cornisa 4, Balcón 3. Cada pista es una recta de pares; las dos a la vez, donde se cruzan.
+[40.6s] lee: ¿Y si te digo «suman 7» y «suman 3»?
+[41.1s] elige «(5, 2).» (Con «suman 7» y «suman 3», ¿qué par cumple las dos?)
+[41.6s] lee: (5, 2) suma 7, pero no 3. Las dos rectas son paralelas: ningún par cumple las dos.
+[41.7s] lee: Mara anota sólo los números de cada pista, en filas: una tabla así se llama matriz. Sirve para no escribir las letras todo el tiempo.
+[42.5s] escena → c10.a-veces
+[43.5s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[49.4s] elige «A medias: ya le toca.» (El balde número 7, ¿cómo va a subir?)
+[49.8s] lee: El balde no lleva la cuenta: que hayan salido llenas no hace que «le toque» a medias.
+[50.6s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[51.6s] lee: El capítulo 11 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[52.8s] {"ended":true,"final":{"mode":"title","seg":"c10.a-veces"},"journal":["Vueltas y flechas"],"evidenceKinds":["radian-predict","radian-piece","radian","sin30-predict","height","sine","period-predict","period","ratio-predict","ratio","vector-step","vector-order","vector","quarter","i-predict","complex","system-try","system-parallel","system","pull","chance-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":52.759,"size":"1600x900","touch":false,"route":"errores","watch":false}

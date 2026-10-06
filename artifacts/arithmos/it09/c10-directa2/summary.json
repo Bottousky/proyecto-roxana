@@ -1,0 +1,43 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c10.a-veces"
+  },
+  "journal": [
+    "Vueltas y flechas"
+  ],
+  "evidenceKinds": [
+    "radian-predict",
+    "radian-piece",
+    "radian",
+    "sin30-predict",
+    "height",
+    "sine",
+    "period-predict",
+    "period",
+    "ratio-predict",
+    "ratio",
+    "vector-step",
+    "vector-order",
+    "vector",
+    "quarter",
+    "i-predict",
+    "complex",
+    "system-try",
+    "system-parallel",
+    "system",
+    "pull",
+    "chance-predict"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 55.063,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

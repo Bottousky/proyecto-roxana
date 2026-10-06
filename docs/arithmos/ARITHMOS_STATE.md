@@ -13,7 +13,11 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 
 ## Estado real (ciclo 6 del loop, 2026-10-06)
 
-- **Capítulos 1 a 9 jugables y encadenados.** El cap. 9 «Depende» tiene 8 escenas: flechas (función
+- **Capítulos 1 a 10 jugables y encadenados.** El cap. 10 «Vueltas y flechas» (radianes, seno como
+  alto en la rueda, periodicidad, razón en rampas, vectores, i como cuarto de vuelta, sistemas 2 × 2
+  como rectas que se cruzan, gancho al azar) pasa las rutas directa y con errores (`it09/c10-*`); sin
+  revisión independiente todavía.
+- El cap. 9 «Depende» tiene 8 escenas: flechas (función
   vs relación, con el largo de la sombra), la máquina de Mara (regla; la de Punto no es función),
   puntos que se paran (tabla → gráfico; unir o no; la Marea borra la ola decorativa de Punto), la
   recta parada, dónde se puede (dominio de la cuenta vs del reparto), lo que sale (imagen de x · x),
@@ -45,6 +49,6 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Revisión independiente del cap. 9 (C9-R); aplicar.
-2. Cap. 10 «Vueltas y flechas» (trigonometría, radianes, periodicidad, vectores, complejos como giro).
+1. Revisión independiente del cap. 9 (C9-R, en curso) y del cap. 10 (C10-R); aplicar.
+2. Cap. 11 «Lo que pasa a veces» (datos, conteo, probabilidad, correlación vs causa) y cap. 12 «Anticipar».
 3. Pendientes narrativos N8-R, N7-R, N6-R, N2-R; cobertura C7b y C6b.

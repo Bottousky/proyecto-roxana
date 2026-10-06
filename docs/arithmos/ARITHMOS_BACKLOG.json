@@ -305,13 +305,15 @@
     },
     {
       "id": "C6b",
-      "title": "Sistemas de ecuaciones; identidad nombrada; ficha §5 de D en el currículo (pendientes de rev-mat-5 M9)",
+      "title": "Sistemas de ecuaciones; identidad nombrada; ficha §5 de D en el currículo (pendientes de rev-mat-5 M9) — sistemas 2 × 2 como rectas que se cruzan, en el cap. 10 (10.7); identidad nombrada y ficha §5 de D siguen pendientes",
       "deps": [
         "C6"
       ],
       "acceptance": "Escena jugable con decisión y comprobación; revisión matemática",
-      "status": "pendiente",
-      "evidence": []
+      "status": "implementado",
+      "evidence": [
+        "artifacts/arithmos/it09/c10-directa2/log.txt"
+      ]
     },
     {
       "id": "N6-R",
@@ -447,6 +449,20 @@
         "C8"
       ],
       "acceptance": "Idem",
+      "status": "implementado",
+      "evidence": [
+        "artifacts/arithmos/it09/c10-directa2/log.txt",
+        "artifacts/arithmos/it09/c10-errores/log.txt",
+        "artifacts/arithmos/it09/c10b-check/log.txt"
+      ]
+    },
+    {
+      "id": "C10-R",
+      "title": "Revisión independiente (matemática y narrativa) del cap. 10",
+      "deps": [
+        "C10"
+      ],
+      "acceptance": "Hallazgos registrados y corregidos o justificados",
       "status": "pendiente",
       "evidence": []
     },

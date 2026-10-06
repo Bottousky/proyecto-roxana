@@ -175,6 +175,10 @@ function pickChoice(prompt, options) {
     ['gira 30°, ¿a qué altura', 'A un tercio'],
     ['Girada 390°', 'Más que 1'],
     ['largo 6, con la misma inclinación', 'Sube 4'],
+    ['en el otro orden', 'A otro lugar'],
+    ['da media vuelta', '−1.'],
+    ['«suman 3»', '(5, 2)'],
+    ['balde número 7', 'A medias'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -269,6 +273,10 @@ function pickChoice(prompt, options) {
     ['gira 30°, ¿a qué altura', 'A medio rayo'],
     ['Girada 390°', '0,5'],
     ['largo 6, con la misma inclinación', 'Sube 3'],
+    ['en el otro orden', 'Al mismo lugar'],
+    ['da media vuelta', 'Uno nuevo'],
+    ['«suman 3»', 'Ningún par'],
+    ['balde número 7', 'No se sabe seguro'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -631,6 +639,11 @@ for (let iter = 0; iter < 4000; iter++) {
       // pone pedazos hasta que el séptimo se pase (o, en la ruta con errores, para antes una vez)
       if (route === 'errores' && !tried.has('c10early') && spots.some(x => x.id === 'c10-done') && (tried.add('c10early'), true)) target = spots.find(x => x.id === 'c10-done');
       else target = spots.find(x => x.id === 'c10-more');
+    } else if (s.seg === 'c10.flechas' && spots.some(x => x.id.startsWith('c10-v'))) {
+      if (route === 'errores' && !tried.has('c10v') && spots.some(x => x.id === 'c10-v2') && (tried.add('c10v'), true)) target = spots.find(x => x.id === 'c10-v2');
+      else target = spots.find(x => x.id === 'c10-v0') || spots.find(x => x.id === 'c10-v1') || spots[0];
+    } else if (s.seg === 'c10.pistas' && spots.some(x => x.id.startsWith('c10-p'))) {
+      target = spots.find(x => x.id === (route === 'errores' && !tried.has('c10p') && (tried.add('c10p'), true) ? 'c10-p3_2' : 'c10-p4_3'));
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
       if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }

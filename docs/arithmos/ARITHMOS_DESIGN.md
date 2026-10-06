@@ -68,7 +68,7 @@ tiene un rasgo mínimo (tamaño, ritmo de parpadeo). Lino es el más chico.
 | 7 | Crecer | E: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos | jugable, en revisión |
 | 8 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | jugable, en revisión |
 | 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | jugable, en revisión |
-| 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | diseño |
+| 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | jugable, sin revisar |
 | 11 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | pendiente |
 | 12 | Anticipar | J: familias de funciones, parámetros, composición, inversa, tasa de cambio, límite/derivada/acumulación en su nivel | pendiente |
 
@@ -324,7 +324,7 @@ Límites a declarar: los gráficos se dibujan con algunos puntos y una línea; l
 puntos la regla sigue igual (hay que decirlo); la «recta parada» es una prueba para dibujos en el
 plano con la entrada acostada.
 
-## Capítulo 10 — Vueltas y flechas (diseño)
+## Capítulo 10 — Vueltas y flechas (implementado, 2026-10-06)
 
 Pregunta de entrada (gancho del cap. 9): lo que vuelve; el sol y la rueda del pozo dan vueltas. Idea
 central: **un giro se mide por el arco que recorre; la altura y el costado de un punto que gira se
