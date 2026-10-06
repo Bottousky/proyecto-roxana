@@ -262,5 +262,29 @@ en el commit siguiente (evidencia: `artifacts/arithmos/it08/c71-trace` ruta dire
 | narr | A5 | Teléfono | Parcial: interacciones en plano cercano, botones separados, guarda de superposición; pendiente: predicciones lejanas en 7.5 y 7.7 |
 | narr | A1, M1–M10 | Plantilla, Punto oyente, voces, la Marea, opciones, costuras, composición, Bitácora | Pendientes (backlog N7-R) |
 
+## Revisiones independientes del cap. 8 (rev-mat-7 y rev-narr-6, 2026-10-06)
+
+Informes: `artifacts/arithmos/it08/review-mat/informe.md` y `artifacts/arithmos/it08/review-narr/informe.md`.
+Ambas sin navegador, sobre 55e9eee. Todas las igualdades y construcciones eran exactas. Corregido en el
+commit siguiente (evidencia: `artifacts/arithmos/it08/c8b-directa`, `it08/c8b-errores`, `it08/c81-check`):
+
+| Origen | # | Hallazgo | Disposición |
+|---|---|---|---|
+| mat | A1 | 8.1: «el dibujo no prueba nada» mal dicho; q < p < 2q implícito; la pregunta del descenso sin «si hubiera»; la contradicción no se cierra | Corregido: el estudiante dice q < p < 2q (y por qué); los nuevos lados son enteros positivos y más chicos; la pregunta lleva «si hubiera un par de enteros»; las tres ramas cierran la contradicción; la Marea borra los dibujos y quedan la cuenta y el razonamiento escritos; Bitácora |
+| mat | A2 / narr A5 | 8.8: la sombra de la tarde apuntaba al sol; la conclusión dependía de eso; no se veía | Corregido: la sombra apunta lejos del sol (derecha a la mañana, izquierda a la tarde), en azul y gruesa; la tabla anota el largo y el sentido; se tocan las 5 horas; 8.8 ya no concluye: deja la pregunta «sólo con el largo, ¿se sabe la hora?» y el cap. 9 la contesta hablando del largo |
+| mat | M1 | «A + B + C» suma puntos | Corregido: ∠A + ∠B + ∠C = 180° |
+| mat | M2 | 8.3: el marco equivocado quedaba al costado | Corregido: la caja del marco transformado se apoya sobre la ventana (con un corrimiento chico cuando no calza) |
+| mat | M3 | Vocabulario, iguales también semejantes, el marco ancho | Corregido: congruentes/semejantes, × 1, el ancho con los mismos ángulos pero lados no proporcionales; sin adelantar «cuatro ventanas» |
+| mat | M4 | Sólo k = 2; «¿cuánta tierra más?» | Corregido: pregunta por el total; se menciona × 3 → × 9 y × 27 |
+| mat | M5 | 8.6: el hueco «cuadrado» tomado del dibujo | Corregido: los dos agudos suman 90° (por 8.2) y queda 180° − 90° |
+| mat | M6 | c sin nombrar | Corregido: catetos, hipotenusa; cateto² + cateto² = hipotenusa² |
+| mat | M7 | 8.7 sin transferencia | Parcial: 3 − (−1) = 4 y 2 − (−1) = 3 explícitos; opción sin los números. Pendiente: otro triángulo |
+| mat | M8, M9 | Conclusiones con horas no vistas; Bitácora | Corregido (todas las horas; ramas de la Bitácora; gramática) |
+| narr | A3 | Punto desaparece | Parcial: en 8.5 Punto escribe «misma cerca = misma tierra» y lo borra él mismo |
+| narr | A4 | La Marea no aparece | Corregido: borra los dibujos de la prueba de √2; el razonamiento queda |
+| narr | A5 | Cajas de 8.4 ilegibles; huerta 2 × 2 contra el cap. 7; la puerta | Corregido: la caja grande por pisos, vista de arriba; la huerta es la de 3 × 3; Peldaño deja √2 en la puerta |
+| narr | M4 | El gancho 8→9 ya resolvía el cap. 9 | Corregido: queda como pregunta |
+| narr | A1, A2, A6, M1–M3, M5–M7 | Plantilla sin hilo ni clímax, agencia, teléfono, voces, opciones, costura 7→8, composición, accesibilidad, Bitácora | Pendientes (backlog N8-R) |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

@@ -1,0 +1,50 @@
+[0.0s] escena → c9.flechas
+[1.0s] lee: Con la tabla de ayer sé qué sombra hay a cada hora. Pero un viajero me preguntó la hora, le dije «mi sombra mide 2»… y no supo qué hacer.
+[5.3s] lee: De cada hora sale una flecha, y una sola.
+[5.9s] elige «Las 10 o las 14: con la sombra sola no se sabe.» (Cornisa dice «mi sombra mide 2». ¿Qué hora es?)
+[6.1s] lee: —Cornisa: a cada hora le toca una sola sombra: la sombra es función de la hora. Al revés no: a la sombra 2 le tocan dos horas. Eso es una relación, pero no una función.
+[6.7s] escena → c9.maquina
+[6.9s] lee: Hice una máquina para las cuentas de los escalones: le doy un número, lo da vuelta adentro y sale otro. Adiviná qué hace.
+[10.8s] elige «21.» (Si entra 10, ¿qué sale?)
+[11.9s] lee: Veintiuno: el doble, y uno más.
+[12.5s] lee: —Mara: tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo.
+[13.1s] lee: Punto también hizo una.
+[14.8s] lee: —Punto, el mismo 3 dio 7 y después 9. Con tu máquina no puedo anticipar nada: no es una función.
+[14.9s] lee: Punto mira su máquina un rato. Después tacha la ruedita que giraba sola.
+[15.5s] escena → c9.puntos
+[16.5s] lee: La tabla me sirve, pero quisiera verla de un vistazo.
+[17.1s] lee: —En el mapa de Mara: la hora por la recta acostada, la sombra por la parada.
+[19.4s] lee: —Punto, es linda, pero ¿a qué hora es esa ola? No sale de la tabla.
+[20.5s] elige «Unirlos: entre las 8 y las 10 también hay sombra.» (¿Los puntos se unen?)
+[21.5s] lee: A cada momento hay una sombra: se puede unir. La línea dice lo que suponemos entre medición y medición.
+[22.2s] lee: Entonces a las 9 mi sombra es… más o menos 3. Casi, porque no lo medí.
+[23.5s] lee: Yo anoto cuántas familias vienen cada día al depósito: lunes 3, martes 5, miércoles 4.
+[24.0s] elige «Sueltos: no hay «lunes y medio».» (¿Esos puntos se unen?)
+[24.2s] lee: —Mara: entre el lunes y el martes no hay un día a medias, ni media familia. Los puntos van sueltos.
+[24.4s] escena → c9.recta
+[24.6s] lee: Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?
+[25.2s] lee: —Si fuera el gráfico de una máquina, a cada entrada, sobre la recta acostada, le tocaría una sola altura. Una recta parada no puede cortarlo dos veces.
+[35.8s] lee: —Balcón: la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas.
+[35.9s] lee: La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál.
+[36.5s] escena → c9.dominio
+[37.5s] lee: Le pedí a Mara una máquina para mi reparto: entra cuántos vienen, sale lo que le toca a cada uno. 1 ÷ (x − 2), como en la escalera.
+[41.0s] lee: Con 2 se traba: abajo queda cero. Con todos los demás sale algo, aunque sea negativo.
+[42.2s] elige «Enteros mayores que 2: tiene que venir gente, y más de dos.» (Para el reparto de Rampa, ¿qué entradas tienen sentido?)
+[42.5s] lee: —Rampa: las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.
+[42.6s] escena → c9.imagen
+[42.8s] lee: Esta máquina hace «por sí mismo»: x · x. Oval me pidió que le saque un −4 para una cuenta. ¿Qué le doy?
+[50.1s] elige «No: un número por sí mismo nunca da negativo.» (¿Puede salir −4?)
+[50.5s] lee: —Mara: lo que puede salir se llama la imagen. La de x · x es el 0 y los positivos. El −4 no está, con los números que conocemos.
+[50.8s] escena → c9.maneras
+[51.0s] lee: Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles.
+[53.1s] lee: —Mara: con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: la recta sube igual todos los días y la curva despega. Se cruzan un poco antes del día 6, como vimos.
+[53.8s] lee: Y la mía, la B, es diez más uno por día: 10 + d.
+[53.9s] escena → c9.vuelve
+[54.9s] lee: Seguí midiendo, varios días. Miren.
+[57.6s] lee: Entre un día y otro, de noche, no hay sombra: ahí la función no está definida. Los huecos son parte del dominio que falta.
+[58.8s] elige «2, como cualquier día a las 10.» (Pasado mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?)
+[59.0s] lee: —Cornisa: 2. Todos los días el sol da la misma vuelta, y la sombra repite su ve.
+[59.7s] lee: Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno, la ve cambia un poco.
+[60.5s] lee: Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.
+[60.8s] lee: El capítulo 10 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[61.6s] {"ended":true,"final":{"mode":"title","seg":"c9.vuelve"},"journal":["Depende"],"evidenceKinds":["map-arrow","inverse-predict","function","machine","rule-predict","punto-machine","rule","plot","join-predict","join-discrete","vertical-predict","vertical","domain-try","domain-story","domain","image-try","image-predict","image","match","three-ways","periodic-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":["[spot tapado] \"−3\" tapa a c9-x1","[spot tapado] \"−2\" tapa a c9-x2","[spot tapado] \"−1\" tapa a c9-x3"],"seconds":61.569,"size":"844x390","touch":true,"route":"directa","watch":false}

@@ -1,0 +1,64 @@
+[0.0s] escena → c8.diagonal
+[1.1s] lee: Partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas lo parto para que caiga justo?
+[1.1s] lee: —Si partiendo el lado en q cayera justo, la diagonal mediría p de esas rayitas. Con esa rayita chica, el cuadrado del lado tendría q · q cuadraditos, y el de la diagonal, p · p.
+[1.2s] lee: Y el cuadrado de la diagonal es el de los dos cuadros: tendría que ser p · p = 2 · q · q, justo.
+[4.0s] lee: Una noche probé hasta mil. Siempre faltó o sobró, a veces uno solo.
+[5.4s] elige «Probando no se termina nunca: hace falta una razón.» (Siempre falta o sobra un poco. ¿Y ahora?)
+[5.8s] lee: —Supongamos que hubiera enteros p y q que cumplen. El de p tiene tanto lugar como los dos de q juntos. La diagonal es más larga que el lado y más corta que dos lados: q es menos que p, y p menos que 2q. Entonces cada cuadrado de q entra en el de p, y los dos juntos se pisan.
+[8.0s] lee: —Si los dos de q tapan lo mismo que el de p, lo que se pisa dos veces tiene que ser igual a lo que quedó sin tapar.
+[8.1s] lee: Un cuadrado, el del medio, igual a dos cuadrados, las esquinas. Otro par que cumpliría. Sus lados, 2q − p y p − q, son enteros, y positivos porque q < p < 2q. Y más chicos que p y q.
+[10.7s] elige «Para siempre: cada par da otro más chico.» (Si hubiera un par de enteros que cumple, ¿hasta cuándo se podría seguir achicando?)
+[11.1s] lee: Eso dice la regla: cada par que cumple da otro más chico. Pero con enteros positivos no se puede bajar para siempre: q, uno menor, otro menor… en algún momento no hay más. Las dos cosas a la vez no pueden ser.
+[11.9s] lee: —Punto: si hubiera un par de enteros que cumple, habría otro más chico, y otro, sin fin. Pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible: no hay ningún par.
+[12.8s] lee: El dibujo mostraba lo que pasaría si existiera el par, y con un dibujo no se distingue un largo de un entero. Lo que prueba es el razonamiento, y vale para todos los p y q a la vez. Probando casos, en cambio, nunca se termina.
+[13.6s] lee: En la puerta dejo √2, que es exacto. Y abajo, chiquito: «1,414 y un poco más».
+[14.3s] escena → c8.vuelta
+[15.4s] lee: Voy a cortar tejas triangulares. El carpintero dice que las tres puntas juntas siempre hacen lo mismo. ¿Lo mismo que qué?
+[18.4s] lee: Las tres puntas juntas hacen la línea recta: media vuelta.
+[18.5s] lee: —Media vuelta es lo que gira Punto para mirar para atrás. Si la vuelta entera se parte en 360 partes, los grados, media vuelta son 180.
+[19.1s] elige «Con este pasó; para saber si pasa con todos, hace falta una razón.» (Cornisa va a cortar tejas de muchas formas. ¿Pasa con todos los triángulos?)
+[19.5s] lee: —Por la punta de arriba, una recta paralela a la de abajo: no se cruzan nunca.
+[21.0s] lee: Con dos paralelas, el lado AC está igual de inclinado contra las dos: el ángulo de A y el de arriba a la izquierda son iguales. Lo mismo B, del otro lado.
+[21.8s] lee: —Cornisa: arriba, sobre la paralela, quedan el de A, el de C y el de B, uno al lado del otro: media vuelta. No usé ninguna medida de este triángulo: vale para cualquiera.
+[22.6s] lee: En un plano, como la pizarra o el piso. Sobre una pelota, un triángulo grande suma más: ahí no hay paralelas que no se crucen.
+[23.4s] escena → c8.copias
+[24.4s] lee: Mi ventana tiene esta forma de ele. Me trajeron cuatro marcos. ¿Cuáles son copias de la mía?
+[33.5s] lee: —Cornisa: el girado y el dado vuelta son iguales a tu ventana, congruentes: se mueven y calzan. El grande es parecido, semejante: achicado a la mitad, calza. Y los iguales también son semejantes, con × 1.
+[34.8s] elige «La forma: los ángulos iguales y todos los lados multiplicados por lo mismo.» (¿Qué tiene igual una copia parecida?)
+[35.2s] lee: Y el ancho tiene los mismos ángulos, todos rectos, pero no todos sus lados se multiplicaron por lo mismo: estirado de un solo lado ya no es mi ventana.
+[35.3s] escena → c8.doble
+[36.3s] lee: Mi huerta es la de nueve cuadros, tres por tres. Quiero otra con el lado el doble de largo. ¿Cuánta tierra va a tener?
+[37.6s] elige «Cuatro veces la tierra.» (Con el lado el doble de largo, ¿cuánta tierra entra?)
+[41.7s] lee: Cuatro huertas como la de ahora: treinta y seis cuadros.
+[41.7s] lee: Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran?
+[43.0s] elige «Ocho.» (Una caja con el lado el doble de largo: ¿cuántas cajas como la de Cornisa entran?)
+[45.9s] lee: Ocho: cuatro en el piso de abajo y cuatro en el de arriba.
+[46.9s] lee: —Peldaño: el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27.
+[47.8s] escena → c8.cerca
+[48.9s] lee: Me quedaron doce tramos de cerca. Quiero una huerta rectangular, con la mayor cantidad de tierra adentro.
+[49.4s] elige «Depende de la forma.» (Con los mismos doce tramos, ¿cambia cuánta tierra queda adentro?)
+[52.9s] lee: La misma cerca y la tierra va de 5 a 9. Depende de la forma. De estas huertas, la cuadrada encierra más.
+[53.0s] lee: —Rampa: la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra.
+[53.8s] escena → c8.pitagoras
+[54.2s] lee: Para la escalera nueva quiero un tirante en diagonal. Las patas miden 3 y 4 cuadros, en escuadra. ¿Cuánto mide el tirante?
+[54.7s] elige «Cinco.» (¿Cuánto mide el tirante?)
+[55.2s] lee: —Armo un cuadrado de lado 3 + 4 con cuatro triángulos como el de Balcón, uno en cada esquina.
+[56.0s] lee: Lo que queda libre en el medio tiene cuatro lados iguales, tirantes. ¿Y sus esquinas? En cada borde se juntan las dos puntas agudas de dos triángulos; esas dos suman 90°, porque las tres puntas de un triángulo suman 180° y una es recta. Queda 180° − 90° = 90°: es un cuadrado.
+[57.3s] lee: El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16.
+[58.2s] lee: —Balcón: el cuadrado del tirante tiene 9 + 16 = 25 cuadros. El tirante mide 5.
+[58.8s] elige «Para cualquier triángulo con ángulo recto: el reacomodo no usó el 3 ni el 4.» (¿Para qué triángulos vale esto?)
+[59.2s] lee: —El lado de enfrente del ángulo recto se llama hipotenusa; los otros dos, catetos.
+[59.3s] lee: Cinco cuadros de tirante. Y sin medir.
+[59.4s] escena → c8.casas
+[60.4s] lee: La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada.
+[62.1s] lee: La casa de Rampa la tengo anotada así: (3, 2).
+[62.3s] lee: —Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar.
+[63.1s] lee: Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1).
+[63.8s] elige «Cinco.» (¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?)
+[64.2s] lee: —Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5.
+[64.3s] escena → c8.sombras
+[64.8s] lee: Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?
+[69.8s] lee: A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir.
+[70.6s] lee: Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?
+[71.7s] escena → c9.flechas
+[72.4s] {"ended":true,"final":{"mode":"play","seg":"c9.flechas"},"journal":["Formas"],"evidenceKinds":["near-miss","proof-need","descent","irrational","angle-cut","angle-general","alt-angle","angles","copy-try","similar-keeps","area-scale-predict","volume-scale-predict","scale","perimeter-predict","fence","perimeter","pythag-predict","pythag-move","pythag-general","pythag","coord-try","coord-distance","coords","shadow"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":72.446,"size":"1600x900","touch":false,"route":"directa","watch":false}

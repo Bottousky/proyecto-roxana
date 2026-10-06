@@ -278,10 +278,10 @@ export function dotStrokes(cx, cy, r, seed, opts = {}) {
  * Texto de tiza: relleno con presión media (el diente lo motea) y borde liviano.
  * `reveal` (0..1) descubre el texto de izquierda a derecha como si se escribiera.
  */
-const SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹⁻';
+const SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹⁻ᵈⁿˣ';
 const SUBS = '₀₁₂₃₄₅₆₇₈₉';
-const SUP_PLAIN = '0123456789−';
-const SUP_RE = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+|[₀₁₂₃₄₅₆₇₈₉]+/g;
+const SUP_PLAIN = '0123456789−dnx';
+const SUP_RE = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁻ᵈⁿˣ]+|[₀₁₂₃₄₅₆₇₈₉]+/g;
 
 /** Texto con exponentes (2⁴, 10⁻³) o subíndices (log₂): se escriben con cifras normales, chicas, altas o bajas
  *  (la tiza no tiene esos signos y la fuente de reemplazo los dibuja casi invisibles). */
@@ -325,7 +325,7 @@ function chalkRuns(ctx, text, x, y, {size, ch, p, weight, align, baseline, revea
 
 export function chalkText(ctx, text, x, y, {size = 40, ch = WHITE, p = 0.86, weight = 400, align = 'left', baseline = 'alphabetic', reveal = 1, fade = 1, font = 'Tiza'} = {}) {
   if (reveal <= 0 || fade <= 0) return 0;
-  if (/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻₀₁₂₃₄₅₆₇₈₉]/.test(text)) return chalkRuns(ctx, text, x, y, {size, ch, p, weight, align, baseline, reveal, fade, font});
+  if (/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻ᵈⁿˣ₀₁₂₃₄₅₆₇₈₉]/.test(text)) return chalkRuns(ctx, text, x, y, {size, ch, p, weight, align, baseline, reveal, fade, font});
   ctx.save();
   ctx.font = `${weight} ${size}px ${font}`;
   ctx.textAlign = align;

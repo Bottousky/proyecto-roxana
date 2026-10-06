@@ -2,7 +2,7 @@
 
 import {Label, Shape, Drawing} from '../engine/world.js';
 import {lerp, easeInOut} from '../engine/rng.js';
-import {pulse, rectSpot, wordSpot} from '../acting.js';
+import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {rectsWithPerimeter, pythag, rearrange, distance} from '../logic/geometry.js';
 import {GROUND, BOARD, SHOTS, area, boardCast, clean, poly, gridSquare, rightTri, family, S, seedOf, WHITE, YELLOW, BLUE} from './common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
@@ -26,6 +26,17 @@ export const cerca = {
     const A = area();
     await d.shot(SHOTS.board, 1);
     await d.say('Rampa', 'Me quedaron doce tramos de cerca. Quiero una huerta rectangular, con la mayor cantidad de tierra adentro.');
+    // Punto ya sabe la respuesta… o cree que la sabe
+    const p = w.get('punto'), st = w.get('student');
+    g.setCinematic(true);
+    p.setMode('still');
+    await zip(d, p, A.x0 + 200, A.y0 - 4, 0.4);
+    const pl = w.add(new Label('c8-pl', 'misma cerca = misma tierra', A.x0 + 24, A.y0 + 12, {size: 18, z: 16, ch: YELLOW, reveal: 0, weight: 700}));
+    await d.draw(pl, 0.6, {key: 'reveal', sound: false});
+    g.audio.punto('happy');
+    d.describe('Punto escribe arriba, en amarillo: misma cerca = misma tierra.');
+    follow(p, st);
+    g.setCinematic(false);
     const pre = await d.choose([
       {id: 'same', text: 'Con la misma cerca, cualquier huerta tiene la misma tierra.'},
       {id: 'depends', text: 'Depende de la forma.'},
@@ -84,9 +95,20 @@ export const cerca = {
       await d.wait(0.6);
     }
     const best = all.reduce((top, r) => (r.area > top.area ? r : top));
-    await d.think(`La misma cerca y la tierra va de ${Math.min(...all.map(r => r.area))} a ${best.area}. ${pre === 'same' ? 'No es la misma: depende de la forma.' : 'Depende de la forma.'} La cuadrada encierra más.`);
+    const seenAreas = [...new Set(tried.map(a => a * (6 - a)))].sort((x, y) => x - y);
+    await d.think(`La misma cerca y la tierra va de ${seenAreas[0]} a ${seenAreas[seenAreas.length - 1]}. ${pre === 'same' ? 'No es la misma: depende de la forma.' : 'Depende de la forma.'} De estas huertas, la cuadrada encierra más.`);
+    // Punto se corrige solo
+    g.setCinematic(true);
+    await pulse(d, p, 1, 0.3);
+    g.audio.erase(0.5, 0.4);
+    await d.fadeTo(pl, 0, 0.6);
+    w.remove('c8-pl');
+    d.describe('Punto borra su cartel amarillo.');
+    g.audio.punto('happy');
+    g.setCinematic(false);
+    g.flags.c8puntoFence = true;
     await d.say('student', 'Rampa: la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra.');
-    await studentWrites(d, g, 'c8-per', 'perímetro 12:  áreas 5, 8, 9', A.x0 + 24, A.y1 - 14, {size: 24});
+    await studentWrites(d, g, 'c8-per', `perímetro 12:  áreas ${seenAreas.join(', ')}`, A.x0 + 24, A.y1 - 14, {size: 24});
     d.evidence('perimeter', {areas: all.map(r => r.area), best: [best.a, best.b]});
     g.flags.c8perim = true;
   },
@@ -149,7 +171,7 @@ export const pitagoras = {
     const tilt = w.add(new Shape('c8-tilt', poly('c8-tilt', [[sa, 0], [S2, sa], [sb, S2], [0, sb]], {ch: YELLOW, w: 2.6}), bx, by, {z: 15}));
     const tiltL = w.add(new Label('c8-tiltl', 'tirante × tirante', bx + S2 / 2, by + S2 / 2 + 6, {size: 15, align: 'center', z: 16, ch: YELLOW}));
     d.describe('Un cuadrado grande con un triángulo azul en cada esquina. En el medio queda libre un cuadrado inclinado, amarillo: sus lados son tirantes.');
-    await d.think('Lo que queda libre en el medio es el cuadrado del tirante.');
+    await d.think('Lo que queda libre en el medio tiene cuatro lados iguales, tirantes. ¿Y sus esquinas? En cada borde se juntan las dos puntas agudas de dos triángulos; esas dos suman 90°, porque las tres puntas de un triángulo suman 180° y una es recta. Queda 180° − 90° = 90°: es un cuadrado.');
     // correr tres triángulos
     const moved = new Set([1]);
     await d.interact(ctl => new Promise(resolve => {
@@ -206,7 +228,8 @@ export const pitagoras = {
       const no = pythag(4, 5, 6);
       await d.think(`${no.left} no es ${no.right}. Los cuatro triángulos encajan en las esquinas del cuadrado grande porque tienen una esquina recta: sin ángulo recto, no hay reacomodo.`);
     }
-    await studentWrites(d, g, 'c8-pyg', 'a² + b² = c²   (con ángulo recto)', A.x0 + 24, A.y1 - 14, {size: 22});
+    await d.say('student', 'El lado de enfrente del ángulo recto se llama hipotenusa; los otros dos, catetos.');
+    await studentWrites(d, g, 'c8-pyg', 'cateto² + cateto² = hipotenusa²', A.x0 + 24, A.y1 - 14, {size: 22});
     await d.say('Balcón', 'Cinco cuadros de tirante. Y sin medir.');
     d.evidence('pythag', {r, holds: pz.holds});
     g.flags.c8pythag = true;
@@ -270,7 +293,7 @@ export const casas = {
     // la distancia en línea recta
     const dist = distance([-1, -1], [3, 2]);
     const c = await d.choose([
-      {id: '7', text: 'Siete: cuatro para el costado y tres para arriba.'},
+      {id: '7', text: 'Siete: lo que camina yendo por las rectas.'},
       {id: '5', text: 'Cinco.'},
       {id: 'measure', text: 'Sin medir no se sabe.'},
     ], {prompt: '¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?', evaluate: true});
@@ -284,7 +307,7 @@ export const casas = {
     await d.draw(legs, 0.9, {sound: false});
     g.setCinematic(false);
     d.describe('Entre las dos casas, un triángulo con ángulo recto: 4 por la acostada, 3 por la parada, y el camino derecho en amarillo.');
-    await d.say('student', `Es el tirante de Balcón: patas 4 y 3, en escuadra. 4² + 3² = 25: el camino derecho mide ${dist.d}.`);
+    await d.say('student', `Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide ${dist.d}.`);
     if (c === '7') await d.think('Siete es yendo por las rectas, en ele. Derecho, cinco.');
     await studentWrites(d, g, 'c8-co', '(3, 2) ≠ (2, 3)', A.x0 + 372, A.y0 + 40, {size: 20});
     d.evidence('coords', {dist});
@@ -318,9 +341,13 @@ export const sombras = {
     await d.shot(SHOTS.shadow, 1);
     await d.say('Cornisa', 'Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?');
     const sun = w.add(new Shape('c8-sun', poly('c8-sun', Array.from({length: 12}, (_, i) => [Math.cos(i / 12 * Math.PI * 2) * 22, Math.sin(i / 12 * Math.PI * 2) * 22]), {ch: YELLOW, w: 2.6}), fx, GROUND - 420, {z: 3}));
-    const setShadow = len => {
+    // la sombra apunta para el lado contrario al sol: a la mañana a la derecha, a la tarde a la izquierda
+    const dirOf = h => (h < 12 ? 1 : h > 12 ? -1 : 0);
+    const setShadow = (len, h) => {
       w.remove('c8-shadow');
-      w.add(new Drawing('c8-shadow', [S([[fx + 6, GROUND - 2], [fx + 6 + len * 40, GROUND - 2]], seedOf(`c8-sh${len}`), {w: 7, p: 0.55})], {z: 2}));
+      const dir = dirOf(h);
+      const pts = dir === 0 ? [[fx - len * 20, GROUND - 3], [fx + len * 20, GROUND - 3]] : [[fx + dir * 4, GROUND - 3], [fx + dir * (4 + len * 40), GROUND - 3]];
+      w.add(new Drawing('c8-shadow', [S(pts, seedOf(`c8-sh${h}`), {w: 11, p: 0.8, ch: BLUE})], {z: 2}));
     };
     const tried = [];
     const HOURS = [8, 10, 12, 14, 16];
@@ -337,26 +364,19 @@ export const sombras = {
         const sx0 = sun.x, sy0 = sun.y;
         const tx = fx - 420 + t * 840, ty = GROUND - 220 - Math.sin(t * Math.PI) * 220;
         try { await d.tween(0.8, q => { sun.x = lerp(sx0, tx, q); sun.y = lerp(sy0, ty, q); }, easeInOut); } catch { return; }
-        setShadow(SHADOW[h]);
-        w.add(new Label(`c8-sr${h}`, `${h} h → sombra ${SHADOW[h]}`, A.x0 + 20, A.y0 + 40 + (tried.length - 1) * 34, {size: 22, z: 12}));
-        d.describe(`A las ${h}, la sombra de Cornisa mide ${SHADOW[h]} pasos.`);
+        setShadow(SHADOW[h], h);
+        const dir = dirOf(h);
+        w.add(new Label(`c8-sr${h}`, `${h} h:  largo ${SHADOW[h]}  ${dir > 0 ? '→' : dir < 0 ? '←' : '(la más corta)'}`, A.x0 + 20, A.y0 + 40 + (tried.length - 1) * 34, {size: 22, z: 12}));
+        d.describe(`A las ${h}, la sombra de Cornisa mide ${SHADOW[h]} ${SHADOW[h] === 1 ? 'paso' : 'pasos'}${dir > 0 ? ' y apunta a la derecha, lejos del sol de la mañana' : dir < 0 ? ' y apunta a la izquierda, lejos del sol de la tarde' : ': la más corta, con el sol bien alto'}.`);
         d.evidence('shadow', {h, len: SHADOW[h]});
         busy = false;
-        if (tried.length >= 4) { g.setHint(null); g.ui.setSpots([]); resolve(); } else refresh();
+        if (tried.length >= HOURS.length) { g.setHint(null); g.ui.setSpots([]); resolve(); } else refresh();
       };
       refresh();
     }));
-    await d.say('Mara', 'Con la tabla, ¿se puede saber la hora mirando la sombra?');
-    const c = await d.choose([
-      {id: 'one-way', text: 'Cada hora da una sola sombra; pero una sombra puede ser de dos horas.'},
-      {id: 'both', text: 'Sí: cada sombra dice su hora.'},
-      {id: 'none', text: 'No: la sombra no tiene que ver con la hora.'},
-    ], {prompt: '¿La sombra dice la hora?', evaluate: true});
-    d.evidence('relation', {answer: c});
-    if (c !== 'one-way') await d.think(c === 'both' ? 'A las 10 y a las 14 la sombra mide lo mismo: mirando la sombra, no se sabe cuál de las dos.' : 'Cambia con la hora, y siempre igual: a las 12, la más corta. Tiene que ver.');
-    await d.say('student', 'Cornisa: la sombra depende de la hora. Dada la hora, hay una sola sombra. Al revés, no: 2 pasos puede ser a las 10 o a las 14.');
+    await d.think('A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir.');
     if (!replay) writeJournal8(g);
-    await d.say('Mara', 'Que una cosa dependa de otra, y de qué manera… eso hay que mirarlo con cuidado.');
+    await d.say('Mara', 'Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?');
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3).catch(() => {});
     g.flags.c8shadow = true;
@@ -377,23 +397,23 @@ function writeJournal8(g) {
   const sk = first('similar-keeps');
   if (sk) seen.push(sk.answer === 'angles' ? 'Una copia parecida conserva la forma: ángulos y proporción.' : 'Una copia parecida no conserva los lados ni el área: conserva la forma, los ángulos y la proporción.');
   const as = first('area-scale-predict'), vs = first('volume-scale-predict');
-  if (as) seen.push(`Con el lado doble, anticipaste ${({2: 'el doble', 4: 'cuatro veces', 3: 'algo más'})[as.answer]} de tierra: fueron cuatro huertas.`);
+  if (as) seen.push(`Con el lado doble, anticipaste ${({2: 'el doble de tierra', 4: 'cuatro veces la tierra', 3: 'apenas un poco más de tierra'})[as.answer]}: fueron cuatro huertas como la de antes.`);
   if (vs) seen.push(vs.answer === '8' ? 'Para la caja de lado doble anticipaste ocho cajas: fueron ocho.' : `Para la caja de lado doble anticipaste ${vs.answer === '2' ? 'dos' : 'cuatro'} cajas: fueron ocho, por el largo, el ancho y el alto.`);
   const pp = first('perimeter-predict');
   if (pp) seen.push(pp.answer === 'depends' ? 'Con la misma cerca, anticipaste que la tierra depende de la forma: de 5 a 9.' : 'Pensaste que la misma cerca da la misma tierra; dio de 5 a 9.');
   const py = first('pythag-predict');
-  if (py) seen.push(py.answer === '5' ? 'Anticipaste el tirante de 5.' : 'Para el tirante dijiste otra cosa; reacomodando los triángulos, 9 + 16 = 25: mide 5.');
+  if (py) seen.push(py.answer === '5' ? 'Anticipaste el tirante de 5.' : py.answer === '7' ? 'Para el tirante dijiste siete; derecho es más corto que por las patas: 9 + 16 = 25, mide 5.' : 'Pensaste que sin medir no se sabía; reacomodando los triángulos se supo: 9 + 16 = 25, mide 5.');
   const cd = first('coord-distance');
-  if (cd) seen.push(cd.answer === '5' ? 'Entre (−1, −1) y (3, 2) viste el tirante: 5.' : 'Entre (−1, −1) y (3, 2), derecho no son 7: son 5, como el tirante.');
+  if (cd) seen.push(cd.answer === '5' ? 'Entre (−1, −1) y (3, 2) viste el tirante: 5.' : cd.answer === '7' ? 'Entre (−1, −1) y (3, 2), derecho no son 7: son 5, como el tirante.' : 'Entre (−1, −1) y (3, 2) pensaste que había que medir; con el tirante, 5.');
   const entry = {
     id: 'c8',
     title: 'Formas',
     abbr: 'Una forma se mide, se copia, se agranda y se ubica; un dibujo muestra, un argumento prueba.',
     body: [
-      'Probando casos no se termina: para saber que algo vale siempre hace falta una razón que sirva para todos a la vez. Así se ve que √2 no es una fracción: si hubiera un par de enteros, habría otro más chico, sin fin.',
-      'Un ángulo es cuánto se gira. Las tres puntas de un triángulo juntas hacen media vuelta, 180°: la paralela lo muestra para cualquier triángulo del plano.',
-      'Copias iguales: se mueven, se giran o se dan vuelta y calzan. Parecidas: los mismos ángulos y todos los lados multiplicados por lo mismo. Con el lado × 2, el área va × 4 y el volumen × 8.',
-      'El perímetro mide el borde; el área, lo de adentro: la misma cerca encierra distinta tierra. Con ángulo recto, a² + b² = c² (reacomodando cuatro triángulos en un cuadrado). Un punto del plano se ubica con dos números en orden: (3, 2) no es (2, 3).',
+      'Probando casos no se termina: para saber que algo vale siempre hace falta una razón que sirva para todos a la vez. Así se ve que √2 no es una fracción: si hubiera un par de enteros, habría otro más chico, sin fin; pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible.',
+      'Un ángulo es cuánto se gira. Los tres ángulos de un triángulo juntos hacen media vuelta, 180°: la paralela lo muestra para cualquier triángulo del plano.',
+      'Copias iguales (congruentes): se mueven, se giran o se dan vuelta y calzan. Parecidas (semejantes): los mismos ángulos y todos los lados multiplicados por lo mismo. Con el lado × 2, el área va × 4 y el volumen × 8; con × 3, × 9 y × 27.',
+      'El perímetro mide el borde; el área, lo de adentro: la misma cerca encierra distinta tierra. Con ángulo recto, cateto² + cateto² = hipotenusa² (reacomodando cuatro triángulos en un cuadrado). Un punto del plano se ubica con dos números en orden: (3, 2) no es (2, 3).',
     ],
     seen,
     moments: [

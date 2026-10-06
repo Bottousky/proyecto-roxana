@@ -1,0 +1,31 @@
+{
+  "ended": false,
+  "final": {
+    "mode": "play",
+    "seg": "c9.recta"
+  },
+  "journal": [],
+  "evidenceKinds": [
+    "map-arrow",
+    "inverse-predict",
+    "function",
+    "machine",
+    "rule-predict",
+    "punto-machine",
+    "rule",
+    "plot",
+    "join-predict",
+    "join-discrete",
+    "vertical-predict"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 284.876,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

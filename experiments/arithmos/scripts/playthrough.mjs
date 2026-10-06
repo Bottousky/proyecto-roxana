@@ -154,7 +154,7 @@ function pickChoice(prompt, options) {
     ['para pasar mil', 'Unos cien'],
     ['no se puede hacer esa cuenta', 'Con x = 0'],
     ['Siempre falta o sobra', 'Ya se probaron mil', 'Probando no se termina'],
-    ['seguir achicando', 'Hasta que lleguen a 1', 'Para siempre'],
+    ['seguir achicando', 'No para siempre', 'Para siempre'],
     ['Pasa con todos los triángulos', 'Pasa con todos', 'hace falta una razón'],
     ['copia parecida', 'Los lados', 'La forma'],
     ['cuánta tierra entra', 'El doble de tierra'],
@@ -168,6 +168,9 @@ function pickChoice(prompt, options) {
     ['Si entra 10', '20: el doble'],
     ['Los puntos se unen', 'Unirlos con una curva linda'],
     ['Esos puntos se unen', 'Unidos'],
+    ['qué entradas tienen sentido', 'Cualquier número menos el 2'],
+    ['Puede salir −4', 'Sí: con −2'],
+    ['Pasado mañana', 'Más: cada día'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -255,6 +258,9 @@ function pickChoice(prompt, options) {
     ['Si entra 10', '21.'],
     ['Los puntos se unen', 'Unirlos: entre'],
     ['Esos puntos se unen', 'Sueltos'],
+    ['qué entradas tienen sentido', 'Enteros mayores'],
+    ['Puede salir −4', 'No: un número'],
+    ['Pasado mañana', '2, como'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -605,6 +611,14 @@ for (let iter = 0; iter < 4000; iter++) {
     } else if (s.seg === 'c9.recta' && spots.some(x => x.id.startsWith('c9-c'))) {
       target = spots[0];
       c9Shape = target.id.replace('c9-c', '');
+    } else if (s.seg === 'c9.maneras' && spots.some(x => x.id.startsWith('c9-e') || x.id.startsWith('c9-l'))) {
+      const sel = s.spots.find(x => x.selected);
+      if (!sel) target = spots.find(x => x.id.startsWith('c9-e'));
+      else {
+        const k = sel.id.replace('c9-e', '');
+        const wrong = route === 'errores' && !tried.has('c9match') && (tried.add('c9match'), true);
+        target = spots.find(x => x.id === (wrong ? 'c9-lB' : `c9-l${k}`));
+      }
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
       if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }

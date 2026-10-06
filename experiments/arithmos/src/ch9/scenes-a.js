@@ -25,7 +25,7 @@ export const flechas = {
     const w = g.world;
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Cornisa', 'Con la tabla de ayer sé qué sombra hay a cada hora. Pero un viajero me preguntó la hora, le dije «mi sombra mide 2»… y no supo qué hacer.');
+    await d.say('Cornisa', 'Con la tabla de ayer sé qué largo tiene mi sombra a cada hora. Un viajero me preguntó la hora y le dije sólo el largo: «mi sombra mide 2». No supo qué contestar.');
     const HX = A.x0 + 70, SX = A.x0 + 320;
     const hy = i => A.y0 + 40 + i * 44;
     const SH = [1, 2, 4], sy = i => A.y0 + 80 + i * 70;
@@ -70,7 +70,7 @@ export const flechas = {
       {id: '10', text: 'Las 10.'},
       {id: 'both', text: 'Las 10 o las 14: con la sombra sola no se sabe.'},
       {id: '12', text: 'Las 12.'},
-    ], {prompt: 'Cornisa dice «mi sombra mide 2». ¿Qué hora es?', evaluate: true});
+    ], {prompt: 'Cornisa dice sólo el largo: «mi sombra mide 2». ¿Qué hora es?', evaluate: true});
     d.evidence('inverse-predict', {answer: c});
     // dar vuelta las flechas
     g.setCinematic(true);
@@ -82,7 +82,7 @@ export const flechas = {
     if (c !== 'both') await d.think(c === '10' ? 'Las 10 o las 14: del 2 salen dos flechas.' : 'A las 12 la sombra mide 1. Con 2, son las 10 o las 14.');
     const fn = isFunction(SOMBRA), inv = isFunction(inverse(SOMBRA));
     if (!fn.ok || inv.ok) console.error('[flechas] la tabla no da función de ida y relación de vuelta');
-    await d.say('student', 'Cornisa: a cada hora le toca una sola sombra: la sombra es función de la hora. Al revés no: a la sombra 2 le tocan dos horas. Eso es una relación, pero no una función.');
+    await d.say('student', 'Cornisa: a cada hora le toca un solo largo de sombra: el largo es función de la hora. Al revés no: al largo 2 le tocan dos horas. Eso es una relación, pero no una función. Si además decís para qué lado apunta, ahí sí se distinguen: pero esa ya es otra entrada.');
     await studentWrites(d, g, 'c9-def', 'función: a cada entrada, una sola salida', A.x0 + 20, A.y1 - 8, {size: 22});
     d.evidence('function', {fn: fn.ok, inverse: inv.ok, bad: inv.bad});
     g.flags.c9fn = true;

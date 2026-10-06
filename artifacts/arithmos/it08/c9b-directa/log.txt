@@ -1,0 +1,22 @@
+[0.0s] escena → c9.dominio
+[1.0s] lee: Le pedí a Mara una máquina para mi reparto: entra cuántos vienen, sale lo que le toca a cada uno. 1 ÷ (x − 2), como en la escalera.
+[4.5s] lee: Con 2 se traba: abajo queda cero. Con todos los demás sale algo, aunque sea negativo.
+[5.8s] elige «Enteros mayores que 2: tiene que venir gente, y más de dos.» (Para el reparto de Rampa, ¿qué entradas tienen sentido?)
+[6.2s] lee: —Rampa: las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.
+[6.3s] escena → c9.imagen
+[6.7s] lee: Esta máquina hace «por sí mismo»: x · x. Oval me pidió que le saque un −4 para una cuenta. ¿Qué le doy?
+[13.9s] elige «No: un número por sí mismo nunca da negativo.» (¿Puede salir −4?)
+[14.2s] lee: —Mara: lo que puede salir se llama la imagen. La de x · x es el 0 y los positivos. El −4 no está, con los números que conocemos.
+[14.5s] escena → c9.maneras
+[14.9s] lee: Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles.
+[17.1s] lee: —Mara: con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: la recta sube igual todos los días y la curva despega. Se cruzan un poco antes del día 6, como vimos.
+[17.9s] lee: Y la mía, la B, es diez más uno por día: 10 + d.
+[18.0s] escena → c9.vuelve
+[19.0s] lee: Seguí midiendo, varios días. Miren.
+[21.8s] lee: Entre un día y otro, de noche, no hay sombra: ahí la función no está definida. Los huecos son parte del dominio que falta.
+[23.1s] elige «2, como cualquier día a las 10.» (Pasado mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?)
+[25.2s] lee: —Cornisa: 2. Todos los días el sol da la misma vuelta, y la sombra repite su ve.
+[26.0s] lee: Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno, la ve cambia un poco.
+[26.8s] lee: Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.
+[27.1s] lee: El capítulo 10 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[28.3s] {"ended":true,"final":{"mode":"title","seg":"c9.vuelve"},"journal":["Depende"],"evidenceKinds":["domain-try","domain-story","domain","image-try","image-predict","image","match","three-ways","periodic-predict"],"fps":{"min":"40.0","median":"60.0"},"errors":[],"seconds":28.298,"size":"1600x900","touch":false,"route":"directa","watch":false}

@@ -1,0 +1,43 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c9.vuelve"
+  },
+  "journal": [
+    "Depende"
+  ],
+  "evidenceKinds": [
+    "map-arrow",
+    "inverse-predict",
+    "function",
+    "machine",
+    "rule-predict",
+    "punto-machine",
+    "rule",
+    "plot",
+    "join-predict",
+    "join-discrete",
+    "vertical-predict",
+    "vertical",
+    "domain-try",
+    "domain-story",
+    "domain",
+    "image-try",
+    "image-predict",
+    "image",
+    "match",
+    "three-ways",
+    "periodic-predict"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 151.505,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}

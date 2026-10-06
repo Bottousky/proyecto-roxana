@@ -381,10 +381,13 @@
         "C7"
       ],
       "acceptance": "Idem",
-      "status": "implementado",
+      "status": "revisado-mat",
       "evidence": [
-        "artifacts/arithmos/it08/c8-directa/log.txt",
-        "artifacts/arithmos/it08/c8-errores/log.txt"
+        "artifacts/arithmos/it08/c8b-directa/log.txt",
+        "artifacts/arithmos/it08/c8b-errores/log.txt",
+        "artifacts/arithmos/it08/c8-telefono2/log.txt",
+        "artifacts/arithmos/it08/review-mat/informe.md",
+        "artifacts/arithmos/it08/review-narr/informe.md"
       ]
     },
     {
@@ -394,8 +397,12 @@
         "C8"
       ],
       "acceptance": "Hallazgos registrados y corregidos o justificados",
-      "status": "pendiente",
-      "evidence": []
+      "status": "revisado-mat",
+      "evidence": [
+        "artifacts/arithmos/it08/review-mat/informe.md",
+        "artifacts/arithmos/it08/review-narr/informe.md",
+        "docs/arithmos/ARITHMOS_REVIEW.md"
+      ]
     },
     {
       "id": "C9",
@@ -405,6 +412,31 @@
         "C8"
       ],
       "acceptance": "Idem",
+      "status": "implementado",
+      "evidence": [
+        "artifacts/arithmos/it08/c9a-directa2/log.txt",
+        "artifacts/arithmos/it08/c9b-directa/log.txt",
+        "artifacts/arithmos/it08/c9-errores/log.txt",
+        "artifacts/arithmos/it08/c9-telefono2/log.txt"
+      ]
+    },
+    {
+      "id": "N8-R",
+      "title": "Pendientes narrativos del cap. 8 (rev-narr-6): hilo de reconstrucción y clímax, agencia (piezas que van solas, predicciones dobles), Punto (8.2, 8.7), teléfono (figuras ilegibles en predicciones), voces, opciones largas, costura 7→8, composición, accesibilidad de lo escrito en la pizarra, Bitácora sin historia",
+      "deps": [
+        "C8"
+      ],
+      "acceptance": "Revisión narrativa sin hallazgos altos",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C9-R",
+      "title": "Revisión independiente (matemática y narrativa) del cap. 9",
+      "deps": [
+        "C9"
+      ],
+      "acceptance": "Hallazgos registrados y corregidos o justificados",
       "status": "pendiente",
       "evidence": []
     },

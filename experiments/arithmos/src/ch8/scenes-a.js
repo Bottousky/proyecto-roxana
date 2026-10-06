@@ -91,7 +91,7 @@ export const diagonal = {
     const qa = w.add(new Shape('c8-Qa', sq('c8-Qa', Q, {ch: BLUE, hatch: 10}), A.x1 - Q - 10, A.y0 + 10, {z: 14}));
     const qb = w.add(new Shape('c8-Qb', sq('c8-Qb', Q, {ch: BLUE, hatch: 10}), A.x1 - Q - 10, A.y0 + 10 + Q + 8, {z: 14}));
     qb.fade = 0.9;
-    await d.say('student', 'Supongamos que hubiera un p y un q que cumplen. El de p tiene tanto lugar como los dos de q juntos. Pongo los dos de q adentro del de p, en esquinas opuestas.');
+    await d.say('student', 'Supongamos que hubiera enteros p y q que cumplen. El de p tiene tanto lugar como los dos de q juntos. La diagonal es más larga que el lado y más corta que dos lados: q es menos que p, y p menos que 2q. Entonces cada cuadrado de q entra en el de p, y los dos juntos se pisan.');
     await d.interact(ctl => new Promise(resolve => {
       const placed = new Set();
       g.setHint(() => ['Tocá cada cuadrado azul: va a una esquina del cuadrado grande.']);
@@ -121,7 +121,7 @@ export const diagonal = {
     d.describe('Los dos cuadrados azules se pisan en un cuadrado del medio, en amarillo, y dejan sin tapar dos esquinas iguales.');
     g.setCinematic(false);
     await d.say('student', 'Si los dos de q tapan lo mismo que el de p, lo que se pisa dos veces tiene que ser igual a lo que quedó sin tapar.');
-    await d.think('Un cuadrado, el del medio, igual a dos cuadrados, las esquinas. Otro par que cumpliría, con lados enteros: 2q − p y p − q. Y más chico.');
+    await d.think('Un cuadrado, el del medio, igual a dos cuadrados, las esquinas. Otro par que cumpliría. Sus lados, 2q − p y p − q, son enteros, y positivos porque q < p < 2q. Y más chicos que p y q.');
     // bajar: más chico, y más chico
     let level = 0;
     const draws = [];
@@ -157,16 +157,28 @@ export const diagonal = {
     await pulse(d, p, 1, 0.3);
     const c2a = await d.choose([
       {id: 'forever', text: 'Para siempre: cada par da otro más chico.'},
-      {id: 'one', text: 'Hasta que lleguen a 1 y 1.'},
+      {id: 'one', text: 'No para siempre: los enteros positivos llegan a 1 y no bajan más.'},
       {id: 'chalk', text: 'Hasta que no se pueda dibujar.'},
-    ], {prompt: '¿Hasta cuándo se puede seguir achicando?', evaluate: true});
+    ], {prompt: 'Si hubiera un par de enteros que cumple, ¿hasta cuándo se podría seguir achicando?', evaluate: true});
     d.evidence('descent', {answer: c2a, example: [descend(7, 5), descend(3, 2)]});
-    if (c2a === 'one') await d.think('1 · 1 no es 2 · 1 · 1. Pero en esta cadena, cada par cumple: no hay dónde parar.');
-    if (c2a === 'chalk') await d.think('El dibujo se acaba, pero el razonamiento no depende del dibujo: cada par que cumple da otro más chico.');
-    await d.say('student', 'Punto: si hubiera un par de enteros que cumple, habría otro más chico, y otro, sin fin. Pero los enteros positivos no bajan para siempre: q, uno menor, otro menor… se acaban. Entonces no hay ningún par.');
-    await studentWrites(d, g, 'c8-no', '√2 no es una fracción', A.x0 + 20, A.y1 - 14, {size: 26});
-    await d.think('El dibujo está hecho con medidas que no existen: no prueba nada. Lo que prueba es el razonamiento, y vale para todos los p y q a la vez. Probando, en cambio, nunca se termina.');
-    await d.say('Peldaño', 'Entonces en la puerta pinto 1,414, y al lado: «casi».');
+    if (c2a === 'forever') await d.think('Eso dice la regla: cada par que cumple da otro más chico. Pero con enteros positivos no se puede bajar para siempre: q, uno menor, otro menor… en algún momento no hay más. Las dos cosas a la vez no pueden ser.');
+    if (c2a === 'one') await d.think('Exacto: los enteros no bajan para siempre. Y sin embargo, si el par cumpliera, siempre habría otro más chico. Las dos cosas a la vez no pueden ser.');
+    if (c2a === 'chalk') await d.think('El dibujo se acaba, pero el razonamiento no depende del dibujo. Si el par cumpliera, siempre habría otro más chico; y los enteros positivos no bajan para siempre. Las dos cosas a la vez no pueden ser.');
+    await d.say('student', 'Punto: si hubiera un par de enteros que cumple, habría otro más chico, y otro, sin fin. Pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible: no hay ningún par.');
+    // la Marea se lleva los dibujos; el razonamiento queda
+    g.setCinematic(true);
+    d.describe('Pasa una brisa de borrador: los cuadrados dibujados se deshacen. La cuenta de arriba, p · p = 2 · q · q, queda.');
+    g.audio.erase(1.2, 0.5);
+    g.camera.shake = 0.15;
+    const pics = w.objects.filter(o => /^c8-(P|Pl|Qa|Qb|mid|midl|c1|c1l|c2|c2l|sup|L\d)/.test(o.id));
+    await d.all(...pics.map(o => d.fadeTo(o, 0, 1.2)));
+    for (const o of pics) w.remove(o.id);
+    g.setCinematic(false);
+    await studentWrites(d, g, 'c8-arg', 'si p y q cumplen →', A.x0 + 20, A.y0 + 90, {size: 20});
+    await studentWrites(d, g, 'c8-arg2', '2q − p  y  p − q  también cumplen, y son más chicos', A.x0 + 40, A.y0 + 120, {size: 20});
+    await studentWrites(d, g, 'c8-no', '√2 no es una fracción', A.x0 + 20, A.y0 + 176, {size: 30});
+    await d.think('El dibujo mostraba lo que pasaría si existiera el par, y con un dibujo no se distingue un largo de un entero. Lo que prueba es el razonamiento, y vale para todos los p y q a la vez. Probando casos, en cambio, nunca se termina.');
+    await d.say('Peldaño', 'En la puerta dejo √2, que es exacto. Y abajo, chiquito: «1,414 y un poco más».');
     void s;
     d.evidence('irrational', {nearest: nearMisses(12).slice(-1)[0]});
     g.flags.c8irr = true;
@@ -254,8 +266,8 @@ export const vuelta = {
     g.setCinematic(false);
     await d.say('student', 'Por la punta de arriba, una recta paralela a la de abajo: no se cruzan nunca.');
     const sA = corners[0], sB = corners[1];
-    const leftAtC = w.add(new Shape('c8-wCa', wedge('c8-wCa', sA.sweep, 34, BLUE), Pc[0], Pc[1], {z: 14, rot: Math.PI - sA.sweep, fade: 0}));
-    const rightAtC = w.add(new Shape('c8-wCb', wedge('c8-wCb', sB.sweep, 34, BLUE), Pc[0], Pc[1], {z: 14, rot: 0, fade: 0}));
+    const leftAtC = w.add(new Shape('c8-wCa', wedge('c8-wCa', sA.sweep, 46, BLUE), Pc[0], Pc[1], {z: 14, rot: Math.PI - sA.sweep, fade: 0}));
+    const rightAtC = w.add(new Shape('c8-wCb', wedge('c8-wCb', sB.sweep, 46, BLUE), Pc[0], Pc[1], {z: 14, rot: 0, fade: 0}));
     await d.all(d.fadeTo(leftAtC, 1, 0.5), d.fadeTo(rightAtC, 1, 0.5));
     d.describe('Arriba, entre la paralela y los lados, quedan dos ángulos marcados en azul: uno a la izquierda de C y otro a la derecha.');
     // ¿a cuál de abajo es igual?
@@ -278,7 +290,7 @@ export const vuelta = {
     }));
     await d.think('Con dos paralelas, el lado AC está igual de inclinado contra las dos: el ángulo de A y el de arriba a la izquierda son iguales. Lo mismo B, del otro lado.');
     await d.say('student', 'Cornisa: arriba, sobre la paralela, quedan el de A, el de C y el de B, uno al lado del otro: media vuelta. No usé ninguna medida de este triángulo: vale para cualquiera.');
-    await studentWrites(d, g, 'c8-sum', 'A + B + C = 180°', A.x0 + 200, A.y1 - 14, {size: 26});
+    await studentWrites(d, g, 'c8-sum', '∠A + ∠B + ∠C = 180°', A.x0 + 190, A.y1 - 14, {size: 26});
     await d.think('En un plano, como la pizarra o el piso. Sobre una pelota, un triángulo grande suma más: ahí no hay paralelas que no se crucen.');
     d.evidence('angles', {A: deg(corners[0].sweep), B: deg(corners[1].sweep), C: deg(corners[2].sweep), wrongPicks: hits - 1});
     g.flags.c8angle = true;
@@ -316,6 +328,17 @@ export const copias = {
     ];
     // lugar de cada uno (su esquina visible arriba a la izquierda)
     const offset = c => (c.id === 'rot' || c.id === 'flip' ? 63 : 0);
+    // esquina superior izquierda de la caja del marco, según su giro, espejo y escala (para apoyarlo sobre la ventana)
+    const minCorner = (c, rot, fx, sc) => {
+      const [W, H] = c.id === 'wide' ? [126, 63] : [63, 63];
+      let mx = Infinity, my = Infinity;
+      for (const [qx, qy] of [[0, 0], [W, 0], [W, H], [0, H]]) {
+        const X = sc * fx * qx, Y = sc * qy;
+        mx = Math.min(mx, Math.cos(rot) * X - Math.sin(rot) * Y);
+        my = Math.min(my, Math.sin(rot) * X + Math.cos(rot) * Y);
+      }
+      return [mx, my];
+    };
     for (const c of cands) {
       c.sh = w.add(c.make(`c8-k${c.id}`));
       c.sh.x = c.x + offset(c);
@@ -378,14 +401,14 @@ export const copias = {
             const s1 = op === 'achicar a la mitad' ? s0 / 2 : s0;
             // dónde queda la esquina: el girado y el dado vuelta tienen su origen corrido 63
             const fits = op === c.op;
-            const tx = fits ? ox : ox + 4, ty = oy;
+            const tx = fits ? ox : ox + 6, ty = fits ? oy : oy + 6;
             await d.tween(0.8, k => {
               c.sh.rot = lerp(r0, r1, k);
               c.sh.sx = lerp(f0, f1, k);
               c.sh.scale = lerp(s0, s1, k);
-              const wantOff = (Math.abs(c.sh.rot) > 0.01 || (c.sh.sx ?? 1) < 0) ? 63 * c.sh.scale : 0;
-              c.sh.x = lerp(sx0, tx + wantOff, k);
-              c.sh.y = lerp(sy0, ty, k);
+              const [mx, my] = minCorner(c, c.sh.rot, c.sh.sx ?? 1, c.sh.scale);
+              c.sh.x = lerp(sx0, tx - mx, k);
+              c.sh.y = lerp(sy0, ty - my, k);
             }, easeInOut);
             if (fits) {
               g.audio.tap(0.2, 1.5);
@@ -410,15 +433,15 @@ export const copias = {
       };
       refresh();
     }));
-    await d.say('student', 'Cornisa: el girado y el dado vuelta son iguales a tu ventana: se mueven y calzan. El grande es parecido: achicado a la mitad, calza.');
+    await d.say('student', 'Cornisa: el girado y el dado vuelta son iguales a tu ventana, congruentes: se mueven y calzan. El grande es parecido, semejante: achicado a la mitad, calza. Y los iguales también son semejantes, con × 1.');
     const c = await d.choose([
       {id: 'angles', text: 'La forma: los ángulos iguales y todos los lados multiplicados por lo mismo.'},
       {id: 'sides', text: 'Los lados: miden lo mismo.'},
       {id: 'area', text: 'El área: ocupa lo mismo.'},
     ], {prompt: '¿Qué tiene igual una copia parecida?', evaluate: true});
     d.evidence('similar-keeps', {answer: c});
-    if (c !== 'angles') await d.think(c === 'sides' ? 'Los lados del grande miden el doble. Lo que se mantiene es la forma: los ángulos, y que todos los lados se multiplican por 2.' : 'El grande ocupa más: cuatro ventanas como la tuya. Lo que se mantiene es la forma: los ángulos y la proporción de los lados.');
-    await d.say('Cornisa', 'El ancho no lo quiero: estirado de un solo lado ya no es mi ventana.');
+    if (c !== 'angles') await d.think(c === 'sides' ? 'Los lados del grande miden el doble. Lo que se mantiene es la forma: los ángulos, y que todos los lados se multiplican por 2.' : 'El grande ocupa más. Lo que se mantiene es la forma: los ángulos y la proporción de los lados.');
+    await d.say('Cornisa', 'Y el ancho tiene los mismos ángulos, todos rectos, pero no todos sus lados se multiplicaron por lo mismo: estirado de un solo lado ya no es mi ventana.');
     g.flags.c8copy = true;
   },
 };
@@ -453,89 +476,97 @@ export const doble = {
     const w = g.world;
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Peldaño', 'Mi huerta es de dos por dos cuadros. Quiero una con el lado el doble de largo. ¿Cuánta tierra más necesito?');
-    const U = 30;
-    const hx = A.x0 + 20, hy = A.y0 + 60;
-    w.add(new Shape('c8-h0', gridSquare('c8-h0', 2, U, YELLOW), hx, hy, {z: 13}));
-    w.add(new Label('c8-h0l', 'la de ahora', hx + U, hy + 2 * U + 22, {size: 16, align: 'center', z: 12}));
-    const bx = A.x0 + 120, by = A.y0 + 30;
-    w.add(new Shape('c8-H', sq('c8-H', 4 * U, {w: 2.6}), bx, by, {z: 12}));
-    w.add(new Label('c8-Hl', 'lado doble', bx + 2 * U, by + 4 * U + 22, {size: 16, align: 'center', z: 12}));
+    await d.say('Peldaño', 'Mi huerta es la de nueve cuadros, tres por tres. Quiero otra con el lado el doble de largo. ¿Cuánta tierra va a tener?');
+    const U = 28;
+    const hx = A.x0 + 16, hy = A.y0 + 60;
+    w.add(new Shape('c8-h0', gridSquare('c8-h0', 3, U, YELLOW), hx, hy, {z: 13}));
+    w.add(new Label('c8-h0l', 'la de ahora', hx + 1.5 * U, hy + 3 * U + 22, {size: 16, align: 'center', z: 12}));
+    const bx = A.x0 + 130, by = A.y0 + 30;
+    w.add(new Shape('c8-H', sq('c8-H', 6 * U, {w: 2.6}), bx, by, {z: 12}));
+    w.add(new Label('c8-Hl', 'lado doble', bx + 3 * U, by + 6 * U + 22, {size: 16, align: 'center', z: 12}));
     const guess = await d.choose([
       {id: '2', text: 'El doble de tierra.'},
       {id: '4', text: 'Cuatro veces la tierra.'},
-      {id: '3', text: 'Dos cuadros más por lado: algo más.'},
+      {id: '3', text: 'Tres cuadros más por lado: algo más.'},
     ], {prompt: 'Con el lado el doble de largo, ¿cuánta tierra entra?', evaluate: true});
     d.evidence('area-scale-predict', {answer: guess});
     await d.shot(SHOTS.tiles, 0.8);
-    // llenar el cuadrado grande con huertas como la de ahora
-    const spots4 = [[0, 0], [2, 0], [0, 2], [2, 2]];
+    const spots4 = [[0, 0], [3, 0], [0, 3], [3, 3]];
     let n = 0;
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Tocá "otra huerta como la de ahora" hasta llenar la grande.']);
-      const refresh = () => g.ui.setSpots([wordSpot('c8-more', 'otra huerta como la de ahora', A.x1 - 120, A.y1 - 40, () => add(), {label: 'Poner otra huerta de dos por dos en la grande'})]);
+      const refresh = () => g.ui.setSpots([wordSpot('c8-more', 'otra huerta', A.x1 - 70, A.y1 - 40, () => add(), {label: 'Poner otra huerta de tres por tres en la grande'})]);
       const add = async () => {
         if (busy || !ctl.alive()) return;
         busy = true;
         g.ui.setSpots([]);
         const [i, j] = spots4[n];
         n++;
-        const t = w.add(new Shape(`c8-hc${n}`, gridSquare(`c8-hc${n}`, 2, U, YELLOW), hx, hy, {z: 14}));
+        const t = w.add(new Shape(`c8-hc${n}`, gridSquare(`c8-hc${n}`, 3, U, YELLOW), hx, hy, {z: 14}));
         try { await d.tween(0.5, k => { t.x = lerp(hx, bx + i * U, k); t.y = lerp(hy, by + j * U, k); }, easeInOut); } catch { return; }
         g.audio.tap(0.2, 1.2 + n * 0.1);
-        w.add(new Label(`c8-hn${n}`, String(n), bx + i * U + U, by + j * U + U + 7, {size: 20, align: 'center', z: 15, ch: YELLOW}));
+        w.add(new Label(`c8-hn${n}`, String(n), bx + i * U + 1.5 * U, by + j * U + 1.5 * U + 8, {size: 22, align: 'center', z: 15, ch: YELLOW}));
         busy = false;
         if (n === 4) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
       };
       refresh();
     }));
-    d.describe('La huerta grande se llena con cuatro huertas como la de ahora: dieciséis cuadros.');
-    await d.think(guess === '4' ? 'Cuatro huertas como la de ahora: dieciséis cuadros.' : 'Cuatro huertas, no dos: el doble de largo y el doble de ancho. Dieciséis cuadros.');
-    // la caja
+    d.describe('La huerta grande se llena con cuatro huertas como la de ahora: treinta y seis cuadros.');
+    await d.think(guess === '4' ? 'Cuatro huertas como la de ahora: treinta y seis cuadros.' : 'Cuatro huertas, no dos: el doble de largo y el doble de ancho. Treinta y seis cuadros.');
+    // la caja, por pisos
     await d.say('Mara', 'Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran?');
     g.setCinematic(true);
     w.removeWhere(o => /^c8-(h|H)/.test(o.id));
     g.setCinematic(false);
-    const s = 48, k = s * 0.35;
-    const cx = A.x0 + 30, cy = A.y0 + 80;
+    const s = 44, k = s * 0.35;
+    const cx = A.x0 + 24, cy = A.y0 + 90;
     w.add(new Shape('c8-cube0', cube('c8-cube0', s, YELLOW), cx, cy, {z: 13}));
-    w.add(new Label('c8-cube0l', 'la de Cornisa', cx + s / 2, cy + s + 22, {size: 16, align: 'center', z: 12}));
-    const Bx = A.x0 + 170, By = A.y0 + 30 + 2 * k;
-    w.add(new Shape('c8-cubeB', cube('c8-cubeB', 2 * s), Bx, By, {z: 12}));
+    w.add(new Label('c8-cube0l', 'la de Cornisa', cx + s / 2, cy + s + 24, {size: 16, align: 'center', z: 12}));
+    // la caja grande vista de arriba, piso por piso
+    const floors = [{x: A.x0 + 140, y: A.y0 + 70, name: 'piso de abajo'}, {x: A.x0 + 270, y: A.y0 + 70, name: 'piso de arriba'}];
+    floors.forEach((f, i) => {
+      w.add(new Shape(`c8-fl${i}`, sq(`c8-fl${i}`, 2 * s, {w: 2.6}), f.x, f.y, {z: 12}));
+      w.add(new Label(`c8-fll${i}`, f.name, f.x + s, f.y + 2 * s + 22, {size: 15, align: 'center', z: 12}));
+    });
+    w.add(new Label('c8-flt', 'la caja de lado doble, vista de arriba:', A.x0 + 140, A.y0 + 46, {size: 16, z: 12, ch: BLUE}));
+    void k;
     const g2 = await d.choose([
       {id: '2', text: 'Dos.'},
       {id: '4', text: 'Cuatro, como la huerta.'},
       {id: '8', text: 'Ocho.'},
     ], {prompt: 'Una caja con el lado el doble de largo: ¿cuántas cajas como la de Cornisa entran?', evaluate: true});
     d.evidence('volume-scale-predict', {answer: g2});
-    // de atrás para adelante, de abajo para arriba
-    const slots = [];
-    for (const z of [1, 0]) for (const r of [1, 0]) for (const c of [0, 1]) slots.push([Bx + c * s + z * k, By + r * s - z * k]);
-    let m = 0;
+    const topView = id => [...sq(`${id}s`, s - 6, {ch: YELLOW, w: 2.2}), ...poly(`${id}x`, [[4, 4], [s - 10, s - 10]], {ch: YELLOW, closed: false, w: 1.4}), ...poly(`${id}y`, [[s - 10, 4], [4, s - 10]], {ch: YELLOW, closed: false, w: 1.4})];
+    let floor = 0, m = 0;
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
-      g.setHint(() => ['Tocá "otra caja" hasta llenar la grande.']);
-      const refresh = () => g.ui.setSpots([wordSpot('c8-box', 'otra caja', A.x1 - 80, A.y1 - 40, () => add(), {label: 'Poner otra caja como la de Cornisa en la grande'})]);
-      const add = async () => {
+      g.setHint(() => ['Tocá "llenar un piso": entran cajas como la de Cornisa hasta cubrirlo.']);
+      const refresh = () => g.ui.setSpots([wordSpot('c8-box', 'llenar un piso', A.x1 - 70, A.y1 - 40, () => fill(), {label: `Llenar el ${floors[floor].name} con cajas como la de Cornisa`})]);
+      const fill = async () => {
         if (busy || !ctl.alive()) return;
         busy = true;
         g.ui.setSpots([]);
-        const [tx, ty] = slots[m];
-        m++;
-        const t = w.add(new Shape(`c8-cb${m}`, cube(`c8-cb${m}`, s, YELLOW), cx, cy, {z: 13 + m * 0.01}));
-        try { await d.tween(0.45, q => { t.x = lerp(cx, tx, q); t.y = lerp(cy, ty, q); }, easeInOut); } catch { return; }
-        g.audio.tap(0.2, 1.1 + m * 0.07);
+        const f = floors[floor];
+        try {
+          for (const [i, j] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
+            m++;
+            const t = w.add(new Shape(`c8-cb${m}`, topView(`c8-cb${m}`), cx, cy, {z: 14}));
+            await d.tween(0.3, q => { t.x = lerp(cx, f.x + 3 + i * s, q); t.y = lerp(cy, f.y + 3 + j * s, q); }, easeInOut);
+            g.audio.tap(0.15, 1.1 + m * 0.07);
+          }
+        } catch { return; }
+        d.describe(`El ${f.name} se llena con cuatro cajas como la de Cornisa.`);
+        floor++;
         busy = false;
-        if (m === 8) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
+        if (floor === 2) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
       };
       refresh();
     }));
-    d.describe('La caja grande se llena con ocho cajas como la de Cornisa: cuatro abajo y cuatro arriba.');
     const sc = scaleBy(2);
-    await d.think(g2 === '8' ? 'Ocho: cuatro en el piso y cuatro arriba.' : 'Ocho: el doble de largo, de ancho y de alto. Cuatro en el piso y cuatro arriba.');
-    await studentWrites(d, g, 'c8-scale', `lado × 2:  área × ${sc.area},  volumen × ${sc.volume}`, A.x0 + 20, A.y1 - 14, {size: 24});
-    await d.say('student', 'Peldaño: el lado se multiplica una vez; el área, dos veces, por el largo y por el ancho; el volumen, tres, también por el alto.');
+    await d.think(g2 === '8' ? 'Ocho: cuatro en el piso de abajo y cuatro en el de arriba.' : 'Ocho: cuatro en cada piso, y son dos pisos, porque el alto también se duplicó.');
+    await studentWrites(d, g, 'c8-scale', `lado × 2:  área × ${sc.area},  volumen × ${sc.volume}`, A.x0 + 20, A.y1 - 10, {size: 24});
+    await d.say('student', 'Peldaño: el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27.');
     d.evidence('scale', sc);
     g.flags.c8scale = true;
   },

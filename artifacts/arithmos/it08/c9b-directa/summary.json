@@ -1,0 +1,31 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c9.vuelve"
+  },
+  "journal": [
+    "Depende"
+  ],
+  "evidenceKinds": [
+    "domain-try",
+    "domain-story",
+    "domain",
+    "image-try",
+    "image-predict",
+    "image",
+    "match",
+    "three-ways",
+    "periodic-predict"
+  ],
+  "fps": {
+    "min": "40.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 28.298,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

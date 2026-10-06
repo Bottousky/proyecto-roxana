@@ -11,19 +11,18 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 - Modelo: la sesión principal corre como Opus 5.5 (`claude-opus-5-5`, según el entorno). Los
   subagentes se lanzan con el alias `opus`; no puedo verificar desde adentro qué versión resolvió.
 
-## Estado real (ciclo 5 del loop, 2026-10-06)
+## Estado real (ciclo 6 del loop, 2026-10-06)
 
-- **Capítulos 1 a 8 jugables y encadenados.** El cap. 8 «Formas» tiene 8 escenas: la diagonal que
-  no cae (√2 no es fracción, por descenso), la vuelta (180° con la paralela), copias (iguales y
-  parecidas), el doble de grande (× 4 y × 8), la misma cerca (perímetro vs área), el tirante
-  (Pitágoras por reacomodo, con contraejemplo), dónde está cada casa (coordenadas, distancia) y
-  sombras (gancho al cap. 9: relación vs función); Bitácora.
-- Cap. 7 corregido según rev-mat-6 (las 3 altas y casi todas las medias) y parte de rev-narr-5
-  (A4, partes de A2, A3 y A5); pendientes en C7b y N7-R.
-- Verificado por interfaz en este ciclo (sin errores): cap. 7 ruta directa (`it08/c71-trace`) y con
-  errores (`it08/c7-errores2`); cap. 8 ruta directa (`it08/c8-directa`) y con errores (`it08/c8-errores`).
-  Cap. 7 en 844×390 en el ciclo anterior (`it07/c7-telefono3`); el cap. 8 en teléfono falta.
-- **Entorno:** dos partidas del bot en paralelo se trabaron (14 min en 7.1); correrlas de a una.
+- **Capítulos 1 a 9 jugables y encadenados.** El cap. 9 «Depende» tiene 8 escenas: flechas (función
+  vs relación, con el largo de la sombra), la máquina de Mara (regla; la de Punto no es función),
+  puntos que se paran (tabla → gráfico; unir o no; la Marea borra la ola decorativa de Punto), la
+  recta parada, dónde se puede (dominio de la cuenta vs del reparto), lo que sale (imagen de x · x),
+  tres maneras (cuenta, tabla y gráfico) y lo que vuelve (gancho al cap. 10); Bitácora.
+- Cap. 8 corregido según rev-mat-7 (las 2 altas y casi todas las medias) y parte de rev-narr-6;
+  pendientes en N8-R.
+- Verificado por interfaz en este ciclo, sin errores: cap. 7 (directa y con errores), cap. 8 (directa,
+  con errores, teléfono), cap. 9 (directa, con errores y teléfono 844×390).
+- **Entorno:** las partidas del bot se corren de a una (dos en paralelo se traban).
 - Audio no escuchado; sin playtests humanos; sin dispositivo táctil real.
 
 ## Comandos
@@ -46,7 +45,6 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Revisión independiente del cap. 8 (C8-R) y cap. 8 en 844×390; aplicar.
-2. Cap. 9 «Depende» (relación vs función, dominio, imagen, tablas, gráficos, expresiones).
-3. Pendientes narrativos N7-R, N6-R y N2-R, empezando por los que tocan comprensión.
-4. Cobertura pendiente: C7b (álgebra) y C6b (sistemas).
+1. Revisión independiente del cap. 9 (C9-R); aplicar.
+2. Cap. 10 «Vueltas y flechas» (trigonometría, radianes, periodicidad, vectores, complejos como giro).
+3. Pendientes narrativos N8-R, N7-R, N6-R, N2-R; cobertura C7b y C6b.
