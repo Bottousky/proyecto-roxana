@@ -89,8 +89,12 @@ for(const id of ROOM_ORDER){
 }
 diorama.onFrame=()=>{
   const focus=diorama.focusId,hide=document.body.classList.contains('showcasing');
+  // Labels never sit under the intro text nor half outside the screen.
+  const intro=document.body.classList.contains('exploring')?null:$('#intro').getBoundingClientRect(),W=innerWidth;
   for(const [id,el] of labels){
-    const p=diorama.project(ROOMS[id].anchor);const visible=p&&!hide&&(!focus||focus===id&&false);
+    const p=diorama.project(ROOMS[id].anchor),half=el.querySelector('.text').offsetWidth/2||70;
+    const clear=p&&p.x-half>8&&p.x+half<W-8&&!(intro&&p.x-half<intro.right+12&&p.y-40<intro.bottom+12&&p.x+half>intro.left);
+    const visible=clear&&!hide&&!focus;
     el.style.opacity=visible?'':'0';el.style.pointerEvents=visible?'':'none';
     if(p)el.style.transform=`translate(${p.x}px,${p.y}px)`;
     el.classList.toggle('hover',diorama.hoverId===id);
@@ -121,7 +125,7 @@ function closeRoom({intro=false}={}){
   stopPlayback();ambience.set({room:null});diorama.focus(null);document.body.classList.remove('room-open');
   $('#panel').setAttribute('aria-hidden','true');delete $('#panel').dataset.room;document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current','false'));
   history.replaceState(null,'',location.pathname+location.search);
-  if(intro)showIntro();else{diorama.panelShift=0;diorama.panelShiftY=0;}
+  if(intro)showIntro();else{diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();}
   // Focus returns to what opened the panel, or to the campus.
   const back=was&&was.isConnected&&was!==document.body&&!was.closest('#panel')?was:document.body.classList.contains('light')?$('#cta-play'):canvas;back.focus({preventScroll:true});
 }
@@ -367,14 +371,15 @@ addEventListener('storage',e=>{if(e.key===SAVE_KEY&&previewStage===null){save=re
 // any 3D. Once the student looks around, it folds into the compact brand.
 function explore(){
   if(document.body.classList.contains('exploring'))return;
-  document.body.classList.add('exploring');diorama.panelShift=0;
+  document.body.classList.add('exploring');diorama.panelShift=0;diorama.panelShiftY=0;
   if(!profile.welcomed){profile.welcomed=true;persistProfile();}
 }
 function showIntro(){
-  document.body.classList.remove('exploring');diorama.panelShift=introShift();
+  document.body.classList.remove('exploring');diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();
 }
 // On wide screens the campus steps right of the intro text.
 function introShift(){return innerWidth>1000&&!document.body.classList.contains('exploring')?-.17:0;}
+function introShiftY(){return innerWidth<=820&&innerHeight>innerWidth&&!document.body.classList.contains('exploring')?-.22:0;}
 function setupWayIn(){
   const o=ohmdalSummary(previewStage===null?save:null),href=base+'index.html'+(o.started?'#continuar':'');
   const label=o.started?'Continuar en Ohmdal':'Entrar a Ohmdal';
@@ -407,7 +412,7 @@ document.querySelectorAll('.intro-links a').forEach(a=>a.addEventListener('click
 addEventListener('hashchange',route);
 $('#cta-explore').addEventListener('click',()=>{explore();canvas.focus({preventScroll:true});toast('Tocá un edificio para acercarte. El directorio de abajo lleva a cada sala.');});
 canvas.addEventListener('pointerdown',()=>explore(),{passive:true});
-addEventListener('resize',()=>{if(!diorama.focusId)diorama.panelShift=introShift();});
+addEventListener('resize',()=>{if(!diorama.focusId){diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();}});
 
 // The light version: the same home without 3D (no WebGL, failed load).
 function lightVersion(reason){
@@ -425,7 +430,7 @@ loadNews(base).then(r=>markUnread(unreadCount(r.items,profile.newsSeen)));
   try{
     await diorama.build(p=>{$('#loading-bar').style.width=`${Math.round(p*100)}%`;});
     syncHour();applySettings();refreshProgress({instant:true});
-    diorama.panelShift=introShift();
+    diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();
     diorama.flyTo({...OVERVIEW,distance:OVERVIEW.distance*1.25,pitch:OVERVIEW.pitch+10,yaw:OVERVIEW.yaw-24},{instant:true});
     requestAnimationFrame(()=>{diorama.flyTo(OVERVIEW);document.body.classList.add('ready');});
     const ex=$('#cta-explore');ex.disabled=false;ex.textContent='Explorar el campus';

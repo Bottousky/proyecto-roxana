@@ -536,7 +536,7 @@ export class SchoolDiorama {
     const r=this.canvas.getBoundingClientRect(),aspect=r.width/Math.max(1,r.height),cam=this.camera.camera;
     // Portrait screens widen the lens and step back so the whole island fits across.
     const fov=aspect<1?Math.min(40,24/Math.max(aspect,.5)*.8):24;if(Math.abs(cam.fov-fov)>.01)cam.fov=fov;
-    const tanH=Math.tan(fov*Math.PI/360),fit=this.focusId||this.closeUp?(aspect<1?1.25:1):Math.max(1,(aspect<1?34:50)/(tanH*aspect*c.distance));
+    const tanH=Math.tan(fov*Math.PI/360),fit=this.focusId||this.closeUp?(aspect<1?1.25:1):Math.max(1,(aspect<1?40:50)/(tanH*aspect*c.distance));
     const yaw=(c.yaw+drift)*Math.PI/180,p=(c.pitch+(!this.focusId&&!this.closeUp&&aspect<1?8:0))*Math.PI/180,d=c.distance*fit;
     this.shift=lerp(this.shift||0,this.panelShift||0,k);this.shiftY=lerp(this.shiftY||0,this.panelShiftY||0,k);
     const sx=this.shift*tanH*d*aspect,sy=this.shiftY*tanH*d;
@@ -545,6 +545,7 @@ export class SchoolDiorama {
     this.camera.setPosition(tx+Math.sin(yaw)*Math.cos(p)*d,ty+Math.sin(p)*d,tz+Math.cos(yaw)*Math.cos(p)*d);
     this.camera.lookAt(tx,ty,tz);
     const want=d;if(Math.abs(this.frame.dof.focusDistance-want)>.2){this.frame.dof.focusDistance=want;this.frame.update();}
+    const fog=this.app.scene.fog;fog.start=d+18;fog.end=d*1.9+120;
   }
 
   // ── Hour and stage ──────────────────────────────────────────────────────────
