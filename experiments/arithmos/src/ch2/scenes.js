@@ -1342,22 +1342,24 @@ export const lugar = {
     const old = w.get('led-dep');
     if (old) { await d.fadeTo(old, 0, 0.4); w.remove('led-dep'); }
     const top = GROUND - 300;
-    const bw = 110, gap = 16;
+    const bw = 86, gap = 10;
     const bx0 = LEDGER.x - (3 * bw + 2 * gap) / 2;
-    const names = ['atados de atados', 'atados', 'sueltos'];
+    const names = ['de 100', 'de 10', 'sueltos'];
+    const longNames = ['atados de atados', 'atados', 'sueltos'];
     const kinds = [2, 1, 0];
     const counts = [0, 0, 0];
     for (let i = 0; i < 3; i++) {
       w.add(new Drawing(`b205-box${i}`, art.rectStrokesFor(`b205-box${i}`, bx0 + i * (bw + gap), top, bw, 90), {z: 11}));
-      w.add(new Label(`b205-n${i}`, names[i], bx0 + i * (bw + gap) + bw / 2, top + 116, {size: 18, align: 'center', z: 11}));
+      w.add(new Label(`b205-n${i}`, names[i], bx0 + i * (bw + gap) + bw / 2, top + 114, {size: 20, align: 'center', z: 11}));
     }
-    const slotIn = (i, k) => [bx0 + i * (bw + gap) + 18 + (k % 5) * 18, top + 30 + Math.floor(k / 5) * 32];
+    // los atados de atados, uno abajo del otro; los demás, de a cinco por fila
+    const slotIn = (i, k) => kinds[i] === 2 ? [bx0 + i * (bw + gap) + bw / 2, top + 22 + (k % 4) * 20] : [bx0 + i * (bw + gap) + 14 + (k % 5) * 14, top + 26 + Math.floor(k / 5) * 34];
     let tries = 0;
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Tocá una caja para poner adentro un grupo de ese tamaño.', 'Doscientos cinco: ¿cuántos atados de atados, cuántos atados y cuántos sueltos?']);
       const refresh = () => {
-        const spots = kinds.map((k, i) => rectSpot(`b205-${i}`, `Caja de los ${names[i]} (hay ${counts[i]}): agregar uno`, {x: bx0 + i * (bw + gap), y: top, w: bw, h: 90}, () => add(i)));
+        const spots = kinds.map((k, i) => rectSpot(`b205-${i}`, `Caja de los ${longNames[i]} (hay ${counts[i]}): agregar uno`, {x: bx0 + i * (bw + gap), y: top, w: bw, h: 90}, () => add(i)));
         spots.push(wordSpot('b205-clear', 'vaciar', LEDGER.x - 120, top - 40, () => clear()));
         spots.push(wordSpot('b205-ok', 'listo', LEDGER.x + 120, top - 40, () => check()));
         g.ui.setSpots(spots);
@@ -1365,7 +1367,7 @@ export const lugar = {
       const add = i => {
         if (busy || counts[i] >= 9) { if (counts[i] >= 9) g.note('Con diez se ata y pasa al cuarto de al lado.'); return; }
         const it = item(w, kinds[i], ...slotIn(i, counts[i]), `b205-it${i}-${counts[i]}`);
-        it.scale = kinds[i] === 2 ? 0.16 : kinds[i] === 1 ? 0.34 : 0.4;
+        it.scale = kinds[i] === 2 ? 0.5 : kinds[i] === 1 ? 0.32 : 0.36;
         it.z = 12;
         counts[i]++;
         g.audio.tap(0.12, 1.4 + i * 0.1);
