@@ -220,7 +220,8 @@
   .wb-compact-control .wb-knob-track{width:96px;height:44px}
   .wb-compact-control .wb-knob-notches{inset:16px 0}
   .wb-compact-control .wb-switch{min-height:44px}
-  .wb-dock{padding:8px 10px 12px}
+  .wb-dock{display:flex;flex-direction:column;padding:8px 10px 12px}
+  .wb-say{order:0}.wb-toolbar{order:1}.wb-compact-controls{order:2}.wb-terminal-drawer{order:3}
   .wb-say p{font-size:14px}
   .wb-success{width:min(440px,94%);padding:16px 16px 12px}
   .wb-success h2{font-size:24px}
