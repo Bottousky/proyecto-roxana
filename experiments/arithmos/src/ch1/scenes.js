@@ -1,6 +1,6 @@
 // Capítulo 1 — ¿Están todos? Escenas jugables.
 
-import {Drawing, Label, Link, Custom} from '../engine/world.js';
+import {Drawing, Label, Link, Custom, Dot} from '../engine/world.js';
 import {YELLOW, WHITE, chalkText, pressureStyle} from '../engine/chalk.js';
 import {easeInOut, easeOut, lerp, mulberry32} from '../engine/rng.js';
 import {evaluatePairs, togglePair} from '../logic/pairing.js';
@@ -1091,15 +1091,23 @@ export const quien = {
         await go;
         voice?.stop?.();
         s.setPose('surprise', 0.2);
-        d.describe('Punto se pone delante de la marca y no te deja borrarla. Después recorre las marcas: ninguna tiene dos puntos.');
+        d.describe('Punto no te deja borrarla. Recuerda la mañana: sobre cada marca aparece, tenue, el punto que pasó cuando la hiciste. Doce marcas, doce puntos: una marca por toque.');
+        const memo = [];
         for (let i = 0; i < MARKS; i++) {
           const [mx, my] = markPos(i);
-          await zip(d, p, mx, my - 40, 0.09);
+          await zip(d, p, mx, my - 40, 0.12);
+          const gd = w.add(new Dot(`memo${i}`, mx, my - 78, {r: 7, z: 7}));
+          gd.fade = 0.38;
+          memo.push(gd);
+          g.audio.tap(0.1, 1.5 + i * 0.04);
         }
         await zip(d, p, fx, fy - 54, 0.3);
         s.setPose('idle', 0.5);
         g.setCinematic(false);
-        await d.think('Nadie quedó con dos marcas. Las marcas están bien: alguien no volvió.');
+        await d.think('Esta mañana pasaron doce y anoté doce: una marca cada vez que tocaba a uno. Ninguna de más.');
+        await d.think('Esta noche volvieron once. Alguien no volvió.');
+        await d.all(...memo.map(o => d.fadeTo(o, 0, 0.5)));
+        for (const o of memo) w.remove(o.id);
         await d.walk(s, STONE.x - 360, GROUND, 170);
         follow(p, s);
       }
@@ -1414,7 +1422,7 @@ export const gradas = {
     base(g, stage('night'));
     w.removeWhere(o => o.id.startsWith('pair-') || o.id === 'crack' || o.id === 'old-marks' || o.id === 'seat-ring');
     stopDance(w);
-    student(w, LINE_X0 - 70);
+    student(w, LINE_X0 - 110);
     punto(w, 0, 0);
     const scratch = g.scratch('c1.gradas');
     const seats = art.seatPositions(GRADAS.x, GROUND, GRADAS.seats);
@@ -1455,7 +1463,7 @@ export const gradas = {
       g.setCinematic(false);
       s.setPose('lookUp', 0.6);
       s.look(1, -0.4);
-      await d.think('Unas gradas. ¿Habrá lugar para todos?');
+      await d.think('Unas gradas. ¿Habrá lugar para la Ronda y Punto?');
       s.setPose('idle', 0.6);
       await d.think('¿Y para mí?');
       // Punto compara a ojo: la fila es larguísima; las gradas, cortas
@@ -1481,7 +1489,7 @@ export const gradas = {
         {id: 'justo', text: 'Alcanzan justo.'},
         {id: 'sobra', text: 'Alcanzan y sobra lugar.'},
         {id: 'nose', text: 'Todavía no sé.'},
-      ], {prompt: 'Así, en fila, ¿alcanzan los asientos?', evaluate: true});
+      ], {prompt: 'Así, en fila, ¿alcanzan los asientos para la Ronda y Punto?', evaluate: true});
       scratch.prediction = prediction;
       g.flags.prediction = prediction;
       if (prediction !== 'nose') {
@@ -1492,27 +1500,6 @@ export const gradas = {
         g.flags.why = scratch.why;
       }
       d.evidence('predict', {prediction, why: scratch.why || null});
-      // Punto, convencido de que la fila es demasiado larga, la aprieta para que "entre"
-      g.setCinematic(true);
-      d.describe('Punto empuja a la fila hasta dejarla bien apretada, más corta que las gradas. Queda conforme.');
-      g.audio.punto('hello');
-      for (let k = LINE_IDS.length - 1; k >= 0; k--) {
-        const dot = lineDot(w, LINE_IDS[k]);
-        const [tx, ty] = squeezedPos(k);
-        hop(d, dot, tx, ty, {g, sound: k % 4 ? null : 'tap', h: 18, dur: 0.35}).then(() => dot.setMode('bob', {home: [dot.x, dot.y]})).catch(() => {});
-        await d.wait(0.07);
-      }
-      await d.wait(0.6);
-      await pulse(d, p, 1, 0.4);
-      scratch.squeezed = true;
-      g.setCinematic(false);
-      const conserve = await d.choose([
-        {id: 'more', text: 'Así entran más.'},
-        {id: 'same', text: 'Son los mismos que antes.'},
-        {id: 'less', text: 'Así entran menos.'},
-      ], {prompt: 'Apretados, ¿cambia algo?', evaluate: true});
-      scratch.conserve = conserve;
-      d.evidence('conserve', {answer: conserve});
       g.queueSave();
     }
     // sentar: tres los elige el jugador; después Punto sigue solo
@@ -1624,12 +1611,47 @@ export const gradas = {
       readings.splice(readings.findIndex(o => o.id === r), 1);
     }
     const pred = scratch.prediction, why = scratch.why;
-    const line = pred === 'no' ? 'Punto y yo pensábamos lo mismo. Mirábamos el largo de la fila.'
-      : pred === 'justo' ? (why === 'count' ? 'No era justo: sobró uno. Se me escapó alguien, o conté a uno dos veces.' : 'No era justo: sobró uno.')
-        : pred === 'sobra' ? (why === 'count' ? 'Contarlos funcionó.' : 'Acerté, pero de casualidad.')
+    const line = pred === 'no' ? (why === 'count' ? 'Si los conté, algo conté mal: sobró un asiento.' : 'Punto y yo pensábamos lo mismo. Mirábamos el largo de la fila.')
+      : pred === 'justo' ? (why === 'count' ? 'Sobró uno. ¿Me conté a mí? En la fila eran trece.' : 'No era justo: sobró uno.')
+        : pred === 'sobra' ? (why === 'count' ? 'Contarlos funcionó.' : 'Acerté, pero mirando el largo no se podía estar seguro.')
           : 'Mirando no se podía saber. Sentándolos, sí.';
     await d.think(line);
-    if (scratch.conserve && scratch.conserve !== 'same') await d.think('Apretados o no, eran los mismos.');
+    if (!scratch.conserve) {
+      // Punto no se convence: los hace levantar y los aprieta en una fila corta
+      g.setCinematic(true);
+      const wide = {x: GRADAS.x - 700, y: GROUND - 360, w: 1100, h: 430};
+      await d.shot(wide, 0.8);
+      d.describe('Punto hace levantar a todos y los pone otra vez en fila, bien apretados: la fila queda más corta que las gradas.');
+      g.audio.punto('hello');
+      for (let k = LINE_IDS.length - 1; k >= 0; k--) {
+        const dot = lineDot(w, LINE_IDS[k]);
+        const [tx, ty] = squeezedPos(k);
+        hop(d, dot, tx, ty, {g, sound: k % 4 ? null : 'tap', h: 30, dur: 0.35}).then(() => dot.setMode('bob', {home: [dot.x, dot.y]})).catch(() => {});
+        await d.wait(0.07);
+      }
+      await d.wait(0.6);
+      await pulse(d, p, 1, 0.4);
+      g.setCinematic(false);
+      const conserve = await d.choose([
+        {id: 'none', text: 'Ninguno.'},
+        {id: 'one', text: 'Uno.'},
+        {id: 'more', text: 'Más de uno.'},
+      ], {prompt: 'Así apretados, si se vuelven a sentar, ¿cuántos asientos sobran?', evaluate: true});
+      scratch.conserve = conserve;
+      d.evidence('conserve', {answer: conserve});
+      g.queueSave();
+      g.setCinematic(true);
+      d.describe('Cada uno vuelve a su asiento. Queda libre el mismo asiento de antes.');
+      for (const [j, who] of Object.entries(seated)) {
+        const dot = w.get(who);
+        hop(d, dot, seats[+j][0], seats[+j][1] - 14, {g, sound: null, h: 50, dur: 0.4}).then(() => dot.setMode('bob', {home: [dot.x, dot.y]})).catch(() => {});
+        await d.wait(0.06);
+      }
+      await d.wait(0.6);
+      await d.shot({x: GRADAS.x - 360, y: GROUND - 330, w: 720, h: 400}, 0.8);
+      g.setCinematic(false);
+      await d.think(conserve === 'one' ? 'Uno, como antes. Apretados o separados, son trece.' : 'Sobró uno, como antes. Apretados o separados, son trece.');
+    }
     await d.fadeTo(ring, 0, 0.5);
     w.remove('seat-ring');
     // el que sobra
@@ -1905,7 +1927,7 @@ export const nombre = {
     if (!replay && !sc.named) {
       const options = [
         {id: 'two', text: 'El 14 nombra a dos.'},
-        {id: 'name', text: 'El 14 nombra a los catorce.'},
+        {id: 'name', text: 'El 14 nombra a catorce.'},
         {id: 'hidden', text: 'Adentro del 14 hay catorce cosas.'},
       ];
       for (;;) {
@@ -2000,9 +2022,12 @@ function writeJournal(g) {
   if (checks.some(c => c.double === 'mark')) seen.push('Una comprobación mostró una marca unida a dos puntos: así no es uno a uno, y no vale.');
   if (checks.some(c => c.verdict === 'incomplete')) seen.push('Otra comprobación mostró que, mientras sobran de los dos lados, todavía no se sabe nada.');
   if (g.flags.reading === 'mistake') seen.push('Pensaste que la marca de más podía ser un error tuyo; tu registro mostraba que no.');
-  const predText = {no: '"no alcanzan: la fila es mucho más larga"', justo: '"alcanzan justo"', sobra: '"alcanzan, y sobra lugar"', pair: '"no sé: hay que emparejar"'}[g.flags.prediction];
-  if (predText) seen.push(`En las gradas predijiste ${predText}. Al sentarlos de a uno, sobró un asiento.`);
-  if (all('conserve').length) seen.push('Cuando Punto los juntó bien apretados, ' + (all('conserve')[0].answer === 'same' ? 'dijiste enseguida que seguía sobrando uno.' : 'al principio pensaste que cambiaba; juntos o separados, eran los mismos.'));
+  const pe = all('predict')[0];
+  const predText = pe && {no: '"no alcanzan"', justo: '"alcanzan justo"', sobra: '"alcanzan, y sobra lugar"', nose: '"todavía no sé"'}[pe.prediction];
+  const whyText = pe?.why === 'count' ? ', contando' : pe?.why === 'look' ? ', mirando el largo de la fila' : '';
+  if (predText) seen.push(`En las gradas, para la Ronda y Punto, dijiste ${predText}${whyText}. Al sentarlos de a uno, sobró un asiento.`);
+  const ce = all('conserve')[0];
+  if (ce) seen.push('Cuando Punto los apretó en una fila corta, ' + (ce.answer === 'one' ? 'anticipaste que seguiría sobrando un asiento: apretados o no, eran trece.' : `pensaste que sobrarían ${ce.answer === 'none' ? 'ninguno' : 'más'}; al sentarse otra vez sobró uno, como antes.`));
   if (all('count').length) seen.push('Contaste las marcas de Punto: una palabra por marca' + (all('count-repeat').length ? ' (y cuando repetiste una, el juego te avisó)' : '') + '. La última fue "catorce".');
   const hints = all('hint').length;
   if (hints) seen.push(`Pediste ${hints === 1 ? 'una ayuda' : `${hints} ayudas`}.`);

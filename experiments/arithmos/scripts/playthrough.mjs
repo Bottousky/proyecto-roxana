@@ -94,8 +94,8 @@ function pickChoice(prompt, options) {
     ['en fila, ¿alcanzan', 'No alcanzan'],
     ['Cómo lo sabés', 'Por cómo se ve'],
     ['asiento libre', 'más en la fila', 'misma cantidad', 'más asientos que en la fila'],
-    ['Apretados', 'entran más', 'los mismos'],
-    ['decís a Punto', 'catorce cosas', 'nombra a dos', 'nombra a los catorce'],
+    ['apretados', 'Ninguno', 'Uno.'],
+    ['decís a Punto', 'catorce cosas', 'nombra a dos', 'nombra a catorce'],
     ['', '¿Quién sos?'],
     ['Dos hileras', 'Hoy llegó más'],
     ['cuarto vacío', 'Nada:', 'espacio', 'Un 0'],
@@ -103,12 +103,15 @@ function pickChoice(prompt, options) {
     ['Qué número es', 'Treinta y dos', 'Trescientos dos'],
     ['ningún cuarto a la izquierda', 'Dejar los diez', 'Tirar un palito', 'dibujar un cuarto'],
     ['lo que debe Curva', 'Un 0', 'Un 3.', 'palabras'],
-    ['tiene Curva ahora', '+1', '5', '−1'],
-    ['le queda a Recta', '+5', '+3'],
-    ['Quién tiene menos', 'Curva', 'Espiral'],
+    ['tiene Curva ahora', '1', '5', '−1'],
+    ['le queda a Recta', 'Tiene 5', 'Tiene 3'],
+    ['número es menor', '−1', '−4'],
+    ['Cuántos pasos', '8', '7'],
     ['más lejos del cero', 'Recta', 'igual'],
-    ['perdonar dos deudas', 'No se puede', 'Quitarle', 'Agregar'],
-    ['Si sube cinco', '−8', '+2'],
+    ['sacar dos deudas', 'No se puede', 'Quitarle', 'Agregar'],
+    ['mismo lugar', 'Sacarle', 'Darle'],
+    ['rayita del medio', 'deuda', 'Que se saca'],
+    ['subir cinco', '−9', '+1'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -116,16 +119,16 @@ function pickChoice(prompt, options) {
     ['en fila, ¿alcanzan', 'Alcanzan justo'],
     ['Cómo lo sabés', 'Los conté'],
     ['asiento libre', 'más asientos que en la fila'],
-    ['Apretados', 'los mismos'],
-    ['decís a Punto', 'nombra a los catorce'],
+    ['apretados', 'Uno.'],
+    ['decís a Punto', 'nombra a catorce'],
   ] : [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
     ['marca sola', 'falta uno'],
     ['en fila, ¿alcanzan', 'Todavía no sé'],
     ['asiento libre', 'más asientos que en la fila'],
-    ['Apretados', 'los mismos'],
-    ['decís a Punto', 'nombra a los catorce'],
+    ['apretados', 'Uno.'],
+    ['decís a Punto', 'nombra a catorce'],
     ['Dos hileras', 'no se puede saber'],
     ['cuarto vacío', 'Un 0'],
     ['entre el 3 y el 2', 'no se puede saber'],
@@ -133,16 +136,19 @@ function pickChoice(prompt, options) {
     ['ningún cuarto a la izquierda', 'dibujar un cuarto'],
     ['lo que debe Curva', 'marca nueva'],
     ['tiene Curva ahora', '−1'],
-    ['le queda a Recta', '+3'],
-    ['Quién tiene menos', 'Espiral'],
+    ['le queda a Recta', 'Tiene 3'],
+    ['número es menor', '−4'],
+    ['Cuántos pasos', '7'],
     ['más lejos del cero', 'igual'],
-    ['perdonar dos deudas', 'Agregar'],
-    ['Si sube cinco', '+2'],
+    ['sacar dos deudas', 'Agregar'],
+    ['mismo lugar', 'Darle'],
+    ['rayita del medio', 'Que se saca'],
+    ['subir cinco', '+1'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
     for (const w of wants) {
-      const o = options.find(t => t.includes(w));
+      const o = options.find(t => t === w) || options.find(t => t.includes(w));
       const k = `${prompt}|${o}`;
       if (o && !tried.has(k)) { tried.add(k); return o; }
     }
@@ -162,6 +168,10 @@ const reloaded = new Set();
 const fpsSamples = [];
 let ended = false;
 let partialReloadDone = false;
+let choiceSig = '';
+// --snap=texto1|texto2: captura cuando el texto en pantalla contiene alguno
+const snaps = val('snap', '') ? decodeURIComponent(val('snap', '')).split('|') : [];
+const snapped = new Set();
 
 for (let iter = 0; iter < 4000; iter++) {
   const s = await read();
@@ -201,6 +211,10 @@ for (let iter = 0; iter < 4000; iter++) {
     continue;
   }
   if (s.choices.length) {
+    // las opciones se activan 450 ms después de aparecer: antes, un clic no cuenta
+    const csig = s.prompt + '|' + s.choices.join('|');
+    if (csig !== choiceSig) { choiceSig = csig; await page.waitForTimeout(520); continue; }
+    choiceSig = '';
     const c = pickChoice(s.prompt, s.choices);
     note(`elige «${c}» (${s.prompt})`);
     await shot(`${s.seg}-eleccion`);
@@ -209,6 +223,11 @@ for (let iter = 0; iter < 4000; iter++) {
   }
   if (s.waiting || s.typing) {
     if (s.waiting && !s.typing) note(`lee: ${s.caption}`);
+    if (s.waiting && !s.typing && snaps.some(t => s.caption.includes(t)) && !snapped.has(s.caption)) {
+      snapped.add(s.caption);
+      await page.waitForTimeout(400);
+      await shot(`snap-${s.seg}`);
+    }
     await page.keyboard.press('Enter');
     await page.waitForTimeout(watch ? 900 : 30);
     continue;
@@ -326,6 +345,7 @@ for (let iter = 0; iter < 4000; iter++) {
       const B = k => spots.filter(x => x.label.startsWith('Curva') && x.label.includes(k));
       const done = spots.find(x => x.id === 'cmp-done');
       if (done) target = done;
+      else if (sel && spots.some(x => x.id === 'cmp-untie') && !(sel.label.startsWith('Recta') ? B('atado') : A('atado')).length) target = spots.find(x => x.id === 'cmp-untie');
       else if (sel) {
         const kind = sel.label.includes('atado') ? 'atado' : 'suelto';
         const other = sel.label.startsWith('Recta') ? B(kind) : A(kind);
@@ -336,9 +356,16 @@ for (let iter = 0; iter < 4000; iter++) {
       else if (A('suelto').length && B('suelto').length) target = B('suelto')[0];
       else if (B('suelto').length && A('atado').length) {
         await clickSpot(A('atado')[0].id);
-        await page.waitForTimeout(80);
-        await clickSpot(A('atado')[0].id);
+        await page.waitForTimeout(120);
+        await clickSpot('cmp-untie');
         note('desata un atado de Recta');
+        await page.waitForTimeout(600);
+        continue;
+      } else if (A('suelto').length >= 10 && B('atado').length) {
+        await clickSpot(B('atado')[0].id);
+        await page.waitForTimeout(120);
+        await clickSpot('cmp-untie');
+        note('desata un atado de Curva');
         await page.waitForTimeout(600);
         continue;
       } else target = spots[0];
@@ -352,13 +379,15 @@ for (let iter = 0; iter < 4000; iter++) {
       const sel = s.spots.find(x => x.selected);
       const fams = spots.filter(x => x.label.startsWith('Familia'));
       if (sel && sel.label.startsWith('Familia')) {
-        const v = sel.label.split(', ').pop();
-        const want = v === '0' ? 'cero' : v;
-        if (route === 'errores' && !tried.has('misplace')) { tried.add('misplace'); target = spots.find(x => x.label.startsWith('Marca ') && !x.label.includes(` ${want} `)); }
-        else target = spots.find(x => x.label === `Marca ${want} de la línea`);
-      } else target = fams[0];
+        const n = Number(sel.label.split(', ').pop().replace('−', '-').replace('+', ''));
+        if (route === 'errores' && !tried.has('misplace') && n < 0) { tried.add('misplace'); target = spots.find(x => x.id === `tick${n === -4 ? -1 : n - 1}`); }
+        else target = spots.find(x => x.id === `tick${n}`);
+      } else target = route === 'errores' ? fams[fams.length - 1] : fams[0];
+    } else if (s.seg === 'c3.pozo') {
+      if (route === 'errores' && !tried.has('pitshort')) { tried.add('pitshort'); target = spots.find(x => x.id === 'pit0'); }
+      else target = spots.find(x => x.id === 'pit1');
     } else if (s.seg === 'c3.perdon') {
-      target = byLabel('perdonarla')[0] || spots.find(x => x.id === 'pz-stuck');
+      target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck');
     } else {
       target = spots[0];
     }

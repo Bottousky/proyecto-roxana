@@ -42,7 +42,7 @@ while (Date.now() < end) {
     if (args.includes('--tap')) {
       const spots = await page.$$eval('#spots .spot', bs => bs.map(b => ({id: b.dataset.id, label: b.getAttribute('aria-label'), sel: b.classList.contains('selected')}))).catch(() => []);
       const sel = spots.find(x => x.sel);
-      const cands = spots.filter(x => /sin (contar|marca|unir)|libre|en la fila|Cruzar|Seguir|buscar|Mirar|Repasar|se tiene|se debe|perdonarla|un paso más|Subir|y la otra/.test(x.label) && !x.sel);
+      const cands = spots.filter(x => /sin (contar|marca|unir)|libre|en la fila|Cruzar|Seguir|buscar|Mirar|Repasar|se tiene|se debe|perdonarla|sacarla|un paso más|Subir|y la otra/.test(x.label) && !x.sel);
       const t = (sel ? cands.find(x => x.label.split(',')[0] !== sel.label.split(',')[0]) : cands[0]) || null;
       if (t) await page.click(`#spots [data-id="${t.id}"]`, {force: true, timeout: 2000}).catch(() => {});
     }

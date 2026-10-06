@@ -79,17 +79,17 @@ transformadas de Laplace/Fourier, integrales múltiples e impropias, derivadas p
 - **Transferencia:** las gradas (1.9): otra estructura (asientos vs fila, la sobra está del otro lado, la forma engaña); y el conteo (1.10) como emparejamiento con palabras.
 
 ### A2 · Cardinalidad y conservación — cap. 1, escenas 1.9 y 1.10
-- **Necesidad:** decidir si alcanzan los asientos sin dejarse engañar por el largo de la fila.
-- **Error:** "más largo = más" (la fila separada, 720 u, parece tener más que unas gradas de 316 u).
-- **Observa / predice / modifica:** predice (no alcanzan / justo / sobra / hay que emparejar) y, si afirma, justifica (contó / tres filas / le pareció); sienta a cada uno en el asiento que quiera; Punto aprieta la fila y vuelve a preguntar.
-- **Consecuencia:** sobra un asiento aunque las gradas son más cortas; apretados, sigue sobrando uno ("cambió el lugar que ocupan, no cuántos son").
+- **Necesidad:** decidir si alcanzan los asientos para la Ronda y Punto sin dejarse engañar por el largo de la fila.
+- **Error:** "más largo = más" (la fila separada, 720 u, parece tener más que unas gradas de 316 u); "apretados entran más".
+- **Observa / predice / modifica:** predice para la fila nombrada (no alcanzan / justo / sobra / todavía no sé) y, si afirma, dice cómo lo sabe (contó / por cómo se ve); sienta a tres en el asiento que quiera y Punto sienta al resto. Después del asiento libre, Punto los aprieta en una fila corta y el jugador predice cuántos asientos sobrarán (ninguno / uno / más de uno).
+- **Consecuencia:** sobra un asiento aunque las gradas son más cortas; se vuelven a sentar y sobra el mismo ("apretados o separados, son trece"). Si contó y dijo "justo", la devolución considera que se contó a sí mismo.
 - **Notación:** "14" y "catorce" nombran lo que no cambia entre las marcas, los presentes y las palabras de "uno" a "catorce".
 - **Transferencia:** Punto hace una marca por cada visita (incluido el estudiante y él mismo): nueva colección emparejable, verificada unión por unión.
 
 ### B0 · Más / menos por correspondencia — cap. 1, escenas 1.5, 1.6 y 1.8
 - **Necesidad:** interpretar la marca sola.
 - **Error:** leer la sobra al revés ("sobra un punto") o atribuirla siempre a un error de registro.
-- **Consecuencia:** el juego responde con la evidencia: la sobra está entre las marcas → hay menos puntos; el registro fue uno a uno → no es un error de anotación.
+- **Consecuencia:** el juego responde con la evidencia: la sobra está entre las marcas → hay menos puntos; Punto muestra el registro de la mañana (doce toques, doce marcas) → no es un error de anotación.
 - **Límite declarado:** las marcas dicen cuántos, no quién (Punto sabe quién).
 
 ### A3 · Contar, número y numeral — cap. 1, escena 1.10
@@ -100,6 +100,33 @@ transformadas de Laplace/Fourier, integrales múltiples e impropias, derivadas p
 - **Límite declarado:** no se niega que "14" tenga estructura: cómo funciona su escritura queda como pregunta.
 - **Puente:** Punto rodea el "1": "¿qué hace un 1 en el nombre de catorce?" → valor posicional (cap. 2).
 
+### A4 · Agrupar de a diez — cap. 2, escenas 2.2 y 2.3
+- **Necesidad:** anotar y comparar cargas de muchos palitos: las hileras de marcas (37 y 34) no se comparan de un vistazo.
+- **Error:** creer que "de un vistazo" alcanza; atar con menos de diez; atar de a cinco sin avisar (Punto).
+- **Observa / predice / modifica:** predice si hoy llegó más; llena el molde de diez palito por palito y ata.
+- **Consecuencia:** atar con menos de diez no se puede; 37 = tres atados y siete sueltos, ordenados atados a la izquierda y sueltos a la derecha; la hilera de ayer, rodeada de a diez, es 34: hoy llegaron tres más. Si había dicho "hoy llegó más", se reconoce que era cierto y que recién ahora se puede asegurar.
+- **Límite declarado:** diez es una costumbre; se podría agrupar de a otra cantidad si todos saben de a cuánto.
+
+### A5 · Valor posicional y cero — cap. 2, escenas 2.3 a 2.8
+- **Necesidad:** escribir lo que hay en el depósito (cuartos de sueltos, atados, atados de atados) con una cifra por cuarto.
+- **Error:** no escribir nada o dejar un espacio en el cuarto vacío; leer 302 como 32; dejar diez en un cuarto.
+- **Observa / predice / modifica:** guarda cargas, ata cuando un cuarto junta diez, escribe el número, elige qué hacer con el cuarto vacío y con diez atados de atados.
+- **Consecuencia:** Punto copia lo escrito sobre un depósito chiquito desde la derecha y marca con una cruz lo que no coincide; sin el 0 todo se corre un lugar; el registro de los Oval (32) se corrige mirando su propio depósito (302); con diez atados de atados se dibuja un cuarto nuevo: 1000.
+- **Notación:** cifra frente a número; el 0 dice "ninguno" en ese lugar.
+
+### B1 · Suma con canje y resta como comparación — cap. 2, escenas 2.4 y 2.6
+- **Necesidad:** guardar cargas que juntan diez en un cuarto; saber cuánta tiza más tiene Recta (52) que Curva (37).
+- **Error:** emparejar un atado con un suelto; dejar diez en un cuarto.
+- **Consecuencia:** "me llevo uno" es atar diez y pasarlo; comparando atado con atado y suelto con suelto, y desatando cuando no queda pareja (de cualquiera de los dos lados), sobran 15: 52 − 37 = 15.
+
+### B2–B3 · Enteros — cap. 3
+- **Necesidad:** anotar en las cuentas (en atados) que Curva debe 3 atados y no tiene ninguno.
+- **Error:** anotar 0 ("no debe nada") o 3 ("tiene tres"); creer que −1 es menor que −4 ("4 es más que 1"); contar marcas en lugar de pasos (8 en lugar de 7); creer que +4 y −4 están a distinta distancia del cero; sacar deudas que no están sin agregar pares cero; leer la rayita de restar como deuda.
+- **Observa / predice / modifica:** elige cómo anotar; empareja atados con deudas (cada par vale cero); anticipa saldos; ubica a las familias en una línea cuyos negativos todavía no tienen número; anticipa pasos; saca deudas anotadas dos veces; elige qué otra acción daría lo mismo; elige hasta qué marca sube Punto en el pozo.
+- **Consecuencia:** cada saldo de la historia sale de una operación del modelo y coincide con su fila del registro; una familia mal ubicada dice cuánto le faltaría para llegar a cero; sacar dos deudas deja igual que dar dos atados: −1 − (−2) = −1 + 2 = +1; en el pozo, si no sube cinco, Punto vuelve a −4.
+- **Notación:** − (deuda o debajo del suelo), + (lo que se tiene), |x|, paréntesis para separar el signo del número de la operación de restar.
+- **Límites declarados:** "deber" y "debajo de cero" son dos lecturas del mismo número; el cero no tiene lado. **Pendiente:** una resta que da negativo (2 − 5) jugada, no sólo dicha.
+
 ## Historia: reconstrucción vs. historia real
 
 El capítulo 1 es una **reconstrucción conceptual**: no afirma que el número "nació" de marcas.
@@ -107,7 +134,7 @@ No se mencionan culturas ni fechas en el juego todavía. Cuando se incorporen, u
 ítems de certeza alta o media de fuentes.md (p. ej. marcas con muescas: objetos notacionales
 deliberados con debate sobre su lectura; fichas lisas mesopotámicas; quipus decimales;
 al-Khwārizmī: *al-jabr* = restituir sumando a ambos miembros, *al-muqābala* = cancelar
-términos semejantes — ancla histórica para el cap. 5).
+términos semejantes — ancla histórica para el cap. 6). El cap. 3 menciona en la Bitácora, como dato, los signos + y − impresos por Widmann (1489).
 
 ## Validaciones pendientes
 - Vigencia de la parte de Electrónica de la Res. 3828/09 y existencia de un diseño 2025 propio de Electrónica.

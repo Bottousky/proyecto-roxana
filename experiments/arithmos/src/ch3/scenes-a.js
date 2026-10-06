@@ -1,16 +1,22 @@
 // Capítulo 3 — Menos que nada (3.1 a 3.3).
 
 import {Drawing, Label} from '../engine/world.js';
-import {YELLOW, stroke} from '../engine/chalk.js';
+import {YELLOW, WHITE, stroke} from '../engine/chalk.js';
 import {zip, hop, pulse, follow, spotOf, rectSpot, wordSpot} from '../acting.js';
 import {combine} from '../logic/integers.js';
 import {
   GROUND, LEDGER, LINE, lineX, waitX, TABLE, SHOTS, base, numberLineOn, chip, tableSlot, mara, villager, student, punto, signed,
 } from './common.js';
 
+/** El registro de cuentas de Mara: una hoja nueva, en atados. */
+export function ledgerHeader(w) {
+  return w.ensure('l3-head', () => new Label('l3-head', 'Cuentas (en atados)', LEDGER.x, GROUND - 110 - 210 + 40, {size: 26, align: 'center', z: 9}));
+}
+
 /** Línea del registro de Mara: nombre a la izquierda, número a la derecha. */
 export function ledgerRow(w, key, name, value, row, {reveal = 1} = {}) {
-  const y = GROUND - 110 - 210 + 52 + row * 46;
+  ledgerHeader(w);
+  const y = GROUND - 110 - 210 + 86 + row * 44;
   const n = w.ensure(`l3n-${key}`, () => new Label(`l3n-${key}`, name, LEDGER.x - 130, y, {size: 30, z: 9}));
   const v = w.ensure(`l3v-${key}`, () => new Label(`l3v-${key}`, value, LEDGER.x + 80, y, {size: 36, z: 9, reveal}));
   v.text = value;
@@ -27,6 +33,7 @@ export function cast(g, {at = 'ledger'} = {}) {
   mara(w, right, {facing: -0.8});
   villager(w, 'curva', right + 110, 'curl', {facing: -0.6, scale: 0.92});
   villager(w, 'recta', right + 210, 'square', {facing: -0.6});
+  villager(w, 'oval-a', right + 300, 'oval', {facing: -0.6});
   return {s, p};
 }
 
@@ -42,8 +49,8 @@ export const deuda = {
     w.clear();
     base(g);
     cast(g);
-    ledgerRow(w, 'recta', 'Recta', '52', 0);
-    ledgerRow(w, 'oval', 'Oval', '302', 1);
+    ledgerRow(w, 'recta', 'Recta', '4', 0);
+    ledgerRow(w, 'oval', 'Oval', '4', 1);
     ledgerRow(w, 'curva', 'Curva', '', 2);
     g.camera.go(SHOTS.ledger);
   },
@@ -54,9 +61,10 @@ export const deuda = {
     const m = w.get('mara');
     const cv = w.get('curva');
     await d.shot(SHOTS.ledger, 1);
-    await d.say('Curva', 'Mara… te debo tres atados de ayer. Y no tengo ninguno.');
+    await d.say('Mara', 'Hoja nueva: las cuentas de cada familia, en atados. Recta tiene cuatro guardados; Oval, otros cuatro.');
+    await d.say('Curva', 'Mara… te debo tres atados de ayer. Y ya no me queda ninguno.');
     m.setPose('think', 0.4);
-    await d.say('Mara', 'Lo que no hay no se escribe… pero esto no es "no hay". ¿Cómo lo anoto?');
+    await d.say('Mara', 'Cuando no hay nada, escribo 0: eso ya lo aprendí. Pero esto no es "no hay": es que falta. ¿Cómo lo anoto?');
     m.setPose('idle', 0.4);
     const v = w.get('l3v-curva');
     const opts = [
@@ -201,20 +209,20 @@ export const pares = {
     const w = g.world;
     base(g);
     cast(g, {at: 'table'});
-    ledgerRow(w, 'recta', 'Recta', '52', 0);
-    ledgerRow(w, 'oval', 'Oval', '302', 1);
+    ledgerRow(w, 'recta', 'Recta', '4', 0);
+    ledgerRow(w, 'oval', 'Oval', '4', 1);
     ledgerRow(w, 'curva', 'Curva', '−3', 2);
     w.ensure('l3-dash', () => new Drawing('l3-dash', [], {z: 10}));
     g.camera.go(SHOTS.table);
   },
   async play(d, g) {
     const w = g.world;
-    const rc = w.get('recta');
-    await d.shot({...SHOTS.table, x: SHOTS.table.x - 200, w: SHOTS.table.w + 500}, 1);
-    await d.say('Recta', 'Curva, tomá: dos atados por la cerca que me arreglaste.');
+    const ov = w.get('oval-a');
+    await d.shot({...SHOTS.table, x: SHOTS.table.x - 200, w: SHOTS.table.w + 700}, 1);
+    await d.say('Oval', 'Curva, tomá: dos atados de los míos, por la cerca que me arreglaste.');
     g.setCinematic(true);
     setTable(g, 'cv', 0, 3);
-    const hs = [0, 1].map(k => chip(w, 'have', rc.x, GROUND - 60, `cv-h${k}`));
+    const hs = [0, 1].map(k => chip(w, 'have', ov.x, GROUND - 60, `cv-h${k}`));
     for (const [k, h] of hs.entries()) await hop(d, h, ...tableSlot('have', k), {g, h: 80, dur: 0.6});
     g.setCinematic(false);
     await d.shot(SHOTS.table, 1);
@@ -223,7 +231,7 @@ export const pares = {
     d.evidence('cancel-result', {haves: r.haves, debts: r.debts, wrong: r.wrong});
     const opts = [
       {id: '-1', text: '−1'},
-      {id: '+1', text: '+1'},
+      {id: '+1', text: '1'},
       {id: '5', text: '5'},
       {id: '0', text: '0'},
     ];
@@ -237,21 +245,33 @@ export const pares = {
       opts.splice(opts.findIndex(o => o.id === c), 1);
     }
     const v = w.get('l3v-curva');
+    const vo = w.get('l3v-oval');
     v.text = '−1'; v.reveal = 0;
+    vo.text = '2'; vo.reveal = 0;
     await d.shot({...SHOTS.table, x: SHOTS.table.x - 900, w: SHOTS.table.w + 900}, 1);
+    await d.draw(vo, 0.4, {key: 'reveal'});
     await d.draw(v, 0.5, {key: 'reveal'});
     w.remove('l3-dash');
     // Recta: tiene cuatro y debe uno. Primero anticipar, después comprobar
     await d.shot(SHOTS.table, 1);
-    await d.say('Mara', 'Y Recta tiene cuatro y me debe uno.');
+    await d.say('Mara', 'Y Recta tiene cuatro guardados… pero ayer le presté uno: me debe uno.');
     setTable(g, 'cv', 0, 0);
     setTable(g, 'rc', 4, 1);
     const pred = await d.choose([
-      {id: '+3', text: '+3'}, {id: '+5', text: '+5'}, {id: '-3', text: '−3'},
+      {id: '+3', text: 'Tiene 3.'}, {id: '+5', text: 'Tiene 5.'}, {id: '-3', text: 'Debe 3.'},
     ], {prompt: '¿Cuánto le queda a Recta?', evaluate: true});
     d.evidence('predict-balance', {answer: pred, expect: '+3'});
     await cancelPairs(d, g, 'rc');
     await d.think(pred === '+3' ? 'Tres. Lo anticipé.' : 'Tres: un par se borró y quedaron tres de arriba.');
+    // la cruz: lo que se tiene también lleva signo
+    const vr = w.get('l3v-recta');
+    await d.shot({...SHOTS.table, x: SHOTS.table.x - 900, w: SHOTS.table.w + 900}, 1);
+    await d.say('Mara', 'Y a lo que se tiene le pongo una cruz, para que nadie lo confunda con una deuda.');
+    vr.text = '+3'; vr.reveal = 0;
+    await d.draw(vr, 0.5, {key: 'reveal'});
+    vo.text = '+2'; vo.reveal = 0;
+    await d.draw(vo, 0.4, {key: 'reveal'});
+    await d.think('Más tres: tres que se tienen. Menos uno: uno que falta.');
     g.flags.c3pairs = true;
   },
 };
@@ -262,7 +282,7 @@ export const pares = {
 
 export const FAMILIES = [
   {id: 'recta', head: 'square', value: 3, name: 'Recta'},
-  {id: 'oval-a', head: 'oval', value: 1, name: 'Oval'},
+  {id: 'oval-a', head: 'oval', value: 2, name: 'Oval'},
   {id: 'curva', head: 'curl', value: -1, name: 'Curva'},
   {id: 'espiral', head: 'tri', value: -4, name: 'Espiral'},
 ];
@@ -277,17 +297,30 @@ export function familySigns(g) {
   }
 }
 
+/** Lo que dice una familia ubicada en una marca equivocada: en términos de lo que tiene o debe. */
+function placeComplaint(f, n) {
+  const v = f.value;
+  if (n === 0) return v > 0 ? `En el cero no tendría nada. Yo tengo ${v}.` : `En el cero no debería nada. Yo debo ${-v}.`;
+  if (v > 0 && n < 0) return `De ese lado estaría debiendo. Yo tengo ${v}.`;
+  if (v < 0 && n > 0) return `De ese lado estaría teniendo ${n}. ¡Ojalá! Yo debo ${-v}.`;
+  if (v > 0) return `Ahí tendría ${n}. Yo tengo ${v}.`;
+  return -n < -v
+    ? `Desde ahí, con ${-n === 1 ? 'un atado' : `${-n} atados`} llegaría a cero. A mí me faltan ${-v}.`
+    : `Desde ahí me faltarían ${-n} para llegar a cero. A mí me faltan ${-v}.`;
+}
+
 export const linea = {
   id: 'c3.linea',
   title: 'La línea',
   setup(g) {
     const w = g.world;
-    base(g, {line: !!g.scratch('c3.linea').drawn});
+    const sc = g.scratch('c3.linea');
+    base(g, {line: !!sc.drawn, neg: !!sc.labeled});
     w.removeWhere(o => /^(cv-|rc-)/.test(o.id));
     const {s} = cast(g, {at: 'table'});
     s.x = LINE.zero + LINE.from * LINE.step - 120;
     FAMILIES.forEach((f, i) => {
-      const placed = g.scratch('c3.linea').placed?.[f.id];
+      const placed = sc.placed?.[f.id];
       villager(w, f.id, placed != null ? lineX(placed) : waitX(i), f.head, {facing: -0.6});
     });
     familySigns(g);
@@ -300,10 +333,10 @@ export const linea = {
     sc.placed ??= {};
     await d.shot(SHOTS.line, 1);
     if (!sc.drawn) {
-      await d.say('Mara', 'Para ver quién tiene más y quién menos, una línea en el suelo. El cero, acá.');
+      await d.say('Mara', 'Para ver quién tiene más y quién menos, una línea en el suelo. El cero, acá. Lo que se tiene, hacia la derecha.');
       g.setCinematic(true);
       s.setPose('writeLow', 0.3);
-      const nl = numberLineOn(w, 0);
+      const nl = numberLineOn(w, 0, {neg: false});
       const x0 = LINE.zero + LINE.from * LINE.step - 50, x1 = LINE.zero + LINE.to * LINE.step + 50;
       s.x = x0;
       const labels = w.objects.filter(o => o.id.startsWith('nl-'));
@@ -319,10 +352,10 @@ export const linea = {
     }
     if (!sc.prediction) {
       sc.prediction = await d.choose([
-        {id: 'espiral', text: 'Espiral, que debe 4.'},
-        {id: 'curva', text: 'Curva, que debe 1.'},
-        {id: 'same', text: 'Igual: los dos deben.'},
-      ], {prompt: '¿Quién tiene menos: Espiral (−4) o Curva (−1)?', evaluate: true});
+        {id: 'espiral', text: '−4'},
+        {id: 'curva', text: '−1'},
+        {id: 'same', text: 'Ninguno: los dos son negativos.'},
+      ], {prompt: '¿Qué número es menor: −4 o −1?', evaluate: true});
       d.evidence('predict-order', {answer: sc.prediction});
       g.saveNow();
     }
@@ -330,11 +363,18 @@ export const linea = {
     await d.interact(ctl => new Promise(resolve => {
       let sel = null;
       let busy = false;
-      g.setHint(() => ['Cada familia va a la marca de su número.', 'Tocá una familia y después la marca de la línea donde va.']);
+      g.setHint(() => [
+        'Cada familia va a la marca de su número. Lo que se tiene, a la derecha del cero.',
+        'Una deuda es lo que falta para llegar a cero: quien debe 4 está a cuatro pasos del cero, del otro lado.',
+        'Tocá una familia y después la marca de la línea donde va.',
+      ]);
       const fams = () => FAMILIES.filter(f => sc.placed[f.id] == null);
       const refresh = () => {
         const spots = fams().map(f => spotOf(w.get(f.id), `Familia ${f.name}, ${signed(f.value)}`, () => pick(f.id), {selected: sel === f.id}));
-        for (let n = LINE.from; n <= LINE.to; n++) spots.push(rectSpot(`tick${n}`, `Marca ${n === 0 ? 'cero' : signed(n)} de la línea`, {x: lineX(n) - 24, y: GROUND - 30, w: 48, h: 90}, () => pick(`tick${n}`), {selected: sel === `tick${n}`}));
+        for (let n = LINE.from; n <= LINE.to; n++) {
+          const label = n === 0 ? 'Marca cero de la línea' : n > 0 ? `Marca ${signed(n)} de la línea` : `Marca sin número, ${-n} ${n === -1 ? 'paso' : 'pasos'} a la izquierda del cero`;
+          spots.push(rectSpot(`tick${n}`, label, {x: lineX(n) - 24, y: GROUND - 30, w: 48, h: 90}, () => pick(`tick${n}`), {selected: sel === `tick${n}`}));
+        }
         g.ui.setSpots(spots);
       };
       const pick = async id => {
@@ -353,7 +393,7 @@ export const linea = {
           await d.walk(fig, lineX(n), GROUND, 260);
           if (n !== f.value) {
             d.evidence('place-wrong', {family: fid, at: n});
-            await d.say(f.name, `Acá dice ${n === 0 ? 'cero' : signed(n)}. Yo tengo ${signed(f.value)}.`);
+            await d.say(f.name, placeComplaint(f, n));
             await d.walk(fig, waitX(FAMILIES.indexOf(f)), GROUND, 300);
           } else {
             sc.placed[fid] = n;
@@ -370,8 +410,26 @@ export const linea = {
     }));
     g.setHint(null);
     await d.shot(SHOTS.line, 1);
+    if (!sc.labeled) {
+      // Punto escribe los números que faltan, con su rayita
+      g.setCinematic(true);
+      const p = w.get('punto');
+      p.setMode('still');
+      d.describe('Punto recorre la línea hacia la izquierda y escribe debajo de cada marca su número con la rayita: −1, −2, −3…');
+      for (let n = -1; n >= LINE.from; n--) {
+        await zip(d, p, lineX(n), GROUND + 20, 0.18);
+        const l = w.add(new Label(`nl-${n}`, signed(n), lineX(n), GROUND + 50, {size: 30, align: 'center', z: 9, reveal: 0, ch: YELLOW}));
+        await d.draw(l, 0.2, {key: 'reveal', sound: false});
+        l.ch = WHITE;
+        g.audio.tap(0.12, 1.4 - n * 0.05);
+      }
+      follow(p, s);
+      g.setCinematic(false);
+      sc.labeled = true;
+      g.saveNow();
+    }
     const pred = sc.prediction;
-    await d.think(pred === 'espiral' ? 'Más a la izquierda, menos.' : pred === 'curva' ? 'Espiral debe más: está más a la izquierda. Tiene menos.' : 'No: Espiral debe cuatro y Curva uno. Espiral está más a la izquierda.');
+    await d.think(pred === 'espiral' ? 'Menos cuatro, más a la izquierda: es menor. Lo anticipé.' : pred === 'curva' ? 'Cuatro es más que uno… pero deber cuatro es tener menos. −4 está más a la izquierda: es menor.' : 'Los dos son negativos, pero no iguales: −4 está más a la izquierda. Es menor.');
     await d.say('Mara', 'Así se ve enseguida: el que está más a la derecha, tiene más.');
     g.flags.c3line = true;
   },

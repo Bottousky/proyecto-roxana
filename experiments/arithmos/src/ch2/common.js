@@ -105,7 +105,7 @@ export function base(g, {dawn = true} = {}) {
   const w = g.world;
   g.renderer.dim = 1;
   g.renderer.tint = dawn ? [1.04, 1.0, 0.94] : [1, 1, 1];
-  w.ensure('ground', () => new Drawing('ground', art.groundLine('ground', GRADAS.x - 900, 9600, GROUND), {z: 0, fade: 0.75}));
+  w.ensure('ground', () => new Drawing('ground', art.groundLine('ground', GRADAS.x - 900, 10800, GROUND), {z: 0, fade: 0.75}));
   w.ensure('gradas', () => new Drawing('gradas', art.gradas('gradas', GRADAS.x, GROUND, art.seatPositions(GRADAS.x, GROUND, GRADAS.seats)), {z: 3}));
   w.ensure('sun', () => new Drawing('sun', art2.sun('sun', GRADAS.x - 240, 270), {z: 1, fade: 0.8}));
   // la pizarra de anoche: marcas de Punto, palabras, la llave, el 14 y el círculo del 1
@@ -129,7 +129,7 @@ export function base(g, {dawn = true} = {}) {
   // camino al depósito
   w.ensure('hill-a', () => art.ghost('hill-a', art.hill('hill-a', 6000, 6700, GROUND - 2, 70, 0.7), 0.45, 0, 1));
   w.ensure('hill-b', () => art.ghost('hill-b', art.hill('hill-b', 8900, 9500, GROUND - 2, 120, 0.7), 0.45, 0, 1));
-  w.ensure('g2-t1', () => art.ghostText('g2-t1', '10 = 1 0', 7000, 170, 44, 0.16));
+  w.ensure('g2-t1', () => art.ghost('g2-t1', art.ghostTree('g2-t1', 7000, 260, 0.8), 0.22, 0.05, -5));
   w.ensure('g2-t2', () => art.ghostText('g2-t2', '9 + 1', 7800, 120, 40, 0.14));
   w.ensure('g2-s1', () => art.smear('g2-s1', [[5400, 200], [6400, 150], [7600, 230], [9200, 160]], 180, 0.32));
   w.ensure('g2-s2', () => art.smear('g2-s2', [[6000, 780], [7400, 740], [9000, 800]], 150, 0.28));

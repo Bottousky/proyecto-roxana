@@ -113,8 +113,34 @@ Evidencia y scripts del revisor: `artifacts/arithmos/it01/review-func/` (`lib.mj
 | F20 | baja | En un recuerdo, "Repetir esta escena" no salía del recuerdo | Corregido: "Salir del recuerdo" |
 | — | autor | En 844×390 el botón "comprobar" tapaba al más chico y se trababa el reencuentro (lo encontró la partida táctil) | Corregido + guarda: un botón de texto que tape un objeto tocable es error de prueba |
 
-Revisiones narrativa/audiovisual (C1-R2) y funcional (C1-R3): en curso / pendientes.
+Revisiones narrativa/audiovisual (C1-R2) y funcional (C1-R3): hechas (arriba). Segunda pasada narrativa: pendiente.
 Playtests humanos: **ninguno**.
 
+## Revisión matemática independiente, 2.ª ronda (rev-mat-2, 2026-10-06, caps. 1–3)
+
+Informe: `artifacts/arithmos/it03/review-mat/informe.md`. Subagente sin navegador (lectura de código,
+textos, Bitácoras, película de la ruta directa de los caps. 1–2). No vio el cap. 3 en pantalla.
+
+| # | Sev. | Hallazgo | Disposición |
+|---|---|---|---|
+| A1 | alta | Cap. 2: el primer numeral de Punto se leía "41" (sueltos a la izquierda de los atados); igual con 37 | Corregido: al terminar de atar, los sueltos se ordenan a la derecha de los atados |
+| A2 | alta | Cap. 3: fichas en atados y registro en palitos con valor posicional (52, 302); saldos que no coincidían con la línea | Corregido: hoja nueva "Cuentas (en atados)"; Recta 4, Oval 4, Curva −3; Oval (4) le paga 2 a Curva (Oval +2), Recta debe 1 (+3). Cada saldo de la línea coincide con su fila |
+| A3 | alta | "Me pidieron prestado y ahora debo tres" invertía la deuda; "ya pagué dos" sin atados | Corregido: cada cambio de saldo es una operación del modelo (Mara le paga 1 a Recta: +4; dos deudas anotadas dos veces se sacan: −1 − (−2) = +1) |
+| A4 | alta | Gradas: "justo" podía ser correcto contando al estudiante y el juego lo acusaba de contar mal (regresión de M15) | Corregido: la pregunta nombra la colección ("para la Ronda y Punto"); el estudiante, un poco aparte; la devolución a "justo + conté" considera que se contó a sí mismo |
+| A5 | alta | Cap. 2 "¿Cuántos más?": tocar dos veces desataba; los atados de Curva no se podían desatar → callejón sin salida | Corregido: tocar de nuevo deselecciona; "desatar" es una acción explícita de cualquiera de los dos lados; aviso si no queda pareja posible |
+| M-a | media | Cap. 2 decía "número" por "cifra" | Corregido en las seis líneas |
+| M-b | media | "El cero no cuenta nada" | Corregido: "El 0 dice 'ninguno' en ese lugar" |
+| M-c | media | Conservación antes de sentar, con opción de identidad (regresión de M10) | Corregido: después del asiento libre, Punto los aprieta y se pregunta cuántos asientos sobran (mismo registro); se vuelven a sentar y se ve |
+| M-d | media | "Hice una marca de más" se refutaba con el emparejamiento actual (circular) | Corregido: Punto muestra el registro de la mañana (doce toques, doce marcas) |
+| M-e | media | "Hoy llegó más" era verdadero y no se reconocía; el 34 nunca aparecía | Corregido: después del 37 se agrupa la hilera de ayer de a diez (34) y se cierra la pregunta |
+| M-f | media | El depósito "de todos" (110) mostraba 302 de los Oval | Corregido: la tiza de los Oval está en su propio depósito |
+| M-g | media | La comparación de estantes ocurría dentro de los cuartos del depósito | Corregido: la comparación se hace afuera, a la izquierda |
+| M-h | media | Signo y resta sin distinguir en el juego | Corregido: en −1 − (−2) se pregunta qué dice la rayita suelta; Mara explica el paréntesis |
+| M-i | media | Perdonar más de lo que se debe; nunca se decía que sacar una deuda es como dar un atado | Corregido: la historia pasa a "deudas anotadas dos veces"; pregunta "¿qué otra cosa la habría dejado igual?" con la respuesta "darle dos atados" mostrada en la línea |
+| M-j | media | El orden en la línea se acertaba buscando el rótulo; la pregunta previa con deudas | Corregido: los negativos no tienen número hasta ubicar a las familias; las quejas dicen cuánto faltaría para llegar a cero; la pregunta es "¿qué número es menor: −4 o −1?" |
+| M-k | media | "Debajo de cero" y "deber" sin puente; 2 − 5 no se juega | Parcial: Punto cae a −4 "como Espiral, que debe cuatro" y la Bitácora lo dice. **Pendiente:** jugar una resta que da negativo (2 − 5) |
+| M-l | media | Pasos y subida del pozo con un solo botón | Corregido: se anticipan los pasos (7/8/1) y en el pozo el jugador elige hasta qué marca sube; si no son cinco, Punto vuelve |
+| bajas 1–12 | baja | Mara olvida el cero; Bitácora que atribuye de más; "nombra a los catorce"; "siete atados"; "dejar los diez"; espacio en blanco; el 0 sin lado; "+" sin presentar; textos fantasma anticipados; comentarios | Corregidas 1–10 (el "+" lo presenta Mara con la cruz; los textos fantasma pasan a dibujos). 11: comentario de `ch3/common.js` corregido; `placevalue.js` sin cambios (función sin uso). 12: currículo, pendiente en este ciclo |
+
 ## Regresiones
-Ninguna registrada todavía.
+- rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

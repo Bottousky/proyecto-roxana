@@ -12,7 +12,7 @@ export {GROUND, DEPOT, LEDGER, mara, villager, student, punto, item, signed};
 
 export const LINE = {zero: 10500, step: 110, from: -6, to: 6};
 export const lineX = n => LINE.zero + n * LINE.step;
-/** Dónde esperan las familias antes de ubicarse (a la izquierda de la línea, dentro del plano). */
+/** Dónde esperan las familias antes de ubicarse (a la derecha de la línea, dentro del plano). */
 export const waitX = i => LINE.zero + LINE.to * LINE.step + 150 + i * 100;
 export const TABLE = {x: 9330, top: GROUND - 320, w: 440, h: 210};
 export const PIT = {x: 11800, step: 70};
@@ -26,7 +26,7 @@ export const SHOTS = {
 };
 
 /** Fondo del capítulo 3: el depósito con su registro, la mesa de cuentas y la línea del suelo. */
-export function base(g, {line = false} = {}) {
+export function base(g, {line = false, neg = true} = {}) {
   const w = g.world;
   g.renderer.dim = 1;
   g.renderer.tint = [1, 1, 1];
@@ -35,17 +35,18 @@ export function base(g, {line = false} = {}) {
   depotBuilding(w, 4);
   ledgerBoard(w);
   w.ensure('table', () => new Drawing('table', art2.easel('table', TABLE.x, GROUND, TABLE.w, TABLE.h), {z: 4}));
-  w.ensure('g3-t1', () => art.ghostText('g3-t1', '−1 + 1 = 0', 9200, 140, 44, 0.16));
-  w.ensure('g3-t2', () => art.ghostText('g3-t2', '|−4| = 4', 11300, 170, 40, 0.14));
+  w.ensure('g3-t1', () => art.ghost('g3-t1', art.ghostLine('g3-t1', 9000, 150, 420, 7), 0.2, 0.05, -5));
+  w.ensure('g3-t2', () => art.ghost('g3-t2', art.ghostSpiral('g3-t2', 11400, 170, 60), 0.2, 0.05, -5));
   w.ensure('g3-s1', () => art.smear('g3-s1', [[8200, 180], [9600, 140], [11000, 210], [12400, 150]], 170, 0.3));
-  if (line) numberLineOn(w, 1);
+  if (line) numberLineOn(w, 1, {neg});
 }
 
-/** La línea del suelo, con números legibles debajo. */
-export function numberLineOn(w, progress = 1) {
+/** La línea del suelo, con números legibles debajo (los negativos, sólo si `neg`). */
+export function numberLineOn(w, progress = 1, {neg = true} = {}) {
   const nl = art3.numberLine('nline', LINE.zero, GROUND, LINE.step, LINE.from, LINE.to);
   const d = w.ensure('nline', () => new Drawing('nline', nl.strokes, {z: 2, progress}));
   for (const t of nl.ticks) {
+    if (t.n < 0 && !neg) continue;
     w.ensure(`nl-${t.n}`, () => new Label(`nl-${t.n}`, t.n === 0 ? '0' : signed(t.n), t.x, GROUND + 50, {size: t.n === 0 ? 36 : 30, align: 'center', z: 9, weight: t.n === 0 ? 700 : 400}));
   }
   return d;

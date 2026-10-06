@@ -49,7 +49,7 @@ export function dropZeros(text) {
 }
 
 /**
- * Comparar emparejando: atado con atado, suelto con suelto, de los cuartos altos a los bajos.
+ * Comparar emparejando: atado con atado, suelto con suelto, de los cuartos bajos a los altos.
  * Si en un cuarto del lado menor sobran y del lado mayor no alcanzan, se desata uno del cuarto
  * de arriba (pedir prestado). Devuelve la diferencia y los pasos, o null si a < b.
  */
