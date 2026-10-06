@@ -56,7 +56,12 @@ const note = s => { const line = `[${((Date.now() - t0) / 1000).toFixed(1)}s] ${
 let shots = 0;
 const shot = async name => {
   shots++;
-  await page.screenshot({path: `${out}/${String(shots).padStart(3, '0')}-${name}.png`});
+  // en una máquina cargada la captura puede tardar: si falla, se anota y la partida sigue
+  try {
+    await page.screenshot({path: `${out}/${String(shots).padStart(3, '0')}-${name}.png`, timeout: 15000});
+  } catch (e) {
+    note(`captura fallida (${name}): ${e.message.split('\n')[0]}`);
+  }
 };
 
 const read = () => page.evaluate(() => {
@@ -179,6 +184,13 @@ function pickChoice(prompt, options) {
     ['da media vuelta', '−1.'],
     ['«suman 3»', '(5, 2)'],
     ['balde número 7', 'A medias'],
+    ['qué parte va a subir llena', 'Exactamente'],
+    ['familia común', 'El promedio'],
+    ['por lo menos 4 seguros', 'B: a veces'],
+    ['el doble de tiza', 'Sí: su barra'],
+    ['4 pares de botas', '10: seis'],
+    ['el 7 o el 12', 'El 12'],
+    ['hace que la Marea borre', 'Sí: van juntos'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -277,6 +289,13 @@ function pickChoice(prompt, options) {
     ['da media vuelta', 'Uno nuevo'],
     ['«suman 3»', 'Ningún par'],
     ['balde número 7', 'No se sabe seguro'],
+    ['qué parte va a subir llena', 'Con muchos baldes'],
+    ['familia común', 'El del medio'],
+    ['por lo menos 4 seguros', 'A: siempre'],
+    ['el doble de tiza', 'Hay que mirar'],
+    ['4 pares de botas', '24'],
+    ['el 7 o el 12', 'El 7 sale'],
+    ['hace que la Marea borre', 'No se sabe'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -297,6 +316,7 @@ let dosPasosStep = 0;
 let copyCand = null;
 let coordStep = 0;
 let c9Shape = null;
+let c11Item = null;
 let logTaps = 0;
 const searchOrder = ['look-crack', 'look-house', 'look-smudge'];
 let lastSeg = null;
@@ -644,6 +664,13 @@ for (let iter = 0; iter < 4000; iter++) {
       else target = spots.find(x => x.id === 'c10-v0') || spots.find(x => x.id === 'c10-v1') || spots[0];
     } else if (s.seg === 'c10.pistas' && spots.some(x => x.id.startsWith('c10-p'))) {
       target = spots.find(x => x.id === (route === 'errores' && !tried.has('c10p') && (tried.add('c10p'), true) ? 'c10-p3_2' : 'c10-p4_3'));
+    } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id === 'c11-sure')) {
+      const truth = c11Item === 'bucket' ? 'c11-chance' : 'c11-sure';
+      const wrong = route === 'errores' && !tried.has('c11k') && (tried.add('c11k'), true);
+      target = spots.find(x => x.id === (wrong ? (truth === 'c11-sure' ? 'c11-chance' : 'c11-sure') : truth));
+    } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id.startsWith('c11-s'))) {
+      target = spots[0];
+      c11Item = target.id.replace('c11-s', '');
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
       if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }

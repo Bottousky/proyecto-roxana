@@ -13,7 +13,10 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 
 ## Estado real (ciclo 6 del loop, 2026-10-06)
 
-- **Capítulos 1 a 10 jugables y encadenados.** El cap. 10 «Vueltas y flechas» (radianes, seno como
+- **Capítulos 1 a 11 jugables y encadenados.** El cap. 11 «Lo que pasa a veces» (frecuencia que se
+  estabiliza, promedio y mediana, rango, gráfico tramposo de Punto que borra la Marea, principio de
+  multiplicación, dos dados, correlación vs causa, gancho al cap. 12) pasa las dos rutas (`it09/c11-*`).
+- El cap. 10 El cap. 10 «Vueltas y flechas» (radianes, seno como
   alto en la rueda, periodicidad, razón en rampas, vectores, i como cuarto de vuelta, sistemas 2 × 2
   como rectas que se cruzan, gancho al azar) pasa las rutas directa y con errores (`it09/c10-*`); sin
   revisión independiente todavía.

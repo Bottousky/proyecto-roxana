@@ -1,0 +1,45 @@
+[0.0s] escena → c11.baldes
+[1.0s] lee: De seis baldes, cuatro subieron llenos. ¿Eso quiere decir que siempre van a ser cuatro de cada seis?
+[2.4s] elige «Con muchos baldes, más o menos dos de cada tres.» (Si subimos mil baldes, ¿qué parte va a subir llena?)
+[6.1s] lee: Al principio salta; con muchos, se queda cerca de dos tercios.
+[6.2s] lee: —Balcón: con muchos baldes, la parte que sube llena se acomoda cerca de 2 de cada 3. Eso lo vimos, no está garantizado. Y el próximo balde, igual, no se sabe.
+[7.0s] escena → c11.medio
+[7.4s] lee: Me piden cuántos atados tiene una familia de las Terrazas, así, en general. Peldaño 3, Rampa 4, Cornisa 4, Balcón 5… y la Ronda, que guarda los de todos, 34.
+[9.0s] elige «El del medio: 4, como la mayoría.» (¿Qué número dice mejor cuántos atados tiene una familia común?)
+[9.5s] lee: Cuatro, como casi todas. El promedio se lo lleva la Ronda.
+[9.5s] lee: —Mara: un número solo siempre esconde algo. El promedio reparte todo, y uno muy grande lo arrastra. El del medio, que se llama mediana, no se mueve aunque la Ronda tenga mil.
+[9.6s] escena → c11.parejo
+[10.1s] lee: Dos ayudantes redibujan escalones. Los dos hacen 5 por día en promedio. Mañana necesito por lo menos 4 seguros. ¿A cuál llamo?
+[12.2s] elige «A: siempre hace entre 4 y 6.» (Para tener por lo menos 4 seguros, ¿a quién llamás?)
+[12.7s] lee: A: sus días van de 4 a 6. B a veces hace 1.
+[12.7s] lee: —Rampa: el promedio no dice qué tan desparejo es. De lo más bajo a lo más alto: A va de 4 a 6, una diferencia de 2; B, de 1 a 9, 8. Eso se llama rango.
+[13.6s] escena → c11.grafico
+[14.0s] lee: Punto juntó tiza para la escalera: 104 trozos. Mara juntó 100. Punto hizo un gráfico.
+[14.6s] elige «Hay que mirar dónde empiezan las barras.» (¿Punto juntó el doble de tiza que Mara?)
+[16.6s] lee: Desde cero, casi iguales: 104 es 4 más que 100, no el doble.
+[17.4s] lee: —Punto: los números eran ciertos, pero el dibujo decía otra cosa. Si las barras no empiezan en cero, el alto no compara cantidades.
+[18.5s] escena → c11.contar
+[19.2s] lee: Para la fiesta de la escalera tengo 3 sombreros y 2 bufandas. ¿De cuántas maneras distintas me puedo vestir?
+[23.5s] lee: Cada sombrero se abre en dos: 3 veces 2, seis maneras.
+[24.8s] elige «24: cada una de las 6 se abre en 4.» (Si además tiene 4 pares de botas, ¿cuántas maneras?)
+[25.3s] lee: Veinticuatro: 3 · 2 · 4.
+[25.3s] lee: —Cornisa: cuando se elige una cosa de cada grupo, las maneras se multiplican: 3 · 2 = 6, y con las botas, 6 · 4 = 24. No hace falta dibujar todas.
+[26.2s] escena → c11.dados
+[26.6s] lee: En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande.
+[27.2s] elige «El 7 sale más seguido.» (¿Qué suma sale más seguido, el 7 o el 12?)
+[28.8s] lee: —Rampa: el 7 sale de 6 maneras de 36; el 12, de una sola, con dos seises. Si los dados son parejos, el 7 tiene 6/36 de probabilidad y el 12, 1/36.
+[29.7s] lee: En la tabla, sí. ¿Y tirando de verdad?
+[30.6s] lee: Contando, el 7 debería salir cerca de 60 veces de 360 y el 12, cerca de 10. Salieron 58 y 6: cerca, no exacto.
+[31.5s] lee: Me paso al 7. Aunque el 12 puede salir igual: no es imposible, es raro.
+[32.3s] escena → c11.causa
+[33.3s] lee: Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche.
+[34.7s] elige «No se sabe: puede haber algo que cause las dos cosas.» (¿El polvo hace que la Marea borre más?)
+[175.8s] lee: Me olvidaba: también anoté el viento.
+[176.7s] lee: Ahí está: el viento trae polvo y empuja la Marea. Las dos cosas vienen con el viento.
+[176.7s] lee: —Mara: que dos cosas suban juntas no dice que una cause la otra. Acá parece que el viento trae las dos. Para saber si el polvo hace algo, habría que mirar días con el mismo viento.
+[177.6s] escena → c11.anticipar
+[178.1s] lee: La escalera de Mara crece de a 10, la de Punto se duplica, la rueda vuelve, el balde a veces sí y a veces no. ¿Con todo eso se puede saber qué viene?
+[180.8s] lee: —Balcón: lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe qué parte va a pasar.
+[181.7s] lee: Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?
+[182.0s] lee: El capítulo 12 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[183.3s] {"ended":true,"final":{"mode":"title","seg":"c11.anticipar"},"journal":["Lo que pasa a veces"],"evidenceKinds":["freq-predict","freq","summary","summary-pick","spread-pick","graph-predict","count-predict","count","dice-predict","dice-mark","dice-roll","cause-predict","anticipate"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":183.336,"size":"1600x900","touch":false,"route":"directa","watch":false}

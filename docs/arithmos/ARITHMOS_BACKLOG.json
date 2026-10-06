@@ -475,6 +475,19 @@
         "C9"
       ],
       "acceptance": "Idem; cierre narrativo del arco de Punto",
+      "status": "implementado",
+      "evidence": [
+        "artifacts/arithmos/it09/c11-directa/log.txt",
+        "artifacts/arithmos/it09/c11-errores2/log.txt"
+      ]
+    },
+    {
+      "id": "C11-R",
+      "title": "Revisión independiente (matemática y narrativa) del cap. 11",
+      "deps": [
+        "C11"
+      ],
+      "acceptance": "Hallazgos registrados y corregidos o justificados",
       "status": "pendiente",
       "evidence": []
     },

@@ -69,7 +69,7 @@ tiene un rasgo mínimo (tamaño, ritmo de parpadeo). Lino es el más chico.
 | 8 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | jugable, en revisión |
 | 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | jugable, en revisión |
 | 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | jugable, sin revisar |
-| 11 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | pendiente |
+| 11 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | jugable, sin revisar |
 | 12 | Anticipar | J: familias de funciones, parámetros, composición, inversa, tasa de cambio, límite/derivada/acumulación en su nivel | pendiente |
 
 ## Capítulo 1 — ¿Están todos? (guion implementado)
@@ -347,6 +347,28 @@ dos rectas. Representaciones: soga del largo del radio, rueda con marcas, flecha
 
 Límites a declarar: π no es 3,14 (es aproximación); el seno se define acá para un radio 1; los complejos
 se presentan como giros, sin la teoría completa; sistemas de 2 × 2.
+
+## Capítulo 11 — Lo que pasa a veces (implementado, 2026-10-06)
+
+Pregunta de entrada (gancho del cap. 10): el balde a veces sube lleno y a veces a medias. Idea central:
+**lo que pasa a veces no se puede anticipar caso por caso, pero se puede contar: con muchos casos, las
+proporciones se estabilizan (es una regularidad observada, no una garantía). Un número resume un
+montón de datos y siempre esconde algo. Contar con cuidado da probabilidades. Que dos cosas crezcan
+juntas no dice que una cause la otra.**
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 11.1 | Muchos baldes | Frecuencia relativa que se estabiliza | Subir 10, después 100, después 1000 baldes y anotar qué parte sube llena | La proporción salta al principio y después se queda cerca de 2/3; nunca es seguro el próximo |
+| 11.2 | El del medio | Promedio y mediana | Elegir qué número representa los atados de las familias, con una que tiene muchísimos | El promedio se va para arriba por una sola familia; la mediana queda donde está la mayoría |
+| 11.3 | Parejo y desparejo | Dispersión | Comparar dos terrazas con el mismo promedio de escalones por día | Mismo promedio, distinto rango: una es pareja y la otra no |
+| 11.4 | El gráfico de Punto | Lectura crítica de gráficos | Punto dibuja barras que no empiezan en cero; decidir si dice la verdad | Redibujado desde cero, la diferencia «enorme» es chica |
+| 11.5 | Contar sin contar | Principio de multiplicación | ¿Cuántos atuendos con 3 sombreros y 2 bufandas? Dibujar el árbol | 3 · 2 = 6; con 4 botas, 24 |
+| 11.6 | Dos dados | Probabilidad con casos igual de posibles | ¿Qué suma sale más, 7 o 12? Contar en la grilla de 36 | 7 sale de 6 maneras, 12 de una: 6/36 contra 1/36; después, tirar muchas veces para comparar |
+| 11.7 | Juntas no es causa | Correlación vs causa | Los días con más polvo, la Marea borra más: ¿el polvo causa la Marea? | Las dos cosas vienen con el viento: una tercera causa |
+| 11.8 | Anticipar | Cierre y gancho al cap. 12 | Juntar lo aprendido para anticipar | Gancho: la escalera de Mara, la rueda y el balde… ¿se puede anticipar todo? |
+
+Límites a declarar: la estabilización es observada, no prueba; los dados se suponen parejos; la
+correlación se muestra con pocos datos.
 
 ## Criterios de escena (lo que las revisiones marcaron una y otra vez)
 
