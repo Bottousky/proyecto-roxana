@@ -132,7 +132,8 @@ class Game {
 
   addEvidence(kind, data = {}) {
     if (!this.state) return;
-    this.state.evidence.push({t: new Date().toISOString(), seg: this.state.segment, kind, ...data});
+    // los datos nunca pisan el tipo, la escena ni la hora
+    this.state.evidence.push({...data, t: new Date().toISOString(), seg: this.state.segment, kind});
     this.queueSave();
   }
 
@@ -208,9 +209,17 @@ class Game {
       }
       this.state.segment = segs[segs.length - 1].id;
       this.flags.chapterDone = true;
+      this.state.chaptersDone = [...new Set([...(this.state.chaptersDone || []), this.chapter.number])];
       this.saveNow();
       await this.chapter.ending?.(d, this);
-      if (d.epoch === epoch) this.toTitle();
+      if (d.epoch !== epoch) return;
+      const next = CHAPTERS[this.chapter.number + 1];
+      if (next) {
+        this.state.chapter = next.number;
+        this.state.segment = next.segments[0].id;
+        this.saveNow();
+        this.runFrom(this.state.segment);
+      } else this.toTitle();
     } catch (e) {
       if (!(e instanceof Abort)) this.fail(e);
     }
@@ -228,13 +237,21 @@ class Game {
     this.runFrom(this.state.segment);
   }
 
+  findSegment(id) {
+    for (const ch of Object.values(CHAPTERS)) {
+      const seg = ch.segments.find(s => s.id === id);
+      if (seg) return seg;
+    }
+    return null;
+  }
+
   availableMoments() {
     if (!this.state) return [];
-    return this.state.moments.map(id => this.chapter.segments.find(s => s.id === id)).filter(Boolean).map(s => ({id: s.id, title: s.moment}));
+    return this.state.moments.map(id => this.findSegment(id)).filter(Boolean).map(s => ({id: s.id, title: s.moment}));
   }
 
   async replayMoment(id) {
-    const seg = this.chapter.segments.find(s => s.id === id);
+    const seg = this.findSegment(id);
     if (!seg) return;
     this.togglePause(false);
     const d = this.director;
@@ -337,6 +354,7 @@ async function boot() {
       game.devNoSave = true;
       game.state = newState();
       game.state.segment = seg;
+      game.state.chapter = Number(seg.match(/^c(\d+)\./)?.[1] || 1);
       game.start(false);
     } else titleScene(game);
     window.__ready = true;

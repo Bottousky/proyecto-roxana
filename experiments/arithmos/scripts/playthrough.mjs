@@ -48,7 +48,8 @@ const errors = [];
 page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', e => errors.push(String(e.stack || e)));
 const url = `http://127.0.0.1:${port}/`;
-await page.goto(url);
+const startSeg = val('start', '');
+await page.goto(startSeg ? `${url}?seg=${startSeg}` : url);
 await page.waitForFunction(() => window.__ready === true, null, {timeout: 20000});
 const t0 = Date.now();
 const note = s => { const line = `[${((Date.now() - t0) / 1000).toFixed(1)}s] ${s}`; log.push(line); console.log(line); };
@@ -95,6 +96,12 @@ function pickChoice(prompt, options) {
     ['asiento libre', 'Había más en la fila', 'misma cantidad', 'más asientos'],
     ['apretados', 'faltan asientos', 'sobran más', 'Sigue sobrando'],
     ['explicás a Punto', 'catorce cosas', 'nombra a dos', 'es un nombre'],
+    ['', '¿Quién sos?'],
+    ['Dos hileras', 'Hoy llegó más'],
+    ['cuarto vacío', 'Nada:', 'espacio', 'Un 0'],
+    ['entre el 3 y el 2', 'Es una mancha'],
+    ['Qué número es', 'Treinta y dos', 'Trescientos dos'],
+    ['ningún cuarto a la izquierda', 'Dejar los diez', 'Tirar un palito', 'dibujar un cuarto'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['recordar a la Ronda', 'Hacer una marca'],
@@ -113,6 +120,11 @@ function pickChoice(prompt, options) {
     ['asiento libre', 'más asientos'],
     ['apretados', 'Sigue sobrando'],
     ['explicás a Punto', 'es un nombre'],
+    ['Dos hileras', 'no se puede saber'],
+    ['cuarto vacío', 'Un 0'],
+    ['entre el 3 y el 2', 'no se puede saber'],
+    ['Qué número es', 'Trescientos dos'],
+    ['ningún cuarto a la izquierda', 'dibujar un cuarto'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -267,6 +279,47 @@ for (let iter = 0; iter < 4000; iter++) {
       const done = byLabel('ya contada');
       if (route === 'errores' && done.length === 5 && !tried.has('recount')) { tried.add('recount'); target = done[0]; }
       else target = todo[(todo.length * 3) % Math.max(1, todo.length)] || todo[0];
+    } else if (s.seg === 'c2.atados') {
+      const word = id => spots.find(x => x.id === id);
+      const atar = word('atar');
+      if (route === 'errores' && atar && atar.label !== 'atar' && !tried.has('shorttie') && byLabel('Palito suelto').length > 20) { tried.add('shorttie'); target = atar; }
+      else if (atar && atar.label === 'atar') target = atar;
+      else if (word('llenar')) target = word('llenar');
+      else if (word('listo') && !atar) target = word('listo');
+      else target = byLabel('Palito suelto')[0] || atar;
+    } else if (s.seg === 'c2.deposito' || s.seg === 'c2.cuarto') {
+      const full = spots.find(x => x.id.startsWith('room') && (x.label.includes('tiene diez') || x.label.includes('(10)')));
+      const sel = s.spots.find(x => x.selected);
+      const loads = spots.filter(x => x.id.startsWith('load-') && x.id !== 'load-one');
+      if (full) target = full;
+      else if (s.seg === 'c2.cuarto') target = spots.find(x => x.id === 'room0');
+      else if (sel) {
+        const want = sel.label.includes('Palito') ? 'room0' : 'room1';
+        if (route === 'errores' && !tried.has('wrongroom') && want === 'room0') { tried.add('wrongroom'); target = spots.find(x => x.id === 'room1'); }
+        else target = spots.find(x => x.id === want);
+      } else target = loads[0];
+    } else if (s.seg === 'c2.cuantos') {
+      const sel = s.spots.find(x => x.selected);
+      const A = k => spots.filter(x => x.label.startsWith('Recta') && x.label.includes(k));
+      const B = k => spots.filter(x => x.label.startsWith('Curva') && x.label.includes(k));
+      const done = spots.find(x => x.id === 'cmp-done');
+      if (done) target = done;
+      else if (sel) {
+        const kind = sel.label.includes('atado') ? 'atado' : 'suelto';
+        const other = sel.label.startsWith('Recta') ? B(kind) : A(kind);
+        if (route === 'errores' && !tried.has('mixed') && kind === 'atado' && sel.label.startsWith('Recta')) { tried.add('mixed'); target = B('suelto')[0]; }
+        else if (other.length) target = other[0];
+        else target = sel; // deselecciona
+      } else if (A('atado').length && B('atado').length) target = A('atado')[0];
+      else if (A('suelto').length && B('suelto').length) target = B('suelto')[0];
+      else if (B('suelto').length && A('atado').length) {
+        await clickSpot(A('atado')[0].id);
+        await page.waitForTimeout(80);
+        await clickSpot(A('atado')[0].id);
+        note('desata un atado de Recta');
+        await page.waitForTimeout(600);
+        continue;
+      } else target = spots[0];
     } else {
       target = spots[0];
     }

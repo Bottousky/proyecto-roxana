@@ -428,3 +428,62 @@ export class Custom {
 }
 
 export {lerp, pressureStyle, YELLOW};
+
+/**
+ * Forma móvil: trazos en coordenadas locales que se dibujan trasladados, rotados y escalados.
+ * Para cosas que se mueven enteras (palitos, atados) sin regenerar sus trazos.
+ */
+export class Shape {
+  constructor(id, strokes, x = 0, y = 0, {z = 10, rot = 0, scale = 1, progress = 1, fade = 1} = {}) {
+    Object.assign(this, {id, strokes, x, y, z, rot, scale, progress, fade});
+    this.visible = true;
+    this.lift = 0;
+    this.flash = 0;
+  }
+
+  update(dt) {
+    this.flash = Math.max(0, this.flash - dt * 1.4);
+  }
+
+  render(ctx, view, frame, world) {
+    if (this.fade <= 0 || this.progress <= 0) return;
+    ctx.save();
+    ctx.translate(this.x, this.y - this.lift);
+    if (this.rot) ctx.rotate(this.rot);
+    if (this.scale !== 1) ctx.scale(this.scale, this.scale);
+    const c = this.progress >= 1 && this.flash <= 0 && world?.cacheEnabled !== false ? this.#cached(view.scale * this.scale) : null;
+    if (c) ctx.drawImage(c.canvas, c.bx, c.by, c.bw, c.bh);
+    else drawStrokes(ctx, this.strokes, this.progress, this.fade * (1 + this.flash * 0.25), 1 + this.flash * 0.4);
+    ctx.restore();
+  }
+
+  #cached(scale) {
+    const want = Math.min(4, Math.pow(2, Math.ceil(Math.log2(Math.max(0.25, scale)) * 2) / 2));
+    const c = this.cache;
+    if (c && c.fade === this.fade && c.strokes === this.strokes && c.scale >= want && c.scale <= want * 2.9) return c;
+    const b = bboxOf(this.strokes);
+    const w = Math.ceil(b.w * want), h = Math.ceil(b.h * want);
+    if (w * h > 2048 * 2048 || w < 1 || h < 1) return null;
+    const canvas = c?.canvas || document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const cx = canvas.getContext('2d');
+    cx.clearRect(0, 0, w, h);
+    cx.globalCompositeOperation = 'lighten';
+    cx.setTransform(want, 0, 0, want, -b.x * want, -b.y * want);
+    drawStrokes(cx, this.strokes, 1, this.fade);
+    this.cache = {canvas, scale: want, fade: this.fade, strokes: this.strokes, bx: b.x, by: b.y, bw: b.w, bh: b.h};
+    return this.cache;
+  }
+
+  dispose() {
+    if (this.cache) this.cache.canvas.width = 0;
+    this.cache = null;
+  }
+
+  bounds() {
+    const b = this.bbox ??= bboxOf(this.strokes);
+    const k = this.scale;
+    return {x: this.x + b.x * k, y: this.y - this.lift + b.y * k, w: b.w * k, h: b.h * k};
+  }
+}

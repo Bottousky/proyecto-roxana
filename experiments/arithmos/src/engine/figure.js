@@ -215,7 +215,11 @@ export class Figure {
     const rnd = mulberry32(base + 1);
     const opts = {w: 3.6 * k, ch: this.ch, p: 0.95, wobble: 0.45 * k};
     const list = [];
-    list.push(stroke(circleGuide(sk.head[0], sk.head[1], BONES.head * k, rnd, {overshoot: 0.28, start: -1.9 + rnd() * 0.3}), {...opts, seed: base + 2}));
+    list.push(stroke(headGuide(this.style?.head, sk.head[0], sk.head[1], BONES.head * k, rnd), {...opts, seed: base + 2}));
+    if (this.style?.head === 'curl') {
+      const [hx, hy] = sk.head, r = BONES.head * k;
+      list.push(stroke(smoothGuide([[hx - 2, hy - r], [hx + 4, hy - r - 9], [hx + 11, hy - r - 6], [hx + 8, hy - r - 1], [hx + 3, hy - r - 4]], 5), {...opts, w: 2.6 * k, seed: base + 9}));
+    }
     list.push(stroke(smoothGuide([sk.neck, mid(sk.neck, sk.hip, 0.5, 1.2 * sk.f), sk.hip], 6), {...opts, seed: base + 3}));
     list.push(stroke(smoothGuide(sk.aL, 6), {...opts, seed: base + 4}));
     list.push(stroke(smoothGuide(sk.aR, 6), {...opts, seed: base + 5}));
@@ -262,11 +266,14 @@ export class Figure {
     const list = [];
     if (st.scarf) {
       const [nx, ny] = sk.neck;
-      list.push(stroke([[nx - 9 * k, ny - 6 * k], [nx, ny - 2 * k], [nx + 9 * k, ny - 6 * k]], {w: 3 * k, p: 0.9, ch: st.scarfCh ?? this.ch, seed: 31, wobble: 0.2}));
-      list.push(stroke([[nx - f * 4 * k, ny - 3 * k], [nx - f * 12 * k, ny + 14 * k], [nx - f * 7 * k, ny + 22 * k]], {w: 2.6 * k, p: 0.85, ch: st.scarfCh ?? this.ch, seed: 32, wobble: 0.2}));
+      list.push(stroke([[nx - 11 * k, ny - 7 * k], [nx, ny - 1 * k], [nx + 11 * k, ny - 7 * k]], {w: 4.2 * k, p: 0.95, ch: st.scarfCh ?? this.ch, seed: 31, wobble: 0.2}));
+      const sway = Math.sin(this.time * 2.2) * 3 * k;
+      list.push(stroke([[nx - f * 4 * k, ny - 3 * k], [nx - f * 15 * k + sway, ny + 16 * k], [nx - f * 9 * k + sway, ny + 28 * k]], {w: 3.4 * k, p: 0.9, ch: st.scarfCh ?? this.ch, seed: 32, wobble: 0.2}));
+      list.push(stroke([[nx - f * 1 * k, ny - 3 * k], [nx - f * 8 * k + sway * 0.6, ny + 14 * k], [nx - f * 2 * k + sway * 0.6, ny + 24 * k]], {w: 3 * k, p: 0.85, ch: st.scarfCh ?? this.ch, seed: 33, wobble: 0.2}));
     }
     if (st.bun) {
-      list.push(stroke(circleGuide(hx - f * r * 0.7, hy - r * 0.85, r * 0.42, mulberry32(41), {overshoot: 0.2}), {w: 2.6 * k, p: 0.9, ch: this.ch, seed: 41}));
+      const br = r * 0.42 * (st.bunScale || 1);
+      list.push(stroke(circleGuide(hx - f * r * 0.62, hy - r * 0.8 - (br - r * 0.42), br, mulberry32(41), {overshoot: 0.2}), {w: 2.6 * k, p: 0.9, ch: this.ch, seed: 41}));
     }
     if (st.hat) {
       list.push(stroke([[hx - r * 1.5, hy - r * 0.75], [hx + r * 1.5, hy - r * 0.8]], {w: 3 * k, p: 0.95, ch: this.ch, seed: 51}));
@@ -292,6 +299,19 @@ export class Figure {
     const k = this.scale;
     return {x: this.x - 30 * k, y: this.y - 150 * k, w: 60 * k, h: 152 * k};
   }
+}
+
+/** Contorno de la cabeza: redonda, ovalada (familia Oval) o cuadrada (familia Recta). */
+function headGuide(kind, cx, cy, r, rnd) {
+  if (kind === 'oval') {
+    const g = circleGuide(0, 0, r, rnd, {overshoot: 0.28, start: -1.9 + rnd() * 0.3});
+    return g.map(([x, y]) => [cx + x * 0.78, cy + y * 1.3 - r * 0.25]);
+  }
+  if (kind === 'square') {
+    const q = r * 0.95;
+    return [[cx - q, cy - q + 2], [cx - q + 2, cy - q], [cx + q, cy - q + 1], [cx + q + 1, cy + q], [cx - q, cy + q + 1], [cx - q - 1, cy - q + 6]];
+  }
+  return circleGuide(cx, cy, r, rnd, {overshoot: 0.28, start: -1.9 + rnd() * 0.3});
 }
 
 function mid(a, b, t, off) {
