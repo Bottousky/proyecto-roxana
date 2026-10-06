@@ -153,6 +153,14 @@ export class SchoolDiorama {
       x.fillStyle=bg;x.fillRect(0,0,W,H);x.strokeStyle=border;x.lineWidth=6;x.strokeRect(8,8,W-16,H-16);x.lineWidth=2;x.strokeRect(18,18,W-36,H-36);
       x.fillStyle=fg;x.font=`600 ${size}px ${serif}`;x.textAlign='center';x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.45)';x.shadowBlur=4;x.fillText(text,W/2,H/2+4);
     },w,h),{gloss:.45});
+    // The galvanometer's face: a cream dial, a scale from 0 to 10, a red needle at rest and the Ω of the workshop.
+    out.dial=lit(sign(app,'dial',(x,W,H)=>{x.clearRect(0,0,W,H);const cx=W/2,cy=H*.6;x.fillStyle='#efe6cf';x.beginPath();x.arc(W/2,H/2,W/2-2,0,Math.PI*2);x.fill();
+      x.strokeStyle='#2b241b';x.lineWidth=2;x.beginPath();x.arc(cx,cy,W*.36,Math.PI*1.18,Math.PI*1.82);x.stroke();
+      for(let i=0;i<=20;i++){const a=Math.PI*(1.18+.64*i/20),r1=W*.36,r2=r1-(i%2?8:16);x.lineWidth=i%2?1.5:2.5;x.beginPath();x.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);x.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);x.stroke();
+        if(i%4===0){x.fillStyle='#2b241b';x.font='600 17px Inter, sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(String(i/2),cx+Math.cos(a)*(r2-14),cy+Math.sin(a)*(r2-14));}}
+      x.strokeStyle='#a5342a';x.lineWidth=3;const n=Math.PI*1.2;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(n)*W*.33,cy+Math.sin(n)*W*.33);x.stroke();x.fillStyle='#3a3026';x.beginPath();x.arc(cx,cy,8,0,Math.PI*2);x.fill();
+      x.fillStyle='#5b4a36';x.font='600 34px "Cormorant Garamond", serif';x.textAlign='center';x.fillText('Ω',cx,H*.84);x.strokeStyle='#8a6a3a';x.lineWidth=5;x.beginPath();x.arc(W/2,H/2,W/2-4,0,Math.PI*2);x.stroke();
+    },256,256),{alpha:true,gloss:.7});
     out['sign:direccion']=plaqueSign('direccion','DIRECCIÓN');
     const brass=(key,text,size=40)=>plaqueSign(key,text,{bg:'#9a7a45',fg:'#2a2116',size,w:512,h:104,border:'#5d4526'});
     out['sign:faro']=brass('faro','EL FARO · OHMDAL');out['sign:novedades']=brass('novedades','NOVEDADES',46);out['sign:physica']=brass('physica','ADENTRO, OTRA REGLA');out['sign:bitland']=brass('bitland','BITLAND · BAJO LA LENTE',34);
@@ -531,7 +539,7 @@ export class SchoolDiorama {
   }
   buildLights(){
     // A soft key light on Roxana's statue: the narrative anchor of the patio reads first in the overview.
-    const spot=(name,pos,at,color,range,inner,outer)=>{const e=new Entity(name);e.addComponent('light',{type:'spot',color:col(color),intensity:0,range,innerConeAngle:inner,outerConeAngle:outer,castShadows:false});e.setPosition(...pos);e.lookAt(...at);e.rotateLocal(-90,0,0);this.root.addChild(e);return e;};
+    const spot=(name,pos,at,color,range,inner,outer)=>{const e=new Entity(name);e.addComponent('light',{type:'spot',color:col(color),intensity:0,range,innerConeAngle:inner,outerConeAngle:outer,castShadows:false});e.setPosition(...pos);e.lookAt(...at);e.rotateLocal(90,0,0);this.root.addChild(e);return e;}; // spots shine along local −Y
     const omni=(name,pos,color,range,parent=this.root)=>{const e=new Entity(name);e.addComponent('light',{type:'omni',color:col(color),intensity:0,range,castShadows:false});e.setPosition(...pos);parent.addChild(e);return e;};
     this.lampLights=LAMPS.map(([x,z])=>omni('Farol',[x,3.7,z],'#ffcf8a',11));
     this.rooms={
@@ -811,7 +819,8 @@ export class SchoolDiorama {
     // The Anfiteatro's screen glows fully only when its room is open; from the overview it stays a quiet frame.
     const screenOn=this.focusId==='anfiteatro'||this.video?1:.38;
     this.materials.screen.emissiveIntensity=(.55+night*.55)*screenOn;this.materials.screen.update();this.rooms.screen.light.intensity=(.2+night*.9)*screenOn;
-    this.rooms.statueKey.light.intensity=(2.4+night*1.8)*(1-(this.focusFade||0)*.6);
+    // Presentation, not progress: a constant key light; at night it grows once Roxana's lamp is back (real `awaken`).
+    this.rooms.statueKey.light.intensity=(1.1+night*(.5+1.1*L(0)))*(1-(this.focusFade||0)*.6);
     this.materials.lampShade.emissiveIntensity=.2+night*1.2;this.materials.lampShade.update();
     this.fx.dust.particlesystem.enabled=!this.reducedMotion&&night<.9;
     // Trophies.

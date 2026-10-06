@@ -359,11 +359,27 @@ function bench(k,I,x,z,{w=3.4,d=1.3}={}){
 function electronicaRoom(k,id,I,{b,P}){
   for(const v of [-4,-.5,3]){
     const [x,z]=P(1.4,v);bench(k,I,x,z);
-    k.box(I,'iron',{x:x-1,z:z-.25,w:.9,d:.6,y:1.02,h:.55,jitter:.05});k.panel(I,`screen@${id}`,{x:x-1,y:1.32,z:z+.06,w:.5,h:.34});
-    k.box(I,'paint',{x:x,z:z-.3,w:.6,d:.45,y:1.02,h:.35,tone:[.28,.36,.3],jitter:.05});
-    k.cylinder(I,'bronze',{x:x+.9,z:z-.2,y:1.02,r:.2,h:.35,seg:10});
-    k.box(I,'paint',{x:x+1,z:z+.3,w:.9,d:.5,y:1.02,h:.03,tone:[.2,.42,.3],jitter:0,ao:false});
-    for(let i=0;i<5;i++)k.box(I,'paint',{x:x+.7+i*.14,z:z+.25+(i%2)*.12,w:.08,d:.05,y:1.05,h:.06,tone:BOOK_TONES[i],jitter:0,ao:false});
+    // An instrument case in walnut: its screen works again with the real `workshop`, brass knobs and a terminal row.
+    k.box(I,'woodDark',{x:x-1,z:z-.25,w:.92,d:.62,y:1.02,h:.6,jitter:.03});k.box(I,'wood',{x:x-1,z:z-.25,w:.98,d:.66,y:1.6,h:.04,jitter:0});
+    k.box(I,'iron',{x:x-1,z:z+.065,w:.82,d:.02,y:1.08,h:.48,jitter:0,ao:false});
+    k.panel(I,`screen@${id}`,{x:x-1.12,y:1.34,z:z+.08,w:.42,h:.3});
+    for(const [dx,dy] of [[.26,1.44],[.26,1.26],[.36,1.35]]){k.lathe(I,'bronze',[[0,0],[.045,0],[.05,.03],[.035,.06],[0,.065]],{x:x-1+dx,z:z+.075,y:dy,rx:90,seg:12,smooth:true,ao:false});}
+    for(let i=0;i<4;i++){const tx=x-1.32+i*.12;k.lathe(I,i%2?'iron':'copper',[[0,0],[.025,0],[.025,.05],[0,.05]],{x:tx,z:z+.075,y:1.12,rx:90,seg:8,ao:false});}
+    // A galvanometer: a round dial behind glass on a turned base, its needle resting on zero.
+    k.box(I,'wood',{x,z:z-.25,w:.56,d:.4,y:1.02,h:.1,jitter:.02});
+    for(const dx of [-.16,.16])k.box(I,'bronze',{x:x+dx,z:z-.25,w:.04,d:.04,y:1.12,h:.18,jitter:0,ao:false});
+    k.lathe(I,'bronze',[[.2,0],[.235,.015],[.235,.06],[.2,.075],[.19,.04]],{x,z:z-.24,y:1.5,rx:90,seg:24,smooth:true,ao:false});
+    k.panel(I,'dial',{x,y:1.5,z:z-.165,w:.4,h:.4});
+    // A spool of copper wire and a soldering iron in its stand.
+    const sx=x+.85;k.lathe(I,'copper',[[.11,-.17],[.11,.17]],{x:sx,z:z-.3,y:1.18,rz:90,seg:16,smooth:true,ao:false});
+    for(const e of [-.18,.18])k.lathe(I,'woodDark',[[0,0],[.17,0],[.17,.03],[0,.03]],{x:sx+e,z:z-.3,y:1.18,rz:90,seg:16,ao:false});
+    k.box(I,'woodDark',{x:sx,z:z-.3,w:.44,d:.12,y:1.02,h:.03,jitter:0});
+    k.box(I,'iron',{x:x+1.3,z:z-.05,w:.18,d:.18,y:1.02,h:.04,jitter:0});
+    k.lathe(I,'iron',[[.035,0],[.03,.32],[.02,.42],[0,.44]],{x:x+1.3,z:z-.05,y:1.06,rz:28,seg:8,ao:false});
+    k.lathe(I,'woodDark',[[.03,0],[.032,.16],[0,.17]],{x:x+1.12,z:z-.05,y:1.37,rz:28,seg:8,ao:false});
+    // The breadboard with its components, as it was left.
+    k.box(I,'paint',{x:x+.45,z:z+.3,w:.8,d:.42,y:1.02,h:.03,tone:[.2,.42,.3],jitter:0,ao:false});
+    for(let i=0;i<5;i++)k.box(I,'paint',{x:x+.15+i*.14,z:z+.25+(i%2)*.12,w:.08,d:.05,y:1.05,h:.06,tone:BOOK_TONES[i],jitter:0,ao:false});
     chair(k,I,x,z+1.05,180);
   }
   for(const u of [-2.4,3.2])shelf(k,I,P(u,0)[0],b.z-b.d/2+.62,2.4,3);

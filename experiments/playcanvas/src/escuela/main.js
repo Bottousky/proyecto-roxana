@@ -488,12 +488,20 @@ canvas.addEventListener('pointerdown',()=>explore(),{passive:true});
 addEventListener('resize',()=>{if(!diorama.focusId){diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();}});
 
 // The light version: the same home without 3D (no WebGL, failed load).
-function lightVersion(reason){
-  document.body.classList.add('light');canvas.hidden=true;
+function lightVersion(reason,{retry=false}={}){
+  document.body.classList.remove('exploring','reacting','showcasing');document.body.classList.add('light');canvas.hidden=true;syncInert();
   $('#cta-explore').hidden=true;
   const el=$('#light');el.classList.remove('hidden');
-  el.innerHTML=`<h2>Los Mundos Aplicados</h2><p class="meta">${esc(reason)}</p><ul>${WORLDS.map(w=>`<li style="--c:${w.color}"><span class="glyph" aria-hidden="true">${esc(w.glyph)}</span><div><b>${esc(w.name)}</b><small>${esc(w.discipline)} · ${esc(w.taller)}</small></div>${w.available?`<a class="cta small" href="${$('#cta-play').getAttribute('href')}">${esc($('#cta-play-label').textContent)}</a>`:'<span class="pill muted">En preparación</span>'}</li>`).join('')}</ul>`;
+  el.innerHTML=`<h2>Los Mundos Aplicados</h2><p class="meta">${esc(reason)}</p><ul>${WORLDS.map(w=>`<li style="--c:${w.color}"><span class="glyph" aria-hidden="true">${esc(w.glyph)}</span><div><b>${esc(w.name)}</b><small>${esc(w.discipline)} · ${esc(w.taller)}</small></div>${w.available?`<a class="cta small" href="${$('#cta-play').getAttribute('href')}">${esc($('#cta-play-label').textContent)}</a>`:'<span class="pill muted">En preparación</span>'}</li>`).join('')}</ul>${retry?'<p class="meta"><a href="" id="light-retry">Volver a cargar el campus 3D</a></p>':''}`;
 }
+// If the GPU drops the 3D context (driver reset, memory pressure, a backgrounded phone), the home keeps working:
+// the same page continues as the light version, with the panel that was open, and offers to reload the campus.
+canvas.addEventListener('webglcontextlost',e=>{
+  e.preventDefault();console.warn('Contexto 3D perdido: versión ligera.');
+  try{diorama.app.timeScale=0;diorama.app.autoRender=false;}catch{}
+  if(diorama.reaction){diorama.reaction.onEnd=()=>{};diorama.endReaction();}
+  caption('');lightVersion('El campus 3D se detuvo en este dispositivo. Todo lo demás sigue acá.',{retry:true});
+},{once:true});
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 syncInert();setupWayIn();refreshGreeting();
@@ -510,7 +518,7 @@ const newsReady=loadNews(base).then(r=>{const n=unreadCount(r.items,profile.news
     await wait(900);
     if(location.hash.length>1)route();
     await showChanges();
-    window.__escuela={diorama,openRoom,closeRoom,refreshProgress,openNews};
+    window.__escuela={diorama,openRoom,closeRoom,refreshProgress,openNews,lightVersion};
   }catch(err){
     console.error(err);lightVersion('No se pudo abrir el campus en 3D en este navegador. Todo lo demás está acá.');$('#intro-load').hidden=true;route();
   }

@@ -7,8 +7,11 @@
 <meta name="description" content="Instituto Roxana: una antigua escuela técnica y sus Mundos Aplicados. Lo que comprendés en los mundos vuelve con vos y transforma el Instituto. Entrá a Ohmdal, explorá el campus y seguí sus novedades.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231b3935'/%3E%3Ctext x='32' y='48' text-anchor='middle' font-size='48' fill='%23d8bd80'%3EΩ%3C/text%3E%3C/svg%3E">
 <title>Instituto Roxana</title>
-<link rel="preload" as="image" href="./escuela/campus-tarde.jpg" media="(min-aspect-ratio: 1/1)">
-<link rel="preload" as="image" href="./escuela/campus-tarde-vertical.jpg" media="(max-aspect-ratio: 1/1)">
+<script>
+/* The first picture follows the hour the campus will open in (same rule as hourFor in diorama.js; ?hora wins). */
+(function(){var q=new URLSearchParams(location.search).get('hora'),h=new Date().getHours(),t=/^(manana|tarde|noche)$/.test(q||'')?q:(h>=7&&h<15?'manana':h>=15&&h<20?'tarde':'noche');
+document.documentElement.dataset.hora=t;var v=matchMedia('(max-aspect-ratio: 1/1)').matches?'-vertical':'',l=document.createElement('link');l.rel='preload';l.as='image';l.href='./escuela/campus-'+t+v+'.jpg';document.head.appendChild(l);})();
+</script>
 <style>
 /* The first paint, before any script: identity, one sentence and a way in. */
 html,body{margin:0;height:100%;background:#16201d;color:#ece3cc;font-family:Inter,system-ui,sans-serif}
@@ -16,6 +19,9 @@ html,body{margin:0;height:100%;background:#16201d;color:#ece3cc;font-family:Inte
    backdrop; the live 3D fades in over it. Regenerate with: node scripts/home-shots.mjs poster@0/tarde public/escuela */
 #escuela{position:fixed;inset:0;background:url(./escuela/campus-tarde.jpg) 50% 50%/cover no-repeat,radial-gradient(120% 90% at 70% 40%,#3b4a3a 0%,#1d2a26 55%,#121a18 100%)}
 @media (max-aspect-ratio:1/1){#escuela{background-image:url(./escuela/campus-tarde-vertical.jpg),radial-gradient(120% 90% at 70% 40%,#3b4a3a 0%,#1d2a26 55%,#121a18 100%);background-position:50% 100%}}
+[data-hora=manana] #escuela{background-image:url(./escuela/campus-manana.jpg),radial-gradient(120% 90% at 70% 40%,#4a5a58 0%,#26332f 55%,#121a18 100%)}
+[data-hora=noche] #escuela{background-image:url(./escuela/campus-noche.jpg),radial-gradient(120% 90% at 70% 40%,#1c2540 0%,#0d1324 55%,#070b16 100%)}
+@media (max-aspect-ratio:1/1){[data-hora=manana] #escuela{background-image:url(./escuela/campus-manana-vertical.jpg),radial-gradient(#26332f,#121a18)}[data-hora=noche] #escuela{background-image:url(./escuela/campus-noche-vertical.jpg),radial-gradient(#0d1324,#070b16)}}
 .intro::before{content:"";position:absolute;left:-80px;top:-80px;right:-120px;bottom:-60px;z-index:-1;pointer-events:none;background:radial-gradient(closest-side,rgba(10,16,15,.6),transparent)}
 .intro{position:absolute;left:clamp(16px,3vw,44px);top:clamp(16px,3vw,40px);z-index:6;max-width:min(440px,calc(100vw - 32px))}
 .intro-kicker{margin:0 0 .45rem;font:600 .7rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#d8bd80}

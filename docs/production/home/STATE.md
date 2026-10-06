@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 9 cerrado (2026-10-06). No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 10 cerrado (2026-10-06). No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -163,8 +163,8 @@ son ambiente, no progreso (sin integración de esos mundos).
 - QA: `npm test` 96/96 (incluye compilación de los módulos de la home, que antes no cubría ningún test: así se
   escapó un error de sintaxis durante este ciclo); interacción 26/26; teclado e historial 14/14.
 
-NO VERIFICADO: FPS absolutos con la GPU libre; bfcache real; pérdida de contexto WebGL (no hay manejo de
-`webglcontextlost`); teléfono real; sonido escuchado; memoria de GPU.
+NO VERIFICADO: FPS absolutos con la GPU libre; bfcache real; teléfono real; sonido escuchado; memoria de GPU.
+(Pérdida de contexto WebGL: resuelta y verificada en el ciclo 10.)
 
 ## Ciclo 8 (2026-10-06) — acercamientos limpios y el mapa que recuerda
 
@@ -193,11 +193,26 @@ las lámparas colgantes es emisiva (sin luz puntual propia); FPS sin medir con l
   ya no satura, pero sigue claro (parcial).
 - Imágenes del primer pintado regeneradas. QA: `npm test` 97/97; interacción 26/26; teclado 14/14.
 
+## Ciclo 10 (2026-10-06) — instrumentos del taller, contexto perdido y primer pintado por hora
+
+- **Bancos de Electrónica**: caja de instrumento en nogal (pantalla que vuelve con `workshop` real, perillas de latón,
+  bornes), galvanómetro con esfera graduada y aguja en reposo, bobina de cobre, soldador en su soporte, protoboard.
+  Etapa 0 vs 4 en `evidence/c10/banco-e0.jpg` / `banco-e4.jpg`.
+- **Contexto WebGL perdido** → la misma página continúa como versión ligera (panel abierto conservado, Escape,
+  Novedades, «Volver a cargar el campus 3D»). Defecto encontrado al probarlo: `canvas.hidden` no ocultaba el lienzo
+  (el CSS `display:block` ganaba) y quedaba un rectángulo blanco; corregido. Prueba en `home-interact.mjs` §5.
+- **Luz de acento sobre Roxana**: no alumbraba (apuntaba hacia arriba: los focos de PlayCanvas iluminan por −Y). Lo
+  que el ciclo 9 atribuyó a ese foco era el farol de la etapa ≥1. Corregido y verificado midiendo su dirección; de
+  noche crece con el farol real (`awaken`).
+- **Primer pintado según la hora** (mañana/tarde/noche, horizontal y vertical) elegido por un script en línea con la
+  misma regla que `hourFor`.
+- QA: `npm test` 97/97; interacción **28/28** (incluye contexto perdido); teclado e historial 14/14.
+
 ## Siguiente acción exacta
 
-1. Bancos de Electrónica con instrumentos reconocibles (galvanómetro con dial, soldador, bobinas de cobre) en
-   lugar de cajas; revisar en el acercamiento de la sala abierta.
-2. `webglcontextlost` → versión ligera, con prueba (`WEBGL_lose_context`).
-3. Primer pintado coherente con la hora (imagen de noche) cuando el visitante llega de noche.
-4. Medición con la GPU libre; si no hay bloqueos críticos nuevos, segunda revisión independiente y evaluar
-   CANDIDATO_PARA_REVISION.
+1. Medición con la GPU libre (verificar antes con `ps` que no haya `playthrough.mjs`): FPS absolutos 1440 y 390,
+   reposo/sala/tras ciclos, en `PERF.md`.
+2. Segunda revisión independiente (agente separado, sólo lectura) sobre c08–c10 y los hallazgos abiertos; si no hay
+   críticos, armar el paquete CANDIDATO_PARA_REVISION (§14).
+3. Hallazgos abiertos de menor impacto: «Patio» vs «Sobre Roxana» en el directorio, «Y N más» sin enlace en
+   Novedades, vista previa de entrada sin cancelación, descubribilidad táctil de artefactos.

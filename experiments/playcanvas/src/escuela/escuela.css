@@ -369,3 +369,5 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .reacting .caption b{text-shadow:none;color:#ecd191}
 .reacting .toast{opacity:0!important}
 .map-card figure{margin:.5rem 0 0}.map-card img{display:block;width:100%;border-radius:8px;border:1px solid var(--line)}.map-card figcaption{margin-top:.45rem}
+#diorama[hidden],.light #diorama{display:none!important}
+.light-worlds a:not(.cta){color:var(--brass)}

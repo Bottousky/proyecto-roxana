@@ -102,6 +102,20 @@ async function artifactPoint(page,world){
   ok('tocar la cartelera abre Novedades',await page.evaluate(()=>document.querySelector('#panel').dataset.room==='novedades'));
   await ctx.close();
 }
+// 5 · Pérdida del contexto 3D: la misma página sigue como versión ligera, con su panel, Escape y Novedades.
+{
+  const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
+  page.on('pageerror',e=>errors.push('contexto: '+e.message));
+  await open(page,base+'escuela.html?hora=noche');
+  await page.evaluate(()=>window.__escuela.openRoom('trofeos'));await page.waitForTimeout(1000);
+  await page.evaluate(()=>window.__escuela.diorama.app.graphicsDevice.gl.getExtension('WEBGL_lose_context').loseContext());await page.waitForTimeout(1200);
+  const st=await page.evaluate(()=>({light:document.body.classList.contains('light'),canvas:getComputedStyle(document.querySelector('#diorama')).display,room:document.querySelector('#panel').dataset.room||null,retry:!!document.querySelector('#light-retry')}));
+  ok('contexto perdido: versión ligera, lienzo oculto, panel conservado y opción de recargar',st.light&&st.canvas==='none'&&st.room==='trofeos'&&st.retry,JSON.stringify(st));
+  await page.keyboard.press('Escape');await page.waitForTimeout(500);
+  ok('contexto perdido: Escape cierra el panel',await page.evaluate(()=>!document.querySelector('#panel').dataset.room));
+  await page.screenshot({path:`${out}/contexto-perdido.png`});
+  await ctx.close();
+}
 ok('sin errores de página ni de consola',errors.length===0,errors.slice(0,3).join(' | '));
 await browser.close();
 const failed=results.filter(r=>!r.pass).length;console.log(`\n${results.length-failed}/${results.length} comprobaciones`);process.exit(failed?1:0);
