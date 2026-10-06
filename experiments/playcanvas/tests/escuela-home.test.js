@@ -112,3 +112,17 @@ test('novedades: la selección es acotada y el resto queda en la misma página, 
   assert.match(html,/<details class="news-more"><summary>Ver 2 novedades anteriores<\/summary>/);
   assert.equal((html.match(/news-item/g)||[]).length,8);
 });
+test('vista general: Trofeos y Anfiteatro se ven desde la cámara principal (techos a dos aguas, no cajas)',async()=>{
+  const {OVERVIEW}=await import('../src/escuela/rooms.js');const {BUILDINGS,AMPHI}=await import('../src/escuela/school.js');
+  // The master camera as placeCamera() sets it at 1440×900: distance grows until the island fits across.
+  const fit=Math.max(1,50/(Math.tan(12*Math.PI/180)*1.6*OVERVIEW.distance)),y=OVERVIEW.yaw*Math.PI/180,p=OVERVIEW.pitch*Math.PI/180,d=OVERVIEW.distance*fit,t=OVERVIEW.target;
+  const cam=[t[0]+Math.sin(y)*Math.cos(p)*d,t[1]+Math.sin(p)*d,t[2]+Math.cos(y)*Math.cos(p)*d];
+  const roofAt=(b,x,z)=>{const ov=.55,hw=b.w/2+ov,hd=b.d/2+ov;if(Math.abs(x-b.x)>hw||Math.abs(z-b.z)>hd)return -1;const walls=Math.abs(x-b.x)<=b.w/2&&Math.abs(z-b.z)<=b.d/2,f=b.alongZ?1-Math.abs(x-b.x)/hw:1-Math.abs(z-b.z)/hd;return (walls?b.h:b.h-.2)+b.rise*f;};
+  const seen=(pt,except)=>!Object.entries(BUILDINGS).some(([k,b])=>k!==except&&Array.from({length:399},(_,i)=>(i+1)/400).some(s=>cam[1]+(pt[1]-cam[1])*s<roofAt(b,cam[0]+(pt[0]-cam[0])*s,cam[2]+(pt[2]-cam[2])*s)));
+  const tr=BUILDINGS.trofeos,front=[-.4,-.2,0,.2,.4].flatMap(u=>[1,2.5,3.8].map(h=>[tr.x+u*tr.w/2,h,tr.z+tr.d/2+1.6]));
+  const a=AMPHI,amphi=[[a.x-4,3.6,a.z-.9],[a.x,3.6,a.z-.9],[a.x+4,3.6,a.z-.9],[a.x-6,.6,a.z+6],[a.x,.6,a.z+8],[a.x+6,.6,a.z+6]];
+  // Before the move (corners behind the workshops): Trofeos 10/15, Anfiteatro 3/6.
+  assert.ok(front.filter(q=>seen(q,'trofeos')).length>=12,'fachada de Trofeos tapada');
+  assert.ok(amphi.filter(q=>seen(q,'anfiteatro')).length>=5,'Anfiteatro tapado');
+  assert.ok(seen([a.x,3.6,a.z-.9],'anfiteatro'),'pantalla del Anfiteatro tapada');
+});

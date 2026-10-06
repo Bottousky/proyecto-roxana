@@ -1,8 +1,11 @@
 import {ARTIFACT_PICKS,NOTICE_BOARD as NB} from './artifacts.js';
+import {BUILDINGS,AMPHI} from './school.js';
+const TR=BUILDINGS.trofeos,AM=AMPHI;
 // The places of the Instituto that the diorama can open. Poses are orbit parameters
 // around `target`: yaw (degrees, positive = camera to the east), pitch, distance.
-// The label's pin sits on the gable over the workshop's door, so it marks that building and no other.
-const taller=(x,z,yaw,world)=>({world,anchor:[x-Math.sign(x)*5.8,7.8,z],pick:[[x-5.9,0,z-7.3],[x+5.9,9.6,z+7.3]],pose:{target:[x,1.8,z-.2],yaw,pitch:46,distance:44}});
+// The label's pin sits on the workshop's south gable, by its medallion: the face the master camera sees (the
+// east workshops' doors face west, away from it), so it marks that building and covers none behind it.
+const taller=(x,z,yaw,world)=>({world,anchor:[x,7.6,z+7.2],pick:[[x-5.9,0,z-7.3],[x+5.9,9.6,z+7.3]],pose:{target:[x,1.8,z-.2],yaw,pitch:46,distance:44}});
 export const ROOMS={
   novedades:{name:'Cartelera',short:'Novedades',eyebrow:'Del Instituto',anchor:[NB.x,4.1,NB.z],pick:[[NB.x-2,0,NB.z-1.2],[NB.x+2,3.6,NB.z+1.2]],
     pose:{target:[NB.x,1.9,NB.z],yaw:NB.ry-6,pitch:10,distance:17}},
@@ -14,10 +17,11 @@ export const ROOMS={
   fisica:{name:'Taller de Física',short:'Física',eyebrow:'Physica · experimentar',...taller(-30,13,40,'physica')},
   programacion:{name:'Taller de Programación',short:'Programación',eyebrow:'Bitland · programar',...taller(30,-4,-40,'bitland')},
   matematica:{name:'Taller de Matemática',short:'Matemática',eyebrow:'Arithmos · transformar',...taller(30,13,-40,'arithmos')},
-  trofeos:{name:'Sala de Trofeos',short:'Trofeos',eyebrow:'Tus logros',anchor:[-27,10.8,-21],pick:[[-34.5,0,-28],[-19.5,10,-16]],
-    pose:{target:[-27,1.8,-23.6],yaw:0,pitch:40,distance:38}},
-  anfiteatro:{name:'Anfiteatro',short:'Anfiteatro',eyebrow:'Cinemáticas y videos',anchor:[27,9.2,-26.5],pick:[[15,0,-29],[39,8,-13]],
-    pose:{target:[27,3.4,-23.5],yaw:-4,pitch:22,distance:45}},
+  // Both follow their buildings' coordinates in school.js.
+  trofeos:{name:'Sala de Trofeos',short:'Trofeos',eyebrow:'Tus logros',anchor:[TR.x,10.8,TR.z+2],pick:[[TR.x-7.3,0,TR.z-5],[TR.x+7.3,10,TR.z+7.4]],
+    pose:{target:[TR.x,1.8,TR.z-.6],yaw:0,pitch:40,distance:38}},
+  anfiteatro:{name:'Anfiteatro',short:'Anfiteatro',eyebrow:'Cinemáticas y videos',anchor:[AM.x,9.4,AM.z-1.2],pick:[[AM.x-AM.r0-AM.tiers*1.15+.2,0,AM.z-2.6],[AM.x+AM.r0+AM.tiers*1.15,8,AM.z+1.6+AM.r0+AM.tiers*1.15]],
+    pose:{target:[AM.x,3.2,AM.z+2.4],yaw:-6,pitch:24,distance:42}},
 };
 // Each workshop can also be entered from its artifact on the lawn.
 for(const [id,box] of Object.entries(ARTIFACT_PICKS))ROOMS[id].picks=[ROOMS[id].pick,box];

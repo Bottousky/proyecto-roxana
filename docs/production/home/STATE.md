@@ -248,9 +248,16 @@ teclado 15/15. Paquete §14 en `CANDIDATE.md`.
   principal: medición 390 no realizada.
 - Estado: **CANDIDATO_PARA_REVISION**, con pendientes que dependen de terceros (BLOQUEADO_EXTERNO para lo que falta).
 
+## Ciclo 14 (2026-10-06) — Trofeos y Anfiteatro visibles (pedido del usuario)
+
+- Estaban en las esquinas traseras: la cámara principal veía el Anfiteatro a través de Programación y la fachada de
+  Trofeos tras Electrónica. Ahora flanquean la Dirección en la fila norte, de frente al patio: Anfiteatro al oeste
+  (bajo, se ve entero; 4 gradas), Sala de Trofeos al este (alta, separada de la Dirección). Salas, trofeos y luces
+  derivan de `BUILDINGS`/`AMPHI`. Pines de los talleres en el medallón del hastial sur (la cara que ve la cámara).
+- Prueba nueva con techos a dos aguas y la distancia real de cámara: antes Trofeos 10/15 y Anfiteatro 3/6 puntos
+  visibles; ahora 12/15 y 5/6. Antes/después en `evidence/c14/`.
+
 ## Siguiente acción exacta
 
-Nada ejecutable sin datos o condiciones externas. Retomar sólo si:
-1. la GPU queda libre → `W=390 H=844 DPR=2 QUALITY=low|high node scripts/home-perf.mjs …` sobre la build y actualizar PERF/CANDIDATE;
-2. llegan URLs de redes → `src/escuela/social.js`; novedades → `public/escuela/novedades.json`;
-3. se define el origen de Physica/Bitland/Arithmos → adaptador de progreso según `PROGRESSION.md`.
+1. Regenerar los pósters del primer pintado (muestran la disposición vieja): `home-shots.mjs poster@{0,5,10}/{manana,tarde,noche}`.
+2. Revisar móvil 390 y el modo portada con la nueva fila norte; correr `home-keys.mjs`.

@@ -17,16 +17,19 @@ export const WORLD_ORDER=['ohmdal','physica','bitland','arithmos'];
 // Footprints of the buildings. `cut` lists the walls that drop when the camera enters.
 export const BUILDINGS={
   direccion:{x:0,z:-22,w:19,d:8,h:6.4,rise:3.1,roof:'slate',cut:['s']},
-  trofeos:{x:-27,z:-23,w:14,d:9,h:6.2,rise:2.8,roof:'slate',cut:['s']},
+  // The north range faces the patio and the master camera: the Anfiteatro (low, seen whole across the open
+  // patio) west of the Dirección, the Sala de Trofeos (tall, clear of Programación's roof) east of it.
+  // In the back corners the workshops hid them.
+  trofeos:{x:19,z:-23.5,w:14,d:9,h:6.2,rise:2.8,roof:'slate',cut:['s']},
   ...Object.fromEntries(Object.entries(TALLERES).map(([id,t])=>[id,{x:t.x,z:t.z,w:11,d:14,h:5.8,rise:3,roof:'slate',alongZ:true,cut:[t.side,'s']}])),
 };
 export const TOWER={x:0,z:-28.6,s:4.6,shaft:14};
-export const AMPHI={x:27,z:-25,screenW:9.6,screenH:5.2};
+export const AMPHI={x:-19.6,z:-27.2,screenW:9.6,screenH:5.2,tiers:4,r0:4};
 export const FOUNTAIN={x:0,z:0,r:4.2};
 export const LAMPS=[[-6.5,-4.5],[6.5,-4.5],[-6.5,5.5],[6.5,5.5],[-16,-13.5],[16,-13.5],[-19.5,-2],[19.5,-2],[-19.5,12],[19.5,12],[-15,17.5],[15,17.5],[-3.6,23],[3.6,23],[-3.6,30],[3.6,30]];
 export const PLANTERS=[[-9,-7.5],[9,-7.5],[-9,8],[9,8]];
 // Trophy stands: one tiered stand per world, twelve places each, front row first.
-export const STANDS=(()=>{const b={x:-27,z:-23,w:14,d:9},out={};WORLD_ORDER.forEach((w,wi)=>{const cx=b.x-5.1+wi*3.4,back=b.z-b.d/2+.34+.35,list=[];
+export const STANDS=(()=>{const b=BUILDINGS.trofeos,out={};WORLD_ORDER.forEach((w,wi)=>{const cx=b.x-5.1+wi*3.4,back=b.z-b.d/2+.34+.35,list=[];
   for(let t=0;t<3;t++)for(let j=0;j<4;j++)list.push([cx-1.2+j*.8,.52+t*.42,back+(2-t)*.62+.3]);out[w]=list;});return out;})();
 
 const T=.34; // wall thickness
@@ -68,9 +71,8 @@ function grounds(k){
   slab(0,1,42,34);             // patio
   slab(0,26,6.4,16);           // path to the gate
   for(const [id,t] of Object.entries(TALLERES))slab(t.x+(t.side==='e'?1:-1)*6.6,t.z,3,4.4); // workshop doorsteps
-  slab(-27,-17,3.4,3);slab(-24,-16.2,7,2.6); // to the Sala de Trofeos
+  // Trofeos' colonnade steps and the Anfiteatro's top tier meet the patio directly.
   slab(0,-16.8,7,2.2);         // to the Dirección
-  slab(24,-14.6,9,2.4);        // to the Anfiteatro
   // Stone kerb around the patio.
   for(const [x,z,w,d] of [[-21.2,1,.5,34],[21.2,1,.5,34]])k.box('static','stone',{x,z,w,d,h:.22,jitter:.03});
   // Perimeter: low wall south with hedges, hedges elsewhere.
@@ -472,7 +474,7 @@ function trofeosDetails(k){
 
 // ── Anfiteatro ──────────────────────────────────────────────────────────────────
 function amphitheatre(k){
-  const {x,z,screenW,screenH}=AMPHI,P='anfiteatro';
+  const {x,z,screenW,screenH,tiers,r0:R0}=AMPHI,P='anfiteatro';
   // Stage and screen, facing south.
   k.box(P,'stone',{x,z,w:12,d:3.4,y:0,h:.6,jitter:.02});k.box(P,'wood',{x,z:z+.2,w:11.6,d:3,y:.6,h:.08,jitter:.02});
   k.box(P,'woodDark',{x,z:z-1.2,w:screenW+1,d:.35,y:.68,h:screenH+1.1,jitter:.02});
@@ -480,15 +482,15 @@ function amphitheatre(k){
   k.box(P,'woodDark',{x,z:z-1.1,w:screenW+1.8,d:.6,y:screenH+1.7,h:.4,jitter:.02});
   for(const s of [-1,1]){k.box(P,'curtain',{x:x+s*(screenW/2+.55),z:z-.8,w:.9,d:.35,y:.68,h:screenH+1.05,jitter:.03});k.box(P,'bronze',{x:x+s*(screenW/2+1.1),z:z-1.1,w:.25,d:.25,y:.68,h:screenH+1.5,jitter:0});}
   // Stepped seating in a half ring opening north.
-  for(let t=0;t<5;t++){
-    const r0=4.4+t*1.15,r1=r0+1.15,y=.08+t*.42,seg=16;
+  for(let t=0;t<tiers;t++){
+    const r0=R0+t*1.15,r1=r0+1.15,y=.08+t*.42,seg=16;
     for(let i=0;i<seg;i++){
       const a0=Math.PI*i/seg,a1=Math.PI*(i+1)/seg,o={tone:[1-t*.02,1-t*.02,1-t*.015],ao:false},cz=z+1.6;
       const V=(a,r,h)=>[x+Math.cos(a)*r,h,cz+Math.sin(a)*r];
       const top=[V(a0,r0,y+.42),V(a1,r0,y+.42),V(a1,r1,y+.42),V(a0,r1,y+.42)];
       k.facingQuad(P,'stone',...top,[0,1,0],o);
       k.facingQuad(P,'stone',V(a0,r0,0),V(a1,r0,0),V(a1,r0,y+.42),V(a0,r0,y+.42),[-Math.cos((a0+a1)/2),0,-Math.sin((a0+a1)/2)],o);
-      if(t===4)k.facingQuad(P,'stone',V(a0,r1,0),V(a1,r1,0),V(a1,r1,y+.42),V(a0,r1,y+.42),[Math.cos((a0+a1)/2),0,Math.sin((a0+a1)/2)],o);
+      if(t===tiers-1)k.facingQuad(P,'stone',V(a0,r1,0),V(a1,r1,0),V(a1,r1,y+.42),V(a0,r1,y+.42),[Math.cos((a0+a1)/2),0,Math.sin((a0+a1)/2)],o);
       // Wooden seat boards on each tier.
       k.facingQuad(P,'wood',V(a0,r0+.1,y+.44),V(a1,r0+.1,y+.44),V(a1,r0+.6,y+.44),V(a0,r0+.6,y+.44),[0,1,0],{ao:false,tone:[.95,.95,.95]});
     }
