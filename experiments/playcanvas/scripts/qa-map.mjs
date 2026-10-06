@@ -40,6 +40,18 @@ for (const size of sizes) {
   for (let i = 0; i < 9; i++) { await page.keyboard.press('+'); await page.waitForTimeout(60); }
   await page.keyboard.press('c');
   await page.waitForTimeout(300); await page.screenshot({ path: `${out}/${size}-3-cerca.png` });
+  // Travel from the map itself, when a walked place other than this one exists.
+  if (save && !phone) {
+    await page.keyboard.press('c'); for (let i = 0; i < 6; i++) { await page.keyboard.press('-'); await page.waitForTimeout(50); }
+    await page.waitForTimeout(300);
+    const target = page.locator('.kmap-mark[data-travel]:not([hidden])').first();
+    const name = await target.getAttribute('data-travel');
+    await target.click(); await page.locator('.kmap-popover .kmap-go').waitFor({ state: 'visible' });
+    await page.screenshot({ path: `${out}/${size}-4-viajar.png` });
+    await page.locator('.kmap-popover .kmap-go').click();
+    await page.waitForFunction(area => window.__ohmdal.state.area === area, name, { timeout: 60000 });
+    console.log(size, 'viajó desde el mapa a', name);
+  }
   assert.deepEqual(errors, [], `${size}: no page errors`);
   await page.keyboard.press('Escape');
   await context.close();

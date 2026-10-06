@@ -344,9 +344,8 @@ function openMap(){
   if(!started||!['world','modal'].includes(mode))return;
   // The kingdom map: the world painted from above, with the journey drawn over it.
   modal(renderKingdomMap(state,{position:world.getPlayerPosition(),facing:world.lastStep,inhabitants:world.getInteractions().filter(o=>o.kind==='npc')}),'kingdom-map');
-  bindKingdomMap($('#modal-layer'));
+  bindKingdomMap($('#modal-layer'),{onTravel:id=>{if(!state.visited.includes(id)||!AREAS[id])return;closeModal();if(id!==state.area)enterArea(id);}});
   $('[data-map-guide]').onclick=openGuide;
-  document.querySelectorAll('[data-area]').forEach(button=>button.onclick=()=>{const id=button.dataset.area;if(!state.visited.includes(id)||!AREAS[id])return;closeModal();if(id!==state.area)enterArea(id);});
 }
 
 function openOptions(){

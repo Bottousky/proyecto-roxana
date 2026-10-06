@@ -46,7 +46,7 @@ export function kingdomMapMarks(state, { position, facing, inhabitants = [] } = 
     marks.push({ kind: 'place', id: `place-${id}`, area: id, at: [k.x, k.z - area.bounds[1] * .5 - 1], label: area.name, known, current: state.area === id || (state.area === 'workshop' && id === 'plaza'), minZoom: .5 });
     // Seen from far, each place shows its painted landmark, the way a travel map is illustrated.
     const art = LANDMARK_ART.indexOf(id);
-    if (art >= 0) marks.push({ kind: 'landmark', id: `landmark-${id}`, at: [k.x, k.z], art, known, label: area.name, current: state.area === id, maxZoom: .5 });
+    if (art >= 0) marks.push({ kind: 'landmark', id: `landmark-${id}`, area: id, at: [k.x, k.z], art, known, label: area.name, current: state.area === id || (state.area === 'workshop' && id === 'plaza'), maxZoom: .5 });
     if (!known) continue;
     for (const object of area.objects || []) {
       if (object.hidden) continue;
@@ -70,13 +70,15 @@ export function kingdomMapMarks(state, { position, facing, inhabitants = [] } = 
   return { marks, route: journeyRoute(state, here, goal), here, goal, visited };
 }
 
+// A walked place, not the one you stand in, can be travelled to from the map itself.
+const travel = mark => mark.known && !mark.current && mark.area !== 'workshop' ? ` data-travel="${mark.area}" data-travel-name="${esc(mark.label)}" role="button" tabindex="0" aria-label="${esc(mark.label)}: viajar"` : '';
 function markHtml(mark) {
   const [x, y] = mapPoint(mark.at), data = `data-x="${x}" data-y="${y}"${mark.minZoom ? ` data-min-zoom="${mark.minZoom}"` : ''}${mark.maxZoom ? ` data-max-zoom="${mark.maxZoom}"` : ''}`;
   const label = `<span class="kmap-label">${esc(mark.label)}</span>`;
   switch (mark.kind) {
-    case 'landmark': return `<div class="kmap-mark kmap-landmark ${mark.known ? 'known' : 'unknown'} ${mark.current ? 'current' : ''}" ${data}><span class="kmap-landmark-art" style="--col:${mark.art % 3};--row:${Math.floor(mark.art / 3)};background-image:url(./assets/art-polish/map-landmarks.webp)" aria-hidden="true"></span><span class="kmap-landmark-name">${esc(mark.label)}</span></div>`;
+    case 'landmark': return `<div class="kmap-mark kmap-landmark ${mark.known ? 'known' : 'unknown'} ${mark.current ? 'current' : ''}" ${data}${travel(mark)}><span class="kmap-landmark-art" style="--col:${mark.art % 3};--row:${Math.floor(mark.art / 3)};background-image:url(./assets/art-polish/map-landmarks.webp)" aria-hidden="true"></span><span class="kmap-landmark-name">${esc(mark.label)}</span></div>`;
     case 'region': return `<div class="kmap-mark kmap-region" ${data} aria-hidden="true">${esc(mark.label)}</div>`;
-    case 'place': return `<div class="kmap-mark kmap-place ${mark.known ? 'known' : 'unknown'} ${mark.current ? 'current' : ''}" ${data}>${esc(mark.label)}</div>`;
+    case 'place': return `<div class="kmap-mark kmap-place ${mark.known ? 'known' : 'unknown'} ${mark.current ? 'current' : ''}" ${data}${travel(mark)}>${esc(mark.label)}</div>`;
     case 'bench': return `<div class="kmap-mark kmap-bench ${mark.restored ? 'restored' : 'pending'}" ${data} title="${esc(mark.label)} · ${mark.restored ? 'restaurado' : 'por restaurar'}"><i aria-hidden="true">Ω</i>${label}</div>`;
     case 'memory': return `<div class="kmap-mark kmap-memory" ${data} title="${esc(mark.label)}"><i aria-hidden="true">✦</i>${label}</div>`;
     case 'building': return `<div class="kmap-mark kmap-building" ${data}>${esc(mark.label)}</div>`;
@@ -118,11 +120,11 @@ export function renderKingdomMap(state, options = {}) {
 }
 
 /** Pan, zoom, fog and the marks that follow the map. Returns a function that stops it. */
-export function bindKingdomMap(root) {
+export function bindKingdomMap(root, { onTravel } = {}) {
   const host = root.querySelector('[data-kmap]'); if (!host) return () => {};
   const viewport = host.querySelector('[data-kmap-viewport]'), world = host.querySelector('[data-kmap-world]'), marks = [...host.querySelectorAll('.kmap-mark')];
   const player = marks.find(m => m.classList.contains('kmap-player')), scaleBar = host.querySelector('[data-kmap-scale]');
-  let view = { x: 0, y: 0, s: 1 }, frame = 0;
+  let view = { x: 0, y: 0, s: 1 }, frame = 0, popover = null;
   const size = () => viewport.getBoundingClientRect();
   const limits = () => { const r = size(); return { min: Math.min(r.width / KINGDOM_MAP.width, r.height / KINGDOM_MAP.height) * .92, max: 1.6 }; };
   const clamp = () => {
@@ -144,7 +146,7 @@ export function bindKingdomMap(root) {
     scaleBar.querySelector('i').style.width = `${n(step / metresPerPx)}px`; scaleBar.querySelector('span').textContent = `${step} m`;
     host.dataset.zoom = view.s >= 1.1 ? 'near' : view.s >= .55 ? 'mid' : 'far';
   };
-  const schedule = () => { if (!frame) frame = requestAnimationFrame(draw); };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(draw); if (popover) popover.hidden = true; };
   const zoomAt = (factor, cx, cy) => { const s = view.s, next = Math.min(limits().max, Math.max(limits().min, s * factor)); view.x = cx - (cx - view.x) * next / s; view.y = cy - (cy - view.y) * next / s; view.s = next; schedule(); };
   const centerOn = (px, py, s = view.s) => { const r = size(); view.s = s; view.x = r.width / 2 - px * s; view.y = r.height / 2 - py * s; schedule(); };
   // Start on the traveller, close enough to read the place and its neighbours.
@@ -161,14 +163,33 @@ export function bindKingdomMap(root) {
     const mask = `url(${fog.toDataURL()})`; walked.style.maskImage = walked.style.webkitMaskImage = mask;
   }
   // Pointer: drag to pan, wheel to zoom at the cursor, two fingers to pinch.
-  const pointers = new Map(); let pinch = null;
-  viewport.addEventListener('pointerdown', e => { if (e.target.closest('button,summary,a')) return; viewport.setPointerCapture?.(e.pointerId); pointers.set(e.pointerId, [e.clientX, e.clientY]); host.classList.add('dragging'); if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) }; } });
+  const pointers = new Map(); let pinch = null, travelled = 0;
+  viewport.addEventListener('pointerdown', e => { if (e.target.closest('button,summary,a')) return; travelled = 0; pointers.set(e.pointerId, [e.clientX, e.clientY]); host.classList.add('dragging'); if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) }; } });
   viewport.addEventListener('pointermove', e => {
     if (!pointers.has(e.pointerId)) return;
     const prev = pointers.get(e.pointerId); pointers.set(e.pointerId, [e.clientX, e.clientY]);
     if (pointers.size === 2 && pinch) { const [a, b] = [...pointers.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]), r = size(); zoomAt(d / pinch.d, (a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top); pinch.d = d; return; }
+    travelled += Math.abs(e.clientX - prev[0]) + Math.abs(e.clientY - prev[1]);
+    // Capture only once it is a drag: a tap must still reach the place it touched.
+    if (travelled > 6 && !viewport.hasPointerCapture?.(e.pointerId)) viewport.setPointerCapture?.(e.pointerId);
     view.x += e.clientX - prev[0]; view.y += e.clientY - prev[1]; schedule();
   });
+  // Travel: every [data-area] button goes through one door; a walked place on the map offers it first.
+  popover = document.createElement('div'); popover.className = 'kmap-popover'; popover.hidden = true; host.appendChild(popover);
+  const offer = mark => {
+    popover.innerHTML = `<strong>${mark.dataset.travelName}</strong><button type="button" class="kmap-go" data-area="${mark.dataset.travel}">Viajar acá</button><button type="button" class="kmap-dismiss" aria-label="Cerrar">×</button>`;
+    const r = mark.getBoundingClientRect(), h = host.getBoundingClientRect();
+    popover.style.left = `${Math.round(r.left + r.width / 2 - h.left)}px`; popover.style.top = `${Math.round(r.top - h.top - 8)}px`; popover.hidden = false;
+    popover.querySelector('.kmap-go').focus({ preventScroll: true });
+  };
+  host.addEventListener('click', e => {
+    const go = e.target.closest('[data-area]');
+    if (go && !go.disabled) { onTravel?.(go.dataset.area); return; }
+    if (e.target.closest('.kmap-dismiss')) { popover.hidden = true; return; }
+    const mark = e.target.closest('[data-travel]');
+    if (mark && travelled < 6) offer(mark); else if (!e.target.closest('.kmap-popover')) popover.hidden = true;
+  });
+  host.addEventListener('keydown', e => { const mark = e.target.closest?.('[data-travel]'); if (mark && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); offer(mark); } });
   const release = e => { pointers.delete(e.pointerId); if (pointers.size < 2) pinch = null; if (!pointers.size) host.classList.remove('dragging'); };
   viewport.addEventListener('pointerup', release); viewport.addEventListener('pointercancel', release);
   viewport.addEventListener('wheel', e => { e.preventDefault(); const r = size(); zoomAt(Math.exp(-e.deltaY * .0015), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
