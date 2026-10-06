@@ -121,7 +121,7 @@ function touchArtifact(room){
   const w=worldByRoom(room);if(!w)return openRoom(room);
   explore();document.body.classList.add('reacting');ambience.chime(w.id==='ohmdal'?[523.3,659.3,784]:[392,493.9,587.3]);
   const [title,text]=artifactLine(w.id);caption(title,text);
-  diorama.reactArtifact(w.id,{onEnd:()=>{document.body.classList.remove('reacting');setTimeout(()=>caption(''),1400);openRoom(room);}});
+  diorama.reactArtifact(w.id,{onEnd:()=>{document.body.classList.remove('reacting');setTimeout(()=>caption(''),600);openRoom(room);}});
 }
 
 // ── Rooms ───────────────────────────────────────────────────────────────────────
@@ -424,15 +424,16 @@ function setupWayIn(){
 function openNews(){
   explore();opener=document.activeElement;
   const panel=$('#panel');panel.dataset.room='novedades';panel.setAttribute('aria-hidden','false');document.body.classList.add('room-open');
-  diorama.focus(null);diorama.panelShift=panelFraction();diorama.panelShiftY=innerWidth>820?0:.6;
-  document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current','false'));
+  // The camera goes to the notice board by the path; the readable news is this panel.
+  diorama.focus('novedades');diorama.panelShift=panelFraction();diorama.panelShiftY=innerWidth>820?0:.6;ambience.chime([587.3,784]);
+  document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.room==='novedades')));
   $('#panel-inner').innerHTML=`<header class="panel-head"><button class="panel-back" id="panel-back" aria-label="Volver al Instituto">${svg('back')}<span>Instituto</span></button><span class="eyebrow">Del Instituto</span><h2>Novedades</h2></header><div class="panel-body" id="news-body" aria-busy="true"><p class="meta">Cargando novedades…</p></div>`;
   $('#panel-back').addEventListener('click',()=>closeRoom());
   history.replaceState(null,'',`${location.pathname}${location.search}#novedades`);
   requestAnimationFrame(()=>panel.focus({preventScroll:true}));
   loadNews(base).then(result=>{
     const body=$('#news-body');if(!body)return;body.removeAttribute('aria-busy');body.innerHTML=renderNews(result,{dev:import.meta.env.DEV});
-    if(result.items.length){profile.newsSeen=result.items[0].date;persistProfile();markUnread(0);}
+    if(result.items.length){profile.newsSeen=result.items[0].date;persistProfile();markUnread(0);diorama.setNotices(result.items,0);}
   });
 }
 function markUnread(n){const a=$('#link-news');a.dataset.unread=n?String(n):'';a.setAttribute('aria-label',n?`Novedades (${n} sin leer)`:'Novedades');}
@@ -456,12 +457,12 @@ function lightVersion(reason){
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 setupWayIn();refreshGreeting();
-loadNews(base).then(r=>markUnread(unreadCount(r.items,profile.newsSeen)));
+const newsReady=loadNews(base).then(r=>{const n=unreadCount(r.items,profile.newsSeen);markUnread(n);return {...r,unread:n};});
 (async()=>{
   if(diorama.quiet){lightVersion('Este navegador no puede mostrar el campus en 3D. Todo lo demás está acá.');$('#intro-load').hidden=true;route();return;}
   try{
     await diorama.build(p=>{$('#loading-bar').style.width=`${Math.round(p*100)}%`;});
-    syncHour();applySettings();refreshProgress({instant:true});
+    syncHour();applySettings();refreshProgress({instant:true});newsReady.then(r=>diorama.setNotices(r.items,r.unread));
     diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();
     diorama.flyTo({...OVERVIEW,distance:OVERVIEW.distance*1.25,pitch:OVERVIEW.pitch+10,yaw:OVERVIEW.yaw-24},{instant:true});
     requestAnimationFrame(()=>{diorama.flyTo(OVERVIEW);document.body.classList.add('ready');});

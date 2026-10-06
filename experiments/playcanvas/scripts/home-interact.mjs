@@ -78,6 +78,30 @@ async function artifactPoint(page,world){
   ok('tras recargar no se repite la celebración',await page.evaluate(()=>document.querySelector('#changes').classList.contains('hidden')));
   await ctx.close();
 }
+// 4 · Novedades no leídas (contenido de PRUEBA interceptado, no publicado): farolito y punto se encienden y se apagan al leer.
+{
+  const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
+  await page.route('**/escuela/novedades.json',r=>r.fulfill({json:{version:1,items:[{id:'qa-prueba',title:'Prueba de QA',summary:'Contenido interceptado por el script de pruebas.',date:'2026-10-06',published:true}]}}));
+  await page.addInitScript(()=>{try{if(!sessionStorage.getItem('seeded')){localStorage.setItem('roxana.escuela.v1',JSON.stringify({version:1,welcomed:true,newsSeen:'2026-09-01'}));sessionStorage.setItem('seeded','1');}}catch{}});
+  await open(page,base+'escuela.html?hora=noche');
+  const before=await page.evaluate(()=>({dot:document.querySelector('#link-news').dataset.unread,lamp:window.__escuela.diorama.noticeUnread}));
+  ok('no leído: punto en el enlace y farolito de la cartelera',before.dot==='1'&&before.lamp===1,JSON.stringify(before));
+  await page.screenshot({path:`${out}/cartelera-no-leido.png`});
+  await page.click('#link-news');await page.waitForTimeout(2500);
+  const after=await page.evaluate(()=>({dot:document.querySelector('#link-news').dataset.unread,lamp:window.__escuela.diorama.noticeUnread,room:document.querySelector('#panel').dataset.room,focus:window.__escuela.diorama.focusId,text:document.querySelector('#news-body').innerText}));
+  ok('leer apaga punto y farolito, la cámara va a la cartelera',!after.dot&&after.lamp===0&&after.room==='novedades'&&after.focus==='novedades',JSON.stringify({...after,text:undefined}));
+  ok('el panel muestra la novedad en HTML legible',/Prueba de QA/.test(after.text));
+  await page.screenshot({path:`${out}/cartelera-abierta.png`});
+  await page.reload();await page.waitForFunction(()=>window.__escuela,null,{timeout:120000});await page.waitForTimeout(1200);
+  ok('tras recargar sigue leída',await page.evaluate(()=>!document.querySelector('#link-news').dataset.unread));
+  ok('la URL #novedades se restaura al recargar',await page.evaluate(()=>document.querySelector('#panel').dataset.room==='novedades'));
+  // Tocar la cartelera en 3D abre el mismo panel.
+  await page.evaluate(()=>window.__escuela.closeRoom());await page.waitForTimeout(2000);
+  const pt=await page.evaluate(()=>{const b=window.__escuela.diorama.project([7.4,1.8,21.2]);return {x:b.x,y:b.y};});
+  await page.mouse.click(pt.x,pt.y);await page.waitForTimeout(1200);
+  ok('tocar la cartelera abre Novedades',await page.evaluate(()=>document.querySelector('#panel').dataset.room==='novedades'));
+  await ctx.close();
+}
 ok('sin errores de página ni de consola',errors.length===0,errors.slice(0,3).join(' | '));
 await browser.close();
 const failed=results.filter(r=>!r.pass).length;console.log(`\n${results.length-failed}/${results.length} comprobaciones`);process.exit(failed?1:0);

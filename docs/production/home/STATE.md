@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 3 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 4 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -103,9 +103,27 @@ Limitaciones: la captura de la respuesta es un cuadro (un screenshot no verifica
 disponible, NO VERIFICADO el ritmo); sonido de los gestos sólo con sonido activado, no escuchado; Bitland,
 Physica y Arithmos siguen sin progreso real (bloqueo de origen documentado en `PROGRESSION.md`).
 
+## Ciclo 4 (2026-10-06) — cartelera física y ritmo del gesto
+
+- **Cartelera de novedades** junto al camino del portón (`buildNoticeBoard`): postes, techito de pizarra, corcho
+  con papeles dibujados desde `novedades.json` (hasta cuatro, más recientes primero; vacío digno; ejemplos de
+  desarrollo marcados), placa NOVEDADES, luz tenue de noche y **farolito que sólo se enciende con novedades
+  reales sin leer**. Se reconoce en el plano maestro (rótulo «Cartelera»), está en el directorio y tocarla lleva
+  la cámara a ella y abre el panel HTML. La URL `#novedades` se restaura al recargar.
+- **Ritmo del gesto** revisado con tira de cuadros (`scripts/home-strip.mjs`, 3 s muestreados): antes el efecto
+  empezaba con la cámara en vuelo; ahora hay anticipación (0,55 s), gesto y reposo antes del taller (2,6 s).
+- QA de interacción **26/26** (`evidence/c04/interaccion.log`), incluida la secuencia no leído → leer → recargar con
+  contenido de prueba interceptado (no publicado). `npm test` 93/93.
+
+Limitaciones: la tira es por capturas (~11 fps efectivos), no video; la cartelera muestra el ejemplo sólo en dev,
+en producción hoy queda vacía porque no hay novedades confirmadas (dato externo pendiente, no un error).
+
 ## Siguiente acción exacta
 
-1. Grabar el gesto (Playwright `recordVideo` en `home-interact.mjs`) y revisar ritmo/anticipación/reposo.
-2. Cartelera física de novedades en el patio (pieza 3D que abre `#novedades`), con indicador discreto.
-3. Hacer más legible el chip de Bitland en el plano maestro (luz/placa visibles por encima del taller).
-4. Rendimiento con `vite preview` sin otra carga de GPU; frame times, memoria, ciclos abrir/cerrar panel.
+1. Legibilidad del chip de Bitland en el plano maestro (está tras el Taller de Matemática): resplandor cian
+   contenido que asome sobre el techo o reubicación con prueba de visibilidad proyectada.
+2. Noche: el campus en etapa 0 es muy oscuro fuera de Dirección y cartelera; luz de luna/ventanas sin inventar
+   restauraciones (ambiente, no progreso).
+3. Rendimiento con `vite preview` y GPU sin compartir: frame times, memoria, 10 ciclos abrir/cerrar panel y
+   gesto (fugas de listeners/texturas).
+4. Poster/imagen del campus para la versión ligera y como primer cuadro mientras carga.

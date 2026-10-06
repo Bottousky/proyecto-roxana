@@ -11,6 +11,8 @@ export const ARTIFACTS={
   bitland:{room:'programacion',x:39.6,z:-5.2},
   arithmos:{room:'matematica',x:29.2,z:24},
 };
+// The notice board of the Instituto, by the path from the gate: where its news is pinned.
+export const NOTICE_BOARD={x:7.4,z:21.2,ry:24};
 // Pick boxes, so touching an artifact enters its workshop.
 export const ARTIFACT_PICKS=Object.fromEntries(Object.values(ARTIFACTS).map(a=>[a.room,[[a.x-1.6,0,a.z-1.6],[a.x+1.6,4.8,a.z+1.6]]]));
 
@@ -103,4 +105,22 @@ export function buildArtifacts(k){
     for(const dy of [-.82,.82]){const [fx,fz]=L(0,.04+(dy<0?-.06:.06)*.1);k.box(P,'wood',{x:fx,z:fz,y:1.9+dy-.05,w:2.66,d:.08,h:.1,ry,jitter:0});}
     {const [fx,fz]=L(0,.15);k.box(P,'wood',{x:fx,z:fz,y:1.02,w:2.4,d:.18,h:.05,ry,jitter:0});for(let i=0;i<3;i++){const [sx,sz]=L(-.6+i*.35,.18);k.box(P,'paint',{x:sx,z:sz,y:1.07,w:.16,d:.04,h:.04,ry,tone:[.96,.95,.9],jitter:0,ao:false});}}
   }
+}
+
+/** The notice board: two posts, a small slate roof, a cork face for the papers and a brass lamp for news. */
+export function buildNoticeBoard(k){
+  const {x,z,ry}=NOTICE_BOARD,r=ry*Math.PI/180,ca=Math.cos(r),sa=Math.sin(r),P='board:news';
+  const L=(u,v=0)=>[x+u*ca+v*sa,z-u*sa+v*ca];
+  for(const u of [-1.55,1.55]){const [px,pz]=L(u);k.box(P,'woodDark',{x:px,z:pz,y:0,w:.18,d:.18,h:3.1,ry,jitter:.03});k.box(P,'stoneDark',{x:px,z:pz,y:0,w:.34,d:.34,h:.18,ry,jitter:.02});}
+  const [cx,cz]=L(0,.02);
+  k.box(P,'wood',{x:cx,z:cz,y:1.02,w:3.2,d:.14,h:1.66,ry,jitter:.02});
+  k.panel('board:notices','notices',{x:L(0,.1)[0],z:L(0,.1)[1],y:1.85,w:2.9,h:1.42,ry});
+  for(const [dy,h] of [[.97,.1],[2.6,.1]]){const [fx,fz]=L(0,.12);k.box(P,'woodDark',{x:fx,z:fz,y:dy,w:3.24,d:.08,h,ry,jitter:0});}
+  for(const u of [-1.6,1.6]){const [fx,fz]=L(u,.12);k.box(P,'woodDark',{x:fx,z:fz,y:.97,w:.08,d:.08,h:1.73,ry,jitter:0});}
+  k.gable(P,'slate',{x:cx,z:cz,y:2.95,w:3.7,d:.9,rise:.42,overhang:.12,thick:.08,ry});
+  k.panel(P,'sign:novedades',{x:L(0,.13)[0],z:L(0,.13)[1],y:2.8,w:1.5,h:.3,ry});
+  // The lamp that lights only for real, unread news.
+  const [lx,lz]=L(1.3,.32);k.box(P,'bronze',{x:lx,z:lz,y:2.48,w:.06,d:.3,h:.06,ry,jitter:0,ao:false});
+  k.lathe('board:lamp','noticeLamp',[[.07,0],[.1,.06],[.1,.2],[.06,.25],[0,.26]],{x:lx,z:L(1.3,.46)[1],y:2.26,seg:8});
+  k.lathe(P,'bronze',[[.12,0],[.06,.06],[0,.09]],{x:lx,z:L(1.3,.46)[1],y:2.5,seg:8});
 }

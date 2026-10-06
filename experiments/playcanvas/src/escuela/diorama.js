@@ -9,7 +9,7 @@ import {buildSchool,BUILDINGS,TOWER,LAMPS,STANDS,FOUNTAIN,AMPHI,ISLAND,TALLERES,
 import {makeWorldPortal,PORTAL_COLORS} from './portalfx.js';
 import {loadStatueGlb,statueEntity} from './statue.js';
 import {buildLandscape} from './landscape.js';
-import {ARTIFACTS} from './artifacts.js';
+import {ARTIFACTS,NOTICE_BOARD} from './artifacts.js';
 const statueUrl=import.meta.env.BASE_URL+'escuela/modelos/roxana-estatua.glb';
 import {grain,meadow,tree,glow,earth,sign,dynamicCanvas,marble} from './textures.js';
 import {makeWater,updateWater,bindShore} from '../water.js';
@@ -44,7 +44,7 @@ const MATERIALS={
   lampGlass:{color:'#6c6556',emissive:'#ffd08a',glow:0},lanternGlass:{color:'#57636a',emissive:'#fff0c4',glow:0,gloss:.8},
   glass:{color:'#344b55',emissive:'#ffcb7c',glow:0,gloss:.85},screen:{color:'#10231a',emissive:'#6cf0a2',glow:0},
   flame:{color:'#ffd9a0',emissive:'#ffcf7a',glow:0},
-  ceramic:{color:'#f1ede2',gloss:.82},faroGlass:{color:'#4e5a60',emissive:'#ffe7ad',glow:0,gloss:.85},
+  ceramic:{color:'#f1ede2',gloss:.82},noticeLamp:{color:'#5a5040',emissive:'#ffcf8a',glow:0,gloss:.7},faroGlass:{color:'#4e5a60',emissive:'#ffe7ad',glow:0,gloss:.85},
   cityCyan:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.9,gloss:.6},lensGlass:{color:'#e8f6f4',opacity:.1,gloss:.98,emissive:'#bff6ff',glow:.04},roxanaLamp:{color:'#6c6556',emissive:'#ffd08a',glow:0},bitacora:{color:'#e9dfc6',emissive:'#ffe3a6',glow:.6},
 };
 
@@ -135,6 +135,8 @@ export class SchoolDiorama {
     this.chip=dynamicCanvas(app,'chip',256,256);this.drawChip(0);
     {const m=new StandardMaterial();m.diffuse=col('#0a1214');m.emissive=col('#ffffff');m.emissiveMap=this.chip.texture;m.emissiveIntensity=1;m.useMetalness=true;m.gloss=.7;m.update();out.chip=m;}
     this.yard=dynamicCanvas(app,'yard',512,320);this.drawYard(0);
+    this.notices=dynamicCanvas(app,'notices',768,376);this.drawNotices([]);
+    out.notices=lit(this.notices.texture,{gloss:.15});
     {const m=new StandardMaterial();m.diffuse=col('#ffffff');m.diffuseMap=this.yard.texture;m.emissive=col('#ffffff');m.emissiveMap=this.yard.texture;m.emissiveIntensity=.12;m.gloss=.2;m.update();out.yard=m;}
     {const m=new StandardMaterial();m.diffuse=col('#1d2b22');m.diffuseMap=this.board.texture;m.emissive=col('#ffffff');m.emissiveMap=this.board.texture;m.emissiveIntensity=.35;m.update();out['board@matematica']=m;}
     const serif='"Cormorant Garamond", Georgia, serif';
@@ -144,7 +146,7 @@ export class SchoolDiorama {
     },w,h),{gloss:.45});
     out['sign:direccion']=plaqueSign('direccion','DIRECCIÓN');
     const brass=(key,text,size=40)=>plaqueSign(key,text,{bg:'#9a7a45',fg:'#2a2116',size,w:512,h:104,border:'#5d4526'});
-    out['sign:faro']=brass('faro','EL FARO · OHMDAL');out['sign:physica']=brass('physica','ADENTRO, OTRA REGLA');out['sign:bitland']=brass('bitland','BITLAND · BAJO LA LENTE',34);
+    out['sign:faro']=brass('faro','EL FARO · OHMDAL');out['sign:novedades']=brass('novedades','NOVEDADES',46);out['sign:physica']=brass('physica','ADENTRO, OTRA REGLA');out['sign:bitland']=brass('bitland','BITLAND · BAJO LA LENTE',34);
     for(const [id,t] of Object.entries(TALLERES))out[`sign:${id}`]=plaqueSign(id,t.name,{size:50,w:1024,bg:t.accent});
     out['sign:trofeos']=plaqueSign('trofeos','SALA DE TROFEOS',{size:60,w:1024});
     out['sign:anfiteatro']=plaqueSign('anfiteatro','ANFITEATRO',{size:60,w:1024});
@@ -352,6 +354,28 @@ export class SchoolDiorama {
     const fx=W*.12,fy=H*.84;x.strokeStyle=chalk(.85);x.lineWidth=3;x.beginPath();x.arc(fx,fy-74,10,0,Math.PI*2);x.moveTo(fx,fy-64);x.lineTo(fx,fy-30);x.lineTo(fx-12,fy);x.moveTo(fx,fy-30);x.lineTo(fx+12,fy);x.moveTo(fx,fy-54);x.lineTo(fx+18,fy-62+Math.sin(t*1.3)*3);x.moveTo(fx,fy-54);x.lineTo(fx-14,fy-40);x.stroke();
     this.yard.refresh();
   }
+  /**
+   * The cork of the notice board, drawn from the real news (newest first). Up to four slips, each with its
+   * date and title; development examples are marked as such; with nothing published, one honest slip.
+   * The text is decoration at a distance: the readable news is the HTML panel the board opens.
+   */
+  drawNotices(items){
+    const {ctx:x,canvas:c}=this.notices,W=c.width,H=c.height;let seed=3;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+    x.fillStyle='#a8774a';x.fillRect(0,0,W,H);
+    for(let i=0;i<2400;i++){const v=rnd();x.fillStyle=`rgba(${v>.5?70:200},${v>.5?40:150},${v>.5?20:100},${.12+rnd()*.15})`;x.fillRect(rnd()*W,rnd()*H,2+rnd()*3,2+rnd()*3);}
+    const serif='"Cormorant Garamond", Georgia, serif',slip=(px,py,w,h,rot,draw,tone='#efe6cf')=>{x.save();x.translate(px,py);x.rotate(rot);x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=8;x.shadowOffsetY=3;x.fillStyle=tone;x.fillRect(-w/2,-h/2,w,h);x.shadowColor='transparent';draw(w,h);
+      x.fillStyle='#b5342c';x.beginPath();x.arc(0,-h/2+12,7,0,Math.PI*2);x.fill();x.fillStyle='rgba(255,255,255,.5)';x.beginPath();x.arc(-2,-h/2+10,2.5,0,Math.PI*2);x.fill();x.restore();};
+    const fmt=d=>new Date(d+'T12:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+    const wrap=(text,maxW,font)=>{x.font=font;const words=String(text).split(/\s+/),lines=[];let line='';for(const w of words){const t=line?line+' '+w:w;if(x.measureText(t).width>maxW&&line){lines.push(line);line=w;}else line=t;}if(line)lines.push(line);return lines.slice(0,3);};
+    const shown=items.slice(0,4);
+    if(!shown.length)slip(W/2,H/2,330,170,-.03,(w,h)=>{x.fillStyle='#3a2e22';x.textAlign='center';x.font=`600 30px ${serif}`;x.fillText('Todavía no hay',0,-12);x.fillText('novedades publicadas',0,22);x.font=`500 18px ${serif}`;x.fillStyle='#6b5a44';x.fillText('Instituto Roxana',0,58);});
+    shown.forEach((n,i)=>{const cols=Math.min(shown.length,2),row=Math.floor(i/2),col=i%2,w=cols===1?420:330,px=cols===1?W/2:W*(.27+col*.46),py=shown.length<=2?H/2:H*(.28+row*.46),h=shown.length<=2?230:150;
+      slip(px,py,w,h,((i*37)%7-3)*.012,(w2,h2)=>{x.textAlign='left';x.fillStyle=n.example?'#a0402e':'#6b5a44';x.font=`600 16px Inter, sans-serif`;x.fillText((n.example?'EJEMPLO · ':'')+fmt(n.date).toUpperCase(),-w2/2+18,-h2/2+42);
+        x.fillStyle='#2e241a';const lines=wrap(n.title,w2-36,`600 ${h2>200?30:24}px ${serif}`);lines.forEach((l,j)=>x.fillText(l,-w2/2+18,-h2/2+(h2>200?80:72)+j*(h2>200?32:26)));},n.example?'#f3e3d6':'#efe6cf');});
+    this.notices.refresh();
+  }
+  /** News on the board and, if there is unread real news, its small lamp. */
+  setNotices(items,unread=0){this.drawNotices(items);this.noticeUnread=unread;this.stageDirty=true;}
   /** Banners of the worlds still to open, woven like Ohmdal's: colour, border, glyph. */
   worldBanner(w){
     const spec={physica:['#6a2f1e','Φ'],bitland:['#28295a','λ'],arithmos:['#244a2c','∑']}[w];
@@ -421,7 +445,7 @@ export class SchoolDiorama {
 
   // ── Scenery ─────────────────────────────────────────────────────────────────
   async buildTrees(){
-    const spots=[[-40,-31,0,1.2],[40,-31,4,1.2],[-40,-13,1,1],[40,-13,1,1],[-40.5,4,3,1.1],[42.5,9.5,3,1.1],[-40,22,0,1.15],[40,22,0,1.15],[-31,28,5,1],[38.5,27.5,5,1],[-12,30,2,.9],[17,28.5,2,.9],[-12,-32,1,.85],[12,-32,1,.85],[-8,26,5,.8],[8,26,5,.8],[-38,-24,2,1],[38.5,-22,1,.95],[-27.5,27.5,4,.95],[23,26,4,.95],[-15,-33,1,.8],[15,-33,1,.8]];
+    const spots=[[-40,-31,0,1.2],[40,-31,4,1.2],[-40,-13,1,1],[40,-13,1,1],[-40.5,4,3,1.1],[42.5,9.5,3,1.1],[-40,22,0,1.15],[40,22,0,1.15],[-31,28,5,1],[38.5,27.5,5,1],[-12,30,2,.9],[17,28.5,2,.9],[-12,-32,1,.85],[12,-32,1,.85],[-8,26,5,.8],[21,33,5,.8],[-38,-24,2,1],[38.5,-22,1,.95],[-27.5,27.5,4,.95],[23,26,4,.95],[-15,-33,1,.8],[15,-33,1,.8]];
     this.trees=[];
     const shadow=new StandardMaterial();shadow.diffuse=col('#000000');shadow.useLighting=false;shadow.opacityMap=this.glowTexture;shadow.opacity=.5;shadow.blendType=BLEND_NORMAL;shadow.depthWrite=false;shadow.update();
     for(const [x,z,type,s] of spots){
@@ -471,6 +495,7 @@ export class SchoolDiorama {
       lantern:omni('Linterna',[TOWER.x,TOWER.shaft+4.5,TOWER.z],'#fff0c4',62),
       screen:omni('Pantalla',[AMPHI.x,3.5,AMPHI.z+2.5],'#a8c8d8',14),
       statue:omni('Farol de Roxana',[FOUNTAIN.x,3.3,FOUNTAIN.z+1.1],'#ffd08a',8),
+      board:omni('Luz de la cartelera',[NOTICE_BOARD.x,3.1,NOTICE_BOARD.z+1.2],'#ffd9a0',7),
       faro:omni('Faro en miniatura',[ARTIFACTS.ohmdal.x,4.1,ARTIFACTS.ohmdal.z],'#ffe7ad',5),
     };
   }
@@ -601,12 +626,13 @@ export class SchoolDiorama {
     const a=ARTIFACTS[world];if(!a)return onEnd();
     const poses={ohmdal:{yaw:36,pitch:12,distance:15,y:2.6},physica:{yaw:6,pitch:10,distance:14,y:2.2},bitland:{yaw:10,pitch:26,distance:10,y:1.9},arithmos:{yaw:24,pitch:8,distance:13,y:1.9}};
     const p=poses[world];this.focusId=null;this.closeUp=true;this.flyTo({target:[a.x,p.y,a.z],yaw:p.yaw,pitch:p.pitch,distance:p.distance});this.frame.dof.focusRange=10;this.frame.update();
-    this.reaction={world,t:0,dur:this.reducedMotion?1:2.2,onEnd,lit:this.levels[8]>.5};
+    // The camera settles first (anticipation), then the artifact answers, then a short rest before the room opens.
+    this.reaction={world,t:0,dur:this.reducedMotion?1:2.6,lead:this.reducedMotion?0:.55,onEnd,lit:this.levels[8]>.5};
     if(world==='arithmos')this.yardShift=(this.yardShift||0)+(3.2-((this.clock+(this.yardShift||0))%3.2));
   }
   endReaction(){const r=this.reaction;if(!r)return;this.reaction=null;this.chipBurst=0;this.yardBoost=0;this.floatLift=0;{const g=this.materials.tank;g.emissiveIntensity=.05;g.update();}this.miniBeam.pivot.enabled=false;this.stageDirty=true;r.onEnd();}
   stepReaction(dt){
-    const r=this.reaction;r.t+=dt;const t=r.t,k=Math.min(1,t/r.dur),bell=Math.sin(Math.PI*k);
+    const r=this.reaction;r.t+=dt;const t=Math.max(0,r.t-r.lead),k=Math.min(1,t/(r.dur-r.lead-.25)),bell=Math.sin(Math.PI*k);
     if(r.world==='bitland'){this.chipBurst=1-k;const cc=this.materials.cityCyan;cc.emissiveIntensity=.5+bell*2.2;cc.update();}
     else if(r.world==='arithmos')this.yardBoost=bell;
     else if(r.world==='physica'){this.floatLift=bell;const g=this.materials.tank;g.emissiveIntensity=.05+bell*.5;g.update();}
@@ -615,7 +641,7 @@ export class SchoolDiorama {
       if(r.lit){fg.emissiveIntensity=1.2+bell*3;this.miniBeam.pivot.enabled=true;this.miniBeam.m.emissiveIntensity=.35*bell;this.miniBeam.m.update();this.miniBeam.pivot.setEulerAngles(0,t*140,0);}
       else{const f=(t>.35&&t<.5)||(t>.75&&t<.85)?.6:0;fg.emissiveIntensity=f;}
       fg.update();}
-    if(t>=r.dur)this.endReaction();
+    if(r.t>=r.dur)this.endReaction();
   }
   showcase(i){this.focusId=null;this.closeUp=true;this.flyTo(SHOWCASE[i]);this.frame.dof.focusRange=14;this.frame.update();}
   placeCamera(dt){
@@ -714,6 +740,8 @@ export class SchoolDiorama {
     const fg=this.materials.faroGlass;fg.emissiveIntensity=L(8)*(.9+night*1.6);fg.update();this.rooms.faro.light.intensity=L(8)*(.15+night*.55);
     this.fx.climb.particlesystem.enabled=!this.reducedMotion;this.fx.spill.particlesystem.enabled=!this.reducedMotion;
     const cc=this.materials.cityCyan;cc.emissiveIntensity=.3+night*.7;cc.update();
+    this.rooms.board.light.intensity=.15+night*1.1;
+    const nl=this.materials.noticeLamp;nl.emissiveIntensity=this.noticeUnread?1.4+night*1.6:0;nl.update();
     // Roxana's lamp burns from the first light; the screen glows with the evening.
     const flame=this.materials.flame;flame.emissiveIntensity=.4+L(0)*1.4+night*1.2;flame.update();
     const lamp=this.materials.roxanaLamp;lamp.emissiveIntensity=L(0)*(1.2+night*2.4);lamp.update();this.rooms.statue.light.intensity=L(0)*(.5+night*1.8);

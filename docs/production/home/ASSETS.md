@@ -5,6 +5,7 @@
 | Arquitectura del Instituto | código, `src/escuela/school.js` + `kit.js` | proyecto | el propio código | facetas, UV de mundo, color de vértice |
 | Campiña, camino, arboledas | código, `src/escuela/landscape.js` (ciclo 1) | proyecto | el propio código | terreno polar 34×256, árboles cruzados fusionados por sprite |
 | Artefactos de los talleres | código, `src/escuela/artifacts.js` (ciclo 2) | proyecto | el propio código | Faro, columna, chip y lente, caballete |
+| Cartelera de novedades | código, `buildNoticeBoard` en `artifacts.js` + `drawNotices` en `diorama.js` (ciclo 4) | proyecto | el propio código | corcho dibujado desde `novedades.json`; farolito = no leído real |
 | Texturas vivas del chip y del caballete | canvas, `drawChip` / `drawYard` en `diorama.js` | proyecto | el propio código | 256² y 512×320, ~15 fps, en reposo con movimiento reducido |
 | Estatua de Roxana | `public/escuela/modelos/roxana-estatua.glb` | Meshy (generada antes de este loop; ver commit 4072fec) | GLB (sólo geometría) | `statue.js` agrega normales, UV, mármol |
 | Granos de material | `public/assets/materials.webp` | heredado del juego Ohmdal (`docs/assets.md`) | — | reducido a luminancia |

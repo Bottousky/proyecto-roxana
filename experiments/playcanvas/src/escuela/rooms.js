@@ -1,8 +1,10 @@
-import {ARTIFACT_PICKS} from './artifacts.js';
+import {ARTIFACT_PICKS,NOTICE_BOARD as NB} from './artifacts.js';
 // The places of the Instituto that the diorama can open. Poses are orbit parameters
 // around `target`: yaw (degrees, positive = camera to the east), pitch, distance.
 const taller=(x,z,yaw,world)=>({world,anchor:[x,10.4,z],pick:[[x-5.9,0,z-7.3],[x+5.9,9.6,z+7.3]],pose:{target:[x,1.8,z-.2],yaw,pitch:46,distance:44}});
 export const ROOMS={
+  novedades:{name:'Cartelera',short:'Novedades',eyebrow:'Del Instituto',anchor:[NB.x,4.1,NB.z],pick:[[NB.x-2,0,NB.z-1.2],[NB.x+2,3.6,NB.z+1.2]],
+    pose:{target:[NB.x,1.9,NB.z],yaw:NB.ry-6,pitch:10,distance:17}},
   patio:{name:'Patio de Roxana',short:'Patio',eyebrow:'El centro de la escuela',anchor:[0,7.4,0],pick:[[-5,0,-5],[5,7.5,5]],
     pose:{target:[0,2.4,0],yaw:12,pitch:34,distance:45}},
   direccion:{name:'Dirección',short:'Dirección',eyebrow:'Tu cuenta',anchor:[0,10.4,-18.6],pick:[[-9.8,0,-31.5],[9.8,11,-16]],
@@ -19,7 +21,7 @@ export const ROOMS={
 // Each workshop can also be entered from its artifact on the lawn.
 for(const [id,box] of Object.entries(ARTIFACT_PICKS))ROOMS[id].picks=[ROOMS[id].pick,box];
 export const OVERVIEW={target:[0,3.5,-3],yaw:32,pitch:20,distance:108};
-export const ROOM_ORDER=['direccion','electronica','fisica','programacion','matematica','trofeos','anfiteatro','patio'];
+export const ROOM_ORDER=['direccion','electronica','fisica','programacion','matematica','trofeos','anfiteatro','novedades','patio'];
 export const TALLER_ROOMS=['electronica','fisica','programacion','matematica'];
 
 // Where the camera goes to show each restoration returning to the school.
