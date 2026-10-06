@@ -108,7 +108,7 @@ export function rondaDance(world, {speed = 0.32, cx = RING.x, cy = RING.y, r = R
   ctl.time ??= 0;
   ctl.update = (dt, w) => {
     ctl.time += dt;
-    ctl.angle += ctl.speed * dt;
+    ctl.angle += ctl.speed * dt * (w?.calm ?? 1);
   };
   ids.forEach((id, i) => {
     const d = world.get(id);

@@ -195,6 +195,7 @@ export class UI {
     this.#closeWaiting();
     this.noteToken = null;
     this.lineToken = null;
+    this.caption$.classList.remove('note');
     const thought = who === null;
     this.who$.textContent = who === 'punto' ? 'Punto' : who && who !== 'student' ? who : '';
     this.line$.classList.toggle('thought', thought);
@@ -307,6 +308,8 @@ export class UI {
     this.line$.textContent = shown;
     this.caption$.hidden = false;
     this.caption$.classList.remove('done');
+    // un aviso no espera respuesta: no debe quedarse con los toques dirigidos a la escena
+    this.caption$.classList.add('note');
     document.body.classList.add('captioning');
     this.sr$.textContent = shown;
     clearTimeout(this.noteTimer);

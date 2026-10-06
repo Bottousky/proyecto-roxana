@@ -102,6 +102,13 @@ function pickChoice(prompt, options) {
     ['entre el 3 y el 2', 'Es una mancha'],
     ['Qué número es', 'Treinta y dos', 'Trescientos dos'],
     ['ningún cuarto a la izquierda', 'Dejar los diez', 'Tirar un palito', 'dibujar un cuarto'],
+    ['lo que debe Curva', 'Un 0', 'Un 3.', 'palabras'],
+    ['tiene Curva ahora', '+1', '5', '−1'],
+    ['le queda a Recta', '+5', '+3'],
+    ['Quién tiene menos', 'Curva', 'Espiral'],
+    ['más lejos del cero', 'Recta', 'igual'],
+    ['perdonar dos deudas', 'No se puede', 'Quitarle', 'Agregar'],
+    ['Si sube cinco', '−8', '+2'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -124,6 +131,13 @@ function pickChoice(prompt, options) {
     ['entre el 3 y el 2', 'no se puede saber'],
     ['Qué número es', 'Trescientos dos'],
     ['ningún cuarto a la izquierda', 'dibujar un cuarto'],
+    ['lo que debe Curva', 'marca nueva'],
+    ['tiene Curva ahora', '−1'],
+    ['le queda a Recta', '+3'],
+    ['Quién tiene menos', 'Espiral'],
+    ['más lejos del cero', 'igual'],
+    ['perdonar dos deudas', 'Agregar'],
+    ['Si sube cinco', '+2'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -328,6 +342,23 @@ for (let iter = 0; iter < 4000; iter++) {
         await page.waitForTimeout(600);
         continue;
       } else target = spots[0];
+    } else if (s.seg === 'c3.pares') {
+      const sel = s.spots.find(x => x.selected);
+      const haves = byLabel('se tiene'), debts = byLabel('se debe');
+      if (route === 'errores' && !tried.has('same') && haves.length >= 2 && !sel) { tried.add('same'); await clickSpot(haves[0].id); await page.waitForTimeout(80); target = haves[1]; }
+      else if (sel) target = sel.label.includes('se tiene') ? debts[0] : haves[0];
+      else target = haves[0] || debts[0];
+    } else if (s.seg === 'c3.linea') {
+      const sel = s.spots.find(x => x.selected);
+      const fams = spots.filter(x => x.label.startsWith('Familia'));
+      if (sel && sel.label.startsWith('Familia')) {
+        const v = sel.label.split(', ').pop();
+        const want = v === '0' ? 'cero' : v;
+        if (route === 'errores' && !tried.has('misplace')) { tried.add('misplace'); target = spots.find(x => x.label.startsWith('Marca ') && !x.label.includes(` ${want} `)); }
+        else target = spots.find(x => x.label === `Marca ${want} de la línea`);
+      } else target = fams[0];
+    } else if (s.seg === 'c3.perdon') {
+      target = byLabel('perdonarla')[0] || spots.find(x => x.id === 'pz-stuck');
     } else {
       target = spots[0];
     }

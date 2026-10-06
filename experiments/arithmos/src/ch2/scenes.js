@@ -332,8 +332,20 @@ export const marcar = {
       {id: 'cant', text: 'Así, de un vistazo, no se puede saber.'},
     ], {prompt: 'Dos hileras de marcas, una arriba de la otra.', evaluate: true});
     d.evidence('compare-tallies', {answer: ans});
-    if (ans === 'cant') await d.think('Habría que emparejarlas marca por marca. Con catorce se podía. Con esto…');
-    else await d.think('Puede ser… pero no lo sé. Las marcas de arriba están más separadas que las de abajo. Para saberlo habría que emparejarlas una por una.');
+    // Punto intenta emparejar las dos hileras y se pierde a mitad de camino
+    g.setCinematic(true);
+    d.describe('Punto empieza a saltar de una marca de arriba a una de abajo, de a pares. A la mitad se marea.');
+    p.setMode('still');
+    for (let k = 0; k < 14; k++) {
+      await zip(d, p, x0 + 6 + k * 16.5, y1 - 30, 0.07);
+      await zip(d, p, x0 + k * 15, y0 + 30, 0.07);
+    }
+    p.tremble = 1.4;
+    g.audio.punto('scared');
+    await d.tween(0.6, k => { p.squash = Math.sin(k * Math.PI * 3) * 0.4; });
+    p.setMode('bob', {home: [p.x, p.y]});
+    g.setCinematic(false);
+    await d.think(ans === 'cant' ? 'Una por una, no se termina más.' : 'No lo sé. Una por una, no se termina más.');
     await d.say('Mara', 'Por eso en el depósito atamos. De a diez. Así se hizo siempre.');
     // Punto se adelanta y ata de a cinco
     g.setCinematic(true);
@@ -352,8 +364,7 @@ export const marcar = {
     g.setCinematic(false);
     await d.say('Mara', '¡Eso no es un atado! Un atado tiene diez.');
     m.setPose('idle', 0.5);
-    await d.think('Punto los ató de a cinco, como cuando las marcas se tachan de a cinco. Para contar, serviría igual.');
-    await d.think('Pero si atáramos todo de a cinco, saldrían siete atados y dos sueltos. Mara, que lee de a diez, anotaría setenta y dos.');
+    await d.think('De a cinco también se cuenta. Pero en el registro de Mara, "siete atados" son setenta.');
     g.setCinematic(true);
     for (const f of fives) w.remove(f.id);
     for (let k = 0; k < 15; k++) {
@@ -414,7 +425,7 @@ export const atados = {
     s.setPose('idle', 0.4);
     g.setCinematic(false);
     d.evidence('bundled', {bundles: result.bundles, loose: result.loose, tieTries: result.badTies});
-    await d.think('Tres atados y siete sueltos. Treinta y siete: el 3 son los atados, el 7 los sueltos.');
+    await d.think('Tres atados y siete sueltos. Treinta y siete.');
     s.setPose('surprise', 0.3);
     await d.think('Entonces… el 1 de 14.');
     s.setPose('idle', 0.5);
@@ -445,7 +456,7 @@ export const atados = {
     await pulse(d, p, 2, 0.5);
     g.setCinematic(false);
     await d.say('student', '¡Escribiste!');
-    await d.think('Un atado y cuatro sueltos: catorce. El 1 de 14 no cuenta palitos: cuenta atados de diez.');
+    await d.think('El 1 no cuenta palitos: cuenta atados.');
     g.flags.punto14 = true;
     p.setMode('bob', {home: [p.x, p.y]});
     await d.say('Mara', 'Bueno, bueno. Lindo. Ahora vamos al depósito, que hay que guardar todo.');
@@ -583,7 +594,7 @@ export const deposito = {
     if (st.load === 0) {
       await d.shot(SHOTS.depot, 1.4);
       await d.say('Mara', 'El depósito. Tres cuartos: sueltos, atados y atados de atados.');
-      await d.say('Mara', 'Regla de la casa: en ningún cuarto puede haber más de nueve. Si se juntan diez, se atan y pasan al cuarto de al lado.');
+      await d.say('Mara', 'Regla de la casa: nunca más de nueve por cuarto. Con diez, se atan y pasan al de al lado.');
       await d.say('student', '¿Por qué nueve?');
       await d.say('Mara', 'Porque así se hizo siempre. La Marea desparramó todo; hay que guardar de nuevo.');
     }
@@ -598,7 +609,7 @@ export const deposito = {
       await storeLoad(d, g, counts, L.items);
       g.queueSave();
       if (st.load === 1) {
-        await d.think('Así que "me llevo uno" es esto: diez sueltos que se atan y pasan al cuarto de al lado, como uno solo.');
+        await d.think('"Me llevo uno"… era esto.');
       }
     }
     // anotar lo que hay: un número por cuarto
@@ -606,7 +617,6 @@ export const deposito = {
     await d.say('Mara', 'Ahora se anota como se anota: un número por cuarto, de izquierda a derecha.');
     const written = await writeRooms(d, g, counts);
     st.written = written;
-    await d.think('El cero no cuenta palitos: dice que en ese cuarto no hay nada, y así cada número queda en su lugar.');
     m.setPose('think', 0.4);
     await d.say('Mara', 'Hm. Yo siempre lo dejaba en blanco. Total, no había nada…');
     m.setPose('idle', 0.4);
@@ -713,7 +723,6 @@ async function writeRooms(d, g, counts) {
     await d.draw(line, 0.6, {key: 'reveal'});
     s.setPose('idle', 0.3);
     // Punto lo lee y lo vuelve a cargar en un depósito de prueba
-    const readBack = text.replace(/ /g, emptyChoice === 'space' ? ' ' : '');
     if (emptyChoice === 'space') {
       // un soplido de polvo borra el espacio
       g.audio.erase(0.8, 0.5);
@@ -723,23 +732,76 @@ async function writeRooms(d, g, counts) {
     }
     const shown = line.text;
     const model = fromNumeral(shown);
-    const ok = shown === toNumeral(counts);
-    p.setMode('still');
-    await zip(d, p, LEDGER.x - 40, GROUND - 380, 0.4);
+    d.describe('Punto copia lo escrito sobre un depósito chiquito, cuarto por cuarto, empezando por la derecha.');
+    const ok = await loadModel(d, g, shown, counts) && shown === toNumeral(counts);
     g.audio.punto(ok ? 'yes' : 'question');
     if (!ok) {
-      await d.say('Mara', `Eso dice ${spell(value(model))}. En el depósito hay mucho más.`);
-      await d.think(`"${shown}": se lee de derecha a izquierda, cuarto por cuarto. Sin el cuarto vacío, los números se corrieron de lugar.`);
+      await d.say('Mara', `Eso dice ${spell(value(model))}.`);
+      await d.think('Sin el cuarto vacío, todo se corrió un lugar.');
       line.text = '';
       line.reveal = 0;
+      w.removeWhere(o => o.id.startsWith('mdl-'));
       attempt++;
       follow(p, s);
       continue;
     }
     await d.say('Mara', `Ciento diez. Un atado de atados, un atado… y ningún suelto.`);
+    w.removeWhere(o => o.id.startsWith('mdl-'));
     follow(p, s);
     return shown;
   }
+}
+
+/**
+ * Depósito de prueba en la pizarrita: cajas con lo que hay de verdad (de izquierda a derecha,
+ * del grupo más grande al suelto) y, arriba, los dígitos escritos ubicados por Punto desde la
+ * derecha. Donde no coinciden, una cruz. Devuelve true si todo coincide.
+ */
+async function loadModel(d, g, written, real) {
+  const w = g.world;
+  const p = w.get('punto');
+  w.removeWhere(o => o.id.startsWith('mdl-'));
+  const n = Math.max(real.length, written.length);
+  const bw = 66, gap = 10;
+  const x0 = LEDGER.x - (n * bw + (n - 1) * gap) / 2;
+  const by = GROUND - 200;
+  const boxes = [];
+  for (let k = 0; k < n; k++) {
+    const room = n - 1 - k; // de izquierda a derecha: el grupo más grande primero
+    const bx = x0 + k * (bw + gap);
+    boxes.push({bx, room});
+    w.add(new Drawing(`mdl-box${k}`, art.rectStrokesFor(`mdl-box${k}`, bx, by, bw, 52), {z: 11}));
+    const c = real[room] || 0;
+    for (let j = 0; j < c; j++) {
+      const it = item(w, Math.min(room, 2), bx + 12 + (j % 5) * 11, by + 26 + Math.floor(j / 5) * 4, `mdl-it${k}-${j}`);
+      it.scale = room === 0 ? 0.42 : room === 1 ? 0.38 : 0.2;
+      it.z = 12;
+    }
+  }
+  // Punto ubica cada dígito sobre su caja, empezando por la derecha
+  const digits = [...written];
+  let ok = digits.length === real.length;
+  p.setMode('still');
+  for (let k = 0; k < digits.length; k++) {
+    const box = boxes[n - 1 - k];
+    const ch = digits[digits.length - 1 - k];
+    await zip(d, p, box.bx + bw / 2, by - 50, 0.3);
+    const lab = w.add(new Label(`mdl-d${k}`, ch, box.bx + bw / 2, by - 10, {size: 34, align: 'center', ch: YELLOW, z: 12, reveal: 0, weight: 700}));
+    await d.draw(lab, 0.25, {key: 'reveal', sound: false});
+    g.audio.tap(0.2, 1.6);
+    if (Number(ch) !== (real[box.room] || 0)) ok = false;
+  }
+  // cajas sin dígito o con otro número: una cruz
+  for (const [k, box] of boxes.entries()) {
+    const fromRight = n - 1 - k;
+    const ch = digits[digits.length - 1 - fromRight];
+    if (ch === undefined ? (real[box.room] || 0) !== 0 : Number(ch) !== (real[box.room] || 0)) {
+      w.add(new Drawing(`mdl-x${k}`, art.crossFor(`mdl-x${k}`, box.bx + bw / 2, by + 26, 22), {z: 13}));
+      g.audio.punto('no');
+      await d.wait(0.25);
+    }
+  }
+  return ok;
 }
 
 const UNITS = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce', 'quince'];
@@ -807,16 +869,16 @@ export const cero = {
     await d.say('Mara', 'El registro dice treinta y dos. Tres y dos.');
     if (!replay) {
       // mirar el registro y el estante de los Oval
-      await d.think('En la línea de los Oval, entre el 3 y el 2, hay una mancha.');
+      await d.think('Entre el 3 y el 2 hay una mancha.');
       const look = await d.choose([
         {id: 'nothing', text: 'Es una mancha: no había nada.'},
         {id: 'zero', text: 'Ahí había un cero: trescientos dos.'},
         {id: 'unknown', text: 'Ahí había algo, pero no se puede saber qué.'},
       ], {prompt: '¿Qué había entre el 3 y el 2?', evaluate: true});
       d.evidence('smudge', {answer: look});
-      if (look === 'unknown') await d.think('Es cierto: por la mancha sola no se sabe. Pero la tiza de los Oval está guardada en el depósito. Eso sí se puede mirar.');
-      else if (look === 'zero') await d.think('Puede ser. Para estar seguro, hay que mirar lo que tienen guardado.');
-      else await d.think('Puede ser… pero entonces, ¿por qué dicen que tenían mucho más? Mejor mirar lo que tienen guardado.');
+      if (look === 'unknown') await d.think('Por la mancha sola no se sabe. Su tiza está guardada: eso sí se puede mirar.');
+      else if (look === 'zero') await d.think('Puede ser. Hay que mirar su tiza guardada.');
+      else await d.think('¿Y por qué dicen que tenían mucho más? Hay que mirar su tiza guardada.');
     }
     // el estante de los Oval: 3 atados de atados, 0 atados, 2 sueltos
     g.setCinematic(true);
@@ -833,8 +895,14 @@ export const cero = {
         {id: '320', text: 'Trescientos veinte: 320.'},
       ], {prompt: 'Tres atados de atados, ningún atado, dos sueltos. ¿Qué número es?', evaluate: true});
       d.evidence('read-oval', {answer: read});
-      if (read === '32') await d.think('Si fuera 32, habría tres atados y dos sueltos. Pero los tres son atados de atados: el 3 está dos cuartos a la izquierda. El cuarto del medio está vacío y hay que decirlo.');
-      if (read === '320') await d.think('Si fuera 320, habría dos atados y ningún suelto. Pero hay dos sueltos y ningún atado.');
+      if (read !== '302') {
+        // Punto lo copia sobre el depósito chiquito, al lado del de verdad
+        await d.walk(s, LEDGER.x - 190, GROUND, 220);
+        await d.shot(SHOTS.ledger, 0.8);
+        await loadModel(d, g, read, [2, 0, 3]);
+        await d.think(read === '32' ? 'Así, el 3 queda en el cuarto de los atados. Y es de atados de atados.' : 'Así quedan dos atados y ningún suelto. Es al revés.');
+        w.removeWhere(o => o.id.startsWith('mdl-'));
+      }
     }
     await d.think('Tres, cero, dos. Trescientos dos. Faltaba el cero.');
     // corregir el registro
@@ -907,7 +975,7 @@ export const cuantos = {
     // dos estantes: cada uno con sus atados y sueltos
     const A = shelf(g, 'cmp-a', SHELF.a, 5, 2, 'Recta');
     const B = shelf(g, 'cmp-b', SHELF.b, 3, 7, 'Curva');
-    await d.think('Como en la piedra: emparejar. Pero ahora un atado se puede emparejar con un atado: diez pares de una vez.');
+    await d.think('Como en la piedra: emparejar. Pero de a atados.');
     const r = await compareShelves(d, g, A, B);
     d.evidence('difference', r);
     g.setCinematic(true);
@@ -916,8 +984,8 @@ export const cuantos = {
     await d.draw(eq, 1, {key: 'reveal'});
     s.setPose('idle', 0.4);
     g.setCinematic(false);
-    await d.think('Quince: lo que le quedó a Recta sin pareja. Esta resta es una comparación: lo que sobra al emparejar.');
-    await d.think('Y "pedir prestado" era esto: desatar un atado cuando no alcanzan los sueltos.');
+    await d.think('Quince le quedaron a Recta sin pareja.');
+    await d.think('"Pedir prestado" era desatar.');
     await d.say('Curva', 'Quince. Bueno, no es tanto. Igual se lo voy a reclamar.');
   },
 };
@@ -980,7 +1048,7 @@ async function compareShelves(d, g, A, B) {
       if (a.kind !== b.kind) {
         mixed++;
         d.evidence('pair-mixed');
-        g.note('Un atado son diez: no se empareja con un solo suelto. Atado con atado, suelto con suelto… o desatá uno.');
+        g.note('Un atado son diez: no se empareja con uno solo.');
         return refresh();
       }
       a.paired = b.paired = true;
@@ -1101,8 +1169,18 @@ export const cuarto = {
       ], {prompt: 'Diez atados de atados y ningún cuarto a la izquierda.', evaluate: true});
       d.evidence('new-room', {choice: c});
       if (c === 'build') break;
-      if (c === 'leave') await d.think('Si quedan diez en un cuarto, ¿cómo se anota? Diez no es un dígito: el registro se rompe.');
-      if (c === 'throw') await d.think('Tirar tiza para que entre en el registro… Mara me mataría. Y el número ya no diría lo que hay.');
+      if (c === 'leave') {
+        // anotarlo así: un 10 no entra en un solo lugar
+        d.describe('Punto intenta escribir 10 en el lugar de los atados de atados: el 1 y el 0 no entran en una sola caja.');
+        await loadModel(d, g, '1000', [0, 0, 10]);
+        await d.think('Diez no entra en un lugar.');
+        w.removeWhere(o => o.id.startsWith('mdl-'));
+      }
+      if (c === 'throw') {
+        m.setPose('surprise', 0.2);
+        await d.say('Mara', '¡Ni se te ocurra tirar tiza!');
+        m.setPose('idle', 0.4);
+      }
     }
     // el estudiante dibuja el cuarto nuevo
     g.setCinematic(true);
@@ -1126,7 +1204,7 @@ export const cuarto = {
     await d.draw(L, 0.8, {key: 'reveal'});
     s.setPose('idle', 0.4);
     await d.say('Mara', 'Mil. Nunca se había llenado tanto.');
-    await d.think('Cada cuarto guarda grupos diez veces más grandes que los del cuarto de su derecha. Y siempre se puede dibujar otro.');
+    await d.think('Siempre se puede dibujar otro cuarto.');
     g.flags.thousand = true;
   },
 };
@@ -1181,8 +1259,7 @@ export const lugar = {
     g.audio.punto('happy');
     g.setCinematic(false);
     await d.say('Mara', 'Así que por eso atábamos de a diez. Para que cada número tenga su lugar.');
-    await d.think('En un numeral, el lugar dice el tamaño del grupo: sueltos, atados de diez, atados de cien, de mil. El cero guarda los lugares vacíos.');
-    await d.think('Diez es la costumbre de este depósito. Se podría atar de a otra cantidad; lo que no se puede es cambiar sin avisar, como Punto con sus atados de cinco.');
+    await d.say('student', 'De a cinco también se podría. Pero todos tienen que saber de a cuánto.');
     if (!replay) writeJournal2(g);
     // gancho: lo que se debe
     await d.say('Curva', 'Mara… te debo tres atados de ayer. Y no tengo ninguno.');

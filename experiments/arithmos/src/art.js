@@ -141,6 +141,18 @@ export function seatPositions(cx, ground, count) {
 
 export const dotStrokesFor = (x, y, r, ch = WHITE) => dotStrokes(x, y, r, seedOf('dot', Math.round(x), Math.round(y)), {ch});
 
+export const rectStrokesFor = (id, x, y, w, h) => rectStrokes(x, y, w, h, seedOf(id), {w: 2.6, p: 0.85});
+
+/** Cruz de tiza: algo que no coincide. */
+export function crossFor(id, x, y, r = 20) {
+  const seed = seedOf(id);
+  const rnd = mulberry32(seed);
+  return [
+    S(lineGuide(x - r, y - r, x + r, y + r, rnd), seed, {w: 3.4, p: 0.95}),
+    S(lineGuide(x + r, y - r, x - r, y + r, rnd), seed + 1, {w: 3.4, p: 0.95}),
+  ];
+}
+
 export const circleGuideFor = (x, y, r, seed = 1) => circleGuide(x, y, r, mulberry32(seed + Math.round(x * 7 + y)), {overshoot: 0.3});
 
 export function star(id, x, y, r = 7, ch = WHITE) {

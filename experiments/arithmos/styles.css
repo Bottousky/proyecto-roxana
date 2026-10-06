@@ -71,6 +71,8 @@ button, select, input { font: inherit; color: inherit; }
   border: 0; background: none; font-size: 1.5em; color: var(--chalk-dim); cursor: pointer; opacity: 0; transition: opacity .3s;
 }
 #caption.done .next { opacity: 1; animation: nudge 1.6s ease-in-out infinite; }
+#caption.note { pointer-events: none; cursor: default; }
+#caption.note .next { display: none; }
 #caption .next:focus-visible { outline: 2px dashed var(--yellow); border-radius: 50%; }
 @keyframes nudge { 50% { transform: translateX(4px); } }
 

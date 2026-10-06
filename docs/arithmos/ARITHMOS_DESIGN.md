@@ -127,7 +127,41 @@ Límites a declarar: diez es una convención (otras culturas agruparon de otra m
 fuentes: sexagesimal babilónico, vigesimal maya—, sin presentar el orden del juego como
 historia); el cero como número (cardinal de "ninguno") se conecta con el capítulo 1.
 
-## Capítulo 5 — núcleo de "pasa sumando" (diseño conceptual, no implementado)
+## Capítulo 3 — Menos que nada (diseño, en producción)
+
+Ajuste del recorrido: el bloque B se divide. Cap. 3 = negativos, orden, distancia, |x|, suma y
+resta como movimiento; cap. 4 = multiplicación y división (grupos, escala, reparto, medida,
+propiedades). Los capítulos siguientes corren un lugar (fracciones 5, ecuaciones 6…).
+
+Pregunta de entrada: Curva le debe tres atados a Mara y no tiene ninguno. ¿Cómo se anota
+"menos que nada"? Idea central: **un número con signo dice cuánto y hacia qué lado; tener y
+deber se anulan de a pares; en la recta, el orden es "más a la derecha", y la distancia no tiene
+signo.**
+
+Representaciones: (1) **palitos y deudas**: una deuda se dibuja como un palito hueco, punteado
+(no sólo de otro color); un palito y una deuda juntos se borran: valen cero. (2) **La línea**: una
+recta en el suelo con el 0 en la puerta del depósito; cada familia se para en su saldo.
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 3.1 | Lo que se debe | Hace falta un signo | Cómo anotar la deuda: "0", "3", una palabra, una marca nueva | "0" borra la deuda; "3" la convierte en tener; Punto propone una rayita delante: −3 (su primer signo) |
+| 3.2 | Pares que se anulan | Suma de enteros como emparejar | Juntar lo que tiene y lo que debe Curva; emparejar palito con deuda | Cada par se borra; lo que sobra es el saldo (−1, +2…); emparejar dos palitos no anula nada |
+| 3.3 | La línea | Orden con negativos | Ubicar a cada familia en la línea según su saldo; responder quién tiene menos | Si se ubica −5 a la derecha de −2, Mara compara las deudas y la contradicción se ve |
+| 3.4 | Lejos y cerca | Distancia y valor absoluto | Contar pasos entre dos familias; cuánto le falta a cada una para llegar a 0 | La distancia de +4 a −3 son 7 pasos; −3 y +3 quedan igual de lejos del 0 |
+| 3.5 | Perdonar una deuda | Restar un negativo | Mara perdona dos deudas a quien no tiene deudas sueltas: hay que agregar pares cero primero | Quitar deudas mueve hacia la derecha: −1 − (−2) = +1 |
+| 3.6 | El pozo | Transferencia vertical | Punto cae a un pozo (−3) y sube 5 | La misma línea, parada: termina en +2 |
+| 3.7 | Hacia | Cierre; Punto se vuelve trazo | Punto deja estela al moverse: tiene dirección | Bitácora; gancho al cap. 4: "¿y si todos deben lo mismo, tres veces?" |
+
+Errores con consecuencia: anotar la deuda como 0 o como 3; emparejar palito con palito; creer
+que −5 es más que −2; restar una deuda que no está sin agregar pares. Límites a declarar: "debajo
+de cero" y "deber" son dos lecturas del mismo número, no dos números distintos; el signo menos
+también significa "restar" (se distinguen en la notación con paréntesis).
+
+Historia (fuentes.md, certeza alta): los signos "+" y "−" aparecen impresos en Widmann (1489)
+marcando exceso y faltante en problemas de comercio, no como operaciones; Brahmagupta (628)
+da reglas con "fortunas" y "deudas". Mencionarlo sólo en la Bitácora, como dato, no como origen.
+
+## Capítulo 6 (ecuaciones) — núcleo de "pasa sumando" (diseño conceptual, no implementado)
 
 Representación elegida (requiere el cap. 3: recta con negativos): **una ecuación son dos
 marcadores sobre la misma recta**, uno por miembro, que dependen de una x desconocida.

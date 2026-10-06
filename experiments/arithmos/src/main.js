@@ -59,6 +59,8 @@ class Game {
     this.audio.setVolumes({master: this.settings.master, music: this.settings.music, sfx: this.settings.sfx});
     this.camera.drift = !this.reducedMotion;
     this.camera.allowShake = !this.reducedMotion;
+    const coarse = matchMedia('(pointer: coarse)').matches || matchMedia('(hover: none)').matches;
+    this.world.calm = this.reducedMotion ? 0.12 : coarse ? 0.25 : 1;
     this.renderer.grain = this.settings.clean ? 0.45 : 1;
     this.world.clean = !!this.settings.clean;
     this.layout();

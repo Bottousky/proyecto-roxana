@@ -319,6 +319,10 @@ function headGuide(kind, cx, cy, r, rnd) {
     const g = circleGuide(0, 0, r, rnd, {overshoot: 0.28, start: -1.9 + rnd() * 0.3});
     return g.map(([x, y]) => [cx + x * 0.78, cy + y * 1.3 - r * 0.25]);
   }
+  if (kind === 'tri') {
+    const q = r * 1.1;
+    return [[cx, cy - q * 1.05], [cx + q, cy + q * 0.75], [cx - q, cy + q * 0.78], [cx + 2, cy - q * 1.02]];
+  }
   if (kind === 'square') {
     const q = r * 0.95;
     return [[cx - q, cy - q + 2], [cx - q + 2, cy - q], [cx + q, cy - q + 1], [cx + q + 1, cy + q], [cx - q, cy + q + 1], [cx - q - 1, cy - q + 6]];

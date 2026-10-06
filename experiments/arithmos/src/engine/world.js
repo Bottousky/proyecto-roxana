@@ -242,14 +242,16 @@ export class Dot {
 
   update(dt, world) {
     const px = this.x, py = this.y;
-    const slow = this.hover ? 0.15 : 1;
+    // con dedo (o movimiento reducido) los blancos casi no se mueven: tocarlos no es un desafío de puntería
+    const slow = this.hover ? 0.15 : (world?.calm ?? 1);
     if (this.mode === 'wander') {
       const w = this.wander;
       w.t += dt * slow;
       const s = this.seed % 1000;
       const k = w.speed / Math.max(10, w.radius);
-      const tx = this.home[0] + Math.sin(w.t * k * 0.9 + s) * w.radius + Math.sin(w.t * k * 2.3 + s * 2) * w.radius * 0.3;
-      const ty = this.home[1] + Math.cos(w.t * k * 0.7 + s * 3) * w.radius * 0.55 + Math.sin(w.t * k * 1.9 + s) * w.radius * 0.2;
+      const rr = w.radius * (world?.calm < 1 ? 0.5 : 1);
+      const tx = this.home[0] + Math.sin(w.t * k * 0.9 + s) * rr + Math.sin(w.t * k * 2.3 + s * 2) * rr * 0.3;
+      const ty = this.home[1] + Math.cos(w.t * k * 0.7 + s * 3) * rr * 0.55 + Math.sin(w.t * k * 1.9 + s) * rr * 0.2;
       this.x += (tx - this.x) * Math.min(1, dt * 3 * slow);
       this.y += (ty - this.y) * Math.min(1, dt * 3 * slow);
     } else if (this.mode === 'anchor' && this.anchor) {
@@ -301,6 +303,13 @@ export class Dot {
       ctx.scale(this.scale, this.scale);
       drawStrokes(ctx, this.ringVariants[v], 1, this.fade * (0.75 + this.glow * 0.25), 1, false);
       ctx.restore();
+    }
+    // con dirección: una puntita de flecha al frente cuando se mueve rápido
+    if (this.arrow && Math.hypot(this.vx, this.vy) > 160) {
+      const a = Math.atan2(this.vy, this.vx);
+      const tip = [x + Math.cos(a) * this.r * 2.4, y + Math.sin(a) * this.r * 2.4];
+      const side = k => [tip[0] - Math.cos(a + k) * 9, tip[1] - Math.sin(a + k) * 9];
+      drawStrokes(ctx, [stroke([side(0.6), tip, side(-0.6)], {w: 2.4, p: 0.95, ch: this.ch, seed: 7, wobble: 0.1, lift: false})], 1, this.fade, 1, false);
     }
     if (this.mark > 0) {
       ctx.save();
