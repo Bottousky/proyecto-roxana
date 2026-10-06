@@ -20,7 +20,8 @@ export function makeMaterials() {
     ink: new THREE.MeshBasicMaterial({ color: '#2a1a12' }),
     stone: new THREE.MeshStandardMaterial({ color: '#b98a64', roughness: 0.9 }),
     sphere: new THREE.MeshStandardMaterial({ color: '#d9b45a', metalness: 0.85, roughness: 0.22 }),
-    sphereBand: new THREE.MeshStandardMaterial({ color: '#3a2618', roughness: 0.6 }),
+    // Cream enamel band: the test spheres read against dark terracotta.
+    sphereBand: new THREE.MeshStandardMaterial({ color: '#f4ead2', roughness: 0.45, emissive: '#3a3020' }),
     thread: new THREE.LineBasicMaterial({ color: '#f4ead6', transparent: true, opacity: 0.85 }),
     core: new THREE.MeshBasicMaterial({ color: '#c8fff4' }),
     coreDim: new THREE.MeshBasicMaterial({ color: '#4a8f86' }),
@@ -106,7 +107,8 @@ export class ApexMarks {
     if (bellLine != null) {
       const line = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0 + 0.2, 0.035), new THREE.MeshBasicMaterial({ color: '#d9b45a' }));
       line.position.set((x0 + x1) / 2 - 0.1, bellLine, z - 0.01); line.renderOrder = 9; scene.add(line);
-      const tag = label(bellLine.toFixed(1).replace('.', ','), M, 0.17); tag.position.set(x0 - 0.3, bellLine, z - 0.01); tag.renderOrder = 9; scene.add(tag);
+      const dec = Math.abs(bellLine * 10 - Math.round(bellLine * 10)) > 1e-6 ? 2 : 1;
+      const tag = label(bellLine.toFixed(dec).replace('.', ','), M, 0.17); tag.position.set(x0 - 0.3, bellLine, z - 0.01); tag.renderOrder = 9; scene.add(tag);
     }
   }
   add(y, from) {

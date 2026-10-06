@@ -75,7 +75,8 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
 ## D8 · Fuentes tipográficas y assets
 
 - **Fuentes:** Fraunces e Inter vía `@fontsource` (licencia OFL), empaquetadas. No hay red en tiempo de ejecución.
-- **Geometría, materiales y sonido:** todo procedural, generado en código en esta rama. No hay assets de terceros ni generados por IA.
+- **Geometría, materiales y sonido:** procedurales.
+- **Imágenes generadas:** desde la iteración 04 hay imágenes generadas con el `image_gen` de Codex (vía CLI, a pedido del usuario): textura de estratos, capas de fondo y retrato. Ver `art/PROCEDENCIA.md`.
 
 ## D9 · Rediseño del cruce: más abajo, más alto (iteración 02)
 

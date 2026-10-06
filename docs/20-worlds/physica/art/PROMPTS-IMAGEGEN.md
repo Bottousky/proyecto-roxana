@@ -1,6 +1,6 @@
 # Physica — assets candidatos para generación de imágenes
 
-**Estado:** PROPUESTA. No hay nada generado todavía.
+**Estado:** las prioridades 1, 2 y 3 se generaron el 2026-10-05 por la vía C (ver abajo) y están integradas (ver `PROCEDENCIA.md`). Las prioridades 4 y 5 siguen pendientes.
 
 ## Cómo se hizo en Ohmdal y por qué no se puede igual acá
 
@@ -11,7 +11,9 @@ En las sesiones de Claude Code esa herramienta integrada no existe. La skill tie
 - el paquete `openai` de Python;
 - autorización explícita, porque el contrato pide autorización específica para servicios pagos.
 
-**Vías posibles:**
+**Vía usada (C):** el CLI de Codex incluido en la app de ChatGPT, en modo `codex exec`, con su `image_gen` integrado y la sesión de ChatGPT del usuario. Es automático y no requiere clave de API. El usuario lo pidió el 2026-10-05.
+
+**Vías consideradas antes:**
 - **A.** Generar los assets desde Codex/ChatGPT con estos prompts y dejarlos en `art-source/physica/`. Claude los integra, documenta la procedencia y los revisa en el juego.
 - **B.** Autorizar el CLI con una clave y un presupuesto (cantidad de imágenes y tamaño). Claude ejecuta sólo los ítems listados.
 

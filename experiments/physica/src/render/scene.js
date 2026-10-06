@@ -4,7 +4,7 @@
 // anything else: it crests over the high Terraza and falls again, familiarly, past the
 // railing. Two ordinary falls frame the anomaly.
 import * as THREE from 'three';
-import { rockMaterial, strataBlock, mesaShape } from './rock.js';
+import { rockMaterial, strataBlock } from './rock.js';
 import { waterMaterial, waterTube, waterSheet, fieldPath } from './water.js';
 import { Particles } from './particles.js';
 import { Moss, Plumbs } from './flora.js';
@@ -51,49 +51,61 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const add = (geo, mat = rock, shadow = true) => { const m = new THREE.Mesh(geo, mat); m.receiveShadow = true; m.castShadow = shadow; scene.add(m); return m; };
 
   // Walkable ground. Tops are exactly the simulation's solids.
-  add(strataBlock({ x0: -22, x1: 0, y0: -9, y1: 0, z0: Z_BACK, z1: Z_FRONT, seed: 3, sides: ['e'] }));
+  add(strataBlock({ x0: -22, x1: 0, y0: -9, y1: 0, z0: Z_BACK, z1: Z_FRONT, seed: 1, sides: ['e'] }));
   // Terraza, the Pozo cut through it, the Mirador and its steps (front lanes only: the stream
   // runs behind them at the Terraza's level).
-  add(strataBlock({ x0: 4.5, x1: WELL.x0, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: Z_FRONT, seed: 7, sides: ['w', 'e'] }));
-  add(strataBlock({ x0: WELL.x0, x1: WELL.x1, y0: -11, y1: WELL.floorY - 0.2, z0: Z_BACK, z1: Z_FRONT, seed: 13, sides: [] }));
-  add(strataBlock({ x0: WELL.x1, x1: 17.7, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: -1.0, seed: 17, sides: ['w'] }));
-  add(strataBlock({ x0: WELL.x1, x1: 16.5, y0: -9, y1: MIRADOR_Y, z0: -1.0, z1: Z_FRONT, seed: 19, sides: ['w', 'e'] }));
-  add(strataBlock({ x0: 16.5, x1: 17.1, y0: -9, y1: MIRADOR_Y - 0.3, z0: -1.0, z1: Z_FRONT, seed: 23, sides: ['e'], rim: 0.06 }));
-  add(strataBlock({ x0: 17.1, x1: 17.7, y0: -9, y1: MIRADOR_Y - 0.6, z0: -1.0, z1: Z_FRONT, seed: 29, sides: ['e'], rim: 0.06 }));
-  add(strataBlock({ x0: 17.7, x1: 19.5, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: Z_FRONT, seed: 31, sides: ['e'] }));
-  add(strataBlock({ x0: 19.5, x1: 24, y0: -9, y1: -1.5, z0: Z_BACK, z1: Z_FRONT, seed: 11, sides: ['w'] }));
-  add(strataBlock({ x0: -0.6, x1: 5.1, y0: -11, y1: -4.6, z0: Z_BACK, z1: Z_FRONT, seed: 5, sides: [] }));
+  add(strataBlock({ x0: 4.5, x1: WELL.x0, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: Z_FRONT, seed: 1, sides: ['w', 'e'] }));
+  add(strataBlock({ x0: WELL.x0, x1: WELL.x1, y0: -11, y1: WELL.floorY - 0.2, z0: Z_BACK, z1: Z_FRONT, seed: 1, sides: [] }));
+  add(strataBlock({ x0: WELL.x1, x1: 17.7, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: -1.0, seed: 1, sides: ['w'] }));
+  add(strataBlock({ x0: WELL.x1, x1: 16.5, y0: -9, y1: MIRADOR_Y, z0: -1.0, z1: Z_FRONT, seed: 1, sides: ['w', 'e'] }));
+  add(strataBlock({ x0: 16.5, x1: 17.1, y0: -9, y1: MIRADOR_Y - 0.3, z0: -1.0, z1: Z_FRONT, seed: 1, sides: ['e'], rim: 0.06 }));
+  add(strataBlock({ x0: 17.1, x1: 17.7, y0: -9, y1: MIRADOR_Y - 0.6, z0: -1.0, z1: Z_FRONT, seed: 1, sides: ['e'], rim: 0.06 }));
+  add(strataBlock({ x0: 17.7, x1: 19.5, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: Z_FRONT, seed: 1, sides: ['e'] }));
+  add(strataBlock({ x0: 19.5, x1: 24, y0: -9, y1: -1.5, z0: Z_BACK, z1: Z_FRONT, seed: 1, sides: ['w'] }));
+  add(strataBlock({ x0: -0.6, x1: 5.1, y0: -11, y1: -4.6, z0: Z_BACK, z1: Z_FRONT, seed: 1, sides: [] }));
   // Back walls: a stepped skyline of strata. The chasm keeps its own back wall.
   const backs = [[-26, -14, 8.2, 21], [-14, -6, 6.1, 22], [-6, 0, 5.0, 23], [0, 4.5, 6.6, 24], [4.5, 12, 8.6, 25], [12, 26, 10.6, 26]];
-  const backRock = rockMaterial({ mossAmount: 0.7, shade: 0.38 }); backRock.side = THREE.DoubleSide;
+  const backRock = rockMaterial({ mossAmount: 0.7, shade: 0.38, detail: 0.35 }); backRock.side = THREE.DoubleSide;
   // Back walls receive shadows but do not cast them (nothing in front of them needs their shade).
-  for (const [x0, x1, top, seed] of backs) add(strataBlock({ x0, x1, y0: -11, y1: top, z0: -9, z1: Z_BACK, seed, sides: ['w', 'e'] }), backRock, false);
+  // One relief seed and one darkening reference for all the back walls: no seams between them.
+  for (const [x0, x1, top] of backs) add(strataBlock({ x0, x1, y0: -11, y1: top, z0: -9, z1: Z_BACK, seed: 2, sides: ['w', 'e'], step: 0.32, topRef: 11 }), backRock, false);
   // World edges: tall rock you can see, not an invisible wall.
-  add(strataBlock({ x0: -30, x1: -22, y0: -9, y1: 13, z0: -9, z1: Z_FRONT + 0.6, seed: 31, sides: ['e'] }), backRock, false);
+  add(strataBlock({ x0: -30, x1: -22, y0: -9, y1: 13, z0: -9, z1: Z_FRONT + 0.6, seed: 1, sides: ['e'], step: 0.32 }), backRock, false);
 
-  // Distance: mesas in haze, and behind them, barely, the ordered skyline of a city.
-  const far1 = rockMaterial({ fogFade: 0.35, mossAmount: 0.3 }), far2 = rockMaterial({ fogFade: 0.62, mossAmount: 0 });
-  add(mesaShape([[-70, -12], [-70, 9], [-52, 10], [-48, 14], [-30, 14.5], [-26, 8], [-10, 8.6], [-6, 16], [8, 16.4], [12, 11], [30, 11.5], [34, 18], [52, 18], [56, 9], [80, 9], [80, -12]], -26, 3), far1, false);
-  // The far mesas open into a valley behind the Mirador: from up there, and only from there,
-  // the line of sight passes over the near rock and reaches the city.
-  add(mesaShape([[-90, -12], [-90, 18], [-60, 19], [-55, 24], [-30, 24.5], [-24, 20], [2, 21], [6, 15], [32, 14.5], [36, 21], [70, 22], [90, 26], [90, -12]], -48, 3), far2, false);
-  const city = new THREE.Group();
-  // An ordered skyline: slender towers with stepped crowns, observatory domes and an aqueduct.
-  const cityAdd = (geo, x, y, z = -66) => { const m = new THREE.Mesh(geo, cityMat); m.position.set(x, y, z); city.add(m); return m; };
-  const cityMat = new THREE.MeshBasicMaterial({ color: '#7f7088', fog: true });
-  const winMat = new THREE.MeshBasicMaterial({ color: '#ffe3a8', fog: true });
-  let seed = 9; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  for (let i = 0; i < 16; i++) {
-    const w = 1.4 + r() * 1.6, h = 16 + r() * 16, x = -2 + i * 2.2 + r() * 0.6;
-    cityAdd(new THREE.BoxGeometry(w, h, 2), x, h / 2 + 4);
-    cityAdd(new THREE.BoxGeometry(w * 0.7, 2.2, 1.6), x, h + 4 + 1.1);          // stepped crown
-    cityAdd(new THREE.CylinderGeometry(0.06, 0.06, 3, 4), x, h + 4 + 3.6);     // mast
-    for (let k = 0; k < 4; k++) { const wi = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.55), winMat); wi.position.set(x + (r() - 0.5) * w * 0.6, 8 + r() * (h - 6), -64.95); city.add(wi); }
-  }
-  for (const [x, rr] of [[6, 4.5], [19, 3.2], [28, 5.5]]) { cityAdd(new THREE.SphereGeometry(rr, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), x, 18 + rr * 0.2); cityAdd(new THREE.BoxGeometry(rr * 2, 14, 2), x, 11); }
-  for (let i = 0; i < 9; i++) { const a = cityAdd(new THREE.TorusGeometry(1.6, 0.35, 6, 12, Math.PI), -2 + i * 4, 9.5, -62); a.scale.set(1, 1.3, 1); }
-  cityAdd(new THREE.BoxGeometry(38, 0.9, 1.2), 14, 11.6, -62);
-  scene.add(city);
+  // Distance, in layers (art-source/physica/*-v2.png, see art/PROCEDENCIA.md):
+  //  (a row of extruded 3D mesas in between was tried and removed: flat cardboard next to both)
+  //  · the painted far mesas (z −110), with an empty hazy valley behind the Mirador;
+  //  · the city (z −90), shown by an explicit switch once discovered from the Mirador — not
+  //    hidden by whatever happens to occlude it.
+  // The paintings carry their own haze and do not take the scene's fog.
+  const loadTex = (f) => { const t = new THREE.TextureLoader().load(import.meta.env.BASE_URL + 'textures/' + f); t.colorSpace = THREE.SRGBColorSpace; return t; };
+  const painted = (file, { w, h, z, x, y, order, tint = '#ffffff' }) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: loadTex(file), transparent: true, fog: false, depthWrite: false, color: tint }));
+    m.position.set(x, y, z); m.renderOrder = order; scene.add(m); return m;
+  };
+  // Far mesas: the valley (u ≈ 0.65 of the painting) lies behind the Mirador (x ≈ 13).
+  painted('backdrop-mesas.png', { w: 230, h: 153, z: -110, x: 13 + (0.5 - 0.62) * 230, y: 30, order: -6, tint: '#fbefe2' });
+  const city = painted('city-layer.png', { w: 66, h: 44, z: -90, x: 13, y: 6, order: -5, tint: '#e9dfe6' });
+  city.material.opacity = 0.92;
+  city.visible = false;
+  // Valley haze: the city's base dissolves into it instead of ending on a cut line, and a wide
+  // band below covers the paintings' lower edges.
+  const hazeTex = (() => {
+    const W = 256, H = 128, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const k = c.getContext('2d'), img = k.createImageData(W, H);
+    const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const v = y / (H - 1), u = x / (W - 1), side = sm(0, 0.22, u) * sm(1, 0.78, u);
+      const a = sm(0.05, 0.62, v) * side, i = (y * W + x) * 4;
+      img.data[i] = 236; img.data[i + 1] = 190; img.data[i + 2] = 150; img.data[i + 3] = Math.round(a * 255);
+    }
+    k.putImageData(img, 0, 0);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })();
+  const haze = new THREE.Mesh(new THREE.PlaneGeometry(150, 40), new THREE.MeshBasicMaterial({ map: hazeTex, transparent: true, fog: false, depthWrite: false }));
+  haze.position.set(13, -9, -86); haze.renderOrder = -4; scene.add(haze);
+  const hazeLow = new THREE.Mesh(new THREE.PlaneGeometry(460, 70), new THREE.MeshBasicMaterial({ map: hazeTex, transparent: true, fog: false, depthWrite: false }));
+  hazeLow.position.set(13, -48, -95); hazeLow.renderOrder = -5; scene.add(hazeLow);
 
   // Stream curbs along the Orilla and the Terraza.
   const curb = (x0, x1, y, z) => { const b = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, 0.14, 0.18), M.stone); b.position.set((x0 + x1) / 2, y + 0.07, z); b.castShadow = b.receiveShadow = true; scene.add(b); };
@@ -326,5 +338,5 @@ export function buildScene(world, { quality = 'high' } = {}) {
     if (e.type === 'apex' && e.body === world.avatar.id && e.x > WELL.x0 && e.x < WELL.x1 && e.centre > TERRACE_Y) wellMarks.add(e.centre, e.from);
   }
 
-  return { scene, sun, hemi, update, onEvent, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts };
+  return { scene, sun, hemi, update, onEvent, setCityVisible: v => { city.visible = v; }, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts };
 }

@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-05 · iteración 03.
+**Actualizado:** 2026-10-05 · iteración 04 (acabado visible; ver `evidence/iter-04`).
 
 ## Dónde se trabaja
 
@@ -77,7 +77,11 @@
 
 ## Próximo resultado
 
-**Acabado visible de la escena insignia (A10 + A18).**
+**Agua de la cascada (A19) + modelo 3D del explorador fiel al retrato.**
+- **Agua:** sección según A·v, espuma en el afloramiento, rocío en la cresta y roca mojada.
+- **Modelo:** antiparras con lentes, mechones y colas de bufanda.
+
+*Plan cumplido en la iteración 04:* acabado visible de la escena insignia (A10 + A18).
 - **Roca:** que se lea con detalle de cerca. Procedural, con textura de mayor resolución y relieve por estrato, o con assets generados si el usuario elige la vía A o B de `art/PROMPTS-IMAGEGEN.md`.
 - **Plano de establecimiento:** al entrar, uno que reúna la caída familiar, la cascada que sube y el pozo.
 - **Criterio de aceptación:**

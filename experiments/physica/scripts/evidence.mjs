@@ -70,8 +70,10 @@ await page.waitForFunction(() => window.__physica && window.__physica.world.step
 await page.evaluate(() => { localStorage.removeItem('physica.v1'); localStorage.removeItem('physica.v2'); });
 await page.reload();
 await page.waitForFunction(() => window.__physica && window.__physica.world.stepCount > 30);
+await sleep(900);
+writeFileSync(join(out, '00a-plano-de-establecimiento.png'), await page.screenshot());
 await page.mouse.click(640, 360);
-await sleep(600);
+await sleep(3400);
 writeFileSync(join(out, '00-inicio.png'), await page.screenshot());
 step('inicio', { state: await state() });
 
@@ -223,7 +225,7 @@ const wb = await wellAttempt(2.5, '10b-pozo-demasiado-arriba', 'soltarse a 2,5 m
 step('pozo: demasiado arriba', wb);
 const wc = await wellAttempt(1.5, '10c-pozo-en-la-ventana', 'soltarse a 1,5 m');
 step('pozo: en la ventana', wc);
-await sleep(1500);
+await sleep(2800);
 writeFileSync(join(out, '10d-vista-desde-el-mirador.png'), await page.screenshot());
 await sleep(5000);
 // No dead end: down the steps and back up.

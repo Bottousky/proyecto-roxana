@@ -201,7 +201,7 @@ export class Journal {
 
   render() {
     const notes = this.notes.map(n => `<article><h3>${n.title}</h3><p>${n.body}</p>${n.data?.formula ? `<p class="formal">Si querés escribirlo: <code>${n.data.formula}</code>, con <i>a</i> distinta en cada lugar.</p>` : ''}</article>`).join('');
-    this.panel.innerHTML = `<header><b>Bitácora</b><span>Physica · La cascada ascendente</span><button data-close aria-label="Cerrar">✕</button></header>
+    this.panel.innerHTML = `<header><img class="portrait" alt="" src="${import.meta.env?.BASE_URL ?? './'}textures/explorer-portrait.png"><b>Bitácora</b><span>Physica · La cascada ascendente</span><button data-close aria-label="Cerrar">✕</button></header>
       ${notes || '<p class="empty">Todavía no anotaste nada. Las notas aparecen cuando algo pasa delante tuyo.</p>'}`;
     this.panel.querySelector('[data-close]').onclick = () => this.toggle();
   }

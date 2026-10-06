@@ -35,17 +35,21 @@ const explorer = new Explorer(world.field);
 explorer.addTo(scene);
 
 const camera = new THREE.PerspectiveCamera(32, 1, 0.3, 600);
-const cam = { x: world.avatar.x, y: 1.2, dist: 11.5, elev: 0.2 };
+const cam = params.has('nointro') ? { x: world.avatar.x, y: 1.2, dist: 11.5, elev: 0.2 } : { x: 1.4, y: 0.6, dist: 17, elev: 0.2 };
 const input = new Input(app);
 const sound = new Sound();
 const journal = new Journal(app, world);
 let vista = 0, vistaAge = 0, vistaHeld = false, vistaWas = false;
+// Establishing shot: the whole diorama — familiar fall, the cascade, the Pozo — then the explorer.
+let intro = params.has('nointro') ? 0 : 3.0;
+// The city, once discovered from the Mirador, stays part of the world.
+if (journal.has('mirador')) view.setCityVisible(true);
 journal.onAdd = id => {
   if (id === 'cruce' || id === 'mirador') view.clearChalk(id);
   // From the Mirador, for the first time, the camera rises to show what is behind the landscape.
   // The key that carried the explorer up is still held: it does not cancel the vista; a new
   // press does, after 1.5 s. With reduced motion the camera cuts instead of travelling.
-  if (id === 'mirador') { vista = 6; vistaAge = 0; vistaHeld = true; }
+  if (id === 'mirador') { vista = 6; vistaAge = 0; vistaHeld = true; view.setCityVisible(true); }
 };
 if (journal.footing && !params.has('fresh')) { const f = journal.footing, av = world.avatar; av.x = av.px = f.x; av.y = av.py = f.y; av.lastSupport = { ...f }; }
 
@@ -107,6 +111,7 @@ window.__physica = {
   setPaused,
   // Development inspection only: frame a point (evidence close-ups). Not part of play.
   inspect(x, y, dist) { inspectCam = x == null ? null : { x, y, dist }; },
+  vista() { vista = 6; vistaAge = 0; vistaHeld = false; view.setCityVisible(true); },
 };
 let inspectCam = null;
 
@@ -171,6 +176,14 @@ function frame(now) {
     if (vistaAge > 1.5 && ((pressing && !vistaHeld) || inp.act)) vista = 0;
     tx = 13; ty = 15.5; td = 36;
   }
+  if (intro > 0) {
+    // Composed on the cascade: the pool, the rising column and its crest over the Terraza, the
+    // Orilla's lip on the left third; then the camera travels to the explorer.
+    intro -= dt;
+    if (Math.abs(inp.axis) > 0.1 || inp.act || inp.journal) intro = 0;
+    tx = 1.4; ty = 0.6; td = 17;
+  }
+  hud.classList.toggle('intro', intro > 0);
   if (inspectCam) { tx = inspectCam.x; ty = inspectCam.y; td = inspectCam.dist; }
   // With reduced motion the vista starts and ends as a cut, not a camera move.
   const vistaNow = vista > 0, cut = reduced && vistaNow !== vistaWas; vistaWas = vistaNow;
