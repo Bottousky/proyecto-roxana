@@ -63,3 +63,14 @@ button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-vi
   .rotate-hint{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px auto 0;padding:8px 14px;max-width:300px;border:1px solid #d9bd7f66;border-radius:20px;background:#0c1c18b3;color:#f1e3bd;font-size:13px;line-height:1.35}
   .rotate-hint span{font-size:18px;color:#e0c27f}
 }
+/* Táctil: sin teclado, las teclas no se muestran en los avisos del mundo. */
+@media (pointer:coarse){#interaction kbd,#field-measure kbd{display:none}}
+/* Teléfono apaisado: el cartel arriba al centro, donde no hay nada; el instrumento de Ohm abajo al
+   centro, entre la cruceta y el botón de interactuar, sin pisar el aviso del objeto. */
+@media (orientation:landscape) and (max-height:540px){
+  #toast.toast{top:12px;bottom:auto;font-size:16px;padding:8px 28px;max-width:min(52vw,440px)}
+  #field-meter.field-meter{top:auto;bottom:8px;right:auto;left:50%;transform:translateX(-50%);width:min(420px,48vw);max-height:36dvh;overflow:auto;padding:8px 14px}
+  #field-meter .eyebrow{display:none}
+  #field-meter h3{font-size:18px;margin:0 28px 4px 0}
+  #field-meter p{font-size:13px;line-height:1.5;margin:0}
+}
