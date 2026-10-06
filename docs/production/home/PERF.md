@@ -91,3 +91,12 @@ CLS 0 en todas; entidades estables; heap tras GC 32 MB en todas.
 DOF de alta calidad → 60,2 FPS sin cuadros lentos; la comparación visual no muestra diferencia (`evidence/c11/dof-alta.jpg`
 vs `dof-baja.jpg`). Cambio aplicado: DOF en calidad normal en ambos perfiles. **Re-medición pendiente** con la GPU libre
 (ver abajo si se completó).
+
+### Re-medición tras el cambio de DOF (`evidence/c11/perf/perf2-*.json`)
+
+| Configuración | Reposo (vista general) | Sala | Tras 10 ciclos | Draw calls | Condición |
+|---|---|---|---|---|---|
+| 1440 alto | **60,1 FPS · p99 16,8 ms · 0 lentos** (antes 53,3 · p95 33,3) | 60,2 | 60,2 | 934 | GPU libre al empezar; otro agente arrancó durante la corrida |
+| 390 DPR2 alto / bajo | 33,1 / 60,1 | 38,4 / 60,2 | 28,6 / 46,4 | 770 / 484 | **contaminadas** (2–3 Chrome de otros agentes): no válidas |
+
+Transferencia inicial con los pósters por tramo: 5,33 MB, 19 recursos.

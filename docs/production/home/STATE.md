@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 11 cerrado (2026-10-06). Sin críticos abiertos; falta la medición con la GPU libre. No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **CANDIDATO_PARA_REVISION** (2026-10-06) → [`CANDIDATE.md`](CANDIDATE.md). Sin críticos abiertos. Pulido de arte en curso. No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -224,11 +224,17 @@ las lámparas colgantes es emisiva (sin luz puntual propia); FPS sin medir con l
 
 NO VERIFICADO: FPS con la GPU libre; bfcache real (sólo simulado); teléfono real; sonido; memoria de GPU.
 
+## Ciclo 11 · cierre
+
+Medición con la GPU libre a 1440: el perfil alto caía a 53 FPS en la vista general; con el DOF en calidad normal
+(sin diferencia visible) sostiene 60,1 FPS, p99 16,8 ms. QA final sobre `464af35`: tests 98/98, interacción 32/32,
+teclado 15/15. Paquete §14 en `CANDIDATE.md`.
+
 ## Siguiente acción exacta
 
-1. **Medir con la GPU libre** (comprobar con `ps` que no haya Chrome headless de otros worktrees): `home-perf.mjs` a
-   1440 y 390 DPR 2, perfiles alto y bajo; actualizar PERF y presupuestos (draw calls en bajo ≤ 600).
-2. Con esa medición, si no aparecen críticos: preparar el paquete **CANDIDATO_PARA_REVISION** (§14) en
-   `docs/production/home/CANDIDATE.md` con ruta, cambios, capturas, pruebas, mediciones, integración de progreso,
-   fuentes y pendientes externos.
-3. Arte pendiente (#10 de c11): sprites de visitantes en primeros planos, vereda plana, setos octogonales.
+Pulido sin reabrir el diseño (el candidato no depende de esto):
+1. Arte de primeros planos (REVIEW-c11 #10): ocultar o atenuar sprites de visitantes que entren en una pose de cámara,
+   textura/borde de la vereda junto a los talleres, setos menos facetados.
+2. Medición 390 DPR 2 cuando la GPU esté libre (sigue siendo emulación).
+3. Si llegan datos externos (URLs de redes, novedades, origen de los otros mundos), integrarlos en las
+   configuraciones ya preparadas.
