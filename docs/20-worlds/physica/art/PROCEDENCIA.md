@@ -35,6 +35,11 @@ Todo lo que no figura acá es procedural, generado por código en `experiments/p
 **`explorer-sheet-v1.png`:**
 > Generate exactly ONE image: a landscape 1536x1024 PNG character sheet with a genuinely TRANSPARENT background (preserve alpha). Use case: stylized-concept. Asset type: character sheet for a physics adventure game. Subject: a young, gender-neutral student explorer with a big round head and about 3-head body proportions, dark brown hair with a small tuft on top, brass goggles resting on the forehead, a deep teal coat with three brass buttons, a long saffron-yellow scarf, a leather satchel at the hip, a small round brass instrument on the character's left wrist, a leather belt with a brass buckle at the waist, cream trousers, and brown boots. Curious, attentive expression. Composition: a consistent turnaround showing four separate full-body views in order: front, three-quarter, side, back; plus one bust portrait. […] Style: soft cel-shaded illustration with clean dark outlines and warm light. Constraints: no logos, no text, no labels, no watermark, no background scenery, no ground plane, no opaque background, no checkerboard drawn into the image. All empty space must be truly transparent.
 
+### Uso como referencia
+
+- **Hoja de giro `explorer-sheet-v1.png` (iteración 06):** es la referencia del modelo 3D del explorador, que es procedural (`src/render/avatar.js`, D12). No se proyecta ni se usa como textura: sólo como guía de forma, proporción y color.
+- **Texturas del pelo y de las colas de la bufanda:** se pintan por código en un canvas.
+
 ### Observaciones
 
 - **Hoja del explorador:** tiene un halo cálido semitransparente alrededor de las figuras. En la Bitácora se recorta en un medallón sobre fondo petróleo, donde se lee como viñeta.

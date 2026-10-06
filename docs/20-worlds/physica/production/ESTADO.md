@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 05 (agua de la cascada; ver `evidence/iter-05`).
+**Actualizado:** 2026-10-06 · iteración 06 (el explorador fiel a su hoja de giro; ver `evidence/iter-06`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,22 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 05):** el agua de la cascada tiene volumen, espuma y flujo continuo, y su forma sigue saliendo del campo (D11).
+**Último cambio aceptado (iteración 06):** el explorador 3D se reconstruyó sobre su hoja de giro (D12).
+- **Pelo:** con contorno desparejo, hebras pintadas y un remolino.
+- **Antiparras:** sobre la frente.
+- **Ropa:** abrigo abierto bajo el cinturón, cartera con correa cruzada, reloj de muñeca, pantalón y botas.
+- **Cara:** sonrisa y rubor.
+- **Contorno:** que se sostiene en pantalla.
+- **Colas de la bufanda:** dos, deshilachadas, que caen por un hombro y no atraviesan el cuerpo.
+- **Revisión independiente:** dos pasadas. La segunda encontró cuatro regresiones, todas corregidas.
+- **Evidencia:**
+  - vista de giro junto a la hoja, antes y después;
+  - poses en la cámara de juego;
+  - recorrido con teclado sin regresiones y sin tirones.
+
+  Ver `evidence/iter-06`.
+
+**Iteración 05:** el agua de la cascada tiene volumen, espuma y flujo continuo, y su forma sigue saliendo del campo (D11).
 - **Sección por continuidad** y límite por curvatura en la cresta; velo desgarrado; ondas a la velocidad del agua.
 - **La columna sale de la poza** con la presión declarada de la surgencia; espuma en el afloramiento, la cresta y la llegada; roca mojada.
 - **Revisión independiente:** 8 hallazgos, 6 corregidos y 2 parciales (la corona de la cresta se ve poco; pozas rectangulares).
@@ -65,8 +80,8 @@
 
 **Qué falla todavía (ver BACKLOG):**
 - **Acabado del Hito A** (el mayor impedimento para cerrarlo):
-  - **A24:** el modelo 3D del explorador no coincide con su retrato;
   - pasto, musgo e instrumentos genéricos;
+  - las colas de la bufanda suben en la región, pero en la cámara de juego casi no se ven (A24, parcial);
   - la corona de la cresta se ve poco y las pozas son rectángulos.
 - **A20:** no hay amortiguación; la oscilación ideal es eterna, aunque tiene salidas.
 - **A21:** hay un solo chorro.
@@ -83,9 +98,17 @@
 
 ## Próximo resultado
 
-**Modelo 3D del explorador fiel al retrato (A24).**
-- Antiparras con lentes, mechones, colas de bufanda con movimiento secundario, proporción de 3 cabezas.
-- **Criterio:** vista de giro del modelo junto a la hoja de giro, en las mismas cuatro vistas; recorrido con teclado sin regresiones; revisión independiente centrada en el personaje.
+**Animación legible del explorador (A12) y acabado de lo genérico.** El modelo ya coincide con el retrato, pero falta que el cuerpo cuente lo que pasa.
+- **Poses distinguibles por estado:** esfuerzo al empujar o trepar, deslizamiento, sorpresa al entrar a la región, aterrizaje.
+- **Pista del campo en el propio explorador** que se vea en la cámara de juego, porque hoy las colas suben detrás de la cabeza.
+- **Pasto e instrumentos** con identidad, en vez de conos y esferas genéricas.
+- **Criterio:**
+  - secuencia del cruce con una pose distinta en cada estado, en la cámara de juego;
+  - la pista del campo visible a la escala de juego;
+  - recorrido con teclado sin regresiones;
+  - revisión independiente.
+
+*Plan cumplido en la iteración 06:* el modelo 3D fiel al retrato (A24): vista de giro junto a la hoja.
 
 *Plan cumplido en la iteración 05:* agua de la cascada (A19): sección según A·v, espuma en el afloramiento, rocío en la cresta y roca mojada.
 

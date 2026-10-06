@@ -142,3 +142,20 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
 - **Precalentamiento:** al arrancar se suben todas las texturas, se compilan todos los programas y se dibuja el nivel entero una vez con un frustum de sombra amplio. Tarda ~74 ms, durante el plano inicial.
   - Busca evitar los tirones de primera vista que se midieron (150–250 ms).
   - No se pudo validar en su momento: la máquina tenía una carga media de 11–16 por otra sesión (Chrome headless de Bitland), y con esa carga los tirones aparecen también en corridas posteriores. En la corrida final (carga ~4) no hubo tirones.
+
+## D12 · El explorador, construido sobre su hoja de giro (iteración 06)
+
+**El problema:** el modelo 3D no se parecía al retrato que muestra la Bitácora. De cerca, el pelo era una semiesfera inclinada de costado que tapaba un ojo y dejaba la nuca pelada; la correa de las antiparras flotaba como un halo; el remolino era una púa; la boca quedaba fija en «o»; no se veían piernas ni botas, ni la correa de la cartera.
+
+**Elegido:** reconstruir la geometría sobre `art-source/physica/explorer-sheet-v1.png`, con la misma interfaz de animación (caderas, rodillas, hombros, cabeza, ojos, boca, cadenas).
+- **Proporción:** 1,1 m, la altura de la caja simulada; tres cabezas. El cinturón y su hebilla siguen a 0,55 m, porque es el punto de referencia del cuerpo para las medidas (D8).
+- **Pelo:** una sola masa con un solo contorno. El borde se recorta en puntas (flequillo bajo las antiparras, patillas, nuca despareja), la superficie tiene mechones que sobresalen del contorno y se ensancha sobre las orejas, y lleva hebras pintadas que bajan desde la coronilla.
+  - Se probaron y se descartaron mechones sueltos: con conos se leía como un erizo; con lágrimas planas y contorno propio, como tejas.
+- **Antiparras y correa:** apoyadas sobre esa misma superficie: lentes oscuras con brillo, aros de latón y una correa que baja por la nuca.
+- **Ropa:** el abrigo se cierra arriba del cinturón y se abre en V invertida debajo; puños vueltos; pantalón crema y botas grandes con correa y hebilla; cartera en la cadera derecha, con la correa cruzada al hombro izquierdo; reloj de latón en la muñeca izquierda, girado hacia el frente.
+- **Cara:** ojos grandes con dos brillos, sonrisa (la «o» queda para la sorpresa), mejillas.
+- **Contorno:** las caras traseras se empujan a lo largo de su normal con un ancho fijo. Con una envoltura escalada, la línea se corría en las piezas fuera de su origen.
+- **Lo que sigue siendo física:** las dos colas de la bufanda y el remolino son cadenas en el campo (suben en la región).
+  - Las colas cuelgan de la nuca y se apoyan sobre el abrigo: el empuje es sólo a lo largo del eje frente–espalda y siempre hacia atrás.
+  - Con un empuje radial, las colas se deslizaban hacia los costados (sobre los brazos) un poco en cada cuadro. Al darse vuelta el cuerpo, una cola quedaba atrapada delante del pecho.
+  - Ambos defectos se encontraron en una simulación en node y se comprobaron después de la corrección.

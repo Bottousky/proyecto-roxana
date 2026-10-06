@@ -19,7 +19,7 @@ primero.
 | A9 | **Transferencia**: la misma regla en otra geometría, sin repetir la explicación | El Pozo y el Mirador: ventana de dos límites (cae / llega / corto), predecible con el soporte P | hecho (iter 3; falta validar con personas) |
 | A10 | Acabado de roca: detalle de cerca, estratos con relieve legible | Primer plano a 5 m sin manchas borrosas; comparación antes/después | hecho (iter 4, `evidence/iter-04`; pendiente de la revisión de arte) |
 | A11 | Musgo sin quiebres: barbas suaves que cuelgan y se invierten | Primer plano de la sima: hebras continuas, abajo de y = −3,4 cuelgan y arriba suben | hecho (iter 1, `08-musgo-sima`) |
-| A12 | Avatar: animaciones de esfuerzo, deslizamiento, sorpresa legibles | Secuencia del cruce con pose distinguible por estado | incompleto (orientación corregida: ahora se le ve la cara; faltan esfuerzo y deslizamiento) |
+| A12 | Avatar: animaciones de esfuerzo, deslizamiento, sorpresa legibles | Secuencia del cruce con pose distinguible por estado | incompleto (iter 6: modelo nuevo con caminar, brazos en alto, piernas recogidas y sorpresa; faltan esfuerzo, deslizamiento y aterrizaje legibles) |
 | A13 | Sonido verificado por una persona | Pedido explícito a un humano | bloqueado (no se puede escuchar) |
 | A14 | Táctil y mando probados en dispositivo | Recorrido en un teléfono real y con un mando | bloqueado (sin dispositivo) |
 | A15 | Modo móvil ≥ 30 FPS medido en un dispositivo representativo | Tiempos de cuadro reportados con dispositivo y navegador | bloqueado (sin dispositivo) |
@@ -29,7 +29,7 @@ primero.
 | A17 | **Modificar**: la energía del campo viene de un aparato que el jugador puede afectar | La caída familiar de la izquierda mueve una rueda visible que alimenta las anclas. Desviar el agua baja `power`, el arco cambia y la región se debilita gradualmente. Las anclas responden a la carga. Prueba: el arco recalculado con `power` < 1 no cruza. | pendiente |
 | A18 | Plano de establecimiento que reúna las dos caídas familiares y el arco | Al entrar, una toma que deja ver la composición completa | hecho (iter 4; se salta con cualquier entrada) |
 | A19 | La columna se rompe en la cresta (gotas, sección variable) y salpica con volumen al llegar | Secuencia antes/después comparable | hecho (iter 5, `evidence/iter-05`; revisión independiente aplicada; la corona de la cresta se ve poco y las pozas son rectángulos) |
-| A24 | Modelo 3D del explorador fiel al retrato (lentes de las antiparras, mechones, colas de bufanda, proporción) | Vista de giro del modelo junto al retrato | pendiente |
+| A24 | Modelo 3D del explorador fiel al retrato (lentes de las antiparras, mechones, colas de bufanda, proporción) | Vista de giro del modelo junto al retrato | hecho (iter 6, `evidence/iter-06`; revisión independiente en dos pasadas; quedan la silueta del pelo más redonda que en la hoja y la pista del campo poco visible en la cámara de juego) |
 | A25 | Tiempos de cuadro validados en una máquina tranquila | p99 ≤ 17 ms y máx. ≤ 34 ms durante 60 s, con el cruce y la vista | parcial (iter 5: cruce con máx. 16,8 ms y 0 pasos perdidos con carga ~4; faltan los 60 s y la vista) |
 | A23 | Assets generados (textura de estratos, telón con la ciudad, retrato) | Generados con Codex CLI e integrados (iter 4, `art/PROCEDENCIA.md`). Faltan vegetación y papel de la Bitácora. | parcial |
 | A16 | Accesibilidad: movimiento reducido, texto legible, señales redundantes, remapeo | `?reduced` existe y no hay menú; falta un menú de opciones con volumen, movimiento reducido y tamaño de texto | pendiente |

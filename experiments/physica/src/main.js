@@ -136,6 +136,11 @@ window.__physica = {
   setPaused,
   // Development inspection only: frame a point (evidence close-ups). Not part of play.
   inspect(x, y, dist) { inspectCam = x == null ? null : { x, y, dist }; },
+  // Development turnaround: pin the explorer's yaw (null releases it).
+  pose(yaw) { explorer.yawOverride = yaw; },
+  explorer, // development inspection: the model's chains (scarf tails, curl)
+  // Development: where a world point lands on screen (CSS px), for evidence crops.
+  screenOf(x, y, z = 0) { const v = new THREE.Vector3(x, y, z).project(camera); return { x: (v.x * 0.5 + 0.5) * app.clientWidth, y: (-v.y * 0.5 + 0.5) * app.clientHeight }; },
   vista() { vista = 6; vistaAge = 0; vistaHeld = false; view.setCityVisible(true); },
 };
 let inspectCam = null;
