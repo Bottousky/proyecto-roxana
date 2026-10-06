@@ -301,7 +301,7 @@ async function solvePanel(objectId, id) {
     await measure('voltage', 'positive', 'negative');
     await measure('voltage', 'pumpIn', 'pumpOut');
   }
-  if (id === 'awaken') assert.equal(await page.locator('[data-action="mode"]').count(), 0, 'The first encounter does not introduce instrument modes');
+  if (id === 'awaken') assert.equal(await page.locator('[data-action="mode"]:not([data-mode="wire"])').count(), 0, 'The first encounter offers cables only, no instrument');
   if (id === 'workshop') {
     assert.match(await measure('continuity', 'spliceA', 'spliceB'), /ABIERTO/, 'Continuity exposes the concealed break');
     await screenshot('workshop-continuity-open');

@@ -730,7 +730,8 @@ export class PuzzleWorkbench {
     const a = this.puzzle.ports.find(n => n.id === c.a), b = this.puzzle.ports.find(n => n.id === c.b);
     const x = (a.x + b.x) / 2, y = (a.y + b.y) / 2 - this.plateOffset(c);
     const knob = this.puzzle.knobs?.find(k => k.key === c.valueKey), sw = this.puzzle.switches?.find(k => k.key === c.switchKey);
-    return `<div class="wb-plate ${knob ? 'has-control' : ''}" data-piece="${c.id}" style="left:${x / 10}%;top:${y / 5}%"><span class="wb-plate-name">${escapeHtml(this.pieceName(c))}</span>${this.stateMarkup(c)}${knob ? this.knobControl(knob) : ''}${sw && !sw.external ? this.switchControl(sw) : ''}</div>`;
+    // The pieces the goal is about carry the goal's own mark, so the line above points at the board.
+    return `<div class="wb-plate ${knob ? 'has-control' : ''} ${c.goal ? 'is-goal' : ''}" data-piece="${c.id}" style="left:${x / 10}%;top:${y / 5}%"><span class="wb-plate-name">${c.goal ? '<i class="wb-goal-mark" aria-hidden="true">◎</i>' : ''}${escapeHtml(this.pieceName(c))}</span>${this.stateMarkup(c)}${knob ? this.knobControl(knob) : ''}${sw && !sw.external ? this.switchControl(sw) : ''}</div>`;
   }
 
   /** The hillside line has no piece of its own: its plate sits by the source. */

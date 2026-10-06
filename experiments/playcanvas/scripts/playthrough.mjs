@@ -420,7 +420,7 @@ async function solvePanel(objectId, id) {
     assert.equal((await inspect()).puzzle.state.proofs.foundLoss, true, 'Vega saw where the pressure is lost');
     log('proof', { id, proof: 'foundLoss' });
   }
-  if (id === 'awaken') assert.equal(await page.locator('[data-action="mode"]').count(), 0, 'The first encounter does not introduce instrument modes');
+  if (id === 'awaken') assert.equal(await page.locator('[data-action="mode"]:not([data-mode="wire"])').count(), 0, 'The first encounter offers cables only, no instrument');
   if (id === 'workshop') {
     // Section by section: two have a path, one does not.
     assert.doesNotMatch(await measure('continuity', 's1a', 's1b'), /ABIERTO/, 'The first cloth section is whole');
