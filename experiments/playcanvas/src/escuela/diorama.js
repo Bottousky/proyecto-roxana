@@ -313,7 +313,7 @@ export class SchoolDiorama {
    * Bitland's chip seen through the lens: traces, a stopped clock, and one instruction
    * that keeps running its loop. `awake` (0..1) will come from Bitland's real progress.
    */
-  drawChip(t,awake=0){
+  drawChip(t,awake=0,burst=0){
     const {ctx:x,canvas:c}=this.chip,W=c.width,H=c.height;
     x.fillStyle='#050c0e';x.fillRect(0,0,W,H);
     x.strokeStyle='rgba(95,240,255,.16)';x.lineWidth=2;
@@ -324,6 +324,9 @@ export class SchoolDiorama {
     const at=d=>{const k=Math.floor(d/136)%4,f=(d%136)/136,a=L[k],b=L[(k+1)%4];return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];};
     for(let i=0;i<10;i++){const [px,py]=at((pos-i*5+per)%per);x.fillStyle=`rgba(180,255,255,${(1-i/10)*.9})`;x.beginPath();x.arc(px,py,4-i*.3,0,Math.PI*2);x.fill();}
     x.fillStyle='rgba(95,240,255,.55)';x.font='600 13px ui-monospace, monospace';x.fillText('LOOP',112,132);x.fillText('JMP 0x00',100,150);
+    // Touched: the pulse leaves its loop along a diagonal route, a ring spreads over the die, and it returns.
+    if(burst>0){const k=1-burst,r=20+k*150;x.strokeStyle=`rgba(180,255,255,${burst*.8})`;x.lineWidth=3;x.beginPath();x.arc(128,128,r,0,Math.PI*2);x.stroke();
+      const d=Math.min(1,k*1.6),px=60+136*d,py=60+136*d;x.strokeStyle=`rgba(95,240,255,${.6*burst})`;x.beginPath();x.moveTo(60,60);x.lineTo(px,py);x.stroke();x.fillStyle='#e8ffff';x.beginPath();x.arc(px,py,6,0,Math.PI*2);x.fill();}
     if(awake>0){x.globalAlpha=awake;x.fillStyle='rgba(95,240,255,.6)';for(let i=0;i<20;i++)x.fillRect(70+(i*37)%120,70+(i*53)%120,4,4);x.globalAlpha=1;}
     this.chip.refresh();
   }
@@ -331,7 +334,7 @@ export class SchoolDiorama {
    * Arithmos on the easel: the same quantity changes representation in chalk — a half as a
    * fraction, a decimal, a shaded circle, two of four — while a point waits beside a figure.
    */
-  drawYard(t){
+  drawYard(t,boost=0){
     const {ctx:x,canvas:c}=this.yard,W=c.width,H=c.height,chalk=a=>`rgba(242,244,232,${a})`;
     x.fillStyle='#22352a';x.fillRect(0,0,W,H);
     for(let i=0;i<60;i++){const sx=(i*97)%W,sy=(i*61)%H;x.fillStyle='rgba(240,240,225,.035)';x.fillRect(sx,sy,40,2);}
@@ -344,7 +347,8 @@ export class SchoolDiorama {
     // The equals sign stays: every form is the same amount.
     x.strokeStyle=chalk(.6);x.lineWidth=3;x.beginPath();x.moveTo(W*.36,cy-8);x.lineTo(W*.42,cy-8);x.moveTo(W*.36,cy+8);x.lineTo(W*.42,cy+8);x.stroke();
     // A point that is not yet anything, beside a chalk figure that looks at it.
-    const pulse=.5+.5*Math.sin(t*2.2);x.fillStyle=chalk(.75+pulse*.25);x.beginPath();x.arc(W*.24,cy,5+pulse*2.5,0,Math.PI*2);x.fill();
+    const pulse=.5+.5*Math.sin(t*2.2);x.fillStyle=chalk(.75+pulse*.25);x.beginPath();x.arc(W*.24,cy,5+pulse*2.5+boost*6,0,Math.PI*2);x.fill();
+    if(boost>0){x.strokeStyle=chalk(.85*boost);x.lineWidth=4;x.beginPath();x.moveTo(W*.24-boost*40,cy+26);x.lineTo(W*.24+boost*40,cy+26);x.stroke();}
     const fx=W*.12,fy=H*.84;x.strokeStyle=chalk(.85);x.lineWidth=3;x.beginPath();x.arc(fx,fy-74,10,0,Math.PI*2);x.moveTo(fx,fy-64);x.lineTo(fx,fy-30);x.lineTo(fx-12,fy);x.moveTo(fx,fy-30);x.lineTo(fx+12,fy);x.moveTo(fx,fy-54);x.lineTo(fx+18,fy-62+Math.sin(t*1.3)*3);x.moveTo(fx,fy-54);x.lineTo(fx-14,fy-40);x.stroke();
     this.yard.refresh();
   }
@@ -521,6 +525,12 @@ export class SchoolDiorama {
       mesh.setPositions(new Float32Array([0,0,-.3,L,0,-W/2,L,0,W/2,0,0,.3]));mesh.setUvs(0,new Float32Array([0,0,1,0,1,1,0,1]));mesh.setNormals(new Float32Array(12).fill(0));mesh.setIndices(new Uint32Array([0,1,2,0,2,3]));mesh.update();
       const mi=new MeshInstance(mesh,m,e);mi.castShadow=false;e.addComponent('render',{meshInstances:[mi]});e.setLocalEulerAngles(tilt,s,-4);pivot.addChild(e);}
     this.beam={pivot,m};
+    // The miniature Faro has its own small beam, shown when its lantern is lit and it is touched or dark.
+    {const mm=m.clone();mm.emissiveIntensity=0;mm.update();const piv=new Entity('Haz del Faro en miniatura');piv.setPosition(ARTIFACTS.ohmdal.x,3.85,ARTIFACTS.ohmdal.z);this.root.addChild(piv);
+      for(const s2 of [0,180]){const e=new Entity('Haz · cono');const mesh=new Mesh(this.app.graphicsDevice),L=9,W=1.4;
+        mesh.setPositions(new Float32Array([0,0,-.08,L,0,-W/2,L,0,W/2,0,0,.08]));mesh.setUvs(0,new Float32Array([0,0,1,0,1,1,0,1]));mesh.setNormals(new Float32Array(12).fill(0));mesh.setIndices(new Uint32Array([0,1,2,0,2,3]));mesh.update();
+        const mi=new MeshInstance(mesh,mm,e);mi.castShadow=false;e.addComponent('render',{meshInstances:[mi]});e.setLocalEulerAngles(0,s2,-3);piv.addChild(e);}
+      piv.enabled=false;this.miniBeam={pivot:piv,m:mm};}
   }
   async buildSprites(){
     const place=async(name,x,z,stage)=>{
@@ -548,7 +558,7 @@ export class SchoolDiorama {
       this.hoverAt(e.clientX,e.clientY);
     });
     const up=e=>{pointers.delete(e.pointerId);if(pointers.size<2)pinch=null;if(!down)return;const was=down;down=null;c.style.cursor='';
-      if(moved<=5&&e.type==='pointerup'){const id=this.pick(e.clientX,e.clientY);this.onSelect(id,{x:e.clientX,y:e.clientY});}void was;};
+      if(moved<=5&&e.type==='pointerup'){const id=this.pick(e.clientX,e.clientY);this.onSelect(id,{x:e.clientX,y:e.clientY,artifact:this.pickArtifact});}void was;};
     c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
     c.addEventListener('pointerleave',()=>{if(!down)this.setHover(null);});
     c.addEventListener('wheel',e=>{e.preventDefault();this.goal.distance=clamp(this.goal.distance*Math.exp(e.deltaY*.0012),this.minDistance(),this.maxDistance());this.userMoved=true;},{passive:false});
@@ -561,13 +571,13 @@ export class SchoolDiorama {
   pick(sx,sy){
     const r=this.canvas.getBoundingClientRect(),cam=this.camera.camera,x=sx-r.left,y=sy-r.top;
     const from=cam.screenToWorld(x,y,cam.nearClip),to=cam.screenToWorld(x,y,cam.farClip),dir=to.clone().sub(from).normalize();
-    let best=null,bestT=Infinity;
-    for(const [id,room] of Object.entries(ROOMS))for(const [lo,hi] of room.picks||[room.pick]){
+    let best=null,bestT=Infinity;this.pickArtifact=false;
+    for(const [id,room] of Object.entries(ROOMS))for(const [bi,[lo,hi]] of (room.picks||[room.pick]).entries()){
       let t0=0,t1=Infinity,hit=true;
       for(let a=0;a<3;a++){const o=[from.x,from.y,from.z][a],d=[dir.x,dir.y,dir.z][a];
         if(Math.abs(d)<1e-6){if(o<lo[a]||o>hi[a]){hit=false;break;}continue;}
         let ta=(lo[a]-o)/d,tb=(hi[a]-o)/d;if(ta>tb)[ta,tb]=[tb,ta];t0=Math.max(t0,ta);t1=Math.min(t1,tb);if(t0>t1){hit=false;break;}}
-      if(hit&&t0<bestT){bestT=t0;best=id;}
+      if(hit&&t0<bestT){bestT=t0;best=id;this.pickArtifact=bi===1;}
     }
     return best;
   }
@@ -582,6 +592,30 @@ export class SchoolDiorama {
     this.focusId=id&&ROOMS[id]?id:null;this.closeUp=false;
     this.flyTo(this.focusId?ROOMS[id].pose:OVERVIEW,{instant});
     this.frame.dof.focusRange=this.focusId?16:60;this.frame.update();
+  }
+  /**
+   * The signature touch: the camera comes close to a workshop's artifact and the artifact answers in its own
+   * way for a moment, then `onEnd` opens the room. A second touch or Escape ends it at once.
+   */
+  reactArtifact(world,{onEnd=()=>{}}={}){
+    const a=ARTIFACTS[world];if(!a)return onEnd();
+    const poses={ohmdal:{yaw:36,pitch:12,distance:15,y:2.6},physica:{yaw:6,pitch:10,distance:14,y:2.2},bitland:{yaw:10,pitch:26,distance:10,y:1.9},arithmos:{yaw:24,pitch:8,distance:13,y:1.9}};
+    const p=poses[world];this.focusId=null;this.closeUp=true;this.flyTo({target:[a.x,p.y,a.z],yaw:p.yaw,pitch:p.pitch,distance:p.distance});this.frame.dof.focusRange=10;this.frame.update();
+    this.reaction={world,t:0,dur:this.reducedMotion?1:2.2,onEnd,lit:this.levels[8]>.5};
+    if(world==='arithmos')this.yardShift=(this.yardShift||0)+(3.2-((this.clock+(this.yardShift||0))%3.2));
+  }
+  endReaction(){const r=this.reaction;if(!r)return;this.reaction=null;this.chipBurst=0;this.yardBoost=0;this.floatLift=0;{const g=this.materials.tank;g.emissiveIntensity=.05;g.update();}this.miniBeam.pivot.enabled=false;this.stageDirty=true;r.onEnd();}
+  stepReaction(dt){
+    const r=this.reaction;r.t+=dt;const t=r.t,k=Math.min(1,t/r.dur),bell=Math.sin(Math.PI*k);
+    if(r.world==='bitland'){this.chipBurst=1-k;const cc=this.materials.cityCyan;cc.emissiveIntensity=.5+bell*2.2;cc.update();}
+    else if(r.world==='arithmos')this.yardBoost=bell;
+    else if(r.world==='physica'){this.floatLift=bell;const g=this.materials.tank;g.emissiveIntensity=.05+bell*.5;g.update();}
+    else if(r.world==='ohmdal'){const fg=this.materials.faroGlass;
+      // Lit in the real Ohmdal: the lantern swells and its beam turns. Not yet: it tries twice and stays dark.
+      if(r.lit){fg.emissiveIntensity=1.2+bell*3;this.miniBeam.pivot.enabled=true;this.miniBeam.m.emissiveIntensity=.35*bell;this.miniBeam.m.update();this.miniBeam.pivot.setEulerAngles(0,t*140,0);}
+      else{const f=(t>.35&&t<.5)||(t>.75&&t<.85)?.6:0;fg.emissiveIntensity=f;}
+      fg.update();}
+    if(t>=r.dur)this.endReaction();
   }
   showcase(i){this.focusId=null;this.closeUp=true;this.flyTo(SHOWCASE[i]);this.frame.dof.focusRange=14;this.frame.update();}
   placeCamera(dt){
@@ -601,7 +635,8 @@ export class SchoolDiorama {
     this.camera.setPosition(tx+Math.sin(yaw)*Math.cos(p)*d,ty+Math.sin(p)*d,tz+Math.cos(yaw)*Math.cos(p)*d);
     this.camera.lookAt(tx,ty,tz);
     const want=d;if(Math.abs(this.frame.dof.focusDistance-want)>.2){this.frame.dof.focusDistance=want;this.frame.update();}
-    const fog=this.app.scene.fog;fog.start=d+18;fog.end=d*1.9+120;
+    // Haze behind the school in the overview; close-ups keep it far so near stone is not washed out.
+    const fog=this.app.scene.fog;fog.start=Math.max(d+18,150);fog.end=Math.max(d*1.9+120,420);
   }
 
   // ── Hour and stage ──────────────────────────────────────────────────────────
@@ -740,10 +775,11 @@ export class SchoolDiorama {
     if(!this.reducedMotion){this.parts.get('world:fisica')?.setLocalEulerAngles(0,this.worldAngle,Math.sin(this.clock*.4)*6);
       this.boardClock=(this.boardClock||0)+dt;if(!this.boardSeq&&this.boardClock>.1){this.boardClock=0;this.drawBoard(this.clock);}}
     if(this.boardSeq)this.stepBoardEntry(dt);
+    if(this.reaction)this.stepReaction(dt);
     // Artifacts: the floating stone breathes in its column, chip and easel keep their routines.
-    {const fl=this.parts.get('float:physica'),bp=this.basePos.get('float:physica');if(fl&&bp){const m=this.reducedMotion?0:1;fl.setLocalPosition(bp.x+Math.sin(this.clock*.7)*.08*m,bp.y+Math.sin(this.clock*.9)*.32*m,bp.z+Math.cos(this.clock*.6)*.08*m);fl.setLocalEulerAngles(this.clock*14*m,this.clock*22*m,0);}
-      this.artClock=(this.artClock||0)+dt;if(this.artClock>(this.reducedMotion?1:.066)){this.artClock=0;const t=this.reducedMotion?0:this.clock;this.drawChip(t,this.bitlandAwake||0);this.drawYard(t);}
-      const fp=this.parts.get('faro:lamp');if(fp&&this.levels[8]>.5&&!this.reducedMotion){const fg=this.materials.faroGlass;fg.emissiveIntensity=this.levels[8]*(.9+(this.currentHour?.lamps||0)*1.6)*(.85+.15*Math.sin(this.clock*3.1));fg.update();}}
+    {const fl=this.parts.get('float:physica'),bp=this.basePos.get('float:physica');if(fl&&bp){const m=this.reducedMotion?0:1;fl.setLocalPosition(bp.x+Math.sin(this.clock*.7)*.08*m,bp.y+Math.sin(this.clock*.9)*.32*m+(this.floatLift||0)*1.1,bp.z+Math.cos(this.clock*.6)*.08*m);fl.setLocalEulerAngles(this.clock*14*m,this.clock*22*m,0);}
+      this.artClock=(this.artClock||0)+dt;if(this.artClock>(this.reducedMotion?1:.066)){this.artClock=0;const t=this.reducedMotion?0:this.clock;this.drawChip(t,this.bitlandAwake||0,this.chipBurst||0);this.drawYard(t+(this.yardShift||0),this.yardBoost||0);}
+      const fp=this.parts.get('faro:lamp');if(fp&&this.levels[8]>.5&&!this.reducedMotion&&this.reaction?.world!=='ohmdal'){const fg=this.materials.faroGlass;fg.emissiveIntensity=this.levels[8]*(.9+(this.currentHour?.lamps||0)*1.6)*(.85+.15*Math.sin(this.clock*3.1));fg.update();}}
     if(this.entrySeq)this.stepEntry(dt);
     const sky=this.skyColors||{zenith:col('#6d8fb0'),horizon:col('#f2d3a8')};
     updateWater([this.materials.water],{time:this.clock,motion:this.reducedMotion?0:1,sky:sky.zenith,horizon:sky.horizon,sunDir:this.sun.forward.clone().mulScalar(-1),sunColor:this.sun.light.color,night:clamp((this.currentHour?.lamps||0)-.5,0,.5)*2});

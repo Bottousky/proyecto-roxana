@@ -19,7 +19,7 @@ Cuatro capas separadas (brief §7):
 | `irrigation` | canteros florecen, césped más verde | — | idem |
 | `beacon_link` | estandartes de Ohmdal en la Dirección | — | idem |
 | `beacon_network` | la campana de la torre se mueve | — | idem |
-| `beacon_lens` | linterna de la torre; **lámpara del Faro en miniatura** (ciclo 2); haz sólo de noche | — | `evidence/c02/faro-1440.jpg` (fixture etapa 10) |
+| `beacon_lens` | linterna de la torre; **lámpara del Faro en miniatura** (ciclo 2); haz sólo de noche | tocar el Faro en miniatura: encendido gira su haz; sin `beacon_lens` intenta dos veces y dice que la lente sigue apagada (ciclo 3) | `evidence/c02/faro-1440.jpg`, `evidence/c03/ohmdal-respuesta.jpg`, `ohmdal-apagado.jpg` (fixtures 10 y 3) |
 | `epilogue_shared` | vecinos de Ohmdal visitan el patio | — | idem |
 
 Trofeos y cinemáticas del Anfiteatro también derivan de estos flags. Las capturas con `?etapa=` o `SEED=` son
@@ -42,4 +42,10 @@ progreso real de Bitland; hoy es 0. No se inventan hitos para estos mundos.
 
 - Adaptador `world-progress.js` con lectores defensivos por mundo y tabla hito → transformación para cada uno,
   cuando se confirme dónde y bajo qué origen se publican.
-- «Cambió por tu aventura»: hacerlo no bloqueante y registrar qué cambios se presentaron (ya existe `stageSeen`).
+
+## Regresar (ciclo 3)
+
+Al volver con restauraciones nuevas el campus aparece **ya transformado**; una tarjeta lateral no bloqueante
+lista lo que volvió («Cambió por tu aventura») y ofrece «Ver qué cambió» (recorrido corto, saltable con Escape).
+`stageSeen` avanza en cuanto la tarjeta se muestra: recargar no repite la celebración. «Continuar en Ohmdal»
+queda como acción dominante de la portada. Verificado con fixture en `scripts/home-interact.mjs`.

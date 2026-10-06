@@ -101,7 +101,28 @@ diorama.onFrame=()=>{
   }
 };
 diorama.onHover=id=>{if(id)ambience.tick();document.querySelectorAll('.directory button').forEach(b=>b.classList.toggle('hover',b.dataset.room===id));};
-diorama.onSelect=id=>{if(document.body.classList.contains('showcasing'))return;if(id)openRoom(id);else if(diorama.focusId)closeRoom();};
+diorama.onSelect=(id,{artifact}={})=>{
+  if(document.body.classList.contains('showcasing'))return;
+  if(diorama.reaction){diorama.endReaction();return;}
+  if(id&&artifact&&TALLER_ROOMS.includes(id)&&diorama.focusId!==id)return touchArtifact(id);
+  if(id)openRoom(id);else if(diorama.focusId)closeRoom();
+};
+// What each artifact says when touched. Ohmdal's depends on the student's real Faro.
+function artifactLine(world){
+  const lit=schoolStage(save)>=9;
+  return {
+    ohmdal:['El Faro de Ohmdal',lit?'Lo encendiste en tu viaje: su luz también vive acá.':'Su lente sigue apagada. Se enciende acá cuando la enciendas allá.'],
+    physica:['Physica · otra regla adentro','El agua sube dentro del vidrio y cae afuera, como siempre. El mundo todavía está en preparación.'],
+    bitland:['Bitland · bajo la lente','Una sola instrucción se repite; la ciudad espera la siguiente. El mundo todavía está en preparación.'],
+    arithmos:['Arithmos · la misma cantidad','Cambia la forma de escribirla, no lo que vale. El mundo todavía está en preparación.'],
+  }[world];
+}
+function touchArtifact(room){
+  const w=worldByRoom(room);if(!w)return openRoom(room);
+  explore();document.body.classList.add('reacting');ambience.chime(w.id==='ohmdal'?[523.3,659.3,784]:[392,493.9,587.3]);
+  const [title,text]=artifactLine(w.id);caption(title,text);
+  diorama.reactArtifact(w.id,{onEnd:()=>{document.body.classList.remove('reacting');setTimeout(()=>caption(''),1400);openRoom(room);}});
+}
 
 // ── Rooms ───────────────────────────────────────────────────────────────────────
 function openRoom(id){
@@ -198,6 +219,7 @@ function renderTaller(id){
     :`<section class="world-hero generated" style="--c:${w.color}"><span class="hero-glyph" aria-hidden="true">${esc(w.glyph)}</span><div class="hero-shade"></div><div class="hero-text"><span class="eyebrow">Mundo aplicado · ${esc(w.verb)}</span><h3>${esc(w.name.toUpperCase())}</h3><p class="rule">${esc(w.discipline.toUpperCase())}</p><p>${esc(w.entry.name)}: todavía en preparación.</p></div></section>`;
   if(w.id!=='ohmdal')return `${hero}
   <div class="cta-row"><button class="primary" disabled>${svg('lock')} Entrada en preparación</button>${w.entry.preview?`<button class="quiet" id="preview-entry">${svg('play')} Ver la entrada</button>`:`<span class="meta">Verbo central: ${esc(w.verb)}</span>`}</div>
+  <button class="quiet look" id="look-artifact">${svg('spark')} Mirar ${esc(ARTIFACT_NAMES[w.id])}</button>
   <section class="card"><span class="eyebrow">Cómo se entra</span><b class="entry-name">${esc(w.entry.name)}</b><p>${esc(w.entry.detail)}</p></section>
   <section class="card"><span class="eyebrow">El mundo</span><p>${esc(w.premise)}</p></section>
   <h3>Lo que ${esc(w.name)} devuelve a la escuela</h3>
@@ -205,11 +227,13 @@ function renderTaller(id){
   const o=ohmdalSummary(save),stage=schoolStage(save);
   return `${hero}
   <div class="cta-row"><button class="primary" id="enter-portal">${o.started?'Continuar el viaje':'Cruzar el Portal'} ${svg('arrow')}</button><span class="meta">${o.started?`${o.percent}% · ${fmtTime(o.playtime)}`:'Arco I · nueve lugares'}</span></div>
+  <button class="quiet look" id="look-artifact">${svg('spark')} Mirar ${esc(ARTIFACT_NAMES.ohmdal)}</button>
   ${o.started&&o.objective?`<section class="card objective"><span class="eyebrow">Una pregunta abierta</span><b>${esc(o.objective.title)}</b><p>${esc(o.objective.detail)}</p></section>`:''}
   <h3>Lo que Ohmdal devuelve a la escuela</h3>
   <ol class="timeline">${RESTORATIONS.map((r,i)=>`<li class="${i<stage?'done':i===stage?'next':''}"><span class="dot">${i<stage?svg('check'):i+1}</span><div><b>${esc(r.world)} · ${esc(r.title)}</b><p>${i<stage?esc(r.school):i===stage?'Lo próximo que puede volver.':'Todavía en silencio.'}</p></div></li>`).join('')}</ol>`;
 }
-function bindTaller(id){$('#enter-portal')?.addEventListener('click',enterPortal);$('#preview-entry')?.addEventListener('click',()=>previewEntry(id));}
+function bindTaller(id){$('#enter-portal')?.addEventListener('click',enterPortal);$('#preview-entry')?.addEventListener('click',()=>previewEntry(id));$('#look-artifact')?.addEventListener('click',()=>{closeRoom();touchArtifact(id);});}
+const ARTIFACT_NAMES={ohmdal:'el Faro en miniatura',physica:'la columna de agua',bitland:'la ciudad bajo la lente',arithmos:'el pizarrón del caballete'};
 // A preview of how a world still in preparation will be entered. Only Arithmos has one so far.
 const PREVIEWS={
   arithmos:{flash:'chalk',lines:{door:'La tiza traza una puerta.',walk:'Quien la cruza se vuelve parte del dibujo.',plane:'Del otro lado, un plano que no termina.',dive:'Una misma idea, muchas formas de escribirla.'}},
@@ -322,21 +346,27 @@ function toast(text){const t=$('#toast');t.textContent=text;t.classList.add('on'
 
 /** When the student returns with new restorations, the school offers to show them one by one. */
 async function showChanges(){
-  const stage=schoolStage(save),seen=previewStage!==null?stage:(profile.stageSeen??0);
-  if(stage<=seen){diorama.setStage(stage,{instant:true});return;}
-  diorama.setStage(seen,{instant:true});
-  const fresh=RESTORATIONS.slice(seen,stage),news=$('#changes');
-  news.innerHTML=`<span class="eyebrow">Cambió por tu aventura</span><h2 id="changes-title">Algo volvió al Instituto</h2><p>${fresh.length===1?'Una restauración volvió a la escuela.':`${fresh.length} restauraciones volvieron a la escuela.`}</p><div class="row-buttons"><button class="primary" id="news-show">Recorrerlas ${svg('arrow')}</button><button class="quiet" id="news-skip">Más tarde</button></div>`;
-  news.classList.remove('hidden');
-  const finish=()=>{news.classList.add('hidden');profile.stageSeen=stage;persistProfile();diorama.setStage(stage);};
-  $('#news-skip').addEventListener('click',()=>{finish();diorama.setStage(stage,{instant:true});});
-  $('#news-show').addEventListener('click',async()=>{
-    news.classList.add('hidden');document.body.classList.add('showcasing');
+  const stage=schoolStage(save),seen=previewStage!==null?stage:Math.min(profile.stageSeen??0,stage);
+  diorama.setStage(stage,{instant:true});
+  if(stage<=seen)return;
+  // Presented once: the record moves on as soon as the card appears, so a reload does not celebrate again.
+  profile.stageSeen=stage;persistProfile();
+  const fresh=RESTORATIONS.slice(seen,stage),card=$('#changes');
+  card.innerHTML=`<button class="changes-close" id="changes-close" aria-label="Cerrar">${svg('close')}</button><span class="eyebrow">Cambió por tu aventura</span><h2 id="changes-title">${fresh.length===1?'Algo volvió al Instituto':`${fresh.length} cosas volvieron al Instituto`}</h2>
+    <ul class="changes-list">${fresh.slice(-3).map(r=>`<li><b>${esc(r.world)}</b> ${esc(r.school)}</li>`).join('')}</ul>${fresh.length>3?`<p class="meta">Y ${fresh.length-3} más.</p>`:''}
+    <div class="row-buttons"><button class="quiet" id="changes-show">${svg('play')} Ver qué cambió</button></div>`;
+  card.classList.remove('hidden');
+  const close=()=>card.classList.add('hidden');
+  $('#changes-close').addEventListener('click',close);
+  $('#changes-show').addEventListener('click',async()=>{
+    close();explore();document.body.classList.add('showcasing');diorama.setStage(seen,{instant:true});
     for(let i=seen;i<stage;i++){
+      if(!document.body.classList.contains('showcasing'))break;
       diorama.showcase(i);ambience.chime([523.3,659.3,784,1046.5]);caption(`${RESTORATIONS[i].world} · ${RESTORATIONS[i].title}`,RESTORATIONS[i].school);
-      await wait(settings.reducedMotion?600:1700);diorama.setStage(i+1);await wait(settings.reducedMotion?900:2600);
+      await wait(settings.reducedMotion?600:1500);diorama.setStage(i+1);await wait(settings.reducedMotion?700:2000);
     }
-    caption('');document.body.classList.remove('showcasing');diorama.focus(null);finish();
+    diorama.setStage(stage,{instant:!document.body.classList.contains('showcasing')});
+    caption('');document.body.classList.remove('showcasing');diorama.focus(null);
   });
 }
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -359,6 +389,8 @@ $('#opt-quality').addEventListener('change',e=>{settings.quality=e.target.checke
 $('#opt-stage').value=previewStage??'';
 $('#opt-stage').addEventListener('change',e=>{const v=e.target.value;const u=new URL(location.href);if(v==='')u.searchParams.delete('etapa');else u.searchParams.set('etapa',v);location.href=u.toString();});
 addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&diorama.reaction){diorama.endReaction();return;}
+  if(e.key==='Escape'&&document.body.classList.contains('showcasing')){document.body.classList.remove('showcasing');caption('');return;}
   if(e.key==='Escape'){if(!$('#settings').classList.contains('hidden'))$('#settings').classList.add('hidden');else if(diorama.focusId)closeRoom();}
   if(e.target.closest?.('input,select,textarea'))return;
   const n=Number(e.key);if(n>=1&&n<=ROOM_ORDER.length)openRoom(ROOM_ORDER[n-1]);

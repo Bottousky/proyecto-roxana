@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 2 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 3 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -86,12 +86,26 @@ Limitaciones: los tres mundos no integrados no cambian con progreso (sin contrat
 magnifica; el chip de Bitland apenas asoma en el plano maestro; noche todavía oscura fuera del patio; la
 interacción insignia (respuesta al tocar un artefacto) aún es sólo navegación.
 
+## Ciclo 3 (2026-10-06) — interacción insignia y regreso no bloqueante
+
+- **Tocar un artefacto** acerca la cámara y el objeto responde a su manera (~2 s, saltable con un toque o
+  Escape; con movimiento reducido 1 s sin vuelo), con un rótulo que explica; después abre su taller.
+  Faro: según el `beacon_lens` **real** gira su haz o intenta encender y queda apagado. Columna: la piedra sube
+  y el vidrio se entibia. Chip: el pulso sale de su bucle y un anillo recorre la ciudad. Pizarrón: escribe la
+  siguiente forma y el punto se estira en un segmento. Botón «Mirar …» en cada taller (teclado).
+- **«Cambió por tu aventura»** ya no es modal: campus transformado al llegar, tarjeta lateral con lo que volvió,
+  recorrido opcional; se presenta una sola vez.
+- Bruma de los acercamientos con distancia mínima (antes lavaba la piedra cercana); poses de Física y Bitland.
+- QA de interacción reproducible: `node scripts/home-interact.mjs` → **20/20** (`evidence/c03/interaccion.log`).
+  `npm test` 93/93, build OK. Evidencias en `evidence/c03/` (fixtures etapas 3, 5 y 10).
+
+Limitaciones: la captura de la respuesta es un cuadro (un screenshot no verifica la animación: sin grabación
+disponible, NO VERIFICADO el ritmo); sonido de los gestos sólo con sonido activado, no escuchado; Bitland,
+Physica y Arithmos siguen sin progreso real (bloqueo de origen documentado en `PROGRESSION.md`).
+
 ## Siguiente acción exacta
 
-1. Interacción insignia: al tocar un artefacto, una respuesta propia breve antes de abrir el panel (el Faro
-   gira su luz si está encendido o muestra la lente apagada; la columna invierte un instante; el pulso del chip
-   salta a otra ruta y vuelve; la tiza escribe la siguiente forma). Medible: captura antes/después + sin bloqueo.
-2. «Cambió por tu aventura» no bloqueante (tarjeta lateral, campus ya transformado, recorrido opcional) y
-   prueba de una sola presentación con `SEED`.
-3. Pasar el chip de Bitland a un lugar más legible en el plano maestro o subir su placa/luz.
-4. Rendimiento con la build (`vite preview`) cuando la GPU no esté compartida; registrar frame times y memoria.
+1. Grabar el gesto (Playwright `recordVideo` en `home-interact.mjs`) y revisar ritmo/anticipación/reposo.
+2. Cartelera física de novedades en el patio (pieza 3D que abre `#novedades`), con indicador discreto.
+3. Hacer más legible el chip de Bitland en el plano maestro (luz/placa visibles por encima del taller).
+4. Rendimiento con `vite preview` sin otra carga de GPU; frame times, memoria, ciclos abrir/cerrar panel.
