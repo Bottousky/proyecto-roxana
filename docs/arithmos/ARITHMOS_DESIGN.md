@@ -66,8 +66,8 @@ tiene un rasgo mínimo (tamaño, ritmo de parpadeo). Lino es el más chico.
 | 5 | Partes de algo | C: fracciones, equivalencia, decimales, %, razón, proporción, unidades; inconmensurables, reales; exacto vs aproximado | jugable, revisado |
 | 6 | Lo que no se ve | D: patrón, generalización, incógnita/variable/parámetro; expresión, identidad, ecuación; **"pasa sumando"**; desigualdades; sistemas | jugable, revisado (sistemas pendientes) |
 | 7 | Crecer | E: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos | jugable, en revisión |
-| 8 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | diseño |
-| 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | pendiente |
+| 8 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | jugable, en revisión |
+| 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | diseño |
 | 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | pendiente |
 | 11 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | pendiente |
 | 12 | Anticipar | J: familias de funciones, parámetros, composición, inversa, tasa de cambio, límite/derivada/acumulación en su nivel | pendiente |
@@ -270,7 +270,7 @@ Límites a declarar: √ indica el lado positivo; potencias con exponente fracci
 de otras bases, sólo mencionados; la prueba de que √2 no es una fracción queda para el cap. 8.
 Historia: pendiente de fuentes (no afirmar nada sobre Napier ni Arquímedes sin verificar).
 
-## Capítulo 8 — Formas (diseño)
+## Capítulo 8 — Formas (implementado, 2026-10-06)
 
 Pregunta de entrada (gancho del cap. 7): Peldaño partió la diagonal de un cuadro en doce y no cayó
 en ninguna rayita; ¿en cuántas hay que partirla? Idea central: **una forma se puede medir, copiar,
@@ -297,6 +297,32 @@ el plano (no en una esfera); el reacomodo de 8.6 es una prueba para triángulos 
 dibujos no son exactos y no reemplazan el argumento.
 Historia: pendiente de fuentes (no atribuir a Pitágoras ni a Babilonia nada sin verificar; la tablilla
 YBC 7289 y la historia de la inconmensurabilidad requieren fuente en `research/fuentes.md`).
+
+## Capítulo 9 — Depende (diseño)
+
+Pregunta de entrada (gancho del cap. 8): la sombra de Cornisa depende de la hora; ¿la hora depende de
+la sombra? Idea central: **una función le asigna a cada valor de entrada uno solo de salida; una
+relación puede asignar varios. Una función se puede decir con palabras, con una tabla, con un gráfico
+o con una expresión; el gráfico es una herramienta para leer, no un dibujo.**
+
+Lugar: las Terrazas, la pizarra de Mara y el mapa de dos rectas del cap. 8 (ahora: entrada acostada,
+salida parada). Representaciones: flechas entre dos columnas, máquinas de Mara (entra un número,
+sale otro), puntos en el mapa, la «recta parada» que recorre un gráfico.
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 9.1 | Flechas | Función vs relación | Unir con flechas cada hora con su sombra, y después cada sombra con su hora | De la hora salen flechas de a una; de la sombra 2 salen dos: la hora no depende sólo de la sombra |
+| 9.2 | La máquina de Mara | Regla de entrada y salida; adivinar la regla | Darle números a una máquina y anticipar qué sale | La regla «el doble más uno» se descubre con pocos casos y se comprueba con uno nuevo; la máquina de Punto da distinto con el mismo número: no es una función |
+| 9.3 | Puntos que se paran | Tabla → gráfico; unir o no unir | Poner los puntos de la tabla de sombras en el mapa; decidir si se unen | Entre las 8 y las 10 también hay sombra: se une. Las familias que vinieron cada día no se unen (no hay «día 2 y medio») |
+| 9.4 | La recta parada | Cuándo un dibujo es gráfico de una función | Pasar una recta parada por cuatro dibujos | Si la corta dos veces en algún lugar, no es función (el círculo, la parábola acostada) |
+| 9.5 | Dónde se puede | Dominio | Probar entradas en 1 ÷ (x − 2) y en el reparto de Rampa | La cuenta: todo menos 2; el reparto: enteros mayores que 2. El dominio depende de lo que se cuenta |
+| 9.6 | Lo que sale | Imagen | Pedirle a la máquina «x · x» que dé −4 | Nunca da negativos: la imagen son los números de 0 para arriba |
+| 9.7 | Tres maneras | Expresión, tabla y gráfico de lo mismo | Emparejar la escalera de Mara (1 + 10 · d) y la de Punto (2ᵈ) con sus tablas y gráficos | Una recta y una curva que despega; se cruzan cerca del día 6 (cap. 7) |
+| 9.8 | Lo que vuelve | Cierre y gancho al cap. 10 | Mirar la sombra varios días | Todos los días la misma tabla: algo que se repite (periodicidad, cap. 10) |
+
+Límites a declarar: los gráficos se dibujan con algunos puntos y una línea; la línea supone que entre
+puntos la regla sigue igual (hay que decirlo); la «recta parada» es una prueba para dibujos en el
+plano con la entrada acostada.
 
 ## Criterios de escena (lo que las revisiones marcaron una y otra vez)
 

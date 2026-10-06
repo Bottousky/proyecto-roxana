@@ -1,0 +1,30 @@
+[0.0s] escena → c9.flechas
+[1.0s] lee: Con la tabla de ayer sé qué sombra hay a cada hora. Pero un viajero me preguntó la hora, le dije «mi sombra mide 2»… y no supo qué hacer.
+[5.4s] lee: De cada hora sale una flecha, y una sola.
+[6.0s] elige «Las 10 o las 14: con la sombra sola no se sabe.» (Cornisa dice «mi sombra mide 2». ¿Qué hora es?)
+[6.4s] lee: —Cornisa: a cada hora le toca una sola sombra: la sombra es función de la hora. Al revés no: a la sombra 2 le tocan dos horas. Eso es una relación, pero no una función.
+[7.2s] escena → c9.maquina
+[7.5s] lee: Hice una máquina para las cuentas de los escalones: le doy un número, lo da vuelta adentro y sale otro. Adiviná qué hace.
+[11.4s] elige «21.» (Si entra 10, ¿qué sale?)
+[12.6s] lee: Veintiuno: el doble, y uno más.
+[13.3s] lee: —Mara: tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo.
+[14.1s] lee: Punto también hizo una.
+[16.0s] lee: —Punto, el mismo 3 dio 7 y después 9. Con tu máquina no puedo anticipar nada: no es una función.
+[16.0s] lee: Punto mira su máquina un rato. Después tacha la ruedita que giraba sola.
+[16.7s] escena → c9.puntos
+[17.8s] lee: La tabla me sirve, pero quisiera verla de un vistazo.
+[18.6s] lee: —En el mapa de Mara: la hora por la recta acostada, la sombra por la parada.
+[20.8s] lee: —Punto, es linda, pero ¿a qué hora es esa ola? No sale de la tabla.
+[22.1s] elige «Unirlos: entre las 8 y las 10 también hay sombra.» (¿Los puntos se unen?)
+[23.3s] lee: A cada momento hay una sombra: se puede unir. La línea dice lo que suponemos entre medición y medición.
+[24.1s] lee: Entonces a las 9 mi sombra es… más o menos 3. Casi, porque no lo medí.
+[24.9s] lee: Yo anoto cuántas familias vienen cada día al depósito: lunes 3, martes 5, miércoles 4.
+[25.4s] elige «Sueltos: no hay «lunes y medio».» (¿Esos puntos se unen?)
+[25.8s] lee: —Mara: entre el lunes y el martes no hay un día a medias, ni media familia. Los puntos van sueltos.
+[25.9s] escena → c9.recta
+[26.2s] lee: Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?
+[27.0s] lee: —Si fuera el gráfico de una máquina, a cada entrada, sobre la recta acostada, le tocaría una sola altura. Una recta parada no puede cortarlo dos veces.
+[37.8s] lee: —Balcón: la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas.
+[37.8s] lee: La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál.
+[38.6s] lee: El capítulo 10 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[39.7s] {"ended":true,"final":{"mode":"title","seg":"c9.recta"},"journal":[],"evidenceKinds":["map-arrow","inverse-predict","function","machine","rule-predict","punto-machine","rule","plot","join-predict","join-discrete","vertical-predict","vertical"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":39.685,"size":"1600x900","touch":false,"route":"directa","watch":false}

@@ -164,6 +164,10 @@ function pickChoice(prompt, options) {
     ['Para qué triángulos', 'Para cualquier triángulo.'],
     ['en línea recta', 'Siete'],
     ['La sombra dice la hora', 'Sí: cada sombra'],
+    ['mi sombra mide 2', 'Las 10.'],
+    ['Si entra 10', '20: el doble'],
+    ['Los puntos se unen', 'Unirlos con una curva linda'],
+    ['Esos puntos se unen', 'Unidos'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -247,6 +251,10 @@ function pickChoice(prompt, options) {
     ['Para qué triángulos', 'ángulo recto'],
     ['en línea recta', 'Cinco.'],
     ['La sombra dice la hora', 'Cada hora da una sola sombra'],
+    ['mi sombra mide 2', 'Las 10 o las 14'],
+    ['Si entra 10', '21.'],
+    ['Los puntos se unen', 'Unirlos: entre'],
+    ['Esos puntos se unen', 'Sueltos'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -266,6 +274,7 @@ let areaTaps = 0;
 let dosPasosStep = 0;
 let copyCand = null;
 let coordStep = 0;
+let c9Shape = null;
 let logTaps = 0;
 const searchOrder = ['look-crack', 'look-house', 'look-smudge'];
 let lastSeg = null;
@@ -574,6 +583,28 @@ for (let iter = 0; iter < 4000; iter++) {
       const seq = route === 'errores' ? ['c8-pt2_3', 'c8-pt3_2', 'c8-pt-1_-1'] : ['c8-pt3_2', 'c8-pt-1_-1'];
       target = spots.find(x => x.id === seq[coordStep]) || spots[0];
       coordStep++;
+    } else if (s.seg === 'c9.flechas' && spots.some(x => x.id.startsWith('c9-p'))) {
+      const sel = s.spots.find(x => x.selected);
+      const MAP = {8: 4, 10: 2, 12: 1, 14: 2, 16: 4};
+      if (!sel) target = spots.find(x => x.id.startsWith('c9-ph'));
+      else {
+        const h = Number(sel.id.replace('c9-ph', ''));
+        const wrong = route === 'errores' && !tried.has('c9wrong') && (tried.add('c9wrong'), true);
+        target = spots.find(x => x.id === `c9-ps${wrong ? (MAP[h] === 1 ? 2 : 1) : MAP[h]}`);
+      }
+    } else if (s.seg === 'c9.puntos' && spots.some(x => x.id.startsWith('c9-pt'))) {
+      const MAP = {8: 4, 10: 2, 12: 1, 14: 2, 16: 4};
+      const free = [8, 10, 12, 14, 16].filter(h => spots.some(x => x.id.startsWith(`c9-pt${h}_`)));
+      const h = free[0];
+      const wrong = route === 'errores' && !tried.has('c9plot') && (tried.add('c9plot'), true);
+      target = spots.find(x => x.id === `c9-pt${h}_${wrong ? (MAP[h] + 1) % 5 : MAP[h]}`);
+    } else if (s.seg === 'c9.recta' && spots.some(x => x.id === 'c9-yes')) {
+      const truth = {line: true, parabola: true, circle: false, sideways: false}[c9Shape];
+      const wrong = route === 'errores' && !tried.has(`c9v${c9Shape}`) && c9Shape === 'circle' && (tried.add(`c9v${c9Shape}`), true);
+      target = spots.find(x => x.id === ((truth !== wrong) ? 'c9-yes' : 'c9-no'));
+    } else if (s.seg === 'c9.recta' && spots.some(x => x.id.startsWith('c9-c'))) {
+      target = spots[0];
+      c9Shape = target.id.replace('c9-c', '');
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
       if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }
