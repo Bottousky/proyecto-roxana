@@ -6,7 +6,7 @@ import {ohmdalPlaces,storageOrNull,RESTORATIONS,WORLDS,worldByRoom,readOhmdal,sc
 import {SAVE_KEY,validateState} from '../game/state.js';
 import {CHANNEL,EXPLICACIONES,ANIMACIONES,CINEMATIC_FILES} from './videos.js';
 import {Ambience} from './ambience.js';
-import {loadNews,renderNews,unreadCount} from './news.js';
+import {loadNews,renderNews,unreadCount,newestReal} from './news.js';
 import {renderCommunity} from './social.js';
 
 const $=s=>document.querySelector(s);
@@ -133,6 +133,7 @@ function touchArtifact(room){
 function openRoom(id){
   // Choosing a room ends any gesture in progress instead of being overridden by it when it finishes.
   if(diorama.reaction){diorama.reaction.onEnd=()=>{};diorama.endReaction();document.body.classList.remove('reacting');caption('');}
+  if(document.body.classList.contains('previewing'))diorama.cancelEntryPreview?.();
   if(id==='sobre')id='patio';
   if(id==='novedades')return openNews();
   if(!ROOMS[id])return;
@@ -413,6 +414,7 @@ $('#opt-stage').addEventListener('change',e=>{const v=e.target.value;const u=new
 addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!$('#changes').classList.contains('hidden')){$('#changes').classList.add('hidden');return;}
   if(e.key==='Escape'&&diorama.reaction){diorama.endReaction();return;}
+  if(e.key==='Escape'&&document.body.classList.contains('previewing')){diorama.cancelEntryPreview?.();return;}
   if(e.key==='Escape'&&document.body.classList.contains('showcasing')){document.body.classList.remove('showcasing');caption('');return;}
   if(e.key==='Escape'){if(!$('#settings').classList.contains('hidden'))$('#settings').classList.add('hidden');else if(diorama.focusId||$('#panel').dataset.room)closeRoom();}
   if(e.target.closest?.('input,select,textarea'))return;
@@ -459,7 +461,7 @@ function openNews(){
   requestAnimationFrame(()=>panel.focus({preventScroll:true}));
   loadNews(base).then(result=>{
     const body=$('#news-body');if(!body)return;body.removeAttribute('aria-busy');body.innerHTML=renderNews(result,{dev:import.meta.env.DEV});
-    if(result.items.length){profile.newsSeen=result.items[0].date;persistProfile();markUnread(0);diorama.setNotices(result.items,0);}
+    const seen=newestReal(result.items);if(seen){profile.newsSeen=seen;persistProfile();}markUnread(0);diorama.setNotices(result.items,0);
   });
 }
 function markUnread(n){const a=$('#link-news');a.dataset.unread=n?String(n):'';a.setAttribute('aria-label',n?`Novedades (${n} sin leer)`:'Novedades');}

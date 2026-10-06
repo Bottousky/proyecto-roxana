@@ -45,7 +45,7 @@ const MATERIALS={
   lampGlass:{color:'#6c6556',emissive:'#ffd08a',glow:0},lanternGlass:{color:'#57636a',emissive:'#fff0c4',glow:0,gloss:.8},
   glass:{color:'#344b55',emissive:'#ffcb7c',glow:0,gloss:.85},screen:{color:'#10231a',emissive:'#6cf0a2',glow:0},
   flame:{color:'#ffd9a0',emissive:'#ffcf7a',glow:0},
-  ceramic:{color:'#f1ede2',gloss:.82},pendantBulb:{color:'#6c6556',emissive:'#ffd9a0',glow:0},bulbOhm:{color:'#4c5a58',emissive:'#9ff5ec',glow:0,gloss:.85},skylight:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.6,gloss:.8},
+  ceramic:{color:'#f1ede2',gloss:.82},pendantBulb:{color:'#6c6556',emissive:'#ffd9a0',glow:0},bulbOhm:{color:'#4c5a58',emissive:'#9ff5ec',glow:0,gloss:.85},skylight:{color:'#14112a',emissive:'#9d8cff',glow:.6,gloss:.8},
   chalkWhite:{map:'stone',contrast:.15,color:'#f2f0e6',emissive:'#fffaf0',glow:.22},noticeLamp:{color:'#5a5040',emissive:'#ffcf8a',glow:0,gloss:.7},faroGlass:{color:'#4e5a60',emissive:'#ffe7ad',glow:0,gloss:.85},
   cityCyan:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.9,gloss:.6},lensGlass:{color:'#e8f6f4',opacity:.1,gloss:.98,emissive:'#bff6ff',glow:.04},roxanaLamp:{color:'#6c6556',emissive:'#ffd08a',glow:0},bitacora:{color:'#e9dfc6',emissive:'#ffe3a6',glow:.6},
 };
@@ -222,6 +222,8 @@ export class SchoolDiorama {
     };
     this.entrySeq={world,plan:plans[world],t:0,cb,fired:new Set()};this.camera.camera.nearClip=.05;this.frame.dof.focusRange=4;this.frame.update();
   }
+  /** Ends an entry preview now: the sequence jumps to its last moment, so its own clean-up and onEnd run once. */
+  cancelEntryPreview(){if(this.entrySeq)this.entrySeq.t=this.entrySeq.plan.end;if(this.boardSeq){this.boardSeq.dived=true;this.boardSeq.t=7.9;}}
   stepEntry(dt){
     const q=this.entrySeq,{plan,cb}=q;q.t+=dt;const t=q.t,ramp=(a,b)=>clamp((t-a)/(b-a),0,1);
     for(const [at,key] of plan.lines)if(t>=at&&!q.fired.has('l'+key)){q.fired.add('l'+key);cb.onLine?.(key);if(key==='dive')cb.onDive?.();}
@@ -595,6 +597,16 @@ export class SchoolDiorama {
     const m=new StandardMaterial();m.useLighting=false;m.diffuse=col('#000000');m.emissive=col('#ffd98f');m.emissiveMap=this.glowTexture;m.opacityMap=this.glowTexture;m.opacity=0;m.blendType=BLEND_ADDITIVE;m.depthWrite=false;m.update();
     const e=new Entity('Resplandor de sala');const mi=new MeshInstance(this.quadMesh(1,1),m,e);mi.castShadow=false;e.addComponent('render',{meshInstances:[mi]});e.setEulerAngles(-90,0,0);this.root.addChild(e);
     this.highlight={e,m,alpha:0};
+    // What can be touched without hover: a faint halo on the lawn under each artifact, in its world's colour,
+    // breathing at its own pace. No outlines; gone in close-ups; still with reduced motion.
+    const tones={ohmdal:'#6fd6cf',physica:'#f2a860',bitland:'#a595ff',arithmos:'#86e0a8'};
+    // Additive light needs its falloff in the colour itself (the shared glow keeps it in alpha, RGB stays white).
+    const halo=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
+      g.addColorStop(0,'#ffffff');g.addColorStop(.35,'#8a8a8a');g.addColorStop(.7,'#262626');g.addColorStop(1,'#000000');x.fillStyle=g;x.fillRect(0,0,128,128);
+      const t=new Texture(this.app.graphicsDevice,{width:128,height:128,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);return t;})();
+    this.markers=Object.entries(ARTIFACTS).map(([w,a],i)=>{const mm=new StandardMaterial();mm.useLighting=false;mm.diffuse=col('#000000');mm.emissive=col(tones[w]);mm.emissiveMap=halo;mm.blendType=BLEND_ADDITIVE;mm.emissiveIntensity=0;mm.depthWrite=false;mm.update();
+      const me=new Entity('Halo de '+w);const mi2=new MeshInstance(this.quadMesh(1,1),mm,me);mi2.castShadow=false;me.addComponent('render',{meshInstances:[mi2]});me.setEulerAngles(-90,0,0);me.setPosition(a.x,.24,a.z+1.9);me.setLocalScale(3.8,3.8,1);this.root.addChild(me); /* quadMesh grows from its bottom edge: lying down, that is −z */
+      return {e:me,m:mm,phase:i*1.7,rate:.55+i*.13};});
   }
   buildBeam(){
     // Two cones of light turning from the lantern, like the Faro it now answers.
@@ -868,6 +880,9 @@ export class SchoolDiorama {
     const hl=this.highlight,target=this.hoverId&&this.hoverId!==this.focusId?1:0;hl.alpha=lerp(hl.alpha,target,1-Math.exp(-dt*8));
     if(this.hoverId){const [lo,hi]=ROOMS[this.hoverId].pick;hl.e.setPosition((lo[0]+hi[0])/2,.12,(lo[2]+hi[2])/2+(hi[2]-lo[2])*.75);hl.e.setLocalScale((hi[0]-lo[0])*1.5,(hi[2]-lo[2])*1.5,1);hl.e.setPosition(hl.e.getPosition().x,.12,(lo[2]+hi[2])/2+(hi[2]-lo[2])*.75);}
     hl.m.opacity=hl.alpha*(.55+Math.sin(this.clock*3)*.1);hl.m.update();hl.e.enabled=hl.alpha>.01;
+    {const show=!this.focusId&&!this.closeUp&&!this.reaction?1:0;this.markerK=lerp(this.markerK??0,show,1-Math.exp(-dt*3));
+      for(const mk of this.markers||[]){const breath=this.reducedMotion?.5:.5+.5*Math.sin(this.clock*mk.rate+mk.phase);/* additive: strength lives in the emissive (opacity is ignored by this blend) */
+        mk.m.emissiveIntensity=this.markerK*(.1+.16*breath)*(.8+(this.currentHour?.lamps||0)*.3);mk.m.update();mk.e.enabled=this.markerK>.01;}}
     // Clock hands: stopped at ten to three until the Faro's network runs.
     // The clock stays at ten to three; the bell swings once the Faro's network sings.
     this.parts.get('clock:minute')?.setLocalEulerAngles(0,0,120);this.parts.get('clock:hour')?.setLocalEulerAngles(0,0,-85);

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {validItem,visibleItems,sortItems,unreadCount,renderNews} from '../src/escuela/news.js';
+import {validItem,visibleItems,sortItems,unreadCount,renderNews,newestReal} from '../src/escuela/news.js';
 import {IDENTITIES,confirmed,pendingLinks,renderCommunity} from '../src/escuela/social.js';
 import {readProfile,defaultQuality,freshProfile,readOhmdal,saveProfile,ohmdalPlaces,previewState} from '../src/escuela/progress.js';
 import {heightAt,outside,roadX} from '../src/escuela/landscape.js';
@@ -25,11 +25,14 @@ test('novedades: enlaces sólo https o del propio sitio',()=>{
   assert.equal(quiet(()=>validItem(item({href:'javascript:alert(1)'}))),null);
   assert.equal(quiet(()=>validItem(item({href:'http://inseguro.example'}))),null);
   assert.ok(validItem(item({href:'./index.html'})));
+  assert.equal(quiet(()=>validItem(item({href:'#'}))),null,'nunca href="#"');
+  assert.ok(validItem(item({href:'#novedades'})));
 });
 test('novedades: el indicador de no leído cuenta sólo contenido real posterior a la última visita',()=>{
   const list=[item({id:'n',date:'2026-10-03'}),item({id:'v',date:'2026-09-01'}),item({id:'e',date:'2026-10-04',example:true})].map(validItem);
   assert.equal(unreadCount(list,'2026-10-01'),1);
-  assert.equal(unreadCount(list,null),0);
+  assert.equal(unreadCount(list,null),2,'primera visita: todo lo real está sin leer, los ejemplos no cuentan');
+  assert.equal(newestReal([validItem(item({id:'e',date:'2026-10-09',example:true})),...list.filter(x=>!x.example)]),'2026-10-03');
 });
 test('novedades: estados vacío y error dignos, sin inventar contenido',()=>{
   assert.match(renderNews({status:'ok',items:[]}),/Todavía no hay novedades publicadas/);
@@ -102,4 +105,10 @@ test('mapa del taller: cada lugar aparece sólo con su restauración real, en el
   assert.deepEqual(ohmdalPlaces(previewState(4)).filter(p=>p.restored).map(p=>p.id),['portal','plaza','workshop','road','spring']);
   assert.equal(ohmdalPlaces(previewState(10)).filter(p=>p.restored).length,9);
   assert.deepEqual(ohmdalPlaces(null).map(p=>p.id),['portal','plaza','workshop','road','spring','castle','terraces','lake','lighthouse']);
+});
+test('novedades: la selección es acotada y el resto queda en la misma página, sin enlaces muertos',()=>{
+  const list=Array.from({length:8},(_,i)=>validItem(item({id:'n'+i,date:`2026-09-0${i+1}`})));
+  const html=renderNews({status:'ok',items:sortItems(list)});
+  assert.match(html,/<details class="news-more"><summary>Ver 2 novedades anteriores<\/summary>/);
+  assert.equal((html.match(/news-item/g)||[]).length,8);
 });

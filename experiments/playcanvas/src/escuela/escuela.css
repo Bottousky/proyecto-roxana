@@ -371,3 +371,5 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .map-card figure{margin:.5rem 0 0}.map-card img{display:block;width:100%;border-radius:8px;border:1px solid var(--line)}.map-card figcaption{margin-top:.45rem}
 #diorama[hidden],.light #diorama{display:none!important}
 .light-worlds a:not(.cta){color:var(--brass)}
+
+.news-more{margin-top:.8rem}.news-more summary{cursor:pointer;color:var(--brass);font-weight:600;font-size:.86rem;min-height:44px;display:flex;align-items:center}.news-more .news-list{margin-top:.5rem}

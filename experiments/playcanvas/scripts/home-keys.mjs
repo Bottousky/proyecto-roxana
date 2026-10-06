@@ -59,6 +59,13 @@ await page.goto(base+'escuela.html?hora=tarde');await page.waitForFunction(()=>w
 await page.click('#cta-explore');await page.waitForTimeout(900);
 const stops=[];for(let i=0;i<14;i++){await page.keyboard.press('Tab');stops.push(await page.evaluate(()=>{const a=document.activeElement;return a?.closest('#intro')?'intro':a?.closest('#panel')?'panel':a?.id||a?.dataset?.room||a?.tagName;}));}
 ok('explorando, ni la portada ni el panel cerrado reciben foco',!stops.includes('intro')&&!stops.includes('panel'),stops.join(' → '));
+// Escape cancels an entry preview (a world still in preparation) and leaves its workshop open.
+await page.evaluate(()=>window.__escuela.openRoom('matematica'));await page.waitForTimeout(1200);
+await page.click('#preview-entry');await page.waitForTimeout(900);
+const during=await page.evaluate(()=>document.body.classList.contains('previewing'));
+await page.keyboard.press('Escape');await page.waitForTimeout(900);
+const afterPrev=await page.evaluate(()=>({previewing:document.body.classList.contains('previewing'),room:document.querySelector('#panel').dataset.room||null,seq:!!window.__escuela.diorama.boardSeq}));
+ok('Escape cancela la vista previa de entrada y deja el taller abierto',during&&!afterPrev.previewing&&!afterPrev.seq&&afterPrev.room==='matematica',JSON.stringify(afterPrev));
 ok('sin errores de página',errors.length===0,errors.join(' | '));
 await browser.close();
 const failed=results.filter(x=>!x).length;console.log(`\n${results.length-failed}/${results.length} comprobaciones de teclado e historial`);process.exit(failed?1:0);

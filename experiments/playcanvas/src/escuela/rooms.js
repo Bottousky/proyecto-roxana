@@ -6,7 +6,7 @@ const taller=(x,z,yaw,world)=>({world,anchor:[x-Math.sign(x)*5.8,7.8,z],pick:[[x
 export const ROOMS={
   novedades:{name:'Cartelera',short:'Novedades',eyebrow:'Del Instituto',anchor:[NB.x,4.1,NB.z],pick:[[NB.x-2,0,NB.z-1.2],[NB.x+2,3.6,NB.z+1.2]],
     pose:{target:[NB.x,1.9,NB.z],yaw:NB.ry-6,pitch:10,distance:17}},
-  patio:{name:'Patio de Roxana',short:'Patio',eyebrow:'El centro de la escuela',anchor:[0,7.4,0],pick:[[-5,0,-5],[5,7.5,5]],
+  patio:{name:'Patio de Roxana',short:'Sobre Roxana',eyebrow:'El centro de la escuela',anchor:[0,7.4,0],pick:[[-5,0,-5],[5,7.5,5]],
     pose:{target:[0,2.4,0],yaw:12,pitch:34,distance:45}},
   direccion:{name:'Dirección',short:'Dirección',eyebrow:'Tu cuenta',anchor:[0,10.4,-18.6],pick:[[-9.8,0,-31.5],[9.8,11,-16]],
     pose:{target:[0,2.2,-22],yaw:0,pitch:44,distance:46}},
