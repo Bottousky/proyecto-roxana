@@ -1,5 +1,22 @@
 # Aceptación del Arco I
 
+## Candidata en revisión: `3422928` (5 oct 2026) · bancos rediseñados (ciclo 15)
+
+Build de producción `dist/` y `dist-perf/`, mismo método que la candidata anterior.
+
+| Comprobación | Resultado |
+|---|---|
+| Pasada 1 · recorrido completo con escenas | Completa, 0 errores (410 s) |
+| Pasada 2 · adversarial | Completa, 0 errores (696 s) |
+| Diálogos | Correcta |
+| Humo de la build entregable `dist/` | Correcta |
+| Bancos (`qa-bench-load.mjs`) | Lo principal a la vista 9/9 a 1440×900, 1280×720 y 390×844; sin desplazamiento en escritorio |
+| Flujo de bancos con el mouse (`qa-bench-flow.mjs`) | Correcto |
+| **Táctil 390×844 emulado** | **FALLA**: no apareció el botón «Seguir» de la tarjeta de éxito tras resolver un banco tocando. Sin diagnosticar |
+| Pruebas automáticas | Raíz 291/291, PlayCanvas 83/83 |
+
+La candidata no se acepta hasta corregir y repetir la prueba táctil.
+
 ## Candidata vigente: `6abad80` (5 oct 2026)
 
 Reemplaza a `9b5cd5e` (sección siguiente). Después de la primera entrega, el usuario señaló que los
