@@ -68,7 +68,7 @@ export const flechas = {
     await d.think('De cada hora sale una flecha, y una sola.');
     const c = await d.choose([
       {id: '10', text: 'Las 10.'},
-      {id: 'both', text: 'Las 10 o las 14: con la sombra sola no se sabe.'},
+      {id: 'both', text: 'Las 10 o las 14: con el largo solo no se sabe.'},
       {id: '12', text: 'Las 12.'},
     ], {prompt: 'Cornisa dice sólo el largo: «mi sombra mide 2». ¿Qué hora es?', evaluate: true});
     d.evidence('inverse-predict', {answer: c});
@@ -82,7 +82,7 @@ export const flechas = {
     if (c !== 'both') await d.think(c === '10' ? 'Las 10 o las 14: del 2 salen dos flechas.' : 'A las 12 la sombra mide 1. Con 2, son las 10 o las 14.');
     const fn = isFunction(SOMBRA), inv = isFunction(inverse(SOMBRA));
     if (!fn.ok || inv.ok) console.error('[flechas] la tabla no da función de ida y relación de vuelta');
-    await d.say('student', 'Cornisa: a cada hora le toca un solo largo de sombra: el largo es función de la hora. Al revés no: al largo 2 le tocan dos horas. Eso es una relación, pero no una función. Si además decís para qué lado apunta, ahí sí se distinguen: pero esa ya es otra entrada.');
+    await d.say('student', 'Cornisa: a cada hora le toca un solo largo de sombra: el largo es función de la hora. Al revés no: al largo 2 le tocan dos horas. Eso es una relación (une entradas con salidas), pero no una función. Si además decís para qué lado apunta, ahí sí se distinguen: pero esa ya es otra entrada.');
     await studentWrites(d, g, 'c9-def', 'función: a cada entrada, una sola salida', A.x0 + 20, A.y1 - 8, {size: 22});
     d.evidence('function', {fn: fn.ok, inverse: inv.ok, bad: inv.bad});
     g.flags.c9fn = true;
@@ -160,7 +160,8 @@ export const maquina = {
     ], {prompt: 'Si entra 10, ¿qué sale?', evaluate: true});
     d.evidence('rule-predict', {answer: c, matching: left});
     await feed(10);
-    await d.think(c === '21' ? 'Veintiuno: el doble, y uno más.' : 'Veintiuno: el doble, y uno más. Con pocos casos parecía otra cosa; el caso nuevo lo comprueba.');
+    await d.think('Veintiuno: el doble más uno. Coincide, pero coincidir no prueba la regla: otra regla rara podría dar lo mismo con estos números y otra cosa con el 5.');
+    await d.say('Mara', 'La hice yo: es el doble más uno. Ustedes la adivinaron bien, y el 10 no la desmintió.');
     w.get('c9-ml').text = '× 2 + 1';
     w.get('c9-ml').size = 28;
     await d.say('student', 'Mara: tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo.');
@@ -263,7 +264,7 @@ export const puntos = {
     for (let i = 0; i <= 40; i++) { const t = i / 40; wav.push([px(8) + t * (px(16) - px(8)), py(2.5) + Math.sin(t * Math.PI * 6) * 30]); }
     const deco = w.add(new Drawing('c9-deco', [S(wav, seedOf('c9-deco'), {w: 2.6, p: 0.9, ch: YELLOW})], {z: 13, progress: 0}));
     await d.draw(deco, 0.9, {sound: false});
-    d.describe('Punto dibuja una línea ondulada, linda, que pasa por arriba y por abajo de los puntos sin tocarlos.');
+    d.describe('Punto dibuja una línea ondulada, linda, que no sigue los puntos: no sale de la tabla.');
     g.audio.punto('happy');
     g.setCinematic(false);
     await d.say('student', 'Punto, es linda, pero ¿a qué hora es esa ola? No sale de la tabla.');
@@ -292,7 +293,7 @@ export const puntos = {
       {id: 'join', text: 'Unidos, como los de Cornisa.'},
     ], {prompt: '¿Esos puntos se unen?', evaluate: true});
     d.evidence('join-discrete', {answer: c});
-    await d.say('student', c === 'loose' ? 'Mara: entre el lunes y el martes no hay un día a medias, ni media familia. Los puntos van sueltos.' : 'Mara: entre el lunes y el martes no hay un día a medias, ni media familia: si unimos, la línea dice cosas que no existen. Sueltos.');
+    await d.say('student', c === 'loose' ? 'Mara: entre el lunes y el martes no hay un día a medias: la entrada se cuenta de a uno. Los puntos van sueltos.' : 'Mara: entre el lunes y el martes no hay un día a medias, ni media familia: si unimos, la línea dice cosas que no existen. Sueltos.');
     w.remove('c9-tab');
     await studentWrites(d, g, 'c9-gr', 'un gráfico se lee: cada punto dice algo', A.x0 + 20, A.y1 - 4, {size: 18});
     g.flags.c9graph = true;

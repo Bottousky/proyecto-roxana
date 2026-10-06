@@ -98,7 +98,7 @@ export const dominio = {
       {id: 'all', text: 'Cualquier número.'},
     ], {prompt: 'Para el reparto de Rampa, ¿qué entradas tienen sentido?', evaluate: true});
     d.evidence('domain-story', {answer: c});
-    if (c !== 'int') await d.think(c === 'not2' ? 'La máquina acepta −1 y 2,5, pero no vienen −1 personas ni dos y media. Para el reparto, enteros mayores que 2.' : 'Con 2 la máquina ni siquiera anda. Y para el reparto, sólo enteros mayores que 2.');
+    if (c !== 'int') await d.think(c === 'not2' ? 'La máquina acepta −1 o 0, pero no vienen −1 personas ni cero. Para el reparto, enteros mayores que 2.' : 'Con 2 la máquina ni siquiera anda. Y para el reparto, sólo enteros mayores que 2.');
     const dom = domainOf(f, INS);
     await d.say('student', 'Rampa: las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.');
     await studentWrites(d, g, 'c9-dom', 'dominio: cuenta x ≠ 2;  reparto 3, 4, 5, …', A.x0 + 20, A.y1 - 8, {size: 20});
@@ -163,7 +163,7 @@ export const imagen = {
     if (c === 'm2') await d.think('(−2) · (−2) da 4, no −4: menos por menos es más, como en el cap. 4.');
     if (c === 'other') await d.think('Positivo por positivo, positivo; negativo por negativo, positivo; cero por cero, cero. No hay número que falte probar.');
     const img = imageOf(x => x * x, INS);
-    await d.say('student', 'Mara: lo que puede salir se llama la imagen. La de x · x es el 0 y los positivos. El −4 no está, con los números que conocemos.');
+    await d.say('student', 'Mara: lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números que conocemos.');
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3);
     await studentWrites(d, g, 'c9-img', 'imagen de x · x: 0 y los positivos', A.x0 + 20, A.y1 - 8, {size: 20});
@@ -235,7 +235,7 @@ export const maneras = {
       refresh();
     }));
     d.describe('A es la escalera de Mara, 1 + 10 · d; C, la de Punto, 2 elevado a d. B era la de Peldaño.');
-    await d.say('student', 'Mara: con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: la recta sube igual todos los días y la curva despega. Se cruzan un poco antes del día 6, como vimos.');
+    await d.say('student', 'Mara: con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: la recta sube igual todos los días y la curva despega. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.');
     await d.say('Peldaño', 'Y la mía, la B, es diez más uno por día: 10 + d.');
     d.evidence('three-ways', {done: [...done]});
     g.flags.c9ways = true;
@@ -290,7 +290,7 @@ export const vuelve = {
       }, {label: 'Agregar otro día'})]);
       refresh();
     }));
-    await d.think('Entre un día y otro, de noche, no hay sombra: ahí la función no está definida. Los huecos son parte del dominio que falta.');
+    await d.think('Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos.');
     const c = await d.choose([
       {id: '2', text: '2, como cualquier día a las 10.'},
       {id: 'unknown', text: 'No se puede saber.'},
@@ -298,7 +298,7 @@ export const vuelve = {
     ], {prompt: 'Pasado mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?', evaluate: true});
     d.evidence('periodic-predict', {answer: c});
     await d.say('student', c === '2' ? 'Cornisa: 2. Todos los días el sol da la misma vuelta, y la sombra repite su ve.' : 'Cornisa: 2. Todos los días el sol da la misma vuelta y la sombra repite su ve. Medido no está, pero el patrón se repite.');
-    await d.think('Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno, la ve cambia un poco.');
+    await d.think('Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.');
     if (!replay) writeJournal9(g);
     await d.say('Mara', 'Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.');
     g.audio.punto('question');
@@ -333,7 +333,7 @@ function writeJournal9(g) {
     abbr: 'Una función le asigna a cada entrada una sola salida; se puede decir con flechas, tablas, gráficos o cuentas.',
     body: [
       'Una función le asigna a cada entrada una sola salida: el largo de la sombra depende de la hora. Al revés no siempre: con el largo 2 pueden ser las 10 o las 14. Eso es una relación, pero no una función.',
-      'Una regla se adivina con casos y se comprueba con uno nuevo. Una máquina que con el mismo número da distinto no es una función.',
+      'Una regla se adivina con casos; un caso nuevo puede mostrar que está mal, pero si coincide no la prueba (otra regla podría coincidir ahí). Una relación une entradas con salidas; es función si a cada entrada le toca una sola. Una máquina que con el mismo número da distinto no es una función.',
       'Un gráfico se lee: cada punto dice algo. Se unen los puntos cuando entre medio también hay valores (y es una suposición); no se unen cuando no hay nada entre medio. Si una recta parada corta un dibujo dos veces, no es el gráfico de una función.',
       'El dominio son las entradas con las que se puede: 1 ÷ (x − 2), todo menos el 2; el reparto, enteros mayores que 2. La imagen es lo que puede salir: x · x da 0 o positivos. Una misma función se dice con una cuenta, una tabla o un gráfico; lo que se repite se puede anticipar.',
     ],
