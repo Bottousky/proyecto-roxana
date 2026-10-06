@@ -13,14 +13,14 @@ export {GROUND, DEPOT, LEDGER, mara, villager, student, punto, item, signed};
 export const LINE = {zero: 10500, step: 110, from: -6, to: 6};
 export const lineX = n => LINE.zero + n * LINE.step;
 /** Dónde esperan las familias antes de ubicarse (a la izquierda de la línea, dentro del plano). */
-export const waitX = i => LINE.zero + LINE.from * LINE.step - 470 + i * 95;
+export const waitX = i => LINE.zero + LINE.to * LINE.step + 150 + i * 100;
 export const TABLE = {x: 9330, top: GROUND - 320, w: 440, h: 210};
 export const PIT = {x: 11800, step: 70};
 
 export const SHOTS = {
   ledger: {x: 8100, y: 200, w: 1300, h: 560},
-  table: {x: 8950, y: 220, w: 800, h: 500},
-  line: {x: 9230, y: 260, w: 2140, h: 600},
+  table: {x: 8980, y: 280, w: 760, h: 440},
+  line: {x: 9600, y: 260, w: 2200, h: 600},
   lineClose: {x: 10000, y: 380, w: 1000, h: 420},
   pit: {x: 11450, y: 260, w: 700, h: 820},
 };
@@ -75,13 +75,14 @@ export function chip(w, kind, x, y, id) {
   const sh = kind === 'debt' ? w.add(new Shape(id, art3.debt(id), x, y, {z: 15})) : item(w, 1, x, y, id);
   sh.kind = kind;
   sh.z = 15;
+  sh.scale = sh.baseScale = 1.35;
   return sh;
 }
 
 /** Posiciones en la mesa: lo que se tiene arriba, lo que se debe abajo. */
 export function tableSlot(kind, k) {
-  const x = TABLE.x - TABLE.w / 2 + 50 + k * 54;
-  const y = TABLE.top + (kind === 'have' ? 60 : 150);
+  const x = TABLE.x - TABLE.w / 2 + 60 + k * 72;
+  const y = TABLE.top + (kind === 'have' ? 58 : 150);
   return [x, y];
 }
 

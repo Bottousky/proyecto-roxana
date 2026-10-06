@@ -47,17 +47,19 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | A2b | Contar como emparejamiento con palabras; la última dice cuántos | 1° | 1 | probado-auto |
 | B0 | Más / menos / igual por correspondencia | 1° | 1 | probado-auto |
 | A3 | Número frente a numeral (nombre ≠ colección) | 1° | 1 | probado-auto |
-| A4 | Unidad, agrupación | 1° | 2 | pendiente |
-| A5 | Valor posicional, cero (lugar vacío y "ninguno") | 1° | 2 | pendiente |
-| B1–B5 | Operaciones con significado, recta, negativos, |x|, multiplicación y división | 1°–2° | 3 | pendiente |
-| C1–C4 | Fracciones a reales; exacto vs aproximado | 1°–4° | 4 | pendiente |
-| D1–D6 | Lenguaje algebraico, **pasa sumando**, desigualdades, sistemas | 2°–4° | 5 | pendiente |
-| E1–E7 | Potencias, polinomios, cuadráticas, sucesiones, logaritmos, expresiones racionales | 1°–5° | 6 | pendiente |
-| F1–F4 | Geometría y medida | 1°–5° | 7 | pendiente |
-| G1–G2 | Relaciones y funciones | 1°–3° | 8 | pendiente |
-| H1–H4 | Trigonometría, vectores, complejos, matrices | 3°–6° | 9 | pendiente |
-| I1–I3 | Datos, conteo, probabilidad | 1°–6° | 10 | pendiente |
-| J1–J3 | Síntesis en funciones; cálculo en su nivel | 4°–6° | 11 | pendiente |
+| A4 | Unidad, agrupación (de a diez; la convención) | 1° | 2 | probado-auto |
+| A5 | Valor posicional, cero como lugar vacío, generalización a mil | 1° | 2 | probado-auto |
+| B1 | Suma con canje ("me llevo uno"); resta como comparación ("pedir prestado") | 1° | 2 | probado-auto |
+| B2–B3 | Signo, negativos, opuestos, orden en la recta, distancia, valor absoluto, suma y resta de enteros (pares cero) | 1°–2° | 3 | probado-auto |
+| B4–B5 | Multiplicación (grupos, escala) y división (reparto, medida), propiedades | 1°–2° | 4 | pendiente |
+| C1–C4 | Fracciones a reales; exacto vs aproximado | 1°–4° | 5 | pendiente |
+| D1–D6 | Lenguaje algebraico, **pasa sumando**, desigualdades, sistemas | 2°–4° | 6 | pendiente |
+| E1–E7 | Potencias, polinomios, cuadráticas, sucesiones, logaritmos, expresiones racionales | 1°–5° | 7 | pendiente |
+| F1–F4 | Geometría y medida | 1°–5° | 8 | pendiente |
+| G1–G2 | Relaciones y funciones | 1°–3° | 9 | pendiente |
+| H1–H4 | Trigonometría, vectores, complejos, matrices | 3°–6° | 10 | pendiente |
+| I1–I3 | Datos, conteo, probabilidad | 1°–6° | 11 | pendiente |
+| J1–J3 | Síntesis en funciones; cálculo en su nivel | 4°–6° | 12 | pendiente |
 | K1 | **Lógica proposicional y álgebra de Boole** (INET Electrónica; no está en A–J) | INET | por decidir (¿puente con Bitland?) | pendiente — decisión de alcance |
 | K2 | Divisibilidad y primos (NAP/PBA 1°–2°; no nombrado en A–J) | 1°–2° | 2 o 3 | pendiente |
 | K3 | Combinatoria como objeto propio, binomio de Newton | 2°–4° | 10 | pendiente |

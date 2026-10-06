@@ -1,39 +1,365 @@
 {
   "version": 1,
-  "updated": "2026-10-05",
-  "statuses": ["pendiente", "en-curso", "implementado", "probado-auto", "revisado-mat", "validado-jugadores", "bloqueado"],
+  "updated": "2026-10-06",
+  "statuses": [
+    "pendiente",
+    "en-curso",
+    "implementado",
+    "probado-auto",
+    "revisado-mat",
+    "validado-jugadores",
+    "bloqueado"
+  ],
   "note": "probado-auto valida el sistema, no la comprensión. validado-jugadores requiere playtest humano real.",
   "items": [
-    {"id": "ENG-1", "title": "Render de tiza: presión, diente del pizarrón, cerdas, borde áspero, sin parpadeo", "deps": [], "acceptance": "Capturas en Chrome muestran grano estable entre cuadros; texto y signos legibles; modo limpio reduce textura", "status": "probado-auto", "evidence": ["artifacts/arithmos/it01/lab-chalk.jpg"]},
-    {"id": "ENG-2", "title": "Director de escenas: pausa, saltar animación sin corromper estado, aborto limpio", "deps": [], "acceptance": "Partida automatizada saltando todas las cinemáticas termina igual que una a velocidad real", "status": "probado-auto", "evidence": ["artifacts/arithmos/it01/fast-errores/summary.json", "artifacts/arithmos/it01/watch-directa/summary.json"]},
-    {"id": "ENG-3", "title": "Guardado por escena y estado parcial de interacciones; continuar desde el título", "deps": ["ENG-2"], "acceptance": "Recargar en 5 escenas y a mitad de anotar continúa en la misma escena con el progreso parcial", "status": "probado-auto", "evidence": ["artifacts/arithmos/it01/fast-recargas/log.txt"]},
-    {"id": "ENG-4", "title": "Interfaz accesible: objetos tocables como botones, teclado, lector de pantalla, describir acciones, texto escalable, lectura limpia, movimiento reducido, volúmenes", "deps": [], "acceptance": "Todo objeto interactivo es un botón con etiqueta; el capítulo se completa sólo con teclado; opciones persisten", "status": "implementado", "evidence": []},
-    {"id": "ENG-5", "title": "Audio procedural: tiza, borrador, Marea, voz de Punto, motivos breves", "deps": [], "acceptance": "Sin archivos ni servicios; volumen por canal; análisis de niveles sin saturación. Escucha humana pendiente", "status": "implementado", "evidence": []},
-    {"id": "ENG-6", "title": "Rendimiento medido: 60 fps objetivo en escritorio; medición en dispositivo táctil real", "deps": ["ENG-1"], "acceptance": "Mediana ≥ 58 fps y mínimo ≥ 45 en la partida automatizada de escritorio; medición en tablet real registrada", "status": "en-curso", "evidence": ["artifacts/arithmos/it01/fast-errores/summary.json"]},
-    {"id": "C1-1", "title": "1.1 La puerta: entrada, el estudiante se dibuja, primer gesto", "deps": ["ENG-2"], "acceptance": "Cruzar requiere una acción; el estudiante aparece trazo a trazo y actúa (mirarse las manos, mirar atrás)", "status": "probado-auto", "evidence": []},
-    {"id": "C1-2", "title": "1.2 Alguien: presentación de Punto con decisión acercarse/esperar", "deps": ["C1-1"], "acceptance": "Acercarse hace que Punto se esconda; esperar hace que se acerque; ambos caminos llegan al vínculo", "status": "probado-auto", "evidence": []},
-    {"id": "C1-3", "title": "1.3 La Ronda: anotar uno a uno; contar falla con dignidad", "deps": ["C1-2"], "acceptance": "Cada toque deja una marca unida visualmente al punto; tocar uno ya anotado no duplica y lo explica", "status": "probado-auto", "evidence": []},
-    {"id": "C1-4", "title": "1.4 La Marea (momento rejugable)", "deps": ["C1-3"], "acceptance": "Todo se borra salvo la piedra con marcas; rejugable desde la pausa sin alterar progreso", "status": "probado-auto", "evidence": []},
-    {"id": "C1-5", "title": "1.5 ¿Están todos?: emparejar marcas y puntos; comprobar", "deps": ["C1-4"], "acceptance": "Comprobar distingue inválido (doble), incompleto y concluyente; deshacer funciona; cualquier orden de pares sirve", "status": "probado-auto", "evidence": ["experiments/arithmos/tests/pairing.test.mjs"]},
-    {"id": "C1-6", "title": "1.6 Quién: interpretar la marca sola con respuestas que se discuten con evidencia", "deps": ["C1-5"], "acceptance": "Las tres lecturas tienen respuesta específica; sólo 'falta uno' avanza directo", "status": "probado-auto", "evidence": []},
-    {"id": "C1-7", "title": "1.7 Búsqueda y 1.8 Todos (momento)", "deps": ["C1-6"], "acceptance": "Tres lugares en cualquier orden; repasar al más chico; recorrido final con 12 notas", "status": "probado-auto", "evidence": []},
-    {"id": "C1-8", "title": "1.9 Las gradas: transferencia con predicción", "deps": ["C1-7"], "acceptance": "Predicción registrada; sentar uno por asiento; sobra uno; respuesta según la predicción; Punto también se equivoca", "status": "probado-auto", "evidence": []},
-    {"id": "C1-9", "title": "1.10 El nombre: número vs numeral; evolución de Punto; Bitácora", "deps": ["C1-8"], "acceptance": "Punto hace su primera marca; '14' no se empareja; respuestas erróneas se refutan; Bitácora sólo afirma lo hecho", "status": "probado-auto", "evidence": []},
-    {"id": "C1-R1", "title": "Revisión matemática independiente del capítulo 1", "deps": ["C1-9"], "acceptance": "Hallazgos registrados en ARITHMOS_REVIEW.md y corregidos o justificados", "status": "pendiente", "evidence": []},
-    {"id": "C1-R2", "title": "Revisión narrativa y audiovisual independiente del capítulo 1", "deps": ["C1-9"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C1-R3", "title": "Revisión funcional independiente (rutas alternativas, teclado, táctil, tamaño)", "deps": ["C1-9"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C1-P", "title": "Playtest humano del capítulo 1 (adolescente y adulto)", "deps": ["C1-R1", "C1-R2", "C1-R3"], "acceptance": "Notas de observación: dónde dudan, qué explican con sus palabras, si reconocen la sobra y el numeral", "status": "pendiente", "evidence": []},
-    {"id": "C2", "title": "Cap. 2 Demasiados para marcar: agrupar, unidad, valor posicional, cero; suma y resta con significado", "deps": ["C1-9"], "acceptance": "Contrato educativo por concepto; jugable de principio a fin; transferencia; revisión", "status": "pendiente", "evidence": []},
-    {"id": "C3", "title": "Cap. 3 La línea: recta, orden, distancia, negativos, |x|, multiplicación como escala, división como reparto y medida", "deps": ["C2"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C4", "title": "Cap. 4 Partes de algo: fracciones a reales; exacto vs aproximado; inconmensurables", "deps": ["C3"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C5", "title": "Cap. 5 Lo que no se ve: ecuaciones; 'pasa sumando' como abreviatura de transformaciones; transformaciones inválidas; desigualdades; sistemas", "deps": ["C4"], "acceptance": "El jugador aplica la misma operación a ambos miembros, ve qué se simplifica, reconoce soluciones conservadas, detecta una transformación inválida, transfiere a otra estructura; división por cero, división por expresión que puede anularse, elevar al cuadrado y desigualdades por negativos tratadas con sus condiciones", "status": "pendiente", "evidence": []},
-    {"id": "C6", "title": "Cap. 6 Crecer: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos", "deps": ["C5"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C7", "title": "Cap. 7 Formas: geometría y medida, Pitágoras con alcance de la prueba, coordenadas", "deps": ["C4"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C8", "title": "Cap. 8 Depende: relación vs función, dominio, imagen, representaciones", "deps": ["C5", "C7"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C9", "title": "Cap. 9 Vueltas y flechas: trigonometría, radianes, periodicidad, vectores, complejos, matrices", "deps": ["C7", "C8"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C10", "title": "Cap. 10 Lo que pasa a veces: datos, conteo, probabilidad, correlación vs causa", "deps": ["C8"], "acceptance": "Idem", "status": "pendiente", "evidence": []},
-    {"id": "C11", "title": "Cap. 11 Anticipar: familias de funciones, composición, inversa, tasa de cambio, límite, derivada, acumulación", "deps": ["C6", "C8", "C9"], "acceptance": "Idem; cierre narrativo del arco de Punto", "status": "pendiente", "evidence": []},
-    {"id": "X-1", "title": "Decidir alcance de lógica proposicional y álgebra de Boole (INET Electrónica)", "deps": [], "acceptance": "Decisión registrada en ARITHMOS_REVIEW.md con motivo", "status": "pendiente", "evidence": []},
-    {"id": "X-2", "title": "Integración mínima con la escuela (taller de Matemática abre Arithmos)", "deps": ["C1-R3"], "acceptance": "Cambio mínimo y probado en experiments/playcanvas sin alterar Ohmdal; requiere acuerdo porque toca infraestructura compartida", "status": "pendiente", "evidence": []}
+    {
+      "id": "ENG-1",
+      "title": "Render de tiza: presión, diente del pizarrón, cerdas, borde áspero, sin parpadeo",
+      "deps": [],
+      "acceptance": "Capturas en Chrome muestran grano estable entre cuadros; texto y signos legibles; modo limpio reduce textura",
+      "status": "probado-auto",
+      "evidence": [
+        "artifacts/arithmos/it01/lab-chalk.jpg"
+      ]
+    },
+    {
+      "id": "ENG-2",
+      "title": "Director de escenas: pausa, saltar animación sin corromper estado, aborto limpio",
+      "deps": [],
+      "acceptance": "Partida automatizada saltando todas las cinemáticas termina igual que una a velocidad real",
+      "status": "probado-auto",
+      "evidence": [
+        "artifacts/arithmos/it01/fast-errores/summary.json",
+        "artifacts/arithmos/it01/watch-directa/summary.json"
+      ]
+    },
+    {
+      "id": "ENG-3",
+      "title": "Guardado por escena y estado parcial de interacciones; continuar desde el título",
+      "deps": [
+        "ENG-2"
+      ],
+      "acceptance": "Recargar en 5 escenas y a mitad de anotar continúa en la misma escena con el progreso parcial",
+      "status": "probado-auto",
+      "evidence": [
+        "artifacts/arithmos/it01/fast-recargas/log.txt"
+      ]
+    },
+    {
+      "id": "ENG-4",
+      "title": "Interfaz accesible: objetos tocables como botones, teclado, lector de pantalla, describir acciones, texto escalable, lectura limpia, movimiento reducido, volúmenes",
+      "deps": [],
+      "acceptance": "Todo objeto interactivo es un botón con etiqueta; el capítulo se completa sólo con teclado; opciones persisten",
+      "status": "probado-auto",
+      "evidence": [
+        "experiments/arithmos/scripts/keyboard-check.mjs",
+        "experiments/arithmos/scripts/touch-probe.mjs"
+      ]
+    },
+    {
+      "id": "ENG-5",
+      "title": "Audio procedural: tiza, borrador, Marea, voz de Punto, motivos breves",
+      "deps": [],
+      "acceptance": "Sin archivos ni servicios; volumen por canal; análisis de niveles sin saturación. Escucha humana pendiente",
+      "status": "implementado",
+      "evidence": []
+    },
+    {
+      "id": "ENG-6",
+      "title": "Rendimiento medido: 60 fps objetivo en escritorio; medición en dispositivo táctil real",
+      "deps": [
+        "ENG-1"
+      ],
+      "acceptance": "Mediana ≥ 58 fps y mínimo ≥ 45 en la partida automatizada de escritorio; medición en tablet real registrada",
+      "status": "en-curso",
+      "evidence": [
+        "artifacts/arithmos/it01/fast-errores/summary.json"
+      ]
+    },
+    {
+      "id": "C1-1",
+      "title": "1.1 La puerta: entrada, el estudiante se dibuja, primer gesto",
+      "deps": [
+        "ENG-2"
+      ],
+      "acceptance": "Cruzar requiere una acción; el estudiante aparece trazo a trazo y actúa (mirarse las manos, mirar atrás)",
+      "status": "probado-auto",
+      "evidence": []
+    },
+    {
+      "id": "C1-2",
+      "title": "1.2 Alguien: presentación de Punto con decisión acercarse/esperar",
+      "deps": [
+        "C1-1"
+      ],
+      "acceptance": "Acercarse hace que Punto se esconda; esperar hace que se acerque; ambos caminos llegan al vínculo",
+      "status": "probado-auto",
+      "evidence": []
+    },
+    {
+      "id": "C1-3",
+      "title": "1.3 La Ronda: anotar uno a uno; contar falla con dignidad",
+      "deps": [
+        "C1-2"
+      ],
+      "acceptance": "Cada toque deja una marca unida visualmente al punto; tocar uno ya anotado no duplica y lo explica",
+      "status": "probado-auto",
+      "evidence": []
+    },
+    {
+      "id": "C1-4",
+      "title": "1.4 La Marea (momento rejugable)",
+      "deps": [
+        "C1-3"
+      ],
+      "acceptance": "Todo se borra salvo la piedra con marcas; rejugable desde la pausa sin alterar progreso",
+      "status": "probado-auto",
+      "evidence": []
+    },
+    {
+      "id": "C1-5",
+      "title": "1.5 ¿Están todos?: emparejar marcas y puntos; comprobar",
+      "deps": [
+        "C1-4"
+      ],
+      "acceptance": "Comprobar distingue inválido (doble), incompleto y concluyente; deshacer funciona; cualquier orden de pares sirve",
+      "status": "probado-auto",
+      "evidence": [
+        "experiments/arithmos/tests/pairing.test.mjs"
+      ]
+    },
+    {
+      "id": "C1-6",
+      "title": "1.6 Quién: interpretar la marca sola con respuestas que se discuten con evidencia",
+      "deps": [
+        "C1-5"
+      ],
+      "acceptance": "Las tres lecturas tienen respuesta específica; sólo 'falta uno' avanza directo",
+      "status": "probado-auto",
+      "evidence": []
+    },
+    {
+      "id": "C1-7",
+      "title": "1.7 Búsqueda y 1.8 Todos (momento)",
+      "deps": [
+        "C1-6"
+      ],
+      "acceptance": "Tres lugares en cualquier orden; repasar al más chico; recorrido final con 12 notas",
+      "status": "probado-auto",
+      "evidence": []
+    },
+    {
+      "id": "C1-8",
+      "title": "1.9 Las gradas: transferencia con predicción",
+      "deps": [
+        "C1-7"
+      ],
+      "acceptance": "Predicción registrada; sentar uno por asiento; sobra uno; respuesta según la predicción; Punto también se equivoca",
+      "status": "probado-auto",
+      "evidence": []
+    },
+    {
+      "id": "C1-9",
+      "title": "1.10 El nombre: número vs numeral; evolución de Punto; Bitácora",
+      "deps": [
+        "C1-8"
+      ],
+      "acceptance": "Punto hace su primera marca; '14' no se empareja; respuestas erróneas se refutan; Bitácora sólo afirma lo hecho",
+      "status": "probado-auto",
+      "evidence": []
+    },
+    {
+      "id": "C1-R1",
+      "title": "Revisión matemática independiente del capítulo 1",
+      "deps": [
+        "C1-9"
+      ],
+      "acceptance": "Hallazgos registrados en ARITHMOS_REVIEW.md y corregidos o justificados",
+      "status": "en-curso",
+      "evidence": []
+    },
+    {
+      "id": "C1-R2",
+      "title": "Revisión narrativa y audiovisual independiente del capítulo 1",
+      "deps": [
+        "C1-9"
+      ],
+      "acceptance": "Idem",
+      "status": "implementado",
+      "evidence": [],
+      "note": "Hallazgos N1–N17 aplicados; segunda pasada pendiente."
+    },
+    {
+      "id": "C1-R3",
+      "title": "Revisión funcional independiente (rutas alternativas, teclado, táctil, tamaño)",
+      "deps": [
+        "C1-9"
+      ],
+      "acceptance": "Idem",
+      "status": "implementado",
+      "evidence": [],
+      "note": "Hallazgos F1–F20 aplicados; verificados con keyboard-check, touch-probe y partidas táctiles 844×390."
+    },
+    {
+      "id": "C1-P",
+      "title": "Playtest humano del capítulo 1 (adolescente y adulto)",
+      "deps": [
+        "C1-R1",
+        "C1-R2",
+        "C1-R3"
+      ],
+      "acceptance": "Notas de observación: dónde dudan, qué explican con sus palabras, si reconocen la sobra y el numeral",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C2",
+      "title": "Cap. 2 Demasiados para marcar: agrupar, unidad, valor posicional, cero; suma y resta con significado",
+      "deps": [
+        "C1-9"
+      ],
+      "acceptance": "Contrato educativo por concepto; jugable de principio a fin; transferencia; revisión",
+      "status": "probado-auto",
+      "evidence": [
+        "artifacts/arithmos/it03/watch-directa/log.txt",
+        "artifacts/arithmos/it03/watch-directa/summary.json"
+      ],
+      "note": "Revisión independiente matemática en curso; narrativa pendiente (el revisor se colgó por carga de la máquina)."
+    },
+    {
+      "id": "C3",
+      "title": "Cap. 3 Menos que nada: signo, tener y deber que se anulan, orden en la recta, distancia, |x|, restar negativos con pares cero, transferencia vertical",
+      "deps": [
+        "C2"
+      ],
+      "acceptance": "Idem",
+      "status": "probado-auto",
+      "evidence": [
+        "experiments/arithmos/tests/integers.test.mjs"
+      ],
+      "note": "Implementado y recorrido de punta a punta por interfaz (ruta errores). Falta revisión independiente y pasada visual."
+    },
+    {
+      "id": "C4",
+      "title": "Cap. 4 Veces: multiplicación como grupos y como escala, división como reparto y como medida, propiedades (con negativos)",
+      "deps": [
+        "C3"
+      ],
+      "acceptance": "Idem",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C5",
+      "title": "Cap. 5 Partes de algo: fracciones a reales; exacto vs aproximado; inconmensurables",
+      "deps": [
+        "C4"
+      ],
+      "acceptance": "El jugador aplica la misma operación a ambos miembros, ve qué se simplifica, reconoce soluciones conservadas, detecta una transformación inválida, transfiere a otra estructura; división por cero, división por expresión que puede anularse, elevar al cuadrado y desigualdades por negativos tratadas con sus condiciones",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C6",
+      "title": "Cap. 6 Lo que no se ve: ecuaciones; «pasa sumando» como abreviatura de transformaciones; inválidas; desigualdades; sistemas",
+      "deps": [
+        "C5"
+      ],
+      "acceptance": "Idem",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C7",
+      "title": "Cap. 7 Crecer: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos",
+      "deps": [
+        "C4"
+      ],
+      "acceptance": "Idem",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C8",
+      "title": "Cap. 8 Formas: geometría y medida, Pitágoras con alcance de la prueba, coordenadas",
+      "deps": [
+        "C5",
+        "C7"
+      ],
+      "acceptance": "Idem",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C9",
+      "title": "Cap. 9 Depende: relación vs función, dominio, imagen, representaciones",
+      "deps": [
+        "C7",
+        "C8"
+      ],
+      "acceptance": "Idem",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C10",
+      "title": "Cap. 10 Vueltas y flechas: trigonometría, radianes, periodicidad, vectores, complejos, matrices",
+      "deps": [
+        "C8"
+      ],
+      "acceptance": "Idem",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C11",
+      "title": "Cap. 11 Lo que pasa a veces: datos, conteo, probabilidad, correlación vs causa",
+      "deps": [
+        "C6",
+        "C8",
+        "C9"
+      ],
+      "acceptance": "Idem; cierre narrativo del arco de Punto",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "X-1",
+      "title": "Decidir alcance de lógica proposicional y álgebra de Boole (INET Electrónica)",
+      "deps": [],
+      "acceptance": "Decisión registrada en ARITHMOS_REVIEW.md con motivo",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "X-2",
+      "title": "Integración mínima con la escuela (taller de Matemática abre Arithmos)",
+      "deps": [
+        "C1-R3"
+      ],
+      "acceptance": "Cambio mínimo y probado en experiments/playcanvas sin alterar Ohmdal; requiere acuerdo porque toca infraestructura compartida",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "C12",
+      "title": "Cap. 12 Anticipar: familias de funciones, composición, inversa, tasa de cambio, límite, derivada, acumulación; cierre del arco de Punto",
+      "deps": [
+        "C7",
+        "C9",
+        "C10"
+      ],
+      "acceptance": "Idem; cierre narrativo",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "ENV-1",
+      "title": "Pruebas largas y mediciones de rendimiento afectadas por otras sesiones que usan Chrome en la misma máquina",
+      "deps": [],
+      "acceptance": "Repetir mediciones con la máquina libre; no certificar fps medidos bajo carga",
+      "status": "bloqueado",
+      "evidence": []
+    }
   ]
 }

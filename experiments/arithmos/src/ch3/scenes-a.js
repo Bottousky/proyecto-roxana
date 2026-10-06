@@ -20,12 +20,13 @@ export function ledgerRow(w, key, name, value, row, {reveal = 1} = {}) {
 
 export function cast(g, {at = 'ledger'} = {}) {
   const w = g.world;
-  const s = student(w, at === 'ledger' ? LEDGER.x - 190 : TABLE.x - 300);
+  const s = student(w, at === 'ledger' ? LEDGER.x - 190 : TABLE.x - TABLE.w / 2 - 110);
   const p = punto(w, s.x + 44, GROUND - 150);
   follow(p, s);
-  mara(w, LEDGER.x + 230, {facing: -0.8});
-  villager(w, 'curva', LEDGER.x + 360, 'curl', {facing: -0.6, scale: 0.92});
-  villager(w, 'recta', LEDGER.x + 470, 'square', {facing: -0.6});
+  const right = at === 'ledger' ? LEDGER.x + 230 : TABLE.x + TABLE.w / 2 + 70;
+  mara(w, right, {facing: -0.8});
+  villager(w, 'curva', right + 110, 'curl', {facing: -0.6, scale: 0.92});
+  villager(w, 'recta', right + 210, 'square', {facing: -0.6});
   return {s, p};
 }
 
@@ -284,10 +285,10 @@ export const linea = {
     base(g, {line: !!g.scratch('c3.linea').drawn});
     w.removeWhere(o => /^(cv-|rc-)/.test(o.id));
     const {s} = cast(g, {at: 'table'});
-    s.x = waitX(0) - 120;
+    s.x = LINE.zero + LINE.from * LINE.step - 120;
     FAMILIES.forEach((f, i) => {
       const placed = g.scratch('c3.linea').placed?.[f.id];
-      villager(w, f.id, placed != null ? lineX(placed) : waitX(i), f.head, {facing: 0.6});
+      villager(w, f.id, placed != null ? lineX(placed) : waitX(i), f.head, {facing: -0.6});
     });
     familySigns(g);
     g.camera.go(SHOTS.line);

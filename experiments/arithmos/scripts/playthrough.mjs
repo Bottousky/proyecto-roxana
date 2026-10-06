@@ -363,6 +363,7 @@ for (let iter = 0; iter < 4000; iter++) {
       target = spots[0];
     }
     if (target) {
+      if (opt('trace')) note(`toca ${target.id} (${target.label})`);
       await clickSpot(target.id).catch(e => note(`no pudo tocar ${target.id}: ${e.message.split('\n')[0]}`));
       await page.waitForTimeout(watch ? 500 : 120);
       continue;

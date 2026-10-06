@@ -11,19 +11,21 @@ Actualizado: 2026-10-05 (iteración 1).
 - Modelo: la sesión principal corre como Opus 5.5 (`claude-opus-5-5`, según el entorno). Los
   subagentes se lanzan con el alias `opus`; no puedo verificar desde adentro qué versión resolvió.
 
-## Estado real (fin de la sesión 1)
+## Estado real (ciclo 2 del loop, 2026-10-06)
 
-- **Capítulos 1 y 2 jugables y encadenados** (título → cap. 1 → cap. 2 → título con "volver a jugar").
-- Cap. 1 pasó por tres revisiones independientes (matemática, narrativa/audiovisual, funcional);
-  sus hallazgos están aplicados y registrados en ARITHMOS_REVIEW.md. Falta una **segunda pasada**
-  de las tres sobre la versión corregida.
-- Cap. 2 tiene sólo revisión del autor; falta su revisión independiente y aplicarle las lecciones
-  del cap. 1 (voz lacónica, consecuencias visibles, primeros planos).
-- Probado automáticamente: 25 pruebas unitarias; partida completa de ambos capítulos con recargas
-  (sin errores, mín. 53 fps / mediana 60 en Mac M2); teclado y pausa (`scripts/keyboard-check.mjs`).
-- **Abierto:** en 844×390 táctil, ruta "errores", la política del probador para deshacer la unión
-  doble terminó triplicando un punto y se trabó (probable falla del probador con blancos de ~17 px,
-  no confirmada). Verificar a mano y, si es del juego, separar más los puntos en pantallas bajas.
+- **Capítulos 1, 2 y 3 jugables y encadenados** (título → 1 → 2 → 3 → título con "volver a jugar").
+- Cap. 1: tres revisiones independientes aplicadas (ARITHMOS_REVIEW.md). Segunda pasada matemática
+  en curso (sin navegador). Segunda pasada narrativa: pendiente (el revisor se colgó por carga).
+- Cap. 2: pasada de voz lacónica y consecuencias visibles (depósito de prueba de Punto). Sin
+  revisión independiente todavía (la matemática en curso lo incluye).
+- Cap. 3 "Menos que nada": implementado y recorrido por interfaz (ruta errores, 59 s, sin errores).
+- Cap. 4 "Veces": diseñado (ARITHMOS_DESIGN.md) y con lógica probada (`src/logic/times.js`); escenas pendientes.
+- Pruebas: 40 unitarias; `keyboard-check.mjs`; `touch-probe.mjs` (12/12 marcas y 11/11 puntos
+  tocados con precisión en 844×390); partidas por interfaz de cada capítulo.
+- **Entorno:** la máquina la comparten otras sesiones que corren Chrome (otros worktrees y el
+  checkout principal). Las corridas largas y las mediciones de fps varían mucho con esa carga
+  (una misma escena tardó 31 s o 15 min); dos revisores se colgaron esperando al navegador.
+  No certificar rendimiento medido bajo carga.
 - Audio no escuchado; sin playtests humanos; sin dispositivo táctil real.
 
 ## Comandos
@@ -46,7 +48,7 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Reproducir el atasco táctil 844×390 (ruta errores, emparejar) y corregir.
-2. Nueva película del cap. 1 y segunda pasada de revisores (mat → narr → func).
-3. Revisión independiente del cap. 2 y pasada de dirección/voz.
-4. Capítulo 3 (La línea): recta, orden, negativos ("menos que nada", gancho del cap. 2), distancia, |x|.
+1. Aplicar los hallazgos de la revisión matemática (caps. 1–3) cuando llegue.
+2. Revisión narrativa de los caps. 2 y 3 (y segunda del 1), preferentemente sin navegador o con la máquina libre.
+3. Capítulo 4 "Veces": escenas sobre la lógica ya probada.
+4. Pasada visual del cap. 3 (línea, pozo) con películas por escena.

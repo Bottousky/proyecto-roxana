@@ -59,17 +59,18 @@ tiene un rasgo mínimo (tamaño, ritmo de parpadeo). Lino es el más chico.
 
 | Cap. | Título de trabajo | Cobertura | Estado |
 |---|---|---|---|
-| 1 | ¿Están todos? | A: correspondencia uno a uno, cardinalidad, más/menos por correspondencia, conservación, registro, número vs numeral | en producción |
-| 2 | Demasiados para marcar | A: agrupación, unidad, valor posicional, cero; B: suma/resta con significado | pendiente |
-| 3 | La línea | B: recta, orden, distancia, negativos, opuestos, valor absoluto; multiplicación como grupos y escala; división como reparto y medida | pendiente |
-| 4 | Partes de algo | C: fracciones, equivalencia, decimales, %, razón, proporción, unidades; inconmensurables, reales; exacto vs aproximado | pendiente |
-| 5 | Lo que no se ve | D: patrón, generalización, incógnita/variable/parámetro; expresión, identidad, ecuación; **"pasa sumando"**; desigualdades; sistemas | pendiente |
-| 6 | Crecer | E: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos | pendiente |
-| 7 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | pendiente |
-| 8 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | pendiente |
-| 9 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | pendiente |
-| 10 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | pendiente |
-| 11 | Anticipar | J: familias de funciones, parámetros, composición, inversa, tasa de cambio, límite/derivada/acumulación en su nivel | pendiente |
+| 1 | ¿Están todos? | A: correspondencia uno a uno, cardinalidad, más/menos, conservación, contar, número vs numeral | jugable, revisado (1.ª ronda) |
+| 2 | Demasiados para marcar | A: agrupación, unidad, valor posicional, cero; B: suma con canje, resta como comparación | jugable |
+| 3 | Menos que nada | B: signo, negativos, opuestos, orden, distancia, valor absoluto, suma y resta de enteros | jugable |
+| 4 | Veces | B: multiplicación como grupos y escala, división como reparto y medida, propiedades | pendiente |
+| 5 | Partes de algo | C: fracciones, equivalencia, decimales, %, razón, proporción, unidades; inconmensurables, reales; exacto vs aproximado | pendiente |
+| 6 | Lo que no se ve | D: patrón, generalización, incógnita/variable/parámetro; expresión, identidad, ecuación; **"pasa sumando"**; desigualdades; sistemas | pendiente |
+| 7 | Crecer | E: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos | pendiente |
+| 8 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | pendiente |
+| 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | pendiente |
+| 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | pendiente |
+| 11 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | pendiente |
+| 12 | Anticipar | J: familias de funciones, parámetros, composición, inversa, tasa de cambio, límite/derivada/acumulación en su nivel | pendiente |
 
 ## Capítulo 1 — ¿Están todos? (guion implementado)
 
@@ -160,6 +161,27 @@ también significa "restar" (se distinguen en la notación con paréntesis).
 Historia (fuentes.md, certeza alta): los signos "+" y "−" aparecen impresos en Widmann (1489)
 marcando exceso y faltante en problemas de comercio, no como operaciones; Brahmagupta (628)
 da reglas con "fortunas" y "deudas". Mencionarlo sólo en la Bitácora, como dato, no como origen.
+
+## Capítulo 4 — Veces (diseño, no implementado)
+
+Pregunta de entrada (gancho del cap. 3): cuatro familias de las Terrazas deben tres atados cada una:
+¿cuánto se debe en total? Idea central: **multiplicar es juntar grupos iguales y también estirar
+la línea desde el cero; dividir es repartir o medir; las dos cosas se deshacen entre sí; repartir
+entre nadie no tiene sentido.**
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 4.1 | Lo que deben las Terrazas | Multiplicar como grupos iguales | Juntar las deudas de a grupos; anticipar el total | 4 grupos de 3 = 12; con deudas, −12 |
+| 4.2 | Dar vuelta | Conmutativa con el rectángulo | ¿Girar el rectángulo cambia el total? | 4 filas de 3 y 3 filas de 4: los mismos 12 |
+| 4.3 | Estirar la línea | Multiplicar como escala; por −1 como reflejo | Anticipar dónde cae cada familia al estirar ×2 y al reflejar | −3 × 2 = −6; dos reflejos vuelven: (−1)(−1) = 1, visto, no recitado |
+| 4.4 | Repartir | División como reparto (de a uno, como emparejar) | Repartir 14 atados entre 4 familias | 3 cada una y sobran 2: el resto |
+| 4.5 | Medir | División como medida | ¿Cuántas bolsas de 3 se llenan con 12? | 4; repartir y medir dan el mismo número por caminos distintos |
+| 4.6 | Entre nadie | División por cero | Repartir entre cero familias; llenar bolsas de cero | No empieza nunca / no termina nunca: no tiene sentido |
+| 4.7 | Partir el rectángulo | Distributiva como transferencia | Partir 4 × 5 en 4 × 3 y 4 × 2 | 20 = 12 + 8; gancho: repartir 3 atados entre 4 → cap. 5 |
+
+Límites a declarar: la multiplicación no "siempre agranda" (× 1, × 0, × −1, y luego fracciones);
+el reflejo explica (−1)(−1) = 1 sin presentarlo como regla mágica; el resto depende de qué se
+pregunta (repartir atados enteros vs partirlos).
 
 ## Capítulo 6 (ecuaciones) — núcleo de "pasa sumando" (diseño conceptual, no implementado)
 
