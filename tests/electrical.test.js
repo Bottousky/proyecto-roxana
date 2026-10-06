@@ -127,11 +127,11 @@ test('saved completed state never bypasses electrical validation', () => {
   assert.equal(evaluatePuzzle('beacon_lens', s).solved, false);
 });
 
-test('commissioning only commits a currently operating network and never repeats a solved callback', () => {
+test('a working bench goes into service once, by its button or by leaving; a broken one never does', () => {
   const originalDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
   try {
-    for (const condition of ['working', 'broken-after-working', 'already-commissioned', 'replace-open-panel']) {
+    for (const condition of ['commission-button', 'leave-working', 'broken-after-working', 'already-commissioned', 'replace-open-panel']) {
       const state = initialPuzzleSnapshot('awaken');
       solutions.awaken(state);
       const events = [];
@@ -144,13 +144,14 @@ test('commissioning only commits a currently operating network and never repeats
       assert.equal(events.length, 0, 'stable readings alone must not commission');
       if (condition === 'broken-after-working') state.wires.pop();
       if (condition === 'already-commissioned') state.completed = true;
-      // Leaving never commissions; only the explicit decision does.
-      if (condition === 'working') { bench.close(true); assert.equal(state.completed, false, 'leaving must not put the installation into service'); events.length = 0; bench.active = true; bench.shell = { remove() {} }; }
-      bench.close(condition !== 'replace-open-panel', { commission: true });
-      assert.deepEqual(events, condition === 'working' ? ['solve', 'save', 'close'] : condition === 'replace-open-panel' ? [] : ['close']);
-      if (condition === 'working') assert.equal(state.completed, true);
+      if (condition === 'commission-button') bench.close(true, { commission: true });
+      else if (condition === 'replace-open-panel') bench.close(false);
+      else bench.close();
+      const working = ['commission-button', 'leave-working'].includes(condition);
+      assert.deepEqual(events, working ? ['solve', 'save', 'close'] : condition === 'replace-open-panel' ? [] : ['close'], condition);
+      assert.equal(state.completed, working || condition === 'already-commissioned', condition);
       bench.close();
-      assert.equal(events.filter(e => e === 'solve').length, condition === 'working' ? 1 : 0);
+      assert.equal(events.filter(e => e === 'solve').length, working ? 1 : 0);
     }
   } finally { globalThis.document = originalDocument; }
 });

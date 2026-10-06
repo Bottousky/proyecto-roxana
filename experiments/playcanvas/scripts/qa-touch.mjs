@@ -121,14 +121,14 @@ if (g.mode !== 'puzzle') { await capture('banco-no-abre'); note('banco-no-abre',
 assert.equal(g.mode, 'puzzle', 'tocar la mesa abre el banco del taller');
 await capture('banco-taller');
 // Con el tablero que se desplaza: continuidad tramo por tramo, con la mesa apagada.
-if (await page.locator('[data-action="power"].on').count()) await tapEl('[data-action="power"]');
-const tools = page.locator('[data-drawer="tools"] summary'); if (await tools.count() && await tools.isVisible()) await tapEl('[data-drawer="tools"] summary');
+// El probador apaga la mesa por sí solo: el paso pide sólo elegirlo y apoyar las puntas.
 await tapEl('[data-action="mode"][data-mode="continuity"]');
+assert.equal(await page.evaluate(() => window.__ohmdal.workbench.state.sourceOn), false, 'el probador de camino apaga la mesa solo');
 for (const [a, b] of [['s1a', 's1b'], ['s2a', 's2b']]) { for (const p of [a, b]) { const t = page.locator(`.wb-board button[data-port="${p}"]`); await t.scrollIntoViewIfNeeded(); const box = await t.boundingBox(); await touch(box.x + box.width / 2, box.y + box.height / 2); await page.waitForTimeout(150); } }
 await tapEl('[data-action="mode"][data-mode="wire"]');
 for (const p of ['s2a', 's2b']) { const t = page.locator(`.wb-board button[data-port="${p}"]`); await t.scrollIntoViewIfNeeded(); const box = await t.boundingBox(); await touch(box.x + box.width / 2, box.y + box.height / 2); await page.waitForTimeout(150); }
-await tapEl('[data-action="power"]'); await page.waitForTimeout(400);
-assert.equal((await game()).puzzle?.solved, true, 'el banco del taller se resuelve tocando');
+await page.waitForTimeout(400);
+assert.equal((await game()).puzzle?.solved, true, 'el banco del taller se resuelve tocando, sin encender nada a mano');
 await tapEl('.wb-success [data-action="commission"]');
 for (let i = 0; i < 80; i++) { g = await game(); if (g.mode === 'cinematic') { await page.waitForTimeout(300); continue; } if (g.mode === 'dialogue') { await read(); continue; } if (g.mode === 'world') break; await page.waitForTimeout(200); }
 assert.equal((await game()).flags.workshop, true, 'el taller quedó en servicio');

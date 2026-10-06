@@ -18,7 +18,8 @@ function bench(id, state = initialPuzzleSnapshot(id)) {
   b.html = () => { const previous = globalThis.document; globalThis.document = { activeElement: null }; try { b.render(); } finally { globalThis.document = previous; } return shell.innerHTML; };
   return b;
 }
-const instruction = html => html.match(/class="wb-instruction">.*?<\/span>(.*?)<\/p>/s)?.[1] ?? '';
+// What Ohm says in the dock: one sentence at a time.
+const instruction = html => html.match(/class="wb-say[^"]*"[^>]*>.*?<p><b>[^<]*<\/b>(.*?)<\/p>/s)?.[1] ?? '';
 
 test('every bench ends its hints with a concrete step that names real terminals', () => {
   for (const id of Object.keys(PUZZLES)) {
@@ -38,22 +39,46 @@ test('the hint button announces when the next help is a concrete step', () => {
   assert.match(b.html(), /Mostrame un paso para probar/);
 });
 
-test('with the supply on, the board says to switch it off before wiring', () => {
+test('the board never asks to switch off: a cable is taken at once and the places it can go are marked', () => {
   const previous = globalThis.document;
   globalThis.document = { activeElement: null };
   try {
   const b = bench('distribution');
-  assert.match(instruction(b.html()), /apagá la alimentación para mover cables/);
+  assert.doesNotMatch(b.html(), /apagá|Apagar alimentación|Encender alimentación|data-action="power"/);
+  assert.equal(instruction(b.html()), BENCH_GUIDANCE.distribution.steps[0].how.replace(/«/g, '«'), 'Ohm says what can be touched for the first item of the brief');
   b.touchPort('clinicOut');
-  assert.equal(b.blockedBySupply, true);
-  assert.match(b.html(), /wb-power on\s+wb-next-step/, 'the power switch is highlighted as the next step');
-
-  b.state.sourceOn = false; b.blockedBySupply = false; b.evaluate(false);
-  assert.match(instruction(b.html()), /Tocá un cable para retirarlo/);
-  b.handleClick({ target: { closest: () => ({ dataset: { wire: '1' }, tagName: 'g' }) } });
-  assert.equal(b.pendingTest, true);
-  assert.match(instruction(b.html()), /encendé la alimentación para probar/);
+  assert.equal(b.selected, 'clinicOut', 'the cable is in hand without a procedure');
+  const html = b.html();
+  assert.match(instruction(html), /Tenés el cable tomado de Enfermería −/);
+  assert.match(html, /wb-terminal[^"]*wb-can-join[^"]*" data-node="[^"]*" data-port="negative"/, 'the return terminal is marked as a place it can go');
   } finally { globalThis.document = previous; }
+});
+
+test('every bench names one goal, one step for each item of the brief and at most one instrument', () => {
+  for (const [id, p] of Object.entries(PUZZLES)) {
+    const g = BENCH_GUIDANCE[id], b = bench(id);
+    assert.ok(g.goal && g.goal.length <= 80, `${id}: the goal fits in a line («${g.goal}»)`);
+    assert.equal(g.steps.length, p.criteria.length, `${id}: each item of the brief says what can be touched`);
+    assert.ok(g.tools.length <= 1, `${id}: a single instrument`);
+    const labels = new Set(p.ports.map(n => b.portLabel(n.id)));
+    for (const step of g.steps) for (const [, named] of step.how.matchAll(/«([^»]+)»/g)) assert.ok(labels.has(named), `${id}: «${named}» is a terminal on this bench`);
+    for (const step of g.steps) if (step.tool && step.tool !== 'wire') assert.equal(step.tool, g.tools[0], `${id}: a step only asks for the bench's own instrument`);
+    const html = b.html();
+    assert.match(html, new RegExp(g.goal.replace(/[.*+?^${}()|[\]\\→]/g, '.')), `${id}: the goal is on screen`);
+    assert.equal((html.match(/<li class="[^"]*"><span class="wb-check-mark"/g) ?? []).length, p.criteria.length);
+  }
+});
+
+test('a working, proven bench shows one way forward and what was learned', () => {
+  for (const [id, p] of Object.entries(PUZZLES)) {
+    const s = initialPuzzleSnapshot(id); p.solve(s); s.sourceOn = true; s.tripped = false;
+    if (id === 'distribution') s.switches.kitchen = true;
+    const html = bench(id, s).html();
+    assert.match(html, /class="wb-success"/, `${id}: the success card is on the board`);
+    assert.equal((html.match(/data-action="commission"/g) ?? []).length, 1, `${id}: one button carries the story on`);
+    assert.match(html, /Lo que aprendiste/);
+    assert.doesNotMatch(html, /data-action="hint"/, `${id}: no hints once it works`);
+  }
 });
 
 test('the first bench never asks to switch off: Ohm is wired live and gently', () => {

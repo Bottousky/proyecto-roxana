@@ -244,16 +244,10 @@ async function travel(id, target) {
 }
 
 async function setMode(mode) {
-  const selector = `[data-action="mode"][data-mode="${mode}"]`;
-  const control = page.locator(selector);
-  if (!(await control.count())) {
-    assert.equal((await inspect()).puzzle.mode, mode, 'The first bench already starts in its only available tool');
-    return;
-  }
-  const extraTools = page.locator('[data-drawer="tools"]');
-  if (await extraTools.locator(selector).count() && !await extraTools.evaluate(element => element.open)) {
-    await extraTools.locator('summary').click();
-  }
+  if ((await inspect()).puzzle.mode === mode) return;
+  const control = page.locator(`[data-action="mode"][data-mode="${mode}"]`);
+  // An instrument button toggles; with no cables to lay, putting it down is pressing it again.
+  if (!(await control.count()) && mode === 'wire') { await page.locator('[data-action="mode"].active').click(); return; }
   await control.click();
 }
 async function showNumericReadings() {
@@ -270,9 +264,8 @@ async function removeWire(a, b) {
   const wires = (await inspect()).puzzle.state.wires;
   const index = wires.findIndex(w => w.includes(a) && w.includes(b));
   assert.ok(index >= 0, `The physical cable ${a} ↔ ${b} exists before removal`);
-  const drawer = page.locator('.wb-wire-drawer');
-  if (!await drawer.evaluate(element => element.open)) await drawer.locator('summary').click();
-  await page.locator(`button[data-wire="${index}"]`).click();
+  // Each hand cable carries its own remove button on the board.
+  await page.locator(`button.wb-wire-chip[data-wire="${index}"]`).click();
 }
 async function knob(key, value) {
   const input = page.locator(`input[data-knob="${key}"]:visible`);
@@ -309,7 +302,6 @@ async function solvePanel(objectId, id) {
     await measure('voltage', 'pumpIn', 'pumpOut');
   }
   if (id === 'awaken') assert.equal(await page.locator('[data-action="mode"]').count(), 0, 'The first encounter does not introduce instrument modes');
-  if (id !== 'awaken' && info.puzzle.state.sourceOn && !info.puzzle.state.tripped) await page.locator('[data-action="power"]').click();
   if (id === 'workshop') {
     assert.match(await measure('continuity', 'spliceA', 'spliceB'), /ABIERTO/, 'Continuity exposes the concealed break');
     await screenshot('workshop-continuity-open');
@@ -333,15 +325,13 @@ async function solvePanel(objectId, id) {
       await wire('bearingOut', 'negative'); await wire('positive', 'signalIn'); break;
     case 'beacon_lens':
       // Nereo's comparison, first half: the tap with the lens elsewhere.
-      if (!(await inspect()).puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
       await measure('voltage', 'tap', 'negative');
-      await page.locator('[data-action="power"]').click(); await setMode('wire');
+      await setMode('wire');
       await removeWire('positive', 'lensIn'); await wire('tap', 'lensIn'); await knob('upper', 12); break;
     default: throw new Error(`No UI repair sequence for ${id}`);
   }
   info = await inspect();
-  if (info.puzzle.state.tripped) await page.locator('[data-action="rearm"]').click();
-  else if (!info.puzzle.state.sourceOn) await page.locator('[data-action="power"]').click();
+  assert.equal(info.puzzle.state.tripped, false, `${id}: the repair does not trip the protection`);
   if (id === 'distribution') {
     // Ivara's request: show the infirmary lit while the kitchen is isolated, then reopen it.
     await page.locator('.wb-proof').waitFor({ state: 'visible' });
@@ -358,9 +348,10 @@ async function solvePanel(objectId, id) {
   }
   await page.locator('.wb-success:not(.wb-proof)').waitFor({ state: 'visible' });
   assert.equal((await inspect()).puzzle.result.solved, true, `${id}: electrical model verifies UI repair`);
-  if (id === 'beacon_lens') await measure('voltage', 'lensIn', 'lensOut');
   await screenshot(`${id}-operating`);
-  await page.locator('.wb-success [data-action="commission"]').first().click();
+  // Looking at the board after it works keeps the way forward in the header.
+  if (id === 'beacon_lens') { await page.locator('[data-action="stay"]').click(); await measure('voltage', 'lensIn', 'lensOut'); }
+  await page.locator('[data-action="commission"]:visible').first().click();
   await settle({ timeout: 40000 });
   assert.equal((await inspect()).flags[id], true, `${id}: putting in service persists the repair`);
   log('commissioned', { id });
@@ -430,8 +421,8 @@ try {
   const commissioned = (await inspect()).puzzle;
   assert.equal(commissioned?.id, 'beacon_lens', 'A restored mechanism remains inspectable');
   assert.equal(commissioned.state.completed, true);
-  assert.equal(await page.locator('[data-action="power"],[data-action="rearm"]').first().isDisabled(), true, 'Commissioned supply control is secured');
-  assert.equal(await page.locator('[data-action="reset"]').isDisabled(), true, 'Commissioned topology cannot be reset');
+  assert.equal(await page.locator('input[data-knob]:visible').first().isDisabled(), true, 'Commissioned dial is secured');
+  assert.equal(await page.locator('[data-action="reset"],[data-action="undo"],button.wb-wire-chip').count(), 0, 'Commissioned topology cannot be reset or rewired');
   await measure('voltage', 'lensIn', 'lensOut');
   assert.deepEqual((await inspect()).puzzle.state.wires, commissioned.state.wires, 'Read-only measurement preserves connections');
   await screenshot('commissioned-lens-measurement');

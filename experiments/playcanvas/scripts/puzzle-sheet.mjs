@@ -41,13 +41,13 @@ for (const [id, p] of Object.entries(PUZZLES)) {
     if (!informative) silent++;
     return { label, solved: r.solved, trips: r.overloaded, says: say(says), informative };
   });
-  out.push({ id, title: p.title, understanding: p.lesson, clue: p.observation, brief: p.brief, proof: p.proof?.request || null, firstHint: BENCH_GUIDANCE[id]?.hints?.[0], consequence: PUZZLE_STORY[id]?.complete || null, solvedSays: say(goodSays), solvedOk: good.solved, rows });
+  out.push({ id, title: p.title, understanding: p.lesson, clue: p.observation, brief: p.brief, proof: p.proof?.request || null, goal: BENCH_GUIDANCE[id]?.goal, steps: (p.criteria ?? []).map((c, i) => `${c.text}: ${BENCH_GUIDANCE[id]?.steps?.[i]?.how ?? ''}`), learned: BENCH_GUIDANCE[id]?.learned, firstHint: BENCH_GUIDANCE[id]?.hints?.[0], consequence: PUZZLE_STORY[id]?.complete || null, solvedSays: say(goodSays), solvedOk: good.solved, rows });
 }
 
 if (md) {
   for (const b of out) {
     console.log(`### ${b.title} (\`${b.id}\`)\n`);
-    console.log(`- **Comprensión buscada:** ${b.understanding}\n- **Pista observable:** ${b.clue}\n- **Acción posible:** ${b.brief}${b.proof ? `\n- **Comprobación pedida:** ${b.proof}` : ''}\n- **Primera ayuda:** ${b.firstHint}\n- **Descubrimiento (solución):** ${b.solvedSays}\n- **Consecuencia:** diálogo \`${b.consequence}\` y restauración en el mundo.\n`);
+    console.log(`- **Objetivo en pantalla:** ${b.goal}\n- **Pasos y qué se puede tocar:**\n${b.steps.map((s, i) => `  ${i + 1}. ${s}`).join('\n')}\n- **Lo que aprendiste (al resolver):** ${b.learned}\n- **Comprensión buscada:** ${b.understanding}\n- **Pista observable:** ${b.clue}\n- **Acción posible:** ${b.brief}${b.proof ? `\n- **Comprobación pedida:** ${b.proof}` : ''}\n- **Primera ayuda:** ${b.firstHint}\n- **Descubrimiento (solución):** ${b.solvedSays}\n- **Consecuencia:** diálogo \`${b.consequence}\` y restauración en el mundo.\n`);
     console.log('| Intento equivocado | ¿Resuelve? | Lo que dice el banco |\n|---|---|---|');
     for (const r of b.rows) console.log(`| ${r.label} | ${r.solved ? 'sí' : r.trips ? 'no · protección' : 'no'}${r.informative ? '' : ' · **sin señal distinta**'} | ${r.says.replace(/\|/g, '/')} |`);
     console.log('');
