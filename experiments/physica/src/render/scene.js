@@ -4,8 +4,8 @@
 // anything else: it crests over the high Terraza and falls again, familiarly, past the
 // railing. Two ordinary falls frame the anomaly.
 import * as THREE from 'three';
-import { rockMaterial, strataBlock } from './rock.js';
-import { waterMaterial, waterTube, waterSheet, fieldPath } from './water.js';
+import { rockMaterial, strataBlock, setWetZones } from './rock.js';
+import { waterMaterial, waterTube, waterSheet, fieldPath, foamMound } from './water.js';
 import { Particles } from './particles.js';
 import { Moss, Plumbs } from './flora.js';
 import { makeMaterials, Stand, sphereMesh, fieldAnchor, conduit, Traces, chainProp, Bell, ApexMarks } from './props.js';
@@ -46,6 +46,16 @@ export function buildScene(world, { quality = 'high' } = {}) {
   scene.add(sun, sun.target);
 
   const M = makeMaterials();
+  // Rock wetted by water: the chasm pool's walls and floor, the cascade's landing on the
+  // Terraza, the left fall's basin, the right fall's shelf and the Pozo's water line.
+  setWetZones([
+    [0, -5, -3.6, 4.5, -3.35, 1.6],
+    [4.5, 4.2, -2.8, 6.6, 4.5, -0.7],
+    [-21.8, -0.4, -3.6, -18.8, 0.25, -0.6],
+    [19.5, -1.8, -3.6, 23.5, -1.2, 1.6],
+    [11, -1.2, -3.6, 12.6, -0.45, 1.6],
+    [4.35, 2.6, -2.6, 4.65, 4.45, -0.8],   // the Terraza's face where the crest spills over
+  ]);
   const rock = rockMaterial({ mossAmount: 1 });
   rock.side = THREE.DoubleSide;
   const add = (geo, mat = rock, shadow = true) => { const m = new THREE.Mesh(geo, mat); m.receiveShadow = true; m.castShadow = shadow; scene.add(m); return m; };
@@ -116,31 +126,55 @@ export function buildScene(world, { quality = 'high' } = {}) {
   for (let i = -3; i <= 3; i++) { const bar = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.04, 1.3), M.brassDark); bar.position.set(DRAIN_X + i * 0.1, 0.205, Z_STREAM); scene.add(bar); }
   // Water: everything from the field.
   const water = [];
-  const mkWater = (geo, opts) => { const m = waterMaterial(opts); const mesh = new THREE.Mesh(geo, m); mesh.renderOrder = 3; scene.add(mesh); water.push(m); return mesh; };
+  // Draw order for transparent water: sheets (2), then streams (3), then foam (4); sorting by
+  // bounding-sphere centre let the chasm pool cover the column's root.
+  const mkWater = (geo, opts, order = 3) => { const m = waterMaterial(opts); const mesh = new THREE.Mesh(geo, m); mesh.renderOrder = order; scene.add(mesh); water.push(m); return mesh; };
+  const mkSheet = (geo, opts) => mkWater(geo, opts, 2), mkFoam = (geo, opts) => mkWater(geo, { veil: 1, opacity: 0.85, ...opts }, 4);
+  // Each stream is a body plus a torn, foamy veil around it (apparent volume without a fluid
+  // simulation); foam mounds where water wells up or lands.
+  const stream = (path, o, mat = {}) => {
+    mkWater(waterTube(path, o), { streak: 1.3, wobble: 0.025, ...mat });
+    mkWater(waterTube(path, { ...o, thick: o.thick * 1.55, wide: o.wide * 1.18, segs: 18 }), { streak: 1.3, veil: 1, wobble: 0.07, opacity: 0.85, ...mat });
+  };
   const leftFall = fieldPath(field, -20.3, 7.6, 0.9, 0, p => p.y <= 0.05);
-  mkWater(waterTube(leftFall, { zc: -3.05, thick: 0.5, wide: 1.2, foamStart: 0.15, foamEnd: 0.3, spread: 0.5 }), { streak: 1.2 });
-  mkWater(waterSheet({ x0: -21.4, x1: -19.2, y: 0.03, z0: -3.5, z1: -0.9, speed: 0.8, foamAt: [{ x: -20.1, r: 1.2 }] }), { opacity: 0.85 });
-  mkWater(waterSheet({ x0: -19.4, x1: DRAIN_X, y: 0.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: DRAIN_X, r: 0.8 }], tOffset: -19.4 / STREAM_SPEED }), { streak: 1.4 });
+  stream(leftFall, { zc: -3.05, thick: 0.5, wide: 1.2, foamStart: 0.15, foamEnd: 0.3, spread: 0.5 });
+  const lfEnd = leftFall[leftFall.length - 1];
+  mkFoam(foamMound({ x: lfEnd.x, y: 0.03, z: -2.95, r: 0.5, h: 0.4 }), { wobble: 0.05 });
+  mkSheet(waterSheet({ x0: -21.4, x1: -18.9, y: 0.03, z0: -3.5, z1: -0.9, speed: 0.8, foamAt: [{ r: 1.0 }], radial: { x: lfEnd.x, z: -3.05 } }), { opacity: 0.9 });
+  mkSheet(waterSheet({ x0: -18.9, x1: DRAIN_X, y: 0.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: DRAIN_X, r: 0.8 }], tOffset: -18.9 / STREAM_SPEED }), { streak: 1.4 });
   // The chasm pool, and the water that wells up from it and rises: integrated from the field.
   const spring = world.level.spring;
-  mkWater(waterSheet({ x0: 0.05, x1: 4.45, y: -3.86, z0: -3.45, z1: 1.45, speed: 0.4, foamAt: [{ x: spring.x, r: 1.3 }] }), { opacity: 0.88 });
-  const arch = fieldPath(field, spring.x, spring.y, spring.vx, 0, p => p.vy < 0 && p.y <= TERRACE_Y + 0.04 && p.x > 4.6);
-  arch.unshift({ x: spring.x - 0.05, y: -3.86, vx: 0.2, vy: 0.4, t: -0.25 });
-  const archMesh = mkWater(waterTube(arch, { zc: -2.15, thick: 0.62, wide: 2.3, foamStart: 0.5, foamEnd: 0.32, spread: 0.2 }), { streak: 1.5 });
+  // The chasm pool: ripples travel outward from where the water wells up.
+  mkSheet(waterSheet({ x0: 0.05, x1: 4.45, y: -3.86, z0: -3.45, z1: 1.45, speed: 0.35, foamAt: [{ r: 0.9 }], radial: { x: spring.x, z: Z_STREAM } }), { opacity: 0.95, deep: '#0f5a63', shallow: '#3aa9a6' });
+  const arch = fieldPath(field, spring.x, spring.y, spring.vx, spring.vy, p => p.vy < 0 && p.y <= TERRACE_Y + 0.04 && p.x > 4.6);
+  // The crest is where the column slows to its apex: there it widens and breaks into froth.
+  const apexI = arch.reduce((bi, p, i) => (p.y > arch[bi].y ? i : bi), 0), apexT = arch[apexI].t;
+  // Same width and lane as the channels it joins; glassy where it wells up, white only where it
+  // breaks at the crest and where it lands (the familiar falls are white at their foot instead).
+  stream(arch, { zc: Z_STREAM, thick: 0.6, wide: 1.3, foamStart: 0.12, foamEnd: 0.32, spread: 0, foamAt: [{ t: apexT, dt: 0.35, w: 0.6 }] }, { streak: 1.5 });
+  const archMesh = null;
+  mkFoam(foamMound({ x: spring.x, y: -3.86, z: Z_STREAM, r: 0.5, h: 0.28 }), { wobble: 0.04 });
+  // The crest: where the column turns over, the water spreads into a torn crown of froth
+  // (a stream cannot stay a thick ribbon around a curve tighter than its own thickness).
+  const ap = arch[apexI];
+  mkFoam(foamMound({ x: ap.x, y: ap.y - 0.32, z: Z_STREAM, r: 0.58, h: 0.62 }), { wobble: 0.06 });
   const land = arch[arch.length - 1];
+  mkFoam(foamMound({ x: land.x + 0.1, y: TERRACE_Y + 0.03, z: Z_STREAM, r: 0.45, h: 0.3 }), { wobble: 0.05 });
   curb(land.x - 0.4, 18.9, TERRACE_Y, Z_STREAM + 0.82); curb(land.x - 0.4, 18.9, TERRACE_Y, Z_STREAM - 0.82);
   // The Terraza's stream crosses the Pozo on a small aqueduct.
   const aq = new THREE.Mesh(new THREE.BoxGeometry(WELL.x1 - WELL.x0 + 0.3, 0.42, 1.75), M.stone); aq.position.set((WELL.x0 + WELL.x1) / 2, TERRACE_Y - 0.21, Z_STREAM); aq.castShadow = aq.receiveShadow = true; scene.add(aq);
   // Water at the bottom of the Pozo, and two seeping pipes in its wall: above the region's
   // floor their drops rise, below it they fall.
-  mkWater(waterSheet({ x0: WELL.x0 + 0.02, x1: WELL.x1 - 0.02, y: WELL.floorY + 0.28, z0: Z_BACK, z1: Z_FRONT - 0.1, speed: 0.2 }), { opacity: 0.88 });
+  mkSheet(waterSheet({ x0: WELL.x0 + 0.02, x1: WELL.x1 - 0.02, y: WELL.floorY + 0.28, z0: Z_BACK, z1: Z_FRONT - 0.1, speed: 0.2 }), { opacity: 0.88 });
   for (const py of [WELL.regionY0 + 0.75, WELL.regionY0 - 0.5]) {
     const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.3, 10), M.brassDark); pipe.rotation.z = Math.PI / 2; pipe.position.set(WELL.x0 + 0.12, py, -1.2); scene.add(pipe);
   }
-  mkWater(waterSheet({ x0: land.x - 0.3, x1: 19.55, y: TERRACE_Y + 0.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: land.x, r: 1.0 }], tOffset: land.t }), { streak: 1.4 });
+  mkSheet(waterSheet({ x0: land.x - 0.3, x1: 19.55, y: TERRACE_Y + 0.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: land.x, r: 1.0 }], tOffset: land.t }), { streak: 1.4 });
   const rightFall = fieldPath(field, 19.55, TERRACE_Y + 0.03, 1.5, 0, p => p.y <= -1.45);
-  mkWater(waterTube(rightFall, { zc: Z_STREAM, thick: 0.46, wide: 1.5, foamStart: 0.15, foamEnd: 0.3, spread: 0.5 }), { streak: 1.2 });
-  mkWater(waterSheet({ x0: 19.6, x1: 23.5, y: -1.47, z0: -3.4, z1: 1.2, speed: 0.9, foamAt: [{ x: rightFall[rightFall.length - 1].x, r: 1.4 }] }), { opacity: 0.85 });
+  stream(rightFall, { zc: Z_STREAM, thick: 0.46, wide: 1.5, foamStart: 0.15, foamEnd: 0.3, spread: 0.5 });
+  const rfEnd = rightFall[rightFall.length - 1];
+  mkFoam(foamMound({ x: rfEnd.x, y: -1.47, z: Z_STREAM, r: 0.6, h: 0.4 }), { wobble: 0.05 });
+  mkSheet(waterSheet({ x0: 19.6, x1: 23.5, y: -1.47, z0: -3.4, z1: 1.2, speed: 0.9, foamAt: [{ r: 1.3 }], radial: { x: rfEnd.x, z: Z_STREAM } }), { opacity: 0.9 });
 
   // Particles: spray off the water, pollen over the chasm.
   const parts = new Particles(field, quality === 'low' ? 700 : 1500);
@@ -152,10 +186,11 @@ export function buildScene(world, { quality = 'high' } = {}) {
       vy: p.vy * (0.8 + ps.rnd() * 0.4) + (ps.rnd() - 0.5) * 0.8, vz: (ps.rnd() - 0.5) * 1.2, life: 0.8 + ps.rnd() * 1.4, size: 0.05 + ps.rnd() * 0.07, alpha: 0.75, color, drag: 0.6 };
   };
   const k = quality === 'low' ? 0.5 : 1;
-  arch.zc = -2.15; arch.wide = 2.2;
+  arch.zc = Z_STREAM; arch.wide = 1.3;
   parts.addEmitter({ rate: 60 * k, make: sprayFrom(arch, 0.04, 0.06) });
   parts.addEmitter({ rate: 70 * k, make: sprayFrom(arch, 0.55, 0.7) });
-  parts.addEmitter({ rate: 60 * k, make: sprayFrom(arch, 0.82, 0.12) });
+  const apexF = apexI / (arch.length - 1);
+  parts.addEmitter({ rate: 110 * k, make: sprayFrom(arch, apexF, 0.1) });   // the crest breaking
   parts.addEmitter({ rate: 50 * k, make: sprayFrom(arch, 0.98, 0.04) });
   parts.addEmitter({ rate: 40 * k, make: sprayFrom(leftFall, 0.97, 0.06) });
   parts.addEmitter({ rate: 30 * k, make: sprayFrom(rightFall, 0.97, 0.06) });
@@ -163,7 +198,7 @@ export function buildScene(world, { quality = 'high' } = {}) {
   // (the rising drops fade before reaching the aqueduct's stone; particles do not collide)
   for (const py of [WELL.regionY0 + 0.75, WELL.regionY0 - 0.5]) parts.addEmitter({ rate: 7 * k, make: ps => ({ x: WELL.x0 + 0.3, y: py, z: -1.2 + (ps.rnd() - 0.5) * 0.1,
     vx: 0.35 + ps.rnd() * 0.15, vy: 0, life: py > WELL.regionY0 ? 1.15 : 1.0, size: 0.06, alpha: 0.85, color: [0.8, 0.97, 1], drag: 0.3 }) });
-  parts.addEmitter({ rate: 9 * k, make: ps => { const p = pick(arch, 0.7 + ps.rnd() * 0.25); return { x: p.x + (ps.rnd() - 0.5), y: p.y, z: -2.15 + (ps.rnd() - 0.4) * 2.4, vx: (ps.rnd() - 0.5) * 0.3, vy: 0, life: 3 + ps.rnd() * 2, size: 0.9 + ps.rnd() * 0.8, alpha: 0.12, color: [1, 0.98, 0.95], drag: 4 }; } });
+  parts.addEmitter({ rate: 9 * k, make: ps => { const p = pick(arch, 0.7 + ps.rnd() * 0.25); return { x: p.x + (ps.rnd() - 0.5), y: p.y, z: Z_STREAM + (ps.rnd() - 0.5) * 1.8, vx: (ps.rnd() - 0.5) * 0.3, vy: 0, life: 3 + ps.rnd() * 2, size: 0.9 + ps.rnd() * 0.8, alpha: 0.12, color: [1, 0.98, 0.95], drag: 4 }; } });
   // Pollen from the chasm moss: heavy drag, so it drifts at its terminal speed.
   parts.addEmitter({ rate: 26 * k, make: ps => ({ x: 0.2 + ps.rnd() * 4.1, y: -4.3 + ps.rnd() * 6, z: -3.2 + ps.rnd() * 4.6, vx: 0, vy: 0, vz: 0,
     life: 7 + ps.rnd() * 6, size: 0.035 + ps.rnd() * 0.03, alpha: 0.9, color: [1, 0.93, 0.66], drag: 3.2 }) });
@@ -248,7 +283,9 @@ export function buildScene(world, { quality = 'high' } = {}) {
   // The descent chain, the bell at the Terraza's height, and chalk marks of the explorer's peaks.
   const chainGs = world.chains.map(ch => { const g = chainProp(ch, M); g.userData.id = ch.id; scene.add(g); return g; });
   const bells = new Map(world.bells.map(bl => {
-    const b = bl.id === 'pozo' ? new Bell(bl, MIRADOR_Y, M, WELL.x1 + 0.35) : new Bell(bl, TERRACE_Y, M, 4.95);
+    // The cascade's bell hangs from the Orilla side (beside the plumb mast): a gallows from the
+    // Terraza crossed the column right at its crest and sliced it visually.
+    const b = bl.id === 'pozo' ? new Bell(bl, MIRADOR_Y, M, WELL.x1 + 0.35) : new Bell(bl, 0, M, -0.42);
     scene.add(b.group); return [bl.id, b];
   }));
   const apexMarks = new ApexMarks(scene, M, { bellLine: BELL_LINE });

@@ -7,7 +7,17 @@ import { join } from 'node:path';
 const url = process.argv[2] || 'http://127.0.0.1:4210/';
 const out = process.argv[3] || 'shots-out';
 mkdirSync(out, { recursive: true });
-const SHOTS = [
+const SETS = {
+  agua: [
+    { name: 'w1-afloramiento', explorer: [-1.2, 0], cam: [2.6, -3.0, 6] },
+    { name: 'w2-columna', explorer: [-1.2, 0], cam: [2.8, 0.6, 10] },
+    { name: 'w3-cresta', explorer: [-1.2, 0], cam: [4.3, 4.6, 6] },
+    { name: 'w4-llegada', explorer: [-1.2, 0], cam: [6.0, 4.4, 6] },
+    { name: 'w5-caida-izquierda', explorer: [-16, 0], cam: [-19.5, 3, 9] },
+    { name: 'w6-juego', explorer: [-1.2, 0], cam: null },
+  ],
+};
+const SHOTS = SETS[process.argv[4]] || [
   { name: 'a-inicio', explorer: [-16, 0], cam: null },
   { name: 'b-cascada', explorer: [-1.2, 0], cam: null },
   { name: 'c-pozo', explorer: [10.5, 4.4], cam: null },

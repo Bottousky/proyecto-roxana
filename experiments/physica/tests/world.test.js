@@ -164,12 +164,14 @@ test('determinism: the same inputs give bit-identical states', () => {
 // The water rises from the bottom of the chasm — the deepest start — and crests over the Terraza.
 test('the water rising from the chasm floor crests over the Terraza and lands on it', () => {
   const w = fresh(), sp = CASCADA.spring;
-  const path = ballisticPath(w.field, sp.x, sp.y, sp.vx, 0, { steps: 2400 });
+  const path = ballisticPath(w.field, sp.x, sp.y, sp.vx, sp.vy, { steps: 2400 });
   const down = path.find((p, i) => i > 0 && p.vy < 0 && p.y <= TERRACE_Y + 0.02 && p.x > 4.5);
   const peak = path.reduce((m, p) => Math.max(m, p.y), -Infinity);
   assert.ok(peak > TERRACE_Y, `crest at ${peak}`);
   assert.ok(down && down.x > 4.6, `comes down on the Terraza at x=${down?.x}`);
   assert.ok(path.filter(p => p.x < 4.5).every(p => p.x > 0), 'stays in the chasm until it crests');
+  // it rises clear of the Terraza's face (no water sliding on the cliff)
+  assert.ok(Math.max(...path.filter(p => p.y > 2.5 && p.y < TERRACE_Y && p.vy > 0).map(p => p.x)) < 4.2, 'clear of the face while rising');
 });
 
 // Redesign (iter 2): from the lip the explorer must fall short — a safe failure that informs.

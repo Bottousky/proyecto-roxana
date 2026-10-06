@@ -40,17 +40,25 @@ async function sheet(name, shots, cols = 4, label = '') {
     return c.toDataURL('image/png').split(',')[1];
   }, { b64, cols, rows, w, h, labels: shots.map(s => s.label), label });
   await p2.close();
+  // The sheet is composed in a second tab; headless Chrome can leave the game tab in the
+  // background with requestAnimationFrame stopped (the simulation then froze for minutes).
+  await page.bringToFront();
   writeFileSync(join(out, `${name}.png`), Buffer.from(png, 'base64'));
 }
 
-async function walkTo(x, { tolerance = 0.15, max = 12000 } = {}) {
+// Budgets are in simulated time: under machine load the simulation runs slower than the wall
+// clock, and a wall-clock budget made the explorer stop short (seen at x ≈ −5.6).
+async function walkTo(x, { tolerance = 0.15, simMax = 20, wallMax = 180000 } = {}) {
+  await page.bringToFront();
   let s = await state();
   const key = s.avatar.x < x ? 'ArrowRight' : 'ArrowLeft', dir = Math.sign(x - s.avatar.x);
   await page.keyboard.down(key);
-  const t0 = Date.now();
-  while (Date.now() - t0 < max) { s = await state(); if ((s.avatar.x - x) * dir >= -tolerance) break; await sleep(16); }
+  const t0 = Date.now(), s0 = s.t;
+  let reached = false;
+  while (Date.now() - t0 < wallMax && s.t - s0 < simMax) { s = await state(); if ((s.avatar.x - x) * dir >= -tolerance) { reached = true; break; } await sleep(16); }
   await page.keyboard.up(key);
   await sleep(350);
+  if (!reached) throw new Error(`walkTo(${x}) did not arrive: explorer at ${s.avatar.x.toFixed(2)} after ${(s.t - s0).toFixed(1)} s simulated`);
   return state();
 }
 

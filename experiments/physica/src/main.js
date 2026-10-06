@@ -35,13 +35,38 @@ const explorer = new Explorer(world.field);
 explorer.addTo(scene);
 
 const camera = new THREE.PerspectiveCamera(32, 1, 0.3, 600);
-const cam = params.has('nointro') ? { x: world.avatar.x, y: 1.2, dist: 11.5, elev: 0.2 } : { x: 1.4, y: 0.6, dist: 17, elev: 0.2 };
+// Upload every texture and compile every program before play: an object or painting that
+// first enters the view mid-game must not stall a frame (measured: a 250 ms hitch otherwise).
+function warmUp() {
+  const t0 = performance.now();
+  scene.traverse(o => {
+    const mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+    for (const m of mats) for (const v of Object.values(m)) if (v && v.isTexture && v.image) renderer.initTexture(v);
+    for (const m of mats) if (m.uniforms) for (const u of Object.values(m.uniforms)) if (u.value && u.value.isTexture && u.value.image) renderer.initTexture(u.value);
+  });
+  const hidden = []; scene.traverse(o => { if (!o.visible) { hidden.push(o); o.visible = true; } });
+  renderer.compile(scene, camera);
+  // One full render of the whole level from a wide camera, with the sun's shadow frustum
+  // covering everything: geometry buffers and shadow-depth variants are created now, not when
+  // each part first scrolls into view.
+  const wide = new THREE.PerspectiveCamera(60, 16 / 9, 0.3, 600); wide.position.set(0, 4, 48); wide.lookAt(0, 2, 0);
+  const sc = sun.shadow.camera, saved = [sc.left, sc.right, sc.top, sc.bottom];
+  Object.assign(sc, { left: -45, right: 45, top: 20, bottom: -20 }); sc.updateProjectionMatrix();
+  sun.position.set(-9, 16, 12); sun.target.position.set(0, 0, 0); sun.target.updateMatrixWorld();
+  renderer.render(scene, wide);
+  [sc.left, sc.right, sc.top, sc.bottom] = saved; sc.updateProjectionMatrix();
+  for (const o of hidden) o.visible = false;
+  if (window.__physica) window.__physica.warm = { at: t0, ms: performance.now() - t0 };
+  last = performance.now();   // the warm-up's own time is not simulated time
+}
+THREE.DefaultLoadingManager.onLoad = () => warmUp();
+const cam = params.has('nointro') ? { x: world.avatar.x, y: 1.2, dist: 11.5, elev: 0.2 } : { x: -18.5, y: 2.6, dist: 15, elev: 0.2 };
 const input = new Input(app);
 const sound = new Sound();
 const journal = new Journal(app, world);
 let vista = 0, vistaAge = 0, vistaHeld = false, vistaWas = false;
 // Establishing shot: the whole diorama — familiar fall, the cascade, the Pozo — then the explorer.
-let intro = params.has('nointro') ? 0 : 3.0;
+let intro = params.has('nointro') ? 0 : 4.6;
 // The city, once discovered from the Mirador, stays part of the world.
 if (journal.has('mirador')) view.setCityVisible(true);
 journal.onAdd = id => {
@@ -162,10 +187,10 @@ function frame(now) {
   const inCascade = Math.max(0, 1 - Math.max(0, Math.abs(p.x - 2.6) - 4.5) / 4);
   let tx = THREE.MathUtils.lerp(THREE.MathUtils.clamp(p.x + (reduced ? 0 : av.facing * 1.2), -15.5, 14.5), 2.6, inCascade * 0.75);
   // Vertically: the region's view, but never let the explorer leave the middle 60% of the frame.
-  let ty = THREE.MathUtils.lerp(p.y - av.hh + 1.2, 1.7, inCascade * 0.85);
+  let ty = THREE.MathUtils.lerp(p.y - av.hh + 1.2, 1.95, inCascade * 0.85);
   const halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * cam.dist * 0.6;
   ty = THREE.MathUtils.clamp(ty, p.y + 0.3 - halfH, p.y - 0.3 + halfH * 0.7);
-  let td = THREE.MathUtils.lerp(11.5, 15, inCascade);
+  let td = THREE.MathUtils.lerp(11.5, 16, inCascade);
   // Around the Pozo: frame the shaft from its water to above the Mirador.
   const inWell = Math.max(0, 1 - Math.max(0, Math.abs(p.x - 12.2) - 1.6) / 2.5);
   if (inWell > 0) { tx = THREE.MathUtils.lerp(tx, 12.3, inWell * 0.7); ty = THREE.MathUtils.lerp(ty, 2.9, inWell * 0.8); td = THREE.MathUtils.lerp(td, 14.5, inWell); ty = THREE.MathUtils.clamp(ty, p.y + 0.3 - halfH, p.y - 0.3 + halfH * 0.7); }
@@ -181,7 +206,8 @@ function frame(now) {
     // Orilla's lip on the left third; then the camera travels to the explorer.
     intro -= dt;
     if (Math.abs(inp.axis) > 0.1 || inp.act || inp.journal) intro = 0;
-    tx = 1.4; ty = 0.6; td = 17;
+    // First the familiar fall (water going down), then the column (water going up).
+    if (intro > 2.2) { tx = -18.5; ty = 2.6; td = 15; } else { tx = 1.4; ty = 0.9; td = 17; }
   }
   hud.classList.toggle('intro', intro > 0);
   if (inspectCam) { tx = inspectCam.x; ty = inspectCam.y; td = inspectCam.dist; }

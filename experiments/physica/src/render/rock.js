@@ -54,6 +54,15 @@ export function strataTexture() {
   return strataTex;
 }
 
+// Where water touches rock (pools, landings, the foot of falls): darker and glossier.
+// Boxes in world coordinates [x0,y0,z0, x1,y1,z1]; set by the scene with setWetZones().
+const WET_MAX = 8;
+const wetMin = Array.from({ length: WET_MAX }, () => new THREE.Vector3(1e5, 1e5, 1e5));
+const wetMax = Array.from({ length: WET_MAX }, () => new THREE.Vector3(1e5, 1e5, 1e5));
+export function setWetZones(boxes) {
+  boxes.slice(0, WET_MAX).forEach((b, i) => { wetMin[i].set(b[0], b[1], b[2]); wetMax[i].set(b[3], b[4], b[5]); });
+}
+
 export function rockMaterial({ fogFade = 0, mossAmount = 1, tint = '#ffffff', shade = 0, shadeColor = '#6e5652', detail = 1 } = {}) {
   const m = new THREE.MeshStandardMaterial({ color: tint, roughness: 0.92, metalness: 0 });
   const strata = colorArray(PALETTE.strata);
@@ -63,6 +72,8 @@ export function rockMaterial({ fogFade = 0, mossAmount = 1, tint = '#ffffff', sh
     sh.uniforms.uDetail = { value: strataTexture() };
     sh.uniforms.uDetailAmt = { value: detail };
     sh.uniforms.uBands = { value: BANDS };
+    sh.uniforms.uWetMin = { value: wetMin };
+    sh.uniforms.uWetMax = { value: wetMax };
     sh.uniforms.uMoss = { value: new THREE.Color(PALETTE.moss) };
     sh.uniforms.uMossDeep = { value: new THREE.Color(PALETTE.mossDeep) };
     sh.uniforms.uSoil = { value: new THREE.Color(PALETTE.soil) };
@@ -79,7 +90,8 @@ varying vec3 vWPos; varying vec3 vWNor; varying float vTop; varying float vAxis;
 uniform vec3 uStrata[8]; uniform vec3 uMoss,uMossDeep,uSoil;
 uniform float uMossAmount,uFade,uShade,uDetailAmt; uniform vec3 uShadeCol;
 uniform sampler2D uNoise; uniform sampler2D uDetail;
-float hDetail;
+uniform vec3 uWetMin[${WET_MAX}]; uniform vec3 uWetMax[${WET_MAX}];
+float hDetail; float wetness;
 ${BAND_GLSL}
 vec3 perturbBump(vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float fd){
   vec3 sx=normalize(dFdx(surf_pos)), sy=normalize(dFdy(surf_pos)), n=surf_norm;
@@ -124,13 +136,24 @@ vec3 perturbBump(vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float fd){
         vec3 col=mix(base,top,up);
         // faces under an overhang sit in shadow
         col*=mix(1.,.55,smoothstep(.3,.9,-N.y));
+        wetness=0.;
+        for(int i=0;i<${WET_MAX};i++){
+          vec3 d=max(uWetMin[i]-P,P-uWetMax[i]);
+          // rounded distance outside the box (no rectangular stains)
+          float out_=length(max(d,0.))+min(max(max(d.x,d.y),d.z),0.);
+          wetness=max(wetness,1.-smoothstep(-.05,.35,out_));
+        }
+        wetness*=.75+.25*texture2D(uNoise,F*.9+.2).r;
+        col*=mix(1.,.62,wetness);
         col=mix(col,uShadeCol*(.8+.4*grain),uShade);
         col=mix(col,vec3(.93,.80,.68),uFade);
         vec4 diffuseColor=vec4(col*diffuse,opacity);`)
+      .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+        roughnessFactor*=mix(1.,.38,wetness);`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
         normal=perturbBump(-vViewPosition, normal, vec2(dFdx(hDetail), dFdy(hDetail))*.9*uDetailAmt, faceDirection);`);
   };
-  m.customProgramCacheKey = () => `rock3-${fogFade}-${mossAmount}-${shade}-${detail}`;
+  m.customProgramCacheKey = () => `rock4-${fogFade}-${mossAmount}-${shade}-${detail}`;
   return m;
 }
 

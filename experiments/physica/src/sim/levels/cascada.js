@@ -72,8 +72,11 @@ export const CASCADA = {
     { id: 'cascada', x: 1.1, y: BELL_LINE + 0.27, r: 0.1, line: BELL_LINE },
     { id: 'pozo', x: WELL.x1 - 0.3, y: MIRADOR_LINE + 0.27, r: 0.1, line: MIRADOR_LINE },
   ],
-  // Where the hidden stream wells up in the chasm: just inside the region's lower band.
-  spring: { x: 2.75, y: -3.1, vx: 0.75 },
+  // Where the hidden stream wells up: at the pool's surface, below the region, pushed up by the
+  // head of the stream that sinks into the grate 3.9 m higher (declared: the spring has
+  // pressure; the column is not lifted from rest). It crosses the lower band slowly and then
+  // the region takes over.
+  spring: { x: 2.2, y: -3.86, vx: 0.85, vy: 2.95 },
   // Taut between a bracket on the lip and the chasm floor; a collar stops the descent.
   chains: [
     { id: 'borde', x: 0.92, side: 0.24, lipX: 0, lipY: 0, stopY: -2.5, floorY: -4.6 },

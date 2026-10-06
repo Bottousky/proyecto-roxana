@@ -28,7 +28,9 @@ primero.
 | A22 | Legibilidad del lado de la Orilla | El mástil de plomadas no parece escalera. El aviso de cada soporte apunta a su esfera. La cadena explica por qué no se ofrece con una esfera en la mano. | pendiente |
 | A17 | **Modificar**: la energía del campo viene de un aparato que el jugador puede afectar | La caída familiar de la izquierda mueve una rueda visible que alimenta las anclas. Desviar el agua baja `power`, el arco cambia y la región se debilita gradualmente. Las anclas responden a la carga. Prueba: el arco recalculado con `power` < 1 no cruza. | pendiente |
 | A18 | Plano de establecimiento que reúna las dos caídas familiares y el arco | Al entrar, una toma que deja ver la composición completa | hecho (iter 4; se salta con cualquier entrada) |
-| A19 | El arco se rompe en la cresta (gotas, sección variable) y salpica con volumen al aterrizar | Secuencia comparable antes/después | pendiente |
+| A19 | The column breaks up at the crest (droplets, variable cross-section) and splashes with volume when it lands | Comparable before/after sequence | done (iter 5, `evidence/iter-05`; pending independent review) |
+| A24 | 3D model of the explorer true to the portrait (goggle lenses, locks of hair, scarf tails, proportion) | Turnaround of the model next to the portrait | pending |
+| A25 | Frame times validated on a quiet machine | p99 ≤ 17 ms and max ≤ 34 ms over 60 s with the crossing and the vista | partial (iter 5: crossing with max 16.8 ms and 0 drops at load ~4; 60 s and the vista still pending) |
 | A23 | Assets generados (textura de estratos, telón con la ciudad, retrato) | Generados con Codex CLI e integrados (iter 4, `art/PROCEDENCIA.md`). Faltan vegetación y papel de la Bitácora. | parcial |
 | A16 | Accesibilidad: movimiento reducido, texto legible, señales redundantes, remapeo | `?reduced` existe y no hay menú; falta un menú de opciones con volumen, movimiento reducido y tamaño de texto | pendiente |
 
