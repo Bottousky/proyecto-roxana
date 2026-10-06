@@ -40,7 +40,7 @@ const inspect = () => page.evaluate(() => {
   const game = window.__ohmdal;
   if (!game) return null;
   return {
-    mode: game.mode, area: game.state.area, position: game.world?.getPlayerPosition(),
+    mode: game.mode, area: game.state.area, position: game.world?.getPlayerPosition(), clock: game.world?.clock ?? 0,
     flags: { ...game.state.flags }, nearby: game.nearby?.id, visited: [...game.state.visited], secrets: [...game.state.secrets],
     seen: [...game.state.seen], target: game.world?.target ? [...game.world.target] : null,
     puzzle: game.workbench?.active ? { id: game.workbench.id, mode: game.workbench.mode, state: JSON.parse(JSON.stringify(game.workbench.state)), result: { solved: game.workbench.result.solved, current: game.workbench.result.current, checks: game.workbench.result.checks } } : null,
@@ -59,11 +59,15 @@ async function screenshot(name) {
   report.stages.push({ event: 'screenshot', file, area: where?.area, position: where?.position });
 }
 
+// Waits are measured in game time (the world clock only advances with rendered frames), capped by
+// a generous wall-clock limit: a machine that stops producing frames makes a run slower, not
+// wrong, while a game that truly stops still fails.
 async function settle({ stable = 1300, allowPuzzle = true, timeout = 35000 } = {}) {
   const start = Date.now(), seen = [];
-  let quietSince = null;
-  while (Date.now() - start < timeout) {
+  let quietSince = null, clock0 = null, gameElapsed = 0;
+  while (gameElapsed * 1000 < timeout && Date.now() - start < timeout * 6) {
     const asked = Date.now(), info = await inspect();
+    clock0 ??= info?.clock ?? 0; gameElapsed = (info?.clock ?? clock0) - clock0;
     // What the wait saw, for a diagnosis if it never settles.
     if (seen.at(-1)?.mode !== info?.mode) seen.push({ mode: info?.mode ?? null, at: asked - start, took: Date.now() - asked });
     if (!info) { await page.waitForTimeout(100); continue; }
@@ -87,7 +91,7 @@ async function settle({ stable = 1300, allowPuzzle = true, timeout = 35000 } = {
       await page.waitForTimeout(120);
     }
   }
-  throw new Error(`Timed out settling after ${stage}: ${JSON.stringify({ seen: seen.slice(-12), now: await inspect() })}`);
+  throw new Error(`Timed out settling after ${stage}: ${JSON.stringify({ gameSeconds: +gameElapsed.toFixed(1), wallSeconds: Math.round((Date.now() - start) / 1000), seen: seen.slice(-12), now: await inspect() })}`);
 }
 
 const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
@@ -185,31 +189,32 @@ async function walkTo(id) {
   for (const until = Date.now() + 8000; info.target && Date.now() < until; info = await inspect()) await page.waitForTimeout(100);
   const startingArea = info.area;
   let path = geometry.path?.length ? geometry.path : [goal];
-  let waypoint = 0, lastProgress = Date.now(), best = distance(info.position, goal), replans = 0;
-  const started = Date.now();
-  while (Date.now() - started < 65000) {
+  let waypoint = 0, best = distance(info.position, goal), replans = 0;
+  const started = Date.now(), clock0 = info.clock;
+  let lastProgress = clock0;
+  while (info.clock - clock0 < 65 && Date.now() - started < 65000 * 5) {
     info = await inspect();
     assert.equal(info.area, startingArea, `Walking toward ${id} must remain in its authored area`);
     if (info.mode !== 'world') { await releaseKeys(); await settle({ stable: 180 }); continue; }
     if (info.nearby === id || await page.evaluate(id => {const w=window.__ohmdal.world;return w.canInteractWith(w.getInteractions().find(o=>o.id===id));},id)) { await releaseKeys(); return geometry.object; }
-    if (distance(info.position, goal) < best - 0.12) { best = distance(info.position, goal); lastProgress = Date.now(); }
+    if (distance(info.position, goal) < best - 0.12) { best = distance(info.position, goal); lastProgress = info.clock; }
     while (waypoint < path.length - 1 && distance(info.position, path[waypoint]) < 0.6) waypoint++;
     const target = path[waypoint];
-    await steer(info.position, target, distance(info.position, target) > 2, Date.now() - lastProgress > 1500);
-    if (Date.now() - lastProgress > 6500) {
+    await steer(info.position, target, distance(info.position, target) > 2, info.clock - lastProgress > 1.5);
+    if (info.clock - lastProgress > 6.5) {
       if (++replans > 3) throw new Error(`Movement blocked approaching ${id}: ${JSON.stringify({ position: info.position, goal, nearby: info.nearby, obstacles: geometry.obstacles })}`);
       // A player caught in a corner steps back the way they came before trying again.
       await releaseKeys(); await keyboardNudge(target, info.position); await keyboardNudge(target, info.position);
       // …and sidesteps, alternating sides, as someone would around a post.
       const side = replans % 2 ? 1 : -1, dx = target[0] - info.position[0], dz = target[1] - info.position[1];
       for (let i = 0; i < 3; i++) await keyboardNudge(info.position, [info.position[0] - dz * side, info.position[1] + dx * side]);
-      const fresh = await worldGeometry(id); path = fresh.path?.length ? fresh.path : [goal]; goal = path.at(-1); waypoint = 0; lastProgress = Date.now();
+      const fresh = await worldGeometry(id); path = fresh.path?.length ? fresh.path : [goal]; goal = path.at(-1); waypoint = 0; lastProgress = (await inspect()).clock;
       log('navigation-replan', { id, position: info.position });
     }
     await page.waitForTimeout(60);
   }
   await releaseKeys();
-  throw new Error(`Walking timed out for ${id}: ${JSON.stringify(await inspect())}`);
+  throw new Error(`Walking timed out for ${id}: ${JSON.stringify({ gameSeconds: +(info.clock - clock0).toFixed(1), wallSeconds: Math.round((Date.now() - started) / 1000), goal, best: +best.toFixed(2), ...(await inspect()) })}`);
 }
 
 // Step closer until this, and not a neighbouring object, is what E would use.
