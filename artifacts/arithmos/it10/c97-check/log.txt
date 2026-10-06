@@ -1,0 +1,13 @@
+[0.0s] escena → c9.maneras
+[1.0s] lee: Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles.
+[3.2s] lee: —Mara: con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: la recta sube igual todos los días y la curva despega. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.
+[4.0s] lee: Y la mía, la B, es diez más uno por día: 10 + d.
+[4.0s] escena → c9.vuelve
+[5.0s] lee: Seguí midiendo, varios días. Miren.
+[7.8s] lee: Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos.
+[9.0s] elige «2, como cualquier día a las 10.» (Pasado mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?)
+[9.4s] lee: —Cornisa: 2. Todos los días el sol da la misma vuelta, y la sombra repite su ve.
+[10.2s] lee: Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.
+[11.1s] lee: Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.
+[11.3s] escena → c10.rueda
+[12.1s] {"ended":true,"final":{"mode":"play","seg":"c10.rueda"},"journal":["Depende"],"evidenceKinds":["match","three-ways","periodic-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":12.114,"size":"1600x900","touch":false,"route":"directa","watch":false}

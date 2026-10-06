@@ -296,7 +296,7 @@ de definiciones, alcance y frases falsas en su lectura literal.
 | Origen | # | Hallazgo | Disposición |
 |---|---|---|---|
 | mat-8 (9) | A1 | «Una regla se comprueba con uno nuevo» | Corregido (40ceece): un caso que coincide no prueba; Mara dice que la hizo ella; Bitácora |
-| mat-8 (9) | A2 | 9.7: escalones contados unidos con curvas; «se cruzan antes del día 6» | Parcial: el texto ya no habla de cruce y dice que se leen los puntos; pendiente redibujar sólo puntos y poner escala vertical |
+| mat-8 (9) | A2 | 9.7: escalones contados unidos con curvas; «se cruzan antes del día 6» | Corregido: sólo puntos por día, escala vertical, «el día 6 la de Punto pasa a la de Mara» (`it10/c97-check`) |
 | mat-8 (9) | A3 | 9.8: «noche» para horas sin medir; tiempo sin escala; invierno | Parcial: el texto distingue noche (no definida) de horas sin medir y dice que el dibujo achica los huecos; invierno corregido. Pendiente: tiempo a escala |
 | mat-8 (9) | M1–M8 | Imagen sin alcance, «la sombra» por «el largo», relación sin definir, máquina de Punto sin dibujar, ola decorativa, criterios de unir, citas no vistas | Corregidos M1, M2, M3, M4 (texto), M6, M7 (criterio de la entrada), M8. Pendientes: M5 (dibujar la máquina de Punto), M9, M10 |
 | narr-7 (9) | A1–A4 | Plantilla, el juego da el paso, gráficos que son dibujos, teléfono ilegible | Pendientes (backlog N9-R); A3 parcial con los cambios de mat-8 |

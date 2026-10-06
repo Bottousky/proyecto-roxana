@@ -195,19 +195,19 @@ export const maneras = {
     w.add(new Drawing('c9-axes', axes, {z: 11}));
     for (let t = 0; t <= 6; t++) w.add(new Label(`c9-tx${t}`, String(t), px(t), py(0) + 20, {size: 16, align: 'center', z: 12, ch: BLUE}));
     w.add(new Label('c9-tl', 'día', px(6) + 18, py(0) + 20, {size: 16, z: 12, ch: BLUE}));
+    for (const v of [10, 30, 50, 70]) w.add(new Label(`c9-ty${v}`, String(v), px(0) - 16, py(v) + 5, {size: 14, align: 'right', z: 12, ch: BLUE}));
     const fns = {
       A: {f: t => 1 + 10 * t, ch: WHITE, expr: '1 + 10 · d'},
       B: {f: t => 10 + t, ch: BLUE, expr: '10 + d'},
       C: {f: t => 2 ** t, ch: YELLOW, expr: '2ᵈ'},
     };
     for (const [k, fn] of Object.entries(fns)) {
-      const pts = Array.from({length: 61}, (_, i) => { const t = i / 10; return [px(t), py(Math.min(70, fn.f(t)))]; });
-      w.add(new Drawing(`c9-g${k}`, [S(pts, seedOf(`c9-g${k}`), {w: 2.6, p: 0.9, ch: fn.ch})], {z: 12}));
-      for (let t = 0; t <= 6; t++) if (fn.f(t) <= 70) w.add(new Shape(`c9-gd${k}${t}`, dot(`c9-gd${k}${t}`, 4, fn.ch), px(t), py(fn.f(t)), {z: 13}));
+      // se cuentan por día: sólo los puntos, sin unir
+      for (let t = 0; t <= 6; t++) if (fn.f(t) <= 70) w.add(new Shape(`c9-gd${k}${t}`, dot(`c9-gd${k}${t}`, 5, fn.ch), px(t), py(fn.f(t)), {z: 13}));
     }
     const lab = {A: [px(2) - 30, py(21)], B: [px(6) + 12, py(16)], C: [px(5.5) + 10, py(45)]};
     for (const k of Object.keys(fns)) w.add(new Label(`c9-gl${k}`, k, lab[k][0], lab[k][1], {size: 24, z: 14, ch: fns[k].ch, weight: 700}));
-    d.describe('Tres gráficos en el mismo mapa: A, una recta que sube de a diez; B, una recta casi acostada que empieza en 10; C, una curva que empieza baja y después se dispara.');
+    d.describe('Tres gráficos de puntos, uno por día, en el mismo mapa: A sube de a diez; B empieza en 10 y casi no sube; C empieza en 1, junto con A, va bajito y después se dispara.');
     await d.shot(SHOTS.tiles, 0.8);
     const EX = [{id: 'A', text: '1 + 10 · d'}, {id: 'C', text: '2ᵈ'}];
     const done = new Set();
@@ -235,7 +235,7 @@ export const maneras = {
       refresh();
     }));
     d.describe('A es la escalera de Mara, 1 + 10 · d; C, la de Punto, 2 elevado a d. B era la de Peldaño.');
-    await d.say('student', 'Mara: con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: la recta sube igual todos los días y la curva despega. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.');
+    await d.say('student', 'Mara: con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.');
     await d.say('Peldaño', 'Y la mía, la B, es diez más uno por día: 10 + d.');
     d.evidence('three-ways', {done: [...done]});
     g.flags.c9ways = true;
