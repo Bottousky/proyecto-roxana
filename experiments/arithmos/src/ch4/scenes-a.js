@@ -81,13 +81,16 @@ export const grupos = {
       g.setCinematic(true);
       p.setMode('still');
       d.describe('Punto vuela a la pizarra de Mara y escribe, en amarillo: 4 + 3 = 7.');
-      await zip(d, p, BOARD.x - 180, boardTop() + 40, 0.5);
+      // inserto: la pizarra de cerca, para que se lea lo que escribe Punto
+      await d.all(d.shot({x: BOARD.x - BOARD.w / 2 - 40, y: boardTop() - 40, w: BOARD.w + 80, h: BOARD.h * 0.9}, 0.7), zip(d, p, BOARD.x - 180, boardTop() + 40, 0.5));
       const l = punto7(w);
       l.reveal = 0;
       await d.draw(l, 0.7, {key: 'reveal', sound: false});
       g.audio.punto('happy');
       await pulse(d, p, 2, 0.4);
+      await d.wait(0.8);
       follow(p, s);
+      await d.shot(SHOTS.terr, 0.8);
       g.setCinematic(false);
       sc.guess = await d.choose([
         {id: '7', text: 'Siete, como escribió Punto.'},

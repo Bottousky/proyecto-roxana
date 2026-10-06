@@ -1909,7 +1909,7 @@ export const nombre = {
     // Punto intenta emparejar el 14 como si fuera otra fila
     g.setCinematic(true);
     const ctx = document.createElement('canvas').getContext('2d');
-    ctx.font = '700 96px Kalam';
+    ctx.font = '700 96px Tiza';
     const w1 = ctx.measureText('1').width, w4 = ctx.measureText('4').width;
     const g1 = [NAME.numX + w1 / 2, NAME.numY - 34], g4 = [NAME.numX + w1 + w4 / 2, NAME.numY - 34];
     const last = order.slice(-4, -2).map(id => w.get(id));

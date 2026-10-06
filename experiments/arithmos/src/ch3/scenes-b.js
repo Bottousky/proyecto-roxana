@@ -461,11 +461,40 @@ export const hacia = {
     const s = w.get('student');
     const p = w.get('punto');
     await d.shot(SHOTS.line, 1);
-    // Punto recorre la línea: ahora deja una flecha al moverse
+    // el jugador manda a Punto de un lado al otro del cero: le aparece una flecha
     g.setCinematic(true);
-    p.arrow = true;
-    d.describe('Punto corre por la línea hacia la derecha y vuelve hacia la izquierda. Ahora, al moverse, lleva una flecha adelante.');
     await zip(d, p, lineX(0), GROUND - 50, 0.5);
+    g.setCinematic(false);
+    await d.say('student', 'Punto, andá a saludar a alguien.');
+    const at = {recta: 4, curva: 1, 'oval-a': -3, cuna: -4};
+    const visited = [];
+    await d.interact(ctl => new Promise(resolve => {
+      let busy = false;
+      g.setHint(() => ['Tocá una familia: Punto va hasta ella. Después, una del otro lado del cero.']);
+      const refresh = () => g.ui.setSpots(FAMILIES.filter(f => !visited.includes(f.id)).map(f => spotOf(w.get(f.id), `Familia ${f.name}, en ${signed(at[f.id])}`, () => go(f))));
+      const go = async f => {
+        if (busy || !ctl.alive()) return;
+        busy = true;
+        g.ui.setSpots([]);
+        try {
+          p.setMode('still');
+          p.arrow = true;
+          d.describe(`Punto va hacia ${f.name}, ${at[f.id] > 0 ? 'a la derecha' : 'a la izquierda'} del cero, con una flecha adelante.`);
+          await zip(d, p, lineX(at[f.id]), GROUND - 210, 0.8);
+          g.audio.punto('happy');
+          visited.push(f.id);
+          d.evidence('punto-goes', {to: f.id, value: at[f.id]});
+          if (visited.length >= 2 && visited.some(v => at[v] > 0) && visited.some(v => at[v] < 0)) return resolve();
+          if (visited.length >= 2) await d.think('Ahora a alguien del otro lado del cero.');
+          await zip(d, p, lineX(0), GROUND - 50, 0.5);
+        } catch { return; }
+        busy = false;
+        refresh();
+      };
+      refresh();
+    }));
+    g.setHint(null);
+    g.setCinematic(true);
     await zip(d, p, lineX(6), GROUND - 50, 0.7);
     const plus = w.add(new Label('hacia-plus', '+', lineX(6) + 70, GROUND - 40, {size: 64, z: 9, ch: YELLOW, reveal: 0, weight: 700}));
     await d.draw(plus, 0.4, {key: 'reveal'});

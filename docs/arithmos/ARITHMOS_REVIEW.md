@@ -183,5 +183,25 @@ Informe: `artifacts/arithmos/it04/review-narr/informe.md`. Sin navegador; varias
 | — | (autor) | El 4 de la tiza (Kalam) se confunde con el 9 | Corregido: familia "Tiza" = Kalam con el 4 de Atkinson Hyperlegible (unicode-range), también en subtítulos y opciones |
 | B1–B13 | baja | Varios | Corregidos B1, B2 (saldos en blanco; el amarillo es de Punto), B3, B6, B8, B12; el resto pendiente |
 
+## Revisiones independientes del cap. 5 (rev-mat-4 y rev-narr-3, 2026-10-06)
+
+Informes: `artifacts/arithmos/it05/review-mat/informe.md` y `artifacts/arithmos/it05/review-narr/informe.md`.
+Ambas sin navegador, sobre el commit 074d296. Corregido en el commit siguiente:
+
+| Origen | # | Hallazgo | Disposición |
+|---|---|---|---|
+| mat | A-1 | n/d definido como "n partes de las d" (hacía imposible 5/4) | Corregido: "n pedazos del tamaño que entra d veces justo"; la opción de 5/4 ya no se apoya en la definición vieja; Bitácora |
+| mat | A-2 | Devolución falsa ("un salto más" desde 1/4) | Corregido: cuenta los saltos que faltan |
+| mat | A-3 | Cinco décimos más largos que una barra | Corregido: todo lo guardado en las cajas a la misma escala; la media barra se parte en décimos que se achican junto con ella |
+| mat | A-4 | La diagonal: "no cierra en decimales" usado como evidencia | Corregido: el jugador mide con mitades, tercios, quintos, séptimos, décimos o doceavos; contraejemplo de 1/3 (no cierra en décimos y en tercios entra justo); el límite de la prueba se declara |
+| mat | medias | Regla de partes iguales; "en 3" rechazado; "no eran vecinas"; cantidades entre escenas; porqués; "cuarto" ambiguo; fracciones de pie; Bitácora que atribuye de más; cociente, 0,75, 1/2 en la recta | Corregidos: "a cada una le tiene que tocar lo mismo"; "en 3" válido (2/3 + 1/12); "en cuartos son vecinas"; historias coherentes (barra extra para Cornisa y Peldaño; Cornisa le da 1/3 de lo suyo; las barras de Mara); el jugador elige la partición común (6/7/12; 5/6); "diez décimos hacen una barra"; % como centésimos y misma cuenta dada vuelta; "cajas" en vez de "cuartos"; raya de las fracciones; 3 ÷ 4 = 3/4; 3/4 = 0,75; 1/2 rotulado. **Pendiente:** multiplicar por una fracción en general (sólo × 1/2 como 50 %) |
+| narr | A1 | Agencia: casi todo menú | Parcial: 5.5, 5.6, 5.7 y 5.9 pasan a acciones con decisión (particiones, cajas, mediciones) |
+| narr | A2 | Cuentas contradictorias | Corregido (ver mat) |
+| narr | A3 | La Marea ausente | Corregido en 5.1: una brisa se lleva la nota vieja "medio" (sin decir de qué) |
+| narr | A4 | El 5 se lee S y el 1, l | Corregido: todas las cifras de la tiza con el diseño de Atkinson Hyperlegible |
+| narr | A5 | Voces de aula | Parcial: el estudiante le habla a Punto y concluye; Mara ya no define la coma ni cierra la diagonal |
+| narr | A6 | Composición | Parcial: primer plano de las barras punteadas, inserto en la recta, escalas, nombres de las familias en el suelo |
+| narr | M1–M10 | Ganchos, errores de Punto con la misma puesta, opciones obvias, motivos débiles, "cuarto", nombres, 2,05 escrito, Bitácora, repeticiones, accesibilidad | Parciales: gancho 4→5 reescrito (el atado rajado); Punto se corrige solo; "cajas"; nombres; 2,05 escrito; Bitácora de 4 párrafos. Pendientes: motivos de 5.4/5.8 y más primeros planos |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

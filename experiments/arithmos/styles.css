@@ -2,13 +2,13 @@
 @font-face { font-family: Kalam; src: url(assets/fonts/kalam-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: Kalam; src: url(assets/fonts/kalam-latin-700-normal.woff2) format('woff2'); font-weight: 700; font-display: swap; }
 @font-face { font-family: 'Atkinson Hyperlegible'; src: url(assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
-/* Tiza: la letra de Kalam, pero con un 4 abierto y recto (el 4 de Kalam se confunde con el 9). */
+/* Tiza: la letra de Kalam, con las cifras de Atkinson Hyperlegible (en Kalam el 4 parece 9, el 5 una S y el 1 una l). */
 @font-face { font-family: Tiza; src: url(assets/fonts/kalam-latin-300-normal.woff2) format('woff2'); font-weight: 300; }
 @font-face { font-family: Tiza; src: url(assets/fonts/kalam-latin-400-normal.woff2) format('woff2'); font-weight: 400; }
 @font-face { font-family: Tiza; src: url(assets/fonts/kalam-latin-700-normal.woff2) format('woff2'); font-weight: 700; }
-@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2'); font-weight: 300; unicode-range: U+0034; size-adjust: 104%; }
-@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2'); font-weight: 400; unicode-range: U+0034; size-adjust: 104%; }
-@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2) format('woff2'); font-weight: 700; unicode-range: U+0034; size-adjust: 104%; }
+@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2'); font-weight: 300; unicode-range: U+0030-0039; size-adjust: 104%; }
+@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2'); font-weight: 400; unicode-range: U+0030-0039; size-adjust: 104%; }
+@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2) format('woff2'); font-weight: 700; unicode-range: U+0030-0039; size-adjust: 104%; }
 @font-face { font-family: 'Atkinson Hyperlegible'; src: url(assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2) format('woff2'); font-weight: 700; font-display: swap; }
 
 :root {

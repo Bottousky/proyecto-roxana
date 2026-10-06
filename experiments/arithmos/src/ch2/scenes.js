@@ -784,7 +784,7 @@ async function writeRooms(d, g, counts) {
       {id: 'blank', text: 'Nada: si no hay nada, no se escribe.'},
       {id: 'space', text: 'Un espacio en blanco.'},
       {id: 'zero', text: 'Un 0.'},
-    ], {prompt: 'En el depósito: un atado de atados, un atado y ningún suelto. ¿Qué escribís para el cuarto vacío?', evaluate: true});
+    ], {prompt: 'Uno de los cuartos quedó vacío. ¿Qué escribís para ese cuarto?', evaluate: true});
     d.evidence('write-empty', {choice: emptyChoice, attempt});
     const text = digits.map(n => (n ? String(n) : emptyChoice === 'zero' ? '0' : emptyChoice === 'space' ? ' ' : '')).join('');
     const line = ledgerLine(w, 'led-dep', text, 0, {reveal: 0});
@@ -977,7 +977,7 @@ export const cero = {
         {id: '32', text: 'Treinta y dos: 32.'},
         {id: '302', text: 'Trescientos dos: 302.'},
         {id: '320', text: 'Trescientos veinte: 320.'},
-      ], {prompt: 'Tres atados de atados, ningún atado, dos sueltos. ¿Qué número es?', evaluate: true});
+      ], {prompt: '¿Qué número dice el depósito de los Oval?', evaluate: true});
       d.evidence('read-oval', {answer: read});
       if (read !== '302') {
         // Punto lo copia sobre el depósito chiquito, al lado del de verdad
@@ -1337,26 +1337,69 @@ export const lugar = {
     const p = w.get('punto');
     const m = w.get('mara');
     await d.shot({...SHOTS.ledger, x: SHOTS.ledger.x - 80, w: SHOTS.ledger.w + 260}, 1);
-    // Punto le explica a Mara el 14, con lo que aprendió
-    g.setCinematic(true);
-    p.setMode('still');
-    const bx = LEDGER.x - 100, by = GROUND - 200;
-    d.describe('Punto escribe 14 en la pizarrita de Mara, dibuja un atado debajo del 1 y cuatro palitos debajo del 4.');
-    const n = w.add(new Label('lug-14', '14', bx, by, {size: 64, ch: YELLOW, weight: 700, z: 10, reveal: 0}));
-    await zip(d, p, bx, by - 50, 0.4);
-    await d.draw(n, 0.7, {key: 'reveal'});
-    const bun = item(w, 1, bx + 16, by + 50);
-    bun.z = 16;
-    bun.progress = 0;
-    await d.tween(0.6, k => { bun.progress = k; });
-    for (let k = 0; k < 4; k++) {
-      const st = item(w, 0, bx + 56 + k * 14, by + 50);
-      st.z = 16;
-      st.progress = 0;
-      await d.tween(0.15, q => { st.progress = q; });
+    // Mara pone a prueba lo aprendido: armar 205 con atados en tres cajas
+    await d.say('Mara', 'A ver si aprendí. A los Recta les debo doscientos cinco palitos. Armámelo en la pizarrita, que lo quiero ver.');
+    const old = w.get('led-dep');
+    if (old) { await d.fadeTo(old, 0, 0.4); w.remove('led-dep'); }
+    const top = GROUND - 300;
+    const bw = 110, gap = 16;
+    const bx0 = LEDGER.x - (3 * bw + 2 * gap) / 2;
+    const names = ['atados de atados', 'atados', 'sueltos'];
+    const kinds = [2, 1, 0];
+    const counts = [0, 0, 0];
+    for (let i = 0; i < 3; i++) {
+      w.add(new Drawing(`b205-box${i}`, art.rectStrokesFor(`b205-box${i}`, bx0 + i * (bw + gap), top, bw, 90), {z: 11}));
+      w.add(new Label(`b205-n${i}`, names[i], bx0 + i * (bw + gap) + bw / 2, top + 116, {size: 18, align: 'center', z: 11}));
     }
-    g.audio.punto('happy');
+    const slotIn = (i, k) => [bx0 + i * (bw + gap) + 18 + (k % 5) * 18, top + 30 + Math.floor(k / 5) * 32];
+    let tries = 0;
+    await d.interact(ctl => new Promise(resolve => {
+      let busy = false;
+      g.setHint(() => ['Tocá una caja para poner adentro un grupo de ese tamaño.', 'Doscientos cinco: ¿cuántos atados de atados, cuántos atados y cuántos sueltos?']);
+      const refresh = () => {
+        const spots = kinds.map((k, i) => rectSpot(`b205-${i}`, `Caja de los ${names[i]} (hay ${counts[i]}): agregar uno`, {x: bx0 + i * (bw + gap), y: top, w: bw, h: 90}, () => add(i)));
+        spots.push(wordSpot('b205-clear', 'vaciar', LEDGER.x - 120, top - 40, () => clear()));
+        spots.push(wordSpot('b205-ok', 'listo', LEDGER.x + 120, top - 40, () => check()));
+        g.ui.setSpots(spots);
+      };
+      const add = i => {
+        if (busy || counts[i] >= 9) { if (counts[i] >= 9) g.note('Con diez se ata y pasa al cuarto de al lado.'); return; }
+        const it = item(w, kinds[i], ...slotIn(i, counts[i]), `b205-it${i}-${counts[i]}`);
+        it.scale = kinds[i] === 2 ? 0.16 : kinds[i] === 1 ? 0.34 : 0.4;
+        it.z = 12;
+        counts[i]++;
+        g.audio.tap(0.12, 1.4 + i * 0.1);
+        refresh();
+      };
+      const clear = () => {
+        if (busy) return;
+        w.removeWhere(o => o.id.startsWith('b205-it'));
+        counts.fill(0);
+        refresh();
+      };
+      const check = async () => {
+        if (busy || !ctl.alive()) return;
+        busy = true;
+        tries++;
+        const value = counts[0] * 100 + counts[1] * 10 + counts[2];
+        d.evidence('build-205', {counts: [...counts], value});
+        try {
+          if (value === 205) return resolve();
+          await d.say('Mara', `Eso que armaste es ${value}. Yo dije doscientos cinco.`);
+        } catch { return; }
+        busy = false;
+        refresh();
+      };
+      refresh();
+    }));
+    g.setHint(null);
+    g.setCinematic(true);
+    const l205 = w.add(new Label('b205-num', '205', LEDGER.x, top - 50, {size: 60, weight: 700, z: 12, reveal: 0}));
+    m.setPose('write', 0.3);
+    await d.draw(l205, 0.7, {key: 'reveal'});
+    m.setPose('idle', 0.4);
     g.setCinematic(false);
+    await d.say('Mara', tries === 1 ? 'Dos, cero, cinco. Con el cero en el medio, que yo antes dejaba en blanco.' : 'Ahí sí: dos, cero, cinco. El cero en el medio, que yo antes dejaba en blanco.');
     await d.say('Mara', 'Así que por eso atábamos de a diez. Para que cada cifra tenga su lugar.');
     await d.say('student', 'De a cinco también se podría. Pero todos tienen que saber de a cuánto.');
     if (!replay) writeJournal2(g);

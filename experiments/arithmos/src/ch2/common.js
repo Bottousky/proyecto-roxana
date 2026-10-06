@@ -123,7 +123,7 @@ export function base(g, {dawn = true} = {}) {
   w.ensure('brace', () => new Drawing('brace', [art.S([[bx - 10, NAME.marksY - 40], [bx + 6, NAME.marksY - 30], [bx + 4, (NAME.marksY + GROUND) / 2 - 12], [bx + 18, (NAME.marksY + GROUND) / 2], [bx + 4, (NAME.marksY + GROUND) / 2 + 12], [bx + 6, GROUND - 4], [bx - 10, GROUND + 6]], 611, {w: 3, p: 0.9})], {z: 9}));
   w.ensure('num-14', () => new Label('num-14', '14', NAME.numX, NAME.numY, {size: 96, weight: 700, z: 9}));
   const m = document.createElement('canvas').getContext('2d');
-  m.font = '700 96px Kalam';
+  m.font = '700 96px Tiza';
   const g1x = NAME.numX + m.measureText('1').width / 2, g1y = NAME.numY - 34;
   w.ensure('one-ring', () => new Drawing('one-ring', [art.S(art.circleGuideFor(g1x, g1y, 44), 717, {w: 2.2, p: 0.8, ch: YELLOW})], {z: 9}));
   // camino al depósito
@@ -140,6 +140,10 @@ export function depotBuilding(w, count = 3) {
   const id = count === 4 ? 'depot4' : 'depot';
   w.remove(count === 4 ? 'depot' : 'depot4');
   const d = art2.depot('depot', DEPOT.right, GROUND, count === 4 ? DEPOT4 : DEPOT.widths);
+  // un rótulo debajo de cada cuarto: qué se guarda ahí
+  const names = ['sueltos', 'atados', 'atados de atados', 'de mil'];
+  w.removeWhere(o => o.id.startsWith('roomname-'));
+  d.rooms.forEach((r, i) => w.add(new Label(`roomname-${i}`, names[i], r.x + r.w / 2, GROUND + 34, {size: 20, align: 'center', z: 9, fade: 0.8})));
   return w.ensure(id, () => new Drawing(id, d.strokes, {z: 4}));
 }
 

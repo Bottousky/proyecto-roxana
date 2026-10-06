@@ -131,16 +131,12 @@ function pickChoice(prompt, options) {
     ['medio montón de seis', 'Lo mismo', 'Medio montón'],
     ['partes iguales cortás', 'En 3.', 'En 2.'],
     ['quién tiene más tiza', 'Cornisa', 'Tienen lo mismo'],
-    ['sextos de barra hacen', 'Dos.', 'Tres.'],
+    ['sexto de barra hacen', 'Dos.', 'Tres.'],
     ['Para marcar 3/4', 'en 3.', 'en 4.'],
     ['dónde va 5/4', 'ningún lado', 'Pasando'],
     ['entre 1/2 y 3/4', 'No:', 'Sí'],
-    ['un cuarto o un tercio', '1/4 de barra', '1/3 de barra'],
-    ['2/3 o 3/4', 'Son iguales', '3/4.'],
-    ['cuánto tiene Rampa', '2/5', '5/6'],
-    ['Dónde se guarda', 'con las enteras', 'Partirla'],
     ['2,05 es lo mismo', 'Sí: el 0', 'No: es menos'],
-    ['trato les conviene', 'El 80 %', 'Dan lo mismo'],
+    ['trato le conviene', 'El 80 %', 'Dan lo mismo'],
     ['mida la diagonal justo', 'partiendo bastante fino', 'Quizás'],
     ['pasa sumando', 'se muda', 'Sumar lo mismo'],
     ['Cómo lo comprobás', 'Creerle', 'Poner a Punto'],
@@ -197,16 +193,12 @@ function pickChoice(prompt, options) {
     ['medio montón de seis', 'Medio montón'],
     ['partes iguales cortás', 'En 4.'],
     ['quién tiene más tiza', 'Tienen lo mismo'],
-    ['sextos de barra hacen', 'Tres.'],
+    ['sexto de barra hacen', 'Tres.'],
     ['Para marcar 3/4', 'en 4.'],
     ['dónde va 5/4', 'Pasando'],
     ['entre 1/2 y 3/4', 'Sí'],
-    ['un cuarto o un tercio', '1/3 de barra'],
-    ['2/3 o 3/4', '3/4.'],
-    ['cuánto tiene Rampa', '5/6'],
-    ['Dónde se guarda', 'Partirla'],
     ['2,05 es lo mismo', 'No: es menos'],
-    ['trato les conviene', 'Dan lo mismo'],
+    ['trato le conviene', 'Dan lo mismo'],
     ['mida la diagonal justo', 'Quizás'],
     ['pasa sumando', 'Sumar lo mismo'],
     ['Cómo lo comprobás', 'Poner a Punto'],
@@ -392,6 +384,17 @@ for (let iter = 0; iter < 4000; iter++) {
       const done = byLabel('ya contada');
       if (route === 'errores' && done.length === 5 && !tried.has('recount')) { tried.add('recount'); target = done[0]; }
       else target = todo[(todo.length * 3) % Math.max(1, todo.length)] || todo[0];
+    } else if (s.seg === 'c2.lugar' && spots.some(x => x.id === 'b205-ok')) {
+      const n = i => Number((spots.find(x => x.id === `b205-${i}`)?.label.match(/hay (\d+)/) || [])[1] || 0);
+      const goal = route === 'errores' && !tried.has('b205wrong') ? [2, 5, 0] : [2, 0, 5];
+      const cur = [n(0), n(1), n(2)];
+      const over = cur.some((c, i) => c > goal[i]);
+      if (over) target = spots.find(x => x.id === 'b205-clear');
+      else {
+        const i = [0, 1, 2].find(k => cur[k] < goal[k]);
+        if (i !== undefined) target = spots.find(x => x.id === `b205-${i}`);
+        else { if (route === 'errores') tried.add('b205wrong'); target = spots.find(x => x.id === 'b205-ok'); }
+      }
     } else if (s.seg === 'c2.atados' && spots.some(x => x.id === 'yring')) {
       target = spots.find(x => x.id === 'yring');
     } else if (s.seg === 'c2.atados') {
@@ -481,6 +484,11 @@ for (let iter = 0; iter < 4000; iter++) {
     } else if (s.seg?.startsWith('c6.') && spots.some(x => x.id.startsWith('op-'))) {
       const order = route === 'errores' ? ['op-oneL', 'op-bothM', 'op-both', 'op-keep', 'op-flip', 'op-m7', 'op-m1', 'op-d2', 'op-d4', 'op-x4'] : ['op-both', 'op-flip', 'op-m1', 'op-d2', 'op-x4'];
       target = order.map(id => spots.find(x => x.id === id)).find(Boolean) || spots[0];
+    } else if (s.seg?.startsWith('c5.') && spots.some(x => x.id.startsWith('part-'))) {
+      const want = route === 'errores' ? ['part-6', 'part-7', 'part-5', 'part-12'] : ['part-12', 'part-6'];
+      target = want.map(id => spots.find(x => x.id === id)).find(Boolean) || spots[0];
+    } else if (s.seg === 'c5.decimos' && spots.some(x => x.id.startsWith('dc-into'))) {
+      target = spots.find(x => x.id === (route === 'errores' && !tried.has('dcwrong') && (tried.add('dcwrong'), true) ? 'dc-into0' : 'dc-into1'));
     } else if (s.seg === 'c5.recta') {
       const qs = spots.filter(x => x.id.startsWith('q'));
       if (route === 'errores' && !tried.has('q1')) { tried.add('q1'); target = qs.find(x => x.id === 'q1'); }

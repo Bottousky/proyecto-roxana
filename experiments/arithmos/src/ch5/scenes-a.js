@@ -32,9 +32,13 @@ export async function writeBoard(d, g, id, text, row, opts = {}) {
   return l;
 }
 
-/** Las cuatro familias, abajo, mirando a la pizarra. */
+/** Las cuatro familias, abajo, mirando a la pizarra, con su nombre escrito en el suelo. */
 export function familiesDown(g) {
-  FAMILIES.forEach((f, k) => family(g.world, k, FX(k), GROUND, {facing: 0.5}));
+  const w = g.world;
+  FAMILIES.forEach((f, k) => {
+    family(w, k, FX(k), GROUND, {facing: 0.5});
+    w.ensure(`fname-${k}`, () => new Label(`fname-${k}`, f.name, FX(k), GROUND + 34, {size: 22, align: 'center', z: 9, fade: 0.85}));
+  });
 }
 
 // ——————————————————————————————————————————————
@@ -45,8 +49,7 @@ function halfBundle(w, id, x, y) {
   const list = [];
   for (let i = 0; i < 5; i++) list.push(S([[(i - 2) * 3.8, -21], [(i - 2) * 3.8 + 0.4, 21]], seedOf(id) + i, {w: 2.4, p: 0.9}));
   list.push(S([[-11, 1], [11, 0]], seedOf(id) + 9, {w: 2.6, p: 0.95, ch: 2}));
-  const sh = w.add(new Shape(id, list, x, y, {z: 15}));
-  return sh;
+  return w.add(new Shape(id, list, x, y, {z: 15}));
 }
 
 export const medio = {
@@ -60,6 +63,8 @@ export const medio = {
     familiesDown(g);
     item(w, 1, BOARD.x - 80, GROUND - 26, 'c5-a0').z = 15;
     item(w, 1, BOARD.x + 0, GROUND - 26, 'c5-a1').z = 15;
+    // una nota vieja en la pizarra, a medio borrar: "medio", sin decir de qué
+    w.add(new Label('c5-old', 'medio', BOARD.x + 120, boardTop() + 250, {size: 30, z: 8, fade: 0.45}));
     g.camera.go(SHOTS.share);
   },
   async play(d, g) {
@@ -67,9 +72,10 @@ export const medio = {
     const s = w.get('student');
     const p = w.get('punto');
     await d.shot(SHOTS.share, 1.2);
-    await d.say('Balcón', 'Mara, ¿y los dos atados que sobraron ayer? Somos cuatro familias.');
+    d.describe('A la mañana siguiente, delante de la pizarra, los dos atados que sobraron. Uno está rajado por el medio.');
+    await d.say('Balcón', 'El atado que empujó Punto amaneció rajado. ¿Lo terminamos de partir, para las cuatro?');
     const opts = [
-      {id: 'untie', text: 'Desatarlos: son veinte palitos.'},
+      {id: 'untie', text: 'Mejor desatarlos: son veinte palitos.'},
       {id: 'halve', text: 'Partir cada atado por la mitad.'},
       {id: 'two', text: 'Darle uno a dos familias.'},
     ];
@@ -82,7 +88,6 @@ export const medio = {
       opts.splice(opts.findIndex(o => o.id === 'two'), 1);
     }
     g.setCinematic(true);
-    const got = [];
     if (how === 'untie') {
       d.describe('Los dos atados se desatan: veinte palitos. Cada familia recibe cinco.');
       const sticks = [];
@@ -97,9 +102,8 @@ export const medio = {
       await d.all(...sticks.map((st, i) => {
         const f = i % 4, j = Math.floor(i / 4);
         st.z = 15;
-        return hop(d, st, FX(f) - 80 + j * 11, GROUND - 24, {g, h: 80, dur: 0.5 + i * 0.03, sound: i % 5 ? null : 'tap'});
+        return hop(d, st, FX(f) - 90 + j * 11, GROUND - 24, {g, h: 80, dur: 0.5 + i * 0.03, sound: i % 5 ? null : 'tap'});
       }));
-      got.push('cinco palitos');
     } else {
       d.describe('Cada atado se parte por la mitad: cuatro medios atados, uno para cada familia.');
       const halves = [];
@@ -110,17 +114,15 @@ export const medio = {
         g.audio.erase(0.4, 0.3);
         halves.push(halfBundle(w, `c5-h${a * 2}`, x0 - 12, GROUND - 26), halfBundle(w, `c5-h${a * 2 + 1}`, x0 + 12, GROUND - 26));
       }
-      await d.all(...halves.map((h, i) => hop(d, h, FX(i) - 60, GROUND - 26, {g, h: 90, dur: 0.6 + i * 0.05, sound: i ? null : 'tap'})));
+      await d.all(...halves.map((h, i) => hop(d, h, FX(i) - 70, GROUND - 26, {g, h: 90, dur: 0.6 + i * 0.05, sound: i ? null : 'tap'})));
     }
     g.setCinematic(false);
-    await d.think(how === 'untie' ? 'Cinco palitos cada una.' : 'Medio atado cada una.');
     await d.say('Mara', 'Cinco palitos: medio atado.');
-    await d.think(how === 'untie' ? 'Partiendo cada atado por la mitad, daba lo mismo: dos nombres para lo mismo.' : 'Y desatando, daba lo mismo: cinco palitos. Dos nombres para lo mismo.');
+    await d.say('student', how === 'untie' ? 'Punto, mirá: partiendo cada atado por la mitad, daba lo mismo. Dos nombres para lo mismo.' : 'Punto, mirá: desatando, daba lo mismo: cinco palitos. Dos nombres para lo mismo.');
     await d.shot(SHOTS.board, 0.8);
     await writeBoard(d, g, 'c5-l0', '2 atados entre 4 → 1/2 atado cada una', 0);
     await writeBoard(d, g, 'c5-l1', '1/2 atado = 5 palitos', 1);
-    await d.say('student', 'Uno, una raya, dos: una parte, de dos iguales.');
-    await d.say('Mara', 'Así lo anoto.');
+    await d.say('student', 'Uno, una raya, dos: un pedazo, de los que entran dos justos en un atado.');
     // ¿medio de qué?
     await d.shot(SHOTS.share, 0.8);
     await d.say('Cornisa', '¿Y si en vez de medio atado me dan medio montón? Allá hay seis atados.');
@@ -141,8 +143,17 @@ export const medio = {
     await d.all(...heap.map((o, i) => d.tween(0.5, q => { o.x = lerp(BOARD.x - 140 + (i % 3) * 42, BOARD.x - 160 + (i % 3) * 42 + (i >= 3 ? 170 : 0), q); o.y = lerp(GROUND - 26 - Math.floor(i / 3) * 48, GROUND - 26, q); })));
     await pulse(d, heap[3], 1, 0.3);
     g.setCinematic(false);
-    await d.think(c === 'monton' ? 'Medio montón son tres atados: mucho más que medio atado.' : 'Medio montón son tres atados. Medio atado, cinco palitos. "Medio" solo no dice cuánto.');
+    await d.think(c === 'monton' ? 'Medio montón son tres atados: mucho más que medio atado.' : 'Medio montón son tres atados; medio atado, cinco palitos. "Medio" solo no dice cuánto.');
     await d.say('Mara', 'Medio, ¿de qué? Desde hoy, en mis cuentas eso va siempre.');
+    // la Marea se lleva la nota vieja, la que no decía de qué
+    g.setCinematic(true);
+    await d.shot(SHOTS.board, 0.8);
+    d.describe('Pasa una brisa de borrador: la nota vieja que sólo decía "medio" se borra. "1/2 atado = 5 palitos" se queda.');
+    g.audio.erase(1.2, 0.5);
+    g.camera.shake = 0.15;
+    await d.fadeTo(w.get('c5-old'), 0, 1.2);
+    w.remove('c5-old');
+    g.setCinematic(false);
     g.flags.c5half = true;
   },
 };
@@ -160,6 +171,7 @@ function restoreBars(w) {
 /** Dónde va, en la barra fantasma de la familia k, un pedazo que empieza en `from` (de 0 a 1). */
 const ghostSlot = (k, from) => [ghostX(k) + from * GHOST.w, GHOST.y];
 const GS = GHOST.w / BAR.w;
+const GHOST_SHOT = {x: FX(0) - 180, y: GHOST.y - 170, w: FX(3) - FX(0) + 360, h: 330};
 
 export const barras = {
   id: 'c5.barras',
@@ -180,7 +192,7 @@ export const barras = {
     const p = w.get('punto');
     await d.shot(SHOTS.share, 1);
     await d.say('Mara', 'Llegaron tres barras de tiza nueva para las cuatro familias. Estas no se desatan: son de una pieza.');
-    await d.say('Mara', 'Arriba de cada familia dibujé una barra entera, punteada, para ver cuánto le toca.');
+    d.describe('Arriba de cada familia hay una barra entera dibujada en punteado: la medida de una barra.');
     // Punto corta a ojo
     g.setCinematic(true);
     p.setMode('still');
@@ -195,72 +207,63 @@ export const barras = {
     const uneven = lens.map((len, i) => { const pc = piece(w, `pc-u${i}`, len, x0 + acc + i * 8, barY(0)); acc += len; return pc; });
     await d.wait(0.3);
     await d.all(...uneven.map((pc, i) => d.all(hop(d, pc, ...ghostSlot(i, 0), {g, h: 120, dur: 0.6, sound: i ? null : 'tap'}), d.tween(0.6, q => { pc.scale = lerp(1, GS, q); }))));
+    await d.shot(GHOST_SHOT, 0.7);
     follow(p, s);
     g.setCinematic(false);
     await d.say('Rampa', 'El mío es más largo que el de Cornisa.');
     await d.say('Cornisa', '¡Y el mío es el más chico!');
     d.evidence('cut-uneven');
     g.audio.punto('sad');
-    await d.say('Mara', 'Para que sea igual para todas, los pedazos tienen que ser iguales.');
+    await d.say('Mara', 'Para que sea igual para todas, a cada una le tiene que tocar lo mismo.');
+    await d.say('student', 'Punto: si las partes son iguales y cada una recibe las mismas, seguro que es lo mismo.');
     g.setCinematic(true);
+    await d.shot(SHOTS.share, 0.6);
     for (const pc of uneven) w.remove(pc.id);
     piece(w, 'bar0', BAR.w, BOARD.x - BAR.w / 2, barY(0)).progress = 0;
     await d.tween(0.5, q => { w.get('bar0').progress = q; });
     g.setCinematic(false);
-    // elegir en cuántas partes iguales cortar
-    const opts = [
+    // elegir en cuántas partes iguales cortar: los tres caminos llegan
+    const n = Number(await d.choose([
       {id: '2', text: 'En 2.'},
       {id: '3', text: 'En 3.'},
       {id: '4', text: 'En 4.'},
-    ];
-    let n;
+    ], {prompt: 'Tres barras entre cuatro familias. ¿En cuántas partes iguales cortás cada barra?'}));
+    d.evidence('cut', {n});
     const filled = [0, 0, 0, 0];
-    for (;;) {
-      n = Number(await d.choose(opts, {prompt: 'Tres barras entre cuatro familias. ¿En cuántas partes iguales cortás cada barra?'}));
-      d.evidence('cut', {n});
-      const pcs = await cutBars(d, g, n);
-      const r = await dealPieces(d, g, pcs, filled, n);
-      if (r.left.length === 0) break;
-      if (n === 2) {
-        await d.say('Mara', 'Sobran dos mitades, y son cuatro familias.');
-        await d.think('Cada mitad, en dos: cuatro cuartos.');
-        g.setCinematic(true);
-        const quarters = [];
-        for (const [i, h] of r.left.entries()) {
-          const hx = h.x;
-          w.remove(h.id);
-          g.audio.erase(0.3, 0.3);
-          quarters.push(piece(w, `pc-q${i * 2}`, BAR.w / 4, hx, h.y), piece(w, `pc-q${i * 2 + 1}`, BAR.w / 4, hx + BAR.w / 4 + 6, h.y));
-        }
-        g.setCinematic(false);
-        await dealPieces(d, g, quarters, filled, 4);
-        break;
-      }
-      // en tres: sobra un tercio que no se reparte en cuatro sin cortar de nuevo
-      await d.say('Mara', 'Sobra un tercio, y son cuatro familias. Así se complica. Empecemos de nuevo.');
+    const pcs = await cutBars(d, g, n);
+    const r = await dealPieces(d, g, pcs, filled, n);
+    if (r.left.length) {
+      // lo que sobra se vuelve a partir: alcanza para todas
+      const what = n === 2 ? 'dos mitades' : 'un tercio';
+      await d.say('Mara', `Sobra${r.left.length === 1 ? '' : 'n'} ${what}, y son cuatro familias.`);
+      await d.think(n === 2 ? 'Cada mitad, en dos: cuatro pedazos iguales, uno para cada una.' : 'Ese tercio, en cuatro: cuatro pedazos chiquitos, uno para cada una.');
       g.setCinematic(true);
-      w.removeWhere(o => o.id.startsWith('pc-'));
-      filled.fill(0);
-      restoreBars(w);
-      for (let k = 0; k < 3; k++) w.get(`bar${k}`).progress = 0;
-      await d.tween(0.5, q => { for (let k = 0; k < 3; k++) w.get(`bar${k}`).progress = q; });
+      const small = [];
+      const sub = n === 2 ? 2 : 4;
+      const sl = BAR.w / n / sub;
+      for (const [i, h] of r.left.entries()) {
+        const hx = h.x;
+        w.remove(h.id);
+        g.audio.erase(0.3, 0.3);
+        for (let k = 0; k < sub; k++) small.push(piece(w, `pc-s${i}-${k}`, sl, hx + k * (sl + 5), h.y));
+      }
       g.setCinematic(false);
-      opts.splice(opts.findIndex(o => o.id === '3'), 1);
+      await dealPieces(d, g, small, filled, n * sub);
     }
-    // cada barra fantasma quedó llena hasta las tres cuartas partes
     if (filled.some(f => Math.abs(f - 0.75) > 1e-9)) console.error(`[barras] las familias tienen ${filled.join(', ')} y la cuenta dice 3/4`);
     g.setCinematic(true);
-    d.describe('En cada barra punteada quedan llenas tres de cuatro partes iguales.');
+    await d.shot(GHOST_SHOT, 0.8);
+    d.describe('Primer plano de las barras punteadas: en cada una quedan llenas tres de cuatro partes iguales.');
     const marks = [];
     for (let k = 0; k < 4; k++) {
-      for (let q = 1; q < 4; q++) marks.push(w.add(new Drawing(`gfill-${k}-${q}`, [S([[ghostX(k) + q * GHOST.w / 4, GHOST.y - 12], [ghostX(k) + q * GHOST.w / 4, GHOST.y + 12]], seedOf(`gf${k}${q}`), {w: 2, p: 0.95, ch: YELLOW, lift: false})], {z: 17, progress: 0})));
+      for (let q = 1; q < 4; q++) marks.push(w.add(new Drawing(`gfill-${k}-${q}`, [S([[ghostX(k) + q * GHOST.w / 4, GHOST.y - 14], [ghostX(k) + q * GHOST.w / 4, GHOST.y + 14]], seedOf(`gf${k}${q}`), {w: 2, p: 0.95, ch: YELLOW, lift: false})], {z: 17, progress: 0})));
     }
     await d.tween(0.6, q => { for (const m of marks) m.progress = q; });
     g.setCinematic(false);
-    await d.think(n === 4 ? 'Tres cuartos de barra cada una.' : 'Media barra y un cuarto: la mitad son dos cuartos, así que son tres cuartos.');
-    await d.say('student', 'Tres cuartos: tres partes, de las cuatro iguales que entran en una barra.');
+    await d.think(n === 4 ? 'Tres pedazos de cuarto cada una.' : n === 2 ? 'Media barra y un cuarto: la media son dos cuartos, así que son tres cuartos.' : 'Dos tercios y un doceavo: en doceavos, ocho y uno, nueve. Nueve doceavos son tres cuartos.');
+    await d.say('student', 'Tres cuartos: tres pedazos del tamaño de un cuarto, el que entra cuatro veces justo en una barra.');
     await d.shot(SHOTS.board, 0.8);
-    await writeBoard(d, g, 'c5-l2', '3 barras entre 4 → 3/4 de barra cada una', 0);
+    await writeBoard(d, g, 'c5-l2', '3 barras ÷ 4 familias = 3/4 de barra', 0);
     d.evidence('share-bars', {each: '3/4', path: n});
     g.flags.c5bars = true;
   },
@@ -319,8 +322,6 @@ export const equivalentes = {
     w.removeWhere(o => /^(c5-|bar|pc-|ghost-|gfill|eq-)/.test(o.id));
     cast(g, {sx: BOARD.x - BOARD.w / 2 - 200, mx: BOARD.x - BOARD.w / 2 - 90});
     familiesDown(g);
-    family(w, 2, BOARD.x - BOARD.w / 2 - 310, GROUND, {facing: 0.6});
-    family(w, 0, BOARD.x - BOARD.w / 2 - 420, GROUND, {facing: 0.6});
     const x0 = BOARD.x - BAR.w / 2;
     w.add(new Label('eq-na', 'Cornisa', x0 - 10, ROW.a() + 8, {size: 24, align: 'right', z: 9}));
     w.add(new Label('eq-nb', 'Peldaño', x0 - 10, ROW.b() + 8, {size: 24, align: 'right', z: 9}));
@@ -336,7 +337,8 @@ export const equivalentes = {
     const s = w.get('student');
     const p = w.get('punto');
     await d.shot(SHOTS.board, 1);
-    await d.say('Mara', 'Ayer, a Cornisa le tocó una barra cortada en cuartos; a Peldaño, una cortada por la mitad.');
+    d.describe('En la pizarra, dos barras punteadas: la de Cornisa con dos pedazos de un cuarto; la de Peldaño con un pedazo de una mitad.');
+    await d.say('Mara', 'Me quedaba una barra para Cornisa y Peldaño. Cornisa la quiso en cuartos; Peldaño, por la mitad.');
     await d.say('Cornisa', 'Yo tengo dos pedazos y Peldaño uno solo. ¡Tengo más!');
     const c = await d.choose([
       {id: 'cornisa', text: 'Cornisa: tiene dos pedazos.'},
@@ -365,28 +367,26 @@ export const equivalentes = {
       })]);
     }));
     const same = equivalent(frac(2, 4), frac(1, 2));
-    await d.think(c === 'same' ? 'Llegan justo hasta el mismo lugar: lo mismo.' : c === 'cornisa' ? 'Dos pedazos, pero cada uno es la mitad de chico: llegan justo hasta el mismo lugar.' : 'Su pedazo es más grande, pero los dos de Cornisa llegan justo hasta el mismo lugar.');
+    await d.think(c === 'same' ? 'Llegan justo hasta el mismo lugar.' : c === 'cornisa' ? 'Dos pedazos, pero cada uno es la mitad de chico: llegan justo hasta el mismo lugar.' : 'Su pedazo es más grande, pero los dos de Cornisa llegan justo hasta el mismo lugar.');
     d.evidence('equiv', {same});
-    await writeBoard(d, g, 'c5-l3', '2/4 = 1/2', 5, {size: 32});
     const t = await d.choose([
       {id: '3', text: 'Tres.'}, {id: '2', text: 'Dos.'}, {id: '6', text: 'Seis.'}, {id: '1', text: 'Uno.'},
-    ], {prompt: '¿Cuántos sextos de barra hacen media barra?', evaluate: true});
+    ], {prompt: '¿Cuántos pedazos de un sexto de barra hacen media barra?', evaluate: true});
     d.evidence('equiv-transfer', {answer: t});
     g.setCinematic(true);
     p.setMode('still');
     d.describe('Punto marca sextos sobre la barra de Peldaño: tres sextos llegan hasta la mitad.');
-    const ticks = [];
     for (let i = 1; i < 6; i++) {
       const x = x0 + i * BAR.w / 6;
       await zip(d, p, x, ROW.b() - 50, 0.15);
-      ticks.push(w.add(new Drawing(`eq-t${i}`, [S([[x, ROW.b() - BAR.h / 2 - 8], [x, ROW.b() + BAR.h / 2 + 8]], seedOf(`eqt${i}`), {w: 2, p: 0.95, ch: YELLOW, lift: false})], {z: 17})));
+      w.add(new Drawing(`eq-t${i}`, [S([[x, ROW.b() - BAR.h / 2 - 8], [x, ROW.b() + BAR.h / 2 + 8]], seedOf(`eqt${i}`), {w: 2, p: 0.95, ch: YELLOW, lift: false})], {z: 17}));
       g.audio.tap(0.12, 1.5);
     }
     follow(p, s);
     g.setCinematic(false);
-    await d.think('Tres sextos llegan justo a la mitad.');
+    await d.think(t === '3' ? 'Tres sextos llegan justo a la mitad.' : `Tres sextos, no ${{2: 'dos', 6: 'seis', 1: 'uno'}[t]}: llegan justo a la mitad.`);
     await writeBoard(d, g, 'c5-l3', '1/2 = 2/4 = 3/6', 5, {size: 32});
-    await d.say('student', 'El mismo pedazo de barra, con tres nombres.');
+    await d.say('student', 'Punto: el mismo pedazo de barra, con tres nombres.');
     await d.say('Cornisa', 'Bueno. Pero los míos son dos.');
     d.evidence('equiv-names', {names: ['1/2', '2/4', '3/6'], ok: equivalent(frac(3, 6), frac(1, 2))});
     g.flags.c5equiv = true;
@@ -431,13 +431,14 @@ export const recta = {
       g.setCinematic(false);
       opts.splice(opts.findIndex(o => o.id === String(dpart)), 1);
     }
+    fracLabel(w, 'l5f-12', 1, 2, lx(0.5), GROUND - 110, {size: 28});
     // ubicar 3/4
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Cada marca es un cuarto más. Tocá la marca de 3/4.']);
       const refresh = () => {
         const spots = [];
-        for (let i = 1; i < 4; i++) spots.push(rectSpot(`q${i}`, `Marca ${i} de 4 entre el 0 y el 1`, {x: lx(i / 4) - 20, y: GROUND - 34, w: 40, h: 80}, () => pick(i)));
+        for (let i = 1; i < 4; i++) spots.push(rectSpot(`q${i}`, `Marca ${i} de 4 entre el 0 y el 1`, {x: lx(i / 4) - 24, y: GROUND - 40, w: 48, h: 90}, () => pick(i)));
         g.ui.setSpots(spots);
       };
       const pick = async i => {
@@ -450,7 +451,8 @@ export const recta = {
         } catch { return; }
         d.evidence('place-frac', {at: `${i}/4`});
         if (i !== 3) {
-          try { await d.think(`Esa es ${['', 'un cuarto', 'dos cuartos: la mitad'][i]}. Tres cuartos es un salto más.`); } catch { return; }
+          const more = 3 - i;
+          try { await d.think(`Esa es ${['', 'un cuarto', 'dos cuartos: la mitad'][i]}. Para tres cuartos ${more === 1 ? 'falta un salto' : 'faltan dos saltos'}.`); } catch { return; }
           follow(p, s);
           busy = false;
           return refresh();
@@ -466,8 +468,8 @@ export const recta = {
     const c = await d.choose([
       {id: 'past', text: 'Pasando el 1.'},
       {id: 'in', text: 'Entre el 0 y el 1.'},
-      {id: 'none', text: 'En ningún lado: no se pueden tomar 5 de 4 partes.'},
-    ], {prompt: '¿Y dónde va 5/4?', evaluate: true});
+      {id: 'none', text: 'En ningún lado: en una barra no entran cinco cuartos.'},
+    ], {prompt: '¿Y dónde va 5/4: cinco pedazos del tamaño de un cuarto?', evaluate: true});
     d.evidence('predict-54', {answer: c});
     g.setCinematic(true);
     p.setMode('still');
@@ -476,25 +478,28 @@ export const recta = {
     for (let k = 1; k <= 5; k++) { await zip(d, p, lx(k / 4), GROUND - 40, 0.22); g.audio.tap(0.12, 1.4 + k * 0.08); }
     fracLabel(w, 'l5f-54', 5, 4, lx(1.25), GROUND - 110, {ch: YELLOW});
     g.setCinematic(false);
-    await d.think(c === 'past' ? 'Cinco cuartos: una barra entera y un cuarto más.' : 'Cinco cuartos pasan el 1: una barra entera y un cuarto más. Cuartos hay los que haga falta.');
+    await d.say('student', c === 'past' ? 'Punto, cinco pedazos de un cuarto: una barra entera y un cuarto más.' : 'En una barra no entran cinco cuartos, pero cinco pedazos de un cuarto sí existen: una barra y un cuarto más.');
     // entre 1/2 y 3/4
     const dn = await d.choose([
-      {id: 'no', text: 'No: son marcas vecinas.'},
+      {id: 'no', text: 'No: en cuartos son marcas vecinas.'},
       {id: 'yes', text: 'Sí, partiendo más fino.'},
     ], {prompt: '¿Hay algún número entre 1/2 y 3/4?', evaluate: true});
     d.evidence('density', {answer: dn});
     g.setCinematic(true);
-    d.describe('Punto parte cada cuarto en dos: aparece una marca nueva entre 1/2 y 3/4, la de 5/8. Después parte otra vez, y aparece otra entre 1/2 y 5/8.');
+    d.describe('De cerca: Punto parte cada cuarto en dos y aparece una marca nueva entre 1/2 y 3/4, la de 5/8. Después parte otra vez, y aparece otra entre 1/2 y 5/8.');
+    const zoom = {x: lx(0.42), y: GROUND - 300, w: lx(0.83) - lx(0.42), h: 380};
+    await d.shot(zoom, 0.9);
     const p8 = partitionOn(w, 8, {progress: 0});
     await d.draw(p8, 0.8, {sound: false});
-    fracLabel(w, 'l5f-58', 5, 8, lx(5 / 8), GROUND - 190, {ch: YELLOW, size: 24});
-    await d.wait(0.4);
+    fracLabel(w, 'l5f-58', 5, 8, lx(5 / 8), GROUND - 70, {ch: YELLOW, size: 20});
+    await d.wait(0.5);
     const p16 = partitionOn(w, 16, {progress: 0});
     await d.draw(p16, 0.8, {sound: false});
-    fracLabel(w, 'l5f-916', 9, 16, lx(9 / 16), GROUND - 260, {ch: YELLOW, size: 22});
+    fracLabel(w, 'l5f-916', 9, 16, lx(9 / 16), GROUND - 70, {ch: YELLOW, size: 16});
     g.setCinematic(false);
-    await d.think(dn === 'yes' ? 'Siempre cabe otro: partiendo más fino, siempre aparece una marca en el medio.' : 'No eran vecinas: entre dos marcas siempre cabe otra, partiendo más fino.');
+    await d.think(dn === 'yes' ? 'Siempre cabe otro: partiendo más fino, aparece una marca en el medio.' : 'En cuartos eran vecinas. Partiendo más fino, aparece una marca en el medio: siempre cabe otra.');
     d.evidence('between', {a: '1/2', b: '3/4', found: ['5/8', '9/16'], ok: compare(frac(1, 2), frac(9, 16)) < 0 && compare(frac(9, 16), frac(5, 8)) < 0});
+    await d.shot(SHOTS.line, 0.8);
     g.flags.c5line = true;
   },
 };

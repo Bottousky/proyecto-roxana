@@ -245,6 +245,31 @@ deshacer; con el cap. 1: la transformación es uno a uno sobre la recta. Ancla h
 certeza alta): al-Khwārizmī, *al-jabr* (restituir lo restado sumándolo en ambos miembros) y
 *al-muqābala* (cancelar términos iguales a ambos lados). En la Bitácora, como dato.
 
+## Capítulo 7 — Crecer (diseño, no implementado)
+
+Pregunta de entrada (gancho del cap. 6): x · x = 2. Idea central: **multiplicar repetido crece
+distinto que sumar repetido; cada crecimiento tiene una pregunta inversa (raíz, logaritmo); un
+producto de sumas es un rectángulo partido; y "deshacer" un cuadrado tiene dos caminos.**
+
+Representaciones: cuadrados y rectángulos de tiza con lados x y 1 (fichas de área: x², x, 1);
+tablas que crecen día por día; la recta del cap. 6 para las raíces.
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 7.1 | El lado del cuadrado | Raíz como pregunta inversa del cuadrado | ¿Qué lado tiene un cuadrado de área 9? ¿y de área 2? | √9 = 3 (el lado es positivo; x² = 9 también tiene −3); √2 entre 1,41 y 1,42 |
+| 7.2 | Sumar o duplicar | Crecimiento aditivo vs multiplicativo | Elegir el plan para redibujar la escalera antes que la Marea: +10 por día o ×2 por día | Al principio gana sumar; desde el día 6 (61 contra 64), duplicar; tabla día por día |
+| 7.3 | Contar los factores | Potencias; exponente 0 y negativo por patrón | Seguir la tabla hacia atrás: 2³, 2², 2¹, … | Cada paso atrás divide por 2: 2⁰ = 1, 2⁻¹ = 1/2 (patrón, no regla) |
+| 7.4 | Muy grande, muy chico | Notación científica | Escribir el polvo de tiza de la Marea | 3 · 10⁶ vs 3000000; comparar por el exponente; el error de contar ceros |
+| 7.5 | Áreas con x | Polinomios como áreas | Armar (x + 2)(x + 3) con fichas | x² + 5x + 6: la distributiva del cap. 4, dos veces |
+| 7.6 | Al revés | Factorizar como armar un rectángulo | Con x² + 5x + 6 en fichas, armar un rectángulo | (x + 2)(x + 3); con x² + 5x + 5 no cierra |
+| 7.7 | Completar el cuadrado | Cuadráticas | x² + 2x = 8: completar el cuadrado con una ficha | (x + 1)² = 9 → x + 1 = 3 o −3 → x = 2 o −4 (cap. 6) |
+| 7.8 | ¿Cuántas veces? | Logaritmo como pregunta inversa | ¿Cuántas duplicaciones para pasar 1000? | Entre 9 y 10 (2¹⁰ = 1024); log₂ 1000 ≈ 9,97 |
+| 7.9 | Donde no se puede | Expresiones racionales: restricciones | 1 ÷ (x − 2): ¿dónde no está definida? | En x = 2 (cap. 4: no se divide por cero) |
+
+Límites a declarar: √ indica el lado positivo; potencias con exponente fraccionario y logaritmos
+de otras bases, sólo mencionados; la prueba de que √2 no es una fracción queda para el cap. 8.
+Historia: pendiente de fuentes (no afirmar nada sobre Napier ni Arquímedes sin verificar).
+
 ## Interfaz
 
 Sin HUD permanente. Un ícono de tiza (≡) abre la pausa: continuar, volver a ver,

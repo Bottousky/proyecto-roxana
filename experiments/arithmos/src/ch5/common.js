@@ -12,8 +12,8 @@ const S = (guide, seed, opts = {}) => stroke(guide, {seed, ...opts});
 /** Una barra de tiza nueva: la unidad que no se desata. */
 export const BAR = {w: 320, h: 34};
 /** Dónde se para cada familia y dónde está su barra fantasma (la unidad, punteada). */
-export const FX = k => 13200 + k * 160;
-export const GHOST = {w: 140, y: GROUND - 250};
+export const FX = k => 13050 + k * 220;
+export const GHOST = {w: 180, y: GROUND - 250};
 export const ghostX = k => FX(k) - GHOST.w / 2;
 
 export const SHOTS = {
@@ -107,9 +107,11 @@ export function partitionOn(w, d, {progress = 1} = {}) {
 export function fracLabel(w, id, n, d, x, y, opts = {}) {
   const size = opts.size ?? 30;
   const ch = opts.ch ?? WHITE;
-  const top = w.add(new Label(`${id}-n`, String(n), x, y - size * 0.55, {size, align: 'center', z: opts.z ?? 9, ch, reveal: opts.reveal ?? 1}));
-  const bot = w.add(new Label(`${id}-d`, String(d), x, y + size * 0.55, {size, align: 'center', z: opts.z ?? 9, ch, reveal: opts.reveal ?? 1}));
-  const bar = w.add(new Drawing(`${id}-b`, [S([[x - size * 0.42, y - size * 0.12], [x + size * 0.42, y - size * 0.12]], seedOf(id), {w: 2.4, p: 0.95, ch, lift: false})], {z: opts.z ?? 9, progress: opts.reveal ?? 1}));
+  // numerador arriba de la raya y denominador abajo, sin que la raya los toque
+  const top = w.add(new Label(`${id}-n`, String(n), x, y - size * 0.4, {size, align: 'center', z: opts.z ?? 9, ch, reveal: opts.reveal ?? 1}));
+  const bot = w.add(new Label(`${id}-d`, String(d), x, y + size * 0.66, {size, align: 'center', z: opts.z ?? 9, ch, reveal: opts.reveal ?? 1}));
+  const half = size * (String(Math.max(n, d)).length * 0.3 + 0.12);
+  const bar = w.add(new Drawing(`${id}-b`, [S([[x - half, y - size * 0.24], [x + half, y - size * 0.24]], seedOf(id), {w: 2.4, p: 0.95, ch, lift: false})], {z: opts.z ?? 9, progress: opts.reveal ?? 1}));
   return [top, bar, bot];
 }
 
