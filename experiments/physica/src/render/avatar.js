@@ -396,87 +396,197 @@ export class Explorer {
     this.tuft = { n: 2, len: 0.07, pts: [] };
     this.tuftMesh = new THREE.Mesh(curlGeo(), m.hair);
 
-    this.state = { yaw: -0.6, walk: 0, squash: 0, surprise: 0, blink: 0, nextBlink: 2, look: 0, armUp: 0, tuck: 0, lean: 0, carry: 0, push: 0 };
+    this.state = { yaw: -0.6, walk: 0, squash: 0, surprise: 0, land: 0, blink: 0, nextBlink: 2, poseT: 0, dustT: 0, sweatT: 0,
+      land: 0, landHold: 0, release: 0,
+      j: { hip: [0, 0], knee: [0, 0], arm: [0.05, 0.05], out: [0.13, 0.13], lean: 0, look: 0, drop: 0, turn: 0 } };
+    this.poseState = 'de-pie'; this.poseLog = {};
+    // Water: every material of the explorer is clipped by one plane (inactive out of the water).
+    this.clip = new THREE.Plane(new THREE.Vector3(0, 1, 0), 1e6);
+    const clipped = new Set();
+    this.root.traverse(o => { if (o.isMesh) for (const m of [].concat(o.material)) clipped.add(m); });
+    for (const t of this.tails) clipped.add(t.mesh.material);
+    for (const m of clipped) m.clippingPlanes = [this.clip];
+    this.ring = new THREE.Mesh(bake(new THREE.RingGeometry(0.2, 0.26, 32), { r: [-Math.PI / 2, 0, 0] }),
+      new THREE.MeshBasicMaterial({ color: '#eafcff', transparent: true, opacity: 0.55, depthWrite: false }));
+    this.ring.visible = false; this.ring.renderOrder = 5;
+    this.fx = new ExplorerFX(field);
     this._a = { x: 0, y: 0 };
   }
 
   addTo(scene) {
-    scene.add(this.root, this.tuftMesh, ...this.tails.map(t => t.mesh));
+    scene.add(this.root, this.tuftMesh, ...this.tails.map(t => t.mesh), this.fx.group, this.ring);
     for (const o of [this.root, this.tuftMesh, ...this.tails.map(t => t.mesh)]) o.traverse(q => { if (q.isMesh) q.castShadow = !q.userData.ink && !q.userData.noShadow; });
   }
 
   onEvent(e, avatarId) {
     if (e.body !== avatarId) return;
-    if (e.type === 'enter') this.state.surprise = 1;
-    if (e.type === 'mantle') { this.state.armUp = 1.2; this.state.squash = 0.12; }
-    if (e.type === 'impact' && e.speed > 1.2) this.state.squash = Math.min(0.28, e.speed * 0.05);
+    const st = this.state;
+    if (e.type === 'enter') { st.surprise = 1; this.fx.startle(this.head.localToWorld(V(0, 0.26, 0))); }
+    if (e.type === 'letgo') st.release = 1;
+    if (e.type === 'mantle' || e.type === 'step-up') st.squash = 0.12;
+    if (e.type === 'impact' && e.speed > 1.0) {
+      st.squash = Math.min(0.28, e.speed * 0.05);
+      // A landing is a contact whose normal opposes the local field (a floor for that field);
+      // bumping a wall only squashes.
+      const g = this.field.at(e.x, e.y, { x: 0, y: 0 }), gl = Math.hypot(g.x, g.y) || 1;
+      if (-((e.nx ?? 0) * g.x + (e.ny ?? 0) * g.y) / gl > 0.6) {
+        st.land = Math.max(0.5, Math.min(1, e.speed / 4)); st.landHold = 0.15; // a crouch that soaks the landing
+        this.fx.dust(this.root.position.x, this.root.position.y, 4, 0.25 + e.speed * 0.1);
+      }
+    }
+  }
+
+  /** The pose the body should tell, read from the simulated state (never the other way round). */
+  classify(s, ctx, gUp) {
+    const air = !s.grounded, speed = Math.abs(s.vx), c = s.control ?? 0;
+    if (ctx.onChain) return gUp && ctx.inputY < -0.2 ? 'cadena-esfuerzo' : 'cadena';
+    if (ctx.mantling) return 'trepar';
+    if (ctx.inWater) return 'agua';
+    if (ctx.holding) return 'cargar';
+    if (ctx.pushing) return 'empujar';
+    if (!air) {
+      if (c * s.vx < 0 && Math.abs(c) > 6 && (speed > 0.9 || (this.poseState === 'frenar' && speed > 0.3))) return 'frenar';
+      return speed > 0.25 ? 'caminar' : 'de-pie';
+    }
+    if (gUp) return 'suspendido';
+    return s.vy < -1.2 ? 'caer' : 'en-el-aire';
   }
 
   /** p: interpolated position (centre of the sim box); s: sim avatar state. */
   update(dt, time, p, s, ctx) {
     const st = this.state, feetY = p.y - s.hh;
     this.root.position.set(p.x, feetY, 0);
-    const g = { x: s.gx ?? 0, y: s.gy ?? -9.8 }, gUp = g.y > 0.8;
-    const air = !s.grounded;
+    // The field where the body is: read here, because the simulation does not refresh the body's
+    // own field while something holds it (the chain).
+    const g = this.field.at(p.x, p.y, { x: 0, y: 0 }), gUp = g.y > 0.8;
     // Facing: three-quarter toward the camera. rotation.y = θ sends the face (+x local) to
     // (cos θ, 0, −sin θ): θ = −0.6 looks right and a little toward the camera (+z);
     // θ = −(π − 0.6) looks left the same way. Turning passes through facing the camera.
-    const yawT = s.facing > 0 ? -0.6 : -(Math.PI - 0.6);
+    const pose = this.classify(s, ctx, gUp);
+    // While the feet skid the body keeps facing the way it is still moving, and turns after.
+    const face = pose === 'frenar' ? Math.sign(s.vx) : s.facing;
+    // Carrying or pushing, the body turns toward profile: the sphere is straight ahead in the
+    // simulation, and at three-quarters it would sit off to one side of the hands.
+    // On the chain, the same, so the grip shows in front of the body. Suspended in a region, the
+    // body turns toward the camera: the trailing V of the arms then lies in the picture plane.
+    const turn = pose === 'cargar' || pose === 'empujar' || pose.startsWith('cadena') ? 0.25 : pose === 'suspendido' ? 1.15 : 0.6;
+    const yawT = face > 0 ? -turn : -(Math.PI - turn);
     st.yaw += (yawT - st.yaw) * Math.min(1, dt * 10);
     if (this.yawOverride != null) { st.yaw = this.yawOverride; st.nextBlink = 1; st.blink = 0; } // development turnaround only
     this.body.rotation.y = st.yaw;
 
-    const speed = Math.abs(s.vx);
+    if (pose !== this.poseState) { this.poseState = pose; st.poseT = 0; } else st.poseT += dt;
+    this.poseOverlay = (st.surprise > 0.15 ? ' +sobresalto' : '') + (st.land > 0.15 ? ' +aterrizaje' : '');
+    this.poseLog[pose] = (this.poseLog[pose] || 0) + dt;
+    const speed = Math.abs(s.vx), air = !s.grounded;
     if (!air) st.walk += speed * dt * 5.4;
-    const stride = air ? 0 : Math.min(1, speed / 2.6);
-    st.armUp += ((ctx.onChain ? 1.15 : air ? (gUp ? 1 : 0.55) : 0) - st.armUp) * Math.min(1, dt * (air || ctx.onChain ? 5 : 8));
-    // On the chain in an upward pull the legs drift up and the body hangs from the hands.
-    st.tuck += ((ctx.onChain ? (gUp ? 0.8 : 0.1) : air && gUp ? 1 : air ? 0.4 : 0) - st.tuck) * Math.min(1, dt * 6);
-    st.carry += ((ctx.holding ? 1 : 0) - st.carry) * Math.min(1, dt * 10);
-    st.push += ((ctx.pushing ? 1 : 0) - st.push) * Math.min(1, dt * 8);
+    const stride = air ? 0 : Math.min(1, speed / 2.6), sw = Math.sin(st.walk);
     st.squash *= Math.exp(-dt * 9);
-    st.surprise = Math.max(0, st.surprise - dt * 0.7);
+    st.surprise = Math.max(0, st.surprise - dt * 1.25);
+    if ((st.landHold -= dt) <= 0) st.land = Math.max(0, st.land - dt * 4);
+    st.release = Math.max(0, st.release - dt * 2);
 
-    const sw = Math.sin(st.walk), bob = Math.abs(Math.cos(st.walk)) * 0.035 * stride;
-    const breathe = Math.sin(time * 2.1) * 0.008;
-    this.body.position.y = bob + breathe * (1 - stride);
-    this.body.scale.set(1 + st.squash * 0.6, 1 - st.squash, 1 + st.squash * 0.6);
-    // Lean: into the push, against the control acceleration, back when floating up.
-    const leanT = st.push * 0.28 + (air ? -(s.vx * 0.04) : 0) + (s.control ?? 0) * 0.006 + (ctx.onChain ? 0.18 : 0);
-    st.lean += (leanT - st.lean) * Math.min(1, dt * 8);
+    // Targets per pose: hip (+ swings the leg forward), knee (− bends it), arm (0 hanging,
+    // π/2 forward, π overhead), out (splay), lean (+ toward the face), look (+ up), drop (m).
+    const T = { hip: [0, 0], knee: [0, 0], arm: [0.05, 0.05], out: [0.13, 0.13], lean: 0, look: ctx.lookAt ?? 0, drop: 0, k: 10 };
+    const legsWalk = (amp = 1) => { for (const i of [0, 1]) { const ph = i ? sw : -sw; T.hip[i] = ph * 0.65 * stride * amp; T.knee[i] = -Math.max(0, -ph) * 0.7 * stride * amp; } };
+    const armsSwing = () => { for (const i of [0, 1]) T.arm[i] = (i ? -sw : sw) * 0.55 * stride; };
+    const both = (key, f) => { T[key][0] = f(0); T[key][1] = f(1); };
+    const fx = this.fx;
+    switch (pose) {
+      case 'caminar': legsWalk(); armsSwing(); T.lean = 0.07 * stride; break;
+      case 'frenar': // the feet skid: leaning back, the front leg braced, arms out for balance
+        T.lean = -0.32; T.hip = [0.55, -0.25]; T.knee = [-0.05, -0.7]; both('arm', () => 0.95); both('out', () => 0.7); T.look = -0.08; T.k = 14;
+        if ((st.dustT -= dt) < 0) { st.dustT = 0.07; fx.dust(p.x + Math.sign(s.vx) * 0.14, feetY, 1, 0.5); }
+        break;
+      case 'empujar': // effort: crouched behind the hands, which press on the sphere's upper back
+        legsWalk(0.6); T.hip[0] -= 0.2; T.hip[1] -= 0.2; both('arm', () => 0.2); both('out', () => -0.05); T.lean = 0.4; T.drop = -0.08; T.look = -0.05; T.k = 16; break;
+      case 'cargar': // the hands round the sphere; a shorter stride, knees a little bent under the weight
+        legsWalk(0.6); both('arm', () => 1.5); both('out', () => -0.05); T.lean = 0.1; T.drop = -0.025; break;
+      case 'agua': // treading water: arms sculling at the sides, slow kicks
+        // The water is not footing: drawn sunk to the chest and cut at the surface (the simulated
+        // box rests on the surface), knees tucked, arms sculling at the waterline.
+        both('arm', i => 1.45 + 0.35 * Math.sin(time * 5 + i * Math.PI)); both('out', () => 0.9);
+        both('hip', i => 0.6 + 0.25 * Math.sin(time * 4 + i * Math.PI)); both('knee', () => -1.3); T.look = 0.15; T.drop = -0.32 + 0.025 * Math.sin(time * 3); break;
+      case 'cadena': case 'cadena-esfuerzo': {
+        const effort = pose === 'cadena-esfuerzo', climb = ctx.climbing ? Math.sin(time * (effort ? 11 : 9)) * 0.3 : 0;
+        if (gUp) { // pulled upward the body hangs above its grip: arms reach down to the chain,
+          // legs float up; pulling down against it, hand over hand, the legs kick and the body heaves
+          T.arm = [0.75 + climb, 0.75 - climb]; both('out', () => 0.05);
+          both('hip', i => 0.8 + (effort ? 0.35 * Math.sin(time * 9 + i * Math.PI) : 0)); both('knee', () => effort ? -1.0 : -1.15);
+          T.lean = 0.12; T.look = 0.05; T.drop = effort ? 0.06 * Math.sin(time * 9) : 0;
+        } else { // the familiar way: hands above the head, the body hangs below them
+          T.arm = [2.85 + climb, 2.85 - climb]; both('out', () => 0.22);
+          both('hip', i => 0.12 + 0.05 * i); both('knee', () => -0.25); T.lean = 0.1; T.look = 0.1;
+        }
+        if (effort && (st.sweatT -= dt) < 0) { st.sweatT = 0.35; fx.drop(this.head.localToWorld(V(-0.05, 0.14, 0.12))); }
+        break;
+      }
+      case 'trepar': both('arm', () => 2.4); both('out', () => 0.3); both('hip', () => 0.9); both('knee', () => -1.4); T.lean = 0.35; T.k = 16; break;
+      case 'caer': // falling in the familiar field: arms trailing up and flailing wide (clear of the
+        // face), legs bicycling, a glance down
+        both('arm', i => 2.4 + 0.4 * Math.sin(time * 11 + i * 2)); both('out', () => 0.95);
+        both('hip', i => 0.4 + 0.5 * Math.sin(time * 10 + i * Math.PI)); both('knee', () => -0.9); T.lean = -0.05; T.look = -0.15; break;
+      case 'en-el-aire':
+        both('arm', () => 2.1); both('out', () => 0.45); T.hip = [0.3, 0.1]; T.knee = [-0.5, -0.3];
+        T.look = Math.atan2(s.vy, Math.max(0.5, speed)) * 0.35; break;
+      case 'suspendido': { // falling upward: the mirror of 'caer'. Limbs trail the motion: rising,
+        // the arms trail down and wide and the legs pull up; sinking (slowing), the arms trail up.
+        const up = THREE.MathUtils.clamp(s.vy / 1.5, -1, 1), rise = (up + 1) / 2;
+        both('arm', i => THREE.MathUtils.lerp(2.3, 0.6, rise) + 0.3 * Math.sin(time * 9 + i * 2)); both('out', () => THREE.MathUtils.lerp(0.8, 1.15, rise));
+        both('hip', i => THREE.MathUtils.lerp(-0.1, 0.9, rise) + 0.25 * Math.sin(time * 6 + i * Math.PI)); both('knee', () => THREE.MathUtils.lerp(-0.3, -1.45, rise));
+        T.lean = 0; T.look = 0.2 * up; T.k = 7; break;
+      }
+      default: break; // 'de-pie'
+    }
+    // Transients on top: the startle on entering a region, the crouch that soaks a landing.
+    const sp = st.surprise ** 0.7;
+    both('arm', i => T.arm[i] + 0.6 * sp); both('out', i => T.out[i] + 0.9 * sp);
+    if (st.release > 0) { const r = Math.min(1, st.release * 1.4); both('arm', i => T.arm[i] * (1 - r) + 1.7 * r); both('out', i => T.out[i] + 1.35 * r); }
+    T.look = THREE.MathUtils.clamp(T.look, -0.2, 0.22); // the face stays readable
+    if (st.land > 0) { both('hip', i => T.hip[i] + 0.8 * st.land); both('knee', i => T.knee[i] - 1.3 * st.land); both('out', i => T.out[i] + 0.5 * st.land); T.drop -= 0.075 * st.land; }
+
+    const J = st.j, k = Math.min(1, dt * T.k), kf = Math.min(1, dt * 16);
+    for (const key of ['hip', 'knee', 'arm', 'out']) for (const i of [0, 1]) J[key][i] += (T[key][i] - J[key][i]) * (key === 'hip' || key === 'knee' ? (stride > 0.05 ? kf : k) : k);
+    J.lean += (T.lean - J.lean) * k; J.look += (T.look - J.look) * Math.min(1, dt * 6); J.drop += (T.drop - J.drop) * kf;
+    // In alarm (the startle, falling) the head turns toward the camera so the face can be read.
+    const alarmT = Math.max(st.surprise, pose === 'caer' ? 0.7 : 0);
+    J.turn += ((-Math.PI / 2 - st.yaw) * 0.6 * alarmT - J.turn) * Math.min(1, dt * 10);
+
+    const bob = Math.abs(Math.cos(st.walk)) * 0.035 * stride, breathe = Math.sin(time * 2.1) * 0.008;
+    this.body.position.y = bob + breathe * (1 - stride) + J.drop;
+    // The startle: a quick squash, then a stretch that settles.
+    const pop = st.surprise > 0.88 ? -0.1 : 0.15 * (st.surprise / 0.88) ** 0.7;
+    this.body.scale.set(1 + st.squash * 0.6 - pop * 0.4, 1 - st.squash + pop, 1 + st.squash * 0.6 - pop * 0.4);
     // Euler XYZ applies z in the body's own frame, whose forward is +x: lean toward the face.
-    this.body.rotation.z = -st.lean;
-
-    this.legs.forEach((l, i) => {
-      const ph = i ? sw : -sw;
-      l.hip.rotation.z = ph * 0.65 * stride + st.tuck * 0.9;
-      l.knee.rotation.z = -(Math.max(0, -ph) * 0.7 * stride) - st.tuck * 1.5;
-    });
+    this.body.rotation.z = -J.lean;
+    this.legs.forEach((l, i) => { l.hip.rotation.z = J.hip[i]; l.knee.rotation.z = J.knee[i]; });
     this.arms.forEach((a, i) => {
-      const side = i ? 1 : -1, ph = i ? -sw : sw;
-      const swing = ph * 0.55 * stride * (1 - st.carry) * (1 - st.push);
-      // Climbing: hand over hand, alternating; otherwise a small flutter while floating.
-      const climb = ctx.climbing ? Math.sin(time * 9 + i * Math.PI) * 0.35 : 0;
-      const up = st.armUp * (gUp ? 2.5 : 1.9) + (ctx.onChain ? climb : Math.sin(time * 7 + i) * 0.15 * st.armUp * (gUp ? 0.4 : 1));
-      a.rotation.z = swing + up * (1 - st.carry) + st.carry * 1.35 + st.push * 1.2;
-      // Splay: a hanging arm clears the coat; a raised arm opens outward.
-      a.rotation.x = side * (-0.13 + st.armUp * 0.62 + st.carry * 0.25);
+      const side = i ? 1 : -1, F = J.arm[i], o = J.out[i];
+      // Splay outward whatever the arm's swing: about x when it hangs or is raised, about y
+      // when it points forward.
+      a.rotation.set(-side * o * Math.cos(F), -side * o * Math.sin(F) * 0.8, F);
     });
-    // Head: look along motion; up when the field lifts; surprise widens the eyes.
-    const lookT = air ? Math.atan2(s.vy, Math.max(0.5, Math.abs(s.vx))) * 0.35 : (ctx.lookAt ?? 0);
-    st.look += (lookT - st.look) * Math.min(1, dt * 5);
-    this.head.rotation.z = st.look;
+    this.head.rotation.set(0, J.turn, J.look);
     st.nextBlink -= dt;
     if (st.nextBlink < 0) { st.blink = 0.14; st.nextBlink = 2.5 + Math.random() * 3; }
     st.blink = Math.max(0, st.blink - dt);
-    const eyeY = st.blink > 0 ? 0.12 : 1.35 + st.surprise * 0.4;
-    for (const e of this.eyes) e.scale.set(0.42, eyeY, 1 + st.surprise * 0.25);
+    const alarm = Math.max(st.surprise, pose === 'caer' ? 0.6 : 0, pose === 'cadena-esfuerzo' ? 0.3 : 0);
+    const eyeY = st.blink > 0 ? 0.12 : 1.35 + alarm * 0.4;
+    for (const e of this.eyes) e.scale.set(0.42, eyeY, 1 + alarm * 0.25);
     for (const gl of this.glints) gl.visible = st.blink <= 0;
-    this.smile.visible = st.surprise < 0.25; this.oMouth.visible = !this.smile.visible;
-    this.oMouth.scale.setScalar(0.7 + st.surprise * 0.8);
+    this.smile.visible = alarm < 0.25; this.oMouth.visible = !this.smile.visible;
+    this.oMouth.scale.setScalar(0.7 + alarm * 0.8);
     if (this.device) this.device.material.color.setHSL(0.47, 0.8, 0.55 + 0.2 * Math.sin(time * 3));
 
+    // In the water the body is cut at the surface (the simulated feet rest on it), with a ring.
+    const inWater = pose === 'agua';
+    this.clip.constant = inWater ? -(feetY - 0.005) : 1e6;
+    this.ring.visible = inWater;
+    if (inWater) { this.ring.position.set(p.x, feetY + 0.004, 0); const r = 1 + 0.08 * Math.sin(time * 3); this.ring.scale.set(r, r, r); }
+
     this.updateChains(dt, feetY, g);
+    fx.update(dt);
   }
 
   updateChains(dt, feetY, g) {
@@ -526,6 +636,9 @@ export class Explorer {
   }
 
   chain(ch, root, dt, g, damping, stiff = false, collide = null) {
+    // A jump of the anchor (R back to firm footing, a reset) restarts the chain hanging from it;
+    // otherwise the links would stretch across the screen for several frames.
+    if (ch.pts.length && Math.hypot(root.x - ch.pts[0].x, root.y - ch.pts[0].y) > 0.4) ch.pts.length = 0;
     if (!ch.pts.length) for (let i = 0; i <= ch.n; i++) ch.pts.push({ x: root.x, y: root.y - ch.len * i, z: root.z, px: root.x, py: root.y - ch.len * i });
     const ps = ch.pts; ps[0].x = root.x; ps[0].y = root.y; ps[0].z = root.z;
     const h = Math.min(dt, 1 / 30), d = 1 - damping;
@@ -545,6 +658,64 @@ export class Explorer {
     if (stiff) { // hair keeps some shape: pull the tip toward the head's up axis
       const up = this.head.localToWorld(V(CURL.lean, 0.34, 0)), t = ps[ps.length - 1];
       t.x += (up.x - t.x) * CURL.k; t.y += (up.y - t.y) * CURL.k;
+    }
+  }
+}
+
+/** Small cues around the explorer: dust where the feet skid or land, a startle mark when
+ *  entering a region, drops of effort. The drops are free points in the same field, so in the
+ *  cascade's region they fall upward like everything else. Representation only. */
+class ExplorerFX {
+  constructor(field) {
+    this.field = field; this.group = new THREE.Group(); this._a = { x: 0, y: 0 };
+    const tex = (() => {
+      if (typeof document === 'undefined') return null;
+      const cv = document.createElement('canvas'); cv.width = cv.height = 64; const g = cv.getContext('2d');
+      const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.55, 'rgba(255,255,255,0.6)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, 64, 64); const t = new THREE.CanvasTexture(cv); return t;
+    })();
+    // Marks and drops: a cream capsule with a dark ink edge, so they read over rock and sky.
+    const markTex = (() => {
+      if (typeof document === 'undefined') return null;
+      const cv = document.createElement('canvas'); cv.width = 32; cv.height = 64; const g = cv.getContext('2d');
+      g.fillStyle = '#2a160e'; g.beginPath(); g.roundRect(4, 4, 24, 56, 12); g.fill();
+      g.fillStyle = '#fff6d8'; g.beginPath(); g.roundRect(9, 9, 14, 46, 7); g.fill();
+      const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t;
+    })();
+    this.tex = { soft: tex, mark: markTex };
+    const geo = new THREE.PlaneGeometry(1, 1);
+    this.pool = Array.from({ length: 28 }, () => {
+      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0 }));
+      m.visible = false; m.renderOrder = 6; this.group.add(m);
+      return { m, life: 0, age: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, s0: 0, s1: 0, a0: 0, kind: '', field: false, rot: 0, stretch: 1 };
+    });
+  }
+  spawn(o) {
+    const q = this.pool.find(q => q.life <= 0) || this.pool.reduce((a, b) => (a.age / a.life > b.age / b.life ? a : b));
+    Object.assign(q, { age: 0, rot: 0, stretch: 1, field: false, z: 0.25, tex: 'soft' }, o);
+    q.m.visible = true; q.m.material.color.set(o.color); q.m.material.map = this.tex[q.tex]; q.m.material.needsUpdate = true; return q;
+  }
+  dust(x, y, n, v) {
+    for (let i = 0; i < n; i++) {
+      const a = (i / Math.max(1, n - 1) - 0.5) * 2.4;
+      this.spawn({ kind: 'dust', x: x + Math.sin(a) * 0.08, y: y + 0.03, vx: Math.sin(a) * v, vy: 0.15 + Math.cos(a) * v * 0.3, life: 0.6, s0: 0.07, s1: 0.24, a0: 0.55, color: '#dcc6a2' });
+    }
+  }
+  startle(at) {
+    for (const a of [-0.8, -0.27, 0.27, 0.8]) this.spawn({ kind: 'mark', tex: 'mark', x: at.x + Math.sin(a) * 0.14, y: at.y + Math.cos(a) * 0.14, z: at.z + 0.1, vx: Math.sin(a) * 0.6, vy: Math.cos(a) * 0.6, life: 0.6, s0: 0.07, s1: 0.08, a0: 1, color: '#ffffff', rot: -a, stretch: 2.6 });
+  }
+  drop(at) {
+    this.spawn({ kind: 'drop', tex: 'mark', x: at.x, y: at.y, z: at.z, vx: (Math.random() - 0.5) * 0.8, vy: 0.9, life: 0.8, s0: 0.06, s1: 0.05, a0: 1, color: '#ffffff', field: true, stretch: 1.4 });
+  }
+  update(dt) {
+    for (const q of this.pool) {
+      if (q.life <= 0) continue;
+      q.age += dt; if (q.age >= q.life) { q.life = 0; q.m.visible = false; continue; }
+      if (q.field) { this.field.at(q.x, q.y, this._a); q.vx += this._a.x * dt; q.vy += this._a.y * dt; } else { q.vx *= Math.exp(-dt * 4); q.vy *= Math.exp(-dt * 4); }
+      q.x += q.vx * dt; q.y += q.vy * dt;
+      const t = q.age / q.life, sc = q.s0 + (q.s1 - q.s0) * t;
+      q.m.position.set(q.x, q.y, q.z); q.m.rotation.z = q.rot; q.m.scale.set(sc, sc * q.stretch, 1);
+      q.m.material.opacity = q.a0 * (q.kind === 'mark' ? 1 - t * t : 1 - t);
     }
   }
 }

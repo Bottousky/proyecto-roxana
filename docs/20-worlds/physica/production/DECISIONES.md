@@ -159,3 +159,36 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
   - Las colas cuelgan de la nuca y se apoyan sobre el abrigo: el empuje es sólo a lo largo del eje frente–espalda y siempre hacia atrás.
   - Con un empuje radial, las colas se deslizaban hacia los costados (sobre los brazos) un poco en cada cuadro. Al darse vuelta el cuerpo, una cola quedaba atrapada delante del pecho.
   - Ambos defectos se encontraron en una simulación en node y se comprobaron después de la corrección.
+
+## D13 · El cuerpo cuenta el estado físico (iteración 07)
+
+**El problema:** el explorador tenía un par de mezclas sueltas (brazos arriba en el aire, piernas recogidas, cargar, empujar). No había deslizamiento, la sorpresa sólo se veía en los ojos (2 px en la cámara de juego) y el cambio de gravedad apenas se notaba en la postura.
+
+**Elegido:** un clasificador de poses que lee el estado simulado (nunca al revés) y elige una silueta por estado.
+- **Lo que lee:**
+  - apoyo;
+  - velocidad;
+  - aceleración de control;
+  - el campo donde está el cuerpo (leído en el modelo, porque la simulación no lo actualiza mientras la cadena sostiene al cuerpo);
+  - cadena, trepada, carga y empuje;
+  - agua (apoyado en un sólido que no es apoyo firme).
+- **Las poses:**
+  - de pie;
+  - caminar;
+  - frenar: con los pies que patinan, el cuerpo sigue mirando hacia donde se mueve y gira después;
+  - empujar y cargar;
+  - en la cadena, y con esfuerzo cuando se baja contra el empuje de la región;
+  - trepar;
+  - en el agua;
+  - caer en el campo familiar;
+  - en el aire;
+  - suspendido: en la región el cuerpo «cae hacia arriba», se inclina hacia atrás con los brazos en Y y mira hacia arriba.
+- **Transitorios encima:**
+  - el sobresalto al entrar a una región: brazos abiertos, estiramiento y una marca sobre la cabeza;
+  - el agachado que amortigua un aterrizaje: sólo si la normal del contacto se opone al campo local, porque un golpe contra una pared no es un aterrizaje.
+- **Señales pequeñas:**
+  - polvo donde patinan o aterrizan los pies;
+  - la marca del sobresalto;
+  - gotas de esfuerzo. Las gotas son puntos libres en el mismo campo: en la región caen hacia arriba, como todo.
+- **Cámara:** flotando en una región, el cuadro se abre un poco (+0,9 m de distancia). Con movimiento reducido no se aplica.
+- **Representación, no física:** nada de esto mueve el cuerpo simulado. En el agua el dibujo se hunde hasta la cintura, mientras la caja simulada descansa sobre la superficie. El agua no es un instrumento de medida.

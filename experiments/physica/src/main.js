@@ -22,6 +22,7 @@ const debug = params.has('debug');
 
 const app = document.getElementById('app');
 const renderer = new THREE.WebGLRenderer({ antialias: quality !== 'low', powerPreference: 'high-performance' });
+renderer.localClippingEnabled = true; // the explorer is cut at the water's surface
 renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'low' ? 1.25 : 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.02;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -143,7 +144,8 @@ window.__physica = {
   screenOf(x, y, z = 0) { const v = new THREE.Vector3(x, y, z).project(camera); return { x: (v.x * 0.5 + 0.5) * app.clientWidth, y: (-v.y * 0.5 + 0.5) * app.clientHeight }; },
   vista() { vista = 6; vistaAge = 0; vistaHeld = false; view.setCityVisible(true); },
 };
-let inspectCam = null;
+let inspectCam = null, camFloat = 0;
+const camG = { x: 0, y: 0 };
 
 // ---------- loop ----------
 let last = performance.now(), time = 0, stepPhase = 0;
@@ -181,7 +183,8 @@ function frame(now) {
   const pushing = av.supportSteps > 0 && Math.abs(world.input.x) > 0.1 && world.bodies.some(b => b.kind === 'sphere' && !b.heldBy && Math.abs(b.y - (av.y - av.hh + b.r)) < 0.1 && (b.x - av.x) * av.facing > 0 && Math.abs(b.x - av.x) < av.hw + b.r + 0.03);
   const its = world.interactables();
   const onChain = av.heldBy?.type === 'chain';
-  explorer.update(dt, time, p, { ...av, grounded: av.supportSteps > 0 || onChain }, { holding, pushing, onChain, climbing: onChain && Math.abs(world.input.y) > 0.2, lookAt: its.length ? 0.15 : 0 });
+  explorer.update(dt, time, p, { ...av, grounded: av.supportSteps > 0 || onChain }, { holding, pushing, onChain, climbing: onChain && Math.abs(world.input.y) > 0.2,
+    inputY: world.input.y, mantling: av.heldBy?.type === 'mantle', inWater: av.supportSteps > 0 && !!av.support?.solid?.noFooting, lookAt: its.length ? 0.15 : 0 });
   if (av.supportSteps > 0 && Math.abs(av.vx) > 0.4) { stepPhase += Math.abs(av.vx) * dt * 1.72; if (stepPhase > 1) { stepPhase -= 1; sound.step(); } }
   view.update(dt, time, alpha);
   const zw = Math.max(...world.field.zones.map(z => world.field.weight(z, av.x, av.y)));
@@ -215,6 +218,10 @@ function frame(now) {
     if (intro > 2.2) { tx = -18.5; ty = 2.6; td = 15; } else { tx = 1.4; ty = 0.9; td = 17; }
   }
   hud.classList.toggle('intro', intro > 0);
+  // Floating in a region the frame opens up a little: more room above, a lighter feel.
+  const floating = av.supportSteps === 0 && !av.heldBy && world.field.at(av.x, av.y, camG).y > 0.8 ? 1 : 0;
+  camFloat += (floating - camFloat) * Math.min(1, dt * 1.5);
+  if (!reduced) { td += 0.9 * camFloat; ty += 0.3 * camFloat; }
   if (inspectCam) { tx = inspectCam.x; ty = inspectCam.y; td = inspectCam.dist; }
   // With reduced motion the vista starts and ends as a cut, not a camera move.
   const vistaNow = vista > 0, cut = reduced && vistaNow !== vistaWas; vistaWas = vistaNow;

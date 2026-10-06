@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 06 (el explorador fiel a su hoja de giro; ver `evidence/iter-06`).
+**Actualizado:** 2026-10-06 · iteración 07 (el cuerpo cuenta el estado físico; ver `evidence/iter-07`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,24 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 06):** el explorador 3D se reconstruyó sobre su hoja de giro (D12).
+**Último cambio aceptado (iteración 07):** el explorador elige su pose a partir del estado simulado (D13).
+- **Poses:**
+  - frenar, con los pies que patinan;
+  - empujar y cargar, con las manos sobre la esfera;
+  - la cadena, con el esfuerzo de bajar contra la región;
+  - flotar en el agua, recortado en la superficie;
+  - caer, con la cara en alarma;
+  - suspendido en la región, de frente con los brazos en V.
+- **Transitorios:** el sobresalto al entrar a una región; el agachado al aterrizar, sólo si el contacto es un piso para el campo local.
+- **Gotas de esfuerzo:** son puntos en el mismo campo (en la región caen hacia arriba).
+- **Cámara:** el cuadro se abre un poco al flotar.
+- **Corrección:** las cadenas de tela se reinician al teletransportarse (R), porque antes la bufanda cruzaba la pantalla.
+- **Revisión independiente:** dos pasadas.
+- **Evidencia:** secuencias con teclado real, antes y después, con la pose de cada cuadro; recorrido sin regresiones.
+
+  Ver `evidence/iter-07`.
+
+**Iteración 06:** el explorador 3D se reconstruyó sobre su hoja de giro (D12).
 - **Pelo:** con contorno desparejo, hebras pintadas y un remolino.
 - **Antiparras:** sobre la frente.
 - **Ropa:** abrigo abierto bajo el cinturón, cartera con correa cruzada, reloj de muñeca, pantalón y botas.
@@ -81,14 +98,15 @@
 **Qué falla todavía (ver BACKLOG):**
 - **Acabado del Hito A** (el mayor impedimento para cerrarlo):
   - pasto, musgo e instrumentos genéricos;
-  - las colas de la bufanda suben en la región, pero en la cámara de juego casi no se ven (A24, parcial);
+  - las colas de la bufanda suben en la región, pero en la cámara de juego casi no se ven (A24, parcial); el cuerpo sí cuenta el campo con la pose suspendida;
+  - el esfuerzo en la cadena se lee poco a escala de juego (A12, parcial);
   - la corona de la cresta se ve poco y las pozas son rectángulos.
 - **A20:** no hay amortiguación; la oscilación ideal es eterna, aunque tiene salidas.
 - **A21:** hay un solo chorro.
 - **A17:** no hay nada que *modificar*.
 - **A22:** el mástil parece una escalera.
 - **A23:** assets generados, esperando la decisión del usuario.
-- **A12:** las animaciones del avatar no se revisaron en movimiento.
+- **A12 (resto):** las poses se revisaron en secuencias de cuadros; falta verlas en movimiento continuo, en video.
 - **A16:** no hay menú de opciones.
 - **No verificado:**
   - el sonido: nadie lo escuchó;
@@ -98,15 +116,18 @@
 
 ## Próximo resultado
 
-**Animación legible del explorador (A12) y acabado de lo genérico.** El modelo ya coincide con el retrato, pero falta que el cuerpo cuente lo que pasa.
-- **Poses distinguibles por estado:** esfuerzo al empujar o trepar, deslizamiento, sorpresa al entrar a la región, aterrizaje.
-- **Pista del campo en el propio explorador** que se vea en la cámara de juego, porque hoy las colas suben detrás de la cabeza.
-- **Pasto e instrumentos** con identidad, en vez de conos y esferas genéricas.
+**Vegetación e instrumentos con identidad (A23, legibilidad A22).**
+- **Vegetación:** el pasto de conos verdes y el musgo genérico ocupan el primer plano de todos los cuadros de juego, y son lo más «programador» que queda a la vista. Se reemplazan por vegetación con identidad, que se oriente según el campo como el musgo: pastos y juncos que se doblan hacia arriba en la región, flores, suculentas.
+- **Lado de la Orilla legible (A22):**
+  - el mástil de plomadas no debe parecer una escalera;
+  - cada soporte tiene que mostrar a qué esfera corresponde.
 - **Criterio:**
-  - secuencia del cruce con una pose distinta en cada estado, en la cámara de juego;
-  - la pista del campo visible a la escala de juego;
-  - recorrido con teclado sin regresiones;
-  - revisión independiente.
+  - antes/después en las mismas tomas de juego;
+  - la vegetación responde al campo de forma medible (la inclinación sigue al campo local);
+  - recorrido con teclado sin regresiones, 60 FPS;
+  - revisión independiente centrada en arte.
+
+*Plan cumplido en la iteración 07:* poses legibles por estado (A12): secuencias en la cámara de juego con una pose distinta por estado y el campo en la postura (suspendido, sobresalto).
 
 *Plan cumplido en la iteración 06:* el modelo 3D fiel al retrato (A24): vista de giro junto a la hoja.
 

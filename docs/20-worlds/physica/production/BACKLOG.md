@@ -19,7 +19,7 @@ primero.
 | A9 | **Transferencia**: la misma regla en otra geometría, sin repetir la explicación | El Pozo y el Mirador: ventana de dos límites (cae / llega / corto), predecible con el soporte P | hecho (iter 3; falta validar con personas) |
 | A10 | Acabado de roca: detalle de cerca, estratos con relieve legible | Primer plano a 5 m sin manchas borrosas; comparación antes/después | hecho (iter 4, `evidence/iter-04`; pendiente de la revisión de arte) |
 | A11 | Musgo sin quiebres: barbas suaves que cuelgan y se invierten | Primer plano de la sima: hebras continuas, abajo de y = −3,4 cuelgan y arriba suben | hecho (iter 1, `08-musgo-sima`) |
-| A12 | Avatar: animaciones de esfuerzo, deslizamiento, sorpresa legibles | Secuencia del cruce con pose distinguible por estado | incompleto (iter 6: modelo nuevo con caminar, brazos en alto, piernas recogidas y sorpresa; faltan esfuerzo, deslizamiento y aterrizaje legibles) |
+| A12 | Avatar: animaciones de esfuerzo, deslizamiento, sorpresa legibles | Secuencia del cruce con pose distinguible por estado | hecho (iter 7, `evidence/iter-07`: secuencias a 1× con teclado real y la pose de cada cuadro; revisión independiente en dos pasadas. Parcial: el esfuerzo en la cadena y soltarse se leen poco) |
 | A13 | Sonido verificado por una persona | Pedido explícito a un humano | bloqueado (no se puede escuchar) |
 | A14 | Táctil y mando probados en dispositivo | Recorrido en un teléfono real y con un mando | bloqueado (sin dispositivo) |
 | A15 | Modo móvil ≥ 30 FPS medido en un dispositivo representativo | Tiempos de cuadro reportados con dispositivo y navegador | bloqueado (sin dispositivo) |
