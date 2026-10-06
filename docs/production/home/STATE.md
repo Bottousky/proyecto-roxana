@@ -239,9 +239,18 @@ teclado 15/15. Paquete §14 en `CANDIDATE.md`.
   `evidence/c12/bitland-respuesta.jpg`; vista general sin regresión `evidence/c12/explorar-10-tarde-1440.jpg`.
 - QA: tests 98/98; interacción 32/32; teclado 15/15. Medición 390: GPU ocupada por tres agentes, sin medir.
 
+## Ciclo 13 (2026-10-06) — verificación breve, sin cambios
+
+- Revisados los interiores de Física, Programación y Matemática con la cámara real (`output/home/c13/`, no versionado).
+  El triángulo claro sobre el muro norte es la luz del sol sobre su cara interior, recortada por la sombra del muro
+  vecino (no hay geometría por encima de los muros: verificado en la página). No es un defecto.
+- Sin datos externos nuevos (redes `url:null`, 0 novedades reales). GPU ocupada por Physica, Arithmos y el checkout
+  principal: medición 390 no realizada.
+- Estado: **CANDIDATO_PARA_REVISION**, con pendientes que dependen de terceros (BLOQUEADO_EXTERNO para lo que falta).
+
 ## Siguiente acción exacta
 
-1. Medición 390 DPR 2 cuando la GPU esté libre (sigue siendo emulación); actualizar PERF y CANDIDATE.
-2. Si llegan datos externos (URLs de redes, novedades, origen de los otros mundos), integrarlos.
-3. Sin datos nuevos ni GPU libre: no hay más trabajo de alto impacto ejecutable sin reabrir el diseño (personajes 3D o
-   interiores de mundos no integrados quedan fuera de este alcance); las siguientes ejecuciones deben ser breves.
+Nada ejecutable sin datos o condiciones externas. Retomar sólo si:
+1. la GPU queda libre → `W=390 H=844 DPR=2 QUALITY=low|high node scripts/home-perf.mjs …` sobre la build y actualizar PERF/CANDIDATE;
+2. llegan URLs de redes → `src/escuela/social.js`; novedades → `public/escuela/novedades.json`;
+3. se define el origen de Physica/Bitland/Arithmos → adaptador de progreso según `PROGRESSION.md`.
