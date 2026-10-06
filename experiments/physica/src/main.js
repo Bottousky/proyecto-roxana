@@ -39,14 +39,15 @@ const cam = { x: world.avatar.x, y: 1.2, dist: 11.5 };
 const input = new Input(app);
 const sound = new Sound();
 const journal = new Journal(app, world);
+journal.onAdd = id => { if (id === 'cruce') view.clearChalk(); };
 if (journal.footing && !params.has('fresh')) { const f = journal.footing, av = world.avatar; av.x = av.px = f.x; av.y = av.py = f.y; av.lastSupport = { ...f }; }
 
 // ---------- HUD ----------
 const hud = document.createElement('div'); hud.className = 'hud';
 hud.innerHTML = `
   <div class="title" id="title"><span class="eyebrow">Physica</span><b>La cascada ascendente</b></div>
-  <div class="prompt" id="prompt" hidden><kbd id="prompt-key">E</kbd><span id="prompt-verb"></span></div>
-  <div class="hint" id="hint"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar (en el aire: volver a pisar firme) · <kbd>J</kbd> Bitácora</div>
+  <div class="prompt" id="prompt" hidden><kbd id="prompt-key">E</kbd><span><span id="prompt-verb"></span><small id="prompt-hint"></small></span></div>
+  <div class="hint" id="hint"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>▲</kbd><kbd>▼</kbd> ajustar, trepar · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar (en el aire: volver a pisar firme) · <kbd>J</kbd> Bitácora</div>
   <div class="legend" id="legend" hidden><i></i> una marca cada 0,1 s · anillo cada 0,5 s</div>
   <div class="pause" id="pause" hidden><div><b>En pausa</b><p>El experimento quedó detenido donde estaba.</p><button id="resume">Seguir</button></div></div>
   ${debug ? '<pre class="debug" id="debug"></pre>' : ''}`;
@@ -104,7 +105,7 @@ let inspectCam = null;
 
 // ---------- loop ----------
 let last = performance.now(), time = 0, stepPhase = 0;
-const pending = { act: false, reset: false };
+const pending = { act: false, reset: false, adjust: 0 };
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(0.25, (now - last) / 1000); last = now;
@@ -115,19 +116,21 @@ function frame(now) {
   if (paused) { renderer.render(scene, camera); return; }
   if (journal.open) { inp.axis = 0; inp.act = false; }
   if (inp.act) pending.act = true;
+  if (inp.adjust) pending.adjust = inp.adjust;
   if (inp.reset) pending.reset = true;
-  if (Math.abs(inp.axis) > 0.1 && !moved) { moved = true; hintTimer = 6; }
+  if (Math.abs(inp.axis) > 0.1 && !moved) { moved = true; hintTimer = input.lastDevice === 'touch' ? 14 : 6; }
   time += dt;
 
   const alpha = stepper.advance(dt, () => {
-    world.input.x = inp.axis;
+    world.input.x = inp.axis; world.input.y = inp.axisY;
+    if (pending.adjust) { world.input.adjust = pending.adjust; pending.adjust = 0; }
     if (pending.act) { world.input.act = true; pending.act = false; }
     if (pending.reset) { world.input.reset = true; pending.reset = false; }
   });
   const av = world.avatar;
   for (const e of world.drainEvents()) {
     eventLog.push(e); if (eventLog.length > 400) eventLog.shift();
-    sound.event(e, av.id); explorer.onEvent(e, av.id); journal.onEvent(e);
+    sound.event(e, av.id); explorer.onEvent(e, av.id); journal.onEvent(e); view.onEvent(e);
   }
   journal.update(dt);
 
@@ -135,7 +138,8 @@ function frame(now) {
   const holding = !!av.holding;
   const pushing = av.supportSteps > 0 && Math.abs(world.input.x) > 0.1 && world.bodies.some(b => b.kind === 'sphere' && !b.heldBy && Math.abs(b.y - (av.y - av.hh + b.r)) < 0.1 && (b.x - av.x) * av.facing > 0 && Math.abs(b.x - av.x) < av.hw + b.r + 0.03);
   const its = world.interactables();
-  explorer.update(dt, time, p, { ...av, grounded: av.supportSteps > 0 }, { holding, pushing, lookAt: its.length ? 0.15 : 0 });
+  const onChain = av.heldBy?.type === 'chain';
+  explorer.update(dt, time, p, { ...av, grounded: av.supportSteps > 0 || onChain }, { holding, pushing, onChain, climbing: onChain && Math.abs(world.input.y) > 0.2, lookAt: its.length ? 0.15 : 0 });
   if (av.supportSteps > 0 && Math.abs(av.vx) > 0.4) { stepPhase += Math.abs(av.vx) * dt * 1.72; if (stepPhase > 1) { stepPhase -= 1; sound.step(); } }
   view.update(dt, time, alpha);
   const zw = world.field.weight(world.field.zones[0], av.x, av.y);
@@ -146,10 +150,10 @@ function frame(now) {
   const inCascade = Math.max(0, 1 - Math.max(0, Math.abs(p.x - 2.6) - 4.5) / 4);
   let tx = THREE.MathUtils.lerp(THREE.MathUtils.clamp(p.x + (reduced ? 0 : av.facing * 1.2), -15.5, 14.5), 2.6, inCascade * 0.75);
   // Vertically: the region's view, but never let the explorer leave the middle 60% of the frame.
-  let ty = THREE.MathUtils.lerp(p.y - av.hh + 1.2, 1.5, inCascade * 0.85);
+  let ty = THREE.MathUtils.lerp(p.y - av.hh + 1.2, 1.7, inCascade * 0.85);
   const halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * cam.dist * 0.6;
   ty = THREE.MathUtils.clamp(ty, p.y + 0.3 - halfH, p.y - 0.3 + halfH * 0.7);
-  let td = THREE.MathUtils.lerp(11.5, 14, inCascade);
+  let td = THREE.MathUtils.lerp(11.5, 15, inCascade);
   if (inspectCam) { tx = inspectCam.x; ty = inspectCam.y; td = inspectCam.dist; }
   const k = Math.min(1, dt * (reduced ? 6 : 2.6));
   cam.x += (tx - cam.x) * k; cam.y += (ty - cam.y) * k; cam.dist += (td - cam.dist) * k;
@@ -166,6 +170,7 @@ function frame(now) {
     promptEl.style.transform = `translate(${(v.x * 0.5 + 0.5) * app.clientWidth}px, ${(-v.y * 0.5 + 0.5) * app.clientHeight}px) translate(-50%, -100%)`;
     $('prompt-key').textContent = input.lastDevice === 'gamepad' ? 'A' : input.lastDevice === 'touch' ? 'E' : 'E';
     $('prompt-verb').textContent = it.verb;
+    $('prompt-hint').textContent = it.hint || '';
   } else promptEl.hidden = true;
   $('legend').hidden = !world.traces.length || journal.open;
   if (moved) { hintTimer -= dt; if (hintTimer < 0) $('hint').classList.add('gone'); }

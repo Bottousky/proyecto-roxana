@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { World, DT, ballisticPath, SPHERE, AVATAR } from '../src/sim/world.js';
 import { FixedStepper } from '../src/sim/stepper.js';
-import { CASCADA, STREAM_SPEED } from '../src/sim/levels/cascada.js';
+import { CASCADA, STREAM_SPEED, TERRACE_Y } from '../src/sim/levels/cascada.js';
 import { G_FAMILIAR } from '../src/sim/field.js';
 
 const ZONE = CASCADA.zones[0];
@@ -103,7 +103,11 @@ test('ideal 1D field: the sphere returns to its release height (energy, known so
 });
 
 test('leaving the region it keeps its instantaneous velocity and then follows exterior gravity', () => {
-  const w = fresh(), st = releaseStand(w, 'B'), b = st.body, z = w.field.zones[0];
+  // Released from 1 m the sphere clears the band completely above the top (peak 3.8 m).
+  const w = fresh(), sB = stand(w, 'B');
+  w.avatar.x = sB.x; w.step(); w.input.adjust = -1; w.step(); w.input.adjust = -1; w.step();
+  assert.equal(sB.clampY, 1);
+  const st = releaseStand(w, 'B'), b = st.body, z = w.field.zones[0];
   let before = null;
   for (let i = 0; i < 4 / DT; i++) {
     const wt = w.field.weight(z, b.x, b.y);
@@ -113,7 +117,8 @@ test('leaving the region it keeps its instantaneous velocity and then follows ex
   }
   assert.ok(Math.abs(b.vy - before.vy) < 0.1, `exit velocity ${b.vy} vs just before ${before.vy}`);
   // Once clear of the band it decelerates at exactly g.
-  while (w.field.weight(z, b.x, b.y - SPHERE.r) > 0) w.step();
+  let guard = 0; while (w.field.weight(z, b.x, b.y - SPHERE.r) > 0 && guard++ < 600) w.step();
+  assert.ok(guard < 600, 'the sphere clears the band');
   const v1 = b.vy; w.step(); const v2 = b.vy;
   assert.ok(Math.abs((v2 - v1) / DT + G_FAMILIAR) < 1e-6, `exterior acceleration ${(v2 - v1) / DT}`);
 });
@@ -155,28 +160,72 @@ test('determinism: the same inputs give bit-identical states', () => {
   assert.deepEqual(a.bodies.map(x => [x.x, x.y, x.vx, x.vy]), b.bodies.map(x => [x.x, x.y, x.vx, x.vy]));
 });
 
-test('the water arch: leaving the lip at stream speed it crosses the chasm onto the terrace', () => {
-  const w = fresh();
-  const path = ballisticPath(w.field, 0, 0.05, STREAM_SPEED, 0, { steps: 1200 });
+// Redesign (iter 2): the stream no longer leaves the lip (its arch drew the explorer's route).
+// The water rises from the bottom of the chasm — the deepest start — and crests over the Terraza.
+test('the water rising from the chasm floor crests over the Terraza and lands on it', () => {
+  const w = fresh(), sp = CASCADA.spring;
+  const path = ballisticPath(w.field, sp.x, sp.y, sp.vx, 0, { steps: 2400 });
+  const down = path.find((p, i) => i > 0 && p.vy < 0 && p.y <= TERRACE_Y + 0.02 && p.x > 4.5);
   const peak = path.reduce((m, p) => Math.max(m, p.y), -Infinity);
-  const down = path.find((p, i) => i > 0 && p.vy < 0 && p.y <= 3.05 && p.x > 2);
-  assert.ok(peak > ZONE.y1 && peak < ZONE.y1 + 2, `crest at ${peak}`);
-  assert.ok(down && down.x > 4.5, `comes down at x=${down?.x}`);
-  assert.ok(path.filter(p => p.x < 4.5).every(p => p.y > -0.1), 'never falls into the chasm');
+  assert.ok(peak > TERRACE_Y, `crest at ${peak}`);
+  assert.ok(down && down.x > 4.6, `comes down on the Terraza at x=${down?.x}`);
+  assert.ok(path.filter(p => p.x < 4.5).every(p => p.x > 0), 'stays in the chasm until it crests');
 });
 
-test('end-to-end: the explorer walks off the lip, rises with the region and lands on the terrace', () => {
+// Redesign (iter 2): from the lip the explorer must fall short — a safe failure that informs.
+test('walking off the lip, the explorer rises but falls short of the Terraza and is not stranded', () => {
   const w = fresh(), av = w.avatar;
-  let maxY = -Infinity, left = false, ticks = 0;
-  while (ticks++ < 20 / DT) {
-    w.input.x = 1; w.step();
-    maxY = Math.max(maxY, av.y);
-    if (av.x > 0.3) left = true;
-    if (left && av.x > 5 && av.supportSteps > 10) break;
-  }
-  assert.ok(av.x > 5, `reached x=${av.x}`);
-  assert.ok(Math.abs(av.y - AVATAR.hh - 3) < 0.01, `standing on the terrace at feet=${av.y - AVATAR.hh}`);
-  assert.ok(maxY - AVATAR.hh > 3, 'it rose above the terrace top');
+  let apex = -Infinity;
+  for (let i = 0; i < 8 / DT; i++) { w.input.x = 1; w.step(); for (const e of w.drainEvents()) if (e.type === 'apex') apex = Math.max(apex, e.y); }
+  assert.ok(av.x < 4.6 || av.y - AVATAR.hh < TERRACE_Y - 0.1, 'did not land on the Terraza');
+  const expected = 3 + (ZONE.g.y / G_FAMILIAR) * (3 - AVATAR.hh) - AVATAR.hh;   // sharp-boundary estimate
+  assert.ok(Math.abs(apex - expected) < 0.15, `feet peaked at ${apex}, model ${expected}`);
+  assert.ok(TERRACE_Y - apex > 0.5, 'clearly short, beyond the edge-grab reach');
+  let back = false;
+  for (let i = 0; i < 10 / DT && !back; i++) { w.input.x = -1; w.step(); back = av.supportSteps > 5 && av.x < 0; }
+  assert.ok(back, 'steering back reaches the Orilla');
+});
+
+function chainRoute(w, letGoY) {
+  const av = w.avatar;
+  w.shortSeen = true;
+  av.x = -0.4; av.y = AVATAR.hh; av.px = av.x; av.py = av.y;
+  run(w, 0.3);
+  w.input.act = true; w.step();
+  assert.equal(av.heldBy?.type, 'chain', 'holding the chain');
+  let n = 0; while (av.y > letGoY && n++ < 3000) { w.input.y = -1; w.step(); }
+  w.input.y = 0; w.input.act = true; w.step();
+  assert.equal(av.heldBy, null, 'let go');
+  for (let i = 0; i < 8 / DT; i++) { w.input.x = 1; w.step(); if (av.x > 4.6 && av.supportSteps > 10) break; }
+  return av.x > 4.6 && av.supportSteps > 10 && Math.abs(av.y - AVATAR.hh - TERRACE_Y) < 0.02;
+}
+
+test('the chain: letting go deep enough reaches the Terraza, too shallow does not', () => {
+  for (const y of [0.55, 0, -0.5]) assert.equal(chainRoute(fresh(), y), false, `let go at ${y} should fall short`);
+  for (const y of [-1, -1.5, -2, -2.45]) assert.equal(chainRoute(fresh(), y), true, `let go at ${y} should reach`);
+});
+
+test('the bell at the Terraza height rings for B from the same depths that carry the explorer', () => {
+  const rings = y0 => {
+    const w = fresh(), st = stand(w, 'B');
+    w.avatar.x = st.x; w.step();
+    while (st.clampY > y0 + 1e-9) { w.input.adjust = -1; w.step(); }
+    w.input.act = true; w.step();
+    let n = 0; for (let i = 0; i < 4 / DT; i++) { w.step(); n += w.drainEvents().filter(e => e.type === 'bell').length; }
+    return n > 0;
+  };
+  for (const y of [2, 1, 0, -0.5]) assert.equal(rings(y), false, `B from ${y} should not ring`);
+  for (const y of [-1, -1.5, -2, -2.5]) assert.equal(rings(y), true, `B from ${y} should ring`);
+});
+
+test('B\'s clamp moves in 0.5 m steps along its rail and stops at its ends', () => {
+  const w = fresh(), st = stand(w, 'B');
+  w.avatar.x = st.x; w.step();
+  for (let i = 0; i < 20; i++) { w.input.adjust = -1; w.step(); }
+  assert.equal(st.clampY, -2.5);
+  assert.equal(st.body.y, -2.5);
+  w.input.adjust = 1; w.step();
+  assert.equal(st.clampY, -2);
 });
 
 test('end-to-end: stopping inside the region leaves the explorer suspended, never stranded', () => {
@@ -190,16 +239,13 @@ test('end-to-end: stopping inside the region leaves the explorer suspended, neve
   assert.ok(back, `can steer back to the Orilla (x=${av.x}, y=${av.y})`);
 });
 
-test('pushing a loose sphere off the lip sends it after the water', () => {
+test('a loose sphere pushed off the lip rises like the explorer and also falls short', () => {
   const w = fresh(), av = w.avatar;
-  // Clear the other loose spheres; push L3 from behind.
-  const balls = w.bodies.filter(b => b.home);
-  balls[0].x = -12; balls[1].x = -13;
-  const b = balls[2]; b.x = -2; b.y = SPHERE.r; b.heldBy = null;
+  const b = w.bodies.filter(x => x.home)[2]; b.heldBy = null; b.x = -2; b.y = SPHERE.r;
   av.x = -3; av.y = AVATAR.hh;
   let t = 0; while (t++ < 2.5 / DT) { w.input.x = av.x < -0.7 ? 1 : 0; w.step(); }
-  run(w, 4, { x: 0 });
-  assert.ok(b.x > 4.5 && Math.abs(b.y - (3 + SPHERE.r)) < 0.05, `sphere at ${b.x.toFixed(2)},${b.y.toFixed(2)}`);
+  let top = -Infinity; for (let i = 0; i < 6 / DT; i++) { w.input.x = 0; w.step(); top = Math.max(top, b.y + b.r); }
+  assert.ok(top < TERRACE_Y && b.x < 4.5 + b.r, `sphere top reached ${top.toFixed(2)} at x=${b.x.toFixed(2)}`);
 });
 
 test('local reset returns test bodies to their supports and keeps the explorer', () => {
@@ -214,16 +260,16 @@ test('local reset returns test bodies to their supports and keeps the explorer',
 
 test('reeling brings the sphere home and re-arms the support; a new release repeats the path', () => {
   const w = fresh(), st = releaseStand(w, 'B');
-  run(w, 2);
-  const first = w.traces.find(t => t.source === 'B').marks.slice(0, 15).map(m => [m.x, m.y]);
+  run(w, 0.9);   // mid-flight, away from the clamp (near it the reel would re-arm in one step)
+  const first = w.traces.find(t => t.source === 'B').marks.slice(0, 8).map(m => [m.x, m.y]);
   w.input.act = true; w.step();
   assert.equal(st.state, 'reeling');
   run(w, 5);
   assert.equal(st.state, 'armed');
   w.input.act = true; w.step();
-  run(w, 2);
+  run(w, 0.9);
   const tr = w.traces.filter(t => t.source === 'B');
-  const second = tr[tr.length - 1].marks.slice(0, 15).map(m => [m.x, m.y]);
+  const second = tr[tr.length - 1].marks.slice(0, 8).map(m => [m.x, m.y]);
   assert.deepEqual(second, first);
 });
 
@@ -244,36 +290,34 @@ test('the route is never blocked: release A, release B, then cross (no jam on in
   assert.equal(stand(w, 'A').state, 'free', 'A released');
   walkTo(stand(w, 'B').x + 0.05); assert.ok(Math.abs(av.x - stand(w, 'B').x) < 0.25, `reached support B (x=${av.x})`);
   w.input.act = true; w.step(); run(w, 0.5);
-  let n = 0; while (n++ < 12 / DT && !(av.x > 5 && av.supportSteps > 10)) { w.input.x = 1; w.step(); }
-  assert.ok(av.x > 5 && Math.abs(av.y - AVATAR.hh - 3) < 0.01, `on the terrace (x=${av.x}, y=${av.y})`);
+  assert.ok(chainRoute(w, -1.5), 'down the chain and across to the Terraza');
 });
 
-test('taking a sphere from the table, carrying it and letting go at the lip sends it with the water', () => {
+test('equivalence: a sphere and the explorer let go side by side at the same depth rise together', () => {
   const w = fresh(), av = w.avatar;
-  const walkTo = (x, max = 15) => { let n = 0; while (Math.abs(av.x - x) > 0.1 && n++ < max / DT) { w.input.x = Math.sign(x - av.x); w.step(); } };
-  walkTo(-5.5); w.input.x = 0; run(w, 0.3);
+  w.shortSeen = true;
+  av.x = -0.4; av.y = AVATAR.hh; run(w, 0.3);
   w.input.act = true; w.step();
-  assert.ok(av.holding, 'holding a sphere');
-  const b = av.holding;
-  walkTo(-1.2);
-  // keep walking and let go just before the lip, at walking speed
-  let n = 0; while (av.x < -0.55 && n++ < 400) { w.input.x = 1; w.step(); }
-  w.input.act = true; w.input.x = 0; w.step();
-  assert.equal(av.holding, null);
-  run(w, 5);
-  assert.ok(b.x > 4.5 && Math.abs(b.y - (3 + SPHERE.r)) < 0.06, `sphere ended at ${b.x.toFixed(2)},${b.y.toFixed(2)}`);
+  let n = 0; while (av.y > -1.5 && n++ < 3000) { w.input.y = -1; w.step(); }
+  w.input.y = 0;
+  const b = w.bodies.filter(x => x.home)[0];
+  b.heldBy = null; b.x = av.x + 0.9; b.y = av.y; b.vx = b.vy = 0;   // set beside the hands (test setup)
+  w.input.act = true; w.step();
+  let worst = 0;
+  for (let i = 0; i < 1.2 / DT; i++) { w.step(); worst = Math.max(worst, Math.abs(b.y - av.y)); }
+  assert.ok(worst < 0.01, `vertical separation grew to ${worst}`);
 });
 
 test('returning from the Terraza: stepping back into the region and holding ▶ gets back onto it', () => {
   // Reviewer's case: walk left off the terrace, float, then hold right at various reaction times.
   for (const react of [0.3, 0.6, 1.0, 1.3, 1.8, 2.5, 3.2]) {
     const w = fresh(), av = w.avatar;
-    av.x = 6; av.y = 3 + AVATAR.hh; av.px = av.x; av.py = av.y;
+    av.x = 6; av.y = TERRACE_Y + AVATAR.hh; av.px = av.x; av.py = av.y;
     run(w, 0.3);
     let n = 0; while (av.x > 4.3 && n++ < 600) { w.input.x = -1; w.step(); }
     run(w, react, { x: 0 });
     let ok = false;
-    for (let i = 0; i < 10 / DT && !ok; i++) { w.input.x = 1; w.step(); ok = av.x > 4.6 && av.supportSteps > 10 && Math.abs(av.y - AVATAR.hh - 3) < 0.02; }
+    for (let i = 0; i < 10 / DT && !ok; i++) { w.input.x = 1; w.step(); ok = av.x > 4.6 && av.supportSteps > 10 && Math.abs(av.y - AVATAR.hh - TERRACE_Y) < 0.02; }
     assert.ok(ok, `reaction ${react}s: stuck at x=${av.x.toFixed(2)} y=${(av.y - AVATAR.hh).toFixed(2)}`);
   }
 });
@@ -286,4 +330,34 @@ test('R while floating with no support returns the explorer to its last firm foo
   w.input.reset = true; w.step();
   run(w, 0.3);
   assert.ok(av.supportSteps > 0 && av.x < 0 && Math.abs(av.y - AVATAR.hh) < 0.01, `back on the Orilla at ${av.x.toFixed(2)},${av.y.toFixed(2)}`);
+});
+
+test('climbing back up the chain leaves the explorer on firm ground on the Orilla', () => {
+  const w = fresh(), av = w.avatar;
+  av.x = -0.4; av.y = AVATAR.hh; run(w, 0.3);
+  w.shortSeen = true;
+  w.input.act = true; w.step();
+  assert.equal(av.heldBy?.type, 'chain');
+  run(w, 0.6, { y: -1 });
+  run(w, 2, { y: 1 });
+  run(w, 1, { y: 0 });
+  assert.equal(av.heldBy, null, 'off the chain');
+  assert.ok(av.supportSteps > 30 && av.x < -0.2 && Math.abs(av.y - AVATAR.hh) < 0.01, `on the Orilla at ${av.x.toFixed(2)},${av.y.toFixed(2)}`);
+});
+
+test('the bell rings once per release, not on every bounce', () => {
+  const w = fresh(), st = stand(w, 'B');
+  w.avatar.x = st.x; w.step();
+  while (st.clampY > -1.5 + 1e-9) { w.input.adjust = -1; w.step(); }
+  w.input.act = true; w.step();
+  let n = 0; for (let i = 0; i < 30 / DT; i++) { w.step(); n += w.drainEvents().filter(e => e.type === 'bell').length; }
+  assert.equal(n, 1);
+});
+
+test('the chain is offered only after a first attempt fell short (or after the bell rang)', () => {
+  const w = fresh(), av = w.avatar;
+  av.x = -0.4; av.y = AVATAR.hh; run(w, 0.3);
+  assert.ok(!w.interactables().some(i => i.kind === 'chain'), 'not offered at first');
+  w.shortSeen = true;
+  assert.ok(w.interactables().some(i => i.kind === 'chain'), 'offered after a short attempt');
 });

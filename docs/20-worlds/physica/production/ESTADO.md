@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-05 · iteración 01 (preparación + primera iteración).
+**Actualizado:** 2026-10-05 · iteración 02.
 
 ## Dónde se trabaja
 
@@ -14,19 +14,23 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 01):** la cascada ascendente es jugable de punta a punta. Se aceptó con esta evidencia:
-- 29 pruebas;
-- un recorrido con teclado real;
-- capturas en secuencia, en `evidence/iter-01`;
-- una revisión independiente, con sus correcciones en `evidence/iter-01/REVISION.md`.
+**Último cambio aceptado (iteración 02):** el cruce exige anticipar.
+- **Desde el borde no se llega.** La Terraza está a 4,4 m y la región termina en 3 m.
+- **Experimento seguro:** el riel de B tiene una campana a la altura de la Terraza y predice el umbral de la cadena (el mismo número, la misma referencia: el centro del cuerpo).
+- **El agua:** sube desde la poza del fondo y es lo único que cresta.
+- **Evidencia:** 35 pruebas, recorrido con teclado y revisión independiente. Ver `evidence/iter-02` (README y REVISION).
+
+**Iteración 01:** la cascada se juega de punta a punta, con la revisión corregida. Ver `evidence/iter-01`.
 
 **Qué hay:**
 - **Campo regional** con banda suave y superposición.
 - **Integración** Verlet a 120 Hz, determinista.
-- **Dos soportes con carrete**, a la misma altura y a ambos lados del borde: el A suelta fuera de la región y el B dentro.
+- **Dos soportes con carrete**, a la misma altura (2 m) y a ambos lados del borde. El riel de B baja hasta −2,5 m (▲▼). La campana de la Terraza suena una vez por suelta.
+- **Cadena para bajar dentro de la región** (▼, con esfuerzo). Se suelta con E. Se ofrece después del primer intento corto.
+- **Tiza por intento** en la pared, rotulada con el lugar de partida, y la línea de la campana a 4,5 m.
 - **Trazas** cada 0,1 s.
 - **Esferas sueltas** para llevar y soltar.
-- **Arco de agua** integrado del mismo campo, enmarcado por dos caídas familiares.
+- **Agua:** el arroyo se va por una reja, brota en la poza de la sima y sube integrada del mismo campo hasta crestar sobre la Terraza. Dos caídas familiares la enmarcan.
 - **Indicadores del borde:**
   - plomadas, que se invierten;
   - musgo, que sube en la región;
@@ -40,9 +44,11 @@
 - **Rendimiento:** 60 FPS medidos en escritorio (M2) después de reemplazar el ruido por fragmento por una textura.
 
 **Qué falla todavía (ver BACKLOG):**
-- **A8:** no hay un momento de *anticipar* antes de probar, y el agua dibuja la ruta ganadora.
+- **A20:** «lo más profundo» siempre gana (fuerza bruta) y la oscilación sin pérdidas es eterna.
+- **A21:** hay un solo chorro.
 - **A17:** no hay nada que *modificar*.
 - **A9:** no hay transferencia a otra geometría.
+- **A22:** el mástil parece una escalera.
 - **A10 y A12:** la roca se ve borrosa de cerca y la composición del cuadro de la cascada está apretada.
 - **A12:** las animaciones del avatar no se revisaron en movimiento.
 - **A16:** no hay menú de opciones.
@@ -54,7 +60,15 @@
 
 ## Próximo resultado
 
-**A8 + A17: anticipar y modificar, sin que el agua revele la ruta.**
+**A20 + A9: un objetivo con dos límites y la transferencia.**
+- **Amortiguación:** arrastre del aire declarado (pruebas contra la solución con arrastre lineal), con los umbrales recalculados.
+- **Segunda configuración:** reutiliza la regla en otra geometría, por ejemplo un nicho alto con techo. Ahí soltarse demasiado abajo también falla, porque el cuerpo choca con el techo y vuelve a la región sin daño. Hay que elegir una profundidad intermedia, que el riel de B permite predecir.
+- **Criterio de aceptación:**
+  - con teclado, un intento demasiado abajo y otro demasiado arriba fallan e informan;
+  - uno intermedio llega;
+  - la Bitácora compara los tres con números medidos.
+
+*Plan anterior, absorbido en lo de arriba:* A8 + A17, anticipar y modificar, sin que el agua revele la ruta.
 - **Rediseño del cruce:** el agua sigue enseñando la regla (sube en la región), pero su arco no coincide con la ruta del explorador.
   - Por ejemplo, el arroyo sale más lento y su arco se queda en la región: forma la cresta y se derrama.
   - Con eso, cruzar exige una elección que puede fallar sin castigo: desde dónde y con qué rapidez entrar.

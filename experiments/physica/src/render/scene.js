@@ -1,14 +1,15 @@
 // La cascada ascendente: the diorama. Composition, left to right — a familiar waterfall
-// feeds a stream along the Orilla; at the lip the stream arches UP across the chasm under
-// the region's field and comes down on the Terraza; the Terraza's stream falls again,
-// familiarly, past the railing. Two ordinary falls frame the anomaly.
+// feeds a stream along the Orilla that sinks through a grate into the rock; it wells up at
+// the bottom of the chasm, and from that deepest start the region lifts it higher than
+// anything else: it crests over the high Terraza and falls again, familiarly, past the
+// railing. Two ordinary falls frame the anomaly.
 import * as THREE from 'three';
 import { rockMaterial, strataBlock, mesaShape } from './rock.js';
 import { waterMaterial, waterTube, waterSheet, fieldPath } from './water.js';
 import { Particles } from './particles.js';
 import { Moss, Plumbs } from './flora.js';
-import { makeMaterials, Stand, sphereMesh, fieldAnchor, conduit, Traces } from './props.js';
-import { STREAM_SPEED } from '../sim/levels/cascada.js';
+import { makeMaterials, Stand, sphereMesh, fieldAnchor, conduit, Traces, chainProp, Bell, ApexMarks } from './props.js';
+import { STREAM_SPEED, TERRACE_Y, BELL_LINE } from '../sim/levels/cascada.js';
 
 const Z_STREAM = -1.7, Z_FRONT = 1.6, Z_BACK = -3.6;
 export const LANE_Z = [0, -0.5];   // explorer's path, experiment lane
@@ -51,7 +52,7 @@ export function buildScene(world, { quality = 'high' } = {}) {
 
   // Walkable ground. Tops are exactly the simulation's solids.
   add(strataBlock({ x0: -22, x1: 0, y0: -9, y1: 0, z0: Z_BACK, z1: Z_FRONT, seed: 3, sides: ['e'] }));
-  add(strataBlock({ x0: 4.5, x1: 19.5, y0: -9, y1: 3, z0: Z_BACK, z1: Z_FRONT, seed: 7, sides: ['w', 'e'] }));
+  add(strataBlock({ x0: 4.5, x1: 19.5, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: Z_FRONT, seed: 7, sides: ['w', 'e'] }));
   add(strataBlock({ x0: 19.5, x1: 24, y0: -9, y1: -1.5, z0: Z_BACK, z1: Z_FRONT, seed: 11, sides: ['w'] }));
   add(strataBlock({ x0: -0.6, x1: 5.1, y0: -11, y1: -4.6, z0: Z_BACK, z1: Z_FRONT, seed: 5, sides: [] }));
   // Back walls: a stepped skyline of strata. The chasm keeps its own back wall.
@@ -79,20 +80,28 @@ export function buildScene(world, { quality = 'high' } = {}) {
 
   // Stream curbs along the Orilla and the Terraza.
   const curb = (x0, x1, y, z) => { const b = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, 0.14, 0.18), M.stone); b.position.set((x0 + x1) / 2, y + 0.07, z); b.castShadow = b.receiveShadow = true; scene.add(b); };
-  curb(-19.4, -0.15, 0, Z_STREAM + 0.82); curb(-19.4, -0.15, 0, Z_STREAM - 0.82);
+  const DRAIN_X = -1.7;
+  curb(-19.4, DRAIN_X + 0.5, 0, Z_STREAM + 0.82); curb(-19.4, DRAIN_X + 0.5, 0, Z_STREAM - 0.82);
+  // The stream's end: a stone basin with an iron grate; the water goes into the rock.
+  const basin = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 1.9), M.stone); basin.position.set(DRAIN_X, 0.1, Z_STREAM); basin.castShadow = basin.receiveShadow = true; scene.add(basin);
+  for (let i = -3; i <= 3; i++) { const bar = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.04, 1.3), M.brassDark); bar.position.set(DRAIN_X + i * 0.1, 0.205, Z_STREAM); scene.add(bar); }
   // Water: everything from the field.
   const water = [];
   const mkWater = (geo, opts) => { const m = waterMaterial(opts); const mesh = new THREE.Mesh(geo, m); mesh.renderOrder = 3; scene.add(mesh); water.push(m); return mesh; };
   const leftFall = fieldPath(field, -20.3, 7.6, 0.9, 0, p => p.y <= 0.05);
   mkWater(waterTube(leftFall, { zc: -3.05, thick: 0.5, wide: 1.2, foamStart: 0.15, foamEnd: 0.3, spread: 0.5 }), { streak: 1.2 });
   mkWater(waterSheet({ x0: -21.4, x1: -19.2, y: 0.03, z0: -3.5, z1: -0.9, speed: 0.8, foamAt: [{ x: -20.1, r: 1.2 }] }), { opacity: 0.85 });
-  mkWater(waterSheet({ x0: -19.4, x1: 0.02, y: 0.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: 0, r: 0.6 }], tOffset: -19.4 / STREAM_SPEED }), { streak: 1.4 });
-  const arch = fieldPath(field, 0.02, 0.04, STREAM_SPEED, 0, p => p.vy < 0 && p.y <= 3.04 && p.x > 4.6);
-  const archMesh = mkWater(waterTube(arch, { zc: Z_STREAM, thick: 0.46, wide: 1.5, foamStart: 0.22, foamEnd: 0.36, spread: 0.35 }), { streak: 1.6 });
+  mkWater(waterSheet({ x0: -19.4, x1: DRAIN_X, y: 0.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: DRAIN_X, r: 0.8 }], tOffset: -19.4 / STREAM_SPEED }), { streak: 1.4 });
+  // The chasm pool, and the water that wells up from it and rises: integrated from the field.
+  const spring = world.level.spring;
+  mkWater(waterSheet({ x0: 0.05, x1: 4.45, y: -3.86, z0: -3.45, z1: 1.45, speed: 0.4, foamAt: [{ x: spring.x, r: 1.3 }] }), { opacity: 0.88 });
+  const arch = fieldPath(field, spring.x, spring.y, spring.vx, 0, p => p.vy < 0 && p.y <= TERRACE_Y + 0.04 && p.x > 4.6);
+  arch.unshift({ x: spring.x - 0.05, y: -3.86, vx: 0.2, vy: 0.4, t: -0.25 });
+  const archMesh = mkWater(waterTube(arch, { zc: -2.15, thick: 0.62, wide: 2.3, foamStart: 0.5, foamEnd: 0.32, spread: 0.2 }), { streak: 1.5 });
   const land = arch[arch.length - 1];
-  curb(land.x - 0.6, 18.9, 3, Z_STREAM + 0.82); curb(land.x - 0.6, 18.9, 3, Z_STREAM - 0.82);
-  mkWater(waterSheet({ x0: land.x - 0.3, x1: 19.55, y: 3.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: land.x, r: 1.0 }], tOffset: land.t }), { streak: 1.4 });
-  const rightFall = fieldPath(field, 19.55, 3.03, 1.5, 0, p => p.y <= -1.45);
+  curb(land.x - 0.4, 18.9, TERRACE_Y, Z_STREAM + 0.82); curb(land.x - 0.4, 18.9, TERRACE_Y, Z_STREAM - 0.82);
+  mkWater(waterSheet({ x0: land.x - 0.3, x1: 19.55, y: TERRACE_Y + 0.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: land.x, r: 1.0 }], tOffset: land.t }), { streak: 1.4 });
+  const rightFall = fieldPath(field, 19.55, TERRACE_Y + 0.03, 1.5, 0, p => p.y <= -1.45);
   mkWater(waterTube(rightFall, { zc: Z_STREAM, thick: 0.46, wide: 1.5, foamStart: 0.15, foamEnd: 0.3, spread: 0.5 }), { streak: 1.2 });
   mkWater(waterSheet({ x0: 19.6, x1: 23.5, y: -1.47, z0: -3.4, z1: 1.2, speed: 0.9, foamAt: [{ x: rightFall[rightFall.length - 1].x, r: 1.4 }] }), { opacity: 0.85 });
 
@@ -102,17 +111,19 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const pick = (path, t) => path[Math.max(0, Math.min(path.length - 1, Math.floor(t * (path.length - 1))))];
   const sprayFrom = (path, spot, spread, color = [0.92, 1, 0.98]) => ps => {
     const p = pick(path, spot + (ps.rnd() - 0.5) * spread);
-    return { x: p.x, y: p.y, z: Z_STREAM + (ps.rnd() - 0.5) * 1.4, vx: p.vx * (0.8 + ps.rnd() * 0.4) + (ps.rnd() - 0.5) * 0.8,
+    return { x: p.x, y: p.y, z: (path.zc ?? Z_STREAM) + (ps.rnd() - 0.5) * (path.wide ?? 1.4), vx: p.vx * (0.8 + ps.rnd() * 0.4) + (ps.rnd() - 0.5) * 0.8,
       vy: p.vy * (0.8 + ps.rnd() * 0.4) + (ps.rnd() - 0.5) * 0.8, vz: (ps.rnd() - 0.5) * 1.2, life: 0.8 + ps.rnd() * 1.4, size: 0.05 + ps.rnd() * 0.07, alpha: 0.75, color, drag: 0.6 };
   };
   const k = quality === 'low' ? 0.5 : 1;
-  parts.addEmitter({ rate: 70 * k, make: sprayFrom(arch, 0.02, 0.05) });
-  parts.addEmitter({ rate: 55 * k, make: sprayFrom(arch, 0.45, 0.5) });
-  parts.addEmitter({ rate: 50 * k, make: sprayFrom(arch, 0.97, 0.06) });
+  arch.zc = -2.15; arch.wide = 2.2;
+  parts.addEmitter({ rate: 60 * k, make: sprayFrom(arch, 0.04, 0.06) });
+  parts.addEmitter({ rate: 70 * k, make: sprayFrom(arch, 0.55, 0.7) });
+  parts.addEmitter({ rate: 60 * k, make: sprayFrom(arch, 0.82, 0.12) });
+  parts.addEmitter({ rate: 50 * k, make: sprayFrom(arch, 0.98, 0.04) });
   parts.addEmitter({ rate: 40 * k, make: sprayFrom(leftFall, 0.97, 0.06) });
   parts.addEmitter({ rate: 30 * k, make: sprayFrom(rightFall, 0.97, 0.06) });
   // Mist: large, faint, slow — it hangs around the crest.
-  parts.addEmitter({ rate: 9 * k, make: ps => { const p = pick(arch, 0.35 + ps.rnd() * 0.4); return { x: p.x + (ps.rnd() - 0.5), y: p.y, z: Z_STREAM + (ps.rnd() - 0.2) * 2, vx: (ps.rnd() - 0.5) * 0.3, vy: 0, life: 3 + ps.rnd() * 2, size: 0.9 + ps.rnd() * 0.8, alpha: 0.12, color: [1, 0.98, 0.95], drag: 4 }; } });
+  parts.addEmitter({ rate: 9 * k, make: ps => { const p = pick(arch, 0.7 + ps.rnd() * 0.25); return { x: p.x + (ps.rnd() - 0.5), y: p.y, z: -2.15 + (ps.rnd() - 0.4) * 2.4, vx: (ps.rnd() - 0.5) * 0.3, vy: 0, life: 3 + ps.rnd() * 2, size: 0.9 + ps.rnd() * 0.8, alpha: 0.12, color: [1, 0.98, 0.95], drag: 4 }; } });
   // Pollen from the chasm moss: heavy drag, so it drifts at its terminal speed.
   parts.addEmitter({ rate: 26 * k, make: ps => ({ x: 0.2 + ps.rnd() * 4.1, y: -4.3 + ps.rnd() * 6, z: -3.2 + ps.rnd() * 4.6, vx: 0, vy: 0, vz: 0,
     life: 7 + ps.rnd() * 6, size: 0.035 + ps.rnd() * 0.03, alpha: 0.9, color: [1, 0.93, 0.66], drag: 3.2 }) });
@@ -123,13 +134,13 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const moss = new Moss(field);
   let ms = 77; const mr = () => (ms = (ms * 16807) % 2147483647) / 2147483647;
   const mossCols = ['#6f8f45', '#86a356', '#56743a', '#9bb466'];
-  for (let y = -0.25; y > -4.5; y -= 0.32) for (const z of [-3.3, -2.7, 0.9, 1.4]) {
+  for (let y = -0.25; y > -4.5; y -= 0.32) for (const z of [-3.3, -2.9, 0.9, 1.4]) {
     moss.add({ root: [0.02, y + (mr() - 0.5) * 0.15, z + (mr() - 0.5) * 0.2], n: 6, len: 0.09 + mr() * 0.05, dir: [0.2, -1], wall: { value: 0.03, side: 1 }, width: 0.06, color: mossCols[Math.floor(mr() * 4)] });
-    moss.add({ root: [4.48, y + 3 + (mr() - 0.5) * 0.15, z + (mr() - 0.5) * 0.2], n: 6, len: 0.09 + mr() * 0.05, dir: [-0.2, -1], wall: { value: 4.47, side: -1 }, width: 0.06, color: mossCols[Math.floor(mr() * 4)] });
+    moss.add({ root: [4.48, y + TERRACE_Y + (mr() - 0.5) * 0.15, z + (mr() - 0.5) * 0.2], n: 6, len: 0.09 + mr() * 0.05, dir: [-0.2, -1], wall: { value: 4.47, side: -1 }, width: 0.06, color: mossCols[Math.floor(mr() * 4)] });
   }
   for (let y = 2.75 - 3; y > -4.5; y -= 0.32) { /* right wall below the terrace already covered */ }
   for (let x = -14; x < -0.2; x += 0.45 + mr() * 0.3) moss.add({ root: [x, -0.12, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
-  for (let x = 4.8; x < 18.5; x += 0.45 + mr() * 0.3) moss.add({ root: [x, 2.88, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
+  for (let x = 4.8; x < 18.5; x += 0.45 + mr() * 0.3) moss.add({ root: [x, TERRACE_Y - 0.12, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
   scene.add(moss.build());
 
   // Measuring mast with plumb bobs on the Orilla's lip, reaching over the chasm.
@@ -147,7 +158,8 @@ export function buildScene(world, { quality = 'high' } = {}) {
   // The apparatus that sustains the region: four anchors and their supply conduits,
   // running back into the rock toward something that is not part of this landscape.
   const anchors = [];
-  for (const [x, y] of [[0, -3.4], [4.5, -3.4], [0, 3], [4.5, 3]]) {
+  const zr = world.field.zones[0];
+  for (const [x, y] of [[0, zr.y0], [4.5, zr.y0], [0, zr.y1], [4.5, zr.y1]]) {
     const a = fieldAnchor(M, { x, y, z: Z_BACK + 0.12 }); scene.add(a); anchors.push(a);
   }
   const conduits = [
@@ -170,10 +182,17 @@ export function buildScene(world, { quality = 'high' } = {}) {
   table.traverse(o => { o.castShadow = o.receiveShadow = true; });
   scene.add(table);
   const railing = new THREE.Group();
-  for (let z = -3.2; z <= 1.4; z += 0.7) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 1.2, 8), M.brassDark); p.position.set(18.98, 3.6, z); railing.add(p); }
-  for (const y of [3.75, 4.15]) { const b = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 4.7, 8), M.brass); b.rotation.x = Math.PI / 2; b.position.set(18.98, y, -0.9); railing.add(b); }
+  for (let z = -3.2; z <= 1.4; z += 0.7) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 1.2, 8), M.brassDark); p.position.set(18.98, TERRACE_Y + 0.6, z); railing.add(p); }
+  for (const y of [TERRACE_Y + 0.75, TERRACE_Y + 1.15]) { const b = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 4.7, 8), M.brass); b.rotation.x = Math.PI / 2; b.position.set(18.98, y, -0.9); railing.add(b); }
   railing.traverse(o => { o.castShadow = true; });
   scene.add(railing);
+
+  // The descent chain, the bell at the Terraza's height, and chalk marks of the explorer's peaks.
+  const chainG = world.chain ? chainProp(world.chain, M) : null;
+  if (chainG) scene.add(chainG);
+  const bell = world.bell ? new Bell(world.bell, TERRACE_Y, M) : null;
+  if (bell) scene.add(bell.group);
+  const apexMarks = new ApexMarks(scene, M, { bellLine: BELL_LINE });
 
   const sphereMeshes = new Map();
   for (const b of world.bodies) if (b.kind === 'sphere') { const m = sphereMesh(b.r, M); scene.add(m); sphereMeshes.set(b.id, m); }
@@ -183,7 +202,7 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const bladeGeo = new THREE.ConeGeometry(0.025, 0.28, 3); bladeGeo.translate(0, 0.14, 0);
   const grass = new THREE.InstancedMesh(bladeGeo, new THREE.MeshLambertMaterial({ color: '#8fa35a' }), quality === 'low' ? 500 : 1100);
   let gs = 5; const gr = () => (gs = (gs * 16807) % 2147483647) / 2147483647;
-  const tops = [[-21, -0.25, 0], [4.75, 18.7, 3]];
+  const tops = [[-21, -0.25, 0], [4.75, 18.7, TERRACE_Y]];
   for (let i = 0; i < grass.count; i++) {
     const [x0, x1, y] = tops[i % 2 ? 1 : 0];
     const x = x0 + gr() * (x1 - x0);
@@ -234,9 +253,21 @@ export function buildScene(world, { quality = 'high' } = {}) {
       if (b.support) m.rotation.z -= dx / b.r;
     }
     world.stands.forEach((st, i) => { const b = st.body; v3.set(b.px + (b.x - b.px) * alpha, b.py + (b.y - b.py) * alpha + b.r * 0.9, LANE_Z[1]); stands[i].update(dt, { ...st, sagSign: 1 }, v3); });
+    bell?.update(dt); apexMarks.update(dt);
+    if (chainG) {
+      const av = world.avatar, held = av.heldBy?.type === 'chain';
+      const y = held ? av.py + (av.y - av.py) * alpha : chainG.userData.restY;
+      chainG.userData.ring.position.y = y; chainG.userData.pointer.position.y = y;
+    }
     traces.sync(world.traces, id => { const b = world.bodies.find(x => x.id === id); return LANE_Z[b?.lane ?? 0] + 0.22; });
     if ((time * 30 | 0) % 2 === 0) updateGrass(time);
   }
 
-  return { scene, sun, hemi, update, arch, archMesh, sphereMeshes, M, plumbs, moss, parts };
+  function onEvent(e) {
+    if (e.type === 'bell') bell?.ring(e.speed);
+    // Chalk the buckle's peak on the Terraza's face for every attempt in the chasm.
+    if (e.type === 'apex' && e.body === world.avatar.id && e.x > 0 && e.x < 4.6 && e.centre > 2.5) apexMarks.add(e.centre, e.from);
+  }
+
+  return { scene, sun, hemi, update, onEvent, clearChalk: () => apexMarks.clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts };
 }

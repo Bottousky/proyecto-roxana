@@ -42,7 +42,10 @@ export class Explorer {
     const coat = new THREE.Mesh(new THREE.LatheGeometry(prof, 18), m.coat); coat.castShadow = true; outline(coat, 1.05);
     this.body.add(coat);
     for (let i = 0; i < 3; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 6), m.brass); b.position.set(0.135 - i * 0.004, 0.55 - i * 0.09, 0.02); this.body.add(b); }
-    const belt = new THREE.Mesh(new THREE.TorusGeometry(0.148, 0.018, 6, 20), m.leather); belt.rotation.x = Math.PI / 2; belt.position.y = 0.4; this.body.add(belt);
+    // The belt sits at the body's centre of mass (0.55 m): its brass buckle is the explorer's
+    // reference point, the same one the chain's numbers and the chalk marks use.
+    const belt = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.02, 6, 20), m.leather); belt.rotation.x = Math.PI / 2; belt.position.y = 0.55; this.body.add(belt);
+    const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.06, 0.07), m.brass); buckle.position.set(0.145, 0.55, 0); this.body.add(buckle);
     // Satchel with the Bitácora.
     const satchel = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.13, 0.07), m.leather); satchel.position.set(-0.04, 0.33, 0.17); satchel.rotation.y = 0.1; satchel.castShadow = true; this.body.add(satchel);
     const flap = new THREE.Mesh(new THREE.BoxGeometry(0.152, 0.05, 0.075), m.coatDark); flap.position.set(-0.04, 0.38, 0.17); this.body.add(flap);
@@ -125,8 +128,9 @@ export class Explorer {
     const speed = Math.abs(s.vx);
     if (!air) st.walk += speed * dt * 5.4;
     const stride = air ? 0 : Math.min(1, speed / 2.6);
-    st.armUp += ((air ? (gUp ? 1 : 0.55) : 0) - st.armUp) * Math.min(1, dt * (air ? 5 : 8));
-    st.tuck += ((air && gUp ? 1 : air ? 0.4 : 0) - st.tuck) * Math.min(1, dt * 6);
+    st.armUp += ((ctx.onChain ? 1.15 : air ? (gUp ? 1 : 0.55) : 0) - st.armUp) * Math.min(1, dt * (air || ctx.onChain ? 5 : 8));
+    // On the chain in an upward pull the legs drift up and the body hangs from the hands.
+    st.tuck += ((ctx.onChain ? (gUp ? 0.8 : 0.1) : air && gUp ? 1 : air ? 0.4 : 0) - st.tuck) * Math.min(1, dt * 6);
     st.carry += ((ctx.holding ? 1 : 0) - st.carry) * Math.min(1, dt * 10);
     st.push += ((ctx.pushing ? 1 : 0) - st.push) * Math.min(1, dt * 8);
     st.squash *= Math.exp(-dt * 9);
@@ -137,7 +141,7 @@ export class Explorer {
     this.body.position.y = bob + breathe * (1 - stride);
     this.body.scale.set(1 + st.squash * 0.6, 1 - st.squash, 1 + st.squash * 0.6);
     // Lean: into the push, against the control acceleration, back when floating up.
-    const leanT = st.push * 0.28 + (air ? -(s.vx * 0.04) : 0) + (s.control ?? 0) * 0.006;
+    const leanT = st.push * 0.28 + (air ? -(s.vx * 0.04) : 0) + (s.control ?? 0) * 0.006 + (ctx.onChain ? 0.18 : 0);
     st.lean += (leanT - st.lean) * Math.min(1, dt * 8);
     // Euler XYZ applies z in the body's own frame, whose forward is +x: lean toward the face.
     this.body.rotation.z = -st.lean;
@@ -150,7 +154,9 @@ export class Explorer {
     this.arms.forEach((a, i) => {
       const ph = i ? -sw : sw;
       const swing = ph * 0.55 * stride * (1 - st.carry) * (1 - st.push);
-      const up = st.armUp * (gUp ? 2.5 : 1.9) + Math.sin(time * 7 + i) * 0.15 * st.armUp * (gUp ? 0.4 : 1);
+      // Climbing: hand over hand, alternating; otherwise a small flutter while floating.
+      const climb = ctx.climbing ? Math.sin(time * 9 + i * Math.PI) * 0.35 : 0;
+      const up = st.armUp * (gUp ? 2.5 : 1.9) + (ctx.onChain ? climb : Math.sin(time * 7 + i) * 0.15 * st.armUp * (gUp ? 0.4 : 1));
       a.rotation.z = swing + up * (1 - st.carry) + st.carry * 1.35 + st.push * 1.2;
       a.rotation.x = (i ? 1 : -1) * (0.08 + st.armUp * 0.5 + st.carry * 0.25);
     });

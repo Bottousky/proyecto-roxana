@@ -76,3 +76,26 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
 
 - **Fuentes:** Fraunces e Inter vía `@fontsource` (licencia OFL), empaquetadas. No hay red en tiempo de ejecución.
 - **Geometría, materiales y sonido:** todo procedural, generado en código en esta rama. No hay assets de terceros ni generados por IA.
+
+## D9 · Rediseño del cruce: más abajo, más alto (iteración 02)
+
+**El problema:** el arco de agua salía del borde a la misma velocidad que el explorador y dibujaba su ruta. Cruzar no exigía anticipar y no se podía fallar (revisión de la iter 1, hallazgo 1).
+
+**Elegido:**
+- La Terraza sube a 4,4 m y la región sigue terminando en 3 m.
+  - En la región, un cuerpo sube sobre el borde superior (a/g)·(3 − y₀).
+  - Desde el borde de la Orilla, los pies del explorador llegan a ~3,45 m: falla segura, con marca de tiza y nota «No alcanzó».
+- Una **cadena** permite bajar dentro de la región y elegir dónde soltarse.
+  - Desde ≈ −0,75 m o más abajo se llega (con el agarre de borde); desde −0,5 m o más arriba, no.
+  - Mientras el explorador está en la cadena, sus manos son la autoridad: el campo no lo integra. Al soltarse, la velocidad es cero.
+- El **soporte B** tiene un riel con pinza ajustable (▲▼, 0,5 m) y una **campana** a la altura de la Terraza.
+  - La esfera la hace sonar desde −1 m o más abajo. Es el mismo umbral que lleva al explorador (equivalencia: el campo no distingue masas).
+  - Así el experimento seguro predice el propio cruce.
+- **El agua ya no sale del borde:** se va por una reja, brota en la poza del fondo de la sima y, desde ese inicio más profundo, es lo único que cresta sobre la Terraza.
+  - Enseña la regla («más abajo, más alto») sin dibujar la ruta del explorador.
+- El límite derecho de la región pasa a x = 4,8, dentro de la roca de la Terraza, para que el campo pleno llegue a su pared.
+  - Con el límite en 4,5, la banda lateral restaba altura junto a la pared y volver desde la Terraza fallaba.
+- La cadena cuelga a 0,92 m del borde: así el cuerpo del explorador queda fuera de la banda izquierda.
+  - Con 0,62 m, su cuarto izquierdo sentía 3,89 m/s² en lugar de 4,00, y la prueba de equivalencia con la esfera falló.
+
+**Límite conocido:** bajar hasta el fondo de la cadena siempre funciona. La transferencia (A9) debe crear un caso donde «lo más profundo» no sea siempre lo correcto.

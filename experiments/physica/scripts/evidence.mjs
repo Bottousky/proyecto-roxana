@@ -6,6 +6,7 @@
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { loadavg, cpus } from 'node:os';
 
 const url = process.argv[2] || 'http://127.0.0.1:4210/';
 const out = process.argv[3] || 'evidence-out';
@@ -17,7 +18,7 @@ const page = await ctx.newPage();
 const errors = [], logs = [];
 page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') logs.push(`${m.type()}: ${m.text()}`); });
 page.on('pageerror', e => errors.push(String(e)));
-const report = { url, started: new Date().toISOString(), steps: [] };
+const report = { url, started: new Date().toISOString(), steps: [], machine: { cores: cpus().length, loadavgAtStart: loadavg() } };
 const step = (name, data = {}) => { report.steps.push({ name, ...data }); console.log('·', name, JSON.stringify(data).slice(0, 220)); };
 const state = () => page.evaluate(() => window.__physica.state());
 const sleep = ms => page.waitForTimeout(ms);
@@ -66,7 +67,7 @@ async function capture(n, every, labelFn) {
 
 await page.goto(url + (url.includes('?') ? '&' : '?') + 'nopause');
 await page.waitForFunction(() => window.__physica && window.__physica.world.stepCount > 30);
-await page.evaluate(() => localStorage.removeItem('physica.v1'));
+await page.evaluate(() => { localStorage.removeItem('physica.v1'); localStorage.removeItem('physica.v2'); });
 await page.reload();
 await page.waitForFunction(() => window.__physica && window.__physica.world.stepCount > 30);
 await page.mouse.click(640, 360);
@@ -85,57 +86,96 @@ await sleep(800);
 const trA = await page.evaluate(() => window.__physica.world.traces.find(t => t.source === 'A'));
 step('traza A', { marks: trA.marks.length, end: trA.end, y: trA.marks.map(m => +m.y.toFixed(3)) });
 
-// 2 — release inside the region at support B.
+// 2 — B inside the region from the same height: rises, no bell.
 s = await walkTo(standX.B + 0.05);
 step('en soporte B', { x: s.avatar.x });
 await page.keyboard.press('e');
-const riseB = await capture(12, 180, st => `B t≈${st.t.toFixed(2)}s y=${st.stands[1].y.toFixed(2)} vy=${st.stands[1].vy.toFixed(2)}`);
-await sheet('02-subida-en-region', riseB.shots, 4, 'Soporte B, dentro de la región, a la misma altura y a 2,95 m de A: sube, sale por arriba, frena y vuelve');
+const riseB = await capture(10, 160, st => `B y=${st.stands[1].y.toFixed(2)} vy=${st.stands[1].vy.toFixed(2)}`);
+await sheet('02-subida-desde-2m', riseB.shots, 5, 'Soporte B desde 2,0 m (misma altura que A), dentro de la región: sube, no llega a la campana');
+let bells = await page.evaluate(() => window.__physica.events.filter(e => e.type === 'bell').length);
 const trB = await page.evaluate(() => window.__physica.world.traces.find(t => t.source === 'B'));
-step('traza B', { marks: trB.marks.length, y: trB.marks.map(m => +m.y.toFixed(3)), vy: trB.marks.map(m => +m.vy.toFixed(3)) });
-// Reel back.
+step('traza B desde 2 m', { peak: Math.max(...trB.marks.map(m => m.y)), bells });
+// Reel back, then lower the clamp to −1 m (six steps of 0.5 m) and release again.
+await page.keyboard.press('e'); await sleep(1800);
+for (let i = 0; i < 6; i++) { await page.keyboard.press('ArrowDown'); await sleep(120); }
+const clampB = await page.evaluate(() => window.__physica.world.stands[1].clampY);
+step('pinza B bajada', { clampY: clampB, state: (await state()).stands[1].state });
 await page.keyboard.press('e');
-await sleep(2500);
-s = await state();
-step('carrete', { standB: s.stands[1].state });
-// Release again: the same path?
-await page.keyboard.press('e');
-await sleep(2000);
+const riseB2 = await capture(10, 200, st => `B y=${st.stands[1].y.toFixed(2)} vy=${st.stands[1].vy.toFixed(2)}`);
+await sheet('02b-subida-desde-menos-1m', riseB2.shots, 5, 'Soporte B desde −1,0 m: sube más alto y hace sonar la campana a la altura de la Terraza');
+bells = await page.evaluate(() => window.__physica.events.filter(e => e.type === 'bell').length);
 const trB2 = await page.evaluate(() => { const ts = window.__physica.world.traces.filter(t => t.source === 'B'); return ts[ts.length - 1]; });
-const same = trB2.marks.slice(0, 15).every((m, i) => Math.abs(m.y - trB.marks[i].y) < 1e-9);
-step('repetición B', { identicalFirst15: same });
+step('traza B desde −1 m', { from: trB2.marks[0].y, peak: Math.max(...trB2.marks.map(m => m.y)), bells });
+// Repeatability: reel, release again from the same place, compare the first marks.
+await page.keyboard.press('e'); await sleep(2600);
+await page.keyboard.press('e'); await sleep(1400);
+const trB3 = await page.evaluate(() => { const ts = window.__physica.world.traces.filter(t => t.source === 'B'); return ts[ts.length - 1]; });
+step('repetición B', { identicalFirst8: trB3.marks.slice(0, 8).every((m, i) => Math.abs(m.y - trB2.marks[i].y) < 1e-9) });
 
-// 3 — the explorer's own crossing, walking off the lip (frame times recorded meanwhile).
+// 3 — the explorer from the lip: rises, falls short (chalk mark), R returns to footing.
 s = await walkTo(-2.0);
 await page.evaluate(() => window.__physica.resetFrames());
 await page.keyboard.down('ArrowRight');
+const shortShots = [], shortTraj = [];
+let t0 = Date.now(), k = 0, simStart = (await state()).t;
+// Windows are measured in simulated time: screenshots stall the page, the simulation does not catch up.
+while ((await state()).t - simStart < 3.6 && Date.now() - t0 < 30000) {
+  const st = await state(); shortTraj.push({ ms: Date.now() - t0, simT: st.t - simStart, ...st.avatar });
+  if (k++ % 4 === 0 && shortShots.length < 10) shortShots.push({ buf: await page.screenshot(), label: `pies=${(st.avatar.y - 0.55).toFixed(2)} vy=${st.avatar.vy.toFixed(2)}` });
+  await sleep(20);
+}
+await page.keyboard.up('ArrowRight');
+await sheet('03a-desde-el-borde-no-alcanza', shortShots, 5, 'Desde el borde: la región levanta al explorador, pero sus pies no llegan a la Terraza (4,4 m); queda una marca de tiza');
+const apexes = await page.evaluate(() => window.__physica.events.filter(e => e.type === 'apex').map(e => ({ feet: +e.y.toFixed(2), centre: +e.centre.toFixed(2), from: e.from })));
+await page.evaluate(() => window.__physica.inspect(3.6, 3.6, 6)); await sleep(1800);
+writeFileSync(join(out, '03a2-tiza-y-linea-de-campana.png'), await page.screenshot());
+await page.evaluate(() => window.__physica.inspect(null));
+await sleep(300);
+await page.keyboard.press('r'); await sleep(700);
+s = await state();
+step('desde el borde', { apexFeet: apexes, footingAfterR: s.avatar });
+writeFileSync(join(out, 'trayectoria-desde-borde.json'), JSON.stringify(shortTraj));
+
+// 3b — down the chain to −1.5 m (centre), let go, steer to the Terraza.
+s = await walkTo(-0.35);
+const offered = await page.evaluate(() => window.__physica.world.interactables().map(i => i.kind));
+await page.keyboard.press('e'); await sleep(200);
+const onChain = (await page.evaluate(() => window.__physica.world.avatar.heldBy?.type));
+await page.keyboard.down('ArrowDown');
+t0 = Date.now(); while (Date.now() - t0 < 4000) { const st = await state(); if (st.avatar.y <= -1.5) break; await sleep(16); }
+await page.keyboard.up('ArrowDown');
+await sleep(200);
+const letGoAt = (await state()).avatar.y;
+writeFileSync(join(out, '03b-en-la-cadena.png'), await page.screenshot());
+await page.keyboard.press('e');
+await page.keyboard.down('ArrowRight');
 const traj = [], crossShots = [];
-const t0 = Date.now();
-let k = 0;
-while (Date.now() - t0 < 4200) {
+t0 = Date.now(); k = 0; simStart = (await state()).t;
+while ((await state()).t - simStart < 6 && Date.now() - t0 < 40000) {
   const st = await state();
-  traj.push({ ms: Date.now() - t0, ...st.avatar });
-  if (k++ % 4 === 0 && crossShots.length < 16) crossShots.push({ buf: await page.screenshot(), label: `x=${st.avatar.x.toFixed(2)} y=${(st.avatar.y - 0.55).toFixed(2)} vy=${st.avatar.vy.toFixed(2)}` });
+  traj.push({ ms: Date.now() - t0, simT: st.t - simStart, ...st.avatar });
+  if (k++ % 4 === 0 && crossShots.length < 15) crossShots.push({ buf: await page.screenshot(), label: `x=${st.avatar.x.toFixed(2)} pies=${(st.avatar.y - 0.55).toFixed(2)} vy=${st.avatar.vy.toFixed(2)}` });
+  if (st.avatar.x > 6 && st.avatar.grounded) break;
   await sleep(20);
 }
 await page.keyboard.up('ArrowRight');
 await sleep(800);
-await sheet('03-cruce', crossShots, 4, 'Cruce: caminar fuera del borde, la región eleva al explorador, sale por arriba y baja en la Terraza');
+await sheet('03c-cruce-por-la-cadena', crossShots, 5, 'Cadena: soltarse con el centro a −1,5 m; la región lo lleva más alto y llega a la Terraza');
 s = await state();
-step('cruce', { final: s.avatar, landedOnTerrace: s.avatar.x > 4.6 && Math.abs(s.avatar.y - 0.55 - 3) < 0.02 && s.avatar.grounded,
-  framesDuringCrossing: await page.evaluate(() => window.__physica.stats()), note: 'includes 16 screenshots taken during the crossing' });
+step('cruce por la cadena', { offeredAtLip: offered, onChain, letGoCentreY: letGoAt, final: s.avatar, landedOnTerrace: s.avatar.x > 4.6 && Math.abs(s.avatar.y - 0.55 - 4.4) < 0.02 && s.avatar.grounded,
+  mantles: await page.evaluate(() => window.__physica.events.filter(e => e.type === 'mantle').length) });
+writeFileSync(join(out, 'trayectoria-cruce.json'), JSON.stringify(traj));
 
-// 3b — reviewer's case: step back into the region from the Terraza, float, then hold ▶.
+// 3c — stepping back into the region from the Terraza, then holding ▶ (regression of iter 1).
 await walkTo(5.6);
 await page.keyboard.down('ArrowLeft'); await sleep(450); await page.keyboard.up('ArrowLeft');
 await sleep(900);
 await page.keyboard.down('ArrowRight');
 const back = [];
-for (let i = 0; i < 160; i++) { const st = await state(); back.push(st.avatar); if (st.avatar.x > 4.7 && st.avatar.grounded) break; await sleep(25); }
+for (let i = 0; i < 220; i++) { const st = await state(); back.push(st.avatar); if (st.avatar.x > 4.7 && st.avatar.grounded) break; await sleep(25); }
 await page.keyboard.up('ArrowRight');
 const bl = back[back.length - 1];
-step('volver a la Terraza', { samples: back.length, final: bl, onTerrace: bl.x > 4.7 && bl.grounded && Math.abs(bl.y - 3.55) < 0.02, mantle: (await page.evaluate(() => window.__physica.events.filter(e => e.type === 'mantle').length)) });
-writeFileSync(join(out, 'trayectoria-cruce.json'), JSON.stringify(traj));
+step('volver a la Terraza', { samples: back.length, final: bl, onTerrace: bl.x > 4.7 && bl.grounded && Math.abs(bl.y - 0.55 - 4.4) < 0.02 });
 
 // 4 — Bitácora and save/load.
 writeFileSync(join(out, '04-terraza.png'), await page.screenshot());
@@ -147,7 +187,7 @@ await page.reload();
 await page.waitForFunction(() => window.__physica && window.__physica.world.stepCount > 30);
 const reloaded = await state();
 const after = reloaded.journal;
-step('guardado', { before, after, persisted: JSON.stringify(before) === JSON.stringify(after), explorerAfterReload: reloaded.avatar, resumedOnTerrace: reloaded.avatar.x > 4.6 && reloaded.avatar.y > 3 });
+step('guardado', { before, after, persisted: JSON.stringify(before) === JSON.stringify(after), explorerAfterReload: reloaded.avatar, resumedOnTerrace: reloaded.avatar.x > 4.6 && reloaded.avatar.y > 4.4 });
 
 // 5 — pause and resume: the simulation must not jump.
 await page.evaluate(() => window.__physica.setPaused(true));
@@ -170,15 +210,17 @@ await page.evaluate(() => { const w = window.__physica.world, a = w.avatar; a.x 
 await sleep(800);
 await page.evaluate(() => window.__physica.resetFrames());
 await page.keyboard.down('ArrowRight'); await sleep(4500); await page.keyboard.up('ArrowRight');
-step('rendimiento-cruce', { stats: await page.evaluate(() => window.__physica.stats()), traces: (await state()).traces.length, final: (await state()).avatar });
+step('rendimiento-cruce', { stats: await page.evaluate(() => window.__physica.stats()), traces: (await state()).traces.length, final: (await state()).avatar, note: 'walk off the lip with no screenshots (the failing branch; the camera follows the full rise)' });
 // Close-ups (inspection camera): instruments at the lip, moss on the chasm walls.
 await page.evaluate(() => window.__physica.inspect(0.3, 2.6, 5.5)); await sleep(2500);
 writeFileSync(join(out, '07-plomadas.png'), await page.screenshot());
-await page.evaluate(() => window.__physica.inspect(2.2, -2.2, 7)); await sleep(2500);
-writeFileSync(join(out, '08-musgo-sima.png'), await page.screenshot());
+await page.evaluate(() => window.__physica.inspect(2.2, -1.2, 9)); await sleep(2500);
+writeFileSync(join(out, '08-sima-cadena-riel.png'), await page.screenshot());
+await page.evaluate(() => window.__physica.inspect(2.5, 1.5, 22)); await sleep(2500);
+writeFileSync(join(out, '09-plano-general.png'), await page.screenshot());
 await page.evaluate(() => window.__physica.inspect(null));
 
-report.errors = errors; report.consoleWarnings = logs; report.finished = new Date().toISOString();
+report.errors = errors; report.consoleWarnings = logs; report.finished = new Date().toISOString(); report.machine.loadavgAtEnd = loadavg();
 writeFileSync(join(out, 'report.json'), JSON.stringify(report, null, 2));
 console.log('errors', errors.length, 'warnings', logs.length);
 await browser.close();

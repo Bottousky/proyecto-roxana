@@ -31,8 +31,12 @@ kbd { display: inline-grid; place-items: center; min-width: 22px; height: 22px; 
 .debug { position: absolute; left: 12px; bottom: 70px; margin: 0; padding: 8px; background: rgba(0,0,0,.6); color: #cfe; font: 12px/1.4 ui-monospace, monospace; }
 .touch { display: none; position: absolute; inset: auto 0 0 0; padding: 16px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); justify-content: space-between; pointer-events: none; }
 .has-touch .touch { display: flex; }
-.has-touch .hint { display: none; }
-.touch > div { display: flex; gap: 12px; pointer-events: auto; }
+.has-touch .hint { bottom: auto; top: 64px; font-size: 12px; padding: 6px 10px; }
+.has-touch .hint kbd { min-width: 18px; height: 18px; }
+.touch > div { display: flex; gap: 12px; pointer-events: auto; align-items: center; }
+.touch-vert { display: flex; flex-direction: column; gap: 8px; }
+.touch-vert button { width: 52px; height: 52px; font-size: 18px; }
+.prompt small { display: block; font: 500 11px/1.2 Inter, sans-serif; opacity: .75; }
 .touch button { width: 64px; height: 64px; border-radius: 50%; background: rgba(42,26,18,.6); color: #fff4df; font-size: 22px; padding: 0; touch-action: none; }
 .touch button.big { width: 78px; height: 78px; background: rgba(42,26,18,.78); }
 @media (max-width: 640px) { .title b { font-size: 22px; } .legend { top: auto; bottom: 110px; right: 12px; } }

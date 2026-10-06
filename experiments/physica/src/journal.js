@@ -3,7 +3,7 @@
 // Notes never block play and nothing asks the player to answer anything.
 import { DT } from './sim/world.js';
 
-const KEY = 'physica.v1';
+const KEY = 'physica.v2';   // v1 saved positions belong to the earlier geometry
 const fmt = (v, d = 1) => v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
 
 /** Height where a rising trace stops accelerating upward: its second differences change sign. */
@@ -44,7 +44,13 @@ export class Journal {
     this.toastEl = document.createElement('div'); this.toastEl.className = 'toast'; this.toastEl.hidden = true;
     root.append(this.panel, this.toastEl);
     this.toastT = 0;
-    try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s?.notes) { this.notes = s.notes; this.flags = s.flags || {}; this.footing = s.footing || null; } } catch { /* storage unavailable: start empty */ }
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (s?.notes) { this.notes = s.notes; this.flags = s.flags || {}; this.footing = s.footing || null; }
+      // A saved footing must still be firm ground in this geometry.
+      const f = this.footing, av = world.avatar;
+      if (f && !world.solids.some(o => !o.only && f.x >= o.x0 && f.x <= o.x1 && Math.abs(f.y - av.hh - o.y1) < 0.01)) this.footing = null;
+    } catch { /* storage unavailable: start empty */ }
     this.render();
   }
 
@@ -55,7 +61,7 @@ export class Journal {
   add(id, title, body, data = null) {
     if (this.has(id)) return;
     this.notes.push({ id, title, body, data, at: Date.now() });
-    this.save(); this.render();
+    this.save(); this.render(); this.onAdd?.(id);
     this.toastEl.innerHTML = `<b>Bitácora</b> · ${title} <kbd>J</kbd>`; this.toastEl.hidden = false; this.toastT = 5;
   }
 
@@ -71,7 +77,7 @@ export class Journal {
         const h = tr.marks[0].y - e.y;
         const before = tr.marks.filter(m => m.t < tFall - 0.02);
         const a = fitAcceleration(before);
-        this.flags.aA = a;
+        this.flags.aA = a; this.flags.hA = tr.marks[0].y;
         this.add('caida', 'Una caída conocida',
           `Desde el soporte de la orilla la esfera bajó ${fmt(h, 2)} m en ${fmt(tFall, 2)} s. Entre marca y marca pasa siempre el mismo tiempo, 0,1 s, y la distancia entre ellas crece: cada décima de segundo va más rápido que la anterior.`,
           { h, tFall, a });
@@ -79,38 +85,70 @@ export class Journal {
     }
     if (e.type === 'exit' && e.zone === 'cascada' && !this.has('subida')) {
       const tr = w.traces.find(t => t.source === 'B' && t.body === e.body && !t.done);
-      if (tr && tr.marks.length >= 4) {
-        // Fit only the stretch before the measured acceleration changed: read from the marks,
-        // not from the scene's configuration.
-        const yb = boundaryFromMarks(tr.marks);
-        const inside = firstRise(tr.marks, yb);
-        this.flags.aB = fitAcceleration(inside);
-        this.flags.yB = yb;
-        this.flags.pendingB = tr.id;
-      }
+      if (tr && tr.marks.length >= 4) this.flags.pendingB = tr.id;
     }
     if (e.type === 'enter' && e.zone === 'cascada' && this.flags.pendingB && !this.has('subida')) {
       const tr = w.traces.find(t => t.id === this.flags.pendingB);
       if (tr && tr.body === e.body) {
+        // Back inside: the trace now holds the whole excursion. Fit only the stretch before the
+        // measured acceleration changed — read from the marks, not from the configuration.
+        const yb = boundaryFromMarks(tr.marks);
+        this.flags.aB = fitAcceleration(firstRise(tr.marks, yb));
+        this.flags.yB = yb;
         const h0 = tr.marks[0].y, peak = Math.max(...tr.marks.map(m => m.y));
-        const yb = this.flags.yB;
+        const hA = this.flags.hA;
+        const same = hA != null && Math.abs(hA - h0) < 0.01;
         this.add('subida', 'Soltada, subió',
-          `Desde el soporte del borde, a la misma altura que el de la orilla, la esfera no cayó: sin que nadie la empujara salió hacia arriba y cada marca quedó más lejos de la anterior.${yb != null ? ` Cerca de ${fmt(yb, 1)} m dejó de acelerar hacia arriba` : ' Más arriba dejó de acelerar hacia arriba'}, frenó, llegó a ${fmt(peak, 2)} m y volvió a bajar. Adentro frena y vuelve a subir.`,
+          `Desde el soporte del borde, a ${fmt(h0, 1)} m${same ? ', la misma altura que en la orilla,' : ''} la esfera no cayó: sin que nadie la empujara salió hacia arriba y cada marca quedó más lejos de la anterior.${yb != null ? ` Cerca de ${fmt(yb, 1)} m dejó de acelerar hacia arriba` : ' Más arriba dejó de acelerar hacia arriba'}, frenó, llegó a ${fmt(peak, 2)} m y volvió a bajar.`,
           { h0, peak, yb, a: this.flags.aB });
       }
     }
-    if (e.type === 'enter' && e.body === w.avatar.id && e.zone === 'cascada' && this.flags.climbFrom == null) this.flags.climbFrom = w.avatar.y - w.avatar.hh;
+    if (e.type === 'letgo') this.flags.letGo = e.y - w.avatar.hh;
+    if (e.type === 'release' && e.stand === 'B') {
+      const st = w.stands.find(s => s.id === 'B');
+      if (this.flags.bFrom != null && !this.flags.bRang) (this.flags.bSilent ||= []).push(this.flags.bFrom);
+      this.flags.bFrom = st.clampY; this.flags.bRang = false;
+    }
+    if (e.type === 'bell') this.flags.bRang = true;
+    if (e.type === 'bell' && !this.has('campana') && this.flags.bFrom != null) {
+      const silent = (this.flags.bSilent || []).filter(y => y > this.flags.bFrom);
+      const before = silent.length ? ` Antes, desde ${fmt(Math.min(...silent), 1)} m, no había llegado.` : '';
+      this.add('campana', 'La campana de la Terraza',
+        `Soltada desde ${fmt(this.flags.bFrom, 1)} m, la esfera llegó a la campana, cuya línea pintada en la pared está a ${fmt(w.level.bellLine, 1)} m. No hubo que empujarla.${before}`,
+        { from: this.flags.bFrom, silent });
+    }
+    if (e.type === 'apex' && e.body === w.avatar.id && e.x > 0 && e.x < 4.7 && e.centre > 2.5) {
+      (this.flags.attempts ||= []).push({ from: e.from, apex: e.centre });
+      const line = w.level.bellLine;
+      if (!this.has('corto') && !this.has('cruce') && e.centre < line - 0.05) this.add('corto', 'No alcanzó',
+        `Tu hebilla llegó a ${fmt(e.centre, 2)} m; la línea de la campana, en la pared, está a ${fmt(line, 1)} m. La tiza queda en la pared con el lugar desde donde empezaste. Algo se puede cambiar antes de entrar.`,
+        { apex: e.centre, line });
+    }
+    if (e.type === 'enter' && e.body === w.avatar.id && e.zone === 'cascada') { this.flags.climbFrom = w.avatar.y - w.avatar.hh; this.flags.climbTop = -Infinity; }
     if (e.type === 'exit' && e.body === w.avatar.id && e.zone === 'cascada') this.flags.wasInside = true;
   }
 
   update(dt) {
     const w = this.world, av = w.avatar;
-    if (this.flags.climbFrom != null && !this.has('cruce')) this.flags.climbTop = Math.max(this.flags.climbTop ?? -Infinity, av.y - av.hh);
-    if (!this.has('cruce') && this.flags.wasInside && av.x > 4.7 && av.supportSteps > 20 && Math.abs(av.y - av.hh - 3) < 0.05) {
-      const rise = this.flags.climbTop - this.flags.climbFrom;
-      this.add('cruce', 'Por el camino del agua',
-        `Caminaste fuera del borde y la región te levantó como al agua: tus pies subieron ${fmt(rise, 1)} m sin saltar y bajaste en la Terraza. Afuera de la región todo vuelve a caer como siempre.`,
-        { rise });
+    if (this.flags.climbFrom != null && !this.has('cruce') && !av.heldBy) this.flags.climbTop = Math.max(this.flags.climbTop ?? -Infinity, av.y - av.hh);
+    if (!this.has('profundidad')) {
+      // Two releases of B from different heights, each with its own peak, read from the traces.
+      const runs = new Map();
+      for (const t of w.traces) if (t.source === 'B' && t.done && t.marks.length > 4) runs.set(+t.marks[0].y.toFixed(2), Math.max(...t.marks.map(m => m.y)));
+      if (runs.size >= 2) {
+        const list = [...runs].sort((a, b) => b[0] - a[0]);
+        const lines = list.map(([y0, pk]) => `desde ${fmt(y0, 1)} m llegó a ${fmt(pk, 2)} m`).join('; ');
+        this.add('profundidad', 'Más abajo, más alto', `Soltada desde distintas alturas en el soporte del borde: ${lines}. Cuanto más abajo empieza, más alto termina: adentro gana velocidad en cada metro que sube.`, { runs: list });
+      }
+    }
+    const terraceY = w.solids.find(s => s.id === 'terraza').y1;
+    if (!this.has('cruce') && this.flags.wasInside && av.x > 4.7 && av.supportSteps > 20 && Math.abs(av.y - av.hh - terraceY) < 0.05) {
+      const at = this.flags.attempts || [], last = at[at.length - 1];
+      const prev = at.slice(0, -1).filter(a => (a.from ?? 0.55) !== (last?.from ?? 0.55)).pop();
+      const where = v => v == null ? 'desde el borde' : `soltándote con la hebilla a ${fmt(v, 1)} m`;
+      let body = last ? `Esta vez, ${where(last.from)}, tu hebilla llegó a ${fmt(last.apex, 2)} m y alcanzaste el borde de la Terraza.` : 'Llegaste a la Terraza.';
+      if (last && prev) body += ` Antes, ${where(prev.from)}, había llegado a ${fmt(prev.apex, 2)} m.${(prev.from ?? 0.55) > (last.from ?? 0.55) && prev.apex < last.apex ? ' Empezar más abajo dentro de la región te llevó más alto, como al agua que sube desde el fondo.' : ''}`;
+      this.add('cruce', 'El cruce', body, { last, prev });
     }
     if (!this.has('medida') && this.has('caida') && this.has('subida') && this.flags.aA != null && this.flags.aB != null) {
       this.add('medida', 'Dos condiciones, dos aceleraciones',

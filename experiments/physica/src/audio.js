@@ -75,6 +75,11 @@ export class Sound {
         else this.blip({ freq: 1600 + Math.random() * 500, to: 900, dur: 0.07 + v * 0.1, type: 'triangle', gain: 0.05 + v * 0.22, noise: 0.25, filter: 4000 });
         break;
       }
+      case 'bell': [880, 1320, 1760, 2210].forEach((f, i) => this.blip({ freq: f, dur: 1.6 - i * 0.3, type: 'sine', gain: 0.12 / (i + 1) })); break;
+      case 'adjust': this.blip({ freq: 1900, to: 1500, dur: 0.05, type: 'square', gain: 0.03, noise: 0.3, filter: 6000 }); break;
+      case 'stop': this.blip({ freq: 160, dur: 0.1, type: 'square', gain: 0.04 }); break;
+      case 'grab': case 'ungrab': this.blip({ freq: 420, to: 300, dur: 0.12, type: 'triangle', gain: 0.07, noise: 0.4, filter: 3000 }); break;
+      case 'letgo': this.blip({ freq: 520, to: 780, dur: 0.25, type: 'sine', gain: 0.08 }); break;
       case 'mantle': this.blip({ freq: 180, to: 260, dur: 0.18, gain: 0.08, noise: 0.5, filter: 1200 }); break;
       case 'footing': this.blip({ freq: 700, to: 350, dur: 0.35, type: 'sine', gain: 0.1 }); break;
       case 'enter': if (e.body === avatarId) this.blip({ freq: 260, to: 620, dur: 0.6, type: 'sine', gain: 0.12, noise: 0.15, filter: 1800 }); break;

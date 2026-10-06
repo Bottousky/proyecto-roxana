@@ -2,11 +2,14 @@
 import * as THREE from 'three';
 import { TRACE_MAX_MARKS } from '../sim/world.js';
 const TRACE_CAP = TRACE_MAX_MARKS + 1;
+// Both height scales (B's rail and the chain) are drawn at one depth so equal numbers line up on screen.
+const SCALE_Z = -0.3;
 
 export function makeMaterials() {
   return {
     brass: new THREE.MeshStandardMaterial({ color: '#c9a04a', metalness: 0.8, roughness: 0.32 }),
     brassDark: new THREE.MeshStandardMaterial({ color: '#8a6a2c', metalness: 0.7, roughness: 0.45 }),
+    iron: new THREE.MeshStandardMaterial({ color: '#4a4440', metalness: 0.7, roughness: 0.5 }),
     copper: new THREE.MeshStandardMaterial({ color: '#4f9a88', metalness: 0.45, roughness: 0.5 }),
     wood: new THREE.MeshStandardMaterial({ color: '#7a4a2c', roughness: 0.8 }),
     woodLight: new THREE.MeshStandardMaterial({ color: '#a8703f', roughness: 0.78 }),
@@ -23,6 +26,90 @@ export function makeMaterials() {
 
 function cyl(r0, r1, h, m, seg = 12) { const c = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, h, seg), m); c.castShadow = true; c.receiveShadow = true; return c; }
 function box(w, h, d, m) { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.castShadow = true; b.receiveShadow = true; return b; }
+
+/** A small painted number on an enamel tag, facing the camera. */
+export function label(text, M, size = 0.17) {
+  const c = document.createElement('canvas'), k = c.getContext('2d'), font = '700 40px Georgia, serif';
+  k.font = font; const w = Math.max(96, Math.ceil(k.measureText(text).width) + 28);
+  c.width = w; c.height = 64;
+  k.fillStyle = '#f1e6cc'; k.beginPath(); k.roundRect(4, 6, w - 8, 52, 10); k.fill();
+  k.fillStyle = '#2a1a12'; k.font = font; k.textAlign = 'center'; k.textBaseline = 'middle'; k.fillText(text, w / 2, 34);
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.Mesh(new THREE.PlaneGeometry(size * 1.5 * w / 96, size), new THREE.MeshBasicMaterial({ map: tex, transparent: true }));
+}
+
+/** The descent chain: taut from a bracket on the lip to the chasm floor, numbered every metre. */
+export function chainProp(ch, M) {
+  const g = new THREE.Group();
+  const top = ch.lipY + 0.35, bottom = ch.floorY, n = Math.round((top - bottom) / 0.075);
+  const linkGeo = new THREE.TorusGeometry(0.035, 0.011, 6, 10);
+  const links = new THREE.InstancedMesh(linkGeo, M.iron || M.brassDark, n);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
+  for (let i = 0; i < n; i++) {
+    e.set(0, i % 2 ? Math.PI / 2 : 0, Math.PI / 2); q.setFromEuler(e);
+    m4.compose(new THREE.Vector3(ch.x, top - i * 0.075, 0.02), q, new THREE.Vector3(1, 1, 1)); links.setMatrixAt(i, m4);
+  }
+  links.castShadow = true; g.add(links);
+  // Davit on the lip and an anchor ring on the floor.
+  const davit = box(ch.x + 0.2, 0.07, 0.09, M.brassDark); davit.position.set((ch.x - 0.2) / 2, top + 0.03, 0.02); g.add(davit);
+  const post = box(0.09, top + 0.1, 0.09, M.brassDark); post.position.set(-0.2, (top + 0.1) / 2, 0.02); g.add(post);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 8, 16), M.brassDark); ring.rotation.x = Math.PI / 2; ring.position.set(ch.x, bottom + 0.03, 0.02); g.add(ring);
+  const collar = cyl(0.07, 0.07, 0.06, M.brass); collar.position.set(ch.x, ch.stopY + 0.25, 0.02); g.add(collar);
+  for (let y = Math.ceil(ch.stopY); y <= ch.lipY + 1e-6; y += 1) {
+    // Numbers sit between the wall and the chain, where the explorer's body does not cover them.
+    const t = label(`${y < 0 ? '−' : ''}${Math.abs(y)}`, M, 0.17); t.position.set(0.24, y, SCALE_Z); g.add(t);
+    const tick = box(0.12, 0.02, 0.02, M.brass); tick.position.set(ch.x - 0.06, y, 0.04); g.add(tick);
+  }
+  for (let y = ch.stopY + 0.5; y < ch.lipY; y += 1) { const tick = box(0.07, 0.015, 0.02, M.brass); tick.position.set(ch.x - 0.05, y, 0.04); g.add(tick); }
+  // The ring the explorer holds slides with its buckle; at rest it waits at the lip.
+  const ringM = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.02, 8, 18), M.brass); ringM.position.set(ch.x, ch.lipY + 0.55, 0.02); g.add(ringM);
+  const pointer = box(Math.max(0.1, ch.x - 0.38), 0.018, 0.02, M.brass); pointer.position.set((ch.x + 0.38) / 2, ch.lipY + 0.55, SCALE_Z + 0.02); g.add(pointer);
+  g.userData.ring = ringM; g.userData.pointer = pointer; g.userData.restY = ch.lipY + 0.55;
+  return g;
+}
+
+/** A bell hung from a gallows on the Terraza, at the Terraza's height above B's rail. */
+export class Bell {
+  constructor(bl, terraceY, M) {
+    const g = this.group = new THREE.Group();
+    const postX = 4.95, armY = terraceY + 1.25;
+    const post = cyl(0.05, 0.06, armY - terraceY, M.wood); post.position.set(postX, (terraceY + armY) / 2, -0.5); g.add(post);
+    const arm = box(postX - bl.x + 0.1, 0.06, 0.06, M.woodLight); arm.position.set((postX + bl.x) / 2, armY, -0.5); g.add(arm);
+    this.pivot = new THREE.Group(); this.pivot.position.set(bl.x, armY, -0.5); g.add(this.pivot);
+    const cord = cyl(0.01, 0.01, armY - bl.y - 0.12, M.brassDark); cord.position.y = -(armY - bl.y - 0.12) / 2; this.pivot.add(cord);
+    const prof = [[0.0, 0.16], [0.05, 0.16], [0.07, 0.12], [0.08, 0.04], [0.11, -0.04], [0.12, -0.07], [0.0, -0.07]].map(p => new THREE.Vector2(p[0], p[1]));
+    const bell = new THREE.Mesh(new THREE.LatheGeometry(prof, 20), M.brass); bell.position.y = -(armY - bl.y); bell.scale.setScalar(1.7); bell.castShadow = true; this.pivot.add(bell);
+    this.swing = 0; this.phase = 0;
+  }
+  ring(speed) { this.swing = Math.min(0.6, 0.2 + speed * 0.12); this.phase = 0; }
+  update(dt) { this.phase += dt * 7; this.swing *= Math.exp(-dt * 1.4); this.pivot.rotation.z = Math.sin(this.phase) * this.swing; }
+}
+
+/**
+ * Chalk on the Terraza's face: one mark per attempt at the height the explorer's buckle
+ * reached, labelled with where it started, kept until the crossing. A painted line marks the
+ * bell's height, the line a centre must reach.
+ */
+export class ApexMarks {
+  constructor(scene, M, { bellLine, x0 = 3.95, x1 = 4.45, z = 0.62 }) {
+    this.scene = scene; this.M = M; this.items = []; this.x0 = x0; this.x1 = x1; this.z = z;
+    const line = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0 + 0.2, 0.035), new THREE.MeshBasicMaterial({ color: '#d9b45a' }));
+    line.position.set((x0 + x1) / 2 - 0.1, bellLine, z - 0.01); line.renderOrder = 9; scene.add(line);
+    const tag = label(bellLine.toFixed(1).replace('.', ','), M, 0.17); tag.position.set(x0 - 0.3, bellLine, z - 0.01); tag.renderOrder = 9; scene.add(tag);
+  }
+  add(y, from) {
+    const g = new THREE.Group();
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(this.x1 - this.x0, 0.05), new THREE.MeshBasicMaterial({ color: '#fff7e0', transparent: true, depthWrite: false }));
+    m.position.set((this.x0 + this.x1) / 2, y, this.z); m.renderOrder = 9; g.add(m);
+    // Labelled on the open side, where neither the rock nor the water covers it.
+    const t = label(from == null ? 'borde' : `${from < 0 ? '−' : ''}${Math.abs(from).toFixed(1).replace('.', ',')}`, this.M, 0.14);
+    t.position.set(this.x0 - 0.3, y, this.z); t.renderOrder = 9; g.add(t);
+    this.scene.add(g); this.items.push(g);
+    if (this.items.length > 6) this.scene.remove(this.items.shift());
+  }
+  clear() { for (const g of this.items) this.scene.remove(g); this.items = []; }
+  update() {}
+}
 
 /** A test sphere: brass with a dark equator so its rotation reads. */
 export function sphereMesh(r, M) {
@@ -42,9 +129,10 @@ export class Stand {
   constructor(spec, M) {
     this.spec = spec; this.M = M;
     const g = this.group = new THREE.Group();
-    const { x, baseY, clampX, clampY } = spec;
+    const { x, baseY, clampX, clampY, rail } = spec;
     const z0 = spec.z ?? -0.55, zl = spec.laneZ ?? 0;
-    const topY = clampY + 0.42;
+    const topY = (rail ? rail.max : clampY) + 0.42;
+    this.zl = zl;
     const foot = box(0.7, 0.08, 0.7, M.stone); foot.position.set(x, baseY + 0.04, z0); g.add(foot);
     const post = cyl(0.05, 0.065, topY - baseY, M.wood); post.position.set(x, baseY + (topY - baseY) / 2, z0); g.add(post);
     const collar = cyl(0.075, 0.075, 0.08, M.brass); collar.position.set(x, topY - 0.05, z0); g.add(collar);
@@ -52,13 +140,27 @@ export class Stand {
     const ax = clampX - x, len = Math.abs(ax);
     const arm = box(len, 0.06, 0.06, M.woodLight); arm.position.set(x + ax / 2, topY, z0); g.add(arm);
     const fwd = box(0.05, 0.05, Math.abs(z0 - zl) + 0.05, M.brass); fwd.position.set(clampX, topY, (z0 + zl) / 2); g.add(fwd);
-    const drop = cyl(0.018, 0.018, 0.26, M.brass); drop.position.set(clampX, topY - 0.13, zl); g.add(drop);
-    // Clamp jaws pivot open on release.
+    if (rail) {
+      // A rail hangs from the arm into the chasm; the clamp rides it on a carriage.
+      const zr = zl - 0.22, bottom = rail.min - 0.35;
+      const rod = cyl(0.022, 0.022, topY - bottom, M.brassDark); rod.position.set(clampX, (topY + bottom) / 2, zr); g.add(rod);
+      const link = box(0.05, 0.05, 0.27, M.brass); link.position.set(clampX, topY, (z0 + zr) / 2); g.add(link);
+      for (let y = rail.min; y <= rail.max + 1e-6; y += rail.step) {
+        const major = Math.abs(y - Math.round(y)) < 1e-6;
+        const t = box(major ? 0.16 : 0.1, 0.014, 0.03, M.ink); t.position.set(clampX + 0.06, y, zr + 0.02); g.add(t);
+        if (major) { const l = label(`${y < 0 ? '−' : ''}${Math.abs(Math.round(y))}`, M); l.position.set(clampX + 0.26, y, SCALE_Z); g.add(l); }
+      }
+    } else {
+      const drop = cyl(0.018, 0.018, 0.26, M.brass); drop.position.set(clampX, topY - 0.13, zl); g.add(drop);
+    }
+    // Clamp jaws pivot open on release; they ride a carriage at the clamp's height.
+    this.carriage = new THREE.Group(); this.carriage.position.set(clampX, clampY, zl); g.add(this.carriage);
+    if (rail) { const cb = box(0.12, 0.1, 0.26, M.brass); cb.position.set(0, 0.26, -0.11); this.carriage.add(cb); }
     this.jaws = [-1, 1].map(s => {
-      const piv = new THREE.Group(); piv.position.set(clampX, clampY + 0.2, zl);
+      const piv = new THREE.Group(); piv.position.set(0, 0.2, 0);
       const jaw = box(0.035, 0.2, 0.05, M.brassDark); jaw.position.set(s * 0.06, -0.1, 0); piv.add(jaw);
       const tipj = box(0.07, 0.03, 0.05, M.brassDark); tipj.position.set(s * 0.035, -0.2, 0); piv.add(tipj);
-      g.add(piv); piv.userData.s = s; return piv;
+      this.carriage.add(piv); piv.userData.s = s; return piv;
     });
     // Reel on the post with a crank.
     this.reel = new THREE.Group(); this.reel.position.set(x + (ax > 0 ? 0.12 : -0.12), baseY + 1.05, z0 + 0.1);
@@ -94,12 +196,13 @@ export class Stand {
     this.open += (target - this.open) * Math.min(1, dt * 14);
     for (const j of this.jaws) j.rotation.z = j.userData.s * this.open * 0.55;
     if (st.state === 'reeling') this.reel.rotation.z -= dt * 14;
-    // Thread: reel → pulley → sphere, slack sagging toward the local pull when free.
-    const pts = [], r = this.reel.position, P = this.pulley;
+    this.carriage.position.y += (st.clampY - this.carriage.position.y) * Math.min(1, dt * 18);
+    // Thread: reel → pulley → (down the rail) → clamp → sphere, slack when free.
+    const pts = [], r = this.reel.position, P = this.spec.rail ? new THREE.Vector3(this.pulley.x, this.carriage.position.y + 0.3, this.zl) : this.pulley;
     pts.push(new THREE.Vector3(r.x, r.y + 0.09, r.z));
-    pts.push(new THREE.Vector3(r.x, P.y, r.z));
-    pts.push(new THREE.Vector3(P.x, P.y, P.z));
-    const end = st.state === 'armed' ? new THREE.Vector3(P.x, st.clampY + 0.1, P.z) : spherePos;
+    pts.push(new THREE.Vector3(r.x, this.pulley.y, r.z));
+    pts.push(new THREE.Vector3(this.pulley.x, this.pulley.y, this.pulley.z));
+    const end = st.state === 'armed' ? new THREE.Vector3(P.x, this.carriage.position.y + 0.1, P.z) : spherePos;
     const n = 15, d = end.distanceTo(P), slack = st.state === 'free' ? Math.min(0.6, d * 0.12) : 0.0;
     for (let i = 1; i <= n; i++) {
       const t = i / n, p = new THREE.Vector3().lerpVectors(P, end, t);
