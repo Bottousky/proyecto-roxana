@@ -341,6 +341,7 @@ let c9Shape = null;
 let c11Item = null;
 let knobStep = 0;
 let c12Cell = 0;
+const interactSnapped = new Set();
 let logTaps = 0;
 const searchOrder = ['look-crack', 'look-house', 'look-smudge'];
 let lastSeg = null;
@@ -419,6 +420,13 @@ for (let iter = 0; iter < 4000; iter++) {
     continue;
   }
   if (s.spots.length) {
+    // la primera interacción de cada escena, con la cámara ya quieta: evidencia del encuadre al tocar
+    if ((opt('snap') || val('snap', '')) && !interactSnapped.has(s.seg)) {
+      interactSnapped.add(s.seg);
+      await page.waitForTimeout(700);
+      await shot(`${s.seg}-interaccion`);
+      continue;
+    }
     const spots = s.spots.filter(x => !x.disabled);
     const byLabel = t => spots.filter(x => x.label.includes(t));
     let target = null;

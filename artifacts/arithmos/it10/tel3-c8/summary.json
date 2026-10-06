@@ -1,0 +1,46 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c9.flechas"
+  },
+  "journal": [
+    "Formas"
+  ],
+  "evidenceKinds": [
+    "near-miss",
+    "proof-need",
+    "descent",
+    "irrational",
+    "angle-cut",
+    "angle-general",
+    "alt-angle",
+    "angles",
+    "copy-try",
+    "similar-keeps",
+    "area-scale-predict",
+    "volume-scale-predict",
+    "scale",
+    "perimeter-predict",
+    "fence",
+    "perimeter",
+    "pythag-predict",
+    "pythag-move",
+    "pythag-general",
+    "pythag",
+    "coord-try",
+    "coord-distance",
+    "coords",
+    "shadow"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 61.683,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}

@@ -73,7 +73,8 @@ class Game {
     // la franja del texto queda reservada: la cámara no salta cuando aparece un diálogo
     const bottom = !playing ? 0 : h >= 560 ? Math.min(h * 0.3, 175 * textScale) : Math.min(h * 0.2, 80 * textScale);
     this.baseBottom = bottom;
-    this.camera.safe = {left: 0, right: 0, top: playing ? 56 : 0, bottom};
+    // en pantallas bajas (teléfono acostado) el margen de arriba es menor: los botones van en la esquina
+    this.camera.safe = {left: 0, right: 0, top: playing ? (h < 560 ? 36 : 56) : 0, bottom};
     // teléfono en vertical: se avisa una vez que conviene girarlo
     const rotate = document.getElementById('rotate');
     if (rotate) rotate.hidden = !(playing && w < 700 && h > w * 1.15 && !this.rotateOk);
@@ -99,7 +100,9 @@ class Game {
     // si el panel de elecciones crece (texto grande, pantalla baja), la escena se corre hacia arriba
     if (this.mode === 'play') {
       const panel = this.ui.choices$.hidden ? 0 : this.ui.choices$.offsetHeight;
-      const want = Math.max(this.baseBottom || 0, panel + 8);
+      // en pantallas bajas, mientras se toca la escena y no hay texto abajo, la escena usa ese lugar
+      const free = innerHeight < 560 && this.ui.interactive && this.ui.choices$.hidden && !this.ui.waiting;
+      const want = Math.max(free ? 16 : (this.baseBottom || 0), panel + 8);
       const cur = this.camera.safe.bottom;
       this.camera.safe.bottom = cur + (want - cur) * Math.min(1, raw * 6);
     }

@@ -1,0 +1,26 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c9.flechas"
+  },
+  "journal": [
+    "Formas"
+  ],
+  "evidenceKinds": [
+    "coord-try",
+    "coord-distance",
+    "coords",
+    "shadow"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 12.176,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}
