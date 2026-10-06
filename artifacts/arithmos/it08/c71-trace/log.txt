@@ -1,0 +1,148 @@
+[0.0s] escena → c7.lado
+[1.0s] lee: Tengo nueve cuadros de huerta y los quiero en una huerta cuadrada. ¿Cuánto mide el lado?
+[1.9s] toca rows-1 (Acomodar los nueve cuadros en una fila)
+[2.6s] lee: Eso es un pasillo, no una huerta cuadrada.
+[3.2s] lee: —Tres filas de tres: el lado mide 3. Punto, tres por tres es nueve: tres es la raíz de nueve.
+[3.3s] lee: En la cuenta de Oval, x · x = 9 también daba −3.
+[3.4s] lee: —Un lado no mide −3. La raíz de un número es la positiva; el −3 hay que agregarlo aparte.
+[3.5s] lee: Y la que le conté a Mara: dos cuadros, también cuadrada. x · x = 2.
+[4.1s] elige «Menos de 2.» (Una huerta cuadrada hecha con dos cuadros de lado 1: ¿cuánto mide su lado?)
+[4.5s] toca cut0 (Cortar el cuadro 1 por la diagonal)
+[4.7s] toca cut0 (Cortar el cuadro 1 por la diagonal)
+[4.8s] toca cut0 (Cortar el cuadro 1 por la diagonal)
+[4.9s] toca cut1 (Cortar el cuadro 2 por la diagonal)
+[5.2s] toca cut1 (Cortar el cuadro 2 por la diagonal)
+[5.3s] toca cut1 (Cortar el cuadro 2 por la diagonal)
+[5.4s] toca tri-c7-t0a (Llevar el triángulo 1 al cuadrado grande)
+[5.6s] toca tri-c7-t0a (Llevar el triángulo 1 al cuadrado grande)
+[5.7s] toca tri-c7-t0a (Llevar el triángulo 1 al cuadrado grande)
+[5.8s] toca tri-c7-t0a (Llevar el triángulo 1 al cuadrado grande)
+[6.0s] toca tri-c7-t0a (Llevar el triángulo 1 al cuadrado grande)
+[6.1s] toca tri-c7-t0b (Llevar el triángulo 1 al cuadrado grande)
+[6.3s] toca tri-c7-t0b (Llevar el triángulo 1 al cuadrado grande)
+[6.4s] toca tri-c7-t0b (Llevar el triángulo 1 al cuadrado grande)
+[6.6s] toca tri-c7-t0b (Llevar el triángulo 1 al cuadrado grande)
+[6.7s] toca tri-c7-t0b (Llevar el triángulo 1 al cuadrado grande)
+[6.8s] toca tri-c7-t1a (Llevar el triángulo 1 al cuadrado grande)
+[7.0s] toca tri-c7-t1a (Llevar el triángulo 1 al cuadrado grande)
+[7.1s] toca tri-c7-t1a (Llevar el triángulo 1 al cuadrado grande)
+[7.2s] toca tri-c7-t1a (Llevar el triángulo 1 al cuadrado grande)
+[7.4s] toca tri-c7-t1a (Llevar el triángulo 1 al cuadrado grande)
+[7.5s] toca tri-c7-t1b (Llevar el triángulo 1 al cuadrado grande)
+[7.6s] toca tri-c7-t1b (Llevar el triángulo 1 al cuadrado grande)
+[7.8s] toca tri-c7-t1b (Llevar el triángulo 1 al cuadrado grande)
+[7.9s] toca tri-c7-t1b (Llevar el triángulo 1 al cuadrado grande)
+[8.1s] toca tri-c7-t1b (Llevar el triángulo 1 al cuadrado grande)
+[9.6s] lee: Menos de 2: el lado es la diagonal de un cuadro.
+[9.7s] lee: —Punto: esta huerta tiene área 2, dos cuadros. Su lado, multiplicado por sí mismo, da 2: es la diagonal de un cuadro, la que medimos, más o menos 1,414.
+[9.8s] lee: Así que el camino en diagonal mide raíz de dos. Lo pinto así en la puerta.
+[9.8s] escena → c7.duplicar
+[10.9s] lee: La Marea se llevó entera la escalera del fondo: cien escalones. Hoy dibujo uno, y después diez por día.
+[11.5s] elige «El de Punto: cada día, el doble.» (Empezando los dos con un escalón: ¿quién llega antes a cien?)
+[13.0s] toca dp-next (otro día)
+[13.2s] lee: Once contra dos. Punto se queda atrás.
+[13.3s] toca dp-next (otro día)
+[13.4s] toca dp-next (otro día)
+[13.5s] toca dp-next (otro día)
+[13.6s] toca dp-next (otro día)
+[13.8s] toca dp-next (otro día)
+[13.9s] toca dp-next (otro día)
+[14.0s] toca dp-next (otro día)
+[14.2s] toca dp-next (otro día)
+[14.3s] lee: Día 6: 64 contra 61. Punto pasa adelante.
+[14.4s] toca dp-next (otro día)
+[14.5s] toca dp-next (otro día)
+[14.7s] lee: No entra en la pizarra: achico todo igual, las dos barras y la raya del 100.
+[14.7s] lee: —Punto: al principio sumar diez gana. Duplicar empieza lento, pero cada día agrega todo lo que ya había. Desde el día 6 vas adelante, y cada día sacás más ventaja.
+[14.8s] lee: Entonces la redibujamos a tu manera. ¿Y de dónde sacás tanta tiza el día siete?
+[14.9s] escena → c7.factores
+[15.9s] lee: Lo de Punto se anota largo: dos por dos por dos por dos. ¿No hay una forma corta?
+[15.9s] lee: —Se empieza en 1 y se multiplica por dos tantas veces como dice el número de arriba, chiquito.
+[16.0s] toca pw-down (Escribir 2³)
+[16.9s] toca pw-down (Escribir 2²)
+[17.8s] lee: Cada renglón hacia abajo, un dos menos: el resultado se divide por dos.
+[17.9s] toca pw-down (Escribir 2¹)
+[18.7s] toca pw-down (Escribir 2⁰)
+[19.4s] elige «2⁰ = 1.» (Siguiendo la tabla hacia abajo, ¿cuánto vale 2⁰?)
+[20.2s] lee: —Dos dividido dos: uno. Y con la regla: empezar en 1 y multiplicar cero veces deja el 1.
+[20.2s] lee: ¿Y un renglón más abajo?
+[20.7s] lee: —Punto: el exponente cuenta cuántas veces se multiplica por dos. Para abajo de cero, cuántas veces se divide.
+[20.7s] escena → c7.grande
+[21.7s] lee: Medí el polvo de tiza que dejó la Marea esta noche: tres millones de granos. No me entra en la libreta.
+[21.8s] toca sc-z1 (Contar el cero 1)
+[22.1s] toca sc-z2 (Contar el cero 2)
+[22.3s] toca sc-z3 (Contar el cero 3)
+[22.5s] toca sc-z4 (Contar el cero 4)
+[22.8s] toca sc-z5 (Contar el cero 5)
+[23.0s] toca sc-z6 (Contar el cero 6)
+[23.2s] toca sc-ok (Listo: 6 lugares)
+[23.4s] lee: —Punto: seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica.
+[23.5s] lee: La de anoche la anoté así: 4 · 10⁵.
+[24.0s] elige «Esta noche: 3 · 10⁶.» (¿Qué noche dejó más polvo?)
+[24.5s] lee: —Esta noche: tres millones contra cuatrocientos mil. El exponente dice cuántos lugares, y pesa más que el 3 o el 4.
+[24.6s] lee: Y un grano solo es nada: una milésima de gramo.
+[24.7s] lee: —Lo chico también se corre: tres lugares para el otro lado, como la tabla de los dos, para abajo.
+[24.8s] escena → c7.areas
+[25.8s] lee: Voy a agrandar una huerta cuadrada, pero todavía no decidí de qué lado: le digo x. Le sumo dos filas abajo y tres columnas al costado. Quiero una cuenta que sirva para cualquier lado.
+[25.9s] lee: La ficha x la dibujo de un largo cualquiera: x puede ser cualquier número.
+[26.5s] elige «Un x por x, cinco tiras y seis cuadraditos.» (¿Qué fichas hacen falta para llenar la huerta nueva?)
+[28.4s] toca ar-pick-x2-ar-T0 (Ficha: cuadrado x por x)
+[29.0s] toca ar-pick-x-ar-Tx0 (Ficha: tira x por 1)
+[29.5s] toca ar-pick-x-ar-Tx1 (Ficha: tira x por 1)
+[30.1s] toca ar-pick-x-ar-Tx2 (Ficha: tira x por 1)
+[30.6s] toca ar-pick-x-ar-Tx3 (Ficha: tira x por 1)
+[31.0s] toca ar-pick-x-ar-Tx4 (Ficha: tira x por 1)
+[31.5s] toca ar-pick-u-ar-Tu0 (Ficha: cuadradito 1 por 1)
+[32.1s] toca ar-pick-u-ar-Tu1 (Ficha: cuadradito 1 por 1)
+[32.5s] toca ar-pick-u-ar-Tu2 (Ficha: cuadradito 1 por 1)
+[33.0s] toca ar-pick-u-ar-Tu3 (Ficha: cuadradito 1 por 1)
+[33.5s] toca ar-pick-u-ar-Tu4 (Ficha: cuadradito 1 por 1)
+[33.9s] toca ar-pick-u-ar-Tu5 (Ficha: cuadradito 1 por 1)
+[34.4s] lee: Un x por x, cinco tiras, seis cuadraditos.
+[34.5s] lee: —Peldaño: es partir el rectángulo, como cuando repartimos en las Terrazas, pero de los dos lados. Dos por tres, los cuadraditos; dos más tres, las tiras.
+[34.6s] escena → c7.al-reves
+[35.6s] lee: A mí me dieron las fichas sueltas: un x por x, cinco tiras y seis cuadraditos. Quiero una huerta rectangular, sin que sobre nada.
+[37.0s] elige «x + 2 por x + 3» (¿Con qué lados probás armar la huerta?)
+[37.5s] lee: —Balcón: los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres.
+[37.6s] lee: ¿Y si me hubieran dado cinco cuadraditos?
+[37.7s] lee: Dos números que sumen cinco y multiplicados den cinco: cero y cinco dan cero, uno y cuatro dan cuatro, dos y tres dan seis. Con enteros, ninguno: con estas fichas, ese rectángulo no se arma. Con lados que no son enteros se podría, pero esas fichas no existen.
+[37.7s] escena → c7.completar
+[38.7s] lee: Mi huerta: un cuadrado de lado x y dos tiras de x pegadas, una a cada lado. En total, ocho cuadraditos de tierra. ¿Cuánto mide x?
+[39.3s] elige «Un cuadradito en la esquina.» (¿Qué le falta para ser un cuadrado?)
+[40.5s] toca cq-corner (Poner un cuadradito en la esquina vacía)
+[41.6s] elige «8 + 1: se agregó un cuadradito.» (Del otro lado del igual, ¿qué escribís?)
+[42.0s] lee: —Rampa: un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.
+[42.1s] lee: Con x = 2 se pueden contar: cuatro del cuadrado y dos de cada tira, ocho de tierra. Con la esquina, nueve: tres por tres.
+[42.2s] lee: Las dos cumplen (x + 1)² = 9, porque (−3) · (−3) también es 9. Pruebo x = −4 en la cuenta de Rampa: 16 − 8 = 8. Cumple. La huerta no: un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.
+[42.3s] escena → c7.cuantas-veces
+[42.7s] lee: Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?
+[43.3s] elige «Unos diez días.» (Empezando con uno y duplicando cada día, ¿cuántos días para pasar mil?)
+[44.5s] toca lg-dup (duplicar)
+[44.7s] toca lg-dup (duplicar)
+[44.8s] toca lg-dup (duplicar)
+[44.9s] toca lg-dup (duplicar)
+[45.0s] toca lg-dup (duplicar)
+[45.2s] toca lg-dup (duplicar)
+[45.3s] toca lg-dup (duplicar)
+[45.4s] toca lg-dup (duplicar)
+[45.6s] toca lg-dup (duplicar)
+[45.7s] toca lg-dup (duplicar)
+[45.8s] toca lg-ok (ya pasó)
+[46.0s] lee: —Punto: 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó.
+[46.1s] lee: Diez: duplicar llega lejos enseguida.
+[46.1s] lee: Para pasar mil, diez. ¿Y para llegar justo a mil?
+[46.2s] lee: —Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero hay pasos más chicos: media duplicación es multiplicar por √2, porque dos medias hacen una, √2 · √2 = 2. Nueve y media: 512 · 1,414, unos 724. Todavía no.
+[46.3s] lee: El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo.
+[46.4s] escena → c7.no-se-puede
+[46.8s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[47.3s] elige «Con x = 2.» (¿Para qué x no se puede hacer esa cuenta?)
+[48.6s] toca ns-x2 (Probar con x = 2)
+[49.2s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[49.2s] toca ns-x5 (Probar con x = 5)
+[49.4s] toca ns-x4 (Probar con x = 4)
+[49.5s] lee: Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2.
+[49.6s] lee: —Rampa: la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero.
+[49.7s] lee: La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.
+[49.8s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?
+[49.8s] escena → c8.diagonal
+[50.7s] {"ended":true,"final":{"mode":"play","seg":"c8.diagonal"},"journal":["Crecer"],"evidenceKinds":["square-rows","side-predict","side","race-predict","race-day","race","pow-row","pow-zero","powers","sci-compare","sci","expand-predict","expand","factor-try","factor","complete-predict","complete-other","complete","log-predict","log-step","log","rational-predict","rational-try","rational"],"fps":{"min":"36.0","median":"60.0"},"errors":[],"seconds":50.651,"size":"1600x900","touch":false,"route":"directa","watch":false}

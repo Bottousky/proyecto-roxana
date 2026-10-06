@@ -330,10 +330,13 @@
         "C4"
       ],
       "acceptance": "Idem",
-      "status": "implementado",
+      "status": "revisado-mat",
       "evidence": [
-        "artifacts/arithmos/it07/c6c7-directa/log.txt",
-        "artifacts/arithmos/it07/c7-errores/log.txt"
+        "artifacts/arithmos/it08/c71-trace/log.txt",
+        "artifacts/arithmos/it08/c7-errores2/log.txt",
+        "artifacts/arithmos/it07/c7-telefono3/log.txt",
+        "artifacts/arithmos/it07/review-mat/informe.md",
+        "artifacts/arithmos/it07/review-narr/informe.md"
       ]
     },
     {
@@ -343,6 +346,30 @@
         "C7"
       ],
       "acceptance": "Hallazgos registrados y corregidos o justificados",
+      "status": "revisado-mat",
+      "evidence": [
+        "artifacts/arithmos/it07/review-mat/informe.md",
+        "artifacts/arithmos/it07/review-narr/informe.md",
+        "docs/arithmos/ARITHMOS_REVIEW.md"
+      ]
+    },
+    {
+      "id": "C7b",
+      "title": "Cobertura de E pendiente (rev-mat-6 M7, M11): propiedades de las potencias, raíces de otro índice, √(x²) = |x|, sucesiones nombradas, completar el cuadrado con otro b y con una o ninguna solución, simplificar racionales con restricción",
+      "deps": [
+        "C7"
+      ],
+      "acceptance": "Escena jugable con decisión; revisión matemática",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
+      "id": "N7-R",
+      "title": "Pendientes narrativos del cap. 7 (rev-narr-5): plantilla repetida y sin acumulación ni clímax, el juego da el paso decisivo en 7.1/7.5/7.6, Punto oyente, voces (Mara aporta contenido), la Marea sin nada en juego, opciones que se delatan, costuras 6→7 y 7→8, primeros planos, predicciones lejanas en teléfono, Bitácora sin momentos de historia",
+      "deps": [
+        "C7"
+      ],
+      "acceptance": "Revisión narrativa sin hallazgos altos",
       "status": "pendiente",
       "evidence": []
     },
@@ -354,6 +381,19 @@
         "C7"
       ],
       "acceptance": "Idem",
+      "status": "implementado",
+      "evidence": [
+        "artifacts/arithmos/it08/c8-directa/log.txt",
+        "artifacts/arithmos/it08/c8-errores/log.txt"
+      ]
+    },
+    {
+      "id": "C8-R",
+      "title": "Revisión independiente (matemática y narrativa) del cap. 8",
+      "deps": [
+        "C8"
+      ],
+      "acceptance": "Hallazgos registrados y corregidos o justificados",
       "status": "pendiente",
       "evidence": []
     },

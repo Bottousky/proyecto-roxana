@@ -82,7 +82,7 @@ export const cerca = {
       table(3, 3, show(3), tried.length - 1);
       await d.wait(0.6);
     }
-    const best = all.reduce((m, r) => (r.area > m.area ? r : m));
+    const best = all.reduce((top, r) => (r.area > top.area ? r : top));
     await d.think(`La misma cerca y la tierra va de ${Math.min(...all.map(r => r.area))} a ${best.area}. ${pre === 'same' ? 'No es la misma: depende de la forma.' : 'Depende de la forma.'} La cuadrada encierra más.`);
     await d.say('student', 'Rampa: la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra.');
     await studentWrites(d, g, 'c8-per', 'perímetro 12:  áreas 5, 8, 9', A.x0 + 24, A.y1 - 14, {size: 24});
@@ -192,7 +192,7 @@ export const pitagoras = {
     if (r.freeA !== r.squaresAB || !pz.holds) console.error('[pitágoras] el reacomodo no cierra');
     await d.think('El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16.');
     await d.say('student', guess === '5' ? 'Balcón: el cuadrado del tirante tiene 9 + 16 = 25 cuadros. El tirante mide 5.' : 'Balcón: el cuadrado del tirante tiene 9 + 16 = 25 cuadros: el tirante mide 5, porque 5 · 5 = 25.');
-    await studentWrites(d, g, 'c8-py', '3² + 4² = 5²', A.x1 - 160, A.y1 - 14, {size: 28});
+    await studentWrites(d, g, 'c8-py', '3² + 4² = 5²', A.x1 - 160, A.y0 + 184, {size: 28});
     const gen = await d.choose([
       {id: 'right', text: 'Para cualquier triángulo con ángulo recto: el reacomodo no usó el 3 ni el 4.'},
       {id: 'only', text: 'Sólo para 3, 4 y 5.'},
@@ -229,7 +229,7 @@ export const casas = {
     const A = area();
     await d.shot(SHOTS.board, 1);
     await d.say('Mara', 'La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada.');
-    const U = 56, X0 = -1, X1 = 5, Y0 = -1, Y1 = 3;
+    const U = 52, X0 = -1, X1 = 5, Y0 = -1, Y1 = 3;
     const gx = A.x0 + 40, gy = A.y0 + 22;
     const px = x => gx + (x - X0) * U, py = y => gy + (Y1 - y) * U;
     const lines = [];
@@ -285,7 +285,7 @@ export const casas = {
     d.describe('Entre las dos casas, un triángulo con ángulo recto: 4 por la acostada, 3 por la parada, y el camino derecho en amarillo.');
     await d.say('student', `Es el tirante de Balcón: patas 4 y 3, en escuadra. 4² + 3² = 25: el camino derecho mide ${dist.d}.`);
     if (c === '7') await d.think('Siete es yendo por las rectas, en ele. Derecho, cinco.');
-    await studentWrites(d, g, 'c8-co', '(3, 2) ≠ (2, 3)', A.x1 - 150, A.y0 + 36, {size: 22});
+    await studentWrites(d, g, 'c8-co', '(3, 2) ≠ (2, 3)', A.x0 + 372, A.y0 + 40, {size: 20});
     d.evidence('coords', {dist});
     g.flags.c8coords = true;
   },
@@ -305,7 +305,7 @@ export const sombras = {
     boardCast(g, 2);
     const w = g.world;
     const c = w.get('cornisa');
-    if (c) { c.x = BOARD.x - BOARD.w / 2 - 330; c.face?.(1); }
+    if (c) { c.x = 13450; c.face?.(1); }
     g.camera.go(SHOTS.shadow);
   },
   async play(d, g, {replay} = {}) {
@@ -313,12 +313,10 @@ export const sombras = {
     const p = w.get('punto');
     const A = area();
     const cor = w.get('cornisa');
-    const fx = cor ? cor.x : BOARD.x - BOARD.w / 2 - 330;
+    const fx = cor ? cor.x : 13450;
     await d.shot(SHOTS.shadow, 1);
     await d.say('Cornisa', 'Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?');
     const sun = w.add(new Shape('c8-sun', poly('c8-sun', Array.from({length: 12}, (_, i) => [Math.cos(i / 12 * Math.PI * 2) * 22, Math.sin(i / 12 * Math.PI * 2) * 22]), {ch: YELLOW, w: 2.6}), fx, GROUND - 420, {z: 3}));
-    const shadowOf = h => w.ensure('c8-shadow', () => new Drawing('c8-shadow', [S([[0, 0], [1, 0]], seedOf('c8-sh'), {w: 6, p: 0.5})], {z: 2}));
-    shadowOf(12);
     const setShadow = len => {
       w.remove('c8-shadow');
       w.add(new Drawing('c8-shadow', [S([[fx + 6, GROUND - 2], [fx + 6 + len * 40, GROUND - 2]], seedOf(`c8-sh${len}`), {w: 7, p: 0.55})], {z: 2}));
@@ -371,14 +369,15 @@ function writeJournal8(g) {
   const nm = ev.filter(e => e.kind === 'near-miss').map(e => e.q);
   if (nm.length) seen.push(`Partiste el lado en ${nm.join(', ')}: nunca cayó justo.`);
   const pn = first('proof-need');
-  if (pn) seen.push(pn.answer === 'arg' ? 'Viste que probando no se termina y que hacía falta una razón.' : 'Pensaste en seguir probando o en dar por probado con mil casos; hacía falta una razón que sirva para todos.');
+  if (pn) seen.push(pn.answer === 'arg' ? 'Viste que probando no se termina y que hacía falta una razón.' : pn.answer === 'more' ? 'Pensaste en seguir probando; los números no se terminan, y hacía falta una razón que sirva para todos.' : 'Pensaste que mil casos alcanzaban; mil no son todos, y hacía falta una razón que sirva para todos.');
   if (first('descent')) seen.push('Con dos cuadrados adentro de uno, cada par que cumpliera daba otro más chico: con enteros, imposible. √2 no es una fracción.');
   const ag = first('angle-general');
   if (ag) seen.push(ag.answer === 'why' ? 'Juntaste las puntas de un triángulo en media vuelta y pediste una razón para todos: la paralela.' : 'Juntaste las puntas de un triángulo en media vuelta; para todos los triángulos, la razón fue la paralela.');
   const sk = first('similar-keeps');
   if (sk) seen.push(sk.answer === 'angles' ? 'Una copia parecida conserva la forma: ángulos y proporción.' : 'Una copia parecida no conserva los lados ni el área: conserva la forma, los ángulos y la proporción.');
   const as = first('area-scale-predict'), vs = first('volume-scale-predict');
-  if (as) seen.push(`Con el lado doble, anticipaste ${({2: 'el doble', 4: 'cuatro veces', 3: 'algo más'})[as.answer]} de tierra: fueron cuatro huertas${vs ? `, y ${vs.answer === '8' ? 'ocho' : `${vs.answer === '2' ? 'dos' : 'cuatro'}, pero fueron ocho`} cajas` : ''}.`);
+  if (as) seen.push(`Con el lado doble, anticipaste ${({2: 'el doble', 4: 'cuatro veces', 3: 'algo más'})[as.answer]} de tierra: fueron cuatro huertas.`);
+  if (vs) seen.push(vs.answer === '8' ? 'Para la caja de lado doble anticipaste ocho cajas: fueron ocho.' : `Para la caja de lado doble anticipaste ${vs.answer === '2' ? 'dos' : 'cuatro'} cajas: fueron ocho, por el largo, el ancho y el alto.`);
   const pp = first('perimeter-predict');
   if (pp) seen.push(pp.answer === 'depends' ? 'Con la misma cerca, anticipaste que la tierra depende de la forma: de 5 a 9.' : 'Pensaste que la misma cerca da la misma tierra; dio de 5 a 9.');
   const py = first('pythag-predict');

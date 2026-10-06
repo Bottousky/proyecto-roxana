@@ -249,7 +249,7 @@ export const vuelta = {
     if (c === 'yes') await d.think('Vimos uno. Recortar y juntar con todos no se puede.');
     // la paralela por C
     g.setCinematic(true);
-    const par = w.add(new Shape('c8-par', poly('c8-par', [[-150, 0], [150, 0]], {closed: false, w: 2, ch: BLUE}), Pc[0], Pc[1], {z: 12, progress: 0}));
+    const par = w.add(new Shape('c8-par', poly('c8-par', [[-88, 0], [200, 0]], {closed: false, w: 2, ch: BLUE}), Pc[0], Pc[1], {z: 12, progress: 0}));
     await d.draw(par, 0.7, {sound: false});
     g.setCinematic(false);
     await d.say('student', 'Por la punta de arriba, una recta paralela a la de abajo: no se cruzan nunca.');

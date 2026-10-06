@@ -1,11 +1,11 @@
 // Capítulo 7 — Crecer (7.3 a 7.9): contar los factores, muy grande, áreas con x, al revés,
 // completar el cuadrado, ¿cuántas veces? y donde no se puede.
 
-import {Drawing, Label} from '../engine/world.js';
+import {Drawing, Label, Shape} from '../engine/world.js';
 import {lerp, easeInOut} from '../engine/rng.js';
 import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {power, sci, expand, factor, completeSquare, timesToReach, undefinedAt} from '../logic/growth.js';
-import {GROUND, BOARD, SHOTS, T, base, cast, family, familiesHome, area, tile, S, seedOf, YELLOW, BLUE} from './common.js';
+import {GROUND, BOARD, SHOTS, T, base, cast, family, familiesHome, area, tile, plate, S, seedOf, WHITE, YELLOW, BLUE} from './common.js';
 import {studentWrites} from './scenes-a.js';
 
 const SUP = {'0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻'};
@@ -85,8 +85,8 @@ export const factores = {
     const A = area();
     await d.shot(SHOTS.board, 1);
     await d.say('Mara', 'Lo de Punto se anota largo: dos por dos por dos por dos. ¿No hay una forma corta?');
-    await d.say('student', 'Se cuentan los dos que se multiplican y se anota arriba, chiquito.');
-    await studentWrites(d, g, 'pw-def', `${pw(2, 4)} = 2 · 2 · 2 · 2 = 16`, A.x0 + 20, A.y0 + 36, {size: 28});
+    await d.say('student', 'Se empieza en 1 y se multiplica por dos tantas veces como dice el número de arriba, chiquito.');
+    await studentWrites(d, g, 'pw-def', `${pw(2, 4)} = 1 · 2 · 2 · 2 · 2 = 16`, A.x0 + 20, A.y0 + 36, {size: 28});
     // la tabla hacia abajo: el jugador baja renglón por renglón
     const rowY = i => A.y0 + 36 + i * 40;
     let n = 4;
@@ -132,7 +132,7 @@ export const factores = {
     const a0 = w.add(new Label('pw-a0', '÷ 2', A.x0 + 190, rowY(4) - 16, {size: 20, z: 12, ch: YELLOW, reveal: 0}));
     await d.draw(a0, 0.3, {key: 'reveal', sound: false});
     await studentWrites(d, g, 'pw-r0', `${pw(2, 0)} = 1`, A.x0 + 20, rowY(4), {size: 28});
-    await d.say('student', zero === '1' ? 'Dos dividido dos: uno. La tabla no se corta.' : `No ${zero === '0' ? 'cero' : 'dos'}: dos dividido dos es uno. Si no, la tabla se corta.`);
+    await d.say('student', zero === '1' ? 'Dos dividido dos: uno. Y con la regla: empezar en 1 y multiplicar cero veces deja el 1.' : `No ${zero === '0' ? 'cero' : 'dos'}: dos dividido dos es uno. Y con la regla: empezar en 1 y multiplicar cero veces deja el 1.`);
     await d.say('Mara', '¿Y un renglón más abajo?');
     const a1 = w.add(new Label('pw-a-1', '÷ 2', A.x0 + 190, rowY(5) - 16, {size: 20, z: 12, ch: YELLOW, reveal: 0}));
     await d.draw(a1, 0.3, {key: 'reveal', sound: false});
@@ -182,9 +182,9 @@ export const grande = {
     const counted = new Set();
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
-      g.setHint(() => ['Cada lugar que se corre el 3 es un × 10. Tocá cada cero que hay detrás del 3.', 'Cuando estén todos, tocá "listo".']);
+      g.setHint(() => ['Cada lugar que se corre el 3 es un × 10. Tocá lo que haya que contar.', 'Cuando estén todos, tocá "listo".']);
       const refresh = () => {
-        const spots = digits.map((c, i) => i === 0 || counted.has(i) ? null : rectSpot(`sc-z${i}`, `Contar el cero ${i}`, {x: dx(i) - 6, y: dy - 34, w: 32, h: 40}, () => tap(i))).filter(Boolean);
+        const spots = digits.map((c, i) => counted.has(i) ? null : rectSpot(`sc-z${i}`, i === 0 ? 'Contar el 3' : `Contar el cero ${i}`, {x: dx(i) - 6, y: dy - 34, w: 32, h: 40}, () => tap(i))).filter(Boolean);
         if (counted.size) spots.push(wordSpot('sc-ok', 'listo', A.x0 + 170, dy + 70, () => ok(), {label: `Listo: ${counted.size} ${counted.size === 1 ? 'lugar' : 'lugares'}`}));
         g.ui.setSpots(spots);
       };
@@ -201,6 +201,14 @@ export const grande = {
       };
       const ok = () => {
         if (busy || !ctl.alive()) return;
+        if (counted.has(0)) {
+          g.note('Contaste el 3: 3 · 10⁷ serían treinta millones. El 3 es lo que se multiplica; los lugares que se corre son los ceros.');
+          d.evidence('sci-count3', {counted: counted.size});
+          counted.delete(0);
+          w.remove('sc-m0');
+          refresh();
+          return;
+        }
         if (counted.size < 6) { g.note(`Quedan ceros sin contar: van ${counted.size}.`); d.evidence('sci-short', {counted: counted.size}); return; }
         g.ui.setSpots([]);
         resolve();
@@ -259,7 +267,8 @@ export const areas = {
     const w = g.world;
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Peldaño', 'Agrando la huerta cuadrada: dos filas más para abajo y tres columnas más al costado. El lado de antes no lo sé: le digo x.');
+    await d.say('Peldaño', 'Voy a agrandar una huerta cuadrada, pero todavía no decidí de qué lado: le digo x. Le sumo dos filas abajo y tres columnas al costado. Quiero una cuenta que sirva para cualquier lado.');
+    await d.think('La ficha x la dibujo de un largo cualquiera: x puede ser cualquier número.');
     const ox = A.x0 + 70, oy = A.y0 + 34;
     outline(w, 'ar-out', ox, oy, T.X + 3 * T.U, T.X + 2 * T.U);
     w.add(new Label('ar-t', 'x + 3', ox + (T.X + 3 * T.U) / 2, oy - 8, {size: 22, align: 'center', z: 12}));
@@ -363,9 +372,9 @@ export const alReves = {
       g.setCinematic(false);
       if (ok) break;
       const parts = [];
-      if (missX) parts.push(`faltan ${missX === 1 ? 'una tira' : `${missX} tiras`}`);
+      if (missX) parts.push(missX === 1 ? 'falta una tira' : `faltan ${missX} tiras`);
       if (extraX) parts.push(`sobra${extraX === 1 ? ' una tira' : `n ${extraX} tiras`}`);
-      if (missU) parts.push(`faltan ${missU} cuadraditos`);
+      if (missU) parts.push(missU === 1 ? 'falta un cuadradito' : `faltan ${missU} cuadraditos`);
       if (extraU) parts.push(`sobra${extraU === 1 ? ' un cuadradito' : `n ${extraU} cuadraditos`}`);
       await d.think(`Así no cierra: ${parts.join(' y ')}.`);
       g.setCinematic(true);
@@ -380,7 +389,7 @@ export const alReves = {
     await d.say('Balcón', '¿Y si me hubieran dado cinco cuadraditos?');
     const five = factor(5, 5);
     if (five) console.error('[al revés] x² + 5x + 5 no debería armarse');
-    await d.think('Dos números que sumen cinco y multiplicados den cinco: uno y cuatro dan cuatro, dos y tres dan seis. Con enteros, ninguno: ese rectángulo no se arma.');
+    await d.think('Dos números que sumen cinco y multiplicados den cinco: cero y cinco dan cero, uno y cuatro dan cuatro, dos y tres dan seis. Con enteros, ninguno: con estas fichas, ese rectángulo no se arma. Con lados que no son enteros se podría, pero esas fichas no existen.');
     d.evidence('factor', {f, five});
     g.flags.c7factor = true;
   },
@@ -446,9 +455,23 @@ export const completar = {
     const r = completeSquare(2, 8);
     if (r.roots[0] !== 2 || r.roots[1] !== -4) console.error('[completar] (x + 1)² = 9 no da 2 y −4');
     await d.say('student', 'Rampa: un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.');
-    await d.say('Mara', 'Como en la cuenta de Oval: x · x = 9 también daba con −3.');
-    await d.think('x + 1 = −3 también cumple la cuenta: x = −4. La huerta no, porque un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.');
-    await studentWrites(d, g, 'cq-eq3', `x = ${r.roots[0]}  o  x = −${-r.roots[1]}`, ex, A.y0 + 180, {size: 28});
+    // con x = 2 la huerta se dibuja a escala y se cuentan los cuadraditos
+    g.setCinematic(true);
+    await d.all(...['cq-x2', 'cq-xr', 'cq-xb', 'cq-u'].map(id => w.get(id)).filter(Boolean).map(o => d.fadeTo(o, 0, 0.5)));
+    w.removeWhere(o => /^cq-(x2|xr|xb|u)$/.test(o.id));
+    const k = T.U + 6;
+    const cells = [];
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+      const ch = i < 2 && j < 2 ? WHITE : i === 2 && j === 2 ? YELLOW : BLUE;
+      cells.push(w.add(new Shape(`cq-c${i}${j}`, plate(`cq-c${i}${j}`, k - 4, k - 4, ch, false), ox + j * k + 2, oy + i * k + 2, {z: 14, fade: 0})));
+    }
+    await d.all(...cells.map(c => d.fadeTo(c, 1, 0.5)));
+    g.setCinematic(false);
+    d.describe('Con x = 2, la huerta a escala: un cuadrado de 2 por 2 en blanco, dos tiras de 2 en azul y la esquina amarilla. Tres por tres cuadraditos.');
+    await d.think('Con x = 2 se pueden contar: cuatro del cuadrado y dos de cada tira, ocho de tierra. Con la esquina, nueve: tres por tres.');
+    await studentWrites(d, g, 'cq-eq3', 'x + 1 = 3   o   x + 1 = −3', ex, A.y0 + 180, {size: 26});
+    await d.think('Las dos cumplen (x + 1)² = 9, porque (−3) · (−3) también es 9. Pruebo x = −4 en la cuenta de Rampa: 16 − 8 = 8. Cumple. La huerta no: un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.');
+    await studentWrites(d, g, 'cq-eq4', `x = ${r.roots[0]}   o   x = −${-r.roots[1]}`, ex, A.y0 + 224, {size: 26});
     d.evidence('complete', r);
     g.flags.c7complete = true;
   },
@@ -513,13 +536,14 @@ export const cuantasVeces = {
     g.setHint(null);
     const t = timesToReach(2, 1000);
     if (t.k !== 10) console.error('[cuántas veces] 2 a la cuántas no da 10');
-    if (res.k > t.k) await d.think(`Con ${t.k} ya había pasado: ${t.above}. Las otras ${res.k - t.k} sobraban.`);
+    if (res.k > t.k) await d.think(`Con ${t.k} ya había pasado: ${t.above}. ${res.k - t.k === 1 ? 'La otra sobraba.' : `Las otras ${res.k - t.k} sobraban.`}`);
     await d.say('student', `Punto: ${t.k} veces. ${pw(2, 9)} es ${t.below}, todavía no; ${pw(2, 10)} es ${t.above}, ya pasó.`);
     await studentWrites(d, g, 'lg-eq', `${pw(2, 9)} = ${t.below} < 1000 < ${t.above} = ${pw(2, 10)}`, A.x0 + 24, A.y0 + 176, {size: 26});
     await d.think(guess === '10' ? 'Diez: duplicar llega lejos enseguida.' : `Diez, no ${guess === '100' ? 'cien' : 'quinientos'}: duplicar llega lejos enseguida.`);
-    await d.say('student', 'La potencia pregunta: dos, diez veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para llegar a mil? Esa pregunta tiene nombre: logaritmo.');
+    await d.say('Mara', 'Para pasar mil, diez. ¿Y para llegar justo a mil?');
+    await d.say('student', 'Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero hay pasos más chicos: media duplicación es multiplicar por √2, porque dos medias hacen una, √2 · √2 = 2. Nueve y media: 512 · 1,414, unos 724. Todavía no.');
+    await d.think('El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo.');
     await studentWrites(d, g, 'lg-log', `log₂ 1000 ≈ ${t.log.toFixed(2).replace('.', ',')}`, A.x0 + 24, A.y0 + 222, {size: 26});
-    await d.say('Mara', 'Casi diez: nueve duplicaciones no alcanzan y diez se pasan un poco.');
     d.evidence('log', {k: t.k, log: +t.log.toFixed(3)});
     g.flags.c7log = true;
   },
@@ -552,23 +576,24 @@ export const noSePuede = {
     ], {prompt: '¿Para qué x no se puede hacer esa cuenta?', evaluate: true});
     d.evidence('rational-predict', {answer: pre});
     // la tabla: el jugador prueba valores
-    const rowY = i => A.y0 + 90 + i * 34;
+    const rowY = i => A.y0 + 84 + i * 28;
     w.add(new Label('ns-h', 'x      x − 2      1 ÷ (x − 2)', A.x0 + 24, rowY(0) - 6, {size: 20, z: 12, ch: BLUE}));
     await d.shot(SHOTS.tiles, 0.8);
     const tried = [];
-    const VALS = [5, 4, 3, 2];
-    const share = x => (x - 2 === 1 ? '1' : x - 2 === 0 ? '?' : `1/${x - 2}`);
+    const VALS = [5, 4, 3, 2, 1, 0];
+    const share = x => { const q = x - 2; return q === 0 ? '?' : q === 1 ? '1' : q === -1 ? '−1' : q > 0 ? `1/${q}` : `−1/${-q}`; };
+    const sg = n => (n < 0 ? `−${-n}` : String(n));
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Tocá un valor de x para probar la cuenta. Probá varios.']);
-      const refresh = () => g.ui.setSpots(VALS.filter(x => !tried.includes(x)).map(x => wordSpot(`ns-x${x}`, `x = ${x}`, A.x1 - 80, A.y0 + 34 + VALS.indexOf(x) * 70, () => put(x), {label: `Probar con x = ${x}`})));
+      const refresh = () => g.ui.setSpots(VALS.filter(x => !tried.includes(x)).map(x => wordSpot(`ns-x${x}`, `x = ${x}`, A.x1 - 150 + (VALS.indexOf(x) % 2) * 100, A.y0 + 34 + Math.floor(VALS.indexOf(x) / 2) * 72, () => put(x), {label: `Probar con x = ${x}`})));
       const put = async x => {
         if (busy || !ctl.alive()) return;
         busy = true;
         g.ui.setSpots([]);
         tried.push(x);
         const i = tried.length;
-        const l = w.add(new Label(`ns-r${x}`, `${x}          ${x - 2}             ${share(x)}`, A.x0 + 24, rowY(i), {size: 24, z: 12, reveal: 0}));
+        const l = w.add(new Label(`ns-r${x}`, `${x}          ${sg(x - 2)}             ${share(x)}`, A.x0 + 24, rowY(i), {size: 22, z: 12, reveal: 0}));
         try {
           await d.draw(l, 0.5, {key: 'reveal'});
           d.evidence('rational-try', {x});
@@ -603,13 +628,13 @@ export const noSePuede = {
     g.setHint(null);
     const u = undefinedAt(2);
     await d.think(pre === '2' ? 'Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2.' : pre === '0' ? 'Con x = 0 abajo queda −2, y eso se divide. El cero que molesta es el de abajo: aparece con x = 2.' : 'Con x = 2, abajo queda cero, y por cero no se divide.');
-    await studentWrites(d, g, 'ns-no', 'x ≠ 2', A.x0 + 24, A.y1 - 14, {size: 30});
+    await studentWrites(d, g, 'ns-no', 'x ≠ 2', A.x1 - 150, A.y1 - 14, {size: 30});
     await d.say('student', `Rampa: la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque ${u.reason}.`);
-    await d.say('Rampa', 'Entonces escribo arriba: "si vienen más de dos". Con 3, un atado entero cada uno; con 5, un tercio.');
+    await d.say('Rampa', 'La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.');
     d.evidence('rational', u);
     g.flags.c7rational = true;
     if (!replay) writeJournal7(g);
-    await d.say('Peldaño', 'Con la raíz de dos pinté la puerta. Pero ayer partí la diagonal en doce y no cayó en ninguna rayita. ¿En cuántas hay que partirla?');
+    await d.say('Peldaño', 'Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?');
     g.audio.punto('question');
   },
 };
@@ -621,11 +646,11 @@ function writeJournal7(g) {
   const sp = first('side-predict');
   if (sp) seen.push(sp.answer === 'less' ? 'Anticipaste que una huerta cuadrada de dos cuadros tiene lado menor que 2; armándola con triángulos, el lado era la diagonal de un cuadro: √2.' : 'Pensaste que el lado de una huerta cuadrada de dos cuadros era 2 o más; armándola, el lado era la diagonal de un cuadro: √2 ≈ 1,414.');
   const rp = first('race-predict');
-  if (rp) seen.push(rp.answer === 'mul' ? 'Apostaste por duplicar: al principio perdía, y desde el día 6 pasó adelante.' : 'Apostaste a sumar diez o al empate; sumar ganó los primeros días y duplicar pasó adelante el día 6.');
+  if (rp) seen.push(rp.answer === 'mul' ? 'Apostaste por duplicar: al principio perdía, y desde el día 6 pasó adelante.' : `${rp.answer === 'add' ? 'Apostaste a sumar diez' : 'Pensaste que llegaban juntos'}; sumar ganó los primeros días y duplicar pasó adelante el día 6.`);
   const pz = first('pow-zero');
   if (pz) seen.push(pz.answer === '1' ? 'Siguiendo la tabla hacia abajo, dijiste 2⁰ = 1.' : 'Para 2⁰ dijiste otro valor; la tabla, dividiendo por dos, daba 1.');
   const sc = first('sci-compare');
-  if (sc) seen.push(sc.answer === 'a' ? 'Comparaste por el exponente: 3 · 10⁶ es más que 4 · 10⁵.' : 'Miraste primero el 3 y el 4; el exponente pesaba más: 3 · 10⁶ es más que 4 · 10⁵.');
+  if (sc) seen.push(sc.answer === 'a' ? 'Elegiste la noche de 3 · 10⁶: es más que 4 · 10⁵.' : sc.answer === 'b' ? 'Miraste primero el 3 y el 4; pesaba más el exponente: 3 · 10⁶ es más que 4 · 10⁵.' : 'Te parecieron parecidas; 3 · 10⁶ es más de siete veces 4 · 10⁵.');
   const ep = first('expand-predict');
   if (ep) seen.push(ep.answer === 'full' ? 'Anticipaste las cinco tiras de (x + 2)(x + 3).' : 'Armando (x + 2)(x + 3) con fichas, hicieron falta cinco tiras y seis cuadraditos.');
   const ft = ev.filter(e => e.kind === 'factor-try').map(e => `x + ${e.p} por x + ${e.q}`);
@@ -635,16 +660,16 @@ function writeJournal7(g) {
   const lp = first('log-predict');
   if (lp) seen.push(lp.answer === '10' ? 'Anticipaste unos diez días para pasar mil duplicando.' : 'Esperabas muchos más días; duplicando, alcanzaron diez.');
   const rq = first('rational-predict');
-  if (rq) seen.push(rq.answer === '2' ? 'Viste que 1 ÷ (x − 2) no se puede con x = 2.' : 'Pensaste en otro valor; el que no se puede en 1 ÷ (x − 2) es x = 2, donde abajo queda cero.');
+  if (rq) seen.push(rq.answer === '2' ? 'Viste que 1 ÷ (x − 2) no se puede con x = 2.' : rq.answer === '0' ? 'Pensaste en x = 0; con 0 abajo queda −2, y se puede. La que no se puede es x = 2, donde abajo queda cero.' : 'Pensaste que se podía con cualquier x; con x = 2 abajo queda cero, y por cero no se divide.');
   const entry = {
     id: 'c7',
     title: 'Crecer',
     abbr: 'Multiplicar repetido crece distinto que sumar repetido, y cada crecimiento tiene su pregunta al revés.',
     body: [
-      'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el lado, el número positivo; x · x = 9 tiene además −3.',
-      'Sumar lo mismo crece parejo; duplicar empieza lento y después no lo alcanza nadie. 2ⁿ cuenta cuántas veces se multiplica por 2; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Los números muy grandes o muy chicos se escriben corriendo lugares: 3 · 10⁶, 10⁻³.',
+      'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3.',
+      'Sumar lo mismo crece parejo; duplicar empieza lento y después saca cada vez más ventaja. En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
       'Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4.',
-      '¿Cuántas veces hay que duplicar para pasar mil? Diez (2¹⁰ = 1024): es la pregunta al revés de la potencia, el logaritmo (log₂ 1000 ≈ 9,97). Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2.',
+      'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2.',
     ],
     seen,
     moments: [

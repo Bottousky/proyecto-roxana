@@ -155,7 +155,7 @@ export const lado = {
     void lab2;
     await d.think(guess === 'less' ? 'Menos de 2: el lado es la diagonal de un cuadro.' : guess === '2' ? 'Un lado de 2 haría una huerta de cuatro cuadros, no de dos. El lado es la diagonal de un cuadro: menos de 2.' : 'Menos de 2, no más: el lado es la diagonal de un cuadro.');
     const r2 = sideOf(2);
-    await d.say('student', 'Punto: el lado de esta huerta, por sí mismo, da dos. Es la diagonal que medimos: más o menos 1,414.');
+    await d.say('student', 'Punto: esta huerta tiene área 2, dos cuadros. Su lado, multiplicado por sí mismo, da 2: es la diagonal de un cuadro, la que medimos, más o menos 1,414.');
     await studentWrites(d, g, 'c7-r2', '√2 · √2 = 2', A.x0 + 16, A.y0 + 60, {size: 28});
     await studentWrites(d, g, 'c7-r2b', '√2 ≈ 1,414', A.x0 + 16, A.y0 + 104, {size: 28});
     d.evidence('side', {lo: r2.lo, hi: r2.hi});
@@ -201,28 +201,37 @@ export const duplicar = {
     ], {prompt: 'Empezando los dos con un escalón: ¿quién llega antes a cien?', evaluate: true});
     d.evidence('race-predict', {answer: guess});
     // la tabla y dos columnas que crecen
-    const rows = race(1, 10, 2, 10);
+    const DAYS = 8;
+    const rows = race(1, 10, 2, DAYS);
     const tx = A.x0 + 10, ty = A.y0 + 22;
     const colX = [tx, tx + 64, tx + 140];
     ['día', 'Mara', 'Punto'].forEach((h, i) => w.add(new Label(`dp-h${i}`, h, colX[i], ty, {size: 20, z: 12, ch: i === 2 ? YELLOW : undefined})));
     const barX = [A.x1 - 150, A.x1 - 70];
-    const barBottom = A.y1 - 8, scale = (A.y1 - A.y0 - 40) / 130;
+    const barBottom = A.y1 - 8, H = A.y1 - A.y0 - 70;
     const barId = i => `dp-bar${i}`;
     w.add(new Label('dp-bl0', 'Mara', barX[0] + 16, barBottom + 18, {size: 16, align: 'center', z: 12}));
     w.add(new Label('dp-bl1', 'Punto', barX[1] + 16, barBottom + 18, {size: 16, align: 'center', z: 12, ch: YELLOW}));
-    w.add(new Drawing('dp-100', [S([[barX[0] - 10, barBottom - 100 * scale], [barX[1] + 42, barBottom - 100 * scale]], seedOf('dp100'), {w: 1.6, p: 0.7})], {z: 12}));
-    w.add(new Label('dp-100l', '100', barX[0] - 14, barBottom - 100 * scale + 6, {size: 16, align: 'right', z: 12}));
+    // la escala se achica cuando una barra no entra: todo se redibuja a la misma escala (nada se recorta)
+    let scale = H / 130;
     const setBars = r => {
+      const want = H / Math.max(130, r.add, r.mul);
+      const rescaled = want < scale - 1e-9;
+      scale = Math.min(scale, want);
+      w.removeWhere(o => o.id === 'dp-100' || o.id === 'dp-100l');
+      w.add(new Drawing('dp-100', [S([[barX[0] - 10, barBottom - 100 * scale], [barX[1] + 42, barBottom - 100 * scale]], seedOf('dp100'), {w: 1.6, p: 0.7})], {z: 12}));
+      w.add(new Label('dp-100l', '100', barX[0] - 14, barBottom - 100 * scale + 6, {size: 16, align: 'right', z: 12}));
       [0, 1].forEach(i => {
-        const v = Math.min(130, i ? r.mul : r.add);
+        const v = i ? r.mul : r.add;
         const strokes = plate(`dp-b${i}-${r.day}`, 32, Math.max(2, v * scale), i ? YELLOW : WHITE, true).map(st => shiftStroke(st, barX[i], barBottom - v * scale));
         w.add(new Drawing(barId(i), strokes, {z: 13}));
       });
+      return rescaled;
     };
     let day = 0;
     const addRow = r => {
-      [r.day, r.add, r.mul].forEach((v, i) => w.add(new Label(`dp-r${r.day}-${i}`, String(v), colX[i], ty + 22 + r.day * 21, {size: 18, z: 12})));
-      setBars(r);
+      [r.day, r.add, r.mul].forEach((v, i) => w.add(new Label(`dp-r${r.day}-${i}`, String(v), colX[i], ty + 22 + r.day * 24, {size: 20, z: 12})));
+      d.describe(`Día ${r.day}: Mara lleva ${r.add} escalones; Punto, ${r.mul}.`);
+      return setBars(r);
     };
     addRow(rows[0]);
     await d.shot(SHOTS.tiles, 0.8);
@@ -232,7 +241,7 @@ export const duplicar = {
       g.setHint(() => ['Tocá "otro día" y mirá las dos columnas.', 'Podés parar cuando quieras, después de que alguno llegue a cien.']);
       const refresh = () => {
         const spots = [];
-        if (day < 10) spots.push(wordSpot('dp-next', 'otro día', A.x0 + 290, A.y1 - 120, () => next()));
+        if (day < DAYS) spots.push(wordSpot('dp-next', 'otro día', A.x0 + 290, A.y1 - 120, () => next()));
         if (rows[day].mul >= 100) spots.push(wordSpot('dp-stop', 'parar', A.x0 + 290, A.y1 - 30, () => { if (!busy && ctl.alive()) resolve(); }));
         g.ui.setSpots(spots);
       };
@@ -240,7 +249,7 @@ export const duplicar = {
         if (busy || !ctl.alive()) return;
         busy = true;
         day++;
-        addRow(rows[day]);
+        const rescaled = addRow(rows[day]);
         g.audio.tap(0.15, 1.2 + day * 0.05);
         d.evidence('race-day', {day, add: rows[day].add, mul: rows[day].mul});
         try {
@@ -251,16 +260,20 @@ export const duplicar = {
             await pulse(d, p, 2, 0.4);
             await d.think(`Día ${day}: ${rows[day].mul} contra ${rows[day].add}. Punto pasa adelante.`);
           }
+          if (rescaled) {
+            d.describe('La barra de Punto ya no entraba: las dos barras se redibujan más chicas, a la misma escala, y la raya del 100 baja.');
+            await d.think('No entra en la pizarra: achico todo igual, las dos barras y la raya del 100.');
+          }
         } catch { return; }
         busy = false;
-        if (day >= 10) resolve();
+        if (day >= DAYS) resolve();
         else refresh();
       };
       refresh();
     }));
     g.setHint(null);
     const od = overtakeDay(1, 10, 2);
-    await d.say('student', 'Punto: al principio sumar diez gana. Duplicar empieza lento, pero cada día suma todo lo que ya había. Desde el día ' + od + ', no te alcanza nadie.');
+    await d.say('student', 'Punto: al principio sumar diez gana. Duplicar empieza lento, pero cada día agrega todo lo que ya había. Desde el día ' + od + ' vas adelante, y cada día sacás más ventaja.');
     await d.say('Mara', 'Entonces la redibujamos a tu manera. ¿Y de dónde sacás tanta tiza el día siete?');
     g.audio.punto('question');
     d.evidence('race', {overtake: od, guess});

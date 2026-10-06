@@ -159,6 +159,11 @@ function pickChoice(prompt, options) {
     ['copia parecida', 'Los lados', 'La forma'],
     ['cuánta tierra entra', 'El doble de tierra'],
     ['cuántas cajas como la de Cornisa', 'Cuatro, como la huerta'],
+    ['cambia cuánta tierra', 'Con la misma cerca'],
+    ['mide el tirante', 'Siete'],
+    ['Para qué triángulos', 'Para cualquier triángulo.'],
+    ['en línea recta', 'Siete'],
+    ['La sombra dice la hora', 'Sí: cada sombra'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -237,6 +242,11 @@ function pickChoice(prompt, options) {
     ['copia parecida', 'La forma'],
     ['cuánta tierra entra', 'Cuatro veces'],
     ['cuántas cajas como la de Cornisa', 'Ocho.'],
+    ['cambia cuánta tierra', 'Depende'],
+    ['mide el tirante', 'Cinco.'],
+    ['Para qué triángulos', 'ángulo recto'],
+    ['en línea recta', 'Cinco.'],
+    ['La sombra dice la hora', 'Cada hora da una sola sombra'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -255,6 +265,7 @@ let doubleDone = false;
 let areaTaps = 0;
 let dosPasosStep = 0;
 let copyCand = null;
+let coordStep = 0;
 let logTaps = 0;
 const searchOrder = ['look-crack', 'look-house', 'look-smudge'];
 let lastSeg = null;
@@ -534,9 +545,10 @@ for (let iter = 0; iter < 4000; iter++) {
       if (route === 'errores' && !tried.has('q1')) { tried.add('q1'); target = qs.find(x => x.id === 'q1'); }
       else target = qs.find(x => x.id === 'q3') || spots[0];
     } else if (s.seg === 'c7.grande' && spots.some(x => x.id.startsWith('sc-'))) {
-      const zs = spots.filter(x => x.id.startsWith('sc-z'));
+      const zs = spots.filter(x => x.id.startsWith('sc-z') && x.id !== 'sc-z0');
       const ok = spots.find(x => x.id === 'sc-ok');
-      if (route === 'errores' && ok && zs.length === 5 && !tried.has('scshort')) { tried.add('scshort'); target = ok; }
+      if (route === 'errores' && !tried.has('sc3a') && spots.some(x => x.id === 'sc-z0')) { tried.add('sc3a'); target = spots.find(x => x.id === 'sc-z0'); }
+      else if (route === 'errores' && !tried.has('sc3b') && ok) { tried.add('sc3b'); target = ok; }
       else target = zs[0] || ok;
     } else if (s.seg === 'c7.areas' && spots.some(x => x.id.startsWith('ar-pick-'))) {
       const seq = route === 'errores' ? ['x2', 'x', 'x', 'x', 'x', 'x', 'x', 'u', 'u', 'u', 'u', 'u', 'u'] : ['x2', 'x', 'x', 'x', 'x', 'x', 'u', 'u', 'u', 'u', 'u', 'u'];
@@ -558,6 +570,10 @@ for (let iter = 0; iter < 4000; iter++) {
       const right = {rot: 'c8-op0', flip: 'c8-op1', big: 'c8-op2', wide: 'c8-op3'}[copyCand];
       const wrong = {rot: 'c8-op1', flip: 'c8-op0', big: 'c8-op3', wide: 'c8-op2'}[copyCand];
       target = spots.find(x => x.id === (route === 'errores' && !tried.has(`cp${copyCand}`) && (tried.add(`cp${copyCand}`), true) ? wrong : right));
+    } else if (s.seg === 'c8.casas' && spots.some(x => x.id.startsWith('c8-pt'))) {
+      const seq = route === 'errores' ? ['c8-pt2_3', 'c8-pt3_2', 'c8-pt-1_-1'] : ['c8-pt3_2', 'c8-pt-1_-1'];
+      target = spots.find(x => x.id === seq[coordStep]) || spots[0];
+      coordStep++;
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
       if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }

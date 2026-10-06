@@ -235,5 +235,32 @@ Corregido en el commit siguiente (evidencia en `artifacts/arithmos/it07/c6-*`):
 | narr | A6 | Puesta de diapositiva | Pendiente |
 | narr | M1–M10 | Costuras, caja de 6.1, opciones largas, nombres, izquierda/derecha, inválidos siempre ajenos, Bitácora, accesibilidad | Parciales: gancho 6→7 sin adelantar el descubrimiento; izquierda/derecha; el jugador tiene en la mano un paso inválido (6.8); descripciones nuevas en 6.3, 6.5, 6.7, 6.8; botones con verbo. Pendientes: caja de 6.1, longitud de las opciones, blancos táctiles de la recta en teléfono |
 
+## Revisiones independientes del cap. 7 (rev-mat-6 y rev-narr-5, 2026-10-06)
+
+Informes: `artifacts/arithmos/it07/review-mat/informe.md` y `artifacts/arithmos/it07/review-narr/informe.md`.
+Ambas sin navegador, sobre b5ed429. Todas las igualdades de la pizarra eran verdaderas. Corregido
+en el commit siguiente (evidencia: `artifacts/arithmos/it08/c71-trace` ruta directa, `it08/c7-errores2`):
+
+| Origen | # | Hallazgo | Disposición |
+|---|---|---|---|
+| mat | A1 | Logaritmo mal definido («cuántas veces para llegar a mil» contado con duplicaciones enteras) | Corregido: se distingue «pasar mil» (10 duplicaciones) de «llegar justo» (el exponente no entero); media duplicación = × √2 (de 7.1), 2^9,5 ≈ 724; Bitácora reescrita |
+| mat | A2 / narr A3 | Barras de 7.2 recortadas en 130 | Corregido: la escala se achica para todo a la vez (barras y raya del 100), con descripción; la carrera dura 8 días |
+| mat | A3 / narr A3 | Ficha x fuera de escala en 7.7 | Corregido: se avisa que x se dibuja de un largo cualquiera (7.5) y, hallado x = 2, la huerta se redibuja a escala y se cuentan 8 y 9 |
+| mat | M1 | «Por sí mismo da dos» | Corregido: «área 2; multiplicado por sí mismo da 2» |
+| mat | M2 | 2⁰ sin regla de partida | Corregido: «se empieza en 1»; 2⁴ = 1 · 2 · 2 · 2 · 2; la réplica usa la regla y la tabla |
+| mat | M3 | Notación científica: mantisa 1–9 | Corregido en la Bitácora; pendiente un caso como 3 040 000 |
+| mat | M4 / narr A3 | «El lado de antes no lo sé» contradice 7.1 | Corregido: x es un lado todavía no decidido; «una cuenta que sirva para cualquier lado» |
+| mat | M5 | «Ese rectángulo no se arma» como definición | Corregido: «con estas fichas»; se nombra 0 + 5 y que con lados no enteros se podría |
+| mat | M6 | −4 por analogía | Corregido: renglón x + 1 = 3 o x + 1 = −3; se prueba −4 en la cuenta (16 − 8 = 8); se quitó la línea de Oval repetida |
+| mat | M8 / narr A2 | 7.9 sin x = 0; dominio de la cuenta vs del reparto | Corregido: se pueden probar 0 y 1 (con resultados negativos); Rampa distingue la cuenta (x ≠ 2) del reparto (más de dos) |
+| mat | M9 | Gancho «partí la diagonal» | Corregido: «partí el lado» |
+| mat | M10 | Bitácora: objetos, exageraciones, atribuciones | Corregido en párrafos 1, 2 y 4 y en las ramas de «lo que pasó» |
+| mat | M7, M11 | Completar el cuadrado con un solo b; cobertura de E (propiedades de potencias, otras raíces, √(x²) = |x|, sucesiones, racionales) | Pendiente (backlog C7b) |
+| mat | B | «faltan una tira», «Las otras 1» | Corregido |
+| narr | A2 | El juego da el paso decisivo | Parcial: en 7.4 se puede contar el 3 (el error de Punto) y tiene consecuencia; en 7.9 se prueban 0 y 1. Pendiente: 7.1, 7.5, 7.6 |
+| narr | A4 | 7.8 ya resuelto por la tabla de 7.2 | Corregido: 7.2 termina en el día 8 (256) |
+| narr | A5 | Teléfono | Parcial: interacciones en plano cercano, botones separados, guarda de superposición; pendiente: predicciones lejanas en 7.5 y 7.7 |
+| narr | A1, M1–M10 | Plantilla, Punto oyente, voces, la Marea, opciones, costuras, composición, Bitácora | Pendientes (backlog N7-R) |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

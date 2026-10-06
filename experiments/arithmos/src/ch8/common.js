@@ -4,9 +4,12 @@
 import {Drawing, Label, Shape} from '../engine/world.js';
 import {stroke, lineGuide, WHITE, YELLOW, BLUE} from '../engine/chalk.js';
 import {mulberry32, seedOf} from '../engine/rng.js';
-import {base as base7, BOARD, boardTop, cast, family, familiesHome, GROUND, area, SHOTS, T, tile, plate} from '../ch7/common.js';
+import {base as base7, BOARD, boardTop, cast, family, familiesHome, GROUND, area, SHOTS as SHOTS7, T, tile, plate} from '../ch7/common.js';
 
-export {BOARD, boardTop, cast, family, familiesHome, GROUND, area, SHOTS, T, tile, plate, Drawing, Label, Shape, WHITE, YELLOW, BLUE, seedOf};
+export {BOARD, boardTop, cast, family, familiesHome, GROUND, area, T, tile, plate, Drawing, Label, Shape, WHITE, YELLOW, BLUE, seedOf};
+
+/** Los planos del cap. 7 y uno abierto, para el sol y la sombra frente a las Terrazas. */
+export const SHOTS = {...SHOTS7, shadow: {x: 13000, y: 200, w: 1250, h: 640}};
 
 export const S = (guide, seed, opts = {}) => stroke(guide, {seed, ...opts});
 

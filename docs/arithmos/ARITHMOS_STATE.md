@@ -11,40 +11,19 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 - Modelo: la sesión principal corre como Opus 5.5 (`claude-opus-5-5`, según el entorno). Los
   subagentes se lanzan con el alias `opus`; no puedo verificar desde adentro qué versión resolvió.
 
-## Estado real (ciclo 4 del loop, 2026-10-06, noche)
+## Estado real (ciclo 5 del loop, 2026-10-06)
 
-- **Capítulos 1 a 7 jugables y encadenados** (título → 1 → … → 7 → título). El cap. 7 «Crecer» tiene
-  9 escenas: lado del cuadrado (√9, √2 armando dos cuadros), sumar o duplicar, contar los factores
-  (2⁰, 2⁻¹ por patrón), muy grande/muy chico (Punto cuenta mal los ceros y se corrige), áreas con x,
-  al revés (factorizar), completar el cuadrado, ¿cuántas veces? (logaritmo) y donde no se puede
-  (1 ÷ (x − 2)); Bitácora y gancho al cap. 8.
-- Revisiones independientes de este ciclo (sin navegador):
-  - rev-mat-4 y rev-narr-3 (cap. 5): aplicadas salvo pendientes anotados.
-  - rev-mat-5 (cap. 6): las 4 altas corregidas (6.8 con deshacer y camino de mitades; 3 = x ÷ 4
-    comprobado en el 12; 6.7 con el conjunto solución dibujado; «para qué x coinciden»), y casi
-    todas las medias.
-  - rev-narr-4 (cap. 6): A4 corregida; A1, A3 y A5 parciales; A2 y A6 pendientes (backlog N6-R).
-- Cambios transversales:
-  - Los botones nuevos se ubican en el mismo cuadro en que se crean (antes, un toque rápido podía
-    caer en otro: explicaba un registro raro del bot).
-  - Los exponentes (2⁴, 10⁻³) se dibujan como cifras chicas y altas: la tiza no tenía esos signos.
-  - Fracciones exactas en las cuentas («x/16», no «0,063x»).
-- Verificado por interfaz en este ciclo:
-  - Cap. 6 por la ruta con errores (`it07/c6-errores`) y caps. 6→7 por la ruta directa
-    (`it07/c6c7-directa`), sin errores.
-  - Cap. 7 escenas 7.3–7.9 por la ruta directa (`it07/c7b-directa2`).
-- Cap. 7 verificado también por la ruta con errores (`it07/c7-errores`) y en 844×390 táctil
-  (`it07/c7-telefono3`). La guarda de botones ahora detecta botones de texto superpuestos entre sí;
-  en el teléfono la cámara deja lugar para los subtítulos (la toma cercana queda a escala ≈ 0,67):
-  los botones apilados necesitan unas 70 unidades entre sí. Queda un aviso en 7.9 (corregido después
-  de esa partida, sin volver a verificar).
-- **Cap. 8 «Formas» en curso:** lógica `logic/geometry.js` (7 pruebas); escenas 8.1–8.4 jugables
-  (`it07/c8a-directa`, sin errores); 8.5–8.8 escritas en `src/ch8/scenes-b.js` **sin enganchar ni
-  probar** (falta sumarlas a `ch8/chapter.js`, políticas del bot y partidas).
-- Revisiones del cap. 7 (matemática y narrativa) lanzadas; informes en `artifacts/arithmos/it07/review-*/`
-  cuando terminen. Pendiente aplicar.
-- Pendientes chicos del cap. 7: «Las otras 1 sobraban», «faltan una tira» (concordancia con 1).
-- **Entorno:** máquina compartida con otras sesiones que usan Chrome.
+- **Capítulos 1 a 8 jugables y encadenados.** El cap. 8 «Formas» tiene 8 escenas: la diagonal que
+  no cae (√2 no es fracción, por descenso), la vuelta (180° con la paralela), copias (iguales y
+  parecidas), el doble de grande (× 4 y × 8), la misma cerca (perímetro vs área), el tirante
+  (Pitágoras por reacomodo, con contraejemplo), dónde está cada casa (coordenadas, distancia) y
+  sombras (gancho al cap. 9: relación vs función); Bitácora.
+- Cap. 7 corregido según rev-mat-6 (las 3 altas y casi todas las medias) y parte de rev-narr-5
+  (A4, partes de A2, A3 y A5); pendientes en C7b y N7-R.
+- Verificado por interfaz en este ciclo (sin errores): cap. 7 ruta directa (`it08/c71-trace`) y con
+  errores (`it08/c7-errores2`); cap. 8 ruta directa (`it08/c8-directa`) y con errores (`it08/c8-errores`).
+  Cap. 7 en 844×390 en el ciclo anterior (`it07/c7-telefono3`); el cap. 8 en teléfono falta.
+- **Entorno:** dos partidas del bot en paralelo se trabaron (14 min en 7.1); correrlas de a una.
 - Audio no escuchado; sin playtests humanos; sin dispositivo táctil real.
 
 ## Comandos
@@ -67,9 +46,7 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Cap. 7: ruta con errores, teléfono 844×390, revisión matemática y narrativa independiente; aplicar.
-2. Pendientes narrativos del cap. 6 (N6-R) y de los caps. 2–4 (N2-R), empezando por los que tocan
-   comprensión.
-3. Cap. 8 «Formas» (geometría, Pitágoras con el alcance de la prueba, coordenadas; la prueba de que √2
-   no es una fracción).
-4. Sistemas de ecuaciones (C6b).
+1. Revisión independiente del cap. 8 (C8-R) y cap. 8 en 844×390; aplicar.
+2. Cap. 9 «Depende» (relación vs función, dominio, imagen, tablas, gráficos, expresiones).
+3. Pendientes narrativos N7-R, N6-R y N2-R, empezando por los que tocan comprensión.
+4. Cobertura pendiente: C7b (álgebra) y C6b (sistemas).
