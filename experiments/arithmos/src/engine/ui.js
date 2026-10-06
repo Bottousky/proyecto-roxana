@@ -422,9 +422,13 @@ export class UI {
       if (this.spots$.children[i] !== el) this.spots$.insertBefore(el, this.spots$.children[i] || null);
     });
     this.#roving();
+    // ubicar ya los botones nuevos: si no, hasta el próximo cuadro quedan en el origen y un toque rápido cae en otro
+    if (this.lastView) this.positionSpots(this.lastView, this.lastCam);
   }
 
   positionSpots(view, cam) {
+    this.lastView = view;
+    this.lastCam = cam;
     for (const s of this.spots) {
       const el = this.spotEls.get(s.id);
       if (!el) continue;

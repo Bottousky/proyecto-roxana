@@ -72,6 +72,7 @@ export class EqView {
     this.shown = {L: e.L.f(x), R: e.R.f(x)};
     this.texts = {L: e.L.text, R: e.R.text};
     this.hidden = {L: false, R: false};
+    this.showSet = false;
     this.w.removeWhere(o => o.id.startsWith('eqv-'));
     for (const side of ['L', 'R']) this.#marker(side);
     this.w.add(new Custom('eqv-link', {z: 7, render: (ctx, view) => this.#renderLink(ctx, view)}));
@@ -123,6 +124,21 @@ export class EqView {
   }
 
   #renderLink(ctx) {
+    if (this.showSet) {
+      // el conjunto: todas las marcas enteras donde la relación se cumple
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,255,0,0.85)';
+      for (let n = LINE.from; n <= LINE.to; n++) {
+        const l = this.e.L.f(n), r = this.e.R.f(n);
+        if (!Number.isFinite(l) || !Number.isFinite(r)) continue;
+        const ok = this.e.rel === '=' ? Math.abs(l - r) < 1e-9 : this.e.rel === '<' ? l < r - 1e-9 : this.e.rel === '>' ? l > r + 1e-9 : false;
+        if (!ok) continue;
+        ctx.beginPath();
+        ctx.arc(lx(n), GROUND + 16, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
     if (this.e.rel !== '=') {
       // desigualdad: una tilde amarilla sobre Punto cuando se cumple
       if (!this.holds) return;

@@ -58,7 +58,7 @@ export function placeX(d, g, view, {hint, done, after}) {
       try {
         await moveX(d, g, view, n);
         tries.push(n);
-        d.evidence('try-x', {x: n, match: view.match});
+        d.evidence('try-x', {x: n, match: view.match, holds: view.holds});
         if (after) await after(n);
       } catch { return; }
       busy = false;
@@ -101,14 +101,14 @@ export const caja = {
     p.setMode('still');
     await hop(d, p, lx(0), GROUND - 26, {g, h: 120, dur: 0.7, sound: 'hop'});
     g.setCinematic(false);
-    await d.say('student', 'Punto, vos sos lo de la caja. Te llamo x.');
+    await d.say('student', 'Punto, vos hacés de lo que hay en la caja. Mientras no lo sepamos, le decimos x.');
     await writeDeriv(d, g, 'd6-0', 'x − 3 = 5', 0);
     const view = new EqView(g, eq(lin(1, -3), lin(0, 5)), 0);
     await d.wait(0.6);
     d.describe('Sobre la recta, dos marcadores: el de abajo dice x − 3 y está en −3; el de arriba dice 5 y está en 5.');
     await d.think('Abajo, lo que da x − 3. Arriba, el 5. Tienen que caer en el mismo lugar.');
     const tries = await placeX(d, g, view, {
-      hint: ['Mové a Punto: el marcador de x − 3 se mueve con él. El 5 se queda.', 'Cuando los dos marcadores caigan en la misma marca, encontraste lo de la caja.'],
+      hint: ['Mové a Punto: el marcador de x − 3 se mueve con él. El 5 se queda.', 'Cuando los dos marcadores caigan juntos, Punto está en el número de la caja.'],
       done: v => v.match,
     });
     d.evidence('solve-box', {tries: tries.length});
@@ -180,7 +180,7 @@ export const dosLados = {
         view.set(addOne(e0, 'L', 3), {L: 'x − 3 + 3', R: '5'});
         await d.wait(1.2);
         d.describe('El marcador de la izquierda se corre tres lugares; el de la derecha se queda. Se separaron.');
-        await d.think('Se separaron. Con Punto en el 8 ya no cumple: eso es otra cuenta.');
+        await d.think('Se separaron: con Punto en el 8 ya no cumple. Es otra cuenta, x = 5, con otra solución.');
       } else if (chosen === 'bothM') {
         view.set(addBoth(e0, -3), {L: 'x − 3 − 3', R: '5 − 3'});
         await d.wait(1.2);
@@ -200,7 +200,7 @@ export const dosLados = {
     await writeDeriv(d, g, 'd6-1', 'x − 3 + 3 = 5 + 3', 1);
     await d.say('student', 'Ir tres para atrás y volver tres es quedarse en el lugar, para cualquier x. Queda x.');
     view.set(addBoth(e0, 3));
-    await writeDeriv(d, g, 'd6-2', 'x = 8', 2);
+    await writeDeriv(d, g, 'd6-2', 'x = 5 + 3 = 8', 2);
     // ¿qué es "pasa sumando"?
     const c = await d.choose([
       {id: 'both', text: 'Sumar lo mismo a los dos lados, y simplificar.'},
@@ -217,7 +217,7 @@ export const dosLados = {
     const ab = w.add(new Label('d6-ab', '"pasa sumando" = sumar a los dos lados', lx(LINE.from) + 20, GROUND - 270, {size: 24, z: 9, reveal: 0, ch: YELLOW}));
     await d.draw(ab, 0.8, {key: 'reveal', sound: false});
     g.setCinematic(false);
-    await d.think('Y se puede deshacer: restando 3 a los dos, vuelvo. Por eso no aparece ni se pierde ninguna x.');
+    await d.think('Sumar 3 se puede hacer con cualquier x: ninguna solución se pierde. Y se deshace restando 3: no aparece ninguna nueva. Por eso es la misma cuenta, escrita de otra forma.');
     await d.say('Curva', 'Ah. Así sí.');
     if (!replay) g.flags.c6both = true;
     view.dispose();
@@ -287,6 +287,14 @@ export const memoria = {
     await writeDeriv(d, g, 'd6-r3', 'x = 2', 3);
     await d.say('student', 'El 3 sumaba: para sacarlo, se resta a los dos lados. "Pasa restando" es eso.');
     await d.say('Recta', 'De memoria lo pasé con el signo que tenía. Y salió otra cuenta.');
+    // la Marea se lleva lo que no se entendía; lo comprobado queda
+    g.setCinematic(true);
+    d.describe('Pasa una brisa de borrador: el renglón de memoria de Recta, "x = 5 + 3 = 8", se deshace. Los renglones comprobados quedan.');
+    g.audio.erase(1.2, 0.5);
+    g.camera.shake = 0.15;
+    await d.fadeTo(wrongLine, 0, 1.2);
+    w.remove('d6-r1');
+    g.setCinematic(false);
     view.dispose();
     g.flags.c6memory = true;
   },
@@ -337,15 +345,15 @@ export const porCero = {
       hint: ['Mové a Punto a dos o tres lugares distintos y mirá los marcadores.'],
       done: () => ++moves >= 3,
     });
-    await d.think('Con Punto en cualquier lado, siguen juntos en el cero. Con esta cuenta, cualquier caja serviría.');
+    await d.think('Con Punto en cualquier lado, siguen juntos en el cero. Con esta cuenta, cualquier caja serviría. En el 8 también siguen juntos: que el 8 siga sirviendo no alcanza, tampoco tienen que aparecer otras.');
     const ans = await d.choose([
       {id: 'lost', text: 'Por cero, todo cae en el mismo lugar: se perdió lo que decía la cuenta.'},
       {id: 'all', text: 'Entonces cualquier x es solución de verdad.'},
       {id: 'nothing', text: 'Multiplicar por cero no cambia nada.'},
     ], {prompt: '¿Qué hizo el truco de Cuña?', evaluate: true});
     d.evidence('times-zero-eq', {answer: ans, solutions: solveLinear(mulBoth(e0, 0)).kind});
-    await d.say('Mara', ans === 'all' ? 'La caja tiene ocho. No cualquier cosa.' : 'La caja tiene ocho. El truco dice que cualquier cosa.');
-    await d.think('Desde 0 = 0 no se puede volver: por cero no se deshace. Y lo que no se deshace puede inventar soluciones.');
+    await d.say('Mara', ans === 'all' ? 'La caja tiene ocho. No cualquier cosa.' : ans === 'nothing' ? 'Cambió todo: antes servía sólo el 8; ahora, cualquier cosa.' : 'La caja tiene ocho. El truco dice que cualquier cosa.');
+    await d.think('Desde 0 = 0 no se puede volver: por cero no se deshace. Y lo que no se deshace puede hacer aparecer soluciones que no estaban.');
     view.dispose();
     g.flags.c6zero = true;
   },

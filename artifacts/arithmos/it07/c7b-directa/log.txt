@@ -1,0 +1,20 @@
+[0.0s] escena → c7.factores
+[1.0s] lee: Lo de Punto se anota largo: dos por dos por dos por dos. ¿No hay una forma corta?
+[1.1s] lee: —Se cuentan los dos que se multiplican y se anota arriba, chiquito.
+[4.1s] lee: Cada renglón hacia abajo, un dos menos: el resultado se divide por dos.
+[6.6s] elige «2⁰ = 1.» (Siguiendo la tabla hacia abajo, ¿cuánto vale 2⁰?)
+[7.6s] lee: —Dos dividido dos: uno. La tabla no se corta.
+[8.7s] lee: ¿Y un renglón más abajo?
+[9.9s] lee: —Punto: el exponente cuenta cuántas veces se multiplica por dos. Para abajo de cero, cuántas veces se divide.
+[10.9s] escena → c7.grande
+[11.9s] lee: Medí el polvo de tiza que dejó la Marea esta noche: tres millones de granos. No me entra en la libreta.
+[15.1s] lee: —Punto: seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica.
+[15.3s] lee: La de anoche la anoté así: 4 · 10⁵.
+[15.8s] elige «Esta noche: 3 · 10⁶.» (¿Qué noche dejó más polvo?)
+[16.4s] lee: —Esta noche: tres millones contra cuatrocientos mil. El exponente dice cuántos lugares, y pesa más que el 3 o el 4.
+[16.6s] lee: Y un grano solo es nada: una milésima de gramo.
+[16.7s] lee: —Lo chico también se corre: tres lugares para el otro lado, como la tabla de los dos, para abajo.
+[17.6s] escena → c7.areas
+[18.6s] lee: Agrando la huerta cuadrada: dos filas más para abajo y tres columnas más al costado. El lado de antes no lo sé: le digo x.
+[20.1s] elige «Un x por x, cinco tiras y seis cuadraditos.» (¿Qué fichas hacen falta para llenar la huerta nueva?)
+[84.0s] {"ended":false,"final":{"mode":"play","seg":"c7.areas"},"journal":[],"evidenceKinds":["pow-row","pow-zero","powers","sci-short","sci-compare","sci","expand-predict","expand-extra"],"fps":{"min":"40.0","median":"60.0"},"errors":["atascado en c7.areas: [\"c7.areas\",\"La esquina ya está llena: ese cuadradito sobra.\",[],[\"ar-pick-x-ar-Tx2Ficha: tira x por 1false\",\"ar-pick-x-ar-Tx3Ficha: tira x por 1false\",\"ar-pick-x-ar-Tx4Ficha: tira x por 1false\",\"ar-pick-x-ar-Tx5Ficha: tira x por 1false\",\"ar-pick-u-ar-Tu6Ficha: cuadradito 1 por 1false\",\"ar-pick-u-ar"],"seconds":83.998,"size":"1600x900","touch":false,"route":"directa","watch":false}

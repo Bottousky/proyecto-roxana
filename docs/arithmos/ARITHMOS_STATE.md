@@ -1,6 +1,6 @@
 # Arithmos — estado
 
-Actualizado: 2026-10-05 (iteración 1).
+Actualizado: 2026-10-06 (ciclo 4 del loop).
 
 ## Dónde
 
@@ -11,27 +11,30 @@ Actualizado: 2026-10-05 (iteración 1).
 - Modelo: la sesión principal corre como Opus 5.5 (`claude-opus-5-5`, según el entorno). Los
   subagentes se lanzan con el alias `opus`; no puedo verificar desde adentro qué versión resolvió.
 
-## Estado real (ciclo 3 del loop, 2026-10-06, tarde)
+## Estado real (ciclo 4 del loop, 2026-10-06, noche)
 
-- **Capítulos 1 a 5 jugables y encadenados** (título → 1 → 2 → 3 → 4 → 5 → título).
-- Revisiones independientes de este ciclo, todas sin navegador:
-  - rev-mat-2 (caps. 1–3): aplicada.
-  - rev-mat-3 (cap. 4): aplicada.
-  - rev-narr-2 (caps. 2–4): altas aplicadas salvo A4, que quedó parcial; las medias quedan en parte pendientes (backlog N2-R).
+- **Capítulos 1 a 7 jugables y encadenados** (título → 1 → … → 7 → título). El cap. 7 «Crecer» tiene
+  9 escenas: lado del cuadrado (√9, √2 armando dos cuadros), sumar o duplicar, contar los factores
+  (2⁰, 2⁻¹ por patrón), muy grande/muy chico (Punto cuenta mal los ceros y se corrige), áreas con x,
+  al revés (factorizar), completar el cuadrado, ¿cuántas veces? (logaritmo) y donde no se puede
+  (1 ÷ (x − 2)); Bitácora y gancho al cap. 8.
+- Revisiones independientes de este ciclo (sin navegador):
+  - rev-mat-4 y rev-narr-3 (cap. 5): aplicadas salvo pendientes anotados.
+  - rev-mat-5 (cap. 6): las 4 altas corregidas (6.8 con deshacer y camino de mitades; 3 = x ÷ 4
+    comprobado en el 12; 6.7 con el conjunto solución dibujado; «para qué x coinciden»), y casi
+    todas las medias.
+  - rev-narr-4 (cap. 6): A4 corregida; A1, A3 y A5 parciales; A2 y A6 pendientes (backlog N6-R).
 - Cambios transversales:
-  - El 4 de la tiza ya no se confunde con el 9 (familia "Tiza").
-  - La Bitácora muestra primero lo que pasó.
-  - Enter avanza el diálogo aunque el foco esté en un objeto tocable.
-  - Chequeo estático de escenas: `npm run lint`.
-  - La partida automática se detiene ante una falla del juego.
+  - Los botones nuevos se ubican en el mismo cuadro en que se crean (antes, un toque rápido podía
+    caer en otro: explicaba un registro raro del bot).
+  - Los exponentes (2⁴, 10⁻³) se dibujan como cifras chicas y altas: la tiza no tenía esos signos.
+  - Fracciones exactas en las cuentas («x/16», no «0,063x»).
 - Verificado por interfaz en este ciclo:
-  - Partida completa caps. 1→4 con 8 recargas (454 s, sin errores; antes de la pasada narrativa).
-  - Cap. 4, rutas directa y con errores (después de la pasada).
-  - Cap. 5, ruta directa.
-  - Cap. 4 en 844×390 táctil.
+  - Cap. 6 por la ruta con errores (`it07/c6-errores`) y caps. 6→7 por la ruta directa
+    (`it07/c6c7-directa`), sin errores.
+  - Cap. 7 escenas 7.3–7.9 por la ruta directa (`it07/c7b-directa2`).
 - Pendiente de este ciclo:
-  - Rutas con errores de los caps. 2, 3 y 5 después de la pasada narrativa (en curso).
-  - Revisión independiente del cap. 5.
+  - Cap. 7 por la ruta con errores y en 844×390; revisión independiente del cap. 7 (C7-R).
 - **Entorno:** máquina compartida con otras sesiones que usan Chrome.
 - Audio no escuchado; sin playtests humanos; sin dispositivo táctil real.
 
@@ -55,7 +58,9 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Terminar de verificar los caps. 2, 3 y 5 por la ruta con errores y commitear.
-2. Revisión independiente matemática y narrativa del cap. 5.
-3. Pendientes de rev-narr-2 (N2-R), empezando por los que tocan comprensión (cierres con decisión, reglas antes de actuar).
-4. Cap. 6 "Lo que no se ve": la ecuación como dos marcadores en la recta y el núcleo de "pasa sumando".
+1. Cap. 7: ruta con errores, teléfono 844×390, revisión matemática y narrativa independiente; aplicar.
+2. Pendientes narrativos del cap. 6 (N6-R) y de los caps. 2–4 (N2-R), empezando por los que tocan
+   comprensión.
+3. Cap. 8 «Formas» (geometría, Pitágoras con el alcance de la prueba, coordenadas; la prueba de que √2
+   no es una fracción).
+4. Sistemas de ecuaciones (C6b).

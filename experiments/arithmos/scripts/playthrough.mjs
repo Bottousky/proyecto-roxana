@@ -143,6 +143,16 @@ function pickChoice(prompt, options) {
     ['truco de Cuña', 'cualquier x es', 'se perdió'],
     ['x · x caiga en el 9', 'Una sola', 'Dos.'],
     ['x = 0 cumple', 'No:', 'Sí:'],
+    ['cuadrada hecha con dos cuadros', 'Lado 2', 'Menos de 2'],
+    ['llega antes a cien', 'El de Mara', 'El de Punto'],
+    ['cuánto vale 2⁰', '2⁰ = 0', '2⁰ = 1.'],
+    ['Qué noche dejó más', 'Anoche', 'Esta noche'],
+    ['fichas hacen falta', 'Un x por x y seis'],
+    ['probás armar la huerta', 'x + 1 por x + 6', 'x + 1 por x + 5', 'x + 2 por x + 3'],
+    ['le falta para ser un cuadrado', 'Otra tira'],
+    ['Del otro lado del igual', 'Queda 8'],
+    ['para pasar mil', 'Unos cien'],
+    ['no se puede hacer esa cuenta', 'Con x = 0'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -205,6 +215,16 @@ function pickChoice(prompt, options) {
     ['truco de Cuña', 'se perdió'],
     ['x · x caiga en el 9', 'Dos.'],
     ['x = 0 cumple', 'Sí:'],
+    ['cuadrada hecha con dos cuadros', 'Menos de 2'],
+    ['llega antes a cien', 'El de Punto'],
+    ['cuánto vale 2⁰', '2⁰ = 1.'],
+    ['Qué noche dejó más', 'Esta noche'],
+    ['fichas hacen falta', 'cinco tiras'],
+    ['probás armar la huerta', 'x + 2 por x + 3'],
+    ['le falta para ser un cuadrado', 'Un cuadradito'],
+    ['Del otro lado del igual', '8 + 1'],
+    ['para pasar mil', 'Unos diez'],
+    ['no se puede hacer esa cuenta', 'Con x = 2'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -220,6 +240,9 @@ function pickChoice(prompt, options) {
 // Estado de las interacciones con objetos
 let pairingStage = 0;
 let doubleDone = false;
+let areaTaps = 0;
+let dosPasosStep = 0;
+let logTaps = 0;
 const searchOrder = ['look-crack', 'look-house', 'look-smudge'];
 let lastSeg = null;
 let stuck = 0;
@@ -477,10 +500,14 @@ for (let iter = 0; iter < 4000; iter++) {
       target = (route === 'errores' && !tried.has('nzmore') && spots.length && (tried.add('nzmore'), true)) ? spots.find(x => x.id === 'nz-fill') : spots.find(x => x.id === 'nz-stop');
     } else if (s.seg?.startsWith('c6.') && spots.some(x => /^x-?\d+$/.test(x.id))) {
       // mover a Punto: buscar la marca que pide la escena
-      const want = {'c6.caja': [route === 'errores' ? 5 : 8, 8], 'c6.memoria': [8, 2], 'c6.por-cero': [3, -4, 6], 'c6.cuadrado': [-3], 'c6.dividir': [0], 'c6.al-reves': [-5, 2], 'c6.dos-pasos': [3]}[s.seg] || [0];
+      const want = {'c6.caja': [route === 'errores' ? 5 : 8, 8], 'c6.memoria': [8, 2], 'c6.por-cero': [3, -4, 6], 'c6.cuadrado': [-3], 'c6.dividir': [0], 'c6.al-reves': [-5, 2], 'c6.dos-pasos': [3, 12]}[s.seg] || [0];
       const ids = want.map(n => `x${n}`);
       target = spots.find(x => ids.includes(x.id) && !tried.has(`${s.seg}${x.id}${pairingStage}`)) || spots.find(x => ids.includes(x.id)) || spots[0];
       if (target) tried.add(`${s.seg}${target.id}${pairingStage}`);
+    } else if (s.seg === 'c6.dos-pasos' && spots.some(x => x.id.startsWith('op-'))) {
+      const seq = route === 'errores' ? ['op-m7', 'op-half', 'op-undo', 'op-m1', 'op-d2', 'op-d4', 'op-p4', 'op-x4'] : ['op-d2', 'op-mh', 'op-x4'];
+      target = spots.find(x => x.id === seq[dosPasosStep]) || spots.find(x => x.id === 'op-x4') || spots[0];
+      if (target?.id === seq[dosPasosStep]) dosPasosStep++;
     } else if (s.seg?.startsWith('c6.') && spots.some(x => x.id.startsWith('op-'))) {
       const order = route === 'errores' ? ['op-oneL', 'op-bothM', 'op-both', 'op-keep', 'op-flip', 'op-m7', 'op-m1', 'op-d2', 'op-d4', 'op-x4'] : ['op-both', 'op-flip', 'op-m1', 'op-d2', 'op-x4'];
       target = order.map(id => spots.find(x => x.id === id)).find(Boolean) || spots[0];
@@ -493,6 +520,22 @@ for (let iter = 0; iter < 4000; iter++) {
       const qs = spots.filter(x => x.id.startsWith('q'));
       if (route === 'errores' && !tried.has('q1')) { tried.add('q1'); target = qs.find(x => x.id === 'q1'); }
       else target = qs.find(x => x.id === 'q3') || spots[0];
+    } else if (s.seg === 'c7.grande' && spots.some(x => x.id.startsWith('sc-'))) {
+      const zs = spots.filter(x => x.id.startsWith('sc-z'));
+      const ok = spots.find(x => x.id === 'sc-ok');
+      if (route === 'errores' && ok && zs.length === 5 && !tried.has('scshort')) { tried.add('scshort'); target = ok; }
+      else target = zs[0] || ok;
+    } else if (s.seg === 'c7.areas' && spots.some(x => x.id.startsWith('ar-pick-'))) {
+      const seq = route === 'errores' ? ['x2', 'x', 'x', 'x', 'x', 'x', 'x', 'u', 'u', 'u', 'u', 'u', 'u'] : ['x2', 'x', 'x', 'x', 'x', 'x', 'u', 'u', 'u', 'u', 'u', 'u'];
+      const k = seq[areaTaps++] || 'u';
+      target = spots.find(x => x.id.startsWith(`ar-pick-${k}-`)) || spots[0];
+    } else if (s.seg === 'c7.cuantas-veces' && spots.some(x => x.id.startsWith('lg-'))) {
+      const goal = route === 'errores' ? 11 : 10;
+      if (route === 'errores' && logTaps === 5 && !tried.has('logearly')) { tried.add('logearly'); target = spots.find(x => x.id === 'lg-ok'); }
+      else if (logTaps < goal) { logTaps++; target = spots.find(x => x.id === 'lg-dup'); }
+      else target = spots.find(x => x.id === 'lg-ok');
+    } else if (s.seg === 'c7.no-se-puede' && spots.some(x => x.id.startsWith('ns-x'))) {
+      target = route === 'errores' ? spots[0] : (spots.find(x => x.id === 'ns-x2') || spots[0]);
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
       if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }

@@ -1,6 +1,6 @@
 // Lo que no se ve: una ecuación son dos miembros que dependen de una x desconocida.
-// Resolver es buscar dónde coinciden. Una transformación se aplica a los dos miembros a la vez;
-// si se puede deshacer (es uno a uno), no aparecen ni se pierden soluciones.
+// Resolver es buscar para qué x coinciden. Una transformación se aplica a los dos miembros a la vez;
+// si se puede hacer para toda x, no se pierde ninguna solución; si además se puede deshacer, no aparece ninguna.
 //
 // Los miembros son funciones de x con una descripción; se comparan sobre una muestra de valores
 // (enteros y medios de −20 a 20) además de, cuando son lineales, resolverse exactamente.
@@ -9,7 +9,7 @@
 export const lin = (a, b) => ({a, b, f: x => a * x + b, text: linText(a, b)});
 
 function linText(a, b) {
-  const ax = a === 0 ? '' : a === 1 ? 'x' : a === -1 ? '−x' : `${fmt(a)}x`;
+  const ax = a === 0 ? '' : a === 1 ? 'x' : a === -1 ? '−x' : coefX(a);
   if (!ax) return fmt(b);
   if (b === 0) return ax;
   return `${ax} ${b > 0 ? '+' : '−'} ${fmt(Math.abs(b))}`;
@@ -19,12 +19,18 @@ const fmt = n => {
   const sign = n < 0 ? '−' : '';
   const a = Math.abs(n);
   if (Number.isInteger(a)) return sign + a;
-  for (let d = 2; d <= 12; d++) {
+  for (let d = 2; d <= 100; d++) {
     const k = Math.round(a * d);
     if (Math.abs(k / d - a) < 1e-9) return `${sign}${k}/${d}`;
   }
   return sign + String(+a.toFixed(3)).replace('.', ',');
 };
+
+/** a·x escrito sin ambigüedad: con fracción, «x/4» o «3x/4» (no «1/4x»). */
+function coefX(a) {
+  const m = /^(−?)(\d+)\/(\d+)$/.exec(fmt(a));
+  return m ? `${m[1]}${m[2] === '1' ? '' : m[2]}x/${m[3]}` : `${fmt(a)}x`;
+}
 
 /** Un miembro cualquiera (no lineal): función y texto. */
 export const expr = (f, text, opts = {}) => ({f, text, ...opts});

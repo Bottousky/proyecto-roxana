@@ -1,0 +1,51 @@
+[0.0s] escena → c7.factores
+[1.0s] lee: Lo de Punto se anota largo: dos por dos por dos por dos. ¿No hay una forma corta?
+[1.1s] lee: —Se cuentan los dos que se multiplican y se anota arriba, chiquito.
+[3.6s] lee: Cada renglón hacia abajo, un dos menos: el resultado se divide por dos.
+[5.9s] elige «2⁰ = 1.» (Siguiendo la tabla hacia abajo, ¿cuánto vale 2⁰?)
+[6.7s] lee: —Dos dividido dos: uno. La tabla no se corta.
+[7.5s] lee: ¿Y un renglón más abajo?
+[8.7s] lee: —Punto: el exponente cuenta cuántas veces se multiplica por dos. Para abajo de cero, cuántas veces se divide.
+[9.5s] escena → c7.grande
+[10.5s] lee: Medí el polvo de tiza que dejó la Marea esta noche: tres millones de granos. No me entra en la libreta.
+[12.9s] lee: —Punto: seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica.
+[13.0s] lee: La de anoche la anoté así: 4 · 10⁵.
+[13.5s] elige «Esta noche: 3 · 10⁶.» (¿Qué noche dejó más polvo?)
+[14.3s] lee: —Esta noche: tres millones contra cuatrocientos mil. El exponente dice cuántos lugares, y pesa más que el 3 o el 4.
+[14.4s] lee: Y un grano solo es nada: una milésima de gramo.
+[14.5s] lee: —Lo chico también se corre: tres lugares para el otro lado, como la tabla de los dos, para abajo.
+[15.7s] escena → c7.areas
+[16.7s] lee: Agrando la huerta cuadrada: dos filas más para abajo y tres columnas más al costado. El lado de antes no lo sé: le digo x.
+[18.8s] elige «Un x por x, cinco tiras y seis cuadraditos.» (¿Qué fichas hacen falta para llenar la huerta nueva?)
+[26.2s] lee: Un x por x, cinco tiras, seis cuadraditos.
+[26.3s] lee: —Peldaño: es partir el rectángulo, como cuando repartimos en las Terrazas, pero de los dos lados. Dos por tres, los cuadraditos; dos más tres, las tiras.
+[26.4s] escena → c7.al-reves
+[27.4s] lee: A mí me dieron las fichas sueltas: un x por x, cinco tiras y seis cuadraditos. Quiero una huerta rectangular, sin que sobre nada.
+[29.7s] elige «x + 2 por x + 3» (¿Con qué lados probás armar la huerta?)
+[30.3s] lee: —Balcón: los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres.
+[30.4s] lee: ¿Y si me hubieran dado cinco cuadraditos?
+[31.2s] lee: Dos números que sumen cinco y multiplicados den cinco: uno y cuatro dan cuatro, dos y tres dan seis. Con enteros, ninguno: ese rectángulo no se arma.
+[31.3s] escena → c7.completar
+[32.3s] lee: Mi huerta: un cuadrado de lado x y dos tiras de x pegadas, una a cada lado. En total, ocho cuadraditos de tierra. ¿Cuánto mide x?
+[32.9s] elige «Un cuadradito en la esquina.» (¿Qué le falta para ser un cuadrado?)
+[35.4s] elige «8 + 1: se agregó un cuadradito.» (Del otro lado del igual, ¿qué escribís?)
+[36.3s] lee: —Rampa: un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.
+[36.4s] lee: Como en la cuenta de Oval: x · x = 9 también daba con −3.
+[37.3s] lee: x + 1 = −3 también cumple la cuenta: x = −4. La huerta no, porque un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.
+[38.1s] escena → c7.cuantas-veces
+[38.6s] lee: Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?
+[39.2s] elige «Unos diez días.» (Empezando con uno y duplicando cada día, ¿cuántos días para pasar mil?)
+[41.2s] lee: —Punto: 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó.
+[41.3s] lee: Diez: duplicar llega lejos enseguida.
+[41.4s] lee: —La potencia pregunta: dos, diez veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para llegar a mil? Esa pregunta tiene nombre: logaritmo.
+[42.5s] lee: Casi diez: nueve duplicaciones no alcanzan y diez se pasan un poco.
+[42.6s] escena → c7.no-se-puede
+[43.6s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[45.0s] elige «Con x = 2.» (¿Para qué x no se puede hacer esa cuenta?)
+[47.1s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[48.4s] lee: Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2.
+[49.5s] lee: —Rampa: la cuenta sirve para cualquier x menos 2. Ahí no da un número raro: no da nada, no se divide por cero.
+[49.6s] lee: Entonces escribo arriba: "si vienen más de dos". Con 3, un atado entero cada uno; con 5, un tercio.
+[50.5s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí la diagonal en doce y no cayó en ninguna rayita. ¿En cuántas hay que partirla?
+[50.7s] lee: El capítulo 8 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[53.7s] {"ended":true,"final":{"mode":"title","seg":"c7.no-se-puede"},"journal":["Crecer"],"evidenceKinds":["pow-row","pow-zero","powers","sci-compare","sci","expand-predict","expand","factor-try","factor","complete-predict","complete-other","complete","log-predict","log-step","log","rational-predict","rational-try","rational"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":53.654,"size":"1600x900","touch":false,"route":"directa","watch":false}

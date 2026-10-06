@@ -45,7 +45,7 @@ test('elevar al cuadrado puede agregar soluciones: x = 3 → x² = 9 tiene tambi
   assert.deepEqual(solutions(sq), [-3, 3]);
 });
 
-test('dividir por una expresión que puede valer 0 pierde soluciones: x² = x ÷ x pierde el 0', () => {
+test('dividir por una expresión que puede valer 0 pierde soluciones: dividir x² = x por x pierde el 0', () => {
   const x = expr(v => v * v, 'x²');
   const e = eq(x, lin(1, 0));
   assert.deepEqual(solutions(e), [0, 1]);
@@ -72,4 +72,12 @@ test('dos pasos: 2x + 1 = 7 (deshacer en orden inverso) y la incógnita a la der
   assert.deepEqual(solveLinear(t), {kind: 'one', x: 3});
   const r = eq(lin(0, 3), lin(1 / 4, 0));
   assert.deepEqual(solveLinear(mulBoth(r, 4)), {kind: 'one', x: 12});
+});
+
+test('las fracciones se escriben exactas y sin ambigüedad', () => {
+  const e = divBoth(eq(lin(0, 3), lin(1 / 4, 0)), 4);
+  assert.equal(e.R.text, 'x/16');
+  assert.equal(e.L.text, '3/4');
+  assert.equal(lin(1 / 2, 1 / 4).text, 'x/2 + 1/4');
+  assert.equal(lin(3 / 4, 0).text, '3x/4');
 });

@@ -1,0 +1,30 @@
+{
+  "ended": false,
+  "final": {
+    "mode": "play",
+    "seg": "c7.areas"
+  },
+  "journal": [],
+  "evidenceKinds": [
+    "pow-row",
+    "pow-zero",
+    "powers",
+    "sci-short",
+    "sci-compare",
+    "sci",
+    "expand-predict",
+    "expand-extra"
+  ],
+  "fps": {
+    "min": "40.0",
+    "median": "60.0"
+  },
+  "errors": [
+    "atascado en c7.areas: [\"c7.areas\",\"La esquina ya está llena: ese cuadradito sobra.\",[],[\"ar-pick-x-ar-Tx2Ficha: tira x por 1false\",\"ar-pick-x-ar-Tx3Ficha: tira x por 1false\",\"ar-pick-x-ar-Tx4Ficha: tira x por 1false\",\"ar-pick-x-ar-Tx5Ficha: tira x por 1false\",\"ar-pick-u-ar-Tu6Ficha: cuadradito 1 por 1false\",\"ar-pick-u-ar"
+  ],
+  "seconds": 83.998,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

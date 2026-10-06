@@ -278,8 +278,54 @@ export function dotStrokes(cx, cy, r, seed, opts = {}) {
  * Texto de tiza: relleno con presión media (el diente lo motea) y borde liviano.
  * `reveal` (0..1) descubre el texto de izquierda a derecha como si se escribiera.
  */
+const SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹⁻';
+const SUBS = '₀₁₂₃₄₅₆₇₈₉';
+const SUP_PLAIN = '0123456789−';
+const SUP_RE = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+|[₀₁₂₃₄₅₆₇₈₉]+/g;
+
+/** Texto con exponentes (2⁴, 10⁻³) o subíndices (log₂): se escriben con cifras normales, chicas, altas o bajas
+ *  (la tiza no tiene esos signos y la fuente de reemplazo los dibuja casi invisibles). */
+function chalkRuns(ctx, text, x, y, {size, ch, p, weight, align, baseline, reveal, fade, font}) {
+  const runs = [];
+  let last = 0;
+  for (const m of text.matchAll(SUP_RE)) {
+    if (m.index > last) runs.push({t: text.slice(last, m.index), sup: false});
+    const sub = SUBS.includes(m[0][0]);
+    runs.push({t: [...m[0]].map(c => SUP_PLAIN[(sub ? SUBS : SUPS).indexOf(c)]).join(''), sup: true, sub});
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) runs.push({t: text.slice(last), sup: false});
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = baseline;
+  const big = `${weight} ${size}px ${font}`, small = `${weight} ${Math.round(size * 0.62)}px ${font}`;
+  for (const r of runs) { ctx.font = r.sup ? small : big; r.w = ctx.measureText(r.t).width + (r.sup ? size * 0.04 : 0); }
+  const w = runs.reduce((a, r) => a + r.w, 0);
+  const left = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+  if (reveal < 1) {
+    ctx.beginPath();
+    ctx.rect(left - size, y - size * 2, size + w * reveal, size * 4);
+    ctx.clip();
+  }
+  ctx.lineJoin = 'round';
+  let cx = left;
+  for (const r of runs) {
+    ctx.font = r.sup ? small : big;
+    const ry = r.sub ? y + size * 0.18 : r.sup ? y - size * 0.42 : y;
+    ctx.strokeStyle = pressureStyle(ch, 0.3 * fade);
+    ctx.lineWidth = Math.max(1, (r.sup ? size * 0.62 : size) * 0.07);
+    ctx.strokeText(r.t, cx, ry);
+    ctx.fillStyle = pressureStyle(ch, p * fade);
+    ctx.fillText(r.t, cx, ry);
+    cx += r.w;
+  }
+  ctx.restore();
+  return w;
+}
+
 export function chalkText(ctx, text, x, y, {size = 40, ch = WHITE, p = 0.86, weight = 400, align = 'left', baseline = 'alphabetic', reveal = 1, fade = 1, font = 'Tiza'} = {}) {
   if (reveal <= 0 || fade <= 0) return 0;
+  if (/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻₀₁₂₃₄₅₆₇₈₉]/.test(text)) return chalkRuns(ctx, text, x, y, {size, ch, p, weight, align, baseline, reveal, fade, font});
   ctx.save();
   ctx.font = `${weight} ${size}px ${font}`;
   ctx.textAlign = align;

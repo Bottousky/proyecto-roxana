@@ -6,7 +6,7 @@ import {YELLOW} from '../engine/chalk.js';
 import {pulse, follow, wordSpot} from '../acting.js';
 import {lin, expr, eq, addBoth, mulBoth, divBoth, squareBoth, divBothByExpr, solutions, sameSolutions, solveLinear} from '../logic/equations.js';
 import {GROUND, LINE, lx, SHOTS, base, cast, EqView, villager, signed} from './common.js';
-import {derivLine, writeDeriv, placeX} from './scenes-a.js';
+import {derivLine, writeDeriv, placeX, moveX} from './scenes-a.js';
 
 function lineSetup(g, who, head, x0 = 0) {
   const w = g.world;
@@ -64,7 +64,11 @@ export const cuadrado = {
     await d.think('Menos tres por menos tres, nueve. Apareció otra x.');
     const sq = squareBoth(e0);
     d.evidence('square', {before: solutions(e0), after: solutions(sq)});
-    await d.say('student', 'Pero la caja de Oval tenía 3: x = 3. El −3 lo trajo el cuadrado.');
+    // probar el −3 en la cuenta de antes
+    view.set(e0, {L: 'x', R: '3'});
+    await d.wait(1);
+    d.describe('Con Punto en el −3, la cuenta de Oval vuelve a la recta: x = 3. Los marcadores se separan: uno en el −3, otro en el 3.');
+    await d.say('student', 'En la cuenta de Oval, x = 3, el −3 no cumple: los marcadores se separan. El −3 lo trajo el cuadrado.');
     await d.think('Al cuadrado, −3 y 3 caen en el mismo 9: no se puede deshacer sin perder cuál era. Después de elevar, hay que probar en la cuenta de antes.');
     await d.say('Oval', 'Más lindo, pero con un invitado de más.');
     view.dispose();
@@ -107,10 +111,11 @@ export const dividir = {
     view.set(divBothByExpr(e0, lin(1, 0)), {L: '(x · x) ÷ x', R: 'x ÷ x'});
     await d.wait(1);
     d.describe('Con la cuenta dividida por x y Punto en el 0, los marcadores desaparecen: dividir por cero no está definido.');
-    await d.think('Y en la cuenta dividida, con Punto en el 0, los marcadores desaparecen: dividir por cero no da nada.');
+    await d.think('Y en la cuenta dividida, con Punto en el 0, los marcadores desaparecen: dividir por cero no está definido, no hay ningún número.');
     d.evidence('div-by-x', {before: solutions(e0), after: solutions(divBothByExpr(e0, lin(1, 0)))});
     await d.say('student', 'Al dividir por x, se suponía que x no es cero. Y justo el 0 era una de las soluciones. Se perdió.');
-    await d.say('Curva', 'O sea que son dos: el 0 y el 1.');
+    await d.say('student', 'Por partes: si x no es cero, dividir se puede y se deshace, y queda x = 1. Si x es cero, se mira aparte: 0 · 0 = 0, cumple. No hay más.');
+    await d.say('Curva', 'Dos, el 0 y el 1. Y yo había encontrado una.');
     view.dispose();
     g.flags.c6div = true;
   },
@@ -130,14 +135,18 @@ export const alReves = {
     const view = new EqView(g, e0, 0);
     derivLine(w, 'd6-i0', '−2x < 6', 0);
     await d.shot(SHOTS.line, 1);
-    await d.say('Cuña', 'Me dieron un acertijo: −2 por x tiene que quedar debajo de 6. ¿Qué x sirven?');
+    await d.say('Cuña', 'Me dieron un acertijo: −2 por x tiene que dar menos que 6. ¿Qué x sirven?');
     await d.think('Ahora no es "igual": es "menor". Cuando se cumple, aparece una tilde sobre Punto.');
     const seen = new Set();
     await placeX(d, g, view, {
-      hint: ['Mové a Punto a varios lados: la tilde amarilla aparece donde −2x queda a la izquierda del 6.'],
+      hint: ['Mové a Punto a varios lados: la tilde aparece cuando −2x da menos que 6 (su marcador, a la izquierda del de 6 en la recta).'],
       done: v => { seen.add(v.holds ? 'yes' : 'no'); return seen.size === 2; },
     });
-    await d.think('Algunas x cumplen y otras no.');
+    view.showSet = true;
+    d.describe('Debajo de la recta se marcan todas las x enteras que cumplen: del −2 para la derecha.');
+    await d.think('Algunas x cumplen y otras no. Las que cumplen quedan marcadas debajo de la recta.');
+    await moveX(d, g, view, 0);
+    d.describe('Punto vuelve al 0, que cumple: −2 · 0 = 0, y 0 es menos que 6.');
     const ops = [
       {id: 'keep', text: '÷ (−2), dejando <', label: 'Dividir por menos dos y dejar el menor'},
       {id: 'flip', text: '÷ (−2), dando vuelta: >', label: 'Dividir por menos dos y dar vuelta el signo'},
@@ -152,16 +161,18 @@ export const alReves = {
       const same = sameSolutions(e0, t);
       if (op === 'flip') {
         await writeDeriv(d, g, 'd6-i1', 'x > −3', 1);
-        await d.think('Con Punto en el 0 se sigue cumpliendo. Las mismas x de antes.');
+        await d.think('Las marcas no se movieron: cumplen las mismas x de antes. Y con Punto en el 0, sigue cumpliéndose: 0 > −3.');
         d.evidence('ineq', {same});
         break;
       }
-      await d.think('Con Punto en el 0: antes se cumplía (0 < 6) y ahora no (0 < −3). Cambiaron las x que sirven.');
+      d.describe('Las marcas de abajo saltan al otro lado: ahora están del −4 para la izquierda.');
+      await d.think('Las marcas se fueron al otro lado. Con Punto en el 0: antes se cumplía (0 < 6) y ahora no (0 < −3). Cambiaron las x que sirven.');
       view.set(e0, {L: '−2x', R: '6'});
       await d.wait(0.6);
       ops.splice(ops.findIndex(o => o.id === op), 1);
     }
     await d.say('student', 'Dividir por un negativo da vuelta la recta, como la media vuelta de las Terrazas: lo que estaba a la izquierda queda a la derecha. Por eso el signo se da vuelta.');
+    await d.think('Dividir por 2, en cambio, no da vuelta nada: 2x < 6 queda x < 3. Lo que da vuelta es el signo menos del número por el que se divide.');
     view.dispose();
     g.flags.c6ineq = true;
   },
@@ -181,74 +192,137 @@ export const dosPasos = {
     const p = w.get('punto');
     await d.shot(SHOTS.line, 1);
     await d.say('Recta', 'Una última: dos cajas iguales y un atado suelto son siete atados.');
-    let e = eq(lin(2, 1), lin(0, 7));
+    const E0 = eq(lin(2, 1), lin(0, 7));
+    let e = E0;
     const view = new EqView(g, e, 0);
     derivLine(w, 'd6-t0', '2x + 1 = 7', 0);
-    let row = 1;
-    const opsAll = [
-      {id: 'm1', text: '−1 a los dos', f: q => addBoth(q, -1), t: q => ({L: `${q.L.text} − 1`, R: `${q.R.text} − 1`})},
-      {id: 'd2', text: '÷ 2 a los dos', f: q => divBoth(q, 2), t: q => ({L: `(${q.L.text}) ÷ 2`, R: `${q.R.text} ÷ 2`})},
-      {id: 'm7', text: '−7 a los dos', f: q => addBoth(q, -7), t: q => ({L: `${q.L.text} − 7`, R: `${q.R.text} − 7`})},
+    const solved = q => q.L.a === 1 && q.L.b === 0;
+    const OPS = [
+      {id: 'm1', text: '− 1', label: 'Restar 1 a los dos lados', name: 'restar 1', f: q => addBoth(q, -1), t: q => ({L: `${q.L.text} − 1`, R: `${q.R.text} − 1`})},
+      {id: 'd2', text: '÷ 2', label: 'Dividir los dos lados por 2', name: 'dividir por 2', f: q => divBoth(q, 2), t: q => ({L: `(${q.L.text}) ÷ 2`, R: `${q.R.text} ÷ 2`})},
+      {id: 'mh', text: '− 1/2', label: 'Restar un medio a los dos lados', name: 'restar 1/2', f: q => addBoth(q, -1 / 2), t: q => ({L: `${q.L.text} − 1/2`, R: `${q.R.text} − 1/2`})},
+      {id: 'm7', text: '− 7', label: 'Restar 7 a los dos lados', name: 'restar 7', f: q => addBoth(q, -7), t: q => ({L: `${q.L.text} − 7`, R: `${q.R.text} − 7`})},
+      {id: 'half', text: '÷ 2 sólo al 2x', label: 'Dividir por 2 sólo el término con x', name: 'dividir por 2 sólo el término con x', bad: true},
     ];
+    const stack = [];
     const path = [];
-    for (let guard = 0; guard < 6; guard++) {
-      const op = await pickOp(d, g, opsAll, 'Elegí qué hacer a los dos lados. Cualquier camino que deje sola a la x vale.');
-      const o = opsAll.find(x => x.id === op);
-      const before = e;
-      e = o.f(e);
-      path.push(op);
-      view.set(e, o.t(before));
-      await d.wait(1);
-      view.set(e);
-      d.evidence('two-step', {op, keeps: sameSolutions(before, e)});
-      await writeDeriv(d, g, `d6-t${row}`, `${e.L.text} = ${e.R.text}`, row);
-      row++;
-      if (e.L.a === 1 && e.L.b === 0) break;
-      if (op === 'm7') await d.think('Sigue valiendo, pero no ayudó: la x no quedó más sola.');
-      if (row > 4) break;
+    let rescued = false;
+    let steps = 0;
+    while (!solved(e)) {
+      const full = stack.length >= 3;
+      const choices = (full ? [] : OPS.filter(o => !o.bad || (e.L.a === 2 && e.L.b !== 0))).concat(stack.length ? [{id: 'undo', text: 'deshacer', label: 'Deshacer el último paso'}] : []);
+      const op = await d.interact(ctl => new Promise(resolve => {
+        g.setHint(() => [full ? 'Ya son muchos renglones: deshacé alguno.' : 'Elegí qué hacerle a la cuenta. Cualquier paso que se haga a los dos lados vale; el que deja sola a la x, termina.', 'Si un paso no ayudó, se puede deshacer.']);
+        g.ui.setSpots(choices.map((o, i) => wordSpot(`op-${o.id}`, o.text, lx(-2 + (i % 3) * 5), GROUND - 350 + Math.floor(i / 3) * 50, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(o.id); } }, {label: o.label})));
+      }));
+      steps++;
+      if (op === 'undo') {
+        const prev = stack.pop();
+        path.push('undo');
+        d.evidence('two-step', {op, keeps: true});
+        const last = w.get(`d6-t${stack.length + 1}`);
+        g.setCinematic(true);
+        g.audio.erase(0.5, 0.4);
+        if (last) { await d.fadeTo(last, 0, 0.5); w.remove(last.id); }
+        g.setCinematic(false);
+        e = prev;
+        view.set(e);
+        await d.wait(0.7);
+      } else {
+        const o = OPS.find(x => x.id === op);
+        if (o.bad) {
+          // dividir sólo una parte de un lado: el otro lado no se mueve
+          const t = eq(lin(e.L.a / 2, e.L.b), e.R);
+          view.set(t, {L: `${t.L.text}`, R: e.R.text});
+          await d.wait(1.1);
+          d.describe(`Sólo se mueve el marcador del primer miembro; el del ${e.R.text} se queda quieto.`);
+          d.evidence('two-step', {op, keeps: sameSolutions(e, t)});
+          path.push(op);
+          g.audio.punto('no');
+          await pulse(d, p, 1, 0.3);
+          const s1 = solveLinear(t);
+          await d.think(`El ${e.R.text} no se movió: no fue lo mismo a los dos lados, y la mitad de ${e.L.text} no es ${t.L.text}. Esa cuenta pide x = ${s1.kind === 'one' ? fmtNum(s1.x) : '?'}: es otra cuenta.`);
+          view.set(e);
+          await d.wait(0.7);
+          continue;
+        }
+        const before = e;
+        e = o.f(e);
+        stack.push(before);
+        path.push(op);
+        view.set(e, o.t(before));
+        await d.wait(1);
+        view.set(e);
+        d.evidence('two-step', {op, keeps: sameSolutions(before, e)});
+        await writeDeriv(d, g, `d6-t${stack.length}`, `${e.L.text} = ${e.R.text}`, stack.length);
+        if (op === 'm7' && !solved(e)) await d.think('Sigue valiendo, pero no ayudó: la x no quedó más sola.');
+      }
+      if (!solved(e) && steps >= 10) {
+        rescued = true;
+        await d.think('Muchos pasos y la x sigue acompañada. Vuelvo al principio: primero lo que está más afuera, el +1; después, el doble.');
+        g.setCinematic(true);
+        for (let k = stack.length; k >= 1; k--) w.remove(`d6-t${k}`);
+        stack.length = 0;
+        e = addBoth(E0, -1);
+        stack.push(E0);
+        derivLine(w, 'd6-t1', `${e.L.text} = ${e.R.text}`, 1);
+        stack.push(e);
+        e = divBoth(e, 2);
+        derivLine(w, 'd6-t2', `${e.L.text} = ${e.R.text}`, 2);
+        view.set(e);
+        g.setCinematic(false);
+        await d.wait(0.8);
+      }
     }
     const sol = solveLinear(e);
-    if (!(e.L.a === 1 && e.L.b === 0)) {
-      await d.think('Así no termino nunca. Primero lo que está más afuera: el +1. Después, el doble.');
-      e = divBoth(addBoth(eq(lin(2, 1), lin(0, 7)), -1), 2);
-      view.set(e);
-      await writeDeriv(d, g, `d6-t${row}`, 'x = 3', row);
-    }
-    await d.say('student', path[0] === 'd2' ? 'Dividiendo primero también se llega, con mitades en el camino: x + 1/2 = 7/2, y x = 3.' : 'Primero el +1, después el doble: x = 3.');
+    const kept = path.filter(o => o !== 'undo' && o !== 'half');
+    const firstDiv = !rescued && !!w.get('d6-t1')?.text.startsWith('x + 1/2');
+    await d.say('student', rescued ? 'Primero el +1, después el doble: x = 3.' : firstDiv ? 'Dividiendo primero también se llega, con mitades en el camino: x + 1/2 = 7/2, y x = 3.' : 'Primero el +1, después el doble: x = 3.');
+    await d.say('Mara', firstDiv ? '¿Y restando primero?' : '¿Y si dividías primero?');
+    await d.say('student', 'También da 3. Sumar, restar, o dividir por un número que no es cero, a los dos lados, no pierde ni agrega soluciones: cualquier camino así que deje sola a la x llega al mismo número.');
     // comprobar moviendo a Punto
-    await placeX(d, g, view, {hint: ['Poné a Punto en el 3 para comprobar en la cuenta.'], done: v => v.x === 3});
-    view.set(eq(lin(2, 1), lin(0, 7)));
-    await d.wait(1);
-    await d.think('En la cuenta del principio también: dos por tres, más uno, siete.');
+    view.set(E0);
+    await placeX(d, g, view, {hint: ['Poné a Punto en el 3 para comprobar en la cuenta del principio.'], done: v => v.x === 3});
+    await d.think('Dos por tres, más uno: siete. Se cumple.');
     await d.say('Recta', 'Las dos cajas, de a tres. Ahora me acuerdo.');
-    d.evidence('two-step-result', {x: sol.kind === 'one' ? sol.x : null, path});
-    // la x a la derecha
+    d.evidence('two-step-result', {x: sol.kind === 'one' ? sol.x : null, path, rescued, kept});
+    // la x a la derecha: se borra la pizarra y se empieza otra
+    g.setCinematic(true);
+    for (let k = 0; k <= 3; k++) { const l = w.get(`d6-t${k}`); if (l) d.fadeTo(l, 0, 0.6).then(() => w.remove(l.id)).catch(() => {}); }
+    await d.wait(0.7);
+    g.setCinematic(false);
     await d.say('Recta', '¿Y si la caja está del otro lado? Tres atados son la cuarta parte de una caja.');
-    let e2 = eq(lin(0, 3), lin(1 / 4, 0));
-    view.set(e2, {L: '3', R: 'x ÷ 4'});
-    derivLine(w, 'd6-t6', '3 = x ÷ 4', 5);
-    const op2 = await pickOp(d, g, [
-      {id: 'x4', text: '× 4 a los dos'},
-      {id: 'd4', text: '÷ 4 a los dos'},
-      {id: 'p4', text: '+ 4 a los dos'},
-    ], 'La x está a la derecha. ¿Qué la deja sola?');
-    d.evidence('right-side', {op: op2});
-    if (op2 !== 'x4') {
-      e2 = op2 === 'd4' ? divBoth(e2, 4) : addBoth(e2, 4);
-      view.set(e2);
-      await d.wait(1);
-      await d.think(op2 === 'd4' ? 'Siguen juntos, pero ahora es x ÷ 16: más lejos de quedar sola. Lo que la deshace es multiplicar.' : 'Siguen juntos, pero la x no se soltó. Dividir se deshace multiplicando.');
-      e2 = eq(lin(0, 3), lin(1 / 4, 0));
+    const E2 = eq(lin(0, 3), lin(1 / 4, 0));
+    view.set(E2, {L: '3', R: 'x ÷ 4'});
+    derivLine(w, 'd6-u0', '3 = x ÷ 4', 0);
+    const rops = [
+      {id: 'x4', text: '× 4 a los dos', label: 'Multiplicar los dos lados por 4'},
+      {id: 'd4', text: '÷ 4 a los dos', label: 'Dividir los dos lados por 4'},
+      {id: 'p4', text: '+ 4 a los dos', label: 'Sumar 4 a los dos lados'},
+    ];
+    for (;;) {
+      const op2 = await pickOp(d, g, rops, 'La x está a la derecha. ¿Qué la deja sola?');
+      d.evidence('right-side', {op: op2});
+      if (op2 === 'x4') break;
+      if (op2 === 'd4') view.set(divBoth(E2, 4), {L: '3/4', R: 'x ÷ 16'});
+      else view.set(addBoth(E2, 4), {L: '7', R: 'x ÷ 4 + 4'});
+      await d.wait(1.1);
+      await d.think(op2 === 'd4' ? 'Del lado de la x quedó x ÷ 16: más lejos de quedar sola. Lo que deshace un "÷ 4" es "× 4".' : 'Quedó x ÷ 4 + 4: la x no se soltó. Lo que deshace dividir es multiplicar.');
+      view.set(E2, {L: '3', R: 'x ÷ 4'});
+      await d.wait(0.6);
+      rops.splice(rops.findIndex(o => o.id === op2), 1);
     }
-    e2 = mulBoth(e2, 4);
-    view.set(e2, {L: '12', R: 'x'});
+    view.set(mulBoth(E2, 4), {L: '3 · 4', R: 'x ÷ 4 · 4'});
     await d.wait(1);
-    await writeDeriv(d, g, 'd6-t7', '12 = x', 6);
-    await d.think('La x puede quedar de cualquier lado. Doce.');
+    view.set(mulBoth(E2, 4), {L: '12', R: 'x'});
+    await writeDeriv(d, g, 'd6-u1', '12 = x', 1);
+    view.set(E2, {L: '3', R: 'x ÷ 4'});
+    await placeX(d, g, view, {hint: ['Poné a Punto en el 12 y mirá la cuenta del principio: 3 = x ÷ 4.'], done: v => v.x === 12});
+    await d.think('Doce dividido cuatro, tres: los marcadores caen juntos. La x puede quedar de cualquier lado del igual.');
     if (!replay) writeJournal6(g);
     view.dispose();
-    // gancho: la diagonal
-    await d.say('Mara', 'Peldaño vino con la diagonal de su huerta. Dice que el cuadrado dibujado sobre ella ocupa justo dos cuadrados de la huerta.');
+    // gancho: la huerta de dos cuadros
+    await d.say('Mara', 'Peldaño anda con otro problema: quiere una huerta cuadrada con justo dos cuadros de tierra. ¿Cuánto mide el lado?');
     g.setCinematic(true);
     const hk = w.add(new Label('d6-hook', 'x · x = 2', lx(4), GROUND - 330, {size: 44, z: 9, reveal: 0, ch: YELLOW}));
     p.setMode('still');
@@ -257,9 +331,11 @@ export const dosPasos = {
     await pulse(d, p, 2, 0.4);
     follow(p, w.get('student'));
     g.setCinematic(false);
-    await d.think('Un número que por sí mismo da 2. Ni 1,4 ni 1,5. Hay que aprender a hacer crecer los números… y a deshacerlo.');
+    await d.think('Un número que, multiplicado por sí mismo, da 2. Uno por uno es 1; dos por dos, 4. Está en el medio. Hay que aprender a hacer crecer los números… y a deshacerlo.');
   },
 };
+
+const fmtNum = n => (Number.isInteger(n) ? String(n).replace('-', '−') : String(n).replace('.', ',').replace('-', '−'));
 
 function writeJournal6(g) {
   const ev = g.state.evidence.filter(e => (e.run || 1) === (g.state.run || 1));
@@ -267,33 +343,36 @@ function writeJournal6(g) {
   const all = k => ev.filter(e => e.kind === k);
   const seen = [];
   const sb = first('solve-box');
-  if (sb) seen.push(`Moviste a Punto (la x) hasta que x − 3 cayó en el 5: ocho${sb.tries > 3 ? `, después de ${sb.tries} intentos` : ''}. La caja tenía ocho.`);
+  if (sb) seen.push(`Moviste a Punto (la x) hasta que x − 3 cayó en el 5: con x = 8${sb.tries > 3 ? `, después de ${sb.tries} intentos` : ''}. La caja tenía ocho.`);
   const op2 = all('op2').map(e => e.op);
-  if (op2.length) seen.push(op2[0] === 'both' ? 'Sumaste 3 a los dos lados: los marcadores siguieron juntos y quedó x = 8.' : `Probaste ${op2.filter(o => o !== 'both').map(o => ({oneL: 'sumar 3 sólo a la izquierda (se separaron)', bothM: 'restar 3 a los dos (siguieron juntos, pero no despejó)'}[o])).join(' y ')} antes de sumar 3 a los dos lados.`);
+  if (op2.length) seen.push(op2[0] === 'both' ? 'Sumaste 3 a los dos lados: los marcadores siguieron juntos y quedó x = 8.' : `Probaste ${op2.filter(o => o !== 'both').map(o => ({oneL: 'sumar 3 sólo al primer miembro (se separaron)', bothM: 'restar 3 a los dos (siguieron juntos, pero no despejó)'}[o])).join(' y ')} antes de sumar 3 a los dos lados.`);
   const ps = first('pasa-sumando');
-  if (ps) seen.push(ps.answer === 'both' ? '"Pasa sumando" quedó como abreviatura de sumar a los dos lados.' : 'Pensaste que "pasa sumando" era mudar el número o una regla sin explicación; es sumar a los dos lados, en corto.');
-  if (first('substitute')) seen.push('Comprobaste la cuenta de memoria de Recta poniendo a Punto en el 8: no cumplía. Era x = 2.');
-  const tz = first('times-zero-eq');
-  if (tz) seen.push('Con el truco de multiplicar por cero, cualquier x parecía servir: por cero se pierde lo que decía la cuenta.');
+  if (ps) seen.push(ps.answer === 'both' ? '"Pasa sumando" quedó como abreviatura de sumar a los dos lados.' : ps.answer === 'move' ? 'Pensaste que "pasa sumando" era mudar el número de lado; es sumar a los dos lados, en corto.' : 'Pensaste que "pasa sumando" era una regla sin explicación; es sumar a los dos lados, en corto.');
+  const ch = first('check-how');
+  if (first('substitute')) seen.push(ch?.answer === 'sub' ? 'Elegiste comprobar la cuenta de memoria de Recta poniendo a Punto en el 8: no cumplía. Era x = 2.' : 'La cuenta de memoria de Recta se comprobó poniendo a Punto en el 8: no cumplía. Era x = 2.');
+  if (first('times-zero-eq')) seen.push('Con el truco de multiplicar por cero, cualquier x parecía servir: por cero se pierde lo que decía la cuenta.');
   const sp = first('square-predict');
-  if (sp) seen.push(sp.answer === '2' ? 'Anticipaste que x · x = 9 tiene dos soluciones: 3 y −3.' : 'Al elevar al cuadrado apareció el −3, que la cuenta de antes no tenía.');
+  if (sp) seen.push(sp.answer === '2' ? 'Anticipaste que x · x = 9 tiene dos soluciones; buscando, aparecieron el 3 y el −3.' : 'Al elevar al cuadrado apareció el −3, que la cuenta de antes no tenía.');
   if (first('div-by-x')) seen.push('Dividiendo x · x = x por x se perdió el 0, que sí cumplía.');
   const io = all('ineq-op').map(e => e.op);
-  if (io.length) seen.push(io[0] === 'flip' ? 'Al dividir −2 · x < 6 por −2 diste vuelta el signo: x > −3.' : 'Dividiste por −2 sin dar vuelta el signo y cambiaron las x que sirven; dando vuelta, x > −3.');
+  if (io.length) seen.push(io[0] === 'flip' ? 'Al dividir −2x < 6 por −2 diste vuelta el signo: x > −3, y las x marcadas no cambiaron.' : 'Dividiste por −2 sin dar vuelta el signo y las x marcadas saltaron al otro lado; dando vuelta, x > −3.');
   const tr = first('two-step-result');
-  if (tr) seen.push(`En 2 · x + 1 = 7 tu camino fue: ${tr.path.map(o => ({m1: 'restar 1', d2: 'dividir por 2', m7: 'restar 7'}[o])).join(', ')}. x = 3.`);
+  if (tr) {
+    const names = {m1: 'restar 1', d2: 'dividir por 2', mh: 'restar 1/2', m7: 'restar 7', half: 'dividir sólo el 2x (no valía)', undo: 'deshacer'};
+    seen.push(tr.rescued ? `En 2x + 1 = 7 probaste ${tr.path.map(o => names[o]).join(', ')}; después de muchos pasos, el camino se hizo junto: restar 1 y dividir por 2. x = 3.` : `En 2x + 1 = 7 tu camino fue: ${tr.path.map(o => names[o]).join(', ')}. x = 3.`);
+  }
   const entry = {
     id: 'c6',
     title: 'Lo que no se ve',
-    abbr: 'Una ecuación son dos miembros; resolver es buscar dónde coinciden, sin perder ni inventar soluciones.',
+    abbr: 'Una ecuación son dos miembros; resolver es buscar para qué x coinciden, sin perder ni inventar soluciones.',
     body: [
-      'Una incógnita es un número que está pero no se ve. Se le pone un nombre: x.',
-      'Hacer lo mismo a los dos lados con algo que se puede deshacer (sumar, restar, multiplicar o dividir por un número que no sea cero) no cambia dónde coinciden. "Pasa sumando" abrevia eso: sumar a los dos lados y simplificar.',
+      'Una incógnita es un número que está pero no se ve. Se le pone un nombre: x. Resolver es encontrar para qué x los dos miembros dan lo mismo.',
+      'Hacer lo mismo a los dos lados no cambia para qué x coinciden si cumple dos cosas: que se pueda hacer con cualquier x (así no se pierde ninguna solución) y que se pueda deshacer (así no aparece ninguna). Sumar o restar cualquier número, o multiplicar o dividir por un número que no sea cero, cumplen las dos. "Pasa sumando" abrevia eso: sumar a los dos lados y simplificar.',
       'Para comprobar, se pone el valor en la cuenta original. De memoria se puede pasar un número con el signo equivocado.',
-      'Lo que no se deshace puede cambiar las soluciones: por cero aparecen todas; al cuadrado pueden aparecer de más (3 y −3); dividiendo por algo que puede valer cero se pueden perder (el 0 en x · x = x).',
-      'En una desigualdad, multiplicar o dividir por un negativo da vuelta la recta: el signo se invierte.',
-      'Se deshace en el orden contrario al que se armó, pero cualquier camino válido llega.',
-      'Dato: al-Khwārizmī (Bagdad, hacia 820) llamó al-jabr a restituir lo que se resta sumándolo en los dos miembros, y al-muqābala a cancelar lo igual de los dos lados. De al-jabr viene "álgebra".',
+      'Por cero no se deshace: aparecen todas las x. Al cuadrado no se deshace: pueden aparecer de más (3 y −3). Dividir por algo que vale cero en alguna x no se puede hacer en esa x: ahí se puede perder una solución (el 0 en x · x = x).',
+      'En una desigualdad, multiplicar o dividir por un negativo da vuelta la recta: el signo se invierte. Por un positivo, no.',
+      'Hay muchos caminos válidos; no todos ayudan, pero todo camino válido que deja sola a la x da el mismo número.',
+      'Dato: al-Khwārizmī (Bagdad, hacia 820) llamó al-jabr a restituir lo que se resta, y al-muqābala a cancelar lo igual de los dos lados; lo hacía en palabras, sin símbolos. De al-jabr viene "álgebra".',
     ],
     seen,
     moments: [

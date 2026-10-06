@@ -221,8 +221,8 @@ orígenes únicos.
 Pregunta de entrada (gancho del cap. 5): la diagonal existe pero no se sabe escribir; antes, algo
 más simple: Mara tiene una caja cerrada con atados adentro y no sabe cuántos. Idea central: **una
 incógnita es un número que no se ve; una ecuación son dos miembros que dependen de ella; resolver
-es encontrar dónde coinciden; transformar los dos miembros a la vez con algo que se puede deshacer
-no cambia las soluciones.**
+es encontrar para qué x coinciden; transformar los dos miembros a la vez con algo que se puede hacer
+para toda x y se puede deshacer no cambia las soluciones.**
 
 Representación: la **recta con dos marcadores**, uno por miembro. Punto se sienta sobre la recta
 y hace de x: el jugador lo cambia de marca y los dos marcadores se mueven según sus expresiones.
@@ -245,7 +245,7 @@ deshacer; con el cap. 1: la transformación es uno a uno sobre la recta. Ancla h
 certeza alta): al-Khwārizmī, *al-jabr* (restituir lo restado sumándolo en ambos miembros) y
 *al-muqābala* (cancelar términos iguales a ambos lados). En la Bitácora, como dato.
 
-## Capítulo 7 — Crecer (diseño, no implementado)
+## Capítulo 7 — Crecer (implementado, 2026-10-06)
 
 Pregunta de entrada (gancho del cap. 6): x · x = 2. Idea central: **multiplicar repetido crece
 distinto que sumar repetido; cada crecimiento tiene una pregunta inversa (raíz, logaritmo); un
@@ -269,6 +269,31 @@ tablas que crecen día por día; la recta del cap. 6 para las raíces.
 Límites a declarar: √ indica el lado positivo; potencias con exponente fraccionario y logaritmos
 de otras bases, sólo mencionados; la prueba de que √2 no es una fracción queda para el cap. 8.
 Historia: pendiente de fuentes (no afirmar nada sobre Napier ni Arquímedes sin verificar).
+
+## Criterios de escena (lo que las revisiones marcaron una y otra vez)
+
+Antes de dar por escrita una escena, comprobar:
+
+1. **Una decisión que cambia el mundo**, no sólo un menú: el jugador toca, arma, elige una
+   partición o una operación, y ve la consecuencia. A lo sumo una predicción por escena.
+2. **Nada de un solo botón** salvo cuando el gesto mismo es la experiencia (y aun así, que el
+   jugador decida cuándo parar).
+3. **El estudiante escribe** la notación y **dice** la conclusión, a alguien (Punto, una familia).
+   Mara reacciona, anota, pregunta; no define ni cierra.
+4. **Punto se equivoca de verdad** al menos una vez por capítulo y **se corrige él mismo**
+   (borra y reescribe); su evolución se conserva (`flags`).
+5. **Cuentas coherentes**: toda cantidad tiene origen en la historia y coincide entre escenas
+   (y con los capítulos anteriores). Si es una hipótesis, que se diga.
+6. **La Marea** aparece una vez por capítulo: borra lo que no se entiende; lo entendido resiste.
+7. **Sin veredictos automáticos** ("como dije", "lo anticipé"): habla la consecuencia.
+8. **Composición**: primer plano en el momento clave; nada fuera de cuadro; textos dentro de la
+   pizarra; escalas fieles (si dos cosas valen lo mismo, miden lo mismo).
+9. **Accesibilidad**: cada evento visual con `d.describe`; rótulos con posición y verbo.
+10. **Bitácora**: primero lo que pasó (sin atribuir de más), después ≤ 4 párrafos de ideas.
+11. **Definiciones correctas** y límites declarados; la evidencia no puede probar más de lo que
+    muestra.
+12. Verificación: `npm run lint`, pruebas de la lógica, partidas por las dos rutas con capturas,
+    y mirar las capturas.
 
 ## Interfaz
 

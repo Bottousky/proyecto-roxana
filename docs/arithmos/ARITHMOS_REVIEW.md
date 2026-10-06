@@ -203,5 +203,37 @@ Ambas sin navegador, sobre el commit 074d296. Corregido en el commit siguiente:
 | narr | A6 | Composición | Parcial: primer plano de las barras punteadas, inserto en la recta, escalas, nombres de las familias en el suelo |
 | narr | M1–M10 | Ganchos, errores de Punto con la misma puesta, opciones obvias, motivos débiles, "cuarto", nombres, 2,05 escrito, Bitácora, repeticiones, accesibilidad | Parciales: gancho 4→5 reescrito (el atado rajado); Punto se corrige solo; "cajas"; nombres; 2,05 escrito; Bitácora de 4 párrafos. Pendientes: motivos de 5.4/5.8 y más primeros planos |
 
+## Revisiones independientes del cap. 6 (rev-mat-5 y rev-narr-4, 2026-10-06)
+
+Informes: `artifacts/arithmos/it06/review-mat/informe.md` y `artifacts/arithmos/it06/review-narr/informe.md`.
+Ambas sin navegador, sobre el commit 22d9276. Todas las igualdades de la pizarra eran correctas; 65/65 pruebas.
+Corregido en el commit siguiente (evidencia en `artifacts/arithmos/it07/c6-*`):
+
+| Origen | # | Hallazgo | Disposición |
+|---|---|---|---|
+| mat | A1 | 6.8: sólo −1 → ÷2 terminaba; dividir primero o −7 dejaban sin salida; el rescate se contradecía; renglones superpuestos | Corregido: paleta −1, ÷2, −1/2, −7, un paso inválido y **deshacer** (borra el renglón); con tres renglones sólo se ofrece deshacer; rescate a los 10 pasos, con texto coherente; la ruta directa del bot recorre ahora el camino ÷2 → −1/2 |
+| mat | A2 | «3 = x ÷ 4»: «siguen juntos» con los marcadores separados; «0,063x» | Corregido: los textos ya no dicen «juntos»; el jugador lleva a Punto al 12 y ahí sí coinciden; `fmt` escribe fracciones exactas hasta /100 y los coeficientes como «x/16», «3x/4» (prueba nueva) |
+| mat | A3 | 6.7: «con Punto en el 0» con Punto en otro lado | Corregido: Punto vuelve al 0 antes de elegir; además se marcan debajo de la recta **todas** las x enteras que cumplen, antes y después (el conjunto se ve, no se infiere de un punto) |
+| mat | A4 | «Resolver es buscar dónde coinciden» confundía el valor común con la solución | Corregido en Bitácora, consigna de 6.1, encabezado de `equations.js`: «para qué x coinciden» |
+| mat | M1 | Criterio de un solo punto | Parcial: 6.4 dice que «que el 8 siga sirviendo no alcanza»; 6.2 nombra la otra solución de la cuenta rota (x = 5). Pendiente: mover a Punto después de la transformación válida |
+| mat | M2 | Dos condiciones mezcladas | Corregido: «se puede hacer con cualquier x» (no se pierde) y «se puede deshacer» (no aparece), en 6.2 y en la Bitácora; ÷x clasificado como «no se puede hacer en x = 0». Pendiente: decisión predictiva antes de ver el resultado |
+| mat | M3 | 6.6: «son dos» sin justificar; «no da nada» | Corregido: casos (x ≠ 0 → x = 1; x = 0 aparte); «no está definido, no hay ningún número» |
+| mat | M4 | 6.5: el jugador no comprueba el −3 | Corregido: la cuenta original vuelve a la recta con Punto en −3 y los marcadores se separan |
+| mat | M5 | «debajo de 6», «izquierda» ambigua, sin contraste | Corregido: «dar menos que 6», «primer miembro»; contraste ÷2 sin vuelta |
+| mat | M6 | La línea equivocada de Recta quedaba en la pizarra | Corregido: la Marea la borra (también rev-narr A1) |
+| mat | M7 | Bitácora atribuía de más | Corregido: distingue camino propio y rescate, «Elegiste comprobar» sólo si lo eligió, respuestas separadas, «todo camino válido que deja sola a la x da el mismo número» |
+| mat | M8 | 6.8 sin paso inválido | Corregido: «÷ 2 sólo al 2x», con su consecuencia (sólo se mueve un marcador; la cuenta pide otra x) |
+| mat | M9 | Cobertura: sistemas, factorización, identidad, conjunto solución | Parcial: conjunto solución visible en 6.7; factorización en 7.5–7.6. Pendiente: sistemas (C6b en el backlog), identidad nombrada, ficha §5 de D |
+| mat | M10 | Gancho «x · x = 2» de oídas | Corregido: el gancho es una pregunta de Peldaño (huerta cuadrada de dos cuadros); 7.1 lo resuelve con la construcción de cortar dos cuadros en triángulos |
+| mat | M11 | El bot tocaba un botón y se ejecutaba otro | Corregido en `ui.js`: los botones nuevos se ubican al crearse (antes quedaban en el origen hasta el cuadro siguiente) |
+| mat | B3–B9, B11 | Varios | Corregidos B3 (nombre de prueba), B4 (`holds` en la evidencia), B5 (2x en la Bitácora), B6, B8 («en palabras, sin símbolos»), B9, B11 («x = 5 + 3 = 8»). Pendientes: B1 (marcadores fuera de escala), B10, B12 |
+| narr | A1 | La Marea no actúa | Parcial: borra la cuenta de memoria de Recta en 6.3. Pendiente: la pasada grande del cierre |
+| narr | A2 | Desfile de vecinos con trucos | Pendiente (replanteo: atar cada escena al saldo de cada familia del cap. 3) |
+| narr | A3 | Punto como cursor | Parcial: «vos hacés de lo que hay en la caja»; reacciona al paso inválido. Pendiente: que se ofrezca, se equivoque y tenga un primer plano |
+| narr | A4 | Texto contra imagen | Corregido (ver mat A1–A3, M7) |
+| narr | A5 | «Pasa sumando» en un solo punto | Parcial (conjunto de 6.7; ver mat M1) |
+| narr | A6 | Puesta de diapositiva | Pendiente |
+| narr | M1–M10 | Costuras, caja de 6.1, opciones largas, nombres, izquierda/derecha, inválidos siempre ajenos, Bitácora, accesibilidad | Parciales: gancho 6→7 sin adelantar el descubrimiento; izquierda/derecha; el jugador tiene en la mano un paso inválido (6.8); descripciones nuevas en 6.3, 6.5, 6.7, 6.8; botones con verbo. Pendientes: caja de 6.1, longitud de las opciones, blancos táctiles de la recta en teléfono |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

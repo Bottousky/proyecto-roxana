@@ -1,0 +1,40 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c7.no-se-puede"
+  },
+  "journal": [
+    "Crecer"
+  ],
+  "evidenceKinds": [
+    "pow-row",
+    "pow-zero",
+    "powers",
+    "sci-compare",
+    "sci",
+    "expand-predict",
+    "expand",
+    "factor-try",
+    "factor",
+    "complete-predict",
+    "complete-other",
+    "complete",
+    "log-predict",
+    "log-step",
+    "log",
+    "rational-predict",
+    "rational-try",
+    "rational"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 53.654,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}
