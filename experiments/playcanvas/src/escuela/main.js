@@ -410,7 +410,7 @@ function showIntro(){
   document.body.classList.remove('exploring');diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();
 }
 // On wide screens the campus steps right of the intro text.
-function introShift(){return innerWidth>1000&&!document.body.classList.contains('exploring')?-.17:0;}
+function introShift(){return innerWidth>1000&&!document.body.classList.contains('exploring')?-.22:0;}
 function introShiftY(){return innerWidth<=820&&innerHeight>innerWidth&&!document.body.classList.contains('exploring')?-.22:0;}
 function setupWayIn(){
   const o=ohmdalSummary(previewStage===null?save:null),href=base+'index.html'+(o.started?'#continuar':'');

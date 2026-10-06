@@ -346,3 +346,4 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .changes-list b{display:block;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
 @media (max-width:820px){.changes{left:16px;right:16px;width:auto;bottom:118px}}
 .light .look{display:none}
+.light .intro::before{display:none}

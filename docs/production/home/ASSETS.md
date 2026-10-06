@@ -8,6 +8,8 @@
 | Remates de techo por taller | código, `roofAccent` en `school.js` (ciclo 5) | proyecto | el propio código | pararrayos con bombilla (Ω), anemómetro (Φ), lucernario cian y mástil (λ), sólido de tiza en anillo (∑) |
 | Cartelera de novedades | código, `buildNoticeBoard` en `artifacts.js` + `drawNotices` en `diorama.js` (ciclo 4) | proyecto | el propio código | corcho dibujado desde `novedades.json`; farolito = no leído real |
 | Texturas vivas del chip y del caballete | canvas, `drawChip` / `drawYard` en `diorama.js` | proyecto | el propio código | 256² y 512×320, ~15 fps, en reposo con movimiento reducido |
+| Imagen fija del campus (primer pintado y versión ligera) | `public/escuela/campus-tarde.jpg` (1600×1000) y `campus-tarde-vertical.jpg` (860×1800), renderizadas desde el campus real | proyecto | `node scripts/home-shots.mjs poster@0/tarde public/escuela` (`NAME`, `W`, `H`) | no es una imagen pintada: se regenera cuando cambie el campus |
+| Estandarte de Ohmdal (copia) | `public/escuela/estandarte-ohmdal.jpg`, reducción de `assets/art-polish/kingdom-banner.webp` (ver `docs/assets.md`) | heredado | el original | 828×552, al tamaño en que se dibuja |
 | Estatua de Roxana | `public/escuela/modelos/roxana-estatua.glb` | Meshy (generada antes de este loop; ver commit 4072fec) | GLB (sólo geometría) | `statue.js` agrega normales, UV, mármol |
 | Granos de material | `public/assets/materials.webp` | heredado del juego Ohmdal (`docs/assets.md`) | — | reducido a luminancia |
 | Árboles (sprites) | `public/assets/trees.webp` | heredado del juego Ohmdal (`docs/assets.md`) | — | chroma key magenta |

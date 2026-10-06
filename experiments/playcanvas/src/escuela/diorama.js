@@ -395,7 +395,7 @@ export class SchoolDiorama {
     const m=src.clone();m.noShadow=src.noShadow;m.update();this.materials[key]=m;return m;
   }
   async bannerTexture(){
-    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=new URL('./assets/art-polish/kingdom-banner.webp',document.baseURI).href;});
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=new URL('./escuela/estandarte-ohmdal.jpg',document.baseURI).href; /* reduced copy of assets/art-polish/kingdom-banner.webp at the size it is drawn */});
     return sign(this.app,'banner',(x,W,H)=>{x.drawImage(img,0,0,W,H-60);x.fillStyle='#1c4b4a';x.beginPath();x.moveTo(0,H-60);x.lineTo(W/2,H);x.lineTo(W,H-60);x.fill();},512,828);
   }
   portraitTexture(){
@@ -559,17 +559,21 @@ export class SchoolDiorama {
         const mi=new MeshInstance(mesh,mm,e);mi.castShadow=false;e.addComponent('render',{meshInstances:[mi]});e.setLocalEulerAngles(0,s2,-3);piv.addChild(e);}
       piv.enabled=false;this.miniBeam={pivot:piv,m:mm};}
   }
+  /**
+   * People in the patio. Each sprite sheet is downloaded only when its moment comes: the student at the gate
+   * from the start, Ohm after the first light, the visitors of Ohmdal after the epilogue (see ensureSprites).
+   */
   async buildSprites(){
-    const place=async(name,x,z,stage)=>{
-      const sprite=await actorArt(this.app,name);const e=new Entity(name);
-      e.addComponent('sprite',{type:'simple',sprite,frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.sprite.material.update();
-      e.setPosition(x,.08,z);this.root.addChild(e);e.enabled=false;return {e,stage,name,phase:x};
-    };
-    this.sprites=[
-      await place('ohm',-22.4,-1.4,1),
-      await place('edda',-3.6,5,10),await place('lumen',4,4.8,10),await place('tala',7,-6.4,10),await place('nereo',-7,-6.2,10),
-    ];
-    try{this.sprites.push(await place('player',-1.2,25,0));}catch{}
+    this.sprites=[];this.spritePlan=[['player',-1.2,25,0],['ohm',-22.4,-1.4,1],['edda',-3.6,5,10],['lumen',4,4.8,10],['tala',7,-6.4,10],['nereo',-7,-6.2,10]];this.spriteLoads=new Map();
+    await this.ensureSprites();
+  }
+  ensureSprites(){
+    const want=this.spritePlan.filter(([name,,,stage])=>(stage===0?this.stage<10:this.stage>=stage)&&!this.spriteLoads.has(name));
+    return Promise.all(want.map(([name,x,z,stage])=>{
+      const job=actorArt(this.app,name).then(sprite=>{const e=new Entity(name);
+        e.addComponent('sprite',{type:'simple',sprite,frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.sprite.material.update();
+        e.setPosition(x,.08,z);this.root.addChild(e);e.enabled=false;this.sprites.push({e,stage,name,phase:x});this.stageDirty=true;}).catch(err=>console.warn('Sprite no disponible:',name,err.message));
+      this.spriteLoads.set(name,job);return job;}));
   }
 
   // ── Input: click to enter, drag to turn, wheel to approach ────────────────────
@@ -758,7 +762,8 @@ export class SchoolDiorama {
     this.fx.dust.particlesystem.enabled=!this.reducedMotion&&night<.9;
     // Trophies.
     trophies.forEach((t,i)=>{this.show(`trophy:ohmdal:${i}`,t.earned);this.show(`dome:ohmdal:${i}`,!t.earned);});
-    // Visitors.
+    // Visitors: load what the stage asks for, then show it.
+    if(this.spritePlan)this.ensureSprites();
     for(const s of this.sprites||[])s.e.enabled=s.stage===0?this.stage<10:this.stage>=s.stage;
     // Grade: the abandoned school is cooler and flatter.
     const warm=this.stage/10,gr=h.grade;this.frame.grading.saturation=gr[0]*lerp(.78,1.02,warm);this.frame.grading.tint=new Color(gr[1]*lerp(.95,1,warm),gr[2],gr[3]*lerp(1.06,1,warm));this.frame.grading.brightness=gr[4];this.frame.update();

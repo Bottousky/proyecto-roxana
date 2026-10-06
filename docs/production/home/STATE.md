@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 5 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 6 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -133,11 +133,27 @@ en producción hoy queda vacía porque no hay novedades confirmadas (dato extern
 Limitaciones: en modo portada (escritorio) el texto cubre Física y parte de Electrónica; los remates de Φ, λ, ∑
 son ambiente, no progreso (sin integración de esos mundos).
 
+## Ciclo 6 (2026-10-06) — primer pintado real, portada, medición y peso
+
+- **Primer pintado = el campus**: imagen fija renderizada desde el plano maestro (horizontal y vertical) como fondo
+  antes de cualquier JS, con velo del lado del texto y estilos críticos de los botones en línea. Es también el fondo
+  de la versión ligera sin WebGL (antes: degradado vacío). Se regenera con `home-shots.mjs poster@0/tarde`.
+- **Portada de escritorio**: título en una línea, columnas más angostas y campus más a la derecha; el patio ya no
+  queda bajo el texto (Física sigue parcialmente cubierta en 1440×900; se ve al explorar).
+- **Medición** (`PERF.md`, `scripts/home-perf.mjs`, build de producción, GPU compartida con otros agentes):
+  60 FPS con p99 16,8 ms en reposo, sala abierta y tras 10 ciclos; LCP 252 ms; CLS 0; interactivo en 2,0 s;
+  sin fugas de entidades. Draw calls 856–1233: anotado como presupuesto pendiente.
+- **Peso inicial 6,74 → 5,30 MB**: visitantes de Ohmdal se descargan al llegar a su etapa; estandarte en copia
+  reducida. Etapa 10 verificada con los visitantes en el patio. QA de interacción 26/26, `npm test` 93/93.
+- Corregido: rectángulo duro detrás del texto en la versión ligera.
+
 ## Siguiente acción exacta
 
-1. Rendimiento con `vite preview` y GPU sin compartir: frame times, memoria, 10 ciclos abrir/cerrar panel y
-   gesto (fugas de listeners/texturas); presupuesto de draw calls tras medir.
-2. Poster del campus (imagen honesta del plano maestro) para la versión ligera y como primer cuadro.
-3. Portada de escritorio: evaluar texto más compacto o campus más a la derecha para que Física no quede tapada.
-4. Revisión crítica separada (arte, interacción, integración) y paquete de CANDIDATO_PARA_REVISION si no hay
-   bloqueos críticos.
+1. Revisión crítica separada (no independiente: un solo agente) de arte, interacción e integración contra el brief
+   §2–§12, con lista de defectos concretos y su severidad; corregir los críticos.
+2. Perfil «calidad baja» real (sin SSAO, sombras 2048, DPR ≤ 1,25) y medir draw calls/FPS en él; elegirlo por
+   defecto en pantallas táctiles angostas.
+3. Accesibilidad: recorrido con sólo teclado (Tab/Enter/Escape) por portada, directorio, paneles y gesto; contraste
+   de rótulos sobre bruma.
+4. Si no quedan bloqueos críticos: paquete CANDIDATO_PARA_REVISION (§14) con ruta, cambios, capturas, pruebas,
+   mediciones, integración de progreso, fuentes de assets y pendientes externos (redes, novedades, mundos).

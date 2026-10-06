@@ -33,6 +33,9 @@ for(const spec of shots){
   await page.waitForFunction(()=>window.__escuela||document.body.classList.contains('light'),null,{timeout:120000});
   const ready=Date.now()-t0;
   await page.waitForTimeout(2600);
+  // Poster: the arrival composition with every overlay hidden, saved as JPEG for the first paint.
+  if(name==='poster'){await page.addStyleTag({content:'#escuela>*:not(#diorama){display:none!important}'});await page.waitForTimeout(4500);
+    const file=`${out}/${process.env.NAME||'poster'}.jpg`;await page.screenshot({path:file,type:'jpeg',quality:Number(process.env.Q||74)});console.log('poster',file);await context.close();continue;}
   if(name==='llegada'||hash){await page.screenshot({path:`${out}/${spec.replace(/[@/:]/g,'-')}-${width}.png`});console.log('captura',spec,`listo ${ready} ms`);await context.close();continue;}
   await page.evaluate(name=>{
     const e=window.__escuela;document.querySelector('#news')?.classList.add('hidden');
