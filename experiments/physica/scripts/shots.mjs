@@ -17,6 +17,14 @@ const SETS = {
     { name: 'w6-juego', explorer: [-1.2, 0], cam: null },
   ],
 };
+SETS.flora = [
+  { name: 'v1-orilla-cerca', explorer: [-8, 0], cam: [-8.5, 0.7, 4.5] },
+  { name: 'v2-cara-terraza-borde-region', explorer: [-1.2, 0], cam: [4.1, 3.0, 4.2] },
+  { name: 'v3-sima-helechos', explorer: [-1.2, 0], cam: [2.2, -1.6, 6] },
+  { name: 'v4-pozo-paredes', explorer: [10.3, 4.4], cam: [11.8, 1.6, 5] },
+  { name: 'v5-terraza-arriba', explorer: [7, 4.4], cam: [8, 5.0, 6] },
+  { name: 'v6-juego-orilla', explorer: [-12, 0], cam: null },
+];
 const SHOTS = SETS[process.argv[4]] || [
   { name: 'a-inicio', explorer: [-16, 0], cam: null },
   { name: 'b-cascada', explorer: [-1.2, 0], cam: null },

@@ -8,6 +8,7 @@ import { rockMaterial, strataBlock, setWetZones } from './rock.js';
 import { waterMaterial, waterTube, waterSheet, fieldPath, foamMound } from './water.js';
 import { Particles } from './particles.js';
 import { Moss, Plumbs } from './flora.js';
+import { Vegetation } from './vegetation.js';
 import { makeMaterials, Stand, sphereMesh, fieldAnchor, conduit, Traces, chainProp, Bell, ApexMarks } from './props.js';
 import { STREAM_SPEED, TERRACE_Y, BELL_LINE, WELL, MIRADOR_Y, MIRADOR_LINE } from '../sim/levels/cascada.js';
 
@@ -294,40 +295,29 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const sphereMeshes = new Map();
   for (const b of world.bodies) if (b.kind === 'sphere') { const m = sphereMesh(b.r, M); scene.add(m); sphereMeshes.set(b.id, m); }
 
-  // Grass tufts on the walkable tops, leaning against the local pull with the wind.
-  const blades = [];
-  const bladeGeo = new THREE.ConeGeometry(0.025, 0.28, 3); bladeGeo.translate(0, 0.14, 0);
-  const grass = new THREE.InstancedMesh(bladeGeo, new THREE.MeshLambertMaterial({ color: '#8fa35a' }), quality === 'low' ? 500 : 1100);
-  let gs = 5; const gr = () => (gs = (gs * 16807) % 2147483647) / 2147483647;
-  const tops = [[-21, -0.25, 0], [4.75, WELL.x0 - 0.1, TERRACE_Y], [WELL.x1 + 0.1, 16.4, MIRADOR_Y], [17.8, 18.7, TERRACE_Y]];
-  const topLen = tops.map(t => t[1] - t[0]), topSum = topLen.reduce((a, b) => a + b, 0);
-  for (let i = 0; i < grass.count; i++) {
-    let pickT = gr() * topSum, ti = 0; while (pickT > topLen[ti]) { pickT -= topLen[ti]; ti++; }
-    const [x0, x1, y] = tops[Math.min(ti, tops.length - 1)];
-    const x = x0 + gr() * (x1 - x0);
-    let z = -3.3 + gr() * 4.8;
-    if (Math.abs(z - Z_STREAM) < 0.95) z = gr() < 0.5 ? Z_STREAM - 1.0 - gr() * 0.5 : Z_STREAM + 1.0 + gr() * 0.3;
-    if (Math.abs(z) < 0.35 && gr() < 0.75) z += 0.6;
-    blades.push({ x, y, z, s: 0.6 + gr() * 0.8, rot: gr() * 6.28, ph: gr() * 6.28 });
-    grass.setColorAt(i, new THREE.Color().setHSL(0.2 + gr() * 0.06, 0.35 + gr() * 0.2, 0.36 + gr() * 0.16));
-  }
-  grass.receiveShadow = true;
-  scene.add(grass);
-  const tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpE = new THREE.Euler(), tmpS = new THREE.Vector3(), tmpP = new THREE.Vector3(), ga = { x: 0, y: 0 };
-  const updateGrass = time => {
-    blades.forEach((b, i) => {
-      field.at(b.x, b.y + 0.1, ga);
-      const g = Math.hypot(ga.x, ga.y) || 1;
-      // Blades stand against the pull; where it weakens (the lip's band) the wind bends them more.
-      const lean = (1 - Math.min(1, g / 9.8)) * 0.9 + Math.sin(time * 1.7 + b.ph) * 0.12;
-      tmpE.set(0, b.rot, lean); tmpQ.setFromEuler(tmpE);
-      tmpS.set(b.s, b.s, b.s);
-      tmpP.set(b.x, b.y, b.z);
-      tmpM.compose(tmpP, tmpQ, tmpS); grass.setMatrixAt(i, tmpM);
-    });
-    grass.instanceMatrix.needsUpdate = true;
-  };
-  updateGrass(0);
+  // Vegetation with identity (painted plants, vegetation.js): tufts, flowers, moss cushions and
+  // succulents on the walkable tops, reeds along the channels, ferns out of the faces of the
+  // chasm and of the Pozo. The ferns' tips follow the local field: they flip at each region's edge.
+  // Instruments come first: no tall plant behind a support, the mast, a bell or the table.
+  const instrumentX = [-2.9, -1.0, mastX, 10.1, WELL.x1 + 0.35, -5.5];
+  const veg = new Vegetation(scene, field, {
+    quality,
+    tops: [[-21, -0.25, 0], [4.75, WELL.x0 - 0.1, TERRACE_Y], [WELL.x1 + 0.1, 16.4, MIRADOR_Y], [17.8, 18.7, TERRACE_Y]],
+    avoid: (x, z, tall) => Math.abs(z - Z_STREAM) < 0.95 || (x > -6.5 && x < -4.5 && z < -0.2) ||
+      (tall && z < 0.3 && instrumentX.some(ix => Math.abs(x - ix) < 0.6)),
+    streams: [{ x0: -18.5, x1: DRAIN_X - 0.7, y: 0, z: Z_STREAM, half: 0.82 }, { x0: land.x + 0.6, x1: WELL.x0 - 0.4, y: TERRACE_Y, z: Z_STREAM, half: 0.82 },
+      { x0: WELL.x1 + 0.4, x1: 18.4, y: TERRACE_Y, z: Z_STREAM, half: 0.82 }],
+    // Ferns on the Terraza's face only: it crosses the region's top edge (y = 3), so they curl up
+    // below it and droop above it. A gap at 2.75–3.6 leaves the edge's anchor in view (it is on the
+    // back wall and, seen from the camera, lands there). They stay behind the measurement plane
+    // (labels at z 0.08), short enough to keep clear of the rising column, and a second layer
+    // behind the water lane thickens the band around the edge.
+    // Above the edge they are shorter (the crest passes close to the face there) and start higher,
+    // so their droop stays clear of the edge's anchor ring.
+    walls: [{ x: 4.5, nx: -1, z: [[-0.75, -0.45]], bands: [[-0.9, 2.6]], step: 0.5 },
+      { x: 4.5, nx: -1, z: [[-0.75, -0.45]], bands: [[3.9, 4.3]], step: 0.36, scale: 0.68 },
+      { x: 4.5, nx: -1, z: [[-3.1, -2.7]], bands: [[1.4, 2.3], [3.9, 4.3]], step: 0.5, scale: 0.85 }],
+  });
 
   const traces = new Traces(scene);
   const v3 = new THREE.Vector3();
@@ -360,7 +350,7 @@ export function buildScene(world, { quality = 'high' } = {}) {
       g.userData.ring.position.y = y; g.userData.pointer.position.y = y;
     }
     traces.sync(world.traces, id => { const b = world.bodies.find(x => x.id === id); return LANE_Z[b?.lane ?? 0] + 0.22; });
-    if ((time * 30 | 0) % 2 === 0) updateGrass(time);
+    if ((time * 30 | 0) % 2 === 0) { const av = world.avatar; veg.update(time, { x: av.x, y: av.y - av.hh }); }
   }
 
   function onEvent(e) {
@@ -375,5 +365,5 @@ export function buildScene(world, { quality = 'high' } = {}) {
     if (e.type === 'apex' && e.body === world.avatar.id && e.x > WELL.x0 && e.x < WELL.x1 && e.centre > TERRACE_Y) wellMarks.add(e.centre, e.from);
   }
 
-  return { scene, sun, hemi, update, onEvent, setCityVisible: v => { city.visible = v; }, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts };
+  return { scene, sun, hemi, update, onEvent, setCityVisible: v => { city.visible = v; }, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts, veg };
 }

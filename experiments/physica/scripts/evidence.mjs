@@ -188,7 +188,11 @@ async function wellAttempt(letGo, name, label) {
   await walkTo(10.65);
   await page.keyboard.press('e'); await sleep(150);
   const held = await page.evaluate(() => window.__physica.world.avatar.heldBy?.chain?.id);
-  await holdUntil('ArrowDown', async () => (await state()).avatar.y <= letGo, 10);
+  // Hold ▼ to near the target, then short taps (the chain only moves while ▼ is held): under
+  // machine load the poll's latency let a single long hold overshoot by 0.2 m and more, which
+  // moved a "too high" attempt into the window.
+  await holdUntil('ArrowDown', async () => (await state()).avatar.y <= letGo + 0.3, 10);
+  for (let i = 0; i < 40 && (await state()).avatar.y > letGo; i++) { await page.keyboard.down('ArrowDown'); await sleep(50); await page.keyboard.up('ArrowDown'); await sleep(60); }
   const at = (await state()).avatar.y;
   await page.keyboard.press('e');
   const shots = []; const t0s = (await state()).t; let outcome = null, k2 = 0;

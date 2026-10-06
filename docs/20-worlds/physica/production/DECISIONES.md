@@ -192,3 +192,22 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
   - gotas de esfuerzo. Las gotas son puntos libres en el mismo campo: en la región caen hacia arriba, como todo.
 - **Cámara:** flotando en una región, el cuadro se abre un poco (+0,9 m de distancia). Con movimiento reducido no se aplica.
 - **Representación, no física:** nada de esto mueve el cuerpo simulado. En el agua el dibujo se hunde hasta la cintura, mientras la caja simulada descansa sobre la superficie. El agua no es un instrumento de medida.
+
+## D14 · Vegetación con identidad, y helechos que muestran el campo (iteración 08)
+
+**El problema:** el pasto eran unos 1100 conos verdes de tres caras, lo más «de programador» que quedaba en todos los cuadros de juego. Además, ninguna planta mostraba el campo; sólo el musgo de la sima lo hacía.
+
+**Elegido:**
+- **Plantas pintadas** (imagen generada, `art/PROCEDENCIA.md`) en tarjetas instanciadas, en un solo llamado de dibujo.
+  - La cámara del diorama mira siempre de frente, así que una tarjeta se lee como la planta entera.
+  - El espejado se hace en la textura: con una escala negativa se invierte el orden de los vértices y se ve la cara trasera, sin luz.
+  - Cada tarjeta usa el rectángulo medido de su planta, así su base es la base de la planta.
+- **Comunidades:**
+  - **Arriba:** matas, flores, suculentas y musgo. Cerca del camino sólo plantas bajas; el pasto alto, bien atrás.
+  - **Juncos** en matas sobre la orilla de enfrente de cada canal (la orilla de acá da al camino).
+  - **Helechos** que salen de las caras de la sima y del Pozo.
+- **Física de la flexión** (sólo representación):
+  - Una planta erguida tiene el campo a lo largo del tallo: un cambio vertical sólo la comprime, así que las plantas del suelo muestran el viento y se apartan al paso del explorador, no el campo.
+  - Un helecho que sale de una pared es una pequeña ménsula: la punta se desvía a lo largo del campo local y en proporción a él (`fieldBend`, con prueba).
+  - Por eso los helechos se doblan hacia abajo afuera y se enroscan hacia arriba adentro. En la cara de la Terraza, que cruza el borde superior de la región (y = 3), se dan vuelta en el borde. En el Pozo pasa lo mismo, en y = 1.
+- **Instrumentos primero:** los helechos quedan detrás del plano de medición (los rótulos están en z 0,08). En la primera versión tapaban los rótulos de la cadena.

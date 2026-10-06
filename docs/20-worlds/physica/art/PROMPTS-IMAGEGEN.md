@@ -1,6 +1,6 @@
 # Physica — assets candidatos para generación de imágenes
 
-**Estado:** las prioridades 1, 2 y 3 se generaron el 2026-10-05 por la vía C (ver abajo) y están integradas (ver `PROCEDENCIA.md`). Las prioridades 4 y 5 siguen pendientes.
+**Estado:** las prioridades 1, 2 y 3 se generaron el 2026-10-05 y la 4 (vegetación) el 2026-10-06, todas por la vía C (ver abajo), y están integradas (ver `PROCEDENCIA.md`). La prioridad 5 sigue pendiente.
 
 ## Cómo se hizo en Ohmdal y por qué no se puede igual acá
 

@@ -31,7 +31,7 @@ primero.
 | A19 | La columna se rompe en la cresta (gotas, sección variable) y salpica con volumen al llegar | Secuencia antes/después comparable | hecho (iter 5, `evidence/iter-05`; revisión independiente aplicada; la corona de la cresta se ve poco y las pozas son rectángulos) |
 | A24 | Modelo 3D del explorador fiel al retrato (lentes de las antiparras, mechones, colas de bufanda, proporción) | Vista de giro del modelo junto al retrato | hecho (iter 6, `evidence/iter-06`; revisión independiente en dos pasadas; quedan la silueta del pelo más redonda que en la hoja y la pista del campo poco visible en la cámara de juego) |
 | A25 | Tiempos de cuadro validados en una máquina tranquila | p99 ≤ 17 ms y máx. ≤ 34 ms durante 60 s, con el cruce y la vista | parcial (iter 5: cruce con máx. 16,8 ms y 0 pasos perdidos con carga ~4; faltan los 60 s y la vista) |
-| A23 | Assets generados (textura de estratos, telón con la ciudad, retrato) | Generados con Codex CLI e integrados (iter 4, `art/PROCEDENCIA.md`). Faltan vegetación y papel de la Bitácora. | parcial |
+| A23 | Assets generados (textura de estratos, telón con la ciudad, retrato) | Generados con Codex CLI e integrados (iter 4, `art/PROCEDENCIA.md`). Faltan vegetación y papel de la Bitácora. | parcial (iter 8: vegetación pintada integrada, con helechos que siguen el campo; falta el papel de la Bitácora) |
 | A16 | Accesibilidad: movimiento reducido, texto legible, señales redundantes, remapeo | `?reduced` existe y no hay menú; falta un menú de opciones con volumen, movimiento reducido y tamaño de texto | pendiente |
 
 ## Hito B — primer episodio (no empezado)

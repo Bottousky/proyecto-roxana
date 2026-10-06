@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 07 (el cuerpo cuenta el estado físico; ver `evidence/iter-07`).
+**Actualizado:** 2026-10-06 · iteración 08 (vegetación con identidad; ver `evidence/iter-08`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,17 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 07):** el explorador elige su pose a partir del estado simulado (D13).
+**Último cambio aceptado (iteración 08):** plantas pintadas en lugar de los conos verdes (D14).
+- **Plantas:** matas mixtas, flores y musgo arriba; juncos con huecos en la orilla de enfrente de cada canal.
+- **Helechos** en la cara de la Terraza, que siguen el campo (arco con bisagra en la raíz, saturado): cuelgan arriba del borde de la región y se enroscan hacia arriba adentro.
+- **Instrumentos despejados.**
+- **Plantas asentadas:** sombra, normales hacia el cielo y bordes sin halo.
+- **Revisión independiente:** dos pasadas.
+- **Evidencia:** antes y después en las mismas tomas; prueba del giro con el campo del nivel; recorrido sin regresiones.
+
+  Ver `evidence/iter-08`.
+
+**Iteración 07:** el explorador elige su pose a partir del estado simulado (D13).
 - **Poses:**
   - frenar, con los pies que patinan;
   - empujar y cargar, con las manos sobre la esfera;
@@ -97,7 +107,8 @@
 
 **Qué falla todavía (ver BACKLOG):**
 - **Acabado del Hito A** (el mayor impedimento para cerrarlo):
-  - pasto, musgo e instrumentos genéricos;
+  - las barbas de musgo escalonadas, las manchas planas de verde del suelo y los instrumentos genéricos desentonan con las plantas pintadas;
+  - el giro de los helechos se lee débil en la cámara de juego;
   - las colas de la bufanda suben en la región, pero en la cámara de juego casi no se ven (A24, parcial); el cuerpo sí cuenta el campo con la pose suspendida;
   - el esfuerzo en la cadena se lee poco a escala de juego (A12, parcial);
   - la corona de la cresta se ve poco y las pozas son rectángulos.
@@ -116,16 +127,20 @@
 
 ## Próximo resultado
 
-**Vegetación e instrumentos con identidad (A23, legibilidad A22).**
-- **Vegetación:** el pasto de conos verdes y el musgo genérico ocupan el primer plano de todos los cuadros de juego, y son lo más «programador» que queda a la vista. Se reemplazan por vegetación con identidad, que se oriente según el campo como el musgo: pastos y juncos que se doblan hacia arriba en la región, flores, suculentas.
-- **Lado de la Orilla legible (A22):**
-  - el mástil de plomadas no debe parecer una escalera;
-  - cada soporte tiene que mostrar a qué esfera corresponde.
+**Lado de la Orilla legible (A22) y el suelo a la altura de las plantas.**
+- **El mástil de plomadas** no debe parecer una escalera.
+- **Cada soporte** tiene que mostrar a qué esfera corresponde.
+- **La cadena** tiene que explicar por qué no se ofrece mientras el explorador lleva una esfera en la mano.
+- **El suelo y el musgo:**
+  - las manchas planas de verde se reemplazan por un suelo pintado;
+  - las barbas de musgo escalonadas, por hebras suaves que sigan marcando el campo;
+  - todo coherente con las plantas pintadas.
 - **Criterio:**
-  - antes/después en las mismas tomas de juego;
-  - la vegetación responde al campo de forma medible (la inclinación sigue al campo local);
-  - recorrido con teclado sin regresiones, 60 FPS;
-  - revisión independiente centrada en arte.
+  - antes/después en las mismas tomas;
+  - una revisión independiente que no confunda el mástil con una escalera y asocie cada soporte con su esfera sin texto;
+  - recorrido con teclado sin regresiones.
+
+*Plan cumplido en la iteración 08:* vegetación con identidad (A23, parte): plantas pintadas; helechos que siguen el campo, con prueba.
 
 *Plan cumplido en la iteración 07:* poses legibles por estado (A12): secuencias en la cámara de juego con una pose distinta por estado y el campo en la postura (suspendido, sobresalto).
 
