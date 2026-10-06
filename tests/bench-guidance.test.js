@@ -177,3 +177,12 @@ test("Edda's lost bet in the Castillo is what the model shows: the infirmary doe
   const alone = evaluatePuzzle('distribution', s).solution.branches.clinic.voltage;
   assert.ok(Math.abs(together - alone) < .05, `infirmary ${together.toFixed(2)} V with the kitchen, ${alone.toFixed(2)} V alone`);
 });
+
+test('a loose terminal shows where a path is cut, and the mark goes once the bench works', () => {
+  const b = bench('beacon_supply');
+  const html = b.html();
+  for (const id of ['lineBa', 'lineBb']) assert.match(html, new RegExp(`wb-open[^"]*" data-node="[^"]*" data-port="${id}"`), `${id} is loose`);
+  assert.doesNotMatch(html, /wb-open[^"]*" data-node="[^"]*" data-port="lineAa"/, 'a wired terminal is not marked');
+  const s = initialPuzzleSnapshot('beacon_supply'); PUZZLES.beacon_supply.solve(s); s.sourceOn = true;
+  assert.doesNotMatch(bench('beacon_supply', s).html(), /wb-open/);
+});

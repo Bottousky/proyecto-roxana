@@ -87,6 +87,8 @@
 .wb-terminal.selected{border-color:#fff0bf;box-shadow:0 0 0 6px #e7ce8477,0 0 20px #ecc779aa;animation:wb-breathe 1.2s infinite}
 .wb-terminal.wb-can-join{box-shadow:0 2px 5px #0009,0 0 0 5px #8fd09e88,0 0 16px #8fd09e66}
 .wb-terminal.wb-cannot{opacity:.38}
+.wb-terminal.wb-open{box-shadow:0 2px 5px #0009,0 0 0 4px #0a1d1699,0 0 0 6px #e3a764aa}
+.wb-rail-port.wb-open{border-style:dashed;border-color:#e3a764aa}
 .wb-terminal.wb-loose{animation:wb-loose 1.6s ease-in-out infinite}
 .wb-terminal.probe-red{box-shadow:0 0 0 5px #c96244;border-color:#ffc3a4}
 .wb-terminal.probe-black{box-shadow:0 0 0 5px #131516,0 0 0 7px #c9d2b188;border-color:#a9b7ab}

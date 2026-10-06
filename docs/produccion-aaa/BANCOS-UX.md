@@ -56,12 +56,30 @@ números siguen disponibles dentro del instrumento («Ver números»).
 arrastrado, mandos del Cerrojo y de las Terrazas, pedido de Ivara, cortocircuito del Portal y
 tarjeta de éxito.
 
+## Teléfono: apaisado primero (ciclo 16)
+
+El usuario propuso probar el teléfono apaisado. Es la forma natural de jugar una aventura en 3D,
+y la investigación sugería ese mismo diseño para el banco: tablero grande y acciones al alcance
+de los pulgares. Con 844×390 emulado, el mundo y el título ya se veían bien, pero el banco se
+reducía a una franja ilegible y el mapa quedaba debajo de su encabezado. Ahora:
+
+- **Banco:** dos columnas. A la izquierda, el tablero tan grande como deja la altura, con cada
+  mando sobre su pieza y botones de 34 px. A la derecha, el objetivo con el paso actual en
+  palabras (los demás, sólo con su marca), los cuatro botones arriba y siempre a mano, y la frase
+  de Ohm debajo, que se desplaza si es larga. Los bornes responden 8 px más allá de su borde.
+- **Mapa:** la guía y las pestañas a la izquierda; el mapa entero a la derecha.
+- **Bitácora:** la página ocupa casi toda la altura. **Diálogo:** más bajo, deja ver la escena.
+- **En vertical:** el título y los bancos sugieren girar el teléfono, sin impedir seguir así. La
+  barra de Ohm ya no queda fija sobre el tablero: en la prueba táctil tapaba los bornes.
+
+`scripts/qa-landscape.mjs` captura todas esas pantallas y `qa-touch.mjs` acepta `SIZE=844x390`.
+
 ## Pendiente o NO VERIFICADO
 
 - **Prueba con personas: NO VERIFICADA.** La investigación recomienda partidas grabadas con
   jugadores nuevos que narren en voz alta. Nada de lo medido acá sustituye eso.
-- **Teléfono real: NO VERIFICADO.** Sólo con emulación táctil a 390×844, donde las placas pasan a
-  una lista bajo el tablero y los bornes también aparecen en una lista cómoda.
+- **Teléfono real: NO VERIFICADO.** Sólo con emulación táctil: apaisado 844×390 y 740×360, y
+  vertical 390×844.
 - No implementado, para discutir: pistas que cambian según el error cometido (hoy son una
   secuencia fija de cuatro), una pregunta de predicción en los bancos clave (por ejemplo, antes de
   que Ivara aísle la cocina) y señalar en el tablero dónde se corta un camino abierto.

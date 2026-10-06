@@ -427,6 +427,20 @@ Pruebas actualizadas al comportamiento nuevo, sin borrar ninguna: raíz 291/291 
 83/83. Nuevo `scripts/qa-bench-flow.mjs`, que juega cinco bancos con el mouse. Las partidas
 completas se registran en [ACEPTACION.md](ACEPTACION.md).
 
+## Ciclo 16 · El teléfono, apaisado (6 oct 2026)
+
+El usuario preguntó si no convenía probar el teléfono apaisado. Sí: es la forma natural de jugar una
+aventura en 3D. Con 844×390 emulado, el mundo y el título se veían bien, pero el banco se reducía a
+una franja ilegible, el mapa quedaba debajo de su encabezado, la Bitácora casi no dejaba lugar a la
+página y el diálogo tapaba media escena. Todo eso quedó resuelto. El detalle, con capturas, está en
+[BANCOS-UX.md](BANCOS-UX.md#teléfono-apaisado-primero-ciclo-16): banco en dos columnas, mapa con
+la guía al costado, Bitácora a pantalla completa y diálogo más bajo. En vertical, el juego sugiere
+girar el teléfono.
+
+También quedó resuelta la falla táctil de la candidata `3422928`. En vertical, la barra de Ohm
+estaba fija sobre el tablero y tapaba los bornes que la prueba tocaba. Ahora va debajo del tablero.
+La partida táctil vertical pasa completa (`output/qa-touch-390x844/`).
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -451,6 +465,7 @@ completas se registran en [ACEPTACION.md](ACEPTACION.md).
 | 16 | Navegación | Detalles atravesables a la altura del pecho | Hecho (ciclo 10): 13 eran falsos positivos (margen menor que el cuerpo); 3 reales corregidos |
 | 17 | Assets | `portraits.webp` y `portraits-2.webp` (semirrealistas) ya no se usan: los retratos activos están en `art-polish/` y coinciden con los sprites | Limpieza |
 | 18 | Puzzles/UI | Bancos difíciles de entender: qué hacer, cómo, cuándo está bien, cómo seguir (reporte del usuario) | Hecho (ciclo 15): ver BANCOS-UX.md. Prueba con personas NO VERIFICADA |
+| 19 | Móvil | Teléfono apaisado: banco ilegible, mapa fuera de la vista | Hecho (ciclo 16) en emulación; hardware real NO VERIFICADO |
 
 ## Comandos útiles (desde `experiments/playcanvas`)
 
