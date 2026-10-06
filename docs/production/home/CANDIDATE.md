@@ -74,7 +74,7 @@ artefactos muestran sólo ambiente propio, sin hitos inventados.
 
 ## Riesgos y limitaciones conocidas
 
-- Arte abierto (REVIEW-c11 #10): sprites de visitantes en algunos primeros planos, vereda plana, setos octogonales; protoboard y soldador simples; Física, Programación y Matemática con interiores sin trabajar.
+- Arte abierto: sprites 2D de visitantes al fondo de algunos primeros planos (estilo del juego sobre escena 3D); protoboard y soldador simples; Física, Programación y Matemática con interiores sin trabajar. (Vereda dentada y setos facetados: corregidos en c12.)
 - La bruma de tarde sigue beige oliva; las colinas quedan fuera del encuadre maestro.
 - bfcache real, sonido escuchado y memoria de GPU: NO VERIFICADOS.
 - El ritmo de las animaciones se revisó con tiras de cuadros (≈11 fps), no con video.

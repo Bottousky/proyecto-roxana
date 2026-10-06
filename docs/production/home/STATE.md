@@ -230,11 +230,18 @@ Medición con la GPU libre a 1440: el perfil alto caía a 53 FPS en la vista gen
 (sin diferencia visible) sostiene 60,1 FPS, p99 16,8 ms. QA final sobre `464af35`: tests 98/98, interacción 32/32,
 teclado 15/15. Paquete §14 en `CANDIDATE.md`.
 
+## Ciclo 12 (2026-10-06) — pulido de primeros planos
+
+- La «vereda dentada y sobreexpuesta» de los acercamientos era el borde pixelado de la sombra del sol y un brillo
+  especular del césped (gloss 0,25 con el sol bajo de frente). Ahora la sombra cubre 48 unidades en vez de 190 al
+  acercarse (texeles ~4× más finos) y pasto, tierra, terreno y setos son mates. Setos con 13 segmentos y normales
+  suaves en lugar de prismas de 7 caras. Antes/después: `evidence/c08/bitland-respuesta.jpg` →
+  `evidence/c12/bitland-respuesta.jpg`; vista general sin regresión `evidence/c12/explorar-10-tarde-1440.jpg`.
+- QA: tests 98/98; interacción 32/32; teclado 15/15. Medición 390: GPU ocupada por tres agentes, sin medir.
+
 ## Siguiente acción exacta
 
-Pulido sin reabrir el diseño (el candidato no depende de esto):
-1. Arte de primeros planos (REVIEW-c11 #10): ocultar o atenuar sprites de visitantes que entren en una pose de cámara,
-   textura/borde de la vereda junto a los talleres, setos menos facetados.
-2. Medición 390 DPR 2 cuando la GPU esté libre (sigue siendo emulación).
-3. Si llegan datos externos (URLs de redes, novedades, origen de los otros mundos), integrarlos en las
-   configuraciones ya preparadas.
+1. Medición 390 DPR 2 cuando la GPU esté libre (sigue siendo emulación); actualizar PERF y CANDIDATE.
+2. Si llegan datos externos (URLs de redes, novedades, origen de los otros mundos), integrarlos.
+3. Sin datos nuevos ni GPU libre: no hay más trabajo de alto impacto ejecutable sin reabrir el diseño (personajes 3D o
+   interiores de mundos no integrados quedan fuera de este alcance); las siguientes ejecuciones deben ser breves.

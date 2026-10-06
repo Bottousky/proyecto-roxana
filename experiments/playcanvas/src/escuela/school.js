@@ -80,7 +80,7 @@ function grounds(k){
 function hedge(k,x,z,w,d){
   const n=Math.max(1,Math.round(Math.max(w,d)/1.6));
   for(let i=0;i<n;i++){const t=(i+.5)/n-.5,px=x+(w>d?t*w:0),pz=z+(d>w?t*d:0),s=.85+noise(i+x,z)*.35;
-    k.lathe('static','hedge',[[0,0],[.95*s,.1],[1.05*s,.8],[.75*s,1.35],[0,1.5]],{x:px,z:pz,seg:7,phase:noise(i,x),tone:[.95+noise(i,2)*.1,1,.95]});}
+    k.lathe('static','hedge',[[0,0],[.95*s,.1],[1.06*s,.55],[1.02*s,.95],[.75*s,1.33],[.3*s,1.5],[0,1.53]],{x:px,z:pz,seg:13,smooth:true,phase:noise(i,x),tone:[.95+noise(i,2)*.1,1,.95]});}
 }
 
 // ── Buildings ───────────────────────────────────────────────────────────────────

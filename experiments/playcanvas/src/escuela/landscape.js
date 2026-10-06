@@ -57,7 +57,7 @@ export function buildLandscape(app,root,{meadow,trees}){
   }
   for(let j=0;j<rings.length-1;j++)for(let i=0;i<seg;i++){const a=j*(seg+1)+i,b=a+seg+1;idx.push(a,a+1,b,b,a+1,b+1);}
   const mesh=new Mesh(app.graphicsDevice);mesh.setPositions(new Float32Array(pos));mesh.setNormals(new Float32Array(nor));mesh.setUvs(0,new Float32Array(uv));mesh.setColors(new Float32Array(col));mesh.setIndices(new Uint32Array(idx));mesh.update();
-  const ground=new StandardMaterial();ground.diffuseMap=meadow;ground.diffuse=new Color().fromString('#cfd6a2');ground.diffuseVertexColor=true;ground.useMetalness=true;ground.metalness=0;ground.gloss=.18;ground.update();
+  const ground=new StandardMaterial();ground.diffuseMap=meadow;ground.diffuse=new Color().fromString('#cfd6a2');ground.diffuseVertexColor=true;ground.useMetalness=true;ground.metalness=0;ground.gloss=.04;ground.update();
   out.terrain=entity('Campiña',mesh,ground,root,{cast:false});
   out.groundMaterial=ground;
   // ── Trees: belts along plot edges and copses, crossed planes merged per sprite. ──

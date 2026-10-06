@@ -18,7 +18,7 @@ con la GPU libre.
 | 7 | MEDIO | Evidencia de bancos con cámara inalcanzable; sin capturas 390 | **Corregido**: capturas con la cámara real de la sala (etapas 0/10) y a 390×844 |
 | 8 | MEDIO | «Reducir movimiento» incompleto | **Corregido**: remolino del Portal congelado; portal, chorros, luciérnagas y linterna sin partículas. QA §9 |
 | 9 | MEDIO | Primer pintado siempre en etapa 0 | **Corregido**: pósters por hora × tramo (0–1, 2–6, 7–10), elegidos leyendo la partida |
-| 10 | MEDIO | Primeros planos: sprites de visitantes, vereda plana, setos octogonales | Abierto (arte) |
+| 10 | MEDIO | Primeros planos: sprites de visitantes, vereda plana, setos octogonales | **Parcial (c12)**: la «vereda dentada y sobreexpuesta» era el borde de la sombra pixelado y un brillo especular del césped → sombra más fina en acercamientos y césped mate; setos redondeados (`evidence/c08/bitland-respuesta.jpg` → `evidence/c12/bitland-respuesta.jpg`). Abierto: sprites 2D de visitantes al fondo de algunos primeros planos (choque de estilo, requiere personajes 3D) |
 | 11 | MEDIO | Docs que afirmaban de más; atribución de ImageGen | **Corregido** en STATE/REVIEW-c07/ASSETS (ver abajo) |
 | 12 | BAJO | Nombres del mapa sobre el marco | **Corregido** |
 | 13 | BAJO | Alfombra estirada | **Corregido**: dos paños a la proporción de la imagen |

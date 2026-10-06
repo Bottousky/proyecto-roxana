@@ -33,11 +33,12 @@ export const HOURS={
 export function hourFor(date=new Date()){const h=date.getHours();return h>=7&&h<15?'manana':h>=15&&h<20?'tarde':'noche';}
 
 const MATERIALS={
-  grass:{map:'meadow',color:'#d2d8a8'},turf:{map:'grass',color:'#7f9353'},earth:{map:'earth',color:'#b09274'},soil:{color:'#4b3b2d'},
+  // Grass and earth are matte: with a glossy lawn the low sun turned it into a white sheen in close-ups.
+  grass:{map:'meadow',color:'#d2d8a8',gloss:.04},turf:{map:'grass',color:'#7f9353',gloss:.04},earth:{map:'earth',color:'#b09274',gloss:.05},soil:{color:'#4b3b2d'},
   stone:{map:'stone',color:'#d3c6ac'},stoneDark:{map:'stone',color:'#9a9080'},cobble:{map:'cobble',color:'#c0b49d'},
   plaster:{map:'stone',contrast:.28,color:'#ecdfc4'},statue:{map:'stone',contrast:.35,color:'#dcd6ca'},
   slate:{map:'slate',color:'#5f737b'},roofPhysica:{map:'slate',color:'#a0624c'},roofBitland:{map:'slate',color:'#5f6c92'},roofArithmos:{map:'slate',color:'#6d8559'},
-  wood:{map:'wood',color:'#a4744c'},woodDark:{map:'wood',color:'#5c3f2c'},floor:{map:'wood',color:'#b88b62'},hedge:{map:'grass',color:'#6a8a4a'},
+  wood:{map:'wood',color:'#a4744c'},woodDark:{map:'wood',color:'#5c3f2c'},floor:{map:'wood',color:'#b88b62'},hedge:{map:'grass',color:'#6a8a4a',gloss:.06},
   bronze:{map:'copper',color:'#c79c5c',metal:.8,gloss:.55},copper:{map:'copper',color:'#c47f4c',metal:.7,gloss:.5},iron:{color:'#393e43',metal:.55,gloss:.45},
   paint:{color:'#ffffff'},curtain:{map:'wood',contrast:.25,color:'#76403a'},lampShade:{color:'#3f7a55',emissive:'#78d69a',glow:.15},
   gold:{map:'copper',contrast:.2,color:'#ffd873',metal:.55,gloss:.72,emissive:'#b0801c',glow:.55},
@@ -845,6 +846,8 @@ export class SchoolDiorama {
     for(const s of this.sprites||[])s.e.enabled=s.stage===0?this.stage<10:this.stage>=s.stage;
     // Grade: the abandoned school is cooler and flatter.
     const warm=this.stage/10,gr=h.grade,close=this.closeK||0;this.frame.grading.saturation=gr[0]*lerp(.78,1.02,warm);this.frame.grading.tint=new Color(lerp(gr[1]*lerp(.95,1,warm),1,.6*close),gr[2],lerp(gr[3]*lerp(1.06,1,warm),1,.6*close));// Close-ups sit a little lower: the near stone and brass were clipping under the afternoon sun.
+    // Close-ups: the sun's shadow map covers a shorter distance, so its texels are finer (no stair-stepped edges).
+    {const sd=lerp(190,48,close);if(Math.abs(this.sun.light.shadowDistance-sd)>.5)this.sun.light.shadowDistance=sd;}
     this.frame.grading.brightness=gr[4]*(1-.26*close);this.frame.bloom.intensity=.022*(1-.6*close);this.frame.update();
     this.stageDirty=false;void force;
   }
