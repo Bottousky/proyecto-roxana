@@ -43,7 +43,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | Id | Concepto | Año ref. | Capítulo | Estado |
 |---|---|---|---|---|
 | A1 | Correspondencia uno a uno | (base de NAP 7°) | 1 | probado-auto |
-| A2 | Cardinalidad; conservación ante reordenar/separar | 1° | 1 | probado-auto |
+| A2 | Cardinalidad; conservación ante reordenar/separar/apretar | 1° | 1 | probado-auto |
+| A2b | Contar como emparejamiento con palabras; la última dice cuántos | 1° | 1 | probado-auto |
 | B0 | Más / menos / igual por correspondencia | 1° | 1 | probado-auto |
 | A3 | Número frente a numeral (nombre ≠ colección) | 1° | 1 | probado-auto |
 | A4 | Unidad, agrupación | 1° | 2 | pendiente |
@@ -67,21 +68,21 @@ transformadas de Laplace/Fourier, integrales múltiples e impropias, derivadas p
 
 ## Contrato educativo por concepto (implementados)
 
-### A1 · Correspondencia uno a uno — cap. 1, escenas 1.3 y 1.5
+### A1 · Correspondencia uno a uno — cap. 1, escenas 1.3, 1.5 y 1.8
 - **Necesidad:** saber si "volvieron todos" cuando no se puede (o no se sabe) contar y las cosas se mueven. Presupone: distinguir individuos.
 - **Error a distinguir:** creer que comparar exige contar; o que basta "ver que hay muchos". En el emparejamiento: unir algo dos veces y no notarlo.
 - **Observa / predice / modifica:** ve marcas fijas y puntos que se mueven; une marca↔punto; deshace; decide cuándo comprobar.
 - **Consecuencia que comprueba:** Punto recorre cada unión; un punto unido a dos marcas se señala como inválido; si sobran de ambos lados "todavía no se sabe"; si sobra sólo una marca, falta alguien.
 - **Otra representación / notación:** marcas de conteo (registro), luego numeral "14" y palabra "catorce".
-- **Transferencia:** las gradas (1.8): otra estructura (asientos vs fila, la sobra está del otro lado, la forma engaña).
+- **Transferencia:** las gradas (1.9): otra estructura (asientos vs fila, la sobra está del otro lado, la forma engaña); y el conteo (1.10) como emparejamiento con palabras.
 
-### A2 · Cardinalidad y conservación — cap. 1, escenas 1.8 y 1.9
+### A2 · Cardinalidad y conservación — cap. 1, escenas 1.9 y 1.10
 - **Necesidad:** decidir si alcanzan los asientos sin dejarse engañar por el largo de la fila.
-- **Error:** "más largo = más" (la fila separada parece tener más).
-- **Observa / predice / modifica:** predice antes (alcanzan / no / hay que emparejar); sienta uno por asiento en el orden que quiera.
-- **Consecuencia:** sobra un asiento aunque las gradas ocupan menos largo; los que están sentados se corren y la cantidad no cambia.
-- **Notación:** "14" nombra lo que comparten marcas, asientos ocupados y presentes.
-- **Transferencia:** Punto hace una marca por cada presente (incluido el estudiante): nueva colección emparejable.
+- **Error:** "más largo = más" (la fila separada, 720 u, parece tener más que unas gradas de 316 u).
+- **Observa / predice / modifica:** predice (no alcanzan / justo / sobra / hay que emparejar) y, si afirma, justifica (contó / tres filas / le pareció); sienta a cada uno en el asiento que quiera; Punto aprieta la fila y vuelve a preguntar.
+- **Consecuencia:** sobra un asiento aunque las gradas son más cortas; apretados, sigue sobrando uno ("cambió el lugar que ocupan, no cuántos son").
+- **Notación:** "14" y "catorce" nombran lo que no cambia entre las marcas, los presentes y las palabras de "uno" a "catorce".
+- **Transferencia:** Punto hace una marca por cada visita (incluido el estudiante y él mismo): nueva colección emparejable, verificada unión por unión.
 
 ### B0 · Más / menos por correspondencia — cap. 1, escenas 1.5, 1.6 y 1.8
 - **Necesidad:** interpretar la marca sola.
@@ -89,12 +90,13 @@ transformadas de Laplace/Fourier, integrales múltiples e impropias, derivadas p
 - **Consecuencia:** el juego responde con la evidencia: la sobra está entre las marcas → hay menos puntos; el registro fue uno a uno → no es un error de anotación.
 - **Límite declarado:** las marcas dicen cuántos, no quién (Punto sabe quién).
 
-### A3 · Número frente a numeral — cap. 1, escena 1.9
-- **Necesidad:** no tener que mirar todas las marcas cada vez: ponerle nombre.
-- **Error:** tratar el numeral como colección ("14" = dos cosas, o "tiene catorce adentro").
-- **Observa / modifica:** Punto intenta emparejar "1" y "4" con dos presentes; el jugador elige qué explicarle (con respuestas que se refutan con lo visible).
-- **Consecuencia:** las marcas sí se emparejan con todos; el numeral no; "14" y "catorce" son dos nombres del mismo número.
-- **Puente:** Punto rodea el "1" de "14": ¿por qué un 1 si no hay uno solo de nada? → valor posicional (cap. 2).
+### A3 · Contar, número y numeral — cap. 1, escena 1.10
+- **Necesidad:** decir cuántos son sin mirar todas las marcas cada vez: contarlas y ponerles nombre.
+- **Error:** tratar el numeral como colección ("14" nombra a dos, o "tiene catorce cosas adentro"); contar una marca dos veces.
+- **Observa / modifica:** el jugador cuenta las marcas de Punto (una palabra por marca, en cualquier orden; repetir se avisa); Punto intenta emparejar "1" y "4" con dos presentes; el jugador elige qué explicarle.
+- **Consecuencia:** la última palabra dice cuántas hay; las marcas se emparejan unión por unión con todos los presentes; el numeral no es una colección; "14" y "catorce" nombran el mismo número.
+- **Límite declarado:** no se niega que "14" tenga estructura: cómo funciona su escritura queda como pregunta.
+- **Puente:** Punto rodea el "1": "¿qué hace un 1 en el nombre de catorce?" → valor posicional (cap. 2).
 
 ## Historia: reconstrucción vs. historia real
 

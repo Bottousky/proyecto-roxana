@@ -1,0 +1,46 @@
+<!doctype html><meta charset="utf-8"><title>Arithmos · análisis de audio</title>
+<body style="background:#111;color:#ddd;font:14px monospace"><pre id="out">analizando…</pre>
+<script type="module">
+import {Sound} from '../src/engine/audio.js';
+const SR = 44100;
+const cases = [
+  ['tiza 1 s', s => s.chalkStart(1), 1.6],
+  ['tiza 2,6 s', s => s.chalkStart(2.6), 3.2],
+  ['golpe', s => s.tap(0.6), 0.5],
+  ['borrador', s => s.erase(1.2), 1.6],
+  ['marea', s => s.marea(7.5), 9],
+  ...['hello', 'happy', 'hop', 'question', 'scared', 'sad', 'no', 'yes', 'surprise'].map(k => [`punto ${k}`, s => s.punto(k), 2.5]),
+  ...['ronda', 'door', 'loss', 'found', 'all', 'reveal', 'night', 'end'].map(k => [`motivo ${k}`, s => s.cue(k), 10]),
+];
+function fftMag(x) {
+  // DFT por bandas (Goertzel) en frecuencias de interés
+  const bands = [125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000, 12000];
+  return bands.map(f => {
+    const k = 2 * Math.cos(2 * Math.PI * f / SR);
+    let s1 = 0, s2 = 0;
+    for (let i = 0; i < x.length; i++) { const s0 = x[i] + k * s1 - s2; s2 = s1; s1 = s0; }
+    return [f, Math.sqrt(s1 * s1 + s2 * s2 - k * s1 * s2) / x.length];
+  });
+}
+const rows = [];
+for (const [name, fn, dur] of cases) {
+  const ctx = new OfflineAudioContext(2, Math.ceil(SR * dur), SR);
+  const s = new Sound();
+  s.unlock(ctx);
+  s.setVolumes({master: 0.8, music: 0.7, sfx: 0.8});
+  fn(s);
+  const buf = await ctx.startRendering();
+  const d = buf.getChannelData(0);
+  let peak = 0, sum = 0;
+  for (const v of d) { peak = Math.max(peak, Math.abs(v)); sum += v * v; }
+  const rms = Math.sqrt(sum / d.length);
+  const mags = fftMag(d);
+  const total = mags.reduce((a, [, m]) => a + m, 0) || 1;
+  const high = mags.filter(([f]) => f >= 6000).reduce((a, [, m]) => a + m, 0) / total;
+  const db = v => (20 * Math.log10(Math.max(v, 1e-9))).toFixed(1);
+  rows.push({name, peakDb: +db(peak), rmsDb: +db(rms), highShare: +high.toFixed(3), clipped: peak >= 0.999});
+}
+document.getElementById('out').textContent = JSON.stringify(rows, null, 1);
+window.__audio = rows;
+window.__ready = true;
+</script>

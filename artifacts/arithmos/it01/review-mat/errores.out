@@ -1,0 +1,49 @@
+[0.0s] escena → undefined
+[0.8s] escena → c1.puerta
+[1.5s] escena → c1.alguien
+[2.2s] elige «Acercarte» (Un punto amarillo, quieto, te mira (o algo parecido).)
+[6.7s] lee: Se escondió.
+[6.7s] elige «Quedarte quieto y esperar» (Punto espía desde su escondite.)
+[7.8s] escena → c1.ronda
+[8.2s] elige «Contarlos ahora, rápido» (¿Cómo recordar a la Ronda?)
+[8.9s] lee: —Uno…
+[8.9s] lee: —Dos…
+[9.0s] lee: —Tres…
+[9.2s] lee: —Cuatro…
+[9.2s] lee: ¿Ese ya lo conté? Se cruzan todo el tiempo.
+[9.3s] lee: Contar es darle a cada uno una palabra: uno, dos, tres… Pero las palabras se las lleva el aire. Y Punto no sabe qué quiere decir "cuatro".
+[9.4s] lee: Necesito algo que se quede quieto y que Punto pueda ver.
+[9.5s] lee: Una marca por cada uno. La piedra no se mueve.
+[22.9s] lee: Cada uno tiene su marca. Y cada marca es de uno.
+[23.2s] escena → c1.marea
+[23.6s] escena → c1.vuelven
+[24.9s] comprueba antes de terminar (error deliberado)
+[26.6s] une un punto a dos marcas (error deliberado)
+[27.3s] deshace la unión doble
+[27.6s] deshace la unión doble
+[27.9s] deshace la unión doble
+[28.2s] deshace la unión doble
+[28.6s] deshace la unión doble
+[34.6s] lee: A cada punto le tocó una marca. Y quedó una marca sola.
+[34.6s] escena → c1.quien
+[36.8s] elige «Que sobra un punto.» (¿Qué quiere decir esa marca sola?)
+[37.4s] lee: No. Lo que quedó sola es una marca, no un punto. Si sobra una marca, faltan puntos.
+[37.5s] elige «Que hice una marca de más.» (¿Qué quiere decir esa marca sola?)
+[38.0s] lee: Puede ser… Pero hice una sola marca por cada uno, y ninguno se quedó con dos.
+[38.0s] lee: Si las marcas están bien, entonces alguien no volvió.
+[38.3s] escena → c1.busqueda
+[39.7s] lee: Una grieta en el pizarrón. Adentro no hay nadie.
+[43.7s] lee: Al lado de la casa borrada, alguien hizo marcas como las mías. Hace mucho.
+[43.8s] lee: Así que no soy el primero que anota para no olvidar.
+[46.8s] lee: Ahí. Debajo del polvo. Casi no se ve.
+[47.0s] escena → c1.todos
+[47.8s] escena → c1.gradas
+[48.2s] elige «No alcanzan: la fila es más larga.» (¿Alcanzan los asientos para toda la fila?)
+[48.8s] lee: Probemos: uno por asiento.
+[55.8s] escena → c1.nombre
+[56.2s] elige «El 14 tiene catorce adentro, pero no se ven.» (¿Qué le explicás a Punto?)
+[56.7s] lee: No. "14" son dos signos y nada más. No hay catorce escondidos adentro.
+[56.7s] elige «Tenés razón: en el 14 hay dos.» (¿Qué le explicás a Punto?)
+[57.3s] lee: Pero entonces "14" diría lo mismo que dos marcas. Y no: dice cuántos somos.
+[57.3s] elige «El 14 no es una colección: es un nombre.» (¿Qué le explicás a Punto?)
+[58.3s] {"ended":true,"final":{"mode":"title","seg":"c1.nombre"},"journal":["¿Están todos?"],"evidenceKinds":["door","meet","record-method","record","record-repeat","recorded","pair","check","unpair","interpret","search","predict","seat","numeral"],"fps":{"min":"36.9","median":"60.0"},"errors":[],"seconds":58.31,"size":"1600x900","touch":false,"route":"errores","watch":false}

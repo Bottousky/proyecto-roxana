@@ -1,0 +1,67 @@
+[0.0s] escena → undefined
+[0.4s] escena → c1.puerta
+[14.9s] lee: Tengo las manos de tiza.
+[19.2s] lee: La puerta se está borrando. No del todo: queda el contorno.
+[22.4s] lee: Acá hubo muchas cosas escritas. Alguien las borró a medias.
+[23.3s] escena → c1.alguien
+[26.7s] lee: Algo se movió.
+[27.6s] elige «Quedarte quieto y esperar» (Un punto amarillo, quieto, te mira (o algo parecido).)
+[38.4s] lee: —Hola.
+[40.2s] lee: No habla. O no habla como yo.
+[41.1s] lee: —¿Tenés nombre?
+[43.6s] lee: Un punto. Nada más que un punto… y nada menos.
+[45.4s] lee: —Te voy a decir Punto. Hasta que me digas cómo te llamás.
+[49.4s] lee: Quiere que lo siga.
+[57.6s] escena → c1.ronda
+[63.2s] lee: —¿Son tuyos? ¿Tu familia?
+[65.0s] lee: Punto es amarillo; ellos son blancos. Pero bailan como él.
+[69.3s] lee: ¿Qué es eso? Está borrando todo a su paso.
+[71.7s] lee: Si pasa por acá, los va a desparramar. Y después, ¿cómo va a saber Punto si volvieron todos?
+[72.6s] elige «Hacer una marca en la piedra por cada uno» (¿Cómo recordar a la Ronda?)
+[74.0s] lee: Una marca por cada uno. La piedra no se mueve.
+[88.8s] lee: Cada uno tiene su marca. Y cada marca es de uno.
+[89.7s] escena → c1.marea
+[102.7s] lee: Se llevó todo. Menos las marcas.
+[104.5s] lee: Lo que alguien hizo entendiendo para qué servía… resistió. Eso parece.
+[105.4s] escena → c1.vuelven
+[116.9s] lee: Se mueven tanto que no se dejan contar. Y Punto no sabe contar.
+[119.3s] lee: Pero las marcas no se mueven. Cada marca era uno de ellos.
+[139.9s] lee: A cada punto le tocó una marca. Y quedó una marca sola.
+[141.8s] escena → c1.quien
+[144.4s] elige «Que falta uno de ellos.» (¿Qué quiere decir esa marca sola?)
+[153.1s] lee: Las marcas saben cuántos. No saben quién. Punto sí.
+[155.2s] lee: —¿Quién falta? ¿El más chico? ¿El que siempre llegaba tarde a la ronda?
+[157.3s] lee: —Vamos a buscarlo.
+[164.8s] escena → c1.busqueda
+[169.4s] lee: Una grieta en el pizarrón. Adentro no hay nadie.
+[175.5s] lee: Al lado de la casa borrada, alguien hizo marcas como las mías. Hace mucho.
+[177.5s] lee: Así que no soy el primero que anota para no olvidar.
+[182.6s] lee: Ahí. Debajo del polvo. Casi no se ve.
+[188.6s] lee: Lo encontramos.
+[189.6s] escena → c1.todos
+[190.4s] lee: Falta una sola unión.
+[196.9s] lee: A cada marca, uno. A cada uno, una marca. No sobra nada.
+[197.8s] lee: —Están todos.
+[201.3s] escena → c1.gradas
+[207.5s] lee: Alguien está dibujando estrellas. No sé quién.
+[210.3s] lee: La Ronda quiere mirarlas desde las gradas. Se pusieron en fila para subir.
+[214.2s] lee: Punto cree que no alcanzan los asientos. La fila es mucho más larga que las gradas.
+[215.2s] elige «No sé. Hay que ver si a cada uno le toca un asiento.» (¿Alcanzan los asientos para toda la fila?)
+[216.8s] lee: Probemos: uno por asiento.
+[227.4s] lee: La fila se vació y sobró un asiento.
+[229.3s] lee: La fila parecía más larga porque estaban separados, no porque fueran más.
+[231.1s] lee: No se podía saber mirando el largo. Emparejando, sí.
+[234.2s] lee: ¿Para mí?
+[243.7s] escena → c1.nombre
+[249.9s] lee: ¡Hizo una marca! Su primera marca.
+[257.2s] lee: Una por cada uno. Hasta una para él… y una para mí.
+[261.5s] lee: Para no tener que mirar todas las marcas cada vez, le pongo un nombre.
+[267.1s] elige «El 14 no es una colección: es un nombre.» (¿Qué le explicás a Punto?)
+[271.9s] lee: Las marcas sí se pueden emparejar con nosotros, sin que sobre nada. Las marcas son una colección: como nosotros, como los asientos ocupados.
+[275.8s] lee: Lo que tienen en común —las marcas, los asientos ocupados, nosotros— no es la forma ni el tamaño: es que se pueden emparejar sin que sobre nada.
+[277.6s] lee: Eso que comparten es el número. "14" y "catorce" son dos nombres para él.
+[280.1s] lee: ¿Por qué un 1, si acá no hay uno solo de nada?
+[281.0s] lee: —Buena pregunta.
+[281.9s] lee: Mañana.
+[288.0s] lee: El capítulo 2 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[290.1s] {"ended":true,"final":{"mode":"title","seg":"c1.nombre"},"journal":["¿Están todos?"],"evidenceKinds":["door","meet","record-method","record","recorded","pair","check","interpret","search","predict","seat","numeral"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":290.072,"size":"1600x900","touch":false,"route":"directa","watch":true}

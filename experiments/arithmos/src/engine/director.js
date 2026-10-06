@@ -2,7 +2,7 @@
 //
 // - El tiempo de juego se detiene en pausa.
 // - Saltar completa animaciones al instante (mismo estado final) hasta la próxima
-//   interacción; los diálogos salteados quedan en el historial.
+//   próxima línea de diálogo o interacción: lo que se dice nunca se saltea.
 // - Abortar (cargar, salir) invalida la escena en curso sin dejar promesas colgadas.
 
 export class Abort extends Error {
@@ -136,7 +136,8 @@ export class Director {
   async say(who, text, opts = {}) {
     const epoch = this.epoch;
     this.game.logLine(who, text, opts);
-    if (this.skipping) return;
+    // "saltar animación" adelanta movimientos, no lo que se dice ni se concluye
+    if (this.skipping) this.setSkipping(false);
     await this.ui.caption(who, text, opts);
     this.check(epoch);
   }

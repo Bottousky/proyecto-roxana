@@ -243,6 +243,7 @@ export class Figure {
       ? [stroke([[ex - sep - 1.6 * k, ey], [ex - sep + 1.6 * k, ey]], {w: 2 * k, p: 0.85, seed: 3}), stroke([[ex + sep - 1.6 * k, ey], [ex + sep + 1.6 * k, ey]], {w: 2 * k, p: 0.85, seed: 4})]
       : [...dotStrokes(ex - sep, ey, 1.5 * k, 5, {p: 1}), ...dotStrokes(ex + sep, ey, 1.5 * k, 6, {p: 1})];
     drawStrokes(ctx, eyes, 1, this.fade);
+    if (this.style) this.#drawStyle(ctx, sk);
     if (this.holdsChalk) {
       const hand = sk.aR[2];
       const elbow = sk.aR[1];
@@ -251,6 +252,27 @@ export class Figure {
       const t = [hand[0] + (dx / l) * 7 * k, hand[1] + (dy / l) * 7 * k];
       drawStrokes(ctx, [stroke([[hand[0] + dx / l * 1, hand[1] + dy / l * 1], t], {w: 4.6 * k, p: 1, wobble: 0, seed: 9, lift: false})], 1, this.fade);
     }
+  }
+
+  /** Rasgos de otros habitantes: bufanda, rodete, sombrero. */
+  #drawStyle(ctx, sk) {
+    const k = sk.k, f = sk.f, st = this.style;
+    const [hx, hy] = sk.head;
+    const r = BONES.head * k;
+    const list = [];
+    if (st.scarf) {
+      const [nx, ny] = sk.neck;
+      list.push(stroke([[nx - 9 * k, ny - 6 * k], [nx, ny - 2 * k], [nx + 9 * k, ny - 6 * k]], {w: 3 * k, p: 0.9, ch: st.scarfCh ?? this.ch, seed: 31, wobble: 0.2}));
+      list.push(stroke([[nx - f * 4 * k, ny - 3 * k], [nx - f * 12 * k, ny + 14 * k], [nx - f * 7 * k, ny + 22 * k]], {w: 2.6 * k, p: 0.85, ch: st.scarfCh ?? this.ch, seed: 32, wobble: 0.2}));
+    }
+    if (st.bun) {
+      list.push(stroke(circleGuide(hx - f * r * 0.7, hy - r * 0.85, r * 0.42, mulberry32(41), {overshoot: 0.2}), {w: 2.6 * k, p: 0.9, ch: this.ch, seed: 41}));
+    }
+    if (st.hat) {
+      list.push(stroke([[hx - r * 1.5, hy - r * 0.75], [hx + r * 1.5, hy - r * 0.8]], {w: 3 * k, p: 0.95, ch: this.ch, seed: 51}));
+      list.push(stroke([[hx - r * 0.85, hy - r * 0.8], [hx - r * 0.7, hy - r * 1.8], [hx + r * 0.7, hy - r * 1.8], [hx + r * 0.85, hy - r * 0.82]], {w: 3 * k, p: 0.9, ch: this.ch, seed: 52}));
+    }
+    drawStrokes(ctx, list, 1, this.fade);
   }
 
   /** Punta de la tiza (para trazar desde la mano). */

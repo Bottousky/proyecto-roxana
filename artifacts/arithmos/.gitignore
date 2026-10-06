@@ -1,5 +1,8 @@
-# Películas y corridas temporales: se regeneran con scripts/playthrough.mjs
-film/
-*/film/
-*/*/film/
+# Películas, capturas de revisores y corridas temporales: pesadas y regenerables.
+# Su ruta queda registrada en docs/arithmos/ARITHMOS_STATE.md y ARITHMOS_REVIEW.md.
+**/film/
 tmp/
+it*/review-*/**/*.png
+it*/review-*/**/*.jpg
+it*/review-*/**/*.jpeg
+it*/review-*/**/*.webm

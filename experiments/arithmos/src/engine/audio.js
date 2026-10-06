@@ -8,15 +8,16 @@ export class Sound {
     this.loops = new Set();
   }
 
-  /** Debe llamarse desde un gesto del jugador. */
-  unlock() {
+  /** Debe llamarse desde un gesto del jugador. `offline` permite analizar sin parlantes. */
+  unlock(offline = null) {
     if (this.ctx) {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
+      if (this.ctx.state === 'suspended' && !this.offline) this.ctx.resume();
       return;
     }
     const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    const ctx = new AC();
+    if (!AC && !offline) return;
+    const ctx = offline || new AC();
+    this.offline = !!offline;
     this.ctx = ctx;
     this.master = ctx.createGain();
     this.master.connect(ctx.destination);
@@ -58,13 +59,14 @@ export class Sound {
   apply() {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
-    this.master.gain.setTargetAtTime(this.vol.master, t, 0.05);
+    // ganancia de mezcla: los sonidos se diseñaron bajos; ver lab/audio.html
+    this.master.gain.setTargetAtTime(this.vol.master * 2.1, t, 0.05);
     this.musicGain.gain.setTargetAtTime(this.vol.music * 0.55, t, 0.05);
     this.sfxGain.gain.setTargetAtTime(this.vol.sfx, t, 0.05);
   }
 
   get ready() {
-    return !!this.ctx && this.ctx.state === 'running';
+    return !!this.ctx && (this.offline || this.ctx.state === 'running');
   }
 
   #noiseBuffer(sec, kind) {
@@ -236,8 +238,8 @@ export class Sound {
     lp.frequency.linearRampToValueAtTime(160, t + sec);
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.5, t + sec * 0.45);
-    g.gain.linearRampToValueAtTime(0.42, t + sec * 0.6);
+    g.gain.linearRampToValueAtTime(0.3, t + sec * 0.45);
+    g.gain.linearRampToValueAtTime(0.25, t + sec * 0.6);
     g.gain.linearRampToValueAtTime(0, t + sec);
     src.connect(lp);
     lp.connect(g);
@@ -316,7 +318,7 @@ export class Sound {
     switch (kind) {
       case 'hello': n(0, 0); n(4, 0.12); n(7, 0.24, 0.3); break; // su firma: tres notas ascendentes
       case 'happy': n(7, 0, 0.12); n(12, 0.09, 0.22); break;
-      case 'hop': n(5 + Math.random() * 2, 0, 0.09, 0.045); break;
+      case 'hop': n(5 + Math.random() * 2, 0, 0.11, 0.09); break;
       case 'question': this.#glide(base, base * 1.33, 0.32, 0.06); break;
       case 'scared': for (let i = 0; i < 5; i++) n(3 - i * 1.5, i * 0.06, 0.08, 0.05); break;
       case 'sad': n(3, 0, 0.35, 0.05); n(-2, 0.3, 0.6, 0.045); break;

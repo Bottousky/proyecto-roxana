@@ -12,7 +12,7 @@ export const CHAPTER_1 = {
     g.setCinematic(true);
     const view = g.camera.current;
     const cx = view.x + view.w / 2;
-    const cy = view.y + view.h * 0.42;
+    const cy = view.y + view.h * 0.16;
     const a = w.add(new Label('end-1', 'Fin del capítulo 1', cx, cy, {size: 60, align: 'center', reveal: 0, z: 60, weight: 700}));
     const b = w.add(new Label('end-2', 'Próximo: Demasiados para marcar', cx, cy + 70, {size: 34, align: 'center', reveal: 0, z: 60}));
     g.audio.cue('end');

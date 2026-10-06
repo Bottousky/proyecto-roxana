@@ -1,0 +1,25 @@
+[0.0s] escena → undefined
+[0.4s] escena → c1.puerta
+[1.1s] escena → c1.alguien
+[1.5s] elige «Quedarte quieto y esperar» (Un punto amarillo, quieto, te mira (o algo parecido).)
+[2.5s] escena → c1.ronda
+[2.9s] elige «Hacer una marca en la piedra por cada uno» (¿Cómo recordar a la Ronda?)
+[3.5s] lee: Una marca por cada uno. La piedra no se mueve.
+[16.5s] lee: Cada uno tiene su marca. Y cada marca es de uno.
+[16.7s] escena → c1.marea
+[17.2s] escena → c1.vuelven
+[24.5s] lee: A cada punto le tocó una marca. Y quedó una marca sola.
+[24.5s] escena → c1.quien
+[26.7s] elige «Que falta uno de ellos.» (¿Qué quiere decir esa marca sola?)
+[27.3s] escena → c1.busqueda
+[28.6s] lee: Una grieta en el pizarrón. Adentro no hay nadie.
+[32.6s] lee: Al lado de la casa borrada, alguien hizo marcas como las mías. Hace mucho.
+[32.7s] lee: Así que no soy el primero que anota para no olvidar.
+[35.6s] lee: Ahí. Debajo del polvo. Casi no se ve.
+[35.8s] escena → c1.todos
+[36.7s] escena → c1.gradas
+[37.1s] elige «No sé. Hay que ver si a cada uno le toca un asiento.» (¿Alcanzan los asientos para toda la fila?)
+[37.7s] lee: Probemos: uno por asiento.
+[44.9s] escena → c1.nombre
+[45.3s] elige «El 14 no es una colección: es un nombre.» (¿Qué le explicás a Punto?)
+[46.2s] {"ended":true,"final":{"mode":"title","seg":"c1.nombre"},"journal":["¿Están todos?"],"evidenceKinds":["door","meet","record-method","record","recorded","pair","check","interpret","search","predict","seat","numeral"],"fps":{"min":"40.0","median":"60.0"},"errors":[],"seconds":46.16,"size":"1600x900","touch":false,"route":"directa","watch":false}

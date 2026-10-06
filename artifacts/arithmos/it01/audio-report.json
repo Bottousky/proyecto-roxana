@@ -1,0 +1,156 @@
+[
+  {
+    "name": "tiza 1 s",
+    "peakDb": -15.1,
+    "rmsDb": -31.8,
+    "highShare": 0.047,
+    "clipped": false
+  },
+  {
+    "name": "tiza 2,6 s",
+    "peakDb": -14.3,
+    "rmsDb": -30.3,
+    "highShare": 0.047,
+    "clipped": false
+  },
+  {
+    "name": "golpe",
+    "peakDb": -24.7,
+    "rmsDb": -46.1,
+    "highShare": 0.013,
+    "clipped": false
+  },
+  {
+    "name": "borrador",
+    "peakDb": -13.7,
+    "rmsDb": -29.5,
+    "highShare": 0.004,
+    "clipped": false
+  },
+  {
+    "name": "marea",
+    "peakDb": -6.7,
+    "rmsDb": -22.2,
+    "highShare": 0.003,
+    "clipped": false
+  },
+  {
+    "name": "punto hello",
+    "peakDb": -16.2,
+    "rmsDb": -38.1,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "punto happy",
+    "peakDb": -17.4,
+    "rmsDb": -42.2,
+    "highShare": 0.001,
+    "clipped": false
+  },
+  {
+    "name": "punto hop",
+    "peakDb": -25.1,
+    "rmsDb": -51.8,
+    "highShare": 0.002,
+    "clipped": false
+  },
+  {
+    "name": "punto question",
+    "peakDb": -26.8,
+    "rmsDb": -45,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "punto scared",
+    "peakDb": -19.2,
+    "rmsDb": -43,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "punto sad",
+    "peakDb": -20.1,
+    "rmsDb": -40,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "punto no",
+    "peakDb": -19.9,
+    "rmsDb": -45.7,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "punto yes",
+    "peakDb": -20.1,
+    "rmsDb": -46.1,
+    "highShare": 0.001,
+    "clipped": false
+  },
+  {
+    "name": "punto surprise",
+    "peakDb": -26.1,
+    "rmsDb": -46.8,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "motivo ronda",
+    "peakDb": -18.4,
+    "rmsDb": -35.7,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "motivo door",
+    "peakDb": -22.4,
+    "rmsDb": -36.1,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "motivo loss",
+    "peakDb": -24,
+    "rmsDb": -43.2,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "motivo found",
+    "peakDb": -18.8,
+    "rmsDb": -40.8,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "motivo all",
+    "peakDb": -20.9,
+    "rmsDb": -35.6,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "motivo reveal",
+    "peakDb": -19,
+    "rmsDb": -35.4,
+    "highShare": 0,
+    "clipped": false
+  },
+  {
+    "name": "motivo night",
+    "peakDb": -26,
+    "rmsDb": -42.1,
+    "highShare": 0.001,
+    "clipped": false
+  },
+  {
+    "name": "motivo end",
+    "peakDb": -19.1,
+    "rmsDb": -35.6,
+    "highShare": 0,
+    "clipped": false
+  }
+]

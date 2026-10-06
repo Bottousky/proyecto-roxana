@@ -1,7 +1,7 @@
 // Capítulo 1 — ¿Están todos? Escenas jugables.
 
 import {Drawing, Label, Link, Custom} from '../engine/world.js';
-import {YELLOW, WHITE, chalkText} from '../engine/chalk.js';
+import {YELLOW, WHITE, chalkText, pressureStyle} from '../engine/chalk.js';
 import {easeInOut, easeOut, lerp, mulberry32} from '../engine/rng.js';
 import {evaluatePairs, togglePair} from '../logic/pairing.js';
 import {
@@ -367,6 +367,7 @@ export const ronda = {
     ctl.speed = 0.35;
     ctl.r = RING.r * 0.92;
     g.setCinematic(false);
+    ctl.speed = 0.22;
     await d.think('Si pasa por acá, los va a desparramar. Y después, ¿cómo va a saber Punto si volvieron todos?');
     let first = await d.choose([
       {id: 'count', text: 'Contarlos ahora, rápido'},
@@ -375,17 +376,15 @@ export const ronda = {
     d.evidence('record-method', {choice: first});
     if (first === 'count') {
       s.setPose('point', 0.3);
-      const words = ['uno', 'dos', 'tres', 'cuatro…'];
-      ctl.speed = 0.75;
+      const words = ['Uno…', 'dos…', 'tres…', 'cuatro…'];
       for (const word of words) {
         s.look(0.8, -0.2 + Math.random() * 0.3);
-        await d.say('student', word.charAt(0).toUpperCase() + word.slice(1) + (word.endsWith('…') ? '' : '…'));
+        await d.say('student', word);
       }
-      ctl.speed = 0.35;
       s.setPose('think', 0.5);
       await d.think('¿Ese ya lo conté? Se cruzan todo el tiempo.');
-      await d.think('Contar es darle a cada uno una palabra: uno, dos, tres… Pero las palabras se las lleva el aire. Y Punto no sabe qué quiere decir "cuatro".');
-      await d.think('Necesito algo que se quede quieto y que Punto pueda ver.');
+      await d.think('Contar es darle a cada uno una palabra, en orden —uno, dos, tres…—, y la última dice cuántos son. Si los fuera tildando a medida que los cuento, funcionaría.');
+      await d.think('Pero Punto no conoce esas palabras. Necesito algo que él también pueda ver y comparar después.');
       s.setPose('idle', 0.5);
     }
     await d.think('Una marca por cada uno. La piedra no se mueve.');
@@ -400,27 +399,66 @@ export const ronda = {
 };
 
 function mareaBand(w, x) {
-  const band = w.ensure('marea-band', () => new Custom('marea-band', {z: -20}));
+  const band = w.ensure('marea-band', () => new Custom('marea-band', {z: 25}));
   band.x = x;
-  band.width = 360;
+  band.width ??= 360;
+  band.strength ??= 0.45;
+  band.t ??= 0;
+  band.specks ??= [];
+  band.lastX ??= x;
+  band.update = dt => {
+    band.t += dt;
+    // polvo de tiza que el borde arrastra
+    const moved = band.x - band.lastX;
+    band.lastX = band.x;
+    if (band.strength >= 0.6 && moved > 0) {
+      const n = Math.min(40, Math.round(moved * 0.5));
+      for (let i = 0; i < n; i++) band.specks.push({x: band.x - Math.random() * 40, y: -100 + Math.random() * 1000, vx: 60 + Math.random() * 260, vy: (Math.random() - 0.4) * 60, life: 0.6 + Math.random() * 0.9, r: 1 + Math.random() * 2.4});
+    }
+    for (const p of band.specks) { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 30 * dt; p.life -= dt; }
+    band.specks = band.specks.filter(p => p.life > 0).slice(-900);
+  };
+  // en el polvo: la franja clara del fieltro, con estrías que tiemblan
   band.renderDust = ctx => {
+    const W = band.width, k = band.strength;
     ctx.save();
-    const grad = ctx.createLinearGradient(band.x - band.width, 0, band.x + band.width * 0.3, 0);
-    grad.addColorStop(0, 'rgba(255,255,255,0.0)');
-    grad.addColorStop(0.55, 'rgba(255,255,255,0.55)');
-    grad.addColorStop(0.85, 'rgba(255,255,255,0.75)');
+    const grad = ctx.createLinearGradient(band.x - W * 1.6, 0, band.x + W * 0.25, 0);
+    grad.addColorStop(0, 'rgba(255,255,255,0)');
+    grad.addColorStop(0.5, `rgba(255,255,255,${0.6 * k})`);
+    grad.addColorStop(0.88, `rgba(255,255,255,${Math.min(1, 1.3 * k)})`);
     grad.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = grad;
-    ctx.fillRect(band.x - band.width, -400, band.width * 1.3, 1700);
-    // estrías verticales del fieltro
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-    for (let i = 0; i < 18; i++) {
-      const xx = band.x - band.width * 0.8 + i * band.width * 0.06;
-      ctx.lineWidth = 6 + (i % 4) * 3;
+    ctx.fillRect(band.x - W * 1.6, -600, W * 1.85, 2200);
+    for (let i = 0; i < 26; i++) {
+      const xx = band.x - W * 1.4 + i * W * 0.06 + Math.sin(band.t * 3 + i) * 4;
+      ctx.strokeStyle = `rgba(255,255,255,${(0.08 + (i % 5) * 0.03) * k * 2})`;
+      ctx.lineWidth = 4 + (i % 4) * 4;
       ctx.beginPath();
-      ctx.moveTo(xx, -400);
-      ctx.lineTo(xx + 30, 1300);
+      ctx.moveTo(xx, -600);
+      ctx.bezierCurveTo(xx + 40, 200, xx - 30, 700, xx + 20, 1600);
       ctx.stroke();
+    }
+    ctx.restore();
+  };
+  // en la tiza: lo que queda debajo del fieltro se apaga mientras pasa
+  band.render = ctx => {
+    if (band.strength < 0.6) return;
+    const W = band.width;
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    const grad = ctx.createLinearGradient(band.x - W * 1.2, 0, band.x + W * 0.2, 0);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(0.55, 'rgba(0,0,0,0.6)');
+    grad.addColorStop(0.9, 'rgba(0,0,0,0.95)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(band.x - W * 1.2, -600, W * 1.4, 2200);
+    ctx.globalCompositeOperation = 'lighten';
+    for (const p of band.specks) {
+      ctx.fillStyle = pressureStyle(WHITE, Math.min(0.75, p.life));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
     }
     ctx.restore();
   };
@@ -441,7 +479,7 @@ async function recordRonda(d, g) {
     m.progress = 1;
     w.get(id).mark = 1;
   });
-  ctl.speed = 0.16;
+  ctl.speed = 0.22;
   let repeats = 0;
   let busy = false;
   await d.interact(ctl2 => new Promise(resolve => {
@@ -527,6 +565,8 @@ export const marea = {
     const band = w.get('marea-band');
     g.setCinematic(true);
     await d.shot(SHOTS.marea, 1.8);
+    band.strength = 1;
+    band.width = 520;
     g.audio.marea(7.5);
     d.describe('La Marea llega: un borrador inmenso pasa por todo el pizarrón.');
     s.setPose('hide', 0.4);
@@ -546,8 +586,7 @@ export const marea = {
     await d.tween(6.2, k => {
       const dt = Math.max(0, k - last) * 6.2;
       last = k;
-      band.x = lerp(500, 3500, k);
-      band.width = 420;
+      band.x = lerp(900, 3500, k);
       g.camera.shake = Math.max(g.camera.shake, 0.5 * Math.sin(k * Math.PI));
       for (const gh of ghosts) {
         const gx = gh.bbox ? gh.bbox.x + gh.bbox.w / 2 : gh.x;
@@ -571,6 +610,7 @@ export const marea = {
       o.dot.fade = 0;
       o.dot.visible = false;
     }
+    await d.tween(0.8, k => { band.strength = 1 - k; });
     w.remove('marea-band');
     // lo que quedó
     base(g, stage('marea-done'));
@@ -703,7 +743,7 @@ export const vuelven = {
       await zip(d, p, s.x + 60, GROUND - 170, 0.35);
       follow(p, s);
       g.audio.punto('question');
-      const title = w.add(new Label('title-card', '¿Están todos?', 2370, 205, {size: 74, align: 'center', reveal: 0, z: 50, weight: 700}));
+      const title = w.add(new Label('title-card', '¿Están todos?', SHOTS.ronda.x + SHOTS.ronda.w / 2, 330, {size: 92, align: 'center', reveal: 0, z: 50, weight: 700}));
       await d.draw(title, 1.6, {key: 'reveal'});
       await d.wait(1.2);
       await d.fadeTo(title, 0, 1);
@@ -802,7 +842,7 @@ async function pairing(d, g) {
       checks++;
       g.ui.setSpots([]);
       const r = evaluatePairs(markIds, RETURNED, links);
-      d.evidence('check', {verdict: r.verdict, pairs: links.length});
+      d.evidence('check', {verdict: r.verdict, pairs: links.length, double: r.doubleRight.length ? 'dot' : r.doubleLeft.length ? 'mark' : null});
       try {
         p.setMode('still');
         // Punto recorre las uniones de izquierda a derecha
@@ -902,7 +942,7 @@ export const quien = {
       reading = await d.choose(options, {prompt: '¿Qué quiere decir esa marca sola?'});
       d.evidence('interpret', {reading});
       if (reading === 'extra') {
-        await d.think('No. Lo que quedó sola es una marca, no un punto. Si sobra una marca, faltan puntos.');
+        await d.think('No. La que quedó sola es una marca, no un punto. Si a cada punto le tocó una marca y sobra una marca, hay menos puntos que marcas.');
         options.splice(options.findIndex(o => o.id === 'extra'), 1);
         continue;
       }
@@ -1014,8 +1054,7 @@ export const busqueda = {
       } else if (which === 'house') {
         s.setPose('lookDown', 0.5);
         await zip(d, p, FIELD.house[0] + 190, GROUND - 90, 0.5);
-        await d.think('Al lado de la casa borrada, alguien hizo marcas como las mías. Hace mucho.');
-        await d.think('Así que no soy el primero que anota para no olvidar.');
+        await d.think('Al lado de la casa borrada, alguien hizo marcas como las mías. Hace mucho. Medio borradas, pero siguen ahí.');
         s.setPose('idle', 0.4);
         follow(p, s);
       } else {
@@ -1078,8 +1117,9 @@ export const todos = {
     const lino = rondaDot(w, RONDA_IDS.indexOf(LINO));
     lino.visible = true;
     lino.fade = 1;
-    lino.x = STONE.x + 260;
-    lino.y = GROUND - 150;
+    // llega por la derecha, lejos de la fila de los emparejados
+    lino.x = STONE.x + STONE.w / 2 + 70;
+    lino.y = GROUND - 90;
     lino.setMode('bob', {home: [lino.x, lino.y]});
     w.removeWhere(o => o.id === 'free-ring');
     g.camera.go(SHOTS.stone);
@@ -1163,10 +1203,31 @@ export const todos = {
 // 1.9 Las gradas (transferencia)
 // ——————————————————————————————————————————————
 
+// La fila: la Ronda y Punto (trece). Las gradas: catorce asientos, compactas.
 const LINE_IDS = [...RONDA_IDS.slice(0, 6), 'punto', ...RONDA_IDS.slice(6)];
 
-function linePos(k) {
-  return [LINE_X0 + k * LINE_GAP, GROUND - 14];
+function linePos(k, gap = LINE_GAP, x0 = LINE_X0) {
+  return [x0 + k * gap, GROUND - 14];
+}
+
+function bottomRightSeat(seats) {
+  return seats.reduce((best, pos, j) => (pos[1] > seats[best][1] + 1 || (Math.abs(pos[1] - seats[best][1]) < 1 && pos[0] > seats[best][0]) ? j : best), 0);
+}
+
+/** Quién está sentado dónde al final: todos salvo el asiento de abajo a la derecha. */
+function seatedMap(g) {
+  if (g.flags.seated && Object.keys(g.flags.seated).length === LINE_IDS.length) return g.flags.seated;
+  const seats = art.seatPositions(GRADAS.x, GROUND, GRADAS.seats);
+  const free = bottomRightSeat(seats);
+  const map = {};
+  let k = 0;
+  seats.forEach((_, j) => { if (j !== free && k < LINE_IDS.length) map[j] = LINE_IDS[k++]; });
+  g.flags.seated = map;
+  return map;
+}
+
+function lineDot(w, id) {
+  return id === 'punto' ? w.get('punto') : rondaDot(w, RONDA_IDS.indexOf(id));
 }
 
 export const gradas = {
@@ -1175,14 +1236,14 @@ export const gradas = {
   setup(g) {
     const w = g.world;
     base(g, stage('night'));
-    w.removeWhere(o => o.id.startsWith('pair-') || o.id === 'crack' || o.id === 'old-marks');
+    w.removeWhere(o => o.id.startsWith('pair-') || o.id === 'crack' || o.id === 'old-marks' || o.id === 'seat-ring');
     stopDance(w);
-    const s = student(w, LINE_X0 - 120);
+    student(w, LINE_X0 - 70);
     punto(w, 0, 0);
     const seats = art.seatPositions(GRADAS.x, GROUND, GRADAS.seats);
     const seated = g.scratch('c1.gradas').seated || {};
     LINE_IDS.forEach((id, k) => {
-      const dot = id === 'punto' ? w.get('punto') : rondaDot(w, RONDA_IDS.indexOf(id));
+      const dot = lineDot(w, id);
       dot.visible = true;
       dot.fade = 1;
       dot.mark = 0;
@@ -1208,8 +1269,7 @@ export const gradas = {
       d.describe('Anochece. Una mano que no se ve dibuja estrellas, una por una.');
       for (let i = 0; i < 12; i++) {
         const st = w.get(`star${i}`);
-        if (!st) continue;
-        st.progress = 0;
+        if (st) st.progress = 0;
       }
       g.audio.cue('night');
       for (let i = 0; i < 12; i++) {
@@ -1221,66 +1281,90 @@ export const gradas = {
       await d.think('Alguien está dibujando estrellas. No sé quién.');
       s.setPose('idle', 0.6);
       await d.shot(SHOTS.gradas, 1.8);
-      await d.think('La Ronda quiere mirarlas desde las gradas. Se pusieron en fila para subir.');
-      // Punto compara a ojo y se preocupa
+      await d.think('La Ronda y Punto quieren mirarlas desde las gradas. Se pusieron en fila para subir.');
+      // Punto compara a ojo: recorre la fila larguísima y después las gradas, compactas
       g.setCinematic(true);
       const [x0] = linePos(0);
       const [x1] = linePos(LINE_IDS.length - 1);
       p.setMode('still');
       await zip(d, p, x0, GROUND - 60, 0.45);
-      await d.tween(0.9, k => { p.x = lerp(x0, x1, k); p.squash = 0.4; }, easeInOut);
+      await d.tween(1.1, k => { p.x = lerp(x0, x1, k); p.squash = 0.4; }, easeInOut);
       p.squash = 0;
-      await zip(d, p, GRADAS.x - 110, GROUND - 190, 0.4);
-      await d.tween(0.6, k => { p.x = lerp(GRADAS.x - 110, GRADAS.x + 110, k); }, easeInOut);
+      const half = 158;
+      await zip(d, p, GRADAS.x - half, GROUND - 170, 0.4);
+      await d.tween(0.5, k => { p.x = lerp(GRADAS.x - half, GRADAS.x + half, k); }, easeInOut);
       tremble(p, 1);
       g.audio.punto('scared');
-      d.describe('Punto recorre la fila, larguísima, y después los asientos, apretados. Tiembla: cree que no alcanzan.');
+      d.describe('Punto recorre la fila, larguísima, y después las gradas, mucho más cortas. Tiembla: cree que no alcanzan.');
       const [hx, hy] = linePos(LINE_IDS.indexOf('punto'));
       await zip(d, p, hx, hy, 0.5);
       p.setMode('bob', {home: [hx, hy]});
       g.setCinematic(false);
-      await d.think('Punto cree que no alcanzan los asientos. La fila es mucho más larga que las gradas.');
+      await d.think('Punto cree que no alcanzan los asientos: la fila es mucho más larga que las gradas.');
     }
     let prediction = scratch.prediction;
     if (!prediction) {
       prediction = await d.choose([
-        {id: 'no', text: 'No alcanzan: la fila es más larga.'},
-        {id: 'yes', text: 'Alcanzan, y sobra lugar.'},
+        {id: 'no', text: 'No alcanzan: la fila es mucho más larga.'},
+        {id: 'justo', text: 'Alcanzan justo: uno por asiento.'},
+        {id: 'sobra', text: 'Alcanzan, y sobra lugar.'},
         {id: 'pair', text: 'No sé. Hay que ver si a cada uno le toca un asiento.'},
       ], {prompt: '¿Alcanzan los asientos para toda la fila?'});
       scratch.prediction = prediction;
       g.flags.prediction = prediction;
-      d.evidence('predict', {prediction});
+      if (prediction === 'justo' || prediction === 'sobra') {
+        scratch.why = await d.choose([
+          {id: 'count', text: 'Conté la fila y conté los asientos.'},
+          {id: 'rows', text: 'Las gradas tienen tres filas de asientos.'},
+          {id: 'guess', text: 'Me pareció.'},
+        ], {prompt: '¿Cómo lo sabés?'});
+        g.flags.why = scratch.why;
+      }
+      d.evidence('predict', {prediction, why: scratch.why || null});
       g.queueSave();
       await d.think('Probemos: uno por asiento.');
     }
-    // sentar: tocar un asiento libre hace subir al primero de la fila
+    // sentar: elegir a alguien de la fila y un asiento (en cualquier orden)
     await d.interact(ctl => new Promise(resolve => {
       const waiting = () => LINE_IDS.filter(id => !Object.values(seated).includes(id));
-      g.setHint(() => ['Cada asiento es para uno solo.', 'Tocá un asiento libre: el primero de la fila sube a ocuparlo.', 'Seguí hasta que la fila se vacíe… o se acaben los asientos.']);
+      let sel = null;
       let busy = false;
+      g.setHint(() => [
+        'Cada asiento es para uno solo, y cada uno de la fila necesita un asiento.',
+        'Tocá a alguien de la fila y después un asiento libre.',
+        'Seguí hasta que se vacíe la fila… o se acaben los asientos.',
+      ]);
       const refresh = () => {
         const left = waiting();
-        g.ui.setSpots(seats.map((pos, j) => rectSpot(`seat${j}`, seated[j] ? 'Asiento ocupado' : 'Asiento libre', {x: pos[0] - 22, y: pos[1] - 40, w: 44, h: 46}, () => sit(j), {disabled: !left.length})));
+        const spots = left.map(id => dotSpot(g, id, id === 'punto' ? 'Punto, en la fila' : 'Uno de la Ronda, en la fila', () => pick(id), {selected: sel === id}));
+        seats.forEach((pos, j) => spots.push(rectSpot(`seat${j}`, seated[j] ? 'Asiento ocupado' : 'Asiento libre', {x: pos[0] - 22, y: pos[1] - 40, w: 44, h: 46}, () => pick(`seat${j}`), {selected: sel === `seat${j}`})));
+        g.ui.setSpots(spots);
       };
-      const sit = async j => {
+      const pick = async id => {
         if (busy || !ctl.alive()) return;
-        if (seated[j]) {
+        g.audio.tap(0.16, 1.7);
+        const isSeat = id.startsWith('seat');
+        if (isSeat && seated[+id.slice(4)]) {
           g.note('Ese asiento ya tiene a alguien.');
-          d.evidence('seat-taken', {seat: j});
+          d.evidence('seat-taken', {seat: +id.slice(4)});
           return;
         }
-        const left = waiting();
-        if (!left.length) return;
+        if (!sel || sel === id || sel.startsWith('seat') === isSeat) {
+          sel = sel === id ? null : id;
+          refresh();
+          return;
+        }
+        const j = +(isSeat ? id : sel).slice(4);
+        const who = isSeat ? sel : id;
+        sel = null;
         busy = true;
-        const id = left[left.length - 1]; // sube el más cercano a las gradas
-        const dot = w.get(id);
-        seated[j] = id;
+        seated[j] = who;
         scratch.seated = seated;
         g.queueSave();
-        d.evidence('seat', {seat: j, who: id});
+        d.evidence('seat', {seat: j, who});
         try {
-          await hop(d, dot, seats[j][0], seats[j][1] - 14, {g, sound: id === 'punto' ? 'hop' : 'tap', h: 60, dur: 0.42});
+          const dot = w.get(who);
+          await hop(d, dot, seats[j][0], seats[j][1] - 14, {g, sound: who === 'punto' ? 'hop' : 'tap', h: 60, dur: 0.42});
           dot.setMode('bob', {home: [dot.x, dot.y]});
         } catch {
           return;
@@ -1293,40 +1377,87 @@ export const gradas = {
     }));
     g.setHint(null);
     const freeSeat = seats.findIndex((_, j) => !seated[j]);
-    g.flags.freeSeat = freeSeat;
     g.setCinematic(true);
-    await d.shot({x: GRADAS.x - 380, y: GROUND - 330, w: 760, h: 400}, 1.2);
+    await d.shot({x: GRADAS.x - 360, y: GROUND - 330, w: 720, h: 400}, 1.2);
     const [sx, sy] = seats[freeSeat];
     const ring = w.add(new Drawing('seat-ring', [art.S(art.circleGuideFor(sx, sy - 10, 26), 551, {w: 2, p: 0.6, ch: YELLOW})], {z: 8, progress: 0}));
     await d.draw(ring, 0.7);
     g.setCinematic(false);
-    await d.think('La fila se vació y sobró un asiento.');
-    await d.think('La fila parecía más larga porque estaban separados, no porque fueran más.');
+    await d.think('La fila se vació y quedó un asiento libre.');
+    const readings = [
+      {id: 'seats', text: 'Hay más asientos que los que estaban en la fila.'},
+      {id: 'line', text: 'Había más en la fila que asientos.'},
+      {id: 'same', text: 'Son la misma cantidad.'},
+    ];
+    for (;;) {
+      const r = await d.choose(readings, {prompt: '¿Qué dice el asiento libre?'});
+      d.evidence('interpret-seat', {reading: r});
+      if (r === 'seats') break;
+      if (r === 'line') await d.think('Si hubiera más en la fila, alguien se habría quedado parado. Lo que sobró es un asiento.');
+      if (r === 'same') await d.think('Si fueran la misma cantidad, no sobraría nada de ningún lado. Y sobró un asiento.');
+      readings.splice(readings.findIndex(o => o.id === r), 1);
+    }
+    const why = scratch.why;
     if (prediction === 'no') {
       await pulse(d, p, 1, -0.3, 0.5);
-      await d.think('Punto y yo pensamos lo mismo. Nos equivocamos los dos: miramos el largo, no los emparejamos.');
-    } else if (prediction === 'yes') {
-      await d.think('Lo dije sin estar seguro. Ahora sí lo sé: a cada uno le tocó un asiento y quedó uno libre.');
+      await d.think('Punto y yo pensamos lo mismo. Nos equivocamos los dos: miramos el largo de la fila, no si a cada uno le tocaba un asiento.');
+    } else if (prediction === 'justo') {
+      await d.think(why === 'count'
+        ? 'No era justo: sobró uno. Si conté, me salteé o repetí a alguien. Contar también es emparejar, cada uno con una palabra: no hay que saltear ni repetir.'
+        : 'Casi: alcanzaron, pero no justo. Sobró uno.');
+    } else if (prediction === 'sobra') {
+      await d.think(why === 'count'
+        ? 'Contar funcionó: contar también es emparejar, cada uno con una palabra. Sentarlos de a uno lo confirma.'
+        : why === 'rows'
+          ? 'Las tres filas hacen que entren en poco espacio; pero el espacio no dice cuántos son. Emparejando, sí: sobró uno.'
+          : 'Acertaste, pero sin saber por qué. Ahora sí lo sabemos: sobró un asiento.');
     } else {
       await d.think('No se podía saber mirando el largo. Emparejando, sí.');
     }
     await d.fadeTo(ring, 0, 0.5);
     w.remove('seat-ring');
-    // se corren para dejar el lugar libre abajo, a la derecha
-    g.setCinematic(true);
-    const last = seats.length - 1;
-    const bottomRight = seats.reduce((best, pos, j) => (pos[1] > seats[best][1] + 1 || (Math.abs(pos[1] - seats[best][1]) < 1 && pos[0] > seats[best][0]) ? j : best), 0);
-    if (freeSeat !== bottomRight) {
-      const who = seated[bottomRight];
-      const dot = w.get(who);
-      delete seated[bottomRight];
-      seated[freeSeat] = who;
-      await hop(d, dot, seats[freeSeat][0], seats[freeSeat][1] - 14, {g, sound: 'tap', h: 40});
-      dot.setMode('bob', {home: [dot.x, dot.y]});
+    // prueba de conservación: Punto los hace bajar y los aprieta en una fila corta
+    if (!scratch.conserved) {
+      g.setCinematic(true);
+      await d.shot(SHOTS.gradas, 1);
+      d.describe('Punto hace bajar a todos y los acomoda bien apretados, en una fila más corta que las gradas.');
+      g.audio.punto('hello');
+      const order = LINE_IDS;
+      const x0 = GRADAS.x - 560;
+      for (const [k, id] of order.entries()) {
+        const dot = w.get(id);
+        hop(d, dot, x0 + k * 20, GROUND - 14, {g, sound: k % 4 ? null : 'tap', h: 40, dur: 0.4}).then(() => dot.setMode('bob', {home: [dot.x, dot.y]})).catch(() => {});
+        await d.wait(0.08);
+      }
+      await d.wait(0.6);
+      g.setCinematic(false);
+      const opts = [
+        {id: 'more', text: 'Ahora sobran más asientos.'},
+        {id: 'same', text: 'Sigue sobrando uno.'},
+        {id: 'fewer', text: 'Ahora faltan asientos.'},
+      ];
+      for (;;) {
+        const r = await d.choose(opts, {prompt: 'Juntos y apretados, ¿alcanzan los asientos?'});
+        d.evidence('conserve', {answer: r});
+        if (r === 'same') break;
+        await d.think('Se juntaron, pero no se fue nadie ni llegó nadie. Si los sentáramos de nuevo, cada uno tendría su asiento… y ¿cuántos sobrarían?');
+        opts.splice(opts.findIndex(o => o.id === r), 1);
+      }
+      await d.think('Juntos o separados, son los mismos. Cambió el lugar que ocupan, no cuántos son.');
+      scratch.conserved = true;
     }
-    scratch.seated = seated;
-    g.flags.seated = seated;
-    void last;
+    // vuelven a sentarse; el asiento libre queda abajo a la derecha, para vos
+    g.setCinematic(true);
+    g.flags.seated = null;
+    const finalSeats = seatedMap(g);
+    for (const [j, who] of Object.entries(finalSeats)) {
+      const dot = w.get(who);
+      hop(d, dot, seats[+j][0], seats[+j][1] - 14, {g, sound: null, h: 50, dur: 0.45}).then(() => dot.setMode('bob', {home: [dot.x, dot.y]})).catch(() => {});
+      await d.wait(0.05);
+    }
+    await d.wait(0.6);
+    scratch.seated = finalSeats;
+    const bottomRight = bottomRightSeat(seats);
     // Punto empuja al estudiante hacia el lugar libre
     p.setMode('still');
     await zip(d, p, s.x + 30, GROUND - 120, 0.6);
@@ -1334,15 +1465,14 @@ export const gradas = {
     s.look(1, -0.2);
     await d.tween(0.5, k => { p.x = s.x + 30 - Math.sin(k * Math.PI) * 14; });
     g.setCinematic(false);
-    await d.think('¿Para mí?');
+    await d.think('¿El que sobra es para mí?');
     s.face(1);
     g.setCinematic(true);
     const [bx] = seats[bottomRight];
-    await d.walk(s, bx + 46, GROUND, 160);
+    await d.walk(s, bx - 6, GROUND, 160);
     s.setPose('sitGround', 0.8);
-    s.face(-0.3);
-
-    const pSeat = Object.entries(seated).find(([, who]) => who === 'punto');
+    s.face(0.6);
+    const pSeat = Object.entries(finalSeats).find(([, who]) => who === 'punto');
     if (pSeat) {
       await zip(d, p, seats[+pSeat[0]][0], seats[+pSeat[0]][1] - 14, 0.6);
       p.setMode('bob', {home: [p.x, p.y]});
@@ -1356,27 +1486,35 @@ export const gradas = {
 // 1.10 El nombre (momento)
 // ——————————————————————————————————————————————
 
-const BOARD = {x: GRADAS.x + 330, y: GROUND - 238};
+const BOARD = {x: GRADAS.x + 300, y: GROUND - 250};
+const MARK_STEP = 34;
+const NUMBER_WORDS = ['uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce'];
+
 function boardMarkPos(i) {
-  return [BOARD.x + i * 20 + Math.floor(i / 5) * 0, BOARD.y];
+  return [BOARD.x + i * MARK_STEP, BOARD.y];
+}
+
+/** Orden en que Punto visita a los presentes: la Ronda (por asiento), vos y, al final, él mismo. */
+function presentOrder(g) {
+  const seated = seatedMap(g);
+  const ronda = Object.keys(seated).sort((a, b) => a - b).map(j => seated[j]).filter(id => id !== 'punto');
+  return [...ronda, 'student', 'punto'];
 }
 
 export const nombre = {
   id: 'c1.nombre',
   title: 'El nombre',
-  moment: 'El nombre de lo que comparten',
+  moment: 'El número y sus nombres',
   setup(g) {
     const w = g.world;
     base(g, stage('seated'));
-    w.removeWhere(o => o.id.startsWith('pmark') || o.id.startsWith('num-') || o.id.startsWith('plink') || o.id === 'one-ring' || o.id === 'seat-ring' || o.id === 'word-14');
+    w.removeWhere(o => /^(pmark|num-|plink|count-|word-|one-ring|seat-ring|end-)/.test(o.id));
     const seats = art.seatPositions(GRADAS.x, GROUND, GRADAS.seats);
-    const seated = g.flags.seated || Object.fromEntries(LINE_IDS.map((id, k) => [k, id]));
-    const bottomRight = seats.reduce((best, pos, j) => (pos[1] > seats[best][1] + 1 || (Math.abs(pos[1] - seats[best][1]) < 1 && pos[0] > seats[best][0]) ? j : best), 0);
-    const s = student(w, seats[bottomRight][0] + 46, {pose: 'sitGround', facing: -0.3});
-    void s;
+    const seated = seatedMap(g);
+    student(w, seats[bottomRightSeat(seats)][0] - 6, {pose: 'sitGround', facing: 0.6});
     punto(w, 0, 0);
     for (const [j, id] of Object.entries(seated)) {
-      const dot = id === 'punto' ? w.get('punto') : rondaDot(w, RONDA_IDS.indexOf(id));
+      const dot = lineDot(w, id);
       dot.visible = true;
       dot.fade = 1;
       dot.x = seats[+j][0];
@@ -1389,82 +1527,137 @@ export const nombre = {
     const w = g.world;
     const s = w.get('student');
     const p = w.get('punto');
-    const seated = g.flags.seated || {};
-    const seats = art.seatPositions(GRADAS.x, GROUND, GRADAS.seats);
-    // Punto intenta marcar, como vio hacer
+    const order = presentOrder(g);
+    const visit = async id => {
+      if (id === 'punto') {
+        // una marca también para él mismo: duda, gira en el lugar
+        g.audio.punto('question');
+        await d.tween(0.6, k => { p.scale = 1 + Math.sin(k * Math.PI) * 0.4; p.squash = Math.sin(k * Math.PI * 2) * 0.3; });
+        p.scale = 1;
+        p.squash = 0;
+        return;
+      }
+      const [tx, ty] = id === 'student' ? s.headPos() : [w.get(id).x, w.get(id).y];
+      await zip(d, p, tx, ty - 26, 0.16);
+      if (id !== 'student') w.get(id).lift = 6;
+      await d.wait(0.06);
+      if (id !== 'student') w.get(id).lift = 0;
+    };
+    const markFor = (i, progress = 0) => w.add(new Drawing(`pmark${i}`, art.tally(`pmark${i}`, ...boardMarkPos(i), 36).map(st => recolor(st, YELLOW)), {z: 9, progress}));
     g.setCinematic(true);
     await d.shot(SHOTS.nombre, 1.6);
     p.setMode('still');
-    await zip(d, p, BOARD.x - 40, BOARD.y, 0.6);
-    d.describe('Punto se lanza contra el pizarrón, como quien prueba una tiza.');
+    d.describe('Punto va hasta uno de la Ronda y después se lanza contra el pizarrón, como quien prueba una tiza.');
+    // el primero: visita, intenta marcar dos veces sin lograrlo, y a la tercera
+    await visit(order[0]);
     for (let attempt = 0; attempt < 2; attempt++) {
-      await zip(d, p, BOARD.x - 40, BOARD.y + 26, 0.12);
+      await zip(d, p, boardMarkPos(0)[0], BOARD.y - 30, 0.3);
+      await zip(d, p, boardMarkPos(0)[0], BOARD.y + 10, 0.12);
       g.audio.tap(0.3, 1.4);
       await pulse(d, p, 1, -0.35, 0.15);
-      await zip(d, p, BOARD.x - 40, BOARD.y - 20, 0.25);
       if (attempt === 0) g.audio.punto('no');
-      await d.wait(0.4);
+      await d.wait(0.35);
     }
-    // tercer intento: una marca
-    const first = w.add(new Drawing('pmark0', art.tally('pmark0', ...boardMarkPos(0), 36).map(st => recolor(st, YELLOW)), {z: 9, progress: 0}));
+    const first = markFor(0);
     await zip(d, p, ...boardMarkPos(0), 0.12);
     await d.draw(first, 0.25);
     g.audio.punto('surprise');
-    await zip(d, p, BOARD.x, BOARD.y - 60, 0.3);
+    await zip(d, p, BOARD.x, BOARD.y - 70, 0.3);
     await pulse(d, p, 2, 0.5, 0.2);
     g.setCinematic(false);
-    await d.think('¡Hizo una marca! Su primera marca.');
-    d.describe('Punto aprendió a marcar. Ahora va de cada uno de los sentados a la pizarra y deja una marca por cada uno.');
-    // una marca por cada uno de los que están sentados (incluido vos)
+    await d.think('¡Hizo una marca! Su primera marca. Y es de alguien: del que fue a ver.');
+    d.describe('Punto aprendió a marcar. Ahora va hasta cada uno de los presentes y, por cada visita, deja una marca.');
     g.setCinematic(true);
-    const everyone = [...Object.values(seated).filter(id => id !== 'punto'), 'punto', 'student'];
-    for (let i = 1; i < everyone.length; i++) {
-      const who = everyone[i];
-      const o = w.get(who);
-      const [tx, ty] = who === 'student' ? s.headPos() : [o.x, o.y];
-      await zip(d, p, tx, ty - 24, 0.16);
-      const mk = w.add(new Drawing(`pmark${i}`, art.tally(`pmark${i}`, ...boardMarkPos(i), 36).map(st => recolor(st, YELLOW)), {z: 9, progress: 0}));
+    for (let i = 1; i < order.length; i++) {
+      await visit(order[i]);
+      const mk = markFor(i);
       await zip(d, p, ...boardMarkPos(i), 0.16);
       await d.draw(mk, 0.12, {sound: false});
       g.audio.tap(0.22, 1.6 + (i % 4) * 0.1);
     }
-    // la de vos
-    await zip(d, p, BOARD.x + everyone.length * 20 + 30, BOARD.y - 40, 0.3);
+    await zip(d, p, boardMarkPos(order.length - 1)[0] + 50, BOARD.y - 50, 0.3);
     p.setMode('bob', {home: [p.x, p.y]});
     g.setCinematic(false);
-    await d.think('Una por cada uno. Hasta una para él… y una para mí.');
-    // el nombre
+    await d.think('Una marca por cada visita: una por cada uno de la Ronda, una por mí… y una por él mismo.');
+    // contar: emparejar las marcas con las palabras
     s.setPose('idle', 0.6);
     s.face(1);
     g.setCinematic(true);
-    await d.walk(s, BOARD.x - 10, GROUND, 170);
+    await d.walk(s, BOARD.x - 30, GROUND, 170);
     await d.shot(SHOTS.marksNight, 1.4);
-    s.setPose('write', 0.3);
-    const numX = BOARD.x + 40, numY = GROUND - 96;
-    const num = w.add(new Label('num-14', '14', numX, numY, {size: 84, weight: 700, reveal: 0, z: 9}));
-    await d.draw(num, 0.9, {key: 'reveal'});
-    s.setPose('idle', 0.4);
     g.setCinematic(false);
-    await d.think('Para no tener que mirar todas las marcas cada vez, le pongo un nombre.');
-    // Punto intenta emparejar el numeral
+    await d.think('¿Cuántos somos? Las marcas no se mueven: ahora sí se pueden contar.');
+    const wordLabel = w.add(new Label('count-word', '', BOARD.x + (order.length - 1) * MARK_STEP / 2, BOARD.y - 62, {size: 40, align: 'center', z: 10}));
+    const scratch = g.scratch();
+    const counted = [];
+    let repeats = 0;
+    await d.interact(ctl => new Promise(resolve => {
+      g.setHint(() => [
+        'Contar es darle a cada marca una palabra, en orden: sin saltear ni repetir ninguna.',
+        'Tocá las marcas de a una, en el orden que quieras. Cada toque dice la palabra que sigue.',
+      ]);
+      const refresh = () => g.ui.setSpots(order.map((_, i) => {
+        const [x, y] = boardMarkPos(i);
+        const label = counted.includes(i) ? `Marca de Punto, ya contada: ${NUMBER_WORDS[counted.indexOf(i)]}` : 'Marca de Punto, sin contar';
+        return rectSpot(`pm${i}`, label, {x: x - 16, y: y - 26, w: 32, h: 52}, () => tap(i));
+      }));
+      const tap = i => {
+        if (!ctl.alive()) return;
+        if (counted.includes(i)) {
+          repeats++;
+          g.note('Esa ya tiene su palabra. Si la cuento otra vez, el número sale de más.');
+          d.evidence('count-repeat', {mark: i});
+          return;
+        }
+        counted.push(i);
+        const word = NUMBER_WORDS[counted.length - 1];
+        wordLabel.text = word;
+        g.ui.describe(word);
+        g.audio.note(392 * Math.pow(2, [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23][counted.length - 1] / 12), 0, 0.4, {gain: 0.045, bus: 'sfx'});
+        const [x, y] = boardMarkPos(i);
+        w.add(new Drawing(`count-dot${i}`, art.dotStrokesFor(x, y + 34, 3.2), {z: 9}));
+        d.evidence('count', {mark: i, word});
+        if (counted.length === order.length) resolve();
+        else refresh();
+      };
+      refresh();
+    }));
+    g.setHint(null);
+    scratch.countRepeats = repeats;
+    await d.think('…trece, catorce. La última palabra dice cuántas marcas hay: catorce. Y como cada marca es de uno de nosotros, somos catorce.');
+    // escribirlo
+    s.setPose('write', 0.3);
+    const numX = BOARD.x + 30, numY = GROUND - 96;
+    const num = w.add(new Label('num-14', '14', numX, numY, {size: 84, weight: 700, reveal: 0, z: 9}));
+    g.setCinematic(true);
+    await d.draw(num, 0.9, {key: 'reveal'});
+    const word = w.add(new Label('word-14', 'catorce', numX + 120, numY - 4, {size: 46, reveal: 0, z: 9}));
+    await d.draw(word, 0.9, {key: 'reveal'});
+    s.setPose('idle', 0.4);
+    await d.fadeTo(wordLabel, 0, 0.4);
+    g.setCinematic(false);
+    await d.think('Catorce, con cifras, se escribe así. Es más corto que catorce marcas.');
+    // Punto intenta emparejar el numeral con los presentes
     g.setCinematic(true);
     s.face(-0.6);
-    await d.walk(s, numX + 170, GROUND, 140);
+    await d.walk(s, numX + 300, GROUND, 140);
     await d.shot(SHOTS.nombre, 1.2);
     const ctx = document.createElement('canvas').getContext('2d');
     ctx.font = '700 84px Kalam';
     const w1 = ctx.measureText('1').width, w4 = ctx.measureText('4').width;
     const g1 = [numX + w1 / 2, numY - 30], g4 = [numX + w1 + w4 / 2, numY - 30];
-    const pick = Object.values(seated).filter(id => id !== 'punto').slice(0, 2).map(id => w.get(id));
+    const pick = order.slice(0, 2).map(id => w.get(id));
     p.setMode('still');
     await zip(d, p, g1[0], g1[1] - 50, 0.4);
     g.audio.punto('hop');
-    const l1 = w.add(new Link('plink1', () => [g1[0], g1[1] - 24], () => [pick[0].x, pick[0].y], {ch: YELLOW, p: 0.7, w: 1.8, z: 8, progress: 0}));
+    const l1 = w.add(new Link('plink1', () => [g1[0], g1[1] - 24], () => [pick[0].x, pick[0].y], {ch: YELLOW, p: 0.9, w: 2.8, z: 8, progress: 0, gap: 8}));
     await d.draw(l1, 0.5);
+    pulse(d, pick[0], 2, 0.5, 0.2).catch(() => {});
     await zip(d, p, g4[0], g4[1] - 50, 0.3);
     g.audio.punto('hop');
-    const l4 = w.add(new Link('plink4', () => [g4[0], g4[1] - 24], () => [pick[1].x, pick[1].y], {ch: YELLOW, p: 0.7, w: 1.8, z: 8, progress: 0}));
+    const l4 = w.add(new Link('plink4', () => [g4[0], g4[1] - 24], () => [pick[1].x, pick[1].y], {ch: YELLOW, p: 0.9, w: 2.8, z: 8, progress: 0, gap: 8}));
     await d.draw(l4, 0.5);
+    pulse(d, pick[1], 2, 0.5, 0.2).catch(() => {});
     await zip(d, p, g4[0] + 40, g4[1] - 80, 0.4);
     g.audio.punto('question');
     await d.wait(0.6);
@@ -1474,15 +1667,15 @@ export const nombre = {
     if (!replay) {
       const options = [
         {id: 'name', text: 'El 14 no es una colección: es un nombre.'},
-        {id: 'hidden', text: 'El 14 tiene catorce adentro, pero no se ven.'},
-        {id: 'two', text: 'Tenés razón: en el 14 hay dos.'},
+        {id: 'hidden', text: 'El 14 tiene catorce cosas adentro, pero no se ven.'},
+        {id: 'two', text: 'Tenés razón: el 14 nombra a dos.'},
       ];
       for (;;) {
         const r = await d.choose(options, {prompt: '¿Qué le explicás a Punto?'});
         d.evidence('numeral', {answer: r});
         if (r === 'name') break;
-        if (r === 'hidden') await d.think('No. "14" son dos signos y nada más. No hay catorce escondidos adentro.');
-        if (r === 'two') await d.think('Pero entonces "14" diría lo mismo que dos marcas. Y no: dice cuántos somos.');
+        if (r === 'hidden') await d.think('No hay catorce cosas escondidas en el 14. Es una manera de escribir un número.');
+        if (r === 'two') await d.think('No: nombra a catorce. Que se escriba con dos signos no quiere decir que nombre a dos.');
         options.splice(options.findIndex(o => o.id === r), 1);
       }
     }
@@ -1493,31 +1686,23 @@ export const nombre = {
     voice?.stop?.();
     w.remove('plink1');
     w.remove('plink4');
-    // las marcas de Punto se emparejan con todos: eso sí es una colección
-    const allIds = [...Object.values(seated).filter(id => id !== 'punto'), 'punto', 'student'];
-    const links = allIds.map((id, i) => {
-      const o = w.get(id);
-      const at = id === 'student' ? () => { const h = s.headPos(); return [h[0], h[1] - 20]; } : () => [o.x, o.y];
+    s.setPose('idle', 0.4);
+    // las marcas sí se emparejan uno a uno con los presentes: se ve unión por unión
+    await d.shot(SHOTS.nombre, 1);
+    for (const [i, id] of order.entries()) {
+      const at = id === 'student' ? () => { const h = s.headPos(); return [h[0], h[1] - 22]; } : () => [w.get(id).x, w.get(id).y - 4];
       const [mx, my] = boardMarkPos(i);
-      return w.add(new Link(`plink-all${i}`, () => [mx, my - 20], at, {p: 0.45, w: 1.4, z: 7, progress: 0}));
-    });
-    s.setPose('idle', 0.4);
-    await d.shot(SHOTS.nombre, 1.2);
-    await d.all(...links.map((l, i) => d.wait(i * 0.07).then(() => d.draw(l, 0.4, {sound: i % 4 === 0}))));
+      const l = w.add(new Link(`plink-all${i}`, () => [mx, my + 22], at, {p: 0.75, w: 1.8, z: 7, progress: 0, dash: true, gap: 10}));
+      await d.draw(l, 0.22, {sound: false});
+      g.audio.note(293.66 * Math.pow(2, [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24, 26, 28, 31][i] / 12), 0, 0.6, {gain: 0.04, bus: 'sfx'});
+    }
     g.setCinematic(false);
-    await d.think('Las marcas sí se pueden emparejar con nosotros, sin que sobre nada. Las marcas son una colección: como nosotros, como los asientos ocupados.');
-    await d.all(...links.map(l => d.fadeTo(l, 0, 0.8)));
+    await d.think('Las marcas se emparejan con nosotros, uno a uno, sin que sobre nada. Y las palabras de "uno" a "catorce" también.');
+    await d.all(...order.map((_, i) => d.fadeTo(w.get(`plink-all${i}`), 0, 0.8)));
     w.removeWhere(o => o.id.startsWith('plink-all'));
-    g.setCinematic(true);
-    await d.shot(SHOTS.marksNight, 1.2);
-    const word = w.add(new Label('word-14', 'catorce', numX + 120, numY - 4, {size: 46, reveal: 0, z: 9}));
-    s.setPose('write', 0.3);
-    await d.draw(word, 0.9, {key: 'reveal'});
-    s.setPose('idle', 0.4);
     g.audio.cue('reveal');
-    g.setCinematic(false);
-    await d.think('Lo que tienen en común —las marcas, los asientos ocupados, nosotros— no es la forma ni el tamaño: es que se pueden emparejar sin que sobre nada.');
-    await d.think('Eso que comparten es el número. "14" y "catorce" son dos nombres para él.');
+    await d.think('Hay algo que no cambia entre todas las colecciones que se pueden emparejar así, uno a uno y sin que sobre nada: las marcas, nosotros, esas palabras. Eso es el número.');
+    await d.think('"Catorce" y "14" son dos nombres para ese número.');
     // Punto rodea el 1
     g.setCinematic(true);
     p.setMode('still');
@@ -1532,7 +1717,7 @@ export const nombre = {
     p.setMode('bob', {home: [g1[0] + 52, g1[1] - 60]});
     d.describe('Punto dibuja un círculo amarillo alrededor del 1 de "14" y se queda mirándolo.');
     g.setCinematic(false);
-    await d.think('¿Por qué un 1, si acá no hay uno solo de nada?');
+    await d.think('¿Qué hace un 1 en el nombre de catorce?');
     await d.say('student', 'Buena pregunta.');
     await d.think('Mañana.');
     if (!replay) writeJournal(g);
@@ -1544,39 +1729,47 @@ function recolor(st, ch) {
   return st;
 }
 
-/** Bitácora: sólo afirma lo que la partida muestra que pasó. */
+/** Bitácora: sólo afirma lo que la partida muestra que pasó (y distingue lo que hizo la ayuda). */
 function writeJournal(g) {
   const ev = g.state.evidence;
-  const has = k => ev.some(e => e.kind === k);
+  const all = k => ev.filter(e => e.kind === k);
   const seen = [];
-  const rec = ev.filter(e => e.kind === 'record').length;
-  if (rec) seen.push(`Antes de la Marea hiciste una marca por cada uno de la Ronda${ev.some(e => e.kind === 'record-repeat') ? ' (y cuando volviste a tocar a alguien ya anotado, no lo marcaste dos veces)' : ''}.`);
-  if (has('record-method') && ev.find(e => e.kind === 'record-method').choice === 'count') seen.push('Intentaste contarlos mientras se movían y viste por qué hacía falta algo que se quedara quieto.');
-  const checks = ev.filter(e => e.kind === 'check' && !e.final);
-  const invalid = checks.filter(c => c.verdict === 'invalid').length;
-  const incomplete = checks.filter(c => c.verdict === 'incomplete').length;
-  let pairLine = 'Al volver, emparejaste marcas y puntos: sobró una marca, y faltaba el más chico.';
-  if (invalid) pairLine += ' En el camino, una comprobación mostró a alguien unido a dos: no valía.';
-  if (incomplete) pairLine += ' Otra comprobación mostró que, mientras sobran de los dos lados, todavía no se sabe nada.';
+  if (all('record').length) {
+    seen.push('Antes de la Marea hiciste una marca por cada uno de la Ronda.' + (all('record-repeat').length ? ' Cuando tocaste a alguien ya anotado, la marca no se repitió: una por cada uno.' : ''));
+  }
+  if (all('record-method')[0]?.choice === 'count') seen.push('Intentaste contarlos mientras giraban: contar también sirve si nadie se saltea ni se repite, pero Punto no conocía las palabras.');
+  const pairs = all('pair');
+  const byHint = pairs.filter(e => e.viaHint).length;
+  let pairLine = 'Al volver, emparejaste marcas y puntos uno a uno: sobró una marca, y faltaba el más chico.';
+  if (byHint) pairLine += ` (${byHint === 1 ? 'Una unión la hizo' : `${byHint} uniones las hizo`} la ayuda.)`;
   seen.push(pairLine);
-  const reading = g.flags.reading;
-  if (reading === 'mistake') seen.push('Pensaste que la marca de más podía ser un error tuyo; tu registro mostraba que no.');
-  const pred = g.flags.prediction;
-  const predText = {no: '"no alcanzan: la fila es más larga"', yes: '"alcanzan, y sobra lugar"', pair: '"no sé: hay que emparejar"'}[pred];
+  const checks = all('check').filter(c => !c.final);
+  if (checks.some(c => c.double === 'dot')) seen.push('Una comprobación mostró un punto unido a dos marcas: así no es uno a uno, y no vale.');
+  if (checks.some(c => c.double === 'mark')) seen.push('Una comprobación mostró una marca unida a dos puntos: así no es uno a uno, y no vale.');
+  if (checks.some(c => c.verdict === 'incomplete')) seen.push('Otra comprobación mostró que, mientras sobran de los dos lados, todavía no se sabe nada.');
+  if (g.flags.reading === 'mistake') seen.push('Pensaste que la marca de más podía ser un error tuyo; tu registro mostraba que no.');
+  const predText = {no: '"no alcanzan: la fila es mucho más larga"', justo: '"alcanzan justo"', sobra: '"alcanzan, y sobra lugar"', pair: '"no sé: hay que emparejar"'}[g.flags.prediction];
   if (predText) seen.push(`En las gradas predijiste ${predText}. Al sentarlos de a uno, sobró un asiento.`);
-  const hints = ev.filter(e => e.kind === 'hint').length;
+  if (all('conserve').length) seen.push('Cuando Punto los juntó bien apretados, ' + (all('conserve')[0].answer === 'same' ? 'dijiste enseguida que seguía sobrando uno.' : 'al principio pensaste que cambiaba; juntos o separados, eran los mismos.'));
+  if (all('count').length) seen.push('Contaste las marcas de Punto: una palabra por marca' + (all('count-repeat').length ? ' (y cuando repetiste una, el juego te avisó)' : '') + '. La última fue "catorce".');
+  const hints = all('hint').length;
   if (hints) seen.push(`Pediste ${hints === 1 ? 'una ayuda' : `${hints} ayudas`}.`);
   const entry = {
     id: 'c1',
     title: '¿Están todos?',
-    abbr: 'Misma cantidad: se pueden emparejar sin que sobre nada.',
+    abbr: 'Misma cantidad: se pueden emparejar uno a uno sin que sobre nada.',
     body: [
-      'Si al emparejar sobra algo de un lado, ese lado tiene más. No importa la forma, el tamaño ni lo separados que estén.',
-      'Si sobran de los dos lados, todavía no se puede concluir. Si algo quedó unido a dos, no vale.',
-      'El número es lo que comparten todas las colecciones que se pueden emparejar entre sí. "14" y "catorce" son nombres de ese número: no tienen catorce de nada adentro.',
+      'Uno a uno quiere decir: cada cosa de un lado con una sola del otro, y ninguna usada dos veces.',
+      'Si al emparejar así sobra algo de un solo lado, ese lado tiene más. Si sobran de los dos lados, todavía no se terminó de emparejar. La forma, el tamaño y la distancia no cambian cuántos son.',
+      'Contar también es emparejar: cada cosa con una palabra, en orden, sin saltear ni repetir; la última palabra dice cuántas hay.',
+      'El número es lo que no cambia entre todas las colecciones que se pueden emparejar así. "14" y "catorce" son nombres de ese número: el 14 no tiene catorce cosas adentro (cómo funciona su escritura es otra pregunta).',
+      'Todo esto vale para colecciones que se terminan. Con colecciones que no se terminan pasan cosas raras; Punto todavía no lo sabe.',
     ],
     seen,
-    moment: 'c1.todos',
+    moments: [
+      {id: 'c1.todos', label: 'Desplegar: emparejar marcas y puntos'},
+      {id: 'c1.nombre', label: 'Desplegar: el número y sus nombres'},
+    ],
   };
   g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
   g.ui.toast('Anotado en la Bitácora');

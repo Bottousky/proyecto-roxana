@@ -105,6 +105,7 @@ export class UI {
   caption(who, text) {
     this.#closeWaiting();
     this.noteToken = null;
+    this.lineToken = null;
     const thought = who === null;
     this.who$.textContent = who === 'punto' ? 'Punto' : who && who !== 'student' ? who : '';
     this.line$.classList.toggle('thought', thought);
@@ -185,6 +186,12 @@ export class UI {
     this.waiting = null;
     clearTimeout(w.timer);
     this.game.audio.tap(0.12, 1.6);
+    // si no llega otra línea enseguida, el texto viejo no debe quedar sobre la acción
+    const token = {};
+    this.lineToken = token;
+    setTimeout(() => {
+      if (this.lineToken === token && !this.waiting && !this.typing && !this.noteToken) this.hideCaption();
+    }, 160);
     w.resolve();
   }
 
@@ -446,12 +453,13 @@ export class UI {
         }
         div.append(ul);
       }
-      if (e.moment) {
+      const moments = e.moments || (e.moment ? [{id: e.moment, label: 'Desplegar: volver a ver por qué'}] : []);
+      for (const m of moments) {
         const b = document.createElement('button');
         b.type = 'button';
-        b.dataset.moment = e.moment;
-        b.textContent = 'Desplegar: volver a ver por qué';
-        div.append(b);
+        b.dataset.moment = m.id;
+        b.textContent = m.label;
+        div.append(b, document.createElement('br'));
       }
       panel.append(div);
     }

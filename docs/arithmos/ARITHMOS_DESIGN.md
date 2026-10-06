@@ -80,22 +80,82 @@ orden, la forma, la distancia; lo que no cambia es el número.
 
 | # | Escena | Propósito dramático | Decisión del jugador | Consecuencia perceptible |
 |---|---|---|---|---|
-| 1.1 | La puerta | Umbral; volverse dibujo | Cruzar la puerta trazada | El estudiante se dibuja a sí mismo trazo a trazo, se mira las manos |
-| 1.2 | Alguien | Conocer a Punto; establecer timidez y curiosidad | Acercarse o quedarse quieto | Si se acerca, Punto se esconde y vuelve sólo si esperás; si esperás, se acerca y te rodea |
-| 1.3 | La Ronda | Lo que Punto quiere; amenaza de la Marea | Anotar a la Ronda: tocar cada punto deja una marca en la piedra | Cada toque traza una línea punto→marca; un punto ya anotado lo dice; la marca queda |
-| 1.4 | La Marea | Pérdida | (cinemática, rejugable) | Todo se borra salvo la piedra con marcas: lo comprendido resiste |
-| 1.5 | ¿Están todos? | Angustia de Punto; los puntos vuelven revueltos y no se dejan contar | Intentar contar (falla con dignidad) o emparejar marcas con puntos; deshacer; comprobar | Comprobar recorre cada par; un punto con dos líneas se señala como inválido; sobra una marca: falta alguien |
-| 1.6 | Quién | Las marcas dicen cuántos, no quién; Punto sabe quién | Interpretar la marca sobrante (falta uno / me equivoqué / sobra) y buscar en tres lugares | Lino aparece medio borrado en una mancha; el estudiante lo repasa con tiza |
-| 1.7 | Todos | Reencuentro | Emparejar la última marca | La Ronda vuelve a bailar (rejugable) |
-| 1.8 | Las gradas | Transferencia: estructura distinta; Punto se equivoca | Predecir si alcanzan los asientos (fila larga vs gradas compactas); comprobar emparejando | Sobra un asiento aunque la fila de asientos es más corta: es para vos |
-| 1.9 | El nombre | Revelación número/numeral; evolución de Punto | Punto hace su primera marca; el estudiante escribe 14; intentar emparejar "14" con los puntos | Sólo hay dos signos: el numeral no es una colección, es un nombre; Punto pregunta cómo dos signos alcanzan para catorce → cap. 2 |
+| 1.1 | La puerta | Umbral; volverse dibujo | Cruzar la puerta trazada | El estudiante se dibuja trazo a trazo, se mira las manos |
+| 1.2 | Alguien | Conocer a Punto; timidez y curiosidad | Acercarse o quedarse quieto | Si se acerca, Punto se esconde; si espera, se acerca, lo rodea y toca la tiza |
+| 1.3 | La Ronda | Lo que Punto quiere; amenaza de la Marea | Contar (falla porque giran y Punto no conoce las palabras) o anotar: tocar cada punto deja su marca | Cada toque traza una línea punto→marca; uno ya anotado no se repite |
+| 1.4 | La Marea | Pérdida | (cinemática, rejugable) | Todo se borra salvo la piedra con marcas |
+| 1.5 | ¿Están todos? | Angustia de Punto; vuelven revueltos | Emparejar marcas con puntos; deshacer; comprobar | Comprobar recorre cada par; doble = inválido; sobras de ambos lados = no se sabe; sobra una marca |
+| 1.6 | Quién | Las marcas dicen cuántos, no quién | Interpretar la marca sola | Sólo "falta uno" se sostiene con la evidencia; Punto sabe quién |
+| 1.7 | La búsqueda | Buscar al más chico | Tres lugares en cualquier orden; repasarlo con tiza | Lino vuelve a encenderse |
+| 1.8 | Todos | Reencuentro | Unir la última marca | Recorrido con 12 notas; la Ronda baila (rejugable) |
+| 1.9 | Las gradas | Transferencia; Punto se equivoca | Predecir (y justificar), sentar a cada uno donde quiera, interpretar el asiento libre, decidir si apretarlos cambia algo | La fila larga no tenía más: sobra un asiento (para vos); juntos o separados son los mismos |
+| 1.10 | El nombre | Revelación número/numeral; evolución de Punto | Contar las marcas de Punto (una palabra por marca); explicarle qué es "14" | Punto marca una vez por cada visita; la última palabra dice cuántos; "14" y "catorce" nombran el número; Punto pregunta qué hace un 1 en el nombre de catorce (rejugable) |
 
-Errores con consecuencia comprensible: emparejar un punto con dos marcas (se detecta al
-comprobar y se explica), predecir mal en las gradas (se comprueba sin castigo), leer la
-marca sobrante como error de anotación (Punto muestra que alguien falta de verdad).
+Errores con consecuencia comprensible: emparejar un punto con dos marcas o una marca con dos
+puntos (se detecta al comprobar y se explica), comprobar antes de terminar, predecir mal en las
+gradas (se comprueba sin castigo), leer mal el asiento libre, creer que apretar la fila cambia
+cuántos son, contar dos veces una marca, leer la marca sobrante como error de anotación.
 
 Ayudas graduadas (opcionales, botón "?"): 1) reformular la pregunta, 2) señalar el rasgo
 relevante, 3) demostrar un paso. Usar ayuda se registra como evidencia, no castiga.
+
+## Capítulo 2 — Demasiados para marcar (diseño, no implementado)
+
+Pregunta de entrada: Punto rodeó el "1" de "14": ¿por qué un 1 si no hay uno solo de nada?
+Idea central: **en un numeral, el lugar dice el tamaño del grupo; el cero guarda un lugar
+vacío; "me llevo uno" es atar diez y pasarlos al cuarto de al lado.** Las marcas de
+conteo no escalan; agrupar sí. Restar también es emparejar, y emparejar atados es emparejar
+diez a la vez.
+
+Personaje nuevo: **Mara**, atadora del depósito. Ata palitos de a diez "porque así se hizo
+siempre". La Marea le borró los ceros del registro y ella cree que "el cero no es nada, se
+puede saltear". Su comunidad cree tener 32 de algo que en realidad son 302.
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 2.1 | A la mañana | Punto ya marca: marca todo (incluida tu cabeza) | — (respiro, humor) | Punto vuelve a rodear el "1" |
+| 2.2 | La bandada | Las marcas no escalan | Intentar comparar dos hileras de marcas larguísimas | Imposible de un vistazo: hace falta agrupar |
+| 2.3 | Mara | Procedimiento sin explicación | Preguntar o mirar | Mara ata de a diez sin saber por qué |
+| 2.4 | Atados | Agrupar; la unidad puede ser un atado | Rodear grupos (Punto prueba de a cinco: válido para contar, no para el registro de Mara) | 3 atados y 7 sueltos = 37; el "1" de "14" es un atado |
+| 2.5 | El depósito | Valor posicional; canje | Guardar entregas con "a lo sumo 9 por cuarto" | Diez sueltos se atan y pasan: "me llevo uno" tiene cuerpo |
+| 2.6 | El cero que falta | Cero como lugar vacío | Escribir lo que hay (3 · vacío · 2): "32", "3 2", "302" | Punto carga cada escritura en el depósito: sólo "302" coincide; el cero resiste a la Marea |
+| 2.7 | ¿Cuántos más? | Resta como comparación por emparejamiento | Emparejar atado con atado, suelto con suelto; desatar cuando no alcanza | La sobra es la diferencia; "pedir prestado" = desatar |
+| 2.8 | Más cuartos | Transferencia: generalizar la regla | Guardar una entrega que llena el cuarto de los cien | Hace falta inventar un cuarto nuevo |
+| 2.9 | Lo que vale el lugar | Cierre; Punto escribe su primer numeral | Explicarle a Mara con atados | Mara corrige su registro; gancho: "le debo tres atados al vecino" → cap. 3 |
+
+Límites a declarar: diez es una convención (otras culturas agruparon de otra manera —ver
+fuentes: sexagesimal babilónico, vigesimal maya—, sin presentar el orden del juego como
+historia); el cero como número (cardinal de "ninguno") se conecta con el capítulo 1.
+
+## Capítulo 5 — núcleo de "pasa sumando" (diseño conceptual, no implementado)
+
+Representación elegida (requiere el cap. 3: recta con negativos): **una ecuación son dos
+marcadores sobre la misma recta**, uno por miembro, que dependen de una x desconocida.
+Resolver es buscar dónde coinciden. Una transformación se aplica a **los dos marcadores a la
+vez**: "+3" los corre 3 hacia la derecha; si coincidían, siguen coincidiendo.
+
+- x − 3 = 5 → aplicar "+3" a ambos miembros: x − 3 + 3 = 5 + 3 → el miembro izquierdo se
+  **simplifica** porque x − 3 + 3 = x para toda x (se ve: ir 3 a la izquierda y volver 3 no
+  mueve) → x = 8. "Pasa sumando" queda como abreviatura de esos dos pasos, desplegable.
+- Aplicar algo a un solo miembro separa los marcadores: transformación inválida a la vista.
+- Caminos alternativos válidos: restar 5 a ambos (x − 8 = 0), luego sumar 8. Se evalúa la
+  equivalencia, no una secuencia de clics.
+- **Por qué se conservan las soluciones:** cada paso se puede deshacer (sumar 3 se deshace
+  restando 3). Dicho con el cap. 1: la transformación es **uno a uno** sobre la recta; si dos
+  valores distintos no pueden ir a parar al mismo lugar, no aparecen ni se pierden soluciones.
+- **Cuándo no:** multiplicar por 0 aplasta toda la recta en un punto (todo "coincide": aparecen
+  soluciones falsas; no se puede deshacer). Elevar al cuadrado dobla la recta (−a y a caen
+  juntos): puede introducir soluciones; hay que verificar. Dividir por una expresión que puede
+  valer 0 no está definido en esos valores: puede perder soluciones (x² = x ÷ x → x = 1 pierde
+  x = 0). Multiplicar una desigualdad por un negativo refleja la recta: el orden se invierte.
+- Detección de transformaciones inválidas: un habitante "despeja" de memoria ("el 3 pasa
+  restando", "pasa dividiendo" un término que sumaba); el jugador lo comprueba sustituyendo un
+  valor en la ecuación original y en la transformada.
+- Transferencia con otra estructura: 2x + 1 = 7 (dos pasos, orden de deshacer), 3 = x/4 (la
+  incógnita a la derecha), y una desigualdad −2x < 6.
+- Ancla histórica (fuentes.md, certeza alta): al-Khwārizmī, *al-jabr* = restituir lo restado
+  sumándolo en ambos miembros; *al-muqābala* = cancelar términos iguales a ambos lados.
+  Presentarlo como dato documentado, no como origen único.
 
 ## Interfaz
 

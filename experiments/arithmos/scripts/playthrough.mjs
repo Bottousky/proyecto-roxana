@@ -90,13 +90,28 @@ function pickChoice(prompt, options) {
     ['espía', 'Quedarte'], ['te mira', 'Acercarte'],
     ['recordar a la Ronda', 'Contarlos'],
     ['marca sola', 'sobra un punto', 'hice una marca de más', 'falta uno'],
-    ['Alcanzan los asientos', 'No alcanzan'],
-    ['explicás a Punto', 'tiene catorce', 'en el 14 hay dos', 'es un nombre'],
+    ['Alcanzan los asientos para toda', 'No alcanzan'],
+    ['Cómo lo sabés', 'Me pareció'],
+    ['asiento libre', 'Había más en la fila', 'misma cantidad', 'más asientos'],
+    ['apretados', 'faltan asientos', 'sobran más', 'Sigue sobrando'],
+    ['explicás a Punto', 'catorce cosas', 'nombra a dos', 'es un nombre'],
+  ] : route === 'justo' ? [
+    ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
+    ['recordar a la Ronda', 'Hacer una marca'],
+    ['marca sola', 'falta uno'],
+    ['Alcanzan los asientos para toda', 'Alcanzan justo'],
+    ['Cómo lo sabés', 'Conté'],
+    ['asiento libre', 'más asientos'],
+    ['apretados', 'Sigue sobrando'],
+    ['explicás a Punto', 'es un nombre'],
   ] : [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['recordar a la Ronda', 'Hacer una marca'],
     ['marca sola', 'falta uno'],
-    ['Alcanzan los asientos', 'Hay que ver'],
+    ['Alcanzan los asientos para toda', 'Hay que ver'],
+    ['Cómo lo sabés', 'Conté'],
+    ['asiento libre', 'más asientos'],
+    ['apretados', 'Sigue sobrando'],
     ['explicás a Punto', 'es un nombre'],
   ];
   for (const [key, ...wants] of pref) {
@@ -241,11 +256,17 @@ for (let iter = 0; iter < 4000; iter++) {
       const sel = s.spots.find(x => x.selected);
       target = sel ? spots.find(x => x.id !== sel.id) : spots[0];
     } else if (s.seg === 'c1.gradas') {
+      const sel = s.spots.find(x => x.selected);
       const free = byLabel('Asiento libre');
-      if (route === 'errores' && !tried.has('taken') && byLabel('Asiento ocupado').length) { tried.add('taken'); target = byLabel('Asiento ocupado')[0]; }
-      else target = free[(free.length * 7) % Math.max(1, free.length) === 0 ? 0 : 0];
-      // varía el orden: elige el del medio
-      if (target && free.length > 2) target = free[Math.floor(free.length / 2)];
+      const line = spots.filter(x => !x.id.startsWith('seat'));
+      if (route === 'errores' && !tried.has('taken') && byLabel('Asiento ocupado').length && !sel) { tried.add('taken'); target = byLabel('Asiento ocupado')[0]; }
+      else if (sel) target = sel.id.startsWith('seat') ? line[0] : free[Math.floor(free.length / 2)];
+      else target = line[line.length - 1];
+    } else if (s.seg === 'c1.nombre') {
+      const todo = byLabel('sin contar');
+      const done = byLabel('ya contada');
+      if (route === 'errores' && done.length === 5 && !tried.has('recount')) { tried.add('recount'); target = done[0]; }
+      else target = todo[(todo.length * 3) % Math.max(1, todo.length)] || todo[0];
     } else {
       target = spots[0];
     }

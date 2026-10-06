@@ -13,8 +13,8 @@ export const RING = {x: 2560, y: 400, r: 170};
 export const MARKS = 12;
 export const FIELD = {crack: [3170, 640], smudge: [3460, 590], house: [3800, 700]};
 export const GRADAS = {x: 5010, seats: 14};
-export const LINE_X0 = 4130;
-export const LINE_GAP = 44;
+export const LINE_X0 = 4050;
+export const LINE_GAP = 60;
 
 // planos (rectángulos de mundo)
 export const SHOTS = {
@@ -23,14 +23,14 @@ export const SHOTS = {
   meet: {x: 380, y: 260, w: 1300, h: 520},
   meetClose: {x: 760, y: 420, w: 560, h: 320},
   ronda: {x: 1660, y: 200, w: 1200, h: 560},
-  pairing: {x: 1840, y: 280, w: 780, h: 440},
-  stone: {x: 1840, y: 470, w: 700, h: 300},
-  marea: {x: 900, y: 120, w: 2200, h: 760},
+  pairing: {x: 1780, y: 280, w: 840, h: 440},
+  stone: {x: 1720, y: 440, w: 860, h: 330},
+  marea: {x: 1480, y: 150, w: 1500, h: 640},
   field: {x: 2860, y: 360, w: 1100, h: 420},
-  gradas: {x: 4050, y: 250, w: 1360, h: 520},
+  gradas: {x: 3870, y: 300, w: 1390, h: 470},
   sky: {x: 4150, y: -60, w: 1400, h: 760},
-  nombre: {x: 4680, y: 250, w: 1300, h: 520},
-  marksNight: {x: 5240, y: 360, w: 560, h: 380},
+  nombre: {x: 4800, y: 300, w: 1140, h: 460},
+  marksNight: {x: 5240, y: 330, w: 680, h: 420},
 };
 
 export const MARK_GAP = 46;

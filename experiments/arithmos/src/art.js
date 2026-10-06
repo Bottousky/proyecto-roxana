@@ -1,6 +1,6 @@
 // Piezas dibujadas a mano alzada. Todas son deterministas: el mismo id dibuja lo mismo.
 
-import {stroke, lineGuide, circleGuide, arcGuide, smoothGuide, rectStrokes, WHITE, YELLOW, BLUE} from './engine/chalk.js';
+import {stroke, lineGuide, circleGuide, arcGuide, smoothGuide, rectStrokes, dotStrokes, WHITE, YELLOW, BLUE} from './engine/chalk.js';
 
 export const SEAT_GAP = 46;
 export const TIER = 64;
@@ -106,10 +106,10 @@ export function gradas(id, cx, ground, seats) {
   const tiers = 3;
   for (let t = 0; t < tiers; t++) {
     const y = ground - t * TIER;
-    const half = 300 - t * 34;
+    const half = 158 - t * 24;
     const g = [];
-    for (let i = 0; i <= 12; i++) {
-      const u = i / 12;
+    for (let i = 0; i <= 10; i++) {
+      const u = i / 10;
       g.push([cx - half + u * half * 2, y - Math.sin(u * Math.PI) * 10]);
     }
     list.push(S(g, seed + t * 3, {w: 3.6, p: 0.9}));
@@ -132,12 +132,14 @@ export function seatPositions(cx, ground, count) {
     const n = Math.min(rows[r], count - k);
     for (let i = 0; i < n; i++) {
       const x = cx + (i - (n - 1) / 2) * SEAT_GAP;
-      out.push([x, y - Math.sin(((x - cx) / 300 + 0.5) * Math.PI) * 10]);
+      out.push([x, y - Math.sin(((x - cx) / 316 + 0.5) * Math.PI) * 10]);
       k++;
     }
   }
   return out;
 }
+
+export const dotStrokesFor = (x, y, r, ch = WHITE) => dotStrokes(x, y, r, seedOf('dot', Math.round(x), Math.round(y)), {ch});
 
 export const circleGuideFor = (x, y, r, seed = 1) => circleGuide(x, y, r, mulberry32(seed + Math.round(x * 7 + y)), {overshoot: 0.3});
 

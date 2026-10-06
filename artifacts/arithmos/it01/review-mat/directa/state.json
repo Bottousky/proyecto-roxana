@@ -1,0 +1,770 @@
+{
+  "version": 1,
+  "chapter": 1,
+  "segment": "c1.nombre",
+  "flags": {
+    "metApproaches": 0,
+    "recorded": 12,
+    "pairs": [
+      [
+        "mark0",
+        "r0"
+      ],
+      [
+        "mark1",
+        "r1"
+      ],
+      [
+        "mark2",
+        "r2"
+      ],
+      [
+        "mark3",
+        "r3"
+      ],
+      [
+        "mark4",
+        "r4"
+      ],
+      [
+        "mark5",
+        "r5"
+      ],
+      [
+        "mark6",
+        "r6"
+      ],
+      [
+        "mark7",
+        "r7"
+      ],
+      [
+        "mark8",
+        "r8"
+      ],
+      [
+        "mark9",
+        "r9"
+      ],
+      [
+        "mark10",
+        "r10"
+      ],
+      [
+        "mark11",
+        "r11"
+      ]
+    ],
+    "freeMark": "mark11",
+    "reading": "missing",
+    "found": true,
+    "all": true,
+    "prediction": "pair",
+    "freeSeat": 13,
+    "seated": {
+      "0": "r0",
+      "1": "r1",
+      "2": "r3",
+      "3": "r5",
+      "4": "r6",
+      "6": "r10",
+      "7": "r11",
+      "8": "r9",
+      "9": "r7",
+      "10": "punto",
+      "11": "r4",
+      "12": "r2",
+      "13": "r8"
+    },
+    "chapterDone": true
+  },
+  "scratch": {
+    "c1.alguien": {
+      "approaches": 0
+    },
+    "c1.ronda": {
+      "recorded": [
+        "r0",
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9",
+        "r10",
+        "r11"
+      ]
+    },
+    "c1.vuelven": {
+      "links": [
+        [
+          "mark0",
+          "r0"
+        ],
+        [
+          "mark1",
+          "r1"
+        ],
+        [
+          "mark2",
+          "r2"
+        ],
+        [
+          "mark3",
+          "r3"
+        ],
+        [
+          "mark4",
+          "r4"
+        ],
+        [
+          "mark5",
+          "r5"
+        ],
+        [
+          "mark6",
+          "r6"
+        ],
+        [
+          "mark7",
+          "r7"
+        ],
+        [
+          "mark8",
+          "r8"
+        ],
+        [
+          "mark9",
+          "r9"
+        ],
+        [
+          "mark10",
+          "r10"
+        ]
+      ]
+    },
+    "c1.busqueda": {
+      "seen": [
+        "crack",
+        "house",
+        "smudge"
+      ]
+    },
+    "c1.gradas": {
+      "prediction": "pair",
+      "seated": {
+        "0": "r0",
+        "1": "r1",
+        "2": "r3",
+        "3": "r5",
+        "4": "r6",
+        "6": "r10",
+        "7": "r11",
+        "8": "r9",
+        "9": "r7",
+        "10": "punto",
+        "11": "r4",
+        "12": "r2",
+        "13": "r8"
+      }
+    }
+  },
+  "evidence": [
+    {
+      "t": "2026-10-05T23:42:48.901Z",
+      "seg": "c1.puerta",
+      "kind": "door"
+    },
+    {
+      "t": "2026-10-05T23:42:49.944Z",
+      "seg": "c1.alguien",
+      "kind": "meet",
+      "choice": "wait"
+    },
+    {
+      "t": "2026-10-05T23:42:51.459Z",
+      "seg": "c1.ronda",
+      "kind": "record-method",
+      "choice": "marks"
+    },
+    {
+      "t": "2026-10-05T23:42:52.257Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r0",
+      "n": 1,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:42:53.290Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r1",
+      "n": 2,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:42:54.372Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r2",
+      "n": 3,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:42:55.439Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r3",
+      "n": 4,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:42:56.473Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r4",
+      "n": 5,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:42:57.538Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r5",
+      "n": 6,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:42:58.605Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r6",
+      "n": 7,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:42:59.655Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r7",
+      "n": 8,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:00.690Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r8",
+      "n": 9,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:01.723Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r9",
+      "n": 10,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:02.755Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r10",
+      "n": 11,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:03.823Z",
+      "seg": "c1.ronda",
+      "kind": "record",
+      "id": "r11",
+      "n": 12,
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:04.340Z",
+      "seg": "c1.ronda",
+      "kind": "recorded",
+      "count": 12,
+      "repeats": 0
+    },
+    {
+      "t": "2026-10-05T23:43:05.695Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark0",
+      "dot": "r0",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:05.963Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark1",
+      "dot": "r1",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:06.231Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark2",
+      "dot": "r2",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:06.499Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark3",
+      "dot": "r3",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:06.779Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark4",
+      "dot": "r4",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:07.066Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark5",
+      "dot": "r5",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:07.333Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark6",
+      "dot": "r6",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:07.600Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark7",
+      "dot": "r7",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:07.867Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark8",
+      "dot": "r8",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:08.146Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark9",
+      "dot": "r9",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:08.416Z",
+      "seg": "c1.vuelven",
+      "kind": "pair",
+      "mark": "mark10",
+      "dot": "r10",
+      "viaHint": false
+    },
+    {
+      "t": "2026-10-05T23:43:08.550Z",
+      "seg": "c1.vuelven",
+      "kind": "check",
+      "verdict": "left-more",
+      "pairs": 11
+    },
+    {
+      "t": "2026-10-05T23:43:15.062Z",
+      "seg": "c1.quien",
+      "kind": "interpret",
+      "reading": "missing"
+    },
+    {
+      "t": "2026-10-05T23:43:15.677Z",
+      "seg": "c1.busqueda",
+      "kind": "search",
+      "place": "crack"
+    },
+    {
+      "t": "2026-10-05T23:43:16.591Z",
+      "seg": "c1.busqueda",
+      "kind": "search",
+      "place": "house"
+    },
+    {
+      "t": "2026-10-05T23:43:20.727Z",
+      "seg": "c1.busqueda",
+      "kind": "search",
+      "place": "smudge"
+    },
+    {
+      "t": "2026-10-05T23:43:24.678Z",
+      "seg": "c1.todos",
+      "kind": "check",
+      "verdict": "equal",
+      "pairs": 12,
+      "final": true
+    },
+    {
+      "t": "2026-10-05T23:43:25.575Z",
+      "seg": "c1.gradas",
+      "kind": "predict",
+      "prediction": "pair"
+    },
+    {
+      "t": "2026-10-05T23:43:25.700Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 7,
+      "who": "r11"
+    },
+    {
+      "t": "2026-10-05T23:43:26.493Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 6,
+      "who": "r10"
+    },
+    {
+      "t": "2026-10-05T23:43:27.027Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 8,
+      "who": "r9"
+    },
+    {
+      "t": "2026-10-05T23:43:27.553Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 5,
+      "who": "r8"
+    },
+    {
+      "t": "2026-10-05T23:43:28.086Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 9,
+      "who": "r7"
+    },
+    {
+      "t": "2026-10-05T23:43:28.611Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 4,
+      "who": "r6"
+    },
+    {
+      "t": "2026-10-05T23:43:29.145Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 10,
+      "who": "punto"
+    },
+    {
+      "t": "2026-10-05T23:43:29.668Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 3,
+      "who": "r5"
+    },
+    {
+      "t": "2026-10-05T23:43:30.191Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 11,
+      "who": "r4"
+    },
+    {
+      "t": "2026-10-05T23:43:30.707Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 2,
+      "who": "r3"
+    },
+    {
+      "t": "2026-10-05T23:43:31.245Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 12,
+      "who": "r2"
+    },
+    {
+      "t": "2026-10-05T23:43:31.770Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 1,
+      "who": "r1"
+    },
+    {
+      "t": "2026-10-05T23:43:32.296Z",
+      "seg": "c1.gradas",
+      "kind": "seat",
+      "seat": 0,
+      "who": "r0"
+    },
+    {
+      "t": "2026-10-05T23:43:33.675Z",
+      "seg": "c1.nombre",
+      "kind": "numeral",
+      "answer": "name"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c1",
+      "title": "¿Están todos?",
+      "abbr": "Misma cantidad: se pueden emparejar sin que sobre nada.",
+      "body": [
+        "Si al emparejar sobra algo de un lado, ese lado tiene más. No importa la forma, el tamaño ni lo separados que estén.",
+        "Si sobran de los dos lados, todavía no se puede concluir. Si algo quedó unido a dos, no vale.",
+        "El número es lo que comparten todas las colecciones que se pueden emparejar entre sí. \"14\" y \"catorce\" son nombres de ese número: no tienen catorce de nada adentro."
+      ],
+      "seen": [
+        "Antes de la Marea hiciste una marca por cada uno de la Ronda.",
+        "Al volver, emparejaste marcas y puntos: sobró una marca, y faltaba el más chico.",
+        "En las gradas predijiste \"no sé: hay que emparejar\". Al sentarlos de a uno, sobró un asiento."
+      ],
+      "moment": "c1.todos"
+    }
+  ],
+  "completed": [
+    "c1.puerta",
+    "c1.alguien",
+    "c1.ronda",
+    "c1.marea",
+    "c1.vuelven",
+    "c1.quien",
+    "c1.busqueda",
+    "c1.todos",
+    "c1.gradas",
+    "c1.nombre"
+  ],
+  "moments": [
+    "c1.marea",
+    "c1.todos",
+    "c1.nombre"
+  ],
+  "log": [
+    {
+      "who": null,
+      "text": "Tengo las manos de tiza."
+    },
+    {
+      "who": null,
+      "text": "La puerta se está borrando. No del todo: queda el contorno."
+    },
+    {
+      "who": null,
+      "text": "Acá hubo muchas cosas escritas. Alguien las borró a medias."
+    },
+    {
+      "who": null,
+      "text": "Algo se movió."
+    },
+    {
+      "who": "student",
+      "text": "Hola."
+    },
+    {
+      "who": null,
+      "text": "No habla. O no habla como yo."
+    },
+    {
+      "who": "student",
+      "text": "¿Tenés nombre?"
+    },
+    {
+      "who": null,
+      "text": "Un punto. Nada más que un punto… y nada menos."
+    },
+    {
+      "who": "student",
+      "text": "Te voy a decir Punto. Hasta que me digas cómo te llamás."
+    },
+    {
+      "who": null,
+      "text": "Quiere que lo siga."
+    },
+    {
+      "who": "student",
+      "text": "¿Son tuyos? ¿Tu familia?"
+    },
+    {
+      "who": null,
+      "text": "Punto es amarillo; ellos son blancos. Pero bailan como él."
+    },
+    {
+      "who": null,
+      "text": "¿Qué es eso? Está borrando todo a su paso."
+    },
+    {
+      "who": null,
+      "text": "Si pasa por acá, los va a desparramar. Y después, ¿cómo va a saber Punto si volvieron todos?"
+    },
+    {
+      "who": null,
+      "text": "Una marca por cada uno. La piedra no se mueve."
+    },
+    {
+      "who": null,
+      "text": "Cada uno tiene su marca. Y cada marca es de uno."
+    },
+    {
+      "who": null,
+      "text": "Se llevó todo. Menos las marcas."
+    },
+    {
+      "who": null,
+      "text": "Lo que alguien hizo entendiendo para qué servía… resistió. Eso parece."
+    },
+    {
+      "who": null,
+      "text": "Se mueven tanto que no se dejan contar. Y Punto no sabe contar."
+    },
+    {
+      "who": null,
+      "text": "Pero las marcas no se mueven. Cada marca era uno de ellos."
+    },
+    {
+      "who": null,
+      "text": "A cada punto le tocó una marca. Y quedó una marca sola."
+    },
+    {
+      "who": null,
+      "text": "Las marcas saben cuántos. No saben quién. Punto sí."
+    },
+    {
+      "who": "student",
+      "text": "¿Quién falta? ¿El más chico? ¿El que siempre llegaba tarde a la ronda?"
+    },
+    {
+      "who": "student",
+      "text": "Vamos a buscarlo."
+    },
+    {
+      "who": null,
+      "text": "Lo que la Marea arrastró quedó por acá."
+    },
+    {
+      "who": null,
+      "text": "Una grieta en el pizarrón. Adentro no hay nadie."
+    },
+    {
+      "who": null,
+      "text": "Al lado de la casa borrada, alguien hizo marcas como las mías. Hace mucho."
+    },
+    {
+      "who": null,
+      "text": "Así que no soy el primero que anota para no olvidar."
+    },
+    {
+      "who": null,
+      "text": "Ahí. Debajo del polvo. Casi no se ve."
+    },
+    {
+      "who": null,
+      "text": "Lo encontramos."
+    },
+    {
+      "who": null,
+      "text": "Falta una sola unión."
+    },
+    {
+      "who": null,
+      "text": "A cada marca, uno. A cada uno, una marca. No sobra nada."
+    },
+    {
+      "who": "student",
+      "text": "Están todos."
+    },
+    {
+      "who": null,
+      "text": "Alguien está dibujando estrellas. No sé quién."
+    },
+    {
+      "who": null,
+      "text": "La Ronda quiere mirarlas desde las gradas. Se pusieron en fila para subir."
+    },
+    {
+      "who": null,
+      "text": "Punto cree que no alcanzan los asientos. La fila es mucho más larga que las gradas."
+    },
+    {
+      "who": null,
+      "text": "Probemos: uno por asiento."
+    },
+    {
+      "who": null,
+      "text": "La fila se vació y sobró un asiento."
+    },
+    {
+      "who": null,
+      "text": "La fila parecía más larga porque estaban separados, no porque fueran más."
+    },
+    {
+      "who": null,
+      "text": "No se podía saber mirando el largo. Emparejando, sí."
+    },
+    {
+      "who": null,
+      "text": "¿Para mí?"
+    },
+    {
+      "who": null,
+      "text": "¡Hizo una marca! Su primera marca."
+    },
+    {
+      "who": null,
+      "text": "Una por cada uno. Hasta una para él… y una para mí."
+    },
+    {
+      "who": null,
+      "text": "Para no tener que mirar todas las marcas cada vez, le pongo un nombre."
+    },
+    {
+      "who": null,
+      "text": "Las marcas sí se pueden emparejar con nosotros, sin que sobre nada. Las marcas son una colección: como nosotros, como los asientos ocupados."
+    },
+    {
+      "who": null,
+      "text": "Lo que tienen en común —las marcas, los asientos ocupados, nosotros— no es la forma ni el tamaño: es que se pueden emparejar sin que sobre nada."
+    },
+    {
+      "who": null,
+      "text": "Eso que comparten es el número. \"14\" y \"catorce\" son dos nombres para él."
+    },
+    {
+      "who": null,
+      "text": "¿Por qué un 1, si acá no hay uno solo de nada?"
+    },
+    {
+      "who": "student",
+      "text": "Buena pregunta."
+    },
+    {
+      "who": null,
+      "text": "Mañana."
+    },
+    {
+      "who": null,
+      "text": "El capítulo 2 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados."
+    }
+  ],
+  "createdAt": "2026-10-05T23:42:48.321Z",
+  "updatedAt": "2026-10-05T23:43:33.963Z"
+}

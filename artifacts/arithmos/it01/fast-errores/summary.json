@@ -1,0 +1,36 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c1.nombre"
+  },
+  "journal": [
+    "¿Están todos?"
+  ],
+  "evidenceKinds": [
+    "door",
+    "meet",
+    "record-method",
+    "record",
+    "record-repeat",
+    "recorded",
+    "pair",
+    "check",
+    "unpair",
+    "interpret",
+    "search",
+    "predict",
+    "seat",
+    "numeral"
+  ],
+  "fps": {
+    "min": "46.7",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 54.07,
+  "size": "1600x900",
+  "touch": false,
+  "route": "errores",
+  "watch": false
+}

@@ -126,7 +126,7 @@ class Game {
 
   saveNow() {
     clearTimeout(this.saveTimer);
-    if (!this.state || this.director.replay) return;
+    if (!this.state || this.director.replay || this.devNoSave) return;
     saveState(this.state);
   }
 
@@ -268,7 +268,12 @@ class Game {
     const level = Math.min(this.hint.level, lines.length - 1);
     this.hint.level++;
     this.addEvidence('hint', {level: level + 1});
-    const item = lines[level];
+    let item = lines[level];
+    // la demostración se hace una vez; después, la ayuda vuelve a ser una explicación
+    if (typeof item === 'function') {
+      if (this.hint.demoUsed) item = [...lines].reverse().find(l => typeof l === 'string');
+      else this.hint.demoUsed = true;
+    }
     if (typeof item === 'function') item();
     else this.note(item);
   }
@@ -326,7 +331,14 @@ async function boot() {
     const game = new Game();
     window.__game = game;
     document.getElementById('corner').hidden = true;
-    titleScene(game);
+    // desarrollo: ?seg=c1.marea abre esa escena en una partida temporal (no se guarda)
+    const seg = new URLSearchParams(location.search).get('seg');
+    if (seg) {
+      game.devNoSave = true;
+      game.state = newState();
+      game.state.segment = seg;
+      game.start(false);
+    } else titleScene(game);
     window.__ready = true;
   } catch (e) {
     const el = document.getElementById('fatal');
