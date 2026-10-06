@@ -1,4 +1,4 @@
-import { renderWorldMap, mapStyles } from './world-map.js';
+import { renderKingdomMap, bindKingdomMap } from './kingdom-map.js';
 import './style.css';
 import './interface.css';
 import './atlas.css';
@@ -10,7 +10,7 @@ import './travel-instrument.css';
 import './art-polish.css';
 import './journey-ui.css';
 import './hud.css';
-import {renderJourneyGuide,bindMapViews} from './journey-guide.js';
+import {renderJourneyGuide} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
 import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
@@ -348,8 +348,9 @@ function openGuide(){
 
 function openMap(){
   if(!started||!['world','modal'].includes(mode))return;
-  modal(`<style>${mapStyles}</style>${renderWorldMap(state,{position:world.getPlayerPosition(),inhabitants:world.getInteractions().filter(o=>o.kind==='npc'),objectiveArea:getObjective(state)?.area})}`,'map-modal');
-  bindMapViews($('#modal-layer'));
+  // The kingdom map: the world painted from above, with the journey drawn over it.
+  modal(renderKingdomMap(state,{position:world.getPlayerPosition(),facing:world.lastStep,inhabitants:world.getInteractions().filter(o=>o.kind==='npc')}),'kingdom-map');
+  bindKingdomMap($('#modal-layer'));
   $('[data-map-guide]').onclick=openGuide;
   document.querySelectorAll('[data-area]').forEach(button=>button.onclick=()=>{const id=button.dataset.area;if(!state.visited.includes(id)||!AREAS[id])return;closeModal();if(id!==state.area)enterArea(id);});
 }

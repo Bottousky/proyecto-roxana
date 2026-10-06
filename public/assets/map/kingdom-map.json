@@ -1,0 +1,10 @@
+{
+  "pxPerMetre": 8,
+  "x0": -100,
+  "z0": -345,
+  "width": 2048,
+  "height": 4096,
+  "metresWide": 256,
+  "metresTall": 512,
+  "north": "-z"
+}
