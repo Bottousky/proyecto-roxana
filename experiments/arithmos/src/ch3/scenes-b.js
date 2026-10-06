@@ -38,19 +38,20 @@ export const distancia = {
   },
   async play(d, g) {
     const w = g.world;
+    const s = w.get('student');
     const p = w.get('punto');
     await d.shot(SHOTS.line, 1);
-    await d.say('Espiral', 'Recta, ¿cuánto más que nosotros tenés?');
+    await d.say('Cuña', 'Recta, ¿cuánto más que nosotros tenés?');
     const guess = await d.choose([
       {id: '7', text: '7'}, {id: '8', text: '8'}, {id: '1', text: '1'},
-    ], {prompt: '¿Cuántos pasos hay de Espiral (−4) a Recta (+3)?', evaluate: true});
+    ], {prompt: '¿Cuántos pasos hay de Cuña (−4) a Recta (+3)?', evaluate: true});
     d.evidence('predict-steps', {answer: guess});
-    // contar pasos de Espiral (−4) a Recta (+3): uno por marca
+    // contar pasos de Cuña (−4) a Recta (+3): uno por marca
     await d.think('Pasos, de marca en marca.');
     let at = -4;
     const target = 3;
     await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => ['Desde Espiral, un paso por marca hasta llegar a Recta.', 'Tocá la marca siguiente, a la derecha de la última.']);
+      g.setHint(() => ['Desde Cuña, un paso por marca hasta llegar a Recta.', 'Tocá la marca siguiente, a la derecha de la última.']);
       const refresh = () => g.ui.setSpots([rectSpot(`step${at + 1}`, `Marca ${signed(at + 1)}: un paso más`, {x: lineX(at + 1) - 24, y: GROUND - 40, w: 48, h: 90}, () => step())]);
       let busy = false;
       const step = async () => {
@@ -78,7 +79,7 @@ export const distancia = {
       refresh();
     }));
     g.setHint(null);
-    await d.think(guess === '7' ? 'Siete, como dije. Las deudas también son pasos.'
+    await d.think(guess === '7' ? 'Siete. Las deudas también son pasos.'
       : guess === '8' ? 'Ocho marcas, pero siete pasos: en la primera marca ya estaba parado.'
         : 'Siete, no uno: tres menos cuatro no sirve acá. Los pasos de las deudas también cuentan.');
     // la distancia al cero no tiene lado
@@ -93,9 +94,9 @@ export const distancia = {
     g.setCinematic(false);
     const c = await d.choose([
       {id: 'recta', text: 'Recta, que tiene 4.'},
-      {id: 'curva', text: 'Espiral, que debe 4.'},
+      {id: 'curva', text: 'Cuña, que debe 4.'},
       {id: 'same', text: 'Están igual de lejos.'},
-    ], {prompt: '¿Quién está más lejos del cero: Recta (+4) o Espiral (−4)?', evaluate: true});
+    ], {prompt: '¿Quién está más lejos del cero: Recta (+4) o Cuña (−4)?', evaluate: true});
     d.evidence('abs', {answer: c});
     // Punto mide de los dos lados
     g.setCinematic(true);
@@ -109,7 +110,16 @@ export const distancia = {
     }
     g.setCinematic(false);
     await d.think(c === 'same' ? 'Cuatro pasos cada uno.' : 'Cuatro pasos cada uno: igual de lejos.');
-    await d.say('Mara', 'Lo lejos que está del cero no tiene lado. Se anota con dos barritas: |−4| = 4, y también |+4| = 4.');
+    // el estudiante lo anota en el suelo
+    g.setCinematic(true);
+    await d.walk(s, lineX(-6) - 40, GROUND, 260);
+    s.setPose('writeLow', 0.3);
+    const ab = w.add(new Label('cv-abs', '|−4| = |+4| = 4', lineX(-5), GROUND - 250, {size: 40, z: 9, reveal: 0}));
+    await d.draw(ab, 1, {key: 'reveal'});
+    s.setPose('idle', 0.4);
+    g.setCinematic(false);
+    await d.say('student', 'Las barritas dicen: lo lejos del cero, sin el lado.');
+    await d.say('Mara', 'Dos barritas. Lo anoto así.');
     g.flags.c3dist = true;
   },
 };
@@ -228,13 +238,11 @@ export const perdon = {
     d.evidence('forgive-same', {answer: same});
     g.setCinematic(true);
     p.setMode('still');
-    p.arrow = true;
     const to = same === 'give' ? 1 : -3;
     await zip(d, p, lineX(-1), GROUND - 50, 0.4);
     await zip(d, p, lineX(to), GROUND - 50, 0.6);
     g.audio.punto(same === 'give' ? 'yes' : 'no');
     await d.wait(0.4);
-    p.arrow = false;
     follow(p, w.get('student'));
     g.setCinematic(false);
     await d.think(same === 'give' ? 'Lo mismo: sacar dos deudas es como dar dos atados.' : 'Eso la lleva a −3, para el otro lado. Sacar dos deudas es como dar dos atados.');
@@ -249,9 +257,10 @@ export const perdon = {
       {id: 'same', text: 'Lo mismo que las otras rayitas.'},
     ], {prompt: 'En −1 − (−2), ¿qué dice la rayita del medio, la que está suelta?', evaluate: true});
     d.evidence('read-minus', {answer: read});
-    await d.say('Mara', read === 'take'
-      ? 'Eso. La suelta dice "sacar". Las pegadas al número dicen "deuda". Por eso el paréntesis: guarda al número con su signo.'
-      : 'No: la suelta dice "sacar". Las pegadas al número dicen "deuda". Por eso el paréntesis: guarda al número con su signo.');
+    await d.say('student', read === 'take'
+      ? 'La suelta dice "sacar". Las pegadas al número dicen "deuda". El paréntesis guarda al número con su rayita.'
+      : 'No: la suelta dice "sacar". Las pegadas al número dicen "deuda". El paréntesis guarda al número con su rayita.');
+    await d.say('Mara', 'Para no confundirlas. Bien.');
     await d.think('El mismo trazo, dos trabajos.');
     // al revés: pagar más atados de los que se tienen
     await payMore(d, g);
@@ -278,11 +287,13 @@ async function payMore(d, g) {
   let padded = false;
   await d.interact(ctl => new Promise(resolve => {
     let busy = false;
-    g.setHint(() => ['Tocá un atado de la mesa para pagarlo.', 'Si no quedan atados, se puede agregar un atado y una deuda: juntos valen cero.']);
+    g.setHint(() => ['Tocá un atado de la mesa para pagarlo.', 'Si no quedan atados, Oval le puede pedir prestado a Mara: un atado que tiene y uno que debe, juntos valen cero.']);
     const haves = () => w.objects.filter(o => o.id.startsWith('pm-') && o.kind === 'have' && !o.gone);
+    let lent = 0;
     const refresh = () => {
-      const spots = haves().map(o => spotOf(o, 'Un atado de Oval: pagarlo', () => pay(o)));
-      if (!spots.length && paid < 5) spots.push(wordSpot('pm-pad', 'agregar pares que valen cero', TABLE.x, TABLE.top - 30, () => pad()));
+      const hs = haves();
+      const spots = hs.map((o, i) => spotOf(o, `Atado de Oval ${i + 1} de ${hs.length}: pagarlo`, () => pay(o)));
+      if (paid < 5 && lent < 4) spots.push(wordSpot('pm-pad', 'pedirle a Mara un atado prestado', TABLE.x, TABLE.top - 30, () => pad()));
       g.ui.setSpots(spots);
     };
     const pay = async o => {
@@ -301,16 +312,16 @@ async function payMore(d, g) {
       if (busy || !ctl.alive()) return;
       busy = true;
       padded = true;
-      d.describe('Aparecen en la mesa tres atados y tres deudas: tres pares que valen cero.');
+      d.describe('Mara le presta un atado a Oval: en la mesa aparecen un atado y una deuda.');
       try {
-        const list = [];
-        for (let k = 0; k < 3; k++) {
-          list.push(chip(w, 'have', ...tableSlot('have', k), `pm-zh${k}`), chip(w, 'debt', ...tableSlot('debt', k), `pm-zd${k}`));
-        }
-        for (const o of list) o.progress = 0;
-        await d.tween(0.6, q => { for (const o of list) o.progress = q; });
+        if (!lent) await d.say('Mara', 'Te lo presto: un atado que tenés y uno que me debés.');
+        const k = lent++;
+        const h = chip(w, 'have', ...tableSlot('have', 2 + k), `pm-zh${k}`);
+        const dd = chip(w, 'debt', ...tableSlot('debt', k), `pm-zd${k}`);
+        h.progress = dd.progress = 0;
+        await d.tween(0.4, q => { h.progress = dd.progress = q; });
       } catch { return; }
-      d.evidence('pay-pad', {pairs: 3});
+      d.evidence('pay-pad', {lent});
       busy = false;
       refresh();
     };
@@ -319,7 +330,12 @@ async function payMore(d, g) {
   g.setHint(null);
   const r = removeHaves({haves: 2, debts: 0}, 5);
   d.evidence('pay-result', {value: r.value, padded});
-  await d.think(guess === '-3' ? 'Quedó debiendo tres, como dije: 2 − 5 = −3.' : guess === '+3' ? 'No le quedan: quedaron tres deudas. 2 − 5 = −3.' : 'Pudo pagar, pero quedó debiendo tres: 2 − 5 = −3.');
+  const left = w.objects.filter(o => o.id.startsWith('pm-') && !o.gone);
+  const lh = left.filter(o => o.kind === 'have').length, ld = left.filter(o => o.kind === 'debt').length;
+  if (lh - ld !== r.value) console.error(`[pagar] en la mesa quedan ${lh} atados y ${ld} deudas; la cuenta dice ${r.value}`);
+  if (lh > 0) await d.think(`Sobró ${lh === 1 ? 'un par' : `${lh} pares`} de lo prestado: un atado y una deuda, que no cambian nada.`);
+  await d.say('Mara', 'Me pagaste cinco: dos tuyos y tres que te presté. Me debés tres.');
+  await d.think(guess === '-3' ? 'Dos menos cinco: menos tres.' : guess === '+3' ? 'No le quedan atados: le quedan tres deudas. 2 − 5 = −3.' : 'Pudo pagar, pidiendo prestado, y quedó debiendo tres: 2 − 5 = −3.');
   await d.shot(SHOTS.line, 1);
   g.setCinematic(true);
   ov.face(-1);
@@ -359,6 +375,7 @@ export const pozo = {
     await zip(d, p, PIT.x - 20, GROUND - 40, 0.5);
     await zip(d, p, PIT.x + 30, GROUND - 60, 0.3);
     g.audio.punto('surprise');
+    d.describe('Punto juega en el borde del pozo, resbala y cae hasta la marca −4.');
     await d.tween(0.6, k => { p.x = PIT.x + 30; p.y = GROUND - 60 + k * k * (4 * PIT.step + 60); });
     g.audio.tap(0.4, 0.9);
     p.tremble = 1;
@@ -366,7 +383,7 @@ export const pozo = {
     g.setCinematic(false);
     await d.say('student', '¡Punto!');
     s.setPose('lean', 0.3);
-    await d.say('Mara', 'Cuatro debajo del suelo… como Espiral, que debe cuatro. El mismo −4.');
+    await d.say('Mara', 'Cuatro debajo del suelo… como Cuña, que debe cuatro. El mismo −4.');
     const c = await d.choose([
       {id: '+1', text: '+1'}, {id: '-9', text: '−9'}, {id: '+9', text: '+9'}, {id: '-1', text: '−1'},
     ], {prompt: 'Punto está en −4. Puede subir cinco marcas. ¿Dónde queda?', evaluate: true});
@@ -418,7 +435,7 @@ export const pozo = {
     w.removeWhere(o => o.id.startsWith('pitc-'));
     p.tremble = 0;
     s.setPose('idle', 0.4);
-    await d.think(c === '+1' ? 'Más uno. Arriba del suelo, como dije.' : 'Más uno: cuatro para llegar al suelo y uno más.');
+    await d.think(c === '+1' ? 'Más uno, arriba del suelo.' : 'Más uno: cuatro para llegar al suelo y uno más.');
     g.flags.c3pit = true;
   },
 };
@@ -458,10 +475,14 @@ export const hacia = {
     g.audio.punto('happy');
     follow(p, s);
     g.setCinematic(false);
-    await d.say('Mara', 'Ahora cada número dice cuánto… y para qué lado. Menos el cero, que está en el medio.');
+    await d.say('student', 'Punto… ahora señalás.');
+    g.audio.punto('happy');
+    await pulse(d, p, 2, 0.4);
+    g.flags.puntoArrow = true;
+    await d.think('Cada número dice cuánto y para qué lado, como Punto. Menos el cero, que está en el medio.');
     if (!replay) writeJournal3(g);
-    await d.say('Mara', 'Arriba, en el barrio de las Terrazas, cuatro familias deben lo mismo: tres atados cada una.');
-    await d.say('Mara', '¿Cuánto se debe, en total?');
+    await d.say('Mara', 'Arriba, en las Terrazas, la Marea se está llevando la escalera. Dicen que en una piedra hay un signo que nadie entiende.');
+    await d.say('Mara', 'Y me deben atados. Mañana subimos.');
     g.audio.punto('question');
     await pulse(d, p, 1, 0.4);
   },
@@ -510,6 +531,6 @@ function writeJournal3(g) {
     moments: [{id: 'c3.hacia', label: 'Desplegar: cuánto y hacia dónde'}],
   };
   g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora');
+  g.ui.toast('Anotado en la Bitácora (≡)');
   g.saveNow();
 }

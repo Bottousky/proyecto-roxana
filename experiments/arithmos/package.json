@@ -8,7 +8,8 @@
     "test": "node --test tests/",
     "check": "for f in src/*.js src/*/*.js scripts/*.mjs; do node --check \"$f\" || exit 1; done",
     "play:auto": "node scripts/playthrough.mjs ../../artifacts/arithmos/tmp/auto",
-    "play:film": "node scripts/playthrough.mjs ../../artifacts/arithmos/tmp/film --watch --film --route=directa"
+    "play:film": "node scripts/playthrough.mjs ../../artifacts/arithmos/tmp/film --watch --film --route=directa",
+    "lint": "node scripts/lint-scenes.mjs"
   },
   "devDependencies": {
     "playwright": "^1.55.0"

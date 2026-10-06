@@ -912,8 +912,8 @@ async function pairing(d, g, {dots = RETURNED, done = 'left-more', initial} = {}
       for (const [i, m] of markIds.entries()) spots.push(rectSpot(m, label(m), markRect(i), () => choose(m), {selected: selected === m}));
       for (const id of RETURNED_) spots.push(dotSpot(g, id, label(id), () => choose(id), {selected: selected === id}));
       if (links.length) {
-        const [cx] = markPos(MARKS - 1);
-        spots.push(wordSpot('check', 'comprobar', cx + 120, PAIRED_Y - 70, () => check()));
+        // al costado de la piedra, más abajo de donde deambulan los puntos (que no lo tapen)
+        spots.push(wordSpot('check', 'comprobar', STONE.x + STONE.w / 2 + 90, GROUND - 40, () => check()));
       }
       g.ui.setSpots(spots);
     };
@@ -2052,7 +2052,7 @@ function writeJournal(g) {
     ],
   };
   g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora');
+  g.ui.toast('Anotado en la Bitácora (≡)');
   g.saveNow();
 }
 

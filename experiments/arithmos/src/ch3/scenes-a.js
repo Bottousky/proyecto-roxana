@@ -61,8 +61,9 @@ export const deuda = {
     const m = w.get('mara');
     const cv = w.get('curva');
     await d.shot(SHOTS.ledger, 1);
-    await d.say('Mara', 'Hoja nueva: las cuentas de cada familia, en atados. Recta tiene cuatro guardados; Oval, otros cuatro.');
-    await d.say('Curva', 'Mara… te debo tres atados de ayer. Y ya no me queda ninguno.');
+    d.describe('En la pizarrita de Mara, una hoja nueva: Recta 4, Oval 4, y al lado de Curva, nada. Curva espera con las manos vacías.');
+    await d.say('Mara', 'Hoja nueva. Desde que todos devolvieron lo que les sobraba, anoto lo que cada familia tiene guardado acá, en atados.');
+    await d.say('Curva', 'Y yo, los tres que te debo.');
     m.setPose('think', 0.4);
     await d.say('Mara', 'Cuando no hay nada, escribo 0: eso ya lo aprendí. Pero esto no es "no hay": es que falta. ¿Cómo lo anoto?');
     m.setPose('idle', 0.4);
@@ -110,6 +111,12 @@ export const deuda = {
         await d.draw(v, 0.6, {key: 'reveal'});
         await d.say('Mara', 'Eso se entiende. ¿Y si mañana le pagan dos? ¿Hago la cuenta con palabras?');
       }
+      // una pasada de borrador se lleva lo que no sirve
+      g.setCinematic(true);
+      d.describe('Pasa una brisa de borrador por la pizarrita y se lleva lo que estaba escrito al lado de Curva.');
+      g.audio.erase(0.8, 0.5);
+      await d.fadeTo(v, 0, 0.8, 'reveal');
+      g.setCinematic(false);
       v.text = '';
       opts.splice(opts.findIndex(o => o.id === c), 1);
       if (c === 'words') break;
@@ -119,8 +126,20 @@ export const deuda = {
     v.text = '3'; v.reveal = 1;
     p.setMode('still');
     const bx = v.x - 22, by = v.y - 13;
+    // primero la pone detrás
+    const ax = v.x + 30;
+    await zip(d, p, ax, by - 30, 0.4);
+    d.describe('Punto dibuja una rayita amarilla, acostada, después del 3.');
+    const wrong = w.add(new Drawing('l3-dash-w', [stroke([[ax, by], [ax + 20, by]], {w: 4, p: 0.95, ch: YELLOW, seed: 34, lift: false})], {z: 10, progress: 0}));
+    await d.tween(0.4, k => { p.x = ax + k * 20; p.y = by; wrong.progress = k; });
+    g.setCinematic(false);
+    await d.say('Mara', 'Tres menos… ¿menos qué? ¿Le falta algo a la cuenta?');
+    g.setCinematic(true);
+    g.audio.punto('surprise');
+    await d.fadeTo(wrong, 0, 0.4);
+    w.remove(wrong.id);
     await zip(d, p, bx - 10, by - 30, 0.4);
-    d.describe('Punto dibuja una rayita amarilla, acostada, delante del 3.');
+    d.describe('Punto la borra y la vuelve a dibujar delante del 3.');
     const dash = w.add(new Drawing('l3-dash', [stroke([[bx - 12, by], [bx + 8, by]], {w: 4, p: 0.95, ch: YELLOW, seed: 33, lift: false})], {z: 10, progress: 0}));
     await d.tween(0.4, k => { p.x = bx - 12 + k * 20; p.y = by; dash.progress = k; });
     g.audio.punto('happy');
@@ -129,6 +148,13 @@ export const deuda = {
     follow(p, s);
     g.setCinematic(false);
     await d.say('Mara', 'Una rayita acostada. Menos tres: tres que faltan.');
+    // lo que se entiende, resiste
+    g.setCinematic(true);
+    d.describe('Pasa otra brisa de borrador por la pizarrita. El −3 de Curva se queda firme.');
+    g.audio.erase(1.2, 0.5);
+    g.camera.shake = 0.15;
+    await d.wait(1.2);
+    g.setCinematic(false);
     await d.think('Tres, pero para el otro lado.');
     g.flags.c3debt = true;
   },
@@ -222,11 +248,12 @@ export const pares = {
     await d.say('Oval', 'Curva, tomá: dos atados de los míos, por la cerca que me arreglaste.');
     g.setCinematic(true);
     setTable(g, 'cv', 0, 3);
+    d.describe('Oval le pasa dos atados a Curva. En la mesa: dos atados arriba y tres deudas punteadas abajo.');
     const hs = [0, 1].map(k => chip(w, 'have', ov.x, GROUND - 60, `cv-h${k}`));
     for (const [k, h] of hs.entries()) await hop(d, h, ...tableSlot('have', k), {g, h: 80, dur: 0.6});
     g.setCinematic(false);
     await d.shot(SHOTS.table, 1);
-    await d.say('Mara', 'Ahora tiene dos y debe tres. Lo que tiene paga lo que debe: uno contra uno.');
+    await d.say('Mara', 'Ahora tiene dos y debe tres.');
     const r = await cancelPairs(d, g, 'cv');
     d.evidence('cancel-result', {haves: r.haves, debts: r.debts, wrong: r.wrong});
     const opts = [
@@ -262,7 +289,7 @@ export const pares = {
     ], {prompt: '¿Cuánto le queda a Recta?', evaluate: true});
     d.evidence('predict-balance', {answer: pred, expect: '+3'});
     await cancelPairs(d, g, 'rc');
-    await d.think(pred === '+3' ? 'Tres. Lo anticipé.' : 'Tres: un par se borró y quedaron tres de arriba.');
+    await d.think(pred === '+3' ? 'Tres: un par se borró.' : 'Tres: un par se borró y quedaron tres de arriba.');
     // la cruz: lo que se tiene también lleva signo
     const vr = w.get('l3v-recta');
     await d.shot({...SHOTS.table, x: SHOTS.table.x - 900, w: SHOTS.table.w + 900}, 1);
@@ -271,7 +298,10 @@ export const pares = {
     await d.draw(vr, 0.5, {key: 'reveal'});
     vo.text = '+2'; vo.reveal = 0;
     await d.draw(vo, 0.4, {key: 'reveal'});
-    await d.think('Más tres: tres que se tienen. Menos uno: uno que falta.');
+    await d.say('Mara', 'Y Cuña, que me debe cuatro desde la semana pasada.');
+    const vc = ledgerRow(w, 'cuna', 'Cuña', '−4', 3, {reveal: 0});
+    await d.draw(vc, 0.5, {key: 'reveal'});
+    await d.think('Más tres: tres que se tienen. Menos cuatro: cuatro que faltan.');
     g.flags.c3pairs = true;
   },
 };
@@ -284,14 +314,14 @@ export const FAMILIES = [
   {id: 'recta', head: 'square', value: 3, name: 'Recta'},
   {id: 'oval-a', head: 'oval', value: 2, name: 'Oval'},
   {id: 'curva', head: 'curl', value: -1, name: 'Curva'},
-  {id: 'espiral', head: 'tri', value: -4, name: 'Espiral'},
+  {id: 'cuna', head: 'tri', value: -4, name: 'Cuña'},
 ];
 
 export function familySigns(g) {
   const w = g.world;
   for (const f of FAMILIES) {
     const fig = w.get(f.id);
-    w.ensure(`sign-${f.id}`, () => new Label(`sign-${f.id}`, signed(f.value), 0, 0, {size: 30, align: 'center', z: 32, ch: YELLOW}));
+    w.ensure(`sign-${f.id}`, () => new Label(`sign-${f.id}`, signed(f.value), 0, 0, {size: 30, align: 'center', z: 32}));
     const lab = w.get(`sign-${f.id}`);
     lab.update = () => { const h = fig.headPos(); lab.x = h[0]; lab.y = h[1] - 34; };
   }
@@ -429,8 +459,8 @@ export const linea = {
       g.saveNow();
     }
     const pred = sc.prediction;
-    await d.think(pred === 'espiral' ? 'Menos cuatro, más a la izquierda: es menor. Lo anticipé.' : pred === 'curva' ? 'Cuatro es más que uno… pero deber cuatro es tener menos. −4 está más a la izquierda: es menor.' : 'Los dos son negativos, pero no iguales: −4 está más a la izquierda. Es menor.');
-    await d.say('Mara', 'Así se ve enseguida: el que está más a la derecha, tiene más.');
+    await d.think(pred === 'espiral' ? 'Menos cuatro, más a la izquierda: es menor.' : pred === 'curva' ? 'Cuatro es más que uno… pero deber cuatro es tener menos. −4 está más a la izquierda: es menor.' : 'Los dos son negativos, pero no iguales: −4 está más a la izquierda. Es menor.');
+    await d.say('Curva', 'O sea que yo, en −1, tengo más que Cuña. Algo es algo.');
     g.flags.c3line = true;
   },
 };

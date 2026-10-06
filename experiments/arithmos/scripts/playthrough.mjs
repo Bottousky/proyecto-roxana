@@ -75,6 +75,7 @@ const read = () => page.evaluate(() => {
     skip: vis(document.querySelector('#skip-btn')),
     cinematic: g.cinematic,
     titleVisible: vis(document.querySelector('#title')),
+    fatal: vis(document.querySelector('#fatal')) ? document.querySelector('#fatal').textContent : '',
     flags: g.state?.flags,
     fps: (() => { const f = g.frameTimes.slice(-120); return f.length ? f.length / f.reduce((a, b) => a + b, 0) : 0; })(),
   };
@@ -116,9 +117,7 @@ function pickChoice(prompt, options) {
     ['le deben las Terrazas', 'Siete', 'Doce'],
     ['giradas', 'Más', 'Lo mismo'],
     ['dos maneras', 'Hay que contar las dos', 'Alcanza con una'],
-    ['Con el doble', '−1', '−6'],
-    ['vuelta las cuentas', '+4', '−4'],
-    ['vuelta otra vez', 'Quedan más', 'Vuelven'],
+    ['otra media vuelta', 'Quedan más', 'Vuelven'],
     ['Catorce atados entre cuatro', 'Cuatro cada una', 'Tres cada una, y sobran'],
     ['Quedan dos atados', 'Dárselos', 'Partirlos', 'Dejarlos'],
     ['bolsas de tres se llenan', 'Tres bolsas', 'Cuatro bolsas'],
@@ -128,6 +127,21 @@ function pickChoice(prompt, options) {
     ['por 0 da 6', 'El cero', 'Ninguno'],
     ['sumando las dos partes', 'Sí, cambia', 'No: siempre'],
     ['4 × 13', '43', '52'],
+    ['Dos atados entre cuatro', 'Darle uno', 'Desatarlos'],
+    ['medio montón de seis', 'Lo mismo', 'Medio montón'],
+    ['partes iguales cortás', 'En 3.', 'En 2.'],
+    ['quién tiene más tiza', 'Cornisa', 'Tienen lo mismo'],
+    ['sextos de barra hacen', 'Dos.', 'Tres.'],
+    ['Para marcar 3/4', 'en 3.', 'en 4.'],
+    ['dónde va 5/4', 'ningún lado', 'Pasando'],
+    ['entre 1/2 y 3/4', 'No:', 'Sí'],
+    ['un cuarto o un tercio', '1/4 de barra', '1/3 de barra'],
+    ['2/3 o 3/4', 'Son iguales', '3/4.'],
+    ['cuánto tiene Rampa', '2/5', '5/6'],
+    ['Dónde se guarda', 'con las enteras', 'Partirla'],
+    ['2,05 es lo mismo', 'Sí: el 0', 'No: es menos'],
+    ['trato les conviene', 'El 80 %', 'Dan lo mismo'],
+    ['mida la diagonal justo', 'partiendo bastante fino', 'Quizás'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -164,9 +178,7 @@ function pickChoice(prompt, options) {
     ['le deben las Terrazas', 'Doce'],
     ['giradas', 'Lo mismo'],
     ['dos maneras', 'Alcanza con una'],
-    ['Con el doble', '−6'],
-    ['vuelta las cuentas', '−4'],
-    ['vuelta otra vez', 'Vuelven'],
+    ['otra media vuelta', 'Vuelven'],
     ['Catorce atados entre cuatro', 'Tres cada una, y sobran'],
     ['Quedan dos atados', 'Dejarlos'],
     ['bolsas de tres se llenan', 'Cuatro bolsas'],
@@ -176,6 +188,21 @@ function pickChoice(prompt, options) {
     ['por 0 da 6', 'Ninguno'],
     ['sumando las dos partes', 'No: siempre'],
     ['4 × 13', '52'],
+    ['Dos atados entre cuatro', 'Desatarlos'],
+    ['medio montón de seis', 'Medio montón'],
+    ['partes iguales cortás', 'En 4.'],
+    ['quién tiene más tiza', 'Tienen lo mismo'],
+    ['sextos de barra hacen', 'Tres.'],
+    ['Para marcar 3/4', 'en 4.'],
+    ['dónde va 5/4', 'Pasando'],
+    ['entre 1/2 y 3/4', 'Sí'],
+    ['un cuarto o un tercio', '1/3 de barra'],
+    ['2/3 o 3/4', '3/4.'],
+    ['cuánto tiene Rampa', '5/6'],
+    ['Dónde se guarda', 'Partirla'],
+    ['2,05 es lo mismo', 'No: es menos'],
+    ['trato les conviene', 'Dan lo mismo'],
+    ['mida la diagonal justo', 'Quizás'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -195,7 +222,7 @@ const searchOrder = ['look-crack', 'look-house', 'look-smudge'];
 let lastSeg = null;
 let stuck = 0;
 let lastSig = '';
-const reloadAt = new Set(opt('reload') ? ['c1.ronda', 'c1.vuelven', 'c1.gradas', 'c1.nombre'] : []);
+const reloadAt = new Set([...(opt('reload') ? ['c1.ronda', 'c1.vuelven', 'c1.gradas', 'c1.nombre'] : []), ...val('reload-at', '').split(',').filter(Boolean)]);
 const reloaded = new Set();
 const fpsSamples = [];
 let ended = false;
@@ -226,6 +253,9 @@ for (let iter = 0; iter < 4000; iter++) {
       continue;
     }
   }
+  if (s.fatal) { errors.push(`falla del juego en ${s.seg}: ${s.fatal}`); note(`FALLA: ${s.fatal}`); break; }
+  // --until=N: termina cuando empieza el capítulo N + 1
+  if (val('until', '') && s.seg?.startsWith(`c${Number(val('until', '0')) + 1}.`)) { ended = true; break; }
   if (s.fps) fpsSamples.push(s.fps);
   if (s.mode === 'title') {
     if (s.flags?.chapterDone) { ended = true; break; }
@@ -297,7 +327,7 @@ for (let iter = 0; iter < 4000; iter++) {
       const freeMarks = spots.filter(x => x.id.startsWith('mark') && x.label.includes('sin unir'));
       const freeDots = spots.filter(x => !x.id.startsWith('mark') && x.label.includes('sin unir'));
       const linkedDots = byLabel('unido a una marca');
-      const dbl = byLabel('unido a 2 marcas');
+      const dbl = spots.filter(x => /unido a [2-9] marcas/.test(x.label));
       if (dbl.length && pairingStage >= 2 && !sel) {
         const st = await page.evaluate(() => window.__game.state.scratch['c1.vuelven'].links);
         const last = st.filter(([, b]) => b === dbl[0].id).pop();
@@ -352,6 +382,8 @@ for (let iter = 0; iter < 4000; iter++) {
       const done = byLabel('ya contada');
       if (route === 'errores' && done.length === 5 && !tried.has('recount')) { tried.add('recount'); target = done[0]; }
       else target = todo[(todo.length * 3) % Math.max(1, todo.length)] || todo[0];
+    } else if (s.seg === 'c2.atados' && spots.some(x => x.id === 'yring')) {
+      target = spots.find(x => x.id === 'yring');
     } else if (s.seg === 'c2.atados') {
       const word = id => spots.find(x => x.id === id);
       const atar = word('atar');
@@ -426,8 +458,17 @@ for (let iter = 0; iter < 4000; iter++) {
       if (route === 'errores' && !tried.has('unfair') && fams.some(x => n(x) > min)) { tried.add('unfair'); target = fams.find(x => n(x) > min); }
       else if (vuelta && route !== 'errores') target = vuelta;
       else target = fams.find(x => n(x) === min);
+    } else if (s.seg === 'c4.estirar' && spots.some(x => x.id.startsWith('op-'))) {
+      target = route === 'errores' ? spots[0] : (spots.find(x => x.id === 'op-times2' || x.id === 'op-timesm1') || spots[0]);
+    } else if (s.seg === 'c4.nadie' && spots.some(x => x.id === 'nz-stop')) {
+      target = (route === 'errores' && !tried.has('nzmore') && spots.length && (tried.add('nzmore'), true)) ? spots.find(x => x.id === 'nz-fill') : spots.find(x => x.id === 'nz-stop');
+    } else if (s.seg === 'c5.recta') {
+      const qs = spots.filter(x => x.id.startsWith('q'));
+      if (route === 'errores' && !tried.has('q1')) { tried.add('q1'); target = qs.find(x => x.id === 'q1'); }
+      else target = qs.find(x => x.id === 'q3') || spots[0];
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
+      if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }
     } else {
       target = spots[0];
     }

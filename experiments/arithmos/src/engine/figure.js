@@ -323,6 +323,27 @@ function headGuide(kind, cx, cy, r, rnd) {
     const q = r * 1.1;
     return [[cx, cy - q * 1.05], [cx + q, cy + q * 0.75], [cx - q, cy + q * 0.78], [cx + 2, cy - q * 1.02]];
   }
+  if (kind === 'diamond') {
+    const q = r * 1.15;
+    return [[cx, cy - q], [cx + q * 0.85, cy], [cx, cy + q], [cx - q * 0.85, cy], [cx + 1, cy - q + 1]];
+  }
+  if (kind === 'half') {
+    // semicírculo: cúpula con base recta
+    const pts = [];
+    for (let i = 0; i <= 10; i++) { const a = Math.PI + (i / 10) * Math.PI; pts.push([cx + Math.cos(a) * r * 1.1, cy + r * 0.55 + Math.sin(a) * r * 1.3]); }
+    pts.push([cx - r * 1.1, cy + r * 0.55 + 1]);
+    return pts;
+  }
+  if (kind === 'step') {
+    // escalón: dos peldaños
+    const q = r * 1.05;
+    return [[cx - q, cy + q], [cx - q, cy - q * 0.1], [cx, cy - q * 0.1], [cx, cy - q], [cx + q, cy - q], [cx + q, cy + q], [cx - q + 1, cy + q + 1]];
+  }
+  if (kind === 'hex') {
+    const pts = [];
+    for (let i = 0; i <= 6; i++) { const a = -Math.PI / 2 + (i / 6) * Math.PI * 2; pts.push([cx + Math.cos(a) * r * 1.08, cy + Math.sin(a) * r * 1.08]); }
+    return pts;
+  }
   if (kind === 'square') {
     const q = r * 0.95;
     return [[cx - q, cy - q + 2], [cx - q + 2, cy - q], [cx + q, cy - q + 1], [cx + q + 1, cy + q], [cx - q, cy + q + 1], [cx - q - 1, cy - q + 6]];

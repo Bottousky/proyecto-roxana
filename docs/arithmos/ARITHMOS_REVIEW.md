@@ -142,5 +142,46 @@ textos, Bitácoras, película de la ruta directa de los caps. 1–2). No vio el 
 | M-l | media | Pasos y subida del pozo con un solo botón | Corregido: se anticipan los pasos (7/8/1) y en el pozo el jugador elige hasta qué marca sube; si no son cinco, Punto vuelve |
 | bajas 1–12 | baja | Mara olvida el cero; Bitácora que atribuye de más; "nombra a los catorce"; "siete atados"; "dejar los diez"; espacio en blanco; el 0 sin lado; "+" sin presentar; textos fantasma anticipados; comentarios | Corregidas 1–10 (el "+" lo presenta Mara con la cruz; los textos fantasma pasan a dibujos). 11: comentario de `ch3/common.js` corregido; `placevalue.js` sin cambios (función sin uso). 12: currículo, pendiente en este ciclo |
 
+## Revisión matemática independiente del cap. 4 (rev-mat-3, 2026-10-06)
+
+Informe: `artifacts/arithmos/it04/review-mat/informe.md`. Sin navegador. Confirmó resueltas casi todas las
+correcciones de rev-mat-2.
+
+| # | Sev. | Hallazgo | Disposición |
+|---|---|---|---|
+| A-1 | alta | "Otra vuelta" aparecía con repartos desparejos y el juego decía "cada una tiene tres" igual | Corregido: sólo aparece cuando todas tienen lo mismo, y no actúa si no; guarda que compara lo que se ve con la cuenta |
+| — | alta (autor) | Los atados de la familia 0 se tomaban por "sin dueño" (5 sobrantes) | Corregido antes de la revisión; guardas en reparto y medida |
+| M-1 | media | El giro del rectángulo reacomodaba los atados (no era rígido) | Corregido: filas y columnas igual de separadas; el giro cae justo en la grilla (guarda) |
+| M-2 | media | La media vuelta no era un giro (positivos y negativos por arriba); la segunda desandaba; (−1)(−1) sin nadie en ±1 | Corregido: giro rígido alrededor del cero (positivos por arriba, negativos por abajo); la segunda media vuelta sigue en el mismo sentido y cierra la vuelta; Punto gira desde +1 |
+| M-3 | media | Cantidades del cap. 4 contradictorias (deudas que se duplican; "ayer" eran 12; la huerta 9 × 4 y 4 × 5; 6 atados sin origen) | Corregido: 4.3 es el plano de las casas respecto del pozo (escala, no deudas); "recién, catorce"; la huerta de 9 × 4 es de Rampa; los 6 atados son los guardados para la próxima cosecha |
+| M-4 | media | En 2 − 5 los pares cero salían de la nada y Mara cobraba 8 | Corregido: Oval le pide prestado a Mara de a un atado (el jugador decide cuántos); Mara: "me pagaste cinco: dos tuyos y tres que te presté; me debés tres"; guarda de la cuenta |
+| A2 parcial | — | Espiral sin fila en el registro | Corregido: se anota (ahora "Cuña", −4) en 3.2 |
+| baja 12 | — | Currículo y diseño desactualizados | Corregido (B4–B5 implementado; deuda = atado punteado) |
+
+## Revisión narrativa y de puesta en escena, caps. 2–4 (rev-narr-2, 2026-10-06)
+
+Informe: `artifacts/arithmos/it04/review-narr/informe.md`. Sin navegador; varias capturas eran anteriores al código.
+
+| # | Sev. | Hallazgo | Disposición |
+|---|---|---|---|
+| A1 | alta | La Marea desaparece después del cap. 2 | Corregido en 3 y 4: la pasada de borrador se lleva las escrituras equivocadas de la deuda y el −3 resiste; la escalera de las Terrazas está borroneada y se redibuja al entender 4 × 3; el gancho 3→4 es la escalera y la piedra |
+| A2 | alta | Mara pasa a enunciar reglas y conclusiones | Corregido en 3–4: las conclusiones las dice o piensa el estudiante (|x|, paréntesis, 6 ÷ 0); Mara reacciona y anota |
+| A3 | alta | El estudiante pierde voz y autoría | Corregido: el estudiante escribe las igualdades del cap. 4 y |−4| = |+4| = 4; rodea él la hilera de ayer en 2.3; más líneas dichas |
+| A4 | alta | Cuestionario encadenado y acciones de un solo botón | Parcial: 4.3 pasa a elegir la operación (× 2 / + 2 / × (−2); × (−1) / − 4 / × 0) con consecuencia; 4.6 se para cuando el jugador quiere; 2 − 5 se pide prestado de a uno. Quedan predicciones por escena en 3 y 4 |
+| A5 | alta | Cuentas contradictorias entre escenas y capítulos | Corregido (ver rev-mat-3 M-3); 3.1 reconcilia con el cap. 2 ("desde que todos devolvieron lo que les sobraba") |
+| A6 | alta | La evolución de Punto se decreta y se pierde | Corregido: la flecha se estrena en 3.7 con reacción del estudiante, se guarda (`flags.puntoArrow`) y sigue en los caps. 4–5; en 3.1 Punto se equivoca de verdad (pone la rayita detrás del 3) |
+| A7 | alta | Las familias del cap. 4 repetían cabezas | Corregido: cabezas nuevas (escalón, rombo, semicírculo, hexágono) y nombres escritos en los escalones; Espiral pasa a llamarse Cuña (cabeza triangular) |
+| A8 | alta | Las primeras cifras de Punto, fuera de cuadro y bajo el suelo | Corregido: estudiante dentro del plano, primer plano, cifras arriba del suelo, Punto se aparta |
+| M1 | media | "Como dije / lo anticipé" | Corregido en caps. 2–5 |
+| M2 | media | Ganchos repetidos | Corregido 2→3 y 3→4 |
+| M3–M7, M9, M12 | media | Cierres sin decisión, redundancias, reglas antes de actuar, motivos débiles, monotonía del depósito, lugares sin rótulo, deseo del protagonista | **Pendiente** (anotado en el backlog) |
+| M8 | media | Composición | Parcial (notas del cap. 4; rótulos de nombres). Pendiente: atenuar la pizarra del cap. 1 en el 2, mancha del cero |
+| M10 | media | Bitácora más manual que recuerdo | Corregido: "Lo que pasó" primero, "Lo que eso dice" después; el aviso dice dónde está (≡) |
+| M11 | media | Rótulos repetidos, botones sin verbo, eventos sin describir | Corregido en 2–4 (posición en rótulos, botones con verbo, descripciones nuevas) |
+| M13 | media | "4 + 3 = 7" ilegible en teléfono | Parcial (primer plano de la piedra); pendiente inserto de la pizarra |
+| M14 | media | 2 − 5: los pares se agregaban de a tres | Corregido |
+| — | (autor) | El 4 de la tiza (Kalam) se confunde con el 9 | Corregido: familia "Tiza" = Kalam con el 4 de Atkinson Hyperlegible (unicode-range), también en subtítulos y opciones |
+| B1–B13 | baja | Varios | Corregidos B1, B2 (saldos en blanco; el amarillo es de Punto), B3, B6, B8, B12; el resto pendiente |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

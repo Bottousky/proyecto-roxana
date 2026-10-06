@@ -2,6 +2,13 @@
 @font-face { font-family: Kalam; src: url(assets/fonts/kalam-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: Kalam; src: url(assets/fonts/kalam-latin-700-normal.woff2) format('woff2'); font-weight: 700; font-display: swap; }
 @font-face { font-family: 'Atkinson Hyperlegible'; src: url(assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
+/* Tiza: la letra de Kalam, pero con un 4 abierto y recto (el 4 de Kalam se confunde con el 9). */
+@font-face { font-family: Tiza; src: url(assets/fonts/kalam-latin-300-normal.woff2) format('woff2'); font-weight: 300; }
+@font-face { font-family: Tiza; src: url(assets/fonts/kalam-latin-400-normal.woff2) format('woff2'); font-weight: 400; }
+@font-face { font-family: Tiza; src: url(assets/fonts/kalam-latin-700-normal.woff2) format('woff2'); font-weight: 700; }
+@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2'); font-weight: 300; unicode-range: U+0034; size-adjust: 104%; }
+@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2'); font-weight: 400; unicode-range: U+0034; size-adjust: 104%; }
+@font-face { font-family: Tiza; src: url(assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2) format('woff2'); font-weight: 700; unicode-range: U+0034; size-adjust: 104%; }
 @font-face { font-family: 'Atkinson Hyperlegible'; src: url(assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2) format('woff2'); font-weight: 700; font-display: swap; }
 
 :root {
@@ -12,7 +19,7 @@
   --yellow: #f6d575;
   --blue: #a8d6f2;
   --scale: 1;
-  --hand: Kalam, 'Comic Sans MS', cursive;
+  --hand: Tiza, Kalam, 'Comic Sans MS', cursive;
   --clean: 'Atkinson Hyperlegible', system-ui, sans-serif;
   --font: var(--hand);
   --caption-size: calc(clamp(19px, 1.25vw + 11px, 29px) * var(--scale));
@@ -183,3 +190,4 @@ body.clean .spot:focus-visible::after { border-color: #ffd76a; border-style: sol
 @media (prefers-reduced-motion: reduce) {
   #caption.done .next { animation: none; }
 }
+.entry h4 { font-size: 1rem; margin: .9em 0 .25em; opacity: .75; font-weight: 700; }

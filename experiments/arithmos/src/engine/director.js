@@ -139,7 +139,7 @@ export class Director {
     // "saltar animación" adelanta movimientos, no lo que se dice ni se concluye
     if (this.skipping) this.setSkipping(false);
     if (who === 'student') this.world.get('student')?.talk?.(Math.min(2.2, 0.6 + text.length * 0.03));
-    else if (who && who !== 'punto') this.world.get(who.toLowerCase())?.talk?.(Math.min(2.2, 0.6 + text.length * 0.03));
+    else if (who && who !== 'punto') this.world.get(who.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))?.talk?.(Math.min(2.2, 0.6 + text.length * 0.03));
     await this.ui.caption(who, text, opts);
     this.check(epoch);
   }

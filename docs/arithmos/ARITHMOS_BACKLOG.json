@@ -251,13 +251,13 @@
     "C3"
    ],
    "acceptance": "Idem",
-   "status": "implementado",
+   "status": "revisado-mat",
    "evidence": [
-    "artifacts/arithmos/it04/c4-directa.log",
-    "artifacts/arithmos/it04/c4-errores.log",
-    "experiments/arithmos/tests/times.test.mjs"
+    "artifacts/arithmos/it04/review-mat/informe.md",
+    "artifacts/arithmos/it05/c4-errores.log",
+    "artifacts/arithmos/it05/c4-directa.log"
    ],
-   "note": "7 escenas jugables por interfaz (rutas directa y con errores, sin errores de prueba). Falta revisión independiente matemática y narrativa."
+   "note": "rev-mat-3 aplicada (reparto, giro rígido, media vuelta, cantidades). Pasada narrativa de rev-narr-2 aplicada en parte."
   },
   {
    "id": "C5",
@@ -266,8 +266,12 @@
     "C4"
    ],
    "acceptance": "El jugador aplica la misma operación a ambos miembros, ve qué se simplifica, reconoce soluciones conservadas, detecta una transformación inválida, transfiere a otra estructura; división por cero, división por expresión que puede anularse, elevar al cuadrado y desigualdades por negativos tratadas con sus condiciones",
-   "status": "pendiente",
-   "evidence": []
+   "status": "implementado",
+   "evidence": [
+    "artifacts/arithmos/it04/c5-directa.log",
+    "experiments/arithmos/tests/fractions.test.mjs"
+   ],
+   "note": "9 escenas jugables por interfaz (ruta directa, sin errores). Lógica en src/logic/fractions.js con pruebas. Sin revisión independiente."
   },
   {
    "id": "C6",
@@ -369,6 +373,30 @@
    "deps": [],
    "acceptance": "Repetir mediciones con la máquina libre; no certificar fps medidos bajo carga",
    "status": "bloqueado",
+   "evidence": []
+  },
+  {
+   "id": "N2-R",
+   "title": "Pendientes de rev-narr-2 (caps. 2–4): cierres con decisión (2.8, 3.7), redundancias, reglas antes de actuar, motivos débiles (2.6, 2.7, 3.4, 3.6), monotonía del depósito (2.4), rótulos de cuartos y mesa, deseo del protagonista y la Ronda, composición (pizarra del cap. 1 en el 2, mancha del cero), inserto de la pizarra en 4.1",
+   "deps": [
+    "C2",
+    "C3",
+    "C4"
+   ],
+   "acceptance": "Cada punto resuelto o justificado en ARITHMOS_REVIEW.md, con capturas",
+   "status": "pendiente",
+   "evidence": [
+    "artifacts/arithmos/it04/review-narr/informe.md"
+   ]
+  },
+  {
+   "id": "C5-R",
+   "title": "Revisión independiente (matemática y narrativa) del cap. 5",
+   "deps": [
+    "C5"
+   ],
+   "acceptance": "Hallazgos registrados y corregidos o justificados",
+   "status": "pendiente",
    "evidence": []
   }
  ]

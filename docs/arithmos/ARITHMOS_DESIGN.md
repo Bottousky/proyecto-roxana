@@ -139,7 +139,7 @@ Pregunta de entrada: Curva le debe tres atados a Mara y no tiene ninguno. ¿Cóm
 deber se anulan de a pares; en la recta, el orden es "más a la derecha", y la distancia no tiene
 signo.**
 
-Representaciones: (1) **palitos y deudas**: una deuda se dibuja como un palito hueco, punteado
+Representaciones: (1) **palitos y deudas**: una deuda se dibuja como un atado punteado (hueco), punteado
 (no sólo de otro color); un palito y una deuda juntos se borran: valen cero. (2) **La línea**: una
 recta en el suelo con el 0 en la puerta del depósito; cada familia se para en su saldo.
 
@@ -191,21 +191,21 @@ Idea central: **una fracción es una medida hecha con partes iguales de una unid
 número tiene muchos nombres (2/4 = 1/2 = 0,5 = 50 %); entre dos números siempre hay lugar en la
 recta; y hay medidas que ninguna partición alcanza exactamente.**
 
-Representaciones: (1) el atado como **barra** (unidad) que se parte con cortes de tiza en partes
-iguales; (2) la **recta** de los caps. 3–4, ahora con el segmento de 0 a 1 subdividido; (3) el
+Representaciones: (1) la **barra de tiza nueva** (unidad continua, no se desata) que se parte
+con cortes en partes iguales; el atado sirve primero para ver que "medio" depende de la unidad; (2) la **recta** de los caps. 3–4, ahora con el segmento de 0 a 1 subdividido; (3) el
 **depósito** del cap. 2 con un cuarto nuevo a la derecha de los sueltos: el de los décimos.
 
 | # | Escena | Idea | Decisión | Consecuencia |
 |---|---|---|---|---|
-| 5.1 | Medio atado | Partes iguales de una unidad | Partir un atado en dos (el corte lo decide el jugador) | Un corte desparejo provoca protesta: "medio" exige partes iguales; 1/2 = una de dos partes iguales |
-| 5.2 | ¿Medio de qué? | La unidad importa | ¿Qué es más: medio atado o medio montón de 6 atados? | El "medio" depende de la unidad; 1/2 solo no dice cuánto |
-| 5.3 | Dos de cuatro | Equivalencia | Repartir 2 atados entre 4: partir cada uno en 2 o en 4 | Cada familia recibe 1/2 o 2/4; superpuestas, coinciden: 2/4 = 1/2 |
-| 5.4 | Entre el 0 y el 1 | Fracción como punto de la recta; densidad | Ubicar 1/2, 3/4 y 5/4 en la línea | Subdividir el segmento unidad; 5/4 cae pasando el 1; entre dos marcas siempre se puede marcar otra |
-| 5.5 | Más partes, más chicas | Comparar fracciones | Punto dice que 1/4 > 1/3 "porque 4 > 3"; comparar 2/3 y 3/4 | Las piezas puestas lado a lado contradicen a Punto; partición común (doceavos): 8/12 < 9/12 |
+| 5.1 | Medio atado | Fracción de una unidad agrupada; la unidad importa | Repartir los 2 atados que sobraron entre 4 (desatar, partir cada uno por la mitad, o dárselos a dos); ¿qué es más, medio atado o medio montón de seis? | Desatar da 5 palitos a cada una; partir por la mitad, medio atado: lo mismo con dos nombres (1/2 atado = 5 palitos); medio montón son 3 atados: "medio" no dice cuánto sin decir de qué |
+| 5.2 | Barras enteras | Partes iguales; n/d como "n partes de las que entran d en la unidad" | 3 barras de tiza nueva (no se desatan) entre 4 familias: en cuántas partes cortar cada barra; Punto corta a ojo | Las partes desparejas provocan protesta; cortando en 2 sobran mitades; en 4, 12 cuartos: 3 cada una = 3/4 de barra |
+| 5.3 | Dos de cuatro | Equivalencia | ¿Quién tiene más: 2 cuartos o 1 mitad de la misma barra? ¿Cuántos sextos son medio? | Superpuestos coinciden: 2/4 = 1/2 = 3/6; mismo número, otro nombre |
+| 5.4 | Entre el 0 y el 1 | Fracción como punto de la recta; densidad | Ubicar 1/2, 3/4 y 5/4; buscar un número entre 1/2 y 3/4 | El segmento unidad se subdivide; 5/4 queda pasando el 1; entre dos marcas siempre cabe otra (5/8) |
+| 5.5 | Más partes, más chicas | Comparar | Punto: "1/4 > 1/3 porque 4 > 3"; comparar 2/3 y 3/4 | Las piezas lado a lado lo contradicen; doceavos: 8/12 < 9/12 |
 | 5.6 | Sumar pedazos | Suma con partición común | Punto suma arriba y abajo: 1/2 + 1/3 = 2/5 | 2/5 es menos que 1/2 solo: absurdo visible; sextos: 3/6 + 2/6 = 5/6 |
-| 5.7 | El cuarto de los décimos | Decimales como valor posicional | Un atado partido en diez va a un cuarto nuevo, a la derecha, separado por una coma | 2,5 = 2 + 5/10 = 2 + 1/2; 2,05 frente a 2,5 (el cero vuelve a guardar un lugar) |
+| 5.7 | El cuarto de los décimos | Decimales como valor posicional | En el depósito, una barra partida en diez va a un cuarto nuevo, a la derecha, después de una coma | 2,5 = 2 + 5/10 = 2 + 1/2; 2,05 frente a 2,5 (el cero vuelve a guardar un lugar) |
 | 5.8 | De cada cien | Porcentaje | ¿Qué es más: el 50 % de 80 o el 80 % de 50? | Las dos dan 40; % = "de cada cien" = centésimos |
-| 5.9 | Lo que no entra justo | Exacto vs aproximado; inconmensurables (adelanto) | Medir la diagonal de la huerta cuadrada con partes del lado | Ninguna partición probada coincide; 1,4 → 1,41 → 1,414 se acercan sin llegar; el límite se declara: la prueba de que ninguna sirve llega en el cap. 8 |
+| 5.9 | Lo que no entra justo | Exacto vs aproximado; inconmensurables (adelanto) | Medir la diagonal de la huerta cuadrada con partes del lado | Ninguna partición probada coincide; 1,4 → 1,41 → 1,414 se acercan sin llegar; se declara que la prueba de que ninguna sirve llega en el cap. 8 |
 
 Errores con consecuencia: partes desiguales llamadas "mitad"; comparar fracciones por el
 denominador solo; sumar numeradores y denominadores; leer 2,05 como 2,5; creer que un porcentaje

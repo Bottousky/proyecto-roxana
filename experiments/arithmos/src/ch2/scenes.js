@@ -319,7 +319,7 @@ export const marcar = {
     const y1 = yesterdayRow(w);
     w.add(new Label('hoy-label', 'hoy', x0 - 64, y0 + 10, {size: 30, z: 9, ch: YELLOW}));
     g.setCinematic(false);
-    await d.say('Mara', 'Ayer anoté la carga así, con marcas. ¿Llegó más hoy que ayer?');
+    await d.say('Mara', 'La de ayer la anoté así, con marcas: la Marea me había desarmado los atados. ¿Llegó más hoy que ayer?');
     const ans = await d.choose([
       {id: 'more', text: 'Hoy llegó más.'},
       {id: 'less', text: 'Hoy llegó menos.'},
@@ -386,7 +386,7 @@ export const atados = {
     base(g);
     morningCast(g);
     w.ensure('sled', () => new Drawing('sled', art2.sled('sled', SLED.x - 260, GROUND), {z: 11}));
-    const s = student(w, PILE.x - 330);
+    const s = student(w, PILE.x - 190);
     const p = punto(w, s.x + 44, GROUND - 150);
     follow(p, s);
     mara(w, FRAME.x + 340, {facing: -0.7});
@@ -427,22 +427,46 @@ export const atados = {
     const prev = g.state.evidence.filter(e => e.kind === 'compare-tallies' && (e.run || 1) === (g.state.run || 1)).pop();
     await d.think('¿Y la hilera de ayer?');
     await d.shot({...SHOTS.frame, y: SHOTS.frame.y - 110}, 0.8);
+    let loops = 0;
+    await d.interact(ctl => new Promise(resolve => {
+      let busy = false;
+      g.setHint(() => ['Como en el molde: de a diez. Tocá la hilera para rodear las próximas diez marcas.']);
+      const refresh = () => {
+        const x0 = YEST.x + loops * 10 * YEST.gap - 8;
+        g.ui.setSpots([rectSpot('yring', loops < 3 ? `Rodear diez marcas de ayer (van ${loops})` : 'Rodear las marcas que quedan', {x: x0, y: YEST.y - 34, w: YEST.x + 34 * YEST.gap - x0, h: 68}, () => ring())]);
+      };
+      const ring = async () => {
+        if (busy || !ctl.alive()) return;
+        busy = true;
+        if (loops >= 3) {
+          g.note('Quedan cuatro marcas: no alcanzan para otra ronda de diez. Quedan sueltas.');
+          d.evidence('ring-rest');
+          busy = false;
+          return resolve();
+        }
+        const cx = YEST.x + (loops * 10 + 4.5) * YEST.gap, cy = YEST.y;
+        const pts = [];
+        for (let k = 0; k <= 26; k++) { const a = -Math.PI / 2 + (k / 24) * Math.PI * 2; pts.push([cx + Math.cos(a) * 92, cy + Math.sin(a) * 30]); }
+        const loop = w.add(new Drawing(`yloop${loops}`, [art.S(pts, 760 + loops, {w: 2.2, p: 0.75})], {z: 9, progress: 0}));
+        s.setPose('write', 0.3);
+        try { await d.draw(loop, 0.45); } catch { return; }
+        s.setPose('idle', 0.3);
+        loops++;
+        d.evidence('ring-ten', {n: loops});
+        busy = false;
+        refresh();
+      };
+      refresh();
+    }));
+    g.setHint(null);
     g.setCinematic(true);
     s.setPose('write', 0.3);
-    d.describe('Rodeás las marcas de ayer de a diez: tres rondas de diez y cuatro marcas sueltas.');
-    for (let j = 0; j < 3; j++) {
-      const cx = YEST.x + (j * 10 + 4.5) * YEST.gap, cy = YEST.y;
-      const pts = [];
-      for (let k = 0; k <= 26; k++) { const a = -Math.PI / 2 + (k / 24) * Math.PI * 2; pts.push([cx + Math.cos(a) * 92, cy + Math.sin(a) * 30]); }
-      const loop = w.add(new Drawing(`yloop${j}`, [art.S(pts, 760 + j, {w: 2.2, p: 0.75})], {z: 9, progress: 0}));
-      await d.draw(loop, 0.45);
-    }
     const y34 = w.add(new Label('y34', '34', YEST.x + 34 * YEST.gap + 30, YEST.y + 14, {size: 48, z: 9, reveal: 0, weight: 700}));
     await d.draw(y34, 0.5, {key: 'reveal'});
     s.setPose('idle', 0.4);
     g.setCinematic(false);
     d.evidence('compare-resolved', {yesterday: 34, today: 37});
-    await d.think(prev?.answer === 'more' ? 'Ayer, treinta y cuatro. Hoy llegó más, como dije: tres más. Ahora lo puedo asegurar.' : 'Ayer, treinta y cuatro; hoy, treinta y siete. Hoy llegaron tres más.');
+    await d.think(prev?.answer === 'more' ? 'Ayer, treinta y cuatro. Hoy llegó más: tres más. Ahora sí lo puedo asegurar.' : 'Ayer, treinta y cuatro; hoy, treinta y siete. Hoy llegaron tres más.');
     await d.shot(SHOTS.frame, 0.8);
     s.setPose('surprise', 0.3);
     await d.think('Entonces… el 1 de 14.');
@@ -461,18 +485,22 @@ export const atados = {
     const looseList = w.objects.filter(o => o.id.startsWith('small'));
     const [lx] = [looseList.reduce((a, o) => a + o.x, 0) / Math.max(1, looseList.length)];
     p.setMode('still');
-    await zip(d, p, bnd.x, bnd.y + 60, 0.5);
-    d.describe('Punto escribe un 1 debajo del atado y un 4 debajo de los cuatro sueltos. Son sus primeras cifras.');
-    const d1 = w.add(new Label('p14-1', '1', bnd.x - 10, bnd.y + 86, {size: 56, ch: YELLOW, z: 16, reveal: 0, weight: 700}));
+    const close = {x: bnd.x - 260, y: GROUND - 300, w: 560, h: 340};
+    await d.shot(close, 0.9);
+    const dy = GROUND - 92;
+    await zip(d, p, bnd.x, dy - 70, 0.5);
+    d.describe('Punto escribe un 1 arriba del atado y un 4 arriba de los cuatro sueltos. Son sus primeras cifras.');
+    const d1 = w.add(new Label('p14-1', '1', bnd.x - 10, dy, {size: 56, ch: YELLOW, z: 16, reveal: 0, weight: 700}));
     g.audio.chalkStart(0.6, 0.6);
     await d.draw(d1, 0.6, {key: 'reveal', sound: false});
-    await zip(d, p, lx, bnd.y + 60, 0.4);
-    const d4 = w.add(new Label('p14-4', '4', lx - 12, bnd.y + 86, {size: 56, ch: YELLOW, z: 16, reveal: 0, weight: 700}));
+    await zip(d, p, lx, dy - 70, 0.4);
+    const d4 = w.add(new Label('p14-4', '4', lx - 12, dy, {size: 56, ch: YELLOW, z: 16, reveal: 0, weight: 700}));
     g.audio.chalkStart(0.6, 0.6);
     await d.draw(d4, 0.6, {key: 'reveal', sound: false});
     g.audio.punto('happy');
-    await zip(d, p, lx + 60, GROUND - 120, 0.3);
+    await zip(d, p, lx + 110, dy - 130, 0.4);
     await pulse(d, p, 2, 0.5);
+    await d.wait(1.2);
     g.setCinematic(false);
     await d.say('student', '¡Escribiste!');
     await d.think('El 1 no cuenta palitos: cuenta atados.');
@@ -530,10 +558,10 @@ async function fillFrames(d, g, slots, {total, prefix, keepScratch, quickAvailab
     ]);
     const refresh = () => {
       const free = loose();
-      const spots = free.map((o, i) => spotOf(o, 'Palito suelto', () => put(o)));
-      if (inFrame.length) spots.push(wordSpot('atar', inFrame.length === 10 ? 'atar' : `atar (${inFrame.length})`, FRAME.x + 175, FRAME.y - 4, () => tie()));
+      const spots = free.map((o, i) => spotOf(o, `Palito suelto ${i + 1} de ${free.length}`, () => put(o)));
+      if (inFrame.length) spots.push(wordSpot('atar', inFrame.length === 10 ? 'atar' : `atar (hay ${inFrame.length})`, FRAME.x + 175, FRAME.y - 4, () => tie()));
       if (quick && !inFrame.length && free.length >= 10) spots.push(wordSpot('llenar', 'llenar el molde de una vez', FRAME.x, FRAME.y - 70, () => fillAll()));
-      if (bundles > 0 && free.length < 10 && !inFrame.length) spots.push(wordSpot('listo', 'listo', FRAME.x + 175, FRAME.y + 60, () => done()));
+      if (bundles > 0 && free.length < 10 && !inFrame.length) spots.push(wordSpot('listo', 'listo: no alcanza para otro atado', FRAME.x + 175, FRAME.y + 60, () => done()));
       g.ui.setSpots(spots);
     };
     const put = async (o, fast = false) => {
@@ -1075,11 +1103,14 @@ async function compareShelves(d, g, A, B) {
     const canPair = () => [0, 1].some(k => live(A).some(o => o.kind === k) && live(B).some(o => o.kind === k));
     const refresh = () => {
       const spots = [];
-      for (const o of [...live(A), ...live(B)]) {
-        spots.push(spotOf(o, `${o.side === 'cmp-a' ? 'Recta' : 'Curva'}: ${o.kind ? 'atado' : 'suelto'}`, () => pick(o), {selected: sel === o}));
+      for (const list of [live(A), live(B)]) {
+        for (const kind of [1, 0]) {
+          const same = list.filter(o => o.kind === kind);
+          same.forEach((o, i) => spots.push(spotOf(o, `${o.side === 'cmp-a' ? 'Recta' : 'Curva'}: ${kind ? 'atado' : 'suelto'} ${i + 1} de ${same.length}`, () => pick(o), {selected: sel === o})));
+        }
       }
       if (sel && sel.kind === 1) spots.push(wordSpot('cmp-untie', 'desatar', sel.x, sel.y - 120, () => untieSel()));
-      if (!live(B).length) spots.push(wordSpot('cmp-done', 'ya no queda nada de Curva', SHELF.b, GROUND - 300, () => finish()));
+      if (!live(B).length) spots.push(wordSpot('cmp-done', 'terminar: ver lo que le sobra a Recta', SHELF.b, GROUND - 300, () => finish()));
       else if (!canPair() && !warned) {
         warned = true;
         g.note('Ya no queda ninguna pareja del mismo tipo. Un atado se puede desatar en diez sueltos.');
@@ -1377,7 +1408,7 @@ function writeJournal2(g) {
     ],
   };
   g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora');
+  g.ui.toast('Anotado en la Bitácora (≡)');
   g.saveNow();
 }
 

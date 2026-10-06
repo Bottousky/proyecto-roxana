@@ -25,11 +25,16 @@ function boardLine(w, id, text, row, {size = 34, reveal = 1} = {}) {
 }
 
 async function writeLine(d, g, id, text, row, opts) {
-  const m = g.world.get('mara');
+  const s = g.world.get('student');
   const l = boardLine(g.world, id, text, row, {...opts, reveal: 0});
-  m?.setPose('write', 0.3);
+  l.reveal = 0;
+  g.setCinematic(true);
+  s.face(1);
+  await d.walk(s, BOARD.x - BOARD.w / 2 - 40, GROUND, 240);
+  s.setPose('write', 0.3);
   await d.draw(l, Math.min(1.4, 0.3 + text.length * 0.04), {key: 'reveal'});
-  m?.setPose('idle', 0.4);
+  s.setPose('idle', 0.4);
+  g.setCinematic(false);
   return l;
 }
 
@@ -69,6 +74,7 @@ export const repartir = {
     const given = sc.given;
     await d.shot(SHOTS.share, 1);
     if (!sc.guess) {
+      d.describe('Las cuatro familias bajaron con la cosecha: catorce atados, en un montón delante de la pizarra.');
       await d.say('Mara', 'Las Terrazas juntaron la cosecha: catorce atados. Bajaron las cuatro familias para repartirla.');
       await d.say('Balcón', 'Igual para todas, ¿eh? Que nadie reciba más que otra.');
       sc.guess = await d.choose([
@@ -79,7 +85,7 @@ export const repartir = {
       ], {prompt: 'Catorce atados entre cuatro familias, igual para todas. ¿Cuánto le toca a cada una?', evaluate: true});
       d.evidence('predict-share', {answer: sc.guess});
       g.saveNow();
-      await d.say('Mara', 'De a uno, por vueltas: nadie recibe el segundo hasta que todas tengan el primero.');
+      await d.say('Balcón', 'De a uno, por vueltas. Nadie recibe el segundo hasta que todas tengan el primero.');
     }
     const pile = () => w.objects.filter(o => o.id.startsWith('sh-') && o.owner == null && o.y > GROUND - 120 && o.x < BOARD.x + BOARD.w / 2).sort((a, b) => b.x - a.x);
     const total = () => given.reduce((a, b) => a + b, 0);
@@ -101,7 +107,7 @@ export const repartir = {
       g.setHint(() => ['Tocá a una familia para darle el próximo atado del montón.', 'Por vueltas: primero uno a cada una; después, el segundo.', 'Cuando quedan menos atados que familias, ya no alcanza para otra vuelta.']);
       const refresh = () => {
         const spots = FAMILIES.map((f, k) => spotOf(w.get(f.id), `Familia ${f.name}: tiene ${given[k] === 1 ? 'un atado' : `${given[k]} atados`}`, () => pick(k)));
-        if (Math.min(...given) >= 1 && 14 - total() >= 4) spots.push(wordSpot('vuelta', 'otra vuelta, a todas', BOARD.x + 40, GROUND - 120, () => round()));
+        if (Math.min(...given) >= 1 && Math.min(...given) === Math.max(...given) && 14 - total() >= 4) spots.push(wordSpot('vuelta', 'dar otra vuelta: uno a cada una', BOARD.x + 40, GROUND - 120, () => round()));
         g.ui.setSpots(spots);
       };
       const pick = async k => {
@@ -120,7 +126,7 @@ export const repartir = {
         else refresh();
       };
       const round = async () => {
-        if (busy || !ctl.alive()) return;
+        if (busy || !ctl.alive() || Math.min(...given) !== Math.max(...given)) return;
         busy = true;
         d.evidence('share-round');
         try { for (let k = 0; k < 4; k++) await give(k); } catch { return; }
@@ -169,7 +175,7 @@ export const repartir = {
     await d.draw(rl, 0.5, {key: 'reveal', sound: false});
     g.setCinematic(false);
     const g0 = sc.guess;
-    await d.think(g0 === '3r2' ? 'Tres cada una, y sobran dos. Como dije.'
+    await d.think(g0 === '3r2' ? 'Tres cada una, y sobran dos.'
       : g0 === '4' ? 'Cuatro no: para cuatro cada una harían falta dieciséis.'
         : g0 === '3' ? 'Tres, sí. Y dos que sobran: también hay que decirlo.'
           : 'Repartiendo se supo: tres cada una, y sobran dos.');
@@ -213,7 +219,7 @@ export const medir = {
     sc.bags ??= 0;
     await d.shot(SHOTS.share, 1);
     if (!sc.guess) {
-      await d.say('Peldaño', 'Mara, con la cosecha te pagamos: tres atados cada familia. Las cuatro.');
+      await d.say('Peldaño', 'Mara, con la cosecha te pagamos lo que te debíamos: tres atados cada familia.');
       await d.say('Mara', 'Doce atados. Los tengo que llevar al depósito en bolsas de tres.');
       sc.guess = await d.choose([
         {id: '4', text: 'Cuatro bolsas.'},
@@ -256,9 +262,9 @@ export const medir = {
     g.setHint(null);
     const r = measure(12, 3);
     if (sc.bags !== r.bags || pile().length !== r.rest) console.error(`[medida] ${sc.bags} bolsas y ${pile().length} sueltos; la cuenta dice ${r.bags} y ${r.rest}`);
-    await d.think(sc.guess === '4' ? 'Cuatro bolsas, como dije.' : `Cuatro bolsas, no ${{3: 'tres', 9: 'nueve', 36: 'treinta y seis'}[sc.guess]}: cada bolsa se lleva tres.`);
-    await d.say('Mara', 'Ayer: doce entre cuatro familias, tres para cada una. Hoy: doce de a tres, cuatro bolsas.');
-    await d.think('Dos preguntas distintas. Y las dos se contestan con la misma cuenta: 4 × 3 = 12.');
+    await d.think(sc.guess === '4' ? 'Cuatro bolsas.' : `Cuatro bolsas, no ${{3: 'tres', 9: 'nueve', 36: 'treinta y seis'}[sc.guess]}: cada bolsa se lleva tres.`);
+    await d.say('student', 'Recién repartimos: cada familia, tres. Ahora medimos: bolsas de tres, cuatro bolsas.');
+    await d.think('Dos preguntas distintas. Las dos se contestan con 4 × 3 = 12.');
     await d.shot(SHOTS.boardWide, 0.8);
     await writeLine(d, g, 'bl-3', '12 ÷ 3 = 4, porque 4 × 3 = 12', 0, {size: 30});
     // transferencia: bolsas de cuatro
@@ -268,7 +274,7 @@ export const medir = {
     ], {prompt: 'Con los mismos doce atados, ¿cuántas bolsas de cuatro se llenan?', evaluate: true});
     d.evidence('measure-transfer', {answer: t});
     g.setCinematic(true);
-    d.describe('Mara vacía las bolsas y vuelve a llenarlas de a cuatro: quedan tres bolsas.');
+    d.describe('Las bolsas se vacían y se vuelven a llenar de a cuatro: quedan tres bolsas.');
     g.audio.erase(0.5, 0.3);
     for (let k = 0; k < 4; k++) w.remove(`bag${k}`);
     for (let k = 0; k < 4; k++) w.remove(`bagn${k}`);
@@ -318,7 +324,8 @@ export const nadie = {
     const p = w.get('punto');
     const sc = g.scratch();
     await d.shot(SHOTS.share, 1);
-    await d.say('Balcón', 'Mara, una pregunta. Si un día las Terrazas quedan vacías, sin ninguna familia… ¿a quién le toca la cosecha?');
+    await d.say('Mara', 'Estos seis atados los guardo para repartir en la próxima cosecha.');
+    await d.say('Balcón', '¿Y si para entonces las Terrazas quedan vacías, como la escalera que se llevaba la Marea? ¿A quién le tocan?');
     const a = await d.choose([
       {id: '0', text: 'A cada una le tocan cero.'},
       {id: '6', text: 'A cada una le tocan seis.'},
@@ -345,12 +352,16 @@ export const nadie = {
       : a === '0' ? 'Cero sería si hubiera familias y no les tocara nada. Acá no hay "cada una": el reparto no empieza.'
         : 'Seis, ¿a quién? No hay nadie que los reciba: el reparto no empieza.');
     // bolsas de cero
-    await d.say('Mara', '¿Y si los guardo en bolsas de cero? ¿Cuántas bolsas lleno con seis atados?');
+    await d.say('Rampa', '¿Y en bolsas donde no entra nada? ¿Cuántas se llenan con seis atados?');
     let bags = 0;
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
-      g.setHint(() => ['Tocá "llenar una bolsa de cero" y mirá el montón.']);
-      const refresh = () => g.ui.setSpots([wordSpot('nz-fill', bags ? 'llenar otra bolsa de cero' : 'llenar una bolsa de cero', 13420, GROUND - 200, () => fill())]);
+      g.setHint(() => ['Tocá "llenar una bolsa de cero" y mirá el montón. Cuando quieras, pará.']);
+      const refresh = () => {
+        const spots = [wordSpot('nz-fill', bags ? 'llenar otra bolsa de cero' : 'llenar una bolsa de cero', 13420, GROUND - 200, () => fill())];
+        if (bags >= 1) spots.push(wordSpot('nz-stop', 'parar', 13420, GROUND - 270, () => { if (!busy && ctl.alive()) { follow(p, s); resolve(); } }));
+        g.ui.setSpots(spots);
+      };
       const fill = async () => {
         if (busy || !ctl.alive()) return;
         busy = true;
@@ -367,12 +378,12 @@ export const nadie = {
         bags++;
         d.evidence('zero-bag', {n: bags});
         busy = false;
-        if (bags >= 3) { follow(p, s); resolve(); } else refresh();
+        if (bags >= 8) { follow(p, s); resolve(); } else refresh();
       };
       refresh();
     }));
     g.setHint(null);
-    await d.think('Tres bolsas, y el montón sigue igual: seis.');
+    await d.think(`${bags === 1 ? 'Una bolsa' : `${['', '', 'Dos', 'Tres', 'Cuatro', 'Cinco', 'Seis', 'Siete', 'Ocho'][bags]} bolsas`}, y el montón sigue igual: seis.`);
     const m = await d.choose([
       {id: '6', text: 'Seis bolsas.'},
       {id: 'inf', text: 'Infinitas bolsas.'},
@@ -382,7 +393,7 @@ export const nadie = {
     await d.think(m === 'never' ? 'Cada bolsa se lleva cero. Nunca se termina.'
       : m === 'inf' ? 'Ni siquiera infinitas: cada bolsa se lleva cero, y juntando ceros nunca se llega a seis.'
         : 'Seis bolsas de cero guardan cero atados. El montón sigue ahí.');
-    await d.say('Mara', 'Dividir es deshacer multiplicar. ¿Qué número, multiplicado por cero, da seis?');
+    await d.say('student', 'Doce dividido tres era cuatro porque cuatro por tres es doce. Entonces, ¿qué número por cero da seis?');
     const z = await d.choose([
       {id: '0', text: 'El cero.'},
       {id: '6', text: 'El seis.'},
@@ -400,9 +411,9 @@ export const nadie = {
     }
     g.setCinematic(false);
     await d.think(z === 'none' ? 'Todo por cero da cero. Ninguno da seis.' : 'No: por cero, todo da cero. Ninguno da seis.');
-    await writeLine(d, g, 'nz-l', '6 ÷ 0 → no tiene respuesta', 3, {size: 30});
-    await d.say('Mara', 'No es cero ni infinito: es una pregunta sin respuesta. Por eso no se divide por cero.');
-    await d.think('Y si por cero todo da cero, tampoco se puede volver atrás: desde el cero no se sabe de dónde vino cada uno.');
+    await writeLine(d, g, 'nz-l', '6 ÷ 0 → no hay ningún número', 3, {size: 30});
+    await d.think('Ni cero ni infinito: la pregunta no tiene respuesta.');
+    await d.say('Mara', 'Entonces eso no lo anoto. Ni cero, ni nada: no se reparte entre nadie.');
     g.flags.c4zero = true;
   },
 };
@@ -518,7 +529,7 @@ export const partir = {
     await d.draw(eq, 1, {key: 'reveal'});
     w.get('mara')?.setPose('idle', 0.4);
     // transferencia: 4 × 13 con lo que se sabe del depósito
-    await d.say('Mara', 'Y esto sirve para cuentas que no entran en la huerta. Cuatro veces trece, por ejemplo.');
+    await d.say('Peldaño', 'Mi otra huerta, la del fondo, es de cuatro filas de trece. ¿Cuántas plantas son?');
     const t = await d.choose([
       {id: '52', text: '52'}, {id: '43', text: '43'}, {id: '17', text: '17'}, {id: '412', text: '412'},
     ], {prompt: '¿Cuánto es 4 × 13?', evaluate: true});
@@ -545,7 +556,7 @@ export const partir = {
     await d.draw(lb, 0.5, {key: 'reveal'});
     await d.draw(lt, 0.6, {key: 'reveal', sound: false});
     g.setCinematic(false);
-    await d.think(t === '52' ? 'Cuarenta y doce: cincuenta y dos.'
+    await d.think(t === '52' ? 'Cuarenta y doce.'
       : t === '43' ? 'Cuarenta y tres sería 4 × 10 + 3. El 3 también va cuatro veces, una por fila: cuarenta y doce, cincuenta y dos.'
         : t === '17' ? 'Diecisiete es 4 + 13: sumar no es multiplicar. Cuatro filas de trece: cincuenta y dos.'
           : '412 es pegar el 4 y el 12. Pero 4 × 10 son cuarenta, no cuatro: cincuenta y dos.');
@@ -555,7 +566,8 @@ export const partir = {
     await d.say('Mara', 'Partirlos… Un pedazo de atado. Eso no lo anoté nunca.');
     g.audio.punto('question');
     await pulse(d, p, 1, 0.4);
-    await d.think('Partes de algo. Punto ya está mirando los atados como si fueran a romperse.');
+    d.describe('Punto empuja uno de los atados que sobraron. El atado se raja apenas, por el medio.');
+    await d.think('Punto mira la rajadura como si fuera una puerta.');
   },
 };
 
@@ -570,8 +582,10 @@ function writeJournal4(g) {
   if (tp) seen.push(tp.answer === 'same' ? 'Anticipaste que girar el rectángulo no cambiaba el total.' : 'Pensaste que girar el rectángulo cambiaba el total; girado, seguían siendo doce.');
   const tt = first('turn-transfer');
   if (tt) seen.push(tt.answer === 'one' ? 'Con la huerta de 9 × 4, viste que alcanzaba contar una sola vez.' : 'Con la huerta de 9 × 4, quisiste contar las dos maneras; girada era la misma.');
-  const pd = first('predict-double');
-  if (pd) seen.push(pd.answer === '-6' ? 'Anticipaste que −3 por dos queda en −6.' : `Anticipaste que −3 por dos quedaba en ${pd.answer.replace('-', '−')}; quedó en −6: más lejos del cero, pero menor.`);
+  const sc4 = all('scale-choice').map(e => e.op);
+  if (sc4.length) seen.push(sc4[0] === 'times2' ? 'Para el plano al doble elegiste × 2: cada casa al doble de lejos del pozo, y Cornisa de −3 a −6.' : `Para el plano al doble probaste ${sc4.filter(o => o !== 'times2').map(o => ({plus2: '+ 2 (todas se corrieron, no se alejaron)', timesm2: '× (−2) (al doble, pero del otro lado)'}[o])).join(' y ')} antes de × 2.`);
+  const fc4 = all('flip-choice').map(e => e.op);
+  if (fc4.some(o => o === 'times0')) seen.push('Con × 0 todas las casas cayeron en el pozo: desde ahí no se sabía dónde estaba cada una.');
   const pf = first('predict-flip2');
   if (pf) seen.push(pf.answer === 'back' ? 'Anticipaste que dos medias vueltas devuelven a todos a su lugar: (−1) × (−1) = 1.' : 'Dos medias vueltas devolvieron a todos a su lugar, aunque esperabas otra cosa: (−1) × (−1) = 1.');
   if (all('unfair').length) seen.push('Al repartir, cuando quisiste darle un segundo atado a una familia antes que a las demás, protestó.');
@@ -601,7 +615,7 @@ function writeJournal4(g) {
       'Dividir es repartir (14 entre 4: tres cada una, sobran 2; 14 = 4 × 3 + 2) o medir (12 en bolsas de 3: 4 bolsas). Las dos deshacen una multiplicación: 12 ÷ 3 = 4 porque 4 × 3 = 12.',
       'No se divide por cero: ningún número por 0 da 6. Tampoco 0 ÷ 0: cualquier número por 0 da 0, así que no hay uno solo.',
       'Partir un rectángulo no cambia el total: 4 × 5 = 4 × 3 + 4 × 2. Así, 4 × 13 = 4 × 10 + 4 × 3 = 52.',
-      'Dato: Brahmagupta (628) dio reglas para operar con "fortunas" y "deudas"; también escribió que 0 ÷ 0 = 0, y eso no funciona.',
+      'Dato: Brahmagupta (628) dio reglas para operar con "fortunas" y "deudas"; también escribió que 0 ÷ 0 = 0. Hoy se sabe que 0 ÷ 0 no tiene un resultado.',
     ],
     seen,
     moments: [
@@ -610,6 +624,6 @@ function writeJournal4(g) {
     ],
   };
   g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora');
+  g.ui.toast('Anotado en la Bitácora (≡)');
   g.saveNow();
 }

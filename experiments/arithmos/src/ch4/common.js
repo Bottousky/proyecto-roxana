@@ -23,10 +23,10 @@ export const lineX = n => LINE.zero + n * LINE.step;
 export const ROCK = {x: 12800};
 
 export const FAMILIES = [
-  {id: 'peldano', name: 'Peldaño', head: 'square'},
-  {id: 'rampa', name: 'Rampa', head: 'tri'},
-  {id: 'cornisa', name: 'Cornisa', head: 'oval'},
-  {id: 'balcon', name: 'Balcón', head: 'curl'},
+  {id: 'peldano', name: 'Peldaño', head: 'step'},
+  {id: 'rampa', name: 'Rampa', head: 'diamond'},
+  {id: 'cornisa', name: 'Cornisa', head: 'half'},
+  {id: 'balcon', name: 'Balcón', head: 'hex'},
 ];
 
 export const SHOTS = {
@@ -53,7 +53,13 @@ export function base(g, {line = false} = {}) {
   g.renderer.tint = [1.02, 1.0, 0.97];
   w.ensure('ground', () => new Drawing('ground', art.groundLine('ground', 12000, 18200, GROUND), {z: 0, fade: 0.75}));
   const t = art4.terraces('terr', TERR.x0, GROUND, TERR.count, TERR.w, TERR.rise);
-  w.ensure('terr', () => new Drawing('terr', t.strokes, {z: 2}));
+  const terr = w.ensure('terr', () => new Drawing('terr', t.strokes, {z: 2}));
+  // la Marea se come la escalera hasta que alguien entiende el signo de la piedra
+  terr.fade = g.flags.c4groups ? 1 : 0.42;
+  FAMILIES.forEach((f, k) => {
+    const st = t.steps[k];
+    w.ensure(`tname-${k}`, () => new Label(`tname-${k}`, f.name, st.x0 + 135, st.y + 30, {size: 20, align: 'center', z: 3, fade: 0.8}));
+  });
   w.ensure('board', () => new Drawing('board', art2.easel('board', BOARD.x, GROUND, BOARD.w, BOARD.h), {z: 4}));
   w.ensure('rock', () => new Drawing('rock', art4.rock('rock', ROCK.x, GROUND), {z: 3}));
   // el signo de la piedra: casi borrado hasta que se entiende
@@ -78,6 +84,8 @@ export function cast(g, {sx = BOARD.x - BOARD.w / 2 - 120, mx = BOARD.x + BOARD.
   const w = g.world;
   const s = student(w, sx);
   const p = punto(w, s.x + 44, GROUND - 150);
+  // desde el cap. 3, Punto señala hacia dónde va
+  p.arrow = !!g.flags.puntoArrow;
   follow(p, s);
   mara(w, mx, {facing: -0.8});
   return {s, p};
@@ -105,7 +113,7 @@ export function chip(w, kind, x, y, id, scale = 1) {
 }
 
 /** Posición en la pizarra: f filas de c columnas, centradas. */
-export function gridPos(f, c, i, j, {gx = 70, gy = 58} = {}) {
+export function gridPos(f, c, i, j, {gx = 64, gy = 64} = {}) {
   const top = boardTop();
   const cx = BOARD.x, cy = top + 40 + BOARD.h * 0.42;
   return [cx + (j - (c - 1) / 2) * gx, cy + (i - (f - 1) / 2) * gy];

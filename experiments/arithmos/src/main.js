@@ -384,7 +384,7 @@ class Game {
 async function boot() {
   try {
     await Promise.race([
-      Promise.all([document.fonts.load('400 40px Kalam'), document.fonts.load('700 40px Kalam'), document.fonts.load('700 20px "Atkinson Hyperlegible"')]),
+      Promise.all([document.fonts.load('400 40px Kalam'), document.fonts.load('700 40px Kalam'), document.fonts.load('400 40px Tiza', '4a'), document.fonts.load('700 40px Tiza', '4a'), document.fonts.load('300 40px Tiza', '4a'), document.fonts.load('700 20px "Atkinson Hyperlegible"')]),
       new Promise(r => setTimeout(r, 2500)),
     ]);
     const game = new Game();

@@ -278,7 +278,7 @@ export function dotStrokes(cx, cy, r, seed, opts = {}) {
  * Texto de tiza: relleno con presión media (el diente lo motea) y borde liviano.
  * `reveal` (0..1) descubre el texto de izquierda a derecha como si se escribiera.
  */
-export function chalkText(ctx, text, x, y, {size = 40, ch = WHITE, p = 0.86, weight = 400, align = 'left', baseline = 'alphabetic', reveal = 1, fade = 1, font = 'Kalam'} = {}) {
+export function chalkText(ctx, text, x, y, {size = 40, ch = WHITE, p = 0.86, weight = 400, align = 'left', baseline = 'alphabetic', reveal = 1, fade = 1, font = 'Tiza'} = {}) {
   if (reveal <= 0 || fade <= 0) return 0;
   ctx.save();
   ctx.font = `${weight} ${size}px ${font}`;

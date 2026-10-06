@@ -61,7 +61,9 @@ export class UI {
       }
       if (!this.pause$.hidden) return;
       const onControl = e.target instanceof HTMLElement && e.target.closest('button, input, select, a');
-      if ((e.key === 'Enter' || e.key === ' ') && this.waiting && !onControl) {
+      // con un diálogo en pantalla, Enter lo avanza aunque el foco quede en un objeto tocable
+      const onSpot = e.target instanceof HTMLElement && e.target.closest('#spots');
+      if ((e.key === 'Enter' || e.key === ' ') && this.waiting && (!onControl || onSpot)) {
         e.preventDefault();
         this.advance();
       }
@@ -602,12 +604,10 @@ export class UI {
       abbr.className = 'abbr';
       abbr.textContent = e.abbr;
       div.append(h, abbr);
-      for (const line of e.body || []) {
-        const p = document.createElement('p');
-        p.textContent = line;
-        div.append(p);
-      }
+      // primero lo que pasó en esta partida; después lo que eso dice
       if (e.seen?.length) {
+        const hs = document.createElement('h4');
+        hs.textContent = 'Lo que pasó';
         const ul = document.createElement('ul');
         ul.className = 'seen';
         for (const s of e.seen) {
@@ -615,7 +615,17 @@ export class UI {
           li.textContent = s;
           ul.append(li);
         }
-        div.append(ul);
+        div.append(hs, ul);
+      }
+      if (e.body?.length) {
+        const hb = document.createElement('h4');
+        hb.textContent = 'Lo que eso dice';
+        div.append(hb);
+      }
+      for (const line of e.body || []) {
+        const p = document.createElement('p');
+        p.textContent = line;
+        div.append(p);
       }
       const moments = this.game.mode !== 'play' ? [] : e.moments || (e.moment ? [{id: e.moment, label: 'Desplegar: volver a ver por qué'}] : []);
       for (const m of moments) {

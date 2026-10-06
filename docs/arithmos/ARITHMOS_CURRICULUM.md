@@ -51,8 +51,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | A5 | Valor posicional, cero como lugar vacío, generalización a mil | 1° | 2 | probado-auto |
 | B1 | Suma con canje ("me llevo uno"); resta como comparación ("pedir prestado") | 1° | 2 | probado-auto |
 | B2–B3 | Signo, negativos, opuestos, orden en la recta, distancia, valor absoluto, suma y resta de enteros (pares cero) | 1°–2° | 3 | probado-auto |
-| B4–B5 | Multiplicación (grupos, escala) y división (reparto, medida), propiedades | 1°–2° | 4 | pendiente |
-| C1–C4 | Fracciones a reales; exacto vs aproximado | 1°–4° | 5 | pendiente |
+| B4–B5 | Multiplicación (grupos, escala) y división (reparto, medida), propiedades | 1°–2° | 4 | probado-auto (revisado-mat con correcciones aplicadas) |
+| C1–C4 | Fracciones a reales; exacto vs aproximado | 1°–4° | 5 | implementado (cap. 5, en prueba; C3 razón y proporción pasa al cap. 9) |
 | D1–D6 | Lenguaje algebraico, **pasa sumando**, desigualdades, sistemas | 2°–4° | 6 | pendiente |
 | E1–E7 | Potencias, polinomios, cuadráticas, sucesiones, logaritmos, expresiones racionales | 1°–5° | 7 | pendiente |
 | F1–F4 | Geometría y medida | 1°–5° | 8 | pendiente |
