@@ -74,3 +74,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-vi
   #field-meter h3{font-size:18px;margin:0 28px 4px 0}
   #field-meter p{font-size:13px;line-height:1.5;margin:0}
 }
+/* The touch controls' row spans the screen, but only its buttons take touches: the ground between
+   them stays walkable and Ohm's instrument above it stays closable. */
+#touch-controls{pointer-events:none}
+#touch-controls>*{pointer-events:auto}

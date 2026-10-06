@@ -148,4 +148,6 @@ note('taller-en-servicio');
 assert.deepEqual(errors, [], 'sin errores de página ni de consola');
 await writeFile(resolve(out, 'report.json'), JSON.stringify({ viewport: `${vw}x${vh} táctil emulado`, log, errors }, null, 2));
 console.log('Táctil: título, lectura, cruceta, toque en el suelo y en objetos, dos bancos, medición, mapa, Bitácora y pausa sin errores.');
-await browser.close();
+// With the machine loaded, closing Chrome can hang after the report is written: do not wait forever.
+await Promise.race([browser.close(), new Promise(r => setTimeout(r, 15000))]);
+process.exit(0);
