@@ -67,8 +67,8 @@ tiene un rasgo mínimo (tamaño, ritmo de parpadeo). Lino es el más chico.
 | 6 | Lo que no se ve | D: patrón, generalización, incógnita/variable/parámetro; expresión, identidad, ecuación; **"pasa sumando"**; desigualdades; sistemas | jugable, revisado (sistemas pendientes) |
 | 7 | Crecer | E: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos | jugable, en revisión |
 | 8 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | jugable, en revisión |
-| 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | diseño |
-| 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | pendiente |
+| 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | jugable, en revisión |
+| 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | diseño |
 | 11 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | pendiente |
 | 12 | Anticipar | J: familias de funciones, parámetros, composición, inversa, tasa de cambio, límite/derivada/acumulación en su nivel | pendiente |
 
@@ -298,7 +298,7 @@ dibujos no son exactos y no reemplazan el argumento.
 Historia: pendiente de fuentes (no atribuir a Pitágoras ni a Babilonia nada sin verificar; la tablilla
 YBC 7289 y la historia de la inconmensurabilidad requieren fuente en `research/fuentes.md`).
 
-## Capítulo 9 — Depende (diseño)
+## Capítulo 9 — Depende (implementado, 2026-10-06)
 
 Pregunta de entrada (gancho del cap. 8): la sombra de Cornisa depende de la hora; ¿la hora depende de
 la sombra? Idea central: **una función le asigna a cada valor de entrada uno solo de salida; una
@@ -323,6 +323,30 @@ sale otro), puntos en el mapa, la «recta parada» que recorre un gráfico.
 Límites a declarar: los gráficos se dibujan con algunos puntos y una línea; la línea supone que entre
 puntos la regla sigue igual (hay que decirlo); la «recta parada» es una prueba para dibujos en el
 plano con la entrada acostada.
+
+## Capítulo 10 — Vueltas y flechas (diseño)
+
+Pregunta de entrada (gancho del cap. 9): lo que vuelve; el sol y la rueda del pozo dan vueltas. Idea
+central: **un giro se mide por el arco que recorre; la altura y el costado de un punto que gira se
+repiten cada vuelta; una flecha dice cuánto y hacia dónde, y las flechas se suman; multiplicar por i
+es girar un cuarto de vuelta; dos condiciones a la vez son dos rectas que se cruzan.**
+
+Lugar: el pozo de las Terrazas con su rueda y su balde (el «pozo» del cap. 3), la pizarra y el mapa de
+dos rectas. Representaciones: soga del largo del radio, rueda con marcas, flechas de tiza, el mapa.
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 10.1 | La rueda del pozo | Radián: el ángulo medido con el radio | Anticipar cuántas sogas del largo del radio entran alrededor de la rueda; después ponerlas | Entran 6 y un poco más: una vuelta son 2π ≈ 6,28 radios; media vuelta, π |
+| 10.2 | Alto y costado | Seno y coseno como alto y costado de un punto que gira | Girar la rueda de a 30° y medir la altura del balde | La tabla de alturas; con radio 1, la altura es el seno; el costado, el coseno; alto² + costado² = 1 (Pitágoras) |
+| 10.3 | Lo que se repite | Periodicidad | Seguir girando más de una vuelta y poner las alturas en el mapa | La ola se repite cada vuelta (2π); no es la sombra de Cornisa: la forma se parece pero no es la misma regla |
+| 10.4 | La rampa | Razones en triángulos rectángulos | Dos rampas con el mismo ángulo y distinto largo: comparar alto ÷ largo | Semejantes (cap. 8): la razón no cambia; con la tabla de 10.2 se calcula una altura sin medirla |
+| 10.5 | Flechas | Vectores: cuánto y hacia dónde; suma punta con cola | Llevar a Punto con flechas hasta lo de Rampa, en dos tramos | (3, 2) + (1, −4) = (4, −2); el orden no cambia el destino |
+| 10.6 | Un cuarto de vuelta | Números complejos como giro | Girar flechas un cuarto de vuelta; ¿qué número hace eso? | i: dos cuartos de vuelta son media vuelta, i · i = −1 (cap. 4: × (−1) es media vuelta); 2i · 2i = −4 (cap. 9: «con los números que conocemos») |
+| 10.7 | Dos pistas | Sistemas como rectas que se cruzan | Con dos pistas de Mara (suman 7, se llevan 1), buscar el punto que cumple las dos | (4, 3): donde se cruzan; sin cruce (paralelas) no hay solución; la tabla de coeficientes (matriz) como forma de anotar |
+| 10.8 | Lo que pasa a veces | Cierre y gancho al cap. 11 | El balde a veces sube lleno y a veces no | No todo se repite igual: algunas cosas pasan a veces (azar) |
+
+Límites a declarar: π no es 3,14 (es aproximación); el seno se define acá para un radio 1; los complejos
+se presentan como giros, sin la teoría completa; sistemas de 2 × 2.
 
 ## Criterios de escena (lo que las revisiones marcaron una y otra vez)
 

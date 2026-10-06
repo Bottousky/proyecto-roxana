@@ -1,0 +1,24 @@
+[0.0s] escena → c10.rueda
+[1.0s] lee: La rueda del pozo perdió la soga. Tengo pedazos del largo del rayo de la rueda, de la punta al centro. ¿Cuántos hacen falta para dar toda la vuelta?
+[1.6s] elige «Seis y un poco más.» (¿Cuántos pedazos del largo del rayo entran alrededor de la rueda?)
+[6.6s] lee: Seis enteros y un pedacito.
+[6.7s] lee: —Balcón: una vuelta entera son 6 rayos y un poco más: 6,28… Ese número no termina; se lo llama 2π. Media vuelta, π, unos 3,14 rayos.
+[6.8s] lee: Medir un giro por cuántos rayos recorre el borde: eso es medir en radianes. Sirve para cualquier rueda: con una más grande, los pedazos también son más largos.
+[7.6s] escena → c10.alto
+[8.6s] lee: Ato el balde a la manija de la rueda. Si giro la rueda, ¿a qué altura queda la manija?
+[9.9s] elige «A medio rayo.» (Si la rueda gira 30°, ¿a qué altura sobre el centro queda la manija?)
+[13.0s] lee: Medio rayo justo.
+[13.1s] lee: —Balcón: con la manija a 30° y su reflejo a −30°, el triángulo tiene tres ángulos de 60°: los tres lados miden un rayo. La altura es la mitad de ese lado: medio rayo.
+[13.2s] lee: —Con la rueda de un rayo, a la altura de la manija se le dice seno del ángulo; al costado, coseno. Y como en el tirante, alto² + costado² = 1.
+[13.3s] escena → c10.repite
+[13.6s] lee: ¿Y si la rueda sigue girando? Pongamos las alturas en el mapa, como mi sombra.
+[18.8s] elige «0,5: como a los 30°.» (Girada 390°, ¿a qué altura queda la manija?)
+[19.2s] lee: 390 es una vuelta y 30 más: misma altura que a los 30°.
+[19.2s] lee: —Cornisa: la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.
+[20.1s] escena → c10.rampa
+[20.6s] lee: Mis rampas de carga tienen todas la misma inclinación: 30°. Una corta, de 2 tablones de largo, sube 1. La larga, de 4, sube 2. Quiero una de 6: ¿cuánto va a subir?
+[21.9s] elige «Sube 3: la mitad del largo, como las otras.» (La rampa de largo 6, con la misma inclinación, ¿cuánto sube?)
+[23.1s] lee: Tres: las rampas son semejantes, como las copias de Cornisa. Alto ÷ largo no cambia: 1/2.
+[23.9s] lee: —Rampa: con la misma inclinación, alto ÷ largo es siempre el mismo número, y es el seno del ángulo: sen 30° = 0,5. Con la tabla de la rueda, sabés cuánto sube cualquier rampa sin construirla.
+[24.8s] lee: El capítulo 11 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[25.9s] {"ended":true,"final":{"mode":"title","seg":"c10.rampa"},"journal":[],"evidenceKinds":["radian-predict","radian-piece","radian","sin30-predict","height","sine","period-predict","period","ratio-predict","ratio"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":25.894,"size":"1600x900","touch":false,"route":"directa","watch":false}

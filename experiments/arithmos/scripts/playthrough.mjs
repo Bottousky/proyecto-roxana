@@ -171,6 +171,10 @@ function pickChoice(prompt, options) {
     ['qué entradas tienen sentido', 'Cualquier número menos el 2'],
     ['Puede salir −4', 'Sí: con −2'],
     ['Pasado mañana', 'Más: cada día'],
+    ['entran alrededor de la rueda', 'Tres, como'],
+    ['gira 30°, ¿a qué altura', 'A un tercio'],
+    ['Girada 390°', 'Más que 1'],
+    ['largo 6, con la misma inclinación', 'Sube 4'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -261,6 +265,10 @@ function pickChoice(prompt, options) {
     ['qué entradas tienen sentido', 'Enteros mayores'],
     ['Puede salir −4', 'No: un número'],
     ['Pasado mañana', '2, como'],
+    ['entran alrededor de la rueda', 'Seis y un poco más'],
+    ['gira 30°, ¿a qué altura', 'A medio rayo'],
+    ['Girada 390°', '0,5'],
+    ['largo 6, con la misma inclinación', 'Sube 3'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -619,6 +627,10 @@ for (let iter = 0; iter < 4000; iter++) {
         const wrong = route === 'errores' && !tried.has('c9match') && (tried.add('c9match'), true);
         target = spots.find(x => x.id === (wrong ? 'c9-lB' : `c9-l${k}`));
       }
+    } else if (s.seg === 'c10.rueda' && spots.some(x => x.id === 'c10-more')) {
+      // pone pedazos hasta que el séptimo se pase (o, en la ruta con errores, para antes una vez)
+      if (route === 'errores' && !tried.has('c10early') && spots.some(x => x.id === 'c10-done') && (tried.add('c10early'), true)) target = spots.find(x => x.id === 'c10-done');
+      else target = spots.find(x => x.id === 'c10-more');
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
       if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }
