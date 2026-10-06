@@ -44,8 +44,15 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export class World {
   constructor(level) {
     this.level = level;
-    this.field = new Field({ zones: level.zones });
-    this.solids = level.solids.map(s => ({ friction: 0.6, ...s }));
+    // Depth: a level may declare the diorama's depth; its regions and solids without their own
+    // z0/z1 take it (on the 2.5D path, z = 0, nothing changes). Behind it, only what is declared.
+    const dio = level.diorama || {};
+    this.field = new Field({ zones: level.zones.map(z => ({ ...dio, ...z })) });
+    this.solids = level.solids.map(s => ({ friction: 0.6, ...dio, ...s }));
+    this.doors = (level.doors || []).map(d => ({ ...d, open: false, openT: 0, opening: false }));
+    this.depthAreas = level.depthAreas || [];
+    this.depthBlockers = level.depthBlockers || [];
+    this.citySeen = false;
     this.bodies = [];
     this.stands = [];
     this.traces = [];
@@ -89,13 +96,13 @@ export class World {
   }
 
   addBody(spec) {
-    const b = { id: this.nextId++, lane: 0, vx: 0, vy: 0, ax: 0, ay: 0, heldBy: null, support: null, supportSteps: 0,
+    const b = { id: this.nextId++, lane: 0, z: 0, vz: 0, vx: 0, vy: 0, ax: 0, ay: 0, heldBy: null, support: null, supportSteps: 0,
       zoneW: {}, px: spec.x, py: spec.y, ...spec };
     this.bodies.push(b);
     return b;
   }
 
-  snapshotPrev(b) { b.px = b.x; b.py = b.y; }
+  snapshotPrev(b) { b.px = b.x; b.py = b.y; b.pz = b.z; }
 
   emit(type, data) { this.events.push({ type, step: this.stepCount, t: this.t, ...data }); }
 
@@ -132,6 +139,12 @@ export class World {
       b.support = null;
     }
 
+    for (const door of this.doors) if (door.opening && !door.open) {
+      door.openT = Math.min(door.swing || 0, door.openT + DT);
+      if (door.openT >= (door.swing || 0)) { door.open = true; door.opening = false; this.emit('door-open', { door: door.id }); }
+    }
+    if (!av.heldBy) this.depthStep(av, inp);
+
     for (let pass = 0; pass < 3; pass++) {
       for (const b of this.bodies) if (!b.heldBy) this.collideSolids(b, pass === 0);
       this.collideBodies(pass === 0);
@@ -144,7 +157,9 @@ export class World {
         av.airSteps = av.supportSteps ? 0 : (av.airSteps || 0) + 1;
         if (av.supportSteps > 10) av.letGoY = null;
         const sd = av.support?.solid;
-        if (av.supportSteps > 30 && sd && !sd.noFooting && av.x - av.hw >= sd.x0 + 0.1 && av.x + av.hw <= sd.x1 - 0.1) av.lastSupport = { x: av.x, y: av.y };
+        if (av.supportSteps > 30 && sd && !sd.noFooting && av.x - av.hw >= sd.x0 + 0.1 && av.x + av.hw <= sd.x1 - 0.1 && av.z === 0) av.lastSupport = { x: av.x, y: av.y };
+        // Having stood on the Mirador, the explorer has seen the city: the arch can be opened.
+        if (!this.citySeen && sd && sd.id === this.level.citySolid && av.supportSteps > 10) { this.citySeen = true; this.emit('city-seen', {}); }
       }
       if (b.y < -30 || b.y > 60 || Math.abs(b.x) > 200) this.recover(b);
     }
@@ -166,7 +181,7 @@ export class World {
   }
 
   fieldOn(b, out) {
-    return b.shape === 'box' ? this.field.onBody(b.x, b.y, b.hw, b.hh, out) : this.field.onBody(b.x, b.y, b.r * 0.7, b.r * 0.7, out);
+    return b.shape === 'box' ? this.field.onBody(b.x, b.y, b.hw, b.hh, out, b.z) : this.field.onBody(b.x, b.y, b.r * 0.7, b.r * 0.7, out, b.z);
   }
 
   /**
@@ -183,7 +198,7 @@ export class World {
     if (grounded ? (rise <= 0.01 || rise > AVATAR.step) : (rise < -0.02 || rise > AVATAR.mantle || Math.abs(av.vy) > 3)) return;
     const to = { x: (nx < 0 ? s.x0 : s.x1) - nx * (av.hw + 0.06), y: s.y1 + av.hh + 0.002 };
     for (const o of this.solids) {
-      if (o === s || (o.only && o.only !== 'box')) continue;
+      if (o === s || (o.only && o.only !== 'box') || !this.atDepth(o, av.z)) continue;
       if (to.x + av.hw > o.x0 && to.x - av.hw < o.x1 && to.y + av.hh > o.y0 && to.y - av.hh < o.y1) return;
     }
     av.heldBy = { type: 'mantle', from: { x: av.x, y: av.y }, to, t: 0, time: grounded ? AVATAR.stepTime : AVATAR.mantleTime };
@@ -236,9 +251,50 @@ export class World {
     if (record && -vn > 0.45) this.emit('impact', { body: b.id, kind: b.kind, speed: -vn, x: b.x, y: b.y, nx, ny });
   }
 
+  /** Whether a solid exists at depth z (solids without z0/z1 span all depth). Every query over
+   *  solids goes through here: contacts, and the free space a step-up or a grab needs. */
+  atDepth(s, z) { return s.z0 === undefined || (z >= s.z0 && z <= s.z1); }
+
+  /** The door whose threshold strip the explorer stands in, if any. */
+  doorAt(av) { return this.doors.find(d => av.x > d.x0 - 0.6 && av.x < d.x1 + 0.6 && Math.abs(av.y - av.hh - d.y) < 0.15) || null; }
+
+  /**
+   * Walking in depth. On the 2.5D path the explorer lives at z = 0. Through an open door, ▲
+   * walks away from the camera (−z) and ▼ back; in depth the explorer moves only within the
+   * level's walkable areas (the strip in front of the door, the passage, the neighbourhood).
+   * Assist (declared): in the strip, walking in depth eases the explorer toward the door's
+   * centre, so getting through takes no aiming. Gravity and supports are the same as anywhere.
+   */
+  depthStep(av, inp) {
+    const iy = Math.abs(inp.y) > 0.2 ? inp.y : 0;
+    if (av.z === 0) {
+      const door = this.doorAt(av);
+      if (!(door?.open && iy > 0 && av.supportSteps > 0 && !av.holding)) { av.vz = 0; return; }
+    }
+    const target = -iy * AVATAR.walk, dv = target - av.vz, lim = AVATAR.aGround * DT;
+    av.vz += Math.max(-lim, Math.min(lim, dv));
+    let nz = av.z + av.vz * DT;
+    if (nz >= 0) { av.z = 0; av.vz = 0; return; } // back on the 2.5D path
+    const door = this.doors.find(d => d.open && av.x > d.x0 - 0.6 && av.x < d.x1 + 0.6 && nz > d.z - 1.2);
+    if (door && iy !== 0) { const cx = (door.x0 + door.x1) / 2; av.x += Math.max(-1, Math.min(1, (cx - av.x) * 4)) * AVATAR.walk * 0.6 * DT; }
+    // Back from the far side: the passage is behind the camera, out of sight. Walking back (▼)
+    // near the near wall of the area beyond leads to the passage's mouth (declared assist).
+    const back = this.doors.find(d => d.open && d.mouthZ !== undefined && iy < 0 && av.z < d.mouthZ + 0.1 && av.z > d.mouthZ - 2.5);
+    if (back) { const cx = (back.x0 + back.x1) / 2; av.x += Math.max(-1, Math.min(1, (cx - av.x) * 2)) * AVATAR.walk * 0.8 * DT; }
+    const feet = av.y - av.hh;
+    const blocked = (x, z) => this.depthBlockers.some(b => b.top > feet + AVATAR.step && (b.circle
+      ? Math.hypot(Math.max(Math.abs(x - b.circle.x) - av.hw, 0), Math.max(Math.abs(z - b.circle.z) - av.hw, 0)) < b.circle.r
+      : x + av.hw > b.x0 && x - av.hw < b.x1 && z + av.hw > b.z0 && z - av.hw < b.z1));
+    const inside = (x, z) => !blocked(x, z) && this.depthAreas.some(r => x - av.hw >= r.x0 && x + av.hw <= r.x1 && z - av.hw >= r.z0 && z + av.hw <= r.z1);
+    if (inside(av.x, nz)) av.z = nz; else av.vz = 0;
+    if (!inside(av.x, av.z)) { av.x = av.px; av.vx = 0; } // sideways into a wall: stop there
+    if (!inside(av.x, av.z)) av.x = Math.max(...this.depthAreas.filter(r => av.z - av.hw >= r.z0 && av.z + av.hw <= r.z1).map(r => Math.min(Math.max(av.x, r.x0 + av.hw), r.x1 - av.hw)), av.x);
+  }
+
   collideSolids(b, record) {
     for (const s of this.solids) {
       if (s.only && s.only !== b.shape) continue;
+      if (!this.atDepth(s, b.z)) continue; // not at this depth
       if (b.shape === 'circle') {
         const cx = clamp(b.x, s.x0, s.x1), cy = clamp(b.y, s.y0, s.y1);
         let dx = b.x - cx, dy = b.y - cy;
@@ -269,7 +325,7 @@ export class World {
     const free = this.bodies.filter(b => !b.heldBy);
     for (let i = 0; i < free.length; i++) for (let j = i + 1; j < free.length; j++) {
       const a = free[i], c = free[j];
-      if (a.lane !== c.lane) continue;
+      if (a.lane !== c.lane || Math.abs(a.z - c.z) > 0.5) continue;
       let nx, ny, pen;
       if (a.shape === 'circle' && c.shape === 'circle') {
         const dx = c.x - a.x, dy = c.y - a.y, d = Math.hypot(dx, dy), rr = a.r + c.r;
@@ -346,7 +402,9 @@ export class World {
       // A cause, not an order (the other prompts are infinitives); the box clears the head.
       // At the lip, in the free band between the head and the two hanging spheres (both at 2 m):
       // higher, it covered one or both of them.
-      out.push({ kind: 'drop', verb: 'Soltar', d: 0, x: av.x - (atChain ? 0.15 : 0), y: av.y + (atChain ? 0.2 : 0), reason: atChain ? 'Manos ocupadas: así no se puede bajar por la cadena.' : null });
+      const atDoor = this.doorAt(av)?.open;
+      out.push({ kind: 'drop', verb: 'Soltar', d: 0, x: av.x - (atChain ? 0.15 : 0), y: av.y + (atChain ? 0.2 : 0),
+        reason: atChain ? 'Manos ocupadas: así no se puede bajar por la cadena.' : atDoor ? 'Manos ocupadas: con la esfera no se entra por el arco.' : null });
       return out;
     }
     // A chain is offered within 0.75 m of its lip, at its real distance from where it is taken
@@ -368,6 +426,21 @@ export class World {
         out.push({ kind: 'chain-foot', chain: ch.id, verb: 'Subir por la cadena', d: 0, x: ch.x, y: ch.floorY + 1.4 });
       }
     }
+    if (av.z < -0.3) {
+      // In depth nothing of the 2.5D path is in reach. Standing still beyond the passage (whose
+      // mouth is behind the camera), the way back is named.
+      const door = this.doors.find(d => d.mouthZ !== undefined && av.z < d.mouthZ);
+      if (door && Math.hypot(av.vx, av.vz) < 0.1 && av.supportSteps > 0) out.push({ kind: 'back', key: '▼', verb: 'Volver', d: 0, x: av.x, y: av.y + 0.9, z: av.z });
+      return out;
+    }
+    for (const door of this.doors) {
+      if (door.open || door.opening || !this.citySeen || av.supportSteps === 0) continue;
+      const lx = door.lever ? door.lever.x : (door.x0 + door.x1) / 2, d = Math.abs(av.x - lx);
+      if (d < 0.9 && Math.abs(av.y - av.hh - door.y) < 0.15) out.push({ kind: 'door', id: door.id, verb: door.verb || 'Abrir', d, x: lx, y: door.y + 1.6 });
+    }
+    // An open door is walked through, not used: the prompt names the key (▲), E does nothing.
+    const open = this.doors.find(d => d.open && this.doorAt(av) === d);
+    if (open && av.supportSteps > 0) out.push({ kind: 'enter', key: '▲', verb: 'Entrar', d: Math.abs(av.x - (open.x0 + open.x1) / 2) + 0.3, x: (open.x0 + open.x1) / 2, y: open.y + 2.6 });
     for (const st of this.stands) {
       const d = Math.abs(av.x - st.x);
       if (d > AVATAR.reach + 0.4 || Math.abs(av.y - AVATAR.hh - st.baseY) > 0.8) continue;
@@ -395,6 +468,8 @@ export class World {
     const it = this.interactables()[0];
     if (!it) return;
     const av = this.avatar;
+    if (it.kind === 'door') { const door = this.doors.find(d => d.id === it.id); door.opening = true; this.emit('door-opening', { door: door.id }); return; }
+    if (it.kind === 'enter' || it.kind === 'back') return;
     if (it.kind === 'drop') {
       const b = av.holding; av.holding = null; b.heldBy = null; b.bellRungThisFlight = false;
       b.vx = av.vx; b.vy = av.vy;
@@ -539,12 +614,12 @@ export class World {
 }
 
 /** Integrate a free point through the field (no contacts): the path water and spray follow. */
-export function ballisticPath(field, x, y, vx, vy, { steps = 600, every = 6, stopY = -Infinity } = {}) {
+export function ballisticPath(field, x, y, vx, vy, { steps = 600, every = 6, stopY = -Infinity, z = 0 } = {}) {
   const pts = [{ x, y, vx, vy, t: 0 }], a = { x: 0, y: 0 }, b = { x: 0, y: 0 };
   for (let i = 1; i <= steps; i++) {
-    field.at(x, y, a);
+    field.at(x, y, a, z);
     x += vx * DT + 0.5 * a.x * DT * DT; y += vy * DT + 0.5 * a.y * DT * DT;
-    field.at(x, y, b);
+    field.at(x, y, b, z);
     vx += 0.5 * (a.x + b.x) * DT; vy += 0.5 * (a.y + b.y) * DT;
     if (i % every === 0) pts.push({ x, y, vx, vy, t: i * DT });
     if (y < stopY) break;

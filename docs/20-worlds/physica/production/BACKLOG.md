@@ -37,6 +37,18 @@ primero.
 ## Hito B — primer episodio (no empezado)
 
 - **B1:** entrada desde el Instituto (Taller de Física, pecera). Requiere decidir la integración con la landing de otra rama, sin modificar Ohmdal.
-- **B2:** prueba mínima de la transición 2.5D → 3D: una abertura en la pared del fondo (el arco tapiado de la Terraza) se vuelve transitable y revela un barrio.
+- **B2:** prueba mínima de la transición 2.5D → 3D.
+  - **Qué es:** una abertura en la pared del fondo (el arco tapiado de la Terraza) se vuelve transitable y revela un barrio.
+  - **Estado: parcial** (iter 13, `evidence/iter-13`). Hecho:
+    - la misma simulación con profundidad;
+    - la manivela, con su eje en profundidad;
+    - pasaje y plaza, con obstáculos sólidos;
+    - la cámara continua;
+    - 11 pruebas y el recorrido con teclado.
+  - **Falta:**
+    - lo que asoma sobre el muro, en vez de aparecer de golpe;
+    - la identidad de la metrópolis, con al menos un experimento cotidiano interactivo;
+    - la fuente con un chorro de contraste;
+    - una toma de la plaza entera.
 - **B3:** familia «Introducción» y **B4:** familia MRU (ver `FAMILIAS.md`).
 - **B5:** primer sector jugable de la metrópolis.

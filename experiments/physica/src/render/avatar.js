@@ -438,7 +438,7 @@ export class Explorer {
 
   /** The pose the body should tell, read from the simulated state (never the other way round). */
   classify(s, ctx, gUp) {
-    const air = !s.grounded, speed = Math.abs(s.vx), c = s.control ?? 0;
+    const air = !s.grounded, speed = Math.hypot(s.vx, s.vz ?? 0), c = s.control ?? 0;
     if (ctx.onChain) return gUp && ctx.inputY < -0.2 ? 'cadena-esfuerzo' : 'cadena';
     if (ctx.mantling) return 'trepar';
     if (ctx.inWater) return 'agua';
@@ -455,7 +455,7 @@ export class Explorer {
   /** p: interpolated position (centre of the sim box); s: sim avatar state. */
   update(dt, time, p, s, ctx) {
     const st = this.state, feetY = p.y - s.hh;
-    this.root.position.set(p.x, feetY, 0);
+    this.root.position.set(p.x, feetY, p.z ?? 0);
     // The field where the body is: read here, because the simulation does not refresh the body's
     // own field while something holds it (the chain).
     const g = this.field.at(p.x, p.y, { x: 0, y: 0 }), gUp = g.y > 0.8;
@@ -465,12 +465,20 @@ export class Explorer {
     const pose = this.classify(s, ctx, gUp);
     // While the feet skid the body keeps facing the way it is still moving, and turns after.
     const face = pose === 'frenar' ? Math.sign(s.vx) : s.facing;
+    // In depth the explorer faces where it walks (away from the camera, toward it, sideways).
+    const inDepth = (p.z ?? 0) < -0.05, sp2 = Math.hypot(s.vx, s.vz ?? 0);
+    if (inDepth && sp2 > 0.3) st.depthYaw = Math.atan2(-(s.vz ?? 0), s.vx);
     // Carrying or pushing, the body turns toward profile: the sphere is straight ahead in the
     // simulation, and at three-quarters it would sit off to one side of the hands.
     // On the chain, the same, so the grip shows in front of the body. Suspended in a region, the
     // body turns toward the camera: the trailing V of the arms then lies in the picture plane.
     const turn = pose === 'cargar' || pose === 'empujar' || pose.startsWith('cadena') ? 0.25 : pose === 'suspendido' ? 1.15 : 0.6;
-    const yawT = face > 0 ? -turn : -(Math.PI - turn);
+    let yawT = face > 0 ? -turn : -(Math.PI - turn);
+    if (inDepth && st.depthYaw !== undefined) {
+      yawT = st.depthYaw; // the shortest way round from the current yaw
+      while (yawT - st.yaw > Math.PI) yawT -= 2 * Math.PI;
+      while (yawT - st.yaw < -Math.PI) yawT += 2 * Math.PI;
+    }
     st.yaw += (yawT - st.yaw) * Math.min(1, dt * 10);
     if (this.yawOverride != null) { st.yaw = this.yawOverride; st.nextBlink = 1; st.blink = 0; } // development turnaround only
     this.body.rotation.y = st.yaw;
@@ -478,7 +486,7 @@ export class Explorer {
     if (pose !== this.poseState) { this.poseState = pose; st.poseT = 0; } else st.poseT += dt;
     this.poseOverlay = (st.surprise > 0.15 ? ' +sobresalto' : '') + (st.land > 0.15 ? ' +aterrizaje' : '');
     this.poseLog[pose] = (this.poseLog[pose] || 0) + dt;
-    const speed = Math.abs(s.vx), air = !s.grounded;
+    const speed = Math.hypot(s.vx, s.vz ?? 0), air = !s.grounded;
     if (!air) st.walk += speed * dt * 5.4;
     const stride = air ? 0 : Math.min(1, speed / 2.6), sw = Math.sin(st.walk);
     st.squash *= Math.exp(-dt * 9);
@@ -596,7 +604,7 @@ export class Explorer {
     // The scarf tails hang from the back of the neck and drape over the coat, not through it.
     const collide = q => {
       const h = q.y - feetY, r = bodyRadius(h); if (r <= 0) return;
-      const wx = q.x - this.root.position.x, wz = q.z;
+      const wx = q.x - this.root.position.x, wz = q.z - this.root.position.z;
       const lx = wx * c - wz * sn, lz = wx * sn + wz * c; // world → body frame (inverse yaw)
       const rx = (r + 0.022) * (h > 0.73 ? SKULL.sx : COAT_X), rz = r + 0.022;
       // Pushed out along the body's front–back axis only (a radial push would slide the tails
@@ -605,7 +613,7 @@ export class Explorer {
       const w2 = 1 - (lz / rz) ** 2; if (w2 <= 0) return;
       const bx = rx * Math.sqrt(w2); if (lx <= -bx || lx >= bx) return;
       const nx = -bx, x = this.root.position.x + nx * c + lz * sn;
-      q.px += x - q.x; q.x = x; q.z = -nx * sn + lz * c;
+      q.px += x - q.x; q.x = x; q.z = this.root.position.z - nx * sn + lz * c;
     };
     for (const t of this.tails) {
       const anchor = this.body.localToWorld(t.anchor.clone());

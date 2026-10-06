@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 12 (opciones de accesibilidad; ver `evidence/iter-12`).
+**Actualizado:** 2026-10-06 · iteración 13 (transición 2.5D → 3D, parcial; ver `evidence/iter-13`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,17 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 12):** opciones de accesibilidad (A16, D17).
+**Último cambio aceptado (iteración 13, Hito B · B2 parcial):** el arco tapiado se abre y lleva a un barrio en 3D (D18).
+- **La simulación** gana profundidad donde el nivel la declara; el recorrido 2.5D no cambia y sus pruebas pasan.
+- **El acceso:** una manivela en la Terraza, después del Mirador, con su eje en profundidad.
+- **El espacio:** un pasaje y una plaza con obstáculos sólidos.
+- **La cámara:** continua y sin entrar en la roca.
+- **Para volver:** «▼ Volver» y una ayuda declarada.
+- **Evidencia:** 66 pruebas y el recorrido con teclado completo.
+
+  Ver `evidence/iter-13` y su REVISION, con lo que falta para cerrar B2.
+
+**Iteración 12:** opciones de accesibilidad (A16, D17).
 - **El panel:** la pausa es un panel modal con volumen, movimiento reducido y tamaño del texto.
 - **Manejo:** teclado, mando y táctil; los ajustes se guardan.
 - **Movimiento reducido:** corta en cada cambio de plano.
@@ -159,14 +169,17 @@
 
 El loop no se detiene: según el contrato, al cerrar un hito se sigue con el próximo, y esas validaciones quedan pedidas.
 
-**Próximo resultado: Hito B, B2 — prueba mínima de la transición 2.5D → 3D.**
-- **Qué es:** el arco tapiado de la pared del fondo de la Terraza se vuelve transitable y revela un barrio de la metrópolis.
-- **Por qué primero:** es el mayor riesgo técnico y de diseño del Hito B (cámara, controles y física con una dimensión más), y B1 (la entrada desde el Instituto) depende de decisiones de otra rama.
+**Próximo resultado: cerrar B2. El barrio se lee como la metrópolis y tiene un experimento cotidiano.**
+- **Un experimento interactivo en la plaza** que reuse un instrumento del 2.5D («el mismo instrumento, otro lugar»). Por ejemplo, un soporte con esfera, regla y trazas: allá la esfera cae como en la Orilla, y la Bitácora compara las dos.
+- **Escala y arquitectura de la ciudad pintada:** piedra clara, soportales y puertas, y uno o dos habitantes.
+- **La fuente:** un chorro central a la velocidad de la surgencia de la sima (2,95 m/s), que acá sube sólo 0,44 m. Agua en el cuenco.
+- **Lo que asoma sobre el muro:** diseñado (la cúpula en el eje del arco, techos en bruma), en vez de aparecer de golpe.
 - **Criterio:**
-  - con teclado, el explorador cruza el arco y vuelve sin perder controles ni cámara;
-  - el campo y la física siguen siendo deterministas (pruebas);
-  - el recorrido del Hito A sin regresiones;
-  - revisión independiente.
+  - con teclado, el experimento se usa en la plaza y deja una nota medida en la Bitácora;
+  - una revisión independiente que lo lea como la metrópolis habitada, no como un decorado vacío;
+  - 2.5D y la transición sin regresiones.
+
+*Plan cumplido en la iteración 13:* la mayor parte de B2: la transición mínima jugable, con la misma simulación.
 
 *Plan cumplido en las iteraciones 11 y 12:*
 - el tirón A25, diagnosticado como del entorno;

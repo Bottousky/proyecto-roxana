@@ -265,3 +265,36 @@ El contrato (§7) pide movimiento reducido, texto legible y controles enseñados
 - **Guardado:** en `localStorage` con try/catch. El movimiento reducido sólo se guarda si el jugador lo elige; hasta entonces manda el sistema, y `?reduced` siempre gana.
 - **Tamaño del texto:** escala todas las fuentes de la interfaz y de la Bitácora con una variable CSS. Los avisos quedan dentro de la pantalla.
 - **Táctil:** tiene su propia ayuda, encima de la barra, y botones más chicos en pantallas angostas.
+
+## D18 · La transición 2.5D → 3D: la misma simulación con una dimensión más (iteración 13, Hito B · B2)
+
+**El pedido (contrato §2):** una escena mínima de la transición. Una abertura que parecía decorativa se vuelve transitable, detrás de una pared aparece un barrio y un mecanismo revela su eje. «La cámara cambia cómo observamos, no modifica por sí sola las leyes físicas.» Sin desarrollar dos juegos incompatibles.
+
+**Elegido:** una sola simulación, que gana profundidad donde el nivel la declara.
+- **Profundidad opcional:** las regiones del campo y los sólidos aceptan un rango de profundidad (`z0`/`z1`).
+  - El nivel declara la profundidad del diorama (`diorama`), y todo lo que ya existía la toma.
+  - En el recorrido 2.5D el explorador vive en z = 0 y nada cambia: las 55 pruebas anteriores pasan sin tocarlas.
+  - Detrás del muro no hay regiones (condiciones familiares) y el agujero del Pozo no sigue bajo el barrio.
+- **El explorador** tiene z y vz.
+  - Por una puerta abierta, ▲ camina alejándose de la cámara y ▼ vuelve; ◀▶ siguen siendo los costados.
+  - En profundidad sólo se mueve dentro de áreas transitables declaradas: el umbral frente al arco, el pasaje y el barrio. Las paredes son esos bordes.
+  - La gravedad, los apoyos y los escalones son los mismos de siempre.
+  - Los contactos entre cuerpos ocurren sólo a profundidad parecida.
+- **Dos ayudas declaradas:**
+  - en el umbral, caminar en profundidad centra al explorador en el pasaje, así no hace falta apuntar;
+  - del otro lado, ▼ cerca del muro lleva a la boca del pasaje, que queda detrás de la cámara y fuera de la vista.
+- **El arco:** se ofrece («Abrir el arco», E) recién después de pisar el Mirador, donde se vio la ciudad.
+  - Su relleno de piedra gira 100° hacia el pasaje sobre un eje de latón visible.
+  - Abierto, el aviso dice «▲ Entrar»: se camina, no se usa.
+  - Con una esfera en la mano no se entra, y el juego dice por qué.
+- **La cámara:** pasa de la vista lateral del diorama a una cámara baja detrás del explorador, como función continua de su profundidad (de z 0 a −1,8).
+  - Va baja en el pasaje, para no entrar en la roca, y sube en la plaza.
+  - Con movimiento reducido no hace falta un corte: sigue la posición del explorador.
+- **El barrio** (propuesta de nombre, sin asentar en el canon):
+  - una plaza con fachadas, un observatorio, plantas y faroles;
+  - una fuente cuyo chorro sale del mismo campo que la cascada y por eso cae como siempre: el contraste con el agua que sube.
+  - Se dibuja recién cuando el arco se abre; antes asomaba por encima del muro del cañón.
+- **Cambios en la escena 2.5D, sin cambiar su física:**
+  - el muro del fondo se corta en el pasaje;
+  - un conducto de los anclajes que lo cruzaba cambió de recorrido;
+  - una pasarela de piedra cruza el arroyo de la Terraza (es un sólido con rango de profundidad, que no existe en z = 0).

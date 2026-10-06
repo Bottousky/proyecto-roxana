@@ -49,7 +49,7 @@ export class Journal {
       if (s?.notes) { this.notes = s.notes; this.flags = s.flags || {}; this.footing = s.footing || null; }
       // A saved footing must still be firm ground in this geometry.
       const f = this.footing, av = world.avatar;
-      if (f && !world.solids.some(o => !o.only && f.x >= o.x0 && f.x <= o.x1 && Math.abs(f.y - av.hh - o.y1) < 0.01)) this.footing = null;
+      if (f && !world.solids.some(o => !o.only && world.atDepth(o, 0) && f.x >= o.x0 && f.x <= o.x1 && Math.abs(f.y - av.hh - o.y1) < 0.01)) this.footing = null;
     } catch { /* storage unavailable: start empty */ }
     this.render();
   }
@@ -69,6 +69,8 @@ export class Journal {
 
   onEvent(e) {
     const w = this.world;
+    if (e.type === 'city-seen' && !this.has('arco')) this.add('arco', 'El arco tapiado',
+      'Desde el Mirador se ve una ciudad, lejos, detrás del paisaje. En la Terraza, el muro del fondo tiene un arco tapiado con una palanca de latón: entre sus piedras pasa luz.');
     if (e.type === 'impact' && !this.has('caida')) {
       const tr = w.traces.find(t => t.source === 'A' && t.body === e.body);
       if (tr && tr.marks.length >= 3) {
@@ -133,6 +135,9 @@ export class Journal {
   }
 
   update(dt) {
+    // Behind the wall, once: the neighbourhood, and the water that falls as on the Orilla.
+    if (this.world.avatar.z < -9.2 && !this.has('barrio')) this.add('barrio', 'Detrás del muro',
+      'El arco llevaba a un barrio de la ciudad. El agua de la fuente cae como en la Orilla: acá no hay ninguna región, rige la condición de siempre.');
     const w = this.world, av = w.avatar;
     if (this.flags.climbFrom != null && !this.has('cruce') && !av.heldBy) this.flags.climbTop = Math.max(this.flags.climbTop ?? -Infinity, av.y - av.hh);
     if (!this.has('profundidad')) {

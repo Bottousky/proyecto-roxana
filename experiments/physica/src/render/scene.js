@@ -9,8 +9,9 @@ import { waterMaterial, waterTube, waterSheet, fieldPath, foamMound } from './wa
 import { Particles } from './particles.js';
 import { Moss, Plumbs } from './flora.js';
 import { Vegetation } from './vegetation.js';
+import { buildBarrio } from './barrio.js';
 import { makeMaterials, Stand, sphereMesh, fieldAnchor, conduit, Traces, chainProp, Bell, ApexMarks } from './props.js';
-import { STREAM_SPEED, TERRACE_Y, BELL_LINE, WELL, MIRADOR_Y, MIRADOR_LINE } from '../sim/levels/cascada.js';
+import { STREAM_SPEED, TERRACE_Y, BELL_LINE, WELL, MIRADOR_Y, MIRADOR_LINE, ARCH } from '../sim/levels/cascada.js';
 
 const Z_STREAM = -1.7, Z_FRONT = 1.6, Z_BACK = -3.6;
 export const LANE_Z = [0, -0.5];   // explorer's path, experiment lane
@@ -30,7 +31,8 @@ function skyDome() {
   return s;
 }
 
-export function buildScene(world, { quality = 'high' } = {}) {
+export function buildScene(world, opts = {}) {
+  const { quality = 'high' } = opts;
   const scene = new THREE.Scene();
   const field = world.field;
   const fogColor = new THREE.Color('#efcfa8');
@@ -75,11 +77,16 @@ export function buildScene(world, { quality = 'high' } = {}) {
   add(strataBlock({ x0: 19.5, x1: 24, y0: -9, y1: -1.5, z0: Z_BACK, z1: Z_FRONT, seed: 1, sides: ['w'] }));
   add(strataBlock({ x0: -0.6, x1: 5.1, y0: -11, y1: -4.6, z0: Z_BACK, z1: Z_FRONT, seed: 1, sides: [] }));
   // Back walls: a stepped skyline of strata. The chasm keeps its own back wall.
-  const backs = [[-26, -14, 8.2, 21], [-14, -6, 6.1, 22], [-6, 0, 5.0, 23], [0, 4.5, 6.6, 24], [4.5, 12, 8.6, 25], [12, 26, 10.6, 26]];
+  // Behind the Terraza the wall is cut by the walled arch's passage (Hito B): the blocks on either
+  // side are its walls, a lintel spans it and the block under it is its floor.
+  const backs = [[-26, -14, 8.2, 21], [-14, -6, 6.1, 22], [-6, 0, 5.0, 23], [0, 4.5, 6.6, 24], [4.5, ARCH.x0, 8.6, 25], [ARCH.x1, 12, 8.6, 25], [12, 26, 10.6, 26]];
   const backRock = rockMaterial({ mossAmount: 0.7, shade: 0.38, detail: 0.35 }); backRock.side = THREE.DoubleSide;
   // Back walls receive shadows but do not cast them (nothing in front of them needs their shade).
   // One relief seed and one darkening reference for all the back walls: no seams between them.
   for (const [x0, x1, top] of backs) add(strataBlock({ x0, x1, y0: -11, y1: top, z0: -9, z1: Z_BACK, seed: 2, sides: ['w', 'e'], step: 0.32, topRef: 11 }), backRock, false);
+  add(strataBlock({ x0: ARCH.x0, x1: ARCH.x1, y0: TERRACE_Y + ARCH.h, y1: 8.6, z0: -9, z1: Z_BACK, seed: 2, sides: [], step: 0.32, topRef: 11 }), backRock, false);
+  add(strataBlock({ x0: ARCH.x0, x1: ARCH.x1, y0: -11, y1: TERRACE_Y, z0: -9, z1: Z_BACK, seed: 2, sides: [], step: 0.32, topRef: 11 }), backRock, false);
+  const barrio = buildBarrio(scene, { M, streamZ: Z_STREAM, wallRock: backRock, field, zBack: Z_BACK, world });
   // World edges: tall rock you can see, not an invisible wall.
   add(strataBlock({ x0: -30, x1: -22, y0: -9, y1: 13, z0: -9, z1: Z_FRONT + 0.6, seed: 1, sides: ['e'], step: 0.32 }), backRock, false);
 
@@ -291,7 +298,8 @@ export function buildScene(world, { quality = 'high' } = {}) {
   }
   const conduits = [
     conduit(M, [[0, 3, Z_BACK + 0.05], [-0.8, 4.2, Z_BACK - 0.2], [-2.5, 4.9, Z_BACK - 0.6], [-4, 5.3, -5.5]]),
-    conduit(M, [[4.5, 3, Z_BACK + 0.05], [5.4, 4.6, Z_BACK - 0.2], [7, 6.2, Z_BACK - 0.5], [9, 7.2, -5.5]]),
+    // (kept west of the arch's passage, which it used to cross)
+    conduit(M, [[4.5, 3, Z_BACK + 0.05], [5.2, 4.6, Z_BACK - 0.2], [5.9, 6.5, Z_BACK - 0.5], [6.4, 7.6, -5.5]]),
     conduit(M, [[0, -3.4, Z_BACK + 0.05], [1.2, -4.3, Z_BACK - 0.2], [2.25, -4.5, -5.2]]),
     conduit(M, [[4.5, -3.4, Z_BACK + 0.05], [3.3, -4.3, Z_BACK - 0.2], [2.25, -4.5, -5.2]]),
   ];
@@ -337,7 +345,7 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const veg = new Vegetation(scene, field, {
     quality,
     tops: [[-21, -0.25, 0], [4.75, WELL.x0 - 0.1, TERRACE_Y], [WELL.x1 + 0.1, 16.4, MIRADOR_Y], [17.8, 18.7, TERRACE_Y]],
-    avoid: (x, z, tall) => Math.abs(z - Z_STREAM) < 0.95 || (x > -6.5 && x < -4.5 && z < -0.2) ||
+    avoid: (x, z, tall) => Math.abs(z - Z_STREAM) < 0.95 || (x > -6.5 && x < -4.5 && z < -0.2) || (x > ARCH.x0 - 0.8 && x < ARCH.x1 + 0.8 && z < 0.5) ||
       (tall && z < 0.3 && instrumentX.some(ix => Math.abs(x - ix) < 0.6)),
     streams: [{ x0: -18.5, x1: DRAIN_X - 0.7, y: 0, z: Z_STREAM, half: 0.82 }, { x0: land.x + 0.6, x1: WELL.x0 - 0.4, y: TERRACE_Y, z: Z_STREAM, half: 0.82 },
       { x0: WELL.x1 + 0.4, x1: 18.4, y: TERRACE_Y, z: Z_STREAM, half: 0.82 }],
@@ -385,10 +393,12 @@ export function buildScene(world, { quality = 'high' } = {}) {
     }
     traces.sync(world.traces, id => { const b = world.bodies.find(x => x.id === id); return LANE_Z[b?.lane ?? 0] + 0.22; });
     if ((time * 30 | 0) % 2 === 0) { const av = world.avatar; veg.update(time, { x: av.x, y: av.y - av.hh }); }
+    barrio.update(dt, time);
   }
 
   function onEvent(e) {
     if (e.type === 'bell') bells.get(e.bell || 'cascada')?.ring(e.speed);
+
     // Landing in the Pozo's water splashes.
     if (e.type === 'impact' && e.kind === 'avatar' && e.x > WELL.x0 && e.x < WELL.x1 && e.y < WELL.floorY + 1.2) {
       parts.burst(26, ps => ({ x: e.x + (ps.rnd() - 0.5) * 0.5, y: WELL.floorY + 0.3, z: (ps.rnd() - 0.5) * 0.8, vx: (ps.rnd() - 0.5) * 2, vy: 1.5 + ps.rnd() * 2.5,

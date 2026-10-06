@@ -173,8 +173,8 @@ export function foamMound({ x, y, z, r, h = 0.5 }) {
 }
 
 /** Path of a parcel leaving (x,y) at (vx,vy) until `until(p)` holds, under `field`. */
-export function fieldPath(field, x, y, vx, vy, until, every = 3) {
-  const all = ballisticPath(field, x, y, vx, vy, { steps: 2400, every });
+export function fieldPath(field, x, y, vx, vy, until, every = 3, z = 0) {
+  const all = ballisticPath(field, x, y, vx, vy, { steps: 2400, every, z });
   const out = [];
   for (const p of all) { out.push(p); if (out.length > 2 && until(p)) break; }
   return out;

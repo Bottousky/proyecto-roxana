@@ -273,6 +273,23 @@ await page.evaluate(() => window.__physica.inspect(12.0, 2.2, 9)); await sleep(2
 save(join(out, '11-pozo-instrumentos.png'), await snap('11-pozo-instrumentos.png'));
 await page.evaluate(() => window.__physica.inspect(null));
 
+// 4c — Hito B, B2: the walled arch. The city was seen from the Mirador, so it can be opened;
+// ▲ walks through the passage into the neighbourhood, ▼ (only) brings the explorer back.
+{
+  const depth = () => page.evaluate(() => { const w = window.__physica.world, a = w.avatar; return { x: a.x, z: a.z, on: a.support?.solid?.id || null, open: w.doors[0].open, citySeen: w.citySeen }; });
+  await walkTo(6.4); // the crank beside the arch
+  const before = await depth();
+  await page.keyboard.press('e');
+  const opened = await holdUntil('Shift', async () => (await depth()).open, 4); // the leaf takes its swing
+  await walkTo(7.6);
+  const entered = await holdUntil('ArrowUp', async () => (await depth()).z < -12, 10);
+  save(join(out, '12-barrio.png'), await snap('12-barrio'));
+  const inside = await depth();
+  const back = await holdUntil('ArrowDown', async () => (await depth()).z === 0, 14);
+  const after = await depth();
+  step('arco y barrio', { citySeen: before.citySeen, opened, entered, inside: { z: +inside.z.toFixed(2), on: inside.on }, back, after: { x: +after.x.toFixed(2), z: after.z, on: after.on } });
+}
+
 // 4 — Bitácora and save/load.
 save(join(out, '04-terraza.png'), await snap('04-terraza.png'));
 await page.keyboard.press('j'); await sleep(400);

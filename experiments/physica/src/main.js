@@ -8,7 +8,7 @@ import '@fontsource/inter/600.css';
 import './style.css';
 import { World, DT } from './sim/world.js';
 import { FixedStepper } from './sim/stepper.js';
-import { CASCADA } from './sim/levels/cascada.js';
+import { CASCADA, ARCH } from './sim/levels/cascada.js';
 import { buildScene } from './render/scene.js';
 import { Explorer } from './render/avatar.js';
 import { Input } from './input.js';
@@ -35,12 +35,13 @@ app.appendChild(renderer.domElement);
 
 const world = new World(CASCADA);
 const stepper = new FixedStepper(world);
-const view = buildScene(world, { quality });
+const view = buildScene(world, { quality, reduced: () => reduced });
 const { scene, sun } = view;
 const explorer = new Explorer(world.field);
 explorer.addTo(scene);
 
 const camera = new THREE.PerspectiveCamera(32, 1, 0.3, 600);
+let baseFov = 32; // the play view's angle (wider in portrait); depth widens it
 // Upload every texture and compile every program before play: an object or painting that
 // first enters the view mid-game must not stall a frame (measured: a 250 ms hitch otherwise).
 function warmUp() {
@@ -163,7 +164,7 @@ let hintTimer = 0, moved = false;
 function resize() {
   const w = app.clientWidth, h = app.clientHeight;
   renderer.setSize(w, h); camera.aspect = w / h;
-  camera.fov = w / h < 1 ? 46 : 32;
+  camera.fov = baseFov = w / h < 1 ? 46 : 32;
   camera.updateProjectionMatrix();
 }
 addEventListener('resize', resize); resize();
@@ -217,7 +218,7 @@ window.__physica = {
   screenOf(x, y, z = 0) { const v = new THREE.Vector3(x, y, z).project(camera); return { x: (v.x * 0.5 + 0.5) * app.clientWidth, y: (-v.y * 0.5 + 0.5) * app.clientHeight }; },
   vista() { vista = 6; vistaAge = 0; vistaHeld = false; view.setCityVisible(true); },
 };
-let inspectCam = null, camFloat = 0;
+let inspectCam = null, camFloat = 0, camDepth = 0;
 const camG = { x: 0, y: 0 };
 
 // ---------- loop ----------
@@ -257,7 +258,7 @@ function frame(now) {
   }
   journal.update(dt);
 
-  const p = { x: av.px + (av.x - av.px) * alpha, y: av.py + (av.y - av.py) * alpha };
+  const p = { x: av.px + (av.x - av.px) * alpha, y: av.py + (av.y - av.py) * alpha, z: (av.pz ?? 0) + (av.z - (av.pz ?? 0)) * alpha };
   const holding = !!av.holding;
   const pushing = av.supportSteps > 0 && Math.abs(world.input.x) > 0.1 && world.bodies.some(b => b.kind === 'sphere' && !b.heldBy && Math.abs(b.y - (av.y - av.hh + b.r)) < 0.1 && (b.x - av.x) * av.facing > 0 && Math.abs(b.x - av.x) < av.hw + b.r + 0.03);
   const its = world.interactables();
@@ -316,21 +317,40 @@ function frame(now) {
   // Continuous in the explorer's position (applied at once with reduced motion, so it must not jump).
   const elevT = vista > 0 ? 0.2 : THREE.MathUtils.lerp(0.2, 0.05, THREE.MathUtils.smoothstep(inWell, 0.3, 0.7));
   cam.elev += (elevT - cam.elev) * (reduced ? 1 : Math.min(1, dt * 3));
-  camera.position.set(cam.x, cam.y + cam.dist * cam.elev, cam.dist);
-  camera.lookAt(cam.x, cam.y, 0);
-  sun.position.set(cam.x - 9, 16, 12); sun.target.position.set(cam.x, 0, 0);
+  // Depth (Hito B): through the arch the camera goes from the diorama's side view to behind the
+  // explorer, as a continuous function of how deep it is (z 0 → −1.8): the camera changes how we
+  // look, the explorer's walking and the physics stay the same. Low in the passage (it must not
+  // enter the rock), higher in the square.
+  // The blend spans the whole threshold in front of the arch (z 0 → −3.6) and is eased, so the
+  // push-in takes about a second at walking pace; the view widens with depth (32° → 48°).
+  const dzT = THREE.MathUtils.smoothstep(-p.z, 0, 3.6);
+  camDepth += (dzT - camDepth) * (reduced ? 1 : Math.min(1, dt * 4));
+  const dz = camDepth, feet = p.y - av.hh, camZ = p.z + 4.6;
+  const camH = THREE.MathUtils.lerp(1.75, 3.1, THREE.MathUtils.smoothstep(-camZ, 9.0, 11.0));
+  // In the passage the camera keeps to its width (beside it is rock); out of it, it follows freely.
+  const inPassage = THREE.MathUtils.smoothstep(-camZ, 3.4, 4.0) * (1 - THREE.MathUtils.smoothstep(-camZ, 9.0, 9.8));
+  const camX = THREE.MathUtils.lerp(p.x, THREE.MathUtils.clamp(p.x, ARCH.x0 + 0.35, ARCH.x1 - 0.35), inPassage);
+  const pos2 = [cam.x, cam.y + cam.dist * cam.elev, cam.dist], look2 = [cam.x, cam.y, 0];
+  const posD = [camX, feet + camH, camZ], lookD = [p.x, feet + 0.95, p.z - 2.2];
+  const fovT = THREE.MathUtils.lerp(baseFov, Math.max(baseFov, 48), dz);
+  if (Math.abs(camera.fov - fovT) > 0.01) { camera.fov = fovT; camera.updateProjectionMatrix(); }
+  const mix = (a, b) => a.map((v, i) => v + (b[i] - v) * dz);
+  const [px, py, pz] = mix(pos2, posD), [lx, ly, lz] = mix(look2, lookD);
+  camera.position.set(px, py, pz);
+  camera.lookAt(lx, ly, lz);
+  sun.position.set(lx - 9, 16, lz + 12); sun.target.position.set(lx, 0, lz);
 
   // Prompt over the nearest interactable.
   const it = its[0];
   view.highlight(it && !journal.open && it.kind === 'stand' ? { body: it.body, stand: it.id } : null);
   if (it && !journal.open) {
-    const v = new THREE.Vector3(it.x, it.y + 0.4, 0).project(camera);
+    const v = new THREE.Vector3(it.x, it.y + 0.4, it.z ?? 0).project(camera);
     promptEl.hidden = false;
     // Kept inside the screen (with large text a prompt near an edge used to start off it).
     const W = app.clientWidth, H = app.clientHeight, pw = promptEl.offsetWidth, ph = promptEl.offsetHeight;
     const px = THREE.MathUtils.clamp((v.x * 0.5 + 0.5) * W, pw / 2 + 8, W - pw / 2 - 8), py = THREE.MathUtils.clamp((-v.y * 0.5 + 0.5) * H, ph + 8, H - 8);
     promptEl.style.transform = `translate(${px}px, ${py}px) translate(-50%, -100%)`;
-    $('prompt-key').textContent = input.lastDevice === 'gamepad' ? 'A' : input.lastDevice === 'touch' ? 'E' : 'E';
+    $('prompt-key').textContent = it.key || (input.lastDevice === 'gamepad' ? 'A' : 'E');
     $('prompt-verb').textContent = it.verb;
     $('prompt-hint').textContent = it.hint || '';
     $('prompt-reason').textContent = it.reason || '';

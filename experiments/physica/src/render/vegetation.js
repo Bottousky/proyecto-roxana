@@ -71,7 +71,7 @@ export class Vegetation {
    * walls: fern faces { x, nx, z: [[z0, z1], …], bands: [[y0, y1], …], scale };
    * avoid(x, z, tall): true where a plant must not grow (instruments, channels, the table).
    */
-  constructor(scene, field, { tops, walls = [], avoid, quality = 'high', streams = [] }) {
+  constructor(scene, field, { tops = [], walls = [], avoid, quality = 'high', streams = [], spots = [] }) {
     this.field = field; this.plants = [];
     let s = 11; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
     const pick = table => { let r = rnd() * table.reduce((a, b) => a + b[1], 0); for (const [v, w] of table) { if ((r -= w) <= 0) return v; } return table[0][0]; };
@@ -80,6 +80,8 @@ export class Vegetation {
     const TALL = new Set([PLANT.tallGrass, PLANT.reeds, PLANT.coral, PLANT.saffron]);
     // Flowers weigh more than their share: many fall near the path or the instruments and are skipped.
     const ground = [[PLANT.tuft, 32], [PLANT.tallGrass, 8], [PLANT.coral, 20], [PLANT.saffron, 19], [PLANT.moss, 13], [PLANT.succulent, 9]];
+    // Explicit plants (a planter, a garden bed): { cell, x, y, z, h }.
+    for (const p of spots) this.add(p.cell, p.x, p.y, p.z, p.h, rnd() < 0.5, rnd());
     const lens = tops.map(t => t[1] - t[0]), total = lens.reduce((a, b) => a + b, 0);
     const place = (kind, x, y, z) => {
       if (Math.abs(z) < 0.7 && TALL.has(kind)) return; // near the path only low plants
@@ -88,7 +90,7 @@ export class Vegetation {
       this.add(kind, x, y, z, H[kind][0] + rnd() * (H[kind][1] - H[kind][0]), rnd() < 0.5, rnd());
     };
     // Clumps of a few mixed plants, denser toward the lips; then a scatter of low ones.
-    const clumps = quality === 'low' ? 45 : 95;
+    const clumps = !tops.length ? 0 : quality === 'low' ? 45 : 95;
     for (let c = 0; c < clumps; c++) {
       let t = rnd() * total, k = 0; while (t > lens[k] && k < lens.length - 1) { t -= lens[k]; k++; }
       const [x0, x1, y] = tops[k], u = rnd() < 0.3 ? (rnd() < 0.5 ? rnd() * 0.12 : 1 - rnd() * 0.12) : rnd();
@@ -98,7 +100,7 @@ export class Vegetation {
         place(rnd() < 0.6 ? dom : pick(ground), x, y, cz + (rnd() - 0.5) * 0.7);
       }
     }
-    for (let i = 0; i < (quality === 'low' ? 25 : 60); i++) {
+    for (let i = 0; i < (!tops.length ? 0 : quality === 'low' ? 25 : 60); i++) {
       let t = rnd() * total, k = 0; while (t > lens[k] && k < lens.length - 1) { t -= lens[k]; k++; }
       const [x0, x1, y] = tops[k];
       place(rnd() < 0.6 ? PLANT.tuft : PLANT.moss, x0 + rnd() * (x1 - x0), y, -3.1 + rnd() * 4.4);

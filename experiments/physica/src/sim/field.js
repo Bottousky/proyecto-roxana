@@ -10,6 +10,8 @@
 // wins where both are fully present, and the result stays continuous across both bands.
 // A region switched off (`active:false`) contributes nothing; `power` scales its weight so
 // the apparatus that sustains it can ramp it up or down over time instead of instantly.
+// Depth: a region may declare z0/z1 (its extent in depth, with the same band); without them it
+// extends through all depth, as on the 2.5D path where everything lives at z = 0.
 
 export const G_FAMILIAR = 9.8;
 
@@ -32,18 +34,20 @@ export class Field {
 
   zone(id) { return this.zones.find(z => z.id === id); }
 
-  /** Weight in [0,1] with which region `z` governs the point (x,y). */
-  weight(z, x, y) {
+  /** Weight in [0,1] with which region `z` governs the point (x, y, depth). */
+  weight(z, x, y, d = 0) {
     if (!z.active || z.power <= 0) return 0;
     const h = z.band / 2;
-    return smoothstep(-h, h, insideDistance(z, x, y)) * Math.min(1, z.power);
+    let w = smoothstep(-h, h, insideDistance(z, x, y));
+    if (z.z0 !== undefined && w > 0) w *= smoothstep(-h, h, Math.min(d - z.z0, z.z1 - d));
+    return w * Math.min(1, z.power);
   }
 
-  /** Effective acceleration at a point, in m/s². */
-  at(x, y, out = { x: 0, y: 0 }) {
+  /** Effective acceleration at a point, in m/s² (depth d, 0 on the 2.5D path). */
+  at(x, y, out = { x: 0, y: 0 }, d = 0) {
     let ax = this.exterior.x, ay = this.exterior.y;
     for (const z of this.zones) {
-      const w = this.weight(z, x, y);
+      const w = this.weight(z, x, y, d);
       if (w > 0) { ax += (z.g.x - ax) * w; ay += (z.g.y - ay) * w; }
     }
     out.x = ax; out.y = ay;
@@ -54,16 +58,16 @@ export class Field {
    * Acceleration on an extended body: the mean over its centre and the centres of its four
    * quadrants. A body partially inside a region feels the corresponding fraction of it.
    */
-  onBody(cx, cy, hw, hh, out = { x: 0, y: 0 }) {
+  onBody(cx, cy, hw, hh, out = { x: 0, y: 0 }, d = 0) {
     const qx = hw / 2, qy = hh / 2;
     let sx = 0, sy = 0;
     const p = this._p || (this._p = { x: 0, y: 0 });
     const pts = [[0, 0], [-qx, -qy], [qx, -qy], [-qx, qy], [qx, qy]];
-    for (const [dx, dy] of pts) { this.at(cx + dx, cy + dy, p); sx += p.x; sy += p.y; }
+    for (const [dx, dy] of pts) { this.at(cx + dx, cy + dy, p, d); sx += p.x; sy += p.y; }
     out.x = sx / 5; out.y = sy / 5;
     return out;
   }
 
   /** Ids of regions with any weight at the point — what an instrument there would register. */
-  regionsAt(x, y) { return this.zones.filter(z => this.weight(z, x, y) > 0).map(z => z.id); }
+  regionsAt(x, y, d = 0) { return this.zones.filter(z => this.weight(z, x, y, d) > 0).map(z => z.id); }
 }

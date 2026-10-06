@@ -12,6 +12,13 @@
 // Terraza's height. A chain from the lip lets the explorer go down and choose where to let go.
 export const STREAM_SPEED = 2.6;
 export const TERRACE_Y = 4.4;
+// The walled arch in the Terraza's back wall (1.6 m wide, 2.4 m high) and the neighbourhood behind.
+export const ARCH = { x0: 6.8, x1: 8.4, h: 2.4 };
+export const BARRIO = { x0: 2.0, x1: 14.0, z0: -22.0 };
+// Depth of the Terraza's stream (the channel the cascade lands in), as drawn.
+export const STREAM_Z = -1.7;
+// The fountain in the middle of the square (on the passage's axis).
+export const FUENTE = { x: (ARCH.x0 + ARCH.x1) / 2, z: -15.2 };
 export const BELL_LINE = 4.5;
 // El Pozo (transfer): a shaft in the Terraza with its own region, from y = 1.0 up to the
 // Terraza's level. Same rule, two limits: let go too high and the Mirador is out of reach;
@@ -33,6 +40,29 @@ export const CASCADA = {
     // Its sides sit 0.3 m inside the rock, like the cascade's right edge.
     { id: 'pozo', label: 'Región del pozo', x0: WELL.x0 - 0.3, x1: WELL.x1 + 0.3, y0: WELL.regionY0, y1: TERRACE_Y, g: { x: 0, y: 4.0 }, band: 0.6, priority: 1 },
   ],
+  // Depth (Hito B, B2). The 2.5D path lives at z = 0; its regions and solids span the diorama's
+  // depth (to just behind the back wall's face, at −3.6). Behind the Terraza's back wall, through
+  // the walled arch, a passage leads to a neighbourhood of the city: familiar conditions there.
+  diorama: { z0: -4.0, z1: 2.0 },
+  citySolid: 'mirador',
+  // mouthZ: where the passage opens onto the neighbourhood (the far side of the wall).
+  // lever: the crank on the 2.5D path (z ≈ 0) whose shaft runs into depth to the arch's pivot;
+  // swing: seconds the leaf takes to open (the door is walkable only once open).
+  doors: [{ id: 'arco', label: 'Arco tapiado', verb: 'Abrir el arco', x0: ARCH.x0, x1: ARCH.x1, y: TERRACE_Y, z: -3.6, mouthZ: -9.0, lever: { x: ARCH.x0 - 0.45 }, swing: 1.6 }],
+  // In depth, what the explorer cannot walk through: the fountain's basin and the lamp posts.
+  depthBlockers: [
+    // the arch's crank post and the shaft it drives into depth (1 m high: not walked under)
+    // (its front edge just behind the explorer's half-depth at z = 0, so it never blocks the path)
+    { id: 'palanca', x0: ARCH.x0 - 0.57, x1: ARCH.x0 - 0.33, z0: -3.6, z1: -0.27, top: TERRACE_Y + 1.05 },
+    { id: 'fuente', circle: { x: FUENTE.x, z: FUENTE.z, r: 1.62 }, top: TERRACE_Y + 0.5 },
+    ...[[BARRIO.x0 + 0.6, -10], [BARRIO.x1 - 0.6, -10], [BARRIO.x0 + 0.6, BARRIO.z0 + 0.6], [BARRIO.x1 - 0.6, BARRIO.z0 + 0.6]]
+      .map(([x, z], i) => ({ id: `farol-${i}`, circle: { x, z, r: 0.1 }, top: TERRACE_Y + 2.6 })),
+  ],
+  depthAreas: [
+    { id: 'umbral', x0: ARCH.x0 - 0.6, x1: ARCH.x1 + 0.6, z0: -3.9, z1: 0.3 },
+    { id: 'pasaje', x0: ARCH.x0, x1: ARCH.x1, z0: -9.3, z1: -3.3 },
+    { id: 'barrio', x0: BARRIO.x0, x1: BARRIO.x1, z0: BARRIO.z0, z1: -8.7 },
+  ],
   solids: [
     { id: 'orilla', x0: -22, x1: 0, y0: -9, y1: 0, friction: 0.6 },
     { id: 'terraza', x0: 4.5, x1: WELL.x0, y0: -9, y1: TERRACE_Y, friction: 0.6 },
@@ -49,6 +79,14 @@ export const CASCADA = {
     { id: 'fondo', x0: -0.5, x1: 5, y0: -10, y1: -4.6 },
     { id: 'pared-oeste', x0: -24, x1: -22, y0: -9, y1: 14 },
     { id: 'pared-este', x0: 23, x1: 25, y0: -9, y1: 14 },
+    // A stone footbridge over the Terraza's stream, in front of the arch (behind the 2.5D path).
+    { id: 'puente', x0: ARCH.x0 - 0.15, x1: ARCH.x1 + 0.15, y0: TERRACE_Y - 0.3, y1: TERRACE_Y + 0.16, z0: STREAM_Z - 1.0, z1: STREAM_Z + 1.0, friction: 0.6 },
+    // The passage's floor and the neighbourhood's pavement, at the Terraza's level.
+    { id: 'pasaje', x0: ARCH.x0, x1: ARCH.x1, y0: -9, y1: TERRACE_Y, z0: -9.3, z1: -3.3, friction: 0.6 },
+    { id: 'barrio', x0: BARRIO.x0, x1: BARRIO.x1, y0: -9, y1: TERRACE_Y, z0: BARRIO.z0, z1: -8.7, friction: 0.6 },
+    // The square's planters: low enough to step onto (0.35 m, under the walking step).
+    ...[[-3.2, -2.6], [3.2, -2.6], [-3.2, 2.8], [3.2, 2.8]].map(([dx, dz], i) => ({ id: `cantero-${i}`, x0: FUENTE.x + dx - 0.95, x1: FUENTE.x + dx + 0.95,
+      y0: TERRACE_Y - 0.2, y1: TERRACE_Y + 0.35, z0: FUENTE.z + dz - 0.6, z1: FUENTE.z + dz + 0.6, friction: 0.6 })),
   ],
   // Release supports: the sphere hangs from a clamp; a reel keeps a slack thread on it.
   // A and B start at the same height, 2.95 m apart, on either side of the boundary: only
