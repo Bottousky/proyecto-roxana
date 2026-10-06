@@ -14,7 +14,9 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 ## Estado real (ciclo 7 del loop, 2026-10-07)
 
 - **El recorrido completo, capítulos 1 a 12, es jugable y está encadenado** (título → 1 → … → 12 →
-  tarjeta final «Arithmos — Lo que se entiende, resiste»). Cada capítulo pasa por la ruta directa y la
+  tarjeta final «Arithmos — Lo que se entiende, resiste»). Partida completa del bot, de una vez, 1 → 12 con tres
+  recargas (en 3.2, 7.5 y 11.6): sin errores, 804 s, las 12 entradas de la Bitácora
+  (`artifacts/arithmos/it10/full-1a12`). Cada capítulo pasa por la ruta directa y la
   ruta con errores del bot; los caps. 7–9 también en 844×390.
 - Revisiones matemáticas independientes hechas para los 12 capítulos. Las altas de los caps. 9–12
   (rev-mat-8, 9 y 10) están corregidas en texto o datos (ver `ARITHMOS_REVIEW.md`); quedan medias
@@ -24,8 +26,9 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   hallazgos queda en N10-12.
 - Teléfono acostado: mientras se toca la escena y no hay texto, la pizarra usa el lugar del subtítulo
   (≈ 30 % más grande). La guarda de botones superpuestos ahora ignora a los que deambulan.
-- Guarda nueva de interfaz (botones de texto que se pisan): encontró y corrigió un caso en 5.9; los
-  caps. 6–9 no se volvieron a pasar con esa guarda a 1600×900.
+- Guarda de interfaz (botones de texto que se pisan): todos los capítulos pasan a 1600×900; en 844×390
+  se corrigieron los casos de 1.x, 2.x, 4.6, 5.5/5.6/5.9, 6.x y 12.1 (las elecciones que no son
+  espaciales —operaciones, particiones— pasaron al panel de opciones).
 - **Entorno:** máquina compartida; las partidas del bot se corren de a una y las capturas pueden tardar
   (el bot ahora tolera una captura fallida).
 - Audio no escuchado; sin playtests humanos; sin dispositivo táctil real.

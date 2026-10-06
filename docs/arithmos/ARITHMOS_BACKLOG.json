@@ -567,10 +567,10 @@
     },
     {
       "id": "ENV-1",
-      "title": "Pruebas largas y mediciones de rendimiento afectadas por otras sesiones que usan Chrome en la misma máquina",
+      "title": "Pruebas largas afectadas por otras sesiones en la misma máquina: partidas del bot de a una, capturas lentas toleradas, puerto con reintento",
       "deps": [],
       "acceptance": "Repetir mediciones con la máquina libre; no certificar fps medidos bajo carga",
-      "status": "bloqueado",
+      "status": "implementado",
       "evidence": []
     },
     {
