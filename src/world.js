@@ -417,6 +417,16 @@ export class World {
     const copper=this.mat('#9c5f3c',null,{metalness:.55,roughness:.55});
     for(const [x,z] of [[-8.2,-3.3],[7.6,2.6]]){this.cylinder(x,.06,z,.6,.12,this.m.darkwood);this.cylinder(x,.46,z,.42,.7,copper);this.cylinder(x,.86,z,.6,.12,this.m.darkwood);this.solid(x,z,1.2,1.2,'workshop-copper-spool');}
     for(let i=0;i<6;i++){const x=-8+i*2.5;this.cable([[x,5.6,-11],[x,5.4,-7],[x+.7,4.8,-5]],i%2?this.m.metal:this.m.brass);}
+    // The tools of the trade on their board, beside the cable hooks: hammer, pliers, screwdrivers, a
+    // wrench and a coil of solder. On the east counter, lamp globes wait for their repair.
+    {const bx=3.55,by=2.5,bz=-d/2+.72,f=bz+.07,steel=this.m.metal;
+      this.box(bx,by,bz,2.5,1.3,.06,this.m.wood).name='workshop-tool-board';for(const y of [by-.69,by+.69])this.box(bx,y,bz+.03,2.6,.08,.12,this.m.darkwood);
+      this.beam([bx-.95,by-.42,f],[bx-.95,by+.3,f],.06,this.m.darkwood);this.box(bx-.95,by+.36,f,.36,.12,.1,steel);
+      this.beam([bx-.62,by-.42,f],[bx-.5,by+.32,f],.035,steel);this.beam([bx-.38,by-.42,f],[bx-.5,by+.32,f],.035,steel);
+      for(let k=0;k<3;k++){const x=bx-.1+k*.2;this.cylinder(x,by+.16,f,.035,.26,k===1?this.m.redcloth:this.m.wood);this.cylinder(x,by-.18,f,.012,.42,steel);}
+      this.beam([bx+.62,by-.4,f],[bx+.62,by+.22,f],.05,steel);this.torus(bx+.62,by+.3,f,.08,.028,steel);
+      this.torus(bx+1.0,by+.12,f,.13,.035,this.m.brass);this.torus(bx+1.0,by+.12,f,.08,.03,this.m.brass);}
+    for(const [k,x] of [6.4,7.2,9.6].entries()){this.cylinder(x,2.74,-7.78,.11,.1,this.m.brass);const globe=this.sphere(x,2.98,-7.78,.21,this.m.glass,this.root,1.15);globe.name='workshop-lamp-globe';if(k===1)this.beam([x-.02,2.84,-7.78],[x+.03,3.1,-7.78],.012,this.m.metal);}
     const warm=new THREE.PointLight('#ffd4a1',17,20,1.5);warm.position.set(-7,4,3);this.root.add(warm);
     this.box(-w*.44,2.2,d*.38,1.6,4.4,2.5,this.m.darkwood);for(let y of [1,2.1,3.2,4.3]){this.box(-w*.42,y,d*.38,1.9,.13,2.7,this.m.wood);for(let k=0;k<4;k++)this.box(-w*.42,y+.22,d*.30+k*.5,.6,.4,.28,k%2?this.m.brass:this.m.roofRed);}
     this.sun.intensity=1.4;this.sun.position.set(5,12,-16);

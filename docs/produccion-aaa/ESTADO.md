@@ -468,7 +468,7 @@ Responde a lo que se hizo en el reino y deja el umbral del Arco II. El detalle e
 | 4 | Navegación | Faroles de la escena sobre caminos (Mercado y Terrazas) | Hecho (ciclo 2) |
 | 5 | Presentación | Profundidad de campo: el destino de cada llegada (fuente, rueda del Manantial, Castillo) queda borroso en el tercio superior | Hecho (ciclo 5) |
 | 6 | Presentación | Llegadas con grandes ocluyentes borrosos en primer plano | Revisado (ciclo 10): son el lugar anterior (continuidad), ya en foco; sin cambios |
-| 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía | Mejorado (ciclo 8): luz de lámparas al restaurar, mesa de dibujo y mostrador. Pendiente: objetos propios del oficio (cobre, vidrio, herramientas) |
+| 7 | Arte | Interior del taller de Lumen: caja oscura casi vacía | Hecho (ciclos 8 y 19): luz de lámparas al restaurar, mesa de dibujo y mostrador, carretes de cobre, tablero de herramientas y globos de vidrio esperando reparación |
 | 8 | Momentos | Despertar (6), canal del Manantial, Ω de la Puerta y haz del Faro (7), regreso del Manantial (12) | Hecho |
 | 9 | Puzzles | Verificar en juego los 8 hallazgos de la crítica del 25 sep; fichas y coherencia del modelo | Hecho en lo verificable (ciclos 2 y 4): relato según traza, Ivara/Nereo exigen comprobación, volver ≠ poner en servicio, primera clase antes del cierre y acuerdo forja/riego en Terrazas están en el código y la partida los recorre; fichas y modelo en ciclo 4. El hallazgo 5 (estructura predecible por zona) es de ritmo: queda para revisión humana de diversión |
 | 10 | UI | Banco: tomaba un cable sin tener ninguno y la indicación «Ahora tocá otra pieza…» quedaba tras resolver | Hecho (ciclo 2) |
@@ -477,9 +477,9 @@ Responde a lo que se hizo en el reino y deja el umbral del Arco II. El detalle e
 | 12b | Rendimiento | Descarga de 19,3 MB | Hecho (ciclo 11): 16,8 MB; geometría 11,3 → 8,8 MB |
 | 13 | Móvil | Controles táctiles y 390×844 | Hecho en emulación (ciclo 12, `qa-touch.mjs`); hardware real NO VERIFICADO |
 | 14 | Audio | Revisión por código | Hecho (ciclo 12): sonidos de restauración completos; escucha NO VERIFICADA |
-| 15 | Presentación | (Hecho, ciclo 3) Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Pendiente |
+| 15 | Presentación | (Hecho, ciclo 3) Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Hecho (ciclo 3) |
 | 16 | Navegación | Detalles atravesables a la altura del pecho | Hecho (ciclo 10): 13 eran falsos positivos (margen menor que el cuerpo); 3 reales corregidos |
-| 17 | Assets | `portraits.webp` y `portraits-2.webp` (semirrealistas) ya no se usan: los retratos activos están en `art-polish/` y coinciden con los sprites | Limpieza |
+| 17 | Assets | `portraits.webp` y `portraits-2.webp` (semirrealistas) ya no se ven: los retratos activos están en `art-polish/` y coinciden con los sprites | Revisado (ciclo 19): se conservan; `style.css` los usa como base y dos herramientas de QA los usan (`qa-art.html`, `qa-asset-server.mjs`) |
 | 18 | Puzzles/UI | Bancos difíciles de entender: qué hacer, cómo, cuándo está bien, cómo seguir (reporte del usuario) | Hecho (ciclo 15): ver BANCOS-UX.md. Prueba con personas NO VERIFICADA |
 | 19 | Móvil | Teléfono apaisado: banco ilegible, mapa fuera de la vista | Hecho (ciclo 16) en emulación; hardware real NO VERIFICADO |
 | 20 | Mapa | El mapa no parecía de un juego ni seguía la geografía (reporte del usuario) | Hecho (ciclo 17): ver MAPA.md. Teléfono real NO VERIFICADO |

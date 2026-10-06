@@ -84,6 +84,8 @@ export function quietMountKeepsClear(x, z, ground = 0) {
   if (x > r.x0 - 1 && x < d.x && z > r.z0 - 1 && z < r.z1 + 1 && ground < r.high + .25) return true;
   if (Math.abs(x - d.x) < d.thickness / 2 + 3.2 && z > d.z0 - 1 && z < d.z1 + 1) return true;
   if (Math.abs(x - p.x) < p.d / 2 + 2 && Math.abs(z - p.z) < p.w / 2 + 2) return true;
+  // The gorge floor between the dam's gates and the house: the penstocks run there.
+  if (x > d.x && x < p.x && Math.abs(z - m.gorge.z) < m.gorge.halfWidth + 2.5) return true;
   for (let i = 1; i < m.tailrace.length; i++) {
     const [ax, az] = m.tailrace[i - 1], [bx, bz] = m.tailrace[i], vx = bx - ax, vz = bz - az, t = Math.max(0, Math.min(1, ((x - ax) * vx + (z - az) * vz) / (vx * vx + vz * vz)));
     if (Math.hypot(x - ax - vx * t, z - az - vz * t) < 1.3) return true;

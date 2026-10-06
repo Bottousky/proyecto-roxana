@@ -62,6 +62,7 @@ test('nothing grows in the reservoir or on the works', () => {
   assert.equal(quietMountKeepsClear(M.dam.x, (M.dam.z0 + M.dam.z1) / 2), true);
   assert.equal(quietMountKeepsClear(M.powerhouse.x, M.powerhouse.z), true);
   assert.equal(quietMountKeepsClear(-7.8, -96.6), true, 'the old canal');
+  assert.equal(quietMountKeepsClear(-20.6, -82.4), true, 'between the gates and the house');
   assert.equal(quietMountKeepsClear(M.peak[0], M.peak[1], 30), false, 'the mountainside does grow');
 });
 

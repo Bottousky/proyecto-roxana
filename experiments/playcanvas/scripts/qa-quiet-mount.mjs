@@ -36,11 +36,11 @@ for (const [name, set] of Object.entries(states)) {
     if (set.forge !== undefined && s.puzzles.irrigation) { s.flags.irrigation = true; s.puzzles.irrigation.values.forge = set.forge === 12 ? 6 : 12; s.puzzles.irrigation.values.warmth = 12; s.puzzles.irrigation.values.flow = 12; }
     w.updateFlags(s);
   }, set);
-  // A free, diagonal look from above the Manantial toward the mountain.
-  await page.evaluate(() => { const w = window.__ohmdal.world; w.freeLook ??= w.update; w.update = (dt, st, input) => { w.freeLook(dt, st, input); w.camera.setPosition(22, 26, -58); w.camera.lookAt(-30, 7, -88); w.camera.camera.fov = 38; }; });
+  // A free, diagonal look from above the Manantial toward the mountain (inspection: nothing fades for the player).
+  await page.evaluate(() => { const w = window.__ohmdal.world; w.setInspection(true); w.freeLook ??= w.update; w.update = (dt, st, input) => { w.freeLook(dt, st, input); w.camera.setPosition(22, 26, -58); w.camera.lookAt(-30, 7, -88); w.camera.camera.fov = 38; }; });
   await page.waitForTimeout(900);
   await page.screenshot({ path: `${out}/${name}-diagonal.png` });
-  await page.evaluate(() => { const w = window.__ohmdal.world; w.update = w.freeLook; });
+  await page.evaluate(() => { const w = window.__ohmdal.world; w.update = w.freeLook; w.setInspection(false); });
   await page.waitForTimeout(600);
 }
 // The gameplay view from the Manantial's west side.

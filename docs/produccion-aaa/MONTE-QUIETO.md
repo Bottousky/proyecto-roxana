@@ -58,6 +58,21 @@ oeste. El monte entero se ve en el mapa y en el final del Faro.
 - El mapa (fidelidad 100 %) muestra el monte con sombreado de relieve, su nombre y la casa con su
   luz.
 
+## Roca en capas (ciclo 19)
+
+Las paredes altas junto a la represa se leían como un empedrado gigante: la misma textura de roca,
+en baldosas de 2,6 m, cubría frentes de quince metros. El shader del relieve (`src/relief.js`) ahora
+dibuja estratos. Cada capa, de 1,5 m y apenas ondulada, estira las piedras en lajas, las corre y
+tiene su propio tono. Bajo cada labio hay una veta oscura, sobre el labio un poco de luz y, a
+veces, musgo; además hay chorreaduras oscuras por donde bajó el agua. Vale para todos los frentes
+de roca del valle. En los lugares jugables los frentes son bajos y casi no cambian
+(`scripts/art-review.mjs`, cinco lugares revisados). En el final del Faro, el plano del monte se ve
+como roca en capas.
+
+Tampoco crecen árboles entre las compuertas y la casa, donde corren las tuberías de cobre
+(`quietMountKeepsClear`). `qa-quiet-mount.mjs` mira en modo inspección, así nada se vuelve
+transparente por quedar delante del jugador.
+
 ## Pendiente
 
 - El Arco II: entrar a la casa y entender qué alimenta esa luz.

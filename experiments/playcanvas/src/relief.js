@@ -29,10 +29,16 @@ void getAlbedo(){
   float broad=tNoise(p.xz*0.045)*0.65+tNoise(p.xz*0.11+7.3)*0.35;
   grass*=mix(vec3(0.84,0.95,0.86),vec3(1.12,1.05,0.8),smoothstep(0.25,0.8,broad));
   vec2 side=a.x>a.z?p.zy:p.xy;
-  vec3 rock=texture2D(uRock,side/2.6).rgb;
-  // Strata: tall faces read as layered rock, not as a wall of cobbles.
-  rock*=0.84+0.2*smoothstep(0.25,0.75,fract(p.y*0.45+tNoise(p.xz*0.12)*0.7))*mix(1.0,0.85,tNoise(vec2(p.y*1.7,p.x*0.2+p.z*0.2)));
-  rock*=vec3(1.04,1.0,0.94);
+  // Strata: tall faces read as layered rock, not as a wall of cobbles. Each layer, gently wavy,
+  // stretches the stones into slabs, shifts them and has its own tone; under each lip a dark seam,
+  // on each lip a little light and, here and there, moss.
+  float bed=p.y/1.5+tNoise(side.xx*0.06+3.7)*0.8,layer=floor(bed),within=fract(bed),tone=tHash(vec2(layer,3.1));
+  vec3 rock=texture2D(uRock,vec2(side.x/5.2+tone*7.0,p.y/1.7)).rgb;
+  rock*=mix(0.5,1.0,smoothstep(0.02,0.26,within))*(1.0+0.12*smoothstep(0.82,1.0,within));
+  rock*=mix(vec3(0.86,0.88,0.9),vec3(1.06,0.98,0.84),tone)*(0.84+0.26*tNoise(side*0.06));
+  // Long, dark streaks where water has run down the face.
+  rock*=1.0-0.16*smoothstep(0.62,0.92,tNoise(vec2(side.x*0.55,p.y*0.035+5.1)));
+  rock=mix(rock,texture2D(uMoss,side/2.2).rgb*0.9,smoothstep(0.5,0.85,tNoise(side*0.3+layer*1.7))*smoothstep(0.66,0.97,within)*0.8);
   float cliff=smoothstep(0.78,0.55,n.y);
   vec3 ledge=mix(grass,texture2D(uMoss,p.xz/2.2).rgb,smoothstep(0.55,0.8,tNoise(p.xz*0.3))*0.5);
   vec3 c=mix(ledge,rock,cliff);
