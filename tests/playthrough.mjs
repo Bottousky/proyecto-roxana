@@ -31,7 +31,7 @@ const inspect = () => page.evaluate(() => {
     mode: game.mode, area: game.state.area, position: game.world?.getPlayerPosition(),
     flags: { ...game.state.flags }, nearby: game.nearby?.id, visited: [...game.state.visited], secrets: [...game.state.secrets],
     seen: [...game.state.seen], target: game.world?.target ? [...game.world.target] : null,
-    puzzle: game.workbench?.active ? { id: game.workbench.id, mode: game.workbench.mode, state: JSON.parse(JSON.stringify(game.workbench.state)), result: { solved: game.workbench.result.solved, current: game.workbench.result.current } } : null,
+    puzzle: game.workbench?.active ? { id: game.workbench.id, mode: game.workbench.mode, state: JSON.parse(JSON.stringify(game.workbench.state)), result: { solved: game.workbench.result.solved, current: game.workbench.result.current, checks: game.workbench.result.checks } } : null,
   };
 });
 

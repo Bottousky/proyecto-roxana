@@ -408,6 +408,25 @@ táctil y diálogos: completas y sin errores.
   limpia en condiciones normales. El guion ahora registra los estados que ve mientras espera.
   La adversarial se repitió con baja carga y pasó.
 
+## Ciclo 15 · Bancos que se entienden: objetivo, pasos, estado sobre cada pieza y un solo botón (5 oct 2026)
+
+El usuario volvió a jugar los bancos y los encontró difíciles de entender, sobrecargados y con
+demasiadas opciones. No quedaba claro qué hacer, cómo, cuándo estaba bien ni cómo seguir. Pidió
+investigar puzzles y juegos parecidos. La investigación con fuentes está en
+[INVESTIGACION-PUZZLES-UX.md](INVESTIGACION-PUZZLES-UX.md) y el rediseño, con el antes y el
+después medidos, en [BANCOS-UX.md](BANCOS-UX.md). En resumen:
+- Objetivo en una frase y encargo en pasos que se tildan solos. Las piezas de la meta llevan ◎.
+- Cada pieza dice su estado en palabras y lleva su propio mando sobre el tablero.
+- Los cables soldados son cobre fijo por los bordes; los de mano cuelgan, se arrastran y tienen su ×.
+- Una sola frase de Ohm y un solo instrumento por banco. La mesa se alimenta sola. La pista se
+  ofrece cuando no se avanza.
+- Al cumplir, «¡Funciona!», lo que se aprendió y un único «Seguir la historia →». Salir con el
+  banco funcionando lo pone en servicio.
+
+Pruebas actualizadas al comportamiento nuevo, sin borrar ninguna: raíz 291/291 y PlayCanvas
+83/83. Nuevo `scripts/qa-bench-flow.mjs`, que juega cinco bancos con el mouse. Las partidas
+completas se registran en [ACEPTACION.md](ACEPTACION.md).
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -431,6 +450,7 @@ táctil y diálogos: completas y sin errores.
 | 15 | Presentación | (Hecho, ciclo 3) Tipografía diminuta a 1280×720: rol del hablante 8 px, «Continuar» 10 px, teclas del recordatorio 8 px, guardado 9 px, rótulos de Bitácora/mapa 8–10 px, notas de opciones 10 px (`scripts/qa-type-sizes.mjs`) | Pendiente |
 | 16 | Navegación | Detalles atravesables a la altura del pecho | Hecho (ciclo 10): 13 eran falsos positivos (margen menor que el cuerpo); 3 reales corregidos |
 | 17 | Assets | `portraits.webp` y `portraits-2.webp` (semirrealistas) ya no se usan: los retratos activos están en `art-polish/` y coinciden con los sprites | Limpieza |
+| 18 | Puzzles/UI | Bancos difíciles de entender: qué hacer, cómo, cuándo está bien, cómo seguir (reporte del usuario) | Hecho (ciclo 15): ver BANCOS-UX.md. Prueba con personas NO VERIFICADA |
 
 ## Comandos útiles (desde `experiments/playcanvas`)
 
