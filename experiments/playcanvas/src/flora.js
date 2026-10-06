@@ -6,6 +6,7 @@ import {isExterior,travelBounds,inTravelCorridor} from './game/kingdom-geography
 import {makeWind} from './wind.js';
 import {walkableTerrain} from './terrain.js';
 import {reliefHeight,reliefSlope} from './relief.js';
+import {quietMountKeepsClear} from './game/quiet-mount.js';
 import {surface} from './art.ts';
 import grid from './data/relief.json';
 
@@ -68,7 +69,7 @@ export async function sowFlora(world){
       if(s.water>0&&!shoreline)continue;
       if(corridor(X,Z))continue; // los caminos entre lugares quedan libres
       if(Z<seaLine&&!walkable(X,Z)&&!border(X,Z))continue; // al norte del Faro solo hay mar
-      if(near(x,z,.05))continue;
+      if(near(x,z,.05)||quietMountKeepsClear(X,Z,reliefHeight(X,Z)))continue;
       if(!shoreline&&s.water===0&&border(X,Z)){
         // Dos o tres matas altas por celda, apretadas, para que el borde se lea como seto.
         for(let k=0;k<3;k++){const hx=X+(hash(gx,gz,20+k)-.5)*SPACING,hz=Z+(hash(gx,gz,30+k)-.5)*SPACING;if(walkable(hx,hz))continue;hedges.positions.push([hx,hz,pick(HEDGE,hash(gx,gz,40+k)),Math.floor(hash(gx,gz,50+k)*4)]);}
@@ -104,7 +105,7 @@ export async function sowFlora(world){
   // Sotobosque en todas las lomas: pasto alto y matas donde no llegó la siembra de los lugares.
   for(let j=0;j<grid.rows;j+=2)for(let i=0;i<grid.cols;i+=2){
     const X=grid.x0+(i+hash(i,j,70)*2)*grid.cell,Z=grid.z0+(j+hash(i,j,71)*2)*grid.cell,y=reliefHeight(X,Z);
-    if(y<.4||reliefSlope(X,Z)>.8||claimed.has(Math.floor(X/SPACING)+','+Math.floor(Z/SPACING)))continue;
+    if(y<.4||reliefSlope(X,Z)>.8||claimed.has(Math.floor(X/SPACING)+','+Math.floor(Z/SPACING))||quietMountKeepsClear(X,Z,y))continue;
     if(hash(i,j,72)>.25+noise(X*.05,Z*.05)*.55)continue;
     const [sheet,row,height]=pick(WILD,hash(i,j,73)),cell=plants[sheet][row*4+Math.floor(hash(i,j,74)*4)];if(!cell)continue;
     const h=height*(.9+hash(i,j,75)*.5),w=h*cell.aspect,b=batches[sheet],base=b.positions.length/3,tint=.8+hash(i,j,76)*.2,[u0,v0,u1,v1]=cell.uv;
@@ -117,7 +118,7 @@ export async function sowFlora(world){
   const forest=Array.from({length:6},()=>({positions:[],uvs:[],colors:[],indices:[]}));
   for(let j=0;j<grid.rows;j+=3)for(let i=0;i<grid.cols;i+=3){
     const X=grid.x0+(i+hash(i,j,60)*3)*grid.cell,Z=grid.z0+(j+hash(i,j,61)*3)*grid.cell,y=reliefHeight(X,Z);
-    if(y<2.2||reliefSlope(X,Z)>.55)continue;
+    if(y<2.2||reliefSlope(X,Z)>.55||quietMountKeepsClear(X,Z,y))continue;
     // Ni un árbol entre la cámara y un valle: el llano más cercano al norte no debe estar a menos de 14 m.
     let shields=false;for(let k=2;k<=14;k+=2)if(reliefHeight(X,Z-k)<.05){shields=true;break;}if(shields)continue;
     const patch=noise(X*.035,Z*.035);if(hash(i,j,62)>patch*1.25-.05)continue;

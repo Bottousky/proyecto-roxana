@@ -6,7 +6,8 @@
 // dibujan encima desde los mismos datos que usa el juego para caminar.
 // Uso: GAME_URL=… PXM=8 node scripts/bake-map.mjs   →   public/assets/map/kingdom-map.webp + .json
 import { chromium } from 'playwright';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { gunzipSync } from 'node:zlib';
 import { resolve } from 'node:path';
 import { chromePath, gpuArgs } from './chrome.mjs';
 import { KINGDOM, EXTERIORS, passageGeometry, WATERCOURSE } from '../src/game/kingdom-geography.js';
@@ -17,7 +18,7 @@ const PXM = Number(process.env.PXM || 8);             // píxeles por metro en l
 const TILE_PX = Number(process.env.TILE_PX || 1024);  // lado de cada toma
 const TILE_M = TILE_PX / PXM;                         // metros que cubre cada toma
 // Extensión (metros, norte = −z): del río al sur del Portal hasta el mar al norte del Faro.
-const EXTENT = { x0: Number(process.env.X0 ?? -100), x1: Number(process.env.X1 ?? 150), z0: Number(process.env.Z0 ?? -345), z1: Number(process.env.Z1 ?? 125) };
+const EXTENT = { x0: Number(process.env.X0 ?? -132), x1: Number(process.env.X1 ?? 124), z0: Number(process.env.Z0 ?? -345), z1: Number(process.env.Z1 ?? 125) };
 const out = resolve(root, process.env.OUT || 'public/assets/map');
 const name = process.env.NAME || 'kingdom-map.webp';
 await mkdir(out, { recursive: true });
@@ -30,6 +31,11 @@ for (const id of EXTERIORS) {
   for (const p of layout.paths ?? []) roads.push({ width: p.width, points: p.points.map(([x, z]) => [x + k.x, z + k.z]) });
   for (const c of layout.courts ?? []) courts.push(c.r != null ? { x: c.x + k.x, z: c.z + k.z, r: c.r } : { x: c.x + k.x, z: c.z + k.z, w: c.w, d: c.d });
 }
+
+// Hillshade from the game's own relief (src/data/relief.bin.gz): every hill, and the Monte Quieto,
+// reads as topography, lit from the north-west as on a classic map. Half the map's resolution.
+const relief = { ...JSON.parse(await readFile(resolve(root, 'src/data/relief.json'), 'utf8')), heights: new Float32Array(gunzipSync(await readFile(resolve(root, 'src/data/relief.bin.gz'))).buffer.slice(0)) };
+const reliefAt = (X, Z) => { const fx = (X - relief.x0) / relief.cell, fz = (Z - relief.z0) / relief.cell, i = Math.floor(fx), j = Math.floor(fz); if (i < 0 || j < 0 || i >= relief.cols - 1 || j >= relief.rows - 1) return 0; const tx = fx - i, tz = fz - j, h = (a, b) => relief.heights[b * relief.cols + a]; return (h(i, j) * (1 - tx) + h(i + 1, j) * tx) * (1 - tz) + (h(i, j + 1) * (1 - tx) + h(i + 1, j + 1) * tx) * tz; };
 
 const browser = await chromium.launch({ headless: true, executablePath: chromePath, args: gpuArgs });
 const page = await browser.newPage({ viewport: { width: TILE_PX, height: TILE_PX }, deviceScaleFactor: 1 });
@@ -67,11 +73,18 @@ for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
 console.log('');
 
 const width = cols * TILE_PX, height = rows * TILE_PX;
+const SW = width / 2, SH = height / 2, shade = new Uint8Array(SW * SH * 4), step = 2 / PXM, light = [-.55, .62, -.55], ll = Math.hypot(...light);
+for (let j = 0; j < SH; j++) for (let i = 0; i < SW; i++) {
+  const X = EXTENT.x0 + (i + .5) * step, Z = EXTENT.z0 + (j + .5) * step, e = .7;
+  const hx = (reliefAt(X + e, Z) - reliefAt(X - e, Z)) / (2 * e), hz = (reliefAt(X, Z + e) - reliefAt(X, Z - e)) / (2 * e), n = [-hx, 1, -hz], nl = Math.hypot(...n);
+  const lit = (n[0] * light[0] + n[1] * light[1] + n[2] * light[2]) / (nl * ll), flat = light[1] / ll, h = reliefAt(X, Z);
+  const k = (j * SW + i) * 4; shade[k] = Math.max(0, Math.min(255, 128 + (lit - flat) * 330)); shade[k + 1] = Math.min(255, h * 6); shade[k + 2] = 0; shade[k + 3] = 255;
+}
 const meta = { pxPerMetre: PXM, x0: EXTENT.x0, z0: EXTENT.z0, width, height, metresWide: cols * TILE_M, metresTall: rows * TILE_M, north: '-z' };
 const stitch = await browser.newPage();
 // Fidelity probes: the river's course must be painted as water, each place and its roads as land.
 const probes = { water: WATERCOURSE.filter((_, i) => i % 2 === 0), land: [...EXTERIORS.map(id => [KINGDOM[id].x, KINGDOM[id].z]), ...roads.filter(r => !r.bridge).flatMap(r => r.points.filter((_, i) => i % 6 === 3))] };
-const [rawUrl, mapUrl, fidelity] = await stitch.evaluate(async ({ tiles, width, height, size, meta, roads, courts, radius, probes }) => {
+const [rawUrl, mapUrl, fidelity] = await stitch.evaluate(async ({ tiles, width, height, size, meta, roads, courts, radius, probes, shadeData, SW, SH }) => {
   const raw = document.createElement('canvas'); raw.width = width; raw.height = height;
   { const g = raw.getContext('2d'); for (const t of tiles) { const img = new Image(); img.src = `data:image/png;base64,${t.data}`; await img.decode(); g.drawImage(img, t.c * size, t.r * size); } }
   const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
@@ -121,7 +134,7 @@ void main(){ float acc = 0., wsum = 0.; for (int i = -36; i <= 36; i++) { float 
   const clean = head + `uniform sampler2D M; uniform sampler2D S;
 void main(){ vec4 m = texture(M, uv); float w = smoothstep(.42, .58, texture(S, uv).r); o = vec4(w, m.g * (1. - w), m.b * (1. - w), m.a * (1. - w)); }`;
   // 4 · The painter.
-  const compose = head + `uniform sampler2D K; uniform sampler2D M; uniform sampler2D W; uniform float pxm;
+  const compose = head + `uniform sampler2D K; uniform sampler2D M; uniform sampler2D W; uniform sampler2D S; uniform float pxm;
 float mask(vec2 off, int ch){ vec4 v = texture(M, uv + off * px); return ch == 0 ? v.r : ch == 1 ? v.g : ch == 2 ? v.b : v.a; }
 void main(){
   vec2 q = uv / px;                      // pixel coordinates
@@ -161,6 +174,11 @@ void main(){
   float lx = lum(texture(K, uv + vec2(1, 0) * px).rgb) - lum(texture(K, uv - vec2(1, 0) * px).rgb);
   float lz = lum(texture(K, uv + vec2(0, 1) * px).rgb) - lum(texture(K, uv - vec2(0, 1) * px).rgb);
   col *= 1. - (1. - water) * (1. - stone) * (1. - forest) * smoothstep(.06, .2, length(vec2(lx, lz))) * .14;
+  // Hillshade from the relief heights, and higher ground a little paler and warmer (the shade map
+  // is stored top row first, while this pass runs with the origin at the bottom).
+  vec4 hs = texture(S, vec2(uv.x, 1. - uv.y)); float relief = hs.r * 2. - 1., elevation = hs.g * 255. / 6.;
+  col *= 1. + (1. - water) * clamp(relief, -.42, .3) * .9;
+  col = mix(col, col * vec3(1.06, 1.04, .96) + .03, (1. - water) * smoothstep(8., 34., elevation) * .5);
   // Ink: the coast strongest, then the edges of woods, stone and roofs.
   float coast = 0., ink = 0.;
   for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) { vec2 off = vec2(i, j) * 1.5; coast = max(coast, abs(mask(off, 0) - water)); ink = max(ink, max(abs(mask(off, 2) - stone), abs(mask(off, 3) - roof)) * .6); }
@@ -188,6 +206,9 @@ void main(){
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   };
   const source = texture(raw), K = texture(null), M0 = texture(null), M = texture(null), B1 = texture(null), B2 = texture(null);
+  const S = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, S); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, SW, SH, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(atob(shadeData).split('').map(c => c.charCodeAt(0))));
+  for (const [key, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, key, v);
   run(program(kuwahara), { t: source }, target(K), { R: radius });
   run(program(classify), { t: K }, target(M0));
   const blurProgram = program(blur), small = 2 * (meta.pxPerMetre * .9) ** 2;
@@ -204,7 +225,7 @@ void main(){
   run(blurProgram, { t: B1 }, target(B2), { dir: [0, 1], spread: 450 });
   run(blurProgram, { t: B2 }, target(B1), { dir: [1, 0], spread: 450 });
   run(blurProgram, { t: B1 }, target(B2), { dir: [0, 1], spread: 450 });
-  run(program(compose), { K, M, W: B2 }, null, { pxm: meta.pxPerMetre });
+  run(program(compose), { K, M, W: B2, S }, null, { pxm: meta.pxPerMetre });
   // Roads on top, from the walking data: a pale ribbon with a dark edge, trails thinner.
   const out = document.createElement('canvas'); out.width = width; out.height = height;
   const g = out.getContext('2d'); g.drawImage(canvas, 0, 0);
@@ -216,7 +237,7 @@ void main(){
   for (const r of roads) stroke(r.points, roadPx(r.width) + 2.4, r.bridge ? 'rgba(52,44,32,.8)' : 'rgba(84,66,42,.55)');
   for (const r of roads) stroke(r.points, roadPx(r.width), r.bridge ? 'rgba(190,170,132,.95)' : r.trail ? 'rgba(201,182,138,.78)' : 'rgba(214,196,152,.88)');
   return [raw.toDataURL('image/webp', .88), out.toDataURL('image/webp', .86), fidelity];
-}, { tiles, width, height, size: TILE_PX, meta, roads, courts, probes, radius: Number(process.env.RADIUS || Math.max(2, Math.round(PXM * .45))) });
+}, { tiles, width, height, size: TILE_PX, meta, roads, courts, probes, shadeData: Buffer.from(shade).toString('base64'), SW, SH, radius: Number(process.env.RADIUS || Math.max(2, Math.round(PXM * .45))) });
 const pct = f => Math.round(f.agree / Math.max(1, f.probes) * 100);
 console.log(`fidelidad: el río del juego cae sobre agua pintada en ${pct(fidelity.water)}% de ${fidelity.water.probes} puntos; lugares y caminos sobre tierra en ${pct(fidelity.land)}% de ${fidelity.land.probes}`);
 if (!process.env.OUT && (pct(fidelity.water) < 90 || pct(fidelity.land) < 95)) { console.error('El mapa pintado no coincide con la geografía del juego.'); process.exit(1); }

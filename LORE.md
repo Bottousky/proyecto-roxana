@@ -170,6 +170,13 @@ Corazón Nuevo; el Tribunal y la Casa de Compuertas; la Antena y el Observatorio
 y El Empalme. Son lugares posibles para explorar ritmos, señales, máquinas,
 decisiones, comunicaciones e integración. Sus historias están por desarrollar.
 
+La **Casa de Compuertas** ya se ve desde La Luz. Está al oeste del Manantial, al pie del
+**Monte Quieto**: una central de agua antigua y callada, con una represa de piedra que guarda
+un embalse en una hondonada. Su canal viejo alimenta la roca donde nace el acueducto del
+Manantial. Cuando el Faro vuelve a encenderse, en su ventana se prende una luz que nadie
+encendió. Se sostiene si el embalse quedó alto y parpadea si las Terrazas se llevaron el agua
+primero. La abuela de Edda decía que esa luz avisaba algo. Es el umbral del Arco II.
+
 Roxana también conserva otros Mundos Aplicados como horizonte narrativo:
 
 - **Physica — experimentar:** el Instituto alteró condiciones para aislar

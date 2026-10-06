@@ -10,6 +10,7 @@ import { gunzipSync, gzipSync } from 'node:zlib';
 import { AREAS } from '../src/game/content.js';
 import { isExterior, travelBounds } from '../src/game/kingdom-geography.js';
 import { walkableTerrain } from '../src/terrain.js';
+import { QUIET_MOUNT, quietMountHeight } from '../src/game/quiet-mount.js';
 
 const root = new URL('../', import.meta.url);
 const scene = JSON.parse(readFileSync(new URL('src/data/scene.json', root)));
@@ -29,6 +30,8 @@ for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
   const X = x0 + i * CELL, Z = z0 + j * CELL;
   if (exteriors.some(a => { const x = X - a.ox, z = Z - a.oz; return Math.abs(x) <= a.tw / 2 && Math.abs(z) <= a.td / 2 && walkableTerrain(a.id, x, z); })) flat[idx(i, j)] = 1;
 }
+// Lo caminable, solo: desde ahí mira la cámara de juego (ver el Monte Quieto, más abajo).
+const walkable = flat.slice();
 // 2. Todo lo construido, plantado o mojado: se rasteriza desde arriba.
 function raster(mesh, lift = 0) {
   const p = view(mesh, 'positions'), t = view(mesh, 'indices'), pv = mesh.dynamic?.pivot || [0, 0, 0];
@@ -87,6 +90,57 @@ for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
   if (front > 0) h = Math.min(h, .5 + 6 * (1 - front) ** 2);
   height[idx(i, j)] = Math.max(0, h);
 }
+
+// 4. El Monte Quieto (src/game/quiet-mount.js): su forma diseñada, con los mismos escalones de roca,
+// salvo en la hondonada del embalse y el desfiladero. La cámara de juego mira al norte desde 61 m al
+// sur del jugador: cada punto del monte queda por debajo de los rayos de la cámara hacia todo lo
+// caminable, con un margen, así la montaña crece lejos de la mirada y nunca tapa al viajero.
+const Q = QUIET_MOUNT, E = Q.extent, LENS = Math.hypot(13.5, 25) * 2 * 1.3, PITCH = 26 * Math.PI / 180;
+const camUp = 1.5 + Math.sin(PITCH) * LENS, camBack = Math.cos(PITCH) * LENS - 5.5, EYE = 1, MARGIN_RAY = 1.2;
+const cap = new Float32Array(W * H).fill(Infinity);
+for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+  if (!walkable[idx(i, j)]) continue;
+  const X = x0 + i * CELL, Z = z0 + j * CELL;
+  if (X < E.x0 - 3 || X > E.x1 + 3 || Z > E.z1 || Z + camBack < E.z0) continue;
+  for (let s = .5; s < camBack; s += .5) {
+    const zz = Z + s, jj = Math.round((zz - z0) / CELL), y = EYE + (camUp - EYE) * s / camBack - MARGIN_RAY;
+    if (jj < 0 || jj >= H) break;
+    for (let di = -1; di <= 1; di++) { const ii = i + di; if (ii >= 0 && ii < W && y < cap[idx(ii, jj)]) cap[idx(ii, jj)] = y; }
+  }
+}
+const inBowlOrGorge = (X, Z) => Math.hypot((X - Q.basin.x) / Q.basin.rx, (Z - Q.basin.z) / Q.basin.rz) < 1.15 || (X > Q.gorge.x0 - 1.5 && X < E.x1 && Math.abs(Z - Q.gorge.z) < Q.gorge.halfWidth + Math.max(0, X - Q.gorge.x0) * .12 + .3);
+let mountTop = 0;
+for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+  const X = x0 + i * CELL, Z = z0 + j * CELL, edge = Math.min(X - E.x0, E.x1 - X, Z - E.z0, E.z1 - Z);
+  if (edge <= 0) continue;
+  let m = quietMountHeight(X, Z);
+  if (m > 1 && !inBowlOrGorge(X, Z)) { const step = 2.4, k = Math.floor(m / step), frac = m / step - k; m = (k + smooth(ramp(.55, 1, frac))) * step * .92 + m * .08 + (fbm(X * .12, Z * .12, 5) - .5) * .7; }
+  m = Math.max(0, Math.min(m, cap[idx(i, j)]));
+  const w = smooth(ramp(0, 10, edge)), k = idx(i, j);
+  height[k] = height[k] * (1 - w) + m * w;
+  mountTop = Math.max(mountTop, height[k]);
+}
+// The reservoir must stay held by its banks after the camera limit: its sheet is clipped by them.
+const at = (X, Z) => height[idx(Math.round((X - x0) / CELL), Math.round((Z - z0) / CELL))];
+let bank = Infinity; const R = Q.reservoir, upstream = Q.dam.x - Q.dam.thickness / 2;
+for (let X = R.x0; X <= upstream - 1; X += 1) bank = Math.min(bank, at(X, R.z0), at(X, R.z1));
+for (let Z = R.z0; Z <= R.z1; Z += 1) bank = Math.min(bank, at(R.x0, Z));
+if (bank < R.high + .3) { console.error(`El embalse del Monte Quieto se derrama: su borde más bajo queda a ${bank.toFixed(2)} m y el agua a ${R.high} m.`); process.exit(1); }
+// And nothing raised hides a walkable point from the gameplay camera: the mountain is guaranteed; the
+// valley's ordinary hills are reported.
+let worst = -Infinity, worstAt = null, mountainWorst = -Infinity;
+for (let j = 0; j < H; j += 2) for (let i = 0; i < W; i += 2) {
+  if (!walkable[idx(i, j)]) continue;
+  const X = x0 + i * CELL, Z = z0 + j * CELL;
+  for (let s = 2; s < camBack; s += 1) {
+    const jj = Math.round((Z + s - z0) / CELL); if (jj >= H) break;
+    const over = height[idx(i, jj)] - (EYE + (camUp - EYE) * s / camBack);
+    if (over > worst) { worst = over; worstAt = [X, Z]; }
+    const XX = X, ZZ = Z + s; if (XX > E.x0 && XX < E.x1 && ZZ > E.z0 && ZZ < E.z1) mountainWorst = Math.max(mountainWorst, over);
+  }
+}
+if (mountainWorst > 0) { console.error(`El Monte Quieto tapa al viajero por ${mountainWorst.toFixed(2)} m.`); process.exit(1); }
+console.log(`Monte Quieto: cumbre ${mountTop.toFixed(1)} m, borde del embalse ${bank.toFixed(1)} m (agua ${R.high} m), margen con la cámara ${(-mountainWorst).toFixed(1)} m; colinas del valle: peor margen ${(-worst).toFixed(1)} m en ${worstAt.map(v => v.toFixed(0)).join(', ')}`);
 
 writeFileSync(new URL('src/data/relief.bin.gz', root), gzipSync(Buffer.from(height.buffer), { level: 9 }));
 writeFileSync(new URL('src/data/relief.json', root), JSON.stringify({ x0, z0, cell: CELL, cols: W, rows: H }) + '\n');

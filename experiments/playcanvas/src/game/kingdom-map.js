@@ -3,12 +3,13 @@ import { AREA_LAYOUTS } from './world-layout.js';
 import { KINGDOM, EXTERIORS, isExterior, passageGeometry, toKingdom } from './kingdom-geography.js';
 import { journeyGuidance } from './journey-guide.js';
 import { journeyPhase } from './story-time.js';
+import { QUIET_MOUNT, quietMountState } from './quiet-mount.js';
 import './kingdom-map.css';
 
 // The kingdom map is the world itself, photographed from above and painted (scripts/bake-map.mjs):
 // its geography is the game's by construction. Everything that changes with the journey (where
 // the traveller is, what is next, what has been restored, what is still unknown) is drawn over it.
-export const KINGDOM_MAP = Object.freeze({ src: './assets/map/kingdom-map.webp', pxPerMetre: 8, x0: -100, z0: -345, width: 2048, height: 4096 });
+export const KINGDOM_MAP = Object.freeze({ src: './assets/map/kingdom-map.webp', pxPerMetre: 8, x0: -132, z0: -345, width: 2048, height: 4096 });
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = value => Math.round(value * 10) / 10;
 /** Kingdom metres → map image pixels. */
@@ -56,6 +57,10 @@ export function kingdomMapMarks(state, { position, facing, inhabitants = [] } = 
     for (const building of AREA_LAYOUTS[id]?.buildings || []) if (building.label) marks.push({ kind: 'building', id: building.id, at: toKingdom(id, [building.x, building.z]), label: building.label, minZoom: 1.1 });
     for (const exit of area.exits || []) if (!openExit(exit, state) && isExterior(exit.target)) marks.push({ kind: 'locked', id: exit.id, at: toKingdom(id, [exit.x, exit.z]), label: `${AREAS[exit.target]?.name ?? 'Paso'} · paso cerrado`, minZoom: .6 });
   }
+  // The Monte Quieto is named on every map; its Casa de Compuertas once the Manantial is known, its
+  // window lit or dark as the kingdom left it. It is not a destination yet.
+  marks.push({ kind: 'peak', id: 'quiet-mount', at: QUIET_MOUNT.peak, label: QUIET_MOUNT.name });
+  if (visited.has('spring')) { const lamp = quietMountState(state).lamp; marks.push({ kind: 'works', id: 'quiet-mount-house', at: [QUIET_MOUNT.powerhouse.x, QUIET_MOUNT.powerhouse.z], label: QUIET_MOUNT.house, lamp, minZoom: .4 }); }
   // The workshop is a building of the village: its bench is shown at its door.
   if (visited.has('workshop')) for (const object of AREAS.workshop.objects || []) if (object.puzzle) marks.push({ kind: 'bench', id: object.id, at: [KINGDOM.workshop.x, KINGDOM.workshop.z], label: object.label, restored: !!state.flags?.[object.puzzle], minZoom: .35 });
   for (const person of inhabitants) if (Number.isFinite(person.x)) marks.push({ kind: 'person', id: person.id, at: kingdomOf(state.area, [person.x, person.z]), label: person.label, minZoom: 1 });
@@ -77,6 +82,8 @@ function markHtml(mark) {
   const label = `<span class="kmap-label">${esc(mark.label)}</span>`;
   switch (mark.kind) {
     case 'landmark': return `<div class="kmap-mark kmap-landmark ${mark.known ? 'known' : 'unknown'} ${mark.current ? 'current' : ''}" ${data}${travel(mark)}><span class="kmap-landmark-art" style="--col:${mark.art % 3};--row:${Math.floor(mark.art / 3)};background-image:url(./assets/art-polish/map-landmarks.webp)" aria-hidden="true"></span><span class="kmap-landmark-name">${esc(mark.label)}</span></div>`;
+    case 'peak': return `<div class="kmap-mark kmap-peak" ${data}><i aria-hidden="true">▲</i><span>${esc(mark.label)}</span></div>`;
+    case 'works': return `<div class="kmap-mark kmap-works lamp-${mark.lamp}" ${data} title="${esc(mark.label)}${mark.lamp === 'off' ? ' · callada' : mark.lamp === 'flicker' ? ' · su luz parpadea' : ' · su luz se sostiene'}"><i aria-hidden="true"></i><span class="kmap-label">${esc(mark.label)}</span></div>`;
     case 'region': return `<div class="kmap-mark kmap-region" ${data} aria-hidden="true">${esc(mark.label)}</div>`;
     case 'place': return `<div class="kmap-mark kmap-place ${mark.known ? 'known' : 'unknown'} ${mark.current ? 'current' : ''}" ${data}${travel(mark)}>${esc(mark.label)}</div>`;
     case 'bench': return `<div class="kmap-mark kmap-bench ${mark.restored ? 'restored' : 'pending'}" ${data} title="${esc(mark.label)} · ${mark.restored ? 'restaurado' : 'por restaurar'}"><i aria-hidden="true">Ω</i>${label}</div>`;

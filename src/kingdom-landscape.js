@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {EXTERIORS,KINGDOM,WATERCOURSE,WATERCOURSE_SPLIT,passageGeometry,corridorX} from './kingdom-geography.js';
 import {buildWatersideArt} from './waterside-art.js';
+import {buildQuietMount} from './quiet-mount-art.js';
 
 function ribbon(owner,points,width,material,y=.073){
   const positions=[];
@@ -90,6 +91,8 @@ export function buildKingdomLandscape(owner){
   for(let i=0;i<14;i++){
     const mountain=owner.mesh('cone',dark,-68+i*12,6,-347-(i%3)*8,14,16+i%4*3,17);mountain.castShadow=false;mountain.name='kingdom-distant-mountain';
   }
+  // West of the Manantial, the Monte Quieto and its Casa de Compuertas (see quiet-mount.js).
+  buildQuietMount(owner,{water,stone,dark,wood});
   owner.root=root;
   return {connections,water};
 }

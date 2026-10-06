@@ -63,6 +63,18 @@
 .kmap-landmark.unknown .kmap-landmark-name{color:#d9cfb4;font-style:italic}
 .kmap-landmark.current .kmap-landmark-name{color:#ffe29a;border-color:#e5c37caa}
 .kmap-player,.kmap-objective{z-index:3}
+.kmap-peak{display:flex;flex-direction:column;align-items:center;gap:2px;transform-origin:center}
+.kmap-peak i{font-style:normal;font-size:22px;line-height:1;color:#3b2e1b;text-shadow:0 0 4px #f3e6c1,0 0 10px #f3e6c1aa}
+.kmap-peak span{font:italic 600 16px 'Cormorant Garamond',Georgia,serif;letter-spacing:.24em;text-transform:uppercase;color:#fbf0d4;text-shadow:0 0 3px #1d150b,0 0 8px #1d150b,0 1px 2px #000;white-space:nowrap}
+.kmap[data-zoom="near"] .kmap-peak span{font-size:19px}
+.kmap-works{width:16px;height:16px}
+.kmap-works i{display:block;width:16px;height:16px;border-radius:3px;background:#2a2a24;border:2px solid #b9a679;box-shadow:0 2px 5px #000a}
+.kmap-works.lamp-steady i{background:radial-gradient(circle,#fff3c4,#f2c66a 60%,#a47a35);box-shadow:0 0 10px #f4d58b,0 2px 5px #000a}
+.kmap-works.lamp-flicker i{background:radial-gradient(circle,#fff3c4,#f2c66a 60%,#a47a35);animation:kmap-flicker 1.3s steps(1) infinite}
+@keyframes kmap-flicker{0%,100%{opacity:1}35%{opacity:.35}42%{opacity:1}70%{opacity:.6}}
+.kmap-works .kmap-label{opacity:0;transition:opacity .2s}
+.kmap[data-zoom="near"] .kmap-works .kmap-label,.kmap[data-zoom="mid"] .kmap-works .kmap-label{opacity:1}
+@media (prefers-reduced-motion:reduce){.kmap-works.lamp-flicker i{animation:none;opacity:.7}}
 /* Alrededor del mapa. */
 .kmap-title{position:absolute;z-index:10;top:16px;left:16px;padding:12px 22px 12px 20px;background:linear-gradient(120deg,#2a2418f0,#1a1d16f0);border:1px solid #c9ab6c88;border-radius:4px 18px 4px 18px;box-shadow:0 8px 24px #0009,inset 0 0 0 4px #00000033;pointer-events:none}
 .kmap-title .eyebrow{display:block;font-size:10px;letter-spacing:.32em;color:#cdb380}

@@ -6,7 +6,7 @@ const RECORDS = {
   arrival: {area:'portal'}, circuit:{area:'portal',puzzle:'awaken'}, diagnosis:{area:'workshop',puzzle:'workshop'},
   operating_window:{area:'road',puzzle:'gate'}, source_load:{area:'spring',puzzle:'pump'}, parallel:{area:'castle',puzzle:'distribution'},
   power:{area:'terraces',puzzle:'irrigation'}, return_at_scale:{area:'lake'}, tower_source:{area:'lighthouse',puzzle:'beacon_supply'},
-  tower_distribution:{area:'lighthouse',puzzle:'beacon_network'}, light:{area:'lighthouse',puzzle:'beacon_lens'},
+  tower_distribution:{area:'lighthouse',puzzle:'beacon_network'}, light:{area:'lighthouse',puzzle:'beacon_lens'}, quiet_mount:{area:'spring'},
 };
 
 export function journalPages(state) {

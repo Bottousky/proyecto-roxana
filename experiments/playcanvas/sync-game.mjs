@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 const root=new URL('../../src/',import.meta.url),out=new URL('./src/game/',import.meta.url);
 fs.mkdirSync(out,{recursive:true});
-const modules=['main','state','content','electrical','puzzle-model','puzzles','bench-evidence','journal','field-notes','audio','world-circuits','world-feedback','world-inhabitants','world-interaction','world-audio','world-map','world-layout','kingdom-geography','story-time','travel-instrument','journey-guide','cinematics','cinematic-progress','interaction-prompt','navigation','collision','actor-animation','kingdom-map'];
+const modules=['main','state','content','electrical','puzzle-model','puzzles','bench-evidence','journal','field-notes','audio','world-circuits','world-feedback','world-inhabitants','world-interaction','world-audio','world-map','world-layout','kingdom-geography','story-time','travel-instrument','journey-guide','cinematics','cinematic-progress','interaction-prompt','navigation','collision','actor-animation','kingdom-map','quiet-mount'];
 for(const name of modules){
  let text=fs.readFileSync(new URL(name+'.js',root),'utf8');
  if(name==='main')text=text.replace("import {ContinuousWorld as World} from './continuous-world.js';","import {PlayCanvasWorld as World} from '../world.js';\nimport '../fonts.css';").replace(/^import '@fontsource\/.*\r?\n/gm,'').replaceAll('Jugar Ohmdal.cmd','Jugar PlayCanvas.cmd');

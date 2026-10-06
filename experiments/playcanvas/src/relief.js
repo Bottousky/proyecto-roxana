@@ -30,6 +30,9 @@ void getAlbedo(){
   grass*=mix(vec3(0.84,0.95,0.86),vec3(1.12,1.05,0.8),smoothstep(0.25,0.8,broad));
   vec2 side=a.x>a.z?p.zy:p.xy;
   vec3 rock=texture2D(uRock,side/2.6).rgb;
+  // Strata: tall faces read as layered rock, not as a wall of cobbles.
+  rock*=0.84+0.2*smoothstep(0.25,0.75,fract(p.y*0.45+tNoise(p.xz*0.12)*0.7))*mix(1.0,0.85,tNoise(vec2(p.y*1.7,p.x*0.2+p.z*0.2)));
+  rock*=vec3(1.04,1.0,0.94);
   float cliff=smoothstep(0.78,0.55,n.y);
   vec3 ledge=mix(grass,texture2D(uMoss,p.xz/2.2).rgb,smoothstep(0.55,0.8,tNoise(p.xz*0.3))*0.5);
   vec3 c=mix(ledge,rock,cliff);

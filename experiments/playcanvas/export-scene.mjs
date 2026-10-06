@@ -39,6 +39,9 @@ function capture(world,id,offset=[0,0],landscape=false){
   for(const mesh of [...(world.fountainWater||[]),...(world.fountainStreams||[])])tag(mesh,{kind:'visible',flag:'pump'});
   for(const mesh of world.irrigationWater||[])tag(mesh,{kind:'visible',flag:'irrigation'});
   if(world.springWaterworks)for(const key of ['flume','basin','fall'])tag(world.springWaterworks[key],{kind:'visible',flag:'spring_sluice',or:'pump'});
+  // The Casa de Compuertas answers the kingdom (src/quiet-mount.js): canal water, the weeping gate,
+  // the reservoir's level and the lamp. The runtime reads the state; here we only mark the pieces.
+  if(world.quietMount){const q=world.quietMount;tag(q.tailraceWater,{kind:'visible',flag:'spring_sluice',or:'pump'});tag(q.weep,{kind:'visible',flag:'pump'});tag(q.reservoirHigh,{kind:'quiet-mount',part:'reservoir-high'});tag(q.reservoirLow,{kind:'quiet-mount',part:'reservoir-low'});tag(q.lamp,{kind:'quiet-mount',part:'lamp'});}
   for(const lamp of world.lamps||[]){const p=lamp.bulb.getWorldPosition(new T.Vector3());output.lights.push({area:id,position:[p.x+offset[0],p.y,p.z+offset[1]]});}
   for(const h of world.hangingLamps||[])output.lights.push({area:id,position:[h.x+offset[0],h.y,h.z+offset[1]],hanging:true});
   const captureMesh=(object,override=null,group=null)=>{
@@ -65,7 +68,7 @@ function capture(world,id,offset=[0,0],landscape=false){
     if(object.name==='kingdom-distant-mountain')return;
     if(PAVING.has(object.name))descriptor.paving=true;
     if(object.name==='terrace-crop')descriptor.crop=true;
-    if(['field-rock','upland-outcrop'].includes(object.name))descriptor.rock=true;
+    if(['field-rock','upland-outcrop','quiet-mount-rock'].includes(object.name))descriptor.rock=true;
     if(['window-pane','workshop-window-glass'].includes(object.name))descriptor.pane=true;
     const batchKey=id+owner+(dynamic?.id||'')+JSON.stringify(descriptor);let batch=batches.get(batchKey);
     if(!batch){batch={area:id,owner,dynamic,material:descriptor,positions:[],normals:[],uvs:[],colors:[],indices:[]};batches.set(batchKey,batch);}

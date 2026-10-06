@@ -12,6 +12,7 @@ import {describeWorldAudio} from './game/world-audio.js';
 import {journeyPhase} from './game/story-time.js';
 import {readReceiverFeedback,readControlFeedback} from './game/world-feedback.js';
 import {createCinematic,sampleCinematic,returningCinematic,gameplayCameraPose} from './game/cinematics.js';
+import {quietMountState} from './game/quiet-mount.js';
 import sceneUrl from './data/scene.json?url';
 import geometryUrl from './data/geometry.bin.gz?url';
 import {walkableTerrain} from './terrain.js';
@@ -256,7 +257,20 @@ export class PlayCanvasWorld {
   faceInhabitantSpeaker(s){faceInhabitantSpeaker(this,s);const a=this.speakerActor(s);if(a)this.speaking={actor:a,t:0};}
   speakerActor(s){if(!s||s==='narrator')return null;if(s==='player')return this.playerActor;if(s==='ohm'||s==='ohm_companion')return this.ohm.visible?this.ohmActor:null;return this.regions.get(this.area.id)?.actors.find(a=>a.name===s&&a.entity.enabled)||null;}
   endInhabitantConversation(){endInhabitantConversation(this);this.speaking=null;}
-  updateFlags(state){this.state=state;if(this.area)this.obstacles=this.localObstacles(this.area.id);this.ohm&&(this.ohm.visible=!!state.flags.awaken);this.wakeOhm(state);this.signature=JSON.stringify([state.flags,state.puzzles]);for(const d of this.dynamics){if(d.kind==='visible')d.entity.enabled=!!(state.flags[d.flag]??state.flags[d.or]);if(d.kind==='indicator'){const active=!!state.flags[d.flag];d.material.emissive=color(active?'#62d7ae':'#675430');d.material.emissiveIntensity=active?1.1:.25;d.material.update();}if(d.receiver)d.feedback=readReceiverFeedback(d.area,state,d.receiver);}for(const r of this.receivers||[]){r.material.emissiveIntensity=r.intensity*readReceiverFeedback(r.area,state,r.object).level;r.material.update();}}
+  // The Casa de Compuertas answers the kingdom: the reservoir's level, and a lamp that lights with
+  // the Faro, steady over a full reservoir and faltering over a drawn-down one (game/quiet-mount.js).
+  answerQuietMount(d,mount){
+    if(d.part==='reservoir-high')d.entity.enabled=mount.reservoir==='high';
+    if(d.part==='reservoir-low')d.entity.enabled=mount.reservoir==='low';
+    if(d.part==='lamp'){d.lampMode=mount.lamp;
+      if(!d.light){d.light=new Entity('Farol de la Casa de Compuertas');d.light.addComponent('light',{type:'omni',color:color('#ffcf86'),intensity:0,range:11,castShadows:false});d.light.setPosition(d.pivot[0]+.6,d.pivot[1],d.pivot[2]);d.entity.parent.addChild(d.light);}
+      d.material.emissive=color('#ffcf86');this.lightQuietMount(d,this.clock);}
+  }
+  lightQuietMount(d,t){
+    const on=d.lampMode==='off'?0:1,s=Math.sin(t*3.1)+Math.sin(t*7.7+1.3)*.6+Math.sin(t*17.3)*.3,k=d.lampMode==='flicker'?(s>-.35?.78+.22*Math.sin(t*23):.12):1;
+    d.material.emissiveIntensity=2.6*on*k;d.material.update();if(d.light)d.light.light.intensity=1.5*on*k;
+  }
+  updateFlags(state){this.state=state;if(this.area)this.obstacles=this.localObstacles(this.area.id);this.ohm&&(this.ohm.visible=!!state.flags.awaken);this.wakeOhm(state);this.signature=JSON.stringify([state.flags,state.puzzles]);const mount=quietMountState(state);for(const d of this.dynamics){if(d.kind==='visible')d.entity.enabled=!!(state.flags[d.flag]??state.flags[d.or]);if(d.kind==='quiet-mount')this.answerQuietMount(d,mount);if(d.kind==='indicator'){const active=!!state.flags[d.flag];d.material.emissive=color(active?'#62d7ae':'#675430');d.material.emissiveIntensity=active?1.1:.25;d.material.update();}if(d.receiver)d.feedback=readReceiverFeedback(d.area,state,d.receiver);}for(const r of this.receivers||[]){r.material.emissiveIntensity=r.intensity*readReceiverFeedback(r.area,state,r.object).level;r.material.update();}}
   // Ohm wakes where he slept: he stays on the pedestal through the scene, then hops down.
   wakeOhm(state){
     const awake=!!state.flags.awaken,was=this.ohmWasAwake;this.ohmWasAwake=awake;
@@ -492,6 +506,7 @@ export class PlayCanvasWorld {
     if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?1.5+2.2*n:0;}
     for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color(g.area==='workshop'?'#ffc57d':'#ff9f45');g.material.emissiveIntensity=g.area==='workshop'?level:level*1.5;g.material.update();}
     for(const d of this.dynamics){const e=d.entity,flag=!!f[d.flag],motion=reduced?0:1;
+      if(d.kind==='quiet-mount'&&d.part==='lamp'&&d.lampMode==='flicker')this.lightQuietMount(d,reduced?0:this.clock);
       if(d.kind==='gate'){const wanted=f.gate?1:0;d.progress+=(wanted-d.progress)*Math.min(1,dt*1.2);e.setPosition(d.pivot[0],d.pivot[1]+d.progress*5.8,d.pivot[2]);this.gateProgress=d.progress;}
       // The lifting gear follows the leaf (src/world-gateway.js setPose): the chain winds from the
       // leaf's top up to the drive, the counterweight drops, the drive turns.

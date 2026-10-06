@@ -1,4 +1,5 @@
 import { terracesAgreement as TERRACES_AGREEMENT } from './puzzle-model.js';
+import { quietMountState } from './quiet-mount.js';
 // Ohmdal · La Luz. All progress is expressed as observable, persistent world state.
 const line = (speaker, text, emotion) => ({ speaker, text, ...(emotion ? { emotion } : {}) });
 const d = (...lines) => lines.map(([speaker, text, emotion]) => line(speaker, text, emotion));
@@ -198,6 +199,7 @@ export const DIALOGUES = {
   pump_complete: d(
     ['narrator', 'La bomba toma aire, tose una vez y llena el primer conducto. El agua corre hacia la Plaza.'],
     ['vega', 'Ese sonido. Pensé que lo había olvidado. Era el comienzo de mis mañanas.'],
+    ['vega', 'Y mirá el canal viejo, el que baja del Monte Quieto: volvió a traer agua. La Casa de Compuertas está callada desde antes de que yo naciera.'],
     ['player', 'No alcanzaba con que el camino estuviera unido. Esa unión vieja estaba haciendo otra cosa cuando la bomba trabajaba.'],
     ['ohm', 'El instrumento puede guardar ambas lecturas. Una sola habría contado menos.'],
     ['vega', 'El Castillo decide el reparto. Voy a las Terrazas a preparar los canales. Cuando llegues, no vas a encontrarme esperando.']),
@@ -705,6 +707,11 @@ export function journalText(entry, state = {}) {
     if (agreement === 'riego') return 'Elegimos que el agua llegara primero. El horno de Yesca trabaja más bajo, a tandas más cortas, y el cable de la ladera no se calienta. La última parcela volvió a recibir agua.';
     return entry.text;
   }
+  if (entry.id === 'quiet_mount') {
+    const mount = quietMountState(state);
+    if (mount.reservoir === 'low') return 'Cuando el Faro tomó aire, en la ladera del Monte Quieto se encendió la luz de la Casa de Compuertas. Nadie la encendió. Parpadea, como si le faltara fuerza: las Terrazas se llevaron el agua primero y el embalse quedó bajo. ¿Tendrá que ver? La abuela de Edda decía que esa luz avisaba algo.';
+    return entry.text + ' Se sostiene firme; el embalse está alto.';
+  }
   if (entry.id !== 'operating_window') return entry.text;
   const brake = gateBrake(state);
   if (!brake) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó.';
@@ -735,6 +742,7 @@ export const JOURNAL = [
   { id: 'tower_source', title: 'Faro · I. El primer escalón', text: 'Nereo reconoció la vibración bajo el pie. El núcleo puede trabajar sin recalentar el tendido. La torre empezó a parecer tres preguntas más pequeñas.', explanation: 'La tensión se reparte entre el tendido, el regulador y el núcleo. Bajar la resistencia del regulador puede aumentar la corriente y también las pérdidas en el cable. Comprobamos el suministro con su carga conectada: importa qué puntos medimos y qué estaba trabajando durante la lectura.', requires: ['beacon_supply'] },
   { id: 'tower_distribution', title: 'Faro · II. El ruido que faltaba', text: 'La corona volvió a girar y Nereo reconoció un golpecito al final de la vuelta. Las luces de la galería ya no están en el mismo camino que el motor.', explanation: 'Óptica, motor y señal costera tienen ramas propias entre los mismos dos nodos. Sus resistencias son diferentes: comparten tensión, pero conducen corrientes distintas. La fuente entrega la suma. Reutilizamos la idea del Castillo en una instalación con más servicios.', requires: ['beacon_network'] },
   { id: 'light', title: 'Faro · III. La Luz', text: 'El haz llegó a la Plaza y una campana respondió. Nereo pidió que dejáramos escrito cómo saber si está bien. Tala ya encontró otra cosa para investigar.', explanation: 'La lente se alimenta desde una toma intermedia de dos resistencias: un divisor de tensión. Al conectarla queda en paralelo con el brazo inferior y cambia el reparto. Por eso calibramos con ella conectada, no sólo en vacío. Dejamos posiciones y condiciones de medida para que otra persona pueda verificar la señal y ajustar cuando algo cambie.', requires: ['beacon_lens'] },
+  { id: 'quiet_mount', title: 'Una luz en el Monte Quieto', text: 'Cuando el Faro tomó aire, en la ladera del Monte Quieto se encendió la luz de la Casa de Compuertas. Nadie la encendió. La abuela de Edda decía que esa luz avisaba algo. ¿Qué la alimenta allá arriba, si la casa está cerrada?', requires: ['beacon_lens'], experiment: true },
 ];
 
 const objectives = [
@@ -845,8 +853,23 @@ function terracesClose(state) {
   return [...TERRACES_CLOSE[agreement], ...lines.filter(l => /anotar|sendero del lago/.test(l.text))];
 }
 
+// When the Faro is lit, the Casa de Compuertas answers on the Monte Quieto: steady over a full
+// reservoir, faltering over one the Terrazas drew down (quiet-mount.js).
+function finaleLines(state) {
+  const lines = DIALOGUES.beacon_lens_complete, at = lines.findIndex(l => /Coincidencia registrada/.test(l.text)) + 1, mount = quietMountState(state);
+  const answer = [
+    { speaker: 'narrator', text: 'Al oeste, en la ladera del Monte Quieto, se enciende una ventana de la Casa de Compuertas. Nadie la encendió.' },
+    { speaker: 'edda', text: '¿La Casa de Compuertas? Mi abuela decía que esa luz avisaba algo. Nunca supo qué.' },
+    ...(mount.lamp === 'flicker'
+      ? [{ speaker: 'ohm', text: 'Parpadea. Le falta fuerza.' }, { speaker: 'edda', text: 'Las Terrazas se llevaron el agua primero. Allá arriba quedó poca.' }]
+      : [{ speaker: 'ohm', text: 'Se sostiene. Algo, allá arriba, todavía la alimenta.' }]),
+  ];
+  return [...lines.slice(0, at), ...answer, ...lines.slice(at)];
+}
+
 export function resolveDialogue(id, state = {}) {
   const resolved = resolveDialogueId(id, state);
+  if (resolved === 'beacon_lens_complete') return finaleLines(state);
   if (resolved === 'irrigation_complete') return terracesClose(state);
   if (resolved === 'lighthouse_epilogue') return lessonLines(state);
   if (resolved === PUZZLE_STORY.gate.complete) return completionLines('gate', state);
