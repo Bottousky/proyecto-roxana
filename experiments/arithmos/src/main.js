@@ -35,6 +35,9 @@ class Game {
     this.applySettings();
     matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', () => this.applySettings());
     window.addEventListener('resize', () => this.layout());
+    document.getElementById('rotate')?.addEventListener('click', e => {
+      if (e.target.closest('[data-act=rotate-ok]')) { this.rotateOk = true; this.layout(); }
+    });
     this.layout();
     requestAnimationFrame(t => this.frame(t));
   }
@@ -55,6 +58,7 @@ class Game {
     this.ui.applySettings();
     this.audio.setVolumes({master: this.settings.master, music: this.settings.music, sfx: this.settings.sfx});
     this.camera.drift = !this.reducedMotion;
+    this.camera.allowShake = !this.reducedMotion;
     this.renderer.grain = this.settings.clean ? 0.45 : 1;
     this.world.clean = !!this.settings.clean;
     this.layout();
@@ -66,7 +70,11 @@ class Game {
     const textScale = this.settings.textScale || 1;
     // la franja del texto queda reservada: la cámara no salta cuando aparece un diálogo
     const bottom = !playing ? 0 : h >= 560 ? Math.min(h * 0.3, 175 * textScale) : Math.min(h * 0.2, 80 * textScale);
+    this.baseBottom = bottom;
     this.camera.safe = {left: 0, right: 0, top: playing ? 56 : 0, bottom};
+    // teléfono en vertical: se avisa una vez que conviene girarlo
+    const rotate = document.getElementById('rotate');
+    if (rotate) rotate.hidden = !(playing && w < 700 && h > w * 1.15 && !this.rotateOk);
   }
 
   // ——— Bucle ———
@@ -85,6 +93,14 @@ class Game {
       this.boil = (this.boil + 1) % 3000;
     }
     this.director.update(dt);
+    this.ui.setSkippable(this.cinematic && !this.director.skipping && !this.ui.waiting && this.ui.choices$.hidden && !this.paused);
+    // si el panel de elecciones crece (texto grande, pantalla baja), la escena se corre hacia arriba
+    if (this.mode === 'play') {
+      const panel = this.ui.choices$.hidden ? 0 : this.ui.choices$.offsetHeight;
+      const want = Math.max(this.baseBottom || 0, panel + 8);
+      const cur = this.camera.safe.bottom;
+      this.camera.safe.bottom = cur + (want - cur) * Math.min(1, raw * 6);
+    }
     this.camera.update(dt);
     this.world.update(dt);
     this.render();
@@ -133,7 +149,7 @@ class Game {
   addEvidence(kind, data = {}) {
     if (!this.state) return;
     // los datos nunca pisan el tipo, la escena ni la hora
-    this.state.evidence.push({...data, t: new Date().toISOString(), seg: this.state.segment, kind});
+    this.state.evidence.push({...data, t: new Date().toISOString(), seg: this.state.segment, run: this.state.run || 1, kind});
     this.queueSave();
   }
 
@@ -219,7 +235,11 @@ class Game {
         this.state.segment = next.segments[0].id;
         this.saveNow();
         this.runFrom(this.state.segment);
-      } else this.toTitle();
+      } else {
+        this.state.finished = true;
+        this.saveNow();
+        this.toTitle();
+      }
     } catch (e) {
       if (!(e instanceof Abort)) this.fail(e);
     }
@@ -232,9 +252,27 @@ class Game {
 
   restartSegment() {
     this.togglePause(false);
+    if (this.director.replay && this.replayBack) {
+      this.director.replay = false;
+      this.runFrom(this.replayBack);
+      return;
+    }
     if (!this.state?.segment) return;
     delete this.state.scratch[this.state.segment];
     this.runFrom(this.state.segment);
+  }
+
+  /** Volver a jugar un capítulo terminado: partida nueva de ese capítulo (la evidencia se separa). */
+  replayChapter(n) {
+    const ch = CHAPTERS[n];
+    if (!ch || !this.state) return;
+    this.state.run = (this.state.run || 1) + 1;
+    this.state.chapter = n;
+    this.state.segment = ch.segments[0].id;
+    this.state.finished = false;
+    for (const seg of ch.segments) delete this.state.scratch[seg.id];
+    this.saveNow();
+    this.start(false);
   }
 
   findSegment(id) {
@@ -256,6 +294,7 @@ class Game {
     this.togglePause(false);
     const d = this.director;
     const back = this.state.segment;
+    this.replayBack = back;
     d.abort();
     d.replay = true;
     const epoch = d.epoch;
@@ -302,14 +341,13 @@ class Game {
   }
 
   openOptions() {
-    this.ui.showPause(true);
-    this.ui.showTab('options');
+    this.ui.showPause(true, 'options');
   }
 
   togglePause(force) {
     if (this.mode !== 'play') {
       if (force === false || (force === undefined && !this.ui.pause$.hidden)) {
-        this.ui.pause$.hidden = true;
+        this.ui.showPause(false);
         document.querySelector('#title [data-act=options]')?.focus({preventScroll: true});
       }
       return;
@@ -319,6 +357,8 @@ class Game {
     this.paused = on;
     this.ui.showPause(on);
     if (on) this.saveNow();
+    // el sonido también se detiene: nada sigue sonando sobre una imagen congelada
+    try { on ? this.audio.ctx?.suspend() : this.audio.ctx?.resume(); } catch { /* sin audio */ }
   }
 
   toTitle() {

@@ -62,8 +62,20 @@ export function titleScene(game) {
   const cont = title.querySelector('[data-act=continue]');
   const fresh = title.querySelector('[data-act=new]');
   const has = !!game.state?.segment;
-  cont.hidden = !has;
+  const finished = !!game.state?.finished;
+  cont.hidden = !has || finished;
   fresh.textContent = has ? 'Empezar de nuevo' : 'Empezar';
+  const actions = title.querySelector('.actions');
+  actions.querySelectorAll('[data-act^=chapter-]').forEach(b => b.remove());
+  if (finished) {
+    for (const n of game.state.chaptersDone || []) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.act = `chapter-${n}`;
+      b.textContent = `Volver a jugar el capítulo ${n}`;
+      actions.prepend(b);
+    }
+  }
   fresh.dataset.confirm = '';
   title.onclick = e => {
     const act = e.target.closest('[data-act]')?.dataset.act;
@@ -79,7 +91,8 @@ export function titleScene(game) {
       game.start(true);
     }
     if (act === 'options') game.openOptions();
+    if (act.startsWith('chapter-')) game.replayChapter(Number(act.slice(8)));
   };
-  (has ? cont : fresh).focus({preventScroll: true});
+  (actions.querySelector('button:not([hidden])') || fresh).focus({preventScroll: true});
 }
 

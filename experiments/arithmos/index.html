@@ -10,14 +10,14 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main id="stage" aria-label="Arithmos">
+  <main id="stage" aria-label="Arithmos" tabindex="-1">
     <canvas id="board" aria-hidden="true"></canvas>
     <canvas id="overlay" aria-hidden="true"></canvas>
     <div id="spots" role="group" aria-label="Cosas que podés tocar en la escena"></div>
 
-    <section id="caption" hidden aria-hidden="true">
-      <div class="who"></div>
-      <p class="line"></p>
+    <section id="caption" hidden>
+      <div class="who" aria-hidden="true"></div>
+      <p class="line" aria-hidden="true"></p>
       <button class="next" type="button" aria-label="Continuar">›</button>
     </section>
     <div id="choices" role="group" hidden></div>
@@ -41,6 +41,11 @@
       </div>
       <p class="note">Con sonido se disfruta más; se juega completo sin él.</p>
     </section>
+
+    <div id="rotate" hidden>
+      <p>Arithmos se ve mejor con el teléfono horizontal.</p>
+      <button type="button" data-act="rotate-ok">Seguir igual</button>
+    </div>
 
     <div id="pause" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
       <div class="sheet">

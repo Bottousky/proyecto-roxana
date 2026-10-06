@@ -39,6 +39,11 @@ while (Date.now() < end) {
     await page.evaluate(() => { const g = window.__game; if (g?.ui.waiting && !g.ui.typing) g.ui.advance(); }).catch(() => {});
     // elige la opción indicada con --pick=texto (o la última, para no tomar siempre la primera)
     const want = val('pick', '');
+    if (args.includes('--tap')) {
+      const spots = await page.$$eval('#spots .spot', bs => bs.map(b => ({id: b.dataset.id, label: b.getAttribute('aria-label')}))).catch(() => []);
+      const t = spots.find(x => /sin (contar|marca|unir)|libre|en la fila|Cruzar|Seguir|buscar|Mirar|Repasar/.test(x.label)) || null;
+      if (t) await page.click(`#spots [data-id="${t.id}"]`, {force: true, timeout: 2000}).catch(() => {});
+    }
     const opts = await page.$$eval('#choices:not([hidden]) button', bs => bs.map(b => b.textContent)).catch(() => []);
     if (opts.length) {
       const o = opts.find(t => want && t.includes(want)) || opts[opts.length - 1];

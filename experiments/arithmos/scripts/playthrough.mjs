@@ -89,13 +89,13 @@ const tried = new Set();
 function pickChoice(prompt, options) {
   const pref = route === 'errores' ? [
     ['espía', 'Quedarte'], ['te mira', 'Acercarte'],
-    ['recordar a la Ronda', 'Contarlos'],
+    ['vuelven todos', 'Contarlos'],
     ['marca sola', 'sobra un punto', 'hice una marca de más', 'falta uno'],
-    ['Alcanzan los asientos para toda', 'No alcanzan'],
-    ['Cómo lo sabés', 'Me pareció'],
-    ['asiento libre', 'Había más en la fila', 'misma cantidad', 'más asientos'],
-    ['apretados', 'faltan asientos', 'sobran más', 'Sigue sobrando'],
-    ['explicás a Punto', 'catorce cosas', 'nombra a dos', 'es un nombre'],
+    ['en fila, ¿alcanzan', 'No alcanzan'],
+    ['Cómo lo sabés', 'Por cómo se ve'],
+    ['asiento libre', 'más en la fila', 'misma cantidad', 'más asientos que en la fila'],
+    ['Apretados', 'entran más', 'los mismos'],
+    ['decís a Punto', 'catorce cosas', 'nombra a dos', 'nombra a los catorce'],
     ['', '¿Quién sos?'],
     ['Dos hileras', 'Hoy llegó más'],
     ['cuarto vacío', 'Nada:', 'espacio', 'Un 0'],
@@ -104,22 +104,21 @@ function pickChoice(prompt, options) {
     ['ningún cuarto a la izquierda', 'Dejar los diez', 'Tirar un palito', 'dibujar un cuarto'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
-    ['recordar a la Ronda', 'Hacer una marca'],
+    ['vuelven todos', 'Anotarlos'],
     ['marca sola', 'falta uno'],
-    ['Alcanzan los asientos para toda', 'Alcanzan justo'],
-    ['Cómo lo sabés', 'Conté'],
-    ['asiento libre', 'más asientos'],
-    ['apretados', 'Sigue sobrando'],
-    ['explicás a Punto', 'es un nombre'],
+    ['en fila, ¿alcanzan', 'Alcanzan justo'],
+    ['Cómo lo sabés', 'Los conté'],
+    ['asiento libre', 'más asientos que en la fila'],
+    ['Apretados', 'los mismos'],
+    ['decís a Punto', 'nombra a los catorce'],
   ] : [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
-    ['recordar a la Ronda', 'Hacer una marca'],
+    ['vuelven todos', 'Anotarlos'],
     ['marca sola', 'falta uno'],
-    ['Alcanzan los asientos para toda', 'Hay que ver'],
-    ['Cómo lo sabés', 'Conté'],
-    ['asiento libre', 'más asientos'],
-    ['apretados', 'Sigue sobrando'],
-    ['explicás a Punto', 'es un nombre'],
+    ['en fila, ¿alcanzan', 'Todavía no sé'],
+    ['asiento libre', 'más asientos que en la fila'],
+    ['Apretados', 'los mismos'],
+    ['decís a Punto', 'nombra a los catorce'],
     ['Dos hileras', 'no se puede saber'],
     ['cuarto vacío', 'Un 0'],
     ['entre el 3 y el 2', 'no se puede saber'],
@@ -204,7 +203,12 @@ for (let iter = 0; iter < 4000; iter++) {
     const spots = s.spots.filter(x => !x.disabled);
     const byLabel = t => spots.filter(x => x.label.includes(t));
     let target = null;
-    if (s.seg === 'c1.ronda') {
+    if (s.seg === 'c1.ronda' && byLabel('contar').length + byLabel('contado').length) {
+      const todoC = byLabel('sin contar');
+      const doneC = byLabel('ya contado');
+      if (route === 'errores' && doneC.length === 3 && !tried.has('recountR')) { tried.add('recountR'); target = doneC[0]; }
+      else target = todoC[0];
+    } else if (s.seg === 'c1.ronda') {
       // provoca una vez el "ya tiene su marca"
       const done = byLabel('ya tiene su marca');
       const todo = byLabel('sin marca');
@@ -223,10 +227,10 @@ for (let iter = 0; iter < 4000; iter++) {
         note(`tras recargar: escena ${after.seg}, anotados guardados ${marks}`);
         continue;
       }
-    } else if (s.seg === 'c1.vuelven') {
+    } else if (s.seg === 'c1.vuelven' || (s.seg === 'c1.todos' && spots.some(x => x.id === 'check' || x.id.startsWith('mark')))) {
       const sel = s.spots.find(x => x.selected);
-      const freeMarks = byLabel('marca de la piedra, sin unir');
-      const freeDots = byLabel('punto de la Ronda, sin unir');
+      const freeMarks = spots.filter(x => x.id.startsWith('mark') && x.label.includes('sin unir'));
+      const freeDots = spots.filter(x => !x.id.startsWith('mark') && x.label.includes('sin unir'));
       const linkedDots = byLabel('unido a una marca');
       const dbl = byLabel('unido a 2 marcas');
       if (dbl.length && pairingStage >= 2 && !sel) {
@@ -240,7 +244,11 @@ for (let iter = 0; iter < 4000; iter++) {
         await page.waitForTimeout(200);
         continue;
       }
-      if (route === 'errores' && pairingStage === 0 && linkedDots.length >= 3 && !sel) {
+      if (s.seg === 'c1.todos') {
+        if (sel) target = sel.id.startsWith('mark') ? freeDots[0] : freeMarks[0];
+        else if (freeDots.length && freeMarks.length) target = freeMarks[0];
+        else target = spots.find(x => x.id === 'check');
+      } else if (route === 'errores' && pairingStage === 0 && linkedDots.length >= 3 && !sel) {
         pairingStage = 1;
         note('comprueba antes de terminar (error deliberado)');
         target = spots.find(x => x.id === 'check');

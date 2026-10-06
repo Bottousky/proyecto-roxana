@@ -77,7 +77,7 @@ export class Camera {
       dx = Math.sin(this.time * 0.21) * 3 + Math.sin(this.time * 0.13 + 1) * 2;
       dy = Math.sin(this.time * 0.17 + 2) * 2;
     }
-    if (this.shake > 0) {
+    if (this.shake > 0 && this.allowShake !== false) {
       dx += Math.sin(this.time * 61) * this.shake * 6;
       dy += Math.cos(this.time * 53) * this.shake * 4;
     }

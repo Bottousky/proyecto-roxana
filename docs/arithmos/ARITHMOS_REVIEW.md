@@ -61,6 +61,58 @@ Evidencia del revisor: `artifacts/arithmos/it01/review-mat/`. Disposición:
 
 Pendiente: nueva pasada de rev-mat sobre la versión corregida.
 
+### Revisión narrativa y audiovisual independiente (rev-narr, 2026-10-05, sobre la película it02)
+
+Evidencia del revisor: `artifacts/arithmos/it02/review-narr/` (hojas de contacto por tramo, cortes, rutas alternativas). Disposición:
+
+| # | Sev. | Hallazgo | Resolución |
+|---|---|---|---|
+| N1 | alta | La revelación final era una definición leída (32 % del texto del capítulo en la última escena) | Rehecho: marcas, palabras y presentes se alinean en tres filas columna por columna; una llave y "14"; quedan 3 líneas cortas. Las definiciones viven en la Bitácora |
+| N2 | alta | La voz del estudiante pasaba de lacónica a profesor; fórmulas repetidas | Dieta de texto: pensamientos cortos, sin "X es Y"; la fórmula uno a uno queda en la retroalimentación y la Bitácora |
+| N3 | alta | Equivocarse no tenía consecuencia en el mundo (cuestionarios por eliminación); la opción correcta se delataba por el registro | Cada respuesta equivocada produce un cambio visible: Punto busca un punto sin línea; Punto impide borrar la marca y revisa; Punto busca a alguien parado o salta en el asiento vacío; los doce sin unir reclaman; Punto se asoma detrás del 14. Opciones con el mismo registro |
+| N4 | alta | Todo lo emocional en plano general; Punto ilegible | Primeros planos (≤ 500 u, ≥ 2 s) en la pérdida, el descubrimiento de quién falta, el hallazgo, el baile con el más chico y la primera marca; Punto más grande (r 11) |
+| N5 | alta | Figura en reposo como "chupetín"; no actuaba al hablar | Pose de reposo con extremidades separadas; gesto automático al hablar; saludo, sobresalto al toque de Punto, arrodillarse junto a Punto, encogerse de hombros |
+| N6 | alta | Clímax de 3 s, último par como hueco único, cortes duros | Reencuentro con todas las marcas y puntos tocables (unir mal se detecta); baile ≥ 6 s con plano cercano; regreso caminando con el más chico; noche que cae sobre la ronda y corte por coincidencia de estrellas |
+| N7 | media | Punto pasivo | Guía el registro yendo al siguiente sin anotar; intenta marcar la piedra y falla (prepara su primera marca); imita el salto tardío del que falta; brilla más cerca del escondite |
+| N8 | media | Pagos sin preparar (el más chico llega tarde; primera marca) | Primer plano del más chico llegando tarde; intento fallido de Punto en la piedra |
+| N9 | media | Ruta "Contarlos" contradecía la imagen y era un riel | Contar es interactivo y funciona (cada uno queda tildado con su palabra); las marcas se eligen porque Punto no conoce las palabras |
+| N10 | media | Monotonía: ~76 toques idénticos | Gradas: el jugador sienta a tres y Punto sigue; el recuento final escribe palabras (otra acción) |
+| N11 | media | Gradas como ejercicio con pretexto; Punto experimentador sin motivo | El deseo del estudiante abre la escena ("¿Y para mí?"); Punto aprieta la fila por su propio error (cree que es demasiado larga) |
+| N12 | media | Signos ilegibles: "!" bajo las marcas, abanico de líneas, pares que parecen figuras | Sin puntitos bajo las marcas; sin abanico; puntos que comparten marca se separan |
+| N13 | media | Composición: objetivos al borde, Marea fuera de cuadro | Guarda de 56 px en las pruebas; la Marea avanza dentro del encuadre durante el registro |
+| N14 | media | Líneas que narran lo visible | Recortadas o eliminadas |
+| N15–17 | baja | Reescrituras puntuales, "Tengo las manos de tiza" sin mirar las manos, detalles | Aplicadas: "¿Son tu familia?", "¿Cómo vas a saber si vuelven todos?", "Ni idea. Mañana.", cabeza inclinada hacia las manos |
+
+Pendiente: nueva película y segunda pasada de rev-narr sobre esta versión.
+
+### Revisión funcional independiente (rev-func, 2026-10-05, sobre ef68a58 y ff90ce6)
+
+Evidencia y scripts del revisor: `artifacts/arithmos/it01/review-func/` (`lib.mjs`, `t1`–`t7`, `p01`–`p08`; con `ARITHMOS_LIVE=1` usan el árbol actual). Disposición:
+
+| # | Sev. | Hallazgo | Resolución / comprobación |
+|---|---|---|---|
+| F1 | alta | Tras cerrar la pausa, Enter la reabría (foco en ≡) | Corregido: el foco vuelve a la escena. `node scripts/keyboard-check.mjs` → `enterAdvancesAfterPause: true` |
+| F2 | alta | La pausa no retenía el foco; se elegía detrás | Corregido: el resto es `inert`, Tab queda atrapado y las elecciones ignoran la entrada en pausa. `keyboard-check` → `focusEscapedPause: 0` |
+| F3 | alta | Táctil en teléfono: el toque activaba al vecino y mostraba errores no cometidos (evidencia falseada) | Corregido: el toque elige el objeto cuyo dibujo está más cerca (no el botón de arriba). Partida táctil 844×390 ruta directa: ninguna evidencia de repetición falsa |
+| F4 | alta | Saltar se salteaba conclusiones | Corregido antes (ff90ce6) |
+| F5 | alta | Con texto grande, las elecciones tapaban la pregunta y la escena | Panel con altura máxima y desplazamiento, letra que se adapta a pantallas bajas; la cámara se corre hacia arriba según el alto real del panel. Pendiente re-medir con `p08` |
+| F6 | media | Opciones desde el título fallaba en la primera visita | Corregido: el diálogo se titula "Opciones", abre esa pestaña con el foco adentro y tolera no tener partida |
+| F7 | media | Volver a ver/Desplegar desde el título quedaba colgado | Corregido: fuera de la partida esas pestañas y botones no aparecen |
+| F8 | media | Un Enter de más elegía la primera opción (y era la correcta) | Corregido: no se acepta elegir antes de 450 ms; el foco llega después; las opciones evaluativas se mezclan |
+| F9 | media | Recargar a mitad repetía preguntas y duplicaba evidencia | Corregido en la Ronda, Quién y El nombre (fases guardadas); guardado inmediato en cada acción |
+| F10 | media | Con el capítulo terminado, Continuar rejugaba la última escena | Corregido: los capítulos se encadenan; al terminar el último, el título ofrece volver a jugar cada capítulo como partida nueva (la evidencia lleva número de partida y la Bitácora usa sólo la actual) |
+| F11 | media | En vertical la escena es diminuta | Aviso para girar el teléfono (se puede seguir igual). Vertical sigue sin optimizar |
+| F12 | media | "?" repetido completaba la tarea | Corregido antes (una sola demostración) |
+| F13 | media | Emparejar con teclado: ~289 Tab, orden y etiquetas sin posición | Corregido: un solo Tab entra al grupo y las flechas llevan al objeto más cercano en esa dirección; etiquetas con posición ("marca 3 desde la izquierda", "cerca de la marca 5") |
+| F14 | baja | Movimiento reducido mantenía la sacudida | Corregido |
+| F15 | baja | "Saltar" visible mientras un texto espera | Corregido: sólo durante animaciones |
+| F16 | baja | El audio seguía en pausa | Corregido: el contexto de audio se suspende |
+| F17 | baja | Un punto que deambula salía de cuadro en tablet | Mitigado (la guarda lo detecta); ajustar casas si reaparece |
+| F18 | baja | "Describir" se superponía con "saltar" | Movido debajo de los controles de la esquina |
+| F19 | baja | DOM: botón enfocable dentro de `aria-hidden`; pestañas sin `aria-controls` ni flechas | Corregido |
+| F20 | baja | En un recuerdo, "Repetir esta escena" no salía del recuerdo | Corregido: "Salir del recuerdo" |
+| — | autor | En 844×390 el botón "comprobar" tapaba al más chico y se trababa el reencuentro (lo encontró la partida táctil) | Corregido + guarda: un botón de texto que tape un objeto tocable es error de prueba |
+
 Revisiones narrativa/audiovisual (C1-R2) y funcional (C1-R3): en curso / pendientes.
 Playtests humanos: **ninguno**.
 

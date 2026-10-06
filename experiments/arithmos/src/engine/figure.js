@@ -9,11 +9,11 @@ import {mulberry32, lerp, clamp} from './rng.js';
 export const BONES = {thigh: 32, shin: 32, torso: 46, neck: 16, head: 15.5, upper: 25, fore: 24};
 
 export const POSES = {
-  idle: {lean: 0.02, tilt: 0, armL: [0.12, 0.18], armR: [-0.1, 0.22], legL: [0.06, -0.06], legR: [-0.06, -0.04], drop: 0},
+  idle: {lean: 0.03, tilt: 0.04, armL: [0.34, 0.32], armR: [-0.26, 0.38], legL: [0.16, -0.08], legR: [-0.14, -0.05], drop: 0},
   relaxed: {lean: -0.02, tilt: 0.06, armL: [0.2, 0.3], armR: [-0.18, 0.25], legL: [0.12, -0.05], legR: [-0.1, -0.02], drop: 0},
   lookUp: {lean: -0.1, tilt: -0.35, armL: [0.05, 0.15], armR: [-0.05, 0.2], legL: [0.08, -0.04], legR: [-0.08, -0.04], drop: 0},
   lookDown: {lean: 0.12, tilt: 0.38, armL: [0.1, 0.3], armR: [-0.05, 0.4], legL: [0.06, -0.05], legR: [-0.06, -0.04], drop: 1},
-  hands: {lean: 0.08, tilt: 0.48, armL: [1.05, 1.3], armR: [0.85, 1.55], legL: [0.06, -0.05], legR: [-0.06, -0.04], drop: 0},
+  hands: {lean: 0.18, tilt: 0.85, armL: [1.0, 1.45], armR: [0.8, 1.75], legL: [0.12, -0.06], legR: [-0.1, -0.04], drop: 0},
   surprise: {lean: -0.16, tilt: -0.18, armL: [0.65, 0.9], armR: [-0.35, 0.95], legL: [0.14, -0.08], legR: [-0.22, -0.02], drop: 0},
   crouch: {lean: 0.42, tilt: 0.3, armL: [0.75, 0.25], armR: [0.4, 0.5], legL: [1.25, -1.9], legR: [0.35, -1.6], drop: 26},
   kneel: {lean: 0.15, tilt: 0.25, armL: [0.45, 0.4], armR: [0.2, 0.5], legL: [1.5, -1.5], legR: [-0.1, -1.75], drop: 30},
@@ -91,6 +91,12 @@ export class Figure {
     if (dur <= 0) this.pose = copyPose(this.target);
   }
 
+  /** Gesto breve al hablar: las manos acompañan la frase. */
+  talk(sec = 1.1) {
+    this.talkT = sec;
+    this.talkSeed = Math.random() * 10;
+  }
+
   look(gx, gy) {
     this.gazeTarget = [clamp(gx, -1, 1), clamp(gy, -1, 1)];
   }
@@ -152,6 +158,7 @@ export class Figure {
     this.walking += (want - this.walking) * Math.min(1, dt * 9);
     if (!this.path && this.walking < 0.02) this.walking = 0;
     this.breath += dt;
+    if (this.talkT > 0) this.talkT = Math.max(0, this.talkT - dt);
     this.blinkT -= dt;
     if (this.blinkT < 0) {
       this.blink = 0.14;
@@ -172,6 +179,11 @@ export class Figure {
     const legR = [p.legR[0] - w * Math.sin(ph) * 0.5, p.legR[1] - w * Math.max(0, Math.sin(ph + 1.2 + Math.PI)) * 0.9];
     let armL = [p.armL[0] - w * Math.sin(ph) * 0.42, p.armL[1] + w * 0.25];
     let armR = [p.armR[0] + w * Math.sin(ph) * 0.42, p.armR[1] + w * 0.25];
+    if (this.talkT > 0 && !this.walking) {
+      const k = Math.min(1, this.talkT * 2) * Math.sin(this.time * 9 + this.talkSeed);
+      armR = [armR[0] + 0.35 * Math.min(1, this.talkT), armR[1] + 0.25 * k];
+      armL = [armL[0] + 0.12 * k, armL[1]];
+    }
     if (this.gesture) {
       const g = this.gesture(this.time);
       if (g.armR) armR = [armR[0] + g.armR[0], armR[1] + g.armR[1]];

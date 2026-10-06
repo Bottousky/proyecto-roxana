@@ -6,7 +6,7 @@ import {YELLOW, WHITE, BLUE} from '../engine/chalk.js';
 import {seedOf} from '../engine/rng.js';
 import * as art from '../art.js';
 import * as art2 from './art.js';
-import {GROUND, GRADAS, rondaDot, punto, student, RONDA_IDS} from '../ch1/common.js';
+import {GROUND, GRADAS, rondaDot, punto, student, RONDA_IDS, NAME, nameMarkPos} from '../ch1/common.js';
 
 export {GROUND};
 
@@ -21,10 +21,10 @@ export const LEDGER = {x: 8620};
 
 export const SHOTS = {
   morning: {x: GRADAS.x - 560, y: 160, w: 1500, h: 620},
-  board14: {x: GRADAS.x + 160, y: 330, w: 900, h: 420},
+  board14: {x: GRADAS.x + 300, y: 250, w: 1100, h: 480},
   arrival: {x: 5700, y: 260, w: 1300, h: 520},
   pile: {x: 5980, y: 300, w: 1060, h: 460},
-  frame: {x: 6170, y: 290, w: 1000, h: 470},
+  frame: {x: 6040, y: 290, w: 1130, h: 470},
   depot: {x: 7280, y: 230, w: 1580, h: 560},
   depotRooms: {x: 7480, y: 340, w: 1000, h: 420},
   ledger: {x: 7560, y: 200, w: 1300, h: 560},
@@ -108,18 +108,24 @@ export function base(g, {dawn = true} = {}) {
   w.ensure('ground', () => new Drawing('ground', art.groundLine('ground', GRADAS.x - 900, 9600, GROUND), {z: 0, fade: 0.75}));
   w.ensure('gradas', () => new Drawing('gradas', art.gradas('gradas', GRADAS.x, GROUND, art.seatPositions(GRADAS.x, GROUND, GRADAS.seats)), {z: 3}));
   w.ensure('sun', () => new Drawing('sun', art2.sun('sun', GRADAS.x - 240, 270), {z: 1, fade: 0.8}));
-  // el 14 y las marcas de Punto siguen en el pizarrón desde anoche
-  const bx = GRADAS.x + 300, by = GROUND - 250;
+  // la pizarra de anoche: marcas de Punto, palabras, la llave, el 14 y el círculo del 1
+  const words = ['uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce'];
   for (let i = 0; i < 14; i++) {
+    const [mx, my] = nameMarkPos(i);
     w.ensure(`pmark${i}`, () => {
-      const d = new Drawing(`pmark${i}`, art.tally(`pmark${i}`, bx + i * 34, by, 36), {z: 9});
-      for (const s of d.strokes) s.ch = YELLOW;
+      const d = new Drawing(`pmark${i}`, art.tally(`pmark${i}`, mx, my, 40), {z: 9});
+      for (const s2 of d.strokes) s2.ch = YELLOW;
       return d;
     });
+    w.ensure(`nword${i}`, () => new Label(`nword${i}`, words[i], mx, NAME.wordsY + (i % 2) * 22, {size: 26, align: 'center', z: 10}));
   }
-  w.ensure('num-14', () => new Label('num-14', '14', bx + 30, GROUND - 96, {size: 84, weight: 700, z: 9}));
-  w.ensure('word-14', () => new Label('word-14', 'catorce', bx + 150, GROUND - 100, {size: 46, z: 9}));
-  w.ensure('one-ring', () => new Drawing('one-ring', [art.S(art.circleGuideFor(bx + 30 + 14, GROUND - 132, 38), 717, {w: 2.2, p: 0.8, ch: YELLOW})], {z: 9}));
+  const bx = NAME.numX - 46;
+  w.ensure('brace', () => new Drawing('brace', [art.S([[bx - 10, NAME.marksY - 40], [bx + 6, NAME.marksY - 30], [bx + 4, (NAME.marksY + GROUND) / 2 - 12], [bx + 18, (NAME.marksY + GROUND) / 2], [bx + 4, (NAME.marksY + GROUND) / 2 + 12], [bx + 6, GROUND - 4], [bx - 10, GROUND + 6]], 611, {w: 3, p: 0.9})], {z: 9}));
+  w.ensure('num-14', () => new Label('num-14', '14', NAME.numX, NAME.numY, {size: 96, weight: 700, z: 9}));
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = '700 96px Kalam';
+  const g1x = NAME.numX + m.measureText('1').width / 2, g1y = NAME.numY - 34;
+  w.ensure('one-ring', () => new Drawing('one-ring', [art.S(art.circleGuideFor(g1x, g1y, 44), 717, {w: 2.2, p: 0.8, ch: YELLOW})], {z: 9}));
   // camino al depósito
   w.ensure('hill-a', () => art.ghost('hill-a', art.hill('hill-a', 6000, 6700, GROUND - 2, 70, 0.7), 0.45, 0, 1));
   w.ensure('hill-b', () => art.ghost('hill-b', art.hill('hill-b', 8900, 9500, GROUND - 2, 120, 0.7), 0.45, 0, 1));

@@ -330,7 +330,7 @@ export const marcar = {
       {id: 'less', text: 'Hoy llegó menos.'},
       {id: 'same', text: 'Lo mismo.'},
       {id: 'cant', text: 'Así, de un vistazo, no se puede saber.'},
-    ], {prompt: 'Dos hileras de marcas, una arriba de la otra.'});
+    ], {prompt: 'Dos hileras de marcas, una arriba de la otra.', evaluate: true});
     d.evidence('compare-tallies', {answer: ans});
     if (ans === 'cant') await d.think('Habría que emparejarlas marca por marca. Con catorce se podía. Con esto…');
     else await d.think('Puede ser… pero no lo sé. Las marcas de arriba están más separadas que las de abajo. Para saberlo habría que emparejarlas una por una.');
@@ -353,7 +353,7 @@ export const marcar = {
     await d.say('Mara', '¡Eso no es un atado! Un atado tiene diez.');
     m.setPose('idle', 0.5);
     await d.think('Punto los ató de a cinco, como cuando las marcas se tachan de a cinco. Para contar, serviría igual.');
-    await d.think('Pero Mara anota de a diez. Si en su registro dice "siete atados", ella lee setenta palitos, no treinta y cinco.');
+    await d.think('Pero si atáramos todo de a cinco, saldrían siete atados y dos sueltos. Mara, que lee de a diez, anotaría setenta y dos.');
     g.setCinematic(true);
     for (const f of fives) w.remove(f.id);
     for (let k = 0; k < 15; k++) {
@@ -705,7 +705,7 @@ async function writeRooms(d, g, counts) {
       {id: 'blank', text: 'Nada: si no hay nada, no se escribe.'},
       {id: 'space', text: 'Un espacio en blanco.'},
       {id: 'zero', text: 'Un 0.'},
-    ], {prompt: 'En el depósito: un atado de atados, un atado y ningún suelto. ¿Qué escribís para el cuarto vacío?'});
+    ], {prompt: 'En el depósito: un atado de atados, un atado y ningún suelto. ¿Qué escribís para el cuarto vacío?', evaluate: true});
     d.evidence('write-empty', {choice: emptyChoice, attempt});
     const text = digits.map(n => (n ? String(n) : emptyChoice === 'zero' ? '0' : emptyChoice === 'space' ? ' ' : '')).join('');
     const line = ledgerLine(w, 'led-dep', text, 0, {reveal: 0});
@@ -812,7 +812,7 @@ export const cero = {
         {id: 'nothing', text: 'Es una mancha: no había nada.'},
         {id: 'zero', text: 'Ahí había un cero: trescientos dos.'},
         {id: 'unknown', text: 'Ahí había algo, pero no se puede saber qué.'},
-      ], {prompt: '¿Qué había entre el 3 y el 2?'});
+      ], {prompt: '¿Qué había entre el 3 y el 2?', evaluate: true});
       d.evidence('smudge', {answer: look});
       if (look === 'unknown') await d.think('Es cierto: por la mancha sola no se sabe. Pero la tiza de los Oval está guardada en el depósito. Eso sí se puede mirar.');
       else if (look === 'zero') await d.think('Puede ser. Para estar seguro, hay que mirar lo que tienen guardado.');
@@ -831,7 +831,7 @@ export const cero = {
         {id: '32', text: 'Treinta y dos: 32.'},
         {id: '302', text: 'Trescientos dos: 302.'},
         {id: '320', text: 'Trescientos veinte: 320.'},
-      ], {prompt: 'Tres atados de atados, ningún atado, dos sueltos. ¿Qué número es?'});
+      ], {prompt: 'Tres atados de atados, ningún atado, dos sueltos. ¿Qué número es?', evaluate: true});
       d.evidence('read-oval', {answer: read});
       if (read === '32') await d.think('Si fuera 32, habría tres atados y dos sueltos. Pero los tres son atados de atados: el 3 está dos cuartos a la izquierda. El cuarto del medio está vacío y hay que decirlo.');
       if (read === '320') await d.think('Si fuera 320, habría dos atados y ningún suelto. Pero hay dos sueltos y ningún atado.');
@@ -916,7 +916,7 @@ export const cuantos = {
     await d.draw(eq, 1, {key: 'reveal'});
     s.setPose('idle', 0.4);
     g.setCinematic(false);
-    await d.think('Quince: un atado y cinco sueltos que quedaron sin pareja. Restar es ver lo que sobra al emparejar.');
+    await d.think('Quince: lo que le quedó a Recta sin pareja. Esta resta es una comparación: lo que sobra al emparejar.');
     await d.think('Y "pedir prestado" era esto: desatar un atado cuando no alcanzan los sueltos.');
     await d.say('Curva', 'Quince. Bueno, no es tanto. Igual se lo voy a reclamar.');
   },
@@ -1098,7 +1098,7 @@ export const cuarto = {
         {id: 'leave', text: 'Dejar los diez ahí, total entran.'},
         {id: 'throw', text: 'Tirar un palito y listo.'},
         {id: 'build', text: 'Atarlos y dibujar un cuarto nuevo a la izquierda.'},
-      ], {prompt: 'Diez atados de atados y ningún cuarto a la izquierda.'});
+      ], {prompt: 'Diez atados de atados y ningún cuarto a la izquierda.', evaluate: true});
       d.evidence('new-room', {choice: c});
       if (c === 'build') break;
       if (c === 'leave') await d.think('Si quedan diez en un cuarto, ¿cómo se anota? Diez no es un dígito: el registro se rompe.');
@@ -1195,7 +1195,7 @@ export const lugar = {
 };
 
 function writeJournal2(g) {
-  const ev = g.state.evidence;
+  const ev = g.state.evidence.filter(e => (e.run || 1) === (g.state.run || 1));
   const all = k => ev.filter(e => e.kind === k);
   const seen = [];
   const b = all('bundled')[0];
@@ -1219,7 +1219,7 @@ function writeJournal2(g) {
       'Un numeral es una lista de cuántos grupos hay de cada tamaño: el de la derecha cuenta sueltos, el siguiente atados de diez, el siguiente atados de cien… Cada lugar vale diez veces el de su derecha.',
       '"Me llevo uno": cuando se juntan diez de un tamaño, se atan y pasan como uno al lugar de la izquierda.',
       'El cero no cuenta nada: dice que en ese lugar no hay ningún grupo, y así los demás números no se corren.',
-      'Restar también es emparejar: atado con atado, suelto con suelto; si no alcanzan los sueltos, se desata un atado ("pedir prestado"). Lo que sobra es la diferencia.',
+      'Una resta también se puede leer como comparación: emparejar atado con atado y suelto con suelto; si no alcanzan los sueltos, se desata un atado ("pedir prestado"). Lo que sobra es la diferencia.',
       'Diez es una costumbre, no una ley: se puede agrupar de a otra cantidad, siempre que todos sepan de a cuánto.',
     ],
     seen,

@@ -28,19 +28,21 @@ button, select, input { font: inherit; color: inherit; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 #stage { position: fixed; inset: 0; }
+#stage:focus { outline: none; }
 #board, #overlay { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 #overlay { pointer-events: none; }
 
 /* ——— Trazos interactivos ——— */
 #spots { position: absolute; inset: 0; pointer-events: none; }
 .spot {
-  position: absolute; pointer-events: auto; background: transparent; border: 0; padding: 0; margin: 0;
+  position: absolute; pointer-events: none; background: transparent; border: 0; padding: 0; margin: 0;
   border-radius: 50%; cursor: pointer; min-width: 44px; min-height: 44px; transform: translate(-50%, -50%);
 }
 .spot::after {
   content: ''; position: absolute; inset: 4px; border-radius: inherit; border: 2px dashed transparent; transition: border-color .2s, inset .2s;
 }
-.spot:hover::after { border-color: rgba(241, 240, 230, 0.35); }
+.spot.hover::after { border-color: rgba(241, 240, 230, 0.35); }
+.spot.word { pointer-events: auto; }
 .spot:focus-visible { outline: none; }
 .spot:focus-visible::after { border-color: rgba(246, 213, 117, 0.95); inset: 0; }
 .spot.selected::after { border: 2.5px solid rgba(246, 213, 117, 0.9); inset: -2px; }
@@ -74,11 +76,16 @@ button, select, input { font: inherit; color: inherit; }
 
 #choices {
   position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; gap: .5em 1.4em; justify-content: center;
+  max-height: 58vh; overflow-y: auto; overscroll-behavior: contain;
   padding: 2.4em max(16px, 6vw) max(22px, env(safe-area-inset-bottom));
   background: linear-gradient(to top, rgba(9, 19, 15, 0.88) 0%, rgba(9, 19, 15, 0.55) 60%, rgba(9, 19, 15, 0) 100%);
   font-size: var(--caption-size);
 }
 #choices .prompt { flex-basis: 100%; text-align: center; font-style: italic; color: #e3e7d8; margin: 0 0 .2em; }
+@media (max-height: 520px) {
+  #choices, #caption { font-size: min(var(--caption-size), 5.4vh); padding-top: 1.2em; }
+  #choices { gap: .2em 1em; }
+}
 #choices button {
   border: 0; background: none; cursor: pointer; padding: .2em .4em; border-radius: 10px; color: var(--chalk); text-align: left; max-width: 26em;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 C 25 2, 55 7, 98 3' stroke='%23f1f0e6' stroke-opacity='.5' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -89,7 +96,7 @@ button, select, input { font: inherit; color: inherit; }
 #choices button:focus-visible { outline: 2px dashed var(--yellow); outline-offset: 4px; }
 
 #describe {
-  position: absolute; left: 50%; top: max(14px, env(safe-area-inset-top)); transform: translateX(-50%); margin: 0; max-width: min(90vw, 40em);
+  position: absolute; left: 50%; top: calc(max(10px, env(safe-area-inset-top)) + 58px); transform: translateX(-50%); margin: 0; max-width: min(calc(100% - 32px), 40em);
   font-size: calc(var(--caption-size) * .78); color: var(--blue); text-align: center; background: rgba(9,19,15,.72); padding: .3em .8em; border-radius: 10px;
 }
 
@@ -155,6 +162,8 @@ body.captioning #skip-btn { bottom: auto; top: max(10px, env(safe-area-inset-top
 .entry button, .moment { border: 0; background: none; cursor: pointer; text-decoration: underline dashed rgba(241,240,230,.5); text-underline-offset: 5px; padding: .25em 0; min-height: 40px; }
 .moment { display: block; font-size: 1.1em; }
 
+#rotate { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1em; padding: 24px; text-align: center; background: rgba(8,17,13,.92); font-size: 22px; }
+#rotate button { border: 0; background: none; font-size: 20px; text-decoration: underline; cursor: pointer; min-height: 44px; }
 #fatal { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center; font-size: 22px; background: var(--board); }
 #fatal[hidden] { display: none; }
 

@@ -38,9 +38,21 @@ export class UI {
       this.advance();
     });
     $('#board').addEventListener('click', () => {
+      if (this.swallowClick) { this.swallowClick = false; return; }
       if (this.waiting) this.advance();
     });
+    // Tocar por cercanía: gana el objeto cuyo dibujo está más cerca del dedo, no el botón de arriba.
+    const stage = $('#stage');
+    stage.addEventListener('pointerdown', e => this.#pointer(e), {capture: true});
+    stage.addEventListener('pointermove', e => this.#hover(e));
+    this.spots$.addEventListener('keydown', e => this.#arrows(e));
+    this.spots$.addEventListener('focusin', e => {
+      const id = e.target?.dataset?.id;
+      if (id) this.rovingId = id;
+      this.#roving();
+    });
     document.addEventListener('keydown', e => {
+      this.trapFocus(e);
       if (e.defaultPrevented) return;
       if (e.key === 'Escape') {
         e.preventDefault();
@@ -60,6 +72,15 @@ export class UI {
     // pestañas de la pausa
     for (const tab of this.pause$.querySelectorAll('[role=tab]')) {
       tab.addEventListener('click', () => this.showTab(tab.dataset.tab));
+      tab.addEventListener('keydown', e => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        const tabs = [...this.pause$.querySelectorAll('[role=tab]')].filter(t => !t.hidden);
+        const i = tabs.indexOf(tab);
+        const n = tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+        this.showTab(n.dataset.tab);
+        n.focus();
+        e.preventDefault();
+      });
     }
     this.pause$.addEventListener('click', e => {
       const act = e.target.closest('[data-act]')?.dataset.act;
@@ -73,6 +94,74 @@ export class UI {
       el.addEventListener('input', () => this.#readOption(el));
       el.addEventListener('change', () => this.#readOption(el));
     }
+  }
+
+  #nearest(x, y, slop = 26) {
+    let best = null, bestD = Infinity;
+    for (const s of this.spots) {
+      if (s.disabled) continue;
+      const r = this.spotEls.get(s.id)?._r;
+      if (!r) continue;
+      const dx = Math.max(r.x0 - x, 0, x - r.x1), dy = Math.max(r.y0 - y, 0, y - r.y1);
+      const edge = Math.hypot(dx, dy);
+      if (edge > slop) continue;
+      // si el dedo cae dentro de varios, decide la distancia al centro del dibujo
+      const score = edge > 0 ? edge + 1000 : Math.hypot(x - r.cx, y - r.cy);
+      if (score < bestD) { bestD = score; best = s; }
+    }
+    return best;
+  }
+
+  #pointer(e) {
+    if (this.game.paused || !this.spots.length) return;
+    if (e.target.closest?.('#caption, #choices, #corner, #pause, #skip-btn, #title, #fatal, .word')) return;
+    const s = this.#nearest(e.clientX, e.clientY, e.pointerType === 'touch' ? 30 : 18);
+    if (!s) return;
+    e.preventDefault();
+    e.stopPropagation();
+    this.swallowClick = true;
+    setTimeout(() => { this.swallowClick = false; }, 400);
+    s.onActivate?.(s.id);
+  }
+
+  #hover(e) {
+    const s = this.spots.length ? this.#nearest(e.clientX, e.clientY, 18) : null;
+    const id = s?.id || null;
+    if (id === this.hoverId) return;
+    const prev = this.spots.find(x => x.id === this.hoverId);
+    prev?.onHover?.(false);
+    this.spotEls.get(this.hoverId)?.classList.remove('hover');
+    this.hoverId = id;
+    s?.onHover?.(true);
+    this.spotEls.get(id)?.classList.add('hover');
+  }
+
+  /** Flechas: pasar al objeto más cercano en esa dirección. Tab sale del grupo. */
+  #arrows(e) {
+    const dirs = {ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1]};
+    const dir = dirs[e.key];
+    if (!dir) return;
+    const cur = this.spotEls.get(e.target?.dataset?.id)?._r;
+    if (!cur) return;
+    e.preventDefault();
+    let best = null, bestD = Infinity;
+    for (const s of this.spots) {
+      const r = this.spotEls.get(s.id)?._r;
+      if (!r || s.id === e.target.dataset.id) continue;
+      const dx = r.cx - cur.cx, dy = r.cy - cur.cy;
+      const along = dx * dir[0] + dy * dir[1];
+      if (along <= 2) continue;
+      const across = Math.abs(dx * dir[1]) + Math.abs(dy * dir[0]);
+      const d = along + across * 2.5;
+      if (d < bestD) { bestD = d; best = s; }
+    }
+    if (best) this.spotEls.get(best.id)?.focus({preventScroll: true});
+  }
+
+  #roving() {
+    const ids = this.spots.map(s => s.id);
+    if (!ids.includes(this.rovingId)) this.rovingId = ids[0];
+    for (const [id, el] of this.spotEls) el.tabIndex = id === this.rovingId ? 0 : -1;
   }
 
   #readOption(el) {
@@ -239,8 +328,16 @@ export class UI {
 
   // ——— Elecciones ———
 
-  choose(options, {prompt} = {}) {
+  choose(options, {prompt, shuffle = false} = {}) {
     this.hideCaption();
+    if (shuffle) {
+      options = [...options];
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+    }
+    const shownAt = performance.now();
     const box = this.choices$;
     box.replaceChildren();
     if (prompt) {
@@ -259,6 +356,8 @@ export class UI {
         b.dataset.id = o.id;
         b.addEventListener('click', e => {
           e.stopPropagation();
+          // nada de elegir sin leer: ni en pausa, ni con un Enter que venía de antes
+          if (this.game.paused || performance.now() - shownAt < 450) return;
           box.hidden = true;
           box.replaceChildren();
           this.choiceResolve = null;
@@ -268,7 +367,8 @@ export class UI {
         box.append(b);
       }
       box.hidden = false;
-      box.querySelector('button')?.focus({preventScroll: true});
+      box.scrollTop = 0;
+      setTimeout(() => { if (!box.hidden && !this.game.paused) box.querySelector('button')?.focus({preventScroll: true}); }, 460);
     });
   }
 
@@ -316,6 +416,7 @@ export class UI {
       // orden de tabulación = orden de la lista
       if (this.spots$.children[i] !== el) this.spots$.insertBefore(el, this.spots$.children[i] || null);
     });
+    this.#roving();
   }
 
   positionSpots(view, cam) {
@@ -327,7 +428,8 @@ export class UI {
       const [x1, y1] = cam.toScreen(view, r.x + r.w, r.y + r.h);
       // guarda: algo tocable fuera de cuadro es un bloqueo para quien juega
       const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-      const out = cx < 0 || cy < 0 || cx > innerWidth || cy > innerHeight;
+      // fuera de cuadro o pegado al borde (menos de 56 px): difícil de ver y de tocar
+      const out = cx < 56 || cy < 56 || cx > innerWidth - 56 || cy > innerHeight - 56;
       const now = performance.now();
       if (out && !cam.moving) {
         el.dataset.outSince ??= String(now);
@@ -344,6 +446,38 @@ export class UI {
       if (s.kind !== 'word') {
         el.style.width = `${Math.max(44, x1 - x0)}px`;
         el.style.height = `${Math.max(44, y1 - y0)}px`;
+        el._r = {x0, y0, x1, y1, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2};
+      } else {
+        // el tamaño del texto se mide una vez (medir en cada cuadro forzaría el maquetado)
+        if (!el._size || el._sizeText !== el.textContent) {
+          el._size = [el.offsetWidth, el.offsetHeight];
+          el._sizeText = el.textContent;
+        }
+        const cxw = (x0 + x1) / 2, cyw = (y0 + y1) / 2;
+        el._r = {x0: cxw - el._size[0] / 2, y0: cyw - el._size[1] / 2, x1: cxw + el._size[0] / 2, y1: cyw + el._size[1] / 2, cx: cxw, cy: cyw};
+      }
+    }
+    if (!cam.moving && this.spots.some(x => x.kind === 'word')) this.checkOverlaps();
+  }
+
+  /** Guarda de pruebas: un botón de texto no debe tapar otro objeto tocable. */
+  checkOverlaps() {
+    const words = this.spots.filter(s => s.kind === 'word');
+    for (const wsp of words) {
+      const a = this.spotEls.get(wsp.id)?._r;
+      if (!a) continue;
+      for (const o of this.spots) {
+        if (o.kind === 'word' || o.disabled) continue;
+        const b = this.spotEls.get(o.id)?._r;
+        if (!b) continue;
+        if (b.cx > a.x0 && b.cx < a.x1 && b.cy > a.y0 && b.cy < a.y1) {
+          const key = `${wsp.id}/${o.id}`;
+          this.overlapWarned ??= new Set();
+          if (!this.overlapWarned.has(key)) {
+            this.overlapWarned.add(key);
+            console.error(`[spot tapado] "${wsp.text || wsp.id}" tapa a ${o.id}`);
+          }
+        }
       }
     }
   }
@@ -377,32 +511,59 @@ export class UI {
 
   // ——— Pausa ———
 
-  showPause(on) {
+  showPause(on, tab = 'menu') {
     this.pause$.hidden = !on;
     const playing = this.game.mode === 'play';
+    const replay = this.game.director.replay;
+    for (const sel of ['#spots', '#choices', '#caption', '#corner', '#skip-btn', '#title', '#board']) {
+      const el = $(sel);
+      if (el) el.inert = on;
+    }
     for (const act of ['restart-seg', 'title']) this.pause$.querySelector(`[data-act=${act}]`).hidden = !playing;
+    this.pause$.querySelector('[data-act=restart-seg]').textContent = replay ? 'Salir del recuerdo' : 'Repetir esta escena';
+    for (const t of ['menu', 'moments', 'history']) this.pause$.querySelector(`[role=tab][data-tab=${t}]`).hidden = !playing;
+    $('#pause-title').textContent = playing ? 'Pausa' : 'Opciones';
     if (on) {
       this.syncOptions();
       this.renderJournal();
       this.renderMoments();
       this.renderHistory();
       $('.where', this.pause$).textContent = this.game.whereText();
-      this.showTab('menu');
-      this.pause$.querySelector('[data-act=resume]')?.focus({preventScroll: true});
-    } else {
-      $('#menu-btn').focus({preventScroll: true});
+      this.showTab(playing ? tab : tab === 'menu' ? 'options' : tab);
+      const first = this.pause$.querySelector('.panel:not([hidden]) button, .panel:not([hidden]) input, .panel:not([hidden]) select');
+      first?.focus({preventScroll: true});
+    } else if (playing) {
+      // el foco vuelve a la escena: Enter avanza el texto, no reabre la pausa
+      if (!this.choices$.hidden) setTimeout(() => this.choices$.querySelector('button')?.focus({preventScroll: true}), 0);
+      else $('#stage').focus({preventScroll: true});
     }
   }
 
+  /** Tab no sale del diálogo de pausa. */
+  trapFocus(e) {
+    if (this.pause$.hidden || e.key !== 'Tab') return;
+    const items = [...this.pause$.querySelectorAll('button, input, select')].filter(el => !el.hidden && el.offsetParent !== null && !el.closest('[hidden]'));
+    if (!items.length) return;
+    const i = items.indexOf(document.activeElement);
+    const next = e.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : (i === items.length - 1 ? 0 : i + 1);
+    e.preventDefault();
+    items[next].focus();
+  }
+
   showTab(name) {
-    for (const t of this.pause$.querySelectorAll('[role=tab]')) t.setAttribute('aria-selected', String(t.dataset.tab === name));
+    for (const t of this.pause$.querySelectorAll('[role=tab]')) {
+      t.setAttribute('aria-selected', String(t.dataset.tab === name));
+      t.setAttribute('aria-controls', `panel-${t.dataset.tab}`);
+      t.tabIndex = t.dataset.tab === name ? 0 : -1;
+    }
+    for (const p of this.pause$.querySelectorAll('.panel')) p.id = `panel-${p.dataset.panel}`;
     for (const p of this.pause$.querySelectorAll('.panel')) p.hidden = p.dataset.panel !== name;
   }
 
   renderHistory() {
     const ol = $('.history', this.pause$);
     ol.replaceChildren();
-    for (const l of this.game.state.log.slice(-60)) {
+    for (const l of (this.game.state?.log || []).slice(-60)) {
       const li = document.createElement('li');
       if (l.who === 'punto') {
         const w = document.createElement('span');
@@ -422,7 +583,7 @@ export class UI {
   renderJournal() {
     const panel = $('[data-panel=journal]', this.pause$);
     panel.replaceChildren();
-    const entries = this.game.state.journal;
+    const entries = this.game.state?.journal || [];
     if (!entries.length) {
       const p = document.createElement('p');
       p.textContent = 'La Bitácora todavía está en blanco. Lo que entiendas acá quedará anotado con tus propias pruebas.';
@@ -453,7 +614,7 @@ export class UI {
         }
         div.append(ul);
       }
-      const moments = e.moments || (e.moment ? [{id: e.moment, label: 'Desplegar: volver a ver por qué'}] : []);
+      const moments = this.game.mode !== 'play' ? [] : e.moments || (e.moment ? [{id: e.moment, label: 'Desplegar: volver a ver por qué'}] : []);
       for (const m of moments) {
         const b = document.createElement('button');
         b.type = 'button';

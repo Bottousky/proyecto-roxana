@@ -138,6 +138,8 @@ export class Director {
     this.game.logLine(who, text, opts);
     // "saltar animación" adelanta movimientos, no lo que se dice ni se concluye
     if (this.skipping) this.setSkipping(false);
+    if (who === 'student') this.world.get('student')?.talk?.(Math.min(2.2, 0.6 + text.length * 0.03));
+    else if (who && who !== 'punto') this.world.get(who.toLowerCase())?.talk?.(Math.min(2.2, 0.6 + text.length * 0.03));
     await this.ui.caption(who, text, opts);
     this.check(epoch);
   }
@@ -155,7 +157,8 @@ export class Director {
   async choose(options, opts = {}) {
     const epoch = this.epoch;
     this.setSkipping(false);
-    const id = await this.ui.choose(options, opts);
+    // en una respuesta evaluativa, la posición no debe delatar la correcta
+    const id = await this.ui.choose(options, {shuffle: !!opts.evaluate, ...opts});
     this.check(epoch);
     return id;
   }

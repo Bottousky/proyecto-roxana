@@ -29,8 +29,8 @@ export const SHOTS = {
   field: {x: 2860, y: 360, w: 1100, h: 420},
   gradas: {x: 3870, y: 300, w: 1390, h: 470},
   sky: {x: 4150, y: -60, w: 1400, h: 760},
-  nombre: {x: 4800, y: 300, w: 1140, h: 460},
-  marksNight: {x: 5240, y: 330, w: 680, h: 420},
+  nombre: {x: 5150, y: 250, w: 1250, h: 470},
+  marksNight: {x: 5200, y: 240, w: 900, h: 420},
 };
 
 export const MARK_GAP = 46;
@@ -71,7 +71,7 @@ export function student(world, x = DOOR.x + 90, opts = {}) {
 }
 
 export function punto(world, x, y, opts = {}) {
-  const p = world.ensure('punto', () => new Dot('punto', x, y, {r: 9, ch: YELLOW, ring: true, z: 40}));
+  const p = world.ensure('punto', () => new Dot('punto', x, y, {r: 11, ch: YELLOW, ring: true, z: 40}));
   p.x = x;
   p.y = y;
   p.home = [x, y];
@@ -227,6 +227,17 @@ export const STARS = [
 ];
 
 /** Orden de etapas: setup de cada escena declara la suya. */
+/** Pizarra del final del capítulo: marcas de Punto, palabras, presentes y el "14". */
+export const NAME = {
+  x0: GRADAS.x + 300,
+  step: 56,
+  marksY: GROUND - 340,
+  wordsY: GROUND - 280,
+  numX: GRADAS.x + 300 + 13 * 56 + 96,
+  numY: GROUND - 150,
+};
+export const nameMarkPos = i => [NAME.x0 + i * NAME.step, NAME.marksY];
+
 /** Altura donde se ubica un punto emparejado con su marca (por encima del canto). */
 export const PAIRED_Y = GROUND - 158;
 
