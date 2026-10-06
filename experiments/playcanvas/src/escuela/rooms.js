@@ -1,3 +1,4 @@
+import {ARTIFACT_PICKS} from './artifacts.js';
 // The places of the Instituto that the diorama can open. Poses are orbit parameters
 // around `target`: yaw (degrees, positive = camera to the east), pitch, distance.
 const taller=(x,z,yaw,world)=>({world,anchor:[x,10.4,z],pick:[[x-5.9,0,z-7.3],[x+5.9,9.6,z+7.3]],pose:{target:[x,1.8,z-.2],yaw,pitch:46,distance:44}});
@@ -15,6 +16,8 @@ export const ROOMS={
   anfiteatro:{name:'Anfiteatro',short:'Anfiteatro',eyebrow:'Cinemáticas y videos',anchor:[27,9.2,-26.5],pick:[[15,0,-29],[39,8,-13]],
     pose:{target:[27,3.4,-23.5],yaw:-4,pitch:22,distance:45}},
 };
+// Each workshop can also be entered from its artifact on the lawn.
+for(const [id,box] of Object.entries(ARTIFACT_PICKS))ROOMS[id].picks=[ROOMS[id].pick,box];
 export const OVERVIEW={target:[0,3.5,-3],yaw:32,pitch:20,distance:108};
 export const ROOM_ORDER=['direccion','electronica','fisica','programacion','matematica','trofeos','anfiteatro','patio'];
 export const TALLER_ROOMS=['electronica','fisica','programacion','matematica'];

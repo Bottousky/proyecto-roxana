@@ -2,6 +2,7 @@
 // patio. Everything here is geometry; lights, particles and sprites live in diorama.js.
 // Axes: x east, z south (toward the default camera), y up. The island top is y = 0.
 import {Kit} from './kit.js';
+import {buildArtifacts} from './artifacts.js';
 
 export const ISLAND={w:92,d:74,r:8};
 // Four workshops of equal weight flank the patio, one per Applied World. The patio side
@@ -44,7 +45,7 @@ export function buildSchool(){
   building(k,'direccion');direccionDetails(k);tower(k);
   building(k,'trofeos');trofeosDetails(k);
   for(const id of Object.keys(TALLERES)){building(k,id);taller(k,id);}
-  amphitheatre(k);fountain(k);patio(k);gate(k);
+  amphitheatre(k);fountain(k);patio(k);gate(k);buildArtifacts(k);
   return k;
 }
 

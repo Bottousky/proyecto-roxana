@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 1.
+Estado: **EN CURSO** · ciclo 2 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -58,10 +58,40 @@ móvil del nuevo layout, teclado/foco, `npm test`, build de producción, rendimi
 Defectos conocidos: el rótulo «Taller de Física» queda bajo los botones de la portada; antetítulo con poco contraste;
 cuatro talleres siguen idénticos por fuera; noche muy oscura; la tarjeta «Cambió por tu aventura» sigue siendo bloqueante.
 
+## Ciclo 2 (2026-10-06) — verificación del ciclo 1 y artefactos protagonistas
+
+Verificado (Chrome headless, ANGLE Metal, M2; GPU compartida con la partida automatizada de otro agente, así que
+los tiempos de captura no sirven como medición):
+- `npm test`: 93 pruebas OK (10 nuevas en `tests/escuela-home.test.js`: novedades, redes, perfil, paisaje,
+  artefactos). `vite build` OK.
+- `#novedades` (ejemplo rotulado sólo en dev), `#sobre`, versión ligera sin WebGL (`--disable-3d-apis`),
+  móvil 390×844: capturas en `evidence/c02/`. 60 FPS a 1440×900 en reposo (rAF, 3 s), sin otra carga simultánea.
+
+Corregido:
+- Bruma ligada a la distancia de cámara (móvil ya no queda lavado); rótulos ocultos si caen bajo la portada o
+  salen de pantalla; controles y portada ya no se superponen en móvil; medidor oculto en pantallas angostas.
+- El haz diurno seguía visible: con mezcla aditiva la opacidad no actúa; ahora se apaga por emisivo y `enabled`.
+- Aviso de vista previa fuera del título.
+
+Salto visible — artefactos protagonistas (`src/escuela/artifacts.js`, ver `PROGRESSION.md` y `ASSETS.md`):
+- Ohmdal: Faro en miniatura con placa y tendido de cobre sobre aisladores hasta los faroles del patio.
+  La linterna se enciende sólo con `beacon_lens` real.
+- Physica: columna de vidrio donde el agua sube, una piedra flota y el plato derrama afuera, donde cae.
+- Bitland: ciudad cian sobre un chip bajo una lupa inclinada; un pulso recorre un único bucle (`LOOP / JMP 0x00`).
+- Arithmos: caballete con pizarrón: la misma cantidad cambia de representación (½, 0,5, círculo, 2/4, 50 %),
+  un punto que late y una figura de palitos.
+- Tocar un artefacto abre su taller (segunda caja de selección por sala). Árboles movidos para despejar ejes.
+
+Limitaciones: los tres mundos no integrados no cambian con progreso (sin contrato de origen); la lupa no
+magnifica; el chip de Bitland apenas asoma en el plano maestro; noche todavía oscura fuera del patio; la
+interacción insignia (respuesta al tocar un artefacto) aún es sólo navegación.
+
 ## Siguiente acción exacta
 
-1. `cd experiments/playcanvas && npm test` y `node node_modules/vite/bin/vite.js build`; corregir lo que rompa.
-2. Recorrer con `scripts/home-shots.mjs`: `#novedades`, `#sobre`, móvil 390×844, y forzar sin WebGL
-   (Chrome `--disable-webgl`) para la versión ligera.
-3. Ocultar rótulos que caen bajo `.intro` (o desplazar más el campus) y subir contraste del antetítulo.
-4. Siguiente salto visible: identidad exterior de cada taller (artefacto vivo visible desde el plano maestro).
+1. Interacción insignia: al tocar un artefacto, una respuesta propia breve antes de abrir el panel (el Faro
+   gira su luz si está encendido o muestra la lente apagada; la columna invierte un instante; el pulso del chip
+   salta a otra ruta y vuelve; la tiza escribe la siguiente forma). Medible: captura antes/después + sin bloqueo.
+2. «Cambió por tu aventura» no bloqueante (tarjeta lateral, campus ya transformado, recorrido opcional) y
+   prueba de una sola presentación con `SEED`.
+3. Pasar el chip de Bitland a un lugar más legible en el plano maestro o subir su placa/luz.
+4. Rendimiento con la build (`vite preview`) cuando la GPU no esté compartida; registrar frame times y memoria.

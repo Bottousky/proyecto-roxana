@@ -9,6 +9,7 @@ import {buildSchool,BUILDINGS,TOWER,LAMPS,STANDS,FOUNTAIN,AMPHI,ISLAND,TALLERES,
 import {makeWorldPortal,PORTAL_COLORS} from './portalfx.js';
 import {loadStatueGlb,statueEntity} from './statue.js';
 import {buildLandscape} from './landscape.js';
+import {ARTIFACTS} from './artifacts.js';
 const statueUrl=import.meta.env.BASE_URL+'escuela/modelos/roxana-estatua.glb';
 import {grain,meadow,tree,glow,earth,sign,dynamicCanvas,marble} from './textures.js';
 import {makeWater,updateWater,bindShore} from '../water.js';
@@ -42,7 +43,9 @@ const MATERIALS={
   dim:{map:'stone',contrast:.2,color:'#8c8a86',opacity:.55},
   lampGlass:{color:'#6c6556',emissive:'#ffd08a',glow:0},lanternGlass:{color:'#57636a',emissive:'#fff0c4',glow:0,gloss:.8},
   glass:{color:'#344b55',emissive:'#ffcb7c',glow:0,gloss:.85},screen:{color:'#10231a',emissive:'#6cf0a2',glow:0},
-  flame:{color:'#ffd9a0',emissive:'#ffcf7a',glow:0},roxanaLamp:{color:'#6c6556',emissive:'#ffd08a',glow:0},bitacora:{color:'#e9dfc6',emissive:'#ffe3a6',glow:.6},
+  flame:{color:'#ffd9a0',emissive:'#ffcf7a',glow:0},
+  ceramic:{color:'#f1ede2',gloss:.82},faroGlass:{color:'#4e5a60',emissive:'#ffe7ad',glow:0,gloss:.85},
+  cityCyan:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.9,gloss:.6},lensGlass:{color:'#e8f6f4',opacity:.1,gloss:.98,emissive:'#bff6ff',glow:.04},roxanaLamp:{color:'#6c6556',emissive:'#ffd08a',glow:0},bitacora:{color:'#e9dfc6',emissive:'#ffe3a6',glow:.6},
 };
 
 export class SchoolDiorama {
@@ -115,6 +118,7 @@ export class SchoolDiorama {
       m.update();out[name]=m;
     }
     out.grass.diffuseMapTiling.set(1,1);
+    out.cityCyan.emissiveVertexColor=true;out.cityCyan.update();out.lensGlass.cull=CULLFACE_NONE;out.lensGlass.opacityFadesSpecular=true;out.lensGlass.gloss=.55;out.lensGlass.diffuseVertexColor=false;out.lensGlass.update();out.lensGlass.noShadow=true;
     const g=glow(app);
     out['portal@electronica']=makeWorldPortal(g,'ohmdal');
     out.water=makeWater(new StandardMaterial());const blank=new Texture(app.graphicsDevice,{width:1,height:1,format:PIXELFORMAT_RGBA8,minFilter:FILTER_LINEAR,magFilter:FILTER_LINEAR,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});bindShore(out.water,blank,false,0);out.water.noShadow=true;
@@ -128,6 +132,10 @@ export class SchoolDiorama {
     {const m=new StandardMaterial();m.diffuse=col('#d8eef0');m.opacity=.24;m.blendType=BLEND_NORMAL;m.depthWrite=false;m.useMetalness=true;m.metalness=0;m.gloss=.95;m.cull=CULLFACE_NONE;m.emissive=col('#ffb35c');m.emissiveIntensity=.05;m.update();m.noShadow=true;out.tank=m;}
     this.leyes=dynamicCanvas(app,'leyes',512,200);this.drawLeyes([.3,.67,1.04,.41]);out.leyes=lit(this.leyes.texture,{gloss:.4});
     this.board=dynamicCanvas(app,'board',640,384);this.drawBoard(0);
+    this.chip=dynamicCanvas(app,'chip',256,256);this.drawChip(0);
+    {const m=new StandardMaterial();m.diffuse=col('#0a1214');m.emissive=col('#ffffff');m.emissiveMap=this.chip.texture;m.emissiveIntensity=1;m.useMetalness=true;m.gloss=.7;m.update();out.chip=m;}
+    this.yard=dynamicCanvas(app,'yard',512,320);this.drawYard(0);
+    {const m=new StandardMaterial();m.diffuse=col('#ffffff');m.diffuseMap=this.yard.texture;m.emissive=col('#ffffff');m.emissiveMap=this.yard.texture;m.emissiveIntensity=.12;m.gloss=.2;m.update();out.yard=m;}
     {const m=new StandardMaterial();m.diffuse=col('#1d2b22');m.diffuseMap=this.board.texture;m.emissive=col('#ffffff');m.emissiveMap=this.board.texture;m.emissiveIntensity=.35;m.update();out['board@matematica']=m;}
     const serif='"Cormorant Garamond", Georgia, serif';
     const plaqueSign=(key,text,{bg='#2c3b36',fg='#e5c98c',size=64,w=768,h=128,border='#b89455'}={})=>lit(sign(app,key,(x,W,H)=>{
@@ -135,6 +143,8 @@ export class SchoolDiorama {
       x.fillStyle=fg;x.font=`600 ${size}px ${serif}`;x.textAlign='center';x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.45)';x.shadowBlur=4;x.fillText(text,W/2,H/2+4);
     },w,h),{gloss:.45});
     out['sign:direccion']=plaqueSign('direccion','DIRECCIÓN');
+    const brass=(key,text,size=40)=>plaqueSign(key,text,{bg:'#9a7a45',fg:'#2a2116',size,w:512,h:104,border:'#5d4526'});
+    out['sign:faro']=brass('faro','EL FARO · OHMDAL');out['sign:physica']=brass('physica','ADENTRO, OTRA REGLA');out['sign:bitland']=brass('bitland','BITLAND · BAJO LA LENTE',34);
     for(const [id,t] of Object.entries(TALLERES))out[`sign:${id}`]=plaqueSign(id,t.name,{size:50,w:1024,bg:t.accent});
     out['sign:trofeos']=plaqueSign('trofeos','SALA DE TROFEOS',{size:60,w:1024});
     out['sign:anfiteatro']=plaqueSign('anfiteatro','ANFITEATRO',{size:60,w:1024});
@@ -299,6 +309,45 @@ export class SchoolDiorama {
     const flash=sm((t-6.2)/1);if(flash>0){x.fillStyle=`rgba(210,245,220,${flash*.85})`;x.fillRect(0,0,W,H);}
     this.board.refresh();
   }
+  /**
+   * Bitland's chip seen through the lens: traces, a stopped clock, and one instruction
+   * that keeps running its loop. `awake` (0..1) will come from Bitland's real progress.
+   */
+  drawChip(t,awake=0){
+    const {ctx:x,canvas:c}=this.chip,W=c.width,H=c.height;
+    x.fillStyle='#050c0e';x.fillRect(0,0,W,H);
+    x.strokeStyle='rgba(95,240,255,.16)';x.lineWidth=2;
+    for(let i=0;i<9;i++){const p=16+i*28;x.beginPath();x.moveTo(p,8);x.lineTo(p,40+(i%3)*14);x.lineTo(p+14,54+(i%3)*14);x.stroke();x.beginPath();x.moveTo(8,p);x.lineTo(36+(i%2)*20,p);x.stroke();x.beginPath();x.moveTo(W-8,p);x.lineTo(W-40-(i%2)*16,p);x.stroke();x.beginPath();x.moveTo(p,H-8);x.lineTo(p,H-36-(i%3)*10);x.stroke();}
+    // The loop: a rectangle of copper the pulse never leaves while the city waits.
+    const L=[[60,60],[196,60],[196,196],[60,196]],per=136*4,pos=((t*90)%per+per)%per;
+    x.strokeStyle='rgba(95,240,255,.35)';x.lineWidth=3;x.beginPath();x.moveTo(...L[0]);for(const q of L.slice(1))x.lineTo(...q);x.closePath();x.stroke();
+    const at=d=>{const k=Math.floor(d/136)%4,f=(d%136)/136,a=L[k],b=L[(k+1)%4];return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];};
+    for(let i=0;i<10;i++){const [px,py]=at((pos-i*5+per)%per);x.fillStyle=`rgba(180,255,255,${(1-i/10)*.9})`;x.beginPath();x.arc(px,py,4-i*.3,0,Math.PI*2);x.fill();}
+    x.fillStyle='rgba(95,240,255,.55)';x.font='600 13px ui-monospace, monospace';x.fillText('LOOP',112,132);x.fillText('JMP 0x00',100,150);
+    if(awake>0){x.globalAlpha=awake;x.fillStyle='rgba(95,240,255,.6)';for(let i=0;i<20;i++)x.fillRect(70+(i*37)%120,70+(i*53)%120,4,4);x.globalAlpha=1;}
+    this.chip.refresh();
+  }
+  /**
+   * Arithmos on the easel: the same quantity changes representation in chalk — a half as a
+   * fraction, a decimal, a shaded circle, two of four — while a point waits beside a figure.
+   */
+  drawYard(t){
+    const {ctx:x,canvas:c}=this.yard,W=c.width,H=c.height,chalk=a=>`rgba(242,244,232,${a})`;
+    x.fillStyle='#22352a';x.fillRect(0,0,W,H);
+    for(let i=0;i<60;i++){const sx=(i*97)%W,sy=(i*61)%H;x.fillStyle='rgba(240,240,225,.035)';x.fillRect(sx,sy,40,2);}
+    const forms=['½','0,5','circle','2/4','50 %'],cycle=3.2,k=Math.floor(t/cycle),f=(t%cycle)/cycle,form=forms[k%forms.length];
+    const draw=Math.min(1,f*3),fade=f>.82?1-(f-.82)/.18:1,cx=W*.6,cy=H*.48;
+    x.save();x.globalAlpha=fade;x.strokeStyle=chalk(.92);x.fillStyle=chalk(.92);x.lineWidth=4;x.lineCap='round';
+    if(form==='circle'){x.beginPath();x.arc(cx,cy,70,-Math.PI/2,-Math.PI/2+Math.PI*2*draw);x.stroke();if(draw>=1){x.beginPath();x.moveTo(cx,cy-70);x.lineTo(cx,cy+70);x.stroke();x.globalAlpha=fade*.5;for(let i=-60;i<70;i+=12){x.beginPath();x.moveTo(cx-Math.sqrt(Math.max(0,70*70-i*i)),cy+i);x.lineTo(cx-4,cy+i);x.stroke();}}}
+    else{x.font=`italic 600 ${form.length>2?92:120}px "Cormorant Garamond", serif`;x.textAlign='center';x.textBaseline='middle';x.save();x.beginPath();x.rect(cx-160,0,320*draw,H);x.clip();x.fillText(form,cx,cy);x.restore();}
+    x.restore();
+    // The equals sign stays: every form is the same amount.
+    x.strokeStyle=chalk(.6);x.lineWidth=3;x.beginPath();x.moveTo(W*.36,cy-8);x.lineTo(W*.42,cy-8);x.moveTo(W*.36,cy+8);x.lineTo(W*.42,cy+8);x.stroke();
+    // A point that is not yet anything, beside a chalk figure that looks at it.
+    const pulse=.5+.5*Math.sin(t*2.2);x.fillStyle=chalk(.75+pulse*.25);x.beginPath();x.arc(W*.24,cy,5+pulse*2.5,0,Math.PI*2);x.fill();
+    const fx=W*.12,fy=H*.84;x.strokeStyle=chalk(.85);x.lineWidth=3;x.beginPath();x.arc(fx,fy-74,10,0,Math.PI*2);x.moveTo(fx,fy-64);x.lineTo(fx,fy-30);x.lineTo(fx-12,fy);x.moveTo(fx,fy-30);x.lineTo(fx+12,fy);x.moveTo(fx,fy-54);x.lineTo(fx+18,fy-62+Math.sin(t*1.3)*3);x.moveTo(fx,fy-54);x.lineTo(fx-14,fy-40);x.stroke();
+    this.yard.refresh();
+  }
   /** Banners of the worlds still to open, woven like Ohmdal's: colour, border, glyph. */
   worldBanner(w){
     const spec={physica:['#6a2f1e','Φ'],bitland:['#28295a','λ'],arithmos:['#244a2c','∑']}[w];
@@ -368,7 +417,7 @@ export class SchoolDiorama {
 
   // ── Scenery ─────────────────────────────────────────────────────────────────
   async buildTrees(){
-    const spots=[[-40,-31,0,1.2],[40,-31,4,1.2],[-40,-13,1,1],[40,-13,1,1],[-40.5,4,3,1.1],[40.5,4,3,1.1],[-40,22,0,1.15],[40,22,0,1.15],[-31,28,5,1],[31,28,5,1],[-17,28.5,2,.9],[17,28.5,2,.9],[-12,-32,1,.85],[12,-32,1,.85],[-8,26,5,.8],[8,26,5,.8],[-38,-24,2,1],[38.5,-22,1,.95],[-23,26,4,.95],[23,26,4,.95],[-15,-33,1,.8],[15,-33,1,.8]];
+    const spots=[[-40,-31,0,1.2],[40,-31,4,1.2],[-40,-13,1,1],[40,-13,1,1],[-40.5,4,3,1.1],[42.5,9.5,3,1.1],[-40,22,0,1.15],[40,22,0,1.15],[-31,28,5,1],[38.5,27.5,5,1],[-12,30,2,.9],[17,28.5,2,.9],[-12,-32,1,.85],[12,-32,1,.85],[-8,26,5,.8],[8,26,5,.8],[-38,-24,2,1],[38.5,-22,1,.95],[-27.5,27.5,4,.95],[23,26,4,.95],[-15,-33,1,.8],[15,-33,1,.8]];
     this.trees=[];
     const shadow=new StandardMaterial();shadow.diffuse=col('#000000');shadow.useLighting=false;shadow.opacityMap=this.glowTexture;shadow.opacity=.5;shadow.blendType=BLEND_NORMAL;shadow.depthWrite=false;shadow.update();
     for(const [x,z,type,s] of spots){
@@ -418,6 +467,7 @@ export class SchoolDiorama {
       lantern:omni('Linterna',[TOWER.x,TOWER.shaft+4.5,TOWER.z],'#fff0c4',62),
       screen:omni('Pantalla',[AMPHI.x,3.5,AMPHI.z+2.5],'#a8c8d8',14),
       statue:omni('Farol de Roxana',[FOUNTAIN.x,3.3,FOUNTAIN.z+1.1],'#ffd08a',8),
+      faro:omni('Faro en miniatura',[ARTIFACTS.ohmdal.x,4.1,ARTIFACTS.ohmdal.z],'#ffe7ad',5),
     };
   }
   particle(name,pos,opts){
@@ -447,6 +497,12 @@ export class SchoolDiorama {
       velocityGraph:new CurveSet([[0,-.3,.5,.3,1,-.2],[0,.1,.5,-.1,1,.15],[0,.3,.5,-.3,1,.2]]),scaleGraph:new Curve([0,.12,1,.12]),alphaGraph:new Curve([0,0,.2,1,.4,.2,.6,1,.8,.3,1,0]),colorGraph:new CurveSet([[0,1],[0,.95],[0,.55]])});
     this.fx.lantern=this.particle('Brillo de la linterna',[TOWER.x,TOWER.shaft+4.5,TOWER.z],{numParticles:n(14),lifetime:3,rate:.2,rate2:.3,emitterShape:EMITTERSHAPE_SPHERE,emitterRadius:.9,
       velocityGraph:new CurveSet([[0,0],[0,.3],[0,0]]),scaleGraph:new Curve([0,.3,1,.05]),alphaGraph:new Curve([0,0,.3,.8,1,0]),colorGraph:new CurveSet([[0,1],[0,.95],[0,.75]])});
+    {const {x,z}=ARTIFACTS.physica;
+      this.fx.climb=this.particle('Agua que sube',[x,.7,z],{numParticles:n(70),lifetime:2.25,rate:.035,rate2:.05,emitterShape:EMITTERSHAPE_SPHERE,emitterRadius:.32,emitterRadiusInner:.05,
+        velocityGraph:new CurveSet([[0,0,1,0],[0,.9,.5,1.3,1,1.2],[0,0,1,0]]),velocityGraph2:new CurveSet([[0,.05,1,-.05],[0,1,.5,1.45,1,1.3],[0,-.05,1,.05]]),
+        scaleGraph:new Curve([0,.06,1,.09]),alphaGraph:new Curve([0,0,.1,.7,.75,.55,.92,0,1,0]),colorGraph:new CurveSet([[0,.72],[0,.9],[0,1]]),blendType:BLEND_NORMAL,alignToMotion:true,stretch:.5});
+      this.fx.spill=this.particle('Agua que cae',[x,3.98,z],{numParticles:n(80),lifetime:1,rate:.012,rate2:.02,emitterShape:EMITTERSHAPE_SPHERE,emitterRadius:.98,emitterRadiusInner:.95,
+        velocityGraph:new CurveSet([[0,0],[0,-.6,1,-3.4],[0,0]]),scaleGraph:new Curve([0,.05,1,.07]),alphaGraph:new Curve([0,.6,.8,.5,1,0]),colorGraph:new CurveSet([[0,.8],[0,.92],[0,1]]),blendType:BLEND_NORMAL,alignToMotion:true,stretch:.4});}
     for(const e of Object.values(this.fx))e.particlesystem.enabled=false;
   }
   buildHighlight(){
@@ -506,8 +562,8 @@ export class SchoolDiorama {
     const r=this.canvas.getBoundingClientRect(),cam=this.camera.camera,x=sx-r.left,y=sy-r.top;
     const from=cam.screenToWorld(x,y,cam.nearClip),to=cam.screenToWorld(x,y,cam.farClip),dir=to.clone().sub(from).normalize();
     let best=null,bestT=Infinity;
-    for(const [id,room] of Object.entries(ROOMS)){
-      const [lo,hi]=room.pick;let t0=0,t1=Infinity,hit=true;
+    for(const [id,room] of Object.entries(ROOMS))for(const [lo,hi] of room.picks||[room.pick]){
+      let t0=0,t1=Infinity,hit=true;
       for(let a=0;a<3;a++){const o=[from.x,from.y,from.z][a],d=[dir.x,dir.y,dir.z][a];
         if(Math.abs(d)<1e-6){if(o<lo[a]||o>hi[a]){hit=false;break;}continue;}
         let ta=(lo[a]-o)/d,tb=(hi[a]-o)/d;if(ta>tb)[ta,tb]=[tb,ta];t0=Math.max(t0,ta);t1=Math.min(t1,tb);if(t0>t1){hit=false;break;}}
@@ -616,8 +672,13 @@ export class SchoolDiorama {
     const banners=this.parts.get('banners');if(banners){banners.enabled=L(6)>.01;banners.setLocalScale(1,Math.max(.01,ease(L(6))),1);banners.setLocalPosition(0,4.85*(1-ease(L(6))),0);}
     // 8 beacon_network: the bell swings (see update). 9 beacon_lens: the lantern.
     const lantern=this.materials.lanternGlass;lantern.emissiveIntensity=L(8)*(1.6+night*3);lantern.update();
-    this.rooms.lantern.light.intensity=L(8)*(.6+night*1.4);this.beam.m.opacity=L(8)*clamp((night-.75)/.25,0,1)*.2*(1-(this.focusFade||0));this.beam.m.update();this.beam.pivot.enabled=L(8)>.01;
+    this.rooms.lantern.light.intensity=L(8)*(.6+night*1.4);// Additive blending ignores opacity: the beam's strength lives in its emissive and it is off by day.
+    const beam=L(8)*clamp((night-.75)/.25,0,1)*(1-(this.focusFade||0));this.beam.m.emissiveIntensity=beam*.12;this.beam.m.update();this.beam.pivot.enabled=beam>.01;
     this.fx.lantern.particlesystem.enabled=L(8)>.5;
+    // The Faro in miniature answers the real Faro: dark glass until the lens is lit in Ohmdal.
+    const fg=this.materials.faroGlass;fg.emissiveIntensity=L(8)*(.9+night*1.6);fg.update();this.rooms.faro.light.intensity=L(8)*(.15+night*.55);
+    this.fx.climb.particlesystem.enabled=!this.reducedMotion;this.fx.spill.particlesystem.enabled=!this.reducedMotion;
+    const cc=this.materials.cityCyan;cc.emissiveIntensity=.3+night*.7;cc.update();
     // Roxana's lamp burns from the first light; the screen glows with the evening.
     const flame=this.materials.flame;flame.emissiveIntensity=.4+L(0)*1.4+night*1.2;flame.update();
     const lamp=this.materials.roxanaLamp;lamp.emissiveIntensity=L(0)*(1.2+night*2.4);lamp.update();this.rooms.statue.light.intensity=L(0)*(.5+night*1.8);
@@ -679,6 +740,10 @@ export class SchoolDiorama {
     if(!this.reducedMotion){this.parts.get('world:fisica')?.setLocalEulerAngles(0,this.worldAngle,Math.sin(this.clock*.4)*6);
       this.boardClock=(this.boardClock||0)+dt;if(!this.boardSeq&&this.boardClock>.1){this.boardClock=0;this.drawBoard(this.clock);}}
     if(this.boardSeq)this.stepBoardEntry(dt);
+    // Artifacts: the floating stone breathes in its column, chip and easel keep their routines.
+    {const fl=this.parts.get('float:physica'),bp=this.basePos.get('float:physica');if(fl&&bp){const m=this.reducedMotion?0:1;fl.setLocalPosition(bp.x+Math.sin(this.clock*.7)*.08*m,bp.y+Math.sin(this.clock*.9)*.32*m,bp.z+Math.cos(this.clock*.6)*.08*m);fl.setLocalEulerAngles(this.clock*14*m,this.clock*22*m,0);}
+      this.artClock=(this.artClock||0)+dt;if(this.artClock>(this.reducedMotion?1:.066)){this.artClock=0;const t=this.reducedMotion?0:this.clock;this.drawChip(t,this.bitlandAwake||0);this.drawYard(t);}
+      const fp=this.parts.get('faro:lamp');if(fp&&this.levels[8]>.5&&!this.reducedMotion){const fg=this.materials.faroGlass;fg.emissiveIntensity=this.levels[8]*(.9+(this.currentHour?.lamps||0)*1.6)*(.85+.15*Math.sin(this.clock*3.1));fg.update();}}
     if(this.entrySeq)this.stepEntry(dt);
     const sky=this.skyColors||{zenith:col('#6d8fb0'),horizon:col('#f2d3a8')};
     updateWater([this.materials.water],{time:this.clock,motion:this.reducedMotion?0:1,sky:sky.zenith,horizon:sky.horizon,sunDir:this.sun.forward.clone().mulScalar(-1),sunColor:this.sun.light.color,night:clamp((this.currentHour?.lamps||0)-.5,0,.5)*2});
