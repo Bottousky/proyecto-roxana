@@ -41,3 +41,17 @@ Mayores restantes: chunk compartido del motor + contenido del juego 2,17 MB (579
 - Siguientes palancas, en orden de beneficio/riesgo: cuantizar y decimar la estatua (Draco/meshopt no está en el
   proyecto: requiere evaluar), separar del chunk de la home el contenido del juego que sólo usa el Anfiteatro,
   fusionar remates/artefactos estáticos con su techo por material.
+
+## Ciclo 7 · draw calls por perfil (build, 1440×900)
+
+Interiores, pisos y trofeos de cada edificio dejan de dibujarse mientras su techo los tapa (no cambia la imagen).
+
+| Perfil | Antes: vista / tras ciclos | Después: vista / tras ciclos |
+|---|---|---|
+| Alta (SSAO, sombras 4096, MSAA 4×) | 1231 / 856 | **927 / 614** |
+| Baja (sin SSAO, sombras 2048, DPR ≤ 1,25) | 882 / 685 | **642 / 479** |
+
+FPS de esta corrida **no válidos**: había cuatro partidas automatizadas de otros agentes en la misma GPU (≈36 FPS
+en ambos perfiles, por contención). La corrida previa, con menos carga, dio 60 FPS en baja y 47,6 en alta.
+Repetir con la GPU libre. El perfil bajo es el predeterminado en pantallas táctiles de tamaño teléfono
+(`defaultQuality` en `progress.js`); la elección del usuario se conserva.
