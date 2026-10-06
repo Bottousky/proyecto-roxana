@@ -29,7 +29,8 @@ export function startServer(p = port) {
       res.writeHead(404, {'content-type': 'text/plain; charset=utf-8'}).end('No encontrado');
     }
   });
-  return new Promise(ok => server.listen(p, '127.0.0.1', () => ok(server)));
+  // si el puerto está ocupado, se rechaza (quien llama puede probar otro)
+  return new Promise((ok, ko) => { server.once('error', ko); server.listen(p, '127.0.0.1', () => ok(server)); });
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

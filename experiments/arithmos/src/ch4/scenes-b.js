@@ -358,8 +358,8 @@ export const nadie = {
       let busy = false;
       g.setHint(() => ['Tocá "llenar una bolsa de cero" y mirá el montón. Cuando quieras, pará.']);
       const refresh = () => {
-        const spots = [wordSpot('nz-fill', bags ? 'llenar otra bolsa de cero' : 'llenar una bolsa de cero', 13420, GROUND - 200, () => fill())];
-        if (bags >= 1) spots.push(wordSpot('nz-stop', 'parar', 13420, GROUND - 270, () => { if (!busy && ctl.alive()) { follow(p, s); resolve(); } }));
+        const spots = [wordSpot('nz-fill', bags ? 'llenar otra bolsa de cero' : 'llenar una bolsa de cero', 13420, GROUND - 170, () => fill())];
+        if (bags >= 1) spots.push(wordSpot('nz-stop', 'parar', 13420, GROUND - 310, () => { if (!busy && ctl.alive()) { follow(p, s); resolve(); } }));
         g.ui.setSpots(spots);
       };
       const fill = async () => {

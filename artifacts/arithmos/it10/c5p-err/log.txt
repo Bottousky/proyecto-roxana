@@ -1,0 +1,90 @@
+[0.0s] escena → c5.medio
+[1.2s] lee: El atado que empujó Punto amaneció rajado. ¿Lo terminamos de partir, para las cuatro?
+[1.8s] elige «Darle uno a dos familias.» (Dos atados entre cuatro familias, igual para todas. ¿Cómo se reparten?)
+[2.2s] lee: ¿Y Rampa y nosotras, nada? Ayer quedamos en que era igual para todas.
+[2.7s] elige «Partir cada atado por la mitad.» (Dos atados entre cuatro familias, igual para todas. ¿Cómo se reparten?)
+[3.2s] lee: Cinco palitos: medio atado.
+[3.2s] lee: —Punto, mirá: desatando, daba lo mismo: cinco palitos. Dos nombres para lo mismo.
+[4.1s] lee: —Uno, una raya, dos: un pedazo, de los que entran dos justos en un atado.
+[5.0s] lee: ¿Y si en vez de medio atado me dan medio montón? Allá hay seis atados.
+[5.6s] elige «Lo mismo: los dos son "medio".» (¿Qué es más: medio atado o medio montón de seis atados?)
+[6.0s] lee: Medio montón son tres atados; medio atado, cinco palitos. "Medio" solo no dice cuánto.
+[6.1s] lee: Medio, ¿de qué? Desde hoy, en mis cuentas eso va siempre.
+[6.2s] escena → c5.barras
+[6.5s] lee: Llegaron tres barras de tiza nueva para las cuatro familias. Estas no se desatan: son de una pieza.
+[6.6s] lee: El mío es más largo que el de Cornisa.
+[6.7s] lee: ¡Y el mío es el más chico!
+[6.8s] lee: Para que sea igual para todas, a cada una le tiene que tocar lo mismo.
+[6.8s] lee: —Punto: si las partes son iguales y cada una recibe las mismas, seguro que es lo mismo.
+[7.5s] elige «En 3.» (Tres barras entre cuatro familias. ¿En cuántas partes iguales cortás cada barra?)
+[8.1s] lee: Sobra un tercio, y son cuatro familias.
+[8.2s] lee: Ese tercio, en cuatro: cuatro pedazos chiquitos, uno para cada una.
+[8.3s] lee: Dos tercios y un doceavo: en doceavos, ocho y uno, nueve. Nueve doceavos son tres cuartos.
+[8.3s] lee: —Tres cuartos: tres pedazos del tamaño de un cuarto, el que entra cuatro veces justo en una barra.
+[9.2s] escena → c5.equivalentes
+[9.6s] lee: Me quedaba una barra para Cornisa y Peldaño. Cornisa la quiso en cuartos; Peldaño, por la mitad.
+[9.7s] lee: Yo tengo dos pedazos y Peldaño uno solo. ¡Tengo más!
+[10.3s] elige «Cornisa: tiene dos pedazos.» (Dos cuartos de barra o media barra: ¿quién tiene más tiza?)
+[12.0s] lee: Dos pedazos, pero cada uno es la mitad de chico: llegan justo hasta el mismo lugar.
+[12.6s] elige «Dos.» (¿Cuántos pedazos de un sexto de barra hacen media barra?)
+[13.1s] lee: Tres sextos, no dos: llegan justo a la mitad.
+[13.2s] lee: —Punto: el mismo pedazo de barra, con tres nombres.
+[13.2s] lee: Bueno. Pero los míos son dos.
+[13.3s] escena → c5.recta
+[14.3s] lee: Para el registro: una línea como la de Curva, pero con el 1 bien lejos del 0. ¿Dónde anoto los tres cuartos de barra?
+[14.8s] elige «Partir cada tramo en 3.» (Para marcar 3/4, ¿en cuántas partes iguales partís el tramo de 0 a 1?)
+[15.3s] lee: Con tercios no hay ninguna marca que sea tres cuartos.
+[15.9s] elige «Partir cada tramo en 4.» (Para marcar 3/4, ¿en cuántas partes iguales partís el tramo de 0 a 1?)
+[17.0s] lee: Esa es un cuarto. Para tres cuartos faltan dos saltos.
+[18.6s] elige «En ningún lado: en una barra no entran cinco cuartos.» (¿Y dónde va 5/4: cinco pedazos del tamaño de un cuarto?)
+[19.1s] lee: —En una barra no entran cinco cuartos, pero cinco pedazos de un cuarto sí existen: una barra y un cuarto más.
+[19.7s] elige «No: en cuartos son marcas vecinas.» (¿Hay algún número entre 1/2 y 3/4?)
+[20.1s] lee: En cuartos eran vecinas. Partiendo más fino, aparece una marca en el medio: siempre cabe otra.
+[21.0s] escena → c5.comparar
+[22.1s] lee: Punto dice que un cuarto de barra es más que un tercio, porque cuatro es más que tres. Yo prefiero el cuarto, entonces.
+[24.0s] lee: Ah, no. Me quedo con el tercio.
+[24.0s] lee: —Punto: más partes, más chicas.
+[24.1s] lee: ¿Y dos tercios o tres cuartos? A los dos les falta un pedazo para la barra entera.
+[24.7s] elige «Partir las dos barras en 6.» (Para comparar, las dos barras tienen que estar partidas igual, y que en la partición caigan justo los tercios y los cuartos.)
+[25.2s] lee: En sextos caen los tercios, pero los cuartos quedan entre dos marcas.
+[25.8s] elige «Partir las dos barras en 7.» (Para comparar, las dos barras tienen que estar partidas igual, y que en la partición caigan justo los tercios y los cuartos.)
+[26.3s] lee: En séptimos no cae ni un tercio ni un cuarto.
+[26.9s] elige «Partir las dos barras en 12.» (Para comparar, las dos barras tienen que estar partidas igual, y que en la partición caigan justo los tercios y los cuartos.)
+[27.3s] lee: Ocho doceavos contra nueve: tres cuartos es más. Al que le falta el pedazo más chico, tiene más.
+[27.4s] escena → c5.sumar
+[28.4s] lee: Le regalé a Peldaño un tercio de barra, de lo mío. Él ya tenía media. ¿Cuánto tiene ahora?
+[30.3s] lee: Lo de Punto es más corto que la media barra sola. Juntando, no puede haber menos.
+[30.9s] elige «Partir las dos barras en 5.» (Para contar pedazos, tienen que ser del mismo tamaño: elegí una partición donde caigan la mitad y el tercio.)
+[31.3s] lee: En quintos no cae ni la mitad ni el tercio: el cinco de Punto no sirve para contar.
+[31.9s] elige «Partir las dos barras en 6.» (Para contar pedazos, tienen que ser del mismo tamaño: elegí una partición donde caigan la mitad y el tercio.)
+[32.4s] lee: —Punto: tres sextos y dos sextos son cinco sextos. Para sumar pedazos, primero del mismo tamaño.
+[32.5s] escena → c5.decimos
+[32.9s] lee: A mí me quedaron dos barras enteras y media. Lo anoto en el registro del depósito, por cajas, como siempre.
+[33.1s] lee: Si la pongo con las enteras, mañana alguien cuenta tres barras.
+[33.3s] lee: —Diez décimos hacen una barra, como diez palitos un atado. Y la coma de Punto separa las barras de sus partes.
+[33.4s] lee: Me sirve.
+[33.5s] lee: En el registro viejo encontré esto otro. ¿Es lo mismo?
+[34.4s] elige «Sí: el 0 no cuenta nada.» (¿2,05 es lo mismo que 2,5?)
+[34.9s] lee: —No: cinco centésimos son mucho menos que cinco décimos. El 0 guarda el lugar de los décimos, como en el depósito.
+[35.0s] lee: El cero otra vez. Ya no se me escapa.
+[35.0s] lee: ¿Y mis tres cuartos, cómo se anotan así?
+[35.1s] lee: Un cuarto son veinticinco centésimos: cuatro de esos hacen cien. Tres, setenta y cinco.
+[35.2s] escena → c5.cien
+[35.6s] lee: Para la próxima cosecha les ofrezco dos tratos. El 50 por ciento de 80 palitos, o el 80 por ciento de 50.
+[35.6s] lee: —Por ciento: de cada cien. El 50 % es 50 de cada 100: la mitad.
+[36.2s] elige «El 80 % de 50.» (¿Qué trato le conviene a Peldaño?)
+[36.7s] lee: Cuarenta y cuarenta. Mara, sos tramposa.
+[37.6s] lee: Es la misma cuenta dada vuelta: 50 × 80 ÷ 100. Y el 50 % es multiplicar por un medio: achica.
+[37.6s] escena → c5.diagonal
+[38.6s] lee: Mi huerta nueva es cuadrada: de lado, una barra justa. Quiero un camino en diagonal. ¿Cuántas barras mide?
+[40.4s] elige «Medir en mitades del lado.» (¿En cuántas partes partís el lado para medir la diagonal? (prueba 1 de 3))
+[42.5s] elige «Medir en tercios del lado.» (¿En cuántas partes partís el lado para medir la diagonal? (prueba 2 de 3))
+[44.7s] elige «Medir en quintos del lado.» (¿En cuántas partes partís el lado para medir la diagonal? (prueba 3 de 3))
+[46.8s] elige «Hasta ahora ninguna. Quizás no haya ninguna.» (¿Habrá alguna partición del lado que mida la diagonal justo?)
+[47.2s] lee: —Ojo, Punto: un tercio de barra, en décimos, tampoco cierra: 0,3; 0,33; 0,333… Y en tercios entra justo.
+[47.3s] lee: Así que no cerrar en décimos no prueba nada. Lo raro de la diagonal es que tampoco entró en ninguna de las otras.
+[47.4s] lee: Que ninguna, nunca, entre justo, se puede probar. Lo voy a necesitar cuando dibujemos cuadrados.
+[47.5s] lee: —Con la raya ondulada: "más o menos". Lo exacto no lo sé escribir todavía.
+[47.5s] lee: Más o menos me alcanza para el camino. Pero, ¿cómo se anota un número que no sé cuánto vale?
+[47.8s] escena → c6.caja
+[48.5s] {"ended":true,"final":{"mode":"play","seg":"c6.caja"},"journal":["Partes de algo"],"evidenceKinds":["share-two","unit-half","cut-uneven","cut","share-bars","equiv-predict","equiv","equiv-transfer","equiv-names","line-partition","place-frac","predict-54","density","between","compare-unit","common-partition","compare-result","add-partition","add","store-half","read-205","decimal","percent-predict","percent","diag-try","diag-predict","diag"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":48.521,"size":"1600x900","touch":false,"route":"errores","watch":false}

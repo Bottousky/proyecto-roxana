@@ -1,0 +1,29 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c5.medio"
+  },
+  "journal": [
+    "Veces"
+  ],
+  "evidenceKinds": [
+    "share-zero",
+    "zero-bag",
+    "measure-zero",
+    "times-zero",
+    "predict-split",
+    "cut",
+    "distributive-transfer"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 16.191,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}

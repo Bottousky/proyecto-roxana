@@ -19,8 +19,13 @@ const route = val('route', 'errores');
 const watch = opt('watch');
 await mkdir(out, {recursive: true});
 
-const port = 4300 + Math.floor(Math.random() * 300);
-const server = await startServer(port);
+// puerto al azar; si está ocupado (otra partida, otra sesión), se prueba otro
+let port, server;
+for (let k = 0; k < 8 && !server; k++) {
+  port = 4300 + Math.floor(Math.random() * 600);
+  server = await startServer(port).catch(() => null);
+}
+if (!server) throw new Error('no hay puerto libre para el servidor de la partida');
 const browser = await chromium.launch({channel: 'chrome'});
 const context = await browser.newContext({
   viewport: {width: W, height: H}, deviceScaleFactor: 1, hasTouch: opt('touch'), isMobile: opt('touch') && W < 900,
@@ -191,6 +196,8 @@ function pickChoice(prompt, options) {
     ['4 pares de botas', '10: seis'],
     ['el 7 o el 12', 'El 12'],
     ['hace que la Marea borre', 'Sí: van juntos'],
+    ['tercios y los cuartos', 'Partir las dos barras en 6', 'Partir las dos barras en 7', 'Partir las dos barras en 12'],
+    ['la mitad y el tercio', 'Partir las dos barras en 5', 'Partir las dos barras en 6'],
     ['siguen cayendo juntos con Punto en el 8', 'Sumar 3 sólo', 'Restar 3', 'Sumar 3 a los dos'],
     ['El signo queda igual', 'dejar el', 'dar vuelta'],
     ['Elegí qué hacerle a la cuenta', 'Restar 7', 'Dividir por 2 sólo', 'Deshacer', 'Restar 1 a', 'Dividir los dos lados por 2'],
@@ -309,6 +316,8 @@ function pickChoice(prompt, options) {
     ['4 pares de botas', '24'],
     ['el 7 o el 12', 'El 7 sale'],
     ['hace que la Marea borre', 'No se sabe'],
+    ['tercios y los cuartos', 'Partir las dos barras en 12'],
+    ['la mitad y el tercio', 'Partir las dos barras en 6'],
     ['siguen cayendo juntos con Punto en el 8', 'Sumar 3 a los dos'],
     ['El signo queda igual', 'dar vuelta'],
     ['Elegí qué hacerle a la cuenta', 'Dividir los dos lados por 2', 'Restar un medio'],

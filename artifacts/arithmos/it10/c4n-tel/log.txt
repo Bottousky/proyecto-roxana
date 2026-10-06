@@ -1,0 +1,27 @@
+[0.0s] escena → c4.nadie
+[1.0s] lee: Estos seis atados los guardo para repartir en la próxima cosecha.
+[1.1s] lee: ¿Y si para entonces las Terrazas quedan vacías, como la escalera que se llevaba la Marea? ¿A quién le tocan?
+[1.7s] elige «No hay a quién darle: la pregunta no tiene respuesta.» (Seis atados repartidos entre cero familias. ¿Cuánto le toca a cada una?)
+[1.9s] lee: No hay primera familia: el reparto no empieza nunca.
+[2.0s] lee: ¿Y en bolsas donde no entra nada? ¿Cuántas se llenan con seis atados?
+[3.1s] lee: Una bolsa, y el montón sigue igual: seis.
+[3.6s] elige «Ninguna cantidad alcanza: no se termina nunca.» (¿Cuántas bolsas de cero hacen falta para guardar los seis atados?)
+[3.8s] lee: Cada bolsa se lleva cero. Nunca se termina.
+[3.9s] lee: —Doce dividido tres era cuatro porque cuatro por tres es doce. Entonces, ¿qué número por cero da seis?
+[4.4s] elige «Ninguno: todo por cero da cero.» (¿Qué número por 0 da 6?)
+[5.5s] lee: Todo por cero da cero. Ninguno da seis.
+[5.6s] lee: Ni cero ni infinito: la pregunta no tiene respuesta.
+[5.7s] lee: Entonces eso no lo anoto. Ni cero, ni nada: no se reparte entre nadie.
+[5.7s] escena → c4.partir
+[6.8s] lee: El plano de mi huerta: cuatro filas de cinco. Le quiero dar una parte a Balcón, cortando entre dos columnas.
+[7.4s] elige «No: siempre son las mismas plantas.» (Después de cortar, sumando las dos partes, ¿cambia el total?)
+[10.0s] lee: ¿Y cortando en otro lugar?
+[13.0s] lee: Veinte las dos veces. Se reparten distinto, pero son las mismas plantas.
+[14.7s] lee: Mi otra huerta, la del fondo, es de cuatro filas de trece. ¿Cuántas plantas son?
+[15.3s] elige «52» (¿Cuánto es 4 × 13?)
+[15.5s] lee: Cuarenta y doce.
+[15.6s] lee: Mara… ¿y los dos atados que sobraron de la cosecha? Somos cuatro familias.
+[15.6s] lee: Partirlos… Un pedazo de atado. Eso no lo anoté nunca.
+[15.9s] lee: Punto mira la rajadura como si fuera una puerta.
+[16.0s] escena → c5.medio
+[16.2s] {"ended":true,"final":{"mode":"play","seg":"c5.medio"},"journal":["Veces"],"evidenceKinds":["share-zero","zero-bag","measure-zero","times-zero","predict-split","cut","distributive-transfer"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":16.191,"size":"844x390","touch":true,"route":"directa","watch":false}

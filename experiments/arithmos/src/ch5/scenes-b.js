@@ -29,11 +29,10 @@ function boardCast(g) {
 }
 
 /** Palabras para elegir una partición; devuelve el número elegido. */
-function pickPartition(d, g, list, hint) {
-  return d.interact(ctl => new Promise(resolve => {
-    g.setHint(() => [hint]);
-    g.ui.setSpots(list.map((n, i) => wordSpot(`part-${n}`, `partir en ${n}`, BOARD.x - 150 + i * 150, boardTop() - 34, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(n); } }, {label: `Partir las dos barras en ${n} partes iguales`})));
-  }));
+// la partición se elige en el panel de opciones: en el teléfono, los botones en fila se pisaban
+async function pickPartition(d, g, list, hint) {
+  const id = await d.choose(list.map(n => ({id: String(n), text: `Partir las dos barras en ${n}.`})), {prompt: hint});
+  return Number(id);
 }
 
 /** Punto borra lo que escribió y lo vuelve a escribir. */
@@ -455,25 +454,13 @@ export const diagonal = {
       d.evidence('diag-try', {d: part.n, lo: m.parts, exact: m.exact});
       return m;
     };
-    await d.interact(ctl => new Promise(resolve => {
-      let busy = false;
-      g.setHint(() => ['Elegí en cuántas partes partir el lado para medir la diagonal. Probá varias.']);
-      const refresh = () => {
-        const left = PARTS.filter(pt => !tried.includes(pt.n));
-        g.ui.setSpots(left.map((pt, i) => wordSpot(`dgp-${pt.n}`, `en ${pt.name}`, BOARD.x - 250 + (i % 3) * 170, top - 92 + Math.floor(i / 3) * 60, () => go(pt), {label: `Medir la diagonal en ${pt.name} del lado`})));
-      };
-      const go = async pt => {
-        if (busy || !ctl.alive()) return;
-        busy = true;
-        g.ui.setSpots([]);
-        tried.push(pt.n);
-        try { await measure(pt); } catch { return; }
-        busy = false;
-        if (tried.length >= 3) resolve();
-        else refresh();
-      };
-      refresh();
-    }));
+    while (tried.length < 3) {
+      const left = PARTS.filter(pt => !tried.includes(pt.n));
+      const id = await d.choose(left.map(pt => ({id: String(pt.n), text: `Medir en ${pt.name} del lado.`})), {prompt: `¿En cuántas partes partís el lado para medir la diagonal? (prueba ${tried.length + 1} de 3)`});
+      const pt = PARTS.find(x => String(x.n) === id);
+      tried.push(pt.n);
+      await measure(pt);
+    }
     g.setHint(null);
     const c = await d.choose([
       {id: 'finer', text: 'Sí: con alguna partición más fina, va a entrar justo.'},
