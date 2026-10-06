@@ -50,25 +50,14 @@ export function buildSchool(){
 
 // ── Land ────────────────────────────────────────────────────────────────────────
 function island(k){
+  // The school's lawn: a raised terrace on open land (landscape.js builds the country
+  // around it). The paths and patio sit a few centimetres above the grass.
   const out=roundedRect(ISLAND.w,ISLAND.d,ISLAND.r),n=out.length;
-  // Grass top as a fan; the paths and patio sit a few centimetres above it.
   for(let i=0;i<n;i++){const a=out[i],b=out[(i+1)%n];k.tri('ground','grass',[0,0,0],[b[0],0,b[1]],[a[0],0,a[1]],{ao:false});}
-  // A turf lip, then soil strata tapering into a rocky underside.
-  const rings=[[0,1,0],[-.35,1,0],[-2.6,.99,.3],[-5.2,.93,.7],[-8,.8,1.2],[-11,.58,1.6],[-13.5,.3,1.8],[-15,.1,1]];
-  for(let r=0;r<rings.length-1;r++){
-    const [y0,s0,j0]=rings[r],[y1,s1,j1]=rings[r+1],mat=r===0?'turf':'earth',shade=1-r*.09;
-    for(let i=0;i<n;i++){
-      const i2=(i+1)%n,P=(idx,ring,y,s,j)=>{const p=out[idx],w=1+(noise(idx,ring)-.5)*j*.08;return [p[0]*s*w,y+(noise(idx,ring+9)-.5)*j,p[1]*s*w];};
-      const a=P(i,r,y0,s0,j0),b=P(i2,r,y0,s0,j0),c=P(i2,r+1,y1,s1,j1),d=P(i,r+1,y1,s1,j1);
-      k.facingQuad('ground',mat,a,d,c,b,[(out[i][0]+out[i2][0]),0,(out[i][1]+out[i2][1])],{ao:false,tone:r===0?[1,1,1]:[shade,shade*.97,shade*.95]});
-    }
-  }
-  const last=rings.at(-1),L=rings.length-1,E=idx=>{const p=out[idx],w=1+(noise(idx,L)-.5)*last[2]*.08;return [p[0]*last[1]*w,last[0]+(noise(idx,L+9)-.5)*last[2],p[1]*last[1]*w];};
-  for(let i=0;i<n;i++)k.facing('ground','earth',[0,last[0]-2.5,0],E(i),E((i+1)%n),[0,-1,0],{ao:false,tone:[.6,.58,.56]});
-  // Boulders breaking out of the strata.
-  for(let i=0;i<26;i++){
-    const p=out[Math.floor(noise(i,3)*n)],y=-2.5-noise(i,6)*7,s=(y>-5.2?.95:y>-8?.84:.7)-.02;
-    k.lathe('ground','stoneDark',[[0,0],[1.1,.2],[1.3,1],[.8,1.8],[0,2.1]],{x:p[0]*s,y,z:p[1]*s,seg:6,sx:1+noise(i,7),sz:1+noise(i,8)*.6,phase:noise(i,9),tone:[.9,.88,.86]});
+  // A turf lip down to the surrounding land, so the terrace edge reads as a low bank.
+  for(let i=0;i<n;i++){
+    const i2=(i+1)%n,P=(idx,y,grow)=>{const p=out[idx],l=Math.hypot(p[0],p[1])||1;return [p[0]+p[0]/l*grow,y,p[1]+p[1]/l*grow];};
+    k.facingQuad('ground','turf',P(i,0,0),P(i,-.62,.5),P(i2,-.62,.5),P(i2,0,0),[(out[i][0]+out[i2][0]),0,(out[i][1]+out[i2][1])],{ao:false,tone:[.9,.92,.86]});
   }
 }
 

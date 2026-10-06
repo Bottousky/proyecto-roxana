@@ -15,7 +15,7 @@ export const ROOMS={
   anfiteatro:{name:'Anfiteatro',short:'Anfiteatro',eyebrow:'Cinemáticas y videos',anchor:[27,9.2,-26.5],pick:[[15,0,-29],[39,8,-13]],
     pose:{target:[27,3.4,-23.5],yaw:-4,pitch:22,distance:45}},
 };
-export const OVERVIEW={target:[0,-2,1],yaw:0,pitch:40,distance:200};
+export const OVERVIEW={target:[0,3.5,-3],yaw:32,pitch:20,distance:108};
 export const ROOM_ORDER=['direccion','electronica','fisica','programacion','matematica','trofeos','anfiteatro','patio'];
 export const TALLER_ROOMS=['electronica','fisica','programacion','matematica'];
 

@@ -4,10 +4,11 @@
 // switches on what each restoration returned: light, water, flowers, the tower lamp.
 import {Application,Entity,StandardMaterial,Color,Vec3,Quat,Mesh,MeshInstance,CameraFrame,Curve,CurveSet,Texture,
   FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,TONEMAP_ACES,BLEND_NORMAL,BLEND_ADDITIVE,CULLFACE_NONE,CULLFACE_FRONT,
-  EMITTERSHAPE_BOX,EMITTERSHAPE_SPHERE,EnvLighting,TEXTUREPROJECTION_EQUIRECT,SHADOW_PCF5_16F,SSAOTYPE_LIGHTING,SSAOTYPE_NONE,PIXELFORMAT_RGBA8,FILTER_LINEAR,ADDRESS_CLAMP_TO_EDGE} from 'playcanvas';
+  EMITTERSHAPE_BOX,EMITTERSHAPE_SPHERE,EnvLighting,FOG_LINEAR,TEXTUREPROJECTION_EQUIRECT,SHADOW_PCF5_16F,SSAOTYPE_LIGHTING,SSAOTYPE_NONE,PIXELFORMAT_RGBA8,FILTER_LINEAR,ADDRESS_CLAMP_TO_EDGE} from 'playcanvas';
 import {buildSchool,BUILDINGS,TOWER,LAMPS,STANDS,FOUNTAIN,AMPHI,ISLAND,TALLERES,WORLD_ORDER} from './school.js';
 import {makeWorldPortal,PORTAL_COLORS} from './portalfx.js';
 import {loadStatueGlb,statueEntity} from './statue.js';
+import {buildLandscape} from './landscape.js';
 const statueUrl=import.meta.env.BASE_URL+'escuela/modelos/roxana-estatua.glb';
 import {grain,meadow,tree,glow,earth,sign,dynamicCanvas,marble} from './textures.js';
 import {makeWater,updateWater,bindShore} from '../water.js';
@@ -66,7 +67,7 @@ export class SchoolDiorama {
     const f=this.frame=new CameraFrame(this.app,this.camera.camera);
     f.rendering.toneMapping=TONEMAP_ACES;f.rendering.samples=this.quality==='high'?4:1;
     f.bloom.intensity=.022;f.bloom.blurLevel=14;
-    f.vignette.intensity=.38;f.vignette.inner=.55;f.vignette.outer=1.4;f.vignette.curvature=.6;
+    f.vignette.intensity=.24;f.vignette.inner=.55;f.vignette.outer=1.4;f.vignette.curvature=.6;
     f.colorEnhance.enabled=true;f.colorEnhance.vibrance=.14;f.colorEnhance.shadows=.1;f.colorEnhance.highlights=-.05;
     f.grading.enabled=true;
     if(this.quality==='high'){f.ssao.type=SSAOTYPE_LIGHTING;f.ssao.intensity=.45;f.ssao.radius=12;f.ssao.samples=12;f.ssao.blurEnabled=true;}
@@ -92,6 +93,8 @@ export class SchoolDiorama {
       for(const part of ['statue','statue:flame'])this.parts.get(part).enabled=false;}catch(error){console.warn('Estatua esculpida no disponible:',error.message);}
     onProgress(.6,'Plantando árboles');
     await this.buildTrees();this.buildSky();this.buildClouds();
+    this.landscape=buildLandscape(app,this.root,{meadow:this.materials.grass.diffuseMap,trees:this.treeMaterials});
+    app.scene.fog.type=FOG_LINEAR;app.scene.fog.start=165;app.scene.fog.end=410;
     onProgress(.75,'Encendiendo la escuela');
     this.buildLights();this.buildParticles();this.buildHighlight();this.buildBeam();
     onProgress(.88,'Llegan los habitantes');
@@ -397,11 +400,12 @@ export class SchoolDiorama {
     this.skyMesh.setColors(cols);this.skyMesh.update();
   }
   buildClouds(){
-    this.clouds=[];const m=new StandardMaterial();m.useLighting=false;m.diffuse=col('#000000');m.emissive=col('#ffffff');m.emissiveMap=this.glowTexture;m.opacityMap=this.glowTexture;m.opacity=.42;m.blendType=BLEND_NORMAL;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update();m.noShadow=true;this.cloudMaterial=m;
-    for(let i=0;i<14;i++){
-      const a=i/14*Math.PI*2+Math.sin(i*3)*.25,r=62+((i*37)%30),y=-24-(i%4)*5,s=22+(i*13)%16;
+    // High, slow banks of cloud over the far country; the haze softens them at the horizon.
+    this.clouds=[];const m=new StandardMaterial();m.useLighting=false;m.useFog=false;m.diffuse=col('#000000');m.emissive=col('#ffffff');m.emissiveMap=this.glowTexture;m.opacityMap=this.glowTexture;m.opacity=.5;m.blendType=BLEND_NORMAL;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update();m.noShadow=true;this.cloudMaterial=m;
+    for(let i=0;i<16;i++){
+      const a=i/16*Math.PI*2+Math.sin(i*3)*.25,r=430+((i*137)%260),y=95+(i%5)*26,s=90+(i*53)%80;
       const e=new Entity('Nube');const mi=new MeshInstance(this.quadMesh(s*2.2,s),m,e);mi.castShadow=false;mi.receiveShadow=false;e.addComponent('render',{meshInstances:[mi]});
-      e.setPosition(Math.cos(a)*r,y,Math.sin(a)*r*.8);this.root.addChild(e);this.clouds.push({e,a,r,y,speed:.004+(i%5)*.0015});
+      e.setPosition(Math.cos(a)*r,y,Math.sin(a)*r*.8);this.root.addChild(e);this.clouds.push({e,a,r,y,speed:.0012+(i%5)*.0005});
     }
   }
   buildLights(){
@@ -532,8 +536,8 @@ export class SchoolDiorama {
     const r=this.canvas.getBoundingClientRect(),aspect=r.width/Math.max(1,r.height),cam=this.camera.camera;
     // Portrait screens widen the lens and step back so the whole island fits across.
     const fov=aspect<1?Math.min(40,24/Math.max(aspect,.5)*.8):24;if(Math.abs(cam.fov-fov)>.01)cam.fov=fov;
-    const tanH=Math.tan(fov*Math.PI/360),fit=this.focusId||this.closeUp?(aspect<1?1.25:1):Math.max(1,50/(tanH*aspect*c.distance));
-    const yaw=(c.yaw+drift)*Math.PI/180,p=(c.pitch+(!this.focusId&&!this.closeUp&&aspect<1?14:0))*Math.PI/180,d=c.distance*fit;
+    const tanH=Math.tan(fov*Math.PI/360),fit=this.focusId||this.closeUp?(aspect<1?1.25:1):Math.max(1,(aspect<1?34:50)/(tanH*aspect*c.distance));
+    const yaw=(c.yaw+drift)*Math.PI/180,p=(c.pitch+(!this.focusId&&!this.closeUp&&aspect<1?8:0))*Math.PI/180,d=c.distance*fit;
     this.shift=lerp(this.shift||0,this.panelShift||0,k);this.shiftY=lerp(this.shiftY||0,this.panelShiftY||0,k);
     const sx=this.shift*tanH*d*aspect,sy=this.shiftY*tanH*d;
     // Move the look point right (panel on the side) or down (panel below) so the room sits in the free area.
@@ -556,6 +560,8 @@ export class SchoolDiorama {
     this.app.scene.ambientLight=c('ambient');this.camera.camera.clearColor=linear(c('below'));
     this.paintSky(c('zenith'),c('horizon'),c('below'));
     this.cloudMaterial.emissive=c('cloud');this.cloudMaterial.update();
+    // Haze toward the horizon colour turns the far hills blue and the night ones into silhouettes.
+    const night=lerp(a.lamps,b.lamps,t);this.app.scene.fog.color=mixColor(c('horizon'),col('#fff8ec'),.42*(1-clamp((night-.6)/.4,0,1)));
     this.skyColors={zenith:c('zenith'),horizon:c('horizon')};
     if(m.t>=1){this.hourMix=null;this.buildEnvironment(b);}this.stageDirty=true;
   }
@@ -609,7 +615,7 @@ export class SchoolDiorama {
     const banners=this.parts.get('banners');if(banners){banners.enabled=L(6)>.01;banners.setLocalScale(1,Math.max(.01,ease(L(6))),1);banners.setLocalPosition(0,4.85*(1-ease(L(6))),0);}
     // 8 beacon_network: the bell swings (see update). 9 beacon_lens: the lantern.
     const lantern=this.materials.lanternGlass;lantern.emissiveIntensity=L(8)*(1.6+night*3);lantern.update();
-    this.rooms.lantern.light.intensity=L(8)*(.6+night*1.4);this.beam.m.opacity=L(8)*Math.max(0,night-.4)*.22*(1-(this.focusFade||0));this.beam.m.update();this.beam.pivot.enabled=L(8)>.01;
+    this.rooms.lantern.light.intensity=L(8)*(.6+night*1.4);this.beam.m.opacity=L(8)*clamp((night-.75)/.25,0,1)*.2*(1-(this.focusFade||0));this.beam.m.update();this.beam.pivot.enabled=L(8)>.01;
     this.fx.lantern.particlesystem.enabled=L(8)>.5;
     // Roxana's lamp burns from the first light; the screen glows with the evening.
     const flame=this.materials.flame;flame.emissiveIntensity=.4+L(0)*1.4+night*1.2;flame.update();

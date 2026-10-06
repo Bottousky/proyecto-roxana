@@ -110,7 +110,7 @@ export function ohmdalSummary(state){
 }
 
 // The student's own record at the school: separate from any world save.
-export function freshProfile(){return {version:1,name:'',crest:'omega',createdAt:Date.now(),rooms:[],watched:[],stageSeen:0,welcomed:false,settings:{muted:true,reducedMotion:false,quality:'high'}};}
+export function freshProfile(){return {version:1,name:'',crest:'omega',createdAt:Date.now(),rooms:[],watched:[],stageSeen:0,welcomed:false,newsSeen:null,settings:{muted:true,reducedMotion:false,quality:'high'}};}
 export function readProfile(storage=globalThis.localStorage){
   const base=freshProfile();
   try{const data=JSON.parse(storage?.getItem(SCHOOL_KEY)||'null');if(!data||data.version!==1)return base;
@@ -119,6 +119,7 @@ export function readProfile(storage=globalThis.localStorage){
       rooms:Array.isArray(data.rooms)?[...new Set(data.rooms.filter(x=>typeof x==='string'))]:[],
       watched:Array.isArray(data.watched)?[...new Set(data.watched.filter(x=>typeof x==='string'))]:[],
       stageSeen:Number.isInteger(data.stageSeen)&&data.stageSeen>=0?Math.min(10,data.stageSeen):0,welcomed:data.welcomed===true,
+      newsSeen:/^\d{4}-\d{2}-\d{2}$/.test(data.newsSeen||'')?data.newsSeen:null,
       settings:{...base.settings,...(data.settings&&typeof data.settings==='object'?{muted:data.settings.muted!==false,reducedMotion:data.settings.reducedMotion===true,quality:data.settings.quality==='low'?'low':'high'}:{})}};
   }catch{return base;}
 }

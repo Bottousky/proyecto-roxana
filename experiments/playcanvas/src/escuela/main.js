@@ -6,6 +6,8 @@ import {RESTORATIONS,WORLDS,worldByRoom,readOhmdal,schoolStage,previewState,trop
 import {SAVE_KEY,validateState} from '../game/state.js';
 import {CHANNEL,EXPLICACIONES,ANIMACIONES,CINEMATIC_FILES} from './videos.js';
 import {Ambience} from './ambience.js';
+import {loadNews,renderNews,unreadCount} from './news.js';
+import {renderCommunity} from './social.js';
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -31,14 +33,15 @@ let profile=readProfile();
 let save=previewStage!==null?previewState(previewStage):readOhmdal();
 const settings=profile.settings;
 
-document.querySelector('#escuela').innerHTML=`
-  <canvas id="diorama" aria-label="Diorama del Instituto Roxana. Tocá un edificio para entrar." tabindex="0"></canvas>
+document.querySelector('#escuela').insertAdjacentHTML('afterbegin',`
+  <canvas id="diorama" aria-label="Campus del Instituto Roxana en 3D. Tocá un edificio para acercarte; el directorio de abajo lleva a cada sala." tabindex="0"></canvas>
   <div id="labels" class="labels" aria-hidden="true"></div>
   <div id="letterbox" class="letterbox" aria-hidden="true"><i></i><i></i></div>
-  <header class="brand" aria-label="Instituto Roxana">
-    <button id="home" class="crest" title="Vista general" aria-label="Volver a la vista general">Ω</button>
-    <div><h1>Instituto Roxana</h1><p>Escuela de Mundos Aplicados</p></div>
-  </header>
+  <div class="brand" role="group" aria-label="Instituto Roxana">
+    <button id="home" class="crest" title="Vista general" aria-label="Volver a la vista general del Instituto">Ω</button>
+    <div><p class="brand-name">Instituto Roxana</p><p class="brand-sub">Escuela de Mundos Aplicados</p></div>
+    <a class="brand-cta" id="brand-cta" href="./index.html">Entrar a Ohmdal</a>
+  </div>
   <nav class="tools" aria-label="Ambiente">
     <div class="hours" role="radiogroup" aria-label="Hora del día">
       ${Object.entries(HOURS).map(([id,h])=>`<button role="radio" data-hour="${id}" aria-label="${h.label}" title="${h.label}">${svg(id==='manana'?'sun':id==='tarde'?'dusk':'moon')}</button>`).join('')}
@@ -61,14 +64,19 @@ document.querySelector('#escuela').innerHTML=`
   </footer>
   <aside id="panel" class="panel" aria-hidden="true" tabindex="-1"><div class="panel-inner" id="panel-inner"></div></aside>
   <div id="caption" class="caption" aria-live="polite"></div>
-  <div id="news" class="news hidden" role="dialog" aria-labelledby="news-title"></div>
-  <div id="loading" class="loading"><div class="loading-sigil">Ω</div><p id="loading-text">Abriendo el Instituto</p><div class="loading-bar"><i id="loading-bar"></i></div></div>
+  <div id="changes" class="changes hidden" role="dialog" aria-labelledby="changes-title"></div>
+  <section id="light" class="light-worlds hidden" aria-label="Mundos Aplicados"></section>
   <div id="portal-flash" class="portal-flash"></div>
-  <div id="toast" class="toast" role="status"></div>`;
+  <div id="toast" class="toast" role="status"></div>`);
 
 const canvas=$('#diorama');
 const ambience=new Ambience();
-const diorama=new SchoolDiorama(canvas,{quality:settings.quality,reducedMotion:settings.reducedMotion||matchMedia('(prefers-reduced-motion: reduce)').matches});
+// Without WebGL the home still works as a designed page: a quiet stand-in answers the
+// diorama's calls and the light version lists the worlds, news and Roxana.
+function quietDiorama(){const state={quiet:true,focusId:null,hoverId:null,hourId:'tarde',screen:null};return new Proxy(state,{get:(t,k)=>k in t?t[k]:()=>{},set:(t,k,v)=>{t[k]=v;return true;}});}
+let diorama;
+try{diorama=new SchoolDiorama(canvas,{quality:settings.quality,reducedMotion:settings.reducedMotion||matchMedia('(prefers-reduced-motion: reduce)').matches});}
+catch(err){console.warn('Campus 3D no disponible:',err.message);diorama=quietDiorama();}
 diorama.hourId=params.get('hora')&&HOURS[params.get('hora')]?params.get('hora'):hourFor();
 
 // ── Labels over the buildings ───────────────────────────────────────────────────
@@ -93,26 +101,34 @@ diorama.onSelect=id=>{if(document.body.classList.contains('showcasing'))return;i
 
 // ── Rooms ───────────────────────────────────────────────────────────────────────
 function openRoom(id){
+  if(id==='sobre')id='patio';
+  if(id==='novedades')return openNews();
   if(!ROOMS[id])return;
+  explore();
   if(diorama.focusId!==id)ambience.chime();ambience.set({room:TALLER_ROOMS.includes(id)?(worldByRoom(id).available?'taller':'dormant'):id});
   diorama.focus(id);document.body.classList.add('room-open');diorama.panelShift=panelFraction();diorama.panelShiftY=innerWidth>820?0:.6;
   document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.room===id)));
-  const panel=$('#panel');panel.dataset.room=id;panel.setAttribute('aria-hidden','false');
+  const panel=$('#panel');if(!panel.dataset.room)opener=document.activeElement;panel.dataset.room=id;panel.setAttribute('aria-hidden','false');
   $('#panel-inner').innerHTML=`<header class="panel-head"><button class="panel-back" id="panel-back" aria-label="Volver al Instituto">${svg('back')}<span>Instituto</span></button><span class="eyebrow">${esc(ROOMS[id].eyebrow)}</span><h2>${esc(ROOMS[id].name)}</h2></header><div class="panel-body">${renderRoom(id)}</div>`;
   $('#panel-back').addEventListener('click',closeRoom);bindRoom(id);
   if(!profile.rooms.includes(id)){profile.rooms.push(id);persistProfile();}
-  history.replaceState(null,'',`#${id}${location.search?'':''}`);
+  history.replaceState(null,'',`${location.pathname}${location.search}#${id==='patio'?'sobre':id}`);
   requestAnimationFrame(()=>panel.focus({preventScroll:true}));
 }
-function closeRoom(){
-  stopPlayback();ambience.set({room:null});diorama.focus(null);document.body.classList.remove('room-open');diorama.panelShift=0;diorama.panelShiftY=0;
-  $('#panel').setAttribute('aria-hidden','true');document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current','false'));
-  history.replaceState(null,'',location.pathname+location.search);canvas.focus({preventScroll:true});
+let opener=null;
+function closeRoom({intro=false}={}){
+  const was=opener;opener=null;
+  stopPlayback();ambience.set({room:null});diorama.focus(null);document.body.classList.remove('room-open');
+  $('#panel').setAttribute('aria-hidden','true');delete $('#panel').dataset.room;document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current','false'));
+  history.replaceState(null,'',location.pathname+location.search);
+  if(intro)showIntro();else{diorama.panelShift=0;diorama.panelShiftY=0;}
+  // Focus returns to what opened the panel, or to the campus.
+  const back=was&&was.isConnected&&was!==document.body&&!was.closest('#panel')?was:document.body.classList.contains('light')?$('#cta-play'):canvas;back.focus({preventScroll:true});
 }
 function panelFraction(){return innerWidth>820?Math.min(440,innerWidth*.38)/innerWidth:0;}
 addEventListener('resize',()=>{if(diorama.focusId)diorama.panelShift=panelFraction();diorama.panelShiftY=innerWidth>820?0:.6;});
 function renderRoom(id){return TALLER_ROOMS.includes(id)?renderTaller(id):({direccion:renderDireccion,trofeos:renderTrofeos,anfiteatro:renderAnfiteatro,patio:renderPatio}[id])();}
-function bindRoom(id){if(TALLER_ROOMS.includes(id))return bindTaller(id);({direccion:bindDireccion,trofeos:bindTrofeos,anfiteatro:bindAnfiteatro,patio:()=>{}}[id])();}
+function bindRoom(id){if(TALLER_ROOMS.includes(id))return bindTaller(id);if(id==='novedades')return;({direccion:bindDireccion,trofeos:bindTrofeos,anfiteatro:bindAnfiteatro,patio:()=>{}}[id])();}
 
 const fmtDate=t=>t?new Date(t).toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'}):'—';
 const fmtTime=s=>{const m=Math.floor((s||0)/60);return m<60?`${m} min`:`${Math.floor(m/60)} h ${m%60} min`;};
@@ -274,10 +290,11 @@ function stopPlayback(){clearTimeout(storyTimer);const v=$('#film');if(v){v.paus
 
 function renderPatio(){
   const stage=schoolStage(save);
-  return `<p class="lead">Roxana es una antigua escuela técnica que enseñaba mediante los Mundos Aplicados: lugares donde comprender una disciplina permite intervenir sobre consecuencias reales.</p>
+  return `<p class="eyebrow">Sobre Roxana</p><p class="lead">Roxana es una antigua escuela técnica que enseñaba mediante los Mundos Aplicados: lugares donde comprender una disciplina permite intervenir sobre consecuencias reales.</p>
   <p>La directora fundadora del programa permanece en la memoria de la escuela a través de esta estatua, documentos y relatos incompletos. Mira hacia el portón y sostiene un libro cerrado contra el pecho.</p>
   <section class="card"><span class="eyebrow">La escuela recupera su luz</span><b class="big">${stage} de ${RESTORATIONS.length*WORLDS.length}</b><div class="progress"><i style="width:${stage/(RESTORATIONS.length*WORLDS.length)*100}%"></i></div><p class="meta">Cada restauración en un Mundo Aplicado devuelve algo al Instituto. Hoy está abierto el portal de Ohmdal; Physica, Bitland y Arithmos esperan en sus talleres.</p></section>
-  <p class="meta">Quién fue Roxana, qué es realmente la Bitácora y qué relación tuvo el Instituto con cada mundo son preguntas que la escuela todavía conserva.</p>`;
+  <p class="meta">Quién fue Roxana, qué es realmente la Bitácora y qué relación tuvo el Instituto con cada mundo son preguntas que la escuela todavía conserva.</p>
+  ${renderCommunity()}`;
 }
 
 // ── Progress, meter, news ──────────────────────────────────────────────────────
@@ -289,7 +306,7 @@ function refreshProgress({instant=false}={}){
   if(previewStage!==null)$('#preview-banner').innerHTML=`Vista previa · etapa ${previewStage}. <a href="${location.pathname}">Volver a mi partida</a>`;
   refreshGreeting();
 }
-function refreshGreeting(){$('.brand p').textContent=profile.name?`Registro de ${profile.name}`:'Escuela de Mundos Aplicados';}
+function refreshGreeting(){$('.brand-sub').textContent=profile.name?`Registro de ${profile.name}`:'Escuela de Mundos Aplicados';}
 function persistProfile(){saveProfile(profile);}
 function applySettings(){diorama.setReducedMotion(settings.reducedMotion);diorama.setQuality(settings.quality);$('#opt-motion').checked=settings.reducedMotion;$('#opt-quality').checked=settings.quality==='high';document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);}
 function setSound(on){
@@ -299,20 +316,13 @@ function setSound(on){
 }
 function toast(text){const t=$('#toast');t.textContent=text;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3200);}
 
-/** When the student returns with new restorations, the school shows them one by one. */
-function showWelcome(){
-  const news=$('#news');
-  news.innerHTML=`<span class="eyebrow">Escuela de Mundos Aplicados</span><h2 id="news-title">Bienvenida, bienvenido al Instituto Roxana</h2><p>Tocá un edificio para entrar. Cuatro talleres guardan las entradas a los Mundos Aplicados: Electrónica, Física, Programación y Matemática. Lo que restaures en cada mundo vuelve a encender esta escuela. En la Dirección está tu registro.</p><div class="row-buttons"><button class="primary" id="welcome-explore">Explorar la escuela ${svg('arrow')}</button><button class="quiet" id="welcome-taller">Entrada abierta: Ohmdal</button></div>`;
-  news.classList.remove('hidden');const done=()=>{news.classList.add('hidden');profile.welcomed=true;persistProfile();};
-  $('#welcome-taller').addEventListener('click',()=>{done();openRoom('electronica');});$('#welcome-explore').addEventListener('click',done);
-}
-async function showNews(){
+/** When the student returns with new restorations, the school offers to show them one by one. */
+async function showChanges(){
   const stage=schoolStage(save),seen=previewStage!==null?stage:(profile.stageSeen??0);
-  if(stage===0&&!profile.welcomed&&previewStage===null){diorama.setStage(0,{instant:true});showWelcome();return;}
   if(stage<=seen){diorama.setStage(stage,{instant:true});return;}
   diorama.setStage(seen,{instant:true});
-  const fresh=RESTORATIONS.slice(seen,stage),news=$('#news');
-  news.innerHTML=`<span class="eyebrow">Mientras estabas en Ohmdal</span><h2 id="news-title">Algo cambió en el Instituto</h2><p>${fresh.length===1?'Una restauración volvió a la escuela.':`${fresh.length} restauraciones volvieron a la escuela.`}</p><div class="row-buttons"><button class="primary" id="news-show">Recorrerlas ${svg('arrow')}</button><button class="quiet" id="news-skip">Más tarde</button></div>`;
+  const fresh=RESTORATIONS.slice(seen,stage),news=$('#changes');
+  news.innerHTML=`<span class="eyebrow">Cambió por tu aventura</span><h2 id="changes-title">Algo volvió al Instituto</h2><p>${fresh.length===1?'Una restauración volvió a la escuela.':`${fresh.length} restauraciones volvieron a la escuela.`}</p><div class="row-buttons"><button class="primary" id="news-show">Recorrerlas ${svg('arrow')}</button><button class="quiet" id="news-skip">Más tarde</button></div>`;
   news.classList.remove('hidden');
   const finish=()=>{news.classList.add('hidden');profile.stageSeen=stage;persistProfile();diorama.setStage(stage);};
   $('#news-skip').addEventListener('click',()=>{finish();diorama.setStage(stage,{instant:true});});
@@ -330,7 +340,7 @@ function caption(title,text=''){const c=$('#caption');if(!title){c.classList.rem
 
 // ── Controls ───────────────────────────────────────────────────────────────────
 document.querySelectorAll('.directory button').forEach(b=>b.addEventListener('click',()=>diorama.focusId===b.dataset.room?closeRoom():openRoom(b.dataset.room)));
-$('#home').addEventListener('click',closeRoom);
+$('#home').addEventListener('click',()=>closeRoom({intro:true}));
 document.querySelectorAll('[data-hour]').forEach(b=>b.addEventListener('click',()=>{
   // On narrow screens only the current hour shows: tapping it moves to the next one.
   const ids=Object.keys(HOURS),narrow=innerWidth<=560,next=narrow&&b.dataset.hour===diorama.hourId?ids[(ids.indexOf(diorama.hourId)+1)%ids.length]:b.dataset.hour;
@@ -352,18 +362,77 @@ addEventListener('keydown',e=>{
 // The Ohmdal save may change in another tab: the school follows.
 addEventListener('storage',e=>{if(e.key===SAVE_KEY&&previewStage===null){save=readOhmdal();refreshProgress();}});
 
+// ── Intro, way in, news ────────────────────────────────────────────────────────
+// The intro is plain HTML in escuela.html: identity, one sentence and a way in before
+// any 3D. Once the student looks around, it folds into the compact brand.
+function explore(){
+  if(document.body.classList.contains('exploring'))return;
+  document.body.classList.add('exploring');diorama.panelShift=0;
+  if(!profile.welcomed){profile.welcomed=true;persistProfile();}
+}
+function showIntro(){
+  document.body.classList.remove('exploring');diorama.panelShift=introShift();
+}
+// On wide screens the campus steps right of the intro text.
+function introShift(){return innerWidth>1000&&!document.body.classList.contains('exploring')?-.17:0;}
+function setupWayIn(){
+  const o=ohmdalSummary(previewStage===null?save:null),href=base+'index.html'+(o.started?'#continuar':'');
+  const label=o.started?'Continuar en Ohmdal':'Entrar a Ohmdal';
+  for(const a of [$('#cta-play'),$('#brand-cta')]){a.href=href;}
+  $('#cta-play-label').textContent=label;$('#brand-cta').textContent=o.started?'Continuar':'Entrar a Ohmdal';
+  $('#cta-meta').textContent=o.started?`${o.area?o.area+' · ':''}${o.percent}% del Arco I · ${fmtTime(o.playtime)} de viaje`:'Hoy está abierta la entrada a Ohmdal · La Luz: electricidad, nueve lugares.';
+  // A returning student continues first; the intro line says so.
+  if(o.started){$('#intro-line').textContent='Tu viaje sigue abierto. El Instituto guarda lo que trajiste.';}
+}
+function openNews(){
+  explore();opener=document.activeElement;
+  const panel=$('#panel');panel.dataset.room='novedades';panel.setAttribute('aria-hidden','false');document.body.classList.add('room-open');
+  diorama.focus(null);diorama.panelShift=panelFraction();diorama.panelShiftY=innerWidth>820?0:.6;
+  document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current','false'));
+  $('#panel-inner').innerHTML=`<header class="panel-head"><button class="panel-back" id="panel-back" aria-label="Volver al Instituto">${svg('back')}<span>Instituto</span></button><span class="eyebrow">Del Instituto</span><h2>Novedades</h2></header><div class="panel-body" id="news-body" aria-busy="true"><p class="meta">Cargando novedades…</p></div>`;
+  $('#panel-back').addEventListener('click',()=>closeRoom());
+  history.replaceState(null,'',`${location.pathname}${location.search}#novedades`);
+  requestAnimationFrame(()=>panel.focus({preventScroll:true}));
+  loadNews(base).then(result=>{
+    const body=$('#news-body');if(!body)return;body.removeAttribute('aria-busy');body.innerHTML=renderNews(result,{dev:import.meta.env.DEV});
+    if(result.items.length){profile.newsSeen=result.items[0].date;persistProfile();markUnread(0);}
+  });
+}
+function markUnread(n){const a=$('#link-news');a.dataset.unread=n?String(n):'';a.setAttribute('aria-label',n?`Novedades (${n} sin leer)`:'Novedades');}
+function route(){
+  const hash=decodeURIComponent(location.hash.slice(1));
+  if(hash==='novedades')openNews();else if(hash==='sobre'||ROOMS[hash])openRoom(hash);
+}
+document.querySelectorAll('.intro-links a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRoom(a.getAttribute('href').slice(1));}));
+addEventListener('hashchange',route);
+$('#cta-explore').addEventListener('click',()=>{explore();canvas.focus({preventScroll:true});toast('Tocá un edificio para acercarte. El directorio de abajo lleva a cada sala.');});
+canvas.addEventListener('pointerdown',()=>explore(),{passive:true});
+addEventListener('resize',()=>{if(!diorama.focusId)diorama.panelShift=introShift();});
+
+// The light version: the same home without 3D (no WebGL, failed load).
+function lightVersion(reason){
+  document.body.classList.add('light');canvas.hidden=true;
+  $('#cta-explore').hidden=true;
+  const el=$('#light');el.classList.remove('hidden');
+  el.innerHTML=`<h2>Los Mundos Aplicados</h2><p class="meta">${esc(reason)}</p><ul>${WORLDS.map(w=>`<li style="--c:${w.color}"><span class="glyph" aria-hidden="true">${esc(w.glyph)}</span><div><b>${esc(w.name)}</b><small>${esc(w.discipline)} · ${esc(w.taller)}</small></div>${w.available?`<a class="cta small" href="${$('#cta-play').getAttribute('href')}">${esc($('#cta-play-label').textContent)}</a>`:'<span class="pill muted">En preparación</span>'}</li>`).join('')}</ul>`;
+}
+
 // ── Boot ───────────────────────────────────────────────────────────────────────
+setupWayIn();refreshGreeting();
+loadNews(base).then(r=>markUnread(unreadCount(r.items,profile.newsSeen)));
 (async()=>{
+  if(diorama.quiet){lightVersion('Este navegador no puede mostrar el campus en 3D. Todo lo demás está acá.');$('#intro-load').hidden=true;route();return;}
   try{
-    await diorama.build((p,text)=>{$('#loading-bar').style.width=`${Math.round(p*100)}%`;$('#loading-text').textContent=text;});
+    await diorama.build(p=>{$('#loading-bar').style.width=`${Math.round(p*100)}%`;});
     syncHour();applySettings();refreshProgress({instant:true});
-    diorama.flyTo({...OVERVIEW,distance:OVERVIEW.distance*1.35,pitch:OVERVIEW.pitch+12,yaw:OVERVIEW.yaw-30},{instant:true});
-    requestAnimationFrame(()=>{diorama.flyTo(OVERVIEW);$('#loading').classList.add('done');document.body.classList.add('ready');});
-    const hash=location.hash.slice(1);
+    diorama.panelShift=introShift();
+    diorama.flyTo({...OVERVIEW,distance:OVERVIEW.distance*1.25,pitch:OVERVIEW.pitch+10,yaw:OVERVIEW.yaw-24},{instant:true});
+    requestAnimationFrame(()=>{diorama.flyTo(OVERVIEW);document.body.classList.add('ready');});
+    const ex=$('#cta-explore');ex.disabled=false;ex.textContent='Explorar el campus';
     await wait(900);
-    if(ROOMS[hash])openRoom(hash);else await showNews();
-    window.__escuela={diorama,openRoom,closeRoom,refreshProgress};
+    if(location.hash.length>1)route();else await showChanges();
+    window.__escuela={diorama,openRoom,closeRoom,refreshProgress,openNews};
   }catch(err){
-    console.error(err);$('#loading-text').textContent='No se pudo abrir el Instituto en este navegador (hace falta WebGL2).';
+    console.error(err);lightVersion('No se pudo abrir el campus en 3D en este navegador. Todo lo demás está acá.');$('#intro-load').hidden=true;route();
   }
 })();
