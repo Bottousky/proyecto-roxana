@@ -11,21 +11,20 @@ Actualizado: 2026-10-05 (iteración 1).
 - Modelo: la sesión principal corre como Opus 5.5 (`claude-opus-5-5`, según el entorno). Los
   subagentes se lanzan con el alias `opus`; no puedo verificar desde adentro qué versión resolvió.
 
-## Estado real (ciclo 2 del loop, 2026-10-06)
+## Estado real (ciclo 3 del loop, 2026-10-06)
 
-- **Capítulos 1, 2 y 3 jugables y encadenados** (título → 1 → 2 → 3 → título con "volver a jugar").
-- Cap. 1: tres revisiones independientes aplicadas (ARITHMOS_REVIEW.md). Segunda pasada matemática
-  en curso (sin navegador). Segunda pasada narrativa: pendiente (el revisor se colgó por carga).
-- Cap. 2: pasada de voz lacónica y consecuencias visibles (depósito de prueba de Punto). Sin
-  revisión independiente todavía (la matemática en curso lo incluye).
-- Cap. 3 "Menos que nada": implementado y recorrido por interfaz (ruta errores, 59 s, sin errores).
-- Cap. 4 "Veces": diseñado (ARITHMOS_DESIGN.md) y con lógica probada (`src/logic/times.js`); escenas pendientes.
-- Pruebas: 40 unitarias; `keyboard-check.mjs`; `touch-probe.mjs` (12/12 marcas y 11/11 puntos
-  tocados con precisión en 844×390); partidas por interfaz de cada capítulo.
-- **Entorno:** la máquina la comparten otras sesiones que corren Chrome (otros worktrees y el
-  checkout principal). Las corridas largas y las mediciones de fps varían mucho con esa carga
-  (una misma escena tardó 31 s o 15 min); dos revisores se colgaron esperando al navegador.
-  No certificar rendimiento medido bajo carga.
+- **Capítulos 1, 2, 3 y 4 jugables y encadenados** (el 4 recién implementado: en prueba).
+- Segunda revisión matemática independiente (caps. 1–3) recibida y aplicada: 5 hallazgos altos y
+  12 medios corregidos, salvo uno parcial (jugar una resta que da negativo, 2 − 5). Detalle en
+  ARITHMOS_REVIEW.md. Commit `e105e6a`.
+- Verificado por interfaz después de las correcciones: cap. 2 → 3 por la ruta con errores
+  (200 s, sin errores) y por la directa con capturas; cap. 3 solo por las dos rutas. La partida
+  automática ahora espera a que las opciones se activen (antes, varias respuestas equivocadas no
+  se probaban de verdad).
+- Cap. 4 "Veces": 7 escenas (grupos, girar, estirar la línea, repartir, medir, entre nadie,
+  partir el rectángulo) sobre `src/logic/times.js`. Sin revisión independiente todavía.
+- Pendiente de revisión independiente: narrativa de los caps. 2–4; matemática del cap. 4.
+- **Entorno:** la máquina la comparten otras sesiones con Chrome; los tiempos y fps varían con esa carga.
 - Audio no escuchado; sin playtests humanos; sin dispositivo táctil real.
 
 ## Comandos
@@ -48,7 +47,7 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Aplicar los hallazgos de la revisión matemática (caps. 1–3) cuando llegue.
-2. Revisión narrativa de los caps. 2 y 3 (y segunda del 1), preferentemente sin navegador o con la máquina libre.
-3. Capítulo 4 "Veces": escenas sobre la lógica ya probada.
-4. Pasada visual del cap. 3 (línea, pozo) con películas por escena.
+1. Terminar de probar el cap. 4 por las dos rutas, con capturas, y corregir.
+2. Revisión independiente matemática del cap. 4 y narrativa de los caps. 2–4.
+3. M-k pendiente: una resta que da negativo jugada (2 − 5), quizá al inicio del cap. 4 o en el 6.
+4. Cap. 5 "Partes de algo": diseño (fracciones como medida y como reparto de los 2 atados que sobraron).

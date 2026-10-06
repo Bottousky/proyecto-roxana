@@ -62,7 +62,7 @@ tiene un rasgo mínimo (tamaño, ritmo de parpadeo). Lino es el más chico.
 | 1 | ¿Están todos? | A: correspondencia uno a uno, cardinalidad, más/menos, conservación, contar, número vs numeral | jugable, revisado (1.ª ronda) |
 | 2 | Demasiados para marcar | A: agrupación, unidad, valor posicional, cero; B: suma con canje, resta como comparación | jugable |
 | 3 | Menos que nada | B: signo, negativos, opuestos, orden, distancia, valor absoluto, suma y resta de enteros | jugable |
-| 4 | Veces | B: multiplicación como grupos y escala, división como reparto y medida, propiedades | pendiente |
+| 4 | Veces | B: multiplicación como grupos y escala, división como reparto y medida, propiedades | implementado, en prueba |
 | 5 | Partes de algo | C: fracciones, equivalencia, decimales, %, razón, proporción, unidades; inconmensurables, reales; exacto vs aproximado | pendiente |
 | 6 | Lo que no se ve | D: patrón, generalización, incógnita/variable/parámetro; expresión, identidad, ecuación; **"pasa sumando"**; desigualdades; sistemas | pendiente |
 | 7 | Crecer | E: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos | pendiente |
@@ -162,26 +162,27 @@ Historia (fuentes.md, certeza alta): los signos "+" y "−" aparecen impresos en
 marcando exceso y faltante en problemas de comercio, no como operaciones; Brahmagupta (628)
 da reglas con "fortunas" y "deudas". Mencionarlo sólo en la Bitácora, como dato, no como origen.
 
-## Capítulo 4 — Veces (diseño, no implementado)
+## Capítulo 4 — Veces (implementado, en prueba)
 
-Pregunta de entrada (gancho del cap. 3): cuatro familias de las Terrazas deben tres atados cada una:
-¿cuánto se debe en total? Idea central: **multiplicar es juntar grupos iguales y también estirar
-la línea desde el cero; dividir es repartir o medir; las dos cosas se deshacen entre sí; repartir
-entre nadie no tiene sentido.**
+Lugar: las Terrazas, una ladera en cuatro escalones; una familia por escalón (Peldaño, Rampa,
+Cornisa, Balcón: sombrero y cabeza propia). Al pie, la pizarra de Mara y una piedra con un signo
+casi borrado ("4 × 3") que nadie entiende; cuando se entiende, se vuelve nítido (lo comprendido
+resiste). Pregunta de entrada (gancho del cap. 3): cuatro familias deben tres atados cada una.
 
 | # | Escena | Idea | Decisión | Consecuencia |
 |---|---|---|---|---|
-| 4.1 | Lo que deben las Terrazas | Multiplicar como grupos iguales | Juntar las deudas de a grupos; anticipar el total | 4 grupos de 3 = 12; con deudas, −12 |
-| 4.2 | Dar vuelta | Conmutativa con el rectángulo | ¿Girar el rectángulo cambia el total? | 4 filas de 3 y 3 filas de 4: los mismos 12 |
-| 4.3 | Estirar la línea | Multiplicar como escala; por −1 como reflejo | Anticipar dónde cae cada familia al estirar ×2 y al reflejar | −3 × 2 = −6; dos reflejos vuelven: (−1)(−1) = 1, visto, no recitado |
-| 4.4 | Repartir | División como reparto (de a uno, como emparejar) | Repartir 14 atados entre 4 familias | 3 cada una y sobran 2: el resto |
-| 4.5 | Medir | División como medida | ¿Cuántas bolsas de 3 se llenan con 12? | 4; repartir y medir dan el mismo número por caminos distintos |
-| 4.6 | Entre nadie | División por cero | Repartir entre cero familias; llenar bolsas de cero | No empieza nunca / no termina nunca: no tiene sentido |
-| 4.7 | Partir el rectángulo | Distributiva como transferencia | Partir 4 × 5 en 4 × 3 y 4 × 2 | 20 = 12 + 8; gancho: repartir 3 atados entre 4 → cap. 5 |
+| 4.1 | Lo que deben las Terrazas | Grupos iguales | Anticipar el total (Punto escribe 4 + 3 = 7); bajar las deudas de a una familia | Cada familia es una fila; al lado, 3, 6, 9, 12; 4 × 3 = 12 y 4 × (−3) = −12; el signo de la piedra se aclara |
+| 4.2 | Dar vuelta | Conmutativa | ¿Girar cambia el total?; girar; ¿hay que contar 9 × 4 de las dos maneras? | Tres filas de cuatro: 12; 4 × 3 = 3 × 4; si se quiere contar dos veces, Mara lo frena |
+| 4.3 | Estirar la línea (momento) | Escala; ×1; ×(−1) como media vuelta | Anticipar −3 × 2; aplicar × 2, × (−1) dos veces | −6: más lejos del cero pero menor (Punto corrige "× 2 → más"); × 1 no mueve; dos medias vueltas: (−1) × (−1) = 1 |
+| 4.4 | Repartir | División como reparto | Anticipar; repartir de a uno, por vueltas; qué hacer con los 2 que sobran | Dar dos veces a la misma familia provoca protesta; 14 = 4 × 3 + 2; partirlos queda como pregunta (cap. 5) |
+| 4.5 | Medir | División como medida | Anticipar bolsas de 3; llenar; bolsas de 4 | 4 bolsas; 12 ÷ 3 = 4 porque 4 × 3 = 12; 3 bolsas de 4 |
+| 4.6 | Entre nadie | División por cero | Repartir entre cero familias; llenar bolsas de cero; qué número por 0 da 6 | Punto no tiene a quién dar; el montón no baja; todo por 0 da 0: 6 ÷ 0 no tiene respuesta |
+| 4.7 | Partir el rectángulo (momento) | Distributiva | ¿Cambia el total según dónde se corte?; cortar en dos lugares; 4 × 13 | 20 las dos veces; 4 × 5 = 4 × c + 4 × (5 − c); 4 × 13 = 40 + 12; gancho: los 2 atados que sobraron, entre 4 |
 
-Límites a declarar: la multiplicación no "siempre agranda" (× 1, × 0, × −1, y luego fracciones);
-el reflejo explica (−1)(−1) = 1 sin presentarlo como regla mágica; el resto depende de qué se
-pregunta (repartir atados enteros vs partirlos).
+Límites declarados: la multiplicación no "siempre agranda" (× 1, × −1, y luego fracciones); el
+reflejo explica (−1)(−1) = 1 como media vuelta, sin regla mágica; el resto depende de lo que se
+pregunta (atados enteros); 0 ÷ 0 tampoco tiene un resultado (en la Bitácora). Dato histórico:
+Brahmagupta (628) operó con fortunas y deudas y sostuvo 0 ÷ 0 = 0 (fuentes.md §8, certeza alta).
 
 ## Capítulo 6 (ecuaciones) — núcleo de "pasa sumando" (diseño conceptual, no implementado)
 

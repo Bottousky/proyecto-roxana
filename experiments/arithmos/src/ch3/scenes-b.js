@@ -4,7 +4,7 @@ import {Drawing, Label, Custom} from '../engine/world.js';
 import {YELLOW, stroke, chalkText} from '../engine/chalk.js';
 import {lerp} from '../engine/rng.js';
 import {zip, hop, pulse, follow, spotOf, rectSpot, wordSpot} from '../acting.js';
-import {removeDebts} from '../logic/integers.js';
+import {removeDebts, removeHaves} from '../logic/integers.js';
 import {GROUND, LINE, lineX, TABLE, PIT, SHOTS, base, chip, tableSlot, villager, signed, art, pitOn} from './common.js';
 import {cast, ledgerRow, FAMILIES, familySigns} from './scenes-a.js';
 
@@ -253,9 +253,83 @@ export const perdon = {
       ? 'Eso. La suelta dice "sacar". Las pegadas al número dicen "deuda". Por eso el paréntesis: guarda al número con su signo.'
       : 'No: la suelta dice "sacar". Las pegadas al número dicen "deuda". Por eso el paréntesis: guarda al número con su signo.');
     await d.think('El mismo trazo, dos trabajos.');
+    // al revés: pagar más atados de los que se tienen
+    await payMore(d, g);
     g.flags.c3forgive = true;
   },
 };
+
+/** Oval tiene 2 atados y tiene que pagar 5: 2 − 5 = −3 (pares cero para poder pagar). */
+async function payMore(d, g) {
+  const w = g.world;
+  const p = w.get('punto');
+  const ov = w.get('oval-a');
+  await d.shot(SHOTS.table, 1);
+  await d.say('Oval', 'Y yo tengo dos atados, pero tengo que pagarle cinco a Mara por las tejas.');
+  w.removeWhere(o => /^(pm-|pz-[hd])/.test(o.id));
+  for (let k = 0; k < 2; k++) chip(w, 'have', ...tableSlot('have', k), `pm-h${k}`);
+  const guess = await d.choose([
+    {id: '-3', text: 'Queda debiendo 3.'},
+    {id: '+3', text: 'Le quedan 3.'},
+    {id: 'cant', text: 'No puede pagar: no le alcanza.'},
+  ], {prompt: 'Oval tiene 2 y paga 5. ¿Cómo queda?', evaluate: true});
+  d.evidence('predict-pay', {answer: guess});
+  let paid = 0;
+  let padded = false;
+  await d.interact(ctl => new Promise(resolve => {
+    let busy = false;
+    g.setHint(() => ['Tocá un atado de la mesa para pagarlo.', 'Si no quedan atados, se puede agregar un atado y una deuda: juntos valen cero.']);
+    const haves = () => w.objects.filter(o => o.id.startsWith('pm-') && o.kind === 'have' && !o.gone);
+    const refresh = () => {
+      const spots = haves().map(o => spotOf(o, 'Un atado de Oval: pagarlo', () => pay(o)));
+      if (!spots.length && paid < 5) spots.push(wordSpot('pm-pad', 'agregar pares que valen cero', TABLE.x, TABLE.top - 30, () => pad()));
+      g.ui.setSpots(spots);
+    };
+    const pay = async o => {
+      if (busy || !ctl.alive()) return;
+      busy = true;
+      o.gone = true;
+      try { await hop(d, o, TABLE.x + TABLE.w / 2 + 120, GROUND - 40, {g, h: 60, dur: 0.4}); } catch { return; }
+      w.remove(o.id);
+      paid++;
+      d.evidence('pay', {paid});
+      busy = false;
+      if (paid >= 5) resolve();
+      else refresh();
+    };
+    const pad = async () => {
+      if (busy || !ctl.alive()) return;
+      busy = true;
+      padded = true;
+      d.describe('Aparecen en la mesa tres atados y tres deudas: tres pares que valen cero.');
+      try {
+        const list = [];
+        for (let k = 0; k < 3; k++) {
+          list.push(chip(w, 'have', ...tableSlot('have', k), `pm-zh${k}`), chip(w, 'debt', ...tableSlot('debt', k), `pm-zd${k}`));
+        }
+        for (const o of list) o.progress = 0;
+        await d.tween(0.6, q => { for (const o of list) o.progress = q; });
+      } catch { return; }
+      d.evidence('pay-pad', {pairs: 3});
+      busy = false;
+      refresh();
+    };
+    refresh();
+  }));
+  g.setHint(null);
+  const r = removeHaves({haves: 2, debts: 0}, 5);
+  d.evidence('pay-result', {value: r.value, padded});
+  await d.think(guess === '-3' ? 'Quedó debiendo tres, como dije: 2 − 5 = −3.' : guess === '+3' ? 'No le quedan: quedaron tres deudas. 2 − 5 = −3.' : 'Pudo pagar, pero quedó debiendo tres: 2 − 5 = −3.');
+  await d.shot(SHOTS.line, 1);
+  g.setCinematic(true);
+  ov.face(-1);
+  await d.walk(ov, lineX(-3), GROUND, 160);
+  ov.face(0.3);
+  w.get('sign-oval-a').text = signed(-3);
+  g.setCinematic(false);
+  await d.think('Sacar atados lleva a la izquierda, aunque se pase del cero.');
+  void p;
+}
 
 // ——————————————————————————————————————————————
 // 3.6 El pozo
@@ -362,7 +436,7 @@ export const hacia = {
     base(g, {line: true});
     w.removeWhere(o => /^(pz-|hacia-)/.test(o.id));
     cast(g, {at: 'table'});
-    placeFamilies(g, {curva: 1, recta: 4});
+    placeFamilies(g, {curva: 1, recta: 4, 'oval-a': -3});
     g.camera.go(SHOTS.line);
   },
   async play(d, g, {replay} = {}) {
@@ -413,6 +487,8 @@ function writeJournal3(g) {
   if (fh.length) seen.push('Para sacar dos deudas cuando quedaba una sola, agregaste un atado y una deuda (valen cero) y sacaste la deuda: −1 − (−2) = +1.');
   const fs = all('forgive-same')[0];
   if (fs) seen.push(fs.answer === 'give' ? 'Viste que sacar dos deudas deja igual que dar dos atados.' : 'Pensaste que sacar deudas era como quitar atados o sumar deudas; en la línea iba para el otro lado.');
+  const pp2 = all('predict-pay')[0];
+  if (pp2) seen.push(pp2.answer === '-3' ? 'Anticipaste que Oval, con 2 y pagando 5, quedaba debiendo 3: 2 − 5 = −3.' : 'Oval tenía 2 y pagó 5: para poder pagar hicieron falta pares que valen cero, y quedó debiendo 3 (2 − 5 = −3).');
   const pp = all('predict-pit')[0];
   if (pp) seen.push(`Desde −4, subir cinco: anticipaste ${pp.answer.replace('-', '−')}; Punto quedó en +1.`);
   const entry = {
@@ -425,6 +501,7 @@ function writeJournal3(g) {
       'En la línea, más a la derecha es más: −4 es menos que −1, aunque 4 sea más que 1.',
       'La distancia no tiene signo: de −4 a +3 hay 7 pasos. Lo lejos que está un número del cero se escribe con barritas: |−4| = |+4| = 4.',
       'Sacar una deuda sube el valor, igual que dar un atado: −1 − (−2) = −1 + 2 = +1. Si no hay deudas para sacar, se agregan pares que valen cero.',
+      'Pagar más de lo que se tiene deja deudas: 2 − 5 = −3. Para poder sacar los atados que faltan, se agregan pares que valen cero.',
       '"Deber 4" y "estar 4 debajo del suelo" son dos lecturas del mismo número: −4.',
       'El mismo signo "−" se usa para "menos tres" y para "restar": los paréntesis ayudan a no confundirlos.',
       'Dato: los signos + y − aparecen impresos en 1489 (Widmann) para marcar exceso y faltante en cuentas de comercio.',

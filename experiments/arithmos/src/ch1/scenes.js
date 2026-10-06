@@ -1091,13 +1091,16 @@ export const quien = {
         await go;
         voice?.stop?.();
         s.setPose('surprise', 0.2);
-        d.describe('Punto no te deja borrarla. Recuerda la mañana: sobre cada marca aparece, tenue, el punto que pasó cuando la hiciste. Doce marcas, doce puntos: una marca por toque.');
+        d.describe('Punto no te deja borrarla. Recuerda la mañana: debajo de las marcas aparece, tenue, una hilera con los que pasaron entonces, uno debajo de cada marca. Doce marcas, doce puntos: una marca por toque.');
         const memo = [];
+        const [m0x] = markPos(0);
+        const memoLabel = w.add(new Label('memo-l', 'esta mañana', m0x - 40, GROUND + 70, {size: 24, align: 'right', z: 7, fade: 0.6}));
+        memo.push(memoLabel);
         for (let i = 0; i < MARKS; i++) {
           const [mx, my] = markPos(i);
           await zip(d, p, mx, my - 40, 0.12);
-          const gd = w.add(new Dot(`memo${i}`, mx, my - 78, {r: 7, z: 7}));
-          gd.fade = 0.38;
+          const gd = w.add(new Dot(`memo${i}`, mx, GROUND + 62, {r: 7, z: 7}));
+          gd.fade = 0.5;
           memo.push(gd);
           g.audio.tap(0.1, 1.5 + i * 0.04);
         }

@@ -111,7 +111,23 @@ function pickChoice(prompt, options) {
     ['sacar dos deudas', 'No se puede', 'Quitarle', 'Agregar'],
     ['mismo lugar', 'Sacarle', 'Darle'],
     ['rayita del medio', 'deuda', 'Que se saca'],
+    ['tiene 2 y paga 5', 'Le quedan 3', 'Queda debiendo'],
     ['subir cinco', '−9', '+1'],
+    ['le deben las Terrazas', 'Siete', 'Doce'],
+    ['giradas', 'Más', 'Lo mismo'],
+    ['dos maneras', 'Hay que contar las dos', 'Alcanza con una'],
+    ['Con el doble', '−1', '−6'],
+    ['vuelta las cuentas', '+4', '−4'],
+    ['vuelta otra vez', 'Quedan más', 'Vuelven'],
+    ['Catorce atados entre cuatro', 'Cuatro cada una', 'Tres cada una, y sobran'],
+    ['Quedan dos atados', 'Dárselos', 'Partirlos', 'Dejarlos'],
+    ['bolsas de tres se llenan', 'Tres bolsas', 'Cuatro bolsas'],
+    ['bolsas de cuatro', 'Cuatro.', 'Tres.'],
+    ['entre cero familias', 'tocan cero', 'No hay a quién'],
+    ['bolsas de cero hacen falta', 'Infinitas', 'Ninguna cantidad'],
+    ['por 0 da 6', 'El cero', 'Ninguno'],
+    ['sumando las dos partes', 'Sí, cambia', 'No: siempre'],
+    ['4 × 13', '43', '52'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -143,7 +159,23 @@ function pickChoice(prompt, options) {
     ['sacar dos deudas', 'Agregar'],
     ['mismo lugar', 'Darle'],
     ['rayita del medio', 'Que se saca'],
+    ['tiene 2 y paga 5', 'Queda debiendo'],
     ['subir cinco', '+1'],
+    ['le deben las Terrazas', 'Doce'],
+    ['giradas', 'Lo mismo'],
+    ['dos maneras', 'Alcanza con una'],
+    ['Con el doble', '−6'],
+    ['vuelta las cuentas', '−4'],
+    ['vuelta otra vez', 'Vuelven'],
+    ['Catorce atados entre cuatro', 'Tres cada una, y sobran'],
+    ['Quedan dos atados', 'Dejarlos'],
+    ['bolsas de tres se llenan', 'Cuatro bolsas'],
+    ['bolsas de cuatro', 'Tres.'],
+    ['entre cero familias', 'No hay a quién'],
+    ['bolsas de cero hacen falta', 'Ninguna cantidad'],
+    ['por 0 da 6', 'Ninguno'],
+    ['sumando las dos partes', 'No: siempre'],
+    ['4 × 13', '52'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -386,8 +418,16 @@ for (let iter = 0; iter < 4000; iter++) {
     } else if (s.seg === 'c3.pozo') {
       if (route === 'errores' && !tried.has('pitshort')) { tried.add('pitshort'); target = spots.find(x => x.id === 'pit0'); }
       else target = spots.find(x => x.id === 'pit1');
+    } else if (s.seg === 'c4.repartir') {
+      const fams = spots.filter(x => x.label.startsWith('Familia'));
+      const n = x => Number((x.label.match(/tiene (\d+|un)/) || [])[1]?.replace('un', '1') || 0);
+      const min = Math.min(...fams.map(n));
+      const vuelta = spots.find(x => x.id === 'vuelta');
+      if (route === 'errores' && !tried.has('unfair') && fams.some(x => n(x) > min)) { tried.add('unfair'); target = fams.find(x => n(x) > min); }
+      else if (vuelta && route !== 'errores') target = vuelta;
+      else target = fams.find(x => n(x) === min);
     } else if (s.seg === 'c3.perdon') {
-      target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck');
+      target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
     } else {
       target = spots[0];
     }
