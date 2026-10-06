@@ -13,6 +13,14 @@
 export const STREAM_SPEED = 2.6;
 export const TERRACE_Y = 4.4;
 export const BELL_LINE = 4.5;
+// El Pozo (transfer): a shaft in the Terraza with its own region, from y = 1.0 up to the
+// Terraza's level. Same rule, two limits: let go too high and the Mirador is out of reach;
+// let go below the region's floor and there is nothing to lift you — you drop into the water.
+export const WELL = { x0: 11.0, x1: 12.6, floorY: -1.0, regionY0: 1.0 };
+export const MIRADOR_Y = 5.15;
+// A centre (buckle, sphere) that reaches MIRADOR_LINE puts the feet within edge-grab reach of
+// the Mirador. Releases from ~1.2 m (just above the region's floor band) to ~2.3 m reach it.
+export const MIRADOR_LINE = MIRADOR_Y + 0.1;
 
 export const CASCADA = {
   id: 'cascada',
@@ -22,10 +30,19 @@ export const CASCADA = {
   zones: [
     // The right edge sits 0.3 m inside the Terraza's rock, so the full field reaches its face.
     { id: 'cascada', label: 'Región de la cascada', x0: 0, x1: 4.8, y0: -3.4, y1: 3.0, g: { x: 0, y: 4.0 }, band: 0.6, priority: 1 },
+    // Its sides sit 0.3 m inside the rock, like the cascade's right edge.
+    { id: 'pozo', label: 'Región del pozo', x0: WELL.x0 - 0.3, x1: WELL.x1 + 0.3, y0: WELL.regionY0, y1: TERRACE_Y, g: { x: 0, y: 4.0 }, band: 0.6, priority: 1 },
   ],
   solids: [
     { id: 'orilla', x0: -22, x1: 0, y0: -9, y1: 0, friction: 0.6 },
-    { id: 'terraza', x0: 4.5, x1: 19.5, y0: -9, y1: TERRACE_Y, friction: 0.6 },
+    { id: 'terraza', x0: 4.5, x1: WELL.x0, y0: -9, y1: TERRACE_Y, friction: 0.6 },
+    // Standing in the water is not firm footing: R never returns the explorer there.
+    { id: 'pozo-fondo', x0: WELL.x0, x1: WELL.x1, y0: -9, y1: WELL.floorY, noFooting: true },
+    { id: 'mirador', x0: WELL.x1, x1: 16.5, y0: -9, y1: MIRADOR_Y, friction: 0.6 },
+    // Steps wider than the explorer (0.52 m), each no higher than the walking step (0.36 m).
+    { id: 'escalon-1', x0: 16.5, x1: 17.1, y0: -9, y1: MIRADOR_Y - 0.3 },
+    { id: 'escalon-2', x0: 17.1, x1: 17.7, y0: -9, y1: MIRADOR_Y - 0.6 },
+    { id: 'terraza-b', x0: 17.7, x1: 19.5, y0: -9, y1: TERRACE_Y, friction: 0.6 },
     { id: 'repisa', x0: 19.5, x1: 23, y0: -9, y1: -1.5 },
     // A railing marks the end of the walkable terrace (visible, not an invisible wall).
     { id: 'baranda', x0: 18.9, x1: 19.05, y0: TERRACE_Y, y1: TERRACE_Y + 1.3, only: 'box' },
@@ -40,17 +57,29 @@ export const CASCADA = {
     { id: 'A', label: 'Soporte de la orilla', x: -2.9, baseY: 0, clampX: -1.85, clampY: 2.0, threadMax: 10 },
     { id: 'B', label: 'Soporte del borde', x: -1.0, baseY: 0, clampX: 1.1, clampY: 2.0, threadMax: 10,
       rail: { min: -2.5, max: 2.5, step: 0.5 } },
+    // The Pozo's support: same instrument, new place. Its rail reaches below the region's floor.
+    { id: 'P', label: 'Soporte del pozo', x: WELL.x0 - 0.9, baseY: TERRACE_Y, clampX: WELL.x1 - 0.3, clampY: 3.0, threadMax: 9,
+      rail: { min: -0.5, max: 4.0, step: 0.5 } },
   ],
   goalSolid: 'terraza',
+  miradorLine: MIRADOR_LINE,
   bellLine: BELL_LINE,
   // One reference for everything: the centre of a body (the sphere's centre, the explorer's
   // buckle). The bell rings when a centre reaches BELL_LINE; an explorer whose buckle reaches
   // it has its feet within the edge-grab reach of the Terraza, so the same line predicts both.
   bell: { x: 1.1, y: BELL_LINE + 0.27, r: 0.1 },
+  bells: [
+    { id: 'cascada', x: 1.1, y: BELL_LINE + 0.27, r: 0.1, line: BELL_LINE },
+    { id: 'pozo', x: WELL.x1 - 0.3, y: MIRADOR_LINE + 0.27, r: 0.1, line: MIRADOR_LINE },
+  ],
   // Where the hidden stream wells up in the chasm: just inside the region's lower band.
   spring: { x: 2.75, y: -3.1, vx: 0.75 },
   // Taut between a bracket on the lip and the chasm floor; a collar stops the descent.
-  chain: { x: 0.92, side: 0.24, lipX: 0, lipY: 0, stopY: -2.5, floorY: -4.6 },
+  chains: [
+    { id: 'borde', x: 0.92, side: 0.24, lipX: 0, lipY: 0, stopY: -2.5, floorY: -4.6 },
+    // Down to the well's water: the explorer can let go anywhere, also below the region.
+    { id: 'pozo', x: WELL.x0 + 0.95, side: 0.24, lipX: WELL.x0, lipY: TERRACE_Y, stopY: WELL.floorY + 0.55, floorY: WELL.floorY, regionFloor: WELL.regionY0 },
+  ],
   // Loose spheres rest on a table behind the path until the explorer takes one.
   loose: [
     { id: 'L1', x: -5.9, y: 0.78 },

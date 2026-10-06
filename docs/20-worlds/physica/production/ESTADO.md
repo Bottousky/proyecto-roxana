@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-05 · iteración 02.
+**Actualizado:** 2026-10-05 · iteración 03.
 
 ## Dónde se trabaja
 
@@ -14,7 +14,19 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 02):** el cruce exige anticipar.
+**Último cambio aceptado (iteración 03):** transferencia con dos límites.
+- **El Pozo:** un pozo con su propia región. Su piso está a 1,0 m.
+- **El Mirador:** más alto, del otro lado.
+- **Experimento seguro:** el soporte P (riel y campana) predice exactamente la ventana del explorador (1,2–2,3 m).
+- **Salidas:**
+  - cadena en el aire;
+  - el agua no cuenta como apoyo firme;
+  - R desde el agua.
+- **Plano de medición único.**
+- **Vista de la ciudad** al llegar al Mirador.
+- **Evidencia:** 44 pruebas y recorrido con teclado. Ver `evidence/iter-03` (README y REVISION).
+
+**Iteración 02:** el cruce exige anticipar.
 - **Desde el borde no se llega.** La Terraza está a 4,4 m y la región termina en 3 m.
 - **Experimento seguro:** el riel de B tiene una campana a la altura de la Terraza y predice el umbral de la cadena (el mismo número, la misma referencia: el centro del cuerpo).
 - **El agua:** sube desde la poza del fondo y es lo único que cresta.
@@ -44,11 +56,16 @@
 - **Rendimiento:** 60 FPS medidos en escritorio (M2) después de reemplazar el ruido por fragmento por una textura.
 
 **Qué falla todavía (ver BACKLOG):**
-- **A20:** «lo más profundo» siempre gana (fuerza bruta) y la oscilación sin pérdidas es eterna.
+- **Acabado audiovisual del Hito A** (el mayor impedimento para cerrarlo):
+  - **A10:** la roca se ve borrosa de cerca;
+  - **A18:** no hay plano de establecimiento;
+  - **A19:** el arco y la cresta del agua;
+  - la ciudad es una silueta simple.
+- **A20:** no hay amortiguación; la oscilación ideal es eterna, aunque tiene salidas.
 - **A21:** hay un solo chorro.
 - **A17:** no hay nada que *modificar*.
-- **A9:** no hay transferencia a otra geometría.
 - **A22:** el mástil parece una escalera.
+- **A23:** assets generados, esperando la decisión del usuario.
 - **A10 y A12:** la roca se ve borrosa de cerca y la composición del cuadro de la cascada está apretada.
 - **A12:** las animaciones del avatar no se revisaron en movimiento.
 - **A16:** no hay menú de opciones.
@@ -60,7 +77,15 @@
 
 ## Próximo resultado
 
-**A20 + A9: un objetivo con dos límites y la transferencia.**
+**Acabado visible de la escena insignia (A10 + A18).**
+- **Roca:** que se lea con detalle de cerca. Procedural, con textura de mayor resolución y relieve por estrato, o con assets generados si el usuario elige la vía A o B de `art/PROMPTS-IMAGEGEN.md`.
+- **Plano de establecimiento:** al entrar, uno que reúna la caída familiar, la cascada que sube y el pozo.
+- **Criterio de aceptación:**
+  - comparación antes/después en las mismas tomas (inicio, cascada, pozo, primer plano a 5 m);
+  - 60 FPS sostenidos;
+  - revisión independiente centrada en arte.
+
+*Plan anterior, ya cumplido en la iteración 03:* A20 + A9, un objetivo con dos límites y la transferencia.
 - **Amortiguación:** arrastre del aire declarado (pruebas contra la solución con arrastre lineal), con los umbrales recalculados.
 - **Segunda configuración:** reutiliza la regla en otra geometría, por ejemplo un nicho alto con techo. Ahí soltarse demasiado abajo también falla, porque el cuerpo choca con el techo y vuelve a la región sin daño. Hay que elegir una profundidad intermedia, que el riel de B permite predecir.
 - **Criterio de aceptación:**

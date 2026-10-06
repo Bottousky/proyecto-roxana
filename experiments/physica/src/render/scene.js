@@ -9,7 +9,7 @@ import { waterMaterial, waterTube, waterSheet, fieldPath } from './water.js';
 import { Particles } from './particles.js';
 import { Moss, Plumbs } from './flora.js';
 import { makeMaterials, Stand, sphereMesh, fieldAnchor, conduit, Traces, chainProp, Bell, ApexMarks } from './props.js';
-import { STREAM_SPEED, TERRACE_Y, BELL_LINE } from '../sim/levels/cascada.js';
+import { STREAM_SPEED, TERRACE_Y, BELL_LINE, WELL, MIRADOR_Y, MIRADOR_LINE } from '../sim/levels/cascada.js';
 
 const Z_STREAM = -1.7, Z_FRONT = 1.6, Z_BACK = -3.6;
 export const LANE_Z = [0, -0.5];   // explorer's path, experiment lane
@@ -52,7 +52,15 @@ export function buildScene(world, { quality = 'high' } = {}) {
 
   // Walkable ground. Tops are exactly the simulation's solids.
   add(strataBlock({ x0: -22, x1: 0, y0: -9, y1: 0, z0: Z_BACK, z1: Z_FRONT, seed: 3, sides: ['e'] }));
-  add(strataBlock({ x0: 4.5, x1: 19.5, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: Z_FRONT, seed: 7, sides: ['w', 'e'] }));
+  // Terraza, the Pozo cut through it, the Mirador and its steps (front lanes only: the stream
+  // runs behind them at the Terraza's level).
+  add(strataBlock({ x0: 4.5, x1: WELL.x0, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: Z_FRONT, seed: 7, sides: ['w', 'e'] }));
+  add(strataBlock({ x0: WELL.x0, x1: WELL.x1, y0: -11, y1: WELL.floorY - 0.2, z0: Z_BACK, z1: Z_FRONT, seed: 13, sides: [] }));
+  add(strataBlock({ x0: WELL.x1, x1: 17.7, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: -1.0, seed: 17, sides: ['w'] }));
+  add(strataBlock({ x0: WELL.x1, x1: 16.5, y0: -9, y1: MIRADOR_Y, z0: -1.0, z1: Z_FRONT, seed: 19, sides: ['w', 'e'] }));
+  add(strataBlock({ x0: 16.5, x1: 17.1, y0: -9, y1: MIRADOR_Y - 0.3, z0: -1.0, z1: Z_FRONT, seed: 23, sides: ['e'], rim: 0.06 }));
+  add(strataBlock({ x0: 17.1, x1: 17.7, y0: -9, y1: MIRADOR_Y - 0.6, z0: -1.0, z1: Z_FRONT, seed: 29, sides: ['e'], rim: 0.06 }));
+  add(strataBlock({ x0: 17.7, x1: 19.5, y0: -9, y1: TERRACE_Y, z0: Z_BACK, z1: Z_FRONT, seed: 31, sides: ['e'] }));
   add(strataBlock({ x0: 19.5, x1: 24, y0: -9, y1: -1.5, z0: Z_BACK, z1: Z_FRONT, seed: 11, sides: ['w'] }));
   add(strataBlock({ x0: -0.6, x1: 5.1, y0: -11, y1: -4.6, z0: Z_BACK, z1: Z_FRONT, seed: 5, sides: [] }));
   // Back walls: a stepped skyline of strata. The chasm keeps its own back wall.
@@ -66,16 +74,25 @@ export function buildScene(world, { quality = 'high' } = {}) {
   // Distance: mesas in haze, and behind them, barely, the ordered skyline of a city.
   const far1 = rockMaterial({ fogFade: 0.35, mossAmount: 0.3 }), far2 = rockMaterial({ fogFade: 0.62, mossAmount: 0 });
   add(mesaShape([[-70, -12], [-70, 9], [-52, 10], [-48, 14], [-30, 14.5], [-26, 8], [-10, 8.6], [-6, 16], [8, 16.4], [12, 11], [30, 11.5], [34, 18], [52, 18], [56, 9], [80, 9], [80, -12]], -26, 3), far1, false);
-  add(mesaShape([[-90, -12], [-90, 18], [-60, 19], [-55, 24], [-30, 24.5], [-24, 20], [4, 21], [9, 27], [30, 27.5], [36, 21], [70, 22], [90, 26], [90, -12]], -48, 3), far2, false);
+  // The far mesas open into a valley behind the Mirador: from up there, and only from there,
+  // the line of sight passes over the near rock and reaches the city.
+  add(mesaShape([[-90, -12], [-90, 18], [-60, 19], [-55, 24], [-30, 24.5], [-24, 20], [2, 21], [6, 15], [32, 14.5], [36, 21], [70, 22], [90, 26], [90, -12]], -48, 3), far2, false);
   const city = new THREE.Group();
-  const cityMat = new THREE.MeshBasicMaterial({ color: '#c9a98f', fog: true });
+  // An ordered skyline: slender towers with stepped crowns, observatory domes and an aqueduct.
+  const cityAdd = (geo, x, y, z = -66) => { const m = new THREE.Mesh(geo, cityMat); m.position.set(x, y, z); city.add(m); return m; };
+  const cityMat = new THREE.MeshBasicMaterial({ color: '#7f7088', fog: true });
   const winMat = new THREE.MeshBasicMaterial({ color: '#ffe3a8', fog: true });
   let seed = 9; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  for (let i = 0; i < 26; i++) {
-    const w = 1.6 + r() * 2.2, h = 14 + r() * 16, x = -16 + i * 1.9 + r() * 0.8;
-    const t = new THREE.Mesh(new THREE.BoxGeometry(w, h, 2), cityMat); t.position.set(x, h / 2 + 4, -70); city.add(t);
-    for (let k = 0; k < 4; k++) { const wi = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.5), winMat); wi.position.set(x + (r() - 0.5) * w * 0.7, 6 + r() * (h - 3), -68.95); city.add(wi); }
+  for (let i = 0; i < 16; i++) {
+    const w = 1.4 + r() * 1.6, h = 16 + r() * 16, x = -2 + i * 2.2 + r() * 0.6;
+    cityAdd(new THREE.BoxGeometry(w, h, 2), x, h / 2 + 4);
+    cityAdd(new THREE.BoxGeometry(w * 0.7, 2.2, 1.6), x, h + 4 + 1.1);          // stepped crown
+    cityAdd(new THREE.CylinderGeometry(0.06, 0.06, 3, 4), x, h + 4 + 3.6);     // mast
+    for (let k = 0; k < 4; k++) { const wi = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.55), winMat); wi.position.set(x + (r() - 0.5) * w * 0.6, 8 + r() * (h - 6), -64.95); city.add(wi); }
   }
+  for (const [x, rr] of [[6, 4.5], [19, 3.2], [28, 5.5]]) { cityAdd(new THREE.SphereGeometry(rr, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), x, 18 + rr * 0.2); cityAdd(new THREE.BoxGeometry(rr * 2, 14, 2), x, 11); }
+  for (let i = 0; i < 9; i++) { const a = cityAdd(new THREE.TorusGeometry(1.6, 0.35, 6, 12, Math.PI), -2 + i * 4, 9.5, -62); a.scale.set(1, 1.3, 1); }
+  cityAdd(new THREE.BoxGeometry(38, 0.9, 1.2), 14, 11.6, -62);
   scene.add(city);
 
   // Stream curbs along the Orilla and the Terraza.
@@ -100,6 +117,14 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const archMesh = mkWater(waterTube(arch, { zc: -2.15, thick: 0.62, wide: 2.3, foamStart: 0.5, foamEnd: 0.32, spread: 0.2 }), { streak: 1.5 });
   const land = arch[arch.length - 1];
   curb(land.x - 0.4, 18.9, TERRACE_Y, Z_STREAM + 0.82); curb(land.x - 0.4, 18.9, TERRACE_Y, Z_STREAM - 0.82);
+  // The Terraza's stream crosses the Pozo on a small aqueduct.
+  const aq = new THREE.Mesh(new THREE.BoxGeometry(WELL.x1 - WELL.x0 + 0.3, 0.42, 1.75), M.stone); aq.position.set((WELL.x0 + WELL.x1) / 2, TERRACE_Y - 0.21, Z_STREAM); aq.castShadow = aq.receiveShadow = true; scene.add(aq);
+  // Water at the bottom of the Pozo, and two seeping pipes in its wall: above the region's
+  // floor their drops rise, below it they fall.
+  mkWater(waterSheet({ x0: WELL.x0 + 0.02, x1: WELL.x1 - 0.02, y: WELL.floorY + 0.28, z0: Z_BACK, z1: Z_FRONT - 0.1, speed: 0.2 }), { opacity: 0.88 });
+  for (const py of [WELL.regionY0 + 0.75, WELL.regionY0 - 0.5]) {
+    const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.3, 10), M.brassDark); pipe.rotation.z = Math.PI / 2; pipe.position.set(WELL.x0 + 0.12, py, -1.2); scene.add(pipe);
+  }
   mkWater(waterSheet({ x0: land.x - 0.3, x1: 19.55, y: TERRACE_Y + 0.035, z0: Z_STREAM - 0.72, z1: Z_STREAM + 0.72, speed: STREAM_SPEED, foamAt: [{ x: land.x, r: 1.0 }], tOffset: land.t }), { streak: 1.4 });
   const rightFall = fieldPath(field, 19.55, TERRACE_Y + 0.03, 1.5, 0, p => p.y <= -1.45);
   mkWater(waterTube(rightFall, { zc: Z_STREAM, thick: 0.46, wide: 1.5, foamStart: 0.15, foamEnd: 0.3, spread: 0.5 }), { streak: 1.2 });
@@ -123,6 +148,9 @@ export function buildScene(world, { quality = 'high' } = {}) {
   parts.addEmitter({ rate: 40 * k, make: sprayFrom(leftFall, 0.97, 0.06) });
   parts.addEmitter({ rate: 30 * k, make: sprayFrom(rightFall, 0.97, 0.06) });
   // Mist: large, faint, slow — it hangs around the crest.
+  // (the rising drops fade before reaching the aqueduct's stone; particles do not collide)
+  for (const py of [WELL.regionY0 + 0.75, WELL.regionY0 - 0.5]) parts.addEmitter({ rate: 7 * k, make: ps => ({ x: WELL.x0 + 0.3, y: py, z: -1.2 + (ps.rnd() - 0.5) * 0.1,
+    vx: 0.35 + ps.rnd() * 0.15, vy: 0, life: py > WELL.regionY0 ? 1.15 : 1.0, size: 0.06, alpha: 0.85, color: [0.8, 0.97, 1], drag: 0.3 }) });
   parts.addEmitter({ rate: 9 * k, make: ps => { const p = pick(arch, 0.7 + ps.rnd() * 0.25); return { x: p.x + (ps.rnd() - 0.5), y: p.y, z: -2.15 + (ps.rnd() - 0.4) * 2.4, vx: (ps.rnd() - 0.5) * 0.3, vy: 0, life: 3 + ps.rnd() * 2, size: 0.9 + ps.rnd() * 0.8, alpha: 0.12, color: [1, 0.98, 0.95], drag: 4 }; } });
   // Pollen from the chasm moss: heavy drag, so it drifts at its terminal speed.
   parts.addEmitter({ rate: 26 * k, make: ps => ({ x: 0.2 + ps.rnd() * 4.1, y: -4.3 + ps.rnd() * 6, z: -3.2 + ps.rnd() * 4.6, vx: 0, vy: 0, vz: 0,
@@ -141,6 +169,11 @@ export function buildScene(world, { quality = 'high' } = {}) {
   for (let y = 2.75 - 3; y > -4.5; y -= 0.32) { /* right wall below the terrace already covered */ }
   for (let x = -14; x < -0.2; x += 0.45 + mr() * 0.3) moss.add({ root: [x, -0.12, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
   for (let x = 4.8; x < 18.5; x += 0.45 + mr() * 0.3) moss.add({ root: [x, TERRACE_Y - 0.12, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
+  for (let x = WELL.x1 + 0.2; x < 16.3; x += 0.45 + mr() * 0.3) moss.add({ root: [x, MIRADOR_Y - 0.12, Z_FRONT + 0.12], n: 5, len: 0.09, dir: [0, -1], width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
+  for (let y = TERRACE_Y - 0.3; y > WELL.floorY + 0.4; y -= 0.38) for (const z of [-3.2, 1.3]) {
+    moss.add({ root: [WELL.x0 + 0.02, y, z], n: 5, len: 0.09, dir: [0.2, -1], wall: { value: WELL.x0 + 0.03, side: 1 }, width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
+    moss.add({ root: [WELL.x1 - 0.02, y, z], n: 5, len: 0.09, dir: [-0.2, -1], wall: { value: WELL.x1 - 0.03, side: -1 }, width: 0.055, color: mossCols[Math.floor(mr() * 4)] });
+  }
   scene.add(moss.build());
 
   // Measuring mast with plumb bobs on the Orilla's lip, reaching over the chasm.
@@ -153,6 +186,14 @@ export function buildScene(world, { quality = 'high' } = {}) {
     const tick = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.012, 0.05), M.ink); tick.position.set(mastX - 0.06, y, mastZ + 0.03); scene.add(tick);
     plumbs.addBob([armTip, y, mastZ]);
   }
+  // A second plumb mast down the Pozo: the bobs show where its region ends below.
+  const wmX = WELL.x1 - 0.15, wmTip = WELL.x1 - 0.65;
+  const wmZ = -0.4;   // close to the measuring plane, so its bobs line up with the numbers
+  const wmast = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, TERRACE_Y - WELL.floorY, 10), M.brassDark); wmast.position.set(wmX, (TERRACE_Y + WELL.floorY) / 2, wmZ); scene.add(wmast);
+  for (let y = WELL.floorY + 0.5; y <= TERRACE_Y - 0.4 + 1e-6; y += 0.5) {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(wmX - wmTip, 0.025, 0.025), M.brass); arm.position.set((wmX + wmTip) / 2, y, wmZ); scene.add(arm);
+    plumbs.addBob([wmTip, y, wmZ]);
+  }
   scene.add(plumbs.group);
 
   // The apparatus that sustains the region: four anchors and their supply conduits,
@@ -161,6 +202,11 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const zr = world.field.zones[0];
   for (const [x, y] of [[0, zr.y0], [4.5, zr.y0], [0, zr.y1], [4.5, zr.y1]]) {
     const a = fieldAnchor(M, { x, y, z: Z_BACK + 0.12 }); scene.add(a); anchors.push(a);
+  }
+  // In the narrow Pozo the anchors sit near the lanes (z −0.9), not on the far back wall, so
+  // they appear at their true heights next to the numbers.
+  for (const [x, y] of [[WELL.x0 + 0.12, WELL.regionY0], [WELL.x1 - 0.12, WELL.regionY0], [WELL.x0 + 0.12, TERRACE_Y - 0.25], [WELL.x1 - 0.12, TERRACE_Y - 0.25]]) {
+    const a = fieldAnchor(M, { x, y, z: -0.9 }); a.scale.setScalar(0.45); scene.add(a); anchors.push(a);
   }
   const conduits = [
     conduit(M, [[0, 3, Z_BACK + 0.05], [-0.8, 4.2, Z_BACK - 0.2], [-2.5, 4.9, Z_BACK - 0.6], [-4, 5.3, -5.5]]),
@@ -188,11 +234,13 @@ export function buildScene(world, { quality = 'high' } = {}) {
   scene.add(railing);
 
   // The descent chain, the bell at the Terraza's height, and chalk marks of the explorer's peaks.
-  const chainG = world.chain ? chainProp(world.chain, M) : null;
-  if (chainG) scene.add(chainG);
-  const bell = world.bell ? new Bell(world.bell, TERRACE_Y, M) : null;
-  if (bell) scene.add(bell.group);
+  const chainGs = world.chains.map(ch => { const g = chainProp(ch, M); g.userData.id = ch.id; scene.add(g); return g; });
+  const bells = new Map(world.bells.map(bl => {
+    const b = bl.id === 'pozo' ? new Bell(bl, MIRADOR_Y, M, WELL.x1 + 0.35) : new Bell(bl, TERRACE_Y, M, 4.95);
+    scene.add(b.group); return [bl.id, b];
+  }));
   const apexMarks = new ApexMarks(scene, M, { bellLine: BELL_LINE });
+  const wellMarks = new ApexMarks(scene, M, { bellLine: MIRADOR_LINE, x0: WELL.x1 - 0.45, x1: WELL.x1 - 0.05 });
 
   const sphereMeshes = new Map();
   for (const b of world.bodies) if (b.kind === 'sphere') { const m = sphereMesh(b.r, M); scene.add(m); sphereMeshes.set(b.id, m); }
@@ -202,9 +250,11 @@ export function buildScene(world, { quality = 'high' } = {}) {
   const bladeGeo = new THREE.ConeGeometry(0.025, 0.28, 3); bladeGeo.translate(0, 0.14, 0);
   const grass = new THREE.InstancedMesh(bladeGeo, new THREE.MeshLambertMaterial({ color: '#8fa35a' }), quality === 'low' ? 500 : 1100);
   let gs = 5; const gr = () => (gs = (gs * 16807) % 2147483647) / 2147483647;
-  const tops = [[-21, -0.25, 0], [4.75, 18.7, TERRACE_Y]];
+  const tops = [[-21, -0.25, 0], [4.75, WELL.x0 - 0.1, TERRACE_Y], [WELL.x1 + 0.1, 16.4, MIRADOR_Y], [17.8, 18.7, TERRACE_Y]];
+  const topLen = tops.map(t => t[1] - t[0]), topSum = topLen.reduce((a, b) => a + b, 0);
   for (let i = 0; i < grass.count; i++) {
-    const [x0, x1, y] = tops[i % 2 ? 1 : 0];
+    let pickT = gr() * topSum, ti = 0; while (pickT > topLen[ti]) { pickT -= topLen[ti]; ti++; }
+    const [x0, x1, y] = tops[Math.min(ti, tops.length - 1)];
     const x = x0 + gr() * (x1 - x0);
     let z = -3.3 + gr() * 4.8;
     if (Math.abs(z - Z_STREAM) < 0.95) z = gr() < 0.5 ? Z_STREAM - 1.0 - gr() * 0.5 : Z_STREAM + 1.0 + gr() * 0.3;
@@ -253,21 +303,28 @@ export function buildScene(world, { quality = 'high' } = {}) {
       if (b.support) m.rotation.z -= dx / b.r;
     }
     world.stands.forEach((st, i) => { const b = st.body; v3.set(b.px + (b.x - b.px) * alpha, b.py + (b.y - b.py) * alpha + b.r * 0.9, LANE_Z[1]); stands[i].update(dt, { ...st, sagSign: 1 }, v3); });
-    bell?.update(dt); apexMarks.update(dt);
-    if (chainG) {
-      const av = world.avatar, held = av.heldBy?.type === 'chain';
-      const y = held ? av.py + (av.y - av.py) * alpha : chainG.userData.restY;
-      chainG.userData.ring.position.y = y; chainG.userData.pointer.position.y = y;
+    for (const b of bells.values()) b.update(dt);
+    apexMarks.update(dt);
+    for (const g of chainGs) {
+      const av = world.avatar, held = av.heldBy?.type === 'chain' && av.heldBy.chain.id === g.userData.id;
+      const y = held ? av.py + (av.y - av.py) * alpha : g.userData.restY;
+      g.userData.ring.position.y = y; g.userData.pointer.position.y = y;
     }
     traces.sync(world.traces, id => { const b = world.bodies.find(x => x.id === id); return LANE_Z[b?.lane ?? 0] + 0.22; });
     if ((time * 30 | 0) % 2 === 0) updateGrass(time);
   }
 
   function onEvent(e) {
-    if (e.type === 'bell') bell?.ring(e.speed);
+    if (e.type === 'bell') bells.get(e.bell || 'cascada')?.ring(e.speed);
+    // Landing in the Pozo's water splashes.
+    if (e.type === 'impact' && e.kind === 'avatar' && e.x > WELL.x0 && e.x < WELL.x1 && e.y < WELL.floorY + 1.2) {
+      parts.burst(26, ps => ({ x: e.x + (ps.rnd() - 0.5) * 0.5, y: WELL.floorY + 0.3, z: (ps.rnd() - 0.5) * 0.8, vx: (ps.rnd() - 0.5) * 2, vy: 1.5 + ps.rnd() * 2.5,
+        vz: (ps.rnd() - 0.5) * 1.5, life: 0.6 + ps.rnd() * 0.5, size: 0.06 + ps.rnd() * 0.06, alpha: 0.9, color: [0.85, 0.98, 1], drag: 0.5 }));
+    }
     // Chalk the buckle's peak on the Terraza's face for every attempt in the chasm.
     if (e.type === 'apex' && e.body === world.avatar.id && e.x > 0 && e.x < 4.6 && e.centre > 2.5) apexMarks.add(e.centre, e.from);
+    if (e.type === 'apex' && e.body === world.avatar.id && e.x > WELL.x0 && e.x < WELL.x1 && e.centre > TERRACE_Y) wellMarks.add(e.centre, e.from);
   }
 
-  return { scene, sun, hemi, update, onEvent, clearChalk: () => apexMarks.clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts };
+  return { scene, sun, hemi, update, onEvent, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts };
 }

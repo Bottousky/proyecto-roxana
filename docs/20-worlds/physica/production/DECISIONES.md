@@ -99,3 +99,32 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
   - Con 0,62 m, su cuarto izquierdo sentía 3,89 m/s² en lugar de 4,00, y la prueba de equivalencia con la esfera falló.
 
 **Límite conocido:** bajar hasta el fondo de la cadena siempre funciona. La transferencia (A9) debe crear un caso donde «lo más profundo» no sea siempre lo correcto.
+
+## D10 · Transferencia: el Pozo y el Mirador (iteración 03)
+
+**El problema:** en la cascada, «lo más profundo» siempre gana (revisión de la iter 2, hallazgo 1).
+
+**Elegido:** la misma regla en otra geometría, sin explicarla de nuevo, con una ventana de dos límites.
+- **El Pozo** es un pozo de 1,6 m en la Terraza, con agua al fondo, y tiene su propia región (+4 m/s²).
+  - La región va de y = 1,0 hasta el nivel de la Terraza.
+  - El Mirador (5,15 m; su línea, a 5,25 m) está del otro lado.
+- **Los tres resultados**, según dónde se suelta el centro del cuerpo:
+  - por debajo de ~1,15 m (donde la banda inferior ya tira hacia abajo) cae al agua;
+  - entre ~1,2 y ~2,3 m llega al Mirador (rótulos 1,5 y 2 dentro);
+  - más arriba no alcanza y vuelve a la Terraza.
+- **El soporte P** tiene riel y campana en la línea del Mirador, y predice exactamente esos mismos límites con una esfera, sin arriesgar al explorador.
+- **Por qué no hay salida «por abajo» que funcione:** el fondo de la región es un máximo de energía potencial. Justo por encima se sube con la mayor energía posible; justo por debajo se cae.
+- **Cómo se descubre el límite inferior sin caerse:**
+  - un mástil de plomadas en el pozo (las de abajo cuelgan y las de arriba apuntan hacia arriba);
+  - musgo;
+  - dos caños que gotean: en el de arriba las gotas suben, en el de abajo caen.
+- **La caída al agua es segura:** desde el pie de la cadena se vuelve a subir, y R devuelve a la Terraza (el agua no cuenta como apoyo firme). En el aire, junto a una cadena, uno se puede agarrar de ella.
+- **Plano de medición único:** todo lo numérico (números, tiza, líneas) va en z = 0,08. En el pozo la cámara mira casi a nivel, para que la profundidad no desplace alturas (paralaje).
+- **Paso de escalón:** asistencia declarada de 0,36 m al caminar, para los escalones del Mirador. Los escalones son más anchos que el explorador.
+- **La vista del Mirador:**
+  - la primera vez que se llega, la cámara sube y muestra la ciudad detrás de las mesetas;
+  - las mesetas lejanas se abrieron en un valle para que esa línea de visión exista sólo desde ahí.
+  - Una primera versión afirmaba en la Bitácora algo que no se veía. Se corrigió la geometría y se verificó con captura.
+- **Amortiguación:** se decidió **no** agregarla todavía. El modelo de la Escena A sigue siendo ideal (sin arrastre), declarado así.
+  - En el Pozo, un intento corto vuelve solo a la Terraza (el techo de la región está a su nivel), así que la oscilación eterna no bloquea.
+  - Sigue abierta para la cascada (A20).

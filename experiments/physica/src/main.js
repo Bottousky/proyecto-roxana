@@ -35,11 +35,18 @@ const explorer = new Explorer(world.field);
 explorer.addTo(scene);
 
 const camera = new THREE.PerspectiveCamera(32, 1, 0.3, 600);
-const cam = { x: world.avatar.x, y: 1.2, dist: 11.5 };
+const cam = { x: world.avatar.x, y: 1.2, dist: 11.5, elev: 0.2 };
 const input = new Input(app);
 const sound = new Sound();
 const journal = new Journal(app, world);
-journal.onAdd = id => { if (id === 'cruce') view.clearChalk(); };
+let vista = 0, vistaAge = 0, vistaHeld = false, vistaWas = false;
+journal.onAdd = id => {
+  if (id === 'cruce' || id === 'mirador') view.clearChalk(id);
+  // From the Mirador, for the first time, the camera rises to show what is behind the landscape.
+  // The key that carried the explorer up is still held: it does not cancel the vista; a new
+  // press does, after 1.5 s. With reduced motion the camera cuts instead of travelling.
+  if (id === 'mirador') { vista = 6; vistaAge = 0; vistaHeld = true; }
+};
 if (journal.footing && !params.has('fresh')) { const f = journal.footing, av = world.avatar; av.x = av.px = f.x; av.y = av.py = f.y; av.lastSupport = { ...f }; }
 
 // ---------- HUD ----------
@@ -142,8 +149,8 @@ function frame(now) {
   explorer.update(dt, time, p, { ...av, grounded: av.supportSteps > 0 || onChain }, { holding, pushing, onChain, climbing: onChain && Math.abs(world.input.y) > 0.2, lookAt: its.length ? 0.15 : 0 });
   if (av.supportSteps > 0 && Math.abs(av.vx) > 0.4) { stepPhase += Math.abs(av.vx) * dt * 1.72; if (stepPhase > 1) { stepPhase -= 1; sound.step(); } }
   view.update(dt, time, alpha);
-  const zw = world.field.weight(world.field.zones[0], av.x, av.y);
-  const near = Math.max(0, 1 - Math.max(0, Math.abs(av.x - 2.25) - 2.25) / 6);
+  const zw = Math.max(...world.field.zones.map(z => world.field.weight(z, av.x, av.y)));
+  const near = Math.max(...world.field.zones.map(z => Math.max(0, 1 - Math.max(0, Math.abs(av.x - (z.x0 + z.x1) / 2) - (z.x1 - z.x0) / 2) / 6)));
   sound.update(time, av.x, near, zw);
 
   // Camera: follows the explorer; around the cascade it widens to show the whole region.
@@ -154,11 +161,26 @@ function frame(now) {
   const halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * cam.dist * 0.6;
   ty = THREE.MathUtils.clamp(ty, p.y + 0.3 - halfH, p.y - 0.3 + halfH * 0.7);
   let td = THREE.MathUtils.lerp(11.5, 15, inCascade);
+  // Around the Pozo: frame the shaft from its water to above the Mirador.
+  const inWell = Math.max(0, 1 - Math.max(0, Math.abs(p.x - 12.2) - 1.6) / 2.5);
+  if (inWell > 0) { tx = THREE.MathUtils.lerp(tx, 12.3, inWell * 0.7); ty = THREE.MathUtils.lerp(ty, 2.9, inWell * 0.8); td = THREE.MathUtils.lerp(td, 14.5, inWell); ty = THREE.MathUtils.clamp(ty, p.y + 0.3 - halfH, p.y - 0.3 + halfH * 0.7); }
+  if (vista > 0) {
+    vista -= dt; vistaAge += dt;
+    const pressing = Math.abs(inp.axis) > 0.1;
+    if (!pressing) vistaHeld = false;
+    if (vistaAge > 1.5 && ((pressing && !vistaHeld) || inp.act)) vista = 0;
+    tx = 13; ty = 15.5; td = 36;
+  }
   if (inspectCam) { tx = inspectCam.x; ty = inspectCam.y; td = inspectCam.dist; }
-  const k = Math.min(1, dt * (reduced ? 6 : 2.6));
+  // With reduced motion the vista starts and ends as a cut, not a camera move.
+  const vistaNow = vista > 0, cut = reduced && vistaNow !== vistaWas; vistaWas = vistaNow;
+  const k = cut ? 1 : Math.min(1, dt * (reduced ? 6 : 2.6));
   cam.x += (tx - cam.x) * k; cam.y += (ty - cam.y) * k; cam.dist += (td - cam.dist) * k;
   // Slightly above the play plane, like looking into a diorama: tops and the arch's width read.
-  camera.position.set(cam.x, cam.y + cam.dist * 0.2, cam.dist);
+  // In the Pozo the camera looks nearly level: things at different depths keep their apparent
+  // heights (parallax would put the region's floor marks at the wrong numbers).
+  cam.elev += ((inWell > 0.5 && vista <= 0 ? 0.05 : 0.2) - cam.elev) * Math.min(1, dt * 3);
+  camera.position.set(cam.x, cam.y + cam.dist * cam.elev, cam.dist);
   camera.lookAt(cam.x, cam.y, 0);
   sun.position.set(cam.x - 9, 16, 12); sun.target.position.set(cam.x, 0, 0);
 

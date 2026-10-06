@@ -361,3 +361,114 @@ test('the chain is offered only after a first attempt fell short (or after the b
   w.shortSeen = true;
   assert.ok(w.interactables().some(i => i.kind === 'chain'), 'offered after a short attempt');
 });
+
+// ---- El Pozo: the same rule in another geometry, with two limits (iter 3) ----
+import { WELL, MIRADOR_Y } from '../src/sim/levels/cascada.js';
+
+function wellRoute(w, letGoY, steer = 1) {
+  const av = w.avatar;
+  av.x = WELL.x0 - 0.4; av.y = TERRACE_Y + AVATAR.hh; av.px = av.x; av.py = av.y;
+  run(w, 0.3);
+  w.input.act = true; w.step();
+  assert.equal(av.heldBy?.type, 'chain', 'holding the well chain');
+  assert.equal(av.heldBy.chain.id, 'pozo');
+  let n = 0; while (av.y > letGoY && n++ < 4000) { w.input.y = -1; w.step(); }
+  w.input.y = 0; w.input.act = true; w.step();
+  for (let i = 0; i < 8 / DT; i++) {
+    w.input.x = steer; w.step();
+    const sd = av.support?.solid?.id;
+    if (av.supportSteps > 10 && sd === 'mirador') return 'mirador';
+    if (av.supportSteps > 10 && sd === 'pozo-fondo') return 'cae';
+  }
+  return 'corto';
+}
+
+test('El Pozo: let go too low and you drop; in the window you reach the Mirador; too high falls short', () => {
+  assert.equal(wellRoute(fresh(), 0.9), 'cae', 'below the region floor nothing lifts');
+  assert.equal(wellRoute(fresh(), 1.05), 'cae', 'in the lower band the pull is still downward');
+  for (const y of [1.3, 1.5, 1.7, 2.0, 2.25]) assert.equal(wellRoute(fresh(), y), 'mirador', `from ${y}`);
+  for (const y of [2.5, 3.0, 3.5]) assert.equal(wellRoute(fresh(), y), 'corto', `from ${y}`);
+});
+
+test('El Pozo: from the well floor the explorer can climb the chain back to the Terraza', () => {
+  const w = fresh(), av = w.avatar;
+  assert.equal(wellRoute(w, 0.9), 'cae');
+  run(w, 0.5, { x: -1 });
+  w.input.x = 0;
+  const ch = w.chains.find(c => c.id === 'pozo');
+  // walk to the chain's foot and take it from below
+  let n = 0; while (Math.abs(av.x - (ch.x - ch.side)) > 0.05 && n++ < 600) { w.input.x = Math.sign(ch.x - ch.side - av.x) * 0.4; w.step(); }
+  w.input.x = 0; run(w, 0.2);
+  const grab = w.interactables().find(i => i.kind === 'chain-foot');
+  assert.ok(grab, `the chain is offered from the well floor (at x=${av.x.toFixed(2)})`);
+  w.input.act = true; w.step();
+  for (let i = 0; i < 8 / DT && av.heldBy; i++) { w.input.y = 1; w.step(); }
+  w.input.y = 0; run(w, 0.5);
+  assert.ok(av.supportSteps > 10 && Math.abs(av.y - AVATAR.hh - TERRACE_Y) < 0.01 && av.x < WELL.x0, `back on the Terraza at ${av.x.toFixed(2)},${(av.y - AVATAR.hh).toFixed(2)}`);
+});
+
+test('El Pozo: walking into it from the Terraza never reaches the Mirador, and there is always a way out', () => {
+  const w = fresh(), av = w.avatar;
+  av.x = WELL.x0 - 1.5; av.y = TERRACE_Y + AVATAR.hh; run(w, 0.2);
+  let entered = false, reachedMirador = false;
+  for (let i = 0; i < 10 / DT; i++) {
+    w.input.x = 1; w.step();
+    if (av.x > WELL.x0 + 0.3) entered = true;
+    if (av.supportSteps > 10 && av.support?.solid?.id === 'mirador') reachedMirador = true;
+  }
+  assert.ok(entered, 'it really went into the shaft');
+  assert.ok(!reachedMirador, 'walking in does not reach the Mirador');
+  // Ways out: steer back to the Terraza, or catch the chain in the air.
+  let back = false;
+  for (let i = 0; i < 10 / DT && !back; i++) { w.input.x = -1; w.step(); back = av.supportSteps > 10 && av.support?.solid?.id === 'terraza'; }
+  assert.ok(back, 'steering back lands on the Terraza');
+});
+
+test('El Pozo: an explorer bobbing beside a chain can catch it and climb out', () => {
+  const w = fresh(), av = w.avatar;
+  assert.equal(wellRoute(w, 4.2, 0), 'corto');      // let go just under the top, no steering: it bobs
+  assert.equal(av.supportSteps, 0, 'still bobbing');
+  const it = w.interactables().find(i => i.kind === 'chain-air');
+  assert.ok(it, 'the chain is offered in the air');
+  w.input.act = true; w.step();
+  assert.equal(av.heldBy?.type, 'chain');
+  for (let i = 0; i < 6 / DT && av.heldBy; i++) { w.input.y = 1; w.step(); }
+  w.input.y = 0; run(w, 0.4);
+  assert.ok(av.supportSteps > 10 && av.support?.solid?.id === 'terraza', 'climbed out onto the Terraza');
+});
+
+test('El Pozo: the water is not firm footing — R from the water returns to the Terraza', () => {
+  const w = fresh(), av = w.avatar;
+  assert.equal(wellRoute(w, 0.9), 'cae');
+  run(w, 1.0, { x: 0 });
+  assert.ok(av.lastSupport && av.lastSupport.y > TERRACE_Y, `last footing kept on the Terraza (${av.lastSupport?.x},${av.lastSupport?.y})`);
+  w.input.reset = true; w.step(); run(w, 0.3);
+  assert.ok(av.support?.solid?.id === 'terraza', 'R put the explorer back on the Terraza');
+});
+
+test('El Pozo: support P predicts the explorer — its bell rings from exactly the clamp heights that reach the Mirador', () => {
+  const rings = y0 => {
+    const w = fresh(), st = stand(w, 'P');
+    w.avatar.x = st.x; w.avatar.y = TERRACE_Y + AVATAR.hh; w.step();
+    while (st.clampY > y0 + 1e-9) { w.input.adjust = -1; w.step(); }
+    while (st.clampY < y0 - 1e-9) { w.input.adjust = 1; w.step(); }
+    w.input.act = true; w.step();
+    let n = 0; for (let i = 0; i < 5 / DT; i++) { w.step(); n += w.drainEvents().filter(e => e.type === 'bell' && e.bell === 'pozo').length; }
+    return { n, fell: st.body.y < WELL.floorY + 0.3 };
+  };
+  for (const y of [1.5, 2.0]) assert.ok(rings(y).n > 0, `P from ${y} rings`);
+  for (const y of [2.5, 3.0, 4.0]) assert.equal(rings(y).n, 0, `P from ${y} is short`);
+  for (const y of [-0.5, 0, 0.5, 1.0]) { const r = rings(y); assert.ok(r.n === 0 && r.fell, `P from ${y} falls into the water`); }
+  for (const y of [1.5, 2.0]) assert.equal(wellRoute(fresh(), y), 'mirador', `explorer from ${y}`);
+  for (const y of [1.0, 2.5]) assert.notEqual(wellRoute(fresh(), y), 'mirador', `explorer from ${y}`);
+});
+
+test('The Mirador is left by its steps and the steps lead back up: no dead end', () => {
+  const w = fresh(), av = w.avatar;
+  av.x = 14; av.y = MIRADOR_Y + AVATAR.hh; run(w, 0.3);
+  let n = 0; while (av.x < 18 && n++ < 10 / DT) { w.input.x = 1; w.step(); }
+  run(w, 0.6, { x: 0 });
+  assert.ok(av.x >= 18 && Math.abs(av.y - AVATAR.hh - TERRACE_Y) < 0.01, `down on the far Terraza at ${av.x.toFixed(2)}`);
+  n = 0; while (av.x > 14 && n++ < 10 / DT) { w.input.x = -1; w.step(); }
+  assert.ok(av.x <= 14 && Math.abs(av.y - AVATAR.hh - MIRADOR_Y) < 0.01, `back up on the Mirador at ${av.x.toFixed(2)},${(av.y - AVATAR.hh).toFixed(2)}`);
+});

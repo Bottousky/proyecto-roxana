@@ -166,6 +166,71 @@ step('cruce por la cadena', { offeredAtLip: offered, onChain, letGoCentreY: letG
   mantles: await page.evaluate(() => window.__physica.events.filter(e => e.type === 'mantle').length) });
 writeFileSync(join(out, 'trayectoria-cruce.json'), JSON.stringify(traj));
 
+// 4p — El Pozo (transfer): the same rule with two limits, all with the keyboard.
+const solidUnder = () => page.evaluate(() => { const a = window.__physica.world.avatar; return a.supportSteps > 5 ? a.support?.solid?.id ?? null : null; });
+async function holdUntil(key, pred, simSeconds = 8) {
+  await page.keyboard.down(key);
+  const t0s = (await state()).t, w0 = Date.now(); let ok = false;
+  while ((await state()).t - t0s < simSeconds && Date.now() - w0 < 60000) { if (await pred()) { ok = true; break; } await sleep(20); }
+  await page.keyboard.up(key); return ok;
+}
+async function wellAttempt(letGo, name, label) {
+  await walkTo(10.65);
+  await page.keyboard.press('e'); await sleep(150);
+  const held = await page.evaluate(() => window.__physica.world.avatar.heldBy?.chain?.id);
+  await holdUntil('ArrowDown', async () => (await state()).avatar.y <= letGo, 10);
+  const at = (await state()).avatar.y;
+  await page.keyboard.press('e');
+  const shots = []; const t0s = (await state()).t; let outcome = null, k2 = 0;
+  await page.keyboard.down('ArrowRight');
+  while ((await state()).t - t0s < 6) {
+    const st = await state(), on = await solidUnder();
+    if (k2++ % 5 === 0 && shots.length < 10) shots.push({ buf: await page.screenshot(), label: `${label} hebilla=${st.avatar.y.toFixed(2)}` });
+    if (on === 'mirador' || on === 'pozo-fondo') { outcome = on; break; }
+    await sleep(20);
+  }
+  await page.keyboard.up('ArrowRight');
+  if (!outcome) { // short: steer back to the Terraza
+    await holdUntil('ArrowLeft', async () => (await solidUnder()) === 'terraza', 8);
+    outcome = (await solidUnder()) === 'terraza' ? 'corto' : 'sin apoyo';
+  }
+  await sheet(name, shots, 5, `Pozo: ${label}`);
+  return { held, letGoCentre: at, outcome };
+}
+// The Pozo's support first: the same instrument tells where the window is, before risking oneself.
+await walkTo(10.1);
+const pShots = [];
+for (let i = 0; i < 2; i++) { await page.keyboard.press('ArrowDown'); await sleep(120); }
+await page.keyboard.press('e');
+let t0p = (await state()).t; while ((await state()).t - t0p < 1.6) { pShots.push({ buf: await page.screenshot(), label: `P desde 2,0 · y=${(await page.evaluate(() => window.__physica.world.stands.find(s => s.id === 'P').body.y)).toFixed(2)}` }); await sleep(250); if (pShots.length >= 5) break; }
+const pBell = await page.evaluate(() => window.__physica.events.filter(e => e.type === 'bell' && e.bell === 'pozo').length);
+await page.keyboard.press('e'); await sleep(2600);
+for (let i = 0; i < 2; i++) { await page.keyboard.press('ArrowDown'); await sleep(120); }
+await page.keyboard.press('e');
+t0p = (await state()).t; while ((await state()).t - t0p < 1.6) { pShots.push({ buf: await page.screenshot(), label: `P desde 1,0 · y=${(await page.evaluate(() => window.__physica.world.stands.find(s => s.id === 'P').body.y)).toFixed(2)}` }); await sleep(250); if (pShots.length >= 10) break; }
+const pEnd = await page.evaluate(() => window.__physica.world.stands.find(s => s.id === 'P').body.y);
+await sheet('10-0-soporte-del-pozo', pShots, 5, 'Soporte P: desde 2,0 m sube y toca la campana del Mirador; desde 1,0 m cae al agua');
+step('pozo: soporte P', { bellFrom2: pBell, endFrom1: pEnd, fellIntoWater: pEnd < -0.5 });
+await page.keyboard.press('e'); await sleep(2000);
+const wa = await wellAttempt(0.9, '10a-pozo-demasiado-abajo', 'soltarse a 0,9 m (debajo del fondo de la región)');
+step('pozo: demasiado abajo', wa);
+// Back up from the water: the chain from its foot.
+await walkTo(11.5);
+await page.keyboard.press('e'); await sleep(150);
+await holdUntil('ArrowUp', async () => (await solidUnder()) === 'terraza', 10);
+step('pozo: subir desde el agua', { on: await solidUnder(), avatar: (await state()).avatar });
+const wb = await wellAttempt(2.5, '10b-pozo-demasiado-arriba', 'soltarse a 2,5 m');
+step('pozo: demasiado arriba', wb);
+const wc = await wellAttempt(1.5, '10c-pozo-en-la-ventana', 'soltarse a 1,5 m');
+step('pozo: en la ventana', wc);
+await sleep(1500);
+writeFileSync(join(out, '10d-vista-desde-el-mirador.png'), await page.screenshot());
+await sleep(5000);
+// No dead end: down the steps and back up.
+const down = await holdUntil('ArrowRight', async () => (await state()).avatar.x > 18.2, 8);
+const up = await holdUntil('ArrowLeft', async () => (await state()).avatar.x < 15 && (await solidUnder()) === 'mirador', 8);
+step('mirador: escalones', { down, up, avatar: (await state()).avatar, events: await page.evaluate(() => window.__physica.events.filter(e => e.type === 'step-up').length) });
+
 // 3c — stepping back into the region from the Terraza, then holding ▶ (regression of iter 1).
 await walkTo(5.6);
 await page.keyboard.down('ArrowLeft'); await sleep(450); await page.keyboard.up('ArrowLeft');
@@ -176,6 +241,9 @@ for (let i = 0; i < 220; i++) { const st = await state(); back.push(st.avatar); 
 await page.keyboard.up('ArrowRight');
 const bl = back[back.length - 1];
 step('volver a la Terraza', { samples: back.length, final: bl, onTerrace: bl.x > 4.7 && bl.grounded && Math.abs(bl.y - 0.55 - 4.4) < 0.02 });
+await page.evaluate(() => window.__physica.inspect(12.0, 2.2, 9)); await sleep(2200);
+writeFileSync(join(out, '11-pozo-instrumentos.png'), await page.screenshot());
+await page.evaluate(() => window.__physica.inspect(null));
 
 // 4 — Bitácora and save/load.
 writeFileSync(join(out, '04-terraza.png'), await page.screenshot());

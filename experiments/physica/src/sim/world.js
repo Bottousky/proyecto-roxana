@@ -32,6 +32,8 @@ export const AVATAR = {
   mantleTime: 0.28,     // s the climb takes; the climb, not the field, moves the body meanwhile
   chainDown: 1.0,       // m/s pulling oneself down a chain against an upward pull (effort)
   chainUp: 1.4,         // m/s climbing back up
+  step: 0.36,           // m: a step this high is taken while walking (declared assist)
+  stepTime: 0.14,       // s
 };
 export const SPHERE = { r: 0.17, mass: 1.2, restitution: 0.35, friction: 0.32 };
 const BOUNCE_MIN = 0.7;  // m/s: slower normal impacts settle instead of bouncing
@@ -53,8 +55,11 @@ export class World {
     this.nextId = 1;
     this.traceSeq = 0;
     this.input = { x: 0, y: 0, act: false, reset: false, adjust: 0 };
-    this.chain = level.chain ? { ...level.chain } : null;
-    this.bell = level.bell ? { ...level.bell, rung: 0 } : null;
+    // Chains: the first one is offered only after a first attempt (try, then tools).
+    this.chains = (level.chains || (level.chain ? [level.chain] : [])).map((c, i) => ({ id: c.id || `cadena-${i}`, gated: i === 0, ...c }));
+    this.chain = this.chains[0] || null;
+    this.bells = (level.bells || (level.bell ? [{ id: 'cascada', ...level.bell }] : [])).map(b => ({ ...b, rung: 0 }));
+    this.bell = this.bells[0] || null;
     this._a = { x: 0, y: 0 };
     this._a1 = { x: 0, y: 0 };
 
@@ -101,7 +106,8 @@ export class World {
     if (inp.reset) {
       inp.reset = false;
       // R restarts what is at stake: the explorer if it has been adrift, otherwise the experiment.
-      if (this.avatar.airSteps > 0.3 / DT && this.avatar.lastSupport) this.returnToFooting();
+      const av0 = this.avatar, inWater = av0.support?.solid?.noFooting;
+      if ((av0.airSteps > 0.3 / DT || inWater) && av0.lastSupport) this.returnToFooting();
       else this.resetExperiment();
     }
     if (inp.act) { inp.act = false; this.interact(); }
@@ -109,7 +115,7 @@ export class World {
 
     const av = this.avatar;
     if (av.heldBy?.type === 'mantle') this.updateMantle(av);
-    if (av.heldBy?.type === 'chain') this.updateChain(av, inp.y);
+    if (av.heldBy?.type === 'chain') this.updateChain(av, inp.y, av.heldBy.chain);
     const vyBefore = av.vy, airBefore = av.supportSteps === 0 && !av.heldBy;
     for (const b of this.bodies) {
       if (b.heldBy) continue;
@@ -138,7 +144,7 @@ export class World {
         av.airSteps = av.supportSteps ? 0 : (av.airSteps || 0) + 1;
         if (av.supportSteps > 10) av.letGoY = null;
         const sd = av.support?.solid;
-        if (av.supportSteps > 30 && sd && av.x - av.hw >= sd.x0 + 0.3 && av.x + av.hw <= sd.x1 - 0.3) av.lastSupport = { x: av.x, y: av.y };
+        if (av.supportSteps > 30 && sd && !sd.noFooting && av.x - av.hw >= sd.x0 + 0.1 && av.x + av.hw <= sd.x1 - 0.1) av.lastSupport = { x: av.x, y: av.y };
       }
       if (b.y < -30 || b.y > 60 || Math.abs(b.x) > 200) this.recover(b);
     }
@@ -170,24 +176,26 @@ export class World {
    */
   tryMantle(av, s, nx) {
     const ix = this.input.x;
-    if (av.supportSteps > 0 || av.heldBy || ix * nx >= -0.1) return;
+    if (av.heldBy || ix * nx >= -0.1) return;
     const feet = av.y - av.hh, rise = s.y1 - feet;
-    if (rise < -0.02 || rise > AVATAR.mantle || Math.abs(av.vy) > 3) return;
+    // Walking: steps up to AVATAR.step are taken. In the air: edges up to AVATAR.mantle are grabbed.
+    const grounded = av.supportSteps > 0;
+    if (grounded ? (rise <= 0.01 || rise > AVATAR.step) : (rise < -0.02 || rise > AVATAR.mantle || Math.abs(av.vy) > 3)) return;
     const to = { x: (nx < 0 ? s.x0 : s.x1) - nx * (av.hw + 0.06), y: s.y1 + av.hh + 0.002 };
     for (const o of this.solids) {
       if (o === s || (o.only && o.only !== 'box')) continue;
       if (to.x + av.hw > o.x0 && to.x - av.hw < o.x1 && to.y + av.hh > o.y0 && to.y - av.hh < o.y1) return;
     }
-    av.heldBy = { type: 'mantle', from: { x: av.x, y: av.y }, to, t: 0 };
+    av.heldBy = { type: 'mantle', from: { x: av.x, y: av.y }, to, t: 0, time: grounded ? AVATAR.stepTime : AVATAR.mantleTime };
     av.vx = 0; av.vy = 0;
-    this.emit('mantle', { body: av.id, x: to.x, y: to.y });
+    this.emit(grounded ? 'step-up' : 'mantle', { body: av.id, x: to.x, y: to.y });
   }
 
   updateMantle(av) {
     const m = av.heldBy; m.t += DT;
-    const k = Math.min(1, m.t / AVATAR.mantleTime), up = Math.min(1, k * 1.6), across = Math.max(0, (k - 0.35) / 0.65);
+    const k = Math.min(1, m.t / m.time), up = Math.min(1, k * 1.6), across = Math.max(0, (k - 0.35) / 0.65);
     av.x = m.from.x + (m.to.x - m.from.x) * across; av.y = m.from.y + (m.to.y - m.from.y) * up;
-    if (k >= 1) { av.heldBy = null; av.vx = 0; av.vy = 0; }
+    if (k >= 1) { av.heldBy = null; av.vx = 0; av.vy = 0; av.supportSteps = 1; }
   }
 
   returnToFooting() {
@@ -332,11 +340,21 @@ export class World {
     const av = this.avatar, out = [];
     if (av.heldBy?.type === 'chain') { out.push({ kind: 'letgo', verb: 'Soltarse', d: 0, x: av.x, y: av.y + 0.5, hint: '▲▼ subir o bajar' }); return out; }
     if (av.holding) { out.push({ kind: 'drop', verb: 'Soltar', d: 0, x: av.x, y: av.y }); return out; }
-    const ch = this.chain;
-    // The chain is the lip's interaction: within 0.75 m of the edge it takes precedence.
-    // Offered once the explorer has fallen short once, or has heard the bell: first try, then tools.
-    if (ch && (this.shortSeen || this.bell?.rung) && av.supportSteps > 0 && av.x > -0.75 && av.x < ch.x && Math.abs(av.y - av.hh - ch.lipY) < 0.1) {
-      out.push({ kind: 'chain', verb: 'Bajar por la cadena', d: 0, x: ch.x, y: ch.lipY + 1.0 });
+    // A chain is its lip's interaction: within 0.75 m of the edge it takes precedence.
+    // A gated chain is offered once the explorer has fallen short once, or has heard the bell.
+    for (const ch of this.chains) {
+      if (ch.gated && !(this.shortSeen || this.bell?.rung)) continue;
+      if (av.supportSteps > 0 && av.x > ch.lipX - 0.75 && av.x < ch.x && Math.abs(av.y - av.hh - ch.lipY) < 0.1) {
+        out.push({ kind: 'chain', chain: ch.id, verb: 'Bajar por la cadena', d: 0, x: ch.x, y: ch.lipY + 1.0 });
+      }
+      // In the air beside a chain the explorer can catch it: a way out of any oscillation.
+      if (!(ch.gated && !(this.shortSeen || this.bell?.rung)) && av.supportSteps === 0 && !av.heldBy && Math.abs(av.x - (ch.x - ch.side)) < 0.45 && av.y > ch.stopY - 0.05 && av.y < ch.lipY + av.hh) {
+        out.push({ kind: 'chain-air', chain: ch.id, verb: 'Agarrarse de la cadena', d: 0, x: ch.x, y: av.y + 0.7 });
+      }
+      // From the floor at the chain's foot it can be climbed back up.
+      if (av.supportSteps > 0 && Math.abs(av.x - (ch.x - ch.side)) < 0.6 && Math.abs(av.y - av.hh - ch.floorY) < 0.1 && ch.stopY <= ch.floorY + av.hh + 0.01) {
+        out.push({ kind: 'chain-foot', chain: ch.id, verb: 'Subir por la cadena', d: 0, x: ch.x, y: ch.floorY + 1.4 });
+      }
     }
     for (const st of this.stands) {
       const d = Math.abs(av.x - st.x);
@@ -368,14 +386,17 @@ export class World {
       const b = this.bodies.find(x => x.id === it.id);
       b.heldBy = { type: 'hand' }; av.holding = b;
       this.emit('pick', { body: b.id });
-    } else if (it.kind === 'chain') {
-      const ch = this.chain;
-      av.heldBy = { type: 'chain' }; av.vx = av.vy = 0; av.supportSteps = 0; av.airSteps = 0;
-      av.x = ch.x - ch.side; av.y = ch.lipY + av.hh;
+    } else if (it.kind === 'chain' || it.kind === 'chain-foot' || it.kind === 'chain-air') {
+      const ch = this.chains.find(c => c.id === it.chain);
+      // Catching it in the air the hands absorb the motion: an explicit impulse from the chain.
+      av.heldBy = { type: 'chain', chain: ch }; av.vx = av.vy = 0; av.supportSteps = 0; av.airSteps = 0;
+      av.x = ch.x - ch.side; av.y = it.kind === 'chain' ? ch.lipY + av.hh : it.kind === 'chain-foot' ? ch.stopY : Math.max(ch.stopY, Math.min(ch.lipY + av.hh, av.y));
+      this.emit('grab', { body: av.id, chain: ch.id, air: it.kind === 'chain-air' });
       this.emit('grab', { body: av.id });
     } else if (it.kind === 'letgo') {
-      av.heldBy = null; av.vx = 0; av.vy = 0; av.supportSteps = 0; av.airSteps = 0; av.letGoY = av.y;
-      this.emit('letgo', { body: av.id, x: av.x, y: av.y });
+      const ch = av.heldBy.chain;
+      av.heldBy = null; av.vx = 0; av.vy = 0; av.supportSteps = 0; av.airSteps = 0; av.letGoY = av.y; av.letGoChain = ch.id;
+      this.emit('letgo', { body: av.id, x: av.x, y: av.y, chain: ch.id });
     } else if (it.kind === 'stand') {
       const st = this.stands.find(s => s.id === it.id);
       if (st.state === 'armed') {
@@ -403,8 +424,7 @@ export class World {
   }
 
   /** On the chain the explorer's hands are the authority: it moves along the chain only. */
-  updateChain(av, iy) {
-    const ch = this.chain;
+  updateChain(av, iy, ch) {
     av.x = ch.x - ch.side; av.vx = 0;
     const v = iy < -0.2 ? -AVATAR.chainDown : iy > 0.2 ? AVATAR.chainUp : 0;
     const top = ch.lipY + av.hh, bottom = ch.stopY;
@@ -420,14 +440,12 @@ export class World {
 
   /** A bell at a height: anything that reaches it rings it once per pass. */
   updateBell() {
-    const bl = this.bell;
-    if (!bl) return;
-    for (const b of this.bodies) {
+    for (const bl of this.bells) for (const b of this.bodies) {
       if (b.kind !== 'sphere' || b.heldBy) continue;
       // Once per flight: the clapper rings on the first touch after a release, not on every bounce.
-      const near = Math.hypot(b.x - bl.x, b.y - bl.y) < bl.r + b.r;
-      if (near && !b.atBell && !b.bellRungThisFlight) { this.emit('bell', { body: b.id, speed: Math.hypot(b.vx, b.vy) }); bl.rung++; b.bellRungThisFlight = true; }
-      b.atBell = near;
+      const near = Math.hypot(b.x - bl.x, b.y - bl.y) < bl.r + b.r, key = `atBell_${bl.id}`;
+      if (near && !b[key] && !b.bellRungThisFlight) { this.emit('bell', { body: b.id, bell: bl.id, speed: Math.hypot(b.vx, b.vy) }); bl.rung++; b.bellRungThisFlight = true; }
+      b[key] = near;
     }
   }
 

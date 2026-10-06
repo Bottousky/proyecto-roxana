@@ -124,6 +124,10 @@ export class Journal {
         `Tu hebilla llegó a ${fmt(e.centre, 2)} m; la línea de la campana, en la pared, está a ${fmt(line, 1)} m. La tiza queda en la pared con el lugar desde donde empezaste. Algo se puede cambiar antes de entrar.`,
         { apex: e.centre, line });
     }
+    // El Pozo: every attempt from its chain, measured, and how it ended.
+    if (e.type === 'letgo' && e.chain === 'pozo') this.flags.wellTry = { from: e.y, apex: null };
+    if (e.type === 'grab' && this.flags.wellTry) this.closeWellTry('cadena');
+    if (e.type === 'footing' && this.flags.wellTry) this.closeWellTry('rescate');
     if (e.type === 'enter' && e.body === w.avatar.id && e.zone === 'cascada') { this.flags.climbFrom = w.avatar.y - w.avatar.hh; this.flags.climbTop = -Infinity; }
     if (e.type === 'exit' && e.body === w.avatar.id && e.zone === 'cascada') this.flags.wasInside = true;
   }
@@ -155,10 +159,44 @@ export class Journal {
         `Con las marcas de tus dos experimentos: afuera, la velocidad de la esfera cambió ${fmt(Math.abs(this.flags.aA), 1)} m/s por segundo, hacia abajo. Adentro de la región, ${fmt(Math.abs(this.flags.aB), 1)} m/s por segundo, hacia arriba. No cambia la esfera: cambia el lugar.`,
         { aA: this.flags.aA, aB: this.flags.aB, formula: 'y = y₀ + ½·a·t²' });
     }
+    const wt = this.flags.wellTry;
+    // Highest point of the attempt, measured from the explorer's own trajectory (also when the
+    // edge grab ends the flight before an apex event).
+    if (wt && !av.heldBy && av.supportSteps === 0) wt.apex = Math.max(wt.apex ?? -Infinity, av.y);
+    if (wt && av.supportSteps > 20) this.closeWellTry(av.support?.solid?.id);
     if (this.toastT > 0) { this.toastT -= dt; if (this.toastT <= 0) this.toastEl.hidden = true; }
     // Keep the last firm footing saved so a reload resumes where the explorer stood.
     const ls = av.lastSupport;
     if (ls && (!this.footing || Math.abs(ls.x - this.footing.x) > 0.5 || Math.abs(ls.y - this.footing.y) > 0.1)) { this.footing = { ...ls }; this.save(); }
+  }
+
+  /** Classify a Pozo attempt by its cause, with numbers taken from the attempt itself. */
+  closeWellTry(on) {
+    const w = this.world, wt = this.flags.wellTry, line = w.level.miradorLine;
+    this.flags.wellTry = null;
+    const rose = wt.apex != null && wt.apex > wt.from + 0.05;
+    let outcome;
+    if (on === 'mirador') outcome = 'mirador';
+    else if (on === 'pozo-fondo') outcome = rose ? 'corto' : (wt.from > w.chains.find(c => c.id === 'pozo').stopY + 0.05 ? 'cae' : 'agua');
+    else outcome = rose && wt.apex >= line ? 'direccion' : 'corto';
+    (this.flags.wellTries ||= []).push({ ...wt, outcome });
+    const where = v => `con la hebilla a ${fmt(v, 1)} m`;
+    if (outcome === 'cae' && !this.has('pozo-cae')) this.add('pozo-cae', 'Más abajo, nada',
+      `Te soltaste ${where(wt.from)} y en lugar de subir caíste al agua: ahí la región del pozo ya no levantaba. Más abajo no siempre es más alto: hay que estar adentro.`, { ...wt });
+    if (outcome === 'corto' && !this.has('pozo-corto')) this.add('pozo-corto', 'Corto en el pozo',
+      `Te soltaste ${where(wt.from)}; tu hebilla llegó a ${fmt(wt.apex, 2)} m. La línea del Mirador está a ${fmt(line, 2)} m.`, { ...wt });
+    if (outcome === 'direccion' && !this.has('pozo-direccion')) this.add('pozo-direccion', 'Alto, pero lejos',
+      `Te soltaste ${where(wt.from)} y tu hebilla pasó la línea del Mirador (${fmt(wt.apex, 2)} m), pero no fuiste hacia él a tiempo.`, { ...wt });
+    if (outcome === 'mirador' && !this.has('mirador')) {
+      const tries = this.flags.wellTries.slice(0, -1);
+      const uniq = list => [...new Set(list.map(t => fmt(t.from, 1)))];
+      const fell = uniq(tries.filter(t => t.outcome === 'cae')), short = uniq(tries.filter(t => t.outcome === 'corto'));
+      let body = `Te soltaste ${where(wt.from)} y llegaste al Mirador: tu hebilla subió hasta ${fmt(wt.apex, 2)} m, sobre su línea de ${fmt(line, 2)} m.`;
+      if (fell.length) body += ` Desde ${fell.join(' y ')} m caíste: ahí la región del pozo ya no levantaba.`;
+      if (short.length) body += ` Desde ${short.join(' y ')} m no alcanzaste.`;
+      if (fell.length && short.length) body += ' La respuesta estaba en el medio: lo bastante abajo para subir alto, pero adentro de la región.';
+      this.add('mirador', 'El Mirador', body, { tries: this.flags.wellTries });
+    }
   }
 
   render() {

@@ -15,8 +15,12 @@ Los nombres de escenas son propuestas; los resultados educativos son los del con
   - musgo y bufanda orientados;
   - polen que se acumula en el borde;
   - zumbido de las anclas.
-- **Transferencia:** la misma regla en otra geometría, por ejemplo una región con techo donde se camina invertido o dos regiones superpuestas. **Pendiente.**
-- **Estado:** **IMPLEMENTADO (Hito A en curso)**. Falta la anticipación explícita, la transferencia y el acabado de arte.
+- **Transferencia:** el Pozo. La misma regla en otra geometría, con dos límites: demasiado abajo se sale del campo y se cae; demasiado arriba no alcanza. **Implementada (iter 3).**
+- **Anticipación:** el riel de B y la campana predicen el umbral de la cadena (iter 2).
+- **Estado:** **IMPLEMENTADO (Hito A en curso)**.
+  - Falta el acabado de arte.
+  - Falta la amortiguación (decisión pendiente).
+  - Falta la validación con personas.
 
 ## 1. Introducción: referencia, posición, desplazamiento, tiempo, unidades, vectores
 - **Concepto:** la posición se describe respecto de una referencia. Dos observadores describen distinto un mismo transporte.

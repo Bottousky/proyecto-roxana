@@ -26,7 +26,7 @@ la historia: el legado sigue en git y se cita por commit.
 | Cascada ascendente | LEGACY (key art) → **IMPLEMENTADO** con modelo nuevo | Ver `DECISIONES.md`. |
 | Metrópolis detrás del paisaje | LEGACY + contrato | Sólo insinuada en el horizonte. Sin implementar. |
 | INSTRUMENTO (compañero), Voz Docente | LEGACY | No implementados. Sin decisión. |
-| Nombres «Orilla», «Terraza», «Soporte de la orilla/del borde» | **PROPUESTA** | Nombres de trabajo de esta iteración. |
+| Nombres «Orilla», «Terraza», «Soporte de la orilla/del borde», «Pozo», «Mirador» | **PROPUESTA** | Nombres de trabajo. |
 | Aspecto del explorador | **PROPUESTA** | Ningún documento lo define. Ver `DECISIONES.md`. |
 
 ## Conflictos registrados

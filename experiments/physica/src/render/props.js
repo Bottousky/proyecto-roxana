@@ -2,8 +2,11 @@
 import * as THREE from 'three';
 import { TRACE_MAX_MARKS } from '../sim/world.js';
 const TRACE_CAP = TRACE_MAX_MARKS + 1;
-// Both height scales (B's rail and the chain) are drawn at one depth so equal numbers line up on screen.
-const SCALE_Z = -0.3;
+// Everything numeric — the rails' and chains' scales, the chalk, the bell and Mirador lines —
+// is drawn on one plane just in front of the explorer's lane, so equal heights line up on screen
+// from any camera height (instruments at other depths would show parallax).
+export const MEASURE_Z = 0.08;
+const SCALE_Z = MEASURE_Z;
 
 export function makeMaterials() {
   return {
@@ -51,28 +54,35 @@ export function chainProp(ch, M) {
   }
   links.castShadow = true; g.add(links);
   // Davit on the lip and an anchor ring on the floor.
-  const davit = box(ch.x + 0.2, 0.07, 0.09, M.brassDark); davit.position.set((ch.x - 0.2) / 2, top + 0.03, 0.02); g.add(davit);
-  const post = box(0.09, top + 0.1, 0.09, M.brassDark); post.position.set(-0.2, (top + 0.1) / 2, 0.02); g.add(post);
+  const davit = box(ch.x - ch.lipX + 0.2, 0.07, 0.09, M.brassDark); davit.position.set((ch.x + ch.lipX - 0.2) / 2, top + 0.03, 0.02); g.add(davit);
+  const post = box(0.09, 0.45, 0.09, M.brassDark); post.position.set(ch.lipX - 0.2, ch.lipY + 0.22, 0.02); g.add(post);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 8, 16), M.brassDark); ring.rotation.x = Math.PI / 2; ring.position.set(ch.x, bottom + 0.03, 0.02); g.add(ring);
   const collar = cyl(0.07, 0.07, 0.06, M.brass); collar.position.set(ch.x, ch.stopY + 0.25, 0.02); g.add(collar);
-  for (let y = Math.ceil(ch.stopY); y <= ch.lipY + 1e-6; y += 1) {
-    // Numbers sit between the wall and the chain, where the explorer's body does not cover them.
-    const t = label(`${y < 0 ? '−' : ''}${Math.abs(y)}`, M, 0.17); t.position.set(0.24, y, SCALE_Z); g.add(t);
-    const tick = box(0.12, 0.02, 0.02, M.brass); tick.position.set(ch.x - 0.06, y, 0.04); g.add(tick);
+  // Numbered every half metre, between the wall and the chain, where the explorer's body does not cover them.
+  for (let y = Math.ceil(ch.stopY * 2) / 2; y <= ch.lipY + 1e-6; y += 0.5) {
+    const whole = Math.abs(y - Math.round(y)) < 1e-6;
+    const txt = `${y < 0 ? '−' : ''}${whole ? Math.abs(Math.round(y)) : Math.abs(y).toFixed(1).replace('.', ',')}`;
+    const t = label(txt, M, whole ? 0.25 : 0.2); t.position.set(ch.lipX + 0.2, y, SCALE_Z); g.add(t);
+    const tick = box(whole ? 0.12 : 0.08, 0.02, 0.02, M.brass); tick.position.set(ch.x - 0.06, y, 0.04); g.add(tick);
   }
-  for (let y = ch.stopY + 0.5; y < ch.lipY; y += 1) { const tick = box(0.07, 0.015, 0.02, M.brass); tick.position.set(ch.x - 0.05, y, 0.04); g.add(tick); }
+  // Where a region's floor crosses the chain: a brass collar and a seam across the shaft, the
+  // apparatus's own mark (the plumbs and drips show the same thing by behaviour).
+  if (ch.regionFloor != null) {
+    const c2 = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.025, 8, 18), M.copper); c2.rotation.x = Math.PI / 2; c2.position.set(ch.x, ch.regionFloor, 0.02); g.add(c2);
+    const seam = box(1.5, 0.025, 0.02, M.copper); seam.position.set(ch.lipX + 0.8, ch.regionFloor, SCALE_Z - 0.01); g.add(seam);
+  }
   // The ring the explorer holds slides with its buckle; at rest it waits at the lip.
   const ringM = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.02, 8, 18), M.brass); ringM.position.set(ch.x, ch.lipY + 0.55, 0.02); g.add(ringM);
-  const pointer = box(Math.max(0.1, ch.x - 0.38), 0.018, 0.02, M.brass); pointer.position.set((ch.x + 0.38) / 2, ch.lipY + 0.55, SCALE_Z + 0.02); g.add(pointer);
+  const pointer = box(Math.max(0.1, ch.x - ch.lipX - 0.38), 0.018, 0.02, M.brass); pointer.position.set((ch.x + ch.lipX + 0.38) / 2, ch.lipY + 0.55, SCALE_Z + 0.02); g.add(pointer);
   g.userData.ring = ringM; g.userData.pointer = pointer; g.userData.restY = ch.lipY + 0.55;
   return g;
 }
 
 /** A bell hung from a gallows on the Terraza, at the Terraza's height above B's rail. */
 export class Bell {
-  constructor(bl, terraceY, M) {
-    const g = this.group = new THREE.Group();
-    const postX = 4.95, armY = terraceY + 1.25;
+  constructor(bl, groundY, M, postX) {
+    const g = this.group = new THREE.Group(), terraceY = groundY;
+    const armY = Math.max(terraceY + 1.25, bl.y + 0.9);
     const post = cyl(0.05, 0.06, armY - terraceY, M.wood); post.position.set(postX, (terraceY + armY) / 2, -0.5); g.add(post);
     const arm = box(postX - bl.x + 0.1, 0.06, 0.06, M.woodLight); arm.position.set((postX + bl.x) / 2, armY, -0.5); g.add(arm);
     this.pivot = new THREE.Group(); this.pivot.position.set(bl.x, armY, -0.5); g.add(this.pivot);
@@ -91,11 +101,13 @@ export class Bell {
  * bell's height, the line a centre must reach.
  */
 export class ApexMarks {
-  constructor(scene, M, { bellLine, x0 = 3.95, x1 = 4.45, z = 0.62 }) {
+  constructor(scene, M, { bellLine, x0 = 3.95, x1 = 4.45, z = MEASURE_Z }) {
     this.scene = scene; this.M = M; this.items = []; this.x0 = x0; this.x1 = x1; this.z = z;
-    const line = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0 + 0.2, 0.035), new THREE.MeshBasicMaterial({ color: '#d9b45a' }));
-    line.position.set((x0 + x1) / 2 - 0.1, bellLine, z - 0.01); line.renderOrder = 9; scene.add(line);
-    const tag = label(bellLine.toFixed(1).replace('.', ','), M, 0.17); tag.position.set(x0 - 0.3, bellLine, z - 0.01); tag.renderOrder = 9; scene.add(tag);
+    if (bellLine != null) {
+      const line = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0 + 0.2, 0.035), new THREE.MeshBasicMaterial({ color: '#d9b45a' }));
+      line.position.set((x0 + x1) / 2 - 0.1, bellLine, z - 0.01); line.renderOrder = 9; scene.add(line);
+      const tag = label(bellLine.toFixed(1).replace('.', ','), M, 0.17); tag.position.set(x0 - 0.3, bellLine, z - 0.01); tag.renderOrder = 9; scene.add(tag);
+    }
   }
   add(y, from) {
     const g = new THREE.Group();
@@ -148,7 +160,7 @@ export class Stand {
       for (let y = rail.min; y <= rail.max + 1e-6; y += rail.step) {
         const major = Math.abs(y - Math.round(y)) < 1e-6;
         const t = box(major ? 0.16 : 0.1, 0.014, 0.03, M.ink); t.position.set(clampX + 0.06, y, zr + 0.02); g.add(t);
-        if (major) { const l = label(`${y < 0 ? '−' : ''}${Math.abs(Math.round(y))}`, M); l.position.set(clampX + 0.26, y, SCALE_Z); g.add(l); }
+        if (major) { const l = label(`${y < 0 ? '−' : ''}${Math.abs(Math.round(y))}`, M, 0.22); l.position.set(clampX + 0.3, y, SCALE_Z); g.add(l); }
       }
     } else {
       const drop = cyl(0.018, 0.018, 0.26, M.brass); drop.position.set(clampX, topY - 0.13, zl); g.add(drop);
