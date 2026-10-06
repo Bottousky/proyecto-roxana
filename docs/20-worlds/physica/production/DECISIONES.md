@@ -130,15 +130,15 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
   - En el Pozo, un intento corto vuelve solo a la Terraza (el techo de la región está a su nivel), así que la oscilación eterna no bloquea.
   - Sigue abierta para la cascada (A20).
 
-## D11 · Water with volume, from the same field (iteration 05)
+## D11 · Agua con volumen, del mismo campo (iteración 05)
 
-- **Shape:** it still comes from the field. Each stream is the path of a parcel integrated with `ballisticPath`.
-- **Cross-section by continuity:** A·v = constant. The thickness goes as √(v_ref/v) and is clamped to 0.6–1.45, so the column swells where it is slow (the spring and the crest) and thins where it is fast. Before this, the minimum was clamped at 0.35 and the column looked like a hose.
-- **Body plus veil:** a 1.55× wider tube whose fragments only survive as streaks and froth. Where there is more foam it keeps fewer shreds, but whiter ones, so the water breaks up at the crest without simulating droplets.
-- **Waves on the surface:** displaced by noise in (aT − time), so they travel at the parcel's speed, just like the streaks.
-- **Pools:** ripples travel outward from the spring or the impact. The `radial` option uses aT = distance / speed.
-- **Foam mounds** where water wells up and where it lands.
-- **Wet rock:** declared zones (`setWetZones`) where the rock darkens and its roughness drops.
-- **Warm-up:** at startup every texture is uploaded and every program compiled, and the whole level is rendered once with a wide shadow frustum. It takes ~74 ms during the opening shot.
-  - It's meant to avoid the first-view hitches measured (150–250 ms).
-  - It couldn't be validated: the machine had a load average of 11–16 from another session (headless Chrome on Bitland), and with that load the hitches also show up in later runs.
+- **Forma:** sigue saliendo del campo. Cada chorro es la trayectoria de una parcela integrada con `ballisticPath`.
+- **Sección por continuidad:** A·v = constante. El grosor va como √(v_ref/v), acotado a 0,6–1,45: la columna se ensancha donde es lenta (el afloramiento y la cresta) y se afina donde es rápida. Antes el mínimo estaba en 0,35 y la columna parecía una manguera.
+- **Cuerpo y velo:** un tubo 1,55 veces más ancho cuyos fragmentos sólo sobreviven como vetas y espuma. Donde hay más espuma quedan menos jirones, pero más blancos: el agua se rompe en la cresta sin simular gotas.
+- **Ondas en la superficie:** desplazadas con ruido en (aT − tiempo), así viajan a la velocidad de la parcela, igual que las vetas.
+- **Pozas:** las ondas se alejan del afloramiento o del impacto. La opción `radial` usa aT = distancia / velocidad.
+- **Montículos de espuma** donde el agua brota y donde cae.
+- **Roca mojada:** zonas declaradas (`setWetZones`) donde la roca se oscurece y baja su rugosidad.
+- **Precalentamiento:** al arrancar se suben todas las texturas, se compilan todos los programas y se dibuja el nivel entero una vez con un frustum de sombra amplio. Tarda ~74 ms, durante el plano inicial.
+  - Busca evitar los tirones de primera vista que se midieron (150–250 ms).
+  - No se pudo validar en su momento: la máquina tenía una carga media de 11–16 por otra sesión (Chrome headless de Bitland), y con esa carga los tirones aparecen también en corridas posteriores. En la corrida final (carga ~4) no hubo tirones.

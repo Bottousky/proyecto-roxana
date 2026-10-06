@@ -1,46 +1,46 @@
-# Iteration 05 — the cascade water (evidence)
+# Iteración 05 — el agua de la cascada (evidencia)
 
-**Main result:** the column now has apparent volume, foam and continuous flow, and its shape still comes from the same field as the bodies. Design in `../../DECISIONES.md` D11; the review and its response are in `REVISION.md`.
+**Resultado principal:** la columna tiene volumen aparente, espuma y flujo continuo, y su forma sigue saliendo del mismo campo que los cuerpos. Diseño en `../../DECISIONES.md` D11; la revisión y su respuesta, en `REVISION.md`.
 
-**What changed in the water:**
-- **Spring:** the column now leaves the pool's surface, pushed by the spring's pressure, which is declared in the model.
-- **Thickness:** it follows continuity, and at the crest it is capped by the radius of curvature, so the stream no longer folds over itself.
-- **Body and veil:** a body plus a torn veil, with waves that travel at the water's own speed.
-- **Foam:** a crown of froth at the crest and foam mounds where the water wells up and where it lands.
-- **Pools:** the ripples now spread out in rings from the spring and from each landing point.
-- **Wet rock:** declared zones with a rounded falloff.
-- **Opening shot:** familiar fall, then the column.
+**Qué cambió en el agua:**
+- **Afloramiento:** la columna sale de la superficie de la poza, empujada por la presión de la surgencia, declarada en el modelo.
+- **Grosor:** sigue la continuidad y, en la cresta, lo limita el radio de curvatura; el chorro ya no se pliega sobre sí mismo.
+- **Cuerpo y velo:** un cuerpo más un velo desgarrado, con ondas que viajan a la velocidad del agua.
+- **Espuma:** una corona de espuma en la cresta y montículos donde el agua brota y donde cae.
+- **Pozas:** las ondas se abren en anillos desde el afloramiento y desde cada punto de caída.
+- **Roca mojada:** zonas declaradas con borde redondeado.
+- **Plano inicial:** primero la caída familiar, después la columna.
 
-**Images:**
+**Imágenes:**
 
-| Prefix | Version |
+| Prefijo | Versión |
 |---|---|
-| `antes-*` | Before |
-| `intermedio-*` | The version that went to review |
-| `despues-*` | After the corrections |
+| `antes-*` | Antes |
+| `intermedio-*` | La versión que fue a revisión |
+| `despues-*` | Después de las correcciones |
 
-Same shots in all three: `w1` spring, `w2` column, `w3` crest, `w4` landing, `w5` left fall, `w6` play camera.
+Las mismas tomas en las tres: `w1` afloramiento, `w2` columna, `w3` cresta, `w4` llegada, `w5` caída izquierda, `w6` cámara de juego. Del recorrido: `00a-plano-de-establecimiento`, `03c-cruce-por-la-cadena`, `10c-pozo-en-la-ventana`.
 
-## Technical (measured)
+## Técnico (medido)
 
-- `npm test`: 44/44. The water test now checks that the column comes out of the pool with the declared velocity, crests over the Terraza, lands on it, and rises clear of the face.
-- **Keyboard route** (`report.json`, Apple M2, headless Chrome, load 4.2–4.3 across 8 cores): the full route, all three shaft outcomes and the steps pass; 10 notes persist; 0 errors.
-- **Frame times:**
+- `npm test`: 44/44. La prueba del agua comprueba que la columna sale de la poza con la velocidad declarada, cresta sobre la Terraza, cae en ella y sube despegada de la cara.
+- **Recorrido con teclado** (`report.json`, Apple M2, Chrome headless, carga 4,2–4,3 en 8 núcleos): pasan el recorrido completo, los tres resultados del pozo y los escalones; persisten 10 notas; 0 errores.
+- **Tiempos de cuadro (ms):**
 
-  | Situation | p50 | p95 | p99 | max | steps dropped |
+  | Situación | p50 | p95 | p99 | máx. | pasos perdidos |
   |---|---|---|---|---|---|
-  | Idle | 16.7 | 16.7 | 16.8 | 16.8 | 0 |
-  | Crossing | 16.7 | 16.7 | 16.8 | 16.8 | 0 |
+  | Reposo | 16,7 | 16,7 | 16,8 | 16,8 | 0 |
+  | Cruce | 16,7 | 16,7 | 16,8 | 16,8 | 0 |
 
-  Before the warm-up, the first crossing showed hitches of 150–250 ms.
-- **Route harness:** two failures came from the harness, not from the game:
-  - `walkTo` used a wall-clock budget, and under load the simulation advances more slowly. It now uses simulated time.
-  - The sheets are composed in a second tab, which left the game tab with `requestAnimationFrame` stopped. The game tab is now brought back to the front.
+  Antes del precalentamiento, el primer cruce mostraba tirones de 150–250 ms.
+- **Arnés del recorrido:** dos fallas venían del arnés, no del juego:
+  - `walkTo` usaba un presupuesto de reloj de pared, y con carga la simulación avanza más lento. Ahora usa tiempo simulado.
+  - Las hojas de contacto se componen en una segunda pestaña, que dejaba la del juego con `requestAnimationFrame` detenido. Ahora la pestaña del juego vuelve al frente.
 
-## Not verified
+## Sin verificar
 
-- The look of the veil at grazing angles in close-up.
-- Sound.
-- Performance over 60 s with the vista, on a quiet machine.
-- Mobile.
-- Whether a person reads "this water is going up" without anyone explaining it.
+- El aspecto del velo en ángulos rasantes, de cerca.
+- El sonido.
+- El rendimiento durante 60 s con la vista, en una máquina tranquila.
+- Móvil.
+- Si una persona lee «esta agua sube» sin que nadie se lo explique.

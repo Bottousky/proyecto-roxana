@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-05 · iteración 04 (acabado visible; ver `evidence/iter-04`).
+**Actualizado:** 2026-10-06 · iteración 05 (agua de la cascada; ver `evidence/iter-05`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,15 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 03):** transferencia con dos límites.
+**Último cambio aceptado (iteración 05):** el agua de la cascada tiene volumen, espuma y flujo continuo, y su forma sigue saliendo del campo (D11).
+- **Sección por continuidad** y límite por curvatura en la cresta; velo desgarrado; ondas a la velocidad del agua.
+- **La columna sale de la poza** con la presión declarada de la surgencia; espuma en el afloramiento, la cresta y la llegada; roca mojada.
+- **Revisión independiente:** 8 hallazgos, 6 corregidos y 2 parciales (la corona de la cresta se ve poco; pozas rectangulares).
+- **Evidencia:** 44 pruebas; recorrido con teclado sin regresiones y sin tirones en el cruce (carga ~4). Ver `evidence/iter-05`.
+
+**Iteración 04:** acabado visible. Roca con detalle pintado y relieve por estrato, fondo pintado en capas, ciudad con interruptor, plano de establecimiento y retrato en la Bitácora. Ver `evidence/iter-04`.
+
+**Iteración 03:** transferencia con dos límites.
 - **El Pozo:** un pozo con su propia región. Su piso está a 1,0 m.
 - **El Mirador:** más alto, del otro lado.
 - **Experimento seguro:** el soporte P (riel y campana) predice exactamente la ventana del explorador (1,2–2,3 m).
@@ -56,17 +64,15 @@
 - **Rendimiento:** 60 FPS medidos en escritorio (M2) después de reemplazar el ruido por fragmento por una textura.
 
 **Qué falla todavía (ver BACKLOG):**
-- **Acabado audiovisual del Hito A** (el mayor impedimento para cerrarlo):
-  - **A10:** la roca se ve borrosa de cerca;
-  - **A18:** no hay plano de establecimiento;
-  - **A19:** el arco y la cresta del agua;
-  - la ciudad es una silueta simple.
+- **Acabado del Hito A** (el mayor impedimento para cerrarlo):
+  - **A24:** el modelo 3D del explorador no coincide con su retrato;
+  - pasto, musgo e instrumentos genéricos;
+  - la corona de la cresta se ve poco y las pozas son rectángulos.
 - **A20:** no hay amortiguación; la oscilación ideal es eterna, aunque tiene salidas.
 - **A21:** hay un solo chorro.
 - **A17:** no hay nada que *modificar*.
 - **A22:** el mástil parece una escalera.
 - **A23:** assets generados, esperando la decisión del usuario.
-- **A10 y A12:** la roca se ve borrosa de cerca y la composición del cuadro de la cascada está apretada.
 - **A12:** las animaciones del avatar no se revisaron en movimiento.
 - **A16:** no hay menú de opciones.
 - **No verificado:**
@@ -77,9 +83,11 @@
 
 ## Próximo resultado
 
-**Agua de la cascada (A19) + modelo 3D del explorador fiel al retrato.**
-- **Agua:** sección según A·v, espuma en el afloramiento, rocío en la cresta y roca mojada.
-- **Modelo:** antiparras con lentes, mechones y colas de bufanda.
+**Modelo 3D del explorador fiel al retrato (A24).**
+- Antiparras con lentes, mechones, colas de bufanda con movimiento secundario, proporción de 3 cabezas.
+- **Criterio:** vista de giro del modelo junto a la hoja de giro, en las mismas cuatro vistas; recorrido con teclado sin regresiones; revisión independiente centrada en el personaje.
+
+*Plan cumplido en la iteración 05:* agua de la cascada (A19): sección según A·v, espuma en el afloramiento, rocío en la cresta y roca mojada.
 
 *Plan cumplido en la iteración 04:* acabado visible de la escena insignia (A10 + A18).
 - **Roca:** que se lea con detalle de cerca. Procedural, con textura de mayor resolución y relieve por estrato, o con assets generados si el usuario elige la vía A o B de `art/PROMPTS-IMAGEGEN.md`.
@@ -119,5 +127,5 @@ node scripts/evidence.mjs http://127.0.0.1:4210/ <carpeta-de-salida>
 ```
 
 **Loop:**
-- Programado en esta sesión con `/loop 5m` (cron `*/5 * * * *`, job `0bc8e745`). Se cancela con CronDelete.
+- Programado en esta sesión con `/loop 5m` (cron `*/5 * * * *`, job `478624ed`, recreado al retomar después del límite de uso). Se cancela con CronDelete.
 - Vive sólo mientras la sesión esté abierta.
