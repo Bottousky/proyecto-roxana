@@ -124,7 +124,7 @@ export function bindKingdomMap(root) {
   const player = marks.find(m => m.classList.contains('kmap-player')), scaleBar = host.querySelector('[data-kmap-scale]');
   let view = { x: 0, y: 0, s: 1 }, frame = 0;
   const size = () => viewport.getBoundingClientRect();
-  const limits = () => { const r = size(); return { min: Math.min(r.width / KINGDOM_MAP.width, r.height / KINGDOM_MAP.height) * .92, max: 2.4 }; };
+  const limits = () => { const r = size(); return { min: Math.min(r.width / KINGDOM_MAP.width, r.height / KINGDOM_MAP.height) * .92, max: 1.6 }; };
   const clamp = () => {
     const r = size(), { min, max } = limits(); view.s = Math.min(max, Math.max(min, view.s));
     const w = KINGDOM_MAP.width * view.s, h = KINGDOM_MAP.height * view.s;

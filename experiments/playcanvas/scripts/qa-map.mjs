@@ -37,8 +37,8 @@ for (const size of sizes) {
   await page.locator('.kmap-viewport').focus();
   for (let i = 0; i < 6; i++) { await page.keyboard.press('-'); await page.waitForTimeout(60); }
   await page.waitForTimeout(300); await page.screenshot({ path: `${out}/${size}-2-reino.png` });
-  await page.keyboard.press('c');
   for (let i = 0; i < 9; i++) { await page.keyboard.press('+'); await page.waitForTimeout(60); }
+  await page.keyboard.press('c');
   await page.waitForTimeout(300); await page.screenshot({ path: `${out}/${size}-3-cerca.png` });
   assert.deepEqual(errors, [], `${size}: no page errors`);
   await page.keyboard.press('Escape');

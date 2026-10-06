@@ -125,11 +125,16 @@ void main(){
   vec2 q = uv / px;                      // pixel coordinates
   vec2 metres = q / pxm;                 // map metres
   vec3 k = texture(K, uv).rgb; float l = lum(k);
-  vec4 m = texture(M, uv); float water = m.r, forest = m.g, stone = m.b, roof = m.a;
+  vec4 m = texture(M, uv); float water = m.r, stone = m.b, roof = m.a;
+  // The edge of a wood is never ruled: the forest mask is read through a gentle warp of a few metres
+  // (roads, courts, roofs and water stay exactly where the game has them).
+  vec2 warp = (vec2(fbm(metres * .055), fbm(metres * .055 + 17.3)) - .5) * 9. * pxm * px;
+  float forest = texture(M, uv + warp).g * (1. - water) * (1. - stone) * (1. - roof);
   float deep = texture(W, uv).r;         // 0 on land … 1 far out at sea
   // Meadow: an olive wash that keeps the land's own light and dark.
   float wash = fbm(metres * .045);
-  vec3 meadow = mix(vec3(.60, .64, .42), vec3(.73, .73, .50), wash) * (.82 + .55 * (l - .36));
+  vec3 meadow = mix(vec3(.60, .64, .42), vec3(.73, .73, .50), wash) * (.86 + .4 * (l - .36));
+  meadow *= 1. + (noise(metres * vec2(1.1, .28)) - .5) * .07;            // grass strokes
   // Forest: crowns of trees, each lit from the north-west, dark between them.
   vec2 cell = metres / 2.6, ic = floor(cell); float d1 = 9., d2 = 9.; vec2 nearest = vec2(0); float tone = 0.;
   for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) { vec2 g = ic + vec2(i, j), f = g + .15 + .7 * hash2(g); float d = length(cell - f); if (d < d1) { d2 = d1; d1 = d; nearest = cell - f; tone = hash(g); } else if (d < d2) d2 = d; }
@@ -153,10 +158,13 @@ void main(){
   // Relief: where the land's light changes sharply (an escarpment), shade toward the south-east.
   float lx = lum(texture(K, uv + vec2(1, 0) * px).rgb) - lum(texture(K, uv - vec2(1, 0) * px).rgb);
   float lz = lum(texture(K, uv + vec2(0, 1) * px).rgb) - lum(texture(K, uv - vec2(0, 1) * px).rgb);
-  col *= 1. - (1. - water) * (1. - stone) * clamp(length(vec2(lx, lz)) * 1.2, 0., .16);
+  col *= 1. - (1. - water) * (1. - stone) * (1. - forest) * smoothstep(.06, .2, length(vec2(lx, lz))) * .14;
   // Ink: the coast strongest, then the edges of woods, stone and roofs.
   float coast = 0., ink = 0.;
-  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) { vec2 off = vec2(i, j) * 1.5; coast = max(coast, abs(mask(off, 0) - water)); ink = max(ink, max(abs(mask(off, 2) - stone), abs(mask(off, 3) - roof)) * .6 + abs(mask(off, 1) - forest) * .2); }
+  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) { vec2 off = vec2(i, j) * 1.5; coast = max(coast, abs(mask(off, 0) - water)); ink = max(ink, max(abs(mask(off, 2) - stone), abs(mask(off, 3) - roof)) * .6); }
+  // The wood's own rim: darker crowns where the warped forest meets the meadow.
+  float rim = abs(texture(M, uv + warp + vec2(2., 0.) * px).g - texture(M, uv + warp - vec2(2., 0.) * px).g) + abs(texture(M, uv + warp + vec2(0., 2.) * px).g - texture(M, uv + warp - vec2(0., 2.) * px).g);
+  col = mix(col, col * .7, smoothstep(.3, 1., rim) * .5);
   col = mix(col, vec3(.86, .93, .88), smoothstep(.2, .6, coast) * water * .55);   // foam on the water side
   col = mix(col, vec3(.16, .17, .14), smoothstep(.25, .7, coast) * (1. - water) * .75);
   col = mix(col, vec3(.2, .17, .12), smoothstep(.3, .8, ink) * .45);
