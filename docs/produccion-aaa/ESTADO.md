@@ -441,6 +441,16 @@ También quedó resuelta la falla táctil de la candidata `3422928`. En vertical
 estaba fija sobre el tablero y tapaba los bornes que la prueba tocaba. Ahora va debajo del tablero.
 La partida táctil vertical pasa completa (`output/qa-touch-390x844/`).
 
+## Ciclo 17 · Un mapa de juego que es el mundo (6 oct 2026)
+
+El usuario pidió reemplazar el mapa, que parecía «una página web con garabatos», por un mapa de
+juego AAA que siguiera de verdad la geografía. Ahora el mapa es el propio mundo fotografiado desde
+arriba y pintado en la GPU. Encima tiene niebla de lo no recorrido, ilustraciones de cada lugar,
+nombres según el zoom, bancos, el jugador con su dirección, el siguiente paso con ruta dorada, y
+viaje desde la lista o tocando el lugar. El detalle está en [MAPA.md](MAPA.md). La fidelidad está
+medida: el río del juego cae sobre agua pintada en el 100 % de los puntos, y lugares y caminos
+sobre tierra en el 100 %.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -466,6 +476,7 @@ La partida táctil vertical pasa completa (`output/qa-touch-390x844/`).
 | 17 | Assets | `portraits.webp` y `portraits-2.webp` (semirrealistas) ya no se usan: los retratos activos están en `art-polish/` y coinciden con los sprites | Limpieza |
 | 18 | Puzzles/UI | Bancos difíciles de entender: qué hacer, cómo, cuándo está bien, cómo seguir (reporte del usuario) | Hecho (ciclo 15): ver BANCOS-UX.md. Prueba con personas NO VERIFICADA |
 | 19 | Móvil | Teléfono apaisado: banco ilegible, mapa fuera de la vista | Hecho (ciclo 16) en emulación; hardware real NO VERIFICADO |
+| 20 | Mapa | El mapa no parecía de un juego ni seguía la geografía (reporte del usuario) | Hecho (ciclo 17): ver MAPA.md. Teléfono real NO VERIFICADO |
 
 ## Comandos útiles (desde `experiments/playcanvas`)
 

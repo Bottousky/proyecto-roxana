@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { chromePath, gpuArgs } from './chrome.mjs';
-import { KINGDOM, EXTERIORS, passageGeometry } from '../src/game/kingdom-geography.js';
+import { KINGDOM, EXTERIORS, passageGeometry, WATERCOURSE } from '../src/game/kingdom-geography.js';
 import { AREA_LAYOUTS } from '../src/game/world-layout.js';
 
 const root = resolve(import.meta.dirname, '..');
@@ -69,7 +69,9 @@ console.log('');
 const width = cols * TILE_PX, height = rows * TILE_PX;
 const meta = { pxPerMetre: PXM, x0: EXTENT.x0, z0: EXTENT.z0, width, height, metresWide: cols * TILE_M, metresTall: rows * TILE_M, north: '-z' };
 const stitch = await browser.newPage();
-const [rawUrl, mapUrl] = await stitch.evaluate(async ({ tiles, width, height, size, meta, roads, courts, radius }) => {
+// Fidelity probes: the river's course must be painted as water, each place and its roads as land.
+const probes = { water: WATERCOURSE.filter((_, i) => i % 2 === 0), land: [...EXTERIORS.map(id => [KINGDOM[id].x, KINGDOM[id].z]), ...roads.filter(r => !r.bridge).flatMap(r => r.points.filter((_, i) => i % 6 === 3))] };
+const [rawUrl, mapUrl, fidelity] = await stitch.evaluate(async ({ tiles, width, height, size, meta, roads, courts, radius, probes }) => {
   const raw = document.createElement('canvas'); raw.width = width; raw.height = height;
   { const g = raw.getContext('2d'); for (const t of tiles) { const img = new Image(); img.src = `data:image/png;base64,${t.data}`; await img.decode(); g.drawImage(img, t.c * size, t.r * size); } }
   const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
@@ -191,7 +193,12 @@ void main(){
   const blurProgram = program(blur), small = 2 * (meta.pxPerMetre * .9) ** 2;
   run(blurProgram, { t: M0 }, target(B1), { dir: [1, 0], spread: small });
   run(blurProgram, { t: B1 }, target(B2), { dir: [0, 1], spread: small });
-  run(program(clean), { M: M0, S: B2 }, target(M));
+  const cleanTarget = target(M);
+  run(program(clean), { M: M0, S: B2 }, cleanTarget);
+  // Read the clean classification where the game says there is water, and where it says there is land.
+  const readWater = ([x, z]) => { const px = Math.round((x - meta.x0) * meta.pxPerMetre), py = Math.round((z - meta.z0) * meta.pxPerMetre); if (px < 0 || py < 0 || px >= width || py >= height) return null; const v = new Uint8Array(4); gl.bindFramebuffer(gl.FRAMEBUFFER, cleanTarget); gl.readPixels(px, height - 1 - py, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, v); return v[0] / 255; };
+  const share = (points, wantWater) => { const seen = points.map(readWater).filter(v => v !== null); return { probes: seen.length, agree: seen.filter(v => wantWater ? v > .5 : v < .5).length }; };
+  const fidelity = { water: share(probes.water, true), land: share(probes.land, false) };
   // The ripples need a long reach: blur the clean water twice with a wide kernel.
   run(blurProgram, { t: M }, target(B1), { dir: [1, 0], spread: 450 });
   run(blurProgram, { t: B1 }, target(B2), { dir: [0, 1], spread: 450 });
@@ -208,8 +215,12 @@ void main(){
   const roadPx = w => Math.max(2.2, w * .5 * meta.pxPerMetre);
   for (const r of roads) stroke(r.points, roadPx(r.width) + 2.4, r.bridge ? 'rgba(52,44,32,.8)' : 'rgba(84,66,42,.55)');
   for (const r of roads) stroke(r.points, roadPx(r.width), r.bridge ? 'rgba(190,170,132,.95)' : r.trail ? 'rgba(201,182,138,.78)' : 'rgba(214,196,152,.88)');
-  return [raw.toDataURL('image/webp', .88), out.toDataURL('image/webp', .86)];
-}, { tiles, width, height, size: TILE_PX, meta, roads, courts, radius: Number(process.env.RADIUS || Math.max(2, Math.round(PXM * .45))) });
+  return [raw.toDataURL('image/webp', .88), out.toDataURL('image/webp', .86), fidelity];
+}, { tiles, width, height, size: TILE_PX, meta, roads, courts, probes, radius: Number(process.env.RADIUS || Math.max(2, Math.round(PXM * .45))) });
+const pct = f => Math.round(f.agree / Math.max(1, f.probes) * 100);
+console.log(`fidelidad: el río del juego cae sobre agua pintada en ${pct(fidelity.water)}% de ${fidelity.water.probes} puntos; lugares y caminos sobre tierra en ${pct(fidelity.land)}% de ${fidelity.land.probes}`);
+if (!process.env.OUT && (pct(fidelity.water) < 90 || pct(fidelity.land) < 95)) { console.error('El mapa pintado no coincide con la geografía del juego.'); process.exit(1); }
+meta.fidelity = { river: pct(fidelity.water), land: pct(fidelity.land) };
 await writeFile(resolve(out, name), Buffer.from(mapUrl.split(',')[1], 'base64'));
 if (process.env.RAW) await writeFile(resolve(out, name.replace('.webp', '-raw.webp')), Buffer.from(rawUrl.split(',')[1], 'base64'));
 await writeFile(resolve(out, name.replace('.webp', '.json')), JSON.stringify(meta, null, 2) + '\n');

@@ -6,5 +6,9 @@
   "height": 4096,
   "metresWide": 256,
   "metresTall": 512,
-  "north": "-z"
+  "north": "-z",
+  "fidelity": {
+    "river": 100,
+    "land": 100
+  }
 }
