@@ -1,0 +1,43 @@
+{
+  "ended": false,
+  "final": {
+    "mode": "play",
+    "seg": "c7.cuantas-veces"
+  },
+  "journal": [],
+  "evidenceKinds": [
+    "square-rows",
+    "side-predict",
+    "side",
+    "race-predict",
+    "race-day",
+    "race",
+    "pow-row",
+    "pow-zero",
+    "powers",
+    "sci-compare",
+    "sci",
+    "expand-predict",
+    "expand",
+    "factor-try",
+    "factor",
+    "complete-predict",
+    "complete-other",
+    "complete",
+    "log-predict",
+    "log-step",
+    "log-early"
+  ],
+  "fps": {
+    "min": "48.0",
+    "median": "60.0"
+  },
+  "errors": [
+    "atascado en c7.cuantas-veces: [\"c7.cuantas-veces\",\"2 todavía no pasa mil.\",[],[\"lg-dupduplicarfalse\",\"lg-okya pasófalse\"]]"
+  ],
+  "seconds": 98.897,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}

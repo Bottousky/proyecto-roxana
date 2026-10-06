@@ -62,11 +62,11 @@ tiene un rasgo mínimo (tamaño, ritmo de parpadeo). Lino es el más chico.
 | 1 | ¿Están todos? | A: correspondencia uno a uno, cardinalidad, más/menos, conservación, contar, número vs numeral | jugable, revisado (1.ª ronda) |
 | 2 | Demasiados para marcar | A: agrupación, unidad, valor posicional, cero; B: suma con canje, resta como comparación | jugable |
 | 3 | Menos que nada | B: signo, negativos, opuestos, orden, distancia, valor absoluto, suma y resta de enteros | jugable |
-| 4 | Veces | B: multiplicación como grupos y escala, división como reparto y medida, propiedades | implementado, en prueba |
-| 5 | Partes de algo | C: fracciones, equivalencia, decimales, %, razón, proporción, unidades; inconmensurables, reales; exacto vs aproximado | pendiente |
-| 6 | Lo que no se ve | D: patrón, generalización, incógnita/variable/parámetro; expresión, identidad, ecuación; **"pasa sumando"**; desigualdades; sistemas | pendiente |
-| 7 | Crecer | E: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos | pendiente |
-| 8 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | pendiente |
+| 4 | Veces | B: multiplicación como grupos y escala, división como reparto y medida, propiedades | jugable, revisado |
+| 5 | Partes de algo | C: fracciones, equivalencia, decimales, %, razón, proporción, unidades; inconmensurables, reales; exacto vs aproximado | jugable, revisado |
+| 6 | Lo que no se ve | D: patrón, generalización, incógnita/variable/parámetro; expresión, identidad, ecuación; **"pasa sumando"**; desigualdades; sistemas | jugable, revisado (sistemas pendientes) |
+| 7 | Crecer | E: potencias, raíces, notación científica, polinomios, factorización, cuadráticas, expresiones racionales, sucesiones, logaritmos | jugable, en revisión |
+| 8 | Formas | F: ángulos, congruencia, semejanza, Pitágoras (alcance de la prueba), perímetro, área, volumen, escala, coordenadas | diseño |
 | 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | pendiente |
 | 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | pendiente |
 | 11 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | pendiente |
@@ -100,7 +100,7 @@ cuántos son, contar dos veces una marca, leer la marca sobrante como error de a
 Ayudas graduadas (opcionales, botón "?"): 1) reformular la pregunta, 2) señalar el rasgo
 relevante, 3) demostrar un paso. Usar ayuda se registra como evidencia, no castiga.
 
-## Capítulo 2 — Demasiados para marcar (diseño, no implementado)
+## Capítulo 2 — Demasiados para marcar (implementado)
 
 Pregunta de entrada: Punto rodeó el "1" de "14": ¿por qué un 1 si no hay uno solo de nada?
 Idea central: **en un numeral, el lugar dice el tamaño del grupo; el cero guarda un lugar
@@ -128,7 +128,7 @@ Límites a declarar: diez es una convención (otras culturas agruparon de otra m
 fuentes: sexagesimal babilónico, vigesimal maya—, sin presentar el orden del juego como
 historia); el cero como número (cardinal de "ninguno") se conecta con el capítulo 1.
 
-## Capítulo 3 — Menos que nada (diseño, en producción)
+## Capítulo 3 — Menos que nada (implementado)
 
 Ajuste del recorrido: el bloque B se divide. Cap. 3 = negativos, orden, distancia, |x|, suma y
 resta como movimiento; cap. 4 = multiplicación y división (grupos, escala, reparto, medida,
@@ -162,7 +162,7 @@ Historia (fuentes.md, certeza alta): los signos "+" y "−" aparecen impresos en
 marcando exceso y faltante en problemas de comercio, no como operaciones; Brahmagupta (628)
 da reglas con "fortunas" y "deudas". Mencionarlo sólo en la Bitácora, como dato, no como origen.
 
-## Capítulo 4 — Veces (implementado, en prueba)
+## Capítulo 4 — Veces (implementado)
 
 Lugar: las Terrazas, una ladera en cuatro escalones; una familia por escalón (Peldaño, Rampa,
 Cornisa, Balcón: sombrero y cabeza propia). Al pie, la pizarra de Mara y una piedra con un signo
@@ -184,7 +184,7 @@ reflejo explica (−1)(−1) = 1 como media vuelta, sin regla mágica; el resto 
 pregunta (atados enteros); 0 ÷ 0 tampoco tiene un resultado (en la Bitácora). Dato histórico:
 Brahmagupta (628) operó con fortunas y deudas y sostuvo 0 ÷ 0 = 0 (fuentes.md §8, certeza alta).
 
-## Capítulo 5 — Partes de algo (diseño, no implementado)
+## Capítulo 5 — Partes de algo (implementado)
 
 Pregunta de entrada (gancho del cap. 4): sobraron 2 atados de la cosecha y son 4 familias.
 Idea central: **una fracción es una medida hecha con partes iguales de una unidad elegida; el mismo
@@ -216,7 +216,7 @@ cantidades (C3) se tratan con funciones (cap. 9); los reales y su completitud, s
 Historia (fuentes.md): verificar antes de usar fracciones egipcias o babilónicas; no afirmar
 orígenes únicos.
 
-## Capítulo 6 — Lo que no se ve (diseño, en producción)
+## Capítulo 6 — Lo que no se ve (implementado)
 
 Pregunta de entrada (gancho del cap. 5): la diagonal existe pero no se sabe escribir; antes, algo
 más simple: Mara tiene una caja cerrada con atados adentro y no sabe cuántos. Idea central: **una
@@ -269,6 +269,34 @@ tablas que crecen día por día; la recta del cap. 6 para las raíces.
 Límites a declarar: √ indica el lado positivo; potencias con exponente fraccionario y logaritmos
 de otras bases, sólo mencionados; la prueba de que √2 no es una fracción queda para el cap. 8.
 Historia: pendiente de fuentes (no afirmar nada sobre Napier ni Arquímedes sin verificar).
+
+## Capítulo 8 — Formas (diseño)
+
+Pregunta de entrada (gancho del cap. 7): Peldaño partió la diagonal de un cuadro en doce y no cayó
+en ninguna rayita; ¿en cuántas hay que partirla? Idea central: **una forma se puede medir, copiar,
+agrandar y ubicar; lo que se ve en un dibujo es evidencia, y para saber que vale siempre hace falta
+un argumento que sirva para todos los casos a la vez.**
+
+Lugar: las Terrazas y el piso de la explanada (huertas dibujadas en el suelo); la pizarra de Mara para
+las cuentas. Representaciones: fichas cuadradas del cap. 7, cuerdas con nudos, la recta del cap. 3
+cruzada por otra (coordenadas), la media vuelta del cap. 4 (ángulos).
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 8.1 | La diagonal que no cae | √2 no es una fracción: probar no alcanza, hace falta un argumento | Buscar p y q con un cuadrado de p × p igual a dos de q × q (fichas); después elegir si probar más o argumentar | Nunca justo (9 y 8; 49 y 50; 289 y 288). Argumento de Tennenbaum: si hubiera un par, habría otro más chico, y así siempre: con enteros no se puede bajar para siempre. Alcance: vale para todos los p y q a la vez |
+| 8.2 | La vuelta | Ángulo como cantidad de giro; suma de los ángulos de un triángulo | Cortar las tres puntas de un triángulo y juntarlas | Forman media vuelta (180°). Alcance: eso es un triángulo; la paralela por un vértice lo muestra para todos (en el plano) |
+| 8.3 | Copias | Congruencia (mover, girar, dar vuelta) vs semejanza (escala) | Elegir cuáles ventanas son copias de la de Cornisa | La girada y la dada vuelta son iguales; la agrandada, parecida (mismos ángulos, lados ×2); la estirada de un solo lado, ninguna |
+| 8.4 | El doble de grande | Escala: longitudes ×k, áreas ×k², volúmenes ×k³ | Predecir cuánta tierra y cuántos atados hacen falta si se duplica el lado | Huerta ×4 (fichas del cap. 7), caja ×8 (atados apilados) |
+| 8.5 | La misma cerca | Perímetro y área son cosas distintas | Con 12 tramos de cerca, armar huertas rectangulares | 1 × 5, 2 × 4, 3 × 3: áreas 5, 8, 9; mismo perímetro, distinta área |
+| 8.6 | Pitágoras | En un triángulo rectángulo, el cuadrado de la hipotenusa es la suma de los otros dos | Contar fichas sobre los lados de 3-4-5; después reacomodar cuatro triángulos en un cuadrado de lado a + b | 9 + 16 = 25; el reacomodo lo muestra para cualquier a y b ((a + b)² del cap. 7). Contraejemplo: un triángulo no rectángulo no cumple |
+| 8.7 | Dónde está cada casa | Coordenadas: dos rectas numéricas cruzadas | Ubicar las casas de las familias con dos números (también negativos) | Un par ordenado por casa; (2, 3) ≠ (3, 2); la distancia entre dos casas con Pitágoras |
+| 8.8 | Sombras | Cierre y gancho al cap. 9 | Medir la sombra de Cornisa a distintas horas | La sombra depende de la hora: ¿cada hora da una sola sombra? |
+
+Límites a declarar: el argumento de 8.1 prueba que √2 no es una fracción, no da sus cifras; 180° vale en
+el plano (no en una esfera); el reacomodo de 8.6 es una prueba para triángulos rectángulos; los
+dibujos no son exactos y no reemplazan el argumento.
+Historia: pendiente de fuentes (no atribuir a Pitágoras ni a Babilonia nada sin verificar; la tablilla
+YBC 7289 y la historia de la inconmensurabilidad requieren fuente en `research/fuentes.md`).
 
 ## Criterios de escena (lo que las revisiones marcaron una y otra vez)
 

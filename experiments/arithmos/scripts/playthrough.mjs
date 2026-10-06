@@ -153,6 +153,12 @@ function pickChoice(prompt, options) {
     ['Del otro lado del igual', 'Queda 8'],
     ['para pasar mil', 'Unos cien'],
     ['no se puede hacer esa cuenta', 'Con x = 0'],
+    ['Siempre falta o sobra', 'Ya se probaron mil', 'Probando no se termina'],
+    ['seguir achicando', 'Hasta que lleguen a 1', 'Para siempre'],
+    ['Pasa con todos los triángulos', 'Pasa con todos', 'hace falta una razón'],
+    ['copia parecida', 'Los lados', 'La forma'],
+    ['cuánta tierra entra', 'El doble de tierra'],
+    ['cuántas cajas como la de Cornisa', 'Cuatro, como la huerta'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -225,6 +231,12 @@ function pickChoice(prompt, options) {
     ['Del otro lado del igual', '8 + 1'],
     ['para pasar mil', 'Unos diez'],
     ['no se puede hacer esa cuenta', 'Con x = 2'],
+    ['Siempre falta o sobra', 'Probando no se termina'],
+    ['seguir achicando', 'Para siempre'],
+    ['Pasa con todos los triángulos', 'hace falta una razón'],
+    ['copia parecida', 'La forma'],
+    ['cuánta tierra entra', 'Cuatro veces'],
+    ['cuántas cajas como la de Cornisa', 'Ocho.'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -242,6 +254,7 @@ let pairingStage = 0;
 let doubleDone = false;
 let areaTaps = 0;
 let dosPasosStep = 0;
+let copyCand = null;
 let logTaps = 0;
 const searchOrder = ['look-crack', 'look-house', 'look-smudge'];
 let lastSeg = null;
@@ -536,6 +549,15 @@ for (let iter = 0; iter < 4000; iter++) {
       else target = spots.find(x => x.id === 'lg-ok');
     } else if (s.seg === 'c7.no-se-puede' && spots.some(x => x.id.startsWith('ns-x'))) {
       target = route === 'errores' ? spots[0] : (spots.find(x => x.id === 'ns-x2') || spots[0]);
+    } else if (s.seg === 'c8.vuelta' && spots.some(x => x.id.startsWith('c8-alt-'))) {
+      target = spots.find(x => x.id === (route === 'errores' && !tried.has('altB') && (tried.add('altB'), true) ? 'c8-alt-B' : 'c8-alt-A'));
+    } else if (s.seg === 'c8.copias' && spots.some(x => x.id.startsWith('c8-sel-'))) {
+      target = spots[0];
+      copyCand = target.id.replace('c8-sel-', '');
+    } else if (s.seg === 'c8.copias' && spots.some(x => x.id.startsWith('c8-op'))) {
+      const right = {rot: 'c8-op0', flip: 'c8-op1', big: 'c8-op2', wide: 'c8-op3'}[copyCand];
+      const wrong = {rot: 'c8-op1', flip: 'c8-op0', big: 'c8-op3', wide: 'c8-op2'}[copyCand];
+      target = spots.find(x => x.id === (route === 'errores' && !tried.has(`cp${copyCand}`) && (tried.add(`cp${copyCand}`), true) ? wrong : right));
     } else if (s.seg === 'c3.perdon') {
       target = byLabel('sacarla')[0] || spots.find(x => x.id === 'pz-stuck') || byLabel('pagarlo')[0] || spots.find(x => x.id === 'pm-pad');
       if (route === 'errores' && spots.some(x => x.id === 'pm-pad') && byLabel('pagarlo').length && !tried.has('padearly')) { tried.add('padearly'); target = spots.find(x => x.id === 'pm-pad'); }

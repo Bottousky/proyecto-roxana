@@ -1,0 +1,50 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c7.no-se-puede"
+  },
+  "journal": [
+    "Crecer"
+  ],
+  "evidenceKinds": [
+    "square-rows",
+    "side-predict",
+    "side",
+    "race-predict",
+    "race-day",
+    "race",
+    "pow-row",
+    "pow-zero",
+    "powers",
+    "sci-compare",
+    "sci",
+    "expand-predict",
+    "expand",
+    "factor-try",
+    "factor",
+    "complete-predict",
+    "complete-other",
+    "complete",
+    "log-predict",
+    "log-step",
+    "log",
+    "rational-predict",
+    "rational-try",
+    "rational"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [
+    "[spot tapado] \"x = 4\" tapa a ns-x5",
+    "[spot tapado] \"x = 3\" tapa a ns-x4",
+    "[spot tapado] \"x = 2\" tapa a ns-x3"
+  ],
+  "seconds": 59.132,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}

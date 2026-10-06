@@ -1,0 +1,37 @@
+[0.0s] escena → c8.diagonal
+[1.0s] lee: Partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas lo parto para que caiga justo?
+[1.1s] lee: —Si partiendo el lado en q cayera justo, la diagonal mediría p de esas rayitas. Con esa rayita chica, el cuadrado del lado tendría q · q cuadraditos, y el de la diagonal, p · p.
+[1.2s] lee: Y el cuadrado de la diagonal es el de los dos cuadros: tendría que ser p · p = 2 · q · q, justo.
+[4.0s] lee: Una noche probé hasta mil. Siempre faltó o sobró, a veces uno solo.
+[5.3s] elige «Probando no se termina nunca: hace falta una razón.» (Siempre falta o sobra un poco. ¿Y ahora?)
+[5.7s] lee: —Supongamos que hubiera un p y un q que cumplen. El de p tiene tanto lugar como los dos de q juntos. Pongo los dos de q adentro del de p, en esquinas opuestas.
+[7.9s] lee: —Si los dos de q tapan lo mismo que el de p, lo que se pisa dos veces tiene que ser igual a lo que quedó sin tapar.
+[8.0s] lee: Un cuadrado, el del medio, igual a dos cuadrados, las esquinas. Otro par que cumpliría, con lados enteros: 2q − p y p − q. Y más chico.
+[10.6s] elige «Para siempre: cada par da otro más chico.» (¿Hasta cuándo se puede seguir achicando?)
+[11.1s] lee: —Punto: si hubiera un par de enteros que cumple, habría otro más chico, y otro, sin fin. Pero los enteros positivos no bajan para siempre: q, uno menor, otro menor… se acaban. Entonces no hay ningún par.
+[11.9s] lee: El dibujo está hecho con medidas que no existen: no prueba nada. Lo que prueba es el razonamiento, y vale para todos los p y q a la vez. Probando, en cambio, nunca se termina.
+[12.7s] lee: Entonces en la puerta pinto 1,414, y al lado: «casi».
+[12.8s] escena → c8.vuelta
+[13.8s] lee: Voy a cortar tejas triangulares. El carpintero dice que las tres puntas juntas siempre hacen lo mismo. ¿Lo mismo que qué?
+[16.9s] lee: Las tres puntas juntas hacen la línea recta: media vuelta.
+[17.0s] lee: —Media vuelta es lo que gira Punto para mirar para atrás. Si la vuelta entera se parte en 360 partes, los grados, media vuelta son 180.
+[17.6s] elige «Con este pasó; para saber si pasa con todos, hace falta una razón.» (Cornisa va a cortar tejas de muchas formas. ¿Pasa con todos los triángulos?)
+[18.0s] lee: —Por la punta de arriba, una recta paralela a la de abajo: no se cruzan nunca.
+[19.4s] lee: Con dos paralelas, el lado AC está igual de inclinado contra las dos: el ángulo de A y el de arriba a la izquierda son iguales. Lo mismo B, del otro lado.
+[20.2s] lee: —Cornisa: arriba, sobre la paralela, quedan el de A, el de C y el de B, uno al lado del otro: media vuelta. No usé ninguna medida de este triángulo: vale para cualquiera.
+[21.0s] lee: En un plano, como la pizarra o el piso. Sobre una pelota, un triángulo grande suma más: ahí no hay paralelas que no se crucen.
+[21.7s] escena → c8.copias
+[22.8s] lee: Mi ventana tiene esta forma de ele. Me trajeron cuatro marcos. ¿Cuáles son copias de la mía?
+[31.9s] lee: —Cornisa: el girado y el dado vuelta son iguales a tu ventana: se mueven y calzan. El grande es parecido: achicado a la mitad, calza.
+[32.5s] elige «La forma: los ángulos iguales y todos los lados multiplicados por lo mismo.» (¿Qué tiene igual una copia parecida?)
+[32.9s] lee: El ancho no lo quiero: estirado de un solo lado ya no es mi ventana.
+[32.9s] escena → c8.doble
+[34.0s] lee: Mi huerta es de dos por dos cuadros. Quiero una con el lado el doble de largo. ¿Cuánta tierra más necesito?
+[35.3s] elige «Cuatro veces la tierra.» (Con el lado el doble de largo, ¿cuánta tierra entra?)
+[38.6s] lee: Cuatro huertas como la de ahora: dieciséis cuadros.
+[38.6s] lee: Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran?
+[39.9s] elige «Ocho.» (Una caja con el lado el doble de largo: ¿cuántas cajas como la de Cornisa entran?)
+[44.2s] lee: Ocho: cuatro en el piso y cuatro arriba.
+[45.0s] lee: —Peldaño: el lado se multiplica una vez; el área, dos veces, por el largo y por el ancho; el volumen, tres, también por el alto.
+[45.8s] lee: El capítulo 9 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[47.0s] {"ended":true,"final":{"mode":"title","seg":"c8.doble"},"journal":[],"evidenceKinds":["near-miss","proof-need","descent","irrational","angle-cut","angle-general","alt-angle","angles","copy-try","similar-keeps","area-scale-predict","volume-scale-predict","scale"],"fps":{"min":"36.0","median":"60.0"},"errors":[],"seconds":46.975,"size":"1600x900","touch":false,"route":"directa","watch":false}

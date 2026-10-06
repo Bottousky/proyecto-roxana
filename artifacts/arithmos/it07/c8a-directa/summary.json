@@ -1,0 +1,33 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c8.doble"
+  },
+  "journal": [],
+  "evidenceKinds": [
+    "near-miss",
+    "proof-need",
+    "descent",
+    "irrational",
+    "angle-cut",
+    "angle-general",
+    "alt-angle",
+    "angles",
+    "copy-try",
+    "similar-keeps",
+    "area-scale-predict",
+    "volume-scale-predict",
+    "scale"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 46.975,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

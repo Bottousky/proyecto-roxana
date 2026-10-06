@@ -93,6 +93,7 @@ export const factores = {
     const row = (k, text, i) => w.add(new Label(`pw-r${k}`, text, A.x0 + 20, rowY(i), {size: 28, z: 12}));
     // el primer renglón de la tabla es la definición misma
     let zero = null;
+    await d.shot(SHOTS.tiles, 0.8);
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Tocá "un renglón abajo": el exponente baja uno. Fijate qué le pasa al resultado.']);
@@ -478,6 +479,7 @@ export const cuantasVeces = {
       {id: '500', text: 'Quinientos días: la mitad de mil.'},
     ], {prompt: 'Empezando con uno y duplicando cada día, ¿cuántos días para pasar mil?', evaluate: true});
     d.evidence('log-predict', {answer: guess});
+    await d.shot(SHOTS.tiles, 0.8);
     let k = 0, v = 1;
     const val = w.add(new Label('lg-v', '1', A.x0 + 40, A.y0 + 70, {size: 48, z: 12, weight: 700}));
     const cnt = w.add(new Label('lg-c', '0 duplicaciones', A.x0 + 40, A.y0 + 116, {size: 26, z: 12}));
@@ -485,8 +487,8 @@ export const cuantasVeces = {
       g.setHint(() => ['Tocá "duplicar" hasta pasar mil, contando cuántas veces.', 'Cuando haya pasado mil, tocá "ya pasó".']);
       const refresh = () => {
         const spots = [];
-        if (k < 13) spots.push(wordSpot('lg-dup', 'duplicar', A.x1 - 110, A.y0 + 60, () => dup()));
-        if (k >= 1) spots.push(wordSpot('lg-ok', 'ya pasó', A.x1 - 110, A.y0 + 110, () => ok()));
+        if (k < 13) spots.push(wordSpot('lg-dup', 'duplicar', A.x1 - 110, A.y0 + 50, () => dup()));
+        if (k >= 1) spots.push(wordSpot('lg-ok', 'ya pasó', A.x1 - 110, A.y0 + 150, () => ok()));
         g.ui.setSpots(spots);
       };
       const dup = () => {
@@ -559,7 +561,7 @@ export const noSePuede = {
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Tocá un valor de x para probar la cuenta. Probá varios.']);
-      const refresh = () => g.ui.setSpots(VALS.filter(x => !tried.includes(x)).map(x => wordSpot(`ns-x${x}`, `x = ${x}`, A.x1 - 80, A.y0 + 40 + VALS.indexOf(x) * 56, () => put(x), {label: `Probar con x = ${x}`})));
+      const refresh = () => g.ui.setSpots(VALS.filter(x => !tried.includes(x)).map(x => wordSpot(`ns-x${x}`, `x = ${x}`, A.x1 - 80, A.y0 + 34 + VALS.indexOf(x) * 70, () => put(x), {label: `Probar con x = ${x}`})));
       const put = async x => {
         if (busy || !ctl.alive()) return;
         busy = true;
@@ -582,7 +584,6 @@ export const noSePuede = {
             await d.say('student', 'Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.');
             // la Marea: se lleva lo que no se entiende
             g.setCinematic(true);
-            await d.shot(SHOTS.board, 0.6);
             d.describe('Pasa una brisa de borrador. El "= 0" de Punto se deshace; el renglón con el signo de pregunta queda.');
             g.audio.erase(1.2, 0.5);
             g.camera.shake = 0.15;

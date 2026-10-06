@@ -33,8 +33,17 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   - Cap. 6 por la ruta con errores (`it07/c6-errores`) y caps. 6→7 por la ruta directa
     (`it07/c6c7-directa`), sin errores.
   - Cap. 7 escenas 7.3–7.9 por la ruta directa (`it07/c7b-directa2`).
-- Pendiente de este ciclo:
-  - Cap. 7 por la ruta con errores y en 844×390; revisión independiente del cap. 7 (C7-R).
+- Cap. 7 verificado también por la ruta con errores (`it07/c7-errores`) y en 844×390 táctil
+  (`it07/c7-telefono3`). La guarda de botones ahora detecta botones de texto superpuestos entre sí;
+  en el teléfono la cámara deja lugar para los subtítulos (la toma cercana queda a escala ≈ 0,67):
+  los botones apilados necesitan unas 70 unidades entre sí. Queda un aviso en 7.9 (corregido después
+  de esa partida, sin volver a verificar).
+- **Cap. 8 «Formas» en curso:** lógica `logic/geometry.js` (7 pruebas); escenas 8.1–8.4 jugables
+  (`it07/c8a-directa`, sin errores); 8.5–8.8 escritas en `src/ch8/scenes-b.js` **sin enganchar ni
+  probar** (falta sumarlas a `ch8/chapter.js`, políticas del bot y partidas).
+- Revisiones del cap. 7 (matemática y narrativa) lanzadas; informes en `artifacts/arithmos/it07/review-*/`
+  cuando terminen. Pendiente aplicar.
+- Pendientes chicos del cap. 7: «Las otras 1 sobraban», «faltan una tira» (concordancia con 1).
 - **Entorno:** máquina compartida con otras sesiones que usan Chrome.
 - Audio no escuchado; sin playtests humanos; sin dispositivo táctil real.
 

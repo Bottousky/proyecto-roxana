@@ -476,10 +476,14 @@ export class UI {
       const a = this.spotEls.get(wsp.id)?._r;
       if (!a) continue;
       for (const o of this.spots) {
-        if (o.kind === 'word' || o.disabled) continue;
+        if (o === wsp || o.disabled) continue;
         const b = this.spotEls.get(o.id)?._r;
         if (!b) continue;
-        if (b.cx > a.x0 && b.cx < a.x1 && b.cy > a.y0 && b.cy < a.y1) {
+        // un botón de texto no debe tapar el centro de otro objeto, ni montarse sobre otro botón de texto
+        const covers = o.kind === 'word'
+          ? Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0) > 4 && Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) > 4 && wsp.id < o.id
+          : b.cx > a.x0 && b.cx < a.x1 && b.cy > a.y0 && b.cy < a.y1;
+        if (covers) {
           const key = `${wsp.id}/${o.id}`;
           this.overlapWarned ??= new Set();
           if (!this.overlapWarned.has(key)) {

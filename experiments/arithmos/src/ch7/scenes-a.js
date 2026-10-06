@@ -59,6 +59,7 @@ export const lado = {
       cells.push(c);
     }
     d.describe('En la pizarra, nueve cuadraditos en fila.');
+    await d.shot(SHOTS.tiles, 0.8);
     const rows = await d.interact(ctl => new Promise(resolve => {
       g.setHint(() => ['Elegí en cuántas filas acomodar los nueve cuadros. Peldaño la quiere cuadrada.']);
       const opts = [1, 3, 9];
@@ -224,13 +225,14 @@ export const duplicar = {
       setBars(r);
     };
     addRow(rows[0]);
+    await d.shot(SHOTS.tiles, 0.8);
     let overtook = false;
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Tocá "otro día" y mirá las dos columnas.', 'Podés parar cuando quieras, después de que alguno llegue a cien.']);
       const refresh = () => {
         const spots = [];
-        if (day < 10) spots.push(wordSpot('dp-next', 'otro día', A.x0 + 290, A.y1 - 70, () => next()));
+        if (day < 10) spots.push(wordSpot('dp-next', 'otro día', A.x0 + 290, A.y1 - 120, () => next()));
         if (rows[day].mul >= 100) spots.push(wordSpot('dp-stop', 'parar', A.x0 + 290, A.y1 - 30, () => { if (!busy && ctl.alive()) resolve(); }));
         g.ui.setSpots(spots);
       };

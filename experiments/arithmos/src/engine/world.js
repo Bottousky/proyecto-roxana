@@ -460,6 +460,8 @@ export class Shape {
     ctx.translate(this.x, this.y - this.lift);
     if (this.rot) ctx.rotate(this.rot);
     if (this.scale !== 1) ctx.scale(this.scale, this.scale);
+    // sx: espejo horizontal (dar vuelta la figura); de 1 a −1 pasa por una figura finita
+    if (this.sx !== undefined && this.sx !== 1) ctx.scale(this.sx, 1);
     const c = this.progress >= 1 && this.flash <= 0 && world?.cacheEnabled !== false ? this.#cached(view.scale * this.scale) : null;
     if (c) ctx.drawImage(c.canvas, c.bx, c.by, c.bw, c.bh);
     else drawStrokes(ctx, this.strokes, this.progress, this.fade * (1 + this.flash * 0.25), 1 + this.flash * 0.4);

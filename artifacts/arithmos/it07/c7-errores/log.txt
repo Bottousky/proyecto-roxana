@@ -1,0 +1,77 @@
+[0.0s] escena → c7.lado
+[1.0s] lee: Tengo nueve cuadros de huerta y los quiero en una huerta cuadrada. ¿Cuánto mide el lado?
+[2.0s] lee: Eso es un pasillo, no una huerta cuadrada.
+[2.7s] lee: —Tres filas de tres: el lado mide 3. Punto, tres por tres es nueve: tres es la raíz de nueve.
+[2.9s] lee: En la cuenta de Oval, x · x = 9 también daba −3.
+[5.2s] lee: —Un lado no mide −3. La raíz de un número es la positiva; el −3 hay que agregarlo aparte.
+[35.6s] lee: Y la que le conté a Mara: dos cuadros, también cuadrada. x · x = 2.
+[37.1s] elige «Lado 2: son dos cuadros.» (Una huerta cuadrada hecha con dos cuadros de lado 1: ¿cuánto mide su lado?)
+[43.7s] no pudo tocar cut1: page.click: Timeout 5000ms exceeded.
+[48.0s] lee: Un lado de 2 haría una huerta de cuatro cuadros, no de dos. El lado es la diagonal de un cuadro: menos de 2.
+[48.0s] lee: —Punto: el lado de esta huerta, por sí mismo, da dos. Es la diagonal que medimos: más o menos 1,414.
+[48.2s] lee: Así que el camino en diagonal mide raíz de dos. Lo pinto así en la puerta.
+[48.2s] escena → c7.duplicar
+[49.2s] lee: La Marea se llevó entera la escalera del fondo: cien escalones. Hoy dibujo uno, y después diez por día.
+[50.7s] elige «El de Mara: diez por día.» (Empezando los dos con un escalón: ¿quién llega antes a cien?)
+[51.4s] lee: Once contra dos. Punto se queda atrás.
+[52.5s] lee: Día 6: 64 contra 61. Punto pasa adelante.
+[53.1s] lee: —Punto: al principio sumar diez gana. Duplicar empieza lento, pero cada día suma todo lo que ya había. Desde el día 6, no te alcanza nadie.
+[54.2s] lee: Entonces la redibujamos a tu manera. ¿Y de dónde sacás tanta tiza el día siete?
+[55.2s] escena → c7.factores
+[56.2s] lee: Lo de Punto se anota largo: dos por dos por dos por dos. ¿No hay una forma corta?
+[56.3s] lee: —Se cuentan los dos que se multiplican y se anota arriba, chiquito.
+[59.0s] lee: Cada renglón hacia abajo, un dos menos: el resultado se divide por dos.
+[61.3s] elige «2⁰ = 0: no queda ningún dos.» (Siguiendo la tabla hacia abajo, ¿cuánto vale 2⁰?)
+[62.2s] lee: —No cero: dos dividido dos es uno. Si no, la tabla se corta.
+[63.2s] lee: ¿Y un renglón más abajo?
+[64.4s] lee: —Punto: el exponente cuenta cuántas veces se multiplica por dos. Para abajo de cero, cuántas veces se divide.
+[65.6s] escena → c7.grande
+[66.7s] lee: Medí el polvo de tiza que dejó la Marea esta noche: tres millones de granos. No me entra en la libreta.
+[69.4s] lee: —Punto: seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica.
+[69.5s] lee: La de anoche la anoté así: 4 · 10⁵.
+[70.1s] elige «Anoche: 4 · 10⁵, porque 4 es más que 3.» (¿Qué noche dejó más polvo?)
+[70.8s] lee: —Esta noche: tres millones contra cuatrocientos mil. Primero se mira el exponente, cuántos lugares; el 3 o el 4 vienen después.
+[70.9s] lee: Y un grano solo es nada: una milésima de gramo.
+[71.1s] lee: —Lo chico también se corre: tres lugares para el otro lado, como la tabla de los dos, para abajo.
+[71.9s] escena → c7.areas
+[73.0s] lee: Agrando la huerta cuadrada: dos filas más para abajo y tres columnas más al costado. El lado de antes no lo sé: le digo x.
+[74.3s] elige «Un x por x y seis cuadraditos.» (¿Qué fichas hacen falta para llenar la huerta nueva?)
+[81.5s] lee: Un x por x, cinco tiras y seis cuadraditos. Las tiras son los bordes nuevos: no se pueden olvidar.
+[82.5s] lee: —Peldaño: es partir el rectángulo, como cuando repartimos en las Terrazas, pero de los dos lados. Dos por tres, los cuadraditos; dos más tres, las tiras.
+[82.6s] escena → c7.al-reves
+[83.6s] lee: A mí me dieron las fichas sueltas: un x por x, cinco tiras y seis cuadraditos. Quiero una huerta rectangular, sin que sobre nada.
+[85.8s] elige «x + 1 por x + 6» (¿Con qué lados probás armar la huerta?)
+[86.4s] lee: Así no cierra: faltan 2 tiras.
+[87.0s] elige «x + 1 por x + 5» (¿Con qué lados probás armar la huerta?)
+[87.8s] lee: Así no cierra: faltan una tira y sobra un cuadradito.
+[89.3s] elige «x + 2 por x + 3» (¿Con qué lados probás armar la huerta?)
+[89.9s] lee: —Balcón: los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres.
+[89.9s] lee: ¿Y si me hubieran dado cinco cuadraditos?
+[90.8s] lee: Dos números que sumen cinco y multiplicados den cinco: uno y cuatro dan cuatro, dos y tres dan seis. Con enteros, ninguno: ese rectángulo no se arma.
+[90.8s] escena → c7.completar
+[91.9s] lee: Mi huerta: un cuadrado de lado x y dos tiras de x pegadas, una a cada lado. En total, ocho cuadraditos de tierra. ¿Cuánto mide x?
+[92.4s] elige «Otra tira.» (¿Qué le falta para ser un cuadrado?)
+[93.7s] lee: Una tira más lo haría más largo de un lado. Le falta el hueco de la esquina: uno por uno.
+[94.8s] elige «Queda 8: el cuadradito es de la huerta, no de la cuenta.» (Del otro lado del igual, ¿qué escribís?)
+[95.3s] lee: Si la huerta ganó un cuadradito, la tierra también: lo que se agrega de un lado del igual, se agrega del otro.
+[96.2s] lee: —Rampa: un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.
+[96.3s] lee: Como en la cuenta de Oval: x · x = 9 también daba con −3.
+[97.2s] lee: x + 1 = −3 también cumple la cuenta: x = −4. La huerta no, porque un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.
+[98.2s] escena → c7.cuantas-veces
+[98.7s] lee: Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?
+[99.2s] elige «Unos cien días.» (Empezando con uno y duplicando cada día, ¿cuántos días para pasar mil?)
+[102.0s] lee: Con 10 ya había pasado: 1024. Las otras 1 sobraban.
+[103.0s] lee: —Punto: 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó.
+[103.1s] lee: Diez, no cien: duplicar llega lejos enseguida.
+[103.2s] lee: —La potencia pregunta: dos, diez veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para llegar a mil? Esa pregunta tiene nombre: logaritmo.
+[104.2s] lee: Casi diez: nueve duplicaciones no alcanzan y diez se pasan un poco.
+[104.2s] escena → c7.no-se-puede
+[105.3s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[106.9s] elige «Con x = 0: dividir por cero.» (¿Para qué x no se puede hacer esa cuenta?)
+[110.5s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[111.5s] lee: Con x = 0 abajo queda −2, y eso se divide. El cero que molesta es el de abajo: aparece con x = 2.
+[112.5s] lee: —Rampa: la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero.
+[112.6s] lee: Entonces escribo arriba: "si vienen más de dos". Con 3, un atado entero cada uno; con 5, un tercio.
+[113.7s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí la diagonal en doce y no cayó en ninguna rayita. ¿En cuántas hay que partirla?
+[113.8s] lee: El capítulo 8 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[115.2s] {"ended":true,"final":{"mode":"title","seg":"c7.no-se-puede"},"journal":["Crecer"],"evidenceKinds":["square-rows","side-predict","side","race-predict","race-day","race","pow-row","pow-zero","powers","sci-short","sci-compare","sci","expand-predict","expand-extra","expand","factor-try","factor","complete-predict","complete-other","complete","log-predict","log-step","log-early","log","rational-predict","rational-try","rational"],"fps":{"min":"40.0","median":"60.0"},"errors":[],"seconds":115.167,"size":"1600x900","touch":false,"route":"errores","watch":false}
