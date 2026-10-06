@@ -479,16 +479,21 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-**Entrega parcial, candidata `6abad80` (5 oct 2026).** Aceptación repetida tras el ciclo 14
-([ACEPTACION.md](ACEPTACION.md)). Siguen pendientes y fuera del alcance de este equipo:
-- móvil real (tacto y 30 FPS);
+**Entrega parcial, candidata `80ae42c` (6 oct 2026).** Aceptación completa en verde, que ahora
+incluye el teléfono apaisado ([ACEPTACION.md](ACEPTACION.md)). Siguen pendientes, fuera del alcance
+de este equipo:
+- teléfono real (tacto y 30 FPS);
 - escucha del audio;
-- revisión humana de diversión y aprendizaje;
-- rendimiento absoluto de esta revisión en un equipo sin otras sesiones.
+- prueba con personas, en especial de los bancos rediseñados.
 
-Siguen accionables y discutibles con el usuario: la oscuridad de la llegada al Faro de noche, el
-Lago al crepúsculo (dominan las copas) y el taller a oscuras, todos pedidos así por el canon.
-Reexportar el mundo ya es posible: `npm run export:world` (4 min).
+Siguen abiertos y para decidir con el usuario:
+- **Bancos:** pistas que cambien según el error cometido y una pregunta de predicción en los bancos
+  clave ([BANCOS-UX.md](BANCOS-UX.md)).
+- **Escenas oscuras:** la llegada al Faro de noche, el Lago al crepúsculo y el taller a oscuras.
+  El canon las pide así.
+
+Para mirar el juego en el navegador integrado, cerrá la pestaña al terminar: compite por la GPU
+con las partidas automatizadas.
 
 Servidores de trabajo: `npm run dev` (4190, código vivo), `node scripts/serve-snapshot.mjs 4192`
-(copia congelada para partidas largas), base `2397b6f` en un worktree en 4193 para comparar.
+(copia congelada para partidas largas).
