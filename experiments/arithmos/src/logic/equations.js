@@ -14,7 +14,17 @@ function linText(a, b) {
   if (b === 0) return ax;
   return `${ax} ${b > 0 ? '+' : '−'} ${fmt(Math.abs(b))}`;
 }
-const fmt = n => (n < 0 ? `−${Math.abs(n)}` : String(n));
+/** Escribe un número como se escribe en el pizarrón: enteros, o fracciones chicas (7/2), o con coma. */
+const fmt = n => {
+  const sign = n < 0 ? '−' : '';
+  const a = Math.abs(n);
+  if (Number.isInteger(a)) return sign + a;
+  for (let d = 2; d <= 12; d++) {
+    const k = Math.round(a * d);
+    if (Math.abs(k / d - a) < 1e-9) return `${sign}${k}/${d}`;
+  }
+  return sign + String(+a.toFixed(3)).replace('.', ',');
+};
 
 /** Un miembro cualquiera (no lineal): función y texto. */
 export const expr = (f, text, opts = {}) => ({f, text, ...opts});

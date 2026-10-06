@@ -280,8 +280,13 @@
     "C5"
    ],
    "acceptance": "Idem",
-   "status": "pendiente",
-   "evidence": []
+   "status": "implementado",
+   "evidence": [
+    "artifacts/arithmos/it05/c6-directa.log",
+    "artifacts/arithmos/it05/c6-errores.log",
+    "experiments/arithmos/tests/equations.test.mjs"
+   ],
+   "note": "8 escenas: la caja (incógnita), lo mismo a los dos lados (pasa sumando), el que despeja de memoria (sustitución), por cero, al cuadrado, dividir por x, desigualdad con negativo, dos pasos y la x a la derecha. Lógica en src/logic/equations.js con pruebas. Rutas directa y con errores sin errores. Sin revisión independiente."
   },
   {
    "id": "C7",

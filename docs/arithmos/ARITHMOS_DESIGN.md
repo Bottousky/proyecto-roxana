@@ -216,35 +216,34 @@ cantidades (C3) se tratan con funciones (cap. 9); los reales y su completitud, s
 Historia (fuentes.md): verificar antes de usar fracciones egipcias o babilónicas; no afirmar
 orígenes únicos.
 
-## Capítulo 6 (ecuaciones) — núcleo de "pasa sumando" (diseño conceptual, no implementado)
+## Capítulo 6 — Lo que no se ve (diseño, en producción)
 
-Representación elegida (requiere el cap. 3: recta con negativos): **una ecuación son dos
-marcadores sobre la misma recta**, uno por miembro, que dependen de una x desconocida.
-Resolver es buscar dónde coinciden. Una transformación se aplica a **los dos marcadores a la
-vez**: "+3" los corre 3 hacia la derecha; si coincidían, siguen coincidiendo.
+Pregunta de entrada (gancho del cap. 5): la diagonal existe pero no se sabe escribir; antes, algo
+más simple: Mara tiene una caja cerrada con atados adentro y no sabe cuántos. Idea central: **una
+incógnita es un número que no se ve; una ecuación son dos miembros que dependen de ella; resolver
+es encontrar dónde coinciden; transformar los dos miembros a la vez con algo que se puede deshacer
+no cambia las soluciones.**
 
-- x − 3 = 5 → aplicar "+3" a ambos miembros: x − 3 + 3 = 5 + 3 → el miembro izquierdo se
-  **simplifica** porque x − 3 + 3 = x para toda x (se ve: ir 3 a la izquierda y volver 3 no
-  mueve) → x = 8. "Pasa sumando" queda como abreviatura de esos dos pasos, desplegable.
-- Aplicar algo a un solo miembro separa los marcadores: transformación inválida a la vista.
-- Caminos alternativos válidos: restar 5 a ambos (x − 8 = 0), luego sumar 8. Se evalúa la
-  equivalencia, no una secuencia de clics.
-- **Por qué se conservan las soluciones:** cada paso se puede deshacer (sumar 3 se deshace
-  restando 3). Dicho con el cap. 1: la transformación es **uno a uno** sobre la recta; si dos
-  valores distintos no pueden ir a parar al mismo lugar, no aparecen ni se pierden soluciones.
-- **Cuándo no:** multiplicar por 0 aplasta toda la recta en un punto (todo "coincide": aparecen
-  soluciones falsas; no se puede deshacer). Elevar al cuadrado dobla la recta (−a y a caen
-  juntos): puede introducir soluciones; hay que verificar. Dividir por una expresión que puede
-  valer 0 no está definido en esos valores: puede perder soluciones (x² = x ÷ x → x = 1 pierde
-  x = 0). Multiplicar una desigualdad por un negativo refleja la recta: el orden se invierte.
-- Detección de transformaciones inválidas: un habitante "despeja" de memoria ("el 3 pasa
-  restando", "pasa dividiendo" un término que sumaba); el jugador lo comprueba sustituyendo un
-  valor en la ecuación original y en la transformada.
-- Transferencia con otra estructura: 2x + 1 = 7 (dos pasos, orden de deshacer), 3 = x/4 (la
-  incógnita a la derecha), y una desigualdad −2x < 6.
-- Ancla histórica (fuentes.md, certeza alta): al-Khwārizmī, *al-jabr* = restituir lo restado
-  sumándolo en ambos miembros; *al-muqābala* = cancelar términos iguales a ambos lados.
-  Presentarlo como dato documentado, no como origen único.
+Representación: la **recta con dos marcadores**, uno por miembro. Punto se sienta sobre la recta
+y hace de x: el jugador lo cambia de marca y los dos marcadores se mueven según sus expresiones.
+Cuando coinciden, una raya amarilla los une. Las transformaciones son palabras para aplicar a los
+dos miembros o a uno solo.
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 6.1 | La caja cerrada | Incógnita; ecuación como dos miembros | Mover a Punto (x) hasta que "lo de la caja menos 3" coincida con 5 | Los marcadores se mueven con x; coinciden sólo en x = 8 |
+| 6.2 | Lo mismo a los dos lados | "Pasa sumando" como transformación de ambos miembros | Elegir qué aplicar: +3 a los dos, +3 sólo a la izquierda, −3 a los dos | +3 a los dos corre los dos marcadores: siguen coincidiendo en 8 y la izquierda queda x; a uno solo, se separan; "pasa sumando" queda como abreviatura de los dos pasos |
+| 6.3 | El que despeja de memoria | Transformación inválida detectada por sustitución | Un habitante escribe x + 3 = 5 → x = 5 + 3; el jugador sustituye 8 en la original | 8 + 3 = 11, no 5: el "pasa" con el signo equivocado cambió la ecuación |
+| 6.4 | Por cero | ×0 no se puede deshacer | Alguien "simplifica" multiplicando todo por 0 | 0 = 0: cualquier x coincide; soluciones falsas; no hay vuelta |
+| 6.5 | Al cuadrado | Elevar al cuadrado puede agregar soluciones | x = 3 al cuadrado: ¿cuántas x cumplen x² = 9? | −3 también; hay que verificar en la original |
+| 6.6 | Dividir por lo que puede ser cero | Perder soluciones | x² = x; dividir por x | Queda x = 1 y se perdió x = 0 |
+| 6.7 | Al revés | Desigualdad por un negativo | −2x < 6: dividir por −2 con o sin dar vuelta | Sin dar vuelta, los valores que cumplen no coinciden (se ve en la recta) |
+| 6.8 | Dos pasos | Orden de deshacer; incógnita a la derecha | 2x + 1 = 7 (¿qué se deshace primero?); 3 = x / 4 | Varios caminos válidos; se evalúa que cada paso conserve las soluciones |
+
+Por qué se conservan las soluciones (dicho por el estudiante, no por Mara): cada paso se puede
+deshacer; con el cap. 1: la transformación es uno a uno sobre la recta. Ancla histórica (fuentes.md,
+certeza alta): al-Khwārizmī, *al-jabr* (restituir lo restado sumándolo en ambos miembros) y
+*al-muqābala* (cancelar términos iguales a ambos lados). En la Bitácora, como dato.
 
 ## Interfaz
 

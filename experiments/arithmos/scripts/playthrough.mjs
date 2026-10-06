@@ -142,6 +142,11 @@ function pickChoice(prompt, options) {
     ['2,05 es lo mismo', 'Sí: el 0', 'No: es menos'],
     ['trato les conviene', 'El 80 %', 'Dan lo mismo'],
     ['mida la diagonal justo', 'partiendo bastante fino', 'Quizás'],
+    ['pasa sumando', 'se muda', 'Sumar lo mismo'],
+    ['Cómo lo comprobás', 'Creerle', 'Poner a Punto'],
+    ['truco de Cuña', 'cualquier x es', 'se perdió'],
+    ['x · x caiga en el 9', 'Una sola', 'Dos.'],
+    ['x = 0 cumple', 'No:', 'Sí:'],
   ] : route === 'justo' ? [
     ['espía', 'Quedarte'], ['te mira', 'Quedarte'],
     ['vuelven todos', 'Anotarlos'],
@@ -203,6 +208,11 @@ function pickChoice(prompt, options) {
     ['2,05 es lo mismo', 'No: es menos'],
     ['trato les conviene', 'Dan lo mismo'],
     ['mida la diagonal justo', 'Quizás'],
+    ['pasa sumando', 'Sumar lo mismo'],
+    ['Cómo lo comprobás', 'Poner a Punto'],
+    ['truco de Cuña', 'se perdió'],
+    ['x · x caiga en el 9', 'Dos.'],
+    ['x = 0 cumple', 'Sí:'],
   ];
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
@@ -462,6 +472,15 @@ for (let iter = 0; iter < 4000; iter++) {
       target = route === 'errores' ? spots[0] : (spots.find(x => x.id === 'op-times2' || x.id === 'op-timesm1') || spots[0]);
     } else if (s.seg === 'c4.nadie' && spots.some(x => x.id === 'nz-stop')) {
       target = (route === 'errores' && !tried.has('nzmore') && spots.length && (tried.add('nzmore'), true)) ? spots.find(x => x.id === 'nz-fill') : spots.find(x => x.id === 'nz-stop');
+    } else if (s.seg?.startsWith('c6.') && spots.some(x => /^x-?\d+$/.test(x.id))) {
+      // mover a Punto: buscar la marca que pide la escena
+      const want = {'c6.caja': [route === 'errores' ? 5 : 8, 8], 'c6.memoria': [8, 2], 'c6.por-cero': [3, -4, 6], 'c6.cuadrado': [-3], 'c6.dividir': [0], 'c6.al-reves': [-5, 2], 'c6.dos-pasos': [3]}[s.seg] || [0];
+      const ids = want.map(n => `x${n}`);
+      target = spots.find(x => ids.includes(x.id) && !tried.has(`${s.seg}${x.id}${pairingStage}`)) || spots.find(x => ids.includes(x.id)) || spots[0];
+      if (target) tried.add(`${s.seg}${target.id}${pairingStage}`);
+    } else if (s.seg?.startsWith('c6.') && spots.some(x => x.id.startsWith('op-'))) {
+      const order = route === 'errores' ? ['op-oneL', 'op-bothM', 'op-both', 'op-keep', 'op-flip', 'op-m7', 'op-m1', 'op-d2', 'op-d4', 'op-x4'] : ['op-both', 'op-flip', 'op-m1', 'op-d2', 'op-x4'];
+      target = order.map(id => spots.find(x => x.id === id)).find(Boolean) || spots[0];
     } else if (s.seg === 'c5.recta') {
       const qs = spots.filter(x => x.id.startsWith('q'));
       if (route === 'errores' && !tried.has('q1')) { tried.add('q1'); target = qs.find(x => x.id === 'q1'); }
