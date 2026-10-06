@@ -1,0 +1,34 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c8.sombras"
+  },
+  "journal": [
+    "Formas"
+  ],
+  "evidenceKinds": [
+    "perimeter-predict",
+    "fence",
+    "perimeter",
+    "pythag-predict",
+    "pythag-move",
+    "pythag-general",
+    "pythag",
+    "coord-try",
+    "coord-distance",
+    "coords",
+    "shadow",
+    "relation"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 21.202,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}

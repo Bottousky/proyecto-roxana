@@ -1,0 +1,17 @@
+[0.0s] escena → c8.casas
+[1.0s] lee: La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada.
+[2.4s] lee: La casa de Rampa la tengo anotada así: (3, 2).
+[2.9s] lee: —Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar.
+[3.6s] lee: Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1).
+[4.3s] elige «Siete: cuatro para el costado y tres para arriba.» (¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?)
+[4.6s] lee: —Es el tirante de Balcón: patas 4 y 3, en escuadra. 4² + 3² = 25: el camino derecho mide 5.
+[4.7s] lee: Siete es yendo por las rectas, en ele. Derecho, cinco.
+[4.8s] escena → c8.sombras
+[5.2s] lee: Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?
+[9.7s] lee: Con la tabla, ¿se puede saber la hora mirando la sombra?
+[10.8s] elige «Sí: cada sombra dice su hora.» (¿La sombra dice la hora?)
+[11.0s] lee: A las 10 y a las 14 la sombra mide lo mismo: mirando la sombra, no se sabe cuál de las dos.
+[11.7s] lee: —Cornisa: la sombra depende de la hora. Dada la hora, hay una sola sombra. Al revés, no: 2 pasos puede ser a las 10 o a las 14.
+[12.7s] lee: Que una cosa dependa de otra, y de qué manera… eso hay que mirarlo con cuidado.
+[13.1s] lee: El capítulo 9 todavía se está dibujando. Tu Bitácora y tus momentos quedan guardados.
+[13.9s] {"ended":true,"final":{"mode":"title","seg":"c8.sombras"},"journal":["Formas"],"evidenceKinds":["coord-try","coord-distance","coords","shadow","relation"],"fps":{"min":"36.0","median":"60.0"},"errors":[],"seconds":13.876,"size":"844x390","touch":true,"route":"errores","watch":false}

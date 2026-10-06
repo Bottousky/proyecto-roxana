@@ -57,10 +57,11 @@ export const cerca = {
       d.describe(`Una huerta de ${a} por ${b} con los doce tramos de cerca: adentro entran ${a * b} cuadros de tierra.`);
       return a * b;
     };
+    w.add(new Label('c8-wl', 'ancho:', A.x1 - 160, A.y0 + 14, {size: 18, z: 12, ch: BLUE}));
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Elegí el ancho de la huerta: el largo sale solo, porque la cerca es siempre la misma. Mirá cuánta tierra queda adentro.']);
-      const refresh = () => g.ui.setSpots([1, 2, 3, 4, 5].filter(a => !tried.includes(a)).map(a => wordSpot(`c8-w${a}`, `ancho ${a}`, A.x1 - 140 + ((a - 1) % 2) * 100, A.y0 + 40 + Math.floor((a - 1) / 2) * 72, () => pick(a), {label: `Armar la huerta de ${a} de ancho`})));
+      const refresh = () => g.ui.setSpots([1, 2, 3, 4, 5].filter(a => !tried.includes(a)).map(a => wordSpot(`c8-w${a}`, String(a), A.x1 - 140 + ((a - 1) % 2) * 100, A.y0 + 46 + Math.floor((a - 1) / 2) * 72, () => pick(a), {label: `Armar la huerta de ${a} de ancho`})));
       const pick = async a => {
         if (busy || !ctl.alive()) return;
         busy = true;
@@ -233,16 +234,16 @@ export const casas = {
     const gx = A.x0 + 40, gy = A.y0 + 22;
     const px = x => gx + (x - X0) * U, py = y => gy + (Y1 - y) * U;
     const lines = [];
-    for (let x = X0; x <= X1; x++) lines.push(S([[px(x), py(Y1) - 6], [px(x), py(Y0) + 6]], seedOf('c8-gx') + x, {w: x === 0 ? 2.6 : 1, p: x === 0 ? 0.95 : 0.35, lift: false}));
-    for (let y = Y0; y <= Y1; y++) lines.push(S([[px(X0) - 6, py(y)], [px(X1) + 6, py(y)]], seedOf('c8-gy') + y, {w: y === 0 ? 2.6 : 1, p: y === 0 ? 0.95 : 0.35, lift: false}));
+    for (let x = X0; x <= X1; x++) lines.push(S([[px(x), py(Y1) - 6], [px(x), py(Y0) + 6]], seedOf('c8-gx') + x, {w: x === 0 ? 2.6 : 1.4, p: x === 0 ? 0.95 : 0.5, lift: false}));
+    for (let y = Y0; y <= Y1; y++) lines.push(S([[px(X0) - 6, py(y)], [px(X1) + 6, py(y)]], seedOf('c8-gy') + y, {w: y === 0 ? 2.6 : 1.4, p: y === 0 ? 0.95 : 0.5, lift: false}));
     w.add(new Drawing('c8-grid', lines, {z: 11}));
-    for (let x = X0; x <= X1; x++) w.add(new Label(`c8-gxl${x}`, x < 0 ? `−${-x}` : String(x), px(x) - 10, py(0) + 18, {size: 15, align: 'center', z: 12, ch: BLUE}));
-    for (let y = Y0; y <= Y1; y++) if (y !== 0) w.add(new Label(`c8-gyl${y}`, y < 0 ? `−${-y}` : String(y), px(0) - 10, py(y) - 6, {size: 15, align: 'right', z: 12, ch: BLUE}));
+    for (let x = X0; x <= X1; x++) w.add(new Label(`c8-gxl${x}`, x < 0 ? `−${-x}` : String(x), px(x) - 12, py(0) + 22, {size: 21, align: 'center', z: 12, ch: BLUE}));
+    for (let y = Y0; y <= Y1; y++) if (y !== 0) w.add(new Label(`c8-gyl${y}`, y < 0 ? `−${-y}` : String(y), px(0) - 8, py(y) - 6, {size: 21, align: 'right', z: 12, ch: BLUE}));
     d.describe('En la pizarra, una cuadrícula con dos rectas numeradas que se cruzan en el cero: una acostada y una parada.');
     await d.shot(SHOTS.tiles, 0.8);
     const house = (id, x, y, name) => {
       w.add(new Shape(id, poly(id, [[-10, 0], [10, 0], [10, -14], [0, -24], [-10, -14]], {ch: YELLOW, w: 2.4}), px(x), py(y), {z: 14}));
-      w.add(new Label(`${id}l`, name, px(x) + 14, py(y) - 18, {size: 15, z: 14, ch: YELLOW}));
+      w.add(new Label(`${id}l`, name, px(x) + 14, py(y) - 18, {size: 19, z: 14, ch: YELLOW}));
     };
     const placeAt = (target, name, wrongNote) => d.interact(ctl => new Promise(resolve => {
       g.setHint(() => [`Tocá el cruce donde va la casa de ${name}: el primer número se cuenta por la recta acostada; el segundo, por la parada.`]);

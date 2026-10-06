@@ -1,0 +1,27 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c8.sombras"
+  },
+  "journal": [
+    "Formas"
+  ],
+  "evidenceKinds": [
+    "coord-try",
+    "coord-distance",
+    "coords",
+    "shadow",
+    "relation"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 13.876,
+  "size": "844x390",
+  "touch": true,
+  "route": "errores",
+  "watch": false
+}
