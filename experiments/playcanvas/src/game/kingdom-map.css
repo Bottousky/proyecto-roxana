@@ -53,7 +53,10 @@
 .kmap-player i::after{content:'';position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-10%);border-radius:50%;background:#173a33;border:2px solid #a8f0dd}
 @keyframes kmap-here{from{transform:scale(.6);opacity:1}to{transform:scale(1.6);opacity:0}}
 
-.kmap-landmark{width:78px;height:78px}
+.kmap-landmark{width:var(--landmark,78px);height:var(--landmark,78px)}
+.kmap[data-zoom="farthest"] .kmap-landmark{width:10px;height:10px}
+.kmap[data-zoom="farthest"] .kmap-landmark-art{display:none}
+.kmap[data-zoom="farthest"] .kmap-landmark-name{top:50%;transform:translate(-50%,-50%);font-size:13px}
 .kmap-landmark-art{position:absolute;inset:0;background-repeat:no-repeat;background-size:300% 300%;background-position:calc(var(--col) * 50%) calc(var(--row) * 50%);filter:drop-shadow(0 6px 6px #000a)}
 .kmap-landmark.unknown .kmap-landmark-art{filter:grayscale(.65) sepia(.4) brightness(.85) drop-shadow(0 6px 6px #000a);opacity:.9}
 .kmap-landmark-name{position:absolute;left:50%;top:calc(100% - 4px);transform:translateX(-50%);padding:2px 10px 3px;font:600 15px/1 'Cormorant Garamond',Georgia,serif;letter-spacing:.05em;color:#fff1cf;background:linear-gradient(90deg,transparent,#1d1910e6 14%,#1d1910e6 86%,transparent);border-top:1px solid #c9ab6c66;border-bottom:1px solid #c9ab6c66;white-space:nowrap}

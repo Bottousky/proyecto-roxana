@@ -46,7 +46,7 @@ export function kingdomMapMarks(state, { position, facing, inhabitants = [] } = 
     marks.push({ kind: 'place', id: `place-${id}`, area: id, at: [k.x, k.z - area.bounds[1] * .5 - 1], label: area.name, known, current: state.area === id || (state.area === 'workshop' && id === 'plaza'), minZoom: .5 });
     // Seen from far, each place shows its painted landmark, the way a travel map is illustrated.
     const art = LANDMARK_ART.indexOf(id);
-    if (art >= 0) marks.push({ kind: 'landmark', id: `landmark-${id}`, area: id, at: [k.x, k.z], art, known, label: area.name, current: state.area === id || (state.area === 'workshop' && id === 'plaza'), maxZoom: .5 });
+    if (art >= 0) marks.push({ kind: 'landmark', id: `landmark-${id}`, area: id, at: [k.x, k.z], art, known, label: area.name, current: state.area === id || (state.area === 'workshop' && id === 'plaza'), maxZoom: .47 });
     if (!known) continue;
     for (const object of area.objects || []) {
       if (object.hidden) continue;
@@ -144,7 +144,9 @@ export function bindKingdomMap(root, { onTravel } = {}) {
     // A scale bar that stays a round number of metres.
     const metresPerPx = 1 / (KINGDOM_MAP.pxPerMetre * view.s), target = 90 * metresPerPx, step = [5, 10, 20, 25, 50, 100, 200].find(v => v >= target) || 200;
     scaleBar.querySelector('i').style.width = `${n(step / metresPerPx)}px`; scaleBar.querySelector('span').textContent = `${step} m`;
-    host.dataset.zoom = view.s >= 1.1 ? 'near' : view.s >= .55 ? 'mid' : 'far';
+    host.dataset.zoom = view.s >= 1.1 ? 'near' : view.s >= .55 ? 'mid' : view.s >= .16 ? 'far' : 'farthest';
+    // Landmark art shrinks with the sheet, and gives way to names alone when the whole kingdom is small.
+    host.style.setProperty('--landmark', `${Math.round(Math.max(40, Math.min(78, 320 * view.s)))}px`);
   };
   const schedule = () => { if (!frame) frame = requestAnimationFrame(draw); if (popover) popover.hidden = true; };
   const zoomAt = (factor, cx, cy) => { const s = view.s, next = Math.min(limits().max, Math.max(limits().min, s * factor)); view.x = cx - (cx - view.x) * next / s; view.y = cy - (cy - view.y) * next / s; view.s = next; schedule(); };
