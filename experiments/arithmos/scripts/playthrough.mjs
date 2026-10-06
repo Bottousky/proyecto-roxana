@@ -313,6 +313,12 @@ function pickChoice(prompt, options) {
     ['¿Qué familia sigue la Marea?', 'Duplica'],
     ['pasa la escalera', 'En la noche 5'],
   ];
+  if (prompt.includes('tiene esta forma')) {
+    const NAME = ['altura de la rueda', 'escalera de Mara', 'reparto', 'escalera de Punto', 'huerta'][c12Cell];
+    const wrong = route === 'errores' && !tried.has('c12fam') && (tried.add('c12fam'), true);
+    const o = wrong ? options.find(t => !t.includes(NAME)) : options.find(t => t.includes(NAME));
+    if (o) return o;
+  }
   for (const [key, ...wants] of pref) {
     if (!prompt.includes(key)) continue;
     for (const w of wants) {
@@ -334,6 +340,7 @@ let coordStep = 0;
 let c9Shape = null;
 let c11Item = null;
 let knobStep = 0;
+let c12Cell = 0;
 let logTaps = 0;
 const searchOrder = ['look-crack', 'look-house', 'look-smudge'];
 let lastSeg = null;
@@ -688,15 +695,9 @@ for (let iter = 0; iter < 4000; iter++) {
     } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id.startsWith('c11-s'))) {
       target = spots[0];
       c11Item = target.id.replace('c11-s', '');
-    } else if (s.seg === 'c12.familias' && spots.some(x => x.id.startsWith('c12-r') || x.id.startsWith('c12-c'))) {
-      const sel = s.spots.find(x => x.selected);
-      const CELL = {mara: 1, punto: 3, huerta: 4, rueda: 0, reparto: 2};
-      if (!sel) target = spots.find(x => x.id.startsWith('c12-r'));
-      else {
-        const id = sel.id.replace('c12-r', '');
-        const wrong = route === 'errores' && !tried.has('c12f') && (tried.add('c12f'), true);
-        target = spots.find(x => x.id === `c12-c${wrong ? (CELL[id] + 1) % 5 : CELL[id]}`);
-      }
+    } else if (s.seg === 'c12.familias' && spots.some(x => x.id.startsWith('c12-c'))) {
+      target = spots[0];
+      c12Cell = Number(target.id.replace('c12-c', ''));
     } else if (s.seg === 'c12.perillas' && spots.some(x => x.id.startsWith('c12-a') || x.id.startsWith('c12-b'))) {
       const seq = route === 'errores' ? ['c12-bp', 'c12-ap', 'c12-ap', 'c12-ap', 'c12-bm', 'c12-bm', 'c12-bm'] : ['c12-ap', 'c12-ap', 'c12-ap', 'c12-bm', 'c12-bm'];
       target = spots.find(x => x.id === seq[knobStep]) || spots[0];

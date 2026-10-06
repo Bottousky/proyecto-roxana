@@ -50,26 +50,22 @@ export const familias = {
     d.describe('Cinco formas: una ola; una recta que sube pareja; una curva cortada en dos con un hueco en el medio; una curva que empieza baja y se dispara; una U.');
     await d.shot(SHOTS.tiles, 0.8);
     const done = new Set();
-    let sel = null;
-    await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => [sel ? `¿Cuál es la forma de «${RULES.find(r => r.id === sel).name}»? Tocala.` : 'Tocá una regla de abajo y después su forma.']);
-      const refresh = () => g.ui.setSpots([
-        ...PICKS.filter(id => !done.has(id)).map(id => wordSpot(`c12-r${id}`, SHORT[id], A.x0 + 60 + PICKS.indexOf(id) % 3 * 170, A.y1 - (PICKS.indexOf(id) < 3 ? 34 : 4) - 10, () => { if (ctl.alive()) { sel = sel === id ? null : id; refresh(); } }, {label: RULES.find(r => r.id === id).name, selected: sel === id})),
-        ...(sel ? cells.map((c, i) => rectSpot(`c12-c${i}`, `La forma ${i + 1}`, {x: c.x, y: c.y, w: c.w, h: c.h}, () => pick(c, i))) : []),
-      ]);
-      const pick = (c, i) => {
-        if (!ctl.alive() || !sel) return;
-        const rule = RULES.find(r => r.id === sel);
-        d.evidence('family-try', {rule: sel, family: c.family, ok: rule.family === c.family});
-        if (rule.family !== c.family) { g.note(HINT[sel]); return; }
-        done.add(sel);
-        w.add(new Label(`c12-fl${i}`, rule.name, c.x + c.w / 2, c.y + c.h + 14, {size: 14, align: 'center', z: 13, ch: YELLOW}));
-        g.audio.tap(0.2, 1.2 + done.size * 0.08);
-        sel = null;
-        if (done.size === PICKS.length) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
-      };
-      refresh();
-    }));
+    const placed = new Set();
+    while (done.size < PICKS.length) {
+      const idx = await d.interact(ctl => new Promise(resolve => {
+        g.setHint(() => ['Tocá una forma: después elegís qué regla del viaje tiene esa forma.']);
+        g.ui.setSpots(cells.map((c, i) => i).filter(i => !placed.has(i)).map(i => rectSpot(`c12-c${i}`, `La forma ${i + 1}`, {x: cells[i].x, y: cells[i].y, w: cells[i].w, h: cells[i].h}, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(i); } })));
+      }));
+      const c = cells[idx];
+      const rid = await d.choose(PICKS.filter(id => !done.has(id)).map(id => ({id, text: RULES.find(r => r.id === id).name})), {prompt: '¿Qué regla del viaje tiene esta forma?'});
+      const rule = RULES.find(r => r.id === rid);
+      d.evidence('family-try', {rule: rid, family: c.family, ok: rule.family === c.family});
+      if (rule.family !== c.family) { await d.think(HINT[rid]); continue; }
+      done.add(rid);
+      placed.add(idx);
+      w.add(new Label(`c12-fl${idx}`, rule.name, c.x + c.w / 2, c.y + c.h + 14, {size: 14, align: 'center', z: 13, ch: YELLOW}));
+      g.audio.tap(0.2, 1.2 + done.size * 0.08);
+    }
     await d.say('student', 'Mara: cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las que se cortan no están definidas en un lugar, y cerca de él se disparan. Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
     d.evidence('families', {done: [...done]});
     g.flags.c12families = true;

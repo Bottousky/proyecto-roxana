@@ -1,0 +1,42 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c12.anticipar"
+  },
+  "journal": [
+    "Anticipar"
+  ],
+  "evidenceKinds": [
+    "family-try",
+    "families",
+    "knob",
+    "params",
+    "jump-predict",
+    "jump-tap",
+    "jump",
+    "compose",
+    "inverse-predict",
+    "inverse-square",
+    "rate",
+    "derivative-predict",
+    "accum",
+    "integral-predict",
+    "piecewise-predict",
+    "final-family",
+    "final-predict"
+  ],
+  "fps": {
+    "min": "20.0",
+    "median": "60.0"
+  },
+  "errors": [
+    "[spot tapado] \"Mara\" tapa a c12-rrueda",
+    "[spot tapado] \"Punto\" tapa a c12-rreparto"
+  ],
+  "seconds": 30.76,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}
