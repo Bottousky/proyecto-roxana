@@ -723,7 +723,7 @@ export class PuzzleWorkbench {
 
   switchControl(sw) {
     const on = this.state.switches[sw.key];
-    return `<button class="wb-switch ${on ? 'on' : ''}" data-action="switch" data-key="${sw.key}" aria-pressed="${on}" ${sw.external ? 'disabled' : ''}><i aria-hidden="true"></i>${sw.external ? 'Aislada en el patio' : on ? 'Llave: conectada' : 'Llave: aislada'}</button>`;
+    return `<button class="wb-switch ${on ? 'on' : ''}" data-action="switch" data-key="${sw.key}" aria-pressed="${on}" aria-label="${escapeHtml(sw.label)}: ${on ? 'conectada' : 'aislada'}" title="${escapeHtml(sw.label)}" ${sw.external ? 'disabled' : ''}><i aria-hidden="true"></i>${sw.external ? 'Aislada en el patio' : on ? 'Conectada' : 'Aislada'}</button>`;
   }
 
   plate(c) {
@@ -836,11 +836,13 @@ export class PuzzleWorkbench {
         <p class="wb-node-caption" aria-live="polite"></p>
       </div>
         ${success && !this.successDismissed ? `<div class="wb-success" role="status"><div class="wb-success-seal" aria-hidden="true">✓</div><h2>¡Funciona!</h2>${successWhat ? `<p class="wb-success-what">${escapeHtml(successWhat)}</p>` : ''}<p class="wb-learned"><b>Lo que aprendiste</b>${escapeHtml(guidance.learned)}</p><div class="wb-success-actions"><button class="wb-primary" data-action="commission">${leaveLabel}</button><button class="wb-quiet" data-action="stay">Seguir mirando la mesa</button></div></div>` : ''}
+      <p class="wb-rotate-hint"><span aria-hidden="true">⟳</span>Con el teléfono apaisado, el tablero se ve más grande.</p>
       <ul class="wb-piece-list">${[...p.components.filter(c => c.goal || this.probeMarks?.[c.id] || (p.constraints ?? []).some(k => k.branch === c.id)).map(c => `<li><span>${escapeHtml(this.pieceName(c))}</span>${this.stateMarkup(c)}</li>`), (p.constraints ?? []).some(k => k.source) ? `<li>${this.linePlate().replace(/^<div[^>]*>|<\/div>$/g, '')}</li>` : ''].join('')}</ul>
-      ${controls && !inService ? `<div class="wb-compact-controls">${controls}</div>` : ''}
-      <details class="wb-terminal-drawer" data-drawer="terminals" ${p.cables ? 'open' : ''}><summary>Tocar las conexiones <span>Las mismas piezas, más cerca</span></summary><div class="wb-terminal-rail">${p.ports.map(n => portMarkup(n, true)).join('')}</div></details></main>
+</main>
       <footer class="wb-dock"><div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face" aria-hidden="true">${say.who === 'EDDA' ? 'E' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${hintButton}</div>
-        <div class="wb-toolbar">${tools ? `<div class="wb-tools">${tools}</div>` : ''}${this.renderProbe()}<div class="wb-history">${inService ? '<button data-action="practice">Practicar con una copia</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : ''}${!inService ? `<button data-action="undo" ${!this.history.length ? 'disabled' : ''} title="Deshacer el último cambio"><span aria-hidden="true">↶</span>Deshacer</button><button data-action="reset" title="Volver a la disposición inicial de la mesa"><span aria-hidden="true">↺</span>Empezar de nuevo</button>` : ''}</div></div></footer>
+        ${controls && !inService ? `<div class="wb-compact-controls">${controls}</div>` : ''}
+        <div class="wb-toolbar">${tools ? `<div class="wb-tools">${tools}</div>` : ''}${this.renderProbe()}<div class="wb-history">${inService ? '<button data-action="practice">Practicar con una copia</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : ''}${!inService ? `<button data-action="undo" ${!this.history.length ? 'disabled' : ''} title="Deshacer el último cambio"><span aria-hidden="true">↶</span>Deshacer</button><button data-action="reset" title="Volver a la disposición inicial de la mesa"><span aria-hidden="true">↺</span>Empezar de nuevo</button>` : ''}</div></div>
+        <details class="wb-terminal-drawer" data-drawer="terminals" ${p.cables ? 'open' : ''}><summary>Tocar las conexiones <span>Las mismas piezas, más cerca</span></summary><div class="wb-terminal-rail">${p.ports.map(n => portMarkup(n, true)).join('')}</div></details></footer>
     </div>`;
     this.shell.querySelectorAll('[data-drawer]').forEach(d => { d.open = drawers[d.dataset.drawer] ?? d.hasAttribute('open'); });
     if (inService) this.shell.querySelectorAll('[data-action="switch"],[data-action="knob"],input[data-knob],button[data-wire]').forEach(el => { el.disabled = true; });

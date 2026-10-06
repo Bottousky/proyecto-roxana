@@ -32,8 +32,11 @@ for (const id of ids) {
     for (const path of root.querySelectorAll('.wb-wire-casing')) { const m = path.getScreenCTM(), len = path.getTotalLength(); for (let s = 0; s < len; s += 4) { const p = path.getPointAtLength(s), x = m.a * p.x + m.c * p.y + m.e, y = m.b * p.x + m.d * p.y + m.f; for (const l of labels) if (x > l.r.left && x < l.r.right && y > l.r.top && y < l.r.bottom) crossed.add(l.e.textContent.trim()); } }
     // What must be seen together: the goal and its steps, the board with its plates, and Ohm's line with the tools.
     const caseBox = root.querySelector('.wb-case').getBoundingClientRect(), limit = Math.min(innerHeight, caseBox.bottom);
-    const primary = ['.wb-goal', '.wb-board', '.wb-say', '.wb-toolbar', '.wb-plate'].map(s => [...root.querySelectorAll(s)].find(vis)).filter(Boolean);
-    const hidden = primary.filter(e => e.getBoundingClientRect().bottom > limit + 1).map(e => e.className.split(' ')[0]);
+    // Goal, board and tools must be whole; Ohm's sentence must at least begin on screen (in a
+    // landscape phone it follows the buttons and scrolls in its column).
+    const primary = ['.wb-goal', '.wb-board', '.wb-toolbar', '.wb-plate'].map(s => [...root.querySelectorAll(s)].find(vis)).filter(Boolean);
+    const say = root.querySelector('.wb-say');
+    const hidden = [...primary.filter(e => e.getBoundingClientRect().bottom > limit + 1), ...(say && say.getBoundingClientRect().top > limit - 36 ? [say] : [])].map(e => e.className.split(' ')[0]);
     return { overlaps, hidden, scroll: scroller ? scroller.scrollHeight - scroller.clientHeight : 0, boardFits: board.bottom <= innerHeight && board.top >= 0, asideBottom: aside ? Math.round(aside.bottom - innerHeight) : 0, texts: texts.length, controls: controls.length, crossed: [...crossed] };
   });
   if (shots) await page.screenshot({ path: `${shots}/${width}x${height}-${id}.png` });

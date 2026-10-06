@@ -12,7 +12,9 @@ import { chromePath, gpuArgs } from './chrome.mjs';
 const out = resolve(process.env.OUT || 'output/qa-touch');
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ headless: true, executablePath: chromePath, args: gpuArgs });
-const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+// SIZE=844x390 juega con el teléfono apaisado, la forma recomendada.
+const [vw, vh] = (process.env.SIZE || '390x844').split('x').map(Number);
+const context = await browser.newContext({ viewport: { width: vw, height: vh }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
 const page = await context.newPage();
 const cdp = await context.newCDPSession(page);
 const errors = [], log = [];
@@ -28,10 +30,17 @@ const read = async () => { for (let i = 0; i < 200; i++) { const g = await game(
 // toward it, as anyone would walk toward something they cannot see yet.
 const aim = id => page.evaluate(id => {
   const w = window.__ohmdal.world, o = w.getInteractions().find(i => i.id === id), r = w.canvas.getBoundingClientRect(), [px, pz] = w.getPlayerPosition();
-  const inside = p => p.visible && p.x > 30 && p.x < r.width - 30 && p.y > 190 && p.y < r.height - 230;
+  // The open ground: away from the edges and from whatever the interface draws over the world.
+  const top = Math.min(190, r.height * .24), bottom = Math.min(230, r.height * .3);
+  const free = p => { const hit = document.elementFromPoint(p.x + r.left, p.y + r.top); return !hit || hit === w.canvas || hit.closest?.('#world') && !hit.closest('button,a,.hud-top,.hud-tools,#touch-controls,.objective,.interaction'); };
+  const inside = p => p.visible && p.x > 30 && p.x < r.width - 30 && p.y > top && p.y < r.height - bottom && free(p);
   const own = w.getScreenPosition(o); if (inside(own)) return { x: own.x + r.left, y: own.y + r.top, direct: true };
   const dx = o.x - px, dz = o.z - pz, d = Math.hypot(dx, dz), k = Math.min(1, 3.5 / d), spot = w.getScreenPosition({ x: px + dx * k, z: pz + dz * k, ground: true });
-  return { x: Math.max(30, Math.min(r.width - 30, spot.x)) + r.left, y: Math.max(190, Math.min(r.height - 230, spot.y)) + r.top, direct: false };
+  const at = { x: Math.max(30, Math.min(r.width - 30, spot.x)), y: Math.max(top, Math.min(r.height - bottom, spot.y)) };
+  // A spot under the interface slides toward the traveller, who is always on open ground.
+  const me = w.getScreenPosition({ x: px, z: pz, ground: true });
+  for (let t = 0; t < 1 && !free(at); t += .1) { at.x += (me.x - at.x) * .2; at.y += (me.y - at.y) * .2; }
+  return { x: at.x + r.left, y: at.y + r.top, direct: false };
 }, id);
 async function reach(id, { until = g => g.near === id || g.mode !== 'world', tries = 30 } = {}) {
   for (let i = 0; i < tries; i++) {
@@ -137,6 +146,6 @@ const reopened = await page.evaluate(() => window.__meter.filter(e => e.mode)); 
 note('taller-en-servicio');
 
 assert.deepEqual(errors, [], 'sin errores de página ni de consola');
-await writeFile(resolve(out, 'report.json'), JSON.stringify({ viewport: '390x844 táctil emulado', log, errors }, null, 2));
+await writeFile(resolve(out, 'report.json'), JSON.stringify({ viewport: `${vw}x${vh} táctil emulado`, log, errors }, null, 2));
 console.log('Táctil: título, lectura, cruceta, toque en el suelo y en objetos, dos bancos, medición, mapa, Bitácora y pausa sin errores.');
 await browser.close();
