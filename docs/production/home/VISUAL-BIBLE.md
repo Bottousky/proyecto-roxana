@@ -15,8 +15,12 @@ Fijada en el ciclo 1. No se reinventa por ciclo; se ajusta con evidencia.
 - **Paleta:** piedra `#e7dcc3`, pizarra `#5f737b`, latón `#d8bd80`, tinta UI `#10191a`. Acentos por mundo:
   Ω cian `#6fd6cf`, Φ ámbar `#f2a860`, λ violeta `#a595ff` (el cian de Bitland queda contenido en su chip),
   ∑ verde tiza `#86e0a8`.
+- **Foco narrativo:** la estatua de Roxana recibe una luz de acento cálida y suave a toda hora; la pantalla del
+  Anfiteatro queda apagada a media luz desde la vista general y brilla entera sólo con su sala abierta.
 - **Luz:** mañana con bruma blanca fría; tarde dorada (hora heroica por defecto entre 15 y 20 h); noche donde
-  dibujan las ventanas y los faroles. La bruma empieza detrás de la escuela según la distancia de cámara.
+  dibujan las ventanas y los faroles. La bruma empieza detrás de la escuela según la distancia de cámara y, de día, tira al azul del cielo
+  (perspectiva aérea). De noche: luna fría con luz suficiente para leer techos; el patio sin restaurar queda
+  oscuro y el restaurado se enciende con sus faroles (la noche cuenta el progreso).
 - **Materiales:** granos fotográficos reducidos a luminancia + color por material + color de vértice
   (suciedad baja, desgaste). Vidrio translúcido con especular atenuado; latón y cobre con brillo medio.
 - **Tipografía y señalética:** Cormorant Garamond para títulos y placas, Inter para interfaz. Placas de latón

@@ -28,7 +28,7 @@ export const HOURS={
   manana:{label:'Mañana',sun:[52,-30,'#fff1d6',1.75],ambient:'#a9b8c2',zenith:'#5f8fbf',horizon:'#d6e6ea',below:'#87a6b4',lamps:.15,windows:.1,grade:[1.02,1,1,1.01,1.02],cloud:'#ffffff',env:.85},
   tarde:{label:'Tarde',sun:[30,-58,'#ffd49a',1.9],ambient:'#a59c9e',zenith:'#5a7fae',horizon:'#f6c894',below:'#c79c80',lamps:.55,windows:.45,grade:[1.04,1.05,1,.9,1],cloud:'#fff0dc',env:.8},
   // Moonlight: enough to read roofs and paths; the lit windows still lead.
-  noche:{label:'Noche',sun:[46,40,'#a9bcff',.62],ambient:'#4a5a82',zenith:'#070d20',horizon:'#2a3a5e',below:'#10182c',lamps:1,windows:1,grade:[.85,.86,.92,1.12,.95],cloud:'#8795b8',env:.45},
+  noche:{label:'Noche',sun:[52,28,'#bccbff',1.05],ambient:'#6a7ca6',zenith:'#070d20',horizon:'#2a3a5e',below:'#10182c',lamps:1,windows:1,grade:[.85,.88,.94,1.1,1.06],cloud:'#8795b8',env:.6},
 };
 export function hourFor(date=new Date()){const h=date.getHours();return h>=7&&h<15?'manana':h>=15&&h<20?'tarde':'noche';}
 
@@ -39,7 +39,7 @@ const MATERIALS={
   slate:{map:'slate',color:'#5f737b'},roofPhysica:{map:'slate',color:'#a0624c'},roofBitland:{map:'slate',color:'#5f6c92'},roofArithmos:{map:'slate',color:'#6d8559'},
   wood:{map:'wood',color:'#a4744c'},woodDark:{map:'wood',color:'#5c3f2c'},floor:{map:'wood',color:'#b88b62'},hedge:{map:'grass',color:'#6a8a4a'},
   bronze:{map:'copper',color:'#c79c5c',metal:.8,gloss:.55},copper:{map:'copper',color:'#c47f4c',metal:.7,gloss:.5},iron:{color:'#393e43',metal:.55,gloss:.45},
-  paint:{color:'#ffffff'},curtain:{map:'wood',contrast:.25,color:'#8a2f31'},lampShade:{color:'#3f7a55',emissive:'#78d69a',glow:.15},
+  paint:{color:'#ffffff'},curtain:{map:'wood',contrast:.25,color:'#76403a'},lampShade:{color:'#3f7a55',emissive:'#78d69a',glow:.15},
   gold:{map:'copper',contrast:.2,color:'#ffd873',metal:.55,gloss:.72,emissive:'#b0801c',glow:.55},
   dim:{map:'stone',contrast:.2,color:'#8c8a86',opacity:.55},
   lampGlass:{color:'#6c6556',emissive:'#ffd08a',glow:0},lanternGlass:{color:'#57636a',emissive:'#fff0c4',glow:0,gloss:.8},
@@ -530,6 +530,8 @@ export class SchoolDiorama {
     }
   }
   buildLights(){
+    // A soft key light on Roxana's statue: the narrative anchor of the patio reads first in the overview.
+    const spot=(name,pos,at,color,range,inner,outer)=>{const e=new Entity(name);e.addComponent('light',{type:'spot',color:col(color),intensity:0,range,innerConeAngle:inner,outerConeAngle:outer,castShadows:false});e.setPosition(...pos);e.lookAt(...at);e.rotateLocal(-90,0,0);this.root.addChild(e);return e;};
     const omni=(name,pos,color,range,parent=this.root)=>{const e=new Entity(name);e.addComponent('light',{type:'omni',color:col(color),intensity:0,range,castShadows:false});e.setPosition(...pos);parent.addChild(e);return e;};
     this.lampLights=LAMPS.map(([x,z])=>omni('Farol',[x,3.7,z],'#ffcf8a',11));
     this.rooms={
@@ -539,6 +541,7 @@ export class SchoolDiorama {
       lantern:omni('Linterna',[TOWER.x,TOWER.shaft+4.5,TOWER.z],'#fff0c4',62),
       screen:omni('Pantalla',[AMPHI.x,3.5,AMPHI.z+2.5],'#a8c8d8',14),
       statue:omni('Farol de Roxana',[FOUNTAIN.x,3.3,FOUNTAIN.z+1.1],'#ffd08a',8),
+      statueKey:spot('Luz sobre Roxana',[FOUNTAIN.x+4,12,FOUNTAIN.z+8],[FOUNTAIN.x,4.6,FOUNTAIN.z],'#ffe9c4',24,10,22),
       board:omni('Luz de la cartelera',[NOTICE_BOARD.x,3.1,NOTICE_BOARD.z+1.2],'#ffd9a0',7),
       faro:omni('Faro en miniatura',[ARTIFACTS.ohmdal.x,4.1,ARTIFACTS.ohmdal.z],'#ffe7ad',5),
     };
@@ -712,7 +715,7 @@ export class SchoolDiorama {
     this.camera.lookAt(tx,ty,tz);
     const want=d;if(Math.abs(this.frame.dof.focusDistance-want)>.2){this.frame.dof.focusDistance=want;this.frame.update();}
     // Haze behind the school in the overview; close-ups keep it far so near stone is not washed out.
-    const fog=this.app.scene.fog;fog.start=Math.max(d+18,150);fog.end=Math.max(d*1.9+120,420);
+    const fog=this.app.scene.fog;fog.start=Math.max(d+40,170);fog.end=Math.max(d*2.6+260,620);
   }
 
   // ── Hour and stage ──────────────────────────────────────────────────────────
@@ -729,7 +732,8 @@ export class SchoolDiorama {
     this.paintSky(c('zenith'),c('horizon'),c('below'));
     this.cloudMaterial.emissive=c('cloud');this.cloudMaterial.update();
     // Haze toward the horizon colour turns the far hills blue and the night ones into silhouettes.
-    const night=lerp(a.lamps,b.lamps,t);this.app.scene.fog.color=mixColor(c('horizon'),col('#fff8ec'),.42*(1-clamp((night-.6)/.4,0,1)));
+    // Aerial perspective: by day the haze leans to the sky's blue so the far hills read as layers, not a wall.
+    const night=lerp(a.lamps,b.lamps,t),day=1-clamp((night-.6)/.4,0,1);this.app.scene.fog.color=mixColor(mixColor(mixColor(c('horizon'),c('zenith'),.38*day),col('#f4f2ee'),.2*day),col('#33456e'),.45*(1-day));
     this.skyColors={zenith:c('zenith'),horizon:c('horizon')};
     if(m.t>=1){this.hourMix=null;this.buildEnvironment(b);}this.stageDirty=true;
   }
@@ -783,6 +787,8 @@ export class SchoolDiorama {
     const banners=this.parts.get('banners');if(banners){banners.enabled=L(6)>.01;banners.setLocalScale(1,Math.max(.01,ease(L(6))),1);banners.setLocalPosition(0,4.85*(1-ease(L(6))),0);}
     // 8 beacon_network: the bell swings (see update). 9 beacon_lens: the lantern.
     const lantern=this.materials.lanternGlass;lantern.emissiveIntensity=L(8)*(1.6+night*3);lantern.update();
+    // The Sala de Trofeos' skylight glows with its trophies, softly: it must not burn into a white bar.
+    {const sk=this.materials['lanternGlass@trofeos'];if(sk){if(!sk.darkGlass){sk.darkGlass=true;sk.diffuse=col('#2c3439');sk.gloss=.25;sk.metalness=0;}sk.emissiveIntensity=(.02+earned/12*.08)*(.4+night*.6);sk.update();}}
     this.rooms.lantern.light.intensity=L(8)*(.6+night*1.4);// Additive blending ignores opacity: the beam's strength lives in its emissive and it is off by day.
     const beam=L(8)*clamp((night-.75)/.25,0,1)*(1-(this.focusFade||0));this.beam.m.emissiveIntensity=beam*.12;this.beam.m.update();this.beam.pivot.enabled=beam>.01;
     this.fx.lantern.particlesystem.enabled=L(8)>.5;
@@ -802,7 +808,10 @@ export class SchoolDiorama {
     const city=this.materials['city@programacion'];if(!this.entrySeq){city.emissiveIntensity=.3+night*.8;city.update();}
     const world=this.materials['world@fisica'];if(!this.entrySeq){world.emissiveIntensity=1.2+night*.9;world.update();}
     const visor=this.materials['visor@programacion'];if(!this.entrySeq){visor.emissiveIntensity=.35+night*.5;visor.update();}
-    this.materials.screen.emissiveIntensity=.55+night*.55;this.materials.screen.update();this.rooms.screen.light.intensity=.2+night*.9;
+    // The Anfiteatro's screen glows fully only when its room is open; from the overview it stays a quiet frame.
+    const screenOn=this.focusId==='anfiteatro'||this.video?1:.38;
+    this.materials.screen.emissiveIntensity=(.55+night*.55)*screenOn;this.materials.screen.update();this.rooms.screen.light.intensity=(.2+night*.9)*screenOn;
+    this.rooms.statueKey.light.intensity=(2.4+night*1.8)*(1-(this.focusFade||0)*.6);
     this.materials.lampShade.emissiveIntensity=.2+night*1.2;this.materials.lampShade.update();
     this.fx.dust.particlesystem.enabled=!this.reducedMotion&&night<.9;
     // Trophies.

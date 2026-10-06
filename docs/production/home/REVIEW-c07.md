@@ -21,7 +21,7 @@ Veredicto del revisor: **no corresponde CANDIDATO_PARA_REVISION todavía** (2 cr
 | 11 | MEDIO | Carreras: atajos durante gesto, gesto que pisa la sala elegida, farolito tardío, `focus(null)` con panel | **Corregido** (atajos en reposo y con modificadores excluidos, `openRoom` cancela gesto, farolito recalcula, recorrido respeta panel). Vista previa de entrada sin cancelación: abierto |
 | 12 | MEDIO | Foco en controles ocultos, canvas sin foco visible, tarjeta sin Escape | **Corregido**: `inert` en portada/panel, `:focus-visible` en canvas, Escape cierra la tarjeta |
 | 13 | MEDIO | Rótulos sobre el edificio equivocado | **Corregido**: pin sobre el hastial de la puerta |
-| 14–18 | MEDIO | Jerarquía del plano maestro, fondo sin colinas, noche, primer pintado por hora/etapa, acercamientos sobreexpuestos, Bitland/Faro/lucernario de Trofeos | Abiertos (arte) |
+| 14–18 | MEDIO | Jerarquía del plano maestro, fondo sin colinas, noche, primer pintado por hora/etapa, acercamientos sobreexpuestos, Bitland/Faro/lucernario de Trofeos | **Parcial (c08–c09)**: pantalla del Anfiteatro atenuada en vista general, luz de acento en la estatua, bruma azulada y colinas más cercanas (siguen fuera del encuadre: la cámara maestra no ve el horizonte), noche más legible, acercamientos con menos exposición. Abiertos: primer pintado por hora/etapa, lucernario de Trofeos todavía claro, Bitland/Faro de detalle |
 | 19 | MEDIO | Selector de etapas abierto (spoilers); promesa de entrada de Bitland | **Corregido**: selector sólo en dev o `?qa`; texto «boceto… puede cambiar» |
 | 20 | MEDIO | QA sobredeclarado | Parcial: casos no cubiertos listados como NO VERIFICADO en STATE |
 | 21 | MEDIO | Descubribilidad táctil de artefactos | Abierto |

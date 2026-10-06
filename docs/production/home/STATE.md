@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 8 cerrado (2026-10-06). No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 9 cerrado (2026-10-06). No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -180,10 +180,24 @@ NO VERIFICADO: FPS absolutos con la GPU libre; bfcache real; pérdida de context
 Limitaciones: bancos e instrumentos del taller siguen siendo cajas; los otros tres interiores sin cambios; la luz de
 las lámparas colgantes es emisiva (sin luz puntual propia); FPS sin medir con la GPU libre.
 
+## Ciclo 9 (2026-10-06) — jerarquía del plano maestro (antes/después en `evidence/c09/`)
+
+- Pantalla del Anfiteatro a media luz desde la vista general (deja de ser lo más saturado del cuadro) y telón menos
+  rojo; brilla entera con la sala abierta o un video.
+- Luz de acento cálida sobre la estatua de Roxana: de noche es el foco del patio.
+- Bruma más lejana y azulada de día (perspectiva aérea): el fondo deja de ser una pared beige; árboles lejanos con
+  suelo debajo. Colinas acercadas, pero **siguen fuera del encuadre** (la cámara maestra mira hacia abajo y el
+  horizonte queda arriba del cuadro): no se forzó.
+- Noche: más luna y luz ambiente; en etapas bajas se leen las formas; en la etapa 10 los faroles restaurados
+  encienden el patio (la noche cuenta el progreso real). Lucernario de Trofeos con material propio y emisivo tenue:
+  ya no satura, pero sigue claro (parcial).
+- Imágenes del primer pintado regeneradas. QA: `npm test` 97/97; interacción 26/26; teclado 14/14.
+
 ## Siguiente acción exacta
 
-1. Plano maestro (revisión #14–16): bajar el emisivo de la pantalla del Anfiteatro en vista general, acento de luz
-   cálida sobre la estatua de Roxana, colinas visibles bajo la bruma (niebla por altura o colinas más cercanas) y
-   noche legible (rebote de ventanas, luna). Comparar antes/después en el mismo encuadre y hora.
-2. Bancos de Electrónica con instrumentos reconocibles (galvanómetro con dial, soldador, bobinas) en lugar de cajas.
-3. `webglcontextlost` → versión ligera; medir con la GPU libre.
+1. Bancos de Electrónica con instrumentos reconocibles (galvanómetro con dial, soldador, bobinas de cobre) en
+   lugar de cajas; revisar en el acercamiento de la sala abierta.
+2. `webglcontextlost` → versión ligera, con prueba (`WEBGL_lose_context`).
+3. Primer pintado coherente con la hora (imagen de noche) cuando el visitante llega de noche.
+4. Medición con la GPU libre; si no hay bloqueos críticos nuevos, segunda revisión independiente y evaluar
+   CANDIDATO_PARA_REVISION.

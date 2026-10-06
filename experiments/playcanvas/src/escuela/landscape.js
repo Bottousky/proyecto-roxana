@@ -29,7 +29,8 @@ export function heightAt(x,z){
   // The road keeps to calmer ground so its ribbon lies flat on the land.
   const calm=z>30?1-smooth(12,3,Math.abs(x-roadX(z)))*.85:1;
   const roll=(fbm(x/70,z/70)-.45)*7*smooth(8,70,d)*calm;
-  const hills=Math.pow(fbm(x/150+11,z/150-4),1.6)*90*smooth(170,430,r)+smooth(380,700,r)*40;
+  // Hills rise behind the school within reach of the master camera, so the haze can layer them.
+  const hills=Math.pow(fbm(x/120+11,z/120-4),1.4)*70*smooth(105,300,r)+smooth(260,560,r)*55;
   return bank+roll+hills;
 }
 // Fields: large irregular plots of wheat, meadow, fallow and pasture tones.

@@ -442,7 +442,7 @@ function trofeosDetails(k){
   k.box('trofeos:colonnade','stone',{x:b.x,z:pz+.1,w:7.2,d:3,y:3.9,h:.4,jitter:.02});
   k.gable('trofeos:colonnade','slate',{x:b.x,z:pz+.1,w:7.4,d:3,y:4.3,rise:1.1,alongZ:true,ends:'stone',overhang:.2});
   // Skylight lantern on the ridge.
-  k.box(`${id}:roof`,'lanternGlass',{x:b.x,z:b.z,w:7,d:2.2,y:b.h+b.rise-.2,h:.9,jitter:0});
+  k.box(`${id}:roof`,'lanternGlass@trofeos',{x:b.x,z:b.z,w:7,d:2.2,y:b.h+b.rise-.2,h:.9,jitter:0});
   k.gable(`${id}:roof`,'bronze',{x:b.x,z:b.z,w:7.3,d:2.5,y:b.h+b.rise+.7,rise:.6,overhang:.05,thick:.08});
   // One tiered stand per world under its banner; trophies are separate parts.
   const I='trofeos:interior',back=b.z-b.d/2+T;
