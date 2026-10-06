@@ -1,0 +1,280 @@
+{
+ "mando": [
+  {
+   "what": "Start",
+   "paused": true,
+   "focus": "opt-volume",
+   "volume": 80,
+   "reduced": false,
+   "ui": "1",
+   "journal": false
+  },
+  {
+   "what": "cruz ▶ ×2 en el volumen",
+   "paused": true,
+   "focus": "opt-volume",
+   "volume": 90,
+   "reduced": false,
+   "ui": "1",
+   "journal": false
+  },
+  {
+   "what": "cruz ▼, A: movimiento reducido",
+   "paused": true,
+   "focus": "opt-reduced",
+   "volume": 90,
+   "reduced": true,
+   "ui": "1",
+   "journal": false
+  },
+  {
+   "what": "cruz ▼, ▶ ×2: tamaño del texto",
+   "paused": true,
+   "focus": "opt-text",
+   "volume": 90,
+   "reduced": true,
+   "ui": "1.5",
+   "journal": false
+  },
+  {
+   "what": "Select (no debe abrir la Bitácora)",
+   "paused": true,
+   "focus": "opt-text",
+   "volume": 90,
+   "reduced": true,
+   "ui": "1.5",
+   "journal": false
+  },
+  {
+   "what": "B: cierra",
+   "paused": false,
+   "focus": "BODY",
+   "volume": 90,
+   "reduced": true,
+   "ui": "1.5",
+   "journal": false
+  }
+ ],
+ "tactil 390×844": {
+  "vw": 390,
+  "allButtonsInside": true,
+  "buttons": [
+   {
+    "label": "Izquierda",
+    "box": [
+     16,
+     758,
+     64,
+     806
+    ]
+   },
+   {
+    "label": "Arriba",
+    "box": [
+     70,
+     736,
+     112,
+     778
+    ]
+   },
+   {
+    "label": "Abajo",
+    "box": [
+     70,
+     786,
+     112,
+     828
+    ]
+   },
+   {
+    "label": "Derecha",
+    "box": [
+     118,
+     758,
+     166,
+     806
+    ]
+   },
+   {
+    "label": "Bitácora",
+    "box": [
+     206,
+     758,
+     254,
+     806
+    ]
+   },
+   {
+    "label": "Reiniciar",
+    "box": [
+     260,
+     758,
+     308,
+     806
+    ]
+   },
+   {
+    "label": "Usar",
+    "box": [
+     314,
+     752,
+     374,
+     812
+    ]
+   },
+   {
+    "label": "Pausa y opciones",
+    "box": [
+     330,
+     12,
+     378,
+     60
+    ]
+   }
+  ],
+  "promptInside": true,
+  "promptBox": [
+   8,
+   317,
+   218,
+   362
+  ],
+  "hintBox": [
+   12,
+   622,
+   378,
+   720
+  ],
+  "titleBox": [
+   28,
+   24,
+   390,
+   117
+  ],
+  "hintOverTitle": false
+ },
+ "tactil 430×932": {
+  "vw": 430,
+  "allButtonsInside": true,
+  "buttons": [
+   {
+    "label": "Izquierda",
+    "box": [
+     16,
+     839,
+     70,
+     893
+    ]
+   },
+   {
+    "label": "Arriba",
+    "box": [
+     78,
+     816,
+     124,
+     862
+    ]
+   },
+   {
+    "label": "Abajo",
+    "box": [
+     78,
+     870,
+     124,
+     916
+    ]
+   },
+   {
+    "label": "Derecha",
+    "box": [
+     132,
+     839,
+     186,
+     893
+    ]
+   },
+   {
+    "label": "Bitácora",
+    "box": [
+     224,
+     839,
+     278,
+     893
+    ]
+   },
+   {
+    "label": "Reiniciar",
+    "box": [
+     286,
+     839,
+     340,
+     893
+    ]
+   },
+   {
+    "label": "Usar",
+    "box": [
+     348,
+     833,
+     414,
+     899
+    ]
+   },
+   {
+    "label": "Pausa y opciones",
+    "box": [
+     370,
+     12,
+     418,
+     60
+    ]
+   }
+  ],
+  "promptInside": true,
+  "promptBox": [
+   8,
+   355,
+   218,
+   400
+  ],
+  "hintBox": [
+   12,
+   710,
+   418,
+   808
+  ],
+  "titleBox": [
+   28,
+   24,
+   399,
+   80
+  ],
+  "hintOverTitle": false
+ },
+ "intro sin ?reduced (guardado: no)": {
+  "reduced": false,
+  "frames": 393,
+  "travellingFrames": 168,
+  "cuts": 1,
+  "maxStep": 24.47
+ },
+ "intro con ?reduced (guardado: no)": {
+  "reduced": true,
+  "frames": 394,
+  "travellingFrames": 0,
+  "cuts": 3,
+  "maxStep": 24.47
+ },
+ "Bitácora detrás del panel": {
+  "focusAlwaysInPanel": true,
+  "journalStillOpen": true,
+  "journalInert": true
+ },
+ "mando: desplazamiento con Controles abierto": {
+  "opened": "1.5",
+  "reachedSeguir": true,
+  "allFocusedVisible": true,
+  "maxScroll": 292,
+  "steps": 4
+ }
+}

@@ -4,6 +4,7 @@
 // The mix has not been listened to by its author: it is UNVERIFIED until a person hears it.
 export class Sound {
   constructor() { this.ctx = null; this.enabled = true; this.volume = 0.8; }
+  setVolume(v) { this.volume = v; if (this.master) this.master.gain.setTargetAtTime(v, this.ctx.currentTime, 0.05); }
 
   start() {
     if (this.ctx) { this.ctx.resume?.(); return; }

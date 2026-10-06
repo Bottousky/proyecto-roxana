@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 11 (diagnóstico del tirón A25; ver `evidence/iter-11`).
+**Actualizado:** 2026-10-06 · iteración 12 (opciones de accesibilidad; ver `evidence/iter-12`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,15 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 10):** suelo pintado y musgo en flecos (D16).
+**Último cambio aceptado (iteración 12):** opciones de accesibilidad (A16, D17).
+- **El panel:** la pausa es un panel modal con volumen, movimiento reducido y tamaño del texto.
+- **Manejo:** teclado, mando y táctil; los ajustes se guardan.
+- **Movimiento reducido:** corta en cada cambio de plano.
+- **Paquete de evaluación humana del Hito A:** `EVALUACION-HITO-A.md`.
+
+**Iteración 11:** el tirón de ~300 ms por minuto es del entorno (Chrome headless y Metal), con una página de control. La telemetría registra ahora el intervalo real.
+
+**Iteración 10:** suelo pintado y musgo en flecos (D16).
 - **Suelo:** los altos tienen una textura pintada repetible, en lugar de manchas de ruido.
 - **Musgo:** matas entintadas con puntas ocres, despejadas de anclajes y reglas; sigue el campo (dos pruebas nuevas).
 - **Prueba de resistencia nueva:** halló un tirón de 250 ms por minuto, anterior a esta iteración (A25).
@@ -144,16 +152,26 @@
 
 ## Próximo resultado
 
-**Cerrar el Hito A como candidata para evaluación humana, o lo que la impida.**
-- **Lo que hay:** el recorrido de la escena insignia está completo y probado con teclado, y el acabado visible pasó por revisiones de arte en cada pieza.
-- **Antes de pasar al Hito B:**
-  1. ~~Identificar el tirón de 250 ms por minuto (A25)~~. Hecho en la iteración 11: es del entorno (Chrome headless, Metal), con una página de control que tiene la misma pausa. Ver `evidence/iter-11`.
-  2. Escribir el paquete de evaluación humana del Hito A (apartado 11 del contrato): recorrido, controles, fallas conocidas y preguntas concretas sobre claridad y diversión.
-  3. Revisar si queda algún impedimento de juego en el Hito A antes de abrir el Hito B (entrada desde el Instituto).
+**Hito A: candidata para evaluación humana, con el paquete escrito (`EVALUACION-HITO-A.md`).** Lo que queda del Hito A necesita personas o dispositivos:
+- sonido (A13);
+- dispositivos reales (A14, A15);
+- claridad y diversión.
+
+El loop no se detiene: según el contrato, al cerrar un hito se sigue con el próximo, y esas validaciones quedan pedidas.
+
+**Próximo resultado: Hito B, B2 — prueba mínima de la transición 2.5D → 3D.**
+- **Qué es:** el arco tapiado de la pared del fondo de la Terraza se vuelve transitable y revela un barrio de la metrópolis.
+- **Por qué primero:** es el mayor riesgo técnico y de diseño del Hito B (cámara, controles y física con una dimensión más), y B1 (la entrada desde el Instituto) depende de decisiones de otra rama.
 - **Criterio:**
-  - el tirón identificado y corregido o explicado con datos;
-  - el paquete de evaluación escrito en `docs/20-worlds/physica/production/`;
-  - el recorrido sin regresiones.
+  - con teclado, el explorador cruza el arco y vuelve sin perder controles ni cámara;
+  - el campo y la física siguen siendo deterministas (pruebas);
+  - el recorrido del Hito A sin regresiones;
+  - revisión independiente.
+
+*Plan cumplido en las iteraciones 11 y 12:*
+- el tirón A25, diagnosticado como del entorno;
+- el paquete de evaluación humana del Hito A;
+- las opciones de accesibilidad (A16).
 
 *Plan cumplido en la iteración 10:* suelo pintado y musgo coherente con las plantas, sin tapar instrumentos y siguiendo el campo.
 

@@ -17,7 +17,12 @@ import { Journal } from './journal.js';
 
 const params = new URLSearchParams(location.search);
 const quality = params.get('quality') || (matchMedia('(pointer: coarse)').matches ? 'low' : 'high');
-const reduced = params.has('reduced') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+import { load as loadSettings, save as saveSettings, effectiveReduced, TEXT_SIZES } from './settings.js';
+const storage = (() => { try { return window.localStorage; } catch { return null; } })();
+const settings = loadSettings(storage);
+const motionPref = matchMedia('(prefers-reduced-motion: reduce)');
+const reducedNow = () => effectiveReduced(settings, { forced: params.has('reduced'), system: motionPref.matches });
+let reduced = reducedNow();
 const debug = params.has('debug');
 
 const app = document.getElementById('app');
@@ -65,7 +70,7 @@ const cam = params.has('nointro') ? { x: world.avatar.x, y: 1.2, dist: 11.5, ele
 const input = new Input(app);
 const sound = new Sound();
 const journal = new Journal(app, world);
-let vista = 0, vistaAge = 0, vistaHeld = false, vistaWas = false;
+let vista = 0, vistaAge = 0, vistaHeld = false, vistaWas = false, introShotWas = -1;
 // Establishing shot: the whole diorama — familiar fall, the cascade, the Pozo — then the explorer.
 let intro = params.has('nointro') ? 0 : 4.6;
 // The city, once discovered from the Mirador, stays part of the world.
@@ -84,13 +89,75 @@ const hud = document.createElement('div'); hud.className = 'hud';
 hud.innerHTML = `
   <div class="title" id="title"><span class="eyebrow">Physica</span><b>La cascada ascendente</b></div>
   <div class="prompt" id="prompt" hidden><kbd id="prompt-key">E</kbd><span><span id="prompt-verb"></span><small id="prompt-hint"></small><small id="prompt-reason" class="reason"></small></span></div>
-  <div class="hint" id="hint"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>▲</kbd><kbd>▼</kbd> ajustar, trepar · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar (en el aire: volver a pisar firme) · <kbd>J</kbd> Bitácora</div>
+  <div class="hint" id="hint"><span class="kbd-only"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>▲</kbd><kbd>▼</kbd> ajustar, trepar · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar (en el aire: volver a pisar firme) · <kbd>J</kbd> Bitácora · <kbd>Esc</kbd> opciones</span><span class="touch-only">◀ ▶ caminar · ▲ ▼ ajustar, trepar · botón grande: usar · ↺ volver a pisar firme · ✎ Bitácora · ⏸ opciones</span><span class="pad-only">palanca: caminar · ▲ ▼ ajustar, trepar · A usar · Y volver a pisar firme · Select Bitácora · Start opciones</span></div>
   <div class="legend" id="legend" hidden><i></i> una marca cada 0,1 s · anillo cada 0,5 s</div>
-  <div class="pause" id="pause" hidden><div><b>En pausa</b><p>El experimento quedó detenido donde estaba.</p><button id="resume">Seguir</button></div></div>
+  <div class="pause" id="pause" hidden><div role="dialog" aria-modal="true" aria-labelledby="pause-title">
+    <h2 id="pause-title">En pausa</h2>
+    <p>El experimento quedó detenido donde estaba.</p>
+    <label class="row"><span>Volumen</span><input type="range" id="opt-volume" min="0" max="100" step="5"><output id="opt-volume-out" aria-hidden="true"></output></label>
+    <label class="check"><input type="checkbox" id="opt-reduced" aria-describedby="opt-reduced-desc"><span>Movimiento reducido<small id="opt-reduced-desc">La cámara corta en vez de viajar y no se adelanta al caminar.${params.has('reduced') ? ' Activado por la dirección (?reduced).' : ''}</small></span></label>
+    <fieldset style="margin-top:14px"><legend>Tamaño del texto</legend><div class="sizes" id="opt-text">${TEXT_SIZES.map(t => `<label><input type="radio" name="opt-text" value="${t.value}"><span>${t.label}</span></label>`).join('')}</div></fieldset>
+    <details><summary>Controles</summary><table><thead><tr><th></th><th>Teclado</th><th>Mando</th><th>Táctil</th></tr></thead><tbody>
+      <tr><th>Caminar</th><td>◀ ▶ · A D</td><td>palanca izquierda · cruz ◀ ▶</td><td>◀ ▶</td></tr>
+      <tr><th>Ajustar, trepar</th><td>▲ ▼ · W S</td><td>palanca · cruz ▲ ▼</td><td>▲ ▼</td></tr>
+      <tr><th>Usar</th><td>E · espacio · Enter</td><td>A</td><td>botón grande</td></tr>
+      <tr><th>Reiniciar / volver a pisar firme</th><td>R</td><td>Y</td><td>↺</td></tr>
+      <tr><th>Bitácora</th><td>J · Tab</td><td>Select</td><td>✎</td></tr>
+      <tr><th>Pausa y opciones</th><td>Esc · P</td><td>Start</td><td>⏸</td></tr>
+    </tbody></table></details>
+    <div class="actions"><button id="resume">Seguir</button></div>
+  </div></div>
   ${debug ? '<pre class="debug" id="debug"></pre>' : ''}`;
 app.appendChild(hud);
 const $ = id => document.getElementById(id);
 const promptEl = $('prompt');
+// ---------- options ----------
+function applySettings() {
+  document.documentElement.style.setProperty('--ui', settings.text);
+  sound.setVolume(settings.volume);
+  reduced = reducedNow(); if (window.__physica) window.__physica.reduced = reduced;
+  const vol = $('opt-volume'), pct = Math.round(settings.volume * 100), said = settings.volume === 0 ? 'sin sonido' : `${pct} %`;
+  vol.value = pct; vol.setAttribute('aria-valuetext', said); $('opt-volume-out').textContent = said;
+  $('opt-reduced').checked = reduced; $('opt-reduced').disabled = params.has('reduced'); // ?reduced always wins
+  for (const r of $('opt-text').querySelectorAll('input')) r.checked = +r.value === settings.text;
+}
+const changeSetting = (k, v) => { settings[k] = v; saveSettings(storage, settings); applySettings(); };
+$('opt-volume').addEventListener('input', e => changeSetting('volume', e.target.value / 100));
+$('opt-reduced').addEventListener('change', e => changeSetting('reduced', e.target.checked));
+$('opt-text').addEventListener('change', e => changeSetting('text', +e.target.value));
+motionPref.addEventListener?.('change', applySettings);
+applySettings();
+// The panel is modal: focus stays in it (Tab wraps), a click on the backdrop does not take focus away.
+const pausePanel = $('pause');
+// One stop per control: the text size group counts once (its checked radio), as with Tab.
+const focusables = () => [...pausePanel.querySelectorAll('input:not([disabled]), button, summary')]
+  .filter(el => el.offsetParent !== null && (el.type !== 'radio' || el.checked));
+// Listened on the document: focus may have dropped to the page (a click on the panel's text).
+document.addEventListener('keydown', e => {
+  if (!paused || e.key !== 'Tab') return;
+  const f = focusables(), i = f.indexOf(document.activeElement);
+  e.preventDefault();
+  (i < 0 ? (e.shiftKey ? f[f.length - 1] : f[0]) : f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length]).focus();
+}, true);
+pausePanel.addEventListener('mousedown', e => { if (e.target === pausePanel) e.preventDefault(); });
+// Gamepad in the panel: ▲▼ move between controls, ◀▶ change the value, A activates, B or Start closes.
+function padInPanel(inp) {
+  const f = focusables(); let el = document.activeElement;
+  if (!f.includes(el)) { f[0]?.focus(); el = f[0]; }
+  if (inp.adjust) {
+    // On «Controles», open, ▼ scrolls through the table before moving on.
+    const box = pausePanel.firstElementChild, details = pausePanel.querySelector('details');
+    if (el?.tagName === 'SUMMARY' && details.open && inp.adjust < 0 && box.scrollTop + box.clientHeight < box.scrollHeight - 2) { box.scrollBy(0, 140); return; }
+    const next = f[(f.indexOf(el) - inp.adjust + f.length) % f.length]; next.focus(); next.scrollIntoView({ block: 'nearest' }); return;
+  }
+  if (inp.step && el?.id === 'opt-volume') { el.value = +el.value + inp.step * 5; el.dispatchEvent(new Event('input', { bubbles: true })); return; }
+  if (inp.step && el?.name === 'opt-text') {
+    const rs = [...$('opt-text').querySelectorAll('input')], j = Math.max(0, Math.min(rs.length - 1, rs.indexOf(el) + inp.step));
+    rs[j].focus(); rs[j].checked = true; rs[j].dispatchEvent(new Event('change', { bubbles: true })); return;
+  }
+  if (inp.act && el) el.click();
+  if (inp.back) setPaused(false);
+}
 let hintTimer = 0, moved = false;
 
 function resize() {
@@ -106,6 +173,9 @@ addEventListener('resize', resize); resize();
 let paused = false;
 function setPaused(p) {
   paused = p; $('pause').hidden = !p;
+  // Modal: everything outside the panel is inert while it is open (no focus, no clicks).
+  for (const el of [...app.children, ...hud.children]) if (el !== hud && el !== $('pause')) el.inert = p;
+  if (p) $('opt-volume').focus({ preventScroll: true }); else document.activeElement?.blur?.();
   if (p) stepper.pause(); else { stepper.resume(); last = performance.now(); }
 }
 addEventListener('blur', () => { if (!params.has('nopause')) setPaused(true); });
@@ -164,8 +234,9 @@ function frame(now) {
   if (interval > 100 && longFrames.length < 50) longFrames.push({ at: +(now / 1000).toFixed(2), interval: +interval.toFixed(1), prevWork: +lastWork.toFixed(1) });
   const inp = input.poll();
   if (inp.pause) setPaused(!paused);
+  document.body.classList.toggle('has-pad', input.lastDevice === 'gamepad');
+  if (paused) { if (input.lastDevice === 'gamepad') padInPanel(inp); renderer.render(scene, camera); return; }
   if (inp.journal) journal.toggle();
-  if (paused) { renderer.render(scene, camera); return; }
   if (journal.open) { inp.axis = 0; inp.act = false; }
   if (inp.act) pending.act = true;
   if (inp.adjust) pending.adjust = inp.adjust;
@@ -232,13 +303,19 @@ function frame(now) {
   if (!reduced) { td += 0.9 * camFloat; ty += 0.3 * camFloat; }
   if (inspectCam) { tx = inspectCam.x; ty = inspectCam.y; td = inspectCam.dist; }
   // With reduced motion the vista starts and ends as a cut, not a camera move.
-  const vistaNow = vista > 0, cut = reduced && vistaNow !== vistaWas; vistaWas = vistaNow;
+  // With reduced motion every change of shot is a cut: the vista, the intro's two shots, and any
+  // jump of the target (R back to firm footing, a reset), not only travelling.
+  const vistaNow = vista > 0, introShot = intro > 2.2 ? 1 : intro > 0 ? 2 : 0;
+  const cut = reduced && (vistaNow !== vistaWas || introShot !== introShotWas || Math.hypot(tx - cam.x, ty - cam.y) > 3);
+  vistaWas = vistaNow; introShotWas = introShot;
   const k = cut ? 1 : Math.min(1, dt * (reduced ? 6 : 2.6));
   cam.x += (tx - cam.x) * k; cam.y += (ty - cam.y) * k; cam.dist += (td - cam.dist) * k;
   // Slightly above the play plane, like looking into a diorama: tops and the arch's width read.
   // In the Pozo the camera looks nearly level: things at different depths keep their apparent
   // heights (parallax would put the region's floor marks at the wrong numbers).
-  cam.elev += ((inWell > 0.5 && vista <= 0 ? 0.05 : 0.2) - cam.elev) * Math.min(1, dt * 3);
+  // Continuous in the explorer's position (applied at once with reduced motion, so it must not jump).
+  const elevT = vista > 0 ? 0.2 : THREE.MathUtils.lerp(0.2, 0.05, THREE.MathUtils.smoothstep(inWell, 0.3, 0.7));
+  cam.elev += (elevT - cam.elev) * (reduced ? 1 : Math.min(1, dt * 3));
   camera.position.set(cam.x, cam.y + cam.dist * cam.elev, cam.dist);
   camera.lookAt(cam.x, cam.y, 0);
   sun.position.set(cam.x - 9, 16, 12); sun.target.position.set(cam.x, 0, 0);
@@ -249,7 +326,10 @@ function frame(now) {
   if (it && !journal.open) {
     const v = new THREE.Vector3(it.x, it.y + 0.4, 0).project(camera);
     promptEl.hidden = false;
-    promptEl.style.transform = `translate(${(v.x * 0.5 + 0.5) * app.clientWidth}px, ${(-v.y * 0.5 + 0.5) * app.clientHeight}px) translate(-50%, -100%)`;
+    // Kept inside the screen (with large text a prompt near an edge used to start off it).
+    const W = app.clientWidth, H = app.clientHeight, pw = promptEl.offsetWidth, ph = promptEl.offsetHeight;
+    const px = THREE.MathUtils.clamp((v.x * 0.5 + 0.5) * W, pw / 2 + 8, W - pw / 2 - 8), py = THREE.MathUtils.clamp((-v.y * 0.5 + 0.5) * H, ph + 8, H - 8);
+    promptEl.style.transform = `translate(${px}px, ${py}px) translate(-50%, -100%)`;
     $('prompt-key').textContent = input.lastDevice === 'gamepad' ? 'A' : input.lastDevice === 'touch' ? 'E' : 'E';
     $('prompt-verb').textContent = it.verb;
     $('prompt-hint').textContent = it.hint || '';

@@ -1,0 +1,289 @@
+{
+  "url": "http://127.0.0.1:4210/",
+  "started": "2026-10-06T22:35:05.665Z",
+  "steps": [
+    {
+      "name": "inicio",
+      "state": {
+        "t": 5.166666666666667,
+        "step": 620,
+        "avatar": {
+          "x": -16,
+          "y": 0.55,
+          "vx": 0,
+          "vy": 0,
+          "grounded": true,
+          "gy": -9.8
+        },
+        "stands": [
+          {
+            "id": "A",
+            "state": "armed",
+            "x": -1.85,
+            "y": 2,
+            "vy": 0
+          },
+          {
+            "id": "B",
+            "state": "armed",
+            "x": 1.1,
+            "y": 2,
+            "vy": 0
+          },
+          {
+            "id": "P",
+            "state": "armed",
+            "x": 12.299999999999999,
+            "y": 3,
+            "vy": 0
+          }
+        ],
+        "traces": [],
+        "journal": [],
+        "paused": false,
+        "camera": {
+          "x": -11.523412666032558,
+          "y": 3.6630863929132613,
+          "z": 12.615087770313194
+        }
+      }
+    },
+    {
+      "name": "en soporte A",
+      "x": -2.8499999999998358
+    },
+    {
+      "name": "traza A",
+      "marks": 8,
+      "end": "vuelta",
+      "y": [
+        2,
+        1.951,
+        1.804,
+        1.559,
+        1.216,
+        0.775,
+        0.236,
+        0.312
+      ]
+    },
+    {
+      "name": "en soporte B",
+      "x": -0.8499999999998414
+    },
+    {
+      "name": "traza B desde 2 m",
+      "peak": 3.4080826349753184,
+      "bells": 0
+    },
+    {
+      "name": "pinza B bajada",
+      "clampY": -1,
+      "state": "armed"
+    },
+    {
+      "name": "traza B desde −1 m",
+      "from": -1,
+      "peak": 4.632386423210553,
+      "bells": 1
+    },
+    {
+      "name": "repetición B",
+      "identicalFirst8": true
+    },
+    {
+      "name": "desde el borde",
+      "apexFeet": [
+        {
+          "feet": 3.45,
+          "centre": 4,
+          "from": null
+        }
+      ],
+      "footingAfterR": {
+        "x": -0.37972222222206387,
+        "y": 0.55,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "gy": -9.69021463586848
+      }
+    },
+    {
+      "name": "cruce por la cadena",
+      "offeredAtLip": [
+        "chain",
+        "stand"
+      ],
+      "onChain": "chain",
+      "letGoCentreY": -1.533333333333331,
+      "final": {
+        "x": 6.281076388888904,
+        "y": 4.95,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "gy": -9.8
+      },
+      "landedOnTerrace": true,
+      "mantles": 1
+    },
+    {
+      "name": "pozo: soporte P",
+      "bellFrom2": 1,
+      "endFrom1": -0.83,
+      "fellIntoWater": true
+    },
+    {
+      "name": "pozo: demasiado abajo",
+      "held": "pozo",
+      "letGoCentre": 0.8999999999999644,
+      "outcome": "pozo-fondo"
+    },
+    {
+      "name": "pozo: subir desde el agua",
+      "on": "terraza",
+      "avatar": {
+        "x": 10.64,
+        "y": 4.95,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "gy": -9.771295868768712
+      }
+    },
+    {
+      "name": "pozo: demasiado arriba",
+      "held": "pozo",
+      "letGoCentre": 2.483333333333292,
+      "outcome": "corto"
+    },
+    {
+      "name": "pozo: en la ventana",
+      "held": "pozo",
+      "letGoCentre": 1.4999999999999623,
+      "outcome": "mirador"
+    },
+    {
+      "name": "mirador: escalones",
+      "down": true,
+      "up": true,
+      "avatar": {
+        "x": 14.948645833333316,
+        "y": 5.7,
+        "vx": -3,
+        "vy": 0,
+        "grounded": true,
+        "gy": -9.8
+      },
+      "events": 3
+    },
+    {
+      "name": "volver a la Terraza",
+      "samples": 126,
+      "final": {
+        "x": 4.824305555555556,
+        "y": 4.95,
+        "vx": 0.24166666666666667,
+        "vy": 0,
+        "grounded": true,
+        "gy": -9.8
+      },
+      "onTerrace": true
+    },
+    {
+      "name": "guardado",
+      "before": [
+        "caida",
+        "subida",
+        "medida",
+        "campana",
+        "profundidad",
+        "corto",
+        "cruce",
+        "pozo-cae",
+        "pozo-corto",
+        "mirador"
+      ],
+      "after": [
+        "caida",
+        "subida",
+        "medida",
+        "campana",
+        "profundidad",
+        "corto",
+        "cruce",
+        "pozo-cae",
+        "pozo-corto",
+        "mirador"
+      ],
+      "persisted": true,
+      "explorerAfterReload": {
+        "x": 4.873645833333179,
+        "y": 4.95,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "gy": -9.8
+      },
+      "resumedOnTerrace": true
+    },
+    {
+      "name": "pausa",
+      "stepsWhilePaused": 0,
+      "stepsAfterResume300ms": 34
+    },
+    {
+      "name": "rendimiento",
+      "stats": {
+        "n": 360,
+        "p50": 16.700000762939453,
+        "p95": 16.799999237060547,
+        "p99": 16.799999237060547,
+        "max": 16.799999237060547,
+        "dropped": 0
+      },
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+      "viewport": "1280x720",
+      "note": "headless Chrome; frame interval includes vsync wait"
+    },
+    {
+      "name": "rendimiento-cruce",
+      "stats": {
+        "n": 270,
+        "p50": 16.700000762939453,
+        "p95": 16.700000762939453,
+        "p99": 16.799999237060547,
+        "max": 16.799999237060547,
+        "dropped": 0
+      },
+      "traces": 0,
+      "final": {
+        "x": 4.24,
+        "y": 0.655475125584357,
+        "vx": 0,
+        "vy": 0.9127774783748829,
+        "grounded": false,
+        "gy": 4
+      },
+      "note": "walk off the lip with no screenshots (the failing branch; the camera follows the full rise)"
+    }
+  ],
+  "machine": {
+    "cores": 8,
+    "loadavgAtStart": [
+      5.736328125,
+      5.64794921875,
+      4.2978515625
+    ],
+    "loadavgAtEnd": [
+      3.71533203125,
+      4.82177734375,
+      4.1572265625
+    ]
+  },
+  "captureTimeouts": [],
+  "errors": [],
+  "consoleWarnings": [],
+  "finished": "2026-10-06T22:37:21.080Z"
+}

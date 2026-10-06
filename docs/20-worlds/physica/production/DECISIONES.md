@@ -243,3 +243,25 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
   - **Textura:** hebras finas que se deshilachan, con prueba alfa. La silueta la da la textura, no la tira.
   - **En cada labio:** un fleco continuo de piezas superpuestas, de largo desigual y con algunos huecos.
   - **En las paredes de la sima:** dos capas atrás y una detrás del plano de medición. En la primera versión, una capa delante tapaba la regla, como ya lo hacía el musgo anterior.
+
+## D17 · Opciones de accesibilidad en la pausa (iteración 12)
+
+**El problema (A16):**
+- **Pausa:** sólo tenía «Seguir».
+- **Movimiento reducido:** existía sólo como parámetro de la URL o como preferencia del sistema.
+- **Volumen y texto:** no había control de volumen ni de tamaño de texto.
+
+El contrato (§7) pide movimiento reducido, texto legible y controles enseñados para teclado, mando y táctil.
+
+**Elegido:**
+- **El panel:** Esc o P (Start en el mando, ⏸ en una esquina en táctil) pausan y abren las opciones:
+  - volumen;
+  - movimiento reducido;
+  - tamaño del texto (1, 1,25, 1,5);
+  - una tabla de controles desplegable.
+- **Modal de verdad:** el foco queda adentro y el juego no recibe teclas mientras está abierto.
+- **Mando:** ▲▼ mueven el foco, ◀▶ cambian el valor, A activa y B cierra.
+- **Movimiento reducido** es un corte en cada cambio de plano: la vista, los dos planos del inicio, R y los reinicios, y la inclinación del Pozo. Cuando está activo, la cámara no se adelanta al caminar ni se abre al flotar.
+- **Guardado:** en `localStorage` con try/catch. El movimiento reducido sólo se guarda si el jugador lo elige; hasta entonces manda el sistema, y `?reduced` siempre gana.
+- **Tamaño del texto:** escala todas las fuentes de la interfaz y de la Bitácora con una variable CSS. Los avisos quedan dentro de la pantalla.
+- **Táctil:** tiene su propia ayuda, encima de la barra, y botones más chicos en pantallas angostas.

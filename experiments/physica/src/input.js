@@ -6,6 +6,9 @@ export class Input {
     addEventListener('keydown', e => {
       if (e.repeat) return;
       const k = e.key.toLowerCase();
+      // While the options panel is open, keys belong to it (its controls and its focus trap),
+      // except Escape / P, which close it: nothing reaches the game behind it.
+      if (document.getElementById('pause')?.hidden === false && k !== 'escape' && k !== 'p') return;
       this.keys.add(k); this.lastDevice = 'keyboard';
       if (k === 'e' || k === ' ' || k === 'enter') this.pressed.add('act');
       if (k === 'r') this.pressed.add('reset');
@@ -26,6 +29,10 @@ export class Input {
     pad.innerHTML = `<div class="touch-move"><button data-axis="-1" aria-label="Izquierda">◀</button><div class="touch-vert"><button data-vaxis="1" aria-label="Arriba">▲</button><button data-vaxis="-1" aria-label="Abajo">▼</button></div><button data-axis="1" aria-label="Derecha">▶</button></div>
       <div class="touch-act"><button data-act="journal" aria-label="Bitácora">✎</button><button data-act="reset" aria-label="Reiniciar">↺</button><button data-act="act" class="big" aria-label="Usar">E</button></div>`;
     root.appendChild(pad);
+    // Pause and options: its own corner, so the action buttons keep the bottom bar's width.
+    const pauseBtn = document.createElement('button'); pauseBtn.className = 'touch-pause'; pauseBtn.dataset.act = 'pause';
+    pauseBtn.setAttribute('aria-label', 'Pausa y opciones'); pauseBtn.textContent = '⏸'; root.appendChild(pauseBtn);
+    pauseBtn.addEventListener('pointerdown', e => { e.preventDefault(); this.pressed.add('pause'); this.lastDevice = 'touch'; });
     const held = new Map();
     const upd = () => { let a = 0; for (const v of held.values()) a += v; this.touchAxis = Math.max(-1, Math.min(1, a)); };
     pad.querySelectorAll('[data-axis]').forEach(b => {
@@ -72,10 +79,16 @@ export class Input {
       if (gp.buttons[13]?.pressed) ay -= 1;
       const edge = (i, name) => { const p = !!gp.buttons[i]?.pressed; if (p && !this.padPrev[i]) { this.pressed.add(name); this.lastDevice = 'gamepad'; } this.padPrev[i] = p; };
       edge(0, 'act'); edge(2, 'act'); edge(3, 'reset'); edge(8, 'journal'); edge(9, 'pause'); edge(12, 'up'); edge(13, 'down');
+      // For menus: B backs out; the d-pad and the stick step left and right.
+      edge(1, 'back'); edge(14, 'left'); edge(15, 'right');
+      const sx = x > 0.5 ? 1 : x < -0.5 ? -1 : 0;
+      if (sx && sx !== this.stickPrevX) this.pressed.add(sx > 0 ? 'right' : 'left');
+      this.stickPrevX = sx;
     }
     this.axis = Math.max(-1, Math.min(1, a)); this.axisY = Math.max(-1, Math.min(1, ay));
     const out = { axis: this.axis, axisY: this.axisY, act: this.pressed.has('act'), reset: this.pressed.has('reset'), journal: this.pressed.has('journal'), pause: this.pressed.has('pause'),
-      adjust: this.pressed.has('up') ? 1 : this.pressed.has('down') ? -1 : 0 };
+      adjust: this.pressed.has('up') ? 1 : this.pressed.has('down') ? -1 : 0,
+      back: this.pressed.has('back'), step: this.pressed.has('right') ? 1 : this.pressed.has('left') ? -1 : 0 };
     this.pressed.clear();
     return out;
   }

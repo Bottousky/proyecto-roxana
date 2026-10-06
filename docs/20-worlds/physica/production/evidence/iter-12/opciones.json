@@ -1,0 +1,112 @@
+{
+ "log": [
+  {
+   "what": "inicio",
+   "paused": false,
+   "focus": "BODY",
+   "volume": 80,
+   "focusName": "",
+   "reduced": false,
+   "ui": "1",
+   "stored": null,
+   "step": 158,
+   "hintFont": "13px"
+  },
+  {
+   "what": "Esc: pausa abierta",
+   "paused": true,
+   "focus": "opt-volume",
+   "volume": 80,
+   "focusName": "",
+   "reduced": false,
+   "ui": "1",
+   "stored": null,
+   "step": 158,
+   "hintFont": "13px"
+  },
+  {
+   "what": "◀ ×6 en el volumen",
+   "paused": true,
+   "focus": "opt-volume",
+   "volume": 50,
+   "focusName": "",
+   "reduced": false,
+   "ui": "1",
+   "stored": "{\"volume\":0.5,\"reduced\":null,\"text\":1}",
+   "step": 158,
+   "hintFont": "13px"
+  },
+  {
+   "what": "Tab, espacio: movimiento reducido",
+   "paused": true,
+   "focus": "opt-reduced",
+   "volume": 50,
+   "focusName": "",
+   "reduced": true,
+   "ui": "1",
+   "stored": "{\"volume\":0.5,\"reduced\":true,\"text\":1}",
+   "step": 158,
+   "hintFont": "13px"
+  },
+  {
+   "what": "Tab, ▶ ×2: «Muy grande»",
+   "paused": true,
+   "focus": "INPUT",
+   "volume": 50,
+   "focusName": "opt-text",
+   "reduced": true,
+   "ui": "1.5",
+   "stored": "{\"volume\":0.5,\"reduced\":true,\"text\":1.5}",
+   "step": 158,
+   "hintFont": "19.5px"
+  },
+  {
+   "what": "Tab ×10 (trampa de foco)",
+   "allInPanel": true,
+   "journalOpened": false
+  },
+  {
+   "what": "Esc: vuelve al juego",
+   "paused": false,
+   "focus": "BODY",
+   "volume": 50,
+   "focusName": "",
+   "reduced": true,
+   "ui": "1.5",
+   "stored": "{\"volume\":0.5,\"reduced\":true,\"text\":1.5}",
+   "step": 241,
+   "hintFont": "19.5px"
+  },
+  {
+   "what": "recarga: los ajustes persisten",
+   "paused": false,
+   "focus": "BODY",
+   "volume": 50,
+   "focusName": "",
+   "reduced": true,
+   "ui": "1.5",
+   "stored": "{\"volume\":0.5,\"reduced\":true,\"text\":1.5}",
+   "step": 157,
+   "hintFont": "19.5px"
+  },
+  {
+   "what": "900×600, texto muy grande",
+   "hintLeft": 12,
+   "hintRight": 888,
+   "vw": 900,
+   "scrolls": false,
+   "resumeVisible": true
+  },
+  {
+   "what": "390×844, texto muy grande",
+   "hintLeft": 12,
+   "hintRight": 378,
+   "vw": 390,
+   "scrolls": false,
+   "resumeVisible": true
+  }
+ ],
+ "stepFrozenWhilePaused": true,
+ "explorerXAfterWalking": -14.199999999999982,
+ "errors": []
+}
