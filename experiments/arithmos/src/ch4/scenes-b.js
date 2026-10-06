@@ -11,7 +11,7 @@ import {boardNotes} from './scenes-a.js';
 const WORDS = ['uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce'];
 
 /** Dónde se para cada familia para recibir su parte. */
-const FX = k => 14000 + k * 160;
+const FX = k => 13200 + k * 160;
 /** El k-ésimo atado que recibe una familia. */
 const placeOf = (k, i) => [FX(k) - 62 + (i % 2) * 44, GROUND - 26 - Math.floor(i / 2) * 50];
 /** El montón, delante de la pizarra. */
@@ -81,7 +81,7 @@ export const repartir = {
       g.saveNow();
       await d.say('Mara', 'De a uno, por vueltas: nadie recibe el segundo hasta que todas tengan el primero.');
     }
-    const pile = () => w.objects.filter(o => o.id.startsWith('sh-') && !o.owner && o.y > GROUND - 120 && o.x < BOARD.x + BOARD.w / 2).sort((a, b) => b.x - a.x);
+    const pile = () => w.objects.filter(o => o.id.startsWith('sh-') && o.owner == null && o.y > GROUND - 120 && o.x < BOARD.x + BOARD.w / 2).sort((a, b) => b.x - a.x);
     const total = () => given.reduce((a, b) => a + b, 0);
     const give = async k => {
       const o = pile()[0];
@@ -161,6 +161,8 @@ export const repartir = {
     }
     g.setCinematic(true);
     const left = pile();
+    // guarda: lo que se ve tiene que coincidir con la cuenta
+    if (left.length !== r.rest) console.error(`[reparto] quedan ${left.length} atados en el montón y la cuenta dice ${r.rest}`);
     left.forEach((o, i) => { o.id.startsWith('sh-') && (o.owner = 'rest'); hop(d, o, BOARD.x + 160 + i * 46, GROUND - 26, {g, h: 40, sound: null}).catch(() => {}); });
     await d.wait(0.5);
     const rl = w.add(new Label('rest-l', 'sobran 2', BOARD.x + 140, GROUND - 70, {size: 26, z: 9, reveal: 0}));
@@ -183,7 +185,7 @@ export const repartir = {
 // 4.5 Medir
 // ——————————————————————————————————————————————
 
-const bagPos = k => [14100 + k * 120, GROUND - 40];
+const bagPos = k => [13260 + k * 120, GROUND - 40];
 
 export const medir = {
   id: 'c4.medir',
@@ -200,7 +202,7 @@ export const medir = {
     for (let i = 0; i < 12 - bags * 3; i++) item(w, 1, ...pileOf(i), `ms-${i}`).z = 15;
     for (let k = 0; k < bags; k++) bagShape(w, k, false, 3);
     familiesHome(g);
-    family(w, 0, 14600, GROUND, {facing: -0.6});
+    family(w, 0, 13780, GROUND, {facing: 0.6});
     g.camera.go(SHOTS.share);
   },
   async play(d, g) {
@@ -253,6 +255,7 @@ export const medir = {
     }));
     g.setHint(null);
     const r = measure(12, 3);
+    if (sc.bags !== r.bags || pile().length !== r.rest) console.error(`[medida] ${sc.bags} bolsas y ${pile().length} sueltos; la cuenta dice ${r.bags} y ${r.rest}`);
     await d.think(sc.guess === '4' ? 'Cuatro bolsas, como dije.' : `Cuatro bolsas, no ${{3: 'tres', 9: 'nueve', 36: 'treinta y seis'}[sc.guess]}: cada bolsa se lleva tres.`);
     await d.say('Mara', 'Ayer: doce entre cuatro familias, tres para cada una. Hoy: doce de a tres, cuatro bolsas.');
     await d.think('Dos preguntas distintas. Y las dos se contestan con la misma cuenta: 4 × 3 = 12.');
@@ -305,7 +308,7 @@ export const nadie = {
     boardNotes(g, 3);
     cast(g, {sx: BOARD.x - BOARD.w / 2 - 200, mx: BOARD.x - BOARD.w / 2 - 90});
     familiesHome(g);
-    family(w, 3, BOARD.x + BOARD.w / 2 + 80, GROUND, {facing: -0.6});
+    family(w, 3, BOARD.x - BOARD.w / 2 - 330, GROUND, {facing: 0.6});
     for (let i = 0; i < 6; i++) item(w, 1, ...pileOf(i), `nz-${i}`).z = 15;
     g.camera.go(SHOTS.share);
   },
@@ -347,7 +350,7 @@ export const nadie = {
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Tocá "llenar una bolsa de cero" y mirá el montón.']);
-      const refresh = () => g.ui.setSpots([wordSpot('nz-fill', bags ? 'llenar otra bolsa de cero' : 'llenar una bolsa de cero', 14280, GROUND - 210, () => fill())]);
+      const refresh = () => g.ui.setSpots([wordSpot('nz-fill', bags ? 'llenar otra bolsa de cero' : 'llenar una bolsa de cero', 13420, GROUND - 200, () => fill())]);
       const fill = async () => {
         if (busy || !ctl.alive()) return;
         busy = true;
@@ -429,8 +432,8 @@ export const partir = {
     boardNotes(g, 3);
     cast(g, {sx: BOARD.x - BOARD.w / 2 - 200, mx: BOARD.x - BOARD.w / 2 - 90});
     familiesHome(g);
-    family(w, 0, BOARD.x + BOARD.w / 2 + 120, GROUND, {facing: -0.6});
-    family(w, 3, BOARD.x + BOARD.w / 2 + 230, GROUND, {facing: -0.6});
+    family(w, 0, BOARD.x - BOARD.w / 2 - 330, GROUND, {facing: 0.6});
+    family(w, 3, BOARD.x - BOARD.w / 2 - 440, GROUND, {facing: 0.6});
     gardenPart(w, 'gd-all', GARDEN.f, GARDEN.c, BOARD.x - GARDEN.c * CELL / 2);
     g.camera.go(SHOTS.boardWide);
   },

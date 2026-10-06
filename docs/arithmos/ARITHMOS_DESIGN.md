@@ -184,6 +184,38 @@ reflejo explica (−1)(−1) = 1 como media vuelta, sin regla mágica; el resto 
 pregunta (atados enteros); 0 ÷ 0 tampoco tiene un resultado (en la Bitácora). Dato histórico:
 Brahmagupta (628) operó con fortunas y deudas y sostuvo 0 ÷ 0 = 0 (fuentes.md §8, certeza alta).
 
+## Capítulo 5 — Partes de algo (diseño, no implementado)
+
+Pregunta de entrada (gancho del cap. 4): sobraron 2 atados de la cosecha y son 4 familias.
+Idea central: **una fracción es una medida hecha con partes iguales de una unidad elegida; el mismo
+número tiene muchos nombres (2/4 = 1/2 = 0,5 = 50 %); entre dos números siempre hay lugar en la
+recta; y hay medidas que ninguna partición alcanza exactamente.**
+
+Representaciones: (1) el atado como **barra** (unidad) que se parte con cortes de tiza en partes
+iguales; (2) la **recta** de los caps. 3–4, ahora con el segmento de 0 a 1 subdividido; (3) el
+**depósito** del cap. 2 con un cuarto nuevo a la derecha de los sueltos: el de los décimos.
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 5.1 | Medio atado | Partes iguales de una unidad | Partir un atado en dos (el corte lo decide el jugador) | Un corte desparejo provoca protesta: "medio" exige partes iguales; 1/2 = una de dos partes iguales |
+| 5.2 | ¿Medio de qué? | La unidad importa | ¿Qué es más: medio atado o medio montón de 6 atados? | El "medio" depende de la unidad; 1/2 solo no dice cuánto |
+| 5.3 | Dos de cuatro | Equivalencia | Repartir 2 atados entre 4: partir cada uno en 2 o en 4 | Cada familia recibe 1/2 o 2/4; superpuestas, coinciden: 2/4 = 1/2 |
+| 5.4 | Entre el 0 y el 1 | Fracción como punto de la recta; densidad | Ubicar 1/2, 3/4 y 5/4 en la línea | Subdividir el segmento unidad; 5/4 cae pasando el 1; entre dos marcas siempre se puede marcar otra |
+| 5.5 | Más partes, más chicas | Comparar fracciones | Punto dice que 1/4 > 1/3 "porque 4 > 3"; comparar 2/3 y 3/4 | Las piezas puestas lado a lado contradicen a Punto; partición común (doceavos): 8/12 < 9/12 |
+| 5.6 | Sumar pedazos | Suma con partición común | Punto suma arriba y abajo: 1/2 + 1/3 = 2/5 | 2/5 es menos que 1/2 solo: absurdo visible; sextos: 3/6 + 2/6 = 5/6 |
+| 5.7 | El cuarto de los décimos | Decimales como valor posicional | Un atado partido en diez va a un cuarto nuevo, a la derecha, separado por una coma | 2,5 = 2 + 5/10 = 2 + 1/2; 2,05 frente a 2,5 (el cero vuelve a guardar un lugar) |
+| 5.8 | De cada cien | Porcentaje | ¿Qué es más: el 50 % de 80 o el 80 % de 50? | Las dos dan 40; % = "de cada cien" = centésimos |
+| 5.9 | Lo que no entra justo | Exacto vs aproximado; inconmensurables (adelanto) | Medir la diagonal de la huerta cuadrada con partes del lado | Ninguna partición probada coincide; 1,4 → 1,41 → 1,414 se acercan sin llegar; el límite se declara: la prueba de que ninguna sirve llega en el cap. 8 |
+
+Errores con consecuencia: partes desiguales llamadas "mitad"; comparar fracciones por el
+denominador solo; sumar numeradores y denominadores; leer 2,05 como 2,5; creer que un porcentaje
+"es" una cantidad sin referencia. Límites a declarar: la razón y la proporción como relación entre
+cantidades (C3) se tratan con funciones (cap. 9); los reales y su completitud, sólo como idea de
+"medidas sin partición exacta"; π no se trata acá.
+
+Historia (fuentes.md): verificar antes de usar fracciones egipcias o babilónicas; no afirmar
+orígenes únicos.
+
 ## Capítulo 6 (ecuaciones) — núcleo de "pasa sumando" (diseño conceptual, no implementado)
 
 Representación elegida (requiere el cap. 3: recta con negativos): **una ecuación son dos

@@ -15,12 +15,12 @@ export {GROUND, mara, villager, student, punto, item, signed};
 /** Escalones de las Terrazas: uno por familia, subiendo hacia la derecha. */
 export const TERR = {x0: 14700, w: 270, rise: 70, count: 4};
 /** La pizarra de Mara, al pie de la ladera. */
-export const BOARD = {x: 13600, w: 540, h: 300};
+export const BOARD = {x: 14300, w: 540, h: 300};
 export const boardTop = () => GROUND - 110 - BOARD.h;
 /** La línea de la ladera, más allá de las terrazas. */
 export const LINE = {zero: 16900, step: 80, from: -7, to: 7};
 export const lineX = n => LINE.zero + n * LINE.step;
-export const ROCK = {x: 12950};
+export const ROCK = {x: 12800};
 
 export const FAMILIES = [
   {id: 'peldano', name: 'Peldaño', head: 'square'},
@@ -30,9 +30,9 @@ export const FAMILIES = [
 ];
 
 export const SHOTS = {
-  terr: {x: 12880, y: 130, w: 3000, h: 740},
-  board: {x: 13220, y: 240, w: 780, h: 450},
-  boardWide: {x: 12980, y: 140, w: 1400, h: 620},
+  terr: {x: 13790, y: 170, w: 2110, h: 680},
+  board: {x: 13920, y: 240, w: 780, h: 450},
+  boardWide: {x: 13680, y: 140, w: 1400, h: 620},
   line: {x: 16080, y: 290, w: 1620, h: 560},
   share: {x: 12980, y: 200, w: 1800, h: 600},
 };

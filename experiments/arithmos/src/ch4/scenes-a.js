@@ -153,7 +153,7 @@ export const grupos = {
     await d.say('Mara', 'Cuatro veces tres. ¡Eso decía la piedra!');
     // la piedra se vuelve legible
     g.setCinematic(true);
-    await d.shot({x: ROCK.x - 300, y: 200, w: 1700, h: 600}, 1);
+    await d.shot({x: ROCK.x - 300, y: 200, w: 2300, h: 640}, 1);
     d.describe('El signo de la piedra, que casi no se veía, se vuelve nítido: 4 × 3.');
     g.audio.cue('found');
     await d.fadeTo(w.get('rock-sign'), 1, 1.4);
@@ -200,7 +200,7 @@ export const girar = {
     w.removeWhere(o => /^(p7|g9|turn-)/.test(o.id));
     cast(g);
     familiesHome(g);
-    family(w, 1, BOARD.x + BOARD.w / 2 + 220, GROUND, {facing: -0.7});
+    family(w, 1, BOARD.x - BOARD.w / 2 - 260, GROUND, {facing: 0.7});
     boardNotes(g, g.scratch('c4.girar').turned ? 3 : 2);
     const turned = g.scratch('c4.girar').turned;
     const order = g.state.scratch['c4.grupos']?.moved || [0, 1, 2, 3];
