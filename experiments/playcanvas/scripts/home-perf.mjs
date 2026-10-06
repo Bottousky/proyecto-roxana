@@ -16,6 +16,8 @@ const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:dpr}
 const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
 await page.addInitScript(()=>{window.__lcp=0;new PerformanceObserver(l=>{for(const e of l.getEntries())window.__lcp=e.startTime;}).observe({type:'largest-contentful-paint',buffered:true});
   window.__cls=0;new PerformanceObserver(l=>{for(const e of l.getEntries())if(!e.hadRecentInput)window.__cls+=e.value;}).observe({type:'layout-shift',buffered:true});});
+// QUALITY=low|high fixes the profile through the school's own settings (isolated profile).
+if(process.env.QUALITY)await page.addInitScript(q=>{try{localStorage.setItem('roxana.escuela.v1',JSON.stringify({version:1,welcomed:true,settings:{muted:true,reducedMotion:false,quality:q}}));}catch{}},process.env.QUALITY);
 const t0=Date.now();
 await page.goto(url);
 await page.waitForFunction(()=>window.__escuela&&document.body.classList.contains('ready'),null,{timeout:120000});
@@ -42,7 +44,7 @@ await page.waitForTimeout(2500);
 const after=await snapshot();
 const idleAfter=await frames(5000);
 const ua=await page.evaluate(()=>navigator.userAgent);
-const result={date:new Date().toISOString(),url,viewport:{width,height,dpr},ua,host:{cpu:cpus()[0]?.model,cores:cpus().length,memGB:Math.round(totalmem()/2**30)},
+const result={date:new Date().toISOString(),url,quality:process.env.QUALITY||'por defecto',viewport:{width,height,dpr},ua,host:{cpu:cpus()[0]?.model,cores:cpus().length,memGB:Math.round(totalmem()/2**30)},
   web,readyMs:ready,idle,room,idleAfter,before,after,leak:{heapMB:+(after.heapMB-before.heapMB).toFixed(1),textures:after.textures-before.textures,entities:after.entities-before.entities},errors};
 writeFileSync(outFile,JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));
 await browser.close();

@@ -110,7 +110,11 @@ export function ohmdalSummary(state){
 }
 
 // The student's own record at the school: separate from any world save.
-export function freshProfile(){return {version:1,name:'',crest:'omega',createdAt:Date.now(),rooms:[],watched:[],stageSeen:0,welcomed:false,newsSeen:null,settings:{muted:true,reducedMotion:false,quality:'high'}};}
+/** First visit on a touch screen of phone size starts in the lighter profile (no SSAO, smaller shadows, DPR ≤ 1.25). */
+export function defaultQuality(env=globalThis){
+  try{const coarse=env.matchMedia?.('(pointer: coarse)').matches,small=Math.min(env.screen?.width||9999,env.screen?.height||9999)<820;return coarse&&small?'low':'high';}catch{return 'high';}
+}
+export function freshProfile(env){return {version:1,name:'',crest:'omega',createdAt:Date.now(),rooms:[],watched:[],stageSeen:0,welcomed:false,newsSeen:null,settings:{muted:true,reducedMotion:false,quality:defaultQuality(env)}};}
 export function readProfile(storage=globalThis.localStorage){
   const base=freshProfile();
   try{const data=JSON.parse(storage?.getItem(SCHOOL_KEY)||'null');if(!data||data.version!==1)return base;

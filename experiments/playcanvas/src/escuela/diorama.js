@@ -92,6 +92,10 @@ export class SchoolDiorama {
     this.root=new Entity('Instituto Roxana');app.root.addChild(this.root);
     this.parts=kit.build(app,this.materials,this.root);
     this.basePos=new Map([...this.parts].map(([k,e])=>[k,e.getLocalPosition().clone()]));
+    // What lives inside each building is drawn only while its roof is lifted: closed, the roof hides it, and it
+    // would only cost draw calls and shadows. The render component is toggled; stage logic keeps `enabled`.
+    const inside={direccion:['bitacora'],trofeos:[],electronica:['portal:electronica'],fisica:['tank','fluid:fisica','world:fisica','pendulum:fisica','orrery:fisica'],programacion:['city:programacion','visor:programacion'],matematica:['board:matematica']};
+    this.interiors=Object.fromEntries(Object.keys(BUILDINGS).map(id=>[id,[...this.parts].filter(([k])=>k===`${id}:interior`||k===`${id}:floor`||inside[id]?.includes(k)||(id==='trofeos'&&/^(trophy|dome):/.test(k))).map(([,e])=>e)]));
     // The sculpted statue of Roxana replaces the lathe figure; the latter stays as fallback.
     try{const glb=await loadStatueGlb(statueUrl);const stone=new StandardMaterial();stone.diffuse=col('#cfc8ba');stone.diffuseMap=marble(app);stone.diffuseVertexColor=true;stone.useMetalness=true;stone.metalness=0;stone.gloss=.42;stone.update();
       this.statue=statueEntity(app,stone,glb,{x:FOUNTAIN.x,y:2.7,z:FOUNTAIN.z,height:3.5});this.root.addChild(this.statue);
@@ -716,7 +720,7 @@ export class SchoolDiorama {
       const sc=this.materials[`screen@${id}`];if(sc){sc.emissiveIntensity=t.world==='ohmdal'?L(1)*2.2:.7+night*.6;sc.update();}
     }
     const leds=this.materials['leds@programacion'];leds.emissiveIntensity=.35+night*.3;leds.update();
-    this.fx.smoke.particlesystem.enabled=L(1)>.5&&!this.reducedMotion;this.fx.portal.particlesystem.enabled=true;this.fx.quantum.particlesystem.enabled=!this.reducedMotion;
+    this.fx.smoke.particlesystem.enabled=L(1)>.5&&!this.reducedMotion;this.fx.portal.particlesystem.enabled=Boolean(this.cut?.electronica?.inside);this.fx.quantum.particlesystem.enabled=!this.reducedMotion&&Boolean(this.cut?.fisica?.inside);
     // Dirección is where the student started: always a little lit.
     glass('direccion',.25+h.windows*1.6);this.rooms.direccion.light.intensity=.8+night*1.1;
     const trophies=this.trophyState||[],earned=trophies.filter(t=>t.earned).length;
@@ -791,6 +795,7 @@ export class SchoolDiorama {
       const st=(this.cut??={})[id]??={open:0,hover:0};st.open=lerp(st.open,open,1-Math.exp(-dt*(this.reducedMotion?60:3.5)));st.hover=lerp(st.hover,hover,1-Math.exp(-dt*8));
       const roof=this.parts.get(`${id}:roof`),rb=this.basePos.get(`${id}:roof`);
       const lift=ease(clamp(st.open,0,1))*16+st.hover*.55;
+      const inside=st.open>.004||st.hover>.05;if(st.inside!==inside){st.inside=inside;for(const e of this.interiors?.[id]||[])if(e.render)e.render.enabled=inside;this.stageDirty=true;}
       if(roof){roof.setLocalPosition(rb.x,rb.y+lift,rb.z);roof.enabled=st.open<.97;}
       // Roof accents that turn or glow ride with the roof.
       for(const extra of [`${id}:spin`,`bulb:${id}`]){const e=this.parts.get(extra),eb=this.basePos.get(extra);if(e){e.setLocalPosition(eb.x,eb.y+lift,eb.z);e.enabled=st.open<.97;}}

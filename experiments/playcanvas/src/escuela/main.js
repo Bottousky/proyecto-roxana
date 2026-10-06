@@ -33,8 +33,10 @@ let profile=readProfile();
 let save=previewStage!==null?previewState(previewStage):readOhmdal();
 const settings=profile.settings;
 
-document.querySelector('#escuela').insertAdjacentHTML('afterbegin',`
-  <canvas id="diorama" aria-label="Campus del Instituto Roxana en 3D. Tocá un edificio para acercarte; el directorio de abajo lleva a cada sala." tabindex="0"></canvas>
+// The 3D interface goes after the intro in the document, so keyboard order starts with the way in. The canvas
+// is not a tab stop (the directory is its keyboard equivalent) but can take focus back when a panel closes.
+document.querySelector('#escuela').insertAdjacentHTML('beforeend',`
+  <canvas id="diorama" aria-label="Campus del Instituto Roxana en 3D. Tocá un edificio para acercarte; el directorio de abajo lleva a cada sala." tabindex="-1"></canvas>
   <div id="labels" class="labels" aria-hidden="true"></div>
   <div id="letterbox" class="letterbox" aria-hidden="true"><i></i><i></i></div>
   <div class="brand" role="group" aria-label="Instituto Roxana">
@@ -137,7 +139,7 @@ function openRoom(id){
   $('#panel-inner').innerHTML=`<header class="panel-head"><button class="panel-back" id="panel-back" aria-label="Volver al Instituto">${svg('back')}<span>Instituto</span></button><span class="eyebrow">${esc(ROOMS[id].eyebrow)}</span><h2>${esc(ROOMS[id].name)}</h2></header><div class="panel-body">${renderRoom(id)}</div>`;
   $('#panel-back').addEventListener('click',closeRoom);bindRoom(id);
   if(!profile.rooms.includes(id)){profile.rooms.push(id);persistProfile();}
-  history.replaceState(null,'',`${location.pathname}${location.search}#${id==='patio'?'sobre':id}`);
+  setUrl(id==='patio'?'sobre':id);
   requestAnimationFrame(()=>panel.focus({preventScroll:true}));
 }
 let opener=null;
@@ -145,7 +147,7 @@ function closeRoom({intro=false}={}){
   const was=opener;opener=null;
   stopPlayback();ambience.set({room:null});diorama.focus(null);document.body.classList.remove('room-open');
   $('#panel').setAttribute('aria-hidden','true');delete $('#panel').dataset.room;document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current','false'));
-  history.replaceState(null,'',location.pathname+location.search);
+  setUrl('');
   if(intro)showIntro();else{diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();}
   // Focus returns to what opened the panel, or to the campus.
   const back=was&&was.isConnected&&was!==document.body&&!was.closest('#panel')?was:document.body.classList.contains('light')?$('#cta-play'):canvas;back.focus({preventScroll:true});
@@ -429,7 +431,7 @@ function openNews(){
   document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.room==='novedades')));
   $('#panel-inner').innerHTML=`<header class="panel-head"><button class="panel-back" id="panel-back" aria-label="Volver al Instituto">${svg('back')}<span>Instituto</span></button><span class="eyebrow">Del Instituto</span><h2>Novedades</h2></header><div class="panel-body" id="news-body" aria-busy="true"><p class="meta">Cargando novedades…</p></div>`;
   $('#panel-back').addEventListener('click',()=>closeRoom());
-  history.replaceState(null,'',`${location.pathname}${location.search}#novedades`);
+  setUrl('novedades');
   requestAnimationFrame(()=>panel.focus({preventScroll:true}));
   loadNews(base).then(result=>{
     const body=$('#news-body');if(!body)return;body.removeAttribute('aria-busy');body.innerHTML=renderNews(result,{dev:import.meta.env.DEV});
@@ -437,12 +439,20 @@ function openNews(){
   });
 }
 function markUnread(n){const a=$('#link-news');a.dataset.unread=n?String(n):'';a.setAttribute('aria-label',n?`Novedades (${n} sin leer)`:'Novedades');}
+// Each room is a step in the browser's history: Back closes or returns to the previous room, Forward reopens.
+let traversing=false;
+function setUrl(hash){
+  if(traversing)return;const url=`${location.pathname}${location.search}${hash?'#'+hash:''}`;
+  if(decodeURIComponent(location.hash.slice(1))!==hash)history.pushState({room:hash||null},'',url);
+}
 function route(){
   const hash=decodeURIComponent(location.hash.slice(1));
-  if(hash==='novedades')openNews();else if(hash==='sobre'||ROOMS[hash])openRoom(hash);
+  traversing=true;
+  try{if(hash==='novedades')openNews();else if(hash==='sobre'||ROOMS[hash])openRoom(hash);else if($('#panel').dataset.room)closeRoom();}
+  finally{traversing=false;}
 }
 document.querySelectorAll('.intro-links a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRoom(a.getAttribute('href').slice(1));}));
-addEventListener('hashchange',route);
+addEventListener('popstate',route);
 $('#cta-explore').addEventListener('click',()=>{explore();canvas.focus({preventScroll:true});toast('Tocá un edificio para acercarte. El directorio de abajo lleva a cada sala.');});
 canvas.addEventListener('pointerdown',()=>explore(),{passive:true});
 addEventListener('resize',()=>{if(!diorama.focusId){diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();}});

@@ -347,3 +347,10 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 @media (max-width:820px){.changes{left:16px;right:16px;width:auto;bottom:118px}}
 .light .look{display:none}
 .light .intro::before{display:none}
+
+/* Ciclo 7 · el lienzo va detrás de la interfaz aunque esté después en el documento; la marca compacta no es
+   enfocable mientras está oculta. */
+#diorama{z-index:0}
+.brand{visibility:hidden;transition:opacity 1.2s .5s var(--ease),transform 1.2s .5s var(--ease),visibility 0s 1.7s}
+.exploring .brand{visibility:visible;transition:opacity 1.2s .2s var(--ease),transform 1.2s .2s var(--ease),visibility 0s}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px}

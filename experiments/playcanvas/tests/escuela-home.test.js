@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {validItem,visibleItems,sortItems,unreadCount,renderNews} from '../src/escuela/news.js';
 import {IDENTITIES,confirmed,pendingLinks,renderCommunity} from '../src/escuela/social.js';
-import {readProfile} from '../src/escuela/progress.js';
+import {readProfile,defaultQuality,freshProfile} from '../src/escuela/progress.js';
 import {heightAt,outside,roadX} from '../src/escuela/landscape.js';
 import {ROOMS} from '../src/escuela/rooms.js';
 import {ARTIFACTS} from '../src/escuela/artifacts.js';
@@ -72,4 +72,14 @@ test('artefactos: cada uno queda en el césped, fuera de los edificios, y lleva 
     assert.ok(a.x<lo[0]||a.x>hi[0]||a.z<lo[2]||a.z>hi[2],`${world} fuera de su edificio`);
     assert.equal(ROOMS[a.room].picks.length,2);
   }
+});
+test('calidad: táctil de tamaño teléfono empieza en el perfil liviano; lo elegido se conserva',()=>{
+  const env=(coarse,w,h)=>({matchMedia:q=>({matches:q.includes('coarse')&&coarse}),screen:{width:w,height:h}});
+  assert.equal(defaultQuality(env(true,390,844)),'low');
+  assert.equal(defaultQuality(env(false,1440,900)),'high');
+  assert.equal(defaultQuality(env(true,1024,1366)),'high');
+  assert.equal(defaultQuality({}),'high');
+  assert.equal(freshProfile(env(true,390,844)).settings.quality,'low');
+  const store={getItem:()=>JSON.stringify({version:1,settings:{quality:'high'}})};
+  assert.equal(readProfile(store).settings.quality,'high');
 });
