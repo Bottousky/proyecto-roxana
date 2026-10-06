@@ -191,6 +191,11 @@ function pickChoice(prompt, options) {
     ['4 pares de botas', '10: seis'],
     ['el 7 o el 12', 'El 12'],
     ['hace que la Marea borre', 'Sí: van juntos'],
+    ['siguen cayendo juntos con Punto en el 8', 'Sumar 3 sólo', 'Restar 3', 'Sumar 3 a los dos'],
+    ['El signo queda igual', 'dejar el', 'dar vuelta'],
+    ['Elegí qué hacerle a la cuenta', 'Restar 7', 'Dividir por 2 sólo', 'Deshacer', 'Restar 1 a', 'Dividir los dos lados por 2'],
+    ['deshacé alguno', 'Deshacer'],
+    ['¿Qué la deja sola?', 'Dividir los dos lados por 4', 'Sumar 4', 'Multiplicar'],
     ['¿Cuándo está más alto?', 'Cerca del final'],
     ['deshace «el doble más uno»', 'La mitad'],
     ['«por sí mismo» dio 9', '3.'],
@@ -304,6 +309,11 @@ function pickChoice(prompt, options) {
     ['4 pares de botas', '24'],
     ['el 7 o el 12', 'El 7 sale'],
     ['hace que la Marea borre', 'No se sabe'],
+    ['siguen cayendo juntos con Punto en el 8', 'Sumar 3 a los dos'],
+    ['El signo queda igual', 'dar vuelta'],
+    ['Elegí qué hacerle a la cuenta', 'Dividir los dos lados por 2', 'Restar un medio'],
+    ['deshacé alguno', 'Deshacer'],
+    ['¿Qué la deja sola?', 'Multiplicar'],
     ['¿Cuándo está más alto?', 'A los 3'],
     ['deshace «el doble más uno»', 'Menos uno'],
     ['«por sí mismo» dio 9', '3 o −3'],
@@ -357,7 +367,7 @@ let choiceSig = '';
 const snaps = val('snap', '') ? decodeURIComponent(val('snap', '')).split('|') : [];
 const snapped = new Set();
 
-for (let iter = 0; iter < 4000; iter++) {
+for (let iter = 0; iter < 30000; iter++) {
   const s = await read();
   if (s.seg !== lastSeg) {
     note(`escena → ${s.seg}`);

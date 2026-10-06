@@ -476,7 +476,8 @@ export class UI {
       const a = this.spotEls.get(wsp.id)?._r;
       if (!a) continue;
       for (const o of this.spots) {
-        if (o === wsp || o.disabled) continue;
+        // los que deambulan pasan por debajo un momento y siguen: no cuentan como tapados
+        if (o === wsp || o.disabled || o.wanders) continue;
         const b = this.spotEls.get(o.id)?._r;
         if (!b) continue;
         // un botón de texto no debe tapar el centro de otro objeto, ni montarse sobre otro botón de texto

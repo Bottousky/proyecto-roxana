@@ -191,7 +191,7 @@ export const final = {
     const s = w.get('student');
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche: 1, 2, 4 y 8 escalones. La escalera grande tiene 30. ¿Llegamos a terminar de redibujar?');
+    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche: 1, 2, 4 y 8 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?');
     const box = {x: A.x0 + 40, y: A.y0 + 20, w: 300, h: 210};
     const {px, py} = axes(w, 'c12-g', box, [0, 6], [0, 40], {xticks: [1, 2, 3, 4, 5, 6], yticks: [10, 20, 30, 40], xname: 'noche'});
     for (const [n, v] of NIGHTS) w.add(new Shape(`c12-n${n}`, dot(`c12-n${n}`, 6, BLUE), px(n), py(v), {z: 14}));
@@ -226,26 +226,34 @@ export const final = {
     await d.think(c === '5' ? 'La quinta: 16 todavía no, 32 sí.' : c === '4' ? 'La cuarta llega a 16: todavía no. La quinta, 32: ahí pasa.' : 'Duplica, no suma: la cuarta 16, la quinta 32. Hay que apurarse.');
     await d.say('student', 'Mara: con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.');
     await d.say('Mara', 'Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.');
-    // la Marea grande: borra lo suelto; lo entendido queda
+    // la cuarta noche pone a prueba la suposición
+    await d.say('Mara', 'Cuarta noche.');
     g.setCinematic(true);
-    p.setMode('still');
-    await zip(d, p, px(4), py(16) - 14, 0.5);
-    await d.tween(1.2, q => { const n = 4 + q; p.x = px(n); p.y = py(Math.min(40, 2 ** n)) - 14; }, easeInOut);
-    g.audio.punto('happy');
-    d.describe('Punto corre por la curva hasta la noche 5, un paso adelante de la Marea.');
+    const n4 = w.add(new Shape('c12-n4', dot('c12-n4', 6, BLUE), px(4), py(16), {z: 15, fade: 0}));
+    await d.fadeTo(n4, 1, 0.6);
+    g.setCinematic(false);
+    d.describe('Un punto azul nuevo: la cuarta noche la Marea llegó a 16, justo sobre la curva que duplica.');
+    d.evidence('final-check', {night: 4, v: 16});
+    await d.think('Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La quinta pasa los 30.');
+    await d.say('Mara', 'Entonces redibujamos la escalera esta noche, antes de la quinta. ¡A trabajar!');
+    // la quinta noche: la Marea grande pasa y la escalera, redibujada a tiempo, resiste
+    g.setCinematic(true);
     await d.shot(SHOTS.board, 1.2);
-    d.describe('Pasa la Marea grande, una brisa de borrador sobre las Terrazas. Lo que estaba suelto se deshace; la escalera, la pizarra y las cuentas entendidas quedan.');
+    d.describe('Quinta noche. Pasa la Marea grande, una brisa de borrador sobre las Terrazas, más alta que la escalera. La escalera, redibujada a tiempo, resiste; la pizarra con sus cuentas, también.');
     g.audio.marea?.(5);
     g.camera.shake = 0.3;
-    const loose = w.objects.filter(o => /^c12-(n\d|top|topl)$/.test(o.id));
-    await d.all(...loose.map(o => d.fadeTo(o, 0, 1.6)));
-    for (const o of loose) w.remove(o.id);
-    follow(p, s);
+    await d.wait(2.2);
     g.setCinematic(false);
-    await d.say('Mara', 'La escalera sigue ahí.');
+    await d.say('Mara', 'Llegamos. La escalera sigue ahí, y lo que entendimos también.');
+    // Punto corre por su gráfico mientras se dice su viaje
+    p.setMode('still');
+    const run = d.tween(3.2, q => { const n = 5 * q; p.x = px(n); p.y = py(Math.min(40, 2 ** n)) - 14; }, easeInOut);
+    d.describe('Punto corre por la curva, desde la primera noche hasta la quinta, un paso adelante.');
     await d.say('student', 'Punto: al principio eras un punto que contaba. Después tuviste un lado para ir, una flecha. Ahora corrés por un gráfico, un paso adelante.');
+    await run.catch(() => {});
     g.audio.punto('happy');
     await pulse(d, p, 2, 0.4).catch(() => {});
+    follow(p, s);
     if (!replay) writeJournal12(g);
     g.flags.c12final = true;
     g.flags.gameDone = true;

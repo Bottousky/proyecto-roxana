@@ -910,7 +910,7 @@ async function pairing(d, g, {dots = RETURNED, done = 'left-more', initial} = {}
     const refresh = () => {
       const spots = [];
       for (const [i, m] of markIds.entries()) spots.push(rectSpot(m, label(m), markRect(i), () => choose(m), {selected: selected === m}));
-      for (const id of RETURNED_) spots.push(dotSpot(g, id, label(id), () => choose(id), {selected: selected === id}));
+      for (const id of RETURNED_) spots.push(dotSpot(g, id, label(id), () => choose(id), {selected: selected === id, wanders: true}));
       if (links.length) {
         // al costado de la piedra, más abajo de donde deambulan los puntos (que no lo tapen)
         spots.push(wordSpot('check', 'comprobar', STONE.x + STONE.w / 2 + 90, GROUND - 40, () => check()));

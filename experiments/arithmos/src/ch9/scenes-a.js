@@ -168,8 +168,14 @@ export const maquina = {
     // la máquina de Punto
     await d.say('Mara', 'Punto también hizo una.');
     g.setCinematic(true);
+    const pmx = A.x0 + 330, pmy = A.y0 + 150;
+    const pm = w.add(machine('c9-pm', pmx, pmy, 90, 56, YELLOW));
+    pm.progress = 0;
+    await d.draw(pm, 0.6, {sound: false});
+    w.add(new Label('c9-pml', 'la de Punto', pmx + 45, pmy + 34, {size: 15, align: 'center', z: 13, ch: YELLOW}));
     p.setMode('still');
-    await zip(d, p, mx + mw / 2, my + mh + 40, 0.4);
+    await zip(d, p, pmx + 45, pmy - 18, 0.4);
+    d.describe('Al lado, una máquina más chica, amarilla: la de Punto.');
     g.setCinematic(false);
     const outs = [7, 9];
     let k = 0;
@@ -192,7 +198,12 @@ export const maquina = {
     await pulse(d, p, 1, 0.3);
     await d.say('student', 'Punto, el mismo 3 dio 7 y después 9. Con tu máquina no puedo anticipar nada: no es una función.');
     g.audio.punto('sad');
-    await d.think('Punto mira su máquina un rato. Después tacha la ruedita que giraba sola.');
+    await d.think('Punto mira su máquina un rato. Adentro tenía una ruedita que giraba sola.');
+    g.setCinematic(true);
+    const cross = w.add(new Drawing('c9-pmx', [S([[pmx + 30, pmy + 12], [pmx + 60, pmy + 44]], seedOf('c9-pmx'), {w: 3, p: 0.95, ch: YELLOW}), S([[pmx + 60, pmy + 12], [pmx + 30, pmy + 44]], seedOf('c9-pmx') + 1, {w: 3, p: 0.95, ch: YELLOW})], {z: 14, progress: 0}));
+    await d.draw(cross, 0.5, {sound: false});
+    d.describe('Punto tacha la ruedita de su máquina.');
+    g.setCinematic(false);
     g.audio.punto('happy');
     follow(p, s);
     d.evidence('rule', {rule: 'double1', seen});

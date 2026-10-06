@@ -136,9 +136,9 @@ export const caja = {
 // ——————————————————————————————————————————————
 
 const OPS2 = [
-  {id: 'oneL', text: '+3 sólo a la izquierda', label: 'Sumarle 3 sólo a la izquierda'},
-  {id: 'bothM', text: '−3 a los dos lados', label: 'Restarle 3 a los dos lados'},
-  {id: 'both', text: '+3 a los dos lados', label: 'Sumarle 3 a los dos lados'},
+  {id: 'oneL', text: 'Sumar 3 sólo al primer miembro, x − 3.', label: 'Sumarle 3 sólo al primer miembro'},
+  {id: 'bothM', text: 'Restar 3 a los dos lados.', label: 'Restarle 3 a los dos lados'},
+  {id: 'both', text: 'Sumar 3 a los dos lados.', label: 'Sumarle 3 a los dos lados'},
 ];
 
 export const dosLados = {
@@ -171,10 +171,7 @@ export const dosLados = {
     const ops = [...OPS2];
     let chosen;
     for (;;) {
-      chosen = await d.interact(ctl => new Promise(resolve => {
-        g.setHint(() => ['Probá una operación: mirá si los dos marcadores siguen cayendo juntos con Punto en el 8.', 'Lo que sirve tiene que dejar a la x sola de un lado.']);
-        g.ui.setSpots(ops.map((o, i) => wordSpot(`op-${o.id}`, o.text, lx(-2 + i * 5), GROUND - 330, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(o.id); } }, {label: o.label})));
-      }));
+      chosen = await d.choose(ops.map(o => ({id: o.id, text: o.text})), {prompt: '¿Qué le hacés a la cuenta? Después mirá si los dos marcadores siguen cayendo juntos con Punto en el 8.'});
       d.evidence('op2', {op: chosen});
       if (chosen === 'oneL') {
         view.set(addOne(e0, 'L', 3), {L: 'x − 3 + 3', R: '5'});

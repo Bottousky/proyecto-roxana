@@ -22,11 +22,9 @@ function lineSetup(g, who, head, x0 = 0) {
 }
 
 /** Paleta de operaciones sobre la recta; devuelve el id elegido. */
+// las operaciones se eligen en el panel de opciones: en el teléfono, botones en fila sobre la recta se pisaban
 function pickOp(d, g, ops, hint) {
-  return d.interact(ctl => new Promise(resolve => {
-    g.setHint(() => [hint]);
-    g.ui.setSpots(ops.map((o, i) => wordSpot(`op-${o.id}`, o.text, lx(-3 + i * 4.5), GROUND - 330, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(o.id); } }, {label: o.label || o.text})));
-  }));
+  return d.choose(ops.map(o => ({id: o.id, text: o.label || o.text})), {prompt: hint});
 }
 
 // ——————————————————————————————————————————————
@@ -148,8 +146,8 @@ export const alReves = {
     await moveX(d, g, view, 0);
     d.describe('Punto vuelve al 0, que cumple: −2 · 0 = 0, y 0 es menos que 6.');
     const ops = [
-      {id: 'keep', text: '÷ (−2), dejando <', label: 'Dividir por menos dos y dejar el menor'},
-      {id: 'flip', text: '÷ (−2), dando vuelta: >', label: 'Dividir por menos dos y dar vuelta el signo'},
+      {id: 'keep', text: '÷ (−2), dejando <', label: 'Dividir por −2 y dejar el «<».'},
+      {id: 'flip', text: '÷ (−2), dando vuelta: >', label: 'Dividir por −2 y dar vuelta el signo: «>».'},
     ];
     let op;
     for (;;) {
@@ -211,10 +209,7 @@ export const dosPasos = {
     while (!solved(e)) {
       const full = stack.length >= 3;
       const choices = (full ? [] : OPS.filter(o => !o.bad || (e.L.a === 2 && e.L.b !== 0))).concat(stack.length ? [{id: 'undo', text: 'deshacer', label: 'Deshacer el último paso'}] : []);
-      const op = await d.interact(ctl => new Promise(resolve => {
-        g.setHint(() => [full ? 'Ya son muchos renglones: deshacé alguno.' : 'Elegí qué hacerle a la cuenta. Cualquier paso que se haga a los dos lados vale; el que deja sola a la x, termina.', 'Si un paso no ayudó, se puede deshacer.']);
-        g.ui.setSpots(choices.map((o, i) => wordSpot(`op-${o.id}`, o.text, lx(-2 + (i % 3) * 5), GROUND - 350 + Math.floor(i / 3) * 50, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(o.id); } }, {label: o.label})));
-      }));
+      const op = await d.choose(choices.map(o => ({id: o.id, text: o.label})), {prompt: full ? 'Ya son muchos renglones: deshacé alguno.' : 'Elegí qué hacerle a la cuenta (si un paso no ayuda, se puede deshacer).'});
       steps++;
       if (op === 'undo') {
         const prev = stack.pop();

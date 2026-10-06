@@ -19,7 +19,11 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 - Revisiones matemáticas independientes hechas para los 12 capítulos. Las altas de los caps. 9–12
   (rev-mat-8, 9 y 10) están corregidas en texto o datos (ver `ARITHMOS_REVIEW.md`); quedan medias
   pendientes en C9-R…C12-R, N9-R y N10-12.
-- Revisión narrativa de los caps. 10–12: en curso (no hecha hasta ahora).
+- Revisión narrativa de los caps. 10–12 hecha (rev-narr-8): el cierre se rehizo (la cuarta noche pone a
+  prueba la suposición, la Marea pasa y la escalera resiste, Punto corre por su gráfico); el resto de sus
+  hallazgos queda en N10-12.
+- Teléfono acostado: mientras se toca la escena y no hay texto, la pizarra usa el lugar del subtítulo
+  (≈ 30 % más grande). La guarda de botones superpuestos ahora ignora a los que deambulan.
 - Guarda nueva de interfaz (botones de texto que se pisan): encontró y corrigió un caso en 5.9; los
   caps. 6–9 no se volvieron a pasar con esa guarda a 1600×900.
 - **Entorno:** máquina compartida; las partidas del bot se corren de a una y las capturas pueden tardar

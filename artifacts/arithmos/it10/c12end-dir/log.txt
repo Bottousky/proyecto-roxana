@@ -1,0 +1,14 @@
+[0.0s] escena → c12.anticipar
+[1.0s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche: 1, 2, 4 y 8 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?
+[3.2s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[4.2s] elige «En la noche 5: 32 pasa los 30.» (Si sigue duplicando, ¿en qué noche pasa la escalera?)
+[4.6s] lee: La quinta: 16 todavía no, 32 sí.
+[4.7s] lee: —Mara: con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.
+[4.8s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[5.6s] lee: Cuarta noche.
+[5.7s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La quinta pasa los 30.
+[6.7s] lee: Entonces redibujamos la escalera esta noche, antes de la quinta. ¡A trabajar!
+[7.6s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[8.5s] lee: —Punto: al principio eras un punto que contaba. Después tuviste un lado para ir, una flecha. Ahora corrés por un gráfico, un paso adelante.
+[12.2s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[12.6s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["final-family","final-predict","final-check"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":12.639,"size":"1600x900","touch":false,"route":"directa","watch":false}

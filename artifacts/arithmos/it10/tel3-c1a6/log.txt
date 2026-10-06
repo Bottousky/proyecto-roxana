@@ -1,0 +1,405 @@
+[0.0s] escena → undefined
+[0.3s] escena → c1.puerta
+[0.7s] lee: Tengo las manos de tiza.
+[1.1s] lee: …No hay vuelta. Por ahora.
+[3.3s] lee: Alguien borró todo esto a medias.
+[3.6s] escena → c1.alguien
+[33.8s] lee: Algo se movió.
+[34.3s] elige «Quedarte quieto y esperar» (Un punto amarillo, quieto, te mira (o algo parecido).)
+[34.6s] lee: —Hola.
+[35.1s] lee: No habla. O no habla como yo.
+[35.1s] lee: —¿Tenés nombre?
+[36.7s] lee: Un punto. Nada más… y nada menos.
+[36.8s] lee: —Te voy a decir Punto. Hasta que me digas cómo te llamás.
+[37.7s] escena → c1.ronda
+[37.8s] lee: —¿Son tu familia?
+[68.3s] lee: ¿Qué es eso?
+[68.4s] lee: Si pasa por acá, los desparrama.
+[68.9s] elige «Anotarlos en la piedra.» (¿Cómo vas a saber si vuelven todos?)
+[82.7s] escena → c1.marea
+[112.9s] lee: Se llevó todo. Menos las marcas.
+[112.9s] escena → c1.vuelven
+[143.0s] lee: No paran de moverse.
+[173.1s] lee: Cada marca era uno de ellos.
+[179.8s] lee: Quedó una marca sola.
+[179.9s] escena → c1.quien
+[182.6s] elige «Que falta uno de ellos.» (¿Qué quiere decir esa marca sola?)
+[182.8s] lee: Las marcas saben cuántos. No saben quién. Punto sí.
+[184.4s] lee: —¿El más chico? ¿El que llegaba tarde?
+[185.2s] lee: —Vamos a buscarlo.
+[186.6s] escena → c1.busqueda
+[186.7s] lee: Por acá tiene que estar.
+[187.6s] lee: Nadie.
+[191.6s] lee: Alguien anotó acá, hace mucho.
+[196.0s] lee: Ahí. Debajo del polvo.
+[226.2s] lee: Lo encontramos.
+[226.2s] escena → c1.todos
+[226.4s] lee: Ahora sí.
+[306.2s] lee: —Están todos.
+[306.3s] escena → c1.gradas
+[306.4s] lee: Unas gradas. ¿Habrá lugar para la Ronda y Punto?
+[306.5s] lee: ¿Y para mí?
+[307.1s] elige «Todavía no sé.» (Así, en fila, ¿alcanzan los asientos para la Ronda y Punto?)
+[307.3s] lee: Uno por asiento.
+[309.8s] elige «Había más asientos que en la fila.» (Quedó un asiento libre. ¿Qué quiere decir?)
+[310.0s] lee: Mirando no se podía saber. Sentándolos, sí.
+[310.6s] elige «Uno.» (Así apretados, si se vuelven a sentar, ¿cuántos asientos sobran?)
+[310.8s] lee: Sobró uno, como antes. Apretados o separados, son trece.
+[311.4s] lee: ¿El que sobra es para mí?
+[311.5s] escena → c1.nombre
+[311.6s] lee: ¡Le salió!
+[311.7s] lee: ¿Cuántos somos?
+[313.6s] lee: —¡Bajen! Cada uno debajo de su marca.
+[313.7s] lee: Catorce marcas. Catorce palabras. Catorce de nosotros.
+[314.3s] elige «El 14 nombra a catorce.» (¿Qué le decís a Punto?)
+[314.5s] lee: No es una fila más: es el nombre de cuántos hay en cada una.
+[314.6s] lee: Me mira como preguntando qué hace un 1 ahí, si somos catorce.
+[314.7s] lee: —Ni idea. Mañana.
+[314.7s] escena → c2.manana
+[314.9s] lee: Desde anoche marca todo. Hasta a mí.
+[315.0s] lee: —Sí, ya sé. El 1. Todavía no lo sé.
+[315.1s] lee: Uf. Todo lo que se llevó la Marea hay que volver a dibujarlo. Y sin tiza no se dibuja nada.
+[315.2s] lee: ¿Y vos? Tenés una tiza en la mano… ¿Sabés contar palitos?
+[315.7s] elige «Sí. ¿Te ayudo?» ()
+[315.9s] lee: ¡Por fin alguien! Soy Mara. Guardo la tiza de todos y anoto cuánta le toca a cada familia.
+[316.0s] escena → c2.marcar
+[316.1s] lee: Hay que anotar cuántos palitos llegaron.
+[316.2s] lee: La de ayer la anoté así, con marcas: la Marea me había desarmado los atados. ¿Llegó más hoy que ayer?
+[316.8s] elige «Así, de un vistazo, no se puede saber.» (Dos hileras de marcas, una arriba de la otra.)
+[317.0s] lee: Una por una, no se termina más.
+[317.1s] lee: Por eso en el depósito atamos. De a diez. Así se hizo siempre.
+[317.2s] lee: ¡Eso no es un atado! Un atado tiene diez.
+[317.2s] lee: De a cinco también se cuenta. Pero si en el depósito un atado es de diez, uno de cinco engaña al que lo lea.
+[317.3s] escena → c2.atados
+[317.4s] lee: Este es el molde de diez: diez ranuras, un palito en cada una. Cuando se llena, se ata.
+[317.5s] lee: ¿Por qué de a diez? No me preguntes. Así se hizo siempre.
+[327.0s] lee: Tres atados y siete sueltos. Treinta y siete.
+[327.1s] lee: ¿Y la hilera de ayer?
+[329.7s] lee: Ayer, treinta y cuatro; hoy, treinta y siete. Hoy llegaron tres más.
+[330.6s] lee: Entonces… el 1 de 14.
+[330.6s] lee: —Punto, vení. Mirá.
+[330.7s] lee: ¿Catorce? Tomá, de la otra bolsa.
+[333.6s] lee: —¡Escribiste!
+[333.7s] lee: El 1 no cuenta palitos: cuenta atados.
+[333.8s] lee: Bueno, bueno. Lindo. Ahora vamos al depósito, que hay que guardar todo.
+[333.8s] escena → c2.deposito
+[335.2s] lee: El depósito. Tres cuartos: sueltos, atados y atados de atados.
+[335.3s] lee: Regla de la casa: nunca más de nueve por cuarto. Con diez, se atan y pasan al de al lado.
+[335.4s] lee: —¿Por qué nueve?
+[335.4s] lee: Porque así se hizo siempre. La Marea desparramó todo; hay que guardar de nuevo.
+[335.5s] lee: La carga de recién: tres atados y siete sueltos.
+[345.8s] no pudo tocar room0: page.click: Timeout 5000ms exceeded.
+[345.9s] lee: Otra carga: cinco sueltos.
+[350.2s] lee: "Me llevo uno"… era esto.
+[350.3s] lee: La última: seis atados y ocho sueltos.
+[361.6s] lee: Ahora se anota como se anota: una cifra por cuarto, de izquierda a derecha.
+[369.0s] elige «Un 0.» (Uno de los cuartos quedó vacío. ¿Qué escribís para ese cuarto?)
+[371.6s] lee: Ciento diez. Un atado de atados, un atado… y ningún suelto.
+[371.6s] lee: Hm. Yo siempre lo dejaba en blanco. Total, no había nada…
+[371.7s] escena → c2.cero
+[374.5s] lee: Mara, con treinta y dos palitos no alcanza ni para la puerta. Antes de la Marea teníamos muchísimo más.
+[374.5s] lee: El registro dice treinta y dos. Tres y dos.
+[374.6s] lee: Entre el 3 y el 2 hay una mancha.
+[375.2s] elige «Ahí había algo, pero no se puede saber qué.» (¿Qué había entre el 3 y el 2?)
+[375.3s] lee: Por la mancha sola no se sabe. Su tiza está guardada: eso sí se puede mirar.
+[375.4s] lee: Nuestra tiza está en casa, en nuestro depósito. Vengan a ver.
+[376.0s] elige «Trescientos veinte: 320.» (¿Qué número dice el depósito de los Oval?)
+[385.1s] lee: Así quedan dos atados y ningún suelto. Es al revés.
+[385.2s] lee: Tres, cero, dos. Trescientos dos. Faltaba el cero.
+[385.3s] lee: ¡Trescientos dos! Y yo les daba treinta y dos…
+[385.4s] lee: Siempre pensé que el cero no era nada. Que daba lo mismo ponerlo o no.
+[385.4s] lee: —Dice "ninguno" en ese cuarto. Sin él, el 3 se corre de lugar.
+[385.5s] lee: Un cuarto vacío también se escribe.
+[385.6s] escena → c2.cuantos
+[386.6s] lee: Mara, ¿cuánta tiza más que nosotros tiene la familia Recta?
+[386.7s] lee: Recta, cincuenta y dos. Curva, treinta y siete. Sacalo vos, que yo ya me mareé.
+[386.7s] lee: Como en la piedra: emparejar. Pero de a atados.
+[390.8s] desata un atado de Recta
+[395.5s] lee: Quince le quedaron a Recta sin pareja.
+[395.6s] lee: "Pedir prestado" era desatar.
+[395.6s] lee: Quince. Bueno, no es tanto. Igual se lo voy a reclamar.
+[395.7s] escena → c2.cuarto
+[396.7s] lee: Todos devolvieron lo que les sobraba. Nueve, nueve y nueve: el depósito está lleno hasta el techo.
+[396.8s] lee: Y acaban de traer un palito más.
+[400.3s] lee: ¡Diez atados de atados! Y no hay más cuartos. ¿Qué hacemos?
+[400.8s] elige «Atarlos y dibujar un cuarto nuevo a la izquierda.» (Diez atados de atados y ningún cuarto a la izquierda.)
+[401.1s] lee: Mil. Nunca se había llenado tanto.
+[401.1s] lee: Siempre se puede dibujar otro cuarto.
+[401.2s] escena → c2.lugar
+[402.2s] lee: A ver si aprendí. A los Recta les debo doscientos cinco palitos. Armámelo en la pizarrita, que lo quiero ver.
+[403.7s] lee: Dos, cero, cinco. Con el cero en el medio, que yo antes dejaba en blanco.
+[403.8s] lee: Así que por eso atábamos de a diez. Para que cada cifra tenga su lugar.
+[403.8s] lee: —De a cinco también se podría. Pero todos tienen que saber de a cuánto.
+[403.9s] lee: Mara… te debo tres atados de ayer. Y ya no me queda ninguno.
+[404.0s] lee: ¿Y eso cómo lo anoto? ¿Menos que nada?
+[404.2s] lee: Menos que nada. Punto me mira como anoche, cuando rodeó el 1.
+[404.3s] escena → c3.deuda
+[405.3s] lee: Hoja nueva. Desde que todos devolvieron lo que les sobraba, anoto lo que cada familia tiene guardado acá, en atados.
+[405.4s] lee: Y yo, los tres que te debo.
+[405.5s] lee: Cuando no hay nada, escribo 0: eso ya lo aprendí. Pero esto no es "no hay": es que falta. ¿Cómo lo anoto?
+[406.0s] elige «Un 3 con una marca nueva delante.» (¿Cómo se anota lo que debe Curva?)
+[406.3s] lee: Tres menos… ¿menos qué? ¿Le falta algo a la cuenta?
+[406.4s] lee: Una rayita acostada. Menos tres: tres que faltan.
+[406.5s] lee: Tres, pero para el otro lado.
+[406.5s] escena → c3.pares
+[407.6s] lee: Curva, tomá: dos atados de los míos, por la cerca que me arreglaste.
+[407.7s] lee: Ahora tiene dos y debe tres.
+[410.0s] elige «−1» (¿Cuánto tiene Curva ahora?)
+[413.2s] lee: Y Recta tiene cuatro guardados… pero ayer le presté uno: me debe uno.
+[413.7s] elige «Tiene 3.» (¿Cuánto le queda a Recta?)
+[414.8s] lee: Tres: un par se borró.
+[415.8s] lee: Y a lo que se tiene le pongo una cruz, para que nadie lo confunda con una deuda.
+[416.8s] lee: Y Cuña, que me debe cuatro desde la semana pasada.
+[417.4s] lee: Más tres: tres que se tienen. Menos cuatro: cuatro que faltan.
+[417.4s] escena → c3.linea
+[418.5s] lee: Para ver quién tiene más y quién menos, una línea en el suelo. El cero, acá. Lo que se tiene, hacia la derecha.
+[419.1s] elige «−4» (¿Qué número es menor: −4 o −1?)
+[435.8s] lee: Menos cuatro, más a la izquierda: es menor.
+[435.9s] lee: O sea que yo, en −1, tengo más que Cuña. Algo es algo.
+[435.9s] escena → c3.distancia
+[436.9s] lee: Recta, ¿cuánto más que nosotros tenés?
+[437.5s] elige «7» (¿Cuántos pasos hay de Cuña (−4) a Recta (+3)?)
+[437.7s] lee: Pasos, de marca en marca.
+[440.4s] lee: Siete. Las deudas también son pasos.
+[440.5s] lee: Recta, por la cerca que arreglaste ayer: un atado más.
+[441.1s] elige «Están igual de lejos.» (¿Quién está más lejos del cero: Recta (+4) o Cuña (−4)?)
+[441.3s] lee: Cuatro pasos cada uno.
+[441.4s] lee: —Las barritas dicen: lo lejos del cero, sin el lado.
+[441.5s] lee: Dos barritas. Lo anoto así.
+[441.5s] escena → c3.perdon
+[442.5s] lee: Curva, revisé el registro de ayer: dos deudas tuyas las anoté dos veces. Hay que sacarlas.
+[442.6s] lee: Pero… si en la cuenta debo uno solo.
+[443.8s] elige «Agregar un atado y una deuda: juntos valen cero.» (Hay que sacar dos deudas y en la mesa no queda ninguna.)
+[444.0s] lee: Vale lo mismo que antes. Pero ahora hay una deuda para sacar.
+[444.6s] lee: Le quedó un atado. En realidad, Curva no debía: tenía uno.
+[446.4s] elige «Darle dos atados.» (Curva pasó de −1 a +1. ¿Qué otra cosa la habría dejado en el mismo lugar?)
+[446.6s] lee: Lo mismo: sacar dos deudas es como dar dos atados.
+[448.4s] elige «Que se saca algo.» (En −1 − (−2), ¿qué dice la rayita del medio, la que está suelta?)
+[448.5s] lee: —La suelta dice "sacar". Las pegadas al número dicen "deuda". El paréntesis guarda al número con su rayita.
+[448.6s] lee: Para no confundirlas. Bien.
+[448.7s] lee: El mismo trazo, dos trabajos.
+[449.7s] lee: Y yo tengo dos atados, pero tengo que pagarle cinco a Mara por las tejas.
+[450.3s] elige «Queda debiendo 3.» (Oval tiene 2 y paga 5. ¿Cómo queda?)
+[451.6s] lee: Te lo presto: un atado que tenés y uno que me debés.
+[454.6s] lee: Me pagaste cinco: dos tuyos y tres que te presté. Me debés tres.
+[454.7s] lee: Dos menos cinco: menos tres.
+[455.8s] lee: Sacar atados lleva a la izquierda, aunque se pase del cero.
+[455.8s] escena → c3.pozo
+[456.9s] lee: —¡Punto!
+[456.9s] lee: Cuatro debajo del suelo… como Cuña, que debe cuatro. El mismo −4.
+[457.5s] elige «+1» (Punto está en −4. Puede subir cinco marcas. ¿Dónde queda?)
+[460.0s] lee: Más uno, arriba del suelo.
+[460.0s] escena → c3.hacia
+[461.1s] lee: —Punto, andá a saludar a alguien.
+[463.4s] lee: —Punto… ahora señalás.
+[463.8s] lee: Cada número dice cuánto y para qué lado, como Punto. Menos el cero, que está en el medio.
+[463.9s] lee: Arriba, en las Terrazas, la Marea se está llevando la escalera. Dicen que en una piedra hay un signo que nadie entiende.
+[464.0s] lee: Y me deben atados. Mañana subimos.
+[464.3s] escena → c4.grupos
+[465.5s] lee: Las Terrazas. Miren la escalera: la Marea se la está llevando.
+[465.5s] lee: Desde que nadie entiende lo que dice la piedra de abajo. Lo de las deudas sí lo sabemos: tres atados cada familia.
+[465.6s] lee: Un 4, una cruz acostada y un 3. Nadie sabe qué quiere decir.
+[466.2s] elige «Doce atados.» (¿Cuántos atados le deben las Terrazas a Mara?)
+[466.4s] lee: Bajemos las deudas a la pizarra. Cada familia, una fila.
+[473.6s] no pudo tocar grp1: page.click: Timeout 5000ms exceeded.
+[477.1s] lee: Tres, seis, nueve, doce.
+[477.2s] lee: —Cuatro filas de tres. Cuatro veces tres.
+[477.3s] lee: ¡Eso decía la piedra!
+[477.4s] lee: Y en mis cuentas, como son deudas, ¿cómo lo anoto?
+[477.5s] lee: Menos doce. Cuatro veces menos tres.
+[477.5s] escena → c4.girar
+[478.6s] lee: Si lo miro de costado, son tres filas de cuatro. ¿Entonces debemos más?
+[479.1s] elige «Lo mismo: son las mismas deudas.» (Cuatro filas de tres, giradas, son tres filas de cuatro. ¿Cambia el total?)
+[480.5s] lee: Doce, como antes: cuatro, ocho, doce. Ninguna deuda se fue ni llegó.
+[480.6s] lee: Mi huerta de atrás: nueve filas de cuatro plantas. Mirada desde el camino, cuatro filas de nueve.
+[481.2s] elige «Alcanza con una: es el mismo rectángulo, girado.» (¿Hace falta contar las plantas de las dos maneras?)
+[481.4s] lee: Las mismas plantas, de costado. Se cuentan una vez.
+[481.4s] escena → c4.estirar
+[482.5s] lee: Para el plano nuevo de las Terrazas: el pozo de agua en el cero, y cada casa a tantos pasos del pozo.
+[482.6s] lee: Y lo quiero al doble de grande: cada casa, al doble de lejos del pozo.
+[484.3s] lee: Al doble de lejos, cada una de su lado. El pozo no se movió.
+[484.4s] lee: Cornisa quedó en −6: más lejos del pozo, pero más a la izquierda que −3. "Más" no es la palabra.
+[484.5s] lee: Por uno, nadie se mueve. Multiplicar no siempre agranda.
+[484.6s] lee: Y otro plano para los que llegan del otro lado del pozo: lo de la derecha, a la izquierda, a la misma distancia.
+[486.3s] lee: Media vuelta alrededor del pozo: cada una quedó a la misma distancia, del otro lado.
+[486.8s] elige «Vuelven adonde estaban.» (¿Y si se da otra media vuelta, para el mismo lado?)
+[488.7s] lee: Las dos medias vueltas cerraron la vuelta entera: cada una en su casa.
+[488.8s] lee: —Punto, mirá: empezaste en el 1, dos medias vueltas, y estás en el 1.
+[488.8s] escena → c4.repartir
+[489.8s] lee: Las Terrazas juntaron la cosecha: catorce atados. Bajaron las cuatro familias para repartirla.
+[489.9s] lee: Igual para todas, ¿eh? Que nadie reciba más que otra.
+[490.5s] elige «Tres cada una, y sobran dos.» (Catorce atados entre cuatro familias, igual para todas. ¿Cuánto le toca a cada una?)
+[490.7s] lee: De a uno, por vueltas. Nadie recibe el segundo hasta que todas tengan el primero.
+[497.1s] elige «Dejarlos aparte: sobran.» (Cada familia tiene tres. Quedan dos atados y son cuatro familias.)
+[497.4s] lee: Tres cada una, y sobran dos.
+[498.2s] escena → c4.medir
+[498.4s] lee: Mara, con la cosecha te pagamos lo que te debíamos: tres atados cada familia.
+[498.5s] lee: Doce atados. Los tengo que llevar al depósito en bolsas de tres.
+[499.0s] elige «Cuatro bolsas.» (¿Cuántas bolsas de tres se llenan con doce atados?)
+[503.3s] lee: Cuatro bolsas.
+[503.3s] lee: —Recién repartimos: cada familia, tres. Ahora medimos: bolsas de tres, cuatro bolsas.
+[503.4s] lee: Dos preguntas distintas. Las dos se contestan con 4 × 3 = 12.
+[504.8s] elige «Tres.» (Con los mismos doce atados, ¿cuántas bolsas de cuatro se llenan?)
+[505.0s] lee: Tres bolsas de cuatro.
+[505.9s] escena → c4.nadie
+[506.1s] lee: Estos seis atados los guardo para repartir en la próxima cosecha.
+[506.1s] lee: ¿Y si para entonces las Terrazas quedan vacías, como la escalera que se llevaba la Marea? ¿A quién le tocan?
+[506.7s] elige «No hay a quién darle: la pregunta no tiene respuesta.» (Seis atados repartidos entre cero familias. ¿Cuánto le toca a cada una?)
+[506.9s] lee: No hay primera familia: el reparto no empieza nunca.
+[507.0s] lee: ¿Y en bolsas donde no entra nada? ¿Cuántas se llenan con seis atados?
+[508.1s] lee: Una bolsa, y el montón sigue igual: seis.
+[508.6s] elige «Ninguna cantidad alcanza: no se termina nunca.» (¿Cuántas bolsas de cero hacen falta para guardar los seis atados?)
+[508.8s] lee: Cada bolsa se lleva cero. Nunca se termina.
+[508.9s] lee: —Doce dividido tres era cuatro porque cuatro por tres es doce. Entonces, ¿qué número por cero da seis?
+[509.5s] elige «Ninguno: todo por cero da cero.» (¿Qué número por 0 da 6?)
+[510.6s] lee: Todo por cero da cero. Ninguno da seis.
+[510.7s] lee: Ni cero ni infinito: la pregunta no tiene respuesta.
+[510.7s] lee: Entonces eso no lo anoto. Ni cero, ni nada: no se reparte entre nadie.
+[510.8s] escena → c4.partir
+[511.8s] lee: El plano de mi huerta: cuatro filas de cinco. Le quiero dar una parte a Balcón, cortando entre dos columnas.
+[512.4s] elige «No: siempre son las mismas plantas.» (Después de cortar, sumando las dos partes, ¿cambia el total?)
+[515.0s] lee: ¿Y cortando en otro lugar?
+[518.0s] lee: Veinte las dos veces. Se reparten distinto, pero son las mismas plantas.
+[519.7s] lee: Mi otra huerta, la del fondo, es de cuatro filas de trece. ¿Cuántas plantas son?
+[520.2s] elige «52» (¿Cuánto es 4 × 13?)
+[520.5s] lee: Cuarenta y doce.
+[520.5s] lee: Mara… ¿y los dos atados que sobraron de la cosecha? Somos cuatro familias.
+[520.6s] lee: Partirlos… Un pedazo de atado. Eso no lo anoté nunca.
+[520.9s] lee: Punto mira la rajadura como si fuera una puerta.
+[520.9s] escena → c5.medio
+[522.2s] lee: El atado que empujó Punto amaneció rajado. ¿Lo terminamos de partir, para las cuatro?
+[522.8s] elige «Darle uno a dos familias.» (Dos atados entre cuatro familias, igual para todas. ¿Cómo se reparten?)
+[523.0s] lee: ¿Y Rampa y nosotras, nada? Ayer quedamos en que era igual para todas.
+[523.5s] elige «Mejor desatarlos: son veinte palitos.» (Dos atados entre cuatro familias, igual para todas. ¿Cómo se reparten?)
+[523.7s] lee: Cinco palitos: medio atado.
+[523.8s] lee: —Punto, mirá: partiendo cada atado por la mitad, daba lo mismo. Dos nombres para lo mismo.
+[524.7s] lee: —Uno, una raya, dos: un pedazo, de los que entran dos justos en un atado.
+[525.6s] lee: ¿Y si en vez de medio atado me dan medio montón? Allá hay seis atados.
+[526.2s] elige «Medio montón.» (¿Qué es más: medio atado o medio montón de seis atados?)
+[526.4s] lee: Medio montón son tres atados: mucho más que medio atado.
+[526.5s] lee: Medio, ¿de qué? Desde hoy, en mis cuentas eso va siempre.
+[526.6s] escena → c5.barras
+[526.8s] lee: Llegaron tres barras de tiza nueva para las cuatro familias. Estas no se desatan: son de una pieza.
+[526.9s] lee: El mío es más largo que el de Cornisa.
+[526.9s] lee: ¡Y el mío es el más chico!
+[527.0s] lee: Para que sea igual para todas, a cada una le tiene que tocar lo mismo.
+[527.1s] lee: —Punto: si las partes son iguales y cada una recibe las mismas, seguro que es lo mismo.
+[527.7s] elige «En 4.» (Tres barras entre cuatro familias. ¿En cuántas partes iguales cortás cada barra?)
+[527.9s] lee: Tres pedazos de cuarto cada una.
+[528.0s] lee: —Tres cuartos: tres pedazos del tamaño de un cuarto, el que entra cuatro veces justo en una barra.
+[528.8s] escena → c5.equivalentes
+[529.0s] lee: Me quedaba una barra para Cornisa y Peldaño. Cornisa la quiso en cuartos; Peldaño, por la mitad.
+[529.1s] lee: Yo tengo dos pedazos y Peldaño uno solo. ¡Tengo más!
+[529.6s] elige «Tienen lo mismo.» (Dos cuartos de barra o media barra: ¿quién tiene más tiza?)
+[531.1s] lee: Llegan justo hasta el mismo lugar.
+[531.6s] elige «Tres.» (¿Cuántos pedazos de un sexto de barra hacen media barra?)
+[531.9s] lee: Tres sextos llegan justo a la mitad.
+[532.0s] lee: —Punto: el mismo pedazo de barra, con tres nombres.
+[532.0s] lee: Bueno. Pero los míos son dos.
+[532.1s] escena → c5.recta
+[533.1s] lee: Para el registro: una línea como la de Curva, pero con el 1 bien lejos del 0. ¿Dónde anoto los tres cuartos de barra?
+[533.6s] elige «Partir cada tramo en 4.» (Para marcar 3/4, ¿en cuántas partes iguales partís el tramo de 0 a 1?)
+[535.4s] elige «Pasando el 1.» (¿Y dónde va 5/4: cinco pedazos del tamaño de un cuarto?)
+[535.6s] lee: —Punto, cinco pedazos de un cuarto: una barra entera y un cuarto más.
+[536.2s] elige «Sí, partiendo más fino.» (¿Hay algún número entre 1/2 y 3/4?)
+[536.4s] lee: Siempre cabe otro: partiendo más fino, aparece una marca en el medio.
+[537.2s] escena → c5.comparar
+[538.3s] lee: Punto dice que un cuarto de barra es más que un tercio, porque cuatro es más que tres. Yo prefiero el cuarto, entonces.
+[540.1s] lee: Ah, no. Me quedo con el tercio.
+[540.2s] lee: —Punto: más partes, más chicas.
+[540.3s] lee: ¿Y dos tercios o tres cuartos? A los dos les falta un pedazo para la barra entera.
+[540.5s] lee: Ocho doceavos contra nueve: tres cuartos es más. Al que le falta el pedazo más chico, tiene más.
+[540.6s] escena → c5.sumar
+[541.6s] lee: Le regalé a Peldaño un tercio de barra, de lo mío. Él ya tenía media. ¿Cuánto tiene ahora?
+[543.4s] lee: Lo de Punto es más corto que la media barra sola. Juntando, no puede haber menos.
+[543.7s] lee: —Punto: tres sextos y dos sextos son cinco sextos. Para sumar pedazos, primero del mismo tamaño.
+[543.7s] escena → c5.decimos
+[543.9s] lee: A mí me quedaron dos barras enteras y media. Lo anoto en el registro del depósito, por cajas, como siempre.
+[544.1s] lee: —Diez décimos hacen una barra, como diez palitos un atado. Y la coma de Punto separa las barras de sus partes.
+[544.2s] lee: Me sirve.
+[544.3s] lee: En el registro viejo encontré esto otro. ¿Es lo mismo?
+[545.2s] elige «No: es menos que 2,5.» (¿2,05 es lo mismo que 2,5?)
+[545.5s] lee: —Cinco centésimos son mucho menos que cinco décimos. El 0 guarda el lugar de los décimos, como en el depósito.
+[545.5s] lee: El cero otra vez. Ya no se me escapa.
+[545.6s] lee: ¿Y mis tres cuartos, cómo se anotan así?
+[545.7s] lee: Un cuarto son veinticinco centésimos: cuatro de esos hacen cien. Tres, setenta y cinco.
+[545.7s] escena → c5.cien
+[545.9s] lee: Para la próxima cosecha les ofrezco dos tratos. El 50 por ciento de 80 palitos, o el 80 por ciento de 50.
+[545.9s] lee: —Por ciento: de cada cien. El 50 % es 50 de cada 100: la mitad.
+[546.5s] elige «Dan lo mismo.» (¿Qué trato le conviene a Peldaño?)
+[546.7s] lee: Cuarenta las dos veces. Mara, sos tramposa.
+[547.6s] lee: Es la misma cuenta dada vuelta: 50 × 80 ÷ 100. Y el 50 % es multiplicar por un medio: achica.
+[547.7s] escena → c5.diagonal
+[548.7s] lee: Mi huerta nueva es cuadrada: de lado, una barra justa. Quiero un camino en diagonal. ¿Cuántas barras mide?
+[554.1s] elige «Hasta ahora ninguna. Quizás no haya ninguna.» (¿Habrá alguna partición del lado que mida la diagonal justo?)
+[554.3s] lee: —Ojo, Punto: un tercio de barra, en décimos, tampoco cierra: 0,3; 0,33; 0,333… Y en tercios entra justo.
+[554.4s] lee: Así que no cerrar en décimos no prueba nada. Lo raro de la diagonal es que tampoco entró en ninguna de las otras.
+[554.4s] lee: Que ninguna, nunca, entre justo, se puede probar. Lo voy a necesitar cuando dibujemos cuadrados.
+[554.5s] lee: —Con la raya ondulada: "más o menos". Lo exacto no lo sé escribir todavía.
+[554.6s] lee: Más o menos me alcanza para el camino. Pero, ¿cómo se anota un número que no sé cuánto vale?
+[554.9s] escena → c6.caja
+[555.9s] lee: En esta caja guardé atados antes de la Marea. No me acuerdo cuántos, y no la quiero abrir a la intemperie.
+[556.0s] lee: Lo que sí anoté: si saco tres, quedan cinco.
+[556.1s] lee: Un número que está, pero no se ve.
+[556.2s] lee: —Punto, vos hacés de lo que hay en la caja. Mientras no lo sepamos, le decimos x.
+[556.3s] lee: Abajo, lo que da x − 3. Arriba, el 5. Tienen que caer en el mismo lugar.
+[557.2s] lee: Ocho: ocho menos tres, cinco.
+[557.3s] lee: Ocho. Bien.
+[557.3s] escena → c6.dos-lados
+[558.3s] lee: Probando se encuentra. Pero si mañana son treinta cajas, me paso la vida moviendo a Punto.
+[558.4s] lee: Mi abuela decía: "el 3 pasa sumando". Nunca supe adónde pasaba.
+[559.7s] lee: Siguen juntos: si a los dos les sumo lo mismo, siguen coincidiendo.
+[559.8s] lee: —Ir tres para atrás y volver tres es quedarse en el lugar, para cualquier x. Queda x.
+[560.4s] elige «Sumar lo mismo a los dos lados, y simplificar.» (Entonces, ¿qué quería decir "el 3 pasa sumando"?)
+[560.6s] lee: Sumar 3 se puede hacer con cualquier x: ninguna solución se pierde. Y se deshace restando 3: no aparece ninguna nueva. Por eso es la misma cuenta, escrita de otra forma.
+[560.7s] lee: Ah. Así sí.
+[560.7s] escena → c6.memoria
+[561.7s] lee: Yo tengo otra caja: si le agrego tres, son cinco. Eso lo resuelvo de memoria.
+[561.8s] lee: El 3 pasa al otro lado. Ocho.
+[562.4s] elige «Poner a Punto en el 8 en la cuenta de arriba.» (Recta dice que x es 8. ¿Cómo lo comprobás?)
+[564.8s] lee: Con Punto en el 8, x + 3 da 11. No cae en el 5.
+[565.7s] lee: Dos. Dos más tres, cinco.
+[565.8s] lee: —El 3 sumaba: para sacarlo, se resta a los dos lados. "Pasa restando" es eso.
+[565.9s] lee: De memoria lo pasé con el signo que tenía. Y salió otra cuenta.
+[566.0s] escena → c6.por-cero
+[566.1s] lee: Yo tengo un truco más rápido: multiplico los dos lados por cero. Me queda cero igual a cero, y listo.
+[566.2s] lee: Los dos marcadores, en el cero. Y si muevo a Punto…
+[568.8s] lee: Con Punto en cualquier lado, siguen juntos en el cero. Con esta cuenta, cualquier caja serviría. En el 8 también siguen juntos: que el 8 siga sirviendo no alcanza, tampoco tienen que aparecer otras.
+[569.3s] elige «Por cero, todo cae en el mismo lugar: se perdió lo que decía la cuenta.» (¿Qué hizo el truco de Cuña?)
+[569.5s] lee: La caja tiene ocho. El truco dice que cualquier cosa.
+[569.6s] lee: Desde 0 = 0 no se puede volver: por cero no se deshace. Y lo que no se deshace puede hacer aparecer soluciones que no estaban.
+[569.6s] escena → c6.cuadrado
+[570.6s] lee: A mí me gusta elevar todo al cuadrado: x por x, y 3 por 3. Queda más lindo.
+[571.2s] elige «Dos.» (¿Cuántas x hacen que x · x caiga en el 9?)
+[572.3s] lee: Menos tres por menos tres, nueve. Apareció otra x.
+[573.3s] lee: —En la cuenta de Oval, x = 3, el −3 no cumple: los marcadores se separan. El −3 lo trajo el cuadrado.
+[573.4s] lee: Al cuadrado, −3 y 3 caen en el mismo 9: no se puede deshacer sin perder cuál era. Después de elevar, hay que probar en la cuenta de antes.
+[573.4s] lee: Más lindo, pero con un invitado de más.
+[573.5s] escena → c6.dividir
+[574.5s] lee: Esta la saqué rápido: x por x igual a x. Divido los dos lados por x, y queda x = 1.
+[575.1s] elige «Sí: 0 · 0 = 0.» (¿x = 0 cumple x · x = x?)
+[576.1s] lee: Con Punto en el 0, los dos dan 0: cumple.
+[577.1s] lee: Y en la cuenta dividida, con Punto en el 0, los marcadores desaparecen: dividir por cero no está definido, no hay ningún número.
+[577.2s] lee: —Al dividir por x, se suponía que x no es cero. Y justo el 0 era una de las soluciones. Se perdió.
+[577.3s] lee: —Por partes: si x no es cero, dividir se puede y se deshace, y queda x = 1. Si x es cero, se mira aparte: 0 · 0 = 0, cumple. No hay más.
+[577.3s] lee: Dos, el 0 y el 1. Y yo había encontrado una.
+[577.4s] escena → c6.al-reves
+[578.4s] lee: Me dieron un acertijo: −2 por x tiene que dar menos que 6. ¿Qué x sirven?
+[578.5s] lee: Ahora no es "igual": es "menor". Cuando se cumple, aparece una tilde sobre Punto.
+[580.3s] lee: Algunas x cumplen y otras no. Las que cumplen quedan marcadas debajo de la recta.
+[582.2s] lee: Las marcas no se movieron: cumplen las mismas x de antes. Y con Punto en el 0, sigue cumpliéndose: 0 > −3.
+[582.3s] lee: —Dividir por un negativo da vuelta la recta, como la media vuelta de las Terrazas: lo que estaba a la izquierda queda a la derecha. Por eso el signo se da vuelta.
+[582.4s] lee: Dividir por 2, en cambio, no da vuelta nada: 2x < 6 queda x < 3. Lo que da vuelta es el signo menos del número por el que se divide.
+[582.4s] escena → c6.dos-pasos
+[583.4s] lee: Una última: dos cajas iguales y un atado suelto son siete atados.
+[585.6s] lee: —Dividiendo primero también se llega, con mitades en el camino: x + 1/2 = 7/2, y x = 3.
+[585.7s] lee: ¿Y restando primero?
+[585.8s] lee: —También da 3. Sumar, restar, o dividir por un número que no es cero, a los dos lados, no pierde ni agrega soluciones: cualquier camino así que deje sola a la x llega al mismo número.
+[586.7s] lee: Dos por tres, más uno: siete. Se cumple.
+[586.7s] lee: Las dos cajas, de a tres. Ahora me acuerdo.
+[586.8s] lee: ¿Y si la caja está del otro lado? Tres atados son la cuarta parte de una caja.
+[588.8s] lee: Doce dividido cuatro, tres: los marcadores caen juntos. La x puede quedar de cualquier lado del igual.
+[588.9s] lee: Peldaño anda con otro problema: quiere una huerta cuadrada con justo dos cuadros de tierra. ¿Cuánto mide el lado?
+[589.0s] lee: Un número que, multiplicado por sí mismo, da 2. Uno por uno es 1; dos por dos, 4. Está en el medio. Hay que aprender a hacer crecer los números… y a deshacerlo.
+[589.0s] escena → c7.lado
+[589.3s] {"ended":true,"final":{"mode":"play","seg":"c7.lado"},"journal":["¿Están todos?","Demasiados para marcar","Menos que nada","Veces","Partes de algo","Lo que no se ve"],"evidenceKinds":["door","meet","record-method","record","recorded","pair","check","interpret","search","predict","seat","interpret-seat","conserve","count","numeral","meet-mara","compare-tallies","tie","fill-quick","bundled","ring-ten","ring-rest","compare-resolved","carry","write-empty","smudge","read-oval","untie","difference","new-room","build-205","write-debt","cancel","cancel-result","read-balance","predict-balance","predict-order","place","predict-steps","step","abs","forgive","forgive-how","forgive-result","forgive-same","read-minus","predict-pay","pay","pay-pad","pay-result","predict-pit","pit-climb","punto-goes","predict-total","gather","times","turn-predict","turn","turn-transfer","scale-choice","scale","flip-choice","predict-flip2","predict-share","share-round","rest","share","predict-measure","bag","measure-transfer","measure","share-zero","zero-bag","measure-zero","times-zero","predict-split","cut","distributive-transfer","share-two","unit-half","cut-uneven","share-bars","equiv-predict","equiv","equiv-transfer","equiv-names","line-partition","place-frac","predict-54","density","between","compare-unit","common-partition","compare-result","add-partition","add","store-half","read-205","decimal","percent-predict","percent","diag-try","diag-predict","diag","try-x","solve-box","op2","pasa-sumando","check-how","substitute","pass-wrong","times-zero-eq","square-predict","square","zero-root-predict","div-by-x","ineq-op","ineq","two-step","two-step-result","right-side"],"fps":{"min":"46.7","median":"60.0"},"errors":["[spot tapado] \"llenar otra bolsa de cero\" tapa a nz-stop","[spot tapado] \"partir en 6\" tapa a part-7","[spot tapado] \"partir en 12\" tapa a part-7","[spot tapado] \"partir en 5\" tapa a part-6","[spot tapado] \"en mitades\" tapa a dgp-3","[spot tapado] \"en mitades\" tapa a dgp-7","[spot tapado] \"en tercios\" tapa a dgp-5","[spot tapado] \"en tercios\" tapa a dgp-7","[spot tapado] \"en décimos\" tapa a dgp-2","[spot tapado] \"en décimos\" tapa a dgp-3","[spot tapado] \"en décimos\" tapa a dgp-5","[spot tapado] \"en décimos\" tapa a dgp-7","[spot tapado] \"en décimos\" tapa a dgp-12","[spot tapado] \"en doceavos\" tapa a dgp-3","[spot tapado] \"en doceavos\" tapa a dgp-5","[spot tapado] \"en quintos\" tapa a dgp-7","[spot tapado] \"en doceavos\" tapa a dgp-7","[spot tapado] \"−3 a los dos lados\" tapa a op-oneL","[spot tapado] \"+3 a los dos lados\" tapa a op-bothM","[spot tapado] \"÷ (−2), dando vuelta: >\" tapa a op-keep","[spot tapado] \"− 1\" tapa a op-m7","[spot tapado] \"÷ 2\" tapa a op-half","[spot tapado] \"÷ 2\" tapa a op-undo"],"seconds":589.33,"size":"844x390","touch":true,"route":"directa","watch":false}

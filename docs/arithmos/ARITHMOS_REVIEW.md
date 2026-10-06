@@ -309,5 +309,18 @@ de definiciones, alcance y frases falsas en su lectura literal.
 | mat-10 (11, 12) | M1, M5, M6, M7, M8 | «No dice nada del próximo caso»; «cuánto subió» ambiguo; «las rectas suben»; la tangente como «apenas toca»; la falacia «crecen cada vez menos» | Corregidos |
 | mat-10 (11, 12) | M2–M4, M9, M10 | Eje logarítmico sin decir, «4 seguros» con 5 días, equiprobabilidad de los dados, valor absoluto sin dibujar, cobertura de J | Pendientes (C11-R, C12-R) |
 
+## Revisión narrativa de los caps. 10 a 12 (rev-narr-8, 2026-10-07)
+
+Informe: `artifacts/arithmos/it10/review-narr-10-12/informe.md` (sobre a3cc472, sin navegador).
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | El cierre no cierra: la predicción no se pone a prueba, la Marea borra lo medido y deja lo supuesto, la escalera de 30 contra la de mil del cap. 7 | Corregido: la cuarta noche llega a 16 sobre la curva («la suposición aguantó una noche más: no es una prueba»); se redibuja a tiempo; la Marea grande pasa en su plano y la escalera resiste; «Llegamos»; la escalera es la de las Terrazas |
+| A2 | El arco de Punto se cuenta en vez de mostrarse | Parcial: Punto corre por la curva mientras se dice su viaje. Pendiente: que Punto anticipe algo él mismo, se equivoque en 10 y 12, y los cabos sueltos («¿Cómo te llamás?», la Ronda) |
+| A3 | Plantilla en las 24 escenas, menús evaluados, un solo botón | Pendiente (N10-12) |
+| A4 | Gráficos ilegibles para decidir (también en teléfono) | Parcial: en teléfono acostado la pizarra crece ~30 % mientras se toca (a3cc472). Pendiente: rótulos chicos a 1600×900 (11.4, 11.7) y predicciones hechas con el texto ocupando la pantalla |
+| A5 | Imagen contra tesis en las costuras (baldes con ciclo de tres, eje logarítmico sin decir) | Pendiente (N10-12) |
+| M1–M9 | Voces, Marea, costuras, cuentas, opciones, accesibilidad, composición, Bitácoras, 12.1 | Pendientes (N10-12); 12.1 ya elige en el panel de opciones |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

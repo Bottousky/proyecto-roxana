@@ -1,0 +1,39 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c7.lado"
+  },
+  "journal": [
+    "Lo que no se ve"
+  ],
+  "evidenceKinds": [
+    "try-x",
+    "solve-box",
+    "op2",
+    "pasa-sumando",
+    "check-how",
+    "substitute",
+    "pass-wrong",
+    "times-zero-eq",
+    "square-predict",
+    "square",
+    "zero-root-predict",
+    "div-by-x",
+    "ineq-op",
+    "ineq",
+    "two-step",
+    "two-step-result",
+    "right-side"
+  ],
+  "fps": {
+    "min": "20.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 37.801,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}

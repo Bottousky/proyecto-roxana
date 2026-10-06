@@ -559,7 +559,7 @@ async function fillFrames(d, g, slots, {total, prefix, keepScratch, quickAvailab
     const refresh = () => {
       const free = loose();
       const spots = free.map((o, i) => spotOf(o, `Palito suelto ${i + 1} de ${free.length}`, () => put(o)));
-      if (inFrame.length) spots.push(wordSpot('atar', inFrame.length === 10 ? 'atar' : `atar (hay ${inFrame.length})`, FRAME.x + 175, FRAME.y - 4, () => tie()));
+      if (inFrame.length) spots.push(wordSpot('atar', inFrame.length === 10 ? 'atar' : `atar (hay ${inFrame.length})`, FRAME.x + 175, FRAME.y - 70, () => tie()));
       if (quick && !inFrame.length && free.length >= 10) spots.push(wordSpot('llenar', 'llenar el molde de una vez', FRAME.x, FRAME.y - 70, () => fillAll()));
       if (bundles > 0 && free.length < 10 && !inFrame.length) spots.push(wordSpot('listo', 'listo: no alcanza para otro atado', FRAME.x + 175, FRAME.y + 60, () => done()));
       g.ui.setSpots(spots);
