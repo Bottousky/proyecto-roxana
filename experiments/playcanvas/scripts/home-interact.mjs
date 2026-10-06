@@ -7,6 +7,7 @@ import {mkdirSync,existsSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {previewState} from '../src/escuela/progress.js';
 import {ARTIFACTS} from '../src/escuela/artifacts.js';
+// Note: sections 7 and 8 simulate browser conditions (bfcache restore, entry-preview state); they verify the handlers.
 
 const base=process.env.HOME_URL||'http://127.0.0.1:4196/';
 const out=process.argv[2]||fileURLToPath(new URL('../output/home/interact/',import.meta.url));mkdirSync(out,{recursive:true});
@@ -44,7 +45,7 @@ async function artifactPoint(page,world){
   // Escape saltea la respuesta y abre el taller enseguida.
   await page.evaluate(()=>window.__escuela.closeRoom());await page.waitForTimeout(1800);
   const pt=await artifactPoint(page,'physica');await page.mouse.click(pt.x,pt.y);await page.waitForTimeout(200);await page.keyboard.press('Escape');await page.waitForTimeout(300);
-  ok('Escape saltea la respuesta',await page.evaluate(()=>!window.__escuela.diorama.reaction&&document.querySelector('#panel').dataset.room==='fisica'));
+  ok('Escape sale del gesto sin entrar al taller',await page.evaluate(()=>!window.__escuela.diorama.reaction&&!document.querySelector('#panel').dataset.room));
   // El botón del panel da el mismo gesto con teclado.
   await page.evaluate(()=>window.__escuela.openRoom('matematica'));await page.waitForTimeout(1500);
   await page.focus('#look-artifact');await page.keyboard.press('Enter');await page.waitForTimeout(300);
@@ -114,6 +115,51 @@ async function artifactPoint(page,world){
   await page.keyboard.press('Escape');await page.waitForTimeout(500);
   ok('contexto perdido: Escape cierra el panel',await page.evaluate(()=>!document.querySelector('#panel').dataset.room));
   await page.screenshot({path:`${out}/contexto-perdido.png`});
+  await ctx.close();
+}
+// 6 · Árboles: se desvanecen (no desaparecen de golpe) cuando un acercamiento los pone delante.
+{
+  const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
+  await open(page,base+'escuela.html?etapa=10&hora=tarde');await page.click('#cta-explore');await page.waitForTimeout(1800);
+  const pt=await artifactPoint(page,'arithmos');await page.mouse.click(pt.x,pt.y);await page.waitForTimeout(60);
+  const early=await page.evaluate(()=>window.__escuela.diorama.trees.map(t=>t.k));
+  await page.waitForTimeout(1200);
+  const later=await page.evaluate(()=>window.__escuela.diorama.trees.map(t=>t.k));
+  const fading=later.map((k,i)=>k<.05&&early[i]>.3).filter(Boolean).length;
+  ok('acercamiento: los árboles del primer plano se desvanecen (ninguno salta de golpe)',fading>0&&early.every(k=>k>.3),`desvanecidos ${fading}, mínimo al inicio ${Math.min(...early).toFixed(2)}`);
+  await ctx.close();
+}
+// 7 · Volver con Atrás (bfcache, SIMULADO con un pageshow persistido): la home relee la partida y cuenta el cambio.
+{
+  const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
+  await page.addInitScript(save=>{try{if(!sessionStorage.getItem('seeded')){localStorage.setItem('ohmdal.playcanvas.arc1.v1',save);localStorage.setItem('roxana.escuela.v1',JSON.stringify({version:1,stageSeen:3,welcomed:true}));sessionStorage.setItem('seeded','1');}}catch{}},JSON.stringify(previewState(3)));
+  await open(page,base+'escuela.html?hora=tarde');
+  await page.evaluate(save=>{localStorage.setItem('ohmdal.playcanvas.arc1.v1',save);document.body.classList.add('entering');document.querySelector('#portal-flash').classList.add('on');
+    dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));},JSON.stringify(previewState(5)));
+  await page.waitForTimeout(800);
+  const st=await page.evaluate(()=>({stage:window.__escuela.diorama.stage,card:!document.querySelector('#changes').classList.contains('hidden'),flash:document.querySelector('#portal-flash').classList.contains('on'),cta:document.querySelector('#cta-play').innerText}));
+  ok('regreso por bfcache (simulado): partida releída, tarjeta de cambios, sin destello',st.stage===5&&st.card&&!st.flash,JSON.stringify(st));
+  await ctx.close();
+}
+// 8 · Versión ligera: la vista previa de entrada no se ofrece ni puede dejar la pantalla sin salida.
+{
+  const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
+  await open(page,base+'escuela.html?hora=tarde');
+  await page.evaluate(()=>window.__escuela.openRoom('matematica'));await page.waitForTimeout(800);
+  await page.evaluate(()=>window.__escuela.diorama.app.graphicsDevice.gl.getExtension('WEBGL_lose_context').loseContext());await page.waitForTimeout(800);
+  await page.evaluate(()=>window.__escuela.openRoom('matematica'));await page.waitForTimeout(500);
+  const btn=await page.evaluate(()=>!!document.querySelector('#preview-entry'));
+  await page.evaluate(()=>document.body.classList.add('showcasing','previewing'));await page.keyboard.press('Escape');await page.waitForTimeout(300);
+  const stuck=await page.evaluate(()=>document.body.classList.contains('previewing')||document.body.classList.contains('showcasing'));
+  ok('versión ligera: sin «Ver la entrada» y Escape siempre sale',!btn&&!stuck,JSON.stringify({btn,stuck}));
+  await ctx.close();
+}
+// 9 · Movimiento reducido del sistema: sin partículas ni remolino animado.
+{
+  const ctx=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});const page=await ctx.newPage();page.setDefaultTimeout(30000);
+  await open(page,base+'escuela.html?etapa=10&hora=noche');await page.evaluate(()=>window.__escuela.openRoom('electronica'));await page.waitForTimeout(1500);
+  const rm=await page.evaluate(()=>{const d=window.__escuela.diorama,on=Object.entries(d.fx).filter(([,e])=>e.particlesystem.enabled).map(([k])=>k);return {reduced:d.reducedMotion,particles:on,jets:d.jets.some(j=>j.particlesystem.enabled)};});
+  ok('movimiento reducido: ninguna partícula ni chorro activos',rm.reduced&&!rm.particles.length&&!rm.jets,JSON.stringify(rm));
   await ctx.close();
 }
 ok('sin errores de página ni de consola',errors.length===0,errors.slice(0,3).join(' | '));

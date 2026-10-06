@@ -36,7 +36,7 @@ ok('el atajo 3 abre el Taller de Física',await page.evaluate(()=>document.query
 await page.focus('#look-artifact');await page.keyboard.press('Enter');await page.waitForTimeout(300);
 ok('«Mirar…» con Enter inicia el gesto',await page.evaluate(()=>window.__escuela.diorama.reaction?.world==='physica'));
 await page.keyboard.press('Escape');await page.waitForTimeout(600);
-ok('Escape termina el gesto y deja el taller abierto',await page.evaluate(()=>!window.__escuela.diorama.reaction&&document.querySelector('#panel').dataset.room==='fisica'));
+ok('Escape en un gesto iniciado desde el panel vuelve al panel',await page.evaluate(()=>!window.__escuela.diorama.reaction&&document.querySelector('#panel').dataset.room==='fisica'));
 await page.keyboard.press('Escape');await page.waitForTimeout(700);
 // 4 · Browser history: a room is a step back, and forward restores it.
 await page.evaluate(()=>window.__escuela.openRoom('direccion'));await page.waitForTimeout(900);

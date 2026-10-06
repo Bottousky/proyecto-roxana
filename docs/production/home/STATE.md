@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 10 cerrado (2026-10-06). No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 11 cerrado (2026-10-06). Sin críticos abiertos; falta la medición con la GPU libre. No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -169,7 +169,7 @@ NO VERIFICADO: FPS absolutos con la GPU libre; bfcache real; teléfono real; son
 ## Ciclo 8 (2026-10-06) — acercamientos limpios y el mapa que recuerda
 
 - **Acercamientos** (revisión #7 y #18): en salas, gestos y recorridos los árboles del patio que quedan delante o al
-  costado del sujeto se apartan; la exposición baja (−26 %) y el tinte de la tarde se neutraliza al acercarse; el
+  costado del sujeto se apagaban de golpe (rectificado: desde c11 se desvanecen); la exposición baja (−26 %) y el tinte de la tarde se neutraliza al acercarse; el
   rótulo del gesto pasa arriba con fondo propio; el aviso de exploración se oculta durante el gesto. Physica: la
   columna interior sube continua hasta el plato y la cortina exterior cae hasta la pileta; encuadre más abierto.
 - **Mapa del Taller de Electrónica** (memoria §7): cada lugar de Ohmdal aparece con su miniatura sólo tras su
@@ -185,7 +185,7 @@ las lámparas colgantes es emisiva (sin luz puntual propia); FPS sin medir con l
 - Pantalla del Anfiteatro a media luz desde la vista general (deja de ser lo más saturado del cuadro) y telón menos
   rojo; brilla entera con la sala abierta o un video.
 - Luz de acento cálida sobre la estatua de Roxana: de noche es el foco del patio.
-- Bruma más lejana y azulada de día (perspectiva aérea): el fondo deja de ser una pared beige; árboles lejanos con
+- Bruma más lejana; de mañana tira a azul, de tarde sigue beige oliva (rectificado en c11); árboles lejanos con
   suelo debajo. Colinas acercadas, pero **siguen fuera del encuadre** (la cámara maestra mira hacia abajo y el
   horizonte queda arriba del cuadro): no se forzó.
 - Noche: más luna y luz ambiente; en etapas bajas se leen las formas; en la etapa 10 los faroles restaurados
@@ -208,11 +208,27 @@ las lámparas colgantes es emisiva (sin luz puntual propia); FPS sin medir con l
   misma regla que `hourFor`.
 - QA: `npm test` 97/97; interacción **28/28** (incluye contexto perdido); teclado e historial 14/14.
 
+## Ciclo 11 (2026-10-06) — segunda revisión independiente y correcciones
+
+- Señal táctil de los artefactos: halo tenue del color de cada mundo que respira y se apaga en los acercamientos.
+  (Dos defectos propios al hacerlo: con mezcla aditiva la opacidad no actúa, y un comentario `//` se comió el
+  `addChild`, así que el halo no existía; ambos corregidos y verificados en la página.)
+- Directorio «Sobre Roxana»; Novedades sin enlaces muertos (resto en la misma página, `href="#"` rechazado, no leído en
+  primera visita sólo con contenido real); vista previa de entrada cancelable; lucernario de Bitland en violeta.
+- **Segunda revisión independiente**: 0 críticos, 4 altos. Triage en [`REVIEW-c11.md`](REVIEW-c11.md): ALTO 1–3
+  corregidos con prueba (versión ligera sin callejón, regreso por bfcache simulado, árboles que se desvanecen), ALTO 4
+  bloqueado por el entorno (GPU ocupada por otro agente todo el ciclo). Medios y bajos corregidos salvo #10 (arte).
+- Pósters del primer pintado por hora × tramo de progreso (abandonada / media / restaurada).
+- QA: `npm test` 98/98; interacción **32/32** (nuevas: árboles, bfcache simulado, ligera, movimiento reducido);
+  teclado e historial 15/15. Evidencias en `evidence/c11/`.
+
+NO VERIFICADO: FPS con la GPU libre; bfcache real (sólo simulado); teléfono real; sonido; memoria de GPU.
+
 ## Siguiente acción exacta
 
-1. Medición con la GPU libre (verificar antes con `ps` que no haya `playthrough.mjs`): FPS absolutos 1440 y 390,
-   reposo/sala/tras ciclos, en `PERF.md`.
-2. Segunda revisión independiente (agente separado, sólo lectura) sobre c08–c10 y los hallazgos abiertos; si no hay
-   críticos, armar el paquete CANDIDATO_PARA_REVISION (§14).
-3. Hallazgos abiertos de menor impacto: «Patio» vs «Sobre Roxana» en el directorio, «Y N más» sin enlace en
-   Novedades, vista previa de entrada sin cancelación, descubribilidad táctil de artefactos.
+1. **Medir con la GPU libre** (comprobar con `ps` que no haya Chrome headless de otros worktrees): `home-perf.mjs` a
+   1440 y 390 DPR 2, perfiles alto y bajo; actualizar PERF y presupuestos (draw calls en bajo ≤ 600).
+2. Con esa medición, si no aparecen críticos: preparar el paquete **CANDIDATO_PARA_REVISION** (§14) en
+   `docs/production/home/CANDIDATE.md` con ruta, cambios, capturas, pruebas, mediciones, integración de progreso,
+   fuentes y pendientes externos.
+3. Arte pendiente (#10 de c11): sprites de visitantes en primeros planos, vereda plana, setos octogonales.

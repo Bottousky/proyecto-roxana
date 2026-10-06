@@ -3,7 +3,7 @@
 // lowers the walls toward the camera. The school's stage (from the Ohmdal save)
 // switches on what each restoration returned: light, water, flowers, the tower lamp.
 import {Application,Entity,StandardMaterial,Color,Vec3,Quat,Mesh,MeshInstance,CameraFrame,Curve,CurveSet,Texture,
-  FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,TONEMAP_ACES,BLEND_NORMAL,BLEND_ADDITIVE,CULLFACE_NONE,CULLFACE_FRONT,
+  FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,TONEMAP_ACES,BLEND_NORMAL,BLEND_ADDITIVE,BLEND_NONE,CULLFACE_NONE,CULLFACE_FRONT,
   EMITTERSHAPE_BOX,EMITTERSHAPE_SPHERE,EnvLighting,FOG_LINEAR,TEXTUREPROJECTION_EQUIRECT,SHADOW_PCF5_16F,SSAOTYPE_LIGHTING,SSAOTYPE_NONE,PIXELFORMAT_RGBA8,FILTER_LINEAR,ADDRESS_CLAMP_TO_EDGE} from 'playcanvas';
 import {buildSchool,BUILDINGS,TOWER,LAMPS,STANDS,FOUNTAIN,AMPHI,ISLAND,TALLERES,WORLD_ORDER} from './school.js';
 import {makeWorldPortal,PORTAL_COLORS} from './portalfx.js';
@@ -77,7 +77,9 @@ export class SchoolDiorama {
     f.grading.enabled=true;
     if(this.quality==='high'){f.ssao.type=SSAOTYPE_LIGHTING;f.ssao.intensity=.45;f.ssao.radius=12;f.ssao.samples=12;f.ssao.blurEnabled=true;}
     // Tilt-shift: a narrow focus band on the target reads as a miniature.
-    f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=OVERVIEW.distance;f.dof.focusRange=60;f.dof.blurRadius=4;f.dof.blurRings=4;f.dof.blurRingPoints=5;f.dof.highQuality=this.quality==='high';
+    f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=OVERVIEW.distance;f.dof.focusRange=60;f.dof.blurRadius=4;f.dof.blurRings=4;f.dof.blurRingPoints=5;
+    // Full-resolution DOF cost frames at 1440 (ciclo 11, PERF.md) with no visible difference at this blur radius.
+    f.dof.highQuality=false;
     f.update();
   }
 
@@ -404,7 +406,7 @@ export class SchoolDiorama {
     x.strokeStyle='#8a6a3a';x.lineWidth=6;x.strokeRect(14,14,W-28,H-28);x.lineWidth=1.5;x.strokeRect(26,26,W-52,H-52);
     x.fillStyle='#4a3622';x.textAlign='center';x.font='600 46px "Cormorant Garamond", Georgia, serif';x.fillText('OHMDAL',W/2,76);
     x.font='italic 500 22px "Cormorant Garamond", Georgia, serif';x.fillStyle='#6b5236';x.fillText('Lo que volvió a encenderse',W/2,104);
-    const slot=i=>{const col=i%3,row=Math.floor(i/3);return [W*(.2+col*.3),150+row*190];};
+    const slot=i=>{const col=i%3,row=Math.floor(i/3);return [W*(.2+col*.3),138+row*178];};
     // The route of Arc I, dashed, through the nine places in order.
     x.setLineDash([10,9]);x.strokeStyle='rgba(110,80,45,.55)';x.lineWidth=3;x.beginPath();for(let i=0;i<9;i++){const [px,py]=slot(i);i?x.lineTo(px,py+70):x.moveTo(px,py+70);}x.stroke();x.setLineDash([]);
     for(let i=0;i<9;i++){const [px,py]=slot(i),p=places[i];
@@ -413,10 +415,10 @@ export class SchoolDiorama {
       else{x.fillStyle='rgba(239,224,189,.9)';x.beginPath();x.arc(px,py+70,46,0,Math.PI*2);x.fill();x.setLineDash([6,7]);x.strokeStyle='rgba(110,80,45,.5)';x.lineWidth=2;x.stroke();x.setLineDash([]);
         x.fillStyle='rgba(110,80,45,.45)';x.font='italic 500 34px "Cormorant Garamond", Georgia, serif';x.fillText('?',px,py+82);}
       x.fillStyle='#a5342a';x.beginPath();x.arc(px,py-2,7,0,Math.PI*2);x.fill();}
-    this.mapCanvas.refresh();this.onMap?.();
+    this.mapCanvas.refresh();this.mapUrl=null;this.onMap?.();
   }
   /** The same map as an image for the HTML panel (readable and with a text alternative there). */
-  mapImage(){return this.mapAtlas?this.mapCanvas.canvas.toDataURL('image/jpeg',.82):null;}
+  mapImage(){if(!this.mapAtlas)return null;return this.mapUrl??=this.mapCanvas.canvas.toDataURL('image/jpeg',.82);}
   /** Places of Ohmdal from the save; the atlas and the rug load the first time the workshop opens. */
   setPlaces(list){this.places=list;this.drawOhmdalMap();}
   async loadWorkshopArt(){
@@ -503,11 +505,11 @@ export class SchoolDiorama {
     const shadow=new StandardMaterial();shadow.diffuse=col('#000000');shadow.useLighting=false;shadow.opacityMap=this.glowTexture;shadow.opacity=.5;shadow.blendType=BLEND_NORMAL;shadow.depthWrite=false;shadow.update();
     for(const [x,z,type,s] of spots){
       const h=(type===1?8.2:7.2)*s,w=h*(type===1?.62:1.05);
-      const e=new Entity('Árbol');const mi=new MeshInstance(this.quadMesh(w,h),this.treeMaterials[type],e);mi.castShadow=true;
+      const mat=this.treeMaterials[type].clone();mat.update();const e=new Entity('Árbol');const mi=new MeshInstance(this.quadMesh(w,h),mat,e);mi.castShadow=true;
       e.addComponent('render',{meshInstances:[mi]});e.setPosition(x,-.05,z);this.root.addChild(e);
       const blob=new Entity('Sombra del árbol');const bm=new MeshInstance(this.quadMesh(w*.8,w*.8),shadow,blob);bm.castShadow=false;blob.addComponent('render',{meshInstances:[bm]});
       blob.setEulerAngles(-90,0,0);blob.setPosition(x,.1,z+w*.4);this.root.addChild(blob);
-      this.trees.push({e,blob,x,z,w,h,phase:x*.37+z*.11});
+      this.trees.push({e,blob,mat,x,z,w,h,phase:x*.37+z*.11,k:1});
     }
   }
   quadMesh(w,h){
@@ -689,7 +691,7 @@ export class SchoolDiorama {
   focus(id,{instant=false}={}){
     this.focusId=id&&ROOMS[id]?id:null;this.closeUp=false;
     this.flyTo(this.focusId?ROOMS[id].pose:OVERVIEW,{instant});
-    this.frame.dof.focusRange=this.focusId?16:60;this.frame.update();
+    this.frame.dof.focusRange=this.focusId?16:60;this.frame.update();this.stageDirty=true;
   }
   /**
    * The signature touch: the camera comes close to a workshop's artifact and the artifact answers in its own
@@ -784,7 +786,7 @@ export class SchoolDiorama {
       const sc=this.materials[`screen@${id}`];if(sc){sc.emissiveIntensity=t.world==='ohmdal'?L(1)*2.2:.7+night*.6;sc.update();}
     }
     const leds=this.materials['leds@programacion'];leds.emissiveIntensity=.35+night*.3;leds.update();
-    this.fx.smoke.particlesystem.enabled=L(1)>.5&&!this.reducedMotion;this.fx.portal.particlesystem.enabled=Boolean(this.cut?.electronica?.inside);this.fx.quantum.particlesystem.enabled=!this.reducedMotion&&Boolean(this.cut?.fisica?.inside);
+    this.fx.smoke.particlesystem.enabled=L(1)>.5&&!this.reducedMotion;this.fx.portal.particlesystem.enabled=!this.reducedMotion&&Boolean(this.cut?.electronica?.inside);this.fx.quantum.particlesystem.enabled=!this.reducedMotion&&Boolean(this.cut?.fisica?.inside);
     // Dirección is where the student started: always a little lit.
     glass('direccion',.25+h.windows*1.6);this.rooms.direccion.light.intensity=.8+night*1.1;
     const trophies=this.trophyState||[],earned=trophies.filter(t=>t.earned).length;
@@ -793,11 +795,11 @@ export class SchoolDiorama {
     const g=ease(L(2));this.parts.get('gate:w')?.setLocalEulerAngles(0,-105*g,0);this.parts.get('gate:e')?.setLocalEulerAngles(0,105*g,0);this.show('gate:chain',L(2)<.5);
     // 4 pump: water returns to the fountain.
     const water=this.parts.get('fountain:water');if(water){water.enabled=L(3)>.01;water.setLocalScale(1,1,1);water.setLocalPosition(0,(L(3)-1)*.45,0);}
-    this.show('fountain:leaves',L(3)<.5);for(const j of this.jets)j.particlesystem.enabled=L(3)>.6;this.fx.splash.particlesystem.enabled=L(3)>.6;
+    this.show('fountain:leaves',L(3)<.5);for(const j of this.jets)j.particlesystem.enabled=L(3)>.6&&!this.reducedMotion;this.fx.splash.particlesystem.enabled=L(3)>.6&&!this.reducedMotion;
     // 5 distribution: lamps light branch by branch.
     const lampMat=this.materials.lampGlass;lampMat.emissiveIntensity=L(4)*(.8+night*2.6);lampMat.update();
     this.lampLights.forEach((e,i)=>{const on=clamp(L(4)*LAMPS.length-i,0,1);e.light.intensity=on*(.3+night*2.3);});
-    this.fx.fireflies.particlesystem.enabled=L(4)>.5&&night>.7;
+    this.fx.fireflies.particlesystem.enabled=L(4)>.5&&night>.7&&!this.reducedMotion;
     // 6 irrigation: flowers, no weeds, a greener lawn.
     this.show('planters:dry',L(5)<.5);this.show('planters:green',L(5)>.05);this.show('planters:flowers',L(5)>.5);this.show('weeds',L(5)<.5);
     const green=this.parts.get('planters:green');if(green)green.setLocalScale(1,Math.max(.05,L(5)),1);
@@ -811,12 +813,13 @@ export class SchoolDiorama {
     {const sk=this.materials['lanternGlass@trofeos'];if(sk){if(!sk.darkGlass){sk.darkGlass=true;sk.diffuse=col('#2c3439');sk.gloss=.25;sk.metalness=0;}sk.emissiveIntensity=(.02+earned/12*.08)*(.4+night*.6);sk.update();}}
     this.rooms.lantern.light.intensity=L(8)*(.6+night*1.4);// Additive blending ignores opacity: the beam's strength lives in its emissive and it is off by day.
     const beam=L(8)*clamp((night-.75)/.25,0,1)*(1-(this.focusFade||0));this.beam.m.emissiveIntensity=beam*.12;this.beam.m.update();this.beam.pivot.enabled=beam>.01;
-    this.fx.lantern.particlesystem.enabled=L(8)>.5;
+    this.fx.lantern.particlesystem.enabled=L(8)>.5&&!this.reducedMotion;
     // The Faro in miniature answers the real Faro: dark glass until the lens is lit in Ohmdal.
     const fg=this.materials.faroGlass;fg.emissiveIntensity=L(8)*(.9+night*1.6);fg.update();this.rooms.faro.light.intensity=L(8)*(.15+night*.55);
     this.fx.climb.particlesystem.enabled=!this.reducedMotion;this.fx.spill.particlesystem.enabled=!this.reducedMotion;
     const cc=this.materials.cityCyan;cc.emissiveIntensity=.3+night*.7;cc.update();
     // The workshop's lamps work again (real `workshop`): its roof bulb too.
+    {const sh=this.materials['lampShade@electronica'];if(sh){sh.emissiveIntensity=.02+L(1)*(.3+night*1.1);sh.update();}}
     const pb=this.materials.pendantBulb;pb.emissiveIntensity=L(1)*(2.2+night*1.5);pb.update();
     const bo=this.materials.bulbOhm;bo.emissiveIntensity=L(1)*(1.1+night*2.2);bo.update();
     this.skylightBase=.45+night*1.1;const sk=this.materials.skylight;sk.emissiveIntensity=this.skylightBase;sk.update();
@@ -896,7 +899,7 @@ export class SchoolDiorama {
     this.parts.get('matematica:spin')?.setLocalEulerAngles(Math.sin(this.clock*.23)*14*motion,this.clock*11*motion,0);
     {const sk=this.materials.skylight;if(sk&&!this.reducedMotion){sk.emissiveIntensity=this.skylightBase*(.88+.12*Math.sin(this.clock*.8));sk.update();}}
     if(this.beam.pivot.enabled&&!this.reducedMotion)this.beam.pivot.setEulerAngles(0,this.clock*22,0);
-    this.materials['portal@electronica'].setParameter('uPortalTime',this.clock);
+    if(!this.reducedMotion)this.materials['portal@electronica'].setParameter('uPortalTime',this.clock);
     this.worldAngle=(this.worldAngle||0)+dt*(this.worldSpin??14);
     if(!this.reducedMotion){this.parts.get('world:fisica')?.setLocalEulerAngles(0,this.worldAngle,Math.sin(this.clock*.4)*6);
       this.boardClock=(this.boardClock||0)+dt;if(!this.boardSeq&&this.boardClock>.1){this.boardClock=0;this.drawBoard(this.clock);}}
@@ -905,13 +908,17 @@ export class SchoolDiorama {
     // Close-ups (a room, an artifact, a showcase): exposure eases down, and the patio trees standing between the
     // camera and what it looks at step aside, so nothing paints a flat sprite over the subject.
     {const want=this.focusId||this.closeUp?1:0,k=1-Math.exp(-dt*3);if(Math.abs((this.closeK||0)-want)>.004){this.closeK=lerp(this.closeK||0,want,k);this.stageDirty=true;}
-      const cp=this.camera.getPosition(),tg=this.cam.target,dx=tg.x-cp.x,dy=tg.y-cp.y,dz=tg.z-cp.z,L2=dx*dx+dy*dy+dz*dz||1;
+      // Judged from where the camera is going (its goal), not where it is: the decision is made once, on the click.
+      const g=this.goal,gy=g.yaw*Math.PI/180,gp=g.pitch*Math.PI/180,tg=g.target,cp={x:tg.x+Math.sin(gy)*Math.cos(gp)*g.distance,y:tg.y+Math.sin(gp)*g.distance,z:tg.z+Math.cos(gy)*Math.cos(gp)*g.distance};
+      const dx=tg.x-cp.x,dy=tg.y-cp.y,dz=tg.z-cp.z,L2=dx*dx+dy*dy+dz*dz||1,fade=1-Math.exp(-dt*(this.reducedMotion?60:9));
       for(const t of this.trees){let hide=false;
-        // Any tree in the visible foreground (nearer than or beside the subject, inside the view) is set aside.
+        // Any tree in the visible foreground (nearer than or beside the subject, inside the view) fades aside.
         if(want){const L=Math.sqrt(L2),u=((t.x-cp.x)*dx+(t.h*.5-cp.y)*dy+(t.z-cp.z)*dz)/L2,px=cp.x+dx*u,pz=cp.z+dz*u,cam=this.camera.camera,r=this.canvas.getBoundingClientRect();
           const halfW=Math.tan(cam.fov*Math.PI/360)*Math.max(1,r.width/Math.max(1,r.height))*u*L;
           hide=u>.02&&u<1.3&&Math.hypot(px-t.x,pz-t.z)<halfW+t.w*.5;}
-        if(t.hidden!==hide){t.hidden=hide;t.e.enabled=!hide;t.blob.enabled=!hide;}}}
+        const k=lerp(t.k,hide?0:1,fade);if(Math.abs(k-t.k)>.002||(k<.01)!==(t.k<.01)){t.k=k<.01?0:k>.995?1:k;
+          // Blend only while fading: at rest the tree keeps its cut-out (sorted, cheap) rendering.
+          t.mat.blendType=t.k<1?BLEND_NORMAL:BLEND_NONE;t.mat.opacity=t.k;t.mat.depthWrite=t.k>=1;t.mat.update();t.e.enabled=t.k>0;t.blob.enabled=t.k>.5;}}}
     // Artifacts: the floating stone breathes in its column, chip and easel keep their routines.
     {const fl=this.parts.get('float:physica'),bp=this.basePos.get('float:physica');if(fl&&bp){const m=this.reducedMotion?0:1;fl.setLocalPosition(bp.x+Math.sin(this.clock*.7)*.08*m,bp.y+Math.sin(this.clock*.9)*.32*m+(this.floatLift||0)*1.1,bp.z+Math.cos(this.clock*.6)*.08*m);fl.setLocalEulerAngles(this.clock*14*m,this.clock*22*m,0);}
       this.artClock=(this.artClock||0)+dt;if(this.artClock>(this.reducedMotion?1:.066)){this.artClock=0;const t=this.reducedMotion?0:this.clock;this.drawChip(t,this.bitlandAwake||0,this.chipBurst||0);this.drawYard(t+(this.yardShift||0),this.yardBoost||0);}
@@ -939,7 +946,7 @@ export class SchoolDiorama {
     if(this.videoTexture){this.videoTexture.destroy();this.videoTexture=null;}this.video=null;
     this.materials.screen.emissiveMap=this.screen.texture;this.materials.screen.update();
   }
-  setQuality(q){this.quality=q;this.app.graphicsDevice.maxPixelRatio=Math.min(window.devicePixelRatio||1,q==='high'?2:1.25);this.frame.rendering.samples=q==='high'?4:1;this.frame.ssao.type=q==='high'?SSAOTYPE_LIGHTING:SSAOTYPE_NONE;this.frame.dof.highQuality=q==='high';this.frame.update();this.sun.light.shadowResolution=q==='high'?4096:2048;}
+  setQuality(q){this.quality=q;this.app.graphicsDevice.maxPixelRatio=Math.min(window.devicePixelRatio||1,q==='high'?2:1.25);this.frame.rendering.samples=q==='high'?4:1;this.frame.ssao.type=q==='high'?SSAOTYPE_LIGHTING:SSAOTYPE_NONE;this.frame.dof.highQuality=false;this.frame.update();this.sun.light.shadowResolution=q==='high'?4096:2048;}
   setReducedMotion(v){this.reducedMotion=v;this.stageDirty=true;}
 }
 void CULLFACE_FRONT;void Quat;void ISLAND;

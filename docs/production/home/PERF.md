@@ -72,3 +72,22 @@ Comparación relativa con la misma carga (`evidence/c07/perf-*-v2.json`):
 Conclusión prudente: no hay degradación atribuible a los ciclos con carga igual; el 16,4 FPS del ciclo 6 se midió
 en un primer plano con desenfoque cercano y bajo contención. **Pendiente:** medir con la GPU libre para dar FPS
 absolutos y repetir el «después» en el móvil emulado. LCP 196–204 ms.
+
+## Ciclo 11 · primera medición con la GPU libre (build, `evidence/c11/perf/`)
+
+Condición verificada con `ps` antes y después de cada corrida (Chrome headless de otros worktrees). 1440 alto:
+limpia de punta a punta. 1440 bajo: limpia al empezar, otro agente arrancó durante la corrida. 390: contaminadas.
+
+| Configuración | Listo | LCP | Reposo (vista general) | Sala | Tras 10 ciclos | Draw calls |
+|---|---|---|---|---|---|---|
+| 1440 alto (limpia) | 1,7 s | 96 ms | **53,3 FPS · p95 33,3 ms** | 60,2 | 60,2 | 934 |
+| 1440 bajo (limpia al inicio) | 1,6 s | 88 ms | 60,1 · p99 16,8 | 60,2 | 60,2 | 650 / 660 |
+| 390 DPR2 alto (contaminada) | 1,9 s | 88 ms | 60,1 | 60,2 | 44,8 | 770 |
+| 390 DPR2 bajo (contaminada) | 1,6 s | 112 ms | 60,1 | 60,2 | 60,2 | **484** (≤ 600) |
+
+CLS 0 en todas; entidades estables; heap tras GC 32 MB en todas.
+
+**Hallazgo:** en perfil alto la vista general a 1440 no sostiene 60 FPS. A/B (contaminado, sólo indicativo): sin
+DOF de alta calidad → 60,2 FPS sin cuadros lentos; la comparación visual no muestra diferencia (`evidence/c11/dof-alta.jpg`
+vs `dof-baja.jpg`). Cambio aplicado: DOF en calidad normal en ambos perfiles. **Re-medición pendiente** con la GPU libre
+(ver abajo si se completó).

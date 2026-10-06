@@ -122,11 +122,18 @@ function artifactLine(world){
     arithmos:['Arithmos · la misma cantidad','Cambia la forma de escribirla, no lo que vale. El mundo todavía está en preparación.'],
   }[world];
 }
-function touchArtifact(room){
+function touchArtifact(room,{fromPanel=false}={}){
   const w=worldByRoom(room);if(!w)return openRoom(room);
   explore();document.body.classList.add('reacting');ambience.chime(w.id==='ohmdal'?[523.3,659.3,784]:[392,493.9,587.3]);
   const [title,text]=artifactLine(w.id);caption(title,text);
-  diorama.reactArtifact(w.id,{onEnd:()=>{document.body.classList.remove('reacting');setTimeout(()=>caption(''),600);openRoom(room);}});
+  diorama.reactArtifact(w.id,{onEnd:()=>{caption('');document.body.classList.remove('reacting');openRoom(room);}});
+  diorama.reaction&&(diorama.reaction.fromPanel=fromPanel,diorama.reaction.room=room);
+}
+/** Escape during a gesture: back where the student was (the panel, if the gesture came from it), never further in. */
+function leaveGesture(){
+  const r=diorama.reaction;if(!r)return;const back=r.fromPanel?r.room:null;
+  r.onEnd=()=>{};diorama.endReaction();caption('');document.body.classList.remove('reacting');
+  if(back)openRoom(back);else{diorama.focus(null);canvas.focus({preventScroll:true});}
 }
 
 // ── Rooms ───────────────────────────────────────────────────────────────────────
@@ -135,6 +142,7 @@ function openRoom(id){
   if(diorama.reaction){diorama.reaction.onEnd=()=>{};diorama.endReaction();document.body.classList.remove('reacting');caption('');}
   if(document.body.classList.contains('previewing'))diorama.cancelEntryPreview?.();
   if(id==='sobre')id='patio';
+  if(id!=='anfiteatro')stopPlayback();
   if(id==='novedades')return openNews();
   if(!ROOMS[id])return;
   explore();
@@ -229,7 +237,7 @@ function renderTaller(id){
     ?`<section class="world-hero" style="--cover:url('${asset('/assets/cover.webp')}')"><div class="hero-shade"></div><div class="hero-text"><span class="eyebrow">Mundo aplicado · ${esc(w.verb)}</span><h3>OHMDAL</h3><p class="rule">LA LUZ</p><p>El mundo no perdió su luz. Olvidó cómo encenderla.</p></div></section>`
     :`<section class="world-hero generated" style="--c:${w.color}"><span class="hero-glyph" aria-hidden="true">${esc(w.glyph)}</span><div class="hero-shade"></div><div class="hero-text"><span class="eyebrow">Mundo aplicado · ${esc(w.verb)}</span><h3>${esc(w.name.toUpperCase())}</h3><p class="rule">${esc(w.discipline.toUpperCase())}</p><p>${esc(w.entry.name)}: todavía en preparación.</p></div></section>`;
   if(w.id!=='ohmdal')return `${hero}
-  <div class="cta-row"><button class="primary" disabled>${svg('lock')} Entrada en preparación</button>${w.entry.preview?`<button class="quiet" id="preview-entry">${svg('play')} Ver la entrada</button>`:`<span class="meta">Verbo central: ${esc(w.verb)}</span>`}</div>
+  <div class="cta-row"><button class="primary" disabled>${svg('lock')} Entrada en preparación</button>${w.entry.preview&&!document.body.classList.contains('light')?`<button class="quiet" id="preview-entry">${svg('play')} Ver la entrada</button>`:`<span class="meta">Verbo central: ${esc(w.verb)}</span>`}</div>
   <button class="quiet look" id="look-artifact">${svg('spark')} Mirar ${esc(ARTIFACT_NAMES[w.id])}</button>
   <section class="card"><span class="eyebrow">Cómo se entra</span><b class="entry-name">${esc(w.entry.name)}</b><p>${esc(w.entry.detail)}</p></section>
   <section class="card"><span class="eyebrow">El mundo</span><p>${esc(w.premise)}</p></section>
@@ -251,7 +259,7 @@ function renderMapCard(){
 }
 // When the map finishes drawing (its atlas loads on first visit), the panel's copy follows.
 diorama.onMap=()=>{const img=document.getElementById('ohmdal-map'),src=diorama.mapImage?.();if(img&&src){img.src=src;img.hidden=false;}};
-function bindTaller(id){$('#enter-portal')?.addEventListener('click',enterPortal);$('#preview-entry')?.addEventListener('click',()=>previewEntry(id));$('#look-artifact')?.addEventListener('click',()=>{closeRoom();touchArtifact(id);});}
+function bindTaller(id){$('#enter-portal')?.addEventListener('click',enterPortal);$('#preview-entry')?.addEventListener('click',()=>previewEntry(id));$('#look-artifact')?.addEventListener('click',()=>{closeRoom();touchArtifact(id,{fromPanel:true});});}
 const ARTIFACT_NAMES={ohmdal:'el Faro en miniatura',physica:'la columna de agua',bitland:'la ciudad bajo la lente',arithmos:'el pizarrón del caballete'};
 // A preview of how a world still in preparation will be entered. Only Arithmos has one so far.
 const PREVIEWS={
@@ -259,9 +267,11 @@ const PREVIEWS={
   physica:{flash:'quantum',lines:{a:'Una pecera con un mundo adentro.',b:'Desde la consola se regulan sus leyes.',c:'Quien se acerca se vuelve del tamaño de un átomo.',dive:'Un mundo donde las leyes se pueden regular.'}},
   bitland:{flash:'vr',lines:{a:'Un casco conectado a un microcontrolador.',b:'El visor se enciende.',c:'Adentro del chip, una ciudad corre sobre instrucciones.',dive:'Bitland.'}},
 };
+// Leaves an entry preview at once, without waiting for the 3D (which may be gone).
+function endPreviewNow(){document.body.classList.remove('showcasing','previewing');caption('');$('#portal-flash').classList.remove('on','chalk','quantum','vr');if(diorama.entrySeq)diorama.entrySeq=null;if(diorama.boardSeq)diorama.boardSeq=null;}
 function previewEntry(id){
   const w=worldByRoom(id),plan=PREVIEWS[w?.id];
-  if(!plan||document.body.classList.contains('showcasing'))return;
+  if(!plan||document.body.classList.contains('showcasing')||document.body.classList.contains('light')||diorama.quiet)return;
   document.body.classList.add('showcasing','previewing');diorama.panelShift=0;diorama.panelShiftY=0;ambience.chime([392,523.3,659.3]);
   const flash=$('#portal-flash');
   diorama.playEntryPreview(w.id,{
@@ -376,11 +386,11 @@ async function showChanges(){
   const fresh=RESTORATIONS.slice(seen,stage),card=$('#changes');
   card.innerHTML=`<button class="changes-close" id="changes-close" aria-label="Cerrar">${svg('close')}</button><span class="eyebrow">Cambió por tu aventura</span><h2 id="changes-title">${fresh.length===1?'Algo volvió al Instituto':`${fresh.length} cosas volvieron al Instituto`}</h2>
     <ul class="changes-list">${fresh.slice(-3).map(r=>`<li><b>${esc(r.world)}</b> ${esc(r.school)}</li>`).join('')}</ul>${fresh.length>3?`<p class="meta">Y ${fresh.length-3} más.</p>`:''}
-    <div class="row-buttons"><button class="quiet" id="changes-show">${svg('play')} Ver qué cambió</button></div>`;
+    ${document.body.classList.contains('light')?'':`<div class="row-buttons"><button class="quiet" id="changes-show">${svg('play')} Ver qué cambió</button></div>`}`;
   card.classList.remove('hidden');
   const close=()=>card.classList.add('hidden');
   $('#changes-close').addEventListener('click',close);
-  $('#changes-show').addEventListener('click',async()=>{
+  $('#changes-show')?.addEventListener('click',async()=>{
     close();explore();document.body.classList.add('showcasing');diorama.setStage(seen,{instant:true});
     for(let i=seen;i<stage;i++){
       if(!document.body.classList.contains('showcasing'))break;
@@ -413,8 +423,8 @@ $('#opt-stage').value=previewStage??'';
 $('#opt-stage').addEventListener('change',e=>{const v=e.target.value;const u=new URL(location.href);if(v==='')u.searchParams.delete('etapa');else u.searchParams.set('etapa',v);location.href=u.toString();});
 addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!$('#changes').classList.contains('hidden')){$('#changes').classList.add('hidden');return;}
-  if(e.key==='Escape'&&diorama.reaction){diorama.endReaction();return;}
-  if(e.key==='Escape'&&document.body.classList.contains('previewing')){diorama.cancelEntryPreview?.();return;}
+  if(e.key==='Escape'&&diorama.reaction){leaveGesture();return;}
+  if(e.key==='Escape'&&document.body.classList.contains('previewing')){if(diorama.quiet||document.body.classList.contains('light'))endPreviewNow();else diorama.cancelEntryPreview?.();return;}
   if(e.key==='Escape'&&document.body.classList.contains('showcasing')){document.body.classList.remove('showcasing');caption('');return;}
   if(e.key==='Escape'){if(!$('#settings').classList.contains('hidden'))$('#settings').classList.add('hidden');else if(diorama.focusId||$('#panel').dataset.room)closeRoom();}
   if(e.target.closest?.('input,select,textarea'))return;
@@ -484,13 +494,20 @@ function route(){
 }
 document.querySelectorAll('.intro-links a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRoom(a.getAttribute('href').slice(1));}));
 addEventListener('popstate',route);
-addEventListener('pageshow',e=>{if(e.persisted){document.body.classList.remove('entering');$('#portal-flash').classList.remove('on');}});
+// Back from a world through the browser's cache: the page wakes as it was left (portal close-up, old save).
+// Read the save again, put the campus where the URL says, and tell what changed.
+addEventListener('pageshow',e=>{if(!e.persisted)return;
+  document.body.classList.remove('entering');$('#portal-flash').classList.remove('on');
+  if(previewStage===null)save=readOhmdal();setupWayIn();refreshProgress({instant:true});
+  traversing=true;try{const hash=decodeURIComponent(location.hash.slice(1));if(hash==='novedades'||hash==='sobre'||ROOMS[hash])route();else{if($('#panel').dataset.room)closeRoom();diorama.focus(null);}}finally{traversing=false;}
+  showChanges();});
 $('#cta-explore').addEventListener('click',()=>{explore();canvas.focus({preventScroll:true});toast('Tocá un edificio para acercarte. El directorio de abajo lleva a cada sala.');});
 canvas.addEventListener('pointerdown',()=>explore(),{passive:true});
 addEventListener('resize',()=>{if(!diorama.focusId){diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();}});
 
 // The light version: the same home without 3D (no WebGL, failed load).
 function lightVersion(reason,{retry=false}={}){
+  endPreviewNow();document.querySelector('#preview-entry')?.remove();
   document.body.classList.remove('exploring','reacting','showcasing');document.body.classList.add('light');canvas.hidden=true;syncInert();
   $('#cta-explore').hidden=true;
   const el=$('#light');el.classList.remove('hidden');
@@ -509,7 +526,7 @@ canvas.addEventListener('webglcontextlost',e=>{
 syncInert();setupWayIn();refreshGreeting();
 const newsReady=loadNews(base).then(r=>{const n=unreadCount(r.items,profile.newsSeen);markUnread(n);return {...r,unread:n};});
 (async()=>{
-  if(diorama.quiet){lightVersion('Este navegador no puede mostrar el campus en 3D. Todo lo demás está acá.');$('#intro-load').hidden=true;route();return;}
+  if(diorama.quiet){lightVersion('Este navegador no puede mostrar el campus en 3D. Todo lo demás está acá.');$('#intro-load').hidden=true;route();showChanges();return;}
   try{
     await diorama.build(p=>{$('#loading-bar').style.width=`${Math.round(p*100)}%`;});
     syncHour();applySettings();refreshProgress({instant:true});newsReady.then(r=>diorama.setNotices(r.items,unreadCount(r.items,profile.newsSeen)));
