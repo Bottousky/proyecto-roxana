@@ -294,6 +294,7 @@
   .wb-probe p{flex-basis:100%}
   .wb-meter-readout{min-width:0}
   .wb-compact-controls,.wb-terminal-drawer,.wb-piece-list{display:none}
+  .wb-line-plate{left:1.5%!important;top:auto!important;bottom:1.5%;transform:none}
   .wb-plate .wb-knob{display:flex}
   .wb-plate .wb-switch{display:inline-flex}
   .wb-plate.has-control{flex-direction:column;gap:2px;padding:3px 6px 4px}

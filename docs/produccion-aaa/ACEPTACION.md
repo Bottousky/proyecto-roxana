@@ -36,6 +36,8 @@ Con ese cambio, las dos candidatas completaron el recorrido con carga de 5 a 9 (
 
 **NO VERIFICADO:** teléfono real (tacto y rendimiento), escucha del audio y prueba con personas.
 
+**Después de la aceptación:** un ajuste sólo de estilo en el teléfono apaisado. En las Terrazas, la placa «Cable de la ladera» pasa a la esquina inferior izquierda, porque el mando del freno del calor tapaba su estado. Verificado con `qa-landscape.mjs` (sin errores) y `qa-bench-load.mjs` a 844×390 (9/9).
+
 ## Candidata reemplazada: `3422928` (5 oct 2026)
 
 
