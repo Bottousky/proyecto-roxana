@@ -1,0 +1,19 @@
+[0.0s] escena → c12.familias
+[1.0s] lee: Juntemos las reglas del viaje. Dibujé cinco formas. Cada regla tiene la suya: si reconocemos la forma, sabemos qué esperar.
+[3.9s] lee: —Mara: cada forma es una familia. Las rectas suben parejo; las que despegan, duplican; las U son iguales de los dos lados; las olas vuelven; las que tienen un hueco no están definidas en un lugar. Viendo un pedazo, uno ya sabe qué esperar.
+[4.6s] escena → c12.perillas
+[5.7s] lee: Todas las rectas son de la misma familia, pero no son iguales. La escalera de Mara: el día 0 tenía 1 escalón; el día 3, 31. ¿Qué recta es?
+[7.1s] lee: —Rampa: b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia.
+[7.9s] escena → c12.salto
+[8.9s] lee: Punto salta de alegría. Mara le midió la altura: a los t segundos está a 6t − t², y tarda 6 en volver al piso.
+[9.5s] elige «A los 3: la mitad del salto.» (¿Cuándo está más alto?)
+[12.1s] lee: A los 3, la mitad: el salto es igual de los dos lados.
+[12.2s] lee: —Cornisa: los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta.
+[12.9s] escena → c12.encadenar
+[13.3s] lee: Puse dos máquinas en fila: «el doble más uno» y «por sí mismo». Si entra 2, ¿importa cuál va primero?
+[15.2s] lee: 25 y 9: el orden importa. Encadenar reglas es otra regla, y depende de cuál va primero.
+[15.8s] elige «Menos uno, y después la mitad.» (¿Qué máquina deshace «el doble más uno»?)
+[16.2s] lee: Se deshace en el orden contrario, como en el capítulo de la caja: 5 menos 1 es 4, la mitad, 2.
+[16.7s] elige «3 o −3: con el 9 solo no se sabe.» (Si «por sí mismo» dio 9, ¿qué entró?)
+[17.1s] lee: —Mara: «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.
+[18.3s] {"ended":true,"final":{"mode":"title","seg":"c12.encadenar"},"journal":[],"evidenceKinds":["family-try","families","knob","params","jump-predict","jump-tap","jump","compose","inverse-predict","inverse-square"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":18.26,"size":"1600x900","touch":false,"route":"directa","watch":false}

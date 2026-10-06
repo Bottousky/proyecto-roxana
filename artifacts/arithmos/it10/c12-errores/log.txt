@@ -1,0 +1,48 @@
+[0.0s] escena → c12.familias
+[1.0s] lee: Juntemos las reglas del viaje. Dibujé cinco formas. Cada regla tiene la suya: si reconocemos la forma, sabemos qué esperar.
+[4.0s] lee: —Mara: cada forma es una familia. Las rectas suben parejo; las que despegan, duplican; las U son iguales de los dos lados; las olas vuelven; las que tienen un hueco no están definidas en un lugar. Viendo un pedazo, uno ya sabe qué esperar.
+[4.8s] escena → c12.perillas
+[5.8s] lee: Todas las rectas son de la misma familia, pero no son iguales. La escalera de Mara: el día 0 tenía 1 escalón; el día 3, 31. ¿Qué recta es?
+[7.5s] lee: —Rampa: b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia.
+[8.3s] escena → c12.salto
+[9.3s] lee: Punto salta de alegría. Mara le midió la altura: a los t segundos está a 6t − t², y tarda 6 en volver al piso.
+[9.9s] elige «Cerca del final, a los 5.» (¿Cuándo está más alto?)
+[11.7s] lee: A los 3, justo en la mitad: el salto es una U dada vuelta, igual de los dos lados.
+[11.7s] lee: —Cornisa: los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta.
+[12.5s] escena → c12.encadenar
+[12.9s] lee: Puse dos máquinas en fila: «el doble más uno» y «por sí mismo». Si entra 2, ¿importa cuál va primero?
+[15.4s] lee: 25 y 9: el orden importa. Encadenar reglas es otra regla, y depende de cuál va primero.
+[15.9s] elige «La mitad, y después menos uno.» (¿Qué máquina deshace «el doble más uno»?)
+[16.3s] lee: Con 5: la mitad es 2,5, menos uno 1,5: no vuelve al 2. Se deshace en el orden contrario: menos uno, la mitad.
+[16.9s] elige «3.» (Si «por sí mismo» dio 9, ¿qué entró?)
+[17.3s] lee: —Mara: «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.
+[18.1s] escena → c12.rapido
+[18.4s] lee: En el salto de Punto: justo al segundo 1, ¿qué tan rápido sube?
+[19.3s] lee: —En un tramo se puede medir: cuánto subió dividido cuánto tiempo pasó. Del 1 al 2 subió de 5 a 8: 3 por segundo.
+[21.8s] elige «A 3,99: es el último que dio.» (¿A qué número se acercan?)
+[22.2s] lee: Con un tramo más corto daría 3,999, y después 3,9999: se acercan a 4.
+[22.3s] lee: —Cornisa: justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul, al final, apenas toca el salto: es la tangente.
+[23.0s] escena → c12.junta
+[23.4s] lee: Abrí la canilla del pozo de a poco: a los t minutos salen 2t baldes por minuto. ¿Cuánta agua juntamos en 3 minutos?
+[25.8s] elige «6: el último caudal.» (¿A cuántos baldes se acercan las sumas?)
+[26.2s] lee: Seis es el caudal del final, por minuto. Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.
+[27.0s] lee: —Balcón: si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó.
+[27.8s] escena → c12.tramos
+[28.2s] lee: Mi precio por redibujar escalones: hasta 10, un trozo de tiza cada uno. Después del décimo, medio trozo por escalón.
+[30.3s] elige «16: uno por escalón.» (¿Cuánta tiza cobra por 16 escalones?)
+[30.7s] lee: El primer tramo cuesta 10; los 6 escalones que siguen, medio cada uno: 3. Total, 13.
+[30.8s] lee: —Rampa: tu precio es una función por tramos: una regla hasta 10 y otra después. La distancia al cero del pozo también era así: a la izquierda del cero, −x; a la derecha, x. Un solo gráfico, dos reglas.
+[31.6s] escena → c12.anticipar
+[31.9s] lee: La Marea vuelve. Medí cuánto subió cada noche: 1, 2, 4, 8 escalones. La escalera grande tiene 30. ¿Llegamos a terminar de redibujar?
+[34.0s] elige «Suma lo mismo: una recta» (¿Qué familia sigue la Marea?)
+[34.5s] lee: Una recta no pasa por los cuatro: de 1 a 2 sube 1, de 4 a 8 sube 4. No suma lo mismo.
+[35.7s] elige «Va y vuelve: una ola» (¿Qué familia sigue la Marea?)
+[36.1s] lee: Hasta ahora sólo sube, y cada vez más: no parece una ola.
+[37.4s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[38.3s] elige «En la noche 4: 16.» (¿En qué noche la Marea pasa la escalera?)
+[38.6s] lee: La cuarta llega a 16: todavía no. La quinta, 32: ahí pasa.
+[38.7s] lee: —Mara: tenemos cuatro noches. No hace falta redibujar todo: lo que entendimos, la Marea no lo borra. Hay que redibujar lo que todavía no se entiende.
+[39.5s] lee: La escalera sigue ahí.
+[39.6s] lee: —Punto: al principio eras un punto que contaba. Después tuviste un lado para ir, una flecha. Ahora corrés por un gráfico, un paso adelante.
+[40.8s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[41.2s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["family-try","families","knob","params","jump-predict","jump-tap","jump","compose","inverse-predict","inverse-square","rate","derivative-predict","accum","integral-predict","piecewise-predict","final-family","final-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":41.208,"size":"1600x900","touch":false,"route":"errores","watch":false}

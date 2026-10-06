@@ -9,5 +9,6 @@ import {CHAPTER_8} from './ch8/chapter.js';
 import {CHAPTER_9} from './ch9/chapter.js';
 import {CHAPTER_10} from './ch10/chapter.js';
 import {CHAPTER_11} from './ch11/chapter.js';
+import {CHAPTER_12} from './ch12/chapter.js';
 
-export const CHAPTERS = {1: CHAPTER_1, 2: CHAPTER_2, 3: CHAPTER_3, 4: CHAPTER_4, 5: CHAPTER_5, 6: CHAPTER_6, 7: CHAPTER_7, 8: CHAPTER_8, 9: CHAPTER_9, 10: CHAPTER_10, 11: CHAPTER_11};
+export const CHAPTERS = {1: CHAPTER_1, 2: CHAPTER_2, 3: CHAPTER_3, 4: CHAPTER_4, 5: CHAPTER_5, 6: CHAPTER_6, 7: CHAPTER_7, 8: CHAPTER_8, 9: CHAPTER_9, 10: CHAPTER_10, 11: CHAPTER_11, 12: CHAPTER_12};

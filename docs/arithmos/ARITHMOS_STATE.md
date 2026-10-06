@@ -13,7 +13,11 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 
 ## Estado real (ciclo 6 del loop, 2026-10-06)
 
-- **Capítulos 1 a 11 jugables y encadenados.** El cap. 11 «Lo que pasa a veces» (frecuencia que se
+- **El recorrido completo, capítulos 1 a 12, es jugable y está encadenado.** El cap. 12 «Anticipar»
+  (familias, perillas, el salto de Punto, composición e inversa, derivada como límite de velocidades,
+  integral como límite de sumas, por tramos, y el cierre con la Marea y el arco de Punto) pasa las dos
+  rutas (`it10/c12-*`); sin revisión independiente todavía.
+- El cap. 11 El cap. 11 «Lo que pasa a veces» (frecuencia que se
   estabiliza, promedio y mediana, rango, gráfico tramposo de Punto que borra la Marea, principio de
   multiplicación, dos dados, correlación vs causa, gancho al cap. 12) pasa las dos rutas (`it09/c11-*`).
 - El cap. 10 El cap. 10 «Vueltas y flechas» (radianes, seno como

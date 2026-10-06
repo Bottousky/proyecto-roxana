@@ -70,7 +70,7 @@ tiene un rasgo mínimo (tamaño, ritmo de parpadeo). Lino es el más chico.
 | 9 | Depende | G: relación vs función, dominio, imagen, tablas, gráficos, expresiones | jugable, en revisión |
 | 10 | Vueltas y flechas | H: trigonometría, radianes, periodicidad, vectores, complejos como rotación, sistemas y matrices | jugable, sin revisar |
 | 11 | Lo que pasa a veces | I: estadística, dispersión, lectura crítica de gráficos, conteo, probabilidad, correlación vs causa | jugable, sin revisar |
-| 12 | Anticipar | J: familias de funciones, parámetros, composición, inversa, tasa de cambio, límite/derivada/acumulación en su nivel | pendiente |
+| 12 | Anticipar | J: familias de funciones, parámetros, composición, inversa, tasa de cambio, límite/derivada/acumulación en su nivel | jugable, sin revisar |
 
 ## Capítulo 1 — ¿Están todos? (guion implementado)
 
@@ -369,6 +369,29 @@ juntas no dice que una cause la otra.**
 
 Límites a declarar: la estabilización es observada, no prueba; los dados se suponen parejos; la
 correlación se muestra con pocos datos.
+
+## Capítulo 12 — Anticipar (implementado, 2026-10-06)
+
+Pregunta de entrada (gancho del cap. 11): las reglas que vimos son todas distintas; ¿y si las ponemos
+juntas para elegir la que sirve cada vez? Idea central: **las reglas se agrupan en familias que se
+reconocen por su forma; los parámetros las ajustan; un gráfico se lee (ceros, signo, crece/decrece,
+máximos); las reglas se encadenan y algunas se deshacen; la tasa de cambio dice qué tan rápido, y
+juntar lo que entra de a poco da el total. Con eso se anticipa.** Cierre del arco de Punto: el punto
+que empezó siendo un punto suelto termina recorriendo gráficos, adelantándose.
+
+| # | Escena | Idea | Decisión | Consecuencia |
+|---|---|---|---|---|
+| 12.1 | Familias | Familias de funciones por su forma | Poner cada regla del viaje (escalera de Mara, de Punto, huerta x · x, rueda, reparto 1 ÷ (x − 2), distancia al cero, ¿cuántas veces?) con su forma | Recta, curva que despega, U, ola, curva con un hueco que no se cruza, V, curva que se aplana |
+| 12.2 | Perillas | Parámetros | Girar las perillas de y = a · x + b hasta pasar por dos puntos | b mueve para arriba y abajo; a inclina; la escalera de Mara es a = 10, b = 1 |
+| 12.3 | El tiro de Punto | Ceros, signo, crecimiento, máximo | Leer la altura de Punto en un salto: 6t − t² | Ceros en 0 y 6, máximo 9 en t = 3; sube hasta 3, baja después |
+| 12.4 | Una tras otra | Composición e inversa | Encadenar «el doble más uno» y «por sí mismo» en los dos órdenes; buscar la máquina que deshace | Distinto orden, distinto resultado; «menos uno, la mitad» deshace la primera (cap. 6); x · x sólo se deshace si se sabe el signo (cap. 7) |
+| 12.5 | Qué tan rápido | Tasa de cambio; de la secante a la tangente | La velocidad de Punto en t = 1: promedio en tramos cada vez más cortos | 3; 3,5; 3,9; 3,99 → 4: la velocidad en un instante (derivada, nombrada) |
+| 12.6 | Lo que se junta | Acumulación | El pozo se llena con un caudal que crece; sumar rectángulos cada vez más finos | El total se acerca al área bajo el gráfico del caudal (integral, nombrada) |
+| 12.7 | Por tramos | Funciones por tramos; valor absoluto | La tarifa de la tiza: hasta 10, 1 cada uno; después, la mitad | Una regla con dos tramos; la distancia al cero es otra: −x a la izquierda, x a la derecha |
+| 12.8 | Anticipar | Cierre del juego | Con la Marea creciendo, elegir la familia y las perillas para anticipar cuándo llega a la escalera | Las Terrazas se salvan; Punto recorre el gráfico adelantándose; fin |
+
+Límites a declarar: derivada e integral se nombran y se ven como límite de promedios y de sumas, sin
+reglas de cálculo; las familias se reconocen por la forma en un tramo, no se clasifican todas.
 
 ## Criterios de escena (lo que las revisiones marcaron una y otra vez)
 

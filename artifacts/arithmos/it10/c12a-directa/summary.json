@@ -1,0 +1,30 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c12.encadenar"
+  },
+  "journal": [],
+  "evidenceKinds": [
+    "family-try",
+    "families",
+    "knob",
+    "params",
+    "jump-predict",
+    "jump-tap",
+    "jump",
+    "compose",
+    "inverse-predict",
+    "inverse-square"
+  ],
+  "fps": {
+    "min": "20.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 18.26,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

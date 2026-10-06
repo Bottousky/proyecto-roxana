@@ -518,6 +518,19 @@
         "C10"
       ],
       "acceptance": "Idem; cierre narrativo",
+      "status": "implementado",
+      "evidence": [
+        "artifacts/arithmos/it10/c12-directa/log.txt",
+        "artifacts/arithmos/it10/c12-errores/log.txt"
+      ]
+    },
+    {
+      "id": "C12-R",
+      "title": "Revisión independiente (matemática y narrativa) del cap. 12 y del recorrido completo",
+      "deps": [
+        "C12"
+      ],
+      "acceptance": "Hallazgos registrados y corregidos o justificados",
       "status": "pendiente",
       "evidence": []
     },
