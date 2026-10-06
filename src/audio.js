@@ -429,6 +429,12 @@ export class AudioDirector {
         this._wood(360, time, 0.055);
         this._tone(660, time + 0.025, 0.22, 0.032, 'sine', this.effects, 0);
         break;
+      case 'map':
+        // A sheet unfolding: two short rustles and a soft settle.
+        this._noise(time, 0.09, 0.06, 2600, true);
+        this._noise(time + 0.07, 0.12, 0.05, 1800, true);
+        this._noise(time + 0.17, 0.16, 0.035, 900);
+        break;
       case 'disconnect':
         this._wood(300, time, 0.05);
         this._noise(time, 0.05, 0.09, 1400, true);
