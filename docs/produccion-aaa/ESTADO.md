@@ -451,6 +451,12 @@ viaje desde la lista o tocando el lugar. El detalle está en [MAPA.md](MAPA.md).
 medida: el río del juego cae sobre agua pintada en el 100 % de los puntos, y lugares y caminos
 sobre tierra en el 100 %.
 
+## Ciclo 18 · El Monte Quieto y la Casa de Compuertas (6 oct 2026)
+
+A pedido del usuario, al oeste del Manantial ahora hay una montaña con una central de agua callada.
+Responde a lo que se hizo en el reino y deja el umbral del Arco II. El detalle está en
+[MONTE-QUIETO.md](MONTE-QUIETO.md). El mapa suma sombreado de relieve y el nombre del monte.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -477,6 +483,7 @@ sobre tierra en el 100 %.
 | 18 | Puzzles/UI | Bancos difíciles de entender: qué hacer, cómo, cuándo está bien, cómo seguir (reporte del usuario) | Hecho (ciclo 15): ver BANCOS-UX.md. Prueba con personas NO VERIFICADA |
 | 19 | Móvil | Teléfono apaisado: banco ilegible, mapa fuera de la vista | Hecho (ciclo 16) en emulación; hardware real NO VERIFICADO |
 | 20 | Mapa | El mapa no parecía de un juego ni seguía la geografía (reporte del usuario) | Hecho (ciclo 17): ver MAPA.md. Teléfono real NO VERIFICADO |
+| 21 | Mundo | Montaña y central al oeste del Manantial, umbral del Arco II (pedido del usuario) | Hecho (ciclo 18): ver MONTE-QUIETO.md |
 
 ## Comandos útiles (desde `experiments/playcanvas`)
 
