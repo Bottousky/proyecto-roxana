@@ -2,7 +2,7 @@ import '../fonts.css';
 import './escuela.css';
 import {SchoolDiorama,HOURS,hourFor} from './diorama.js';
 import {ROOMS,ROOM_ORDER,OVERVIEW,TALLER_ROOMS} from './rooms.js';
-import {RESTORATIONS,WORLDS,worldByRoom,readOhmdal,schoolStage,previewState,trophies,cinematics,ohmdalSummary,readProfile,saveProfile} from './progress.js';
+import {storageOrNull,RESTORATIONS,WORLDS,worldByRoom,readOhmdal,schoolStage,previewState,trophies,cinematics,ohmdalSummary,readProfile,saveProfile} from './progress.js';
 import {SAVE_KEY,validateState} from '../game/state.js';
 import {CHANNEL,EXPLICACIONES,ANIMACIONES,CINEMATIC_FILES} from './videos.js';
 import {Ambience} from './ambience.js';
@@ -32,6 +32,9 @@ const previewStage=params.has('etapa')?Math.max(0,Math.min(10,Number(params.get(
 let profile=readProfile();
 let save=previewStage!==null?previewState(previewStage):readOhmdal();
 const settings=profile.settings;
+// The system's «reduce motion» counts as much as the school's own switch, and is followed if it changes.
+const motionQuery=matchMedia('(prefers-reduced-motion: reduce)');
+const reduced=()=>settings.reducedMotion||motionQuery.matches;
 
 // The 3D interface goes after the intro in the document, so keyboard order starts with the way in. The canvas
 // is not a tab stop (the directory is its keyboard equivalent) but can take focus back when a panel closes.
@@ -54,8 +57,8 @@ document.querySelector('#escuela').insertAdjacentHTML('beforeend',`
   <section id="settings" class="settings hidden" aria-label="Ajustes">
     <label><input type="checkbox" id="opt-motion"> Reducir movimiento</label>
     <label><input type="checkbox" id="opt-quality"> Gráficos de alta calidad</label>
-    <label>Ver la escuela en otra etapa <select id="opt-stage"><option value="">Mi partida</option>${Array.from({length:11},(_,i)=>`<option value="${i}">Etapa ${i}${i?` · ${RESTORATIONS[i-1].world}`:' · abandonada'}</option>`).join('')}</select></label>
-    <small>La vista previa no modifica tu partida.</small>
+    ${import.meta.env.DEV||params.has('qa')?'':'<!-- vista previa de etapas: sólo con ?qa -->'}<label class="${import.meta.env.DEV||params.has('qa')?'':'hidden'}">Ver la escuela en otra etapa <select id="opt-stage"><option value="">Mi partida</option>${Array.from({length:11},(_,i)=>`<option value="${i}">Etapa ${i}${i?` · ${RESTORATIONS[i-1].world}`:' · abandonada'}</option>`).join('')}</select></label>
+    <small class="${import.meta.env.DEV||params.has('qa')?'':'hidden'}">La vista previa no modifica tu partida.</small>
   </section>
   <div id="preview-banner" class="preview-banner hidden"></div>
   <footer class="dock">
@@ -66,7 +69,7 @@ document.querySelector('#escuela').insertAdjacentHTML('beforeend',`
   </footer>
   <aside id="panel" class="panel" aria-hidden="true" tabindex="-1"><div class="panel-inner" id="panel-inner"></div></aside>
   <div id="caption" class="caption" aria-live="polite"></div>
-  <div id="changes" class="changes hidden" role="dialog" aria-labelledby="changes-title"></div>
+  <div id="changes" class="changes hidden" role="region" aria-labelledby="changes-title"></div>
   <section id="light" class="light-worlds hidden" aria-label="Mundos Aplicados"></section>
   <div id="portal-flash" class="portal-flash"></div>
   <div id="toast" class="toast" role="status"></div>`);
@@ -77,7 +80,7 @@ const ambience=new Ambience();
 // diorama's calls and the light version lists the worlds, news and Roxana.
 function quietDiorama(){const state={quiet:true,focusId:null,hoverId:null,hourId:'tarde',screen:null};return new Proxy(state,{get:(t,k)=>k in t?t[k]:()=>{},set:(t,k,v)=>{t[k]=v;return true;}});}
 let diorama;
-try{diorama=new SchoolDiorama(canvas,{quality:settings.quality,reducedMotion:settings.reducedMotion||matchMedia('(prefers-reduced-motion: reduce)').matches});}
+try{diorama=new SchoolDiorama(canvas,{quality:settings.quality,reducedMotion:reduced()});}
 catch(err){console.warn('Campus 3D no disponible:',err.message);diorama=quietDiorama();}
 diorama.hourId=params.get('hora')&&HOURS[params.get('hora')]?params.get('hora'):hourFor();
 
@@ -128,6 +131,8 @@ function touchArtifact(room){
 
 // ── Rooms ───────────────────────────────────────────────────────────────────────
 function openRoom(id){
+  // Choosing a room ends any gesture in progress instead of being overridden by it when it finishes.
+  if(diorama.reaction){diorama.reaction.onEnd=()=>{};diorama.endReaction();document.body.classList.remove('reacting');caption('');}
   if(id==='sobre')id='patio';
   if(id==='novedades')return openNews();
   if(!ROOMS[id])return;
@@ -139,16 +144,19 @@ function openRoom(id){
   $('#panel-inner').innerHTML=`<header class="panel-head"><button class="panel-back" id="panel-back" aria-label="Volver al Instituto">${svg('back')}<span>Instituto</span></button><span class="eyebrow">${esc(ROOMS[id].eyebrow)}</span><h2>${esc(ROOMS[id].name)}</h2></header><div class="panel-body">${renderRoom(id)}</div>`;
   $('#panel-back').addEventListener('click',closeRoom);bindRoom(id);
   if(!profile.rooms.includes(id)){profile.rooms.push(id);persistProfile();}
-  setUrl(id==='patio'?'sobre':id);
+  setUrl(id==='patio'?'sobre':id);syncInert();
   requestAnimationFrame(()=>panel.focus({preventScroll:true}));
 }
 let opener=null;
+// What is hidden leaves the keyboard order: the intro while exploring or reading a panel, the panel while closed.
+function syncInert(){const open=Boolean($('#panel').dataset.room);$('#panel').inert=!open;$('#intro').inert=open||document.body.classList.contains('exploring');}
 function closeRoom({intro=false}={}){
   const was=opener;opener=null;
   stopPlayback();ambience.set({room:null});diorama.focus(null);document.body.classList.remove('room-open');
   $('#panel').setAttribute('aria-hidden','true');delete $('#panel').dataset.room;document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current','false'));
   setUrl('');
   if(intro)showIntro();else{diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();}
+  syncInert();
   // Focus returns to what opened the panel, or to the campus.
   const back=was&&was.isConnected&&was!==document.body&&!was.closest('#panel')?was:document.body.classList.contains('light')?$('#cta-play'):canvas;back.focus({preventScroll:true});
 }
@@ -199,15 +207,15 @@ function renderDireccion(){
 function bindDireccion(){
   $('#student-name').addEventListener('input',e=>{profile.name=e.target.value.trim().slice(0,40);persistProfile();refreshGreeting();});
   document.querySelectorAll('input[name=crest]').forEach(r=>r.addEventListener('change',()=>{profile.crest=r.value;persistProfile();$('.crest-big').textContent=CRESTS[r.value].label;}));
-  $('#export-save')?.addEventListener('click',()=>{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return;const url=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='Ohmdal-La-Luz-bitacora.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Copia de la Bitácora descargada.');});
+  $('#export-save')?.addEventListener('click',()=>{const raw=storageOrNull()?.getItem(SAVE_KEY);if(!raw)return toast('No se pudo leer la partida de este navegador.');const url=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='Ohmdal-La-Luz-bitacora.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Copia de la Bitácora descargada.');});
   $('#import-save')?.addEventListener('change',async e=>{
     const file=e.target.files?.[0];if(!file)return;
-    try{const state=validateState(JSON.parse(await file.text()));if(previewStage!==null)throw new Error('Salí de la vista previa para importar.');localStorage.setItem(SAVE_KEY,JSON.stringify(state));save=state;refreshProgress();openRoom('direccion');toast('Bitácora importada. La escuela se actualiza.');}
+    try{const state=validateState(JSON.parse(await file.text()));if(previewStage!==null)throw new Error('Salí de la vista previa para importar.');const store=storageOrNull();if(!store)throw new Error('Este navegador no permite guardar datos del sitio.');store.setItem(SAVE_KEY,JSON.stringify(state));save=state;refreshProgress();openRoom('direccion');toast('Bitácora importada. La escuela se actualiza.');}
     catch(err){toast(err.message||'No se pudo leer la copia.');}
   });
   $('#reset-save')?.addEventListener('click',()=>{
     if(!confirm('¿Borrar la partida de Ohmdal de este navegador? Exportá una copia antes si querés conservarla.'))return;
-    localStorage.removeItem(SAVE_KEY);save=null;refreshProgress();openRoom('direccion');toast('Partida borrada.');
+    try{storageOrNull()?.removeItem(SAVE_KEY);}catch{}save=null;refreshProgress();openRoom('direccion');toast('Partida borrada.');
   });
   $('#pref-sound').addEventListener('change',e=>setSound(e.target.checked));
   $('#pref-motion').addEventListener('change',e=>{settings.reducedMotion=e.target.checked;persistProfile();applySettings();});
@@ -250,22 +258,21 @@ function previewEntry(id){
   diorama.playEntryPreview(w.id,{
     onLine:key=>caption(w.name,plan.lines[key]||''),
     onDive:()=>{ambience.chime([523.3,784,1046.5,1318.5]);flash.classList.add('on',plan.flash);setTimeout(()=>flash.classList.remove('on'),900);},
-    onEnd:()=>{caption('');document.body.classList.remove('showcasing','previewing');setTimeout(()=>flash.classList.remove(plan.flash),600);diorama.panelShift=panelFraction();diorama.panelShiftY=innerWidth>820?0:.6;toast(`Así se va a entrar a ${w.name}. El mundo todavía está en preparación.`);},
+    onEnd:()=>{caption('');document.body.classList.remove('showcasing','previewing');setTimeout(()=>flash.classList.remove(plan.flash),600);diorama.panelShift=panelFraction();diorama.panelShiftY=innerWidth>820?0:.6;toast(`Un boceto de la entrada a ${w.name}: el mundo todavía está en preparación y puede cambiar.`);},
   });
 }
 function enterPortal(){
   diorama.flyTo({target:[-34.2,2.25,-4],yaw:90,pitch:6,distance:9});
   document.body.classList.add('entering');$('#portal-flash').classList.add('on');
-  setTimeout(()=>{location.href=base+'index.html'+(save&&previewStage===null?'#continuar':'');},settings.reducedMotion?50:1500);
+  setTimeout(()=>{location.href=base+'index.html'+(save&&previewStage===null?'#continuar':'');},reduced()?50:1500);
 }
 
 let trophyWorld='ohmdal';
 function renderTrofeos(){
-  const w=WORLDS.find(x=>x.id===trophyWorld),list=w.available?trophies(save):Array.from({length:12},()=>({title:'???',detail:'',earned:false,progress:0,kind:'medal'})),earned=list.filter(t=>t.earned).length;
+  const w=WORLDS.find(x=>x.id===trophyWorld),list=w.available?trophies(save):[],earned=list.filter(t=>t.earned).length;
   return `
   <div class="tabs" role="tablist">${WORLDS.map(x=>`<button role="tab" data-world="${x.id}" aria-selected="${x.id===trophyWorld}" style="--c:${x.color}"><span class="tab-glyph">${esc(x.glyph)}</span>${esc(x.name)}</button>`).join('')}</div>
-  <p class="count"><b>${earned}</b> de ${list.length} trofeos de ${esc(w.name)}</p>
-  ${w.available?'':`<p class="meta empty">La grada de ${esc(w.name)} espera sus doce trofeos. Llegan cuando se abra la entrada del ${esc(w.taller)}.</p>`}
+  ${w.available?`<p class="count"><b>${earned}</b> de ${list.length} trofeos de ${esc(w.name)}</p>`:`<p class="meta empty">La grada de ${esc(w.name)} está vacía. Sus logros llegarán cuando el mundo comparta su progreso con el Instituto; todavía no hay una lista.</p>`}
   <div class="trophies">${list.map(t=>`<article class="trophy ${t.earned?'earned':''}"><div class="trophy-icon">${svg(t.kind==='medal'?'medal':t.kind)}</div><div><b>${esc(t.earned||t.progress>0?t.title:'???')}</b><p>${esc(t.earned?t.detail:t.progress>0?t.detail:'Un lugar espera bajo el vidrio.')}</p>${!t.earned&&t.progress>0?`<div class="progress small"><i style="width:${Math.round(t.progress*100)}%"></i></div>`:''}</div></article>`).join('')}</div>`;
 }
 function bindTrofeos(){document.querySelectorAll('[data-world]').forEach(b=>b.addEventListener('click',()=>{trophyWorld=b.dataset.world;$('.panel-body').innerHTML=renderTrofeos();bindTrofeos();$(`[data-world="${trophyWorld}"]`)?.focus();}));}
@@ -322,7 +329,7 @@ function renderPatio(){
   const stage=schoolStage(save);
   return `<p class="eyebrow">Sobre Roxana</p><p class="lead">Roxana es una antigua escuela técnica que enseñaba mediante los Mundos Aplicados: lugares donde comprender una disciplina permite intervenir sobre consecuencias reales.</p>
   <p>La directora fundadora del programa permanece en la memoria de la escuela a través de esta estatua, documentos y relatos incompletos. Mira hacia el portón y sostiene un libro cerrado contra el pecho.</p>
-  <section class="card"><span class="eyebrow">La escuela recupera su luz</span><b class="big">${stage} de ${RESTORATIONS.length*WORLDS.length}</b><div class="progress"><i style="width:${stage/(RESTORATIONS.length*WORLDS.length)*100}%"></i></div><p class="meta">Cada restauración en un Mundo Aplicado devuelve algo al Instituto. Hoy está abierto el portal de Ohmdal; Physica, Bitland y Arithmos esperan en sus talleres.</p></section>
+  <section class="card"><span class="eyebrow">Lo que Ohmdal devolvió al Instituto</span><b class="big">${stage} de ${RESTORATIONS.length}</b><div class="progress"><i style="width:${stage/RESTORATIONS.length*100}%"></i></div><p class="meta">Cada restauración en Ohmdal devuelve algo al Instituto. Physica, Bitland y Arithmos esperan en sus talleres: su progreso todavía no llega a la escuela.</p></section>
   <p class="meta">Quién fue Roxana, qué es realmente la Bitácora y qué relación tuvo el Instituto con cada mundo son preguntas que la escuela todavía conserva.</p>
   ${renderCommunity()}`;
 }
@@ -331,14 +338,18 @@ function renderPatio(){
 function refreshProgress({instant=false}={}){
   const stage=schoolStage(save);diorama.setStage(stage,{instant});diorama.setTrophies(trophies(save));ambience.set({stage});
   // Four worlds, ten lamps each: the school's light is shared among them.
-  $('#school-meter').innerHTML=`<span class="meter-label">La escuela recupera su luz</span>${WORLDS.map(w=>{const n=w.id==='ohmdal'?stage:0;return `<span class="meter-world ${w.available?'':'off'}" style="--c:${w.color}" title="${esc(w.name)}${w.available?` · ${n}/${RESTORATIONS.length}`:' · en preparación'}"><i class="glyph">${esc(w.glyph)}</i><span class="lamps">${RESTORATIONS.map((r,i)=>`<i class="${i<n?'on':''}"></i>`).join('')}</span></span>`;}).join('')}<b>${stage}/${RESTORATIONS.length*WORLDS.length}</b>`;
+  // Only Ohmdal shares its progress with the school today: the other worlds show their sign, not invented counts.
+  $('#school-meter').innerHTML=`<span class="meter-label">La escuela recupera su luz</span>${WORLDS.map(w=>w.id==='ohmdal'
+    ?`<span class="meter-world" style="--c:${w.color}" title="${esc(w.name)} · ${stage} de ${RESTORATIONS.length} restauraciones"><i class="glyph">${esc(w.glyph)}</i><span class="lamps">${RESTORATIONS.map((r,i)=>`<i class="${i<stage?'on':''}"></i>`).join('')}</span><b>${stage}/${RESTORATIONS.length}</b></span>`
+    :`<span class="meter-world off" style="--c:${w.color}" title="${esc(w.name)} · todavía sin integrar"><i class="glyph">${esc(w.glyph)}</i></span>`).join('')}<span class="meter-note">los otros mundos, sin integrar</span>`;
   $('#preview-banner').classList.toggle('hidden',previewStage===null);
   if(previewStage!==null)$('#preview-banner').innerHTML=`Vista previa · etapa ${previewStage}. <a href="${location.pathname}">Volver a mi partida</a>`;
   refreshGreeting();
 }
 function refreshGreeting(){$('.brand-sub').textContent=profile.name?`Registro de ${profile.name}`:'Escuela de Mundos Aplicados';}
 function persistProfile(){saveProfile(profile);}
-function applySettings(){diorama.setReducedMotion(settings.reducedMotion);diorama.setQuality(settings.quality);$('#opt-motion').checked=settings.reducedMotion;$('#opt-quality').checked=settings.quality==='high';document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);}
+function applySettings(){diorama.setReducedMotion(reduced());diorama.setQuality(settings.quality);$('#opt-motion').checked=settings.reducedMotion;$('#opt-quality').checked=settings.quality==='high';document.documentElement.classList.toggle('reduced-motion',reduced());}
+motionQuery.addEventListener?.('change',()=>applySettings());
 function setSound(on){
   settings.muted=!on;persistProfile();if(on)ambience.start();else ambience.stop();
   const b=$('#sound-button');b.setAttribute('aria-pressed',String(on));b.innerHTML=svg(on?'sound':'mute');
@@ -365,10 +376,10 @@ async function showChanges(){
     for(let i=seen;i<stage;i++){
       if(!document.body.classList.contains('showcasing'))break;
       diorama.showcase(i);ambience.chime([523.3,659.3,784,1046.5]);caption(`${RESTORATIONS[i].world} · ${RESTORATIONS[i].title}`,RESTORATIONS[i].school);
-      await wait(settings.reducedMotion?600:1500);diorama.setStage(i+1);await wait(settings.reducedMotion?700:2000);
+      await wait(reduced()?600:1500);diorama.setStage(i+1);await wait(reduced()?700:2000);
     }
     diorama.setStage(stage,{instant:!document.body.classList.contains('showcasing')});
-    caption('');document.body.classList.remove('showcasing');diorama.focus(null);
+    caption('');document.body.classList.remove('showcasing');if(!$('#panel').dataset.room)diorama.focus(null);
   });
 }
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -384,17 +395,21 @@ document.querySelectorAll('[data-hour]').forEach(b=>b.addEventListener('click',(
 function syncHour(){document.querySelectorAll('[data-hour]').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.hour===diorama.hourId)));}
 $('#sound-button').addEventListener('click',()=>setSound(settings.muted));
 // Browsers need a gesture before audio: a saved preference resumes on the first touch.
-addEventListener('pointerdown',()=>{if(!settings.muted&&!ambience.on)setSound(true);},{once:true});
+addEventListener('pointerdown',e=>{if(!settings.muted&&!ambience.on&&!e.target.closest?.('#sound-button,#pref-sound'))setSound(true);},{once:true});
+{const b=$('#sound-button');b.setAttribute('aria-pressed',String(!settings.muted));b.innerHTML=svg(settings.muted?'mute':'sound');}
 $('#settings-button').addEventListener('click',()=>{$('#settings').classList.toggle('hidden');});
 $('#opt-motion').addEventListener('change',e=>{settings.reducedMotion=e.target.checked;persistProfile();applySettings();});
 $('#opt-quality').addEventListener('change',e=>{settings.quality=e.target.checked?'high':'low';persistProfile();applySettings();});
 $('#opt-stage').value=previewStage??'';
 $('#opt-stage').addEventListener('change',e=>{const v=e.target.value;const u=new URL(location.href);if(v==='')u.searchParams.delete('etapa');else u.searchParams.set('etapa',v);location.href=u.toString();});
 addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!$('#changes').classList.contains('hidden')){$('#changes').classList.add('hidden');return;}
   if(e.key==='Escape'&&diorama.reaction){diorama.endReaction();return;}
   if(e.key==='Escape'&&document.body.classList.contains('showcasing')){document.body.classList.remove('showcasing');caption('');return;}
-  if(e.key==='Escape'){if(!$('#settings').classList.contains('hidden'))$('#settings').classList.add('hidden');else if(diorama.focusId)closeRoom();}
+  if(e.key==='Escape'){if(!$('#settings').classList.contains('hidden'))$('#settings').classList.add('hidden');else if(diorama.focusId||$('#panel').dataset.room)closeRoom();}
   if(e.target.closest?.('input,select,textarea'))return;
+  // Number shortcuts only while the campus is at rest (not during a gesture, a tour or an entry preview).
+  if(diorama.reaction||document.body.classList.contains('showcasing')||e.metaKey||e.ctrlKey||e.altKey)return;
   const n=Number(e.key);if(n>=1&&n<=ROOM_ORDER.length)openRoom(ROOM_ORDER[n-1]);
 });
 // The Ohmdal save may change in another tab: the school follows.
@@ -404,12 +419,13 @@ addEventListener('storage',e=>{if(e.key===SAVE_KEY&&previewStage===null){save=re
 // The intro is plain HTML in escuela.html: identity, one sentence and a way in before
 // any 3D. Once the student looks around, it folds into the compact brand.
 function explore(){
-  if(document.body.classList.contains('exploring'))return;
+  if(document.body.classList.contains('exploring')||document.body.classList.contains('light'))return;
   document.body.classList.add('exploring');diorama.panelShift=0;diorama.panelShiftY=0;
   if(!profile.welcomed){profile.welcomed=true;persistProfile();}
+  syncInert();
 }
 function showIntro(){
-  document.body.classList.remove('exploring');diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();
+  document.body.classList.remove('exploring');diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();syncInert();
 }
 // On wide screens the campus steps right of the intro text.
 function introShift(){return innerWidth>1000&&!document.body.classList.contains('exploring')?-.22:0;}
@@ -431,7 +447,7 @@ function openNews(){
   document.querySelectorAll('.directory button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.room==='novedades')));
   $('#panel-inner').innerHTML=`<header class="panel-head"><button class="panel-back" id="panel-back" aria-label="Volver al Instituto">${svg('back')}<span>Instituto</span></button><span class="eyebrow">Del Instituto</span><h2>Novedades</h2></header><div class="panel-body" id="news-body" aria-busy="true"><p class="meta">Cargando novedades…</p></div>`;
   $('#panel-back').addEventListener('click',()=>closeRoom());
-  setUrl('novedades');
+  setUrl('novedades');syncInert();
   requestAnimationFrame(()=>panel.focus({preventScroll:true}));
   loadNews(base).then(result=>{
     const body=$('#news-body');if(!body)return;body.removeAttribute('aria-busy');body.innerHTML=renderNews(result,{dev:import.meta.env.DEV});
@@ -443,7 +459,12 @@ function markUnread(n){const a=$('#link-news');a.dataset.unread=n?String(n):'';a
 let traversing=false;
 function setUrl(hash){
   if(traversing)return;const url=`${location.pathname}${location.search}${hash?'#'+hash:''}`;
-  if(decodeURIComponent(location.hash.slice(1))!==hash)history.pushState({room:hash||null},'',url);
+  if(decodeURIComponent(location.hash.slice(1))===hash)return;
+  // Opening from the campus adds one step; switching rooms replaces it; closing returns to the step before
+  // when the home created the current one (so Back never reopens what was just closed).
+  if(!hash){if(history.state?.home)history.back();else history.replaceState(null,'',url);}
+  else if(history.state?.home)history.replaceState({home:true,room:hash},'',url);
+  else history.pushState({home:true,room:hash},'',url);
 }
 function route(){
   const hash=decodeURIComponent(location.hash.slice(1));
@@ -453,6 +474,7 @@ function route(){
 }
 document.querySelectorAll('.intro-links a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRoom(a.getAttribute('href').slice(1));}));
 addEventListener('popstate',route);
+addEventListener('pageshow',e=>{if(e.persisted){document.body.classList.remove('entering');$('#portal-flash').classList.remove('on');}});
 $('#cta-explore').addEventListener('click',()=>{explore();canvas.focus({preventScroll:true});toast('Tocá un edificio para acercarte. El directorio de abajo lleva a cada sala.');});
 canvas.addEventListener('pointerdown',()=>explore(),{passive:true});
 addEventListener('resize',()=>{if(!diorama.focusId){diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();}});
@@ -466,19 +488,20 @@ function lightVersion(reason){
 }
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
-setupWayIn();refreshGreeting();
+syncInert();setupWayIn();refreshGreeting();
 const newsReady=loadNews(base).then(r=>{const n=unreadCount(r.items,profile.newsSeen);markUnread(n);return {...r,unread:n};});
 (async()=>{
   if(diorama.quiet){lightVersion('Este navegador no puede mostrar el campus en 3D. Todo lo demás está acá.');$('#intro-load').hidden=true;route();return;}
   try{
     await diorama.build(p=>{$('#loading-bar').style.width=`${Math.round(p*100)}%`;});
-    syncHour();applySettings();refreshProgress({instant:true});newsReady.then(r=>diorama.setNotices(r.items,r.unread));
+    syncHour();applySettings();refreshProgress({instant:true});newsReady.then(r=>diorama.setNotices(r.items,unreadCount(r.items,profile.newsSeen)));
     diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();
     diorama.flyTo({...OVERVIEW,distance:OVERVIEW.distance*1.25,pitch:OVERVIEW.pitch+10,yaw:OVERVIEW.yaw-24},{instant:true});
     requestAnimationFrame(()=>{diorama.flyTo(OVERVIEW);document.body.classList.add('ready');});
     const ex=$('#cta-explore');ex.disabled=false;ex.textContent='Explorar el campus';
     await wait(900);
-    if(location.hash.length>1)route();else await showChanges();
+    if(location.hash.length>1)route();
+    await showChanges();
     window.__escuela={diorama,openRoom,closeRoom,refreshProgress,openNews};
   }catch(err){
     console.error(err);lightVersion('No se pudo abrir el campus en 3D en este navegador. Todo lo demás está acá.');$('#intro-load').hidden=true;route();

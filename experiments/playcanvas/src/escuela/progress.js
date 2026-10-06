@@ -42,8 +42,10 @@ export const worldByRoom=room=>WORLDS.find(w=>w.room===room);
 const PUZZLE_FLAGS=['awaken','workshop','gate','pump','distribution','irrigation','beacon_supply','beacon_network','beacon_lens'];
 
 /** Read the Ohmdal save. Never throws, never writes. */
-export function readOhmdal(storage=globalThis.localStorage){
-  try{const raw=storage?.getItem(SAVE_KEY);if(!raw)return null;return validateState(JSON.parse(raw));}catch{return null;}
+// Reading `localStorage` itself can throw (site data blocked): every access stays inside a try.
+export function storageOrNull(){try{return globalThis.localStorage??null;}catch{return null;}}
+export function readOhmdal(storage){
+  try{storage??=storageOrNull();const raw=storage?.getItem(SAVE_KEY);if(!raw)return null;return validateState(JSON.parse(raw));}catch{return null;}
 }
 
 /** 0 = the school as the student found it; RESTORATIONS.length = fully restored. */
@@ -115,9 +117,9 @@ export function defaultQuality(env=globalThis){
   try{const coarse=env.matchMedia?.('(pointer: coarse)').matches,small=Math.min(env.screen?.width||9999,env.screen?.height||9999)<820;return coarse&&small?'low':'high';}catch{return 'high';}
 }
 export function freshProfile(env){return {version:1,name:'',crest:'omega',createdAt:Date.now(),rooms:[],watched:[],stageSeen:0,welcomed:false,newsSeen:null,settings:{muted:true,reducedMotion:false,quality:defaultQuality(env)}};}
-export function readProfile(storage=globalThis.localStorage){
+export function readProfile(storage){
   const base=freshProfile();
-  try{const data=JSON.parse(storage?.getItem(SCHOOL_KEY)||'null');if(!data||data.version!==1)return base;
+  try{storage??=storageOrNull();const data=JSON.parse(storage?.getItem(SCHOOL_KEY)||'null');if(!data||data.version!==1)return base;
     return {...base,name:typeof data.name==='string'?data.name.slice(0,40):'',crest:['omega','engranaje','compas','llave'].includes(data.crest)?data.crest:'omega',
       createdAt:Number.isFinite(data.createdAt)?data.createdAt:base.createdAt,
       rooms:Array.isArray(data.rooms)?[...new Set(data.rooms.filter(x=>typeof x==='string'))]:[],
@@ -127,4 +129,4 @@ export function readProfile(storage=globalThis.localStorage){
       settings:{...base.settings,...(data.settings&&typeof data.settings==='object'?{muted:data.settings.muted!==false,reducedMotion:data.settings.reducedMotion===true,quality:data.settings.quality==='low'?'low':'high'}:{})}};
   }catch{return base;}
 }
-export function saveProfile(profile,storage=globalThis.localStorage){try{storage?.setItem(SCHOOL_KEY,JSON.stringify(profile));return true;}catch{return false;}}
+export function saveProfile(profile,storage){try{storage??=storageOrNull();if(!storage)return false;storage.setItem(SCHOOL_KEY,JSON.stringify(profile));return true;}catch{return false;}}

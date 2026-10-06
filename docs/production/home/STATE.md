@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 6 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 7 cerrado (2026-10-06). No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -147,13 +147,32 @@ son ambiente, no progreso (sin integración de esos mundos).
   reducida. Etapa 10 verificada con los visitantes en el patio. QA de interacción 26/26, `npm test` 93/93.
 - Corregido: rectángulo duro detrás del texto en la versión ligera.
 
+## Ciclo 7 (2026-10-06) — revisión independiente y corrección de bloqueos
+
+- **Revisión crítica** por un agente separado, de sólo lectura: 24 hallazgos, 2 críticos. Triage completo en
+  [`REVIEW-c07.md`](REVIEW-c07.md).
+- **Crítico 1 (reporte):** el ciclo 6 omitió un dato adverso (16,4 FPS tras ciclos a 390 DPR 2). Corregido en
+  PERF/STATE. El script medía ese «después» en un primer plano; corregido. Con carga igual, antes ≈ después.
+- **Crítico 2:** «reducir movimiento» del sistema ahora se respeta en 3D, esperas y CSS.
+- **Corregidos además:** cantidades inventadas para mundos sin integrar (medidor «n/10» de Ohmdal), regreso con
+  hash que salteaba «Cambió por tu aventura», home caída con almacenamiento bloqueado, versión ligera sin
+  directorio, historial (abrir = un paso, cerrar = volver), carreras de gesto/atajos/farolito, `inert` y foco
+  visible, rótulos anclados a su edificio, destello del portal al volver por bfcache, sonido al iniciar,
+  selector de etapas sólo con `?qa`, interiores sin dibujar con el techo cerrado (≈25 % menos draw calls),
+  perfil liviano por defecto en teléfonos táctiles.
+- QA: `npm test` 96/96 (incluye compilación de los módulos de la home, que antes no cubría ningún test: así se
+  escapó un error de sintaxis durante este ciclo); interacción 26/26; teclado e historial 14/14.
+
+NO VERIFICADO: FPS absolutos con la GPU libre; bfcache real; pérdida de contexto WebGL (no hay manejo de
+`webglcontextlost`); teléfono real; sonido escuchado; memoria de GPU.
+
 ## Siguiente acción exacta
 
-1. Revisión crítica separada (no independiente: un solo agente) de arte, interacción e integración contra el brief
-   §2–§12, con lista de defectos concretos y su severidad; corregir los críticos.
-2. Perfil «calidad baja» real (sin SSAO, sombras 2048, DPR ≤ 1,25) y medir draw calls/FPS en él; elegirlo por
-   defecto en pantallas táctiles angostas.
-3. Accesibilidad: recorrido con sólo teclado (Tab/Enter/Escape) por portada, directorio, paneles y gesto; contraste
-   de rótulos sobre bruma.
-4. Si no quedan bloqueos críticos: paquete CANDIDATO_PARA_REVISION (§14) con ruta, cambios, capturas, pruebas,
-   mediciones, integración de progreso, fuentes de assets y pendientes externos (redes, novedades, mundos).
+1. **Arte de los acercamientos** (hallazgos 7 y 18): sacar/atenuar sprites que entran en cada pose del gesto y de
+   la cartelera, bajar exposición de tarde en primer plano, mover el rótulo del gesto fuera del artefacto y hacer
+   legible «adentro sube / afuera cae» en Physica.
+2. **Interior del Taller de Electrónica** (hallazgo 8): remate de muros cortados, mobiliario con detalle, objetos
+   narrativos de Ohmdal.
+3. **Plano maestro** (14–16): pantalla del Anfiteatro menos dominante, acento de luz en la estatua, colinas visibles
+   bajo la bruma, noche legible.
+4. Manejo de `webglcontextlost` → versión ligera; medición con la GPU libre.

@@ -40,7 +40,8 @@ for(let i=0;i<10;i++){
   await page.evaluate(()=>window.__escuela.openNews());await page.waitForTimeout(500);await page.evaluate(()=>window.__escuela.closeRoom());await page.waitForTimeout(250);
   await page.evaluate(w=>window.__escuela.diorama.reactArtifact(w,{onEnd:()=>{}}),['ohmdal','physica','bitland','arithmos'][i%4]);await page.waitForTimeout(400);await page.evaluate(()=>window.__escuela.diorama.endReaction());
 }
-await page.waitForTimeout(2500);
+// Back to the same overview as before the cycles, so «after» compares like with like.
+await page.evaluate(()=>window.__escuela.closeRoom());await page.waitForTimeout(3000);
 const after=await snapshot();
 const idleAfter=await frames(5000);
 const ua=await page.evaluate(()=>navigator.userAgent);

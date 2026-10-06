@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {validItem,visibleItems,sortItems,unreadCount,renderNews} from '../src/escuela/news.js';
 import {IDENTITIES,confirmed,pendingLinks,renderCommunity} from '../src/escuela/social.js';
-import {readProfile,defaultQuality,freshProfile} from '../src/escuela/progress.js';
+import {readProfile,defaultQuality,freshProfile,readOhmdal,saveProfile} from '../src/escuela/progress.js';
 import {heightAt,outside,roadX} from '../src/escuela/landscape.js';
 import {ROOMS} from '../src/escuela/rooms.js';
 import {ARTIFACTS} from '../src/escuela/artifacts.js';
@@ -82,4 +82,18 @@ test('calidad: táctil de tamaño teléfono empieza en el perfil liviano; lo ele
   assert.equal(freshProfile(env(true,390,844)).settings.quality,'low');
   const store={getItem:()=>JSON.stringify({version:1,settings:{quality:'high'}})};
   assert.equal(readProfile(store).settings.quality,'high');
+});
+test('almacenamiento bloqueado: leer y guardar no rompen la home',()=>{
+  const desc=Object.getOwnPropertyDescriptor(globalThis,'localStorage');
+  Object.defineProperty(globalThis,'localStorage',{configurable:true,get(){throw new DOMException('bloqueado','SecurityError');}});
+  try{
+    assert.equal(readOhmdal(),null);
+    assert.equal(readProfile().version,1);
+    assert.equal(saveProfile(freshProfile()),false);
+  }finally{if(desc)Object.defineProperty(globalThis,'localStorage',desc);else delete globalThis.localStorage;}
+});
+test('los módulos de la home compilan (main.js no lo importa ninguna otra prueba)',async()=>{
+  const {transform}=await import('esbuild');const {readFileSync,readdirSync}=await import('node:fs');
+  const dir=new URL('../src/escuela/',import.meta.url);
+  for(const f of readdirSync(dir).filter(f=>f.endsWith('.js')))await transform(readFileSync(new URL(f,dir),'utf8'),{loader:'js',format:'esm'});
 });

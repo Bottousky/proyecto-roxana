@@ -58,3 +58,17 @@ FPS de esta corrida **no válidos**: había cuatro partidas automatizadas de otr
 en ambos perfiles, por contención). La corrida previa, con menos carga, dio 60 FPS en baja y 47,6 en alta.
 Repetir con la GPU libre. El perfil bajo es el predeterminado en pantallas táctiles de tamaño teléfono
 (`defaultQuality` en `progress.js`); la elección del usuario se conserva.
+
+### Re-medición tras la revisión (script corregido: el reposo «después» se mide en la misma vista general)
+
+GPU compartida con 1–3 partidas automatizadas de otros agentes durante la corrida: **FPS absolutos no válidos**.
+Comparación relativa con la misma carga (`evidence/c07/perf-*-v2.json`):
+
+| Viewport | Reposo antes | Sala | Reposo después de 10 ciclos | Draw calls antes / después | Entidades |
+|---|---|---|---|---|---|
+| 1440×900 DPR 1 | 27,4 FPS | 31,0 | 27,6 | 927 / 943 | +0 |
+| 390×844 DPR 2 (emulación) | 30,5 FPS | 36,6 | 28,0 | 763 / 738 | +0 |
+
+Conclusión prudente: no hay degradación atribuible a los ciclos con carga igual; el 16,4 FPS del ciclo 6 se midió
+en un primer plano con desenfoque cercano y bajo contención. **Pendiente:** medir con la GPU libre para dar FPS
+absolutos y repetir el «después» en el móvil emulado. LCP 196–204 ms.

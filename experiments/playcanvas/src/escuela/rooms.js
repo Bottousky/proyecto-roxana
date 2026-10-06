@@ -1,8 +1,8 @@
 import {ARTIFACT_PICKS,NOTICE_BOARD as NB} from './artifacts.js';
 // The places of the Instituto that the diorama can open. Poses are orbit parameters
 // around `target`: yaw (degrees, positive = camera to the east), pitch, distance.
-// Labels float above the roof accents, not over them.
-const taller=(x,z,yaw,world)=>({world,anchor:[x,13.4,z],pick:[[x-5.9,0,z-7.3],[x+5.9,9.6,z+7.3]],pose:{target:[x,1.8,z-.2],yaw,pitch:46,distance:44}});
+// The label's pin sits on the gable over the workshop's door, so it marks that building and no other.
+const taller=(x,z,yaw,world)=>({world,anchor:[x-Math.sign(x)*5.8,7.8,z],pick:[[x-5.9,0,z-7.3],[x+5.9,9.6,z+7.3]],pose:{target:[x,1.8,z-.2],yaw,pitch:46,distance:44}});
 export const ROOMS={
   novedades:{name:'Cartelera',short:'Novedades',eyebrow:'Del Instituto',anchor:[NB.x,4.1,NB.z],pick:[[NB.x-2,0,NB.z-1.2],[NB.x+2,3.6,NB.z+1.2]],
     pose:{target:[NB.x,1.9,NB.z],yaw:NB.ry-6,pitch:10,distance:17}},

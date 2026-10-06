@@ -43,12 +43,22 @@ await page.evaluate(()=>window.__escuela.openRoom('direccion'));await page.waitF
 await page.evaluate(()=>window.__escuela.openNews());await page.waitForTimeout(900);
 await page.goBack();await page.waitForTimeout(1000);
 const afterBack=await page.evaluate(()=>({url:location.href,room:document.querySelector('#panel').dataset.room||null}));
-ok('Atrás vuelve a la sala anterior dentro de la home',afterBack.url.includes('escuela.html')&&afterBack.room==='direccion',JSON.stringify(afterBack));
-await page.goBack();await page.waitForTimeout(1000);
-const afterBack2=await page.evaluate(()=>({url:location.href,room:document.querySelector('#panel').dataset.room||null}));
-ok('Atrás otra vez cierra el panel sin salir de la home',afterBack2.url.includes('escuela.html')&&!afterBack2.room,JSON.stringify(afterBack2));
+ok('Atrás cierra el panel sin salir de la home',afterBack.url.includes('escuela.html')&&!afterBack.room,JSON.stringify(afterBack));
 await page.goForward();await page.waitForTimeout(1000);
-ok('Adelante reabre la sala',await page.evaluate(()=>document.querySelector('#panel').dataset.room==='direccion'));
+ok('Adelante reabre la última sala',await page.evaluate(()=>document.querySelector('#panel').dataset.room==='novedades'));
+// Closing from the interface steps back: Back afterwards must not reopen what was just closed.
+await page.evaluate(()=>window.__escuela.closeRoom());await page.waitForTimeout(900);
+const len=await page.evaluate(()=>history.length);
+await page.evaluate(()=>window.__escuela.openRoom('trofeos'));await page.waitForTimeout(600);await page.evaluate(()=>window.__escuela.closeRoom());await page.waitForTimeout(900);
+await page.evaluate(()=>window.__escuela.openRoom('fisica'));await page.waitForTimeout(600);await page.evaluate(()=>window.__escuela.closeRoom());await page.waitForTimeout(900);
+ok('abrir y cerrar no hace crecer el historial',await page.evaluate(l=>history.length<=l+1,len),String(await page.evaluate(()=>history.length)));
+await page.goBack();await page.waitForTimeout(1000);
+{const st=await page.evaluate(()=>({url:location.href,room:document.querySelector('#panel')?.dataset.room??null}));ok('Atrás tras cerrar no reabre la sala cerrada (sale al paso anterior)',st.room!=='fisica',JSON.stringify(st));}
+// Hidden controls are not tab stops: closed panel and folded intro.
+await page.goto(base+'escuela.html?hora=tarde');await page.waitForFunction(()=>window.__escuela,null,{timeout:120000});await page.waitForTimeout(1200);
+await page.click('#cta-explore');await page.waitForTimeout(900);
+const stops=[];for(let i=0;i<14;i++){await page.keyboard.press('Tab');stops.push(await page.evaluate(()=>{const a=document.activeElement;return a?.closest('#intro')?'intro':a?.closest('#panel')?'panel':a?.id||a?.dataset?.room||a?.tagName;}));}
+ok('explorando, ni la portada ni el panel cerrado reciben foco',!stops.includes('intro')&&!stops.includes('panel'),stops.join(' → '));
 ok('sin errores de página',errors.length===0,errors.join(' | '));
 await browser.close();
 const failed=results.filter(x=>!x).length;console.log(`\n${results.length-failed}/${results.length} comprobaciones de teclado e historial`);process.exit(failed?1:0);

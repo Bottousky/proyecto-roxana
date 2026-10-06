@@ -304,7 +304,7 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .room-label:hover small,.room-label.hover small,.room-label:focus-visible small{display:block}
 .changes{position:fixed;left:clamp(16px,3vw,44px);bottom:clamp(100px,14vh,140px);z-index:11;width:min(380px,calc(100vw - 32px));padding:1.1rem 1.2rem;border-radius:14px;background:rgba(16,25,26,.93);backdrop-filter:blur(14px);border:1px solid var(--line-strong);box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .changes h2{margin:.4rem 0;font:600 1.5rem/1.05 var(--serif);color:#fbf3dd}.changes p{color:var(--muted);margin:.2rem 0}
-.light .dock,.light .tools,.light #labels{display:none}
+.light .tools,.light #labels,.light .school-meter{display:none}
 .light-worlds{position:absolute;left:clamp(16px,3vw,44px);right:clamp(16px,3vw,44px);bottom:clamp(16px,3vw,40px);z-index:5;max-width:640px;padding:1rem 1.2rem;border-radius:14px;background:rgba(16,25,26,.8);border:1px solid var(--line)}
 .light-worlds h2{margin:0 0 .3rem;font:600 1.4rem/1.1 var(--serif)}
 .light-worlds ul{list-style:none;margin:.6rem 0 0;padding:0;display:grid;gap:.5rem}
@@ -354,3 +354,11 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .brand{visibility:hidden;transition:opacity 1.2s .5s var(--ease),transform 1.2s .5s var(--ease),visibility 0s 1.7s}
 .exploring .brand{visibility:visible;transition:opacity 1.2s .2s var(--ease),transform 1.2s .2s var(--ease),visibility 0s}
 :focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+
+/* Ciclo 7 · movimiento reducido del sistema también en CSS; foco visible en el lienzo; versión ligera con directorio. */
+@media (prefers-reduced-motion: reduce){*{transition-duration:.01s!important;animation:none!important}}
+#diorama:focus-visible{outline:2px solid var(--brass);outline-offset:-4px}
+.light .dock{opacity:1}
+.meter-world b{margin-left:.35rem}.meter-note{font-size:.62rem;letter-spacing:.06em;color:var(--muted);opacity:.8}
+@media (max-width:820px){.meter-note{display:none}}
+.light .light-worlds{bottom:calc(clamp(12px,2vw,24px) + 76px)}@media (max-width:820px){.light .light-worlds{left:16px;right:16px;bottom:96px;max-height:42vh;overflow:auto}.light .intro-sub{display:none}}
