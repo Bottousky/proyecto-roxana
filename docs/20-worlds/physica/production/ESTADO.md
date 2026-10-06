@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 08 (vegetación con identidad; ver `evidence/iter-08`).
+**Actualizado:** 2026-10-06 · iteración 09 (la Orilla se lee; ver `evidence/iter-09`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,16 @@
 
 ## Hito actual: A (escena insignia), en curso
 
-**Último cambio aceptado (iteración 08):** plantas pintadas en lugar de los conos verdes (D14).
+**Último cambio aceptado (iteración 09):** la Orilla se lee (A22, D15).
+- **El mástil de plomadas** ya no es una escalera y enmarca el borde de la región.
+- **Cada soporte** muestra su esfera (aviso junto a ella, anillo, brazo encendido).
+- **La cadena con las manos ocupadas** explica la causa.
+- **La interacción más cercana gana:** se corrigió que E en el poste del soporte P agarrara la cadena del Pozo.
+- **Evidencia:** antes y después con teclado real; revisión independiente en dos pasadas; 50 pruebas; recorrido completo.
+
+  Ver `evidence/iter-09`.
+
+**Iteración 08:** plantas pintadas en lugar de los conos verdes (D14).
 - **Plantas:** matas mixtas, flores y musgo arriba; juncos con huecos en la orilla de enfrente de cada canal.
 - **Helechos** en la cara de la Terraza, que siguen el campo (arco con bisagra en la raíz, saturado): cuelgan arriba del borde de la región y se enroscan hacia arriba adentro.
 - **Instrumentos despejados.**
@@ -127,18 +136,16 @@
 
 ## Próximo resultado
 
-**Lado de la Orilla legible (A22) y el suelo a la altura de las plantas.**
-- **El mástil de plomadas** no debe parecer una escalera.
-- **Cada soporte** tiene que mostrar a qué esfera corresponde.
-- **La cadena** tiene que explicar por qué no se ofrece mientras el explorador lleva una esfera en la mano.
-- **El suelo y el musgo:**
-  - las manchas planas de verde se reemplazan por un suelo pintado;
-  - las barbas de musgo escalonadas, por hebras suaves que sigan marcando el campo;
-  - todo coherente con las plantas pintadas.
+**El suelo y el musgo a la altura de las plantas pintadas.**
+- **Suelo:** las manchas planas de verde de los altos se reemplazan por un suelo pintado (imagen generada para el proyecto, con su procedencia).
+- **Musgo:** las barbas escalonadas, por hebras suaves que sigan marcando el campo (cuelgan y se invierten).
 - **Criterio:**
   - antes/después en las mismas tomas;
-  - una revisión independiente que no confunda el mástil con una escalera y asocie cada soporte con su esfera sin texto;
-  - recorrido con teclado sin regresiones.
+  - el musgo responde al campo (prueba);
+  - recorrido con teclado sin regresiones;
+  - revisión independiente centrada en arte.
+
+*Plan cumplido en la iteración 09:* la Orilla se lee (A22): el mástil no es una escalera y cada soporte muestra su esfera, según la revisión independiente.
 
 *Plan cumplido en la iteración 08:* vegetación con identidad (A23, parte): plantas pintadas; helechos que siguen el campo, con prueba.
 

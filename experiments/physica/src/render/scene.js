@@ -226,14 +226,28 @@ export function buildScene(world, { quality = 'high' } = {}) {
 
   // Measuring mast with plumb bobs on the Orilla's lip, reaching over the chasm.
   const plumbs = new Plumbs(field, M);
-  const mastX = -0.42, mastZ = -0.8, armTip = 0.55;
+  const mastX = -0.42, mastZ = -0.8;
   const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 6.0, 10), M.brassDark); mast.position.set(mastX, 3.0, mastZ); mast.castShadow = true; scene.add(mast);
   const mastFoot = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.12, 12), M.stone); mastFoot.position.set(mastX, 0.06, mastZ); scene.add(mastFoot);
-  for (let y = 0.5; y <= 5.51; y += 0.5) {
-    const arm = new THREE.Mesh(new THREE.BoxGeometry(armTip - mastX, 0.03, 0.03), M.brass); arm.position.set((armTip + mastX) / 2, y, mastZ); arm.castShadow = true; scene.add(arm);
-    const tick = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.012, 0.05), M.ink); tick.position.set(mastX - 0.06, y, mastZ + 0.03); scene.add(tick);
-    plumbs.addBob([armTip, y, mastZ]);
+  // Not a ladder: angled brackets at uneven heights, closer together around the region's top
+  // edge (y = 3) where the bobs flip, their tips staggered so the bobs never line up as a rail.
+  // None inside the field's transition band (2.7–3.3): a bob there lies sideways and reads as broken,
+  // and B's arm crosses at 2.92. The nearest pair, one pointing up below and one hanging above,
+  // frames the edge, which is marked on the mast by a brass collar.
+  // (The first hanging one is at 4.1: lower, its bracket crosses the edge's brass anchor wheel.)
+  for (const [y, tipX] of [[0.65, 0.5], [1.15, 0.6], [2.3, 0.5], [4.1, 0.56], [4.8, 0.5], [5.5, 0.58]]) {
+    const rise = 0.28, dx = tipX - mastX, L = Math.hypot(dx, rise);
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(L, 0.028, 0.028), M.brass);
+    arm.position.set(mastX + dx / 2, y - rise / 2, mastZ); arm.rotation.z = Math.atan2(rise, dx); scene.add(arm); // no shadow: it drew a lattice on the wall
+    const hook = new THREE.Mesh(new THREE.TorusGeometry(0.025, 0.007, 6, 12), M.brassDark); hook.position.set(tipX, y, mastZ); scene.add(hook);
+    const tick = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.012, 0.05), M.ink); tick.position.set(mastX - 0.06, y - rise, mastZ + 0.03); scene.add(tick);
+    plumbs.addBob([tipX, y, mastZ]);
   }
+  // The edge on the mast: a band in the glow of the anchors that mark the region's corners (the
+  // same mark for the same thing), wider than the mast, with a short pointer toward the bobs; just
+  // above B's arm (2.92), which lights cream when B is active.
+  const edgeCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 18), M.core); edgeCollar.position.set(mastX, 3.04, mastZ); scene.add(edgeCollar);
+  const edgePointer = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.035, 0.035), M.core); edgePointer.position.set(mastX + 0.3, 3.04, mastZ); scene.add(edgePointer);
   // A second plumb mast down the Pozo: the bobs show where its region ends below.
   const wmX = WELL.x1 - 0.15, wmTip = WELL.x1 - 0.65;
   const wmZ = -0.4;   // close to the measuring plane, so its bobs line up with the numbers
@@ -265,9 +279,10 @@ export function buildScene(world, { quality = 'high' } = {}) {
   for (const c of conduits) scene.add(c);
 
   // Supports, table and test spheres.
+  const standById = new Map();
   const stands = world.stands.map(st => {
     const s = new Stand({ ...st, z: -1.0, laneZ: LANE_Z[1], ruler: st.id === 'A' ? { x: st.x + 0.5, y0: 0, y1: 3, z: -0.75 } : null }, M);
-    scene.add(s.group); return s;
+    scene.add(s.group); standById.set(st.id, s); return s;
   });
   const table = new THREE.Group();
   const top = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.1, 0.62), M.woodLight); top.position.set(-5.5, 0.73, -0.62); table.add(top);
@@ -365,5 +380,23 @@ export function buildScene(world, { quality = 'high' } = {}) {
     if (e.type === 'apex' && e.body === world.avatar.id && e.x > WELL.x0 && e.x < WELL.x1 && e.centre > TERRACE_Y) wellMarks.add(e.centre, e.from);
   }
 
-  return { scene, sun, hemi, update, onEvent, setCityVisible: v => { city.visible = v; }, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts, veg };
+  // The sphere a prompt refers to: a soft ring around it while that prompt is shown.
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.016, 8, 40), new THREE.MeshBasicMaterial({ color: '#fff1c8', transparent: true, opacity: 0.8, depthWrite: false }));
+  ring.visible = false; ring.renderOrder = 8; scene.add(ring);
+  let ringId = null, activeStand = null;
+  // The active support: its sphere ringed, and its arm and clamp lit, so the prompt, the sphere
+  // and the post the explorer stands at read as one apparatus.
+  function highlight(h) {
+    ringId = h?.body ?? null; ring.visible = ringId != null;
+    const st = h ? standById.get(h.stand) : null;
+    if (st !== activeStand) { activeStand?.setActive(false); st?.setActive(true); activeStand = st; }
+  }
+  function updateRing(time) {
+    activeStand?.pulse(time);
+    if (ringId == null) return;
+    const m = sphereMeshes.get(ringId); if (!m) { ring.visible = false; return; }
+    ring.position.copy(m.position); ring.position.z += 0.05;
+    const k = 1 + 0.06 * Math.sin(time * 5); ring.scale.set(k, k, k); ring.material.opacity = 0.55 + 0.3 * Math.sin(time * 5);
+  }
+  return { scene, sun, hemi, update: (dt, time, alpha) => { update(dt, time, alpha); updateRing(time); }, onEvent, highlight, setCityVisible: v => { city.visible = v; }, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts, veg };
 }

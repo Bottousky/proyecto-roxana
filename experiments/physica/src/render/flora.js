@@ -97,10 +97,11 @@ export class Plumbs extends Chains {
     // Real threads are never perfectly plumb: a slight initial tilt lets an inverted pull
     // swing the bob over instead of balancing it on an unstable equilibrium forever.
     const c = this.add({ root, n: 1, len, dir: [0.08, -1] });
-    const bob = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.15, 12), this.mat.brass);
+    // Large enough to read their direction at the play camera (~12 px).
+    const bob = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.2, 12), this.mat.brass);
     bob.castShadow = true;
     const cap = new THREE.Mesh(new THREE.SphereGeometry(0.04, 10, 8), this.mat.brass);
-    bob.add(cap); cap.position.y = -0.07;
+    bob.add(cap); cap.position.y = -0.095; cap.scale.setScalar(1.3);
     const thread = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), this.mat.thread);
     thread.frustumCulled = false;
     this.group.add(bob, thread);

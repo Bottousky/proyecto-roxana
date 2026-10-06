@@ -56,7 +56,11 @@ export const CASCADA = {
   stands: [
     { id: 'A', label: 'Soporte de la orilla', x: -2.9, baseY: 0, clampX: -1.85, clampY: 2.0, threadMax: 10 },
     { id: 'B', label: 'Soporte del borde', x: -1.0, baseY: 0, clampX: 1.1, clampY: 2.0, threadMax: 10,
-      rail: { min: -2.5, max: 2.5, step: 0.5 } },
+      rail: { min: -2.5, max: 2.5, step: 0.5 },
+      // B's prompt goes below and to the right of its sphere, in the chasm's open air: above it,
+      // it covered the plumb mast at the region's top edge and B's own arm and clamp.
+      // Low enough to clear the rail's "2", the readout ▲▼ changes.
+      prompt: { dx: 1.0, dy: -1.25 } },
     // The Pozo's support: same instrument, new place. Its rail reaches below the region's floor.
     { id: 'P', label: 'Soporte del pozo', x: WELL.x0 - 0.9, baseY: TERRACE_Y, clampX: WELL.x1 - 0.3, clampY: 3.0, threadMax: 9,
       rail: { min: -0.5, max: 4.0, step: 0.5 } },

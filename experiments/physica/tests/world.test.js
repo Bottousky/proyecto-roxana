@@ -474,3 +474,43 @@ test('The Mirador is left by its steps and the steps lead back up: no dead end',
   n = 0; while (av.x > 14 && n++ < 10 / DT) { w.input.x = -1; w.step(); }
   assert.ok(av.x <= 14 && Math.abs(av.y - AVATAR.hh - MIRADOR_Y) < 0.01, `back up on the Mirador at ${av.x.toFixed(2)},${(av.y - AVATAR.hh).toFixed(2)}`);
 });
+
+test("a support's prompt sits over the sphere it releases; reeling in, over the post", () => {
+  const w = fresh(), av = w.avatar;
+  for (const id of ['A', 'B']) {
+    const st = stand(w, id);
+    av.x = av.px = st.x; av.y = av.py = st.baseY + av.hh; av.vx = av.vy = 0; run(w, 0.3);
+    const it = w.interactables().find(i => i.kind === 'stand' && i.id === id);
+    assert.ok(it, `support ${id} offers its action`);
+    assert.equal(it.body, st.body.id);
+    const dx = st.prompt?.dx ?? 0; // B's is offset into the chasm's open air
+    assert.ok(Math.abs(it.x - (st.body.x + dx)) < 1e-9, `${id}: at its sphere (x ${it.x} vs ${st.body.x} + ${dx})`);
+  }
+  // B released: the prompt to reel in goes back to B's post.
+  const b = stand(w, 'B'); releaseStand(w, 'B'); run(w, 0.5);
+  av.x = av.px = b.x; av.y = av.py = b.baseY + av.hh; run(w, 0.2);
+  const reel = w.interactables().find(i => i.kind === 'stand' && i.id === 'B');
+  assert.equal(b.state, 'free'); assert.ok(Math.abs(reel.x - b.x) < 1e-9);
+});
+
+test('with a sphere in hand at the chain lip, the game says why the chain is not offered', () => {
+  const w = fresh(), av = w.avatar; w.shortSeen = true;
+  const loose = w.bodies.find(x => x.kind === 'sphere' && x.heldBy?.type === 'shelf');
+  av.x = av.px = loose.x; av.y = av.py = av.hh; run(w, 0.3);
+  w.input.act = true; w.step(); w.input.act = false;
+  assert.ok(av.holding, 'picked up a sphere');
+  av.x = av.px = -0.35; run(w, 0.3);
+  const its = w.interactables();
+  assert.equal(its.length, 1); assert.equal(its[0].kind, 'drop');
+  assert.match(its[0].reason || '', /Manos ocupadas.*cadena/);
+  // Away from the lip there is no such hint.
+  av.x = av.px = -6; run(w, 0.3);
+  assert.ok(!w.interactables()[0].reason);
+});
+
+test("next to the Pozo's support P, E goes to P; at the lip, to the chain (the nearest wins)", () => {
+  const at = x => { const w = fresh(), av = w.avatar; av.x = av.px = x; av.y = av.py = TERRACE_Y + av.hh; run(w, 0.25); return w.interactables()[0]; };
+  const p = stand(fresh(), 'P');
+  for (const x of [p.x, p.x + 0.16, p.x + 0.25]) assert.equal(at(x).kind, 'stand', `at ${x.toFixed(2)} (P's post at ${p.x})`);
+  assert.equal(at(10.7).kind, 'chain', 'standing at the lip');
+});

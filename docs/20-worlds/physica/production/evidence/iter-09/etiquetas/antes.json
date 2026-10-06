@@ -1,0 +1,52 @@
+[
+ {
+  "name": "1-soporte-A",
+  "note": "al lado del soporte A (orilla)",
+  "prompt": {
+   "verb": "Soltar la esfera",
+   "hint": "",
+   "x": 340,
+   "y": 367
+  }
+ },
+ {
+  "name": "2-soporte-B",
+  "note": "al lado del soporte B (borde)",
+  "prompt": {
+   "verb": "Soltar la esfera",
+   "hint": "▲▼ altura de la pinza",
+   "x": 411,
+   "y": 377
+  }
+ },
+ {
+  "name": "3-mastil",
+  "note": "el mástil de plomadas, de cerca",
+  "prompt": {
+   "verb": "Soltar la esfera",
+   "hint": "▲▼ altura de la pinza",
+   "x": 533,
+   "y": 529
+  }
+ },
+ {
+  "name": "4-borde-con-esfera",
+  "note": "en el labio con una esfera en la mano (holding=true)",
+  "prompt": {
+   "verb": "Soltar",
+   "hint": "",
+   "x": 469,
+   "y": 426
+  }
+ },
+ {
+  "name": "5-borde-sin-esfera",
+  "note": "la misma posición, después de soltarla",
+  "prompt": {
+   "verb": "Bajar por la cadena",
+   "hint": "",
+   "x": 541,
+   "y": 393
+  }
+ }
+]

@@ -152,8 +152,10 @@ export class Stand {
     const collar = cyl(0.075, 0.075, 0.08, M.brass); collar.position.set(x, topY - 0.05, z0); g.add(collar);
     // Arm: from the post top, along x to the clamp's x, then forward in z to the play plane.
     const ax = clampX - x, len = Math.abs(ax);
-    const arm = box(len, 0.06, 0.06, M.woodLight); arm.position.set(x + ax / 2, topY, z0); g.add(arm);
-    const fwd = box(0.05, 0.05, Math.abs(z0 - zl) + 0.05, M.brass); fwd.position.set(clampX, topY, (z0 + zl) / 2); g.add(fwd);
+    // The arm and the clamp's link get their own materials, so the active support can light them.
+    this.lit = [M.woodLight.clone(), M.brass.clone()];
+    const arm = box(len, 0.06, 0.06, this.lit[0]); arm.position.set(x + ax / 2, topY, z0); g.add(arm);
+    const fwd = box(0.05, 0.05, Math.abs(z0 - zl) + 0.05, this.lit[1]); fwd.position.set(clampX, topY, (z0 + zl) / 2); g.add(fwd);
     if (rail) {
       // A rail hangs from the arm into the chasm; the clamp rides it on a carriage.
       const zr = zl - 0.22, bottom = rail.min - 0.35;
@@ -165,7 +167,7 @@ export class Stand {
         if (major) { const l = label(`${y < 0 ? '−' : ''}${Math.abs(Math.round(y))}`, M, 0.22); l.position.set(clampX + 0.3, y, SCALE_Z); g.add(l); }
       }
     } else {
-      const drop = cyl(0.018, 0.018, 0.26, M.brass); drop.position.set(clampX, topY - 0.13, zl); g.add(drop);
+      const drop = cyl(0.018, 0.018, 0.26, this.lit[1]); drop.position.set(clampX, topY - 0.13, zl); g.add(drop);
     }
     // Clamp jaws pivot open on release; they ride a carriage at the clamp's height.
     this.carriage = new THREE.Group(); this.carriage.position.set(clampX, clampY, zl); g.add(this.carriage);
@@ -188,6 +190,13 @@ export class Stand {
     // Height scale beside the support (graduated every 0.5 m, numbered each metre).
     if (spec.ruler) this.addRuler(spec.ruler);
     this.open = 0;
+  }
+
+  setActive(on) { this.active = on; if (!on) for (const m of this.lit) m.emissive.setRGB(0, 0, 0); }
+  pulse(time) {
+    if (!this.active) return;
+    const k = 0.32 + 0.18 * Math.sin(time * 5);
+    for (const m of this.lit) m.emissive.setRGB(k, k * 0.85, k * 0.55);
   }
 
   addRuler({ x, y0, y1, z = -0.25 }) {

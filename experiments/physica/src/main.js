@@ -83,7 +83,7 @@ if (journal.footing && !params.has('fresh')) { const f = journal.footing, av = w
 const hud = document.createElement('div'); hud.className = 'hud';
 hud.innerHTML = `
   <div class="title" id="title"><span class="eyebrow">Physica</span><b>La cascada ascendente</b></div>
-  <div class="prompt" id="prompt" hidden><kbd id="prompt-key">E</kbd><span><span id="prompt-verb"></span><small id="prompt-hint"></small></span></div>
+  <div class="prompt" id="prompt" hidden><kbd id="prompt-key">E</kbd><span><span id="prompt-verb"></span><small id="prompt-hint"></small><small id="prompt-reason" class="reason"></small></span></div>
   <div class="hint" id="hint"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>▲</kbd><kbd>▼</kbd> ajustar, trepar · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar (en el aire: volver a pisar firme) · <kbd>J</kbd> Bitácora</div>
   <div class="legend" id="legend" hidden><i></i> una marca cada 0,1 s · anillo cada 0,5 s</div>
   <div class="pause" id="pause" hidden><div><b>En pausa</b><p>El experimento quedó detenido donde estaba.</p><button id="resume">Seguir</button></div></div>
@@ -237,6 +237,7 @@ function frame(now) {
 
   // Prompt over the nearest interactable.
   const it = its[0];
+  view.highlight(it && !journal.open && it.kind === 'stand' ? { body: it.body, stand: it.id } : null);
   if (it && !journal.open) {
     const v = new THREE.Vector3(it.x, it.y + 0.4, 0).project(camera);
     promptEl.hidden = false;
@@ -244,6 +245,7 @@ function frame(now) {
     $('prompt-key').textContent = input.lastDevice === 'gamepad' ? 'A' : input.lastDevice === 'touch' ? 'E' : 'E';
     $('prompt-verb').textContent = it.verb;
     $('prompt-hint').textContent = it.hint || '';
+    $('prompt-reason').textContent = it.reason || '';
   } else promptEl.hidden = true;
   $('legend').hidden = !world.traces.length || journal.open;
   if (moved) { hintTimer -= dt; if (hintTimer < 0) $('hint').classList.add('gone'); }

@@ -211,3 +211,23 @@ Cada decisión dice qué se eligió, por qué y qué la invalidaría.
   - Un helecho que sale de una pared es una pequeña ménsula: la punta se desvía a lo largo del campo local y en proporción a él (`fieldBend`, con prueba).
   - Por eso los helechos se doblan hacia abajo afuera y se enroscan hacia arriba adentro. En la cara de la Terraza, que cruza el borde superior de la región (y = 3), se dan vuelta en el borde. En el Pozo pasa lo mismo, en y = 1.
 - **Instrumentos primero:** los helechos quedan detrás del plano de medición (los rótulos están en z 0,08). En la primera versión tapaban los rótulos de la cadena.
+
+## D15 · La Orilla se lee: instrumentos que no se confunden y avisos en su lugar (iteración 09)
+
+**El problema (A22):**
+- **El mástil de plomadas** era un montante con 11 brazos horizontales cada 0,5 m: una escalera, incluso en su sombra.
+- **El aviso de cada soporte** flotaba sobre el poste: el del soporte B aparecía junto a la esfera del A.
+- **Con una esfera en la mano**, la cadena simplemente no se ofrecía, sin explicación.
+
+**Elegido:**
+- **El mástil:**
+  - ménsulas inclinadas a alturas irregulares, con las puntas escalonadas para que las plomadas no formen un riel;
+  - sin sombra de las ménsulas, que dibujaba una celosía;
+  - plomadas un 35 % más grandes;
+  - **ninguna dentro de la banda de transición del campo (2,7–3,3 m):** ahí una plomada queda de costado y parece rota, y además la cruzaba el brazo de B. El par más cercano (abajo a 2,3, apuntando arriba; arriba a 4,1, colgando) enmarca el borde, que un collar de latón marca en el mástil a 3 m.
+- **Los soportes:**
+  - el aviso de «Soltar la esfera» va sobre la esfera que suelta, o junto a ella cuando taparía un instrumento (el de B, con un desplazamiento propio del nivel);
+  - un anillo rodea esa esfera, y el brazo y la pinza del soporte activo se iluminan: aviso, esfera y poste se leen como un solo aparato;
+  - el aviso de recoger con el carrete queda en el poste, donde está el carrete.
+- **La cadena con las manos ocupadas:** el aviso de soltar suma una **causa** con otro estilo (azafrán, en dos líneas), distinta de las ayudas de control: «Manos ocupadas: soltá la esfera para bajar por la cadena.»
+- **El aviso de «Bajar por la cadena»** va sobre el explorador en el labio, no sobre la sima: ahí sube la esfera recién soltada.

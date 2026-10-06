@@ -339,13 +339,25 @@ export class World {
   interactables() {
     const av = this.avatar, out = [];
     if (av.heldBy?.type === 'chain') { out.push({ kind: 'letgo', verb: 'Soltarse', d: 0, x: av.x, y: av.y + 0.5, hint: '▲▼ subir o bajar' }); return out; }
-    if (av.holding) { out.push({ kind: 'drop', verb: 'Soltar', d: 0, x: av.x, y: av.y }); return out; }
-    // A chain is its lip's interaction: within 0.75 m of the edge it takes precedence.
+    if (av.holding) {
+      // At a chain's lip, say why it is not offered: the hands are full.
+      const atChain = this.chains.some(ch => !(ch.gated && !(this.shortSeen || this.bell?.rung)) && av.supportSteps > 0 &&
+        av.x > ch.lipX - 0.75 && av.x < ch.x && Math.abs(av.y - av.hh - ch.lipY) < 0.1);
+      // A cause, not an order (the other prompts are infinitives); the box clears the head.
+      // At the lip, in the free band between the head and the two hanging spheres (both at 2 m):
+      // higher, it covered one or both of them.
+      out.push({ kind: 'drop', verb: 'Soltar', d: 0, x: av.x - (atChain ? 0.15 : 0), y: av.y + (atChain ? 0.2 : 0), reason: atChain ? 'Manos ocupadas: así no se puede bajar por la cadena.' : null });
+      return out;
+    }
+    // A chain is offered within 0.75 m of its lip, at its real distance from where it is taken
+    // (standing at the lip). It used to count as distance 0 there, which took E away from a
+    // support whose post stands within that reach (the Pozo's P, 0.15 m from it).
     // A gated chain is offered once the explorer has fallen short once, or has heard the bell.
     for (const ch of this.chains) {
       if (ch.gated && !(this.shortSeen || this.bell?.rung)) continue;
       if (av.supportSteps > 0 && av.x > ch.lipX - 0.75 && av.x < ch.x && Math.abs(av.y - av.hh - ch.lipY) < 0.1) {
-        out.push({ kind: 'chain', chain: ch.id, verb: 'Bajar por la cadena', d: 0, x: ch.x, y: ch.lipY + 1.0 });
+        // Over the explorer at the lip, not over the chasm: a sphere just let go rises there.
+        out.push({ kind: 'chain', chain: ch.id, verb: 'Bajar por la cadena', d: Math.abs(av.x - (ch.lipX - av.hw - 0.05)), x: ch.lipX - 1.1, y: ch.lipY + 1.0 });
       }
       // In the air beside a chain the explorer can catch it: a way out of any oscillation.
       if (!(ch.gated && !(this.shortSeen || this.bell?.rung)) && av.supportSteps === 0 && !av.heldBy && Math.abs(av.x - (ch.x - ch.side)) < 0.45 && av.y > ch.stopY - 0.05 && av.y < ch.lipY + av.hh) {
@@ -361,7 +373,13 @@ export class World {
       if (d > AVATAR.reach + 0.4 || Math.abs(av.y - AVATAR.hh - st.baseY) > 0.8) continue;
       const verb = st.state === 'armed' ? 'Soltar la esfera' : st.state === 'free' ? 'Recoger con el carrete' : null;
       const hint = st.state === 'armed' && st.rail ? '▲▼ altura de la pinza' : null;
-      if (verb) out.push({ kind: 'stand', id: st.id, verb, hint, d, x: st.x, y: st.baseY + 1.2 });
+      // The prompt sits over the sphere it refers to, not over the post: two supports stand side
+      // by side and each one's arm reaches to the other side of the other's.
+      // Reeling in is done at the post, where the reel is; the sphere may be anywhere by then.
+      const armed = st.state === 'armed';
+      // A level can move a prompt off its sphere (`prompt: { dx, dy }`) where it would cover an instrument.
+      const off = st.prompt ?? { dx: 0, dy: 0.2 };
+      if (verb) out.push({ kind: 'stand', id: st.id, body: st.body.id, verb, hint, d, x: armed ? st.body.x + off.dx : st.x, y: armed ? st.body.y + off.dy : st.baseY + 1.2 });
     }
     for (const b of this.bodies) {
       if (b.kind !== 'sphere' || this.standOf(b) || (b.heldBy && b.heldBy.type !== 'shelf')) continue;
