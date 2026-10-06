@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 10 (suelo pintado y musgo en flecos; ver `evidence/iter-10`).
+**Actualizado:** 2026-10-06 · iteración 11 (diagnóstico del tirón A25; ver `evidence/iter-11`).
 
 ## Dónde se trabaja
 
@@ -147,7 +147,7 @@
 **Cerrar el Hito A como candidata para evaluación humana, o lo que la impida.**
 - **Lo que hay:** el recorrido de la escena insignia está completo y probado con teclado, y el acabado visible pasó por revisiones de arte en cada pieza.
 - **Antes de pasar al Hito B:**
-  1. Identificar el tirón de 250 ms por minuto (A25): perfil de rendimiento de Chrome durante la prueba de resistencia.
+  1. ~~Identificar el tirón de 250 ms por minuto (A25)~~. Hecho en la iteración 11: es del entorno (Chrome headless, Metal), con una página de control que tiene la misma pausa. Ver `evidence/iter-11`.
   2. Escribir el paquete de evaluación humana del Hito A (apartado 11 del contrato): recorrido, controles, fallas conocidas y preguntas concretas sobre claridad y diversión.
   3. Revisar si queda algún impedimento de juego en el Hito A antes de abrir el Hito B (entrada desde el Instituto).
 - **Criterio:**

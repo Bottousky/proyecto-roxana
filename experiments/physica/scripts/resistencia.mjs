@@ -16,15 +16,18 @@ try {
   await page.evaluate(x => { const a = window.__physica.world.avatar; a.x = a.px = x; a.y = a.py = a.hh; }, X);
   await page.waitForTimeout(2000);
   await page.evaluate(() => window.__physica.resetFrames());
-  const heap = [], frames = [];
+  const heap = [], frames = [], works = [];
   for (let t = 0; t < secs && !crashed; t += 5) {
     await page.waitForTimeout(5000);
-    const s = await page.evaluate(() => ({ heap: performance.memory ? performance.memory.usedJSHeapSize : 0, f: window.__physica.frames() }));
-    heap.push(+(s.heap / 1048576).toFixed(1)); frames.push(...s.f);
+    const s = await page.evaluate(() => ({ heap: performance.memory ? performance.memory.usedJSHeapSize : 0, f: window.__physica.frames(), w: window.__physica.works ? window.__physica.works() : [] }));
+    heap.push(+(s.heap / 1048576).toFixed(1)); frames.push(...s.f); works.push(...s.w);
     await page.evaluate(() => window.__physica.resetFrames());
   }
   const a = frames.slice().sort((p, q) => p - q), q = p => a[Math.min(a.length - 1, Math.floor(p * a.length))];
-  Object.assign(out, { crashed, n: a.length, p50: q(0.5), p99: q(0.99), max: a[a.length - 1], over17: a.filter(f => f > 17).length, over34: a.filter(f => f > 34).length, heapMB: heap });
+  const w = works.slice().sort((p, q) => p - q), wq = p => +(w[Math.min(w.length - 1, Math.floor(p * w.length))] ?? 0).toFixed(2);
+  const longFrames = await page.evaluate(() => window.__physica.longFrames || []);
+  Object.assign(out, { crashed, n: a.length, p50: q(0.5), p99: q(0.99), max: +a[a.length - 1].toFixed(1), over17: a.filter(f => f > 17).length, over34: a.filter(f => f > 34).length,
+    work: { p50: wq(0.5), p99: wq(0.99), max: wq(1) }, longFrames, heapMB: heap });
 } catch (e) { out.error = String(e).split('\n')[0]; out.crashed = crashed; }
 out.errors = errors; out.loadEnd = os.loadavg().map(v => +v.toFixed(1));
 console.log(JSON.stringify(out));

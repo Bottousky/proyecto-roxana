@@ -115,11 +115,14 @@ const startAudio = () => sound.start();
 addEventListener('keydown', startAudio); addEventListener('pointerdown', startAudio);
 
 // ---------- telemetry ----------
-const frameTimes = new Float32Array(600); let frameIdx = 0, frameCount = 0;
+const frameTimes = new Float32Array(600), workTimes = new Float32Array(600); let frameIdx = 0, frameCount = 0, lastWork = 0;
+const longFrames = [];
 const eventLog = [];
 window.__physica = {
   world, view, DT, version: '0.1.0', quality, reduced,
   frames() { const n = Math.min(frameCount, frameTimes.length); return Array.from(frameTimes.slice(0, n)); },
+  works() { const n = Math.min(frameCount, workTimes.length); return Array.from(workTimes.slice(0, n)); },
+  longFrames,
   resetFrames() { frameCount = 0; frameIdx = 0; stepper.dropped = 0; },
   stats() {
     const a = this.frames().sort((x, y) => x - y); if (!a.length) return null;
@@ -152,8 +155,13 @@ let last = performance.now(), time = 0, stepPhase = 0;
 const pending = { act: false, reset: false, adjust: 0 };
 function frame(now) {
   requestAnimationFrame(frame);
-  const dt = Math.min(0.25, (now - last) / 1000); last = now;
-  frameTimes[frameIdx] = dt * 1000; frameIdx = (frameIdx + 1) % frameTimes.length; frameCount++;
+  const workStart = performance.now();
+  // Telemetry records the real interval; only the simulation's dt is clamped (a long stall must
+  // not become a long step). Recording the clamped dt reported every stall as exactly 250 ms.
+  const interval = now - last;
+  const dt = Math.min(0.25, interval / 1000); last = now;
+  const fi = frameIdx; frameTimes[fi] = interval; frameIdx = (frameIdx + 1) % frameTimes.length; frameCount++;
+  if (interval > 100 && longFrames.length < 50) longFrames.push({ at: +(now / 1000).toFixed(2), interval: +interval.toFixed(1), prevWork: +lastWork.toFixed(1) });
   const inp = input.poll();
   if (inp.pause) setPaused(!paused);
   if (inp.journal) journal.toggle();
@@ -253,5 +261,8 @@ function frame(now) {
   if (debug) $('debug').textContent = `x ${av.x.toFixed(2)} y ${av.y.toFixed(2)} vx ${av.vx.toFixed(2)} vy ${av.vy.toFixed(2)}\ng ${(av.gy ?? 0).toFixed(2)} w ${zw.toFixed(2)} step ${world.stepCount}`;
 
   renderer.render(scene, camera);
+  // CPU time this frame took in our code (simulation, scene update, render submission): a long
+  // interval with short work means the browser delivered the frame late, not that we were busy.
+  lastWork = performance.now() - workStart; workTimes[fi] = lastWork;
 }
 requestAnimationFrame(frame);
