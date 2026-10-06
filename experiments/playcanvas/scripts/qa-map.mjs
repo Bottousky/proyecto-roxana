@@ -2,23 +2,24 @@
 // avanzada (IMPORT=archivo.json), y comprueba y captura la vista inicial, el reino entero y un
 // acercamiento, en escritorio y en el teléfono. Uso: GAME_URL=… SIZES=1440x900,844x390 OUT=carpeta node scripts/qa-map.mjs
 import { chromium } from 'playwright';
-import { mkdir, readFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import { chromePath, gpuArgs } from './chrome.mjs';
 
 const url = process.env.GAME_URL || 'http://127.0.0.1:4190/', out = process.env.OUT || 'output/qa-map';
 await mkdir(out, { recursive: true });
 const sizes = (process.env.SIZES || '1440x900,844x390,390x844').split(',');
-const save = process.env.IMPORT ? await readFile(process.env.IMPORT, 'utf8') : null;
+const save = process.env.IMPORT || null;
 const browser = await chromium.launch({ headless: true, executablePath: chromePath, args: gpuArgs });
 for (const size of sizes) {
   const [width, height] = size.split('x').map(Number), phone = width < 900 || height < 600;
   const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, ...(phone ? { isMobile: true, hasTouch: true } : {}) });
   const page = await context.newPage(), errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  if (save) await context.addInitScript(text => { localStorage.setItem('ohmdal.playcanvas.arc1.v1', text); }, save);
   await page.goto(url, { waitUntil: 'networkidle' });
-  await page.locator(save ? '#continue' : '#new-game').click();
+  // A late journey comes in through the title screen's own import, as a player would bring it.
+  if (save) { await page.locator('#title-settings').click(); await page.locator('#import-save').setInputFiles(save); await page.locator('#transition').waitFor({ state: 'hidden', timeout: 120000 }); }
+  else await page.locator('#new-game').click();
   await page.waitForFunction(() => ['dialogue', 'world'].includes(window.__ohmdal?.mode), {}, { timeout: 180000 });
   for (let i = 0; i < 100 && await page.evaluate(() => window.__ohmdal.mode !== 'world'); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(140); }
   await page.keyboard.press('m');
