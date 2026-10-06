@@ -1,5 +1,5 @@
 import {ARTIFACT_PICKS,NOTICE_BOARD as NB} from './artifacts.js';
-import {BUILDINGS,AMPHI} from './school.js';
+import {BUILDINGS,AMPHI} from './layout.js';
 const TR=BUILDINGS.trofeos,AM=AMPHI;
 // The places of the Instituto that the diorama can open. Poses are orbit parameters
 // around `target`: yaw (degrees, positive = camera to the east), pitch, distance.

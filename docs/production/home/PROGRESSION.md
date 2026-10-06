@@ -59,3 +59,22 @@ Al volver con restauraciones nuevas el campus aparece **ya transformado**; una t
 lista lo que volvió («Cambió por tu aventura») y ofrece «Ver qué cambió» (recorrido corto, saltable con Escape).
 `stageSeen` avanza en cuanto la tarjeta se muestra: recargar no repite la celebración. «Continuar en Ohmdal»
 queda como acción dominante de la portada. Verificado con fixture en `scripts/home-interact.mjs`.
+
+## Versión clásica (ciclo 15)
+
+`escuela-clasica.html` lee la misma partida (sólo lectura) con las mismas funciones de `progress.js`, sin 3D:
+
+| Hito real | En la versión clásica |
+|---|---|
+| Hay partida | «Continuar en Ohmdal» desde el primer pintado (script en línea), registro con cifras, «Una pregunta abierta» |
+| Etapa 0–1 / 2–6 / 7–10 | Lámina I del campus: la misma imagen fija que el primer pintado del 3D (hora × tramo) |
+| `gate` (etapa ≥ 3) | Plano: portón abierto |
+| `pump` (etapa ≥ 4) | Plano: fuente con agua |
+| `distribution` (etapa ≥ 5) | Plano: dieciséis faroles encendidos |
+| `irrigation` (etapa ≥ 6) | Plano: canteros en flor |
+| `beacon_lens` (etapa ≥ 9) | Lámina del Faro en miniatura con la lente encendida |
+| Restauraciones nuevas | «Cambió por tu aventura» en la página, una sola vez: comparte `stageSeen` con el 3D |
+| Trofeos, lugares del mapa, funciones | Cifras y sala de trofeos de Ohmdal; Physica, Bitland y Arithmos sin cifras («todavía no comparten su progreso») |
+
+`?etapa=n` es una vista previa rotulada: no ofrece «Continuar» ni escribe el registro.
+

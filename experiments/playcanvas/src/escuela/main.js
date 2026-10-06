@@ -59,6 +59,7 @@ document.querySelector('#escuela').insertAdjacentHTML('beforeend',`
     <label><input type="checkbox" id="opt-quality"> Gráficos de alta calidad</label>
     ${import.meta.env.DEV||params.has('qa')?'':'<!-- vista previa de etapas: sólo con ?qa -->'}<label class="${import.meta.env.DEV||params.has('qa')?'':'hidden'}">Ver la escuela en otra etapa <select id="opt-stage"><option value="">Mi partida</option>${Array.from({length:11},(_,i)=>`<option value="${i}">Etapa ${i}${i?` · ${RESTORATIONS[i-1].world}`:' · abandonada'}</option>`).join('')}</select></label>
     <small class="${import.meta.env.DEV||params.has('qa')?'':'hidden'}">La vista previa no modifica tu partida.</small>
+    <a class="settings-link" href="${base}escuela-clasica.html">Versión clásica del Instituto, sin 3D</a>
   </section>
   <div id="preview-banner" class="preview-banner hidden"></div>
   <footer class="dock">
@@ -492,7 +493,8 @@ function route(){
   try{if(hash==='novedades')openNews();else if(hash==='sobre'||ROOMS[hash])openRoom(hash);else if($('#panel').dataset.room)closeRoom();}
   finally{traversing=false;}
 }
-document.querySelectorAll('.intro-links a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRoom(a.getAttribute('href').slice(1));}));
+// Novedades and Sobre Roxana open as rooms; the classic version is an ordinary page.
+document.querySelectorAll('.intro-links a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openRoom(a.getAttribute('href').slice(1));}));
 addEventListener('popstate',route);
 // Back from a world through the browser's cache: the page wakes as it was left (portal close-up, old save).
 // Read the save again, put the campus where the URL says, and tell what changed.
@@ -511,7 +513,7 @@ function lightVersion(reason,{retry=false}={}){
   document.body.classList.remove('exploring','reacting','showcasing');document.body.classList.add('light');canvas.hidden=true;syncInert();
   $('#cta-explore').hidden=true;
   const el=$('#light');el.classList.remove('hidden');
-  el.innerHTML=`<h2>Los Mundos Aplicados</h2><p class="meta">${esc(reason)}</p><ul>${WORLDS.map(w=>`<li style="--c:${w.color}"><span class="glyph" aria-hidden="true">${esc(w.glyph)}</span><div><b>${esc(w.name)}</b><small>${esc(w.discipline)} · ${esc(w.taller)}</small></div>${w.available?`<a class="cta small" href="${$('#cta-play').getAttribute('href')}">${esc($('#cta-play-label').textContent)}</a>`:'<span class="pill muted">En preparación</span>'}</li>`).join('')}</ul>${retry?'<p class="meta"><a href="" id="light-retry">Volver a cargar el campus 3D</a></p>':''}`;
+  el.innerHTML=`<h2>Los Mundos Aplicados</h2><p class="meta">${esc(reason)} <a href="${base}escuela-clasica.html">Versión clásica completa</a>.</p><ul>${WORLDS.map(w=>`<li style="--c:${w.color}"><span class="glyph" aria-hidden="true">${esc(w.glyph)}</span><div><b>${esc(w.name)}</b><small>${esc(w.discipline)} · ${esc(w.taller)}</small></div>${w.available?`<a class="cta small" href="${$('#cta-play').getAttribute('href')}">${esc($('#cta-play-label').textContent)}</a>`:'<span class="pill muted">En preparación</span>'}</li>`).join('')}</ul>${retry?'<p class="meta"><a href="" id="light-retry">Volver a cargar el campus 3D</a></p>':''}`;
 }
 // If the GPU drops the 3D context (driver reset, memory pressure, a backgrounded phone), the home keeps working:
 // the same page continues as the light version, with the panel that was open, and offers to reload the campus.

@@ -3,7 +3,7 @@
 // and a ring of hills that the haze turns blue. One terrain mesh, one road ribbon and
 // the distant trees merged per sprite, so the whole surround costs a handful of draws.
 import {Mesh,MeshInstance,Entity,StandardMaterial,Color,CULLFACE_NONE} from 'playcanvas';
-import {ISLAND} from './school.js';
+import {ISLAND} from './layout.js';
 
 const smooth=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t);};
 function hash2(i,j){let n=Math.imul(i,374761393)+Math.imul(j,668265263);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967296;}

@@ -5,6 +5,7 @@
 //   NOWEBGL=1 apaga WebGL (versión ligera). Tomas 'hash:novedades' abren la ruta con ese hash.
 //   SEED=n escribe una partida de PRUEBA (fixture, etapa n) en el perfil aislado: sirve para
 //   mirar estados, no acredita progreso real. REDUCED=1 emula movimiento reducido.
+//   PLATE=1 guarda una lámina JPEG sin interfaz (NAME) para la home clásica; con 'pose:<json codificado>'.
 import {chromium} from 'playwright';
 import {mkdirSync,existsSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
@@ -42,6 +43,9 @@ for(const spec of shots){
     if(name==='vista')e.closeRoom();else if(name==='explorar')document.querySelector('#cta-explore').click();else if(name.startsWith('showcase:'))e.diorama.showcase(Number(name.split(':')[1]));else if(name.startsWith('pose:')){document.body.classList.add('exploring');e.diorama.panelShift=0;e.diorama.panelShiftY=0;e.diorama.closeUp=true;e.diorama.flyTo(JSON.parse(decodeURIComponent(name.slice(5))));}else e.openRoom(name);
   },name);
   await page.waitForTimeout(Number(process.env.SETTLE||3600));
+  // PLATE=1: a still for the classic home (no interface over the campus), saved as JPEG under NAME.
+  if(process.env.PLATE==='1'){await page.addStyleTag({content:'#escuela>*:not(#diorama){display:none!important}'});await page.waitForTimeout(600);
+    const file=`${out}/${process.env.NAME||'lamina'}.jpg`;await page.screenshot({path:file,type:'jpeg',quality:Number(process.env.Q||78)});console.log('lámina',file);await context.close();continue;}
   const file=`${out}/${(process.env.NAME||spec.replace(/[@/:]/g,'-').slice(0,80))}-${width}.png`;
   await page.screenshot({path:file});console.log('captura',file,`listo ${ready} ms`);
   await context.close();

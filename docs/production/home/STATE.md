@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **CANDIDATO_PARA_REVISION** (2026-10-06) → [`CANDIDATE.md`](CANDIDATE.md). Sin críticos abiertos. Pulido de arte en curso. No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **CANDIDATO_PARA_REVISION** (2026-10-06) → [`CANDIDATE.md`](CANDIDATE.md). Sin críticos abiertos. El loop por cron está cancelado: se trabaja por pedido directo del usuario (ciclos 14–15).
 
 ## Qué es la home real
 
@@ -257,7 +257,49 @@ teclado 15/15. Paquete §14 en `CANDIDATE.md`.
 - Prueba nueva con techos a dos aguas y la distancia real de cámara: antes Trofeos 10/15 y Anfiteatro 3/6 puntos
   visibles; ahora 12/15 y 5/6. Antes/después en `evidence/c14/`.
 
+## Ciclo 15 (2026-10-06) — pósters con la fila norte y versión clásica (pedido del usuario)
+
+**Pósters.** Los 18 del primer pintado (hora × tramo × horizontal/vertical) regenerados con Trofeos y Anfiteatro
+en la fila norte (`public/escuela/campus-*.jpg`). Se ven en la portada y en la versión ligera (`evidence/c15/`).
+
+**Versión clásica** — `escuela-clasica.html` (pedido: «una home tradicional como alternativa»). Una página web
+convencional del mismo Instituto, no un reemplazo del campus: sirve a quien no puede o no quiere el 3D, a quien
+sólo quiere leer (familias, docentes, prensa) y a buscadores (brief §11: «explicar Roxana sin obligar a interpretar
+el canvas»). Concepto: el *prospecto* impreso de la escuela — papel y tinta de día, la noche del campus si el sistema
+la prefiere; láminas numeradas que son tomas del campus 3D real.
+- Secciones: portada (Entrar/Continuar, «Recorrer el campus en 3D», Lámina I del campus por hora × tramo), «Cambió
+  por tu aventura» (una sola vez, comparte `stageSeen` con el 3D), I Mundos (Ohmdal destacado; los otros tres
+  «en preparación», sin progreso inventado), II Tu registro (cifras, pregunta abierta, las diez restauraciones,
+  sala de trofeos de Ohmdal), III El campus (plano SVG dibujado con las medidas de `layout.js`; los números son
+  los atajos 1–9 del 3D y enlazan a cada sala), IV Novedades (mismo `novedades.json`), V Sobre Roxana.
+- Servida ya escrita: un plugin de Vite (`vite.config.js`) completa el HTML con `clasica-render.js` para una
+  primera visita; sin JS se lee entera. `clasica.js` (sin motor 3D: ≈152 KB de JS, ≈56 KB comprimidos) reescribe
+  lo que depende de la partida, que lee sin escribir. `?etapa=n`: vista previa rotulada, sin «Continuar» ni escrituras.
+- `layout.js`: las medidas del campus salieron de `school.js` a un módulo sin dependencias (lo leen el 3D, las salas
+  y el plano). Láminas en `public/escuela/clasica/` con `PLATE=1` en `home-shots.mjs`. Poses usadas:
+  Faro `{"target":[-22.6,2.8,-9.4],"yaw":68,"pitch":9,"distance":15}` (etapa 0 y 10), Physica
+  `{"target":[-22.2,2.5,22],"yaw":10,"pitch":8,"distance":22}`, Bitland `{"target":[39.6,1.7,-5.2],"yaw":12,"pitch":24,"distance":12}`,
+  Arithmos `{"target":[29.2,2,24],"yaw":30,"pitch":7,"distance":12}`, Roxana `{"target":[0,3.4,0],"yaw":10,"pitch":8,"distance":17}` (todas de tarde).
+- Desde el 3D: «Versión clásica» en la portada, en Ajustes, en la versión ligera y en `noscript`.
+- Corregido al revisar: un `<link rel="alternate">` hacía que Vite copiara `escuela.html` sin compilar a `assets/`
+  (enlace roto en producción); el Cormorant incluido sólo tiene cifras de estilo antiguo («1» parece «ı») → las
+  cifras van en Inter; la captura sin JS se colgaba (sin scripts no corren temporizadores).
+
+Verificado (Chrome 141 headless, perfil aislado; partidas de prueba = fixtures, no progreso):
+`npm test` 103/103 (4 pruebas nuevas: HTML servido completo y sin enlaces muertos, misma lámina que el 3D para
+3 horas × 11 etapas, registro/plano/láminas según la partida y sin cifras para mundos no integrados, sin motor 3D);
+`clasica-check.mjs` 44/44 (escritorio, sin JS, 390 con partida, vista previa en oscuro, 820; CLS de laboratorio
+0,002 a 1440 y 0,000 a 390 con «Cambió por tu aventura»; LCP de laboratorio ≈0,1 s en el servidor local, sólo indicio);
+`home-interact.mjs` 32/32 y `home-keys.mjs` 15/15 con los enlaces nuevos; build OK
+(`escuela-clasica.html` 25 KB, 7,3 KB comprimido). Capturas en `evidence/c15/`.
+
+NO VERIFICADO: lector de pantalla real, teléfono real, métricas de campo. Sin redirección automática a la clásica
+cuando falta WebGL (la versión ligera conserva las rutas y paneles; se puede cambiar si se prefiere).
+Abierto: el arranque 3D en headless se colgó >120 s en 2 de ~30 cargas de esta sesión (un póster y una captura
+390); al reintentar arrancó en 1,7 s. Sin causa identificada.
+
 ## Siguiente acción exacta
 
-1. Regenerar los pósters del primer pintado (muestran la disposición vieja): `home-shots.mjs poster@{0,5,10}/{manana,tarde,noche}`.
-2. Revisar móvil 390 y el modo portada con la nueva fila norte; correr `home-keys.mjs`.
+1. Recorrer la versión clásica con VoiceOver (macOS) y anotar lo que no se entienda sin ver.
+2. Investigar el arranque 3D colgado intermitente (2/30 en headless): registrar en qué paso de `diorama.build` queda.
+3. Pendientes externos sin cambios: URLs de redes, novedades reales, origen de los otros mundos, derechos de assets.

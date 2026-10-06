@@ -126,3 +126,61 @@ test('vista general: Trofeos y Anfiteatro se ven desde la cámara principal (tec
   assert.ok(amphi.filter(q=>seen(q,'anfiteatro')).length>=5,'Anfiteatro tapado');
   assert.ok(seen([a.x,3.6,a.z-.9],'anfiteatro'),'pantalla del Anfiteatro tapada');
 });
+
+// ── Versión clásica (escuela-clasica.html) ─────────────────────────────────────
+const here=p=>new URL(p,import.meta.url);
+test('versión clásica: la página servida trae todo el Instituto escrito, sin partida ni enlaces muertos',async()=>{
+  const {renderStatic}=await import('../src/escuela/clasica-render.js');const {existsSync}=await import('node:fs');
+  const news=JSON.parse(readFileSync(here('../public/escuela/novedades.json'),'utf8')).items;
+  const html=quiet(()=>renderStatic(readFileSync(here('../escuela-clasica.html'),'utf8'),{news}));
+  assert.ok(!html.includes('<!--clasica:'),'quedan marcas sin completar');
+  assert.equal((html.match(/<article class="world/g)||[]).length,4,'cuatro mundos');
+  assert.equal((html.match(/<ol class="ledger">/g)||[]).length,1);
+  assert.equal((html.match(/<li><a href="\.\/escuela\.html#/g)||[]).length,9,'nueve lugares en el plano');
+  assert.ok(!/href="#"|href=""/.test(html),'sin enlaces vacíos');
+  assert.ok(!html.includes('#continuar'),'una primera visita no ofrece continuar');
+  assert.ok(!html.includes('Ejemplo: así se ve'),'el ejemplo de desarrollo no se publica');
+  for(const [,src] of html.matchAll(/src="\.\/(escuela\/[^"]+)"/g))assert.ok(existsSync(here('../public/'+src)),src);
+  // Every room it links to opens in the 3D home (rooms.js, plus the routes #sobre and #novedades).
+  for(const [,h] of html.matchAll(/href="\.\/escuela\.html#([\w-]+)"/g))assert.ok(ROOMS[h]||h==='sobre',h);
+  for(const [,id] of html.matchAll(/href="#([\w-]+)"/g))assert.ok(html.includes(`id="${id}"`),`ancla #${id}`);
+});
+test('versión clásica: el primer pintado elige la misma lámina que la home 3D (hora × tramo de la partida)',async()=>{
+  const {campusImage}=await import('../src/escuela/clasica-render.js');const {runInNewContext}=await import('node:vm');
+  const run=(file,{search='',save=null,hour=16})=>{
+    const code=readFileSync(here(file),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1],props={},win={};
+    const document={documentElement:{dataset:{},style:{setProperty:(k,v)=>{props[k]=v;}}},createElement:()=>({}),head:{appendChild:()=>{}}};
+    runInNewContext(code,{URLSearchParams,location:{search},Date:class extends Date{getHours(){return hour;}},localStorage:{getItem:()=>save},matchMedia:()=>({matches:false}),document,window:win,JSON,Number,Math,Boolean});
+    return {poster:props['--poster'],campus:win.__campus};
+  };
+  for(const [hora,hour] of [['manana',9],['tarde',16],['noche',22]])for(let n=0;n<=10;n++){
+    const want=campusImage(hora,n);
+    assert.equal(run('../escuela-clasica.html',{search:`?etapa=${n}`,hour}).campus.src,want,`clásica ${hora} ${n}`);
+    assert.equal(run('../escuela.html',{search:`?etapa=${n}`,hour}).poster,`url("${want}")`,`3D ${hora} ${n}`);
+  }
+  const save=JSON.stringify(previewState(6));
+  assert.equal(run('../escuela-clasica.html',{save}).campus.src,campusImage('tarde',6));
+  assert.equal(run('../escuela.html',{save}).poster,`url("${campusImage('tarde',6)}")`);
+});
+test('versión clásica: registro, láminas y plano siguen la partida real; la vista previa no ofrece continuar',async()=>{
+  const {renderRecord,renderPlan,renderWorlds,wayIn}=await import('../src/escuela/clasica-render.js');
+  const lit=h=>(h.match(/class="lamp lit"/g)||[]).length;
+  assert.equal(lit(renderPlan(null)),0);assert.equal(lit(renderPlan(previewState(4))),0);assert.equal(lit(renderPlan(previewState(5))),16);
+  assert.ok(renderPlan(previewState(4)).includes('fountain water')&&!renderPlan(previewState(3)).includes('fountain water'));
+  assert.match(renderRecord(previewState(6)),/Continuar en Ohmdal/);
+  assert.doesNotMatch(renderRecord(previewState(6),{way:wayIn(null),preview:6}),/Continuar/);
+  assert.match(renderRecord(previewState(6),{way:wayIn(null),preview:6}),/Vista previa de la etapa 6/);
+  assert.match(renderWorlds(previewState(9)),/mundo-ohmdal-luz\.jpg/);assert.doesNotMatch(renderWorlds(previewState(8)),/mundo-ohmdal-luz/);
+  // Worlds without integration never get counts or trophies of their own.
+  const rec=renderRecord(previewState(10));assert.match(rec,/Physica, Bitland y Arithmos todavía no comparten su progreso/);
+  assert.doesNotMatch(rec,/(Physica|Bitland|Arithmos)[^<]{0,40}\d+\s*\/\s*\d+/);
+  assert.match(renderRecord(null),/Todavía no hay un viaje guardado/);
+});
+test('versión clásica: no carga el motor 3D ni el campus',async()=>{
+  const {build}=await import('esbuild');const {fileURLToPath}=await import('node:url');
+  const r=await build({entryPoints:[fileURLToPath(here('../src/escuela/clasica.js'))],bundle:true,minify:true,write:false,metafile:true,format:'esm',logLevel:'silent'});
+  const inputs=Object.keys(r.metafile.inputs);
+  assert.ok(!inputs.some(f=>f.includes('node_modules/playcanvas')),'playcanvas en la versión clásica');
+  assert.ok(!inputs.some(f=>/escuela\/(school|diorama|kit|landscape|statue)\.js$/.test(f)),'geometría 3D en la versión clásica');
+  assert.ok(r.outputFiles[0].contents.length<160_000,`script de ${r.outputFiles[0].contents.length} bytes`);
+});
