@@ -2,7 +2,7 @@
 // patio. Everything here is geometry; lights, particles and sprites live in diorama.js.
 // Axes: x east, z south (toward the default camera), y up. The island top is y = 0.
 import {Kit} from './kit.js';
-import {buildArtifacts,buildNoticeBoard} from './artifacts.js';
+import {buildArtifacts,buildNoticeBoard,segment} from './artifacts.js';
 
 export const ISLAND={w:92,d:74,r:8};
 // Four workshops of equal weight flank the patio, one per Applied World. The patio side
@@ -242,9 +242,51 @@ function taller(k,id){
   k.box(`${id}:roof`,'stoneDark',{x:P(-2.4,0)[0],z:b.z+5.3,w:1,d:1,y:b.h+.6,h:3.2,jitter:.03});
   // The world's medallion on the south gable, readable from the whole patio.
   k.panel(`${id}:roof`,`medal:${t.world}`,{x:b.x,y:b.h+1.1,z:b.z+b.d/2+.06,w:1.7,h:1.7});
+  roofAccent(k,id,f);
   // Each world has its own way in, against the outer wall: only Ohmdal is a portal.
   ({ohmdal:portalEntry,bitland:vrEntry,physica:tankEntry,arithmos:boardEntry})[t.world](k,id,I,f);
   ({electronica:electronicaRoom,fisica:fisicaRoom,programacion:programacionRoom,matematica:matematicaRoom})[id](k,id,I,f);
+}
+/**
+ * Each workshop crowns its ridge with something of its discipline, so the four roofs read apart from the
+ * master camera while the architecture stays common. Static pieces ride on the roof; turning ones on `:spin`.
+ */
+function roofAccent(k,id,{b,t}){
+  const R=`${id}:roof`,top=b.h+b.rise+.15,x=b.x;
+  if(t.world==='ohmdal'){
+    // A copper lightning rod with a glass bulb that lights when the workshop's lamps work again.
+    const z=b.z-4.6;k.box(R,'bronze',{x,z,y:top-.05,w:.5,d:.5,h:.12,jitter:0});k.cylinder(R,'copper',{x,z,y:top,r:.06,r2:.045,h:2.1,seg:8});
+    for(const y of [.5,1.05])k.lathe(R,'ceramic',[[0,0],[.12,.02],[.14,.08],[.1,.12],[0,.13]],{x,z,y:top+y,seg:10,smooth:true,ao:false});
+    k.lathe(`bulb:${id}`,'bulbOhm',[[0,0],[.12,.03],[.22,.2],[.2,.36],[.1,.44],[0,.46]],{x,z,y:top+2.05,seg:12,smooth:true,ao:false});
+    k.lathe(R,'copper',[[.08,0],[.1,.05],[0,.08]],{x,z,y:top+2.5,seg:8});
+    // Its down conductor follows the slope to the eave.
+    segment(k,R,'copper',[x,top,z],[x+b.w/2+.3,b.h+.15,z],.025);
+  }else if(t.world==='physica'){
+    // An anemometer: the wind is measured, not guessed.
+    // Sized for the master camera: it has to read as a silhouette from across the fields.
+    const z=b.z+3.2;k.box(R,'stone',{x,z,y:top-.05,w:.9,d:.9,h:.25,jitter:0});k.cylinder(R,'iron',{x,z,y:top+.15,r:.09,r2:.07,h:2.6,seg:8});
+    const y=top+2.8;k.pivot(`${id}:spin`,x,y,z);k.cylinder(`${id}:spin`,'bronze',{x,z,y:y-.12,r:.18,h:.26,seg:10});
+    for(let i=0;i<3;i++){const a=i/3*Math.PI*2,ex=x+Math.cos(a)*1.4,ez=z+Math.sin(a)*1.4;segment(k,`${id}:spin`,'iron',[x,y,z],[ex,y,ez],.04);
+      k.lathe(`${id}:spin`,'bronze',[[0,-.32],[.24,-.24],[.34,0],[.3,.04]],{x:ex,z:ez,y,rz:90,ry:-a*57.3,seg:12,smooth:true,ao:false});}
+    k.box(R,'iron',{x,z,y:top+1.9,w:1.6,d:.07,h:.07,jitter:0,ao:false});k.box(R,'iron',{x,z,y:top+1.9,w:.07,d:1.6,h:.07,jitter:0,ao:false});
+  }else if(t.world==='bitland'){
+    // A ridge lantern of glass: the city in the chip below spills a contained cyan light through it.
+    const z0=b.z-5,z1=b.z+2.2,zc=(z0+z1)/2,L=z1-z0;
+    k.box(R,'bronze',{x,z:zc,y:top-.12,w:1.4,d:L+.3,h:.14,jitter:0});
+    k.box(R,'skylight',{x,z:zc,y:top,w:1.1,d:L,h:.5,jitter:0,ao:false});
+    for(let i=0;i<=6;i++)k.box(R,'iron',{x,z:z0+i*L/6,y:top,w:1.16,d:.06,h:.54,jitter:0,ao:false});
+    k.gable(R,'iron',{x,z:zc,y:top+.5,w:1.3,d:L+.2,rise:.28,overhang:.04,thick:.05,alongZ:true});
+    // A thin mast at the north end.
+    const zm=b.z-6;k.cylinder(R,'iron',{x,z:zm,y:top,r:.05,h:2.6,seg:6});for(const y of [1.4,2.1])k.box(R,'iron',{x,z:zm,y:top+y,w:.7,d:.04,h:.04,jitter:0,ao:false});
+    k.lathe(R,'skylight',[[0,0],[.07,.04],[0,.12]],{x,z:zm,y:top+2.6,seg:8,ao:false});
+  }else if(t.world==='arithmos'){
+    // A finial that is a solid of chalk, turning slowly inside a brass ring.
+    const z=b.z-3.4;k.box(R,'stone',{x,z,y:top-.05,w:1,d:1,h:.4,jitter:0});k.cylinder(R,'bronze',{x,z,y:top+.35,r:.11,h:1.6,seg:8});
+    const y=top+2.9;k.pivot(`${id}:spin`,x,y,z);
+    k.lathe(`${id}:spin`,'chalkWhite',[[0,-.95],[.84,0],[0,.95]],{x,z,y,seg:5,ao:false});
+    const ring=Array.from({length:9},(_,i)=>{const a=-Math.PI/2+i/8*Math.PI*2;return [1.25+Math.cos(a)*.05,Math.sin(a)*.05];});
+    k.lathe(R,'bronze',ring,{x,z,y,rx:90,seg:28,ao:false});k.lathe(R,'bronze',ring,{x,z,y,rz:90,seg:28,ao:false});
+  }
 }
 function portalEntry(k,id,I,{b,s,P,ry,half}){
   const [px]=P(-half+1.25,0);

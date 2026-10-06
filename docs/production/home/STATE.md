@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 4 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 5 cerrado (2026-10-06). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -118,12 +118,26 @@ Physica y Arithmos siguen sin progreso real (bloqueo de origen documentado en `P
 Limitaciones: la tira es por capturas (~11 fps efectivos), no video; la cartelera muestra el ejemplo sólo en dev,
 en producción hoy queda vacía porque no hay novedades confirmadas (dato externo pendiente, no un error).
 
+## Ciclo 5 (2026-10-06) — silueta propia de cada taller y noche legible
+
+- **Remates de techo** (`roofAccent` en `school.js`), dimensionados para el plano maestro y que suben con el techo
+  al abrir la sala: Electrónica, pararrayos de cobre con aisladores, bajada y una bombilla que se enciende con
+  `workshop` **real**; Física, anemómetro que gira con ráfagas; Programación, lucernario de vidrio con luz cian
+  contenida (la ciudad del chip) y un mástil — Bitland por fin se anuncia desde lejos; Matemática, un sólido de
+  tiza que rota dentro de un anillo de latón. Movimiento en reposo con movimiento reducido.
+- Rótulos de talleres elevados por encima de los remates. Luz de luna (ambiente) para leer techos y caminos.
+- Verificación: partes y proyecciones inspeccionadas en página; el anemómetro cae bajo el botón «Explorar» en modo
+  portada (visible al explorar: `evidence/c05/explorar-2-tarde-1440.jpg`). `npm test` 93/93.
+- Nueva toma `explorar` en `home-shots.mjs`. Una captura cayó por `CVDisplayLink` (pantalla en reposo); se repitió.
+
+Limitaciones: en modo portada (escritorio) el texto cubre Física y parte de Electrónica; los remates de Φ, λ, ∑
+son ambiente, no progreso (sin integración de esos mundos).
+
 ## Siguiente acción exacta
 
-1. Legibilidad del chip de Bitland en el plano maestro (está tras el Taller de Matemática): resplandor cian
-   contenido que asome sobre el techo o reubicación con prueba de visibilidad proyectada.
-2. Noche: el campus en etapa 0 es muy oscuro fuera de Dirección y cartelera; luz de luna/ventanas sin inventar
-   restauraciones (ambiente, no progreso).
-3. Rendimiento con `vite preview` y GPU sin compartir: frame times, memoria, 10 ciclos abrir/cerrar panel y
-   gesto (fugas de listeners/texturas).
-4. Poster/imagen del campus para la versión ligera y como primer cuadro mientras carga.
+1. Rendimiento con `vite preview` y GPU sin compartir: frame times, memoria, 10 ciclos abrir/cerrar panel y
+   gesto (fugas de listeners/texturas); presupuesto de draw calls tras medir.
+2. Poster del campus (imagen honesta del plano maestro) para la versión ligera y como primer cuadro.
+3. Portada de escritorio: evaluar texto más compacto o campus más a la derecha para que Física no quede tapada.
+4. Revisión crítica separada (arte, interacción, integración) y paquete de CANDIDATO_PARA_REVISION si no hay
+   bloqueos críticos.

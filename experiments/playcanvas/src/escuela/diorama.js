@@ -27,7 +27,8 @@ const linear=c=>new Color(Math.pow(c.r,2.2),Math.pow(c.g,2.2),Math.pow(c.b,2.2))
 export const HOURS={
   manana:{label:'Mañana',sun:[52,-30,'#fff1d6',1.75],ambient:'#a9b8c2',zenith:'#5f8fbf',horizon:'#d6e6ea',below:'#87a6b4',lamps:.15,windows:.1,grade:[1.02,1,1,1.01,1.02],cloud:'#ffffff',env:.85},
   tarde:{label:'Tarde',sun:[30,-58,'#ffd49a',1.9],ambient:'#a59c9e',zenith:'#5a7fae',horizon:'#f6c894',below:'#c79c80',lamps:.55,windows:.45,grade:[1.04,1.05,1,.9,1],cloud:'#fff0dc',env:.8},
-  noche:{label:'Noche',sun:[46,40,'#9fb4ff',.38],ambient:'#3c4a66',zenith:'#070d20',horizon:'#2a3a5e',below:'#10182c',lamps:1,windows:1,grade:[.85,.86,.92,1.12,.95],cloud:'#8795b8',env:.45},
+  // Moonlight: enough to read roofs and paths; the lit windows still lead.
+  noche:{label:'Noche',sun:[46,40,'#a9bcff',.62],ambient:'#4a5a82',zenith:'#070d20',horizon:'#2a3a5e',below:'#10182c',lamps:1,windows:1,grade:[.85,.86,.92,1.12,.95],cloud:'#8795b8',env:.45},
 };
 export function hourFor(date=new Date()){const h=date.getHours();return h>=7&&h<15?'manana':h>=15&&h<20?'tarde':'noche';}
 
@@ -44,7 +45,8 @@ const MATERIALS={
   lampGlass:{color:'#6c6556',emissive:'#ffd08a',glow:0},lanternGlass:{color:'#57636a',emissive:'#fff0c4',glow:0,gloss:.8},
   glass:{color:'#344b55',emissive:'#ffcb7c',glow:0,gloss:.85},screen:{color:'#10231a',emissive:'#6cf0a2',glow:0},
   flame:{color:'#ffd9a0',emissive:'#ffcf7a',glow:0},
-  ceramic:{color:'#f1ede2',gloss:.82},noticeLamp:{color:'#5a5040',emissive:'#ffcf8a',glow:0,gloss:.7},faroGlass:{color:'#4e5a60',emissive:'#ffe7ad',glow:0,gloss:.85},
+  ceramic:{color:'#f1ede2',gloss:.82},bulbOhm:{color:'#4c5a58',emissive:'#9ff5ec',glow:0,gloss:.85},skylight:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.6,gloss:.8},
+  chalkWhite:{map:'stone',contrast:.15,color:'#f2f0e6',emissive:'#fffaf0',glow:.22},noticeLamp:{color:'#5a5040',emissive:'#ffcf8a',glow:0,gloss:.7},faroGlass:{color:'#4e5a60',emissive:'#ffe7ad',glow:0,gloss:.85},
   cityCyan:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.9,gloss:.6},lensGlass:{color:'#e8f6f4',opacity:.1,gloss:.98,emissive:'#bff6ff',glow:.04},roxanaLamp:{color:'#6c6556',emissive:'#ffd08a',glow:0},bitacora:{color:'#e9dfc6',emissive:'#ffe3a6',glow:.6},
 };
 
@@ -740,6 +742,9 @@ export class SchoolDiorama {
     const fg=this.materials.faroGlass;fg.emissiveIntensity=L(8)*(.9+night*1.6);fg.update();this.rooms.faro.light.intensity=L(8)*(.15+night*.55);
     this.fx.climb.particlesystem.enabled=!this.reducedMotion;this.fx.spill.particlesystem.enabled=!this.reducedMotion;
     const cc=this.materials.cityCyan;cc.emissiveIntensity=.3+night*.7;cc.update();
+    // The workshop's lamps work again (real `workshop`): its roof bulb too.
+    const bo=this.materials.bulbOhm;bo.emissiveIntensity=L(1)*(1.1+night*2.2);bo.update();
+    this.skylightBase=.45+night*1.1;const sk=this.materials.skylight;sk.emissiveIntensity=this.skylightBase;sk.update();
     this.rooms.board.light.intensity=.15+night*1.1;
     const nl=this.materials.noticeLamp;nl.emissiveIntensity=this.noticeUnread?1.4+night*1.6:0;nl.update();
     // Roxana's lamp burns from the first light; the screen glows with the evening.
@@ -780,7 +785,10 @@ export class SchoolDiorama {
       const open=this.focusId===id?1:0,hover=this.hoverId===id&&!open?1:0;
       const st=(this.cut??={})[id]??={open:0,hover:0};st.open=lerp(st.open,open,1-Math.exp(-dt*(this.reducedMotion?60:3.5)));st.hover=lerp(st.hover,hover,1-Math.exp(-dt*8));
       const roof=this.parts.get(`${id}:roof`),rb=this.basePos.get(`${id}:roof`);
-      if(roof){const lift=ease(clamp(st.open,0,1))*16+st.hover*.55;roof.setLocalPosition(rb.x,rb.y+lift,rb.z);roof.enabled=st.open<.97;}
+      const lift=ease(clamp(st.open,0,1))*16+st.hover*.55;
+      if(roof){roof.setLocalPosition(rb.x,rb.y+lift,rb.z);roof.enabled=st.open<.97;}
+      // Roof accents that turn or glow ride with the roof.
+      for(const extra of [`${id}:spin`,`bulb:${id}`]){const e=this.parts.get(extra),eb=this.basePos.get(extra);if(e){e.setLocalPosition(eb.x,eb.y+lift,eb.z);e.enabled=st.open<.97;}}
       for(const side of ['n','s','e','w']){const w=this.parts.get(`${id}:wall:${side}`);if(!w)continue;const drop=b.cut.includes(side)?ease(clamp(st.open,0,1)):0;w.setLocalScale(1,1-drop*.88,1);}
       if(id==='direccion'){const p=this.parts.get('direccion:portico');if(p){p.setLocalScale(1,Math.max(.001,1-ease(clamp(st.open,0,1))),1);p.enabled=st.open<.97;}const bn=this.parts.get('banners');if(bn&&st.open>.02)bn.setLocalScale(1,Math.max(.01,ease(this.levels[6])*(1-st.open)),1);}
       if(id==='trofeos'){const p=this.parts.get('trofeos:colonnade');if(p){p.setLocalScale(1,Math.max(.001,1-ease(clamp(st.open,0,1))),1);p.enabled=st.open<.97;}}
@@ -797,6 +805,11 @@ export class SchoolDiorama {
     this.parts.get('bell')?.setLocalEulerAngles(Math.sin(this.clock*2.4)*16*this.levels[7]*motion,0,0);
     this.parts.get('pendulum:fisica')?.setLocalEulerAngles(Math.sin(this.clock*1.7)*14*motion,0,0);
     this.parts.get('orrery:fisica')?.setLocalEulerAngles(0,this.clock*6*motion,0);
+    // The anemometer turns with gusts; the chalk solid turns slowly and tilts.
+    {const gust=1+.45*Math.sin(this.clock*.31)+.25*Math.sin(this.clock*1.13);this.windAngle=(this.windAngle||0)+dt*150*gust*motion;}
+    this.parts.get('fisica:spin')?.setLocalEulerAngles(0,this.windAngle||0,0);
+    this.parts.get('matematica:spin')?.setLocalEulerAngles(Math.sin(this.clock*.23)*14*motion,this.clock*11*motion,0);
+    {const sk=this.materials.skylight;if(sk&&!this.reducedMotion){sk.emissiveIntensity=this.skylightBase*(.88+.12*Math.sin(this.clock*.8));sk.update();}}
     if(this.beam.pivot.enabled&&!this.reducedMotion)this.beam.pivot.setEulerAngles(0,this.clock*22,0);
     this.materials['portal@electronica'].setParameter('uPortalTime',this.clock);
     this.worldAngle=(this.worldAngle||0)+dt*(this.worldSpin??14);

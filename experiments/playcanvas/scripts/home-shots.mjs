@@ -36,7 +36,7 @@ for(const spec of shots){
   if(name==='llegada'||hash){await page.screenshot({path:`${out}/${spec.replace(/[@/:]/g,'-')}-${width}.png`});console.log('captura',spec,`listo ${ready} ms`);await context.close();continue;}
   await page.evaluate(name=>{
     const e=window.__escuela;document.querySelector('#news')?.classList.add('hidden');
-    if(name==='vista')e.closeRoom();else if(name.startsWith('showcase:'))e.diorama.showcase(Number(name.split(':')[1]));else if(name.startsWith('pose:')){document.body.classList.add('exploring');e.diorama.panelShift=0;e.diorama.panelShiftY=0;e.diorama.closeUp=true;e.diorama.flyTo(JSON.parse(decodeURIComponent(name.slice(5))));}else e.openRoom(name);
+    if(name==='vista')e.closeRoom();else if(name==='explorar')document.querySelector('#cta-explore').click();else if(name.startsWith('showcase:'))e.diorama.showcase(Number(name.split(':')[1]));else if(name.startsWith('pose:')){document.body.classList.add('exploring');e.diorama.panelShift=0;e.diorama.panelShiftY=0;e.diorama.closeUp=true;e.diorama.flyTo(JSON.parse(decodeURIComponent(name.slice(5))));}else e.openRoom(name);
   },name);
   await page.waitForTimeout(Number(process.env.SETTLE||3600));
   const file=`${out}/${(process.env.NAME||spec.replace(/[@/:]/g,'-').slice(0,80))}-${width}.png`;

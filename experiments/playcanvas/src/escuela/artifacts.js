@@ -17,7 +17,7 @@ export const NOTICE_BOARD={x:7.4,z:21.2,ry:24};
 export const ARTIFACT_PICKS=Object.fromEntries(Object.values(ARTIFACTS).map(a=>[a.room,[[a.x-1.6,0,a.z-1.6],[a.x+1.6,4.8,a.z+1.6]]]));
 
 /** A thin square prism between two points: wires, rods, stays. */
-function segment(k,part,mat,a,b,r=.03,o={}){
+export function segment(k,part,mat,a,b,r=.03,o={}){
   const d=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],l=Math.hypot(...d)||1,u=d.map(v=>v/l);
   let p=Math.abs(u[1])<.9?[0,1,0]:[1,0,0];
   const c1=[u[1]*p[2]-u[2]*p[1],u[2]*p[0]-u[0]*p[2],u[0]*p[1]-u[1]*p[0]],n1=Math.hypot(...c1);const s=c1.map(v=>v/n1*r);

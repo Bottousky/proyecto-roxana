@@ -12,7 +12,7 @@ Cuatro capas separadas (brief §7):
 | Hito real (flag) | Transformación visible | Interacción nueva | Evidencia |
 |---|---|---|---|
 | `awaken` | farol a los pies de Roxana, ventana del Taller, Ohm en el patio | — | `tests/escuela.test.js` (etapas) · capturas `?etapa=1` |
-| `workshop` | lámparas del Taller de Electrónica, humo de chimenea | — | idem |
+| `workshop` | lámparas del Taller de Electrónica, humo de chimenea, **bombilla del pararrayos** (ciclo 5) | — | idem · `evidence/c05/explorar-2-tarde-1440.jpg` |
 | `gate` | se abre el portón, cae la cadena | — | idem |
 | `pump` | la fuente vuelve a correr | — | idem |
 | `distribution` | faroles del patio rama por rama; luciérnagas de noche | — | idem |
