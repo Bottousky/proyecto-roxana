@@ -362,3 +362,10 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .meter-world b{margin-left:.35rem}.meter-note{font-size:.62rem;letter-spacing:.06em;color:var(--muted);opacity:.8}
 @media (max-width:820px){.meter-note{display:none}}
 .light .light-worlds{bottom:calc(clamp(12px,2vw,24px) + 76px)}@media (max-width:820px){.light .light-worlds{left:16px;right:16px;bottom:96px;max-height:42vh;overflow:auto}.light .intro-sub{display:none}}
+
+/* Ciclo 8 · el rótulo del gesto va arriba, con fondo propio, lejos del artefacto. */
+.reacting .caption{top:clamp(84px,11vh,110px);bottom:auto;padding:.8rem 1.3rem 1rem;border-radius:14px;background:linear-gradient(180deg,rgba(12,19,18,.82),rgba(12,19,18,.68));border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.reacting .caption span{font-size:clamp(1.1rem,1.8vw,1.45rem);text-shadow:none}
+.reacting .caption b{text-shadow:none;color:#ecd191}
+.reacting .toast{opacity:0!important}
+.map-card figure{margin:.5rem 0 0}.map-card img{display:block;width:100%;border-radius:8px;border:1px solid var(--line)}.map-card figcaption{margin-top:.45rem}

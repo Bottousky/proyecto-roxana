@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {validItem,visibleItems,sortItems,unreadCount,renderNews} from '../src/escuela/news.js';
 import {IDENTITIES,confirmed,pendingLinks,renderCommunity} from '../src/escuela/social.js';
-import {readProfile,defaultQuality,freshProfile,readOhmdal,saveProfile} from '../src/escuela/progress.js';
+import {readProfile,defaultQuality,freshProfile,readOhmdal,saveProfile,ohmdalPlaces,previewState} from '../src/escuela/progress.js';
 import {heightAt,outside,roadX} from '../src/escuela/landscape.js';
 import {ROOMS} from '../src/escuela/rooms.js';
 import {ARTIFACTS} from '../src/escuela/artifacts.js';
@@ -96,4 +96,10 @@ test('los módulos de la home compilan (main.js no lo importa ninguna otra prueb
   const {transform}=await import('esbuild');const {readFileSync,readdirSync}=await import('node:fs');
   const dir=new URL('../src/escuela/',import.meta.url);
   for(const f of readdirSync(dir).filter(f=>f.endsWith('.js')))await transform(readFileSync(new URL(f,dir),'utf8'),{loader:'js',format:'esm'});
+});
+test('mapa del taller: cada lugar aparece sólo con su restauración real, en el orden del viaje',()=>{
+  assert.deepEqual(ohmdalPlaces(null).filter(p=>p.restored),[]);
+  assert.deepEqual(ohmdalPlaces(previewState(4)).filter(p=>p.restored).map(p=>p.id),['portal','plaza','workshop','road','spring']);
+  assert.equal(ohmdalPlaces(previewState(10)).filter(p=>p.restored).length,9);
+  assert.deepEqual(ohmdalPlaces(null).map(p=>p.id),['portal','plaza','workshop','road','spring','castle','terraces','lake','lighthouse']);
 });

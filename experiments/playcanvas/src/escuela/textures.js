@@ -26,6 +26,11 @@ export async function grain(app,name,{contrast=.55}={}){
   c.getContext('2d').drawImage(img,cx*w+2,cy*h+2,w-4,h-4,0,0,512,512);
   return upload(app,key,toGrain(c,contrast));
 }
+/** A project picture as a texture (loaded once, on demand). */
+export async function picture(app,url,{repeat=false}={}){
+  const key='pic:'+url;if(cache.has(key))return cache.get(key);
+  return upload(app,key,await image(url),{repeat});
+}
 export async function meadow(app){
   if(cache.has('meadow'))return cache.get('meadow');
   return upload(app,'meadow',await image('/assets/art-polish/meadow.webp'));

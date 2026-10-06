@@ -25,6 +25,16 @@ Cuatro capas separadas (brief §7):
 Trofeos y cinemáticas del Anfiteatro también derivan de estos flags. Las capturas con `?etapa=` o `SEED=` son
 **fixtures**: verifican el render de un estado, no la integración con una partida real.
 
+## Memoria: el mapa del Taller de Electrónica (ciclo 8)
+
+Un mapa de Ohmdal colgado en la pared norte del taller (y repetido como imagen con texto alternativo en el panel)
+muestra la miniatura y el nombre de cada lugar del Arco I **sólo cuando su restauración ocurrió en la partida real**
+(`ohmdalPlaces` en `progress.js`, prueba en `tests/escuela-home.test.js`). Los lugares pendientes son huecos
+anónimos con «?», sin nombre ni imagen (sin spoiler). Correspondencia lugar → flag: portal→`awaken`,
+plaza→`pump`, workshop→`workshop`, road→`gate`, spring→`pump`, castle→`distribution`, terraces→`irrigation`,
+lake→`beacon_link`, lighthouse→`beacon_lens`. Las lámparas colgantes del taller se encienden con `workshop`.
+Evidencia (fixtures 0/4/10): `evidence/c08/mapa-e0.jpg`, `mapa-e4.jpg`, `mapa-e10.jpg`.
+
 ## Physica, Bitland, Arithmos (contrato pendiente)
 
 Sus mundos viven en otras ramas y, en desarrollo, en otros orígenes: la home **no puede** leer sus guardados hoy.

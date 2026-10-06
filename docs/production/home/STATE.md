@@ -1,7 +1,7 @@
 # Home · Instituto Roxana — estado de producción
 
 Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
-Estado: **EN CURSO** · ciclo 7 cerrado (2026-10-06). No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
+Estado: **EN CURSO** · ciclo 8 cerrado (2026-10-06). No es candidato todavía (ver `REVIEW-c07.md`). Loop de sesión: cron `04a38e45` cada minuto.
 
 ## Qué es la home real
 
@@ -166,13 +166,24 @@ son ambiente, no progreso (sin integración de esos mundos).
 NO VERIFICADO: FPS absolutos con la GPU libre; bfcache real; pérdida de contexto WebGL (no hay manejo de
 `webglcontextlost`); teléfono real; sonido escuchado; memoria de GPU.
 
+## Ciclo 8 (2026-10-06) — acercamientos limpios y el mapa que recuerda
+
+- **Acercamientos** (revisión #7 y #18): en salas, gestos y recorridos los árboles del patio que quedan delante o al
+  costado del sujeto se apartan; la exposición baja (−26 %) y el tinte de la tarde se neutraliza al acercarse; el
+  rótulo del gesto pasa arriba con fondo propio; el aviso de exploración se oculta durante el gesto. Physica: la
+  columna interior sube continua hasta el plato y la cortina exterior cae hasta la pileta; encuadre más abierto.
+- **Mapa del Taller de Electrónica** (memoria §7): cada lugar de Ohmdal aparece con su miniatura sólo tras su
+  restauración real; los demás son huecos anónimos. También en el panel, con texto alternativo. Alfombra de Lumen y
+  lámparas colgantes que se encienden con `workshop`. Atlas y alfombra cargan al abrir el taller.
+- QA: `npm test` 97/97; interacción 26/26; teclado e historial 14/14. Evidencias en `evidence/c08/`.
+
+Limitaciones: bancos e instrumentos del taller siguen siendo cajas; los otros tres interiores sin cambios; la luz de
+las lámparas colgantes es emisiva (sin luz puntual propia); FPS sin medir con la GPU libre.
+
 ## Siguiente acción exacta
 
-1. **Arte de los acercamientos** (hallazgos 7 y 18): sacar/atenuar sprites que entran en cada pose del gesto y de
-   la cartelera, bajar exposición de tarde en primer plano, mover el rótulo del gesto fuera del artefacto y hacer
-   legible «adentro sube / afuera cae» en Physica.
-2. **Interior del Taller de Electrónica** (hallazgo 8): remate de muros cortados, mobiliario con detalle, objetos
-   narrativos de Ohmdal.
-3. **Plano maestro** (14–16): pantalla del Anfiteatro menos dominante, acento de luz en la estatua, colinas visibles
-   bajo la bruma, noche legible.
-4. Manejo de `webglcontextlost` → versión ligera; medición con la GPU libre.
+1. Plano maestro (revisión #14–16): bajar el emisivo de la pantalla del Anfiteatro en vista general, acento de luz
+   cálida sobre la estatua de Roxana, colinas visibles bajo la bruma (niebla por altura o colinas más cercanas) y
+   noche legible (rebote de ventanas, luna). Comparar antes/después en el mismo encuadre y hora.
+2. Bancos de Electrónica con instrumentos reconocibles (galvanómetro con dial, soldador, bobinas) en lugar de cajas.
+3. `webglcontextlost` → versión ligera; medir con la GPU libre.

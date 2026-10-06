@@ -2,7 +2,7 @@ import '../fonts.css';
 import './escuela.css';
 import {SchoolDiorama,HOURS,hourFor} from './diorama.js';
 import {ROOMS,ROOM_ORDER,OVERVIEW,TALLER_ROOMS} from './rooms.js';
-import {storageOrNull,RESTORATIONS,WORLDS,worldByRoom,readOhmdal,schoolStage,previewState,trophies,cinematics,ohmdalSummary,readProfile,saveProfile} from './progress.js';
+import {ohmdalPlaces,storageOrNull,RESTORATIONS,WORLDS,worldByRoom,readOhmdal,schoolStage,previewState,trophies,cinematics,ohmdalSummary,readProfile,saveProfile} from './progress.js';
 import {SAVE_KEY,validateState} from '../game/state.js';
 import {CHANNEL,EXPLICACIONES,ANIMACIONES,CINEMATIC_FILES} from './videos.js';
 import {Ambience} from './ambience.js';
@@ -239,9 +239,17 @@ function renderTaller(id){
   <div class="cta-row"><button class="primary" id="enter-portal">${o.started?'Continuar el viaje':'Cruzar el Portal'} ${svg('arrow')}</button><span class="meta">${o.started?`${o.percent}% · ${fmtTime(o.playtime)}`:'Arco I · nueve lugares'}</span></div>
   <button class="quiet look" id="look-artifact">${svg('spark')} Mirar ${esc(ARTIFACT_NAMES.ohmdal)}</button>
   ${o.started&&o.objective?`<section class="card objective"><span class="eyebrow">Una pregunta abierta</span><b>${esc(o.objective.title)}</b><p>${esc(o.objective.detail)}</p></section>`:''}
+  ${renderMapCard()}
   <h3>Lo que Ohmdal devuelve a la escuela</h3>
   <ol class="timeline">${RESTORATIONS.map((r,i)=>`<li class="${i<stage?'done':i===stage?'next':''}"><span class="dot">${i<stage?svg('check'):i+1}</span><div><b>${esc(r.world)} · ${esc(r.title)}</b><p>${i<stage?esc(r.school):i===stage?'Lo próximo que puede volver.':'Todavía en silencio.'}</p></div></li>`).join('')}</ol>`;
 }
+function renderMapCard(){
+  const places=ohmdalPlaces(save),got=places.filter(p=>p.restored);
+  const alt=`Mapa de Ohmdal en la pared del taller: ${got.length} de 9 lugares restaurados${got.length?': '+got.map(p=>p.name).join(', '):''}.`;
+  return `<section class="card map-card"><span class="eyebrow">El mapa del taller</span><figure><img id="ohmdal-map" alt="${esc(alt)}" ${diorama.mapImage?.()?`src="${diorama.mapImage()}"`:'hidden'}><figcaption class="meta">${got.length?`${got.length} de 9 lugares volvieron a encenderse. Cada uno aparece cuando lo restaurás en Ohmdal.`:'Todavía no hay lugares en el mapa: aparecen a medida que los restaurás en Ohmdal.'}</figcaption></figure></section>`;
+}
+// When the map finishes drawing (its atlas loads on first visit), the panel's copy follows.
+diorama.onMap=()=>{const img=document.getElementById('ohmdal-map'),src=diorama.mapImage?.();if(img&&src){img.src=src;img.hidden=false;}};
 function bindTaller(id){$('#enter-portal')?.addEventListener('click',enterPortal);$('#preview-entry')?.addEventListener('click',()=>previewEntry(id));$('#look-artifact')?.addEventListener('click',()=>{closeRoom();touchArtifact(id);});}
 const ARTIFACT_NAMES={ohmdal:'el Faro en miniatura',physica:'la columna de agua',bitland:'la ciudad bajo la lente',arithmos:'el pizarrón del caballete'};
 // A preview of how a world still in preparation will be entered. Only Arithmos has one so far.
@@ -336,7 +344,7 @@ function renderPatio(){
 
 // ── Progress, meter, news ──────────────────────────────────────────────────────
 function refreshProgress({instant=false}={}){
-  const stage=schoolStage(save);diorama.setStage(stage,{instant});diorama.setTrophies(trophies(save));ambience.set({stage});
+  const stage=schoolStage(save);diorama.setStage(stage,{instant});diorama.setTrophies(trophies(save));diorama.setPlaces?.(ohmdalPlaces(save));ambience.set({stage});
   // Four worlds, ten lamps each: the school's light is shared among them.
   // Only Ohmdal shares its progress with the school today: the other worlds show their sign, not invented counts.
   $('#school-meter').innerHTML=`<span class="meter-label">La escuela recupera su luz</span>${WORLDS.map(w=>w.id==='ohmdal'

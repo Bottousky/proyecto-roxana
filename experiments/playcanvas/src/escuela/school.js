@@ -366,7 +366,17 @@ function electronicaRoom(k,id,I,{b,P}){
     for(let i=0;i<5;i++)k.box(I,'paint',{x:x+.7+i*.14,z:z+.25+(i%2)*.12,w:.08,d:.05,y:1.05,h:.06,tone:BOOK_TONES[i],jitter:0,ao:false});
     chair(k,I,x,z+1.05,180);
   }
-  for(const u of [-2.4,.4,3.2])shelf(k,I,P(u,0)[0],b.z-b.d/2+.62,2.4,3);
+  for(const u of [-2.4,3.2])shelf(k,I,P(u,0)[0],b.z-b.d/2+.62,2.4,3);
+  // The map of Ohmdal on the north wall: each place is pinned once it has been restored (see ohmdalPlaces).
+  const mx=P(.4,0)[0],mz=b.z-b.d/2+T+.04;
+  k.box(I,'woodDark',{x:mx,z:mz+.02,y:.95,w:3.5,d:.08,h:2.55,jitter:0});
+  k.panel(`map:${id}`,'ohmdalMap',{x:mx,y:2.22,z:mz+.08,w:3.3,h:2.28});
+  k.box(I,'bronze',{x:mx,z:mz+.1,y:3.42,w:1.2,d:.03,h:.05,jitter:0,ao:false});
+  // Lumen's rug under the benches, and a lamp over each bench that works again with the real `workshop`.
+  {const [rx,rz]=P(1.4,-.5);k.panel(`rug:${id}`,'workshopRug',{x:rx,y:.135,z:rz,w:4.2,h:9.6,rx:-90});}
+  for(const v of [-4,-.5,3]){const [x,z]=P(1.4,v);k.box(I,'iron',{x,z,y:3.65,w:.02,d:.02,h:b.h-3.65,jitter:0,ao:false});
+    k.lathe(I,'iron',[[.06,0],[.05,.06],[0,.08]],{x,z,y:3.6,seg:8});k.lathe(I,'lampShade',[[.42,0],[.36,.06],[.14,.32],[.06,.36],[0,.37]],{x,z,y:3.25,seg:14,smooth:true});
+    k.lathe(`pendants:${id}`,'pendantBulb',[[0,-.12],[.09,-.08],[.1,0],[0,.04]],{x,z,y:3.3,seg:10,smooth:true,ao:false});}
   for(let i=0;i<3;i++){const [x,z]=P(3.8,5.4-i*1.05);k.lathe(I,'copper',[[0,0],[.42,0],[.42,.08],[.28,.1],[.28,.5],[.42,.52],[.42,.6],[0,.6]],{x,z,rx:90,y:.43,seg:10});}
 }
 function fisicaRoom(k,id,I,{b,s,P}){

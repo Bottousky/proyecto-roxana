@@ -11,7 +11,7 @@ import {loadStatueGlb,statueEntity} from './statue.js';
 import {buildLandscape} from './landscape.js';
 import {ARTIFACTS,NOTICE_BOARD} from './artifacts.js';
 const statueUrl=import.meta.env.BASE_URL+'escuela/modelos/roxana-estatua.glb';
-import {grain,meadow,tree,glow,earth,sign,dynamicCanvas,marble} from './textures.js';
+import {grain,meadow,tree,glow,earth,sign,dynamicCanvas,marble,picture} from './textures.js';
 import {makeWater,updateWater,bindShore} from '../water.js';
 import {actorArt} from '../art.ts';
 import {ROOMS,OVERVIEW,SHOWCASE} from './rooms.js';
@@ -45,7 +45,7 @@ const MATERIALS={
   lampGlass:{color:'#6c6556',emissive:'#ffd08a',glow:0},lanternGlass:{color:'#57636a',emissive:'#fff0c4',glow:0,gloss:.8},
   glass:{color:'#344b55',emissive:'#ffcb7c',glow:0,gloss:.85},screen:{color:'#10231a',emissive:'#6cf0a2',glow:0},
   flame:{color:'#ffd9a0',emissive:'#ffcf7a',glow:0},
-  ceramic:{color:'#f1ede2',gloss:.82},bulbOhm:{color:'#4c5a58',emissive:'#9ff5ec',glow:0,gloss:.85},skylight:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.6,gloss:.8},
+  ceramic:{color:'#f1ede2',gloss:.82},pendantBulb:{color:'#6c6556',emissive:'#ffd9a0',glow:0},bulbOhm:{color:'#4c5a58',emissive:'#9ff5ec',glow:0,gloss:.85},skylight:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.6,gloss:.8},
   chalkWhite:{map:'stone',contrast:.15,color:'#f2f0e6',emissive:'#fffaf0',glow:.22},noticeLamp:{color:'#5a5040',emissive:'#ffcf8a',glow:0,gloss:.7},faroGlass:{color:'#4e5a60',emissive:'#ffe7ad',glow:0,gloss:.85},
   cityCyan:{color:'#0c1a1e',emissive:'#5ff0ff',glow:.9,gloss:.6},lensGlass:{color:'#e8f6f4',opacity:.1,gloss:.98,emissive:'#bff6ff',glow:.04},roxanaLamp:{color:'#6c6556',emissive:'#ffd08a',glow:0},bitacora:{color:'#e9dfc6',emissive:'#ffe3a6',glow:.6},
 };
@@ -94,7 +94,7 @@ export class SchoolDiorama {
     this.basePos=new Map([...this.parts].map(([k,e])=>[k,e.getLocalPosition().clone()]));
     // What lives inside each building is drawn only while its roof is lifted: closed, the roof hides it, and it
     // would only cost draw calls and shadows. The render component is toggled; stage logic keeps `enabled`.
-    const inside={direccion:['bitacora'],trofeos:[],electronica:['portal:electronica'],fisica:['tank','fluid:fisica','world:fisica','pendulum:fisica','orrery:fisica'],programacion:['city:programacion','visor:programacion'],matematica:['board:matematica']};
+    const inside={direccion:['bitacora'],trofeos:[],electronica:['portal:electronica','map:electronica','rug:electronica','pendants:electronica'],fisica:['tank','fluid:fisica','world:fisica','pendulum:fisica','orrery:fisica'],programacion:['city:programacion','visor:programacion'],matematica:['board:matematica']};
     this.interiors=Object.fromEntries(Object.keys(BUILDINGS).map(id=>[id,[...this.parts].filter(([k])=>k===`${id}:interior`||k===`${id}:floor`||inside[id]?.includes(k)||(id==='trofeos'&&/^(trophy|dome):/.test(k))).map(([,e])=>e)]));
     // The sculpted statue of Roxana replaces the lathe figure; the latter stays as fallback.
     try{const glb=await loadStatueGlb(statueUrl);const stone=new StandardMaterial();stone.diffuse=col('#cfc8ba');stone.diffuseMap=marble(app);stone.diffuseVertexColor=true;stone.useMetalness=true;stone.metalness=0;stone.gloss=.42;stone.update();
@@ -142,6 +142,9 @@ export class SchoolDiorama {
     {const m=new StandardMaterial();m.diffuse=col('#0a1214');m.emissive=col('#ffffff');m.emissiveMap=this.chip.texture;m.emissiveIntensity=1;m.useMetalness=true;m.gloss=.7;m.update();out.chip=m;}
     this.yard=dynamicCanvas(app,'yard',512,320);this.drawYard(0);
     this.notices=dynamicCanvas(app,'notices',768,376);this.drawNotices([]);
+    this.mapCanvas=dynamicCanvas(app,'ohmdal-map',1024,708);this.places=[];this.drawOhmdalMap();
+    out.ohmdalMap=lit(this.mapCanvas.texture,{gloss:.25});
+    {const m=new StandardMaterial();m.diffuse=col('#2f6a63');m.gloss=.08;m.useMetalness=true;m.update();out.workshopRug=m;}
     out.notices=lit(this.notices.texture,{gloss:.15});
     {const m=new StandardMaterial();m.diffuse=col('#ffffff');m.diffuseMap=this.yard.texture;m.emissive=col('#ffffff');m.emissiveMap=this.yard.texture;m.emissiveIntensity=.12;m.gloss=.2;m.update();out.yard=m;}
     {const m=new StandardMaterial();m.diffuse=col('#1d2b22');m.diffuseMap=this.board.texture;m.emissive=col('#ffffff');m.emissiveMap=this.board.texture;m.emissiveIntensity=.35;m.update();out['board@matematica']=m;}
@@ -380,6 +383,40 @@ export class SchoolDiorama {
         x.fillStyle='#2e241a';const lines=wrap(n.title,w2-36,`600 ${h2>200?30:24}px ${serif}`);lines.forEach((l,j)=>x.fillText(l,-w2/2+18,-h2/2+(h2>200?80:72)+j*(h2>200?32:26)));},n.example?'#f3e3d6':'#efe6cf');});
     this.notices.refresh();
   }
+  /**
+   * The map of Ohmdal in the Taller de Electrónica: parchment, the route of Arc I, and one slot per place.
+   * A restored place shows its miniature and name (from the project's map atlas); the rest stay anonymous.
+   */
+  drawOhmdalMap(){
+    const {ctx:x,canvas:c}=this.mapCanvas,W=c.width,H=c.height,places=this.places||[],img=this.mapAtlas;
+    const g=x.createRadialGradient(W/2,H/2,60,W/2,H/2,W*.7);g.addColorStop(0,'#efe0bd');g.addColorStop(1,'#cdb388');x.fillStyle=g;x.fillRect(0,0,W,H);
+    let seed=5;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;for(let i=0;i<1800;i++){x.fillStyle=`rgba(120,90,50,${r()*.06})`;x.fillRect(r()*W,r()*H,1+r()*3,1+r()*2);}
+    x.strokeStyle='#8a6a3a';x.lineWidth=6;x.strokeRect(14,14,W-28,H-28);x.lineWidth=1.5;x.strokeRect(26,26,W-52,H-52);
+    x.fillStyle='#4a3622';x.textAlign='center';x.font='600 46px "Cormorant Garamond", Georgia, serif';x.fillText('OHMDAL',W/2,76);
+    x.font='italic 500 22px "Cormorant Garamond", Georgia, serif';x.fillStyle='#6b5236';x.fillText('Lo que volvió a encenderse',W/2,104);
+    const slot=i=>{const col=i%3,row=Math.floor(i/3);return [W*(.2+col*.3),150+row*190];};
+    // The route of Arc I, dashed, through the nine places in order.
+    x.setLineDash([10,9]);x.strokeStyle='rgba(110,80,45,.55)';x.lineWidth=3;x.beginPath();for(let i=0;i<9;i++){const [px,py]=slot(i);i?x.lineTo(px,py+70):x.moveTo(px,py+70);}x.stroke();x.setLineDash([]);
+    for(let i=0;i<9;i++){const [px,py]=slot(i),p=places[i];
+      if(p?.restored&&img){const cw=img.width/3,ch=img.height/3;x.drawImage(img,(i%3)*cw+cw*.04,Math.floor(i/3)*ch+ch*.04,cw*.92,ch*.92,px-78,py-6,156,156);
+        x.fillStyle='#3e2c1a';x.font='600 21px "Cormorant Garamond", Georgia, serif';x.fillText(p.name,px,py+168);}
+      else{x.fillStyle='rgba(239,224,189,.9)';x.beginPath();x.arc(px,py+70,46,0,Math.PI*2);x.fill();x.setLineDash([6,7]);x.strokeStyle='rgba(110,80,45,.5)';x.lineWidth=2;x.stroke();x.setLineDash([]);
+        x.fillStyle='rgba(110,80,45,.45)';x.font='italic 500 34px "Cormorant Garamond", Georgia, serif';x.fillText('?',px,py+82);}
+      x.fillStyle='#a5342a';x.beginPath();x.arc(px,py-2,7,0,Math.PI*2);x.fill();}
+    this.mapCanvas.refresh();this.onMap?.();
+  }
+  /** The same map as an image for the HTML panel (readable and with a text alternative there). */
+  mapImage(){return this.mapAtlas?this.mapCanvas.canvas.toDataURL('image/jpeg',.82):null;}
+  /** Places of Ohmdal from the save; the atlas and the rug load the first time the workshop opens. */
+  setPlaces(list){this.places=list;this.drawOhmdalMap();}
+  async loadWorkshopArt(){
+    if(this.workshopArt)return this.workshopArt;
+    this.workshopArt=(async()=>{try{
+      const atlas=new Image();atlas.src=new URL('./assets/art-polish/map-landmarks.webp',document.baseURI).href;await atlas.decode();this.mapAtlas=atlas;this.drawOhmdalMap();
+      const rug=await picture(this.app,'/assets/art-polish/workshop-rug.webp');const m=this.materials.workshopRug;m.diffuse=col('#ffffff');m.diffuseMap=rug;m.update();
+    }catch(err){console.warn('Arte del taller no disponible:',err.message);}})();
+    return this.workshopArt;
+  }
   /** News on the board and, if there is unread real news, its small lamp. */
   setNotices(items,unread=0){this.drawNotices(items);this.noticeUnread=unread;this.stageDirty=true;}
   /** Banners of the worlds still to open, woven like Ohmdal's: colour, border, glyph. */
@@ -457,9 +494,10 @@ export class SchoolDiorama {
     for(const [x,z,type,s] of spots){
       const h=(type===1?8.2:7.2)*s,w=h*(type===1?.62:1.05);
       const e=new Entity('Árbol');const mi=new MeshInstance(this.quadMesh(w,h),this.treeMaterials[type],e);mi.castShadow=true;
-      e.addComponent('render',{meshInstances:[mi]});e.setPosition(x,-.05,z);this.root.addChild(e);this.trees.push({e,phase:x*.37+z*.11});
+      e.addComponent('render',{meshInstances:[mi]});e.setPosition(x,-.05,z);this.root.addChild(e);
       const blob=new Entity('Sombra del árbol');const bm=new MeshInstance(this.quadMesh(w*.8,w*.8),shadow,blob);bm.castShadow=false;blob.addComponent('render',{meshInstances:[bm]});
       blob.setEulerAngles(-90,0,0);blob.setPosition(x,.1,z+w*.4);this.root.addChild(blob);
+      this.trees.push({e,blob,x,z,w,h,phase:x*.37+z*.11});
     }
   }
   quadMesh(w,h){
@@ -533,11 +571,13 @@ export class SchoolDiorama {
     this.fx.lantern=this.particle('Brillo de la linterna',[TOWER.x,TOWER.shaft+4.5,TOWER.z],{numParticles:n(14),lifetime:3,rate:.2,rate2:.3,emitterShape:EMITTERSHAPE_SPHERE,emitterRadius:.9,
       velocityGraph:new CurveSet([[0,0],[0,.3],[0,0]]),scaleGraph:new Curve([0,.3,1,.05]),alphaGraph:new Curve([0,0,.3,.8,1,0]),colorGraph:new CurveSet([[0,1],[0,.95],[0,.75]])});
     {const {x,z}=ARTIFACTS.physica;
-      this.fx.climb=this.particle('Agua que sube',[x,.7,z],{numParticles:n(70),lifetime:2.25,rate:.035,rate2:.05,emitterShape:EMITTERSHAPE_SPHERE,emitterRadius:.32,emitterRadiusInner:.05,
-        velocityGraph:new CurveSet([[0,0,1,0],[0,.9,.5,1.3,1,1.2],[0,0,1,0]]),velocityGraph2:new CurveSet([[0,.05,1,-.05],[0,1,.5,1.45,1,1.3],[0,-.05,1,.05]]),
-        scaleGraph:new Curve([0,.06,1,.09]),alphaGraph:new Curve([0,0,.1,.7,.75,.55,.92,0,1,0]),colorGraph:new CurveSet([[0,.72],[0,.9],[0,1]]),blendType:BLEND_NORMAL,alignToMotion:true,stretch:.5});
-      this.fx.spill=this.particle('Agua que cae',[x,3.98,z],{numParticles:n(80),lifetime:1,rate:.012,rate2:.02,emitterShape:EMITTERSHAPE_SPHERE,emitterRadius:.98,emitterRadiusInner:.95,
-        velocityGraph:new CurveSet([[0,0],[0,-.6,1,-3.4],[0,0]]),scaleGraph:new Curve([0,.05,1,.07]),alphaGraph:new Curve([0,.6,.8,.5,1,0]),colorGraph:new CurveSet([[0,.8],[0,.92],[0,1]]),blendType:BLEND_NORMAL,alignToMotion:true,stretch:.4});}
+      // Inside the glass the water climbs as a steady column from the basin and is gathered under the dish;
+      // outside it spills over the dish rim and falls the whole way back into the basin, as water does.
+      this.fx.climb=this.particle('Agua que sube',[x,.75,z],{numParticles:n(120),lifetime:2.1,rate:.016,rate2:.024,emitterShape:EMITTERSHAPE_SPHERE,emitterRadius:.26,emitterRadiusInner:.02,
+        velocityGraph:new CurveSet([[0,0,1,0],[0,1.1,.4,1.5,1,1.45],[0,0,1,0]]),velocityGraph2:new CurveSet([[0,.03,1,-.03],[0,1.2,.4,1.6,1,1.5],[0,-.03,1,.03]]),
+        scaleGraph:new Curve([0,.05,.8,.07,1,.03]),alphaGraph:new Curve([0,0,.08,.75,.8,.6,.95,0,1,0]),colorGraph:new CurveSet([[0,.75],[0,.93],[0,1]]),blendType:BLEND_NORMAL,alignToMotion:true,stretch:.9});
+      this.fx.spill=this.particle('Agua que cae',[x,3.98,z],{numParticles:n(150),lifetime:1.45,rate:.008,rate2:.012,emitterShape:EMITTERSHAPE_SPHERE,emitterRadius:.99,emitterRadiusInner:.94,
+        velocityGraph:new CurveSet([[0,0],[0,-.9,1,-3.9],[0,0]]),scaleGraph:new Curve([0,.045,1,.07]),alphaGraph:new Curve([0,.65,.85,.55,1,0]),colorGraph:new CurveSet([[0,.82],[0,.94],[0,1]]),blendType:BLEND_NORMAL,alignToMotion:true,stretch:.7});}
     for(const e of Object.values(this.fx))e.particlesystem.enabled=false;
   }
   buildHighlight(){
@@ -634,7 +674,7 @@ export class SchoolDiorama {
    */
   reactArtifact(world,{onEnd=()=>{}}={}){
     const a=ARTIFACTS[world];if(!a)return onEnd();
-    const poses={ohmdal:{yaw:36,pitch:12,distance:15,y:2.6},physica:{yaw:6,pitch:10,distance:14,y:2.2},bitland:{yaw:10,pitch:26,distance:10,y:1.9},arithmos:{yaw:24,pitch:8,distance:13,y:1.9}};
+    const poses={ohmdal:{yaw:36,pitch:12,distance:15,y:2.6},physica:{yaw:6,pitch:7,distance:22,y:2.6},bitland:{yaw:10,pitch:26,distance:10,y:1.9},arithmos:{yaw:24,pitch:8,distance:13,y:1.9}};
     const p=poses[world];this.focusId=null;this.closeUp=true;this.flyTo({target:[a.x,p.y,a.z],yaw:p.yaw,pitch:p.pitch,distance:p.distance});this.frame.dof.focusRange=10;this.frame.update();
     // The camera settles first (anticipation), then the artifact answers, then a short rest before the room opens.
     this.reaction={world,t:0,dur:this.reducedMotion?1:2.6,lead:this.reducedMotion?0:.55,onEnd,lit:this.levels[8]>.5};
@@ -751,6 +791,7 @@ export class SchoolDiorama {
     this.fx.climb.particlesystem.enabled=!this.reducedMotion;this.fx.spill.particlesystem.enabled=!this.reducedMotion;
     const cc=this.materials.cityCyan;cc.emissiveIntensity=.3+night*.7;cc.update();
     // The workshop's lamps work again (real `workshop`): its roof bulb too.
+    const pb=this.materials.pendantBulb;pb.emissiveIntensity=L(1)*(2.2+night*1.5);pb.update();
     const bo=this.materials.bulbOhm;bo.emissiveIntensity=L(1)*(1.1+night*2.2);bo.update();
     this.skylightBase=.45+night*1.1;const sk=this.materials.skylight;sk.emissiveIntensity=this.skylightBase;sk.update();
     this.rooms.board.light.intensity=.15+night*1.1;
@@ -770,7 +811,8 @@ export class SchoolDiorama {
     if(this.spritePlan)this.ensureSprites();
     for(const s of this.sprites||[])s.e.enabled=s.stage===0?this.stage<10:this.stage>=s.stage;
     // Grade: the abandoned school is cooler and flatter.
-    const warm=this.stage/10,gr=h.grade;this.frame.grading.saturation=gr[0]*lerp(.78,1.02,warm);this.frame.grading.tint=new Color(gr[1]*lerp(.95,1,warm),gr[2],gr[3]*lerp(1.06,1,warm));this.frame.grading.brightness=gr[4];this.frame.update();
+    const warm=this.stage/10,gr=h.grade,close=this.closeK||0;this.frame.grading.saturation=gr[0]*lerp(.78,1.02,warm);this.frame.grading.tint=new Color(lerp(gr[1]*lerp(.95,1,warm),1,.6*close),gr[2],lerp(gr[3]*lerp(1.06,1,warm),1,.6*close));// Close-ups sit a little lower: the near stone and brass were clipping under the afternoon sun.
+    this.frame.grading.brightness=gr[4]*(1-.26*close);this.frame.bloom.intensity=.022*(1-.6*close);this.frame.update();
     this.stageDirty=false;void force;
   }
 
@@ -795,7 +837,7 @@ export class SchoolDiorama {
       const st=(this.cut??={})[id]??={open:0,hover:0};st.open=lerp(st.open,open,1-Math.exp(-dt*(this.reducedMotion?60:3.5)));st.hover=lerp(st.hover,hover,1-Math.exp(-dt*8));
       const roof=this.parts.get(`${id}:roof`),rb=this.basePos.get(`${id}:roof`);
       const lift=ease(clamp(st.open,0,1))*16+st.hover*.55;
-      const inside=st.open>.004||st.hover>.05;if(st.inside!==inside){st.inside=inside;for(const e of this.interiors?.[id]||[])if(e.render)e.render.enabled=inside;this.stageDirty=true;}
+      const inside=st.open>.004||st.hover>.05;if(st.inside!==inside){st.inside=inside;if(inside&&id==='electronica')this.loadWorkshopArt();for(const e of this.interiors?.[id]||[])if(e.render)e.render.enabled=inside;this.stageDirty=true;}
       if(roof){roof.setLocalPosition(rb.x,rb.y+lift,rb.z);roof.enabled=st.open<.97;}
       // Roof accents that turn or glow ride with the roof.
       for(const extra of [`${id}:spin`,`bulb:${id}`]){const e=this.parts.get(extra),eb=this.basePos.get(extra);if(e){e.setLocalPosition(eb.x,eb.y+lift,eb.z);e.enabled=st.open<.97;}}
@@ -827,6 +869,16 @@ export class SchoolDiorama {
       this.boardClock=(this.boardClock||0)+dt;if(!this.boardSeq&&this.boardClock>.1){this.boardClock=0;this.drawBoard(this.clock);}}
     if(this.boardSeq)this.stepBoardEntry(dt);
     if(this.reaction)this.stepReaction(dt);
+    // Close-ups (a room, an artifact, a showcase): exposure eases down, and the patio trees standing between the
+    // camera and what it looks at step aside, so nothing paints a flat sprite over the subject.
+    {const want=this.focusId||this.closeUp?1:0,k=1-Math.exp(-dt*3);if(Math.abs((this.closeK||0)-want)>.004){this.closeK=lerp(this.closeK||0,want,k);this.stageDirty=true;}
+      const cp=this.camera.getPosition(),tg=this.cam.target,dx=tg.x-cp.x,dy=tg.y-cp.y,dz=tg.z-cp.z,L2=dx*dx+dy*dy+dz*dz||1;
+      for(const t of this.trees){let hide=false;
+        // Any tree in the visible foreground (nearer than or beside the subject, inside the view) is set aside.
+        if(want){const L=Math.sqrt(L2),u=((t.x-cp.x)*dx+(t.h*.5-cp.y)*dy+(t.z-cp.z)*dz)/L2,px=cp.x+dx*u,pz=cp.z+dz*u,cam=this.camera.camera,r=this.canvas.getBoundingClientRect();
+          const halfW=Math.tan(cam.fov*Math.PI/360)*Math.max(1,r.width/Math.max(1,r.height))*u*L;
+          hide=u>.02&&u<1.3&&Math.hypot(px-t.x,pz-t.z)<halfW+t.w*.5;}
+        if(t.hidden!==hide){t.hidden=hide;t.e.enabled=!hide;t.blob.enabled=!hide;}}}
     // Artifacts: the floating stone breathes in its column, chip and easel keep their routines.
     {const fl=this.parts.get('float:physica'),bp=this.basePos.get('float:physica');if(fl&&bp){const m=this.reducedMotion?0:1;fl.setLocalPosition(bp.x+Math.sin(this.clock*.7)*.08*m,bp.y+Math.sin(this.clock*.9)*.32*m+(this.floatLift||0)*1.1,bp.z+Math.cos(this.clock*.6)*.08*m);fl.setLocalEulerAngles(this.clock*14*m,this.clock*22*m,0);}
       this.artClock=(this.artClock||0)+dt;if(this.artClock>(this.reducedMotion?1:.066)){this.artClock=0;const t=this.reducedMotion?0:this.clock;this.drawChip(t,this.bitlandAwake||0,this.chipBurst||0);this.drawYard(t+(this.yardShift||0),this.yardBoost||0);}

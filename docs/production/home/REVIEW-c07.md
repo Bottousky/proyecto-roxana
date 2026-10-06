@@ -14,8 +14,8 @@ Veredicto del revisor: **no corresponde CANDIDATO_PARA_REVISION todavía** (2 cr
 | 4 | ALTO | Volver con hash se salteaba «Cambió por tu aventura» | **Corregido**: `route()` y luego siempre `showChanges()` |
 | 5 | ALTO | `localStorage` bloqueado abortaba la home | **Corregido**: acceso dentro de `try` (`storageOrNull`), prueba con getter que lanza |
 | 6 | ALTO | Versión ligera sin directorio, Escape inútil, portada que desaparecía | **Corregido**: directorio visible, sin modo «explorar» en ligera, Escape por estado del panel. Capturas c07/sin-webgl |
-| 7 | ALTO | Sprites pixel-art en acercamientos | Abierto (arte, próximo bloque) |
-| 8 | ALTO | Interiores de talleres = cajas | Abierto (arte, próximo bloque: Electrónica primero) |
+| 7 | ALTO | Sprites pixel-art en acercamientos | **Corregido (c08)**: árboles del primer plano y laterales se apartan en acercamientos (`evidence/c08/*-respuesta.jpg`) |
+| 8 | ALTO | Interiores de talleres = cajas | **Parcial (c08)**: Electrónica con mapa de progreso, alfombra de Lumen y lámparas colgantes; bancos e instrumentos siguen siendo cajas; otros talleres sin cambios |
 | 9 | ALTO | Destello del portal al volver por bfcache | **Corregido**: `pageshow` con `persisted` (no verificado con bfcache real) |
 | 10 | MEDIO | Cerrar agregaba entradas al historial | **Corregido**: abrir = un paso, cambiar = reemplazar, cerrar = volver. `home-keys.mjs` 14/14 |
 | 11 | MEDIO | Carreras: atajos durante gesto, gesto que pisa la sala elegida, farolito tardío, `focus(null)` con panel | **Corregido** (atajos en reposo y con modificadores excluidos, `openRoom` cancela gesto, farolito recalcula, recorrido respeta panel). Vista previa de entrada sin cancelación: abierto |

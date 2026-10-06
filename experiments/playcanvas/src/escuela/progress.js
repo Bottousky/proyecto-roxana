@@ -65,6 +65,12 @@ export function previewState(stage){
   return {version:1,area:visited.at(-1)||'portal',flags,seen:[],secrets,visited,puzzles:{},fieldNotes:[],personalNotes:stage>3?{circuit:'El retorno también es camino.'}:{},playtime:stage*540,createdAt:Date.now()-stage*864e5,savedAt:Date.now()};
 }
 
+// The nine places of Arc I in journey order (the order of the map atlas), each with the restoration that lit it.
+export const OHMDAL_PLACES=[['portal','awaken'],['plaza','pump'],['workshop','workshop'],['road','gate'],['spring','pump'],['castle','distribution'],['terraces','irrigation'],['lake','beacon_link'],['lighthouse','beacon_lens']]
+  .map(([id,flag],cell)=>({id,flag,cell,name:AREAS[id]?.name||id}));
+/** Places of the workshop's map: a place appears only once its restoration happened in the real save. */
+export function ohmdalPlaces(state){return OHMDAL_PLACES.map(p=>({...p,restored:Boolean(state?.flags?.[p.flag])}));}
+
 export function allSecrets(){return Object.values(AREAS).flatMap(a=>a.objects).filter(o=>o.secret).map(o=>o.secret);}
 
 export function journalCount(state){
