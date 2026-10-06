@@ -48,7 +48,7 @@ export const rueda = {
     const guess = await d.choose([
       {id: '6', text: 'Seis justos.'},
       {id: '6+', text: 'Seis y un poco más.'},
-      {id: '3', text: 'Tres, como de punta a punta pasando por el centro.'},
+      {id: '3', text: 'Cuatro, como los cuatro rayos dibujados.'},
     ], {prompt: '¿Cuántos pedazos del largo del rayo entran alrededor de la rueda?', evaluate: true});
     d.evidence('radian-predict', {answer: guess});
     await d.shot(SHOTS.tiles, 0.8);
@@ -98,9 +98,9 @@ export const rueda = {
     const gap = w.add(new Drawing('c10-gap', [S(arcPts(cx, cy, R + 4, 6, TAU, 6), seedOf('c10-gap'), {w: 5, p: 0.95, ch: BLUE})], {z: 14, progress: 0}));
     await d.draw(gap, 0.4, {sound: false});
     d.describe('Seis pedazos amarillos y un hueco azul chiquito, menos de un tercio de pedazo.');
-    await d.think(guess === '6+' ? 'Seis enteros y un pedacito.' : guess === '6' ? 'Seis no alcanzan: queda un hueco. Seis y un pedacito.' : 'Tres pedazos son media vuelta y un poco más. La vuelta entera: seis y un pedacito.');
-    await d.say('student', 'Balcón: una vuelta entera son 6 rayos y un poco más: 6,28… Ese número no termina; se lo llama 2π. Media vuelta, π, unos 3,14 rayos.');
-    await studentWrites(d, g, 'c10-2pi', 'una vuelta = 2π rayos ≈ 6,28', A.x0 + 20, A.y1 - 10, {size: 22});
+    await d.think(guess === '6+' ? 'Seis enteros y un pedacito.' : guess === '6' ? 'Seis no alcanzan: queda un hueco. Seis y un pedacito.' : 'Los rayos dibujados adentro no miden el borde: alrededor entran seis y un pedacito.');
+    await d.say('student', 'Balcón: una vuelta entera son 6 rayos y un poco más: 6,28… Se lo llama 2π. Media vuelta, π, unos 3,14 rayos: por eso el borde entero es π veces el diámetro, que son dos rayos. Se sabe que π no es una fracción, aunque probarlo es más difícil que lo de √2.');
+    await studentWrites(d, g, 'c10-2pi', '360° = 2π radianes (≈ 6,28 rayos de borde)', A.x0 + 20, A.y1 - 10, {size: 20});
     await d.think('Medir un giro por cuántos rayos recorre el borde: eso es medir en radianes. Sirve para cualquier rueda: con una más grande, los pedazos también son más largos.');
     d.evidence('radian', {pieces: 6, tau: +TAU.toFixed(3)});
     g.flags.c10radian = true;

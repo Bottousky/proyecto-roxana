@@ -1,0 +1,25 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c6.caja"
+  },
+  "journal": [
+    "Partes de algo"
+  ],
+  "evidenceKinds": [
+    "diag-try",
+    "diag-predict",
+    "diag"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 8.14,
+  "size": "1600x900",
+  "touch": false,
+  "route": "errores",
+  "watch": false
+}

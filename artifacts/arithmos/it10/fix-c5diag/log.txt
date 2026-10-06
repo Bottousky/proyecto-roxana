@@ -1,0 +1,10 @@
+[0.0s] escena → c5.diagonal
+[1.0s] lee: Mi huerta nueva es cuadrada: de lado, una barra justa. Quiero un camino en diagonal. ¿Cuántas barras mide?
+[6.5s] elige «Hasta ahora ninguna. Quizás no haya ninguna.» (¿Habrá alguna partición del lado que mida la diagonal justo?)
+[6.9s] lee: —Ojo, Punto: un tercio de barra, en décimos, tampoco cierra: 0,3; 0,33; 0,333… Y en tercios entra justo.
+[7.0s] lee: Así que no cerrar en décimos no prueba nada. Lo raro de la diagonal es que tampoco entró en ninguna de las otras.
+[7.0s] lee: Que ninguna, nunca, entre justo, se puede probar. Lo voy a necesitar cuando dibujemos cuadrados.
+[7.1s] lee: —Con la raya ondulada: "más o menos". Lo exacto no lo sé escribir todavía.
+[7.2s] lee: Más o menos me alcanza para el camino. Pero, ¿cómo se anota un número que no sé cuánto vale?
+[7.5s] escena → c6.caja
+[8.1s] {"ended":true,"final":{"mode":"play","seg":"c6.caja"},"journal":["Partes de algo"],"evidenceKinds":["diag-try","diag-predict","diag"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":8.14,"size":"1600x900","touch":false,"route":"errores","watch":false}

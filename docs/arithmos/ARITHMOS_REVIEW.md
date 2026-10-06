@@ -286,5 +286,28 @@ commit siguiente (evidencia: `artifacts/arithmos/it08/c8b-directa`, `it08/c8b-er
 | narr | M4 | El gancho 8→9 ya resolvía el cap. 9 | Corregido: queda como pregunta |
 | narr | A1, A2, A6, M1–M3, M5–M7 | Plantilla sin hilo ni clímax, agencia, teléfono, voces, opciones, costura 7→8, composición, accesibilidad, Bitácora | Pendientes (backlog N8-R) |
 
+## Revisiones independientes de los caps. 9 a 12 (rev-mat-8, rev-narr-7, rev-mat-9, rev-mat-10, 2026-10-06/07)
+
+Informes: `artifacts/arithmos/it09/review-mat/informe.md` (cap. 9), `it09/review-narr/informe.md` (cap. 9),
+`it10/review-mat/informe.md` (cap. 10) e `it10/review-mat-11-12/informe.md` (caps. 11 y 12). Todas sin
+navegador. En los cuatro capítulos, todas las igualdades escritas eran verdaderas; los hallazgos altos son
+de definiciones, alcance y frases falsas en su lectura literal.
+
+| Origen | # | Hallazgo | Disposición |
+|---|---|---|---|
+| mat-8 (9) | A1 | «Una regla se comprueba con uno nuevo» | Corregido (40ceece): un caso que coincide no prueba; Mara dice que la hizo ella; Bitácora |
+| mat-8 (9) | A2 | 9.7: escalones contados unidos con curvas; «se cruzan antes del día 6» | Parcial: el texto ya no habla de cruce y dice que se leen los puntos; pendiente redibujar sólo puntos y poner escala vertical |
+| mat-8 (9) | A3 | 9.8: «noche» para horas sin medir; tiempo sin escala; invierno | Parcial: el texto distingue noche (no definida) de horas sin medir y dice que el dibujo achica los huecos; invierno corregido. Pendiente: tiempo a escala |
+| mat-8 (9) | M1–M8 | Imagen sin alcance, «la sombra» por «el largo», relación sin definir, máquina de Punto sin dibujar, ola decorativa, criterios de unir, citas no vistas | Corregidos M1, M2, M3, M4 (texto), M6, M7 (criterio de la entrada), M8. Pendientes: M5 (dibujar la máquina de Punto), M9, M10 |
+| narr-7 (9) | A1–A4 | Plantilla, el juego da el paso, gráficos que son dibujos, teléfono ilegible | Pendientes (backlog N9-R); A3 parcial con los cambios de mat-8 |
+| mat-9 (10) | A1 | «Tres pedazos son media vuelta y un poco más» (falso: 3 < π) | Corregido: la opción es «cuatro, como los rayos dibujados»; se dice que el borde es π veces el diámetro; 360° = 2π en la pizarra; π «no es fracción» en vez de «no termina» |
+| mat-9 (10) | A2 | «Dos cuartos: vuelta entera» | Corregido: media vuelta, como × (−1); regla (a, b) → (−b, a) |
+| mat-9 (10) | A3 | Pares de atados como rectas continuas; «la solución está donde se cruzan» | Corregido: sólo puntos (filas de pares), el cruce tiene que caer en un punto entero, caso de filas iguales; Bitácora con «primer grado» |
+| mat-9 (10) | M1–M14 | Cuerda vs arco, radianes sin uso posterior, sen 30° sin justificar los 60°, coseno sólo nombrado, 390° ya dibujado, rampa sin ángulo marcado, semejanza por ángulos, punto vs flecha, i sin regla, baldes con período 3, Bitácora | Parciales (M2 360° = 2π; M10 regla del cuarto). Pendientes en C10-R |
+| mat-10 (11) | A1 | 11.7: los datos no apoyaban «el viento trae las dos»; se afirmaba la causa | Corregido: datos nuevos donde, con el mismo viento, más polvo no trae más borrones; el estudiante compara de a pares y dice que son pocos días; Bitácora sin afirmar la causa |
+| mat-10 (12) | A2 | El final extrapola «duplica» con 4 puntos sin declararlo | Corregido: «si sigue duplicando» en la pregunta; el estudiante dice que otra regla podría pasar por los mismos puntos y que se anota como suposición; 12.1 y la Bitácora dicen «si la regla sigue igual» |
+| mat-10 (11, 12) | M1, M5, M6, M7, M8 | «No dice nada del próximo caso»; «cuánto subió» ambiguo; «las rectas suben»; la tangente como «apenas toca»; la falacia «crecen cada vez menos» | Corregidos |
+| mat-10 (11, 12) | M2–M4, M9, M10 | Eje logarítmico sin decir, «4 seguros» con 5 días, equiprobabilidad de los dados, valor absoluto sin dibujar, cobertura de J | Pendientes (C11-R, C12-R) |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

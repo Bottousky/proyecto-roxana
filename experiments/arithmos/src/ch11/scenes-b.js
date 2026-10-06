@@ -166,12 +166,13 @@ export const dados = {
 // ——————————————————————————————————————————————
 
 const DAYS = [
-  {dust: 2, erase: 1, wind: 'poco'},
-  {dust: 5, erase: 4, wind: 'bastante'},
-  {dust: 3, erase: 2, wind: 'poco'},
-  {dust: 8, erase: 7, wind: 'mucho'},
-  {dust: 6, erase: 6, wind: 'mucho'},
-  {dust: 4, erase: 3, wind: 'bastante'},
+  // dentro del mismo viento, el día de más polvo no borra más: lo que cambia los borrones es el viento
+  {dust: 2, erase: 2, wind: 'poco'},
+  {dust: 3, erase: 1, wind: 'poco'},
+  {dust: 4, erase: 4, wind: 'bastante'},
+  {dust: 5, erase: 3, wind: 'bastante'},
+  {dust: 7, erase: 6, wind: 'mucho'},
+  {dust: 8, erase: 5, wind: 'mucho'},
 ];
 
 export const causa = {
@@ -193,7 +194,7 @@ export const causa = {
     w.add(new Label('c11-axl', 'polvo →', gx + 9 * U - 30, gy + 20, {size: 14, z: 12, ch: BLUE}));
     w.add(new Label('c11-ayl', 'borrones', gx + 6, gy - 9 * U - 4, {size: 14, z: 12, ch: BLUE}));
     DAYS.forEach((r, i) => w.add(new Shape(`c11-pt${i}`, dot(`c11-pt${i}`, 5), gx + r.dust * U, gy - r.erase * U, {z: 13})));
-    d.describe('Seis puntos: los días con más polvo, más borrones. Los puntos suben juntos, casi en fila.');
+    d.describe('Seis puntos: en general, los días con más polvo tienen más borrones. Los puntos suben juntos.');
     const c = await d.choose([
       {id: 'yes', text: 'Sí: van juntos, el polvo hace borrar a la Marea.'},
       {id: 'maybe', text: 'No se sabe: puede haber algo que cause las dos cosas.'},
@@ -207,8 +208,8 @@ export const causa = {
       w.add(new Label(`c11-wl${i}`, r.wind, gx + r.dust * U + 10, gy - r.erase * U - 8, {size: 14, z: 14, ch}));
     });
     d.describe('Al lado de cada punto, el viento de ese día: los días de mucho viento son los de más polvo y más borrones.');
-    await d.think(c === 'maybe' ? 'Ahí está: el viento trae polvo y empuja la Marea. Las dos cosas vienen con el viento.' : c === 'yes' ? 'Van juntos, sí. Pero los días de mucho viento hay más polvo y también más Marea: el viento puede causar las dos.' : 'Casualidad no parece: suben juntos todos los días. Pero el viento puede estar detrás de las dos.');
-    await d.say('student', 'Mara: que dos cosas suban juntas no dice que una cause la otra. Acá parece que el viento trae las dos. Para saber si el polvo hace algo, habría que mirar días con el mismo viento.');
+    await d.think('Mirando de a pares con el mismo viento: con poco viento, el día de más polvo borró menos; con bastante, también; con mucho, también. Dentro del mismo viento, más polvo no trajo más borrones.');
+    await d.say('student', 'Mara: que dos cosas suban juntas no dice que una cause la otra. Con estos seis días, el que acompaña a los borrones parece el viento, no el polvo. Pero son pocos días: para estar más seguros, habría que anotar muchos más.');
     await studentWrites(d, g, 'c11-cz', 'juntas ≠ una causa la otra', A.x0 + 250, A.y0 + 40, {size: 22});
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3).catch(() => {});
@@ -266,7 +267,7 @@ export const anticipar = {
       };
       refresh();
     }));
-    await d.say('student', 'Balcón: lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe qué parte va a pasar.');
+    await d.say('student', 'Balcón: lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar.');
     if (!replay) writeJournal11(g);
     await d.say('Mara', 'Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?');
     g.audio.punto('question');
@@ -292,13 +293,13 @@ function writeJournal11(g) {
   const dp = first('dice-predict');
   if (dp) seen.push(dp.answer === '7' ? 'Anticipaste que el 7 sale más que el 12: 6 maneras contra 1.' : 'Pensaste en el 12 o en que todas salen igual; el 7 sale de 6 maneras y el 12 de una.');
   const cz = first('cause-predict');
-  if (cz) seen.push(cz.answer === 'maybe' ? 'Sospechaste una tercera causa: era el viento.' : 'Pensaste que el polvo causaba la Marea o que era casualidad; el viento traía las dos cosas.');
+  if (cz) seen.push(cz.answer === 'maybe' ? 'Sospechaste una tercera cosa detrás de las dos: el viento parecía acompañar a los borrones.' : cz.answer === 'yes' ? 'Pensaste que el polvo hacía borrar a la Marea; con el mismo viento, más polvo no trajo más borrones.' : 'Pensaste que era casualidad; en seis días suben juntas, pero con el mismo viento el polvo no hace la diferencia.');
   const entry = {
     id: 'c11',
     title: 'Lo que pasa a veces',
     abbr: 'Lo que pasa a veces no se anticipa caso por caso, pero se puede contar.',
     body: [
-      'Con muchos casos, la parte de veces que algo pasa se acomoda cerca de un número (2 de cada 3 baldes llenos). Es algo que se observa, no una garantía, y no dice nada del próximo caso.',
+      'Con muchos casos, la parte de veces que algo pasa se acomoda cerca de un número (2 de cada 3 baldes llenos). Es algo que se observa, no una garantía: del próximo caso dice qué es más probable, no qué va a pasar.',
       'Un número resume muchos datos y siempre esconde algo: el promedio reparte todo y uno muy grande lo arrastra; la mediana, el del medio, no. El rango dice qué tan desparejos son. En un gráfico de barras, hay que mirar dónde empieza el eje.',
       'Cuando se elige una cosa de cada grupo, las maneras se multiplican (3 · 2 · 4 = 24). Con casos igual de posibles, la probabilidad es casos que sirven sobre casos posibles: el 7 con dos dados, 6/36; el 12, 1/36.',
       'Que dos cosas suban juntas no dice que una cause la otra: puede haber una tercera, como el viento.',

@@ -61,7 +61,7 @@ export const rapido = {
     ], {prompt: '¿A qué número se acercan?', evaluate: true});
     d.evidence('derivative-predict', {answer: c});
     await d.think(c === '4' ? 'Cuatro. Con tramo cero no se divide, pero los tramos cada vez más cortos se acercan a 4.' : c === '3.99' ? 'Con un tramo más corto daría 3,999, y después 3,9999: se acercan a 4.' : 'Con tramo cero no se puede dividir, es cierto. Pero los tramos cada vez más cortos se acercan a un número: 4.');
-    await d.say('student', 'Cornisa: justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul, al final, apenas toca el salto: es la tangente.');
+    await d.say('student', 'Cornisa: justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente.');
     await studentWrites(d, g, 'c12-der', 'velocidad en t = 1:  3 → 3,5 → 3,9 → 3,99 → 4', A.x0 + 20, A.y1 - 4, {size: 17});
     g.flags.c12rate = true;
   },
@@ -124,7 +124,7 @@ export const junta = {
       {id: 'inf', text: 'Cada vez más, sin parar.'},
     ], {prompt: '¿A cuántos baldes se acercan las sumas?', evaluate: true});
     d.evidence('integral-predict', {answer: c});
-    await d.think(c === '9' ? 'Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2.' : c === '6' ? 'Seis es el caudal del final, por minuto. Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.' : 'Crecen, pero cada vez menos: se acercan a 9, el triángulo bajo la recta.');
+    await d.think(c === '9' ? 'Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2.' : c === '6' ? 'Seis es el caudal del final, por minuto. Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.' : 'Crecen, pero no sin parar: nunca pasan el área bajo la recta, el triángulo de 3 · 6 ÷ 2 = 9, y se le acercan.');
     await d.say('student', 'Balcón: si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó.');
     await studentWrites(d, g, 'c12-int', 'juntado = área bajo el caudal = 9', A.x0 + 20, A.y1 - 4, {size: 18});
     g.flags.c12accum = true;
@@ -191,7 +191,7 @@ export const final = {
     const s = w.get('student');
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Mara', 'La Marea vuelve. Medí cuánto subió cada noche: 1, 2, 4, 8 escalones. La escalera grande tiene 30. ¿Llegamos a terminar de redibujar?');
+    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche: 1, 2, 4 y 8 escalones. La escalera grande tiene 30. ¿Llegamos a terminar de redibujar?');
     const box = {x: A.x0 + 40, y: A.y0 + 20, w: 300, h: 210};
     const {px, py} = axes(w, 'c12-g', box, [0, 6], [0, 40], {xticks: [1, 2, 3, 4, 5, 6], yticks: [10, 20, 30, 40], xname: 'noche'});
     for (const [n, v] of NIGHTS) w.add(new Shape(`c12-n${n}`, dot(`c12-n${n}`, 6, BLUE), px(n), py(v), {z: 14}));
@@ -221,10 +221,11 @@ export const final = {
       {id: '5', text: 'En la noche 5: 32 pasa los 30.'},
       {id: '4', text: 'En la noche 4: 16.'},
       {id: '15', text: 'En la noche 15, sumando de a dos.'},
-    ], {prompt: '¿En qué noche la Marea pasa la escalera?', evaluate: true});
+    ], {prompt: 'Si sigue duplicando, ¿en qué noche pasa la escalera?', evaluate: true});
     d.evidence('final-predict', {answer: c});
     await d.think(c === '5' ? 'La quinta: 16 todavía no, 32 sí.' : c === '4' ? 'La cuarta llega a 16: todavía no. La quinta, 32: ahí pasa.' : 'Duplica, no suma: la cuarta 16, la quinta 32. Hay que apurarse.');
-    await d.say('student', 'Mara: tenemos cuatro noches. No hace falta redibujar todo: lo que entendimos, la Marea no lo borra. Hay que redibujar lo que todavía no se entiende.');
+    await d.say('student', 'Mara: con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.');
+    await d.say('Mara', 'Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.');
     // la Marea grande: borra lo suelto; lo entendido queda
     g.setCinematic(true);
     p.setMode('still');
@@ -275,7 +276,7 @@ function writeJournal12(g) {
       'Las reglas se agrupan en familias que se reconocen por su forma: rectas, curvas que despegan, U, olas, curvas con un hueco. Los parámetros eligen cuál de la familia: en y = a · x + b, b es dónde empieza y a cuánto sube por paso.',
       'Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo).',
       'La tasa de cambio en un tramo es cuánto cambió dividido cuánto pasó; con tramos cada vez más cortos se acerca a la derivada. Juntar lo que entra de a poco es sumar rectángulos cada vez más finos: se acerca al área bajo el gráfico, la integral.',
-      'Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero. Con todo eso, se anticipa.',
+      'Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero. Con todo eso se anticipa, suponiendo que la regla sigue; y cuando llegan datos nuevos, se revisa.',
     ],
     seen,
     moments: [

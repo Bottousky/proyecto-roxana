@@ -70,7 +70,7 @@ export const familias = {
       };
       refresh();
     }));
-    await d.say('student', 'Mara: cada forma es una familia. Las rectas suben parejo; las que despegan, duplican; las U son iguales de los dos lados; las olas vuelven; las que tienen un hueco no están definidas en un lugar. Viendo un pedazo, uno ya sabe qué esperar.');
+    await d.say('student', 'Mara: cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las que se cortan no están definidas en un lugar, y cerca de él se disparan. Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
     d.evidence('families', {done: [...done]});
     g.flags.c12families = true;
   },

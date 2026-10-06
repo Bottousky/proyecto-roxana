@@ -11,29 +11,19 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 - Modelo: la sesión principal corre como Opus 5.5 (`claude-opus-5-5`, según el entorno). Los
   subagentes se lanzan con el alias `opus`; no puedo verificar desde adentro qué versión resolvió.
 
-## Estado real (ciclo 6 del loop, 2026-10-06)
+## Estado real (ciclo 7 del loop, 2026-10-07)
 
-- **El recorrido completo, capítulos 1 a 12, es jugable y está encadenado.** El cap. 12 «Anticipar»
-  (familias, perillas, el salto de Punto, composición e inversa, derivada como límite de velocidades,
-  integral como límite de sumas, por tramos, y el cierre con la Marea y el arco de Punto) pasa las dos
-  rutas (`it10/c12-*`); sin revisión independiente todavía.
-- El cap. 11 El cap. 11 «Lo que pasa a veces» (frecuencia que se
-  estabiliza, promedio y mediana, rango, gráfico tramposo de Punto que borra la Marea, principio de
-  multiplicación, dos dados, correlación vs causa, gancho al cap. 12) pasa las dos rutas (`it09/c11-*`).
-- El cap. 10 El cap. 10 «Vueltas y flechas» (radianes, seno como
-  alto en la rueda, periodicidad, razón en rampas, vectores, i como cuarto de vuelta, sistemas 2 × 2
-  como rectas que se cruzan, gancho al azar) pasa las rutas directa y con errores (`it09/c10-*`); sin
-  revisión independiente todavía.
-- El cap. 9 «Depende» tiene 8 escenas: flechas (función
-  vs relación, con el largo de la sombra), la máquina de Mara (regla; la de Punto no es función),
-  puntos que se paran (tabla → gráfico; unir o no; la Marea borra la ola decorativa de Punto), la
-  recta parada, dónde se puede (dominio de la cuenta vs del reparto), lo que sale (imagen de x · x),
-  tres maneras (cuenta, tabla y gráfico) y lo que vuelve (gancho al cap. 10); Bitácora.
-- Cap. 8 corregido según rev-mat-7 (las 2 altas y casi todas las medias) y parte de rev-narr-6;
-  pendientes en N8-R.
-- Verificado por interfaz en este ciclo, sin errores: cap. 7 (directa y con errores), cap. 8 (directa,
-  con errores, teléfono), cap. 9 (directa, con errores y teléfono 844×390).
-- **Entorno:** las partidas del bot se corren de a una (dos en paralelo se traban).
+- **El recorrido completo, capítulos 1 a 12, es jugable y está encadenado** (título → 1 → … → 12 →
+  tarjeta final «Arithmos — Lo que se entiende, resiste»). Cada capítulo pasa por la ruta directa y la
+  ruta con errores del bot; los caps. 7–9 también en 844×390.
+- Revisiones matemáticas independientes hechas para los 12 capítulos. Las altas de los caps. 9–12
+  (rev-mat-8, 9 y 10) están corregidas en texto o datos (ver `ARITHMOS_REVIEW.md`); quedan medias
+  pendientes en C9-R…C12-R, N9-R y N10-12.
+- Revisión narrativa de los caps. 10–12: en curso (no hecha hasta ahora).
+- Guarda nueva de interfaz (botones de texto que se pisan): encontró y corrigió un caso en 5.9; los
+  caps. 6–9 no se volvieron a pasar con esa guarda a 1600×900.
+- **Entorno:** máquina compartida; las partidas del bot se corren de a una y las capturas pueden tardar
+  (el bot ahora tolera una captura fallida).
 - Audio no escuchado; sin playtests humanos; sin dispositivo táctil real.
 
 ## Comandos
@@ -56,6 +46,9 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Revisión independiente del cap. 9 (C9-R, en curso) y del cap. 10 (C10-R); aplicar.
-2. Cap. 11 «Lo que pasa a veces» (datos, conteo, probabilidad, correlación vs causa) y cap. 12 «Anticipar».
-3. Pendientes narrativos N8-R, N7-R, N6-R, N2-R; cobertura C7b y C6b.
+1. Revisión narrativa de los caps. 10–12 (en curso) y aplicar sus altas.
+2. Pasada del bot por los caps. 6–9 con la guarda nueva (1600×900 y 844×390).
+3. Pendientes de narrativa por capítulo (N2-R, N6-R … N10-12), empezando por agencia y legibilidad en
+   teléfono, que se repiten en todas las revisiones.
+4. Cobertura pendiente: C6b (identidad), C7b, familias que faltan en el cap. 12 (logarítmica, radical).
+5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.

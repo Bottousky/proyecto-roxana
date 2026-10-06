@@ -439,6 +439,19 @@
         "C9"
       ],
       "acceptance": "Hallazgos registrados y corregidos o justificados",
+      "status": "revisado-mat",
+      "evidence": [
+        "artifacts/arithmos/it09/review-mat/informe.md",
+        "artifacts/arithmos/it09/review-narr/informe.md"
+      ]
+    },
+    {
+      "id": "N9-R",
+      "title": "Pendientes del cap. 9 (rev-narr-7 y rev-mat-8): plantilla y clímax, el jugador debe dar el paso decisivo (tabla visible en 9.1, regla que no se escriba sola, recta parada manejada por el jugador), 9.7 sólo puntos con escala, 9.8 tiempo a escala, dibujar la máquina de Punto, teléfono",
+      "deps": [
+        "C9"
+      ],
+      "acceptance": "Revisión sin hallazgos altos",
       "status": "pendiente",
       "evidence": []
     },
@@ -463,8 +476,10 @@
         "C10"
       ],
       "acceptance": "Hallazgos registrados y corregidos o justificados",
-      "status": "pendiente",
-      "evidence": []
+      "status": "revisado-mat",
+      "evidence": [
+        "artifacts/arithmos/it10/review-mat/informe.md"
+      ]
     },
     {
       "id": "C11",
@@ -482,14 +497,28 @@
       ]
     },
     {
+      "id": "N10-12",
+      "title": "Revisión narrativa de los caps. 10 a 12 (no hecha) y medias pendientes de rev-mat-9 y rev-mat-10",
+      "deps": [
+        "C10",
+        "C11",
+        "C12"
+      ],
+      "acceptance": "Revisión narrativa hecha y altas corregidas",
+      "status": "pendiente",
+      "evidence": []
+    },
+    {
       "id": "C11-R",
       "title": "Revisión independiente (matemática y narrativa) del cap. 11",
       "deps": [
         "C11"
       ],
       "acceptance": "Hallazgos registrados y corregidos o justificados",
-      "status": "pendiente",
-      "evidence": []
+      "status": "revisado-mat",
+      "evidence": [
+        "artifacts/arithmos/it10/review-mat-11-12/informe.md"
+      ]
     },
     {
       "id": "X-1",
@@ -531,8 +560,10 @@
         "C12"
       ],
       "acceptance": "Hallazgos registrados y corregidos o justificados",
-      "status": "pendiente",
-      "evidence": []
+      "status": "revisado-mat",
+      "evidence": [
+        "artifacts/arithmos/it10/review-mat-11-12/informe.md"
+      ]
     },
     {
       "id": "ENV-1",

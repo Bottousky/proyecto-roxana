@@ -460,7 +460,7 @@ export const diagonal = {
       g.setHint(() => ['Elegí en cuántas partes partir el lado para medir la diagonal. Probá varias.']);
       const refresh = () => {
         const left = PARTS.filter(pt => !tried.includes(pt.n));
-        g.ui.setSpots(left.map((pt, i) => wordSpot(`dgp-${pt.n}`, `en ${pt.name}`, BOARD.x - 230 + (i % 3) * 140, top - 70 + Math.floor(i / 3) * 40, () => go(pt), {label: `Medir la diagonal en ${pt.name} del lado`})));
+        g.ui.setSpots(left.map((pt, i) => wordSpot(`dgp-${pt.n}`, `en ${pt.name}`, BOARD.x - 250 + (i % 3) * 170, top - 92 + Math.floor(i / 3) * 60, () => go(pt), {label: `Medir la diagonal en ${pt.name} del lado`})));
       };
       const go = async pt => {
         if (busy || !ctl.alive()) return;

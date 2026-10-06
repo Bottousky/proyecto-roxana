@@ -173,7 +173,7 @@ export const cuarto = {
       }, {label: 'Girar la flecha un cuarto de vuelta'})]);
       refresh();
     }));
-    await d.think('Dos cuartos: (−3, −1). La flecha da vuelta entera hacia el otro lado: es la de antes por −1.');
+    await d.think('Dos cuartos: (−3, −1). Media vuelta: la flecha apunta para el lado contrario, como multiplicar por −1. Cada cuarto, (a, b) pasa a (−b, a).');
     const c = await d.choose([
       {id: 'none', text: 'Ninguno: un número por sí mismo nunca da negativo.'},
       {id: 'new', text: 'Uno nuevo, que no está en la recta: el que gira un cuarto.'},
@@ -218,12 +218,10 @@ export const pistas = {
     const sum7 = Array.from({length: 8}, (_, a) => [a, 7 - a]);
     const diff1 = Array.from({length: 7}, (_, b) => [b + 1, b]);
     for (const [a, b] of sum7) w.add(new Shape(`c10-s${a}`, dot(`c10-s${a}`, 5, WHITE), px(a), py(b), {z: 14}));
-    w.add(new Drawing('c10-l1', [S([[px(0), py(7)], [px(7), py(0)]], seedOf('c10-l1'), {w: 2, p: 0.8})], {z: 13}));
     d.describe('En el mapa, todos los pares que suman 7, en blanco: forman una recta inclinada hacia abajo.');
-    await d.think('Con una sola pista hay ocho pares posibles: toda una recta.');
+    await d.think('Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos.');
     await d.say('Mara', 'Segunda pista: el de Cornisa le lleva 1 al de Balcón.');
     for (const [a, b] of diff1) w.add(new Shape(`c10-d${a}`, dot(`c10-d${a}`, 5, YELLOW), px(a), py(b), {z: 14}));
-    w.add(new Drawing('c10-l2', [S([[px(1), py(0)], [px(7), py(6)]], seedOf('c10-l2'), {w: 2, p: 0.8, ch: YELLOW})], {z: 13}));
     d.describe('En amarillo, los pares donde el primero le lleva 1 al segundo: otra recta, que sube.');
     await d.shot(SHOTS.tiles, 0.8);
     await d.interact(ctl => new Promise(resolve => {
@@ -240,24 +238,24 @@ export const pistas = {
     const sol = solve2([1, 1, 7], [1, -1, 1]);
     w.add(new Shape('c10-sol', poly('c10-sol', Array.from({length: 10}, (_, i) => [Math.cos(i / 10 * Math.PI * 2) * 12, Math.sin(i / 10 * Math.PI * 2) * 12]), {ch: YELLOW, w: 3}), px(sol.x), py(sol.y), {z: 15}));
     d.describe('El par (4, 3), donde se cruzan las dos rectas, queda marcado.');
-    await d.say('student', 'Mara: Cornisa 4, Balcón 3. Cada pista es una recta de pares; las dos a la vez, donde se cruzan.');
+    await d.say('student', 'Mara: Cornisa 4, Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.');
     await studentWrites(d, g, 'c10-sys', 'a + b = 7', A.x0 + 300, A.y0 + 36, {size: 22});
     await studentWrites(d, g, 'c10-sys2', 'a − b = 1', A.x0 + 300, A.y0 + 66, {size: 22});
     await studentWrites(d, g, 'c10-sys3', '→ (4, 3)', A.x0 + 300, A.y0 + 98, {size: 22, ch: YELLOW});
     await d.say('Mara', '¿Y si te digo «suman 7» y «suman 3»?');
     const c = await d.choose([
-      {id: 'none', text: 'Ningún par: esas dos rectas no se cruzan.'},
+      {id: 'none', text: 'Ningún par: esas dos filas no se cruzan.'},
       {id: '52', text: '(5, 2).'},
       {id: 'many', text: 'Muchos: cualquiera de la primera.'},
     ], {prompt: 'Con «suman 7» y «suman 3», ¿qué par cumple las dos?', evaluate: true});
     d.evidence('system-parallel', {answer: c});
     g.setCinematic(true);
-    const par = w.add(new Drawing('c10-l3', [S([[px(0), py(3)], [px(3), py(0)]], seedOf('c10-l3'), {w: 2.4, p: 0.9, ch: BLUE})], {z: 13, progress: 0}));
-    await d.draw(par, 0.6, {sound: false});
+    for (let a = 0; a <= 3; a++) w.add(new Shape(`c10-t${a}`, dot(`c10-t${a}`, 5, BLUE), px(a), py(3 - a), {z: 14}));
+    await d.wait(0.4);
     g.setCinematic(false);
     const none = solve2([1, 1, 7], [1, 1, 3]);
-    d.describe('En azul, los pares que suman 3: una recta paralela a la de los que suman 7. No se cruzan.');
-    await d.think(c === 'none' ? 'Paralelas: ningún par cumple las dos.' : c === '52' ? '(5, 2) suma 7, pero no 3. Las dos rectas son paralelas: ningún par cumple las dos.' : 'Ninguno de la primera suma 3: las rectas son paralelas y no se cruzan.');
+    d.describe('En azul, los pares que suman 3: otra fila, paralela a la de los que suman 7. No tienen ningún punto en común.');
+    await d.think(c === 'none' ? 'Paralelas: ningún par cumple las dos.' : c === '52' ? '(5, 2) suma 7, pero no 3. Las dos filas son paralelas: ningún par cumple las dos.' : 'Ninguno de la primera suma 3: las filas son paralelas y no se tocan. Si fueran la misma fila, servirían todos.');
     w.add(new Label('c10-tabh', 'en tabla:', A.x0 + 300, A.y0 + 150, {size: 16, z: 12, ch: BLUE}));
     await studentWrites(d, g, 'c10-tab', '1    1  |  7', A.x0 + 310, A.y0 + 178, {size: 20});
     await studentWrites(d, g, 'c10-tab2', '1  −1  |  1', A.x0 + 310, A.y0 + 204, {size: 20});
@@ -330,7 +328,7 @@ function writeJournal10(g) {
   const first = k => ev.find(e => e.kind === k);
   const seen = [];
   const rp = first('radian-predict');
-  if (rp) seen.push(rp.answer === '6+' ? 'Anticipaste seis rayos y un poco más alrededor de la rueda.' : rp.answer === '6' ? 'Esperabas seis justos; quedó un hueco: seis y un pedacito, 2π.' : 'Pensaste en tres rayos; tres son media vuelta y un poco más: la vuelta entera, 2π ≈ 6,28.');
+  if (rp) seen.push(rp.answer === '6+' ? 'Anticipaste seis rayos y un poco más alrededor de la rueda.' : rp.answer === '6' ? 'Esperabas seis justos; quedó un hueco: seis y un pedacito, 2π.' : 'Pensaste en los cuatro rayos dibujados; el borde mide seis rayos y un pedacito: 2π ≈ 6,28.');
   const s30 = first('sin30-predict');
   if (s30) seen.push(s30.answer === 'half' ? 'Anticipaste que a 30° la manija sube medio rayo.' : 'Pensaste otra altura para los 30°; sube medio rayo, por el triángulo de lados iguales.');
   const pp = first('period-predict');
@@ -353,7 +351,7 @@ function writeJournal10(g) {
       'Un giro se mide por cuántos rayos recorre el borde: una vuelta son 2π radianes (≈ 6,28), media vuelta π. π no es 3,14: es un número que no termina.',
       'En una rueda de un rayo, la altura del punto que gira es el seno del ángulo y el costado, el coseno: sen 30° = 0,5. Se repiten cada vuelta: sen(x + 360°) = sen x. En rampas de la misma inclinación, alto ÷ largo es siempre el seno del ángulo.',
       'Una flecha (vector) dice cuánto y hacia dónde; se suman punta con cola, y el orden no cambia el destino. Girar un cuarto de vuelta es multiplicar por i: i · i = −1, y 2i · 2i = −4.',
-      'Dos condiciones a la vez son dos rectas: la solución está donde se cruzan; si son paralelas, no hay. Los números de cada condición, en filas, forman una tabla llamada matriz.',
+      'Dos condiciones de primer grado a la vez son dos filas de pares sobre rectas: lo que cumple las dos está en el cruce; si son paralelas, no hay; si son la misma, todos. Con atados enteros, además, el cruce tiene que caer en un punto entero. Los números de cada condición, en filas, forman una tabla llamada matriz.',
     ],
     seen,
     moments: [

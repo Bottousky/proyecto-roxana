@@ -176,7 +176,7 @@ function pickChoice(prompt, options) {
     ['qué entradas tienen sentido', 'Cualquier número menos el 2'],
     ['Puede salir −4', 'Sí: con −2'],
     ['Pasado mañana', 'Más: cada día'],
-    ['entran alrededor de la rueda', 'Tres, como'],
+    ['entran alrededor de la rueda', 'Cuatro, como'],
     ['gira 30°, ¿a qué altura', 'A un tercio'],
     ['Girada 390°', 'Más que 1'],
     ['largo 6, con la misma inclinación', 'Sube 4'],
