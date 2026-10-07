@@ -1,0 +1,28 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c12.anticipar"
+  },
+  "journal": [
+    "Anticipar"
+  ],
+  "evidenceKinds": [
+    "accum",
+    "integral-predict",
+    "piecewise-predict",
+    "final-family",
+    "final-predict",
+    "final-check"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 17.519,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

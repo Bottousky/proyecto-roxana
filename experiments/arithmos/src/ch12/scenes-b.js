@@ -98,41 +98,47 @@ export const junta = {
     w.add(curve('c12-rate', rate, [0, 3], px, py, [0, 6], {ch: WHITE, n: 10}));
     d.describe('Un mapa con el caudal: una recta que sube de 0 a 6 baldes por minuto en 3 minutos.');
     await d.shot(SHOTS.tiles, 0.8);
-    const N = [3, 6, 30];
+    // el jugador elige en cuántos pedazos partir y si mira los rectángulos por abajo o por arriba
     let k = 0;
-    const show = n => {
+    const measured = [];
+    w.add(new Label('c12-sh', 'pedazos', A.x1 - 160, A.y0 + 22, {size: 15, z: 12, ch: BLUE}));
+    const show = (n, above = false) => {
       w.removeWhere(o => o.id.startsWith('c12-rc'));
       const dt = 3 / n;
+      let sum = 0;
       for (let i = 0; i < n; i++) {
-        const t = i * dt, h = rate(t);
+        const t = i * dt, h = rate(above ? t + dt : t);
+        sum += h * dt;
         if (h <= 0) continue;
-        w.add(new Shape(`c12-rc${i}`, poly(`c12-rc${i}`, [[0, 0], [px(dt) - px(0), 0], [px(dt) - px(0), py(h) - py(0)], [0, py(h) - py(0)]], {ch: YELLOW, w: n > 10 ? 1.2 : 2}), px(t), py(0), {z: 12}));
+        w.add(new Shape(`c12-rc${i}`, poly(`c12-rc${i}`, [[0, 0], [px(dt) - px(0), 0], [px(dt) - px(0), py(h) - py(0)], [0, py(h) - py(0)]], {ch: above ? BLUE : YELLOW, w: n > 10 ? 1.2 : 2}), px(t), py(0), {z: 12}));
       }
-      const s = riemann(rate, 3, n);
-      w.add(new Label(`c12-s${k}`, `${n} pedazos:  ${dec(s)}`, A.x1 - 150, A.y0 + 40 + k * 32, {size: 19, z: 12}));
-      d.describe(`Partiendo en ${n} pedazos, cada rectángulo es caudal por tiempo; juntos suman ${dec(s)} baldes.`);
-      d.evidence('accum', {n, s: +s.toFixed(3)});
+      if (!above && Math.abs(sum - riemann(rate, 3, n)) > 1e-9) console.error('[junta] la suma no coincide con riemann');
+      w.add(new Label(`c12-s${k}`, `${n}, ${above ? 'por arriba' : 'por abajo'}:  ${dec(sum)}`, A.x1 - 160, A.y0 + 48 + k * 30, {size: 17, z: 12, ch: above ? BLUE : YELLOW}));
+      d.describe(`Partiendo en ${n} pedazos, con los rectángulos ${above ? 'por arriba de la recta' : 'por debajo de la recta'}: cada uno es caudal por tiempo; juntos suman ${dec(sum)} baldes.`);
+      d.evidence('accum', {n, above, s: +sum.toFixed(3)});
+      measured.push({n, above, s: sum});
+      k++;
     };
-    show(N[0]);
-    k++;
-    await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => ['Tocá «más fino»: los rectángulos se angostan y se pegan más a la recta.']);
-      const refresh = () => g.ui.setSpots([wordSpot('c12-fine', 'más fino', A.x1 - 70, A.y1 - 26, () => {
-        if (!ctl.alive()) return;
-        show(N[k]);
-        k++;
-        g.audio.tap(0.15, 1 + k * 0.1);
-        if (k >= N.length) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
-      }, {label: 'Partir el tiempo en más pedazos'})]);
-      refresh();
-    }));
+    show(3);
+    for (;;) {
+      const ready = measured.length >= 3 && measured.some(m => m.n >= 12);
+      const opts = [6, 12, 30].filter(n => !measured.some(m => m.n === n && !m.above)).map(n => ({id: `b${n}`, text: `En ${n} pedazos, por abajo.`}));
+      if (!measured.some(m => m.above)) opts.push({id: 'a12', text: 'En 12 pedazos, por arriba de la recta.'});
+      if (ready) opts.push({id: 'done', text: 'Ya está: ya se ve adónde van.'});
+      if (!opts.length || (opts.length === 1 && opts[0].id === 'done')) break;
+      const pick = await d.choose(opts, {prompt: '¿En cuántos pedazos partís el tiempo ahora?'});
+      if (pick === 'done') break;
+      show(Number(pick.slice(1)), pick[0] === 'a');
+      g.audio.tap(0.15, 1 + k * 0.1);
+    }
+    if (measured.some(m => m.above)) await d.think('Por abajo dan menos que lo juntado y por arriba, más: lo encierran.');
     const c = await d.choose([
       {id: '9', text: '9: lo que hay debajo de la recta, un triángulo de 3 por 6, a la mitad.'},
       {id: '6', text: '6: el último caudal.'},
       {id: 'inf', text: 'Cada vez más, sin parar.'},
     ], {prompt: '¿A cuántos baldes se acercan las sumas?', evaluate: true});
     d.evidence('integral-predict', {answer: c});
-    await d.think(c === '9' ? 'Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2.' : c === '6' ? 'Seis es el caudal del final, por minuto. Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.' : 'Crecen, pero no sin parar: nunca pasan el área bajo la recta, el triángulo de 3 · 6 ÷ 2 = 9, y se le acercan.');
+    await d.think(c === '9' ? 'Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2.' : c === '6' ? 'Seis es el caudal del final, por minuto. Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.' : 'Las de abajo crecen, pero no sin parar: nunca pasan el área bajo la recta, el triángulo de 3 · 6 ÷ 2 = 9, y se le acercan.');
     await d.say('student', 'Balcón, si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó.');
     await studentWrites(d, g, 'c12-int', 'juntado = área bajo el caudal = 9', A.x0 + 20, A.y1 - 4, {size: 18});
     g.flags.c12accum = true;

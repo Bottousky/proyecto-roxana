@@ -44,6 +44,13 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   11.6): sin errores, 796 s, 12 Bitácoras (`it11/full-1a12`). Y por la ruta con errores (recargas en 2.2, 9.2 y
   12.3): sin errores, 916 s, 12 Bitácoras sin texto roto (`it11/full2-1a12`). En 9.1 el jugador dibuja las flechas al
   revés desde el 2, con la tabla de ayer a la vista.
+- Agencia (N10-12 A3 y N9-R): en 9.1 el jugador dibuja las flechas al revés y decide si hay otra hora; en 9.8
+  anticipa antes de ver lo medido y mira él mismo el punto; en 10.2 elige hasta qué ángulo girar (descubre que
+  120° tiene la altura de 60°); en 10.6 anticipa adónde va (3, 1) con un cuarto de vuelta; en 11.1 decide cuántos
+  baldes subir y puede pedir otra tanda; en 12.5 elige los tramos (también hacia atrás: 4,1 y 3,9 encierran el 4);
+  en 12.6 elige los pedazos y puede mirar los rectángulos por arriba (8,25 y 9,75 encierran el 9). Tercera revisión
+  (rev-c8b) aplicada. **En pantallas bajas el panel de opciones tiene «ver la pizarra»**: se esconde un momento y la
+  pizarra se ve grande; el bot lo usa con `--peek` y captura la pizarra en cada pregunta.
 - **Entorno:** la máquina se suspendió de madrugada (≈ 01:30–02:00); dos corridas y una revisión se cortaron
   por eso y se repitieron sin problemas.
 - Revisión narrativa de los caps. 10–12 hecha (rev-narr-8): el cierre se rehizo (la cuarta noche pone a

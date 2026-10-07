@@ -147,6 +147,13 @@ export const cuarto = {
     w.add(new Label('c10-vl0', pair(v), px(v[0]) + 10, py(v[1]) - 6, {size: 18, z: 14, ch: YELLOW}));
     d.describe('Una flecha amarilla del cero a (3, 1).');
     await d.shot(SHOTS.tiles, 0.8);
+    // antes de girar, el jugador anticipa adónde va la punta
+    const qp = await d.choose([
+      {id: 'ok', text: '(−1, 3): lo que iba adelante ahora va para arriba.'},
+      {id: 'clock', text: '(1, −3): gira para el otro lado.'},
+      {id: 'swap', text: '(−3, 1): se le cambia el signo al de adelante.'},
+    ], {prompt: 'Un cuarto de vuelta contra el reloj: ¿adónde va a quedar la punta de (3, 1)?', evaluate: true});
+    d.evidence('quarter-predict', {answer: qp});
     let turns = 0;
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
@@ -178,6 +185,7 @@ export const cuarto = {
       }, {label: 'Girar la flecha un cuarto de vuelta'})]);
       refresh();
     }));
+    await d.think(qp === 'ok' ? 'El primer cuarto la dejó en (−1, 3), como dijiste.' : qp === 'clock' ? '(1, −3) es girar a favor del reloj. Contra el reloj quedó en (−1, 3).' : '(−3, 1) es reflejarla en el eje parado, no girarla: la flecha no se pone de pie. Quedó en (−1, 3).');
     await d.think('Dos cuartos: (−3, −1). Media vuelta: la flecha apunta para el lado contrario, como multiplicar por −1. Cada cuarto, (a, b) pasa a (−b, a).');
     const c = await d.choose([
       {id: 'none', text: 'Ninguno: un número por sí mismo nunca da negativo.'},
@@ -365,6 +373,8 @@ function writeJournal10(g) {
   if (r60) seen.push(r60.answer === 'sin' ? 'Para la rampa de 60° usaste la tabla de la rueda: 4 · 0,87 ≈ 3,5.' : r60.answer === 'half' ? 'Para la rampa de 60° usaste la mitad, que es el seno de 30°; a 60° es 0,87: sube unos 3,5.' : 'Para la rampa de 60° doblaste el alto con el ángulo; no crece parejo: sube unos 3,5.');
   const vo = first('vector-order');
   if (vo) seen.push(vo.answer === 'same' ? 'Viste que el orden de las flechas no cambia el destino.' : 'Pensaste que el orden cambiaba el destino; cambia el camino, no adónde se llega.');
+  const qpr = first('quarter-predict');
+  if (qpr) seen.push(qpr.answer === 'ok' ? 'Anticipaste que un cuarto de vuelta lleva (3, 1) a (−1, 3).' : qpr.answer === 'clock' ? 'Para un cuarto de vuelta elegiste (1, −3), que es girar a favor del reloj; contra el reloj, (−1, 3).' : 'Para un cuarto de vuelta elegiste (−3, 1), que es un reflejo; girando, (−1, 3).');
   const ip = first('i-predict');
   if (ip) seen.push(ip.answer === 'new' ? 'Buscaste un número nuevo para el cuarto de vuelta: i.' : ip.answer === 'none' ? 'Dijiste que ningún número, multiplicado dos veces, daba media vuelta; en la recta no hay, pero fuera de la recta está i, y i · i = −1.' : 'Probaste con −1; −1 · −1 es 1, vuelta entera. El cuarto de vuelta es i, y i · i = −1.');
   const sp = first('system-parallel');

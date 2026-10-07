@@ -1,0 +1,30 @@
+[0.0s] escena → c10.cuarto
+[1.0s] lee: En la Terraza de las Vueltas, cuando te dan media vuelta, se escribe × (−1). Así lo anotamos desde la piedra. ¿Y un cuarto de vuelta, cómo se escribe?
+[2.7s] elige «(−3, 1): se le cambia el signo al de adelante.» (Un cuarto de vuelta contra el reloj: ¿adónde va a quedar la punta de (3, 1)?)
+[5.5s] lee: (−3, 1) es reflejarla en el eje parado, no girarla: la flecha no se pone de pie. Quedó en (−1, 3).
+[6.2s] lee: Dos cuartos: (−3, −1). Media vuelta: la flecha apunta para el lado contrario, como multiplicar por −1. Cada cuarto, (a, b) pasa a (−b, a).
+[6.8s] elige «−1.» (¿Qué número, multiplicado dos veces, da media vuelta, × (−1)?)
+[7.2s] lee: −1 por −1 es 1: dos medias vueltas, vuelta entera. Hace falta uno que sea medio camino: un cuarto.
+[7.2s] lee: —Mara, a la flecha (0, 1), uno arriba del cero, le decimos i. Multiplicar por i es girar un cuarto de vuelta, contra el reloj. Dos cuartos son media vuelta: i · i = −1. i no está en la recta.
+[7.3s] lee: —La flecha (3, 1) es el número 3 + i: tres adelante y uno arriba. Por i: i · 3 + i · i = 3i − 1. Es la flecha (−1, 3), la del primer giro: el de adelante pasa arriba, y el de arriba pasa adelante con el signo cambiado.
+[7.4s] lee: ¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?
+[7.5s] lee: —Con los números de la recta no se podía, y eso sigue valiendo en la recta. Con éstos sí: multiplicar por 2i es girar un cuarto de vuelta y estirar al doble. Dos veces: media vuelta y cuatro veces el largo, −4. Y −2i, girando para el otro lado, también.
+[7.6s] escena → c10.pistas
+[7.9s] lee: Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7.
+[8.0s] lee: Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos.
+[8.1s] lee: Segunda pista: el de Cornisa le lleva 1 al de Balcón.
+[10.1s] lee: —Mara, son Cornisa 4 y Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.
+[10.2s] lee: ¿Y si te digo «suman 7» y «suman 3»?
+[10.8s] elige «(5, 2).» (Con «suman 7» y «suman 3», ¿qué par cumple las dos?)
+[11.2s] lee: (5, 2) suma 7, pero no 3. Las dos filas son paralelas: ningún par cumple las dos.
+[11.3s] lee: Una tabla así, sólo con los números de cada pista, se llama matriz.
+[11.3s] lee: —Mara, en la tabla azul la parte de la izquierda es igual en las dos filas y el resultado no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas.
+[11.4s] lee: ¿Y si te digo «suman 7» y «el doble de los dos suma 14»?
+[11.5s] lee: —Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares.
+[11.5s] escena → c10.a-veces
+[12.5s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[17.6s] elige «A medias: ya le toca.» (El balde número 7, ¿cómo va a subir?)
+[18.0s] lee: El balde no lleva la cuenta: lo que salió antes no cambia lo que sale ahora.
+[18.0s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[18.3s] escena → c11.baldes
+[19.0s] {"ended":true,"final":{"mode":"play","seg":"c11.baldes"},"journal":["Vueltas y flechas"],"evidenceKinds":["quarter-predict","quarter","i-predict","complex","system-try","system-parallel","system","pull","chance-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":19.01,"size":"1600x900","touch":false,"route":"errores","watch":false}
