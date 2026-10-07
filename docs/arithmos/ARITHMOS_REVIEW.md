@@ -284,7 +284,7 @@ commit siguiente (evidencia: `artifacts/arithmos/it08/c8b-directa`, `it08/c8b-er
 | narr | A4 | La Marea no aparece | Corregido: borra los dibujos de la prueba de √2; el razonamiento queda |
 | narr | A5 | Cajas de 8.4 ilegibles; huerta 2 × 2 contra el cap. 7; la puerta | Corregido: la caja grande por pisos, vista de arriba; la huerta es la de 3 × 3; Peldaño deja √2 en la puerta |
 | narr | M4 | El gancho 8→9 ya resolvía el cap. 9 | Corregido: queda como pregunta |
-| narr | A1, A2, A6, M1–M3, M5–M7 | Plantilla sin hilo ni clímax, agencia, teléfono, voces, opciones, costura 7→8, composición, accesibilidad, Bitácora | Pendientes (backlog N8-R) |
+| narr | A1, A2, A6, M1–M3, M5–M7 | Plantilla sin hilo ni clímax, agencia, teléfono, voces, opciones, costura 7→8, composición, accesibilidad, Bitácora | Parcial (ciclo 8): A2 en 8.8, el jugador mide cada sombra en una regla de tiza en el piso (con la cámara de cerca) antes de que se anote (`it11/c88c*`); voces con coma. Resto pendiente (backlog N8-R) |
 
 ## Revisiones independientes de los caps. 9 a 12 (rev-mat-8, rev-narr-7, rev-mat-9, rev-mat-10, 2026-10-06/07)
 

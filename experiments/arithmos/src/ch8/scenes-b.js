@@ -353,8 +353,9 @@ export const sombras = {
     const HOURS = [8, 10, 12, 14, 16];
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
-      g.setHint(() => ['Tocá una hora: el sol se mueve y la sombra de Cornisa cambia. Se anota en la tabla.']);
-      const refresh = () => g.ui.setSpots(HOURS.filter(h => !tried.includes(h)).map((h, i) => wordSpot(`c8-h${h}`, `${h} h`, fx - 280 + HOURS.indexOf(h) * 140, GROUND + 70, () => at(h), {label: `Mirar la sombra a las ${h}`})));
+      const hoursHint = () => g.setHint(() => ['Tocá una hora: el sol se mueve y la sombra de Cornisa cambia. Después la medís con la regla.']);
+      hoursHint();
+      const refresh = () => hoursHint() || g.ui.setSpots(HOURS.filter(h => !tried.includes(h)).map((h, i) => wordSpot(`c8-h${h}`, `${h} h`, fx - 280 + HOURS.indexOf(h) * 140, GROUND + 70, () => at(h), {label: `Mirar la sombra a las ${h}`})));
       const at = async h => {
         if (busy || !ctl.alive()) return;
         busy = true;
@@ -366,6 +367,32 @@ export const sombras = {
         try { await d.tween(0.8, q => { sun.x = lerp(sx0, tx, q); sun.y = lerp(sy0, ty, q); }, easeInOut); } catch { return; }
         setShadow(SHADOW[h], h);
         const dir = dirOf(h);
+        // el jugador mide: una regla de tiza en el piso, con una marca por paso, desde donde empieza la sombra
+        const step = dir === 0 ? 1 : dir, s0 = dir === 0 ? fx - 20 : fx + dir * 4;
+        const ticks = [S([[s0, GROUND + 12], [s0 + step * 5 * 40, GROUND + 12]], seedOf('c8-ruler'), {w: 2, p: 0.85, ch: YELLOW, lift: false})];
+        for (let k = 0; k <= 5; k++) ticks.push(S([[s0 + step * k * 40, GROUND + 6], [s0 + step * k * 40, GROUND + 20]], seedOf('c8-ruler') + 1 + k, {w: 2, p: 0.85, ch: YELLOW, lift: false}));
+        w.add(new Drawing('c8-ruler', ticks, {z: 3}));
+        for (let k = 1; k <= 5; k++) w.add(new Label(`c8-rl${k}`, String(k), s0 + step * k * 40, GROUND + 40, {size: 18, align: 'center', z: 3, ch: YELLOW}));
+        d.describe(`A las ${h}, la sombra de Cornisa, en azul${dir > 0 ? ', apunta a la derecha' : dir < 0 ? ', apunta a la izquierda' : ', la más corta'}. Debajo, una regla de tiza con marcas de a un paso, del 1 al 5.`);
+        // de cerca, para medir
+        const mid = s0 + step * 2.5 * 40;
+        try { await d.shot({x: mid - 230, y: GROUND - 210, w: 460, h: 290}, 0.6); } catch { return; }
+        try {
+          await new Promise(res => {
+            g.setHint(() => ['Mirá dónde termina la sombra azul y tocá esa marca de la regla.']);
+            g.ui.setSpots(Array.from({length: 5}, (_, i) => i + 1).map(k => rectSpot(`c8-m${k}`, `Marca ${k} de la regla`, {x: s0 + step * k * 40 - 16, y: GROUND + 4, w: 32, h: 44}, () => {
+              if (!ctl.alive()) return;
+              const ok = k === SHADOW[h];
+              d.evidence('shadow-measure', {h, k, ok});
+              if (!ok) { g.note(k < SHADOW[h] ? `En la marca ${k} todavía hay sombra: termina más lejos.` : `En la marca ${k} ya no hay sombra: termina antes.`); return; }
+              g.ui.setSpots([]);
+              res();
+            })));
+          });
+        } catch { return; }
+        w.remove('c8-ruler');
+        for (let k = 1; k <= 5; k++) w.remove(`c8-rl${k}`);
+        try { await d.shot(SHOTS.shadow, 0.6); } catch { return; }
         w.add(new Label(`c8-sr${h}`, `${h} h:  largo ${SHADOW[h]}  ${dir > 0 ? '→' : dir < 0 ? '←' : '(la más corta)'}`, A.x0 + 20, A.y0 + 40 + (tried.length - 1) * 34, {size: 22, z: 12}));
         d.describe(`A las ${h}, la sombra de Cornisa mide ${SHADOW[h]} ${SHADOW[h] === 1 ? 'paso' : 'pasos'}${dir > 0 ? ' y apunta a la derecha, lejos del sol de la mañana' : dir < 0 ? ' y apunta a la izquierda, lejos del sol de la tarde' : ': la más corta, con el sol bien alto'}.`);
         d.evidence('shadow', {h, len: SHADOW[h]});

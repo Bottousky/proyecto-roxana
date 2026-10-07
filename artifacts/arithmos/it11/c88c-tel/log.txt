@@ -1,0 +1,6 @@
+[0.0s] escena → c8.sombras
+[1.0s] lee: Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?
+[13.3s] lee: A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir.
+[13.4s] lee: Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?
+[13.6s] escena → c9.flechas
+[13.9s] {"ended":true,"final":{"mode":"play","seg":"c9.flechas"},"journal":["Formas"],"evidenceKinds":["shadow-measure","shadow"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":13.893,"size":"844x390","touch":true,"route":"errores","watch":false}

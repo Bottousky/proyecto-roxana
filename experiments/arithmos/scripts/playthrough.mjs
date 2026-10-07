@@ -413,6 +413,7 @@ let dosPasosStep = 0;
 let copyCand = null;
 let coordStep = 0;
 let c9Shape = null;
+let c8Hour = 8;
 let c9Moves = 0;
 let c11Item = null;
 let c11Dice = 7;
@@ -509,8 +510,10 @@ for (let iter = 0; iter < 30000; iter++) {
   }
   if (s.spots.length) {
     // la primera interacción de cada escena, con la cámara ya quieta: evidencia del encuadre al tocar
-    if ((opt('snap') || val('snap', '')) && !interactSnapped.has(s.seg)) {
-      interactSnapped.add(s.seg);
+    // una captura por cada tipo de interacción nueva de la escena (por el prefijo del primer lugar tocable)
+    const ikey = `${s.seg}|${(s.spots[0]?.id || '').replace(/[0-9_]+$/, '')}`;
+    if ((opt('snap') || val('snap', '')) && !interactSnapped.has(ikey)) {
+      interactSnapped.add(ikey);
       await page.waitForTimeout(700);
       await shot(`${s.seg}-interaccion`);
       continue;
@@ -745,6 +748,14 @@ for (let iter = 0; iter < 30000; iter++) {
       const seq = route === 'errores' ? ['c8-pt2_3', 'c8-pt3_2', 'c8-pt-1_-1'] : ['c8-pt3_2', 'c8-pt-1_-1'];
       target = spots.find(x => x.id === seq[coordStep]) || spots[0];
       coordStep++;
+    } else if (s.seg === 'c8.sombras' && spots.some(x => x.id.startsWith('c8-m'))) {
+      // mide la sombra en la regla (con errores, una marca equivocada la primera vez)
+      const len = {8: 4, 10: 2, 12: 1, 14: 2, 16: 4}[c8Hour];
+      const wrong = route === 'errores' && !tried.has('c8measure') && (tried.add('c8measure'), true);
+      target = spots.find(x => x.id === `c8-m${wrong ? (len === 5 ? 4 : len + 1) : len}`);
+    } else if (s.seg === 'c8.sombras' && spots.some(x => x.id.startsWith('c8-h'))) {
+      target = spots[0];
+      c8Hour = Number(target.id.replace('c8-h', ''));
     } else if (s.seg === 'c9.flechas' && spots.some(x => x.id === 'c9-q2')) {
       // flechas al revés: el 2 y después las horas con sombra 2 (con errores, primero una que no)
       const q2 = s.spots.find(x => x.id === 'c9-q2');
