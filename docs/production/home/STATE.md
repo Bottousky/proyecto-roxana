@@ -370,6 +370,9 @@ por GitHub Pages. En vivo, con el Mac despierto: `clasica-check.mjs` 44/44 (LCP 
   archivos faltantes ni errores; clásica 44/44; interacción 32/32; teclado 15/15; 20/20 arranques (1,5 s).
   En desarrollo, con los destinos por defecto: clásica 45/45 y 5/5 arranques. `npm test` 104/104 (prueba nueva:
   con los destinos de publicación ninguna página de la home enlaza a `index.html` ni a `escuela.html`).
+- **Publicado**: `main` = `d9c7339`, `gh-pages` = `2e379d3`. En vivo (https://bottousky.github.io/proyecto-roxana/):
+  la raíz es el Instituto Roxana; redirección de `escuela.html` con sala, juego en `ohmdal.html` sin errores, clásica
+  44/44, 10/10 arranques (mediana 1,7 s). Evidencia en `evidence/c18/vivo/`.
 
 ## Siguiente acción exacta
 
