@@ -128,6 +128,32 @@ export const perillas = {
     }));
     await d.say('student', `Rampa, b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia.`);
     d.evidence('params', {a, b, moves});
+    // otra familia con perilla: las U y = a · x · x
+    g.setCinematic(true);
+    const olds = w.objects.filter(o => /^c12-/.test(o.id));
+    await d.tween(0.5, q => { for (const o of olds) o.fade = 1 - q; });
+    for (const o of olds) w.remove(o.id);
+    g.setCinematic(false);
+    await d.say('Rampa', 'Las U de las huertas también tienen perilla. Mi huerta nueva: con lado 2, quiero 8 de tierra.');
+    const ub = {x: A.x0 + 40, y: A.y0 + 20, w: 260, h: 210};
+    const U2 = axes(w, 'c12-ug', ub, [-3, 3], [0, 10], {xticks: [-2, 2], yticks: [4, 8], xname: 'x'});
+    const UA = [{a: 0.5, ch: WHITE, t: 'a = 1/2'}, {a: 1, ch: BLUE, t: 'a = 1'}, {a: 2, ch: YELLOW, t: 'a = 2'}];
+    for (const [i, u] of UA.entries()) {
+      w.add(curve(`c12-u${i}`, x => u.a * x * x, [-3, 3], U2.px, U2.py, [0, 10], {ch: u.ch, n: 40}));
+      const xl = Math.min(2.9, Math.sqrt(9.4 / u.a));
+      w.add(new Label(`c12-ul${i}`, u.t, U2.px(xl) + 6, U2.py(u.a * xl * xl) + 4, {size: 15, z: 13, ch: u.ch}));
+    }
+    w.add(new Shape('c12-u28', dot('c12-u28', 6, YELLOW), U2.px(2), U2.py(8), {z: 14}));
+    w.add(new Label('c12-u28l', '(2, 8)', U2.px(2) - 12, U2.py(8) - 8, {size: 16, align: 'right', z: 14}));
+    d.describe('Tres U: y = a · x · x con a = 1/2, a = 1 y a = 2. Cuanto más grande es a, más angosta la U. Un punto en (2, 8).');
+    const ua = await d.choose([
+      {id: '2', text: 'a = 2: 2 · 2 · 2 = 8.'},
+      {id: '1', text: 'a = 1: es la U de siempre, x · x.'},
+      {id: '0.5', text: 'a = 1/2: la más abierta, para que entre más tierra.'},
+    ], {prompt: '¿Qué perilla pasa por (2, 8)?', evaluate: true});
+    d.evidence('params-u', {answer: ua});
+    await d.think(ua === '2' ? 'a = 2: con x = 2, 2 · 4 = 8.' : ua === '1' ? 'Con a = 1 y x = 2 da 4, no 8. Hace falta a = 2: 2 · 4 = 8.' : 'Con a = 1/2 y x = 2 da 2. Más abierta es menos alta: hace falta a = 2, más angosta.');
+    await d.say('student', 'Rampa, en las U la perilla a la estrecha o la abre: con a más grande, sube más rápido y queda más angosta. Para pasar por (2, 8), a = 2.');
     g.flags.c12params = true;
   },
 };

@@ -105,7 +105,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | J6 | Por tramos; valor absoluto (la V) | 4°–6° (rango del bloque) | 12.7 | probado-auto · revisado-mat |
 | J7 | Anticipar con una suposición declarada y revisarla | 4°–6° (rango del bloque) | 12.8 | probado-auto · revisado-mat |
 | J8 | Discontinuidad y asíntota nombradas (la forma cortada); la raíz como familia, con gráfico, reflejo de x · x sobre la diagonal | 4°–6° (rango del bloque) | 12.1, 12.4 | probado-auto (pendiente revisión matemática) |
-| J-gap | Polinómica de grado mayor que 2, parámetros de otras familias, asíntota horizontal (simetría: nombrada en 12.1) | 4°–6° (rango del bloque) | — | pendiente |
+| J2b | Parámetro de otra familia: y = a · x · x, la perilla estrecha o abre la U (pasar por (2, 8)) | 4°–6° (rango del bloque) | 12.2 | probado-auto (pendiente revisión matemática) |
+| J-gap | Polinómica de grado mayor que 2, asíntota horizontal (simetría: nombrada en 12.1) | 4°–6° (rango del bloque) | — | pendiente |
 | K1 | **Lógica proposicional y álgebra de Boole** (INET Electrónica; no está en A–J) | INET | por decidir (¿puente con Bitland?) | pendiente — decisión de alcance |
 | K2 | Divisibilidad y primos (NAP/PBA 1°–2°; no nombrado en A–J) | 1°–2° | 2 o 3 | pendiente |
 | K3 | Combinatoria como objeto propio, binomio de Newton | 2°–4° | 10 | pendiente |
