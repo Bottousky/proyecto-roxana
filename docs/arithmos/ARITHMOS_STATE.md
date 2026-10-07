@@ -41,7 +41,9 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   respuesta de 9.1; la del 5 escribía «undefined») — corregido en las doce y el bot ahora marca como error una
   Bitácora con «undefined» o «NaN». 9.2 muestra lo que da la primera pieza antes de elegir la segunda; 9.4 deja
   seguir mirando; la asíntota se define bien. Partida completa 1 → 12 (ruta directa, recargas en 3.2, 7.3b y
-  11.6): sin errores, 796 s, 12 Bitácoras (`it11/full-1a12`).
+  11.6): sin errores, 796 s, 12 Bitácoras (`it11/full-1a12`). Y por la ruta con errores (recargas en 2.2, 9.2 y
+  12.3): sin errores, 916 s, 12 Bitácoras sin texto roto (`it11/full2-1a12`). En 9.1 el jugador dibuja las flechas al
+  revés desde el 2, con la tabla de ayer a la vista.
 - **Entorno:** la máquina se suspendió de madrugada (≈ 01:30–02:00); dos corridas y una revisión se cortaron
   por eso y se repitieron sin problemas.
 - Revisión narrativa de los caps. 10–12 hecha (rev-narr-8): el cierre se rehizo (la cuarta noche pone a
@@ -81,7 +83,6 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 2. Cobertura pendiente (ver huecos en la matriz): C7b (cociente de potencias, sucesiones nombradas,
    simplificar racionales), J (polinómica de grado mayor, simetrías, parámetros de otras familias, asíntota
    horizontal).
-3. Agencia en 9.1 (el jugador dibuja las flechas al revés) y 9.8 (el botón único de «otro día»); bajas de rev-c8
-   (B7, B9).
-4. Partida completa por la ruta con errores (en curso al cerrar el ciclo 8, `it11/full2-1a12`).
+3. Agencia en 9.8 (el botón único de «otro día») y en los caps. 10–12 (N10-12 A3); bajas de rev-c8 (B7, B9).
+4. Revisión matemática de 7.7 (una y ninguna solución) y de 9.1 nuevo.
 5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.
