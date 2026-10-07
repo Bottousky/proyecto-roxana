@@ -8,7 +8,7 @@ import {SHOTS, area, base, boardCast, clean, poly, S, seedOf, WHITE, YELLOW, BLU
 import {dot} from '../ch9/common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
 
-const dec = v => String(v).replace('.', ',');
+const dec = v => String(v).replace('.', ',').replace('-', '−');
 
 /** Un arco de circunferencia (centro cx, cy; radio r) de a0 a a1, con la parada hacia arriba (ángulos contra el reloj). */
 function arcPts(cx, cy, r, a0, a1, n = 24) {
@@ -165,32 +165,46 @@ export const alto = {
     await d.shot(SHOTS.tiles, 0.8);
     let deg = 0;
     const rows = [];
-    const turn = async () => {
-      const d0 = deg, d1 = deg + 30;
-      await d.tween(0.6, q => { const a = (d0 + (d1 - d0) * q) * Math.PI / 180; handle.x = cx + Math.cos(a) * R; handle.y = cy - Math.sin(a) * R; }, easeInOut);
+    const r2 = v => dec(Math.round(v * 100) / 100);
+    const turnTo = async d1 => {
+      const d0 = deg;
+      await d.tween(0.4 + Math.abs(d1 - d0) / 150, q => { const a = (d0 + (d1 - d0) * q) * Math.PI / 180; handle.x = cx + Math.cos(a) * R; handle.y = cy - Math.sin(a) * R; }, easeInOut);
       deg = d1;
       setLevel(deg);
       const p = point(1, deg);
       rows.push({deg, y: p.y, x: p.x});
-      const r2 = v => dec(Math.round(v * 100) / 100);
       if (rows.length === 1) col('c10-rowh', A.y0 + 22, ['giro', 'alto', 'costado'], {size: 15, ch: BLUE});
       col(`c10-row${deg}`, A.y0 + 22 + rows.length * 28, [`${deg}°`, r2(p.y), r2(p.x)]);
-      d.describe(`Girada ${deg}°, la manija queda a ${r2(p.y)} rayo sobre el centro y a ${r2(p.x)} rayo al costado.`);
+      d.describe(`Girada ${deg}°, la manija queda a ${r2(p.y)} rayo sobre el centro y a ${r2(p.x)} rayo al costado${p.x < 0 ? ', del lado izquierdo' : ''}.`);
       d.evidence('height', {deg, y: p.y});
     };
-    await d.interact(ctl => new Promise(resolve => {
-      let busy = false;
-      g.setHint(() => ['Tocá «girar 30°» y leé la altura en la regla.']);
-      const refresh = () => g.ui.setSpots([wordSpot('c10-turn', 'girar 30°', A.x1 - 80, A.y1 - 30, async () => {
-        if (busy || !ctl.alive()) return;
-        busy = true;
-        g.ui.setSpots([]);
-        try { await turn(); } catch { return; }
-        busy = false;
-        if (deg >= 90) { g.setHint(null); resolve(); } else refresh();
-      }, {label: 'Girar la rueda 30 grados'})]);
-      refresh();
-    }));
+    // el jugador elige hasta dónde girar; para seguir hacen falta 30°, 60° y 90° en la tabla
+    const ANGLES = [30, 60, 90, 120, 150];
+    const visited = new Set();
+    let past90 = null;
+    for (;;) {
+      const ready = [30, 60, 90].every(a => visited.has(a));
+      const opts = ANGLES.filter(a => !visited.has(a)).map(a => ({id: String(a), text: `Girar hasta ${a}°.`}));
+      if (ready) opts.push({id: 'done', text: 'Ya está: con esto alcanza.'});
+      if (opts.length === 1 && opts[0].id === 'done') break;
+      const pick = await d.choose(opts, {prompt: visited.size ? `Está en ${deg}°. ¿Hasta dónde la giro ahora?` : '¿Hasta dónde giro la rueda? Se anota la altura de la manija en cada giro.'});
+      if (pick === 'done') break;
+      const a = Number(pick);
+      if (a > 90 && !past90) {
+        past90 = await d.choose([
+          {id: 'same', text: `A la misma altura que a ${180 - a}°: baja como subió.`},
+          {id: 'more', text: 'Más alto que a 90°: sigue subiendo.'},
+          {id: 'below', text: 'Abajo del centro: ya pasó la mitad.'},
+        ], {prompt: `A ${a}°, ¿a qué altura va a quedar la manija?`, evaluate: true});
+        d.evidence('sin-past90-predict', {deg: a, answer: past90});
+      }
+      await turnTo(a);
+      visited.add(a);
+      if (a > 90 && rows.filter(r => r.deg > 90).length === 1) {
+        const y = r2(point(1, a).y);
+        await d.think(past90 === 'same' ? `${y}, como a ${180 - a}°. Lo que cambia es el costado: ahora está del lado izquierdo, negativo.` : past90 === 'more' ? `No sube más que el rayo: después de 90° baja. ${y}, como a ${180 - a}°; el costado ahora es negativo.` : `Todavía está arriba del centro: abajo recién pasa después de 180°. ${y}, como a ${180 - a}°; lo que se dio vuelta es el costado.`);
+      }
+    }
     await d.think(g30 === 'half' ? 'Medio rayo justo.' : g30 === 'unknown' ? 'Medio rayo. Y se podía saber sin medir: lo dice un triángulo de lados iguales.' : 'A 30° la manija sube medio rayo, no un tercio: la altura no crece parejo con el giro.');
     // por qué medio: la mitad de un triángulo equilátero (se borran las rayas de los 90°)
     g.setCinematic(true);
