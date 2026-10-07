@@ -1,0 +1,81 @@
+[0.0s] escena → c8.doble
+[1.0s] lee: Mi huerta es la de nueve cuadros, tres por tres. Quiero otra con el lado el doble de largo. ¿Cuánta tierra va a tener?
+[1.6s] elige «El doble de tierra.» (Con el lado el doble de largo, ¿cuánta tierra entra?)
+[2.8s] toca c8-q0 (Poner una huerta de tres por tres en ese lugar de la grande)
+[3.4s] toca c8-q1 (Poner una huerta de tres por tres en ese lugar de la grande)
+[3.9s] toca c8-full (La huerta grande ya está llena)
+[4.1s] lee: Todavía queda tierra sin huerta. Mirá los huecos.
+[4.1s] toca c8-q2 (Poner una huerta de tres por tres en ese lugar de la grande)
+[4.7s] toca c8-q3 (Poner una huerta de tres por tres en ese lugar de la grande)
+[5.2s] toca c8-full (La huerta grande ya está llena)
+[5.4s] lee: Cuatro huertas, no dos: el doble de largo y el doble de ancho. Treinta y seis cuadros.
+[5.4s] lee: Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran? Llenala vos.
+[5.5s] toca c8-cell00 (Poner una caja como la de Cornisa en el piso de abajo)
+[5.9s] toca c8-cell01 (Poner una caja como la de Cornisa en el piso de abajo)
+[6.2s] toca c8-cell02 (Poner una caja como la de Cornisa en el piso de abajo)
+[6.6s] toca c8-cell03 (Poner una caja como la de Cornisa en el piso de abajo)
+[7.0s] toca c8-boxfull (La caja grande ya está llena)
+[7.2s] lee: El piso de arriba está vacío. La caja grande también es el doble de alta.
+[7.2s] toca c8-cell10 (Poner una caja como la de Cornisa en el piso de arriba)
+[7.6s] toca c8-cell11 (Poner una caja como la de Cornisa en el piso de arriba)
+[8.0s] toca c8-cell12 (Poner una caja como la de Cornisa en el piso de arriba)
+[8.4s] toca c8-cell13 (Poner una caja como la de Cornisa en el piso de arriba)
+[8.7s] toca c8-boxfull (La caja grande ya está llena)
+[8.9s] lee: Ocho: cuatro en el piso de abajo y cuatro en el de arriba. Se duplicaron el largo, el ancho y también el alto.
+[9.0s] lee: —Peldaño, el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27.
+[9.1s] escena → c8.cerca
+[10.1s] lee: Me quedaron doce tramos de cerca. Quiero una huerta rectangular, con la mayor cantidad de tierra adentro.
+[10.7s] elige «Con la misma cerca, cualquier huerta tiene la misma tierra.» (Con los mismos doce tramos, ¿cambia cuánta tierra queda adentro?)
+[11.9s] toca c8-w1 (Armar la huerta de 1 de ancho)
+[12.5s] toca c8-w2 (Armar la huerta de 2 de ancho)
+[13.2s] toca c8-w3 (Armar la huerta de 3 de ancho)
+[13.9s] lee: La misma cerca y la tierra va de 5 a 9. No es la misma: depende de la forma. De estas huertas, la cuadrada encierra más.
+[14.0s] lee: —Rampa, la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra.
+[14.0s] escena → c8.pitagoras
+[14.4s] lee: Para la escalera nueva quiero un tirante en diagonal. Las patas miden 3 y 4 cuadros, en escuadra. ¿Cuánto mide el tirante?
+[14.9s] elige «Siete: tres más cuatro.» (¿Cuánto mide el tirante?)
+[15.3s] lee: Ir por las patas, 3 y después 4, es más largo que ir derecho por la diagonal.
+[15.4s] lee: —Armo un cuadrado de lado 3 + 4 con cuatro triángulos como el de Balcón, uno en cada esquina.
+[16.3s] lee: Lo que queda libre en el medio tiene cuatro lados iguales, tirantes. ¿Y sus esquinas? En cada borde se juntan las dos puntas agudas de dos triángulos; esas dos suman 90°, porque las tres puntas de un triángulo suman 180° y una es recta. Queda 180° − 90° = 90°: es un cuadrado.
+[16.3s] toca c8-mv0 (Correr el triángulo 1)
+[16.4s] toca c8-mv2 (Correr el triángulo 3)
+[16.6s] toca c8-mv3 (Correr el triángulo 4)
+[16.7s] lee: El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16.
+[16.8s] lee: —Balcón, el cuadrado del tirante tiene 9 + 16 = 25 cuadros: el tirante mide 5, porque 5 · 5 = 25.
+[17.4s] elige «Para cualquier triángulo.» (¿Para qué triángulos vale esto?)
+[17.8s] lee: Mi otra escalera tiene patas 4 y 5, pero no en escuadra, y el tirante mide 6.
+[17.9s] lee: 41 no es 36. Los cuatro triángulos encajan en las esquinas del cuadrado grande porque tienen una esquina recta: sin ángulo recto, no hay reacomodo.
+[17.9s] lee: —El lado de enfrente del ángulo recto se llama hipotenusa; los otros dos, catetos.
+[18.0s] lee: Cinco cuadros de tirante. Y sin medir.
+[18.1s] escena → c8.casas
+[19.1s] lee: La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada.
+[20.0s] lee: La casa de Rampa la tengo anotada así: (3, 2).
+[20.0s] toca c8-pt2_3 (El cruce (2, 3))
+[20.1s] toca c8-pt3_2 (El cruce (3, 2))
+[20.3s] lee: —Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar.
+[20.4s] lee: Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1).
+[20.4s] toca c8-pt-1_-1 (El cruce (-1, -1))
+[20.6s] lee: Por las rectas, Peldaño camina en ele: primero de un lado y después del otro. ¿Dónde dobla?
+[20.6s] toca c8-cn1_1 (El cruce (1, 1))
+[20.7s] toca c8-cn-1_2 (El cruce (-1, 2))
+[21.6s] lee: Doblando en (−1, 2): 3 y 4, siete en total. Doblando en (3, −1) también daría 4 y 3.
+[22.2s] elige «Siete, como en ele.» (¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?)
+[22.6s] lee: —Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5.
+[22.6s] lee: Siete es yendo por las rectas, en ele. Derecho, cinco.
+[22.7s] escena → c8.sombras
+[23.1s] lee: Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?
+[23.1s] toca c8-h8 (Mirar la sombra a las 8)
+[24.5s] toca c8-m5 (Marca 5 de la regla)
+[24.7s] toca c8-m4 (Marca 4 de la regla)
+[25.3s] toca c8-h10 (Mirar la sombra a las 10)
+[26.8s] toca c8-m2 (Marca 2 de la regla)
+[27.4s] toca c8-h12 (Mirar la sombra a las 12)
+[28.9s] toca c8-m1 (Marca 1 de la regla)
+[29.5s] toca c8-h14 (Mirar la sombra a las 14)
+[31.0s] toca c8-m2 (Marca 2 de la regla)
+[31.6s] toca c8-h16 (Mirar la sombra a las 16)
+[33.0s] toca c8-m4 (Marca 4 de la regla)
+[33.7s] lee: A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir.
+[33.8s] lee: Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?
+[34.1s] escena → c9.flechas
+[34.8s] {"ended":true,"final":{"mode":"play","seg":"c9.flechas"},"journal":["Formas"],"evidenceKinds":["area-scale-predict","area-fill","volume-fill","scale","perimeter-predict","fence","perimeter","pythag-predict","pythag-move","pythag-general","pythag","coord-try","coord-corner","coord-distance","coords","shadow-measure","shadow"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":34.767,"size":"1600x900","touch":false,"route":"errores","watch":false}

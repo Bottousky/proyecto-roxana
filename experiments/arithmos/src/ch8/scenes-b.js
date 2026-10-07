@@ -69,34 +69,36 @@ export const cerca = {
       return a * b;
     };
     w.add(new Label('c8-wl', 'ancho:', A.x1 - 160, A.y0 + 14, {size: 18, z: 12, ch: BLUE}));
-    await d.interact(ctl => new Promise(resolve => {
-      let busy = false;
-      g.setHint(() => ['Elegí el ancho de la huerta: el largo sale solo, porque la cerca es siempre la misma. Mirá cuánta tierra queda adentro.']);
-      const refresh = () => g.ui.setSpots([1, 2, 3, 4, 5].filter(a => !tried.includes(a)).map(a => wordSpot(`c8-w${a}`, String(a), A.x1 - 140 + ((a - 1) % 2) * 100, A.y0 + 46 + Math.floor((a - 1) / 2) * 72, () => pick(a), {label: `Armar la huerta de ${a} de ancho`})));
-      const pick = async a => {
-        if (busy || !ctl.alive()) return;
-        busy = true;
-        g.ui.setSpots([]);
-        tried.push(a);
-        const ar = show(a);
-        table(a, 6 - a, ar, tried.length - 1);
-        d.evidence('fence', {a, b: 6 - a, area: ar});
-        g.audio.tap(0.15, 1 + ar * 0.05);
-        try { await d.wait(0.6); } catch { return; }
-        busy = false;
-        if (tried.length >= 3) { g.setHint(null); g.ui.setSpots([]); resolve(); } else refresh();
-      };
-      refresh();
-    }));
-    if (!tried.includes(3)) {
-      await d.say('Rampa', '¿Y bien cuadrada, de tres por tres?');
-      tried.push(3);
-      table(3, 3, show(3), tried.length - 1);
-      await d.wait(0.6);
+    // el jugador prueba anchos y decide él cuál armar; si no es la que más encierra, Rampa duda
+    let current = null, early = 0;
+    for (;;) {
+      const pick = await d.interact(ctl => new Promise(resolve => {
+        g.setHint(() => [current ? 'Probá otro ancho, o tocá «armar esta» si es la que encierra más tierra.' : 'Elegí el ancho de la huerta: el largo sale solo, porque la cerca es siempre la misma. Mirá cuánta tierra queda adentro.']);
+        const spots = [1, 2, 3, 4, 5].filter(a => a !== current).map(a => wordSpot(`c8-w${a}`, String(a), A.x1 - 140 + ((a - 1) % 2) * 100, A.y0 + 44 + Math.floor((a - 1) / 2) * 58, () => { if (ctl.alive()) resolve(a); }, {label: `Armar la huerta de ${a} de ancho`}));
+        if (current && tried.length >= 2) spots.push(wordSpot('c8-build', 'armar esta', A.x1 - 90, A.y0 + 232, () => { if (ctl.alive()) resolve('build'); }, {label: `Armar la de ${current} por ${6 - current}: es la que encierra más`}));
+        g.ui.setSpots(spots);
+      }));
+      g.setHint(null);
+      if (pick === 'build') {
+        d.evidence('fence-build', {a: current, area: current * (6 - current)});
+        if (current === 3) break;
+        early++;
+        await d.say('Rampa', early === 1 ? `Con ${current} por ${6 - current} me entran ${current * (6 - current)}. ¿No habrá una que encierre más con los mismos doce tramos?` : `${current * (6 - current)} otra vez. Probá la más pareja, la que tiene el ancho igual al largo.`);
+        continue;
+      }
+      current = pick;
+      const ar = show(pick);
+      if (!tried.includes(pick)) {
+        tried.push(pick);
+        table(pick, 6 - pick, ar, tried.length - 1);
+        d.evidence('fence', {a: pick, b: 6 - pick, area: ar});
+      }
+      g.audio.tap(0.15, 1 + ar * 0.05);
+      await d.wait(0.4);
     }
     const best = all.reduce((top, r) => (r.area > top.area ? r : top));
     const seenAreas = [...new Set(tried.map(a => a * (6 - a)))].sort((x, y) => x - y);
-    await d.think(`La misma cerca y la tierra va de ${seenAreas[0]} a ${seenAreas[seenAreas.length - 1]}. ${pre === 'same' ? 'No es la misma: depende de la forma.' : 'Depende de la forma.'} De estas huertas, la cuadrada encierra más.`);
+    await d.think(`La misma cerca y la tierra va de ${seenAreas[0]} a ${seenAreas[seenAreas.length - 1]}. ${pre === 'same' ? 'No es la misma: depende de la forma.' : 'Depende de la forma.'} De los rectángulos con doce tramos, el cuadrado de tres por tres es el que más encierra.`);
     // Punto se corrige solo
     g.setCinematic(true);
     await pulse(d, p, 1, 0.3);
@@ -176,7 +178,7 @@ export const pitagoras = {
     const moved = new Set([1]);
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
-      g.setHint(() => ['Tocá los triángulos que se pueden correr: quedan de a dos, formando rectángulos. El cuadrado grande no cambia.']);
+      g.setHint(() => ['Tocá un triángulo azul para correrlo dentro del cuadrado grande.']);
       const boxOf = k => {
         const [x, y, r] = before[k];
         // caja del triángulo según su giro
@@ -202,15 +204,27 @@ export const pitagoras = {
       };
       refresh();
     }));
-    // lo que queda libre ahora
-    g.setCinematic(true);
-    const fa = w.add(new Shape('c8-fa', gridSquare('c8-fa', a, U, YELLOW), bx, by, {z: 15, fade: 0}));
-    const fb = w.add(new Shape('c8-fb', gridSquare('c8-fb', b, U, YELLOW), bx + sa, by + sa, {z: 15, fade: 0}));
-    await d.all(d.fadeTo(fa, 1, 0.6), d.fadeTo(fb, 1, 0.6));
-    w.add(new Label('c8-fal', '3 × 3', bx + sa / 2, by + sa / 2 + 6, {size: 15, align: 'center', z: 16}));
-    w.add(new Label('c8-fbl', '4 × 4', bx + sa + sb / 2, by + sa + sb / 2 + 6, {size: 15, align: 'center', z: 16}));
-    g.setCinematic(false);
-    d.describe('Los triángulos quedaron de a dos. Lo libre ahora son dos cuadrados: uno de 3 por 3 y otro de 4 por 4.');
+    // lo que queda libre ahora: lo encuentra el jugador
+    d.describe('Los triángulos quedaron de a dos, en dos esquinas del cuadrado grande.');
+    await d.say('Balcón', '¿Y ahora qué quedó libre, sin triángulo encima?');
+    const free = [{id: 'c8-fa', n: a, x: bx, y: by}, {id: 'c8-fb', n: b, x: bx + sa, y: by + sa}];
+    const found = new Set();
+    await d.interact(ctl => new Promise(resolve => {
+      g.setHint(() => ['Tocá cada parte del cuadrado grande que quedó libre, sin triángulo encima.']);
+      const refresh = () => g.ui.setSpots(free.filter(f => !found.has(f.id)).map(f => rectSpot(`${f.id}s`, 'Una parte libre del cuadrado grande', {x: f.x + 4, y: f.y + 4, w: f.n * U - 8, h: f.n * U - 8}, async () => {
+        if (!ctl.alive() || found.has(f.id)) return;
+        found.add(f.id);
+        g.ui.setSpots([]);
+        const sh = w.add(new Shape(f.id, gridSquare(f.id, f.n, U, YELLOW), f.x, f.y, {z: 15, fade: 0}));
+        await d.fadeTo(sh, 1, 0.5).catch(() => {});
+        w.add(new Label(`${f.id}l`, `${f.n} × ${f.n}`, f.x + f.n * U / 2, f.y + f.n * U / 2 + 6, {size: 15, align: 'center', z: 16}));
+        g.audio.tap(0.15, 1.1 + found.size * 0.1);
+        d.describe(`Libre: un cuadrado de ${f.n} por ${f.n}, ${f.n * f.n} cuadros.`);
+        if (found.size === free.length) { g.setHint(null); resolve(); } else refresh();
+      })));
+      refresh();
+    }));
+    d.describe('Lo libre ahora son dos cuadrados: uno de 3 por 3 y otro de 4 por 4.');
     const r = rearrange(a, b), pz = pythag(3, 4, 5);
     if (r.freeA !== r.squaresAB || !pz.holds) console.error('[pitágoras] el reacomodo no cierra');
     await d.think('El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16.');
@@ -453,9 +467,9 @@ function writeJournal8(g) {
   if (ag) seen.push(ag.answer === 'why' ? 'Juntaste las puntas de un triángulo en media vuelta y pediste una razón para todos: la paralela.' : 'Juntaste las puntas de un triángulo en media vuelta; para todos los triángulos, la razón fue la paralela.');
   const sk = first('similar-keeps');
   if (sk) seen.push(sk.answer === 'angles' ? 'Una copia parecida conserva la forma: ángulos y proporción.' : 'Una copia parecida no conserva los lados ni el área: conserva la forma, los ángulos y la proporción.');
-  const as = first('area-scale-predict'), vs = first('volume-scale-predict');
+  const as = first('area-scale-predict'), vs = first('volume-fill');
   if (as) seen.push(`Con el lado doble, anticipaste ${({2: 'el doble de tierra', 4: 'cuatro veces la tierra', 3: 'apenas un poco más de tierra'})[as.answer]}: fueron cuatro huertas como la de antes.`);
-  if (vs) seen.push(vs.answer === '8' ? 'Para la caja de lado doble anticipaste ocho cajas: fueron ocho.' : `Para la caja de lado doble anticipaste ${vs.answer === '2' ? 'dos' : 'cuatro'} cajas: fueron ocho, por el largo, el ancho y el alto.`);
+  if (vs) seen.push(vs.early ? 'Llenaste la caja de lado doble caja por caja; la diste por llena antes de tiempo, y entraron ocho: cuatro por piso, porque el alto también se duplicó.' : 'Llenaste la caja de lado doble caja por caja: entraron ocho, cuatro en cada piso.');
   const pp = first('perimeter-predict');
   if (pp) seen.push(pp.answer === 'depends' ? 'Con la misma cerca, anticipaste que la tierra depende de la forma: de 5 a 9.' : 'Pensaste que la misma cerca da la misma tierra; dio de 5 a 9.');
   const py = first('pythag-predict');

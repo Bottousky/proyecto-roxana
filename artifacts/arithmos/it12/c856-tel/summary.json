@@ -1,0 +1,38 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c9.flechas"
+  },
+  "journal": [
+    "Formas"
+  ],
+  "evidenceKinds": [
+    "perimeter-predict",
+    "fence",
+    "fence-build",
+    "perimeter",
+    "pythag-predict",
+    "pythag-move",
+    "pythag-general",
+    "pythag",
+    "coord-try",
+    "coord-corner",
+    "coord-distance",
+    "coords",
+    "shadow-measure",
+    "shadow"
+  ],
+  "fps": {
+    "min": "33.2",
+    "median": "60.0"
+  },
+  "errors": [
+    "[spot tapado] \"armar esta\" tapa a c8-w5"
+  ],
+  "seconds": 225.051,
+  "size": "844x390",
+  "touch": true,
+  "route": "errores",
+  "watch": false
+}

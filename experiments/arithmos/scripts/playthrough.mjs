@@ -417,6 +417,7 @@ let coordStep = 0;
 let c9Shape = null;
 let c8Hour = 8;
 let c11Ax = 0;
+let c8Fence = 0;
 let c9Moves = 0;
 let c11Item = null;
 let c11Dice = 7;
@@ -829,6 +830,19 @@ for (let iter = 0; iter < 30000; iter++) {
     } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id.startsWith('c11-s'))) {
       target = spots[0];
       c11Item = target.id.replace('c11-s', '');
+    } else if (s.seg === 'c8.doble' && spots.some(x => x.id === 'c8-full' || x.id === 'c8-boxfull')) {
+      // llena la huerta y la caja; con errores, dice «ya está llena» a la mitad (una vez cada una)
+      const done = spots.find(x => x.id === 'c8-full' || x.id === 'c8-boxfull');
+      const left = spots.filter(x => /^c8-(q|cell)/.test(x.id));
+      const total = done.id === 'c8-full' ? 4 : 8;
+      const key = `c8early-${done.id}`;
+      if (route === 'errores' && left.length === total / 2 && !tried.has(key) && (tried.add(key), true)) target = done;
+      else target = left[0] || done;
+    } else if (s.seg === 'c8.cerca' && spots.some(x => x.id.startsWith('c8-w'))) {
+      // prueba anchos y arma; con errores, arma la de 2 antes de probar la cuadrada
+      const seq = route === 'errores' ? ['c8-w1', 'c8-w2', 'c8-build', 'c8-w3', 'c8-build'] : ['c8-w2', 'c8-w3', 'c8-build'];
+      target = spots.find(x => x.id === seq[c8Fence]) || spots.find(x => x.id === 'c8-w3') || spots[0];
+      c8Fence++;
     } else if (s.seg === 'c10.repite' && spots.some(x => x.id === 'c10-unk')) {
       // marca la altura a los 390°: con errores, «más arriba que 1»
       target = spots.find(x => x.id === (route === 'errores' ? 'c10-mmore' : 'c10-mhalf'));

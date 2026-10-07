@@ -491,35 +491,46 @@ export const doble = {
     ], {prompt: 'Con el lado el doble de largo, ¿cuánta tierra entra?', evaluate: true});
     d.evidence('area-scale-predict', {answer: guess});
     await d.shot(SHOTS.tiles, 0.8);
-    const spots4 = [[0, 0], [3, 0], [0, 3], [3, 3]];
-    let n = 0;
-    await d.interact(ctl => new Promise(resolve => {
-      let busy = false;
-      g.setHint(() => ['Tocá "otra huerta como la de ahora" hasta llenar la grande.']);
-      const refresh = () => g.ui.setSpots([wordSpot('c8-more', 'otra huerta', A.x1 - 70, A.y1 - 40, () => add(), {label: 'Poner otra huerta de tres por tres en la grande'})]);
-      const add = async () => {
-        if (busy || !ctl.alive()) return;
-        busy = true;
-        g.ui.setSpots([]);
-        const [i, j] = spots4[n];
-        n++;
-        const t = w.add(new Shape(`c8-hc${n}`, gridSquare(`c8-hc${n}`, 3, U, YELLOW), hx, hy, {z: 14}));
-        try { await d.tween(0.5, k => { t.x = lerp(hx, bx + i * U, k); t.y = lerp(hy, by + j * U, k); }, easeInOut); } catch { return; }
-        g.audio.tap(0.2, 1.2 + n * 0.1);
-        w.add(new Label(`c8-hn${n}`, String(n), bx + i * U + 1.5 * U, by + j * U + 1.5 * U + 8, {size: 22, align: 'center', z: 15, ch: YELLOW}));
-        busy = false;
-        if (n === 4) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
-      };
-      refresh();
-    }));
+    // el jugador pone huertas como la de ahora donde quiere, y dice él cuándo la grande está llena
+    const quads = [[0, 0], [3, 0], [0, 3], [3, 3]];
+    const placed = new Set();
+    let early = false;
+    const count = () => {
+      w.remove('c8-hcount');
+      w.add(new Label('c8-hcount', `huertas: ${placed.size}   cuadros: ${9 * placed.size}`, bx + 3 * U, by - 8, {size: 16, align: 'center', z: 15, ch: YELLOW}));
+    };
+    for (;;) {
+      const pick = await d.interact(ctl => new Promise(resolve => {
+        g.setHint(() => ['Tocá un lugar vacío de la huerta grande para poner ahí otra huerta como la de ahora. Cuando esté llena, tocá «ya está llena».']);
+        g.ui.setSpots([
+          ...quads.map(([i, j], k) => ({i, j, k})).filter(q => !placed.has(q.k)).map(({i, j, k}) => rectSpot(`c8-q${k}`, 'Poner una huerta de tres por tres en ese lugar de la grande', {x: bx + i * U + 4, y: by + j * U + 4, w: 3 * U - 8, h: 3 * U - 8}, () => { if (ctl.alive()) resolve(k); })),
+          wordSpot('c8-full', 'ya está llena', A.x1 - 80, A.y1 - 40, () => { if (ctl.alive()) resolve('full'); }, {label: 'La huerta grande ya está llena'}),
+        ]);
+      }));
+      g.setHint(null);
+      if (pick === 'full') {
+        if (placed.size === quads.length) break;
+        early = true;
+        await d.say('Peldaño', placed.size ? 'Todavía queda tierra sin huerta. Mirá los huecos.' : 'Está vacía todavía: poné huertas como la de ahora.');
+        continue;
+      }
+      placed.add(pick);
+      const [i, j] = quads[pick];
+      const t = w.add(new Shape(`c8-hc${pick}`, gridSquare(`c8-hc${pick}`, 3, U, YELLOW), hx, hy, {z: 14}));
+      await d.tween(0.5, k => { t.x = lerp(hx, bx + i * U, k); t.y = lerp(hy, by + j * U, k); }, easeInOut);
+      g.audio.tap(0.2, 1.2 + placed.size * 0.1);
+      count();
+      d.describe(`Ya hay ${placed.size} ${placed.size === 1 ? 'huerta' : 'huertas'} como la de ahora en la grande: ${9 * placed.size} cuadros.`);
+    }
+    d.evidence('area-fill', {early});
     d.describe('La huerta grande se llena con cuatro huertas como la de ahora: treinta y seis cuadros.');
     await d.think(guess === '4' ? 'Cuatro huertas como la de ahora: treinta y seis cuadros.' : 'Cuatro huertas, no dos: el doble de largo y el doble de ancho. Treinta y seis cuadros.');
-    // la caja, por pisos
-    await d.say('Mara', 'Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran?');
+    // la caja, por pisos: sin menú; el jugador la llena caja por caja
+    await d.say('Mara', 'Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran? Llenala vos.');
     g.setCinematic(true);
     w.removeWhere(o => /^c8-(h|H)/.test(o.id));
     g.setCinematic(false);
-    const s = 44, k = s * 0.35;
+    const s = 44;
     const cx = A.x0 + 24, cy = A.y0 + 90;
     w.add(new Shape('c8-cube0', cube('c8-cube0', s, YELLOW), cx, cy, {z: 13}));
     w.add(new Label('c8-cube0l', 'la de Cornisa', cx + s / 2, cy + s + 24, {size: 16, align: 'center', z: 12}));
@@ -530,41 +541,39 @@ export const doble = {
       w.add(new Label(`c8-fll${i}`, f.name, f.x + s, f.y + 2 * s + 22, {size: 15, align: 'center', z: 12}));
     });
     w.add(new Label('c8-flt', 'la caja de lado doble, vista de arriba:', A.x0 + 140, A.y0 + 46, {size: 16, z: 12, ch: BLUE}));
-    void k;
-    const g2 = await d.choose([
-      {id: '2', text: 'Dos.'},
-      {id: '4', text: 'Cuatro, como la huerta.'},
-      {id: '8', text: 'Ocho.'},
-    ], {prompt: 'Una caja con el lado el doble de largo: ¿cuántas cajas como la de Cornisa entran?', evaluate: true});
-    d.evidence('volume-scale-predict', {answer: g2});
     const topView = id => [...sq(`${id}s`, s - 6, {ch: YELLOW, w: 2.2}), ...poly(`${id}x`, [[4, 4], [s - 10, s - 10]], {ch: YELLOW, closed: false, w: 1.4}), ...poly(`${id}y`, [[s - 10, 4], [4, s - 10]], {ch: YELLOW, closed: false, w: 1.4})];
-    let floor = 0, m = 0;
-    await d.interact(ctl => new Promise(resolve => {
-      let busy = false;
-      g.setHint(() => ['Tocá "llenar un piso": entran cajas como la de Cornisa hasta cubrirlo.']);
-      const refresh = () => g.ui.setSpots([wordSpot('c8-box', 'llenar un piso', A.x1 - 70, A.y1 - 40, () => fill(), {label: `Llenar el ${floors[floor].name} con cajas como la de Cornisa`})]);
-      const fill = async () => {
-        if (busy || !ctl.alive()) return;
-        busy = true;
-        g.ui.setSpots([]);
-        const f = floors[floor];
-        try {
-          for (const [i, j] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
-            m++;
-            const t = w.add(new Shape(`c8-cb${m}`, topView(`c8-cb${m}`), cx, cy, {z: 14}));
-            await d.tween(0.3, q => { t.x = lerp(cx, f.x + 3 + i * s, q); t.y = lerp(cy, f.y + 3 + j * s, q); }, easeInOut);
-            g.audio.tap(0.15, 1.1 + m * 0.07);
-          }
-        } catch { return; }
-        d.describe(`El ${f.name} se llena con cuatro cajas como la de Cornisa.`);
-        floor++;
-        busy = false;
-        if (floor === 2) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
-      };
-      refresh();
-    }));
+    const cells = floors.flatMap((f, fi) => [[0, 0], [1, 0], [0, 1], [1, 1]].map(([i, j], ci) => ({id: `c8-cell${fi}${ci}`, fi, x: f.x + 3 + i * s, y: f.y + 3 + j * s})));
+    const filled = new Set();
+    let earlyBox = false;
+    for (;;) {
+      const pick = await d.interact(ctl => new Promise(resolve => {
+        g.setHint(() => ['Tocá un lugar vacío de un piso para poner ahí una caja como la de Cornisa. Cuando la caja grande esté llena, tocá «ya está llena».']);
+        g.ui.setSpots([
+          ...cells.filter(c => !filled.has(c.id)).map(c => rectSpot(c.id, `Poner una caja como la de Cornisa en el ${floors[c.fi].name}`, {x: c.x + 2, y: c.y + 2, w: s - 10, h: s - 10}, () => { if (ctl.alive()) resolve(c); })),
+          wordSpot('c8-boxfull', 'ya está llena', A.x1 - 70, A.y1 - 40, () => { if (ctl.alive()) resolve('full'); }, {label: 'La caja grande ya está llena'}),
+        ]);
+      }));
+      g.setHint(null);
+      if (pick === 'full') {
+        if (filled.size === cells.length) break;
+        earlyBox = true;
+        const free = floors.filter((_, fi) => cells.some(c => c.fi === fi && !filled.has(c.id)));
+        await d.say('Mara', free.length === 1 && free[0] === floors[1] && !cells.some(c => c.fi === 1 && filled.has(c.id))
+          ? 'El piso de arriba está vacío. La caja grande también es el doble de alta.'
+          : `Todavía hay lugar en el ${free.map(f => f.name).join(' y en el ')}.`);
+        continue;
+      }
+      filled.add(pick.id);
+      const t = w.add(new Shape(`${pick.id}b`, topView(`${pick.id}b`), cx, cy, {z: 14}));
+      await d.tween(0.35, q => { t.x = lerp(cx, pick.x, q); t.y = lerp(cy, pick.y, q); }, easeInOut);
+      g.audio.tap(0.15, 1.1 + filled.size * 0.07);
+      w.remove('c8-bcount');
+      w.add(new Label('c8-bcount', `cajas: ${filled.size}`, A.x0 + 249, A.y0 + 212, {size: 17, align: 'center', z: 15, ch: YELLOW}));
+      d.describe(`Una caja como la de Cornisa en el ${floors[pick.fi].name}. Van ${filled.size}.`);
+    }
+    d.evidence('volume-fill', {early: earlyBox});
+    await d.think('Ocho: cuatro en el piso de abajo y cuatro en el de arriba. Se duplicaron el largo, el ancho y también el alto.');
     const sc = scaleBy(2);
-    await d.think(g2 === '8' ? 'Ocho: cuatro en el piso de abajo y cuatro en el de arriba.' : 'Ocho: cuatro en cada piso, y son dos pisos, porque el alto también se duplicó.');
     await studentWrites(d, g, 'c8-scale', `lado × 2:  área × ${sc.area},  volumen × ${sc.volume}`, A.x0 + 20, A.y1 - 10, {size: 24});
     await d.say('student', 'Peldaño, el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27.');
     d.evidence('scale', sc);

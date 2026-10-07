@@ -1,0 +1,44 @@
+[0.0s] escena → c8.doble
+[1.0s] lee: Mi huerta es la de nueve cuadros, tres por tres. Quiero otra con el lado el doble de largo. ¿Cuánta tierra va a tener?
+[1.5s] elige «El doble de tierra.» (Con el lado el doble de largo, ¿cuánta tierra entra?)
+[4.6s] lee: Todavía queda tierra sin huerta. Mirá los huecos.
+[6.6s] lee: Cuatro huertas, no dos: el doble de largo y el doble de ancho. Treinta y seis cuadros.
+[6.7s] lee: Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran? Llenala vos.
+[9.2s] lee: El piso de arriba está vacío. La caja grande también es el doble de alta.
+[12.3s] lee: Ocho: cuatro en el piso de abajo y cuatro en el de arriba. Se duplicaron el largo, el ancho y también el alto.
+[12.4s] lee: —Peldaño, el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27.
+[12.5s] escena → c8.cerca
+[13.5s] lee: Me quedaron doce tramos de cerca. Quiero una huerta rectangular, con la mayor cantidad de tierra adentro.
+[14.1s] elige «Con la misma cerca, cualquier huerta tiene la misma tierra.» (Con los mismos doce tramos, ¿cambia cuánta tierra queda adentro?)
+[17.0s] lee: Con 2 por 4 me entran 8. ¿No habrá una que encierre más con los mismos doce tramos?
+[18.1s] lee: La misma cerca y la tierra va de 5 a 9. No es la misma: depende de la forma. De los rectángulos con doce tramos, el cuadrado de tres por tres es el que más encierra.
+[18.2s] lee: —Rampa, la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra.
+[18.3s] escena → c8.pitagoras
+[18.4s] lee: Para la escalera nueva quiero un tirante en diagonal. Las patas miden 3 y 4 cuadros, en escuadra. ¿Cuánto mide el tirante?
+[19.0s] elige «Siete: tres más cuatro.» (¿Cuánto mide el tirante?)
+[19.2s] lee: Ir por las patas, 3 y después 4, es más largo que ir derecho por la diagonal.
+[19.2s] lee: —Armo un cuadrado de lado 3 + 4 con cuatro triángulos como el de Balcón, uno en cada esquina.
+[20.1s] lee: Lo que queda libre en el medio tiene cuatro lados iguales, tirantes. ¿Y sus esquinas? En cada borde se juntan las dos puntas agudas de dos triángulos; esas dos suman 90°, porque las tres puntas de un triángulo suman 180° y una es recta. Queda 180° − 90° = 90°: es un cuadrado.
+[21.4s] lee: El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16.
+[21.5s] lee: —Balcón, el cuadrado del tirante tiene 9 + 16 = 25 cuadros: el tirante mide 5, porque 5 · 5 = 25.
+[22.1s] elige «Para cualquier triángulo.» (¿Para qué triángulos vale esto?)
+[22.2s] lee: Mi otra escalera tiene patas 4 y 5, pero no en escuadra, y el tirante mide 6.
+[22.3s] lee: 41 no es 36. Los cuatro triángulos encajan en las esquinas del cuadrado grande porque tienen una esquina recta: sin ángulo recto, no hay reacomodo.
+[22.4s] lee: —El lado de enfrente del ángulo recto se llama hipotenusa; los otros dos, catetos.
+[22.5s] lee: Cinco cuadros de tirante. Y sin medir.
+[22.5s] escena → c8.casas
+[23.5s] lee: La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada.
+[24.4s] lee: La casa de Rampa la tengo anotada así: (3, 2).
+[25.5s] lee: —Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar.
+[25.6s] lee: Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1).
+[25.8s] lee: Por las rectas, Peldaño camina en ele: primero de un lado y después del otro. ¿Dónde dobla?
+[27.6s] lee: Doblando en (−1, 2): 3 y 4, siete en total. Doblando en (3, −1) también daría 4 y 3.
+[28.2s] elige «Siete, como en ele.» (¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?)
+[28.4s] lee: —Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5.
+[28.5s] lee: Siete es yendo por las rectas, en ele. Derecho, cinco.
+[28.6s] escena → c8.sombras
+[28.7s] lee: Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?
+[1103.2s] lee: A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir.
+[1103.3s] lee: Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?
+[1103.5s] escena → c9.flechas
+[1103.8s] {"ended":true,"final":{"mode":"play","seg":"c9.flechas"},"journal":["Formas"],"evidenceKinds":["area-scale-predict","area-fill","volume-fill","scale","perimeter-predict","fence","fence-build","perimeter","pythag-predict","pythag-move","pythag-general","pythag","coord-try","coord-corner","coord-distance","coords","shadow-measure","shadow"],"fps":{"min":"30.0","median":"60.0"},"errors":["[spot tapado] \"armar esta\" tapa a c8-w5"],"seconds":1103.782,"size":"844x390","touch":true,"route":"errores","watch":false}
