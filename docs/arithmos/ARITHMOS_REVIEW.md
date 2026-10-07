@@ -174,7 +174,8 @@ Informe: `artifacts/arithmos/it04/review-narr/informe.md`. Sin navegador; varias
 | A8 | alta | Las primeras cifras de Punto, fuera de cuadro y bajo el suelo | Corregido: estudiante dentro del plano, primer plano, cifras arriba del suelo, Punto se aparta |
 | M1 | media | "Como dije / lo anticipé" | Corregido en caps. 2–5 |
 | M2 | media | Ganchos repetidos | Corregido 2→3 y 3→4 |
-| M3–M7, M9, M12 | media | Cierres sin decisión, redundancias, reglas antes de actuar, motivos débiles, monotonía del depósito, lugares sin rótulo, deseo del protagonista | **Pendiente** (anotado en el backlog) |
+| M3 | media | Cierres sin decisión (2.8, 3.7) | Hecho (verificado en el ciclo 9 leyendo el código): en 2.8 el jugador arma 205 con atados en las tres cajas y Mara lee lo que armó; en 3.7 el jugador manda a Punto a una familia de cada lado del cero y la flecha aparece ahí |
+| M4–M7, M9, M12 | media | Redundancias, reglas antes de actuar, motivos débiles, monotonía del depósito, lugares sin rótulo, deseo del protagonista | **Pendiente** (anotado en el backlog) |
 | M8 | media | Composición | Parcial (notas del cap. 4; rótulos de nombres). Pendiente: atenuar la pizarra del cap. 1 en el 2, mancha del cero |
 | M10 | media | Bitácora más manual que recuerdo | Corregido: "Lo que pasó" primero, "Lo que eso dice" después; el aviso dice dónde está (≡) |
 | M11 | media | Rótulos repetidos, botones sin verbo, eventos sin describir | Corregido en 2–4 (posición en rótulos, botones con verbo, descripciones nuevas) |
