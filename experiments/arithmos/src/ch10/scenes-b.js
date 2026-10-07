@@ -43,7 +43,7 @@ export const flechas = {
     const s = w.get('student');
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Rampa', 'Punto, traeme la soga. Estás en el pozo, en el cero del mapa; mi casa está en (3, 2), como la anotó Mara. Mara sólo te deja moverte con estas flechas.');
+    await d.say('Rampa', 'Punto, la soga vieja se había caído al pozo y ya la sacamos; yo la empalmo con la nueva en mi casa: traémela. Estás en el pozo, en el cero del mapa; mi casa está en (3, 2), como la anotó Mara. Mara sólo te deja moverte con estas flechas.');
     const {px, py} = grid(w, 'c10-g', {X0: -1, X1: 6, Y0: -4, Y1: 4, U: 28, gx: A.x0 + 30, gy: A.y0 + 14});
     w.add(new Shape('c10-home', poly('c10-home', [[-10, 0], [10, 0], [10, -14], [0, -24], [-10, -14]], {ch: YELLOW, w: 2.4}), px(3), py(2), {z: 14}));
     w.add(new Label('c10-homel', 'Rampa', px(3) + 14, py(2) + 16, {size: 15, z: 14, ch: YELLOW}));
@@ -236,33 +236,33 @@ export const pistas = {
     const U = 32;
     const {px, py} = grid(w, 'c10-g', {X0: 0, X1: 7, Y0: 0, Y1: 7, U, gx: A.x0 + 40, gy: A.y0 + 10});
     w.add(new Label('c10-ax', 'Cornisa →', A.x0 + 40 + 7 * U + 14, A.y0 + 10 + 7 * U + 6, {size: 14, z: 12, ch: BLUE}));
+    w.add(new Label('c10-ay', 'Balcón ↑', A.x0 + 48, A.y0 + 4, {size: 14, z: 12, ch: BLUE}));
     const sum7 = Array.from({length: 8}, (_, a) => [a, 7 - a]);
     const diff1 = Array.from({length: 7}, (_, b) => [b + 1, b]);
     for (const [a, b] of sum7) w.add(new Shape(`c10-s${a}`, dot(`c10-s${a}`, 5, WHITE), px(a), py(b), {z: 14}));
     d.describe('En el mapa, todos los pares que suman 7, en blanco: forman una recta inclinada hacia abajo.');
     await d.think('Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos.');
+    // Punto se adelanta: con la primera pista sola, ya elige un par
+    const p = w.get('punto');
+    g.setCinematic(true);
+    p.setMode('still');
+    g.audio.punto('happy');
+    await zip(d, p, px(5), py(2) - 14, 0.5);
+    g.setCinematic(false);
+    d.describe('Punto no espera la segunda pista: salta solo al par (5, 2), sobre la fila blanca. 5 y 2 suman 7.');
+    d.evidence('punto-try', {pair: [5, 2]});
     await d.say('Mara', 'Segunda pista: el de Cornisa le lleva 1 al de Balcón.');
     for (const [a, b] of diff1) w.add(new Shape(`c10-d${a}`, dot(`c10-d${a}`, 5, YELLOW), px(a), py(b), {z: 14}));
     d.describe('En amarillo, los pares donde el primero le lleva 1 al segundo: otra recta, que sube.');
     await d.shot(SHOTS.tiles, 0.8);
-    // Punto se apura: salta a un par que cumple la primera pista, y se da cuenta solo
-    {
-      const p = w.get('punto');
-      g.setCinematic(true);
-      p.setMode('still');
-      g.audio.punto('happy');
-      await zip(d, p, px(5), py(2) - 14, 0.5);
-      g.setCinematic(false);
-      d.describe('Punto salta solo al par (5, 2), sobre la fila blanca: 5 y 2 suman 7.');
-      d.evidence('punto-try', {pair: [5, 2]});
-      await d.think('Punto se paró en (5, 2): suma 7. Mira la fila amarilla, después a sí mismo.');
-      g.audio.punto('question');
-      await pulse(d, p, 1, 0.3).catch(() => {});
-      g.setCinematic(true);
-      await zip(d, p, px(7) + 34, py(6), 0.5);
-      g.setCinematic(false);
-      d.describe('Punto se baja solo: (5, 2) no está en la fila amarilla, el 5 le lleva 3 al 2, no 1.');
-    }
+    // Punto se da cuenta solo y se baja
+    g.audio.punto('question');
+    await pulse(d, p, 1, 0.3).catch(() => {});
+    await d.think('Punto mira la fila amarilla: (5, 2) no está en ella. El 5 le lleva 3 al 2, no 1. Se apuró.');
+    g.setCinematic(true);
+    await zip(d, p, px(7) + 46, py(3), 0.5);
+    g.setCinematic(false);
+    d.describe('Punto se baja solo de (5, 2) y se corre al costado del mapa.');
     await d.interact(ctl => new Promise(resolve => {
       g.setHint(() => ['Tocá el par que cumple las dos pistas a la vez.']);
       g.ui.setSpots(diff1.map(([a, b]) => rectSpot(`c10-p${a}_${b}`, `El par (${a}, ${b})`, {x: px(a) - 16, y: py(b) - 16, w: 32, h: 32}, () => {
@@ -352,7 +352,7 @@ export const aVeces = {
         g.ui.setSpots([]);
         const r = PULLS[k++];
         tally[r]++;
-        try { await pull(d, g, r === 'llena' ? 1 : 0.5, {back: false}); } catch { return; }
+        try { await pull(d, g, r === 'llena' ? 1 : 0.5, {back: false, say: r}); } catch { return; }
         const l = w.add(new Label(`c10-pl${k}`, `${k}.  ${r}`, A.x0 + 30, A.y0 + 34 + (k - 1) * 37, {size: 30, z: 12, ch: r === 'llena' ? undefined : YELLOW, reveal: 0}));
         try { await d.draw(l, 0.4, {key: 'reveal'}); } catch { return; }
         g.audio.tap(0.2, r === 'llena' ? 1.3 : 0.9);
@@ -364,7 +364,7 @@ export const aVeces = {
       }, {label: 'Subir el balde'})]);
       refresh();
     }));
-    w.add(new Label('c10-tl', `llena: ${tally.llena}    a medias: ${tally['a medias']}`, A.x0 + 250, A.y0 + 70, {size: 26, z: 12}));
+    w.add(new Label('c10-tl', `llena: ${tally.llena}    a medias: ${tally['a medias']}`, A.x0 + 250, A.y0 + 150, {size: 26, z: 12}));
     await d.shot(SHOTS.tiles, 0.8);
     const c = await d.choose([
       {id: 'unsure', text: 'No se sabe seguro; lo más probable, llena.'},

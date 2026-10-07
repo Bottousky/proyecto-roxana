@@ -230,7 +230,7 @@ export const final = {
     const s = w.get('student');
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche. Las dos primeras: 1 y 2 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?');
+    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?');
     const box = {x: A.x0 + 40, y: A.y0 + 20, w: 300, h: 210};
     const {px, py} = axes(w, 'c12-g', box, [0, 6], [0, 40], {xticks: [1, 2, 3, 4, 5, 6], yticks: [10, 20, 30, 40], xname: 'noche'});
     const night = ([n, v]) => w.add(new Shape(`c12-n${n}`, dot(`c12-n${n}`, 6, BLUE), px(n), py(v), {z: 14}));
@@ -253,7 +253,7 @@ export const final = {
     g.setCinematic(false);
     d.describe('Punto se adelanta: corre por una recta amarilla que sube de a un escalón por noche, y llega a 7 en la noche 6.');
     d.evidence('punto-guess', {rule: 'suma 1'});
-    await d.say('Mara', 'Esperá, Punto. La tercera y la cuarta noche fueron 4 y 8.');
+    await d.say('Mara', 'Esperá, Punto. Las noches 2 y 3 fueron 4 y 8.');
     g.setCinematic(true);
     for (const nv of NIGHTS.slice(2)) { const sh = night(nv); sh.fade = 0; await d.fadeTo(sh, 1, 0.4); }
     g.setCinematic(false);
@@ -264,10 +264,11 @@ export const final = {
     g.setCinematic(true);
     await d.fadeTo(pline, 0, 0.8);
     w.remove('c12-pline');
-    await zip(d, p, px(3), py(8) - 16, 0.5);
+    await zip(d, p, px(6) + 34, py(12), 0.5);
     g.setCinematic(false);
-    d.describe('Punto borra su recta él mismo y se queda arriba del último punto, esperando.');
+    d.describe('Punto borra su recta él mismo y se corre al costado del mapa, esperando.');
     d.evidence('punto-erase', {});
+    await d.think('Con dos noches, 1 y 2, pasaban las dos: la recta que suma uno y la que duplica, como la de Punto en la carrera. Él eligió una antes de tiempo; las noches 2 y 3 la desmintieron.');
     const FAM = [
       {id: 'dbl', text: 'Duplica: la familia que despega', f: n => 2 ** n},
       {id: 'line', text: 'Suma lo mismo: una recta', f: n => 1 + 7 * n / 3},
@@ -292,23 +293,23 @@ export const final = {
       {id: '15', text: 'En la noche 15, sumando de a dos.'},
     ], {prompt: 'Si sigue duplicando, ¿en qué noche pasa la escalera?', evaluate: true});
     d.evidence('final-predict', {answer: c});
-    await d.think(c === '5' ? 'La quinta: 16 todavía no, 32 sí.' : c === '4' ? 'La cuarta llega a 16: todavía no. La quinta, 32: ahí pasa.' : 'Duplica, no suma: la cuarta 16, la quinta 32. Hay que apurarse.');
-    await d.say('student', 'Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.');
+    await d.think(c === '5' ? 'La noche 5: en la 4, 16, todavía no; en la 5, 32, sí.' : c === '4' ? 'La noche 4 llega a 16: todavía no. La noche 5, 32: ahí pasa.' : 'Duplica, no suma: la noche 4, 16; la noche 5, 32. Hay que apurarse.');
+    await d.say('student', 'Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la noche 5. Lo anotamos como suposición y miramos cada noche si se cumple.');
     await d.say('Mara', 'Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.');
-    // la cuarta noche pone a prueba la suposición
-    await d.say('Mara', 'Cuarta noche.');
+    // la noche 4 pone a prueba la suposición
+    await d.say('Mara', 'Noche 4.');
     g.setCinematic(true);
     const n4 = w.add(new Shape('c12-n4', dot('c12-n4', 6, BLUE), px(4), py(16), {z: 15, fade: 0}));
     await d.fadeTo(n4, 1, 0.6);
     g.setCinematic(false);
-    d.describe('Un punto azul nuevo: la cuarta noche la Marea llegó a 16, justo sobre la curva que duplica.');
+    d.describe('Un punto azul nuevo: la noche 4 la Marea llegó a 16, justo sobre la curva que duplica.');
     d.evidence('final-check', {night: 4, v: 16});
-    await d.think('Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La quinta pasa los 30.');
-    await d.say('Mara', 'Entonces redibujamos la escalera esta noche, antes de la quinta. ¡A trabajar!');
-    // la quinta noche: la Marea grande pasa y la escalera, redibujada a tiempo, resiste
+    await d.think('Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La noche 5 pasa los 30.');
+    await d.say('Mara', 'Entonces redibujamos la escalera esta noche, antes de la noche 5. ¡A trabajar!');
+    // la noche 5: la Marea grande pasa y la escalera, redibujada a tiempo, resiste
     g.setCinematic(true);
     await d.shot(SHOTS.board, 1.2);
-    d.describe('Quinta noche. Pasa la Marea grande, una brisa de borrador sobre las Terrazas, más alta que la escalera. La escalera, redibujada a tiempo, resiste; la pizarra con sus cuentas, también.');
+    d.describe('Noche 5. Pasa la Marea grande, una brisa de borrador sobre las Terrazas, más alta que la escalera. La escalera, redibujada a tiempo, resiste; la pizarra con sus cuentas, también.');
     g.audio.marea?.(5);
     g.camera.shake = 0.3;
     await d.wait(2.2);
@@ -316,21 +317,22 @@ export const final = {
     await d.say('Mara', 'Llegamos. La escalera sigue ahí, y lo que entendimos también.');
     // Punto corre por su gráfico, un paso adelante
     p.setMode('still');
-    d.describe('Punto corre por la curva, desde la primera noche hasta la quinta, un paso adelante.');
+    d.describe('Punto corre por la curva, desde la noche 0 hasta la 5, un paso adelante.');
     await d.tween(2.6, q => { const n = 5 * q; p.x = px(n); p.y = py(Math.min(40, 2 ** n)) - 14; }, easeInOut).catch(() => {});
     g.audio.punto('happy');
     // la pregunta del cap. 1: el nombre
     await d.say('student', 'Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?');
     g.setCinematic(true);
     // sube arriba de la pizarra y dibuja en el aire, saliendo de él
-    const nx = p.x + 10, ny = A.y0 - 70;
-    await zip(d, p, nx - 14, ny, 0.6);
+    const nx = p.x + 40, ny = A.y0 - 64;
+    await zip(d, p, nx - 34, ny + 16, 0.6);
+    const ring = Array.from({length: 11}, (_, i) => [nx + Math.cos(i / 10 * Math.PI * 2) * 6, ny + Math.sin(i / 10 * Math.PI * 2) * 6]);
     const name = w.add(new Drawing('c12-name', [
-      S([[nx, ny], [nx + 2, ny + 1]], seedOf('c12-name'), {w: 6, p: 1, ch: YELLOW}),
-      S([[nx, ny], [nx + 60, ny - 10]], seedOf('c12-name') + 1, {w: 3, p: 0.95, ch: YELLOW}),
-      S([[nx + 60, ny - 10], [nx + 50, ny - 18]], seedOf('c12-name') + 2, {w: 3, p: 0.95, ch: YELLOW}),
-      S([[nx + 60, ny - 10], [nx + 52, ny - 1]], seedOf('c12-name') + 3, {w: 3, p: 0.95, ch: YELLOW}),
-      S(Array.from({length: 16}, (_, i) => [nx + 60 + i * 6, ny - 10 - (i * i) * 0.45]), seedOf('c12-name') + 4, {w: 3, p: 0.95, ch: YELLOW}),
+      S(ring, seedOf('c12-name'), {w: 4, p: 1, ch: YELLOW}),
+      S([[nx + 14, ny - 2], [nx + 78, ny - 14]], seedOf('c12-name') + 1, {w: 3.2, p: 0.95, ch: YELLOW}),
+      S([[nx + 78, ny - 14], [nx + 62, ny - 24]], seedOf('c12-name') + 2, {w: 3.2, p: 0.95, ch: YELLOW}),
+      S([[nx + 78, ny - 14], [nx + 64, ny - 2]], seedOf('c12-name') + 3, {w: 3.2, p: 0.95, ch: YELLOW}),
+      S(Array.from({length: 16}, (_, i) => [nx + 92 + i * 6, ny - 14 - (i * i) * 0.45]), seedOf('c12-name') + 4, {w: 3.2, p: 0.95, ch: YELLOW}),
     ], {z: 16, progress: 0}));
     await d.draw(name, 2.2, {sound: false});
     g.setCinematic(false);
@@ -360,7 +362,7 @@ function writeJournal12(g) {
   const ip2 = first('integral-predict');
   if (ip2) seen.push(ip2.answer === '9' ? 'Viste que las sumas se acercan al área bajo el caudal: 9.' : 'Las sumas de rectángulos se acercaban a 9, el área bajo el caudal.');
   const fp = first('final-predict');
-  if (fp) seen.push(fp.answer === '5' ? 'Anticipaste la noche 5 para la Marea.' : 'Para la Marea pensaste otra noche; duplicando, pasa la escalera en la quinta.');
+  if (fp) seen.push(fp.answer === '5' ? 'Anticipaste la noche 5 para la Marea.' : 'Para la Marea pensaste otra noche; duplicando, pasa la escalera en la noche 5.');
   const entry = {
     id: 'c12',
     title: 'Anticipar',

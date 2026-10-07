@@ -1,0 +1,48 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c11.baldes"
+  },
+  "journal": [
+    "Vueltas y flechas"
+  ],
+  "evidenceKinds": [
+    "radian-predict",
+    "radian-piece",
+    "radian",
+    "sin30-predict",
+    "height",
+    "sin-past90-predict",
+    "sine",
+    "period-predict",
+    "period",
+    "ratio-predict",
+    "ratio",
+    "ratio60-predict",
+    "ratio60",
+    "vector-step",
+    "vector-order",
+    "vector",
+    "quarter-predict",
+    "quarter",
+    "i-predict",
+    "complex",
+    "punto-try",
+    "system-try",
+    "system-parallel",
+    "system",
+    "pull",
+    "chance-predict"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 57.817,
+  "size": "1600x900",
+  "touch": false,
+  "route": "errores",
+  "watch": false
+}

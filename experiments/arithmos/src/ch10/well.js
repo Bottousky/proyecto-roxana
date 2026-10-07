@@ -1,7 +1,7 @@
 // Capítulo 10 — el pozo de las Terrazas, fuera de la pizarra: la rueda con su manija, la soga y el balde.
 
 import {easeInOut} from '../engine/rng.js';
-import {GROUND, Drawing, Shape, S, seedOf, WHITE, YELLOW, BLUE} from '../ch9/common.js';
+import {GROUND, Drawing, Shape, Label, S, seedOf, WHITE, YELLOW, BLUE} from '../ch9/common.js';
 
 export const WELL = {x: 13450, rim: GROUND - 60, axle: GROUND - 196, R: 38};
 /** El pozo de cerca, con lugar para la rueda y el balde arriba. */
@@ -47,16 +47,17 @@ export function well(g, {rope = true} = {}) {
       S([[x - 64, rim - 4], [x - 64, axle - 32]], seed + 3, {w: 2.6, p: 0.9}),
       S([[x + 64, rim - 4], [x + 64, axle - 32]], seed + 4, {w: 2.6, p: 0.9}),
       S([[x - 78, axle - 26], [x, axle - 70], [x + 78, axle - 26]], seed + 5, {w: 2.6, p: 0.9}),
-      S([[x - 64 - R - 14, axle], [x + 64, axle]], seed + 6, {w: 2.2, p: 0.8}),
+      S([[x - 64, axle], [x + 64, axle]], seed + 6, {w: 2.2, p: 0.8}),
     ];
     // piedras de la pared
     for (let i = 0; i < 3; i++) list.push(S([[x - 72, G - 18 - i * 16], [x + 72, G - 18 - i * 16]], seed + 10 + i, {w: 1.2, p: 0.45, lift: false}));
     for (let i = 0; i < 6; i++) { const sx = x - 60 + i * 24 + (i % 2) * 10, sy = G - 18 - (i % 3) * 16; list.push(S([[sx, sy], [sx, sy + 16]], seed + 20 + i, {w: 1.2, p: 0.45, lift: false})); }
     return new Drawing('well', list, {z: 3});
   });
-  w.ensure('well-wheel', () => new Shape('well-wheel', wheelStrokes(R), x - 64 - R - 14, axle, {z: 4}));
+  // la rueda es el tambor: la soga se enrolla en su borde y cuelga del lado derecho
+  w.ensure('well-wheel', () => new Shape('well-wheel', wheelStrokes(R), x, axle, {z: 4}));
   if (rope) {
-    w.ensure('well-bucket', () => new Shape('well-bucket', bucketStrokes(0), x, rim + 6, {z: 4, fade: 0}));
+    w.ensure('well-bucket', () => new Shape('well-bucket', bucketStrokes(0), x + R, rim + 6, {z: 4, fade: 0}));
     setRope(g, rim + 6);
   } else {
     w.remove('well-bucket');
@@ -65,28 +66,31 @@ export function well(g, {rope = true} = {}) {
 }
 
 function setRope(g, y) {
-  const {x, axle} = WELL;
+  const {x, axle, R} = WELL;
   g.world.remove('well-rope');
-  g.world.add(new Drawing('well-rope', [S([[x, axle], [x, y]], seedOf('well-rope'), {w: 1.6, p: 0.8, lift: false})], {z: 3}));
+  g.world.add(new Drawing('well-rope', [S([[x + R, axle], [x + R, y]], seedOf('well-rope'), {w: 1.6, p: 0.8, lift: false})], {z: 3}));
 }
 
-/** Sube el balde girando la manija; `fill` dice cómo llega. Vuelve a bajarlo al final si `back`. */
-export async function pull(d, g, fill = 1, {back = true, sec = 1.1} = {}) {
-  const w = g.world, {rim} = WELL;
+/** Sube el balde girando la rueda: la soga que se enrolla en el borde es lo que sube el balde (ángulo = largo ÷ rayo).
+ *  `fill` dice cómo llega; con `say`, se escribe al lado del balde. Vuelve a bajarlo al final si `back`. */
+export async function pull(d, g, fill = 1, {back = true, sec = 1.1, say = null} = {}) {
+  const w = g.world, {x, rim, R} = WELL;
   const wheel = w.get('well-wheel');
   w.remove('well-bucket');
-  const b = w.add(new Shape('well-bucket', bucketStrokes(fill), WELL.x, rim + 6, {z: 4, fade: 0}));
+  w.remove('well-res');
+  const b = w.add(new Shape('well-bucket', bucketStrokes(fill), x + R, rim + 6, {z: 4, fade: 0}));
   const y0 = rim + 6, y1 = rim - 74, r0 = wheel ? wheel.rot : 0;
   await d.tween(sec, q => {
     b.y = y0 + (y1 - y0) * q;
     b.fade = Math.min(1, q * 3);
-    if (wheel) wheel.rot = r0 - q * Math.PI * 4;
+    if (wheel) wheel.rot = r0 - ((y0 - b.y) / R);
     setRope(g, b.y);
   }, easeInOut);
   g.audio.tap(0.15, fill >= 1 ? 1.3 : 0.9);
+  if (say) w.add(new Label('well-res', say, x + R + 24, y1 + 18, {size: 28, z: 5, ch: fill >= 1 ? WHITE : YELLOW}));
   if (!back) return;
   await d.wait(0.5);
-  await d.tween(0.6, q => { b.y = y1 + (y0 - y1) * q; b.fade = 1 - q; if (wheel) wheel.rot = r0 - (1 - q) * Math.PI * 4; setRope(g, b.y); }, easeInOut);
+  await d.tween(0.6, q => { b.y = y1 + (y0 - y1) * q; b.fade = 1 - q; if (wheel) wheel.rot = r0 - ((y0 - b.y) / R); setRope(g, b.y); }, easeInOut);
 }
 
 export {WHITE};

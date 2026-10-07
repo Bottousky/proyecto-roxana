@@ -1,0 +1,19 @@
+[0.0s] escena → c11.dados
+[1.0s] lee: ¡Doce! ¿Vieron? En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande.
+[1.6s] elige «El 7 sale más seguido.» (¿Qué suma sale más seguido, el 7 o el 12?)
+[4.1s] lee: —Rampa, el 7 sale de 6 maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene 6/36 de probabilidad y el 12, 1/36.
+[4.2s] lee: En la tabla, sí. ¿Y tirando de verdad?
+[4.4s] lee: Contando, el 7 debería salir cerca de 60 veces de 360 y el 12, cerca de 10. Salieron 58 y 6: cerca, no exacto.
+[4.4s] lee: Me paso al 7. Aunque el 12 puede salir igual: no es imposible, es raro.
+[4.5s] escena → c11.causa
+[5.5s] lee: Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche.
+[6.8s] elige «No se sabe: puede haber algo que cause las dos cosas.» (¿El polvo hace que la Marea borre más?)
+[8.0s] lee: Me olvidaba: también anoté el viento.
+[8.1s] lee: Mirando de a pares con el mismo viento: con poco viento, el día de más polvo borró menos; con bastante, también; con mucho, también. Dentro del mismo viento, más polvo no trajo más borrones.
+[8.2s] lee: —Mara, que dos cosas suban juntas no dice que una cause la otra. Con estos seis días, el que acompaña a los borrones parece el viento, no el polvo. Pero son pocos días: para estar más seguros, habría que anotar muchos más.
+[8.2s] escena → c11.anticipar
+[8.6s] lee: La escalera de Mara crece de a 10, la de Punto se duplica, la rueda vuelve, el balde a veces sí y a veces no. ¿Con todo eso se puede saber qué viene?
+[10.5s] lee: —Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar.
+[10.6s] lee: Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?
+[10.9s] escena → c12.familias
+[11.6s] {"ended":true,"final":{"mode":"play","seg":"c12.familias"},"journal":["Lo que pasa a veces"],"evidenceKinds":["dice-predict","dice-cell","dice-done","dice-mark","dice-roll","cause-predict","anticipate"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":11.564,"size":"1600x900","touch":false,"route":"directa","watch":false}

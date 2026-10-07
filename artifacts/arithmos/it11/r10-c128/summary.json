@@ -1,0 +1,28 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c12.anticipar"
+  },
+  "journal": [
+    "Anticipar"
+  ],
+  "evidenceKinds": [
+    "punto-guess",
+    "punto-erase",
+    "final-family",
+    "final-predict",
+    "final-check",
+    "punto-name"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 9.726,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

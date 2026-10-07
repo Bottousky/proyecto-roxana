@@ -100,7 +100,7 @@ export const dados = {
     const rx = BOARD.x + 135;
     die('c11-die1', 6, rx - 26, GROUND - 21);
     die('c11-die2', 6, rx + 26, GROUND - 21);
-    d.describe('Al lado de Rampa, en el piso, dos dados: los dos muestran seis.');
+    d.describe('Debajo de la pizarra, en el piso, dos dados: los dos muestran seis.');
     await d.say('Rampa', '¡Doce! ¿Vieron? En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande.');
     const pre = await d.choose([
       {id: '7', text: 'El 7 sale más seguido.'},
@@ -114,7 +114,6 @@ export const dados = {
     for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) {
       const x = gx + (b - 1) * C, y = gy + (a - 1) * C;
       cells.push({a, b, x, y});
-      w.add(new Label(`c11-g${a}${b}`, String(a + b), x + C / 2, y + C / 2 + 6, {size: 16, align: 'center', z: 12}));
     }
     const lines = [];
     for (let i = 0; i <= 6; i++) {
@@ -126,24 +125,30 @@ export const dados = {
       w.add(new Label(`c11-ga${i}`, String(i), gx - 10, gy + (i - 1) * C + C / 2 + 6, {size: 15, align: 'right', z: 12, ch: BLUE}));
       w.add(new Label(`c11-gb${i}`, String(i), gx + (i - 1) * C + C / 2, gy - 6, {size: 15, align: 'center', z: 12, ch: BLUE}));
     }
-    d.describe('Una tabla de 6 por 6: cada casillero es un par de dados, con su suma escrita adentro.');
+    w.add(new Label('c11-gbn', 'dado 2 →', gx + 6 * C + 8, gy - 6, {size: 14, z: 12, ch: BLUE}));
+    w.add(new Label('c11-gan', 'dado 1 ↓', gx - 34, gy + 6 * C + 20, {size: 14, z: 12, ch: BLUE}));
+    const sumLabel = (c, ch) => { w.remove(`c11-g${c.a}${c.b}`); w.add(new Label(`c11-g${c.a}${c.b}`, String(c.a + c.b), c.x + C / 2, c.y + C / 2 + 6, {size: 16, align: 'center', z: 12, ch})); };
+    d.describe('Una tabla de 6 por 6 vacía: cada casillero es un par, lo que sale en el dado 1 (renglón) y lo que sale en el dado 2 (columna).');
     await d.shot(SHOTS.tiles, 0.8);
     // el jugador marca los casilleros y decide cuándo están todos
     const sums = diceSums();
     const found = {7: new Set(), 12: new Set()};
     let target = 7;
+    const task = () => { w.remove('c11-task'); w.add(new Label('c11-task', `marcá los que suman ${target}`, A.x1 - 74, A.y0 + 22, {size: 18, align: 'center', z: 12, ch: target === 7 ? YELLOW : BLUE})); d.describe(`En la pizarra: marcá los pares que suman ${target}.`); };
+    task();
     await d.interact(ctl => new Promise(resolve => {
       g.setHint(() => [`Tocá cada casillero que suma ${target}. Cuando estén todos, tocá «ya están todos».`]);
       const refresh = () => g.ui.setSpots([
-        ...cells.filter(c => !found[7].has(`${c.a}${c.b}`) && !found[12].has(`${c.a}${c.b}`)).map(c => rectSpot(`c11-q${c.a}${c.b}`, `El par ${c.a} y ${c.b}, que suma ${c.a + c.b}`, {x: c.x, y: c.y, w: C, h: C}, () => tap(c))),
+        ...cells.filter(c => !found[7].has(`${c.a}${c.b}`) && !found[12].has(`${c.a}${c.b}`)).map(c => rectSpot(`c11-q${c.a}${c.b}`, `Dado 1: ${c.a}, dado 2: ${c.b}`, {x: c.x, y: c.y, w: C, h: C}, () => tap(c))),
         wordSpot('c11-done', 'ya están todos', A.x1 - 70, A.y0 + 60, () => done(), {label: `Decir que ya están todos los que suman ${target}`}),
       ]);
       const tap = c => {
         if (!ctl.alive()) return;
         const ok = c.a + c.b === target;
         d.evidence('dice-cell', {a: c.a, b: c.b, target, ok});
-        if (!ok) { g.note(`${c.a} + ${c.b} = ${c.a + c.b}, no ${target}.`); return; }
+        if (!ok) { sumLabel(c); g.note(`${c.a} + ${c.b} = ${c.a + c.b}, no ${target}.`); return; }
         found[target].add(`${c.a}${c.b}`);
+        sumLabel(c, target === 7 ? YELLOW : BLUE);
         const id = `c11-m${target}-${c.a}${c.b}`;
         w.add(new Shape(id, poly(id, [[3, 3], [C - 3, 3], [C - 3, C - 3], [3, C - 3]], {ch: target === 7 ? YELLOW : BLUE, w: 2.6}), c.x, c.y, {z: 13}));
         g.audio.tap(0.15, target === 7 ? 1.2 + found[7].size * 0.05 : 0.9);
@@ -160,13 +165,19 @@ export const dados = {
         }
         d.describe(`Los pares que suman ${target}: ${sums[target]} ${sums[target] === 1 ? 'casillero' : 'casilleros'} de 36.`);
         d.evidence('dice-mark', {sum: target, n: sums[target]});
-        if (target === 7) { target = 12; refresh(); return; }
+        if (target === 7) { target = 12; task(); refresh(); return; }
         g.ui.setSpots([]);
         g.setHint(null);
         resolve();
       };
       refresh();
     }));
+    g.setCinematic(true);
+    for (const c of cells) if (!w.get(`c11-g${c.a}${c.b}`)) sumLabel(c);
+    w.remove('c11-task');
+    await d.wait(0.4);
+    g.setCinematic(false);
+    d.describe('Se completan las sumas de los 36 casilleros: los 7 forman una diagonal; el 12 está solo, en la esquina.');
     await d.say('student', `Rampa, el 7 sale de ${sums[7]} maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene ${sums[7]}/36 de probabilidad y el 12, 1/36.`);
     await d.say('Rampa', 'En la tabla, sí. ¿Y tirando de verdad?');
     const r = rollTwo(360);

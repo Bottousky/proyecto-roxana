@@ -417,5 +417,20 @@ Informe: `artifacts/arithmos/it11/review-c8c/informe.md`. Toda la matemática nu
 | M8 | 10.6 y 12.6 nuevos no se habían corrido en teléfono | Corridos con `--peek` (`it11/r5-tel-c10`, `it11/r5-tel-c12`) |
 | B | Tablas en orden de elección; Bitácora 12 rama «el último»; tandas sólo por color; `aria-label` distinto del texto; botón chico; guarda de 450 ms al volver | Corregidos: la tabla de 10.2 se ordena por ángulo; rama propia; rótulo «otra tanda»; `aria-label` que empieza con el texto visible; 44 px de alto; la guarda se rearma |
 
+## Revisión de 11.6, 12.8, 10.7 y el pozo (rev-c8d, 2026-10-07)
+
+Informe: `artifacts/arithmos/it11/review-c8d/informe.md`. Todas las cuentas verificadas.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | 12.8: «la cuarta noche» valía 8 y después 16 | Corregido: las noches se cuentan como el eje (noche 0, 1, 2…) en todo el final y la Bitácora |
+| A2 | 11.6: la consigna no estaba en pantalla | Corregido: «marcá los que suman 7» (después 12) escrito en la pizarra y descripto |
+| M (11.6) | Los casilleros mostraban la suma: marcar era buscar «7» | Corregido: los casilleros empiezan vacíos; el jugador suma al tocar (si no es, la suma queda escrita); ejes «dado 1» y «dado 2»; al final se completan las 36 sumas |
+| M (pozo) | La soga colgaba del eje y no tocaba la rueda; la soga en 10.5 iba al revés de la historia | Corregido: la rueda es el tambor y la soga cuelga de su borde; el giro es largo ÷ rayo; 10.5: «la soga vieja se había caído al pozo… la empalmo en mi casa» |
+| M (12.8) | El error de Punto sin razón; el nombre no se leía; Punto tapaba un dato | Corregido: «con dos noches pasaban las dos, la recta y la que duplica»; punto, flecha y curva más grandes, Punto al costado; se corre fuera del mapa |
+| M (10.7) | Punto «se descuidaba» con las dos pistas a la vista | Corregido: salta con la primera pista sola (se adelanta) y se baja al ver la segunda; queda fuera de la grilla |
+| M (10.8 teléfono) | Pizarra y balde ilegibles | El resultado se escribe grande al lado del balde («llena» / «a medias») |
+| B | Dados, total sobre el renglón 2, manija pegada al poste, «Balcón ↑» | Corregidos (descripción de los dados, total más abajo, rueda centrada, rótulo) |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).
