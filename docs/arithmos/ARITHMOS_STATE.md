@@ -110,6 +110,20 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 - Integración con la escuela (`experiments/playcanvas`) requiere tocar infraestructura compartida:
   se deja propuesta, no se hace sin acuerdo (backlog X-2).
 
+## Arco I (pedido del 2026-10-07: «terminá el arco 1 de arithmos»)
+
+El Arco I es la historia completa que ya existe: de la puerta del cap. 1 («No hay vuelta. Por ahora.») a la decisión
+de la puerta en 12.8, en 12 capítulos. Terminarlo, según el contrato (§14), es dejarlo así:
+
+- recorrido implementado y encadenado (hecho);
+- revisión matemática de todo lo que cambió (falta rev-c9c: 7.1, 7.5, 7.6 y la recta táctil del cap. 6);
+- pendientes narrativos N2-R, N6-R … N10-12 cerrados «sin hallazgos altos», según una revisión narrativa del arco
+  entero (\`it12/review-narr-arco\`, en curso);
+- partidas completas de una vez, ruta directa y ruta con errores, también en 844×390 (\`it13/\`);
+- handoff «LISTO PARA PLAYTEST HUMANO», con lo que no se puede hacer en forma autónoma explícitamente pendiente:
+  audio escuchado, playtest con personas (C1-P), rendimiento en dispositivo táctil real (ENG-6), y las decisiones del
+  usuario X-1 (lógica y Boole) y X-2 (integración con la escuela, toca infraestructura compartida).
+
 ## Siguiente acción
 
 1. Partida completa 1 → 12 de una sola vez. En el ciclo 9 se hizo en dos tramos en 844×390 por la ruta con errores
