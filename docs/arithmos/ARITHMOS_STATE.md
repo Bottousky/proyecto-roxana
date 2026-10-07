@@ -27,6 +27,23 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   que x · x nunca da negativo. Verificado: cap. 10 en las dos rutas y en 844×390, 12.7 y 9.6
   (`artifacts/arithmos/it11/`). Lo escrito por el estudiante en la pizarra llega ahora al lector de
   pantalla. Matriz de cobertura de `ARITHMOS_CURRICULUM.md` puesta al día, con los huecos que quedan.
+- Ciclo 8, además: escena nueva **7.3b «Juntar factores»** (propiedades de las potencias desplegadas y contadas,
+  la suma no junta, raíz cúbica apilando capas: 64 = 2⁶ = 4³ = 8²); **identidad** nombrada en 6.4;
+  **discontinuidad y asíntota** nombradas en 12.1; la **raíz** dibujada como reflejo de x · x en 12.4.
+  Agencia: en **9.4** el jugador mueve la recta parada y cuenta cortes antes de decidir; en **9.2** arma la regla
+  con dos piezas y la máquina la prueba contra lo anotado. El estudiante le habla a los personajes con coma
+  («Mara, …») y el lector de pantalla dice quién habla. Revisión matemática independiente rev-mat-11 de los
+  arreglos del cap. 10 y de 7.3b: dos errores nuevos en pantalla (la ventana «de cuatro lados», la raya de la
+  tabla que parecía fracción) y 15 bajas, todo corregido y verificado (`it11/rv-*`).
+- Más tarde en el ciclo 8: 7.7 con una y ninguna solución y la raíz de (x + 1)² como distancia al cero; 11.4 y
+  11.7 deciden con el gráfico de cerca. Segunda revisión independiente (rev-c8) de 9.2, 9.4, 6.4, 12.1 y 12.4:
+  encontró que **las Bitácoras leían evidencia de otros capítulos** con el mismo nombre (la del 12 tomaba la
+  respuesta de 9.1; la del 5 escribía «undefined») — corregido en las doce y el bot ahora marca como error una
+  Bitácora con «undefined» o «NaN». 9.2 muestra lo que da la primera pieza antes de elegir la segunda; 9.4 deja
+  seguir mirando; la asíntota se define bien. Partida completa 1 → 12 (ruta directa, recargas en 3.2, 7.3b y
+  11.6): sin errores, 796 s, 12 Bitácoras (`it11/full-1a12`).
+- **Entorno:** la máquina se suspendió de madrugada (≈ 01:30–02:00); dos corridas y una revisión se cortaron
+  por eso y se repitieron sin problemas.
 - Revisión narrativa de los caps. 10–12 hecha (rev-narr-8): el cierre se rehizo (la cuarta noche pone a
   prueba la suposición, la Marea pasa y la escalera resiste, Punto corre por su gráfico); el resto de sus
   hallazgos queda en N10-12.
@@ -61,7 +78,10 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 1. Pendientes de narrativa por capítulo (N2-R, N6-R … N10-12), empezando por agencia (que el jugador dé
    el paso decisivo) y por Punto como personaje, que se repiten en todas las revisiones.
-2. Cobertura pendiente (ver huecos en la matriz): C7b (propiedades de potencias, otras raíces, √(x²) = |x|,
-   sucesiones), identidad nombrada (C6b), J (polinómica de grado mayor, radical con gráfico, asíntotas).
-3. Partida completa 1 → 12 otra vez después de los cambios de este ciclo.
+2. Cobertura pendiente (ver huecos en la matriz): C7b (cociente de potencias, sucesiones nombradas,
+   simplificar racionales), J (polinómica de grado mayor, simetrías, parámetros de otras familias, asíntota
+   horizontal).
+3. Agencia en 9.1 (el jugador dibuja las flechas al revés) y 9.8 (el botón único de «otro día»); bajas de rev-c8
+   (B7, B9).
+4. Partida completa por la ruta con errores (en curso al cerrar el ciclo 8, `it11/full2-1a12`).
 5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.

@@ -73,7 +73,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | E6 | Ecuación cuadrática; completar el cuadrado | 1°–5° (rango del bloque) | 7.7 | probado-auto · revisado-mat |
 | E7 | Logaritmo como pregunta inversa («¿cuántas veces?») | 1°–5° (rango del bloque) | 7.8; familia en 12.1 | probado-auto · revisado-mat |
 | E8 | Expresiones racionales: dónde no se puede | 1°–5° (rango del bloque) | 7.9 | probado-auto · revisado-mat |
-| E-gap | Cociente de potencias y exponente fraccionario, √(x²) como distancia al cero de x, sucesiones nombradas, completar el cuadrado con una o ninguna solución, simplificar racionales con su restricción | 1°–5° (rango del bloque) | — | pendiente (C7b) |
+| E6b | Completar el cuadrado con una o ninguna solución; la raíz de (x + 1)² como distancia al cero | 1°–5° (rango del bloque) | 7.7 | probado-auto (pendiente revisión matemática) |
+| E-gap | Cociente de potencias y exponente fraccionario, sucesiones nombradas, simplificar racionales con su restricción | 1°–5° (rango del bloque) | — | pendiente (C7b) |
 | F1 | Ángulo como giro; suma de los ángulos de un triángulo | 1°–5° (rango del bloque) | 8.2 | probado-auto · revisado-mat (rev-mat-7) |
 | F2 | Congruencia vs semejanza | 1°–5° (rango del bloque) | 8.3 | probado-auto · revisado-mat |
 | F3 | Escala: longitudes × k, áreas × k², volúmenes × k³ | 1°–5° (rango del bloque) | 8.4 | probado-auto · revisado-mat |

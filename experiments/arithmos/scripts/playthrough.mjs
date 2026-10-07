@@ -703,6 +703,14 @@ for (let iter = 0; iter < 30000; iter++) {
       const seq = route === 'errores' ? ['c8-pt2_3', 'c8-pt3_2', 'c8-pt-1_-1'] : ['c8-pt3_2', 'c8-pt-1_-1'];
       target = spots.find(x => x.id === seq[coordStep]) || spots[0];
       coordStep++;
+    } else if (s.seg === 'c9.flechas' && spots.some(x => x.id === 'c9-q2')) {
+      // flechas al revés: el 2 y después las horas con sombra 2 (con errores, primero una que no)
+      const q2 = s.spots.find(x => x.id === 'c9-q2');
+      if (!q2.selected) target = q2;
+      else {
+        const wrong = route === 'errores' && !tried.has('c9back') && (tried.add('c9back'), true);
+        target = spots.find(x => x.id === (wrong ? 'c9-qh12' : 'c9-qh10')) || spots.find(x => x.id === 'c9-qh14');
+      }
     } else if (s.seg === 'c9.flechas' && spots.some(x => x.id.startsWith('c9-p'))) {
       const sel = s.spots.find(x => x.selected);
       const MAP = {8: 4, 10: 2, 12: 1, 14: 2, 16: 4};
@@ -781,6 +789,11 @@ const final = await read();
 await shot('final');
 const evidence = await page.evaluate(() => window.__game.state);
 await writeFile(`${out}/state.json`, JSON.stringify(evidence, null, 2));
+// una Bitácora con «undefined» o «NaN» es un error, aunque la partida termine
+for (const e of evidence.journal) {
+  const text = [e.title, e.abbr, ...(e.body || []), ...(e.seen || [])].join(' ');
+  if (/undefined|NaN|\[object/.test(text)) errors.push(`Bitácora ${e.id}: texto roto: ${text.match(/.{0,60}(undefined|NaN|\[object).{0,20}/)?.[0]}`);
+}
 const fps = fpsSamples.filter(Boolean);
 const summary = {
   ended,
