@@ -1,0 +1,46 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "title",
+    "seg": "c12.anticipar"
+  },
+  "journal": [
+    "Anticipar"
+  ],
+  "evidenceKinds": [
+    "family-try",
+    "families",
+    "knob",
+    "params",
+    "params-u",
+    "jump-predict",
+    "jump-tap",
+    "jump",
+    "box-predict",
+    "box",
+    "compose",
+    "inverse-predict",
+    "inverse-square",
+    "rate",
+    "derivative-predict",
+    "accum",
+    "integral-predict",
+    "piecewise-predict",
+    "punto-guess",
+    "punto-erase",
+    "final-family",
+    "final-predict",
+    "final-check",
+    "punto-name"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 48.557,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

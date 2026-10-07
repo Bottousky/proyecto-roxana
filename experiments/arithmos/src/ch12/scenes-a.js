@@ -68,7 +68,7 @@ export const familias = {
       w.add(new Label(`c12-fl${idx}`, rule.name, c.x + c.w / 2, c.y + c.h + 14, {size: 14, align: 'center', z: 13, ch: YELLOW}));
       g.audio.tap(0.2, 1.2 + done.size * 0.08);
     }
-    await d.say('student', 'Mara, cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados del eje parado, y por eso se dice que son simétricas; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.');
+    await d.say('student', 'Mara, cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados de una raya parada que pasa por su punta, y por eso se dice que son simétricas; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.');
     const hc = cells.findIndex(c => c.asym);
     if (hc >= 0) {
       const c = cells[hc];
@@ -77,7 +77,7 @@ export const familias = {
       d.describe('En la forma partida, junto a la raya punteada, en el 2, donde no se puede repartir, se escribe «asíntota».');
     }
     await d.say('student', 'Las partidas no están definidas en un lugar: el gráfico se interrumpe ahí, y a eso se le dice discontinuidad. Cerca del 2 se disparan, y se acercan a la raya punteada tanto como se quiera: una raya así se llama asíntota. Esta no la tocan nunca, porque en el 2 no hay valor.');
-    await d.say('student', 'Y la del reparto tiene otra, acostada: si vienen 102, a cada uno le toca 1 ÷ 100 = 0,01; si vienen 1002, 0,001. Cuantos más vienen, más cerca de 0, sin llegar nunca: la raya del 0 también es asíntota.');
+    await d.say('student', 'Y la del reparto tiene otra, acostada: si vienen 102, a cada uno le toca 1 ÷ 100 = 0,01; si vienen 1002, 0,001. Con más gente se acerca a 0 tanto como se quiera, y nunca llega, porque 1 dividido por un número no da 0: la raya del 0 también es asíntota.');
     await d.say('student', 'La del «¿cuántas veces?» también tiene una: cerca del 0 baja sin fin, pegada al eje parado.');
     await d.say('student', 'Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
     d.evidence('families', {done: [...done]});
@@ -135,7 +135,7 @@ export const perillas = {
     await d.tween(0.5, q => { for (const o of olds) o.fade = 1 - q; });
     for (const o of olds) w.remove(o.id);
     g.setCinematic(false);
-    await d.say('Rampa', 'Las U de las huertas también tienen perilla. Mi huerta nueva: con lado 2, quiero 8 de tierra.');
+    await d.say('Rampa', 'Las U de las huertas también tienen perilla. Mi huerta nueva es de a cuadrados de lado x, pegados: la tierra es a · x · x. Con lado 2, quiero 8 de tierra.');
     const ub = {x: A.x0 + 40, y: A.y0 + 20, w: 260, h: 210};
     const U2 = axes(w, 'c12-ug', ub, [-3, 3], [0, 10], {xticks: [-2, 2], yticks: [4, 8], xname: 'x'});
     const UA = [{a: 0.5, ch: WHITE, t: 'a = 1/2'}, {a: 1, ch: BLUE, t: 'a = 1'}, {a: 2, ch: YELLOW, t: 'a = 2'}];
@@ -148,13 +148,13 @@ export const perillas = {
     w.add(new Label('c12-u28l', '(2, 8)', U2.px(2) - 12, U2.py(8) - 8, {size: 16, align: 'right', z: 14}));
     d.describe('Tres U: y = a · x · x con a = 1/2, a = 1 y a = 2. Cuanto más grande es a, más angosta la U. Un punto en (2, 8).');
     const ua = await d.choose([
-      {id: '2', text: 'a = 2: 2 · 2 · 2 = 8.'},
-      {id: '1', text: 'a = 1: es la U de siempre, x · x.'},
+      {id: '2', text: 'a = 2: dos cuadrados de 2 por 2, 2 · 4 = 8.'},
+      {id: '1', text: 'a = 1: un solo cuadrado, la U de siempre.'},
       {id: '0.5', text: 'a = 1/2: la más abierta, para que entre más tierra.'},
     ], {prompt: '¿Qué perilla pasa por (2, 8)?', evaluate: true});
     d.evidence('params-u', {answer: ua});
     await d.think(ua === '2' ? 'a = 2: con x = 2, 2 · 4 = 8.' : ua === '1' ? 'Con a = 1 y x = 2 da 4, no 8. Hace falta a = 2: 2 · 4 = 8.' : 'Con a = 1/2 y x = 2 da 2. Más abierta es menos alta: hace falta a = 2, más angosta.');
-    await d.say('student', 'Rampa, en las U la perilla a la estrecha o la abre: con a más grande, sube más rápido y queda más angosta. Para pasar por (2, 8), a = 2.');
+    await d.say('student', 'Rampa, en las U la perilla a la estrecha o la abre: con a más grande (y positiva), sube más rápido y queda más angosta. Para pasar por (2, 8), a = 2: dos cuadrados.');
     g.flags.c12params = true;
   },
 };
@@ -227,12 +227,19 @@ export const salto = {
     for (const o of olds) w.remove(o.id);
     g.setCinematic(false);
     await d.say('Cornisa', 'Con una tabla de 6 por 6 hago cajas: corto un cuadrado de lado x en cada esquina y levanto los bordes. Entra x · (6 − 2x) · (6 − 2x).');
-    const bb = {x: A.x0 + 40, y: A.y0 + 24, w: 300, h: 200};
+    const bb = {x: A.x0 + 40, y: A.y0 + 24, w: 300, h: 170};
     const B = axes(w, 'c12-bx', bb, [0, 3], [0, 18], {xticks: [1, 2, 3], yticks: [8, 16], xname: 'corte x', yname: 'lo que entra'});
     const bc = w.add(curve('c12-box', boxVolume, [0, 3], B.px, B.py, [0, 18], {ch: WHITE, n: 60}));
     bc.progress = 0;
     await d.draw(bc, 0.9, {sound: false});
-    d.describe('El gráfico de lo que entra en la caja según el corte x: sale de 0, sube hasta 16 en x = 1 y baja hasta 0 en x = 3. No es igual de los dos lados.');
+    // la tabla con las esquinas cortadas, de costado
+    const tx0 = A.x1 - 130, ty0 = A.y0 + 30, u = 15;
+    const sq = (id, x, y, side, ch, wd = 2) => w.add(new Drawing(id, [S([[x, y], [x + side, y], [x + side, y + side], [x, y + side], [x, y]], seedOf(id), {w: wd, p: 0.9, ch})], {z: 12}));
+    sq('c12-sheet', tx0, ty0, 6 * u, WHITE, 2.4);
+    for (const [i, [cx0, cy0]] of [[0, 0], [5, 0], [0, 5], [5, 5]].entries()) sq(`c12-cut${i}`, tx0 + cx0 * u, ty0 + cy0 * u, u, YELLOW);
+    w.add(new Label('c12-sh6', '6', tx0 + 3 * u, ty0 - 6, {size: 15, align: 'center', z: 12, ch: BLUE}));
+    w.add(new Label('c12-shx', 'x', tx0 + u / 2, ty0 + 6 * u + 16, {size: 15, align: 'center', z: 12, ch: YELLOW}));
+    d.describe('Al costado, la tabla de 6 por 6 con un cuadradito de lado x cortado en cada esquina. El gráfico de lo que entra en la caja según el corte: sale de 0, sube, y vuelve a 0 en x = 3.');
     const bxa = await d.choose([
       {id: '1', text: 'x = 1: donde el gráfico está más alto, 16.'},
       {id: '1.5', text: 'x = 1,5: en la mitad, como el salto.'},
@@ -242,8 +249,10 @@ export const salto = {
     w.add(new Shape('c12-bmax', dot('c12-bmax', 6, YELLOW), B.px(1), B.py(16), {z: 14}));
     w.add(new Label('c12-bmaxl', '(1, 16)', B.px(1) + 10, B.py(16) - 8, {size: 16, z: 14, ch: YELLOW}));
     await d.think(bxa === '1' ? 'Uno: entra 1 · 4 · 4 = 16.' : bxa === '1.5' ? 'Con 1,5 entra 1,5 · 3 · 3 = 13,5. La caja no es una U: el máximo no queda en la mitad, queda en x = 1, con 16.' : 'Con 3 el fondo mide 6 − 6 = 0: la caja no tiene fondo y no entra nada. Es un cero. El máximo está en x = 1, con 16.');
-    await d.say('student', 'Cornisa, se lee igual que el salto: ceros en 0 y en 3, crece hasta x = 1, el máximo es 16, y después decrece. Pero no es una U: no es igual de los dos lados. Multiplicando, aparece x · x · x: es un polinomio de grado 3.');
-    await studentWrites(d, g, 'c12-boxw', 'x · (6 − 2x) · (6 − 2x) = 4 · x · x · x − 24 · x · x + 36 · x', A.x0 + 16, A.y1 - 4, {size: 15});
+    await d.say('student', 'Cornisa, el corte va de 0 a 3: con más de 3 no queda tabla. Ahí se lee igual que el salto: ceros en 0 y en 3, crece hasta x = 1, el máximo es 16, y después decrece. Pero no es una U dada vuelta como el salto: no es igual de los dos lados.');
+    await studentWrites(d, g, 'c12-boxw1', '(6 − 2x) · (6 − 2x) = 36 − 24 · x + 4 · x · x', A.x0 + 16, A.y1 - 28, {size: 15});
+    await studentWrites(d, g, 'c12-boxw', 'x · (36 − 24 · x + 4 · x · x) = 4 · x · x · x − 24 · x · x + 36 · x', A.x0 + 16, A.y1 - 4, {size: 15});
+    await d.say('student', 'Una suma de términos con x multiplicada por sí misma se llama polinomio, y el grado es cuántas veces, como mucho: acá x · x · x, grado 3. Como cuenta sirve para cualquier x; como caja, sólo de 0 a 3.');
     d.evidence('box', {max: boxVolume(1)});
     g.flags.c12jump = true;
   },

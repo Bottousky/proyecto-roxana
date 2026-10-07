@@ -108,7 +108,7 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | J2b | Parámetro de otra familia: y = a · x · x, la perilla estrecha o abre la U (pasar por (2, 8)) | 4°–6° (rango del bloque) | 12.2 | probado-auto (pendiente revisión matemática) |
 | J3b | Polinómica de grado 3: la caja de Cornisa x · (6 − 2x)², leída como el salto (ceros, crece, máximo en x = 1, decrece) pero sin simetría | 4°–6° (rango del bloque) | 12.3 | probado-auto (pendiente revisión matemática) |
 | J8b | Asíntota horizontal: el reparto 1 ÷ (x − 2) con 102 y 1002 personas se acerca a 0 sin llegar | 4°–6° (rango del bloque) | 12.1 | probado-auto (pendiente revisión matemática) |
-| J-gap | (ninguno abierto en J; queda revisión matemática de lo agregado) | 4°–6° (rango del bloque) | — | pendiente |
+| J-gap | (ninguno abierto en J; lo agregado pasó la revisión rev-c12c con correcciones) | 4°–6° (rango del bloque) | — | pendiente |
 | K1 | **Lógica proposicional y álgebra de Boole** (INET Electrónica; no está en A–J) | INET | por decidir (¿puente con Bitland?) | pendiente — decisión de alcance |
 | K2 | Divisibilidad y primos (NAP/PBA 1°–2°; no nombrado en A–J) | 1°–2° | 2 o 3 | pendiente |
 | K3 | Combinatoria como objeto propio, binomio de Newton | 2°–4° | 10 | pendiente |

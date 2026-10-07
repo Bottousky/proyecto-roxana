@@ -447,5 +447,18 @@ distractores.
 | M | El bot no elegía la opción equivocada de 7.2 | Corregido el selector; la ruta con errores ahora prueba «10 · n», «× 1,5» y «x = −2» |
 | B | «Cinco dos repartidos…»; «se restan» en general; Bitácora («escribiste», (x + 1)² = 0 con la huerta) | Corregidos. «× 2 el anterior» de 7.2 se conecta con 2ⁿ al final de 7.3 |
 
+## Revisión matemática de lo agregado al cap. 12 (rev-c12c, 2026-10-07)
+
+Informe: `artifacts/arithmos/it11/review-c12c/informe.md`. Ninguna cuenta mal.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | La caja sin dominio: como polinomio no tiene máximo | Corregido: «el corte va de 0 a 3: con más de 3 no queda tabla»; «como cuenta sirve para cualquier x; como caja, sólo de 0 a 3»; Bitácora |
+| A2 | «Simétricas respecto del eje parado» es falso para el salto | Corregido: «iguales de los dos lados de una raya parada que pasa por su punta» |
+| M1 | Asíntota acostada sin «tanto como se quiera» ni razón | Corregido: «se acerca a 0 tanto como se quiera, y nunca llega, porque 1 dividido por un número no da 0» |
+| M2–M3 | «2 · 2 · 2 = 8» se lee como x · x · x; a sin significado | Corregido: la huerta es de a cuadrados de lado x; «a = 2: dos cuadrados de 2 por 2, 2 · 4 = 8» |
+| M4–M5 | Polinomio y grado sin definir; igualdad sin pasos; sin croquis | Corregidos: definición en una línea; dos renglones de cuenta; la tabla con las esquinas cortadas dibujada (`it11/r12-c12-errores/018`) |
+| B | a positiva; describe con la respuesta antes de la pregunta; «U dada vuelta»; Bitácora sin la perilla de las U | Corregidos |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).
