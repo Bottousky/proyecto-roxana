@@ -19,7 +19,8 @@ function rulerTexture(len, { step = 1, every = 2, px = 96, from = 0, bg = '#efe2
   for (let i = 0; i * step <= len + 1e-6; i++) {
     const m = i * step, x = Math.min(c.width - 2, Math.round(m * px)), major = Math.abs(m / every - Math.round(m / every)) < 1e-6;
     g.fillRect(x - (major ? 3 : 2), 0, major ? 6 : 4, major ? 44 : 26);
-    if (major && x > 20 && x < c.width - 20) g.fillText(String(Math.round(from + m)), x, 50);
+    // (the zero is labelled too, left-aligned at the edge: it is the reference)
+    if (major && x < c.width - 20) { g.textAlign = x < 20 ? 'left' : 'center'; g.fillText(String(Math.round(from + m)), x < 20 ? x + 6 : x, 50); }
   }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
@@ -104,7 +105,8 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
   const deck = new THREE.Mesh(new THREE.BoxGeometry(CARRO.len, CARRO.h, D), deckMat); deck.position.y = Y - CARRO.h / 2; deck.castShadow = deck.receiveShadow = true; car.add(deck);
   const trim = new THREE.Mesh(new THREE.BoxGeometry(CARRO.len + 0.04, 0.08, D + 0.04), M.brass); trim.position.y = Y - 0.04; car.add(trim);
   // the car's own ruler, on its deck along the platform's side (its side face is below the platform's level)
-  const ruler = new THREE.Mesh(new THREE.PlaneGeometry(CARRO.len - 0.1, 0.34), new THREE.MeshStandardMaterial({ map: rulerTexture(CARRO.len - 0.1, { step: 0.5, every: 1, px: 128, bg: '#d9a441', ink: '#1e140c' }), roughness: 0.5, metalness: 0.2 }));
+  // (its full length: its zero is the car's west end, from where the recorder measures)
+  const ruler = new THREE.Mesh(new THREE.PlaneGeometry(CARRO.len, 0.34), new THREE.MeshStandardMaterial({ map: rulerTexture(CARRO.len, { step: 0.5, every: 1, px: 128, bg: '#d9a441', ink: '#1e140c' }), roughness: 0.5, metalness: 0.2 }));
   ruler.rotation.x = -Math.PI / 2; ruler.position.set(0, Y + 0.005, D / 2 - 0.17); ruler.receiveShadow = true; car.add(ruler);
   for (const sx of [-1, 1]) for (const z of [-D / 2 + 0.45, D / 2 - 0.45]) { const wh = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.1, 16), M.brassDark); wh.rotation.x = Math.PI / 2; wh.position.set(sx * (CARRO.len / 2 - 0.5), Y - 0.5, z); car.add(wh); }
   const bench = new THREE.Mesh(new THREE.BoxGeometry(CARRO.len - 0.6, 0.12, 0.45), M.woodLight); bench.position.set(0, Y + 0.45, -D / 2 + 0.3); bench.castShadow = true; car.add(bench);
@@ -121,9 +123,44 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
     const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 8), lampMat); lamp.position.set(sx * (CARRO.len / 2 - 0.12), Y + 1.58, D / 2 - 0.12); car.add(lamp);
   }
   const grip = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.32, 0.1), M.brassDark); grip.position.set(0, Y - 0.62, zc - (CARRO.z0 + CARRO.z1) / 2); car.add(grip);
+  // the recorder (D22): a brass clockwork box at the deck's east corner, its lamp saying its state
+  // (beside the bench, behind where the explorer stands: walking the deck it went through the box)
+  const RZ = -D / 2 + 0.75, RX = CARRO.len / 2 - 0.22;
+  const recBox = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.26, 0.22), M.brass); recBox.position.set(RX, Y + 0.7, RZ); recBox.castShadow = true; car.add(recBox);
+  const recPost = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 0.58, 8), M.brassDark); recPost.position.set(RX, Y + 0.29, RZ); car.add(recPost);
+  const recDial = new THREE.Mesh(new THREE.CircleGeometry(0.085, 20), M.enamel); recDial.position.set(RX, Y + 0.71, RZ + 0.115); car.add(recDial);
   car.position.set(k.x, 0, zc); scene.add(car);
   // each moving part is merged within itself (one mesh per material: the car ~30 meshes → a handful)
   for (const g of [car, drum, retW, retE]) mergeStatic(g);
+  // (added after merging: they change) the recorder's lamp and hand; its marks
+  const recLamp = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), new THREE.MeshBasicMaterial({ color: '#3a2a1c' })); recLamp.position.set(RX, Y + 0.88, RZ); car.add(recLamp);
+  const recHand = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.07, 0.01), M.ink); recHand.geometry.translate(0, 0.035, 0); recHand.position.set(RX, Y + 0.71, RZ + 0.12); car.add(recHand);
+  const TRIP = Math.abs(CARRO.stops[1] - CARRO.stops[0]) / CARRO.speed + CARRO.ramp, MAXM = Math.ceil(TRIP / 0.5) + 4, mtx = new THREE.Matrix4();
+  // one colour per mark, the same in the three records (chalk, ink, the car's notch): mark n pairs up by
+  // colour, cycling every 6 marks (3 s), plus a thread from each notch to its chalk (its length is the tape's reading)
+  const hues = ['#d6402a', '#e9a032', '#3f9a4a', '#2f7fd0', '#7a4fc2', '#c23f8e'].map(c => new THREE.Color(c));
+  // chalk on the kerb: a short blue bar across its strip at each mark (the ground's record; white on
+  // the cream kerb did not read)
+  // (alternating two blues, and the ink two reds, mark by mark: the n-th chalk and the n-th ink pair up)
+  const chalk = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.08, 0.12).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffffff' }), MAXM);
+  chalk.count = 0; chalk.frustumCulled = false; scene.add(chalk);
+  // the car's own notch on the kerb at each mark (its west end, the tape's zero): from notch to chalk,
+  // the tape's reading — the sum, mark by mark, on the ground
+  const notch = new THREE.InstancedMesh(new THREE.CircleGeometry(0.07, 3).rotateX(-Math.PI / 2).rotateY(Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffffff' }), MAXM);
+  notch.count = 0; notch.frustumCulled = false; scene.add(notch);
+  const thread = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 0.018).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.8 }), MAXM);
+  thread.count = 0; thread.frustumCulled = false; scene.add(thread);
+  const v3 = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+  // ink on the car's tape: a dark red mark at each mark; the ones in the same place stack across the
+  // tape into a column (many marks in one place, not one)
+  const ink = new THREE.InstancedMesh(new THREE.CircleGeometry(0.032, 14).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffffff' }), MAXM);
+  ink.count = 0; ink.frustumCulled = false; car.add(ink);
+  // how many ink marks a column holds, written beside it (×22): one bar would read as one mark
+  const makeCount = parent => { const c = document.createElement('canvas'); c.width = 128; c.height = 64; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); sp.scale.set(0.42, 0.21, 1); sp.visible = false; sp.renderOrder = 9; parent.add(sp); return { sp, c, t }; };
+  const inkCounts = [makeCount(car), makeCount(car)], chalkCount = makeCount(scene); // (the two largest ink columns; the chalk's too)
+  const writeCount = ({ sp, c, t }, n) => { const g = c.getContext('2d'); g.clearRect(0, 0, 128, 64); g.fillStyle = 'rgba(30,20,12,0.85)'; g.beginPath(); g.roundRect(4, 8, 120, 48, 14); g.fill(); g.fillStyle = '#f6e7c4'; g.font = 'bold 34px Inter, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`×${n}`, 64, 33); t.needsUpdate = true; };
+  let lastMarks = 0, flash = 0;
+  let shownTrip = -1, shown = 0;
   let spin = 0;
   return {
     keep: [car, drum, retW, retE, cable],
@@ -132,6 +169,40 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
       // the cable runs at the car's cruising speed, always: its marks move along, the wheels turn
       spin += dt * CARRO.speed; drum.rotation.z = -spin / 1.15; retW.rotation.z = retE.rotation.z = spin / (1.15 * 0.45);
       cableTex.offset.x = -spin / 0.5;
+      // the recorder: its marks (the latest recorded trip), its lamp (amber set, green marking)
+      const r = world.recorder;
+      if (r.trip !== shownTrip || (r.version || 0) !== shown) {
+        shownTrip = r.trip; shown = r.version || 0; const n = Math.min(MAXM, r.marks.length);
+        const inkGroups = new Map(), gGroups = new Map();
+        for (let i = 0; i < n; i++) {
+          const m = r.marks[i], col = hues[i % hues.length];
+          // coincident marks stack ACROSS each strip (never along it: that would falsify the reading)
+          const onG = r.marks.slice(0, i).filter(o => Math.abs(o.g - m.g) < 0.06).length;
+          const gk = r.marks.findIndex(o => Math.abs(o.g - m.g) < 0.06); gGroups.set(gk, (gGroups.get(gk) || 0) + 1);
+          const gz = AVENIDA.andenZ0 + 0.27 - Math.min(0.2, onG * 0.035);
+          mtx.makeTranslation(CARRO.kerb0 + m.g, Y + 0.066, gz); chalk.setMatrixAt(i, mtx); chalk.setColorAt(i, col);
+          const nx = CARRO.kerb0 + m.k - CARRO.len / 2;
+          mtx.makeTranslation(nx, Y + 0.067, AVENIDA.andenZ0 + 0.06); notch.setMatrixAt(i, mtx); notch.setColorAt(i, col);
+          // the thread from the notch to the chalk, slightly offset per mark so overlapping ones stay apart
+          const x0 = nx, x1 = CARRO.kerb0 + m.g, tz = AVENIDA.andenZ0 + 0.1 + (i % hues.length) * 0.012;
+          v3.set((x0 + x1) / 2, Y + 0.0665, tz); sc.set(Math.max(0.01, Math.abs(x1 - x0)), 1, 1); mtx.compose(v3, q, sc); thread.setMatrixAt(i, mtx); thread.setColorAt(i, col);
+          const stack = r.marks.slice(0, i).filter(o => Math.abs(o.c - m.c) < 0.06).length;
+          const ck = r.marks.findIndex(o => Math.abs(o.c - m.c) < 0.06); inkGroups.set(ck, (inkGroups.get(ck) || 0) + 1);
+          mtx.makeTranslation(m.c - CARRO.len / 2, Y + 0.012, D / 2 - 0.17 - 0.14 + Math.min(0.28, stack * 0.0125)); ink.setMatrixAt(i, mtx); ink.setColorAt(i, col);
+        }
+        chalk.count = ink.count = notch.count = thread.count = n;
+        for (const im of [chalk, ink, notch, thread]) { im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; }
+        // a count beside each group of 3 or more (the two largest on the tape, the largest on the kerb)
+        const ig = [...inkGroups].filter(([, c]) => c >= 3).sort((a, b) => b[1] - a[1]);
+        inkCounts.forEach((L, j) => { const g = ig[j]; L.sp.visible = !!g; if (g) { writeCount(L, g[1]); L.sp.position.set(r.marks[g[0]].c - CARRO.len / 2 + 0.28, Y + 0.25, D / 2 - 0.17); } });
+        const gg = [...gGroups].filter(([, c]) => c >= 3).sort((a, b) => b[1] - a[1])[0];
+        chalkCount.sp.visible = !!gg; if (gg) { writeCount(chalkCount, gg[1]); chalkCount.sp.position.set(CARRO.kerb0 + r.marks[gg[0]].g + 0.3, Y + 0.25, AVENIDA.andenZ0 + 0.3); }
+      }
+      if ((r.version || 0) !== lastMarks) { if (r.state === 'on') flash = 0.15; lastMarks = r.version || 0; }
+      flash = Math.max(0, flash - dt);
+      // the lamp: amber set, green marking (a flash at each mark), cream done, red cut; the hand: one division per mark
+      recLamp.material.color.set(r.state === 'armed' ? '#f0b04a' : r.state === 'on' ? (flash > 0 ? '#e9ffe6' : '#4fc65e') : r.state === 'done' ? '#efe6c8' : r.state === 'cut' ? '#d0402a' : '#3a2a1c');
+      recHand.rotation.z = -r.marks.length * Math.PI * 2 / 24;
     },
   };
 }

@@ -63,6 +63,10 @@ export class World {
       const k = { ...c, x: c.stops[0], v: 0, dx: 0, leg: 0, t: 0, phase: 'parada', solid };
       this.placeCarrier(k); return k;
     });
+    // The car's recorder (D22): during a trip it marks every 0.5 s where the explorer is, in two
+    // records at once: chalk on the platform's kerb (the ground's frame, from the kerb's zero) and
+    // ink on the car's tape (the car's frame, from the car's west end).
+    this.recorder = { state: 'off', carrier: null, marks: [], trip: 0, startStep: 0, lastStep: 0 };
     this.depthBlockers = level.depthBlockers || [];
     this.citySeen = false;
     this.bodies = [];
@@ -170,6 +174,7 @@ export class World {
       this.collideBodies(pass === 0);
     }
     this.updateFrames();
+    this.updateRecorder();
 
     for (const b of this.bodies) {
       if (b.heldBy) continue;
@@ -243,7 +248,9 @@ export class World {
 
   /** Horizontal acceleration the explorer applies to itself. Declared assist, never vertical. */
   locomotion(av, ix) {
-    const target = clamp(ix, -1, 1) * AVATAR.walk;
+    // Aboard a car the explorer steps with care, at half pace (declared assist): 1.5 m/s, the car's
+    // own speed, so a walk along its deck lasts a few of the recorder's marks.
+    const target = clamp(ix, -1, 1) * AVATAR.walk * (av.carrier ? 0.5 : 1);
     const supported = av.supportSteps > 0;
     av.grounded = supported;
     if (supported) return clamp((target - av.vx) / DT, -AVATAR.aGround, AVATAR.aGround);
@@ -331,6 +338,25 @@ export class World {
   }
 
   inArea(b) { return this.areasNow().some(r => b.x - b.hw >= r.x0 - 1e-6 && b.x + b.hw <= r.x1 + 1e-6 && b.z - b.hw >= r.z0 - 1e-6 && b.z + b.hw <= r.z1 + 1e-6); }
+
+  updateRecorder() {
+    const r = this.recorder, k = r.carrier, av = this.avatar;
+    if (!k || r.state === 'off' || r.state === 'done' || r.state === 'cut') return;
+    const mark = () => { r.version = (r.version || 0) + 1; r.marks.push({ t: (this.stepCount - r.startStep) * DT, g: av.x - k.kerb0, c: av.x - (k.x - k.len / 2), k: k.x - k.kerb0 }); r.lastStep = this.stepCount; };
+    if (r.state === 'armed') {
+      if (av.carrier !== k) { r.state = 'off'; this.emit('record-cancel', {}); return; }
+      // (the previous trip's marks stay until this one starts: arming does not erase what is to be read)
+      if (k.phase !== 'parada') { r.state = 'on'; r.startStep = this.stepCount; r.marks = []; mark(); this.emit('record-start', { trip: r.trip }); }
+      return;
+    }
+    if (av.carrier !== k) { r.state = 'cut'; this.emit('record-done', { trip: r.trip, aborted: true, marks: r.marks.slice() }); return; }
+    if (k.phase === 'parada') {
+      // on arriving: a mark, unless the grid's last one fell (almost) now — no duplicate in the same place
+      if (this.stepCount - r.lastStep <= 2) r.marks.pop(); // (mark() bumps the version: the replaced one is redrawn)
+      mark(); r.state = 'done'; this.emit('record-done', { trip: r.trip, aborted: false, marks: r.marks.slice() }); return;
+    }
+    if ((this.stepCount - r.startStep) % Math.round(0.5 / DT) === 0) { mark(); this.emit('record-mark', { trip: r.trip, n: r.marks.length }); }
+  }
 
   /** The walkable areas now: those behind a closed gate left out, those on a carrier where it is. */
   areasNow() {
@@ -554,6 +580,9 @@ export class World {
       const door = this.doors.find(d => d.mouthZ !== undefined && av.z < d.mouthZ);
       // Beside a car waiting at a stop, ▲ boards it.
       for (const c of this.carriers) if (c.phase === 'parada' && av.supportSteps > 0 && !av.carrier && Math.abs(av.x - c.x) < c.len / 2 - 0.3 && av.z < c.z1 + 1.6 && av.z > c.z1) out.push({ kind: 'board', key: '▲', verb: 'Subir al carro', d: 0.5, x: av.x + 0.85, y: av.y + 0.1, z: av.z });
+      // Aboard a car waiting at a stop, its recorder can be set for the next trip.
+      const rc = this.recorder;
+      if (av.carrier && av.carrier.phase === 'parada' && av.supportSteps > 0 && rc.state !== 'armed' && rc.state !== 'on') out.push({ kind: 'record', verb: 'Registrar el viaje', hint: 'tiza en el andén y tinta en el carro, cada 0,5 s · ▼ bajar', d: 0.4, x: av.x + 0.85, y: av.y + 0.6, z: av.z });
       // On the car, ▼ steps off it: named while it waits at a stop, not while it runs.
       const onCar = this.carriers.find(k => av.support?.solid === k.solid);
       if (onCar) { if (onCar.phase === 'parada' && av.supportSteps > 0 && !out.length) out.push({ kind: 'back', key: '▼', verb: 'Bajar del carro', d: 9, x: av.x + 0.85, y: av.y + 0.1, z: av.z }); }
@@ -584,6 +613,7 @@ export class World {
     const av = this.avatar;
     if (it.kind === 'door') { const door = this.doors.find(d => d.id === it.id); door.opening = true; this.emit('door-opening', { door: door.id }); return; }
     if (it.kind === 'gate') { const g = this.gates.find(x => x.id === it.id); g.opening = true; this.emit('gate-opening', { gate: g.id }); return; }
+    if (it.kind === 'record') { Object.assign(this.recorder, { state: 'armed', carrier: av.carrier, trip: this.recorder.trip + 1 }); this.emit('record-armed', { trip: this.recorder.trip }); return; }
     if (it.kind === 'enter' || it.kind === 'back' || it.kind === 'board') return;
     if (it.kind === 'drop') {
       const b = av.holding; av.holding = null; b.heldBy = null; b.bellRungThisFlight = false;

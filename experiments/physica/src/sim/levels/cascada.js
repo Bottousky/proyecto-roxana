@@ -34,7 +34,8 @@ export const CALLE = { x0: 9.75, x1: 12.35, z1: BARRIO.z0, z0: -36.0 };
 // south side and a cable car running east–west on the track beside it, between two stops.
 export const AVENIDA = { x0: -4, x1: 24, andenZ0: -40.2, andenZ1: -35.5, z0: -44.6 };
 // (its stops at round readings of the kerb, which counts metres from the platform's west end: 5 and 20)
-export const CARRO = { id: 'carro', len: 3.6, z0: -42.6, z1: AVENIDA.andenZ0, y: TERRACE_Y, h: 0.5, stops: [AVENIDA.x0 + 5, AVENIDA.x0 + 20], speed: 1.5, ramp: 0.5, dwell: 6 };
+// (kerb0: where the kerb's metres count from, for the recorder's chalk record)
+export const CARRO = { id: 'carro', len: 3.6, z0: -42.6, z1: AVENIDA.andenZ0, y: TERRACE_Y, h: 0.5, stops: [AVENIDA.x0 + 5, AVENIDA.x0 + 20], speed: 1.5, ramp: 0.5, dwell: 6, kerb0: AVENIDA.x0 };
 // Two neighbours: one sits on the fountain's rim facing the passage, one stands at an east door.
 // (the sitting one on the south-west of the rim, facing out: off the jet seen from the passage)
 export const VECINOS = { sentada: { x: FUENTE.x - 1.15, z: FUENTE.z + 1.15, facing: -Math.PI / 4 }, parado: { x: BARRIO.x1 - 0.6, z: -17.6 } };

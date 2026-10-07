@@ -90,6 +90,10 @@ export class Sound {
       case 'gate-open': this.blip({ freq: 230, to: 160, dur: 0.15, type: 'square', gain: 0.05, noise: 0.4, filter: 2500 }); break;
       case 'carrier-warn': [0, 0.22].forEach(d => setTimeout(() => [1046, 2093].forEach((f, i) => this.blip({ freq: f, dur: 0.7 - i * 0.3, type: 'sine', gain: 0.09 / (i + 1) })), d * 1000)); break;
       case 'carrier-start': this.blip({ freq: 110, to: 170, dur: 0.5, type: 'sawtooth', gain: 0.04, noise: 0.5, filter: 900 }); break;
+      case 'record-armed': this.blip({ freq: 880, to: 1320, dur: 0.12, type: 'triangle', gain: 0.06 }); break;
+      case 'record-mark': this.blip({ freq: 2400, dur: 0.03, type: 'square', gain: 0.02, noise: 0.2, filter: 6000 }); break;
+      case 'record-start': this.blip({ freq: 1320, dur: 0.06, type: 'triangle', gain: 0.05 }); break;
+      case 'record-done': this.blip(e.aborted ? { freq: 300, to: 180, dur: 0.25, type: 'square', gain: 0.04 } : { freq: 1320, to: 880, dur: 0.2, type: 'triangle', gain: 0.06 }); break;
       case 'carrier-stop': this.blip({ freq: 1400, to: 900, dur: 0.35, type: 'triangle', gain: 0.025, noise: 0.3, filter: 5000 }); break;
     }
   }

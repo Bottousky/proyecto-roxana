@@ -94,6 +94,8 @@ test('in the street, over the Pozo\'s x, the Pozo\'s chain is not offered (it ha
 test('on the car the way off is named while it waits, not while it runs', () => {
   const w = at(CARRO.stops[0], -41.4), k = car(w);
   run(w, 0.3, { x: 0, y: 0 });
+  assert.equal(w.interactables()[0]?.verb, 'Registrar el viaje', 'first, the recorder can be set');
+  press(w); // set it
   assert.equal(w.interactables()[0]?.verb, 'Bajar del carro');
   run(w, CARRO.dwell + 1.5);
   assert.equal(k.phase, 'marcha'); assert.ok(!w.interactables().some(i => i.kind === 'back'));

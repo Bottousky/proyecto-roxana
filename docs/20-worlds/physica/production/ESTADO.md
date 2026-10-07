@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-07 · iteración 16 (la parada del carro de cable; B3 «Introducción» en curso; ver `evidence/iter-16`).
+**Actualizado:** 2026-10-07 · iteración 17 (el registrador del carro: dos registros del mismo viaje; B3 en curso; ver `evidence/iter-17`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,26 @@
 
 ## Hito actual: B (primer episodio), en curso. El A espera la evaluación humana (`EVALUACION-HITO-A.md`)
 
-**Último cambio aceptado (iteración 16, Hito B · B3 en curso):** la parada del carro de cable (D21).
+**Último cambio aceptado (iteración 17, Hito B · B3 en curso):** el registrador del carro (D22).
+- **Qué hace:** cada 0,5 s marca dónde está el explorador en dos registros a la vez:
+  - tiza en el cordón del andén;
+  - tinta en la cinta del carro;
+  - más la muesca del carro en el cordón.
+
+  La marca n tiene el mismo color en los tres.
+- **Lo que se lee en el mundo:**
+  - parado, la tiza queda espaciada y la tinta en un lugar;
+  - caminando contra la marcha, al revés: la tiza quieta (×4) y la tinta avanzando.
+- **La Bitácora:** escribe cada viaje con sus números. La suma (Δandén = Δcarro + Δsobre el carro) y el signo (hacia el oeste) se explican la primera vez que aparecen.
+- **Evidencia:**
+  - 95 pruebas, una de ellas no tautológica, contra las velocidades;
+  - la secuencia con teclas;
+  - el recorrido completo con el registrador.
+- **Revisión independiente en dos pasadas:** encontró el registro borrado al armar, la suma que sólo existía en el texto, el corte que no se detenía y el emparejamiento sobreafirmado. Todo corregido.
+
+  Ver `evidence/iter-17`.
+
+**Iteración 16 (Hito B · B3 en curso):** la parada del carro de cable (D21).
 - **El lugar:** detrás de la reja de la plaza, una avenida con andén.
   - El carro corre a velocidad constante entre dos paradas.
   - El impulso lo da un cable que se ve correr, movido por la rueda de una casa de máquinas.
@@ -219,19 +238,21 @@
 
 El loop no se detiene: según el contrato, al cerrar un hito se sigue con el próximo, y esas validaciones quedan pedidas.
 
-**Próximo resultado: medir el mismo movimiento desde dos referencias (B3).**
-- **El jalón:** un cuerpo que el explorador lleva y planta, en el andén o sobre el carro. El carro lo lleva.
-- **Dos registros físicos y simultáneos:**
-  - **cuáles:** tiza en el suelo (marcas fijas en el andén) y una cinta en el carro (marcas que viajan con él);
-  - **primero:** la linterna del carro;
-  - **después, el caso que no es trivial:** el explorador caminando sobre el carro en marcha, donde los desplazamientos se suman o se restan.
-- **La Bitácora:**
-  - posiciones y desplazamientos respecto de cada jalón, con signo (el tramo oeste da negativo);
-  - dice que las dos descripciones son correctas.
+**Próximo resultado: el jalón y un encargo que exija predecir (B3).**
+- **El jalón:**
+  - una vara que el explorador lleva y planta, en el andén o sobre el carro;
+  - las lecturas se toman también desde él;
+  - mover el origen cambia las posiciones y no los desplazamientos.
+- **Un encargo de un vecino en la parada:** por ejemplo, «que tu última tiza quede en mi jalón».
+  - Pide elegir dónde pararse en la cinta antes de salir: la posición en el carro más la del carro.
+  - Falla sin castigo y se reintenta.
+- **La vista en tabla** de los dos registros: marca, t, cordón, cinta.
 - **Criterio:**
-  - con teclado, el mismo viaje medido desde las dos referencias, con números distintos y correctos;
-  - pruebas de la cinemática relativa;
-  - una revisión independiente que lo lea como problema, no como texto.
+  - con teclado, el encargo se cumple con una predicción y falla con otra;
+  - pruebas;
+  - una revisión que lo lea como problema.
+
+*Plan cumplido en la iteración 17:* dos registros físicos del mismo viaje, el caso caminando y el signo.
 
 *Plan cumplido en la iteración 16:* la base de «Introducción»: la avenida, el carro y el marco de la velocidad.
 

@@ -36,12 +36,17 @@ Los nombres de escenas son propuestas; los resultados educativos son los del con
     - lo que va sobre el carro (el explorador, las esferas) viaja con él, con la velocidad del carro al dejarlo (el marco de la velocidad, D21);
     - las referencias en el suelo (cordón marcado cada metro) y en el carro (su regla);
     - el viaje con teclas.
-  - **Falta (en orden, según la revisión de la iteración 16):**
-    - el jalón, como cuerpo que el carro también lleva; las lecturas se toman respecto de él;
-    - dos registros físicos y simultáneos, no un modo de dibujo: tiza en el suelo y cinta en el carro. Primero la linterna; después el caso que no es trivial, el explorador caminando sobre el carro en marcha, donde los desplazamientos se suman o se restan;
-    - el tramo hacia el oeste, con el desplazamiento negativo: los vectores, y la distancia frente al desplazamiento;
-    - las notas de la Bitácora, con dos tablas;
-    - el encargo que depende del marco y la transferencia del bote.
+  - **Hecho en la iteración 17 (D22):** el registrador del carro.
+    - Dos registros físicos y simultáneos: tiza en el cordón y tinta en la cinta del carro, más la muesca del carro, emparejados por color.
+    - El caso que no es trivial: caminar sobre el carro en marcha. Contra la marcha, la tiza se queda quieta y la tinta avanza.
+    - El desplazamiento negativo hacia el oeste.
+    - Las notas de la Bitácora, con los números de cada viaje.
+  - **Falta, en orden:**
+    - **el jalón:** mover el origen cambia las posiciones, no los desplazamientos;
+    - **un encargo que exija predecir en un marco;**
+    - **la vista en tabla:** marca, t, cordón, cinta;
+    - **una persona en el andén** como segundo observador;
+    - **la transferencia del bote.**
 
 ## 2. MRU
 - **Concepto:** a intervalos iguales, distancias iguales; velocidad = distancia / tiempo.

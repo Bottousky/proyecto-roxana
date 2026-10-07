@@ -1,0 +1,536 @@
+{
+ "frames": [
+  {
+   "label": "a bordo: «E Registrar el viaje»",
+   "t": 3.52,
+   "x": 1,
+   "z": -40.78,
+   "on": "carro",
+   "car": 1,
+   "phase": "parada",
+   "rec": "off",
+   "marks": 0,
+   "prompt": "E Registrar el viaje",
+   "file": "00.png"
+  },
+  {
+   "label": "registrador listo (luz ámbar)",
+   "t": 3.89,
+   "x": 1,
+   "z": -40.79,
+   "on": "carro",
+   "car": 1,
+   "phase": "parada",
+   "rec": "armed",
+   "marks": 0,
+   "prompt": "▼ Bajar del carro",
+   "file": "01.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 7.22,
+   "x": 2.46,
+   "z": -40.8,
+   "on": "carro",
+   "car": 2.46,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 3,
+   "prompt": null,
+   "file": "02.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 8.29,
+   "x": 4.06,
+   "z": -40.8,
+   "on": "carro",
+   "car": 4.06,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 5,
+   "prompt": null,
+   "file": "03.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 9.36,
+   "x": 5.66,
+   "z": -40.8,
+   "on": "carro",
+   "car": 5.66,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 7,
+   "prompt": null,
+   "file": "04.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 10.43,
+   "x": 7.26,
+   "z": -40.8,
+   "on": "carro",
+   "car": 7.26,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 9,
+   "prompt": null,
+   "file": "05.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 11.49,
+   "x": 8.86,
+   "z": -40.8,
+   "on": "carro",
+   "car": 8.86,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 11,
+   "prompt": null,
+   "file": "06.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 12.56,
+   "x": 10.46,
+   "z": -40.8,
+   "on": "carro",
+   "car": 10.46,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 14,
+   "prompt": null,
+   "file": "07.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 13.63,
+   "x": 12.06,
+   "z": -40.8,
+   "on": "carro",
+   "car": 12.06,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 16,
+   "prompt": null,
+   "file": "08.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 14.69,
+   "x": 13.66,
+   "z": -40.8,
+   "on": "carro",
+   "car": 13.66,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 18,
+   "prompt": null,
+   "file": "09.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 15.76,
+   "x": 15.26,
+   "z": -40.8,
+   "on": "carro",
+   "car": 15.26,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 20,
+   "prompt": null,
+   "file": "10.png"
+  },
+  {
+   "label": "viaje registrado, parado",
+   "t": 16.82,
+   "x": 16,
+   "z": -40.8,
+   "on": "carro",
+   "car": 16,
+   "phase": "parada",
+   "rec": "done",
+   "marks": 22,
+   "prompt": "E Registrar el viaje",
+   "file": "11.png"
+  },
+  {
+   "label": "llegada: la tinta en un lugar, la tiza a lo largo del cordón",
+   "t": 17.06,
+   "x": 16,
+   "z": -40.8,
+   "on": "carro",
+   "car": 16,
+   "phase": "parada",
+   "rec": "done",
+   "marks": 22,
+   "prompt": "E Registrar el viaje",
+   "file": "12.png"
+  },
+  {
+   "label": "registrar la vuelta (el registro anterior sigue a la vista)",
+   "t": 18.02,
+   "x": 16,
+   "z": -40.8,
+   "on": "carro",
+   "car": 16,
+   "phase": "parada",
+   "rec": "armed",
+   "marks": 22,
+   "prompt": "▼ Bajar del carro",
+   "file": "13.png"
+  },
+  {
+   "label": "vuelta, antes de caminar",
+   "t": 25.18,
+   "x": 10.89,
+   "z": -40.8,
+   "on": "carro",
+   "car": 12.37,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 6,
+   "prompt": null,
+   "file": "14.png"
+  },
+  {
+   "label": "▶ caminando contra la marcha",
+   "t": 26.14,
+   "x": 10.73,
+   "z": -40.8,
+   "on": "carro",
+   "car": 10.92,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 8,
+   "prompt": null,
+   "file": "15.png"
+  },
+  {
+   "label": "▶ caminando contra la marcha",
+   "t": 27.11,
+   "x": 10.73,
+   "z": -40.8,
+   "on": "carro",
+   "car": 9.47,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 10,
+   "prompt": null,
+   "file": "16.png"
+  },
+  {
+   "label": "vuelta registrada",
+   "t": 28.18,
+   "x": 9.29,
+   "z": -40.8,
+   "on": "carro",
+   "car": 7.88,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 12,
+   "prompt": null,
+   "file": "17.png"
+  },
+  {
+   "label": "vuelta registrada",
+   "t": 29.24,
+   "x": 7.69,
+   "z": -40.8,
+   "on": "carro",
+   "car": 6.28,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 14,
+   "prompt": null,
+   "file": "18.png"
+  },
+  {
+   "label": "vuelta registrada",
+   "t": 30.31,
+   "x": 6.09,
+   "z": -40.8,
+   "on": "carro",
+   "car": 4.68,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 16,
+   "prompt": null,
+   "file": "19.png"
+  },
+  {
+   "label": "vuelta registrada",
+   "t": 31.38,
+   "x": 4.49,
+   "z": -40.8,
+   "on": "carro",
+   "car": 3.08,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 18,
+   "prompt": null,
+   "file": "20.png"
+  },
+  {
+   "label": "vuelta registrada",
+   "t": 32.44,
+   "x": 2.89,
+   "z": -40.8,
+   "on": "carro",
+   "car": 1.48,
+   "phase": "marcha",
+   "rec": "on",
+   "marks": 20,
+   "prompt": null,
+   "file": "21.png"
+  },
+  {
+   "label": "vuelta registrada",
+   "t": 33.51,
+   "x": 2.41,
+   "z": -40.8,
+   "on": "carro",
+   "car": 1,
+   "phase": "parada",
+   "rec": "done",
+   "marks": 22,
+   "prompt": "E Registrar el viaje",
+   "file": "22.png"
+  },
+  {
+   "label": "llegada de la vuelta: la tinta corrida, la tiza",
+   "t": 34.14,
+   "x": 2.41,
+   "z": -40.8,
+   "on": "carro",
+   "car": 1,
+   "phase": "parada",
+   "rec": "done",
+   "marks": 22,
+   "prompt": "E Registrar el viaje",
+   "file": "23.png"
+  },
+  {
+   "label": "la Bitácora",
+   "t": 35.01,
+   "x": 2.41,
+   "z": -40.8,
+   "on": "carro",
+   "car": 1,
+   "phase": "parada",
+   "rec": "done",
+   "marks": 22,
+   "prompt": null,
+   "file": "24.png"
+  },
+  {
+   "label": "▶ por el andén: la tiza en el cordón",
+   "t": 37.38,
+   "x": 5.71,
+   "z": -39.95,
+   "on": "anden",
+   "car": 1,
+   "phase": "parada",
+   "rec": "done",
+   "marks": 22,
+   "prompt": "▼ Volver",
+   "file": "25.png"
+  },
+  {
+   "label": "▶ por el andén: la tiza en el cordón",
+   "t": 39.09,
+   "x": 10.21,
+   "z": -39.95,
+   "on": "anden",
+   "car": 1.01,
+   "phase": "arranca",
+   "rec": "done",
+   "marks": 22,
+   "prompt": "▼ Volver",
+   "file": "26.png"
+  }
+ ],
+ "lastRecord": {
+  "state": "done",
+  "carrier": {
+   "id": "carro",
+   "len": 3.6,
+   "z0": -42.6,
+   "z1": -40.2,
+   "y": 4.4,
+   "h": 0.5,
+   "stops": [
+    1,
+    16
+   ],
+   "speed": 1.5,
+   "ramp": 0.5,
+   "dwell": 6,
+   "kerb0": -4,
+   "x": 1.0234375000000353,
+   "v": 0.37500000000028244,
+   "dx": 0.003020833333335915,
+   "leg": 2,
+   "t": 6.125000000000094,
+   "phase": "arranca",
+   "solid": {
+    "id": "carro",
+    "x0": -0.7765624999999647,
+    "x1": 2.8234375000000353,
+    "y0": 3.9000000000000004,
+    "y1": 4.4,
+    "z0": -42.6,
+    "z1": -40.2,
+    "friction": 0.6,
+    "carrier": "carro"
+   },
+   "px": 1.0204166666666994
+  },
+  "marks": [
+   {
+    "t": 0,
+    "g": 18.510694444444525,
+    "c": 0.31069444444452543,
+    "k": 20
+   },
+   {
+    "t": 0.5,
+    "g": 18.135694444444354,
+    "c": 0.31069444444452543,
+    "k": 19.62499999999983
+   },
+   {
+    "t": 1,
+    "g": 17.38569444444432,
+    "c": 0.31069444444452543,
+    "k": 18.874999999999794
+   },
+   {
+    "t": 1.5,
+    "g": 16.635694444444283,
+    "c": 0.31069444444452543,
+    "k": 18.12499999999976
+   },
+   {
+    "t": 2,
+    "g": 15.885694444444244,
+    "c": 0.31069444444452543,
+    "k": 17.37499999999972
+   },
+   {
+    "t": 2.5,
+    "g": 15.135694444444287,
+    "c": 0.31069444444452543,
+    "k": 16.624999999999762
+   },
+   {
+    "t": 3,
+    "g": 14.734444444444314,
+    "c": 0.6594444444445102,
+    "k": 15.874999999999805
+   },
+   {
+    "t": 3.5,
+    "g": 14.734444444444314,
+    "c": 1.4094444444444676,
+    "k": 15.124999999999847
+   },
+   {
+    "t": 4,
+    "g": 14.734444444444314,
+    "c": 2.159444444444425,
+    "k": 14.37499999999989
+   },
+   {
+    "t": 4.5,
+    "g": 14.734444444444314,
+    "c": 2.9094444444443814,
+    "k": 13.624999999999932
+   },
+   {
+    "t": 5,
+    "g": 14.285694444444344,
+    "c": 3.2106944444443686,
+    "k": 12.874999999999975
+   },
+   {
+    "t": 5.5,
+    "g": 13.535694444444387,
+    "c": 3.2106944444443686,
+    "k": 12.125000000000018
+   },
+   {
+    "t": 6,
+    "g": 12.78569444444443,
+    "c": 3.2106944444443686,
+    "k": 11.37500000000006
+   },
+   {
+    "t": 6.5,
+    "g": 12.035694444444472,
+    "c": 3.2106944444443686,
+    "k": 10.625000000000103
+   },
+   {
+    "t": 7,
+    "g": 11.285694444444514,
+    "c": 3.2106944444443686,
+    "k": 9.875000000000146
+   },
+   {
+    "t": 7.5,
+    "g": 10.535694444444557,
+    "c": 3.2106944444443686,
+    "k": 9.125000000000188
+   },
+   {
+    "t": 8,
+    "g": 9.7856944444446,
+    "c": 3.2106944444443686,
+    "k": 8.375000000000231
+   },
+   {
+    "t": 8.5,
+    "g": 9.035694444444642,
+    "c": 3.2106944444443686,
+    "k": 7.625000000000274
+   },
+   {
+    "t": 9,
+    "g": 8.285694444444685,
+    "c": 3.2106944444443686,
+    "k": 6.875000000000316
+   },
+   {
+    "t": 9.5,
+    "g": 7.535694444444728,
+    "c": 3.2106944444443686,
+    "k": 6.125000000000359
+   },
+   {
+    "t": 10,
+    "g": 6.78569444444477,
+    "c": 3.2106944444443686,
+    "k": 5.3750000000004015
+   },
+   {
+    "t": 10.508333333333333,
+    "g": 6.410694444444369,
+    "c": 3.2106944444443686,
+    "k": 5
+   }
+  ],
+  "trip": 2,
+  "startStep": 2700,
+  "lastStep": 3961,
+  "version": 46
+ },
+ "journal": [
+  "barrio",
+  "registro",
+  "registro-caminando"
+ ],
+ "errors": []
+}

@@ -323,15 +323,20 @@ await page.evaluate(() => window.__physica.inspect(null));
   for (let i = 0; i < 300; i++) { const c = await carS(); if (c.phase === 'parada' && Math.abs(c.car - stop) < 0.01) break; await sleep(100); }
   await holdUntil('ArrowUp', async () => (await carS()).on === 'carro', 4);
   const boarded = await carS();
+  await sleep(400);
+  const recOffered = (await carS()).it;
+  await page.keyboard.press('e'); await sleep(300); // the recorder, for this trip
+  const recArmed = await page.evaluate(() => window.__physica.world.recorder.state);
   for (let i = 0; i < 400; i++) { if ((await carS()).phase !== 'parada') break; await sleep(100); }
   for (let i = 0; i < 400; i++) { const c = await carS(); if (c.phase === 'parada') break; await sleep(100); }
   const arrived = await carS();
+  const record = await page.evaluate(() => { const r = window.__physica.world.recorder, m = r.marks; return { state: r.state, marks: m.length, dGround: +(m.at(-1).g - m[0].g).toFixed(3), dCar: +(m.at(-1).c - m[0].c).toFixed(3), noted: window.__physica.state().journal.includes('registro') }; });
   save(join(out, '14-a-bordo-del-carro.png'), await snap('14-a-bordo-del-carro'));
   await holdUntil('ArrowDown', async () => (await carS()).on === 'anden', 3);
   const off = await carS();
   await holdUntil('ArrowDown', async () => (await depth()).z > -21, 20); // up the street (▼ is funnelled to it)
   const inSquare = await depth();
-  step('calle y carro', { gateOffered, gateOpen, stop, boarded: { on: boarded.on, car: +boarded.car.toFixed(2) }, arrived: { on: arrived.on, car: +arrived.car.toFixed(2), carried: +(arrived.x - boarded.x).toFixed(2) }, off: { on: off.on, x: +off.x.toFixed(2) }, backInSquare: { z: +inSquare.z.toFixed(2), on: inSquare.on } });
+  step('calle y carro', { gateOffered, gateOpen, stop, recorder: { offered: recOffered, armed: recArmed, ...record }, boarded: { on: boarded.on, car: +boarded.car.toFixed(2) }, arrived: { on: arrived.on, car: +arrived.car.toFixed(2), carried: +(arrived.x - boarded.x).toFixed(2) }, off: { on: off.on, x: +off.x.toFixed(2) }, backInSquare: { z: +inSquare.z.toFixed(2), on: inSquare.on } });
   const back = await holdUntil('ArrowDown', async () => (await depth()).z === 0, 20);
   const after = await depth();
   step('arco y barrio', { citySeen: before.citySeen, opened, entered, inside: { z: +inside.z.toFixed(2), on: inside.on }, plaza: { offered, ...plaza, noted: plaza.journal.includes('plaza') }, back, after: { x: +after.x.toFixed(2), z: after.z, on: after.on } });

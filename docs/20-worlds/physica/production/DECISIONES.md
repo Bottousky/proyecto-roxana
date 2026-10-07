@@ -476,3 +476,44 @@ El contrato (§7) pide movimiento reducido, texto legible y controles enseñados
 - un viaje en el carro con teclas.
 
 El jalón, las marcas en cada marco y las notas vienen después.
+
+## D22 · El registrador del carro: dos registros físicos del mismo viaje (iteración 17, Hito B · B3)
+
+**El pedido.** Medir el mismo movimiento desde dos referencias, sin que «el marco» sea un modo de dibujo (revisión de la iteración 16).
+
+**El aparato.** El carro lleva un registrador de relojería.
+- **Cómo se arma:** a bordo, con el carro en una parada, «E Registrar el viaje».
+- **Qué hace:** cuando el carro arranca, el registrador marca cada 0,5 s, y una vez más al llegar, dónde está el explorador en dos registros a la vez:
+  - **tiza en el cordón del andén:** la marca queda en el suelo. Su lectura es la posición respecto del cero del cordón, en el extremo oeste del andén;
+  - **tinta en la cinta del carro:** la marca viaja con el carro. Su lectura es la posición respecto del cero de la cinta, en el extremo oeste del carro.
+- **Las marcas de tinta que coinciden** se apilan a lo ancho de la cinta: se ven como una columna de marcas en un mismo lugar, no como una sola.
+- **Si el explorador baja durante el viaje,** el registro se corta (luz roja).
+
+**Tres viajes que cuentan algo distinto:**
+- **Parado sobre el carro:**
+  - las marcas de tiza quedan espaciadas (0,75 m cada 0,5 s en marcha) y las de tinta, todas en el mismo lugar;
+  - en el andén, el explorador se desplazó 15 m; en el carro, 0 m. Es el mismo viaje.
+- **Caminando sobre el carro en marcha,** el caso que no es trivial:
+  - en la cinta, el explorador se desplaza respecto del carro; en el cordón, se suman el carro y su caminata (o se restan, si camina hacia atrás);
+  - la Bitácora lo dice con los números medidos: Δ en el andén = Δ del carro + Δ sobre el carro.
+- **Hacia el oeste:** las lecturas del cordón bajan y el desplazamiento es negativo.
+  - La distancia es su valor absoluto; el signo dice hacia dónde.
+  - Ahí entran los vectores en una dimensión.
+
+**Ajustado después de la revisión (la suma tiene que verse en el mundo, no sólo en la Bitácora):**
+- **Una tercera huella:** en cada marca, el carro deja su propia muesca en el cordón, un triángulo terracota en su extremo oeste, que es el cero de la cinta. De la muesca a la tiza hay exactamente la lectura de la cinta: la suma se ve marca por marca.
+- **Las marcas se emparejan por color:** la marca n tiene el mismo color en los tres registros (tiza, tinta y muesca), en un ciclo de seis colores (3 s). Un hilo del mismo color une cada muesca con su tiza: su largo es la lectura de la cinta. Al principio alternaban sólo dos colores; eso daba la paridad, no el emparejamiento.
+- **A bordo, el explorador camina con cuidado,** a media marcha (1,5 m/s, la velocidad del carro): ayuda declarada.
+  - Caminando contra la marcha, la tiza se apila en un lugar y la tinta se reparte 0,75 m por marca. Es el espejo del viaje parado.
+  - Varias marcas iguales llevan su cuenta (×N), en la cinta y en el cordón.
+- **Los dos ceros están rotulados.** La cinta tiene el largo completo del carro: su cero es su extremo oeste.
+- **No se duplica la marca de llegada.**
+
+**Lo que no hace.**
+- No elige un marco para dibujar: los dos registros existen a la vez. El registro queda hasta que arranca el próximo viaje registrado; armar el registrador no lo borra.
+- No se guarda al recargar, igual que las trazas.
+- Un registro cortado (el explorador bajó durante el viaje) queda cortado, sin nota, aunque el explorador vuelva a subir: no se reanuda ni se cierra después.
+- **La media marcha a bordo es una ayuda de diseño:** fabrica el caso «tiza quieta». La nota lo dice: «caminabas tan rápido como el carro, al revés».
+- Las notas no explican antes de medir: se escriben con los números de cada viaje.
+
+**Después:** el jalón (un cero que coloca el jugador) y el encargo que depende del marco.

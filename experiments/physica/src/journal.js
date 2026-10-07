@@ -6,6 +6,8 @@ import { FUENTE, TERRACE_Y } from './sim/levels/cascada.js';
 
 const KEY = 'physica.v2';   // v1 saved positions belong to the earlier geometry
 const fmt = (v, d = 1) => v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+/** A displacement with its sign (the true minus sign): +15,0 · −3,2 · 0,0. */
+const sgn = (v, d = 1) => (v >= 0.05 ? '+' : v <= -0.05 ? '−' : '') + fmt(Math.abs(v) < 0.05 ? 0 : Math.abs(v), d);
 
 /** Height where a rising trace stops accelerating upward: its second differences change sign. */
 export function boundaryFromMarks(marks) {
@@ -70,6 +72,34 @@ export class Journal {
 
   onEvent(e) {
     const w = this.world;
+    // The car's recorder (D22): two records of one trip, written with that trip's numbers. A note is
+    // composed per trip: the first one says what the two records are; the sum (walking on the car) and
+    // the sign (westward) are explained the first time they appear, in whichever note that is.
+    if (e.type === 'record-done' && !e.aborted && e.marks.length >= 2) {
+      const m0 = e.marks[0], m1 = e.marks.at(-1), T = m1.t - m0.t, n = e.marks.length;
+      // (rounded as shown, from the rounded readings: the sum adds up and so do the readings)
+      const r1 = v => Math.round(v * 10) / 10, G0 = r1(m0.g), G1 = r1(m1.g), C0 = r1(m0.c), DG = r1(G1 - G0), DK = r1(m1.k - m0.k), DC = r1(DG - DK), C1 = r1(C0 + DC);
+      const walked = Math.abs(m1.c - m0.c) >= 0.5 || e.marks.some(m => Math.abs(m.c - m0.c) >= 0.5), west = DK < 0;
+      const sameInk = e.marks.every(m => Math.abs(m.c - m0.c) < 0.05);
+      const data = { g0: m0.g, g1: m1.g, c0: m0.c, c1: m1.c, dg: DG, dc: DC, dk: DK, T, n };
+      const sum = walked && !this.flags.sumSaid ? ` El desplazamiento respecto del andén es el del carro más el tuyo sobre el carro: ${sgn(DK)} + (${sgn(DC)}) = ${sgn(DK + DC)} m.` : '';
+      const sign = west && !this.flags.signSaid ? ` Hacia el oeste las lecturas del cordón bajan: el desplazamiento es negativo. La distancia recorrida fue ${fmt(Math.abs(DG))} m; el signo dice hacia dónde.` : '';
+      let id = null, title = '', body = '';
+      if (!this.has('registro')) {
+        id = 'registro'; title = 'Dos registros del mismo viaje';
+        body = `El registrador marcó cada 0,5 s dónde estabas, con tiza en el cordón del andén y con tinta en la cinta del carro: ${n} marcas en cada uno. En el cordón pasaste de ${fmt(G0)} m a ${fmt(G1)} m, un desplazamiento de ${sgn(DG)} m en ${fmt(T)} s. En la cinta, de ${fmt(C0)} m a ${fmt(C1)} m: ${sgn(DC)} m${sameInk ? ', todas las marcas en el mismo lugar' : ''}. Fue un solo viaje: las dos descripciones son correctas, cada una respecto de su regla.${sum}${sign}`;
+      } else if (sum && !this.has('registro-caminando')) {
+        id = 'registro-caminando'; title = 'Caminando sobre el carro';
+        // what shows most: marks that stayed in one place on the kerb (walking against the car at its speed)
+        const stay = e.marks.reduce((best, m, i) => Math.max(best, e.marks.filter((o, j) => j >= i && Math.abs(o.g - m.g) < 0.05).length), 0);
+        const still = stay >= 3 ? ` Durante ${fmt((stay - 1) * 0.5)} s ${stay} marcas de tiza quedaron en el mismo lugar del cordón: respecto del andén no te movías, mientras en la cinta avanzabas 0,75 m cada 0,5 s. Caminabas tan rápido como el carro, al revés.` : '';
+        body = `Esta vez caminaste sobre el carro mientras andaba. Respecto del carro te desplazaste ${sgn(DC)} m; el carro, ${sgn(DK)} m; y respecto del andén, ${sgn(DG)} m.${still}${sum}${sign}`;
+      } else if (sign && !this.has('registro-oeste')) {
+        id = 'registro-oeste'; title = 'Hacia el oeste';
+        body = `En el cordón pasaste de ${fmt(m0.g)} m a ${fmt(m1.g)} m, un desplazamiento de ${sgn(DG)} m.${sign}`;
+      }
+      if (id) { if (sum) this.flags.sumSaid = true; if (sign) this.flags.signSaid = true; this.add(id, title, body, data); }
+    }
     if (e.type === 'city-seen' && !this.has('arco')) this.add('arco', 'El arco tapiado',
       'Desde el Mirador se ve una ciudad, lejos, detrás del paisaje. En la Terraza, el muro del fondo tiene un arco tapiado con una palanca de latón: entre sus piedras pasa luz.');
     if (e.type === 'impact' && !this.has('caida')) {
