@@ -276,7 +276,21 @@ export const duplicar = {
     g.setHint(null);
     const od = overtakeDay(1, 10, 2);
     await d.say('student', 'Punto, al principio sumar diez gana. Duplicar empieza lento, pero cada día agrega todo lo que ya había. Desde el día ' + od + ' vas adelante, y cada día sacás más ventaja.');
-    await d.say('Mara', 'Entonces la redibujamos a tu manera. ¿Y de dónde sacás tanta tiza el día siete?');
+    // cualquier día: el renglón n de la tabla
+    await d.say('Mara', 'Y la mía, ¿cuántos escalones tiene el día n, cualquier día, sin hacer toda la tabla?');
+    const gen = await d.choose([
+      {id: 'ok', text: '1 + 10 · n: el primero, y diez por cada día.'},
+      {id: '10n', text: '10 · n: diez por día.'},
+      {id: '11n', text: '11 · n: el día 1 tenía 11.'},
+    ], {prompt: 'El día n, ¿cuántos escalones tiene la escalera de Mara?', evaluate: true});
+    d.evidence('race-general', {answer: gen});
+    await d.think(gen === 'ok' ? 'Con n = 3: 1 + 30 = 31, como en la tabla.' : gen === '10n' ? 'Con n = 3 daría 30, y la tabla dice 31: falta el primero, el del día 0.' : 'Con n = 2 daría 22, y la tabla dice 21: el 11 del día 1 ya incluye el primero.');
+    const rowN = (i, t, ch) => w.add(new Label(`dp-rn${i}`, t, colX[i] + (i === 2 ? 28 : 0), ty + 22 + 9 * 24, {size: i === 0 ? 20 : 16, z: 12, ch, reveal: 0}));
+    const nl = [rowN(0, 'n'), rowN(1, '1 + 10 · n'), rowN(2, '× 2 el anterior', YELLOW)];
+    for (const l of nl) await d.draw(l, 0.3, {key: 'reveal', sound: false});
+    d.describe('Abajo de la tabla, un renglón para cualquier día n: Mara, 1 + 10 · n; Punto, el doble del anterior.');
+    await d.say('student', 'Mara, a una lista que suma siempre lo mismo se le dice sucesión aritmética. La de Punto, que multiplica siempre por lo mismo, es geométrica.');
+    await d.say('Mara', 'Entonces la redibujamos a tu manera, Punto. ¿Y de dónde sacás tanta tiza el día siete?');
     g.audio.punto('question');
     d.evidence('race', {overtake: od, guess});
     g.flags.c7race = true;

@@ -1,0 +1,52 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c8.diagonal"
+  },
+  "journal": [
+    "Crecer"
+  ],
+  "evidenceKinds": [
+    "race-predict",
+    "race-day",
+    "race-general",
+    "race",
+    "pow-row",
+    "pow-zero",
+    "powers",
+    "pow-product",
+    "pow-power",
+    "pow-sum",
+    "cube-predict",
+    "cube-layer",
+    "cube",
+    "sci-compare",
+    "sci",
+    "expand-predict",
+    "expand",
+    "factor-try",
+    "factor",
+    "complete-predict",
+    "complete-other",
+    "complete-zero",
+    "complete-negative",
+    "complete",
+    "log-predict",
+    "log-step",
+    "log",
+    "rational-predict",
+    "rational-try",
+    "rational"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 59.632,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

@@ -63,7 +63,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | D6 | Sistemas 2 × 2 (cruce, paralelas, misma recta) | 2°–4° (rango del bloque) | 10.7 | probado-auto · revisado-mat (rev-mat-9) |
 | D7 | Variable y parámetro | 2°–4° (rango del bloque) | 12.2 (perillas) | probado-auto · revisado-mat |
 | D8 | Ecuación vs identidad (la que vale para cualquier x), nombrada cuando el truco de multiplicar por cero vuelve identidad una ecuación | 2°–4° (rango del bloque) | 6.4 | probado-auto (pendiente revisión matemática) |
-| D-gap | Patrones y generalización como tema propio | 2°–4° (rango del bloque) | — | pendiente (C6b) |
+| D9 | Generalización: el renglón «día n» de una tabla (1 + 10 · n), comprobado con la tabla | 2°–4° (rango del bloque) | 7.2 | probado-auto (pendiente revisión matemática) |
+| D-gap | Patrones y generalización como tema propio (más allá de 7.2 y 9.2) | 2°–4° (rango del bloque) | — | pendiente (C6b) |
 | E1 | Raíz como pregunta inversa del cuadrado | 1°–5° (rango del bloque) | 7.1 | probado-auto · revisado-mat (rev-mat-6) |
 | E2 | Crecimiento aditivo vs multiplicativo | 1°–5° (rango del bloque) | 7.2 | probado-auto · revisado-mat |
 | E3 | Potencias; exponente 0 y negativo por patrón | 1°–5° (rango del bloque) | 7.3 | probado-auto · revisado-mat |
@@ -74,7 +75,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | E7 | Logaritmo como pregunta inversa («¿cuántas veces?») | 1°–5° (rango del bloque) | 7.8; familia en 12.1 | probado-auto · revisado-mat |
 | E8 | Expresiones racionales: dónde no se puede | 1°–5° (rango del bloque) | 7.9 | probado-auto · revisado-mat |
 | E6b | Completar el cuadrado con una o ninguna solución; la raíz de (x + 1)² como distancia al cero | 1°–5° (rango del bloque) | 7.7 | probado-auto (pendiente revisión matemática) |
-| E-gap | Cociente de potencias y exponente fraccionario, sucesiones nombradas, simplificar racionales con su restricción | 1°–5° (rango del bloque) | — | pendiente (C7b) |
+| E2b | Sucesiones aritmética y geométrica, nombradas con la tabla de 7.2 | 1°–5° (rango del bloque) | 7.2 | probado-auto (pendiente revisión matemática) |
+| E-gap | Cociente de potencias y exponente fraccionario, simplificar racionales con su restricción | 1°–5° (rango del bloque) | — | pendiente (C7b) |
 | F1 | Ángulo como giro; suma de los ángulos de un triángulo | 1°–5° (rango del bloque) | 8.2 | probado-auto · revisado-mat (rev-mat-7) |
 | F2 | Congruencia vs semejanza | 1°–5° (rango del bloque) | 8.3 | probado-auto · revisado-mat |
 | F3 | Escala: longitudes × k, áreas × k², volúmenes × k³ | 1°–5° (rango del bloque) | 8.4 | probado-auto · revisado-mat |
