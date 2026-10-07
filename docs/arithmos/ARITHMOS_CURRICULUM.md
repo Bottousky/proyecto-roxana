@@ -62,7 +62,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | D5 | Orden de deshacer; incógnita a la derecha | 2°–4° (rango del bloque) | 6.8 | probado-auto · revisado-mat |
 | D6 | Sistemas 2 × 2 (cruce, paralelas, misma recta) | 2°–4° (rango del bloque) | 10.7 | probado-auto · revisado-mat (rev-mat-9) |
 | D7 | Variable y parámetro | 2°–4° (rango del bloque) | 12.2 (perillas) | probado-auto · revisado-mat |
-| D-gap | Identidad nombrada (vale para todo x); patrones y generalización como tema propio | 2°–4° (rango del bloque) | — | pendiente (C6b) |
+| D8 | Ecuación vs identidad (la que vale para cualquier x), nombrada cuando el truco de multiplicar por cero vuelve identidad una ecuación | 2°–4° (rango del bloque) | 6.4 | probado-auto (pendiente revisión matemática) |
+| D-gap | Patrones y generalización como tema propio | 2°–4° (rango del bloque) | — | pendiente (C6b) |
 | E1 | Raíz como pregunta inversa del cuadrado | 1°–5° (rango del bloque) | 7.1 | probado-auto · revisado-mat (rev-mat-6) |
 | E2 | Crecimiento aditivo vs multiplicativo | 1°–5° (rango del bloque) | 7.2 | probado-auto · revisado-mat |
 | E3 | Potencias; exponente 0 y negativo por patrón | 1°–5° (rango del bloque) | 7.3 | probado-auto · revisado-mat |

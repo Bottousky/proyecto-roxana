@@ -305,14 +305,15 @@
     },
     {
       "id": "C6b",
-      "title": "Sistemas de ecuaciones; identidad nombrada; ficha §5 de D en el currículo (pendientes de rev-mat-5 M9) — sistemas 2 × 2 como rectas que se cruzan, en el cap. 10 (10.7); identidad nombrada y ficha §5 de D siguen pendientes",
+      "title": "Sistemas de ecuaciones (10.7); identidad nombrada (6.4, ciclo 8); ficha §5 de D pendiente",
       "deps": [
         "C6"
       ],
       "acceptance": "Escena jugable con decisión y comprobación; revisión matemática",
       "status": "implementado",
       "evidence": [
-        "artifacts/arithmos/it09/c10-directa2/log.txt"
+        "artifacts/arithmos/it09/c10-directa2/log.txt",
+        "artifacts/arithmos/it11/c6z-directa/log.txt"
       ]
     },
     {
@@ -357,13 +358,17 @@
     },
     {
       "id": "C7b",
-      "title": "Cobertura de E pendiente (rev-mat-6 M7, M11): propiedades de las potencias, raíces de otro índice, √(x²) = |x|, sucesiones nombradas, completar el cuadrado con otro b y con una o ninguna solución, simplificar racionales con restricción",
+      "title": "Cobertura de E (rev-mat-6 M7, M11): hecho en 7.3b (ciclo 8) propiedades de las potencias y raíz cúbica; pendientes cociente de potencias y exponente fraccionario, √(x²) = |x|, sucesiones nombradas, completar el cuadrado con una o ninguna solución, simplificar racionales con restricción",
       "deps": [
         "C7"
       ],
       "acceptance": "Escena jugable con decisión; revisión matemática",
-      "status": "pendiente",
-      "evidence": []
+      "status": "en-curso",
+      "evidence": [
+        "artifacts/arithmos/it11/c7f-probe/log.txt",
+        "artifacts/arithmos/it11/c7j-errores/log.txt",
+        "artifacts/arithmos/it11/c7j2-tel/log.txt"
+      ]
     },
     {
       "id": "N7-R",
