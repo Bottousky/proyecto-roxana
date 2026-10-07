@@ -68,7 +68,7 @@ export const familias = {
       w.add(new Label(`c12-fl${idx}`, rule.name, c.x + c.w / 2, c.y + c.h + 14, {size: 14, align: 'center', z: 13, ch: YELLOW}));
       g.audio.tap(0.2, 1.2 + done.size * 0.08);
     }
-    await d.say('student', 'Mara, cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.');
+    await d.say('student', 'Mara, cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados del eje parado, y por eso se dice que son simétricas; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.');
     const hc = cells.findIndex(c => c.asym);
     if (hc >= 0) {
       const c = cells[hc];
