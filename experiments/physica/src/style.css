@@ -90,3 +90,9 @@ kbd { display: inline-grid; place-items: center; min-width: calc(22px * var(--ui
 .v-depth { display: none; }
 body.in-depth .v-path { display: none; }
 body.in-depth .v-depth { display: inline; }
+
+/* The trip's table in the Bitácora (D24): kerb = car's zero + tape, row by row. */
+.journal table.tabla { border-collapse: collapse; margin: 6px 0 4px; font-variant-numeric: tabular-nums; font-size: calc(13px * var(--ui)); }
+.journal table.tabla th { font-weight: 600; text-align: right; padding: 2px 6px; border-bottom: 1px solid rgba(42,26,18,.3); }
+.journal table.tabla td { text-align: right; padding: 1px 6px; }
+.journal table.tabla td:nth-child(3), .journal table.tabla td:nth-child(5), .journal table.tabla th:nth-child(3), .journal table.tabla th:nth-child(5) { opacity: .55; padding: 1px 2px; }

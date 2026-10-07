@@ -6,6 +6,46 @@ import { FUENTE, TERRACE_Y } from './sim/levels/cascada.js';
 
 const KEY = 'physica.v2';   // v1 saved positions belong to the earlier geometry
 const fmt = (v, d = 1) => v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+/**
+ * The readings shown for a recorded trip, one rule for the whole family (D24, after review): to the
+ * decimetre, rounding ties the same way every time (a still explorer sat exactly on 1,85 and the ramp
+ * put the car on x,x25 marks: plain rounding flickered with floating-point noise); the car's zero (Z) and
+ * the tape (C) are rounded, and the kerb is their sum (G = Z + C), so every shown number adds up — in
+ * the table, the notes, the bubbles and the errand alike.
+ */
+export const rnd = v => Math.round(v * 10 + 1e-6) / 10;
+export function lecturas(marks, half) {
+  return marks.map(m => { const Z = rnd(m.k - half), C = rnd(m.c); return { t: rnd(m.t), Z, C, G: rnd(Z + C) }; });
+}
+/** The shown reading of an errand try: where its last chalk is, and by how much it missed. */
+export function shownTry(t) { const G = rnd(rnd(t.zero) + rnd(t.c)); return { G, Z: rnd(t.zero), C: rnd(t.c), miss: rnd(G - t.target) }; }
+
+/** A recorded trip as a short table (D24): a row every 2 s and the arrival; t, kerb = car's zero + tape. */
+export function tripTable(marks, half) {
+  const L = lecturas(marks, half), rows = [];
+  L.forEach((r, i) => { if (i === L.length - 1 || Math.abs(r.t / 2 - Math.round(r.t / 2)) < 1e-6) rows.push({ t: r.t, g: r.G, z: r.Z, c: r.C }); });
+  return rows;
+}
+
+/**
+ * What each observer says about a recorded trip: the boy on the far pavement (the ground) and the
+ * passenger on the car. «No te moviste» only when every mark stayed in one place; having walked and come
+ * back is said as such (a displacement of 0 is not the same as not moving).
+ */
+export function describeTrip(marks, half) {
+  const L = lecturas(marks, half), a = L[0], b = L.at(-1), T = b.t - a.t;
+  const DG = rnd(b.G - a.G), DK = rnd(b.Z - a.Z), DC = rnd(b.C - a.C);
+  const stillInk = marks.every(m => Math.abs(m.c - marks[0].c) < 0.05), stillGround = marks.every(m => Math.abs(m.g - marks[0].g) < 0.05);
+  const dir = v => (v > 0 ? 'hacia el este' : 'hacia el oeste');
+  const anden = Math.abs(DG) < 0.05
+    ? (stillGround ? ['Desde la vereda: 0,0 m', 'no te moviste.'] : ['Desde la vereda: 0,0 m', 'te moviste, pero volviste', 'al mismo lugar.'])
+    : [`Desde la vereda: ${sgn(DG)} m`, `en ${fmt(T)} s, ${dir(DG)}.`, `El carro: ${sgn(DK)} m.`];
+  const carro = Math.abs(DC) < 0.05
+    ? (stillInk ? ['Desde el carro: 0,0 m', 'no te moviste.', `La vereda se fue ${fmt(Math.abs(DK))} m ${DK > 0 ? 'al oeste' : 'al este'}.`] : ['Desde el carro: 0,0 m', 'caminaste, pero terminaste', 'donde empezaste.'])
+    : [`Desde el carro: ${sgn(DC)} m`, `${dir(DC)}, por la cubierta.`];
+  return { anden, carro, DG, DK, DC, T };
+}
+
 /** A displacement with its sign (the true minus sign): +15,0 · −3,2 · 0,0. */
 const sgn = (v, d = 1) => (v >= 0.05 ? '+' : v <= -0.05 ? '−' : '') + fmt(Math.abs(v) < 0.05 ? 0 : Math.abs(v), d);
 
@@ -62,12 +102,13 @@ export class Journal {
   save() { try { localStorage.setItem(KEY, JSON.stringify({ notes: this.notes, flags: this.flags, footing: this.world.avatar.lastSupport || this.footing })); } catch { /* not persisted */ } }
 
   /** Adds a note, or rewrites it if it exists (a running record, like the errand's attempts). */
-  put(id, title, body, data = null) {
-    const n = this.notes.find(x => x.id === id);
-    if (!n) return this.add(id, title, body, data);
-    Object.assign(n, { title, body, data, at: Date.now() });
+  put(id, title, body, data = null, { quiet = false } = {}) {
+    const i = this.notes.findIndex(x => x.id === id);
+    if (i < 0 && !quiet) return this.add(id, title, body, data);
+    if (i >= 0) this.notes.splice(i, 1); // (rewritten notes move to the end: the latest)
+    this.notes.push({ id, title, body, data, at: Date.now() });
     this.save(); this.render(); this.onAdd?.(id);
-    this.toastEl.innerHTML = `<b>Bitácora</b> · ${title} <kbd>J</kbd>`; this.toastEl.hidden = false; this.toastT = 5;
+    if (!quiet) { this.toastEl.innerHTML = `<b>Bitácora</b> · ${title} <kbd>J</kbd>`; this.toastEl.hidden = false; this.toastT = 5; }
   }
 
   add(id, title, body, data = null) {
@@ -88,17 +129,18 @@ export class Journal {
       `En la parada este, una vecina clavó su jalón en el cordón del andén, en ${fmt(e.target)} m. Te pidió que la última marca de tiza de tu registrador, en un viaje hacia la parada este hecho quieto, quede al pie de su jalón (el recuadro en el cordón). El cartel de la parada este dice dónde se detiene ahí el cero de la cinta del carro.`, { target: e.target });
     if (e.type === 'errand-miss' || e.type === 'errand-walked' || e.type === 'errand-done') {
       const tries = (this.flags.errandTries ||= []);
-      tries.push({ round: e.round, g: e.g, miss: e.miss, still: e.still });
-      const line = (t, i) => `${i + 1}) ${t.still ? `tu última tiza en ${fmt(t.g, 1)} m: ${Math.abs(t.miss) <= 0.15 ? 'al pie del jalón' : `${t.miss < 0 ? 'faltaron' : 'sobraron'} ${fmt(Math.abs(t.miss), 1)} m`}` : 'caminaste durante el viaje: no cuenta'}`;
+      const sh = shownTry(e);
+      tries.push({ round: e.round, g: sh.G, miss: sh.miss, still: e.still, met: e.type === 'errand-done' });
+      const line = (t, i) => `${i + 1}) ${t.still ? `tu última tiza en ${fmt(t.g, 1)} m: ${t.met ? 'al pie del jalón' : `${t.miss < 0 ? 'faltaron' : 'sobraron'} ${fmt(Math.abs(t.miss), 1)} m`}` : 'caminaste durante el viaje: no cuenta'}`;
       const rounds = [...new Set(tries.map(t => t.round))];
       const body = rounds.map(r => { const ts = tries.filter(t => t.round === r).slice(-5); return `Jalón en ${fmt(this.world.level.encargo.targets[r])} m: ${ts.map(line).join('; ')}.`; }).join(' ');
       this.put('encargo-intentos', 'El encargo: los intentos', `${body} El carro siempre se detiene igual; lo que cambia es dónde vas parado en él.`, { tries });
     }
     if (e.type === 'errand-done') {
-      const sum = `${fmt(e.zero, 1)} + ${fmt(e.c, 1)} = ${fmt(e.zero + e.c, 1)} m`;
+      const sh = shownTry(e), sum = `${fmt(sh.Z)} + ${fmt(sh.C)} = ${fmt(sh.G)} m`;
       const id = e.round === 0 ? 'encargo-cumplido' : `encargo-cumplido-${e.round + 1}`;
       this.add(id, e.round === 0 ? 'El encargo, cumplido' : 'Otra vez, en otro lugar',
-        `Tu última tiza quedó en ${fmt(e.g, 1)} m del cordón, al pie del jalón de la vecina (${fmt(e.target)} m). Ibas parado en ${fmt(e.c, 1)} m de la cinta, y el cero de la cinta se detuvo en ${fmt(e.zero, 1)} m del cordón: ${sum}. Una posición en el andén es la posición del carro más la posición sobre el carro.${e.tries > 1 ? ` Lo lograste en el intento ${e.tries}.` : ''}${e.next !== undefined ? ` Cuando el carro salió, la vecina corrió su jalón a ${fmt(e.next)} m: «¿Y ahora?»` : ''}`, { g: e.g, c: e.c, zero: e.zero, tries: e.tries, round: e.round });
+        `Tu última tiza quedó en ${fmt(sh.G)} m del cordón, al pie del jalón de la vecina (${fmt(e.target)} m). Ibas parado en ${fmt(sh.C)} m de la cinta, y el cero de la cinta se detuvo en ${fmt(sh.Z)} m del cordón: ${sum}. Una posición en el andén es la posición del carro más la posición sobre el carro.${e.tries > 1 ? ` Lo lograste en el intento ${e.tries}.` : ''}${e.next !== undefined ? ` Cuando el carro salió, la vecina corrió su jalón a ${fmt(e.next)} m: «¿Y ahora?»` : ''}`, { g: e.g, c: e.c, zero: e.zero, tries: e.tries, round: e.round });
     }
     if (e.type === 'errand' || e.type === 'errand-miss' || e.type === 'errand-walked' || e.type === 'errand-done' || e.type === 'errand-moved') {
       const er = this.world.errand; this.flags.errand = { state: er.state, round: er.round, placed: er.placed, tries: er.tries.map(t => ({ ...t })) }; this.save();
@@ -107,9 +149,9 @@ export class Journal {
     // composed per trip: the first one says what the two records are; the sum (walking on the car) and
     // the sign (westward) are explained the first time they appear, in whichever note that is.
     if (e.type === 'record-done' && !e.aborted && e.marks.length >= 2) {
-      const m0 = e.marks[0], m1 = e.marks.at(-1), T = m1.t - m0.t, n = e.marks.length;
-      // (rounded as shown, from the rounded readings: the sum adds up and so do the readings)
-      const r1 = v => Math.round(v * 10) / 10, G0 = r1(m0.g), G1 = r1(m1.g), C0 = r1(m0.c), DG = r1(G1 - G0), DK = r1(m1.k - m0.k), DC = r1(DG - DK), C1 = r1(C0 + DC);
+      const m0 = e.marks[0], m1 = e.marks.at(-1), n = e.marks.length, half = e.half ?? 1.8;
+      // (the family's one rule for shown readings: lecturas)
+      const L = lecturas(e.marks, half), T = L.at(-1).t - L[0].t, G0 = L[0].G, G1 = L.at(-1).G, C0 = L[0].C, C1 = L.at(-1).C, DG = rnd(G1 - G0), DK = rnd(L.at(-1).Z - L[0].Z), DC = rnd(C1 - C0);
       const walked = Math.abs(m1.c - m0.c) >= 0.5 || e.marks.some(m => Math.abs(m.c - m0.c) >= 0.5), west = DK < 0;
       const sameInk = e.marks.every(m => Math.abs(m.c - m0.c) < 0.05);
       const data = { g0: m0.g, g1: m1.g, c0: m0.c, c1: m1.c, dg: DG, dc: DC, dk: DK, T, n };
@@ -127,19 +169,25 @@ export class Journal {
         body = `Esta vez caminaste sobre el carro mientras andaba. Respecto del carro te desplazaste ${sgn(DC)} m; el carro, ${sgn(DK)} m; y respecto del andén, ${sgn(DG)} m.${still}${sum}${sign}`;
       } else if (sign && !this.has('registro-oeste')) {
         id = 'registro-oeste'; title = 'Hacia el oeste';
-        body = `En el cordón pasaste de ${fmt(m0.g)} m a ${fmt(m1.g)} m, un desplazamiento de ${sgn(DG)} m.${sign}`;
+        body = `En el cordón pasaste de ${fmt(G0)} m a ${fmt(G1)} m, un desplazamiento de ${sgn(DG)} m.${sign}`;
       }
       if (id) { if (sum) this.flags.sumSaid = true; if (sign) this.flags.signSaid = true; this.add(id, title, body, data); }
+      // the latest recorded trip, always: its table and what the two observers said (D24); quiet when the
+      // trip already got its own note (its title is the one to show)
+      const d = describeTrip(e.marks, half);
+      this.put('registro-tabla', 'El último viaje registrado, en tabla',
+        `Lo que dijo el chico de la vereda de enfrente: «${d.anden.join(' ')}» Lo que dijo la pasajera: «${d.carro.join(' ')}» Los dos tienen razón: cada uno describe el viaje respecto de su lugar (la vereda y el andén son el mismo suelo). En cada fila de la tabla, la lectura del cordón es dónde está el cero del carro más la lectura de la cinta.`,
+        { table: tripTable(e.marks, half) }, { quiet: !!id });
     }
     // (after the trip's own note) Readings from the explorer's jalón (a third zero): positions change with the zero, displacements do not.
     if (e.type === 'record-done' && !e.aborted && e.jal && e.marks.length >= 2 && e.marks[0].j !== undefined) {
-      const m0 = e.marks[0], m1 = e.marks.at(-1), r1 = v => Math.round(v * 10) / 10;
-      // (displacements from the exact readings; the final position derived from them, so the shown numbers add up)
-      const J0 = r1(m0.j), DJ = r1(m1.j - m0.j), J1 = r1(J0 + DJ), DG = r1(m1.g - m0.g), DC = r1(m1.c - m0.c);
+      // (from the same shown readings: from the jalón = kerb − its reading on the kerb, or tape − its reading on the tape)
+      const L = lecturas(e.marks, e.half ?? 1.8), at = rnd(e.jal.at), car = e.jal.frame === 'carro';
+      const J0 = rnd((car ? L[0].C : L[0].G) - at), J1 = rnd((car ? L.at(-1).C : L.at(-1).G) - at), DJ = rnd(J1 - J0), DG = rnd(L.at(-1).G - L[0].G), DC = rnd(L.at(-1).C - L[0].C);
       if (e.jal.frame === 'anden' && !this.has('jalon-anden')) this.add('jalon-anden', 'Un cero que elegiste',
-        `Tu jalón estaba clavado en el andén, en ${fmt(e.jal.at)} m del cordón. Desde él pasaste de ${sgn(J0)} m a ${sgn(J1)} m: ${sgn(DJ)} m. En el cordón, el desplazamiento fue ${sgn(DG)} m: el mismo. Las posiciones son otras porque el cero está en otro lugar; el desplazamiento no depende de dónde pongas el cero.`, { J0, J1, DJ, DG });
+        `Tu jalón estaba clavado en el andén, en ${fmt(rnd(e.jal.at))} m del cordón. Desde él pasaste de ${sgn(J0)} m a ${sgn(J1)} m: ${sgn(DJ)} m. En el cordón, el desplazamiento fue ${sgn(DG)} m: el mismo. Las posiciones son otras porque el cero está en otro lugar; el desplazamiento no depende de dónde pongas el cero.`, { J0, J1, DJ, DG });
       if (e.jal.frame === 'carro' && !this.has('jalon-carro')) this.add('jalon-carro', 'Un cero que viaja',
-        `Tu jalón estaba clavado en el carro, en ${fmt(e.jal.at)} m de la cinta. Desde él pasaste de ${sgn(J0)} m a ${sgn(J1)} m: ${sgn(DJ)} m, el mismo desplazamiento que en la cinta (${sgn(DC)} m), no el del cordón (${sgn(DG)} m). El jalón viajaba con el carro: medir desde él es medir respecto del carro.`, { J0, J1, DJ, DC, DG });
+        `Tu jalón estaba clavado en el carro, en ${fmt(rnd(e.jal.at))} m de la cinta. Desde él pasaste de ${sgn(J0)} m a ${sgn(J1)} m: ${sgn(DJ)} m, el mismo desplazamiento que en la cinta (${sgn(DC)} m), no el del cordón (${sgn(DG)} m). El jalón viajaba con el carro: medir desde él es medir respecto del carro.`, { J0, J1, DJ, DC, DG });
     }
     if (e.type === 'city-seen' && !this.has('arco')) this.add('arco', 'El arco tapiado',
       'Desde el Mirador se ve una ciudad, lejos, detrás del paisaje. En la Terraza, el muro del fondo tiene un arco tapiado con una palanca de latón: entre sus piedras pasa luz.');
@@ -299,7 +347,8 @@ export class Journal {
   }
 
   render() {
-    const notes = this.notes.map(n => `<article><h3>${n.title}</h3><p>${n.body}</p>${n.data?.formula ? `<p class="formal">Si querés escribirlo: <code>${n.data.formula}</code>, con <i>a</i> distinta en cada lugar.</p>` : ''}</article>`).join('');
+    const table = rows => `<table class="tabla"><tr><th>t (s)</th><th>cordón (m)</th><th>=</th><th>dónde está el 0 del carro (m)</th><th>+</th><th>cinta (m)</th></tr>${rows.map(r => `<tr><td>${fmt(r.t)}</td><td>${fmt(r.g)}</td><td>=</td><td>${fmt(r.z)}</td><td>+</td><td>${fmt(r.c)}</td></tr>`).join('')}</table>`;
+    const notes = this.notes.map(n => `<article><h3>${n.title}</h3><p>${n.body}</p>${n.data?.table ? table(n.data.table) : ''}${n.data?.formula ? `<p class="formal">Si querés escribirlo: <code>${n.data.formula}</code>, con <i>a</i> distinta en cada lugar.</p>` : ''}</article>`).join('');
     this.panel.innerHTML = `<header><img class="portrait" alt="" src="${import.meta.env?.BASE_URL ?? './'}textures/explorer-portrait.png"><b>Bitácora</b><span>Physica · La cascada ascendente</span><button data-close aria-label="Cerrar">✕</button></header>
       ${notes || '<p class="empty">Todavía no anotaste nada. Las notas aparecen cuando algo pasa delante tuyo.</p>'}`;
     this.panel.querySelector('[data-close]').onclick = () => this.toggle();

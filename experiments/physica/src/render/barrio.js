@@ -10,7 +10,7 @@ import { waterMaterial, waterTube, fieldPath } from './water.js';
 import { Vegetation, PLANT } from './vegetation.js';
 import { buildAvenida } from './avenida.js';
 import { mergeStatic } from './merge.js';
-import { ARCH, BARRIO, TERRACE_Y, VECINOS, FAROLES, SOPORTAL, CALLE, ENCARGO } from '../sim/levels/cascada.js';
+import { ARCH, BARRIO, TERRACE_Y, VECINOS, FAROLES, SOPORTAL, CALLE, ENCARGO, OBSERVADOR } from '../sim/levels/cascada.js';
 
 const Y = TERRACE_Y;
 
@@ -286,7 +286,11 @@ export function buildBarrio(scene, { M, wallRock, cutRock = wallRock, field, zBa
   // the neighbour at the east stop, beside her jalón (the errand, D23)
   const guarda = person({ coat: '#3f6f7a', hat: '#c8321f' });
   guarda.g.position.set(ENCARGO.vecina.x, Y, ENCARGO.vecina.z); guarda.g.rotation.y = Math.PI * 0.8;
-  const keep = new Set([sitter.g, stander.g, guarda.g, ...hands, ...under, gatePivot, ...avenida.keep]);
+  // the two observers (D24): a passenger on the car's bench, a boy watching from the platform
+  const pasajera = person({ coat: '#7a5a2e', hat: '#2f4f5a', sitting: true });
+  const chico = person({ coat: '#c4782e', hat: '#3a3a40' }); chico.g.scale.setScalar(0.78); chico.g.position.set(OBSERVADOR.x, Y, OBSERVADOR.z);
+  avenida.setObservers(pasajera, chico);
+  const keep = new Set([sitter.g, stander.g, guarda.g, pasajera.g, chico.g, ...hands, ...under, gatePivot, ...avenida.keep]);
   town.userData.merge = mergeStatic(town, o => keep.has(o));
 
   // ---- seen from in front of the wall (the 2.5D path) ----
@@ -387,7 +391,7 @@ export function buildBarrio(scene, { M, wallRock, cutRock = wallRock, field, zBa
       if (town.visible) {
         // the neighbours look at the explorer when it comes near (within 4 m); otherwise, the square or the book
         const av = world.avatar;
-        for (const [p, idle] of [[stander, () => Math.sin(time * 0.35) * 0.55], [sitter, () => 0], [guarda, () => Math.sin(time * 0.3) * 0.4]]) {
+        for (const [p, idle] of [[stander, () => Math.sin(time * 0.35) * 0.55], [sitter, () => 0], [guarda, () => Math.sin(time * 0.3) * 0.4], [chico, () => 0]]) {
           const dx = av.x - p.g.position.x, dz = av.z - p.g.position.z, near = Math.hypot(dx, dz) < 4;
           let yaw = near ? Math.atan2(dx, dz) - p.g.rotation.y : idle(); yaw = Math.atan2(Math.sin(yaw), Math.cos(yaw));
           if (Math.abs(yaw) > 1.4) yaw = idle(); // behind them: they go back to what they were doing (no swing across)

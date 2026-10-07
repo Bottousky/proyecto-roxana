@@ -398,7 +398,8 @@ export class World {
       if (this.stepCount - r.lastStep <= 2) r.marks.pop(); // (mark() bumps the version: the replaced one is redrawn)
       mark(); r.state = 'done';
       const jal = r.jal && this.jalon.version === r.jal.version ? r.jal : null;
-      this.emit('record-done', { trip: r.trip, aborted: false, marks: r.marks.slice(), jal });
+      r.endLeg = k.leg; // (the trip it describes ended here: the observers speak of it until the car leaves)
+      this.emit('record-done', { trip: r.trip, aborted: false, marks: r.marks.slice(), jal, half: k.len / 2 });
       this.checkErrand(k, r.marks);
       return;
     }

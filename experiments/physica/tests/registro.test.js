@@ -149,3 +149,64 @@ test('a cut record stays cut: one event, and boarding again (running or at a sto
     assert.ok(!j.notes.some(n => n.id.startsWith('registro')), `${reboard}: no note from a cut record`);
   }
 });
+
+test('the last trip in a table: a row every 2 s and the arrival; each row adds up (kerb = car\'s zero + tape)', async () => {
+  const { tripTable } = await import('../src/journal.js');
+  const { w, j } = aboard();
+  const m = rideRecorded(w, j);
+  const n = j.notes.find(x => x.id === 'registro-tabla');
+  assert.ok(n?.data?.table, 'the table note');
+  const t = n.data.table;
+  assert.deepEqual(t.map(r => r.t), [0, 2, 4, 6, 8, 10, 10.5]);
+  for (const r of t) assert.ok(Math.abs(r.g - (r.z + r.c)) < 1e-9, `row ${r.t}: ${r.g} = ${r.z} + ${r.c}`);
+  assert.ok(t.every(r => Math.abs(r.c - t[0].c) < 1e-9), 'standing: the tape column does not change');
+  assert.deepEqual(tripTable(m, CARRO.len / 2), t);
+});
+
+test('the two observers describe the same trip differently, with its numbers', async () => {
+  const { describeTrip } = await import('../src/journal.js');
+  const { w, j } = aboard();
+  const still = describeTrip(rideRecorded(w, j), CARRO.len / 2);
+  assert.deepEqual(still.anden, ['Desde la vereda: +15,0 m', 'en 10,5 s, hacia el este.', 'El carro: +15,0 m.']);
+  assert.deepEqual(still.carro, ['Desde el carro: 0,0 m', 'no te moviste.', 'La vereda se fue 15,0 m al oeste.']);
+  run(w, j, 0.2);
+  const walked = describeTrip(rideRecorded(w, j, { from: 3, dur: 1.2, dir: -1 }), CARRO.len / 2);
+  assert.match(walked.anden.join(' '), /Desde la vereda: −1\d,\d m en 10,5 s, hacia el oeste/);
+  assert.match(walked.carro.join(' '), /Desde el carro: −\d,\d m hacia el oeste, por la cubierta/);
+  assert.ok(Math.abs(walked.DG - (walked.DK + walked.DC)) < 1e-9);
+});
+
+test('walking and coming back is not «not moving»: the passenger says so (displacement 0 is not the same as still)', async () => {
+  const { describeTrip } = await import('../src/journal.js');
+  const { w, j, a } = aboard();
+  assert.equal(w.interactables()[0]?.kind, 'record'); press(w, j);
+  for (let i = 0; i < Math.round((CARRO.dwell + TRIP + 1) / DT) && w.recorder.state !== 'done'; i++) {
+    const tr = w.recorder.state === 'on' ? (w.stepCount - w.recorder.startStep) * DT : -1;
+    Object.assign(w.input, { x: tr > 3 && tr < 3.4 ? 1 : tr > 3.6 && tr < 4.0 ? -1 : 0, y: 0 }); w.step(); feed(w, j);
+  }
+  const m = w.recorder.marks;
+  assert.ok(m.some(x => Math.abs(x.c - m[0].c) >= 0.05), 'it did walk');
+  const d = describeTrip(m, CARRO.len / 2);
+  if (Math.abs(d.DC) < 0.05) assert.deepEqual(d.carro, ['Desde el carro: 0,0 m', 'caminaste, pero terminaste', 'donde empezaste.']);
+  else assert.doesNotMatch(d.carro.join(' '), /no te moviste/);
+});
+
+test('one rule for shown readings: the table, the notes and the bubbles agree; ties round the same way; the car\'s zero advances steadily', async () => {
+  const { describeTrip, tripTable, lecturas } = await import('../src/journal.js');
+  for (const c of [1.85, 2.45, 1.0, 3.15]) {
+    store.clear();
+    const w = new World(CASCADA), j = new Journal({ append() {} }, w);
+    w.citySeen = true; for (const d of [w.doors[0], w.gates[0]]) { d.open = true; d.openT = d.swing; }
+    const a = w.avatar, k = w.carriers[0]; a.x = a.px = k.x - CARRO.len / 2 + c; a.z = a.pz = CARRO.z1 - 0.6; a.y = a.py = TERRACE_Y + a.hh; run(w, j, 0.3);
+    const m = rideRecorded(w, j);
+    const t = tripTable(m, CARRO.len / 2), d = describeTrip(m, CARRO.len / 2), L = lecturas(m, CARRO.len / 2);
+    assert.ok(t.every(r => r.c === t[0].c), `tape ${c}: the tape column constant (${t.map(r => r.c)})`);
+    const steps = t.slice(1, -2).map((r, i) => Math.round((t[i + 2].z - r.z) * 10) / 10);
+    assert.ok(steps.every(s => s === 3), `the zero advances 3,0 every 2 s in cruise (${t.map(r => r.z)})`);
+    const note = j.notes.find(x => x.id === 'registro');
+    const G0 = L[0].G, G1 = L.at(-1).G;
+    assert.ok(note.body.includes(`pasaste de ${G0.toFixed(1).replace('.', ',')} m a ${G1.toFixed(1).replace('.', ',')} m`), `note = table (${note.body.slice(0, 160)})`);
+    assert.equal(t[0].g, G0); assert.equal(t.at(-1).g, G1);
+    assert.ok(Math.abs(d.DG - (G1 - G0)) < 1e-9, 'bubble = note');
+  }
+});

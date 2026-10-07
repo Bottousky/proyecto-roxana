@@ -40,7 +40,9 @@ await until(null, s => s.rec === 'on', 4000);
 for (let i = 0; i < 12; i++) { await wait(1000); if ((await st()).rec === 'done') break; if (i % 3 === 0) await shot('viaje 1'); }
 await until(null, s => s.rec === 'done', 4000); await wait(500);
 await shot('llegada del intento 1: la tiza no queda en el jalón de la vecina');
-await tap('KeyJ'); await wait(500); await shot('Bitácora tras el intento 1'); await tap('KeyJ');
+await wait(1200); await shot('los dos observadores, tras el intento 1');
+await tap('KeyJ'); await wait(500); await shot('Bitácora tras el intento 1');
+await page.evaluate(() => { const el = document.querySelector('.journal'); if (el) el.scrollTop = el.scrollHeight; }); await wait(300); await shot('Bitácora: la tabla del viaje'); await tap('KeyJ');
 // back west aboard, unrecorded
 await until(null, s => s.phase !== 'parada', 4000);
 await until(null, s => s.phase === 'parada' && Math.abs(s.car - L.stops[0]) < 0.01, 4000); await wait(300);

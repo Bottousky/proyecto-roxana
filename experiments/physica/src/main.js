@@ -70,6 +70,11 @@ THREE.DefaultLoadingManager.onLoad = () => warmUp();
 const cam = params.has('nointro') ? { x: world.avatar.x, y: 1.2, dist: 11.5, elev: 0.2 } : { x: -18.5, y: 2.6, dist: 15, elev: 0.2 };
 const input = new Input(app);
 const sound = new Sound();
+// ?avenida: the evaluation start of «Introducción» (EVALUACION-INTRODUCCION.md; declared, not part of play):
+// a clean Bitácora, the city seen, the arch and the street's gate open, the explorer on the platform.
+const avenidaStart = params.has('avenida');
+// (cleared once per browser tab: a reload during the session keeps the Bitácora and the errand)
+if (avenidaStart) { try { if (!sessionStorage.getItem('physica.avenida')) { localStorage.removeItem('physica.v2'); sessionStorage.setItem('physica.avenida', '1'); } } catch { /* not stored */ } }
 const journal = new Journal(app, world);
 let vista = 0, vistaAge = 0, vistaHeld = false, vistaWas = false, introShotWas = -1;
 // Establishing shot: the whole diorama — familiar fall, the cascade, the Pozo — then the explorer.
@@ -84,7 +89,10 @@ journal.onAdd = id => {
   // press does, after 1.5 s. With reduced motion the camera cuts instead of travelling.
   if (id === 'mirador') { vista = 6; vistaAge = 0; vistaHeld = true; view.setCityVisible(true); }
 };
-if (journal.footing && !params.has('fresh')) { const f = journal.footing, av = world.avatar; av.x = av.px = f.x; av.y = av.py = f.y; av.lastSupport = { ...f }; }
+if (avenidaStart) {
+  world.citySeen = true; for (const d of [world.doors[0], world.gates[0]]) { d.open = true; d.openT = d.swing; }
+  const av = world.avatar; av.x = av.px = 11.05; av.z = av.pz = -36.6; av.y = av.py = 4.4 + av.hh; av.vx = av.vy = av.vz = 0;
+} else if (journal.footing && !params.has('fresh')) { const f = journal.footing, av = world.avatar; av.x = av.px = f.x; av.y = av.py = f.y; av.lastSupport = { ...f }; }
 
 // ---------- HUD ----------
 const hud = document.createElement('div'); hud.className = 'hud';

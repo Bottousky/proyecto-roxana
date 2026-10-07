@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-07 · iteración 18 (el jalón y el encargo de la vecina; B3 en curso; ver `evidence/iter-18`).
+**Actualizado:** 2026-10-07 · iteración 19 (dos observadores y la tabla; B3 en curso; ver `evidence/iter-19`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,20 @@
 
 ## Hito actual: B (primer episodio), en curso. El A espera la evaluación humana (`EVALUACION-HITO-A.md`)
 
-**Último cambio aceptado (iteración 18, Hito B · B3 en curso):** el jalón y el encargo de la vecina (D23).
+**Último cambio aceptado (iteración 19, Hito B · B3 en curso):** dos observadores, la tabla y el pedido a la vista (D24).
+- **Los observadores:** al llegar de un viaje registrado, el chico de la vereda («+15,0 m… El carro: +15,0 m») y la pasajera del carro («0,0 m, no te moviste. La vereda se fue 15,0 m al oeste») describen el mismo viaje.
+- **La Bitácora:** la tabla del último viaje (cordón = dónde está el 0 del carro + cinta).
+- **Los números:** una sola regla, al decímetro y con empates estables. La revisión encontró que el mismo viaje daba números distintos según dónde se leyera; ya no.
+- **A bordo,** la chapa de la línea y el encargo.
+- **Para la evaluación:** el arranque `?avenida` y el paquete `EVALUACION-INTRODUCCION.md`.
+- **Evidencia:**
+  - 106 pruebas;
+  - las secuencias con teclas;
+  - una revisión en dos pasadas.
+
+  Ver `evidence/iter-19`.
+
+**Iteración 18 (Hito B · B3 en curso):** el jalón y el encargo de la vecina (D23).
 - **El encargo:** en la parada este, una vecina pide que la última tiza de un viaje quieto caiga al pie de su jalón (21,5 m).
   - Se puede predecir: el cero del carro se detiene en 19,0 m, marcado por el cartel y la chapa; hay que ir en 2,5 m de la cinta.
   - Ella responde en el mundo: «Faltaron 0,7 m →» o «¡Justo ahí!», con la bandera.
@@ -254,17 +267,17 @@
 
 El loop no se detiene: según el contrato, al cerrar un hito se sigue con el próximo, y esas validaciones quedan pedidas.
 
-**Próximo resultado: cerrar «Introducción» con lo que falta, y prepararla para personas (B3).**
-- **La vista en tabla** de los dos registros y del jalón: marca, t, cordón, cinta, jalón. La resta cordón − cinta es la posición del carro.
-- **Un segundo observador en el andén** que describa el mismo viaje: el ejemplo del contrato.
-- **El pedido legible donde se decide,** en la parada oeste.
-- **La transferencia:** el bote junto al arco de agua.
-- **El paquete de evaluación humana de la familia,** con las preguntas de las revisiones 17 y 18.
+**Próximo resultado: la transferencia de «Introducción», con vectores en el mundo (B3).**
+- **Qué:** el mismo movimiento descrito desde un marco que se mueve, fuera de la avenida. FAMILIAS propone el bote junto al arco de agua (desde el bote, el agua sólo sube y baja). Un equivalente más barato sería una esfera soltada desde el carro en marcha: desde el carro cae recta, desde la vereda traza un arco.
+- **Con flechas:** el desplazamiento del carro, el que se hace sobre el carro y el que se ve desde el suelo, encadenados.
 - **Criterio:**
   - con teclado;
   - pruebas;
-  - una revisión que la lea como familia completa;
-  - si sólo queda validación humana, se pide y se sigue con la familia MRU (B4).
+  - una revisión que la lea como transferencia;
+  - el paquete al día.
+- **Después:** declarar la familia «pendiente de validación humana» una sola vez y pasar a MRU (B4) sin suspender el loop. El §11 suspende sólo cuando de todo el alcance sólo queda validación humana.
+
+*Plan cumplido en la iteración 19:* dos observadores, la tabla, el pedido a la vista y el paquete de evaluación.
 
 *Plan cumplido en la iteración 18:* el jalón (el origen) y un encargo que recompensa predecir.
 

@@ -44,10 +44,13 @@ Los nombres de escenas son propuestas; los resultados educativos son los del con
   - **Hecho en la iteración 18 (D23):**
     - el jalón, un cero que se clava en el andén o en el carro, con su cinta con signo;
     - el encargo de la vecina: un viaje quieto cuya última tiza caiga al pie de su jalón. Recompensa predecir dónde ir en el carro (19,0 + lectura de la cinta) y después se corre a otro número.
-  - **Falta, en orden:**
-    - **la vista en tabla:** marca, t, cordón, cinta;
-    - **una persona en el andén** como segundo observador;
-    - **la transferencia del bote.**
+  - **Hecho en la iteración 19 (D24):**
+    - dos observadores, el chico de la vereda y la pasajera del carro, describen cada viaje con sus números;
+    - la tabla del último viaje: cordón = dónde está el 0 del carro + cinta;
+    - una sola regla para los números mostrados;
+    - el pedido a la vista a bordo;
+    - el paquete de evaluación (`EVALUACION-INTRODUCCION.md`).
+  - **Falta antes de declararla «pendiente de validación humana»:** la transferencia, con al menos una representación de vectores en el mundo.
 
 ## 2. MRU
 - **Concepto:** a intervalos iguales, distancias iguales; velocidad = distancia / tiempo.

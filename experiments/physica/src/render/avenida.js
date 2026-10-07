@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { TERRACE_Y, CALLE, AVENIDA, CARRO, JALONES, ENCARGO } from '../sim/levels/cascada.js';
 import { mergeStatic } from './merge.js';
+import { describeTrip, shownTry } from '../journal.js';
 
 const Y = TERRACE_Y;
 
@@ -116,18 +117,37 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
   // stop posts on the platform, with a bell, at each stop
   // The stops: a post right where the car's tape zero (its west end) stops, its sign pointing down at a
   // yellow plate on the kerb with the zero of the car's tape (the same yellow), and a bell.
-  for (const x of CARRO.stops) {
+  let westPlate = null;
+  CARRO.stops.forEach((x, si) => {
     const x0 = x - CARRO.len / 2, zero = Math.round((x0 - CARRO.kerb0) * 10) / 10, pz = AVENIDA.andenZ0 + 0.75;
     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 2.6, 10), M.brassDark); post.position.set(x0 - 0.45, Y + 1.3, pz); post.castShadow = true; scene.add(post);
     const arm = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.04), M.brassDark); arm.position.set(x0 - 0.2, Y + 2.62, pz); scene.add(arm);
-    const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.62), new THREE.MeshStandardMaterial({ map: signTexture(['PARADA', 'aquí para el 0', 'del carro:', `${String(zero).replace('.', ',')} m ↓`], { h: 200 }), roughness: 0.7 }));
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.62), new THREE.MeshStandardMaterial({ map: signTexture([si === 0 ? 'PARADA OESTE' : 'PARADA ESTE', 'aquí para el 0', 'del carro:', `${String(zero).replace('.', ',')} m ↓`], { h: 200 }), roughness: 0.7 }));
     sign.position.set(x0, Y + 2.25, pz + 0.03); scene.add(sign);
     const back = new THREE.Mesh(new THREE.BoxGeometry(0.84, 0.66, 0.03), M.brassDark); back.position.set(x0, Y + 2.25, pz); scene.add(back);
     const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.34), new THREE.MeshStandardMaterial({ map: signTexture(['', '0'], { w: 64, h: 100, bg: '#d9a441', band: '#d9a441', ink: '#1e140c' }), roughness: 0.5 }));
     plate.rotation.x = -Math.PI / 2; plate.position.set(x0 + 0.11, Y + 0.0665, AVENIDA.andenZ0 + 0.52); scene.add(plate);
     const pin = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.013, 0.5), M.ink); pin.position.set(x0, Y + 0.066, AVENIDA.andenZ0 + 0.4); scene.add(pin);
     const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.13, 0.18, 12, 1, true), M.brass); bell.position.set(x0 - 0.45, Y + 1.9, pz + 0.08); scene.add(bell);
-  }
+  });
+  const eastZero = Math.round((CARRO.stops[1] - CARRO.len / 2 - CARRO.kerb0) * 10) / 10, fmtM = v => String(v).replace('.', ',');
+  // The line's plate, on the car (seen aboard, where the place on the car is chosen): where the car's zero
+  // stops at each stop, and the neighbour's errand once asked. (On the west stop's post it read as that
+  // stop's name, and it fell out of the frame from 2.5 m of the tape.)
+  const westZero = Math.round((CARRO.stops[0] - CARRO.len / 2 - CARRO.kerb0) * 10) / 10;
+  const lc = document.createElement('canvas'); lc.width = 360; lc.height = 230; const lt = new THREE.CanvasTexture(lc); lt.colorSpace = THREE.SRGBColorSpace;
+  const linePlate = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.61), new THREE.MeshStandardMaterial({ map: lt, roughness: 0.7 }));
+  westPlate = { c: lc, t: lt, key: '' };
+  const drawWestPlate = target => {
+    const key = String(target); if (key === westPlate.key) return; westPlate.key = key;
+    const g = lc.getContext('2d'); g.fillStyle = '#f1e6cc'; g.fillRect(0, 0, 360, 230); g.fillStyle = '#b5603f'; g.fillRect(0, 0, 360, 36);
+    g.fillStyle = '#f6ecd6'; g.font = 'bold 24px Inter, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('LÍNEA DEL CARRO', 180, 19);
+    g.fillStyle = '#3a2a1c'; g.font = '23px Inter, system-ui, sans-serif'; g.fillText('El 0 del carro para en:', 180, 60);
+    g.font = 'bold 26px Inter, system-ui, sans-serif'; g.fillText(`← oeste ${fmtM(westZero)} m   ·   este ${fmtM(eastZero)} m →`, 180, 96);
+    if (target != null) { g.fillStyle = '#3f6f7a'; g.fillRect(10, 130, 340, 90); g.fillStyle = '#f6ecd6'; g.font = 'bold 23px Inter, system-ui, sans-serif'; g.fillText('Encargo: tu última tiza', 180, 154); g.fillText(`en ${fmtM(target)} m, viajando quieto`, 180, 182); g.font = '20px Inter, system-ui, sans-serif'; g.fillText('hacia la parada este →', 180, 206); }
+    lt.needsUpdate = true;
+  };
+  drawWestPlate(null);
   // ---- the car: a deck on wheels, a bench, a lantern at each end, a ruler along its side ----
   const car = new THREE.Group();
   const D = CARRO.z1 - CARRO.z0, deckMat = new THREE.MeshStandardMaterial({ color: '#8a5a36', roughness: 0.75 });
@@ -158,6 +178,10 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
   const recBox = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.26, 0.22), M.brass); recBox.position.set(RX, Y + 0.7, RZ); recBox.castShadow = true; car.add(recBox);
   const recPost = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 0.58, 8), M.brassDark); recPost.position.set(RX, Y + 0.29, RZ); car.add(recPost);
   const recDial = new THREE.Mesh(new THREE.CircleGeometry(0.085, 20), M.enamel); recDial.position.set(RX, Y + 0.71, RZ + 0.115); car.add(recDial);
+  // the line's plate on a short post at the deck's west end, facing the camera
+  // (east of the canopy's corner post, which covered a smaller one)
+  const lpPost = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.1, 8), M.brassDark); lpPost.position.set(-CARRO.len / 2 + 0.62, Y + 0.55, D / 2 - 0.12); car.add(lpPost);
+  linePlate.position.set(-CARRO.len / 2 + 0.62, Y + 1.38, D / 2 - 0.1); car.add(linePlate);
   car.position.set(k.x, 0, zc); scene.add(car);
   // the jalones' rack (two spare poles stay in it), and the neighbour's jalón on the kerb
   const rack = new THREE.Group(); rack.position.set(JALONES.x, Y, JALONES.z - 0.15);
@@ -174,17 +198,25 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
   for (const dx of [-tol, tol]) { const bar = new THREE.Mesh(new THREE.PlaneGeometry(0.016, 0.3).rotateX(-Math.PI / 2), M.ink); bar.position.set(dx, Y + 0.0668, AVENIDA.andenZ0 + 0.2); her.add(bar); }
   for (let i = 0; i < 5; i++) for (const dz of [0.06, 0.34]) { const dash = new THREE.Mesh(new THREE.PlaneGeometry(0.04, 0.012).rotateX(-Math.PI / 2), M.ink); dash.position.set(-tol + 0.03 + i * 0.06, Y + 0.0668, AVENIDA.andenZ0 + dz); her.add(dash); }
   // her speech bubble (what she asks, how the last try went), over her head
-  const bub = (() => { const c = document.createElement('canvas'); c.width = 512; c.height = 200; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); sp.scale.set(2.0, 0.78, 1); sp.renderOrder = 10; sp.visible = false; sp.position.set(ENCARGO.vecina.x - 0.6, Y + 2.75, ENCARGO.vecina.z); scene.add(sp); return { sp, c, t, key: '' }; })();
-  const say = (lines) => {
-    const key = lines.join('|'); if (key === bub.key) return; bub.key = key;
-    const g = bub.c.getContext('2d'); g.clearRect(0, 0, 512, 200);
+  const makeBubble = (parent, x, y, z, scale = 1) => { const c = document.createElement('canvas'); c.width = 512; c.height = 200; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); sp.scale.set(2.0 * scale, 0.78 * scale, 1); sp.renderOrder = 10; sp.visible = false; sp.position.set(x, y, z); parent.add(sp); return { sp, c, t, key: '' }; };
+  const bub = makeBubble(scene, ENCARGO.vecina.x - 0.15, Y + 2.62, ENCARGO.vecina.z, 0.78); // (smaller, right over her: wider, it covered the passenger's number or left the frame)
+  const say = (lines, b = bub) => {
+    const key = lines.join('|'); if (key === b.key) return; b.key = key;
+    const g = b.c.getContext('2d'); g.clearRect(0, 0, 512, 200);
     g.fillStyle = 'rgba(250,243,228,0.96)'; g.strokeStyle = '#3a2a1c'; g.lineWidth = 4; g.beginPath(); g.roundRect(6, 6, 500, 160, 26); g.fill(); g.stroke();
     g.beginPath(); g.moveTo(330, 164); g.lineTo(380, 196); g.lineTo(370, 160); g.fill();
     g.fillStyle = '#2b1d12'; g.textAlign = 'center'; g.textBaseline = 'middle';
     lines.forEach((l, i) => { g.font = `${i === 0 ? 'bold 38px' : '30px'} Inter, system-ui, sans-serif`; g.fillText(l, 256, 52 + i * 46 + (lines.length === 2 ? 22 : 0)); });
-    bub.t.needsUpdate = true;
+    b.t.needsUpdate = true;
   };
   let seenTries = 0, wave = 0;
+  // the two observers (D24): a passenger on the car's bench, a boy on the platform; their bubbles
+  let obs = null;
+  const setObservers = (passenger, kid) => {
+    // (the passenger on the bench's east half, the boy across the track to the west: apart on screen)
+    car.add(passenger.g); passenger.g.position.set(0.55, Y + 0.56, -D / 2 + 0.34);
+    obs = { kid, kidBub: makeBubble(scene, kid.g.position.x, Y + 2.6, kid.g.position.z, 1.45), carBub: makeBubble(car, 0.55, Y + 2.05, -D / 2 + 0.6, 1.0) };
+  };
   // the explorer's jalón carries its own tape, signed, with its zero at the pole (−3 … 0 … +3)
   const signedTape = (left, right) => {
     const px = 128, w = Math.round((left + right) * px), c = document.createElement('canvas'); c.width = w; c.height = 72; const g = c.getContext('2d');
@@ -236,6 +268,7 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
   let spin = 0;
   return {
     keep: [car, drum, retW, retE, cable, myJalon, her, jTape], // (her group moves with the target: not merged)
+    setObservers,
     update(dt, time, alpha = 1) {
       car.position.x = (k.px ?? k.x) + (k.x - (k.px ?? k.x)) * alpha;
       const jl = world.jalon, av = world.avatar;
@@ -244,6 +277,7 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
       her.position.x = CARRO.kerb0 + ENCARGO.targets[Math.min(er.placed ?? er.round, ENCARGO.targets.length - 1)];
       if (er.tries.length !== seenTries) { const t = er.tries.at(-1); seenTries = er.tries.length; if (t && t.still && Math.abs(t.miss) <= ENCARGO.tol) wave = 4; }
       wave = Math.max(0, wave - dt); flag.position.y = Y + 1.58 + (wave > 0 ? 0.25 : 0); flag.rotation.y = wave > 0 ? Math.sin(time * 9) * 0.6 : 0;
+      drawWestPlate(er.state === 'asked' ? tgt : null);
       // what she says (visible near her, on the platform or the car)
       const near = av.z < -35; // (anywhere on the platform or the car: the west stop is where the place is chosen)
       const last = er.tries.at(-1), fmt1 = v => v.toFixed(1).replace('.', ',').replace('-', '−');
@@ -254,7 +288,15 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
         else if (wave > 0) say(['¡Justo ahí!', `¿Y ahora en ${fmt1(tgt)} m?`]);
         else if (!last || last.round !== er.round) say(['Tu última tiza, al pie', `de mi jalón: ${fmt1(tgt)} m`, 'viajando quieto → parada este']);
         else if (!last.still) say(['Caminaste en el viaje:', 'así no vale.', 'Elegí tu lugar antes de salir.']);
-        else say([last.miss < 0 ? `Faltaron ${fmt1(-last.miss)} m  →` : `←  Sobraron ${fmt1(last.miss)} m`, `Mi jalón: ${fmt1(tgt)} m`]);
+        else { const sh = shownTry(last); say([sh.miss < 0 ? `Faltaron ${fmt1(-sh.miss)} m  →` : `←  Sobraron ${fmt1(sh.miss)} m`, `Tu tiza: ${fmt1(sh.G)} m · mi jalón: ${fmt1(tgt)} m`]); }
+      }
+      // what each observer says about the last recorded trip (after it, near them)
+      if (obs) {
+        // only about the trip that just ended: from its arrival until the car leaves that stop
+        const r = world.recorder, show = r.state === 'done' && r.marks.length >= 2 && av.z < -35 && k.phase === 'parada' && k.leg === r.endLeg;
+        const d = show ? describeTrip(r.marks, CARRO.len / 2) : null;
+        obs.kidBub.sp.visible = !!d && Math.abs(av.x - obs.kid.g.position.x) < 12; obs.carBub.sp.visible = !!d && (av.carrier === k || Math.abs(av.x - k.x) < 8);
+        if (d) { say(d.anden, obs.kidBub); say(d.carro, obs.carBub); }
       }
       // the explorer's jalón's own tape, when planted
       const tk = `${jl.state}|${jl.version}`;

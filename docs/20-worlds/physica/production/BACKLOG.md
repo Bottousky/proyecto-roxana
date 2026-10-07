@@ -53,7 +53,7 @@ primero.
     - abrir la calle del norte;
     - pulir la silueta en el plano bajo del umbral y los vecinos.
 - **B3:** familia «Introducción» (ver `FAMILIAS.md`, D21).
-  - **Estado: en curso** (iter 16–18, `evidence/iter-16`, `iter-17`, `iter-18`).
+  - **Estado: en curso** (iter 16–19, `evidence/iter-16` … `iter-19`).
   - **Hecho:**
     - la reja de la plaza, la calle y el andén;
     - el carro de cable, con velocidad constante, la casa de máquinas y paradas;
@@ -62,11 +62,9 @@ primero.
     - el viaje con teclas, incluido en el recorrido completo.
     - el registrador del carro (iter 17): dos registros físicos del mismo viaje, el caso caminando, el desplazamiento negativo y las notas.
     - el jalón y el encargo de la vecina (iter 18): un cero que se elige, y una tarea que recompensa predecir.
+    - dos observadores, la tabla y el pedido a la vista; el paquete de evaluación (iter 19).
   - **Falta:**
-    - la vista en tabla;
-    - un segundo observador;
-    - vectores más allá del desplazamiento con signo;
-    - la transferencia del bote;
-    - una prueba con personas antes de cerrar la familia.
+    - la transferencia, con vectores en el mundo;
+    - después, la prueba con personas (`EVALUACION-INTRODUCCION.md`).
 - **B4:** familia MRU (ver `FAMILIAS.md`).
 - **B5:** primer sector jugable de la metrópolis. Empezado con la avenida del carro (iter 16). La deuda de dibujo del barrio quedó pagada en la iter 16 (unión por material).

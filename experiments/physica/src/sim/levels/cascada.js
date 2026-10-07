@@ -42,6 +42,9 @@ export const CARRO = { id: 'carro', len: 3.6, z0: -42.6, z1: AVENIDA.andenZ0, y:
 // (limitZ: carried past it, back into the square, the jalón goes back to its rack)
 export const JALONES = { x: AVENIDA.x0 + 2.6, z: -38.4, limitZ: BARRIO.z0 + 0.3 };
 // Her jalón moves to the next target once one is met (a memorised position must not do): readings 21.5, 20.3.
+// A boy watching from the far pavement, across the track from the east stop (one of the two observers,
+// D24): on the ground, and in view from the car (on the platform he was too close to the camera).
+export const OBSERVADOR = { x: AVENIDA.x0 + 17.3, z: AVENIDA.z0 - 1.0 }; // (west of the car at the east stop, apart from the passenger on screen)
 export const ENCARGO = { targets: [21.5, 20.3], tol: 0.15, vecina: { x: AVENIDA.x0 + 22.9, z: -39.6 } }; // (beside her jalón, past the car's east end at the stop)
 // Two neighbours: one sits on the fountain's rim facing the passage, one stands at an east door.
 // (the sitting one on the south-west of the rim, facing out: off the jet seen from the passage)

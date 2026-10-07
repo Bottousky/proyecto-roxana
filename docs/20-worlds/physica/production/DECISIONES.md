@@ -555,3 +555,35 @@ El jalón, las marcas en cada marco y las notas vienen después.
 **Para que el número 19,0 sea legible,** las paradas se corrieron 0,8 m: el cero del carro se detiene en 4,0 m y 19,0 m del cordón.
 
 **Después:** la vista en tabla, un segundo observador en el andén y la transferencia del bote.
+
+## D24 · Dos observadores, la tabla y el pedido donde se decide (iteración 19, Hito B · B3)
+
+**El pedido** (contrato, «Introducción»: «dos observadores describen de manera diferente un transporte en movimiento»; revisiones 17–18): hasta ahora había dos registros, no dos observadores. Faltaba la vista en tabla, y en la parada oeste, donde se elige el lugar, no se veían ni el pedido ni el número de la parada este.
+
+**Dos observadores, con los números del viaje.**
+- **Una pasajera** viaja sentada en el banco del carro.
+- **Un chico** mira desde la vereda de enfrente, del otro lado de la vía, frente a la parada este. En el andén quedaba demasiado cerca de la cámara y fuera de cuadro.
+- **Al llegar de un viaje registrado,** cada uno dice en un globo lo que vio, con los números del registro, hasta que el carro sale de esa parada:
+  - el chico: «Desde la vereda: +15,0 m, en 10,5 s, hacia el este. El carro: +15,0 m»;
+  - la pasajera: «Desde el carro: 0,0 m, no te moviste. La vereda se fue 15,0 m al oeste».
+- **Si se camina:** la pasajera dice cuánto y hacia dónde por la cubierta. Si se caminó y se volvió al mismo lugar, dice eso, no «no te moviste»: un desplazamiento 0 no es lo mismo que no moverse. Usa el mismo umbral que el encargo.
+- **Los dos tienen razón:** cada uno describe respecto de su lugar. La Bitácora lo dice.
+
+**Una sola regla para los números que se muestran** (después de la revisión). Están al decímetro, y todos salen de las mismas lecturas: tabla, notas, globos y encargo.
+- **El empate se redondea siempre igual.** Un explorador quieto caía justo en 1,85 de la cinta, y la rampa del carro deja su cero en x,x25: con el redondeo común, el ruido de la coma flotante hacía titilar las filas.
+- **Se redondean el cero del carro y la cinta;** el cordón es su suma. Así todo número mostrado suma.
+
+**La tabla.** Una nota que se reescribe con el último viaje registrado.
+- **Qué muestra:** una fila cada 2 s y la llegada, con t, el cordón, dónde está el 0 del carro y la cinta.
+- **Cada fila suma:** cordón = dónde está el 0 del carro + cinta. Es la transformación entre los dos marcos, fila por fila.
+- **La rampa se ve:** el 0 avanza 2,6 m en los primeros 2 s y 3,0 m cada 2 s en marcha.
+
+**El pedido donde se decide.**
+- **Una chapa en el carro,** a bordo y a la vista: «LÍNEA DEL CARRO · El 0 del carro para en: ← oeste 4 m · este 19 m →».
+- **Con el encargo pedido,** también lleva el pedido.
+- Primero estuvo en el poste de la parada oeste. Ahí se leía como el nombre de esa parada y quedaba fuera de cuadro desde 2,5 m de la cinta.
+- **Los carteles de las paradas** se llaman «PARADA OESTE» y «PARADA ESTE».
+
+**El arranque de evaluación** `?avenida` (declarado, no es parte del juego): borra lo guardado, abre el arco y la reja y deja al explorador en el andén.
+
+**Después:** la transferencia, con vectores en dos dimensiones, para cerrar la familia. El paquete de evaluación con personas está en `EVALUACION-INTRODUCCION.md`.
