@@ -10,7 +10,8 @@ import {renderNews,visibleItems} from './news.js';
 import {renderCommunity} from './social.js';
 
 export const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export const PLAY='./index.html',CAMPUS='./escuela.html';
+import {PLAY,CAMPUS} from './links.js';
+export {PLAY,CAMPUS};
 /** A room of the 3D campus by its URL (the 3D home routes the same hashes). */
 export const room3d=id=>`${CAMPUS}#${id==='patio'?'sobre':id}`;
 const fmtTime=s=>{const m=Math.floor((s||0)/60);return m<60?`${m} min`:`${Math.floor(m/60)} h ${m%60} min`;};

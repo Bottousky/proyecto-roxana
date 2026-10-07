@@ -10,6 +10,8 @@ import {ARTIFACTS} from '../src/escuela/artifacts.js';
 // Note: sections 7 and 8 simulate browser conditions (bfcache restore, entry-preview state); they verify the handlers.
 
 const base=process.env.HOME_URL||'http://127.0.0.1:4196/';
+// The campus page under HOME_URL: escuela.html in this package; HOME_PAGE='' on the published site (the root).
+const PAGE=process.env.HOME_PAGE??'escuela.html';
 const out=process.argv[2]||fileURLToPath(new URL('../output/home/interact/',import.meta.url));mkdirSync(out,{recursive:true});
 const chrome=['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome','C:/Program Files/Google/Chrome/Application/chrome.exe'].find(existsSync);
 const browser=await chromium.launch({headless:true,executablePath:chrome,args:[process.platform==='darwin'?'--use-angle=metal':'--use-angle=d3d11','--ignore-gpu-blocklist']});
@@ -26,7 +28,7 @@ async function artifactPoint(page,world){
   const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
   page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   await page.addInitScript(save=>{try{if(!sessionStorage.getItem('seeded')){localStorage.setItem('ohmdal.playcanvas.arc1.v1',save);localStorage.setItem('roxana.escuela.v1',JSON.stringify({version:1,stageSeen:10,welcomed:true}));sessionStorage.setItem('seeded','1');}}catch{}},JSON.stringify(previewState(10)));
-  await open(page,base+'escuela.html?hora=tarde');
+  await open(page,base+PAGE+'?hora=tarde');
   await page.click('#cta-explore');await page.waitForTimeout(1600);
   for(const world of Object.keys(ARTIFACTS)){
     await page.evaluate(()=>window.__escuela.closeRoom());await page.waitForTimeout(1800);
@@ -57,7 +59,7 @@ async function artifactPoint(page,world){
 {
   const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
   await page.addInitScript(save=>{try{if(!sessionStorage.getItem('seeded')){localStorage.setItem('ohmdal.playcanvas.arc1.v1',save);localStorage.setItem('roxana.escuela.v1',JSON.stringify({version:1,stageSeen:3,welcomed:true}));sessionStorage.setItem('seeded','1');}}catch{}},JSON.stringify(previewState(3)));
-  await open(page,base+'escuela.html?hora=noche');await page.click('#cta-explore');await page.waitForTimeout(1600);
+  await open(page,base+PAGE+'?hora=noche');await page.click('#cta-explore');await page.waitForTimeout(1600);
   const pt=await artifactPoint(page,'ohmdal');await page.mouse.click(pt.x,pt.y);await page.waitForTimeout(900);
   const cap=await page.evaluate(()=>document.querySelector('#caption').innerText);
   ok('Faro sin encender: lo dice sin inventar',/sigue apagada/.test(cap),cap.replace(/\s+/g,' ').slice(0,80));
@@ -68,7 +70,7 @@ async function artifactPoint(page,world){
 {
   const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
   await page.addInitScript(save=>{try{if(!sessionStorage.getItem('seeded')){localStorage.setItem('ohmdal.playcanvas.arc1.v1',save);localStorage.setItem('roxana.escuela.v1',JSON.stringify({version:1,stageSeen:2,welcomed:true}));sessionStorage.setItem('seeded','1');}}catch{}},JSON.stringify(previewState(5)));
-  await open(page,base+'escuela.html?hora=tarde');
+  await open(page,base+PAGE+'?hora=tarde');
   const shown=await page.evaluate(()=>!document.querySelector('#changes').classList.contains('hidden'));
   ok('la tarjeta de cambios aparece al volver',shown);
   const stage=await page.evaluate(()=>window.__escuela.diorama.stage);ok('el campus ya está transformado',stage===5,`etapa ${stage}`);
@@ -84,7 +86,7 @@ async function artifactPoint(page,world){
   const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
   await page.route('**/escuela/novedades.json',r=>r.fulfill({json:{version:1,items:[{id:'qa-prueba',title:'Prueba de QA',summary:'Contenido interceptado por el script de pruebas.',date:'2026-10-06',published:true}]}}));
   await page.addInitScript(()=>{try{if(!sessionStorage.getItem('seeded')){localStorage.setItem('roxana.escuela.v1',JSON.stringify({version:1,welcomed:true,newsSeen:'2026-09-01'}));sessionStorage.setItem('seeded','1');}}catch{}});
-  await open(page,base+'escuela.html?hora=noche');
+  await open(page,base+PAGE+'?hora=noche');
   const before=await page.evaluate(()=>({dot:document.querySelector('#link-news').dataset.unread,lamp:window.__escuela.diorama.noticeUnread}));
   ok('no leído: punto en el enlace y farolito de la cartelera',before.dot==='1'&&before.lamp===1,JSON.stringify(before));
   await page.screenshot({path:`${out}/cartelera-no-leido.png`});
@@ -107,7 +109,7 @@ async function artifactPoint(page,world){
 {
   const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
   page.on('pageerror',e=>errors.push('contexto: '+e.message));
-  await open(page,base+'escuela.html?hora=noche');
+  await open(page,base+PAGE+'?hora=noche');
   await page.evaluate(()=>window.__escuela.openRoom('trofeos'));await page.waitForTimeout(1000);
   await page.evaluate(()=>window.__escuela.diorama.app.graphicsDevice.gl.getExtension('WEBGL_lose_context').loseContext());await page.waitForTimeout(1200);
   const st=await page.evaluate(()=>({light:document.body.classList.contains('light'),canvas:getComputedStyle(document.querySelector('#diorama')).display,room:document.querySelector('#panel').dataset.room||null,retry:!!document.querySelector('#light-retry')}));
@@ -120,7 +122,7 @@ async function artifactPoint(page,world){
 // 6 · Árboles: se desvanecen (no desaparecen de golpe) cuando un acercamiento los pone delante.
 {
   const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
-  await open(page,base+'escuela.html?etapa=10&hora=tarde');await page.click('#cta-explore');await page.waitForTimeout(1800);
+  await open(page,base+PAGE+'?etapa=10&hora=tarde');await page.click('#cta-explore');await page.waitForTimeout(1800);
   const pt=await artifactPoint(page,'arithmos');await page.mouse.click(pt.x,pt.y);await page.waitForTimeout(60);
   const early=await page.evaluate(()=>window.__escuela.diorama.trees.map(t=>t.k));
   await page.waitForTimeout(1200);
@@ -133,7 +135,7 @@ async function artifactPoint(page,world){
 {
   const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
   await page.addInitScript(save=>{try{if(!sessionStorage.getItem('seeded')){localStorage.setItem('ohmdal.playcanvas.arc1.v1',save);localStorage.setItem('roxana.escuela.v1',JSON.stringify({version:1,stageSeen:3,welcomed:true}));sessionStorage.setItem('seeded','1');}}catch{}},JSON.stringify(previewState(3)));
-  await open(page,base+'escuela.html?hora=tarde');
+  await open(page,base+PAGE+'?hora=tarde');
   await page.evaluate(save=>{localStorage.setItem('ohmdal.playcanvas.arc1.v1',save);document.body.classList.add('entering');document.querySelector('#portal-flash').classList.add('on');
     dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));},JSON.stringify(previewState(5)));
   await page.waitForTimeout(800);
@@ -144,7 +146,7 @@ async function artifactPoint(page,world){
 // 8 · Versión ligera: la vista previa de entrada no se ofrece ni puede dejar la pantalla sin salida.
 {
   const ctx=await browser.newContext({viewport:{width:1440,height:900}});const page=await ctx.newPage();page.setDefaultTimeout(30000);
-  await open(page,base+'escuela.html?hora=tarde');
+  await open(page,base+PAGE+'?hora=tarde');
   await page.evaluate(()=>window.__escuela.openRoom('matematica'));await page.waitForTimeout(800);
   await page.evaluate(()=>window.__escuela.diorama.app.graphicsDevice.gl.getExtension('WEBGL_lose_context').loseContext());await page.waitForTimeout(800);
   await page.evaluate(()=>window.__escuela.openRoom('matematica'));await page.waitForTimeout(500);
@@ -157,7 +159,7 @@ async function artifactPoint(page,world){
 // 9 · Movimiento reducido del sistema: sin partículas ni remolino animado.
 {
   const ctx=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});const page=await ctx.newPage();page.setDefaultTimeout(30000);
-  await open(page,base+'escuela.html?etapa=10&hora=noche');await page.evaluate(()=>window.__escuela.openRoom('electronica'));await page.waitForTimeout(1500);
+  await open(page,base+PAGE+'?etapa=10&hora=noche');await page.evaluate(()=>window.__escuela.openRoom('electronica'));await page.waitForTimeout(1500);
   const rm=await page.evaluate(()=>{const d=window.__escuela.diorama,on=Object.entries(d.fx).filter(([,e])=>e.particlesystem.enabled).map(([k])=>k);return {reduced:d.reducedMotion,particles:on,jets:d.jets.some(j=>j.particlesystem.enabled)};});
   ok('movimiento reducido: ninguna partícula ni chorro activos',rm.reduced&&!rm.particles.length&&!rm.jets,JSON.stringify(rm));
   await ctx.close();

@@ -354,9 +354,26 @@ por GitHub Pages. En vivo, con el Mac despierto: `clasica-check.mjs` 44/44 (LCP 
 - https://bottousky.github.io/proyecto-roxana/escuela-clasica.html (versión clásica)
 - La raíz https://bottousky.github.io/proyecto-roxana/ sigue siendo el juego de Ohmdal publicado el 2026-09-13.
 
+## Ciclo 18 (2026-10-07) — la escuela 3D es la raíz del sitio (pedido del usuario)
+
+- En producción: `index.html` = campus 3D, `escuela-clasica.html` = versión clásica, `escuela.html` = redirección a la
+  raíz (conserva consulta y sala), `ohmdal.html` = el juego publicado el 2026-09-13, copiado sin cambios (sólo usa la
+  dirección de la página para resolver sus recursos, en la misma carpeta). La partida se guarda por origen: mover
+  páginas no la pierde.
+- `src/escuela/links.js`: un solo lugar para los destinos «juego» y «campus». En el paquete siguen siendo
+  `./index.html` y `./escuela.html`; la publicación usa `VITE_PLAY_URL=./ohmdal.html` y `VITE_CAMPUS_URL=./`. El plugin
+  de `vite.config.js` aplica los mismos destinos a los enlaces estáticos de las dos páginas; `HOME_ONLY=1` compila sólo
+  la home. `scripts/pages-home.mjs` arma la carpeta lista para `gh-pages`. Los scripts de QA aceptan `HOME_PAGE=''`.
+- README («Verificación»): cómo publicar ahora el juego (como `ohmdal.html`) y la escuela sin pisarse.
+- Verificado sobre el árbol de producción servido en local bajo `/proyecto-roxana/`, con el Mac despierto (0 reposos):
+  redirección con `?hora=noche&etapa=4#trofeos` → raíz con Trofeos abierta; el juego arranca en `ohmdal.html` sin
+  archivos faltantes ni errores; clásica 44/44; interacción 32/32; teclado 15/15; 20/20 arranques (1,5 s).
+  En desarrollo, con los destinos por defecto: clásica 45/45 y 5/5 arranques. `npm test` 104/104 (prueba nueva:
+  con los destinos de publicación ninguna página de la home enlaza a `index.html` ni a `escuela.html`).
+
 ## Siguiente acción exacta
 
-1. Decidir si la home pasa a ser la entrada del sitio (hoy la raíz es el juego; la home está en `escuela.html`).
+1. Quien publique Ohmdal debe publicarlo como `ohmdal.html` (README); avisar al loop de Ohmdal.
 2. Pendientes de publicación que siguen abiertos: derechos de assets (estatua de Meshy, mapa y alfombra de ImageGen),
    revisión independiente de los ciclos 12–17, teléfono real y lector de pantalla.
 3. Pendientes externos: URLs de redes, novedades reales, origen de los otros mundos.

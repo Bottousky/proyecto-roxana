@@ -5,6 +5,8 @@
 import {chromium} from 'playwright';
 import {existsSync} from 'node:fs';
 const base=process.env.HOME_URL||'http://127.0.0.1:4196/',N=Number(process.env.N||30),limit=Number(process.env.LIMIT||45000);
+// The campus page under HOME_URL: escuela.html in this package; HOME_PAGE='' on the published site (the root).
+const PAGE=process.env.HOME_PAGE??'escuela.html';
 const browser=await chromium.launch({headless:true,executablePath:['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome','C:/Program Files/Google/Chrome/Application/chrome.exe'].find(existsSync),args:['--use-angle=metal','--enable-gpu','--ignore-gpu-blocklist',...(process.env.NOTHROTTLE?['--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows']:[])]});
 const times=[];let stalls=0,navStalls=0;
 for(let i=0;i<N;i++){
@@ -12,7 +14,7 @@ for(let i=0;i<N;i++){
   const page=await ctx.newPage();const pending=new Map(),log=[];
   page.on('request',r=>pending.set(r,Date.now()));page.on('requestfinished',r=>pending.delete(r));page.on('requestfailed',r=>{log.push('falló '+r.url());pending.delete(r);});
   page.on('console',m=>log.push(m.type()+': '+m.text().slice(0,200)));page.on('pageerror',e=>log.push('pageerror: '+e.message));
-  const t0=Date.now();let navOk=true;await page.goto(`${base}escuela.html?etapa=${i%11}&hora=${['manana','tarde','noche'][i%3]}`,{waitUntil:'commit',timeout:limit}).catch(()=>{navOk=false;});
+  const t0=Date.now();let navOk=true;await page.goto(`${base}${PAGE}?etapa=${i%11}&hora=${['manana','tarde','noche'][i%3]}`,{waitUntil:'commit',timeout:limit}).catch(()=>{navOk=false;});
   if(!navOk){navStalls++;console.log(`#${i} la navegación no recibió respuesta en ${limit} ms`);await ctx.close();continue;}
   try{await page.waitForFunction(()=>window.__escuela||document.body.classList.contains('light'),null,{timeout:limit});times.push(Date.now()-t0);}
   catch{stalls++;const st=await page.evaluate(()=>({bar:document.querySelector('#loading-bar')?.style.width,ready:document.body.classList.contains('ready'),light:document.body.classList.contains('light'),explore:document.querySelector('#cta-explore')?.textContent})).catch(e=>({err:e.message}));

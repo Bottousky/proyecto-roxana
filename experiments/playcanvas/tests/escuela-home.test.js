@@ -190,3 +190,17 @@ test('versión clásica: no carga el motor 3D ni el campus',async()=>{
   assert.ok(!inputs.some(f=>/escuela\/(school|diorama|kit|landscape|statue)\.js$/.test(f)),'geometría 3D en la versión clásica');
   assert.ok(r.outputFiles[0].contents.length<160_000,`script de ${r.outputFiles[0].contents.length} bytes`);
 });
+test('publicación: con la escuela en la raíz, ningún enlace de la home lleva a index.html ni a escuela.html',async()=>{
+  const {execFileSync}=await import('node:child_process');const {fileURLToPath}=await import('node:url');
+  // A separate process: links.js reads the environment once, when it loads.
+  const code=`const {default:c}=await import(${JSON.stringify(here('../vite.config.js').href)});const fs=await import('node:fs');const h=c.plugins[0].transformIndexHtml.handler,out={};
+    for(const f of ['escuela.html','escuela-clasica.html']){const p=${JSON.stringify(fileURLToPath(here('../')))}+f;out[f]=await h(fs.readFileSync(p,'utf8'),{filename:p});}
+    const {PLAY,CAMPUS}=await import(${JSON.stringify(here('../src/escuela/links.js').href)});console.log(JSON.stringify({out,PLAY,CAMPUS}));`;
+  const r=JSON.parse(execFileSync(process.execPath,['--input-type=module','-e',code],{env:{...process.env,VITE_PLAY_URL:'./ohmdal.html',VITE_CAMPUS_URL:'./'},encoding:'utf8'}).trim().split('\n').at(-1));
+  assert.equal(r.PLAY,'./ohmdal.html');assert.equal(r.CAMPUS,'./');
+  for(const [f,html] of Object.entries(r.out)){
+    assert.doesNotMatch(html,/"\.\/index\.html|"\.\/escuela\.html/,`${f} todavía enlaza a index.html o escuela.html`);
+    assert.match(html,/href="\.\/ohmdal\.html"/,`${f} sin enlace al juego`);
+  }
+  assert.equal((r.out['escuela-clasica.html'].match(/href="\.\/#(direccion|electronica|fisica|programacion|matematica|trofeos|anfiteatro|novedades|sobre)"/g)||[]).length>=9,true,'las salas del plano llevan a la raíz');
+});

@@ -3,7 +3,7 @@
 Arco I jugable en la rama **codex/playcanvas-slice**.
 
 - Jugar: http://127.0.0.1:4190/
-- Producción: https://bottousky.github.io/proyecto-roxana/
+- Producción: https://bottousky.github.io/proyecto-roxana/ (la escuela 3D; el juego está en `ohmdal.html`)
 - Versión anterior para comparar: http://127.0.0.1:4180/
 - Iniciar localmente: abrir **Jugar PlayCanvas.cmd**, o ejecutar npm run dev.
 - En un checkout nuevo: npm ci antes de iniciar.
@@ -148,10 +148,18 @@ el arco empieza en el Portal.
 
 ## Verificación
 
-GitHub Pages publica los archivos compilados desde la rama `gh-pages`,
-con `node node_modules/vite/bin/vite.js build --base=/proyecto-roxana/ --outDir dist-pages`.
-La rama `main` conserva el reinicio del canon. Los assets y el mapa admiten
-la subruta del repositorio. Publicar el contenido de `dist-pages` con `.nojekyll`.
+GitHub Pages publica los archivos compilados desde la rama `gh-pages`. Desde el 2026-10-07
+la raíz del sitio es la escuela 3D (Instituto Roxana) y el juego vive en `ohmdal.html`:
+
+- `index.html`: campus 3D · `escuela-clasica.html`: versión sin 3D · `escuela.html`: redirige a la raíz.
+- `ohmdal.html`: el juego. **No publicar el `index.html` del juego en la raíz**: pisaría la escuela.
+
+Publicar el juego: `node node_modules/vite/bin/vite.js build --base=/proyecto-roxana/ --outDir dist-pages`,
+copiar `dist-pages` sobre `gh-pages` **renombrando su `index.html` a `ohmdal.html`**.
+Publicar la escuela: `node scripts/pages-home.mjs dist-pages-home` y copiar esa carpeta sobre `gh-pages`
+(ya trae `index.html`, la versión clásica y la redirección; sus enlaces al juego apuntan a `ohmdal.html`).
+En los dos casos, con `.nojekyll`. La partida se guarda por origen, así que mover páginas no la pierde.
+La rama `main` conserva el reinicio del canon. Los assets y el mapa admiten la subruta del repositorio.
 
 - npm test: pruebas del modelo eléctrico, progresión, guardado, Bitácora,
   cinemáticas, accesibilidad de objetos y correspondencia de los caminos.

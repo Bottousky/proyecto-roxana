@@ -12,6 +12,8 @@ const chrome=['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome','C:
 const browser=await chromium.launch({headless:true,executablePath:chrome});
 let failed=0;const ok=(cond,what)=>{console.log(`${cond?'OK  ':'FAIL'} ${what}`);if(!cond)failed++;};
 const SAVE='ohmdal.playcanvas.arc1.v1',SCHOOL='roxana.escuela.v1';
+// Link targets as the page was built (src/escuela/links.js): the published site uses ./ohmdal.html and ./
+const PLAY=process.env.VITE_PLAY_URL||'./index.html',CAMPUS=process.env.VITE_CAMPUS_URL||'./escuela.html';
 
 async function open({width=1440,height=900,dpr=1,mobile=false,js=true,scheme='light',seed=null,profile=null,query='hora=tarde'}={}){
   const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:dpr,isMobile:mobile,hasTouch:mobile,javaScriptEnabled:js,colorScheme:scheme});
@@ -36,27 +38,27 @@ async function shot(page,name,{js=true}={}){
 // 1 · First visit, desktop.
 {
   const {context,page,errors}=await open();
-  const r=await page.evaluate(()=>({
+  const r=await page.evaluate(([PLAY,CAMPUS])=>({
     overflow:document.scrollingElement.scrollWidth-innerWidth,h1:document.querySelectorAll('h1').length,
     hashLinks:[...document.querySelectorAll('a')].filter(a=>a.getAttribute('href')==='#'||!a.getAttribute('href')).length,
     imgsNoAlt:[...document.images].filter(i=>!i.hasAttribute('alt')).length,
     worlds:document.querySelectorAll('.world').length,legend:document.querySelectorAll('.legend a').length,
     cta:document.querySelector('.hero .cta').innerText.trim(),ctaHref:document.querySelector('.hero .cta').getAttribute('href'),
-    to3d:[...document.querySelectorAll('a[href^="./escuela.html"]')].length,
+    to3d:[...document.querySelectorAll('a[href]')].filter(a=>{const h=a.getAttribute('href');return h===CAMPUS||h.startsWith(CAMPUS+'#');}).length,
     headings:[...document.querySelectorAll('h1,h2,h3')].map(h=>Number(h.tagName[1])),
     still:document.querySelector('#campus-still')?.getAttribute('src'),changes:document.querySelector('.changes')!==null,
     lit:document.querySelectorAll('.plan .lamp.lit').length,
     links:[...new Set([...document.querySelectorAll('a[href]')].map(a=>a.getAttribute('href')).filter(h=>h.startsWith('./')).map(h=>h.split('#')[0]))],
     anchors:[...document.querySelectorAll('a[href^="#"]')].map(a=>a.getAttribute('href').slice(1)).filter(id=>!document.getElementById(id)),
     plates:[...document.images].map(i=>i.getAttribute('src')),
-  }));
+  }),[PLAY,CAMPUS]);
   ok(r.overflow<=0,`1440: sin desborde horizontal (${r.overflow})`);
   {const m=await page.evaluate(()=>({cls:window.__cls,lcp:window.__lcp}));ok(m.cls<.1,`1440: CLS de laboratorio ${m.cls.toFixed(3)} (< 0,1)`);console.log(`info LCP de laboratorio 1440: ${m.lcp?.t} ms (${m.lcp?.el})`);}
   ok(r.h1===1,'un solo h1');
   ok(r.hashLinks===0,'ningún enlace vacío ni href="#"');
   ok(r.imgsNoAlt===0,'todas las imágenes con alt');
   ok(r.worlds===4&&r.legend===9,`cuatro mundos y nueve lugares en el plano (${r.worlds}/${r.legend})`);
-  ok(r.cta==='Entrar a Ohmdal'&&r.ctaHref==='./index.html','primera visita: «Entrar a Ohmdal» sin continuar');
+  ok(r.cta==='Entrar a Ohmdal'&&r.ctaHref===PLAY,'primera visita: «Entrar a Ohmdal» sin continuar');
   ok(r.to3d>=10,`enlaces al campus 3D (${r.to3d})`);
   ok(r.headings.every((h,i)=>i===0||h<=r.headings[i-1]+1),'jerarquía de títulos sin saltos');
   ok(r.still==='./escuela/campus-tarde.jpg','lámina del campus: tarde, etapa 0');
@@ -89,7 +91,7 @@ async function shot(page,name,{js=true}={}){
     small:[...document.querySelectorAll('a,button,summary')].filter(e=>{const b=e.getBoundingClientRect();return b.width>0&&b.height>0&&b.height<40&&!e.closest('.plan')&&getComputedStyle(e).display!=='inline';}).map(e=>e.textContent.trim().slice(0,30))}));
   ok(r.overflow<=0,`390: sin desborde horizontal (${r.overflow})`);
   {const m=await page.evaluate(()=>({cls:window.__cls,lcp:window.__lcp}));ok(m.cls<.1,`390 con partida: CLS de laboratorio ${m.cls.toFixed(3)} (< 0,1)`);console.log(`info LCP de laboratorio 390: ${m.lcp?.t} ms (${m.lcp?.el})`);}
-  ok(r.cta==='Continuar en Ohmdal'&&r.href==='./index.html#continuar','con partida: «Continuar en Ohmdal» lleva a continuar');
+  ok(r.cta==='Continuar en Ohmdal'&&r.href===PLAY+'#continuar','con partida: «Continuar en Ohmdal» lleva a continuar');
   ok(r.changes===6,`«Cambió por tu aventura» con las seis restauraciones (${r.changes})`);
   ok(r.still==='./escuela/campus-tarde-e5.jpg','lámina del campus del tramo 2–6');
   ok(r.stats===6,'registro con sus seis cifras');

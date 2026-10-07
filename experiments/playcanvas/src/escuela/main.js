@@ -8,6 +8,7 @@ import {CHANNEL,EXPLICACIONES,ANIMACIONES,CINEMATIC_FILES} from './videos.js';
 import {Ambience} from './ambience.js';
 import {loadNews,renderNews,unreadCount,newestReal} from './news.js';
 import {renderCommunity} from './social.js';
+import {PLAY} from './links.js';
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -45,7 +46,7 @@ document.querySelector('#escuela').insertAdjacentHTML('beforeend',`
   <div class="brand" role="group" aria-label="Instituto Roxana">
     <button id="home" class="crest" title="Vista general" aria-label="Volver a la vista general del Instituto">Ω</button>
     <div><p class="brand-name">Instituto Roxana</p><p class="brand-sub">Escuela de Mundos Aplicados</p></div>
-    <a class="brand-cta" id="brand-cta" href="./index.html">Entrar a Ohmdal</a>
+    <a class="brand-cta" id="brand-cta" href="${PLAY}">Entrar a Ohmdal</a>
   </div>
   <nav class="tools" aria-label="Ambiente">
     <div class="hours" role="radiogroup" aria-label="Hora del día">
@@ -284,7 +285,7 @@ function previewEntry(id){
 function enterPortal(){
   diorama.flyTo({target:[-34.2,2.25,-4],yaw:90,pitch:6,distance:9});
   document.body.classList.add('entering');$('#portal-flash').classList.add('on');
-  setTimeout(()=>{location.href=base+'index.html'+(save&&previewStage===null?'#continuar':'');},reduced()?50:1500);
+  setTimeout(()=>{location.href=PLAY+(save&&previewStage===null?'#continuar':'');},reduced()?50:1500);
 }
 
 let trophyWorld='ohmdal';
@@ -452,7 +453,7 @@ function showIntro(){
 function introShift(){return innerWidth>1000&&!document.body.classList.contains('exploring')?-.22:0;}
 function introShiftY(){return innerWidth<=820&&innerHeight>innerWidth&&!document.body.classList.contains('exploring')?-.22:0;}
 function setupWayIn(){
-  const o=ohmdalSummary(previewStage===null?save:null),href=base+'index.html'+(o.started?'#continuar':'');
+  const o=ohmdalSummary(previewStage===null?save:null),href=PLAY+(o.started?'#continuar':'');
   const label=o.started?'Continuar en Ohmdal':'Entrar a Ohmdal';
   for(const a of [$('#cta-play'),$('#brand-cta')]){a.href=href;}
   $('#cta-play-label').textContent=label;$('#brand-cta').textContent=o.started?'Continuar':'Entrar a Ohmdal';

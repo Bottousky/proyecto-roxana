@@ -7,6 +7,8 @@ import {mkdirSync,existsSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 
 const base=process.env.HOME_URL||'http://127.0.0.1:4196/';
+// The campus page under HOME_URL: escuela.html in this package; HOME_PAGE='' on the published site (the root).
+const PAGE=process.env.HOME_PAGE??'escuela.html';
 const out=process.argv[2]||fileURLToPath(new URL('../output/home/keys/',import.meta.url));mkdirSync(out,{recursive:true});
 const chrome=['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome','C:/Program Files/Google/Chrome/Application/chrome.exe'].find(existsSync);
 const browser=await chromium.launch({headless:true,executablePath:chrome,args:[process.platform==='darwin'?'--use-angle=metal':'--use-angle=d3d11','--ignore-gpu-blocklist']});
@@ -16,7 +18,7 @@ const errors=[];page.on('pageerror',e=>errors.push(e.message));
 const active=()=>page.evaluate(()=>{const a=document.activeElement;if(!a||a===document.body)return 'body';const r=a.getBoundingClientRect(),cs=getComputedStyle(a);
   return {id:a.id||null,tag:a.tagName.toLowerCase(),text:(a.getAttribute('aria-label')||a.innerText||'').trim().slice(0,40),room:a.dataset?.room||null,visible:r.width>0&&r.height>0&&cs.visibility!=='hidden'&&Number(cs.opacity)>0.05,outline:cs.outlineStyle!=='none'||cs.boxShadow!=='none'};});
 
-await page.goto(base+'escuela.html?hora=tarde');await page.waitForFunction(()=>window.__escuela,null,{timeout:120000});await page.waitForTimeout(1500);
+await page.goto(base+PAGE+'?hora=tarde');await page.waitForFunction(()=>window.__escuela,null,{timeout:120000});await page.waitForTimeout(1500);
 // 1 · Tab order from the top: the way in comes first.
 const order=[];for(let i=0;i<8;i++){await page.keyboard.press('Tab');order.push(await active());}
 console.log('orden de Tab:',order.map(a=>a.id||a.room||a.text).join(' → '));
@@ -43,7 +45,7 @@ await page.evaluate(()=>window.__escuela.openRoom('direccion'));await page.waitF
 await page.evaluate(()=>window.__escuela.openNews());await page.waitForTimeout(900);
 await page.goBack();await page.waitForTimeout(1000);
 const afterBack=await page.evaluate(()=>({url:location.href,room:document.querySelector('#panel').dataset.room||null}));
-ok('Atrás cierra el panel sin salir de la home',afterBack.url.includes('escuela.html')&&!afterBack.room,JSON.stringify(afterBack));
+ok('Atrás cierra el panel sin salir de la home',new URL(afterBack.url).pathname.endsWith('/'+PAGE)&&!afterBack.room,JSON.stringify(afterBack));
 await page.goForward();await page.waitForTimeout(1000);
 ok('Adelante reabre la última sala',await page.evaluate(()=>document.querySelector('#panel').dataset.room==='novedades'));
 // Closing from the interface steps back: Back afterwards must not reopen what was just closed.
@@ -55,7 +57,7 @@ ok('abrir y cerrar no hace crecer el historial',await page.evaluate(l=>history.l
 await page.goBack();await page.waitForTimeout(1000);
 {const st=await page.evaluate(()=>({url:location.href,room:document.querySelector('#panel')?.dataset.room??null}));ok('Atrás tras cerrar no reabre la sala cerrada (sale al paso anterior)',st.room!=='fisica',JSON.stringify(st));}
 // Hidden controls are not tab stops: closed panel and folded intro.
-await page.goto(base+'escuela.html?hora=tarde');await page.waitForFunction(()=>window.__escuela,null,{timeout:120000});await page.waitForTimeout(1200);
+await page.goto(base+PAGE+'?hora=tarde');await page.waitForFunction(()=>window.__escuela,null,{timeout:120000});await page.waitForTimeout(1200);
 await page.click('#cta-explore');await page.waitForTimeout(900);
 const stops=[];for(let i=0;i<14;i++){await page.keyboard.press('Tab');stops.push(await page.evaluate(()=>{const a=document.activeElement;return a?.closest('#intro')?'intro':a?.closest('#panel')?'panel':a?.id||a?.dataset?.room||a?.tagName;}));}
 ok('explorando, ni la portada ni el panel cerrado reciben foco',!stops.includes('intro')&&!stops.includes('panel'),stops.join(' → '));

@@ -12,6 +12,8 @@ import {fileURLToPath} from 'node:url';
 import {previewState} from '../src/escuela/progress.js';
 
 const base=process.env.HOME_URL||'http://127.0.0.1:4196/';
+// The campus page under HOME_URL: escuela.html in this package; HOME_PAGE='' on the published site (the root).
+const PAGE=process.env.HOME_PAGE??'escuela.html';
 const shots=(process.argv[2]||'vista').split(',');
 const out=process.argv[3]||fileURLToPath(new URL('../output/home/',import.meta.url));
 const width=Number(process.env.W||1440),height=Number(process.env.H||900),dpr=Number(process.env.DPR||1);
@@ -29,7 +31,7 @@ for(const spec of shots){
   const query=new URLSearchParams();if(stage!=='')query.set('etapa',stage);query.set('hora',hour);
   const t0=Date.now();
   const hash=name.startsWith('hash:')?'#'+name.slice(5):'';
-  await page.goto(`${base}escuela.html?${query}${hash}`);
+  await page.goto(`${base}${PAGE}?${query}${hash}`);
   if(name==='inicio'){await page.waitForTimeout(400);await page.screenshot({path:`${out}/${spec.replace(/[@/:]/g,'-')}-${width}.png`});console.log('captura',spec,'(primer cuadro)');await context.close();continue;}
   await page.waitForFunction(()=>window.__escuela||document.body.classList.contains('light'),null,{timeout:120000});
   const ready=Date.now()-t0;
