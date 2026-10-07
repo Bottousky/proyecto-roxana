@@ -148,10 +148,10 @@ test('versión clásica: la página servida trae todo el Instituto escrito, sin 
 test('versión clásica: el primer pintado elige la misma lámina que la home 3D (hora × tramo de la partida)',async()=>{
   const {campusImage}=await import('../src/escuela/clasica-render.js');const {runInNewContext}=await import('node:vm');
   const run=(file,{search='',save=null,hour=16})=>{
-    const code=readFileSync(here(file),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1],props={},win={};
+    const code=readFileSync(here(file),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1],props={},win={},timers=[];
     const document={documentElement:{dataset:{},style:{setProperty:(k,v)=>{props[k]=v;}}},createElement:()=>({}),head:{appendChild:()=>{}}};
-    runInNewContext(code,{URLSearchParams,location:{search},Date:class extends Date{getHours(){return hour;}},localStorage:{getItem:()=>save},matchMedia:()=>({matches:false}),document,window:win,JSON,Number,Math,Boolean});
-    return {poster:props['--poster'],campus:win.__campus};
+    runInNewContext(code,{URLSearchParams,location:{search},Date:class extends Date{getHours(){return hour;}},localStorage:{getItem:()=>save},matchMedia:()=>({matches:false}),document,window:win,JSON,Number,Math,Boolean,setTimeout:(fn,ms)=>timers.push([fn,ms])});
+    return {poster:props['--poster'],campus:win.__campus,timers,document};
   };
   for(const [hora,hour] of [['manana',9],['tarde',16],['noche',22]])for(let n=0;n<=10;n++){
     const want=campusImage(hora,n);
@@ -161,6 +161,12 @@ test('versión clásica: el primer pintado elige la misma lámina que la home 3D
   const save=JSON.stringify(previewState(6));
   assert.equal(run('../escuela-clasica.html',{save}).campus.src,campusImage('tarde',6));
   assert.equal(run('../escuela.html',{save}).poster,`url("${campusImage('tarde',6)}")`);
+  // After 12 s without the campus (slow GPU, a script that never arrives), the 3D home offers the classic version.
+  const slowCase=ready=>{const r=run('../escuela.html',{}),el={hidden:true};r.document.body={classList:{contains:c=>c==='ready'&&ready}};r.document.getElementById=id=>id==='intro-slow'?el:null;
+    const [fn,ms]=r.timers.at(-1);assert.equal(ms,12000);fn();return el.hidden;};
+  assert.equal(slowCase(false),false,'sin campus a los 12 s se ofrece la versión clásica');
+  assert.equal(slowCase(true),true,'con el campus listo no se ofrece');
+  assert.match(readFileSync(here('../escuela.html'),'utf8'),/id="intro-slow"[^>]*hidden>[^<]*<a href="\.\/escuela-clasica\.html">/);
 });
 test('versión clásica: registro, láminas y plano siguen la partida real; la vista previa no ofrece continuar',async()=>{
   const {renderRecord,renderPlan,renderWorlds,wayIn}=await import('../src/escuela/clasica-render.js');

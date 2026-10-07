@@ -4,7 +4,7 @@
 import {readOhmdal,readProfile,saveProfile,previewState,schoolStage,RESTORATIONS} from './progress.js';
 import {SAVE_KEY} from '../game/state.js';
 import {loadNews,renderNews,unreadCount,newestReal} from './news.js';
-import {wayIn,renderWorlds,renderRecord,renderPlan,renderAboutStage,renderChanges,campusCaption,campusAlt,campusImage} from './clasica-render.js';
+import {wayIn,renderWorlds,renderRecord,renderPlan,renderAboutStage,renderChanges,campusCaption,campusAlt,campusImage,renderCommunity} from './clasica-render.js';
 
 const $=s=>document.querySelector(s);
 const base=import.meta.env.BASE_URL;
@@ -19,8 +19,11 @@ function render(){
   for(const a of document.querySelectorAll('[data-way]'))a.href=way.href;
   $('#way-meta').textContent=way.meta;
   $('#brand-sub').textContent=profile.name?`Registro de ${profile.name}`:'Escuela de Mundos Aplicados';
-  // The served page is the first visit: only a save (or a preview) changes what it says.
-  if(save){
+  // The served page is the first visit: only a save (or a preview) changes what it says. If it came unwritten (the
+  // build could not render it), the browser writes every part.
+  const served=Boolean($('#worlds .world'));
+  if(!served)$('#about-stage').insertAdjacentHTML('afterend',renderCommunity());
+  if(save||!served){
     $('#worlds').innerHTML=renderWorlds(save,{way});
     $('#record').innerHTML=renderRecord(save,{way,name:profile.name,preview:previewStage});
     $('#plan').innerHTML=renderPlan(save);

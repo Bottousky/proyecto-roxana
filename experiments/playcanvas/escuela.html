@@ -15,7 +15,10 @@
 try{if(q.has('etapa'))n=Number(q.get('etapa'))||0;else{var f=(JSON.parse(localStorage.getItem('ohmdal.playcanvas.arc1.v1')||'null')||{}).flags||{};
   ['awaken','workshop','gate','pump','distribution','irrigation','beacon_link','beacon_network','beacon_lens','epilogue_shared'].every(function(k){if(f[k]){n++;return true;}return false;});}}catch(e){}
 var e=n>=7?'-e10':n>=2?'-e5':'',v=matchMedia('(max-aspect-ratio: 1/1)').matches?'-vertical':'',src='./escuela/campus-'+t+e+v+'.jpg',d=document.documentElement;
-d.dataset.hora=t;d.style.setProperty('--poster','url("'+src+'")');var l=document.createElement('link');l.rel='preload';l.as='image';l.href=src;document.head.appendChild(l);})();
+d.dataset.hora=t;d.style.setProperty('--poster','url("'+src+'")');var l=document.createElement('link');l.rel='preload';l.as='image';l.href=src;document.head.appendChild(l);
+/* A slow or busy GPU, or a script that never arrives, must not leave the visitor without a way forward: after 12 s
+   without the campus, the intro offers the classic version (main.js hides it once the campus or the light version is up). */
+setTimeout(function(){var b=document.body,e=document.getElementById('intro-slow');if(e&&b&&!b.classList.contains('ready')&&!b.classList.contains('light'))e.hidden=false;},12000);})();
 </script>
 <link rel="preload" as="font" type="font/woff2" href="./fonts/cormorant-garamond-latin-600-normal.woff2" crossorigin>
 <style>
@@ -46,7 +49,8 @@ html,body{margin:0;height:100%;background:#16201d;color:#ece3cc;font-family:Inte
 .intro .cta{display:inline-flex;align-items:center;gap:.5rem;min-height:46px;padding:.65rem 1.15rem;border-radius:10px;font-weight:600;font-size:.92rem;text-decoration:none;color:#1e1a10;background:linear-gradient(180deg,#e7cd91,#c49d5c);box-shadow:0 8px 24px rgba(216,189,128,.25)}
 .intro .ghost{padding:.6rem 1rem;border-radius:10px;border:1px solid rgba(216,189,128,.6);background:rgba(16,25,26,.55);color:#ece3cc;font:600 .9rem Inter,system-ui,sans-serif}
 .cta-meta{margin:.55rem 0 0;font-size:.8rem;color:#e0d8c2}
-.intro h1,.intro-line,.intro-sub,.cta-meta,.intro-kicker{text-shadow:0 1px 10px rgba(0,0,0,.7)}
+.intro-slow{margin:.7rem 0 0;max-width:34ch;font-size:.82rem;line-height:1.45;color:#e0d8c2}.intro-slow a{color:#e6d7ae}
+.intro h1,.intro-line,.intro-sub,.cta-meta,.intro-kicker,.intro-slow{text-shadow:0 1px 10px rgba(0,0,0,.7)}
 .intro-kicker{color:#e9cf93}
 /* A veil over the still, on the text side: it lies under the 3D, so it only serves the first paint and the light version. */
 #escuela::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(10,16,15,.62) 0%,rgba(10,16,15,.3) 32%,transparent 52%)}
@@ -71,6 +75,7 @@ html,body{margin:0;height:100%;background:#16201d;color:#ece3cc;font-family:Inte
       <a href="./escuela-clasica.html" id="link-classic">Versión clásica</a>
     </nav>
     <div class="intro-load" id="intro-load" aria-hidden="true"><i id="loading-bar"></i></div>
+    <p class="intro-slow" id="intro-slow" role="status" hidden>El campus 3D está tardando en este equipo. Podés seguir en la <a href="./escuela-clasica.html">versión clásica</a>.</p>
   </header>
   <noscript><p class="noscript">El campus 3D necesita JavaScript. Podés <a href="./index.html">entrar directamente a Ohmdal</a> o leer la <a href="./escuela-clasica.html">versión clásica del Instituto</a>.</p></noscript>
 </main>

@@ -1,6 +1,6 @@
 # CANDIDATO PARA REVISIÓN · Home del Instituto Roxana
 
-2026-10-06 · rama `claude/roxana-home-3d-upgrade-e3f8d2` (22 commits sobre `f7984ca`, sin push) · ciclos 1–15.
+2026-10-06 · rama `claude/roxana-home-3d-upgrade-e3f8d2` (23 commits sobre `f7984ca`, sin push) · ciclos 1–16.
 
 Esto es un **candidato**, no una aprobación: la calidad subjetiva la decide quien revisa. Las dos revisiones
 críticas fueron hechas por agentes separados de sólo lectura (independientes del autor, no personas).
@@ -26,6 +26,7 @@ clásica, sin 3D). Estados de prueba sin tocar partidas: `?etapa=0..10&hora=mana
 | Progreso sólo como etapas genéricas; «0/40» | Transformaciones específicas desde la partida real de Ohmdal (ver Progreso); medidor honesto «n/10 Ohmdal · los otros mundos, sin integrar» |
 | Sin novedades ni redes | Cartelera física en el camino del portón + panel HTML, estados vacío/carga/error, no leído real; redes en configuración validada sin URL inventada |
 | Sala de Trofeos y Anfiteatro escondidos en las esquinas traseras (c14) | Fila norte, a los lados de la Dirección, visibles desde la vista general (prueba de visibilidad con la cámara real) |
+| Carga 3D lenta: «Preparando el campus…» sin salida | A los 12 s sin campus (o sin script principal) la portada ofrece la versión clásica (c16) |
 | Sólo el 3D y su versión ligera | **Versión clásica** (`escuela-clasica.html`, c15): página web convencional del mismo Instituto, servida ya escrita (se lee sin JS), con láminas del campus real, plano SVG con las medidas del 3D, registro, novedades y Sobre Roxana; sin motor 3D; enlazada desde la portada, Ajustes, la versión ligera y `noscript` |
 
 Bitácora completa por ciclo en `STATE.md`; triage de revisiones en `REVIEW-c07.md` y `REVIEW-c11.md`.

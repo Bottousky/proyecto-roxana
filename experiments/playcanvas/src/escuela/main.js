@@ -531,6 +531,7 @@ const newsReady=loadNews(base).then(r=>{const n=unreadCount(r.items,profile.news
   if(diorama.quiet){lightVersion('Este navegador no puede mostrar el campus en 3D. Todo lo demás está acá.');$('#intro-load').hidden=true;route();showChanges();return;}
   try{
     await diorama.build(p=>{$('#loading-bar').style.width=`${Math.round(p*100)}%`;});
+    $('#intro-slow').hidden=true;  // the inline timer in escuela.html offered the classic version while this was slow
     syncHour();applySettings();refreshProgress({instant:true});newsReady.then(r=>diorama.setNotices(r.items,unreadCount(r.items,profile.newsSeen)));
     diorama.panelShift=introShift();diorama.panelShiftY=introShiftY();
     diorama.flyTo({...OVERVIEW,distance:OVERVIEW.distance*1.25,pitch:OVERVIEW.pitch+10,yaw:OVERVIEW.yaw-24},{instant:true});
@@ -541,6 +542,7 @@ const newsReady=loadNews(base).then(r=>{const n=unreadCount(r.items,profile.news
     await showChanges();
     window.__escuela={diorama,openRoom,closeRoom,refreshProgress,openNews,lightVersion};
   }catch(err){
+    $('#intro-slow').hidden=true;
     console.error(err);lightVersion('No se pudo abrir el campus en 3D en este navegador. Todo lo demás está acá.');$('#intro-load').hidden=true;route();
   }
 })();

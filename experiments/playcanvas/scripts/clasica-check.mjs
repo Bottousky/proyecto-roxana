@@ -2,7 +2,7 @@
 // Seeded saves are TEST fixtures (previewState) written into the throwaway profile; they look at states, they are
 // not progress. Usage: node scripts/clasica-check.mjs [evidence folder]   HOME_URL (default http://127.0.0.1:4196/)
 import {chromium} from 'playwright';
-import {mkdirSync,existsSync} from 'node:fs';
+import {mkdirSync,existsSync,readFileSync} from 'node:fs';
 import {previewState} from '../src/escuela/progress.js';
 
 const base=process.env.HOME_URL||'http://127.0.0.1:4196/';
@@ -119,6 +119,17 @@ async function shot(page,name,{js=true}={}){
   const {context,page}=await open({width:820,height:1180,dpr:2});
   ok(await page.evaluate(()=>document.scrollingElement.scrollWidth<=innerWidth),'820: sin desborde horizontal');
   await shot(page,'820-primera-visita');await context.close();
+}
+// 6 · The page arrives unwritten (the build could not render it): the browser writes every part. Needs the dev
+// server, which serves /src/ to the raw file.
+{
+  const context=await browser.newContext({viewport:{width:1440,height:900}});const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const raw=readFileSync(new URL('../escuela-clasica.html',import.meta.url),'utf8');
+  await page.route(/escuela-clasica\.html/,route=>route.fulfill({contentType:'text/html',body:raw}));
+  await page.goto(`${base}escuela-clasica.html?hora=tarde`,{waitUntil:'networkidle'});
+  const r=await page.evaluate(()=>({worlds:document.querySelectorAll('.world').length,legend:document.querySelectorAll('.legend li').length,ledger:document.querySelectorAll('.ledger li').length,marks:document.body.innerHTML.includes('<!--clasica:')}));
+  ok(r.worlds===4&&r.legend===9&&r.ledger===10&&errors.length===0,`servida sin escribir: el navegador completa mundos, plano y registro (${r.worlds}/${r.legend}/${r.ledger}) ${errors.join(' | ')}`);
+  await context.close();
 }
 await browser.close();
 console.log(failed?`\n${failed} comprobaciones fallaron`:'\nTodas las comprobaciones pasaron');

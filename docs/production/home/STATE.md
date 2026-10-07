@@ -298,8 +298,44 @@ cuando falta WebGL (la versión ligera conserva las rutas y paneles; se puede ca
 Abierto: el arranque 3D en headless se colgó >120 s en 2 de ~30 cargas de esta sesión (un póster y una captura
 390); al reintentar arrancó en 1,7 s. Sin causa identificada.
 
+## Ciclo 16 (2026-10-07) — revisión para mergear a `main` (pedido del usuario)
+
+**Rama frente a `main`.** `main` = `origin/main` = `f7984ca`, la base de esta rama: el merge es directo (*fast-forward*),
+sin conflictos. Simulación con las ramas de otros agentes (`git merge-tree`): Arithmos, Bitland y Physica sin
+conflictos; `codex/playcanvas-slice` (Ohmdal) choca en `experiments/playcanvas/README.md`, pero ese conflicto ya
+existe entre `main` y esa rama y esta rama no toca el README. Fuera de la home sólo toca `.claude/launch.json` y
+`experiments/playcanvas/vite.config.js` (compartido con el juego). Suma ≈25 MB, 22 de ellos de evidencia.
+
+**Corregido.**
+- `vite.config.js` importaba el render de la clásica al cargarse: un cambio futuro del juego que lo rompiera en Node
+  tiraba también el servidor y el build de Ohmdal. Ahora se carga sólo para esa página y su falla no es fatal; la
+  página sale sin escribir y `clasica.js` la completa (QA de la clásica §6).
+- Aviso de arranque lento: si a los 12 s no hay campus (GPU lenta u ocupada, o el script principal no llegó), la
+  portada ofrece la versión clásica y lo retira cuando el campus está listo. Es un temporizador en el script en
+  línea de `escuela.html` (cuenta desde la navegación y funciona sin el módulo). `scripts/home-slow.mjs`.
+
+**Arranques largos (Chrome 154 sin ventana, perfiles aislados; `scripts/home-boots.mjs`).** Servidor de desarrollo:
+1 de 30 y 2 de 60 arranques pasaron de 30 s; build de producción: 2 de 38. Mediana 1,5 s. Se detienen en puntos
+distintos (10 % texturas, 88 % personajes, 100 % ya con el campus visible y usable), sin pedidos de red pendientes,
+con temporizadores, cuadros y mensajes respondiendo al sondear, y todos terminaron solos dentro de 30 s más. Una
+vez el servidor local no respondió una navegación en 30 s. En la misma máquina corría la partida automatizada de
+otro agente. Es compatible con contención de CPU/GPU del entorno de prueba, pero **no está demostrado**: NO
+VERIFICADO en un navegador con ventana (el panel del navegador estaba oculto).
+
+Verificado: `npm test` 103/103 (incluye el aviso de 12 s), `npm run check`, build, `clasica-check.mjs` 45/45.
+`home-slow.mjs`: el aviso no aparece a los 8 s y sí a los 14 s en todas las corridas (6/6), y sin el script principal
+también; que el campus termine después de la textura demorada 20 s pasó sólo 2 de 6 veces (las otras quedaron en la
+misma espera larga de arriba).
+NO limpio: con la máquina saturada (carga 10–21; otros agentes con partidas automatizadas), `home-interact.mjs` dio
+29/32 (fallan los tres gestos de artefacto: el clic se calcula con la cámara todavía en vuelo, (-482,1805) fuera de
+pantalla) y `home-keys.mjs` se cortó por tiempo. El ciclo 15 dio 32/32 y 15/15 con la máquina libre; los cambios de
+este ciclo no tocan cámara, artefactos ni teclado, pero hay que repetirlos con la máquina libre antes de mergear.
+
 ## Siguiente acción exacta
 
-1. Recorrer la versión clásica con VoiceOver (macOS) y anotar lo que no se entienda sin ver.
-2. Investigar el arranque 3D colgado intermitente (2/30 en headless): registrar en qué paso de `diorama.build` queda.
-3. Pendientes externos sin cambios: URLs de redes, novedades reales, origen de los otros mundos, derechos de assets.
+0. Con la máquina libre: `home-interact.mjs` y `home-keys.mjs` (esperado 32/32 y 15/15).
+1. Con el panel del navegador visible (o en Chrome con ventana), cargar `escuela.html` unas 20 veces y medir si
+   aparecen arranques de más de 12 s; si aparecen, registrar en qué `await` de `diorama.build` quedan.
+2. Antes de publicar (no de mergear): derechos de assets (Meshy, ImageGen), revisión independiente de los ciclos
+   12–16, teléfono real y lector de pantalla.
+3. Pendientes externos sin cambios: URLs de redes, novedades reales, origen de los otros mundos.
