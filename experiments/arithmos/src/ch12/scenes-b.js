@@ -280,7 +280,7 @@ function writeJournal12(g) {
   const first = k => ev.find(e => e.kind === k);
   const seen = [];
   const fam = ev.filter(e => e.kind === 'family-try');
-  if (fam.length) { const bad = fam.filter(e => !e.ok).length; seen.push(bad ? `Reconociste las cinco formas; ${bad === 1 ? 'una' : bad} la${bad === 1 ? '' : 's'} probaste en otra familia primero.` : 'Reconociste las seis formas de entrada.'); }
+  if (fam.length) { const bad = fam.filter(e => !e.ok).length; seen.push(bad ? `Reconociste las seis formas; ${bad === 1 ? 'una' : bad} la${bad === 1 ? '' : 's'} probaste en otra familia primero.` : 'Reconociste las seis formas de entrada.'); }
   const jp = first('jump-predict');
   if (jp) seen.push(jp.answer === '3' ? 'Anticipaste el punto más alto del salto en la mitad, a los 3.' : 'Pensaste el punto más alto en otro lado; el salto es igual de los dos lados: a los 3.');
   const ip = first('inverse-predict');
@@ -296,8 +296,8 @@ function writeJournal12(g) {
     title: 'Anticipar',
     abbr: 'Reconocer la familia, ajustar las perillas, leer el gráfico: así se anticipa.',
     body: [
-      'Las reglas se agrupan en familias que se reconocen por su forma: rectas, curvas que despegan, U, olas, curvas con un hueco. Los parámetros eligen cuál de la familia: en y = a · x + b, b es dónde empieza y a cuánto sube por paso.',
-      'Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo).',
+      'Las reglas se agrupan en familias que se reconocen por su forma: rectas, curvas que despegan, U, olas, curvas que suben cada vez más despacio y curvas cortadas. Donde una curva se corta hay una discontinuidad; la raya a la que se pega sin tocarla es una asíntota. Los parámetros eligen cuál de la familia: en y = a · x + b, b es dónde empieza y a cuánto sube por paso.',
+      'Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo). Con x desde 0, el gráfico de la raíz es el de x · x reflejado sobre la diagonal: (a, b) pasa a (b, a).',
       'La tasa de cambio en un tramo es cuánto cambió dividido cuánto pasó; con tramos cada vez más cortos se acerca a la derivada. Juntar lo que entra de a poco es sumar rectángulos cada vez más finos: se acerca al área bajo el gráfico, la integral.',
       'Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero, |x|: x a la derecha del cero y −x a la izquierda, que ahí da positivo. Con todo eso se anticipa, suponiendo que la regla sigue; y cuando llegan datos nuevos, se revisa.',
     ],

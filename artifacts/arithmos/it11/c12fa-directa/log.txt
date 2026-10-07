@@ -1,0 +1,58 @@
+[0.0s] escena → c12.familias
+[1.0s] lee: Juntemos las reglas del viaje. Dibujé seis formas. Cada regla tiene la suya: si reconocemos la forma, sabemos qué esperar.
+[3.6s] elige «altura de la rueda» (¿Qué regla del viaje tiene esta forma?)
+[4.5s] elige «escalera de Mara» (¿Qué regla del viaje tiene esta forma?)
+[5.5s] elige «reparto 1 ÷ (x − 2)» (¿Qué regla del viaje tiene esta forma?)
+[6.5s] elige «escalera de Punto» (¿Qué regla del viaje tiene esta forma?)
+[7.5s] elige «huerta x · x» (¿Qué regla del viaje tiene esta forma?)
+[8.5s] elige «¿cuántas veces?» (¿Qué regla del viaje tiene esta forma?)
+[8.9s] lee: —Mara: cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.
+[9.0s] lee: —Las que se cortan no están definidas en un lugar: el gráfico se corta ahí, y a eso se le dice discontinuidad. Cerca del corte se disparan, pegadas a la raya punteada sin tocarla nunca: esa raya se llama asíntota.
+[9.7s] lee: —Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.
+[9.8s] escena → c12.perillas
+[10.8s] lee: Todas las rectas son de la misma familia, pero no son iguales. La escalera de Mara: el día 0 tenía 1 escalón; el día 3, 31. ¿Qué recta es?
+[13.3s] lee: —Rampa: b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia.
+[13.3s] escena → c12.salto
+[14.3s] lee: Punto salta de alegría. Mara le midió la altura: a los t segundos está a 6t − t², y tarda 6 en volver al piso.
+[14.9s] elige «A los 3: la mitad del salto.» (¿Cuándo está más alto?)
+[17.5s] lee: A los 3, la mitad: el salto es igual de los dos lados.
+[17.6s] lee: —Cornisa: los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta.
+[17.7s] escena → c12.encadenar
+[18.0s] lee: Puse dos máquinas en fila: «el doble más uno» y «por sí mismo». Si entra 2, ¿importa cuál va primero?
+[20.2s] lee: 25 y 9: el orden importa. Encadenar reglas es otra regla, y depende de cuál va primero.
+[20.7s] elige «Menos uno, y después la mitad.» (¿Qué máquina deshace «el doble más uno»?)
+[21.1s] lee: Se deshace en el orden contrario, como en el capítulo de la caja: 5 menos 1 es 4, la mitad, 2.
+[21.6s] elige «3 o −3: con el 9 solo no se sabe.» (Si «por sí mismo» dio 9, ¿qué entró?)
+[22.0s] lee: —Mara: «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.
+[22.1s] lee: —Dibujadas para x desde 0, la raíz es x · x dada vuelta sobre la diagonal: se cambian la entrada y la salida. Cada punto (a, b) de una es el (b, a) de la otra. Es la familia de las raíces: sube cada vez más despacio.
+[22.8s] escena → c12.rapido
+[23.8s] lee: En el salto de Punto: justo al segundo 1, ¿qué tan rápido sube?
+[23.9s] lee: —En un tramo se puede medir: cuánto subió dividido cuánto tiempo pasó. Del 1 al 2 subió de 5 a 8: 3 por segundo.
+[26.6s] elige «A 4: cada vez más cerca.» (¿A qué número se acercan?)
+[27.0s] lee: Cuatro. Con tramo cero no se divide, pero los tramos cada vez más cortos se acercan a 4.
+[27.1s] lee: —Cornisa: justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente.
+[27.1s] escena → c12.junta
+[27.5s] lee: Abrí la canilla del pozo de a poco: a los t minutos salen 2t baldes por minuto. ¿Cuánta agua juntamos en 3 minutos?
+[30.1s] elige «9: lo que hay debajo de la recta, un triángulo de 3 por 6, a la mitad.» (¿A cuántos baldes se acercan las sumas?)
+[30.4s] lee: Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2.
+[30.5s] lee: —Balcón: si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó.
+[30.6s] escena → c12.tramos
+[30.9s] lee: Mi precio por redibujar escalones: hasta 10, un trozo de tiza cada uno. Después del décimo, medio trozo por escalón.
+[32.3s] elige «13: los primeros 10 a uno, los otros 6 a medio.» (¿Cuánta tiza cobra por 16 escalones?)
+[32.6s] lee: Trece: diez por el primer tramo, tres por el segundo.
+[32.7s] lee: —Rampa: tu precio es una función por tramos: una regla hasta 10 y otra después. Un solo gráfico, dos reglas.
+[32.8s] lee: —Lo lejos del cero también va por tramos, como Recta y Cuña en la línea de la ladera: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V.
+[32.9s] escena → c12.anticipar
+[33.2s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche: 1, 2, 4 y 8 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?
+[36.0s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[36.9s] elige «En la noche 5: 32 pasa los 30.» (Si sigue duplicando, ¿en qué noche pasa la escalera?)
+[37.3s] lee: La quinta: 16 todavía no, 32 sí.
+[37.3s] lee: —Mara: con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.
+[37.4s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[37.5s] lee: Cuarta noche.
+[37.6s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La quinta pasa los 30.
+[37.6s] lee: Entonces redibujamos la escalera esta noche, antes de la quinta. ¡A trabajar!
+[37.7s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[37.8s] lee: —Punto: al principio eras un punto que contaba. Después tuviste un lado para ir, una flecha. Ahora corrés por un gráfico, un paso adelante.
+[41.4s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[41.8s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["family-try","families","knob","params","jump-predict","jump-tap","jump","compose","inverse-predict","inverse-square","rate","derivative-predict","accum","integral-predict","piecewise-predict","final-family","final-predict","final-check"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":41.83,"size":"1600x900","touch":false,"route":"directa","watch":false}

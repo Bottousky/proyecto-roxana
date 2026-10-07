@@ -68,7 +68,16 @@ export const familias = {
       w.add(new Label(`c12-fl${idx}`, rule.name, c.x + c.w / 2, c.y + c.h + 14, {size: 14, align: 'center', z: 13, ch: YELLOW}));
       g.audio.tap(0.2, 1.2 + done.size * 0.08);
     }
-    await d.say('student', 'Mara: cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las que se cortan no están definidas en un lugar, y cerca de él se disparan; las del «¿cuántas veces?» suben cada vez más despacio. Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
+    await d.say('student', 'Mara: cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.');
+    const hc = cells.findIndex(c => c.asym);
+    if (hc >= 0) {
+      const c = cells[hc];
+      const ax = c.x + (c.asym - c.xr[0]) / (c.xr[1] - c.xr[0]) * c.w;
+      w.add(new Label('c12-asl', 'asíntota', ax - 4, c.y + 12, {size: 13, align: 'right', z: 13, ch: BLUE}));
+      d.describe('En la forma cortada, junto a la raya punteada, se escribe «asíntota».');
+    }
+    await d.say('student', 'Las que se cortan no están definidas en un lugar: el gráfico se corta ahí, y a eso se le dice discontinuidad. Cerca del corte se disparan, pegadas a la raya punteada sin tocarla nunca: esa raya se llama asíntota.');
+    await d.say('student', 'Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
     d.evidence('families', {done: [...done]});
     g.flags.c12families = true;
   },
@@ -249,6 +258,22 @@ export const encadenar = {
     d.evidence('inverse-square', {answer: c2});
     await d.say('student', 'Mara: «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.');
     await studentWrites(d, g, 'c12-inv', '× 2 + 1  ↔  − 1, ÷ 2        x · x  ↔  √ (si x ≥ 0)', A.x0 + 20, A.y1 - 6, {size: 17});
+    // la raíz, dibujada: el gráfico de x · x (con x ≥ 0) dado vuelta sobre la diagonal
+    const gb = {x: A.x0 + 330, y: A.y0 + 110, w: 110, h: 110};
+    const ga = axes(w, 'c12-rg', gb, [0, 3], [0, 3], {xticks: [1, 2, 3], yticks: [1, 2, 3]});
+    w.add(new Drawing('c12-rd', Array.from({length: 10}, (_, k) => S([[ga.px(k * 0.3), ga.py(k * 0.3)], [ga.px(k * 0.3 + 0.15), ga.py(k * 0.3 + 0.15)]], seedOf('c12-rd') + k, {w: 2, p: 0.85, ch: BLUE, lift: false})), {z: 12}));
+    g.setCinematic(true);
+    const sqc = w.add(curve('c12-rsq', x => x * x, [0, 3], ga.px, ga.py, [0, 3], {ch: WHITE, n: 30}));
+    sqc.progress = 0;
+    await d.draw(sqc, 0.6, {sound: false});
+    const rtc = w.add(curve('c12-rrt', x => Math.sqrt(x), [0, 3], ga.px, ga.py, [0, 3], {ch: YELLOW, n: 30}));
+    rtc.progress = 0;
+    await d.draw(rtc, 0.6, {sound: false});
+    w.add(new Label('c12-rsql', 'x · x', ga.px(1.2) - 8, ga.py(2.2), {size: 14, align: 'right', z: 13}));
+    w.add(new Label('c12-rrtl', '√x', ga.px(2.4), ga.py(1.55) - 12, {size: 15, align: 'center', z: 13, ch: YELLOW}));
+    g.setCinematic(false);
+    d.describe('Un mapa chico, de 0 a 3 en los dos ejes: x · x en blanco, la raíz en amarillo y la diagonal punteada en azul. Las dos curvas son una el reflejo de la otra sobre la diagonal.');
+    await d.say('student', 'Dibujadas para x desde 0, la raíz es x · x dada vuelta sobre la diagonal: se cambian la entrada y la salida. Cada punto (a, b) de una es el (b, a) de la otra. Es la familia de las raíces: sube cada vez más despacio.');
     g.flags.c12inverse = true;
   },
 };
