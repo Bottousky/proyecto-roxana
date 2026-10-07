@@ -403,6 +403,7 @@ let coordStep = 0;
 let c9Shape = null;
 let c9Moves = 0;
 let c11Item = null;
+let c11Dice = 7;
 let knobStep = 0;
 let c12Cell = 0;
 const interactSnapped = new Set();
@@ -781,6 +782,16 @@ for (let iter = 0; iter < 30000; iter++) {
       else target = spots.find(x => x.id === 'c10-v0') || spots.find(x => x.id === 'c10-v1') || spots[0];
     } else if (s.seg === 'c10.pistas' && spots.some(x => x.id.startsWith('c10-p'))) {
       target = spots.find(x => x.id === (route === 'errores' && !tried.has('c10p') && (tried.add('c10p'), true) ? 'c10-p3_2' : 'c10-p4_3'));
+    } else if (s.seg === 'c11.dados' && spots.some(x => x.id === 'c11-done')) {
+      // marca los 7, dice «ya están todos», marca el 12 (con errores: un casillero equivocado y un «ya están» antes de tiempo)
+      const left = spots.filter(x => x.id.startsWith('c11-q'));
+      const sumOf = x => Number(x.id[5]) + Number(x.id[6]);
+      const sevens = left.filter(x => sumOf(x) === 7);
+      if (route === 'errores' && !tried.has('c11wrong') && (tried.add('c11wrong'), true)) target = left.find(x => sumOf(x) === 2);
+      else if (route === 'errores' && sevens.length === 3 && !tried.has('c11early') && (tried.add('c11early'), true)) target = spots.find(x => x.id === 'c11-done');
+      else if (sevens.length) target = sevens[0];
+      else if (c11Dice === 7) { c11Dice = 12; target = spots.find(x => x.id === 'c11-done'); }
+      else target = left.find(x => sumOf(x) === 12) || spots.find(x => x.id === 'c11-done');
     } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id === 'c11-sure')) {
       const truth = c11Item === 'bucket' ? 'c11-chance' : 'c11-sure';
       const wrong = route === 'errores' && !tried.has('c11k') && (tried.add('c11k'), true);

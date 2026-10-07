@@ -1,0 +1,29 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c12.familias"
+  },
+  "journal": [
+    "Lo que pasa a veces"
+  ],
+  "evidenceKinds": [
+    "dice-predict",
+    "dice-cell",
+    "dice-done",
+    "dice-mark",
+    "dice-roll",
+    "cause-predict",
+    "anticipate"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 10.493,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}
