@@ -101,7 +101,9 @@ class Game {
     if (this.mode === 'play') {
       const panel = this.ui.choices$.hidden ? 0 : this.ui.choices$.offsetHeight;
       // en pantallas bajas, mientras se toca la escena y no hay texto abajo, la escena usa ese lugar
-      const free = innerHeight < 560 && this.ui.interactive && this.ui.choices$.hidden && !this.ui.waiting;
+      // (también mientras se esconden las opciones para mirar la pizarra)
+      const peeking = !!this.ui.peekBack$ && !this.ui.peekBack$.hidden;
+      const free = innerHeight < 560 && ((this.ui.interactive && this.ui.choices$.hidden && !this.ui.waiting) || peeking);
       const want = Math.max(free ? 16 : (this.baseBottom || 0), panel + 8);
       const cur = this.camera.safe.bottom;
       this.camera.safe.bottom = cur + (want - cur) * Math.min(1, raw * 6);

@@ -172,7 +172,13 @@ export class Label {
 
   render(ctx, view, frame, world) {
     if (world?.clean && !this.decor) return;
-    chalkText(ctx, this.text, this.x, this.y, {size: this.size, ch: this.ch, align: this.align, reveal: this.reveal, fade: this.fade, weight: this.weight, p: this.p});
+    // en pantallas bajas (teléfono acostado) la letra chica crece hasta ~12 px en pantalla, a lo sumo un 30 %
+    let size = this.size;
+    if (!this.decor && typeof innerHeight !== 'undefined' && innerHeight < 560 && view?.scale) {
+      const css = (size * view.scale) / (view.dpr || 1);
+      if (css < 12) size = Math.min(size * 1.3, (12 * (view.dpr || 1)) / view.scale);
+    }
+    chalkText(ctx, this.text, this.x, this.y, {size, ch: this.ch, align: this.align, reveal: this.reveal, fade: this.fade, weight: this.weight, p: this.p});
   }
 
   renderClean(ctx, view, cam) {
