@@ -853,6 +853,38 @@ export const noSePuede = {
     await d.say('Rampa', 'La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.');
     d.evidence('rational', u);
     g.flags.c7rational = true;
+    // simplificar sin perder dónde no se puede
+    g.setCinematic(true);
+    const olds = w.objects.filter(o => /^ns-/.test(o.id));
+    await d.tween(0.5, q => { for (const o of olds) o.fade = 1 - q; });
+    for (const o of olds) w.remove(o.id);
+    g.setCinematic(false);
+    await d.say('Mara', 'Yo tengo otra cuenta: (x · x − 4) ÷ (x − 2). Dicen que es lo mismo que x + 2, que es más corta.');
+    const big = w.add(new Label('ns-q', '(x · x − 4) ÷ (x − 2)', A.x0 + 20, A.y0 + 40, {size: 26, z: 12, reveal: 0}));
+    await d.draw(big, 0.6, {key: 'reveal'});
+    w.add(new Label('ns-q2', '¿= x + 2?', A.x0 + 300, A.y0 + 40, {size: 26, z: 12, ch: YELLOW}));
+    d.describe('En la pizarra: (x · x − 4) ÷ (x − 2), y al lado, con signo de pregunta, igual a x + 2.');
+    const sim = await d.choose([
+      {id: 'almost', text: 'Casi: dan lo mismo, menos en x = 2, donde la primera no está definida.'},
+      {id: 'same', text: 'Sí: son la misma cuenta, para cualquier x.'},
+      {id: 'diff', text: 'No: con x = 3 dan distinto.'},
+    ], {prompt: '¿Son la misma cuenta?', evaluate: true});
+    d.evidence('rational-simplify', {answer: sim});
+    const ROWS = [[3, '5 ÷ 1 = 5', '5'], [0, '−4 ÷ (−2) = 2', '2'], [2, '0 ÷ 0: no está definida', '4']];
+    w.add(new Label('ns-th0', 'x', A.x0 + 20, A.y0 + 92, {size: 18, z: 12, ch: BLUE}));
+    w.add(new Label('ns-th1', '(x · x − 4) ÷ (x − 2)', A.x0 + 70, A.y0 + 92, {size: 17, z: 12, ch: BLUE}));
+    w.add(new Label('ns-th2', 'x + 2', A.x0 + 300, A.y0 + 92, {size: 18, z: 12, ch: YELLOW}));
+    for (const [i, [x, a, b]] of ROWS.entries()) {
+      const y = A.y0 + 126 + i * 32;
+      w.add(new Label(`ns-tx${i}`, String(x), A.x0 + 20, y, {size: 19, z: 12}));
+      const la = w.add(new Label(`ns-ta${i}`, a, A.x0 + 70, y, {size: 17, z: 12, ch: x === 2 ? YELLOW : undefined, reveal: 0}));
+      await d.draw(la, 0.4, {key: 'reveal', sound: false});
+      w.add(new Label(`ns-tb${i}`, b, A.x0 + 300, y, {size: 19, z: 12}));
+      d.describe(`Con x = ${x}: la primera da ${a.replace(':', ',')}; x + 2 da ${b}.`);
+    }
+    await d.think(sim === 'almost' ? 'Con 3 y con 0 dan igual. Con 2, la primera es 0 ÷ 0: no está definida, y x + 2 da 4.' : sim === 'same' ? 'Con 3 y con 0 dan igual, pero con 2 la primera es 0 ÷ 0: no está definida, y x + 2 da 4. En x = 2 no son la misma.' : 'Con 3 dan las dos 5, y con 0, las dos 2. Distinto es sólo el 2: ahí la primera no está definida.');
+    await d.say('student', 'Mara, x · x − 4 es (x − 2) · (x + 2): x · x + 2 · x − 2 · x − 4. Si x no es 2, el (x − 2) de arriba se va con el de abajo y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2.');
+    await studentWrites(d, g, 'ns-simp', '(x · x − 4) ÷ (x − 2) = x + 2,  con x ≠ 2', A.x0 + 20, A.y1 - 8, {size: 20});
     if (!replay) writeJournal7(g);
     await d.say('Peldaño', 'Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?');
     g.audio.punto('question');
@@ -896,6 +928,8 @@ function writeJournal7(g) {
   if (cn) seen.push(cn.answer === 'none' ? 'Viste que (x + 1)² = −9 no tiene solución en la recta.' : cn.answer === 'two' ? 'Para (x + 1)² = −9 elegiste x = 2 y x = −4; con esos da 9, no −9: en la recta, ninguna.' : 'Para (x + 1)² = −9 elegiste x = −4; con ese da 9, no −9: en la recta, ninguna.');
   const lp = first('log-predict');
   if (lp) seen.push(lp.answer === '10' ? 'Anticipaste unos diez días para pasar mil duplicando.' : 'Esperabas muchos más días; duplicando, alcanzaron diez.');
+  const rs = first('rational-simplify');
+  if (rs) seen.push(rs.answer === 'almost' ? 'Viste que (x · x − 4) ÷ (x − 2) es x + 2 salvo en x = 2.' : rs.answer === 'same' ? 'Pensaste que (x · x − 4) ÷ (x − 2) y x + 2 eran iguales para todo x; en x = 2 la primera no está definida.' : 'Pensaste que (x · x − 4) ÷ (x − 2) y x + 2 daban distinto con 3; dan igual, salvo en x = 2.');
   const rq = first('rational-predict');
   if (rq) seen.push(rq.answer === '2' ? 'Viste que 1 ÷ (x − 2) no se puede con x = 2.' : rq.answer === '0' ? 'Pensaste en x = 0; con 0 abajo queda −2, y se puede. La que no se puede es x = 2, donde abajo queda cero.' : 'Pensaste que se podía con cualquier x; con x = 2 abajo queda cero, y por cero no se divide.');
   const entry = {
@@ -906,7 +940,7 @@ function writeJournal7(g) {
       'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.',
       'Sumar lo mismo crece parejo (sucesión aritmética: el día n, 1 + 10 · n); duplicar empieza lento y después saca cada vez más ventaja (sucesión geométrica: cada día, el doble del anterior). En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Dividirlas saca factores, y los exponentes se restan: 2⁵ ÷ 2² = 2³. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
       'Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4. La raíz de (x + 1)² es lo lejos que está x + 1 del cero; por eso hay dos. Si x + 1 es positivo, la raíz de (x + 1)² es x + 1; si es negativo, no. Si el cuadrado da 0, hay una sola solución; si da un negativo, ninguna en la recta.',
-      'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2.',
+      'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2. Al simplificar, la restricción se anota: (x · x − 4) ÷ (x − 2) = x + 2, con x ≠ 2.',
     ],
     seen,
     moments: [

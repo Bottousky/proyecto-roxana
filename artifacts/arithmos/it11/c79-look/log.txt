@@ -1,0 +1,10 @@
+[0.0s] escena → c7.no-se-puede
+[1.0s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[1.6s] elige «Con x = 2.» (¿Para qué x no se puede hacer esa cuenta?)
+[4.4s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[4.8s] lee: Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2.
+[4.9s] lee: —Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero.
+[5.0s] lee: La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.
+[5.8s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?
+[5.8s] escena → c8.diagonal
+[6.6s] {"ended":true,"final":{"mode":"play","seg":"c8.diagonal"},"journal":["Crecer"],"evidenceKinds":["rational-predict","rational-try","rational"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":6.588,"size":"1600x900","touch":false,"route":"directa","watch":false}

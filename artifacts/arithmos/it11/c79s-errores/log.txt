@@ -1,0 +1,14 @@
+[0.0s] escena → c7.no-se-puede
+[1.0s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[1.6s] elige «Con x = 0: dividir por cero.» (¿Para qué x no se puede hacer esa cuenta?)
+[6.0s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[6.1s] lee: Con x = 0 abajo queda −2, y eso se divide. El cero que molesta es el de abajo: aparece con x = 2.
+[6.2s] lee: —Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero.
+[6.3s] lee: La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.
+[6.4s] lee: Yo tengo otra cuenta: (x · x − 4) ÷ (x − 2). Dicen que es lo mismo que x + 2, que es más corta.
+[7.5s] elige «Sí: son la misma cuenta, para cualquier x.» (¿Son la misma cuenta?)
+[9.2s] lee: Con 3 y con 0 dan igual, pero con 2 la primera es 0 ÷ 0: no está definida, y x + 2 da 4. En x = 2 no son la misma.
+[9.2s] lee: —Mara, x · x − 4 es (x − 2) · (x + 2): x · x + 2 · x − 2 · x − 4. Si x no es 2, el (x − 2) de arriba se va con el de abajo y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2.
+[10.1s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?
+[10.1s] escena → c8.diagonal
+[10.9s] {"ended":true,"final":{"mode":"play","seg":"c8.diagonal"},"journal":["Crecer"],"evidenceKinds":["rational-predict","rational-try","rational","rational-simplify"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":10.88,"size":"1600x900","touch":false,"route":"errores","watch":false}

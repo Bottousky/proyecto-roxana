@@ -76,7 +76,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | E8 | Expresiones racionales: dónde no se puede | 1°–5° (rango del bloque) | 7.9 | probado-auto · revisado-mat |
 | E6b | Completar el cuadrado con una o ninguna solución; la raíz de (x + 1)² como distancia al cero | 1°–5° (rango del bloque) | 7.7 | probado-auto (pendiente revisión matemática) |
 | E2b | Sucesiones aritmética y geométrica, nombradas con la tabla de 7.2 | 1°–5° (rango del bloque) | 7.2 | probado-auto (pendiente revisión matemática) |
-| E-gap | Exponente fraccionario, simplificar racionales con su restricción | 1°–5° (rango del bloque) | — | pendiente (C7b) |
+| E8b | Simplificar una expresión racional sin perder la restricción ((x · x − 4) ÷ (x − 2) = x + 2, con x ≠ 2), comprobado con una tabla | 1°–5° (rango del bloque) | 7.9 | probado-auto (pendiente revisión matemática) |
+| E-gap | Exponente fraccionario | 1°–5° (rango del bloque) | — | pendiente (C7b) |
 | F1 | Ángulo como giro; suma de los ángulos de un triángulo | 1°–5° (rango del bloque) | 8.2 | probado-auto · revisado-mat (rev-mat-7) |
 | F2 | Congruencia vs semejanza | 1°–5° (rango del bloque) | 8.3 | probado-auto · revisado-mat |
 | F3 | Escala: longitudes × k, áreas × k², volúmenes × k³ | 1°–5° (rango del bloque) | 8.4 | probado-auto · revisado-mat |
