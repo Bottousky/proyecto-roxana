@@ -60,35 +60,39 @@ export const baldes = {
     await d.shot(SHOTS.tiles, 0.8);
     const xs = pulls(1000);
     let shown = 1;
-    const plot = async upto => {
+    const plot = async (upto, from = shown, data = xs, id = 'c11', ch = YELLOW) => {
       const pts = [];
-      for (let n = shown; n <= upto; n += n < 10 ? 1 : n < 100 ? 3 : 25) pts.push([px(n), py(shareFull(xs, n))]);
-      pts.push([px(upto), py(shareFull(xs, upto))]);
-      const line = w.add(new Drawing(`c11-c${upto}`, [S(pts, seedOf(`c11-c${upto}`), {w: 2.4, p: 0.9, ch: YELLOW})], {z: 13, progress: 0}));
+      for (let n = from; n <= upto; n += n < 10 ? 1 : n < 100 ? 3 : 25) pts.push([px(n), py(shareFull(data, n))]);
+      pts.push([px(upto), py(shareFull(data, upto))]);
+      const line = w.add(new Drawing(`${id}-c${upto}`, [S(pts, seedOf(`${id}-c${upto}`), {w: 2.4, p: 0.9, ch})], {z: 13, progress: 0}));
       await d.draw(line, 0.8, {sound: false});
-      w.add(new Shape(`c11-d${upto}`, dot(`c11-d${upto}`, 5), px(upto), py(shareFull(xs, upto)), {z: 14}));
-      w.add(new Label(`c11-dl${upto}`, pct(shareFull(xs, upto)), px(upto), py(shareFull(xs, upto)) - 14, {size: 16, align: 'center', z: 14, ch: YELLOW}));
-      shown = upto;
-      d.describe(`Con ${upto} baldes, subió lleno el ${pct(shareFull(xs, upto))}.`);
-      d.evidence('freq', {n: upto, share: +shareFull(xs, upto).toFixed(3)});
+      w.add(new Shape(`${id}-d${upto}`, dot(`${id}-d${upto}`, 5, ch), px(upto), py(shareFull(data, upto)), {z: 14}));
+      w.add(new Label(`${id}-dl${upto}`, pct(shareFull(data, upto)), px(upto), py(shareFull(data, upto)) + (ch === BLUE ? 22 : -14), {size: 16, align: 'center', z: 14, ch}));
+      d.describe(`${ch === BLUE ? 'En la otra tanda, con' : 'Con'} ${upto} baldes, subió lleno el ${pct(shareFull(data, upto))}.`);
+      d.evidence('freq', {n: upto, share: +shareFull(data, upto).toFixed(3), batch: ch === BLUE ? 2 : 1});
     };
-    const STEPS = [10, 100, 1000];
-    await d.interact(ctl => new Promise(resolve => {
-      let busy = false;
-      g.setHint(() => ['Tocá para subir más baldes y mirá qué parte sube llena.']);
-      const refresh = () => {
-        const next = STEPS.find(n => n > shown);
-        g.ui.setSpots([wordSpot('c11-more', `hasta ${next}`, A.x1 - 70, A.y0 + 40, async () => {
-          if (busy || !ctl.alive()) return;
-          busy = true;
-          g.ui.setSpots([]);
-          try { await plot(next); } catch { return; }
-          busy = false;
-          if (shown >= 1000) { g.setHint(null); resolve(); } else refresh();
-        }, {label: `Subir baldes hasta ${next}`})]);
-      };
-      refresh();
-    }));
+    // el jugador decide hasta cuántos baldes subir, si probar otra tanda y cuándo alcanza
+    const TARGETS = [10, 30, 100, 300, 1000];
+    let second = false;
+    for (;;) {
+      const opts = TARGETS.filter(n => n > shown).map(n => ({id: String(n), text: `Subir hasta ${n} baldes.`}));
+      if (shown >= 100 && !second) opts.push({id: 'again', text: 'Otra tanda, desde cero.'});
+      if (shown >= 100) opts.push({id: 'done', text: 'Ya está: se ve adónde va.'});
+      const pick = await d.choose(opts, {prompt: shown === 1 ? '¿Hasta cuántos baldes subimos?' : `Van ${shown} baldes. ¿Y ahora?`});
+      if (pick === 'done') { d.evidence('freq-stop', {n: shown, second}); break; }
+      if (pick === 'again') {
+        second = true;
+        await d.say('Balcón', 'Otra tanda de baldes, desde el primero.');
+        const ys = pulls(1000, 2 / 3, 13);
+        await plot(1000, 1, ys, 'c11b', BLUE);
+        await d.think(`La otra tanda empezó muy distinta: con 10 baldes, ${pct(shareFull(ys, 10))}. Con pocos baldes salta para cualquier lado; con mil, ${pct(shareFull(ys, 1000))}: también cerca de dos tercios.`);
+        continue;
+      }
+      const n = Number(pick);
+      await plot(n);
+      shown = n;
+      if (shown >= 1000) { d.evidence('freq-stop', {n: shown, second}); break; }
+    }
     await d.think(guess === 'about' ? 'Al principio salta; con muchos, se queda cerca de dos tercios.' : guess === 'exact' ? 'No se queda clavado en dos tercios: a veces da justo y a veces un poco más o un poco menos, siempre cerca.' : 'Caso por caso es suerte, pero con muchos baldes la parte llena se queda cerca de dos tercios.');
     await d.say('student', 'Balcón, con muchos baldes, la parte que sube llena se acomoda cerca de 2 de cada 3. Eso lo vimos, no está garantizado. Y el próximo balde, igual, no se sabe.');
     await studentWrites(d, g, 'c11-f', 'llenos ÷ baldes → cerca de 2/3', A.x0 + 40, A.y0 + 20, {size: 22});

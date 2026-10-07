@@ -284,6 +284,8 @@ function writeJournal11(g) {
   const seen = [];
   const fp = first('freq-predict');
   if (fp) seen.push(fp.answer === 'about' ? 'Anticipaste que con muchos baldes subirían llenos cerca de dos de cada tres.' : fp.answer === 'exact' ? 'Esperabas exactamente dos de cada tres; con muchos baldes se acercó, sin clavarse.' : 'Pensaste que no se podía decir nada; caso por caso no, pero con muchos baldes la parte llena se acomodó cerca de dos tercios.');
+  const fs = first('freq-stop');
+  if (fs) seen.push((fs.n >= 1000 ? 'Subiste hasta mil baldes' : `Paraste en ${fs.n} baldes, cuando ya se veía adónde iba`) + (fs.second ? '; otra tanda empezó distinta y llegó cerca de lo mismo.' : '.'));
   const sp = first('summary-pick');
   if (sp) seen.push(sp.answer === 'mean' ? 'Elegiste el promedio, 10; ninguna familia tiene 10: lo arrastra la Ronda.' : 'Para una familia común elegiste el del medio, 4 (la mediana).');
   const sk = first('spread-pick');
