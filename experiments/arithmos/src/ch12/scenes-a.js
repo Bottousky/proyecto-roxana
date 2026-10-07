@@ -77,6 +77,7 @@ export const familias = {
       d.describe('En la forma partida, junto a la raya punteada, en el 2, donde no se puede repartir, se escribe «asíntota».');
     }
     await d.say('student', 'Las partidas no están definidas en un lugar: el gráfico se interrumpe ahí, y a eso se le dice discontinuidad. Cerca del 2 se disparan, y se acercan a la raya punteada tanto como se quiera: una raya así se llama asíntota. Esta no la tocan nunca, porque en el 2 no hay valor.');
+    await d.say('student', 'Y la del reparto tiene otra, acostada: si vienen 102, a cada uno le toca 1 ÷ 100 = 0,01; si vienen 1002, 0,001. Cuantos más vienen, más cerca de 0, sin llegar nunca: la raya del 0 también es asíntota.');
     await d.say('student', 'La del «¿cuántas veces?» también tiene una: cerca del 0 baja sin fin, pegada al eje parado.');
     await d.say('student', 'Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
     d.evidence('families', {done: [...done]});
