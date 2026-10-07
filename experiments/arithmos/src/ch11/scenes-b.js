@@ -97,7 +97,7 @@ export const dados = {
       w.add(new Shape(id, poly(id, [[-20, -20], [20, -20], [20, 20], [-20, 20]], {w: 2.6}), x, y, {z: 9}));
       P.forEach(([px, py], i) => w.add(new Shape(`${id}p${i}`, dot(`${id}p${i}`, 3.2, WHITE), x + px, y + py, {z: 10})));
     };
-    const rx = BOARD.x + BOARD.w / 2 + 40;
+    const rx = BOARD.x + 135;
     die('c11-die1', 6, rx - 26, GROUND - 21);
     die('c11-die2', 6, rx + 26, GROUND - 21);
     d.describe('Al lado de Rampa, en el piso, dos dados: los dos muestran seis.');
