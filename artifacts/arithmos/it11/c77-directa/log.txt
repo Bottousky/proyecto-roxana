@@ -1,0 +1,32 @@
+[0.0s] escena → c7.completar
+[1.0s] lee: Mi huerta: un cuadrado de lado x y dos tiras de x pegadas, una a cada lado. En total, ocho cuadraditos de tierra. ¿Cuánto mide x?
+[1.6s] elige «Un cuadradito en la esquina.» (¿Qué le falta para ser un cuadrado?)
+[3.9s] elige «8 + 1: se agregó un cuadradito.» (Del otro lado del igual, ¿qué escribís?)
+[4.3s] lee: —Rampa, un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.
+[4.5s] lee: Con x = 2 se pueden contar: cuatro del cuadrado y dos de cada tira, ocho de tierra. Con la esquina, nueve: tres por tres.
+[4.5s] lee: Las dos cumplen (x + 1)² = 9, porque (−3) · (−3) también es 9. Pruebo x = −4 en la cuenta de Rampa: 16 − 8 = 8. Cumple. La huerta no: un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.
+[4.6s] lee: —La raíz da el lado, el positivo. La raíz de (x + 1)² no es x + 1: es lo lejos que está x + 1 del cero. Por eso x + 1 puede ser 3 o −3, los dos a 3 del cero.
+[4.7s] lee: Al completar, siempre queda un cuadrado igual a un número. ¿Y si el número fuera otro?
+[5.3s] elige «Una sola: x + 1 = 0, x = −1.» ((x + 1)² = 0, ¿cuántas soluciones tiene?)
+[5.7s] lee: Una: sólo el 0, por sí mismo, da 0.
+[6.2s] elige «Ninguna en la recta: un número de la recta, por sí mismo, nunca da negativo.» ((x + 1)² = −4, ¿cuántas soluciones tiene?)
+[6.6s] lee: Ninguna en la recta.
+[6.7s] lee: —Al completar el cuadrado queda (x + algo)² = un número. Si es positivo, dos soluciones; si es cero, una; si es negativo, ninguna en la recta.
+[6.8s] escena → c7.cuantas-veces
+[7.1s] lee: Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?
+[7.7s] elige «Unos diez días.» (Empezando con uno y duplicando cada día, ¿cuántos días para pasar mil?)
+[10.4s] lee: —Punto, 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó.
+[10.5s] lee: Diez: duplicar llega lejos enseguida.
+[10.6s] lee: Para pasar mil, diez. ¿Y para llegar justo a mil?
+[10.7s] lee: —Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero hay pasos más chicos: media duplicación es multiplicar por √2, porque dos medias hacen una, √2 · √2 = 2. Nueve y media: 512 · 1,414, unos 724. Todavía no.
+[10.7s] lee: El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo.
+[10.8s] escena → c7.no-se-puede
+[11.2s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[11.7s] elige «Con x = 2.» (¿Para qué x no se puede hacer esa cuenta?)
+[13.6s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[13.9s] lee: Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2.
+[14.0s] lee: —Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero.
+[14.1s] lee: La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.
+[14.2s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?
+[14.2s] escena → c8.diagonal
+[15.1s] {"ended":true,"final":{"mode":"play","seg":"c8.diagonal"},"journal":["Crecer"],"evidenceKinds":["complete-predict","complete-other","complete-zero","complete-negative","complete","log-predict","log-step","log","rational-predict","rational-try","rational"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":15.103,"size":"1600x900","touch":false,"route":"directa","watch":false}

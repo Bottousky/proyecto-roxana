@@ -220,6 +220,8 @@ export const grafico = {
     d.describe('Punto dibuja dos barras: la suya, el doble de alta que la de Mara. Abajo, en chiquito, el eje empieza en 96.');
     follow(p, s);
     g.setCinematic(false);
+    // la decisión se toma con el gráfico de cerca: el 96 tiene que poder leerse
+    await d.shot(SHOTS.tiles, 0.8);
     const c = await d.choose([
       {id: 'double', text: 'Sí: su barra es el doble de alta.'},
       {id: 'check', text: 'Hay que mirar dónde empiezan las barras.'},

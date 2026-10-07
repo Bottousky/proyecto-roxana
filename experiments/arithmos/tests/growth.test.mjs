@@ -64,6 +64,18 @@ test('completar el cuadrado: x² + 2x = 8 → x = 2 o x = −4', () => {
   for (const x of r.roots) assert.equal(x * x + 2 * x, 8);
 });
 
+test('completar el cuadrado con una o ninguna solución: (x + 1)² = 0 y (x + 1)² = −4', () => {
+  const one = completeSquare(2, -1);
+  assert.equal(one.square, 0);
+  assert.deepEqual(one.roots, [-1]);
+  assert.equal((-1) * (-1) + 2 * (-1), -1);
+  const none = completeSquare(2, -5);
+  assert.equal(none.square, -4);
+  assert.deepEqual(none.roots, []);
+  // ningún número de la recta: x² + 2x + 5 = (x + 1)² + 4 ≥ 4
+  for (let x = -10; x <= 10; x += 0.25) assert.ok(x * x + 2 * x + 5 >= 4);
+});
+
 test('¿cuántas duplicaciones para pasar 1000? diez (512 < 1000 < 1024)', () => {
   const r = timesToReach(2, 1000);
   assert.equal(r.k, 10);

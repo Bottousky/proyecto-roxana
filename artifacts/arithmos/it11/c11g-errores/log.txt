@@ -1,0 +1,30 @@
+[0.0s] escena → c11.grafico
+[1.0s] lee: Punto juntó tiza para la escalera: 104 trozos. Mara juntó 100. Punto hizo un gráfico.
+[1.6s] elige «Sí: su barra es el doble de alta.» (¿Punto juntó el doble de tiza que Mara?)
+[3.5s] lee: Desde cero, casi iguales. El doble era de lo que se veía, no de la tiza.
+[3.6s] lee: —Punto, los números eran ciertos, pero el dibujo decía otra cosa. Si las barras no empiezan en cero, el alto no compara cantidades.
+[3.7s] escena → c11.contar
+[4.0s] lee: Para la fiesta de la escalera tengo 3 sombreros y 2 bufandas. ¿De cuántas maneras distintas me puedo vestir?
+[7.4s] lee: Cada sombrero se abre en dos: 3 veces 2, seis maneras.
+[8.0s] elige «10: seis y cuatro más.» (Si además tiene 4 pares de botas, ¿cuántas maneras?)
+[8.4s] lee: Cada una de las seis maneras se abre en cuatro, una por bota: 6 · 4 = 24. Se multiplica, no se suma.
+[8.5s] lee: —Cornisa, cuando se elige una cosa de cada grupo, las maneras se multiplican: 3 · 2 = 6, y con las botas, 6 · 4 = 24. No hace falta dibujar todas.
+[8.5s] escena → c11.dados
+[8.9s] lee: En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande.
+[9.5s] elige «El 12: es el más grande.» (¿Qué suma sale más seguido, el 7 o el 12?)
+[11.0s] lee: —Rampa, el 7 sale de 6 maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene 6/36 de probabilidad y el 12, 1/36.
+[11.1s] lee: En la tabla, sí. ¿Y tirando de verdad?
+[11.3s] lee: Contando, el 7 debería salir cerca de 60 veces de 360 y el 12, cerca de 10. Salieron 58 y 6: cerca, no exacto.
+[11.4s] lee: Me paso al 7. Aunque el 12 puede salir igual: no es imposible, es raro.
+[11.4s] escena → c11.causa
+[12.5s] lee: Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche.
+[13.8s] elige «Sí: van juntos, el polvo hace borrar a la Marea.» (¿El polvo hace que la Marea borre más?)
+[15.0s] lee: Me olvidaba: también anoté el viento.
+[15.1s] lee: Mirando de a pares con el mismo viento: con poco viento, el día de más polvo borró menos; con bastante, también; con mucho, también. Dentro del mismo viento, más polvo no trajo más borrones.
+[15.2s] lee: —Mara, que dos cosas suban juntas no dice que una cause la otra. Con estos seis días, el que acompaña a los borrones parece el viento, no el polvo. Pero son pocos días: para estar más seguros, habría que anotar muchos más.
+[15.3s] escena → c11.anticipar
+[15.7s] lee: La escalera de Mara crece de a 10, la de Punto se duplica, la rueda vuelve, el balde a veces sí y a veces no. ¿Con todo eso se puede saber qué viene?
+[17.6s] lee: —Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar.
+[17.7s] lee: Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?
+[17.9s] escena → c12.familias
+[18.7s] {"ended":true,"final":{"mode":"play","seg":"c12.familias"},"journal":["Lo que pasa a veces"],"evidenceKinds":["graph-predict","count-predict","count","dice-predict","dice-mark","dice-roll","cause-predict","anticipate"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":18.702,"size":"1600x900","touch":false,"route":"errores","watch":false}

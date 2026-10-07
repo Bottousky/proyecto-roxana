@@ -191,10 +191,11 @@ export const causa = {
     await d.say('Mara', 'Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche.');
     const gx = A.x0 + 40, gy = A.y0 + 220, U = 22;
     w.add(new Drawing('c11-ax', [S([[gx, gy], [gx + 9 * U, gy]], seedOf('c11-ax'), {w: 2, p: 0.9}), S([[gx, gy], [gx, gy - 9 * U]], seedOf('c11-ay'), {w: 2, p: 0.9})], {z: 11}));
-    w.add(new Label('c11-axl', 'polvo →', gx + 9 * U - 30, gy + 20, {size: 14, z: 12, ch: BLUE}));
-    w.add(new Label('c11-ayl', 'borrones', gx + 6, gy - 9 * U - 4, {size: 14, z: 12, ch: BLUE}));
+    w.add(new Label('c11-axl', 'polvo →', gx + 9 * U - 40, gy + 22, {size: 17, z: 12, ch: BLUE}));
+    w.add(new Label('c11-ayl', 'borrones ↑', gx + 6, gy - 9 * U - 4, {size: 17, z: 12, ch: BLUE}));
     DAYS.forEach((r, i) => w.add(new Shape(`c11-pt${i}`, dot(`c11-pt${i}`, 5), gx + r.dust * U, gy - r.erase * U, {z: 13})));
     d.describe('Seis puntos: en general, los días con más polvo tienen más borrones. Los puntos suben juntos.');
+    await d.shot(SHOTS.tiles, 0.8);
     const c = await d.choose([
       {id: 'yes', text: 'Sí: van juntos, el polvo hace borrar a la Marea.'},
       {id: 'maybe', text: 'No se sabe: puede haber algo que cause las dos cosas.'},

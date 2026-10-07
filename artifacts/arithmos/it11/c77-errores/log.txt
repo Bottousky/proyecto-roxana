@@ -1,0 +1,35 @@
+[0.0s] escena → c7.completar
+[1.0s] lee: Mi huerta: un cuadrado de lado x y dos tiras de x pegadas, una a cada lado. En total, ocho cuadraditos de tierra. ¿Cuánto mide x?
+[1.6s] elige «Otra tira.» (¿Qué le falta para ser un cuadrado?)
+[2.9s] lee: Una tira más lo haría más largo de un lado. Le falta el hueco de la esquina: uno por uno.
+[3.9s] elige «Queda 8: el cuadradito es de la huerta, no de la cuenta.» (Del otro lado del igual, ¿qué escribís?)
+[4.4s] lee: Si la huerta ganó un cuadradito, la tierra también: lo que se agrega de un lado del igual, se agrega del otro.
+[4.5s] lee: —Rampa, un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.
+[4.6s] lee: Con x = 2 se pueden contar: cuatro del cuadrado y dos de cada tira, ocho de tierra. Con la esquina, nueve: tres por tres.
+[4.7s] lee: Las dos cumplen (x + 1)² = 9, porque (−3) · (−3) también es 9. Pruebo x = −4 en la cuenta de Rampa: 16 − 8 = 8. Cumple. La huerta no: un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.
+[4.8s] lee: —La raíz da el lado, el positivo. La raíz de (x + 1)² no es x + 1: es lo lejos que está x + 1 del cero. Por eso x + 1 puede ser 3 o −3, los dos a 3 del cero.
+[4.9s] lee: Al completar, siempre queda un cuadrado igual a un número. ¿Y si el número fuera otro?
+[5.5s] elige «Dos, como con el 9: una positiva y una negativa.» ((x + 1)² = 0, ¿cuántas soluciones tiene?)
+[5.8s] lee: Con el 9 había 3 y −3. Con el 0, más cero y menos cero son lo mismo: x + 1 = 0, una sola, x = −1.
+[6.4s] elige «Dos: x = 1 y x = −3.» ((x + 1)² = −4, ¿cuántas soluciones tiene?)
+[6.8s] lee: Con x = 1, (1 + 1)² = 4: da 4, no −4. Un número de la recta por sí mismo da 0 o positivo: ninguna.
+[6.8s] lee: —Al completar el cuadrado queda (x + algo)² = un número. Si es positivo, dos soluciones; si es cero, una; si es negativo, ninguna en la recta.
+[6.9s] escena → c7.cuantas-veces
+[7.3s] lee: Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?
+[7.8s] elige «Unos cien días.» (Empezando con uno y duplicando cada día, ¿cuántos días para pasar mil?)
+[10.7s] lee: Con 10 ya había pasado: 1024. La otra sobraba.
+[10.8s] lee: —Punto, 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó.
+[10.9s] lee: Diez, no cien: duplicar llega lejos enseguida.
+[11.0s] lee: Para pasar mil, diez. ¿Y para llegar justo a mil?
+[11.0s] lee: —Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero hay pasos más chicos: media duplicación es multiplicar por √2, porque dos medias hacen una, √2 · √2 = 2. Nueve y media: 512 · 1,414, unos 724. Todavía no.
+[11.1s] lee: El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo.
+[11.2s] escena → c7.no-se-puede
+[11.5s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[12.1s] elige «Con x = 0: dividir por cero.» (¿Para qué x no se puede hacer esa cuenta?)
+[15.5s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[15.6s] lee: Con x = 0 abajo queda −2, y eso se divide. El cero que molesta es el de abajo: aparece con x = 2.
+[15.7s] lee: —Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero.
+[15.7s] lee: La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.
+[15.8s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?
+[15.9s] escena → c8.diagonal
+[16.6s] {"ended":true,"final":{"mode":"play","seg":"c8.diagonal"},"journal":["Crecer"],"evidenceKinds":["complete-predict","complete-other","complete-zero","complete-negative","complete","log-predict","log-step","log-early","log","rational-predict","rational-try","rational"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":16.568,"size":"1600x900","touch":false,"route":"errores","watch":false}
