@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "chapter": 10,
+  "segment": "c10.rueda",
+  "flags": {
+    "c9periodic": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "answer": "more",
+      "t": "2026-10-07T12:33:35.189Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-predict"
+    },
+    {
+      "v": 2,
+      "t": "2026-10-07T12:34:49.794Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-check"
+    },
+    {
+      "answer": "unknown",
+      "t": "2026-10-07T12:34:52.437Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-transfer"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c9",
+      "title": "Depende",
+      "abbr": "Una función le asigna a cada entrada una sola salida; se puede decir con flechas, tablas, gráficos o cuentas.",
+      "body": [
+        "Una función le asigna a cada entrada una sola salida: el largo de la sombra depende de la hora. Al revés no siempre: con el largo 2 pueden ser las 10 o las 14. Eso es una relación, pero no una función.",
+        "Una regla se adivina con casos; un caso nuevo puede mostrar que está mal, pero si coincide no la prueba (otra regla podría coincidir ahí). Una relación une entradas con salidas; es función si a cada entrada le toca una sola. Una máquina que con el mismo número da distinto no es una función.",
+        "Un gráfico se lee: cada punto dice algo. Se unen los puntos cuando entre medio también hay valores (y es una suposición); no se unen cuando no hay nada entre medio. Si una recta parada corta un dibujo dos veces, no es el gráfico de una función.",
+        "El dominio son las entradas con las que se puede: 1 ÷ (x − 2), todo menos el 2; el reparto, enteros mayores que 2. La imagen es lo que puede salir: con números de la recta, x · x da 0 o positivos. Una misma función se dice con una cuenta, una tabla o un gráfico; lo que se repite se puede anticipar."
+      ],
+      "seen": [
+        "Pensaste que la sombra crecía cada día; el día 2 a las 10 midió 2, como el primero.",
+        "Para dentro de diez días a las 8 dijiste que no se podía saber; lo que se repite se anticipa: 4, mientras el sol dé la misma vuelta."
+      ],
+      "moments": [
+        {
+          "id": "c9.puntos",
+          "label": "Desplegar: puntos que se paran"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c9.vuelve"
+  ],
+  "moments": [],
+  "log": [
+    {
+      "who": "Cornisa",
+      "text": "Seguí midiendo, varios días. Miren."
+    },
+    {
+      "who": null,
+      "text": "No creció: el día 2 a las 10 midió 2, como el primero. La misma ve."
+    },
+    {
+      "who": null,
+      "text": "Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. En el dibujo cada día ocupa sus 24 horas: la ve vuelve cada 24 horas, aunque se mida sólo de 8 a 16."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, medido no está. Anticipado sí, suponiendo que el sol repite su recorrido: unos 4. En diez días lo medimos y vemos."
+    },
+    {
+      "who": null,
+      "text": "Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga."
+    },
+    {
+      "who": "Mara",
+      "text": "Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera."
+    }
+  ],
+  "createdAt": "2026-10-07T12:33:31.539Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    9
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c10.rueda"
+  },
+  "journal": [
+    "Depende"
+  ],
+  "evidenceKinds": [
+    "periodic-predict",
+    "periodic-check",
+    "periodic-transfer"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "59.0"
+  },
+  "errors": [],
+  "seconds": 82.03,
+  "size": "1600x900",
+  "touch": false,
+  "route": "errores",
+  "watch": false
+}

@@ -262,16 +262,20 @@ export const vuelve = {
     const A = area();
     await d.shot(SHOTS.board, 1);
     await d.say('Cornisa', 'Seguí midiendo, varios días. Miren.');
-    const gx = A.x0 + 24, gy = A.y0 + 40, DW = 160, HX = 15, UY = 34;
-    const px = (day, h) => gx + day * DW + (h - 8) * HX, py = v => gy + (4 - v) * UY;
-    w.add(new Drawing('c9-base', [S([[gx - 6, py(0)], [gx + 3 * DW, py(0)]], seedOf('c9-base'), {w: 2.4, p: 0.9})], {z: 11}));
+    // el tiempo a escala: cada día ocupa sus 24 horas, también las que no se midieron
+    const gx = A.x0 + 24, gy = A.y0 + 40, HX = 8, UY = 34;
+    const px = (day, h) => gx + (day * 24 + h - 7) * HX, py = v => gy + (4 - v) * UY;
+    w.add(new Drawing('c9-base', [S([[gx - 6, py(0)], [px(2, 17), py(0)]], seedOf('c9-base'), {w: 2.4, p: 0.9})], {z: 11}));
     for (const v of [1, 2, 4]) w.add(new Label(`c9-vy${v}`, String(v), gx - 8, py(v) + 6, {size: 16, align: 'right', z: 12, ch: BLUE}));
     // las horas del día 1, para poder leer «a las 10» en el gráfico
-    for (const h of [8, 10, 12, 14, 16]) w.add(new Label(`c9-vh${h}`, String(h), px(0, h), py(0) - 6, {size: 14, align: 'center', z: 12, ch: BLUE}));
+    for (const h of [8, 12, 16]) w.add(new Label(`c9-vh${h}`, String(h), px(0, h), py(0) - 6, {size: 14, align: 'center', z: 12, ch: BLUE}));
+    w.add(new Drawing('c9-vt', [8, 10, 12, 14, 16].map((h, i) => S([[px(0, h), py(0) - 3], [px(0, h), py(0) + 3]], seedOf('c9-vt') + i, {w: 1.6, p: 0.7, ch: BLUE, lift: false})), {z: 12}));
     const drawDay = async k => {
       const line = w.add(new Drawing(`c9-v${k}`, [S(DAY.map(([h, v]) => [px(k, h), py(v)]), seedOf(`c9-v${k}`), {w: 2.4, p: 0.9, ch: YELLOW})], {z: 13, progress: 0}));
       DAY.forEach(([h, v]) => w.add(new Shape(`c9-vd${k}${h}`, dot(`c9-vd${k}${h}`, 4), px(k, h), py(v), {z: 14})));
       w.add(new Label(`c9-vl${k}`, `día ${k + 1}`, px(k, 12), py(0) + 22, {size: 17, align: 'center', z: 12, ch: BLUE}));
+      // la noche que sigue: sin medir (y de noche no hay sombra)
+      if (k < 2) w.add(new Label(`c9-vn${k}`, 'noche', px(k, 24), py(0) + 22, {size: 14, align: 'center', z: 12, ch: BLUE, fade: 0.7}));
       await d.draw(line, 0.6, {sound: false});
     };
     await drawDay(0);
@@ -315,7 +319,7 @@ export const vuelve = {
       refresh();
     }));
     await d.think(c === '2' ? 'Dos, como dijiste: la misma ve.' : c === 'more' ? 'No creció: el día 2 a las 10 midió 2, como el primero. La misma ve.' : 'Con un solo día no se sabe seguro. Se anticipa con lo que sabemos del sol, y después se mide: dio 2.');
-    await d.think('Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos.');
+    await d.think('Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. En el dibujo cada día ocupa sus 24 horas: la ve vuelve cada 24 horas, aunque se mida sólo de 8 a 16.');
     const c2 = await d.choose([
       {id: '4', text: 'Unos 4, como los días medidos a las 8, si el sol sigue igual.'},
       {id: 'unknown', text: 'No se puede saber: falta medirlo.'},
