@@ -265,7 +265,9 @@ export const vuelve = {
     const gx = A.x0 + 24, gy = A.y0 + 40, DW = 160, HX = 15, UY = 34;
     const px = (day, h) => gx + day * DW + (h - 8) * HX, py = v => gy + (4 - v) * UY;
     w.add(new Drawing('c9-base', [S([[gx - 6, py(0)], [gx + 3 * DW, py(0)]], seedOf('c9-base'), {w: 2.4, p: 0.9})], {z: 11}));
-    for (const v of [1, 4]) w.add(new Label(`c9-vy${v}`, String(v), gx - 8, py(v) + 6, {size: 16, align: 'right', z: 12, ch: BLUE}));
+    for (const v of [1, 2, 4]) w.add(new Label(`c9-vy${v}`, String(v), gx - 8, py(v) + 6, {size: 16, align: 'right', z: 12, ch: BLUE}));
+    // las horas del día 1, para poder leer «a las 10» en el gráfico
+    for (const h of [8, 10, 12, 14, 16]) w.add(new Label(`c9-vh${h}`, String(h), px(0, h), py(0) - 6, {size: 12, align: 'center', z: 12, ch: BLUE}));
     const drawDay = async k => {
       const line = w.add(new Drawing(`c9-v${k}`, [S(DAY.map(([h, v]) => [px(k, h), py(v)]), seedOf(`c9-v${k}`), {w: 2.4, p: 0.9, ch: YELLOW})], {z: 13, progress: 0}));
       DAY.forEach(([h, v]) => w.add(new Shape(`c9-vd${k}${h}`, dot(`c9-vd${k}${h}`, 4), px(k, h), py(v), {z: 14})));
@@ -274,30 +276,38 @@ export const vuelve = {
     };
     await drawDay(0);
     await d.shot(SHOTS.tiles, 0.8);
+    // primero se anticipa, después se mide
+    const c = await d.choose([
+      {id: '2', text: '2, como hoy a las 10.'},
+      {id: 'unknown', text: 'No se puede saber: mañana es otro día.'},
+      {id: 'more', text: 'Más: cada día crece.'},
+    ], {prompt: 'Mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?', evaluate: true});
+    d.evidence('periodic-predict', {answer: c});
     let k = 1;
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
-      g.setHint(() => ['Tocá «otro día» para agregar la sombra del día siguiente.']);
+      g.setHint(() => [k === 1 ? 'Tocá «otro día»: aparece lo que Cornisa midió mañana. Mirá las 10.' : 'Tocá «otro día» para ver uno más.']);
       const refresh = () => g.ui.setSpots([wordSpot('c9-next', 'otro día', A.x1 - 70, A.y1 - 30, async () => {
         if (busy || !ctl.alive()) return;
         busy = true;
         g.ui.setSpots([]);
         try { await drawDay(k); } catch { return; }
-        d.describe(`El día ${k + 1}: la misma ve, de 4 a 1 y de vuelta a 4.`);
+        d.describe(`El día ${k + 1}, medido: la misma ve, de 4 a 1 y de vuelta a 4. A las 10, 2.`);
         k++;
         busy = false;
         if (k >= 3) { g.setHint(null); resolve(); } else refresh();
-      }, {label: 'Agregar otro día'})]);
+      }, {label: 'Ver lo que midió Cornisa otro día'})]);
       refresh();
     }));
+    await d.think(c === '2' ? 'Dos, como dijiste: la misma ve.' : c === 'more' ? 'No creció: el día 2 a las 10 midió 2, como el primero. La misma ve.' : 'Se podía anticipar: el día 2 a las 10 midió 2, como el primero. La misma ve.');
     await d.think('Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos.');
-    const c = await d.choose([
-      {id: '2', text: '2, como cualquier día a las 10.'},
-      {id: 'unknown', text: 'No se puede saber.'},
-      {id: 'more', text: 'Más: cada día crece.'},
-    ], {prompt: 'Pasado mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?', evaluate: true});
-    d.evidence('periodic-predict', {answer: c});
-    await d.say('student', c === '2' ? 'Cornisa, va a medir 2. Todos los días el sol da la misma vuelta, y la sombra repite su vuelta.' : 'Cornisa, va a medir 2. Todos los días el sol da la misma vuelta y la sombra repite su vuelta. Medido no está, pero el patrón se repite.');
+    const c2 = await d.choose([
+      {id: '4', text: '4, como cualquier día a las 8, si el sol sigue dando la misma vuelta.'},
+      {id: 'unknown', text: 'No se puede saber: no lo medimos.'},
+      {id: 'more', text: 'Más que 4: cada día crece.'},
+    ], {prompt: 'Dentro de diez días, a las 8, ¿cuánto va a medir?', evaluate: true});
+    d.evidence('periodic-transfer', {answer: c2});
+    await d.say('student', c2 === '4' ? 'Cornisa, va a medir 4. Todos los días el sol da la misma vuelta, y la sombra repite su forma de ve.' : 'Cornisa, va a medir 4, como cualquier día a las 8. Medido no está, pero el patrón se repite: el sol da la misma vuelta y la sombra repite su forma de ve.');
     await d.think('Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.');
     if (!replay) writeJournal9(g);
     await d.say('Mara', 'Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.');
@@ -333,7 +343,9 @@ function writeJournal9(g) {
   const im = first('image-predict');
   if (im) seen.push(im.answer === 'never' ? 'Viste que x · x, con números de la recta, nunca da negativo.' : 'Pensaste que x · x podía dar −4; con números de la recta, nunca da negativo.');
   const pp = first('periodic-predict');
-  if (pp) seen.push(pp.answer === '2' ? 'Anticipaste la sombra de pasado mañana: se repite.' : 'Para pasado mañana pensaste otra cosa; la ve se repite cada día.');
+  if (pp) seen.push(pp.answer === '2' ? 'Antes de verlo, anticipaste que mañana a las 10 la sombra mediría 2.' : pp.answer === 'more' ? 'Pensaste que la sombra crecía cada día; el día 2 a las 10 midió 2, como el primero.' : 'Dijiste que mañana no se podía saber; el día 2 repitió la ve: a las 10, 2.');
+  const pt = first('periodic-transfer');
+  if (pt) seen.push(pt.answer === '4' ? 'Para dentro de diez días a las 8 dijiste 4, si el sol sigue dando la misma vuelta.' : pt.answer === 'more' ? 'Para dentro de diez días a las 8 pensaste que la sombra crecía; los días medidos repetían la ve: 4, mientras el sol dé la misma vuelta.' : 'Para dentro de diez días a las 8 dijiste que no se podía saber; lo que se repite se anticipa: 4, mientras el sol dé la misma vuelta.');
   const entry = {
     id: 'c9',
     title: 'Depende',

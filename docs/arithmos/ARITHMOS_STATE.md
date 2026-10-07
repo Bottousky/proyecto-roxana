@@ -83,6 +83,6 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 2. Cobertura pendiente (ver huecos en la matriz): C7b (cociente de potencias, sucesiones nombradas,
    simplificar racionales), J (polinómica de grado mayor, simetrías, parámetros de otras familias, asíntota
    horizontal).
-3. Agencia en 9.8 (el botón único de «otro día») y en los caps. 10–12 (N10-12 A3); bajas de rev-c8 (B7, B9).
+3. Agencia en los caps. 10–12 (N10-12 A3: plantilla y menús evaluados); bajas de rev-c8 (B7, B9); 9.8: tiempo a escala (pendiente de mat-8).
 4. Revisión matemática de 7.7 (una y ninguna solución) y de 9.1 nuevo.
 5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.
