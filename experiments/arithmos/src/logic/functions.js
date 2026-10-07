@@ -39,6 +39,24 @@ export function verticalHits(points, xs, tol = 0.26) {
 /** ¿Es gráfico de una función? (ninguna recta parada lo corta dos veces) */
 export const passesVerticalTest = (points, xs) => verticalHits(points, xs).every(h => h.hits <= 1);
 
+/** Las alturas donde una recta parada en x corta cada dibujo (exactas, de abajo arriba). */
+export function crossings(shape, x) {
+  const r = v => Math.round(v * 1000) / 1000 + 0;
+  if (shape === 'line') return x >= -3 && x <= 3 ? [r(0.5 * x + 1)] : [];
+  if (shape === 'parabola') return x >= -3 && x <= 3 ? [r((x * x) / 3)] : [];
+  if (shape === 'circle') {
+    if (Math.abs(x) > 2) return [];
+    const h = Math.sqrt(4 - x * x);
+    return h === 0 ? [0] : [r(-h), r(h)];
+  }
+  if (shape === 'sideways') {
+    if (x < -1.5 || x > 1.5) return [];
+    const h = Math.sqrt(3 * (x + 1.5));
+    return h === 0 ? [0] : [r(-h), r(h)];
+  }
+  return [];
+}
+
 /** Dominio de una regla sobre una lista de candidatos: donde da un número. */
 export const domainOf = (f, candidates) => candidates.filter(x => Number.isFinite(f(x)));
 

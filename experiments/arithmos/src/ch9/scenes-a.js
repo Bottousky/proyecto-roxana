@@ -2,7 +2,7 @@
 
 import {lerp, easeInOut} from '../engine/rng.js';
 import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
-import {isFunction, inverse, rulesMatching, RULES, verticalHits, SHAPES} from '../logic/functions.js';
+import {isFunction, inverse, rulesMatching, RULES, crossings, SHAPES} from '../logic/functions.js';
 import {GROUND, SHOTS, area, base, boardCast, clean, poly, arrow, dot, Drawing, Label, Shape, S, seedOf, WHITE, YELLOW, BLUE} from './common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
 
@@ -342,56 +342,87 @@ export const recta = {
       w.add(new Drawing(`c9-ax${c.id}`, [S([[c.x - 3.2 * K, c.y], [c.x + 3.2 * K, c.y]], seedOf(`c9-ax${c.id}`), {w: 1.2, p: 0.35, lift: false})], {z: 11}));
     }
     d.describe('Cuatro dibujos: una recta inclinada, un círculo, una curva en forma de U y la misma U acostada.');
-    await d.say('student', 'Si fuera el gráfico de una máquina, a cada entrada, sobre la recta acostada, le tocaría una sola altura. Una recta parada no puede cortarlo dos veces.');
+    await d.say('student', 'Si fuera el gráfico de una máquina, a cada entrada le tocaría una sola salida.');
+    await d.say('Mara', 'Las entradas van sobre la recta acostada. Para mirar una entrada sola, poné una recta parada en ese lugar y contá cuántas veces corta el dibujo.');
     await d.shot(SHOTS.tiles, 0.8);
     const done = {};
-    let sel = null;
     const truth = id => id === 'line' || id === 'parabola';
-    const xs = Array.from({length: 25}, (_, i) => -3 + i * 0.25);
+    const NAME = {line: 'la recta', circle: 'el círculo', parabola: 'la U', sideways: 'la U acostada'};
+    const ring = id => poly(id, Array.from({length: 8}, (_, k) => [Math.cos(k / 8 * Math.PI * 2) * 6, Math.sin(k / 8 * Math.PI * 2) * 6]), {ch: YELLOW, w: 3});
+    // la recta parada sobre el dibujo c, en la entrada x: marca los cortes y los cuenta
+    const bar = (c, x) => {
+      for (const id of ['c9-bar', 'c9-hit0', 'c9-hit1', 'c9-bcount']) w.remove(id);
+      const ys = crossings(c.id, x);
+      w.add(new Drawing('c9-bar', [S([[c.x + x * K, c.y - 3.3 * K], [c.x + x * K, c.y + 3.3 * K]], seedOf('c9-bar'), {w: 2.2, p: 0.9, ch: BLUE})], {z: 15}));
+      ys.forEach((y, i) => w.add(new Shape(`c9-hit${i}`, ring(`c9-hit${i}`), c.x + x * K, c.y - y * K, {z: 16})));
+      w.add(new Label('c9-bcount', ys.length === 0 ? 'no corta' : ys.length === 1 ? 'corta 1 vez' : `corta ${ys.length} veces`, A.x0 + 250, A.y0 + 26, {size: 17, align: 'center', z: 16, ch: BLUE}));
+      return ys;
+    };
+    const clearBar = () => { for (const id of ['c9-bar', 'c9-hit0', 'c9-hit1', 'c9-bcount']) w.remove(id); };
     await d.interact(ctl => new Promise(resolve => {
-      let busy = false;
-      g.setHint(() => [sel ? '¿Es el gráfico de una función? Elegí, y la recta parada lo recorre para comprobarlo.' : 'Tocá un dibujo.']);
+      let busy = false, sel = null, bx = -2.5, moves = 0, sawTwo = false;
+      g.setHint(() => [sel ? 'Mové la recta parada con «← mover» y «mover →» y mirá cuántas veces corta. Cuando sepas, tocá «decidir».' : 'Tocá un dibujo para ponerle la recta parada.']);
+      const show = () => {
+        const ys = bar(sel, bx);
+        if (ys.length > 1) sawTwo = true;
+        d.describe(`La recta parada sobre ${NAME[sel.id]}, en la entrada ${String(bx).replace('.', ',')}: ${ys.length === 0 ? 'no lo corta' : ys.length === 1 ? 'lo corta una vez' : `lo corta ${ys.length} veces, a dos alturas`}.`);
+      };
       const refresh = () => {
-        if (!sel) g.ui.setSpots(cells.filter(c => !(c.id in done)).map(c => rectSpot(`c9-c${c.id}`, `El dibujo ${({line: 'de la recta', circle: 'del círculo', parabola: 'de la U', sideways: 'de la U acostada'})[c.id]}`, {x: c.x - 56, y: c.y - 56, w: 112, h: 112}, () => { if (!busy && ctl.alive()) { sel = c; refresh(); } })));
+        if (!sel) g.ui.setSpots(cells.filter(c => !(c.id in done)).map(c => rectSpot(`c9-c${c.id}`, `El dibujo de ${NAME[c.id]}`, {x: c.x - 56, y: c.y - 56, w: 112, h: 112}, () => {
+          if (busy || !ctl.alive()) return;
+          sel = c; bx = -2.5; moves = 0; sawTwo = false;
+          show();
+          refresh();
+        })));
         else g.ui.setSpots([
-          wordSpot('c9-yes', 'es función', A.x0 + 250, A.y0 + 132, () => judge(true), {label: 'Decir que es el gráfico de una función'}),
-          wordSpot('c9-no', 'no es', A.x0 + 250, A.y0 + 196, () => judge(false), {label: 'Decir que no es el gráfico de una función'}),
+          wordSpot('c9-left', '← mover', A.x0 + 250, A.y0 + 70, () => step(-0.5), {label: 'Mover la recta parada a la izquierda'}),
+          wordSpot('c9-right', 'mover →', A.x0 + 250, A.y0 + 132, () => step(0.5), {label: 'Mover la recta parada a la derecha'}),
+          wordSpot('c9-decide', 'decidir', A.x0 + 250, A.y0 + 200, () => decide(), {label: `Decidir si ${NAME[sel.id]} puede ser el gráfico de una máquina`}),
         ]);
       };
-      const judge = async yes => {
+      const step = dx => {
+        if (busy || !ctl.alive() || !sel) return;
+        const nx = Math.max(-3, Math.min(3, bx + dx));
+        if (nx === bx) return;
+        bx = nx;
+        moves++;
+        g.audio.tap(0.1, 1 + bx * 0.05);
+        show();
+      };
+      const decide = async () => {
         if (busy || !ctl.alive() || !sel) return;
         busy = true;
         g.ui.setSpots([]);
         const c = sel;
-        d.evidence('vertical-predict', {shape: c.id, said: yes, truth: truth(c.id)});
-        // la recta parada recorre el dibujo
-        w.remove('c9-bar');
-        const hits = verticalHits(SHAPES[c.id], xs);
-        const worst = hits.reduce((m, h) => (h.hits > m.hits ? h : m), hits[0]);
-        const marks = [];
+        let said;
         try {
-          await d.tween(1.2, q => {
-            const x = -3 + q * 6;
-            w.remove('c9-bar');
-            w.add(new Drawing('c9-bar', [S([[c.x + x * K, c.y - 3.3 * K], [c.x + x * K, c.y + 3.3 * K]], seedOf('c9-bar'), {w: 2.2, p: 0.9, ch: BLUE})], {z: 15}));
-          });
-          // donde más corta, se marcan los cortes
-          const ys = SHAPES[c.id].filter(pt => Math.abs(pt[0] - worst.x) < 0.12).map(pt => pt[1]);
-          const uniq = [];
-          for (const y of ys.sort((a, b) => a - b)) if (!uniq.length || y - uniq[uniq.length - 1] > 0.6) uniq.push(y);
-          w.remove('c9-bar');
-          w.add(new Drawing('c9-bar', [S([[c.x + worst.x * K, c.y - 3.3 * K], [c.x + worst.x * K, c.y + 3.3 * K]], seedOf('c9-bar'), {w: 2.2, p: 0.9, ch: BLUE})], {z: 15}));
-          uniq.forEach((y, i) => marks.push(w.add(new Shape(`c9-hit${i}`, poly(`c9-hit${i}`, Array.from({length: 8}, (_, k) => [Math.cos(k / 8 * Math.PI * 2) * 6, Math.sin(k / 8 * Math.PI * 2) * 6]), {ch: YELLOW, w: 3}), c.x + worst.x * K, c.y - y * K, {z: 16}))));
-          d.describe(worst.hits > 1 ? `La recta parada corta el dibujo en ${worst.hits} lugares a la vez.` : 'La recta parada corta el dibujo en un solo lugar, en cualquier posición.');
-          await d.wait(0.9);
+          said = await d.choose([
+            {id: 'yes', text: 'Puede ser: en cada entrada, una sola altura.'},
+            {id: 'no', text: 'No puede ser: hay una entrada con dos alturas.'},
+          ], {prompt: `¿${NAME[c.id][0].toUpperCase() + NAME[c.id].slice(1)} puede ser el gráfico de una máquina?`});
+        } catch { return; }
+        const yes = said === 'yes';
+        d.evidence('vertical-predict', {shape: c.id, said: yes, truth: truth(c.id), moves, sawTwo});
+        try {
+          if (!truth(c.id) && (!yes ? !sawTwo : true)) {
+            // la entrada que lo muestra: en 0, dos alturas
+            bx = 0;
+            show();
+            d.describe(`En la entrada 0, la recta parada corta a ${NAME[c.id]} dos veces.`);
+            await d.wait(0.6);
+          } else if (truth(c.id) && !yes) {
+            // se recorre todo: siempre una vez
+            for (let x = -3; x <= 3; x += 0.5) { bx = x; bar(c, x); await d.wait(0.07); }
+            d.describe(`Recorriendo todas las entradas, la recta parada corta a ${NAME[c.id]} siempre una vez.`);
+          }
         } catch { return; }
         const ok = yes === truth(c.id);
         done[c.id] = truth(c.id);
         w.add(new Label(`c9-cl${c.id}`, truth(c.id) ? 'función' : 'no es función', c.x, c.y + 3.6 * K + 4, {size: 16, align: 'center', z: 12, ch: YELLOW}));
-        if (!ok) g.note(truth(c.id) ? 'Una sola altura para cada entrada: sí es función.' : 'Hay entradas con dos alturas: no es función.');
+        if (!ok) g.note(truth(c.id) ? 'Corrida por todas las entradas, corta siempre una vez: una sola altura para cada entrada. Sí puede ser.' : 'En la entrada 0 hay dos alturas a la vez: una máquina no puede dar dos salidas. No puede ser.');
         else g.audio.tap(0.2, 1.5);
-        w.remove('c9-bar');
-        for (const m of marks) w.remove(m.id);
+        try { await d.wait(0.5); } catch { return; }
+        clearBar();
         sel = null;
         busy = false;
         if (Object.keys(done).length === 4) { g.setHint(null); resolve(); } else refresh();

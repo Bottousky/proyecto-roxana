@@ -1,0 +1,34 @@
+[0.0s] escena → c9.recta
+[1.0s] lee: Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?
+[1.0s] lee: —Si fuera el gráfico de una máquina, a cada entrada le tocaría una sola salida.
+[1.1s] lee: Las entradas van sobre la recta acostada. Para mirar una entrada sola, poné una recta parada en ese lugar y contá cuántas veces corta el dibujo.
+[4.5s] elige «Puede ser: en cada entrada, una sola altura.» (¿La recta puede ser el gráfico de una máquina?)
+[6.1s] elige «Puede ser: en cada entrada, una sola altura.» (¿El círculo puede ser el gráfico de una máquina?)
+[9.0s] elige «Puede ser: en cada entrada, una sola altura.» (¿La U puede ser el gráfico de una máquina?)
+[11.3s] elige «No puede ser: hay una entrada con dos alturas.» (¿La U acostada puede ser el gráfico de una máquina?)
+[12.2s] lee: —Balcón, la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas.
+[13.2s] lee: La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál.
+[13.2s] escena → c9.dominio
+[14.3s] lee: Le pedí a Mara una máquina para mi reparto: entra cuántos vienen, sale lo que le toca a cada uno. 1 ÷ (x − 2), como en la escalera.
+[18.8s] lee: Con 2 se traba: abajo queda cero. Con todos los demás sale algo, aunque sea negativo.
+[19.4s] elige «Cualquier número menos el 2, como la máquina.» (Para el reparto de Rampa, ¿qué entradas tienen sentido?)
+[19.8s] lee: La máquina acepta −1 o 0, pero no vienen −1 personas ni cero. Para el reparto, enteros mayores que 2.
+[19.8s] lee: —Rampa, las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.
+[19.9s] escena → c9.imagen
+[20.3s] lee: Esta máquina hace «por sí mismo»: x · x. Oval me pidió que le saque un −4 para una cuenta. ¿Qué le doy?
+[28.6s] elige «Sí: con −2, que es negativo.» (¿Puede salir −4?)
+[29.0s] lee: (−2) · (−2) da 4, no −4: menos por menos es más, como en el cap. 4.
+[29.1s] lee: —Mara, lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta.
+[29.3s] escena → c9.maneras
+[29.7s] lee: Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles.
+[32.2s] lee: —Mara, con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.
+[32.3s] lee: Y la mía, la B, es diez más uno por día: 10 + d.
+[32.3s] escena → c9.vuelve
+[33.4s] lee: Seguí midiendo, varios días. Miren.
+[37.2s] lee: Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos.
+[37.7s] elige «Más: cada día crece.» (Pasado mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?)
+[38.2s] lee: —Cornisa, va a medir 2. Todos los días el sol da la misma vuelta y la sombra repite su vuelta. Medido no está, pero el patrón se repite.
+[38.3s] lee: Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.
+[38.3s] lee: Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.
+[38.6s] escena → c10.rueda
+[39.3s] {"ended":true,"final":{"mode":"play","seg":"c10.rueda"},"journal":["Depende"],"evidenceKinds":["vertical-predict","vertical","domain-try","domain-story","domain","image-try","image-predict","image","match","three-ways","periodic-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":39.339,"size":"1600x900","touch":false,"route":"errores","watch":false}

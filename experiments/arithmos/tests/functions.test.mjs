@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {isFunction, inverse, rulesMatching, passesVerticalTest, SHAPES, domainOf, imageOf} from '../src/logic/functions.js';
+import {isFunction, inverse, rulesMatching, passesVerticalTest, SHAPES, domainOf, imageOf, crossings} from '../src/logic/functions.js';
 
 const SOMBRA = [[8, 4], [10, 2], [12, 1], [14, 2], [16, 4]];
 
@@ -22,6 +22,23 @@ test('recta parada: la recta y la parábola pasan; el círculo y la parábola ac
   assert.equal(passesVerticalTest(SHAPES.parabola, xs), true);
   assert.equal(passesVerticalTest(SHAPES.circle, xs), false);
   assert.equal(passesVerticalTest(SHAPES.sideways, xs), false);
+});
+
+test('recta parada en un lugar: cuántas veces corta cada dibujo', () => {
+  assert.deepEqual(crossings('line', -2.5), [-0.25]);
+  assert.deepEqual(crossings('parabola', 0), [0]);
+  assert.deepEqual(crossings('circle', -2.5), []);
+  assert.deepEqual(crossings('circle', 0), [-2, 2]);
+  assert.deepEqual(crossings('circle', 2), [0]);
+  assert.deepEqual(crossings('sideways', -2.5), []);
+  assert.deepEqual(crossings('sideways', -1.5), [0]);
+  assert.equal(crossings('sideways', 0).length, 2);
+  // los cortes caen sobre los dibujos muestreados
+  for (const id of ['line', 'parabola', 'circle', 'sideways']) {
+    for (let x = -3; x <= 3; x += 0.5) {
+      for (const y of crossings(id, x)) assert.ok(SHAPES[id].some(([px, py]) => Math.hypot(px - x, py - y) < 0.25), `${id} ${x} ${y}`);
+    }
+  }
 });
 
 test('dominio e imagen', () => {

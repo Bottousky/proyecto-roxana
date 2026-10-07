@@ -185,6 +185,10 @@ function pickChoice(prompt, options) {
     ['gira 30°, ¿a qué altura', 'A un tercio'],
     ['Girada 390°', 'Más que 1'],
     ['largo 6, con la misma inclinación', 'Sube 4'],
+    ['círculo puede ser', 'Puede ser'],
+    ['La U acostada puede ser', 'No puede'],
+    ['La U puede ser', 'Puede ser'],
+    ['La recta puede ser', 'Puede ser'],
     ['2³ · 2², como una sola', '2⁶: tres por dos'],
     ['(2³)², como una sola', '2⁹'],
     ['2³ + 2² es 2⁵', 'Sí'],
@@ -310,6 +314,10 @@ function pickChoice(prompt, options) {
     ['gira 30°, ¿a qué altura', 'A medio rayo'],
     ['Girada 390°', '0,5'],
     ['largo 6, con la misma inclinación', 'Sube 3'],
+    ['círculo puede ser', 'No puede'],
+    ['La U acostada puede ser', 'No puede'],
+    ['La U puede ser', 'Puede ser'],
+    ['La recta puede ser', 'Puede ser'],
     ['2³ · 2², como una sola', '2⁵: tres'],
     ['(2³)², como una sola', '2⁶: dos veces'],
     ['2³ + 2² es 2⁵', 'No:'],
@@ -367,6 +375,7 @@ let dosPasosStep = 0;
 let copyCand = null;
 let coordStep = 0;
 let c9Shape = null;
+let c9Moves = 0;
 let c11Item = null;
 let knobStep = 0;
 let c12Cell = 0;
@@ -701,13 +710,15 @@ for (let iter = 0; iter < 30000; iter++) {
       const h = free[0];
       const wrong = route === 'errores' && !tried.has('c9plot') && (tried.add('c9plot'), true);
       target = spots.find(x => x.id === `c9-pt${h}_${wrong ? (MAP[h] + 1) % 5 : MAP[h]}`);
-    } else if (s.seg === 'c9.recta' && spots.some(x => x.id === 'c9-yes')) {
-      const truth = {line: true, parabola: true, circle: false, sideways: false}[c9Shape];
-      const wrong = route === 'errores' && !tried.has(`c9v${c9Shape}`) && c9Shape === 'circle' && (tried.add(`c9v${c9Shape}`), true);
-      target = spots.find(x => x.id === ((truth !== wrong) ? 'c9-yes' : 'c9-no'));
+    } else if (s.seg === 'c9.recta' && spots.some(x => x.id === 'c9-decide')) {
+      // corre la recta parada hasta la entrada 0 y decide; con errores, el círculo se decide sin mirar
+      const hasty = route === 'errores' && c9Shape === 'circle';
+      if (!hasty && c9Moves < 5) { c9Moves++; target = spots.find(x => x.id === 'c9-right'); }
+      else target = spots.find(x => x.id === 'c9-decide');
     } else if (s.seg === 'c9.recta' && spots.some(x => x.id.startsWith('c9-c'))) {
       target = spots[0];
       c9Shape = target.id.replace('c9-c', '');
+      c9Moves = 0;
     } else if (s.seg === 'c9.maneras' && spots.some(x => x.id.startsWith('c9-e') || x.id.startsWith('c9-l'))) {
       const sel = s.spots.find(x => x.selected);
       if (!sel) target = spots.find(x => x.id.startsWith('c9-e'));
