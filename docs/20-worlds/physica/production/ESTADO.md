@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-07 · iteración 17 (el registrador del carro: dos registros del mismo viaje; B3 en curso; ver `evidence/iter-17`).
+**Actualizado:** 2026-10-07 · iteración 18 (el jalón y el encargo de la vecina; B3 en curso; ver `evidence/iter-18`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,23 @@
 
 ## Hito actual: B (primer episodio), en curso. El A espera la evaluación humana (`EVALUACION-HITO-A.md`)
 
-**Último cambio aceptado (iteración 17, Hito B · B3 en curso):** el registrador del carro (D22).
+**Último cambio aceptado (iteración 18, Hito B · B3 en curso):** el jalón y el encargo de la vecina (D23).
+- **El encargo:** en la parada este, una vecina pide que la última tiza de un viaje quieto caiga al pie de su jalón (21,5 m).
+  - Se puede predecir: el cero del carro se detiene en 19,0 m, marcado por el cartel y la chapa; hay que ir en 2,5 m de la cinta.
+  - Ella responde en el mundo: «Faltaron 0,7 m →» o «¡Justo ahí!», con la bandera.
+  - Caminar no vale.
+  - Al cumplirse, corre su jalón a 20,3 m cuando el carro sale.
+- **El jalón del explorador:** se clava en el andén o en el carro, con su cinta con signo. La Bitácora muestra que cambiar el cero cambia las posiciones y no los desplazamientos.
+- **Evidencia:**
+  - 102 pruebas;
+  - la secuencia con teclas, con las dos rondas;
+  - el recorrido completo desde un inicio limpio, que cumple el encargo;
+  - una revisión independiente en dos pasadas.
+- **Declarado:** el encargo recompensa predecir, no lo obliga (se puede tantear). En la parada oeste el pedido queda fuera de cuadro.
+
+  Ver `evidence/iter-18`.
+
+**Iteración 17 (Hito B · B3 en curso):** el registrador del carro (D22).
 - **Qué hace:** cada 0,5 s marca dónde está el explorador en dos registros a la vez:
   - tiza en el cordón del andén;
   - tinta en la cinta del carro;
@@ -238,19 +254,19 @@
 
 El loop no se detiene: según el contrato, al cerrar un hito se sigue con el próximo, y esas validaciones quedan pedidas.
 
-**Próximo resultado: el jalón y un encargo que exija predecir (B3).**
-- **El jalón:**
-  - una vara que el explorador lleva y planta, en el andén o sobre el carro;
-  - las lecturas se toman también desde él;
-  - mover el origen cambia las posiciones y no los desplazamientos.
-- **Un encargo de un vecino en la parada:** por ejemplo, «que tu última tiza quede en mi jalón».
-  - Pide elegir dónde pararse en la cinta antes de salir: la posición en el carro más la del carro.
-  - Falla sin castigo y se reintenta.
-- **La vista en tabla** de los dos registros: marca, t, cordón, cinta.
+**Próximo resultado: cerrar «Introducción» con lo que falta, y prepararla para personas (B3).**
+- **La vista en tabla** de los dos registros y del jalón: marca, t, cordón, cinta, jalón. La resta cordón − cinta es la posición del carro.
+- **Un segundo observador en el andén** que describa el mismo viaje: el ejemplo del contrato.
+- **El pedido legible donde se decide,** en la parada oeste.
+- **La transferencia:** el bote junto al arco de agua.
+- **El paquete de evaluación humana de la familia,** con las preguntas de las revisiones 17 y 18.
 - **Criterio:**
-  - con teclado, el encargo se cumple con una predicción y falla con otra;
+  - con teclado;
   - pruebas;
-  - una revisión que lo lea como problema.
+  - una revisión que la lea como familia completa;
+  - si sólo queda validación humana, se pide y se sigue con la familia MRU (B4).
+
+*Plan cumplido en la iteración 18:* el jalón (el origen) y un encargo que recompensa predecir.
 
 *Plan cumplido en la iteración 17:* dos registros físicos del mismo viaje, el caso caminando y el signo.
 

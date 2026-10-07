@@ -41,9 +41,10 @@ Los nombres de escenas son propuestas; los resultados educativos son los del con
     - El caso que no es trivial: caminar sobre el carro en marcha. Contra la marcha, la tiza se queda quieta y la tinta avanza.
     - El desplazamiento negativo hacia el oeste.
     - Las notas de la Bitácora, con los números de cada viaje.
+  - **Hecho en la iteración 18 (D23):**
+    - el jalón, un cero que se clava en el andén o en el carro, con su cinta con signo;
+    - el encargo de la vecina: un viaje quieto cuya última tiza caiga al pie de su jalón. Recompensa predecir dónde ir en el carro (19,0 + lectura de la cinta) y después se corre a otro número.
   - **Falta, en orden:**
-    - **el jalón:** mover el origen cambia las posiciones, no los desplazamientos;
-    - **un encargo que exija predecir en un marco;**
     - **la vista en tabla:** marca, t, cordón, cinta;
     - **una persona en el andén** como segundo observador;
     - **la transferencia del bote.**

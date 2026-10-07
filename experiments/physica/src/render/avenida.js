@@ -5,7 +5,7 @@
 // static parts go into the neighbourhood's group (merged by material there); the car, the drum and
 // the pulleys are returned to be kept apart and driven by `update`.
 import * as THREE from 'three';
-import { TERRACE_Y, CALLE, AVENIDA, CARRO } from '../sim/levels/cascada.js';
+import { TERRACE_Y, CALLE, AVENIDA, CARRO, JALONES, ENCARGO } from '../sim/levels/cascada.js';
 import { mergeStatic } from './merge.js';
 
 const Y = TERRACE_Y;
@@ -22,6 +22,27 @@ function rulerTexture(len, { step = 1, every = 2, px = 96, from = 0, bg = '#efe2
     // (the zero is labelled too, left-aligned at the edge: it is the reference)
     if (major && x < c.width - 20) { g.textAlign = x < 20 ? 'left' : 'center'; g.fillText(String(Math.round(from + m)), x < 20 ? x + 6 : x, 50); }
   }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+
+/** A surveyor's pole (jalón): red and white bands every 0.2 m, a steel point. Origin at its point. */
+export function jalonMesh(M, h = 1.6) {
+  const c = document.createElement('canvas'); c.width = 8; c.height = 64; const g = c.getContext('2d');
+  for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#f4ece0' : '#c8321f'; g.fillRect(0, i * 8, 8, 8); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, h / 1.6);
+  const grp = new THREE.Group();
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, h - 0.12, 10), new THREE.MeshStandardMaterial({ map: t, roughness: 0.6 })); rod.position.y = 0.12 + (h - 0.12) / 2; rod.castShadow = true; grp.add(rod);
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.12, 10), M.brassDark); tip.rotation.x = Math.PI; tip.position.y = 0.06; grp.add(tip);
+  return grp;
+}
+
+/** A small sign texture with lines of text. */
+function signTexture(lines, { w = 256, h = 160, bg = '#f1e6cc', ink = '#3a2a1c', band = '#b5603f' } = {}) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+  g.fillStyle = bg; g.fillRect(0, 0, w, h); g.fillStyle = band; g.fillRect(0, 0, w, 30);
+  g.fillStyle = '#f6ecd6'; g.font = 'bold 22px Inter, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(lines[0], w / 2, 16);
+  const step = (h - 40) / Math.max(1, lines.length - 1);
+  g.fillStyle = ink; lines.slice(1).forEach((l, i) => { g.font = `${i === lines.length - 2 ? `bold ${Math.min(40, w / 2.4)}px` : '24px'} Inter, system-ui, sans-serif`; g.fillText(l, w / 2, 36 + step * (i + 0.6)); });
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 
@@ -93,11 +114,19 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
   const retW = wheelGroup(); retW.scale.setScalar(0.45); retW.rotation.x = -Math.PI / 2; retW.position.set(xw + 0.6, Y - 0.42, zc); scene.add(retW);
   const retE = wheelGroup(); retE.scale.setScalar(0.45); retE.rotation.x = -Math.PI / 2; retE.position.set(xe - 0.6, Y - 0.42, zc); scene.add(retE);
   // stop posts on the platform, with a bell, at each stop
+  // The stops: a post right where the car's tape zero (its west end) stops, its sign pointing down at a
+  // yellow plate on the kerb with the zero of the car's tape (the same yellow), and a bell.
   for (const x of CARRO.stops) {
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 2.6, 10), M.brassDark); post.position.set(x + CARRO.len / 2 + 0.4, Y + 1.3, AVENIDA.andenZ0 + 0.9); post.castShadow = true; scene.add(post);
-    const sign = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.42, 0.04), M.enamel); sign.position.set(x + CARRO.len / 2 + 0.4, Y + 2.35, AVENIDA.andenZ0 + 0.9); scene.add(sign);
-    const band = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.1, 0.05), mats.terracotta); band.position.set(x + CARRO.len / 2 + 0.4, Y + 2.35, AVENIDA.andenZ0 + 0.9); scene.add(band);
-    const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.13, 0.18, 12, 1, true), M.brass); bell.position.set(x + CARRO.len / 2 + 0.4, Y + 2.0, AVENIDA.andenZ0 + 0.98); scene.add(bell);
+    const x0 = x - CARRO.len / 2, zero = Math.round((x0 - CARRO.kerb0) * 10) / 10, pz = AVENIDA.andenZ0 + 0.75;
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 2.6, 10), M.brassDark); post.position.set(x0 - 0.45, Y + 1.3, pz); post.castShadow = true; scene.add(post);
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.04), M.brassDark); arm.position.set(x0 - 0.2, Y + 2.62, pz); scene.add(arm);
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.62), new THREE.MeshStandardMaterial({ map: signTexture(['PARADA', 'aquí para el 0', 'del carro:', `${String(zero).replace('.', ',')} m ↓`], { h: 200 }), roughness: 0.7 }));
+    sign.position.set(x0, Y + 2.25, pz + 0.03); scene.add(sign);
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.84, 0.66, 0.03), M.brassDark); back.position.set(x0, Y + 2.25, pz); scene.add(back);
+    const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.34), new THREE.MeshStandardMaterial({ map: signTexture(['', '0'], { w: 64, h: 100, bg: '#d9a441', band: '#d9a441', ink: '#1e140c' }), roughness: 0.5 }));
+    plate.rotation.x = -Math.PI / 2; plate.position.set(x0 + 0.11, Y + 0.0665, AVENIDA.andenZ0 + 0.52); scene.add(plate);
+    const pin = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.013, 0.5), M.ink); pin.position.set(x0, Y + 0.066, AVENIDA.andenZ0 + 0.4); scene.add(pin);
+    const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.13, 0.18, 12, 1, true), M.brass); bell.position.set(x0 - 0.45, Y + 1.9, pz + 0.08); scene.add(bell);
   }
   // ---- the car: a deck on wheels, a bench, a lantern at each end, a ruler along its side ----
   const car = new THREE.Group();
@@ -130,6 +159,48 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
   const recPost = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 0.58, 8), M.brassDark); recPost.position.set(RX, Y + 0.29, RZ); car.add(recPost);
   const recDial = new THREE.Mesh(new THREE.CircleGeometry(0.085, 20), M.enamel); recDial.position.set(RX, Y + 0.71, RZ + 0.115); car.add(recDial);
   car.position.set(k.x, 0, zc); scene.add(car);
+  // the jalones' rack (two spare poles stay in it), and the neighbour's jalón on the kerb
+  const rack = new THREE.Group(); rack.position.set(JALONES.x, Y, JALONES.z - 0.15);
+  const rackBar = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.06, 0.06), M.wood); rackBar.position.y = 1.0; rack.add(rackBar);
+  for (const sx of [-0.32, 0.32]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.05, 0.06), M.wood); leg.position.set(sx, 0.52, 0); rack.add(leg); }
+  for (const sx of [-0.2, 0.0]) { const p = jalonMesh(M); p.position.set(sx, 0.02, -0.06); p.rotation.x = -0.12; rack.add(p); }
+  scene.add(rack);
+  // her jalón (moved to the next target once one is met), its flag, and a box on the kerb's chalk band
+  // that is the tolerance (±15 cm): the last chalk must fall inside it
+  const her = new THREE.Group(); scene.add(her);
+  const herJalon = jalonMesh(M); herJalon.position.set(0, Y + 0.06, AVENIDA.andenZ0 + 0.3); her.add(herJalon);
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.15), new THREE.MeshStandardMaterial({ color: '#3f6f7a', side: THREE.DoubleSide })); flag.geometry.translate(0.12, 0, 0); flag.position.set(0, Y + 1.58, AVENIDA.andenZ0 + 0.3); her.add(flag);
+  const tol = ENCARGO.tol;
+  for (const dx of [-tol, tol]) { const bar = new THREE.Mesh(new THREE.PlaneGeometry(0.016, 0.3).rotateX(-Math.PI / 2), M.ink); bar.position.set(dx, Y + 0.0668, AVENIDA.andenZ0 + 0.2); her.add(bar); }
+  for (let i = 0; i < 5; i++) for (const dz of [0.06, 0.34]) { const dash = new THREE.Mesh(new THREE.PlaneGeometry(0.04, 0.012).rotateX(-Math.PI / 2), M.ink); dash.position.set(-tol + 0.03 + i * 0.06, Y + 0.0668, AVENIDA.andenZ0 + dz); her.add(dash); }
+  // her speech bubble (what she asks, how the last try went), over her head
+  const bub = (() => { const c = document.createElement('canvas'); c.width = 512; c.height = 200; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); sp.scale.set(2.0, 0.78, 1); sp.renderOrder = 10; sp.visible = false; sp.position.set(ENCARGO.vecina.x - 0.6, Y + 2.75, ENCARGO.vecina.z); scene.add(sp); return { sp, c, t, key: '' }; })();
+  const say = (lines) => {
+    const key = lines.join('|'); if (key === bub.key) return; bub.key = key;
+    const g = bub.c.getContext('2d'); g.clearRect(0, 0, 512, 200);
+    g.fillStyle = 'rgba(250,243,228,0.96)'; g.strokeStyle = '#3a2a1c'; g.lineWidth = 4; g.beginPath(); g.roundRect(6, 6, 500, 160, 26); g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(330, 164); g.lineTo(380, 196); g.lineTo(370, 160); g.fill();
+    g.fillStyle = '#2b1d12'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    lines.forEach((l, i) => { g.font = `${i === 0 ? 'bold 38px' : '30px'} Inter, system-ui, sans-serif`; g.fillText(l, 256, 52 + i * 46 + (lines.length === 2 ? 22 : 0)); });
+    bub.t.needsUpdate = true;
+  };
+  let seenTries = 0, wave = 0;
+  // the explorer's jalón carries its own tape, signed, with its zero at the pole (−3 … 0 … +3)
+  const signedTape = (left, right) => {
+    const px = 128, w = Math.round((left + right) * px), c = document.createElement('canvas'); c.width = w; c.height = 72; const g = c.getContext('2d');
+    g.fillStyle = '#efe7f4'; g.fillRect(0, 0, w, 72); g.fillStyle = '#3b2a52'; g.font = 'bold 30px Inter, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top';
+    for (let m = Math.ceil(-left * 2) / 2; m <= right + 1e-6; m += 0.5) {
+      const x = Math.round((m + left) * px), int = Math.abs(m - Math.round(m)) < 1e-6;
+      g.fillRect(x - (m === 0 ? 4 : int ? 2 : 1), 0, m === 0 ? 8 : int ? 4 : 2, m === 0 ? 72 : int ? 30 : 16);
+      if (int && m !== 0 && x > 16 && x < w - 16) g.fillText((m < 0 ? '−' : '+') + Math.abs(Math.round(m)), x, 34);
+    }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+  };
+  const jTape = new THREE.Mesh(new THREE.PlaneGeometry(1, 0.2).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.95 }));
+  jTape.visible = false; scene.add(jTape);
+  let jTapeKey = '';
+  // the explorer's jalón: drawn where the simulation says it is (rack, hand, platform, car)
+  const myJalon = jalonMesh(M); scene.add(myJalon);
   // each moving part is merged within itself (one mesh per material: the car ~30 meshes → a handful)
   for (const g of [car, drum, retW, retE]) mergeStatic(g);
   // (added after merging: they change) the recorder's lamp and hand; its marks
@@ -156,16 +227,50 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
   const ink = new THREE.InstancedMesh(new THREE.CircleGeometry(0.032, 14).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffffff' }), MAXM);
   ink.count = 0; ink.frustumCulled = false; car.add(ink);
   // how many ink marks a column holds, written beside it (×22): one bar would read as one mark
-  const makeCount = parent => { const c = document.createElement('canvas'); c.width = 128; c.height = 64; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); sp.scale.set(0.42, 0.21, 1); sp.visible = false; sp.renderOrder = 9; parent.add(sp); return { sp, c, t }; };
+  const makeCount = parent => { const c = document.createElement('canvas'); c.width = 128; c.height = 64; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); sp.scale.set(0.5, 0.25, 1); sp.visible = false; sp.renderOrder = 9; parent.add(sp); return { sp, c, t }; };
   const inkCounts = [makeCount(car), makeCount(car)], chalkCount = makeCount(scene); // (the two largest ink columns; the chalk's too)
-  const writeCount = ({ sp, c, t }, n) => { const g = c.getContext('2d'); g.clearRect(0, 0, 128, 64); g.fillStyle = 'rgba(30,20,12,0.85)'; g.beginPath(); g.roundRect(4, 8, 120, 48, 14); g.fill(); g.fillStyle = '#f6e7c4'; g.font = 'bold 34px Inter, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`×${n}`, 64, 33); t.needsUpdate = true; };
+  // (what is counted is written too: '×22' alone beside the kerb's '22' read as a reading)
+  const writeCount = ({ sp, c, t }, n, what) => { const g = c.getContext('2d'); g.clearRect(0, 0, 128, 64); g.fillStyle = 'rgba(30,20,12,0.85)'; g.beginPath(); g.roundRect(4, 8, 120, 48, 14); g.fill(); g.fillStyle = '#f6e7c4'; g.font = 'bold 24px Inter, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`${what} ×${n}`, 64, 33); t.needsUpdate = true; };
   let lastMarks = 0, flash = 0;
   let shownTrip = -1, shown = 0;
   let spin = 0;
   return {
-    keep: [car, drum, retW, retE, cable],
+    keep: [car, drum, retW, retE, cable, myJalon, her, jTape], // (her group moves with the target: not merged)
     update(dt, time, alpha = 1) {
       car.position.x = (k.px ?? k.x) + (k.x - (k.px ?? k.x)) * alpha;
+      const jl = world.jalon, av = world.avatar;
+      // her jalón where the current target is; her flag waves for a while after a success
+      const er = world.errand, tgt = ENCARGO.targets[Math.min(er.round, ENCARGO.targets.length - 1)];
+      her.position.x = CARRO.kerb0 + ENCARGO.targets[Math.min(er.placed ?? er.round, ENCARGO.targets.length - 1)];
+      if (er.tries.length !== seenTries) { const t = er.tries.at(-1); seenTries = er.tries.length; if (t && t.still && Math.abs(t.miss) <= ENCARGO.tol) wave = 4; }
+      wave = Math.max(0, wave - dt); flag.position.y = Y + 1.58 + (wave > 0 ? 0.25 : 0); flag.rotation.y = wave > 0 ? Math.sin(time * 9) * 0.6 : 0;
+      // what she says (visible near her, on the platform or the car)
+      const near = av.z < -35; // (anywhere on the platform or the car: the west stop is where the place is chosen)
+      const last = er.tries.at(-1), fmt1 = v => v.toFixed(1).replace('.', ',').replace('-', '−');
+      if (er.state === 'none') bub.sp.visible = false;
+      else {
+        bub.sp.visible = near;
+        if (er.state === 'done') say(wave > 0 ? ['¡Justo ahí!', 'Gracias.'] : ['Gracias por las tizas.']);
+        else if (wave > 0) say(['¡Justo ahí!', `¿Y ahora en ${fmt1(tgt)} m?`]);
+        else if (!last || last.round !== er.round) say(['Tu última tiza, al pie', `de mi jalón: ${fmt1(tgt)} m`, 'viajando quieto → parada este']);
+        else if (!last.still) say(['Caminaste en el viaje:', 'así no vale.', 'Elegí tu lugar antes de salir.']);
+        else say([last.miss < 0 ? `Faltaron ${fmt1(-last.miss)} m  →` : `←  Sobraron ${fmt1(last.miss)} m`, `Mi jalón: ${fmt1(tgt)} m`]);
+      }
+      // the explorer's jalón's own tape, when planted
+      const tk = `${jl.state}|${jl.version}`;
+      if (tk !== jTapeKey) {
+        jTapeKey = tk;
+        if (jl.state === 'ground') { jTape.material.map?.dispose(); jTape.material.map = signedTape(5, 5); jTape.material.needsUpdate = true; jTape.scale.set(10, 1, 1); jTape.userData.off = 0; if (jTape.parent !== scene) scene.add(jTape); }
+        else if (jl.state === 'car') { jTape.material.map?.dispose(); jTape.material.map = signedTape(jl.c, CARRO.len - jl.c); jTape.material.needsUpdate = true; jTape.scale.set(CARRO.len, 1, 1); jTape.userData.off = CARRO.len / 2 - jl.c; car.add(jTape); }
+        jTape.visible = jl.state === 'ground' || jl.state === 'car';
+      }
+      if (jl.state === 'ground') jTape.position.set(jl.x, Y + 0.008, Math.max(jl.z + 0.22, AVENIDA.andenZ0 + 0.5)); // (never under the kerb)
+      else if (jl.state === 'car') jTape.position.set(-CARRO.len / 2 + jl.c + jTape.userData.off, Y + 0.009, jl.z - zc + 0.22);
+      myJalon.rotation.set(0, 0, 0);
+      if (jl.state === 'rack') myJalon.position.set(JALONES.x + 0.2, Y + 0.02, JALONES.z - 0.21), myJalon.rotation.x = -0.12;
+      else if (jl.state === 'hand') { const ax = av.px + (av.x - av.px) * alpha; myJalon.position.set(ax + av.facing * 0.28, av.y - av.hh + 0.25, av.z + 0.12); myJalon.rotation.z = -av.facing * 0.18; }
+      else if (jl.state === 'ground') myJalon.position.set(jl.x, Y, jl.z);
+      else if (jl.state === 'car') myJalon.position.set(car.position.x - CARRO.len / 2 + jl.c, Y, jl.z);
       // the cable runs at the car's cruising speed, always: its marks move along, the wheels turn
       spin += dt * CARRO.speed; drum.rotation.z = -spin / 1.15; retW.rotation.z = retE.rotation.z = spin / (1.15 * 0.45);
       cableTex.offset.x = -spin / 0.5;
@@ -194,9 +299,9 @@ export function buildAvenida(scene, { M, mats, building, footprints, paveMat, wo
         for (const im of [chalk, ink, notch, thread]) { im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; }
         // a count beside each group of 3 or more (the two largest on the tape, the largest on the kerb)
         const ig = [...inkGroups].filter(([, c]) => c >= 3).sort((a, b) => b[1] - a[1]);
-        inkCounts.forEach((L, j) => { const g = ig[j]; L.sp.visible = !!g; if (g) { writeCount(L, g[1]); L.sp.position.set(r.marks[g[0]].c - CARRO.len / 2 + 0.28, Y + 0.25, D / 2 - 0.17); } });
+        inkCounts.forEach((L, j) => { const g = ig[j]; L.sp.visible = !!g; if (g) { writeCount(L, g[1], 'tinta'); L.sp.position.set(r.marks[g[0]].c - CARRO.len / 2 + 0.28, Y + 0.25, D / 2 - 0.17); } });
         const gg = [...gGroups].filter(([, c]) => c >= 3).sort((a, b) => b[1] - a[1])[0];
-        chalkCount.sp.visible = !!gg; if (gg) { writeCount(chalkCount, gg[1]); chalkCount.sp.position.set(CARRO.kerb0 + r.marks[gg[0]].g + 0.3, Y + 0.25, AVENIDA.andenZ0 + 0.3); }
+        chalkCount.sp.visible = !!gg; if (gg) { writeCount(chalkCount, gg[1], 'tiza'); chalkCount.sp.position.set(CARRO.kerb0 + r.marks[gg[0]].g + 0.3, Y + 0.25, AVENIDA.andenZ0 + 0.3); }
       }
       if ((r.version || 0) !== lastMarks) { if (r.state === 'on') flash = 0.15; lastMarks = r.version || 0; }
       flash = Math.max(0, flash - dt);

@@ -310,7 +310,7 @@ await page.evaluate(() => window.__physica.inspect(null));
   const plaza = await page.evaluate(() => { const w = window.__physica.world, st = w.stands.find(s => s.id === 'C'); return { state: st.state, restY: +st.body.y.toFixed(3), marks: w.traces.find(t => t.source === 'C')?.marks.length || 0, journal: window.__physica.state().journal }; });
   save(join(out, '13-plaza-soporte.png'), await snap('13-plaza-soporte'));
   // 4d — B3: the street's gate, the platform, the cable car (a ride), and back (all keys).
-  const carS = () => page.evaluate(() => { const w = window.__physica.world, a = w.avatar, k = w.carriers[0]; return { x: a.x, z: a.z, on: a.support?.solid?.id || null, car: k.x, phase: k.phase, stops: k.stops, gate: w.gates[0].open, it: w.interactables()[0]?.verb || null }; });
+  const carS = () => page.evaluate(() => { const w = window.__physica.world, a = w.avatar, k = w.carriers[0]; return { x: a.x, z: a.z, on: a.support?.solid?.id || null, car: k.x, phase: k.phase, stops: k.stops, tape: a.x - (k.x - k.len / 2), gate: w.gates[0].open, errand: { state: w.errand.state, round: w.errand.round, tries: w.errand.tries.length }, it: w.interactables()[0]?.verb || null, vecina: w.level.encargo.vecina }; });
   await holdUntil('ArrowUp', async () => (await depth()).z < -19.6, 6);
   await holdUntil('ArrowRight', async () => (await depth()).x > 10.9, 8);
   await holdUntil('ArrowUp', async () => (await carS()).it === 'Abrir la reja', 6);
@@ -318,11 +318,22 @@ await page.evaluate(() => window.__physica.inspect(null));
   await page.keyboard.press('e'); await sleep(1600);
   const gateOpen = (await carS()).gate;
   await holdUntil('ArrowUp', async () => (await carS()).on === 'anden' && (await carS()).z < -37.5, 14);
-  const c0 = await carS(), stop = Math.abs(c0.car - c0.stops[0]) < Math.abs(c0.car - c0.stops[1]) ? c0.stops[0] : c0.stops[1];
-  await holdUntil(stop < c0.x ? 'ArrowLeft' : 'ArrowRight', async () => Math.abs((await carS()).x - stop) < 0.4, 10);
-  for (let i = 0; i < 300; i++) { const c = await carS(); if (c.phase === 'parada' && Math.abs(c.car - stop) < 0.01) break; await sleep(100); }
+  // the neighbour at the east stop: her errand (D23)
+  const c0 = await carS();
+  await holdUntil('ArrowRight', async () => (await carS()).x > c0.vecina.x - 1.2, 10);
+  await holdUntil('ArrowUp', async () => (await carS()).z < c0.vecina.z + 1.2, 4); // towards her
+  const talkOffered = (await carS()).it;
+  await page.keyboard.press('e'); await sleep(300);
+  const asked = (await carS()).errand;
+  // to the west stop, aboard, and to 2.5 m of the car's tape (21.5 − 19.0): the prediction
+  const stop = c0.stops[0];
+  await holdUntil('ArrowLeft', async () => Math.abs((await carS()).x - stop) < 0.4, 12);
+  for (let i = 0; i < 500; i++) { const c = await carS(); if (c.phase === 'parada' && Math.abs(c.car - stop) < 0.01) break; await sleep(100); }
   await holdUntil('ArrowUp', async () => (await carS()).on === 'carro', 4);
   const boarded = await carS();
+  await holdUntil('ArrowRight', async () => (await carS()).tape > 2.3, 3);
+  for (let i = 0; i < 20 && (await carS()).tape < 2.45; i++) { await page.keyboard.down('ArrowRight'); await sleep(40); await page.keyboard.up('ArrowRight'); await sleep(200); }
+  const standAt = +(await carS()).tape.toFixed(2);
   await sleep(400);
   const recOffered = (await carS()).it;
   await page.keyboard.press('e'); await sleep(300); // the recorder, for this trip
@@ -336,7 +347,8 @@ await page.evaluate(() => window.__physica.inspect(null));
   const off = await carS();
   await holdUntil('ArrowDown', async () => (await depth()).z > -21, 20); // up the street (▼ is funnelled to it)
   const inSquare = await depth();
-  step('calle y carro', { gateOffered, gateOpen, stop, recorder: { offered: recOffered, armed: recArmed, ...record }, boarded: { on: boarded.on, car: +boarded.car.toFixed(2) }, arrived: { on: arrived.on, car: +arrived.car.toFixed(2), carried: +(arrived.x - boarded.x).toFixed(2) }, off: { on: off.on, x: +off.x.toFixed(2) }, backInSquare: { z: +inSquare.z.toFixed(2), on: inSquare.on } });
+  const errand = (await carS()).errand;
+  step('calle y carro', { gateOffered, gateOpen, stop, errand: { talkOffered, asked, standAt, after: errand, met: errand.round === 1 }, recorder: { offered: recOffered, armed: recArmed, ...record }, boarded: { on: boarded.on, car: +boarded.car.toFixed(2) }, arrived: { on: arrived.on, car: +arrived.car.toFixed(2), carried: +(arrived.x - boarded.x).toFixed(2) }, off: { on: off.on, x: +off.x.toFixed(2) }, backInSquare: { z: +inSquare.z.toFixed(2), on: inSquare.on } });
   const back = await holdUntil('ArrowDown', async () => (await depth()).z === 0, 20);
   const after = await depth();
   step('arco y barrio', { citySeen: before.citySeen, opened, entered, inside: { z: +inside.z.toFixed(2), on: inside.on }, plaza: { offered, ...plaza, noted: plaza.journal.includes('plaza') }, back, after: { x: +after.x.toFixed(2), z: after.z, on: after.on } });

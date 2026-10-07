@@ -61,6 +61,15 @@ export class Journal {
   has(id) { return this.notes.some(n => n.id === id); }
   save() { try { localStorage.setItem(KEY, JSON.stringify({ notes: this.notes, flags: this.flags, footing: this.world.avatar.lastSupport || this.footing })); } catch { /* not persisted */ } }
 
+  /** Adds a note, or rewrites it if it exists (a running record, like the errand's attempts). */
+  put(id, title, body, data = null) {
+    const n = this.notes.find(x => x.id === id);
+    if (!n) return this.add(id, title, body, data);
+    Object.assign(n, { title, body, data, at: Date.now() });
+    this.save(); this.render(); this.onAdd?.(id);
+    this.toastEl.innerHTML = `<b>Bitácora</b> · ${title} <kbd>J</kbd>`; this.toastEl.hidden = false; this.toastT = 5;
+  }
+
   add(id, title, body, data = null) {
     if (this.has(id)) return;
     this.notes.push({ id, title, body, data, at: Date.now() });
@@ -72,6 +81,28 @@ export class Journal {
 
   onEvent(e) {
     const w = this.world;
+    // The neighbour's errand (D23): asked, its attempts (where the last chalk fell, short or over, not the
+    // answer; a walked trip does not count), met — and then her jalón moves to a new reading.
+    // The errand's state is kept in the flags (restored into the world on loading).
+    if (e.type === 'errand' && e.state === 'asked' && e.round === 0) this.add('encargo', 'El encargo de la vecina',
+      `En la parada este, una vecina clavó su jalón en el cordón del andén, en ${fmt(e.target)} m. Te pidió que la última marca de tiza de tu registrador, en un viaje hacia la parada este hecho quieto, quede al pie de su jalón (el recuadro en el cordón). El cartel de la parada este dice dónde se detiene ahí el cero de la cinta del carro.`, { target: e.target });
+    if (e.type === 'errand-miss' || e.type === 'errand-walked' || e.type === 'errand-done') {
+      const tries = (this.flags.errandTries ||= []);
+      tries.push({ round: e.round, g: e.g, miss: e.miss, still: e.still });
+      const line = (t, i) => `${i + 1}) ${t.still ? `tu última tiza en ${fmt(t.g, 1)} m: ${Math.abs(t.miss) <= 0.15 ? 'al pie del jalón' : `${t.miss < 0 ? 'faltaron' : 'sobraron'} ${fmt(Math.abs(t.miss), 1)} m`}` : 'caminaste durante el viaje: no cuenta'}`;
+      const rounds = [...new Set(tries.map(t => t.round))];
+      const body = rounds.map(r => { const ts = tries.filter(t => t.round === r).slice(-5); return `Jalón en ${fmt(this.world.level.encargo.targets[r])} m: ${ts.map(line).join('; ')}.`; }).join(' ');
+      this.put('encargo-intentos', 'El encargo: los intentos', `${body} El carro siempre se detiene igual; lo que cambia es dónde vas parado en él.`, { tries });
+    }
+    if (e.type === 'errand-done') {
+      const sum = `${fmt(e.zero, 1)} + ${fmt(e.c, 1)} = ${fmt(e.zero + e.c, 1)} m`;
+      const id = e.round === 0 ? 'encargo-cumplido' : `encargo-cumplido-${e.round + 1}`;
+      this.add(id, e.round === 0 ? 'El encargo, cumplido' : 'Otra vez, en otro lugar',
+        `Tu última tiza quedó en ${fmt(e.g, 1)} m del cordón, al pie del jalón de la vecina (${fmt(e.target)} m). Ibas parado en ${fmt(e.c, 1)} m de la cinta, y el cero de la cinta se detuvo en ${fmt(e.zero, 1)} m del cordón: ${sum}. Una posición en el andén es la posición del carro más la posición sobre el carro.${e.tries > 1 ? ` Lo lograste en el intento ${e.tries}.` : ''}${e.next !== undefined ? ` Cuando el carro salió, la vecina corrió su jalón a ${fmt(e.next)} m: «¿Y ahora?»` : ''}`, { g: e.g, c: e.c, zero: e.zero, tries: e.tries, round: e.round });
+    }
+    if (e.type === 'errand' || e.type === 'errand-miss' || e.type === 'errand-walked' || e.type === 'errand-done' || e.type === 'errand-moved') {
+      const er = this.world.errand; this.flags.errand = { state: er.state, round: er.round, placed: er.placed, tries: er.tries.map(t => ({ ...t })) }; this.save();
+    }
     // The car's recorder (D22): two records of one trip, written with that trip's numbers. A note is
     // composed per trip: the first one says what the two records are; the sum (walking on the car) and
     // the sign (westward) are explained the first time they appear, in whichever note that is.
@@ -99,6 +130,16 @@ export class Journal {
         body = `En el cordón pasaste de ${fmt(m0.g)} m a ${fmt(m1.g)} m, un desplazamiento de ${sgn(DG)} m.${sign}`;
       }
       if (id) { if (sum) this.flags.sumSaid = true; if (sign) this.flags.signSaid = true; this.add(id, title, body, data); }
+    }
+    // (after the trip's own note) Readings from the explorer's jalón (a third zero): positions change with the zero, displacements do not.
+    if (e.type === 'record-done' && !e.aborted && e.jal && e.marks.length >= 2 && e.marks[0].j !== undefined) {
+      const m0 = e.marks[0], m1 = e.marks.at(-1), r1 = v => Math.round(v * 10) / 10;
+      // (displacements from the exact readings; the final position derived from them, so the shown numbers add up)
+      const J0 = r1(m0.j), DJ = r1(m1.j - m0.j), J1 = r1(J0 + DJ), DG = r1(m1.g - m0.g), DC = r1(m1.c - m0.c);
+      if (e.jal.frame === 'anden' && !this.has('jalon-anden')) this.add('jalon-anden', 'Un cero que elegiste',
+        `Tu jalón estaba clavado en el andén, en ${fmt(e.jal.at)} m del cordón. Desde él pasaste de ${sgn(J0)} m a ${sgn(J1)} m: ${sgn(DJ)} m. En el cordón, el desplazamiento fue ${sgn(DG)} m: el mismo. Las posiciones son otras porque el cero está en otro lugar; el desplazamiento no depende de dónde pongas el cero.`, { J0, J1, DJ, DG });
+      if (e.jal.frame === 'carro' && !this.has('jalon-carro')) this.add('jalon-carro', 'Un cero que viaja',
+        `Tu jalón estaba clavado en el carro, en ${fmt(e.jal.at)} m de la cinta. Desde él pasaste de ${sgn(J0)} m a ${sgn(J1)} m: ${sgn(DJ)} m, el mismo desplazamiento que en la cinta (${sgn(DC)} m), no el del cordón (${sgn(DG)} m). El jalón viajaba con el carro: medir desde él es medir respecto del carro.`, { J0, J1, DJ, DC, DG });
     }
     if (e.type === 'city-seen' && !this.has('arco')) this.add('arco', 'El arco tapiado',
       'Desde el Mirador se ve una ciudad, lejos, detrás del paisaje. En la Terraza, el muro del fondo tiene un arco tapiado con una palanca de latón: entre sus piedras pasa luz.');

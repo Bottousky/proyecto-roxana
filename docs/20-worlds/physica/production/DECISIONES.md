@@ -517,3 +517,41 @@ El jalón, las marcas en cada marco y las notas vienen después.
 - Las notas no explican antes de medir: se escriben con los números de cada viaje.
 
 **Después:** el jalón (un cero que coloca el jugador) y el encargo que depende del marco.
+
+## D23 · El jalón y el encargo de la vecina (iteración 18, Hito B · B3)
+
+**El pedido** (revisión de la iteración 17): con los dos ceros fijos, el jugador no podía descubrir que mover el origen cambia las posiciones y no los desplazamientos. Y ninguna tarea obligaba a usar la lectura del carro para predecir.
+
+**El jalón.** En la parada oeste hay un soporte con jalones, varas a franjas.
+- «E Tomar un jalón» y «E Clavar el jalón».
+  - **En el andén:** queda en el suelo.
+  - **En la cubierta del carro:** viaja con él.
+  - «E Levantar el jalón» junto a él.
+- **Para el registrador, el jalón es un tercer cero.** Mientras está clavado, cada marca también se lee desde él.
+- **La Bitácora lo compara con el cordón y con la cinta:**
+  - **clavado en el andén,** las posiciones desde el jalón son otras (el cero está en otro lugar), pero el desplazamiento es el mismo que en el cordón;
+  - **clavado en el carro,** el desplazamiento es el de la cinta.
+
+  Cambiar el cero cambia las posiciones; cambiar de marco cambia los desplazamientos.
+
+**El encargo.** En la parada este, una vecina clavó su jalón en el cordón, en 21,5 m.
+- **Qué pide:** que la última marca de tiza de un viaje hacia el este quede al pie de su jalón. Al pie hay un recuadro punteado de ±15 cm.
+- **Qué se puede predecir:** dónde pararse en el carro antes de salir.
+  - El carro se detiene siempre igual. En la parada, el poste está justo donde se detiene el cero de la cinta: el cartel dice «aquí para el 0 del carro: 19 m ↓» y apunta a una chapa amarilla con «0» en el cordón, del amarillo de la cinta.
+  - Parado, la última tiza queda en 19,0 + la lectura de la cinta donde uno va. Hay que ir en 2,5 m.
+- **Sólo cuenta un viaje hecho quieto:** toda la tinta en una columna. La posición se decide antes de salir, no se corrige a ojo durante el viaje. Si caminaste, la vecina dice «así no vale».
+- **Cuando se cumple, la vecina corre su jalón a 20,3 m** («¿Y ahora?»): una posición memorizada no sirve.
+- **Habla en el mundo,** con un globo:
+  - el pedido;
+  - «Faltaron 0,7 m →» o «← Sobraron…»;
+  - «¡Justo ahí!», con la bandera.
+
+  La Bitácora lleva los intentos.
+- **Honestidad:** también se puede resolver tanteando, porque el globo dice cuánto faltó. La predicción ahorra viajes; no es la única salida.
+- **Se guarda al recargar:** estado, ronda e intentos.
+
+**El jalón, visible:** clavado, despliega su propia cinta con signo (−3…0…+3), en el andén o sobre la cubierta, donde viaja con el carro. Se clava donde está el explorador, redondeado a 0,1 m de su regla. Con el carro esperando, E arma primero el registrador; el jalón se levanta después. Si se lo lleva de vuelta a la plaza, vuelve al soporte.
+
+**Para que el número 19,0 sea legible,** las paradas se corrieron 0,8 m: el cero del carro se detiene en 4,0 m y 19,0 m del cordón.
+
+**Después:** la vista en tabla, un segundo observador en el andén y la transferencia del bote.

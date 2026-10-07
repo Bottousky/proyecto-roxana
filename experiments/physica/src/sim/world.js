@@ -67,6 +67,11 @@ export class World {
     // records at once: chalk on the platform's kerb (the ground's frame, from the kerb's zero) and
     // ink on the car's tape (the car's frame, from the car's west end).
     this.recorder = { state: 'off', carrier: null, marks: [], trip: 0, startStep: 0, lastStep: 0 };
+    // The explorer's jalón (D23): at the rack, in hand, or planted on the platform (x, z) or on a car
+    // (c: from the car's west end). While planted, the recorder also reads from it.
+    this.jalon = { state: level.jalones ? 'rack' : 'none', x: 0, z: 0, c: 0, carrier: null, version: 0 };
+    // The neighbour's errand at the east stop.
+    this.errand = { state: 'none', round: 0, placed: 0, tries: [] }; // (placed: the target her jalón stands at)
     this.depthBlockers = level.depthBlockers || [];
     this.citySeen = false;
     this.bodies = [];
@@ -175,6 +180,11 @@ export class World {
     }
     this.updateFrames();
     this.updateRecorder();
+    // her jalón is moved to the next target once the car has left the stop where it was met (not in front
+    // of the explorer aboard: lined up by eye, the new spot would be read off, not predicted)
+    const er = this.errand; if (er.placed !== er.round && this.carriers[0] && this.carriers[0].phase !== 'parada') { er.placed = er.round; this.emit('errand-moved', { target: this.level.encargo.targets[er.round] }); }
+    const J = this.level.jalones;
+    if (J && this.jalon.state === 'hand' && av.z > J.limitZ) { Object.assign(this.jalon, { state: 'rack', carrier: null, version: this.jalon.version + 1 }); this.emit('jalon', { state: 'rack' }); }
 
     for (const b of this.bodies) {
       if (b.heldBy) continue;
@@ -339,21 +349,58 @@ export class World {
 
   inArea(b) { return this.areasNow().some(r => b.x - b.hw >= r.x0 - 1e-6 && b.x + b.hw <= r.x1 + 1e-6 && b.z - b.hw >= r.z0 - 1e-6 && b.z + b.hw <= r.z1 + 1e-6); }
 
+  /** The neighbour's errand: an eastward recorded trip whose last chalk falls at her jalón's foot. */
+  checkErrand(k, marks) {
+    const e = this.errand, E = this.level.encargo;
+    if (!E || e.state !== 'asked' || marks.length < 2 || marks.at(-1).k <= marks[0].k) return;
+    const target = E.targets[e.round], g = marks.at(-1).g, miss = g - target, c = marks.at(-1).c, zero = marks.at(-1).k - k.len / 2;
+    // Only a trip made standing still counts (all the ink in one column): where to stand is decided
+    // before setting off, not steered by eye during the ride.
+    const still = marks.every(m => Math.abs(m.c - marks[0].c) < 0.05);
+    const roundTries = e.tries.filter(t => t.round === e.round).length + 1;
+    const t = { round: e.round, target, g, miss, c, zero, still };
+    e.tries.push(t);
+    const base = { ...t, tries: roundTries, rounds: E.targets.length };
+    if (!still) { this.emit('errand-walked', base); return; }
+    if (Math.abs(miss) > E.tol) { this.emit('errand-miss', base); return; }
+    if (e.round < E.targets.length - 1) { e.round++; this.emit('errand-done', { ...base, next: E.targets[e.round] }); }
+    else { e.state = 'done'; this.emit('errand-done', { ...base, final: true }); }
+  }
+
+  /** Where the planted jalón is on the ground now (null if not planted). */
+  jalonX() {
+    const j = this.jalon;
+    return j.state === 'ground' ? j.x : j.state === 'car' ? j.carrier.x - j.carrier.len / 2 + j.c : null;
+  }
+
   updateRecorder() {
     const r = this.recorder, k = r.carrier, av = this.avatar;
     if (!k || r.state === 'off' || r.state === 'done' || r.state === 'cut') return;
-    const mark = () => { r.version = (r.version || 0) + 1; r.marks.push({ t: (this.stepCount - r.startStep) * DT, g: av.x - k.kerb0, c: av.x - (k.x - k.len / 2), k: k.x - k.kerb0 }); r.lastStep = this.stepCount; };
+    const jx = this.jalonX(), jok = r.jal && this.jalon.version === r.jal.version;
+    const mark = () => { r.version = (r.version || 0) + 1; r.marks.push({ t: (this.stepCount - r.startStep) * DT, g: av.x - k.kerb0, c: av.x - (k.x - k.len / 2), k: k.x - k.kerb0, ...(jok ? { j: av.x - jx } : {}) }); r.lastStep = this.stepCount; };
     if (r.state === 'armed') {
       if (av.carrier !== k) { r.state = 'off'; this.emit('record-cancel', {}); return; }
       // (the previous trip's marks stay until this one starts: arming does not erase what is to be read)
-      if (k.phase !== 'parada') { r.state = 'on'; r.startStep = this.stepCount; r.marks = []; mark(); this.emit('record-start', { trip: r.trip }); }
+      if (k.phase !== 'parada') {
+        // the jalón as it is at departure (a third zero, if planted); moving it during the trip drops it
+        const jl = this.jalon;
+        r.jal = jl.state === 'ground' || jl.state === 'car' ? { frame: jl.state === 'car' ? 'carro' : 'anden', at: jl.state === 'ground' ? jl.x - k.kerb0 : jl.c, version: jl.version } : null;
+        r.state = 'on'; r.startStep = this.stepCount; r.marks = [];
+        const jx0 = this.jalonX();
+        r.marks.push({ t: 0, g: av.x - k.kerb0, c: av.x - (k.x - k.len / 2), k: k.x - k.kerb0, ...(r.jal ? { j: av.x - jx0 } : {}) }); r.version = (r.version || 0) + 1; r.lastStep = this.stepCount;
+        this.emit('record-start', { trip: r.trip });
+      }
       return;
     }
     if (av.carrier !== k) { r.state = 'cut'; this.emit('record-done', { trip: r.trip, aborted: true, marks: r.marks.slice() }); return; }
     if (k.phase === 'parada') {
       // on arriving: a mark, unless the grid's last one fell (almost) now — no duplicate in the same place
       if (this.stepCount - r.lastStep <= 2) r.marks.pop(); // (mark() bumps the version: the replaced one is redrawn)
-      mark(); r.state = 'done'; this.emit('record-done', { trip: r.trip, aborted: false, marks: r.marks.slice() }); return;
+      mark(); r.state = 'done';
+      const jal = r.jal && this.jalon.version === r.jal.version ? r.jal : null;
+      this.emit('record-done', { trip: r.trip, aborted: false, marks: r.marks.slice(), jal });
+      this.checkErrand(k, r.marks);
+      return;
     }
     if ((this.stepCount - r.startStep) % Math.round(0.5 / DT) === 0) { mark(); this.emit('record-mark', { trip: r.trip, n: r.marks.length }); }
   }
@@ -580,9 +627,22 @@ export class World {
       const door = this.doors.find(d => d.mouthZ !== undefined && av.z < d.mouthZ);
       // Beside a car waiting at a stop, ▲ boards it.
       for (const c of this.carriers) if (c.phase === 'parada' && av.supportSteps > 0 && !av.carrier && Math.abs(av.x - c.x) < c.len / 2 - 0.3 && av.z < c.z1 + 1.6 && av.z > c.z1) out.push({ kind: 'board', key: '▲', verb: 'Subir al carro', d: 0.5, x: av.x + 0.85, y: av.y + 0.1, z: av.z });
+      // The jalón (D23): taken from the rack, planted where the explorer stands (platform or car), picked up beside it.
+      const jl = this.jalon, Jr = this.level.jalones, standing = av.supportSteps > 0;
+      let jalonHere = false;
+      const recordable = av.carrier && av.carrier.phase === 'parada' && av.supportSteps > 0 && this.recorder.state !== 'armed' && this.recorder.state !== 'on' && jl.state !== 'hand';
+      if (standing && jl.state === 'rack' && !av.holding && !av.carrier && Math.abs(av.x - Jr.x) < 0.9 && Math.abs(av.z - Jr.z) < 1.3) out.push({ kind: 'jalon-take', verb: 'Tomar un jalón', d: Math.abs(av.x - Jr.x), x: Jr.x, y: av.y + 1.2, z: Jr.z });
+      if (standing && jl.state === 'hand' && (av.carrier || av.support?.solid?.id === 'anden')) out.push({ kind: 'jalon-plant', verb: 'Clavar el jalón', hint: av.carrier ? 'en el carro: viaja con él' : 'en el andén', d: 0.2, x: av.x + 0.85, y: av.y + 0.6, z: av.z });
+      if (standing && ((jl.state === 'ground' && !av.carrier) || (jl.state === 'car' && av.carrier === jl.carrier))) {
+        const d = Math.abs(av.x - this.jalonX());
+        // (at a waiting car the recorder comes first: the jalón is picked up once it is set, or while it runs)
+        if (d < 0.5 && !recordable) { jalonHere = true; out.push({ kind: 'jalon-pick', verb: 'Levantar el jalón', d: d + 0.1, x: this.jalonX(), y: av.y + 1.2, z: av.z }); }
+      }
+      // The neighbour at the east stop and her errand.
+      const En = this.level.encargo;
+      if (En && standing && !av.carrier && Math.hypot(av.x - En.vecina.x, av.z - En.vecina.z) < 2.2) out.push({ kind: 'talk', verb: this.errand.state === 'none' ? 'Hablar con la vecina' : this.errand.state === 'done' ? 'Saludar a la vecina' : 'Preguntarle a la vecina', d: 0.3, x: En.vecina.x, y: av.y + 1.3, z: En.vecina.z });
       // Aboard a car waiting at a stop, its recorder can be set for the next trip.
-      const rc = this.recorder;
-      if (av.carrier && av.carrier.phase === 'parada' && av.supportSteps > 0 && rc.state !== 'armed' && rc.state !== 'on') out.push({ kind: 'record', verb: 'Registrar el viaje', hint: 'tiza en el andén y tinta en el carro, cada 0,5 s · ▼ bajar', d: 0.4, x: av.x + 0.85, y: av.y + 0.6, z: av.z });
+      if (recordable && !jalonHere) out.push({ kind: 'record', verb: 'Registrar el viaje', hint: 'tiza en el andén y tinta en el carro, cada 0,5 s · ▼ bajar', d: 0.4, x: av.x + 0.85, y: av.y + 0.6, z: av.z });
       // On the car, ▼ steps off it: named while it waits at a stop, not while it runs.
       const onCar = this.carriers.find(k => av.support?.solid === k.solid);
       if (onCar) { if (onCar.phase === 'parada' && av.supportSteps > 0 && !out.length) out.push({ kind: 'back', key: '▼', verb: 'Bajar del carro', d: 9, x: av.x + 0.85, y: av.y + 0.1, z: av.z }); }
@@ -613,6 +673,17 @@ export class World {
     const av = this.avatar;
     if (it.kind === 'door') { const door = this.doors.find(d => d.id === it.id); door.opening = true; this.emit('door-opening', { door: door.id }); return; }
     if (it.kind === 'gate') { const g = this.gates.find(x => x.id === it.id); g.opening = true; this.emit('gate-opening', { gate: g.id }); return; }
+    if (it.kind === 'jalon-take') { Object.assign(this.jalon, { state: 'hand', version: this.jalon.version + 1 }); this.emit('jalon', { state: 'hand' }); return; }
+    if (it.kind === 'jalon-plant') {
+      const jl = this.jalon, k = av.carrier;
+      // where the explorer stands, to 0.1 m of its own ruler (the tape or the kerb), within the surface
+      const snap = v => Math.round(v * 10) / 10, kerb0 = this.carriers[0]?.kerb0 ?? 0, an = this.depthAreas.find(r => r.id === 'anden');
+      if (k) Object.assign(jl, { state: 'car', carrier: k, c: clamp(snap(av.x - (k.x - k.len / 2)), 0.1, k.len - 0.1), z: av.z });
+      else Object.assign(jl, { state: 'ground', carrier: null, x: clamp(kerb0 + snap(av.x - kerb0), an ? an.x0 + 0.1 : -Infinity, an ? an.x1 - 0.1 : Infinity), z: av.z });
+      jl.version++; this.emit('jalon', { state: jl.state, at: jl.state === 'car' ? jl.c : jl.x - (this.carriers[0]?.kerb0 ?? 0) }); return;
+    }
+    if (it.kind === 'jalon-pick') { Object.assign(this.jalon, { state: 'hand', carrier: null, version: this.jalon.version + 1 }); this.emit('jalon', { state: 'hand' }); return; }
+    if (it.kind === 'talk') { const e = this.errand; if (e.state === 'none') e.state = 'asked'; this.emit('errand', { state: e.state, round: e.round, target: this.level.encargo.targets[e.round], last: e.tries.at(-1) || null }); return; }
     if (it.kind === 'record') { Object.assign(this.recorder, { state: 'armed', carrier: av.carrier, trip: this.recorder.trip + 1 }); this.emit('record-armed', { trip: this.recorder.trip }); return; }
     if (it.kind === 'enter' || it.kind === 'back' || it.kind === 'board') return;
     if (it.kind === 'drop') {

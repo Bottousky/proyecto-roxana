@@ -76,6 +76,7 @@ let vista = 0, vistaAge = 0, vistaHeld = false, vistaWas = false, introShotWas =
 let intro = params.has('nointro') ? 0 : 4.6;
 // The city, once discovered from the Mirador, stays part of the world.
 if (journal.has('mirador')) { view.setCityVisible(true); world.citySeen = true; } // (seen in an earlier session)
+if (journal.flags.errand) Object.assign(world.errand, structuredClone(journal.flags.errand)); // (the neighbour's errand, as it was left)
 journal.onAdd = id => {
   if (id === 'cruce' || id === 'mirador') view.clearChalk(id);
   // From the Mirador, for the first time, the camera rises to show what is behind the landscape.

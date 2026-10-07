@@ -33,9 +33,16 @@ export const CALLE = { x0: 9.75, x1: 12.35, z1: BARRIO.z0, z0: -36.0 };
 // Beyond the street (Hito B, B3 «Introducción»): an avenue across, with a platform (andén) along its
 // south side and a cable car running east–west on the track beside it, between two stops.
 export const AVENIDA = { x0: -4, x1: 24, andenZ0: -40.2, andenZ1: -35.5, z0: -44.6 };
-// (its stops at round readings of the kerb, which counts metres from the platform's west end: 5 and 20)
+// (the kerb counts metres from the platform's west end, kerb0; the car stops with its tape's zero —
+// its west end — at round readings, 4 and 19: that is what the stop's sign and plate show)
 // (kerb0: where the kerb's metres count from, for the recorder's chalk record)
-export const CARRO = { id: 'carro', len: 3.6, z0: -42.6, z1: AVENIDA.andenZ0, y: TERRACE_Y, h: 0.5, stops: [AVENIDA.x0 + 5, AVENIDA.x0 + 20], speed: 1.5, ramp: 0.5, dwell: 6, kerb0: AVENIDA.x0 };
+export const CARRO = { id: 'carro', len: 3.6, z0: -42.6, z1: AVENIDA.andenZ0, y: TERRACE_Y, h: 0.5, stops: [AVENIDA.x0 + 4 + 1.8, AVENIDA.x0 + 19 + 1.8], speed: 1.5, ramp: 0.5, dwell: 6, kerb0: AVENIDA.x0 };
+// The jalones' rack, west of the west stop (D23), and the neighbour's errand at the east stop: her
+// jalón on the kerb at reading 21.5; the last chalk of an eastward trip must fall at its foot.
+// (limitZ: carried past it, back into the square, the jalón goes back to its rack)
+export const JALONES = { x: AVENIDA.x0 + 2.6, z: -38.4, limitZ: BARRIO.z0 + 0.3 };
+// Her jalón moves to the next target once one is met (a memorised position must not do): readings 21.5, 20.3.
+export const ENCARGO = { targets: [21.5, 20.3], tol: 0.15, vecina: { x: AVENIDA.x0 + 22.9, z: -39.6 } }; // (beside her jalón, past the car's east end at the stop)
 // Two neighbours: one sits on the fountain's rim facing the passage, one stands at an east door.
 // (the sitting one on the south-west of the rim, facing out: off the jet seen from the passage)
 export const VECINOS = { sentada: { x: FUENTE.x - 1.15, z: FUENTE.z + 1.15, facing: -Math.PI / 4 }, parado: { x: BARRIO.x1 - 0.6, z: -17.6 } };
@@ -79,12 +86,16 @@ export const CASCADA = {
     // the neighbours (the sitting one's legs reach out from the rim)
     { id: 'vecina', circle: { x: VECINOS.sentada.x - 0.23, z: VECINOS.sentada.z + 0.23, r: 0.24 }, top: TERRACE_Y + 1.6 },
     { id: 'vecino', circle: { x: VECINOS.parado.x, z: VECINOS.parado.z, r: 0.24 }, top: TERRACE_Y + 1.8 },
+    { id: 'vecina-parada', circle: { x: ENCARGO.vecina.x, z: ENCARGO.vecina.z, r: 0.24 }, top: TERRACE_Y + 1.8 },
+    { id: 'jalones', circle: { x: JALONES.x, z: JALONES.z - 0.15, r: 0.18 }, top: TERRACE_Y + 1.8 },
     ...FAROLES.map(([x, z], i) => ({ id: `farol-${i}`, circle: { x, z, r: 0.1 }, top: TERRACE_Y + 2.6 })),
     ...SOPORTAL.xs.map((x, i) => ({ id: `columna-${i}`, circle: { x, z: SOPORTAL.z, r: 0.14 }, top: TERRACE_Y + 2.9 })),
   ],
   // The street's iron gate (opened with E), and the cable car (D21).
   gates: [{ id: 'reja', label: 'Reja de la calle', verb: 'Abrir la reja', x0: CALLE.x0, x1: CALLE.x1, y: TERRACE_Y, z: CALLE.z1, swing: 1.2 }],
   carriers: [CARRO],
+  jalones: JALONES,
+  encargo: ENCARGO,
   depthAreas: [
     { id: 'umbral', x0: ARCH.x0 - 0.6, x1: ARCH.x1 + 0.6, z0: -3.9, z1: 0.3 },
     // The square begins at the wall's far face (z −9): beside the mouth the explorer's body never
