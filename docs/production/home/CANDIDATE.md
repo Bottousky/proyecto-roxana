@@ -1,6 +1,6 @@
 # CANDIDATO PARA REVISIÓN · Home del Instituto Roxana
 
-2026-10-06 · rama `claude/roxana-home-3d-upgrade-e3f8d2` (23 commits sobre `f7984ca`, sin push) · ciclos 1–16.
+2026-10-06 · rama `claude/roxana-home-3d-upgrade-e3f8d2` (publicado en `main` y en GitHub Pages) · ciclos 1–17.
 
 Esto es un **candidato**, no una aprobación: la calidad subjetiva la decide quien revisa. Las dos revisiones
 críticas fueron hechas por agentes separados de sólo lectura (independientes del autor, no personas).

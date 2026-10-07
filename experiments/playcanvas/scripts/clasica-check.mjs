@@ -121,8 +121,8 @@ async function shot(page,name,{js=true}={}){
   await shot(page,'820-primera-visita');await context.close();
 }
 // 6 · The page arrives unwritten (the build could not render it): the browser writes every part. Needs the dev
-// server, which serves /src/ to the raw file.
-{
+// server, which serves /src/ to the raw file (BUILT=1 skips it against a production build).
+if(!process.env.BUILT){
   const context=await browser.newContext({viewport:{width:1440,height:900}});const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   const raw=readFileSync(new URL('../escuela-clasica.html',import.meta.url),'utf8');
   await page.route(/escuela-clasica\.html/,route=>route.fulfill({contentType:'text/html',body:raw}));

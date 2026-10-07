@@ -331,11 +331,25 @@ NO limpio: con la máquina saturada (carga 10–21; otros agentes con partidas a
 pantalla) y `home-keys.mjs` se cortó por tiempo. El ciclo 15 dio 32/32 y 15/15 con la máquina libre; los cambios de
 este ciclo no tocan cámara, artefactos ni teclado, pero hay que repetirlos con la máquina libre antes de mergear.
 
+## Ciclo 17 (2026-10-07) — a `main` y a producción (pedido del usuario)
+
+**Las esperas largas eran el Mac dormido.** `pmset -g log`: a batería, el Mac entró en «Maintenance Sleep» 8–15 veces
+por hora todo el día (ventanas despiertas de ~45 s). Explica los arranques de 30–60 s, las navegaciones sin respuesta y
+el QA 3D cortado del ciclo 16. Con la corrida envuelta en `caffeinate -dims` (sólo una aserción, sin cambiar ajustes)
+no hubo ningún reposo, y sobre la copia exacta de producción: `home-interact.mjs` 32/32, `home-keys.mjs` 15/15,
+`clasica-check.mjs` (BUILT=1) 44/44, `home-boots.mjs` 30/30 sin esperas largas (mediana 1,5 s, máx. 1,6 s).
+Evidencia en `evidence/c17/`.
+
+**Producción** = GitHub Pages desde la rama `gh-pages` (`https://bottousky.github.io/proyecto-roxana/`), donde está el
+juego de Ohmdal publicado el 2026-09-13 en la raíz. Se compilaron sólo las dos páginas de la home con
+`--base=/proyecto-roxana/` (como indica el README) y se agregaron a `gh-pages`: 82 archivos nuevos, 8 idénticos
+(fuentes), **ninguno modificado**; el juego publicado queda igual. La home queda en `/proyecto-roxana/escuela.html` y
+`/proyecto-roxana/escuela-clasica.html`; la raíz sigue siendo el juego. La home lee la partida del juego publicado
+(misma clave `ohmdal.playcanvas.arc1.v1`; entre esa versión y `main` sólo cambió una preferencia, en otra clave).
+
 ## Siguiente acción exacta
 
-0. Con la máquina libre: `home-interact.mjs` y `home-keys.mjs` (esperado 32/32 y 15/15).
-1. Con el panel del navegador visible (o en Chrome con ventana), cargar `escuela.html` unas 20 veces y medir si
-   aparecen arranques de más de 12 s; si aparecen, registrar en qué `await` de `diorama.build` quedan.
-2. Antes de publicar (no de mergear): derechos de assets (Meshy, ImageGen), revisión independiente de los ciclos
-   12–16, teléfono real y lector de pantalla.
-3. Pendientes externos sin cambios: URLs de redes, novedades reales, origen de los otros mundos.
+1. Decidir si la home pasa a ser la entrada del sitio (hoy la raíz es el juego; la home está en `escuela.html`).
+2. Pendientes de publicación que siguen abiertos: derechos de assets (estatua de Meshy, mapa y alfombra de ImageGen),
+   revisión independiente de los ciclos 12–17, teléfono real y lector de pantalla.
+3. Pendientes externos: URLs de redes, novedades reales, origen de los otros mundos.
