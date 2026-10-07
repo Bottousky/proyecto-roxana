@@ -211,17 +211,30 @@ export const grafico = {
     const A = area();
     await d.shot(SHOTS.board, 1);
     await d.say('Cornisa', 'Punto juntó tiza para la escalera: 104 trozos. Mara juntó 100. Punto hizo un gráfico.');
-    // el gráfico de Punto: las barras empiezan en 96
+    // el gráfico de Punto: las barras empiezan en 96. El dibujo pone la barra más alta siempre del mismo alto (H),
+    // como hace cualquier gráfico que se acomoda a la hoja; lo que cambia es dónde empieza el eje.
     g.setCinematic(true);
     p.setMode('still');
     await zip(d, p, A.x0 + 120, A.y0 + 20, 0.4);
-    const gy = A.y0 + 220, k = 18, from = 96;
-    const barP = (id, x, v, ch) => w.add(new Shape(id, poly(id, [[0, 0], [50, 0], [50, -(v - from) * k], [0, -(v - from) * k]], {ch, hatch: 7, w: 2.2}), x, gy, {z: 12}));
-    barP('c11-pm', A.x0 + 60, 100, WHITE);
-    barP('c11-pp', A.x0 + 140, 104, YELLOW);
-    w.add(new Label('c11-pml', 'Mara', A.x0 + 85, gy + 18, {size: 15, align: 'center', z: 12}));
-    w.add(new Label('c11-ppl', 'Punto', A.x0 + 165, gy + 18, {size: 15, align: 'center', z: 12, ch: YELLOW}));
-    w.add(new Label('c11-p96', '96', A.x0 + 50, gy + 5, {size: 14, align: 'right', z: 12, ch: BLUE}));
+    const gy = A.y0 + 220, H = 144, bx = A.x0 + 70;
+    const tall = (v, from) => H * (v - from) / (104 - from);
+    const ratio = from => Math.round((104 - from) / (100 - from) * 100) / 100;
+    const draw = (from, progress = 1) => {
+      w.removeWhere(o => /^c11-p(m|p|ax|0|rt)$/.test(o.id));
+      const bar = (id, x, v, ch) => w.add(new Shape(id, poly(id, [[0, 0], [50, 0], [50, -tall(v, from)], [0, -tall(v, from)]], {ch, hatch: 7, w: 2.2}), x, gy, {z: 12, progress}));
+      const out = [bar('c11-pm', bx, 100, WHITE), bar('c11-pp', bx + 100, 104, YELLOW)];
+      w.add(new Drawing('c11-pax', [
+        S([[bx - 14, gy], [bx - 14, gy - H - 10]], seedOf('c11-pax'), {w: 1.8, p: 0.8, ch: BLUE}),
+        S([[bx - 14, gy], [bx + 166, gy]], seedOf('c11-pax') + 1, {w: 1.8, p: 0.8, ch: BLUE}),
+      ], {z: 11}));
+      w.add(new Label('c11-p0', String(from), bx - 20, gy + 5, {size: 16, align: 'right', z: 12, ch: BLUE}));
+      w.add(new Label('c11-prt', `a la vista: ×${dec(ratio(from))}`, bx + 75, gy - H - 22, {size: 16, align: 'center', z: 13, ch: from ? YELLOW : WHITE}));
+      return out;
+    };
+    const first = draw(96, 0);
+    await d.all(...first.map(o => d.draw(o, 0.6, {sound: false})));
+    w.add(new Label('c11-pml', 'Mara: 100', bx + 25, gy + 18, {size: 15, align: 'center', z: 12}));
+    w.add(new Label('c11-ppl', 'Punto: 104', bx + 125, gy + 18, {size: 15, align: 'center', z: 12, ch: YELLOW}));
     g.audio.punto('happy');
     d.describe('Punto dibuja dos barras: la suya, el doble de alta que la de Mara. Abajo, en chiquito, el eje empieza en 96.');
     follow(p, s);
@@ -234,33 +247,47 @@ export const grafico = {
       {id: 'lie', text: 'No: Punto mintió con los números.'},
     ], {prompt: '¿Punto juntó el doble de tiza que Mara?', evaluate: true});
     d.evidence('graph-predict', {answer: c});
-    await d.shot(SHOTS.tiles, 0.8);
-    await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => ['Tocá «desde cero» para redibujar las barras empezando en 0.']);
-      g.ui.setSpots([wordSpot('c11-zero', 'desde cero', A.x1 - 70, A.y0 + 60, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(); } }, {label: 'Redibujar las barras desde cero'})]);
-    }));
-    const k0 = 1.6, gx0 = A.x0 + 280;
-    const barZ = (id, x, v, ch) => w.add(new Shape(id, poly(id, [[0, 0], [50, 0], [50, -v * k0], [0, -v * k0]], {ch, hatch: 7, w: 2.2}), x, gy, {z: 12, progress: 0}));
-    const z1 = barZ('c11-zm', gx0, 100, WHITE), z2 = barZ('c11-zp', gx0 + 70, 104, YELLOW);
-    await d.all(d.draw(z1, 0.6, {sound: false}), d.draw(z2, 0.6, {sound: false}));
-    w.add(new Label('c11-z0', '0', gx0 - 8, gy + 5, {size: 14, align: 'right', z: 12, ch: BLUE}));
-    w.add(new Label('c11-zv', '100        104', gx0 + 25, gy - 104 * k0 - 10, {size: 15, z: 13}));
-    d.describe('Desde cero, las dos barras casi iguales: 100 y 104.');
-    await d.think(c === 'check' ? 'Desde cero, casi iguales: 104 es 4 más que 100, no el doble.' : c === 'double' ? 'Desde cero, casi iguales. El doble era de lo que se veía, no de la tiza.' : 'Los números eran ciertos: 104 y 100. Lo que engañaba era el dibujo, que empezaba en 96.');
-    // Punto se corrige y la Marea se lleva el gráfico tramposo
+    await d.think(c === 'check' ? 'A ver qué pasa si el eje empieza en otro lado.' : c === 'double' ? 'El alto dice el doble. ¿Y si el eje empezara en otro número?' : 'Los números son 100 y 104, eso está bien. ¿Y el dibujo?');
+    // el jugador mueve dónde empieza el eje y decide cuándo el dibujo compara bien
+    const FROMS = [96, 90, 80, 50, 0];
+    let from = 96;
+    const tried = [];
+    w.add(new Label('c11-axq', 'el eje empieza en', A.x1 - 158, A.y0 + 26, {size: 16, align: 'center', z: 12, ch: BLUE}));
+    for (;;) {
+      const pick = await d.interact(ctl => new Promise(resolve => {
+        g.setHint(() => ['Tocá un número para que el eje empiece ahí, y mirá cuánto más alta se ve la barra de Punto. Cuando el dibujo compare bien, tocá «así compara».']);
+        g.ui.setSpots([
+          ...FROMS.map((f, i) => wordSpot(`c11-ax${f}`, String(f), A.x1 - 210 + (i % 2) * 110, A.y0 + 66 + Math.floor(i / 2) * 64, () => { if (ctl.alive()) resolve(f); }, {label: `Que el eje empiece en ${f}`, selected: f === from})),
+          wordSpot('c11-axok', 'así compara', A.x1 - 100, A.y0 + 194, () => { if (ctl.alive()) resolve('ok'); }, {label: 'Así el dibujo compara bien las cantidades'}),
+        ]);
+      }));
+      g.ui.setSpots([]);
+      g.setHint(null);
+      if (pick === 'ok') {
+        d.evidence('graph-axis', {from, tried: [...tried]});
+        if (from === 0) break;
+        await d.say('Cornisa', `Todavía no. A la vista, la de Punto es ×${dec(ratio(from))} de la de Mara; la tiza es 104 ÷ 100 = 1,04. Mirá dónde empieza el eje.`);
+        continue;
+      }
+      if (pick === from) continue;
+      from = pick;
+      tried.push(from);
+      const fresh = draw(from, 0);
+      g.audio.erase(0.4, 0.3);
+      await d.all(...fresh.map(o => d.draw(o, 0.5, {sound: false})));
+      d.describe(`El eje empieza en ${from}. La barra de Mara mide ${100 - from} desde el eje y la de Punto ${104 - from}: a la vista, la de Punto es ${dec(ratio(from))} veces la de Mara.`);
+      if (from === 0) await d.think('Desde cero, casi iguales: ×1,04, como la tiza.');
+    }
+    w.remove('c11-axq');
+    await d.think(c === 'check' ? '104 es 4 más que 100, no el doble: el eje en 96 lo hacía parecer.' : c === 'double' ? 'El doble era de lo que se veía, no de la tiza.' : 'Los números eran ciertos: 104 y 100. Lo que engañaba era el dibujo, que empezaba en 96.');
     g.setCinematic(true);
-    await pulse(d, p, 1, 0.3);
     g.audio.punto('sad');
-    d.describe('Pasa una brisa de borrador: el gráfico de Punto, el que empezaba en 96, se deshace. El que empieza en cero queda.');
-    g.audio.erase(1.2, 0.5);
-    g.camera.shake = 0.15;
-    const old = w.objects.filter(o => /^c11-p(m|p|ml|pl|96)$/.test(o.id));
-    await d.all(...old.map(o => d.fadeTo(o, 0, 1.2)));
-    for (const o of old) w.remove(o.id);
+    await pulse(d, p, 1, 0.3);
+    await d.wait(0.3);
     g.audio.punto('happy');
     g.setCinematic(false);
     await d.say('student', 'Punto, los números eran ciertos, pero el dibujo decía otra cosa. Si las barras no empiezan en cero, el alto no compara cantidades.');
-    await studentWrites(d, g, 'c11-g', 'mirar dónde empieza el eje', A.x0 + 20, A.y0 + 30, {size: 22});
+    await studentWrites(d, g, 'c11-g', 'mirar dónde empieza el eje', A.x1 - 250, A.y1 - 8, {size: 20});
     g.flags.c11graph = true;
   },
 };

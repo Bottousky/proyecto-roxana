@@ -107,6 +107,8 @@ class Game {
       const want = Math.max(free ? 16 : (this.baseBottom || 0), panel + 8);
       const cur = this.camera.safe.bottom;
       this.camera.safe.bottom = cur + (want - cur) * Math.min(1, raw * 6);
+      // mientras la escena se reacomoda (se cierra el panel, crece la pizarra), los botones todavía se mueven
+      this.camera.settling = Math.abs(want - cur) > 3;
     }
     this.camera.update(dt);
     this.world.update(dt);

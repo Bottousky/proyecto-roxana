@@ -1,0 +1,1043 @@
+{
+  "version": 1,
+  "chapter": 12,
+  "segment": "c12.anticipar",
+  "flags": {
+    "c11graph": true,
+    "c11count": true,
+    "c11dice": true,
+    "c11cause": true,
+    "c11anticipate": true,
+    "chapterDone": true,
+    "c12families": true,
+    "c12params": true,
+    "c12jump": true,
+    "c12inverse": true,
+    "c12rate": true,
+    "c12accum": true,
+    "c12piecewise": true,
+    "c12final": true,
+    "gameDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "answer": "double",
+      "t": "2026-10-07T09:11:17.032Z",
+      "seg": "c11.grafico",
+      "run": 1,
+      "kind": "graph-predict"
+    },
+    {
+      "from": 90,
+      "tried": [
+        90
+      ],
+      "t": "2026-10-07T09:11:18.703Z",
+      "seg": "c11.grafico",
+      "run": 1,
+      "kind": "graph-axis"
+    },
+    {
+      "from": 0,
+      "tried": [
+        90,
+        50,
+        0
+      ],
+      "t": "2026-10-07T09:11:20.742Z",
+      "seg": "c11.grafico",
+      "run": 1,
+      "kind": "graph-axis"
+    },
+    {
+      "answer": "10",
+      "t": "2026-10-07T09:11:27.048Z",
+      "seg": "c11.contar",
+      "run": 1,
+      "kind": "count-predict"
+    },
+    {
+      "six": 6,
+      "more": 24,
+      "t": "2026-10-07T09:11:27.235Z",
+      "seg": "c11.contar",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "answer": "12",
+      "t": "2026-10-07T09:11:28.648Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-predict"
+    },
+    {
+      "a": 1,
+      "b": 1,
+      "target": 7,
+      "ok": false,
+      "t": "2026-10-07T09:11:30.706Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 1,
+      "b": 6,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-07T09:11:30.856Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 2,
+      "b": 5,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-07T09:11:31.005Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 3,
+      "b": 4,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-07T09:11:31.153Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "target": 7,
+      "found": 3,
+      "missing": 3,
+      "t": "2026-10-07T09:11:31.289Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-done"
+    },
+    {
+      "a": 4,
+      "b": 3,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-07T09:11:31.422Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 5,
+      "b": 2,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-07T09:11:31.556Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 6,
+      "b": 1,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-07T09:11:31.690Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "target": 7,
+      "found": 6,
+      "missing": 0,
+      "t": "2026-10-07T09:11:31.823Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-done"
+    },
+    {
+      "sum": 7,
+      "n": 6,
+      "t": "2026-10-07T09:11:31.823Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-mark"
+    },
+    {
+      "a": 6,
+      "b": 6,
+      "target": 12,
+      "ok": true,
+      "t": "2026-10-07T09:11:31.957Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "target": 12,
+      "found": 1,
+      "missing": 0,
+      "t": "2026-10-07T09:11:32.090Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-done"
+    },
+    {
+      "sum": 12,
+      "n": 1,
+      "t": "2026-10-07T09:11:32.090Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-mark"
+    },
+    {
+      "n7": 58,
+      "n12": 6,
+      "t": "2026-10-07T09:11:33.466Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-roll"
+    },
+    {
+      "answer": "yes",
+      "t": "2026-10-07T09:11:36.498Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-predict"
+    },
+    {
+      "item": "add",
+      "said": "chance",
+      "truth": "sure",
+      "t": "2026-10-07T09:11:41.079Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "dbl",
+      "said": "sure",
+      "truth": "sure",
+      "t": "2026-10-07T09:11:42.400Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "wheel",
+      "said": "sure",
+      "truth": "sure",
+      "t": "2026-10-07T09:11:43.717Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "bucket",
+      "said": "chance",
+      "truth": "chance",
+      "t": "2026-10-07T09:11:45.049Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "rule": "mara",
+      "family": "ola",
+      "ok": false,
+      "t": "2026-10-07T09:11:49.648Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "rueda",
+      "family": "ola",
+      "ok": true,
+      "t": "2026-10-07T09:11:50.797Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "mara",
+      "family": "recta",
+      "ok": true,
+      "t": "2026-10-07T09:11:51.847Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "reparto",
+      "family": "hueco",
+      "ok": true,
+      "t": "2026-10-07T09:11:52.897Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "punto",
+      "family": "despega",
+      "ok": true,
+      "t": "2026-10-07T09:11:53.948Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "huerta",
+      "family": "u",
+      "ok": true,
+      "t": "2026-10-07T09:11:55.014Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "veces",
+      "family": "aplana",
+      "ok": true,
+      "t": "2026-10-07T09:11:56.063Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "done": [
+        "rueda",
+        "mara",
+        "reparto",
+        "punto",
+        "huerta",
+        "veces"
+      ],
+      "t": "2026-10-07T09:11:56.400Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "families"
+    },
+    {
+      "a": 4,
+      "b": 7,
+      "t": "2026-10-07T09:11:59.365Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 6,
+      "b": 7,
+      "t": "2026-10-07T09:11:59.498Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 8,
+      "b": 7,
+      "t": "2026-10-07T09:11:59.634Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 7,
+      "t": "2026-10-07T09:11:59.774Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 5,
+      "t": "2026-10-07T09:11:59.916Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 3,
+      "t": "2026-10-07T09:12:00.069Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 1,
+      "t": "2026-10-07T09:12:00.215Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 1,
+      "moves": 7,
+      "t": "2026-10-07T09:12:00.379Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "params"
+    },
+    {
+      "answer": "0.5",
+      "t": "2026-10-07T09:12:01.445Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "params-u"
+    },
+    {
+      "answer": "5",
+      "t": "2026-10-07T09:12:03.613Z",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-predict"
+    },
+    {
+      "t": "2026-10-07T09:12:05.589Z",
+      "key": null,
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-tap"
+    },
+    {
+      "t": "2026-10-07T09:12:05.728Z",
+      "key": "top",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-tap"
+    },
+    {
+      "t": "2026-10-07T09:12:05.856Z",
+      "key": "zero",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-tap"
+    },
+    {
+      "t": "2026-10-07T09:12:05.989Z",
+      "key": "zero",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-tap"
+    },
+    {
+      "zeros": [
+        0,
+        6
+      ],
+      "top": [
+        3,
+        9
+      ],
+      "t": "2026-10-07T09:12:06.298Z",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump"
+    },
+    {
+      "answer": "1.5",
+      "t": "2026-10-07T09:12:08.196Z",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "box-predict"
+    },
+    {
+      "max": 16,
+      "t": "2026-10-07T09:12:08.422Z",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "box"
+    },
+    {
+      "k": "ab",
+      "v": 25,
+      "t": "2026-10-07T09:12:11.399Z",
+      "seg": "c12.encadenar",
+      "run": 1,
+      "kind": "compose"
+    },
+    {
+      "k": "ba",
+      "v": 9,
+      "t": "2026-10-07T09:12:12.588Z",
+      "seg": "c12.encadenar",
+      "run": 1,
+      "kind": "compose"
+    },
+    {
+      "answer": "swap",
+      "t": "2026-10-07T09:12:13.696Z",
+      "seg": "c12.encadenar",
+      "run": 1,
+      "kind": "inverse-predict"
+    },
+    {
+      "answer": "3",
+      "t": "2026-10-07T09:12:14.680Z",
+      "seg": "c12.encadenar",
+      "run": 1,
+      "kind": "inverse-square"
+    },
+    {
+      "h": 1,
+      "r": 3,
+      "t": "2026-10-07T09:12:16.827Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "rate"
+    },
+    {
+      "h": 0.5,
+      "r": 3.5,
+      "t": "2026-10-07T09:12:17.763Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "rate"
+    },
+    {
+      "h": 0.1,
+      "r": 3.9,
+      "t": "2026-10-07T09:12:18.697Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "rate"
+    },
+    {
+      "answer": "3.99",
+      "t": "2026-10-07T09:12:20.546Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "derivative-predict"
+    },
+    {
+      "n": 3,
+      "above": false,
+      "s": 6,
+      "t": "2026-10-07T09:12:21.976Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "accum"
+    },
+    {
+      "n": 6,
+      "above": false,
+      "s": 7.5,
+      "t": "2026-10-07T09:12:22.913Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "accum"
+    },
+    {
+      "n": 12,
+      "above": false,
+      "s": 8.25,
+      "t": "2026-10-07T09:12:23.914Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "accum"
+    },
+    {
+      "n": 12,
+      "above": true,
+      "s": 9.75,
+      "t": "2026-10-07T09:12:24.815Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "accum"
+    },
+    {
+      "answer": "6",
+      "t": "2026-10-07T09:12:26.646Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "integral-predict"
+    },
+    {
+      "answer": "16",
+      "t": "2026-10-07T09:12:29.045Z",
+      "seg": "c12.tramos",
+      "run": 1,
+      "kind": "piecewise-predict"
+    },
+    {
+      "rule": "suma 1",
+      "t": "2026-10-07T09:12:30.629Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-guess"
+    },
+    {
+      "t": "2026-10-07T09:12:30.829Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-erase"
+    },
+    {
+      "id": "line",
+      "t": "2026-10-07T09:12:31.795Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-family"
+    },
+    {
+      "id": "wave",
+      "t": "2026-10-07T09:12:32.795Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-family"
+    },
+    {
+      "id": "dbl",
+      "t": "2026-10-07T09:12:33.777Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-family"
+    },
+    {
+      "answer": "4",
+      "t": "2026-10-07T09:12:34.694Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-predict"
+    },
+    {
+      "night": 4,
+      "v": 16,
+      "t": "2026-10-07T09:12:35.012Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-check"
+    },
+    {
+      "t": "2026-10-07T09:12:37.962Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-name"
+    },
+    {
+      "answer": "stay",
+      "t": "2026-10-07T09:12:45.477Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-door"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c11",
+      "title": "Lo que pasa a veces",
+      "abbr": "Lo que pasa a veces no se anticipa caso por caso, pero se puede contar.",
+      "body": [
+        "Con muchos casos, la parte de veces que algo pasa se acomoda cerca de un número (2 de cada 3 baldes llenos). Es algo que se observa, no una garantía: del próximo caso dice qué es más probable, no qué va a pasar.",
+        "Un número resume muchos datos y siempre esconde algo: el promedio reparte todo y uno muy grande lo arrastra; la mediana, el del medio, no. El rango dice qué tan desparejos son. En un gráfico de barras, hay que mirar dónde empieza el eje.",
+        "Cuando se elige una cosa de cada grupo, las maneras se multiplican (3 · 2 · 4 = 24). Con casos igual de posibles, la probabilidad es casos que sirven sobre casos posibles: el 7 con dos dados, 6/36; el 12, 1/36.",
+        "Que dos cosas suban juntas no dice que una cause la otra: puede haber una tercera, como el viento."
+      ],
+      "seen": [
+        "El gráfico de Punto te pareció decir otra cosa; desde cero, 104 y 100 son casi iguales.",
+        "Con 4 botas sumaste; se multiplica: 24 maneras.",
+        "Pensaste en el 12 o en que todas salen igual; el 7 sale de 6 maneras y el 12 de una.",
+        "Pensaste que el polvo hacía borrar a la Marea; con el mismo viento, más polvo no trajo más borrones."
+      ],
+      "moments": [
+        {
+          "id": "c11.dados",
+          "label": "Desplegar: dos dados"
+        }
+      ]
+    },
+    {
+      "id": "c12",
+      "title": "Anticipar",
+      "abbr": "Reconocer la familia, ajustar las perillas, leer el gráfico: así se anticipa.",
+      "body": [
+        "Las reglas se agrupan en familias que se reconocen por su forma: rectas, curvas que despegan, U (simétricas: iguales de los dos lados de su eje; y = a · x · x, con a positiva más grande, más angosta), olas, curvas que suben cada vez más despacio y curvas partidas. Donde el gráfico se interrumpe hay una discontinuidad; una raya a la que la curva se acerca tanto como se quiera es una asíntota (la de 1 ÷ (x − 2), en el 2, no se toca nunca porque ahí no hay valor; y con x muy grande se acerca a 0 tanto como se quiera sin llegar: la raya acostada del 0 también es asíntota). Los parámetros eligen cuál de la familia: en y = a · x + b, b es dónde empieza y a cuánto sube por paso.",
+        "Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo; también en uno que no es una U, como la caja de Cornisa, x · (6 − 2x)², un polinomio de grado 3, que como caja sólo tiene sentido con el corte entre 0 y 3. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo). Con x desde 0, el gráfico de la raíz es el de x · x reflejado sobre la diagonal: (a, b) pasa a (b, a), como (2, 4) y (4, 2).",
+        "La tasa de cambio en un tramo es cuánto cambió dividido cuánto pasó; con tramos cada vez más cortos se acerca a la derivada. Juntar lo que entra de a poco es sumar rectángulos cada vez más finos: se acerca al área bajo el gráfico, la integral.",
+        "Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero, |x|: x a la derecha del cero y −x a la izquierda, que ahí da positivo. Con todo eso se anticipa, suponiendo que la regla sigue; y cuando llegan datos nuevos, se revisa."
+      ],
+      "seen": [
+        "Uniste cada forma con su regla; una vez elegiste primero una regla que no era.",
+        "Pensaste el punto más alto en otro lado; el salto es igual de los dos lados: a los 3.",
+        "Para deshacer «el doble más uno» probaste otro orden; se deshace al revés: menos uno, la mitad.",
+        "Al final te quedaste un rato más con la Ronda; la puerta sigue ahí.",
+        "En la caja de Cornisa buscaste el máximo en la mitad, como en el salto; la caja no es una U: el máximo está en x = 1.",
+        "Te quedaste con la última velocidad medida; con tramos más cortos sigue cambiando y se acerca a 4.",
+        "Las sumas de rectángulos se acercaban a 9, el área bajo el caudal.",
+        "Para la Marea pensaste otra noche; duplicando, pasa la escalera en la noche 5."
+      ],
+      "moments": [
+        {
+          "id": "c12.salto",
+          "label": "Desplegar: el salto de Punto"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c11.grafico",
+    "c11.contar",
+    "c11.dados",
+    "c11.causa",
+    "c11.anticipar",
+    "c12.familias",
+    "c12.perillas",
+    "c12.salto",
+    "c12.encadenar",
+    "c12.rapido",
+    "c12.junta",
+    "c12.tramos",
+    "c12.anticipar"
+  ],
+  "moments": [
+    "c11.dados",
+    "c12.salto"
+  ],
+  "log": [
+    {
+      "who": "Cornisa",
+      "text": "Punto juntó tiza para la escalera: 104 trozos. Mara juntó 100. Punto hizo un gráfico."
+    },
+    {
+      "who": null,
+      "text": "El alto dice el doble. ¿Y si el eje empezara en otro número?"
+    },
+    {
+      "who": "Cornisa",
+      "text": "Todavía no. A la vista, la de Punto es ×1,4 de la de Mara; la tiza es 104 ÷ 100 = 1,04. Mirá dónde empieza el eje."
+    },
+    {
+      "who": null,
+      "text": "Desde cero, casi iguales: ×1,04, como la tiza."
+    },
+    {
+      "who": null,
+      "text": "Desde cero, casi iguales. El doble era de lo que se veía, no de la tiza."
+    },
+    {
+      "who": "student",
+      "text": "Punto, los números eran ciertos, pero el dibujo decía otra cosa. Si las barras no empiezan en cero, el alto no compara cantidades."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Para la fiesta de la escalera tengo 3 sombreros y 2 bufandas. ¿De cuántas maneras distintas me puedo vestir?"
+    },
+    {
+      "who": null,
+      "text": "Cada sombrero se abre en dos: 3 veces 2, seis maneras."
+    },
+    {
+      "who": null,
+      "text": "Cada una de las seis maneras se abre en cuatro, una por bota: 6 · 4 = 24. Se multiplica, no se suma."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, cuando se elige una cosa de cada grupo, las maneras se multiplican: 3 · 2 = 6, y con las botas, 6 · 4 = 24. No hace falta dibujar todas."
+    },
+    {
+      "who": "Rampa",
+      "text": "¡Doce! ¿Vieron? En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande."
+    },
+    {
+      "who": null,
+      "text": "1 + 1 = 2, no 7."
+    },
+    {
+      "who": null,
+      "text": "Faltan algunos: los que suman 7 forman una diagonal."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, el 7 sale de 6 maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene 6/36 de probabilidad y el 12, 1/36."
+    },
+    {
+      "who": "Rampa",
+      "text": "En la tabla, sí. ¿Y tirando de verdad?"
+    },
+    {
+      "who": null,
+      "text": "Contando, el 7 debería salir cerca de 60 veces de 360 y el 12, cerca de 10. Salieron 58 y 6: cerca, no exacto."
+    },
+    {
+      "who": "Rampa",
+      "text": "Me paso al 7. Aunque el 12 puede salir igual: no es imposible, es raro."
+    },
+    {
+      "who": "Mara",
+      "text": "Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche."
+    },
+    {
+      "who": "Mara",
+      "text": "Me olvidaba: también anoté el viento."
+    },
+    {
+      "who": null,
+      "text": "Mirando de a pares con el mismo viento: con poco viento, el día de más polvo borró menos; con bastante, también; con mucho, también. Dentro del mismo viento, más polvo no trajo más borrones."
+    },
+    {
+      "who": "student",
+      "text": "Mara, que dos cosas suban juntas no dice que una cause la otra. Con estos seis días, el que acompaña a los borrones parece el viento, no el polvo. Pero son pocos días: para estar más seguros, habría que anotar muchos más."
+    },
+    {
+      "who": "Balcón",
+      "text": "La escalera de Mara crece de a 10, la de Punto se duplica, la rueda vuelve, el balde a veces sí y a veces no. ¿Con todo eso se puede saber qué viene?"
+    },
+    {
+      "who": null,
+      "text": "Tiene una regla que no cambia: se puede calcular exacto."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar."
+    },
+    {
+      "who": "Mara",
+      "text": "Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?"
+    },
+    {
+      "who": "Mara",
+      "text": "Juntemos las reglas del viaje. Dibujé seis formas. Cada regla tiene la suya: si reconocemos la forma, sabemos qué esperar."
+    },
+    {
+      "who": null,
+      "text": "La escalera de Mara sube lo mismo cada día: buscá la que sube pareja."
+    },
+    {
+      "who": "student",
+      "text": "Mara, cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados de una raya parada que pasa por su punta, y por eso se dice que son simétricas; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio."
+    },
+    {
+      "who": "student",
+      "text": "Las partidas no están definidas en un lugar: el gráfico se interrumpe ahí, y a eso se le dice discontinuidad. Cerca del 2 se disparan, y se acercan a la raya punteada tanto como se quiera: una raya así se llama asíntota. Esta no la tocan nunca, porque en el 2 no hay valor."
+    },
+    {
+      "who": "student",
+      "text": "Y la del reparto tiene otra, acostada: si vienen 102, a cada uno le toca 1 ÷ 100 = 0,01; si vienen 1002, 0,001. Con más gente se acerca a 0 tanto como se quiera, y nunca llega, porque 1 dividido por un número no da 0: la raya del 0 también es asíntota."
+    },
+    {
+      "who": "student",
+      "text": "La del «¿cuántas veces?» también tiene una: cerca del 0 baja sin fin, pegada al eje parado."
+    },
+    {
+      "who": "student",
+      "text": "Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple."
+    },
+    {
+      "who": "Rampa",
+      "text": "Todas las rectas son de la misma familia, pero no son iguales. La escalera de Mara: el día 0 tenía 1 escalón; el día 3, 31. ¿Qué recta es?"
+    },
+    {
+      "who": "student",
+      "text": "Rampa, b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia."
+    },
+    {
+      "who": "Rampa",
+      "text": "Las U de las huertas también tienen perilla. Mi huerta nueva es de a cuadrados de lado x, pegados: la tierra es a · x · x. Con lado 2, quiero 8 de tierra."
+    },
+    {
+      "who": null,
+      "text": "Con a = 1/2 y x = 2 da 2. Más abierta es menos alta: hace falta a = 2, más angosta."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, en las U la perilla a la estrecha o la abre: con a más grande (y positiva), sube más rápido y queda más angosta. Para pasar por (2, 8), a = 2: dos cuadrados."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Punto salta de alegría. Mara le midió la altura: a los t segundos está a 6t − t², y tarda 6 en volver al piso."
+    },
+    {
+      "who": null,
+      "text": "A los 1, Punto está a 5: ni en el piso ni en lo más alto."
+    },
+    {
+      "who": null,
+      "text": "A los 3, justo en la mitad: el salto es una U dada vuelta, igual de los dos lados."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Con una tabla de 6 por 6 hago cajas: corto un cuadrado de lado x en cada esquina y levanto los bordes. Entra x · (6 − 2x) · (6 − 2x)."
+    },
+    {
+      "who": null,
+      "text": "Con 1,5 entra 1,5 · 3 · 3 = 13,5. La caja no es una U: el máximo no queda en la mitad, queda en x = 1, con 16."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, el corte va de 0 a 3: con más de 3 no queda tabla. Ahí se lee igual que el salto: ceros en 0 y en 3, crece hasta x = 1, el máximo es 16, y después decrece. Pero no es una U dada vuelta como el salto: no es igual de los dos lados."
+    },
+    {
+      "who": "student",
+      "text": "Una suma de términos con x multiplicada por sí misma se llama polinomio, y el grado es cuántas veces, como mucho: acá x · x · x, grado 3. Como cuenta sirve para cualquier x; como caja, sólo de 0 a 3."
+    },
+    {
+      "who": "Mara",
+      "text": "Puse dos máquinas en fila: «el doble más uno» y «por sí mismo». Si entra 2, ¿importa cuál va primero?"
+    },
+    {
+      "who": null,
+      "text": "25 y 9: el orden importa. Encadenar reglas es otra regla, y depende de cuál va primero."
+    },
+    {
+      "who": null,
+      "text": "Con 5: la mitad es 2,5, menos uno 1,5: no vuelve al 2. Se deshace en el orden contrario: menos uno, la mitad."
+    },
+    {
+      "who": "student",
+      "text": "Mara, «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace."
+    },
+    {
+      "who": "student",
+      "text": "Dibujadas para x desde 0, la raíz es x · x dada vuelta sobre la diagonal: se cambian la entrada y la salida. 2 va a 4 en una; 4 vuelve a 2 en la otra: (2, 4) y (4, 2). Cada punto (a, b) de una es el (b, a) de la otra."
+    },
+    {
+      "who": "student",
+      "text": "Es la familia de las raíces. Como la del «¿cuántas veces?», sube cada vez más despacio, pero arranca en el 0 con valor 0; aquella, cerca del 0, baja sin fin."
+    },
+    {
+      "who": "Cornisa",
+      "text": "En el salto de Punto: justo al segundo 1, ¿qué tan rápido sube?"
+    },
+    {
+      "who": "student",
+      "text": "En un tramo se puede medir: cuánto subió dividido cuánto tiempo pasó. Del 1 al 2 subió de 5 a 8: 3 por segundo."
+    },
+    {
+      "who": null,
+      "text": "El último es una aproximación: con un tramo más corto cambiaría otra vez (3,999 por la derecha, 4,001 por la izquierda). Se acercan a 4."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente."
+    },
+    {
+      "who": "Balcón",
+      "text": "Abrí la canilla del pozo de a poco: a los t minutos salen 2t baldes por minuto. ¿Cuánta agua juntamos en 3 minutos?"
+    },
+    {
+      "who": null,
+      "text": "Por abajo dieron 6, 7,5, 8,25; por arriba, 9,75: lo juntado queda entre las dos, y las dos se le acercan."
+    },
+    {
+      "who": null,
+      "text": "Seis es el caudal del final, por minuto, no lo juntado: las sumas de la pizarra ya pasaron el 6 (9,75). Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó."
+    },
+    {
+      "who": "Rampa",
+      "text": "Mi precio por redibujar escalones: hasta 10, un trozo de tiza cada uno. Después del décimo, medio trozo por escalón."
+    },
+    {
+      "who": null,
+      "text": "El primer tramo cuesta 10; los 6 escalones que siguen, medio cada uno: 3. Total, 13."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, tu precio es una función por tramos: una regla hasta 10 y otra después. Un solo gráfico, dos reglas."
+    },
+    {
+      "who": "student",
+      "text": "Lo lejos del cero también va por tramos, como Recta y Cuña en la línea del depósito: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V."
+    },
+    {
+      "who": "Mara",
+      "text": "La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?"
+    },
+    {
+      "who": "Mara",
+      "text": "Esperá, Punto. Las noches 2 y 3 fueron 4 y 8."
+    },
+    {
+      "who": null,
+      "text": "Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato."
+    },
+    {
+      "who": null,
+      "text": "Con dos noches, 1 y 2, pasaban las dos: la recta que suma uno y la que duplica, como la de Punto en la carrera. Él eligió una antes de tiempo; las noches 2 y 3 la desmintieron."
+    },
+    {
+      "who": null,
+      "text": "Una recta no pasa por los cuatro: de 1 a 2 sube 1, de 4 a 8 sube 4. No suma lo mismo."
+    },
+    {
+      "who": null,
+      "text": "Hasta ahora sólo sube, y cada vez más: no parece una ola."
+    },
+    {
+      "who": null,
+      "text": "La noche 4 llega a 16: todavía no. La noche 5, 32: ahí pasa."
+    },
+    {
+      "who": "student",
+      "text": "Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la noche 5. Lo anotamos como suposición y miramos cada noche si se cumple."
+    },
+    {
+      "who": "Mara",
+      "text": "Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra."
+    },
+    {
+      "who": "Mara",
+      "text": "Noche 4."
+    },
+    {
+      "who": null,
+      "text": "Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La noche 5 pasa los 30."
+    },
+    {
+      "who": "Mara",
+      "text": "Entonces redibujamos la escalera esta noche, antes de la noche 5. ¡A trabajar!"
+    },
+    {
+      "who": "Mara",
+      "text": "Llegamos. La escalera sigue ahí, y lo que entendimos también."
+    },
+    {
+      "who": "student",
+      "text": "Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?"
+    },
+    {
+      "who": "student",
+      "text": "Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto."
+    },
+    {
+      "who": null,
+      "text": "La Ronda baila otra vez, como el primer día. Punto se suma a la vuelta, un paso adelante."
+    },
+    {
+      "who": null,
+      "text": "La puerta del primer día. Del otro lado está todo lo de antes."
+    },
+    {
+      "who": "student",
+      "text": "Me quedo un rato. La puerta no se va, y todavía hay cosas que no entiendo."
+    },
+    {
+      "who": null,
+      "text": "Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje."
+    }
+  ],
+  "createdAt": "2026-10-07T09:11:14.741Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    11,
+    12
+  ],
+  "finished": true
+}

@@ -506,7 +506,7 @@ export class UI {
         el._r = {x0: cxw - el._size[0] / 2, y0: cyw - el._size[1] / 2, x1: cxw + el._size[0] / 2, y1: cyw + el._size[1] / 2, cx: cxw, cy: cyw};
       }
     }
-    if (!cam.moving && this.spots.some(x => x.kind === 'word')) this.checkOverlaps();
+    if (!cam.moving && !cam.settling && this.spots.some(x => x.kind === 'word')) this.checkOverlaps();
   }
 
   /** Guarda de pruebas: un botón de texto no debe tapar otro objeto tocable. */

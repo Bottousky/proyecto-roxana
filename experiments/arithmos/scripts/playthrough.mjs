@@ -416,6 +416,7 @@ let copyCand = null;
 let coordStep = 0;
 let c9Shape = null;
 let c8Hour = 8;
+let c11Ax = 0;
 let c9Moves = 0;
 let c11Item = null;
 let c11Dice = 7;
@@ -828,6 +829,11 @@ for (let iter = 0; iter < 30000; iter++) {
     } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id.startsWith('c11-s'))) {
       target = spots[0];
       c11Item = target.id.replace('c11-s', '');
+    } else if (s.seg === 'c11.grafico' && spots.some(x => x.id === 'c11-axok')) {
+      // mueve el eje: con errores, prueba 90, dice «así compara» antes de tiempo y baja a 50 antes de llegar a 0
+      const seq = route === 'errores' ? ['c11-ax90', 'c11-axok', 'c11-ax50', 'c11-ax0', 'c11-axok'] : ['c11-ax0', 'c11-axok'];
+      target = spots.find(x => x.id === seq[c11Ax]) || spots.find(x => x.id === 'c11-axok');
+      c11Ax++;
     } else if (s.seg === 'c12.familias' && spots.some(x => x.id.startsWith('c12-c'))) {
       target = spots[0];
       c12Cell = Number(target.id.replace('c12-c', ''));

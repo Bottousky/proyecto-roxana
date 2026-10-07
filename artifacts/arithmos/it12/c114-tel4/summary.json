@@ -1,0 +1,37 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c12.familias"
+  },
+  "journal": [
+    "Lo que pasa a veces"
+  ],
+  "evidenceKinds": [
+    "graph-predict",
+    "graph-axis",
+    "count-predict",
+    "count",
+    "dice-predict",
+    "dice-cell",
+    "dice-done",
+    "dice-mark",
+    "dice-roll",
+    "cause-predict",
+    "anticipate"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [
+    "[spot tapado] \"80\" tapa a c11-ax96",
+    "[spot tapado] \"50\" tapa a c11-ax90",
+    "[spot tapado] \"0\" tapa a c11-ax80"
+  ],
+  "seconds": 1020.422,
+  "size": "844x390",
+  "touch": true,
+  "route": "errores",
+  "watch": false
+}

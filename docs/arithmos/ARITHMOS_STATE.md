@@ -99,7 +99,7 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
    el paso decisivo) y por Punto como personaje, que se repiten en todas las revisiones.
 2. Cobertura pendiente (ver huecos en la matriz): J (polinómica de grado mayor que 2, asíntota horizontal).
    Revisión matemática de lo agregado al cap. 7 (en curso) y a 12.2.
-3. Agencia que queda (N10-12 A3): 10.3, 11.4; la puerta en el final (volver o quedarse); bajas de rev-c8 (B7, B9); 9.8: tiempo a escala.
+3. Agencia que queda (N10-12 A3): 10.3 (la vuelta con un botón); bajas de rev-c8 (B7, B9); 9.8: tiempo a escala. Hechos en el ciclo 9: la puerta del final (12.8) y el eje que se mueve en 11.4.
 4. Partida completa 1 → 12 (directa y con errores) después de todos los cambios del ciclo 8.
 4. Revisión matemática de 7.7 (una y ninguna solución) y de 9.1 nuevo.
 5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.
