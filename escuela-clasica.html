@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3ecdc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121a18" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Instituto Roxana, versión clásica: una antigua escuela técnica y sus cuatro Mundos Aplicados — Ohmdal, Physica, Bitland y Arithmos. Lo que comprendés en los mundos vuelve con vos y transforma el Instituto.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231b3935'/%3E%3Ctext x='32' y='48' text-anchor='middle' font-size='48' fill='%23d8bd80'%3EΩ%3C/text%3E%3C/svg%3E">
+<title>Instituto Roxana · versión clásica</title>
+<script>
+/* Before the first paint: the hour (same rule as hourFor in diorama.js; ?hora wins) and the stage of the student's
+   Ohmdal save (read, never written; ?etapa wins). They pick the campus still (same files and steps as the 3D home's
+   first paint, see campusImage in clasica-render.js) and whether the way in says Continuar. */
+(function(){var q=new URLSearchParams(location.search),h=new Date().getHours(),t=/^(manana|tarde|noche)$/.test(q.get('hora')||'')?q.get('hora'):(h>=7&&h<15?'manana':h>=15&&h<20?'tarde':'noche'),n=0,started=false;
+try{if(q.has('etapa'))n=Math.max(0,Math.min(10,Number(q.get('etapa'))||0));else{var s=JSON.parse(localStorage.getItem('ohmdal.playcanvas.arc1.v1')||'null'),f=(s||{}).flags||{};started=Boolean(s);
+  ['awaken','workshop','gate','pump','distribution','irrigation','beacon_link','beacon_network','beacon_lens','epilogue_shared'].every(function(k){if(f[k]){n++;return true;}return false;});}}catch(e){}
+var d=document.documentElement;d.dataset.hora=t;d.dataset.started=started?'1':'';
+window.__campus={hour:t,stage:n,src:'./escuela/campus-'+t+(n>=7?'-e10':n>=2?'-e5':'')+'.jpg'};})();
+</script>
+<link rel="preload" as="font" type="font/woff2" href="./fonts/cormorant-garamond-latin-600-normal.woff2" crossorigin>
+  <script type="module" crossorigin src="/proyecto-roxana/assets/clasica-DYLtfqVF.js"></script>
+  <link rel="modulepreload" crossorigin href="/proyecto-roxana/assets/social-CFdniGQw.js">
+  <link rel="stylesheet" crossorigin href="/proyecto-roxana/assets/clasica-E0AnkE6h.css">
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="masthead">
+  <a class="brand" href="./escuela-clasica.html" aria-label="Instituto Roxana, inicio de la versión clásica">
+    <span class="crest" aria-hidden="true">Ω</span><span class="brand-text"><b>Instituto Roxana</b><small id="brand-sub">Escuela de Mundos Aplicados</small></span>
+  </a>
+  <nav class="sections" aria-label="Secciones">
+    <a href="#mundos">Mundos</a><a href="#registro">Tu registro</a><a href="#campus">El campus</a><a href="#novedades" id="nav-news">Novedades</a><a href="#sobre">Sobre Roxana</a>
+  </nav>
+  <div class="masthead-actions">
+    <a class="switch" href="./escuela.html">Campus 3D</a>
+    <a class="cta small" href="./index.html" data-way><span class="if-new">Entrar a Ohmdal</span><span class="if-started">Continuar</span></a>
+  </div>
+</header>
+
+<main id="contenido">
+  <section class="hero" aria-labelledby="titulo">
+    <div class="hero-text">
+      <p class="kicker">Escuela de Mundos Aplicados</p>
+      <h1 id="titulo">Instituto Roxana</h1>
+      <p class="line" id="hero-line"><span class="if-new">El conocimiento cambia los mundos. Y también este lugar.</span><span class="if-started">Tu viaje sigue abierto. El Instituto guarda lo que trajiste.</span></p>
+      <p class="sub">Una antigua escuela técnica. Cuatro talleres guardan las entradas a sus Mundos Aplicados: lo que comprendés en ellos vuelve con vos y transforma el Instituto.</p>
+      <div class="actions">
+        <a class="cta" href="./index.html" data-way><span class="if-new">Entrar a Ohmdal</span><span class="if-started">Continuar en Ohmdal</span></a>
+        <a class="ghost" href="./escuela.html">Recorrer el campus en 3D</a>
+      </div>
+      <p class="meta" id="way-meta">Hoy está abierta la entrada a Ohmdal · La Luz: electricidad, nueve lugares.</p>
+    </div>
+    <figure class="plate hero-plate">
+      <script>(function(c){document.currentScript.insertAdjacentHTML('beforebegin','<img id="campus-still" src="'+c.src+'" width="1600" height="1000" fetchpriority="high" alt="El Instituto Roxana, visto desde el sudeste: el portón y el camino, el patio con la estatua de Roxana y su fuente, dos talleres a cada lado y, al fondo, el Anfiteatro, la Dirección con su torre y la Sala de Trofeos.">');})(window.__campus);</script>
+      <noscript><img src="./escuela/campus-tarde.jpg" width="1600" height="1000" alt="El Instituto Roxana de tarde, visto desde el sudeste: el portón y el camino, el patio con la estatua de Roxana y su fuente, dos talleres a cada lado y, al fondo, el Anfiteatro, la Dirección con su torre y la Sala de Trofeos."></noscript>
+      <figcaption id="campus-caption"><b>Lámina I.</b> El Instituto visto desde el portón, como lo muestra el campus 3D.</figcaption>
+    </figure>
+  </section>
+
+  <div id="preview-note" class="preview-note" hidden></div>
+  <div id="changes-slot"></div>
+
+  <section class="chapter" id="mundos" aria-labelledby="mundos-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">I</p><h2 id="mundos-title">Los Mundos Aplicados</h2>
+      <p class="chapter-lead">Cada taller del Instituto guarda la entrada a un mundo. En cada uno se aprende una disciplina haciendo: comprenderla permite cambiar lo que pasa allí.</p></header>
+    <div class="worlds" id="worlds"><article class="world featured" id="mundo-ohmdal" style="--c:#6fd6cf" aria-labelledby="w-ohmdal"><figure class="plate"><img src="./escuela/clasica/mundo-ohmdal.jpg" alt="El Faro de Ohmdal en miniatura, sobre su pedestal junto al Taller de Electrónica, con la lente apagada." width="1200" height="800" loading="lazy" decoding="async"><figcaption><b>Lámina II.</b> Taller de Electrónica.</figcaption></figure><div class="world-body"><p class="world-kicker"><span class="glyph" aria-hidden="true">Ω</span>Taller de Electrónica · conectar</p>
+      <h3 id="w-ohmdal">Ohmdal <span>· La Luz</span></h3><p class="discipline">Electricidad y electrónica · <span class="open">abierto</span></p>
+      <p class="tagline">El mundo no perdió su luz. Olvidó cómo encenderla.</p><p>Un reino que fue apagándose cuando sus habitantes dejaron de preguntarse por qué había luz. Recuperar ese conocimiento transforma sus lugares, sus oficios y sus relaciones.</p><dl class="entry"><dt>Cómo se entra</dt><dd><b>El Portal Ω.</b> Se entra cruzando el arco del taller: una pared que deja pasar a quien pregunta.</dd></dl>
+      <p class="meta">Arco I · nueve lugares, de un Portal a un Faro.</p>
+      <p class="artifact-line">En el césped, junto al taller, un Faro en miniatura: su lente sigue apagada. Se enciende acá cuando la enciendas allá.</p>
+      <div class="actions"><a class="cta" href="./index.html" data-way>Entrar a Ohmdal</a><a class="text-link" href="./escuela.html#electronica">Ver el taller en el campus 3D</a></div></div></article><article class="world" id="mundo-physica" style="--c:#f2a860" aria-labelledby="w-physica"><figure class="plate"><img src="./escuela/clasica/mundo-physica.jpg" alt="La columna de vidrio del Taller de Física: adentro el agua sube y una piedra flota; afuera cae, como siempre." width="1200" height="800" loading="lazy" decoding="async"><figcaption><b>Lámina III.</b> Taller de Física.</figcaption></figure><div class="world-body"><p class="world-kicker"><span class="glyph" aria-hidden="true">Φ</span>Taller de Física · experimentar</p>
+      <h3 id="w-physica">Physica</h3><p class="discipline">Física · <span>en preparación</span></p>
+      <p>El Instituto alteró condiciones para aislar fenómenos; las configuraciones superpuestas dejaron consecuencias que hay que comprender mediante observación y experimentación.</p><dl class="entry"><dt>Cómo se entra</dt><dd><b>La pecera.</b> Un mundo subatómico, casi cuántico, contenido en una pecera. Desde su consola se regulan las leyes de la física a gusto.</dd></dl><p class="artifact-line">En el césped, una columna de vidrio donde el agua sube: adentro rige otra regla.</p>
+      <p class="status">Entrada en preparación: todavía no se puede entrar ni guarda progreso.</p>
+      <a class="text-link" href="./escuela.html#fisica">Ver el taller en el campus 3D</a></div></article><article class="world" id="mundo-bitland" style="--c:#a595ff" aria-labelledby="w-bitland"><figure class="plate"><img src="./escuela/clasica/mundo-bitland.jpg" alt="Una ciudad cian sobre un chip, bajo una lupa inclinada, frente al Taller de Programación." width="1200" height="800" loading="lazy" decoding="async"><figcaption><b>Lámina IV.</b> Taller de Programación.</figcaption></figure><div class="world-body"><p class="world-kicker"><span class="glyph" aria-hidden="true">λ</span>Taller de Programación · programar</p>
+      <h3 id="w-bitland">Bitland</h3><p class="discipline">Programación · <span>en preparación</span></p>
+      <p>Una ciudad donde la computación sostiene la infraestructura. Su historia sobre el reloj central y la última intervención del Instituto está por contarse; el reloj de la torre de la escuela sigue detenido.</p><dl class="entry"><dt>Cómo se entra</dt><dd><b>El casco de realidad virtual.</b> Bitland es una ciudad simulada dentro de un microcontrolador. Se entra colocándose el casco.</dd></dl><p class="artifact-line">En el césped, una ciudad sobre un chip, bajo una lupa: una sola instrucción se repite.</p>
+      <p class="status">Entrada en preparación: todavía no se puede entrar ni guarda progreso.</p>
+      <a class="text-link" href="./escuela.html#programacion">Ver el taller en el campus 3D</a></div></article><article class="world" id="mundo-arithmos" style="--c:#86e0a8" aria-labelledby="w-arithmos"><figure class="plate"><img src="./escuela/clasica/mundo-arithmos.jpg" alt="Un pizarrón sobre su caballete frente al Taller de Matemática, con una misma cantidad escrita de varias formas." width="1200" height="800" loading="lazy" decoding="async"><figcaption><b>Lámina V.</b> Taller de Matemática.</figcaption></figure><div class="world-body"><p class="world-kicker"><span class="glyph" aria-hidden="true">∑</span>Taller de Matemática · transformar</p>
+      <h3 id="w-arithmos">Arithmos</h3><p class="discipline">Matemática · <span>en preparación</span></p>
+      <p>Un mundo vinculado a reconocer equivalencias entre representaciones, fracturado por la pérdida de esa capacidad.</p><dl class="entry"><dt>Cómo se entra</dt><dd><b>El pizarrón.</b> La tiza traza una puerta; quien la cruza se vuelve parte del dibujo y, del otro lado, lo espera un plano de ecuaciones que no termina.</dd></dl><p class="artifact-line">En el césped, un pizarrón donde la misma cantidad cambia de forma de escribirse, no de valor.</p>
+      <p class="status">Entrada en preparación: todavía no se puede entrar ni guarda progreso.</p>
+      <a class="text-link" href="./escuela.html#matematica">Ver el taller en el campus 3D</a></div></article></div>
+  </section>
+
+  <section class="chapter" id="registro" aria-labelledby="registro-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">II</p><h2 id="registro-title">Tu registro</h2>
+      <p class="chapter-lead">Lo que el Instituto sabe de tu viaje, leído de tu partida de Ohmdal en este navegador. Esta página nunca la modifica.</p></header>
+    <div class="record" id="record"><div class="record-empty"><p class="lead">Todavía no hay un viaje guardado en este navegador.</p>
+    <p>Cuando entres a Ohmdal, cada lugar que restaures devuelve algo al Instituto: el farol a los pies de Roxana, la fuente, los faroles del patio, la linterna de la torre. Este registro lo va anotando.</p>
+    <a class="cta" href="./index.html" data-way>Entrar a Ohmdal</a></div><h3>Lo que Ohmdal devuelve al Instituto</h3>
+  <ol class="ledger"><li class="next"><span class="mark" aria-hidden="true">1</span><div><b>Portal Ω · Una pequeña luz</b><p>Lo próximo que puede volver.</p></div><span class="visually-hidden">(lo próximo)</span></li><li class=""><span class="mark" aria-hidden="true">2</span><div><b>Taller de Lumen · El oficio de preguntar</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li><li class=""><span class="mark" aria-hidden="true">3</span><div><b>Puerta de Ohm · El otro lado de la puerta</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li><li class=""><span class="mark" aria-hidden="true">4</span><div><b>Manantial · Donde empieza el agua</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li><li class=""><span class="mark" aria-hidden="true">5</span><div><b>Castillo de la Red · Una red que se puede comprender</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li><li class=""><span class="mark" aria-hidden="true">6</span><div><b>Terrazas · Lo que compartimos</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li><li class=""><span class="mark" aria-hidden="true">7</span><div><b>Lago de las Señales · La orilla de la señal</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li><li class=""><span class="mark" aria-hidden="true">8</span><div><b>Faro · II · El ruido que faltaba</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li><li class=""><span class="mark" aria-hidden="true">9</span><div><b>Faro · III · La Luz</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li><li class=""><span class="mark" aria-hidden="true">10</span><div><b>Epílogo · La primera clase</b><p>Todavía en silencio.</p></div><span class="visually-hidden">(pendiente)</span></li></ol><p class="meta note">Physica, Bitland y Arithmos todavía no comparten su progreso con el Instituto: sus gradas y sus funciones esperan a que abran sus entradas.</p></div>
+  </section>
+
+  <section class="chapter" id="campus" aria-labelledby="campus-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">III</p><h2 id="campus-title">El campus</h2>
+      <p class="chapter-lead">Nueve lugares alrededor de un patio. Cada uno se abre también en el campus 3D.</p></header>
+    <div class="campus" id="plan"><figure class="plan-figure"><svg class="plan" viewBox="-49 -43 98 86" aria-hidden="true" focusable="false">
+    <rect class="lawn" x="-46" y="-37" width="92" height="74" rx="8"/>
+    <rect class="paving" x="-21" y="-16" width="42" height="34"/><rect class="paving" x="-3.2" y="18" width="6.4" height="16.4"/><rect class="paving" x="-3.5" y="-17.9" width="7" height="2.2"/>
+    <rect class="paving" x="-24.9" y="-6.2" width="3" height="4.4"/><rect class="paving" x="-24.9" y="10.8" width="3" height="4.4"/><rect class="paving" x="21.9" y="-6.2" width="3" height="4.4"/><rect class="paving" x="21.9" y="10.8" width="3" height="4.4"/>
+    <path class="wall" d="M-43 34.4H-3.4M3.4 34.4H43"/><path class="gate" d="M-3.4 34.4H3.4"/>
+    <path class="hedge" d="M-44.6 -30V30M44.6 -30V30M-44 -35.4H-4M4 -35.4H44"/>
+    <g class="amphi"><path class="seats" d="M-28.2 -27.2A8.6 8.6 0 0 0 -11 -27.2Z"/><path class="tier" d="M-23.6 -27.2A4 4 0 0 0 -15.6 -27.2"/><path class="tier" d="M-24.7 -27.2A5.15 5.15 0 0 0 -14.4 -27.2"/><path class="tier" d="M-25.9 -27.2A6.3 6.3 0 0 0 -13.3 -27.2"/><path class="tier" d="M-27 -27.2A7.449999999999999 7.449999999999999 0 0 0 -12.2 -27.2"/><path class="tier" d="M-28.2 -27.2A8.6 8.6 0 0 0 -11 -27.2"/><rect class="screen" x="-24.4" y="-28.4" width="9.6" height=".7"/></g>
+    <rect class="building" x="-9.5" y="-26" width="19" height="8"/><rect class="building" x="12" y="-28" width="14" height="9"/>
+    <rect class="building tower" x="-2.3" y="-30.9" width="4.6" height="4.6"/>
+    <rect class="building" x="-35.5" y="-11" width="11" height="14"/><rect class="accent" style="fill:#6fd6cf" x="-25.6" y="-10.4" width=".8" height="12.8"/><rect class="building" x="-35.5" y="6" width="11" height="14"/><rect class="accent" style="fill:#f2a860" x="-25.6" y="6.6" width=".8" height="12.8"/><rect class="building" x="24.5" y="-11" width="11" height="14"/><rect class="accent" style="fill:#a595ff" x="24.8" y="-10.4" width=".8" height="12.8"/><rect class="building" x="24.5" y="6" width="11" height="14"/><rect class="accent" style="fill:#86e0a8" x="24.8" y="6.6" width=".8" height="12.8"/>
+    <circle class="fountain" cx="0" cy="0" r="4.2"/><circle class="statue" cx="0" cy="0" r="1.1"/>
+    <rect class="planter" x="-10.7" y="-8.4" width="3.4" height="1.8" rx=".3"/><rect class="planter" x="7.3" y="-8.4" width="3.4" height="1.8" rx=".3"/><rect class="planter" x="-10.7" y="7.1" width="3.4" height="1.8" rx=".3"/><rect class="planter" x="7.3" y="7.1" width="3.4" height="1.8" rx=".3"/>
+    <circle class="lamp" cx="-6.5" cy="-4.5" r=".55"/><circle class="lamp" cx="6.5" cy="-4.5" r=".55"/><circle class="lamp" cx="-6.5" cy="5.5" r=".55"/><circle class="lamp" cx="6.5" cy="5.5" r=".55"/><circle class="lamp" cx="-16" cy="-13.5" r=".55"/><circle class="lamp" cx="16" cy="-13.5" r=".55"/><circle class="lamp" cx="-19.5" cy="-2" r=".55"/><circle class="lamp" cx="19.5" cy="-2" r=".55"/><circle class="lamp" cx="-19.5" cy="12" r=".55"/><circle class="lamp" cx="19.5" cy="12" r=".55"/><circle class="lamp" cx="-15" cy="17.5" r=".55"/><circle class="lamp" cx="15" cy="17.5" r=".55"/><circle class="lamp" cx="-3.6" cy="23" r=".55"/><circle class="lamp" cx="3.6" cy="23" r=".55"/><circle class="lamp" cx="-3.6" cy="30" r=".55"/><circle class="lamp" cx="3.6" cy="30" r=".55"/>
+    <path class="artifact" style="fill:#6fd6cf" d="M-22.4 -10.7l1.3 1.3-1.3 1.3-1.3-1.3z"/><path class="artifact" style="fill:#f2a860" d="M-22.2 20.7l1.3 1.3-1.3 1.3-1.3-1.3z"/><path class="artifact" style="fill:#a595ff" d="M39.6 -6.5l1.3 1.3-1.3 1.3-1.3-1.3z"/><path class="artifact" style="fill:#86e0a8" d="M29.2 22.7l1.3 1.3-1.3 1.3-1.3-1.3z"/>
+    <rect class="board" x="6" y="20.8" width="2.8" height=".8" transform="rotate(-24 7.4 21.2)"/>
+    <a href="./escuela.html#direccion" tabindex="-1"><circle class="num" cx="-5" cy="-22" r="2.5"/><text x="-5" y="-21">1</text></a><a href="./escuela.html#electronica" tabindex="-1"><circle class="num" cx="-30" cy="-4" r="2.5"/><text x="-30" y="-3">2</text></a><a href="./escuela.html#fisica" tabindex="-1"><circle class="num" cx="-30" cy="13" r="2.5"/><text x="-30" y="14">3</text></a><a href="./escuela.html#programacion" tabindex="-1"><circle class="num" cx="30" cy="-4" r="2.5"/><text x="30" y="-3">4</text></a><a href="./escuela.html#matematica" tabindex="-1"><circle class="num" cx="30" cy="13" r="2.5"/><text x="30" y="14">5</text></a><a href="./escuela.html#trofeos" tabindex="-1"><circle class="num" cx="19" cy="-23.5" r="2.5"/><text x="19" y="-22.5">6</text></a><a href="./escuela.html#anfiteatro" tabindex="-1"><circle class="num" cx="-19.6" cy="-23.8" r="2.5"/><text x="-19.6" y="-22.8">7</text></a><a href="./escuela.html#novedades" tabindex="-1"><circle class="num" cx="10.600000000000001" cy="21.2" r="2.5"/><text x="10.600000000000001" y="22.2">8</text></a><a href="./escuela.html#sobre" tabindex="-1"><circle class="num" cx="0" cy="-10.5" r="2.5"/><text x="0" y="-9.5">9</text></a>
+    <g class="compass" transform="translate(42 -32)"><path d="M0 -3.6l1.6 4.2h-3.2z"/><text y="4.6">N</text></g>
+    <g class="scale" transform="translate(-46 40.6)"><path d="M0 0h10M0 -.8v1.6M10 -.8v1.6"/><text x="12" y="1">10 m</text></g>
+    <text class="gate-label" x="0" y="40.9">Portón</text>
+  </svg><figcaption><b>Plano del Instituto.</b> Dibujado con las medidas del campus 3D; los números son también sus atajos de teclado. Hoy muestra los faroles apagados, la fuente seca, los canteros sin flores y el portón cerrado.</figcaption></figure><ol class="legend"><li><a href="./escuela.html#direccion"><span class="n" aria-hidden="true">1</span><b>Dirección</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>Tu registro, tu emblema y la copia de tu Bitácora.</p></li><li><a href="./escuela.html#electronica"><span class="n" aria-hidden="true">2</span><b>Taller de Electrónica</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>La entrada a Ohmdal: el Portal Ω y el mapa del reino en la pared.</p></li><li><a href="./escuela.html#fisica"><span class="n" aria-hidden="true">3</span><b>Taller de Física</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>La entrada a Physica, todavía en preparación.</p></li><li><a href="./escuela.html#programacion"><span class="n" aria-hidden="true">4</span><b>Taller de Programación</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>La entrada a Bitland, todavía en preparación.</p></li><li><a href="./escuela.html#matematica"><span class="n" aria-hidden="true">5</span><b>Taller de Matemática</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>La entrada a Arithmos, todavía en preparación.</p></li><li><a href="./escuela.html#trofeos"><span class="n" aria-hidden="true">6</span><b>Sala de Trofeos</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>Una grada por mundo. La de Ohmdal se llena con tus logros. <span class="count">0 de 12 trofeos de Ohmdal.</span></p></li><li><a href="./escuela.html#anfiteatro"><span class="n" aria-hidden="true">7</span><b>Anfiteatro</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>Las escenas que viviste en Ohmdal, proyectadas otra vez. <span class="count">0 de 7 funciones de Ohmdal.</span></p></li><li><a href="./escuela.html#novedades"><span class="n" aria-hidden="true">8</span><b>Cartelera</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>La cartelera junto al camino: lo que anuncia el Instituto.</p></li><li><a href="./escuela.html#sobre"><span class="n" aria-hidden="true">9</span><b>Patio de Roxana</b><span class="visually-hidden"> (en el campus 3D)</span></a><p>La estatua de la fundadora, la fuente y los faroles.</p></li></ol></div>
+  </section>
+
+  <section class="chapter" id="novedades" aria-labelledby="novedades-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">IV</p><h2 id="novedades-title">Novedades</h2>
+      <p class="chapter-lead">Lo que anuncia el Instituto, con su fecha. Es aparte de tu progreso: lo que cambió por tu aventura está en tu registro.</p></header>
+    <div class="news" id="news"><section class="news-state"><span class="news-seal" aria-hidden="true">Ω</span><b>Todavía no hay novedades publicadas.</b><p class="meta">Cuando el Instituto anuncie algo —un mundo que abre, una función nueva en el Anfiteatro— va a aparecer acá, con su fecha.</p></section></div>
+  </section>
+
+  <section class="chapter" id="sobre" aria-labelledby="sobre-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">V</p><h2 id="sobre-title">Sobre Roxana</h2></header>
+    <div class="about">
+      <div class="about-text">
+        <p class="lead">Roxana es una antigua escuela técnica que enseñaba mediante los Mundos Aplicados: lugares donde comprender una disciplina permite intervenir sobre consecuencias reales.</p>
+        <p>La directora fundadora del programa permanece en la memoria de la escuela a través de esta estatua, documentos y relatos incompletos. Mira hacia el portón y sostiene un libro cerrado contra el pecho.</p>
+        <p>Quién fue Roxana, qué es realmente la Bitácora y qué relación tuvo el Instituto con cada mundo son preguntas que la escuela todavía conserva.</p>
+        <div class="stage-card" id="about-stage"><p class="kicker">Lo que Ohmdal devolvió al Instituto</p><p class="big">0 <small>de 10</small></p><div class="bar" role="img" aria-label="0 de 10 restauraciones"><i style="width:0%"></i></div>
+  <p class="meta">Cada restauración en Ohmdal devuelve algo al Instituto. Physica, Bitland y Arithmos esperan en sus talleres: su progreso todavía no llega a la escuela.</p></div>
+        
+      </div>
+      <figure class="plate"><img src="./escuela/clasica/roxana.jpg" width="1200" height="800" loading="lazy" decoding="async" alt="La estatua de Roxana sobre la fuente del patio, con un libro cerrado contra el pecho; detrás, el pórtico de la Dirección y la pantalla del Anfiteatro."><figcaption><b>Lámina VI.</b> Roxana, en el centro del patio.</figcaption></figure>
+    </div>
+  </section>
+</main>
+
+<footer class="colophon">
+  <div class="colophon-brand"><span class="crest" aria-hidden="true">Ω</span><div><b>Instituto Roxana</b><small>Escuela de Mundos Aplicados</small></div></div>
+  <nav aria-label="Otros accesos">
+    <a href="./escuela.html">Campus 3D</a><a href="./index.html">Ohmdal · La Luz</a><a href="#novedades">Novedades</a><a href="#sobre">Sobre Roxana</a>
+  </nav>
+  <p>Versión clásica del Instituto: la misma escuela, los mismos mundos y el mismo progreso, sin 3D. Tu registro y tu partida viven en este navegador.</p>
+</footer>
+</body>
+</html>
