@@ -452,7 +452,7 @@ export class UI {
         el.dataset.id = s.id;
         this.spotEls.set(s.id, el);
       }
-      el.className = `spot ${s.kind || 'dot'}${s.selected ? ' selected' : ''}`;
+      el.className = `spot ${s.kind || 'dot'}${s.selected ? ' selected' : ''}${s.tile ? ' tile' : ''}`;
       el.setAttribute('aria-label', s.label);
       if (s.kind === 'word') el.textContent = s.text || s.label;
       else el.textContent = '';
@@ -493,7 +493,8 @@ export class UI {
       el.style.left = `${(x0 + x1) / 2}px`;
       el.style.top = `${(y0 + y1) / 2}px`;
       if (s.kind !== 'word') {
-        el.style.width = `${Math.max(44, x1 - x0)}px`;
+        // `tile`: lugares contiguos (una recta numerada): cada uno ocupa su ancho, sin pisar al vecino
+        el.style.width = `${s.tile ? x1 - x0 : Math.max(44, x1 - x0)}px`;
         el.style.height = `${Math.max(44, y1 - y0)}px`;
         el._r = {x0, y0, x1, y1, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2};
       } else {

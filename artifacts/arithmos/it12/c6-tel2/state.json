@@ -1,0 +1,665 @@
+{
+  "version": 1,
+  "chapter": 7,
+  "segment": "c7.lado",
+  "flags": {
+    "c6box": true,
+    "c6both": true,
+    "c6memory": true,
+    "c6zero": true,
+    "c6square": true,
+    "c6div": true,
+    "c6ineq": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "x": 5,
+      "match": false,
+      "holds": false,
+      "t": "2026-10-07T20:47:04.266Z",
+      "seg": "c6.caja",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 8,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:47:05.083Z",
+      "seg": "c6.caja",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "tries": 2,
+      "t": "2026-10-07T20:47:05.083Z",
+      "seg": "c6.caja",
+      "run": 1,
+      "kind": "solve-box"
+    },
+    {
+      "op": "oneL",
+      "t": "2026-10-07T20:47:07.118Z",
+      "seg": "c6.dos-lados",
+      "run": 1,
+      "kind": "op2"
+    },
+    {
+      "op": "bothM",
+      "t": "2026-10-07T20:47:09.934Z",
+      "seg": "c6.dos-lados",
+      "run": 1,
+      "kind": "op2"
+    },
+    {
+      "op": "both",
+      "t": "2026-10-07T20:47:12.701Z",
+      "seg": "c6.dos-lados",
+      "run": 1,
+      "kind": "op2"
+    },
+    {
+      "answer": "move",
+      "t": "2026-10-07T20:47:14.851Z",
+      "seg": "c6.dos-lados",
+      "run": 1,
+      "kind": "pasa-sumando"
+    },
+    {
+      "answer": "trust",
+      "t": "2026-10-07T20:47:16.966Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "check-how"
+    },
+    {
+      "x": 2,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:47:19.200Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 8,
+      "match": false,
+      "holds": false,
+      "t": "2026-10-07T20:47:20.049Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 8,
+      "ok": false,
+      "t": "2026-10-07T20:47:20.118Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "substitute"
+    },
+    {
+      "x": 2,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:47:20.950Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "wrong": {
+        "kind": "one",
+        "x": 8
+      },
+      "right": {
+        "kind": "one",
+        "x": 2
+      },
+      "same": false,
+      "t": "2026-10-07T20:47:21.021Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "pass-wrong"
+    },
+    {
+      "x": -4,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:47:23.200Z",
+      "seg": "c6.por-cero",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 3,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:47:24.050Z",
+      "seg": "c6.por-cero",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 6,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:47:24.867Z",
+      "seg": "c6.por-cero",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "answer": "all",
+      "solutions": "all",
+      "t": "2026-10-07T20:47:25.618Z",
+      "seg": "c6.por-cero",
+      "run": 1,
+      "kind": "times-zero-eq"
+    },
+    {
+      "answer": "1",
+      "t": "2026-10-07T20:47:27.734Z",
+      "seg": "c6.cuadrado",
+      "run": 1,
+      "kind": "square-predict"
+    },
+    {
+      "x": -3,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:47:29.384Z",
+      "seg": "c6.cuadrado",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "before": [
+        3
+      ],
+      "after": [
+        -3,
+        3
+      ],
+      "t": "2026-10-07T20:47:29.436Z",
+      "seg": "c6.cuadrado",
+      "run": 1,
+      "kind": "square"
+    },
+    {
+      "answer": "no",
+      "t": "2026-10-07T20:47:32.501Z",
+      "seg": "c6.dividir",
+      "run": 1,
+      "kind": "zero-root-predict"
+    },
+    {
+      "x": 0,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:47:34.133Z",
+      "seg": "c6.dividir",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "before": [
+        0,
+        1
+      ],
+      "after": [
+        1
+      ],
+      "t": "2026-10-07T20:47:35.252Z",
+      "seg": "c6.dividir",
+      "run": 1,
+      "kind": "div-by-x"
+    },
+    {
+      "x": -5,
+      "match": false,
+      "holds": false,
+      "t": "2026-10-07T20:47:38.317Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 2,
+      "match": false,
+      "holds": true,
+      "t": "2026-10-07T20:47:39.134Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "op": "keep",
+      "t": "2026-10-07T20:47:40.700Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "ineq-op"
+    },
+    {
+      "op": "flip",
+      "t": "2026-10-07T20:47:43.151Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "ineq-op"
+    },
+    {
+      "same": true,
+      "t": "2026-10-07T20:47:44.353Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "ineq"
+    },
+    {
+      "op": "m7",
+      "keeps": true,
+      "t": "2026-10-07T20:47:47.250Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step"
+    },
+    {
+      "op": "half",
+      "keeps": false,
+      "t": "2026-10-07T20:49:24.342Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step"
+    },
+    {
+      "op": "undo",
+      "keeps": true,
+      "t": "2026-10-07T20:49:26.009Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step"
+    },
+    {
+      "op": "m1",
+      "keeps": true,
+      "t": "2026-10-07T20:49:27.708Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step"
+    },
+    {
+      "op": "d2",
+      "keeps": true,
+      "t": "2026-10-07T20:49:29.441Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step"
+    },
+    {
+      "x": 3,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:49:31.308Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 3,
+      "path": [
+        "m7",
+        "half",
+        "undo",
+        "m1",
+        "d2"
+      ],
+      "rescued": false,
+      "kept": [
+        "m7",
+        "m1",
+        "d2"
+      ],
+      "t": "2026-10-07T20:49:31.427Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step-result"
+    },
+    {
+      "op": "d4",
+      "t": "2026-10-07T20:49:32.225Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "right-side"
+    },
+    {
+      "op": "p4",
+      "t": "2026-10-07T20:49:34.643Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "right-side"
+    },
+    {
+      "op": "x4",
+      "t": "2026-10-07T20:49:37.076Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "right-side"
+    },
+    {
+      "x": 12,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-07T20:49:38.974Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "try-x"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c6",
+      "title": "Lo que no se ve",
+      "abbr": "Una ecuación son dos miembros; resolver es buscar para qué x coinciden, sin perder ni inventar soluciones.",
+      "body": [
+        "Una incógnita es un número que está pero no se ve. Se le pone un nombre: x. Resolver es encontrar para qué x los dos miembros dan lo mismo.",
+        "Hacer lo mismo a los dos lados no cambia para qué x coinciden si cumple dos cosas: que se pueda hacer con cualquier x (así no se pierde ninguna solución) y que se pueda deshacer (así no aparece ninguna). Sumar o restar cualquier número, o multiplicar o dividir por un número que no sea cero, cumplen las dos. \"Pasa sumando\" abrevia eso: sumar a los dos lados y simplificar.",
+        "Para comprobar, se pone el valor en la cuenta original. De memoria se puede pasar un número con el signo equivocado.",
+        "Una ecuación pregunta para qué x se cumple (x − 3 = 5, sólo con 8); una identidad se cumple con cualquier x (x − 3 + 3 = x; 0 = 0). Por cero no se deshace: la ecuación se vuelve una identidad y aparecen todas las x. Al cuadrado no se deshace: pueden aparecer de más (3 y −3). Dividir por algo que vale cero en alguna x no se puede hacer en esa x: ahí se puede perder una solución (el 0 en x · x = x).",
+        "En una desigualdad, multiplicar o dividir por un negativo da vuelta la recta: el signo se invierte. Por un positivo, no.",
+        "Hay muchos caminos válidos; no todos ayudan, pero todo camino válido que deja sola a la x da el mismo número.",
+        "Dato: al-Khwārizmī (Bagdad, hacia 820) llamó al-jabr a restituir lo que se resta, y al-muqābala a cancelar lo igual de los dos lados; lo hacía en palabras, sin símbolos. De al-jabr viene \"álgebra\"."
+      ],
+      "seen": [
+        "Moviste a Punto (la x) hasta que x − 3 cayó en el 5: con x = 8. La caja tenía ocho.",
+        "Probaste sumar 3 sólo al primer miembro (se separaron) y restar 3 a los dos (siguieron juntos, pero no despejó) antes de sumar 3 a los dos lados.",
+        "Pensaste que \"pasa sumando\" era mudar el número de lado; es sumar a los dos lados, en corto.",
+        "La cuenta de memoria de Recta se comprobó poniendo a Punto en el 8: no cumplía. Era x = 2.",
+        "Con el truco de multiplicar por cero, cualquier x parecía servir: por cero se pierde lo que decía la cuenta.",
+        "Al elevar al cuadrado apareció el −3, que la cuenta de antes no tenía.",
+        "Dividiendo x · x = x por x se perdió el 0, que sí cumplía.",
+        "Dividiste por −2 sin dar vuelta el signo y las x marcadas saltaron al otro lado; dando vuelta, x > −3.",
+        "En 2x + 1 = 7 tu camino fue: restar 7, dividir sólo el 2x (no valía), deshacer, restar 1, dividir por 2. x = 3."
+      ],
+      "moments": [
+        {
+          "id": "c6.dos-lados",
+          "label": "Desplegar: pasa sumando"
+        },
+        {
+          "id": "c6.dos-pasos",
+          "label": "Desplegar: dos pasos"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c6.caja",
+    "c6.dos-lados",
+    "c6.memoria",
+    "c6.por-cero",
+    "c6.cuadrado",
+    "c6.dividir",
+    "c6.al-reves",
+    "c6.dos-pasos"
+  ],
+  "moments": [
+    "c6.dos-lados",
+    "c6.dos-pasos"
+  ],
+  "log": [
+    {
+      "who": "Mara",
+      "text": "En esta caja guardé atados antes de la Marea. No me acuerdo cuántos, y no la quiero abrir a la intemperie."
+    },
+    {
+      "who": "Mara",
+      "text": "Lo que sí anoté: si saco tres, quedan cinco."
+    },
+    {
+      "who": null,
+      "text": "Un número que está, pero no se ve."
+    },
+    {
+      "who": "student",
+      "text": "Punto, vos hacés de lo que hay en la caja. Mientras no lo sepamos, le decimos x."
+    },
+    {
+      "who": null,
+      "text": "Abajo, lo que da x − 3. Arriba, el 5. Tienen que caer en el mismo lugar."
+    },
+    {
+      "who": null,
+      "text": "Ocho: ocho menos tres, cinco."
+    },
+    {
+      "who": "Mara",
+      "text": "Ocho. Bien."
+    },
+    {
+      "who": "Mara",
+      "text": "Probando se encuentra. Pero si mañana son treinta cajas, me paso la vida moviendo a Punto."
+    },
+    {
+      "who": "Curva",
+      "text": "Mi abuela decía: \"el 3 pasa sumando\". Nunca supe adónde pasaba."
+    },
+    {
+      "who": null,
+      "text": "Se separaron: con Punto en el 8 ya no cumple. Es otra cuenta, x = 5, con otra solución."
+    },
+    {
+      "who": null,
+      "text": "Siguen juntos… pero quedó x − 6 = 2. La x no quedó sola."
+    },
+    {
+      "who": null,
+      "text": "Siguen juntos: si a los dos les sumo lo mismo, siguen coincidiendo."
+    },
+    {
+      "who": "student",
+      "text": "Ir tres para atrás y volver tres es quedarse en el lugar, para cualquier x. Queda x."
+    },
+    {
+      "who": "student",
+      "text": "No se muda: a los dos lados se les suma 3. A la izquierda se cancela y a la derecha queda. Parece que pasó."
+    },
+    {
+      "who": null,
+      "text": "Sumar 3 se puede hacer con cualquier x: ninguna solución se pierde. Y se deshace restando 3: no aparece ninguna nueva. Por eso es la misma cuenta, escrita de otra forma."
+    },
+    {
+      "who": "Curva",
+      "text": "Ah. Así sí."
+    },
+    {
+      "who": "Recta",
+      "text": "Yo tengo otra caja: si le agrego tres, son cinco. Eso lo resuelvo de memoria."
+    },
+    {
+      "who": "Recta",
+      "text": "El 3 pasa al otro lado. Ocho."
+    },
+    {
+      "who": null,
+      "text": "Si me equivoco de memoria, de memoria no me doy cuenta. Mejor probar."
+    },
+    {
+      "who": null,
+      "text": "Con Punto en el 8, x + 3 da 11. No cae en el 5."
+    },
+    {
+      "who": null,
+      "text": "Dos. Dos más tres, cinco."
+    },
+    {
+      "who": "student",
+      "text": "El 3 sumaba: para sacarlo, se resta a los dos lados. \"Pasa restando\" es eso."
+    },
+    {
+      "who": "Recta",
+      "text": "De memoria lo pasé con el signo que tenía. Y salió otra cuenta."
+    },
+    {
+      "who": "Cuña",
+      "text": "Yo tengo un truco más rápido: multiplico los dos lados por cero. Me queda cero igual a cero, y listo."
+    },
+    {
+      "who": null,
+      "text": "Los dos marcadores, en el cero. Y si muevo a Punto…"
+    },
+    {
+      "who": null,
+      "text": "Con Punto en cualquier lado, siguen juntos en el cero. Con esta cuenta, cualquier caja serviría. En el 8 también siguen juntos: que el 8 siga sirviendo no alcanza, tampoco tienen que aparecer otras."
+    },
+    {
+      "who": "Mara",
+      "text": "La caja tiene ocho. No cualquier cosa."
+    },
+    {
+      "who": null,
+      "text": "Desde 0 = 0 no se puede volver: por cero no se deshace. Y lo que no se deshace puede hacer aparecer soluciones que no estaban."
+    },
+    {
+      "who": "student",
+      "text": "Mara, x − 3 = 5 se cumple sólo con 8. Es una ecuación: pregunta qué x la cumplen. Por cero, en cambio, todo da 0, con cualquier x: 0 = 0 se cumple siempre. A una igualdad que vale para cualquier x se le dice identidad. Otra: x − 3 + 3 = x, «ir tres para atrás y volver tres»."
+    },
+    {
+      "who": "student",
+      "text": "El truco de Cuña cambió una ecuación por una identidad. Por eso cualquier caja parecía servir."
+    },
+    {
+      "who": "Oval",
+      "text": "A mí me gusta elevar todo al cuadrado: x por x, y 3 por 3. Queda más lindo."
+    },
+    {
+      "who": null,
+      "text": "Menos tres por menos tres, nueve. Apareció otra x."
+    },
+    {
+      "who": "student",
+      "text": "En la cuenta de Oval, x = 3, el −3 no cumple: los marcadores se separan. El −3 lo trajo el cuadrado."
+    },
+    {
+      "who": null,
+      "text": "Al cuadrado, −3 y 3 caen en el mismo 9: no se puede deshacer sin perder cuál era. Después de elevar, hay que probar en la cuenta de antes."
+    },
+    {
+      "who": "Oval",
+      "text": "Más lindo, pero con un invitado de más."
+    },
+    {
+      "who": "Curva",
+      "text": "Esta la saqué rápido: x por x igual a x. Divido los dos lados por x, y queda x = 1."
+    },
+    {
+      "who": null,
+      "text": "Con Punto en el 0, los dos dan 0: cumple."
+    },
+    {
+      "who": null,
+      "text": "Y en la cuenta dividida, con Punto en el 0, los marcadores desaparecen: dividir por cero no está definido, no hay ningún número."
+    },
+    {
+      "who": "student",
+      "text": "Al dividir por x, se suponía que x no es cero. Y justo el 0 era una de las soluciones. Se perdió."
+    },
+    {
+      "who": "student",
+      "text": "Por partes: si x no es cero, dividir se puede y se deshace, y queda x = 1. Si x es cero, se mira aparte: 0 · 0 = 0, cumple. No hay más."
+    },
+    {
+      "who": "Curva",
+      "text": "Dos, el 0 y el 1. Y yo había encontrado una."
+    },
+    {
+      "who": "Cuña",
+      "text": "Me dieron un acertijo: −2 por x tiene que dar menos que 6. ¿Qué x sirven?"
+    },
+    {
+      "who": null,
+      "text": "Ahora no es \"igual\": es \"menor\". Cuando se cumple, aparece una tilde sobre Punto."
+    },
+    {
+      "who": null,
+      "text": "Algunas x cumplen y otras no. Las que cumplen quedan marcadas debajo de la recta."
+    },
+    {
+      "who": null,
+      "text": "Las marcas se fueron al otro lado. Con Punto en el 0: antes se cumplía (0 < 6) y ahora no (0 < −3). Cambiaron las x que sirven."
+    },
+    {
+      "who": null,
+      "text": "Las marcas no se movieron: cumplen las mismas x de antes. Y con Punto en el 0, sigue cumpliéndose: 0 > −3."
+    },
+    {
+      "who": "student",
+      "text": "Dividir por un negativo da vuelta la recta, como la media vuelta de las Terrazas: lo que estaba a la izquierda queda a la derecha. Por eso el signo se da vuelta."
+    },
+    {
+      "who": null,
+      "text": "Dividir por 2, en cambio, no da vuelta nada: 2x < 6 queda x < 3. Lo que da vuelta es el signo menos del número por el que se divide."
+    },
+    {
+      "who": "Recta",
+      "text": "Una última: dos cajas iguales y un atado suelto son siete atados."
+    },
+    {
+      "who": null,
+      "text": "Sigue valiendo, pero no ayudó: la x no quedó más sola."
+    },
+    {
+      "who": null,
+      "text": "El 0 no se movió: no fue lo mismo a los dos lados, y la mitad de 2x − 6 no es x − 6. Esa cuenta pide x = 6: es otra cuenta."
+    },
+    {
+      "who": "student",
+      "text": "Primero el +1, después el doble: x = 3."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si dividías primero?"
+    },
+    {
+      "who": "student",
+      "text": "También da 3. Sumar, restar, o dividir por un número que no es cero, a los dos lados, no pierde ni agrega soluciones: cualquier camino así que deje sola a la x llega al mismo número."
+    },
+    {
+      "who": null,
+      "text": "Dos por tres, más uno: siete. Se cumple."
+    },
+    {
+      "who": "Recta",
+      "text": "Las dos cajas, de a tres. Ahora me acuerdo."
+    },
+    {
+      "who": "Recta",
+      "text": "¿Y si la caja está del otro lado? Tres atados son la cuarta parte de una caja."
+    },
+    {
+      "who": null,
+      "text": "Del lado de la x quedó x ÷ 16: más lejos de quedar sola. Lo que deshace un \"÷ 4\" es \"× 4\"."
+    },
+    {
+      "who": null,
+      "text": "Quedó x ÷ 4 + 4: la x no se soltó. Lo que deshace dividir es multiplicar."
+    },
+    {
+      "who": null,
+      "text": "Doce dividido cuatro, tres: los marcadores caen juntos. La x puede quedar de cualquier lado del igual."
+    },
+    {
+      "who": "Mara",
+      "text": "Peldaño anda con otro problema: quiere una huerta cuadrada con justo dos cuadros de tierra. ¿Cuánto mide el lado?"
+    },
+    {
+      "who": null,
+      "text": "Un número que, multiplicado por sí mismo, da 2. Uno por uno es 1; dos por dos, 4. Está en el medio. Hay que aprender a hacer crecer los números… y a deshacerlo."
+    }
+  ],
+  "createdAt": "2026-10-07T20:45:19.912Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    6
+  ]
+}

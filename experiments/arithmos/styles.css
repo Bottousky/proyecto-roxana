@@ -54,6 +54,8 @@ button, select, input { font: inherit; color: inherit; }
 .spot:focus-visible::after { border-color: rgba(246, 213, 117, 0.95); inset: 0; }
 .spot.selected::after { border: 2.5px solid rgba(246, 213, 117, 0.9); inset: -2px; }
 .spot.rect { border-radius: 14px; }
+/* lugares contiguos (recta numerada): cada uno con su ancho, sin pisar al vecino */
+.spot.tile { min-width: 0; border-radius: 8px; }
 .spot.word {
   border-radius: 10px; font-size: calc(clamp(18px, 1.1vw + 10px, 26px) * var(--scale)); padding: .1em .45em; min-height: 44px;
   color: var(--chalk); text-shadow: 0 0 1px rgba(255,255,255,.5); white-space: nowrap;

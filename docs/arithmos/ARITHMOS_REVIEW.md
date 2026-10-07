@@ -233,7 +233,7 @@ Corregido en el commit siguiente (evidencia en `artifacts/arithmos/it07/c6-*`):
 | narr | A4 | Texto contra imagen | Corregido (ver mat A1–A3, M7) |
 | narr | A5 | «Pasa sumando» en un solo punto | Parcial (conjunto de 6.7; ver mat M1) |
 | narr | A6 | Puesta de diapositiva | Pendiente |
-| narr | M1–M10 | Costuras, caja de 6.1, opciones largas, nombres, izquierda/derecha, inválidos siempre ajenos, Bitácora, accesibilidad | Parciales: gancho 6→7 sin adelantar el descubrimiento; izquierda/derecha; el jugador tiene en la mano un paso inválido (6.8); descripciones nuevas en 6.3, 6.5, 6.7, 6.8; botones con verbo. Pendientes: caja de 6.1, longitud de las opciones, blancos táctiles de la recta en teléfono |
+| narr | M1–M10 | Costuras, caja de 6.1, opciones largas, nombres, izquierda/derecha, inválidos siempre ajenos, Bitácora, accesibilidad | Ciclo 9: en teléfono los lugares de la recta (dónde poner a Punto) son contiguos, una unidad cada uno (31 px en 844×390), sin pisarse; antes se agrandaban a 44 px y el toque podía caer en el vecino (medido con \`scripts/tile-check.mjs\`; cap. 6 entero en \`it12/c6-tel2\`). Parciales: gancho 6→7 sin adelantar el descubrimiento; izquierda/derecha; el jugador tiene en la mano un paso inválido (6.8); descripciones nuevas en 6.3, 6.5, 6.7, 6.8; botones con verbo. Pendientes: caja de 6.1, longitud de las opciones, blancos táctiles de la recta en teléfono |
 
 ## Revisiones independientes del cap. 7 (rev-mat-6 y rev-narr-5, 2026-10-06)
 

@@ -48,7 +48,7 @@ export function placeX(d, g, view, {hint, done, after}) {
       const spots = [];
       for (let n = LINE.from; n <= LINE.to; n++) {
         if (n === view.x) continue;
-        spots.push(rectSpot(`x${n}`, `Poner a Punto, la x, en ${n === 0 ? 'cero' : signed(n)}`, {x: lx(n) - 18, y: GROUND - 34, w: 36, h: 84}, () => go(n)));
+        spots.push(rectSpot(`x${n}`, `Poner a Punto, la x, en ${n === 0 ? 'cero' : signed(n)}`, {x: lx(n) - LINE.step / 2, y: GROUND - 34, w: LINE.step, h: 84}, () => go(n), {tile: true}));
       }
       g.ui.setSpots(spots);
     };
