@@ -68,7 +68,7 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | E1 | Raíz como pregunta inversa del cuadrado | 1°–5° (rango del bloque) | 7.1 | probado-auto · revisado-mat (rev-mat-6) |
 | E2 | Crecimiento aditivo vs multiplicativo | 1°–5° (rango del bloque) | 7.2 | probado-auto · revisado-mat |
 | E3 | Potencias; exponente 0 y negativo por patrón | 1°–5° (rango del bloque) | 7.3 | probado-auto · revisado-mat |
-| E3b | Propiedades de las potencias (bᵐ · bⁿ, (bᵐ)ⁿ; la suma no) y raíz cúbica como lado de un cubo | 1°–5° (rango del bloque) | 7.3b | implementado (pendiente revisión matemática) |
+| E3b | Propiedades de las potencias (bᵐ · bⁿ, bᵐ ÷ bⁿ, (bᵐ)ⁿ; la suma no) y raíz cúbica como lado de un cubo | 1°–5° (rango del bloque) | 7.3b | implementado (pendiente revisión matemática) |
 | E4 | Notación científica | 1°–5° (rango del bloque) | 7.4 | probado-auto · revisado-mat |
 | E5 | Polinomios como áreas; producto y factorización | 1°–5° (rango del bloque) | 7.5–7.6 | probado-auto · revisado-mat |
 | E6 | Ecuación cuadrática; completar el cuadrado | 1°–5° (rango del bloque) | 7.7 | probado-auto · revisado-mat |
@@ -76,7 +76,7 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | E8 | Expresiones racionales: dónde no se puede | 1°–5° (rango del bloque) | 7.9 | probado-auto · revisado-mat |
 | E6b | Completar el cuadrado con una o ninguna solución; la raíz de (x + 1)² como distancia al cero | 1°–5° (rango del bloque) | 7.7 | probado-auto (pendiente revisión matemática) |
 | E2b | Sucesiones aritmética y geométrica, nombradas con la tabla de 7.2 | 1°–5° (rango del bloque) | 7.2 | probado-auto (pendiente revisión matemática) |
-| E-gap | Cociente de potencias y exponente fraccionario, simplificar racionales con su restricción | 1°–5° (rango del bloque) | — | pendiente (C7b) |
+| E-gap | Exponente fraccionario, simplificar racionales con su restricción | 1°–5° (rango del bloque) | — | pendiente (C7b) |
 | F1 | Ángulo como giro; suma de los ángulos de un triángulo | 1°–5° (rango del bloque) | 8.2 | probado-auto · revisado-mat (rev-mat-7) |
 | F2 | Congruencia vs semejanza | 1°–5° (rango del bloque) | 8.3 | probado-auto · revisado-mat |
 | F3 | Escala: longitudes × k, áreas × k², volúmenes × k³ | 1°–5° (rango del bloque) | 8.4 | probado-auto · revisado-mat |

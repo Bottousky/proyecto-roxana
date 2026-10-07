@@ -263,9 +263,21 @@ export const juntar = {
     await d.think(c3 === 'no' ? 'Doce, no treinta y dos.' : 'Los exponentes se suman cuando se multiplica. Sumando, 8 + 4 = 12: no es 32.');
     await d.say('student', 'Sumar no junta factores: junta cantidades. Lo de los exponentes vale para multiplicar.');
 
+    // 3b. dividir saca factores: los exponentes se restan
+    await d.say('Mara', '¿Y si divido? Cinco dos repartidos en dos dos.');
+    const cq = await d.choose([
+      {id: '3', text: `${pw(2, 3)}: cada dos de abajo se va con uno de arriba.`},
+      {id: '7', text: `${pw(2, 7)}: los exponentes se suman.`},
+      {id: '1', text: `${pw(1, 3)}: dos dividido dos es uno.`},
+    ], {prompt: `¿Cuánto es ${pw(2, 5)} ÷ ${pw(2, 2)}, como una sola potencia?`, evaluate: true});
+    d.evidence('pow-quotient', {answer: cq});
+    await studentWrites(d, g, 'jf-d', `${pw(2, 5)} ÷ ${pw(2, 2)} = (2·2·2·2·2) ÷ (2·2) = 2·2·2 = ${pw(2, 3)}`, A.x0 + 20, rowY[2] + 58, {size: 21});
+    await d.think(cq === '3' ? 'Tres dos: 8.' : cq === '7' ? 'Sumar los exponentes es para multiplicar. Dividiendo, cada dos de abajo se va con uno de arriba: quedan tres, 8. 2⁷ sería 128.' : 'El 2 de abajo no se divide: se divide la cuenta entera. 32 ÷ 4 = 8, que es 2³; 1³ es 1.');
+    await d.say('student', 'Dividir saca factores: los exponentes se restan, 5 − 2 = 3. Como en la tabla de antes, cada renglón hacia abajo sacaba un dos.');
+
     // 4. raíz cúbica: el lado de un cubo
     g.setCinematic(true);
-    const old = w.objects.filter(o => /^jf-(a|b|c|u)/.test(o.id));
+    const old = w.objects.filter(o => /^jf-(a|b|c|d|u)/.test(o.id));
     await d.tween(0.6, q => { for (const o of old) o.fade = 1 - q; });
     for (const o of old) w.remove(o.id);
     g.setCinematic(false);
@@ -864,6 +876,8 @@ function writeJournal7(g) {
   if (pp) seen.push(pp.answer === '5' ? 'Para 2³ · 2² juntaste los factores: 2⁵.' : pp.answer === '6' ? 'Para 2³ · 2² multiplicaste los exponentes; desplegados, eran cinco dos: 2⁵.' : 'Para 2³ · 2² sumaste arriba y multiplicaste los dos de abajo: 4⁵; el 2 no cambia: cinco dos, 2⁵.');
   const ppw = first('pow-power');
   if (ppw) seen.push(ppw.answer === '6' ? 'Para (2³)² viste seis dos: 2⁶.' : ppw.answer === '5' ? 'Para (2³)² sumaste los exponentes; es 2³ repetido dos veces: seis dos, 2⁶.' : 'Para (2³)² elevaste el 3 al cuadrado; es 2³ · 2³: seis dos, 2⁶.');
+  const pq = first('pow-quotient');
+  if (pq) seen.push(pq.answer === '3' ? 'Para 2⁵ ÷ 2² sacaste dos factores: 2³.' : pq.answer === '7' ? 'Para 2⁵ ÷ 2² sumaste los exponentes; dividiendo se restan: 2³.' : 'Para 2⁵ ÷ 2² dividiste los dos de abajo; se divide la cuenta: 32 ÷ 4 = 8 = 2³.');
   const ps = first('pow-sum');
   if (ps) seen.push(ps.answer === 'no' ? 'Viste que 2³ + 2² es 12, no 2⁵.' : 'Pensaste que 2³ + 2² era 2⁵; sumando da 12: los exponentes se juntan al multiplicar.');
   const cb = first('cube-predict');
@@ -890,7 +904,7 @@ function writeJournal7(g) {
     abbr: 'Multiplicar repetido crece distinto que sumar repetido, y cada crecimiento tiene su pregunta al revés.',
     body: [
       'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.',
-      'Sumar lo mismo crece parejo (sucesión aritmética: el día n, 1 + 10 · n); duplicar empieza lento y después saca cada vez más ventaja (sucesión geométrica: cada día, el doble del anterior). En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
+      'Sumar lo mismo crece parejo (sucesión aritmética: el día n, 1 + 10 · n); duplicar empieza lento y después saca cada vez más ventaja (sucesión geométrica: cada día, el doble del anterior). En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Dividirlas saca factores, y los exponentes se restan: 2⁵ ÷ 2² = 2³. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
       'Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4. La raíz de (x + 1)² es lo lejos que está x + 1 del cero; por eso hay dos. Si x + 1 es positivo, la raíz de (x + 1)² es x + 1; si es negativo, no. Si el cuadrado da 0, hay una sola solución; si da un negativo, ninguna en la recta.',
       'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2.',
     ],
