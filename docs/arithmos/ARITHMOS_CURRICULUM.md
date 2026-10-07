@@ -66,12 +66,13 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | E1 | Raíz como pregunta inversa del cuadrado | 1°–5° (rango del bloque) | 7.1 | probado-auto · revisado-mat (rev-mat-6) |
 | E2 | Crecimiento aditivo vs multiplicativo | 1°–5° (rango del bloque) | 7.2 | probado-auto · revisado-mat |
 | E3 | Potencias; exponente 0 y negativo por patrón | 1°–5° (rango del bloque) | 7.3 | probado-auto · revisado-mat |
+| E3b | Propiedades de las potencias (bᵐ · bⁿ, (bᵐ)ⁿ; la suma no) y raíz cúbica como lado de un cubo | 1°–5° (rango del bloque) | 7.3b | implementado (pendiente revisión matemática) |
 | E4 | Notación científica | 1°–5° (rango del bloque) | 7.4 | probado-auto · revisado-mat |
 | E5 | Polinomios como áreas; producto y factorización | 1°–5° (rango del bloque) | 7.5–7.6 | probado-auto · revisado-mat |
 | E6 | Ecuación cuadrática; completar el cuadrado | 1°–5° (rango del bloque) | 7.7 | probado-auto · revisado-mat |
 | E7 | Logaritmo como pregunta inversa («¿cuántas veces?») | 1°–5° (rango del bloque) | 7.8; familia en 12.1 | probado-auto · revisado-mat |
 | E8 | Expresiones racionales: dónde no se puede | 1°–5° (rango del bloque) | 7.9 | probado-auto · revisado-mat |
-| E-gap | Propiedades de las potencias, raíces de otro índice, √(x²) = \| 1°–5° (rango del bloque) |, sucesiones nombradas, completar el cuadrado con una o ninguna solución, simplificar racionales con restricción | 2°–5° | — | pendiente (C7b) |
+| E-gap | Cociente de potencias y exponente fraccionario, √(x²) como distancia al cero de x, sucesiones nombradas, completar el cuadrado con una o ninguna solución, simplificar racionales con su restricción | 1°–5° (rango del bloque) | — | pendiente (C7b) |
 | F1 | Ángulo como giro; suma de los ángulos de un triángulo | 1°–5° (rango del bloque) | 8.2 | probado-auto · revisado-mat (rev-mat-7) |
 | F2 | Congruencia vs semejanza | 1°–5° (rango del bloque) | 8.3 | probado-auto · revisado-mat |
 | F3 | Escala: longitudes × k, áreas × k², volúmenes × k³ | 1°–5° (rango del bloque) | 8.4 | probado-auto · revisado-mat |

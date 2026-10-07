@@ -1,12 +1,33 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {power, powerTable, sideOf, race, overtakeDay, sci, expand, factor, completeSquare, timesToReach} from '../src/logic/growth.js';
+import {power, powerTable, sideOf, race, overtakeDay, sci, expand, factor, completeSquare, timesToReach, factorsOfProduct, factorsOfPower, exactRoot} from '../src/logic/growth.js';
 
 test('potencias: contar factores; hacia atrás, dividir', () => {
   assert.equal(power(2, 3), 8);
   assert.equal(power(2, 0), 1);
   assert.equal(power(2, -1), 0.5);
   assert.deepEqual(powerTable(2, -1, 3).map(r => r.v), [0.5, 1, 2, 4, 8]);
+});
+
+test('juntar factores: 2³ · 2² = 2⁵; (2³)² = 2⁶; 2³ + 2² no es 2⁵', () => {
+  const prod = factorsOfProduct(2, 3, 2);
+  assert.equal(prod.length, 5);
+  assert.equal(prod.reduce((a, b) => a * b, 1), power(2, 5));
+  assert.equal(power(2, 3) * power(2, 2), 32);
+  const rep = factorsOfPower(2, 3, 2);
+  assert.equal(rep.length, 6);
+  assert.equal(power(power(2, 3), 2), power(2, 6));
+  assert.notEqual(power(2, 3) + power(2, 2), power(2, 5));
+  assert.equal(power(2, 3) + power(2, 2), 12);
+});
+
+test('raíz cúbica: un cubo de 64 bloques tiene lado 4; 64 también es 8 · 8', () => {
+  assert.equal(exactRoot(64, 3), 4);
+  assert.equal(exactRoot(64, 2), 8);
+  assert.equal(exactRoot(27, 3), 3);
+  assert.equal(exactRoot(30, 3), null);
+  assert.equal(power(2, 6), power(8, 2));
+  assert.equal(power(2, 6), power(4, 3));
 });
 
 test('el lado de un cuadrado: área 9 → 3 exacto; área 2 → entre 1,41 y 1,42', () => {

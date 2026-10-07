@@ -10,6 +10,16 @@ export function power(b, n) {
   return r;
 }
 
+/** Los factores escritos uno por uno: bᵐ · bⁿ junta m + n factores; (bᵐ)ⁿ repite m factores n veces. */
+export const factorsOfProduct = (b, m, n) => [...Array(m).fill(b), ...Array(n).fill(b)];
+export const factorsOfPower = (b, m, n) => Array.from({length: n}, () => Array(m).fill(b)).flat();
+
+/** El lado de un cubo de v bloques (raíz cúbica, o de índice k): el entero que da justo, o null si ninguno. */
+export function exactRoot(v, k = 3) {
+  for (let s = 0; power(s, k) <= v; s++) if (power(s, k) === v) return s;
+  return null;
+}
+
 /** Tabla de potencias de b desde el exponente `from` hasta `to`. */
 export const powerTable = (b, from, to) => Array.from({length: to - from + 1}, (_, i) => ({n: from + i, v: power(b, from + i)}));
 

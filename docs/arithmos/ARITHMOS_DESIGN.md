@@ -259,6 +259,7 @@ tablas que crecen día por día; la recta del cap. 6 para las raíces.
 | 7.1 | El lado del cuadrado | Raíz como pregunta inversa del cuadrado | ¿Qué lado tiene un cuadrado de área 9? ¿y de área 2? | √9 = 3 (el lado es positivo; x² = 9 también tiene −3); √2 entre 1,41 y 1,42 |
 | 7.2 | Sumar o duplicar | Crecimiento aditivo vs multiplicativo | Elegir el plan para redibujar la escalera antes que la Marea: +10 por día o ×2 por día | Al principio gana sumar; desde el día 6 (61 contra 64), duplicar; tabla día por día |
 | 7.3 | Contar los factores | Potencias; exponente 0 y negativo por patrón | Seguir la tabla hacia atrás: 2³, 2², 2¹, … | Cada paso atrás divide por 2: 2⁰ = 1, 2⁻¹ = 1/2 (patrón, no regla) |
+| 7.3b | Juntar factores | Propiedades de las potencias; raíz cúbica | Anticipar 2³ · 2² y (2³)² y desplegar los factores; decidir si 2³ + 2² es 2⁵; apilar capas de 4 por 4 hasta 64 | Multiplicar junta factores (exponentes se suman); elevar repite (se multiplican); sumar no; 64 = 2⁶ = 4³ = 8²: el lado del cubo (∛) no es el del cuadrado (√). Errores con consecuencia: 8 de lado da una baldosa |
 | 7.4 | Muy grande, muy chico | Notación científica | Escribir el polvo de tiza de la Marea | 3 · 10⁶ vs 3000000; comparar por el exponente; el error de contar ceros |
 | 7.5 | Áreas con x | Polinomios como áreas | Armar (x + 2)(x + 3) con fichas | x² + 5x + 6: la distributiva del cap. 4, dos veces |
 | 7.6 | Al revés | Factorizar como armar un rectángulo | Con x² + 5x + 6 en fichas, armar un rectángulo | (x + 2)(x + 3); con x² + 5x + 5 no cierra |

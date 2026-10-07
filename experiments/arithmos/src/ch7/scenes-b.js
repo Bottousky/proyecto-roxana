@@ -4,7 +4,7 @@
 import {Drawing, Label, Shape} from '../engine/world.js';
 import {lerp, easeInOut} from '../engine/rng.js';
 import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
-import {power, sci, expand, factor, completeSquare, timesToReach, undefinedAt} from '../logic/growth.js';
+import {power, sci, expand, factor, completeSquare, timesToReach, undefinedAt, factorsOfProduct, factorsOfPower, exactRoot} from '../logic/growth.js';
 import {GROUND, BOARD, SHOTS, T, base, cast, family, familiesHome, area, tile, plate, S, seedOf, WHITE, YELLOW, BLUE} from './common.js';
 import {studentWrites} from './scenes-a.js';
 
@@ -144,6 +144,192 @@ export const factores = {
 };
 
 // ——————————————————————————————————————————————
+// 7.3b Juntar factores (propiedades de las potencias y raíz cúbica)
+// ——————————————————————————————————————————————
+
+/** Escribe los factores uno por uno, en grupos entre paréntesis, con su número de orden debajo. Devuelve dónde terminó. */
+async function unfold(d, g, id, groups, x, y) {
+  const w = g.world;
+  const L = (k, t, lx, opts = {}) => w.add(new Label(`${id}-${k}`, t, lx, y, {size: 24, align: 'center', z: 12, ...opts}));
+  let cx = x, k = 0;
+  for (let gi = 0; gi < groups.length; gi++) {
+    if (gi > 0) { L(`m${gi}`, '·', cx + 9); cx += 20; }
+    L(`o${gi}`, '(', cx + 5); cx += 12;
+    for (let j = 0; j < groups[gi].length; j++) {
+      k++;
+      const f = L(`f${k}`, String(groups[gi][j]), cx + 7, {reveal: 0});
+      await d.draw(f, 0.18, {key: 'reveal', sound: false});
+      w.add(new Label(`${id}-n${k}`, String(k), cx + 7, y + 22, {size: 14, align: 'center', z: 12, ch: YELLOW}));
+      g.audio.tap(0.12, 1 + k * 0.07);
+      if (j < groups[gi].length - 1) { L(`d${k}`, '·', cx + 21); cx += 28; } else cx += 16;
+    }
+    L(`c${gi}`, ')', cx + 4); cx += 12;
+  }
+  return cx;
+}
+
+/** Una capa de un cubo de n por n bloques (perspectiva caballera): frente y costado; la tapa va aparte. */
+function slab(id, bx, by, n, u, k, dx, dy) {
+  const y0 = by - k * u, y1 = by - (k + 1) * u, seed = seedOf(id);
+  const list = [S([[bx, y0], [bx + n * u, y0], [bx + n * u, y1], [bx, y1], [bx, y0]], seed, {w: 2.2, p: 0.9})];
+  for (let i = 1; i < n; i++) list.push(S([[bx + i * u, y0], [bx + i * u, y1]], seed + i, {w: 1.2, p: 0.6, lift: false}));
+  const rx = bx + n * u;
+  list.push(S([[rx, y0], [rx + n * dx, y0 + n * dy], [rx + n * dx, y1 + n * dy], [rx, y1]], seed + 40, {w: 2.2, p: 0.9}));
+  for (let i = 1; i < n; i++) list.push(S([[rx + i * dx, y0 + i * dy], [rx + i * dx, y1 + i * dy]], seed + 40 + i, {w: 1.2, p: 0.6, lift: false}));
+  return new Drawing(id, list, {z: 12, progress: 0});
+}
+
+function lid(id, bx, top, n, u, dx, dy) {
+  const seed = seedOf(id);
+  const list = [S([[bx, top], [bx + n * u, top], [bx + n * u + n * dx, top + n * dy], [bx + n * dx, top + n * dy], [bx, top]], seed, {w: 2.2, p: 0.9})];
+  for (let i = 1; i < n; i++) {
+    list.push(S([[bx + i * dx, top + i * dy], [bx + n * u + i * dx, top + i * dy]], seed + i, {w: 1.1, p: 0.55, lift: false}));
+    list.push(S([[bx + i * u, top], [bx + i * u + n * dx, top + n * dy]], seed + 20 + i, {w: 1.1, p: 0.55, lift: false}));
+  }
+  return new Drawing(id, list, {z: 13});
+}
+
+export const juntar = {
+  id: 'c7.juntar',
+  title: 'Juntar factores',
+  setup(g) {
+    clean(g, /^(pw-|jf-)/);
+    boardCast(g, 2);
+    g.camera.go(SHOTS.board);
+  },
+  async play(d, g) {
+    const w = g.world;
+    const A = area();
+    await d.shot(SHOTS.board, 1);
+    const write = async (id, text, x, y, opts = {}) => {
+      const l = w.add(new Label(id, text, x, y, {size: 24, z: 12, reveal: 0, ...opts}));
+      await d.draw(l, Math.min(1, 0.3 + text.length * 0.04), {key: 'reveal'});
+      d.describe(`En la pizarra: ${text}`);
+      return l;
+    };
+    const tapToUnfold = label => d.interact(ctl => new Promise(resolve => {
+      g.setHint(() => ['Tocá «desplegar»: se escriben los factores uno por uno, y se cuentan.']);
+      g.ui.setSpots([wordSpot('jf-open', 'desplegar', A.x1 - 70, A.y1 - 34, () => {
+        if (!ctl.alive()) return;
+        g.ui.setSpots([]);
+        g.setHint(null);
+        resolve();
+      }, {label})]);
+    }));
+    const rowY = [A.y0 + 40, A.y0 + 104, A.y0 + 168];
+
+    // 1. multiplicar potencias del mismo número: se juntan los factores
+    await d.say('Mara', 'El lunes Punto se duplicó tres veces seguidas, y el martes, dos veces más. Lo anoto corto.');
+    await write('jf-a', `${pw(2, 3)} · ${pw(2, 2)} =`, A.x0 + 20, rowY[0]);
+    await d.shot(SHOTS.tiles, 0.8);
+    const c1 = await d.choose([
+      {id: '5', text: `${pw(2, 5)}: tres dos y dos dos más.`},
+      {id: '6', text: `${pw(2, 6)}: tres por dos.`},
+      {id: '4', text: `${pw(4, 5)}: dos por dos abajo, y 3 + 2 arriba.`},
+    ], {prompt: `¿Cuánto es ${pw(2, 3)} · ${pw(2, 2)}, como una sola potencia de 2?`, evaluate: true});
+    d.evidence('pow-product', {answer: c1});
+    await tapToUnfold(`Desplegar ${pw(2, 3)} · ${pw(2, 2)}`);
+    const e1 = await unfold(d, g, 'jf-u1', [factorsOfProduct(2, 3, 2).slice(0, 3), factorsOfProduct(2, 3, 2).slice(3)], A.x0 + 120, rowY[0]);
+    await write('jf-a2', `= ${pw(2, 5)} = ${power(2, 5)}`, e1 + 8, rowY[0], {ch: YELLOW});
+    await d.think(c1 === '5' ? 'Cinco dos: 2⁵.' : c1 === '6' ? 'Son cinco dos, no seis: los tres del lunes y los dos del martes se juntan. Tres y dos se suman.' : 'El 2 de abajo no cambia: cada vez se multiplica por 2. Son cinco dos: 2⁵ = 32. 4⁵ sería 1024.');
+    await d.say('student', 'Mara: multiplicar potencias del mismo número es juntar sus factores. Los exponentes se suman: 3 + 2 = 5.');
+
+    // 2. elevar una potencia: se repiten los factores
+    await d.say('Mara', 'Y si un día se duplica tres veces, y eso pasa dos días seguidos, lo anoto así.');
+    await write('jf-b', `(${pw(2, 3)})${pw('', 2)} =`, A.x0 + 20, rowY[1]);
+    const c2 = await d.choose([
+      {id: '6', text: `${pw(2, 6)}: dos veces tres dos.`},
+      {id: '5', text: `${pw(2, 5)}: 3 + 2.`},
+      {id: '9', text: `${pw(2, 9)}: tres al cuadrado.`},
+    ], {prompt: `¿Cuánto es (${pw(2, 3)})${pw('', 2)}, como una sola potencia de 2?`, evaluate: true});
+    d.evidence('pow-power', {answer: c2});
+    await tapToUnfold(`Desplegar (${pw(2, 3)})${pw('', 2)}`);
+    const rep = factorsOfPower(2, 3, 2);
+    const e2 = await unfold(d, g, 'jf-u2', [rep.slice(0, 3), rep.slice(3)], A.x0 + 108, rowY[1]);
+    await write('jf-b2', `= ${pw(2, 6)} = ${power(2, 6)}`, e2 + 8, rowY[1], {ch: YELLOW});
+    await d.think(c2 === '6' ? 'Seis dos: 2⁶.' : c2 === '5' ? 'Acá no se juntan dos potencias distintas: se repite la misma, 2³, dos veces. Tres dos, dos veces: seis.' : 'El cuadrado es de todo el 2³, no del 3 solo: 2³ · 2³. Seis dos, no nueve.');
+    await d.say('student', 'Elevar una potencia es repetirla: tres dos, dos veces. Los exponentes se multiplican: 3 · 2 = 6.');
+
+    // 3. sumando no se juntan
+    await d.say('Mara', '¿Y si en vez de multiplicar sumo? ¿Se juntan igual?');
+    const c3 = await d.choose([
+      {id: 'no', text: `No: 8 + 4 = 12, y ${pw(2, 5)} es 32.`},
+      {id: 'yes', text: 'Sí: los exponentes se suman.'},
+    ], {prompt: `¿${pw(2, 3)} + ${pw(2, 2)} es ${pw(2, 5)}?`, evaluate: true});
+    d.evidence('pow-sum', {answer: c3});
+    await studentWrites(d, g, 'jf-c', `${pw(2, 3)} + ${pw(2, 2)} = 8 + 4 = 12, y ${pw(2, 5)} = 32`, A.x0 + 20, rowY[2], {size: 24});
+    await d.think(c3 === 'no' ? 'Doce, no treinta y dos.' : 'Los exponentes se suman cuando se multiplica. Sumando, 8 + 4 = 12: no es 32.');
+    await d.say('student', 'Sumar no junta factores: junta cantidades. Lo de los exponentes vale para multiplicar.');
+
+    // 4. raíz cúbica: el lado de un cubo
+    g.setCinematic(true);
+    const old = w.objects.filter(o => /^jf-(a|b|c|u)/.test(o.id));
+    await d.tween(0.6, q => { for (const o of old) o.fade = 1 - q; });
+    for (const o of old) w.remove(o.id);
+    g.setCinematic(false);
+    await d.say('Cornisa', 'Tengo 64 bloques de tiza y quiero apilarlos en un cubo: igual de largo, de ancho y de alto.');
+    const c4 = await d.choose([
+      {id: '4', text: '4: 4 · 4 · 4 = 64.'},
+      {id: '8', text: '8: 8 · 8 = 64.'},
+      {id: '21', text: '21 y pico: 64 ÷ 3.'},
+    ], {prompt: '¿De cuántos bloques de lado es un cubo de 64 bloques?', evaluate: true});
+    d.evidence('cube-predict', {answer: c4});
+    const bx = A.x0 + 320, by = A.y1 - 14;
+    if (c4 === '8') {
+      g.setCinematic(true);
+      const flat = w.add(slab('jf-flat', bx - 10, by, 8, 13, 0, 5, -5));
+      await d.draw(flat, 0.8, {sound: false});
+      w.add(lid('jf-flatl', bx - 10, by - 13, 8, 13, 5, -5));
+      g.setCinematic(false);
+      d.describe('Con 8 de lado, los 64 bloques forman una sola capa de 8 por 8: una baldosa, de un bloque de alto.');
+      await d.think('Con 8 de lado, una sola capa de 8 por 8 ya usa los 64: queda una baldosa de un bloque de alto, no un cubo.');
+      await d.tween(0.5, q => { for (const id of ['jf-flat', 'jf-flatl']) w.get(id).fade = 1 - q; });
+      w.remove('jf-flat');
+      w.remove('jf-flatl');
+    } else if (c4 === '21') {
+      await d.think('Dividir por 3 reparte en tres partes; no arma un cubo. Con 21 de lado, una sola capa ya tendría 21 · 21 = 441 bloques.');
+    }
+    await d.say('Cornisa', 'Probemos con capas de 4 por 4.');
+    const U = 24, DX = 10, DY = -10;
+    let layers = 0;
+    const cnt = w.add(new Label('jf-cnt', '', bx + 68, by - 150, {size: 18, align: 'center', z: 14, ch: YELLOW}));
+    await d.interact(ctl => new Promise(resolve => {
+      let busy = false;
+      g.setHint(() => ['Tocá «otra capa»: cada capa tiene 4 por 4 bloques. Mirá cuántos van.']);
+      const refresh = () => g.ui.setSpots([wordSpot('jf-layer', 'otra capa', A.x0 + 120, A.y0 + 200, async () => {
+        if (busy || !ctl.alive()) return;
+        busy = true;
+        g.ui.setSpots([]);
+        try {
+          const sl = w.add(slab(`jf-l${layers}`, bx, by, 4, U, layers, DX, DY));
+          await d.draw(sl, 0.5, {sound: false});
+          w.remove('jf-lid');
+          layers++;
+          w.add(lid('jf-lid', bx, by - layers * U, 4, U, DX, DY));
+        } catch { return; }
+        g.audio.tap(0.2, 0.9 + layers * 0.12);
+        cnt.text = `${layers} ${layers === 1 ? 'capa' : 'capas'}: ${16 * layers} bloques`;
+        d.describe(`${layers} ${layers === 1 ? 'capa' : 'capas'} de 4 por 4: ${16 * layers} bloques.`);
+        d.evidence('cube-layer', {layers, blocks: 16 * layers});
+        busy = false;
+        if (16 * layers >= 64) { g.setHint(null); resolve(); } else refresh();
+      }, {label: 'Apilar otra capa de 4 por 4 bloques'})]);
+      refresh();
+    }));
+    d.describe('Cuatro capas de 4 por 4: un cubo de 4 de largo, 4 de ancho y 4 de alto, con los 64 bloques.');
+    await d.say('student', 'Cornisa: 4 de largo, 4 de ancho y 4 de alto: 4 · 4 · 4 = 64. El lado del cubo es la raíz cúbica de 64: 4.');
+    await studentWrites(d, g, 'jf-r3', 'raíz cúbica de 64 = 4', A.x0 + 20, A.y0 + 56, {size: 24});
+    await d.say('student', 'Con 8 de lado sale un cuadrado, plano: 8 · 8 = 64, y √64 = 8. La raíz cuadrada pregunta por el lado de un cuadrado; la cúbica, por el de un cubo.');
+    await studentWrites(d, g, 'jf-r2', '√64 = 8', A.x0 + 20, A.y0 + 104, {size: 24});
+    await d.say('Mara', '¿Y cómo puede ser que el 64 sirva para las dos cosas?');
+    await d.say('student', `64 son seis dos: ${pw(2, 6)}. Juntados de a dos, tres veces: 4 · 4 · 4. Juntados de a tres, dos veces: 8 · 8.`);
+    await studentWrites(d, g, 'jf-r6', `64 = ${pw(2, 6)} = ${pw(4, 3)} = ${pw(8, 2)}`, A.x0 + 20, A.y0 + 152, {size: 24, ch: YELLOW});
+    d.evidence('cube', {side: exactRoot(64, 3), square: exactRoot(64, 2)});
+    g.flags.c7roots = true;
+  },
+};
+
+// ——————————————————————————————————————————————
 // 7.4 Muy grande, muy chico
 // ——————————————————————————————————————————————
 
@@ -151,7 +337,7 @@ export const grande = {
   id: 'c7.grande',
   title: 'Muy grande, muy chico',
   setup(g) {
-    clean(g, /^(pw-|sc-)/);
+    clean(g, /^(pw-|sc-|jf-)/);
     boardCast(g, 2);
     g.camera.go(SHOTS.board);
   },
@@ -649,6 +835,14 @@ function writeJournal7(g) {
   if (rp) seen.push(rp.answer === 'mul' ? 'Apostaste por duplicar: al principio perdía, y desde el día 6 pasó adelante.' : `${rp.answer === 'add' ? 'Apostaste a sumar diez' : 'Pensaste que llegaban juntos'}; sumar ganó los primeros días y duplicar pasó adelante el día 6.`);
   const pz = first('pow-zero');
   if (pz) seen.push(pz.answer === '1' ? 'Siguiendo la tabla hacia abajo, dijiste 2⁰ = 1.' : 'Para 2⁰ dijiste otro valor; la tabla, dividiendo por dos, daba 1.');
+  const pp = first('pow-product');
+  if (pp) seen.push(pp.answer === '5' ? 'Para 2³ · 2² juntaste los factores: 2⁵.' : pp.answer === '6' ? 'Para 2³ · 2² multiplicaste los exponentes; desplegados, eran cinco dos: 2⁵.' : 'Para 2³ · 2² multiplicaste también los dos de abajo; el 2 no cambia: cinco dos, 2⁵.');
+  const ppw = first('pow-power');
+  if (ppw) seen.push(ppw.answer === '6' ? 'Para (2³)² viste seis dos: 2⁶.' : ppw.answer === '5' ? 'Para (2³)² sumaste los exponentes; es 2³ repetido dos veces: seis dos, 2⁶.' : 'Para (2³)² elevaste el 3 al cuadrado; es 2³ · 2³: seis dos, 2⁶.');
+  const ps = first('pow-sum');
+  if (ps) seen.push(ps.answer === 'no' ? 'Viste que 2³ + 2² es 12, no 2⁵.' : 'Pensaste que 2³ + 2² era 2⁵; sumando da 12: los exponentes se juntan al multiplicar.');
+  const cb = first('cube-predict');
+  if (cb) seen.push(cb.answer === '4' ? 'Anticipaste que el cubo de 64 bloques tenía lado 4.' : cb.answer === '8' ? 'Para el cubo de 64 pensaste en 8; 8 · 8 = 64 es una capa plana. El cubo tiene lado 4.' : 'Para el cubo de 64 dividiste por 3; apilando capas de 4 por 4, el lado era 4.');
   const sc = first('sci-compare');
   if (sc) seen.push(sc.answer === 'a' ? 'Elegiste la noche de 3 · 10⁶: es más que 4 · 10⁵.' : sc.answer === 'b' ? 'Miraste primero el 3 y el 4; pesaba más el exponente: 3 · 10⁶ es más que 4 · 10⁵.' : 'Te parecieron parecidas; 3 · 10⁶ es más de siete veces 4 · 10⁵.');
   const ep = first('expand-predict');
@@ -666,8 +860,8 @@ function writeJournal7(g) {
     title: 'Crecer',
     abbr: 'Multiplicar repetido crece distinto que sumar repetido, y cada crecimiento tiene su pregunta al revés.',
     body: [
-      'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3.',
-      'Sumar lo mismo crece parejo; duplicar empieza lento y después saca cada vez más ventaja. En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
+      'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.',
+      'Sumar lo mismo crece parejo; duplicar empieza lento y después saca cada vez más ventaja. En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Multiplicar potencias del mismo número junta sus factores, y los exponentes se suman: 2³ · 2² = 2⁵. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
       'Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4.',
       'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2.',
     ],
