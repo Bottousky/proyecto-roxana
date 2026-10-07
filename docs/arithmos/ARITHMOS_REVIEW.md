@@ -387,5 +387,20 @@ capturas y registros del bot).
 | B8, B10–B12 | Panel sin la primera pieza; intentos repetidos; «se corta»; espejo inexacto; la raya «en el 2» | Corregidos |
 | B7, B9 (en parte) | Rótulo «función» pegado al dibujo; contador lejos del dibujo de abajo | Pendientes (bajas) |
 
+## Revisión de 7.7, 9.1 y 9.8 (rev-c8b, 2026-10-07)
+
+Informe: `artifacts/arithmos/it11/review-c8b/informe.md`.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | 7.7: «la raíz de (x + 1)² no es x + 1» (falso si x + 1 ≥ 0) | Corregido: «no siempre es x + 1… si x + 1 es positivo, es x + 1; si es negativo, no»; Bitácora igual |
+| A2 | 9.8: «va a medir 4» sin condición | Corregido: «si el sol sigue haciendo el mismo recorrido, unos 4. No es una medición: es anticipar. En diez días lo medimos y vemos», en las tres ramas |
+| M1–M3 | 7.7: «por sí mismo»; adelanta 9.6 con el mismo −4 y la misma frase; Bitácora «los que probaste» | Corregidos: «multiplicado por sí mismo»; ahora es (x + 1)² = −9, con razón geométrica («no hay cuadrado de área negativa»); Bitácora con lo elegido |
+| M4–M6 | 9.8: tiempos («mañana» con días ya medidos); el juego lee el resultado; el día 1 sin describir | Corregidos: «el día 2, a las 10, ¿cuánto habrá medido?»; el jugador toca el punto de las 10 del día 2 y ve el 2; el día 1 se describe con sus valores |
+| M7 | 9.1: la tabla «de ayer» cambió el sentido de la flecha | Corregido: «8 h: largo 4 →» como en 8.8 (la flecha es para dónde apunta la sombra) |
+| M8 | 9.1: el juego anuncia que hay otra hora | Corregido: después de la primera flecha, el jugador decide «puede haber otra» o «ya está»; si dice «ya está», se marca en amarillo el renglón de las 14 en la tabla |
+| B1–B7 | Varias | Corregidos: se prueban las dos de la rama «dos»; la rama «el 0 no es área» se contesta con la cuenta; las ecuaciones quedan en el resumen («ninguna en la recta»); las opciones equivocadas traen su razón; un solo «del 2 salen dos»; «el día 2» en la Bitácora |
+| Teléfono | 9.8 ilegible al decidir; la tabla de 9.1 chica | Nuevo para todo el juego: en pantallas bajas el panel de opciones tiene «ver la pizarra», que lo esconde para mirar la pizarra más grande, y «volver a las opciones» (`it11/peek-c98-tel`). Tabla de 9.1 más grande; horas de 9.8 de 14 |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

@@ -79,7 +79,7 @@ const read = () => page.evaluate(() => {
     waiting: !!g.ui.waiting,
     typing: !!g.ui.typing,
     caption: vis(document.querySelector('#caption')) ? document.querySelector('#caption .line').textContent : '',
-    choices: vis(document.querySelector('#choices')) ? [...document.querySelectorAll('#choices button')].map(b => b.textContent) : [],
+    choices: vis(document.querySelector('#choices')) ? [...document.querySelectorAll('#choices button:not(.peek)')].map(b => b.textContent) : [],
     prompt: document.querySelector('#choices .prompt')?.textContent || '',
     spots: [...document.querySelectorAll('#spots .spot')].map(b => ({id: b.dataset.id, label: b.getAttribute('aria-label'), disabled: b.getAttribute('aria-disabled') === 'true', selected: b.classList.contains('selected')})),
     skip: vis(document.querySelector('#skip-btn')),
@@ -182,7 +182,8 @@ function pickChoice(prompt, options) {
     ['Esos puntos se unen', 'Unidos'],
     ['qué entradas tienen sentido', 'Cualquier número menos el 2'],
     ['Puede salir −4', 'Sí: con −2'],
-    ['Mañana a las 10', 'Más: cada día'],
+    ['El día 2, a las 10', 'Más: cada día'],
+    ['¿Hay otra hora con sombra 2?', 'Ya está'],
     ['Dentro de diez días', 'No se puede saber'],
     ['entran alrededor de la rueda', 'Seis justos'],
     ['gira 30°, ¿a qué altura', 'A un tercio'],
@@ -196,7 +197,7 @@ function pickChoice(prompt, options) {
     ['La recta puede ser', 'Puede ser'],
     ['2³ · 2², como una sola', '2⁶: tres por dos'],
     ['(x + 1)² = 0, ¿cuántas', 'Dos, como'],
-    ['(x + 1)² = −4, ¿cuántas', 'Dos: x = 1'],
+    ['(x + 1)² = −9, ¿cuántas', 'Dos: x = 2'],
     ['(2³)², como una sola', '2⁹'],
     ['2³ + 2² es 2⁵', 'Sí'],
     ['cubo de 64 bloques', '8: 8'],
@@ -321,7 +322,8 @@ function pickChoice(prompt, options) {
     ['Esos puntos se unen', 'Sueltos'],
     ['qué entradas tienen sentido', 'Enteros mayores'],
     ['Puede salir −4', 'No: un número'],
-    ['Mañana a las 10', '2, como'],
+    ['El día 2, a las 10', '2, como'],
+    ['¿Hay otra hora con sombra 2?', 'Puede haber otra'],
     ['Dentro de diez días', '4, como'],
     ['entran alrededor de la rueda', 'Seis y un poco más'],
     ['gira 30°, ¿a qué altura', 'A medio rayo'],
@@ -335,7 +337,7 @@ function pickChoice(prompt, options) {
     ['La recta puede ser', 'Puede ser'],
     ['2³ · 2², como una sola', '2⁵: tres'],
     ['(x + 1)² = 0, ¿cuántas', 'Una sola'],
-    ['(x + 1)² = −4, ¿cuántas', 'Ninguna en la recta'],
+    ['(x + 1)² = −9, ¿cuántas', 'Ninguna en la recta'],
     ['(2³)², como una sola', '2⁶: dos veces'],
     ['2³ + 2² es 2⁵', 'No:'],
     ['cubo de 64 bloques', '4: 4'],
@@ -414,6 +416,7 @@ let choiceSig = '';
 // --snap=texto1|texto2: captura cuando el texto en pantalla contiene alguno
 const snaps = val('snap', '') ? decodeURIComponent(val('snap', '')).split('|') : [];
 const snapped = new Set();
+const peeked = new Set();
 
 for (let iter = 0; iter < 30000; iter++) {
   const s = await read();
@@ -460,6 +463,16 @@ for (let iter = 0; iter < 30000; iter++) {
     const csig = s.prompt + '|' + s.choices.join('|');
     if (csig !== choiceSig) { choiceSig = csig; await page.waitForTimeout(520); continue; }
     choiceSig = '';
+    // --peek: en pantallas bajas, mira la pizarra escondiendo las opciones y vuelve (una vez por pregunta)
+    if (opt('peek') && !peeked.has(s.prompt) && await page.$('#choices button.peek')) {
+      peeked.add(s.prompt);
+      await page.click('#choices button.peek');
+      await page.waitForTimeout(700);
+      await shot(`${s.seg}-pizarra`);
+      await page.click('#peek-back');
+      await page.waitForTimeout(500);
+      continue;
+    }
     const c = pickChoice(s.prompt, s.choices);
     note(`elige «${c}» (${s.prompt})`);
     await shot(`${s.seg}-eleccion`);

@@ -353,6 +353,23 @@ export class UI {
       box.append(p);
     }
     box.setAttribute('aria-label', prompt || 'Elegí');
+    // en pantallas bajas las opciones tapan la pizarra: se pueden esconder un momento para mirarla
+    const back = this.#peekBack();
+    back.hidden = true;
+    if (innerHeight < 560) {
+      const peek = document.createElement('button');
+      peek.type = 'button';
+      peek.className = 'peek';
+      peek.textContent = 'ver la pizarra';
+      peek.setAttribute('aria-label', 'Esconder las opciones un momento para mirar la pizarra');
+      peek.addEventListener('click', e => {
+        e.stopPropagation();
+        box.hidden = true;
+        back.hidden = false;
+        back.focus({preventScroll: true});
+      });
+      box.append(peek);
+    }
     return new Promise(resolve => {
       this.choiceResolve = resolve;
       for (const o of options) {
@@ -365,6 +382,7 @@ export class UI {
           // nada de elegir sin leer: ni en pausa, ni con un Enter que venía de antes
           if (this.game.paused || performance.now() - shownAt < 450) return;
           box.hidden = true;
+          back.hidden = true;
           box.replaceChildren();
           this.choiceResolve = null;
           this.game.audio.tap(0.3, 1.2);
@@ -374,8 +392,27 @@ export class UI {
       }
       box.hidden = false;
       box.scrollTop = 0;
-      setTimeout(() => { if (!box.hidden && !this.game.paused) box.querySelector('button')?.focus({preventScroll: true}); }, 460);
+      setTimeout(() => { if (!box.hidden && !this.game.paused) box.querySelector('button:not(.peek)')?.focus({preventScroll: true}); }, 460);
     });
+  }
+
+  /** El botón para volver a las opciones después de mirar la pizarra (uno solo, se reusa). */
+  #peekBack() {
+    if (this.peekBack$) return this.peekBack$;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.id = 'peek-back';
+    b.hidden = true;
+    b.textContent = 'volver a las opciones';
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      b.hidden = true;
+      this.choices$.hidden = false;
+      this.choices$.querySelector('button:not(.peek)')?.focus({preventScroll: true});
+    });
+    document.body.append(b);
+    this.peekBack$ = b;
+    return b;
   }
 
   // ——— Objetos tocables ———
@@ -518,6 +555,7 @@ export class UI {
     if (this.choiceResolve) this.choiceResolve = null;
     this.choices$.hidden = true;
     this.choices$.replaceChildren();
+    if (this.peekBack$) this.peekBack$.hidden = true;
     this.setSpots([]);
     this.setHint(false);
     this.setSkippable(false);

@@ -1,0 +1,11 @@
+[0.0s] escena → c9.vuelve
+[1.0s] lee: Seguí midiendo, varios días. Miren.
+[3.0s] elige «2, como el día 1 a las 10: el sol hace el mismo recorrido.» (El día 2, a las 10, ¿cuánto habrá medido la sombra de Cornisa?)
+[4.7s] lee: Dos, como dijiste: la misma ve.
+[4.7s] lee: Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos.
+[5.3s] elige «Unos 4, como los días medidos a las 8, si el sol sigue igual.» (Dentro de diez días, a las 8, ¿cuánto va a medir?)
+[5.5s] lee: —Cornisa, si el sol sigue haciendo el mismo recorrido, unos 4. No es una medición: es anticipar. En diez días lo medimos y vemos.
+[5.6s] lee: Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.
+[5.6s] lee: Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.
+[5.9s] escena → c10.rueda
+[6.1s] {"ended":true,"final":{"mode":"play","seg":"c10.rueda"},"journal":["Depende"],"evidenceKinds":["periodic-predict","periodic-check","periodic-transfer"],"fps":{"min":"20.0","median":"59.5"},"errors":[],"seconds":6.142,"size":"844x390","touch":true,"route":"directa","watch":false}

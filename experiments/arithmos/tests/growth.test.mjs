@@ -69,6 +69,8 @@ test('completar el cuadrado con una o ninguna solución: (x + 1)² = 0 y (x + 1)
   assert.equal(one.square, 0);
   assert.deepEqual(one.roots, [-1]);
   assert.equal((-1) * (-1) + 2 * (-1), -1);
+  assert.equal(completeSquare(2, -10).square, -9);
+  assert.deepEqual(completeSquare(2, -10).roots, []);
   const none = completeSquare(2, -5);
   assert.equal(none.square, -4);
   assert.deepEqual(none.roots, []);

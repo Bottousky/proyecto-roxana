@@ -34,10 +34,12 @@ export const flechas = {
     SOMBRA.forEach(([h], i) => w.add(new Label(`c9-h${h}`, `${h} h`, HX, hy(i) + 8, {size: 24, align: 'center', z: 12})));
     SH.forEach((v, i) => w.add(new Label(`c9-s${v}`, String(v), SX, sy(i) + 8, {size: 26, align: 'center', z: 12})));
     // la tabla de ayer (8.8) queda a la vista: copiar de lo que se ve está bien
-    const TX = A.x1 - 70;
-    w.add(new Label('c9-th', 'la tabla de ayer', TX, A.y0 + 16, {size: 15, align: 'center', z: 12, ch: BLUE}));
-    SOMBRA.forEach(([h, v], i) => w.add(new Label(`c9-t${h}`, `${h} h → ${v}`, TX, A.y0 + 44 + i * 26, {size: 18, align: 'center', z: 12})));
-    d.describe(`En la pizarra, dos columnas: a la izquierda las horas 8, 10, 12, 14 y 16; a la derecha las sombras 1, 2 y 4. En un costado, la tabla de ayer: ${SOMBRA.map(([h, v]) => `a las ${h}, ${v}`).join('; ')}.`);
+    // copiada como se anotó en 8.8: la flecha de la tabla es para qué lado apunta la sombra
+    const TX = A.x1 - 74;
+    const dirOf = h => (h < 12 ? ' →' : h > 12 ? ' ←' : '');
+    w.add(new Label('c9-th', 'la tabla de ayer', TX, A.y0 + 18, {size: 17, align: 'center', z: 12, ch: BLUE}));
+    SOMBRA.forEach(([h, v], i) => w.add(new Label(`c9-t${h}`, `${h} h: largo ${v}${dirOf(h)}`, TX, A.y0 + 48 + i * 28, {size: 19, align: 'center', z: 12})));
+    d.describe(`En la pizarra, dos columnas: a la izquierda las horas 8, 10, 12, 14 y 16; a la derecha las sombras 1, 2 y 4. En un costado, la tabla de ayer: ${SOMBRA.map(([h, v]) => `a las ${h}, largo ${v}${h < 12 ? ', hacia la derecha' : h > 12 ? ', hacia la izquierda' : ''}`).join('; ')}.`);
     await d.shot(SHOTS.tiles, 0.8);
     // el jugador une cada hora con su sombra
     const done = new Set();
@@ -82,7 +84,7 @@ export const flechas = {
     const back2 = new Set();
     await d.interact(ctl => new Promise(resolve => {
       let busy = false, from = false;
-      g.setHint(() => [!from ? 'Dalas vuelta: tocá la sombra 2 y después una hora en la que la sombra medía 2.' : back2.size ? '¿Qué otra hora tenía sombra 2? Tocala.' : 'Ahora tocá una hora en la que la sombra medía 2.']);
+      g.setHint(() => [!from ? 'Dalas vuelta: tocá la sombra 2 y después una hora en la que la sombra medía 2.' : back2.size ? '¿Hay otra hora con sombra 2? Si la hay, tocala.' : 'Ahora tocá una hora en la que la sombra medía 2.']);
       const refresh = () => g.ui.setSpots([
         rectSpot('c9-q2', 'Sombra 2: de acá sale la flecha al revés', {x: SX - 30, y: sy(1) - 20, w: 60, h: 40}, () => { if (!busy && ctl.alive()) { from = true; refresh(); } }, {selected: from}),
         ...(from ? SOMBRA.filter(([h]) => !back2.has(h)).map(([h]) => rectSpot(`c9-qh${h}`, `Las ${h}`, {x: HX - 34, y: hy(SOMBRA.findIndex(r => r[0] === h)) - 20, w: 68, h: 40}, () => pick(h))) : []),
@@ -99,12 +101,29 @@ export const flechas = {
         back2.add(h);
         g.audio.tap(0.15, 1.1 + back2.size * 0.2);
         d.describe(`Una flecha amarilla del 2 a las ${h}.${back2.size === 2 ? ' Del 2 salen dos flechas.' : ''}`);
+        if (back2.size === 2) { g.setHint(null); resolve(); return; }
+        // ¿hay otra? lo decide el jugador
+        let more;
+        try {
+          more = await d.choose([
+            {id: 'look', text: 'Puede haber otra: la busco.'},
+            {id: 'done', text: 'Ya está: el 2 va a una sola hora.'},
+          ], {prompt: '¿Hay otra hora con sombra 2?'});
+        } catch { return; }
+        d.evidence('back-more', {answer: more});
+        if (more === 'done') {
+          const other = SOMBRA.find(([hh, v]) => v === 2 && !back2.has(hh))[0];
+          const row = w.get(`c9-t${other}`);
+          if (row) { w.remove(row.id); w.add(new Label(row.id, row.text, row.x, row.y, {size: row.size, align: row.align, z: 12, ch: YELLOW})); }
+          g.note(`Mirá la tabla de ayer: a las ${other} el largo también era 2.`);
+          d.describe(`En la tabla de ayer se marca en amarillo el renglón de las ${other}: largo 2.`);
+        }
         busy = false;
-        if (back2.size === 2) { g.setHint(null); resolve(); } else refresh();
+        refresh();
       };
       refresh();
     }));
-    await d.think('Del 2 salen dos flechas.');
+    if (c === 'both') await d.think('Del 2 salen dos flechas, como dijiste.');
     g.setCinematic(true);
     for (const [h] of SOMBRA) w.remove(`c9-a${h}`);
     const rest = SOMBRA.filter(([, v]) => v !== 2).map(([h, v]) => w.add(arrow(`c9-b${h}`, SX - 26, sy(SH.indexOf(v)), HX + 36, hy(SOMBRA.findIndex(r => r[0] === h)), YELLOW)));

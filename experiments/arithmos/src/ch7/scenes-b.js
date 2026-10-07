@@ -660,26 +660,26 @@ export const completar = {
     await studentWrites(d, g, 'cq-eq3', 'x + 1 = 3   o   x + 1 = −3', ex, A.y0 + 180, {size: 26});
     await d.think('Las dos cumplen (x + 1)² = 9, porque (−3) · (−3) también es 9. Pruebo x = −4 en la cuenta de Rampa: 16 − 8 = 8. Cumple. La huerta no: un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.');
     await studentWrites(d, g, 'cq-eq4', `x = ${r.roots[0]}   o   x = −${-r.roots[1]}`, ex, A.y0 + 224, {size: 26});
-    await d.say('student', 'La raíz da el lado, el positivo. La raíz de (x + 1)² no es x + 1: es lo lejos que está x + 1 del cero. Por eso x + 1 puede ser 3 o −3, los dos a 3 del cero.');
+    await d.say('student', 'La raíz da el lado, el positivo. La raíz de (x + 1)² no siempre es x + 1: es lo lejos que está x + 1 del cero. Si x + 1 es positivo, es x + 1; si es negativo, no. Por eso x + 1 puede ser 3 o −3, los dos a 3 del cero.');
     // con una o ninguna solución
     await d.say('Mara', 'Al completar, siempre queda un cuadrado igual a un número. ¿Y si el número fuera otro?');
-    const one = completeSquare(2, -1), none = completeSquare(2, -5);
+    const one = completeSquare(2, -1), none = completeSquare(2, -10);
     const z = await d.choose([
       {id: 'one', text: 'Una sola: x + 1 = 0, x = −1.'},
       {id: 'two', text: 'Dos, como con el 9: una positiva y una negativa.'},
       {id: 'none', text: 'Ninguna: el 0 no es el área de ningún cuadrado.'},
-    ], {prompt: '(x + 1)² = 0, ¿cuántas soluciones tiene?', evaluate: true});
+    ], {prompt: 'Si quedara (x + 1)² = 0, ¿cuántas soluciones tendría?', evaluate: true});
     d.evidence('complete-zero', {answer: z, roots: one.roots});
-    await d.think(z === 'one' ? 'Una: sólo el 0, por sí mismo, da 0.' : z === 'two' ? 'Con el 9 había 3 y −3. Con el 0, más cero y menos cero son lo mismo: x + 1 = 0, una sola, x = −1.' : 'Un cuadrado de área 0 tiene lado 0: x + 1 = 0, x = −1. Una sola.');
+    await d.think(z === 'one' ? 'Una: sólo el 0, multiplicado por sí mismo, da 0.' : z === 'two' ? 'Con el 9 había 3 y −3. Con el 0, más cero y menos cero son lo mismo: x + 1 = 0, una sola, x = −1.' : 'Sin pensar en la huerta, con la cuenta: con x = −1, (−1 + 1)² = 0 · 0 = 0. Cumple: una sola.');
     const n = await d.choose([
-      {id: 'none', text: 'Ninguna en la recta: un número de la recta, por sí mismo, nunca da negativo.'},
-      {id: 'two', text: 'Dos: x = 1 y x = −3.'},
-      {id: 'one', text: 'Una: x = −3.'},
-    ], {prompt: '(x + 1)² = −4, ¿cuántas soluciones tiene?', evaluate: true});
+      {id: 'none', text: 'Ninguna en la recta: no hay cuadrado de área negativa.'},
+      {id: 'two', text: 'Dos: x = 2 y x = −4, como con el 9.'},
+      {id: 'one', text: 'Una: x = −4, la negativa.'},
+    ], {prompt: 'Y si quedara (x + 1)² = −9, ¿cuántas soluciones tendría?', evaluate: true});
     d.evidence('complete-negative', {answer: n, roots: none.roots});
-    await d.think(n === 'none' ? 'Ninguna en la recta.' : `Con x = ${n === 'two' ? '1, (1 + 1)² = 4' : '−3, (−3 + 1)² = 4'}: da 4, no −4. Un número de la recta por sí mismo da 0 o positivo: ninguna.`);
+    await d.think(n === 'none' ? 'Ninguna en la recta: con la cuenta también, un número de la recta multiplicado por sí mismo da 0 o positivo.' : `Con x = ${n === 'two' ? '2, (2 + 1)² = 9; con x = −4, (−4 + 1)² = 9' : '−4, (−4 + 1)² = 9'}: da 9, no −9. Un número de la recta multiplicado por sí mismo da 0 o positivo: ninguna.`);
     await d.say('student', 'Al completar el cuadrado queda (x + algo)² = un número. Si es positivo, dos soluciones; si es cero, una; si es negativo, ninguna en la recta.');
-    await studentWrites(d, g, 'cq-eq5', '= 9: dos    = 0: una    = −4: ninguna', ex - 20, A.y1 - 4, {size: 17, ch: YELLOW});
+    await studentWrites(d, g, 'cq-eq5', '(x + 1)² = 9: dos   = 0: una   = −9: ninguna en la recta', A.x0 + 16, A.y1 - 4, {size: 16, ch: YELLOW});
     d.evidence('complete', r);
     g.flags.c7complete = true;
   },
@@ -877,7 +877,7 @@ function writeJournal7(g) {
   const cz = first('complete-zero');
   if (cz) seen.push(cz.answer === 'one' ? 'Viste que (x + 1)² = 0 tiene una sola solución.' : cz.answer === 'two' ? 'Para (x + 1)² = 0 esperabas dos, como con el 9; más cero y menos cero son lo mismo: una.' : 'Para (x + 1)² = 0 pensaste que no había; un cuadrado de área 0 tiene lado 0: una, x = −1.');
   const cn = first('complete-negative');
-  if (cn) seen.push(cn.answer === 'none' ? 'Viste que (x + 1)² = −4 no tiene solución en la recta.' : 'Para (x + 1)² = −4 buscaste un número; los que probaste dan 4, no −4: en la recta, ninguna.');
+  if (cn) seen.push(cn.answer === 'none' ? 'Viste que (x + 1)² = −9 no tiene solución en la recta.' : cn.answer === 'two' ? 'Para (x + 1)² = −9 elegiste x = 2 y x = −4; con esos da 9, no −9: en la recta, ninguna.' : 'Para (x + 1)² = −9 elegiste x = −4; con ese da 9, no −9: en la recta, ninguna.');
   const lp = first('log-predict');
   if (lp) seen.push(lp.answer === '10' ? 'Anticipaste unos diez días para pasar mil duplicando.' : 'Esperabas muchos más días; duplicando, alcanzaron diez.');
   const rq = first('rational-predict');
@@ -889,7 +889,7 @@ function writeJournal7(g) {
     body: [
       'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.',
       'Sumar lo mismo crece parejo; duplicar empieza lento y después saca cada vez más ventaja. En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
-      'Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4. La raíz de (x + 1)² es lo lejos que está x + 1 del cero; por eso hay dos. Si el cuadrado da 0, hay una sola; si da un negativo, ninguna en la recta.',
+      'Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4. La raíz de (x + 1)² es lo lejos que está x + 1 del cero; por eso hay dos. Si x + 1 es positivo, la raíz de (x + 1)² es x + 1; si es negativo, no. Si el cuadrado da 0, hay una sola solución; si da un negativo, ninguna en la recta.',
       'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2.',
     ],
     seen,
