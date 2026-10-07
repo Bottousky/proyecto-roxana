@@ -347,6 +347,13 @@ juego de Ohmdal publicado el 2026-09-13 en la raíz. Se compilaron sólo las dos
 `/proyecto-roxana/escuela-clasica.html`; la raíz sigue siendo el juego. La home lee la partida del juego publicado
 (misma clave `ohmdal.playcanvas.arc1.v1`; entre esa versión y `main` sólo cambió una preferencia, en otra clave).
 
+**Publicado** (2026-10-07): `main` = `ef64041` (fast-forward desde `f7984ca`); `gh-pages` = `59d04fc`, construido
+por GitHub Pages. En vivo, con el Mac despierto: `clasica-check.mjs` 44/44 (LCP de laboratorio 0,87 s a 1440 y
+0,32 s a 390 por la red real), 10/10 arranques del 3D (mediana 1,7 s, máx. 3,8 s), capturas en `evidence/c17/vivo/`.
+- https://bottousky.github.io/proyecto-roxana/escuela.html (campus 3D)
+- https://bottousky.github.io/proyecto-roxana/escuela-clasica.html (versión clásica)
+- La raíz https://bottousky.github.io/proyecto-roxana/ sigue siendo el juego de Ohmdal publicado el 2026-09-13.
+
 ## Siguiente acción exacta
 
 1. Decidir si la home pasa a ser la entrada del sitio (hoy la raíz es el juego; la home está en `escuela.html`).
