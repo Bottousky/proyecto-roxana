@@ -1,0 +1,643 @@
+{
+  "version": 1,
+  "chapter": 10,
+  "segment": "c10.rueda",
+  "flags": {
+    "c9machine": true,
+    "c9graph": true,
+    "c9vertical": true,
+    "c9domain": true,
+    "c9image": true,
+    "c9ways": true,
+    "c9periodic": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "x": 1,
+      "y": 3,
+      "t": "2026-10-07T12:20:41.299Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "machine"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "t": "2026-10-07T12:20:42.133Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "machine"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "t": "2026-10-07T12:20:42.933Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "machine"
+    },
+    {
+      "rule": "× 3",
+      "ok": false,
+      "tries": 1,
+      "t": "2026-10-07T12:20:45.949Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "rule-try"
+    },
+    {
+      "rule": "× 2",
+      "ok": false,
+      "tries": 2,
+      "t": "2026-10-07T12:20:49.032Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "rule-try"
+    },
+    {
+      "rule": "× 2 + 1",
+      "ok": true,
+      "tries": 3,
+      "t": "2026-10-07T12:20:52.166Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "rule-try"
+    },
+    {
+      "answer": "20",
+      "matching": [
+        "double1"
+      ],
+      "t": "2026-10-07T12:20:52.902Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "rule-predict"
+    },
+    {
+      "x": 10,
+      "y": 21,
+      "t": "2026-10-07T12:20:53.716Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "machine"
+    },
+    {
+      "y": 7,
+      "t": "2026-10-07T12:20:55.332Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "punto-machine"
+    },
+    {
+      "y": 9,
+      "t": "2026-10-07T12:20:55.765Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "punto-machine"
+    },
+    {
+      "rule": "double1",
+      "seen": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          10,
+          21
+        ]
+      ],
+      "t": "2026-10-07T12:20:56.170Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "rule"
+    },
+    {
+      "h": 8,
+      "v": 0,
+      "ok": false,
+      "t": "2026-10-07T12:20:58.055Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 8,
+      "v": 4,
+      "ok": true,
+      "t": "2026-10-07T12:20:58.187Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 10,
+      "v": 2,
+      "ok": true,
+      "t": "2026-10-07T12:20:58.319Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 12,
+      "v": 1,
+      "ok": true,
+      "t": "2026-10-07T12:20:58.449Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 14,
+      "v": 2,
+      "ok": true,
+      "t": "2026-10-07T12:20:58.576Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 16,
+      "v": 4,
+      "ok": true,
+      "t": "2026-10-07T12:20:58.710Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "answer": "pretty",
+      "t": "2026-10-07T12:20:59.635Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "join-predict"
+    },
+    {
+      "answer": "join",
+      "t": "2026-10-07T12:21:01.333Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "join-discrete"
+    },
+    {
+      "shape": "line",
+      "said": true,
+      "truth": true,
+      "moves": 5,
+      "sawTwo": false,
+      "t": "2026-10-07T12:21:05.752Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical-predict"
+    },
+    {
+      "shape": "circle",
+      "said": true,
+      "truth": false,
+      "moves": 0,
+      "sawTwo": false,
+      "t": "2026-10-07T12:21:09.539Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical-predict"
+    },
+    {
+      "shape": "parabola",
+      "said": true,
+      "truth": true,
+      "moves": 5,
+      "sawTwo": false,
+      "t": "2026-10-07T12:21:13.119Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical-predict"
+    },
+    {
+      "shape": "sideways",
+      "said": false,
+      "truth": false,
+      "moves": 5,
+      "sawTwo": true,
+      "t": "2026-10-07T12:21:16.086Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical-predict"
+    },
+    {
+      "done": {
+        "line": true,
+        "circle": false,
+        "parabola": true,
+        "sideways": false
+      },
+      "t": "2026-10-07T12:21:16.718Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical"
+    },
+    {
+      "x": -1,
+      "out": "−1/3",
+      "t": "2026-10-07T12:21:20.314Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain-try"
+    },
+    {
+      "x": 0,
+      "out": "−1/2",
+      "t": "2026-10-07T12:21:21.964Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain-try"
+    },
+    {
+      "x": 2,
+      "out": null,
+      "t": "2026-10-07T12:21:22.880Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain-try"
+    },
+    {
+      "answer": "not2",
+      "t": "2026-10-07T12:21:23.651Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain-story"
+    },
+    {
+      "dom": [
+        -1,
+        0,
+        3,
+        5
+      ],
+      "t": "2026-10-07T12:21:23.818Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain"
+    },
+    {
+      "x": -3,
+      "y": 9,
+      "t": "2026-10-07T12:21:26.397Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": -2,
+      "y": 4,
+      "t": "2026-10-07T12:21:27.230Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": -1,
+      "y": 1,
+      "t": "2026-10-07T12:21:28.047Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "t": "2026-10-07T12:21:29.680Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "t": "2026-10-07T12:21:30.513Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "t": "2026-10-07T12:21:31.346Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "t": "2026-10-07T12:21:32.163Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "answer": "m2",
+      "t": "2026-10-07T12:21:32.849Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-predict"
+    },
+    {
+      "img": [
+        0,
+        1,
+        4,
+        9
+      ],
+      "t": "2026-10-07T12:21:33.216Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image"
+    },
+    {
+      "expr": "A",
+      "graph": "B",
+      "ok": false,
+      "t": "2026-10-07T12:21:35.138Z",
+      "seg": "c9.maneras",
+      "run": 1,
+      "kind": "match"
+    },
+    {
+      "expr": "A",
+      "graph": "A",
+      "ok": true,
+      "t": "2026-10-07T12:21:35.274Z",
+      "seg": "c9.maneras",
+      "run": 1,
+      "kind": "match"
+    },
+    {
+      "expr": "C",
+      "graph": "C",
+      "ok": true,
+      "t": "2026-10-07T12:21:36.341Z",
+      "seg": "c9.maneras",
+      "run": 1,
+      "kind": "match"
+    },
+    {
+      "done": [
+        "A",
+        "C"
+      ],
+      "t": "2026-10-07T12:21:36.574Z",
+      "seg": "c9.maneras",
+      "run": 1,
+      "kind": "three-ways"
+    },
+    {
+      "answer": "more",
+      "t": "2026-10-07T12:21:39.749Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-predict"
+    },
+    {
+      "v": 2,
+      "t": "2026-10-07T12:21:42.034Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-check"
+    },
+    {
+      "answer": "unknown",
+      "t": "2026-10-07T12:21:43.615Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-transfer"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c9",
+      "title": "Depende",
+      "abbr": "Una función le asigna a cada entrada una sola salida; se puede decir con flechas, tablas, gráficos o cuentas.",
+      "body": [
+        "Una función le asigna a cada entrada una sola salida: el largo de la sombra depende de la hora. Al revés no siempre: con el largo 2 pueden ser las 10 o las 14. Eso es una relación, pero no una función.",
+        "Una regla se adivina con casos; un caso nuevo puede mostrar que está mal, pero si coincide no la prueba (otra regla podría coincidir ahí). Una relación une entradas con salidas; es función si a cada entrada le toca una sola. Una máquina que con el mismo número da distinto no es una función.",
+        "Un gráfico se lee: cada punto dice algo. Se unen los puntos cuando entre medio también hay valores (y es una suposición); no se unen cuando no hay nada entre medio. Si una recta parada corta un dibujo dos veces, no es el gráfico de una función.",
+        "El dominio son las entradas con las que se puede: 1 ÷ (x − 2), todo menos el 2; el reparto, enteros mayores que 2. La imagen es lo que puede salir: con números de la recta, x · x da 0 o positivos. Una misma función se dice con una cuenta, una tabla o un gráfico; lo que se repite se puede anticipar."
+      ],
+      "seen": [
+        "Probaste 3 reglas (× 3, × 2, × 2 + 1); las que no eran fallaban en algún renglón anotado.",
+        "Con 10 dijiste 20: faltó el + 1 de la regla; salió 21.",
+        "Quisiste una curva linda; se une por los puntos, sin inventar.",
+        "Quisiste unir las familias por día; no hay «lunes y medio»: van sueltas.",
+        "Con la recta parada acertaste 3 de 4 dibujos; en uno decidiste sin moverla.",
+        "Para el reparto de Rampa pensaste en más números; tiene sentido con enteros mayores que 2, aunque la cuenta acepte todos menos el 2.",
+        "Pensaste que x · x podía dar −4; con números de la recta, nunca da negativo.",
+        "Pensaste que la sombra crecía cada día; el día 2 a las 10 midió 2, como el primero.",
+        "Para dentro de diez días a las 8 dijiste que no se podía saber; lo que se repite se anticipa: 4, mientras el sol dé la misma vuelta."
+      ],
+      "moments": [
+        {
+          "id": "c9.puntos",
+          "label": "Desplegar: puntos que se paran"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c9.maquina",
+    "c9.puntos",
+    "c9.recta",
+    "c9.dominio",
+    "c9.imagen",
+    "c9.maneras",
+    "c9.vuelve"
+  ],
+  "moments": [
+    "c9.puntos"
+  ],
+  "log": [
+    {
+      "who": "Mara",
+      "text": "Hice una máquina para las cuentas de los escalones: le doy un número, lo da vuelta adentro y sale otro. Adiviná qué hace."
+    },
+    {
+      "who": null,
+      "text": "Con 2, tu regla da 6, pero salió 5. Esa no es."
+    },
+    {
+      "who": null,
+      "text": "Con 1, tu regla da 2, pero salió 3. Esa no es."
+    },
+    {
+      "who": "Mara",
+      "text": "Mirá cuánto cambia lo que sale cuando lo que entra sube uno. Y fijate qué le falta a la primera pieza para llegar."
+    },
+    {
+      "who": null,
+      "text": "Ahora coincide con todo lo anotado."
+    },
+    {
+      "who": null,
+      "text": "Veintiuno: el doble más uno. Coincide, pero coincidir no prueba la regla: otra regla rara podría dar lo mismo con estos números y otra cosa con uno que no probamos, como el 100."
+    },
+    {
+      "who": "Mara",
+      "text": "La hice yo: es el doble más uno. La armaste bien, y el 10 no la desmintió."
+    },
+    {
+      "who": "student",
+      "text": "Mara, tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo."
+    },
+    {
+      "who": "Mara",
+      "text": "Punto también hizo una."
+    },
+    {
+      "who": "student",
+      "text": "Punto, el mismo 3 dio 7 y después 9. Con tu máquina no puedo anticipar nada: no es una función."
+    },
+    {
+      "who": null,
+      "text": "Punto mira su máquina un rato. Adentro tenía una ruedita que giraba sola."
+    },
+    {
+      "who": "Cornisa",
+      "text": "La tabla me sirve, pero quisiera verla de un vistazo."
+    },
+    {
+      "who": "student",
+      "text": "En el mapa de Mara: la hora por la recta acostada, la sombra por la parada."
+    },
+    {
+      "who": null,
+      "text": "A las 8 la sombra mide 4, no 0."
+    },
+    {
+      "who": "student",
+      "text": "Punto, es linda, pero ¿a qué hora es esa ola? No sale de la tabla."
+    },
+    {
+      "who": null,
+      "text": "Unir sí, pero sin inventar: por los puntos. Lo de en medio es una suposición, no una medición."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Entonces a las 9 mi sombra es… más o menos 3. Casi, porque no lo medí."
+    },
+    {
+      "who": "Mara",
+      "text": "Yo anoto cuántas familias vienen cada día al depósito: lunes 3, martes 5, miércoles 4."
+    },
+    {
+      "who": "student",
+      "text": "Mara, entre el lunes y el martes no hay un día a medias, ni media familia: si unimos, la línea dice cosas que no existen. Sueltos."
+    },
+    {
+      "who": "Balcón",
+      "text": "Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?"
+    },
+    {
+      "who": "student",
+      "text": "Si fuera el gráfico de una máquina, a cada entrada le tocaría una sola salida."
+    },
+    {
+      "who": "Mara",
+      "text": "Las entradas van sobre la recta acostada. Para mirar una entrada sola, poné una recta parada en ese lugar y contá cuántas veces corta el dibujo."
+    },
+    {
+      "who": null,
+      "text": "En el medio, en la entrada 0, hay dos alturas a la vez: una máquina no puede dar dos salidas. Una entrada con una sola altura no alcanza: hay que mirar todas. No puede ser."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas."
+    },
+    {
+      "who": null,
+      "text": "La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál."
+    },
+    {
+      "who": "Rampa",
+      "text": "Le pedí a Mara una máquina para mi reparto: entra cuántos vienen, sale lo que le toca a cada uno. 1 ÷ (x − 2), como en la escalera."
+    },
+    {
+      "who": null,
+      "text": "Con 2 se traba: abajo queda cero. Con todos los demás sale algo, aunque sea negativo."
+    },
+    {
+      "who": null,
+      "text": "La máquina acepta −1 o 0, pero no vienen −1 personas ni cero. Para el reparto, enteros mayores que 2."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina."
+    },
+    {
+      "who": "Mara",
+      "text": "Esta máquina hace «por sí mismo»: x · x. Oval me pidió que le saque un −4 para una cuenta. ¿Qué le doy?"
+    },
+    {
+      "who": null,
+      "text": "(−2) · (−2) da 4, no −4: menos por menos es más, como en el cap. 4."
+    },
+    {
+      "who": "student",
+      "text": "Mara, lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta."
+    },
+    {
+      "who": "Mara",
+      "text": "Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles."
+    },
+    {
+      "who": null,
+      "text": "En B, el día 0 hay 10 y el día 1, 11. Con 1 + 10 · d, el día 0 da 1 y el día 1, 11."
+    },
+    {
+      "who": "student",
+      "text": "Mara, con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Y la mía, la B, es diez más uno por día: 10 + d."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Seguí midiendo, varios días. Miren."
+    },
+    {
+      "who": null,
+      "text": "No creció: el día 2 a las 10 midió 2, como el primero. La misma ve."
+    },
+    {
+      "who": null,
+      "text": "Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, medido no está. Anticipado sí, suponiendo que el sol repite su recorrido: unos 4. En diez días lo medimos y vemos."
+    },
+    {
+      "who": null,
+      "text": "Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga."
+    },
+    {
+      "who": "Mara",
+      "text": "Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera."
+    }
+  ],
+  "createdAt": "2026-10-07T12:20:37.600Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    9
+  ]
+}

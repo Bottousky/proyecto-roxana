@@ -235,7 +235,7 @@ export const maquina = {
         const ok = r === y;
         if (!ok) bad.push([x, y, r]);
         w.remove(`c9-k${i}`);
-        const k = w.add(new Label(`c9-k${i}`, `${ok ? '=' : '≠'} ${r}`, A.x0 + 108, A.y0 + 30 + i * 32, {size: 18, z: 12, ch: ok ? YELLOW : BLUE, reveal: 0}));
+        const k = w.add(new Label(`c9-k${i}`, `${ok ? '=' : '≠'} ${r}`, A.x0 + 108, A.y0 + 30 + i * 32, {size: 18, z: 12, ch: ok ? YELLOW : WHITE, reveal: 0}));
         await d.draw(k, 0.3, {key: 'reveal', sound: false});
         g.audio.tap(0.12, ok ? 1.3 : 0.8);
       }
@@ -422,7 +422,7 @@ export const recta = {
     const A = area();
     await d.shot(SHOTS.board, 1);
     await d.say('Balcón', 'Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?');
-    const K = 17;
+    const K = 15;
     const cells = [
       {id: 'line', x: A.x0 + 130, y: A.y0 + 70},
       {id: 'circle', x: A.x0 + 370, y: A.y0 + 70},
@@ -454,7 +454,7 @@ export const recta = {
       const ys = crossings(c.id, x);
       w.add(new Drawing('c9-bar', [S([[c.x + x * K, c.y - 3.3 * K], [c.x + x * K, c.y + 3.3 * K]], seedOf('c9-bar'), {w: 2.2, p: 0.9, ch: BLUE})], {z: 15}));
       ys.forEach((y, i) => w.add(new Shape(`c9-hit${i}`, ring(`c9-hit${i}`), c.x + x * K, c.y - y * K, {z: 16})));
-      w.add(new Label('c9-bcount', ys.length === 0 ? 'no corta' : ys.length === 1 ? (tangent(c.id, x) ? 'toca en un punto' : 'corta 1 vez') : `corta ${ys.length} veces`, A.x0 + 250, A.y0 + 26, {size: 17, align: 'center', z: 16, ch: BLUE}));
+      w.add(new Label('c9-bcount', ys.length === 0 ? 'no corta' : ys.length === 1 ? (tangent(c.id, x) ? 'toca en un punto' : 'corta 1 vez') : `corta ${ys.length} veces`, A.x0 + 250, c.y < A.y0 + 130 ? A.y0 + 94 : A.y0 + 186, {size: 17, align: 'center', z: 16, ch: BLUE}));
       return ys;
     };
     const clearBar = () => { for (const id of ['c9-bar', 'c9-hit0', 'c9-hit1', 'c9-bcount']) w.remove(id); };
@@ -525,7 +525,7 @@ export const recta = {
         } catch { return; }
         const ok = yes === truth(c.id);
         done[c.id] = truth(c.id);
-        w.add(new Label(`c9-cl${c.id}`, truth(c.id) ? 'función' : 'no es función', c.x, c.y + 3.6 * K + 4, {size: 16, align: 'center', z: 12, ch: YELLOW}));
+        w.add(new Label(`c9-cl${c.id}`, truth(c.id) ? 'función' : 'no es función', c.x, c.y + 3.3 * K + 18, {size: 15, align: 'center', z: 12, ch: YELLOW}));
         if (!ok) g.note(truth(c.id) ? 'Corrida de punta a punta, corta siempre una vez: una sola altura para cada entrada. Sí puede ser.' : 'En el medio, en la entrada 0, hay dos alturas a la vez: una máquina no puede dar dos salidas. Una entrada con una sola altura no alcanza: hay que mirar todas. No puede ser.');
         else g.audio.tap(0.2, 1.5);
         try { await d.wait(0.5); } catch { return; }

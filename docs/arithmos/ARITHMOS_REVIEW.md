@@ -385,7 +385,7 @@ capturas y registros del bot).
 | B1–B3 | 6.4: «como» como razón; rótulo «ecuación»; derivaciones de los personajes sin lector | Corregidos: frase separada; «← ecuación: sólo con 8» y «0 = 0 vale para cualquier x: identidad»; `d.describe` en 6.3, 6.4, 6.5 y 6.6 |
 | B4–B6 | 9.4: «a el círculo», guion ASCII, borde mudo; tangentes; «todas las entradas» | Corregidos: «al círculo», «−», aviso en el borde, «toca en un punto», «de punta a punta» |
 | B8, B10–B12 | Panel sin la primera pieza; intentos repetidos; «se corta»; espejo inexacto; la raya «en el 2» | Corregidos |
-| B7, B9 (en parte) | Rótulo «función» pegado al dibujo; contador lejos del dibujo de abajo | Pendientes (bajas) |
+| B7, B9 | Rótulo «función» pegado al dibujo; contador lejos del dibujo de abajo; error en azul (color de rótulos) | Corregidos (ciclo 9): dibujos un poco más chicos y el rótulo entre filas, sin tocarlos; el contador va al lado del dibujo elegido, en su fila; en 9.2 los renglones que fallan van en blanco con «≠» (`it12/c9-tel`) |
 
 ## Revisión de 7.7, 9.1 y 9.8 (rev-c8b, 2026-10-07)
 

@@ -1,0 +1,43 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c10.rueda"
+  },
+  "journal": [
+    "Depende"
+  ],
+  "evidenceKinds": [
+    "machine",
+    "rule-try",
+    "rule-predict",
+    "punto-machine",
+    "rule",
+    "plot",
+    "join-predict",
+    "join-discrete",
+    "vertical-predict",
+    "vertical",
+    "domain-try",
+    "domain-story",
+    "domain",
+    "image-try",
+    "image-predict",
+    "image",
+    "match",
+    "three-ways",
+    "periodic-predict",
+    "periodic-check",
+    "periodic-transfer"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 66.502,
+  "size": "844x390",
+  "touch": true,
+  "route": "errores",
+  "watch": false
+}
