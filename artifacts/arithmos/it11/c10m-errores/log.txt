@@ -1,0 +1,62 @@
+[0.0s] escena → c10.rueda
+[1.0s] lee: La rueda del pozo perdió la soga. Tengo pedazos del largo del rayo de la rueda, de la punta al centro. ¿Cuántos hacen falta para dar toda la vuelta?
+[130.6s] elige «Seis justos.» (¿Cuántos pedazos del largo del rayo entran alrededor de la rueda?)
+[133.5s] lee: Todavía queda rueda sin soga.
+[136.2s] lee: Con el compás, el rayo entra seis veces justo, pero derecho, de punta a punta por adentro: el hexágono azul. La soga va por el borde, que es más largo: por eso queda un hueco.
+[137.7s] lee: —Balcón: una vuelta entera son 6 rayos y un poco más: 6,28… Se lo llama 2π. Media vuelta, π, unos 3,14 rayos: por eso el borde entero es π veces el diámetro, que son dos rayos. Se sabe que π no es una fracción, aunque probarlo es más difícil que lo de √2.
+[138.0s] lee: Medir un giro por cuántos rayos recorre el borde: eso es medir en radianes. Sirve para cualquier rueda: con una más grande, los pedazos también son más largos.
+[138.1s] escena → c10.alto
+[139.7s] lee: Ato el balde a la manija de la rueda. Si giro la rueda, ¿a qué altura queda la manija?
+[140.3s] elige «A un tercio de rayo: 30 es un tercio de 90.» (Si la rueda gira 30°, ¿a qué altura sobre el centro queda la manija?)
+[146.6s] lee: A 30° la manija sube medio rayo, no un tercio: la altura no crece parejo con el giro.
+[147.1s] lee: —Balcón: en el centro, 30 y 30 hacen 60°. Los dos lados que salen del centro son rayos, iguales, así que las otras dos esquinas son iguales y suman 120°: 60 cada una.
+[147.3s] lee: —Tres esquinas de 60°: los tres lados miden un rayo. El lado parado va de la manija a su reflejo, y la línea del centro lo corta por la mitad: la manija está a medio rayo de altura.
+[147.7s] lee: —Del centro al pie de la manija va el costado: 0,87 a los 30°. Rayo, alto y costado forman un triángulo con esquina recta, como el tirante: alto² + costado² = 1.
+[148.2s] lee: —0,5 · 0,5 + 0,87 · 0,87 da 1,0069: casi 1, porque 0,87 está redondeado. A la altura de la manija, en la rueda de un rayo, se le dice seno del ángulo; al costado, coseno. A la izquierda del centro, el costado es negativo.
+[151.8s] escena → c10.repite
+[158.3s] elige «Más que 1: siguió girando.» (Girada 390°, una vuelta y 30° más, ¿a qué altura va a quedar la manija?)
+[160.9s] lee: Seguir girando no la sube más que el rayo: 390° es una vuelta entera, 360°, y 30° más. La manija está donde estaba a los 30°: medio rayo.
+[161.0s] lee: —Cornisa: la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.
+[161.2s] escena → c10.rampa
+[162.0s] lee: Mis rampas de carga tienen todas la misma inclinación: 30°. Una corta, de 2 tablones de largo, sube 1. La larga, de 4, sube 2. Quiero una de 6: ¿cuánto va a subir?
+[162.6s] elige «Sube 4: dos más que la de 4.» (La rampa de largo 6, con la misma inclinación, ¿cuánto sube?)
+[164.3s] lee: No se suma: se multiplica. Las rampas son semejantes; alto ÷ largo es siempre 1/2. Con largo 6, sube 3.
+[164.4s] lee: —Rampa: ¿semejantes por tener el mismo ángulo? En la ventana de Cornisa no alcanzaba. Pero en un triángulo sí: con la esquina recta y la misma inclinación, la forma queda fija. La ventana tenía cuatro lados.
+[164.5s] lee: —Con la misma inclinación, alto ÷ largo de la tabla es siempre el mismo número, y es el seno del ángulo del piso: sen 30° = 0,5.
+[164.6s] lee: Para la cuesta del pozo quiero una empinada: 60°, con una tabla de largo 4. ¿Cuánto sube esa?
+[165.2s] elige «Sube 4: el doble de ángulo, el doble de alto.» (La rampa de 60° y largo 4, ¿cuánto sube?)
+[166.0s] lee: Con el doble de ángulo no sube el doble: subiría 4, todo el largo de la tabla, y sería una pared. La tabla de la rueda dice 0,87: 4 · 0,87 ≈ 3,5.
+[166.4s] lee: —Rampa: con la tabla de la rueda sabés cuánto sube una rampa de cualquier inclinación, sin construirla.
+[167.6s] escena → c10.flechas
+[168.6s] lee: Punto, traeme la soga. Estás en el pozo, en el cero del mapa; mi casa está en (3, 2), como la anotó Mara. Mara sólo te deja moverte con estas flechas.
+[176.2s] elige «A otro lugar: cambia el camino.» (Si Punto hace las mismas dos flechas en el otro orden, ¿adónde llega?)
+[176.6s] lee: —Punto: el camino cambia, pero el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar.
+[176.7s] lee: —Se suman los de adelante con los de adelante y los de arriba con los de arriba. Y como en cada suma el orden no importa, con cualquier par de flechas pasa lo mismo: las dos rutas son los lados de un paralelogramo.
+[262.6s] escena → c10.cuarto
+[263.6s] lee: En la Terraza de las Vueltas, cuando te dan media vuelta, se escribe × (−1). Así lo anotamos desde la piedra. ¿Y un cuarto de vuelta, cómo se escribe?
+[267.3s] lee: Dos cuartos: (−3, −1). Media vuelta: la flecha apunta para el lado contrario, como multiplicar por −1. Cada cuarto, (a, b) pasa a (−b, a).
+[267.8s] elige «−1.» (¿Qué número, multiplicado dos veces, da media vuelta, × (−1)?)
+[268.2s] lee: −1 por −1 es 1: dos medias vueltas, vuelta entera. Hace falta uno que sea medio camino: un cuarto.
+[268.3s] lee: —Mara: al número que está un rayo arriba del cero le decimos i. Multiplicar por i es girar un cuarto de vuelta, contra el reloj. Dos cuartos son media vuelta: i · i = −1. i no está en la recta.
+[268.4s] lee: —La flecha (3, 1) es el número 3 + i: tres adelante y uno arriba. Por i: i · 3 + i · i = 3i − 1. Es la flecha (−1, 3), la del primer giro: el de adelante pasa arriba, y el de arriba pasa adelante con el signo cambiado.
+[268.5s] lee: ¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?
+[268.5s] lee: —Con los números de la recta no se podía, y eso sigue valiendo en la recta. Con éstos sí: 2i es un cuarto de vuelta y el doble de largo. Dos veces: media vuelta y cuatro veces el largo, −4. Y −2i, girando para el otro lado, también.
+[269.3s] escena → c10.pistas
+[269.7s] lee: Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7.
+[269.8s] lee: Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos.
+[269.8s] lee: Segunda pista: el de Cornisa le lleva 1 al de Balcón.
+[271.9s] lee: —Mara: Cornisa 4, Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.
+[272.0s] lee: ¿Y si te digo «suman 7» y «suman 3»?
+[272.5s] elige «(5, 2).» (Con «suman 7» y «suman 3», ¿qué par cumple las dos?)
+[273.0s] lee: (5, 2) suma 7, pero no 3. Las dos filas son paralelas: ningún par cumple las dos.
+[273.1s] lee: Una tabla así, sólo con los números de cada pista, se llama matriz.
+[273.2s] lee: —Mara: en la tabla azul, la parte de la izquierda es igual en las dos filas y el número no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas.
+[273.2s] lee: ¿Y si te digo «suman 7» y «el doble de los dos suma 14»?
+[273.3s] lee: —Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares.
+[274.1s] escena → c10.a-veces
+[275.2s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[280.9s] elige «A medias: ya le toca.» (El balde número 7, ¿cómo va a subir?)
+[285.1s] lee: El balde no lleva la cuenta: que hayan salido llenas no hace que «le toque» a medias.
+[285.4s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[286.6s] escena → c11.baldes
+[297.7s] {"ended":true,"final":{"mode":"play","seg":"c11.baldes"},"journal":["Vueltas y flechas"],"evidenceKinds":["radian-predict","radian-piece","radian","sin30-predict","height","sine","period-predict","period","ratio-predict","ratio","ratio60-predict","ratio60","vector-step","vector-order","vector","quarter","i-predict","complex","system-try","system-parallel","system","pull","chance-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":297.719,"size":"1600x900","touch":false,"route":"errores","watch":false}

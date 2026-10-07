@@ -52,14 +52,52 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | B1 | Suma con canje ("me llevo uno"); resta como comparación ("pedir prestado") | 1° | 2 | probado-auto |
 | B2–B3 | Signo, negativos, opuestos, orden en la recta, distancia, valor absoluto, suma y resta de enteros (pares cero) | 1°–2° | 3 | probado-auto |
 | B4–B5 | Multiplicación (grupos, escala) y división (reparto, medida), propiedades | 1°–2° | 4 | probado-auto (revisado-mat con correcciones aplicadas) |
-| C1–C4 | Fracciones a reales; exacto vs aproximado | 1°–4° | 5 | implementado (cap. 5, en prueba; C3 razón y proporción pasa al cap. 9) |
-| D1–D6 | Lenguaje algebraico, **pasa sumando**, desigualdades, sistemas | 2°–4° | 6 | pendiente |
-| E1–E7 | Potencias, polinomios, cuadráticas, sucesiones, logaritmos, expresiones racionales | 1°–5° | 7 | pendiente |
-| F1–F4 | Geometría y medida | 1°–5° | 8 | pendiente |
-| G1–G2 | Relaciones y funciones | 1°–3° | 9 | pendiente |
-| H1–H4 | Trigonometría, vectores, complejos, matrices | 3°–6° | 10 | pendiente |
-| I1–I3 | Datos, conteo, probabilidad | 1°–6° | 11 | pendiente |
-| J1–J3 | Síntesis en funciones; cálculo en su nivel | 4°–6° | 12 | pendiente |
+| C1–C4 | Fracciones, equivalencia, decimales como valor posicional, porcentaje, cociente como fracción | 1°–4° | 5 (5.1–5.8) | probado-auto · revisado-mat (rev-mat-4). Pendiente: multiplicar por una fracción en general |
+| C5 | Razón y proporción | 1°–4° (rango del bloque) | 8.4 (escala), 10.4 (rampas semejantes) | probado-auto · revisado-mat |
+| C6 | Exacto vs aproximado; irracionales: √2 no es fracción (prueba), π no es fracción (dicho, sin prueba) | 1°–4° (rango del bloque) | 5.9, 8.1, 10.1 | probado-auto · revisado-mat |
+| D1 | Incógnita; ecuación como dos miembros | 2°–4° (rango del bloque) | 6.1 | probado-auto · revisado-mat (rev-mat-5) |
+| D2 | **Pasa sumando** como transformación de los dos miembros | 2°–4° (rango del bloque) | 6.2 | probado-auto · revisado-mat |
+| D3 | Transformaciones válidas e inválidas; restricciones (× 0, elevar al cuadrado, dividir por lo que puede ser 0) | 2°–4° (rango del bloque) | 6.3–6.6 | probado-auto · revisado-mat |
+| D4 | Desigualdades (multiplicar por un negativo) | 2°–4° (rango del bloque) | 6.7 | probado-auto · revisado-mat |
+| D5 | Orden de deshacer; incógnita a la derecha | 2°–4° (rango del bloque) | 6.8 | probado-auto · revisado-mat |
+| D6 | Sistemas 2 × 2 (cruce, paralelas, misma recta) | 2°–4° (rango del bloque) | 10.7 | probado-auto · revisado-mat (rev-mat-9) |
+| D7 | Variable y parámetro | 2°–4° (rango del bloque) | 12.2 (perillas) | probado-auto · revisado-mat |
+| D-gap | Identidad nombrada (vale para todo x); patrones y generalización como tema propio | 2°–4° (rango del bloque) | — | pendiente (C6b) |
+| E1 | Raíz como pregunta inversa del cuadrado | 1°–5° (rango del bloque) | 7.1 | probado-auto · revisado-mat (rev-mat-6) |
+| E2 | Crecimiento aditivo vs multiplicativo | 1°–5° (rango del bloque) | 7.2 | probado-auto · revisado-mat |
+| E3 | Potencias; exponente 0 y negativo por patrón | 1°–5° (rango del bloque) | 7.3 | probado-auto · revisado-mat |
+| E4 | Notación científica | 1°–5° (rango del bloque) | 7.4 | probado-auto · revisado-mat |
+| E5 | Polinomios como áreas; producto y factorización | 1°–5° (rango del bloque) | 7.5–7.6 | probado-auto · revisado-mat |
+| E6 | Ecuación cuadrática; completar el cuadrado | 1°–5° (rango del bloque) | 7.7 | probado-auto · revisado-mat |
+| E7 | Logaritmo como pregunta inversa («¿cuántas veces?») | 1°–5° (rango del bloque) | 7.8; familia en 12.1 | probado-auto · revisado-mat |
+| E8 | Expresiones racionales: dónde no se puede | 1°–5° (rango del bloque) | 7.9 | probado-auto · revisado-mat |
+| E-gap | Propiedades de las potencias, raíces de otro índice, √(x²) = \| 1°–5° (rango del bloque) |, sucesiones nombradas, completar el cuadrado con una o ninguna solución, simplificar racionales con restricción | 2°–5° | — | pendiente (C7b) |
+| F1 | Ángulo como giro; suma de los ángulos de un triángulo | 1°–5° (rango del bloque) | 8.2 | probado-auto · revisado-mat (rev-mat-7) |
+| F2 | Congruencia vs semejanza | 1°–5° (rango del bloque) | 8.3 | probado-auto · revisado-mat |
+| F3 | Escala: longitudes × k, áreas × k², volúmenes × k³ | 1°–5° (rango del bloque) | 8.4 | probado-auto · revisado-mat |
+| F4 | Perímetro y área | 1°–5° (rango del bloque) | 8.5 | probado-auto · revisado-mat |
+| F5 | Pitágoras | 1°–5° (rango del bloque) | 8.6; 10.2 (alto² + costado² = 1) | probado-auto · revisado-mat |
+| F6 | Coordenadas | 1°–5° (rango del bloque) | 8.7 | probado-auto · revisado-mat |
+| G1 | Función vs relación | 1°–3° (rango del bloque) | 9.1 | probado-auto · revisado-mat (rev-mat-8) |
+| G2 | Regla, tabla, gráfico; unir o no unir; gráfico vs dibujo | 1°–3° (rango del bloque) | 9.2–9.4, 9.7 | probado-auto · revisado-mat |
+| G3 | Dominio e imagen | 1°–3° (rango del bloque) | 9.5–9.6 | probado-auto · revisado-mat |
+| H1 | Radián, seno y coseno, periodicidad, razones en triángulos rectángulos | 3°–6° (rango del bloque) | 10.1–10.4 | probado-auto · revisado-mat (rev-mat-9, medias aplicadas) |
+| H2 | Vectores: cuánto y hacia dónde; suma | 3°–6° (rango del bloque) | 10.5 | probado-auto · revisado-mat |
+| H3 | Números complejos como giro; i · i = −1 | 3°–6° (rango del bloque) | 10.6 | probado-auto · revisado-mat |
+| H4 | Lectura matricial de un sistema | 3°–6° (rango del bloque) | 10.7 | probado-auto · revisado-mat |
+| I1 | Frecuencia relativa que se estabiliza | 1°–6° (rango del bloque) | 11.1 | probado-auto · revisado-mat (rev-mat-10) |
+| I2 | Promedio, mediana, dispersión | 1°–6° (rango del bloque) | 11.2–11.3 | probado-auto · revisado-mat |
+| I3 | Lectura crítica de gráficos | 1°–6° (rango del bloque) | 11.4 | probado-auto · revisado-mat |
+| I4 | Conteo (multiplicación) y probabilidad con casos igual de posibles | 1°–6° (rango del bloque) | 11.5–11.6 | probado-auto · revisado-mat |
+| I5 | Regularidad vs garantía; correlación vs causa | 1°–6° (rango del bloque) | 10.8, 11.7 | probado-auto · revisado-mat |
+| J1 | Familias por su forma: afín, cuadrática, exponencial, logarítmica, trigonométrica, racional | 4°–6° (rango del bloque) | 12.1 (racional y logarítmica sólo como miniatura) | probado-auto · revisado-mat (rev-mat-10) |
+| J2 | Parámetros y cambio de comportamiento (recta) | 4°–6° (rango del bloque) | 12.2 | probado-auto · revisado-mat |
+| J3 | Ceros, signo, crecimiento, decrecimiento, máximo | 4°–6° (rango del bloque) | 12.3 | probado-auto · revisado-mat |
+| J4 | Composición e inversa con sus condiciones | 4°–6° (rango del bloque) | 12.4 | probado-auto · revisado-mat |
+| J5 | Tasa de cambio, derivada (nombrada), acumulación | 4°–6° (rango del bloque) | 12.5–12.6 | probado-auto · revisado-mat |
+| J6 | Por tramos; valor absoluto (la V) | 4°–6° (rango del bloque) | 12.7 | probado-auto · revisado-mat |
+| J7 | Anticipar con una suposición declarada y revisarla | 4°–6° (rango del bloque) | 12.8 | probado-auto · revisado-mat |
+| J-gap | Polinómica de grado mayor que 2, radical con gráfico, asíntotas y discontinuidades nombradas, simetrías, parámetros de otras familias | 4°–6° (rango del bloque) | — | pendiente |
 | K1 | **Lógica proposicional y álgebra de Boole** (INET Electrónica; no está en A–J) | INET | por decidir (¿puente con Bitland?) | pendiente — decisión de alcance |
 | K2 | Divisibilidad y primos (NAP/PBA 1°–2°; no nombrado en A–J) | 1°–2° | 2 o 3 | pendiente |
 | K3 | Combinatoria como objeto propio, binomio de Newton | 2°–4° | 10 | pendiente |

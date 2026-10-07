@@ -163,9 +163,24 @@ export const tramos = {
     ], {prompt: '¿Cuánta tiza cobra por 16 escalones?', evaluate: true});
     d.evidence('piecewise-predict', {answer: c});
     w.add(new Shape('c12-q', dot('c12-q', 6, YELLOW), px(16), py(tariff(16)), {z: 15}));
-    w.add(new Label('c12-ql', `16 → ${tariff(16)}`, px(16) + 8, py(tariff(16)) - 10, {size: 18, z: 15, ch: YELLOW}));
+    w.add(new Label('c12-ql', `16 → ${tariff(16)}`, px(16) - 10, py(tariff(16)) - 12, {size: 18, align: 'right', z: 15, ch: YELLOW}));
     await d.think(c === '13' ? 'Trece: diez por el primer tramo, tres por el segundo.' : `El primer tramo cuesta 10; los 6 escalones que siguen, medio cada uno: 3. Total, ${tariff(16)}.`);
-    await d.say('student', 'Rampa: tu precio es una función por tramos: una regla hasta 10 y otra después. La distancia al cero del pozo también era así: a la izquierda del cero, −x; a la derecha, x. Un solo gráfico, dos reglas.');
+    await d.say('student', 'Rampa: tu precio es una función por tramos: una regla hasta 10 y otra después. Un solo gráfico, dos reglas.');
+    // la distancia al cero, también por tramos: la V
+    const vb = {x: A.x0 + 385, y: A.y0 + 95, w: 110, h: 70};
+    const v = axes(w, 'c12-vg', vb, [-4, 4], [0, 4.5], {xticks: [-4, 4], yticks: [4]});
+    w.add(new Label('c12-vt', 'lejos del cero', vb.x + vb.w / 2, vb.y - 12, {size: 14, align: 'center', z: 12, ch: BLUE}));
+    g.setCinematic(true);
+    const vl = w.add(curve('c12-vl', x => -x, [-4, 0], v.px, v.py, [0, 4.5], {ch: WHITE, n: 4}));
+    const vr = w.add(curve('c12-vr', x => x, [0, 4], v.px, v.py, [0, 4.5], {ch: YELLOW, n: 4}));
+    vl.progress = 0; vr.progress = 0;
+    await d.draw(vl, 0.5, {sound: false});
+    await d.draw(vr, 0.5, {sound: false});
+    w.add(new Label('c12-vll', '−x', v.px(-2) - 6, v.py(1) + 6, {size: 15, align: 'right', z: 13}));
+    w.add(new Label('c12-vrl', 'x', v.px(2) + 8, v.py(1) + 6, {size: 15, z: 13, ch: YELLOW}));
+    g.setCinematic(false);
+    d.describe('Al costado, un gráfico chico en forma de V: lo lejos del cero de cada número. A la izquierda del cero, la regla −x, en blanco; a la derecha, x, en amarillo.');
+    await d.say('student', 'Lo lejos del cero también va por tramos, como Recta y Cuña en la línea de la ladera: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V.');
     await studentWrites(d, g, 'c12-pw', 'hasta 10: x    después: 10 + (x − 10) ÷ 2', A.x0 + 20, A.y1 - 4, {size: 18});
     g.flags.c12piecewise = true;
   },
@@ -284,7 +299,7 @@ function writeJournal12(g) {
       'Las reglas se agrupan en familias que se reconocen por su forma: rectas, curvas que despegan, U, olas, curvas con un hueco. Los parámetros eligen cuál de la familia: en y = a · x + b, b es dónde empieza y a cuánto sube por paso.',
       'Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo).',
       'La tasa de cambio en un tramo es cuánto cambió dividido cuánto pasó; con tramos cada vez más cortos se acerca a la derivada. Juntar lo que entra de a poco es sumar rectángulos cada vez más finos: se acerca al área bajo el gráfico, la integral.',
-      'Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero. Con todo eso se anticipa, suponiendo que la regla sigue; y cuando llegan datos nuevos, se revisa.',
+      'Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero, |x|: x a la derecha del cero y −x a la izquierda, que ahí da positivo. Con todo eso se anticipa, suponiendo que la regla sigue; y cuando llegan datos nuevos, se revisa.',
     ],
     seen,
     moments: [

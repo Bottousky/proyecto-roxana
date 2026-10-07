@@ -155,18 +155,18 @@ export const imagen = {
       refresh();
     }));
     const c = await d.choose([
-      {id: 'never', text: 'No: un número por sí mismo nunca da negativo.'},
+      {id: 'never', text: 'No: un número de la recta, por sí mismo, nunca da negativo.'},
       {id: 'other', text: 'Sí, con algún número que no probé.'},
       {id: 'm2', text: 'Sí: con −2, que es negativo.'},
     ], {prompt: '¿Puede salir −4?', evaluate: true});
     d.evidence('image-predict', {answer: c});
     if (c === 'm2') await d.think('(−2) · (−2) da 4, no −4: menos por menos es más, como en el cap. 4.');
-    if (c === 'other') await d.think('Positivo por positivo, positivo; negativo por negativo, positivo; cero por cero, cero. No hay número que falte probar.');
+    if (c === 'other') await d.think('Positivo por positivo, positivo; negativo por negativo, positivo; cero por cero, cero. No hay número de la recta que falte probar.');
     const img = imageOf(x => x * x, INS);
-    await d.say('student', 'Mara: lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números que conocemos.');
+    await d.say('student', 'Mara: lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta.');
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3);
-    await studentWrites(d, g, 'c9-img', 'imagen de x · x: 0 y los positivos', A.x0 + 20, A.y1 - 8, {size: 20});
+    await studentWrites(d, g, 'c9-img', 'imagen de x · x, en la recta: 0 y los positivos', A.x0 + 20, A.y1 - 8, {size: 20});
     d.evidence('image', {img});
     g.flags.c9image = true;
   },
@@ -324,7 +324,7 @@ function writeJournal9(g) {
   const ds = first('domain-story');
   if (ds) seen.push(ds.answer === 'int' ? 'Para el reparto de Rampa elegiste los enteros mayores que 2.' : 'Para el reparto de Rampa pensaste en más números; tiene sentido con enteros mayores que 2, aunque la cuenta acepte todos menos el 2.');
   const im = first('image-predict');
-  if (im) seen.push(im.answer === 'never' ? 'Viste que x · x nunca da negativo.' : 'Pensaste que x · x podía dar −4; nunca da negativo.');
+  if (im) seen.push(im.answer === 'never' ? 'Viste que x · x, con números de la recta, nunca da negativo.' : 'Pensaste que x · x podía dar −4; con números de la recta, nunca da negativo.');
   const pp = first('periodic-predict');
   if (pp) seen.push(pp.answer === '2' ? 'Anticipaste la sombra de pasado mañana: se repite.' : 'Para pasado mañana pensaste otra cosa; la ve se repite cada día.');
   const entry = {
@@ -335,7 +335,7 @@ function writeJournal9(g) {
       'Una función le asigna a cada entrada una sola salida: el largo de la sombra depende de la hora. Al revés no siempre: con el largo 2 pueden ser las 10 o las 14. Eso es una relación, pero no una función.',
       'Una regla se adivina con casos; un caso nuevo puede mostrar que está mal, pero si coincide no la prueba (otra regla podría coincidir ahí). Una relación une entradas con salidas; es función si a cada entrada le toca una sola. Una máquina que con el mismo número da distinto no es una función.',
       'Un gráfico se lee: cada punto dice algo. Se unen los puntos cuando entre medio también hay valores (y es una suposición); no se unen cuando no hay nada entre medio. Si una recta parada corta un dibujo dos veces, no es el gráfico de una función.',
-      'El dominio son las entradas con las que se puede: 1 ÷ (x − 2), todo menos el 2; el reparto, enteros mayores que 2. La imagen es lo que puede salir: x · x da 0 o positivos. Una misma función se dice con una cuenta, una tabla o un gráfico; lo que se repite se puede anticipar.',
+      'El dominio son las entradas con las que se puede: 1 ÷ (x − 2), todo menos el 2; el reparto, enteros mayores que 2. La imagen es lo que puede salir: con números de la recta, x · x da 0 o positivos. Una misma función se dice con una cuenta, una tabla o un gráfico; lo que se repite se puede anticipar.',
     ],
     seen,
     moments: [

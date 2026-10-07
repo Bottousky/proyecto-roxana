@@ -11,7 +11,7 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
 - Modelo: la sesión principal corre como Opus 5.5 (`claude-opus-5-5`, según el entorno). Los
   subagentes se lanzan con el alias `opus`; no puedo verificar desde adentro qué versión resolvió.
 
-## Estado real (ciclo 7 del loop, 2026-10-07)
+## Estado real (ciclo 8 del loop, 2026-10-07)
 
 - **El recorrido completo, capítulos 1 a 12, es jugable y está encadenado** (título → 1 → … → 12 →
   tarjeta final «Arithmos — Lo que se entiende, resiste»). Partida completa del bot, de una vez, 1 → 12 con tres
@@ -19,8 +19,14 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   (`artifacts/arithmos/it10/full-1a12`). Cada capítulo pasa por la ruta directa y la
   ruta con errores del bot; los caps. 7–9 también en 844×390.
 - Revisiones matemáticas independientes hechas para los 12 capítulos. Las altas de los caps. 9–12
-  (rev-mat-8, 9 y 10) están corregidas en texto o datos (ver `ARITHMOS_REVIEW.md`); quedan medias
-  pendientes en C9-R…C12-R, N9-R y N10-12.
+  (rev-mat-8, 9 y 10) están corregidas. Ciclo 8: aplicadas las medias de rev-mat-9 (cap. 10: cuerda y
+  arco, prueba de los 60°, coseno dibujado y en la tabla, ángulo y esquina recta de la rampa, rampa de 60°
+  con decisión, casa de Rampa coherente con el cap. 8, suma de flechas por coordenadas, 3 + i e
+  i · (3 + i), «contra el reloj», tablas de los dos sistemas, caso de la misma recta, Bitácora) y la M9 de
+  rev-mat-10 (la V del valor absoluto en 12.7). El cap. 9 dice «con números de la recta» donde afirmaba
+  que x · x nunca da negativo. Verificado: cap. 10 en las dos rutas y en 844×390, 12.7 y 9.6
+  (`artifacts/arithmos/it11/`). Lo escrito por el estudiante en la pizarra llega ahora al lector de
+  pantalla. Matriz de cobertura de `ARITHMOS_CURRICULUM.md` puesta al día, con los huecos que quedan.
 - Revisión narrativa de los caps. 10–12 hecha (rev-narr-8): el cierre se rehizo (la cuarta noche pone a
   prueba la suposición, la Marea pasa y la escalera resiste, Punto corre por su gráfico); el resto de sus
   hallazgos queda en N10-12.
@@ -53,9 +59,9 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Revisión narrativa de los caps. 10–12 (en curso) y aplicar sus altas.
-2. Pasada del bot por los caps. 6–9 con la guarda nueva (1600×900 y 844×390).
-3. Pendientes de narrativa por capítulo (N2-R, N6-R … N10-12), empezando por agencia y legibilidad en
-   teléfono, que se repiten en todas las revisiones.
-4. Cobertura pendiente: C6b (identidad), C7b, familias que faltan en el cap. 12 (logarítmica, radical).
+1. Pendientes de narrativa por capítulo (N2-R, N6-R … N10-12), empezando por agencia (que el jugador dé
+   el paso decisivo) y por Punto como personaje, que se repiten en todas las revisiones.
+2. Cobertura pendiente (ver huecos en la matriz): C7b (propiedades de potencias, otras raíces, √(x²) = |x|,
+   sucesiones), identidad nombrada (C6b), J (polinómica de grado mayor, radical con gráfico, asíntotas).
+3. Partida completa 1 → 12 otra vez después de los cambios de este ciclo.
 5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-06",
+  "updated": "2026-10-07",
   "statuses": [
     "pendiente",
     "en-curso",
@@ -471,14 +471,16 @@
     },
     {
       "id": "C10-R",
-      "title": "Revisión independiente (matemática y narrativa) del cap. 10",
+      "title": "Revisión independiente (matemática y narrativa) del cap. 10 — medias de rev-mat-9 aplicadas (ciclo 8); bajas pendientes",
       "deps": [
         "C10"
       ],
       "acceptance": "Hallazgos registrados y corregidos o justificados",
       "status": "revisado-mat",
       "evidence": [
-        "artifacts/arithmos/it10/review-mat/informe.md"
+        "artifacts/arithmos/it10/review-mat/informe.md",
+        "artifacts/arithmos/it11/c10m-errores/log.txt",
+        "artifacts/arithmos/it11/c10m2-errores/log.txt"
       ]
     },
     {
@@ -498,7 +500,7 @@
     },
     {
       "id": "N10-12",
-      "title": "Revisión narrativa de los caps. 10 a 12 (no hecha) y medias pendientes de rev-mat-9 y rev-mat-10",
+      "title": "Pendientes de la revisión narrativa de los caps. 10 a 12 (rev-narr-8, hecha): A2 Punto (que anticipe y se equivoque en 10 y 12; cabos sueltos), A3 plantilla y menús, A4 rótulos chicos y predicciones con el texto encima, A5 costuras, M1–M9",
       "deps": [
         "C10",
         "C11",
@@ -562,7 +564,8 @@
       "acceptance": "Hallazgos registrados y corregidos o justificados",
       "status": "revisado-mat",
       "evidence": [
-        "artifacts/arithmos/it10/review-mat-11-12/informe.md"
+        "artifacts/arithmos/it10/review-mat-11-12/informe.md",
+        "artifacts/arithmos/it11/c12t2-directa/log.txt"
       ]
     },
     {

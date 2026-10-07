@@ -92,13 +92,21 @@ export const rueda = {
       while (n < 6) {
         n++;
         const arc = w.add(new Drawing(`c10-s${n}`, [S(arcPts(cx, cy, R + 4, n - 1, n, 20), seedOf(`c10-s${n}`), {w: 5, p: 0.95, ch: YELLOW})], {z: 14, progress: 0}));
+        w.add(new Label(`c10-sn${n}`, String(n), cx + Math.cos(n - 0.5) * (R + 24), cy - Math.sin(n - 0.5) * (R + 24) + 7, {size: 18, align: 'center', z: 14, ch: YELLOW}));
         await d.draw(arc, 0.3, {sound: false});
       }
     }
     const gap = w.add(new Drawing('c10-gap', [S(arcPts(cx, cy, R + 4, 6, TAU, 6), seedOf('c10-gap'), {w: 5, p: 0.95, ch: BLUE})], {z: 14, progress: 0}));
     await d.draw(gap, 0.4, {sound: false});
     d.describe('Seis pedazos amarillos y un hueco azul chiquito, menos de un tercio de pedazo.');
-    await d.think(guess === '6+' ? 'Seis enteros y un pedacito.' : guess === '6' ? 'Seis no alcanzan: queda un hueco. Seis y un pedacito.' : 'Los rayos dibujados adentro no miden el borde: alrededor entran seis y un pedacito.');
+    if (guess === '6') {
+      // el hexágono del compás: el rayo entra seis veces justo, pero derecho, por adentro
+      const hex = Array.from({length: 7}, (_, k) => [cx + Math.cos(k * Math.PI / 3) * R, cy - Math.sin(k * Math.PI / 3) * R]);
+      const hx = w.add(new Drawing('c10-hex', [S(hex, seedOf('c10-hex'), {w: 2, p: 0.8, ch: BLUE})], {z: 13, progress: 0}));
+      await d.draw(hx, 0.6, {sound: false});
+      d.describe('Adentro de la rueda, un hexágono azul: seis rayos derechos, de punta a punta, cierran justo.');
+      await d.think('Con el compás, el rayo entra seis veces justo, pero derecho, de punta a punta por adentro: el hexágono azul. La soga va por el borde, que es más largo: por eso queda un hueco.');
+    } else await d.think(guess === '6+' ? 'Seis enteros y un pedacito.' : 'Los rayos dibujados adentro no miden el borde: alrededor entran seis y un pedacito.');
     await d.say('student', 'Balcón: una vuelta entera son 6 rayos y un poco más: 6,28… Se lo llama 2π. Media vuelta, π, unos 3,14 rayos: por eso el borde entero es π veces el diámetro, que son dos rayos. Se sabe que π no es una fracción, aunque probarlo es más difícil que lo de √2.');
     await studentWrites(d, g, 'c10-2pi', '360° = 2π radianes (≈ 6,28 rayos de borde)', A.x0 + 20, A.y1 - 10, {size: 20});
     await d.think('Medir un giro por cuántos rayos recorre el borde: eso es medir en radianes. Sirve para cualquier rueda: con una más grande, los pedazos también son más largos.');
@@ -135,12 +143,20 @@ export const alto = {
     const handle = w.add(new Shape('c10-h', dot('c10-h', 7), cx + R, cy, {z: 15}));
     const level = w.add(new Drawing('c10-lv', [], {z: 13}));
     void level;
+    // la altura de la manija hasta la regla; el alto (parado) y el costado (acostado, desde el centro)
     const setLevel = deg => {
       const p = point(1, deg);
+      const hx = cx + p.x * R, hy = cy - p.y * R;
       w.remove('c10-lv');
-      w.add(new Drawing('c10-lv', [S([[cx + p.x * R, cy - p.y * R], [rx, cy - p.y * R]], seedOf(`c10-lv${deg}`), {w: 1.6, p: 0.8, ch: YELLOW, lift: false})], {z: 13}));
+      w.add(new Drawing('c10-lv', [
+        S([[hx, hy], [rx, hy]], seedOf(`c10-lv${deg}`), {w: 1.6, p: 0.8, ch: YELLOW, lift: false}),
+        S([[hx, cy], [hx, hy]], seedOf(`c10-al${deg}`), {w: 2.4, p: 0.9, ch: YELLOW, lift: false}),
+        ...(Math.abs(p.x) > 0.01 ? [S([[cx, cy + 3], [hx, cy + 3]], seedOf(`c10-co${deg}`), {w: 3.4, p: 0.95, ch: YELLOW, lift: false})] : []),
+      ], {z: 13}));
     };
     d.describe('La rueda con la manija amarilla a la derecha, a la altura del centro. Al costado, una regla de −1 a 1 rayo.');
+    const TX = A.x1 - 175;
+    const col = (id, y, cells, opts = {}) => cells.forEach((t, i) => w.add(new Label(`${id}-${i}`, t, TX + [0, 62, 122][i], y, {size: 19, z: 12, ...opts})));
     const g30 = await d.choose([
       {id: 'half', text: 'A medio rayo.'},
       {id: 'third', text: 'A un tercio de rayo: 30 es un tercio de 90.'},
@@ -156,9 +172,11 @@ export const alto = {
       deg = d1;
       setLevel(deg);
       const p = point(1, deg);
-      rows.push({deg, y: p.y});
-      w.add(new Label(`c10-row${deg}`, `${deg}°  →  ${dec(Math.round(p.y * 100) / 100)}`, A.x1 - 150, A.y0 + 30 + (rows.length - 1) * 30, {size: 21, z: 12}));
-      d.describe(`Girada ${deg}°, la manija queda a ${dec(Math.round(p.y * 100) / 100)} rayo sobre el centro.`);
+      rows.push({deg, y: p.y, x: p.x});
+      const r2 = v => dec(Math.round(v * 100) / 100);
+      if (rows.length === 1) col('c10-rowh', A.y0 + 22, ['giro', 'alto', 'costado'], {size: 15, ch: BLUE});
+      col(`c10-row${deg}`, A.y0 + 22 + rows.length * 28, [`${deg}°`, r2(p.y), r2(p.x)]);
+      d.describe(`Girada ${deg}°, la manija queda a ${r2(p.y)} rayo sobre el centro y a ${r2(p.x)} rayo al costado.`);
       d.evidence('height', {deg, y: p.y});
     };
     await d.interact(ctl => new Promise(resolve => {
@@ -178,13 +196,32 @@ export const alto = {
     // por qué medio: la mitad de un triángulo equilátero
     g.setCinematic(true);
     const p30 = point(1, 30);
-    const tri = w.add(new Drawing('c10-tri', [S([[cx, cy], [cx + p30.x * R, cy - p30.y * R], [cx + p30.x * R, cy + p30.y * R], [cx, cy]], seedOf('c10-tri'), {w: 2.4, p: 0.9, ch: BLUE})], {z: 14, progress: 0}));
+    const h30 = [cx + p30.x * R, cy - p30.y * R], m30 = [cx + p30.x * R, cy + p30.y * R];
+    w.add(new Shape('c10-m30', dot('c10-m30', 5, WHITE), h30[0], h30[1], {z: 15}));
+    w.add(new Label('c10-m30l', '30°', h30[0] - 30, h30[1] - 8, {size: 16, align: 'center', z: 15}));
+    w.add(new Shape('c10-m30r', dot('c10-m30r', 5, BLUE), m30[0], m30[1], {z: 15}));
+    w.add(new Label('c10-m30rl', '−30°', m30[0] - 34, m30[1] + 20, {size: 16, align: 'center', z: 15, ch: BLUE}));
+    await d.wait(0.4);
+    const tri = w.add(new Drawing('c10-tri', [S([[cx, cy], h30, m30, [cx, cy]], seedOf('c10-tri'), {w: 2.4, p: 0.9, ch: BLUE})], {z: 14, progress: 0}));
     await d.draw(tri, 0.8, {sound: false});
     g.setCinematic(false);
-    d.describe('Desde el centro, un triángulo azul con la manija de los 30° arriba y su reflejo abajo: sus tres lados son iguales.');
-    await d.say('student', 'Balcón: con la manija a 30° y su reflejo a −30°, el triángulo tiene tres ángulos de 60°: los tres lados miden un rayo. La altura es la mitad de ese lado: medio rayo.');
-    await d.say('student', 'Con la rueda de un rayo, a la altura de la manija se le dice seno del ángulo; al costado, coseno. Y como en el tirante, alto² + costado² = 1.');
-    await studentWrites(d, g, 'c10-sin', 'sen 30° = 0,5    sen 90° = 1', A.x0 + 20, A.y1 - 8, {size: 22});
+    d.describe('La manija marcada en los 30° y su reflejo en −30°. Desde el centro, un triángulo azul con esos dos puntos: sus tres lados son iguales.');
+    await d.say('student', 'Balcón: en el centro, 30 y 30 hacen 60°. Los dos lados que salen del centro son rayos, iguales, así que las otras dos esquinas son iguales y suman 120°: 60 cada una.');
+    await d.say('student', 'Tres esquinas de 60°: los tres lados miden un rayo. El lado parado va de la manija a su reflejo, y la línea del centro lo corta por la mitad: la manija está a medio rayo de altura.');
+    // el costado: del centro al pie de la manija; rayo, alto y costado son el tirante
+    g.setCinematic(true);
+    const leg = w.add(new Drawing('c10-leg', [
+      S([[cx, cy + 3], [h30[0], cy + 3]], seedOf('c10-leg'), {w: 4, p: 0.95, ch: YELLOW}),
+      S([[h30[0], cy], h30], seedOf('c10-leg2'), {w: 3.4, p: 0.95, ch: YELLOW}),
+      S([[h30[0] - 9, cy], [h30[0] - 9, cy - 9], [h30[0], cy - 9]], seedOf('c10-sq'), {w: 1.6, p: 0.8, lift: false}),
+    ], {z: 15, progress: 0}));
+    await d.draw(leg, 0.7, {sound: false});
+    g.setCinematic(false);
+    d.describe('Del centro al pie de la manija, el costado; del pie a la manija, el alto, los dos en amarillo, con esquina recta.');
+    await d.say('student', 'Del centro al pie de la manija va el costado: 0,87 a los 30°. Rayo, alto y costado forman un triángulo con esquina recta, como el tirante: alto² + costado² = 1.');
+    await studentWrites(d, g, 'c10-pyt', '0,5² + 0,87² ≈ 1', A.x1 - 190, A.y0 + 196, {size: 21});
+    await d.say('student', '0,5 · 0,5 + 0,87 · 0,87 da 1,0069: casi 1, porque 0,87 está redondeado. A la altura de la manija, en la rueda de un rayo, se le dice seno del ángulo; al costado, coseno. A la izquierda del centro, el costado es negativo.');
+    await studentWrites(d, g, 'c10-sin', 'sen 30° = 0,5    cos 30° ≈ 0,87', A.x0 + 20, A.y1 - 8, {size: 22});
     d.evidence('sine', {rows});
     g.flags.c10sine = true;
   },
@@ -253,7 +290,7 @@ export const repite = {
     ], {prompt: 'Girada 390°, una vuelta y 30° más, ¿a qué altura va a quedar la manija?', evaluate: true});
     d.evidence('period-predict', {answer: c});
     await oneTurn();
-    await d.think(c === 'half' ? '390 es una vuelta y 30 más: misma altura que a los 30°.' : '390° es una vuelta entera, 360°, y 30° más: la manija está donde estaba a los 30°. Medio rayo.');
+    await d.think(c === 'half' ? '390 es una vuelta y 30 más: misma altura que a los 30°.' : c === 'unknown' ? 'No estaba puesta, pero se podía saber: una vuelta entera, 360°, deja la manija donde estaba. 390° son una vuelta y 30°: medio rayo, como a los 30°.' : 'Seguir girando no la sube más que el rayo: 390° es una vuelta entera, 360°, y 30° más. La manija está donde estaba a los 30°: medio rayo.');
     await d.say('student', 'Cornisa: la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.');
     await studentWrites(d, g, 'c10-per', 'sen(x + 360°) = sen x', A.x0 + 20, A.y1 - 8, {size: 22});
     d.evidence('period', {turns});
@@ -279,15 +316,23 @@ export const rampa = {
     await d.shot(SHOTS.board, 1);
     await d.say('Rampa', 'Mis rampas de carga tienen todas la misma inclinación: 30°. Una corta, de 2 tablones de largo, sube 1. La larga, de 4, sube 2. Quiero una de 6: ¿cuánto va a subir?');
     const U = 26;
-    const draw = (id, x, y, len) => {
-      const p = point(len * U, 30);
-      w.add(new Drawing(id, [S([[x, y], [x + p.x, y], [x + p.x, y - p.y], [x, y]], seedOf(id), {w: 2.6, p: 0.9})], {z: 12}));
-      w.add(new Label(`${id}l`, `largo ${len}`, x + p.x / 2 - 18, y - p.y / 2 - 10, {size: 15, align: 'center', z: 12}));
-      w.add(new Label(`${id}h`, `sube ${dec(len * slopeRatio(30))}`, x + p.x + 8, y - p.y / 2 + 6, {size: 15, z: 12, ch: YELLOW}));
+    // la tabla es el lado largo, enfrente de la esquina recta; el ángulo, al pie, entre el piso y la tabla
+    const draw = (id, x, y, len, deg = 30, rise = dec(len * slopeRatio(30)), angleLabel = false) => {
+      const p = point(len * U, deg);
+      const a = deg * Math.PI / 180;
+      w.add(new Drawing(id, [
+        S([[x, y], [x + p.x, y], [x + p.x, y - p.y], [x, y]], seedOf(id), {w: 2.6, p: 0.9}),
+        S(Array.from({length: 9}, (_, i) => [x + Math.cos(a * i / 8) * 15, y - Math.sin(a * i / 8) * 15]), seedOf(id) + 7, {w: 1.6, p: 0.8, ch: BLUE, lift: false}),
+        S([[x + p.x - 8, y], [x + p.x - 8, y - 8], [x + p.x, y - 8]], seedOf(id) + 8, {w: 1.4, p: 0.8, lift: false}),
+      ], {z: 12}));
+      if (deg > 45) w.add(new Label(`${id}l`, `largo ${len}`, x + p.x / 2 - 10, y - p.y / 2 + 4, {size: 15, align: 'right', z: 12}));
+      else w.add(new Label(`${id}l`, `largo ${len}`, x + p.x / 2 - 20, y - p.y / 2 - 10, {size: 15, align: 'center', z: 12}));
+      w.add(new Label(`${id}h`, `sube ${rise}`, x + p.x + 8, y - p.y / 2 + 6, {size: 15, z: 12, ch: YELLOW}));
+      if (angleLabel) w.add(new Label(`${id}a`, `${deg}°`, x + 14, y + 17, {size: 14, align: 'center', z: 12, ch: BLUE}));
     };
-    draw('c10-r2', A.x0 + 20, A.y0 + 90, 2);
-    draw('c10-r4', A.x0 + 20, A.y0 + 220, 4);
-    d.describe('Dos rampas dibujadas con la misma inclinación: la de largo 2 sube 1; la de largo 4 sube 2.');
+    draw('c10-r2', A.x0 + 20, A.y0 + 90, 2, 30, '1', true);
+    draw('c10-r4', A.x0 + 20, A.y0 + 220, 4, 30, '2', true);
+    d.describe('Dos rampas dibujadas con la misma inclinación, 30° entre el piso y la tabla, y esquina recta abajo a la derecha: la de largo 2 sube 1; la de largo 4 sube 2. El largo es el de la tabla, no lo que ocupa en el piso.');
     const c = await d.choose([
       {id: '3', text: 'Sube 3: la mitad del largo, como las otras.'},
       {id: '4', text: 'Sube 4: dos más que la de 4.'},
@@ -295,12 +340,30 @@ export const rampa = {
     ], {prompt: 'La rampa de largo 6, con la misma inclinación, ¿cuánto sube?', evaluate: true});
     d.evidence('ratio-predict', {answer: c});
     await d.shot(SHOTS.tiles, 0.8);
-    draw('c10-r6', A.x0 + 230, A.y0 + 230, 6);
+    draw('c10-r6', A.x0 + 230, A.y0 + 230, 6, 30, '3', true);
     d.describe('La rampa de largo 6, con la misma inclinación: sube 3.');
     await d.think(c === '3' ? 'Tres: las rampas son semejantes, como las copias de Cornisa. Alto ÷ largo no cambia: 1/2.' : c === '4' ? 'No se suma: se multiplica. Las rampas son semejantes; alto ÷ largo es siempre 1/2. Con largo 6, sube 3.' : 'No hace falta medir: las rampas son semejantes, y alto ÷ largo es siempre 1/2. Con largo 6, sube 3.');
-    await d.say('student', 'Rampa: con la misma inclinación, alto ÷ largo es siempre el mismo número, y es el seno del ángulo: sen 30° = 0,5. Con la tabla de la rueda, sabés cuánto sube cualquier rampa sin construirla.');
+    await d.say('student', 'Rampa: ¿semejantes por tener el mismo ángulo? En la ventana de Cornisa no alcanzaba. Pero en un triángulo sí: con la esquina recta y la misma inclinación, la forma queda fija. La ventana tenía cuatro lados.');
+    await d.say('student', 'Con la misma inclinación, alto ÷ largo de la tabla es siempre el mismo número, y es el seno del ángulo del piso: sen 30° = 0,5.');
     await studentWrites(d, g, 'c10-ramp', 'sube = largo · sen 30° = 6 · 0,5 = 3', A.x0 + 20, A.y0 + 30, {size: 22});
     d.evidence('ratio', {ratio: slopeRatio(30)});
+    // otro ángulo: acá «la mitad» ya no sirve y hace falta la tabla de la rueda
+    await d.say('Rampa', 'Para la cuesta del pozo quiero una empinada: 60°, con una tabla de largo 4. ¿Cuánto sube esa?');
+    const c60 = await d.choose([
+      {id: 'sin', text: 'Unos 3,5: 4 · sen 60°, y sen 60° es 0,87.'},
+      {id: 'half', text: 'Sube 2: la mitad del largo, como las otras.'},
+      {id: 'double', text: 'Sube 4: el doble de ángulo, el doble de alto.'},
+    ], {prompt: 'La rampa de 60° y largo 4, ¿cuánto sube?', evaluate: true});
+    d.evidence('ratio60-predict', {answer: c60});
+    g.setCinematic(true);
+    for (const id of ['c10-r2', 'c10-r4']) for (const k of ['', 'l', 'h', 'a']) w.remove(id + k);
+    g.setCinematic(false);
+    draw('c10-r60', A.x0 + 40, A.y0 + 235, 4, 60, '≈ 3,5', true);
+    d.describe('Las rampas chicas se borran. Una rampa de 60° y largo 4: sube casi 3 y medio.');
+    await d.think(c60 === 'sin' ? 'Con la tabla de la rueda: a 60°, la manija sube 0,87 de rayo. 4 · 0,87 ≈ 3,5.' : c60 === 'half' ? 'La mitad era el seno de 30°. A 60° la tabla de la rueda dice 0,87: 4 · 0,87 ≈ 3,5.' : 'Con el doble de ángulo no sube el doble: subiría 4, todo el largo de la tabla, y sería una pared. La tabla de la rueda dice 0,87: 4 · 0,87 ≈ 3,5.');
+    await studentWrites(d, g, 'c10-ramp60', 'sube = 4 · sen 60° ≈ 4 · 0,87 ≈ 3,5', A.x0 + 20, A.y0 + 62, {size: 22});
+    await d.say('student', 'Rampa: con la tabla de la rueda sabés cuánto sube una rampa de cualquier inclinación, sin construirla.');
+    d.evidence('ratio60', {rise: +(4 * Math.sin(Math.PI / 3)).toFixed(2)});
     g.flags.c10ramp = true;
   },
 };

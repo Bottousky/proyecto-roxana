@@ -16,6 +16,8 @@ export async function studentWrites(d, g, id, text, x, y, opts = {}) {
   await d.walk(s, BOARD.x - BOARD.w / 2 - 40, GROUND, 240);
   s.setPose('write', 0.3);
   await d.draw(l, Math.min(1.3, 0.3 + text.length * 0.04), {key: 'reveal'});
+  // lo escrito en la pizarra también llega al lector de pantalla y a las descripciones
+  d.describe(`En la pizarra: ${text}`);
   s.setPose('idle', 0.4);
   g.setCinematic(false);
   return l;

@@ -1,0 +1,20 @@
+[0.0s] escena → c12.tramos
+[1.0s] lee: Mi precio por redibujar escalones: hasta 10, un trozo de tiza cada uno. Después del décimo, medio trozo por escalón.
+[2.4s] elige «13: los primeros 10 a uno, los otros 6 a medio.» (¿Cuánta tiza cobra por 16 escalones?)
+[2.8s] lee: Trece: diez por el primer tramo, tres por el segundo.
+[2.9s] lee: —Rampa: tu precio es una función por tramos: una regla hasta 10 y otra después. Un solo gráfico, dos reglas.
+[3.0s] lee: —Lo lejos del cero también va por tramos, como Recta y Cuña en la línea de la ladera: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V.
+[3.9s] escena → c12.anticipar
+[4.3s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche: 1, 2, 4 y 8 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?
+[5.7s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[6.6s] elige «En la noche 5: 32 pasa los 30.» (Si sigue duplicando, ¿en qué noche pasa la escalera?)
+[7.0s] lee: La quinta: 16 todavía no, 32 sí.
+[7.1s] lee: —Mara: con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.
+[7.2s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[7.3s] lee: Cuarta noche.
+[7.4s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La quinta pasa los 30.
+[7.4s] lee: Entonces redibujamos la escalera esta noche, antes de la quinta. ¡A trabajar!
+[7.5s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[7.6s] lee: —Punto: al principio eras un punto que contaba. Después tuviste un lado para ir, una flecha. Ahora corrés por un gráfico, un paso adelante.
+[11.2s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[11.6s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["piecewise-predict","final-family","final-predict","final-check"],"fps":{"min":"40.0","median":"60.0"},"errors":[],"seconds":11.637,"size":"1600x900","touch":false,"route":"directa","watch":false}

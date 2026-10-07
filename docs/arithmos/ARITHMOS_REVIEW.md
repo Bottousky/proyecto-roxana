@@ -332,7 +332,20 @@ Informe: `artifacts/arithmos/it10/review-narr-10-12/informe.md` (sobre a3cc472, 
 | mat-10 (11) | M3 | 11.3: «en estos cinco días», sin «seguros» |
 | mat-10 (11) | M4 | 11.6: se dice que se cuenta cuál dado es cuál y por qué los 36 pares son igual de posibles |
 | mat-10 (12) | M10 | 12.1: se suma la familia del «¿cuántas veces?» (logarítmica), seis formas |
-| mat-9/10 | resto | Pendientes en C10-R, C11-R, C12-R |
+| mat-9 (10) | M1 | 10.1: en la rama «seis justos» se dibuja el hexágono del compás (cuerda) y se dice que la soga va por el borde, que es más largo; el relleno automático numera las piezas (`it11/c10m-errores/004`) |
+| mat-9 (10) | M3 | (ya en 6059140) «π no es ninguna fracción»; Bitácora: «3,14 es una aproximación» |
+| mat-9 (10) | M4 | 10.2: se marcan la manija a 30° y su reflejo; se justifican las otras dos esquinas de 60° (lados iguales, suma 180°); «la manija está a medio rayo de altura» en vez de «la altura» |
+| mat-9 (10) | M5 | 10.2: el costado se dibuja en cada giro y va a la tabla (giro, alto, costado); triángulo rayo-alto-costado con esquina recta; 0,5² + 0,87² ≈ 1 con el redondeo dicho; costado negativo a la izquierda (`it11/c10m-errores/008`) |
+| mat-9 (10) | M7 | 10.4: arco del ángulo al pie, cuadradito en la esquina recta, «el largo es el de la tabla, no lo que ocupa en el piso»; Bitácora con qué largo y qué ángulo |
+| mat-9 (10) | M8 | 10.4: «en un triángulo, la esquina recta y la misma inclinación dejan la forma fija; la ventana tenía cuatro lados»; rampa nueva de 60° y largo 4 con decisión (4 · 0,87 ≈ 3,5), donde «la mitad» ya no sirve (`it11/c10m-errores/015`) |
+| mat-9 (10) | M9 | 10.5: la casa de Rampa vuelve a (3, 2) como en el cap. 8; ninguna flecha es (3, 2); suma coordenada a coordenada escrita; el paralelogramo vale para cualquier par (`it11/c10m-errores/019`) |
+| mat-9 (10) | M10 | 10.6: «contra el reloj» en el diálogo y la Bitácora; i es el número un rayo arriba del cero; 3 + i rotulado; i · (3 + i) = −1 + 3i escrito; 2i explicado sin ambigüedad; −2i también (`it11/c10m-errores/023`) |
+| mat-9 (10) | M11 | Cap. 9: pizarra, opción, diálogo y Bitácora dicen «con números de la recta»; en 10.6, «eso sigue valiendo en la recta»; Bitácora del 10 lo reconcilia |
+| mat-9 (10) | M12 | 10.7: se escriben las dos tablas (la azul, de las paralelas) y el estudiante lee el paralelismo en la tabla; caso de la misma recta («el doble suma 14»); Bitácora con «primer grado» y la lectura de la tabla |
+| mat-9 (10) | M14 | Bitácora del 10: cada rama dice lo que el jugador eligió (sin «pensaste otra altura» para «no se sabe», ni «buscaste un par» para «muchos»); abreviatura «multiplicar por i gira un cuarto de vuelta» |
+| mat-9 (10) | M6 (rama) | 10.3: la rama «no se sabe» recibe su propia respuesta |
+| mat-10 (12) | M9 | 12.7: se dibuja la V (lo lejos del cero) con sus dos tramos, −x y x; «con −4, −x es −(−4) = 4»; se cita la línea de la ladera del cap. 3, no el pozo |
+| mat-9/10 | resto | Pendientes: mat-9 B (bajas); mat-10 M10 en parte (perillas en el cierre, polinomios de grado mayor) |
 
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).
