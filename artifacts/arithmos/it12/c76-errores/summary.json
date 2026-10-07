@@ -1,0 +1,39 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c8.diagonal"
+  },
+  "journal": [
+    "Crecer"
+  ],
+  "evidenceKinds": [
+    "factor-try",
+    "factor-none",
+    "factor",
+    "complete-predict",
+    "complete-other",
+    "complete-zero",
+    "complete-negative",
+    "complete",
+    "log-predict",
+    "log-step",
+    "log-early",
+    "half-doubling",
+    "log",
+    "rational-predict",
+    "rational-try",
+    "rational",
+    "rational-simplify"
+  ],
+  "fps": {
+    "min": "36.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 121.636,
+  "size": "1600x900",
+  "touch": false,
+  "route": "errores",
+  "watch": false
+}

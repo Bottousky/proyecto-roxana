@@ -564,20 +564,12 @@ export const alReves = {
     const w = g.world;
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Balcón', 'A mí me dieron las fichas sueltas: un x por x, cinco tiras y seis cuadraditos. Quiero una huerta rectangular, sin que sobre nada.');
+    await d.say('Balcón', 'A mí me dieron las fichas sueltas: un x por x, cinco tiras y cinco cuadraditos. Quiero una huerta rectangular, sin que sobre nada.');
     const ox = A.x0 + 16, oy = A.y0 + 30;
     await d.shot(SHOTS.tiles, 0.8);
-    const pieces = tray(w, 'fx', 5, 6);
-    const home = pieces.map(t => [t.x, t.y]);
-    const opts = [
-      {id: '16', text: 'x + 1 por x + 6', p: 1, q: 6},
-      {id: '23', text: 'x + 2 por x + 3', p: 2, q: 3},
-      {id: '15', text: 'x + 1 por x + 5', p: 1, q: 5},
-    ];
-    for (;;) {
-      const id = await d.choose(opts.map(o => ({id: o.id, text: o.text})), {prompt: '¿Con qué lados probás armar la huerta?'});
-      const o = opts.find(x => x.id === id);
-      d.evidence('factor-try', {p: o.p, q: o.q});
+    // arma la huerta (x + p)(x + q) con las fichas de la bandeja y dice qué falta o sobra
+    const attempt = async (pieces, o, nu) => {
+      const home = pieces.map(t => [t.x, t.y]);
       g.setCinematic(true);
       const out = outline(w, 'fx-out', ox, oy, T.X + o.q * T.U, T.X + o.p * T.U);
       const byKind = {x2: pieces.filter(t => t.kind === 'x2'), x: pieces.filter(t => t.kind === 'x'), u: pieces.filter(t => t.kind === 'u')};
@@ -589,11 +581,11 @@ export const alReves = {
       }
       await d.all(...moves);
       const missX = Math.max(0, o.p + o.q - 5), extraX = Math.max(0, 5 - o.p - o.q);
-      const missU = Math.max(0, o.p * o.q - 6), extraU = Math.max(0, 6 - o.p * o.q);
+      const missU = Math.max(0, o.p * o.q - nu), extraU = Math.max(0, nu - o.p * o.q);
       const ok = !(missX || missU || extraX || extraU);
       d.describe(ok ? 'El rectángulo cierra justo: no falta ni sobra ninguna ficha.' : 'El rectángulo no cierra: quedan huecos o fichas afuera.');
       g.setCinematic(false);
-      if (ok) break;
+      if (ok) return true;
       const parts = [];
       if (missX) parts.push(missX === 1 ? 'falta una tira' : `faltan ${missX} tiras`);
       if (extraX) parts.push(`sobra${extraX === 1 ? ' una tira' : `n ${extraX} tiras`}`);
@@ -601,19 +593,57 @@ export const alReves = {
       if (extraU) parts.push(`sobra${extraU === 1 ? ' un cuadradito' : `n ${extraU} cuadraditos`}`);
       await d.think(`Así no cierra: ${parts.join(' y ')}.`);
       g.setCinematic(true);
-      await d.all(...pieces.map((t, i) => moveTile(d, t, {x: home[i][0], y: home[i][1]}, 0.4)));
+      await d.all(...pieces.map((t, k) => moveTile(d, t, {x: home[k][0], y: home[k][1]}, 0.4)));
       w.remove(out.id);
       g.setCinematic(false);
+      return false;
+    };
+    // primero con cinco cuadraditos: ningún par cierra, y el jugador lo comprueba
+    let pieces = tray(w, 'fx', 5, 5);
+    const five = [
+      {id: '05', text: 'x por x + 5', p: 0, q: 5},
+      {id: '14', text: 'x + 1 por x + 4', p: 1, q: 4},
+      {id: '23', text: 'x + 2 por x + 3', p: 2, q: 3},
+    ];
+    const tried5 = [];
+    for (;;) {
+      const left = five.filter(o => !tried5.includes(o.id));
+      const id = await d.choose([...left.map(o => ({id: o.id, text: o.text})), {id: 'none', text: 'Con estas fichas no se puede.'}], {prompt: 'Con cinco cuadraditos, ¿con qué lados probás armar la huerta?'});
+      if (id === 'none') {
+        d.evidence('factor-none', {tried: [...tried5]});
+        if (!left.length) break;
+        await d.say('Balcón', `¿Seguro? Las tiras piden dos números que sumen 5: 0 y 5, 1 y 4, 2 y 3. ${left.length === 1 ? 'Te falta probar uno.' : `Te faltan probar ${left.length}.`}`);
+        continue;
+      }
+      const o = five.find(x => x.id === id);
+      tried5.push(id);
+      d.evidence('factor-try', {p: o.p, q: o.q, units: 5});
+      if (await attempt(pieces, o, 5)) break;
+    }
+    await d.think('Dos números que sumen cinco y multiplicados den cinco: cero y cinco dan cero, uno y cuatro dan cuatro, dos y tres dan seis. Con enteros, ninguno: con estas fichas, ese rectángulo no se arma.');
+    // con seis cuadraditos, sí
+    await d.say('Balcón', 'Me dieron un cuadradito más: seis. ¿Y ahora?');
+    w.removeWhere(o => /^fx-T/.test(o.id));
+    pieces = tray(w, 'fx', 5, 6);
+    const opts = [
+      {id: '16', text: 'x + 1 por x + 6', p: 1, q: 6},
+      {id: '23', text: 'x + 2 por x + 3', p: 2, q: 3},
+      {id: '15', text: 'x + 1 por x + 5', p: 1, q: 5},
+    ];
+    for (;;) {
+      const id = await d.choose(opts.map(o => ({id: o.id, text: o.text})), {prompt: 'Con seis cuadraditos, ¿con qué lados probás armar la huerta?'});
+      const o = opts.find(x => x.id === id);
+      d.evidence('factor-try', {p: o.p, q: o.q, units: 6});
+      if (await attempt(pieces, o, 6)) break;
       opts.splice(opts.indexOf(o), 1);
     }
     const f = factor(5, 6);
     await studentWrites(d, g, 'fx-eq', `x${SUP['2']} + 5x + 6 = (x + ${f.p})(x + ${f.q})`, A.x0 + 16, A.y1 - 14, {size: 26});
     await d.say('student', 'Balcón, los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres.');
-    await d.say('Balcón', '¿Y si me hubieran dado cinco cuadraditos?');
-    const five = factor(5, 5);
-    if (five) console.error('[al revés] x² + 5x + 5 no debería armarse');
-    await d.think('Dos números que sumen cinco y multiplicados den cinco: cero y cinco dan cero, uno y cuatro dan cuatro, dos y tres dan seis. Con enteros, ninguno: con estas fichas, ese rectángulo no se arma. Con lados que no son enteros se podría, pero esas fichas no existen.');
-    d.evidence('factor', {f, five});
+    const none5 = factor(5, 5);
+    if (none5) console.error('[al revés] x² + 5x + 5 no debería armarse');
+    await d.say('Balcón', 'Con cinco no había manera; con seis, sí. Con lados que no son enteros se podría, pero esas fichas no existen.');
+    d.evidence('factor', {f, five: none5});
     g.flags.c7factor = true;
   },
 };
@@ -953,8 +983,11 @@ function writeJournal7(g) {
   if (sc) seen.push(sc.answer === 'a' ? 'Elegiste la noche de 3 · 10⁶: es más que 4 · 10⁵.' : sc.answer === 'b' ? 'Miraste primero el 3 y el 4; pesaba más el exponente: 3 · 10⁶ es más que 4 · 10⁵.' : 'Te parecieron parecidas; 3 · 10⁶ es más de siete veces 4 · 10⁵.');
   const ep = first('expand-predict');
   if (ep) seen.push(ep.answer === 'full' ? 'Anticipaste las cinco tiras de (x + 2)(x + 3).' : 'Armando (x + 2)(x + 3) con fichas, hicieron falta cinco tiras y seis cuadraditos.');
-  const ft = ev.filter(e => e.kind === 'factor-try').map(e => `x + ${e.p} por x + ${e.q}`);
-  if (ft.length) seen.push(`Para x² + 5x + 6 probaste ${ft.join(', después ')}.`);
+  const side = e => `${e.p ? `x + ${e.p}` : 'x'} por x + ${e.q}`;
+  const ft5 = ev.filter(e => e.kind === 'factor-try' && e.units === 5).map(side);
+  const ft6 = ev.filter(e => e.kind === 'factor-try' && e.units !== 5).map(side);
+  if (ft5.length) seen.push(`Con cinco cuadraditos probaste ${ft5.join(', ')}: ninguno cerraba, x² + 5x + 5 no se arma con estas fichas.`);
+  if (ft6.length) seen.push(`Para x² + 5x + 6 probaste ${ft6.join(', después ')}.`);
   const co = first('complete-other');
   if (co) seen.push(co.answer === '9' ? 'Al completar el cuadrado sumaste 1 de los dos lados del igual.' : 'Al completar el cuadrado, el cuadradito también había que sumarlo del otro lado: 8 + 1.');
   const cz = first('complete-zero');
