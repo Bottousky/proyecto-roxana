@@ -1,0 +1,28 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c11.baldes"
+  },
+  "journal": [
+    "Vueltas y flechas"
+  ],
+  "evidenceKinds": [
+    "punto-try",
+    "system-try",
+    "system-parallel",
+    "system",
+    "pull",
+    "chance-predict"
+  ],
+  "fps": {
+    "min": "34.3",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 21.621,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

@@ -245,6 +245,24 @@ export const pistas = {
     for (const [a, b] of diff1) w.add(new Shape(`c10-d${a}`, dot(`c10-d${a}`, 5, YELLOW), px(a), py(b), {z: 14}));
     d.describe('En amarillo, los pares donde el primero le lleva 1 al segundo: otra recta, que sube.');
     await d.shot(SHOTS.tiles, 0.8);
+    // Punto se apura: salta a un par que cumple la primera pista, y se da cuenta solo
+    {
+      const p = w.get('punto');
+      g.setCinematic(true);
+      p.setMode('still');
+      g.audio.punto('happy');
+      await zip(d, p, px(5), py(2) - 14, 0.5);
+      g.setCinematic(false);
+      d.describe('Punto salta solo al par (5, 2), sobre la fila blanca: 5 y 2 suman 7.');
+      d.evidence('punto-try', {pair: [5, 2]});
+      await d.think('Punto se paró en (5, 2): suma 7. Mira la fila amarilla, después a sí mismo.');
+      g.audio.punto('question');
+      await pulse(d, p, 1, 0.3).catch(() => {});
+      g.setCinematic(true);
+      await zip(d, p, px(7) + 34, py(6), 0.5);
+      g.setCinematic(false);
+      d.describe('Punto se baja solo: (5, 2) no está en la fila amarilla, el 5 le lleva 3 al 2, no 1.');
+    }
     await d.interact(ctl => new Promise(resolve => {
       g.setHint(() => ['Tocá el par que cumple las dos pistas a la vez.']);
       g.ui.setSpots(diff1.map(([a, b]) => rectSpot(`c10-p${a}_${b}`, `El par (${a}, ${b})`, {x: px(a) - 16, y: py(b) - 16, w: 32, h: 32}, () => {

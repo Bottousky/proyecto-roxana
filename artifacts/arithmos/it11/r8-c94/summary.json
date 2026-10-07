@@ -1,0 +1,35 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c10.rueda"
+  },
+  "journal": [
+    "Depende"
+  ],
+  "evidenceKinds": [
+    "vertical-predict",
+    "vertical",
+    "domain-try",
+    "domain-story",
+    "domain",
+    "image-try",
+    "image-predict",
+    "image",
+    "match",
+    "three-ways",
+    "periodic-predict",
+    "periodic-check",
+    "periodic-transfer"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 34.911,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

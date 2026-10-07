@@ -1,0 +1,21 @@
+[0.0s] escena → c10.pistas
+[1.0s] lee: Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7.
+[1.1s] lee: Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos.
+[1.2s] lee: Segunda pista: el de Cornisa le lleva 1 al de Balcón.
+[2.2s] lee: Punto se paró en (5, 2): suma 7. Mira la fila amarilla, después a sí mismo.
+[4.5s] lee: —Mara, son Cornisa 4 y Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.
+[4.7s] lee: ¿Y si te digo «suman 7» y «suman 3»?
+[5.2s] elige «Ningún par: esas dos filas no se cruzan.» (Con «suman 7» y «suman 3», ¿qué par cumple las dos?)
+[5.7s] lee: Paralelas: ningún par cumple las dos.
+[5.8s] lee: Una tabla así, sólo con los números de cada pista, se llama matriz.
+[5.9s] lee: —Mara, en la tabla azul la parte de la izquierda es igual en las dos filas y el resultado no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas.
+[6.0s] lee: ¿Y si te digo «suman 7» y «el doble de los dos suma 14»?
+[6.1s] lee: —Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares.
+[6.1s] escena → c10.a-veces
+[7.1s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[10.8s] lee: El primero llegó lleno, hasta el borde.
+[19.9s] elige «No se sabe seguro; lo más probable, llena.» (El balde número 7, ¿cómo va a subir?)
+[20.4s] lee: Ni la rueda ni el balde avisan. Lo que pasó dice qué es más común, no qué va a pasar.
+[20.5s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[20.8s] escena → c11.baldes
+[21.6s] {"ended":true,"final":{"mode":"play","seg":"c11.baldes"},"journal":["Vueltas y flechas"],"evidenceKinds":["punto-try","system-try","system-parallel","system","pull","chance-predict"],"fps":{"min":"34.3","median":"60.0"},"errors":[],"seconds":21.621,"size":"1600x900","touch":false,"route":"directa","watch":false}

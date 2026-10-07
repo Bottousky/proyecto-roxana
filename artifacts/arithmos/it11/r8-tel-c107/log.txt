@@ -1,0 +1,21 @@
+[0.0s] escena → c10.pistas
+[1.0s] lee: Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7.
+[1.1s] lee: Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos.
+[1.1s] lee: Segunda pista: el de Cornisa le lleva 1 al de Balcón.
+[2.1s] lee: Punto se paró en (5, 2): suma 7. Mira la fila amarilla, después a sí mismo.
+[2.5s] lee: —Mara, son Cornisa 4 y Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.
+[2.6s] lee: ¿Y si te digo «suman 7» y «suman 3»?
+[3.2s] elige «(5, 2).» (Con «suman 7» y «suman 3», ¿qué par cumple las dos?)
+[3.4s] lee: (5, 2) suma 7, pero no 3. Las dos filas son paralelas: ningún par cumple las dos.
+[3.5s] lee: Una tabla así, sólo con los números de cada pista, se llama matriz.
+[3.6s] lee: —Mara, en la tabla azul la parte de la izquierda es igual en las dos filas y el resultado no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas.
+[3.7s] lee: ¿Y si te digo «suman 7» y «el doble de los dos suma 14»?
+[3.8s] lee: —Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares.
+[3.8s] escena → c10.a-veces
+[4.8s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[7.4s] lee: El primero llegó lleno, hasta el borde.
+[16.6s] elige «A medias: ya le toca.» (El balde número 7, ¿cómo va a subir?)
+[16.8s] lee: El balde no lleva la cuenta: lo que salió antes no cambia lo que sale ahora.
+[16.8s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[17.1s] escena → c11.baldes
+[17.4s] {"ended":true,"final":{"mode":"play","seg":"c11.baldes"},"journal":["Vueltas y flechas"],"evidenceKinds":["punto-try","system-try","system-parallel","system","pull","chance-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":17.398,"size":"844x390","touch":true,"route":"errores","watch":false}

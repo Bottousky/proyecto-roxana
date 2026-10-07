@@ -474,9 +474,9 @@ export const recta = {
           refresh();
         })));
         else g.ui.setSpots([
-          wordSpot('c9-left', '← mover', A.x0 + 250, A.y0 + 70, () => step(-0.5), {label: 'Mover la recta parada a la izquierda'}),
-          wordSpot('c9-right', 'mover →', A.x0 + 250, A.y0 + 132, () => step(0.5), {label: 'Mover la recta parada a la derecha'}),
-          wordSpot('c9-decide', 'decidir', A.x0 + 250, A.y0 + 200, () => decide(), {label: `Decidir si ${NAME[sel.id]} puede ser el gráfico de una máquina`}),
+          wordSpot('c9-left', '← mover', A.x0 + 250, A.y0 + 46, () => step(-0.5), {label: 'Mover la recta parada a la izquierda'}),
+          wordSpot('c9-right', 'mover →', A.x0 + 250, A.y0 + 136, () => step(0.5), {label: 'Mover la recta parada a la derecha'}),
+          wordSpot('c9-decide', 'decidir', A.x0 + 250, A.y0 + 226, () => decide(), {label: `Decidir si ${NAME[sel.id]} puede ser el gráfico de una máquina`}),
         ]);
       };
       const step = dx => {
@@ -501,7 +501,13 @@ export const recta = {
             {id: 'look', text: 'Todavía no sé: sigo moviendo la recta.'},
           ], {prompt: `¿${NAME[c.id][0].toUpperCase() + NAME[c.id].slice(1)} puede ser el gráfico de una máquina?`});
         } catch { return; }
-        if (said === 'look') { busy = false; refresh(); return; }
+        if (said === 'look') {
+          // la cámara vuelve a acercarse cuando se va el panel: los botones aparecen después
+          try { await d.wait(0.6); } catch { return; }
+          busy = false;
+          refresh();
+          return;
+        }
         const yes = said === 'yes';
         d.evidence('vertical-predict', {shape: c.id, said: yes, truth: truth(c.id), moves, sawTwo});
         try {

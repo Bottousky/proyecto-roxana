@@ -1,0 +1,37 @@
+[0.0s] escena → c9.recta
+[1.0s] lee: Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?
+[1.1s] lee: —Si fuera el gráfico de una máquina, a cada entrada le tocaría una sola salida.
+[1.2s] lee: Las entradas van sobre la recta acostada. Para mirar una entrada sola, poné una recta parada en ese lugar y contá cuántas veces corta el dibujo.
+[3.5s] elige «Puede ser: en cada entrada, una sola altura.» (¿La recta puede ser el gráfico de una máquina?)
+[5.0s] elige «Todavía no sé: sigo moviendo la recta.» (¿El círculo puede ser el gráfico de una máquina?)
+[6.5s] elige «Puede ser: en cada entrada, una sola altura.» (¿El círculo puede ser el gráfico de una máquina?)
+[9.3s] elige «Puede ser: en cada entrada, una sola altura.» (¿La U puede ser el gráfico de una máquina?)
+[11.4s] elige «No puede ser: hay una entrada con dos alturas.» (¿La U acostada puede ser el gráfico de una máquina?)
+[12.2s] lee: —Balcón, la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas.
+[12.2s] lee: La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál.
+[12.3s] escena → c9.dominio
+[13.3s] lee: Le pedí a Mara una máquina para mi reparto: entra cuántos vienen, sale lo que le toca a cada uno. 1 ÷ (x − 2), como en la escalera.
+[16.8s] lee: Con 2 se traba: abajo queda cero. Con todos los demás sale algo, aunque sea negativo.
+[17.4s] elige «Cualquier número menos el 2, como la máquina.» (Para el reparto de Rampa, ¿qué entradas tienen sentido?)
+[17.6s] lee: La máquina acepta −1 o 0, pero no vienen −1 personas ni cero. Para el reparto, enteros mayores que 2.
+[17.6s] lee: —Rampa, las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.
+[17.7s] escena → c9.imagen
+[17.9s] lee: Esta máquina hace «por sí mismo»: x · x. Oval me pidió que le saque un −4 para una cuenta. ¿Qué le doy?
+[25.2s] elige «Sí: con −2, que es negativo.» (¿Puede salir −4?)
+[25.4s] lee: (−2) · (−2) da 4, no −4: menos por menos es más, como en el cap. 4.
+[25.4s] lee: —Mara, lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta.
+[25.7s] escena → c9.maneras
+[25.9s] lee: Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles.
+[27.4s] lee: —Mara, con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.
+[27.5s] lee: Y la mía, la B, es diez más uno por día: 10 + d.
+[27.6s] escena → c9.vuelve
+[28.6s] lee: Seguí midiendo, varios días. Miren.
+[30.5s] elige «Más: cada día crece.» (El día 2, a las 10, ¿cuánto habrá medido la sombra de Cornisa?)
+[32.1s] lee: No creció: el día 2 a las 10 midió 2, como el primero. La misma ve.
+[32.2s] lee: Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos.
+[32.8s] elige «No se puede saber: falta medirlo.» (Dentro de diez días, a las 8, ¿cuánto va a medir?)
+[32.9s] lee: —Cornisa, medido no está. Anticipado sí, suponiendo que el sol repite su recorrido: unos 4. En diez días lo medimos y vemos.
+[33.0s] lee: Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.
+[33.1s] lee: Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.
+[33.4s] escena → c10.rueda
+[33.7s] {"ended":true,"final":{"mode":"play","seg":"c10.rueda"},"journal":["Depende"],"evidenceKinds":["vertical-predict","vertical","domain-try","domain-story","domain","image-try","image-predict","image","match","three-ways","periodic-predict","periodic-check","periodic-transfer"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":33.67,"size":"844x390","touch":true,"route":"errores","watch":false}

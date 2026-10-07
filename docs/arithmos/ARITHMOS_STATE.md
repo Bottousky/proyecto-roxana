@@ -51,6 +51,11 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   en 12.6 elige los pedazos y puede mirar los rectángulos por arriba (8,25 y 9,75 encierran el 9). Tercera revisión
   (rev-c8b) aplicada. **En pantallas bajas el panel de opciones tiene «ver la pizarra»**: se esconde un momento y la
   pizarra se ve grande; el bot lo usa con `--peek` y captura la pizarra en cada pregunta.
+- Más del ciclo 8: **el pozo existe** fuera de la pizarra (10.1 abre ahí; en 10.8 cada balde sube de verdad);
+  11.6: el jugador marca él mismo los pares de 7 y 12 y Rampa tira dos seises en la fiesta; **12.8**: Punto se
+  adelanta con una recta, la borra él mismo cuando las noches la desmienten, y contesta «¿cómo te llamás?»
+  dibujando un punto, una flecha y una curva. Cuarta revisión (rev-c8c) aplicada. Teléfono: la letra chica crece
+  hasta ~12 px y al mirar la pizarra la escena usa la franja de abajo.
 - **Entorno:** la máquina se suspendió de madrugada (≈ 01:30–02:00); dos corridas y una revisión se cortaron
   por eso y se repitieron sin problemas.
 - Revisión narrativa de los caps. 10–12 hecha (rev-narr-8): el cierre se rehizo (la cuarta noche pone a
@@ -90,6 +95,6 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 2. Cobertura pendiente (ver huecos en la matriz): C7b (cociente de potencias, sucesiones nombradas,
    simplificar racionales), J (polinómica de grado mayor, simetrías, parámetros de otras familias, asíntota
    horizontal).
-3. Agencia en los caps. 10–12 (N10-12 A3: plantilla y menús evaluados); bajas de rev-c8 (B7, B9); 9.8: tiempo a escala (pendiente de mat-8).
+3. Agencia que queda (N10-12 A3): 10.3, 11.4; un error de Punto en el cap. 10; la Ronda y la puerta en el final; bajas de rev-c8 (B7, B9); 9.8: tiempo a escala.
 4. Revisión matemática de 7.7 (una y ninguna solución) y de 9.1 nuevo.
 5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.
