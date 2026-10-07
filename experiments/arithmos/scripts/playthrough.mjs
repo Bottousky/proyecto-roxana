@@ -829,6 +829,9 @@ for (let iter = 0; iter < 30000; iter++) {
     } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id.startsWith('c11-s'))) {
       target = spots[0];
       c11Item = target.id.replace('c11-s', '');
+    } else if (s.seg === 'c10.repite' && spots.some(x => x.id === 'c10-unk')) {
+      // marca la altura a los 390°: con errores, «más arriba que 1»
+      target = spots.find(x => x.id === (route === 'errores' ? 'c10-mmore' : 'c10-mhalf'));
     } else if (s.seg === 'c11.grafico' && spots.some(x => x.id === 'c11-axok')) {
       // mueve el eje: con errores, prueba 90, dice «así compara» antes de tiempo y baja a 50 antes de llegar a 0
       const seq = route === 'errores' ? ['c11-ax90', 'c11-axok', 'c11-ax50', 'c11-ax0', 'c11-axok'] : ['c11-ax0', 'c11-axok'];

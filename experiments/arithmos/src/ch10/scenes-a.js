@@ -307,14 +307,36 @@ export const repite = {
       refresh();
     }));
     await oneTurn();
-    const c = await d.choose([
-      {id: 'half', text: '0,5: como a los 30°.'},
-      {id: 'more', text: 'Más que 1: siguió girando.'},
-      {id: 'unknown', text: 'No se sabe: todavía no la pusimos.'},
-    ], {prompt: 'Girada 390°, una vuelta y 30° más, ¿a qué altura va a quedar la manija?', evaluate: true});
+    // la predicción se marca en el mapa: en la raya de los 390°, ¿a qué altura va a estar la manija?
+    const X = px(390);
+    w.add(new Drawing('c10-v390', [
+      S([[X, py(1.3)], [X, py(-1.15)]], seedOf('c10-v390'), {w: 1.4, p: 0.55, ch: YELLOW, lift: false}),
+      // rayitas donde se puede marcar
+      ...[1.2, 1, 0.5, 0, -0.5].map((v, i) => S([[X - 6, py(v)], [X + 6, py(v)]], seedOf('c10-v390') + 1 + i, {w: 1.6, p: 0.7, ch: YELLOW, lift: false})),
+    ], {z: 11}));
+    w.add(new Label('c10-l390', '390°', X, py(1.3) - 8, {size: 16, align: 'center', z: 12, ch: YELLOW}));
+    d.describe('Una raya amarilla marca los 390° en el mapa, donde todavía no hay nada dibujado.');
+    await d.say('Cornisa', 'Girada 390°, una vuelta y 30° más: ¿a qué altura va a quedar la manija? Marcalo en la raya.');
+    const MARKS = [{id: 'more', v: 1.2, text: 'más arriba que 1'}, {id: 'top', v: 1, text: '1, lo más alto'}, {id: 'half', v: 0.5, text: '0,5'}, {id: 'zero', v: 0, text: '0'}, {id: 'neg', v: -0.5, text: '−0,5'}];
+    const c = await d.interact(ctl => new Promise(resolve => {
+      g.setHint(() => ['Tocá en la raya de los 390° la altura donde va a estar la manija. Si te parece que no se puede saber, tocá «no se sabe».']);
+      g.ui.setSpots([
+        ...MARKS.map(m => rectSpot(`c10-m${m.id}`, `A los 390°, la manija en ${m.text}`, {x: X - 16, y: py(m.v) - 16, w: 32, h: 32}, () => { if (ctl.alive()) resolve(m.id); })),
+        wordSpot('c10-unk', 'no se sabe', A.x1 - 90, A.y0 + 26, () => { if (ctl.alive()) resolve('unknown'); }, {label: 'No se sabe: todavía no la pusimos'}),
+      ]);
+    }));
+    g.setHint(null);
     d.evidence('period-predict', {answer: c});
+    const mark = MARKS.find(m => m.id === c);
+    if (mark) w.add(new Shape('c10-guess', dot('c10-guess', 7, YELLOW), X, py(mark.v), {z: 15}));
+    d.describe(mark ? `Marcaste la manija a los 390° en ${mark.text}.` : 'Dijiste que no se sabe.');
     await oneTurn();
-    await d.think(c === 'half' ? '390 es una vuelta y 30 más: misma altura que a los 30°.' : c === 'unknown' ? 'No estaba puesta, pero se podía saber: una vuelta entera, 360°, deja la manija donde estaba. 390° son una vuelta y 30°: medio rayo, como a los 30°.' : 'Seguir girando no la sube más que el rayo: 390° es una vuelta entera, 360°, y 30° más. La manija está donde estaba a los 30°: medio rayo.');
+    // una vuelta entera de distancia: lo de los 30° vuelve a los 390°
+    const link = w.add(new Drawing('c10-per', Array.from({length: 18}, (_, i) => S([[px(30 + i * 20), py(0.5)], [px(40 + i * 20), py(0.5)]], seedOf('c10-per') + i, {w: 2, p: 0.8, ch: YELLOW, lift: false})), {z: 13, progress: 0}));
+    await d.draw(link, 0.8, {sound: false});
+    w.add(new Label('c10-perl', '360° más', (px(30) + px(390)) / 2, py(0.5) - 10, {size: 16, align: 'center', z: 14, ch: YELLOW}));
+    d.describe('Una raya une el punto de los 30° con el de los 390°: están a la misma altura, a una vuelta entera de distancia.');
+    await d.think(c === 'half' ? '390 es una vuelta y 30 más: misma altura que a los 30°.' : c === 'unknown' ? 'No estaba puesta, pero se podía saber: una vuelta entera, 360°, deja la manija donde estaba. 390° son una vuelta y 30°: medio rayo, como a los 30°.' : c === 'more' ? 'Seguir girando no la sube más que el rayo: 390° es una vuelta entera, 360°, y 30° más. La manija está donde estaba a los 30°: medio rayo.' : '390° es una vuelta entera, 360°, y 30° más. La manija está donde estaba a los 30°: medio rayo, 0,5.');
     await d.say('student', 'Cornisa, la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.');
     await studentWrites(d, g, 'c10-per', 'sen(x + 360°) = sen x', A.x0 + 20, A.y1 - 8, {size: 22});
     d.evidence('period', {turns});

@@ -1,0 +1,52 @@
+[0.0s] escena → c10.repite
+[1.0s] lee: ¿Y si la rueda sigue girando? Pongamos las alturas en el mapa, como mi sombra.
+[4.2s] lee: Girada 390°, una vuelta y 30° más: ¿a qué altura va a quedar la manija? Marcalo en la raya.
+[7.5s] lee: 390 es una vuelta y 30 más: misma altura que a los 30°.
+[8.1s] lee: —Cornisa, la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.
+[8.2s] escena → c10.rampa
+[8.3s] lee: Mis rampas de carga tienen todas la misma inclinación: 30°. Una corta, de 2 tablones de largo, sube 1. La larga, de 4, sube 2. Quiero una de 6: ¿cuánto va a subir?
+[8.8s] elige «Sube 3: la mitad del largo, como las otras.» (La rampa de largo 6, con la misma inclinación, ¿cuánto sube?)
+[9.9s] lee: Tres: las rampas son semejantes, como las copias de Cornisa. Alto ÷ largo no cambia: 1/2.
+[9.9s] lee: —Rampa, ¿semejantes por tener el mismo ángulo? En la ventana de Cornisa no alcanzaba. Pero en un triángulo sí: con la esquina recta y la misma inclinación, la forma queda fija. La ventana era una ele, con seis lados: con más de tres lados, los ángulos no alcanzan.
+[10.0s] lee: —Con la misma inclinación, alto ÷ largo de la tabla es siempre el mismo número, y es el seno del ángulo del piso: sen 30° = 0,5.
+[10.1s] lee: Para la cuesta del pozo quiero una empinada: 60°, con una tabla de largo 4. ¿Cuánto sube esa?
+[10.7s] elige «Unos 3,5: 4 · sen 60°, y sen 60° es casi 0,87.» (La rampa de 60° y largo 4, ¿cuánto sube?)
+[10.8s] lee: Con la tabla de la rueda: a 60°, la manija sube 0,87 de rayo. 4 · 0,87 ≈ 3,5.
+[10.9s] lee: —Rampa, con la rueda sabés cuánto sube una rampa de cualquier inclinación, sin construirla: girás hasta ese ángulo y leés el alto.
+[11.0s] escena → c10.flechas
+[12.0s] lee: Punto, la soga vieja se había caído al pozo y ya la sacamos; yo la empalmo con la nueva en mi casa: traémela. Estás en el pozo, en el cero del mapa; mi casa está en (3, 2), como la anotó Mara. Mara sólo te deja moverte con estas flechas.
+[15.9s] elige «Al mismo lugar.» (Si Punto hace las mismas dos flechas en el otro orden, ¿adónde llega?)
+[16.1s] lee: —Punto, el camino cambia, el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar.
+[16.2s] lee: —Se suman los de adelante con los de adelante y los de arriba con los de arriba. Y como en cada suma el orden no importa, con cualquier par de flechas se llega al mismo lugar; si no van en la misma dirección, las dos rutas son los lados de un paralelogramo.
+[16.2s] lee: —La suma es la flecha (3, 2): la que va derecho del pozo a la casa. Desde el cero, la flecha que llega a un lugar se anota con los mismos números que el lugar; desde otro punto, no.
+[16.3s] escena → c10.cuarto
+[17.3s] lee: En la Terraza de las Vueltas, cuando te dan media vuelta, se escribe × (−1). Así lo anotamos desde la piedra. ¿Y un cuarto de vuelta, cómo se escribe?
+[19.1s] elige «(−1, 3): lo que iba adelante ahora va para arriba.» (Un cuarto de vuelta contra el reloj: ¿adónde va a quedar la punta de (3, 1)?)
+[21.3s] lee: El primer cuarto la dejó en (−1, 3), como dijiste.
+[21.4s] lee: Dos cuartos: (−3, −1). Media vuelta: la flecha apunta para el lado contrario, como multiplicar por −1. Cada cuarto, (a, b) pasa a (−b, a).
+[21.9s] elige «Uno nuevo, que no está en la recta: el que gira un cuarto.» (¿Qué número, multiplicado dos veces, da media vuelta, × (−1)?)
+[22.1s] lee: —Mara, a la flecha (0, 1), uno arriba del cero, le decimos i. Multiplicar por i es girar un cuarto de vuelta, contra el reloj. Dos cuartos son media vuelta: i · i = −1. i no está en la recta.
+[22.2s] lee: —La flecha (3, 1) es el número 3 + i: tres adelante y uno arriba. Por i: i · 3 + i · i = 3i − 1. Es la flecha (−1, 3), la del primer giro: el de adelante pasa arriba, y el de arriba pasa adelante con el signo cambiado.
+[22.3s] lee: ¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?
+[22.4s] lee: —Con los números de la recta no se podía, y eso sigue valiendo en la recta. Con éstos sí: multiplicar por 2i es girar un cuarto de vuelta y estirar al doble. Dos veces: media vuelta y cuatro veces el largo, −4. Y −2i, girando para el otro lado, también.
+[22.5s] escena → c10.pistas
+[22.6s] lee: Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7.
+[22.7s] lee: Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos.
+[22.7s] lee: Segunda pista: el de Cornisa le lleva 1 al de Balcón.
+[23.8s] lee: Punto mira la fila amarilla: (5, 2) no está en ella. El 5 le lleva 3 al 2, no 1. Se apuró.
+[24.8s] lee: —Mara, son Cornisa 4 y Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.
+[24.9s] lee: ¿Y si te digo «suman 7» y «suman 3»?
+[25.5s] elige «Ningún par: esas dos filas no se cruzan.» (Con «suman 7» y «suman 3», ¿qué par cumple las dos?)
+[25.7s] lee: Paralelas: ningún par cumple las dos.
+[25.8s] lee: Una tabla así, sólo con los números de cada pista, se llama matriz.
+[25.9s] lee: —Mara, en la tabla azul la parte de la izquierda es igual en las dos filas y el resultado no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas.
+[25.9s] lee: ¿Y si te digo «suman 7» y «el doble de los dos suma 14»?
+[26.0s] lee: —Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares.
+[26.0s] escena → c10.a-veces
+[27.1s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[30.4s] lee: El primero llegó lleno, hasta el borde.
+[39.6s] elige «No se sabe seguro; lo más probable, llena.» (El balde número 7, ¿cómo va a subir?)
+[39.8s] lee: Ni la rueda ni el balde avisan. Lo que pasó dice qué es más común, no qué va a pasar.
+[39.9s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[40.1s] escena → c11.baldes
+[40.4s] {"ended":true,"final":{"mode":"play","seg":"c11.baldes"},"journal":["Vueltas y flechas"],"evidenceKinds":["period-predict","period","ratio-predict","ratio","ratio60-predict","ratio60","vector-step","vector-order","vector","quarter-predict","quarter","i-predict","complex","punto-try","system-try","system-parallel","system","pull","chance-predict"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":40.364,"size":"844x390","touch":true,"route":"directa","watch":false}
