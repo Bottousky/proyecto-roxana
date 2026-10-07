@@ -402,5 +402,20 @@ Informe: `artifacts/arithmos/it11/review-c8b/informe.md`.
 | B1–B7 | Varias | Corregidos: se prueban las dos de la rama «dos»; la rama «el 0 no es área» se contesta con la cuenta; las ecuaciones quedan en el resumen («ninguna en la recta»); las opciones equivocadas traen su razón; un solo «del 2 salen dos»; «el día 2» en la Bitácora |
 | Teléfono | 9.8 ilegible al decidir; la tabla de 9.1 chica | Nuevo para todo el juego: en pantallas bajas el panel de opciones tiene «ver la pizarra», que lo esconde para mirar la pizarra más grande, y «volver a las opciones» (`it11/peek-c98-tel`). Tabla de 9.1 más grande; horas de 9.8 de 14 |
 
+## Revisión de 10.2, 10.6, 11.1, 12.5, 12.6 y «ver la pizarra» (rev-c8c, 2026-10-07)
+
+Informe: `artifacts/arithmos/it11/review-c8c/informe.md`. Toda la matemática nueva verificada sin errores.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | 11.1: la «otra tanda» quedaba dibujada en todo el capítulo (ids que la limpieza no borraba) | Corregido: ids `c11-tb…`; comprobado en 11.7 (`it11/r5-c11-directa/019`) |
+| A2 | 12.5 y 12.6: «lo encierran» antes de la pregunta evaluada | Corregido: el pensamiento va después de la respuesta |
+| M1 | 12.6: a «6» no se le contesta con las sumas de la pizarra | Corregido: «las sumas de la pizarra ya pasaron el 6 (8,7)» |
+| M2–M4 | Orden libre: «la recta azul del final» puede no ser la más corta; 10.2 se puede parar en 90° y el cierre lo afirma igual; 11.1 se puede parar en 100 | Corregidos: al terminar se dibuja la secante del tramo más corto; 10.2 pide 30°, 60°, 90° y uno más allá de 90° para parar; 11.1 deja parar desde 300 y ofrece la otra tanda también después de 1000 |
+| M5–M6 | «volver a las opciones» encima de la pausa; «ver la pizarra» primero en el orden del foco | Corregidos: el botón queda inerte con la pausa y recupera el foco al volver; «ver la pizarra» va último en el DOM; al reanudar, el foco va a la primera opción |
+| M7 | En teléfono, rótulos de 13 a 15 siguen chicos aun con la pizarra a la vista | Pendiente (ajuste de tamaños por escena) |
+| M8 | 10.6 y 12.6 nuevos no se habían corrido en teléfono | Corridos con `--peek` (`it11/r5-tel-c10`, `it11/r5-tel-c12`) |
+| B | Tablas en orden de elección; Bitácora 12 rama «el último»; tandas sólo por color; `aria-label` distinto del texto; botón chico; guarda de 450 ms al volver | Corregidos: la tabla de 10.2 se ordena por ángulo; rama propia; rótulo «otra tanda»; `aria-label` que empieza con el texto visible; 44 px de alto; la guarda se rearma |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

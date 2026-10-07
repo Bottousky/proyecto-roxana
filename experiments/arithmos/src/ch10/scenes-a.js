@@ -180,7 +180,9 @@ export const alto = {
       const p = point(1, deg);
       rows.push({deg, y: p.y, x: p.x});
       if (rows.length === 1) col('c10-rowh', A.y0 + 22, ['giro', 'alto', 'costado'], {size: 15, ch: BLUE});
-      col(`c10-row${deg}`, A.y0 + 22 + rows.length * 28, [`${deg}°`, r2(p.y), r2(p.x)]);
+      // la tabla, ordenada por ángulo
+      for (const r of rows) for (let i = 0; i < 3; i++) w.remove(`c10-row${r.deg}-${i}`);
+      [...rows].sort((a, b) => a.deg - b.deg).forEach((r, i) => col(`c10-row${r.deg}`, A.y0 + 50 + i * 28, [`${r.deg}°`, r2(r.y), r2(r.x)]));
       d.describe(`Girada ${deg}°, la manija queda a ${r2(p.y)} rayo sobre el centro y a ${r2(p.x)} rayo al costado${p.x < 0 ? ', del lado izquierdo' : ''}.`);
       d.evidence('height', {deg, y: p.y});
     };
@@ -189,7 +191,8 @@ export const alto = {
     const visited = new Set();
     let past90 = null;
     for (;;) {
-      const ready = [30, 60, 90].every(a => visited.has(a));
+      // para parar hacen falta 30°, 60° y 90°, y alguno más allá de 90°
+      const ready = [30, 60, 90].every(a => visited.has(a)) && [...visited].some(a => a > 90);
       const opts = ANGLES.filter(a => !visited.has(a)).map(a => ({id: String(a), text: `Girar hasta ${a}°.`}));
       if (ready) opts.push({id: 'done', text: 'Ya está: con esto alcanza.'});
       if (opts.length === 1 && opts[0].id === 'done') break;

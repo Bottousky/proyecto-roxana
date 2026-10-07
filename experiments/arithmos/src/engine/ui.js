@@ -343,7 +343,7 @@ export class UI {
         [options[i], options[j]] = [options[j], options[i]];
       }
     }
-    const shownAt = performance.now();
+    this.choiceShownAt = performance.now();
     const box = this.choices$;
     box.replaceChildren();
     if (prompt) {
@@ -353,23 +353,8 @@ export class UI {
       box.append(p);
     }
     box.setAttribute('aria-label', prompt || 'Elegí');
-    // en pantallas bajas las opciones tapan la pizarra: se pueden esconder un momento para mirarla
     const back = this.#peekBack();
     back.hidden = true;
-    if (innerHeight < 560) {
-      const peek = document.createElement('button');
-      peek.type = 'button';
-      peek.className = 'peek';
-      peek.textContent = 'ver la pizarra';
-      peek.setAttribute('aria-label', 'Esconder las opciones un momento para mirar la pizarra');
-      peek.addEventListener('click', e => {
-        e.stopPropagation();
-        box.hidden = true;
-        back.hidden = false;
-        back.focus({preventScroll: true});
-      });
-      box.append(peek);
-    }
     return new Promise(resolve => {
       this.choiceResolve = resolve;
       for (const o of options) {
@@ -380,7 +365,7 @@ export class UI {
         b.addEventListener('click', e => {
           e.stopPropagation();
           // nada de elegir sin leer: ni en pausa, ni con un Enter que venía de antes
-          if (this.game.paused || performance.now() - shownAt < 450) return;
+          if (this.game.paused || performance.now() - this.choiceShownAt < 450) return;
           box.hidden = true;
           back.hidden = true;
           box.replaceChildren();
@@ -389,6 +374,21 @@ export class UI {
           resolve(o.id);
         });
         box.append(b);
+      }
+      // en pantallas bajas las opciones tapan la pizarra: se pueden esconder un momento para mirarla (último en el orden)
+      if (innerHeight < 560) {
+        const peek = document.createElement('button');
+        peek.type = 'button';
+        peek.className = 'peek';
+        peek.textContent = 'ver la pizarra';
+        peek.setAttribute('aria-label', 'ver la pizarra: esconde las opciones un momento');
+        peek.addEventListener('click', e => {
+          e.stopPropagation();
+          box.hidden = true;
+          back.hidden = false;
+          back.focus({preventScroll: true});
+        });
+        box.append(peek);
       }
       box.hidden = false;
       box.scrollTop = 0;
@@ -408,6 +408,8 @@ export class UI {
       e.stopPropagation();
       b.hidden = true;
       this.choices$.hidden = false;
+      // al volver, la misma guarda contra elegir sin leer
+      this.choiceShownAt = performance.now();
       this.choices$.querySelector('button:not(.peek)')?.focus({preventScroll: true});
     });
     document.body.append(b);
@@ -568,7 +570,7 @@ export class UI {
     this.pause$.hidden = !on;
     const playing = this.game.mode === 'play';
     const replay = this.game.director.replay;
-    for (const sel of ['#spots', '#choices', '#caption', '#corner', '#skip-btn', '#title', '#board']) {
+    for (const sel of ['#spots', '#choices', '#caption', '#corner', '#skip-btn', '#title', '#board', '#peek-back']) {
       const el = $(sel);
       if (el) el.inert = on;
     }
@@ -587,7 +589,8 @@ export class UI {
       first?.focus({preventScroll: true});
     } else if (playing) {
       // el foco vuelve a la escena: Enter avanza el texto, no reabre la pausa
-      if (!this.choices$.hidden) setTimeout(() => this.choices$.querySelector('button')?.focus({preventScroll: true}), 0);
+      if (!this.choices$.hidden) setTimeout(() => this.choices$.querySelector('button:not(.peek)')?.focus({preventScroll: true}), 0);
+      else if (this.peekBack$ && !this.peekBack$.hidden) setTimeout(() => this.peekBack$.focus({preventScroll: true}), 0);
       else $('#stage').focus({preventScroll: true});
     }
   }

@@ -77,21 +77,23 @@ export const baldes = {
     for (;;) {
       const opts = TARGETS.filter(n => n > shown).map(n => ({id: String(n), text: `Subir hasta ${n} baldes.`}));
       if (shown >= 100 && !second) opts.push({id: 'again', text: 'Otra tanda, desde cero.'});
-      if (shown >= 100) opts.push({id: 'done', text: 'Ya está: se ve adónde va.'});
+      if (shown >= 300) opts.push({id: 'done', text: 'Ya está: se ve adónde va.'});
+      if (!opts.length) break;
       const pick = await d.choose(opts, {prompt: shown === 1 ? '¿Hasta cuántos baldes subimos?' : `Van ${shown} baldes. ¿Y ahora?`});
       if (pick === 'done') { d.evidence('freq-stop', {n: shown, second}); break; }
       if (pick === 'again') {
         second = true;
         await d.say('Balcón', 'Otra tanda de baldes, desde el primero.');
         const ys = pulls(1000, 2 / 3, 13);
-        await plot(1000, 1, ys, 'c11b', BLUE);
+        await plot(1000, 1, ys, 'c11-tb', BLUE);
+        w.add(new Label('c11-tbl', 'otra tanda', px(1000) + 6, py(shareFull(ys, 1000)) + 40, {size: 14, z: 14, ch: BLUE}));
         await d.think(`La otra tanda empezó muy distinta: con 10 baldes, ${pct(shareFull(ys, 10))}. Con pocos baldes salta para cualquier lado; con mil, ${pct(shareFull(ys, 1000))}: también cerca de dos tercios.`);
         continue;
       }
       const n = Number(pick);
       await plot(n);
       shown = n;
-      if (shown >= 1000) { d.evidence('freq-stop', {n: shown, second}); break; }
+      if (shown >= 1000 && second) { d.evidence('freq-stop', {n: shown, second}); break; }
     }
     await d.think(guess === 'about' ? 'Al principio salta; con muchos, se queda cerca de dos tercios.' : guess === 'exact' ? 'No se queda clavado en dos tercios: a veces da justo y a veces un poco más o un poco menos, siempre cerca.' : 'Caso por caso es suerte, pero con muchos baldes la parte llena se queda cerca de dos tercios.');
     await d.say('student', 'Balcón, con muchos baldes, la parte que sube llena se acomoda cerca de 2 de cada 3. Eso lo vimos, no está garantizado. Y el próximo balde, igual, no se sabe.');

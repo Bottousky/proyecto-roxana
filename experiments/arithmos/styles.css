@@ -102,7 +102,7 @@ button, select, input { font: inherit; color: inherit; }
   text-shadow: 0 0 1px rgba(255,255,255,.45);
 }
 #choices button:hover { color: #fff; }
-#choices button.peek { flex-basis: 100%; text-align: center; max-width: none; font-size: .7em; color: var(--blue, #9ccfe8); background-image: none; order: 99; }
+#choices button.peek { flex-basis: 100%; text-align: center; max-width: none; font-size: .78em; color: var(--blue, #9ccfe8); background-image: none; min-height: 44px; padding: .4em 1em; }
 #peek-back {
   position: absolute; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 6;
   border: 1px dashed rgba(241, 240, 230, .6); border-radius: 12px; background: rgba(9, 19, 15, 0.8); color: var(--chalk);

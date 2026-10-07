@@ -59,13 +59,22 @@ export const rapido = {
       g.audio.tap(0.15, 1.2 + k * 0.08);
       if (measured.length === TRAMOS.length) break;
     }
-    if (measured.some(m => m.h < 0)) await d.think('Por la derecha dan menos que 4 y por la izquierda, más: lo encierran.');
+    // la recta azul del final: la del tramo más corto que se midió
+    const best = measured.reduce((a, b) => (Math.abs(b.h) < Math.abs(a.h) ? b : a));
+    {
+      const x0 = 0.2, x1 = 2.6;
+      w.remove('c12-sec');
+      w.add(new Drawing('c12-sec', [S([[px(x0), py(jump(1) + best.r * (x0 - 1))], [px(x1), py(jump(1) + best.r * (x1 - 1))]], seedOf('c12-secb'), {w: 2.2, p: 0.9, ch: BLUE})], {z: 14}));
+      w.remove('c12-p2');
+      w.add(new Shape('c12-p2', dot('c12-p2', 4, BLUE), px(1 + best.h), py(jump(1 + best.h)), {z: 15}));
+    }
     const c = await d.choose([
       {id: '4', text: 'A 4: cada vez más cerca.'},
       {id: '3.99', text: 'Al último que salió: con eso alcanza.'},
       {id: 'none', text: 'A nada: con tramo cero no se puede dividir.'},
     ], {prompt: '¿A qué número se acercan?', evaluate: true});
     d.evidence('derivative-predict', {answer: c});
+    if (measured.some(m => m.h < 0)) await d.think('Por la derecha dieron menos que 4 y por la izquierda, más: lo encierran.');
     await d.think(c === '4' ? 'Cuatro. Con tramo cero no se divide, pero los tramos cada vez más cortos se acercan a 4.' : c === '3.99' ? 'El último es una aproximación: con un tramo más corto cambiaría otra vez (3,999 por la derecha, 4,001 por la izquierda). Se acercan a 4.' : 'Con tramo cero no se puede dividir, es cierto. Pero los tramos cada vez más cortos se acercan a un número: 4.');
     await d.say('student', 'Cornisa, justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente.');
     const right = measured.filter(m => m.h > 0).sort((a, b) => b.h - a.h).map(m => dec(m.r));
@@ -131,14 +140,15 @@ export const junta = {
       show(Number(pick.slice(1)), pick[0] === 'a');
       g.audio.tap(0.15, 1 + k * 0.1);
     }
-    if (measured.some(m => m.above)) await d.think('Por abajo dan menos que lo juntado y por arriba, más: lo encierran.');
     const c = await d.choose([
       {id: '9', text: '9: lo que hay debajo de la recta, un triángulo de 3 por 6, a la mitad.'},
       {id: '6', text: '6: el último caudal.'},
       {id: 'inf', text: 'Cada vez más, sin parar.'},
     ], {prompt: '¿A cuántos baldes se acercan las sumas?', evaluate: true});
     d.evidence('integral-predict', {answer: c});
-    await d.think(c === '9' ? 'Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2.' : c === '6' ? 'Seis es el caudal del final, por minuto. Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.' : 'Las de abajo crecen, pero no sin parar: nunca pasan el área bajo la recta, el triángulo de 3 · 6 ÷ 2 = 9, y se le acercan.');
+    const lows = measured.filter(m => !m.above).map(m => m.s), highs = measured.filter(m => m.above).map(m => m.s);
+    if (highs.length) await d.think(`Por abajo dieron ${lows.map(dec).join(', ')}; por arriba, ${highs.map(dec).join(', ')}: lo juntado queda entre las dos, y las dos se le acercan.`);
+    await d.think(c === '9' ? 'Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2.' : c === '6' ? `Seis es el caudal del final, por minuto, no lo juntado: las sumas de la pizarra ya pasaron el 6 (${dec(Math.max(...measured.map(m => m.s)))}). Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.` : 'Las de abajo crecen, pero no sin parar: nunca pasan el área bajo la recta, el triángulo de 3 · 6 ÷ 2 = 9, y se le acercan.');
     await d.say('student', 'Balcón, si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó.');
     await studentWrites(d, g, 'c12-int', 'juntado = área bajo el caudal = 9', A.x0 + 20, A.y1 - 4, {size: 18});
     g.flags.c12accum = true;
@@ -346,7 +356,7 @@ function writeJournal12(g) {
   const ip = first('inverse-predict');
   if (ip) seen.push(ip.answer === 'right' ? 'Deshiciste «el doble más uno» en el orden contrario.' : 'Para deshacer «el doble más uno» probaste otro orden; se deshace al revés: menos uno, la mitad.');
   const dp = first('derivative-predict');
-  if (dp) seen.push(dp.answer === '4' ? 'Viste que las velocidades de tramos cada vez más cortos se acercan a 4.' : 'Las velocidades de tramos más cortos se acercaban a 4, aunque con tramo cero no se pueda dividir.');
+  if (dp) seen.push(dp.answer === '4' ? 'Viste que las velocidades de tramos cada vez más cortos se acercan a 4.' : dp.answer === '3.99' ? 'Te quedaste con la última velocidad medida; con tramos más cortos sigue cambiando y se acerca a 4.' : 'Las velocidades de tramos más cortos se acercaban a 4, aunque con tramo cero no se pueda dividir.');
   const ip2 = first('integral-predict');
   if (ip2) seen.push(ip2.answer === '9' ? 'Viste que las sumas se acercan al área bajo el caudal: 9.' : 'Las sumas de rectángulos se acercaban a 9, el área bajo el caudal.');
   const fp = first('final-predict');
