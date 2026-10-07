@@ -30,39 +30,47 @@ export const rapido = {
     d.describe('El salto de Punto en el mapa, con un punto amarillo en el segundo 1, a altura 5.');
     await d.say('student', 'En un tramo se puede medir: cuánto subió dividido cuánto tiempo pasó. Del 1 al 2 subió de 5 a 8: 3 por segundo.');
     await d.shot(SHOTS.tiles, 0.8);
-    const H = [1, 0.5, 0.1, 0.01];
+    // el jugador elige qué tramo medir: hacia adelante del 1 o hacia atrás
+    const TRAMOS = [{h: 1, t: 'Del 1 al 2.'}, {h: 0.5, t: 'Del 1 al 1,5.'}, {h: 0.1, t: 'Del 1 al 1,1.'}, {h: 0.01, t: 'Del 1 al 1,01.'}, {h: -0.1, t: 'Del 0,9 al 1.'}, {h: -0.01, t: 'Del 0,99 al 1.'}];
+    const measured = [];
     let k = 0;
     const show = h => {
       const r = avgRate(jump, 1, h);
       w.remove('c12-sec');
       const x0 = 0.2, x1 = 2.6;
       w.add(new Drawing('c12-sec', [S([[px(x0), py(jump(1) + r * (x0 - 1))], [px(x1), py(jump(1) + r * (x1 - 1))]], seedOf(`c12-sec${h}`), {w: 2.2, p: 0.9, ch: BLUE})], {z: 14}));
-      w.add(new Label(`c12-r${k}`, `del 1 al ${dec(1 + h)}:  ${dec(r)}`, A.x1 - 150, A.y0 + 40 + k * 32, {size: 19, z: 12}));
-      d.describe(`Del segundo 1 al ${dec(1 + h)}, subió a ${dec(r)} por segundo en promedio. La recta azul pasa por los dos puntos.`);
+      w.remove('c12-p2');
+      w.add(new Shape('c12-p2', dot('c12-p2', 4, BLUE), px(1 + h), py(jump(1 + h)), {z: 15}));
+      const lo = Math.min(1, 1 + h), hi = Math.max(1, 1 + h);
+      w.add(new Label(`c12-r${k}`, `del ${dec(lo)} al ${dec(hi)}:  ${dec(r)}`, A.x1 - 158, A.y0 + 36 + k * 30, {size: 17, z: 12, ch: h < 0 ? YELLOW : undefined}));
+      d.describe(`Del segundo ${dec(lo)} al ${dec(hi)}, subió a ${dec(r)} por segundo en promedio. La recta azul pasa por los dos puntos.`);
       d.evidence('rate', {h, r: +r.toFixed(3)});
+      measured.push({h, r});
+      k++;
     };
-    show(H[0]);
-    k++;
-    await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => ['Tocá «tramo más corto»: el segundo punto se acerca al 1 y la recta azul gira.']);
-      const refresh = () => g.ui.setSpots([wordSpot('c12-short', 'tramo más corto', A.x1 - 80, A.y1 - 26, () => {
-        if (!ctl.alive()) return;
-        show(H[k]);
-        k++;
-        g.audio.tap(0.15, 1.2 + k * 0.1);
-        if (k >= H.length) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
-      }, {label: 'Achicar el tramo'})]);
-      refresh();
-    }));
+    show(1);
+    for (;;) {
+      const ready = measured.length >= 3 && measured.some(m => Math.abs(m.h) <= 0.1);
+      const opts = TRAMOS.filter(o => !measured.some(m => m.h === o.h)).map(o => ({id: String(o.h), text: o.t}));
+      if (ready) opts.push({id: 'done', text: 'Ya está: ya se ve adónde van.'});
+      const pick = await d.choose(opts, {prompt: '¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.'});
+      if (pick === 'done') break;
+      show(Number(pick));
+      g.audio.tap(0.15, 1.2 + k * 0.08);
+      if (measured.length === TRAMOS.length) break;
+    }
+    if (measured.some(m => m.h < 0)) await d.think('Por la derecha dan menos que 4 y por la izquierda, más: lo encierran.');
     const c = await d.choose([
       {id: '4', text: 'A 4: cada vez más cerca.'},
-      {id: '3.99', text: 'A 3,99: es el último que dio.'},
+      {id: '3.99', text: 'Al último que salió: con eso alcanza.'},
       {id: 'none', text: 'A nada: con tramo cero no se puede dividir.'},
     ], {prompt: '¿A qué número se acercan?', evaluate: true});
     d.evidence('derivative-predict', {answer: c});
-    await d.think(c === '4' ? 'Cuatro. Con tramo cero no se divide, pero los tramos cada vez más cortos se acercan a 4.' : c === '3.99' ? 'Con un tramo más corto daría 3,999, y después 3,9999: se acercan a 4.' : 'Con tramo cero no se puede dividir, es cierto. Pero los tramos cada vez más cortos se acercan a un número: 4.');
+    await d.think(c === '4' ? 'Cuatro. Con tramo cero no se divide, pero los tramos cada vez más cortos se acercan a 4.' : c === '3.99' ? 'El último es una aproximación: con un tramo más corto cambiaría otra vez (3,999 por la derecha, 4,001 por la izquierda). Se acercan a 4.' : 'Con tramo cero no se puede dividir, es cierto. Pero los tramos cada vez más cortos se acercan a un número: 4.');
     await d.say('student', 'Cornisa, justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente.');
-    await studentWrites(d, g, 'c12-der', 'velocidad en t = 1:  3 → 3,5 → 3,9 → 3,99 → 4', A.x0 + 20, A.y1 - 4, {size: 17});
+    const right = measured.filter(m => m.h > 0).sort((a, b) => b.h - a.h).map(m => dec(m.r));
+    const left = measured.filter(m => m.h < 0).sort((a, b) => a.h - b.h).map(m => dec(m.r));
+    await studentWrites(d, g, 'c12-der', `en t = 1:  ${right.join(' → ')}${left.length ? `   ·   ${left.join(' → ')}` : ''}   → 4`, A.x0 + 20, A.y1 - 4, {size: 17});
     g.flags.c12rate = true;
   },
 };

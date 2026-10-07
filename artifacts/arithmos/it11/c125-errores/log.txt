@@ -1,0 +1,38 @@
+[0.0s] escena → c12.rapido
+[1.0s] lee: En el salto de Punto: justo al segundo 1, ¿qué tan rápido sube?
+[1.1s] lee: —En un tramo se puede medir: cuánto subió dividido cuánto tiempo pasó. Del 1 al 2 subió de 5 a 8: 3 por segundo.
+[2.5s] elige «Del 1 al 1,5.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[3.4s] elige «Del 1 al 1,1.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[4.2s] elige «Ya está: ya se ve adónde van.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[5.1s] elige «Al último que salió: con eso alcanza.» (¿A qué número se acercan?)
+[5.5s] lee: El último es una aproximación: con un tramo más corto cambiaría otra vez (3,999 por la derecha, 4,001 por la izquierda). Se acercan a 4.
+[5.6s] lee: —Cornisa, justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente.
+[5.7s] escena → c12.junta
+[6.1s] lee: Abrí la canilla del pozo de a poco: a los t minutos salen 2t baldes por minuto. ¿Cuánta agua juntamos en 3 minutos?
+[7.7s] elige «6: el último caudal.» (¿A cuántos baldes se acercan las sumas?)
+[8.1s] lee: Seis es el caudal del final, por minuto. Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.
+[8.1s] lee: —Balcón, si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó.
+[8.2s] escena → c12.tramos
+[8.6s] lee: Mi precio por redibujar escalones: hasta 10, un trozo de tiza cada uno. Después del décimo, medio trozo por escalón.
+[9.9s] elige «16: uno por escalón.» (¿Cuánta tiza cobra por 16 escalones?)
+[10.3s] lee: El primer tramo cuesta 10; los 6 escalones que siguen, medio cada uno: 3. Total, 13.
+[10.4s] lee: —Rampa, tu precio es una función por tramos: una regla hasta 10 y otra después. Un solo gráfico, dos reglas.
+[10.5s] lee: —Lo lejos del cero también va por tramos, como Recta y Cuña en la línea del depósito: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V.
+[10.6s] escena → c12.anticipar
+[10.9s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche: 1, 2, 4 y 8 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?
+[12.3s] elige «Suma lo mismo: una recta» (¿Qué familia sigue la Marea?)
+[12.7s] lee: Una recta no pasa por los cuatro: de 1 a 2 sube 1, de 4 a 8 sube 4. No suma lo mismo.
+[13.2s] elige «Va y vuelve: una ola» (¿Qué familia sigue la Marea?)
+[13.6s] lee: Hasta ahora sólo sube, y cada vez más: no parece una ola.
+[14.2s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[15.1s] elige «En la noche 4: 16.» (Si sigue duplicando, ¿en qué noche pasa la escalera?)
+[15.4s] lee: La cuarta llega a 16: todavía no. La quinta, 32: ahí pasa.
+[15.5s] lee: —Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.
+[15.6s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[15.6s] lee: Cuarta noche.
+[15.7s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La quinta pasa los 30.
+[15.8s] lee: Entonces redibujamos la escalera esta noche, antes de la quinta. ¡A trabajar!
+[15.9s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[16.0s] lee: —Punto, al principio eras un punto que contaba. Después tuviste un lado para ir, una flecha. Ahora corrés por un gráfico, un paso adelante.
+[19.6s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[20.0s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["rate","derivative-predict","accum","integral-predict","piecewise-predict","final-family","final-predict","final-check"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":19.979,"size":"1600x900","touch":false,"route":"errores","watch":false}
