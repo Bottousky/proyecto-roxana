@@ -73,7 +73,9 @@ function groundTexture() {
   return groundTex;
 }
 
-export function rockMaterial({ fogFade = 0, mossAmount = 1, tint = '#ffffff', shade = 0, shadeColor = '#6e5652', detail = 1 } = {}) {
+// `dissolve` (a uniform { value }, optional): screen-door dissolve 0 → 1, opaque all the way (no
+// sorting against transparent plants): the wall cut away for the camera fades instead of popping.
+export function rockMaterial({ fogFade = 0, mossAmount = 1, tint = '#ffffff', shade = 0, shadeColor = '#6e5652', detail = 1, dissolve = null } = {}) {
   const m = new THREE.MeshStandardMaterial({ color: tint, roughness: 0.92, metalness: 0 });
   const strata = colorArray(PALETTE.strata);
   m.onBeforeCompile = sh => {
@@ -171,8 +173,14 @@ vec3 perturbBump(vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float fd){
         roughnessFactor*=mix(1.,.38,wetness);`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
         normal=perturbBump(-vViewPosition, normal, vec2(dFdx(hDetail), dFdy(hDetail))*.9*uDetailAmt, faceDirection);`);
+    if (dissolve) {
+      sh.uniforms.uDissolve = dissolve;
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uDissolve;')
+        .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+        if (uDissolve > 0.) { float n = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(.06711056, .00583715)))); if (n < uDissolve) discard; }`);
+    }
   };
-  m.customProgramCacheKey = () => `rock6-${fogFade}-${mossAmount}-${shade}-${detail}`;
+  m.customProgramCacheKey = () => `rock6-${fogFade}-${mossAmount}-${shade}-${detail}${dissolve ? '-dissolve' : ''}`;
   return m;
 }
 

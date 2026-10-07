@@ -17,10 +17,18 @@ const put = (x, y, z = 0) => page.evaluate(({ x, y, z }) => { const a = window._
 const shot = async name => { await page.waitForTimeout(2500); await page.screenshot({ path: join(out, `${name}.png`) }); };
 // The Terraza beside the arch, before and after the Mirador.
 await put(5.6, 4.4); await shot('1-terraza-antes-del-mirador');
-await put(14, 5.15); await page.waitForTimeout(800); await shot('2-desde-el-mirador');
+await put(14, 5.15);
+for (let k = 0, at = 0; k < 3; k++) { const t = [600, 1000, 1400][k]; at += t; await page.waitForTimeout(t); await page.screenshot({ path: join(out, `2-mirador-${at}ms.png`) }); } // the silhouette fading in, during the vista
+await shot('2-desde-el-mirador');
 await put(5.6, 4.4); await shot('3-terraza-despues-del-mirador');
-// The whole square, from above the passage's mouth (arch open).
+await page.evaluate(() => window.__physica.inspect(8, 7.5, 24)); await shot('3a-sobre-el-muro-plano-abierto');
+await page.evaluate(() => window.__physica.inspect(null));
+// The arch open, still on the 2.5D side: the neighbourhood only through the passage.
 await page.evaluate(() => { const w = window.__physica.world, d = w.doors[0]; d.open = true; d.openT = d.swing; });
+await put(5.6, 4.4); await shot('3b-terraza-con-el-arco-abierto');
+await page.evaluate(() => window.__physica.inspect(8, 7.5, 24)); await shot('3c-arco-abierto-plano-abierto');
+await page.evaluate(() => window.__physica.inspect(null));
+// The whole square, from above the passage's mouth (arch open).
 await put(7.6, 4.4, -12.2);
 await page.evaluate(() => window.__physica.look([7.6, 13.5, -6.0], [7.8, 4.4, -16.5])); await shot('4-plaza-entera');
 await page.evaluate(() => window.__physica.look([1.0, 10.5, -21.5], [9.5, 4.6, -12.0])); await shot('5-plaza-desde-el-fondo');

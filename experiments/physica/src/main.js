@@ -26,7 +26,7 @@ let reduced = reducedNow();
 const debug = params.has('debug');
 
 const app = document.getElementById('app');
-const renderer = new THREE.WebGLRenderer({ antialias: quality !== 'low', powerPreference: 'high-performance' });
+const renderer = new THREE.WebGLRenderer({ antialias: quality !== 'low', powerPreference: 'high-performance', stencil: true }); // (the arch's portal)
 renderer.localClippingEnabled = true; // the explorer is cut at the water's surface
 renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'low' ? 1.25 : 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.02;
@@ -75,7 +75,7 @@ let vista = 0, vistaAge = 0, vistaHeld = false, vistaWas = false, introShotWas =
 // Establishing shot: the whole diorama — familiar fall, the cascade, the Pozo — then the explorer.
 let intro = params.has('nointro') ? 0 : 4.6;
 // The city, once discovered from the Mirador, stays part of the world.
-if (journal.has('mirador')) view.setCityVisible(true);
+if (journal.has('mirador')) { view.setCityVisible(true); world.citySeen = true; } // (seen in an earlier session)
 journal.onAdd = id => {
   if (id === 'cruce' || id === 'mirador') view.clearChalk(id);
   // From the Mirador, for the first time, the camera rises to show what is behind the landscape.
@@ -222,7 +222,7 @@ window.__physica = {
   screenOf(x, y, z = 0) { const v = new THREE.Vector3(x, y, z).project(camera); return { x: (v.x * 0.5 + 0.5) * app.clientWidth, y: (-v.y * 0.5 + 0.5) * app.clientHeight }; },
   vista() { vista = 6; vistaAge = 0; vistaHeld = false; view.setCityVisible(true); },
 };
-let inspectCam = null, freeCam = null, camFloat = 0, camDepth = 0, wallCut = false;
+let inspectCam = null, freeCam = null, camFloat = 0, camDepth = 0, wallCut = false, frontNow = true;
 const camG = { x: 0, y: 0 };
 
 // ---------- loop ----------
@@ -351,10 +351,16 @@ function frame(now) {
     const m = wallCut ? 0.3 : 0.1;
     const inMouth = (x, y) => x > ARCH.x0 + m && x < ARCH.x1 - m && y < TERRACE_Y + ARCH.h - m;
     const seen = y => { const t = (pz + 9) / (pz - p.z); return inMouth(px + (p.x - px) * t, py + (y - py) * t); };
-    wallCut = !(inMouth(px, py) && seen(feet + 0.2) && seen(feet + 1.6));
+    // (the camera nearing the passage's walls, within 0.5 m, starts the cut early, so it dissolves before it gets there; it
+    // ends once the camera is 0.55 m clear of them: a 0.5 m window around the axis)
+    const mc = wallCut ? 0.55 : 0.5, camClear = px > ARCH.x0 + mc && px < ARCH.x1 - mc && py < TERRACE_Y + ARCH.h - m;
+    wallCut = !(camClear && seen(feet + 0.2) && seen(feet + 1.6));
   } else wallCut = false;
-  view.setWallCut(wallCut);
+  view.setWallCut(wallCut, wallCut && pz > -9 && !(px > ARCH.x0 && px < ARCH.x1 && py < TERRACE_Y + ARCH.h)); // inside the rock: at once
   if (freeCam) { camera.position.set(...freeCam.pos); camera.lookAt(...freeCam.at); }
+  // In front of the arch's plane (the 2.5D side) the neighbourhood is seen only through the passage.
+  frontNow = camera.position.z > world.doors[0].z && !wallCut;
+  view.setFront(frontNow, camera.position);
   sun.position.set(lx - 9, 16, lz + 12); sun.target.position.set(lx, 0, lz);
 
   // Prompt over the nearest interactable.
@@ -372,7 +378,8 @@ function frame(now) {
     $('prompt-hint').textContent = it.hint || '';
     $('prompt-reason').textContent = it.reason || '';
   } else promptEl.hidden = true;
-  $('legend').hidden = !world.traces.length || journal.open;
+  // (a trace behind the wall is not drawn from the 2.5D side: no legend for it there)
+  $('legend').hidden = journal.open || !world.traces.some(t => !(frontNow && (world.bodies.find(b => b.id === t.body)?.z ?? 0) < -4));
   // The first time beyond the arch, the help bar comes back for a while: ▲▼ now walk.
   if (!depthHinted && av.z < -0.3) { depthHinted = true; moved = true; hintTimer = input.lastDevice === 'touch' ? 14 : 6; $('hint').classList.remove('gone'); }
   if (moved) { hintTimer -= dt; if (hintTimer < 0) $('hint').classList.add('gone'); }

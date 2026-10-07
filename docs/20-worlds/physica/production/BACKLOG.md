@@ -39,23 +39,18 @@ primero.
 - **B1:** entrada desde el Instituto (Taller de Física, pecera). Requiere decidir la integración con la landing de otra rama, sin modificar Ohmdal.
 - **B2:** prueba mínima de la transición 2.5D → 3D.
   - **Qué es:** una abertura en la pared del fondo (el arco tapiado de la Terraza) se vuelve transitable y revela un barrio.
-  - **Estado: parcial** (iter 13–14, `evidence/iter-13` y `evidence/iter-14`).
-  - **Hecho en la iteración 13:**
-    - la misma simulación con profundidad;
-    - la manivela, con su eje en profundidad;
-    - pasaje y plaza, con obstáculos sólidos;
-    - la cámara continua;
-    - 11 pruebas y el recorrido con teclado.
-  - **Hecho en la iteración 14 (D19):**
-    - el experimento cotidiano: el soporte C en la plaza y la nota «La misma caída, detrás del muro», que sólo dice lo medido y compara con la de la Orilla;
-    - la fuente: el chorro, a la velocidad vertical de la surgencia, sube 0,44 m; el cuenco tiene agua;
-    - la cámara de la plaza ya no queda tapada (corte del muro, sin cuerpo dentro del muro);
-    - se rodea la fuente sin trabarse;
-    - la toma de la plaza entera;
-    - 5 pruebas nuevas y el recorrido con teclado.
-  - **Falta:**
-    - la identidad de la metrópolis: escala, puertas en las plantas bajas, un soportal, dos o tres habitantes y una vista de la ciudad. Hoy se lee como la plaza de un pueblo;
-    - lo que asoma sobre el muro, como silueta propia y barata (la cúpula en el eje del arco, techos en la bruma). Hoy no asoma nada: el barrio se dibuja recién al abrir el arco;
-    - suavizar el corte del muro, hoy instantáneo.
+  - **Estado: hecho** (iter 13–15; `evidence/iter-13`, `iter-14`, `iter-15`; D18–D20; revisión independiente en dos pasadas por iteración).
+    - La misma simulación con profundidad, y la manivela con su eje.
+    - El pasaje y la plaza, con obstáculos sólidos.
+    - El experimento cotidiano: el soporte C y su nota medida.
+    - La fuente que contrasta con la surgencia.
+    - Desde el lado 2.5D, el barrio se ve sólo por el arco; sobre el muro, una silueta en la bruma.
+    - La plaza como nudo de una ciudad habitada: puertas, galería, una calle con reja y la torre del reloj, y dos vecinos.
+    - La cámara con corte del muro y fundido.
+    - 72 pruebas y el recorrido con teclado.
+  - **Pasa a B5:**
+    - el costo de dibujo del barrio (unas 270 llamadas cuando la boca se ve; unir la geometría estática por material);
+    - abrir la calle del norte;
+    - pulir la silueta en el plano bajo del umbral y los vecinos.
 - **B3:** familia «Introducción» y **B4:** familia MRU (ver `FAMILIAS.md`).
 - **B5:** primer sector jugable de la metrópolis.

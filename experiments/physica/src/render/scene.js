@@ -85,16 +85,29 @@ export function buildScene(world, opts = {}) {
   // One relief seed and one darkening reference for all the back walls: no seams between them.
   // The stretch of wall between the Terraza and the square: from the square the camera may need it
   // out of the way (setWallCut).
-  const wallCut = [];
+  // (the same rock, with a dissolve: it fades out in ~0.2 s instead of popping)
+  const dissolve = { value: 0 }, cutRock = rockMaterial({ mossAmount: 0.7, shade: 0.38, detail: 0.35, dissolve }); cutRock.side = THREE.DoubleSide;
+  // (the blocks take the dissolving rock only while the cut is under way: its discard would cost the
+  // early depth test in every 2.5D frame. Its program is compiled at start-up with the rest: the
+  // passage's ceiling is made of it)
+  const wallCut = [], wallExtras = [];
   for (const [x0, x1, top] of backs) {
     const m = add(strataBlock({ x0, x1, y0: -11, y1: top, z0: -9, z1: Z_BACK, seed: 2, sides: ['w', 'e'], step: 0.32, topRef: 11 }), backRock, false);
     if (x1 > BARRIO.x0 - 0.5 && x0 < BARRIO.x1 + 0.5) wallCut.push(m);
   }
   wallCut.push(add(strataBlock({ x0: ARCH.x0, x1: ARCH.x1, y0: TERRACE_Y + ARCH.h, y1: 8.6, z0: -9, z1: Z_BACK, seed: 2, sides: [], step: 0.32, topRef: 11 }), backRock, false));
   wallCut.push(add(strataBlock({ x0: ARCH.x0, x1: ARCH.x1, y0: -11, y1: TERRACE_Y, z0: -9, z1: Z_BACK, seed: 2, sides: [], step: 0.32, topRef: 11 }), backRock, false));
-  const barrio = buildBarrio(scene, { M, streamZ: Z_STREAM, wallRock: backRock, field, zBack: Z_BACK, world });
-  let wallIsCut = false;
-  const setWallCut = v => { if (v === wallIsCut) return; wallIsCut = v; for (const m of wallCut) m.visible = !v; barrio.setCut(v); };
+  const barrio = buildBarrio(scene, { M, streamZ: Z_STREAM, wallRock: backRock, cutRock, field, zBack: Z_BACK, world });
+  let wallIsCut = false, frontView = true;
+  // `now`: the camera is inside the rock, the wall must be gone this frame
+  const setWallCut = (v, now = false) => { wallIsCut = v; if (now && v) dissolve.value = 1; };
+  const updateCut = dt => {
+    dissolve.value = THREE.MathUtils.clamp(dissolve.value + (wallIsCut ? 1 : -1) * dt / 0.22, 0, 1);
+    const mat = dissolve.value > 0 ? cutRock : backRock;
+    for (const m of wallCut) { m.visible = dissolve.value < 1; m.material = mat; }
+    for (const m of wallExtras) m.visible = dissolve.value <= 0.5;
+    barrio.setDissolve(dissolve.value);
+  };
   // World edges: tall rock you can see, not an invisible wall.
   add(strataBlock({ x0: -30, x1: -22, y0: -9, y1: 13, z0: -9, z1: Z_FRONT + 0.6, seed: 1, sides: ['e'], step: 0.32 }), backRock, false);
 
@@ -312,7 +325,7 @@ export function buildScene(world, opts = {}) {
     conduit(M, [[4.5, -3.4, Z_BACK + 0.05], [3.3, -4.3, Z_BACK - 0.2], [2.25, -4.5, -5.2]]),
   ];
   for (const c of conduits) scene.add(c);
-  wallCut.push(conduits[1]); // it runs into that stretch of wall
+  wallExtras.push(conduits[1]); // it runs into that stretch of wall
 
   // Supports, table and test spheres.
   const standById = new Map();
@@ -393,7 +406,7 @@ export function buildScene(world, opts = {}) {
       const dx = x - m.position.x;
       const z = b.z ? b.z : b.heldBy?.type === 'shelf' ? -0.62 : b.heldBy?.type === 'hand' ? 0.08 : LANE_Z[b.lane];
       m.position.set(x, y, z);
-      m.visible = z > -4 || barrio.town.visible; // behind the wall: only with the neighbourhood
+      m.visible = z > -4 || (barrio.town.visible && !frontView); // behind the wall: only with the neighbourhood, seen from beyond the arch
       if (b.support) m.rotation.z -= dx / b.r;
     }
     world.stands.forEach((st, i) => { const b = st.body; v3.set(b.px + (b.x - b.px) * alpha, b.py + (b.y - b.py) * alpha + b.r * 0.9, b.z || LANE_Z[1]); stands[i].update(dt, { ...st, sagSign: 1 }, v3); });
@@ -405,8 +418,9 @@ export function buildScene(world, opts = {}) {
       g.userData.ring.position.y = y; g.userData.pointer.position.y = y;
     }
     traces.sync(world.traces, id => { const b = world.bodies.find(x => x.id === id); return (b?.z || LANE_Z[b?.lane ?? 0]) + 0.22; });
+    for (const it of traces.items.values()) if (it.z < -4) it.group.visible = !frontView; // behind the wall: seen from beyond the arch
     if ((time * 30 | 0) % 2 === 0) { const av = world.avatar; veg.update(time, { x: av.x, y: av.y - av.hh }); }
-    barrio.update(dt, time);
+    barrio.update(dt, time); updateCut(dt);
   }
 
   function onEvent(e) {
@@ -440,5 +454,5 @@ export function buildScene(world, opts = {}) {
     ring.position.copy(m.position); ring.position.z += 0.05;
     const k = 1 + 0.06 * Math.sin(time * 5); ring.scale.set(k, k, k); ring.material.opacity = 0.55 + 0.3 * Math.sin(time * 5);
   }
-  return { scene, sun, hemi, update: (dt, time, alpha) => { update(dt, time, alpha); updateRing(time); }, onEvent, highlight, setCityVisible: v => { city.visible = v; }, setWallCut, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts, veg };
+  return { scene, sun, hemi, update: (dt, time, alpha) => { update(dt, time, alpha); updateRing(time); }, onEvent, highlight, setCityVisible: v => { city.visible = v; }, setWallCut, setFront: (v, cam) => { frontView = v; barrio.setFront(v, cam); }, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts, veg };
 }

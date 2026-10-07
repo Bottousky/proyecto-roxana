@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-07 · iteración 14 (el soporte de la plaza y la cámara que corta el muro; B2 parcial; ver `evidence/iter-14`).
+**Actualizado:** 2026-10-07 · iteración 15 (el barrio visto desde el 2.5D y la metrópolis habitada; **B2 cerrado**; ver `evidence/iter-15`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,23 @@
 
 ## Hito actual: B (primer episodio), en curso. El A espera la evaluación humana (`EVALUACION-HITO-A.md`)
 
-**Último cambio aceptado (iteración 14, Hito B · B2 parcial):** el barrio tiene un experimento cotidiano (D19).
+**Último cambio aceptado (iteración 15, Hito B · B2 cerrado):** la transición ya no salta y la plaza se lee como un barrio de la ciudad (D20).
+- **Desde el lado 2.5D,** el barrio se ve sólo por el arco (un portal de stencil en la boca del pasaje). Sobre el muro, una silueta en la bruma aparece con un fundido después del Mirador.
+- **La plaza:**
+  - puertas;
+  - una galería en el eje;
+  - una calle hacia el norte, cerrada por una reja, con la torre del reloj al fondo;
+  - dos vecinos que miran al explorador.
+- **El corte del muro** se disuelve en ~0,2 s.
+- **Corregido en la revisión:** el piso del pasaje desde el 2.5D, la ciudad vista al recargar y el fundido completo.
+- **Evidencia:**
+  - 72 pruebas, la secuencia con teclas y el recorrido completo (22 pasos, 0 errores);
+  - las llamadas de dibujo, medidas;
+  - una revisión independiente en dos pasadas: «B2 se puede cerrar con honestidad».
+
+  Ver `evidence/iter-15`.
+
+**Iteración 14 (Hito B · B2 parcial):** el barrio tiene un experimento cotidiano (D19).
 - **El soporte C,** igual al de la Orilla, está en la plaza. Su esfera cae a 9,8 m/s² y la Bitácora lo anota: «La misma caída, detrás del muro». La nota sólo dice lo medido y compara con la Orilla cuando las dos caídas están medidas.
 - **La fuente:** su chorro sale a la velocidad vertical de la surgencia de la sima y sube sólo 0,44 m. Es el contraste con el agua que sube.
 - **La cámara de la plaza** sigue al explorador; si el muro se interpone, se corta. El cuerpo ya no puede quedar dentro del muro.
@@ -186,21 +202,23 @@
 
 El loop no se detiene: según el contrato, al cerrar un hito se sigue con el próximo, y esas validaciones quedan pedidas.
 
-**Próximo resultado: cerrar B2. El barrio se lee como la metrópolis habitada.**
-- **Escala y arquitectura:**
-  - puertas en las plantas bajas;
-  - un soportal en la fachada del fondo, en el eje del pasaje;
-  - una calle o un hueco con la ciudad, o una torre, más allá.
-- **Habitantes:** uno o dos, quietos o en reposo, que usen la plaza: la fuente, un banco.
-- **Lo que asoma sobre el muro:** una silueta propia y barata (la cúpula en el eje del arco, techos en la bruma), visible desde el Mirador.
-  - En la vista 2.5D, la silueta reemplaza al barrio entero. Hoy, al abrir el arco, el barrio aparece de golpe sobre el muro y queda asomando, con su costo de dibujo.
-  - El barrio entero, cuando la cámara pasa el arco.
-- **El corte del muro, suave:** un fundido o un tramo menos abrupto.
-- **La evidencia de la comparación entre A y C** en la Bitácora, capturada con teclas.
+**Próximo resultado: el primer problema de «Introducción» en la ciudad (B3, con el primer tramo de B5).** La calle del norte se abre a una parada de transporte. Ahí, dos observadores describen de manera distinta el mismo movimiento: uno en el andén y otro en el vehículo. El jugador coloca referencias y comprueba qué cambia y qué no (contrato, familia «Introducción»).
+- **Diseño primero:**
+  - una página en DECISIONES con el problema, las mediciones posibles y qué cuenta como entender (no un texto que lo explique);
+  - cómo se conecta con la plaza y con el recorrido 2.5D.
+- **Mínimo jugable:**
+  - abrir la reja;
+  - un tramo de calle caminable;
+  - un vehículo con movimiento uniforme y marcas cada 0,1 s;
+  - una referencia que se coloca;
+  - la Bitácora con lo medido desde los dos puntos de vista.
+- **Deuda que entra:** el costo de dibujo del barrio (unir su geometría estática por material) antes de sumar calle.
 - **Criterio:**
-  - una revisión independiente que lea la plaza como parte de una metrópolis habitada, no como un decorado vacío;
-  - el costo de dibujo en la Terraza, medido antes y después;
-  - 2.5D y la transición sin regresiones.
+  - con teclado, el jugador mide el mismo desplazamiento desde dos referencias y la Bitácora muestra la diferencia;
+  - pruebas de la cinemática (posición relativa, desplazamiento, determinismo);
+  - una revisión independiente que lo lea como problema, no como texto.
+
+*Plan cumplido en las iteraciones 13 a 15:* B2, la transición 2.5D → 3D, cerrada.
 
 *Plan cumplido en la iteración 14:* el experimento cotidiano en la plaza, el contraste de la fuente y la cámara de la plaza.
 

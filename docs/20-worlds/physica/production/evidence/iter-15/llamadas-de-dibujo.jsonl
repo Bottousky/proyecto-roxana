@@ -1,0 +1,9 @@
+{"open":false,"at":"orilla","calls":281,"tris":489106,"p99":16.8,"max":16.8,"n":180}
+{"open":false,"at":"terraza","calls":662,"tris":747426,"p99":16.8,"max":16.8,"n":180}
+{"open":false,"at":"mirador","calls":511,"tris":629152,"p99":16.8,"max":16.8,"n":180}
+{"open":true,"at":"orilla","calls":281,"tris":489106,"p99":16.8,"max":16.8,"n":180}
+{"open":true,"at":"terraza","calls":930,"tris":762104,"p99":16.8,"max":16.8,"n":180}
+{"open":true,"at":"mirador","calls":796,"tris":646154,"p99":16.8,"max":16.8,"n":180}
+{"open":true,"at":"plaza","calls":634,"tris":416802,"p99":16.8,"max":16.8,"n":180}
+{"open":true,"at":"mirador (cámara normal, 9 s después)","calls":796,"tris":646154,"p99":16.8,"cam":{"x":13.1,"y":4.5,"z":14.3}}
+{"open":true,"at":"terraza","calls":930,"tris":762104,"p99":16.8,"cam":{"x":3.6,"y":5.7,"z":16}}

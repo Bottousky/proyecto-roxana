@@ -202,3 +202,13 @@ test('from the arch\'s threshold the path\'s supports are not offered (their cla
   }
   assert.equal(p.clampY, y0);
 });
+
+test('the square\'s neighbours are solid, like the lamps: the explorer walks around them, not through', async () => {
+  const { VECINOS } = await import('../src/sim/levels/cascada.js');
+  const w = atOpenArch(), a = w.avatar, p = VECINOS.parado;
+  a.x = a.px = p.x; a.z = a.pz = p.z + 1.5; run(w, 0.2, { x: 0, y: 0 });
+  run(w, 2, { x: 0, y: 1 }); // ▲ straight at him
+  assert.ok(a.z > p.z + 0.24, `stopped in front of the standing neighbour (z ${a.z.toFixed(2)})`);
+  const s = w.depthBlockers.find(b => b.id === 'vecina').circle, f = w.depthBlockers.find(b => b.id === 'fuente').circle;
+  assert.ok(Math.hypot(s.x - f.x, s.z - f.z) > f.r - 0.1, 'the sitting one is on the rim, by the basin\'s edge');
+});

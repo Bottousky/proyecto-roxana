@@ -360,3 +360,57 @@ El contrato (§7) pide movimiento reducido, texto legible y controles enseñados
 **De paso:**
 - El piso del pasaje tenía alto negativo: su cara miraba hacia abajo y nunca se dibujó, y se veía la roca de debajo. Ahora se ve empedrado.
 - En la ruta de evidencia, `walkTo` corrige con toques cortos cuando una pausa de la página hace que el explorador se pase del objetivo, y lo registra (`walkToOvershoots`).
+
+## D20 · El barrio visto desde el 2.5D, la metrópolis habitada y el corte que se disuelve (iteración 15, Hito B · B2)
+
+**El pedido (revisión de la iteración 14):**
+- lo que asoma sobre el muro, diseñado: al apretar E el barrio aparecía de golpe sobre el muro y quedaba asomando, con su costo de dibujo;
+- que la plaza se lea como parte de una metrópolis habitada;
+- un corte del muro que no salte de un cuadro a otro.
+
+**Desde el lado 2.5D, el barrio se ve sólo por el pasaje.**
+- **El portal:** un cuadro invisible en la boca del pasaje (z −9) marca el stencil.
+  - Mientras la cámara está delante del plano del arco y no hay corte, los materiales del barrio se dibujan sólo donde está esa marca.
+  - Los materiales que el barrio comparte con la escena 2.5D se clonan para él, así el resto no se ve afectado. Los de shader se clonan compartiendo sus uniformes.
+  - **El piso del pasaje no es del barrio.** Dentro del barrio, el portal lo ocultaba desde el lado 2.5D y se veía la roca de abajo; ahora es de la escena y se muestra con el arco abierto.
+  - Cambiar el stencil no recompila nada: se lee en cada dibujo.
+- **El costo:** desde el frente, el barrio ni se dibuja si ninguna línea de la cámara a través del arco puede llegar a la boca.
+  - La prueba tiene en cuenta el ancho y la altura del vano, con 5 cm de margen.
+  - Desde la Orilla, con el arco abierto: 281 llamadas de dibujo, igual que cerrado.
+  - En la Terraza, el barrio se dibuja; el portal recorta píxeles, no llamadas (930 contra 662 con el arco cerrado). Unir su geometría estática por material queda para B5.
+- **Sobre el muro, una silueta propia:**
+  - **Qué es:** las mismas huellas de los edificios, la cúpula y la aguja de la torre, en una sola malla con color por vértice, sin luz (1 llamada de dibujo).
+  - **Cómo se ve:** la crema y la terracota del barrio en tonos medios polvorientos de la bruma, con el sombreado del sol horneado por cara (techos más claros, el lado opuesto al sol más oscuro). Se lee como volumen lejano y no como recorte.
+    - Una paleta más clara quedó blanca después del tone mapping (`intermedio-silueta-blanca`).
+  - **Cuándo:** aparece con un fundido de 2,5 s cuando se ve la ciudad desde el Mirador. Sólo se dibuja fuera del portal.
+  - **Descartado:** unos bloques lejanos planos se leían como cartón sobre el cañón pintado (`intermedio-silueta-de-carton`).
+
+**La metrópolis habitada.**
+- **Una calle sale hacia el norte**, entre el bloque del observatorio y la esquina noreste.
+  - Tiene fachadas a los dos lados, más altas cuanto más lejos.
+  - Una reja de hierro la cierra en el borde de la plaza: ahí termina el área caminable, y ahí empieza B5.
+  - **Una torre del reloj** (11 m, el reloj en marcha) cierra su fondo: la ciudad sigue más allá de la plaza y es más alta.
+  - **Por qué una calle y no volúmenes altos detrás de las filas:** desde la plaza, el borde superior del cuadro queda casi a la altura de la cornisa de la fila norte, así que esos volúmenes no se verían. La calle es la vista de la ciudad.
+- **La fila norte** sube un piso.
+- **Puertas** en todas las plantas bajas que dan a la plaza. Están unidas por material: 4 llamadas de dibujo, no 48.
+- **Un soportal de tres arcos** en el frente del observatorio, en el eje del pasaje: una galería de 0,8 m bajo una losa, con columnas sólidas en el nivel (una sola malla). En relieve se leía como tres puertas negras.
+- **Faroles** entre las puertas, no delante.
+- **Dos vecinos:**
+  - una lee sentada en el borde de la fuente, al sudoeste, mirando hacia el soporte C: no tapa el chorro visto desde el pasaje;
+  - otro está de pie junto a una puerta del este y mira la plaza.
+
+  - Los dos son sólidos, como los faroles.
+  - Miran al explorador cuando se acerca a menos de 4 m. Si no, el de pie mira la plaza y la sentada, su libro.
+  - Son figuras simples y originales, con cuello y manos.
+
+**El corte del muro se disuelve.**
+- La roca de ese tramo tiene una variante con disolvido por tramado: descarta fragmentos según un ruido de pantalla. Sigue siendo opaca, así no hay que ordenarla contra las plantas transparentes. Lleva su propia clave de programa.
+  - Los bloques la usan sólo mientras dura el corte: el descarte anularía la prueba de profundidad temprana en cada cuadro 2.5D.
+  - Su programa se compila al arrancar, con el resto, porque el techo del pasaje es de esa roca.
+- El techo del pasaje se disuelve con el muro, las lámparas se desvanecen y sus luces bajan con el corte.
+- **Duración:** el corte entra en unos 0,22 s.
+  - Empieza cuando la cámara se acerca a 0,65 m de las paredes del pasaje, con histéresis.
+  - Si la cámara ya está dentro de la roca, es inmediato.
+- Sale con el mismo fundido.
+
+**De paso:** al cargar una partida, la ciudad vista se restaura de la Bitácora (`citySeen`). Antes, después de recargar no había silueta y el arco no se podía abrir sin volver al Mirador.

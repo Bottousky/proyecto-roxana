@@ -22,6 +22,16 @@ export const FUENTE = { x: (ARCH.x0 + ARCH.x1) / 2, z: -15.2 };
 // The square's release support: west of the fountain, between its planters (seen on coming out of
 // the passage, and with room behind it for the camera).
 export const SOPORTE_C = { x: 3.0, z: -15.2 };
+// The square's lamps (the north ones between the doors, not in front of them) and the columns of the
+// observatory's arcade, 0.8 m in front of its façade.
+export const FAROLES = [[BARRIO.x0 + 0.6, -10], [BARRIO.x1 - 0.6, -10], [3.9, BARRIO.z0 + 0.6], [12.15, BARRIO.z0 + 0.6]];
+export const SOPORTAL = { xs: [6.42, 7.47, 8.53, 9.58], z: BARRIO.z0 + 0.8 };
+// A street leaves the square northwards, east of the observatory, closed for now by an iron gate at
+// the square's edge (the walkable area ends there); a clock tower closes its far end.
+export const CALLE = { x0: 9.75, x1: 12.35, z1: BARRIO.z0, z0: BARRIO.z0 - 15 };
+// Two neighbours: one sits on the fountain's rim facing the passage, one stands at an east door.
+// (the sitting one on the south-west of the rim, facing out: off the jet seen from the passage)
+export const VECINOS = { sentada: { x: FUENTE.x - 1.15, z: FUENTE.z + 1.15, facing: -Math.PI / 4 }, parado: { x: BARRIO.x1 - 0.6, z: -17.6 } };
 export const BELL_LINE = 4.5;
 // El Pozo (transfer): a shaft in the Terraza with its own region, from y = 1.0 up to the
 // Terraza's level. Same rule, two limits: let go too high and the Mirador is out of reach;
@@ -59,8 +69,11 @@ export const CASCADA = {
     { id: 'palanca', x0: ARCH.x0 - 0.57, x1: ARCH.x0 - 0.33, z0: -3.6, z1: -0.27, top: TERRACE_Y + 1.05 },
     { id: 'fuente', circle: { x: FUENTE.x, z: FUENTE.z, r: 1.62 }, top: TERRACE_Y + 0.5 },
     { id: 'soporte-c', circle: { x: SOPORTE_C.x, z: SOPORTE_C.z - 0.35, r: 0.12 }, top: TERRACE_Y + 2.5 },
-    ...[[BARRIO.x0 + 0.6, -10], [BARRIO.x1 - 0.6, -10], [BARRIO.x0 + 0.6, BARRIO.z0 + 0.6], [BARRIO.x1 - 0.6, BARRIO.z0 + 0.6]]
-      .map(([x, z], i) => ({ id: `farol-${i}`, circle: { x, z, r: 0.1 }, top: TERRACE_Y + 2.6 })),
+    // the neighbours (the sitting one's legs reach out from the rim)
+    { id: 'vecina', circle: { x: VECINOS.sentada.x - 0.23, z: VECINOS.sentada.z + 0.23, r: 0.24 }, top: TERRACE_Y + 1.6 },
+    { id: 'vecino', circle: { x: VECINOS.parado.x, z: VECINOS.parado.z, r: 0.24 }, top: TERRACE_Y + 1.8 },
+    ...FAROLES.map(([x, z], i) => ({ id: `farol-${i}`, circle: { x, z, r: 0.1 }, top: TERRACE_Y + 2.6 })),
+    ...SOPORTAL.xs.map((x, i) => ({ id: `columna-${i}`, circle: { x, z: SOPORTAL.z, r: 0.14 }, top: TERRACE_Y + 2.9 })),
   ],
   depthAreas: [
     { id: 'umbral', x0: ARCH.x0 - 0.6, x1: ARCH.x1 + 0.6, z0: -3.9, z1: 0.3 },

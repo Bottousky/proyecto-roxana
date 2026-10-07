@@ -29,7 +29,7 @@ const shot = async (label) => {
 const simWait = async dt => { const t0 = (await st()).t; while ((await st()).t < t0 + dt) await wait(10); };
 const hold = async (key, secs, every, label) => { await page.keyboard.down(key); for (let k = 0; k * every < secs; k++) { await simWait(every); await shot(`${label} ${((k + 1) * every).toFixed(1)} s`); } await page.keyboard.up(key); };
 // setup: the city seen from the Mirador; then on the Terraza, west of the arch
-await put(14, 5.15); await wait(800);
+await put(14, 5.15); await wait(3200); // (the silhouette over the wall fades in over 2.5 s)
 await put(5.4, 4.4); await wait(1500);
 await shot('Terraza: el arco tapiado');
 await page.keyboard.down('ArrowRight'); while ((await st()).x < 6.25) await wait(10); await page.keyboard.up('ArrowRight'); await wait(500);
