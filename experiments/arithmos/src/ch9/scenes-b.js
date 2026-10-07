@@ -313,6 +313,8 @@ function writeJournal9(g) {
   const seen = [];
   const ip = first('inverse-predict');
   if (ip) seen.push(ip.answer === 'both' ? 'Con la sombra 2 dijiste «las 10 o las 14»: la hora no depende sólo de la sombra.' : 'Con la sombra 2 elegiste una sola hora; dando vuelta las flechas, del 2 salían dos: las 10 y las 14.');
+  const rt = ev.filter(e => e.kind === 'rule-try');
+  if (rt.length) seen.push(rt.length === 1 ? `Armaste la regla de Mara a la primera: ${rt[0].rule}.` : `Probaste ${rt.length} reglas (${rt.map(e => e.rule).join(', ')}); las que no eran fallaban en algún renglón anotado.`);
   const rp = first('rule-predict');
   if (rp) seen.push(rp.answer === '21' ? 'Anticipaste que con 10 la máquina daba 21: el doble más uno.' : 'Con pocos casos pensaste otra regla; el 10 dio 21: el doble más uno.');
   const jp = first('join-predict');

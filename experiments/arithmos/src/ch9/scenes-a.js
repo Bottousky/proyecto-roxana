@@ -152,7 +152,40 @@ export const maquina = {
       };
       refresh();
     }));
+    // el jugador arma la regla con dos piezas; la máquina la prueba contra lo anotado
+    const FIRST = [{id: 'x2', text: '× 2: el doble', f: x => 2 * x, t: '× 2'}, {id: 'x3', text: '× 3: el triple', f: x => 3 * x, t: '× 3'}, {id: 'p3', text: '+ 3: le suma tres', f: x => x + 3, t: '+ 3'}];
+    const THEN = [{id: 'p1', text: '+ 1', f: y => y + 1, t: ' + 1'}, {id: 'p2', text: '+ 2', f: y => y + 2, t: ' + 2'}, {id: 'm1', text: '− 1', f: y => y - 1, t: ' − 1'}, {id: 'none', text: 'Nada más.', f: y => y, t: ''}];
+    let tries = 0;
+    for (;;) {
+      const fa = await d.choose(FIRST.map(o => ({id: o.id, text: o.text})), {prompt: 'Armá la regla. Primero, ¿qué hace la máquina con el número?'});
+      const fb = await d.choose(THEN.map(o => ({id: o.id, text: o.text})), {prompt: 'Y después, ¿qué le hace?'});
+      const A1 = FIRST.find(o => o.id === fa), B1 = THEN.find(o => o.id === fb);
+      const mine = x => B1.f(A1.f(x));
+      tries++;
+      w.get('c9-ml').text = A1.t + B1.t;
+      w.get('c9-ml').size = 28;
+      // se prueba renglón por renglón: lo que da la regla, al lado de lo que salió
+      const bad = [];
+      w.ensure('c9-kh', () => new Label('c9-kh', 'tu regla', A.x0 + 100, A.y0 + 8, {size: 13, z: 12, ch: BLUE}));
+      for (const [i, [x, y]] of seen.entries()) {
+        const r = mine(x);
+        const ok = r === y;
+        if (!ok) bad.push([x, y, r]);
+        w.remove(`c9-k${i}`);
+        const k = w.add(new Label(`c9-k${i}`, `da ${r}`, A.x0 + 100, A.y0 + 30 + i * 32, {size: 18, z: 12, ch: ok ? YELLOW : BLUE, reveal: 0}));
+        await d.draw(k, 0.3, {key: 'reveal', sound: false});
+        g.audio.tap(0.12, ok ? 1.3 : 0.8);
+      }
+      d.describe(`La regla ${A1.t + B1.t} probada con lo anotado: ${seen.map(([x, y]) => `con ${x} da ${mine(x)} y salió ${y}`).join('; ')}.`);
+      d.evidence('rule-try', {rule: A1.t + B1.t, ok: !bad.length, tries});
+      if (!bad.length) break;
+      const [x, y, r] = bad[0];
+      await d.think(`Con ${x}, tu regla da ${r}, pero salió ${y}. Esa no es.`);
+      w.get('c9-ml').text = '?';
+      w.get('c9-ml').size = 40;
+    }
     const left = rulesMatching(seen);
+    await d.think(tries === 1 ? 'Coincide con todo lo anotado.' : 'Ahora coincide con todo lo anotado.');
     const c = await d.choose([
       {id: '21', text: '21.'},
       {id: '20', text: '20: el doble.'},
@@ -161,9 +194,7 @@ export const maquina = {
     d.evidence('rule-predict', {answer: c, matching: left});
     await feed(10);
     await d.think('Veintiuno: el doble más uno. Coincide, pero coincidir no prueba la regla: otra regla rara podría dar lo mismo con estos números y otra cosa con el 5.');
-    await d.say('Mara', 'La hice yo: es el doble más uno. Ustedes la adivinaron bien, y el 10 no la desmintió.');
-    w.get('c9-ml').text = '× 2 + 1';
-    w.get('c9-ml').size = 28;
+    await d.say('Mara', 'La hice yo: es el doble más uno. La armaste bien, y el 10 no la desmintió.');
     await d.say('student', 'Mara, tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo.');
     // la máquina de Punto
     await d.say('Mara', 'Punto también hizo una.');
