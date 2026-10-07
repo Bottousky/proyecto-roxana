@@ -97,7 +97,7 @@
 @keyframes wb-loose{50%{box-shadow:0 2px 5px #0009,0 0 0 8px #e0c27f55,0 0 22px #e0c27f88}}
 
 /* Placas: nombre, estado y mando de cada pieza, sobre la pieza. */
-.wb-plate{position:absolute;z-index:4;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;gap:.4cqw .6cqw;padding:.3cqw .75cqw;border-radius:8px;background:#12201ae0;border:1px solid #b39a6650;box-shadow:0 2px 8px #0006;pointer-events:none}
+.wb-plate{position:absolute;z-index:4;transform:translate(calc(-50% + var(--nudge,0px)),-50%);display:flex;align-items:center;justify-content:center;gap:.4cqw .6cqw;padding:.3cqw .75cqw;border-radius:8px;background:#12201ae0;border:1px solid #b39a6650;box-shadow:0 2px 8px #0006;pointer-events:none}
 .wb-plate>*{pointer-events:auto}
 .wb-plate-name{font:clamp(10px,1.4cqw,15px)/1.2 Georgia,serif;color:#f1e4c2;white-space:nowrap}
 .wb-plate.is-goal{border-color:#e0c27f99;box-shadow:0 2px 8px #0006,0 0 0 1px #e0c27f33}

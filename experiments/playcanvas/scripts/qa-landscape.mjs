@@ -1,5 +1,5 @@
 // Capturas con el teléfono apaisado (la forma recomendada de jugar en el teléfono): título,
-// diálogo, mundo, mapa de la zona y del reino, Bitácora y cuatro bancos. Táctil emulado; sólo
+// diálogo, mundo, mapa (donde está el jugador y el reino entero), Bitácora y cinco bancos. Táctil emulado; sólo
 // mira, no juega. Uso: GAME_URL=… SIZE=844x390 OUT=carpeta node scripts/qa-landscape.mjs
 import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
@@ -19,10 +19,14 @@ await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { tim
 await page.waitForTimeout(2500); await shot('02-dialogo');
 for (let i = 0; i < 80 && await page.evaluate(() => window.__ohmdal.mode === 'dialogue'); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(150); }
 await page.waitForTimeout(1200); await shot('03-mundo');
-await page.keyboard.press('m'); await page.waitForTimeout(800); await shot('04-mapa');
-await page.locator('[data-map-view="kingdom"]').tap(); await page.waitForTimeout(500); await shot('05-mapa-reino'); await page.keyboard.press('Escape');
+await page.keyboard.press('m');
+await page.waitForFunction(() => document.querySelector('.kmap-base')?.complete && document.querySelector('.kmap-base').naturalWidth > 0, {}, { timeout: 30000 });
+await page.waitForTimeout(800); await shot('04-mapa');
+// The kingdom whole: zoom out with the map's own buttons, as a finger would.
+for (let i = 0; i < 3; i++) { await page.locator('[data-kmap-zoom="-1"]').tap(); await page.waitForTimeout(300); }
+await page.waitForTimeout(500); await shot('05-mapa-reino'); await page.keyboard.press('Escape');
 await page.waitForTimeout(400); await page.keyboard.press('j'); await page.waitForTimeout(800); await shot('06-bitacora'); await page.keyboard.press('Escape');
-for (const id of ['awaken', 'gate', 'irrigation', 'distribution']) {
+for (const id of ['awaken', 'gate', 'irrigation', 'distribution', 'beacon_lens']) {
   await page.evaluate(id => { document.querySelector('#workbench').classList.remove('hidden'); window.__ohmdal.workbench.open(id, undefined); }, id);
   await page.waitForTimeout(500); await shot(`07-banco-${id}`);
   await page.evaluate(() => { window.__ohmdal.workbench.close(false); document.querySelector('#workbench').classList.add('hidden'); });

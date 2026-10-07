@@ -1,6 +1,38 @@
 # Aceptación del Arco I
 
-## Candidata vigente: `80ae42c` (6 oct 2026) · bancos rediseñados y teléfono apaisado
+## Candidata vigente: `6a71019` (6 oct 2026) · mapa de juego, Monte Quieto y roca en capas
+
+Reemplaza a `80ae42c` (sección siguiente). Suma el mapa nuevo (ciclo 17, [MAPA.md](MAPA.md)), el
+Monte Quieto con la Casa de Compuertas (ciclo 18, [MONTE-QUIETO.md](MONTE-QUIETO.md)) y la roca en
+capas y las herramientas del taller (ciclo 19). Mismo método: `dist/` entregable y `dist-perf/` con
+inspección de sólo lectura, servidos con `vite preview`. Cada paso esperó hasta 15 minutos a que
+bajara la carga y no hubiera partidas de otras sesiones.
+
+| Comprobación | Resultado | Evidencia |
+|---|---|---|
+| Pasada 1 · recorrido completo con escenas cuadro a cuadro | Completa, 0 errores (411 s): 9 lugares, 9 bancos, 9 recuerdos, final con el plano del Monte Quieto, epílogo y recarga | `output/acceptance-6a71019/1-recorrido/` |
+| Pasada 2 · adversarial (con viaje por el mapa) | Completa, 0 errores (722 s); 16 habitantes respondieron | `output/acceptance-6a71019/2-adversarial/` |
+| Táctil, teléfono vertical 390×844 | Completa, 0 errores | `output/acceptance-6a71019/3-tactil-390x844/` |
+| Táctil, teléfono apaisado 844×390 | Completa, 0 errores | `output/acceptance-6a71019/3-tactil-844x390/` |
+| Diálogos | Correcta | — |
+| Prueba de humo de la build entregable `dist/` | Correcta | — |
+| Bancos (`qa-bench-load.mjs`) | Lo principal a la vista en 9/9 a 1440×900, 1280×720, 844×390 y 390×844. Sin desplazamiento en escritorio. Hallazgo: a 844×390, en la lente del Faro, la placa «Brazo inferior» tapaba la posición del freno (corregido después, ver abajo) | `output/acceptance-6a71019/bancos/` |
+| Bancos jugados con el mouse (`qa-bench-flow.mjs`) | Correcto | `output/acceptance-6a71019/flujo/` |
+| Capturas apaisadas (`qa-landscape.mjs`) | La primera corrida falló porque el guion buscaba el botón «reino» del mapa anterior, que ya no existe. Con el guion corregido, sobre la misma build: sin errores de página; mapa, reino entero, Bitácora y cinco bancos | `output/acceptance-6a71019/apaisado/` |
+| Pruebas automáticas | Raíz 303/303, PlayCanvas 83/83, `npm run check` correcto | — |
+| Rendimiento | No repetido sobre esta candidata: el equipo estuvo ocupado por otras sesiones (carga de hasta 42). La última medición tranquila es la de `720b3f0` (sección siguiente). Desde entonces el mundo suma el Monte Quieto, un relieve y su flora; el mapa sólo pesa al abrirlo. **NO VERIFICADO** para esta candidata | — |
+
+**NO VERIFICADO:** teléfono real (tacto y rendimiento), escucha del audio, prueba con personas y
+rendimiento de esta candidata.
+
+**Después de la aceptación:**
+- Las placas del banco que se tocan se corren de costado (`src/puzzles.js`, `separatePlates`).
+  Verificado sobre el código vivo: `qa-bench-load.mjs` da 9/9 y 0 placas encimadas a 1440×900,
+  1280×720, 844×390 y 390×844; `qa-bench-flow.mjs` correcto; táctil apaisada completa, sin
+  errores; `qa-landscape.mjs` sin errores de página. Pruebas: raíz 303/303, PlayCanvas 83/83.
+- `qa-landscape.mjs` usa los botones de zoom del mapa nuevo y captura también la lente del Faro.
+
+## Candidata anterior: `80ae42c` (6 oct 2026) · bancos rediseñados y teléfono apaisado
 
 Reemplaza a `3422928` (sección siguiente), que había fallado la prueba táctil. Incluye el rediseño
 de los bancos (ciclo 15, [BANCOS-UX.md](BANCOS-UX.md)) y el teléfono apaisado (ciclo 16). Mismo

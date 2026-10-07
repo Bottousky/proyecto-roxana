@@ -154,6 +154,10 @@ export class PuzzleWorkbench {
     this.shell.setAttribute('aria-modal', 'true');
     this.shell.setAttribute('aria-label', this.puzzle.title);
     this.container.appendChild(this.shell);
+    // Turning the phone resizes the board: the plates make room again.
+    this.resizeWatch?.disconnect();
+    this.resizeWatch = typeof ResizeObserver === 'function' ? new ResizeObserver(() => this.separatePlates()) : null;
+    this.resizeWatch?.observe(this.shell);
     this.shell.addEventListener('click', this.handleClick);
     this.shell.addEventListener('input', this.handleInput);
     this.shell.addEventListener('change', this.handleSliderCommit);
@@ -189,6 +193,7 @@ export class PuzzleWorkbench {
     }
     this.active = false;
     clearInterval(this.nudgeTimer);
+    this.resizeWatch?.disconnect(); this.resizeWatch = null;
     document.removeEventListener('keydown', this.handleKey, true);
     this.shell.remove();
     this.shell = null;
@@ -859,6 +864,35 @@ export class PuzzleWorkbench {
     // A fresh success takes the focus, so Enter carries the story on.
     if (success && !this.successDismissed && !this.successAnnounced) { this.successAnnounced = true; this.shell.querySelector('.wb-success [data-action="commission"]')?.focus?.({ preventScroll: true }); }
     if (!success) this.successAnnounced = false;
+    this.separatePlates();
+  }
+
+  // Plates sit over their pieces in board percentages, so on a small board (a landscape phone)
+  // two of them can touch. The one without a control steps aside, sideways, just enough, and
+  // never past the board's edge.
+  separatePlates() {
+    const board = this.shell?.querySelector?.('.wb-board');
+    if (!board?.getBoundingClientRect) return;
+    const plates = [...board.querySelectorAll('.wb-plate:not(.wb-line-plate)')];
+    for (const plate of plates) plate.style.removeProperty('--nudge');
+    const edge = board.getBoundingClientRect(), gap = 6;
+    for (let pass = 0; pass < 3; pass++) {
+      let moved = false;
+      for (let i = 0; i < plates.length; i++) for (let j = i + 1; j < plates.length; j++) {
+        const a = plates[i].getBoundingClientRect(), b = plates[j].getBoundingClientRect();
+        if (!a.width || !b.width) continue;
+        const across = Math.min(a.right, b.right) - Math.max(a.left, b.left), down = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        if (across <= 0 || down <= 0) continue;
+        const [mover, box, other] = plates[i].classList.contains('has-control') ? [plates[j], b, a] : [plates[i], a, b];
+        const right = box.left + box.width / 2 >= other.left + other.width / 2;
+        const room = right ? edge.right - gap - box.right : box.left - (edge.left + gap);
+        const shift = Math.min(across + gap, Math.max(0, room)) * (right ? 1 : -1);
+        if (!shift) continue;
+        mover.style.setProperty('--nudge', `${(parseFloat(mover.style.getPropertyValue('--nudge')) || 0) + shift}px`);
+        moved = true;
+      }
+      if (!moved) break;
+    }
   }
 
   wireSvg(w, i, sealed) {

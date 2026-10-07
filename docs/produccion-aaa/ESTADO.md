@@ -457,6 +457,21 @@ A pedido del usuario, al oeste del Manantial ahora hay una montaña con una cent
 Responde a lo que se hizo en el reino y deja el umbral del Arco II. El detalle está en
 [MONTE-QUIETO.md](MONTE-QUIETO.md). El mapa suma sombreado de relieve y el nombre del monte.
 
+## Ciclo 19 · Roca en capas, el oficio de Lumen y aceptación del mapa y el monte (6 oct 2026)
+
+- **Roca.** Los frentes altos junto a la represa del Monte Quieto parecían un empedrado gigante.
+  El shader del relieve ahora dibuja estratos: lajas estiradas, un tono por capa, una veta oscura
+  bajo cada labio, musgo y chorreaduras ([MONTE-QUIETO.md](MONTE-QUIETO.md#roca-en-capas-ciclo-19)).
+  Vale para todo el valle. En los lugares jugables casi no se nota, porque sus frentes son bajos.
+- **Desfiladero.** Entre las compuertas y la casa ya no crecen árboles.
+- **Taller de Lumen** (backlog 7). Suma un tablero de herramientas en la pared del fondo y globos
+  de lámpara de vidrio esperando reparación sobre el mostrador. No cambia por dónde se camina.
+- **Aceptación de `6a71019`** ([ACEPTACION.md](ACEPTACION.md)). Todo en verde. Dos hallazgos:
+  - `qa-landscape.mjs` había quedado viejo con el mapa nuevo. Ya está corregido.
+  - A 844×390, en la lente del Faro, una placa tapaba la posición del freno. Ahora, si dos placas
+    se tocan, la que no tiene mando se corre de costado lo justo, sin salirse del tablero. Lo
+    vuelve a acomodar al girar el teléfono.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -497,18 +512,21 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-**Entrega parcial, candidata `80ae42c` (6 oct 2026).** Aceptación completa en verde, que ahora
-incluye el teléfono apaisado ([ACEPTACION.md](ACEPTACION.md)). Siguen pendientes, fuera del alcance
-de este equipo:
+**Entrega parcial, candidata `6a71019` (6 oct 2026).** Aceptación completa en verde, que ahora
+incluye el mapa de juego y el Monte Quieto ([ACEPTACION.md](ACEPTACION.md)). Después de ella, sólo
+el acomodo de placas del banco y el guion de capturas apaisadas, verificados aparte. Siguen
+pendientes, fuera del alcance de este equipo:
 - teléfono real (tacto y 30 FPS);
 - escucha del audio;
-- prueba con personas, en especial de los bancos rediseñados.
+- prueba con personas, en especial de los bancos rediseñados;
+- medir el rendimiento de esta candidata con el equipo tranquilo.
 
 Siguen abiertos y para decidir con el usuario:
 - **Bancos:** pistas que cambien según el error cometido y una pregunta de predicción en los bancos
   clave ([BANCOS-UX.md](BANCOS-UX.md)).
 - **Escenas oscuras:** la llegada al Faro de noche, el Lago al crepúsculo y el taller a oscuras.
   El canon las pide así.
+- **Arco II:** la Casa de Compuertas ya está en el mundo y espera su arco.
 
 Para mirar el juego en el navegador integrado, cerrá la pestaña al terminar: compite por la GPU
 con las partidas automatizadas.

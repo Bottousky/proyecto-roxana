@@ -74,6 +74,12 @@ reducía a una franja ilegible y el mapa quedaba debajo de su encabezado. Ahora:
 
 `scripts/qa-landscape.mjs` captura todas esas pantallas y `qa-touch.mjs` acepta `SIZE=844x390`.
 
+**Placas que no se pisan (ciclo 19).** Las placas se ubican sobre su pieza, en porcentajes del
+tablero. En el tablero chico del teléfono, dos pueden tocarse. En la lente del Faro, «Brazo
+inferior» tapaba la posición del freno. Ahora, si dos placas se tocan, la que no tiene mando se
+corre de costado lo justo, sin salirse del tablero, y se vuelven a acomodar al girar el teléfono.
+`qa-bench-load.mjs` cuenta 0 placas encimadas en los cuatro tamaños.
+
 ## Pendiente o NO VERIFICADO
 
 - **Prueba con personas: NO VERIFICADA.** La investigación recomienda partidas grabadas con
