@@ -432,5 +432,20 @@ Informe: `artifacts/arithmos/it11/review-c8d/informe.md`. Todas las cuentas veri
 | M (10.8 teléfono) | Pizarra y balde ilegibles | El resultado se escribe grande al lado del balde («llena» / «a medias») |
 | B | Dados, total sobre el renglón 2, manija pegada al poste, «Balcón ↑» | Corregidos (descripción de los dados, total más abajo, rueda centrada, rótulo) |
 
+## Revisión matemática de lo agregado al cap. 7 (rev-c7b, 2026-10-07)
+
+Informe: `artifacts/arithmos/it11/review-c7b/informe.md`. Ninguna cuenta falsa; problemas de fundamento, notación y
+distractores.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | 7.8: el exponente un medio se apoyaba en una regla mostrada sólo contando factores | Corregido: se presenta como elección para que la regla siga valiendo («igual que se eligió 2⁰ = 1»), y √2 es el positivo |
+| M | 7.8 sin decisión ni escritura | Corregido: «media duplicación, ¿por cuánto multiplica?» (× √2, × 1,5, × 1, cada una comprobada dos veces); «2 elevado a 1/2 = √2» en la pizarra |
+| M | 7.9: la factorización sólo dicha; distractor de cuenta; 0 ÷ 0 sin razón | Corregidos: (x − 2) · (x + 2) desplegado en la pizarra; distractor «tampoco con x = −2: ahí arriba da cero»; «cualquier número por 0 da 0: no hay un solo resultado» |
+| M | «Abajo/arriba» con dos sentidos (base y divisor) | Corregido en 7.3b y 7.9: «cada 2 de 2² se va con un 2 de 2⁵», «se dividen las bases», «el (x − 2) que multiplica se va con el que divide» |
+| M | Bitácora: «una cifra de 1 a 9 por una potencia de 10» | Corregido: «un número de 1 a menos de 10» |
+| M | El bot no elegía la opción equivocada de 7.2 | Corregido el selector; la ruta con errores ahora prueba «10 · n», «× 1,5» y «x = −2» |
+| B | «Cinco dos repartidos…»; «se restan» en general; Bitácora («escribiste», (x + 1)² = 0 con la huerta) | Corregidos. «× 2 el anterior» de 7.2 se conecta con 2ⁿ al final de 7.3 |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

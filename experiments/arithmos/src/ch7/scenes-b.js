@@ -138,6 +138,7 @@ export const factores = {
     await d.draw(a1, 0.3, {key: 'reveal', sound: false});
     await studentWrites(d, g, 'pw-r-1', `${pw(2, -1)} = 1/2`, A.x0 + 20, rowY(5), {size: 28});
     await d.say('student', 'Punto, el exponente cuenta cuántas veces se multiplica por dos. Para abajo de cero, cuántas veces se divide.');
+    await d.say('student', `Y el renglón n de tu escalera, «× 2 el anterior», ahora se escribe corto: el día n tenés 2 elevado a n. El día 8, ${pw(2, 8)} = 256.`);
     d.evidence('powers', {zero: power(2, 0), minus: power(2, -1)});
     g.flags.c7pow = true;
   },
@@ -261,19 +262,19 @@ export const juntar = {
     d.evidence('pow-sum', {answer: c3});
     await studentWrites(d, g, 'jf-c', `${pw(2, 3)} + ${pw(2, 2)} = 8 + 4 = 12, y ${pw(2, 5)} = 32`, A.x0 + 20, rowY[2], {size: 24});
     await d.think(c3 === 'no' ? 'Doce, no treinta y dos.' : 'Los exponentes se suman cuando se multiplica. Sumando, 8 + 4 = 12: no es 32.');
-    await d.say('student', 'Sumar no junta factores: junta cantidades. Lo de los exponentes vale para multiplicar.');
+    await d.say('student', 'Sumar no junta factores: junta cantidades. Lo de sumar los exponentes vale para multiplicar.');
 
     // 3b. dividir saca factores: los exponentes se restan
-    await d.say('Mara', '¿Y si divido? Cinco dos repartidos en dos dos.');
+    await d.say('Mara', '¿Y si divido? Cinco dos, divididos por dos dos.');
     const cq = await d.choose([
-      {id: '3', text: `${pw(2, 3)}: cada dos de abajo se va con uno de arriba.`},
+      {id: '3', text: `${pw(2, 3)}: cada 2 de ${pw(2, 2)} se va con un 2 de ${pw(2, 5)}.`},
       {id: '7', text: `${pw(2, 7)}: los exponentes se suman.`},
-      {id: '1', text: `${pw(1, 3)}: dos dividido dos es uno.`},
+      {id: '1', text: `${pw(1, 3)}: se dividen las bases, 2 ÷ 2 = 1.`},
     ], {prompt: `¿Cuánto es ${pw(2, 5)} ÷ ${pw(2, 2)}, como una sola potencia?`, evaluate: true});
     d.evidence('pow-quotient', {answer: cq});
     await studentWrites(d, g, 'jf-d', `${pw(2, 5)} ÷ ${pw(2, 2)} = (2·2·2·2·2) ÷ (2·2) = 2·2·2 = ${pw(2, 3)}`, A.x0 + 20, rowY[2] + 58, {size: 21});
-    await d.think(cq === '3' ? 'Tres dos: 8.' : cq === '7' ? 'Sumar los exponentes es para multiplicar. Dividiendo, cada dos de abajo se va con uno de arriba: quedan tres, 8. 2⁷ sería 128.' : 'El 2 de abajo no se divide: se divide la cuenta entera. 32 ÷ 4 = 8, que es 2³; 1³ es 1.');
-    await d.say('student', 'Dividir saca factores: los exponentes se restan, 5 − 2 = 3. Como en la tabla de antes, cada renglón hacia abajo sacaba un dos.');
+    await d.think(cq === '3' ? 'Tres dos: 8.' : cq === '7' ? 'Sumar los exponentes es para multiplicar. Dividiendo, cada 2 de 2² se va con un 2 de 2⁵: quedan tres, 8. 2⁷ sería 128.' : 'La base no se divide: se divide la cuenta entera. 32 ÷ 4 = 8, que es 2³; 1³ es 1.');
+    await d.say('student', 'Dividir saca factores: si el que se divide tiene más factores, los exponentes se restan, 5 − 2 = 3. Como en la tabla de antes, cada renglón hacia abajo sacaba un dos.');
 
     // 4. raíz cúbica: el lado de un cubo
     g.setCinematic(true);
@@ -761,8 +762,17 @@ export const cuantasVeces = {
     await studentWrites(d, g, 'lg-eq', `${pw(2, 9)} = ${t.below} < 1000 < ${t.above} = ${pw(2, 10)}`, A.x0 + 24, A.y0 + 176, {size: 26});
     await d.think(guess === '10' ? 'Diez: duplicar llega lejos enseguida.' : `Diez, no ${guess === '100' ? 'cien' : 'quinientos'}: duplicar llega lejos enseguida.`);
     await d.say('Mara', 'Para pasar mil, diez. ¿Y para llegar justo a mil?');
-    await d.say('student', 'Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero hay pasos más chicos: media duplicación es multiplicar por √2, porque dos medias hacen una, √2 · √2 = 2. Nueve y media: 512 · 1,414, unos 724. Todavía no.');
-    await d.say('student', 'Por eso a √2 también se lo escribe 2 elevado a un medio: media duplicación. Como al juntar factores, se suman los exponentes: un medio y un medio hacen uno, y √2 · √2 = 2. Nueve duplicaciones y media son 2 elevado a 9,5.');
+    await d.say('student', 'Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero puede haber pasos más chicos: media duplicación.');
+    const half = await d.choose([
+      {id: 'sqrt', text: '× √2, unos 1,41: dos medias seguidas tienen que hacer × 2.'},
+      {id: '1.5', text: '× 1,5: la mitad del camino entre × 1 y × 2.'},
+      {id: '1', text: '× 1: medio paso no alcanza para cambiar nada.'},
+    ], {prompt: 'Media duplicación, ¿por cuánto multiplica?', evaluate: true});
+    d.evidence('half-doubling', {answer: half});
+    await d.think(half === 'sqrt' ? 'Dos veces × √2: √2 · √2 = 2. Una duplicación entera.' : half === '1.5' ? '× 1,5 dos veces es × 2,25: se pasa de duplicar. Tiene que ser un número que, dos veces, dé 2: √2, unos 1,41.' : '× 1 dos veces sigue siendo × 1: no duplica. Tiene que ser un número que, dos veces, dé 2: √2, unos 1,41.');
+    await d.say('student', 'Si queremos que juntar exponentes siga valiendo también con medios, un medio y un medio tienen que hacer uno: media duplicación tiene que ser √2, el positivo. Por eso se elige escribir √2 como 2 elevado a un medio, igual que se eligió 2⁰ = 1 para que la tabla siguiera.');
+    await studentWrites(d, g, 'lg-half', '2 elevado a 1/2 = √2', A.x1 - 222, A.y0 + 120, {size: 20, ch: YELLOW});
+    await d.say('student', 'Nueve duplicaciones y media: 512 · 1,414, unos 724. Todavía no.');
     await d.think('El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo.');
     await studentWrites(d, g, 'lg-log', `log₂ 1000 ≈ ${t.log.toFixed(2).replace('.', ',')}`, A.x0 + 24, A.y0 + 222, {size: 26});
     d.evidence('log', {k: t.k, log: +t.log.toFixed(3)});
@@ -868,7 +878,7 @@ export const noSePuede = {
     const sim = await d.choose([
       {id: 'almost', text: 'Casi: dan lo mismo, menos en x = 2, donde la primera no está definida.'},
       {id: 'same', text: 'Sí: son la misma cuenta, para cualquier x.'},
-      {id: 'diff', text: 'No: con x = 3 dan distinto.'},
+      {id: 'diff', text: 'Tampoco con x = −2: ahí arriba da cero.'},
     ], {prompt: '¿Son la misma cuenta?', evaluate: true});
     d.evidence('rational-simplify', {answer: sim});
     const ROWS = [[3, '5 ÷ 1 = 5', '5'], [0, '−4 ÷ (−2) = 2', '2'], [2, '0 ÷ 0: no está definida', '4']];
@@ -883,8 +893,10 @@ export const noSePuede = {
       w.add(new Label(`ns-tb${i}`, b, A.x0 + 300, y, {size: 19, z: 12}));
       d.describe(`Con x = ${x}: la primera da ${a.replace(':', ',')}; x + 2 da ${b}.`);
     }
-    await d.think(sim === 'almost' ? 'Con 3 y con 0 dan igual. Con 2, la primera es 0 ÷ 0: no está definida, y x + 2 da 4.' : sim === 'same' ? 'Con 3 y con 0 dan igual, pero con 2 la primera es 0 ÷ 0: no está definida, y x + 2 da 4. En x = 2 no son la misma.' : 'Con 3 dan las dos 5, y con 0, las dos 2. Distinto es sólo el 2: ahí la primera no está definida.');
-    await d.say('student', 'Mara, x · x − 4 es (x − 2) · (x + 2): x · x + 2 · x − 2 · x − 4. Si x no es 2, el (x − 2) de arriba se va con el de abajo y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2.');
+    await d.think(sim === 'almost' ? 'Con 3 y con 0 dan igual. Con 2, la primera es 0 ÷ 0: no está definida, y x + 2 da 4.' : sim === 'same' ? 'Con 3 y con 0 dan igual, pero con 2 la primera es 0 ÷ 0: no está definida, y x + 2 da 4. En x = 2 no son la misma.' : 'Con x = −2 arriba da 0 y abajo −4: 0 ÷ (−4) = 0, lo mismo que x + 2. Un cero arriba no molesta; el que molesta es el de abajo, con x = 2.');
+    await d.say('student', 'Mara, con x = 2 queda 0 ÷ 0: cualquier número por 0 da 0, así que no hay un solo resultado. Por eso no está definida, aunque x + 2 dé 4.');
+    await studentWrites(d, g, 'ns-fac', '(x − 2) · (x + 2) = x · x + 2 · x − 2 · x − 4 = x · x − 4', A.x0 + 20, A.y1 - 40, {size: 17});
+    await d.say('student', 'Y x · x − 4 es (x − 2) · (x + 2). Si x no es 2, el (x − 2) que multiplica se va con el (x − 2) que divide, y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2.');
     await studentWrites(d, g, 'ns-simp', '(x · x − 4) ÷ (x − 2) = x + 2,  con x ≠ 2', A.x0 + 20, A.y1 - 8, {size: 20});
     if (!replay) writeJournal7(g);
     await d.say('Peldaño', 'Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?');
@@ -902,7 +914,7 @@ function writeJournal7(g) {
   const rp = first('race-predict');
   if (rp) seen.push(rp.answer === 'mul' ? 'Apostaste por duplicar: al principio perdía, y desde el día 6 pasó adelante.' : `${rp.answer === 'add' ? 'Apostaste a sumar diez' : 'Pensaste que llegaban juntos'}; sumar ganó los primeros días y duplicar pasó adelante el día 6.`);
   const rg = first('race-general');
-  if (rg) seen.push(rg.answer === 'ok' ? 'Para cualquier día n escribiste 1 + 10 · n.' : rg.answer === '10n' ? 'Para el día n dijiste 10 · n; faltaba el primero: 1 + 10 · n.' : 'Para el día n dijiste 11 · n; el 11 ya incluía el primero: 1 + 10 · n.');
+  if (rg) seen.push(rg.answer === 'ok' ? 'Para cualquier día n elegiste 1 + 10 · n.' : rg.answer === '10n' ? 'Para el día n dijiste 10 · n; faltaba el primero: 1 + 10 · n.' : 'Para el día n dijiste 11 · n; el 11 ya incluía el primero: 1 + 10 · n.');
   const pz = first('pow-zero');
   if (pz) seen.push(pz.answer === '1' ? 'Siguiendo la tabla hacia abajo, dijiste 2⁰ = 1.' : 'Para 2⁰ dijiste otro valor; la tabla, dividiendo por dos, daba 1.');
   const pp = first('pow-product');
@@ -924,13 +936,15 @@ function writeJournal7(g) {
   const co = first('complete-other');
   if (co) seen.push(co.answer === '9' ? 'Al completar el cuadrado sumaste 1 de los dos lados del igual.' : 'Al completar el cuadrado, el cuadradito también había que sumarlo del otro lado: 8 + 1.');
   const cz = first('complete-zero');
-  if (cz) seen.push(cz.answer === 'one' ? 'Viste que (x + 1)² = 0 tiene una sola solución.' : cz.answer === 'two' ? 'Para (x + 1)² = 0 esperabas dos, como con el 9; más cero y menos cero son lo mismo: una.' : 'Para (x + 1)² = 0 pensaste que no había; un cuadrado de área 0 tiene lado 0: una, x = −1.');
+  if (cz) seen.push(cz.answer === 'one' ? 'Viste que (x + 1)² = 0 tiene una sola solución.' : cz.answer === 'two' ? 'Para (x + 1)² = 0 esperabas dos, como con el 9; más cero y menos cero son lo mismo: una.' : 'Para (x + 1)² = 0 pensaste que no había; con x = −1, (−1 + 1)² = 0: una.');
   const cn = first('complete-negative');
   if (cn) seen.push(cn.answer === 'none' ? 'Viste que (x + 1)² = −9 no tiene solución en la recta.' : cn.answer === 'two' ? 'Para (x + 1)² = −9 elegiste x = 2 y x = −4; con esos da 9, no −9: en la recta, ninguna.' : 'Para (x + 1)² = −9 elegiste x = −4; con ese da 9, no −9: en la recta, ninguna.');
+  const hd = first('half-doubling');
+  if (hd) seen.push(hd.answer === 'sqrt' ? 'Para media duplicación elegiste × √2: dos veces da × 2.' : hd.answer === '1.5' ? 'Para media duplicación elegiste × 1,5; dos veces da × 2,25: es × √2.' : 'Para media duplicación elegiste × 1; dos veces no duplica: es × √2.');
   const lp = first('log-predict');
   if (lp) seen.push(lp.answer === '10' ? 'Anticipaste unos diez días para pasar mil duplicando.' : 'Esperabas muchos más días; duplicando, alcanzaron diez.');
   const rs = first('rational-simplify');
-  if (rs) seen.push(rs.answer === 'almost' ? 'Viste que (x · x − 4) ÷ (x − 2) es x + 2 salvo en x = 2.' : rs.answer === 'same' ? 'Pensaste que (x · x − 4) ÷ (x − 2) y x + 2 eran iguales para todo x; en x = 2 la primera no está definida.' : 'Pensaste que (x · x − 4) ÷ (x − 2) y x + 2 daban distinto con 3; dan igual, salvo en x = 2.');
+  if (rs) seen.push(rs.answer === 'almost' ? 'Viste que (x · x − 4) ÷ (x − 2) es x + 2 salvo en x = 2.' : rs.answer === 'same' ? 'Pensaste que (x · x − 4) ÷ (x − 2) y x + 2 eran iguales para todo x; en x = 2 la primera no está definida.' : 'Pensaste que en x = −2 tampoco se podía, por el cero de arriba; un cero arriba no molesta: sólo el de abajo, en x = 2.');
   const rq = first('rational-predict');
   if (rq) seen.push(rq.answer === '2' ? 'Viste que 1 ÷ (x − 2) no se puede con x = 2.' : rq.answer === '0' ? 'Pensaste en x = 0; con 0 abajo queda −2, y se puede. La que no se puede es x = 2, donde abajo queda cero.' : 'Pensaste que se podía con cualquier x; con x = 2 abajo queda cero, y por cero no se divide.');
   const entry = {
@@ -939,9 +953,9 @@ function writeJournal7(g) {
     abbr: 'Multiplicar repetido crece distinto que sumar repetido, y cada crecimiento tiene su pregunta al revés.',
     body: [
       'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.',
-      'Sumar lo mismo crece parejo (sucesión aritmética: el día n, 1 + 10 · n); duplicar empieza lento y después saca cada vez más ventaja (sucesión geométrica: cada día, el doble del anterior). En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Dividirlas saca factores, y los exponentes se restan: 2⁵ ÷ 2² = 2³. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
+      'Sumar lo mismo crece parejo (sucesión aritmética: el día n, 1 + 10 · n); duplicar empieza lento y después saca cada vez más ventaja (sucesión geométrica: cada día, el doble del anterior). En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Dividirlas saca factores, y los exponentes se restan: 2⁵ ÷ 2² = 2³. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con un número de 1 a menos de 10 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
       'Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4. La raíz de (x + 1)² es lo lejos que está x + 1 del cero; por eso hay dos. Si x + 1 es positivo, la raíz de (x + 1)² es x + 1; si es negativo, no. Si el cuadrado da 0, hay una sola solución; si da un negativo, ninguna en la recta.',
-      'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). Media duplicación es multiplicar por √2, que se escribe también 2 elevado a un medio: un medio y un medio hacen uno. El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2. Al simplificar, la restricción se anota: (x · x − 4) ÷ (x − 2) = x + 2, con x ≠ 2.',
+      'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). Media duplicación es multiplicar por √2 (dos veces da × 2); para que juntar exponentes siga valiendo, se elige escribirla 2 elevado a un medio. El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2. Al simplificar, la restricción se anota: (x · x − 4) ÷ (x − 2) = x + 2, con x ≠ 2.',
     ],
     seen,
     moments: [
