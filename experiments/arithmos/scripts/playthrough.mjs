@@ -99,6 +99,8 @@ const clickSpot = async id => {
 const tried = new Set();
 function pickChoice(prompt, options) {
   const pref = route === 'errores' ? [
+    // --c76=b: en 7.6 dice «no se puede» antes de probar, con la razón equivocada
+    ...(val('c76', '') === 'b' ? [['Con cinco cuadraditos', 'Con estas fichas', 'x + 2 y x + 3', 'x y x + 5', 'x + 1 y x + 4'], ['¿Por qué no se puede?', 'Cinco cuadraditos no alcanzan', 'Ningún par']] : []),
     ['espía', 'Quedarte'], ['te mira', 'Acercarte'],
     ['vuelven todos', 'Contarlos'],
     ['marca sola', 'sobra un punto', 'hice una marca de más', 'falta uno'],
@@ -730,8 +732,9 @@ for (let iter = 0; iter < 30000; iter++) {
       else if (route === 'errores' && !tried.has('sc3b') && ok) { tried.add('sc3b'); target = ok; }
       else target = zs[0] || ok;
     } else if (s.seg === 'c7.areas' && spots.some(x => x.id.startsWith('ar-slot'))) {
-      // la tira elegida va al primer borde libre (paradas primero, después acostadas)
-      target = spots.find(x => x.id.startsWith('ar-slot'));
+      // la tira elegida va al primer borde libre (paradas primero, después acostadas); con errores, una vez a la esquina
+      const miss = route === 'errores' && !tried.has('armiss') && spots.some(x => x.id === 'ar-no-u') && (tried.add('armiss'), true);
+      target = miss ? spots.find(x => x.id === 'ar-no-u') : spots.find(x => x.id.startsWith('ar-slot'));
     } else if (s.seg === 'c7.areas' && spots.some(x => x.id.startsWith('ar-pick-'))) {
       const seq = route === 'errores' ? ['x2', 'x', 'x', 'x', 'x', 'x', 'x', 'u', 'u', 'u', 'u', 'u', 'u'] : ['x2', 'x', 'x', 'x', 'x', 'x', 'u', 'u', 'u', 'u', 'u', 'u'];
       const k = seq[areaTaps++] || 'u';
@@ -838,7 +841,9 @@ for (let iter = 0; iter < 30000; iter++) {
       c11Item = target.id.replace('c11-s', '');
     } else if (s.seg === 'c7.lado' && spots.some(x => x.id.startsWith('rows-'))) {
       // con errores, primero una fila (Peldaño protesta y se vuelve a elegir)
-      target = spots.find(x => x.id === (route === 'errores' && spots.some(y => y.id === 'rows-1') ? 'rows-1' : 'rows-3'));
+      // --c71=9: prueba la columna de nueve
+      const wrongRows = val('c71', '') === '9' ? 'rows-9' : 'rows-1';
+      target = spots.find(x => x.id === (route === 'errores' && spots.some(y => y.id === wrongRows) ? wrongRows : 'rows-3'));
     } else if (s.seg === 'c8.diagonal' && spots.some(x => x.id.startsWith('c8-cor-'))) {
       // esquinas de los cuadrados de q: con errores, primero dos vecinas (rectángulos) y después opuestas
       // --c81=b: la misma esquina y después la diagonal arriba a la derecha / abajo a la izquierda

@@ -47,7 +47,8 @@ export function placeX(d, g, view, {hint, done, after}) {
     const refresh = () => {
       const spots = [];
       for (let n = LINE.from; n <= LINE.to; n++) {
-        if (n === view.x) continue;
+        // donde ya está Punto también hay lugar: así los lugares siguen contiguos y un toque ahí no lo mueve al vecino
+        if (n === view.x) { spots.push(rectSpot('x-aqui', `Punto ya está en ${n === 0 ? 'cero' : signed(n)}`, {x: lx(n) - LINE.step / 2, y: GROUND - 34, w: LINE.step, h: 84}, () => g.note('Punto ya está ahí.'), {tile: true})); continue; }
         spots.push(rectSpot(`x${n}`, `Poner a Punto, la x, en ${n === 0 ? 'cero' : signed(n)}`, {x: lx(n) - LINE.step / 2, y: GROUND - 34, w: LINE.step, h: 84}, () => go(n), {tile: true}));
       }
       g.ui.setSpots(spots);

@@ -64,11 +64,13 @@ export const lado = {
     await d.shot(SHOTS.tiles, 0.8);
     const arrange = async n => {
       const cols = 9 / n;
+      // la columna de nueve no entra en la pizarra: se dibuja más chica
+      const k = n === 9 ? 0.55 : 1, u = U * k;
       d.describe(`Los nueve cuadros se acomodan en ${n} ${n === 1 ? 'fila' : 'filas'} de ${cols}.`);
       await d.all(...cells.map((c, i) => {
-        const tx = A.x0 + 60 + (i % cols) * U, ty = A.y0 + 60 + Math.floor(i / cols) * U;
-        const sx = c.x, sy = c.y;
-        return d.tween(0.6, q => { c.x = lerp(sx, tx, q); c.y = lerp(sy, ty, q); }, easeInOut);
+        const tx = A.x0 + 60 + (i % cols) * u, ty = A.y0 + 60 + Math.floor(i / cols) * u;
+        const sx = c.x, sy = c.y, ss = c.scale ?? 1;
+        return d.tween(0.6, q => { c.x = lerp(sx, tx, q); c.y = lerp(sy, ty, q); c.scale = lerp(ss, k, q); }, easeInOut);
       }));
     };
     // el jugador elige las filas; si no queda cuadrada, Peldaño protesta y vuelve a elegir

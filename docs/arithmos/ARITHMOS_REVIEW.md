@@ -234,7 +234,7 @@ Corregido en el commit siguiente (evidencia en `artifacts/arithmos/it07/c6-*`):
 | narr | A4 | Texto contra imagen | Corregido (ver mat A1–A3, M7) |
 | narr | A5 | «Pasa sumando» en un solo punto | Parcial (conjunto de 6.7; ver mat M1) |
 | narr | A6 | Puesta de diapositiva | Pendiente |
-| narr | M1–M10 | Costuras, caja de 6.1, opciones largas, nombres, izquierda/derecha, inválidos siempre ajenos, Bitácora, accesibilidad | Ciclo 9: en teléfono los lugares de la recta (dónde poner a Punto) son contiguos, una unidad cada uno (31 px en 844×390), sin pisarse; antes se agrandaban a 44 px y el toque podía caer en el vecino (medido con \`scripts/tile-check.mjs\`; cap. 6 entero en \`it12/c6-tel2\`). Parciales: gancho 6→7 sin adelantar el descubrimiento; izquierda/derecha; el jugador tiene en la mano un paso inválido (6.8); descripciones nuevas en 6.3, 6.5, 6.7, 6.8; botones con verbo. Pendientes: caja de 6.1, longitud de las opciones, blancos táctiles de la recta en teléfono |
+| narr | M1–M10 | Costuras, caja de 6.1, opciones largas, nombres, izquierda/derecha, inválidos siempre ajenos, Bitácora, accesibilidad | Ciclo 9: en teléfono los lugares de la recta (dónde poner a Punto) son contiguos, una unidad cada uno (31 px en 844×390), sin pisarse; lo que mejora es el anillo de foco y la exploración del lector de pantalla (el toque ya elegía la marca más cercana; corregido por rev-c9c D1) (`scripts/tile-check.mjs` mide las cajas, no los toques; cap. 6 entero en `it12/c6-tel2`). Parciales: gancho 6→7 sin adelantar el descubrimiento; izquierda/derecha; el jugador tiene en la mano un paso inválido (6.8); descripciones nuevas en 6.3, 6.5, 6.7, 6.8; botones con verbo. Pendientes: caja de 6.1, longitud de las opciones, rótulos de la recta chicos en teléfono |
 
 ## Revisiones independientes del cap. 7 (rev-mat-6 y rev-narr-5, 2026-10-06)
 
@@ -509,6 +509,27 @@ dice antes de usarse, y la escala de 9.8 es correcta. Los hallazgos son de compr
 | B9 | 8.2: «la zeta» antes de presentarla | Corregido: «tiene un lado sobre AC…» |
 | B10–B11 | 9.8: «noche» cubría todo el hueco; dos dos puntos | Corregidos: una llave marca la noche de 20 a 6; la oración partida en dos |
 | B12 | Ramas del bot sin correr | Corregido: `--c81=b` (misma esquina y diagonal TR/BL) y `--c85=b` (segunda duda de Rampa); 8.1 y 8.4 también en 844×390 |
+
+## Revisión de 7.1, 7.5, 7.6 y la recta táctil del cap. 6 (rev-c9c, 2026-10-07)
+
+Informe: `artifacts/arithmos/it12/review-c9c/informe.md` (sin navegador). Las cuentas están bien (cada «falta» y
+«sobra» coincide; ningún par entero suma 5 y multiplica 5) y ningún bucle se traba. Evidencia: `artifacts/arithmos/it13/rc9c/`.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | 7.6: el pensamiento de la etapa de cinco resolvía la de seis («dos y tres dan seis») | Corregido: «Probé los tres pares que suman cinco y ninguno cierra…»; la enumeración de productos pasa al cierre, después de la de seis |
+| A2 | 7.6: «con lados que no son enteros se podría» dice de más | Corregido: Balcón cierra con «cero por cinco, cero; uno por cuatro, cuatro; dos por tres, seis. Ninguno da cinco. Con seis, sí» |
+| A3 | 7.6: «x por x + 5» se confunde con la ficha y con la precedencia | Corregido: opciones «x y x + 5», «x + 1 y x + 4»…; en la Bitácora, x(x + 5) y (x + 1)(x + 4) |
+| A4 | 7.6: un «no se puede» correcto recibía «¿Seguro?» y obligaba a probar todo | Corregido: se pide la razón; «ningún par que sume 5 da 5 multiplicado» alcanza; «no alcanzan para la esquina» recibe la corrección de Balcón, con la concordancia arreglada |
+| A5–A6 | Cifras mezcladas; Bitácora sin «y» y con intentos repetidos | Corregidos (números con palabras; lista con «y», sin repetidos) |
+| B1 | 7.5: elegir el borde no tenía respuesta equivocada (los contornos marcaban todo) | Corregido: los lugares libres se marcan sólo después de un toque fuera de lugar o al pedir la segunda ayuda; tocar sobre el x por x o en la esquina de cuadraditos contesta |
+| B2 | 7.5: teclado y lector de pantalla sin aviso al elegir una tira | Corregido: se describe cuántos lugares hay y el foco pasa al primero |
+| B3–B5 | Contornos blancos; ayuda forzada; «seis tiras y cinco cuadraditos» con la devolución de otro error | Corregidos (contornos en azul; «Si es una tira, después tocá dónde va»; devolución de suma y producto) |
+| C1 | 7.1: con nueve filas la columna salía de la pizarra | Corregido: la columna se dibuja más chica y vuelve a su tamaño al pasar a tres filas |
+| D1 | El mensaje del commit de la recta táctil decía de más | Corregida la disposición de rev-narr-4 M1–M10 |
+| D2 | Recta del cap. 6: 31 px por unidad y rótulos de ~10 px en teléfono | Pendiente (baja): rótulos más grandes en pantallas táctiles |
+| D3 | Tocar a Punto lo movía al vecino | Corregido: su lugar también se puede tocar y dice «Punto ya está ahí» |
+| E1 | Ramas sin correr | Corregido: `--c71=9`, `--c76=b`, y 7.5 en 844×390 |
 
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

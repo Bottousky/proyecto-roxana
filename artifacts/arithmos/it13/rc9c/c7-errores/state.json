@@ -1,0 +1,1162 @@
+{
+  "version": 1,
+  "chapter": 8,
+  "segment": "c8.diagonal",
+  "flags": {
+    "c7root": true,
+    "c7race": true,
+    "c7pow": true,
+    "c7roots": true,
+    "c7sci": true,
+    "c7area": true,
+    "c7factor": true,
+    "c7complete": true,
+    "c7log": true,
+    "c7rational": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "rows": 9,
+      "t": "2026-10-07T23:36:37.827Z",
+      "seg": "c7.lado",
+      "run": 1,
+      "kind": "square-rows"
+    },
+    {
+      "rows": 3,
+      "t": "2026-10-07T23:36:39.213Z",
+      "seg": "c7.lado",
+      "run": 1,
+      "kind": "square-rows"
+    },
+    {
+      "answer": "2",
+      "t": "2026-10-07T23:36:41.022Z",
+      "seg": "c7.lado",
+      "run": 1,
+      "kind": "side-predict"
+    },
+    {
+      "lo": 1.41,
+      "hi": 1.42,
+      "t": "2026-10-07T23:36:50.906Z",
+      "seg": "c7.lado",
+      "run": 1,
+      "kind": "side"
+    },
+    {
+      "answer": "add",
+      "t": "2026-10-07T23:36:52.955Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-predict"
+    },
+    {
+      "day": 1,
+      "add": 11,
+      "mul": 2,
+      "t": "2026-10-07T23:36:54.844Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 2,
+      "add": 21,
+      "mul": 4,
+      "t": "2026-10-07T23:36:55.040Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 3,
+      "add": 31,
+      "mul": 8,
+      "t": "2026-10-07T23:36:55.165Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 4,
+      "add": 41,
+      "mul": 16,
+      "t": "2026-10-07T23:36:55.291Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 5,
+      "add": 51,
+      "mul": 32,
+      "t": "2026-10-07T23:36:55.417Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 6,
+      "add": 61,
+      "mul": 64,
+      "t": "2026-10-07T23:36:55.547Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 7,
+      "add": 71,
+      "mul": 128,
+      "t": "2026-10-07T23:36:56.114Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 8,
+      "add": 81,
+      "mul": 256,
+      "t": "2026-10-07T23:36:56.241Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "answer": "10n",
+      "t": "2026-10-07T23:36:57.405Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-general"
+    },
+    {
+      "overtake": 6,
+      "guess": "add",
+      "t": "2026-10-07T23:36:58.478Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race"
+    },
+    {
+      "n": 3,
+      "v": 8,
+      "t": "2026-10-07T23:37:01.503Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "pow-row"
+    },
+    {
+      "n": 2,
+      "v": 4,
+      "t": "2026-10-07T23:37:02.319Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "pow-row"
+    },
+    {
+      "n": 1,
+      "v": 2,
+      "t": "2026-10-07T23:37:03.219Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "pow-row"
+    },
+    {
+      "answer": "0",
+      "t": "2026-10-07T23:37:04.290Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "pow-zero"
+    },
+    {
+      "zero": 1,
+      "minus": 0.5,
+      "t": "2026-10-07T23:37:05.206Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "powers"
+    },
+    {
+      "answer": "6",
+      "t": "2026-10-07T23:37:08.703Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "pow-product"
+    },
+    {
+      "answer": "9",
+      "t": "2026-10-07T23:37:12.939Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "pow-power"
+    },
+    {
+      "answer": "yes",
+      "t": "2026-10-07T23:37:15.754Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "pow-sum"
+    },
+    {
+      "answer": "7",
+      "t": "2026-10-07T23:37:16.821Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "pow-quotient"
+    },
+    {
+      "answer": "8",
+      "t": "2026-10-07T23:37:17.954Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-predict"
+    },
+    {
+      "layers": 1,
+      "blocks": 16,
+      "t": "2026-10-07T23:37:20.136Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-layer"
+    },
+    {
+      "layers": 2,
+      "blocks": 32,
+      "t": "2026-10-07T23:37:20.637Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-layer"
+    },
+    {
+      "layers": 3,
+      "blocks": 48,
+      "t": "2026-10-07T23:37:21.153Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-layer"
+    },
+    {
+      "layers": 4,
+      "blocks": 64,
+      "t": "2026-10-07T23:37:21.703Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-layer"
+    },
+    {
+      "side": 4,
+      "square": 8,
+      "t": "2026-10-07T23:37:22.087Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube"
+    },
+    {
+      "counted": 1,
+      "t": "2026-10-07T23:37:23.759Z",
+      "seg": "c7.grande",
+      "run": 1,
+      "kind": "sci-count3"
+    },
+    {
+      "answer": "b",
+      "t": "2026-10-07T23:37:26.520Z",
+      "seg": "c7.grande",
+      "run": 1,
+      "kind": "sci-compare"
+    },
+    {
+      "a": {
+        "m": 3,
+        "e": 6
+      },
+      "b": {
+        "m": 4,
+        "e": 5
+      },
+      "small": {
+        "m": 1,
+        "e": -3
+      },
+      "t": "2026-10-07T23:37:26.790Z",
+      "seg": "c7.grande",
+      "run": 1,
+      "kind": "sci"
+    },
+    {
+      "answer": "short",
+      "t": "2026-10-07T23:37:28.903Z",
+      "seg": "c7.areas",
+      "run": 1,
+      "kind": "expand-predict"
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:31.253Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "t": "2026-10-07T23:37:32.542Z",
+      "seg": "c7.areas",
+      "run": 1,
+      "kind": "expand-miss"
+    },
+    {
+      "kind": "expand-place",
+      "vertical": true,
+      "t": "2026-10-07T23:37:33.135Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": true,
+      "t": "2026-10-07T23:37:33.767Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": true,
+      "t": "2026-10-07T23:37:34.401Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:34.984Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:35.618Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-extra",
+      "t": "2026-10-07T23:37:35.622Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:36.218Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:36.702Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:37.201Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:37.668Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:38.168Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-07T23:37:38.668Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "x2": 1,
+      "x": 5,
+      "one": 6,
+      "t": "2026-10-07T23:37:38.837Z",
+      "seg": "c7.areas",
+      "run": 1,
+      "kind": "expand"
+    },
+    {
+      "tried": [],
+      "t": "2026-10-07T23:37:41.636Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-none"
+    },
+    {
+      "answer": "few",
+      "t": "2026-10-07T23:37:42.503Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-none-why"
+    },
+    {
+      "p": 2,
+      "q": 3,
+      "units": 5,
+      "t": "2026-10-07T23:37:44.137Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "p": 0,
+      "q": 5,
+      "units": 5,
+      "t": "2026-10-07T23:37:45.135Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "p": 1,
+      "q": 4,
+      "units": 5,
+      "t": "2026-10-07T23:37:46.120Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "tried": [
+        "23",
+        "05",
+        "14"
+      ],
+      "t": "2026-10-07T23:37:47.119Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-none"
+    },
+    {
+      "p": 1,
+      "q": 6,
+      "units": 6,
+      "t": "2026-10-07T23:37:48.853Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "p": 2,
+      "q": 3,
+      "units": 6,
+      "t": "2026-10-07T23:37:49.836Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "f": {
+        "p": 2,
+        "q": 3
+      },
+      "five": null,
+      "t": "2026-10-07T23:37:50.674Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor"
+    },
+    {
+      "answer": "strip",
+      "t": "2026-10-07T23:37:52.838Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete-predict"
+    },
+    {
+      "answer": "8",
+      "t": "2026-10-07T23:37:56.103Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete-other"
+    },
+    {
+      "answer": "two",
+      "roots": [
+        -1
+      ],
+      "t": "2026-10-07T23:37:57.469Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete-zero"
+    },
+    {
+      "answer": "two",
+      "roots": [],
+      "t": "2026-10-07T23:37:58.369Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete-negative"
+    },
+    {
+      "square": 9,
+      "roots": [
+        2,
+        -4
+      ],
+      "t": "2026-10-07T23:37:58.541Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete"
+    },
+    {
+      "answer": "100",
+      "t": "2026-10-07T23:37:59.802Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-predict"
+    },
+    {
+      "k": 1,
+      "v": 2,
+      "t": "2026-10-07T23:38:01.637Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 2,
+      "v": 4,
+      "t": "2026-10-07T23:38:01.762Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 3,
+      "v": 8,
+      "t": "2026-10-07T23:38:01.888Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 4,
+      "v": 16,
+      "t": "2026-10-07T23:38:02.013Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 5,
+      "v": 32,
+      "t": "2026-10-07T23:38:02.138Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 5,
+      "v": 32,
+      "t": "2026-10-07T23:38:02.264Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-early"
+    },
+    {
+      "k": 6,
+      "v": 64,
+      "t": "2026-10-07T23:38:02.393Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 7,
+      "v": 128,
+      "t": "2026-10-07T23:38:02.521Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 8,
+      "v": 256,
+      "t": "2026-10-07T23:38:02.646Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 9,
+      "v": 512,
+      "t": "2026-10-07T23:38:02.771Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 10,
+      "v": 1024,
+      "t": "2026-10-07T23:38:02.896Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 11,
+      "v": 2048,
+      "t": "2026-10-07T23:38:03.021Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "answer": "1.5",
+      "t": "2026-10-07T23:38:04.518Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "half-doubling"
+    },
+    {
+      "k": 10,
+      "log": 9.966,
+      "t": "2026-10-07T23:38:04.854Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log"
+    },
+    {
+      "answer": "0",
+      "t": "2026-10-07T23:38:06.101Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-predict"
+    },
+    {
+      "x": 5,
+      "t": "2026-10-07T23:38:08.485Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 4,
+      "t": "2026-10-07T23:38:09.034Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 3,
+      "t": "2026-10-07T23:38:09.551Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 2,
+      "t": "2026-10-07T23:38:10.101Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 2,
+      "reason": "no se divide por cero",
+      "t": "2026-10-07T23:38:10.453Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational"
+    },
+    {
+      "answer": "diff",
+      "t": "2026-10-07T23:38:12.029Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-simplify"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c7",
+      "title": "Crecer",
+      "abbr": "Multiplicar repetido crece distinto que sumar repetido, y cada crecimiento tiene su pregunta al revés.",
+      "body": [
+        "La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.",
+        "Sumar lo mismo crece parejo (sucesión aritmética: el día n, 1 + 10 · n); duplicar empieza lento y después saca cada vez más ventaja (sucesión geométrica: cada día, el doble del anterior). En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Dividirlas saca factores, y los exponentes se restan: 2⁵ ÷ 2² = 2³. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con un número de 1 a menos de 10 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.",
+        "Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4. La raíz de (x + 1)² es lo lejos que está x + 1 del cero; por eso hay dos. Si x + 1 es positivo, la raíz de (x + 1)² es x + 1; si es negativo, no. Si el cuadrado da 0, hay una sola solución; si da un negativo, ninguna en la recta.",
+        "Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). Media duplicación es multiplicar por √2 (dos veces da × 2); para que juntar exponentes siga valiendo, se elige escribirla 2 elevado a un medio. El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2. Al simplificar, la restricción se anota: (x · x − 4) ÷ (x − 2) = x + 2, con x ≠ 2."
+      ],
+      "seen": [
+        "Pensaste que el lado de una huerta cuadrada de dos cuadros era 2 o más; armándola, el lado era la diagonal de un cuadro: √2 ≈ 1,414.",
+        "Apostaste a sumar diez; sumar ganó los primeros días y duplicar pasó adelante el día 6.",
+        "Para el día n dijiste 10 · n; faltaba el primero: 1 + 10 · n.",
+        "Para 2⁰ dijiste otro valor; la tabla, dividiendo por dos, daba 1.",
+        "Para 2³ · 2² multiplicaste los exponentes; desplegados, eran cinco dos: 2⁵.",
+        "Para (2³)² elevaste el 3 al cuadrado; es 2³ · 2³: seis dos, 2⁶.",
+        "Para 2⁵ ÷ 2² sumaste los exponentes; dividiendo se restan: 2³.",
+        "Pensaste que 2³ + 2² era 2⁵; sumando da 12: los exponentes se juntan al multiplicar.",
+        "Para el cubo de 64 pensaste en 8; 8 · 8 = 64 es una capa plana. El cubo tiene lado 4.",
+        "Miraste primero el 3 y el 4; pesaba más el exponente: 3 · 10⁶ es más que 4 · 10⁵.",
+        "Armando (x + 2)(x + 3) con fichas, hicieron falta cinco tiras y seis cuadraditos.",
+        "Con cinco cuadraditos probaste (x + 2)(x + 3), x(x + 5) y (x + 1)(x + 4): ninguno cerraba. x² + 5x + 5 no se arma con fichas enteras.",
+        "Para x² + 5x + 6 probaste (x + 1)(x + 6) y (x + 2)(x + 3).",
+        "Al completar el cuadrado, el cuadradito también había que sumarlo del otro lado: 8 + 1.",
+        "Para (x + 1)² = 0 esperabas dos, como con el 9; más cero y menos cero son lo mismo: una.",
+        "Para (x + 1)² = −9 elegiste x = 2 y x = −4; con esos da 9, no −9: en la recta, ninguna.",
+        "Para media duplicación elegiste × 1,5; dos veces da × 2,25: es × √2.",
+        "Esperabas muchos más días; duplicando, alcanzaron diez.",
+        "Pensaste que en x = −2 tampoco se podía, por el cero de arriba; un cero arriba no molesta: sólo el de abajo, en x = 2.",
+        "Pensaste en x = 0; con 0 abajo queda −2, y se puede. La que no se puede es x = 2, donde abajo queda cero."
+      ],
+      "moments": [
+        {
+          "id": "c7.areas",
+          "label": "Desplegar: áreas con x"
+        },
+        {
+          "id": "c7.cuantas-veces",
+          "label": "Desplegar: ¿cuántas veces?"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c7.lado",
+    "c7.duplicar",
+    "c7.factores",
+    "c7.juntar",
+    "c7.grande",
+    "c7.areas",
+    "c7.al-reves",
+    "c7.completar",
+    "c7.cuantas-veces",
+    "c7.no-se-puede"
+  ],
+  "moments": [
+    "c7.areas",
+    "c7.cuantas-veces"
+  ],
+  "log": [
+    {
+      "who": "Peldaño",
+      "text": "Tengo nueve cuadros de huerta y los quiero en una huerta cuadrada. ¿Cuánto mide el lado?"
+    },
+    {
+      "who": "Peldaño",
+      "text": "Una columna larguísima. Cuadrada, dije."
+    },
+    {
+      "who": "student",
+      "text": "Tres filas de tres: el lado mide 3. Punto, tres por tres es nueve: tres es la raíz de nueve."
+    },
+    {
+      "who": "Mara",
+      "text": "En la cuenta de Oval, x · x = 9 también daba −3."
+    },
+    {
+      "who": "student",
+      "text": "Un lado no mide −3. La raíz de un número es la positiva; el −3 hay que agregarlo aparte."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Y la que le conté a Mara: dos cuadros, también cuadrada. x · x = 2."
+    },
+    {
+      "who": null,
+      "text": "Un lado de 2 haría una huerta de cuatro cuadros, no de dos. El lado es la diagonal de un cuadro: menos de 2."
+    },
+    {
+      "who": "student",
+      "text": "Punto, esta huerta tiene área 2, dos cuadros. Su lado, multiplicado por sí mismo, da 2: es la diagonal de un cuadro, la que medimos, más o menos 1,414."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Así que el camino en diagonal mide raíz de dos. Lo pinto así en la puerta."
+    },
+    {
+      "who": "Mara",
+      "text": "La Marea se llevó entera la escalera del fondo: cien escalones. Hoy dibujo uno, y después diez por día."
+    },
+    {
+      "who": null,
+      "text": "Once contra dos. Punto se queda atrás."
+    },
+    {
+      "who": null,
+      "text": "Día 6: 64 contra 61. Punto pasa adelante."
+    },
+    {
+      "who": null,
+      "text": "No entra en la pizarra: achico todo igual, las dos barras y la raya del 100."
+    },
+    {
+      "who": "student",
+      "text": "Punto, al principio sumar diez gana. Duplicar empieza lento, pero cada día agrega todo lo que ya había. Desde el día 6 vas adelante, y cada día sacás más ventaja."
+    },
+    {
+      "who": "Mara",
+      "text": "Y la mía, ¿cuántos escalones tiene el día n, cualquier día, sin hacer toda la tabla?"
+    },
+    {
+      "who": null,
+      "text": "Con n = 3 daría 30, y la tabla dice 31: falta el primero, el del día 0."
+    },
+    {
+      "who": "student",
+      "text": "Mara, a una lista que suma siempre lo mismo se le dice sucesión aritmética. La de Punto, que multiplica siempre por lo mismo, es geométrica."
+    },
+    {
+      "who": "Mara",
+      "text": "Entonces la redibujamos a tu manera, Punto. ¿Y de dónde sacás tanta tiza el día siete?"
+    },
+    {
+      "who": "Mara",
+      "text": "Lo de Punto se anota largo: dos por dos por dos por dos. ¿No hay una forma corta?"
+    },
+    {
+      "who": "student",
+      "text": "Se empieza en 1 y se multiplica por dos tantas veces como dice el número de arriba, chiquito."
+    },
+    {
+      "who": null,
+      "text": "Cada renglón hacia abajo, un dos menos: el resultado se divide por dos."
+    },
+    {
+      "who": "student",
+      "text": "No cero: dos dividido dos es uno. Y con la regla: empezar en 1 y multiplicar cero veces deja el 1."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y un renglón más abajo?"
+    },
+    {
+      "who": "student",
+      "text": "Punto, el exponente cuenta cuántas veces se multiplica por dos. Para abajo de cero, cuántas veces se divide."
+    },
+    {
+      "who": "student",
+      "text": "Y el renglón n de tu escalera, «× 2 el anterior», ahora se escribe corto: el día n tenés 2 elevado a n. El día 8, 2⁸ = 256."
+    },
+    {
+      "who": "Mara",
+      "text": "El lunes Punto se duplicó tres veces seguidas, y el martes, dos veces más. Lo anoto corto."
+    },
+    {
+      "who": "student",
+      "text": "Con otro número abajo se escribe igual: 4³ es empezar en 1 y multiplicar por 4 tres veces, 1 · 4 · 4 · 4."
+    },
+    {
+      "who": null,
+      "text": "Son cinco dos, no seis: los tres del lunes y los dos del martes se juntan. Tres y dos se suman."
+    },
+    {
+      "who": "student",
+      "text": "Mara, multiplicar potencias del mismo número es juntar sus factores. Los exponentes se suman: 3 + 2 = 5. Con cualquier número abajo pasa lo mismo: se cuentan factores iguales."
+    },
+    {
+      "who": "Mara",
+      "text": "Y si un día se duplica tres veces, y eso pasa dos días seguidos, lo anoto así."
+    },
+    {
+      "who": null,
+      "text": "El cuadrado es de todo el 2³, no del 3 solo: 2³ · 2³. Seis dos, no nueve."
+    },
+    {
+      "who": "student",
+      "text": "Elevar una potencia es repetirla: tres dos, dos veces. Los exponentes se multiplican: 3 · 2 = 6."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si en vez de multiplicar sumo? ¿Se juntan igual?"
+    },
+    {
+      "who": null,
+      "text": "Los exponentes se suman cuando se multiplica. Sumando, 8 + 4 = 12: no es 32."
+    },
+    {
+      "who": "student",
+      "text": "Sumar no junta factores: junta cantidades. Lo de sumar los exponentes vale para multiplicar."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si divido? Cinco dos, divididos por dos dos."
+    },
+    {
+      "who": null,
+      "text": "Sumar los exponentes es para multiplicar. Dividiendo, cada 2 de 2² se va con un 2 de 2⁵: quedan tres, 8. 2⁷ sería 128."
+    },
+    {
+      "who": "student",
+      "text": "Dividir saca factores: si el que se divide tiene más factores, los exponentes se restan, 5 − 2 = 3. Como en la tabla de antes, cada renglón hacia abajo sacaba un dos."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Tengo 64 bloques de tiza y quiero apilarlos en un cubo: igual de largo, de ancho y de alto."
+    },
+    {
+      "who": null,
+      "text": "Con 8 de lado, una sola capa de 8 por 8 ya usa los 64: queda una baldosa de un bloque de alto, no un cubo."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Probemos con capas de 4 por 4."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, el cubo tiene 4 de largo, 4 de ancho y 4 de alto: 4 · 4 · 4 = 64. El lado del cubo es la raíz cúbica de 64: 4."
+    },
+    {
+      "who": "student",
+      "text": "Con 8 de lado sale un cuadrado, plano: 8 · 8 = 64, y √64 = 8. La raíz cuadrada pregunta por el lado de un cuadrado; la cúbica, por el de un cubo."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y cómo puede ser que el 64 sirva para las dos cosas?"
+    },
+    {
+      "who": "student",
+      "text": "64 son seis dos: 2⁶. Juntados de a dos, tres veces: 4 · 4 · 4. Juntados de a tres, dos veces: 8 · 8."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Medí el polvo de tiza que dejó la Marea esta noche: tres millones de granos. No me entra en la libreta."
+    },
+    {
+      "who": null,
+      "text": "Contaste el 3: 3 · 10⁷ serían treinta millones. El 3 es lo que se multiplica; los lugares que se corre son los ceros."
+    },
+    {
+      "who": "student",
+      "text": "Punto, seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica."
+    },
+    {
+      "who": "Cornisa",
+      "text": "La de anoche la anoté así: 4 · 10⁵."
+    },
+    {
+      "who": "student",
+      "text": "Esta noche: tres millones contra cuatrocientos mil. Primero se mira el exponente, cuántos lugares; el 3 o el 4 vienen después."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Y un grano solo es nada: una milésima de gramo."
+    },
+    {
+      "who": "student",
+      "text": "Lo chico también se corre: tres lugares para el otro lado, como la tabla de los dos, para abajo."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Voy a agrandar una huerta cuadrada, pero todavía no decidí de qué lado: le digo x. Le sumo dos filas abajo y tres columnas al costado. Quiero una cuenta que sirva para cualquier lado."
+    },
+    {
+      "who": null,
+      "text": "La ficha x la dibujo de un largo cualquiera: x puede ser cualquier número."
+    },
+    {
+      "who": null,
+      "text": "Ahí se cruzan las filas nuevas con las columnas nuevas: son cuadraditos de 1 por 1, no tiras."
+    },
+    {
+      "who": null,
+      "text": "Los bordes ya tienen todas sus tiras: esa sobra."
+    },
+    {
+      "who": null,
+      "text": "Un x por x, cinco tiras y seis cuadraditos. Las tiras son los bordes nuevos: no se pueden olvidar."
+    },
+    {
+      "who": "student",
+      "text": "Peldaño, es partir el rectángulo, como cuando repartimos en las Terrazas, pero de los dos lados. Dos por tres, los cuadraditos; dos más tres, las tiras."
+    },
+    {
+      "who": "Balcón",
+      "text": "A mí me dieron las fichas sueltas: un x por x, cinco tiras y cinco cuadraditos. Quiero una huerta rectangular, sin que sobre nada."
+    },
+    {
+      "who": "Balcón",
+      "text": "Con x + 1 y x + 4 la esquina pide cuatro: sobra uno, no falta. Las tiras piden dos números que sumen 5: 0 y 5, 1 y 4, 2 y 3. Todavía no probaste ninguno."
+    },
+    {
+      "who": null,
+      "text": "Así no cierra: falta un cuadradito."
+    },
+    {
+      "who": null,
+      "text": "Así no cierra: sobran cinco cuadraditos."
+    },
+    {
+      "who": null,
+      "text": "Así no cierra: sobra un cuadradito."
+    },
+    {
+      "who": null,
+      "text": "Probé los tres pares que suman cinco y ninguno cierra: con cinco cuadraditos, este rectángulo no se arma."
+    },
+    {
+      "who": "Balcón",
+      "text": "Me dieron un cuadradito más: seis. ¿Y ahora?"
+    },
+    {
+      "who": null,
+      "text": "Así no cierra: faltan dos tiras."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres."
+    },
+    {
+      "who": "Balcón",
+      "text": "Con cinco no había manera: cero por cinco, cero; uno por cuatro, cuatro; dos por tres, seis. Ninguno da cinco. Con seis, sí."
+    },
+    {
+      "who": "Rampa",
+      "text": "Mi huerta: un cuadrado de lado x y dos tiras de x pegadas, una a cada lado. En total, ocho cuadraditos de tierra. ¿Cuánto mide x?"
+    },
+    {
+      "who": null,
+      "text": "Una tira más lo haría más largo de un lado. Le falta el hueco de la esquina: uno por uno."
+    },
+    {
+      "who": null,
+      "text": "Si la huerta ganó un cuadradito, la tierra también: lo que se agrega de un lado del igual, se agrega del otro."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2."
+    },
+    {
+      "who": null,
+      "text": "Con x = 2 se pueden contar: cuatro del cuadrado y dos de cada tira, ocho de tierra. Con la esquina, nueve: tres por tres."
+    },
+    {
+      "who": null,
+      "text": "Las dos cumplen (x + 1)² = 9, porque (−3) · (−3) también es 9. Pruebo x = −4 en la cuenta de Rampa: 16 − 8 = 8. Cumple. La huerta no: un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una."
+    },
+    {
+      "who": "student",
+      "text": "La raíz da el lado, el positivo. La raíz de (x + 1)² no siempre es x + 1: es lo lejos que está x + 1 del cero. Si x + 1 es positivo, es x + 1; si es negativo, no. Por eso x + 1 puede ser 3 o −3, los dos a 3 del cero."
+    },
+    {
+      "who": "Mara",
+      "text": "Al completar, siempre queda un cuadrado igual a un número. ¿Y si el número fuera otro?"
+    },
+    {
+      "who": null,
+      "text": "Con el 9 había 3 y −3. Con el 0, más cero y menos cero son lo mismo: x + 1 = 0, una sola, x = −1."
+    },
+    {
+      "who": null,
+      "text": "Con x = 2, (2 + 1)² = 9; con x = −4, (−4 + 1)² = 9: da 9, no −9. Un número de la recta multiplicado por sí mismo da 0 o positivo: ninguna."
+    },
+    {
+      "who": "student",
+      "text": "Al completar el cuadrado queda (x + algo)² = un número. Si es positivo, dos soluciones; si es cero, una; si es negativo, ninguna en la recta."
+    },
+    {
+      "who": "Mara",
+      "text": "Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?"
+    },
+    {
+      "who": null,
+      "text": "32 todavía no pasa mil."
+    },
+    {
+      "who": null,
+      "text": "Con 10 ya había pasado: 1024. La otra sobraba."
+    },
+    {
+      "who": "student",
+      "text": "Punto, 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó."
+    },
+    {
+      "who": null,
+      "text": "Diez, no cien: duplicar llega lejos enseguida."
+    },
+    {
+      "who": "Mara",
+      "text": "Para pasar mil, diez. ¿Y para llegar justo a mil?"
+    },
+    {
+      "who": "student",
+      "text": "Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero puede haber pasos más chicos: media duplicación."
+    },
+    {
+      "who": null,
+      "text": "× 1,5 dos veces es × 2,25: se pasa de duplicar. Tiene que ser un número que, dos veces, dé 2: √2, unos 1,41."
+    },
+    {
+      "who": "student",
+      "text": "Si queremos que juntar exponentes siga valiendo también con medios, un medio y un medio tienen que hacer uno: media duplicación tiene que ser √2, el positivo. Por eso se elige escribir √2 como 2 elevado a un medio, igual que se eligió 2⁰ = 1 para que la tabla siguiera."
+    },
+    {
+      "who": "student",
+      "text": "Nueve duplicaciones y media: 512 · 1,414, unos 724. Todavía no."
+    },
+    {
+      "who": null,
+      "text": "El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo."
+    },
+    {
+      "who": "Rampa",
+      "text": "Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2)."
+    },
+    {
+      "who": "student",
+      "text": "Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas."
+    },
+    {
+      "who": null,
+      "text": "Con x = 0 abajo queda −2, y eso se divide. El cero que molesta es el de abajo: aparece con x = 2."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero."
+    },
+    {
+      "who": "Rampa",
+      "text": "La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba."
+    },
+    {
+      "who": "Mara",
+      "text": "Yo tengo otra cuenta: (x · x − 4) ÷ (x − 2). Dicen que es lo mismo que x + 2, que es más corta."
+    },
+    {
+      "who": null,
+      "text": "Con x = −2 arriba da 0 y abajo −4: 0 ÷ (−4) = 0, lo mismo que x + 2. Un cero arriba no molesta; el que molesta es el de abajo, con x = 2."
+    },
+    {
+      "who": "student",
+      "text": "Mara, con x = 2 queda 0 ÷ 0: cualquier número por 0 da 0, así que no hay un solo resultado. Por eso no está definida, aunque x + 2 dé 4."
+    },
+    {
+      "who": "student",
+      "text": "Y x · x − 4 es (x − 2) · (x + 2). Si x no es 2, el (x − 2) que multiplica se va con el (x − 2) que divide, y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?"
+    }
+  ],
+  "createdAt": "2026-10-07T23:36:34.828Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    7
+  ]
+}
