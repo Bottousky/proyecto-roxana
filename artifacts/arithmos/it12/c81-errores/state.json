@@ -1,0 +1,847 @@
+{
+  "version": 1,
+  "chapter": 9,
+  "segment": "c9.flechas",
+  "flags": {
+    "c8irr": true,
+    "c8angle": true,
+    "c8copy": true,
+    "c8scale": true,
+    "c8puntoFence": true,
+    "c8perim": true,
+    "c8pythag": true,
+    "c8coords": true,
+    "c8shadow": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "q": 2,
+      "p": 3,
+      "diff": 1,
+      "t": "2026-10-07T17:25:21.583Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "near-miss"
+    },
+    {
+      "q": 3,
+      "p": 4,
+      "diff": -2,
+      "t": "2026-10-07T17:25:22.227Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "near-miss"
+    },
+    {
+      "q": 5,
+      "p": 7,
+      "diff": -1,
+      "t": "2026-10-07T17:25:22.879Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "near-miss"
+    },
+    {
+      "answer": "enough",
+      "t": "2026-10-07T17:25:24.474Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-need"
+    },
+    {
+      "where": [
+        "tl",
+        "tr"
+      ],
+      "opposite": false,
+      "t": "2026-10-07T17:25:26.673Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-corners"
+    },
+    {
+      "where": [
+        "tl",
+        "br"
+      ],
+      "opposite": true,
+      "t": "2026-10-07T17:25:29.291Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-corners"
+    },
+    {
+      "pick": "mid",
+      "t": "2026-10-07T17:25:31.411Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-compare"
+    },
+    {
+      "pick": "corner",
+      "t": "2026-10-07T17:25:31.542Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-compare"
+    },
+    {
+      "pick": "corner",
+      "t": "2026-10-07T17:25:32.722Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-compare"
+    },
+    {
+      "answer": "one",
+      "example": [
+        {
+          "p": 3,
+          "q": 2
+        },
+        {
+          "p": 1,
+          "q": 1
+        }
+      ],
+      "t": "2026-10-07T17:25:37.724Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "descent"
+    },
+    {
+      "nearest": {
+        "p": 17,
+        "q": 12,
+        "pp": 289,
+        "twoQq": 288,
+        "diff": 1
+      },
+      "t": "2026-10-07T17:25:37.997Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "irrational"
+    },
+    {
+      "corner": "A",
+      "deg": 67,
+      "t": "2026-10-07T17:25:41.639Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angle-cut"
+    },
+    {
+      "corner": "B",
+      "deg": 42,
+      "t": "2026-10-07T17:25:43.389Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angle-cut"
+    },
+    {
+      "corner": "C",
+      "deg": 72,
+      "t": "2026-10-07T17:25:45.139Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angle-cut"
+    },
+    {
+      "answer": "yes",
+      "t": "2026-10-07T17:25:46.206Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angle-general"
+    },
+    {
+      "pick": "A",
+      "t": "2026-10-07T17:25:47.991Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "alt-angle"
+    },
+    {
+      "A": 67,
+      "B": 42,
+      "C": 72,
+      "wrongPicks": 0,
+      "t": "2026-10-07T17:25:48.326Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angles"
+    },
+    {
+      "cand": "rot",
+      "op": "girar",
+      "t": "2026-10-07T17:25:52.839Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "cand": "flip",
+      "op": "girar",
+      "t": "2026-10-07T17:25:56.193Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "cand": "flip",
+      "op": "dar vuelta",
+      "t": "2026-10-07T17:25:58.443Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "cand": "big",
+      "op": "achicar a la mitad",
+      "t": "2026-10-07T17:26:01.842Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "cand": "wide",
+      "op": "no hay manera",
+      "t": "2026-10-07T17:27:50.800Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "answer": "sides",
+      "t": "2026-10-07T17:27:52.182Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "similar-keeps"
+    },
+    {
+      "answer": "2",
+      "t": "2026-10-07T17:27:54.280Z",
+      "seg": "c8.doble",
+      "run": 1,
+      "kind": "area-scale-predict"
+    },
+    {
+      "early": true,
+      "t": "2026-10-07T17:27:59.482Z",
+      "seg": "c8.doble",
+      "run": 1,
+      "kind": "area-fill"
+    },
+    {
+      "early": true,
+      "t": "2026-10-07T17:28:05.132Z",
+      "seg": "c8.doble",
+      "run": 1,
+      "kind": "volume-fill"
+    },
+    {
+      "length": 2,
+      "area": 4,
+      "volume": 8,
+      "t": "2026-10-07T17:28:05.421Z",
+      "seg": "c8.doble",
+      "run": 1,
+      "kind": "scale"
+    },
+    {
+      "answer": "same",
+      "t": "2026-10-07T17:28:07.648Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "perimeter-predict"
+    },
+    {
+      "a": 1,
+      "b": 5,
+      "area": 5,
+      "t": "2026-10-07T17:28:09.654Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "fence"
+    },
+    {
+      "a": 2,
+      "b": 4,
+      "area": 8,
+      "t": "2026-10-07T17:28:10.052Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "fence"
+    },
+    {
+      "a": 2,
+      "area": 8,
+      "t": "2026-10-07T17:28:10.513Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "fence-build"
+    },
+    {
+      "a": 3,
+      "b": 3,
+      "area": 9,
+      "t": "2026-10-07T17:28:10.715Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "fence"
+    },
+    {
+      "a": 3,
+      "area": 9,
+      "t": "2026-10-07T17:28:11.165Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "fence-build"
+    },
+    {
+      "areas": [
+        5,
+        8,
+        9
+      ],
+      "best": [
+        3,
+        3
+      ],
+      "t": "2026-10-07T17:28:11.497Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "perimeter"
+    },
+    {
+      "answer": "7",
+      "t": "2026-10-07T17:28:13.282Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-predict"
+    },
+    {
+      "k": 0,
+      "t": "2026-10-07T17:28:15.869Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-move"
+    },
+    {
+      "k": 2,
+      "t": "2026-10-07T17:28:15.886Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-move"
+    },
+    {
+      "k": 3,
+      "t": "2026-10-07T17:28:16.022Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-move"
+    },
+    {
+      "answer": "any",
+      "t": "2026-10-07T17:28:22.592Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-general"
+    },
+    {
+      "r": {
+        "big": 49,
+        "tris": 24,
+        "freeA": 25,
+        "squaresAB": 25
+      },
+      "holds": true,
+      "t": "2026-10-07T17:28:23.238Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag"
+    },
+    {
+      "name": "Rampa",
+      "x": 2,
+      "y": 3,
+      "t": "2026-10-07T17:28:26.611Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-try"
+    },
+    {
+      "name": "Rampa",
+      "x": 3,
+      "y": 2,
+      "t": "2026-10-07T17:28:26.891Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-try"
+    },
+    {
+      "name": "Peldaño",
+      "x": -1,
+      "y": -1,
+      "t": "2026-10-07T17:28:27.172Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-try"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "ok": false,
+      "t": "2026-10-07T17:28:28.621Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-corner"
+    },
+    {
+      "x": -1,
+      "y": 2,
+      "ok": true,
+      "t": "2026-10-07T17:28:28.805Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-corner"
+    },
+    {
+      "answer": "7",
+      "t": "2026-10-07T17:28:30.662Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-distance"
+    },
+    {
+      "dist": {
+        "d2": 25,
+        "exact": true,
+        "d": 5
+      },
+      "t": "2026-10-07T17:28:30.864Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coords"
+    },
+    {
+      "h": 8,
+      "k": 5,
+      "ok": false,
+      "t": "2026-10-07T17:28:34.869Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 8,
+      "k": 3,
+      "ok": false,
+      "t": "2026-10-07T17:28:34.999Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 8,
+      "k": 4,
+      "ok": true,
+      "t": "2026-10-07T17:28:35.130Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 8,
+      "len": 4,
+      "t": "2026-10-07T17:28:35.728Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 10,
+      "k": 2,
+      "ok": true,
+      "t": "2026-10-07T17:30:10.307Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 10,
+      "len": 2,
+      "t": "2026-10-07T17:30:10.902Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 12,
+      "k": 1,
+      "ok": true,
+      "t": "2026-10-07T17:30:12.407Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 12,
+      "len": 1,
+      "t": "2026-10-07T17:30:13.002Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 14,
+      "k": 2,
+      "ok": true,
+      "t": "2026-10-07T17:30:14.490Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 14,
+      "len": 2,
+      "t": "2026-10-07T17:30:15.087Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 16,
+      "k": 4,
+      "ok": true,
+      "t": "2026-10-07T17:30:16.556Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 16,
+      "len": 4,
+      "t": "2026-10-07T17:30:17.153Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c8",
+      "title": "Formas",
+      "abbr": "Una forma se mide, se copia, se agranda y se ubica; un dibujo muestra, un argumento prueba.",
+      "body": [
+        "Probando casos no se termina: para saber que algo vale siempre hace falta una razón que sirva para todos a la vez. Así se ve que √2 no es una fracción: si hubiera un par de enteros, habría otro más chico, sin fin; pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible.",
+        "Un ángulo es cuánto se gira. Los tres ángulos de un triángulo juntos hacen media vuelta, 180°: la paralela lo muestra para cualquier triángulo del plano.",
+        "Copias iguales (congruentes): se mueven, se giran o se dan vuelta y calzan. Parecidas (semejantes): los mismos ángulos y todos los lados multiplicados por lo mismo. Con el lado × 2, el área va × 4 y el volumen × 8; con × 3, × 9 y × 27.",
+        "El perímetro mide el borde; el área, lo de adentro: la misma cerca encierra distinta tierra. Con ángulo recto, cateto² + cateto² = hipotenusa² (reacomodando cuatro triángulos en un cuadrado). Un punto del plano se ubica con dos números en orden: (3, 2) no es (2, 3)."
+      ],
+      "seen": [
+        "Partiste el lado en 2, 3, 5: nunca cayó justo.",
+        "Pensaste que mil casos alcanzaban; mil no son todos, y hacía falta una razón que sirva para todos.",
+        "Con dos cuadrados adentro de uno, cada par que cumpliera daba otro más chico: con enteros, imposible. √2 no es una fracción.",
+        "Juntaste las puntas de un triángulo en media vuelta; para todos los triángulos, la razón fue la paralela.",
+        "Una copia parecida no conserva los lados ni el área: conserva la forma, los ángulos y la proporción.",
+        "Con el lado doble, anticipaste el doble de tierra: fueron cuatro huertas como la de antes.",
+        "Llenaste la caja de lado doble caja por caja; la diste por llena antes de tiempo, y entraron ocho: cuatro por piso, porque el alto también se duplicó.",
+        "Pensaste que la misma cerca da la misma tierra; dio de 5 a 9.",
+        "Para el tirante dijiste siete; derecho es más corto que por las patas: 9 + 16 = 25, mide 5.",
+        "Entre (−1, −1) y (3, 2), derecho no son 7: son 5, como el tirante."
+      ],
+      "moments": [
+        {
+          "id": "c8.doble",
+          "label": "Desplegar: el doble de grande"
+        },
+        {
+          "id": "c8.pitagoras",
+          "label": "Desplegar: el tirante"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c8.diagonal",
+    "c8.vuelta",
+    "c8.copias",
+    "c8.doble",
+    "c8.cerca",
+    "c8.pitagoras",
+    "c8.casas",
+    "c8.sombras"
+  ],
+  "moments": [
+    "c8.doble",
+    "c8.pitagoras"
+  ],
+  "log": [
+    {
+      "who": "Peldaño",
+      "text": "Partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas lo parto para que caiga justo?"
+    },
+    {
+      "who": "student",
+      "text": "Si partiendo el lado en q cayera justo, la diagonal mediría p de esas rayitas. Con esa rayita chica, el cuadrado del lado tendría q · q cuadraditos, y el de la diagonal, p · p."
+    },
+    {
+      "who": null,
+      "text": "Y el cuadrado de la diagonal es el de los dos cuadros: tendría que ser p · p = 2 · q · q, justo."
+    },
+    {
+      "who": "Mara",
+      "text": "Una noche probé hasta mil. Siempre faltó o sobró, a veces uno solo."
+    },
+    {
+      "who": "student",
+      "text": "Mil no son todos: el mil uno podría caer. Hace falta una razón que sirva para todos."
+    },
+    {
+      "who": "student",
+      "text": "Supongamos que hubiera enteros p y q que cumplen. El de p tiene tanto lugar como los dos de q juntos. La diagonal es más larga que el lado y más corta que dos lados: q es menos que p, y p menos que 2q. Entonces cada cuadrado de q entra en el de p, y los dos juntos se pisan."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Así lo pisado es un rectángulo, y lo que queda sin tapar, otro rectángulo: no son cuadrados, no dan otro par. Probá en otras esquinas."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Los dos de q juntos tienen tanto lugar como el de p. ¿Y lo amarillo, que se pisó dos veces, con qué tiene que ser igual?"
+    },
+    {
+      "who": null,
+      "text": "Ese es lo amarillo mismo. ¿Qué parte del cuadrado grande no tapó ningún azul?"
+    },
+    {
+      "who": "student",
+      "text": "Si los dos de q tapan lo mismo que el de p, lo que se pisa dos veces tiene que ser igual a lo que quedó sin tapar: las dos esquinas."
+    },
+    {
+      "who": null,
+      "text": "Un cuadrado, el del medio, igual a dos cuadrados, las esquinas. Otro par que cumpliría. Sus lados, 2q − p y p − q, son enteros, y positivos porque q < p < 2q. Y más chicos que p y q."
+    },
+    {
+      "who": null,
+      "text": "Exacto: los enteros no bajan para siempre. Y sin embargo, si el par cumpliera, siempre habría otro más chico. Las dos cosas a la vez no pueden ser."
+    },
+    {
+      "who": "student",
+      "text": "Punto, si hubiera un par de enteros que cumple, habría otro más chico, y otro, sin fin. Pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible: no hay ningún par."
+    },
+    {
+      "who": null,
+      "text": "El dibujo mostraba lo que pasaría si existiera el par, y con un dibujo no se distingue un largo de un entero. Lo que prueba es el razonamiento, y vale para todos los p y q a la vez. Probando casos, en cambio, nunca se termina."
+    },
+    {
+      "who": "Peldaño",
+      "text": "En la puerta dejo √2, que es exacto. Y abajo, chiquito: «1,414 y un poco más»."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Voy a cortar tejas triangulares. El carpintero dice que las tres puntas juntas siempre hacen lo mismo. ¿Lo mismo que qué?"
+    },
+    {
+      "who": null,
+      "text": "Las tres puntas juntas hacen la línea recta: media vuelta."
+    },
+    {
+      "who": "student",
+      "text": "Media vuelta es lo que gira Punto para mirar para atrás. Si la vuelta entera se parte en 360 partes, los grados, media vuelta son 180."
+    },
+    {
+      "who": null,
+      "text": "Vimos uno. Recortar y juntar con todos no se puede."
+    },
+    {
+      "who": "student",
+      "text": "Por la punta de arriba, una recta paralela a la de abajo: no se cruzan nunca."
+    },
+    {
+      "who": null,
+      "text": "Con dos paralelas, el lado AC está igual de inclinado contra las dos: el ángulo de A y el de arriba a la izquierda son iguales. Lo mismo B, del otro lado."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, arriba, sobre la paralela, quedan el de A, el de C y el de B, uno al lado del otro: media vuelta. No usé ninguna medida de este triángulo: vale para cualquiera."
+    },
+    {
+      "who": null,
+      "text": "En un plano, como la pizarra o el piso. Sobre una pelota, un triángulo grande suma más: ahí no hay paralelas que no se crucen."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Mi ventana tiene esta forma de ele. Me trajeron cuatro marcos. ¿Cuáles son copias de la mía?"
+    },
+    {
+      "who": null,
+      "text": "No calza. Volvé a probar."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, el girado y el dado vuelta son iguales a tu ventana, congruentes: se mueven y calzan. El grande es parecido, semejante: achicado a la mitad, calza. Y los iguales también son semejantes, con × 1."
+    },
+    {
+      "who": null,
+      "text": "Los lados del grande miden el doble. Lo que se mantiene es la forma: los ángulos, y que todos los lados se multiplican por 2."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Y el ancho tiene los mismos ángulos, todos rectos, pero no todos sus lados se multiplicaron por lo mismo: estirado de un solo lado ya no es mi ventana."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Mi huerta es la de nueve cuadros, tres por tres. Quiero otra con el lado el doble de largo. ¿Cuánta tierra va a tener?"
+    },
+    {
+      "who": "Peldaño",
+      "text": "Todavía queda tierra sin huerta. Mirá los huecos."
+    },
+    {
+      "who": null,
+      "text": "Cuatro huertas, no dos: el doble de largo y el doble de ancho. Treinta y seis cuadros."
+    },
+    {
+      "who": "Mara",
+      "text": "Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran? Llenala vos."
+    },
+    {
+      "who": "Mara",
+      "text": "El piso de arriba está vacío. La caja grande también es el doble de alta."
+    },
+    {
+      "who": null,
+      "text": "Ocho: cuatro en el piso de abajo y cuatro en el de arriba. Se duplicaron el largo, el ancho y también el alto."
+    },
+    {
+      "who": "student",
+      "text": "Peldaño, el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27."
+    },
+    {
+      "who": "Rampa",
+      "text": "Me quedaron doce tramos de cerca. Quiero una huerta rectangular, con la mayor cantidad de tierra adentro."
+    },
+    {
+      "who": "Rampa",
+      "text": "Con 2 por 4 me entran 8. ¿No habrá una que encierre más con los mismos doce tramos?"
+    },
+    {
+      "who": null,
+      "text": "La misma cerca y la tierra va de 5 a 9. No es la misma: depende de la forma. De los rectángulos con doce tramos, el cuadrado de tres por tres es el que más encierra."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra."
+    },
+    {
+      "who": "Balcón",
+      "text": "Para la escalera nueva quiero un tirante en diagonal. Las patas miden 3 y 4 cuadros, en escuadra. ¿Cuánto mide el tirante?"
+    },
+    {
+      "who": null,
+      "text": "Ir por las patas, 3 y después 4, es más largo que ir derecho por la diagonal."
+    },
+    {
+      "who": "student",
+      "text": "Armo un cuadrado de lado 3 + 4 con cuatro triángulos como el de Balcón, uno en cada esquina."
+    },
+    {
+      "who": null,
+      "text": "Lo que queda libre en el medio tiene cuatro lados iguales, tirantes. ¿Y sus esquinas? En cada borde se juntan las dos puntas agudas de dos triángulos; esas dos suman 90°, porque las tres puntas de un triángulo suman 180° y una es recta. Queda 180° − 90° = 90°: es un cuadrado."
+    },
+    {
+      "who": "Balcón",
+      "text": "¿Y ahora qué quedó libre, sin triángulo encima?"
+    },
+    {
+      "who": null,
+      "text": "El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, el cuadrado del tirante tiene 9 + 16 = 25 cuadros: el tirante mide 5, porque 5 · 5 = 25."
+    },
+    {
+      "who": "Balcón",
+      "text": "Mi otra escalera tiene patas 4 y 5, pero no en escuadra, y el tirante mide 6."
+    },
+    {
+      "who": null,
+      "text": "41 no es 36. Los cuatro triángulos encajan en las esquinas del cuadrado grande porque tienen una esquina recta: sin ángulo recto, no hay reacomodo."
+    },
+    {
+      "who": "student",
+      "text": "El lado de enfrente del ángulo recto se llama hipotenusa; los otros dos, catetos."
+    },
+    {
+      "who": "Balcón",
+      "text": "Cinco cuadros de tirante. Y sin medir."
+    },
+    {
+      "who": "Mara",
+      "text": "La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada."
+    },
+    {
+      "who": "Mara",
+      "text": "La casa de Rampa la tengo anotada así: (3, 2)."
+    },
+    {
+      "who": null,
+      "text": "Ese es (2, 3): dos por la acostada y tres por la parada. El orden importa."
+    },
+    {
+      "who": "student",
+      "text": "Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar."
+    },
+    {
+      "who": "Mara",
+      "text": "Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1)."
+    },
+    {
+      "who": "Mara",
+      "text": "Por las rectas, Peldaño camina en ele: derecho por una recta, dobla una sola vez y sigue derecho por otra. ¿Dónde dobla?"
+    },
+    {
+      "who": null,
+      "text": "Ni desde lo de Peldaño hasta (1, 1) ni de ahí a lo de Rampa se va derecho por una recta."
+    },
+    {
+      "who": null,
+      "text": "Doblando en (−1, 2): 3 y 4, siete en total. Doblando en (3, −1) también daría 4 y 3."
+    },
+    {
+      "who": "student",
+      "text": "Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5."
+    },
+    {
+      "who": null,
+      "text": "Siete es yendo por las rectas, en ele. Derecho, cinco."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?"
+    },
+    {
+      "who": null,
+      "text": "En la marca 5 ya no hay sombra: termina antes."
+    },
+    {
+      "who": null,
+      "text": "En la marca 3 todavía hay sombra: termina más lejos."
+    },
+    {
+      "who": null,
+      "text": "A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir."
+    },
+    {
+      "who": "Mara",
+      "text": "Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?"
+    }
+  ],
+  "createdAt": "2026-10-07T17:25:18.380Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    8
+  ]
+}

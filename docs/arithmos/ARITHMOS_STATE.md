@@ -110,8 +110,8 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
    (la máquina estaba a batería y suspendiéndose; el primer tramo llegó al límite de 2 h en 9.1): 1.1 → 8.8 sin errores
    (`it12/full-tel-c9`) y 8.7 → 12.8 sin errores hasta el último toque, que venció durante una suspensión
    (`it12/full-tel-c9b`); 12.8 se repitió sola y terminó bien (`it12/c128-tel`). Falta la de una vez y la directa.
-2. Agencia que queda en el cap. 8: 8.1 (la prueba de √2 tiene dos predicciones; los cuadrados de q van solos) y 8.2
-   (las puntas van solas a la línea); la generalización de 8.6 sigue siendo una segunda predicción. Requieren
-   revisión matemática después, porque tocan una prueba.
+2. Agencia que queda en el cap. 8: 8.2 (las puntas van solas a la línea; la paralela la traza el juego); segundas
+   predicciones en 8.1 y 8.6. Revisión independiente de 8.1 nuevo (el jugador elige las esquinas de los cuadrados de
+   q y con qué se compara lo pisado): toca una prueba.
 3. Pendientes de narrativa por capítulo (N2-R, N6-R, N7-R, N8-R, N10-12): Punto como personaje, voces, costuras.
 4. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.

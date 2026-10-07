@@ -503,6 +503,8 @@ function writeJournal8(g) {
   if (nm.length) seen.push(`Partiste el lado en ${nm.join(', ')}: nunca cayó justo.`);
   const pn = first('proof-need');
   if (pn) seen.push(pn.answer === 'arg' ? 'Viste que probando no se termina y que hacía falta una razón.' : pn.answer === 'more' ? 'Pensaste en seguir probando; los números no se terminan, y hacía falta una razón que sirva para todos.' : 'Pensaste que mil casos alcanzaban; mil no son todos, y hacía falta una razón que sirva para todos.');
+  const pc = ev.filter(e => e.kind === 'proof-corners');
+  if (pc.length > 1) seen.push('Pusiste los cuadrados de q primero en esquinas que no servían; en esquinas opuestas, lo pisado y lo libre fueron cuadrados.');
   if (first('descent')) seen.push('Con dos cuadrados adentro de uno, cada par que cumpliera daba otro más chico: con enteros, imposible. √2 no es una fracción.');
   const ag = first('angle-general');
   if (ag) seen.push(ag.answer === 'why' ? 'Juntaste las puntas de un triángulo en media vuelta y pediste una razón para todos: la paralela.' : 'Juntaste las puntas de un triángulo en media vuelta; para todos los triángulos, la razón fue la paralela.');

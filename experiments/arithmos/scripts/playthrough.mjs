@@ -418,6 +418,7 @@ let c9Shape = null;
 let c8Hour = 8;
 let c11Ax = 0;
 let c8Fence = 0;
+let c8Corner = 0;
 let c9Moves = 0;
 let c11Item = null;
 let c11Dice = 7;
@@ -832,6 +833,14 @@ for (let iter = 0; iter < 30000; iter++) {
     } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id.startsWith('c11-s'))) {
       target = spots[0];
       c11Item = target.id.replace('c11-s', '');
+    } else if (s.seg === 'c8.diagonal' && spots.some(x => x.id.startsWith('c8-cor-'))) {
+      // esquinas de los cuadrados de q: con errores, primero dos vecinas (rectángulos) y después opuestas
+      const seq = route === 'errores' ? ['tl', 'tr', 'tl', 'br'] : ['tl', 'br'];
+      target = spots.find(x => x.id === `c8-cor-${seq[c8Corner]}`) || spots[0];
+      c8Corner++;
+    } else if (s.seg === 'c8.diagonal' && spots.some(x => x.id === 'c8-mid-pick')) {
+      const wrong = route === 'errores' && !tried.has('c8mid') && (tried.add('c8mid'), true);
+      target = wrong ? spots.find(x => x.id === 'c8-mid-pick') : spots.find(x => x.id.endsWith('-pick') && x.id !== 'c8-mid-pick');
     } else if (s.seg === 'c8.doble' && spots.some(x => x.id === 'c8-full' || x.id === 'c8-boxfull')) {
       // llena la huerta y la caja; con errores, dice «ya está llena» a la mitad (una vez cada una)
       const done = spots.find(x => x.id === 'c8-full' || x.id === 'c8-boxfull');

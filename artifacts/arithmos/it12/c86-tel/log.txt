@@ -1,0 +1,26 @@
+[0.0s] escena → c8.pitagoras
+[1.0s] lee: Para la escalera nueva quiero un tirante en diagonal. Las patas miden 3 y 4 cuadros, en escuadra. ¿Cuánto mide el tirante?
+[1.6s] elige «Cinco.» (¿Cuánto mide el tirante?)
+[1.8s] lee: —Armo un cuadrado de lado 3 + 4 con cuatro triángulos como el de Balcón, uno en cada esquina.
+[2.7s] lee: Lo que queda libre en el medio tiene cuatro lados iguales, tirantes. ¿Y sus esquinas? En cada borde se juntan las dos puntas agudas de dos triángulos; esas dos suman 90°, porque las tres puntas de un triángulo suman 180° y una es recta. Queda 180° − 90° = 90°: es un cuadrado.
+[104.4s] lee: ¿Y ahora qué quedó libre, sin triángulo encima?
+[107.2s] lee: El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16.
+[107.3s] lee: —Balcón, el cuadrado del tirante tiene 9 + 16 = 25 cuadros. El tirante mide 5.
+[107.8s] elige «Para cualquier triángulo con ángulo recto: el reacomodo no usó el 3 ni el 4.» (¿Para qué triángulos vale esto?)
+[108.0s] lee: —El lado de enfrente del ángulo recto se llama hipotenusa; los otros dos, catetos.
+[108.1s] lee: Cinco cuadros de tirante. Y sin medir.
+[108.2s] escena → c8.casas
+[109.2s] lee: La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada.
+[110.0s] lee: La casa de Rampa la tengo anotada así: (3, 2).
+[111.1s] lee: —Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar.
+[111.1s] lee: Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1).
+[111.4s] lee: Por las rectas, Peldaño camina en ele: derecho por una recta, dobla una sola vez y sigue derecho por otra. ¿Dónde dobla?
+[113.2s] lee: Doblando en (3, −1): 4 y 3, siete en total. Doblando en (−1, 2) también daría 3 y 4.
+[113.8s] elige «Cinco.» (¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?)
+[114.1s] lee: —Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5.
+[114.1s] escena → c8.sombras
+[114.4s] lee: Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?
+[126.8s] lee: A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir.
+[126.9s] lee: Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?
+[127.1s] escena → c9.flechas
+[127.5s] {"ended":true,"final":{"mode":"play","seg":"c9.flechas"},"journal":["Formas"],"evidenceKinds":["pythag-predict","pythag-move","pythag-general","pythag","coord-try","coord-corner","coord-distance","coords","shadow-measure","shadow"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":127.524,"size":"844x390","touch":true,"route":"directa","watch":false}

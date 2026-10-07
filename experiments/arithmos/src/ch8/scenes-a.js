@@ -92,35 +92,69 @@ export const diagonal = {
     const qb = w.add(new Shape('c8-Qb', sq('c8-Qb', Q, {ch: BLUE, hatch: 10}), A.x1 - Q - 10, A.y0 + 10 + Q + 8, {z: 14}));
     qb.fade = 0.9;
     await d.say('student', 'Supongamos que hubiera enteros p y q que cumplen. El de p tiene tanto lugar como los dos de q juntos. La diagonal es más larga que el lado y más corta que dos lados: q es menos que p, y p menos que 2q. Entonces cada cuadrado de q entra en el de p, y los dos juntos se pisan.');
-    await d.interact(ctl => new Promise(resolve => {
-      const placed = new Set();
-      g.setHint(() => ['Tocá cada cuadrado azul: va a una esquina del cuadrado grande.']);
-      const targets = {[qa.id]: [bx, by], [qb.id]: [bx + P - Q, by + P - Q]};
-      const refresh = () => g.ui.setSpots([qa, qb].filter(t => !placed.has(t.id)).map((t, i) => rectSpot(`c8-put-${t.id}`, `Poner el cuadrado de q ${i ? 'abajo a la derecha' : 'arriba a la izquierda'}`, () => ({x: t.x, y: t.y, w: Q, h: Q}), async () => {
-        if (!ctl.alive() || placed.has(t.id)) return;
-        placed.add(t.id);
-        g.ui.setSpots([]);
-        const [tx, ty] = targets[t.id];
-        const sx0 = t.x, sy0 = t.y;
-        try { await d.tween(0.6, k => { t.x = lerp(sx0, tx, k); t.y = lerp(sy0, ty, k); }, easeInOut); } catch { return; }
-        g.audio.tap(0.2, 1.3 + placed.size * 0.1);
-        if (placed.size === 2) { g.setHint(null); resolve(); } else refresh();
-      })));
-      refresh();
-    }));
-    // lo pisado dos veces y lo que quedó sin tapar
+    // el jugador elige en qué esquina va cada cuadrado de q
     const m = 2 * Q - P, e = P - Q;
+    const CORNERS = {tl: [0, 0], tr: [P - Q, 0], bl: [0, P - Q], br: [P - Q, P - Q]};
+    const NAMES = {tl: 'arriba a la izquierda', tr: 'arriba a la derecha', bl: 'abajo a la izquierda', br: 'abajo a la derecha'};
+    const home = [[A.x1 - Q - 10, A.y0 + 10], [A.x1 - Q - 10, A.y0 + 10 + Q + 8]];
+    const slide = async (t, x, y, sec = 0.5) => { const sx0 = t.x, sy0 = t.y; await d.tween(sec, k => { t.x = lerp(sx0, x, k); t.y = lerp(sy0, y, k); }, easeInOut); };
+    let where;
+    for (let attempt = 0; ; attempt++) {
+      where = [];
+      for (const [n, t] of [qa, qb].entries()) {
+        const k = await d.interact(ctl => new Promise(resolve => {
+          g.setHint(() => [`Tocá la esquina del cuadrado grande donde va el ${n ? 'otro' : 'primer'} cuadrado azul.`, 'Si quedan en esquinas opuestas, lo pisado y lo libre son cuadrados.']);
+          g.ui.setSpots(Object.entries(CORNERS).map(([id, [cx, cy]]) => rectSpot(`c8-cor-${id}`, `Poner el cuadrado de q ${NAMES[id]}`, {x: bx + cx + (cx ? Q - 52 : 4), y: by + cy + (cy ? Q - 52 : 4), w: 48, h: 48}, () => { if (ctl.alive()) resolve(id); })));
+        }));
+        g.setHint(null);
+        where.push(k);
+        await slide(t, bx + CORNERS[k][0], by + CORNERS[k][1]).catch(() => {});
+        g.audio.tap(0.2, 1.3 + n * 0.1);
+      }
+      const [k1, k2] = where;
+      const opposite = CORNERS[k1][0] !== CORNERS[k2][0] && CORNERS[k1][1] !== CORNERS[k2][1];
+      d.evidence('proof-corners', {where: [...where], opposite});
+      if (opposite) break;
+      await d.say('Peldaño', k1 === k2
+        ? 'Uno encima del otro se tapan enteros, y no se ve nada nuevo. Probá en otras esquinas.'
+        : 'Así lo pisado es un rectángulo, y lo que queda sin tapar, otro rectángulo: no son cuadrados, no dan otro par. Probá en otras esquinas.');
+      await d.all(slide(qa, home[0][0], home[0][1], 0.4), slide(qb, home[1][0], home[1][1], 0.4)).catch(() => {});
+    }
+    // lo pisado dos veces (en el medio) y las dos esquinas sin tapar, según dónde quedaron
+    const freeAt = CORNERS[where[0]][0] === 0 && CORNERS[where[0]][1] === 0 || CORNERS[where[1]][0] === 0 && CORNERS[where[1]][1] === 0
+      ? [[bx + Q, by], [bx, by + Q]] : [[bx, by], [bx + Q, by + Q]];
     g.setCinematic(true);
     const mid = w.add(new Shape('c8-mid', sq('c8-mid', m, {ch: YELLOW, hatch: 6, w: 3}), bx + P - Q, by + P - Q, {z: 15, fade: 0}));
-    const c1 = w.add(new Shape('c8-c1', sq('c8-c1', e, {ch: WHITE, w: 2}), bx + Q, by, {z: 15, fade: 0}));
-    const c2 = w.add(new Shape('c8-c2', sq('c8-c2', e, {ch: WHITE, w: 2}), bx, by + Q, {z: 15, fade: 0}));
+    const c1 = w.add(new Shape('c8-c1', sq('c8-c1', e, {ch: WHITE, w: 2}), freeAt[0][0], freeAt[0][1], {z: 15, fade: 0}));
+    const c2 = w.add(new Shape('c8-c2', sq('c8-c2', e, {ch: WHITE, w: 2}), freeAt[1][0], freeAt[1][1], {z: 15, fade: 0}));
     await d.all(d.fadeTo(mid, 1, 0.6), d.fadeTo(c1, 1, 0.6), d.fadeTo(c2, 1, 0.6));
     w.add(new Label('c8-midl', '2q − p', bx + P - Q + m / 2, by + P - Q + m / 2 + 6, {size: 16, align: 'center', z: 16, ch: YELLOW}));
-    w.add(new Label('c8-c1l', 'p − q', bx + Q + e / 2, by + e / 2 + 6, {size: 15, align: 'center', z: 16}));
-    w.add(new Label('c8-c2l', 'p − q', bx + e / 2, by + Q + e / 2 + 6, {size: 15, align: 'center', z: 16}));
     d.describe('Los dos cuadrados azules se pisan en un cuadrado del medio, en amarillo, y dejan sin tapar dos esquinas iguales.');
     g.setCinematic(false);
-    await d.say('student', 'Si los dos de q tapan lo mismo que el de p, lo que se pisa dos veces tiene que ser igual a lo que quedó sin tapar.');
+    // el jugador elige con qué se compara lo pisado
+    await d.say('Peldaño', 'Los dos de q juntos tienen tanto lugar como el de p. ¿Y lo amarillo, que se pisó dos veces, con qué tiene que ser igual?');
+    const found = new Set();
+    await d.interact(ctl => new Promise(resolve => {
+      g.setHint(() => ['Tocá lo del cuadrado grande que tiene que ser igual a lo amarillo.', 'Lo amarillo se cuenta dos veces; algo del cuadrado grande no se contó ninguna.']);
+      const refresh = () => g.ui.setSpots([
+        ...[c1, c2].filter(c => !found.has(c.id)).map((c, i) => rectSpot(`${c.id}-pick`, `Una esquina sin tapar del cuadrado grande`, {x: c.x + 2, y: c.y + 2, w: e - 4, h: e - 4}, () => {
+          if (!ctl.alive()) return;
+          found.add(c.id);
+          w.add(new Label(`${c.id}l`, 'p − q', c.x + e / 2, c.y + e / 2 + 6, {size: 15, align: 'center', z: 16}));
+          g.audio.tap(0.15, 1.3 + found.size * 0.1);
+          d.evidence('proof-compare', {pick: 'corner'});
+          if (found.size === 2) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
+          void i;
+        })),
+        rectSpot('c8-mid-pick', 'El cuadrado amarillo, lo pisado dos veces', {x: mid.x + 4, y: mid.y + 4, w: m - 8, h: m - 8}, () => {
+          if (!ctl.alive()) return;
+          d.evidence('proof-compare', {pick: 'mid'});
+          g.note('Ese es lo amarillo mismo. ¿Qué parte del cuadrado grande no tapó ningún azul?');
+        }),
+      ]);
+      refresh();
+    }));
+    await d.say('student', 'Si los dos de q tapan lo mismo que el de p, lo que se pisa dos veces tiene que ser igual a lo que quedó sin tapar: las dos esquinas.');
     await d.think('Un cuadrado, el del medio, igual a dos cuadrados, las esquinas. Otro par que cumpliría. Sus lados, 2q − p y p − q, son enteros, y positivos porque q < p < 2q. Y más chicos que p y q.');
     // bajar: más chico, y más chico
     let level = 0;
