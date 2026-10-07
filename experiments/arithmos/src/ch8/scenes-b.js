@@ -342,6 +342,24 @@ export const casas = {
     ], {z: 13, progress: 0}));
     await d.draw(lPath, 0.8, {sound: false});
     const leg1 = Math.abs(cx + 1) + Math.abs(cy + 1), leg2 = Math.abs(3 - cx) + Math.abs(2 - cy);
+    // Punto hace el camino en ele, paso por paso
+    const p = w.get('punto'), st = w.get('student');
+    const walkLeg = async (from, to, n) => {
+      for (let i = 1; i <= n; i++) {
+        await zip(d, p, lerp(from[0], to[0], i / n), lerp(from[1], to[1], i / n) - 14, 0.2);
+        g.audio.tap(0.12, 1 + i * 0.06);
+      }
+    };
+    if (p) {
+      g.setCinematic(true);
+      try {
+        await zip(d, p, px(-1), py(-1) - 14, 0.5);
+        await walkLeg([px(-1), py(-1)], [px(cx), py(cy)], leg1);
+        await walkLeg([px(cx), py(cy)], [px(3), py(2)], leg2);
+      } catch { /* escena interrumpida */ }
+      g.setCinematic(false);
+      d.describe(`Punto hace el camino en ele, paso por paso: ${leg1} hasta el cruce y ${leg2} hasta lo de Rampa.`);
+    }
     d.describe(`El camino en ele, doblando en (${nm(cx)}, ${nm(cy)}): ${leg1} y ${leg2}, ${leg1 + leg2} en total.`);
     await d.think(`Doblando en (${nm(cx)}, ${nm(cy)}): ${leg1} y ${leg2}, siete en total.${cx === -1 ? ' Doblando en (3, −1) también daría 4 y 3.' : ' Doblando en (−1, 2) también daría 3 y 4.'}`);
     // la distancia en línea recta
@@ -361,6 +379,13 @@ export const casas = {
       S([[px(-1), py(-1)], [px(3), py(2)]], seedOf('c8-l3'), {w: 3, p: 0.95, ch: YELLOW}),
     ], {z: 13, progress: 0}));
     await d.draw(legs, 0.9, {sound: false});
+    // y ahora derecho, por la amarilla
+    if (p) {
+      await zip(d, p, px(-1), py(-1) - 14, 0.4).catch(() => {});
+      await zip(d, p, px(3), py(2) - 14, 0.9).catch(() => {});
+      g.audio.punto('happy');
+      follow(p, st);
+    }
     g.setCinematic(false);
     d.describe('Entre las dos casas, un triángulo con ángulo recto: 4 por la acostada, 3 por la parada, y el camino derecho en amarillo.');
     await d.say('student', `Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide ${dist.d}.`);

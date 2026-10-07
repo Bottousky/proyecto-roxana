@@ -273,7 +273,10 @@ export const vuelta = {
     // ¿a cuál de abajo es igual?
     let hits = 0;
     await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => ['El ángulo azul de la izquierda, arriba, se apoya en el lado AC. ¿Qué ángulo de abajo es igual a él? Tocalo.']);
+      g.setHint(() => [
+        'Arriba, a la izquierda de C, hay un ángulo azul. ¿Qué ángulo de abajo es igual a él? Tocalo.',
+        'El ángulo azul de la izquierda se apoya en el lado AC. ¿Qué ángulo de abajo se apoya en el mismo lado, del otro lado de la zeta?',
+      ]);
       const pick = k => {
         if (!ctl.alive()) return;
         hits++;

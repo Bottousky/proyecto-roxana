@@ -65,7 +65,7 @@ Actualizado: 2026-10-07 (ciclo 9 del loop).
   por la puerta del primer día (se despide de Mara; Punto llega antes y se queda con la Ronda) o quedarse. **11.4**: el
   jugador mueve dónde empieza el eje (96 → 0), ve «a la vista: ×2 … ×1,04» y decide cuándo el dibujo sirve. **10.3**:
   la altura a los 390° se marca en el mapa (1, 0,5, 0, −0,5, −1, «más arriba que 1», «no se sabe»), con devolución
-  propia para cada error. **8.4** (momento): una sola predicción; el jugador llena la huerta y la caja de lado doble y
+  propia para cada error. **8.7**: Punto hace el camino en ele paso por paso y después va derecho. **8.4** (momento): una sola predicción; el jugador llena la huerta y la caja de lado doble y
   dice cuándo están llenas. **8.5**: el jugador decide qué huerta armar. **8.6**: encuentra él lo que quedó libre, sin
   ayuda que anticipe. **9.8** con el tiempo a escala (24 horas por día). Bajas de rev-c8 (B7, B9). Revisión
   independiente rev-c9 (8.7, 8.8, 10.3, 11.4, 12.8): dos altas en 10.3 (id repetido que borraba la raya, Bitácora que
@@ -106,8 +106,10 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Partida completa 1 → 12 (directa y con errores, también en 844×390) con todo lo del ciclo 9, cuando la máquina
-   no esté suspendiéndose.
+1. Partida completa 1 → 12 de una sola vez. En el ciclo 9 se hizo en dos tramos en 844×390 por la ruta con errores
+   (la máquina estaba a batería y suspendiéndose; el primer tramo llegó al límite de 2 h en 9.1): 1.1 → 8.8 sin errores
+   (`it12/full-tel-c9`) y 8.7 → 12.8 sin errores hasta el último toque, que venció durante una suspensión
+   (`it12/full-tel-c9b`); 12.8 se repitió sola y terminó bien (`it12/c128-tel`). Falta la de una vez y la directa.
 2. Agencia que queda en el cap. 8: 8.1 (la prueba de √2 tiene dos predicciones; los cuadrados de q van solos) y 8.2
    (las puntas van solas a la línea); la generalización de 8.6 sigue siendo una segunda predicción. Requieren
    revisión matemática después, porque tocan una prueba.

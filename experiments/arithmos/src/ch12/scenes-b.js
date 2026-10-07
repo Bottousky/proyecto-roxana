@@ -363,7 +363,7 @@ export const final = {
     const DX = 15890;
     const door = w.add(new Drawing('c12-door', art.doorFrame('c12-door', DX, GROUND, 150, 270), {z: 2, progress: 0}));
     const glow = w.add(new Drawing('c12-doorl', art.doorLight('c12-doorl', DX, GROUND, 150, 270), {z: 1, progress: 0}));
-    await d.shot({x: 14240, y: GROUND - 560, w: 1780, h: 680}, 1.2);
+    await d.shot({x: 14820, y: GROUND - 440, w: 1200, h: 500}, 1.2);
     await d.all(d.draw(door, 1.2, {sound: false}), d.draw(glow, 1.4, {sound: false}));
     d.describe('Una tiza que nadie sostiene dibuja, al costado de las Terrazas, la puerta del primer día, con luz del otro lado.');
     await d.think('La puerta del primer día. Aquel día no había vuelta; ahora sí. Del otro lado está todo lo de antes.');

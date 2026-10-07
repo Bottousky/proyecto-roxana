@@ -1,0 +1,326 @@
+[0.0s] escena → c8.casas
+[1.0s] lee: La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada.
+[1.9s] lee: La casa de Rampa la tengo anotada así: (3, 2).
+[3.3s] lee: —Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar.
+[3.3s] lee: Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1).
+[3.6s] lee: Por las rectas, Peldaño camina en ele: derecho por una recta, dobla una sola vez y sigue derecho por otra. ¿Dónde dobla?
+[5.7s] lee: Doblando en (−1, 2): 3 y 4, siete en total. Doblando en (3, −1) también daría 4 y 3.
+[6.3s] elige «Siete, como en ele.» (¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?)
+[6.6s] lee: —Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5.
+[6.6s] lee: Siete es yendo por las rectas, en ele. Derecho, cinco.
+[6.7s] escena → c8.sombras
+[6.9s] lee: Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?
+[19.4s] lee: A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir.
+[19.5s] lee: Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?
+[19.8s] escena → c9.flechas
+[20.8s] lee: Con la tabla de ayer sé qué largo tiene mi sombra a cada hora. Un viajero me preguntó la hora y le dije sólo el largo: «mi sombra mide 2». No supo qué contestar.
+[25.7s] lee: De cada hora sale una flecha, y una sola.
+[26.3s] elige «Las 10.» (Cornisa dice sólo el largo: «mi sombra mide 2». ¿Qué hora es?)
+[130.9s] elige «Ya está: el 2 va a una sola hora.» (¿Hay otra hora con sombra 2?)
+[131.7s] lee: Las 10 o las 14: del 2 salen dos flechas.
+[131.7s] lee: —Cornisa, a cada hora le toca un solo largo de sombra: el largo es función de la hora. Al revés no: al largo 2 le tocan dos horas. Eso es una relación (une entradas con salidas), pero no una función. Si además decís para qué lado apunta, ahí sí se distinguen: pero esa ya es otra entrada.
+[131.8s] escena → c9.maquina
+[131.9s] lee: Hice una máquina para las cuentas de los escalones: le doy un número, lo da vuelta adentro y sale otro. Adiviná qué hace.
+[136.6s] elige «× 3: el triple» (Armá la regla. Primero, ¿qué hace la máquina con el número?)
+[138.1s] elige «Nada más.» (Primero × 3. Y después, ¿qué le hace para que dé lo anotado?)
+[139.3s] lee: Con 2, tu regla da 6, pero salió 5. Esa no es.
+[139.8s] elige «× 2: el doble» (Armá la regla. Primero, ¿qué hace la máquina con el número?)
+[141.4s] elige «Nada más.» (Primero × 2. Y después, ¿qué le hace para que dé lo anotado?)
+[142.6s] lee: Con 1, tu regla da 2, pero salió 3. Esa no es.
+[142.6s] lee: Mirá cuánto cambia lo que sale cuando lo que entra sube uno. Y fijate qué le falta a la primera pieza para llegar.
+[143.2s] elige «× 2: el doble» (Armá la regla. Primero, ¿qué hace la máquina con el número?)
+[144.8s] elige «+ 1» (Primero × 2. Y después, ¿qué le hace para que dé lo anotado?)
+[146.1s] lee: Ahora coincide con todo lo anotado.
+[146.7s] elige «20: el doble.» (Si entra 10, ¿qué sale?)
+[147.9s] lee: Veintiuno: el doble más uno. Coincide, pero coincidir no prueba la regla: otra regla rara podría dar lo mismo con estos números y otra cosa con uno que no probamos, como el 100.
+[148.0s] lee: La hice yo: es el doble más uno. La armaste bien, y el 10 no la desmintió.
+[148.1s] lee: —Mara, tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo.
+[148.1s] lee: Punto también hizo una.
+[150.3s] lee: —Punto, el mismo 3 dio 7 y después 9. Con tu máquina no puedo anticipar nada: no es una función.
+[150.3s] lee: Punto mira su máquina un rato. Adentro tenía una ruedita que giraba sola.
+[150.4s] escena → c9.puntos
+[150.6s] lee: La tabla me sirve, pero quisiera verla de un vistazo.
+[150.6s] lee: —En el mapa de Mara: la hora por la recta acostada, la sombra por la parada.
+[153.2s] lee: —Punto, es linda, pero ¿a qué hora es esa ola? No sale de la tabla.
+[153.8s] elige «Unirlos con una curva linda, como la de Punto.» (¿Los puntos se unen?)
+[154.8s] lee: Unir sí, pero sin inventar: por los puntos. Lo de en medio es una suposición, no una medición.
+[154.9s] lee: Entonces a las 9 mi sombra es… más o menos 3. Casi, porque no lo medí.
+[155.0s] lee: Yo anoto cuántas familias vienen cada día al depósito: lunes 3, martes 5, miércoles 4.
+[155.5s] elige «Unidos, como los de Cornisa.» (¿Esos puntos se unen?)
+[155.7s] lee: —Mara, entre el lunes y el martes no hay un día a medias, ni media familia: si unimos, la línea dice cosas que no existen. Sueltos.
+[155.8s] escena → c9.recta
+[156.0s] lee: Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?
+[156.0s] lee: —Si fuera el gráfico de una máquina, a cada entrada le tocaría una sola salida.
+[156.1s] lee: Las entradas van sobre la recta acostada. Para mirar una entrada sola, poné una recta parada en ese lugar y contá cuántas veces corta el dibujo.
+[160.0s] elige «Puede ser: en cada entrada, una sola altura.» (¿La recta puede ser el gráfico de una máquina?)
+[162.3s] elige «Todavía no sé: sigo moviendo la recta.» (¿El círculo puede ser el gráfico de una máquina?)
+[163.7s] elige «Puede ser: en cada entrada, una sola altura.» (¿El círculo puede ser el gráfico de una máquina?)
+[167.2s] elige «Puede ser: en cada entrada, una sola altura.» (¿La U puede ser el gráfico de una máquina?)
+[170.8s] elige «No puede ser: hay una entrada con dos alturas.» (¿La U acostada puede ser el gráfico de una máquina?)
+[171.7s] lee: —Balcón, la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas.
+[171.8s] lee: La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál.
+[171.9s] escena → c9.dominio
+[172.9s] lee: Le pedí a Mara una máquina para mi reparto: entra cuántos vienen, sale lo que le toca a cada uno. 1 ÷ (x − 2), como en la escalera.
+[254.8s] lee: Con 2 se traba: abajo queda cero. Con todos los demás sale algo, aunque sea negativo.
+[255.4s] elige «Cualquier número menos el 2, como la máquina.» (Para el reparto de Rampa, ¿qué entradas tienen sentido?)
+[255.5s] lee: La máquina acepta −1 o 0, pero no vienen −1 personas ni cero. Para el reparto, enteros mayores que 2.
+[255.6s] lee: —Rampa, las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.
+[255.7s] escena → c9.imagen
+[255.8s] lee: Esta máquina hace «por sí mismo»: x · x. Oval me pidió que le saque un −4 para una cuenta. ¿Qué le doy?
+[264.6s] elige «Sí: con −2, que es negativo.» (¿Puede salir −4?)
+[264.9s] lee: (−2) · (−2) da 4, no −4: menos por menos es más, como en el cap. 4.
+[264.9s] lee: —Mara, lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta.
+[265.2s] escena → c9.maneras
+[265.5s] lee: Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles.
+[269.1s] lee: —Mara, con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.
+[269.2s] lee: Y la mía, la B, es diez más uno por día: 10 + d.
+[269.2s] escena → c9.vuelve
+[270.2s] lee: Seguí midiendo, varios días. Miren.
+[272.2s] elige «Más: cada día crece.» (El día 2, a las 10, ¿cuánto habrá medido la sombra de Cornisa?)
+[275.6s] lee: No creció: el día 2 a las 10 midió 2, como el primero. La misma ve.
+[275.7s] lee: Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. En el dibujo cada día ocupa sus 24 horas: la ve vuelve cada 24 horas, aunque se mida sólo de 8 a 16.
+[276.2s] elige «No se puede saber: falta medirlo.» (Dentro de diez días, a las 8, ¿cuánto va a medir?)
+[276.4s] lee: —Cornisa, medido no está. Anticipado sí, suponiendo que el sol repite su recorrido: unos 4. En diez días lo medimos y vemos.
+[276.5s] lee: Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.
+[276.6s] lee: Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.
+[276.8s] escena → c10.rueda
+[277.9s] lee: La rueda del pozo perdió la soga. Tengo pedazos del largo del rayo de la rueda, de la punta al centro. ¿Cuántos hacen falta para dar toda la vuelta?
+[279.5s] elige «Seis justos.» (¿Cuántos pedazos del largo del rayo entran alrededor de la rueda?)
+[282.0s] lee: Todavía queda rueda sin soga.
+[284.0s] lee: Seis no alcanzan: queda un hueco.
+[284.6s] lee: Con el compás, el rayo entra seis veces justo, pero derecho, de punta a punta por adentro: el hexágono azul. La soga va por el borde, que es más largo: por eso queda un hueco.
+[284.7s] lee: —Balcón, una vuelta entera son 6 rayos y un poco más: 6,28… Se lo llama 2π. Media vuelta, π, unos 3,14 rayos: por eso el borde entero es π veces el diámetro, que son dos rayos. Se sabe que π no es una fracción, aunque probarlo es más difícil que lo de √2.
+[284.8s] lee: Medir un giro por cuántos rayos recorre el borde: eso es medir en radianes. Sirve para cualquier rueda: con una más grande, los pedazos también son más largos.
+[284.8s] escena → c10.alto
+[285.9s] lee: Ato el balde a la manija de la rueda. Si giro la rueda, ¿a qué altura queda la manija?
+[286.5s] elige «A un tercio de rayo: 30 es un tercio de 90.» (Si la rueda gira 30°, ¿a qué altura sobre el centro queda la manija?)
+[288.0s] elige «Girar hasta 30°.» (¿Hasta dónde giro la rueda? Se anota la altura de la manija en cada giro.)
+[289.2s] elige «Girar hasta 60°.» (Está en 30°. ¿Hasta dónde la giro ahora?)
+[290.5s] elige «Girar hasta 90°.» (Está en 60°. ¿Hasta dónde la giro ahora?)
+[291.8s] elige «Girar hasta 120°.» (Está en 90°. ¿Hasta dónde la giro ahora?)
+[292.4s] elige «Más alto que a 90°: sigue subiendo.» (A 120°, ¿a qué altura va a quedar la manija?)
+[293.3s] lee: No sube más que el rayo: después de 90° baja. 0,87, como a 60°; el costado ahora es negativo.
+[293.8s] elige «Ya está: con esto alcanza.» (Está en 120°. ¿Hasta dónde la giro ahora?)
+[294.0s] lee: A 30° la manija sube medio rayo, no un tercio: la altura no crece parejo con el giro.
+[294.1s] lee: —Balcón, en el centro, 30 y 30 hacen 60°. Los dos lados que salen del centro son rayos, iguales, así que las otras dos esquinas son iguales. Las tres suman 180°: a esas dos les quedan 120°, 60 cada una.
+[294.2s] lee: —Tres esquinas de 60°: los tres lados miden un rayo. El lado parado va de la marca de los 30° a su reflejo, y la línea del centro lo corta por la mitad: con la manija en los 30°, está a medio rayo de altura.
+[294.3s] lee: —Del centro al pie de la marca de los 30° va el costado: 0,87 a los 30°. Rayo, alto y costado forman un triángulo con esquina recta, como el tirante: alto² + costado² = 1.
+[294.4s] lee: —0,5 · 0,5 + 0,87 · 0,87 da 1,0069: casi 1, porque 0,87 está redondeado. A la altura de la manija, en la rueda de un rayo, se le dice seno del ángulo; al costado, coseno. A la izquierda del centro, el costado es negativo.
+[294.5s] escena → c10.repite
+[294.7s] lee: ¿Y si la rueda sigue girando? Pongamos las alturas en el mapa, como mi sombra.
+[297.9s] lee: Girada 390°, ¿a qué altura va a quedar la manija? Marcalo en la raya.
+[1311.5s] lee: A los 360° la manija vuelve a 0, donde empezó. Pero 390° son 30° más: la suben lo mismo que los primeros 30°, medio rayo, 0,5.
+[1311.5s] lee: A los 150° también está a 0,5, pero bajando. Subiendo, como a los 30°, recién a los 390°: ahí se repite todo.
+[1311.6s] lee: —Cornisa, la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra nunca se hace negativa, y de noche no hay sombra que medir.
+[1311.7s] escena → c10.rampa
+[1311.8s] lee: Mis rampas de carga tienen todas la misma inclinación: 30°. Una corta, de 2 tablones de largo, sube 1. La larga, de 4, sube 2. Quiero una de 6: ¿cuánto va a subir?
+[1312.4s] elige «Sube 4: dos más que la de 4.» (La rampa de largo 6, con la misma inclinación, ¿cuánto sube?)
+[1313.4s] lee: No se suma: se multiplica. Las rampas son semejantes; alto ÷ largo es siempre 1/2. Con largo 6, sube 3.
+[1313.5s] lee: —Rampa, ¿semejantes por tener el mismo ángulo? En la ventana de Cornisa no alcanzaba. Pero en un triángulo sí: con la esquina recta y la misma inclinación, la forma queda fija. La ventana era una ele, con seis lados: con más de tres lados, los ángulos no alcanzan.
+[1313.5s] lee: —Con la misma inclinación, alto ÷ largo de la tabla es siempre el mismo número, y es el seno del ángulo del piso: sen 30° = 0,5.
+[1313.6s] lee: Para la cuesta del pozo quiero una empinada: 60°, con una tabla de largo 4. ¿Cuánto sube esa?
+[1314.2s] elige «Sube 4: el doble de ángulo, el doble de alto.» (La rampa de 60° y largo 4, ¿cuánto sube?)
+[1314.4s] lee: Con el doble de ángulo no sube el doble: subiría 4, todo el largo de la tabla, y sería una pared. La tabla de la rueda dice 0,87: 4 · 0,87 ≈ 3,5.
+[1314.5s] lee: —Rampa, con la rueda sabés cuánto sube una rampa de cualquier inclinación, sin construirla: girás hasta ese ángulo y leés el alto.
+[1314.5s] escena → c10.flechas
+[1634.7s] lee: Punto, la soga vieja se había caído al pozo y ya la sacamos; yo la empalmo con la nueva en mi casa: traémela. Estás en el pozo, en el cero del mapa; mi casa está en (3, 2), como la anotó Mara. Mara sólo te deja moverte con estas flechas.
+[1641.2s] elige «A otro lugar: cambia el camino.» (Si Punto hace las mismas dos flechas en el otro orden, ¿adónde llega?)
+[1641.5s] lee: —Punto, el camino cambia, pero el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar.
+[1641.6s] lee: —Se suman los de adelante con los de adelante y los de arriba con los de arriba. Y como en cada suma el orden no importa, con cualquier par de flechas se llega al mismo lugar; si no van en la misma dirección, las dos rutas son los lados de un paralelogramo.
+[1641.6s] lee: —La suma es la flecha (3, 2): la que va derecho del pozo a la casa. Desde el cero, la flecha que llega a un lugar se anota con los mismos números que el lugar; desde otro punto, no.
+[1641.7s] escena → c10.cuarto
+[1642.7s] lee: En la Terraza de las Vueltas, cuando te dan media vuelta, se escribe × (−1). Así lo anotamos desde la piedra. ¿Y un cuarto de vuelta, cómo se escribe?
+[1644.4s] elige «(−3, 1): se le cambia el signo al de adelante.» (Un cuarto de vuelta contra el reloj: ¿adónde va a quedar la punta de (3, 1)?)
+[1646.7s] lee: (−3, 1) es reflejarla en el eje parado, no girarla: la flecha no se pone de pie. Quedó en (−1, 3).
+[1646.8s] lee: Dos cuartos: (−3, −1). Media vuelta: la flecha apunta para el lado contrario, como multiplicar por −1. Cada cuarto, (a, b) pasa a (−b, a).
+[1647.4s] elige «−1.» (¿Qué número, multiplicado dos veces, da media vuelta, × (−1)?)
+[1647.5s] lee: −1 por −1 es 1: dos medias vueltas, vuelta entera. Hace falta uno que sea medio camino: un cuarto.
+[1647.6s] lee: —Mara, a la flecha (0, 1), uno arriba del cero, le decimos i. Multiplicar por i es girar un cuarto de vuelta, contra el reloj. Dos cuartos son media vuelta: i · i = −1. i no está en la recta.
+[1647.7s] lee: —La flecha (3, 1) es el número 3 + i: tres adelante y uno arriba. Por i: i · 3 + i · i = 3i − 1. Es la flecha (−1, 3), la del primer giro: el de adelante pasa arriba, y el de arriba pasa adelante con el signo cambiado.
+[1647.8s] lee: ¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?
+[1647.9s] lee: —Con los números de la recta no se podía, y eso sigue valiendo en la recta. Con éstos sí: multiplicar por 2i es girar un cuarto de vuelta y estirar al doble. Dos veces: media vuelta y cuatro veces el largo, −4. Y −2i, girando para el otro lado, también.
+[1647.9s] escena → c10.pistas
+[1648.1s] lee: Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7.
+[1648.2s] lee: Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos.
+[1648.3s] lee: Segunda pista: el de Cornisa le lleva 1 al de Balcón.
+[1649.3s] lee: Punto mira la fila amarilla: (5, 2) no está en ella. El 5 le lleva 3 al 2, no 1. Se apuró.
+[1650.4s] lee: —Mara, son Cornisa 4 y Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.
+[1650.5s] lee: ¿Y si te digo «suman 7» y «suman 3»?
+[1651.0s] elige «(5, 2).» (Con «suman 7» y «suman 3», ¿qué par cumple las dos?)
+[1651.3s] lee: (5, 2) suma 7, pero no 3. Las dos filas son paralelas: ningún par cumple las dos.
+[1651.4s] lee: Una tabla así, sólo con los números de cada pista, se llama matriz.
+[1651.4s] lee: —Mara, en la tabla azul la parte de la izquierda es igual en las dos filas y el resultado no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas.
+[1651.5s] lee: ¿Y si te digo «suman 7» y «el doble de los dos suma 14»?
+[1651.6s] lee: —Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares.
+[1651.6s] escena → c10.a-veces
+[1652.7s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[1656.0s] lee: El primero llegó lleno, hasta el borde.
+[1665.1s] elige «A medias: ya le toca.» (El balde número 7, ¿cómo va a subir?)
+[1665.3s] lee: El balde no lleva la cuenta: lo que salió antes no cambia lo que sale ahora.
+[1665.4s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[1665.6s] escena → c11.baldes
+[1666.7s] lee: De seis baldes, cuatro subieron llenos. ¿Eso quiere decir que siempre van a ser cuatro de cada seis?
+[1667.2s] elige «Exactamente dos de cada tres, siempre.» (Si subimos mil baldes, ¿qué parte va a subir llena?)
+[1668.8s] elige «Subir hasta 10 baldes.» (¿Hasta cuántos baldes subimos?)
+[1670.3s] elige «Subir hasta 100 baldes.» (Van 10 baldes. ¿Y ahora?)
+[1671.8s] elige «Subir hasta 300 baldes.» (Van 100 baldes. ¿Y ahora?)
+[1673.4s] elige «Ya está: se ve adónde va.» (Van 300 baldes. ¿Y ahora?)
+[1673.5s] lee: No se queda clavado en dos tercios: a veces da justo y a veces un poco más o un poco menos, siempre cerca.
+[1673.6s] lee: —Balcón, con muchos baldes, la parte que sube llena se acomoda cerca de 2 de cada 3. Eso lo vimos, no está garantizado. Y el próximo balde, igual, no se sabe.
+[1673.7s] escena → c11.medio
+[1673.8s] lee: Me piden cuántos atados tiene una familia de las Terrazas, así, en general. Peldaño 3, Rampa 4, Cornisa 4, Balcón 5… y la Ronda, que guarda los de todos, 34.
+[1677.1s] elige «El promedio: 10, porque usa todos los datos.» (¿Qué número dice mejor cuántos atados tiene una familia común?)
+[1677.3s] lee: Diez no lo tiene ninguna familia: la Ronda sola empuja el promedio para arriba.
+[1677.4s] lee: —Mara, un número solo siempre esconde algo. El promedio reparte todo, y uno muy grande lo arrastra. El del medio, que se llama mediana, no se mueve aunque la Ronda tenga mil.
+[1677.4s] escena → c11.parejo
+[1677.6s] lee: Dos ayudantes redibujan escalones. Los dos hacen 5 por día en promedio. Mañana necesito por lo menos 4. Te muestro sus últimos cinco días. ¿A cuál llamo?
+[1678.9s] elige «Cualquiera: el promedio es el mismo.» (Para tener por lo menos 4, ¿a quién llamás?)
+[1679.1s] lee: El promedio es el mismo, pero B a veces hizo 1. A, en estos cinco días, nunca menos de 4.
+[1679.2s] lee: —Rampa, el promedio no dice qué tan desparejo es. De lo más bajo a lo más alto: A va de 4 a 6, una diferencia de 2; B, de 1 a 9, 8. Eso se llama rango.
+[1679.2s] escena → c11.grafico
+[1679.4s] lee: Punto juntó tiza para la escalera: 104 trozos. Mara juntó 100. Punto hizo un gráfico.
+[1680.0s] elige «Sí: su barra es el doble de alta.» (¿Punto juntó el doble de tiza que Mara?)
+[1680.2s] lee: El alto dice el doble. ¿Y si el eje empezara en otro número?
+[2468.9s] lee: Todavía no. A la vista, la barra de Punto es 1,4 veces la de Mara; la tiza de Punto es 104 ÷ 100 = 1,04 veces la de Mara. Mirá dónde empieza el eje.
+[2470.2s] lee: Desde cero, ×1,04: lo mismo que la tiza, 104 ÷ 100.
+[2470.3s] lee: El doble era de lo que se veía, no de la tiza.
+[2470.4s] lee: —Punto, los números eran ciertos, pero el dibujo decía otra cosa. Si las barras no empiezan en cero, el alto no compara cantidades.
+[2470.5s] escena → c11.contar
+[2470.7s] lee: Para la fiesta de la escalera tengo 3 sombreros y 2 bufandas. ¿De cuántas maneras distintas me puedo vestir?
+[2475.2s] lee: Cada sombrero se abre en dos: 3 veces 2, seis maneras.
+[2475.7s] elige «10: seis y cuatro más.» (Si además tiene 4 pares de botas, ¿cuántas maneras?)
+[2476.0s] lee: Cada una de las seis maneras se abre en cuatro, una por bota: 6 · 4 = 24. Se multiplica, no se suma.
+[2476.0s] lee: —Cornisa, cuando se elige una cosa de cada grupo, las maneras se multiplican: 3 · 2 = 6, y con las botas, 6 · 4 = 24. No hace falta dibujar todas.
+[2476.1s] escena → c11.dados
+[2476.3s] lee: ¡Doce! ¿Vieron? En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande.
+[2476.9s] elige «El 12: es el más grande.» (¿Qué suma sale más seguido, el 7 o el 12?)
+[2480.4s] lee: —Rampa, el 7 sale de 6 maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene 6/36 de probabilidad y el 12, 1/36.
+[2480.5s] lee: En la tabla, sí. ¿Y tirando de verdad?
+[2481.6s] lee: Contando, el 7 debería salir cerca de 60 veces de 360 y el 12, cerca de 10. Salieron 58 y 6: cerca, no exacto.
+[2481.6s] lee: Me paso al 7. Aunque el 12 puede salir igual: no es imposible, es raro.
+[2481.7s] escena → c11.causa
+[2482.7s] lee: Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche.
+[2484.1s] elige «Sí: van juntos, el polvo hace borrar a la Marea.» (¿El polvo hace que la Marea borre más?)
+[2485.7s] lee: Me olvidaba: también anoté el viento.
+[2485.8s] lee: Mirando de a pares con el mismo viento: con poco viento, el día de más polvo borró menos; con bastante, también; con mucho, también. Dentro del mismo viento, más polvo no trajo más borrones.
+[2485.9s] lee: —Mara, que dos cosas suban juntas no dice que una cause la otra. Con estos seis días, el que acompaña a los borrones parece el viento, no el polvo. Pero son pocos días: para estar más seguros, habría que anotar muchos más.
+[2486.0s] escena → c11.anticipar
+[2486.2s] lee: La escalera de Mara crece de a 10, la de Punto se duplica, la rueda vuelve, el balde a veces sí y a veces no. ¿Con todo eso se puede saber qué viene?
+[2492.7s] lee: —Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar.
+[2492.9s] lee: Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?
+[2493.2s] escena → c12.familias
+[2494.2s] lee: Juntemos las reglas del viaje. Dibujé seis formas. Cada regla tiene la suya: si reconocemos la forma, sabemos qué esperar.
+[2496.6s] elige «escalera de Mara» (¿Qué regla del viaje tiene esta forma?)
+[2496.8s] lee: La escalera de Mara sube lo mismo cada día: buscá la que sube pareja.
+[2497.5s] elige «altura de la rueda» (¿Qué regla del viaje tiene esta forma?)
+[2498.4s] elige «escalera de Mara» (¿Qué regla del viaje tiene esta forma?)
+[2499.2s] elige «reparto 1 ÷ (x − 2)» (¿Qué regla del viaje tiene esta forma?)
+[2500.0s] elige «escalera de Punto» (¿Qué regla del viaje tiene esta forma?)
+[2500.9s] elige «huerta x · x» (¿Qué regla del viaje tiene esta forma?)
+[2501.7s] elige «¿cuántas veces?» (¿Qué regla del viaje tiene esta forma?)
+[2501.8s] lee: —Mara, cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados de una raya parada que pasa por su punta, y por eso se dice que son simétricas; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.
+[2501.9s] lee: —Las partidas no están definidas en un lugar: el gráfico se interrumpe ahí, y a eso se le dice discontinuidad. Cerca del 2 se disparan, y se acercan a la raya punteada tanto como se quiera: una raya así se llama asíntota. Esta no la tocan nunca, porque en el 2 no hay valor.
+[2502.0s] lee: —Y la del reparto tiene otra, acostada: si vienen 102, a cada uno le toca 1 ÷ 100 = 0,01; si vienen 1002, 0,001. Con más gente se acerca a 0 tanto como se quiera, y nunca llega, porque 1 dividido por un número no da 0: la raya del 0 también es asíntota.
+[2502.0s] lee: —La del «¿cuántas veces?» también tiene una: cerca del 0 baja sin fin, pegada al eje parado.
+[2502.1s] lee: —Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.
+[2502.1s] escena → c12.perillas
+[2503.2s] lee: Todas las rectas son de la misma familia, pero no son iguales. La escalera de Mara: el día 0 tenía 1 escalón; el día 3, 31. ¿Qué recta es?
+[2505.8s] lee: —Rampa, b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia.
+[2505.9s] lee: Las U de las huertas también tienen perilla. Mi huerta nueva es de a cuadrados de lado x, pegados: la tierra es a · x · x. Con lado 2, quiero 8 de tierra.
+[2506.4s] elige «a = 1/2: la más abierta, para que entre más tierra.» (¿Qué perilla pasa por (2, 8)?)
+[2506.6s] lee: Con a = 1/2 y x = 2 da 2. Más abierta es menos alta: hace falta a = 2, más angosta.
+[2506.7s] lee: —Rampa, en las U la perilla a la estrecha o la abre: con a más grande (y positiva), sube más rápido y queda más angosta. Para pasar por (2, 8), a = 2: dos cuadrados.
+[2506.7s] escena → c12.salto
+[2507.8s] lee: Punto salta de alegría. Mara le midió la altura: a los t segundos está a 6t − t², y tarda 6 en volver al piso.
+[2508.3s] elige «Cerca del final, a los 5.» (¿Cuándo está más alto?)
+[2510.7s] lee: A los 3, justo en la mitad: el salto es una U dada vuelta, igual de los dos lados.
+[2510.8s] lee: —Cornisa, los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta.
+[2510.8s] lee: Con una tabla de 6 por 6 hago cajas: corto un cuadrado de lado x en cada esquina y levanto los bordes. Entra x · (6 − 2x) · (6 − 2x).
+[2512.3s] elige «x = 1,5: en la mitad, como el salto.» (¿Con qué corte entra más?)
+[2512.5s] lee: Con 1,5 entra 1,5 · 3 · 3 = 13,5. La caja no es una U: el máximo no queda en la mitad, queda en x = 1, con 16.
+[2512.6s] lee: —Cornisa, el corte va de 0 a 3: con más de 3 no queda tabla. Ahí se lee igual que el salto: ceros en 0 y en 3, crece hasta x = 1, el máximo es 16, y después decrece. Pero no es una U dada vuelta como el salto: no es igual de los dos lados.
+[2512.7s] lee: —Una suma de términos con x multiplicada por sí misma se llama polinomio, y el grado es cuántas veces, como mucho: acá x · x · x, grado 3. Como cuenta sirve para cualquier x; como caja, sólo de 0 a 3.
+[2512.7s] escena → c12.encadenar
+[2513.7s] lee: Puse dos máquinas en fila: «el doble más uno» y «por sí mismo». Si entra 2, ¿importa cuál va primero?
+[2609.7s] captura fallida (c12.encadenar-interaccion): page.screenshot: Timeout 15000ms exceeded.
+[2610.8s] lee: 25 y 9: el orden importa. Encadenar reglas es otra regla, y depende de cuál va primero.
+[2611.4s] elige «La mitad, y después menos uno.» (¿Qué máquina deshace «el doble más uno»?)
+[2611.5s] lee: Con 5: la mitad es 2,5, menos uno 1,5: no vuelve al 2. Se deshace en el orden contrario: menos uno, la mitad.
+[2612.1s] elige «3.» (Si «por sí mismo» dio 9, ¿qué entró?)
+[2612.3s] lee: —Mara, «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.
+[2612.4s] lee: —Dibujadas para x desde 0, la raíz es x · x dada vuelta sobre la diagonal: se cambian la entrada y la salida. 2 va a 4 en una; 4 vuelve a 2 en la otra: (2, 4) y (4, 2). Cada punto (a, b) de una es el (b, a) de la otra.
+[2612.5s] lee: —Es la familia de las raíces. Como la del «¿cuántas veces?», sube cada vez más despacio, pero arranca en el 0 con valor 0; aquella, cerca del 0, baja sin fin.
+[2612.5s] escena → c12.rapido
+[2613.5s] lee: En el salto de Punto: justo al segundo 1, ¿qué tan rápido sube?
+[2613.6s] lee: —En un tramo se puede medir: cuánto subió dividido cuánto tiempo pasó. Del 1 al 2 subió de 5 a 8: 3 por segundo.
+[2614.9s] elige «Del 1 al 1,5.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[2615.6s] elige «Del 1 al 1,1.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[2616.3s] elige «Ya está: ya se ve adónde van.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[2617.0s] elige «Al último que salió: con eso alcanza.» (¿A qué número se acercan?)
+[2617.1s] lee: El último es una aproximación: con un tramo más corto cambiaría otra vez (3,999 por la derecha, 4,001 por la izquierda). Se acercan a 4.
+[2617.2s] lee: —Cornisa, justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente.
+[2617.3s] escena → c12.junta
+[2617.4s] lee: Abrí la canilla del pozo de a poco: a los t minutos salen 2t baldes por minuto. ¿Cuánta agua juntamos en 3 minutos?
+[2618.8s] elige «En 6 pedazos, por abajo.» (¿En cuántos pedazos partís el tiempo ahora?)
+[2619.4s] elige «En 12 pedazos, por abajo.» (¿En cuántos pedazos partís el tiempo ahora?)
+[2620.1s] elige «En 12 pedazos, por arriba de la recta.» (¿En cuántos pedazos partís el tiempo ahora?)
+[2620.8s] elige «Ya está: ya se ve adónde van.» (¿En cuántos pedazos partís el tiempo ahora?)
+[2621.5s] elige «6: el último caudal.» (¿A cuántos baldes se acercan las sumas?)
+[2621.6s] lee: Por abajo dieron 6, 7,5, 8,25; por arriba, 9,75: lo juntado queda entre las dos, y las dos se le acercan.
+[2621.7s] lee: Seis es el caudal del final, por minuto, no lo juntado: las sumas de la pizarra ya pasaron el 6 (9,75). Lo juntado es lo que hay debajo de la recta: 3 · 6 ÷ 2 = 9.
+[2621.8s] lee: —Balcón, si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó.
+[2621.8s] escena → c12.tramos
+[2622.0s] lee: Mi precio por redibujar escalones: hasta 10, un trozo de tiza cada uno. Después del décimo, medio trozo por escalón.
+[2623.4s] elige «16: uno por escalón.» (¿Cuánta tiza cobra por 16 escalones?)
+[2623.5s] lee: El primer tramo cuesta 10; los 6 escalones que siguen, medio cada uno: 3. Total, 13.
+[2623.6s] lee: —Rampa, tu precio es una función por tramos: una regla hasta 10 y otra después. Un solo gráfico, dos reglas.
+[2623.7s] lee: —Lo lejos del cero también va por tramos, como Recta y Cuña en la línea del depósito: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V.
+[2623.8s] escena → c12.anticipar
+[2623.9s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?
+[2624.8s] lee: Esperá, Punto. Las noches 2 y 3 fueron 4 y 8.
+[2624.9s] lee: Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato.
+[2625.0s] lee: Con dos noches, 1 y 2, pasaban las dos: la recta que suma uno y la que duplica, como la de Punto en la carrera. Él eligió una antes de tiempo; las noches 2 y 3 la desmintieron.
+[2625.6s] elige «Suma lo mismo: una recta» (¿Qué familia sigue la Marea?)
+[2625.7s] lee: Una recta no pasa por los cuatro: de 1 a 2 sube 1, de 4 a 8 sube 4. No suma lo mismo.
+[2626.3s] elige «Va y vuelve: una ola» (¿Qué familia sigue la Marea?)
+[2626.5s] lee: Hasta ahora sólo sube, y cada vez más: no parece una ola.
+[2627.1s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[2627.7s] elige «En la noche 4: 16.» (Si sigue duplicando, ¿en qué noche pasa la escalera?)
+[2627.9s] lee: La noche 4 llega a 16: todavía no. La noche 5, 32: ahí pasa.
+[2628.0s] lee: —Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la noche 5. Lo anotamos como suposición y miramos cada noche si se cumple.
+[2628.0s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[2628.1s] lee: Noche 4.
+[2628.2s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La noche 5 pasa los 30.
+[2628.3s] lee: Entonces redibujamos la escalera esta noche, antes de la noche 5. ¡A trabajar!
+[2628.4s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[2631.0s] lee: —Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?
+[2631.1s] lee: —Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto.
+[2634.9s] lee: La Ronda baila otra vez, como el primer día. Punto se suma a la vuelta, un paso adelante.
+[2635.0s] lee: La puerta del primer día. Aquel día no había vuelta; ahora sí. Del otro lado está todo lo de antes.
+[2635.6s] elige «Quedarte un rato más: todavía hay cosas que no entendés.» (¿Volvés o te quedás?)
+node:internal/modules/run_main:111
+    triggerUncaughtException(
+    ^
+
+page.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#choices button:has-text("Quedarte un rato más: todavía hay cosas que no entendés.")')
+    - locator resolved to <button type="button" data-id="stay">Quedarte un rato más: todavía hay cosas que no en…</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+
+    at /Users/manuel/code/proyecto-roxana/.claude/worktrees/arithmos-graphic-adventure-065e68/experiments/arithmos/scripts/playthrough.mjs:501:16 {
+  log: [
+    `  - waiting for locator('#choices button:has-text("Quedarte un rato más: todavía hay cosas que no entendés.")')`,
+    '    - locator resolved to <button type="button" data-id="stay">Quedarte un rato más: todavía hay cosas que no en…</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v26.10.0
