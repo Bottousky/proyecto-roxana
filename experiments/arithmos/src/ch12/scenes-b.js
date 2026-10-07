@@ -355,37 +355,44 @@ export const final = {
     rondaDance(w, {speed: 0.5, ...dance, ids: [...RONDA_IDS, 'punto']});
     d.describe('Punto baja y se suma a la ronda.');
     await d.think('La Ronda baila otra vez, como el primer día. Punto se suma a la vuelta, un paso adelante.').catch(() => {});
+    // el estudiante se acerca a la Ronda: la puerta aparece con todos en cuadro
+    g.setCinematic(true);
+    await d.walk(s, dance.cx - dance.r - 50, GROUND, 320).catch(() => {});
+    g.setCinematic(false);
     // la puerta del primer día: volver o quedarse
     const DX = 15890;
     const door = w.add(new Drawing('c12-door', art.doorFrame('c12-door', DX, GROUND, 150, 270), {z: 2, progress: 0}));
     const glow = w.add(new Drawing('c12-doorl', art.doorLight('c12-doorl', DX, GROUND, 150, 270), {z: 1, progress: 0}));
     await d.shot({x: 14240, y: GROUND - 560, w: 1780, h: 680}, 1.2);
     await d.all(d.draw(door, 1.2, {sound: false}), d.draw(glow, 1.4, {sound: false}));
-    d.describe('Al costado de las Terrazas aparece dibujada la puerta del primer día, con luz del otro lado.');
-    await d.think('La puerta del primer día. Del otro lado está todo lo de antes.');
+    d.describe('Una tiza que nadie sostiene dibuja, al costado de las Terrazas, la puerta del primer día, con luz del otro lado.');
+    await d.think('La puerta del primer día. Aquel día no había vuelta; ahora sí. Del otro lado está todo lo de antes.');
     const door1 = await d.choose([
-      {id: 'back', text: 'Volver por la puerta: la puerta queda abierta.'},
-      {id: 'stay', text: 'Quedarme un tiempo más: todavía hay cosas que no entiendo.'},
-    ], {prompt: '¿Volver o quedarse?'});
+      {id: 'back', text: 'Volver por la puerta y dejarla abierta.'},
+      {id: 'stay', text: 'Quedarte un rato más: todavía hay cosas que no entendés.'},
+    ], {prompt: '¿Volvés o te quedás?'});
     d.evidence('final-door', {answer: door1});
     if (door1 === 'back') {
+      await d.say('student', 'Mara, vuelvo por la puerta del primer día. La dejo abierta.');
+      await d.say('Mara', 'Andá. Lo que entendiste, la Marea no lo borra.');
       g.setCinematic(true);
       rondaDance(w, {speed: 0.5, ...dance});
       await zip(d, p, DX - 30, GROUND - 60, 0.8).catch(() => {});
       d.describe('Punto se adelanta y llega primero a la puerta.');
-      await d.walk(s, DX - 70, GROUND, 200).catch(() => {});
+      await d.walk(s, DX - 70, GROUND, 320).catch(() => {});
       g.setCinematic(false);
-      await d.say('student', 'Llegaste antes, como siempre. Paso y la dejo abierta, por si quiero volver a entrar.');
+      await d.say('student', 'Punto, llegaste antes, como siempre. Quedate con la Ronda: paso y la dejo abierta, por si quiero volver a entrar.');
       g.audio.punto('happy');
       await pulse(d, p, 2, 0.4).catch(() => {});
-      d.describe('El estudiante y Punto cruzan la puerta. La luz queda prendida.');
-      await d.all(d.fadeTo(s, 0, 1), d.fadeTo(p, 0, 0.8)).catch(() => {});
-    } else {
+      d.describe('El estudiante cruza la puerta. Punto se queda en el umbral, del lado de las Terrazas, y vuelve a la Ronda. La luz queda prendida.');
       g.setCinematic(true);
-      await d.walk(s, dance.cx - dance.r - 50, GROUND, 200).catch(() => {});
+      await d.fadeTo(s, 0, 1).catch(() => {});
+      await zip(d, p, dance.cx + dance.r + 24, dance.cy - 20, 0.9).catch(() => {});
+      rondaDance(w, {speed: 0.5, ...dance, ids: [...RONDA_IDS, 'punto']});
       g.setCinematic(false);
-      d.describe('El estudiante camina hasta la Ronda y se queda mirándola bailar. La puerta sigue ahí, con su luz.');
-      await d.say('student', 'Me quedo un rato. La puerta no se va, y todavía hay cosas que no entiendo.');
+    } else {
+      d.describe('El estudiante se queda mirando bailar a la Ronda. La puerta sigue ahí, con su luz.');
+      await d.say('student', 'Me quedo un rato más. La puerta no se va.');
       g.audio.punto('happy');
       await pulse(d, p, 2, 0.4).catch(() => {});
     }
@@ -406,8 +413,6 @@ function writeJournal12(g) {
   if (jp) seen.push(jp.answer === '3' ? 'Anticipaste el punto más alto del salto en la mitad, a los 3.' : 'Pensaste el punto más alto en otro lado; el salto es igual de los dos lados: a los 3.');
   const ip = first('inverse-predict');
   if (ip) seen.push(ip.answer === 'right' ? 'Deshiciste «el doble más uno» en el orden contrario.' : 'Para deshacer «el doble más uno» probaste otro orden; se deshace al revés: menos uno, la mitad.');
-  const fd = first('final-door');
-  if (fd) seen.push(fd.answer === 'back' ? 'Al final volviste por la puerta del primer día, que quedó abierta; Punto llegó antes.' : 'Al final te quedaste un rato más con la Ronda; la puerta sigue ahí.');
   const bp = first('box-predict');
   if (bp) seen.push(bp.answer === '1' ? 'En la caja de Cornisa leíste el máximo en x = 1: 16.' : bp.answer === '1.5' ? 'En la caja de Cornisa buscaste el máximo en la mitad, como en el salto; la caja no es una U: el máximo está en x = 1.' : 'En la caja de Cornisa elegiste el corte más grande; con 3 no tiene fondo: el máximo está en x = 1.');
   const dp = first('derivative-predict');
@@ -416,6 +421,8 @@ function writeJournal12(g) {
   if (ip2) seen.push(ip2.answer === '9' ? 'Viste que las sumas se acercan al área bajo el caudal: 9.' : 'Las sumas de rectángulos se acercaban a 9, el área bajo el caudal.');
   const fp = first('final-predict');
   if (fp) seen.push(fp.answer === '5' ? 'Anticipaste la noche 5 para la Marea.' : 'Para la Marea pensaste otra noche; duplicando, pasa la escalera en la noche 5.');
+  const fd = first('final-door');
+  if (fd) seen.push(fd.answer === 'back' ? 'Al final volviste por la puerta del primer día y la dejaste abierta; Punto llegó antes y se quedó con la Ronda.' : 'Al final te quedaste un rato más con la Ronda; la puerta sigue ahí, abierta.');
   const entry = {
     id: 'c12',
     title: 'Anticipar',

@@ -329,7 +329,9 @@ function writeJournal11(g) {
   const sk = first('spread-pick');
   if (sk) seen.push(sk.answer === 'A' ? 'Para tener por lo menos 4 llamaste al ayudante parejo.' : 'Para tener por lo menos 4 pensaste en el otro; con el mismo promedio, el desparejo a veces hace 1.');
   const gp = first('graph-predict');
-  if (gp) seen.push(gp.answer === 'check' ? 'Miraste dónde empezaba el eje del gráfico de Punto.' : 'El gráfico de Punto te pareció decir otra cosa; desde cero, 104 y 100 son casi iguales.');
+  if (gp) seen.push(gp.answer === 'check' ? 'Miraste dónde empezaba el eje del gráfico de Punto.' : gp.answer === 'lie' ? 'Pensaste que Punto había mentido; los números eran ciertos, 104 y 100: engañaba el dibujo.' : 'El gráfico de Punto te pareció decir el doble; era el dibujo, que empezaba en 96.');
+  const early = ev.filter(e => e.kind === 'graph-axis' && e.from !== 0).map(e => e.from);
+  if (early.length) seen.push(`Dijiste que el dibujo servía con el eje en ${early.join(' y en ')}; recién desde 0 se ve ×1,04, como la tiza.`);
   const cp = first('count-predict');
   if (cp) seen.push(cp.answer === '24' ? 'Con 4 botas multiplicaste: 24 maneras.' : 'Con 4 botas sumaste; se multiplica: 24 maneras.');
   const dp = first('dice-predict');

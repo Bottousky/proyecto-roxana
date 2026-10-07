@@ -203,7 +203,7 @@ function pickChoice(prompt, options) {
     ['2³ + 2² es 2⁵', 'Sí'],
     ['¿Qué perilla pasa por (2, 8)?', 'a = 1/2'],
     ['¿Con qué corte entra más?', 'x = 1,5'],
-    ['¿Volver o quedarse?', 'Quedarme'],
+    ['¿Volvés o te quedás?', 'Quedarte'],
     ['¿Son la misma cuenta?', 'Tampoco con x = −2'],
     ['Media duplicación, ¿por cuánto', '× 1,5'],
     ['÷ 2², como una sola', '2⁷'],
@@ -352,7 +352,7 @@ function pickChoice(prompt, options) {
     ['2³ + 2² es 2⁵', 'No:'],
     ['¿Qué perilla pasa por (2, 8)?', 'a = 2'],
     ['¿Con qué corte entra más?', 'x = 1:'],
-    ['¿Volver o quedarse?', 'Volver'],
+    ['¿Volvés o te quedás?', 'Volver'],
     ['¿Son la misma cuenta?', 'Casi'],
     ['Media duplicación, ¿por cuánto', '× √2'],
     ['÷ 2², como una sola', '2³'],
@@ -759,8 +759,10 @@ for (let iter = 0; iter < 30000; iter++) {
     } else if (s.seg === 'c8.sombras' && spots.some(x => x.id.startsWith('c8-m'))) {
       // mide la sombra en la regla (con errores, una marca equivocada la primera vez)
       const len = {8: 4, 10: 2, 12: 1, 14: 2, 16: 4}[c8Hour];
-      const wrong = route === 'errores' && !tried.has('c8measure') && (tried.add('c8measure'), true);
-      target = spots.find(x => x.id === `c8-m${wrong ? (len === 5 ? 4 : len + 1) : len}`);
+      // con errores: una vez de más y, en otra hora con lugar, una de menos («todavía hay sombra»)
+      const over = route === 'errores' && !tried.has('c8measure') && (tried.add('c8measure'), true);
+      const under = !over && route === 'errores' && len > 1 && !tried.has('c8under') && (tried.add('c8under'), true);
+      target = spots.find(x => x.id === `c8-m${over ? (len === 5 ? 4 : len + 1) : under ? len - 1 : len}`);
     } else if (s.seg === 'c8.sombras' && spots.some(x => x.id.startsWith('c8-h'))) {
       target = spots[0];
       c8Hour = Number(target.id.replace('c8-h', ''));
@@ -844,8 +846,8 @@ for (let iter = 0; iter < 30000; iter++) {
       target = spots.find(x => x.id === seq[c8Fence]) || spots.find(x => x.id === 'c8-w3') || spots[0];
       c8Fence++;
     } else if (s.seg === 'c10.repite' && spots.some(x => x.id === 'c10-unk')) {
-      // marca la altura a los 390°: con errores, «más arriba que 1»
-      target = spots.find(x => x.id === (route === 'errores' ? 'c10-mmore' : 'c10-mhalf'));
+      // marca la altura a los 390°: con errores, una de las equivocadas (--c103=top|zero|neg|bottom|more|unk elige cuál)
+      target = spots.find(x => x.id === (route === 'errores' ? `c10-m${val('c103', 'zero')}`.replace('c10-munk', 'c10-unk') : 'c10-mhalf'));
     } else if (s.seg === 'c11.grafico' && spots.some(x => x.id === 'c11-axok')) {
       // mueve el eje: con errores, prueba 90, dice «así compara» antes de tiempo y baja a 50 antes de llegar a 0
       const seq = route === 'errores' ? ['c11-ax90', 'c11-axok', 'c11-ax50', 'c11-ax0', 'c11-axok'] : ['c11-ax0', 'c11-axok'];

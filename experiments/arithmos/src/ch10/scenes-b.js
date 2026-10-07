@@ -393,7 +393,16 @@ function writeJournal10(g) {
   const p90 = first('sin-past90-predict');
   if (p90) seen.push(p90.answer === 'same' ? `Anticipaste que a ${p90.deg}° la manija baja como subió: la altura de los ${180 - p90.deg}°.` : p90.answer === 'more' ? `Pensaste que a ${p90.deg}° seguía subiendo; después de 90° baja: la altura de los ${180 - p90.deg}°.` : `Pensaste que a ${p90.deg}° ya estaba abajo del centro; sigue arriba, a la altura de los ${180 - p90.deg}°, y el costado se hace negativo.`);
   const pp = first('period-predict');
-  if (pp) seen.push(pp.answer === 'half' ? 'A los 390° pusiste la altura de los 30°: la ola se repite.' : pp.answer === 'more' ? 'A los 390° pensaste más que 1; es una vuelta y 30°: la misma altura que a los 30°.' : 'A los 390° dijiste que no se sabía todavía; una vuelta entera deja la manija donde estaba: la altura de los 30°.');
+  const PP = {
+    half: 'A los 390° marcaste 0,5, la altura de los 30°: la ola se repite cada vuelta.',
+    more: 'A los 390° marcaste más arriba que 1; la manija nunca sube más que el rayo. 390° es una vuelta y 30°: la altura de los 30°, 0,5.',
+    top: 'A los 390° marcaste 1, lo más alto; eso pasa a los 90° (y a los 450°). 390° es una vuelta y 30°: 0,5.',
+    zero: 'A los 390° marcaste 0, como al cerrar la vuelta; 30° más la suben como al principio: 0,5.',
+    neg: 'A los 390° marcaste −0,5, la altura de los 330°, 30° antes de cerrar la vuelta; 390° es 30° después: 0,5.',
+    bottom: 'A los 390° marcaste −1, lo más bajo, que pasa a los 270°; 390° es una vuelta y 30°: 0,5.',
+    unknown: 'A los 390° dijiste que no se sabía todavía; una vuelta entera deja la manija donde estaba: la altura de los 30°.',
+  };
+  if (pp) seen.push(PP[pp.answer] || PP.unknown);
   const rr = first('ratio-predict');
   if (rr) seen.push(rr.answer === '3' ? 'La rampa de 6 sube 3: alto ÷ largo no cambia.' : rr.answer === '4' ? 'Para la rampa de 6 sumaste; con la misma inclinación, alto ÷ largo no cambia: sube 3.' : 'Para la rampa de 6 querías construirla; con la misma inclinación, alto ÷ largo no cambia: sube 3.');
   const r60 = first('ratio60-predict');

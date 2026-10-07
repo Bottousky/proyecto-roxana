@@ -460,5 +460,30 @@ Informe: `artifacts/arithmos/it11/review-c12c/informe.md`. Ninguna cuenta mal.
 | M4–M5 | Polinomio y grado sin definir; igualdad sin pasos; sin croquis | Corregidos: definición en una línea; dos renglones de cuenta; la tabla con las esquinas cortadas dibujada (`it11/r12-c12-errores/018`) |
 | B | a positiva; describe con la respuesta antes de la pregunta; «U dada vuelta»; Bitácora sin la perilla de las U | Corregidos |
 
+## Revisión de 8.7, 8.8, 10.3, 11.4 y 12.8 (rev-c9, 2026-10-07)
+
+Informe: `artifacts/arithmos/it12/review-c9/informe.md` (sin navegador, sobre 9c8b346). Todas las cuentas nuevas
+estaban bien; ninguna interacción deja trabado al jugador. Evidencia de lo corregido: `artifacts/arithmos/it12/rc9/`.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | 10.3: la raya «360° más» y la fórmula del estudiante compartían id: la fórmula borraba la raya | Corregido (id propio) |
+| A2 | Bitácora del cap. 10: a quien marcó 1, 0 o −0,5 le decía «dijiste que no se sabía» | Corregido: un texto por respuesta, también −1 |
+| M1 | 10.3: candidatos invisibles; «1» y «más arriba que 1» a 12 px; −1 no existía | Corregido: rayitas más gruesas y rotuladas (1, 0,5, 0, −0,5, −1); «más arriba que 1» es un botón de palabra; se suma −1 con su devolución |
+| M2 | 10.3: tres errores con la misma respuesta | Corregido: una devolución por error (lo más alto a los 90°; 0 a los 360° pero faltan 30°; −0,5 a los 330°; −1 a los 270°) |
+| M3 | 10.3: la pregunta ya decía «una vuelta y 30° más» | Corregido: «Girada 390°, ¿a qué altura…?»; segundo nivel de pista «390° es más que una vuelta entera. ¿Cuánto más?» |
+| M4 | 10.3: la raya horizontal a 0,5 pasaba por los 150° (período aparente de 120°) | Corregido: arco por arriba de la ola de 30° a 390° y el pensamiento «a los 150° también está a 0,5, pero bajando…» |
+| M5 | 11.4: «a la vista: ×2» antes de predecir; el rótulo cambiaba de color en 0 | Corregido: aparece después de la predicción, siempre amarillo |
+| M6 | 8.7: doblando en (−1, 2) se dibujaban dos eles (rectángulo con diagonal) | Corregido: los catetos van por el cruce elegido y la ele se borra |
+| M7 | 12.8: Punto cruzaba en silencio dejando la Ronda; el estudiante no se despedía de Mara | Corregido: «Mara, vuelvo…» / «Andá. Lo que entendiste, la Marea no lo borra»; Punto llega antes, se queda en el umbral y vuelve a la Ronda; Bitácora |
+| M8 | 11.4: «es ×1,4 de la de Mara; la tiza es 1,04» | Corregido: «la barra de Punto es 1,4 veces la de Mara; la tiza de Punto es 104 ÷ 100 = 1,04 veces la de Mara» |
+| B1–B4 | 8.7: una nota para 31 cruces; «de un lado y del otro»; «sin medir» sin devolución; rótulo de Peldaño sobre los ejes | Corregidos: nota según el caso y segundo nivel de pista; «derecho por una recta, dobla una sola vez…»; devolución propia; rótulo abajo |
+| B5–B6 | 8.8: sol vertical al mediodía con sombra a los dos lados; `hoursHint() \|\| …` | Corregidos: el sol del mediodía corrido, la sombra de 1 hacia la derecha desde los pies (y la regla igual); `refresh` en dos sentencias |
+| B7–B8 | 10.3: «tu sombra no sube y baja así» contradecía 8.8; la raya tapaba «360°» | Corregidos: «tu sombra nunca se hace negativa, y de noche no hay sombra que medir»; la raya se corta en el rótulo |
+| B9–B11 | 11.4: «como la tiza» antes de decidir; «así compara»; rótulos de 10 px en teléfono | Corregidos: el pensamiento va después de «así sirve»; botón «así sirve»; rótulos a 20 |
+| B12–B15 | 12.8: opciones en primera persona y «puerta… puerta»; sin «No hay vuelta. Por ahora.»; Bitácora en el medio; estudiante fuera de cuadro y 9 s de caminata | Corregidos: «¿Volvés o te quedás?» en segunda persona; «Aquel día no había vuelta; ahora sí»; la línea de la puerta al final de la Bitácora; el estudiante se acerca a la Ronda antes del plano y camina a 320 |
+| B16 | Bitácora del cap. 11 sin `graph-axis` | Corregido |
+| B17 | El bot no pasaba por las ramas nuevas | Corregido: `--c103=top|zero|neg|bottom|more|unk` y en 8.8 una medida de más y una de menos |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

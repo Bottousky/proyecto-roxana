@@ -280,7 +280,8 @@ export const casas = {
     await d.shot(SHOTS.tiles, 0.8);
     const house = (id, x, y, name) => {
       w.add(new Shape(id, poly(id, [[-10, 0], [10, 0], [10, -14], [0, -24], [-10, -14]], {ch: YELLOW, w: 2.4}), px(x), py(y), {z: 14}));
-      w.add(new Label(`${id}l`, name, px(x) + 14, py(y) - 18, {size: 19, z: 14, ch: YELLOW}));
+      // debajo del cero, el rótulo va abajo para no tapar los números de las rectas
+      w.add(new Label(`${id}l`, name, px(x) + 14, y < 0 ? py(y) + 26 : py(y) - 18, {size: 19, z: 14, ch: YELLOW}));
     };
     const placeAt = (target, name, wrongNote) => d.interact(ctl => new Promise(resolve => {
       g.setHint(() => [`Tocá el cruce donde va la casa de ${name}: el primer número se cuenta por la recta acostada; el segundo, por la parada.`]);
@@ -305,9 +306,12 @@ export const casas = {
     house('c8-hP', -1, -1, 'Peldaño');
     g.audio.tap(0.2, 1.4);
     // por las rectas, en ele: el jugador elige dónde dobla el camino
-    await d.say('Mara', 'Por las rectas, Peldaño camina en ele: primero de un lado y después del otro. ¿Dónde dobla?');
+    await d.say('Mara', 'Por las rectas, Peldaño camina en ele: derecho por una recta, dobla una sola vez y sigue derecho por otra. ¿Dónde dobla?');
     const corner = await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => ['Tocá el cruce donde dobla el camino en ele entre lo de Peldaño y lo de Rampa.']);
+      g.setHint(() => [
+        'Tocá el cruce donde dobla el camino en ele entre lo de Peldaño y lo de Rampa.',
+        'El cruce tiene que estar en una recta que pase por lo de Peldaño y en otra que pase por lo de Rampa.',
+      ]);
       const spots = [];
       for (let x = X0; x <= X1; x++) for (let y = Y0; y <= Y1; y++) {
         if ((x === -1 && y === -1) || (x === 3 && y === 2)) continue;
@@ -315,7 +319,14 @@ export const casas = {
           if (!ctl.alive()) return;
           const ok = (x === 3 && y === -1) || (x === -1 && y === 2);
           d.evidence('coord-corner', {x, y, ok});
-          if (!ok) { g.note(`Desde (−1, −1) hasta (${String(x).replace('-', '−')}, ${String(y).replace('-', '−')}) y de ahí a (3, 2) no son dos tramos derechos por las rectas: el camino en ele dobla una sola vez.`); return; }
+          if (!ok) {
+            const at = `(${String(x).replace('-', '−')}, ${String(y).replace('-', '−')})`;
+            const fromP = x === -1 || y === -1, toR = x === 3 || y === 2;
+            g.note(fromP ? `Hasta ${at} vas derecho, pero de ahí a lo de Rampa no: tendrías que doblar otra vez.`
+              : toR ? `De ${at} a lo de Rampa vas derecho, pero desde lo de Peldaño hasta ahí no se llega por una sola recta.`
+                : `Ni desde lo de Peldaño hasta ${at} ni de ahí a lo de Rampa se va derecho por una recta.`);
+            return;
+          }
           g.ui.setSpots([]);
           g.setHint(null);
           resolve([x, y]);
@@ -342,9 +353,11 @@ export const casas = {
     ], {prompt: '¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?', evaluate: true});
     d.evidence('coord-distance', {answer: c});
     g.setCinematic(true);
+    // los catetos van por el cruce que eligió el jugador
+    w.remove('c8-lpath');
     const legs = w.add(new Drawing('c8-legs', [
-      S([[px(-1), py(-1)], [px(3), py(-1)]], seedOf('c8-l1'), {w: 2.4, p: 0.9, ch: BLUE}),
-      S([[px(3), py(-1)], [px(3), py(2)]], seedOf('c8-l2'), {w: 2.4, p: 0.9, ch: BLUE}),
+      S([[px(-1), py(-1)], [px(cx), py(cy)]], seedOf('c8-l1'), {w: 2.4, p: 0.9, ch: BLUE}),
+      S([[px(cx), py(cy)], [px(3), py(2)]], seedOf('c8-l2'), {w: 2.4, p: 0.9, ch: BLUE}),
       S([[px(-1), py(-1)], [px(3), py(2)]], seedOf('c8-l3'), {w: 3, p: 0.95, ch: YELLOW}),
     ], {z: 13, progress: 0}));
     await d.draw(legs, 0.9, {sound: false});
@@ -352,6 +365,7 @@ export const casas = {
     d.describe('Entre las dos casas, un triángulo con ángulo recto: 4 por la acostada, 3 por la parada, y el camino derecho en amarillo.');
     await d.say('student', `Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide ${dist.d}.`);
     if (c === '7') await d.think('Siete es yendo por las rectas, en ele. Derecho, cinco.');
+    if (c === 'measure') await d.think('Se sabe sin regla: 4 y 3 con esquina recta son las patas del tirante de Balcón, y el tirante salió de la cuenta.');
     await studentWrites(d, g, 'c8-co', '(3, 2) ≠ (2, 3)', A.x0 + 372, A.y0 + 40, {size: 20});
     d.evidence('coords', {dist});
     g.flags.c8coords = true;
@@ -389,7 +403,9 @@ export const sombras = {
     const setShadow = (len, h) => {
       w.remove('c8-shadow');
       const dir = dirOf(h);
-      const pts = dir === 0 ? [[fx - len * 20, GROUND - 3], [fx + len * 20, GROUND - 3]] : [[fx + dir * 4, GROUND - 3], [fx + dir * (4 + len * 40), GROUND - 3]];
+      // al mediodía el sol no está justo arriba: la sombra, la más corta, cae hacia la derecha
+      const dd = dir === 0 ? 1 : dir;
+      const pts = [[fx + dd * 4, GROUND - 3], [fx + dd * (4 + len * 40), GROUND - 3]];
       w.add(new Drawing('c8-shadow', [S(pts, seedOf(`c8-sh${h}`), {w: 11, p: 0.8, ch: BLUE})], {z: 2}));
     };
     const tried = [];
@@ -398,7 +414,7 @@ export const sombras = {
       let busy = false;
       const hoursHint = () => g.setHint(() => ['Tocá una hora: el sol se mueve y la sombra de Cornisa cambia. Después la medís con la regla.']);
       hoursHint();
-      const refresh = () => hoursHint() || g.ui.setSpots(HOURS.filter(h => !tried.includes(h)).map((h, i) => wordSpot(`c8-h${h}`, `${h} h`, fx - 280 + HOURS.indexOf(h) * 140, GROUND + 70, () => at(h), {label: `Mirar la sombra a las ${h}`})));
+      const refresh = () => { hoursHint(); g.ui.setSpots(HOURS.filter(h => !tried.includes(h)).map((h, i) => wordSpot(`c8-h${h}`, `${h} h`, fx - 280 + HOURS.indexOf(h) * 140, GROUND + 70, () => at(h), {label: `Mirar la sombra a las ${h}`}))); };
       const at = async h => {
         if (busy || !ctl.alive()) return;
         busy = true;
@@ -406,12 +422,12 @@ export const sombras = {
         tried.push(h);
         const t = (h - 6) / 12;
         const sx0 = sun.x, sy0 = sun.y;
-        const tx = fx - 420 + t * 840, ty = GROUND - 220 - Math.sin(t * Math.PI) * 220;
+        const tx = fx - 420 + t * 840 - (h === 12 ? 60 : 0), ty = GROUND - 220 - Math.sin(t * Math.PI) * 220;
         try { await d.tween(0.8, q => { sun.x = lerp(sx0, tx, q); sun.y = lerp(sy0, ty, q); }, easeInOut); } catch { return; }
         setShadow(SHADOW[h], h);
         const dir = dirOf(h);
         // el jugador mide: una regla de tiza en el piso, con una marca por paso, desde donde empieza la sombra
-        const step = dir === 0 ? 1 : dir, s0 = dir === 0 ? fx - 20 : fx + dir * 4;
+        const step = dir === 0 ? 1 : dir, s0 = fx + step * 4;
         const ticks = [S([[s0, GROUND + 12], [s0 + step * 5 * 40, GROUND + 12]], seedOf('c8-ruler'), {w: 2, p: 0.85, ch: YELLOW, lift: false})];
         for (let k = 0; k <= 5; k++) ticks.push(S([[s0 + step * k * 40, GROUND + 6], [s0 + step * k * 40, GROUND + 20]], seedOf('c8-ruler') + 1 + k, {w: 2, p: 0.85, ch: YELLOW, lift: false}));
         w.add(new Drawing('c8-ruler', ticks, {z: 3}));

@@ -1,6 +1,6 @@
 # Arithmos — estado
 
-Actualizado: 2026-10-06 (ciclo 4 del loop).
+Actualizado: 2026-10-07 (ciclo 9 del loop).
 
 ## Dónde
 
@@ -61,6 +61,17 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   nombrada, perilla de las U (12.2). El final termina con la Ronda bailando en las Terrazas y Punto sumándose.
   Quinta revisión (rev-c8d) aplicada: noches contadas como el eje, consigna y casilleros vacíos en 11.6, la soga
   del pozo en el borde de la rueda, Punto se adelanta en 10.7.
+- **Ciclo 9 (2026-10-07):** agencia donde el juego daba el paso. **12.8** termina con una decisión del estudiante: volver
+  por la puerta del primer día (se despide de Mara; Punto llega antes y se queda con la Ronda) o quedarse. **11.4**: el
+  jugador mueve dónde empieza el eje (96 → 0), ve «a la vista: ×2 … ×1,04» y decide cuándo el dibujo sirve. **10.3**:
+  la altura a los 390° se marca en el mapa (1, 0,5, 0, −0,5, −1, «más arriba que 1», «no se sabe»), con devolución
+  propia para cada error. **8.4** (momento): una sola predicción; el jugador llena la huerta y la caja de lado doble y
+  dice cuándo están llenas. **8.5**: el jugador decide qué huerta armar. **8.6**: encuentra él lo que quedó libre, sin
+  ayuda que anticipe. **9.8** con el tiempo a escala (24 horas por día). Bajas de rev-c8 (B7, B9). Revisión
+  independiente rev-c9 (8.7, 8.8, 10.3, 11.4, 12.8): dos altas en 10.3 (id repetido que borraba la raya, Bitácora que
+  decía «no se sabía»), ocho medias y 17 bajas; aplicadas todas menos las que quedan anotadas en ARITHMOS_REVIEW.md.
+- **Entorno (ciclo 9):** la máquina entra en ciclos de suspensión de ~15 minutos (pmset: «Sleep Service Back to
+  Sleep»); las corridas se cortan a la mitad y se repiten. Se priorizan corridas por capítulo.
 - **Entorno:** la máquina se suspendió de madrugada (≈ 01:30–02:00); dos corridas y una revisión se cortaron
   por eso y se repitieron sin problemas.
 - Revisión narrativa de los caps. 10–12 hecha (rev-narr-8): el cierre se rehizo (la cuarta noche pone a
@@ -95,11 +106,10 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 ## Siguiente acción
 
-1. Pendientes de narrativa por capítulo (N2-R, N6-R … N10-12), empezando por agencia (que el jugador dé
-   el paso decisivo) y por Punto como personaje, que se repiten en todas las revisiones.
-2. Cobertura pendiente (ver huecos en la matriz): J (polinómica de grado mayor que 2, asíntota horizontal).
-   Revisión matemática de lo agregado al cap. 7 (en curso) y a 12.2.
-3. Bajas que quedan: ninguna de rev-c8 ni de mat-8 (9.8 a escala hecho en el ciclo 9). Hechos en el ciclo 9: la puerta del final (12.8), el eje que se mueve en 11.4, la marca en el mapa a los 390° en 10.3.
-4. Partida completa 1 → 12 (directa y con errores) después de todos los cambios del ciclo 8.
-4. Revisión matemática de 7.7 (una y ninguna solución) y de 9.1 nuevo.
-5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.
+1. Partida completa 1 → 12 (directa y con errores, también en 844×390) con todo lo del ciclo 9, cuando la máquina
+   no esté suspendiéndose.
+2. Agencia que queda en el cap. 8: 8.1 (la prueba de √2 tiene dos predicciones; los cuadrados de q van solos) y 8.2
+   (las puntas van solas a la línea); la generalización de 8.6 sigue siendo una segunda predicción. Requieren
+   revisión matemática después, porque tocan una prueba.
+3. Pendientes de narrativa por capítulo (N2-R, N6-R, N7-R, N8-R, N10-12): Punto como personaje, voces, costuras.
+4. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.

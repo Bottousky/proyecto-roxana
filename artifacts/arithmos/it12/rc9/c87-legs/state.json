@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "chapter": 9,
+  "segment": "c9.flechas",
+  "flags": {
+    "c8coords": true,
+    "c8shadow": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "name": "Rampa",
+      "x": 2,
+      "y": 3,
+      "t": "2026-10-07T14:02:35.736Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-try"
+    },
+    {
+      "name": "Rampa",
+      "x": 3,
+      "y": 2,
+      "t": "2026-10-07T14:02:35.868Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-try"
+    },
+    {
+      "name": "Peldaño",
+      "x": -1,
+      "y": -1,
+      "t": "2026-10-07T14:02:36.138Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-try"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "ok": false,
+      "t": "2026-10-07T14:07:49.721Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-corner"
+    },
+    {
+      "x": -1,
+      "y": 2,
+      "ok": true,
+      "t": "2026-10-07T14:07:49.849Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-corner"
+    },
+    {
+      "answer": "7",
+      "t": "2026-10-07T14:07:51.631Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-distance"
+    },
+    {
+      "dist": {
+        "d2": 25,
+        "exact": true,
+        "d": 5
+      },
+      "t": "2026-10-07T14:07:52.550Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coords"
+    },
+    {
+      "h": 8,
+      "k": 5,
+      "ok": false,
+      "t": "2026-10-07T14:07:56.447Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 8,
+      "k": 3,
+      "ok": false,
+      "t": "2026-10-07T14:07:56.577Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 8,
+      "k": 4,
+      "ok": true,
+      "t": "2026-10-07T14:07:56.708Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 8,
+      "len": 4,
+      "t": "2026-10-07T14:07:57.322Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 10,
+      "k": 2,
+      "ok": true,
+      "t": "2026-10-07T14:07:58.794Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 10,
+      "len": 2,
+      "t": "2026-10-07T14:07:59.390Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 12,
+      "k": 1,
+      "ok": true,
+      "t": "2026-10-07T14:08:00.877Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 12,
+      "len": 1,
+      "t": "2026-10-07T14:08:01.474Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 14,
+      "k": 2,
+      "ok": true,
+      "t": "2026-10-07T14:08:03.015Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 14,
+      "len": 2,
+      "t": "2026-10-07T14:08:03.628Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 16,
+      "k": 4,
+      "ok": true,
+      "t": "2026-10-07T14:08:05.099Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 16,
+      "len": 4,
+      "t": "2026-10-07T14:08:05.711Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c8",
+      "title": "Formas",
+      "abbr": "Una forma se mide, se copia, se agranda y se ubica; un dibujo muestra, un argumento prueba.",
+      "body": [
+        "Probando casos no se termina: para saber que algo vale siempre hace falta una razón que sirva para todos a la vez. Así se ve que √2 no es una fracción: si hubiera un par de enteros, habría otro más chico, sin fin; pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible.",
+        "Un ángulo es cuánto se gira. Los tres ángulos de un triángulo juntos hacen media vuelta, 180°: la paralela lo muestra para cualquier triángulo del plano.",
+        "Copias iguales (congruentes): se mueven, se giran o se dan vuelta y calzan. Parecidas (semejantes): los mismos ángulos y todos los lados multiplicados por lo mismo. Con el lado × 2, el área va × 4 y el volumen × 8; con × 3, × 9 y × 27.",
+        "El perímetro mide el borde; el área, lo de adentro: la misma cerca encierra distinta tierra. Con ángulo recto, cateto² + cateto² = hipotenusa² (reacomodando cuatro triángulos en un cuadrado). Un punto del plano se ubica con dos números en orden: (3, 2) no es (2, 3)."
+      ],
+      "seen": [
+        "Entre (−1, −1) y (3, 2), derecho no son 7: son 5, como el tirante."
+      ],
+      "moments": [
+        {
+          "id": "c8.doble",
+          "label": "Desplegar: el doble de grande"
+        },
+        {
+          "id": "c8.pitagoras",
+          "label": "Desplegar: el tirante"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c8.casas",
+    "c8.sombras"
+  ],
+  "moments": [],
+  "log": [
+    {
+      "who": "Mara",
+      "text": "La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada."
+    },
+    {
+      "who": "Mara",
+      "text": "La casa de Rampa la tengo anotada así: (3, 2)."
+    },
+    {
+      "who": null,
+      "text": "Ese es (2, 3): dos por la acostada y tres por la parada. El orden importa."
+    },
+    {
+      "who": "student",
+      "text": "Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar."
+    },
+    {
+      "who": "Mara",
+      "text": "Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1)."
+    },
+    {
+      "who": "Mara",
+      "text": "Por las rectas, Peldaño camina en ele: derecho por una recta, dobla una sola vez y sigue derecho por otra. ¿Dónde dobla?"
+    },
+    {
+      "who": null,
+      "text": "Ni desde lo de Peldaño hasta (1, 1) ni de ahí a lo de Rampa se va derecho por una recta."
+    },
+    {
+      "who": null,
+      "text": "Doblando en (−1, 2): 3 y 4, siete en total. Doblando en (3, −1) también daría 4 y 3."
+    },
+    {
+      "who": "student",
+      "text": "Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5."
+    },
+    {
+      "who": null,
+      "text": "Siete es yendo por las rectas, en ele. Derecho, cinco."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?"
+    },
+    {
+      "who": null,
+      "text": "En la marca 5 ya no hay sombra: termina antes."
+    },
+    {
+      "who": null,
+      "text": "En la marca 3 todavía hay sombra: termina más lejos."
+    },
+    {
+      "who": null,
+      "text": "A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir."
+    },
+    {
+      "who": "Mara",
+      "text": "Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?"
+    }
+  ],
+  "createdAt": "2026-10-07T14:02:32.607Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    8
+  ]
+}
