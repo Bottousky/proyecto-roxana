@@ -68,7 +68,7 @@ export const familias = {
       w.add(new Label(`c12-fl${idx}`, rule.name, c.x + c.w / 2, c.y + c.h + 14, {size: 14, align: 'center', z: 13, ch: YELLOW}));
       g.audio.tap(0.2, 1.2 + done.size * 0.08);
     }
-    await d.say('student', 'Mara: cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.');
+    await d.say('student', 'Mara, cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio.');
     const hc = cells.findIndex(c => c.asym);
     if (hc >= 0) {
       const c = cells[hc];
@@ -125,7 +125,7 @@ export const perillas = {
         btn('c12-bm', 'b −', A.x1 - 30, A.y0 + 120, () => { b -= 2; }, 'Bajar la recta (b menos 2)'),
       ]);
     }));
-    await d.say('student', `Rampa: b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia.`);
+    await d.say('student', `Rampa, b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia.`);
     d.evidence('params', {a, b, moves});
     g.flags.c12params = true;
   },
@@ -188,7 +188,7 @@ export const salto = {
       refresh();
     }));
     await d.think(pre === '3' ? 'A los 3, la mitad: el salto es igual de los dos lados.' : 'A los 3, justo en la mitad: el salto es una U dada vuelta, igual de los dos lados.');
-    await d.say('student', 'Cornisa: los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta.');
+    await d.say('student', 'Cornisa, los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta.');
     await studentWrites(d, g, 'c12-read', 'crece  0 → 3    máximo 9    decrece  3 → 6', A.x0 + 20, A.y1 - 4, {size: 18});
     follow(p, s);
     d.evidence('jump', r);
@@ -256,7 +256,7 @@ export const encadenar = {
       {id: 'm3', text: '−3.'},
     ], {prompt: 'Si «por sí mismo» dio 9, ¿qué entró?', evaluate: true});
     d.evidence('inverse-square', {answer: c2});
-    await d.say('student', 'Mara: «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.');
+    await d.say('student', 'Mara, «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.');
     await studentWrites(d, g, 'c12-inv', '× 2 + 1  ↔  − 1, ÷ 2        x · x  ↔  √ (si x ≥ 0)', A.x0 + 20, A.y1 - 6, {size: 17});
     // la raíz, dibujada: el gráfico de x · x (con x ≥ 0) dado vuelta sobre la diagonal
     const gb = {x: A.x0 + 330, y: A.y0 + 110, w: 110, h: 110};

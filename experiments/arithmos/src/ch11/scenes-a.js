@@ -90,7 +90,7 @@ export const baldes = {
       refresh();
     }));
     await d.think(guess === 'about' ? 'Al principio salta; con muchos, se queda cerca de dos tercios.' : guess === 'exact' ? 'No se queda clavado en dos tercios: a veces da justo y a veces un poco más o un poco menos, siempre cerca.' : 'Caso por caso es suerte, pero con muchos baldes la parte llena se queda cerca de dos tercios.');
-    await d.say('student', 'Balcón: con muchos baldes, la parte que sube llena se acomoda cerca de 2 de cada 3. Eso lo vimos, no está garantizado. Y el próximo balde, igual, no se sabe.');
+    await d.say('student', 'Balcón, con muchos baldes, la parte que sube llena se acomoda cerca de 2 de cada 3. Eso lo vimos, no está garantizado. Y el próximo balde, igual, no se sabe.');
     await studentWrites(d, g, 'c11-f', 'llenos ÷ baldes → cerca de 2/3', A.x0 + 40, A.y0 + 20, {size: 22});
     g.flags.c11freq = true;
   },
@@ -141,7 +141,7 @@ export const medio = {
     ], {prompt: '¿Qué número dice mejor cuántos atados tiene una familia común?', evaluate: true});
     d.evidence('summary-pick', {answer: c});
     await d.think(c === 'mean' ? 'Diez no lo tiene ninguna familia: la Ronda sola empuja el promedio para arriba.' : c === 'median' ? 'Cuatro, como casi todas. El promedio se lo lleva la Ronda.' : 'Lo más honesto: el del medio, 4, y avisar que hay una que tiene muchísimos.');
-    await d.say('student', 'Mara: un número solo siempre esconde algo. El promedio reparte todo, y uno muy grande lo arrastra. El del medio, que se llama mediana, no se mueve aunque la Ronda tenga mil.');
+    await d.say('student', 'Mara, un número solo siempre esconde algo. El promedio reparte todo, y uno muy grande lo arrastra. El del medio, que se llama mediana, no se mueve aunque la Ronda tenga mil.');
     await studentWrites(d, g, 'c11-mm', `promedio ${m}    mediana ${md}`, A.x0 + 30, A.y0 + 30, {size: 22});
     g.flags.c11median = true;
   },
@@ -180,7 +180,7 @@ export const parejo = {
     ], {prompt: 'Para tener por lo menos 4, ¿a quién llamás?', evaluate: true});
     d.evidence('spread-pick', {answer: c});
     await d.think(c === 'A' ? 'A: sus días van de 4 a 6. B a veces hace 1.' : c === 'B' ? 'B a veces hizo 9, pero también 1. A, en estos cinco días, nunca menos de 4.' : 'El promedio es el mismo, pero B a veces hizo 1. A, en estos cinco días, nunca menos de 4.');
-    await d.say('student', `Rampa: el promedio no dice qué tan desparejo es. De lo más bajo a lo más alto: A va de 4 a 6, una diferencia de ${range(a)}; B, de 1 a 9, ${range(b)}. Eso se llama rango.`);
+    await d.say('student', `Rampa, el promedio no dice qué tan desparejo es. De lo más bajo a lo más alto: A va de 4 a 6, una diferencia de ${range(a)}; B, de 1 a 9, ${range(b)}. Eso se llama rango.`);
     await studentWrites(d, g, 'c11-r', `rango A ${range(a)}    rango B ${range(b)}`, A.x0 + 260, A.y0 + 60, {size: 20});
     g.flags.c11spread = true;
   },
@@ -251,7 +251,7 @@ export const grafico = {
     for (const o of old) w.remove(o.id);
     g.audio.punto('happy');
     g.setCinematic(false);
-    await d.say('student', 'Punto: los números eran ciertos, pero el dibujo decía otra cosa. Si las barras no empiezan en cero, el alto no compara cantidades.');
+    await d.say('student', 'Punto, los números eran ciertos, pero el dibujo decía otra cosa. Si las barras no empiezan en cero, el alto no compara cantidades.');
     await studentWrites(d, g, 'c11-g', 'mirar dónde empieza el eje', A.x0 + 20, A.y0 + 30, {size: 22});
     g.flags.c11graph = true;
   },

@@ -67,7 +67,7 @@ export const contar = {
     ], {prompt: 'Si además tiene 4 pares de botas, ¿cuántas maneras?', evaluate: true});
     d.evidence('count-predict', {answer: c});
     await d.think(c === '24' ? 'Veinticuatro: 3 · 2 · 4.' : 'Cada una de las seis maneras se abre en cuatro, una por bota: 6 · 4 = 24. Se multiplica, no se suma.');
-    await d.say('student', 'Cornisa: cuando se elige una cosa de cada grupo, las maneras se multiplican: 3 · 2 = 6, y con las botas, 6 · 4 = 24. No hace falta dibujar todas.');
+    await d.say('student', 'Cornisa, cuando se elige una cosa de cada grupo, las maneras se multiplican: 3 · 2 = 6, y con las botas, 6 · 4 = 24. No hace falta dibujar todas.');
     await studentWrites(d, g, 'c11-ct', `3 · 2 = ${outfits(3, 2)}    3 · 2 · 4 = ${outfits(3, 2, 4)}`, A.x0 + 20, A.y1 - 8, {size: 22});
     d.evidence('count', {six: outfits(3, 2), more: outfits(3, 2, 4)});
     g.flags.c11count = true;
@@ -140,7 +140,7 @@ export const dados = {
       };
       refresh();
     }));
-    await d.say('student', `Rampa: el 7 sale de ${sums[7]} maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene ${sums[7]}/36 de probabilidad y el 12, 1/36.`);
+    await d.say('student', `Rampa, el 7 sale de ${sums[7]} maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene ${sums[7]}/36 de probabilidad y el 12, 1/36.`);
     await d.say('Rampa', 'En la tabla, sí. ¿Y tirando de verdad?');
     const r = rollTwo(360);
     const n7 = r.filter(x => x === 7).length, n12 = r.filter(x => x === 12).length;
@@ -209,7 +209,7 @@ export const causa = {
     });
     d.describe('Al lado de cada punto, el viento de ese día: los días de mucho viento son los de más polvo y más borrones.');
     await d.think('Mirando de a pares con el mismo viento: con poco viento, el día de más polvo borró menos; con bastante, también; con mucho, también. Dentro del mismo viento, más polvo no trajo más borrones.');
-    await d.say('student', 'Mara: que dos cosas suban juntas no dice que una cause la otra. Con estos seis días, el que acompaña a los borrones parece el viento, no el polvo. Pero son pocos días: para estar más seguros, habría que anotar muchos más.');
+    await d.say('student', 'Mara, que dos cosas suban juntas no dice que una cause la otra. Con estos seis días, el que acompaña a los borrones parece el viento, no el polvo. Pero son pocos días: para estar más seguros, habría que anotar muchos más.');
     await studentWrites(d, g, 'c11-cz', 'juntas ≠ una causa la otra', A.x0 + 250, A.y0 + 40, {size: 22});
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3).catch(() => {});
@@ -267,7 +267,7 @@ export const anticipar = {
       };
       refresh();
     }));
-    await d.say('student', 'Balcón: lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar.');
+    await d.say('student', 'Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar.');
     if (!replay) writeJournal11(g);
     await d.say('Mara', 'Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?');
     g.audio.punto('question');

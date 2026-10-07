@@ -205,7 +205,8 @@ export class UI {
     this.caption$.hidden = false;
     this.caption$.classList.remove('done');
     document.body.classList.add('captioning');
-    this.sr$.textContent = (who === 'punto' ? 'Punto: ' : '') + shown;
+    // el nombre de quien habla también llega al lector de pantalla (en pantalla va arriba, chico)
+    this.sr$.textContent = (who === 'punto' ? 'Punto: ' : who && who !== 'student' ? `${who}: ` : '') + shown;
     const cps = SPEED[this.settings.textSpeed] ?? 44;
     return new Promise(resolve => {
       this.waiting = {resolve};

@@ -103,7 +103,7 @@ export const comparar = {
     }));
     d.evidence('compare-unit', {seen: true});
     await d.say('Rampa', 'Ah, no. Me quedo con el tercio.');
-    await d.say('student', 'Punto: más partes, más chicas.');
+    await d.say('student', 'Punto, más partes, más chicas.');
     await puntoRewrites(d, g, pl, '1/4 < 1/3');
     // 2/3 y 3/4: hace falta una partición que sirva para las dos
     w.removeWhere(o => /^cm-(a|b|ta|tb)$/.test(o.id));
@@ -221,7 +221,7 @@ export const sumar = {
     w.add(new Label('sm-l0', '5/6', X0 + BAR.w + 14, rowY(0) + 9, {size: 22, z: 9}));
     const r = add(frac(1, 2), frac(1, 3));
     const wrong = naiveAdd(frac(1, 2), frac(1, 3));
-    await d.say('student', 'Punto: tres sextos y dos sextos son cinco sextos. Para sumar pedazos, primero del mismo tamaño.');
+    await d.say('student', 'Punto, tres sextos y dos sextos son cinco sextos. Para sumar pedazos, primero del mismo tamaño.');
     await puntoRewrites(d, g, pl, '1/2 + 1/3 = 3/6 + 2/6 = 5/6');
     d.evidence('add', {result: `${r.n}/${r.d}`, naive: `${wrong.n}/${wrong.d}`, naiveSmaller: compare(wrong, frac(1, 2)) < 0});
     g.flags.c5add = true;

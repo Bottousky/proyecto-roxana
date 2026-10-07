@@ -215,7 +215,7 @@ export const barras = {
     d.evidence('cut-uneven');
     g.audio.punto('sad');
     await d.say('Mara', 'Para que sea igual para todas, a cada una le tiene que tocar lo mismo.');
-    await d.say('student', 'Punto: si las partes son iguales y cada una recibe las mismas, seguro que es lo mismo.');
+    await d.say('student', 'Punto, si las partes son iguales y cada una recibe las mismas, seguro que es lo mismo.');
     g.setCinematic(true);
     await d.shot(SHOTS.share, 0.6);
     for (const pc of uneven) w.remove(pc.id);
@@ -386,7 +386,7 @@ export const equivalentes = {
     g.setCinematic(false);
     await d.think(t === '3' ? 'Tres sextos llegan justo a la mitad.' : `Tres sextos, no ${{2: 'dos', 6: 'seis', 1: 'uno'}[t]}: llegan justo a la mitad.`);
     await writeBoard(d, g, 'c5-l3', '1/2 = 2/4 = 3/6', 5, {size: 32});
-    await d.say('student', 'Punto: el mismo pedazo de barra, con tres nombres.');
+    await d.say('student', 'Punto, el mismo pedazo de barra, con tres nombres.');
     await d.say('Cornisa', 'Bueno. Pero los míos son dos.');
     d.evidence('equiv-names', {names: ['1/2', '2/4', '3/6'], ok: equivalent(frac(3, 6), frac(1, 2))});
     g.flags.c5equiv = true;

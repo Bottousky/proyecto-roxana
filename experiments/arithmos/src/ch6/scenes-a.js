@@ -352,7 +352,7 @@ export const porCero = {
     d.evidence('times-zero-eq', {answer: ans, solutions: solveLinear(mulBoth(e0, 0)).kind});
     await d.say('Mara', ans === 'all' ? 'La caja tiene ocho. No cualquier cosa.' : ans === 'nothing' ? 'Cambió todo: antes servía sólo el 8; ahora, cualquier cosa.' : 'La caja tiene ocho. El truco dice que cualquier cosa.');
     await d.think('Desde 0 = 0 no se puede volver: por cero no se deshace. Y lo que no se deshace puede hacer aparecer soluciones que no estaban.');
-    await d.say('student', 'Mara: x − 3 = 5 se cumple sólo con 8. Es una ecuación: pregunta qué x la cumplen. 0 · (x − 3) = 0 · 5 se cumple con cualquier x, como «ir tres para atrás y volver tres»: x − 3 + 3 = x. A una igualdad que vale para cualquier x se le dice identidad.');
+    await d.say('student', 'Mara, x − 3 = 5 se cumple sólo con 8. Es una ecuación: pregunta qué x la cumplen. 0 · (x − 3) = 0 · 5 se cumple con cualquier x, como «ir tres para atrás y volver tres»: x − 3 + 3 = x. A una igualdad que vale para cualquier x se le dice identidad.');
     await writeDeriv(d, g, 'd6-z3', 'vale para cualquier x: identidad', 3, {size: 26, ch: YELLOW});
     await d.say('student', 'El truco de Cuña cambió una ecuación por una identidad. Por eso cualquier caja parecía servir.');
     view.dispose();

@@ -100,7 +100,7 @@ export const dominio = {
     d.evidence('domain-story', {answer: c});
     if (c !== 'int') await d.think(c === 'not2' ? 'La máquina acepta −1 o 0, pero no vienen −1 personas ni cero. Para el reparto, enteros mayores que 2.' : 'Con 2 la máquina ni siquiera anda. Y para el reparto, sólo enteros mayores que 2.');
     const dom = domainOf(f, INS);
-    await d.say('student', 'Rampa: las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.');
+    await d.say('student', 'Rampa, las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.');
     await studentWrites(d, g, 'c9-dom', 'dominio: cuenta x ≠ 2;  reparto 3, 4, 5, …', A.x0 + 20, A.y1 - 8, {size: 20});
     d.evidence('domain', {dom});
     g.flags.c9domain = true;
@@ -163,7 +163,7 @@ export const imagen = {
     if (c === 'm2') await d.think('(−2) · (−2) da 4, no −4: menos por menos es más, como en el cap. 4.');
     if (c === 'other') await d.think('Positivo por positivo, positivo; negativo por negativo, positivo; cero por cero, cero. No hay número de la recta que falte probar.');
     const img = imageOf(x => x * x, INS);
-    await d.say('student', 'Mara: lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta.');
+    await d.say('student', 'Mara, lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta.');
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3);
     await studentWrites(d, g, 'c9-img', 'imagen de x · x, en la recta: 0 y los positivos', A.x0 + 20, A.y1 - 8, {size: 20});
@@ -235,7 +235,7 @@ export const maneras = {
       refresh();
     }));
     d.describe('A es la escalera de Mara, 1 + 10 · d; C, la de Punto, 2 elevado a d. B era la de Peldaño.');
-    await d.say('student', 'Mara: con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.');
+    await d.say('student', 'Mara, con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.');
     await d.say('Peldaño', 'Y la mía, la B, es diez más uno por día: 10 + d.');
     d.evidence('three-ways', {done: [...done]});
     g.flags.c9ways = true;
@@ -297,7 +297,7 @@ export const vuelve = {
       {id: 'more', text: 'Más: cada día crece.'},
     ], {prompt: 'Pasado mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?', evaluate: true});
     d.evidence('periodic-predict', {answer: c});
-    await d.say('student', c === '2' ? 'Cornisa: 2. Todos los días el sol da la misma vuelta, y la sombra repite su ve.' : 'Cornisa: 2. Todos los días el sol da la misma vuelta y la sombra repite su ve. Medido no está, pero el patrón se repite.');
+    await d.say('student', c === '2' ? 'Cornisa, va a medir 2. Todos los días el sol da la misma vuelta, y la sombra repite su vuelta.' : 'Cornisa, va a medir 2. Todos los días el sol da la misma vuelta y la sombra repite su vuelta. Medido no está, pero el patrón se repite.');
     await d.think('Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.');
     if (!replay) writeJournal9(g);
     await d.say('Mara', 'Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.');

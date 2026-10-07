@@ -82,7 +82,7 @@ export const flechas = {
     if (c !== 'both') await d.think(c === '10' ? 'Las 10 o las 14: del 2 salen dos flechas.' : 'A las 12 la sombra mide 1. Con 2, son las 10 o las 14.');
     const fn = isFunction(SOMBRA), inv = isFunction(inverse(SOMBRA));
     if (!fn.ok || inv.ok) console.error('[flechas] la tabla no da función de ida y relación de vuelta');
-    await d.say('student', 'Cornisa: a cada hora le toca un solo largo de sombra: el largo es función de la hora. Al revés no: al largo 2 le tocan dos horas. Eso es una relación (une entradas con salidas), pero no una función. Si además decís para qué lado apunta, ahí sí se distinguen: pero esa ya es otra entrada.');
+    await d.say('student', 'Cornisa, a cada hora le toca un solo largo de sombra: el largo es función de la hora. Al revés no: al largo 2 le tocan dos horas. Eso es una relación (une entradas con salidas), pero no una función. Si además decís para qué lado apunta, ahí sí se distinguen: pero esa ya es otra entrada.');
     await studentWrites(d, g, 'c9-def', 'función: a cada entrada, una sola salida', A.x0 + 20, A.y1 - 8, {size: 22});
     d.evidence('function', {fn: fn.ok, inverse: inv.ok, bad: inv.bad});
     g.flags.c9fn = true;
@@ -164,7 +164,7 @@ export const maquina = {
     await d.say('Mara', 'La hice yo: es el doble más uno. Ustedes la adivinaron bien, y el 10 no la desmintió.');
     w.get('c9-ml').text = '× 2 + 1';
     w.get('c9-ml').size = 28;
-    await d.say('student', 'Mara: tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo.');
+    await d.say('student', 'Mara, tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo.');
     // la máquina de Punto
     await d.say('Mara', 'Punto también hizo una.');
     g.setCinematic(true);
@@ -304,7 +304,7 @@ export const puntos = {
       {id: 'join', text: 'Unidos, como los de Cornisa.'},
     ], {prompt: '¿Esos puntos se unen?', evaluate: true});
     d.evidence('join-discrete', {answer: c});
-    await d.say('student', c === 'loose' ? 'Mara: entre el lunes y el martes no hay un día a medias: la entrada se cuenta de a uno. Los puntos van sueltos.' : 'Mara: entre el lunes y el martes no hay un día a medias, ni media familia: si unimos, la línea dice cosas que no existen. Sueltos.');
+    await d.say('student', c === 'loose' ? 'Mara, entre el lunes y el martes no hay un día a medias: la entrada se cuenta de a uno. Los puntos van sueltos.' : 'Mara, entre el lunes y el martes no hay un día a medias, ni media familia: si unimos, la línea dice cosas que no existen. Sueltos.');
     w.remove('c9-tab');
     await studentWrites(d, g, 'c9-gr', 'un gráfico se lee: cada punto dice algo', A.x0 + 20, A.y1 - 4, {size: 18});
     g.flags.c9graph = true;
@@ -398,7 +398,7 @@ export const recta = {
       };
       refresh();
     }));
-    await d.say('student', 'Balcón: la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas.');
+    await d.say('student', 'Balcón, la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas.');
     await d.think('La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál.');
     d.evidence('vertical', {done});
     g.flags.c9vertical = true;

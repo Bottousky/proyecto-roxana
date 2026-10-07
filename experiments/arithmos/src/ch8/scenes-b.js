@@ -107,7 +107,7 @@ export const cerca = {
     g.audio.punto('happy');
     g.setCinematic(false);
     g.flags.c8puntoFence = true;
-    await d.say('student', 'Rampa: la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra.');
+    await d.say('student', 'Rampa, la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra.');
     await studentWrites(d, g, 'c8-per', `perímetro 12:  áreas ${seenAreas.join(', ')}`, A.x0 + 24, A.y1 - 14, {size: 24});
     d.evidence('perimeter', {areas: all.map(r => r.area), best: [best.a, best.b]});
     g.flags.c8perim = true;
@@ -214,7 +214,7 @@ export const pitagoras = {
     const r = rearrange(a, b), pz = pythag(3, 4, 5);
     if (r.freeA !== r.squaresAB || !pz.holds) console.error('[pitágoras] el reacomodo no cierra');
     await d.think('El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16.');
-    await d.say('student', guess === '5' ? 'Balcón: el cuadrado del tirante tiene 9 + 16 = 25 cuadros. El tirante mide 5.' : 'Balcón: el cuadrado del tirante tiene 9 + 16 = 25 cuadros: el tirante mide 5, porque 5 · 5 = 25.');
+    await d.say('student', guess === '5' ? 'Balcón, el cuadrado del tirante tiene 9 + 16 = 25 cuadros. El tirante mide 5.' : 'Balcón, el cuadrado del tirante tiene 9 + 16 = 25 cuadros: el tirante mide 5, porque 5 · 5 = 25.');
     await studentWrites(d, g, 'c8-py', '3² + 4² = 5²', A.x1 - 160, A.y0 + 184, {size: 28});
     const gen = await d.choose([
       {id: 'right', text: 'Para cualquier triángulo con ángulo recto: el reacomodo no usó el 3 ni el 4.'},

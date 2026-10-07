@@ -164,7 +164,7 @@ export const diagonal = {
     if (c2a === 'forever') await d.think('Eso dice la regla: cada par que cumple da otro más chico. Pero con enteros positivos no se puede bajar para siempre: q, uno menor, otro menor… en algún momento no hay más. Las dos cosas a la vez no pueden ser.');
     if (c2a === 'one') await d.think('Exacto: los enteros no bajan para siempre. Y sin embargo, si el par cumpliera, siempre habría otro más chico. Las dos cosas a la vez no pueden ser.');
     if (c2a === 'chalk') await d.think('El dibujo se acaba, pero el razonamiento no depende del dibujo. Si el par cumpliera, siempre habría otro más chico; y los enteros positivos no bajan para siempre. Las dos cosas a la vez no pueden ser.');
-    await d.say('student', 'Punto: si hubiera un par de enteros que cumple, habría otro más chico, y otro, sin fin. Pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible: no hay ningún par.');
+    await d.say('student', 'Punto, si hubiera un par de enteros que cumple, habría otro más chico, y otro, sin fin. Pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible: no hay ningún par.');
     // la Marea se lleva los dibujos; el razonamiento queda
     g.setCinematic(true);
     d.describe('Pasa una brisa de borrador: los cuadrados dibujados se deshacen. La cuenta de arriba, p · p = 2 · q · q, queda.');
@@ -289,7 +289,7 @@ export const vuelta = {
       ]);
     }));
     await d.think('Con dos paralelas, el lado AC está igual de inclinado contra las dos: el ángulo de A y el de arriba a la izquierda son iguales. Lo mismo B, del otro lado.');
-    await d.say('student', 'Cornisa: arriba, sobre la paralela, quedan el de A, el de C y el de B, uno al lado del otro: media vuelta. No usé ninguna medida de este triángulo: vale para cualquiera.');
+    await d.say('student', 'Cornisa, arriba, sobre la paralela, quedan el de A, el de C y el de B, uno al lado del otro: media vuelta. No usé ninguna medida de este triángulo: vale para cualquiera.');
     await studentWrites(d, g, 'c8-sum', '∠A + ∠B + ∠C = 180°', A.x0 + 190, A.y1 - 14, {size: 26});
     await d.think('En un plano, como la pizarra o el piso. Sobre una pelota, un triángulo grande suma más: ahí no hay paralelas que no se crucen.');
     d.evidence('angles', {A: deg(corners[0].sweep), B: deg(corners[1].sweep), C: deg(corners[2].sweep), wrongPicks: hits - 1});
@@ -433,7 +433,7 @@ export const copias = {
       };
       refresh();
     }));
-    await d.say('student', 'Cornisa: el girado y el dado vuelta son iguales a tu ventana, congruentes: se mueven y calzan. El grande es parecido, semejante: achicado a la mitad, calza. Y los iguales también son semejantes, con × 1.');
+    await d.say('student', 'Cornisa, el girado y el dado vuelta son iguales a tu ventana, congruentes: se mueven y calzan. El grande es parecido, semejante: achicado a la mitad, calza. Y los iguales también son semejantes, con × 1.');
     const c = await d.choose([
       {id: 'angles', text: 'La forma: los ángulos iguales y todos los lados multiplicados por lo mismo.'},
       {id: 'sides', text: 'Los lados: miden lo mismo.'},
@@ -566,7 +566,7 @@ export const doble = {
     const sc = scaleBy(2);
     await d.think(g2 === '8' ? 'Ocho: cuatro en el piso de abajo y cuatro en el de arriba.' : 'Ocho: cuatro en cada piso, y son dos pisos, porque el alto también se duplicó.');
     await studentWrites(d, g, 'c8-scale', `lado × 2:  área × ${sc.area},  volumen × ${sc.volume}`, A.x0 + 20, A.y1 - 10, {size: 24});
-    await d.say('student', 'Peldaño: el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27.');
+    await d.say('student', 'Peldaño, el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27.');
     d.evidence('scale', sc);
     g.flags.c8scale = true;
   },
