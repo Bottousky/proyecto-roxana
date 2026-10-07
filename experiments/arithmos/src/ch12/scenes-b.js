@@ -265,7 +265,7 @@ function writeJournal12(g) {
   const first = k => ev.find(e => e.kind === k);
   const seen = [];
   const fam = ev.filter(e => e.kind === 'family-try');
-  if (fam.length) { const bad = fam.filter(e => !e.ok).length; seen.push(bad ? `Reconociste las cinco formas; ${bad === 1 ? 'una' : bad} la${bad === 1 ? '' : 's'} probaste en otra familia primero.` : 'Reconociste las cinco formas de entrada.'); }
+  if (fam.length) { const bad = fam.filter(e => !e.ok).length; seen.push(bad ? `Reconociste las cinco formas; ${bad === 1 ? 'una' : bad} la${bad === 1 ? '' : 's'} probaste en otra familia primero.` : 'Reconociste las seis formas de entrada.'); }
   const jp = first('jump-predict');
   if (jp) seen.push(jp.answer === '3' ? 'Anticipaste el punto más alto del salto en la mitad, a los 3.' : 'Pensaste el punto más alto en otro lado; el salto es igual de los dos lados: a los 3.');
   const ip = first('inverse-predict');

@@ -322,5 +322,17 @@ Informe: `artifacts/arithmos/it10/review-narr-10-12/informe.md` (sobre a3cc472, 
 | A5 | Imagen contra tesis en las costuras (baldes con ciclo de tres, eje logarítmico sin decir) | Pendiente (N10-12) |
 | M1–M9 | Voces, Marea, costuras, cuentas, opciones, accesibilidad, composición, Bitácoras, 12.1 | Pendientes (N10-12); 12.1 ya elige en el panel de opciones |
 
+### Medias aplicadas después (2026-10-07)
+
+| Origen | # | Disposición |
+|---|---|---|
+| mat-9 (10) | M6 | 10.3: la pregunta por los 390° llega antes de dibujar la segunda vuelta |
+| mat-9 (10) | M13 | 10.8: los baldes ya no siguen un ciclo visible de tres |
+| mat-10 (11) | M2 | 11.1: se dice que cada marca es diez veces más; raya de 2/3; sin «nunca da exacto» |
+| mat-10 (11) | M3 | 11.3: «en estos cinco días», sin «seguros» |
+| mat-10 (11) | M4 | 11.6: se dice que se cuenta cuál dado es cuál y por qué los 36 pares son igual de posibles |
+| mat-10 (12) | M10 | 12.1: se suma la familia del «¿cuántas veces?» (logarítmica), seis formas |
+| mat-9/10 | resto | Pendientes en C10-R, C11-R, C12-R |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

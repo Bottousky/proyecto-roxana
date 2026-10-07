@@ -333,7 +333,7 @@ function pickChoice(prompt, options) {
     ['pasa la escalera', 'En la noche 5'],
   ];
   if (prompt.includes('tiene esta forma')) {
-    const NAME = ['altura de la rueda', 'escalera de Mara', 'reparto', 'escalera de Punto', 'huerta'][c12Cell];
+    const NAME = ['altura de la rueda', 'escalera de Mara', 'reparto', 'escalera de Punto', 'huerta', '¿cuántas veces?'][c12Cell];
     const wrong = route === 'errores' && !tried.has('c12fam') && (tried.add('c12fam'), true);
     const o = wrong ? options.find(t => !t.includes(NAME)) : options.find(t => t.includes(NAME));
     if (o) return o;

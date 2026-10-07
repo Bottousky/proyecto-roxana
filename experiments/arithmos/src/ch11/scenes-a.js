@@ -53,6 +53,9 @@ export const baldes = {
     for (const v of [0.5, 1]) w.add(new Label(`c11-yl${v}`, v === 1 ? 'todos' : 'la mitad', gx - 6, py(v) + 5, {size: 13, align: 'right', z: 12, ch: BLUE}));
     w.add(new Drawing('c11-half', [S([[gx, py(0.5)], [gx + W, py(0.5)]], seedOf('c11-half'), {w: 1, p: 0.35, lift: false})], {z: 11}));
     w.add(new Label('c11-xt', 'baldes', gx + W + 14, gy + 4, {size: 14, z: 12, ch: BLUE}));
+    w.add(new Label('c11-xs', '(cada marca, diez veces más baldes)', gx + W / 2, gy + 40, {size: 13, align: 'center', z: 12, ch: BLUE}));
+    w.add(new Drawing('c11-23', Array.from({length: 18}, (_, i) => S([[gx + i * W / 18, py(2 / 3)], [gx + i * W / 18 + W / 36, py(2 / 3)]], seedOf('c11-23') + i, {w: 1.4, p: 0.6, ch: YELLOW, lift: false})), {z: 12}));
+    w.add(new Label('c11-23l', '2/3', gx + W + 6, py(2 / 3) + 5, {size: 14, z: 12, ch: YELLOW}));
     d.describe('Un gráfico: abajo, cuántos baldes se subieron (1, 10, 100, 1000); arriba, qué parte subió llena.');
     await d.shot(SHOTS.tiles, 0.8);
     const xs = pulls(1000);
@@ -86,7 +89,7 @@ export const baldes = {
       };
       refresh();
     }));
-    await d.think(guess === 'about' ? 'Al principio salta; con muchos, se queda cerca de dos tercios.' : guess === 'exact' ? 'Nunca da exacto: se queda cerca de dos tercios, sin clavarse.' : 'Caso por caso es suerte, pero con muchos baldes la parte llena se queda cerca de dos tercios.');
+    await d.think(guess === 'about' ? 'Al principio salta; con muchos, se queda cerca de dos tercios.' : guess === 'exact' ? 'No se queda clavado en dos tercios: a veces da justo y a veces un poco más o un poco menos, siempre cerca.' : 'Caso por caso es suerte, pero con muchos baldes la parte llena se queda cerca de dos tercios.');
     await d.say('student', 'Balcón: con muchos baldes, la parte que sube llena se acomoda cerca de 2 de cada 3. Eso lo vimos, no está garantizado. Y el próximo balde, igual, no se sabe.');
     await studentWrites(d, g, 'c11-f', 'llenos ÷ baldes → cerca de 2/3', A.x0 + 40, A.y0 + 20, {size: 22});
     g.flags.c11freq = true;
@@ -160,7 +163,7 @@ export const parejo = {
     const w = g.world;
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Rampa', 'Dos ayudantes redibujan escalones. Los dos hacen 5 por día en promedio. Mañana necesito por lo menos 4 seguros. ¿A cuál llamo?');
+    await d.say('Rampa', 'Dos ayudantes redibujan escalones. Los dos hacen 5 por día en promedio. Mañana necesito por lo menos 4. Te muestro sus últimos cinco días. ¿A cuál llamo?');
     const a = [5, 5, 6, 4, 5], b = [1, 9, 2, 8, 5];
     const y0 = A.y0 + 120, y1 = A.y0 + 240, k = 9;
     bars(w, 'c11-a', a, {x0: A.x0 + 40, y0, bw: 26, gap: 10, k});
@@ -171,12 +174,12 @@ export const parejo = {
     d.describe('Dos filas de barras, una por ayudante, con la misma raya azul de promedio en 5. Las barras de A son casi iguales; las de B van de 1 a 9.');
     await d.shot(SHOTS.tiles, 0.8);
     const c = await d.choose([
-      {id: 'A', text: 'A: siempre hace entre 4 y 6.'},
+      {id: 'A', text: 'A: en estos cinco días hizo entre 4 y 6.'},
       {id: 'B', text: 'B: a veces hace 9.'},
       {id: 'same', text: 'Cualquiera: el promedio es el mismo.'},
-    ], {prompt: 'Para tener por lo menos 4 seguros, ¿a quién llamás?', evaluate: true});
+    ], {prompt: 'Para tener por lo menos 4, ¿a quién llamás?', evaluate: true});
     d.evidence('spread-pick', {answer: c});
-    await d.think(c === 'A' ? 'A: sus días van de 4 a 6. B a veces hace 1.' : c === 'B' ? 'B a veces hace 9, pero a veces hace 1. Con A, nunca menos de 4.' : 'El promedio es el mismo, pero B a veces hace 1. Con A, nunca menos de 4.');
+    await d.think(c === 'A' ? 'A: sus días van de 4 a 6. B a veces hace 1.' : c === 'B' ? 'B a veces hizo 9, pero también 1. A, en estos cinco días, nunca menos de 4.' : 'El promedio es el mismo, pero B a veces hizo 1. A, en estos cinco días, nunca menos de 4.');
     await d.say('student', `Rampa: el promedio no dice qué tan desparejo es. De lo más bajo a lo más alto: A va de 4 a 6, una diferencia de ${range(a)}; B, de 1 a 9, ${range(b)}. Eso se llama rango.`);
     await studentWrites(d, g, 'c11-r', `rango A ${range(a)}    rango B ${range(b)}`, A.x0 + 260, A.y0 + 60, {size: 20});
     g.flags.c11spread = true;

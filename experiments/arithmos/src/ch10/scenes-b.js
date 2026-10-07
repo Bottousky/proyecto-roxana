@@ -269,7 +269,7 @@ export const pistas = {
 // 10.8 Lo que pasa a veces
 // ——————————————————————————————————————————————
 
-const PULLS = ['llena', 'llena', 'a medias', 'llena', 'llena', 'a medias'];
+const PULLS = ['llena', 'a medias', 'llena', 'llena', 'llena', 'a medias'];
 
 export const aVeces = {
   id: 'c10.a-veces',

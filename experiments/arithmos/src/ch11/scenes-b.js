@@ -140,7 +140,7 @@ export const dados = {
       };
       refresh();
     }));
-    await d.say('student', `Rampa: el 7 sale de ${sums[7]} maneras de 36; el 12, de una sola, con dos seises. Si los dados son parejos, el 7 tiene ${sums[7]}/36 de probabilidad y el 12, 1/36.`);
+    await d.say('student', `Rampa: el 7 sale de ${sums[7]} maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene ${sums[7]}/36 de probabilidad y el 12, 1/36.`);
     await d.say('Rampa', 'En la tabla, sí. ¿Y tirando de verdad?');
     const r = rollTwo(360);
     const n7 = r.filter(x => x === 7).length, n12 = r.filter(x => x === 12).length;
@@ -285,7 +285,7 @@ function writeJournal11(g) {
   const sp = first('summary-pick');
   if (sp) seen.push(sp.answer === 'mean' ? 'Elegiste el promedio, 10; ninguna familia tiene 10: lo arrastra la Ronda.' : 'Para una familia común elegiste el del medio, 4 (la mediana).');
   const sk = first('spread-pick');
-  if (sk) seen.push(sk.answer === 'A' ? 'Para tener 4 seguros llamaste al ayudante parejo.' : 'Para tener 4 seguros pensaste en el otro; con el mismo promedio, el desparejo a veces hace 1.');
+  if (sk) seen.push(sk.answer === 'A' ? 'Para tener por lo menos 4 llamaste al ayudante parejo.' : 'Para tener por lo menos 4 pensaste en el otro; con el mismo promedio, el desparejo a veces hace 1.');
   const gp = first('graph-predict');
   if (gp) seen.push(gp.answer === 'check' ? 'Miraste dónde empezaba el eje del gráfico de Punto.' : 'El gráfico de Punto te pareció decir otra cosa; desde cero, 104 y 100 son casi iguales.');
   const cp = first('count-predict');

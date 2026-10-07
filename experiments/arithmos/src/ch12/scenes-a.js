@@ -16,15 +16,17 @@ const THUMBS = [
   {family: 'hueco', f: x => 1 / (x - 2), xr: [0, 4], yr: [-4, 4], asym: 2},
   {family: 'despega', f: x => 2 ** x, xr: [0, 6], yr: [0, 65]},
   {family: 'u', f: x => x * x, xr: [-3, 3], yr: [0, 9.5]},
+  {family: 'aplana', f: x => Math.log2(x), xr: [0, 8], yr: [-2, 3.5]},
 ];
-const PICKS = ['mara', 'punto', 'huerta', 'rueda', 'reparto'];
-const SHORT = {mara: 'Mara', punto: 'Punto', huerta: 'huerta', rueda: 'rueda', reparto: 'reparto'};
+const PICKS = ['mara', 'punto', 'huerta', 'rueda', 'reparto', 'veces'];
+const SHORT = {mara: 'Mara', punto: 'Punto', huerta: 'huerta', rueda: 'rueda', reparto: 'reparto', veces: 'veces'};
 const HINT = {
   mara: 'La escalera de Mara sube lo mismo cada día: buscá la que sube pareja.',
   punto: 'La de Punto empieza lenta y después se dispara.',
   huerta: 'x · x da lo mismo con 3 y con −3: buscá la que es igual de los dos lados.',
   rueda: 'La altura de la rueda sube, baja y vuelve.',
   reparto: 'Con 2 no se puede repartir: buscá la que se corta en un lugar.',
+  veces: 'Para llegar al doble hace falta una vez más: crece cada vez más despacio.',
 };
 
 export const familias = {
@@ -40,14 +42,14 @@ export const familias = {
     const w = g.world;
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Mara', 'Juntemos las reglas del viaje. Dibujé cinco formas. Cada regla tiene la suya: si reconocemos la forma, sabemos qué esperar.');
+    await d.say('Mara', 'Juntemos las reglas del viaje. Dibujé seis formas. Cada regla tiene la suya: si reconocemos la forma, sabemos qué esperar.');
     const cells = THUMBS.map((t, i) => ({...t, x: A.x0 + 10 + (i % 3) * 170, y: A.y0 + 8 + Math.floor(i / 3) * 112, w: 150, h: 84}));
     for (const [i, c] of cells.entries()) {
       const {px, py} = axes(w, `c12-ax${i}`, c, c.xr, c.yr);
       w.add(curve(`c12-th${i}`, c.f, c.xr, px, py, c.yr, {ch: WHITE, n: 60}));
       if (c.asym) w.add(new Drawing(`c12-as${i}`, Array.from({length: 6}, (_, k) => S([[px(c.asym), c.y + k * 15], [px(c.asym), c.y + k * 15 + 7]], seedOf(`c12-as${i}`) + k, {w: 1.6, p: 0.6, ch: BLUE, lift: false})), {z: 12}));
     }
-    d.describe('Cinco formas: una ola; una recta que sube pareja; una curva cortada en dos con un hueco en el medio; una curva que empieza baja y se dispara; una U.');
+    d.describe('Seis formas: una ola; una recta que sube pareja; una curva cortada en dos, que no está definida en un lugar; una curva que empieza baja y se dispara; una U; y una curva que sube cada vez más despacio.');
     await d.shot(SHOTS.tiles, 0.8);
     const done = new Set();
     const placed = new Set();
@@ -66,7 +68,7 @@ export const familias = {
       w.add(new Label(`c12-fl${idx}`, rule.name, c.x + c.w / 2, c.y + c.h + 14, {size: 14, align: 'center', z: 13, ch: YELLOW}));
       g.audio.tap(0.2, 1.2 + done.size * 0.08);
     }
-    await d.say('student', 'Mara: cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las que se cortan no están definidas en un lugar, y cerca de él se disparan. Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
+    await d.say('student', 'Mara: cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados; las olas vuelven; las que se cortan no están definidas en un lugar, y cerca de él se disparan; las del «¿cuántas veces?» suben cada vez más despacio. Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
     d.evidence('families', {done: [...done]});
     g.flags.c12families = true;
   },

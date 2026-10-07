@@ -219,7 +219,8 @@ export const repite = {
     await d.shot(SHOTS.tiles, 0.8);
     const all = heights(1, 30, 720);
     let turns = 0;
-    await d.interact(ctl => new Promise(resolve => {
+    // una vuelta por vez: la pregunta por los 390° llega antes de dibujar la segunda
+    const oneTurn = () => d.interact(ctl => new Promise(resolve => {
       let busy = false;
       g.setHint(() => ['Tocá «una vuelta más»: se ponen las alturas de toda una vuelta, de a 30°.']);
       const refresh = () => g.ui.setSpots([wordSpot('c10-turn', 'una vuelta más', A.x1 - 80, A.y1 - 26, async () => {
@@ -239,16 +240,19 @@ export const repite = {
         turns++;
         d.describe(turns === 1 ? 'Una vuelta: la altura sube hasta 1 a los 90°, baja hasta −1 a los 270° y vuelve a 0.' : 'La segunda vuelta dibuja exactamente la misma ola que la primera.');
         busy = false;
-        if (turns >= 2) { g.setHint(null); resolve(); } else refresh();
+        g.setHint(null);
+        resolve();
       }, {label: 'Agregar las alturas de una vuelta más'})]);
       refresh();
     }));
+    await oneTurn();
     const c = await d.choose([
       {id: 'half', text: '0,5: como a los 30°.'},
       {id: 'more', text: 'Más que 1: siguió girando.'},
-      {id: 'unknown', text: 'No se sabe: no la pusimos.'},
-    ], {prompt: 'Girada 390°, ¿a qué altura queda la manija?', evaluate: true});
+      {id: 'unknown', text: 'No se sabe: todavía no la pusimos.'},
+    ], {prompt: 'Girada 390°, una vuelta y 30° más, ¿a qué altura va a quedar la manija?', evaluate: true});
     d.evidence('period-predict', {answer: c});
+    await oneTurn();
     await d.think(c === 'half' ? '390 es una vuelta y 30 más: misma altura que a los 30°.' : '390° es una vuelta entera, 360°, y 30° más: la manija está donde estaba a los 30°. Medio rayo.');
     await d.say('student', 'Cornisa: la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.');
     await studentWrites(d, g, 'c10-per', 'sen(x + 360°) = sen x', A.x0 + 20, A.y1 - 8, {size: 22});
