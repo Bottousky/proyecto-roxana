@@ -220,14 +220,44 @@ export const final = {
     const s = w.get('student');
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche: 1, 2, 4 y 8 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?');
+    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche. Las dos primeras: 1 y 2 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?');
     const box = {x: A.x0 + 40, y: A.y0 + 20, w: 300, h: 210};
     const {px, py} = axes(w, 'c12-g', box, [0, 6], [0, 40], {xticks: [1, 2, 3, 4, 5, 6], yticks: [10, 20, 30, 40], xname: 'noche'});
-    for (const [n, v] of NIGHTS) w.add(new Shape(`c12-n${n}`, dot(`c12-n${n}`, 6, BLUE), px(n), py(v), {z: 14}));
+    const night = ([n, v]) => w.add(new Shape(`c12-n${n}`, dot(`c12-n${n}`, 6, BLUE), px(n), py(v), {z: 14}));
+    NIGHTS.slice(0, 2).forEach(night);
     w.add(new Drawing('c12-top', Array.from({length: 12}, (_, i) => S([[px(i * 0.5), py(30)], [px(i * 0.5 + 0.25), py(30)]], seedOf('c12-top') + i, {w: 1.6, p: 0.7, ch: YELLOW, lift: false})), {z: 12}));
     w.add(new Label('c12-topl', 'escalera: 30', px(0) + 6, py(30) - 8, {size: 15, z: 13, ch: YELLOW}));
-    d.describe('Cuatro puntos azules, las noches 0 a 3: 1, 2, 4 y 8. Una raya punteada amarilla en 30, la altura de la escalera.');
+    d.describe('Dos puntos azules, las noches 0 y 1: 1 y 2. Una raya punteada amarilla en 30, la altura de la escalera.');
     await d.shot(SHOTS.tiles, 0.8);
+    // Punto se adelanta: corre por donde cree que va la Marea, una recta que sube de a uno
+    g.setCinematic(true);
+    p.setMode('still');
+    g.audio.punto('happy');
+    const guess = n => 1 + n;
+    const pline = w.add(curve('c12-pline', guess, [0, 6], px, py, [0, 40], {ch: YELLOW, n: 12}));
+    pline.progress = 0;
+    await d.all(
+      d.draw(pline, 1.6, {sound: false}),
+      d.tween(1.6, q => { const n = 6 * q; p.x = px(n); p.y = py(guess(n)) - 14; }, easeInOut),
+    );
+    g.setCinematic(false);
+    d.describe('Punto se adelanta: corre por una recta amarilla que sube de a un escalón por noche, y llega a 7 en la noche 6.');
+    d.evidence('punto-guess', {rule: 'suma 1'});
+    await d.say('Mara', 'Esperá, Punto. La tercera y la cuarta noche fueron 4 y 8.');
+    g.setCinematic(true);
+    for (const nv of NIGHTS.slice(2)) { const sh = night(nv); sh.fade = 0; await d.fadeTo(sh, 1, 0.4); }
+    g.setCinematic(false);
+    d.describe('Dos puntos azules más, 4 y 8: quedan por arriba de la recta de Punto.');
+    g.audio.punto('question');
+    await pulse(d, p, 1, 0.3).catch(() => {});
+    await d.think('Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato.');
+    g.setCinematic(true);
+    await d.fadeTo(pline, 0, 0.8);
+    w.remove('c12-pline');
+    await zip(d, p, px(3), py(8) - 16, 0.5);
+    g.setCinematic(false);
+    d.describe('Punto borra su recta él mismo y se queda arriba del último punto, esperando.');
+    d.evidence('punto-erase', {});
     const FAM = [
       {id: 'dbl', text: 'Duplica: la familia que despega', f: n => 2 ** n},
       {id: 'line', text: 'Suma lo mismo: una recta', f: n => 1 + 7 * n / 3},
@@ -274,15 +304,30 @@ export const final = {
     await d.wait(2.2);
     g.setCinematic(false);
     await d.say('Mara', 'Llegamos. La escalera sigue ahí, y lo que entendimos también.');
-    // Punto corre por su gráfico mientras se dice su viaje
+    // Punto corre por su gráfico, un paso adelante
     p.setMode('still');
-    const run = d.tween(3.2, q => { const n = 5 * q; p.x = px(n); p.y = py(Math.min(40, 2 ** n)) - 14; }, easeInOut);
     d.describe('Punto corre por la curva, desde la primera noche hasta la quinta, un paso adelante.');
-    await d.say('student', 'Punto, al principio eras un punto que contaba. Después tuviste un lado para ir, una flecha. Ahora corrés por un gráfico, un paso adelante.');
-    await run.catch(() => {});
+    await d.tween(2.6, q => { const n = 5 * q; p.x = px(n); p.y = py(Math.min(40, 2 ** n)) - 14; }, easeInOut).catch(() => {});
     g.audio.punto('happy');
+    // la pregunta del cap. 1: el nombre
+    await d.say('student', 'Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?');
+    g.setCinematic(true);
+    // sube arriba de la pizarra y dibuja en el aire, saliendo de él
+    const nx = p.x + 10, ny = A.y0 - 70;
+    await zip(d, p, nx - 14, ny, 0.6);
+    const name = w.add(new Drawing('c12-name', [
+      S([[nx, ny], [nx + 2, ny + 1]], seedOf('c12-name'), {w: 6, p: 1, ch: YELLOW}),
+      S([[nx, ny], [nx + 60, ny - 10]], seedOf('c12-name') + 1, {w: 3, p: 0.95, ch: YELLOW}),
+      S([[nx + 60, ny - 10], [nx + 50, ny - 18]], seedOf('c12-name') + 2, {w: 3, p: 0.95, ch: YELLOW}),
+      S([[nx + 60, ny - 10], [nx + 52, ny - 1]], seedOf('c12-name') + 3, {w: 3, p: 0.95, ch: YELLOW}),
+      S(Array.from({length: 16}, (_, i) => [nx + 60 + i * 6, ny - 10 - (i * i) * 0.45]), seedOf('c12-name') + 4, {w: 3, p: 0.95, ch: YELLOW}),
+    ], {z: 16, progress: 0}));
+    await d.draw(name, 2.2, {sound: false});
+    g.setCinematic(false);
+    d.describe('Punto dibuja en el aire: un punto, que se estira en una flecha, que se dobla en una curva que sube.');
+    d.evidence('punto-name', {});
+    await d.say('student', 'Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto.');
     await pulse(d, p, 2, 0.4).catch(() => {});
-    follow(p, s);
     if (!replay) writeJournal12(g);
     g.flags.c12final = true;
     g.flags.gameDone = true;

@@ -1,0 +1,17 @@
+[0.0s] escena → c12.anticipar
+[1.0s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche. Las dos primeras: 1 y 2 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?
+[1.9s] lee: Esperá, Punto. La tercera y la cuarta noche fueron 4 y 8.
+[2.8s] lee: Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato.
+[3.4s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[4.3s] elige «En la noche 5: 32 pasa los 30.» (Si sigue duplicando, ¿en qué noche pasa la escalera?)
+[4.6s] lee: La quinta: 16 todavía no, 32 sí.
+[4.7s] lee: —Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.
+[4.8s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[4.9s] lee: Cuarta noche.
+[5.0s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La quinta pasa los 30.
+[5.0s] lee: Entonces redibujamos la escalera esta noche, antes de la quinta. ¡A trabajar!
+[5.1s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[7.8s] lee: —Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?
+[7.9s] lee: —Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto.
+[9.2s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[9.6s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["punto-guess","punto-erase","final-family","final-predict","final-check","punto-name"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":9.562,"size":"1600x900","touch":false,"route":"directa","watch":false}

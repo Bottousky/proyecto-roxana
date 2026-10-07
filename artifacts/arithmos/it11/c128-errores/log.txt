@@ -1,0 +1,21 @@
+[0.0s] escena → c12.anticipar
+[1.0s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche. Las dos primeras: 1 y 2 escalones. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?
+[1.9s] lee: Esperá, Punto. La tercera y la cuarta noche fueron 4 y 8.
+[2.0s] lee: Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato.
+[2.6s] elige «Suma lo mismo: una recta» (¿Qué familia sigue la Marea?)
+[3.0s] lee: Una recta no pasa por los cuatro: de 1 a 2 sube 1, de 4 a 8 sube 4. No suma lo mismo.
+[3.6s] elige «Va y vuelve: una ola» (¿Qué familia sigue la Marea?)
+[4.0s] lee: Hasta ahora sólo sube, y cada vez más: no parece una ola.
+[4.5s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[5.4s] elige «En la noche 4: 16.» (Si sigue duplicando, ¿en qué noche pasa la escalera?)
+[5.8s] lee: La cuarta llega a 16: todavía no. La quinta, 32: ahí pasa.
+[5.9s] lee: —Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la quinta. Lo anotamos como suposición y miramos cada noche si se cumple.
+[6.0s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[6.0s] lee: Cuarta noche.
+[6.1s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La quinta pasa los 30.
+[6.2s] lee: Entonces redibujamos la escalera esta noche, antes de la quinta. ¡A trabajar!
+[6.3s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[9.0s] lee: —Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?
+[9.1s] lee: —Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto.
+[9.6s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[10.0s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["punto-guess","punto-erase","final-family","final-predict","final-check","punto-name"],"fps":{"min":"36.0","median":"59.5"},"errors":[],"seconds":10.027,"size":"1600x900","touch":false,"route":"errores","watch":false}
