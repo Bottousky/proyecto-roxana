@@ -180,7 +180,7 @@ export const tramos = {
     w.add(new Label('c12-vrl', 'x', v.px(2) + 8, v.py(1) + 6, {size: 15, z: 13, ch: YELLOW}));
     g.setCinematic(false);
     d.describe('Al costado, un gráfico chico en forma de V: lo lejos del cero de cada número. A la izquierda del cero, la regla −x, en blanco; a la derecha, x, en amarillo.');
-    await d.say('student', 'Lo lejos del cero también va por tramos, como Recta y Cuña en la línea de la ladera: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V.');
+    await d.say('student', 'Lo lejos del cero también va por tramos, como Recta y Cuña en la línea del depósito: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V.');
     await studentWrites(d, g, 'c12-pw', 'hasta 10: x    después: 10 + (x − 10) ÷ 2', A.x0 + 20, A.y1 - 4, {size: 18});
     g.flags.c12piecewise = true;
   },

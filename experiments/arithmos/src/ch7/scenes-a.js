@@ -157,7 +157,7 @@ export const lado = {
     void lab2;
     await d.think(guess === 'less' ? 'Menos de 2: el lado es la diagonal de un cuadro.' : guess === '2' ? 'Un lado de 2 haría una huerta de cuatro cuadros, no de dos. El lado es la diagonal de un cuadro: menos de 2.' : 'Menos de 2, no más: el lado es la diagonal de un cuadro.');
     const r2 = sideOf(2);
-    await d.say('student', 'Punto: esta huerta tiene área 2, dos cuadros. Su lado, multiplicado por sí mismo, da 2: es la diagonal de un cuadro, la que medimos, más o menos 1,414.');
+    await d.say('student', 'Punto, esta huerta tiene área 2, dos cuadros. Su lado, multiplicado por sí mismo, da 2: es la diagonal de un cuadro, la que medimos, más o menos 1,414.');
     await studentWrites(d, g, 'c7-r2', '√2 · √2 = 2', A.x0 + 16, A.y0 + 60, {size: 28});
     await studentWrites(d, g, 'c7-r2b', '√2 ≈ 1,414', A.x0 + 16, A.y0 + 104, {size: 28});
     d.evidence('side', {lo: r2.lo, hi: r2.hi});
@@ -275,7 +275,7 @@ export const duplicar = {
     }));
     g.setHint(null);
     const od = overtakeDay(1, 10, 2);
-    await d.say('student', 'Punto: al principio sumar diez gana. Duplicar empieza lento, pero cada día agrega todo lo que ya había. Desde el día ' + od + ' vas adelante, y cada día sacás más ventaja.');
+    await d.say('student', 'Punto, al principio sumar diez gana. Duplicar empieza lento, pero cada día agrega todo lo que ya había. Desde el día ' + od + ' vas adelante, y cada día sacás más ventaja.');
     await d.say('Mara', 'Entonces la redibujamos a tu manera. ¿Y de dónde sacás tanta tiza el día siete?');
     g.audio.punto('question');
     d.evidence('race', {overtake: od, guess});

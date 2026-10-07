@@ -109,9 +109,10 @@ export const flechas = {
     await d.draw(b2, 0.4, {sound: false});
     g.setCinematic(false);
     d.describe('En azul, las mismas flechas en el otro orden: el camino es otro, pero termina en la casa de Rampa. Los dos caminos son los lados de un paralelogramo.');
-    await d.say('student', c === 'same' ? 'Punto: el camino cambia, el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar.' : 'Punto: el camino cambia, pero el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar.');
+    await d.say('student', c === 'same' ? 'Punto, el camino cambia, el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar.' : 'Punto, el camino cambia, pero el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar.');
     await studentWrites(d, g, 'c10-vsum', `${pair(f1)} + ${pair(f2)} = (${sg(f1[0])} + ${term(f2[0])}, ${sg(f1[1])} + ${term(f2[1])}) = (3, 2)`, A.x0 + 10, A.y1 - 6, {size: 18});
-    await d.say('student', 'Se suman los de adelante con los de adelante y los de arriba con los de arriba. Y como en cada suma el orden no importa, con cualquier par de flechas pasa lo mismo: las dos rutas son los lados de un paralelogramo.');
+    await d.say('student', 'Se suman los de adelante con los de adelante y los de arriba con los de arriba. Y como en cada suma el orden no importa, con cualquier par de flechas se llega al mismo lugar; si no van en la misma dirección, las dos rutas son los lados de un paralelogramo.');
+    await d.say('student', 'La suma es la flecha (3, 2): la que va derecho del pozo a la casa. Desde el cero, la flecha que llega a un lugar se anota con los mismos números que el lugar; desde otro punto, no.');
     follow(p, s);
     d.evidence('vector', {used: [f1, f2]});
     g.flags.c10vector = true;
@@ -187,14 +188,14 @@ export const cuarto = {
     if (c === 'minus1') await d.think('−1 por −1 es 1: dos medias vueltas, vuelta entera. Hace falta uno que sea medio camino: un cuarto.');
     if (c === 'none') await d.think('Ninguno de la recta: en la recta sólo hay ir para adelante o dar media vuelta. Un cuarto de vuelta sale de la recta.');
     const ii = cmul([0, 1], [0, 1]), m4 = cmul([0, 2], [0, 2]);
-    await d.say('student', 'Mara: al número que está un rayo arriba del cero le decimos i. Multiplicar por i es girar un cuarto de vuelta, contra el reloj. Dos cuartos son media vuelta: i · i = −1. i no está en la recta.');
+    await d.say('student', 'Mara, a la flecha (0, 1), uno arriba del cero, le decimos i. Multiplicar por i es girar un cuarto de vuelta, contra el reloj. Dos cuartos son media vuelta: i · i = −1. i no está en la recta.');
     await studentWrites(d, g, 'c10-i', 'i · i = −1', A.x1 - 160, A.y0 + 40, {size: 30});
     w.add(new Label('c10-vn0', '3 + i', px(3), py(1) + 24, {size: 16, align: 'center', z: 14, ch: YELLOW}));
     d.describe('Debajo de la punta de la flecha amarilla, (3, 1), se anota «3 + i»: tres adelante y uno arriba.');
     await d.say('student', 'La flecha (3, 1) es el número 3 + i: tres adelante y uno arriba. Por i: i · 3 + i · i = 3i − 1. Es la flecha (−1, 3), la del primer giro: el de adelante pasa arriba, y el de arriba pasa adelante con el signo cambiado.');
     await studentWrites(d, g, 'c10-i3', 'i · (3 + i) = −1 + 3i', A.x1 - 195, A.y0 + 140, {size: 19});
     await d.say('Mara', '¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?');
-    await d.say('student', 'Con los números de la recta no se podía, y eso sigue valiendo en la recta. Con éstos sí: 2i es un cuarto de vuelta y el doble de largo. Dos veces: media vuelta y cuatro veces el largo, −4. Y −2i, girando para el otro lado, también.');
+    await d.say('student', 'Con los números de la recta no se podía, y eso sigue valiendo en la recta. Con éstos sí: multiplicar por 2i es girar un cuarto de vuelta y estirar al doble. Dos veces: media vuelta y cuatro veces el largo, −4. Y −2i, girando para el otro lado, también.');
     await studentWrites(d, g, 'c10-2i', '2i · 2i = −4', A.x1 - 160, A.y0 + 90, {size: 26});
     g.audio.punto('happy');
     await pulse(d, p, 2, 0.4).catch(() => {});
@@ -246,7 +247,7 @@ export const pistas = {
     const sol = solve2([1, 1, 7], [1, -1, 1]);
     w.add(new Shape('c10-sol', poly('c10-sol', Array.from({length: 10}, (_, i) => [Math.cos(i / 10 * Math.PI * 2) * 12, Math.sin(i / 10 * Math.PI * 2) * 12]), {ch: YELLOW, w: 3}), px(sol.x), py(sol.y), {z: 15}));
     d.describe('El par (4, 3), donde se cruzan las dos rectas, queda marcado.');
-    await d.say('student', 'Mara: Cornisa 4, Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.');
+    await d.say('student', 'Mara, son Cornisa 4 y Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros.');
     await studentWrites(d, g, 'c10-sys', 'a + b = 7', A.x0 + 300, A.y0 + 36, {size: 22});
     await studentWrites(d, g, 'c10-sys2', 'a − b = 1', A.x0 + 300, A.y0 + 66, {size: 22});
     await studentWrites(d, g, 'c10-sys3', '→ (4, 3)', A.x0 + 300, A.y0 + 98, {size: 22, ch: YELLOW});
@@ -265,13 +266,21 @@ export const pistas = {
     d.describe('En azul, los pares que suman 3: otra fila, paralela a la de los que suman 7. No tienen ningún punto en común.');
     await d.think(c === 'none' ? 'Paralelas: ningún par cumple las dos.' : c === '52' ? '(5, 2) suma 7, pero no 3. Las dos filas son paralelas: ningún par cumple las dos.' : 'Ninguno de la primera suma 3: las filas son paralelas y no se tocan. Si fueran la misma fila, servirían todos.');
     w.add(new Label('c10-tabh', 'en tabla:', A.x0 + 300, A.y0 + 150, {size: 16, z: 12, ch: BLUE}));
-    await studentWrites(d, g, 'c10-tab', '1    1 | 7', A.x0 + 296, A.y0 + 178, {size: 19});
-    await studentWrites(d, g, 'c10-tab2', '1  −1 | 1', A.x0 + 296, A.y0 + 204, {size: 19});
-    await studentWrites(d, g, 'c10-tab3', '1  1 | 7', A.x0 + 430, A.y0 + 178, {size: 19, ch: BLUE});
-    await studentWrites(d, g, 'c10-tab4', '1  1 | 3', A.x0 + 430, A.y0 + 204, {size: 19, ch: BLUE});
-    d.describe('Mara anota sólo los números de cada pista, en filas. A la izquierda, «suman 7» y «le lleva 1»; a la derecha, en azul, «suman 7» y «suman 3».');
+    // la raya que separa los números de la izquierda del resultado se dibuja derecha (la letra de tiza la inclina como una fracción)
+    const table = async (id, rows, x, ch) => {
+      for (const [i, [l, r]] of rows.entries()) {
+        await studentWrites(d, g, `${id}${i}`, l, x, A.y0 + 178 + i * 26, {size: 19, ch});
+        const rl = w.add(new Label(`${id}r${i}`, r, x + 74, A.y0 + 178 + i * 26, {size: 19, z: 12, ch, reveal: 0}));
+        await d.draw(rl, 0.25, {key: 'reveal', sound: false});
+      }
+      const bar = w.add(new Drawing(`${id}bar`, [S([[x + 64, A.y0 + 160], [x + 64, A.y0 + 210]], seedOf(`${id}bar`), {w: 2, p: 0.9, ch: ch ?? WHITE})], {z: 12, progress: 0}));
+      await d.draw(bar, 0.3, {sound: false});
+    };
+    await table('c10-tab', [['1    1', '7'], ['1  −1', '1']], A.x0 + 290, undefined);
+    await table('c10-tabb', [['1    1', '7'], ['1    1', '3']], A.x0 + 405, BLUE);
+    d.describe('Mara anota sólo los números de cada pista, en filas, con una raya antes del resultado. A la izquierda, «suman 7» (1, 1, raya, 7) y «le lleva 1» (1, −1, raya, 1); a la derecha, en azul, «suman 7» (1, 1, raya, 7) y «suman 3» (1, 1, raya, 3).');
     await d.think('Una tabla así, sólo con los números de cada pista, se llama matriz.');
-    await d.say('student', 'Mara: en la tabla azul, la parte de la izquierda es igual en las dos filas y el número no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas.');
+    await d.say('student', 'Mara, en la tabla azul la parte de la izquierda es igual en las dos filas y el resultado no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas.');
     await d.say('Mara', '¿Y si te digo «suman 7» y «el doble de los dos suma 14»?');
     await d.say('student', 'Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares.');
     d.evidence('system', {sol, none: none.kind});
@@ -328,7 +337,7 @@ export const aVeces = {
       {id: 'half', text: 'A medias: ya le toca.'},
     ], {prompt: 'El balde número 7, ¿cómo va a subir?', evaluate: true});
     d.evidence('chance-predict', {answer: c});
-    await d.think(c === 'unsure' ? 'Ni la rueda ni el balde avisan. Lo que pasó dice qué es más común, no qué va a pasar.' : c === 'full' ? 'Casi siempre no es siempre: dos de seis subieron a medias.' : 'El balde no lleva la cuenta: que hayan salido llenas no hace que «le toque» a medias.');
+    await d.think(c === 'unsure' ? 'Ni la rueda ni el balde avisan. Lo que pasó dice qué es más común, no qué va a pasar.' : c === 'full' ? 'Casi siempre no es siempre: dos de seis subieron a medias.' : 'El balde no lleva la cuenta: lo que salió antes no cambia lo que sale ahora.');
     if (!replay) writeJournal10(g);
     await d.say('Mara', 'Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.');
     g.audio.punto('question');
@@ -354,7 +363,7 @@ function writeJournal10(g) {
   const vo = first('vector-order');
   if (vo) seen.push(vo.answer === 'same' ? 'Viste que el orden de las flechas no cambia el destino.' : 'Pensaste que el orden cambiaba el destino; cambia el camino, no adónde se llega.');
   const ip = first('i-predict');
-  if (ip) seen.push(ip.answer === 'new' ? 'Buscaste un número nuevo para el cuarto de vuelta: i.' : ip.answer === 'none' ? 'Dijiste que ningún número daba media vuelta; en la recta no hay, pero fuera de la recta está i, y i · i = −1.' : 'Probaste con −1; −1 · −1 es 1, vuelta entera. El cuarto de vuelta es i, y i · i = −1.');
+  if (ip) seen.push(ip.answer === 'new' ? 'Buscaste un número nuevo para el cuarto de vuelta: i.' : ip.answer === 'none' ? 'Dijiste que ningún número, multiplicado dos veces, daba media vuelta; en la recta no hay, pero fuera de la recta está i, y i · i = −1.' : 'Probaste con −1; −1 · −1 es 1, vuelta entera. El cuarto de vuelta es i, y i · i = −1.');
   const sp = first('system-parallel');
   if (sp) seen.push(sp.answer === 'none' ? 'Con «suman 7» y «suman 3» viste que no hay par: rectas paralelas.' : sp.answer === 'many' ? 'Con «suman 7» y «suman 3» dijiste que servían muchos; las rectas son paralelas: no sirve ninguno.' : 'Con «suman 7» y «suman 3» propusiste (5, 2); suma 7, no 3: las rectas son paralelas y no hay par.');
   const cp = first('chance-predict');
@@ -366,8 +375,8 @@ function writeJournal10(g) {
     body: [
       'Un giro se mide por cuántos rayos recorre el borde, siguiendo la curva: una vuelta, 360°, son 2π radianes (≈ 6,28), media vuelta π. Derecho, de punta a punta, el rayo entra seis veces justo; por el borde, que es más largo, seis y un pedacito. π no es 3,14: 3,14 es una aproximación, y π no es ninguna fracción.',
       'En una rueda de un rayo, la altura del punto que gira es el seno del ángulo y el costado, el coseno: sen 30° = 0,5, cos 30° ≈ 0,87; a la izquierda del centro el costado es negativo. Rayo, alto y costado forman un triángulo con esquina recta: alto² + costado² = 1. Se repiten cada vuelta: sen(x + 360°) = sen x. En una rampa, alto ÷ largo de la tabla (el lado de enfrente de la esquina recta) es el seno del ángulo con el piso; en triángulos, la esquina recta y la misma inclinación dejan la forma fija.',
-      'Una flecha (vector) dice cuánto y hacia dónde, no desde dónde; un lugar no es una flecha. Se suman punta con cola, coordenada a coordenada, y el orden no cambia el destino. La flecha (3, 1) es el número 3 + i. Multiplicar por i gira un cuarto de vuelta contra el reloj: (a, b) pasa a (−b, a), e i · i = −1. Con números de la recta, x · x nunca da negativo; con 2i, 2i · 2i = −4.',
-      'Dos condiciones de primer grado a la vez («tanto de a más tanto de b da tanto») son dos filas de pares sobre rectas: lo que cumple las dos está en el cruce; si son paralelas, no hay; si son la misma, todos. Con atados enteros, además, el cruce tiene que caer en un punto entero. Los números de cada condición, en filas, forman una tabla llamada matriz: si la izquierda de dos filas es igual y el número no, son paralelas.',
+      'Una flecha (vector) dice cuánto y hacia dónde, no desde dónde; un lugar no es una flecha, aunque desde el cero se anoten igual. Se suman punta con cola, coordenada a coordenada, y el orden no cambia el destino. La flecha (3, 1) es el número 3 + i. Multiplicar por i gira un cuarto de vuelta contra el reloj: (a, b) pasa a (−b, a), e i · i = −1. Con números de la recta, x · x nunca da negativo; con 2i, 2i · 2i = −4.',
+      'Dos condiciones de primer grado a la vez («tanto de a más tanto de b da tanto») son dos filas de pares sobre rectas: lo que cumple las dos está en el cruce; si son paralelas, no hay; si son la misma, todos. Con atados enteros, además, el cruce tiene que caer en un punto entero. Los números de cada condición, en filas, forman una tabla llamada matriz: si la izquierda de una fila es la de la otra por un mismo número y el resultado no, son paralelas; si también el resultado, es la misma recta.',
     ],
     seen,
     moments: [

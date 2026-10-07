@@ -347,5 +347,24 @@ Informe: `artifacts/arithmos/it10/review-narr-10-12/informe.md` (sobre a3cc472, 
 | mat-10 (12) | M9 | 12.7: se dibuja la V (lo lejos del cero) con sus dos tramos, −x y x; «con −4, −x es −(−4) = 4»; se cita la línea de la ladera del cap. 3, no el pozo |
 | mat-9/10 | resto | Pendientes: mat-9 B (bajas); mat-10 M10 en parte (perillas en el cierre, polinomios de grado mayor) |
 
+## Revisión matemática de los arreglos del cap. 10 y de la escena 7.3b (rev-mat-11, 2026-10-07)
+
+Informe: `artifacts/arithmos/it11/review-mat-c10b/informe.md` (sobre 6e9b3f4, sin navegador, con capturas).
+Veredicto: los arreglos de rev-mat-9 resuelven M1, M4, M5, M7, M10, M11, M14 y la M9 de 12.7; M8 y M12 quedaban
+parciales por dos errores nuevos. 7.3b: todas las cuentas y dibujos correctos.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | «La ventana tenía cuatro lados»: era una ele de seis | Corregido: «una ele, con seis lados: con más de tres lados, los ángulos no alcanzan» |
+| A2 | La raya de la tabla se dibuja como «/» y la matriz se lee como fracciones | Corregido: la raya es un trazo derecho dibujado aparte; la descripción dice «raya» |
+| M1 | Lugar y flecha se vuelven a juntar sin decir por qué | Corregido: «la suma es la flecha (3, 2), la que va derecho del pozo a la casa; desde el cero se anotan igual»; i es «la flecha (0, 1)»; Bitácora |
+| M2 | 7.3b usa 4⁵, 4³, 8² sin definir otra base | Corregido: «4³ es empezar en 1 y multiplicar por 4 tres veces» antes de la primera pregunta; «con cualquier número abajo, se cuentan factores iguales» |
+| B1–B5 | «cualquier inclinación» con tres filas; «es 0,87»; rama «no se sabe»; 180°; dos manijas | Corregidos: con la rueda se gira y se lee el alto; «casi 0,87»; respuesta propia; «las tres suman 180°»; se borran las rayas de los 90° y se dice «la marca de los 30°» |
+| B6–B10 | Hexágono sólo en una rama; rama `none`; 2i como número; criterio de paralelas; paralelogramo aplastado | Corregidos: el hexágono se dibuja en las tres ramas; «multiplicado dos veces»; «multiplicar por 2i»; criterio con «por un mismo número»; «si no van en la misma dirección» |
+| B11 | 12.7: Recta y Cuña estaban en la línea del depósito | Corregido (la notación \|x\| queda en la Bitácora: la letra de tiza inclina la raya) |
+| B12–B14 | Reglas y exponentes 0 y −1; despliegue sin lector de pantalla; rama `4` de la Bitácora | Corregidos: «cuando los exponentes cuentan factores»; `unfold` describe los factores; «sumaste arriba y multiplicaste abajo» |
+| B15 | «Nombre:» en caps. 7 y 10 | Corregido (18 líneas) |
+| M13 (resto) | «que hayan salido llenas» con el balde 6 a medias | Corregido: «lo que salió antes no cambia lo que sale ahora» |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

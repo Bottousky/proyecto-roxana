@@ -99,15 +99,14 @@ export const rueda = {
     const gap = w.add(new Drawing('c10-gap', [S(arcPts(cx, cy, R + 4, 6, TAU, 6), seedOf('c10-gap'), {w: 5, p: 0.95, ch: BLUE})], {z: 14, progress: 0}));
     await d.draw(gap, 0.4, {sound: false});
     d.describe('Seis pedazos amarillos y un hueco azul chiquito, menos de un tercio de pedazo.');
-    if (guess === '6') {
-      // el hexágono del compás: el rayo entra seis veces justo, pero derecho, por adentro
-      const hex = Array.from({length: 7}, (_, k) => [cx + Math.cos(k * Math.PI / 3) * R, cy - Math.sin(k * Math.PI / 3) * R]);
-      const hx = w.add(new Drawing('c10-hex', [S(hex, seedOf('c10-hex'), {w: 2, p: 0.8, ch: BLUE})], {z: 13, progress: 0}));
-      await d.draw(hx, 0.6, {sound: false});
-      d.describe('Adentro de la rueda, un hexágono azul: seis rayos derechos, de punta a punta, cierran justo.');
-      await d.think('Con el compás, el rayo entra seis veces justo, pero derecho, de punta a punta por adentro: el hexágono azul. La soga va por el borde, que es más largo: por eso queda un hueco.');
-    } else await d.think(guess === '6+' ? 'Seis enteros y un pedacito.' : 'Los rayos dibujados adentro no miden el borde: alrededor entran seis y un pedacito.');
-    await d.say('student', 'Balcón: una vuelta entera son 6 rayos y un poco más: 6,28… Se lo llama 2π. Media vuelta, π, unos 3,14 rayos: por eso el borde entero es π veces el diámetro, que son dos rayos. Se sabe que π no es una fracción, aunque probarlo es más difícil que lo de √2.');
+    await d.think(guess === '6+' ? 'Seis enteros y un pedacito.' : guess === '6' ? 'Seis no alcanzan: queda un hueco.' : 'Los rayos dibujados adentro no miden el borde: alrededor entran seis y un pedacito.');
+    // el hexágono del compás: el rayo entra seis veces justo, pero derecho, por adentro
+    const hex = Array.from({length: 7}, (_, k) => [cx + Math.cos(k * Math.PI / 3) * R, cy - Math.sin(k * Math.PI / 3) * R]);
+    const hx = w.add(new Drawing('c10-hex', [S(hex, seedOf('c10-hex'), {w: 2, p: 0.8, ch: BLUE})], {z: 13, progress: 0}));
+    await d.draw(hx, 0.6, {sound: false});
+    d.describe('Adentro de la rueda, un hexágono azul: seis rayos derechos, de punta a punta, cierran justo.');
+    await d.think(guess === '6' ? 'Con el compás, el rayo entra seis veces justo, pero derecho, de punta a punta por adentro: el hexágono azul. La soga va por el borde, que es más largo: por eso queda un hueco.' : 'Derecho, de punta a punta por adentro, el rayo entra seis veces justo: el hexágono azul. Por el borde, que es más largo, sobra un pedacito.');
+    await d.say('student', 'Balcón, una vuelta entera son 6 rayos y un poco más: 6,28… Se lo llama 2π. Media vuelta, π, unos 3,14 rayos: por eso el borde entero es π veces el diámetro, que son dos rayos. Se sabe que π no es una fracción, aunque probarlo es más difícil que lo de √2.');
     await studentWrites(d, g, 'c10-2pi', '360° = 2π radianes (≈ 6,28 rayos de borde)', A.x0 + 20, A.y1 - 10, {size: 20});
     await d.think('Medir un giro por cuántos rayos recorre el borde: eso es medir en radianes. Sirve para cualquier rueda: con una más grande, los pedazos también son más largos.');
     d.evidence('radian', {pieces: 6, tau: +TAU.toFixed(3)});
@@ -192,9 +191,10 @@ export const alto = {
       }, {label: 'Girar la rueda 30 grados'})]);
       refresh();
     }));
-    await d.think(g30 === 'half' ? 'Medio rayo justo.' : 'A 30° la manija sube medio rayo, no un tercio: la altura no crece parejo con el giro.');
-    // por qué medio: la mitad de un triángulo equilátero
+    await d.think(g30 === 'half' ? 'Medio rayo justo.' : g30 === 'unknown' ? 'Medio rayo. Y se podía saber sin medir: lo dice un triángulo de lados iguales.' : 'A 30° la manija sube medio rayo, no un tercio: la altura no crece parejo con el giro.');
+    // por qué medio: la mitad de un triángulo equilátero (se borran las rayas de los 90°)
     g.setCinematic(true);
+    w.remove('c10-lv');
     const p30 = point(1, 30);
     const h30 = [cx + p30.x * R, cy - p30.y * R], m30 = [cx + p30.x * R, cy + p30.y * R];
     w.add(new Shape('c10-m30', dot('c10-m30', 5, WHITE), h30[0], h30[1], {z: 15}));
@@ -206,8 +206,8 @@ export const alto = {
     await d.draw(tri, 0.8, {sound: false});
     g.setCinematic(false);
     d.describe('La manija marcada en los 30° y su reflejo en −30°. Desde el centro, un triángulo azul con esos dos puntos: sus tres lados son iguales.');
-    await d.say('student', 'Balcón: en el centro, 30 y 30 hacen 60°. Los dos lados que salen del centro son rayos, iguales, así que las otras dos esquinas son iguales y suman 120°: 60 cada una.');
-    await d.say('student', 'Tres esquinas de 60°: los tres lados miden un rayo. El lado parado va de la manija a su reflejo, y la línea del centro lo corta por la mitad: la manija está a medio rayo de altura.');
+    await d.say('student', 'Balcón, en el centro, 30 y 30 hacen 60°. Los dos lados que salen del centro son rayos, iguales, así que las otras dos esquinas son iguales. Las tres suman 180°: a esas dos les quedan 120°, 60 cada una.');
+    await d.say('student', 'Tres esquinas de 60°: los tres lados miden un rayo. El lado parado va de la marca de los 30° a su reflejo, y la línea del centro lo corta por la mitad: con la manija en los 30°, está a medio rayo de altura.');
     // el costado: del centro al pie de la manija; rayo, alto y costado son el tirante
     g.setCinematic(true);
     const leg = w.add(new Drawing('c10-leg', [
@@ -217,8 +217,8 @@ export const alto = {
     ], {z: 15, progress: 0}));
     await d.draw(leg, 0.7, {sound: false});
     g.setCinematic(false);
-    d.describe('Del centro al pie de la manija, el costado; del pie a la manija, el alto, los dos en amarillo, con esquina recta.');
-    await d.say('student', 'Del centro al pie de la manija va el costado: 0,87 a los 30°. Rayo, alto y costado forman un triángulo con esquina recta, como el tirante: alto² + costado² = 1.');
+    d.describe('Del centro al pie de la marca de los 30°, el costado; del pie a la marca, el alto, los dos en amarillo, con esquina recta.');
+    await d.say('student', 'Del centro al pie de la marca de los 30° va el costado: 0,87 a los 30°. Rayo, alto y costado forman un triángulo con esquina recta, como el tirante: alto² + costado² = 1.');
     await studentWrites(d, g, 'c10-pyt', '0,5² + 0,87² ≈ 1', A.x1 - 190, A.y0 + 196, {size: 21});
     await d.say('student', '0,5 · 0,5 + 0,87 · 0,87 da 1,0069: casi 1, porque 0,87 está redondeado. A la altura de la manija, en la rueda de un rayo, se le dice seno del ángulo; al costado, coseno. A la izquierda del centro, el costado es negativo.');
     await studentWrites(d, g, 'c10-sin', 'sen 30° = 0,5    cos 30° ≈ 0,87', A.x0 + 20, A.y1 - 8, {size: 22});
@@ -291,7 +291,7 @@ export const repite = {
     d.evidence('period-predict', {answer: c});
     await oneTurn();
     await d.think(c === 'half' ? '390 es una vuelta y 30 más: misma altura que a los 30°.' : c === 'unknown' ? 'No estaba puesta, pero se podía saber: una vuelta entera, 360°, deja la manija donde estaba. 390° son una vuelta y 30°: medio rayo, como a los 30°.' : 'Seguir girando no la sube más que el rayo: 390° es una vuelta entera, 360°, y 30° más. La manija está donde estaba a los 30°: medio rayo.');
-    await d.say('student', 'Cornisa: la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.');
+    await d.say('student', 'Cornisa, la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra no se hace negativa ni sube y baja así.');
     await studentWrites(d, g, 'c10-per', 'sen(x + 360°) = sen x', A.x0 + 20, A.y1 - 8, {size: 22});
     d.evidence('period', {turns});
     g.flags.c10period = true;
@@ -343,14 +343,14 @@ export const rampa = {
     draw('c10-r6', A.x0 + 230, A.y0 + 230, 6, 30, '3', true);
     d.describe('La rampa de largo 6, con la misma inclinación: sube 3.');
     await d.think(c === '3' ? 'Tres: las rampas son semejantes, como las copias de Cornisa. Alto ÷ largo no cambia: 1/2.' : c === '4' ? 'No se suma: se multiplica. Las rampas son semejantes; alto ÷ largo es siempre 1/2. Con largo 6, sube 3.' : 'No hace falta medir: las rampas son semejantes, y alto ÷ largo es siempre 1/2. Con largo 6, sube 3.');
-    await d.say('student', 'Rampa: ¿semejantes por tener el mismo ángulo? En la ventana de Cornisa no alcanzaba. Pero en un triángulo sí: con la esquina recta y la misma inclinación, la forma queda fija. La ventana tenía cuatro lados.');
+    await d.say('student', 'Rampa, ¿semejantes por tener el mismo ángulo? En la ventana de Cornisa no alcanzaba. Pero en un triángulo sí: con la esquina recta y la misma inclinación, la forma queda fija. La ventana era una ele, con seis lados: con más de tres lados, los ángulos no alcanzan.');
     await d.say('student', 'Con la misma inclinación, alto ÷ largo de la tabla es siempre el mismo número, y es el seno del ángulo del piso: sen 30° = 0,5.');
     await studentWrites(d, g, 'c10-ramp', 'sube = largo · sen 30° = 6 · 0,5 = 3', A.x0 + 20, A.y0 + 30, {size: 22});
     d.evidence('ratio', {ratio: slopeRatio(30)});
     // otro ángulo: acá «la mitad» ya no sirve y hace falta la tabla de la rueda
     await d.say('Rampa', 'Para la cuesta del pozo quiero una empinada: 60°, con una tabla de largo 4. ¿Cuánto sube esa?');
     const c60 = await d.choose([
-      {id: 'sin', text: 'Unos 3,5: 4 · sen 60°, y sen 60° es 0,87.'},
+      {id: 'sin', text: 'Unos 3,5: 4 · sen 60°, y sen 60° es casi 0,87.'},
       {id: 'half', text: 'Sube 2: la mitad del largo, como las otras.'},
       {id: 'double', text: 'Sube 4: el doble de ángulo, el doble de alto.'},
     ], {prompt: 'La rampa de 60° y largo 4, ¿cuánto sube?', evaluate: true});
@@ -362,7 +362,7 @@ export const rampa = {
     d.describe('Las rampas chicas se borran. Una rampa de 60° y largo 4: sube casi 3 y medio.');
     await d.think(c60 === 'sin' ? 'Con la tabla de la rueda: a 60°, la manija sube 0,87 de rayo. 4 · 0,87 ≈ 3,5.' : c60 === 'half' ? 'La mitad era el seno de 30°. A 60° la tabla de la rueda dice 0,87: 4 · 0,87 ≈ 3,5.' : 'Con el doble de ángulo no sube el doble: subiría 4, todo el largo de la tabla, y sería una pared. La tabla de la rueda dice 0,87: 4 · 0,87 ≈ 3,5.');
     await studentWrites(d, g, 'c10-ramp60', 'sube = 4 · sen 60° ≈ 4 · 0,87 ≈ 3,5', A.x0 + 20, A.y0 + 62, {size: 22});
-    await d.say('student', 'Rampa: con la tabla de la rueda sabés cuánto sube una rampa de cualquier inclinación, sin construirla.');
+    await d.say('student', 'Rampa, con la rueda sabés cuánto sube una rampa de cualquier inclinación, sin construirla: girás hasta ese ángulo y leés el alto.');
     d.evidence('ratio60', {rise: +(4 * Math.sin(Math.PI / 3)).toFixed(2)});
     g.flags.c10ramp = true;
   },

@@ -137,7 +137,7 @@ export const factores = {
     const a1 = w.add(new Label('pw-a-1', '÷ 2', A.x0 + 190, rowY(5) - 16, {size: 20, z: 12, ch: YELLOW, reveal: 0}));
     await d.draw(a1, 0.3, {key: 'reveal', sound: false});
     await studentWrites(d, g, 'pw-r-1', `${pw(2, -1)} = 1/2`, A.x0 + 20, rowY(5), {size: 28});
-    await d.say('student', 'Punto: el exponente cuenta cuántas veces se multiplica por dos. Para abajo de cero, cuántas veces se divide.');
+    await d.say('student', 'Punto, el exponente cuenta cuántas veces se multiplica por dos. Para abajo de cero, cuántas veces se divide.');
     d.evidence('powers', {zero: power(2, 0), minus: power(2, -1)});
     g.flags.c7pow = true;
   },
@@ -165,6 +165,7 @@ async function unfold(d, g, id, groups, x, y) {
     }
     L(`c${gi}`, ')', cx + 4); cx += 12;
   }
+  d.describe(`En la pizarra: ${groups.map(gr => `(${gr.join(' · ')})`).join(' · ')}. ${k} factores contados.`);
   return cx;
 }
 
@@ -221,6 +222,7 @@ export const juntar = {
     // 1. multiplicar potencias del mismo número: se juntan los factores
     await d.say('Mara', 'El lunes Punto se duplicó tres veces seguidas, y el martes, dos veces más. Lo anoto corto.');
     await write('jf-a', `${pw(2, 3)} · ${pw(2, 2)} =`, A.x0 + 20, rowY[0]);
+    await d.say('student', `Con otro número abajo se escribe igual: ${pw(4, 3)} es empezar en 1 y multiplicar por 4 tres veces, 1 · 4 · 4 · 4.`);
     await d.shot(SHOTS.tiles, 0.8);
     const c1 = await d.choose([
       {id: '5', text: `${pw(2, 5)}: tres dos y dos dos más.`},
@@ -232,7 +234,7 @@ export const juntar = {
     const e1 = await unfold(d, g, 'jf-u1', [factorsOfProduct(2, 3, 2).slice(0, 3), factorsOfProduct(2, 3, 2).slice(3)], A.x0 + 120, rowY[0]);
     await write('jf-a2', `= ${pw(2, 5)} = ${power(2, 5)}`, e1 + 8, rowY[0], {ch: YELLOW});
     await d.think(c1 === '5' ? 'Cinco dos: 2⁵.' : c1 === '6' ? 'Son cinco dos, no seis: los tres del lunes y los dos del martes se juntan. Tres y dos se suman.' : 'El 2 de abajo no cambia: cada vez se multiplica por 2. Son cinco dos: 2⁵ = 32. 4⁵ sería 1024.');
-    await d.say('student', 'Mara: multiplicar potencias del mismo número es juntar sus factores. Los exponentes se suman: 3 + 2 = 5.');
+    await d.say('student', 'Mara, multiplicar potencias del mismo número es juntar sus factores. Los exponentes se suman: 3 + 2 = 5. Con cualquier número abajo pasa lo mismo: se cuentan factores iguales.');
 
     // 2. elevar una potencia: se repiten los factores
     await d.say('Mara', 'Y si un día se duplica tres veces, y eso pasa dos días seguidos, lo anoto así.');
@@ -317,7 +319,7 @@ export const juntar = {
       refresh();
     }));
     d.describe('Cuatro capas de 4 por 4: un cubo de 4 de largo, 4 de ancho y 4 de alto, con los 64 bloques.');
-    await d.say('student', 'Cornisa: 4 de largo, 4 de ancho y 4 de alto: 4 · 4 · 4 = 64. El lado del cubo es la raíz cúbica de 64: 4.');
+    await d.say('student', 'Cornisa, el cubo tiene 4 de largo, 4 de ancho y 4 de alto: 4 · 4 · 4 = 64. El lado del cubo es la raíz cúbica de 64: 4.');
     await studentWrites(d, g, 'jf-r3', 'raíz cúbica de 64 = 4', A.x0 + 20, A.y0 + 56, {size: 24});
     await d.say('student', 'Con 8 de lado sale un cuadrado, plano: 8 · 8 = 64, y √64 = 8. La raíz cuadrada pregunta por el lado de un cuadrado; la cúbica, por el de un cubo.');
     await studentWrites(d, g, 'jf-r2', '√64 = 8', A.x0 + 20, A.y0 + 104, {size: 24});
@@ -402,7 +404,7 @@ export const grande = {
       refresh();
     }));
     g.setHint(null);
-    await d.say('student', 'Punto: seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica.');
+    await d.say('student', 'Punto, seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica.');
     // Punto se corrige solo
     g.setCinematic(true);
     await pulse(d, p, 1, 0.3);
@@ -505,7 +507,7 @@ export const areas = {
     g.setCinematic(false);
     await d.think(guess === 'full' ? 'Un x por x, cinco tiras, seis cuadraditos.' : 'Un x por x, cinco tiras y seis cuadraditos. Las tiras son los bordes nuevos: no se pueden olvidar.');
     await studentWrites(d, g, 'ar-eq', `(x + 2)(x + 3) = x${SUP['2']} + 5x + 6`, A.x0 + 24, A.y1 - 14, {size: 26});
-    await d.say('student', 'Peldaño: es partir el rectángulo, como cuando repartimos en las Terrazas, pero de los dos lados. Dos por tres, los cuadraditos; dos más tres, las tiras.');
+    await d.say('student', 'Peldaño, es partir el rectángulo, como cuando repartimos en las Terrazas, pero de los dos lados. Dos por tres, los cuadraditos; dos más tres, las tiras.');
     d.evidence('expand', e);
     g.flags.c7area = true;
   },
@@ -571,7 +573,7 @@ export const alReves = {
     }
     const f = factor(5, 6);
     await studentWrites(d, g, 'fx-eq', `x${SUP['2']} + 5x + 6 = (x + ${f.p})(x + ${f.q})`, A.x0 + 16, A.y1 - 14, {size: 26});
-    await d.say('student', 'Balcón: los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres.');
+    await d.say('student', 'Balcón, los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres.');
     await d.say('Balcón', '¿Y si me hubieran dado cinco cuadraditos?');
     const five = factor(5, 5);
     if (five) console.error('[al revés] x² + 5x + 5 no debería armarse');
@@ -640,7 +642,7 @@ export const completar = {
     await studentWrites(d, g, 'cq-eq2', `(x + 1)${SUP['2']} = 9`, ex, A.y0 + 136, {size: 28});
     const r = completeSquare(2, 8);
     if (r.roots[0] !== 2 || r.roots[1] !== -4) console.error('[completar] (x + 1)² = 9 no da 2 y −4');
-    await d.say('student', 'Rampa: un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.');
+    await d.say('student', 'Rampa, un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.');
     // con x = 2 la huerta se dibuja a escala y se cuentan los cuadraditos
     g.setCinematic(true);
     await d.all(...['cq-x2', 'cq-xr', 'cq-xb', 'cq-u'].map(id => w.get(id)).filter(Boolean).map(o => d.fadeTo(o, 0, 0.5)));
@@ -723,7 +725,7 @@ export const cuantasVeces = {
     const t = timesToReach(2, 1000);
     if (t.k !== 10) console.error('[cuántas veces] 2 a la cuántas no da 10');
     if (res.k > t.k) await d.think(`Con ${t.k} ya había pasado: ${t.above}. ${res.k - t.k === 1 ? 'La otra sobraba.' : `Las otras ${res.k - t.k} sobraban.`}`);
-    await d.say('student', `Punto: ${t.k} veces. ${pw(2, 9)} es ${t.below}, todavía no; ${pw(2, 10)} es ${t.above}, ya pasó.`);
+    await d.say('student', `Punto, ${t.k} veces. ${pw(2, 9)} es ${t.below}, todavía no; ${pw(2, 10)} es ${t.above}, ya pasó.`);
     await studentWrites(d, g, 'lg-eq', `${pw(2, 9)} = ${t.below} < 1000 < ${t.above} = ${pw(2, 10)}`, A.x0 + 24, A.y0 + 176, {size: 26});
     await d.think(guess === '10' ? 'Diez: duplicar llega lejos enseguida.' : `Diez, no ${guess === '100' ? 'cien' : 'quinientos'}: duplicar llega lejos enseguida.`);
     await d.say('Mara', 'Para pasar mil, diez. ¿Y para llegar justo a mil?');
@@ -815,7 +817,7 @@ export const noSePuede = {
     const u = undefinedAt(2);
     await d.think(pre === '2' ? 'Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2.' : pre === '0' ? 'Con x = 0 abajo queda −2, y eso se divide. El cero que molesta es el de abajo: aparece con x = 2.' : 'Con x = 2, abajo queda cero, y por cero no se divide.');
     await studentWrites(d, g, 'ns-no', 'x ≠ 2', A.x1 - 150, A.y1 - 14, {size: 30});
-    await d.say('student', `Rampa: la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque ${u.reason}.`);
+    await d.say('student', `Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque ${u.reason}.`);
     await d.say('Rampa', 'La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.');
     d.evidence('rational', u);
     g.flags.c7rational = true;
@@ -836,7 +838,7 @@ function writeJournal7(g) {
   const pz = first('pow-zero');
   if (pz) seen.push(pz.answer === '1' ? 'Siguiendo la tabla hacia abajo, dijiste 2⁰ = 1.' : 'Para 2⁰ dijiste otro valor; la tabla, dividiendo por dos, daba 1.');
   const pp = first('pow-product');
-  if (pp) seen.push(pp.answer === '5' ? 'Para 2³ · 2² juntaste los factores: 2⁵.' : pp.answer === '6' ? 'Para 2³ · 2² multiplicaste los exponentes; desplegados, eran cinco dos: 2⁵.' : 'Para 2³ · 2² multiplicaste también los dos de abajo; el 2 no cambia: cinco dos, 2⁵.');
+  if (pp) seen.push(pp.answer === '5' ? 'Para 2³ · 2² juntaste los factores: 2⁵.' : pp.answer === '6' ? 'Para 2³ · 2² multiplicaste los exponentes; desplegados, eran cinco dos: 2⁵.' : 'Para 2³ · 2² sumaste arriba y multiplicaste los dos de abajo: 4⁵; el 2 no cambia: cinco dos, 2⁵.');
   const ppw = first('pow-power');
   if (ppw) seen.push(ppw.answer === '6' ? 'Para (2³)² viste seis dos: 2⁶.' : ppw.answer === '5' ? 'Para (2³)² sumaste los exponentes; es 2³ repetido dos veces: seis dos, 2⁶.' : 'Para (2³)² elevaste el 3 al cuadrado; es 2³ · 2³: seis dos, 2⁶.');
   const ps = first('pow-sum');
@@ -861,7 +863,7 @@ function writeJournal7(g) {
     abbr: 'Multiplicar repetido crece distinto que sumar repetido, y cada crecimiento tiene su pregunta al revés.',
     body: [
       'La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.',
-      'Sumar lo mismo crece parejo; duplicar empieza lento y después saca cada vez más ventaja. En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Multiplicar potencias del mismo número junta sus factores, y los exponentes se suman: 2³ · 2² = 2⁵. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
+      'Sumar lo mismo crece parejo; duplicar empieza lento y después saca cada vez más ventaja. En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con una cifra de 1 a 9 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.',
       'Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4.',
       'Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2.',
     ],
