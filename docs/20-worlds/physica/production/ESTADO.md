@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-06 · iteración 13 (transición 2.5D → 3D, parcial; ver `evidence/iter-13`).
+**Actualizado:** 2026-10-07 · iteración 14 (el soporte de la plaza y la cámara que corta el muro; B2 parcial; ver `evidence/iter-14`).
 
 ## Dónde se trabaja
 
@@ -12,9 +12,26 @@
   - Arranque: `npm run dev`, en 127.0.0.1:4210.
   - En el panel del navegador de Claude: `.claude/launch.json` → `physica-dev`. Ese archivo es local y no está versionado.
 
-## Hito actual: A (escena insignia), en curso
+## Hito actual: B (primer episodio), en curso. El A espera la evaluación humana (`EVALUACION-HITO-A.md`)
 
-**Último cambio aceptado (iteración 13, Hito B · B2 parcial):** el arco tapiado se abre y lleva a un barrio en 3D (D18).
+**Último cambio aceptado (iteración 14, Hito B · B2 parcial):** el barrio tiene un experimento cotidiano (D19).
+- **El soporte C,** igual al de la Orilla, está en la plaza. Su esfera cae a 9,8 m/s² y la Bitácora lo anota: «La misma caída, detrás del muro». La nota sólo dice lo medido y compara con la Orilla cuando las dos caídas están medidas.
+- **La fuente:** su chorro sale a la velocidad vertical de la surgencia de la sima y sube sólo 0,44 m. Es el contraste con el agua que sube.
+- **La cámara de la plaza** sigue al explorador; si el muro se interpone, se corta. El cuerpo ya no puede quedar dentro del muro.
+- **Corregido:**
+  - el explorador ya no se traba contra el costado de la fuente;
+  - el piso del pasaje se dibuja;
+  - el soporte P ya no se ofrece desde el umbral.
+- **El barrio se dibuja recién al abrir el arco.** Desde el Mirador asomaba mal y costaba 195 llamadas de dibujo.
+- **Evidencia:**
+  - 71 pruebas, la secuencia con teclas y el recorrido completo;
+  - una revisión independiente en dos pasadas;
+  - la pausa del paso «rendimiento» es del entorno: un A/B intercalado la muestra también en HEAD.
+
+  Ver `evidence/iter-14`.
+- **Falta para cerrar B2:** la identidad de la metrópolis, la silueta sobre el muro y suavizar el corte.
+
+**Iteración 13 (Hito B · B2 parcial):** el arco tapiado se abre y lleva a un barrio en 3D (D18).
 - **La simulación** gana profundidad donde el nivel la declara; el recorrido 2.5D no cambia y sus pruebas pasan.
 - **El acceso:** una manivela en la Terraza, después del Mirador, con su eje en profundidad.
 - **El espacio:** un pasaje y una plaza con obstáculos sólidos.
@@ -169,15 +186,23 @@
 
 El loop no se detiene: según el contrato, al cerrar un hito se sigue con el próximo, y esas validaciones quedan pedidas.
 
-**Próximo resultado: cerrar B2. El barrio se lee como la metrópolis y tiene un experimento cotidiano.**
-- **Un experimento interactivo en la plaza** que reuse un instrumento del 2.5D («el mismo instrumento, otro lugar»). Por ejemplo, un soporte con esfera, regla y trazas: allá la esfera cae como en la Orilla, y la Bitácora compara las dos.
-- **Escala y arquitectura de la ciudad pintada:** piedra clara, soportales y puertas, y uno o dos habitantes.
-- **La fuente:** un chorro central a la velocidad de la surgencia de la sima (2,95 m/s), que acá sube sólo 0,44 m. Agua en el cuenco.
-- **Lo que asoma sobre el muro:** diseñado (la cúpula en el eje del arco, techos en bruma), en vez de aparecer de golpe.
+**Próximo resultado: cerrar B2. El barrio se lee como la metrópolis habitada.**
+- **Escala y arquitectura:**
+  - puertas en las plantas bajas;
+  - un soportal en la fachada del fondo, en el eje del pasaje;
+  - una calle o un hueco con la ciudad, o una torre, más allá.
+- **Habitantes:** uno o dos, quietos o en reposo, que usen la plaza: la fuente, un banco.
+- **Lo que asoma sobre el muro:** una silueta propia y barata (la cúpula en el eje del arco, techos en la bruma), visible desde el Mirador.
+  - En la vista 2.5D, la silueta reemplaza al barrio entero. Hoy, al abrir el arco, el barrio aparece de golpe sobre el muro y queda asomando, con su costo de dibujo.
+  - El barrio entero, cuando la cámara pasa el arco.
+- **El corte del muro, suave:** un fundido o un tramo menos abrupto.
+- **La evidencia de la comparación entre A y C** en la Bitácora, capturada con teclas.
 - **Criterio:**
-  - con teclado, el experimento se usa en la plaza y deja una nota medida en la Bitácora;
-  - una revisión independiente que lo lea como la metrópolis habitada, no como un decorado vacío;
+  - una revisión independiente que lea la plaza como parte de una metrópolis habitada, no como un decorado vacío;
+  - el costo de dibujo en la Terraza, medido antes y después;
   - 2.5D y la transición sin regresiones.
+
+*Plan cumplido en la iteración 14:* el experimento cotidiano en la plaza, el contraste de la fuente y la cámara de la plaza.
 
 *Plan cumplido en la iteración 13:* la mayor parte de B2: la transición mínima jugable, con la misma simulación.
 

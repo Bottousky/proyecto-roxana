@@ -78,7 +78,7 @@ export class World {
 
     for (const s of level.stands || []) {
       const st = { ...s, state: 'armed', body: null, clampY: s.clampY };
-      st.body = this.addBody(this.sphereSpec(s.clampX, s.clampY, { tag: s.id, lane: 1 }));
+      st.body = this.addBody(this.sphereSpec(s.clampX, s.clampY, { tag: s.id, lane: 1, z: s.z ?? 0 }));
       st.body.heldBy = { type: 'stand', stand: st };
       this.stands.push(st);
     }
@@ -282,12 +282,23 @@ export class World {
     const back = this.doors.find(d => d.open && d.mouthZ !== undefined && iy < 0 && av.z < d.mouthZ + 0.1 && av.z > d.mouthZ - 2.5);
     if (back) { const cx = (back.x0 + back.x1) / 2; av.x += Math.max(-1, Math.min(1, (cx - av.x) * 2)) * AVATAR.walk * 0.8 * DT; }
     const feet = av.y - av.hh;
-    const blocked = (x, z) => this.depthBlockers.some(b => b.top > feet + AVATAR.step && (b.circle
+    const blocks = (b, x, z) => b.top > feet + AVATAR.step && (b.circle
       ? Math.hypot(Math.max(Math.abs(x - b.circle.x) - av.hw, 0), Math.max(Math.abs(z - b.circle.z) - av.hw, 0)) < b.circle.r
-      : x + av.hw > b.x0 && x - av.hw < b.x1 && z + av.hw > b.z0 && z - av.hw < b.z1));
-    const inside = (x, z) => !blocked(x, z) && this.depthAreas.some(r => x - av.hw >= r.x0 && x + av.hw <= r.x1 && z - av.hw >= r.z0 && z + av.hw <= r.z1);
-    if (inside(av.x, nz)) av.z = nz; else av.vz = 0;
-    if (!inside(av.x, av.z)) { av.x = av.px; av.vx = 0; } // sideways into a wall: stop there
+      : x + av.hw > b.x0 && x - av.hw < b.x1 && z + av.hw > b.z0 && z - av.hw < b.z1);
+    const inside = (x, z) => !this.depthBlockers.some(b => blocks(b, x, z)) && this.depthAreas.some(r => x - av.hw >= r.x0 && x + av.hw <= r.x1 && z - av.hw >= r.z0 && z + av.hw <= r.z1);
+    // Against a round blocker (the fountain's basin) a glancing step slides along it at 45°, at the
+    // same walking speed: head-on (more than 45° into it) it still stops.
+    const round = (x, z) => this.depthBlockers.find(b => b.circle && blocks(b, x, z))?.circle;
+    if (inside(av.x, nz)) av.z = nz;
+    else {
+      const c = round(av.x, nz), sx = c ? Math.sign(av.x - c.x) : 0, k = Math.SQRT1_2, sz2 = av.z + (nz - av.z) * k, slid = av.x + sx * Math.abs(nz - av.z) * k;
+      if (sx && inside(slid, sz2)) { av.x = slid; av.z = sz2; } else av.vz = 0;
+    }
+    if (!inside(av.x, av.z)) {
+      const c = round(av.x, av.z), sz = c ? Math.sign(av.z - c.z) : 0, k = Math.SQRT1_2, sx2 = av.px + (av.x - av.px) * k, slid = av.z + sz * Math.abs(av.x - av.px) * k;
+      if (sz && slid < 0 && inside(sx2, slid)) { av.x = sx2; av.z = slid; }
+      else { av.x = av.px; av.vx = 0; } // sideways into a wall: stop there
+    }
     if (!inside(av.x, av.z)) av.x = Math.max(...this.depthAreas.filter(r => av.z - av.hw >= r.z0 && av.z + av.hw <= r.z1).map(r => Math.min(Math.max(av.x, r.x0 + av.hw), r.x1 - av.hw)), av.x);
   }
 
@@ -426,12 +437,27 @@ export class World {
         out.push({ kind: 'chain-foot', chain: ch.id, verb: 'Subir por la cadena', d: 0, x: ch.x, y: ch.floorY + 1.4 });
       }
     }
+    // Supports are reached at their own depth (the Orilla's at z = 0, the square's behind the wall).
+    for (const st of this.stands) {
+      const d = Math.abs(av.x - st.x);
+      if (st.z === undefined && av.z < -0.3) continue; // the path's supports, not from the threshold
+      if (d > AVATAR.reach + 0.4 || Math.abs(av.y - AVATAR.hh - st.baseY) > 0.8 || Math.abs(av.z - (st.z ?? 0)) > 1.2) continue;
+      const verb = st.state === 'armed' ? 'Soltar la esfera' : st.state === 'free' ? 'Recoger con el carrete' : null;
+      const hint = st.state === 'armed' && st.rail ? '▲▼ altura de la pinza' : null;
+      // The prompt sits over the sphere it refers to, not over the post: two supports stand side
+      // by side and each one's arm reaches to the other side of the other's.
+      // Reeling in is done at the post, where the reel is; the sphere may be anywhere by then.
+      const armed = st.state === 'armed';
+      // A level can move a prompt off its sphere (`prompt: { dx, dy }`) where it would cover an instrument.
+      const off = st.prompt ?? { dx: 0, dy: 0.2 };
+      if (verb) out.push({ kind: 'stand', id: st.id, body: st.body.id, verb, hint, d, x: armed ? st.body.x + off.dx : st.x, y: armed ? st.body.y + off.dy : st.baseY + 1.2, z: st.z ?? 0 });
+    }
     if (av.z < -0.3) {
-      // In depth nothing of the 2.5D path is in reach. Standing still beyond the passage (whose
-      // mouth is behind the camera), the way back is named.
+      // In depth nothing else of the 2.5D path is in reach. Standing still beyond the passage
+      // (whose mouth is behind the camera), the way back is named.
       const door = this.doors.find(d => d.mouthZ !== undefined && av.z < d.mouthZ);
-      if (door && Math.hypot(av.vx, av.vz) < 0.1 && av.supportSteps > 0) out.push({ kind: 'back', key: '▼', verb: 'Volver', d: 0, x: av.x, y: av.y + 0.9, z: av.z });
-      return out;
+      if (door && Math.hypot(av.vx, av.vz) < 0.1 && av.supportSteps > 0 && !out.length) out.push({ kind: 'back', key: '▼', verb: 'Volver', d: 9, x: av.x + 0.85, y: av.y + 0.1, z: av.z }); // beside, not over what is ahead
+      return out.sort((p, q) => p.d - q.d);
     }
     for (const door of this.doors) {
       if (door.open || door.opening || !this.citySeen || av.supportSteps === 0) continue;
@@ -441,19 +467,6 @@ export class World {
     // An open door is walked through, not used: the prompt names the key (▲), E does nothing.
     const open = this.doors.find(d => d.open && this.doorAt(av) === d);
     if (open && av.supportSteps > 0) out.push({ kind: 'enter', key: '▲', verb: 'Entrar', d: Math.abs(av.x - (open.x0 + open.x1) / 2) + 0.3, x: (open.x0 + open.x1) / 2, y: open.y + 2.6 });
-    for (const st of this.stands) {
-      const d = Math.abs(av.x - st.x);
-      if (d > AVATAR.reach + 0.4 || Math.abs(av.y - AVATAR.hh - st.baseY) > 0.8) continue;
-      const verb = st.state === 'armed' ? 'Soltar la esfera' : st.state === 'free' ? 'Recoger con el carrete' : null;
-      const hint = st.state === 'armed' && st.rail ? '▲▼ altura de la pinza' : null;
-      // The prompt sits over the sphere it refers to, not over the post: two supports stand side
-      // by side and each one's arm reaches to the other side of the other's.
-      // Reeling in is done at the post, where the reel is; the sphere may be anywhere by then.
-      const armed = st.state === 'armed';
-      // A level can move a prompt off its sphere (`prompt: { dx, dy }`) where it would cover an instrument.
-      const off = st.prompt ?? { dx: 0, dy: 0.2 };
-      if (verb) out.push({ kind: 'stand', id: st.id, body: st.body.id, verb, hint, d, x: armed ? st.body.x + off.dx : st.x, y: armed ? st.body.y + off.dy : st.baseY + 1.2 });
-    }
     for (const b of this.bodies) {
       if (b.kind !== 'sphere' || this.standOf(b) || (b.heldBy && b.heldBy.type !== 'shelf')) continue;
       const d = Math.hypot(av.x - b.x, (av.y - 0.2) - b.y);

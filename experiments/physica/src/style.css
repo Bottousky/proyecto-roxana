@@ -85,3 +85,8 @@ kbd { display: inline-grid; place-items: center; min-width: calc(22px * var(--ui
 @media (max-width: 480px) { .touch > div { gap: 8px; } .touch button { width: 54px; height: 54px; font-size: 20px; } .touch button.big { width: 66px; height: 66px; } .touch-vert button { width: 46px; height: 46px; } }
 @media (max-width: 420px) { .touch > div { gap: 6px; } .touch button { width: 48px; height: 48px; font-size: 18px; } .touch button.big { width: 60px; height: 60px; } .touch-vert button { width: 42px; height: 42px; } }
 .has-touch .legend { top: 70px; bottom: auto; right: 12px; }
+
+/* What ▲▼ do: on the 2.5D path, adjust and climb; in depth (beyond the arch), walk. */
+.v-depth { display: none; }
+body.in-depth .v-path { display: none; }
+body.in-depth .v-depth { display: inline; }

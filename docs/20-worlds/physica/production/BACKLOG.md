@@ -34,21 +34,28 @@ primero.
 | A23 | Assets generados (textura de estratos, telón con la ciudad, retrato) | Generados con Codex CLI e integrados (iter 4, `art/PROCEDENCIA.md`). Faltan vegetación y papel de la Bitácora. | parcial (iter 8: vegetación pintada integrada, con helechos que siguen el campo; falta el papel de la Bitácora) |
 | A16 | Accesibilidad: movimiento reducido, texto legible, señales redundantes, remapeo | `?reduced` existe y no hay menú; falta un menú de opciones con volumen, movimiento reducido y tamaño de texto | hecho (iter 12, `evidence/iter-12`: panel de opciones modal, con volumen, movimiento reducido y tamaño de texto, operable con teclado, mando y táctil, y guardado. Revisión en dos pasadas. Sin probar con lector de pantalla, mando físico ni teléfono real) |
 
-## Hito B — primer episodio (no empezado)
+## Hito B — primer episodio (en curso desde la iteración 13)
 
 - **B1:** entrada desde el Instituto (Taller de Física, pecera). Requiere decidir la integración con la landing de otra rama, sin modificar Ohmdal.
 - **B2:** prueba mínima de la transición 2.5D → 3D.
   - **Qué es:** una abertura en la pared del fondo (el arco tapiado de la Terraza) se vuelve transitable y revela un barrio.
-  - **Estado: parcial** (iter 13, `evidence/iter-13`). Hecho:
+  - **Estado: parcial** (iter 13–14, `evidence/iter-13` y `evidence/iter-14`).
+  - **Hecho en la iteración 13:**
     - la misma simulación con profundidad;
     - la manivela, con su eje en profundidad;
     - pasaje y plaza, con obstáculos sólidos;
     - la cámara continua;
     - 11 pruebas y el recorrido con teclado.
+  - **Hecho en la iteración 14 (D19):**
+    - el experimento cotidiano: el soporte C en la plaza y la nota «La misma caída, detrás del muro», que sólo dice lo medido y compara con la de la Orilla;
+    - la fuente: el chorro, a la velocidad vertical de la surgencia, sube 0,44 m; el cuenco tiene agua;
+    - la cámara de la plaza ya no queda tapada (corte del muro, sin cuerpo dentro del muro);
+    - se rodea la fuente sin trabarse;
+    - la toma de la plaza entera;
+    - 5 pruebas nuevas y el recorrido con teclado.
   - **Falta:**
-    - lo que asoma sobre el muro, en vez de aparecer de golpe;
-    - la identidad de la metrópolis, con al menos un experimento cotidiano interactivo;
-    - la fuente con un chorro de contraste;
-    - una toma de la plaza entera.
+    - la identidad de la metrópolis: escala, puertas en las plantas bajas, un soportal, dos o tres habitantes y una vista de la ciudad. Hoy se lee como la plaza de un pueblo;
+    - lo que asoma sobre el muro, como silueta propia y barata (la cúpula en el eje del arco, techos en la bruma). Hoy no asoma nada: el barrio se dibuja recién al abrir el arco;
+    - suavizar el corte del muro, hoy instantáneo.
 - **B3:** familia «Introducción» y **B4:** familia MRU (ver `FAMILIAS.md`).
 - **B5:** primer sector jugable de la metrópolis.

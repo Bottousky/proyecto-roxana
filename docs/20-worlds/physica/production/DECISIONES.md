@@ -298,3 +298,65 @@ El contrato (§7) pide movimiento reducido, texto legible y controles enseñados
   - el muro del fondo se corta en el pasaje;
   - un conducto de los anclajes que lo cruzaba cambió de recorrido;
   - una pasarela de piedra cruza el arroyo de la Terraza (es un sólido con rango de profundidad, que no existe en z = 0).
+
+## D19 · El mismo instrumento, otro lugar: el soporte de la plaza y la cámara que corta el muro (iteración 14, Hito B · B2)
+
+**El pedido (revisión de la iteración 13):** que el barrio tenga al menos un experimento cotidiano interactivo y una fuente que contraste con la surgencia; diseñar lo que asoma sobre el muro.
+
+**El experimento cotidiano: el soporte C.**
+- **Qué es:** el mismo instrumento que el soporte A (brazo de 1,05 m, pinza a 2 m, carrete), en la plaza.
+- **Dónde está:** al oeste de la fuente (x 3, z −15,2), entre sus canteros.
+  - Se ve al salir del pasaje.
+  - Detrás queda lugar para la cámara: el experimento se ve sin cortar nada.
+- **Cuándo se ofrece:** a su profundidad (|Δz| ≤ 1,2). Desde el barrio no se ofrecen los de la Orilla, ni al revés.
+- **La nota:** cuando la esfera toca el pavimento, la Bitácora agrega «La misma caída, detrás del muro», con distancia, tiempo y aceleración ajustada a las marcas.
+  - Si el soporte A ya se soltó, compara las dos aceleraciones.
+  - Si no, dice sólo que falta medir la de la Orilla. Una primera versión afirmaba «es la caída de siempre» sin haberla medido.
+  - Si A se suelta después, su nota agrega la comparación con la de la plaza.
+- **La regla** está del otro lado de la esfera, lejos del poste: donde el explorador se para a soltar, la tapaba.
+- **Posición en la lista:** C va al final de los soportes, así A, B y P conservan su orden. La ruta de evidencia los leía por índice: con C primero, leyó la pinza de A como si fuera la de B.
+
+**La fuente.**
+- El chorro central sale hacia arriba a la velocidad vertical de la surgencia de la sima (`level.spring.vy`, 2,95 m/s). La surgencia, además, avanza de costado.
+  - Sin región, sube v²/2g ≈ 0,44 m y vuelve a caer. La Bitácora calcula esa altura con el campo en la fuente.
+  - Allá, la región lo sigue empujando y el agua cresta sobre la Terraza.
+- El cuenco es abierto y de esmalte, con el agua bajo el labio. El de latón se leía negro desde abajo: no tenía nada que reflejar.
+- Desborda por cuatro labios, en láminas finas que caen con el mismo campo.
+  - Al principio los derrames eran anchos y el chorro central, de 5 cm, apenas se veía: el contraste existía sólo en el texto.
+  - Ahora el chorro central es más grueso (11 a 13 cm) y tiene espuma en el ápice.
+
+**Lo que asoma sobre el muro: nada todavía.** El barrio se dibuja recién cuando el arco empieza a abrirse.
+- Probé dibujarlo desde el Mirador (`citySeen`) en adelante, y salió mal por dos lados:
+  - asomaba una fachada cortada sobre el arco, que se leía como «una casa encima del acantilado» y aparecía de golpe;
+  - costaba 195 llamadas de dibujo más en cada cuadro de la Terraza (855 contra 660).
+- Lo que asome tiene que ser una silueta propia, barata y en la bruma, con la cúpula en el eje del arco. Queda pedido para cerrar B2.
+- La esfera del soporte C también se dibuja sólo con el barrio.
+
+**La cámara en la plaza.**
+- **El problema:** la cámara seguía atada al ancho del pasaje mientras el explorador ya estaba en la plaza. Si caminaba hacia un costado junto al muro, la pared del pasaje lo tapaba a él y al experimento.
+- **Elegido:**
+  1. Fuera del pasaje, la cámara sigue al explorador libremente.
+  2. Si la roca entre la Terraza y la plaza queda en medio, se corta: ese tramo del muro, el techo del pasaje y sus lámparas se ocultan, y aparece el piso que sigue bajo el muro.
+     - «En medio» quiere decir que la cámara está dentro de la roca, o que las líneas a la cabeza o a los pies del explorador la cruzan fuera de la boca.
+     - Para que no parpadee, el corte tiene histéresis: entra con 0,1 m de margen y sale con 0,3 m.
+- **Descartado:**
+  - Llevar la cámara a la plaza y subirla. Falla con el explorador pegado al muro: la cámara quedaría delante de él.
+  - Hacer la roca transparente. Choca con el orden de dibujo de las plantas.
+- **Las luces del pasaje** se apagan con el corte (intensidad 0) en lugar de ocultarse. Cambiar cuántas luces hay recompilaría todos los materiales iluminados.
+- **El cuerpo del explorador nunca entra en el espesor del muro.** El área del barrio empieza en la cara del muro (z −9). El pasaje se extiende un ancho de cuerpo más allá, así las dos áreas se superponen.
+  - Antes, junto al muro y fuera de la boca, el explorador podía quedar con 0,24 m del cuerpo dentro de la roca. Ahí la cámara seguía atada al pasaje y no había corte.
+  - Una prueba lo verifica: con las áreas anteriores falla en 100 de 1080 pasos.
+- **Costo:** el corte es instantáneo. Las paredes del pasaje desaparecen de un cuadro a otro cuando el explorador gira junto al muro.
+- **La física no cambia por la cámara.**
+
+**Avisos y ayudas en profundidad.**
+- «▼ Volver» se dibuja al costado del explorador. Sobre su cabeza tapaba lo que tiene adelante: el soporte, el chorro.
+- La barra de ayuda dice qué hacen ▲▼ donde está el explorador:
+  - en el recorrido 2.5D, «ajustar, trepar»;
+  - pasando el arco, «caminar hacia el fondo y volver».
+- Los soportes del recorrido 2.5D no se ofrecen desde el umbral del arco. Antes se ofrecía P, y ▲▼ movía su pinza mientras se caminaba hacia el arco.
+- Contra la fuente, el deslizamiento va a 45° y a la misma velocidad de caminata.
+
+**De paso:**
+- El piso del pasaje tenía alto negativo: su cara miraba hacia abajo y nunca se dibujó, y se veía la roca de debajo. Ahora se ve empedrado.
+- En la ruta de evidencia, `walkTo` corrige con toques cortos cuando una pausa de la página hace que el explorador se pase del objetivo, y lo registra (`walkToOvershoots`).

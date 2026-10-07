@@ -2,6 +2,7 @@
 // experiment that just happened (its trace marks and contact events), never written ahead.
 // Notes never block play and nothing asks the player to answer anything.
 import { DT } from './sim/world.js';
+import { FUENTE, TERRACE_Y } from './sim/levels/cascada.js';
 
 const KEY = 'physica.v2';   // v1 saved positions belong to the earlier geometry
 const fmt = (v, d = 1) => v.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -81,8 +82,26 @@ export class Journal {
         const a = fitAcceleration(before);
         this.flags.aA = a; this.flags.hA = tr.marks[0].y;
         this.add('caida', 'Una caída conocida',
-          `Desde el soporte de la orilla la esfera bajó ${fmt(h, 2)} m en ${fmt(tFall, 2)} s. Entre marca y marca pasa siempre el mismo tiempo, 0,1 s, y la distancia entre ellas crece: cada décima de segundo va más rápido que la anterior.`,
+          `Desde el soporte de la orilla la esfera bajó ${fmt(h, 2)} m en ${fmt(tFall, 2)} s. Entre marca y marca pasa siempre el mismo tiempo, 0,1 s, y la distancia entre ellas crece: cada décima de segundo va más rápido que la anterior.` +
+          (this.flags.aC != null && a != null ? ` Detrás del muro, en la plaza, el soporte igual había medido ${fmt(Math.abs(this.flags.aC), 1)} m/s²; acá, ${fmt(Math.abs(a), 1)} m/s²: ${Math.abs(Math.abs(a) - Math.abs(this.flags.aC)) < 0.3 ? 'la misma caída' : 'no es la misma'}.` : ''),
           { h, tFall, a });
+      }
+    }
+    if (e.type === 'impact' && !this.has('plaza')) {
+      const tr = w.traces.find(t => t.source === 'C' && t.body === e.body);
+      if (tr && tr.marks.length >= 3) {
+        const tFall = e.t - tr.startStep * DT, h = tr.marks[0].y - e.y;
+        const a = fitAcceleration(tr.marks.filter(m => m.t < tFall - 0.02));
+        this.flags.aC = a;
+        // Only what was measured: the comparison needs both falls (the Orilla's note adds it if
+        // support A is released afterwards).
+        const vs = a == null ? '' : this.flags.aA != null
+          ? ` En la Orilla, el soporte igual había medido ${fmt(Math.abs(this.flags.aA), 1)} m/s²: ${Math.abs(Math.abs(a) - Math.abs(this.flags.aA)) < 0.3 ? 'la misma caída, de los dos lados del muro' : 'no es la misma'}.`
+          : ' Para compararla falta soltar el soporte igual de la Orilla.';
+        const acc = a == null ? '' : `, acelerando ${fmt(Math.abs(a), 1)} m/s² hacia abajo`;
+        // The title claims the sameness only once both falls are measured.
+        this.add('plaza', this.flags.aA != null && a != null ? 'La misma caída, detrás del muro' : 'Una caída detrás del muro',
+          `En la plaza, desde un soporte igual al de la Orilla, la esfera bajó ${fmt(h, 2)} m en ${fmt(tFall, 2)} s${acc}.${vs}`, { h, tFall, a });
       }
     }
     if (e.type === 'exit' && e.zone === 'cascada' && !this.has('subida')) {
@@ -137,7 +156,11 @@ export class Journal {
   update(dt) {
     // Behind the wall, once: the neighbourhood, and the water that falls as on the Orilla.
     if (this.world.avatar.z < -9.2 && !this.has('barrio')) this.add('barrio', 'Detrás del muro',
-      'El arco llevaba a un barrio de la ciudad. El agua de la fuente cae como en la Orilla: acá no hay ninguna región, rige la condición de siempre.');
+      (() => {
+        // The fountain's central jet leaves at the spring's speed; here it rises only v²/2g.
+        const v = this.world.level.spring?.vy ?? 2.95, g = Math.abs(this.world.field.at(FUENTE.x, TERRACE_Y + 2, { x: 0, y: 0 }, FUENTE.z).y);
+        return `El arco llevaba a un barrio de la ciudad. El chorro del centro de la fuente sale hacia arriba a ${fmt(v, 2)} m/s, la misma velocidad vertical que la surgencia de la sima: allá la región lo sigue empujando y el agua sube hasta crestar sobre la Terraza; acá sube ${fmt(v * v / (2 * g), 2)} m y vuelve a caer. Detrás del muro no hay ninguna región.`;
+      })());
     const w = this.world, av = w.avatar;
     if (this.flags.climbFrom != null && !this.has('cruce') && !av.heldBy) this.flags.climbTop = Math.max(this.flags.climbTop ?? -Infinity, av.y - av.hh);
     if (!this.has('profundidad')) {

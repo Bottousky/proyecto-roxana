@@ -19,6 +19,9 @@ export const BARRIO = { x0: 2.0, x1: 14.0, z0: -22.0 };
 export const STREAM_Z = -1.7;
 // The fountain in the middle of the square (on the passage's axis).
 export const FUENTE = { x: (ARCH.x0 + ARCH.x1) / 2, z: -15.2 };
+// The square's release support: west of the fountain, between its planters (seen on coming out of
+// the passage, and with room behind it for the camera).
+export const SOPORTE_C = { x: 3.0, z: -15.2 };
 export const BELL_LINE = 4.5;
 // El Pozo (transfer): a shaft in the Terraza with its own region, from y = 1.0 up to the
 // Terraza's level. Same rule, two limits: let go too high and the Mirador is out of reach;
@@ -55,13 +58,17 @@ export const CASCADA = {
     // (its front edge just behind the explorer's half-depth at z = 0, so it never blocks the path)
     { id: 'palanca', x0: ARCH.x0 - 0.57, x1: ARCH.x0 - 0.33, z0: -3.6, z1: -0.27, top: TERRACE_Y + 1.05 },
     { id: 'fuente', circle: { x: FUENTE.x, z: FUENTE.z, r: 1.62 }, top: TERRACE_Y + 0.5 },
+    { id: 'soporte-c', circle: { x: SOPORTE_C.x, z: SOPORTE_C.z - 0.35, r: 0.12 }, top: TERRACE_Y + 2.5 },
     ...[[BARRIO.x0 + 0.6, -10], [BARRIO.x1 - 0.6, -10], [BARRIO.x0 + 0.6, BARRIO.z0 + 0.6], [BARRIO.x1 - 0.6, BARRIO.z0 + 0.6]]
       .map(([x, z], i) => ({ id: `farol-${i}`, circle: { x, z, r: 0.1 }, top: TERRACE_Y + 2.6 })),
   ],
   depthAreas: [
     { id: 'umbral', x0: ARCH.x0 - 0.6, x1: ARCH.x1 + 0.6, z0: -3.9, z1: 0.3 },
-    { id: 'pasaje', x0: ARCH.x0, x1: ARCH.x1, z0: -9.3, z1: -3.3 },
-    { id: 'barrio', x0: BARRIO.x0, x1: BARRIO.x1, z0: BARRIO.z0, z1: -8.7 },
+    // The square begins at the wall's far face (z −9): beside the mouth the explorer's body never
+    // goes into the wall's thickness (the camera would have it inside the rock). The passage reaches
+    // a body's width past the face, so the two areas overlap and one leads into the other.
+    { id: 'pasaje', x0: ARCH.x0, x1: ARCH.x1, z0: -9.6, z1: -3.3 },
+    { id: 'barrio', x0: BARRIO.x0, x1: BARRIO.x1, z0: BARRIO.z0, z1: -9.0 },
   ],
   solids: [
     { id: 'orilla', x0: -22, x1: 0, y0: -9, y1: 0, friction: 0.6 },
@@ -102,6 +109,9 @@ export const CASCADA = {
     // The Pozo's support: same instrument, new place. Its rail reaches below the region's floor.
     { id: 'P', label: 'Soporte del pozo', x: WELL.x0 - 0.9, baseY: TERRACE_Y, clampX: WELL.x1 - 0.3, clampY: 3.0, threadMax: 9,
       rail: { min: -0.5, max: 4.0, step: 0.5 } },
+    // The square's support (Hito B, last so that A, B and P keep their places): the same instrument as the Orilla's, behind the wall. Its
+    // sphere falls the familiar way, and the Bitácora compares the two falls.
+    { id: 'C', label: 'Soporte de la plaza', x: SOPORTE_C.x, z: SOPORTE_C.z, baseY: TERRACE_Y, clampX: SOPORTE_C.x + 1.05, clampY: TERRACE_Y + 2.0, threadMax: 10 },
   ],
   goalSolid: 'terraza',
   miradorLine: MIRADOR_LINE,

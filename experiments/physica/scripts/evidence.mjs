@@ -73,8 +73,19 @@ async function walkTo(x, { tolerance = 0.15, simMax = 20, wallMax = 180000 } = {
   await page.keyboard.up(key);
   await sleep(350);
   if (!reached) throw new Error(`walkTo(${x}) did not arrive: explorer at ${s.avatar.x.toFixed(2)} after ${(s.t - s0).toFixed(1)} s simulated`);
+  // A stall of the page while the key is held (A25) can carry the explorer past the target: walk back
+  // with short taps (still keys), and record it.
+  for (let k = 0; k < 12; k++) {
+    s = await state();
+    const off = s.avatar.x - x;
+    if (Math.abs(off) <= tolerance + 0.25) break;
+    if (k === 0) overshoots.push({ target: x, at: +s.avatar.x.toFixed(2) });
+    const back = off > 0 ? 'ArrowLeft' : 'ArrowRight';
+    await page.keyboard.down(back); await sleep(Math.min(300, 60 + Math.abs(off) * 90)); await page.keyboard.up(back); await sleep(250);
+  }
   return state();
 }
+const overshoots = [];
 
 async function capture(n, every, labelFn) {
   const shots = [], samples = [];
@@ -207,6 +218,11 @@ async function wellAttempt(letGo, name, label) {
   // moved a "too high" attempt into the window.
   await holdUntil('ArrowDown', async () => (await state()).avatar.y <= letGo + 0.3, 10);
   for (let i = 0; i < 40 && (await state()).avatar.y > letGo; i++) { await page.keyboard.down('ArrowDown'); await sleep(50); await page.keyboard.up('ArrowDown'); await sleep(60); }
+  // A stall of the page during the hold (A25) can carry the explorer well below the target: climb
+  // back with ▲ taps (still keys), and record it.
+  const low = (await state()).avatar.y;
+  if (low < letGo - 0.12) overshoots.push({ chain: name, target: letGo, at: +low.toFixed(2) });
+  for (let i = 0; i < 40 && (await state()).avatar.y < letGo - 0.12; i++) { await page.keyboard.down('ArrowUp'); await sleep(50); await page.keyboard.up('ArrowUp'); await sleep(60); }
   const at = (await state()).avatar.y;
   await page.keyboard.press('e');
   const shots = []; const t0s = (await state()).t; let outcome = null, k2 = 0;
@@ -285,9 +301,17 @@ await page.evaluate(() => window.__physica.inspect(null));
   const entered = await holdUntil('ArrowUp', async () => (await depth()).z < -12, 10);
   save(join(out, '12-barrio.png'), await snap('12-barrio'));
   const inside = await depth();
-  const back = await holdUntil('ArrowDown', async () => (await depth()).z === 0, 14);
+  // the square's support: ◀ past the fountain, ▲ to its depth, ◀ against its post, E
+  await holdUntil('ArrowLeft', async () => (await depth()).x < 4.4, 6);
+  await holdUntil('ArrowUp', async () => (await depth()).z < -15.2, 6);
+  await page.keyboard.down('ArrowLeft'); await sleep(500); await page.keyboard.up('ArrowLeft'); await sleep(200);
+  const offered = await page.evaluate(() => window.__physica.world.interactables()[0]?.id || null);
+  await page.keyboard.press('e'); await sleep(1800);
+  const plaza = await page.evaluate(() => { const w = window.__physica.world, st = w.stands.find(s => s.id === 'C'); return { state: st.state, restY: +st.body.y.toFixed(3), marks: w.traces.find(t => t.source === 'C')?.marks.length || 0, journal: window.__physica.state().journal }; });
+  save(join(out, '13-plaza-soporte.png'), await snap('13-plaza-soporte'));
+  const back = await holdUntil('ArrowDown', async () => (await depth()).z === 0, 16);
   const after = await depth();
-  step('arco y barrio', { citySeen: before.citySeen, opened, entered, inside: { z: +inside.z.toFixed(2), on: inside.on }, back, after: { x: +after.x.toFixed(2), z: after.z, on: after.on } });
+  step('arco y barrio', { citySeen: before.citySeen, opened, entered, inside: { z: +inside.z.toFixed(2), on: inside.on }, plaza: { offered, ...plaza, noted: plaza.journal.includes('plaza') }, back, after: { x: +after.x.toFixed(2), z: after.z, on: after.on } });
 }
 
 // 4 — Bitácora and save/load.
@@ -316,7 +340,7 @@ await page.evaluate(() => window.__physica.resetFrames());
 await sleep(6000);
 const stats = await page.evaluate(() => window.__physica.stats());
 const gl = await page.evaluate(() => { const c = document.createElement('canvas').getContext('webgl2'); const d = c.getExtension('WEBGL_debug_renderer_info'); return d ? c.getParameter(d.UNMASKED_RENDERER_WEBGL) : 'unknown'; });
-step('rendimiento', { stats, renderer: gl, viewport: '1280x720', note: 'headless Chrome; frame interval includes vsync wait' });
+step('rendimiento', { stats, renderer: gl, viewport: '1280x720', note: 'headless Chrome; frame interval includes vsync wait', walkToOvershoots: overshoots });
 save(join(out, '06-cascada.png'), await snap('06-cascada.png'));
 // 6b — frame times during a real crossing with no screenshots (worst case of this scene).
 await page.evaluate(() => { const w = window.__physica.world, a = w.avatar; a.x = a.px = -3; a.y = a.py = 0.55; a.vx = a.vy = 0; });

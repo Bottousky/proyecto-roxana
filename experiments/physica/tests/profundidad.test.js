@@ -132,3 +132,73 @@ test('▲ right at the crank (beside the arch) still gets in: its post and shaft
   const lever = w.depthBlockers.find(b => b.id === 'palanca');
   assert.ok(lever.z1 + AVATAR.hw < 0, 'the crank never blocks the 2.5D path at z = 0');
 });
+
+test("the square's support: reached at its depth, its sphere falls the familiar way (same instrument, other place)", async () => {
+  const { fitAcceleration } = await import('../src/journal.js');
+  const { SOPORTE_C, TERRACE_Y: TY } = await import('../src/sim/levels/cascada.js');
+  const w = atOpenArch(), a = w.avatar;
+  // out of the passage, ◀ past the fountain's side, ▲ to the support's depth (over a planter), ◀ to it
+  for (let i = 0; i < 400 && a.z > -11; i++) run(w, 0.02, { y: 1 });
+  run(w, 0.2, { y: 0 });
+  assert.ok(!w.interactables().some(i => i.kind === 'stand'), 'no support offered at the mouth');
+  for (let i = 0; i < 400 && a.x > SOPORTE_C.x + 1.4; i++) run(w, 0.02, { x: -1 });
+  run(w, 0.2, { x: 0 });
+  for (let i = 0; i < 600 && a.z > SOPORTE_C.z; i++) run(w, 0.02, { y: 1 });
+  run(w, 0.2, { y: 0 });
+  run(w, 3, { x: -1 }); run(w, 0.3, { x: 0 }); // against its post
+  const it = w.interactables().find(i => i.kind === 'stand');
+  assert.equal(it?.id, 'C', 'support C is offered');
+  press(w);
+  const st = w.stands.find(s => s.id === 'C');
+  assert.equal(st.state, 'free');
+  run(w, 1.5);
+  const b = st.body;
+  assert.ok(Math.abs(b.y - (TY + b.r)) < 0.02, `rests on the square's pavement (y ${b.y.toFixed(3)})`);
+  const tr = w.traces.find(t => t.source === 'C');
+  assert.ok(tr.marks.length >= 5);
+  const tImpact = Math.sqrt(2 * (tr.marks[0].y - (TY + b.r)) / 9.8);
+  const acc = fitAcceleration(tr.marks.filter(m => m.t < tImpact - 0.02));
+  assert.ok(Math.abs(acc + 9.8) < 0.05, `familiar acceleration (${acc.toFixed(3)} m/s²)`);
+});
+
+test('against the fountain\'s side, ▼ and ▲ slide around its basin (they do not stick to it)', () => {
+  const f = CASCADA.depthBlockers.find(b => b.id === 'fuente').circle;
+  for (const [z0, iy] of [[f.z - 0.3, -1], [f.z + 0.3, 1], [f.z - 0.6, -1]]) {
+    const w = atOpenArch(), a = w.avatar;
+    a.z = a.pz = z0; a.x = a.px = f.x - 3; run(w, 0.2, { x: 0, y: 0 });
+    run(w, 2, { x: 1, y: 0 }); // ▶ into the basin's west side: stopped by it
+    assert.ok(a.x < f.x - f.r, `stopped at the basin (x ${a.x.toFixed(2)})`);
+    const zs = a.z; run(w, 0.8, { x: 0, y: iy });
+    assert.ok(Math.abs(a.z - zs) > 1, `from z ${z0.toFixed(2)}, ${iy < 0 ? '▼' : '▲'} moves along it (z ${zs.toFixed(2)} → ${a.z.toFixed(2)})`);
+  }
+  // head-on it still stops: the basin is solid
+  const w = atOpenArch(), a = w.avatar; a.x = a.px = f.x; a.z = a.pz = f.z + f.r + 1.5; run(w, 3, { x: 0, y: 1 });
+  assert.ok(a.z > f.z + f.r, 'head-on, stopped in front of it');
+});
+
+test('beside the mouth the explorer\'s body never goes into the wall\'s thickness (the camera would have it inside the rock)', () => {
+  const w = atOpenArch(), a = w.avatar;
+  a.x = a.px = 3.5; a.z = a.pz = -11; run(w, 0.2, { x: 0, y: 0 });
+  let inWall = 0, steps = 0;
+  for (let i = 0; i < Math.round(9 / DT); i++) { w.input.x = 0; w.input.y = -1; w.step(); steps++; if (a.z > -9 - AVATAR.hw + 1e-9 && (a.x - AVATAR.hw < ARCH.x0 - 1e-9 || a.x + AVATAR.hw > ARCH.x1 + 1e-9)) inWall++; }
+  assert.equal(inWall, 0, `steps with the body in the wall beside the mouth: ${inWall} of ${steps}`);
+  assert.equal(a.z, 0, 'and ▼ still leads back to the Terraza');
+  // east of the mouth: ▼ towards the wall, ▶ and ◀ pressing against it; the body stays on the square's side
+  const v = atOpenArch(), b = v.avatar; b.x = b.px = 11; b.z = b.pz = -10; run(v, 0.2, { x: 0, y: 0 });
+  let pressed = 0;
+  for (const [x, y, s] of [[0, -1, 0.4], [1, -1, 1.0], [-1, -1, 0.3]]) for (let i = 0; i < Math.round(s / DT); i++) {
+    v.input.x = x; v.input.y = y; v.step();
+    if (b.z > -9 - AVATAR.hw + 1e-9) assert.ok(b.x - AVATAR.hw >= ARCH.x0 - 1e-9 && b.x + AVATAR.hw <= ARCH.x1 + 1e-9, `in the wall at (${b.x.toFixed(2)}, ${b.z.toFixed(2)})`);
+    if (b.z > -9.3) pressed++;
+  }
+  assert.ok(pressed > 0, 'it did reach the wall');
+});
+
+test('from the arch\'s threshold the path\'s supports are not offered (their clamps do not move while walking in)', () => {
+  const w = atOpenArch(), a = w.avatar, p = w.stands.find(s => s.id === 'P'), y0 = p.clampY;
+  for (const x of [8.65, 8.7, 8.74]) {
+    a.x = a.px = x; a.z = a.pz = -0.8; run(w, 0.1, { x: 0, y: 0 });
+    assert.ok(!w.interactables().some(i => i.kind === 'stand'), `no support offered at (${x}, −0.8)`);
+  }
+  assert.equal(p.clampY, y0);
+});

@@ -11,7 +11,7 @@ import { Moss, Plumbs } from './flora.js';
 import { Vegetation } from './vegetation.js';
 import { buildBarrio } from './barrio.js';
 import { makeMaterials, Stand, sphereMesh, fieldAnchor, conduit, Traces, chainProp, Bell, ApexMarks } from './props.js';
-import { STREAM_SPEED, TERRACE_Y, BELL_LINE, WELL, MIRADOR_Y, MIRADOR_LINE, ARCH } from '../sim/levels/cascada.js';
+import { STREAM_SPEED, TERRACE_Y, BELL_LINE, WELL, MIRADOR_Y, MIRADOR_LINE, ARCH, BARRIO } from '../sim/levels/cascada.js';
 
 const Z_STREAM = -1.7, Z_FRONT = 1.6, Z_BACK = -3.6;
 export const LANE_Z = [0, -0.5];   // explorer's path, experiment lane
@@ -83,10 +83,18 @@ export function buildScene(world, opts = {}) {
   const backRock = rockMaterial({ mossAmount: 0.7, shade: 0.38, detail: 0.35 }); backRock.side = THREE.DoubleSide;
   // Back walls receive shadows but do not cast them (nothing in front of them needs their shade).
   // One relief seed and one darkening reference for all the back walls: no seams between them.
-  for (const [x0, x1, top] of backs) add(strataBlock({ x0, x1, y0: -11, y1: top, z0: -9, z1: Z_BACK, seed: 2, sides: ['w', 'e'], step: 0.32, topRef: 11 }), backRock, false);
-  add(strataBlock({ x0: ARCH.x0, x1: ARCH.x1, y0: TERRACE_Y + ARCH.h, y1: 8.6, z0: -9, z1: Z_BACK, seed: 2, sides: [], step: 0.32, topRef: 11 }), backRock, false);
-  add(strataBlock({ x0: ARCH.x0, x1: ARCH.x1, y0: -11, y1: TERRACE_Y, z0: -9, z1: Z_BACK, seed: 2, sides: [], step: 0.32, topRef: 11 }), backRock, false);
+  // The stretch of wall between the Terraza and the square: from the square the camera may need it
+  // out of the way (setWallCut).
+  const wallCut = [];
+  for (const [x0, x1, top] of backs) {
+    const m = add(strataBlock({ x0, x1, y0: -11, y1: top, z0: -9, z1: Z_BACK, seed: 2, sides: ['w', 'e'], step: 0.32, topRef: 11 }), backRock, false);
+    if (x1 > BARRIO.x0 - 0.5 && x0 < BARRIO.x1 + 0.5) wallCut.push(m);
+  }
+  wallCut.push(add(strataBlock({ x0: ARCH.x0, x1: ARCH.x1, y0: TERRACE_Y + ARCH.h, y1: 8.6, z0: -9, z1: Z_BACK, seed: 2, sides: [], step: 0.32, topRef: 11 }), backRock, false));
+  wallCut.push(add(strataBlock({ x0: ARCH.x0, x1: ARCH.x1, y0: -11, y1: TERRACE_Y, z0: -9, z1: Z_BACK, seed: 2, sides: [], step: 0.32, topRef: 11 }), backRock, false));
   const barrio = buildBarrio(scene, { M, streamZ: Z_STREAM, wallRock: backRock, field, zBack: Z_BACK, world });
+  let wallIsCut = false;
+  const setWallCut = v => { if (v === wallIsCut) return; wallIsCut = v; for (const m of wallCut) m.visible = !v; barrio.setCut(v); };
   // World edges: tall rock you can see, not an invisible wall.
   add(strataBlock({ x0: -30, x1: -22, y0: -9, y1: 13, z0: -9, z1: Z_FRONT + 0.6, seed: 1, sides: ['e'], step: 0.32 }), backRock, false);
 
@@ -304,12 +312,16 @@ export function buildScene(world, opts = {}) {
     conduit(M, [[4.5, -3.4, Z_BACK + 0.05], [3.3, -4.3, Z_BACK - 0.2], [2.25, -4.5, -5.2]]),
   ];
   for (const c of conduits) scene.add(c);
+  wallCut.push(conduits[1]); // it runs into that stretch of wall
 
   // Supports, table and test spheres.
   const standById = new Map();
   const stands = world.stands.map(st => {
-    const s = new Stand({ ...st, z: -1.0, laneZ: LANE_Z[1], ruler: st.id === 'A' ? { x: st.x + 0.5, y0: 0, y1: 3, z: -0.75 } : null }, M);
-    scene.add(s.group); standById.set(st.id, s); return s;
+    // At its own depth: the square's support stands behind the wall, inside the neighbourhood.
+    const deep = st.z !== undefined && st.z < -1;
+    const s = new Stand({ ...st, z: deep ? st.z - 0.35 : -1.0, laneZ: deep ? st.z : LANE_Z[1],
+      ruler: st.id === 'A' ? { x: st.x + 0.5, y0: 0, y1: 3, z: -0.75 } : deep ? { x: st.clampX + 0.35, y0: st.baseY, y1: st.baseY + 3, z: st.z - 0.25 } : null }, M); // (beyond the sphere: the explorer stands between it and the post)
+    (deep ? barrio.town : scene).add(s.group); standById.set(st.id, s); return s;
   });
   const table = new THREE.Group();
   const top = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.1, 0.62), M.woodLight); top.position.set(-5.5, 0.73, -0.62); table.add(top);
@@ -379,11 +391,12 @@ export function buildScene(world, opts = {}) {
       const m = sphereMeshes.get(b.id); if (!m) continue;
       const x = b.px + (b.x - b.px) * alpha, y = b.py + (b.y - b.py) * alpha;
       const dx = x - m.position.x;
-      const z = b.heldBy?.type === 'shelf' ? -0.62 : b.heldBy?.type === 'hand' ? 0.08 : LANE_Z[b.lane];
+      const z = b.z ? b.z : b.heldBy?.type === 'shelf' ? -0.62 : b.heldBy?.type === 'hand' ? 0.08 : LANE_Z[b.lane];
       m.position.set(x, y, z);
+      m.visible = z > -4 || barrio.town.visible; // behind the wall: only with the neighbourhood
       if (b.support) m.rotation.z -= dx / b.r;
     }
-    world.stands.forEach((st, i) => { const b = st.body; v3.set(b.px + (b.x - b.px) * alpha, b.py + (b.y - b.py) * alpha + b.r * 0.9, LANE_Z[1]); stands[i].update(dt, { ...st, sagSign: 1 }, v3); });
+    world.stands.forEach((st, i) => { const b = st.body; v3.set(b.px + (b.x - b.px) * alpha, b.py + (b.y - b.py) * alpha + b.r * 0.9, b.z || LANE_Z[1]); stands[i].update(dt, { ...st, sagSign: 1 }, v3); });
     for (const b of bells.values()) b.update(dt);
     apexMarks.update(dt);
     for (const g of chainGs) {
@@ -391,7 +404,7 @@ export function buildScene(world, opts = {}) {
       const y = held ? av.py + (av.y - av.py) * alpha : g.userData.restY;
       g.userData.ring.position.y = y; g.userData.pointer.position.y = y;
     }
-    traces.sync(world.traces, id => { const b = world.bodies.find(x => x.id === id); return LANE_Z[b?.lane ?? 0] + 0.22; });
+    traces.sync(world.traces, id => { const b = world.bodies.find(x => x.id === id); return (b?.z || LANE_Z[b?.lane ?? 0]) + 0.22; });
     if ((time * 30 | 0) % 2 === 0) { const av = world.avatar; veg.update(time, { x: av.x, y: av.y - av.hh }); }
     barrio.update(dt, time);
   }
@@ -427,5 +440,5 @@ export function buildScene(world, opts = {}) {
     ring.position.copy(m.position); ring.position.z += 0.05;
     const k = 1 + 0.06 * Math.sin(time * 5); ring.scale.set(k, k, k); ring.material.opacity = 0.55 + 0.3 * Math.sin(time * 5);
   }
-  return { scene, sun, hemi, update: (dt, time, alpha) => { update(dt, time, alpha); updateRing(time); }, onEvent, highlight, setCityVisible: v => { city.visible = v; }, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts, veg };
+  return { scene, sun, hemi, update: (dt, time, alpha) => { update(dt, time, alpha); updateRing(time); }, onEvent, highlight, setCityVisible: v => { city.visible = v; }, setWallCut, clearChalk: id => (id === 'mirador' ? wellMarks : apexMarks).clear(), arch, archMesh, sphereMeshes, M, plumbs, moss, parts, veg };
 }

@@ -107,11 +107,14 @@ export function buildBarrio(scene, { M, wallRock, field, zBack, streamZ, world }
   const bridge = new THREE.Mesh(new THREE.BoxGeometry(aw + 0.3, 0.46, 2.0), M.stone); bridge.position.set(cx, Y - 0.07, streamZ); bridge.castShadow = bridge.receiveShadow = true; scene.add(bridge);
 
   // ---- the passage: the back wall is cut (scene.js); here its ceiling and two lamps ----
-  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(aw, -9 - zBack), wallRock); ceil.rotation.x = Math.PI / 2; ceil.position.set(cx, Y + ARCH.h, (zBack - 9) / 2); scene.add(ceil);
+  // (the ceiling and the lamps go with the wall when it is cut away for the camera)
+  // (lights are dimmed, not hidden: changing how many lights there are recompiles every lit material)
+  const inWall = [], wallLights = [];
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(aw, -9 - zBack), wallRock); inWall.push(ceil); ceil.rotation.x = Math.PI / 2; ceil.position.set(cx, Y + ARCH.h, (zBack - 9) / 2); scene.add(ceil);
   const lampMat = new THREE.MeshBasicMaterial({ color: '#ffe2a8' });
   for (const [x, z] of [[ARCH.x0 + 0.05, -5.4], [ARCH.x1 - 0.05, -7.6]]) {
-    const l = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), lampMat); l.position.set(x, Y + 1.8, z); scene.add(l);
-    const light = new THREE.PointLight('#ffc77a', 2.2, 4.5, 2); light.position.set(x + (x < cx ? 0.2 : -0.2), Y + 1.7, z); scene.add(light);
+    const l = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), lampMat); l.position.set(x, Y + 1.8, z); scene.add(l); inWall.push(l);
+    const light = new THREE.PointLight('#ffc77a', 2.2, 4.5, 2); light.position.set(x + (x < cx ? 0.2 : -0.2), Y + 1.7, z); scene.add(light); wallLights.push(light);
   }
 
   // ---- the neighbourhood (drawn once the arch starts opening: before, it showed over the canyon's wall) ----
@@ -123,9 +126,16 @@ export function buildBarrio(scene, { M, wallRock, field, zBack, streamZ, world }
   const paveMat = new THREE.MeshStandardMaterial({ map: paveMap, roughness: 0.9 });
   const pave = new THREE.Mesh(new THREE.BoxGeometry(W + 6, 0.3, -9 - (BARRIO.z0 - 3.5)), paveMat);
   pave.position.set((BARRIO.x0 + BARRIO.x1) / 2, Y - 0.15, (-9 + BARRIO.z0 - 3.5) / 2); pave.receiveShadow = true; scene.add(pave);
-  const lane = paveMap.clone(); lane.repeat.set(aw / 3, (-zBack - 9) / -3); lane.needsUpdate = true;
-  const passageFloor = new THREE.Mesh(new THREE.PlaneGeometry(aw, -9 - zBack), new THREE.MeshStandardMaterial({ map: lane, roughness: 0.9 }));
+  const lane = paveMap.clone(); lane.repeat.set(aw / 3, (zBack + 9) / 3); lane.needsUpdate = true;
+  const passageFloor = new THREE.Mesh(new THREE.PlaneGeometry(aw, zBack + 9), new THREE.MeshStandardMaterial({ map: lane, roughness: 0.9 }));
   passageFloor.rotation.x = -Math.PI / 2; passageFloor.position.set(cx, Y + 0.004, (zBack - 9) / 2); passageFloor.receiveShadow = true; scene.add(passageFloor);
+  // Under the wall the square's floor goes on: drawn only while the wall is cut away for the camera
+  // (from the square, near the wall, the camera can be where the rock is).
+  const under = [[BARRIO.x0 - 3, ARCH.x0], [ARCH.x1, BARRIO.x1 + 3]].map(([x0, x1]) => {
+    const map = paveMap.clone(); map.repeat.set((x1 - x0) / 3, (zBack + 9) / 3); map.needsUpdate = true;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, 0.3, zBack + 9), new THREE.MeshStandardMaterial({ map, roughness: 0.9 }));
+    m.position.set((x0 + x1) / 2, Y - 0.15, (zBack - 9) / 2); m.receiveShadow = true; m.visible = false; scene.add(m); return m;
+  });
   // façades around three sides (the fourth is the rock the passage comes through)
   const west = [[-9.5, -12.6, 4.2], [-12.6, -16.4, 3.4, 'pitched'], [-16.4, -19.0, 4.8], [-19.0, -22.2, 3.8, 'pitched']];
   for (const [z1, z0, h, roof] of west) building(scene, { x0: BARRIO.x0 - 2.6, x1: BARRIO.x0 - 0.05, z0, z1, h, mats, roof });
@@ -144,13 +154,24 @@ export function buildBarrio(scene, { M, wallRock, field, zBack, streamZ, world }
   const rim = new THREE.Mesh(new THREE.TorusGeometry(1.55, 0.09, 8, 40), M.enamel); rim.rotation.x = Math.PI / 2; rim.position.set(fx, Y + 0.5, fz); scene.add(rim);
   const pool = new THREE.Mesh(new THREE.CircleGeometry(1.52, 40), waterMaterial({ opacity: 0.9, streak: 0.3 })); pool.rotation.x = -Math.PI / 2; pool.position.set(fx, Y + 0.38, fz); pool.renderOrder = 2; scene.add(pool);
   const column = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.22, 1.25, 16), M.enamel); column.position.set(fx, Y + 0.95, fz); scene.add(column);
-  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.2, 0.25, 24), M.brass); bowl.position.set(fx, Y + 1.62, fz); scene.add(bowl);
+  // the bowl: open, of the column's enamel (brass with nothing to reflect read black from below),
+  // its water a little under the lip
+  const bowlMat = M.enamel.clone(); bowlMat.side = THREE.DoubleSide;
+  const bowlProfile = [[0.2, 0], [0.52, 0.2], [0.6, 0.25], [0.54, 0.26], [0.47, 0.18], [0, 0.17]].map(([r, y]) => new THREE.Vector2(r, y));
+  const bowl = new THREE.Mesh(new THREE.LatheGeometry(bowlProfile, 28), bowlMat); bowl.position.set(fx, Y + 1.49, fz); scene.add(bowl);
+  const lip = new THREE.Mesh(new THREE.TorusGeometry(0.575, 0.025, 6, 28), M.brass); lip.rotation.x = Math.PI / 2; lip.position.set(fx, Y + 1.745, fz); scene.add(lip);
   // computed where the jet really is (in depth too), then drawn around the fountain's centre
-  const jet = fieldPath(field, fx + 0.5, Y + 1.72, 1.1, 0.6, p => p.y <= Y + 0.4, 2, fz).map(p => ({ ...p, x: p.x - fx }));
-  const jetGeo = waterTube(jet, { zc: 0, thick: 0.09, wide: 0.14, foamStart: 0.9, foamEnd: 1.0, spread: 0 });
-  const jetMat = waterMaterial({ streak: 1.2, opacity: 0.85 });
-  const jets = [];
-  for (let k = 0; k < 4; k++) { const m = new THREE.Mesh(jetGeo, jetMat); m.position.set(fx, 0, fz); m.rotation.y = k * Math.PI / 2; m.renderOrder = 3; scene.add(m); jets.push(m); }
+  // The central jet leaves at the chasm spring's speed (level.spring.vy): here, with no region, it
+  // rises v²/2g ≈ 0.44 m and falls back into the bowl. The bowl overflows at four lips.
+  const vJet = world.level.spring?.vy ?? 2.95;
+  const jetUp = fieldPath(field, fx, Y + 1.74, 0.05, vJet, p => p.vy < 0 && p.y <= Y + 1.74, 2, fz).map(p => ({ ...p, x: p.x - fx }));
+  const jetMat = waterMaterial({ streak: 1.2, opacity: 0.8 });
+  const central = new THREE.Mesh(waterTube(jetUp, { zc: 0, thick: 0.11, wide: 0.13, foamStart: 0.7, foamEnd: 1.0, spread: 0 }), jetMat);
+  central.position.set(fx, 0, fz); central.renderOrder = 3; scene.add(central);
+  const bowlWater = new THREE.Mesh(new THREE.CircleGeometry(0.53, 28), waterMaterial({ opacity: 0.9, streak: 0.4 })); bowlWater.rotation.x = -Math.PI / 2; bowlWater.position.set(fx, Y + 1.725, fz); bowlWater.renderOrder = 2; scene.add(bowlWater);
+  const spill = fieldPath(field, fx + 0.61, Y + 1.75, 0.35, 0, p => p.y <= Y + 0.4, 2, fz).map(p => ({ ...p, x: p.x - fx }));
+  const spillGeo = waterTube(spill, { zc: 0, thick: 0.02, wide: 0.08, foamStart: 0.9, foamEnd: 1.0, spread: 0 });
+  for (let k = 0; k < 4; k++) { const m = new THREE.Mesh(spillGeo, jetMat); m.position.set(fx, 0, fz); m.rotation.y = k * Math.PI / 2 + Math.PI / 4; m.renderOrder = 3; scene.add(m); }
   // lamps at the corners of the square
   for (const [x, z] of [[BARRIO.x0 + 0.6, -10], [BARRIO.x1 - 0.6, -10], [BARRIO.x0 + 0.6, BARRIO.z0 + 0.6], [BARRIO.x1 - 0.6, BARRIO.z0 + 0.6]]) {
     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 2.6, 10), M.brassDark); post.position.set(x, Y + 1.3, z); post.castShadow = true; scene.add(post);
@@ -165,6 +186,8 @@ export function buildBarrio(scene, { M, wallRock, field, zBack, streamZ, world }
   const garden = new Vegetation(scene, field, { tops: [], spots, quality: 'high' });
 
   return {
+    town,
+    setCut(v) { for (const m of under) m.visible = v; for (const m of inWall) m.visible = !v; for (const l of wallLights) l.intensity = v ? 0 : 2.2; },
     // Driven by the simulation's door (one authority): the leaf swings 90° into the passage as the
     // crank and its shaft turn; the joints glow once the city has been seen.
     update(dt, time) {
@@ -172,9 +195,12 @@ export function buildBarrio(scene, { M, wallRock, field, zBack, streamZ, world }
       const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
       pivot.rotation.y = e * Math.PI / 2;
       crank.rotation.z = -e * Math.PI * 3; shaft.rotation.y = -e * Math.PI * 3; gear.rotation.y = -e * Math.PI * 3;
+      // Drawn once the arch opens. Drawn from the Mirador on, it peeked over the wall as a house on
+      // the cliff and cost ~195 draw calls in every 2.5D frame at the Terraza (iteration 14): what
+      // shows over the wall is to be its own designed silhouette.
       town.visible = door.open || door.opening;
       glow.material.opacity = world.citySeen && !door.open ? (0.35 + 0.15 * Math.sin(time * 2)) * (1 - e) : 0;
-      jetMat.uniforms.uTime.value = time; pool.material.uniforms.uTime.value = time;
+      jetMat.uniforms.uTime.value = time; pool.material.uniforms.uTime.value = time; bowlWater.material.uniforms.uTime.value = time;
       garden.update(time, null);
     },
   };

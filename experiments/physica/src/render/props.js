@@ -206,9 +206,11 @@ export class Stand {
       const major = Math.abs((y - y0) % 1) < 1e-6, half = Math.abs((y - y0) % 0.5) < 1e-6;
       const t = box(major ? 0.12 : half ? 0.08 : 0.05, 0.012, 0.035, M.ink); t.position.set(x - 0.03, y, z + 0.005); g.add(t);
     }
-    for (let m = Math.ceil(y0); m <= y1; m++) {
+    // Whole metres above the ruler's base (the base need not be at a whole height: the square's is at 4.4).
+    for (let k0 = 0; y0 + k0 <= y1 + 1e-6; k0++) {
+      const m = y0 + k0;
       const c = document.createElement('canvas'); c.width = 64; c.height = 64; const k = c.getContext('2d');
-      k.fillStyle = '#2a1a12'; k.font = '600 44px Georgia, serif'; k.textAlign = 'center'; k.textBaseline = 'middle'; k.fillText(`${m - y0}`, 32, 34);
+      k.fillStyle = '#2a1a12'; k.font = '600 44px Georgia, serif'; k.textAlign = 'center'; k.textBaseline = 'middle'; k.fillText(`${k0}`, 32, 34);
       const sp = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.16), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
       sp.position.set(x + 0.13, m, z + 0.02); g.add(sp);
     }

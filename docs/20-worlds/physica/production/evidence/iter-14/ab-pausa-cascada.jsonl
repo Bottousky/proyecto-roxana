@@ -1,0 +1,16 @@
+{"w":0,"name":"trabajo","n":205,"p99":66.6,"max":66.7,"dropped":0,"sum":6016,"elapsed":6014,"long":[],"load1":6.61}
+{"w":0,"name":"head","n":206,"p99":50,"max":50.1,"dropped":0,"sum":6017,"elapsed":6007,"long":[],"load1":7.62}
+{"w":1,"name":"trabajo","n":268,"p99":66.8,"max":83.4,"dropped":0,"sum":5966,"elapsed":6003,"long":[],"load1":6.31}
+{"w":1,"name":"head","n":181,"p99":66.7,"max":66.7,"dropped":0,"sum":5983,"elapsed":6005,"long":[],"load1":5.34}
+{"w":2,"name":"trabajo","n":212,"p99":50.1,"max":50.1,"dropped":0,"sum":6017,"elapsed":6005,"long":[],"load1":4.98}
+{"w":2,"name":"head","n":236,"p99":50.1,"max":316.6,"dropped":18,"sum":5433,"elapsed":5406,"long":["316.6/3.1"],"load1":4.38}
+{"w":3,"name":"trabajo","n":145,"p99":66.7,"max":66.7,"dropped":0,"sum":6000,"elapsed":6005,"long":[],"load1":4.15}
+{"w":3,"name":"head","n":215,"p99":33.4,"max":50,"dropped":0,"sum":6000,"elapsed":6004,"long":[],"load1":3.9}
+{"w":4,"name":"trabajo","n":211,"p99":50,"max":83.4,"dropped":0,"sum":6033,"elapsed":6004,"long":[],"load1":4.13}
+{"w":4,"name":"head","n":140,"p99":33.5,"max":383.4,"dropped":18,"sum":3017,"elapsed":3000,"long":["383.4/2.8"],"load1":3.95}
+{"w":5,"name":"trabajo","n":149,"p99":83.4,"max":100,"dropped":0,"sum":5983,"elapsed":6004,"long":[],"load1":3.65}
+{"w":5,"name":"head","n":227,"p99":49.9,"max":50,"dropped":0,"sum":6017,"elapsed":6003,"long":[],"load1":3.54}
+{"w":6,"name":"trabajo","n":224,"p99":50,"max":50.1,"dropped":0,"sum":6016,"elapsed":6010,"long":[],"load1":3.37}
+{"w":6,"name":"head","n":258,"p99":50,"max":466.6,"dropped":18,"sum":6016,"elapsed":6003,"long":["466.6/3.1"],"load1":3.48}
+{"w":7,"name":"trabajo","n":207,"p99":83.4,"max":83.4,"dropped":0,"sum":5966,"elapsed":6003,"long":[],"load1":3.1}
+{"w":7,"name":"head","n":195,"p99":66.6,"max":66.6,"dropped":0,"sum":5983,"elapsed":6002,"long":[],"load1":3.28}

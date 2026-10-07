@@ -8,7 +8,7 @@ import '@fontsource/inter/600.css';
 import './style.css';
 import { World, DT } from './sim/world.js';
 import { FixedStepper } from './sim/stepper.js';
-import { CASCADA, ARCH } from './sim/levels/cascada.js';
+import { CASCADA, ARCH, TERRACE_Y } from './sim/levels/cascada.js';
 import { buildScene } from './render/scene.js';
 import { Explorer } from './render/avatar.js';
 import { Input } from './input.js';
@@ -90,7 +90,7 @@ const hud = document.createElement('div'); hud.className = 'hud';
 hud.innerHTML = `
   <div class="title" id="title"><span class="eyebrow">Physica</span><b>La cascada ascendente</b></div>
   <div class="prompt" id="prompt" hidden><kbd id="prompt-key">E</kbd><span><span id="prompt-verb"></span><small id="prompt-hint"></small><small id="prompt-reason" class="reason"></small></span></div>
-  <div class="hint" id="hint"><span class="kbd-only"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>▲</kbd><kbd>▼</kbd> ajustar, trepar · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar (en el aire: volver a pisar firme) · <kbd>J</kbd> Bitácora · <kbd>Esc</kbd> opciones</span><span class="touch-only">◀ ▶ caminar · ▲ ▼ ajustar, trepar · botón grande: usar · ↺ volver a pisar firme · ✎ Bitácora · ⏸ opciones</span><span class="pad-only">palanca: caminar · ▲ ▼ ajustar, trepar · A usar · Y volver a pisar firme · Select Bitácora · Start opciones</span></div>
+  <div class="hint" id="hint"><span class="kbd-only"><kbd>◀</kbd><kbd>▶</kbd> caminar · <kbd>▲</kbd><kbd>▼</kbd> <span class="v-path">ajustar, trepar</span><span class="v-depth">caminar hacia el fondo y volver</span> · <kbd>E</kbd> usar · <kbd>R</kbd> reiniciar (en el aire: volver a pisar firme) · <kbd>J</kbd> Bitácora · <kbd>Esc</kbd> opciones</span><span class="touch-only">◀ ▶ caminar · ▲ ▼ <span class="v-path">ajustar, trepar</span><span class="v-depth">caminar hacia el fondo y volver</span> · botón grande: usar · ↺ volver a pisar firme · ✎ Bitácora · ⏸ opciones</span><span class="pad-only">palanca: caminar · ▲ ▼ <span class="v-path">ajustar, trepar</span><span class="v-depth">caminar hacia el fondo y volver</span> · A usar · Y volver a pisar firme · Select Bitácora · Start opciones</span></div>
   <div class="legend" id="legend" hidden><i></i> una marca cada 0,1 s · anillo cada 0,5 s</div>
   <div class="pause" id="pause" hidden><div role="dialog" aria-modal="true" aria-labelledby="pause-title">
     <h2 id="pause-title">En pausa</h2>
@@ -159,7 +159,7 @@ function padInPanel(inp) {
   if (inp.act && el) el.click();
   if (inp.back) setPaused(false);
 }
-let hintTimer = 0, moved = false;
+let hintTimer = 0, moved = false, depthHinted = false;
 
 function resize() {
   const w = app.clientWidth, h = app.clientHeight;
@@ -209,8 +209,12 @@ window.__physica = {
       journal: journal.ids(), paused, camera: { x: camera.position.x, y: camera.position.y, z: camera.position.z } };
   },
   setPaused,
+  // Development telemetry: what the last frame drew (shadow passes included).
+  drawInfo() { return { calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }; },
   // Development inspection only: frame a point (evidence close-ups). Not part of play.
   inspect(x, y, dist) { inspectCam = x == null ? null : { x, y, dist }; },
+  // Development inspection only: a free camera (position and point looked at), for overview shots.
+  look(pos, at) { freeCam = pos ? { pos, at } : null; },
   // Development turnaround: pin the explorer's yaw (null releases it).
   pose(yaw) { explorer.yawOverride = yaw; },
   explorer, // development inspection: the model's chains (scarf tails, curl)
@@ -218,7 +222,7 @@ window.__physica = {
   screenOf(x, y, z = 0) { const v = new THREE.Vector3(x, y, z).project(camera); return { x: (v.x * 0.5 + 0.5) * app.clientWidth, y: (-v.y * 0.5 + 0.5) * app.clientHeight }; },
   vista() { vista = 6; vistaAge = 0; vistaHeld = false; view.setCityVisible(true); },
 };
-let inspectCam = null, camFloat = 0, camDepth = 0;
+let inspectCam = null, freeCam = null, camFloat = 0, camDepth = 0, wallCut = false;
 const camG = { x: 0, y: 0 };
 
 // ---------- loop ----------
@@ -236,6 +240,7 @@ function frame(now) {
   const inp = input.poll();
   if (inp.pause) setPaused(!paused);
   document.body.classList.toggle('has-pad', input.lastDevice === 'gamepad');
+  document.body.classList.toggle('in-depth', world.avatar.z < -0.3); // the help bar's ▲▼
   if (paused) { if (input.lastDevice === 'gamepad') padInPanel(inp); renderer.render(scene, camera); return; }
   if (inp.journal) journal.toggle();
   if (journal.open) { inp.axis = 0; inp.act = false; }
@@ -327,8 +332,9 @@ function frame(now) {
   camDepth += (dzT - camDepth) * (reduced ? 1 : Math.min(1, dt * 4));
   const dz = camDepth, feet = p.y - av.hh, camZ = p.z + 4.6;
   const camH = THREE.MathUtils.lerp(1.75, 3.1, THREE.MathUtils.smoothstep(-camZ, 9.0, 11.0));
-  // In the passage the camera keeps to its width (beside it is rock); out of it, it follows freely.
-  const inPassage = THREE.MathUtils.smoothstep(-camZ, 3.4, 4.0) * (1 - THREE.MathUtils.smoothstep(-camZ, 9.0, 9.8));
+  // While the explorer is in the passage the camera keeps to its width (beside it is rock); once the
+  // explorer is out in the square, the camera follows it freely (the wall is cut away if in the way).
+  const inPassage = THREE.MathUtils.smoothstep(-camZ, 3.4, 4.0) * (1 - THREE.MathUtils.smoothstep(-camZ, 9.0, 9.8)) * (1 - THREE.MathUtils.smoothstep(-p.z, 9.3, 10.3));
   const camX = THREE.MathUtils.lerp(p.x, THREE.MathUtils.clamp(p.x, ARCH.x0 + 0.35, ARCH.x1 - 0.35), inPassage);
   const pos2 = [cam.x, cam.y + cam.dist * cam.elev, cam.dist], look2 = [cam.x, cam.y, 0];
   const posD = [camX, feet + camH, camZ], lookD = [p.x, feet + 0.95, p.z - 2.2];
@@ -338,6 +344,17 @@ function frame(now) {
   const [px, py, pz] = mix(pos2, posD), [lx, ly, lz] = mix(look2, lookD);
   camera.position.set(px, py, pz);
   camera.lookAt(lx, ly, lz);
+  // From the square, the rock between it and the Terraza must not hide the explorer: while the camera
+  // is inside it, or the lines to the explorer's head and feet cross it outside the passage's mouth,
+  // that stretch of wall is cut away (with a margin that holds the cut, so it does not flicker).
+  if (p.z < -9 && pz > -9.05) {
+    const m = wallCut ? 0.3 : 0.1;
+    const inMouth = (x, y) => x > ARCH.x0 + m && x < ARCH.x1 - m && y < TERRACE_Y + ARCH.h - m;
+    const seen = y => { const t = (pz + 9) / (pz - p.z); return inMouth(px + (p.x - px) * t, py + (y - py) * t); };
+    wallCut = !(inMouth(px, py) && seen(feet + 0.2) && seen(feet + 1.6));
+  } else wallCut = false;
+  view.setWallCut(wallCut);
+  if (freeCam) { camera.position.set(...freeCam.pos); camera.lookAt(...freeCam.at); }
   sun.position.set(lx - 9, 16, lz + 12); sun.target.position.set(lx, 0, lz);
 
   // Prompt over the nearest interactable.
@@ -356,6 +373,8 @@ function frame(now) {
     $('prompt-reason').textContent = it.reason || '';
   } else promptEl.hidden = true;
   $('legend').hidden = !world.traces.length || journal.open;
+  // The first time beyond the arch, the help bar comes back for a while: ▲▼ now walk.
+  if (!depthHinted && av.z < -0.3) { depthHinted = true; moved = true; hintTimer = input.lastDevice === 'touch' ? 14 : 6; $('hint').classList.remove('gone'); }
   if (moved) { hintTimer -= dt; if (hintTimer < 0) $('hint').classList.add('gone'); }
   if (time > 4) $('title').classList.add('gone');
   if (debug) $('debug').textContent = `x ${av.x.toFixed(2)} y ${av.y.toFixed(2)} vx ${av.vx.toFixed(2)} vy ${av.vy.toFixed(2)}\ng ${(av.gy ?? 0).toFixed(2)} w ${zw.toFixed(2)} step ${world.stepCount}`;
