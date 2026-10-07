@@ -6,6 +6,7 @@ import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {add, cmul, quarter, solve2} from '../logic/turns.js';
 import {SHOTS, area, boardCast, clean, poly, dot, arrow, S, seedOf, WHITE, YELLOW, BLUE} from '../ch9/common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
+import {well, pull, SHOT_WELL, SHOT_WELL_BOARD} from './well.js';
 
 const sg = n => (n < 0 ? `−${-n}` : String(n));
 const pair = ([a, b]) => `(${sg(a)}, ${sg(b)})`;
@@ -33,6 +34,7 @@ export const flechas = {
   setup(g) {
     clean(g, /^c10-/);
     boardCast(g, 1);
+    well(g, {rope: false});
     g.camera.go(SHOTS.board);
   },
   async play(d, g) {
@@ -130,6 +132,7 @@ export const cuarto = {
   setup(g) {
     clean(g, /^c10-/);
     boardCast(g, 0);
+    well(g, {rope: false});
     g.camera.go(SHOTS.board);
   },
   async play(d, g) {
@@ -222,6 +225,7 @@ export const pistas = {
   setup(g) {
     clean(g, /^c10-/);
     boardCast(g, 2);
+    well(g, {rope: false});
     g.camera.go(SHOTS.board);
   },
   async play(d, g) {
@@ -308,15 +312,17 @@ export const aVeces = {
   setup(g) {
     clean(g, /^c10-/);
     boardCast(g, 3);
+    well(g, {rope: true});
     g.camera.go(SHOTS.board);
   },
   async play(d, g, {replay} = {}) {
     const w = g.world;
     const p = w.get('punto');
     const A = area();
-    await d.shot(SHOTS.board, 1);
+    await d.shot(SHOT_WELL, 1);
     await d.say('Balcón', 'Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.');
-    await d.shot(SHOTS.tiles, 0.8);
+    // las subidas se ven en el pozo y se anotan en la pizarra
+    await d.shot(SHOT_WELL_BOARD, 0.9);
     let k = 0;
     const tally = {llena: 0, 'a medias': 0};
     await d.interact(ctl => new Promise(resolve => {
@@ -328,17 +334,20 @@ export const aVeces = {
         g.ui.setSpots([]);
         const r = PULLS[k++];
         tally[r]++;
-        const l = w.add(new Label(`c10-pl${k}`, `${k}.  ${r}`, A.x0 + 30, A.y0 + 30 + (k - 1) * 30, {size: 22, z: 12, ch: r === 'llena' ? undefined : YELLOW, reveal: 0}));
+        try { await pull(d, g, r === 'llena' ? 1 : 0.5, {back: false}); } catch { return; }
+        const l = w.add(new Label(`c10-pl${k}`, `${k}.  ${r}`, A.x0 + 30, A.y0 + 34 + (k - 1) * 37, {size: 30, z: 12, ch: r === 'llena' ? undefined : YELLOW, reveal: 0}));
         try { await d.draw(l, 0.4, {key: 'reveal'}); } catch { return; }
         g.audio.tap(0.2, r === 'llena' ? 1.3 : 0.9);
-        d.describe(`El balde número ${k} sube ${r}.`);
+        d.describe(`El balde número ${k} sube ${r}: se ve en el pozo, colgado de la soga.`);
+        if (k === 1) await d.think('El primero llegó lleno, hasta el borde.').catch(() => {});
         d.evidence('pull', {k, r});
         busy = false;
         if (k >= 6) { g.setHint(null); resolve(); } else refresh();
       }, {label: 'Subir el balde'})]);
       refresh();
     }));
-    w.add(new Label('c10-tl', `llena: ${tally.llena}    a medias: ${tally['a medias']}`, A.x0 + 260, A.y0 + 60, {size: 22, z: 12}));
+    w.add(new Label('c10-tl', `llena: ${tally.llena}    a medias: ${tally['a medias']}`, A.x0 + 250, A.y0 + 70, {size: 26, z: 12}));
+    await d.shot(SHOTS.tiles, 0.8);
     const c = await d.choose([
       {id: 'unsure', text: 'No se sabe seguro; lo más probable, llena.'},
       {id: 'full', text: 'Llena, seguro: casi siempre sube llena.'},

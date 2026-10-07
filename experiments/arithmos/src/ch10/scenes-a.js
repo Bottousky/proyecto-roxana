@@ -7,6 +7,7 @@ import {TAU, point, heights, slopeRatio} from '../logic/turns.js';
 import {SHOTS, area, base, boardCast, clean, poly, S, seedOf, WHITE, YELLOW, BLUE} from '../ch9/common.js';
 import {dot} from '../ch9/common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
+import {well, pull, SHOT_WELL} from './well.js';
 
 const dec = v => String(v).replace('.', ',').replace('-', '−');
 
@@ -33,13 +34,17 @@ export const rueda = {
     g.world.clear();
     base(g);
     boardCast(g, 3);
+    well(g, {rope: false});
     g.camera.go(SHOTS.board);
   },
   async play(d, g) {
     const w = g.world;
     const A = area();
-    await d.shot(SHOTS.board, 1);
+    // el pozo de verdad: la rueda sin soga
+    await d.shot(SHOT_WELL, 1);
+    d.describe('El pozo de las Terrazas: una pared de piedra, dos postes, un techito y la rueda con su manija, sin soga.');
     await d.say('Balcón', 'La rueda del pozo perdió la soga. Tengo pedazos del largo del rayo de la rueda, de la punta al centro. ¿Cuántos hacen falta para dar toda la vuelta?');
+    await d.shot(SHOTS.board, 1);
     const R = 70, cx = A.x0 + 150, cy = A.y0 + 130;
     wheel(w, 'c10-w', cx, cy, R);
     w.add(new Drawing('c10-ray', [S([[cx, cy], [cx + R, cy]], seedOf('c10-ray'), {w: 4, p: 0.95, ch: YELLOW})], {z: 13}));
@@ -124,6 +129,7 @@ export const alto = {
   setup(g) {
     clean(g, /^c10-/);
     boardCast(g, 3);
+    well(g, {rope: false});
     g.camera.go(SHOTS.board);
   },
   async play(d, g) {
@@ -252,6 +258,7 @@ export const repite = {
   setup(g) {
     clean(g, /^c10-/);
     boardCast(g, 2);
+    well(g, {rope: false});
     g.camera.go(SHOTS.board);
   },
   async play(d, g) {
@@ -322,6 +329,7 @@ export const rampa = {
   setup(g) {
     clean(g, /^c10-/);
     boardCast(g, 1);
+    well(g, {rope: false});
     g.camera.go(SHOTS.board);
   },
   async play(d, g) {

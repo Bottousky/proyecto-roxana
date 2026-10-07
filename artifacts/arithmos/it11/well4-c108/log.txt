@@ -1,0 +1,8 @@
+[0.0s] escena → c10.a-veces
+[1.0s] lee: Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias.
+[3.6s] lee: El primero llegó lleno, hasta el borde.
+[12.7s] elige «A medias: ya le toca.» (El balde número 7, ¿cómo va a subir?)
+[13.1s] lee: El balde no lleva la cuenta: lo que salió antes no cambia lo que sale ahora.
+[13.2s] lee: Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.
+[13.4s] escena → c11.baldes
+[14.2s] {"ended":true,"final":{"mode":"play","seg":"c11.baldes"},"journal":["Vueltas y flechas"],"evidenceKinds":["pull","chance-predict"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":14.175,"size":"1600x900","touch":false,"route":"errores","watch":false}
