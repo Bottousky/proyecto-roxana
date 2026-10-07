@@ -56,6 +56,11 @@ Actualizado: 2026-10-06 (ciclo 4 del loop).
   adelanta con una recta, la borra él mismo cuando las noches la desmienten, y contesta «¿cómo te llamás?»
   dibujando un punto, una flecha y una curva. Cuarta revisión (rev-c8c) aplicada. Teléfono: la letra chica crece
   hasta ~12 px y al mirar la pizarra la escena usa la franja de abajo.
+- Cobertura del cap. 7 completada (C7b): sucesiones aritmética y geométrica y el «día n» (7.2), cociente de
+  potencias (7.3b), exponente un medio (7.8), simplificar racionales con su restricción (7.9). Cap. 12: simetría
+  nombrada, perilla de las U (12.2). El final termina con la Ronda bailando en las Terrazas y Punto sumándose.
+  Quinta revisión (rev-c8d) aplicada: noches contadas como el eje, consigna y casilleros vacíos en 11.6, la soga
+  del pozo en el borde de la rueda, Punto se adelanta en 10.7.
 - **Entorno:** la máquina se suspendió de madrugada (≈ 01:30–02:00); dos corridas y una revisión se cortaron
   por eso y se repitieron sin problemas.
 - Revisión narrativa de los caps. 10–12 hecha (rev-narr-8): el cierre se rehizo (la cuarta noche pone a
@@ -92,9 +97,9 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 
 1. Pendientes de narrativa por capítulo (N2-R, N6-R … N10-12), empezando por agencia (que el jugador dé
    el paso decisivo) y por Punto como personaje, que se repiten en todas las revisiones.
-2. Cobertura pendiente (ver huecos en la matriz): C7b (cociente de potencias, sucesiones nombradas,
-   simplificar racionales), J (polinómica de grado mayor, simetrías, parámetros de otras familias, asíntota
-   horizontal).
-3. Agencia que queda (N10-12 A3): 10.3, 11.4; un error de Punto en el cap. 10; la Ronda y la puerta en el final; bajas de rev-c8 (B7, B9); 9.8: tiempo a escala.
+2. Cobertura pendiente (ver huecos en la matriz): J (polinómica de grado mayor que 2, asíntota horizontal).
+   Revisión matemática de lo agregado al cap. 7 (en curso) y a 12.2.
+3. Agencia que queda (N10-12 A3): 10.3, 11.4; la puerta en el final (volver o quedarse); bajas de rev-c8 (B7, B9); 9.8: tiempo a escala.
+4. Partida completa 1 → 12 (directa y con errores) después de todos los cambios del ciclo 8.
 4. Revisión matemática de 7.7 (una y ninguna solución) y de 9.1 nuevo.
 5. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.
