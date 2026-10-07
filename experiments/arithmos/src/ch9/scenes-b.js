@@ -308,21 +308,26 @@ export const vuelve = {
 };
 
 function writeJournal9(g) {
-  const ev = g.state.evidence.filter(e => (e.run || 1) === (g.state.run || 1));
+  // sólo lo de este capítulo: hay tipos de evidencia con el mismo nombre en otros (count, cut, scale…)
+  const ev = g.state.evidence.filter(e => (e.run || 1) === (g.state.run || 1) && (!e.seg || e.seg.startsWith('c9.')));
   const first = k => ev.find(e => e.kind === k);
   const seen = [];
   const ip = first('inverse-predict');
   if (ip) seen.push(ip.answer === 'both' ? 'Con la sombra 2 dijiste «las 10 o las 14»: la hora no depende sólo de la sombra.' : 'Con la sombra 2 elegiste una sola hora; dando vuelta las flechas, del 2 salían dos: las 10 y las 14.');
   const rt = ev.filter(e => e.kind === 'rule-try');
-  if (rt.length) seen.push(rt.length === 1 ? `Armaste la regla de Mara a la primera: ${rt[0].rule}.` : `Probaste ${rt.length} reglas (${rt.map(e => e.rule).join(', ')}); las que no eran fallaban en algún renglón anotado.`);
+  const rules = [...new Set(rt.map(e => e.rule))];
+  if (rt.length) seen.push(rt.length === 1 ? `Armaste la regla de Mara a la primera: ${rt[0].rule}.` : `Probaste ${rules.length} reglas (${rules.join(', ')}); las que no eran fallaban en algún renglón anotado.`);
   const rp = first('rule-predict');
-  if (rp) seen.push(rp.answer === '21' ? 'Anticipaste que con 10 la máquina daba 21: el doble más uno.' : 'Con pocos casos pensaste otra regla; el 10 dio 21: el doble más uno.');
+  if (rp) seen.push(rp.answer === '21' ? 'Con tu regla anticipaste que con 10 salía 21.' : rp.answer === '20' ? 'Con 10 dijiste 20: faltó el + 1 de la regla; salió 21.' : 'Con 10 dijiste 13, sumando lo mismo que entre renglones; la regla da 21.');
   const jp = first('join-predict');
   if (jp) seen.push(jp.answer === 'join' ? 'Uniste los puntos de la sombra: entre medición y medición también hay sombra.' : jp.answer === 'loose' ? 'Pensaste dejar los puntos sueltos; entre las 8 y las 10 también hay sombra, así que se unen (suponiendo).' : 'Quisiste una curva linda; se une por los puntos, sin inventar.');
   const jd = first('join-discrete');
   if (jd) seen.push(jd.answer === 'loose' ? 'Las familias por día quedaron sueltas: no hay «lunes y medio».' : 'Quisiste unir las familias por día; no hay «lunes y medio»: van sueltas.');
   const vp = ev.filter(e => e.kind === 'vertical-predict');
-  if (vp.length) { const ok = vp.filter(e => e.said === e.truth).length; seen.push(`Con la recta parada acertaste ${ok} de ${vp.length} dibujos.`); }
+  if (vp.length) {
+    const ok = vp.filter(e => e.said === e.truth).length, still = vp.filter(e => !e.moves).length;
+    seen.push(`Con la recta parada acertaste ${ok} de ${vp.length} dibujos${still ? `; en ${still === 1 ? 'uno' : still} decidiste sin moverla` : ', y la moviste antes de decidir'}.`);
+  }
   const ds = first('domain-story');
   if (ds) seen.push(ds.answer === 'int' ? 'Para el reparto de Rampa elegiste los enteros mayores que 2.' : 'Para el reparto de Rampa pensaste en más números; tiene sentido con enteros mayores que 2, aunque la cuenta acepte todos menos el 2.');
   const im = first('image-predict');

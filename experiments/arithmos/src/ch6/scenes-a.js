@@ -254,6 +254,7 @@ export const memoria = {
     await d.draw(w.get('d6-r0'), 0.6, {key: 'reveal'});
     const wrongLine = derivLine(w, 'd6-r1', 'x = 5 + 3 = 8', 1, {reveal: 0});
     await d.draw(wrongLine, 0.8, {key: 'reveal'});
+    d.describe('Escrito: x = 5 + 3 = 8.');
     r.setPose('idle', 0.4);
     g.setCinematic(false);
     await d.say('Recta', 'El 3 pasa al otro lado. Ocho.');
@@ -332,6 +333,7 @@ export const porCero = {
     await d.draw(l1, 0.8, {key: 'reveal'});
     const l2 = derivLine(w, 'd6-z2', '0 = 0', 2, {reveal: 0});
     await d.draw(l2, 0.5, {key: 'reveal'});
+    d.describe('Cuña escribe: 0 · (x − 3) = 0 · 5, y abajo, 0 = 0.');
     c.setPose('idle', 0.4);
     view.set(mulBoth(e0, 0), {L: '0 · (x − 3)', R: '0 · 5'});
     await d.wait(1.2);
@@ -352,8 +354,10 @@ export const porCero = {
     d.evidence('times-zero-eq', {answer: ans, solutions: solveLinear(mulBoth(e0, 0)).kind});
     await d.say('Mara', ans === 'all' ? 'La caja tiene ocho. No cualquier cosa.' : ans === 'nothing' ? 'Cambió todo: antes servía sólo el 8; ahora, cualquier cosa.' : 'La caja tiene ocho. El truco dice que cualquier cosa.');
     await d.think('Desde 0 = 0 no se puede volver: por cero no se deshace. Y lo que no se deshace puede hacer aparecer soluciones que no estaban.');
-    await d.say('student', 'Mara, x − 3 = 5 se cumple sólo con 8. Es una ecuación: pregunta qué x la cumplen. 0 · (x − 3) = 0 · 5 se cumple con cualquier x, como «ir tres para atrás y volver tres»: x − 3 + 3 = x. A una igualdad que vale para cualquier x se le dice identidad.');
-    await writeDeriv(d, g, 'd6-z3', 'vale para cualquier x: identidad', 3, {size: 26, ch: YELLOW});
+    await d.say('student', 'Mara, x − 3 = 5 se cumple sólo con 8. Es una ecuación: pregunta qué x la cumplen. Por cero, en cambio, todo da 0, con cualquier x: 0 = 0 se cumple siempre. A una igualdad que vale para cualquier x se le dice identidad. Otra: x − 3 + 3 = x, «ir tres para atrás y volver tres».');
+    w.add(new Label('d6-zeq', '← ecuación: sólo con 8', lx(LINE.from) + 200, GROUND - 400, {size: 22, z: 9, ch: YELLOW}));
+    d.describe('Al lado de x − 3 = 5 se anota: ecuación, sólo con 8.');
+    await writeDeriv(d, g, 'd6-z3', '0 = 0 vale para cualquier x: identidad', 3, {size: 26, ch: YELLOW});
     await d.say('student', 'El truco de Cuña cambió una ecuación por una identidad. Por eso cualquier caja parecía servir.');
     view.dispose();
     g.flags.c6zero = true;

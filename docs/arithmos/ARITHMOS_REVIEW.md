@@ -366,5 +366,26 @@ parciales por dos errores nuevos. 7.3b: todas las cuentas y dibujos correctos.
 | B15 | «Nombre:» en caps. 7 y 10 | Corregido (18 líneas) |
 | M13 (resto) | «que hayan salido llenas» con el balde 6 a medias | Corregido: «lo que salió antes no cambia lo que sale ahora» |
 
+## Revisión de lo nuevo del ciclo 8: 9.2, 9.4, 6.4, 12.1, 12.4 (rev-c8, 2026-10-07)
+
+Informe: `artifacts/arithmos/it11/review-c8-nuevas/informe.md` (matemática y agencia, sin navegador, con
+capturas y registros del bot).
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | Las Bitácoras leían evidencia de otros capítulos con el mismo nombre (12 tomaba la de 9.1; 5 escribía «undefined» con la de 4) | Corregido en las doce: cada Bitácora lee sólo la evidencia de sus escenas. Chequeo estático: ninguna depende de otro capítulo; la del 5 dice ahora «Cortaste las barras en 4» (`it11/r2-c45`) |
+| A2 | 9.2 se resolvía probando combinaciones; la segunda pieza se elegía a ciegas | Corregido: con la primera pieza sola, la pizarra muestra lo que da en cada renglón (2, 4, 6 al lado de 3, 5, 7); la pregunta repite la primera pieza; después de dos intentos, Mara señala el salto entre renglones; «=» y «≠» en cada renglón |
+| A3 | «otra cosa con el 5» cuando el 5 ya estaba probado | Corregido: «con uno que no probamos, como el 100» |
+| M1 | Bitácora 9, `rule-predict` | Corregido: cada rama dice lo que se eligió (20: faltó el + 1; 13: sumó lo mismo) |
+| M2–M3 | 9.4: decidir sin mirar sin volver atrás; entradas sin marca | Corregido: opción «Todavía no sé: sigo moviendo la recta»; la Bitácora dice si se decidió sin mover; marca 0 en cada eje y «en el medio, en la entrada 0» |
+| M4 | Definición de asíntota falsa en general | Corregido: «se acerca tanto como se quiera»; «esta no la toca nunca porque en el 2 no hay valor»; la del «¿cuántas veces?» también se nombra |
+| M5–M6 | √ descrita igual que el log; el reflejo sin un par legible | Corregido: «arranca en el 0 con valor 0; aquella, cerca del 0, baja sin fin»; ventana de 0 a 4 con (2, 4) y (4, 2) marcados (`it11/r3-c12`) |
+| M7 | «Reconociste las seis formas»; `bad` cuenta intentos | Corregido: «Uniste cada forma con su regla; N veces elegiste primero una regla que no era» |
+| M8 | 9.2 con salidas de dos cifras | Columna corrida; la del 10 sigue pasando por arriba un instante (animación) |
+| B1–B3 | 6.4: «como» como razón; rótulo «ecuación»; derivaciones de los personajes sin lector | Corregidos: frase separada; «← ecuación: sólo con 8» y «0 = 0 vale para cualquier x: identidad»; `d.describe` en 6.3, 6.4, 6.5 y 6.6 |
+| B4–B6 | 9.4: «a el círculo», guion ASCII, borde mudo; tangentes; «todas las entradas» | Corregidos: «al círculo», «−», aviso en el borde, «toca en un punto», «de punta a punta» |
+| B8, B10–B12 | Panel sin la primera pieza; intentos repetidos; «se corta»; espejo inexacto; la raya «en el 2» | Corregidos |
+| B7, B9 (en parte) | Rótulo «función» pegado al dibujo; contador lejos del dibujo de abajo | Pendientes (bajas) |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

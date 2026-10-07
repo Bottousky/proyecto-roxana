@@ -1,0 +1,52 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c6.caja"
+  },
+  "journal": [
+    "Veces",
+    "Partes de algo"
+  ],
+  "evidenceKinds": [
+    "predict-split",
+    "cut",
+    "distributive-transfer",
+    "share-two",
+    "unit-half",
+    "cut-uneven",
+    "share-bars",
+    "equiv-predict",
+    "equiv",
+    "equiv-transfer",
+    "equiv-names",
+    "line-partition",
+    "place-frac",
+    "predict-54",
+    "density",
+    "between",
+    "compare-unit",
+    "common-partition",
+    "compare-result",
+    "add-partition",
+    "add",
+    "store-half",
+    "read-205",
+    "decimal",
+    "percent-predict",
+    "percent",
+    "diag-try",
+    "diag-predict",
+    "diag"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 52.563,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

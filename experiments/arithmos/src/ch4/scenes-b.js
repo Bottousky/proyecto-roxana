@@ -572,7 +572,8 @@ export const partir = {
 };
 
 function writeJournal4(g) {
-  const ev = g.state.evidence.filter(e => (e.run || 1) === (g.state.run || 1));
+  // sólo lo de este capítulo: hay tipos de evidencia con el mismo nombre en otros (count, cut, scale…)
+  const ev = g.state.evidence.filter(e => (e.run || 1) === (g.state.run || 1) && (!e.seg || e.seg.startsWith('c4.')));
   const all = k => ev.filter(e => e.kind === k);
   const first = k => all(k)[0];
   const seen = [];

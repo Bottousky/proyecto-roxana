@@ -187,7 +187,7 @@ function pickChoice(prompt, options) {
     ['gira 30°, ¿a qué altura', 'A un tercio'],
     ['Girada 390°', 'Más que 1'],
     ['largo 6, con la misma inclinación', 'Sube 4'],
-    ['círculo puede ser', 'Puede ser'],
+    ['círculo puede ser', 'Todavía no sé', 'Puede ser'],
     ['La U acostada puede ser', 'No puede'],
     ['La U puede ser', 'Puede ser'],
     ['La recta puede ser', 'Puede ser'],

@@ -1,0 +1,64 @@
+[0.0s] escena → c9.maquina
+[1.0s] lee: Hice una máquina para las cuentas de los escalones: le doy un número, lo da vuelta adentro y sale otro. Adiviná qué hace.
+[5.9s] elige «× 3: el triple» (Armá la regla. Primero, ¿qué hace la máquina con el número?)
+[7.6s] elige «Nada más.» (Primero × 3. Y después, ¿qué le hace para que dé lo anotado?)
+[9.0s] lee: Con 2, tu regla da 6, pero salió 5. Esa no es.
+[10.2s] elige «× 2: el doble» (Armá la regla. Primero, ¿qué hace la máquina con el número?)
+[11.9s] elige «Nada más.» (Primero × 2. Y después, ¿qué le hace para que dé lo anotado?)
+[13.2s] lee: Con 1, tu regla da 2, pero salió 3. Esa no es.
+[14.0s] lee: Mirá cuánto cambia lo que sale cuando lo que entra sube uno. Y fijate qué le falta a la primera pieza para llegar.
+[14.6s] elige «× 2: el doble» (Armá la regla. Primero, ¿qué hace la máquina con el número?)
+[16.2s] elige «+ 1» (Primero × 2. Y después, ¿qué le hace para que dé lo anotado?)
+[17.5s] lee: Ahora coincide con todo lo anotado.
+[18.8s] elige «20: el doble.» (Si entra 10, ¿qué sale?)
+[20.1s] lee: Veintiuno: el doble más uno. Coincide, pero coincidir no prueba la regla: otra regla rara podría dar lo mismo con estos números y otra cosa con uno que no probamos, como el 100.
+[20.1s] lee: La hice yo: es el doble más uno. La armaste bien, y el 10 no la desmintió.
+[20.2s] lee: —Mara, tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo.
+[20.3s] lee: Punto también hizo una.
+[21.5s] lee: —Punto, el mismo 3 dio 7 y después 9. Con tu máquina no puedo anticipar nada: no es una función.
+[21.5s] lee: Punto mira su máquina un rato. Adentro tenía una ruedita que giraba sola.
+[21.6s] escena → c9.puntos
+[22.0s] lee: La tabla me sirve, pero quisiera verla de un vistazo.
+[22.0s] lee: —En el mapa de Mara: la hora por la recta acostada, la sombra por la parada.
+[24.7s] lee: —Punto, es linda, pero ¿a qué hora es esa ola? No sale de la tabla.
+[25.3s] elige «Unirlos con una curva linda, como la de Punto.» (¿Los puntos se unen?)
+[26.6s] lee: Unir sí, pero sin inventar: por los puntos. Lo de en medio es una suposición, no una medición.
+[26.6s] lee: Entonces a las 9 mi sombra es… más o menos 3. Casi, porque no lo medí.
+[26.7s] lee: Yo anoto cuántas familias vienen cada día al depósito: lunes 3, martes 5, miércoles 4.
+[27.3s] elige «Unidos, como los de Cornisa.» (¿Esos puntos se unen?)
+[27.7s] lee: —Mara, entre el lunes y el martes no hay un día a medias, ni media familia: si unimos, la línea dice cosas que no existen. Sueltos.
+[27.7s] escena → c9.recta
+[28.1s] lee: Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?
+[28.2s] lee: —Si fuera el gráfico de una máquina, a cada entrada le tocaría una sola salida.
+[28.2s] lee: Las entradas van sobre la recta acostada. Para mirar una entrada sola, poné una recta parada en ese lugar y contá cuántas veces corta el dibujo.
+[31.5s] elige «Puede ser: en cada entrada, una sola altura.» (¿La recta puede ser el gráfico de una máquina?)
+[33.2s] elige «Todavía no sé: sigo moviendo la recta.» (¿El círculo puede ser el gráfico de una máquina?)
+[34.2s] elige «Puede ser: en cada entrada, una sola altura.» (¿El círculo puede ser el gráfico de una máquina?)
+[37.1s] elige «Puede ser: en cada entrada, una sola altura.» (¿La U puede ser el gráfico de una máquina?)
+[39.4s] elige «No puede ser: hay una entrada con dos alturas.» (¿La U acostada puede ser el gráfico de una máquina?)
+[40.3s] lee: —Balcón, la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas.
+[40.4s] lee: La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál.
+[40.4s] escena → c9.dominio
+[41.4s] lee: Le pedí a Mara una máquina para mi reparto: entra cuántos vienen, sale lo que le toca a cada uno. 1 ÷ (x − 2), como en la escalera.
+[46.0s] lee: Con 2 se traba: abajo queda cero. Con todos los demás sale algo, aunque sea negativo.
+[46.6s] elige «Cualquier número menos el 2, como la máquina.» (Para el reparto de Rampa, ¿qué entradas tienen sentido?)
+[47.0s] lee: La máquina acepta −1 o 0, pero no vienen −1 personas ni cero. Para el reparto, enteros mayores que 2.
+[47.0s] lee: —Rampa, las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina.
+[47.1s] escena → c9.imagen
+[47.5s] lee: Esta máquina hace «por sí mismo»: x · x. Oval me pidió que le saque un −4 para una cuenta. ¿Qué le doy?
+[55.7s] elige «Sí: con −2, que es negativo.» (¿Puede salir −4?)
+[56.1s] lee: (−2) · (−2) da 4, no −4: menos por menos es más, como en el cap. 4.
+[56.2s] lee: —Mara, lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta.
+[56.4s] escena → c9.maneras
+[56.8s] lee: Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles.
+[59.3s] lee: —Mara, con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos.
+[59.4s] lee: Y la mía, la B, es diez más uno por día: 10 + d.
+[59.4s] escena → c9.vuelve
+[60.5s] lee: Seguí midiendo, varios días. Miren.
+[64.3s] lee: Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. El dibujo, además, achica esos huecos.
+[64.8s] elige «Más: cada día crece.» (Pasado mañana a las 10, ¿cuánto va a medir la sombra de Cornisa?)
+[65.2s] lee: —Cornisa, va a medir 2. Todos los días el sol da la misma vuelta y la sombra repite su vuelta. Medido no está, pero el patrón se repite.
+[65.3s] lee: Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.
+[65.4s] lee: Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.
+[65.6s] escena → c10.rueda
+[66.4s] {"ended":true,"final":{"mode":"play","seg":"c10.rueda"},"journal":["Depende"],"evidenceKinds":["machine","rule-try","rule-predict","punto-machine","rule","plot","join-predict","join-discrete","vertical-predict","vertical","domain-try","domain-story","domain","image-try","image-predict","image","match","three-ways","periodic-predict"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":66.384,"size":"1600x900","touch":false,"route":"errores","watch":false}

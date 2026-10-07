@@ -49,7 +49,7 @@ export const familias = {
       w.add(curve(`c12-th${i}`, c.f, c.xr, px, py, c.yr, {ch: WHITE, n: 60}));
       if (c.asym) w.add(new Drawing(`c12-as${i}`, Array.from({length: 6}, (_, k) => S([[px(c.asym), c.y + k * 15], [px(c.asym), c.y + k * 15 + 7]], seedOf(`c12-as${i}`) + k, {w: 1.6, p: 0.6, ch: BLUE, lift: false})), {z: 12}));
     }
-    d.describe('Seis formas: una ola; una recta que sube pareja; una curva cortada en dos, que no está definida en un lugar; una curva que empieza baja y se dispara; una U; y una curva que sube cada vez más despacio.');
+    d.describe('Seis formas: una ola; una recta que sube pareja; una curva partida en dos, que no está definida en un lugar; una curva que empieza baja y se dispara; una U; y una curva que sube cada vez más despacio.');
     await d.shot(SHOTS.tiles, 0.8);
     const done = new Set();
     const placed = new Set();
@@ -74,9 +74,10 @@ export const familias = {
       const c = cells[hc];
       const ax = c.x + (c.asym - c.xr[0]) / (c.xr[1] - c.xr[0]) * c.w;
       w.add(new Label('c12-asl', 'asíntota', ax - 4, c.y + 12, {size: 13, align: 'right', z: 13, ch: BLUE}));
-      d.describe('En la forma cortada, junto a la raya punteada, se escribe «asíntota».');
+      d.describe('En la forma partida, junto a la raya punteada, en el 2, donde no se puede repartir, se escribe «asíntota».');
     }
-    await d.say('student', 'Las que se cortan no están definidas en un lugar: el gráfico se corta ahí, y a eso se le dice discontinuidad. Cerca del corte se disparan, pegadas a la raya punteada sin tocarla nunca: esa raya se llama asíntota.');
+    await d.say('student', 'Las partidas no están definidas en un lugar: el gráfico se interrumpe ahí, y a eso se le dice discontinuidad. Cerca del 2 se disparan, y se acercan a la raya punteada tanto como se quiera: una raya así se llama asíntota. Esta no la tocan nunca, porque en el 2 no hay valor.');
+    await d.say('student', 'La del «¿cuántas veces?» también tiene una: cerca del 0 baja sin fin, pegada al eje parado.');
     await d.say('student', 'Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple.');
     d.evidence('families', {done: [...done]});
     g.flags.c12families = true;
@@ -259,21 +260,26 @@ export const encadenar = {
     await d.say('student', 'Mara, «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.');
     await studentWrites(d, g, 'c12-inv', '× 2 + 1  ↔  − 1, ÷ 2        x · x  ↔  √ (si x ≥ 0)', A.x0 + 20, A.y1 - 6, {size: 17});
     // la raíz, dibujada: el gráfico de x · x (con x ≥ 0) dado vuelta sobre la diagonal
-    const gb = {x: A.x0 + 330, y: A.y0 + 110, w: 110, h: 110};
-    const ga = axes(w, 'c12-rg', gb, [0, 3], [0, 3], {xticks: [1, 2, 3], yticks: [1, 2, 3]});
-    w.add(new Drawing('c12-rd', Array.from({length: 10}, (_, k) => S([[ga.px(k * 0.3), ga.py(k * 0.3)], [ga.px(k * 0.3 + 0.15), ga.py(k * 0.3 + 0.15)]], seedOf('c12-rd') + k, {w: 2, p: 0.85, ch: BLUE, lift: false})), {z: 12}));
+    const gb = {x: A.x0 + 330, y: A.y0 + 110, w: 104, h: 104};
+    const ga = axes(w, 'c12-rg', gb, [0, 4], [0, 4], {xticks: [2, 4], yticks: [2, 4]});
+    w.add(new Drawing('c12-rd', Array.from({length: 10}, (_, k) => S([[ga.px(k * 0.4), ga.py(k * 0.4)], [ga.px(k * 0.4 + 0.2), ga.py(k * 0.4 + 0.2)]], seedOf('c12-rd') + k, {w: 2, p: 0.85, ch: BLUE, lift: false})), {z: 12}));
     g.setCinematic(true);
-    const sqc = w.add(curve('c12-rsq', x => x * x, [0, 3], ga.px, ga.py, [0, 3], {ch: WHITE, n: 30}));
+    const sqc = w.add(curve('c12-rsq', x => x * x, [0, 2], ga.px, ga.py, [0, 4], {ch: WHITE, n: 30}));
     sqc.progress = 0;
     await d.draw(sqc, 0.6, {sound: false});
-    const rtc = w.add(curve('c12-rrt', x => Math.sqrt(x), [0, 3], ga.px, ga.py, [0, 3], {ch: YELLOW, n: 30}));
+    w.add(new Shape('c12-r24', dot('c12-r24', 4, WHITE), ga.px(2), ga.py(4), {z: 14}));
+    w.add(new Label('c12-r24l', '(2, 4)', ga.px(2) - 8, ga.py(4) + 4, {size: 13, align: 'right', z: 14}));
+    const rtc = w.add(curve('c12-rrt', x => Math.sqrt(x), [0, 4], ga.px, ga.py, [0, 4], {ch: YELLOW, n: 40}));
     rtc.progress = 0;
     await d.draw(rtc, 0.6, {sound: false});
-    w.add(new Label('c12-rsql', 'x · x', ga.px(1.2) - 8, ga.py(2.2), {size: 14, align: 'right', z: 13}));
-    w.add(new Label('c12-rrtl', '√x', ga.px(2.4), ga.py(1.55) - 12, {size: 15, align: 'center', z: 13, ch: YELLOW}));
+    w.add(new Shape('c12-r42', dot('c12-r42', 4, YELLOW), ga.px(4), ga.py(2), {z: 14}));
+    w.add(new Label('c12-r42l', '(4, 2)', ga.px(4) + 6, ga.py(2) + 16, {size: 13, z: 14, ch: YELLOW}));
+    w.add(new Label('c12-rsql', 'x · x', ga.px(0.15), ga.py(3.1), {size: 14, z: 13}));
+    w.add(new Label('c12-rrtl', '√x', ga.px(2.8), ga.py(1.67) - 10, {size: 15, align: 'center', z: 13, ch: YELLOW}));
     g.setCinematic(false);
-    d.describe('Un mapa chico, de 0 a 3 en los dos ejes: x · x en blanco, la raíz en amarillo y la diagonal punteada en azul. Las dos curvas son una el reflejo de la otra sobre la diagonal.');
-    await d.say('student', 'Dibujadas para x desde 0, la raíz es x · x dada vuelta sobre la diagonal: se cambian la entrada y la salida. Cada punto (a, b) de una es el (b, a) de la otra. Es la familia de las raíces: sube cada vez más despacio.');
+    d.describe('Un mapa chico, de 0 a 4 en los dos ejes: x · x en blanco hasta (2, 4), la raíz en amarillo hasta (4, 2), y la diagonal punteada en azul. Las dos curvas son una el reflejo de la otra sobre la diagonal.');
+    await d.say('student', 'Dibujadas para x desde 0, la raíz es x · x dada vuelta sobre la diagonal: se cambian la entrada y la salida. 2 va a 4 en una; 4 vuelve a 2 en la otra: (2, 4) y (4, 2). Cada punto (a, b) de una es el (b, a) de la otra.');
+    await d.say('student', 'Es la familia de las raíces. Como la del «¿cuántas veces?», sube cada vez más despacio, pero arranca en el 0 con valor 0; aquella, cerca del 0, baja sin fin.');
     g.flags.c12inverse = true;
   },
 };

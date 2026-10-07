@@ -45,6 +45,7 @@ export const cuadrado = {
     g.setCinematic(true);
     const l1 = derivLine(w, 'd6-q1', 'x · x = 9', 1, {reveal: 0});
     await d.draw(l1, 0.6, {key: 'reveal'});
+    d.describe('Escrito: x · x = 9.');
     view.set(squareBoth(e0), {L: 'x · x', R: '9'});
     await d.wait(1);
     g.setCinematic(false);
@@ -94,6 +95,7 @@ export const dividir = {
     await d.draw(l1, 0.7, {key: 'reveal'});
     const l2 = derivLine(w, 'd6-v2', 'x = 1', 2, {reveal: 0});
     await d.draw(l2, 0.4, {key: 'reveal'});
+    d.describe('Escrito: (x · x) ÷ x = x ÷ x, y abajo, x = 1.');
     g.setCinematic(false);
     const c = await d.choose([
       {id: 'yes', text: 'Sí: 0 · 0 = 0.'},
@@ -333,7 +335,8 @@ export const dosPasos = {
 const fmtNum = n => (Number.isInteger(n) ? String(n).replace('-', '−') : String(n).replace('.', ',').replace('-', '−'));
 
 function writeJournal6(g) {
-  const ev = g.state.evidence.filter(e => (e.run || 1) === (g.state.run || 1));
+  // sólo lo de este capítulo: hay tipos de evidencia con el mismo nombre en otros (count, cut, scale…)
+  const ev = g.state.evidence.filter(e => (e.run || 1) === (g.state.run || 1) && (!e.seg || e.seg.startsWith('c6.')));
   const first = k => ev.find(e => e.kind === k);
   const all = k => ev.filter(e => e.kind === k);
   const seen = [];
