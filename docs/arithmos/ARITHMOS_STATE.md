@@ -70,6 +70,12 @@ Actualizado: 2026-10-07 (ciclo 9 del loop).
   ayuda que anticipe. **9.8** con el tiempo a escala (24 horas por día). Bajas de rev-c8 (B7, B9). Revisión
   independiente rev-c9 (8.7, 8.8, 10.3, 11.4, 12.8): dos altas en 10.3 (id repetido que borraba la raya, Bitácora que
   decía «no se sabía»), ocho medias y 17 bajas; aplicadas todas menos las que quedan anotadas en ARITHMOS_REVIEW.md.
+- **Más del ciclo 9:** **8.1** (la prueba de √2): el jugador elige la esquina de cada cuadrado de q (vecinas o encimados
+  dan rectángulos, opuestas dan cuadrados) y toca qué tiene tanto lugar como lo pisado dos veces; **8.4**: agrega él el
+  piso de arriba mirando la caja de costado; **7.1**: vuelve a elegir las filas; **7.5**: elige el borde de cada tira;
+  **7.6**: empieza con cinco cuadraditos y comprueba que ningún par cierra; **cap. 6** en teléfono: los lugares de la
+  recta son contiguos y no se pisan. Revisión rev-c9b (8.1, 8.4–8.7, 9.8): la matemática estaba bien; una alta de
+  interacción (8.1 sin indicación de dónde tocar) y seis medias, corregidas y verificadas (\`it12/rc9b\`).
 - **Entorno (ciclo 9):** la máquina entra en ciclos de suspensión de ~15 minutos (pmset: «Sleep Service Back to
   Sleep»); las corridas se cortan a la mitad y se repiten. Se priorizan corridas por capítulo.
 - **Entorno:** la máquina se suspendió de madrugada (≈ 01:30–02:00); dos corridas y una revisión se cortaron
@@ -110,8 +116,7 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
    (la máquina estaba a batería y suspendiéndose; el primer tramo llegó al límite de 2 h en 9.1): 1.1 → 8.8 sin errores
    (`it12/full-tel-c9`) y 8.7 → 12.8 sin errores hasta el último toque, que venció durante una suspensión
    (`it12/full-tel-c9b`); 12.8 se repitió sola y terminó bien (`it12/c128-tel`). Falta la de una vez y la directa.
-2. Agencia que queda en el cap. 8: 8.2 (las puntas van solas a la línea; la paralela la traza el juego); segundas
-   predicciones en 8.1 y 8.6. Revisión independiente de 8.1 nuevo (el jugador elige las esquinas de los cuadrados de
-   q y con qué se compara lo pisado): toca una prueba.
+2. Agencia que queda: 8.2 (las puntas van solas a la línea; la paralela la traza el juego); los triángulos de 7.1;
+   segundas predicciones en 8.1 y 8.6. Revisión independiente de 7.1, 7.5 y 7.6 nuevos.
 3. Pendientes de narrativa por capítulo (N2-R, N6-R, N7-R, N8-R, N10-12): Punto como personaje, voces, costuras.
 4. Lo que no se puede hacer en forma autónoma: escuchar el audio y probar con personas.
