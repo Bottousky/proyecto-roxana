@@ -729,6 +729,9 @@ for (let iter = 0; iter < 30000; iter++) {
       if (route === 'errores' && !tried.has('sc3a') && spots.some(x => x.id === 'sc-z0')) { tried.add('sc3a'); target = spots.find(x => x.id === 'sc-z0'); }
       else if (route === 'errores' && !tried.has('sc3b') && ok) { tried.add('sc3b'); target = ok; }
       else target = zs[0] || ok;
+    } else if (s.seg === 'c7.areas' && spots.some(x => x.id.startsWith('ar-slot'))) {
+      // la tira elegida va al primer borde libre (paradas primero, después acostadas)
+      target = spots.find(x => x.id.startsWith('ar-slot'));
     } else if (s.seg === 'c7.areas' && spots.some(x => x.id.startsWith('ar-pick-'))) {
       const seq = route === 'errores' ? ['x2', 'x', 'x', 'x', 'x', 'x', 'x', 'u', 'u', 'u', 'u', 'u', 'u'] : ['x2', 'x', 'x', 'x', 'x', 'x', 'u', 'u', 'u', 'u', 'u', 'u'];
       const k = seq[areaTaps++] || 'u';
@@ -833,6 +836,9 @@ for (let iter = 0; iter < 30000; iter++) {
     } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id.startsWith('c11-s'))) {
       target = spots[0];
       c11Item = target.id.replace('c11-s', '');
+    } else if (s.seg === 'c7.lado' && spots.some(x => x.id.startsWith('rows-'))) {
+      // con errores, primero una fila (Peldaño protesta y se vuelve a elegir)
+      target = spots.find(x => x.id === (route === 'errores' && spots.some(y => y.id === 'rows-1') ? 'rows-1' : 'rows-3'));
     } else if (s.seg === 'c8.diagonal' && spots.some(x => x.id.startsWith('c8-cor-'))) {
       // esquinas de los cuadrados de q: con errores, primero dos vecinas (rectángulos) y después opuestas
       const seq = route === 'errores' ? ['tl', 'tr', 'tl', 'br'] : ['tl', 'br'];

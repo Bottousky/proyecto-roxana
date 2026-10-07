@@ -62,12 +62,6 @@ export const lado = {
     }
     d.describe('En la pizarra, nueve cuadraditos en fila.');
     await d.shot(SHOTS.tiles, 0.8);
-    const rows = await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => ['Elegí en cuántas filas acomodar los nueve cuadros. Peldaño la quiere cuadrada.']);
-      const opts = [1, 3, 9];
-      g.ui.setSpots(opts.map((n, i) => wordSpot(`rows-${n}`, n === 1 ? 'en 1 fila' : `en ${n} filas`, A.x0 + 70 + i * 150, A.y0 + 24, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(n); } }, {label: `Acomodar los nueve cuadros en ${n === 1 ? 'una fila' : `${n} filas`}`})));
-    }));
-    d.evidence('square-rows', {rows});
     const arrange = async n => {
       const cols = 9 / n;
       d.describe(`Los nueve cuadros se acomodan en ${n} ${n === 1 ? 'fila' : 'filas'} de ${cols}.`);
@@ -77,11 +71,19 @@ export const lado = {
         return d.tween(0.6, q => { c.x = lerp(sx, tx, q); c.y = lerp(sy, ty, q); }, easeInOut);
       }));
     };
-    if (rows !== 3) {
+    // el jugador elige las filas; si no queda cuadrada, Peldaño protesta y vuelve a elegir
+    const opts = [1, 3, 9];
+    for (;;) {
+      const rows = await d.interact(ctl => new Promise(resolve => {
+        g.setHint(() => ['Elegí en cuántas filas acomodar los nueve cuadros. Peldaño la quiere cuadrada.', 'Cuadrada: tantas filas como cuadros en cada fila.']);
+        g.ui.setSpots(opts.map((n, i) => wordSpot(`rows-${n}`, n === 1 ? 'en 1 fila' : `en ${n} filas`, A.x0 + 70 + i * 150, A.y0 + 24, () => { if (ctl.alive()) { g.ui.setSpots([]); g.setHint(null); resolve(n); } }, {label: `Acomodar los nueve cuadros en ${n === 1 ? 'una fila' : `${n} filas`}`})));
+      }));
+      d.evidence('square-rows', {rows});
       await arrange(rows);
+      if (rows === 3) break;
       await d.say('Peldaño', rows === 1 ? 'Eso es un pasillo, no una huerta cuadrada.' : 'Una columna larguísima. Cuadrada, dije.');
+      opts.splice(opts.indexOf(rows), 1);
     }
-    await arrange(3);
     await d.say('student', 'Tres filas de tres: el lado mide 3. Punto, tres por tres es nueve: tres es la raíz de nueve.');
     await studentWrites(d, g, 'c7-r9', '√9 = 3', A.x0 + 220, A.y0 + 110, {size: 34});
     await d.say('Mara', 'En la cuenta de Oval, x · x = 9 también daba −3.');

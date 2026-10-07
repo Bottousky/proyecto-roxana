@@ -257,7 +257,7 @@ en el commit siguiente (evidencia: `artifacts/arithmos/it08/c71-trace` ruta dire
 | mat | M10 | Bitácora: objetos, exageraciones, atribuciones | Corregido en párrafos 1, 2 y 4 y en las ramas de «lo que pasó» |
 | mat | M7, M11 | Completar el cuadrado con un solo b; cobertura de E (propiedades de potencias, otras raíces, √(x²) = |x|, sucesiones, racionales) | Pendiente (backlog C7b) |
 | mat | B | «faltan una tira», «Las otras 1» | Corregido |
-| narr | A2 | El juego da el paso decisivo | Parcial: en 7.4 se puede contar el 3 (el error de Punto) y tiene consecuencia; en 7.9 se prueban 0 y 1. Pendiente: 7.1, 7.5, 7.6 |
+| narr | A2 | El juego da el paso decisivo | Parcial: en 7.4 se puede contar el 3 (el error de Punto) y tiene consecuencia; en 7.9 se prueban 0 y 1. Ciclo 9: en 7.1 las filas que no son 3 ya no se corrigen solas (Peldaño protesta y el jugador vuelve a elegir); en 7.5 el jugador elige en qué borde va cada tira, parada al costado o acostada abajo, con los lugares libres marcados (`it12/c7-errores`). Pendiente: los triángulos de 7.1 y 7.6 |
 | narr | A4 | 7.8 ya resuelto por la tabla de 7.2 | Corregido: 7.2 termina en el día 8 (256) |
 | narr | A5 | Teléfono | Parcial: interacciones en plano cercano, botones separados, guarda de superposición; pendiente: predicciones lejanas en 7.5 y 7.7 |
 | narr | A1, M1–M10 | Plantilla, Punto oyente, voces, la Marea, opciones, costuras, composición, Bitácora | Pendientes (backlog N7-R) |

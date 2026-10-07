@@ -486,27 +486,49 @@ export const areas = {
     await d.shot(SHOTS.tiles, 0.8);
     const slots = slotsFor(ox, oy, 2, 3);
     const used = new Set();
+    // el jugador elige la ficha y, para las tiras, en qué borde va (parada al costado o acostada abajo)
     await d.interact(ctl => new Promise(resolve => {
-      let busy = false;
-      g.setHint(() => ['Tocá una ficha de la bandeja: va al lugar libre que le corresponde en la huerta.', 'Cuando la huerta esté llena, se cuentan las fichas.']);
-      const refresh = () => g.ui.setSpots(pieces.filter(t => !t.placed).map(t => rectSpot(`ar-pick-${t.kind}-${t.id}`, `Ficha: ${tileName(t.kind)}`, () => ({x: t.x, y: t.y, w: t.w2, h: t.h2}), () => put(t))));
-      const put = async t => {
+      let busy = false, sel = null;
+      g.setHint(() => ['Tocá una ficha de la bandeja. Las tiras, después, tocá dónde van en la huerta.', 'Las tiras son los bordes nuevos: al costado y abajo del x por x.']);
+      const freeFor = kind => slots.map((sl, i) => ({sl, i})).filter(({sl, i}) => !used.has(i) && sl.kind === kind);
+      const rectOf = sl => (sl.kind === 'x2' ? {x: sl.x, y: sl.y, w: T.X, h: T.X} : sl.kind === 'u' ? {x: sl.x, y: sl.y, w: T.U, h: T.U} : sl.vertical ? {x: sl.x, y: sl.y, w: T.U, h: T.X} : {x: sl.x, y: sl.y, w: T.X, h: T.U});
+      const ghosts = () => {
+        w.removeWhere(o => /^ar-g\d/.test(o.id));
+        if (sel) freeFor(sel.kind).forEach(({sl, i}) => { const r = rectOf(sl); outline(w, `ar-g${i}`, r.x + 3, r.y + 3, r.w - 6, r.h - 6); });
+      };
+      const refresh = () => {
+        ghosts();
+        const spots = pieces.filter(t => !t.placed).map(t => rectSpot(`ar-pick-${t.kind}-${t.id}`, `Ficha: ${tileName(t.kind)}`, () => ({x: t.x, y: t.y, w: t.w2, h: t.h2}), () => pick(t), {selected: sel === t}));
+        if (sel) freeFor(sel.kind).forEach(({sl, i}) => spots.push(rectSpot(`ar-slot${i}`, `Poner la tira ${sl.vertical ? 'parada, al costado del x por x' : 'acostada, abajo del x por x'}`, rectOf(sl), () => put(i))));
+        g.ui.setSpots(spots);
+      };
+      const put = async i => {
+        if (busy || !ctl.alive() || !sel) return;
+        busy = true;
+        g.ui.setSpots([]);
+        const t = sel;
+        sel = null;
+        used.add(i);
+        t.placed = true;
+        w.removeWhere(o => /^ar-g\d/.test(o.id));
+        try { await moveTile(d, t, slots[i], 0.45); } catch { return; }
+        g.audio.tap(0.15, 1.3 + used.size * 0.03);
+        d.evidence('expand-place', {kind: t.kind, vertical: !!slots[i].vertical});
+        busy = false;
+        if (used.size === slots.length) { g.ui.setSpots([]); resolve(); } else refresh();
+      };
+      const pick = t => {
         if (busy || !ctl.alive()) return;
-        const k = slots.findIndex((sl, i) => !used.has(i) && sl.kind === t.kind);
-        if (k < 0) {
+        const free = freeFor(t.kind);
+        if (!free.length) {
           g.note(t.kind === 'x2' ? 'El x por x ya está puesto.' : t.kind === 'x' ? 'Los bordes ya tienen todas sus tiras: esa sobra.' : 'La esquina ya está llena: ese cuadradito sobra.');
           d.evidence('expand-extra', {kind: t.kind});
           return;
         }
-        busy = true;
-        g.ui.setSpots([]);
-        used.add(k);
-        t.placed = true;
-        try { await moveTile(d, t, slots[k], 0.45); } catch { return; }
-        g.audio.tap(0.15, 1.3 + used.size * 0.03);
-        busy = false;
-        if (used.size === slots.length) { g.ui.setSpots([]); resolve(); }
-        else refresh();
+        sel = t;
+        // el x por x y los cuadraditos no tienen dónde elegir: van solos al primer lugar libre
+        if (t.kind !== 'x') { put(free[0].i); return; }
+        refresh();
       };
       refresh();
     }));
