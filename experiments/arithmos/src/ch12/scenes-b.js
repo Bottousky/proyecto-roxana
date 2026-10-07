@@ -5,6 +5,8 @@ import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {jump, avgRate, riemann, tariff} from '../logic/anticipate.js';
 import {Drawing, Label, Shape, SHOTS, area, boardCast, clean, poly, dot, S, seedOf, WHITE, YELLOW, BLUE, dec, axes, curve} from './common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
+import {RONDA_IDS, rondaDot, rondaDance} from '../ch1/common.js';
+import {GROUND} from '../ch9/common.js';
 
 // ——————————————————————————————————————————————
 // 12.5 Qué tan rápido
@@ -340,6 +342,18 @@ export const final = {
     d.evidence('punto-name', {});
     await d.say('student', 'Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto.');
     await pulse(d, p, 2, 0.4).catch(() => {});
+    // la última imagen: la Ronda baila en las Terrazas, como el primer día, y Punto se suma
+    const dance = {cx: 15080, cy: GROUND - 60, r: 80};
+    RONDA_IDS.forEach((id, i) => { const r = rondaDot(w, i); r.x = dance.cx + Math.cos(i / 12 * Math.PI * 2) * dance.r; r.y = dance.cy; r.fade = 0; });
+    rondaDance(w, {speed: 0.5, ...dance});
+    await d.shot({x: 14000, y: GROUND - 520, w: 1500, h: 600}, 1.6);
+    await d.all(...RONDA_IDS.map(id => d.fadeTo(w.get(id), 1, 0.8)));
+    d.describe('En las Terrazas, la Ronda baila en ronda, como el primer día: doce puntos blancos, y el más chico se atrasa y alcanza.');
+    g.audio.punto('happy');
+    await zip(d, p, dance.cx + dance.r + 24, dance.cy - 20, 0.9).catch(() => {});
+    rondaDance(w, {speed: 0.5, ...dance, ids: [...RONDA_IDS, 'punto']});
+    d.describe('Punto baja y se suma a la ronda.');
+    await d.think('La Ronda baila otra vez, como el primer día. Punto se suma a la vuelta, un paso adelante.').catch(() => {});
     if (!replay) writeJournal12(g);
     g.flags.c12final = true;
     g.flags.gameDone = true;
