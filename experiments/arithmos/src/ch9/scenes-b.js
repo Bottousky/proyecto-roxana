@@ -274,8 +274,12 @@ export const vuelve = {
       const line = w.add(new Drawing(`c9-v${k}`, [S(DAY.map(([h, v]) => [px(k, h), py(v)]), seedOf(`c9-v${k}`), {w: 2.4, p: 0.9, ch: YELLOW})], {z: 13, progress: 0}));
       DAY.forEach(([h, v]) => w.add(new Shape(`c9-vd${k}${h}`, dot(`c9-vd${k}${h}`, 4), px(k, h), py(v), {z: 14})));
       w.add(new Label(`c9-vl${k}`, `día ${k + 1}`, px(k, 12), py(0) + 22, {size: 17, align: 'center', z: 12, ch: BLUE}));
-      // la noche que sigue: sin medir (y de noche no hay sombra)
-      if (k < 2) w.add(new Label(`c9-vn${k}`, 'noche', px(k, 24), py(0) + 22, {size: 14, align: 'center', z: 12, ch: BLUE, fade: 0.7}));
+      // las horas medidas de ese día, y la noche que sigue (de 20 a 6, sin sol; de 16 a 20 y de 6 a 8 hay sombra pero no se midió)
+      if (k > 0) w.add(new Drawing(`c9-vt${k}`, [8, 10, 12, 14, 16].map((h, i) => S([[px(k, h), py(0) - 3], [px(k, h), py(0) + 3]], seedOf(`c9-vt${k}`) + i, {w: 1.6, p: 0.7, ch: BLUE, lift: false})), {z: 12}));
+      if (k < 2) {
+        w.add(new Drawing(`c9-vnb${k}`, [S([[px(k, 20), py(0) + 6], [px(k, 20), py(0) + 12], [px(k, 30), py(0) + 12], [px(k, 30), py(0) + 6]], seedOf(`c9-vnb${k}`), {w: 1.4, p: 0.6, ch: BLUE, lift: false})], {z: 12, fade: 0.7}));
+        w.add(new Label(`c9-vn${k}`, 'noche', px(k, 25), py(0) + 30, {size: 14, align: 'center', z: 12, ch: BLUE, fade: 0.7}));
+      }
       await d.draw(line, 0.6, {sound: false});
     };
     await drawDay(0);
@@ -302,6 +306,7 @@ export const vuelve = {
         busy = false;
         if (k === 2) {
           // el jugador mira él mismo el punto de las 10 del día 2
+          try { await d.say('Cornisa', 'Fijate el día 2: ¿cuánto midió a las 10? Tocá ese punto.'); } catch { return; }
           g.setHint(() => ['Tocá el punto de las 10 del día 2: el segundo punto de esa ve.']);
           const at10 = DAY.find(([h]) => h === 10);
           g.ui.setSpots([rectSpot('c9-d2at10', 'El punto de las 10 del día 2', {x: px(1, 10) - 16, y: py(at10[1]) - 16, w: 32, h: 32}, () => {
@@ -327,7 +332,7 @@ export const vuelve = {
     ], {prompt: 'Dentro de diez días, a las 8, ¿cuánto va a medir?', evaluate: true});
     d.evidence('periodic-transfer', {answer: c2});
     await d.say('student', c2 === '4' ? 'Cornisa, si el sol sigue haciendo el mismo recorrido, unos 4. No es una medición: es anticipar. En diez días lo medimos y vemos.' : c2 === 'more' ? 'Cornisa, los días medidos no crecieron: repitieron la ve. Si el sol sigue igual, unos 4. Es anticipar, no medir: en diez días lo medimos y vemos.' : 'Cornisa, medido no está. Anticipado sí, suponiendo que el sol repite su recorrido: unos 4. En diez días lo medimos y vemos.');
-    await d.think('Lo que se repite se puede anticipar. Mientras el sol dé la misma vuelta: en invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.');
+    await d.think('Lo que se repite se puede anticipar, mientras el sol dé la misma vuelta. En invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga.');
     if (!replay) writeJournal9(g);
     await d.say('Mara', 'Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera.');
     g.audio.punto('question');

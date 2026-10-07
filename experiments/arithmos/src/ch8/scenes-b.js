@@ -47,7 +47,7 @@ export const cerca = {
     const fx = A.x0 + 24, fy = A.y0 + 30;
     const all = rectsWithPerimeter(12);
     const tried = [];
-    const table = (a, b, ar, i) => w.add(new Label(`c8-row${a}`, `${a} × ${b}:  tierra ${ar}`, A.x0 + 214, A.y0 + 40 + i * 30, {size: 20, z: 12, ch: ar === 9 ? YELLOW : undefined}));
+    const table = (a, b, ar, i) => w.add(new Label(`c8-row${a}`, `${a} × ${b}:  tierra ${ar}`, A.x0 + 214, A.y0 + 40 + i * 30, {size: 20, z: 12}));
     const show = a => {
       const b = 6 - a;
       w.removeWhere(o => o.id.startsWith('c8-f'));
@@ -73,9 +73,9 @@ export const cerca = {
     let current = null, early = 0;
     for (;;) {
       const pick = await d.interact(ctl => new Promise(resolve => {
-        g.setHint(() => [current ? 'Probá otro ancho, o tocá «armar esta» si es la que encierra más tierra.' : 'Elegí el ancho de la huerta: el largo sale solo, porque la cerca es siempre la misma. Mirá cuánta tierra queda adentro.']);
-        const spots = [1, 2, 3, 4, 5].filter(a => a !== current).map(a => wordSpot(`c8-w${a}`, String(a), A.x1 - 140 + ((a - 1) % 2) * 100, A.y0 + 44 + Math.floor((a - 1) / 2) * 58, () => { if (ctl.alive()) resolve(a); }, {label: `Armar la huerta de ${a} de ancho`}));
-        if (current && tried.length >= 2) spots.push(wordSpot('c8-build', 'armar esta', A.x1 - 90, A.y0 + 232, () => { if (ctl.alive()) resolve('build'); }, {label: `Armar la de ${current} por ${6 - current}: es la que encierra más`}));
+        g.setHint(() => [current && tried.length >= 2 ? 'Probá otro ancho, o tocá «armar esta» si es la que encierra más tierra.' : current ? 'Probá otro ancho y compará cuánta tierra queda adentro.' : 'Elegí el ancho de la huerta: el largo sale solo, porque la cerca es siempre la misma. Mirá cuánta tierra queda adentro.']);
+        const spots = [1, 2, 3, 4, 5].filter(a => a !== current).map(a => wordSpot(`c8-w${a}`, String(a), A.x1 - 140 + ((a - 1) % 2) * 100, A.y0 + 44 + Math.floor((a - 1) / 2) * 58, () => { if (ctl.alive()) resolve(a); }, {label: `Probar la huerta de ${a} de ancho`}));
+        if (current && tried.length >= 2) spots.push(wordSpot('c8-build', 'armar esta', A.x1 - 90, A.y0 + 232, () => { if (ctl.alive()) resolve('build'); }, {label: `Armar la de ${current} por ${6 - current}`}));
         g.ui.setSpots(spots);
       }));
       g.setHint(null);
@@ -83,7 +83,7 @@ export const cerca = {
         d.evidence('fence-build', {a: current, area: current * (6 - current)});
         if (current === 3) break;
         early++;
-        await d.say('Rampa', early === 1 ? `Con ${current} por ${6 - current} me entran ${current * (6 - current)}. ¿No habrá una que encierre más con los mismos doce tramos?` : `${current * (6 - current)} otra vez. Probá la más pareja, la que tiene el ancho igual al largo.`);
+        await d.say('Rampa', early === 1 ? `Con ${current} por ${6 - current} me entran ${current * (6 - current)}. ¿No habrá una que encierre más con los mismos doce tramos?` : `Con ${current} por ${6 - current}, ${current * (6 - current)}: tampoco es la que más encierra. Probá la más pareja, la que tiene el ancho igual al largo.`);
         continue;
       }
       current = pick;
@@ -96,9 +96,18 @@ export const cerca = {
       g.audio.tap(0.15, 1 + ar * 0.05);
       await d.wait(0.4);
     }
+    // la cuadrada se marca, y se anotan los anchos que no se probaron: así se ven todos los rectángulos de doce tramos
+    w.get('c8-row3').ch = YELLOW;
+    const missing = [1, 2, 3, 4, 5].filter(a => !tried.includes(a));
+    if (missing.length) {
+      await d.say('Rampa', 'Anotemos las que faltan.');
+      missing.forEach((a, k) => table(a, 6 - a, a * (6 - a), tried.length + k));
+      d.describe(`Se anotan las huertas que faltaban: ${missing.map(a => `${a} × ${6 - a}, tierra ${a * (6 - a)}`).join('; ')}.`);
+      await d.wait(0.6);
+    }
     const best = all.reduce((top, r) => (r.area > top.area ? r : top));
-    const seenAreas = [...new Set(tried.map(a => a * (6 - a)))].sort((x, y) => x - y);
-    await d.think(`La misma cerca y la tierra va de ${seenAreas[0]} a ${seenAreas[seenAreas.length - 1]}. ${pre === 'same' ? 'No es la misma: depende de la forma.' : 'Depende de la forma.'} De los rectángulos con doce tramos, el cuadrado de tres por tres es el que más encierra.`);
+    const seenAreas = [...new Set([1, 2, 3, 4, 5].map(a => a * (6 - a)))].sort((x, y) => x - y);
+    await d.think(`La misma cerca y la tierra va de ${seenAreas[0]} a ${seenAreas[seenAreas.length - 1]}. ${pre === 'same' ? 'No es la misma: depende de la forma.' : 'Depende de la forma.'} De los rectángulos con doce tramos enteros, el cuadrado de tres por tres es el que más encierra.`);
     // Punto se corrige solo
     g.setCinematic(true);
     await pulse(d, p, 1, 0.3);
@@ -221,7 +230,9 @@ export const pitagoras = {
         g.audio.tap(0.15, 1.1 + found.size * 0.1);
         d.describe(`Libre: un cuadrado de ${f.n} por ${f.n}, ${f.n * f.n} cuadros.`);
         if (found.size === free.length) { g.setHint(null); resolve(); } else refresh();
-      })));
+      })).concat([[bx + sa, by, sb, sa], [bx, by + sa, sa, sb]].map(([x, y, rw, rh], k) => rectSpot(`c8-trir${k}`, 'Un rectángulo de dos triángulos', {x: x + 4, y: y + 4, w: rw - 8, h: rh - 8}, () => {
+        if (ctl.alive()) g.note('Ahí hay dos triángulos. Buscá lo que no tiene ninguno encima.');
+      }))));
       refresh();
     }));
     d.describe('Lo libre ahora son dos cuadrados: uno de 3 por 3 y otro de 4 por 4.');
@@ -379,16 +390,24 @@ export const casas = {
       S([[px(-1), py(-1)], [px(3), py(2)]], seedOf('c8-l3'), {w: 3, p: 0.95, ch: YELLOW}),
     ], {z: 13, progress: 0}));
     await d.draw(legs, 0.9, {sound: false});
-    // y ahora derecho, por la amarilla
+    // Punto vuelve a lo de Peldaño (sin desandar el camino) para ir derecho después
     if (p) {
-      await zip(d, p, px(-1), py(-1) - 14, 0.4).catch(() => {});
-      await zip(d, p, px(3), py(2) - 14, 0.9).catch(() => {});
-      g.audio.punto('happy');
-      follow(p, st);
+      await d.fadeTo(p, 0, 0.3).catch(() => {});
+      p.x = px(-1);
+      p.y = py(-1) - 14;
+      await d.fadeTo(p, 1, 0.3).catch(() => {});
     }
     g.setCinematic(false);
     d.describe('Entre las dos casas, un triángulo con ángulo recto: 4 por la acostada, 3 por la parada, y el camino derecho en amarillo.');
     await d.say('student', `Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide ${dist.d}.`);
+    if (p) {
+      g.setCinematic(true);
+      try { await walkLeg([px(-1), py(-1)], [px(3), py(2)], 5); } catch { /* escena interrumpida */ }
+      g.audio.punto('happy');
+      follow(p, st);
+      g.setCinematic(false);
+      d.describe('Punto va derecho por la amarilla en cinco pasos iguales, cada uno de largo 1.');
+    }
     if (c === '7') await d.think('Siete es yendo por las rectas, en ele. Derecho, cinco.');
     if (c === 'measure') await d.think('Se sabe sin regla: 4 y 3 con esquina recta son las patas del tirante de Balcón, y el tirante salió de la cuenta.');
     await studentWrites(d, g, 'c8-co', '(3, 2) ≠ (2, 3)', A.x0 + 372, A.y0 + 40, {size: 20});
@@ -514,7 +533,9 @@ function writeJournal8(g) {
   if (as) seen.push(`Con el lado doble, anticipaste ${({2: 'el doble de tierra', 4: 'cuatro veces la tierra', 3: 'apenas un poco más de tierra'})[as.answer]}: fueron cuatro huertas como la de antes.`);
   if (vs) seen.push(vs.early ? 'Llenaste la caja de lado doble caja por caja; la diste por llena antes de tiempo, y entraron ocho: cuatro por piso, porque el alto también se duplicó.' : 'Llenaste la caja de lado doble caja por caja: entraron ocho, cuatro en cada piso.');
   const pp = first('perimeter-predict');
-  if (pp) seen.push(pp.answer === 'depends' ? 'Con la misma cerca, anticipaste que la tierra depende de la forma: de 5 a 9.' : 'Pensaste que la misma cerca da la misma tierra; dio de 5 a 9.');
+  const per = first('perimeter');
+  const range = per ? `de ${Math.min(...per.areas)} a ${Math.max(...per.areas)}` : 'de 5 a 9';
+  if (pp) seen.push(pp.answer === 'depends' ? `Con la misma cerca, anticipaste que la tierra depende de la forma: ${range}.` : `Pensaste que la misma cerca da la misma tierra; dio ${range}.`);
   const py = first('pythag-predict');
   if (py) seen.push(py.answer === '5' ? 'Anticipaste el tirante de 5.' : py.answer === '7' ? 'Para el tirante dijiste siete; derecho es más corto que por las patas: 9 + 16 = 25, mide 5.' : 'Pensaste que sin medir no se sabía; reacomodando los triángulos se supo: 9 + 16 = 25, mide 5.');
   const cd = first('coord-distance');

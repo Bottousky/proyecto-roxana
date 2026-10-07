@@ -1,10 +1,10 @@
 // Capítulo 8 — Formas (8.1 a 8.4): la diagonal que no cae, la vuelta, copias y el doble de grande.
 
-import {Label, Shape} from '../engine/world.js';
+import {Label, Shape, Drawing} from '../engine/world.js';
 import {lerp, easeInOut} from '../engine/rng.js';
 import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {nearMisses, descend, scale as scaleBy} from '../logic/geometry.js';
-import {GROUND, SHOTS, area, base, boardCast, clean, poly, gridSquare, wedge, angleOf, plate, WHITE, YELLOW, BLUE} from './common.js';
+import {GROUND, SHOTS, area, base, boardCast, clean, poly, gridSquare, wedge, angleOf, plate, S, seedOf, WHITE, YELLOW, BLUE} from './common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
 
 const sq = (id, s, opts) => poly(id, [[0, 0], [s, 0], [s, s], [0, s]], opts);
@@ -98,26 +98,50 @@ export const diagonal = {
     const NAMES = {tl: 'arriba a la izquierda', tr: 'arriba a la derecha', bl: 'abajo a la izquierda', br: 'abajo a la derecha'};
     const home = [[A.x1 - Q - 10, A.y0 + 10], [A.x1 - Q - 10, A.y0 + 10 + Q + 8]];
     const slide = async (t, x, y, sec = 0.5) => { const sx0 = t.x, sy0 = t.y; await d.tween(sec, k => { t.x = lerp(sx0, x, k); t.y = lerp(sy0, y, k); }, easeInOut); };
+    const box = (id, x, y, wd, h, ch, hatch) => new Shape(id, poly(id, [[0, 0], [wd, 0], [wd, h], [0, h]], {ch, hatch, w: 2.6}), x, y, {z: 15, fade: 0});
+    await d.say('Peldaño', 'Buscamos otro par más chico: un cuadrado con tanto lugar como dos cuadrados iguales. ¿En qué esquinas del grande ponés los dos de q para que aparezca? Tocá una esquina para cada uno.');
+    // las cuatro esquinas, marcadas en tiza mientras se elige
+    const cornerMarks = () => w.add(new Drawing('c8-cormk', Object.values(CORNERS).flatMap(([cx, cy], k) => {
+      const x = bx + (cx ? P - 8 : 8), y = by + (cy ? P - 8 : 8), sx = cx ? -1 : 1, sy = cy ? -1 : 1;
+      return [S([[x, y + sy * 26], [x, y], [x + sx * 26, y]], seedOf('c8-cormk') + k, {w: 3, p: 0.95, ch: YELLOW, lift: false})];
+    }), {z: 16}));
     let where;
     for (let attempt = 0; ; attempt++) {
       where = [];
       for (const [n, t] of [qa, qb].entries()) {
+        cornerMarks();
         const k = await d.interact(ctl => new Promise(resolve => {
-          g.setHint(() => [`Tocá la esquina del cuadrado grande donde va el ${n ? 'otro' : 'primer'} cuadrado azul.`, 'Si quedan en esquinas opuestas, lo pisado y lo libre son cuadrados.']);
-          g.ui.setSpots(Object.entries(CORNERS).map(([id, [cx, cy]]) => rectSpot(`c8-cor-${id}`, `Poner el cuadrado de q ${NAMES[id]}`, {x: bx + cx + (cx ? Q - 52 : 4), y: by + cy + (cy ? Q - 52 : 4), w: 48, h: 48}, () => { if (ctl.alive()) resolve(id); })));
+          g.setHint(() => [`Tocá la esquina del cuadrado grande donde va el ${n ? 'otro' : 'primer'} cuadrado azul.`, 'Mirá qué forma tiene lo que se pisa y qué forma tiene lo que queda sin tapar.']);
+          g.ui.setSpots([
+            ...Object.entries(CORNERS).map(([id, [cx, cy]]) => rectSpot(`c8-cor-${id}`, `Poner el cuadrado de q ${NAMES[id]}`, {x: bx + cx + (cx ? Q - 52 : 4), y: by + cy + (cy ? Q - 52 : 4), w: 48, h: 48}, () => { if (ctl.alive()) resolve(id); })),
+            // tocar el azul también vale como pregunta: se le dice qué hacer
+            ...[qa, qb].filter((b, bi) => bi >= n).map(b => rectSpot(`c8-qhome-${b.id}`, 'Un cuadrado de q', () => ({x: b.x, y: b.y, w: Q, h: Q}), () => g.note('Tocá la esquina del cuadrado grande donde va.'))),
+          ]);
         }));
         g.setHint(null);
+        w.remove('c8-cormk');
         where.push(k);
         await slide(t, bx + CORNERS[k][0], by + CORNERS[k][1]).catch(() => {});
         g.audio.tap(0.2, 1.3 + n * 0.1);
       }
       const [k1, k2] = where;
-      const opposite = CORNERS[k1][0] !== CORNERS[k2][0] && CORNERS[k1][1] !== CORNERS[k2][1];
+      const [ax, ay] = CORNERS[k1], [cx2, cy2] = CORNERS[k2];
+      const opposite = ax !== cx2 && ay !== cy2;
       d.evidence('proof-corners', {where: [...where], opposite});
       if (opposite) break;
+      // se marca un momento lo pisado (amarillo) y lo que queda sin tapar (blanco), para ver su forma
+      const ox0 = Math.max(ax, cx2), oy0 = Math.max(ay, cy2), ow = Math.min(ax, cx2) + Q - ox0, oh = Math.min(ay, cy2) + Q - oy0;
+      const flash = [w.add(box('c8-flo', bx + ox0, by + oy0, ow, oh, YELLOW, 6))];
+      if (k1 !== k2) {
+        const free = ay === cy2 ? [0, ay ? 0 : Q, P, P - Q] : [ax ? 0 : Q, 0, P - Q, P];
+        flash.push(w.add(box('c8-flf', bx + free[0], by + free[1], free[2], free[3], WHITE, 0)));
+      }
+      await d.all(...flash.map(f => d.fadeTo(f, 1, 0.4))).catch(() => {});
+      d.describe(k1 === k2 ? 'Los dos azules quedan uno encima del otro.' : 'Lo pisado, en amarillo, es un rectángulo; lo que queda sin tapar, en blanco, es otro rectángulo.');
       await d.say('Peldaño', k1 === k2
         ? 'Uno encima del otro se tapan enteros, y no se ve nada nuevo. Probá en otras esquinas.'
         : 'Así lo pisado es un rectángulo, y lo que queda sin tapar, otro rectángulo: no son cuadrados, no dan otro par. Probá en otras esquinas.');
+      for (const f of flash) w.remove(f.id);
       await d.all(slide(qa, home[0][0], home[0][1], 0.4), slide(qb, home[1][0], home[1][1], 0.4)).catch(() => {});
     }
     // lo pisado dos veces (en el medio) y las dos esquinas sin tapar, según dónde quedaron
@@ -131,31 +155,46 @@ export const diagonal = {
     w.add(new Label('c8-midl', '2q − p', bx + P - Q + m / 2, by + P - Q + m / 2 + 6, {size: 16, align: 'center', z: 16, ch: YELLOW}));
     d.describe('Los dos cuadrados azules se pisan en un cuadrado del medio, en amarillo, y dejan sin tapar dos esquinas iguales.');
     g.setCinematic(false);
-    // el jugador elige con qué se compara lo pisado
-    await d.say('Peldaño', 'Los dos de q juntos tienen tanto lugar como el de p. ¿Y lo amarillo, que se pisó dos veces, con qué tiene que ser igual?');
+    // el jugador elige qué tiene que tener tanto lugar como lo pisado
+    await d.say('Peldaño', 'Los dos de q juntos tienen tanto lugar como el de p. Lo amarillo se tapó dos veces: ¿qué parte del cuadrado grande tiene que tener tanto lugar como lo amarillo?');
     const found = new Set();
+    // la cuadrícula de 3 × 3 que forman los bordes: el medio es lo pisado, dos esquinas están libres, el resto lo tapó un solo azul
+    const cuts = [0, P - Q, Q, P];
+    const once = [];
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+      if (r === 1 && c === 1) continue;
+      const x = bx + cuts[c], y = by + cuts[r];
+      if (freeAt.some(([fx, fy]) => Math.abs(fx - x) < 1 && Math.abs(fy - y) < 1)) continue;
+      once.push({x, y, w: cuts[c + 1] - cuts[c], h: cuts[r + 1] - cuts[r]});
+    }
     await d.interact(ctl => new Promise(resolve => {
-      g.setHint(() => ['Tocá lo del cuadrado grande que tiene que ser igual a lo amarillo.', 'Lo amarillo se cuenta dos veces; algo del cuadrado grande no se contó ninguna.']);
+      g.setHint(() => ['Tocá la parte del cuadrado grande que tiene que tener tanto lugar como lo amarillo.', 'Lo amarillo lo cuentan los dos azules; hay partes del grande que no cuenta ninguno.']);
       const refresh = () => g.ui.setSpots([
-        ...[c1, c2].filter(c => !found.has(c.id)).map((c, i) => rectSpot(`${c.id}-pick`, `Una esquina sin tapar del cuadrado grande`, {x: c.x + 2, y: c.y + 2, w: e - 4, h: e - 4}, () => {
+        ...[c1, c2].filter(c => !found.has(c.id)).map(c => rectSpot(`${c.id}-pick`, 'Una esquina sin tapar del cuadrado grande', {x: c.x + 2, y: c.y + 2, w: e - 4, h: e - 4}, () => {
           if (!ctl.alive()) return;
           found.add(c.id);
           w.add(new Label(`${c.id}l`, 'p − q', c.x + e / 2, c.y + e / 2 + 6, {size: 15, align: 'center', z: 16}));
           g.audio.tap(0.15, 1.3 + found.size * 0.1);
           d.evidence('proof-compare', {pick: 'corner'});
-          if (found.size === 2) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
-          void i;
+          if (found.size === 2) { g.ui.setSpots([]); g.setHint(null); resolve(); return; }
+          g.note('Una. ¿Hay otra parte que no tapó ningún azul?');
+          refresh();
         })),
         rectSpot('c8-mid-pick', 'El cuadrado amarillo, lo pisado dos veces', {x: mid.x + 4, y: mid.y + 4, w: m - 8, h: m - 8}, () => {
           if (!ctl.alive()) return;
           d.evidence('proof-compare', {pick: 'mid'});
-          g.note('Ese es lo amarillo mismo. ¿Qué parte del cuadrado grande no tapó ningún azul?');
+          g.note('Eso es lo amarillo mismo. ¿Qué parte del cuadrado grande no tapó ningún azul?');
         }),
+        ...once.map((o, k) => rectSpot(`c8-once${k}`, 'Una parte tapada por un solo azul', {x: o.x + 2, y: o.y + 2, w: o.w - 4, h: o.h - 4}, () => {
+          if (!ctl.alive()) return;
+          d.evidence('proof-compare', {pick: 'once'});
+          g.note('Eso lo tapó un solo azul: cuenta una vez en los dos de q y una vez en el de p, así que se compensa. Buscá lo que no tapó ningún azul.');
+        })),
       ]);
       refresh();
     }));
-    await d.say('student', 'Si los dos de q tapan lo mismo que el de p, lo que se pisa dos veces tiene que ser igual a lo que quedó sin tapar: las dos esquinas.');
-    await d.think('Un cuadrado, el del medio, igual a dos cuadrados, las esquinas. Otro par que cumpliría. Sus lados, 2q − p y p − q, son enteros, y positivos porque q < p < 2q. Y más chicos que p y q.');
+    await d.say('student', 'Los dos de q juntos tienen tanto lugar como el de p. Lo amarillo lo cuentan los dos azules; las esquinas, ninguno. Entonces lo amarillo tiene tanto lugar como las dos esquinas juntas.');
+    await d.think('Un cuadrado, el del medio, con tanto lugar como dos cuadrados, las esquinas. Otro par que cumpliría. Sus lados, 2q − p y p − q, son enteros, y positivos porque q < p < 2q. Y más chicos que p y q.');
     // bajar: más chico, y más chico
     let level = 0;
     const draws = [];
@@ -309,7 +348,7 @@ export const vuelta = {
     await d.interact(ctl => new Promise(resolve => {
       g.setHint(() => [
         'Arriba, a la izquierda de C, hay un ángulo azul. ¿Qué ángulo de abajo es igual a él? Tocalo.',
-        'El ángulo azul de la izquierda se apoya en el lado AC. ¿Qué ángulo de abajo se apoya en el mismo lado, del otro lado de la zeta?',
+        'El ángulo azul de la izquierda tiene un lado sobre AC. ¿Cuál de los dos ángulos de abajo también tiene un lado sobre AC?',
       ]);
       const pick = k => {
         if (!ctl.alive()) return;
@@ -561,7 +600,7 @@ export const doble = {
     }
     d.evidence('area-fill', {early});
     d.describe('La huerta grande se llena con cuatro huertas como la de ahora: treinta y seis cuadros.');
-    await d.think(guess === '4' ? 'Cuatro huertas como la de ahora: treinta y seis cuadros.' : 'Cuatro huertas, no dos: el doble de largo y el doble de ancho. Treinta y seis cuadros.');
+    await d.think(guess === '4' ? 'Cuatro huertas como la de ahora: treinta y seis cuadros.' : guess === '2' ? 'Cuatro huertas, no dos: el doble de largo y el doble de ancho. Treinta y seis cuadros.' : 'No es un poco más: son cuatro huertas como la de ahora. El doble de largo y el doble de ancho: treinta y seis cuadros.');
     // la caja, por pisos: sin menú; el jugador la llena caja por caja
     await d.say('Mara', 'Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran? Llenala vos.');
     g.setCinematic(true);
@@ -571,33 +610,49 @@ export const doble = {
     const cx = A.x0 + 24, cy = A.y0 + 90;
     w.add(new Shape('c8-cube0', cube('c8-cube0', s, YELLOW), cx, cy, {z: 13}));
     w.add(new Label('c8-cube0l', 'la de Cornisa', cx + s / 2, cy + s + 24, {size: 16, align: 'center', z: 12}));
-    // la caja grande vista de arriba, piso por piso
+    w.add(new Label('c8-cube0h', '2 de alto', cx + s / 2, cy + s + 46, {size: 16, align: 'center', z: 12}));
+    // la caja grande: de arriba se ve el piso de abajo; de costado, que es el doble de alta
     const floors = [{x: A.x0 + 140, y: A.y0 + 70, name: 'piso de abajo'}, {x: A.x0 + 270, y: A.y0 + 70, name: 'piso de arriba'}];
-    floors.forEach((f, i) => {
+    const drawFloor = i => {
+      const f = floors[i];
       w.add(new Shape(`c8-fl${i}`, sq(`c8-fl${i}`, 2 * s, {w: 2.6}), f.x, f.y, {z: 12}));
       w.add(new Label(`c8-fll${i}`, f.name, f.x + s, f.y + 2 * s + 22, {size: 15, align: 'center', z: 12}));
-    });
+    };
+    drawFloor(0);
+    const sideX = A.x0 + 400, sideY = A.y0 + 70;
+    w.add(new Shape('c8-side', poly('c8-side', [[0, 0], [2 * s, 0], [2 * s, 2 * s], [0, 2 * s]], {w: 2.6}), sideX, sideY, {z: 12}));
+    w.add(new Label('c8-sidel', 'de costado: 4 de alto', sideX + s, sideY + 2 * s + 22, {size: 15, align: 'center', z: 12}));
     w.add(new Label('c8-flt', 'la caja de lado doble, vista de arriba:', A.x0 + 140, A.y0 + 46, {size: 16, z: 12, ch: BLUE}));
     const topView = id => [...sq(`${id}s`, s - 6, {ch: YELLOW, w: 2.2}), ...poly(`${id}x`, [[4, 4], [s - 10, s - 10]], {ch: YELLOW, closed: false, w: 1.4}), ...poly(`${id}y`, [[s - 10, 4], [4, s - 10]], {ch: YELLOW, closed: false, w: 1.4})];
     const cells = floors.flatMap((f, fi) => [[0, 0], [1, 0], [0, 1], [1, 1]].map(([i, j], ci) => ({id: `c8-cell${fi}${ci}`, fi, x: f.x + 3 + i * s, y: f.y + 3 + j * s})));
     const filled = new Set();
-    let earlyBox = false;
+    let earlyBox = false, floorsOpen = 1;
     for (;;) {
       const pick = await d.interact(ctl => new Promise(resolve => {
-        g.setHint(() => ['Tocá un lugar vacío de un piso para poner ahí una caja como la de Cornisa. Cuando la caja grande esté llena, tocá «ya está llena».']);
+        g.setHint(() => ['Tocá un lugar vacío de un piso para poner ahí una caja como la de Cornisa. Si hace falta otro piso, tocá «agregar un piso». Cuando la caja grande esté llena, tocá «ya está llena».', 'Mirá la caja de costado: ¿cuántas de Cornisa entran a lo alto?']);
         g.ui.setSpots([
-          ...cells.filter(c => !filled.has(c.id)).map(c => rectSpot(c.id, `Poner una caja como la de Cornisa en el ${floors[c.fi].name}`, {x: c.x + 2, y: c.y + 2, w: s - 10, h: s - 10}, () => { if (ctl.alive()) resolve(c); })),
+          ...cells.filter(c => c.fi < floorsOpen && !filled.has(c.id)).map(c => rectSpot(c.id, `Poner una caja como la de Cornisa en el ${floors[c.fi].name}`, {x: c.x + 2, y: c.y + 2, w: s - 10, h: s - 10}, () => { if (ctl.alive()) resolve(c); })),
+          ...(floorsOpen < 2 ? [wordSpot('c8-addfloor', 'agregar un piso', A.x1 - 70, A.y0 + 30, () => { if (ctl.alive()) resolve('floor'); }, {label: 'Agregar otro piso arriba en la caja grande'})] : []),
           wordSpot('c8-boxfull', 'ya está llena', A.x1 - 70, A.y1 - 40, () => { if (ctl.alive()) resolve('full'); }, {label: 'La caja grande ya está llena'}),
         ]);
       }));
       g.setHint(null);
+      if (pick === 'floor') {
+        floorsOpen = 2;
+        drawFloor(1);
+        w.add(new Drawing('c8-sidemid', Array.from({length: 8}, (_, k) => S([[sideX + k * 11, sideY + s], [sideX + k * 11 + 6, sideY + s]], seedOf('c8-sidemid') + k, {w: 1.8, p: 0.7, lift: false})), {z: 12}));
+        g.audio.tap(0.15, 1.2);
+        d.describe('Aparece el piso de arriba de la caja grande; de costado, una raya parte la altura en dos pisos.');
+        continue;
+      }
       if (pick === 'full') {
         if (filled.size === cells.length) break;
         earlyBox = true;
-        const free = floors.filter((_, fi) => cells.some(c => c.fi === fi && !filled.has(c.id)));
-        await d.say('Mara', free.length === 1 && free[0] === floors[1] && !cells.some(c => c.fi === 1 && filled.has(c.id))
-          ? 'El piso de arriba está vacío. La caja grande también es el doble de alta.'
-          : `Todavía hay lugar en el ${free.map(f => f.name).join(' y en el ')}.`);
+        if (floorsOpen < 2) await d.say('Mara', 'La de Cornisa tiene 2 de alto y la grande, 4. ¿Ya está llena?');
+        else {
+          const free = floors.filter((_, fi) => cells.some(c => c.fi === fi && !filled.has(c.id)));
+          await d.say('Mara', `Todavía hay lugar en el ${free.map(f => f.name).join(' y en el ')}.`);
+        }
         continue;
       }
       filled.add(pick.id);
@@ -605,7 +660,7 @@ export const doble = {
       await d.tween(0.35, q => { t.x = lerp(cx, pick.x, q); t.y = lerp(cy, pick.y, q); }, easeInOut);
       g.audio.tap(0.15, 1.1 + filled.size * 0.07);
       w.remove('c8-bcount');
-      w.add(new Label('c8-bcount', `cajas: ${filled.size}`, A.x0 + 249, A.y0 + 212, {size: 17, align: 'center', z: 15, ch: YELLOW}));
+      w.add(new Label('c8-bcount', `cajas: ${filled.size}`, A.x0 + 184, A.y0 + 212, {size: 17, align: 'center', z: 15, ch: YELLOW}));
       d.describe(`Una caja como la de Cornisa en el ${floors[pick.fi].name}. Van ${filled.size}.`);
     }
     d.evidence('volume-fill', {early: earlyBox});

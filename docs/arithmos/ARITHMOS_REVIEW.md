@@ -486,5 +486,29 @@ estaban bien; ninguna interacción deja trabado al jugador. Evidencia de lo corr
 | B16 | Bitácora del cap. 11 sin `graph-axis` | Corregido |
 | B17 | El bot no pasaba por las ramas nuevas | Corregido: `--c103=top|zero|neg|bottom|more|unk` y en 8.8 una medida de más y una de menos |
 
+## Revisión de 8.1, 8.4–8.7 y 9.8 nuevos (rev-c9b, 2026-10-07)
+
+Informe: `artifacts/arithmos/it12/review-c9b/informe.md` (sin navegador). La matemática de los cuatro commits está bien:
+las tres ramas de 8.1 son verdaderas como están dichas, la diagonal TR/BL elige bien las esquinas libres, q < p < 2q se
+dice antes de usarse, y la escala de 9.8 es correcta. Los hallazgos son de comprensión e interacción. Evidencia:
+`artifacts/arithmos/it12/rc9b/`.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| A1 | 8.1: nada indicaba dónde tocar; las esquinas eran invisibles y los azules no respondían | Corregido: las cuatro esquinas del grande se marcan en tiza mientras se elige; tocar un azul dice «Tocá la esquina del cuadrado grande donde va»; Peldaño pide la acción |
+| M1 | 8.1: el objetivo se decía recién después del error; la pista 2 daba la respuesta | Corregido: Peldaño dice antes qué se busca («un cuadrado con tanto lugar como dos cuadrados iguales»); pista 2 «Mirá qué forma tiene lo que se pisa…»; en las ramas de error se marcan un momento lo pisado y lo libre |
+| M2 | 8.1: «tapan lo mismo» es falso; faltaba «juntas» | Corregido con el texto propuesto («tienen tanto lugar como…», «las dos esquinas juntas») |
+| M3 | 8.1: la única opción equivocada era lo amarillo; sin señal de la segunda esquina; «igual con» | Corregido: se pueden tocar las seis partes tapadas una sola vez («se compensa…»); después de la primera esquina, «Una. ¿Hay otra…?»; pregunta por «tanto lugar como lo amarillo»; «Eso es lo amarillo mismo» |
+| M4 | 8.4: los dos pisos dibujados desde el principio | Corregido: al principio sólo el piso de abajo y la caja de costado («4 de alto»; la de Cornisa, «2 de alto»); el jugador agrega el piso de arriba; «ya está llena» con un piso: «La de Cornisa tiene 2 de alto y la grande, 4» |
+| M5 | 8.5: conclusión más allá de lo visto; Bitácora con «de 5 a 9» fijo | Corregido: al armar la cuadrada, Rampa anota los anchos que faltaban; el rango de la Bitácora sale de la evidencia; «doce tramos enteros» |
+| M6 | 9.8: el punto de las 10 se pedía con un lugar invisible | Corregido: Cornisa lo pide en voz alta y el día 2 tiene sus rayitas de hora |
+| B1 | 8.1: rótulos 2q − p y p − q adentro de los cuadrados | Pendiente (baja) |
+| B2–B6 | 8.4 «no dos» para «tres más»; 8.5 «otra vez», pista antes del botón, etiquetas, fila amarilla antes de decidir | Corregidos |
+| B7 | 8.6: tocar los rectángulos de triángulos no decía nada | Corregido: «Ahí hay dos triángulos…» |
+| B8 | 8.7: Punto recorría la diagonal dos veces; el tramo derecho sin pasos | Corregido: Punto reaparece en lo de Peldaño y, después de la cuenta, va derecho en cinco pasos de largo 1 (siete toques contra cinco) |
+| B9 | 8.2: «la zeta» antes de presentarla | Corregido: «tiene un lado sobre AC…» |
+| B10–B11 | 9.8: «noche» cubría todo el hueco; dos dos puntos | Corregidos: una llave marca la noche de 20 a 6; la oración partida en dos |
+| B12 | Ramas del bot sin correr | Corregido: `--c81=b` (misma esquina y diagonal TR/BL) y `--c85=b` (segunda duda de Rampa); 8.1 y 8.4 también en 844×390 |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

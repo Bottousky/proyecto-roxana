@@ -1,0 +1,54 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c9.flechas"
+  },
+  "journal": [
+    "Formas"
+  ],
+  "evidenceKinds": [
+    "near-miss",
+    "proof-need",
+    "proof-corners",
+    "proof-compare",
+    "descent",
+    "irrational",
+    "angle-cut",
+    "angle-general",
+    "alt-angle",
+    "angles",
+    "copy-try",
+    "similar-keeps",
+    "area-scale-predict",
+    "area-fill",
+    "volume-fill",
+    "scale",
+    "perimeter-predict",
+    "fence",
+    "fence-build",
+    "perimeter",
+    "pythag-predict",
+    "pythag-move",
+    "pythag-general",
+    "pythag",
+    "coord-try",
+    "coord-corner",
+    "coord-distance",
+    "coords",
+    "shadow-measure",
+    "shadow"
+  ],
+  "fps": {
+    "min": "20.0",
+    "median": "60.0"
+  },
+  "errors": [
+    "[spot tapado] \"agregar un piso\" tapa a c8-boxfull"
+  ],
+  "seconds": 80.499,
+  "size": "844x390",
+  "touch": true,
+  "route": "directa",
+  "watch": false
+}

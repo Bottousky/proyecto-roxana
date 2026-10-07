@@ -841,23 +841,32 @@ for (let iter = 0; iter < 30000; iter++) {
       target = spots.find(x => x.id === (route === 'errores' && spots.some(y => y.id === 'rows-1') ? 'rows-1' : 'rows-3'));
     } else if (s.seg === 'c8.diagonal' && spots.some(x => x.id.startsWith('c8-cor-'))) {
       // esquinas de los cuadrados de q: con errores, primero dos vecinas (rectángulos) y después opuestas
-      const seq = route === 'errores' ? ['tl', 'tr', 'tl', 'br'] : ['tl', 'br'];
+      // --c81=b: la misma esquina y después la diagonal arriba a la derecha / abajo a la izquierda
+      const seq = route === 'errores' ? (val('c81', '') === 'b' ? ['tl', 'tl', 'tr', 'bl'] : ['tl', 'tr', 'tl', 'br']) : ['tl', 'br'];
       target = spots.find(x => x.id === `c8-cor-${seq[c8Corner]}`) || spots[0];
       c8Corner++;
     } else if (s.seg === 'c8.diagonal' && spots.some(x => x.id === 'c8-mid-pick')) {
+      // con errores: lo amarillo y una parte tapada una vez antes de las esquinas
       const wrong = route === 'errores' && !tried.has('c8mid') && (tried.add('c8mid'), true);
-      target = wrong ? spots.find(x => x.id === 'c8-mid-pick') : spots.find(x => x.id.endsWith('-pick') && x.id !== 'c8-mid-pick');
+      const once = !wrong && route === 'errores' && !tried.has('c8once') && (tried.add('c8once'), true);
+      target = wrong ? spots.find(x => x.id === 'c8-mid-pick') : once ? spots.find(x => x.id.startsWith('c8-once')) : spots.find(x => x.id.endsWith('-pick') && x.id !== 'c8-mid-pick');
     } else if (s.seg === 'c8.doble' && spots.some(x => x.id === 'c8-full' || x.id === 'c8-boxfull')) {
       // llena la huerta y la caja; con errores, dice «ya está llena» a la mitad (una vez cada una)
       const done = spots.find(x => x.id === 'c8-full' || x.id === 'c8-boxfull');
       const left = spots.filter(x => /^c8-(q|cell)/.test(x.id));
-      const total = done.id === 'c8-full' ? 4 : 8;
+      const add = spots.find(x => x.id === 'c8-addfloor');
       const key = `c8early-${done.id}`;
-      if (route === 'errores' && left.length === total / 2 && !tried.has(key) && (tried.add(key), true)) target = done;
-      else target = left[0] || done;
+      if (done.id === 'c8-full') {
+        if (route === 'errores' && left.length === 2 && !tried.has(key) && (tried.add(key), true)) target = done;
+        else target = left[0] || done;
+      } else if (left.length) target = left[0];
+      // el piso de abajo lleno: con errores, primero «ya está llena» (falta el de arriba)
+      else if (add) target = route === 'errores' && !tried.has(key) && (tried.add(key), true) ? done : add;
+      else target = done;
     } else if (s.seg === 'c8.cerca' && spots.some(x => x.id.startsWith('c8-w'))) {
       // prueba anchos y arma; con errores, arma la de 2 antes de probar la cuadrada
-      const seq = route === 'errores' ? ['c8-w1', 'c8-w2', 'c8-build', 'c8-w3', 'c8-build'] : ['c8-w2', 'c8-w3', 'c8-build'];
+      // --c85=b: arma dos veces antes de tiempo (la segunda duda de Rampa)
+      const seq = route === 'errores' ? (val('c85', '') === 'b' ? ['c8-w2', 'c8-w1', 'c8-build', 'c8-w5', 'c8-build', 'c8-w3', 'c8-build'] : ['c8-w1', 'c8-w2', 'c8-build', 'c8-w3', 'c8-build']) : ['c8-w2', 'c8-w3', 'c8-build'];
       target = spots.find(x => x.id === seq[c8Fence]) || spots.find(x => x.id === 'c8-w3') || spots[0];
       c8Fence++;
     } else if (s.seg === 'c10.repite' && spots.some(x => x.id === 'c10-unk')) {
