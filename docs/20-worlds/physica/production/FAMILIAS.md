@@ -29,7 +29,19 @@ Los nombres de escenas son propuestas; los resultados educativos son los del con
 - **Error a evitar:** creer que hay una única descripción verdadera del movimiento.
 - **Señal:** reglas graduadas (ya existe una junto al soporte A); marcas fijas en el suelo y en el transporte.
 - **Transferencia:** describir el arco de agua desde un bote que avanza a la misma velocidad horizontal: verías sólo subir y bajar.
-- **Estado:** PROPUESTA.
+- **Estado:** EN CURSO (D21, iteración 16).
+  - **Hecho:**
+    - la avenida tras la reja de la plaza;
+    - el carro de cable, con velocidad constante, el torno a la vista en la casa de máquinas, el cable que corre y paradas;
+    - lo que va sobre el carro (el explorador, las esferas) viaja con él, con la velocidad del carro al dejarlo (el marco de la velocidad, D21);
+    - las referencias en el suelo (cordón marcado cada metro) y en el carro (su regla);
+    - el viaje con teclas.
+  - **Falta (en orden, según la revisión de la iteración 16):**
+    - el jalón, como cuerpo que el carro también lleva; las lecturas se toman respecto de él;
+    - dos registros físicos y simultáneos, no un modo de dibujo: tiza en el suelo y cinta en el carro. Primero la linterna; después el caso que no es trivial, el explorador caminando sobre el carro en marcha, donde los desplazamientos se suman o se restan;
+    - el tramo hacia el oeste, con el desplazamiento negativo: los vectores, y la distancia frente al desplazamiento;
+    - las notas de la Bitácora, con dos tablas;
+    - el encargo que depende del marco y la transferencia del bote.
 
 ## 2. MRU
 - **Concepto:** a intervalos iguales, distancias iguales; velocidad = distancia / tiempo.

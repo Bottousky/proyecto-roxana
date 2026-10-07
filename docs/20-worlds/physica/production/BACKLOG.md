@@ -52,5 +52,14 @@ primero.
     - el costo de dibujo del barrio (unas 270 llamadas cuando la boca se ve; unir la geometría estática por material);
     - abrir la calle del norte;
     - pulir la silueta en el plano bajo del umbral y los vecinos.
-- **B3:** familia «Introducción» y **B4:** familia MRU (ver `FAMILIAS.md`).
-- **B5:** primer sector jugable de la metrópolis.
+- **B3:** familia «Introducción» (ver `FAMILIAS.md`, D21).
+  - **Estado: en curso** (iter 16, `evidence/iter-16`).
+  - **Hecho:**
+    - la reja de la plaza, la calle y el andén;
+    - el carro de cable, con velocidad constante, la casa de máquinas y paradas;
+    - lo que va sobre el carro viaja con él, con el marco de la velocidad;
+    - las referencias en el suelo y en el carro;
+    - el viaje con teclas, incluido en el recorrido completo.
+  - **Falta:** el jalón, los dos registros simultáneos, el tramo con desplazamiento negativo, las notas y el encargo (en ese orden).
+- **B4:** familia MRU (ver `FAMILIAS.md`).
+- **B5:** primer sector jugable de la metrópolis. Empezado con la avenida del carro (iter 16). La deuda de dibujo del barrio quedó pagada en la iter 16 (unión por material).

@@ -32,6 +32,10 @@ await page.evaluate(() => window.__physica.inspect(null));
 await put(7.6, 4.4, -12.2);
 await page.evaluate(() => window.__physica.look([7.6, 13.5, -6.0], [7.8, 4.4, -16.5])); await shot('4-plaza-entera');
 await page.evaluate(() => window.__physica.look([1.0, 10.5, -21.5], [9.5, 4.6, -12.0])); await shot('5-plaza-desde-el-fondo');
+// The avenue beyond the street's gate (B3): the platform, the track, the car, the engine house.
+await page.evaluate(() => { const g = window.__physica.world.gates[0]; g.open = true; g.openT = g.swing; });
+await page.evaluate(() => window.__physica.look([11, 15, -27], [10, 4.4, -42])); await shot('6-avenida-desde-la-calle');
+await page.evaluate(() => window.__physica.look([30, 10, -34], [12, 4.4, -42])); await shot('7-avenida-y-casa-de-maquinas');
 await page.evaluate(() => window.__physica.look(null));
 console.log('errors', errors);
 await browser.close();

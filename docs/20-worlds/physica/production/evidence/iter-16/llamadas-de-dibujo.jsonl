@@ -1,0 +1,8 @@
+{"open":false,"at":"terraza","calls":662,"tris":747426,"p99":16.8,"errors":[]}
+{"open":true,"at":"terraza","calls":767,"tris":763436,"p99":16.8,"errors":[]}
+{"open":true,"at":"mirador","calls":622,"tris":647006,"p99":16.8,"errors":[]}
+{"open":true,"at":"plaza","calls":413,"tris":417542,"p99":16.8,"errors":[]}
+{"at":"terraza (arco y reja abiertos)","calls":796,"tris":767096,"p99":16.8,"work99":5.5}
+{"at":"plaza","calls":443,"tris":421602,"p99":16.8,"work99":4.5}
+{"at":"andén frente a la calle","calls":179,"tris":70244,"p99":16.8,"work99":3.6}
+{"at":"a bordo, parada oeste","calls":182,"tris":69554,"p99":16.8,"work99":3.6}

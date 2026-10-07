@@ -85,6 +85,12 @@ export class Sound {
       case 'footing': this.blip({ freq: 700, to: 350, dur: 0.35, type: 'sine', gain: 0.1 }); break;
       case 'enter': if (e.body === avatarId) this.blip({ freq: 260, to: 620, dur: 0.6, type: 'sine', gain: 0.12, noise: 0.15, filter: 1800 }); break;
       case 'exit': if (e.body === avatarId) this.blip({ freq: 560, to: 280, dur: 0.5, type: 'sine', gain: 0.08 }); break;
+      // the street's gate and the cable car (B3; not heard by the author: to be checked by ear)
+      case 'gate-opening': this.blip({ freq: 170, to: 240, dur: 0.9, type: 'sawtooth', gain: 0.025, noise: 0.25, filter: 1400 }); break;
+      case 'gate-open': this.blip({ freq: 230, to: 160, dur: 0.15, type: 'square', gain: 0.05, noise: 0.4, filter: 2500 }); break;
+      case 'carrier-warn': [0, 0.22].forEach(d => setTimeout(() => [1046, 2093].forEach((f, i) => this.blip({ freq: f, dur: 0.7 - i * 0.3, type: 'sine', gain: 0.09 / (i + 1) })), d * 1000)); break;
+      case 'carrier-start': this.blip({ freq: 110, to: 170, dur: 0.5, type: 'sawtooth', gain: 0.04, noise: 0.5, filter: 900 }); break;
+      case 'carrier-stop': this.blip({ freq: 1400, to: 900, dur: 0.35, type: 'triangle', gain: 0.025, noise: 0.3, filter: 5000 }); break;
     }
   }
 

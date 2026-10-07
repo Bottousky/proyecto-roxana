@@ -414,3 +414,65 @@ El contrato (§7) pide movimiento reducido, texto legible y controles enseñados
 - Sale con el mismo fundido.
 
 **De paso:** al cargar una partida, la ciudad vista se restaura de la Bitácora (`citySeen`). Antes, después de recargar no había silueta y el arco no se podía abrir sin volver al Mirador.
+
+## D21 · Introducción en la ciudad: la parada del carro de cable (iteración 16, Hito B · B3 + B5)
+
+**El pedido (contrato, familia «Introducción»):** referencia, posición, desplazamiento, tiempo, unidades, medición y vectores. «Dos observadores describen de manera diferente un transporte en movimiento; el jugador coloca referencias y comprueba qué cambia.» Error a evitar (FAMILIAS): creer que hay una única descripción verdadera del movimiento.
+
+**El lugar.** La calle del norte, detrás de la reja de la plaza, desemboca en una avenida transversal con un andén.
+- Por la avenida corre un **carro de cable**: una plataforma baja que se engancha a un cable sin fin.
+- Un **torno visible** en la casa de máquinas, al final de la línea, mueve el cable a velocidad constante. El impulso tiene una fuente que se ve; el rozamiento lo compensa el cable.
+- El carro va de una parada a otra:
+  - espera en cada una;
+  - se engancha (medio segundo para tomar velocidad);
+  - corre a velocidad constante;
+  - se suelta y frena en la otra.
+- La cámara, detrás del explorador, mira al norte: el carro cruza la pantalla de costado. Es la dirección que mejor se lee.
+
+**Las referencias.**
+- **En el suelo:** el cordón del andén lleva marcas cada metro.
+- **En el carro:** su costado lleva una regla.
+- **Un jalón** (una vara a franjas) que el explorador lleva y planta con E, en el andén o sobre la cubierta del carro. Las lecturas de la Bitácora se miden desde el último jalón plantado.
+
+**Lo que se mide.**
+- **Qué:** la linterna del frente del carro deja una marca cada 0,5 s mientras viaja.
+- **Dónde quedan las marcas:** en el marco de la referencia elegida.
+  - Con el jalón en el andén, quedan en el suelo, espaciadas: la linterna se desplazó.
+  - Con el jalón en el carro, viajan con él y caen todas en el mismo lugar: respecto del carro, la linterna no se movió.
+- **Qué compara la Bitácora:** posición inicial y final respecto del jalón, desplazamiento y tiempo, desde cada referencia. Dice que las dos descripciones son correctas.
+- **El explorador como observador:** también puede subir al carro. Parado en la cubierta, el andén se aleja y él no se mueve respecto del carro.
+
+**Qué cuenta como entender (no un texto que lo explique).**
+- **Primero, medir:** el mismo viaje, con el jalón en el andén y en el carro.
+- **Después, un encargo que depende del marco:**
+  - el guarda pide dejar un paquete a cierta distancia del jalón del andén;
+  - el explorador va en el carro y tiene que soltarlo cuando esa marca pasa delante;
+  - desde el carro, el paquete «cae» en su lugar; el andén lo recibe en otro.
+- El encargo queda para cuando la medición esté probada.
+
+**Transferencia** (FAMILIAS): el arco de agua de la sima, visto desde un bote que avanza a su misma velocidad horizontal, sólo sube y baja.
+
+**El marco de la velocidad (decidido en la iteración 16, después de la revisión).**
+- Mientras un cuerpo se apoya en el carro, su velocidad es relativa al carro, y el cuerpo viaja con el desplazamiento del carro.
+- Al apoyarse se le resta la velocidad del carro; al dejarlo se le suma.
+- **Consecuencias:**
+  - quien baja de un carro en marcha baja con su velocidad;
+  - una esfera soltada desde el carro sale con la velocidad del carro y cae en su lugar de la cubierta;
+  - subir a un carro en marcha está permitido.
+- Esto vale para el explorador y para las esferas. Sin este modelo, el encargo y la transferencia del bote serían falsos.
+
+**Lo que se ve (ajustado después de la revisión).**
+- **La casa de máquinas** está frente a la calle, del otro lado de la avenida: su rueda se ve girar a través de un arco cuando se baja por la calle y desde el carro.
+- **El cable** lleva marcas que corren siempre.
+- **El carro** tiene un toldo sobre el banco y barandas: se lee como vehículo.
+- **Las paradas** tienen poste, cartel y campana, y caen en lecturas redondas del cordón (5 m y 20 m).
+- **Avisos:** «▲ Subir al carro» y «▼ Bajar del carro».
+- **A bordo,** el explorador se acomoda a 0,6 m del borde del andén. Con eso la regla del carro queda delante de sus pies y el cordón del andén, a la vista.
+
+**Por partes.** Esta iteración pone:
+- la base de la simulación: un transportador cinemático que lleva lo que tiene encima, y un área transitable que viaja con él;
+- la reja, la calle y el andén;
+- el carro con su torno;
+- un viaje en el carro con teclas.
+
+El jalón, las marcas en cada marco y las notas vienen después.

@@ -41,6 +41,8 @@ const REEL_SPEED = 3.2;  // m/s, the reel's motor drags the sphere home along it
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
+const THREE_clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
 export class World {
   constructor(level) {
     this.level = level;
@@ -51,6 +53,16 @@ export class World {
     this.solids = level.solids.map(s => ({ friction: 0.6, ...dio, ...s }));
     this.doors = (level.doors || []).map(d => ({ ...d, open: false, openT: 0, opening: false }));
     this.depthAreas = level.depthAreas || [];
+    // Gates inside depth (Hito B): an area behind one (`gate` on the area) is walkable once it is open.
+    this.gates = (level.gates || []).map(g => ({ ...g, open: false, opening: false, openT: 0 }));
+    // Carriers (the cable car, B3): a kinematic solid running between two stops at constant speed,
+    // with a short grip and brake ramp; what stands on it is carried, and an area travels with it.
+    this.carriers = (level.carriers || []).map(c => {
+      const solid = { id: c.id, x0: 0, x1: 0, y0: c.y - c.h, y1: c.y, z0: c.z0, z1: c.z1, friction: 0.6, carrier: c.id };
+      this.solids.push(solid);
+      const k = { ...c, x: c.stops[0], v: 0, dx: 0, leg: 0, t: 0, phase: 'parada', solid };
+      this.placeCarrier(k); return k;
+    });
     this.depthBlockers = level.depthBlockers || [];
     this.citySeen = false;
     this.bodies = [];
@@ -109,12 +121,16 @@ export class World {
   /** Advance one fixed step. */
   step() {
     const inp = this.input;
-    for (const b of this.bodies) this.snapshotPrev(b);
+    for (const b of this.bodies) { this.snapshotPrev(b); b.carryDx = 0; }
+    this.updateCarriers();
     if (inp.reset) {
       inp.reset = false;
       // R restarts what is at stake: the explorer if it has been adrift, otherwise the experiment.
       const av0 = this.avatar, inWater = av0.support?.solid?.noFooting;
-      if ((av0.airSteps > 0.3 / DT || inWater) && av0.lastSupport) this.returnToFooting();
+      if (av0.z < -0.3 && av0.lastDepth && !this.inArea(av0)) { // off every walkable area in depth: back to where it last stood
+        Object.assign(av0, { x: av0.lastDepth.x, y: av0.lastDepth.y, z: av0.lastDepth.z, vx: 0, vy: 0, vz: 0, carrier: null }); this.snapshotPrev(av0);
+        this.emit('footing', { body: av0.id, x: av0.x, y: av0.y });
+      } else if ((av0.airSteps > 0.3 / DT || inWater) && av0.lastSupport) this.returnToFooting();
       else this.resetExperiment();
     }
     if (inp.act) { inp.act = false; this.interact(); }
@@ -143,12 +159,17 @@ export class World {
       door.openT = Math.min(door.swing || 0, door.openT + DT);
       if (door.openT >= (door.swing || 0)) { door.open = true; door.opening = false; this.emit('door-open', { door: door.id }); }
     }
+    for (const g of this.gates) if (g.opening && !g.open) {
+      g.openT = Math.min(g.swing, g.openT + DT);
+      if (g.openT >= g.swing) { g.open = true; g.opening = false; this.emit('gate-open', { gate: g.id }); }
+    }
     if (!av.heldBy) this.depthStep(av, inp);
 
     for (let pass = 0; pass < 3; pass++) {
       for (const b of this.bodies) if (!b.heldBy) this.collideSolids(b, pass === 0);
       this.collideBodies(pass === 0);
     }
+    this.updateFrames();
 
     for (const b of this.bodies) {
       if (b.heldBy) continue;
@@ -265,13 +286,71 @@ export class World {
    * Assist (declared): in the strip, walking in depth eases the explorer toward the door's
    * centre, so getting through takes no aiming. Gravity and supports are the same as anywhere.
    */
+  placeCarrier(k) { k.solid.x0 = k.x - k.len / 2; k.solid.x1 = k.x + k.len / 2; }
+
+  /**
+   * The carriers' motion, a function of time: at each stop it waits `dwell`, grips the cable over
+   * `ramp` seconds (constant acceleration), runs at `speed`, and brakes symmetrically to the next
+   * stop. Exact per step (no accumulated error). What stood on it last step moves with it.
+   */
+  updateCarriers() {
+    for (const k of this.carriers) {
+      const from = k.stops[k.leg % 2], to = k.stops[(k.leg + 1) % 2], dir = Math.sign(to - from), D = Math.abs(to - from);
+      const tr = k.ramp, a = k.speed / tr, T = D / k.speed + tr, before = k.x;
+      k.t += DT;
+      const tau = k.t - k.dwell;
+      if (tau <= 0) { k.x = from; k.v = 0; k.phase = 'parada'; }
+      else if (tau >= T) { k.x = to; k.v = 0; k.phase = 'parada'; k.leg++; k.t = 0; this.emit('carrier-stop', { carrier: k.id, x: to }); }
+      else {
+        const s = tau < tr ? 0.5 * a * tau * tau : tau < T - tr ? 0.5 * a * tr * tr + k.speed * (tau - tr) : D - 0.5 * a * (T - tau) ** 2;
+        if (k.phase === 'parada') this.emit('carrier-start', { carrier: k.id, from, to });
+        k.x = from + dir * s; k.v = dir * (tau < tr ? a * tau : tau < T - tr ? k.speed : a * (T - tau));
+        k.phase = tau < tr ? 'arranca' : tau < T - tr ? 'marcha' : 'frena';
+      }
+      if (tau <= 0 && tau > -1.5 && tau - DT <= -1.5) this.emit('carrier-warn', { carrier: k.id }); // a bell before it goes
+      k.px = before; k.dx = k.x - before; this.placeCarrier(k);
+      for (const b of this.bodies) if (b.carrier === k && !b.heldBy) { b.x += k.dx; b.carryDx = k.dx; }
+    }
+  }
+
+  /**
+   * The frame of a body's velocity: while it stands on a carrier, relative to it (it travels with
+   * the carrier's displacement); otherwise relative to the ground. Changing support converts it:
+   * stepping onto a moving car takes its velocity away, stepping off adds it back, so whatever leaves
+   * a moving car (the explorer, a dropped sphere) leaves at the car's speed plus its own.
+   */
+  updateFrames() {
+    for (const b of this.bodies) {
+      if (b.heldBy) continue;
+      const k = this.carriers.find(c => b.support?.solid === c.solid) || null;
+      if (k === (b.carrier || null)) continue;
+      if (b.carrier) b.vx += b.carrier.v;
+      if (k) b.vx -= k.v;
+      b.carrier = k;
+    }
+  }
+
+  inArea(b) { return this.areasNow().some(r => b.x - b.hw >= r.x0 - 1e-6 && b.x + b.hw <= r.x1 + 1e-6 && b.z - b.hw >= r.z0 - 1e-6 && b.z + b.hw <= r.z1 + 1e-6); }
+
+  /** The walkable areas now: those behind a closed gate left out, those on a carrier where it is. */
+  areasNow() {
+    return this.depthAreas.filter(r => !r.gate || this.gates.find(g => g.id === r.gate)?.open).map(r => {
+      if (!r.carrier) return r;
+      const k = this.carriers.find(c => c.id === r.carrier), i = r.inset ?? 0;
+      return { ...r, x0: k.x - k.len / 2 + i, x1: k.x + k.len / 2 - i };
+    });
+  }
+
   depthStep(av, inp) {
     const iy = Math.abs(inp.y) > 0.2 ? inp.y : 0;
     if (av.z === 0) {
       const door = this.doorAt(av);
       if (!(door?.open && iy > 0 && av.supportSteps > 0 && !av.holding)) { av.vz = 0; return; }
     }
-    const target = -iy * AVATAR.walk, dv = target - av.vz, lim = AVATAR.aGround * DT;
+    // On a car, with ▲▼ released, the explorer settles 0.6 m in from the platform's side: the whole body
+    // on the deck (not straddling its edge), the car's ruler just ahead of the feet, the kerb in view.
+    const k = av.carrier, kz = k ? k.z1 - 0.6 : 0;
+    const target = k && iy === 0 && av.supportSteps > 0 ? THREE_clamp((kz - av.z) * 3, -AVATAR.walk * 0.6, AVATAR.walk * 0.6) : -iy * AVATAR.walk, dv = target - av.vz, lim = AVATAR.aGround * DT;
     av.vz += Math.max(-lim, Math.min(lim, dv));
     let nz = av.z + av.vz * DT;
     if (nz >= 0) { av.z = 0; av.vz = 0; return; } // back on the 2.5D path
@@ -281,11 +360,15 @@ export class World {
     // near the near wall of the area beyond leads to the passage's mouth (declared assist).
     const back = this.doors.find(d => d.open && d.mouthZ !== undefined && iy < 0 && av.z < d.mouthZ + 0.1 && av.z > d.mouthZ - 2.5);
     if (back) { const cx = (back.x0 + back.x1) / 2; av.x += Math.max(-1, Math.min(1, (cx - av.x) * 2)) * AVATAR.walk * 0.8 * DT; }
+    // An area can funnel ▼ towards its way out (the platform → the street), within a band of its edge.
+    const fun = iy < 0 && this.areasNow().find(r => r.funnel && av.x >= r.x0 && av.x <= r.x1 && av.z >= r.z0 && av.z <= r.z1 && av.z > r.funnel.z - r.funnel.band);
+    if (fun) av.x += Math.max(-1, Math.min(1, (fun.funnel.x - av.x) * 2)) * AVATAR.walk * 0.8 * DT;
     const feet = av.y - av.hh;
     const blocks = (b, x, z) => b.top > feet + AVATAR.step && (b.circle
       ? Math.hypot(Math.max(Math.abs(x - b.circle.x) - av.hw, 0), Math.max(Math.abs(z - b.circle.z) - av.hw, 0)) < b.circle.r
       : x + av.hw > b.x0 && x - av.hw < b.x1 && z + av.hw > b.z0 && z - av.hw < b.z1);
-    const inside = (x, z) => !this.depthBlockers.some(b => blocks(b, x, z)) && this.depthAreas.some(r => x - av.hw >= r.x0 && x + av.hw <= r.x1 && z - av.hw >= r.z0 && z + av.hw <= r.z1);
+    const areas = this.areasNow();
+    const inside = (x, z) => !this.depthBlockers.some(b => blocks(b, x, z)) && areas.some(r => x - av.hw >= r.x0 && x + av.hw <= r.x1 && z - av.hw >= r.z0 && z + av.hw <= r.z1);
     // Against a round blocker (the fountain's basin) a glancing step slides along it at 45°, at the
     // same walking speed: head-on (more than 45° into it) it still stops.
     const round = (x, z) => this.depthBlockers.find(b => b.circle && blocks(b, x, z))?.circle;
@@ -295,11 +378,16 @@ export class World {
       if (sx && inside(slid, sz2)) { av.x = slid; av.z = sz2; } else av.vz = 0;
     }
     if (!inside(av.x, av.z)) {
-      const c = round(av.x, av.z), sz = c ? Math.sign(av.z - c.z) : 0, k = Math.SQRT1_2, sx2 = av.px + (av.x - av.px) * k, slid = av.z + sz * Math.abs(av.x - av.px) * k;
+      const c = round(av.x, av.z), sz = c ? Math.sign(av.z - c.z) : 0, k2 = Math.SQRT1_2, sx2 = av.px + (av.x - av.px) * k2, slid = av.z + sz * Math.abs(av.x - av.px) * k2;
       if (sz && slid < 0 && inside(sx2, slid)) { av.x = sx2; av.z = slid; }
-      else { av.x = av.px; av.vx = 0; } // sideways into a wall: stop there
+      else { av.x = av.px + (av.carryDx || 0); av.vx = 0; } // sideways into a wall: stop there (where the car carried it, on a car)
     }
-    if (!inside(av.x, av.z)) av.x = Math.max(...this.depthAreas.filter(r => av.z - av.hw >= r.z0 && av.z + av.hw <= r.z1).map(r => Math.min(Math.max(av.x, r.x0 + av.hw), r.x1 - av.hw)), av.x);
+    // still outside (a moving area's edge): to the nearest valid x, on whichever side
+    if (!inside(av.x, av.z)) {
+      const opts = areas.filter(r => av.z - av.hw >= r.z0 && av.z + av.hw <= r.z1).map(r => Math.min(Math.max(av.x, r.x0 + av.hw), r.x1 - av.hw));
+      if (opts.length) av.x = opts.reduce((p, q) => (Math.abs(q - av.x) < Math.abs(p - av.x) ? q : p));
+    }
+    if (av.supportSteps > 0 && inside(av.x, av.z)) av.lastDepth = { x: av.x, y: av.y, z: av.z };
   }
 
   collideSolids(b, record) {
@@ -318,7 +406,7 @@ export class World {
           nx = o[1]; ny = o[2]; pen = o[0] + b.r;
         }
         b.x += nx * pen; b.y += ny * pen;
-        this.contact(b, nx, ny, Math.min(b.friction, s.friction), null, record);
+        this.contact(b, nx, ny, Math.min(b.friction, s.friction), null, record, s);
       } else {
         const ox = Math.min(b.x + b.hw, s.x1) - Math.max(b.x - b.hw, s.x0);
         const oy = Math.min(b.y + b.hh, s.y1) - Math.max(b.y - b.hh, s.y0);
@@ -408,7 +496,7 @@ export class World {
     if (av.heldBy?.type === 'chain') { out.push({ kind: 'letgo', verb: 'Soltarse', d: 0, x: av.x, y: av.y + 0.5, hint: '▲▼ subir o bajar' }); return out; }
     if (av.holding) {
       // At a chain's lip, say why it is not offered: the hands are full.
-      const atChain = this.chains.some(ch => !(ch.gated && !(this.shortSeen || this.bell?.rung)) && av.supportSteps > 0 &&
+      const atChain = Math.abs(av.z) < 0.3 && this.chains.some(ch => !(ch.gated && !(this.shortSeen || this.bell?.rung)) && av.supportSteps > 0 &&
         av.x > ch.lipX - 0.75 && av.x < ch.x && Math.abs(av.y - av.hh - ch.lipY) < 0.1);
       // A cause, not an order (the other prompts are infinitives); the box clears the head.
       // At the lip, in the free band between the head and the two hanging spheres (both at 2 m):
@@ -422,7 +510,9 @@ export class World {
     // (standing at the lip). It used to count as distance 0 there, which took E away from a
     // support whose post stands within that reach (the Pozo's P, 0.15 m from it).
     // A gated chain is offered once the explorer has fallen short once, or has heard the bell.
+    // (the chains hang on the 2.5D path: not offered in depth, where the street crosses their x)
     for (const ch of this.chains) {
+      if (Math.abs(av.z) > 0.3) break;
       if (ch.gated && !(this.shortSeen || this.bell?.rung)) continue;
       if (av.supportSteps > 0 && av.x > ch.lipX - 0.75 && av.x < ch.x && Math.abs(av.y - av.hh - ch.lipY) < 0.1) {
         // Over the explorer at the lip, not over the chasm: a sphere just let go rises there.
@@ -452,11 +542,22 @@ export class World {
       const off = st.prompt ?? { dx: 0, dy: 0.2 };
       if (verb) out.push({ kind: 'stand', id: st.id, body: st.body.id, verb, hint, d, x: armed ? st.body.x + off.dx : st.x, y: armed ? st.body.y + off.dy : st.baseY + 1.2, z: st.z ?? 0 });
     }
+    // Gates in depth: offered at the gate, until opened.
+    for (const g of this.gates) {
+      if (g.open || g.opening || av.supportSteps === 0) continue;
+      const d = Math.abs(av.z - g.z);
+      if (d < 1.0 && av.x > g.x0 - 0.3 && av.x < g.x1 + 0.3) out.push({ kind: 'gate', id: g.id, verb: g.verb || 'Abrir', d, x: (g.x0 + g.x1) / 2, y: g.y + 2.5, z: g.z });
+    }
     if (av.z < -0.3) {
       // In depth nothing else of the 2.5D path is in reach. Standing still beyond the passage
       // (whose mouth is behind the camera), the way back is named.
       const door = this.doors.find(d => d.mouthZ !== undefined && av.z < d.mouthZ);
-      if (door && Math.hypot(av.vx, av.vz) < 0.1 && av.supportSteps > 0 && !out.length) out.push({ kind: 'back', key: '▼', verb: 'Volver', d: 9, x: av.x + 0.85, y: av.y + 0.1, z: av.z }); // beside, not over what is ahead
+      // Beside a car waiting at a stop, ▲ boards it.
+      for (const c of this.carriers) if (c.phase === 'parada' && av.supportSteps > 0 && !av.carrier && Math.abs(av.x - c.x) < c.len / 2 - 0.3 && av.z < c.z1 + 1.6 && av.z > c.z1) out.push({ kind: 'board', key: '▲', verb: 'Subir al carro', d: 0.5, x: av.x + 0.85, y: av.y + 0.1, z: av.z });
+      // On the car, ▼ steps off it: named while it waits at a stop, not while it runs.
+      const onCar = this.carriers.find(k => av.support?.solid === k.solid);
+      if (onCar) { if (onCar.phase === 'parada' && av.supportSteps > 0 && !out.length) out.push({ kind: 'back', key: '▼', verb: 'Bajar del carro', d: 9, x: av.x + 0.85, y: av.y + 0.1, z: av.z }); }
+      else if (door && Math.hypot(av.vx, av.vz) < 0.1 && av.supportSteps > 0 && !out.length) out.push({ kind: 'back', key: '▼', verb: 'Volver', d: 9, x: av.x + 0.85, y: av.y + 0.1, z: av.z }); // beside, not over what is ahead
       return out.sort((p, q) => p.d - q.d);
     }
     for (const door of this.doors) {
@@ -482,10 +583,11 @@ export class World {
     if (!it) return;
     const av = this.avatar;
     if (it.kind === 'door') { const door = this.doors.find(d => d.id === it.id); door.opening = true; this.emit('door-opening', { door: door.id }); return; }
-    if (it.kind === 'enter' || it.kind === 'back') return;
+    if (it.kind === 'gate') { const g = this.gates.find(x => x.id === it.id); g.opening = true; this.emit('gate-opening', { gate: g.id }); return; }
+    if (it.kind === 'enter' || it.kind === 'back' || it.kind === 'board') return;
     if (it.kind === 'drop') {
       const b = av.holding; av.holding = null; b.heldBy = null; b.bellRungThisFlight = false;
-      b.vx = av.vx; b.vy = av.vy;
+      b.vx = av.vx + (av.carrier?.v ?? 0); b.vy = av.vy; b.carrier = null; // (in the ground's frame: from a moving car, at its speed)
       this.emit('drop', { body: b.id });
       this.startTrace(b, 'mano');
     } else if (it.kind === 'pick') {

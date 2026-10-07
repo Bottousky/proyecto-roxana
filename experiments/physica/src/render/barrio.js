@@ -8,6 +8,8 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { waterMaterial, waterTube, fieldPath } from './water.js';
 import { Vegetation, PLANT } from './vegetation.js';
+import { buildAvenida } from './avenida.js';
+import { mergeStatic } from './merge.js';
 import { ARCH, BARRIO, TERRACE_Y, VECINOS, FAROLES, SOPORTAL, CALLE } from '../sim/levels/cascada.js';
 
 const Y = TERRACE_Y;
@@ -50,7 +52,7 @@ function building(scene, { x0, x1, z0, z1, h, mats, roof = 'flat', front = 'z1',
   footprints?.push({ x0, x1, z0, z1, h, roof });
   const w = x1 - x0, d = z1 - z0, grp = new THREE.Group();
   const geo = new THREE.BoxGeometry(w, h, d);
-  const face = (along) => { const m = mats.facade[rnd() < 0.3 ? 1 : 0].clone(); m.map = m.map.clone(); m.map.repeat.set(Math.max(1, Math.round(along / 1.6)), Math.max(1, Math.round(h / 1.6))); m.map.needsUpdate = true; return m; };
+  const face = (along) => { const base = mats.facade[rnd() < 0.3 ? 1 : 0], m = base.clone(); m.map = m.map.clone(); m.map.repeat.set(Math.max(1, Math.round(along / 1.6)), Math.max(1, Math.round(h / 1.6))); m.map.needsUpdate = true; m.userData.base = base; return m; };
   const body = new THREE.Mesh(geo, [face(d), face(d), mats.roofTop, mats.roofTop, face(w), face(w)]);
   body.position.set((x0 + x1) / 2, Y + h / 2, (z0 + z1) / 2); body.castShadow = body.receiveShadow = true; grp.add(body);
   // terracotta cornice and a plinth: the strata's colours, ordered
@@ -148,15 +150,21 @@ export function buildBarrio(scene, { M, wallRock, cutRock = wallRock, field, zBa
   for (const [z1, z0, h, roof] of west) building(scene, { x0: BARRIO.x0 - 2.6, x1: BARRIO.x0 - 0.05, z0, z1, h, mats, roof, footprints });
   for (const [z1, z0, h, roof] of west) building(scene, { x0: BARRIO.x1 + 0.05, x1: BARRIO.x1 + 2.6, z0, z1, h: h + 0.4, mats, roof: roof ? undefined : 'pitched', footprints });
   for (const [x0, x1, h, roof] of [[BARRIO.x0 - 2.6, 3.6, 5.0, 'pitched'], [3.6, 6.3, 5.6], [12.4, BARRIO.x1 + 2.6, 5.0]]) building(scene, { x0, x1, z0: BARRIO.z0 - 3.2, z1: BARRIO.z0 - 0.05, h, mats, roof, footprints });
+  // (the street's façades end at z −31: beyond, a forecourt to the avenue, where the camera, 4.6 m
+  // behind the explorer on the platform, has room)
+  const STREET_END = -31.0;
   // the street northwards (between the observatory's block and the north-east corner): façades on
   // both sides, taller the farther, its own pavement, an iron gate at its mouth
-  for (const [z1, z0, h, roof] of [[BARRIO.z0 - 3.4, BARRIO.z0 - 8.4, 6.2, 'pitched'], [BARRIO.z0 - 8.4, CALLE.z0 + 2.2, 7.4]]) building(scene, { x0: CALLE.x0 - 3.0, x1: CALLE.x0 - 0.05, z0, z1, h, mats, roof, footprints });
-  for (const [z1, z0, h, roof] of [[BARRIO.z0 - 3.2, BARRIO.z0 - 7.6, 6.6], [BARRIO.z0 - 7.6, CALLE.z0 + 2.2, 8.0, 'pitched']]) building(scene, { x0: CALLE.x1 + 0.05, x1: CALLE.x1 + 3.0, z0, z1, h, mats, roof, footprints });
+  for (const [z1, z0, h, roof] of [[BARRIO.z0 - 3.4, BARRIO.z0 - 8.4, 6.2, 'pitched'], [BARRIO.z0 - 8.4, STREET_END, 7.4]]) building(scene, { x0: CALLE.x0 - 3.0, x1: CALLE.x0 - 0.05, z0, z1, h, mats, roof, footprints });
+  for (const [z1, z0, h, roof] of [[BARRIO.z0 - 3.2, BARRIO.z0 - 7.6, 6.6], [BARRIO.z0 - 7.6, STREET_END, 8.0, 'pitched']]) building(scene, { x0: CALLE.x1 + 0.05, x1: CALLE.x1 + 3.0, z0, z1, h, mats, roof, footprints });
   const street = new THREE.Mesh(new THREE.BoxGeometry(CALLE.x1 - CALLE.x0 + 0.2, 0.3, CALLE.z1 - CALLE.z0), paveMat); street.position.set((CALLE.x0 + CALLE.x1) / 2, Y - 0.15, (CALLE.z0 + CALLE.z1) / 2); street.receiveShadow = true; scene.add(street);
   const gate = [];
   for (let x = CALLE.x0 + 0.12; x < CALLE.x1 - 0.05; x += 0.2) { gate.push(new THREE.CylinderGeometry(0.022, 0.022, 2.1, 6).translate(x, Y + 1.05, CALLE.z1 - 0.1)); gate.push(new THREE.ConeGeometry(0.045, 0.14, 6).translate(x, Y + 2.17, CALLE.z1 - 0.1)); }
   for (const y of [0.15, 1.0, 1.95]) gate.push(new THREE.BoxGeometry(CALLE.x1 - CALLE.x0, 0.05, 0.05).translate((CALLE.x0 + CALLE.x1) / 2, Y + y, CALLE.z1 - 0.1));
-  const gateMesh = new THREE.Mesh(mergeGeometries(gate.map(g => g.toNonIndexed())), M.brassDark); gateMesh.castShadow = true; scene.add(gateMesh);
+  // (a leaf hinged at the west post, swinging into the street as the level's gate opens)
+  const gateMesh = new THREE.Mesh(mergeGeometries(gate.map(g => g.toNonIndexed().translate(-CALLE.x0, 0, -(CALLE.z1 - 0.1)))), M.brassDark); gateMesh.castShadow = true;
+  const gatePivot = new THREE.Group(); gatePivot.position.set(CALLE.x0, 0, CALLE.z1 - 0.1); gatePivot.add(gateMesh); scene.add(gatePivot);
+  const gateState = world.gates.find(g => g.id === 'reja');
   // the observatory closing the axis of the passage: a copper dome on a drum
   const obs = building(scene, { x0: 6.3, x1: 9.7, z0: BARRIO.z0 - 3.4, z1: BARRIO.z0 - 0.05, h: 5.2, mats, footprints });
   const drum = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.35, 0.7, 28), M.enamel); drum.position.set(8, Y + 5.55, BARRIO.z0 - 1.7); obs.add(drum);
@@ -164,7 +172,7 @@ export function buildBarrio(scene, { M, wallRock, cutRock = wallRock, field, zBa
   dome.position.set(8, Y + 5.9, BARRIO.z0 - 1.7); dome.castShadow = true; obs.add(dome);
   const slit = new THREE.Mesh(new THREE.BoxGeometry(0.28, 1.0, 2.6), new THREE.MeshStandardMaterial({ color: '#2a1a12' })); slit.position.set(8, Y + 6.6, BARRIO.z0 - 1.7); obs.add(slit);
   // a clock tower behind the north row: the city goes on beyond the square, and is taller
-  const TW = { x0: (CALLE.x0 + CALLE.x1) / 2 - 1.3, x1: (CALLE.x0 + CALLE.x1) / 2 + 1.3, z0: CALLE.z0 - 0.4, z1: CALLE.z0 + 2.2, h: 11 }; // closing the street
+  const TW = { x0: (CALLE.x0 + CALLE.x1) / 2 - 1.3, x1: (CALLE.x0 + CALLE.x1) / 2 + 1.3, z0: -53.4, z1: -50.8, h: 13 }; // beyond the avenue, closing the street's view
   const tower = building(scene, { ...TW, mats, footprints });
   const tcx = (TW.x0 + TW.x1) / 2, tcz = (TW.z0 + TW.z1) / 2;
   const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 1.75, 2.6, 4, 1), mats.terracotta); spire.rotation.y = Math.PI / 4; spire.position.set(tcx, Y + TW.h + 1.52, tcz); tower.add(spire);
@@ -272,6 +280,12 @@ export function buildBarrio(scene, { M, wallRock, cutRock = wallRock, field, zBa
   }
   const garden = new Vegetation(scene, field, { tops: [], spots, quality: 'high' });
 
+  // One mesh per material for the static neighbourhood (the people, the clock's hands, the floor
+  // under the wall and the water stay apart).
+  const avenida = buildAvenida(scene, { M, mats, building, footprints, paveMat, world });
+  const keep = new Set([sitter.g, stander.g, ...hands, ...under, gatePivot, ...avenida.keep]);
+  town.userData.merge = mergeStatic(town, o => keep.has(o));
+
   // ---- seen from in front of the wall (the 2.5D path) ----
   // From in front of the wall the neighbourhood is drawn only through the passage's mouth: a stencil
   // portal there marks the screen, and the neighbourhood's materials are tested against it (those it
@@ -352,7 +366,7 @@ export function buildBarrio(scene, { M, wallRock, cutRock = wallRock, field, zBa
     },
     // Driven by the simulation's door (one authority): the leaf swings 90° into the passage as the
     // crank and its shaft turn; the joints glow once the city has been seen.
-    update(dt, time) {
+    update(dt, time, alpha) {
       const t = door.open ? 1 : (door.openT || 0) / (door.swing || 1);
       const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
       pivot.rotation.y = e * Math.PI / 2;
@@ -362,6 +376,11 @@ export function buildBarrio(scene, { M, wallRock, cutRock = wallRock, field, zBa
       // shows over the wall is to be its own designed silhouette.
       town.visible = (door.open || door.opening) && mouthSeen;
       passageFloor.visible = door.open || door.opening;
+      if (town.visible) {
+        const gt = gateState.open ? 1 : gateState.openT / gateState.swing, ge = gt < 0.5 ? 2 * gt * gt : 1 - Math.pow(-2 * gt + 2, 2) / 2;
+        gatePivot.rotation.y = ge * 1.5; // swinging into the street (short of the observatory's wall)
+        avenida.update(dt, time, alpha);
+      }
       if (town.visible) {
         // the neighbours look at the explorer when it comes near (within 4 m); otherwise, the square or the book
         const av = world.avatar;

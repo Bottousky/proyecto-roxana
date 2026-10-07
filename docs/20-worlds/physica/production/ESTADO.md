@@ -1,6 +1,6 @@
 # Physica — estado
 
-**Actualizado:** 2026-10-07 · iteración 15 (el barrio visto desde el 2.5D y la metrópolis habitada; **B2 cerrado**; ver `evidence/iter-15`).
+**Actualizado:** 2026-10-07 · iteración 16 (la parada del carro de cable; B3 «Introducción» en curso; ver `evidence/iter-16`).
 
 ## Dónde se trabaja
 
@@ -14,7 +14,24 @@
 
 ## Hito actual: B (primer episodio), en curso. El A espera la evaluación humana (`EVALUACION-HITO-A.md`)
 
-**Último cambio aceptado (iteración 15, Hito B · B2 cerrado):** la transición ya no salta y la plaza se lee como un barrio de la ciudad (D20).
+**Último cambio aceptado (iteración 16, Hito B · B3 en curso):** la parada del carro de cable (D21).
+- **El lugar:** detrás de la reja de la plaza, una avenida con andén.
+  - El carro corre a velocidad constante entre dos paradas.
+  - El impulso lo da un cable que se ve correr, movido por la rueda de una casa de máquinas.
+- **La experiencia:** el explorador sube con ▲, viaja y baja con ▼. A bordo, la regla del carro queda fija y el cordón numerado del andén pasa: la base de «dos descripciones del mismo movimiento».
+- **La velocidad tiene marco:** al bajar o al soltar algo desde el carro en marcha, sale con la velocidad del carro.
+- **Deuda pagada:** el barrio unido por material (la plaza pasó de 634 a 443 llamadas de dibujo).
+- **Corregido:** la cadena del Pozo, que se ofrecía en profundidad.
+- **Revisión independiente:** encontró un atrapamiento en la vía, el carro que sólo llevaba al explorador y el arrastre sin velocidad. Los tres están corregidos, con pruebas que fallan con el código anterior.
+- **Evidencia:**
+  - 87 pruebas;
+  - la secuencia con teclas;
+  - el recorrido completo desde un inicio limpio, con el paso «calle y carro»;
+  - el costo de dibujo y de CPU por lugar.
+
+  Ver `evidence/iter-16`.
+
+**Iteración 15 (Hito B · B2 cerrado):** la transición ya no salta y la plaza se lee como un barrio de la ciudad (D20).
 - **Desde el lado 2.5D,** el barrio se ve sólo por el arco (un portal de stencil en la boca del pasaje). Sobre el muro, una silueta en la bruma aparece con un fundido después del Mirador.
 - **La plaza:**
   - puertas;
@@ -202,21 +219,21 @@
 
 El loop no se detiene: según el contrato, al cerrar un hito se sigue con el próximo, y esas validaciones quedan pedidas.
 
-**Próximo resultado: el primer problema de «Introducción» en la ciudad (B3, con el primer tramo de B5).** La calle del norte se abre a una parada de transporte. Ahí, dos observadores describen de manera distinta el mismo movimiento: uno en el andén y otro en el vehículo. El jugador coloca referencias y comprueba qué cambia y qué no (contrato, familia «Introducción»).
-- **Diseño primero:**
-  - una página en DECISIONES con el problema, las mediciones posibles y qué cuenta como entender (no un texto que lo explique);
-  - cómo se conecta con la plaza y con el recorrido 2.5D.
-- **Mínimo jugable:**
-  - abrir la reja;
-  - un tramo de calle caminable;
-  - un vehículo con movimiento uniforme y marcas cada 0,1 s;
-  - una referencia que se coloca;
-  - la Bitácora con lo medido desde los dos puntos de vista.
-- **Deuda que entra:** el costo de dibujo del barrio (unir su geometría estática por material) antes de sumar calle.
+**Próximo resultado: medir el mismo movimiento desde dos referencias (B3).**
+- **El jalón:** un cuerpo que el explorador lleva y planta, en el andén o sobre el carro. El carro lo lleva.
+- **Dos registros físicos y simultáneos:**
+  - **cuáles:** tiza en el suelo (marcas fijas en el andén) y una cinta en el carro (marcas que viajan con él);
+  - **primero:** la linterna del carro;
+  - **después, el caso que no es trivial:** el explorador caminando sobre el carro en marcha, donde los desplazamientos se suman o se restan.
+- **La Bitácora:**
+  - posiciones y desplazamientos respecto de cada jalón, con signo (el tramo oeste da negativo);
+  - dice que las dos descripciones son correctas.
 - **Criterio:**
-  - con teclado, el jugador mide el mismo desplazamiento desde dos referencias y la Bitácora muestra la diferencia;
-  - pruebas de la cinemática (posición relativa, desplazamiento, determinismo);
+  - con teclado, el mismo viaje medido desde las dos referencias, con números distintos y correctos;
+  - pruebas de la cinemática relativa;
   - una revisión independiente que lo lea como problema, no como texto.
+
+*Plan cumplido en la iteración 16:* la base de «Introducción»: la avenida, el carro y el marco de la velocidad.
 
 *Plan cumplido en las iteraciones 13 a 15:* B2, la transición 2.5D → 3D, cerrada.
 

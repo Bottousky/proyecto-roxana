@@ -24,11 +24,17 @@ export const FUENTE = { x: (ARCH.x0 + ARCH.x1) / 2, z: -15.2 };
 export const SOPORTE_C = { x: 3.0, z: -15.2 };
 // The square's lamps (the north ones between the doors, not in front of them) and the columns of the
 // observatory's arcade, 0.8 m in front of its façade.
-export const FAROLES = [[BARRIO.x0 + 0.6, -10], [BARRIO.x1 - 0.6, -10], [3.9, BARRIO.z0 + 0.6], [12.15, BARRIO.z0 + 0.6]];
+// (the north-east one beside the street's mouth, not in it)
+export const FAROLES = [[BARRIO.x0 + 0.6, -10], [BARRIO.x1 - 0.6, -10], [3.9, BARRIO.z0 + 0.6], [12.55, BARRIO.z0 + 0.6]];
 export const SOPORTAL = { xs: [6.42, 7.47, 8.53, 9.58], z: BARRIO.z0 + 0.8 };
 // A street leaves the square northwards, east of the observatory, closed for now by an iron gate at
 // the square's edge (the walkable area ends there); a clock tower closes its far end.
-export const CALLE = { x0: 9.75, x1: 12.35, z1: BARRIO.z0, z0: BARRIO.z0 - 15 };
+export const CALLE = { x0: 9.75, x1: 12.35, z1: BARRIO.z0, z0: -36.0 };
+// Beyond the street (Hito B, B3 «Introducción»): an avenue across, with a platform (andén) along its
+// south side and a cable car running east–west on the track beside it, between two stops.
+export const AVENIDA = { x0: -4, x1: 24, andenZ0: -40.2, andenZ1: -35.5, z0: -44.6 };
+// (its stops at round readings of the kerb, which counts metres from the platform's west end: 5 and 20)
+export const CARRO = { id: 'carro', len: 3.6, z0: -42.6, z1: AVENIDA.andenZ0, y: TERRACE_Y, h: 0.5, stops: [AVENIDA.x0 + 5, AVENIDA.x0 + 20], speed: 1.5, ramp: 0.5, dwell: 6 };
 // Two neighbours: one sits on the fountain's rim facing the passage, one stands at an east door.
 // (the sitting one on the south-west of the rim, facing out: off the jet seen from the passage)
 export const VECINOS = { sentada: { x: FUENTE.x - 1.15, z: FUENTE.z + 1.15, facing: -Math.PI / 4 }, parado: { x: BARRIO.x1 - 0.6, z: -17.6 } };
@@ -75,6 +81,9 @@ export const CASCADA = {
     ...FAROLES.map(([x, z], i) => ({ id: `farol-${i}`, circle: { x, z, r: 0.1 }, top: TERRACE_Y + 2.6 })),
     ...SOPORTAL.xs.map((x, i) => ({ id: `columna-${i}`, circle: { x, z: SOPORTAL.z, r: 0.14 }, top: TERRACE_Y + 2.9 })),
   ],
+  // The street's iron gate (opened with E), and the cable car (D21).
+  gates: [{ id: 'reja', label: 'Reja de la calle', verb: 'Abrir la reja', x0: CALLE.x0, x1: CALLE.x1, y: TERRACE_Y, z: CALLE.z1, swing: 1.2 }],
+  carriers: [CARRO],
   depthAreas: [
     { id: 'umbral', x0: ARCH.x0 - 0.6, x1: ARCH.x1 + 0.6, z0: -3.9, z1: 0.3 },
     // The square begins at the wall's far face (z −9): beside the mouth the explorer's body never
@@ -82,6 +91,13 @@ export const CASCADA = {
     // a body's width past the face, so the two areas overlap and one leads into the other.
     { id: 'pasaje', x0: ARCH.x0, x1: ARCH.x1, z0: -9.6, z1: -3.3 },
     { id: 'barrio', x0: BARRIO.x0, x1: BARRIO.x1, z0: BARRIO.z0, z1: -9.0 },
+    // behind the gate: the street, the platform along the avenue, and the car's deck (where the car is)
+    // (each area overlaps the next by more than a body's width, so one leads into the other; the platform
+    // reaches no farther south than z −35.6: the camera, 4.6 m behind, stays north of the street's façades)
+    { id: 'calle', gate: 'reja', x0: CALLE.x0, x1: CALLE.x1, z0: CALLE.z0 - 0.4, z1: CALLE.z1 + 0.6 },
+    // (▼ on the platform, near its back, is funnelled towards the street's axis: the way back)
+    { id: 'anden', gate: 'reja', x0: AVENIDA.x0, x1: AVENIDA.x1, z0: AVENIDA.andenZ0 - 0.26, z1: CALLE.z0 + 0.4, funnel: { x: (CALLE.x0 + CALLE.x1) / 2, z: CALLE.z0 + 0.4, band: 1.2 } },
+    { id: 'cubierta', gate: 'reja', carrier: 'carro', inset: 0.05, z0: CARRO.z0, z1: CARRO.z1 + 0.26 },
   ],
   solids: [
     { id: 'orilla', x0: -22, x1: 0, y0: -9, y1: 0, friction: 0.6 },
@@ -104,6 +120,10 @@ export const CASCADA = {
     // The passage's floor and the neighbourhood's pavement, at the Terraza's level.
     { id: 'pasaje', x0: ARCH.x0, x1: ARCH.x1, y0: -9, y1: TERRACE_Y, z0: -9.3, z1: -3.3, friction: 0.6 },
     { id: 'barrio', x0: BARRIO.x0, x1: BARRIO.x1, y0: -9, y1: TERRACE_Y, z0: BARRIO.z0, z1: -8.7, friction: 0.6 },
+    { id: 'calle', x0: CALLE.x0, x1: CALLE.x1, y0: -9, y1: TERRACE_Y, z0: CALLE.z0 - 0.5, z1: CALLE.z1 + 0.3, friction: 0.6 },
+    { id: 'anden', x0: AVENIDA.x0, x1: AVENIDA.x1, y0: -9, y1: TERRACE_Y, z0: AVENIDA.andenZ0, z1: AVENIDA.andenZ1, friction: 0.6 },
+    // the track's bed, below the car's deck (nothing falls through it)
+    { id: 'via', x0: AVENIDA.x0 - 2, x1: AVENIDA.x1 + 2, y0: -9, y1: TERRACE_Y - 0.55, z0: AVENIDA.z0, z1: AVENIDA.andenZ0, friction: 0.6 },
     // The square's planters: low enough to step onto (0.35 m, under the walking step).
     ...[[-3.2, -2.6], [3.2, -2.6], [-3.2, 2.8], [3.2, 2.8]].map(([dx, dz], i) => ({ id: `cantero-${i}`, x0: FUENTE.x + dx - 0.95, x1: FUENTE.x + dx + 0.95,
       y0: TERRACE_Y - 0.2, y1: TERRACE_Y + 0.35, z0: FUENTE.z + dz - 0.6, z1: FUENTE.z + dz + 0.6, friction: 0.6 })),

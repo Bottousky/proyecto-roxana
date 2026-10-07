@@ -420,7 +420,7 @@ export function buildScene(world, opts = {}) {
     traces.sync(world.traces, id => { const b = world.bodies.find(x => x.id === id); return (b?.z || LANE_Z[b?.lane ?? 0]) + 0.22; });
     for (const it of traces.items.values()) if (it.z < -4) it.group.visible = !frontView; // behind the wall: seen from beyond the arch
     if ((time * 30 | 0) % 2 === 0) { const av = world.avatar; veg.update(time, { x: av.x, y: av.y - av.hh }); }
-    barrio.update(dt, time); updateCut(dt);
+    barrio.update(dt, time, alpha); updateCut(dt);
   }
 
   function onEvent(e) {
