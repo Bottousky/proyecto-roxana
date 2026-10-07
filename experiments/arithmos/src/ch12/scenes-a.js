@@ -2,7 +2,7 @@
 
 import {lerp} from '../engine/rng.js';
 import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
-import {RULES, lineThrough, jump, readParabola, compose, double1, undoDouble1, sq} from '../logic/anticipate.js';
+import {RULES, lineThrough, jump, readParabola, compose, double1, undoDouble1, sq, boxVolume} from '../logic/anticipate.js';
 import {Drawing, Label, Shape, SHOTS, area, base, boardCast, clean, poly, dot, S, seedOf, WHITE, YELLOW, BLUE, dec, axes, curve} from './common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
 
@@ -219,6 +219,31 @@ export const salto = {
     await studentWrites(d, g, 'c12-read', 'crece  0 → 3    máximo 9    decrece  3 → 6', A.x0 + 20, A.y1 - 4, {size: 18});
     follow(p, s);
     d.evidence('jump', r);
+    // otra forma, la misma lectura: la caja de Cornisa (grado 3)
+    g.setCinematic(true);
+    const olds = w.objects.filter(o => /^c12-/.test(o.id));
+    await d.tween(0.5, q => { for (const o of olds) o.fade = 1 - q; });
+    for (const o of olds) w.remove(o.id);
+    g.setCinematic(false);
+    await d.say('Cornisa', 'Con una tabla de 6 por 6 hago cajas: corto un cuadrado de lado x en cada esquina y levanto los bordes. Entra x · (6 − 2x) · (6 − 2x).');
+    const bb = {x: A.x0 + 40, y: A.y0 + 24, w: 300, h: 200};
+    const B = axes(w, 'c12-bx', bb, [0, 3], [0, 18], {xticks: [1, 2, 3], yticks: [8, 16], xname: 'corte x', yname: 'lo que entra'});
+    const bc = w.add(curve('c12-box', boxVolume, [0, 3], B.px, B.py, [0, 18], {ch: WHITE, n: 60}));
+    bc.progress = 0;
+    await d.draw(bc, 0.9, {sound: false});
+    d.describe('El gráfico de lo que entra en la caja según el corte x: sale de 0, sube hasta 16 en x = 1 y baja hasta 0 en x = 3. No es igual de los dos lados.');
+    const bxa = await d.choose([
+      {id: '1', text: 'x = 1: donde el gráfico está más alto, 16.'},
+      {id: '1.5', text: 'x = 1,5: en la mitad, como el salto.'},
+      {id: '3', text: 'x = 3: el corte más grande.'},
+    ], {prompt: '¿Con qué corte entra más?', evaluate: true});
+    d.evidence('box-predict', {answer: bxa});
+    w.add(new Shape('c12-bmax', dot('c12-bmax', 6, YELLOW), B.px(1), B.py(16), {z: 14}));
+    w.add(new Label('c12-bmaxl', '(1, 16)', B.px(1) + 10, B.py(16) - 8, {size: 16, z: 14, ch: YELLOW}));
+    await d.think(bxa === '1' ? 'Uno: entra 1 · 4 · 4 = 16.' : bxa === '1.5' ? 'Con 1,5 entra 1,5 · 3 · 3 = 13,5. La caja no es una U: el máximo no queda en la mitad, queda en x = 1, con 16.' : 'Con 3 el fondo mide 6 − 6 = 0: la caja no tiene fondo y no entra nada. Es un cero. El máximo está en x = 1, con 16.');
+    await d.say('student', 'Cornisa, se lee igual que el salto: ceros en 0 y en 3, crece hasta x = 1, el máximo es 16, y después decrece. Pero no es una U: no es igual de los dos lados. Multiplicando, aparece x · x · x: es un polinomio de grado 3.');
+    await studentWrites(d, g, 'c12-boxw', 'x · (6 − 2x) · (6 − 2x) = 4 · x · x · x − 24 · x · x + 36 · x', A.x0 + 16, A.y1 - 4, {size: 15});
+    d.evidence('box', {max: boxVolume(1)});
     g.flags.c12jump = true;
   },
 };

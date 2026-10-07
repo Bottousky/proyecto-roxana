@@ -42,3 +42,14 @@ test('tarifa por tramos', () => {
   assert.equal(tariff(10), 10);
   assert.equal(tariff(16), 13);
 });
+
+test('la caja: x · (6 − 2x)² es de grado 3, se anula en 0 y en 3 y tiene su máximo, 16, en x = 1', async () => {
+  const {boxVolume} = await import('../src/logic/anticipate.js');
+  assert.equal(boxVolume(0), 0);
+  assert.equal(boxVolume(3), 0);
+  assert.equal(boxVolume(1), 16);
+  assert.equal(boxVolume(1.5), 13.5);
+  for (let x = 0; x <= 3; x += 0.01) assert.ok(boxVolume(x) <= 16 + 1e-9);
+  for (const x of [0.3, 1.7, 2.4]) assert.ok(Math.abs(boxVolume(x) - (4 * x ** 3 - 24 * x ** 2 + 36 * x)) < 1e-9);
+});
+

@@ -37,6 +37,9 @@ export const sq = x => x * x;
 /** Velocidad media de f entre t y t + h. */
 export const avgRate = (f, t, h) => (f(t + h) - f(t)) / h;
 
+/** La caja de Cornisa: de una tabla de 6 por 6 se cortan cuadrados de lado x en las esquinas. Volumen: x · (6 − 2x)². */
+export const boxVolume = x => x * (6 - 2 * x) * (6 - 2 * x);
+
 /** Suma de rectángulos (por la izquierda) de una tasa r(t) entre 0 y T, con n pedazos. */
 export function riemann(r, T, n) {
   const dt = T / n;

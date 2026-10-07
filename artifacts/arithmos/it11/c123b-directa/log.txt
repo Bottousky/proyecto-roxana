@@ -1,0 +1,65 @@
+[0.0s] escena → c12.salto
+[1.0s] lee: Punto salta de alegría. Mara le midió la altura: a los t segundos está a 6t − t², y tarda 6 en volver al piso.
+[1.6s] elige «A los 3: la mitad del salto.» (¿Cuándo está más alto?)
+[3.3s] lee: A los 3, la mitad: el salto es igual de los dos lados.
+[3.3s] lee: —Cornisa, los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta.
+[3.4s] lee: Con una tabla de 6 por 6 hago cajas: corto un cuadrado de lado x en cada esquina y levanto los bordes. Entra x · (6 − 2x) · (6 − 2x).
+[4.9s] elige «x = 1: donde el gráfico está más alto, 16.» (¿Con qué corte entra más?)
+[5.3s] lee: Uno: entra 1 · 4 · 4 = 16.
+[5.4s] lee: —Cornisa, se lee igual que el salto: ceros en 0 y en 3, crece hasta x = 1, el máximo es 16, y después decrece. Pero no es una U: no es igual de los dos lados. Multiplicando, aparece x · x · x: es un polinomio de grado 3.
+[5.5s] escena → c12.encadenar
+[5.9s] lee: Puse dos máquinas en fila: «el doble más uno» y «por sí mismo». Si entra 2, ¿importa cuál va primero?
+[7.0s] lee: 25 y 9: el orden importa. Encadenar reglas es otra regla, y depende de cuál va primero.
+[7.5s] elige «Menos uno, y después la mitad.» (¿Qué máquina deshace «el doble más uno»?)
+[7.9s] lee: Se deshace en el orden contrario, como en el capítulo de la caja: 5 menos 1 es 4, la mitad, 2.
+[8.5s] elige «3 o −3: con el 9 solo no se sabe.» (Si «por sí mismo» dio 9, ¿qué entró?)
+[8.9s] lee: —Mara, «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace.
+[9.0s] lee: —Dibujadas para x desde 0, la raíz es x · x dada vuelta sobre la diagonal: se cambian la entrada y la salida. 2 va a 4 en una; 4 vuelve a 2 en la otra: (2, 4) y (4, 2). Cada punto (a, b) de una es el (b, a) de la otra.
+[9.1s] lee: —Es la familia de las raíces. Como la del «¿cuántas veces?», sube cada vez más despacio, pero arranca en el 0 con valor 0; aquella, cerca del 0, baja sin fin.
+[9.1s] escena → c12.rapido
+[10.1s] lee: En el salto de Punto: justo al segundo 1, ¿qué tan rápido sube?
+[10.2s] lee: —En un tramo se puede medir: cuánto subió dividido cuánto tiempo pasó. Del 1 al 2 subió de 5 a 8: 3 por segundo.
+[11.6s] elige «Del 1 al 1,5.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[12.5s] elige «Del 1 al 1,1.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[13.4s] elige «Del 0,9 al 1.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[14.3s] elige «Del 1 al 1,01.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[15.2s] elige «Ya está: ya se ve adónde van.» (¿Qué tramo medís ahora? Cuanto más corto, más cerca del segundo 1.)
+[16.1s] elige «A 4: cada vez más cerca.» (¿A qué número se acercan?)
+[16.5s] lee: Por la derecha dieron menos que 4 y por la izquierda, más: lo encierran.
+[16.6s] lee: Cuatro. Con tramo cero no se divide, pero los tramos cada vez más cortos se acercan a 4.
+[16.6s] lee: —Cornisa, justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente.
+[16.7s] escena → c12.junta
+[17.1s] lee: Abrí la canilla del pozo de a poco: a los t minutos salen 2t baldes por minuto. ¿Cuánta agua juntamos en 3 minutos?
+[18.5s] elige «En 6 pedazos, por abajo.» (¿En cuántos pedazos partís el tiempo ahora?)
+[19.4s] elige «En 30 pedazos, por abajo.» (¿En cuántos pedazos partís el tiempo ahora?)
+[20.3s] elige «En 12 pedazos, por arriba de la recta.» (¿En cuántos pedazos partís el tiempo ahora?)
+[21.2s] elige «Ya está: ya se ve adónde van.» (¿En cuántos pedazos partís el tiempo ahora?)
+[22.1s] elige «9: lo que hay debajo de la recta, un triángulo de 3 por 6, a la mitad.» (¿A cuántos baldes se acercan las sumas?)
+[22.5s] lee: Por abajo dieron 6, 7,5, 8,7; por arriba, 9,75: lo juntado queda entre las dos, y las dos se le acercan.
+[22.6s] lee: Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2.
+[22.7s] lee: —Balcón, si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó.
+[22.8s] escena → c12.tramos
+[23.2s] lee: Mi precio por redibujar escalones: hasta 10, un trozo de tiza cada uno. Después del décimo, medio trozo por escalón.
+[24.5s] elige «13: los primeros 10 a uno, los otros 6 a medio.» (¿Cuánta tiza cobra por 16 escalones?)
+[24.9s] lee: Trece: diez por el primer tramo, tres por el segundo.
+[25.0s] lee: —Rampa, tu precio es una función por tramos: una regla hasta 10 y otra después. Un solo gráfico, dos reglas.
+[25.1s] lee: —Lo lejos del cero también va por tramos, como Recta y Cuña en la línea del depósito: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V.
+[25.2s] escena → c12.anticipar
+[25.6s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?
+[26.5s] lee: Esperá, Punto. Las noches 2 y 3 fueron 4 y 8.
+[26.6s] lee: Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato.
+[26.7s] lee: Con dos noches, 1 y 2, pasaban las dos: la recta que suma uno y la que duplica, como la de Punto en la carrera. Él eligió una antes de tiempo; las noches 2 y 3 la desmintieron.
+[27.2s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[28.1s] elige «En la noche 5: 32 pasa los 30.» (Si sigue duplicando, ¿en qué noche pasa la escalera?)
+[28.5s] lee: La noche 5: en la 4, 16, todavía no; en la 5, 32, sí.
+[28.6s] lee: —Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la noche 5. Lo anotamos como suposición y miramos cada noche si se cumple.
+[28.7s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[28.8s] lee: Noche 4.
+[28.9s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La noche 5 pasa los 30.
+[28.9s] lee: Entonces redibujamos la escalera esta noche, antes de la noche 5. ¡A trabajar!
+[29.1s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[31.7s] lee: —Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?
+[31.8s] lee: —Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto.
+[35.6s] lee: La Ronda baila otra vez, como el primer día. Punto se suma a la vuelta, un paso adelante.
+[35.7s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[36.1s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["jump-predict","jump-tap","jump","box-predict","box","compose","inverse-predict","inverse-square","rate","derivative-predict","accum","integral-predict","piecewise-predict","punto-guess","punto-erase","final-family","final-predict","final-check","punto-name"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":36.147,"size":"1600x900","touch":false,"route":"directa","watch":false}

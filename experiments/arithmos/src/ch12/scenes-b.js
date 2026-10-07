@@ -371,6 +371,8 @@ function writeJournal12(g) {
   if (jp) seen.push(jp.answer === '3' ? 'Anticipaste el punto más alto del salto en la mitad, a los 3.' : 'Pensaste el punto más alto en otro lado; el salto es igual de los dos lados: a los 3.');
   const ip = first('inverse-predict');
   if (ip) seen.push(ip.answer === 'right' ? 'Deshiciste «el doble más uno» en el orden contrario.' : 'Para deshacer «el doble más uno» probaste otro orden; se deshace al revés: menos uno, la mitad.');
+  const bp = first('box-predict');
+  if (bp) seen.push(bp.answer === '1' ? 'En la caja de Cornisa leíste el máximo en x = 1: 16.' : bp.answer === '1.5' ? 'En la caja de Cornisa buscaste el máximo en la mitad, como en el salto; la caja no es una U: el máximo está en x = 1.' : 'En la caja de Cornisa elegiste el corte más grande; con 3 no tiene fondo: el máximo está en x = 1.');
   const dp = first('derivative-predict');
   if (dp) seen.push(dp.answer === '4' ? 'Viste que las velocidades de tramos cada vez más cortos se acercan a 4.' : dp.answer === '3.99' ? 'Te quedaste con la última velocidad medida; con tramos más cortos sigue cambiando y se acerca a 4.' : 'Las velocidades de tramos más cortos se acercaban a 4, aunque con tramo cero no se pueda dividir.');
   const ip2 = first('integral-predict');
@@ -383,7 +385,7 @@ function writeJournal12(g) {
     abbr: 'Reconocer la familia, ajustar las perillas, leer el gráfico: así se anticipa.',
     body: [
       'Las reglas se agrupan en familias que se reconocen por su forma: rectas, curvas que despegan, U (simétricas: iguales de los dos lados de su eje), olas, curvas que suben cada vez más despacio y curvas partidas. Donde el gráfico se interrumpe hay una discontinuidad; una raya a la que la curva se acerca tanto como se quiera es una asíntota (la de 1 ÷ (x − 2), en el 2, no se toca nunca porque ahí no hay valor). Los parámetros eligen cuál de la familia: en y = a · x + b, b es dónde empieza y a cuánto sube por paso.',
-      'Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo). Con x desde 0, el gráfico de la raíz es el de x · x reflejado sobre la diagonal: (a, b) pasa a (b, a), como (2, 4) y (4, 2).',
+      'Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo; también en uno que no es una U, como la caja de Cornisa, x · (6 − 2x)², un polinomio de grado 3. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo). Con x desde 0, el gráfico de la raíz es el de x · x reflejado sobre la diagonal: (a, b) pasa a (b, a), como (2, 4) y (4, 2).',
       'La tasa de cambio en un tramo es cuánto cambió dividido cuánto pasó; con tramos cada vez más cortos se acerca a la derivada. Juntar lo que entra de a poco es sumar rectángulos cada vez más finos: se acerca al área bajo el gráfico, la integral.',
       'Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero, |x|: x a la derecha del cero y −x a la izquierda, que ahí da positivo. Con todo eso se anticipa, suponiendo que la regla sigue; y cuando llegan datos nuevos, se revisa.',
     ],
