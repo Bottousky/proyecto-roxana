@@ -744,6 +744,10 @@ for (let iter = 0; iter < 30000; iter++) {
       const right = {rot: 'c8-op0', flip: 'c8-op1', big: 'c8-op2', wide: 'c8-op3'}[copyCand];
       const wrong = {rot: 'c8-op1', flip: 'c8-op0', big: 'c8-op3', wide: 'c8-op2'}[copyCand];
       target = spots.find(x => x.id === (route === 'errores' && !tried.has(`cp${copyCand}`) && (tried.add(`cp${copyCand}`), true) ? wrong : right));
+    } else if (s.seg === 'c8.casas' && spots.some(x => x.id.startsWith('c8-cn'))) {
+      // dónde dobla el camino en ele (con errores, primero un cruce que no sirve)
+      const wrong = route === 'errores' && !tried.has('c8corner') && (tried.add('c8corner'), true);
+      target = spots.find(x => x.id === (wrong ? 'c8-cn1_1' : route === 'errores' ? 'c8-cn-1_2' : 'c8-cn3_-1'));
     } else if (s.seg === 'c8.casas' && spots.some(x => x.id.startsWith('c8-pt'))) {
       const seq = route === 'errores' ? ['c8-pt2_3', 'c8-pt3_2', 'c8-pt-1_-1'] : ['c8-pt3_2', 'c8-pt-1_-1'];
       target = spots.find(x => x.id === seq[coordStep]) || spots[0];

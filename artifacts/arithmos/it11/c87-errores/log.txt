@@ -1,0 +1,16 @@
+[0.0s] escena → c8.casas
+[1.0s] lee: La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada.
+[1.9s] lee: La casa de Rampa la tengo anotada así: (3, 2).
+[3.4s] lee: —Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar.
+[3.5s] lee: Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1).
+[3.7s] lee: Por las rectas, Peldaño camina en ele: primero de un lado y después del otro. ¿Dónde dobla?
+[5.9s] lee: Doblando en (-1, 2): 3 y 4, siete en total. Doblando en (3, −1) también daría 4 y 3.
+[6.5s] elige «Siete, como en ele.» (¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?)
+[7.0s] lee: —Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5.
+[7.0s] lee: Siete es yendo por las rectas, en ele. Derecho, cinco.
+[7.1s] escena → c8.sombras
+[7.5s] lee: Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?
+[20.2s] lee: A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir.
+[20.3s] lee: Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?
+[20.6s] escena → c9.flechas
+[21.3s] {"ended":true,"final":{"mode":"play","seg":"c9.flechas"},"journal":["Formas"],"evidenceKinds":["coord-try","coord-corner","coord-distance","coords","shadow-measure","shadow"],"fps":{"min":"36.0","median":"60.0"},"errors":[],"seconds":21.319,"size":"1600x900","touch":false,"route":"errores","watch":false}

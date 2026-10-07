@@ -290,10 +290,39 @@ export const casas = {
     await placeAt([-1, -1], 'Peldaño', (x, y) => `Ese es (${x}, ${y}). Los dos números son −1: uno para la izquierda y uno para abajo.`);
     house('c8-hP', -1, -1, 'Peldaño');
     g.audio.tap(0.2, 1.4);
+    // por las rectas, en ele: el jugador elige dónde dobla el camino
+    await d.say('Mara', 'Por las rectas, Peldaño camina en ele: primero de un lado y después del otro. ¿Dónde dobla?');
+    const corner = await d.interact(ctl => new Promise(resolve => {
+      g.setHint(() => ['Tocá el cruce donde dobla el camino en ele entre lo de Peldaño y lo de Rampa.']);
+      const spots = [];
+      for (let x = X0; x <= X1; x++) for (let y = Y0; y <= Y1; y++) {
+        if ((x === -1 && y === -1) || (x === 3 && y === 2)) continue;
+        spots.push(rectSpot(`c8-cn${x}_${y}`, `El cruce (${x}, ${y})`, {x: px(x) - 18, y: py(y) - 18, w: 36, h: 36}, () => {
+          if (!ctl.alive()) return;
+          const ok = (x === 3 && y === -1) || (x === -1 && y === 2);
+          d.evidence('coord-corner', {x, y, ok});
+          if (!ok) { g.note(`Desde (−1, −1) hasta (${String(x).replace('-', '−')}, ${String(y).replace('-', '−')}) y de ahí a (3, 2) no son dos tramos derechos por las rectas: el camino en ele dobla una sola vez.`); return; }
+          g.ui.setSpots([]);
+          g.setHint(null);
+          resolve([x, y]);
+        }));
+      }
+      g.ui.setSpots(spots);
+    }));
+    const [cx, cy] = corner;
+    const nm = v => String(v).replace('-', '−');
+    const lPath = w.add(new Drawing('c8-lpath', [
+      S([[px(-1), py(-1)], [px(cx), py(cy)]], seedOf('c8-lp1'), {w: 4, p: 0.95, ch: BLUE}),
+      S([[px(cx), py(cy)], [px(3), py(2)]], seedOf('c8-lp2'), {w: 4, p: 0.95, ch: BLUE}),
+    ], {z: 13, progress: 0}));
+    await d.draw(lPath, 0.8, {sound: false});
+    const leg1 = Math.abs(cx + 1) + Math.abs(cy + 1), leg2 = Math.abs(3 - cx) + Math.abs(2 - cy);
+    d.describe(`El camino en ele, doblando en (${nm(cx)}, ${nm(cy)}): ${leg1} y ${leg2}, ${leg1 + leg2} en total.`);
+    await d.think(`Doblando en (${nm(cx)}, ${nm(cy)}): ${leg1} y ${leg2}, siete en total.${cx === -1 ? ' Doblando en (3, −1) también daría 4 y 3.' : ' Doblando en (−1, 2) también daría 3 y 4.'}`);
     // la distancia en línea recta
     const dist = distance([-1, -1], [3, 2]);
     const c = await d.choose([
-      {id: '7', text: 'Siete: lo que camina yendo por las rectas.'},
+      {id: '7', text: 'Siete, como en ele.'},
       {id: '5', text: 'Cinco.'},
       {id: 'measure', text: 'Sin medir no se sabe.'},
     ], {prompt: '¿Cuánto camina Peldaño hasta lo de Rampa, en línea recta?', evaluate: true});
