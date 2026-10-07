@@ -77,7 +77,8 @@ Estados: **pendiente** · **diseñado** · **implementado** · **probado-auto** 
 | E6b | Completar el cuadrado con una o ninguna solución; la raíz de (x + 1)² como distancia al cero | 1°–5° (rango del bloque) | 7.7 | probado-auto (pendiente revisión matemática) |
 | E2b | Sucesiones aritmética y geométrica, nombradas con la tabla de 7.2 | 1°–5° (rango del bloque) | 7.2 | probado-auto (pendiente revisión matemática) |
 | E8b | Simplificar una expresión racional sin perder la restricción ((x · x − 4) ÷ (x − 2) = x + 2, con x ≠ 2), comprobado con una tabla | 1°–5° (rango del bloque) | 7.9 | probado-auto (pendiente revisión matemática) |
-| E-gap | Exponente fraccionario | 1°–5° (rango del bloque) | — | pendiente (C7b) |
+| E7b | Exponente fraccionario como media duplicación: 2 elevado a un medio = √2 (un medio y un medio hacen uno) | 1°–5° (rango del bloque) | 7.8 | probado-auto (pendiente revisión matemática) |
+| E-gap | (ninguno abierto en E; queda revisión matemática de lo agregado) | 1°–5° (rango del bloque) | — | pendiente (C7b) |
 | F1 | Ángulo como giro; suma de los ángulos de un triángulo | 1°–5° (rango del bloque) | 8.2 | probado-auto · revisado-mat (rev-mat-7) |
 | F2 | Congruencia vs semejanza | 1°–5° (rango del bloque) | 8.3 | probado-auto · revisado-mat |
 | F3 | Escala: longitudes × k, áreas × k², volúmenes × k³ | 1°–5° (rango del bloque) | 8.4 | probado-auto · revisado-mat |

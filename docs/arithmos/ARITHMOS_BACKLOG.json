@@ -358,12 +358,12 @@
     },
     {
       "id": "C7b",
-      "title": "Cobertura de E (rev-mat-6 M7, M11): hecho en 7.3b (ciclo 8) propiedades de las potencias y raíz cúbica; pendientes cociente de potencias y exponente fraccionario, √(x²) = |x|, sucesiones nombradas, completar el cuadrado con una o ninguna solución, simplificar racionales con restricción",
+      "title": "Cobertura de E (rev-mat-6 M7, M11): hecho en el ciclo 8 — propiedades de las potencias (producto, cociente, potencia de potencia; la suma no), raíz cúbica (7.3b), sucesiones aritmética y geométrica y el día n (7.2), completar el cuadrado con una o ninguna solución y la raíz de (x + 1)² (7.7), exponente un medio (7.8), simplificar racionales con su restricción (7.9). Falta la revisión matemática de lo agregado",
       "deps": [
         "C7"
       ],
       "acceptance": "Escena jugable con decisión; revisión matemática",
-      "status": "en-curso",
+      "status": "implementado",
       "evidence": [
         "artifacts/arithmos/it11/c7f-probe/log.txt",
         "artifacts/arithmos/it11/c7j-errores/log.txt",

@@ -1,0 +1,23 @@
+[0.0s] escena → c7.cuantas-veces
+[1.0s] lee: Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?
+[1.6s] elige «Unos diez días.» (Empezando con uno y duplicando cada día, ¿cuántos días para pasar mil?)
+[4.4s] lee: —Punto, 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó.
+[4.5s] lee: Diez: duplicar llega lejos enseguida.
+[4.6s] lee: Para pasar mil, diez. ¿Y para llegar justo a mil?
+[4.6s] lee: —Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero hay pasos más chicos: media duplicación es multiplicar por √2, porque dos medias hacen una, √2 · √2 = 2. Nueve y media: 512 · 1,414, unos 724. Todavía no.
+[4.7s] lee: —Por eso a √2 también se lo escribe 2 elevado a un medio: media duplicación. Como al juntar factores, se suman los exponentes: un medio y un medio hacen uno, y √2 · √2 = 2. Nueve duplicaciones y media son 2 elevado a 9,5.
+[4.8s] lee: El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo.
+[4.8s] escena → c7.no-se-puede
+[5.2s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[5.8s] elige «Con x = 2.» (¿Para qué x no se puede hacer esa cuenta?)
+[7.6s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[7.9s] lee: Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2.
+[8.0s] lee: —Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero.
+[8.1s] lee: La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.
+[8.2s] lee: Yo tengo otra cuenta: (x · x − 4) ÷ (x − 2). Dicen que es lo mismo que x + 2, que es más corta.
+[9.4s] elige «Casi: dan lo mismo, menos en x = 2, donde la primera no está definida.» (¿Son la misma cuenta?)
+[11.0s] lee: Con 3 y con 0 dan igual. Con 2, la primera es 0 ÷ 0: no está definida, y x + 2 da 4.
+[11.1s] lee: —Mara, x · x − 4 es (x − 2) · (x + 2): x · x + 2 · x − 2 · x − 4. Si x no es 2, el (x − 2) de arriba se va con el de abajo y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2.
+[11.2s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?
+[11.3s] escena → c8.diagonal
+[12.0s] {"ended":true,"final":{"mode":"play","seg":"c8.diagonal"},"journal":["Crecer"],"evidenceKinds":["log-predict","log-step","log","rational-predict","rational-try","rational","rational-simplify"],"fps":{"min":"40.0","median":"60.0"},"errors":[],"seconds":12.041,"size":"1600x900","touch":false,"route":"directa","watch":false}
