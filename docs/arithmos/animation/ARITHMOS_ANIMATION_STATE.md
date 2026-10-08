@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-07, ciclo 13 (cont.).
+**Última actualización**: 2026-10-07, ciclo 15.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Ver la vertical slice
@@ -37,6 +37,9 @@
 - E13b/E13c: alfabeto de un trazo completo para las etiquetas del juego (minúsculas, mayúsculas usadas, tildes, puntuación, × → ÷ ° < > ↑ ↓ ← √ ≈ % …).
 - VS3/VS4 (R4 corregida): cámara que se acerca con causa, Punto que llama al próximo punto, negación con repaso, blanco de toque ≥ 52 px CSS, Punto sobre la cabeza, **llave que une 5 y 2 con el 7 debajo** (sin inclinarse: la cabeza ya no tapa el atado).
 - R5 (VS4): No, pero Timing N4 (prov.) y el resto N3. **VS5** (`c15/t10w`): Punto dibuja lazos alrededor de los 5 y los 2 en la Ronda mientras el alumno escribe «5» y «2»; hilos en abanico; polvo en los cruces; poses de mirar con silueta; superposición medida (`c15/eureka.png`). Pendiente: R6.
+- R6 → VS6 (lazo de la unión sincronizado con la llave, quietud, retrasos de torso y brazo); E15: figura dibujada con depósito (misma textura que la escritura).
+- R7 → VS7 (anticipación y rampa de Punto en los lazos, suelo dentro del plano, hilo que nace de su marca, brazos quietos al retroceder).
+- R8 → **VS8** (`c18/t10c`): corregido un error del planificador de movimiento que afectaba a todos los tests (suavizado que subía la velocidad junto a los extremos: 92 000 px/s²; frenadas por curvatura sin límite) → máx. 5000 px/s² medido sobre el plan; en el conteo salteado los puntos se juntan antes de los lazos; hilos atenuados tras la unión. Todos los tests del laboratorio corren sin errores tras el cambio. Pendiente: R9.
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
 - **Se conserva**: el compuesto WebGL de presión + diente (`renderer.js`) — es la base de la textura en todas las técnicas ganadoras; el modelo de mundo/escenas, el director asincrónico, la UI, el guardado y el contenido de los 12 capítulos.
@@ -53,7 +56,7 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **R6 sobre VS5** (en curso). Si aprueba: congelar la slice como benchmark (`c15/t10w`) y pasar a los adaptadores del plan de migración.
+1. **R9 sobre VS8** (en curso). Si aprueba: congelar la slice como benchmark (`c18/t10c`) y pasar a los adaptadores del plan de migración.
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
 4. ~~Rendimiento en escritorio~~ (E12: ~1 ms/cuadro con caché). Teléfono real [H].
