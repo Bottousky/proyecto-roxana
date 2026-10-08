@@ -145,24 +145,28 @@ function build(taps = autoTaps()) {
   writeGlyph('7', eqX + (GLYPHS['='].adv + 0.22) * sz, NUM.y, sz, 141);
   ev('escribe = 7', t);
   // 7. comprende: el alumno se abre, Punto rebota dos veces; la cámara se aleja
-  const T_GET = t + 0.45;
+  // primero se aleja para mirar lo hecho; la comprensión llega al ver el conjunto (y el brazo ya no pasa por la escritura)
+  const T_BACK = t + 0.35;
+  const T_GET = T_BACK + 0.15 + 1.35 + 0.4;
   ev('comprende', T_GET);
   sc.punto.push({kind: 'bounce', t: T_GET + 0.15, at: P1, n: 2});
   sc.score.push({type: 'note', t: T_GET + 0.15, freq: 523, dur: 0.6, gain: 0.05}, {type: 'note', t: T_GET + 0.32, freq: 659, dur: 0.6, gain: 0.045}, {type: 'note', t: T_GET + 0.5, freq: 784, dur: 0.9, gain: 0.04});
   sc.T_GET = T_GET;
-  sc.duration = T_GET + 4.0; // R3: cola de 2.8 s sin cambio → ≤ 1 s quieto al final
+  sc.duration = T_GET + 2.6; // R3: ≤ 1 s quieto al final
   // ——— actor ———
   sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, poses: POSES2, script: [
     ...baseScript(T_PUNTO, Math.max(5.0, taps[0].t + 0.3)),
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
     {t: sc.events['escribe 5 y 2'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
     {t: T_STEP, pose: 'write', overrides: {lean: 0.36, armR: [1.3, 0.3]}, gaze: [0.8, 0.5]},
-    {t: T_GET - 0.15, pose: 'lookDown', gaze: [0.6, 0.3]},           // anticipación: se encoge un instante
-    {t: T_GET, pose: 'eureka', overrides: {armR: [2.45, 0.35]}, face: 0.9, gaze: [1, -0.5]}, // cabeza arriba, mira la Ronda: lo entendió (brazo adelante, no cruza la cara: R3)
-    {t: T_GET + 0.62, pose: 'lookDown'},                                // anticipa el paso atrás
-    {t: T_GET + 0.75, walk: {to: X1 - 170, speed: 190, back: true}},    // dos pasos atrás para mirar lo hecho
-    {t: T_GET + 0.75, pose: 'stand', gaze: [0.8, -0.2]},
-    {t: T_GET + 1.9, pose: 'open', gaze: [0.2, -0.3]},
+    // anticipación: se encoge y el brazo baja por debajo de la ecuación antes de subir (R3/VS2: barría por encima de «5+2=7»)
+    {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
+    {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true}},                  // dos pasos atrás
+    {t: T_BACK + 0.2, pose: 'stand', gaze: [0.7, 0.1]},                                 // mira lo que escribió
+    {t: T_GET - 0.4, pose: 'stand', gaze: [1, -0.4]},                                   // mira la Ronda... (pausa ≥ 0.35 s)
+    {t: T_GET - 0.12, pose: 'lookDown'},                                                // micro-encogida
+    {t: T_GET, pose: 'eureka', face: 0.9, gaze: [1, -0.5]},                             // ¡ya está! (el brazo sube lejos de la escritura)
+    {t: T_GET + 1.0, pose: 'open', gaze: [0.2, -0.3]},
   ]});
   // pasos al sonido: cuando un pie vuelve a apoyar
   let prev = null;
@@ -175,7 +179,7 @@ function build(taps = autoTaps()) {
   sc.camera = cameraTrack([
     // sin zoom de entrada (R2: «zoom sin causa»): el plano ya es el medio; sólo se abre al final, cuando el alumno da un paso atrás
     {t: 0, cx: 1440, cy: 600, w: 1250},
-    {t: T_GET + 1.0, cx: 1400, cy: 610, w: 1450},
+    {t: T_BACK + 0.3, cx: 1400, cy: 610, w: 1450},
   ]);
   return sc;
 }
