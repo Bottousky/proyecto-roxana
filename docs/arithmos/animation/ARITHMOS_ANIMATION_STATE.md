@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-07, ciclo 16.
+**Última actualización**: 2026-10-08, ciclo 17.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Ver la vertical slice
@@ -41,6 +41,7 @@
 - R7 → VS7 (anticipación y rampa de Punto en los lazos, suelo dentro del plano, hilo que nace de su marca, brazos quietos al retroceder).
 - R8 → **VS8** (`c18/t10c`): corregido un error del planificador de movimiento que afectaba a todos los tests (suavizado que subía la velocidad junto a los extremos: 92 000 px/s²; frenadas por curvatura sin límite) → máx. 5000 px/s² medido sobre el plan; en el conteo salteado los puntos se juntan antes de los lazos; hilos atenuados tras la unión. Todos los tests del laboratorio corren sin errores tras el cambio.
 - R9: **N3 en todo** (mínimo de producción alcanzado). **VS9** (`c19/t10k`): saltos 3.º/1.º = 0.71, mirada que sigue cada punto, hilo de los lazos a la llave y al 7, comprensión con contramovimiento y sin vaivén; E16 pies plantados (deslizamiento 16.2 → 0.42 px por 1/240 s). Pendiente: R10 (N4 en Timing/Actuación/Matemática).
+- R10: No (salto de Punto, hilo que cruzaba el «2»). **VS10** (`c20/t10a`) corrige ambos; tiempos de marcas verificados con sondas (≤ 0.1 s tras cada aterrizaje).
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
 - **Se conserva**: el compuesto WebGL de presión + diente (`renderer.js`) — es la base de la textura en todas las técnicas ganadoras; el modelo de mundo/escenas, el director asincrónico, la UI, el guardado y el contenido de los 12 capítulos.
@@ -57,7 +58,7 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **R10 sobre VS9** (en curso). Si aprueba N4: congelar la slice como benchmark (`c19/t10k`) y pasar a los adaptadores del plan de migración.
+1. **R11 sobre VS10** (`c20/t10a`; regenerar evidencias como en `c19/`: textura, tiza, eureka, pies, teléfono, interactivo, salteado). Si aprueba N4: congelar la slice como benchmark y pasar a los adaptadores del plan de migración. (Antes: R10 sobre VS9.) Si aprueba N4: congelar la slice como benchmark (`c19/t10k`) y pasar a los adaptadores del plan de migración.
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
 4. ~~Rendimiento en escritorio~~ (E12: ~1 ms/cuadro con caché). Teléfono real [H].

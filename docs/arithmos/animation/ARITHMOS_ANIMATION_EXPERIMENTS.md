@@ -376,3 +376,10 @@ R9: **N3 en todas las dimensiones** (mínimo de producción alcanzado); falta N4
 **Hallazgo** (sonda de pies del esqueleto a 240 Hz): el pie "apoyado" saltaba 16.2 px (= 6·k) al terminar una caminata hacia atrás y 9–13 px al empezar a caminar; además, al cambiar de pose u orientación los pies se deslizaban (el esqueleto 2D los recoloca).
 **Técnica** (`actor.js`): pies plantados de pie (bloqueo de pie: el pie apoyado no se mueve; si la pose lo pide > 8·k más allá, pasito de 0.22 s de a un pie); piernas por IK hasta el pie plantado; las mezclas hacia/desde la marcha parten y llegan a pies quietos; cada caminata arranca con las pisadas reales (el de atrás primero; se intercambian los nombres si hace falta) y termina donde la dejó el plan.
 **Resultado**: deslizamiento máx. **0.42 px por 1/240 s** con el pie apoyado (antes 16.2), ninguna muestra > 0.5 px (`c19/pies-entra.png`, `pies-atras.png`).
+
+## Revisión R10 (VS9) y VS10 — ciclo 17
+R10: **No** — bloqueaban (a) un salto de Punto de 58 px en una muestra (19.62 s) y (b) el hilo del lazo al 7 cruzaba el «2» y la llave. Disposición (`c20/t10a`):
+(a) causa: tras el salto hacia la cabeza, Punto quedaba fijo en el punto de aterrizaje mientras el alumno retrocedía y al pasar a "posado" saltaba a la cabeza → ahora sigue a la cabeza también mientras se asienta; mayor paso fuera del conteo 4.8 px por 1/240 s (continuo).
+(b) el lazo grande arranca y cierra del lado que mira a la llave; el hilo entra a la llave por su extremo derecho curvándose por debajo: no cruza glifos (`c20/t10a/final.png`).
+(c) "las marcas van 0.6–1.1 s detrás" → **rechazado con sondas**: cada marca empieza 0.09–0.10 s después del aterrizaje (aterrizajes 5.60, 6.37, 7.08, 7.73, 8.35, 9.34, 9.92; inicios 5.70, 6.46, 7.17, 7.83, 8.45, 9.43, 10.01).
+Pendiente: revisión R11 de VS10; desglosar en la tabla «5», «+», «2»; captura interactiva final esperando el fin de la escena.

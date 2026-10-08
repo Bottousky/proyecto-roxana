@@ -185,7 +185,10 @@ function build(taps = autoTaps()) {
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
   // 6. la unión: mientras el alumno dibuja la llave que junta 5 y 2 (en el papel), Punto rodea los siete con un lazo grande
   //    (en la Ronda): el mismo gesto en las dos representaciones. Después, quietud ≥ 0.4 s y recién el «7» (R6).
-  const LALL = depositStroke(lassoGuide(DOTS, 58, 172), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 2500, v0: 8, v1: 10, k0: 1 / 60, smooth: 90}});
+  // arranca y cierra del lado que mira a la llave: de ahí sale el hilo hacia el 7 (R10: salía de arriba y cruzaba el «2»)
+  const cxR = DOTS.reduce((a, d) => a + d[0], 0) / DOTS.length, cyR = DOTS.reduce((a, d) => a + d[1], 0) / DOTS.length;
+  const braceEnd = [TALLY.x + TALLY.pairDx + TALLY.gap + 6, NUM.y + 10];
+  const LALL = depositStroke(lassoGuide(DOTS, 58, 172, Math.atan2(braceEnd[1] - cyR, braceEnd[0] - cxR)), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 2500, v0: 8, v1: 10, k0: 1 / 60, smooth: 90}});
   tp = Math.max(tp + L2.T, t) + 0.2;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from: endOf(L2), to: startOf(LALL), h: 40});
   tp += 0.45 + 0.2;
@@ -205,8 +208,8 @@ function build(taps = autoTaps()) {
     t = write(braceSt, t, 'llave');
     // de los lazos al 7 (R9): al cerrar el lazo grande, Punto sigue de largo y dibuja un hilo celeste hasta la punta de la
     // llave; se queda ahí, quieto, mientras se escribe el 7 (los siete puntos → la llave → el 7)
-    const tip = [bm, by + 21 + 6], e0 = endOf(LALL);
-    const ctrl = [(e0[0] + tip[0]) / 2, Math.min(e0[1], tip[1]) - 60];
+    const tip = [bx1 + 3, by + 1], e0 = endOf(LALL);
+    const ctrl = [tip[0] + (e0[0] - tip[0]) * 0.35, Math.max(e0[1], tip[1]) + 40];
     const carryG = Array.from({length: 30}, (_, k) => { const u = k / 29; return [(1 - u) ** 2 * e0[0] + 2 * (1 - u) * u * ctrl[0] + u * u * tip[0], (1 - u) ** 2 * e0[1] + 2 * (1 - u) * u * ctrl[1] + u * u * tip[1]]; });
     const CARRY = depositStroke(carryG, {w: 3.6, p: 0.78, ch: BLUE, seed: 173, motion: {speed: 700, accel: 2500, v0: 10, v1: 10, smooth: 90}});
     const tc = tp + LALL.T + 0.1;
@@ -286,7 +289,7 @@ function puntoAt(t) {
     if (p.kind === 'appear') { pos = p.at; fill = clamp(tl / p.dur); if (tl < p.dur) sl = 1; }
     else if (p.kind === 'hop') {
       if (p.toFn) p.to = p.toFn(p.t + p.dur);
-      if (tl >= p.dur + 0.35) { pos = p.to; continue; }
+      if (tl >= p.dur + 0.35) { pos = p.toFn ? p.toFn(t) : p.to; continue; } // si el destino se mueve (la cabeza), lo sigue
       const crouch = 0.12; // anticipación 80–140 ms (lenguaje visual; R3)
       if (tl < crouch) { pos = p.from; sl = 1 - 0.22 * minJerk(tl / crouch); }               // se agacha
       else if (tl < p.dur) {
@@ -296,7 +299,7 @@ function puntoAt(t) {
         ang = Math.atan2((p.to[1] - p.from[1]) - 4 * p.h * (1 - 2 * u), p.to[0] - p.from[0]);
       } else {                                                                                // aterriza y se asienta
         const k = (tl - p.dur) / 0.35;
-        pos = p.to; ang = Math.PI / 2;
+        pos = p.toFn ? p.toFn(t) : p.to; ang = Math.PI / 2;
         sl = 1 - 0.24 * Math.exp(-k * 5) * Math.cos(k * 11);
       }
     } else if (p.kind === 'no') {
@@ -333,8 +336,8 @@ function puntoAt(t) {
 
 /** Lazo que rodea un grupo de puntos: el borde de la envolvente convexa engordada (suma de Minkowski con un disco),
  *  arrancando arriba a la izquierda, antihorario, con un leve sobrepaso al cerrar y algo de temblor. */
-function lassoGuide(pts, pad, seed) {
-  const g = [], n = 56, a0 = -Math.PI / 2 - 0.7;
+function lassoGuide(pts, pad, seed, a0 = -Math.PI / 2 - 0.7) {
+  const g = [], n = 56;
   for (let k = 0; k <= n + 4; k++) {
     const a = a0 - (k / n) * Math.PI * 2;
     const ux = Math.cos(a), uy = Math.sin(a);
