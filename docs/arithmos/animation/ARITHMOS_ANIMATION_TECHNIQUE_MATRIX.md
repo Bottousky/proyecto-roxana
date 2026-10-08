@@ -22,5 +22,31 @@ Evidencia: `E01` = `artifacts/arithmos/animlab/c01/t01*` (ver `ARITHMOS_ANIMATIO
 | Ease-in-out por trazo (CSS) | 2 — pico de 1700 px/s en el medio de una línea larga (2.8× crucero de B): se percibe como "lanzado" | 4 | E01 speed.png |
 | **Plan de mano** (ley 2/3 + aceleración acotada + levantadas de Fitts) | 4 — arranque y frenada de ~0.1 s, crucero estable; marcas cortas en campana | 3 — la duración es consecuencia (se ajusta con `speed`/`accel`) | E01 speed.png, `motion.js` |
 
-## Pendiente (se completa con los tests 02–10)
-Escritura (glifos de un trazo vs fuente con barrido), transformación de ecuaciones (identidad por símbolo vs crossfade), borrado (borrador con forma vs fade), actuación (segundo orden vs ease), cámara (trauma vs senoide).
+## Escritura y transformación (E03)
+
+| Técnica | Precisión | Calidad visual | Control temporal | Edición por Claude | Riesgo | Evidencia |
+|---|---|---|---|---|---|---|
+| Fuente + barrido rectangular (`chalkText` + `reveal`) | 4 | 2 — tipografía, no escritura; dígitos de otra fuente | 1 — barrido lineal | 5 | bajo | E03 fila A |
+| Fundido cruzado entre pasos | 3 | 1 — dos ecuaciones superpuestas (t03c, t = 5.33) | 2 | 5 | bajo | E03 fila A |
+| **Glifos de un trazo + plan de mano** | 4 — legibles de 34 a 110 px | 4 — se ven escritos; bajadas más cargadas | 5 — cada trazo buscable | 4 — un glifo = una lista de puntos | medio (cobertura de signos: hoy 0–9 x y + − = ( ) / ·) | E03, E10 |
+| **Identidad por símbolo** (desliza / escribe / tacha / borra; «=» pivote) | 5 | 4 | 5 | 3 — hay que declarar claves por símbolo | medio | E03 |
+
+## Actuación (E05, E09)
+
+| Técnica | Naturalidad | Control | Evidencia |
+|---|---|---|---|
+| Ease-in-out entre poses / `zip` / `hop` senoidal | 1–2 | 5 | E05 x.png, E09 hand-head.png (filas A) |
+| **Segundo orden con retraso por canal** (anticipa con r < 0, sobrepasa, se asienta; mirada → cabeza → torso → brazos) | 3–4 | 3 — se ajusta con f, ζ, r | E05 x.png, E09 hand-head.png |
+| **Pisadas planificadas + IK + péndulo invertido** | 4 — 0 patinaje | 4 | E09 feet.png |
+| Poses del motor (`POSES`) | 2 — en perfil esconden un brazo | 5 | E09 act.png, E10 |
+
+## Borrado (E07), cámara (E08), sonido (E10)
+
+| Técnica | Resultado | Evidencia |
+|---|---|---|
+| Fundido + fantasma | todo se apaga junto, fantasma nítido | E07 fila A |
+| **Borrador visible + neblina ∩ contenido** | causal, ilegible después, polvo con gravedad | E07 cmp.png |
+| `Camera.go` 1.6 s ease | 3.85 pantallas/s de pico en viaje largo; se mueve mientras se dibuja | E08 pan.png |
+| **van Wijk–Nuij + duración por costo + llegar antes** | 1.35 pantallas/s; quieta al empezar la acción | E08 |
+| Sonido de tiza con envolvente fija (motor) | suena aunque la tiza no toque (levantadas simuladas a ritmo fijo) | `src/engine/audio.js` `chalkStart` |
+| **Partitura desde la línea de tiempo** | 11× más energía con contacto; corr. 0.70 con la velocidad; [H] calidad | E10 score.wav |

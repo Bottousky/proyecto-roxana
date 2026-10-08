@@ -213,3 +213,29 @@ Cambios (evidencia en `c06/`):
 **Conclusión**: hipótesis (1) y (2) apoyadas con números. B pasa a ser la cámara del laboratorio.
 
 **Siguiente**: E10 microescena (personaje + tiza + matemática + cámara + sonido + transformación, 20–40 s).
+
+---
+
+## E10 — TEST 10 + TEST 04 · microescena «¿Cuántos son?» (ciclo 9, 2026-10-07)
+
+**Hipótesis**: los módulos probados por separado (depósito + plan de mano, glifos, actor, blob, cámara) se combinan en una escena de ~17 s que se lee como fragmento de juego terminado, con un cambio de representación real: cantidad concreta (7 puntos) → correspondencia (un salto de Punto ↔ una marca) → agrupación (atado de cinco) → números bajo cada grupo → expresión «5 + 2 = 7». El sonido sale de la misma línea de tiempo.
+
+**Técnica**: `animlab/tests/t10-scene.js`; `animlab/core/score.js` (partitura determinista: rasgueo con envolvente = velocidad real de la punta, golpecito al apoyar, pasos desde el plan de pisadas, notas de conteo en escala que sube; render fuera de línea a WAV); brazo que escribe por IK hasta la punta de la tiza (con aire entre trazos y vuelta al costado en pausas largas); la Ronda reacciona al aterrizaje de Punto.
+
+**Resultado** (`c09/t10e`):
+- Guion (s): entra 0.5 → la cámara llega al plano medio 3.7 → Punto aparece 4.0 (el alumno se sorprende) → cuenta 5.1–8.6 (saltos de 0.50 a 0.29 s: el conteo agarra ritmo) → «5», «+», «2» 9.7 → se inclina y escribe «= 7» 10.9–11.9 → comprende 12.4 → la cámara abre 13.3.
+- Correspondencia visible en `t10e/sheet.png`: cada aterrizaje deja un anillo amarillo en el punto y una marca nueva; la 5.ª cruza las cuatro; «5» queda bajo el atado y «2» bajo el par (`t10e/moments.png`).
+- Sonido (`t10e/score.wav`, 17 s): RMS medio con la tiza apoyada 0.021 vs 0.0019 sin contacto (11×); correlación entre velocidad de la punta y RMS 0.70 (el resto es energía de notas y pasos). **No escuchado: sin certificar [H].**
+- Alcance del brazo: la punta queda dentro del alcance salvo un instante del «7» (11 px de más, `reachOver`).
+
+**Defectos encontrados y corregidos** (t10a → t10e): las marcas tapaban la cabeza y el paso al costado tapaba lo escrito (→ escritura a la derecha de la cabeza, a escala de mano, ≈ 8 % del alto; inclinarse en vez de pasar por delante); el «+» no cabía entre 5 y 2 (→ par más separado); con la inclinación grande la cabeza pisaba las marcas (→ inclinación 0.26 y ecuación más compacta).
+
+**Defectos abiertos**:
+1. «5+2=7» quedó apretado (separaciones de operadores menores que las del lenguaje visual) para que entre en el alcance.
+2. Un instante con la punta 11 px fuera del alcance (se nota como mano que no toca la tiza si se mira cuadro a cuadro).
+3. El brazo cruza por delante de las marcas al ir al «7».
+4. La comprensión del alumno (pose `open`) es débil como actuación: poses del motor (ver E09).
+5. El plano final (ancho 1500) deja la escritura chica.
+6. No hay borrado ni transformación con deslizamiento en esta escena (están probados en E03/E07, no integrados).
+
+**Conclusión**: la combinación funciona y la escena es causal de punta a punta (nada aparece sin mano, salto o tiza). Es la base de la vertical slice, no la vertical slice: faltan poses fuertes, un respiro en la composición final y una revisión independiente.

@@ -201,7 +201,7 @@ function vault(s, hip, feet) {
 }
 
 /** IK de dos huesos: rodilla hacia adelante (según facing). */
-function ik(hip, foot, a, b, f) {
+export function ik(hip, foot, a, b, f) {
   const dx = foot[0] - hip[0], dy = foot[1] - hip[1];
   const d = clamp(Math.hypot(dx, dy), 1e-3, a + b - 1e-3);
   const base = Math.atan2(dy, dx);

@@ -18,6 +18,7 @@ const TESTS = {
   '09': () => import('./tests/t09-figure.js'),
   '07': () => import('./tests/t07-erase.js'),
   '08': () => import('./tests/t08-camera.js'),
+  '10': () => import('./tests/t10-scene.js'),
 };
 
 const params = new URLSearchParams(location.search);
@@ -88,6 +89,13 @@ window.__lab = {
   id, title: test.title, duration,
   seek: t => render(t),
   probe: t => test.probe?.(lab, t) ?? null,
+  /** Partitura de la prueba renderizada fuera de línea: {wav (base64), rms a 60 Hz}. */
+  audio: async () => {
+    if (!test.score) return null;
+    const {renderOffline} = await import('./core/score.js');
+    const r = await renderOffline(test.score(lab), duration);
+    return {wav: r.wav, rms: Array.from(r.rms, v => +v.toFixed(5))};
+  },
   metrics: () => test.metrics?.(lab) ?? null,
   /** Perfil por columnas de una franja de mundo: pico de presión y ancho (px de mundo sobre el umbral). */
   columns(x, y, w, h, ch = 0, thr = 0.3) {
@@ -119,9 +127,19 @@ if (params.has('play')) {
   const speed = Number(params.get('speed') || 1);
   const hold = 1.2;
   let start = performance.now();
+  // sonido en vivo: un clic arranca la partitura sincronizada con la imagen (el navegador exige un gesto)
+  let actx = null;
+  const startAudio = async t0 => {
+    if (!test.score || speed !== 1) return;
+    const {renderScore} = await import('./core/score.js');
+    if (actx) actx.close();
+    actx = new AudioContext();
+    renderScore(actx, test.score(lab), {t0});
+  };
+  addEventListener('pointerdown', () => { start = performance.now(); startAudio(0); });
   const loop = now => {
     let t = (now - start) / 1000 * speed;
-    if (t > duration + hold) { start = now; t = 0; }
+    if (t > duration + hold) { start = now; t = 0; if (actx) startAudio(0); }
     render(Math.min(t, duration));
     requestAnimationFrame(loop);
   };

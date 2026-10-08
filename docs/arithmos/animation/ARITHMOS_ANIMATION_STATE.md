@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-07, ciclo 8.
+**Última actualización**: 2026-10-07, ciclo 9.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Cómo retomar
@@ -24,16 +24,28 @@
 - P1 pulido: resueltos los hallazgos aceptados de R1 (deformación ≤ 25 %, borde de Punto en el diente, rastro con forma de glifo, subrayado que une 5 + 3 con el 8, anticipación de señalar). Pendiente: poses con siluetas claras.
 - E07 borrado: `animlab/core/eraser.js` — borrador visible con plan de mano, huella de fieltro, neblina sólo donde había tiza (ilegible), polvo que cae.
 - E08 cámara: `animlab/core/camera2.js` — van Wijk–Nuij con duración por costo; paneo pico 1.35 vs 3.85 pantallas/s; llega antes de la acción; trauma.
+- E10 microescena «¿Cuántos son?» (17 s): personaje + Punto + tiza + cámara + sonido + cambio de representación (7 puntos → marcas → 5 + 2 = 7). Base de la vertical slice. WAV en `artifacts/arithmos/animlab/c09/t10e/score.wav` (sin escuchar).
 
-## Decisión provisional (se confirma tras E03, E05 y E09)
-**B. Reconstrucción parcial**: conservar renderer WebGL, mundo, director y escenas; reemplazar progresivamente (1) el tiempo de dibujo por el plan de mano, (2) el texto por escritura con glifos de un trazo, (3) la actuación por sistemas de segundo orden con superposición. Sin reescribir capítulos hasta que la vertical slice alcance el quality bar.
+## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
+- **Se conserva**: el compuesto WebGL de presión + diente (`renderer.js`) — es la base de la textura en todas las técnicas ganadoras; el modelo de mundo/escenas, el director asincrónico, la UI, el guardado y el contenido de los 12 capítulos.
+- **Se reemplaza, módulo por módulo** (cada uno ya probado en el laboratorio con comparación A/B):
+  1. tiempo de dibujo: `d.draw` lineal → plan de mano (`animlab/core/motion.js`, `deposit.js`) — E01, E02;
+  2. texto: fuente + barrido → glifos de un trazo + identidad por símbolo (`glyphs.js`) — E03;
+  3. Punto: `Dot` + `zip/hop` → `blob.js` (segundo orden, área constante) — E05;
+  4. figura: mezcla de poses → `actor.js` (canales superpuestos, pisadas, IK) — E09; **requiere poses nuevas**;
+  5. borrado: fundido → `eraser.js` — E07;
+  6. cámara: `Camera.go` → `camera2.js` — E08;
+  7. sonido de tiza: envolvente fija → partitura desde la línea de tiempo (`score.js`) — E10.
+- **Por qué no rebuild**: ningún experimento encontró un límite en la arquitectura de render ni en el mundo; los límites estaban en tiempo y actuación, y son reemplazables detrás de las mismas APIs (`Drawing`, `Label`, `Dot`, `Figure`, `Camera`, `d.draw`). Un rebuild tiraría 12 capítulos de contenido verificado sin ganancia visual medible.
+- **Por qué no continuar tal cual**: E03 (fundido con fantasmas), E07 (fundido), E08 (3.85 pantallas/s), E09 (patinaje) muestran defectos de nivel 1 del quality bar que el motor actual no puede corregir con parámetros.
+- **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. E10 microescena (20–40 s): la figura escribe con la mano visible, Punto ayuda, la cámara acompaña, la tiza suena según la velocidad; una idea matemática que se transforma. Base de la vertical slice.
-2. Mano visible que escribe (falta en E03).
-3. Poses nuevas con siluetas (brazos separados, línea de acción).
-4. E07 borrado (borrador visible + neblina), E08 cámara, E04 cambio de representación, E06 función.
-5. E10 microescena → base de la vertical slice.
+1. **Revisión independiente R2 de E10** (sólo imágenes de t10e + WAV no aplica: el revisor no escucha).
+2. **Poses nuevas** para `actor.js`: siluetas claras en ¾ (brazos separados del torso, línea de acción), sobre todo: escribir, señalar, sorpresa, duda, comprender. Re-medir en E09.
+3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
+4. Rendimiento: medir tiza + polvo por cuadro de la vertical slice en escritorio (HUD) y dejar listo el pedido de prueba en teléfono [H].
+5. Después: adaptadores en `src/engine` y capítulo piloto (sólo con la slice aprobada).
 
 ## Abierto / humano
 - Audio: nada certificado (nadie escuchó).

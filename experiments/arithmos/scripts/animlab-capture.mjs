@@ -44,6 +44,14 @@ const metrics = await page.evaluate(() => window.__lab.metrics());
 const probes = await page.evaluate(d => { const o = []; for (let t = 0; t <= d; t += 1 / 60) o.push({t: +t.toFixed(4), p: window.__lab.probe(t)}); return o; }, dur);
 await writeFile(join(out, 'probes.json'), JSON.stringify(probes));
 await writeFile(join(out, 'metrics.json'), JSON.stringify({test, dur, times, renderMs: ms.map(m => +m.toFixed(2)), metrics, errors}, null, 1));
+// sonido: partitura renderizada fuera de línea → WAV + envolvente RMS (para medir sincronía, no calidad)
+if (opt.audio) {
+  const a = await page.evaluate(() => window.__lab.audio());
+  if (a) {
+    await writeFile(join(out, 'score.wav'), Buffer.from(a.wav, 'base64'));
+    await writeFile(join(out, 'rms.json'), JSON.stringify(a.rms));
+  }
+}
 // recortes de detalle con más densidad
 if (opt.crop) {
   const {ctx: c2, page: p2} = await open(3);
