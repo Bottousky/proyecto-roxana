@@ -2,6 +2,7 @@
 // Los planos se definen como rectángulos; la forma de la pantalla decide el zoom.
 
 import {lerp, easeInOut, clamp} from './rng.js';
+import {zoomPath, travelTime, minJerk} from './camera-path.js';
 
 export class Camera {
   constructor() {
@@ -15,6 +16,10 @@ export class Camera {
     this.drift = true;
     this.time = 0;
     this.safe = {left: 0, top: 0, right: 0, bottom: 0};
+    // ?anim=2: viajes por el camino de van Wijk–Nuij con mínimo jerk; `dur` pasa a ser un tope (la duración sale del
+    // costo perceptual y la cámara llega antes si puede). Sin la bandera, el camino de siempre.
+    this.pathMode = false;
+    this.leg = null;
   }
 
   /** Corta o viaja a un plano. Devuelve la duración efectiva. */
@@ -32,6 +37,15 @@ export class Camera {
     this.t = 0;
     this.dur = dur;
     this.ease = ease;
+    this.leg = null;
+    if (this.pathMode) {
+      const f = this.from, c0 = [f.x + f.w / 2, f.y + f.h / 2, f.w], c1 = [r.x + r.w / 2, r.y + r.h / 2, r.w];
+      const path = zoomPath(c0, c1);
+      if (Number.isFinite(path.S)) {
+        this.dur = Math.min(dur, travelTime(Math.abs(path.S)));
+        this.leg = {path, ra0: Math.log(f.h / f.w), ra1: Math.log(r.h / r.w)};
+      }
+    }
     return dur;
   }
 
@@ -41,6 +55,7 @@ export class Camera {
 
   finish() {
     this.t = 1;
+    this.leg = null;
     this.current = {...this.shot};
   }
 
@@ -48,6 +63,14 @@ export class Camera {
     this.time += dt;
     if (this.t < 1) {
       this.t = Math.min(1, this.t + dt / this.dur);
+      if (this.leg) {
+        const e = minJerk(this.t), [cx, cy, w] = this.leg.path.at(e);
+        const h = w * Math.exp(lerp(this.leg.ra0, this.leg.ra1, e)); // la proporción del plano cambia pareja
+        this.current = {x: cx - w / 2, y: cy - h / 2, w, h};
+        if (this.t >= 1) { this.current = {...this.shot}; this.leg = null; }
+        this.shake = Math.max(0, this.shake - dt * 2.5);
+        return;
+      }
       const e = this.ease(this.t);
       const f = this.from;
       // interpolación en escala logarítmica del tamaño para que el zoom se sienta parejo

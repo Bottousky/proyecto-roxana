@@ -54,7 +54,9 @@ page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', e => errors.push(String(e.stack || e)));
 const url = `http://127.0.0.1:${port}/`;
 const startSeg = val('start', '');
-await page.goto(startSeg ? `${url}?seg=${startSeg}` : url);
+// --q=anim=2: parámetros extra en la URL (bandera de animación nueva)
+const extraQ = (args.find(a => a.startsWith('--q=')) || '').slice(4);
+await page.goto(startSeg ? `${url}?seg=${startSeg}${extraQ ? '&' + extraQ : ''}` : `${url}${extraQ ? '?' + extraQ : ''}`);
 await page.waitForFunction(() => window.__ready === true, null, {timeout: 20000});
 const t0 = Date.now();
 const note = s => { const line = `[${((Date.now() - t0) / 1000).toFixed(1)}s] ${s}`; log.push(line); console.log(line); };

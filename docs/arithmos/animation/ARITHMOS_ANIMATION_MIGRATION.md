@@ -1,6 +1,14 @@
 # ARITHMOS · Plan de migración del laboratorio al juego
 
-Estado: **diseño**, nada migrado. Condición de inicio: la vertical slice aprobada por una revisión independiente (N3 en todo, N4 en Timing/Actuación/Matemática). Sin eso, no se toca `src/`.
+Estado: **en curso**. La condición de inicio se cumplió el 2026-10-08 (R16 aprobó la slice: N3 en todo, N4 en Timing/Actuación/Matemática; benchmark `c26/vs15b`).
+
+| Paso | Estado | Evidencia |
+|---|---|---|
+| 1. Cámara (`Camera.go` → van Wijk–Nuij + mínimo jerk, `dur` como tope) | **hecho detrás de `?anim=2`** | `tests/camera.test.mjs` (5 pruebas), `c27/cam2-*.json` (A/B en c1.ronda, c1.vuelven, c1.marea), bot del capítulo 1 con y sin bandera (`c27/bot-c1-{A,B}.out`) |
+| 2. `Drawing` + `d.draw` → depósito con plan de mano | siguiente | — |
+| 3. `Label` → glifos | — | — |
+| 4. Punto (`Dot`, `zip`/`hop`) | — | — |
+| 5. Figura → actor incremental | — | — |
 
 ## Escala (conteo en `experiments/arithmos/src`, 2026-10-07)
 | API del motor | Usos | Qué la reemplaza | Estrategia |

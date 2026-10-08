@@ -18,6 +18,9 @@ class Game {
     this.overlay = document.getElementById('overlay');
     this.overlayCtx = this.overlay.getContext('2d');
     this.camera = new Camera();
+    // ?anim=2: animación del laboratorio (adaptadores, ARITHMOS_ANIMATION_MIGRATION.md). Hoy: cámara.
+    this.anim = new URLSearchParams(location.search).get('anim') === '2' ? 2 : 1;
+    this.camera.pathMode = this.anim === 2;
     this.world = new World();
     this.audio = new Sound();
     this.ui = new UI(this);

@@ -445,3 +445,10 @@ Pendientes no bloqueantes de R16 (para una pasada de pulido con su propia revisi
 - D4 la mano sube 174 → 341 en 0.33 s (pico ~3800 px/s) al terminar el 7, sin gesto legible: el brazo que escribe se suelta hacia la pose; bajarlo con el paso atrás.
 - D5 la mirada satura en su tope en 22.4–22.7 s: aceptado como decisión o reescalar.
 - E1–E4: cuadros 15.80/16.00/16.20 (llave), definir la métrica de quietud antes de comprender en el QUALITY_BAR, una sola definición de vuelo (la del plan, sin agachada), pausa del 7 en el límite (0.35 s).
+
+## M1 — adaptador de cámara (`?anim=2`) — ciclo 23
+**Qué**: `src/engine/camera-path.js` (van Wijk–Nuij + `travelTime` + mínimo jerk; el laboratorio lo importa de ahí: una sola copia). `Camera.go` con `pathMode` (lo enciende `?anim=2` en `main.js`, `game.anim = 2`): el viaje sigue el camino óptimo de zoom/paneo con perfil de mínimo jerk; la proporción del plano cambia pareja (log); la duración sale del costo perceptual y `dur` es un **tope** (la escena sigue esperando `sec` en `d.shot`, así que sus tiempos no cambian; la cámara llega antes si puede). Cortes, `finish()` y saltar, iguales.
+**Pruebas**: `tests/camera.test.mjs` — sin bandera el camino de siempre; con bandera plano final exacto, sin llegar tarde, arranque/llegada en reposo, sin saltos de velocidad, se abre al cruzar lejos; cortes y finish iguales. 106/106 pruebas.
+**A/B en escenas reales** (`scripts/cam-ab.mjs`, tiempo del juego): c1.ronda, c1.vuelven, c1.marea. Con la bandera los viajes duran **0.5–1.0 s** (antes 1.2–2.8 s, la duración pedida entera), la rapidez pico queda en **≤ 0.82 anchos de plano por segundo** (antes ≤ 0.97) y el cambio máximo de rapidez entre cuadros es 7–9 % del pico en ambos (los dos suaves). La cámara llega antes de la acción (VL §7). El único pico (24 anchos/s) es el corte de c1.marea a c1.vuelven, igual en ambos.
+**Regresión**: el bot del capítulo 1 termina igual con y sin bandera (mismas evidencias, 0 errores, fps mín. 46.7 / mediana 60).
+**Abierto [H]**: si los reencuadres chicos de ~0.5 s se sienten bruscos frente a los 1.7 s de antes (el lenguaje visual pide duración por costo; el mínimo es 0.6 s de viaje).

@@ -32,7 +32,9 @@ cdp.on('Page.screencastFrame', async f => {
   await writeFile(`${out}/film/${name}`, Buffer.from(f.data, 'base64'));
 });
 await cdp.send('Page.startScreencast', {format: 'jpeg', quality: 60, maxWidth: 800, maxHeight: 450, everyNthFrame: 1});
-await page.goto(`http://127.0.0.1:${port}/?seg=${seg}`);
+// --q=anim=2: parámetros extra en la URL (p. ej. la bandera de animación nueva)
+const extra = (args.find(a => a.startsWith('--q=')) || '').slice(4);
+await page.goto(`http://127.0.0.1:${port}/?seg=${seg}${extra ? '&' + extra : ''}`);
 const end = Date.now() + Number(secs) * 1000;
 while (Date.now() < end) {
   if (args.includes('--advance')) {
