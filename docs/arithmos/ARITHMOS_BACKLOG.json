@@ -520,8 +520,10 @@
         "C12"
       ],
       "acceptance": "Revisión narrativa hecha y altas corregidas",
-      "status": "pendiente",
-      "evidence": []
+      "status": "cerrado",
+      "evidence": [
+        "artifacts/arithmos/it13/review-arco3/informe.md (sin hallazgos altos; quedan medias anotadas en ARITHMOS_REVIEW.md)"
+      ]
     },
     {
       "id": "C11-R",
@@ -624,9 +626,10 @@
         "C12-R"
       ],
       "acceptance": "Revisión narrativa del arco sin hallazgos altos",
-      "status": "en-curso",
+      "status": "cerrado",
       "evidence": [
-        "artifacts/arithmos/it12/review-narr-arco/informe.md"
+        "artifacts/arithmos/it12/review-narr-arco/informe.md",
+        "artifacts/arithmos/it13/review-arco3/informe.md (sin hallazgos altos; quedan medias anotadas en ARITHMOS_REVIEW.md)"
       ]
     }
   ]

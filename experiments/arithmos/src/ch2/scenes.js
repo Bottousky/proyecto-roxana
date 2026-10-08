@@ -271,6 +271,7 @@ export const marcar = {
   title: 'Demasiados para marcar',
   setup(g) {
     const w = g.world;
+    g.flags.c2board1Dim = true;
     base(g);
     morningCast(g);
     w.removeWhere(o => o.id === 'heap' || o.id === 'head-mark' || o.id.startsWith('mtick-'));
@@ -667,7 +668,7 @@ export const deposito = {
       await d.say('Mara', 'El depósito. Tres cuartos: sueltos, atados y atados de atados.');
       await d.say('Mara', 'Regla de la casa: nunca más de nueve por cuarto. Con diez, se atan y pasan al de al lado.');
       await d.say('student', '¿Por qué nueve?');
-      await d.say('Mara', 'Porque así se hizo siempre. La Marea desparramó todo; hay que guardar de nuevo.');
+      await d.say('Mara', 'La Marea desparramó todo; hay que guardar de nuevo.');
     }
     const loads = [
       {text: 'La carga de recién: tres atados y siete sueltos.', items: [1, 1, 1, 0, 0, 0, 0, 0, 0, 0]},
@@ -717,7 +718,28 @@ async function storeLoad(d, g, counts, kinds) {
         const over = counts[i] >= 10;
         spots.push(rectSpot(`room${i}`, ['Cuarto de los sueltos', 'Cuarto de los atados', 'Cuarto de los atados de atados'][i] + ` (${counts[i]})` + (over ? ': tiene diez, se puede atar' : ''), r, () => room(i)));
       });
+      // después del primer canje, lo repetido se puede hacer de una vez (el canje lo sigue haciendo el jugador)
+      if (g.flags.c2bulk) [0, 1].filter(k => objs.some(o => w.has(o.id) && o.kind === k)).forEach((k, j) => {
+        spots.push(wordSpot(`bulk${k}`, k === 0 ? 'guardar todos los sueltos' : 'guardar todos los atados', DEPOT.right + 150, GROUND - 200 - j * 56, () => bulk(k), {label: k === 0 ? 'Guardar todos los sueltos de la carga en su cuarto' : 'Guardar todos los atados de la carga en su cuarto'}));
+      });
       g.ui.setSpots(spots);
+    };
+    const bulk = async k => {
+      if (busy || !ctl.alive()) return;
+      busy = true;
+      sel = null;
+      g.ui.setSpots([]);
+      for (const o of objs.filter(x => w.has(x.id) && x.kind === k)) {
+        if (counts[k] >= 10) { g.note('Mara: "¡Ya hay diez! Primero se atan."'); break; }
+        const [tx, ty] = slot(k, counts[k]);
+        try { await hop(d, o, tx, ty, {g, h: 40, dur: 0.22}); } catch { return; }
+        w.remove(o.id);
+        counts[k]++;
+        syncDepot(g, counts);
+      }
+      d.evidence('bulk-store', {kind: k});
+      busy = false;
+      finish();
     };
     const pick = o => {
       if (busy) return;
@@ -733,6 +755,7 @@ async function storeLoad(d, g, counts, kinds) {
           try { await tieUp(d, g, counts, i); } catch { return; }
           busy = false;
           d.evidence('carry', {from: i});
+          if (!g.flags.c2bulk) { g.flags.c2bulk = true; g.note('Mara: "Ya sabés cómo es. Si querés, guardá todos de una vez; atar, lo atás vos."'); }
           return finish();
         }
         g.note(counts[i] ? 'Elegí primero algo de la carga.' : 'Ese cuarto está vacío. Elegí algo de la carga.');
@@ -953,7 +976,8 @@ export const cero = {
     await d.say('Oval', 'Mara, con treinta y dos palitos no alcanza ni para la puerta. Antes de la Marea teníamos muchísimo más.');
     await d.say('Mara', 'El registro dice treinta y dos. Tres y dos.');
     if (!replay) {
-      // mirar el registro y el estante de los Oval
+      // mirar el registro y el estante de los Oval: de cerca, para que la mancha se vea
+      await d.shot({x: LEDGER.x - 300, y: GROUND - 360, w: 700, h: 400}, 0.9);
       await d.think('Entre el 3 y el 2 hay una mancha.');
       const look = await d.choose([
         {id: 'nothing', text: 'Es una mancha: no había nada.'},
@@ -1004,7 +1028,6 @@ export const cero = {
     s.setPose('idle', 0.4);
     g.setCinematic(false);
     await d.say('Mara', '¡Trescientos dos! Y yo les daba treinta y dos…');
-    await d.say('Mara', 'Siempre pensé que el cero no era nada. Que daba lo mismo ponerlo o no.');
     await d.say('student', 'Dice "ninguno" en ese cuarto. Sin él, el 3 se corre de lugar.');
     // los Oval vuelven a dibujar su casa
     g.setCinematic(true);
@@ -1056,7 +1079,7 @@ export const cuantos = {
     const s = w.get('student');
     const p = w.get('punto');
     await d.shot({x: SHELF.a - 420, y: 260, w: 1500, h: 520}, 1);
-    await d.say('Curva', 'Mara, ¿cuánta tiza más que nosotros tiene la familia Recta?');
+    await d.say('Curva', 'Mara, la familia Recta tiene el doble de tiza que nosotros. No es justo. ¿Cuánto más tiene?');
     await d.say('Mara', 'Recta, cincuenta y dos. Curva, treinta y siete. Sacalo vos, que yo ya me mareé.');
     // dos estantes: cada uno con sus atados y sueltos
     const A = shelf(g, 'cmp-a', SHELF.a, 5, 2, 'Recta');
@@ -1072,7 +1095,7 @@ export const cuantos = {
     g.setCinematic(false);
     await d.think('Quince le quedaron a Recta sin pareja.');
     await d.think('"Pedir prestado" era desatar.');
-    await d.say('Curva', 'Quince. Bueno, no es tanto. Igual se lo voy a reclamar.');
+    await d.say('Curva', 'Quince más. El doble serían treinta y siete más. Bueno: no es para tanto, no reclamo nada.');
   },
 };
 
@@ -1217,8 +1240,8 @@ export const cuarto = {
     const s = w.get('student');
     const m = w.get('mara');
     await d.shot(SHOTS.depot, 1);
-    await d.say('Mara', 'Todos devolvieron lo que les sobraba. Nueve, nueve y nueve: el depósito está lleno hasta el techo.');
-    await d.say('Mara', 'Y acaban de traer un palito más.');
+    await d.say('Mara', 'Antes de que vuelva la Marea, todos trajeron su tiza al depósito. Nueve, nueve y nueve: está lleno hasta el techo.');
+    await d.say('Mara', 'Y Curva llega con un palito más.');
     const counts = [9, 9, 9];
     const one = item(w, 0, DEPOT.right + 70, GROUND - 30, 'load-one');
     one.z = 16;
@@ -1404,7 +1427,7 @@ export const lugar = {
     m.setPose('idle', 0.4);
     g.setCinematic(false);
     await d.say('Mara', tries === 1 ? 'Dos, cero, cinco. Con el cero en el medio, que yo antes dejaba en blanco.' : 'Ahí sí: dos, cero, cinco. El cero en el medio, que yo antes dejaba en blanco.');
-    await d.say('Mara', 'Así que por eso atábamos de a diez. Para que cada cifra tenga su lugar.');
+    await d.say('Mara', '«Así se hizo siempre», decía yo. Ahora sé por qué atábamos de a diez: para que cada cifra tenga su lugar.');
     await d.say('student', 'De a cinco también se podría. Pero todos tienen que saber de a cuánto.');
     if (!replay) writeJournal2(g);
     // gancho: lo que se debe

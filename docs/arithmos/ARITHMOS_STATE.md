@@ -115,14 +115,20 @@ node scripts/shot.mjs lab/ <png>                 # laboratorio de tiza
 El Arco I es la historia completa que ya existe: de la puerta del cap. 1 («No hay vuelta. Por ahora.») a la decisión
 de la puerta en 12.8, en 12 capítulos. Terminarlo, según el contrato (§14), es dejarlo así:
 
-- recorrido implementado y encadenado (hecho);
-- revisión matemática de todo lo que cambió (falta rev-c9c: 7.1, 7.5, 7.6 y la recta táctil del cap. 6);
-- pendientes narrativos N2-R, N6-R … N10-12 cerrados «sin hallazgos altos», según una revisión narrativa del arco
-  entero (\`it12/review-narr-arco\`, en curso);
-- partidas completas de una vez, ruta directa y ruta con errores, también en 844×390 (\`it13/\`);
-- handoff «LISTO PARA PLAYTEST HUMANO», con lo que no se puede hacer en forma autónoma explícitamente pendiente:
-  audio escuchado, playtest con personas (C1-P), rendimiento en dispositivo táctil real (ENG-6), y las decisiones del
-  usuario X-1 (lógica y Boole) y X-2 (integración con la escuela, toca infraestructura compartida).
+- recorrido implementado y encadenado: **hecho**;
+- revisión matemática de todo lo que cambió: **hecha** (rev-c9, rev-c9b, rev-c9c, review-arco2, review-arco3; ninguna
+  cuenta falsa abierta);
+- pendientes narrativos «sin hallazgos altos»: **cerrados N6-R, N7-R, N8-R, N9-R, N10-12 y N-ARC** (review-narr-arco →
+  review-arco2 → review-arco3). Los hilos del arco: la puerta del primer día se redibuja de 2.1 a 12.8; la escalera de
+  Balcón (8.6) y la Marea que deja una raya por noche hasta pasarla por arriba en la noche 5; Punto se equivoca y se
+  corrige (6.3, 10.7, 12.8); la Ronda en el medio (11.x). **N2-R**: todos sus puntos resueltos o justificados en
+  ARITHMOS_REVIEW.md (ciclo 9); falta la corrida de los caps. 2–4 con esos cambios;
+- partidas completas de una vez: ruta directa 1 → 12 sin errores, 900 s, 12 Bitácoras (`it13/full-directa2`); ruta con
+  errores en 844×390 en curso (`it13/full-tel-errores3`);
+- handoff «LISTO PARA PLAYTEST HUMANO» cuando terminen esas corridas. Quedan explícitamente pendientes: audio escuchado,
+  playtest con personas (C1-P), rendimiento en dispositivo táctil real (ENG-6), y las decisiones del usuario X-1 (lógica
+  y Boole) y X-2 (integración con la escuela, toca infraestructura compartida). Medias abiertas: ver la última tabla de
+  ARITHMOS_REVIEW.md.
 
 ## Siguiente acción
 

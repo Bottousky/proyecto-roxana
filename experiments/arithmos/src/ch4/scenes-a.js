@@ -90,7 +90,8 @@ export const grupos = {
       await pulse(d, p, 2, 0.4);
       await d.wait(0.8);
       follow(p, s);
-      await d.shot(SHOTS.terr, 0.8);
+      // la decisión se toma viendo la pizarra de Punto y las Terrazas juntas, no todo el paisaje
+      await d.shot({x: 13980, y: 230, w: 1500, h: 560}, 0.8);
       g.setCinematic(false);
       sc.guess = await d.choose([
         {id: '7', text: 'Siete, como escribió Punto.'},

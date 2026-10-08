@@ -41,7 +41,7 @@ export const distancia = {
     const s = w.get('student');
     const p = w.get('punto');
     await d.shot(SHOTS.line, 1);
-    await d.say('Cuña', 'Recta, ¿cuánto más que nosotros tenés?');
+    await d.say('Cuña', 'Recta, si me prestás lo que nos separa, quedamos parejos. ¿Cuánto más que nosotros tenés?');
     const guess = await d.choose([
       {id: '7', text: '7'}, {id: '8', text: '8'}, {id: '1', text: '1'},
     ], {prompt: '¿Cuántos pasos hay de Cuña (−4) a Recta (+3)?', evaluate: true});
@@ -86,7 +86,7 @@ export const distancia = {
     g.setCinematic(true);
     const rc = w.get('recta');
     w.removeWhere(o => /^(arc-|cnt-)/.test(o.id));
-    await d.say('Mara', 'Recta, por la cerca que arreglaste ayer: un atado más.');
+    await d.say('Mara', 'Recta, por el techo del depósito que me ayudaste a tapar: un atado más.');
     rc.face(1);
     await d.walk(rc, lineX(4), GROUND, 160);
     rc.face(0.3);
@@ -153,7 +153,7 @@ export const perdon = {
     let removed = 0;
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
-      g.setHint(() => ['Hay que sacar dos deudas de la mesa.', 'Si no hay otra deuda para sacar, se puede agregar algo que valga cero.']);
+      g.setHint(() => ['Hay que sacar dos deudas de la pizarrita.', 'Si no hay otra deuda para sacar, se puede agregar algo que valga cero.']);
       const refresh = () => {
         const spots = w.objects.filter(o => o.id.startsWith('pz-') && o.kind === 'debt' && !o.gone).map(o => spotOf(o, 'Una deuda: sacarla', () => forgive(o)));
         if (!spots.length && removed < 2) spots.push(wordSpot('pz-stuck', '¿y la otra?', TABLE.x, TABLE.top - 30, () => stuck()));
@@ -182,7 +182,7 @@ export const perdon = {
           {id: 'pair', text: 'Agregar un atado y una deuda: juntos valen cero.'},
         ];
         for (;;) {
-          const c = await d.choose(opts, {prompt: 'Hay que sacar dos deudas y en la mesa no queda ninguna.', evaluate: true});
+          const c = await d.choose(opts, {prompt: 'Hay que sacar dos deudas y en la pizarrita no queda ninguna.', evaluate: true});
           d.evidence('forgive-how', {choice: c});
           if (c === 'pair') break;
           if (c === 'cant') {
@@ -287,7 +287,7 @@ async function payMore(d, g) {
   let padded = false;
   await d.interact(ctl => new Promise(resolve => {
     let busy = false;
-    g.setHint(() => ['Tocá un atado de la mesa para pagarlo.', 'Si no quedan atados, Oval le puede pedir prestado a Mara: un atado que tiene y uno que debe, juntos valen cero.']);
+    g.setHint(() => ['Tocá un atado de la pizarrita para pagarlo.', 'Si no quedan atados, Oval le puede pedir prestado a Mara: un atado que tiene y uno que debe, juntos valen cero.']);
     const haves = () => w.objects.filter(o => o.id.startsWith('pm-') && o.kind === 'have' && !o.gone);
     let lent = 0;
     const refresh = () => {
@@ -312,7 +312,7 @@ async function payMore(d, g) {
       if (busy || !ctl.alive()) return;
       busy = true;
       padded = true;
-      d.describe('Mara le presta un atado a Oval: en la mesa aparecen un atado y una deuda.');
+      d.describe('Mara le presta un atado a Oval: en la pizarrita aparecen un atado y una deuda.');
       try {
         if (!lent) await d.say('Mara', 'Te lo presto: un atado que tenés y uno que me debés.');
         const k = lent++;
@@ -332,7 +332,7 @@ async function payMore(d, g) {
   d.evidence('pay-result', {value: r.value, padded});
   const left = w.objects.filter(o => o.id.startsWith('pm-') && !o.gone);
   const lh = left.filter(o => o.kind === 'have').length, ld = left.filter(o => o.kind === 'debt').length;
-  if (lh - ld !== r.value) console.error(`[pagar] en la mesa quedan ${lh} atados y ${ld} deudas; la cuenta dice ${r.value}`);
+  if (lh - ld !== r.value) console.error(`[pagar] en la pizarrita quedan ${lh} atados y ${ld} deudas; la cuenta dice ${r.value}`);
   if (lh > 0) await d.think(`Sobró ${lh === 1 ? 'un par' : `${lh} pares`} de lo prestado: un atado y una deuda, que no cambian nada.`);
   await d.say('Mara', 'Me pagaste cinco: dos tuyos y tres que te presté. Me debés tres.');
   await d.think(guess === '-3' ? 'Dos menos cinco: menos tres.' : guess === '+3' ? 'No le quedan atados: le quedan tres deudas. 2 − 5 = −3.' : 'Pudo pagar, pidiendo prestado, y quedó debiendo tres: 2 − 5 = −3.');
@@ -386,7 +386,7 @@ export const pozo = {
     await d.say('Mara', 'Cuatro debajo del suelo… como Cuña, que debe cuatro. El mismo −4.');
     const c = await d.choose([
       {id: '+1', text: '+1'}, {id: '-9', text: '−9'}, {id: '+9', text: '+9'}, {id: '-1', text: '−1'},
-    ], {prompt: 'Punto está en −4. Puede subir cinco marcas. ¿Dónde queda?', evaluate: true});
+    ], {prompt: 'Punto está en −4. La soga que le tiramos tiene cinco nudos: sube cinco marcas. ¿Dónde queda?', evaluate: true});
     d.evidence('predict-pit', {answer: c});
     // el jugador elige hasta qué marca sube; Punto cuenta lo que sube
     await d.shot(SHOTS.pit, 0.8);

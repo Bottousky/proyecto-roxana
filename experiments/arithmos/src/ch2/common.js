@@ -126,6 +126,10 @@ export function base(g, {dawn = true} = {}) {
   m.font = '700 96px Tiza';
   const g1x = NAME.numX + m.measureText('1').width / 2, g1y = NAME.numY - 34;
   w.ensure('one-ring', () => new Drawing('one-ring', [art.S(art.circleGuideFor(g1x, g1y, 44), 717, {w: 2.2, p: 0.8, ch: YELLOW})], {z: 9}));
+  // pasada la mañana (2.1), la pizarra de anoche queda tenue: es fondo, no compite con lo que pasa adelante
+  const board1 = g.flags.c2board1Dim ? 0.4 : 1;
+  for (let i = 0; i < 14; i++) for (const id of [`pmark${i}`, `nword${i}`]) { const o = w.get(id); if (o) o.fade = board1; }
+  for (const id of ['brace', 'num-14', 'one-ring']) { const o = w.get(id); if (o) o.fade = board1; }
   // camino al depósito
   w.ensure('hill-a', () => art.ghost('hill-a', art.hill('hill-a', 6000, 6700, GROUND - 2, 70, 0.7), 0.45, 0, 1));
   w.ensure('hill-b', () => art.ghost('hill-b', art.hill('hill-b', 8900, 9500, GROUND - 2, 120, 0.7), 0.45, 0, 1));

@@ -175,7 +175,12 @@ Informe: `artifacts/arithmos/it04/review-narr/informe.md`. Sin navegador; varias
 | M1 | media | "Como dije / lo anticipé" | Corregido en caps. 2–5 |
 | M2 | media | Ganchos repetidos | Corregido 2→3 y 3→4 |
 | M3 | media | Cierres sin decisión (2.8, 3.7) | Hecho (verificado en el ciclo 9 leyendo el código): en 2.8 el jugador arma 205 con atados en las tres cajas y Mara lee lo que armó; en 3.7 el jugador manda a Punto a una familia de cada lado del cero y la flecha aparece ahí |
-| M4–M7, M9, M12 | media | Redundancias, reglas antes de actuar, motivos débiles, monotonía del depósito, lugares sin rótulo, deseo del protagonista | **Pendiente** (anotado en el backlog) |
+| M4 | media | Redundancias | Corregido (ciclo 9): «Así se hizo siempre» queda dos veces y se paga en 2.8 («"Así se hizo siempre", decía yo. Ahora sé por qué…»); Mara ya no aprende dos veces que el cero importa (se sacó la línea de 2.5); «la cerca que arreglaste» queda una vez (en 3.x es «el techo del depósito»); los dobles de 4.2, 4.3 y 4.5 ya no están en el código. Justificado: «ayer» es habla de todos los días entre escenas de días seguidos |
+| M5 | media | Reglas antes de actuar | Corregido en ciclos anteriores (los enunciados ya no describen lo que hay que observar; «uno contra uno» y «dividir es deshacer» ya no se dicen antes). Justificado: «De a uno, por vueltas» en 4.x es el procedimiento de reparto de Balcón (cómo reparte un personaje), no la regla matemática que el jugador descubre |
+| M6 | media | Motivos débiles | Corregidos (ciclo 9): 2.6 Curva cree que Recta tiene el doble y que no es justo, y la diferencia (15) lo desmiente; 2.7 todos guardan su tiza en el depósito antes de que vuelva la Marea; 3.4 Cuña quiere saber cuánto pedir prestado para quedar parejo; 3.6 la soga que le tiran a Punto tiene cinco nudos. Justificado: la pregunta de Balcón en 4.6 («¿y si las Terrazas quedan vacías?») es la que lleva a dividir por cero |
+| M7 | media | Monotonía del depósito (2.4) | Corregido (ciclo 9): después del primer canje aparecen «guardar todos los sueltos» y «guardar todos los atados»; se detienen en diez y el atado lo hace el jugador |
+| M9 | media | Lugares sin rótulo | Corregido: los cuartos del depósito tienen su rótulo debajo (ciclo anterior); «la mesa» del cap. 3, que se dibuja como una pizarrita, se llama «la pizarrita» en todo lo que se lee |
+| M12 | media | Deseo del protagonista y la Ronda | Corregido con ARC-A1 (ver «Revisión narrativa del arco entero»): 2.1 el estudiante piensa en la puerta borrada; la puerta reaparece en 8.1 y 11.8 y termina en 12.8; la Ronda va a la fiesta de 11.x. Justificado para los caps. 3–4: la relación cambia con la flecha de Punto en 3.7 |
 | M8 | media | Composición | Parcial (notas del cap. 4; rótulos de nombres). Pendiente: atenuar la pizarra del cap. 1 en el 2, mancha del cero |
 | M10 | media | Bitácora más manual que recuerdo | Corregido: "Lo que pasó" primero, "Lo que eso dice" después; el aviso dice dónde está (≡) |
 | M11 | media | Rótulos repetidos, botones sin verbo, eventos sin describir | Corregido en 2–4 (posición en rótulos, botones con verbo, descripciones nuevas) |
@@ -565,6 +570,15 @@ lo corregido: `artifacts/arithmos/it13/arco2/`.
 | NM7 | Balcón ausente de su escalera | Corregido: Balcón repasa con el jugador («yo te sostengo la tiza») |
 | NB | «Medí» ambiguo, «ésa», comillas rectas | Corregidos |
 | NM5a, NM5c, NM5d, NM6, NB restantes | 10.4 el ángulo lo dice Rampa; 7.3b cinco predicciones seguidas; repasar sin decisión; corridas que faltaban | NM6 rehecho en `it13/arco2`; el resto, pendiente (medias) en N-ARC y N10-12 |
+
+## Tercera revisión del arco (review-arco3, 2026-10-07)
+
+Informe: `artifacts/arithmos/it13/review-arco3/informe.md`. NA1 resuelto: la regla de la Marea es una sola en los caps.
+10, 11 y 12 (deja su raya; borra sólo al pasar la escalera por arriba, la noche 5). Ningún alto nuevo. **Cierran N10-12 y
+N-ARC** como «sin hallazgos altos». Quedan medias: NM1 (la escalera sigue apenas marcada hasta el repaso), NM2 (la tarjeta
+final dice «Lo que se entiende, resiste»; justificado: es el lema del juego y la escena lo precisa), NM5a (en 10.4 el
+ángulo lo dice Rampa), NM5c (cinco predicciones en 7.3b), NM5d (repasar sin decisión), NM7 (Balcón no aparece antes de
+12.8 con su escalera).
 
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

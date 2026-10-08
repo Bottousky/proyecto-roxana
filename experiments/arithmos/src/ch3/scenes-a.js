@@ -248,7 +248,7 @@ export const pares = {
     await d.say('Oval', 'Curva, tomá: dos atados de los míos, por la cerca que me arreglaste.');
     g.setCinematic(true);
     setTable(g, 'cv', 0, 3);
-    d.describe('Oval le pasa dos atados a Curva. En la mesa: dos atados arriba y tres deudas punteadas abajo.');
+    d.describe('Oval le pasa dos atados a Curva. En la pizarrita: dos atados arriba y tres deudas punteadas abajo.');
     const hs = [0, 1].map(k => chip(w, 'have', ov.x, GROUND - 60, `cv-h${k}`));
     for (const [k, h] of hs.entries()) await hop(d, h, ...tableSlot('have', k), {g, h: 80, dur: 0.6});
     g.setCinematic(false);
