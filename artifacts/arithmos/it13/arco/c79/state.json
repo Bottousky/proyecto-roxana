@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "chapter": 8,
+  "segment": "c8.diagonal",
+  "flags": {
+    "c7rational": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "answer": "2",
+      "t": "2026-10-08T00:12:38.978Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-predict"
+    },
+    {
+      "x": 2,
+      "t": "2026-10-08T00:12:41.306Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 5,
+      "t": "2026-10-08T00:12:41.462Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 4,
+      "t": "2026-10-08T00:12:41.594Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 2,
+      "reason": "no se divide por cero",
+      "t": "2026-10-08T00:12:41.930Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational"
+    },
+    {
+      "answer": "almost",
+      "t": "2026-10-08T00:12:43.559Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-simplify"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c7",
+      "title": "Crecer",
+      "abbr": "Multiplicar repetido crece distinto que sumar repetido, y cada crecimiento tiene su pregunta al revés.",
+      "body": [
+        "La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.",
+        "Sumar lo mismo crece parejo (sucesión aritmética: el día n, 1 + 10 · n); duplicar empieza lento y después saca cada vez más ventaja (sucesión geométrica: cada día, el doble del anterior). En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Dividirlas saca factores, y los exponentes se restan: 2⁵ ÷ 2² = 2³. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con un número de 1 a menos de 10 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.",
+        "Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4. La raíz de (x + 1)² es lo lejos que está x + 1 del cero; por eso hay dos. Si x + 1 es positivo, la raíz de (x + 1)² es x + 1; si es negativo, no. Si el cuadrado da 0, hay una sola solución; si da un negativo, ninguna en la recta.",
+        "Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). Media duplicación es multiplicar por √2 (dos veces da × 2); para que juntar exponentes siga valiendo, se elige escribirla 2 elevado a un medio. El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2. Al simplificar, la restricción se anota: (x · x − 4) ÷ (x − 2) = x + 2, con x ≠ 2."
+      ],
+      "seen": [
+        "Viste que (x · x − 4) ÷ (x − 2) es x + 2 salvo en x = 2.",
+        "Viste que 1 ÷ (x − 2) no se puede con x = 2."
+      ],
+      "moments": [
+        {
+          "id": "c7.areas",
+          "label": "Desplegar: áreas con x"
+        },
+        {
+          "id": "c7.cuantas-veces",
+          "label": "Desplegar: ¿cuántas veces?"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c7.no-se-puede"
+  ],
+  "moments": [],
+  "log": [
+    {
+      "who": "Rampa",
+      "text": "Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2)."
+    },
+    {
+      "who": "student",
+      "text": "Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas."
+    },
+    {
+      "who": null,
+      "text": "Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero."
+    },
+    {
+      "who": "Rampa",
+      "text": "La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba."
+    },
+    {
+      "who": "Mara",
+      "text": "Yo tengo otra cuenta: (x · x − 4) ÷ (x − 2). Dicen que es lo mismo que x + 2, que es más corta."
+    },
+    {
+      "who": null,
+      "text": "Con 3 y con 0 dan igual. Con 2, la primera es 0 ÷ 0: no está definida, y x + 2 da 4."
+    },
+    {
+      "who": "student",
+      "text": "Mara, con x = 2 queda 0 ÷ 0: cualquier número por 0 da 0, así que no hay un solo resultado. Por eso no está definida, aunque x + 2 dé 4."
+    },
+    {
+      "who": "student",
+      "text": "Y x · x − 4 es (x − 2) · (x + 2). Si x no es 2, el (x − 2) que multiplica se va con el (x − 2) que divide, y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2."
+    },
+    {
+      "who": null,
+      "text": "Abreviaturas sueltas. Ninguna dice por qué."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?"
+    }
+  ],
+  "createdAt": "2026-10-08T00:12:36.714Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    7
+  ]
+}

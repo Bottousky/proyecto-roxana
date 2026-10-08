@@ -1,0 +1,26 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c8.diagonal"
+  },
+  "journal": [
+    "Crecer"
+  ],
+  "evidenceKinds": [
+    "rational-predict",
+    "rational-try",
+    "rational",
+    "rational-simplify"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 10.648,
+  "size": "1600x900",
+  "touch": false,
+  "route": "directa",
+  "watch": false
+}

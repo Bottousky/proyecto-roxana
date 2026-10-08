@@ -7,6 +7,7 @@ import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {power, sci, expand, factor, completeSquare, timesToReach, undefinedAt, factorsOfProduct, factorsOfPower, exactRoot} from '../logic/growth.js';
 import {GROUND, BOARD, SHOTS, T, base, cast, family, familiesHome, area, tile, plate, S, seedOf, WHITE, YELLOW, BLUE} from './common.js';
 import {studentWrites} from './scenes-a.js';
+import {mareaBand} from '../ch1/scenes.js';
 
 const SUP = {'0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻'};
 /** 2 y 4 → «2⁴»; los exponentes negativos llevan su signo alto. */
@@ -1022,6 +1023,28 @@ export const noSePuede = {
     await d.say('student', 'Y x · x − 4 es (x − 2) · (x + 2). Si x no es 2, el (x − 2) que multiplica se va con el (x − 2) que divide, y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2.');
     await studentWrites(d, g, 'ns-simp', '(x · x − 4) ÷ (x − 2) = x + 2,  con x ≠ 2', A.x0 + 20, A.y1 - 8, {size: 20});
     if (!replay) writeJournal7(g);
+    // de noche la Marea pasa por las Terrazas: se lleva las abreviaturas sueltas; lo que se escribió entendiendo queda
+    const abbr = [['se tacha arriba y abajo', BOARD.x + 330, GROUND - 330], ['el exponente pasa', BOARD.x - 460, GROUND - 250], ['se baja', BOARD.x + 420, GROUND - 400]]
+      .map(([t, x, y], i) => w.add(new Label(`ns-ab${i}`, t, x, y, {size: 22, z: 8, fade: 0.45})));
+    await d.shot({x: 13500, y: GROUND - 560, w: 1700, h: 640}, 1);
+    d.describe('Alrededor de la pizarra, escritas por alguien hace mucho: «se tacha arriba y abajo», «el exponente pasa», «se baja», sin ninguna cuenta al lado.');
+    await d.think('Abreviaturas sueltas. Ninguna dice por qué.');
+    g.setCinematic(true);
+    const mx0 = 13300, mx1 = 15400;
+    const band = w.add(mareaBand(w, mx0));
+    band.strength = 0.85;
+    band.width = 300;
+    g.audio.marea?.(4);
+    g.camera.shake = 0.25;
+    d.describe('De noche pasa la Marea: una franja ancha de borrador cruza las Terrazas. Se lleva las abreviaturas sueltas; lo que escribimos en la pizarra, entendiendo, queda.');
+    await d.tween(2.6, q => {
+      band.x = lerp(mx0, mx1, q);
+      for (const ab of abbr) if (band.x > ab.x) ab.fade = Math.max(0, ab.fade - 0.04);
+    });
+    w.remove('marea-band');
+    abbr.forEach(ab => w.remove(ab.id));
+    g.setCinematic(false);
+    await d.shot(SHOTS.board, 1);
     await d.say('Peldaño', 'Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?');
     g.audio.punto('question');
   },
