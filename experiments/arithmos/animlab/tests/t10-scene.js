@@ -9,7 +9,7 @@
 
 import {Figure} from '../../src/engine/figure.js';
 import {BLUE} from '../../src/engine/chalk.js';
-import {buildActor, ik, drawFigureDeposit} from '../core/actor.js';
+import {planWalk, buildActor, ik, drawFigureDeposit} from '../core/actor.js';
 import {POSES2} from '../core/poses.js';
 import {depositStroke, drawDeposit, drawDepositCached, depositTip, depositSpeed} from '../core/deposit.js';
 import {glyphGuides, GLYPHS} from '../core/glyphs.js';
@@ -80,7 +80,8 @@ function build(taps = autoTaps()) {
     const again = counted.has(i);
     const dur = again ? 0.4 : hopDur(n);
     const to = [DOTS[i][0], DOTS[i][1] - 36]; // se posa arriba del punto, sin pisar el anillo (R2)
-    sc.punto.push({kind: 'hop', t, dur, from, to, h: 36 + 8 * (n === 0)});
+    // más bajos cuanto más rápidos (altura ∝ vuelo^1.5; con gravedad sería ∝ T²): R13, pico/media 2.1–2.6 en los saltos 5–7
+    sc.punto.push({kind: 'hop', t, dur, from, to, h: again ? 30 : Math.max(14, 44 * ((dur - 0.12) / 0.38) ** 1.5)});
     // los ojos van al punto antes de que Punto llegue (la mirada lidera) y después bajan a la marca
     // R11: la cabeza quedaba fija 5.8–10.4 s (sólo se movían los ojos, ±3 px): ahora la mirada Y la cabeza van al punto
     // ~0.1 s antes del despegue (agachada 0.12 s) y bajan a la marca al escribir
@@ -266,14 +267,20 @@ function build(taps = autoTaps()) {
   // 7. comprende: el alumno se abre, Punto rebota dos veces; la cámara se aleja
   // primero se aleja para mirar lo hecho; la comprensión llega al ver el conjunto (y el brazo ya no pasa por la escritura)
   const T_BACK = t + 0.35;
-  const T_GET = T_BACK + 0.15 + 1.35 + 0.55; // R11: +0.15 s, la cabeza esperaba poco al final del paso atrás
+  // la comprensión empieza recién cuando el paso atrás terminó y el alumno quedó quieto ≥ 0.4 s (R13: la reacción caía
+  // sobre los pasos). Fin de la caminata del plan de pisadas + 0.35 s de mezcla de piernas + 0.25 s de pasito + 0.4 s quieto + 0.62 s de
+  // contramovimiento antes del «¡ya está!»
+  const T_WALK_END = T_BACK + 0.15 + planWalk(X1, X1 - 170, 0, 190, K).T;
+  const T_GET = T_WALK_END + 0.35 + 0.25 + 0.4 + 0.62; // + 0.25: el pasito de acomodarse (si lo hay) termina antes de la quietud
+  ev('termina el paso atrás', T_WALK_END);
   ev('comprende', T_GET);
   sc.punto.push({kind: 'bounce', t: T_GET + 0.15, n: 2});
   sc.score.push({type: 'note', t: T_GET + 0.15, freq: 523, dur: 0.6, gain: 0.05}, {type: 'note', t: T_GET + 0.32, freq: 659, dur: 0.6, gain: 0.045}, {type: 'note', t: T_GET + 0.5, freq: 784, dur: 0.9, gain: 0.04});
   sc.T_GET = T_GET;
   sc.duration = T_GET + 2.6; // R3: ≤ 1 s quieto al final
   // ——— actor ———
-  sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, poses: POSES2, script: [
+  // stepK 14: parado, el pie sólo da un pasito si la pose lo quiere a más de 14·k (con 8·k la comprensión caía sobre pasitos, R13)
+  sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, poses: POSES2, stepK: 14, script: [
     ...baseScript(T_PUNTO, Math.max(5.0, taps[0].t + 0.3)),
     ...sc.gaze,
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
@@ -283,10 +290,13 @@ function build(taps = autoTaps()) {
     {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
     {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true, swing: 0.25}, face: 0.6, overrides: {armR: [-0.1, 0.3]}},      // dos pasos atrás (de ¾: las piernas no se funden, R5)
     {t: T_BACK + 0.2, pose: 'lookDown', gaze: [0.7, 0.6]},                              // mira lo que escribió (cabeza abajo)
-    {t: T_GET - 0.62, pose: 'lookDown', overrides: {tilt: 0.55}},                        // contramovimiento: baja un poco más antes de levantar la cabeza
-    {t: T_GET - 0.5, pose: 'lookUp', gaze: [1, -0.7]},                                  // levanta la cabeza hacia la Ronda (los ojos primero)
-    {t: T_GET - 0.12, pose: 'lookUp', overrides: {tilt: -0.2, drop: 3}},                 // micro-encogida pequeña (antes bajaba la cabeza 0.6 rad: vaivén)
-    {t: T_GET, pose: 'eureka', face: 0.9, gaze: [1, -0.5]},                             // ¡ya está! (el brazo sube lejos de la escritura)
+    {t: T_WALK_END - 0.1, face: 0.9},                                                    // se acomoda de frente a lo escrito al terminar el paso (si hace falta un pasito, es parte del paso, no de la comprensión: R13)
+    {t: T_GET - 0.62, pose: 'lookDown', face: 0.9, overrides: {tilt: 0.55}},                        // contramovimiento: baja un poco más antes de levantar la cabeza
+    {t: T_GET - 0.5, pose: 'lookUp', face: 0.9, gaze: [1, -0.7]},                                  // levanta la cabeza hacia la Ronda (los ojos primero)
+    {t: T_GET - 0.12, pose: 'lookUp', face: 0.9, overrides: {tilt: -0.2, drop: 3}},                 // micro-encogida pequeña (antes bajaba la cabeza 0.6 rad: vaivén)
+    // ¡ya está! (el brazo sube lejos de la escritura); las piernas quedan como estaban: la comprensión es del torso para arriba
+    // (R13: la pose de eureka abría las piernas y el alumno daba dos pasitos justo al comprender)
+    {t: T_GET, pose: 'eureka', face: 0.9, gaze: [1, -0.5], overrides: {legL: POSES2.lookUp.legL, legR: POSES2.lookUp.legR, armR: [2.15, -0.2]}}, // brazo arriba y adelante, hacia la Ronda (vertical pasaba por la cabeza)
     {t: T_GET + 1.0, pose: 'open', gaze: [0.2, -0.3]},
   ]});
   // pasos al sonido: cuando un pie vuelve a apoyar
@@ -336,7 +346,7 @@ function puntoAt(t) {
       // cuadro): agachada → impulso (acelera mientras se estira) → vuelo balístico → aterrizaje que absorbe (sigue de largo
       // con la misma velocidad y vuelve, x·e^(−τ/τ0): velocidad continua, sobrepaso ≤ 8 % del salto)
       const crouch = 0.12, push = 0.07, M = p.dur - crouch;
-      const a = push / M;                                     // fracción del tiempo de movimiento que dura el impulso
+      const a = Math.min(push / M, 0.35);                     // fracción del vuelo que dura el impulso (≤ 35 %: queda crucero)
       // perfil de velocidad (fracción del crucero): rampa 0 → 1 en el impulso, crucero, y frenada en el aire hasta `lam` antes
       // de tocar el suelo (lam = 0 con `brake`: aterriza para empezar a trazar enseguida; si no, 0.55 y el resto lo absorbe
       // el aterrizaje con sobrepaso). Integrado: u(s) = ∫v / área
@@ -354,7 +364,7 @@ function puntoAt(t) {
         const tau = tl - p.dur, base = p.toFn ? p.toFn(t) : p.to;
         const vx = lam * (p.to[0] - p.from[0]) / (M * A);                                     // velocidad al tocar el suelo
         const dist = Math.abs(p.to[0] - p.from[0]) || 1;
-        const tau0 = Math.min(0.08, 0.08 * dist * Math.E / (Math.abs(vx) || 1));            // sobrepaso = vx·τ0/e ≤ 8 % del salto
+        const tau0 = Math.min(0.08, 0.06 * dist * Math.E / (Math.abs(vx) || 1));            // sobrepaso = vx·τ0/e ≤ 6 % del salto (VL: ≤ 8 %)
         // termina exactamente en el destino a los 0.3 s (el siguiente salto o gesto puede empezar ahí): se resta el resto
         // con una curva suave de pendiente nula en los extremos (si no, saltaba 2.8 px al terminar)
         const Tset = 0.3, ov = x => vx * x * Math.exp(-x / tau0), sm = clamp(tau / Tset);

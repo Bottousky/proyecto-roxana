@@ -60,11 +60,35 @@ def still_before(T):
         if v < 5 and b['p']['contact'] == 0 and abs(b['p']['handH'] - a['p']['handH']) / d < 20: n += 1
         else: break
     return round(n / 60, 2)
+def still_react(T):  # antes de la reacción: Punto < 5 px/s, cabeza < 0.1 rad/s, pies quietos, a 60 Hz
+    xs = [x for x in p if x['t'] < T][::-1][::4]; n = 0
+    for b, a in zip(xs, xs[1:]):
+        d = b['t'] - a['t']; pa, pb = a['p']['punto'], b['p']['punto']
+        v = ((pb['x'] - pa['x'])**2 + (pb['h'] - pa['h'])**2) ** 0.5 / d
+        fv = max(abs(b['p']['pieL'] - a['p']['pieL']), abs(b['p']['pieR'] - a['p']['pieR'])) / d
+        if v < 5 and abs(b['p']['tilt'] - a['p']['tilt']) / d < 0.1 and fv < 1: n += 1
+        else: break
+    return round(n / 60, 2)
+react = still_react(ev['comprende'] - 0.62) if 'comprende' in ev else None
 pauses = {k: still_before(ev[k]) for k in ('escribe el 5', 'lazo de 2', 'une los grupos', 'empieza el 7') if k in ev}
+# marcas y trazos cortos: pico/media de la velocidad de contacto de cada trazo (sin crucero en trazos de ~40 px)
+runs_c, cur = [], []
+for x in p:
+    c = x['p']['contact']
+    if c > 0: cur.append(c)
+    elif cur: runs_c.append(cur); cur = []
+pm = [round(max(r) / (sum(r) / len(r)), 2) for r in runs_c if len(r) > 4]
+# tamaño de las cifras en un teléfono de 844 px de ancho: 34 px de mundo × 844 / ancho de cámara
+cam_at = lambda T: min(p, key=lambda x: abs(x['t'] - T))['p']['cam']
+num_px = {k: round(34 * 844 / cam_at(ev[k]), 1) for k in ('escribe el 5', 'termina el 7')}
+num_px['final'] = round(34 * 844 / p[-1]['p']['cam'], 1)
 lines = [
   f'saltos de conteo (vuelo del plan, s): {runs}; 3.º/1.º = {runs[2]/runs[0]:.2f}' if len(runs) > 2 else f'saltos: {runs}',
   f'saltos: máx. cambio de vx por cuadro de 60 Hz / pico del salto = {ramps}',
   f'pausas de lectura (s quieto antes de cada idea; Punto < 5 px/s, sin tiza, mano < 20 px/s, a 60 Hz): {pauses}',
+  f'quietud antes de la reacción de comprender (Punto, cabeza y pies; desde el contramovimiento a comprende − 0.62 s): {react} s',
+  f'trazos de tiza: pico/media de la velocidad de contacto por trazo = mín {min(pm)}, máx {max(pm)}, mediana {sorted(pm)[len(pm)//2]} ({len(pm)} trazos)',
+  f'altura de las cifras en un teléfono de 844×390 (px CSS): {num_px}',
   f'tiza: aceleración máx. en render a 240 Hz = {acc:.0f} px/s² (plan: {m.get("chalkAccelMax")})',
   f'pies: deslizamiento máx. con el pie apoyado = {slide:.2f} px por 1/240 s',
   f'Punto: saltos de posición aislados = {len(spikes)} {spikes[:5]}; mayor cambio de aplastamiento = {sq[0]:.1f} % en 1/240 s (t = {sq[1]:.3f})',
@@ -107,6 +131,9 @@ G5=$(EV 'se juntan los hilos de 5'); G2=$(EV 'se juntan los hilos de 2')
 H=$(python3 -c "print(','.join(str(round(x,2)) for x in [$G5-0.1,$G5+0.3,$G5+0.6,$G5+1.0,$G2+0.3,$G2+1.0]))")
 CT=$(python3 -c "print(round($G2 + 1.0, 2))")
 cap "$D/strip-hilos" --cols=3 "--times=$H" "--crop=300,40,1150,540,$CT"
+HC=$(python3 -c "print(';'.join('300,40,1150,540,%s' % round($G5 + d, 2) for d in (-0.05, 0.3, 0.6, 1.0)))")
+cap "$D/hilos-recortes" --frames=2 --dpr=2 "--crop=$HC"
+node scripts/animlab-stack.mjs "$D/hilos-recortes.png" "$D/hilos-recortes/crop-0.png" "$D/hilos-recortes/crop-1.png" "$D/hilos-recortes/crop-2.png" "$D/hilos-recortes/crop-3.png" >/dev/null
 mkdir -p "$D/interactive" && node scripts/animlab-interact.mjs "$D/interactive" >/dev/null
 node scripts/animlab-stack.mjs "$D/interactive.png" "$D/interactive/2-ya-contado.png" "$D/interactive/3-final.png" >/dev/null
 { echo "# $VS — tabla de tiempos (ordenada)"; echo; cat "$D/timeline-table.md"; echo; echo "Medidas de ESTA corrida (main/probes.json, 240 Hz):"; sed 's/^/- /' "$D/medidas.txt"; } > "$D/timeline.md"

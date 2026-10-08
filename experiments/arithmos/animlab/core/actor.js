@@ -29,7 +29,7 @@ const CHANNELS = {
  * @param o.script [{t, pose?, gaze?: [gx, gy], walk?: {to, speed}, face?, hold?, overrides?}]
  *        `overrides` permite fijar canales sueltos de la pose (p. ej. {armR: [2.2, 0.1]}) para un gesto.
  */
-export function buildActor({ground, x, k = 1, script, duration, facing = 1, poses = POSES}) {
+export function buildActor({ground, x, k = 1, script, duration, facing = 1, poses = POSES, stepK = 8}) {
   const n = Math.ceil(duration * HZ) + 2;
   // ——— 1. objetivos por canal en el tiempo (escalones) ———
   for (const e of script) if (typeof e.t !== "number" || Number.isNaN(e.t)) throw new Error(`actor: evento sin tiempo válido ${JSON.stringify(e)}`);
@@ -121,7 +121,7 @@ export function buildActor({ground, x, k = 1, script, duration, facing = 1, pose
       else if (step[f]) {
         const u = (t - step[f].t0) / 0.22;
         if (u >= 1) { pl[f] = step[f].to; step[f] = null; }
-      } else if (Math.abs(want[f] - pl[f]) > 8 * k && !step[f === 'L' ? 'R' : 'L']) step[f] = {t0: t, from: pl[f], to: want[f]};
+      } else if (Math.abs(want[f] - pl[f]) > stepK * k && !step[f === 'L' ? 'R' : 'L']) step[f] = {t0: t, from: pl[f], to: want[f]}; // pasito si la pose lo pide más allá de stepK·k
       let xf = pl[f], lift = 0;
       if (step[f]) { const u = clamp((t - step[f].t0) / 0.22); xf = lerp(step[f].from, step[f].to, minJerk(u)); lift = Math.sin(Math.PI * u) * 7 * k; }
       plantX[j * 2 + fi] = xf; plantLift[j * 2 + fi] = lift;
@@ -155,7 +155,7 @@ export function buildActor({ground, x, k = 1, script, duration, facing = 1, pose
 const addv = (a, b) => [a[0] + b[0], a[1] + b[1]];
 
 /** Plan de pisadas de una caminata recta de x0 a x1 que empieza en t0. */
-function planWalk(x0, x1, t0, speed, k) {
+export function planWalk(x0, x1, t0, speed, k) {
   const dir = Math.sign(x1 - x0) || 1;
   const dist = Math.abs(x1 - x0);
   const D = 36 * k; // largo de paso
