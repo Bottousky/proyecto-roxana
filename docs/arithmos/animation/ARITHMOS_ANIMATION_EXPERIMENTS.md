@@ -193,3 +193,23 @@ Cambios (evidencia en `c06/`):
 **Conclusión**: B convierte el borrado de un fundido (N1 de continuidad) en una acción con causa y consecuencia (N3–N4). La neblina proporcional a lo borrado es un detalle que sólo existe en un pizarrón: candidato a nivel 5 de textura si un humano lo confirma.
 
 **Siguiente**: E10 microescena: la mano (o Punto) que escribe y borra, con cámara y sonido → base de la vertical slice. Antes, E08 cámara (es parte de E10).
+
+---
+
+## E08 — TEST 08 · cámara (ciclo 8, 2026-10-07)
+
+**Hipótesis**: sobre un pizarrón enorme, (1) el camino de zoom y paneo de van Wijk–Nuij con duración por costo perceptual mantiene la velocidad percibida acotada aun en viajes largos, donde un ease de duración fija la dispara; (2) "llegar antes" (la cámara quieta cuando empieza la acción) evita mover el encuadre mientras se dibuja.
+
+**Técnicas**: A = `Camera.go` del motor (ease-in-out cúbico 1.6 s, zoom logarítmico, centro lineal) + temblor senoidal. B = `animlab/core/camera2.js`: `zoomPath` (van Wijk y Nuij 2003, ρ = √2, igual que `d3.interpolateZoom`), duración 0.35 + 0.75·S (0.6–3 s), perfil de mínimo jerk, `arrive` para llegar antes, temblor por trauma² con ruido coherente (sin rotación).
+
+**Resultado** (`c08/pan.png`, `zoom.png`, `w.png`, hojas `t08A`, `t08B`):
+- Pico de paneo en el viaje largo (ecuación → gráfica, 2 900 px de mundo a ancho 1 300): **A 3.85 pantallas/s, B 1.35** (2.8× menos). B se aleja a mitad de camino (`t08B/sheet.png` t = 4.83) y vuelve a acercarse; A cruza a zoom fijo.
+- Duraciones de B por costo: 1.28 s (S 1.25), 1.98 s (S 2.18), 0.6 s (reencuadre, S 0.22), 1.22 s (S 1.16). A: 1.6 s para todo.
+- Reencuadre: B termina a t = 7.0, justo cuando la tiza empieza el círculo; A recién arranca a t = 7.0 y se mueve durante todo el dibujo (`pan.png`, pico de A entre 7 y 8.6 s).
+- Pico de zoom: A 4.09 log2/s, B 3.41.
+
+**Defectos abiertos**: el temblor no se puede juzgar en imágenes fijas (sólo por sonda; [H] en movimiento); el viaje largo de B tarda 2 s, que puede sentirse lento si se repite seguido (para cortes de escena convendrá un corte, no un viaje).
+
+**Conclusión**: hipótesis (1) y (2) apoyadas con números. B pasa a ser la cámara del laboratorio.
+
+**Siguiente**: E10 microescena (personaje + tiza + matemática + cámara + sonido + transformación, 20–40 s).
