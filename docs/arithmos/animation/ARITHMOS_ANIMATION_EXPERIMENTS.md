@@ -253,3 +253,24 @@ Cambios (evidencia en `c06/`):
 **Aplicado a E10** (`c10/t10f` → `t10h`): el alumno se vuelve hacia nosotros cuando aparece Punto; eureka al terminar; **da dos pasos atrás para mirar lo que escribió** y recién ahí se abre (`t10h/final.png`): el brazo ya no tapa las marcas y el plano final relaciona puntos, marcas y cuenta.
 
 **Conclusión**: la orientación por pose es la palanca de silueta más barata. Pendiente: hombros (para encogerse) y manos con forma (puño, índice) si un revisor lo pide.
+
+---
+
+## Revisión independiente R2 (E10 versión t10e) y disposición — ciclo 11, 2026-10-07
+
+Veredicto R2: **No** (Actuación, Textura, Legibilidad, Continuidad en N2; Matemática N3). R2 vio la versión anterior a E11 (poses). Disposición:
+
+| Hallazgo R2 | Disposición → evidencia |
+|---|---|
+| 1. No hay momento de comprensión | Resuelto en E11 + aquí: eureka con cabeza arriba y mirada a la Ronda, paso atrás, brazos abiertos (`c11/t10j/sheet.png` 12.98–14.84). |
+| 2. Punto ↔ marca sólo temporal | **Resuelto**: un hilo celeste (relación, según el lenguaje visual) sale de cada punto contado y llega a su marca antes de que se escriba; el abanico final es el diagrama de la correspondencia uno a uno (`t10j/sheet.png` 7.42 →). |
+| 3. Zoom sin causa | **Resuelto**: no hay zoom de entrada; el plano medio es fijo; sólo se abre al final, con el paso atrás. |
+| 4. Nadie entra | **Resuelto**: el plano abre sobre la Ronda y el alumno entra desde fuera de cuadro (t = 0.9–2.8). |
+| 5. Anillos amarillos tipo interfaz | **Resuelto**: celestes, imperfectos (radio ±2 px, sobrepaso, temblor). |
+| 6. Punto pisa el anillo al posarse | **Resuelto**: se posa 36 px arriba del punto. |
+| 7. Pizarrón sin historia | **Parcial**: rastro de polvo de los saltos de Punto (alpha 0.07, se asienta en 1.5 s). La acumulación en el cruce de la 5.ª marca existe (depósito aditivo) pero no se nota a escala de plano. |
+| 8. «+» chico | **Resuelto**: 1.1× la cifra (el glifo «+» ocupa ~50 % del alto). |
+| (Textura) fondo degradado plano | **Rechazado**: el pizarrón tiene diente y manchas (compuesto WebGL); a escala de hoja de contactos no se ve. Sin cambio. |
+
+## VS1 — vertical slice candidata (ciclo 11)
+`animlab/?test=10&play=1` (clic para sonido). Evidencia `c11/t10j`. Pendiente: revisión R3 sobre esta versión.

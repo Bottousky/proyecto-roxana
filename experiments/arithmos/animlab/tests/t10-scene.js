@@ -8,7 +8,7 @@
 // Cantidad concreta → agrupación → número → expresión: el cambio de representación es la escena (TEST 04).
 
 import {Figure} from '../../src/engine/figure.js';
-import {YELLOW} from '../../src/engine/chalk.js';
+import {BLUE} from '../../src/engine/chalk.js';
 import {buildActor, ik} from '../core/actor.js';
 import {POSES2} from '../core/poses.js';
 import {depositStroke, drawDeposit, depositTip, depositSpeed} from '../core/deposit.js';
@@ -20,7 +20,8 @@ import {countNote} from '../core/score.js';
 import {liftTime, minJerk, clamp, lerp} from '../core/motion.js';
 
 const G = 900, K = 2.7;
-const X0 = 700, X1 = 1130, X2 = 1215; // entrada, lugar de las marcas, paso para «= 7»
+// entra desde fuera de cuadro (R2: «nadie entra»): el plano abre sobre la Ronda y el alumno aparece por la izquierda
+const X0 = 735, X1 = 1130;
 const SH = {dx: 4, dy: -(64 * K * 0.97 + 46 * K - 4 * K)}; // hombro respecto de (x, suelo), de pie
 const REACH = (25 + 24 + 8) * K * 0.97; // brazo + tiza
 const DOTS = [[1500, 520], [1585, 470], [1640, 560], [1560, 615], [1710, 490], [1690, 615], [1770, 555]];
@@ -33,7 +34,7 @@ const W = 5.5;
 let S; // escena construida
 
 function build() {
-  const sc = {strokes: [], hand: [], score: [], punto: [], rings: [], marks: {}, events: {}};
+  const sc = {strokes: [], hand: [], score: [], punto: [], rings: [], links: [], marks: {}, events: {}};
   const ev = (k, t) => { sc.events[k] = +t.toFixed(2); };
   const chalk = (guide, seed, o = {}) => depositStroke(guide, {w: W, p: 0.9, seed, down: 0.14, ...o, motion: {speed: 560, accel: 9000, k0: 1 / 30, ...(o.motion || {})}});
   const write = (st, t, tag) => {
@@ -55,17 +56,26 @@ function build() {
   let t = 5.1, from = P0;
   for (let i = 0; i < 7; i++) {
     const dur = 0.5 - 0.035 * i;
-    const to = [DOTS[i][0], DOTS[i][1] - 15];
+    const to = [DOTS[i][0], DOTS[i][1] - 36]; // se posa arriba del punto, sin pisar el anillo (R2)
     sc.punto.push({kind: 'hop', t, dur, from, to, h: 36 + 8 * (i === 0)});
     const land = t + dur;
-    sc.rings.push({t: land, st: depositStroke(circleGuide(DOTS[i][0], DOTS[i][1], 17, {seed: 40 + i}), {w: 4.5, ch: YELLOW, seed: 50 + i, motion: {speed: 500}})});
+    // anillo celeste (relación, no selección de interfaz): imperfecto, de grosor variable, apenas después del aterrizaje
+    sc.rings.push({t: land + 0.05, st: depositStroke(circleGuide(DOTS[i][0], DOTS[i][1], 17 + 2 * Math.sin(i * 2.3), {seed: 40 + i, wob: 0.05, sweep: Math.PI * 2 + 0.6}), {w: 4.2, p: 0.8, ch: BLUE, seed: 50 + i, motion: {speed: 520}})});
     sc.score.push({type: 'note', t: land, freq: countNote(i), dur: 0.25, gain: 0.06});
     // la marca: sale un instante después del aterrizaje (el alumno mira y anota)
     let guide;
     if (i < 4) { const x = TALLY.x + i * TALLY.gap; guide = [[x + 2, TALLY.top], [x - 1, TALLY.bot]]; }
     else if (i === 4) guide = [[TALLY.x - 8, TALLY.bot - 8], [TALLY.x + 3 * TALLY.gap + 10, TALLY.top + 6]];
     else { const x = TALLY.x + TALLY.pairDx + (i - 5) * TALLY.gap; guide = [[x + 2, TALLY.top], [x - 1, TALLY.bot]]; }
-    (write(chalk(guide, 60 + i, {motion: {speed: i === 4 ? 900 : 620}}), land + 0.06, `marca${i}`));
+    // el hilo celeste: del punto contado a la marca que le corresponde (la correspondencia se ve, no sólo se cronometra)
+    const mid = guide[0];
+    // llega a la marca desde la derecha, con una curva suave: no pasa por encima de la cabeza (t10i: el abanico tapaba la cara)
+    const a = [DOTS[i][0] - 20, DOTS[i][1] + 4], b = [mid[0] + 12, mid[1] + 4];
+    const c = [b[0] + 0.45 * (a[0] - b[0]), Math.max(a[1], b[1]) + 18];
+    const link = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; });
+    const linkSt = depositStroke(link, {w: 2.6, p: 0.5, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
+    sc.links.push({t: land + 0.15, st: linkSt});
+    (write(chalk(guide, 60 + i, {motion: {speed: i === 4 ? 900 : 620}}), land + 0.15 + linkSt.T + 0.03, `marca${i}`));
     from = to;
     t = land + 0.1;
   }
@@ -89,7 +99,7 @@ function build() {
   const sz = NUM.size;
   writeGlyph('5', TALLY.x + 1.5 * TALLY.gap - GLYPHS['5'].adv * sz / 2, NUM.y, sz, 101);
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
-  writeGlyph('+', TALLY.x + (1.5 * TALLY.gap + TALLY.pairDx + TALLY.gap / 2) / 2 - GLYPHS['+'].adv * sz * 0.4, NUM.y, sz * 0.8, 121);
+  writeGlyph('+', TALLY.x + (1.5 * TALLY.gap + TALLY.pairDx + TALLY.gap / 2) / 2 - GLYPHS['+'].adv * sz * 0.55, NUM.y, sz * 1.1, 121); // «+» a ≥ 50 % del alto de la cifra (R2)
   // 6. un paso a la derecha y «= 7»
   // 6. se inclina para llegar más a la derecha (sin pasar por delante de lo escrito) y «= 7»
   const T_STEP = t + 0.1;
@@ -110,7 +120,7 @@ function build() {
   // ——— actor ———
   sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, poses: POSES2, script: [
     {t: 0, pose: 'stand', face: 1},
-    {t: 0.5, walk: {to: X1, speed: 150}},
+    {t: 0.6, walk: {to: X1, speed: 165}},
     {t: 3.9, pose: 'stand', gaze: [0.7, -0.6]},
     {t: T_PUNTO + 0.15, pose: 'surprise', gaze: [0.6, -0.9]},       // ¡un punto! (se vuelve hacia nosotros)
     {t: T_PUNTO + 0.8, pose: 'stand', gaze: [0.9, -0.5]},
@@ -119,7 +129,7 @@ function build() {
     {t: sc.events['escribe 5 y 2'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
     {t: T_STEP, pose: 'write', overrides: {lean: 0.26, armR: [1.3, 0.3]}, gaze: [0.8, 0.5]},
     {t: T_GET - 0.15, pose: 'lookDown', gaze: [0.6, 0.3]},           // anticipación: se encoge un instante
-    {t: T_GET, pose: 'eureka', gaze: [0.8, -0.7]},
+    {t: T_GET, pose: 'eureka', gaze: [1, -0.5]},                     // cabeza arriba, mira la Ronda: lo entendió
     {t: T_GET + 0.7, walk: {to: X1 - 150, speed: 110, back: true}},      // un paso atrás para mirar lo hecho
     {t: T_GET + 0.75, pose: 'stand', gaze: [0.8, -0.2]},
     {t: T_GET + 2.0, pose: 'open', gaze: [0.2, -0.3]},
@@ -133,8 +143,8 @@ function build() {
   }
   // ——— cámara: general → medio (llega antes de que aparezca Punto) → abre al final ———
   sc.camera = cameraTrack([
-    {t: 0, cx: 1250, cy: 560, w: 2300},
-    {t: 2.2, cx: 1440, cy: 600, w: 1150, arrive: T_PUNTO - 0.3},
+    // sin zoom de entrada (R2: «zoom sin causa»): el plano ya es el medio; sólo se abre al final, cuando el alumno da un paso atrás
+    {t: 0, cx: 1440, cy: 600, w: 1250},
     {t: T_GET + 1.0, cx: 1400, cy: 610, w: 1450},
   ]);
   return sc;
@@ -230,6 +240,7 @@ export default {
       fillPressure(ctx, blobOutline(x, y + 2 * hit * 8, 8.5 * (1 + 0.03 * Math.sin(t * 2.6 + i)), {ang: Math.PI / 2, sl, sw: 1 / sl, boil: frame % 3, seed: 20 + i}), 0, 0.74, [x, y], 9);
     });
     for (const r of S.rings) drawDeposit(ctx, r.st, t - r.t);
+    for (const l of S.links) drawDeposit(ctx, l.st, t - l.t);
     for (const s of S.strokes) drawDeposit(ctx, s.st, t - s.t);
     // alumno
     const sk = S.actor.at(t);
@@ -248,6 +259,21 @@ export default {
       const r = 15 * breathe * (0.35 + 0.65 * p.fill);
       fillPressure(ctx, blobOutline(p.pos[0], p.pos[1], r, {ang: p.ang, sl: p.sl, sw: 1 / p.sl, boil: frame % 3, seed: 3}), 0, 0.72 * Math.min(1, p.fill * 1.4), p.pos, r * 1.15);
     }
+  },
+  renderDust(lab, t, ctx) {
+    // Punto arrastra un poco de polvo al saltar: rastro tenue que se asienta en ~1.5 s (R2: «pizarrón sin historia»)
+    ctx.save(); ctx.strokeStyle = '#fff'; ctx.lineCap = 'round'; ctx.lineWidth = 16;
+    for (const p of S.punto) {
+      if (p.kind !== 'hop' || t < p.t) continue;
+      const u1 = clamp((t - p.t - 0.07) / (p.dur - 0.07)), age = Math.max(0, t - p.t - p.dur);
+      const a = 0.07 * Math.exp(-age / 1.5);
+      if (a < 0.004 || u1 <= 0) continue;
+      ctx.globalAlpha = a;
+      ctx.beginPath();
+      for (let u = 0; u <= u1 + 1e-6; u += 0.05) { const x = lerp(p.from[0], p.to[0], u), y = lerp(p.from[1], p.to[1], u) - 4 * p.h * u * (1 - u); u ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke();
+    }
+    ctx.restore();
   },
   score() { return S.score; },
   probe(lab, t) {
