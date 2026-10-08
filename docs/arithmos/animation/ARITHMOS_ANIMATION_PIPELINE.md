@@ -43,6 +43,7 @@ Una técnica pasa de `animlab/` a `src/engine/` sólo si:
 | `scripts/animlab-stack.mjs` | Apila recortes (antes/después, instantes) en una imagen |
 | `scripts/animlab-diff.mjs` | Diferencia de píxeles entre dos PNG: sólo para regresiones no buscadas (p. ej. caché) |
 | `scripts/animlab-interact.mjs` | Prueba con clics reales de la escena interactiva |
+| `scripts/animlab-evidence-t10.sh <cNN> <VSn>` | Evidencia completa de la slice para una revisión, en una carpeta nueva: corrida principal (sondas 240 Hz, audio), textura dpr 3, gráficos de tiza/comprensión/pies, teléfono, salteado, tira de la unión al 7, interacción real, `medidas.txt` y `timeline.md` ordenada (los tiempos de las tiras salen de los eventos de esa corrida) |
 | `--audio` en la captura | Partitura → `score.wav` + `rms.json` (sincronía medible; calidad [H]) |
 | Chrome del sistema vía Playwright 1.63 | Render real con GPU (`--use-angle=metal`) |
 

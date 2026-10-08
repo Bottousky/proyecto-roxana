@@ -172,7 +172,8 @@ function build(taps = autoTaps()) {
   sc.score.push({type: 'chalk', t0: tp, t1: tp + L5.T, speed: tt => depositSpeed(L5, tt - tp)});
   t = tp;
   writeGlyph('5', TALLY.x + 1.5 * TALLY.gap - GLYPHS['5'].adv * sz / 2, NUM.y, sz, 101);
-  ev('escribe 5 y 2', sc.strokes.find(x => x.tag === '5').t);
+  ev('escribe el 5', sc.strokes.find(x => x.tag === '5').t);
+  ev('lazo de 5', tp);
   tp = Math.max(tp + L5.T, t) + 0.15;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.4, from: endOf(L5), to: startOf(L2), h: 30});
   tp += 0.4 + 0.2;
@@ -183,6 +184,9 @@ function build(taps = autoTaps()) {
   // «+» a 1.3× la cifra: en el plano final de 844×390 queda ≥ 12 px CSS (R5: medía 8.6)
   writeGlyph('+', TALLY.x + (1.5 * TALLY.gap + TALLY.pairDx + TALLY.gap / 2) / 2 - GLYPHS['+'].adv * sz * 0.65, NUM.y, sz * 1.3, 121);
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
+  ev('lazo de 2', tp);
+  ev('escribe el +', sc.strokes.find(x => x.tag === '+').t);
+  ev('escribe el 2', sc.strokes.find(x => x.tag === '2').t);
   // 6. la unión: mientras el alumno dibuja la llave que junta 5 y 2 (en el papel), Punto rodea los siete con un lazo grande
   //    (en la Ronda): el mismo gesto en las dos representaciones. Después, quietud ≥ 0.4 s y recién el «7» (R6).
   // arranca y cierra del lado que mira a la llave: de ahí sale el hilo hacia el 7 (R10: salía de arriba y cruzaba el «2»)
@@ -205,6 +209,7 @@ function build(taps = autoTaps()) {
     t = Math.max(t, prev.t1 + liftTime(Math.hypot(brace[0][0] - prev.st.path.x.at(-1), brace[0][1] - prev.st.path.y.at(-1))));
     // la llave dura lo mismo que el lazo grande (se dibujan juntos)
     const braceSt = chalk(brace, 125, {motion: {speed: Math.max(160, 520 * (brace.length * 18) / Math.max(1, LALL.T * 520))}});
+    ev('dibuja la llave', t);
     t = write(braceSt, t, 'llave');
     // de los lazos al 7 (R9): al cerrar el lazo grande, Punto sigue de largo y dibuja un hilo celeste hasta la punta de la
     // llave; se queda ahí, quieto, mientras se escribe el 7 (los siete puntos → la llave → el 7)
@@ -216,9 +221,11 @@ function build(taps = autoTaps()) {
     sc.punto.push({kind: 'trace', t: tc - 0.14, st: CARRY});
     sc.links.push({t: tc, st: CARRY});
     sc.score.push({type: 'chalk', t0: tc, t1: tc + CARRY.T, speed: tt => depositSpeed(CARRY, tt - tc)});
+    ev('hilo a la llave', tc);
     // quietud: la mano y Punto se detienen antes del resultado
-    t = Math.max(t, tc + CARRY.T) + 0.6;
-    ev('quieto antes del 7', t);
+    const still0 = Math.max(t, tc + CARRY.T);
+    ev('quietos (mano y Punto)', still0);
+    t = still0 + 0.6;
     sc.T_UNION = tc + CARRY.T;
     sc.carryEnd = endOf(CARRY);
     ev('empieza el 7', t + 0.0);
