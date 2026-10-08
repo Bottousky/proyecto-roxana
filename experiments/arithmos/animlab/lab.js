@@ -16,6 +16,7 @@ const TESTS = {
   '03': () => import('./tests/t03-equation.js'),
   '05': () => import('./tests/t05-punto.js'),
   '09': () => import('./tests/t09-figure.js'),
+  '09p': () => import('./tests/t09p-poses.js'),
   '07': () => import('./tests/t07-erase.js'),
   '08': () => import('./tests/t08-camera.js'),
   '10': () => import('./tests/t10-scene.js'),

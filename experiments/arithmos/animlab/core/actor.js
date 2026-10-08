@@ -29,15 +29,15 @@ const CHANNELS = {
  * @param o.script [{t, pose?, gaze?: [gx, gy], walk?: {to, speed}, face?, hold?, overrides?}]
  *        `overrides` permite fijar canales sueltos de la pose (p. ej. {armR: [2.2, 0.1]}) para un gesto.
  */
-export function buildActor({ground, x, k = 1, script, duration, facing = 1}) {
+export function buildActor({ground, x, k = 1, script, duration, facing = 1, poses = POSES}) {
   const n = Math.ceil(duration * HZ) + 2;
   // ——— 1. objetivos por canal en el tiempo (escalones) ———
   const events = [...script].sort((a, b) => a.t - b.t);
   const poseAt = t => {
-    let pose = POSES.idle, gaze = [0, 0], over = {};
+    let pose = poses.stand ?? poses.idle, gaze = [0, 0], over = {};
     for (const e of events) {
       if (e.t > t) break;
-      if (e.pose) { pose = POSES[e.pose]; over = {}; }
+      if (e.pose) { pose = poses[e.pose]; over = {}; }
       if (e.overrides) over = {...over, ...e.overrides};
       if (e.gaze) gaze = e.gaze;
     }
@@ -79,7 +79,7 @@ export function buildActor({ground, x, k = 1, script, duration, facing = 1}) {
     swing[i * 2] = i ? swingL.step(1 / HZ, g.armSwing) : 0;
     swing[i * 2 + 1] = i ? swingR.step(1 / HZ, -g.armSwing) : 0;
   }
-  const faceAt = t => { let f = facing; for (const e of events) { if (e.t > t) break; if (e.face != null) f = e.face; if (e.walk) f = Math.sign(e.walk.to - (gaitAt(segs, e.t, x).hip)) || f; } return f; };
+  const faceAt = t => { let f = facing; for (const e of events) { if (e.t > t) break; if (e.face != null) f = e.face; else if (e.pose && poses[e.pose]?.face != null) f = poses[e.pose].face * Math.sign(f || 1); if (e.walk && !e.walk.back) f = Math.sign(e.walk.to - (gaitAt(segs, e.t, x).hip)) || f; } return f; };
   return {
     duration, ground, k, segs, x0: x,
     /** Esqueleto en t (mismo formato que Figure.skeleton()). */

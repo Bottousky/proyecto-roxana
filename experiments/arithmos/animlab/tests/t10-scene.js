@@ -10,6 +10,7 @@
 import {Figure} from '../../src/engine/figure.js';
 import {YELLOW} from '../../src/engine/chalk.js';
 import {buildActor, ik} from '../core/actor.js';
+import {POSES2} from '../core/poses.js';
 import {depositStroke, drawDeposit, depositTip, depositSpeed} from '../core/deposit.js';
 import {glyphGuides, GLYPHS} from '../core/glyphs.js';
 import {circleGuide} from '../core/gesture.js';
@@ -105,20 +106,23 @@ function build() {
   sc.punto.push({kind: 'bounce', t: T_GET + 0.15, at: P1, n: 2});
   sc.score.push({type: 'note', t: T_GET + 0.15, freq: 523, dur: 0.6, gain: 0.05}, {type: 'note', t: T_GET + 0.32, freq: 659, dur: 0.6, gain: 0.045}, {type: 'note', t: T_GET + 0.5, freq: 784, dur: 0.9, gain: 0.04});
   sc.T_GET = T_GET;
-  sc.duration = T_GET + 4.6;
+  sc.duration = T_GET + 5.2;
   // ——— actor ———
-  sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, script: [
-    {t: 0, pose: 'idle'},
+  sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, poses: POSES2, script: [
+    {t: 0, pose: 'stand', face: 1},
     {t: 0.5, walk: {to: X1, speed: 150}},
-    {t: 3.9, pose: 'relaxed', face: 0.75, gaze: [0.7, -0.6]},
-    {t: T_PUNTO + 0.15, pose: 'surprise', gaze: [0.9, -0.9]},       // ¡un punto!
-    {t: T_PUNTO + 0.75, pose: 'relaxed', gaze: [0.9, -0.5]},
+    {t: 3.9, pose: 'stand', gaze: [0.7, -0.6]},
+    {t: T_PUNTO + 0.15, pose: 'surprise', gaze: [0.6, -0.9]},       // ¡un punto! (se vuelve hacia nosotros)
+    {t: T_PUNTO + 0.8, pose: 'stand', gaze: [0.9, -0.5]},
     {t: 5.0, pose: 'write', gaze: [1, -0.4]},
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
     {t: sc.events['escribe 5 y 2'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
     {t: T_STEP, pose: 'write', overrides: {lean: 0.26, armR: [1.3, 0.3]}, gaze: [0.8, 0.5]},
     {t: T_GET - 0.15, pose: 'lookDown', gaze: [0.6, 0.3]},           // anticipación: se encoge un instante
-    {t: T_GET, pose: 'open', gaze: [0.8, -0.7]},
+    {t: T_GET, pose: 'eureka', gaze: [0.8, -0.7]},
+    {t: T_GET + 0.7, walk: {to: X1 - 150, speed: 110, back: true}},      // un paso atrás para mirar lo hecho
+    {t: T_GET + 0.75, pose: 'stand', gaze: [0.8, -0.2]},
+    {t: T_GET + 2.0, pose: 'open', gaze: [0.2, -0.3]},
   ]});
   // pasos al sonido: cuando un pie vuelve a apoyar
   let prev = null;
@@ -131,7 +135,7 @@ function build() {
   sc.camera = cameraTrack([
     {t: 0, cx: 1250, cy: 560, w: 2300},
     {t: 2.2, cx: 1440, cy: 600, w: 1150, arrive: T_PUNTO - 0.3},
-    {t: T_GET + 0.9, cx: 1420, cy: 600, w: 1500},
+    {t: T_GET + 1.0, cx: 1400, cy: 610, w: 1450},
   ]);
   return sc;
 }

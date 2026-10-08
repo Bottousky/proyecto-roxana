@@ -239,3 +239,17 @@ Cambios (evidencia en `c06/`):
 6. No hay borrado ni transformación con deslizamiento en esta escena (están probados en E03/E07, no integrados).
 
 **Conclusión**: la combinación funciona y la escena es causal de punta a punta (nada aparece sin mano, salto o tiza). Es la base de la vertical slice, no la vertical slice: faltan poses fuertes, un respiro en la composición final y una revisión independiente.
+
+---
+
+## E11 — poses con silueta (ciclo 10, 2026-10-07)
+
+**Hipótesis**: las poses del motor fallan en silueta porque el esqueleto es de perfil: a ¾ el brazo de atrás se pega al torso. Si cada pose trae la orientación que necesita (perfil para acciones hacia adelante, frente para emociones), las siluetas se leen sin cambiar el esqueleto.
+
+**Técnica**: `animlab/core/poses.js` (`POSES2`, con `face`), `actor.js` usa la orientación de la pose si el guion no la fija y admite caminar hacia atrás (`walk.back`); hoja `animlab/tests/t09p-poses.js`.
+
+**Resultado** (`c10/poses-a` → `poses-b` → `poses-c`): a ¾ (poses-a) casi todas las poses nuevas se parecían a las viejas; con su orientación (poses-b/c) se leen sorpresa (de frente, brazos arriba y afuera), pensar (mano al mentón), "uy" (mano a la cabeza), eureka (índice arriba), abrirse (brazos abiertos de frente). El encogimiento de hombros todavía es débil (el esqueleto no tiene hombros que suban).
+
+**Aplicado a E10** (`c10/t10f` → `t10h`): el alumno se vuelve hacia nosotros cuando aparece Punto; eureka al terminar; **da dos pasos atrás para mirar lo que escribió** y recién ahí se abre (`t10h/final.png`): el brazo ya no tapa las marcas y el plano final relaciona puntos, marcas y cuenta.
+
+**Conclusión**: la orientación por pose es la palanca de silueta más barata. Pendiente: hombros (para encogerse) y manos con forma (puño, índice) si un revisor lo pide.

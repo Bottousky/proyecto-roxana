@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-07, ciclo 9.
+**Última actualización**: 2026-10-07, ciclo 10.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Cómo retomar
@@ -25,6 +25,7 @@
 - E07 borrado: `animlab/core/eraser.js` — borrador visible con plan de mano, huella de fieltro, neblina sólo donde había tiza (ilegible), polvo que cae.
 - E08 cámara: `animlab/core/camera2.js` — van Wijk–Nuij con duración por costo; paneo pico 1.35 vs 3.85 pantallas/s; llega antes de la acción; trauma.
 - E10 microescena «¿Cuántos son?» (17 s): personaje + Punto + tiza + cámara + sonido + cambio de representación (7 puntos → marcas → 5 + 2 = 7). Base de la vertical slice. WAV en `artifacts/arithmos/animlab/c09/t10e/score.wav` (sin escuchar).
+- E11 poses con silueta (`animlab/core/poses.js`): cada pose trae su orientación; aplicado a E10 (`c10/t10h`): sorpresa de frente, eureka, paso atrás para mirar lo hecho.
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
 - **Se conserva**: el compuesto WebGL de presión + diente (`renderer.js`) — es la base de la textura en todas las técnicas ganadoras; el modelo de mundo/escenas, el director asincrónico, la UI, el guardado y el contenido de los 12 capítulos.
@@ -42,7 +43,7 @@
 
 ## Siguiente (en orden)
 1. **Revisión independiente R2 de E10** (sólo imágenes de t10e + WAV no aplica: el revisor no escucha).
-2. **Poses nuevas** para `actor.js`: siluetas claras en ¾ (brazos separados del torso, línea de acción), sobre todo: escribir, señalar, sorpresa, duda, comprender. Re-medir en E09.
+2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
 4. Rendimiento: medir tiza + polvo por cuadro de la vertical slice en escritorio (HUD) y dejar listo el pedido de prueba en teléfono [H].
 5. Después: adaptadores en `src/engine` y capítulo piloto (sólo con la slice aprobada).
