@@ -1,0 +1,48 @@
+# ARITHMOS · Pipeline de animación para Claude Code
+
+## Principio
+Claude no puede "mirar" una animación en tiempo real: ve **imágenes fijas** (reducidas a ~1568 px de lado) y **números**. Por eso el pipeline convierte el movimiento en cosas que Claude sí puede inspeccionar con precisión:
+
+1. **Tiempo buscable**: toda escena del lab es una función del tiempo; `__lab.seek(t)` dibuja exactamente el cuadro t. Dos versiones se comparan en el mismo instante.
+2. **Sondas**: cada prueba expone `probe(t)` con el estado numérico (punta, velocidad, pose, cámara). El movimiento se juzga en gráficos de curvas (`animlab-plot.mjs`), no a ojo.
+3. **Recortes de detalle**: la textura se juzga en recortes de ~400×80 px capturados a dpr 3 (una captura completa no muestra un trazo de 5 px).
+4. **Hojas de contactos**: la continuidad y la composición se juzgan en 9–12 cuadros equiespaciados en una sola imagen.
+5. **Métricas sobre la presión**: se mide el lienzo de presión (antes del compuesto), no los píxeles finales: pico, ancho, carga y autocorrelación por columna.
+
+## Ciclo (un experimento)
+```
+hipótesis (escrita en EXPERIMENTS, observable)
+ → implementación en animlab/ (no en src/ hasta ganar)
+ → captura: node scripts/animlab-capture.mjs <test> artifacts/arithmos/animlab/cNN/<nombre> [--frames] [--crop] [--q=params]
+ → gráficos: node scripts/animlab-plot.mjs <probes.json> <png> <series>
+ → inspección: final.png (composición), sheet.png (continuidad), crop-*.png (textura), speed.png (timing)
+ → comparación contra la carpeta anterior (misma prueba, mismo t) y contra el QUALITY_BAR
+ → decisión: mejor → documentar por qué (con números); peor → revertir
+ → EXPERIMENTS + STATE + commit
+```
+Cada corrida se guarda en **una carpeta nueva** (`cNN/<prueba><letra>`): nunca se sobrescribe la evidencia anterior.
+
+## Roles
+- **Generador** (sesión principal, Opus): diseña, implementa, captura, mide.
+- **Revisor independiente** (subagente con contexto fresco, a lo sumo uno a la vez): recibe sólo el QUALITY_BAR, las imágenes y las sondas, y puntúa por dimensión con justificación. No ve el código ni la intención del autor (evita la autoaprobación; ver *harness design*, Anthropic). Se usa al cerrar un test y antes de dar un nivel ≥ 4.
+- **Obreros** (Haiku): ediciones mecánicas planificadas, resúmenes de salidas largas.
+- Humano: audio, dispositivo real, comprensión de jugadores (nivel 5 / [H]).
+
+## Migración al juego
+Una técnica pasa de `animlab/` a `src/engine/` sólo si:
+1. ganó en su test con evidencia (EXPERIMENTS);
+2. tiene una prueba equivalente con el motor actual en la misma captura (comparación A/B);
+3. se puede adoptar escena por escena (API compatible o adaptador), sin reescribir capítulos de golpe.
+
+## Herramientas
+| Herramienta | Uso |
+|---|---|
+| `experiments/arithmos/animlab/` | Laboratorio: `index.html?test=NN&t=…` o `&play=1` |
+| `scripts/animlab-capture.mjs` | Cuadros, hoja, recortes, sondas a 60 Hz, métricas, video opcional (`--video`, sólo para humanos) |
+| `scripts/animlab-plot.mjs` | Curvas de sondas (velocidad, posición, ángulos) |
+| Chrome del sistema vía Playwright 1.63 | Render real con GPU (`--use-angle=metal`) |
+
+## Lo que NO hace este pipeline
+- No certifica audio (nadie lo escuchó).
+- No sustituye una prueba con personas ni con un teléfono real.
+- Pixel-similarity sólo detecta cambios no buscados: nunca se usa para decir "mejoró".

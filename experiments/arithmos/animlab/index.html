@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arithmos · Animation Lab</title>
+<style>
+@font-face{font-family:Kalam;src:url(../assets/fonts/kalam-latin-400-normal.woff2) format('woff2');font-weight:400}
+@font-face{font-family:Tiza;src:url(../assets/fonts/kalam-latin-400-normal.woff2) format('woff2');font-weight:400}
+@font-face{font-family:Tiza;src:url(../assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2');font-weight:400;unicode-range:U+0030-0039;size-adjust:104%}
+@font-face{font-family:'Atkinson Hyperlegible';src:url(../assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format('woff2')}
+html,body{margin:0;height:100%;background:#0d1a16;overflow:hidden;font-family:'Atkinson Hyperlegible',system-ui,sans-serif}
+#gl,#svg{position:fixed;inset:0;width:100%;height:100%}
+#svg{pointer-events:none}
+#tags{position:fixed;inset:0;pointer-events:none}
+.tag{position:absolute;color:#9fb8ae;font-size:12px;letter-spacing:.04em;white-space:nowrap;transform:translateY(-50%)}
+#hud{position:fixed;left:8px;bottom:6px;color:#6d887d;font-size:11px}
+#menu{position:fixed;top:8px;right:8px;display:flex;gap:4px;flex-wrap:wrap;max-width:60vw;justify-content:flex-end}
+#menu a{color:#9fb8ae;font-size:11px;text-decoration:none;border:1px solid #2a4a3e;padding:2px 6px;border-radius:3px}
+#menu a.on{background:#2a4a3e;color:#fff}
+body.capture #menu,body.capture #hud{display:none}
+</style></head>
+<body><canvas id="gl"></canvas><svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg><div id="tags"></div><div id="hud"></div><nav id="menu"></nav>
+<script type="module" src="./lab.js"></script></body></html>
