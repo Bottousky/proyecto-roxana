@@ -7,8 +7,8 @@ const LINES = [
   ['á é í ó ú  . , : ? ¿ - × →  0123456789', 80, 300],
   ['la tabla de ayer · esta mañana', 60, 450],
   ['¿están todos?  entra: 2 → se traba', 48, 570],
-  ['un lado de 2   × 2 cada día   hora   sombra', 40, 680],
-  ['abcdefghijklmnñopqrstuvwxyz', 28, 790],
+  ['Mara · Punto · ¡Bien! · x · x = 2 · 100 ÷ 4 · 30° · √2 ≈ 1,4', 40, 680],
+  ['ABCDEFGHILMNOPQRSTUV ÷ ° < > ↑ ↓ ← √ ≈ % * ! ¡', 56, 790],
 ];
 let strokes = [];
 export default {
