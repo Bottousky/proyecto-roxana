@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-07, ciclo 12.
+**Última actualización**: 2026-10-07, ciclo 13.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Ver la vertical slice
@@ -32,6 +32,8 @@
 - R2 (revisión de E10 t10e): No. Disposición punto por punto; la versión VS1 (`c11/t10j`) resuelve 6 de 8 hallazgos y uno parcial: hilos celestes de correspondencia, entrada desde fuera de cuadro, sin zoom sin causa, anillos celestes imperfectos, rastro de Punto.
 - E12: caché de trazos terminados → tiza 0.8 ms/cuadro (antes 4.9); VS1.1 (`c11/t10l`) con hilos que pasan por encima de la Ronda.
 - R3 (VS1): No, pero Timing/Actuación/Continuidad/Matemática en N3. **VS2** (`c12/t10p`) corrige su lista mínima y agrega **interacción real**: el jugador toca los puntos (`?interactive=1&play=1`); tocar uno ya contado no suma marca («ya está»). Probado con clics reales (`scripts/animlab-interact.mjs`, `c12/interactive2`).
+- VS2.1 (`c13/t10q`): se aleja y mira antes de comprender. **R4: No** (Actuación y Legibilidad N2): correspondencia no trazable a 1×, 5 + 2 sin separación visible, mirada que no lidera, sin señal de toque, negación invisible, blanco de toque chico, Punto parece un octavo punto al final.
+- E13 palabras: minúsculas de un trazo (C) ganan a la fuente (A, B): a mitad de escritura la fuente se ve recortada. Falta el alfabeto completo (~60 signos). `ARITHMOS_ANIMATION_MIGRATION.md`: plan de adaptadores con la escala de uso (306 Label, 165 d.draw, 241 d.shot…).
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
 - **Se conserva**: el compuesto WebGL de presión + diente (`renderer.js`) — es la base de la textura en todas las técnicas ganadoras; el modelo de mundo/escenas, el director asincrónico, la UI, el guardado y el contenido de los 12 capítulos.
@@ -48,7 +50,7 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **Revisión R4 de VS2** (`c12/t10p` + `c12/interactive2` + `c12/phone` + `c12/punto-h.png`). Defecto conocido: al subir a eureka el brazo barre por encima de la ecuación.
+1. **Corregir R4** (lista en EXPERIMENTS) y revisión R5.
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
 4. ~~Rendimiento en escritorio~~ (E12: ~1 ms/cuadro con caché). Teléfono real [H].

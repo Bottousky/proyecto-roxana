@@ -299,3 +299,17 @@ R3: **No**, pero sube: Timing N3, Actuación N3, Continuidad N3, Matemática N3;
 | 8. Hilos finos; falta 844×390 | Hilos de 3 px a presión 0.6; captura a 844×390@3 (`c12/phone/sheet.png`): «5+2=7», marcas e hilos legibles. |
 
 **Además**: el conteo se arma desde los toques del jugador (`build(taps)`), con «ya está» si se toca un punto ya contado (sin marca nueva); modo automático = toques guionados (`?taps=0,1,2,2,…` para probar repeticiones).
+
+---
+
+## E13 — escribir palabras (ciclo 13, 2026-10-07)
+
+**Hipótesis**: para palabras en el mundo (306 `Label` en el juego, muchas con texto: «esta mañana», «la tabla de ayer»), unas minúsculas de un trazo escritas con el plan de mano superan a la fuente Kalam revelada, aun letra por letra.
+
+**Técnicas** (misma duración): A Kalam + barrido rectangular (motor); B Kalam revelada letra por letra con ritmo de mano (barrido corto por letra, pausas entre letras y palabras); C minúsculas de imprenta escolar de un trazo (`glyphs.js`: a e m n ñ o p s t u, con repaso del palo en m/n/u y la «a» de un piso que arranca arriba a la derecha), peso 0.13 del alto de cifra, interletra apretada.
+
+**Resultado** (`c13/words-b/cmp.png` final, `mid.png` a t = 2.5 s):
+- Final: las tres se leen; Kalam (A/B) es cursiva y más "diseñada"; C es recta, coherente con las cifras de E03.
+- **A mitad de escritura**: B muestra la «t» cortada por un rectángulo vertical (se ve que es un barrido); C muestra el palo de la «t» dibujándose. Sólo C cumple «nada aparece sin ser dibujado».
+
+**Conclusión**: C para todo texto que se ve escribir; la fuente queda sólo para la lectura limpia (capa de accesibilidad) y la interfaz. **Trabajo pendiente**: alfabeto completo (a–z, mayúsculas usadas, á é í ó ú ü ñ, ¿ ? ¡ ! , . : → ×) ≈ 60 signos, diseñados y revisados en hoja como `c13/words-b`. Es diseño, no mecánica: lo hace la sesión principal, con revisión independiente de la hoja.
