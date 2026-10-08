@@ -16,6 +16,7 @@ const TESTS = {
   '03': () => import('./tests/t03-equation.js'),
   '05': () => import('./tests/t05-punto.js'),
   '09': () => import('./tests/t09-figure.js'),
+  '07': () => import('./tests/t07-erase.js'),
 };
 
 const params = new URLSearchParams(location.search);

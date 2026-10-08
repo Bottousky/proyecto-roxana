@@ -173,3 +173,23 @@ Cambios (evidencia en `c06/`):
 **Resultado**: los hallazgos aceptados de R1 están resueltos salvo los que dependen de piezas nuevas (borrador y mano visibles). En la figura, el ¾ no alcanzó: las poses del motor dejan los brazos pegados al torso (`c06/t09d/act.png`, cuadros 1–2) — **la debilidad es de diseño de poses, no de tiempo**.
 
 **Siguiente**: E07 borrador visible + neblina; E10 microescena con la mano que escribe (base de la vertical slice); un ciclo de poses con siluetas claras (brazos separados del torso, línea de acción).
+
+---
+
+## E07 — TEST 07 · borrado (ciclo 7, 2026-10-07)
+
+**Hipótesis**: un borrado se cree cuando (1) se ve qué borra (un borrador con forma que se mueve como una mano: frena en los giros, se inclina con retraso, entra y sale del pizarrón); (2) lo borrado se transforma en polvo **donde había tiza** (neblina corrida en la dirección de la pasada), no en un fundido uniforme; (3) quedan marcas del fieltro y cae polvo.
+
+**Técnicas**: A = fundido de presión 0.8 s + fantasma de los trazos en la capa de polvo (lo que hace `Drawing.fade`/`dust` hoy). B = `animlab/core/eraser.js`: vaivén vertical con esquinas redondeadas y plan de velocidad (frena en los giros); huella rectangular de bordes blandos orientada como el borrador; neblina = (contenido ensanchado y desenfocado) ∩ (zona barrida), corrida ±13 px en la dirección de la pasada; bandas de fieltro muy tenues; partículas con gravedad emitidas donde había tiza; el borrador dibujado con tiza (contorno, lomo, fieltro rayado), aplastado al apretar.
+
+**Resultado** (`c07/t07a`, `t07b`, comparación `c07/cmp.png`):
+- B: el borrador entra desde arriba, barre en vaivén y sale; durante la pasada se ve lo que todavía no borró a la derecha (`t07b/crop-0`), y a la izquierda una neblina corrida en vertical donde estaban «3 + 4 = 7» y la recta, ilegible pero presente.
+- A: todo se apaga junto, sin causa, y queda un fantasma nítido con la forma exacta de cada trazo.
+
+**Defectos encontrados y corregidos (t07a → t07b)**: la neblina dejaba leer «3 + 4 = 7» (alpha 0.16 → 0.085, corrimiento 5 → 9 px por copia); las estrías finas dibujaban el zigzag como un trazo (→ bandas anchas de alpha ≤ 0.025); quedaba la punta del 7 en el triángulo sin cubrir entre dos giros (el vaivén ahora se pasa 38 px de la caja y el paso bajó a 54 px).
+
+**Defectos abiertos**: nadie sostiene el borrador (en la escena, la mano o Punto); el borrado no suena [H]; el costo de `eraserDust` (dos lienzos auxiliares por cuadro) no se midió en teléfono.
+
+**Conclusión**: B convierte el borrado de un fundido (N1 de continuidad) en una acción con causa y consecuencia (N3–N4). La neblina proporcional a lo borrado es un detalle que sólo existe en un pizarrón: candidato a nivel 5 de textura si un humano lo confirma.
+
+**Siguiente**: E10 microescena: la mano (o Punto) que escribe y borra, con cámara y sonido → base de la vertical slice. Antes, E08 cámara (es parte de E10).
