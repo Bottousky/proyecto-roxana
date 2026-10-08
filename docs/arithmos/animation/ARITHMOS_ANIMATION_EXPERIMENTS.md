@@ -91,3 +91,25 @@ Velocidad (speed.png de t01d): A rectangular (0→570 px/s en un cuadro); C tria
 **Conclusión**: hipótesis (1) y (2) apoyadas. La identidad por símbolo es la diferencia cualitativa más grande hallada hasta ahora entre el motor actual y el objetivo. Nivel estimado de la fila B: Matemática N4 (correspondencia 5 + 3 → 8 visible, simetría del gesto en ambos miembros), Continuidad N3, Timing N3, Legibilidad N3. Fila A: Matemática N2, Continuidad N1.
 
 **Siguiente**: E05 Punto (actuación: anticipación, asentamiento, segundo orden) y E09 figura; después E07 borrado con borrador visible y neblina.
+
+---
+
+## E05 — TEST 05 · Punto (ciclo 4, 2026-10-07)
+
+**Hipótesis**: un punto puede actuar (intención, reacción, sorpresa) sólo con su trayectoria y su deformación, si (1) sigue objetivos con un sistema de segundo orden con respuesta inicial negativa (anticipa), sobrepaso ≤ 8 % y asentamiento; (2) se deforma conservando el área; (3) los cambios de estado (aparecer, dividirse, volverse línea) tienen causa visible.
+
+**Técnicas**: A = `Dot` real de `world.js` con `zip` (ease-in-out 0.32 s), `hop` (seno), aparición y duplicados por fundido. B = `animlab/core/blob.js`: trayectoria integrada a 240 Hz con `SecondOrder` (f 1.7 Hz, ζ 0.66, r −0.45) y consultada en t; contorno áspero relleno con presión 0.68 (el diente da la textura); deformación por velocidad/frenado con área constante; salto guionado (agachada 0.1 s, despegue estirado, vuelo, aterrizaje aplastado y rebote amortiguado); división en dos fases (estrangulamiento lento 0.45 s con cuello, luego suelta); 1 → 2 → 4 → 8 en fila; una línea de tiza los atraviesa y cada punto se funde en ella al pasar la punta.
+
+**Resultado** (`c04/t05a`, `t05b`, `t05d`):
+- Trayectoria x (`t05a/x.png`): B retrocede ~20 px antes de salir (anticipación), sobrepasa ~9 % (ζ 0.62; subido a 0.66 → ~6 %) y se asienta en ~0.5 s; A es una rampa de ease de 0.32 s sin antes ni después.
+- Salto (`t05b/y.png`): B reacciona 0.32 s después de que aparece la marca (percepción), se agacha, sube 70 px y rebota al aterrizar; A sube y baja en un seno de 40 px en el mismo instante en que aparece la marca.
+- División (`t05d/split-stack.png`): óvalo → maní con cintura → cápsula → dos puntos; A: el segundo punto aparece por fundido encima del primero.
+- 8 puntos → recta (`t05b/sheet.png` t = 9.9–11.5): cada punto se achica cuando la tiza pasa por él, en orden; al final queda sólo la línea. En A la línea crece lineal y los puntos se desvanecen todos a la vez.
+
+**Defectos encontrados y corregidos**: relleno a 0.86 parecía papel recortado → 0.68; división instantánea (el resorte separaba en 0.08 s) → fase de estrangulamiento; cuello más ancho que las manchas deformadas (puntas) → ancho limitado por el aplastamiento; fusión con la línea calculada con avance lineal (los últimos puntos no se fundían) → instante de paso tomado del plan de la mano.
+
+**Defectos abiertos**: no hay ojos ni "mirada": la atención de Punto se lee sólo por movimiento (suficiente según el lenguaje visual, a confirmar [H]); la respiración (±3 %) es apenas perceptible en capturas; el cuello podría estrangularse más.
+
+**Conclusión**: B supera a A en todas las acciones pedidas; la actuación por trayectoria funciona. Nivel estimado: Actuación N3–N4 (anticipación y asentamiento medidos; superposición no aplica a un punto), Continuidad N3 (división y fusión con causa), Matemática N3 (2ⁿ y "la recta está hecha de puntos" se ven, sin texto).
+
+**Siguiente**: E09 figura (superposición de cabeza/torso/brazos, pies plantados, mano que escribe) — la mano visible es lo que más falta en E03.

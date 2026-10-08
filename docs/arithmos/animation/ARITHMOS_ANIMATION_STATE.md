@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-07, ciclo 3.
+**Última actualización**: 2026-10-07, ciclo 4.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Cómo retomar
@@ -18,14 +18,15 @@
 - E01 línea: tres técnicas comparadas; gana B (depósito + plan de mano) en tiempo; textura empata o mejora levemente.
 - E02 círculo: `animlab/core/gesture.js` (trazo / tiza apoyada / espera / borrador) cubre lenta, rápida, pausa, aceleración, corrección y borrado; el repaso acumula; ≈ 1 ms por trazo terminado (hay que cachear al integrar). Lección técnica: nunca `destination-out` en el lienzo de presión.
 - E03 ecuación: glifos de un trazo (`animlab/core/glyphs.js`) + identidad por símbolo con el «=» como pivote; «x − 3 = 5 → x − 3 + 3 = 5 + 3 → x = 8» causal y legible; el motor actual (fuente + barrido + fundido) muestra fantasmas superpuestos. Recalibradas las levantadas.
+- E05 Punto: `animlab/core/blob.js` (segundo orden buscable, deformación de área constante, salto, división con cuello, fusión con la línea). Anticipa, sobrepasa ~6 % y se asienta; 1 → 2 → 4 → 8 → recta.
 
 ## Decisión provisional (se confirma tras E03, E05 y E09)
 **B. Reconstrucción parcial**: conservar renderer WebGL, mundo, director y escenas; reemplazar progresivamente (1) el tiempo de dibujo por el plan de mano, (2) el texto por escritura con glifos de un trazo, (3) la actuación por sistemas de segundo orden con superposición. Sin reescribir capítulos hasta que la vertical slice alcance el quality bar.
 
 ## Siguiente (en orden)
-1. E05 Punto (segundo orden, anticipación, asentamiento), E09 figura (superposición, pies plantados).
+1. E09 figura (superposición, pies plantados, mano que escribe).
 2. Mano visible que escribe (falta en E03) y borrador visible (E07).
-4. E07 borrado, E08 cámara, E04 cambio de representación, E06 función.
+4. E07 borrado (borrador visible + neblina), E08 cámara, E04 cambio de representación, E06 función.
 5. E10 microescena → base de la vertical slice.
 
 ## Abierto / humano
