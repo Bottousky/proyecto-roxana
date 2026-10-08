@@ -260,6 +260,7 @@ function build(taps = autoTaps()) {
     ev('empieza el 7', t + 0.0);
     sc.seven = {x: bm - GLYPHS['7'].adv * sz / 2, top: by + 21 + 6, w: GLYPHS['7'].adv * sz}; // para medir la textura
     sc.braceBox = {x: bx0 + 10, y: by - 4, w: bx1 - bx0 - 20, h: 30};
+    sc.braceFull = {x: bx0 - 4, y: by - 6, w: bx1 - bx0 + 8, h: 34};
     writeGlyph('7', bm - GLYPHS['7'].adv * sz / 2, by + 21 + sz + 6, sz, 141);
   }
   sc.punto.push({kind: 'hop', t: t + 0.15, dur: 0.6, from: sc.carryEnd, toFn: perchAt, h: 60});
@@ -275,7 +276,9 @@ function build(taps = autoTaps()) {
   const T_WALK_END = T_BACK + 0.15 + planWalk(X1, X1 - 170, 0, 190, K).T;
   const T_GET = T_WALK_END + 0.35 + 0.25 + 0.4 + 0.62; // + 0.25: el pasito de acomodarse (si lo hay) termina antes de la quietud
   ev('termina el paso atrás', T_WALK_END);
-  ev('comprende', T_GET);
+  ev('contramovimiento (baja la cabeza)', T_GET - 0.62);
+  ev('levanta la vista a la Ronda', T_GET - 0.5);
+  ev('comprende', T_GET); // «¡ya está!»: el brazo sube ~0.14 s después (retraso del canal del brazo), tras su contramovimiento
   sc.punto.push({kind: 'bounce', t: T_GET + 0.15, n: 2});
   sc.score.push({type: 'note', t: T_GET + 0.15, freq: 523, dur: 0.6, gain: 0.05}, {type: 'note', t: T_GET + 0.32, freq: 659, dur: 0.6, gain: 0.045}, {type: 'note', t: T_GET + 0.5, freq: 784, dur: 0.9, gain: 0.04});
   sc.T_GET = T_GET;
@@ -295,7 +298,7 @@ function build(taps = autoTaps()) {
     {t: T_WALK_END - 0.1, face: 0.9},                                                    // se acomoda de frente a lo escrito al terminar el paso (si hace falta un pasito, es parte del paso, no de la comprensión: R13)
     {t: T_GET - 0.62, pose: 'lookDown', face: 0.9, overrides: {tilt: 0.55}},                        // contramovimiento: baja un poco más antes de levantar la cabeza
     {t: T_GET - 0.5, pose: 'lookUp', face: 0.9, gaze: [1, -0.7]},                                  // levanta la cabeza hacia la Ronda (los ojos primero)
-    {t: T_GET - 0.12, pose: 'lookUp', face: 0.9, overrides: {tilt: -0.2, drop: 3}},                 // micro-encogida pequeña (antes bajaba la cabeza 0.6 rad: vaivén)
+    {t: T_GET - 0.12, pose: 'lookUp', face: 0.9, overrides: {tilt: -0.2, drop: 3, armR: [0.05, 0.85]}}, // micro-encogida: el brazo baja antes de subir (contramovimiento, R15)                 // micro-encogida pequeña (antes bajaba la cabeza 0.6 rad: vaivén)
     // ¡ya está! (el brazo sube lejos de la escritura); las piernas quedan como estaban: la comprensión es del torso para arriba
     // (R13: la pose de eureka abría las piernas y el alumno daba dos pasitos justo al comprender)
     {t: T_GET, pose: 'eureka', face: 0.9, gaze: [1, -0.5], overrides: {legL: POSES2.lookUp.legL, legR: POSES2.lookUp.legR, armR: [2.15, -0.2]}}, // brazo arriba y adelante, hacia la Ronda (vertical pasaba por la cabeza)
@@ -343,7 +346,7 @@ function puntoAt(t) {
     }
     else if (p.kind === 'hop') {
       if (p.toFn) p.to = p.toFn(p.t + p.dur);
-      if (tl >= p.dur + 0.35) { pos = p.toFn ? p.toFn(t) : p.to; continue; } // si el destino se mueve (la cabeza), lo sigue
+      if (tl >= p.dur + 0.35) { pos = p.toFn ? p.toFn(t) : p.to; if (p.toFn) sl = perchSquash(t); continue; } // si el destino se mueve (la cabeza), lo sigue
       // salto en cuatro fases (R11: el vuelo arrancaba a velocidad plena y frenaba en seco, y el estiramiento saltaba en un
       // cuadro): agachada → impulso (acelera mientras se estira) → vuelo balístico → aterrizaje que absorbe (sigue de largo
       // con la misma velocidad y vuelve, x·e^(−τ/τ0): velocidad continua, sobrepaso ≤ 8 % del salto)
@@ -390,7 +393,7 @@ function puntoAt(t) {
       else if (u < p.st.T) { const st_ = 1 + 0.07 * clamp(depositSpeed(p.st, u) / 640); sl = pre ? lerp(0.8, st_, clamp(u / 0.15)) : st_; ang = 0; } // se estira según la velocidad (R12)
       else { const tau = u - p.st.T, ta = 0.05, e = 1 + 0.07 * clamp(depositSpeed(p.st, p.st.T) / 640); sl = lerp(e, 1, clamp(tau / 0.06)) - 0.2 * (tau / ta) * Math.exp(1 - tau / ta); pos = [pos[0], pos[1] + R_PUNTO * (1 - sl)]; } // continuo desde el estiramiento final; la base apoyada
     } else if (p.kind === 'perch') {
-      pos = perchAt(t);
+      pos = perchAt(t); sl = perchSquash(t);
     } else if (p.kind === 'bounce') {
       const per = 0.36, i = Math.floor(tl / per), at = perchAt(t);
       // aplastado en el contacto, estirado en el aire, con transición suave (R11: cambiaba en escalón 0.82 ↔ 1.1)
@@ -492,6 +495,16 @@ function beadString(pts) {
 }
 
 /** Arriba de la cabeza del alumno, donde Punto se posa (en el hombro quedaba tapado por la cabeza: t10r). */
+/** Posado sobre la cabeza: la aceleración vertical del apoyo lo aplasta (sube) o lo estira (frena o baja). R15: Punto subía
+ *  55 px con la cabeza sin ninguna reacción. Aceleración por diferencias centradas a 30 ms (el actor está muestreado a 240 Hz). */
+function perchSquash(t) {
+  // aceleración promediada con pesos de campana en ±60 ms, hacia atrás en el tiempo (el cuerpo blando responde con retraso):
+  // con diferencias puras, los escalones de aceleración de la cabeza lo hacían saltar 98 → 80 → 112 % en 0.05 s
+  const h = 0.03, acc = tt => (perchAt(tt + h)[1] - 2 * perchAt(tt)[1] + perchAt(tt - h)[1]) / (h * h);
+  let sum = 0, wsum = 0;
+  for (let k = 0; k <= 6; k++) { const w = Math.exp(-((k - 3) ** 2) / 4.5); sum += w * acc(t - k * 0.02); wsum += w; }
+  return 1 + clamp(sum / wsum * 0.00014, -0.2, 0.12); // + = acelera hacia abajo (y crece hacia abajo) → se estira
+}
 function perchAt(t) {
   const sk = S.actor.at(t);
   return [sk.head[0] - 4 * Math.sign(sk.f || 1), sk.head[1] - 15.5 * K - 24]; // separado del contorno de la cabeza
@@ -709,7 +722,26 @@ export default {
       tex('llave (cuadro final)', api.columns(S.braceBox.x, S.braceBox.y, S.braceBox.w, S.braceBox.h)),
       tex('trazo de arriba del 7 (cuadro final)', api.columns(S.seven.x + 2, S.seven.top - 6, S.seven.w * 0.7, 14)),
     ];
+    // toque y levantada (VL §2): (a) en el depósito de cada trazo escrito (cantidad por estampa: primeros 5 px y últimos
+    // 3 px frente al tramo medio), (b) en la presión dibujada a lo largo de la llave (suma por columna en el cuadro final)
+    const med = a => { const b = [...a].sort((x, y) => x - y); return b.length ? b[b.length >> 1] : NaN; };
+    const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN;
+    const per = S.strokes.filter(x => x.st.L > 30).map(({st}) => {
+      const mid = st.dabs.filter(d => d.s > st.L * 0.3 && d.s < st.L * 0.7);
+      const m = avg(mid.map(d => d.amt));
+      const vs = mid.map(d => d.v), am = mid.map(d => d.amt), mv = avg(vs), ma = avg(am);
+      let cov = 0, sv = 0, sa = 0; for (let i = 0; i < vs.length; i++) { cov += (vs[i] - mv) * (am[i] - ma); sv += (vs[i] - mv) ** 2; sa += (am[i] - ma) ** 2; }
+      return {touch: avg(st.dabs.filter(d => d.s < 5).map(d => d.amt)) / m, lift: avg(st.dabs.filter(d => st.L - d.s < 3).map(d => d.amt)) / m, corrSpeed: sv && sa ? cov / Math.sqrt(sv * sa) : NaN};
+    });
+    let brace = null;
+    if (S.braceFull && api?.columns) {
+      const c = api.columns(S.braceFull.x, S.braceFull.y, S.braceFull.w, S.braceFull.h), sc_ = c.sum.length / S.braceFull.w;
+      const n5 = Math.max(1, Math.round(5 * sc_)), n14 = Math.max(1, Math.round(14 * sc_)), sum = c.sum.filter(v => v > 0.05);
+      const mid = avg(sum.slice(Math.round(sum.length * 0.12), Math.round(sum.length * 0.36))); // brazo izquierdo, sin el pico central
+      brace = {touch5px: +(avg(sum.slice(0, n5)) / mid).toFixed(2), lastQuarterOf14px: +(avg(sum.slice(-Math.max(1, n14 >> 2))) / mid).toFixed(2), columns: sum.length};
+    }
+    const pressure = {strokes: per.length, touchMedian: +med(per.map(x => x.touch)).toFixed(2), liftMedian: +med(per.map(x => x.lift)).toFixed(2), brace};
     const hops = S.punto.filter(p => p.kind === 'hop').map(p => ({t: +p.t.toFixed(3), dur: +p.dur.toFixed(3), brake: !!p.brake}));
-    return {events: S.events, duration: +S.duration.toFixed(2), strokes: S.strokes.length, reachOver: +maxErr.toFixed(1), worstAt: worst, chalkAccelMax: Math.round(aMax), chalkAccelAt: aTag, texture, hops};
+    return {events: S.events, duration: +S.duration.toFixed(2), strokes: S.strokes.length, reachOver: +maxErr.toFixed(1), worstAt: worst, chalkAccelMax: Math.round(aMax), chalkAccelAt: aTag, texture, pressure, hops};
   },
 };

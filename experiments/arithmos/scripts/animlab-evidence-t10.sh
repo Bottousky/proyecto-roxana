@@ -93,6 +93,7 @@ lines = [
   f'pies: deslizamiento máx. con el pie apoyado = {slide:.2f} px por 1/240 s',
   f'Punto: saltos de posición aislados = {len(spikes)} {spikes[:5]}; mayor cambio de aplastamiento = {sq[0]:.1f} % en 1/240 s (t = {sq[1]:.3f})',
   f'alcance: reachOver = {m.get("reachOver")}',
+  (lambda q: f"toque y levantada (VL §2): por trazo (cantidad del depósito, {q['strokes']} trazos) toque {q['touchMedian']} y últimos 3 px {q['liftMedian']} del tramo medio; dibujado en la llave: primeros 5 px {q['brace']['touch5px']}, último cuarto de los 14 px finales {q['brace']['lastQuarterOf14px']}")(m['pressure']) if m.get('pressure') else 'toque y levantada: sin medir',
   'textura (presión antes del compuesto; autocorr. a 2 px del grano tras quitar la tendencia: cerca de 1 = "a cuentas" regulares, cerca de 0 = grano sin patrón; el 0.85 del motor viejo (E01) era sobre una recta, sin quitar tendencia): ' + ('; '.join(f"{x['where']}: pico medio {x['peakMean']}, CV pico {x['peakCV']}, CV ancho {x['widthCV']}, autocorr. 2 px {x['autocorr2px']} ({x['cols']} columnas)" for x in m['texture']) if m.get('texture') else 'sin medir'),
 ]
 open(f'{D}/medidas.txt', 'w').write('\n'.join(lines) + '\n')
@@ -141,6 +142,8 @@ H2=$(python3 -c "import json;h=[x for x in json.load(open('$D/main/metrics.json'
 set -- $H2; TA=$1; TB=$2; TR=$(python3 -c "print(round($GC - 0.3, 2))"); TE=$(python3 -c "print(round($GC + 0.75, 2))")
 cap "$D/mirada-caras" --frames=2 --dpr=2 "--crop=150,250,500,450,$TA;150,250,500,450,$TB;0,150,700,700,$TR;0,150,700,700,$TE"
 node scripts/animlab-stack.mjs "$D/mirada-caras.png" "$D/mirada-caras/crop-0.png" "$D/mirada-caras/crop-1.png" "$D/mirada-caras/crop-2.png" "$D/mirada-caras/crop-3.png" >/dev/null
+# nacimiento de Punto (del pizarrón): tira densa con recorte
+cap "$D/strip-nace" --cols=8 --times=3.95,4.0,4.03,4.06,4.1,4.15,4.25,4.4 "--crop=420,170,300,260,4.06"
 mkdir -p "$D/interactive" && node scripts/animlab-interact.mjs "$D/interactive" >/dev/null
 node scripts/animlab-stack.mjs "$D/interactive.png" "$D/interactive/2-ya-contado.png" "$D/interactive/3-final.png" >/dev/null
 { echo "# $VS — tabla de tiempos (ordenada)"; echo; cat "$D/timeline-table.md"; echo; echo "Medidas de ESTA corrida (main/probes.json, 240 Hz):"; sed 's/^/- /' "$D/medidas.txt"; } > "$D/timeline.md"

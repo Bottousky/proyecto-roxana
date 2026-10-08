@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-08, ciclo 21.
+**Última actualización**: 2026-10-08, ciclo 22.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Ver la vertical slice
@@ -45,6 +45,7 @@
 - R12: No (siete hilos ilegibles y atenuados = fundido, pausas cortas, aterrizaje sin oscilación, textura sin medir). **VS12** (`c23/vs12d`): los hilos de cada grupo se juntan en uno al cerrarse su lazo (7 → 2 → + el del 7), sin ninguna opacidad animada; pausas 0.37 s con Punto, tiza y mano quietos; el centro de Punto se hunde al aplastarse; textura medida sobre la presión.
 - R13: **N3 en todas las dimensiones**; No a N4 (comprensión sobre pasos, saltos rápidos triangulares). **VS13** (`c24/vs13`): comprensión tras 0.43 s quieto y sin pasos, brazo de «¡ya está!» que ya no atraviesa la cabeza, saltos con crucero y más bajos cuanto más rápidos.
 - R14: N3 en todo, **N4 en Timing y Matemática**; Actuación N3 por la mirada. **VS14** (`c25/vs14`): ojos que se leen (hasta 5·k, dentro de la cabeza), pausa del atado de cinco y salto al primer grupo en la tabla, zoom escalonado tras el paso atrás.
+- R15: **N4 en Timing, Matemática y Legibilidad**; Actuación N3 (anticipaciones), Textura sin toque medido. **VS15** (`c26/vs15b`): contramovimiento del brazo, Punto posado con inercia, toque/levantada corregidos en el depósito y medidos (1.14 / 0.42).
 - R10: No (salto de Punto, hilo que cruzaba el «2»). **VS10** (`c20/t10a`) corrige ambos; tiempos de marcas verificados con sondas (≤ 0.1 s tras cada aterrizaje).
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
@@ -62,7 +63,7 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **R15 sobre VS14** (`c25/vs14`). R14: N3 en todo, N4 en Timing y Matemática; Actuación N3 sólo por la mirada, ahora legible y con evidencia [C] (`mirada-caras.png`). Si aprueba N4: congelar `c25/vs14/main` como benchmark y pasar a los adaptadores (MIGRATION: cámara → trazos → Label → Punto → figura).
+1. **R16 sobre VS15** (`c26/vs15b`). R15: N4 en Timing, Matemática y Legibilidad; su lista para Actuación N4 (contramovimiento del brazo, reacción de Punto posado) y Textura N3 (toque y levantada medidos, tras corregir el depósito) está aplicada. Si aprueba N4: congelar `c26/vs15b/main` como benchmark y pasar a los adaptadores (MIGRATION: cámara → trazos → Label → Punto → figura).
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
 4. ~~Rendimiento en escritorio~~ (E12: ~1 ms/cuadro con caché). Teléfono real [H].

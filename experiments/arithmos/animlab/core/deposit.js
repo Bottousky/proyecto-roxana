@@ -85,15 +85,16 @@ export function depositStroke(guide, {w = 4.2, p = 0.9, ch = 0, seed = 1, motion
     // `down`: al escribir, las bajadas cargan más que las subidas (la mano empuja hacia abajo)
     const dy = (path.y[b] - path.y[a]) / Math.max(1e-6, path.s[b] - path.s[a]);
     let pr = p * (1 + 0.12 * nPress(s / 23)) * (1 + down * dy);
-    if (land && s < 5) pr *= 1.18 - 0.03 * s;
+    // toque y levantada se aplican DESPUÉS del tope de la cantidad (antes se aplicaban antes y el tope se comía el toque:
+    // +18 % → +0 % en la mayoría de los trazos, medido en R15)
     const fromEnd = path.L - s;
-    if (lift && fromEnd < 14) pr *= 0.35 + 0.65 * (fromEnd / 14);
+    const shape = (land && s < 5 ? 1.18 - 0.03 * s : 1) * (lift && fromEnd < 14 ? 0.35 + 0.65 * (fromEnd / 14) : 1);
     // más rápido, menos depósito por unidad de largo; además huecos secos a alta velocidad
     const speedK = clamp(Math.pow(vRef / Math.max(40, v), 0.3), 0.72, 1.3);
     const dry = 0.5 + 0.5 * nDry(s / 6) + Math.max(0, v / vRef - 1.1) * 1.5;
     const gap = dry > 0.97 ? 0.5 : 1;
     dabs.push({x: path.x[i] + nx * off, y: path.y[i] + ny * off, t, s, v,
-      amt: clamp(pr * speedK * gap) * DENSITY * (step / (w * 0.22)),
+      amt: clamp(pr * speedK * gap) * shape * DENSITY * (step / (w * 0.22)),
       rot: rot0 + (rnd() - 0.5) * 0.04, variant: face});
   }
   return {kind: 'deposit', path, plan, dabs, w, aspect, ch, T: plan.T, L: path.L};
