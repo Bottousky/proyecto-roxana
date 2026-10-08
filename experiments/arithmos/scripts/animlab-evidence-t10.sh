@@ -134,6 +134,8 @@ cap "$D/strip-hilos" --cols=3 "--times=$H" "--crop=300,40,1150,540,$CT"
 HC=$(python3 -c "print(';'.join('300,40,1150,540,%s' % round($G5 + d, 2) for d in (-0.05, 0.3, 0.6, 1.0)))")
 cap "$D/hilos-recortes" --frames=2 --dpr=2 "--crop=$HC"
 node scripts/animlab-stack.mjs "$D/hilos-recortes.png" "$D/hilos-recortes/crop-0.png" "$D/hilos-recortes/crop-1.png" "$D/hilos-recortes/crop-2.png" "$D/hilos-recortes/crop-3.png" >/dev/null
+GC=$(EV comprende); TC=$(python3 -c "g=$GC;print(','.join(str(round(g+d,2)) for d in (-1.2,-0.62,-0.4,-0.1,0.15,0.4,0.8,1.6)))")
+cap "$D/strip-comprende" --cols=4 "--times=$TC"
 mkdir -p "$D/interactive" && node scripts/animlab-interact.mjs "$D/interactive" >/dev/null
 node scripts/animlab-stack.mjs "$D/interactive.png" "$D/interactive/2-ya-contado.png" "$D/interactive/3-final.png" >/dev/null
 { echo "# $VS — tabla de tiempos (ordenada)"; echo; cat "$D/timeline-table.md"; echo; echo "Medidas de ESTA corrida (main/probes.json, 240 Hz):"; sed 's/^/- /' "$D/medidas.txt"; } > "$D/timeline.md"
