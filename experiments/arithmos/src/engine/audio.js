@@ -106,7 +106,11 @@ export class Sound {
    * Tiza sobre el pizarrón durante `sec` segundos: ruido filtrado con un grano
    * irregular (los saltos de la tiza) y un cuerpo grave muy leve.
    */
-  chalkStart(sec = 1, strength = 1) {
+  /**
+   * `env` (opcional, ?anim=2): [{t, v}] — la tiza suena sólo mientras toca, con nivel según la velocidad de la punta
+   * (v 0..1) y un golpe al empezar cada trazo ({t, tap: true}); reemplaza las levantadas simuladas a ritmo fijo.
+   */
+  chalkStart(sec = 1, strength = 1, env = null) {
     if (!this.ready) return null;
     const ctx = this.ctx, t = ctx.currentTime;
     const src = this.#src(this.noise, true);
@@ -135,6 +139,15 @@ export class Sound {
     g.connect(this.sfxGain);
     const level = 0.16 * strength;
     g.gain.setValueAtTime(0, t);
+    if (env?.length) {
+      for (const e of env) {
+        if (e.tap) { this.tap(0.35 * strength, 1, e.t); continue; }
+        g.gain.linearRampToValueAtTime(level * e.v, t + e.t);
+      }
+      g.gain.linearRampToValueAtTime(0, t + sec + 0.04);
+      src.start(t); lfo.start(t); src.stop(t + sec + 0.1); lfo.stop(t + sec + 0.1);
+      return this.#chalkHandle(g, src, lfo);
+    }
     g.gain.linearRampToValueAtTime(level, t + 0.02);
     // pequeñas levantadas de tiza a lo largo del trazo
     const lifts = Math.floor(sec * 2.2);
@@ -151,6 +164,11 @@ export class Sound {
     src.stop(t + sec + 0.1);
     lfo.stop(t + sec + 0.1);
     this.tap(0.35 * strength);
+    return this.#chalkHandle(g, src, lfo);
+  }
+
+  #chalkHandle(g, src, lfo) {
+    const ctx = this.ctx;
     const handle = {stop: () => {
       try {
         const n = ctx.currentTime;
@@ -166,9 +184,9 @@ export class Sound {
   }
 
   /** Golpe de tiza contra el pizarrón. */
-  tap(strength = 0.6, pitch = 1) {
+  tap(strength = 0.6, pitch = 1, delay = 0) {
     if (!this.ready) return;
-    const ctx = this.ctx, t = ctx.currentTime;
+    const ctx = this.ctx, t = ctx.currentTime + delay; // delay: golpe programado (inicio de cada trazo con ?anim=2)
     const src = this.#src(this.noise);
     const bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';

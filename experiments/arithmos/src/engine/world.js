@@ -3,7 +3,7 @@
 import {drawStrokes, strokesTip, stroke, circleGuide, dotStrokes, chalkText, lineGuide, WHITE, YELLOW, pressureStyle} from './chalk.js';
 import {mulberry32, seedOf, clamp, lerp} from './rng.js';
 import {anim} from './anim.js';
-import {depositStroke, drawDeposit, depositTip} from './deposit.js';
+import {depositStroke, drawDeposit, depositTip, depositSpeed} from './deposit.js';
 import {liftTime} from './motion.js';
 
 export class World {
@@ -118,6 +118,19 @@ export class Drawing {
   /** Duración natural del dibujo con plan de mano (s). La usa `d.draw` con ?anim=2. */
   planDuration() {
     return this.#dep().T;
+  }
+
+  /** Envolvente del rasgueo para un dibujo de `sec` segundos (?anim=2): suena mientras la tiza toca, con nivel según la
+   *  velocidad de la punta; un golpe al empezar cada trazo. Muestras cada 1/40 s de reloj. */
+  soundEnvelope(sec) {
+    const {list, T} = this.#dep(), k = T / Math.max(1e-3, sec), env = [];
+    for (const e of list) env.push({t: e.t0 / k, tap: true});
+    for (let t = 0; t <= sec + 1e-6; t += 1 / 40) {
+      const tau = t * k;
+      const e = list.find(x => tau >= x.t0 && tau <= x.t0 + x.st.T);
+      env.push({t, v: e ? 0.35 + 0.65 * clamp(depositSpeed(e.st, tau - e.t0) * k / 650) : 0});
+    }
+    return env;
   }
 
   #depTip() {
