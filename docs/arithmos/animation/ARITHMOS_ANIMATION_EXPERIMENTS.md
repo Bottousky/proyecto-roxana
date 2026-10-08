@@ -332,3 +332,6 @@ R4: **No** (Actuación y Legibilidad N2; Timing, Textura, Continuidad, Matemáti
 | Final sin salida / repetir | Pendiente (no es parte de la escena; lo resuelve el juego). |
 
 Medidas en 844×390: cifra 23 px CSS (plano medio), 16 px (final); «+» 8.6 px en el final (por debajo de 12 px: defecto abierto menor).
+
+## E13b — alfabeto de un trazo (ciclo 13)
+Conteo de signos en los `Label` literales del juego (162 textos): faltaban 14 minúsculas (d r l i c b q z j f h w v g), tildes, puntuación (: . , ? ¿), operadores (× → ÷ ° > ↑ ↓ ← √ ≈ %) y algunas mayúsculas (C P B A E R M S U O G D N Q). Diseñadas ahora: las 27 minúsculas, á é í ó ú, . , : ? ¿ - × →. Hoja `c14/alphabet-a/final.png`: se leen a 80, 60, 48 y 40 px, también en frases reales del juego («la tabla de ayer», «¿están todos?», «entra: 2 → se traba»); a 28 px el trazo afina (peso mínimo 3 px). **Pendiente**: mayúsculas usadas, ÷ ° > ↑ ↓ ← √ ≈ % y revisión independiente de la hoja.
