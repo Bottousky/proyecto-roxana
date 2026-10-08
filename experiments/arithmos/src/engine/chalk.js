@@ -61,7 +61,8 @@ export function stroke(guide, {w = 3.4, ch = WHITE, seed = 1, p = 0.9, wobble = 
       br[i * BRISTLES + b] = clamp(0.62 + 0.42 * nb(s / 11) + 0.18 * nb2(s / 3.2));
     }
   }
-  return {pts: out, cum, len, w, ch, n, br};
+  // guide/seed/p: para rehacer el trazo como depósito con plan de mano (?anim=2, MIGRATION M2)
+  return {pts: out, cum, len, w, ch, n, br, guide, seed, p};
 }
 const BRISTLES = 3;
 

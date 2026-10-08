@@ -9,6 +9,7 @@ import {Sound} from './engine/audio.js';
 import {loadState, saveState, newState, loadSettings, saveSettings, clearState} from './engine/save.js';
 import {CHAPTERS} from './chapters.js';
 import {titleScene} from './title.js';
+import {anim as animLevel} from './engine/anim.js';
 
 class Game {
   constructor() {
@@ -18,9 +19,10 @@ class Game {
     this.overlay = document.getElementById('overlay');
     this.overlayCtx = this.overlay.getContext('2d');
     this.camera = new Camera();
-    // ?anim=2: animación del laboratorio (adaptadores, ARITHMOS_ANIMATION_MIGRATION.md). Hoy: cámara.
+    // ?anim=2: animación del laboratorio (adaptadores, ARITHMOS_ANIMATION_MIGRATION.md). Hoy: cámara y dibujos de tiza.
     this.anim = new URLSearchParams(location.search).get('anim') === '2' ? 2 : 1;
     this.camera.pathMode = this.anim === 2;
+    animLevel.level = this.anim;
     this.world = new World();
     this.audio = new Sound();
     this.ui = new UI(this);

@@ -118,6 +118,8 @@ export class Director {
   /** Dibuja un objeto (Drawing/Label/Link) con sonido de tiza. */
   async draw(obj, sec = 1, {sound = true, key = 'progress'} = {}) {
     obj[key] = this.skipping ? 1 : obj[key] ?? 0;
+    // ?anim=2: el dibujo dura lo que dura su plan de mano; `sec` es el tope (si el plan es más largo, se acelera)
+    if (this.game.anim === 2 && key === 'progress' && typeof obj.planDuration === 'function') sec = Math.min(sec, obj.planDuration());
     const voice = sound && !this.skipping ? this.audio.chalkStart?.(sec) : null;
     try {
       await this.tween(sec, k => { obj[key] = k; });

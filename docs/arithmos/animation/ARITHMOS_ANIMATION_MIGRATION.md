@@ -5,7 +5,7 @@ Estado: **en curso**. La condición de inicio se cumplió el 2026-10-08 (R16 apr
 | Paso | Estado | Evidencia |
 |---|---|---|
 | 1. Cámara (`Camera.go` → van Wijk–Nuij + mínimo jerk, `dur` como tope) | **hecho detrás de `?anim=2`** | `tests/camera.test.mjs` (5 pruebas), `c27/cam2-*.json` (A/B en c1.ronda, c1.vuelven, c1.marea), bot del capítulo 1 con y sin bandera (`c27/bot-c1-{A,B}.out`) |
-| 2. `Drawing` + `d.draw` → depósito con plan de mano | siguiente | — |
+| 2. `Drawing` + `d.draw` → depósito con plan de mano | **hecho detrás de `?anim=2`** (sonido: rasgueo de siempre con la duración del plan; envolvente por velocidad pendiente) | `c28/puerta-{A,B}` (hojas), `c28/puerta-door-AB2.png` (recorte dpr 2), bot del capítulo 1 sin errores (`c28/bot-c1-B.out`); corrida en tiempo real en curso |
 | 3. `Label` → glifos | — | — |
 | 4. Punto (`Dot`, `zip`/`hop`) | — | — |
 | 5. Figura → actor incremental | — | — |

@@ -2,6 +2,9 @@
 
 import {drawStrokes, strokesTip, stroke, circleGuide, dotStrokes, chalkText, lineGuide, WHITE, YELLOW, pressureStyle} from './chalk.js';
 import {mulberry32, seedOf, clamp, lerp} from './rng.js';
+import {anim} from './anim.js';
+import {depositStroke, drawDeposit, depositTip} from './deposit.js';
+import {liftTime} from './motion.js';
 
 export class World {
   constructor() {
@@ -71,6 +74,9 @@ export class World {
  * `progress` lo dibuja trazo a trazo; `fade` lo atenúa (borrado parcial).
  * Los dibujos terminados se guardan en un lienzo propio a la escala de la cámara.
  */
+// calibración del depósito frente al trazo del motor (ancho de estampa y presión): se ajusta con capturas A/B (M2)
+const DEP_W = 1.75, DEP_P = 1.12;
+
 export class Drawing {
   constructor(id, strokes, {z = 0, progress = 1, fade = 1, cache = true, dust = null} = {}) {
     this.id = id;
@@ -86,7 +92,44 @@ export class Drawing {
   }
 
   tip() {
+    if (anim.level === 2) return this.#depTip();
     return strokesTip(this.strokes, this.progress);
+  }
+
+  // ——— ?anim=2: cada trazo es un depósito de tiza con plan de mano; `progress` es la fracción del TIEMPO del plan
+  //     (trazos + levantadas entre trazos), no del largo (MIGRATION M2) ———
+  #dep() {
+    if (this.dep && this.dep.src === this.strokes && this.dep.n === this.strokes.length) return this.dep; // se rehace si cambian los trazos
+    const list = [];
+    let t = 0, prevEnd = null;
+    this.strokes.forEach((s, i) => {
+      const guide = s.guide ?? Array.from({length: s.n}, (_, k) => [s.pts[k * 3], s.pts[k * 3 + 1]]);
+      const st = depositStroke(guide, {w: s.w * DEP_W, p: Math.min(1, (s.p ?? 0.9) * DEP_P), ch: s.ch, seed: (s.seed ?? i + 1) * 7 + 3, tremor: 0.45});
+      const start = [st.path.x[0], st.path.y[0]];
+      if (prevEnd) t += liftTime(Math.hypot(start[0] - prevEnd[0], start[1] - prevEnd[1]));
+      list.push({st, t0: t});
+      t += st.T;
+      prevEnd = [st.path.x.at(-1), st.path.y.at(-1)];
+    });
+    this.dep = {list, T: t, src: this.strokes, n: this.strokes.length};
+    return this.dep;
+  }
+
+  /** Duración natural del dibujo con plan de mano (s). La usa `d.draw` con ?anim=2. */
+  planDuration() {
+    return this.#dep().T;
+  }
+
+  #depTip() {
+    const {list, T} = this.#dep(), t = clamp(this.progress) * T;
+    let cur = list[0];
+    for (const e of list) if (t >= e.t0) cur = e;
+    return depositTip(cur.st, clamp(t - cur.t0, 0, cur.st.T));
+  }
+
+  #drawDep(ctx, progress, fade) {
+    const {list, T} = this.#dep(), t = clamp(progress) * T;
+    for (const e of list) { if (t <= e.t0) break; drawDeposit(ctx, e.st, progress >= 1 ? Infinity : t - e.t0, fade); }
   }
 
   render(ctx, view, frame, world) {
@@ -101,7 +144,8 @@ export class Drawing {
         return;
       }
     }
-    drawStrokes(ctx, this.strokes, this.progress, this.fade);
+    if (anim.level === 2) this.#drawDep(ctx, this.progress, this.fade);
+    else drawStrokes(ctx, this.strokes, this.progress, this.fade);
   }
 
   #cached(scale) {
@@ -118,7 +162,8 @@ export class Drawing {
     cx.clearRect(0, 0, w, h);
     cx.globalCompositeOperation = 'lighten';
     cx.setTransform(want, 0, 0, want, -b.x * want, -b.y * want);
-    drawStrokes(cx, this.strokes, 1, this.fade);
+    if (anim.level === 2) this.#drawDep(cx, 1, this.fade); // el depósito suma dentro del lienzo; el lienzo se compone con 'lighten'
+    else drawStrokes(cx, this.strokes, 1, this.fade);
     this.cache = {canvas, scale: want, fade: this.fade};
     return this.cache;
   }
