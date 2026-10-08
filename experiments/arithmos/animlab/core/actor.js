@@ -252,3 +252,42 @@ function skeletonFrom({x, ground, k, f, lean, tilt, drop, armL, armR, legL, legR
   const aR = limb([...shoulder], armR[0], armR[1], BONES.upper, BONES.fore, 1);
   return {hip, neck, head, shoulder, lL, lR, aL, aR, f, tilt, k};
 }
+
+// ——— Dibujo de la figura con depósito (E15) ———
+// Mismo esqueleto y mismas guías que Figure.strokes del motor, pero cada trazo se deposita como la escritura
+// (en VS6 la figura con el trazo del motor se veía más manchada que lo escrito: dos texturas en una escena).
+import {depositStroke as _dep, drawDeposit as _draw} from './deposit.js';
+import {smoothGuide as _smooth, circleGuide as _circle} from '../../src/engine/chalk.js';
+import {mulberry32 as _rng} from '../../src/engine/rng.js';
+
+const figCache = new Map();
+/** Dibuja el esqueleto `sk` con trazos de depósito. `boil` (0..2) re-sortea el temblor como el motor (vida a 8 cuadros/s). */
+export function drawFigureDeposit(ctx, sk, {boil = 0, gaze = [0, 0], blink = 0, w = 5.6, ch = 0} = {}) {
+  const k = sk.k;
+  const rnd = _rng(1000 + boil * 977);
+  const W = w * k;
+  const guides = [
+    _circle(sk.head[0], sk.head[1], BONES.head * k, rnd, {overshoot: 0.28, start: -1.9 + rnd() * 0.3}),
+    _smooth([sk.neck, [(sk.neck[0] + sk.hip[0]) / 2 + 1.2 * sk.f, (sk.neck[1] + sk.hip[1]) / 2], sk.hip], 6),
+    _smooth(sk.aL, 6), _smooth(sk.aR, 6), _smooth(sk.lL, 6), _smooth(sk.lR, 6),
+    [[sk.head[0], sk.head[1] + BONES.head * k * 0.98], [sk.neck[0], sk.neck[1]]],
+  ];
+  guides.forEach((g, i) => {
+    // sin plan de velocidad (la figura no se está dibujando): estampas parejas, temblor según el hervor
+    const st = _dep(g, {w: W, p: 0.95, ch, seed: 2000 + boil * 31 + i, tremor: 0.5 * k, land: false, lift: false, motion: {speed: 4000, accel: 1e6}});
+    _draw(ctx, st);
+  });
+  // ojos
+  const f = sk.f, front = 1 - Math.abs(f);
+  const ex = sk.head[0] + f * 5 * k + gaze[0] * 3.2 * k, ey = sk.head[1] - 1.5 * k + gaze[1] * 3 * k + sk.tilt * 2 * k;
+  const sep = (2.6 + front * 3.4) * k;
+  for (const sx of [-1, 1]) {
+    const x = ex + sx * sep;
+    const g = blink > 0 ? [[x - 1.6 * k, ey], [x + 1.6 * k, ey]] : _circle(x, ey, 0.9 * k, rnd, {overshoot: 0.6});
+    _draw(ctx, _dep(g, {w: 2.4 * k, p: 1, ch, seed: 3000 + sx, tremor: 0, land: false, lift: false, motion: {speed: 4000, accel: 1e6}}));
+  }
+  // la tiza en la mano
+  const hand = sk.aR[2], elbow = sk.aR[1];
+  const dx = hand[0] - elbow[0], dy = hand[1] - elbow[1], l = Math.hypot(dx, dy) || 1;
+  _draw(ctx, _dep([[hand[0] + dx / l, hand[1] + dy / l], [hand[0] + dx / l * 7 * k, hand[1] + dy / l * 7 * k]], {w: 4.6 * k, p: 1, ch, seed: 3100, tremor: 0, land: false, lift: false, motion: {speed: 4000, accel: 1e6}}));
+}

@@ -350,3 +350,9 @@ R6: **No** (Timing N3, Actuación N3–N4 en el límite, Legibilidad N3 en orden
 (c) superposición → retraso de torso 0.08→0.11 s y brazo 0.10→0.14 s respecto de la cabeza (`eureka.png`: mano ~110 ms detrás);
 (d) conteo salteado → contorno orgánico por grupo (`blob.groupContour`: unión de discos + cápsulas del árbol mínimo, marching squares + Chaikin) en lugar de hilos de cuentas (`finals.png` abajo).
 La escena dura ahora 22 s.
+
+## E15 — la figura con depósito (ciclo 14)
+**Hallazgo** (recortes dpr 3 de VS6, `c16/textura.png`): la figura se dibujaba con el trazo del motor (segmentos, `lighten`) y lo escrito con depósito: dos texturas en la misma escena — la figura más manchada, con cuentas.
+**Técnica**: `actor.drawFigureDeposit` (mismas guías que `Figure.strokes`, depositadas sin plan de velocidad; temblor según el hervor de 8 cuadros/s; peso 5.6·k).
+**Resultado** (`c16/fig-cmp2.png`: arriba motor, abajo depósito): mismo peso visual, núcleo lleno y bordes ásperos, sin cuentas; coherente con la escritura. Costo: cuadro ~1.1 ms (p95 2.8–3.1) en los tres tamaños, sin cambio medible. `?figura=motor` conserva la versión anterior para comparar.
+**Conclusión**: la figura pasa a depósito. Para la migración: `Figure.render` también se adapta (no sólo `Drawing`).

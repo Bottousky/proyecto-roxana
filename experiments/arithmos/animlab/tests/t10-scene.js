@@ -9,7 +9,7 @@
 
 import {Figure} from '../../src/engine/figure.js';
 import {BLUE} from '../../src/engine/chalk.js';
-import {buildActor, ik} from '../core/actor.js';
+import {buildActor, ik, drawFigureDeposit} from '../core/actor.js';
 import {POSES2} from '../core/poses.js';
 import {depositStroke, drawDeposit, drawDepositCached, depositTip, depositSpeed} from '../core/deposit.js';
 import {glyphGuides, GLYPHS} from '../core/glyphs.js';
@@ -335,7 +335,7 @@ function beadString(pts) {
 /** Arriba de la cabeza del alumno, donde Punto se posa (en el hombro quedaba tapado por la cabeza: t10r). */
 function perchAt(t) {
   const sk = S.actor.at(t);
-  return [sk.head[0] - 4 * Math.sign(sk.f || 1), sk.head[1] - 15.5 * K - 17];
+  return [sk.head[0] - 4 * Math.sign(sk.f || 1), sk.head[1] - 15.5 * K - 24]; // separado del contorno de la cabeza
 }
 
 /** Planos: medio fijo; al aparecer Punto se acerca (la causa es Punto) y llega antes de contar; se abre al alejarse el alumno. */
@@ -424,7 +424,9 @@ export default {
     fig.facing = sk.f;
     fig.time = t;
     fig.blink = (t % 3.3) < 0.11 ? 0.1 : 0;
-    fig.render(ctx, null, frame);
+    // ?figura=motor dibuja con el trazo del motor (comparación A/B); por defecto, con depósito (misma textura que lo escrito)
+    if (lab.params.get('figura') === 'motor') fig.render(ctx, null, frame);
+    else drawFigureDeposit(ctx, sk, {boil: frame % 3, gaze: fig.gaze, blink: fig.blink});
     // Punto
     const p = puntoAt(t);
     if (p) {
