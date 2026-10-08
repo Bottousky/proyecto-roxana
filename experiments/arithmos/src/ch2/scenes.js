@@ -190,6 +190,8 @@ export const manana = {
     await d.wait(0.5);
     g.setCinematic(false);
     await d.think('Desde anoche marca todo. Hasta a mí.');
+    s.look(-1, 0);
+    await d.think('La puerta por la que entré quedó allá atrás, borrada. No hay vuelta, por ahora. Y Punto ya me cuenta entre los suyos.');
     s.setPose('idle', 0.5);
     s.look(0.5, 0);
     // vuelve al 14 y rodea el 1

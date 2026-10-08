@@ -1,0 +1,27 @@
+[0.0s] escena → c12.anticipar
+[1.1s] lee: La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera nueva de Balcón tiene 30, y está a medio dibujar. ¿Llegamos a terminarla?
+[2.0s] lee: Esperá, Punto. Las noches 2 y 3 fueron 4 y 8.
+[2.1s] lee: Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato.
+[2.2s] lee: Con dos noches, 1 y 2, pasaban las dos: la recta que suma uno y la que duplica, como la de Punto en la carrera. Él eligió una antes de tiempo; las noches 2 y 3 la desmintieron.
+[2.7s] elige «Suma lo mismo: una recta» (¿Qué familia sigue la Marea?)
+[2.9s] lee: Una recta no pasa por los cuatro: de 1 a 2 sube 1, de 4 a 8 sube 4. No suma lo mismo.
+[3.5s] elige «Va y vuelve: una ola» (¿Qué familia sigue la Marea?)
+[3.7s] lee: Hasta ahora sólo sube, y cada vez más: no parece una ola.
+[4.2s] elige «Duplica: la familia que despega» (¿Qué familia sigue la Marea?)
+[4.4s] lee: Si sigue duplicando, ¿hasta qué noche tenemos? Marcá en la raya del 30 la primera noche en que la Marea la pasa.
+[5.4s] lee: —Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Lo anotamos como suposición y miramos cada noche si se cumple.
+[5.5s] lee: Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.
+[5.6s] lee: Noche 4.
+[5.7s] lee: Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más.
+[6.5s] lee: Hasta la noche 6, entonces. Esta noche repasamos la mitad.
+[9.0s] lee: La noche 5 llegó a 32: ya pasaba los 30. Marqué la 6 y llegamos tarde con la mitad. Lo repasado resistió; lo otro se lo llevó.
+[9.0s] lee: Lo que repasamos aguantó. Rehagamos lo que se llevó antes de la noche 6: si duplica, llega a 64.
+[10.8s] lee: Llegamos. La escalera sigue ahí, y lo que entendimos también.
+[14.4s] lee: —Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?
+[14.5s] lee: —Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto.
+[18.3s] lee: La Ronda baila otra vez, como el primer día. Punto se suma a la vuelta, un paso adelante.
+[18.4s] lee: La puerta del primer día. Se fue dibujando de a poco, cada vez que algo se entendía. Aquel día no había vuelta; ahora sí. Del otro lado está todo lo de antes.
+[19.0s] elige «Quedarte un rato más: todavía hay cosas que no entendés.» (¿Volvés o te quedás?)
+[19.2s] lee: —Me quedo un rato más. La puerta no se va.
+[19.7s] lee: Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje.
+[19.8s] {"ended":true,"final":{"mode":"title","seg":"c12.anticipar"},"journal":["Anticipar"],"evidenceKinds":["punto-guess","punto-erase","final-family","final-predict","final-check","final-late","punto-name","final-door"],"fps":{"min":"20.0","median":"60.0"},"errors":[],"seconds":19.831,"size":"844x390","touch":true,"route":"errores","watch":false}

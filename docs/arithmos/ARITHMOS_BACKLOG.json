@@ -457,8 +457,10 @@
         "C9"
       ],
       "acceptance": "Revisión sin hallazgos altos",
-      "status": "pendiente",
-      "evidence": []
+      "status": "cerrado",
+      "evidence": [
+        "artifacts/arithmos/it12/review-narr-arco/informe.md (sin hallazgos altos en el cap. 9)"
+      ]
     },
     {
       "id": "C10",
@@ -607,6 +609,18 @@
         "artifacts/arithmos/it05/review-mat/informe.md",
         "artifacts/arithmos/it05/review-narr/informe.md",
         "docs/arithmos/ARITHMOS_REVIEW.md#revisiones-independientes-del-cap-5"
+      ]
+    },
+    {
+      "id": "N-ARC",
+      "title": "Hilos del Arco I que cruzan capítulos (review-narr-arco): la puerta del primer día y el deseo del estudiante (ARC-A1); la Marea como amenaza que crece hasta 12.8 (ARC-A2); Punto que actúa en el medio (ARC-M1); el estudiante lacónico (ARC-M2); opciones que se delatan (ARC-M3); Mara que anuncia el capítulo siguiente (ARC-M4)",
+      "deps": [
+        "C12-R"
+      ],
+      "acceptance": "Revisión narrativa del arco sin hallazgos altos",
+      "status": "en-curso",
+      "evidence": [
+        "artifacts/arithmos/it12/review-narr-arco/informe.md"
       ]
     }
   ]

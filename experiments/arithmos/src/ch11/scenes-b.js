@@ -1,10 +1,13 @@
 // Capítulo 11 — Lo que pasa a veces (11.5 a 11.8): contar sin contar, dos dados, juntas no es causa, anticipar.
 
 import {Drawing, Label, Shape} from '../engine/world.js';
-import {pulse, rectSpot, wordSpot} from '../acting.js';
+import {pulse, zip, follow, rectSpot, wordSpot} from '../acting.js';
+import {RONDA_IDS, rondaDot, rondaDance} from '../ch1/common.js';
 import {outfits, diceSums, rollTwo} from '../logic/chance.js';
 import {SHOTS, area, boardCast, clean, poly, dot, S, seedOf, WHITE, YELLOW, BLUE, BOARD, GROUND} from '../ch9/common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
+import * as art from '../art.js';
+import {mareaNight} from '../stair.js';
 
 // ——————————————————————————————————————————————
 // 11.5 Contar sin contar
@@ -101,6 +104,20 @@ export const dados = {
     die('c11-die1', 6, rx - 26, GROUND - 21);
     die('c11-die2', 6, rx + 26, GROUND - 21);
     d.describe('Debajo de la pizarra, en el piso, dos dados: los dos muestran seis.');
+    // la Ronda vino a la fiesta: baila al pie de las Terrazas, y Punto se queda mirándola
+    const ronda = {cx: 14960, cy: GROUND - 30, r: 52};
+    RONDA_IDS.forEach((id, i) => { const r = rondaDot(w, i); r.x = ronda.cx + Math.cos(i / 12 * Math.PI * 2) * ronda.r; r.y = ronda.cy; });
+    rondaDance(w, {speed: 0.5, ...ronda});
+    const pp = w.get('punto'), st = w.get('student');
+    if (pp) {
+      g.setCinematic(true);
+      await zip(d, pp, ronda.cx - ronda.r - 24, ronda.cy - 30, 0.6).catch(() => {});
+      await d.wait(0.9).catch(() => {});
+      d.describe('Al pie de las Terrazas baila la Ronda, la familia de Punto. Punto se queda mirándola un rato y vuelve.');
+      follow(pp, st);
+      g.setCinematic(false);
+      await d.think('La Ronda vino a la fiesta. Punto la mira un rato largo, y después vuelve conmigo.');
+    }
     await d.say('Rampa', '¡Doce! ¿Vieron? En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande.');
     const pre = await d.choose([
       {id: '7', text: 'El 7 sale más seguido.'},
@@ -218,6 +235,8 @@ export const causa = {
   title: 'Juntas no es causa',
   setup(g) {
     clean(g, /^c11-/);
+    // la Ronda de la fiesta ya se fue
+    g.world.removeWhere(o => RONDA_IDS.includes(o.id) || o.id === 'ronda-ctl');
     boardCast(g, 0);
     g.camera.go(SHOTS.board);
   },
@@ -247,8 +266,38 @@ export const causa = {
       w.add(new Label(`c11-wl${i}`, r.wind, gx + r.dust * U + 10, gy - r.erase * U - 8, {size: 14, z: 14, ch}));
     });
     d.describe('Al lado de cada punto, el viento de ese día: los días de mucho viento son los de más polvo y más borrones.');
-    await d.think('Mirando de a pares con el mismo viento: con poco viento, el día de más polvo borró menos; con bastante, también; con mucho, también. Dentro del mismo viento, más polvo no trajo más borrones.');
-    await d.say('student', 'Mara, que dos cosas suban juntas no dice que una cause la otra. Con estos seis días, el que acompaña a los borrones parece el viento, no el polvo. Pero son pocos días: para estar más seguros, habría que anotar muchos más.');
+    // el jugador compara de a pares con el mismo viento: una flecha del día de menos polvo al de más
+    await d.say('Mara', 'Para ver qué hace el polvo solo, compará días con el mismo viento.');
+    const pairs = new Set();
+    await d.interact(ctl => new Promise(resolve => {
+      let sel = null;
+      g.setHint(() => ['Tocá los dos días que tienen el mismo viento: se unen con una flecha del de menos polvo al de más. Hacelo con los tres vientos.', 'Fijate si la flecha sube o baja: ¿con más polvo, más borrones?']);
+      const refresh = () => g.ui.setSpots(DAYS.map((r, i) => ({r, i})).filter(({r}) => !pairs.has(r.wind)).map(({r, i}) => rectSpot(`c11-day${i}`, `El día de polvo ${r.dust}, ${r.erase} borrones, viento ${r.wind}`, {x: gx + r.dust * U - 14, y: gy - r.erase * U - 14, w: 28, h: 28}, async () => {
+        if (!ctl.alive()) return;
+        if (sel === null) { sel = i; refresh(); return; }
+        if (sel === i) { sel = null; refresh(); return; }
+        const a = DAYS[sel], b = r;
+        if (a.wind !== b.wind) { g.note('Esos dos tienen distinto viento: así no se ve qué hace el polvo solo. Compará los que tienen el mismo.'); d.evidence('cause-pair-wrong', {}); sel = null; refresh(); return; }
+        const [lo, hi] = a.dust < b.dust ? [a, b] : [b, a];
+        sel = null;
+        pairs.add(a.wind);
+        g.ui.setSpots([]);
+        const x0 = gx + lo.dust * U, y0 = gy - lo.erase * U, x1 = gx + hi.dust * U, y1 = gy - hi.erase * U;
+        const ang = Math.atan2(y1 - y0, x1 - x0), tip = [x1 - Math.cos(ang) * 8, y1 - Math.sin(ang) * 8];
+        const arrow = w.add(new Drawing(`c11-arr${a.wind}`, [
+          S([[x0 + Math.cos(ang) * 8, y0 + Math.sin(ang) * 8], tip], seedOf(`c11-arr${a.wind}`), {w: 2.4, p: 0.95, ch: YELLOW}),
+          S([[tip[0] - Math.cos(ang - 0.5) * 10, tip[1] - Math.sin(ang - 0.5) * 10], tip, [tip[0] - Math.cos(ang + 0.5) * 10, tip[1] - Math.sin(ang + 0.5) * 10]], seedOf(`c11-arr${a.wind}`) + 1, {w: 2.4, p: 0.95, ch: YELLOW, lift: false}),
+        ], {z: 15, progress: 0}));
+        try { await d.draw(arrow, 0.5, {sound: false}); } catch { return; }
+        g.audio.tap(0.15, 1.2);
+        d.evidence('cause-pair', {wind: a.wind, down: hi.erase < lo.erase});
+        d.describe(`Viento ${a.wind}: del día de polvo ${lo.dust} al de polvo ${hi.dust}, los borrones van de ${lo.erase} a ${hi.erase}: la flecha baja.`);
+        if (pairs.size === 3) { g.setHint(null); resolve(); } else refresh();
+      }, {selected: sel === i})));
+      refresh();
+    }));
+    await d.think('Las tres flechas bajan: con el mismo viento, más polvo no trajo más borrones.');
+    await d.say('student', 'Mara, que dos cosas suban juntas no dice que una cause la otra. Acá el que acompaña a los borrones parece el viento. Pero son seis días: habría que anotar muchos más.');
     await studentWrites(d, g, 'c11-cz', 'juntas ≠ una causa la otra', A.x0 + 250, A.y0 + 40, {size: 22});
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3).catch(() => {});
@@ -265,6 +314,8 @@ export const anticipar = {
   title: 'Anticipar',
   setup(g) {
     clean(g, /^c11-/);
+    // la Ronda de la fiesta ya se fue
+    g.world.removeWhere(o => RONDA_IDS.includes(o.id) || o.id === 'ronda-ctl');
     boardCast(g, 3);
     g.camera.go(SHOTS.board);
   },
@@ -308,9 +359,21 @@ export const anticipar = {
     }));
     await d.say('student', 'Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar.');
     if (!replay) writeJournal11(g);
+    // la puerta del primer día se ve más que en el cap. 8
+    const door1 = w.add(new Drawing('c11-door1', art.doorFrame('c11-door1', 15890, GROUND, 150, 270), {z: 2, fade: 0.2}));
+    await d.shot({x: 14820, y: GROUND - 440, w: 1200, h: 500}, 1.2);
+    await d.fadeTo(door1, 0.45, 1.2);
+    d.describe('Más allá de las Terrazas, la puerta del primer día se ve más que antes.');
+    await d.think('¿Y la vuelta, se anticipa? La puerta del primer día se ve más que la otra vez. Cada cosa que entendemos la marca un poco más.');
+    await d.shot(SHOTS.board, 1);
     await d.say('Mara', 'Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?');
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3).catch(() => {});
+    // la noche 1: la Marea llega más alto que la anterior
+    g.flags.balconStair = true;
+    await mareaNight(d, g, {reach: 2, describe: 'Otra noche, otra pasada de la Marea, más alta que la anterior.'});
+    d.describe('A la mañana, a la escalera de Balcón le faltan los dos primeros escalones.');
+    await d.say('Mara', 'Anoche, dos escalones. La anterior, uno. Cada noche llega más alto, y la escalera de Balcón sigue sin repasar.');
     g.flags.c11anticipate = true;
   },
 };

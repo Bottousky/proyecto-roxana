@@ -149,25 +149,45 @@ export const factores = {
 // ——————————————————————————————————————————————
 
 /** Escribe los factores uno por uno, en grupos entre paréntesis, con su número de orden debajo. Devuelve dónde terminó. */
-async function unfold(d, g, id, groups, x, y) {
+async function unfold(d, g, id, groups, x, y, {numbers = true, sep = '·'} = {}) {
   const w = g.world;
   const L = (k, t, lx, opts = {}) => w.add(new Label(`${id}-${k}`, t, lx, y, {size: 24, align: 'center', z: 12, ...opts}));
   let cx = x, k = 0;
   for (let gi = 0; gi < groups.length; gi++) {
-    if (gi > 0) { L(`m${gi}`, '·', cx + 9); cx += 20; }
+    if (gi > 0) { L(`m${gi}`, sep, cx + 9); cx += 20; }
     L(`o${gi}`, '(', cx + 5); cx += 12;
     for (let j = 0; j < groups[gi].length; j++) {
       k++;
       const f = L(`f${k}`, String(groups[gi][j]), cx + 7, {reveal: 0});
       await d.draw(f, 0.18, {key: 'reveal', sound: false});
-      w.add(new Label(`${id}-n${k}`, String(k), cx + 7, y + 22, {size: 14, align: 'center', z: 12, ch: YELLOW}));
+      if (numbers) w.add(new Label(`${id}-n${k}`, String(k), cx + 7, y + 22, {size: 14, align: 'center', z: 12, ch: YELLOW}));
       g.audio.tap(0.12, 1 + k * 0.07);
       if (j < groups[gi].length - 1) { L(`d${k}`, '·', cx + 21); cx += 28; } else cx += 16;
     }
     L(`c${gi}`, ')', cx + 4); cx += 12;
   }
-  d.describe(`En la pizarra: ${groups.map(gr => `(${gr.join(' · ')})`).join(' · ')}. ${k} factores contados.`);
+  d.describe(`En la pizarra: ${groups.map(gr => `(${gr.join(' · ')})`).join(` ${sep} `)}.${numbers ? ` ${k} factores contados.` : ''}`);
   return cx;
+}
+
+/** El jugador cuenta los factores desplegados tocándolos uno por uno: debajo de cada uno queda su número. */
+function countFactors(d, g, id, n) {
+  const w = g.world;
+  const counted = new Set();
+  return d.interact(ctl => new Promise(resolve => {
+    g.setHint(() => ['Tocá cada 2 de la cuenta desplegada para contarlo.']);
+    const refresh = () => g.ui.setSpots(Array.from({length: n}, (_, i) => i + 1).filter(k => !counted.has(k)).map(k => {
+      const f = w.get(`${id}-f${k}`);
+      return rectSpot(`${id}-cnt${k}`, `Contar el factor ${k}`, {x: f.x - 13, y: f.y - 24, w: 26, h: 32}, () => {
+        if (!ctl.alive()) return;
+        counted.add(k);
+        w.add(new Label(`${id}-n${k}`, String(counted.size), f.x, f.y + 22, {size: 14, align: 'center', z: 12, ch: YELLOW}));
+        g.audio.tap(0.12, 1 + counted.size * 0.07);
+        if (counted.size === n) { g.ui.setSpots([]); g.setHint(null); d.describe(`${n} factores contados.`); resolve(n); } else refresh();
+      }, {tile: true});
+    }));
+    refresh();
+  }));
 }
 
 /** Una capa de un cubo de n por n bloques (perspectiva caballera): frente y costado; la tapa va aparte. */
@@ -226,13 +246,14 @@ export const juntar = {
     await d.say('student', `Con otro número abajo se escribe igual: ${pw(4, 3)} es empezar en 1 y multiplicar por 4 tres veces, 1 · 4 · 4 · 4.`);
     await d.shot(SHOTS.tiles, 0.8);
     const c1 = await d.choose([
-      {id: '5', text: `${pw(2, 5)}: tres dos y dos dos más.`},
-      {id: '6', text: `${pw(2, 6)}: tres por dos.`},
-      {id: '4', text: `${pw(4, 5)}: dos por dos abajo, y 3 + 2 arriba.`},
-    ], {prompt: `¿Cuánto es ${pw(2, 3)} · ${pw(2, 2)}, como una sola potencia de 2?`, evaluate: true});
+      {id: '5', text: `${pw(2, 5)}`},
+      {id: '6', text: `${pw(2, 6)}`},
+      {id: '4', text: `${pw(4, 5)}`},
+    ], {prompt: `¿Cuánto es ${pw(2, 3)} · ${pw(2, 2)}, como una sola potencia?`, evaluate: true});
     d.evidence('pow-product', {answer: c1});
     await tapToUnfold(`Desplegar ${pw(2, 3)} · ${pw(2, 2)}`);
-    const e1 = await unfold(d, g, 'jf-u1', [factorsOfProduct(2, 3, 2).slice(0, 3), factorsOfProduct(2, 3, 2).slice(3)], A.x0 + 120, rowY[0]);
+    const e1 = await unfold(d, g, 'jf-u1', [factorsOfProduct(2, 3, 2).slice(0, 3), factorsOfProduct(2, 3, 2).slice(3)], A.x0 + 120, rowY[0], {numbers: false});
+    await countFactors(d, g, 'jf-u1', 5);
     await write('jf-a2', `= ${pw(2, 5)} = ${power(2, 5)}`, e1 + 8, rowY[0], {ch: YELLOW});
     await d.think(c1 === '5' ? 'Cinco dos: 2⁵.' : c1 === '6' ? 'Son cinco dos, no seis: los tres del lunes y los dos del martes se juntan. Tres y dos se suman.' : 'El 2 de abajo no cambia: cada vez se multiplica por 2. Son cinco dos: 2⁵ = 32. 4⁵ sería 1024.');
     await d.say('student', 'Mara, multiplicar potencias del mismo número es juntar sus factores. Los exponentes se suman: 3 + 2 = 5. Con cualquier número abajo pasa lo mismo: se cuentan factores iguales.');
@@ -241,14 +262,15 @@ export const juntar = {
     await d.say('Mara', 'Y si un día se duplica tres veces, y eso pasa dos días seguidos, lo anoto así.');
     await write('jf-b', `(${pw(2, 3)})${pw('', 2)} =`, A.x0 + 20, rowY[1]);
     const c2 = await d.choose([
-      {id: '6', text: `${pw(2, 6)}: dos veces tres dos.`},
-      {id: '5', text: `${pw(2, 5)}: 3 + 2.`},
-      {id: '9', text: `${pw(2, 9)}: tres al cuadrado.`},
-    ], {prompt: `¿Cuánto es (${pw(2, 3)})${pw('', 2)}, como una sola potencia de 2?`, evaluate: true});
+      {id: '6', text: `${pw(2, 6)}`},
+      {id: '5', text: `${pw(2, 5)}`},
+      {id: '9', text: `${pw(2, 9)}`},
+    ], {prompt: `¿Cuánto es (${pw(2, 3)})${pw('', 2)}, como una sola potencia?`, evaluate: true});
     d.evidence('pow-power', {answer: c2});
     await tapToUnfold(`Desplegar (${pw(2, 3)})${pw('', 2)}`);
     const rep = factorsOfPower(2, 3, 2);
-    const e2 = await unfold(d, g, 'jf-u2', [rep.slice(0, 3), rep.slice(3)], A.x0 + 108, rowY[1]);
+    const e2 = await unfold(d, g, 'jf-u2', [rep.slice(0, 3), rep.slice(3)], A.x0 + 108, rowY[1], {numbers: false});
+    await countFactors(d, g, 'jf-u2', 6);
     await write('jf-b2', `= ${pw(2, 6)} = ${power(2, 6)}`, e2 + 8, rowY[1], {ch: YELLOW});
     await d.think(c2 === '6' ? 'Seis dos: 2⁶.' : c2 === '5' ? 'Acá no se juntan dos potencias distintas: se repite la misma, 2³, dos veces. Tres dos, dos veces: seis.' : 'El cuadrado es de todo el 2³, no del 3 solo: 2³ · 2³. Seis dos, no nueve.');
     await d.say('student', 'Elevar una potencia es repetirla: tres dos, dos veces. Los exponentes se multiplican: 3 · 2 = 6.');
@@ -256,8 +278,8 @@ export const juntar = {
     // 3. sumando no se juntan
     await d.say('Mara', '¿Y si en vez de multiplicar sumo? ¿Se juntan igual?');
     const c3 = await d.choose([
-      {id: 'no', text: `No: 8 + 4 = 12, y ${pw(2, 5)} es 32.`},
-      {id: 'yes', text: 'Sí: los exponentes se suman.'},
+      {id: 'no', text: 'No.'},
+      {id: 'yes', text: 'Sí.'},
     ], {prompt: `¿${pw(2, 3)} + ${pw(2, 2)} es ${pw(2, 5)}?`, evaluate: true});
     d.evidence('pow-sum', {answer: c3});
     await studentWrites(d, g, 'jf-c', `${pw(2, 3)} + ${pw(2, 2)} = 8 + 4 = 12, y ${pw(2, 5)} = 32`, A.x0 + 20, rowY[2], {size: 24});
@@ -267,12 +289,33 @@ export const juntar = {
     // 3b. dividir saca factores: los exponentes se restan
     await d.say('Mara', '¿Y si divido? Cinco dos, divididos por dos dos.');
     const cq = await d.choose([
-      {id: '3', text: `${pw(2, 3)}: cada 2 de ${pw(2, 2)} se va con un 2 de ${pw(2, 5)}.`},
-      {id: '7', text: `${pw(2, 7)}: los exponentes se suman.`},
-      {id: '1', text: `${pw(1, 3)}: se dividen las bases, 2 ÷ 2 = 1.`},
+      {id: '3', text: `${pw(2, 3)}`},
+      {id: '7', text: `${pw(2, 7)}`},
+      {id: '1', text: `${pw(1, 3)}`},
     ], {prompt: `¿Cuánto es ${pw(2, 5)} ÷ ${pw(2, 2)}, como una sola potencia?`, evaluate: true});
     d.evidence('pow-quotient', {answer: cq});
-    await studentWrites(d, g, 'jf-d', `${pw(2, 5)} ÷ ${pw(2, 2)} = (2·2·2·2·2) ÷ (2·2) = 2·2·2 = ${pw(2, 3)}`, A.x0 + 20, rowY[2] + 58, {size: 21});
+    const qy = rowY[2] + 58;
+    w.add(new Label('jf-dq', `${pw(2, 5)} ÷ ${pw(2, 2)} =`, A.x0 + 20, qy, {size: 22, z: 12}));
+    const eq = await unfold(d, g, 'jf-uq', [[2, 2, 2, 2, 2], [2, 2]], A.x0 + 150, qy, {numbers: false, sep: '÷'});
+    // el jugador saca él mismo cada 2 de abajo con uno de arriba
+    const crossed = [];
+    await d.interact(ctl => new Promise(resolve => {
+      g.setHint(() => ['Tocá un 2 de los que dividen: se va con un 2 de los de arriba.']);
+      const refresh = () => g.ui.setSpots([6, 7].filter(k => !crossed.includes(k)).map(k => {
+        const f = w.get(`jf-uq-f${k}`);
+        return rectSpot(`jf-x${k}`, 'Sacar este 2 con uno de arriba', {x: f.x - 13, y: f.y - 24, w: 26, h: 32}, () => {
+          if (!ctl.alive()) return;
+          crossed.push(k);
+          const top = w.get(`jf-uq-f${6 - crossed.length}`);
+          for (const t of [f, top]) w.add(new Drawing(`jf-xs${t.id}`, [S([[t.x - 9, t.y + 2], [t.x + 9, t.y - 20]], seedOf(`jf-xs${t.id}`), {w: 2.4, p: 0.95, ch: YELLOW})], {z: 13}));
+          g.audio.erase(0.25, 0.3);
+          d.describe(`Se tachan un 2 de los que dividen y un 2 de arriba. Quedan ${5 - crossed.length} de arriba.`);
+          if (crossed.length === 2) { g.ui.setSpots([]); g.setHint(null); resolve(); } else refresh();
+        }, {tile: true});
+      }));
+      refresh();
+    }));
+    await studentWrites(d, g, 'jf-d', `= 2·2·2 = ${pw(2, 3)}`, eq + 8, qy, {size: 21});
     await d.think(cq === '3' ? 'Tres dos: 8.' : cq === '7' ? 'Sumar los exponentes es para multiplicar. Dividiendo, cada 2 de 2² se va con un 2 de 2⁵: quedan tres, 8. 2⁷ sería 128.' : 'La base no se divide: se divide la cuenta entera. 32 ÷ 4 = 8, que es 2³; 1³ es 1.');
     await d.say('student', 'Dividir saca factores: si el que se divide tiene más factores, los exponentes se restan, 5 − 2 = 3. Como en la tabla de antes, cada renglón hacia abajo sacaba un dos.');
 
@@ -284,9 +327,9 @@ export const juntar = {
     g.setCinematic(false);
     await d.say('Cornisa', 'Tengo 64 bloques de tiza y quiero apilarlos en un cubo: igual de largo, de ancho y de alto.');
     const c4 = await d.choose([
-      {id: '4', text: '4: 4 · 4 · 4 = 64.'},
-      {id: '8', text: '8: 8 · 8 = 64.'},
-      {id: '21', text: '21 y pico: 64 ÷ 3.'},
+      {id: '4', text: '4'},
+      {id: '8', text: '8'},
+      {id: '21', text: '21 y pico'},
     ], {prompt: '¿De cuántos bloques de lado es un cubo de 64 bloques?', evaluate: true});
     d.evidence('cube-predict', {answer: c4});
     const bx = A.x0 + 320, by = A.y1 - 14;
@@ -310,8 +353,18 @@ export const juntar = {
     const cnt = w.add(new Label('jf-cnt', '', bx + 68, by - 150, {size: 18, align: 'center', z: 14, ch: YELLOW}));
     await d.interact(ctl => new Promise(resolve => {
       let busy = false;
-      g.setHint(() => ['Tocá «otra capa»: cada capa tiene 4 por 4 bloques. Mirá cuántos van.']);
-      const refresh = () => g.ui.setSpots([wordSpot('jf-layer', 'otra capa', A.x0 + 120, A.y0 + 200, async () => {
+      g.setHint(() => ['Tocá «otra capa» para apilar 4 por 4 bloques más. Cuando sea un cubo, tocá «ya es un cubo».']);
+      const cube = wordSpot('jf-cube', 'ya es un cubo', A.x0 + 120, A.y0 + 250, async () => {
+        if (busy || !ctl.alive()) return;
+        d.evidence('cube-call', {layers});
+        if (layers === 4) { g.ui.setSpots([]); g.setHint(null); resolve(); return; }
+        busy = true;
+        g.ui.setSpots([]);
+        try { await d.say('Cornisa', layers === 0 ? 'Todavía no hay nada apilado.' : `Con ${['', 'una capa', 'dos capas', 'tres capas'][layers]} es una caja de 4 por 4 por ${layers}: ${16 * layers} bloques. Un cubo tiene el alto igual al largo.`); } catch { return; }
+        busy = false;
+        refresh();
+      }, {label: 'Ya es un cubo'});
+      const refresh = () => g.ui.setSpots([...(16 * layers < 64 ? [wordSpot('jf-layer', 'otra capa', A.x0 + 120, A.y0 + 200, async () => {
         if (busy || !ctl.alive()) return;
         busy = true;
         g.ui.setSpots([]);
@@ -327,8 +380,8 @@ export const juntar = {
         d.describe(`${layers} ${layers === 1 ? 'capa' : 'capas'} de 4 por 4: ${16 * layers} bloques.`);
         d.evidence('cube-layer', {layers, blocks: 16 * layers});
         busy = false;
-        if (16 * layers >= 64) { g.setHint(null); resolve(); } else refresh();
-      }, {label: 'Apilar otra capa de 4 por 4 bloques'})]);
+        refresh();
+      }, {label: 'Apilar otra capa de 4 por 4 bloques'})] : []), cube]);
       refresh();
     }));
     d.describe('Cuatro capas de 4 por 4: un cubo de 4 de largo, 4 de ancho y 4 de alto, con los 64 bloques.');

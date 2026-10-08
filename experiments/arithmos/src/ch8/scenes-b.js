@@ -6,6 +6,7 @@ import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {rectsWithPerimeter, pythag, rearrange, distance} from '../logic/geometry.js';
 import {GROUND, BOARD, SHOTS, area, boardCast, clean, poly, gridSquare, rightTri, family, S, seedOf, WHITE, YELLOW, BLUE} from './common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
+import {stair} from '../stair.js';
 
 const sq = (id, s, opts) => poly(id, [[0, 0], [s, 0], [s, s], [0, s]], opts);
 
@@ -256,6 +257,16 @@ export const pitagoras = {
     await d.say('student', 'El lado de enfrente del ángulo recto se llama hipotenusa; los otros dos, catetos.');
     await studentWrites(d, g, 'c8-pyg', 'cateto² + cateto² = hipotenusa²', A.x0 + 24, A.y1 - 14, {size: 22});
     await d.say('Balcón', 'Cinco cuadros de tirante. Y sin medir.');
+    // la escalera nueva de Balcón se empieza: queda al costado de la pizarra, todavía borroneada
+    g.flags.balconStair = true;
+    await d.shot(SHOTS.board, 0.8);
+    const groups = stair(g);
+    groups.forEach(st => { st.progress = 0; });
+    g.setCinematic(true);
+    for (const st of groups) await d.draw(st, 0.25, {sound: false}).catch(() => {});
+    g.setCinematic(false);
+    d.describe('Al costado de la pizarra, Balcón empieza su escalera nueva: treinta escalones, apenas marcados.');
+    await d.say('Balcón', 'La empiezo hoy, al costado de la pizarra. Treinta escalones: la voy a ir repasando de a poco.');
     d.evidence('pythag', {r, holds: pz.holds});
     g.flags.c8pythag = true;
   },

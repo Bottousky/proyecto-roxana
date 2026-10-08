@@ -430,7 +430,7 @@ export const ronda = {
   },
 };
 
-function mareaBand(w, x) {
+export function mareaBand(w, x) {
   const band = w.ensure('marea-band', () => new Custom('marea-band', {z: 25}));
   band.x = x;
   band.width ??= 360;

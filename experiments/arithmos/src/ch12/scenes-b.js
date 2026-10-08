@@ -6,6 +6,8 @@ import {jump, avgRate, riemann, tariff} from '../logic/anticipate.js';
 import {Drawing, Label, Shape, SHOTS, area, boardCast, clean, poly, dot, S, seedOf, WHITE, YELLOW, BLUE, dec, axes, curve} from './common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
 import {RONDA_IDS, rondaDot, rondaDance} from '../ch1/common.js';
+import {mareaBand} from '../ch1/scenes.js';
+import {LAD, stair, restoreStair} from '../stair.js';
 import * as art from '../art.js';
 import {GROUND} from '../ch9/common.js';
 
@@ -233,7 +235,17 @@ export const final = {
     const s = w.get('student');
     const A = area();
     await d.shot(SHOTS.board, 1);
-    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera de las Terrazas tiene 30. ¿Llegamos a terminar de redibujar?');
+    // lo que está en juego: la escalera nueva de Balcón (la del tirante, 8.6), treinta escalones, todavía borroneada;
+    // las noches 0 y 1 la Marea ya se llevó los escalones de abajo (fin de los caps. 10 y 11)
+    g.flags.balconStair = true;
+    g.flags.stairLost ??= 2;
+    stair(g);
+    // los tramos se buscan siempre por su id: al reponer escalones, el de abajo se rehace
+    const grp = k => w.get(`stair-g${k}`);
+    const groups = () => Array.from({length: 6}, (_, k) => grp(k));
+    w.add(new Label('c12-stl', 'escalera de Balcón: 30', LAD.x + LAD.w / 2, GROUND + 26, {size: 16, align: 'center', z: 3, ch: YELLOW}));
+    d.describe(`Al costado de la pizarra, la escalera nueva de Balcón, la del tirante: treinta escalones, todavía borroneados${g.flags.stairLost === 1 ? '; le falta el primer escalón' : g.flags.stairLost ? `; le faltan los ${g.flags.stairLost} de abajo` : ''}.`);
+    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera nueva de Balcón tiene 30, y está a medio dibujar. ¿Llegamos a terminarla?');
     const box = {x: A.x0 + 40, y: A.y0 + 20, w: 300, h: 210};
     const {px, py} = axes(w, 'c12-g', box, [0, 6], [0, 40], {xticks: [1, 2, 3, 4, 5, 6], yticks: [10, 20, 30, 40], xname: 'noche'});
     const night = ([n, v]) => w.add(new Shape(`c12-n${n}`, dot(`c12-n${n}`, 6, BLUE), px(n), py(v), {z: 14}));
@@ -290,14 +302,19 @@ export const final = {
       FAM.splice(FAM.indexOf(fam), 1);
     }
     d.describe('La curva que duplica pasa por los cuatro puntos y sigue subiendo: cruza la raya del 30 entre la noche 4 y la 5.');
-    const c = await d.choose([
-      {id: '5', text: 'En la noche 5: 32 pasa los 30.'},
-      {id: '4', text: 'En la noche 4: 16.'},
-      {id: '15', text: 'En la noche 15, sumando de a dos.'},
-    ], {prompt: 'Si sigue duplicando, ¿en qué noche pasa la escalera?', evaluate: true});
+    // el jugador marca en el mapa la primera noche en que la Marea pasa los 30: es el plazo para terminar la escalera
+    w.add(new Drawing('c12-pnt', [3, 4, 5, 6].map((n, k) => S([[px(n), py(30) - 7], [px(n), py(30) + 7]], seedOf('c12-pnt') + k, {w: 2.4, p: 0.95, ch: YELLOW, lift: false})), {z: 13}));
+    await d.say('Mara', 'Si sigue duplicando, ¿hasta qué noche tenemos? Marcá en la raya del 30 la primera noche en que la Marea la pasa.');
+    const c = await d.interact(ctl => new Promise(resolve => {
+      g.setHint(() => ['Tocá en la raya amarilla del 30 la noche en que la curva la pasa por primera vez.', 'Duplicando: la noche 4, 16; la noche 5, el doble.']);
+      g.ui.setSpots([3, 4, 5, 6].map(n => rectSpot(`c12-pn${n}`, `La noche ${n}`, {x: px(n) - 14, y: py(30) - 16, w: 28, h: 32}, () => { if (ctl.alive()) resolve(String(n)); })));
+    }));
+    g.setHint(null);
     d.evidence('final-predict', {answer: c});
-    await d.think(c === '5' ? 'La noche 5: en la 4, 16, todavía no; en la 5, 32, sí.' : c === '4' ? 'La noche 4 llega a 16: todavía no. La noche 5, 32: ahí pasa.' : 'Duplica, no suma: la noche 4, 16; la noche 5, 32. Hay que apurarse.');
-    await d.say('student', 'Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Si sigue duplicando, tenemos hasta la noche 5. Lo anotamos como suposición y miramos cada noche si se cumple.');
+    w.add(new Shape('c12-pmark', dot('c12-pmark', 7, YELLOW), px(Number(c)), py(30), {z: 15}));
+    d.describe(`Marcaste la noche ${c}.`);
+    if (c === '3' || c === '4') await d.think(c === '3' ? 'La noche 3 llegó a 8: lejos del 30. Duplicando, la 4 llega a 16 y la 5 a 32: pasa en la 5. Mejor temprano que tarde.' : 'La noche 4 llega a 16: todavía no. La 5, 32: ahí pasa. Marqué temprano: mejor que tarde.');
+    await d.say('student', 'Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Lo anotamos como suposición y miramos cada noche si se cumple.');
     await d.say('Mara', 'Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.');
     // la noche 4 pone a prueba la suposición
     await d.say('Mara', 'Noche 4.');
@@ -307,17 +324,72 @@ export const final = {
     g.setCinematic(false);
     d.describe('Un punto azul nuevo: la noche 4 la Marea llegó a 16, justo sobre la curva que duplica.');
     d.evidence('final-check', {night: 4, v: 16});
-    await d.think('Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más. La noche 5 pasa los 30.');
-    await d.say('Mara', 'Entonces redibujamos la escalera esta noche, antes de la noche 5. ¡A trabajar!');
-    // la noche 5: la Marea grande pasa y la escalera, redibujada a tiempo, resiste
-    g.setCinematic(true);
-    await d.shot(SHOTS.board, 1.2);
-    d.describe('Noche 5. Pasa la Marea grande, una brisa de borrador sobre las Terrazas, más alta que la escalera. La escalera, redibujada a tiempo, resiste; la pizarra con sus cuentas, también.');
-    g.audio.marea?.(5);
-    g.camera.shake = 0.3;
-    await d.wait(2.2);
-    g.setCinematic(false);
+    await d.think('Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más.');
+    // el jugador repasa la escalera tramo por tramo; con el plazo de la noche 6, esta noche sólo alcanza la mitad
+    const late = c === '6';
+    const repass = (limit, nightLabel) => d.interact(ctl => new Promise(resolve => {
+      let done = 0;
+      g.setHint(() => ['Tocá cada tramo borroneado de la escalera para repasarlo con tiza.']);
+      const refresh = () => g.ui.setSpots(groups().map((st, k) => ({st, k})).filter(({st}) => st.fade < 1).map(({k}) => rectSpot(`c12-rep${k}`, `Repasar el tramo ${k + 1} de la escalera`, {x: LAD.x - 10, y: GROUND - (k + 1) * LAD.h / 6, w: LAD.w + 20, h: LAD.h / 6}, async () => {
+        if (!ctl.alive() || grp(k).fade >= 1) return;
+        g.ui.setSpots([]);
+        if (k === 0 && g.flags.stairLost) restoreStair(g);
+        const st = grp(k);
+        st.fade = 1;
+        st.progress = 0;
+        try { await d.draw(st, 0.5); } catch { return; }
+        done++;
+        w.remove('c12-repl');
+        w.add(new Label('c12-repl', `repasados: ${groups().filter(x => x.fade >= 1).length * 5} de 30`, LAD.x + LAD.w + 16, GROUND - LAD.h - 12, {size: 16, z: 4, ch: YELLOW}));
+        d.describe(`Tramo repasado. Van ${groups().filter(x => x.fade >= 1).length * 5} escalones de 30.`);
+        if (done >= limit || groups().every(x => x.fade >= 1)) { g.setHint(null); resolve(); } else refresh();
+      })));
+      refresh();
+      void nightLabel;
+    }));
+    await d.shot(SHOTS.board, 0.8);
+    if (late) {
+      await d.say('Mara', 'Hasta la noche 6, entonces. Esta noche repasamos la mitad.');
+      await repass(3, 4);
+    } else {
+      await d.say('Mara', 'Entonces la terminamos esta noche, antes de la noche 5. ¡A trabajar!');
+      await repass(6, 4);
+    }
+    // la Marea pasa de verdad: una franja que cruza la escalera y las Terrazas; lo repasado resiste
+    const sweep = async (night, label) => {
+      g.setCinematic(true);
+      await d.shot({x: 13500, y: GROUND - 560, w: 1700, h: 640}, 1);
+      const band = w.add(mareaBand(w, 13300));
+      band.strength = 0.85;
+      band.width = 300;
+      g.audio.marea?.(5);
+      g.camera.shake = 0.3;
+      d.describe(label);
+      const weak = groups().filter(st => st.fade < 1);
+      await d.tween(2.6, q => {
+        band.x = lerp(13300, 15300, q);
+        for (const st of weak) if (band.x > LAD.x + LAD.w / 2) st.fade = Math.max(0, st.fade - 0.05);
+      });
+      w.remove('marea-band');
+      for (const st of weak) st.fade = 0;
+      g.setCinematic(false);
+      void night;
+      return weak.length;
+    };
+    if (late) {
+      const lost = await sweep(5, 'Noche 5. Pasa la Marea: una franja ancha de borrador cruza la escalera y las Terrazas. Llega a 32: se lleva los tramos que faltaban repasar.');
+      d.evidence('final-late', {lost});
+      await d.think('La noche 5 llegó a 32: ya pasaba los 30. Marqué la 6 y llegamos tarde con la mitad. Lo repasado resistió; lo otro se lo llevó.');
+      await d.say('Mara', 'Lo que repasamos aguantó. Rehagamos lo que se llevó antes de la noche 6: si duplica, llega a 64.');
+      groups().filter(st => st.fade < 1).forEach(st => { st.fade = 0.22; });
+      await repass(6, 6);
+      await sweep(6, 'Noche 6. La Marea grande, más alta todavía, cruza la escalera y las Terrazas. La escalera, entera y repasada, resiste.');
+    } else {
+      await sweep(5, 'Noche 5. Pasa la Marea grande: una franja ancha de borrador cruza la escalera y las Terrazas, más alta que todo. La escalera, repasada a tiempo, resiste; la pizarra con sus cuentas, también.');
+    }
+    g.flags.stairDone = true;
     await d.say('Mara', 'Llegamos. La escalera sigue ahí, y lo que entendimos también.');
+    await d.shot(SHOTS.board, 1);
     // Punto corre por su gráfico, un paso adelante
     p.setMode('still');
     d.describe('Punto corre por la curva, desde la noche 0 hasta la 5, un paso adelante.');
@@ -361,12 +433,12 @@ export const final = {
     g.setCinematic(false);
     // la puerta del primer día: volver o quedarse
     const DX = 15890;
-    const door = w.add(new Drawing('c12-door', art.doorFrame('c12-door', DX, GROUND, 150, 270), {z: 2, progress: 0}));
+    const door = w.add(new Drawing('c12-door', art.doorFrame('c12-door', DX, GROUND, 150, 270), {z: 2, fade: 0.45}));
     const glow = w.add(new Drawing('c12-doorl', art.doorLight('c12-doorl', DX, GROUND, 150, 270), {z: 1, progress: 0}));
     await d.shot({x: 14820, y: GROUND - 440, w: 1200, h: 500}, 1.2);
-    await d.all(d.draw(door, 1.2, {sound: false}), d.draw(glow, 1.4, {sound: false}));
-    d.describe('Una tiza que nadie sostiene dibuja, al costado de las Terrazas, la puerta del primer día, con luz del otro lado.');
-    await d.think('La puerta del primer día. Aquel día no había vuelta; ahora sí. Del otro lado está todo lo de antes.');
+    await d.all(d.fadeTo(door, 1, 1.2), d.draw(glow, 1.4, {sound: false}));
+    d.describe('Al costado de las Terrazas, la puerta del primer día, que se veía apenas, termina de dibujarse; del otro lado hay luz.');
+    await d.think('La puerta del primer día. Se fue dibujando de a poco, cada vez que algo se entendía. Aquel día no había vuelta; ahora sí. Del otro lado está todo lo de antes.');
     const door1 = await d.choose([
       {id: 'back', text: 'Volver por la puerta y dejarla abierta.'},
       {id: 'stay', text: 'Quedarte un rato más: todavía hay cosas que no entendés.'},
@@ -420,7 +492,7 @@ function writeJournal12(g) {
   const ip2 = first('integral-predict');
   if (ip2) seen.push(ip2.answer === '9' ? 'Viste que las sumas se acercan al área bajo el caudal: 9.' : 'Las sumas de rectángulos se acercaban a 9, el área bajo el caudal.');
   const fp = first('final-predict');
-  if (fp) seen.push(fp.answer === '5' ? 'Anticipaste la noche 5 para la Marea.' : 'Para la Marea pensaste otra noche; duplicando, pasa la escalera en la noche 5.');
+  if (fp) seen.push(fp.answer === '5' ? 'Marcaste la noche 5 como plazo y la escalera de Balcón llegó entera a la Marea grande.' : fp.answer === '6' ? 'Marcaste la noche 6 como plazo; la noche 5 ya pasaba los 30 y la Marea se llevó lo que faltaba repasar. Lo repasado resistió, y se rehízo antes de la 6.' : 'Marcaste una noche temprana como plazo; duplicando, la Marea pasa los 30 en la noche 5, y la escalera llegó entera.');
   const fd = first('final-door');
   if (fd) seen.push(fd.answer === 'back' ? 'Al final volviste por la puerta del primer día y la dejaste abierta; Punto llegó antes y se quedó con la Ronda.' : 'Al final te quedaste un rato más con la Ronda; la puerta sigue ahí, abierta.');
   const entry = {

@@ -2,6 +2,8 @@
 // al revés (desigualdades) y dos pasos.
 
 import {Label} from '../engine/world.js';
+import {lerp} from '../engine/rng.js';
+import {mareaBand} from '../ch1/scenes.js';
 import {YELLOW} from '../engine/chalk.js';
 import {pulse, follow, wordSpot} from '../acting.js';
 import {lin, expr, eq, addBoth, mulBoth, divBoth, squareBoth, divBothByExpr, solutions, sameSolutions, solveLinear} from '../logic/equations.js';
@@ -318,6 +320,27 @@ export const dosPasos = {
     await d.think('Doce dividido cuatro, tres: los marcadores caen juntos. La x puede quedar de cualquier lado del igual.');
     if (!replay) writeJournal6(g);
     view.dispose();
+    // la Marea pasa por la recta: se lleva las abreviaturas que nadie entiende; los renglones comprobados quedan
+    const abbr = [['pasa sumando', lx(6), GROUND - 330], ['se tacha', lx(9), GROUND - 270], ['cambia de lado y de signo', lx(4), GROUND - 210]]
+      .map(([t, x, y], i) => w.add(new Label(`d6-ab${i}`, t, x, y, {size: 24, z: 8, fade: 0.45})));
+    d.describe('Al costado de la recta, escritas por alguien hace mucho: «pasa sumando», «se tacha», «cambia de lado y de signo», sin ninguna cuenta al lado.');
+    await d.think('Esas no son nuestras. Son abreviaturas sueltas, sin la cuenta que abrevian.');
+    g.setCinematic(true);
+    const x0 = SHOTS.line.x - 200, x1 = SHOTS.line.x + SHOTS.line.w + 200;
+    const band = w.add(mareaBand(w, x0));
+    band.strength = 0.85;
+    band.width = 300;
+    g.audio.marea?.(4);
+    g.camera.shake = 0.25;
+    d.describe('Pasa la Marea por la recta: una franja ancha de borrador. Se lleva las abreviaturas sueltas; los renglones de cuentas que comprobamos quedan.');
+    await d.tween(2.6, q => {
+      band.x = lerp(x0, x1, q);
+      for (const ab of abbr) if (band.x > ab.x) ab.fade = Math.max(0, ab.fade - 0.04);
+    });
+    w.remove('marea-band');
+    abbr.forEach(ab => w.remove(ab.id));
+    g.setCinematic(false);
+    await d.think('Lo que nadie entendía se lo llevó. Lo que comprobamos, paso por paso, quedó.');
     // gancho: la huerta de dos cuadros
     await d.say('Mara', 'Peldaño anda con otro problema: quiere una huerta cuadrada con justo dos cuadros de tierra. ¿Cuánto mide el lado?');
     g.setCinematic(true);
@@ -347,7 +370,7 @@ function writeJournal6(g) {
   const ps = first('pasa-sumando');
   if (ps) seen.push(ps.answer === 'both' ? '"Pasa sumando" quedó como abreviatura de sumar a los dos lados.' : ps.answer === 'move' ? 'Pensaste que "pasa sumando" era mudar el número de lado; es sumar a los dos lados, en corto.' : 'Pensaste que "pasa sumando" era una regla sin explicación; es sumar a los dos lados, en corto.');
   const ch = first('check-how');
-  if (first('substitute')) seen.push(ch?.answer === 'sub' ? 'Elegiste comprobar la cuenta de memoria de Recta poniendo a Punto en el 8: no cumplía. Era x = 2.' : 'La cuenta de memoria de Recta se comprobó poniendo a Punto en el 8: no cumplía. Era x = 2.');
+  if (first('substitute')) seen.push(ch?.answer === 'sub' ? 'Punto resolvió de memoria y pasó el 3 con el signo que tenía; elegiste comprobarlo poniéndolo en el 8: no cumplía. Era x = 2, y Punto borró su renglón.' : 'Punto resolvió de memoria y pasó el 3 con el signo que tenía; puesto en el 8, no cumplía. Era x = 2, y Punto borró su renglón.');
   if (first('times-zero-eq')) seen.push('Con el truco de multiplicar por cero, cualquier x parecía servir: por cero se pierde lo que decía la cuenta.');
   const sp = first('square-predict');
   if (sp) seen.push(sp.answer === '2' ? 'Anticipaste que x · x = 9 tiene dos soluciones; buscando, aparecieron el 3 y el −3.' : 'Al elevar al cuadrado apareció el −3, que la cuenta de antes no tenía.');

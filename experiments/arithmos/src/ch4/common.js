@@ -9,6 +9,7 @@ import * as art2 from '../ch2/art.js';
 import {GROUND, mara, villager, student, punto, item} from '../ch2/common.js';
 import {signed} from '../logic/integers.js';
 import {follow} from '../acting.js';
+import {stair} from '../stair.js';
 
 export {GROUND, mara, villager, student, punto, item, signed};
 
@@ -62,6 +63,8 @@ export function base(g, {line = false} = {}) {
   });
   w.ensure('board', () => new Drawing('board', art2.easel('board', BOARD.x, GROUND, BOARD.w, BOARD.h), {z: 4}));
   w.ensure('rock', () => new Drawing('rock', art4.rock('rock', ROCK.x, GROUND), {z: 3}));
+  // la escalera nueva de Balcón, desde que se empezó (8.6)
+  if (g.flags.balconStair) stair(g);
   // el signo de la piedra: casi borrado hasta que se entiende
   w.ensure('rock-sign', () => new Label('rock-sign', '4 × 3', ROCK.x, GROUND - 52, {size: 46, align: 'center', z: 4, fade: g.flags.c4groups ? 1 : 0.22}));
   w.ensure('g4-s1', () => art.smear('g4-s1', [[13000, 170], [14400, 130], [15800, 190], [17400, 140]], 170, 0.3));

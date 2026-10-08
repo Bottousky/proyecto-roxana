@@ -1,0 +1,204 @@
+{
+  "version": 1,
+  "chapter": 12,
+  "segment": "c12.anticipar",
+  "flags": {
+    "balconStair": true,
+    "stairLost": 0,
+    "stairDone": true,
+    "c12final": true,
+    "gameDone": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "rule": "suma 1",
+      "t": "2026-10-08T00:07:31.619Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-guess"
+    },
+    {
+      "t": "2026-10-08T00:07:31.832Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-erase"
+    },
+    {
+      "id": "line",
+      "t": "2026-10-08T00:07:32.780Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-family"
+    },
+    {
+      "id": "wave",
+      "t": "2026-10-08T00:07:33.715Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-family"
+    },
+    {
+      "id": "dbl",
+      "t": "2026-10-08T00:07:34.665Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-family"
+    },
+    {
+      "answer": "6",
+      "t": "2026-10-08T00:07:35.840Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-predict"
+    },
+    {
+      "night": 4,
+      "v": 16,
+      "t": "2026-10-08T00:07:36.247Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-check"
+    },
+    {
+      "lost": 3,
+      "t": "2026-10-08T00:07:39.863Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-late"
+    },
+    {
+      "t": "2026-10-08T00:07:46.929Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-name"
+    },
+    {
+      "answer": "stay",
+      "t": "2026-10-08T00:07:52.563Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-door"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c12",
+      "title": "Anticipar",
+      "abbr": "Reconocer la familia, ajustar las perillas, leer el gráfico: así se anticipa.",
+      "body": [
+        "Las reglas se agrupan en familias que se reconocen por su forma: rectas, curvas que despegan, U (simétricas: iguales de los dos lados de su eje; y = a · x · x, con a positiva más grande, más angosta), olas, curvas que suben cada vez más despacio y curvas partidas. Donde el gráfico se interrumpe hay una discontinuidad; una raya a la que la curva se acerca tanto como se quiera es una asíntota (la de 1 ÷ (x − 2), en el 2, no se toca nunca porque ahí no hay valor; y con x muy grande se acerca a 0 tanto como se quiera sin llegar: la raya acostada del 0 también es asíntota). Los parámetros eligen cuál de la familia: en y = a · x + b, b es dónde empieza y a cuánto sube por paso.",
+        "Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo; también en uno que no es una U, como la caja de Cornisa, x · (6 − 2x)², un polinomio de grado 3, que como caja sólo tiene sentido con el corte entre 0 y 3. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo). Con x desde 0, el gráfico de la raíz es el de x · x reflejado sobre la diagonal: (a, b) pasa a (b, a), como (2, 4) y (4, 2).",
+        "La tasa de cambio en un tramo es cuánto cambió dividido cuánto pasó; con tramos cada vez más cortos se acerca a la derivada. Juntar lo que entra de a poco es sumar rectángulos cada vez más finos: se acerca al área bajo el gráfico, la integral.",
+        "Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero, |x|: x a la derecha del cero y −x a la izquierda, que ahí da positivo. Con todo eso se anticipa, suponiendo que la regla sigue; y cuando llegan datos nuevos, se revisa."
+      ],
+      "seen": [
+        "Marcaste la noche 6 como plazo; la noche 5 ya pasaba los 30 y la Marea se llevó lo que faltaba repasar. Lo repasado resistió, y se rehízo antes de la 6.",
+        "Al final te quedaste un rato más con la Ronda; la puerta sigue ahí, abierta."
+      ],
+      "moments": [
+        {
+          "id": "c12.salto",
+          "label": "Desplegar: el salto de Punto"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c12.anticipar"
+  ],
+  "moments": [],
+  "log": [
+    {
+      "who": "Mara",
+      "text": "La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera nueva de Balcón tiene 30, y está a medio dibujar. ¿Llegamos a terminarla?"
+    },
+    {
+      "who": "Mara",
+      "text": "Esperá, Punto. Las noches 2 y 3 fueron 4 y 8."
+    },
+    {
+      "who": null,
+      "text": "Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato."
+    },
+    {
+      "who": null,
+      "text": "Con dos noches, 1 y 2, pasaban las dos: la recta que suma uno y la que duplica, como la de Punto en la carrera. Él eligió una antes de tiempo; las noches 2 y 3 la desmintieron."
+    },
+    {
+      "who": null,
+      "text": "Una recta no pasa por los cuatro: de 1 a 2 sube 1, de 4 a 8 sube 4. No suma lo mismo."
+    },
+    {
+      "who": null,
+      "text": "Hasta ahora sólo sube, y cada vez más: no parece una ola."
+    },
+    {
+      "who": "Mara",
+      "text": "Si sigue duplicando, ¿hasta qué noche tenemos? Marcá en la raya del 30 la primera noche en que la Marea la pasa."
+    },
+    {
+      "who": "student",
+      "text": "Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Lo anotamos como suposición y miramos cada noche si se cumple."
+    },
+    {
+      "who": "Mara",
+      "text": "Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra."
+    },
+    {
+      "who": "Mara",
+      "text": "Noche 4."
+    },
+    {
+      "who": null,
+      "text": "Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más."
+    },
+    {
+      "who": "Mara",
+      "text": "Hasta la noche 6, entonces. Esta noche repasamos la mitad."
+    },
+    {
+      "who": null,
+      "text": "La noche 5 llegó a 32: ya pasaba los 30. Marqué la 6 y llegamos tarde con la mitad. Lo repasado resistió; lo otro se lo llevó."
+    },
+    {
+      "who": "Mara",
+      "text": "Lo que repasamos aguantó. Rehagamos lo que se llevó antes de la noche 6: si duplica, llega a 64."
+    },
+    {
+      "who": "Mara",
+      "text": "Llegamos. La escalera sigue ahí, y lo que entendimos también."
+    },
+    {
+      "who": "student",
+      "text": "Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?"
+    },
+    {
+      "who": "student",
+      "text": "Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto."
+    },
+    {
+      "who": null,
+      "text": "La Ronda baila otra vez, como el primer día. Punto se suma a la vuelta, un paso adelante."
+    },
+    {
+      "who": null,
+      "text": "La puerta del primer día. Se fue dibujando de a poco, cada vez que algo se entendía. Aquel día no había vuelta; ahora sí. Del otro lado está todo lo de antes."
+    },
+    {
+      "who": "student",
+      "text": "Me quedo un rato más. La puerta no se va."
+    },
+    {
+      "who": null,
+      "text": "Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje."
+    }
+  ],
+  "createdAt": "2026-10-08T00:07:29.473Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    12
+  ],
+  "finished": true
+}

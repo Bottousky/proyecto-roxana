@@ -151,7 +151,7 @@ function pickChoice(prompt, options) {
     ['trato le conviene', 'El 80 %', 'Dan lo mismo'],
     ['mida la diagonal justo', 'partiendo bastante fino', 'Quizás'],
     ['pasa sumando', 'se muda', 'Sumar lo mismo'],
-    ['Cómo lo comprobás', 'Creerle', 'Poner a Punto'],
+    ['Cómo lo comprobás', 'Creerle a Punto', 'Poner a Punto'],
     ['truco de Cuña', 'cualquier x es', 'se perdió'],
     ['x · x caiga en el 9', 'Una sola', 'Dos.'],
     ['x = 0 cumple', 'No:', 'Sí:'],
@@ -421,6 +421,8 @@ let c8Hour = 8;
 let c11Ax = 0;
 let c8Fence = 0;
 let c8Corner = 0;
+let c11Pair = 0;
+let c7Layers = 0;
 let c9Moves = 0;
 let c11Item = null;
 let c11Dice = 7;
@@ -839,11 +841,28 @@ for (let iter = 0; iter < 30000; iter++) {
     } else if (s.seg === 'c11.anticipar' && spots.some(x => x.id.startsWith('c11-s'))) {
       target = spots[0];
       c11Item = target.id.replace('c11-s', '');
+    } else if (s.seg === 'c7.juntar' && spots.some(x => x.id === 'jf-cube')) {
+      // con errores, dice «ya es un cubo» con tres capas
+      const layer = spots.find(x => x.id === 'jf-layer');
+      if (route === 'errores' && layer && c7Layers === 3 && !tried.has('c7cube3') && (tried.add('c7cube3'), true)) target = spots.find(x => x.id === 'jf-cube');
+      else if (layer) { target = layer; c7Layers++; } else target = spots.find(x => x.id === 'jf-cube');
     } else if (s.seg === 'c7.lado' && spots.some(x => x.id.startsWith('rows-'))) {
       // con errores, primero una fila (Peldaño protesta y se vuelve a elegir)
       // --c71=9: prueba la columna de nueve
       const wrongRows = val('c71', '') === '9' ? 'rows-9' : 'rows-1';
       target = spots.find(x => x.id === (route === 'errores' && spots.some(y => y.id === wrongRows) ? wrongRows : 'rows-3'));
+    } else if (s.seg === 'c10.rampa' && spots.some(x => x.id.startsWith('c10-turn'))) {
+      // gira la rueda: con errores, primero a 30°
+      const wrong = route === 'errores' && !tried.has('c10t30') && (tried.add('c10t30'), true);
+      target = spots.find(x => x.id === (wrong ? 'c10-turn30' : 'c10-turn60'));
+    } else if (s.seg === 'c11.causa' && spots.some(x => x.id.startsWith('c11-day'))) {
+      // pares con el mismo viento; con errores, primero dos de distinto viento
+      const seq = route === 'errores' ? [0, 2, 0, 1, 2, 3, 4, 5] : [0, 1, 2, 3, 4, 5];
+      target = spots.find(x => x.id === `c11-day${seq[c11Pair]}`) || spots[0];
+      c11Pair++;
+    } else if (s.seg === 'c12.anticipar' && spots.some(x => x.id.startsWith('c12-pn'))) {
+      // el plazo de la escalera: con errores, la noche 6 (llega tarde y la Marea se lleva lo que faltaba)
+      target = spots.find(x => x.id === (route === 'errores' ? 'c12-pn6' : 'c12-pn5'));
     } else if (s.seg === 'c8.diagonal' && spots.some(x => x.id.startsWith('c8-cor-'))) {
       // esquinas de los cuadrados de q: con errores, primero dos vecinas (rectángulos) y después opuestas
       // --c81=b: la misma esquina y después la diagonal arriba a la derecha / abajo a la izquierda

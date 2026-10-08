@@ -247,25 +247,31 @@ export const memoria = {
     const s = w.get('student');
     const e0 = eq(lin(1, 3), lin(0, 5));
     await d.shot(SHOTS.line, 1);
-    await d.say('Recta', 'Yo tengo otra caja: si le agrego tres, son cinco. Eso lo resuelvo de memoria.');
+    await d.say('Recta', 'Yo tengo otra caja: si le agrego tres, son cinco. ¿Cuánto hay adentro?');
     g.setCinematic(true);
     const r = w.get('recta');
     r.setPose('write', 0.3);
     derivLine(w, 'd6-r0', 'x + 3 = 5', 0).reveal = 0;
     await d.draw(w.get('d6-r0'), 0.6, {key: 'reveal'});
-    const wrongLine = derivLine(w, 'd6-r1', 'x = 5 + 3 = 8', 1, {reveal: 0});
-    await d.draw(wrongLine, 0.8, {key: 'reveal'});
-    d.describe('Escrito: x = 5 + 3 = 8.');
     r.setPose('idle', 0.4);
+    // Punto se adelanta y lo resuelve de memoria: pasa el 3 con el signo que tenía
+    const p = w.get('punto');
+    const px0 = p.x, py0 = p.y;
+    await zip(d, p, lx(LINE.from) + 330, GROUND - 330, 0.4);
+    g.audio.punto('happy');
+    const wrongLine = derivLine(w, 'd6-r1', 'x = 5 + 3 = 8', 1, {reveal: 0, ch: YELLOW});
+    await d.draw(wrongLine, 0.8, {key: 'reveal'});
+    d.describe('Punto se adelanta y escribe en amarillo: x = 5 + 3 = 8.');
+    await zip(d, p, px0, py0, 0.4);
     g.setCinematic(false);
-    await d.say('Recta', 'El 3 pasa al otro lado. Ocho.');
+    await d.say('Recta', '¿Ocho? Punto lo hizo de memoria: el 3 se pasó al otro lado.');
     const how = await d.choose([
       {id: 'sub', text: 'Poner a Punto en el 8 en la cuenta de arriba.'},
-      {id: 'trust', text: 'Creerle: lo hizo de memoria.'},
+      {id: 'trust', text: 'Creerle a Punto: lo hizo de memoria.'},
       {id: 'redo', text: 'Hacerla de memoria otra vez.'},
-    ], {prompt: 'Recta dice que x es 8. ¿Cómo lo comprobás?', evaluate: true});
+    ], {prompt: 'Punto dice que x es 8. ¿Cómo lo comprobás?', evaluate: true});
     d.evidence('check-how', {answer: how});
-    if (how !== 'sub') await d.think(how === 'trust' ? 'Si me equivoco de memoria, de memoria no me doy cuenta. Mejor probar.' : 'De memoria otra vez da lo mismo, aunque esté mal. Mejor probar en la de arriba.');
+    if (how !== 'sub') await d.think(how === 'trust' ? 'Si se equivoca de memoria, de memoria no se da cuenta. Mejor probar.' : 'De memoria otra vez da lo mismo, aunque esté mal. Mejor probar en la de arriba.');
     const view = new EqView(g, e0, 0);
     await d.wait(0.5);
     await placeX(d, g, view, {
@@ -274,6 +280,7 @@ export const memoria = {
     });
     await d.think('Con Punto en el 8, x + 3 da 11. No cae en el 5.');
     g.audio.punto('no');
+    await pulse(d, p, 1, 0.3).catch(() => {});
     d.evidence('substitute', {x: 8, ok: false});
     // encontrar la x de verdad
     await placeX(d, g, view, {
@@ -283,18 +290,23 @@ export const memoria = {
     await d.think('Dos. Dos más tres, cinco.');
     const w2 = passWrong(e0, 3);
     d.evidence('pass-wrong', {wrong: solveLinear(w2), right: solveLinear(e0), same: sameSolutions(e0, w2)});
+    // Punto se corrige solo: borra su renglón de memoria y escribe lo que comprobó
+    g.setCinematic(true);
+    const px1 = p.x, py1 = p.y;
+    await zip(d, p, wrongLine.x + 330, wrongLine.y - 30, 0.4);
+    d.describe('Punto borra su renglón de memoria, x = 5 + 3 = 8, y escribe en su lugar: x = 2.');
+    g.audio.erase(0.5, 0.4);
+    wrongLine.reveal = 0;
+    wrongLine.text = 'x = 2';
+    await d.draw(wrongLine, 0.6, {key: 'reveal'});
+    await zip(d, p, px1, py1, 0.4);
+    g.audio.punto('happy');
+    g.setCinematic(false);
+    d.evidence('punto-rewrites', {from: 'x = 5 + 3 = 8', to: 'x = 2'});
     await writeDeriv(d, g, 'd6-r2', 'x + 3 − 3 = 5 − 3', 2);
     await writeDeriv(d, g, 'd6-r3', 'x = 2', 3);
-    await d.say('student', 'El 3 sumaba: para sacarlo, se resta a los dos lados. "Pasa restando" es eso.');
-    await d.say('Recta', 'De memoria lo pasé con el signo que tenía. Y salió otra cuenta.');
-    // la Marea se lleva lo que no se entendía; lo comprobado queda
-    g.setCinematic(true);
-    d.describe('Pasa una brisa de borrador: el renglón de memoria de Recta, "x = 5 + 3 = 8", se deshace. Los renglones comprobados quedan.');
-    g.audio.erase(1.2, 0.5);
-    g.camera.shake = 0.15;
-    await d.fadeTo(wrongLine, 0, 1.2);
-    w.remove('d6-r1');
-    g.setCinematic(false);
+    await d.say('student', 'Punto, el 3 sumaba: para sacarlo, se resta a los dos lados. "Pasa restando" es eso. De memoria lo pasaste con el signo que tenía, y salió otra cuenta.');
+    await d.say('Recta', 'Entonces el 3 no se muda: se resta de los dos lados. Dos.');
     view.dispose();
     g.flags.c6memory = true;
   },

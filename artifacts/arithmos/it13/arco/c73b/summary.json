@@ -1,0 +1,55 @@
+{
+  "ended": true,
+  "final": {
+    "mode": "play",
+    "seg": "c8.diagonal"
+  },
+  "journal": [
+    "Crecer"
+  ],
+  "evidenceKinds": [
+    "pow-product",
+    "pow-power",
+    "pow-sum",
+    "pow-quotient",
+    "cube-predict",
+    "cube-layer",
+    "cube-call",
+    "cube",
+    "sci-count3",
+    "sci-compare",
+    "sci",
+    "expand-predict",
+    "expand-place",
+    "expand-miss",
+    "expand-extra",
+    "expand",
+    "factor-try",
+    "factor-none",
+    "factor",
+    "complete-predict",
+    "complete-other",
+    "complete-zero",
+    "complete-negative",
+    "complete",
+    "log-predict",
+    "log-step",
+    "log-early",
+    "half-doubling",
+    "log",
+    "rational-predict",
+    "rational-try",
+    "rational",
+    "rational-simplify"
+  ],
+  "fps": {
+    "min": "30.0",
+    "median": "60.0"
+  },
+  "errors": [],
+  "seconds": 122.434,
+  "size": "1600x900",
+  "touch": false,
+  "route": "errores",
+  "watch": false
+}

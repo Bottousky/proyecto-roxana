@@ -6,6 +6,7 @@ import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {nearMisses, descend, scale as scaleBy} from '../logic/geometry.js';
 import {GROUND, SHOTS, area, base, boardCast, clean, poly, gridSquare, wedge, angleOf, plate, S, seedOf, WHITE, YELLOW, BLUE} from './common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
+import * as art from '../art.js';
 
 const sq = (id, s, opts) => poly(id, [[0, 0], [s, 0], [s, s], [0, s]], opts);
 
@@ -252,6 +253,12 @@ export const diagonal = {
     await studentWrites(d, g, 'c8-no', '√2 no es una fracción', A.x0 + 20, A.y0 + 176, {size: 30});
     await d.think('El dibujo mostraba lo que pasaría si existiera el par, y con un dibujo no se distingue un largo de un entero. Lo que prueba es el razonamiento, y vale para todos los p y q a la vez. Probando casos, en cambio, nunca se termina.');
     await d.say('Peldaño', 'En la puerta dejo √2, que es exacto. Y abajo, chiquito: «1,414 y un poco más».');
+    // la puerta del primer día, apenas: lo que se entiende la va redibujando
+    const door1 = w.add(new Drawing('c8-door1', art.doorFrame('c8-door1', 15890, GROUND, 150, 270), {z: 2, fade: 0}));
+    await d.shot({x: 14820, y: GROUND - 440, w: 1200, h: 500}, 1.2);
+    await d.fadeTo(door1, 0.2, 1.4);
+    d.describe('Más allá de las Terrazas, apenas, se ve el contorno de una puerta: la del primer día.');
+    await d.think('Peldaño tiene su puerta, con √2. Allá, después de las Terrazas, se ve apenas otra: la del primer día. Antes no estaba.');
     void s;
     d.evidence('irrational', {nearest: nearMisses(12).slice(-1)[0]});
     g.flags.c8irr = true;

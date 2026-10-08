@@ -1,0 +1,100 @@
+[0.0s] escena → c7.juntar
+[1.0s] lee: El lunes Punto se duplicó tres veces seguidas, y el martes, dos veces más. Lo anoto corto.
+[2.5s] lee: —Con otro número abajo se escribe igual: 4³ es empezar en 1 y multiplicar por 4 tres veces, 1 · 4 · 4 · 4.
+[4.6s] elige «4⁵» (¿Cuánto es 2³ · 2², como una sola potencia?)
+[9.3s] lee: El 2 de abajo no cambia: cada vez se multiplica por 2. Son cinco dos: 2⁵ = 32. 4⁵ sería 1024.
+[10.0s] lee: —Mara, multiplicar potencias del mismo número es juntar sus factores. Los exponentes se suman: 3 + 2 = 5. Con cualquier número abajo pasa lo mismo: se cuentan factores iguales.
+[10.8s] lee: Y si un día se duplica tres veces, y eso pasa dos días seguidos, lo anoto así.
+[12.7s] elige «2⁹» (¿Cuánto es (2³)², como una sola potencia?)
+[16.5s] lee: El cuadrado es de todo el 2³, no del 3 solo: 2³ · 2³. Seis dos, no nueve.
+[17.3s] lee: —Elevar una potencia es repetirla: tres dos, dos veces. Los exponentes se multiplican: 3 · 2 = 6.
+[18.1s] lee: ¿Y si en vez de multiplicar sumo? ¿Se juntan igual?
+[19.4s] elige «Sí.» (¿2³ + 2² es 2⁵?)
+[19.8s] lee: Los exponentes se suman cuando se multiplica. Sumando, 8 + 4 = 12: no es 32.
+[20.6s] lee: —Sumar no junta factores: junta cantidades. Lo de sumar los exponentes vale para multiplicar.
+[21.3s] lee: ¿Y si divido? Cinco dos, divididos por dos dos.
+[22.6s] elige «2⁷» (¿Cuánto es 2⁵ ÷ 2², como una sola potencia?)
+[25.7s] lee: Sumar los exponentes es para multiplicar. Dividiendo, cada 2 de 2² se va con un 2 de 2⁵: quedan tres, 8. 2⁷ sería 128.
+[26.5s] lee: —Dividir saca factores: si el que se divide tiene más factores, los exponentes se restan, 5 − 2 = 3. Como en la tabla de antes, cada renglón hacia abajo sacaba un dos.
+[27.3s] lee: Tengo 64 bloques de tiza y quiero apilarlos en un cubo: igual de largo, de ancho y de alto.
+[28.5s] elige «4» (¿De cuántos bloques de lado es un cubo de 64 bloques?)
+[28.9s] lee: Probemos con capas de 4 por 4.
+[32.5s] lee: Con 3 capas es una caja de 4 por 4 por 3: 48 bloques. Un cubo tiene el alto igual al largo.
+[34.9s] lee: —Cornisa, el cubo tiene 4 de largo, 4 de ancho y 4 de alto: 4 · 4 · 4 = 64. El lado del cubo es la raíz cúbica de 64: 4.
+[35.8s] lee: —Con 8 de lado sale un cuadrado, plano: 8 · 8 = 64, y √64 = 8. La raíz cuadrada pregunta por el lado de un cuadrado; la cúbica, por el de un cubo.
+[36.6s] lee: ¿Y cómo puede ser que el 64 sirva para las dos cosas?
+[37.4s] lee: —64 son seis dos: 2⁶. Juntados de a dos, tres veces: 4 · 4 · 4. Juntados de a tres, dos veces: 8 · 8.
+[38.3s] escena → c7.grande
+[38.7s] lee: Medí el polvo de tiza que dejó la Marea esta noche: tres millones de granos. No me entra en la libreta.
+[42.5s] lee: —Punto, seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica.
+[43.3s] lee: La de anoche la anoté así: 4 · 10⁵.
+[44.6s] elige «Anoche: 4 · 10⁵, porque 4 es más que 3.» (¿Qué noche dejó más polvo?)
+[45.0s] lee: —Esta noche: tres millones contra cuatrocientos mil. Primero se mira el exponente, cuántos lugares; el 3 o el 4 vienen después.
+[45.9s] lee: Y un grano solo es nada: una milésima de gramo.
+[46.7s] lee: —Lo chico también se corre: tres lugares para el otro lado, como la tabla de los dos, para abajo.
+[47.4s] escena → c7.areas
+[48.4s] lee: Voy a agrandar una huerta cuadrada, pero todavía no decidí de qué lado: le digo x. Le sumo dos filas abajo y tres columnas al costado. Quiero una cuenta que sirva para cualquier lado.
+[49.2s] lee: La ficha x la dibujo de un largo cualquiera: x puede ser cualquier número.
+[50.5s] elige «Un x por x y seis cuadraditos.» (¿Qué fichas hacen falta para llenar la huerta nueva?)
+[60.6s] lee: Un x por x, cinco tiras y seis cuadraditos. Las tiras son los bordes nuevos: no se pueden olvidar.
+[61.4s] lee: —Peldaño, es partir el rectángulo, como cuando repartimos en las Terrazas, pero de los dos lados. Dos por tres, los cuadraditos; dos más tres, las tiras.
+[62.1s] escena → c7.al-reves
+[63.2s] lee: A mí me dieron las fichas sueltas: un x por x, cinco tiras y cinco cuadraditos. Quiero una huerta rectangular, sin que sobre nada.
+[65.3s] elige «x y x + 5» (Con cinco cuadraditos, ¿con qué lados probás armar la huerta?)
+[65.7s] lee: Así no cierra: sobran cinco cuadraditos.
+[67.0s] elige «x + 1 y x + 4» (Con cinco cuadraditos, ¿con qué lados probás armar la huerta?)
+[67.5s] lee: Así no cierra: sobra un cuadradito.
+[68.7s] elige «x + 2 y x + 3» (Con cinco cuadraditos, ¿con qué lados probás armar la huerta?)
+[69.2s] lee: Así no cierra: falta un cuadradito.
+[70.5s] elige «Con estas fichas no se puede.» (Con cinco cuadraditos, ¿con qué lados probás armar la huerta?)
+[70.9s] lee: Probé los tres pares que suman cinco y ninguno cierra: con cinco cuadraditos, este rectángulo no se arma.
+[71.6s] lee: Me dieron un cuadradito más: seis. ¿Y ahora?
+[72.9s] elige «x + 1 y x + 6» (Con seis cuadraditos, ¿con qué lados probás armar la huerta?)
+[73.3s] lee: Así no cierra: faltan dos tiras.
+[74.6s] elige «x + 2 y x + 3» (Con seis cuadraditos, ¿con qué lados probás armar la huerta?)
+[75.0s] lee: —Balcón, los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres.
+[75.8s] lee: Con cinco no había manera: cero por cinco, cero; uno por cuatro, cuatro; dos por tres, seis. Ninguno da cinco. Con seis, sí.
+[76.5s] escena → c7.completar
+[77.5s] lee: Mi huerta: un cuadrado de lado x y dos tiras de x pegadas, una a cada lado. En total, ocho cuadraditos de tierra. ¿Cuánto mide x?
+[78.8s] elige «Otra tira.» (¿Qué le falta para ser un cuadrado?)
+[80.1s] lee: Una tira más lo haría más largo de un lado. Le falta el hueco de la esquina: uno por uno.
+[82.9s] elige «Queda 8: el cuadradito es de la huerta, no de la cuenta.» (Del otro lado del igual, ¿qué escribís?)
+[83.3s] lee: Si la huerta ganó un cuadradito, la tierra también: lo que se agrega de un lado del igual, se agrega del otro.
+[84.1s] lee: —Rampa, un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2.
+[84.9s] lee: Con x = 2 se pueden contar: cuatro del cuadrado y dos de cada tira, ocho de tierra. Con la esquina, nueve: tres por tres.
+[85.7s] lee: Las dos cumplen (x + 1)² = 9, porque (−3) · (−3) también es 9. Pruebo x = −4 en la cuenta de Rampa: 16 − 8 = 8. Cumple. La huerta no: un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una.
+[86.5s] lee: —La raíz da el lado, el positivo. La raíz de (x + 1)² no siempre es x + 1: es lo lejos que está x + 1 del cero. Si x + 1 es positivo, es x + 1; si es negativo, no. Por eso x + 1 puede ser 3 o −3, los dos a 3 del cero.
+[87.3s] lee: Al completar, siempre queda un cuadrado igual a un número. ¿Y si el número fuera otro?
+[88.5s] elige «Dos, como con el 9: una positiva y una negativa.» (Si quedara (x + 1)² = 0, ¿cuántas soluciones tendría?)
+[88.9s] lee: Con el 9 había 3 y −3. Con el 0, más cero y menos cero son lo mismo: x + 1 = 0, una sola, x = −1.
+[90.2s] elige «Dos: x = 2 y x = −4, como con el 9.» (Y si quedara (x + 1)² = −9, ¿cuántas soluciones tendría?)
+[90.6s] lee: Con x = 2, (2 + 1)² = 9; con x = −4, (−4 + 1)² = 9: da 9, no −9. Un número de la recta multiplicado por sí mismo da 0 o positivo: ninguna.
+[91.3s] lee: —Al completar el cuadrado queda (x + algo)² = un número. Si es positivo, dos soluciones; si es cero, una; si es negativo, ninguna en la recta.
+[92.1s] escena → c7.cuantas-veces
+[92.5s] lee: Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?
+[93.8s] elige «Unos cien días.» (Empezando con uno y duplicando cada día, ¿cuántos días para pasar mil?)
+[97.8s] lee: Con 10 ya había pasado: 1024. La otra sobraba.
+[98.5s] lee: —Punto, 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó.
+[99.3s] lee: Diez, no cien: duplicar llega lejos enseguida.
+[100.1s] lee: Para pasar mil, diez. ¿Y para llegar justo a mil?
+[100.9s] lee: —Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero puede haber pasos más chicos: media duplicación.
+[102.1s] elige «× 1,5: la mitad del camino entre × 1 y × 2.» (Media duplicación, ¿por cuánto multiplica?)
+[102.5s] lee: × 1,5 dos veces es × 2,25: se pasa de duplicar. Tiene que ser un número que, dos veces, dé 2: √2, unos 1,41.
+[103.3s] lee: —Si queremos que juntar exponentes siga valiendo también con medios, un medio y un medio tienen que hacer uno: media duplicación tiene que ser √2, el positivo. Por eso se elige escribir √2 como 2 elevado a un medio, igual que se eligió 2⁰ = 1 para que la tabla siguiera.
+[104.2s] lee: —Nueve duplicaciones y media: 512 · 1,414, unos 724. Todavía no.
+[104.9s] lee: El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo.
+[105.7s] escena → c7.no-se-puede
+[106.1s] lee: Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2).
+[107.4s] elige «Con x = 0: dividir por cero.» (¿Para qué x no se puede hacer esa cuenta?)
+[111.8s] lee: —Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas.
+[112.6s] lee: Con x = 0 abajo queda −2, y eso se divide. El cero que molesta es el de abajo: aparece con x = 2.
+[113.4s] lee: —Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero.
+[114.2s] lee: La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba.
+[115.0s] lee: Yo tengo otra cuenta: (x · x − 4) ÷ (x − 2). Dicen que es lo mismo que x + 2, que es más corta.
+[116.8s] elige «Tampoco con x = −2: ahí arriba da cero.» (¿Son la misma cuenta?)
+[118.5s] lee: Con x = −2 arriba da 0 y abajo −4: 0 ÷ (−4) = 0, lo mismo que x + 2. Un cero arriba no molesta; el que molesta es el de abajo, con x = 2.
+[119.3s] lee: —Mara, con x = 2 queda 0 ÷ 0: cualquier número por 0 da 0, así que no hay un solo resultado. Por eso no está definida, aunque x + 2 dé 4.
+[120.1s] lee: —Y x · x − 4 es (x − 2) · (x + 2). Si x no es 2, el (x − 2) que multiplica se va con el (x − 2) que divide, y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2.
+[120.9s] lee: Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?
+[121.7s] escena → c8.diagonal
+[122.4s] {"ended":true,"final":{"mode":"play","seg":"c8.diagonal"},"journal":["Crecer"],"evidenceKinds":["pow-product","pow-power","pow-sum","pow-quotient","cube-predict","cube-layer","cube-call","cube","sci-count3","sci-compare","sci","expand-predict","expand-place","expand-miss","expand-extra","expand","factor-try","factor-none","factor","complete-predict","complete-other","complete-zero","complete-negative","complete","log-predict","log-step","log-early","half-doubling","log","rational-predict","rational-try","rational","rational-simplify"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":122.434,"size":"1600x900","touch":false,"route":"errores","watch":false}

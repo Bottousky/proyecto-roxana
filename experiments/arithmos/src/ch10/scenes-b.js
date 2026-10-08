@@ -6,6 +6,7 @@ import {zip, pulse, follow, rectSpot, wordSpot} from '../acting.js';
 import {add, cmul, quarter, solve2} from '../logic/turns.js';
 import {SHOTS, area, boardCast, clean, poly, dot, arrow, S, seedOf, WHITE, YELLOW, BLUE} from '../ch9/common.js';
 import {studentWrites} from '../ch7/scenes-a.js';
+import {mareaNight} from '../stair.js';
 import {well, pull, SHOT_WELL, SHOT_WELL_BOARD} from './well.js';
 
 const sg = n => (n < 0 ? `−${-n}` : String(n));
@@ -377,6 +378,11 @@ export const aVeces = {
     await d.say('Mara', 'Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera.');
     g.audio.punto('question');
     await pulse(d, p, 1, 0.3).catch(() => {});
+    // esa noche vuelve la Marea: llega al primer escalón de la escalera de Balcón
+    g.flags.balconStair = true;
+    await mareaNight(d, g, {reach: 1, describe: 'De noche vuelve la Marea: una franja ancha de borrador cruza la pizarra, la escalera de Balcón y las Terrazas.'});
+    d.describe('A la mañana, a la escalera de Balcón le falta el primer escalón.');
+    await d.say('Mara', 'La Marea volvió anoche. Llegó hasta el primer escalón de la escalera de Balcón y se lo llevó: no estaba repasado. Voy a anotar hasta dónde llega cada noche.');
     g.flags.c10chance = true;
   },
 };
@@ -406,7 +412,8 @@ function writeJournal10(g) {
   const rr = first('ratio-predict');
   if (rr) seen.push(rr.answer === '3' ? 'La rampa de 6 sube 3: alto ÷ largo no cambia.' : rr.answer === '4' ? 'Para la rampa de 6 sumaste; con la misma inclinación, alto ÷ largo no cambia: sube 3.' : 'Para la rampa de 6 querías construirla; con la misma inclinación, alto ÷ largo no cambia: sube 3.');
   const r60 = first('ratio60-predict');
-  if (r60) seen.push(r60.answer === 'sin' ? 'Para la rampa de 60° usaste la tabla de la rueda: 4 · 0,87 ≈ 3,5.' : r60.answer === 'half' ? 'Para la rampa de 60° usaste la mitad, que es el seno de 30°; a 60° es 0,87: sube unos 3,5.' : 'Para la rampa de 60° doblaste el alto con el ángulo; no crece parejo: sube unos 3,5.');
+  const turns60 = ev.filter(e => e.kind === 'ratio60-turn').map(e => `${e.deg}°`);
+  if (r60) seen.push(r60.answer === 'sin' ? 'Para la rampa de 60° giraste la rueda hasta 60° y leíste 0,87: 4 · 0,87 ≈ 3,5.' : `Para la rampa de 60° giraste la rueda hasta ${turns60.join(', después ')}; a 60° la manija queda a 0,87: sube unos 3,5.`);
   const vo = first('vector-order');
   if (vo) seen.push(vo.answer === 'same' ? 'Viste que el orden de las flechas no cambia el destino.' : 'Pensaste que el orden cambiaba el destino; cambia el camino, no adónde se llega.');
   const qpr = first('quarter-predict');

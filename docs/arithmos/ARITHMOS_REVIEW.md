@@ -531,5 +531,21 @@ Informe: `artifacts/arithmos/it12/review-c9c/informe.md` (sin navegador). Las cu
 | D3 | Tocar a Punto lo movía al vecino | Corregido: su lugar también se puede tocar y dice «Punto ya está ahí» |
 | E1 | Ramas sin correr | Corregido: `--c71=9`, `--c76=b`, y 7.5 en 844×390 |
 
+## Revisión narrativa del arco entero (review-narr-arco, 2026-10-07)
+
+Informe: `artifacts/arithmos/it12/review-narr-arco/informe.md` (sin navegador; código de los 12 capítulos y capturas).
+Cierra N9-R. Los demás pendientes narrativos no cierran por siete hallazgos altos. Disposición (evidencia: `artifacts/arithmos/it13/arco/`):
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| ARC-A1 | La puerta y el deseo del estudiante desaparecen entre 1.1 y 12.8; la Ronda no se ve en el medio | Corregido: 2.1 el estudiante piensa en la puerta borrada («No hay vuelta, por ahora. Y Punto ya me cuenta entre los suyos»); al final de 8.1 la puerta del primer día aparece apenas más allá de las Terrazas, al final de 11.8 se ve más («cada cosa que entendemos la marca un poco más»), y en 12.8 termina de dibujarse («se fue dibujando de a poco… Aquel día no había vuelta; ahora sí»); la Ronda va a la fiesta de los dados (11.x) y Punto se queda mirándola |
+| ARC-A2 | La Marea dejó de amenazar; capítulos que terminan en un gancho | Corregido en parte: hay algo en juego que crece hasta el clímax. Balcón empieza su escalera nueva al final de 8.6; al final del cap. 10 (noche 0) la Marea pasa de verdad, se ve cruzar, y se lleva el primer escalón no repasado; al final del 11 (noche 1), dos. Son los datos con los que abre 12.8. Al cierre del cap. 6 la Marea cruza la recta y se lleva «pasa sumando», «se tacha» y «cambia de lado y de signo», escritas sueltas por alguien; los renglones comprobados quedan. Pendiente: el cierre del cap. 7 |
+| N6-A1 | Punto es un cursor en el cap. 6 | Corregido en 6.3: Punto se adelanta y resuelve de memoria, pasando el 3 con el signo que tenía (x = 5 + 3 = 8, en amarillo); el jugador lo pone en el 8, no cumple, y Punto borra su renglón y escribe x = 2; Recta pregunta |
+| N7-A1 | 7.3b es un cuestionario de cinco preguntas con la respuesta en la opción | Corregido: opciones con números solos; después de desplegar, el jugador cuenta los factores tocándolos; en el cociente tacha él cada 2 de abajo con uno de arriba; en el cubo dice cuándo es un cubo (con tres capas, Cornisa: «es una caja de 4 por 4 por 3») |
+| N10-A1 | 10.4 con dos menús y el estudiante diciendo que el jugador giró la rueda | Corregido: la rueda con su regla al costado de la rampa; el jugador elige hasta qué ángulo girarla (30°, 45°, 60°, 90°) y lee el alto; 4 · 0,87 ≈ 3,5 después |
+| N11-A1 | 11.7: la comparación por pares la hacía un pensamiento | Corregido: el jugador toca los dos días de cada viento y se dibuja la flecha del de menos polvo al de más; las tres bajan; recién ahí la conclusión, en una línea |
+| N12-A1 | El clímax no pone nada en juego en pantalla | Corregido: la escalera de Balcón (30 escalones, a la que la Marea ya le sacó dos) está al costado de la pizarra, borroneada; el jugador marca en el mapa la noche en que la Marea pasa los 30 y la repasa tramo por tramo; si marca la 6, la Marea de la noche 5 se ve cruzar y se lleva lo no repasado, y se rehace antes de la 6; la Marea grande es la franja de 1.4 cruzando la escalera y las Terrazas |
+| ARC-M1…M5 y medias por capítulo | Punto que no cambia, estudiante profesor, opciones que se delatan, Mara anuncia el capítulo siguiente, teléfono | Pendientes (N-ARC y N-R de cada capítulo) |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

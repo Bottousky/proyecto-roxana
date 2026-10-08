@@ -1,0 +1,345 @@
+{
+  "version": 1,
+  "chapter": 12,
+  "segment": "c12.familias",
+  "flags": {
+    "c11dice": true,
+    "c11cause": true,
+    "balconStair": true,
+    "stairLost": 2,
+    "c11anticipate": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "answer": "12",
+      "t": "2026-10-08T00:07:02.549Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-predict"
+    },
+    {
+      "a": 1,
+      "b": 1,
+      "target": 7,
+      "ok": false,
+      "t": "2026-10-08T00:07:04.436Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 1,
+      "b": 6,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:07:04.571Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 2,
+      "b": 5,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:07:04.704Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 3,
+      "b": 4,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:07:04.849Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "target": 7,
+      "found": 3,
+      "missing": 3,
+      "t": "2026-10-08T00:07:04.977Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-done"
+    },
+    {
+      "a": 4,
+      "b": 3,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:07:05.121Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 5,
+      "b": 2,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:07:05.271Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 6,
+      "b": 1,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:07:05.406Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "target": 7,
+      "found": 6,
+      "missing": 0,
+      "t": "2026-10-08T00:07:05.538Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-done"
+    },
+    {
+      "sum": 7,
+      "n": 6,
+      "t": "2026-10-08T00:07:05.538Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-mark"
+    },
+    {
+      "a": 6,
+      "b": 6,
+      "target": 12,
+      "ok": true,
+      "t": "2026-10-08T00:07:05.689Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "target": 12,
+      "found": 1,
+      "missing": 0,
+      "t": "2026-10-08T00:07:05.822Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-done"
+    },
+    {
+      "sum": 12,
+      "n": 1,
+      "t": "2026-10-08T00:07:05.823Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-mark"
+    },
+    {
+      "n7": 58,
+      "n12": 6,
+      "t": "2026-10-08T00:07:07.151Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-roll"
+    },
+    {
+      "answer": "yes",
+      "t": "2026-10-08T00:07:10.132Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-predict"
+    },
+    {
+      "t": "2026-10-08T00:07:12.214Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-pair-wrong"
+    },
+    {
+      "wind": "poco",
+      "down": true,
+      "t": "2026-10-08T00:07:12.964Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-pair"
+    },
+    {
+      "wind": "bastante",
+      "down": true,
+      "t": "2026-10-08T00:07:13.597Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-pair"
+    },
+    {
+      "wind": "mucho",
+      "down": true,
+      "t": "2026-10-08T00:07:14.230Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-pair"
+    },
+    {
+      "item": "add",
+      "said": "chance",
+      "truth": "sure",
+      "t": "2026-10-08T00:07:18.448Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "dbl",
+      "said": "sure",
+      "truth": "sure",
+      "t": "2026-10-08T00:07:19.717Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "wheel",
+      "said": "sure",
+      "truth": "sure",
+      "t": "2026-10-08T00:07:20.975Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "bucket",
+      "said": "chance",
+      "truth": "chance",
+      "t": "2026-10-08T00:07:22.226Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c11",
+      "title": "Lo que pasa a veces",
+      "abbr": "Lo que pasa a veces no se anticipa caso por caso, pero se puede contar.",
+      "body": [
+        "Con muchos casos, la parte de veces que algo pasa se acomoda cerca de un número (2 de cada 3 baldes llenos). Es algo que se observa, no una garantía: del próximo caso dice qué es más probable, no qué va a pasar.",
+        "Un número resume muchos datos y siempre esconde algo: el promedio reparte todo y uno muy grande lo arrastra; la mediana, el del medio, no. El rango dice qué tan desparejos son. En un gráfico de barras, hay que mirar dónde empieza el eje.",
+        "Cuando se elige una cosa de cada grupo, las maneras se multiplican (3 · 2 · 4 = 24). Con casos igual de posibles, la probabilidad es casos que sirven sobre casos posibles: el 7 con dos dados, 6/36; el 12, 1/36.",
+        "Que dos cosas suban juntas no dice que una cause la otra: puede haber una tercera, como el viento."
+      ],
+      "seen": [
+        "Pensaste en el 12 o en que todas salen igual; el 7 sale de 6 maneras y el 12 de una.",
+        "Pensaste que el polvo hacía borrar a la Marea; con el mismo viento, más polvo no trajo más borrones."
+      ],
+      "moments": [
+        {
+          "id": "c11.dados",
+          "label": "Desplegar: dos dados"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c11.dados",
+    "c11.causa",
+    "c11.anticipar"
+  ],
+  "moments": [
+    "c11.dados"
+  ],
+  "log": [
+    {
+      "who": null,
+      "text": "La Ronda vino a la fiesta. Punto la mira un rato largo, y después vuelve conmigo."
+    },
+    {
+      "who": "Rampa",
+      "text": "¡Doce! ¿Vieron? En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande."
+    },
+    {
+      "who": null,
+      "text": "1 + 1 = 2, no 7."
+    },
+    {
+      "who": null,
+      "text": "Faltan algunos: los que suman 7 forman una diagonal."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, el 7 sale de 6 maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene 6/36 de probabilidad y el 12, 1/36."
+    },
+    {
+      "who": "Rampa",
+      "text": "En la tabla, sí. ¿Y tirando de verdad?"
+    },
+    {
+      "who": null,
+      "text": "Contando, el 7 debería salir cerca de 60 veces de 360 y el 12, cerca de 10. Salieron 58 y 6: cerca, no exacto."
+    },
+    {
+      "who": "Rampa",
+      "text": "Me paso al 7. Aunque el 12 puede salir igual: no es imposible, es raro."
+    },
+    {
+      "who": "Mara",
+      "text": "Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche."
+    },
+    {
+      "who": "Mara",
+      "text": "Me olvidaba: también anoté el viento."
+    },
+    {
+      "who": "Mara",
+      "text": "Para ver qué hace el polvo solo, compará días con el mismo viento."
+    },
+    {
+      "who": null,
+      "text": "Esos dos tienen distinto viento: así no se ve qué hace el polvo solo. Compará los que tienen el mismo."
+    },
+    {
+      "who": null,
+      "text": "Las tres flechas bajan: con el mismo viento, más polvo no trajo más borrones."
+    },
+    {
+      "who": "student",
+      "text": "Mara, que dos cosas suban juntas no dice que una cause la otra. Acá el que acompaña a los borrones parece el viento. Pero son seis días: habría que anotar muchos más."
+    },
+    {
+      "who": "Balcón",
+      "text": "La escalera de Mara crece de a 10, la de Punto se duplica, la rueda vuelve, el balde a veces sí y a veces no. ¿Con todo eso se puede saber qué viene?"
+    },
+    {
+      "who": null,
+      "text": "Tiene una regla que no cambia: se puede calcular exacto."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar."
+    },
+    {
+      "who": null,
+      "text": "¿Y la vuelta, se anticipa? La puerta del primer día se ve más que la otra vez. Cada cosa que entendemos la marca un poco más."
+    },
+    {
+      "who": "Mara",
+      "text": "Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?"
+    },
+    {
+      "who": "Mara",
+      "text": "Anoche, dos escalones. La anterior, uno. Cada noche llega más alto, y la escalera de Balcón sigue sin repasar."
+    }
+  ],
+  "createdAt": "2026-10-08T00:06:59.479Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    11
+  ]
+}
