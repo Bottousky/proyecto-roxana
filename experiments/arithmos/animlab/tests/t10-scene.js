@@ -11,7 +11,7 @@ import {Figure} from '../../src/engine/figure.js';
 import {BLUE} from '../../src/engine/chalk.js';
 import {buildActor, ik} from '../core/actor.js';
 import {POSES2} from '../core/poses.js';
-import {depositStroke, drawDeposit, depositTip, depositSpeed} from '../core/deposit.js';
+import {depositStroke, drawDeposit, drawDepositCached, depositTip, depositSpeed} from '../core/deposit.js';
 import {glyphGuides, GLYPHS} from '../core/glyphs.js';
 import {circleGuide} from '../core/gesture.js';
 import {blobOutline, fillPressure} from '../core/blob.js';
@@ -70,8 +70,10 @@ function build() {
     // el hilo celeste: del punto contado a la marca que le corresponde (la correspondencia se ve, no sólo se cronometra)
     const mid = guide[0];
     // llega a la marca desde la derecha, con una curva suave: no pasa por encima de la cabeza (t10i: el abanico tapaba la cara)
-    const a = [DOTS[i][0] - 20, DOTS[i][1] + 4], b = [mid[0] + 12, mid[1] + 4];
-    const c = [b[0] + 0.45 * (a[0] - b[0]), Math.max(a[1], b[1]) + 18];
+    // y baja sobre su marca desde arriba: no cruza las otras marcas (c11/cache-cmp: los hilos atravesaban el atado)
+    // sale hacia arriba y pasa por encima de la Ronda: no atraviesa otros puntos (t10k: cruzaba anillos vecinos)
+    const a = [DOTS[i][0] - 6, DOTS[i][1] - 22], b = [mid[0] + 2, mid[1] - 12];
+    const c = [(a[0] + b[0]) / 2 + 60, Math.min(...DOTS.map(d => d[1])) - 110];
     const link = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; });
     const linkSt = depositStroke(link, {w: 2.6, p: 0.5, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
     sc.links.push({t: land + 0.15, st: linkSt});
@@ -239,9 +241,11 @@ export default {
       const sl = 1 - hit;
       fillPressure(ctx, blobOutline(x, y + 2 * hit * 8, 8.5 * (1 + 0.03 * Math.sin(t * 2.6 + i)), {ang: Math.PI / 2, sl, sw: 1 / sl, boil: frame % 3, seed: 20 + i}), 0, 0.74, [x, y], 9);
     });
-    for (const r of S.rings) drawDeposit(ctx, r.st, t - r.t);
-    for (const l of S.links) drawDeposit(ctx, l.st, t - l.t);
-    for (const s of S.strokes) drawDeposit(ctx, s.st, t - s.t);
+    // lo terminado se dibuja desde su bitmap (se estampa una sola vez); `?nocache` para comparar
+    const draw = lab.params.has('nocache') ? drawDeposit : drawDepositCached;
+    for (const r of S.rings) draw(ctx, r.st, t - r.t);
+    for (const l of S.links) draw(ctx, l.st, t - l.t);
+    for (const s of S.strokes) draw(ctx, s.st, t - s.t);
     // alumno
     const sk = S.actor.at(t);
     const arm = writingArm(t, sk);

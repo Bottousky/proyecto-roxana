@@ -132,3 +132,34 @@ export function depositSpeed(st, tl) {
   const i = indexAt(st.plan, tl);
   return st.plan.v[Math.min(st.path.n - 1, Math.round(i))];
 }
+
+/**
+ * Igual que drawDeposit, pero un trazo ya terminado se dibuja desde un bitmap (se estampa una sola vez).
+ * El bitmap guarda la presión en espacio de mundo a la escala de la vista (se rehace si la escala cambia > 30 %).
+ * Se compone con 'lighter', como las estampas: el resultado es el mismo que estamparlo.
+ */
+export function drawDepositCached(ctx, st, tl = Infinity, fade = 1) {
+  if (tl < st.T || fade !== 1) return drawDeposit(ctx, st, tl, fade);
+  const m = ctx.getTransform();
+  const scale = Math.hypot(m.a, m.b);
+  let c = st.cache;
+  if (!c || c.scale < scale * 0.77 || c.scale > scale * 1.3) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const d of st.dabs) { x0 = Math.min(x0, d.x); y0 = Math.min(y0, d.y); x1 = Math.max(x1, d.x); y1 = Math.max(y1, d.y); }
+    const pad = st.w;
+    x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+    const W = Math.max(1, Math.ceil((x1 - x0) * scale)), H = Math.max(1, Math.ceil((y1 - y0) * scale));
+    const canvas = c?.canvas || document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const x = canvas.getContext('2d');
+    x.fillStyle = '#000';
+    x.fillRect(0, 0, W, H);
+    x.setTransform(scale, 0, 0, scale, -x0 * scale, -y0 * scale);
+    drawDeposit(x, st, Infinity, 1);
+    c = st.cache = {canvas, scale, x0, y0, w: x1 - x0, h: y1 - y0};
+  }
+  const prev = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.drawImage(c.canvas, c.x0, c.y0, c.w, c.h);
+  ctx.globalCompositeOperation = prev;
+}

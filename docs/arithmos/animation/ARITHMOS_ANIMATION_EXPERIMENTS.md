@@ -274,3 +274,9 @@ Veredicto R2: **No** (Actuación, Textura, Legibilidad, Continuidad en N2; Matem
 
 ## VS1 — vertical slice candidata (ciclo 11)
 `animlab/?test=10&play=1` (clic para sonido). Evidencia `c11/t10j`. Pendiente: revisión R3 sobre esta versión.
+
+## E12 — rendimiento y VS1.1 (ciclo 11, 2026-10-07)
+
+**Rendimiento** (VS1, Chrome de escritorio con GPU, 120 instantes buscados): sin caché, tiza 4.9 ms (p95 6.3) y cuadro 10 ms; con `drawDepositCached` (un trazo terminado se estampa una vez en un bitmap a la escala de la vista y se compone con 'lighter') **tiza 0.8 ms (p95 2.2–2.5) y cuadro ~1 ms** en 1600×900@1, @2 y 844×390@3. Regresión de píxeles con/sin caché (`scripts/animlab-diff.mjs`): |Δ| medio 0.29–0.35 / 255, 0.27–0.33 % de píxeles con |Δ| > 16 (bordes del umbral del diente); visualmente idéntico (`c11/cache-cmp.png`). Teléfono real: sin medir [H].
+
+**VS1.1** (`c11/t10l`): los hilos celestes salen hacia arriba de cada punto y bajan sobre su marca pasando por encima de la Ronda: ya no atraviesan otros anillos ni cruzan el atado (`t10l/final.png`). El plano final es el diagrama de la correspondencia uno a uno.
