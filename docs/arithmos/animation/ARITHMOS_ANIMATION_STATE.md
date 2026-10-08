@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-08, ciclo 22.
+**Última actualización**: 2026-10-08, ciclo 23.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Ver la vertical slice
@@ -46,6 +46,7 @@
 - R13: **N3 en todas las dimensiones**; No a N4 (comprensión sobre pasos, saltos rápidos triangulares). **VS13** (`c24/vs13`): comprensión tras 0.43 s quieto y sin pasos, brazo de «¡ya está!» que ya no atraviesa la cabeza, saltos con crucero y más bajos cuanto más rápidos.
 - R14: N3 en todo, **N4 en Timing y Matemática**; Actuación N3 por la mirada. **VS14** (`c25/vs14`): ojos que se leen (hasta 5·k, dentro de la cabeza), pausa del atado de cinco y salto al primer grupo en la tabla, zoom escalonado tras el paso atrás.
 - R15: **N4 en Timing, Matemática y Legibilidad**; Actuación N3 (anticipaciones), Textura sin toque medido. **VS15** (`c26/vs15b`): contramovimiento del brazo, Punto posado con inercia, toque/levantada corregidos en el depósito y medidos (1.14 / 0.42).
+- **R16: aprobada** (N3 en todo; N4 en Timing, Actuación y Matemática). Benchmark congelado `c26/vs15b`.
 - R10: No (salto de Punto, hilo que cruzaba el «2»). **VS10** (`c20/t10a`) corrige ambos; tiempos de marcas verificados con sondas (≤ 0.1 s tras cada aterrizaje).
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
@@ -63,7 +64,8 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **R16 sobre VS15** (`c26/vs15b`). R15: N4 en Timing, Matemática y Legibilidad; su lista para Actuación N4 (contramovimiento del brazo, reacción de Punto posado) y Textura N3 (toque y levantada medidos, tras corregir el depósito) está aplicada. Si aprueba N4: congelar `c26/vs15b/main` como benchmark y pasar a los adaptadores (MIGRATION: cámara → trazos → Label → Punto → figura).
+1. **Migración (empieza)**: la slice pasó la revisión independiente R16 (N3 en todo, N4 en Timing/Actuación/Matemática). **Benchmark congelado: `artifacts/arithmos/animlab/c26/vs15b`** (etiqueta local `arithmos-animlab-benchmark-vs15`). Siguiente: adaptadores detrás de `?anim=2` en el orden de MIGRATION (cámara → trazos → Label → Punto → figura), con capturas A/B del capítulo 1 y la corrida del bot por paso.
+2. Pulido de la slice (no bloqueante, con revisión propia): pendientes D1, D3, D4, E1–E4 de R16 (EXPERIMENTS).
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
 4. ~~Rendimiento en escritorio~~ (E12: ~1 ms/cuadro con caché). Teléfono real [H].

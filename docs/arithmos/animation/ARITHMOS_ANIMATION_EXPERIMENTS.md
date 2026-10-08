@@ -434,3 +434,14 @@ R15: **N4 en Timing, Matemática y Legibilidad**; Actuación N3 (faltan dos anti
 3. Nacimiento de Punto → decisión de diseño; tira densa en `strip-nace` (mota → crece con sobrepaso).
 4. «comprende» no coincidía con un inicio de movimiento → la tabla separa «contramovimiento (baja la cabeza)», «levanta la vista a la Ronda» y «comprende» («¡ya está!», el brazo sube ~0.14 s después).
 **Toque y levantada (Textura N3)**: al medirlos apareció un **error del depósito**: el toque (+18 %) se aplicaba antes del tope de la cantidad por estampa y el tope se lo comía (mediana +0 %). Ahora toque y levantada se aplican después del tope (el cuerpo del trazo no cambia). **Medido: por trazo, toque 1.14 y últimos 3 px 0.42 del tramo medio (11 trazos); en la presión dibujada de la llave, primeros 5 px 1.19 y final 0.28** (VL §2: +10–18 %, cae al 35 %). La dependencia del depósito con la velocidad (N4) no se puede medir en la cantidad (el cuerpo del trazo está topado): queda sin certificar.
+
+## Revisión R16 (VS15) — ciclo 23: **aprobada**
+R16: **Sí — N3 en las seis dimensiones y N4 en Timing, Actuación y Matemática** (Timing 4, Actuación 4, Textura 3, Legibilidad 3, Continuidad 3, Matemática 4). Sonido y Rendimiento quedan sin certificar [H]/[dispositivo]. Lo que la separa de N5 (según R16): contraste error/comprensión, polvo residual o borrado, ritmo que cambia con el estado de ánimo, predicción del cuadro siguiente [H].
+**Benchmark congelado: `c26/vs15b`** (commit 948a9c75; etiqueta local `arithmos-animlab-benchmark-vs15`).
+Pendientes no bloqueantes de R16 (para una pasada de pulido con su propia revisión, sin tocar el benchmark):
+- D1 «Punto vuela 15.8 → 18.4 s sin motivo visible» → es el lazo grande que Punto traza (y el hilo a la llave); **falta evidencia**: tira densa del lazo grande y sonda de contacto de Punto (el lazo no aparece en `contact`, que es la tiza del alumno).
+- D2 «bajar la presión de los lazos chicos tras la unión» → **rechazado** (fundido, VL §8).
+- D3 el pie izquierdo se corre 3.5 px al despegar (19.77–19.81, alza 0.02–0.23): fijar el pie hasta que se levante de verdad.
+- D4 la mano sube 174 → 341 en 0.33 s (pico ~3800 px/s) al terminar el 7, sin gesto legible: el brazo que escribe se suelta hacia la pose; bajarlo con el paso atrás.
+- D5 la mirada satura en su tope en 22.4–22.7 s: aceptado como decisión o reescalar.
+- E1–E4: cuadros 15.80/16.00/16.20 (llave), definir la métrica de quietud antes de comprender en el QUALITY_BAR, una sola definición de vuelo (la del plan, sin agachada), pausa del 7 en el límite (0.35 s).
