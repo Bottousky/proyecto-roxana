@@ -122,6 +122,7 @@ function build(taps = autoTaps()) {
     sc.gaze.push({t: land + 0.02, gaze: [0.55, 0.55], overrides: {tilt: 0.28, lean: 0.1}});
     const markEnd = write(chalk(guide, 60 + n, {motion: {speed: n === 4 ? 900 : 620}}), land + 0.1, `marca${n}`);
     sc.links.push({t: markEnd + 0.04, st: linkSt, i, n, b, seed: 80 + i});
+    if (n === 4) ev('cierra el atado de cinco (pausa de 0.4 s)', markEnd);
     n++;
     t = land + 0.1;
   }
@@ -173,6 +174,7 @@ function build(taps = autoTaps()) {
   };
   let tp = t + 0.3;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from, to: startOf(L5), h: 40, brake: true});
+  ev('Punto va al primer grupo', tp);
   tp += 0.45 + 0.4; // Punto quieto 0.4 s antes del lazo y del 5 (R12: 0.25)
   sc.punto.push({kind: 'trace', t: tp - 0.14, st: L5});
   const tL5 = tp;
@@ -498,7 +500,7 @@ function perchAt(t) {
 /** Planos: medio fijo; al aparecer Punto se acerca (la causa es Punto) y llega antes de contar; se abre al alejarse el alumno. */
 function cameraShots(T_PUNTO, T_BACK) {
   const shots = [{t: 0, cx: 1440, cy: 600, w: 1250}, {t: T_PUNTO + 0.45, cx: 1470, cy: 598, w: 1100, arrive: T_PUNTO + 0.85}]; // el pie apoya dentro del cuadro (R7)
-  if (Number.isFinite(T_BACK)) shots.push({t: T_BACK + 0.15, cx: 1385, cy: 600, w: 1220}); // empieza con el paso atrás
+  if (Number.isFinite(T_BACK)) shots.push({t: T_BACK + 0.5, cx: 1385, cy: 600, w: 1220}); // después del primer paso atrás y de que Punto se posa (R14: tres movimientos juntos)
   return shots;
 }
 
@@ -669,7 +671,7 @@ export default {
     const sk = S.actor.at(t);
     writingArm(t, sk); // la mano tal como se dibuja (R12: la sonda medía la de la pose, quieta mientras escribía)
     // pies tal como se dibujan (esqueleto), no el plan de pisadas
-    return {pieL: +sk.lL[2][0].toFixed(2), pieR: +sk.lR[2][0].toFixed(2), alzaL: +(G - sk.lL[2][1]).toFixed(2), alzaR: +(G - sk.lR[2][1]).toFixed(2), headUp: +(-(sk.head[0] - sk.neck[0]) * 0 + (sk.neck[1] - sk.head[1])).toFixed(2), tilt: +Math.atan2(sk.head[0] - sk.neck[0], sk.neck[1] - sk.head[1]).toFixed(3), handH: G - sk.aR[2][1], torso: +Math.atan2(sk.neck[0] - sk.hip[0], sk.hip[1] - sk.neck[1]).toFixed(3), contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1), size: +(p.fill * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
+    return {pieL: +sk.lL[2][0].toFixed(2), pieR: +sk.lR[2][0].toFixed(2), alzaL: +(G - sk.lL[2][1]).toFixed(2), alzaR: +(G - sk.lR[2][1]).toFixed(2), headUp: +(-(sk.head[0] - sk.neck[0]) * 0 + (sk.neck[1] - sk.head[1])).toFixed(2), tilt: +Math.atan2(sk.head[0] - sk.neck[0], sk.neck[1] - sk.head[1]).toFixed(3), handH: G - sk.aR[2][1], torso: +Math.atan2(sk.neck[0] - sk.hip[0], sk.hip[1] - sk.neck[1]).toFixed(3), contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1), size: +(p.fill * 100).toFixed(1)} : null, cam: S.camera.at(t)[2], mirada: S.actor.gaze(t).map(v => +v.toFixed(3))};
   },
   metrics(lab) {
     // alcance: ¿la mano llega a cada punto de cada trazo? (error > 0 = la tiza estaría fuera del brazo)

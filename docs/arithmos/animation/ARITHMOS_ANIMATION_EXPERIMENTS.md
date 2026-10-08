@@ -418,3 +418,11 @@ R13: **No, pero N3 en todas las dimensiones** (mínimo de producción). Falta N4
 4. Sobrepaso del salto 7 en el límite (8 %) → tope bajado a 6 %.
 Evidencia faltante: (a) polvo de Punto entre 19.5 y 21.9 s → **no aplica**: Punto va posado en la cabeza del alumno, no se desliza sobre el pizarrón; (b) fusión de hilos → recortes a dpr 2 en `hilos-recortes.png` (−0.05, +0.3, +0.6, +1.0 s; la fusión completa dura 0.7 s + 0.06 s por hilo); (c) **pico/media por trazo de tiza: 1.26–1.89** (mediana 1.73, 14 trazos); (e) **altura de las cifras en 844×390: 26.1 px CSS al escribir, 23.5 en el plano final**.
 Pies: deslizamiento máx. 0.51 px por 1/240 s (al despegar el pie al empezar el paso atrás).
+
+## Revisión R14 (VS13) y VS14 — ciclo 21
+R14: **N3 en todo; N4 en Timing (condicionado a fijar la lectura de «3.ª marca») y en Matemática; Actuación N3** porque la mirada no se veía (ojos centrados y simétricos en los cuadros). Disposición (`c25/vs14`):
+1. Mirada [C] → **aceptado, y era real**: los ojos se corrían 3·k en una cabeza de ~13·k: siempre parecían centrados. Ahora hasta 5·k (horizontal) y 4.5·k (vertical), dentro de la cabeza (si no, el ojo de afuera se pegaba al contorno). `mirada-caras.png`: mira arriba a la derecha al punto en la agachada del salto, baja a la marca al escribir, arriba a la Ronda antes de comprender; sonda `mirada` en `probes.json`.
+2. «3.ª marca»: el QUALITY_BAR ahora dice cuál es el gesto repetido (el vuelo de cada conteo; aclaración R14) — 0.70.
+3. Pausa de 0.98 s entre la 5.ª y la 6.ª marca → **diseño, ahora en la tabla**: «cierra el atado de cinco (pausa de 0.4 s)»; el atado de cinco es la idea que prepara 5 + 2. Desplazamiento de Punto tras el 7.º conteo → evento «Punto va al primer grupo».
+4. Hilos a plena presión durante el conteo (7.7–13.3 s) → **no se cambia**: son las correspondencias que se están construyendo (el foco del conteo); bajarles la presión sería el fundido que prohíbe VL §8. Al cerrarse cada lazo se juntan (ya en VS12).
+5. Paso atrás + zoom + Punto volviendo a la cabeza en el mismo instante → **aceptado**: el zoom empieza 0.35 s después (tras el primer paso y con Punto ya posado).

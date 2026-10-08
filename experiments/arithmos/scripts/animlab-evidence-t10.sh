@@ -136,6 +136,11 @@ cap "$D/hilos-recortes" --frames=2 --dpr=2 "--crop=$HC"
 node scripts/animlab-stack.mjs "$D/hilos-recortes.png" "$D/hilos-recortes/crop-0.png" "$D/hilos-recortes/crop-1.png" "$D/hilos-recortes/crop-2.png" "$D/hilos-recortes/crop-3.png" >/dev/null
 GC=$(EV comprende); TC=$(python3 -c "g=$GC;print(','.join(str(round(g+d,2)) for d in (-1.2,-0.62,-0.4,-0.1,0.15,0.4,0.8,1.6)))")
 cap "$D/strip-comprende" --cols=4 "--times=$TC"
+# mirada [C]: la cara al mirar un punto (en la agachada de un salto), al bajar a la marca y en la comprensión
+H2=$(python3 -c "import json;h=[x for x in json.load(open('$D/main/metrics.json'))['metrics']['hops'] if 6<x['t']<8][0];print(round(h['t']+0.1,2), round(h['t']+h['dur']+0.25,2))")
+set -- $H2; TA=$1; TB=$2; TR=$(python3 -c "print(round($GC - 0.3, 2))"); TE=$(python3 -c "print(round($GC + 0.75, 2))")
+cap "$D/mirada-caras" --frames=2 --dpr=2 "--crop=150,250,500,450,$TA;150,250,500,450,$TB;0,150,700,700,$TR;0,150,700,700,$TE"
+node scripts/animlab-stack.mjs "$D/mirada-caras.png" "$D/mirada-caras/crop-0.png" "$D/mirada-caras/crop-1.png" "$D/mirada-caras/crop-2.png" "$D/mirada-caras/crop-3.png" >/dev/null
 mkdir -p "$D/interactive" && node scripts/animlab-interact.mjs "$D/interactive" >/dev/null
 node scripts/animlab-stack.mjs "$D/interactive.png" "$D/interactive/2-ya-contado.png" "$D/interactive/3-final.png" >/dev/null
 { echo "# $VS — tabla de tiempos (ordenada)"; echo; cat "$D/timeline-table.md"; echo; echo "Medidas de ESTA corrida (main/probes.json, 240 Hz):"; sed 's/^/- /' "$D/medidas.txt"; } > "$D/timeline.md"

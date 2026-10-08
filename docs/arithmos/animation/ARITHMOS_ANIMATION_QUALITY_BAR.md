@@ -28,7 +28,7 @@ Cómo se verifica cada nivel: **[S]** sonda numérica (`__lab.probe`, gráficos 
 - **N1**: progreso lineal o ease genérico idéntico para todo.
 - **N2**: nada arranca ni para en seco salvo a propósito (impactos). [S] velocidad continua: sin saltos > 40 % entre cuadros a 60 Hz, salvo impactos marcados.
 - **N3**: trazos con plan de mano: aceleración acotada, frenada en curvas (v ∝ κ^-1/3 ±), levantadas que dependen de la distancia. [S] gráfico de velocidad de la punta: forma trapezoidal o en campana, nunca rectangular ni triangular con pico > 2× crucero.
-- **N4**: las pausas están **dirigidas**: antes de un cambio de idea hay un tiempo de lectura (≥ 0.35 s quieto), y las acciones repetidas se aceleran (la 3.ª marca tarda ≤ 80 % de la 1.ª). [S] tabla de tiempos de la escena.
+- **N4**: las pausas están **dirigidas**: antes de un cambio de idea hay un tiempo de lectura (≥ 0.35 s quieto), y las acciones repetidas se aceleran (la 3.ª repetición del gesto tarda ≤ 80 % de la 1.ª; en un conteo, el gesto es el vuelo de cada conteo — aclaración R14: no el intervalo entre marcas, que incluye las pausas dirigidas como el atado de cinco). [S] tabla de tiempos de la escena.
 - **N5**: el ritmo cambia con el estado emocional (duda = trazos lentos con micro-pausas; comprensión = trazo continuo). [R]+[H].
 
 ### Actuación (personaje y Punto)

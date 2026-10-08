@@ -339,11 +339,17 @@ export function drawFigureDeposit(ctx, sk, {boil = 0, gaze = [0, 0], blink = 0, 
   });
   // ojos
   const f = sk.f, front = 1 - Math.abs(f);
-  const ex = sk.head[0] + f * 5 * k + gaze[0] * 3.2 * k, ey = sk.head[1] - 1.5 * k + gaze[1] * 3 * k + sk.tilt * 2 * k;
+  // la mirada se tiene que leer en una figura de palitos: los ojos se corren hasta ~5·k hacia donde mira (R14: con 3·k se veían
+  // siempre centrados)
+  const ex = sk.head[0] + f * 5 * k + gaze[0] * 5 * k, ey = sk.head[1] - 1.5 * k + gaze[1] * 4.5 * k + sk.tilt * 2 * k;
   const sep = (2.6 + front * 3.4) * k;
+  // cada ojo queda dentro de la cabeza (con margen para el trazo): si no, el de afuera se pegaba al contorno
+  const rIn = BONES.head * k - 3.4 * k;
   for (const sx of [-1, 1]) {
-    const x = ex + sx * sep;
-    const g = blink > 0 ? [[x - 1.6 * k, ey], [x + 1.6 * k, ey]] : _circle(x, ey, 0.9 * k, rnd, {overshoot: 0.6});
+    let x = ex + sx * sep, y = ey;
+    const dx = x - sk.head[0], dy = y - sk.head[1], d = Math.hypot(dx, dy);
+    if (d > rIn) { x = sk.head[0] + dx / d * rIn; y = sk.head[1] + dy / d * rIn; }
+    const g = blink > 0 ? [[x - 1.6 * k, y], [x + 1.6 * k, y]] : _circle(x, y, 0.9 * k, rnd, {overshoot: 0.6});
     _draw(ctx, _dep(g, {w: 2.4 * k, p: 1, ch, seed: 3000 + sx, tremor: 0, land: false, lift: false, motion: {speed: 4000, accel: 1e6}}));
   }
   // la tiza en la mano
