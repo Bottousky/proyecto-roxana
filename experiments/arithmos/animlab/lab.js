@@ -100,6 +100,8 @@ window.__lab = {
     return {wav: r.wav, rms: Array.from(r.rms, v => +v.toFixed(5))};
   },
   metrics: () => test.metrics?.(lab) ?? null,
+  /** Duración vigente (la escena interactiva la conoce recién cuando el jugador terminó de contar). */
+  dur: () => test.duration,
   /** Perfil por columnas de una franja de mundo: pico de presión y ancho (px de mundo sobre el umbral). */
   columns(x, y, w, h, ch = 0, thr = 0.3) {
     const v = lab.view, c = renderer.chalkCtx;

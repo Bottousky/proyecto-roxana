@@ -41,6 +41,7 @@
 - R7 → VS7 (anticipación y rampa de Punto en los lazos, suelo dentro del plano, hilo que nace de su marca, brazos quietos al retroceder).
 - R8 → **VS8** (`c18/t10c`): corregido un error del planificador de movimiento que afectaba a todos los tests (suavizado que subía la velocidad junto a los extremos: 92 000 px/s²; frenadas por curvatura sin límite) → máx. 5000 px/s² medido sobre el plan; en el conteo salteado los puntos se juntan antes de los lazos; hilos atenuados tras la unión. Todos los tests del laboratorio corren sin errores tras el cambio.
 - R9: **N3 en todo** (mínimo de producción alcanzado). **VS9** (`c19/t10k`): saltos 3.º/1.º = 0.71, mirada que sigue cada punto, hilo de los lazos a la llave y al 7, comprensión con contramovimiento y sin vaivén; E16 pies plantados (deslizamiento 16.2 → 0.42 px por 1/240 s). Pendiente: R10 (N4 en Timing/Actuación/Matemática).
+- R11: No (saltos de Punto sin rampa, cabeza fija al contar, quietud corta). **VS11** (`c22/vs11`): salto en cuatro fases (Δvx/pico ≤ 0.32 por cuadro de 60 Hz), cabeza que sigue cada punto, quietud 0.53 s, nacimiento de Punto con sobrepaso; corregidos además un salto del torso al terminar de caminar, la orientación y aplastamientos en escalón; 0 saltos de posición aislados.
 - R10: No (salto de Punto, hilo que cruzaba el «2»). **VS10** (`c20/t10a`) corrige ambos; tiempos de marcas verificados con sondas (≤ 0.1 s tras cada aterrizaje).
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
@@ -58,7 +59,7 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **R11 sobre VS10** (en curso): evidencia completa en `c21/` generada con `scripts/animlab-evidence-t10.sh` (medidas: saltos 3.º/1.º = 0.71, tiza 5000 px/s², pies 0.43 px, Punto ≤ 4.82 px por 1/240 s fuera del conteo, reachOver 0). Si aprueba N4: congelar `c21/main` como benchmark y pasar a los adaptadores del plan de migración (mapa de APIs del motor en preparación, sólo lectura).
+1. **R12 sobre VS11** (`c22/vs11`, generada con `scripts/animlab-evidence-t10.sh`). R11 (No: Timing N2, Actuación N3) dispuesto punto por punto en EXPERIMENTS. Si aprueba N4: congelar `c22/vs11/main` como benchmark y pasar a los adaptadores (orden en MIGRATION: cámara → trazos → Label → Punto → figura).
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
 4. ~~Rendimiento en escritorio~~ (E12: ~1 ms/cuadro con caché). Teléfono real [H].

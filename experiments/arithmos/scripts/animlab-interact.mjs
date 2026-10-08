@@ -26,9 +26,9 @@ for (const [k, i] of order.entries()) {
   else await p.waitForTimeout(1100);
 }
 // el final: esperar a que la escena termine (duración ya finita tras contar los siete)
-await p.waitForFunction(() => window.__lab.now() >= (window.__labDur?.() ?? 0) - 0.2 || window.__lab.now() > 20, null, {timeout: 30000}).catch(() => {});
-await p.waitForTimeout(2500);
+// (R11: antes cortaba a los 20 s, con la escena todavía a la mitad)
+const ended = await p.waitForFunction(() => { const D = window.__lab.dur(); return Number.isFinite(D) && window.__lab.now() >= D - 0.15; }, null, {timeout: 45000}).then(() => true, () => false);
 await p.screenshot({path: `${out}/3-final.png`});
-const res = await p.evaluate(() => ({t: window.__lab.now()}));
-console.log(JSON.stringify({errors, waitingAt: st, after: res}));
+const res = await p.evaluate(() => ({t: window.__lab.now(), dur: window.__lab.dur()}));
+console.log(JSON.stringify({errors, ended, waitingAt: st, after: res}));
 await b.close(); server.close();

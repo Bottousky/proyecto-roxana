@@ -82,7 +82,13 @@ function build(taps = autoTaps()) {
     const to = [DOTS[i][0], DOTS[i][1] - 36]; // se posa arriba del punto, sin pisar el anillo (R2)
     sc.punto.push({kind: 'hop', t, dur, from, to, h: 36 + 8 * (n === 0)});
     // los ojos van al punto antes de que Punto llegue (la mirada lidera) y después bajan a la marca
-    if (!again) { const hx = X1 + 6, hy = G - 335, dx = DOTS[i][0] - hx, dy = DOTS[i][1] - hy, l = Math.hypot(dx, dy); sc.gaze.push({t: t + dur * 0.4, gaze: [dx / l, dy / l * 1.4]}); }
+    // R11: la cabeza quedaba fija 5.8–10.4 s (sólo se movían los ojos, ±3 px): ahora la mirada Y la cabeza van al punto
+    // ~0.1 s antes del despegue (agachada 0.12 s) y bajan a la marca al escribir
+    { const hx = X1 + 6, hy = G - 335, dx = DOTS[i][0] - hx, dy = DOTS[i][1] - hy, l = Math.hypot(dx, dy);
+      const look = {gaze: [dx / l, dy / l * 1.4], overrides: {tilt: -0.1 + 0.8 * Math.atan2(dy, dx), lean: 0.05}};
+      sc.gaze.push({t: t + 0.02, ...look});
+      if (n === 0 && !again) sc.gaze.push({t: t + 0.301, ...look}); // la pose de escribir (t + 0.3) borra los ajustes: se repite
+    }
     const land = t + dur;
     from = to;
     if (again) {
@@ -112,7 +118,7 @@ function build(taps = autoTaps()) {
     const link = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; });
     // el hilo nace de la marca recién escrita y sube hasta su punto (R7: «cada hilo nace de su marca»)
     const linkSt = depositStroke(link.reverse(), {w: 2.6, p: 0.46, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
-    sc.gaze.push({t: land + 0.02, gaze: [0.55, 0.55]});
+    sc.gaze.push({t: land + 0.02, gaze: [0.55, 0.55], overrides: {tilt: 0.28, lean: 0.1}});
     const markEnd = write(chalk(guide, 60 + n, {motion: {speed: n === 4 ? 900 : 620}}), land + 0.1, `marca${n}`);
     sc.links.push({t: markEnd + 0.04, st: linkSt, i, n, b, seed: 80 + i});
     n++;
@@ -165,7 +171,7 @@ function build(taps = autoTaps()) {
     t += 0.04;
   };
   let tp = t + 0.3;
-  sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from, to: startOf(L5), h: 40});
+  sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from, to: startOf(L5), h: 40, brake: true});
   tp += 0.45 + 0.25;
   sc.punto.push({kind: 'trace', t: tp - 0.14, st: L5});
   sc.links.push({t: tp, st: L5});
@@ -175,7 +181,7 @@ function build(taps = autoTaps()) {
   ev('escribe el 5', sc.strokes.find(x => x.tag === '5').t);
   ev('lazo de 5', tp);
   tp = Math.max(tp + L5.T, t) + 0.15;
-  sc.punto.push({kind: 'hop', t: tp, dur: 0.4, from: endOf(L5), to: startOf(L2), h: 30});
+  sc.punto.push({kind: 'hop', t: tp, dur: 0.4, from: endOf(L5), to: startOf(L2), h: 30, brake: true});
   tp += 0.4 + 0.2;
   sc.punto.push({kind: 'trace', t: tp - 0.14, st: L2});
   sc.links.push({t: tp, st: L2});
@@ -193,8 +199,8 @@ function build(taps = autoTaps()) {
   const cxR = DOTS.reduce((a, d) => a + d[0], 0) / DOTS.length, cyR = DOTS.reduce((a, d) => a + d[1], 0) / DOTS.length;
   const braceEnd = [TALLY.x + TALLY.pairDx + TALLY.gap + 6, NUM.y + 10];
   const LALL = depositStroke(lassoGuide(DOTS, 58, 172, Math.atan2(braceEnd[1] - cyR, braceEnd[0] - cxR)), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 2500, v0: 8, v1: 10, k0: 1 / 60, smooth: 90}});
-  tp = Math.max(tp + L2.T, t) + 0.2;
-  sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from: endOf(L2), to: startOf(LALL), h: 40});
+  tp = Math.max(tp + L2.T, t) + 0.42; // quietud ≥ 0.35 s con «5+2» escrito antes de unir (R11: 0.31 s)
+  sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from: endOf(L2), to: startOf(LALL), h: 40, brake: true});
   tp += 0.45 + 0.2;
   const T_STEP = tp;
   ev('une los grupos', T_STEP);
@@ -217,8 +223,8 @@ function build(taps = autoTaps()) {
     const ctrl = [tip[0] + (e0[0] - tip[0]) * 0.35, Math.max(e0[1], tip[1]) + 40];
     const carryG = Array.from({length: 30}, (_, k) => { const u = k / 29; return [(1 - u) ** 2 * e0[0] + 2 * (1 - u) * u * ctrl[0] + u * u * tip[0], (1 - u) ** 2 * e0[1] + 2 * (1 - u) * u * ctrl[1] + u * u * tip[1]]; });
     const CARRY = depositStroke(carryG, {w: 3.6, p: 0.78, ch: BLUE, seed: 173, motion: {speed: 700, accel: 2500, v0: 10, v1: 10, smooth: 90}});
-    const tc = tp + LALL.T + 0.1;
-    sc.punto.push({kind: 'trace', t: tc - 0.14, st: CARRY});
+    const tc = tp + LALL.T;
+    sc.punto.push({kind: 'trace', t: tc, st: CARRY, pre: 0}); // sigue de largo: misma velocidad de salida y entrada (10 px/s)
     sc.links.push({t: tc, st: CARRY});
     sc.score.push({type: 'chalk', t0: tc, t1: tc + CARRY.T, speed: tt => depositSpeed(CARRY, tt - tc)});
     ev('hilo a la llave', tc);
@@ -238,7 +244,7 @@ function build(taps = autoTaps()) {
   // 7. comprende: el alumno se abre, Punto rebota dos veces; la cámara se aleja
   // primero se aleja para mirar lo hecho; la comprensión llega al ver el conjunto (y el brazo ya no pasa por la escritura)
   const T_BACK = t + 0.35;
-  const T_GET = T_BACK + 0.15 + 1.35 + 0.4;
+  const T_GET = T_BACK + 0.15 + 1.35 + 0.55; // R11: +0.15 s, la cabeza esperaba poco al final del paso atrás
   ev('comprende', T_GET);
   sc.punto.push({kind: 'bounce', t: T_GET + 0.15, n: 2});
   sc.score.push({type: 'note', t: T_GET + 0.15, freq: 523, dur: 0.6, gain: 0.05}, {type: 'note', t: T_GET + 0.32, freq: 659, dur: 0.6, gain: 0.045}, {type: 'note', t: T_GET + 0.5, freq: 784, dur: 0.9, gain: 0.04});
@@ -249,7 +255,7 @@ function build(taps = autoTaps()) {
     ...baseScript(T_PUNTO, Math.max(5.0, taps[0].t + 0.3)),
     ...sc.gaze,
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
-    {t: sc.events['escribe 5 y 2'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
+    {t: sc.events['escribe el 5'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
     {t: T_STEP, pose: 'write', overrides: {drop: 8}, gaze: [0.8, 0.6]},           // dobla apenas las rodillas para escribir más abajo
     // anticipación: se encoge y el brazo baja por debajo de la ecuación antes de subir (R3/VS2: barría por encima de «5+2=7»)
     {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
@@ -293,37 +299,61 @@ function puntoAt(t) {
   for (const p of S.punto) {
     if (t < p.t) break;
     const tl = t - p.t;
-    if (p.kind === 'appear') { pos = p.at; fill = clamp(tl / p.dur); if (tl < p.dur) sl = 1; }
+    if (p.kind === 'appear') {
+      // nace de un toque: una mota que se hincha con sobrepaso y se asienta (R11: crecía lineal, como un fundido de escala)
+      pos = p.at;
+      const k = Math.max(0, tl - 0.05) / p.dur;
+      fill = tl < 0.05 ? 0.12 : Math.min(1.25, 1 - 0.88 * Math.exp(-k * 6) * Math.cos(k * 7.5));
+      sl = tl < 0.05 ? 1 : 1 + 0.12 * Math.exp(-k * 5) * Math.sin(k * 11);
+    }
     else if (p.kind === 'hop') {
       if (p.toFn) p.to = p.toFn(p.t + p.dur);
       if (tl >= p.dur + 0.35) { pos = p.toFn ? p.toFn(t) : p.to; continue; } // si el destino se mueve (la cabeza), lo sigue
-      const crouch = 0.12; // anticipación 80–140 ms (lenguaje visual; R3)
+      // salto en cuatro fases (R11: el vuelo arrancaba a velocidad plena y frenaba en seco, y el estiramiento saltaba en un
+      // cuadro): agachada → impulso (acelera mientras se estira) → vuelo balístico → aterrizaje que absorbe (sigue de largo
+      // con la misma velocidad y vuelve, x·e^(−τ/τ0): velocidad continua, sobrepaso ≤ 8 % del salto)
+      const crouch = 0.12, push = 0.07, M = p.dur - crouch;
+      const a = push / M;                                     // fracción del tiempo de movimiento que dura el impulso
+      // perfil de velocidad (fracción del crucero): rampa 0 → 1 en el impulso, crucero, y frenada en el aire hasta `lam` antes
+      // de tocar el suelo (lam = 0 con `brake`: aterriza para empezar a trazar enseguida; si no, 0.55 y el resto lo absorbe
+      // el aterrizaje con sobrepaso). Integrado: u(s) = ∫v / área
+      const b = a, lam = p.brake ? 0 : 0.55, A = 1 - a / 2 - b * (1 - lam) / 2;
+      const warp = s => (s < a ? s * s / (2 * a) : s < 1 - b ? a / 2 + (s - a) : a / 2 + (1 - a - b) + (s - 1 + b) - (1 - lam) * (s - 1 + b) ** 2 / (2 * b)) / A;
+      const flightSl = u => 1.18 - 0.18 * Math.abs(2 * u - 1);
       if (tl < crouch) { pos = p.from; sl = 1 - 0.22 * minJerk(tl / crouch); }               // se agacha
       else if (tl < p.dur) {
-        const u = (tl - crouch) / (p.dur - crouch);
+        const sN = (tl - crouch) / M, u = warp(sN);
         pos = [lerp(p.from[0], p.to[0], u), lerp(p.from[1], p.to[1], u) - 4 * p.h * u * (1 - u)];
-        sl = 1.18 - 0.18 * Math.abs(2 * u - 1);                                               // estirado en el aire
+        sl = sN < a ? lerp(0.78, flightSl(u), minJerk(sN / a)) : flightSl(u);                 // el estiramiento se libera en el impulso
         ang = Math.atan2((p.to[1] - p.from[1]) - 4 * p.h * (1 - 2 * u), p.to[0] - p.from[0]);
-      } else {                                                                                // aterriza y se asienta
-        const k = (tl - p.dur) / 0.35;
-        pos = p.toFn ? p.toFn(t) : p.to; ang = Math.PI / 2;
-        sl = 1 - 0.24 * Math.exp(-k * 5) * Math.cos(k * 11);
+      } else {                                                                                // aterriza, sigue de largo, vuelve y se asienta
+        const tau = tl - p.dur, base = p.toFn ? p.toFn(t) : p.to;
+        const vx = lam * (p.to[0] - p.from[0]) / (M * A);                                     // velocidad al tocar el suelo
+        const dist = Math.abs(p.to[0] - p.from[0]) || 1;
+        const tau0 = Math.min(0.08, 0.08 * dist * Math.E / (Math.abs(vx) || 1));            // sobrepaso = vx·τ0/e ≤ 8 % del salto
+        // termina exactamente en el destino a los 0.3 s (el siguiente salto o gesto puede empezar ahí): se resta el resto
+        // con una curva suave de pendiente nula en los extremos (si no, saltaba 2.8 px al terminar)
+        const Tset = 0.3, ov = x => vx * x * Math.exp(-x / tau0), sm = clamp(tau / Tset);
+        pos = [base[0] + (tau < Tset ? ov(tau) - ov(Tset) * sm * sm * (3 - 2 * sm) : 0), base[1]]; ang = Math.PI / 2;
+        const ta = 0.04;                                                                      // aplastamiento que crece en ~2 cuadros
+        sl = 1 - 0.24 * (tau / ta) * Math.exp(1 - tau / ta);
       }
     } else if (p.kind === 'no') {
       if (tl < 0.8) { pos = [p.at[0] + 15 * Math.sin(tl * 24) * Math.exp(-tl * 3.2), p.at[1]]; sl = 1 + 0.08 * Math.abs(Math.sin(tl * 26)) * Math.exp(-tl * 4); ang = 0; }
       else pos = p.at;
     } else if (p.kind === 'trace') {
       // se encoge 0.14 s antes de arrancar (anticipación) y se asienta al terminar (R7: arrancaba y frenaba en seco)
-      const pre = 0.14, u = tl - pre;
+      const pre = p.pre ?? 0.14, u = tl - pre;
       pos = depositTip(p.st, clamp(u, 0, p.st.T)); ang = Math.PI / 2;
-      if (u < 0) sl = 1 - 0.2 * minJerk(tl / pre);
-      else if (u < p.st.T) { sl = lerp(0.8, 1.06, clamp(u / 0.15)); ang = 0; }
-      else { const k = (u - p.st.T) / 0.35; sl = 1 - 0.18 * Math.exp(-k * 5) * Math.cos(k * 11); }
+      if (u < 0) sl = Math.min(sl, 1 - 0.2 * minJerk(tl / pre)); // si todavía se aplasta del aterrizaje, parte de ahí
+      else if (u < p.st.T) { sl = pre ? lerp(0.8, 1.06, clamp(u / 0.15)) : 1.06; ang = 0; }
+      else { const tau = u - p.st.T, ta = 0.05; sl = lerp(1.06, 1, clamp(tau / 0.06)) - 0.2 * (tau / ta) * Math.exp(1 - tau / ta); } // R11: saltaba 1.06 → 0.82
     } else if (p.kind === 'perch') {
       pos = perchAt(t);
     } else if (p.kind === 'bounce') {
       const per = 0.36, i = Math.floor(tl / per), at = perchAt(t);
-      if (i < p.n) { const u = (tl % per) / per; pos = [at[0], at[1] - 4 * 26 * u * (1 - u)]; sl = u < 0.15 || u > 0.85 ? 0.82 : 1.1; }
+      // aplastado en el contacto, estirado en el aire, con transición suave (R11: cambiaba en escalón 0.82 ↔ 1.1)
+      if (i < p.n) { const u = (tl % per) / per; pos = [at[0], at[1] - 4 * 26 * u * (1 - u)]; const env = clamp(tl / 0.05) * clamp((p.n * per - tl) / 0.05); sl = 1 + (0.82 + 0.28 * Math.sin(Math.PI * u) ** 0.6 - 1) * env; }
       else pos = at;
     }
   }
@@ -415,7 +445,7 @@ function perchAt(t) {
 
 /** Planos: medio fijo; al aparecer Punto se acerca (la causa es Punto) y llega antes de contar; se abre al alejarse el alumno. */
 function cameraShots(T_PUNTO, T_BACK) {
-  const shots = [{t: 0, cx: 1440, cy: 600, w: 1250}, {t: T_PUNTO + 0.45, cx: 1470, cy: 598, w: 1100, arrive: T_PUNTO + 1.1}]; // el pie apoya dentro del cuadro (R7)
+  const shots = [{t: 0, cx: 1440, cy: 600, w: 1250}, {t: T_PUNTO + 0.45, cx: 1470, cy: 598, w: 1100, arrive: T_PUNTO + 0.85}]; // el pie apoya dentro del cuadro (R7)
   if (Number.isFinite(T_BACK)) shots.push({t: T_BACK + 0.15, cx: 1385, cy: 600, w: 1220}); // empieza con el paso atrás
   return shots;
 }
@@ -433,10 +463,12 @@ function writingArm(t, sk) {
       const a = [h.st.path.x.at(-1), h.st.path.y.at(-1)], b = [next.st.path.x[0], next.st.path.y[0]];
       const gap = next.t0 - h.t1;
       if (gap < 1.4) { const k = minJerk((t - h.t1) / gap); target = [lerp(a[0], b[0], k), lerp(a[1], b[1], k) - Math.sin(Math.PI * k) * 6]; w = 1; }
-      else { // vuelve al costado y después sube de nuevo
-        const out = clamp((t - h.t1) / 0.35), back = clamp((next.t0 - t) / 0.35);
-        w = 1 - minJerk(Math.min(out, back));
-        target = t - h.t1 < next.t0 - t ? a : b;
+      else { // pausa larga: la mano baja y descansa justo debajo de lo escrito, con la tiza lista, y vuelve
+        // (R11: volvía a la pose de escribir, con el brazo en alto, y cruzaba las marcas del 5)
+        const rest = [Math.min(a[0], b[0]) - 6, NUM.y + 34];
+        const out = minJerk(clamp((t - h.t1) / 0.45)), back = minJerk(clamp((next.t0 - t) / 0.45));
+        target = t - h.t1 < next.t0 - t ? [lerp(a[0], rest[0], out), lerp(a[1], rest[1], out)] : [lerp(b[0], rest[0], back), lerp(b[1], rest[1], back)];
+        w = 1;
       }
       break;
     }
@@ -515,8 +547,8 @@ export default {
     const p = puntoAt(t);
     if (p) {
       const breathe = 1 + 0.03 * Math.sin(t * Math.PI);
-      const r = 15 * breathe * (0.35 + 0.65 * p.fill);
-      fillPressure(ctx, blobOutline(p.pos[0], p.pos[1], r, {ang: p.ang, sl: p.sl, sw: 1 / p.sl, boil: frame % 3, seed: 3}), 0, 0.72 * Math.min(1, p.fill * 1.4), p.pos, r * 1.15);
+      const r = 15 * breathe * p.fill;
+      fillPressure(ctx, blobOutline(p.pos[0], p.pos[1], r, {ang: p.ang, sl: p.sl, sw: 1 / p.sl, boil: frame % 3, seed: 3}), 0, 0.72, p.pos, r * 1.15);
     }
   },
   renderDust(lab, t, ctx) {
@@ -580,7 +612,7 @@ export default {
     const p = puntoAt(t);
     const sk = S.actor.at(t);
     // pies tal como se dibujan (esqueleto), no el plan de pisadas
-    return {pieL: +sk.lL[2][0].toFixed(2), pieR: +sk.lR[2][0].toFixed(2), alzaL: +(G - sk.lL[2][1]).toFixed(2), alzaR: +(G - sk.lR[2][1]).toFixed(2), headUp: +(-(sk.head[0] - sk.neck[0]) * 0 + (sk.neck[1] - sk.head[1])).toFixed(2), tilt: +Math.atan2(sk.head[0] - sk.neck[0], sk.neck[1] - sk.head[1]).toFixed(3), handH: G - sk.aR[2][1], torso: +Math.atan2(sk.neck[0] - sk.hip[0], sk.hip[1] - sk.neck[1]).toFixed(3), contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
+    return {pieL: +sk.lL[2][0].toFixed(2), pieR: +sk.lR[2][0].toFixed(2), alzaL: +(G - sk.lL[2][1]).toFixed(2), alzaR: +(G - sk.lR[2][1]).toFixed(2), headUp: +(-(sk.head[0] - sk.neck[0]) * 0 + (sk.neck[1] - sk.head[1])).toFixed(2), tilt: +Math.atan2(sk.head[0] - sk.neck[0], sk.neck[1] - sk.head[1]).toFixed(3), handH: G - sk.aR[2][1], torso: +Math.atan2(sk.neck[0] - sk.hip[0], sk.hip[1] - sk.neck[1]).toFixed(3), contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1), size: +(p.fill * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
   },
   metrics(lab) {
     // alcance: ¿la mano llega a cada punto de cada trazo? (error > 0 = la tiza estaría fuera del brazo)

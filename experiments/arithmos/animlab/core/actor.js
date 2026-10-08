@@ -32,6 +32,7 @@ const CHANNELS = {
 export function buildActor({ground, x, k = 1, script, duration, facing = 1, poses = POSES}) {
   const n = Math.ceil(duration * HZ) + 2;
   // ——— 1. objetivos por canal en el tiempo (escalones) ———
+  for (const e of script) if (typeof e.t !== "number" || Number.isNaN(e.t)) throw new Error(`actor: evento sin tiempo válido ${JSON.stringify(e)}`);
   const events = [...script].sort((a, b) => a.t - b.t);
   const poseAt = t => {
     let pose = poses.stand ?? poses.idle, gaze = [0, 0], over = {};
@@ -81,12 +82,20 @@ export function buildActor({ground, x, k = 1, script, duration, facing = 1, pose
     swing[i * 2 + 1] = i ? swingR.step(1 / HZ, -g.armSwing) : 0;
   }
   const faceAt = t => { let f = facing; for (const e of events) { if (e.t > t) break; if (e.face != null) f = e.face; else if (e.pose && poses[e.pose]?.face != null) f = poses[e.pose].face * Math.sign(f || 1); if (e.walk && !e.walk.back) f = Math.sign(e.walk.to - (gaitAt(segs, e.t, x).hip)) || f; } return f; };
+  // orientación suavizada: dos promedios móviles hacia atrás de 0.09 s (un escalón → curva en S de 0.18 s). Sirve aunque
+  // haya varios cambios seguidos; la versión anterior (un solo cambio por ventana) saltaba si dos caían en 0.18 s (R11)
+  const faceS = new Float32Array(n);
+  {
+    const w = Math.round(0.09 * HZ), r = Float32Array.from({length: n}, (_, i) => faceAt(i / HZ)), a = new Float32Array(n);
+    for (const [src, dst] of [[r, a], [a, faceS]]) { let acc = w * src[0]; for (let i = 0; i < n; i++) { acc += src[i] - (i >= w ? src[i - w] : src[0]); dst[i] = acc / w; } }
+  }
+  const faceAtS = t => { const u = clamp(t * HZ, 0, n - 1), i = Math.floor(u), j = Math.min(n - 1, i + 1); return lerp(faceS[i], faceS[j], u - i); };
   const raw = (t, plant = null) => {
     const i = clamp(Math.round(t * HZ), 0, n - 1);
     const ch = name => [out[name][i * 2], out[name][i * 2 + 1]];
     const g = gaitAt(segs, t, x);
     return skeletonFrom({
-      x: g.hip, ground, k, f: smoothFace(faceAt, t),
+      x: g.hip, ground, k, f: faceAtS(t),
       lean: ch('lean')[0] + g.walking * 0.08, tilt: ch('tilt')[0], drop: ch('drop')[0],
       armL: addv(ch('armL'), [swing[i * 2] * g.walking, 0.22 * g.walking]), armR: addv(ch('armR'), [swing[i * 2 + 1] * g.walking, 0.22 * g.walking]),
       legL: ch('legL'), legR: ch('legR'), gait: g, bob: bob[i], plant,
@@ -144,14 +153,6 @@ export function buildActor({ground, x, k = 1, script, duration, facing = 1, pose
 }
 
 const addv = (a, b) => [a[0] + b[0], a[1] + b[1]];
-function smoothFace(faceAt, t) {
-  // girar no es instantáneo: ~0.18 s, con mínimo jerk entre el valor anterior y el nuevo
-  const a = faceAt(t - 0.18), b = faceAt(t);
-  if (a === b) return b;
-  let ts = t;
-  while (ts > t - 0.18 && faceAt(ts - 0.005) === b) ts -= 0.005;
-  return lerp(a, b, minJerk((t - ts) / 0.18));
-}
 
 /** Plan de pisadas de una caminata recta de x0 a x1 que empieza en t0. */
 function planWalk(x0, x1, t0, speed, k) {
@@ -208,7 +209,10 @@ function gaitAt(segs, t, xStart) {
   // hacia atrás invertía izquierdo y derecho: el pie saltaba 6·k = 16 px al terminar, R9)
   let fL = hip - 3 * k * d, fR = hip + 3 * k * d;
   if (last) { const P = last.P, iL = (P.length - 1) % 2 === 0 ? P.length - 1 : P.length - 2; fL = P[iL]; fR = P[iL === P.length - 1 ? P.length - 2 : P.length - 1]; if (last.swap) [fL, fR] = [fR, fL]; }
-  return {hip, feet: {L: {x: fL, lift: 0}, R: {x: fR, lift: 0}}, walking: 0, moving: false, bob: 0, armSwing: 0, wWalk};
+  // el peso de la marcha termina en 0.4 al final de la caminata: decae acá (antes caía a 0 en una muestra y el torso y los
+  // brazos saltaban, 3.5–4.8 px en la cabeza: R11)
+  const walking = last ? 0.4 * (1 - minJerk(clamp(since / 0.3))) : 0;
+  return {hip, feet: {L: {x: fL, lift: 0}, R: {x: fR, lift: 0}}, walking, moving: false, bob: 0, armSwing: 0, wWalk};
 }
 
 /** Pies durante una caminata, en función de la posición de la cadera (así frenan cuando frena la cadera). */
