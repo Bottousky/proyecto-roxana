@@ -46,7 +46,7 @@ export function autoTaps(order = [0, 1, 2, 3, 4, 5, 6]) {
 function build(taps = autoTaps()) {
   const sc = {strokes: [], hand: [], score: [], punto: [], rings: [], links: [], marks: {}, events: {}};
   const ev = (k, t) => { sc.events[k] = +t.toFixed(2); };
-  const chalk = (guide, seed, o = {}) => depositStroke(guide, {w: W, p: 0.9, seed, down: 0.14, ...o, motion: {speed: 560, accel: 9000, k0: 1 / 30, ...(o.motion || {})}});
+  const chalk = (guide, seed, o = {}) => depositStroke(guide, {w: W, p: 0.9, seed, down: 0.14, ...o, motion: {speed: 560, accel: 5000, k0: 1 / 30, ...(o.motion || {})}}); // ≤ 5000 px/s² (R7)
   const write = (st, t, tag) => {
     sc.strokes.push({st, t, tag});
     sc.hand.push({st, t0: t, t1: t + st.T});
@@ -101,11 +101,12 @@ function build(taps = autoTaps()) {
     const mid = guide[0];
     const a = [DOTS[i][0] - 6, DOTS[i][1] - 22], b = [mid[0] + 1, mid[1] - 5];
     // cada hilo con su propio arco (abanico): se pueden seguir uno por uno hasta su marca (R5)
-    const c = [(a[0] + b[0]) / 2 + 40 + (n - 3) * 30, Math.min(...DOTS.map(d => d[1])) - 150 - Math.abs(n - 3) * 14];
+    const c = [(a[0] + b[0]) / 2 + 40 + (n - 3) * 30, Math.min(...DOTS.map(d => d[1])) - 115 - Math.abs(n - 3) * 12];
     const link = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; });
-    const linkSt = depositStroke(link, {w: 2.6, p: 0.46, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
-    sc.links.push({t: land + 0.15, st: linkSt});
-    write(chalk(guide, 60 + n, {motion: {speed: n === 4 ? 900 : 620}}), land + 0.15 + linkSt.T + 0.03, `marca${n}`);
+    // el hilo nace de la marca recién escrita y sube hasta su punto (R7: «cada hilo nace de su marca»)
+    const linkSt = depositStroke(link.reverse(), {w: 2.6, p: 0.46, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
+    const markEnd = write(chalk(guide, 60 + n, {motion: {speed: n === 4 ? 900 : 620}}), land + 0.1, `marca${n}`);
+    sc.links.push({t: markEnd + 0.04, st: linkSt});
     n++;
     t = land + 0.1;
   }
@@ -129,7 +130,7 @@ function build(taps = autoTaps()) {
   const g5 = order.slice(0, 5).map(k => DOTS[k]), g2 = order.slice(5).map(k => DOTS[k]);
   const nested = g2.some(p => insideHull(p, g5, 27)) || g5.some(p => insideHull(p, g2, 27));
   const groupGuide = (pts, seed) => nested ? groupContour(pts, {r: 24, w: 10}) : lassoGuide(pts, 27, seed);
-  const lasso = (pts, seed) => depositStroke(groupGuide(pts, seed), {w: 4.2, p: 0.82, ch: BLUE, seed, motion: {speed: 640, accel: 6000, k0: 1 / 40}});
+  const lasso = (pts, seed) => depositStroke(groupGuide(pts, seed), {w: 4.2, p: 0.82, ch: BLUE, seed, motion: {speed: 640, accel: 2500, v0: 8, v1: 10, k0: 1 / 40}});
   const L5 = lasso(g5, 170), L2 = lasso(g2, 171);
   sc.groupStyle = nested ? 'contorno' : 'lazo';
   const startOf = st => [st.path.x[0], st.path.y[0]], endOf = st => [st.path.x.at(-1), st.path.y.at(-1)];
@@ -146,7 +147,7 @@ function build(taps = autoTaps()) {
   let tp = t + 0.3;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from, to: startOf(L5), h: 40});
   tp += 0.45 + 0.25;
-  sc.punto.push({kind: 'trace', t: tp, st: L5});
+  sc.punto.push({kind: 'trace', t: tp - 0.14, st: L5});
   sc.links.push({t: tp, st: L5});
   sc.score.push({type: 'chalk', t0: tp, t1: tp + L5.T, speed: tt => depositSpeed(L5, tt - tp)});
   ev('escribe 5 y 2', tp);
@@ -155,7 +156,7 @@ function build(taps = autoTaps()) {
   tp = Math.max(tp + L5.T, t) + 0.15;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.4, from: endOf(L5), to: startOf(L2), h: 30});
   tp += 0.4 + 0.2;
-  sc.punto.push({kind: 'trace', t: tp, st: L2});
+  sc.punto.push({kind: 'trace', t: tp - 0.14, st: L2});
   sc.links.push({t: tp, st: L2});
   sc.score.push({type: 'chalk', t0: tp, t1: tp + L2.T, speed: tt => depositSpeed(L2, tt - tp)});
   t = Math.max(t, tp);
@@ -164,13 +165,13 @@ function build(taps = autoTaps()) {
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
   // 6. la unión: mientras el alumno dibuja la llave que junta 5 y 2 (en el papel), Punto rodea los siete con un lazo grande
   //    (en la Ronda): el mismo gesto en las dos representaciones. Después, quietud ≥ 0.4 s y recién el «7» (R6).
-  const LALL = depositStroke(lassoGuide(DOTS, 58, 172), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 7000, k0: 1 / 60}});
+  const LALL = depositStroke(lassoGuide(DOTS, 58, 172), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 2500, v0: 8, v1: 10, k0: 1 / 60}});
   tp = Math.max(tp + L2.T, t) + 0.2;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from: endOf(L2), to: startOf(LALL), h: 40});
   tp += 0.45 + 0.2;
   const T_STEP = tp;
   ev('une los grupos', T_STEP);
-  sc.punto.push({kind: 'trace', t: tp, st: LALL});
+  sc.punto.push({kind: 'trace', t: tp - 0.14, st: LALL});
   sc.links.push({t: tp, st: LALL});
   sc.score.push({type: 'chalk', t0: tp, t1: tp + LALL.T, speed: tt => depositSpeed(LALL, tt - tp)});
   t = Math.max(t, tp);
@@ -183,7 +184,7 @@ function build(taps = autoTaps()) {
     const braceSt = chalk(brace, 125, {motion: {speed: Math.max(160, 520 * (brace.length * 18) / Math.max(1, LALL.T * 520))}});
     t = write(braceSt, t, 'llave');
     // quietud: la mano y Punto se detienen antes del resultado
-    t = Math.max(t, tp + LALL.T) + 0.45;
+    t = Math.max(t, tp + LALL.T) + 0.6;
     ev('quieto antes del 7', t);
     writeGlyph('7', bm - GLYPHS['7'].adv * sz / 2, by + 21 + sz + 6, sz, 141);
   }
@@ -208,7 +209,7 @@ function build(taps = autoTaps()) {
     {t: T_STEP, pose: 'write', overrides: {drop: 8}, gaze: [0.8, 0.6]},           // dobla apenas las rodillas para escribir más abajo
     // anticipación: se encoge y el brazo baja por debajo de la ecuación antes de subir (R3/VS2: barría por encima de «5+2=7»)
     {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
-    {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true}, face: 0.6},       // dos pasos atrás (de ¾: las piernas no se funden, R5)
+    {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true, swing: 0.25}, face: 0.6, overrides: {armR: [-0.1, 0.3]}},      // dos pasos atrás (de ¾: las piernas no se funden, R5)
     {t: T_BACK + 0.2, pose: 'lookDown', gaze: [0.7, 0.6]},                              // mira lo que escribió (cabeza abajo)
     {t: T_GET - 0.5, pose: 'lookUp', gaze: [1, -0.7]},                                  // levanta la cabeza hacia la Ronda (los ojos primero: canal de mirada más rápido)
     {t: T_GET - 0.12, pose: 'lookDown'},                                                // micro-encogida
@@ -267,7 +268,12 @@ function puntoAt(t) {
       if (tl < 0.8) { pos = [p.at[0] + 15 * Math.sin(tl * 24) * Math.exp(-tl * 3.2), p.at[1]]; sl = 1 + 0.08 * Math.abs(Math.sin(tl * 26)) * Math.exp(-tl * 4); ang = 0; }
       else pos = p.at;
     } else if (p.kind === 'trace') {
-      pos = depositTip(p.st, Math.min(tl, p.st.T)); sl = tl < p.st.T ? 1.08 : 1; ang = 0;
+      // se encoge 0.14 s antes de arrancar (anticipación) y se asienta al terminar (R7: arrancaba y frenaba en seco)
+      const pre = 0.14, u = tl - pre;
+      pos = depositTip(p.st, clamp(u, 0, p.st.T)); ang = Math.PI / 2;
+      if (u < 0) sl = 1 - 0.2 * minJerk(tl / pre);
+      else if (u < p.st.T) { sl = lerp(0.8, 1.06, clamp(u / 0.15)); ang = 0; }
+      else { const k = (u - p.st.T) / 0.35; sl = 1 - 0.18 * Math.exp(-k * 5) * Math.cos(k * 11); }
     } else if (p.kind === 'perch') {
       pos = perchAt(t);
     } else if (p.kind === 'bounce') {
@@ -340,8 +346,8 @@ function perchAt(t) {
 
 /** Planos: medio fijo; al aparecer Punto se acerca (la causa es Punto) y llega antes de contar; se abre al alejarse el alumno. */
 function cameraShots(T_PUNTO, T_BACK) {
-  const shots = [{t: 0, cx: 1440, cy: 600, w: 1250}, {t: T_PUNTO + 0.45, cx: 1480, cy: 560, w: 1020, arrive: T_PUNTO + 1.1}];
-  if (Number.isFinite(T_BACK)) shots.push({t: T_BACK + 0.3, cx: 1385, cy: 590, w: 1220});
+  const shots = [{t: 0, cx: 1440, cy: 600, w: 1250}, {t: T_PUNTO + 0.45, cx: 1470, cy: 598, w: 1100, arrive: T_PUNTO + 1.1}]; // el pie apoya dentro del cuadro (R7)
+  if (Number.isFinite(T_BACK)) shots.push({t: T_BACK + 0.15, cx: 1385, cy: 600, w: 1220}); // empieza con el paso atrás
   return shots;
 }
 

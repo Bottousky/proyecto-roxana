@@ -49,6 +49,7 @@ export function buildActor({ground, x, k = 1, script, duration, facing = 1, pose
   const segs = [];
   for (const e of walks) {
     const seg = planWalk(hipX, e.walk.to, e.t, e.walk.speed ?? 115, k);
+    seg.swing = e.walk.swing ?? 1; // amplitud del balanceo de brazos (al retroceder, poco: los brazos no barren lo escrito)
     segs.push(seg);
     hipX = e.walk.to;
   }
@@ -196,7 +197,7 @@ function vault(s, hip, feet) {
   const stance = [feet.L, feet.R].filter(f => f.lift < 0.5);
   const dx = stance.length ? Math.min(...stance.map(f => Math.abs(f.x - hip))) : 0;
   const bob = L - Math.sqrt(Math.max(0, L * L - dx * dx)); // cuánto baja la cadera
-  const armSwing = clamp((feet.L.x - feet.R.x) / (s.Dd || 30) * s.dir, -1, 1) * 0.6;
+  const armSwing = clamp((feet.L.x - feet.R.x) / (s.Dd || 30) * s.dir, -1, 1) * 0.6 * (s.swing ?? 1);
   return {bob, armSwing};
 }
 

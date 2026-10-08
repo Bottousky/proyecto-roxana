@@ -356,3 +356,6 @@ La escena dura ahora 22 s.
 **Técnica**: `actor.drawFigureDeposit` (mismas guías que `Figure.strokes`, depositadas sin plan de velocidad; temblor según el hervor de 8 cuadros/s; peso 5.6·k).
 **Resultado** (`c16/fig-cmp2.png`: arriba motor, abajo depósito): mismo peso visual, núcleo lleno y bordes ásperos, sin cuentas; coherente con la escritura. Costo: cuadro ~1.1 ms (p95 2.8–3.1) en los tres tamaños, sin cambio medible. `?figura=motor` conserva la versión anterior para comparar.
 **Conclusión**: la figura pasa a depósito. Para la migración: `Figure.render` también se adapta (no sólo `Drawing`).
+
+## Revisión R7 (VS6) y VS7 — ciclo 14
+R7: **No** (N3 en todo; eureka N4). Lista y disposición (`c17/`): (1) Punto arrancaba y frenaba en seco en los lazos → anticipación 0.14 s, aceleración 2500 px/s², asentamiento (`punto.png`); (2) tiza > 5000 px/s² → 5000 (`tiza.png`); (3) piernas fuera de cuadro en el plano medio → plano 1100 de ancho con el suelo dentro (`t10z/sheet.png`); (4) **el hilo nace de la marca** recién escrita y sube al punto; (5) el plano final arranca con el paso atrás; (6) quietud antes del 7: 0.6 s. Además: al retroceder, balanceo de brazos al 25 % (el brazo barría «5+2»). Texturas a dpr 3: `textura.png` (escritura, lazos, figura con depósito).
