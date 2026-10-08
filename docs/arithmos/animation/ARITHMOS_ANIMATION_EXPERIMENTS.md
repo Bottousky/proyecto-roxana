@@ -62,3 +62,32 @@ Velocidad (speed.png de t01d): A rectangular (0→570 px/s en un cuadro); C tria
 **Conclusión**: el modelo de gesto sirve como primitiva única para dibujar, pausar, corregir y borrar con tiempo buscable. Nivel estimado: Timing N3, Textura N3–N4 (acumula, carga en la pausa), Continuidad N2 (nada aparece sin trazo; el borrado todavía no tiene borrador visible).
 
 **Siguiente**: E03 escritura matemática con glifos de un trazo y transformación con identidad por símbolo.
+
+---
+
+## E03 — TEST 03 · escritura y transformación de una ecuación (ciclo 3, 2026-10-07)
+
+**Hipótesis**: (1) glifos de un solo trazo escritos con el plan de mano se leen tan bien como la fuente actual y se ven *escritos*; (2) una transformación con **identidad por símbolo** (lo que se conserva se desliza, lo nuevo se escribe, lo cancelado se tacha y se borra, el «=» fijo) se entiende como operación, mientras que el fundido cruzado del motor actual se ve como "cambio de diapositiva".
+
+**Técnica**: `animlab/core/glyphs.js` (0–9, x, y, +, −, =, (, ), /, · en orden de escritura escolar; partes suaves y con esquinas encadenadas sin levantar, p. ej. la cúspide del 3), `layoutAround` (el «=» como pivote), `animlab/tests/t03-equation.js` (fila A: `chalkText` + `reveal` + fundidos, como hoy; fila B: glifos + deslizamientos con mínimo jerk y arco + tachado + borrador por grupo en lienzo aparte + rastro de polvo).
+
+**Resultado** (`c03/t03c`, `c03/t03d`, hoja `c03/glyphs-a`):
+- Legibilidad: los glifos se leen a 36, 60 y 90 px (`glyphs-a/final.png`). La «x» va a altura x (0.6) y las cifras a 1.0, como en un cuaderno.
+- Ritmo de escritura (`t03c/hand-write.png`): «x − 3 = 5» en 2.9 s; ~50 % del tiempo en el aire; micro-pausa visible antes del «=». Picos de ~600 px/s en trazos de 80 px.
+- Transformación: la secuencia es causal y legible en la hoja de contactos (`t03c/sheet.png`): «x − 3» se corre a la izquierda (el «=» y el «5» quietos) → «+ 3» amarillo a la izquierda → el mismo gesto a la derecha → tachado de «−3» y «+3» → «8» escrito debajo de «5 + 3» (la correspondencia se ve) → se borran los cancelados y la suma → «x» y «8» se acomodan junto al «=»; el 8 crece mientras sube.
+- La fila A (motor actual) muestra en `t03c/sheet.png` t = 5.33 la superposición fantasma de dos ecuaciones a la vez (fundido cruzado) y el cambio de largo del renglón con el «=» moviéndose de lugar.
+- Rastro de polvo de lo que se desliza (`t03d/crop-0`, `crop-2`): visible, tenue, se asienta.
+
+**Defectos encontrados y corregidos**:
+- Escritura demasiado lenta (4.4 s): las levantadas de Fitts estaban sobredimensionadas (0.23 s a 40 px). Recalibrado `liftTime` (0.045 + 0.00025·d + 0.028·log₂(1 + d/6)): ~0.15 s a 40 px. *Las capturas de E01/E02 se hicieron con la calibración anterior.*
+- El borrador dejaba motas nítidas en los giros del vaivén: ahora pasa ~w/3 más allá de la caja y con fuerza 0.965.
+
+**Defectos abiertos**:
+- No hay **mano visible**: la tiza escribe sola. Para N4 de continuidad hace falta quién escribe (la mano/figura o Punto) — E09/E10.
+- El borrador tampoco se ve (E07).
+- El rastro de polvo de un deslizamiento es una franja redondeada uniforme; podría seguir la forma del glifo (E07).
+- Duración total 16 s: aceptable para enseñar, pero el ritmo de los tramos "leer" (0.6–0.7 s) no se probó con personas [H].
+
+**Conclusión**: hipótesis (1) y (2) apoyadas. La identidad por símbolo es la diferencia cualitativa más grande hallada hasta ahora entre el motor actual y el objetivo. Nivel estimado de la fila B: Matemática N4 (correspondencia 5 + 3 → 8 visible, simetría del gesto en ambos miembros), Continuidad N3, Timing N3, Legibilidad N3. Fila A: Matemática N2, Continuidad N1.
+
+**Siguiente**: E05 Punto (actuación: anticipación, asentamiento, segundo orden) y E09 figura; después E07 borrado con borrador visible y neblina.

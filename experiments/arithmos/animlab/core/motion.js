@@ -111,8 +111,10 @@ export function indexAt(plan, tl) {
 }
 
 /** Tiempo de levantar la tiza y viajar `d` px hasta el próximo trazo (Fitts simplificado). */
-export function liftTime(d, {base = 0.07, per = 0.00042, w = 6} = {}) {
-  return base + per * d + 0.05 * Math.log2(1 + d / w);
+// Calibrado en E03: con 0.07 / 0.00042 / 0.05 una levantada de 40 px tardaba 0.23 s y «x − 3 = 5» 3.7 s;
+// a mano se escribe en ~2 s (levantadas de 0.1–0.15 s dentro de una palabra).
+export function liftTime(d, {base = 0.045, per = 0.00025, w = 6, fitts = 0.028} = {}) {
+  return base + per * d + fitts * Math.log2(1 + d / w);
 }
 
 // ——— Curvas de tiempo para actuación (no para trazos) ———
