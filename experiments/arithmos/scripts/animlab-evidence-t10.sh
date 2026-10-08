@@ -102,6 +102,11 @@ cap "$D/salteado-junta" --q=taps=3,0,5,1,6,2,4 --times=10.4,10.75,11.1,11.45,11.
 node scripts/animlab-stack.mjs "$D/salteado-junta.png" "$D/salteado-junta/crop-0.png" "$D/salteado-junta/crop-1.png" >/dev/null
 U=$(python3 -c "a,b=$T_HILO-1.4,$T_7;print(','.join(str(round(a+(b-a)*k/5,2)) for k in range(6)))")
 cap "$D/strip-unionsiete" --cols=6 "--times=$U"
+# los hilos de cada grupo se juntan en uno al cerrarse su lazo
+G5=$(EV 'se juntan los hilos de 5'); G2=$(EV 'se juntan los hilos de 2')
+H=$(python3 -c "print(','.join(str(round(x,2)) for x in [$G5-0.1,$G5+0.3,$G5+0.6,$G5+1.0,$G2+0.3,$G2+1.0]))")
+CT=$(python3 -c "print(round($G2 + 1.0, 2))")
+cap "$D/strip-hilos" --cols=3 "--times=$H" "--crop=300,40,1150,540,$CT"
 mkdir -p "$D/interactive" && node scripts/animlab-interact.mjs "$D/interactive" >/dev/null
 node scripts/animlab-stack.mjs "$D/interactive.png" "$D/interactive/2-ya-contado.png" "$D/interactive/3-final.png" >/dev/null
 { echo "# $VS — tabla de tiempos (ordenada)"; echo; cat "$D/timeline-table.md"; echo; echo "Medidas de ESTA corrida (main/probes.json, 240 Hz):"; sed 's/^/- /' "$D/medidas.txt"; } > "$D/timeline.md"
