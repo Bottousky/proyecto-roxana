@@ -16,10 +16,10 @@ const HZ = 240;
 const CHANNELS = {
   gaze: {f: 6, z: 0.9, r: 0, delay: 0},
   tilt: {f: 3.6, z: 0.62, r: 0, delay: 0.03},
-  lean: {f: 2.4, z: 0.7, r: 0, delay: 0.08},
+  lean: {f: 2.4, z: 0.7, r: 0, delay: 0.11},   // el torso sigue a la cabeza 80 ms después (R6)
   drop: {f: 2.8, z: 0.6, r: 0, delay: 0.06},
-  armL: {f: 2.3, z: 0.5, r: 0, delay: 0.12},
-  armR: {f: 2.6, z: 0.5, r: 0, delay: 0.1},
+  armL: {f: 2.3, z: 0.5, r: 0, delay: 0.16},
+  armR: {f: 2.6, z: 0.5, r: 0, delay: 0.14},   // el brazo, ~110 ms después de la cabeza
   legL: {f: 3, z: 0.8, r: 0, delay: 0.05},
   legR: {f: 3, z: 0.8, r: 0, delay: 0.05},
 };

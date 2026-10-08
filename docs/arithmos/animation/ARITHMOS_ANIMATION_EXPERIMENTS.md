@@ -342,3 +342,11 @@ Conteo de signos en los `Label` literales del juego (162 textos): faltaban 14 mi
 
 ## VS5 — correcciones de R5 (ciclo 13)
 (a) superposición medida (`c15/eureka.png`: cabeza → torso → mano, la mano ~60 ms tarde y con sobrepaso); (b) paso atrás de ¾ y poses `lookUp`/`lookDown` con silueta (la del motor era un "chupetín" en perfil: `c15/interactive-end/stack.png`); (c) **lazos de Punto alrededor de los 5 y de los 2 en la Ronda**, sincronizados con la escritura de «5» y «2» (`c15/t10v/final.png`); si el jugador contó salteado y los grupos se entremezclan, hilos de cuentas en vez de lazos anidados (`c15/salteado.png`, arriba) — se lee peor que los lazos: limitación conocida; (d) hilos en abanico, más tenues que los lazos (jerarquía grupo > correspondencia); (e) «+» 1.3× y plano final más cerrado; (f) polvo en los cuatro cruces de la quinta marca; (g) misma escena en automático e interactivo (`c15/interactive.png`). Arreglos de herramientas: `animlab-capture` separaba mal `--q=taps=…`; `animlab-plot` arranca el eje en el primer dato.
+
+## Revisión R6 (VS5) y VS6 — ciclo 14, 2026-10-07
+R6: **No** (Timing N3, Actuación N3–N4 en el límite, Legibilidad N3 en orden / N2 salteado, Matemática N3). Lista mínima y disposición (`c16/`):
+(a) quietud ≥ 0.35 s antes del «7» → 0.44 s medidos (`quieto.png`: Punto se detiene a 16.53, la tiza toca a 16.97);
+(b) un gesto que una los siete → **lazo grande de Punto alrededor de toda la Ronda, sincronizado con la llave** (la unión dibujada en las dos representaciones a la vez: `finals.png` arriba);
+(c) superposición → retraso de torso 0.08→0.11 s y brazo 0.10→0.14 s respecto de la cabeza (`eureka.png`: mano ~110 ms detrás);
+(d) conteo salteado → contorno orgánico por grupo (`blob.groupContour`: unión de discos + cápsulas del árbol mínimo, marching squares + Chaikin) en lugar de hilos de cuentas (`finals.png` abajo).
+La escena dura ahora 22 s.

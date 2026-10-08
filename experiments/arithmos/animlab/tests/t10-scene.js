@@ -14,7 +14,7 @@ import {POSES2} from '../core/poses.js';
 import {depositStroke, drawDeposit, drawDepositCached, depositTip, depositSpeed} from '../core/deposit.js';
 import {glyphGuides, GLYPHS} from '../core/glyphs.js';
 import {circleGuide} from '../core/gesture.js';
-import {blobOutline, fillPressure} from '../core/blob.js';
+import {blobOutline, fillPressure, groupContour} from '../core/blob.js';
 import {cameraTrack} from '../core/camera2.js';
 import {countNote} from '../core/score.js';
 import {liftTime, minJerk, clamp, lerp} from '../core/motion.js';
@@ -128,10 +128,10 @@ function build(taps = autoTaps()) {
   // como "grupo dentro de grupo": entonces cada grupo se enhebra como un hilo de cuentas, en el orden en que se contó
   const g5 = order.slice(0, 5).map(k => DOTS[k]), g2 = order.slice(5).map(k => DOTS[k]);
   const nested = g2.some(p => insideHull(p, g5, 27)) || g5.some(p => insideHull(p, g2, 27));
-  const groupGuide = (pts, seed) => nested ? beadString(pts) : lassoGuide(pts, 27, seed);
+  const groupGuide = (pts, seed) => nested ? groupContour(pts, {r: 24, w: 10}) : lassoGuide(pts, 27, seed);
   const lasso = (pts, seed) => depositStroke(groupGuide(pts, seed), {w: 4.2, p: 0.82, ch: BLUE, seed, motion: {speed: 640, accel: 6000, k0: 1 / 40}});
   const L5 = lasso(g5, 170), L2 = lasso(g2, 171);
-  sc.groupStyle = nested ? 'hilo' : 'lazo';
+  sc.groupStyle = nested ? 'contorno' : 'lazo';
   const startOf = st => [st.path.x[0], st.path.y[0]], endOf = st => [st.path.x.at(-1), st.path.y.at(-1)];
   const sz = NUM.size;
   const writeGlyph = (ch, x, y, size, seed, color = 0) => {
@@ -162,25 +162,34 @@ function build(taps = autoTaps()) {
   // «+» a 1.3× la cifra: en el plano final de 844×390 queda ≥ 12 px CSS (R5: medía 8.6)
   writeGlyph('+', TALLY.x + (1.5 * TALLY.gap + TALLY.pairDx + TALLY.gap / 2) / 2 - GLYPHS['+'].adv * sz * 0.65, NUM.y, sz * 1.3, 121);
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
-  tp = Math.max(tp + L2.T, t) + 0.15;
-  sc.punto.push({kind: 'hop', t: tp, dur: 0.6, from: endOf(L2), toFn: perchAt, h: 60});
-  sc.punto.push({kind: 'perch', t: tp + 0.95});
-  sc.score.push({type: 'note', t: tp + 0.6, freq: 392, dur: 0.2, gain: 0.04});
-  // 6. un paso a la derecha y «= 7»
-  // 6. una llave une los dos grupos y debajo el 7: «5 y 2, juntos, son 7» (R4/c13: inclinarse para «= 7» metía la cabeza
-  //    sobre el atado; con la llave todo queda al alcance sin inclinarse y la unión de los grupos se dibuja)
-  const T_STEP = t + 0.12;
+  // 6. la unión: mientras el alumno dibuja la llave que junta 5 y 2 (en el papel), Punto rodea los siete con un lazo grande
+  //    (en la Ronda): el mismo gesto en las dos representaciones. Después, quietud ≥ 0.4 s y recién el «7» (R6).
+  const LALL = depositStroke(lassoGuide(DOTS, 58, 172), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 7000, k0: 1 / 60}});
+  tp = Math.max(tp + L2.T, t) + 0.2;
+  sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from: endOf(L2), to: startOf(LALL), h: 40});
+  tp += 0.45 + 0.2;
+  const T_STEP = tp;
   ev('une los grupos', T_STEP);
-  t = T_STEP;
+  sc.punto.push({kind: 'trace', t: tp, st: LALL});
+  sc.links.push({t: tp, st: LALL});
+  sc.score.push({type: 'chalk', t0: tp, t1: tp + LALL.T, speed: tt => depositSpeed(LALL, tt - tp)});
+  t = Math.max(t, tp);
   {
     const bx0 = TALLY.x - 4, bx1 = TALLY.x + TALLY.pairDx + TALLY.gap + 6, by = NUM.y + 10, bm = (bx0 + bx1) / 2;
     const brace = [[bx0, by], [bx0 + 6, by + 9], [bm - 10, by + 11], [bm, by + 21], [bm + 10, by + 11], [bx1 - 6, by + 9], [bx1, by]];
     const prev = sc.hand.at(-1);
     t = Math.max(t, prev.t1 + liftTime(Math.hypot(brace[0][0] - prev.st.path.x.at(-1), brace[0][1] - prev.st.path.y.at(-1))));
-    t = write(chalk(brace, 125, {motion: {speed: 520}}), t, 'llave');
-    t += 0.1;
+    // la llave dura lo mismo que el lazo grande (se dibujan juntos)
+    const braceSt = chalk(brace, 125, {motion: {speed: Math.max(160, 520 * (brace.length * 18) / Math.max(1, LALL.T * 520))}});
+    t = write(braceSt, t, 'llave');
+    // quietud: la mano y Punto se detienen antes del resultado
+    t = Math.max(t, tp + LALL.T) + 0.45;
+    ev('quieto antes del 7', t);
     writeGlyph('7', bm - GLYPHS['7'].adv * sz / 2, by + 21 + sz + 6, sz, 141);
   }
+  sc.punto.push({kind: 'hop', t: t + 0.15, dur: 0.6, from: endOf(LALL), toFn: perchAt, h: 60});
+  sc.punto.push({kind: 'perch', t: t + 0.15 + 0.95});
+  sc.score.push({type: 'note', t: t + 0.75, freq: 392, dur: 0.2, gain: 0.04});
   ev('escribe 7', t);
   // 7. comprende: el alumno se abre, Punto rebota dos veces; la cámara se aleja
   // primero se aleja para mirar lo hecho; la comprensión llega al ver el conjunto (y el brazo ya no pasa por la escritura)
