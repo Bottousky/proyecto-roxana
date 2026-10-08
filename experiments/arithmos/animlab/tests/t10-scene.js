@@ -21,19 +21,29 @@ import {liftTime, minJerk, clamp, lerp} from '../core/motion.js';
 
 const G = 900, K = 2.7;
 // entra desde fuera de cuadro (R2: «nadie entra»): el plano abre sobre la Ronda y el alumno aparece por la izquierda
-const X0 = 735, X1 = 1130;
+const X0 = 690, X1 = 1130; // R3: a 735 asomaban brazo y pie en el borde a t = 0
 const SH = {dx: 4, dy: -(64 * K * 0.97 + 46 * K - 4 * K)}; // hombro respecto de (x, suelo), de pie
 const REACH = (25 + 24 + 8) * K * 0.97; // brazo + tiza
 const DOTS = [[1500, 520], [1585, 470], [1640, 560], [1560, 615], [1710, 490], [1690, 615], [1770, 555]];
 // la escritura va a la derecha de la cabeza (radio ≈ 42) y a escala de mano: letras ≈ 8 % del alto de la figura
 // (t10a: las marcas tapaban la cabeza y el paso al costado tapaba lo escrito)
-const TALLY = {x: X1 + 58, top: G - 300, bot: G - 266, gap: 10, pairDx: 56};
+const TALLY = {x: X1 + 58, top: G - 300, bot: G - 266, gap: 13, pairDx: 64}; // R3: ≥ 8 px entre marcas a 1600 y grupos separados
 const NUM = {y: G - 214, size: 34};
 const W = 5.5;
 
 let S; // escena construida
 
-function build() {
+/** Toques del jugador por defecto (modo automático): los 7 puntos en orden, con el ritmo del guion original. */
+export function autoTaps(order = [0, 1, 2, 3, 4, 5, 6]) {
+  let t = 5.1, n = 0;
+  const out = [];
+  const seen = new Set();
+  // reposo ≥ 0.3 s entre saltos (R3: Punto nunca quedaba quieto) y 0.4 s más tras el quinto (el atado de cinco es la idea)
+  for (const dot of order) { out.push({t, dot}); const again = seen.has(dot); seen.add(dot); t += again ? 1.4 : 0.5 - 0.035 * n + 0.32 + (n === 4 ? 0.4 : 0); if (!again) n++; }
+  return out;
+}
+
+function build(taps = autoTaps()) {
   const sc = {strokes: [], hand: [], score: [], punto: [], rings: [], links: [], marks: {}, events: {}};
   const ev = (k, t) => { sc.events[k] = +t.toFixed(2); };
   const chalk = (guide, seed, o = {}) => depositStroke(guide, {w: W, p: 0.9, seed, down: 0.14, ...o, motion: {speed: 560, accel: 9000, k0: 1 / 30, ...(o.motion || {})}});
@@ -52,34 +62,56 @@ function build() {
   sc.punto.push({kind: 'appear', t: T_PUNTO, at: P0, dur: 0.4});
   sc.score.push({type: 'note', t: T_PUNTO + 0.3, freq: 523, dur: 0.3, gain: 0.05});
   ev('aparece Punto', T_PUNTO);
-  // 3. contar: Punto salta a cada punto; con cada aterrizaje, una marca. Los saltos se aceleran (contar agarra ritmo).
-  let t = 5.1, from = P0;
-  for (let i = 0; i < 7; i++) {
-    const dur = 0.5 - 0.035 * i;
+  // 3. contar: el jugador toca un punto de la Ronda; Punto salta ahí. Si es nuevo: anillo, hilo y marca.
+  //    Si ya estaba contado: Punto niega con el cuerpo («ya está») y no hay marca nueva (contar cada uno una sola vez).
+  //    Los saltos se aceleran con la cuenta (contar agarra ritmo). Sin los 7, la escena espera.
+  let t = T_PUNTO + 1.1, from = P0, n = 0;
+  const counted = new Set();
+  sc.waitFrom = t;
+  for (const tap of taps) {
+    if (n >= 7) break;
+    t = Math.max(t, tap.t);
+    const i = tap.dot;
+    const again = counted.has(i);
+    const dur = again ? 0.4 : 0.5 - 0.035 * n;
     const to = [DOTS[i][0], DOTS[i][1] - 36]; // se posa arriba del punto, sin pisar el anillo (R2)
-    sc.punto.push({kind: 'hop', t, dur, from, to, h: 36 + 8 * (i === 0)});
+    sc.punto.push({kind: 'hop', t, dur, from, to, h: 36 + 8 * (n === 0)});
     const land = t + dur;
-    // anillo celeste (relación, no selección de interfaz): imperfecto, de grosor variable, apenas después del aterrizaje
-    sc.rings.push({t: land + 0.05, st: depositStroke(circleGuide(DOTS[i][0], DOTS[i][1], 17 + 2 * Math.sin(i * 2.3), {seed: 40 + i, wob: 0.05, sweep: Math.PI * 2 + 0.6}), {w: 4.2, p: 0.8, ch: BLUE, seed: 50 + i, motion: {speed: 520}})});
-    sc.score.push({type: 'note', t: land, freq: countNote(i), dur: 0.25, gain: 0.06});
-    // la marca: sale un instante después del aterrizaje (el alumno mira y anota)
-    let guide;
-    if (i < 4) { const x = TALLY.x + i * TALLY.gap; guide = [[x + 2, TALLY.top], [x - 1, TALLY.bot]]; }
-    else if (i === 4) guide = [[TALLY.x - 8, TALLY.bot - 8], [TALLY.x + 3 * TALLY.gap + 10, TALLY.top + 6]];
-    else { const x = TALLY.x + TALLY.pairDx + (i - 5) * TALLY.gap; guide = [[x + 2, TALLY.top], [x - 1, TALLY.bot]]; }
-    // el hilo celeste: del punto contado a la marca que le corresponde (la correspondencia se ve, no sólo se cronometra)
-    const mid = guide[0];
-    // llega a la marca desde la derecha, con una curva suave: no pasa por encima de la cabeza (t10i: el abanico tapaba la cara)
-    // y baja sobre su marca desde arriba: no cruza las otras marcas (c11/cache-cmp: los hilos atravesaban el atado)
-    // sale hacia arriba y pasa por encima de la Ronda: no atraviesa otros puntos (t10k: cruzaba anillos vecinos)
-    const a = [DOTS[i][0] - 6, DOTS[i][1] - 22], b = [mid[0] + 2, mid[1] - 12];
-    const c = [(a[0] + b[0]) / 2 + 60, Math.min(...DOTS.map(d => d[1])) - 110];
-    const link = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; });
-    const linkSt = depositStroke(link, {w: 2.6, p: 0.5, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
-    sc.links.push({t: land + 0.15, st: linkSt});
-    (write(chalk(guide, 60 + i, {motion: {speed: i === 4 ? 900 : 620}}), land + 0.15 + linkSt.T + 0.03, `marca${i}`));
     from = to;
+    if (again) {
+      sc.punto.push({kind: 'no', t: land + 0.3, at: to});
+      sc.score.push({type: 'note', t: land + 0.3, freq: 233, dur: 0.18, gain: 0.05}, {type: 'note', t: land + 0.5, freq: 220, dur: 0.22, gain: 0.05});
+      ev(`ya contado ${i}`, land);
+      t = land + 1.0;
+      continue;
+    }
+    counted.add(i);
+    // anillo celeste (relación, no selección de interfaz): imperfecto, de grosor variable, apenas después del aterrizaje
+    sc.rings.push({t: land + 0.05, dot: i, st: depositStroke(circleGuide(DOTS[i][0], DOTS[i][1], 16 + 3 * Math.sin(i * 2.3), {seed: 40 + i, wob: 0.06, from: -Math.PI / 2 + 0.35 + i * 0.9, sweep: Math.PI * 2 + 0.3 + 0.12 * (i % 4)}), {w: 4.2, p: 0.8, ch: BLUE, seed: 50 + i, motion: {speed: 520}})});
+    sc.score.push({type: 'note', t: land, freq: countNote(n), dur: 0.25, gain: 0.06});
+    // la marca n (por orden de conteo, no por punto)
+    let guide;
+    if (n < 4) { const x = TALLY.x + n * TALLY.gap; guide = [[x + 2, TALLY.top], [x - 1, TALLY.bot]]; }
+    else if (n === 4) guide = [[TALLY.x - 8, TALLY.bot - 8], [TALLY.x + 3 * TALLY.gap + 10, TALLY.top + 6]];
+    else { const x = TALLY.x + TALLY.pairDx + (n - 5) * TALLY.gap; guide = [[x + 2, TALLY.top], [x - 1, TALLY.bot]]; }
+    // el hilo celeste: del punto contado a su marca. Sale hacia arriba, pasa por encima de la Ronda y baja sobre la marca
+    // (no tapa la cara, no cruza el atado ni otros anillos: t10i, cache-cmp, t10k)
+    const mid = guide[0];
+    const a = [DOTS[i][0] - 6, DOTS[i][1] - 22], b = [mid[0] + 1, mid[1] - 5];
+    const c = [(a[0] + b[0]) / 2 + 60, Math.min(...DOTS.map(d => d[1])) - 175];
+    const link = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; });
+    const linkSt = depositStroke(link, {w: 3.0, p: 0.6, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
+    sc.links.push({t: land + 0.15, st: linkSt});
+    write(chalk(guide, 60 + n, {motion: {speed: n === 4 ? 900 : 620}}), land + 0.15 + linkSt.T + 0.03, `marca${n}`);
+    n++;
     t = land + 0.1;
+  }
+  sc.counted = n;
+  if (n < 7) { // falta contar: la escena espera al jugador
+    sc.duration = Infinity;
+    sc.actor = buildActor({ground: G, x: X0, k: K, duration: Math.max(30, t + 30), poses: POSES2, script: baseScript(T_PUNTO, Infinity)});
+    sc.camera = cameraTrack([{t: 0, cx: 1440, cy: 600, w: 1250}]);
+    return sc;
   }
   ev('fin de contar', t);
   // 4. Punto vuelve junto al alumno y mira lo escrito
@@ -118,23 +150,19 @@ function build() {
   sc.punto.push({kind: 'bounce', t: T_GET + 0.15, at: P1, n: 2});
   sc.score.push({type: 'note', t: T_GET + 0.15, freq: 523, dur: 0.6, gain: 0.05}, {type: 'note', t: T_GET + 0.32, freq: 659, dur: 0.6, gain: 0.045}, {type: 'note', t: T_GET + 0.5, freq: 784, dur: 0.9, gain: 0.04});
   sc.T_GET = T_GET;
-  sc.duration = T_GET + 5.2;
+  sc.duration = T_GET + 4.0; // R3: cola de 2.8 s sin cambio → ≤ 1 s quieto al final
   // ——— actor ———
   sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, poses: POSES2, script: [
-    {t: 0, pose: 'stand', face: 1},
-    {t: 0.6, walk: {to: X1, speed: 165}},
-    {t: 3.9, pose: 'stand', gaze: [0.7, -0.6]},
-    {t: T_PUNTO + 0.15, pose: 'surprise', gaze: [0.6, -0.9]},       // ¡un punto! (se vuelve hacia nosotros)
-    {t: T_PUNTO + 0.8, pose: 'stand', gaze: [0.9, -0.5]},
-    {t: 5.0, pose: 'write', gaze: [1, -0.4]},
+    ...baseScript(T_PUNTO, sc.events['fin de contar']),
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
     {t: sc.events['escribe 5 y 2'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
-    {t: T_STEP, pose: 'write', overrides: {lean: 0.26, armR: [1.3, 0.3]}, gaze: [0.8, 0.5]},
+    {t: T_STEP, pose: 'write', overrides: {lean: 0.36, armR: [1.3, 0.3]}, gaze: [0.8, 0.5]},
     {t: T_GET - 0.15, pose: 'lookDown', gaze: [0.6, 0.3]},           // anticipación: se encoge un instante
-    {t: T_GET, pose: 'eureka', gaze: [1, -0.5]},                     // cabeza arriba, mira la Ronda: lo entendió
-    {t: T_GET + 0.7, walk: {to: X1 - 150, speed: 110, back: true}},      // un paso atrás para mirar lo hecho
+    {t: T_GET, pose: 'eureka', overrides: {armR: [2.45, 0.35]}, face: 0.9, gaze: [1, -0.5]}, // cabeza arriba, mira la Ronda: lo entendió (brazo adelante, no cruza la cara: R3)
+    {t: T_GET + 0.62, pose: 'lookDown'},                                // anticipa el paso atrás
+    {t: T_GET + 0.75, walk: {to: X1 - 170, speed: 190, back: true}},    // dos pasos atrás para mirar lo hecho
     {t: T_GET + 0.75, pose: 'stand', gaze: [0.8, -0.2]},
-    {t: T_GET + 2.0, pose: 'open', gaze: [0.2, -0.3]},
+    {t: T_GET + 1.9, pose: 'open', gaze: [0.2, -0.3]},
   ]});
   // pasos al sonido: cuando un pie vuelve a apoyar
   let prev = null;
@@ -152,6 +180,18 @@ function build() {
   return sc;
 }
 
+/** Lo que hace el alumno hasta terminar de contar (compartido por la escena completa y la que espera al jugador). */
+function baseScript(T_PUNTO, countEnd) {
+  return [
+    {t: 0, pose: 'stand', face: 1},
+    {t: 0.6, walk: {to: X1, speed: 165}},
+    {t: 3.9, pose: 'stand', gaze: [0.7, -0.6]},
+    {t: T_PUNTO + 0.15, pose: 'surprise', gaze: [0.6, -0.9]},       // ¡un punto! (se vuelve hacia nosotros)
+    {t: T_PUNTO + 0.8, pose: 'stand', gaze: [0.9, -0.5]},
+    {t: 5.0, pose: 'write', gaze: [1, -0.4]},
+  ];
+}
+
 // ——— Punto ———
 function puntoAt(t) {
   let pos = null, sl = 1, ang = Math.PI / 2, fill = 0;
@@ -161,7 +201,7 @@ function puntoAt(t) {
     if (p.kind === 'appear') { pos = p.at; fill = clamp(tl / p.dur); if (tl < p.dur) sl = 1; }
     else if (p.kind === 'hop') {
       if (tl >= p.dur + 0.35) { pos = p.to; continue; }
-      const crouch = 0.07;
+      const crouch = 0.12; // anticipación 80–140 ms (lenguaje visual; R3)
       if (tl < crouch) { pos = p.from; sl = 1 - 0.22 * minJerk(tl / crouch); }               // se agacha
       else if (tl < p.dur) {
         const u = (tl - crouch) / (p.dur - crouch);
@@ -173,6 +213,9 @@ function puntoAt(t) {
         pos = p.to; ang = Math.PI / 2;
         sl = 1 - 0.24 * Math.exp(-k * 5) * Math.cos(k * 11);
       }
+    } else if (p.kind === 'no') {
+      if (tl < 0.6) { pos = [p.at[0] + 7 * Math.sin(tl * 26) * Math.exp(-tl * 4), p.at[1]]; sl = 1 + 0.08 * Math.abs(Math.sin(tl * 26)) * Math.exp(-tl * 4); ang = 0; }
+      else pos = p.at;
     } else if (p.kind === 'bounce') {
       const per = 0.36, i = Math.floor(tl / per);
       if (i < p.n) { const u = (tl % per) / per; pos = [p.at[0], p.at[1] - 4 * 26 * u * (1 - u)]; sl = u < 0.15 || u > 0.85 ? 0.82 : 1.1; }
@@ -222,8 +265,11 @@ let fig;
 export default {
   title: 'microescena «¿Cuántos son?»',
   duration: 0,
-  setup() {
-    S = build();
+  setup(lab) {
+    // ?taps=0,1,2,2,3,4,5,6 → orden de toques en modo automático (p. ej. para ver el «ya está» de un punto repetido)
+    const order = lab.params.get('taps')?.split(',').map(Number);
+    this.taps = lab.params.has('interactive') ? [] : autoTaps(order);
+    S = build(this.taps);
     this.duration = S.duration;
     fig = new Figure('alumno', X0, G, {scale: K});
     fig.skeleton = () => fig._sk;
@@ -266,11 +312,11 @@ export default {
   },
   renderDust(lab, t, ctx) {
     // Punto arrastra un poco de polvo al saltar: rastro tenue que se asienta en ~1.5 s (R2: «pizarrón sin historia»)
-    ctx.save(); ctx.strokeStyle = '#fff'; ctx.lineCap = 'round'; ctx.lineWidth = 16;
+    ctx.save(); ctx.strokeStyle = '#fff'; ctx.lineCap = 'round'; ctx.lineWidth = 30; ctx.filter = 'blur(4px)';
     for (const p of S.punto) {
       if (p.kind !== 'hop' || t < p.t) continue;
       const u1 = clamp((t - p.t - 0.07) / (p.dur - 0.07)), age = Math.max(0, t - p.t - p.dur);
-      const a = 0.07 * Math.exp(-age / 1.5);
+      const a = 0.05 * Math.exp(-age / 1.5);
       if (a < 0.004 || u1 <= 0) continue;
       ctx.globalAlpha = a;
       ctx.beginPath();
@@ -280,10 +326,21 @@ export default {
     ctx.restore();
   },
   score() { return S.score; },
+  /** Interacción: tocar un punto de la Ronda mientras se cuenta. Devuelve true si la escena cambió. */
+  onPointer(lab, t, [wx, wy]) {
+    if (!lab.params.has('interactive') || S.counted >= 7 || t < S.waitFrom - 0.3) return false;
+    let best = -1, bd = 46;
+    DOTS.forEach(([x, y], i) => { const d = Math.hypot(wx - x, wy - y); if (d < bd) { bd = d; best = i; } });
+    if (best < 0) return false;
+    this.taps.push({t, dot: best});
+    S = build(this.taps);
+    this.duration = S.duration;
+    return true;
+  },
   probe(lab, t) {
     const h = S.hand.find(h => t >= h.t0 && t <= h.t1);
     const p = puntoAt(t);
-    return {contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1]} : null, cam: S.camera.at(t)[2]};
+    return {contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
   },
   metrics(lab) {
     // alcance: ¿la mano llega a cada punto de cada trazo? (error > 0 = la tiza estaría fuera del brazo)

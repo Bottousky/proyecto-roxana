@@ -280,3 +280,22 @@ Veredicto R2: **No** (Actuación, Textura, Legibilidad, Continuidad en N2; Matem
 **Rendimiento** (VS1, Chrome de escritorio con GPU, 120 instantes buscados): sin caché, tiza 4.9 ms (p95 6.3) y cuadro 10 ms; con `drawDepositCached` (un trazo terminado se estampa una vez en un bitmap a la escala de la vista y se compone con 'lighter') **tiza 0.8 ms (p95 2.2–2.5) y cuadro ~1 ms** en 1600×900@1, @2 y 844×390@3. Regresión de píxeles con/sin caché (`scripts/animlab-diff.mjs`): |Δ| medio 0.29–0.35 / 255, 0.27–0.33 % de píxeles con |Δ| > 16 (bordes del umbral del diente); visualmente idéntico (`c11/cache-cmp.png`). Teléfono real: sin medir [H].
 
 **VS1.1** (`c11/t10l`): los hilos celestes salen hacia arriba de cada punto y bajan sobre su marca pasando por encima de la Ronda: ya no atraviesan otros anillos ni cruzan el atado (`t10l/final.png`). El plano final es el diagrama de la correspondencia uno a uno.
+
+---
+
+## Revisión R3 (VS1, `c11/t10j`) y VS2 — ciclo 12, 2026-10-07
+
+R3: **No**, pero sube: Timing N3, Actuación N3, Continuidad N3, Matemática N3; Textura y Legibilidad N2. Lista mínima y disposición (evidencia en `c12/`):
+
+| R3 | Disposición |
+|---|---|
+| 1. Los hilos convergen en un extremo: no se sabe qué marca es de qué punto | Marcas cada 13 px (17 px en pantalla) y cada hilo baja sobre su propia marca desde arriba (`c12/t10o/sheet.png` 11.46–18.15). |
+| 2. Sin acento en el quinto | +0.4 s de quietud tras el quinto aterrizaje; par separado 64 px del atado. |
+| 3. Punto: anticipación 0.07 s y sin reposo | Agachada 0.12 s; reposo ≥ 0.32 s entre saltos (`c12/punto-h.png`: mesetas entre saltos y muesca de agachada antes de cada uno). |
+| 4. El brazo de eureka cruza la cara | Eureka de perfil con el brazo adelante; **queda**: al subir, el brazo barre por encima de la ecuación (`c12/phone` t = 14.33). |
+| 5. Paso atrás débil, cola muerta | Dos pasos atrás (170 px a 190 px/s) con anticipación; cola final ≤ 1 s. |
+| 6. El rastro del salto se confunde con el hilo | Rastro de polvo ancho (30 px), desenfocado, alpha 0.05. |
+| 7. Fragmentos antes de entrar | Entra desde 690 (fuera de cuadro): t = 0 y 0.95 vacíos de alumno. |
+| 8. Hilos finos; falta 844×390 | Hilos de 3 px a presión 0.6; captura a 844×390@3 (`c12/phone/sheet.png`): «5+2=7», marcas e hilos legibles. |
+
+**Además**: el conteo se arma desde los toques del jugador (`build(taps)`), con «ya está» si se toca un punto ya contado (sin marca nueva); modo automático = toques guionados (`?taps=0,1,2,2,…` para probar repeticiones).
