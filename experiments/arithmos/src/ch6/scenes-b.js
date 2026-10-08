@@ -193,6 +193,10 @@ export const dosPasos = {
     const w = g.world;
     const p = w.get('punto');
     await d.shot(SHOTS.line, 1);
+    // al costado de la recta, desde hace mucho: abreviaturas sueltas, sin cuenta (la Marea se las lleva al final)
+    [['se despeja', lx(6), GROUND - 330], ['se tacha', lx(9), GROUND - 270], ['cambia de lado y de signo', lx(4), GROUND - 210]]
+      .forEach(([t, x, y], i) => w.add(new Label(`d6-ab${i}`, t, x, y, {size: 24, z: 8, fade: 0.45})));
+    d.describe('Al costado de la recta, escritas por alguien hace mucho: «se despeja», «se tacha», «cambia de lado y de signo», sin ninguna cuenta al lado.');
     await d.say('Recta', 'Una última: dos cajas iguales y un atado suelto son siete atados.');
     const E0 = eq(lin(2, 1), lin(0, 7));
     let e = E0;
@@ -320,11 +324,9 @@ export const dosPasos = {
     await d.think('Doce dividido cuatro, tres: los marcadores caen juntos. La x puede quedar de cualquier lado del igual.');
     if (!replay) writeJournal6(g);
     view.dispose();
-    // la Marea pasa por la recta: se lleva las abreviaturas que nadie entiende; los renglones comprobados quedan
-    const abbr = [['pasa sumando', lx(6), GROUND - 330], ['se tacha', lx(9), GROUND - 270], ['cambia de lado y de signo', lx(4), GROUND - 210]]
-      .map(([t, x, y], i) => w.add(new Label(`d6-ab${i}`, t, x, y, {size: 24, z: 8, fade: 0.45})));
-    d.describe('Al costado de la recta, escritas por alguien hace mucho: «pasa sumando», «se tacha», «cambia de lado y de signo», sin ninguna cuenta al lado.');
-    await d.think('Esas no son nuestras. Son abreviaturas sueltas, sin la cuenta que abrevian.');
+    // la Marea pasa por la recta: se lleva las abreviaturas que nadie entiende (estaban desde el principio); los renglones comprobados quedan
+    const abbr = ['d6-ab0', 'd6-ab1', 'd6-ab2'].map(id => w.get(id)).filter(Boolean);
+    await d.think('Las abreviaturas sueltas del costado no son nuestras: ninguna tiene al lado la cuenta que abrevia.');
     g.setCinematic(true);
     const x0 = SHOTS.line.x - 200, x1 = SHOTS.line.x + SHOTS.line.w + 200;
     const band = w.add(mareaBand(w, x0));

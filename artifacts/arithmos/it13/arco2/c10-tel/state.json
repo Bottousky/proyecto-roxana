@@ -1,0 +1,484 @@
+{
+  "version": 1,
+  "chapter": 11,
+  "segment": "c11.baldes",
+  "flags": {
+    "c10ramp": true,
+    "c10vector": true,
+    "c10complex": true,
+    "c10system": true,
+    "balconStair": true,
+    "tides": [
+      [
+        0,
+        1
+      ]
+    ],
+    "c10chance": true,
+    "chapterDone": true
+  },
+  "scratch": {},
+  "evidence": [
+    {
+      "answer": "4",
+      "t": "2026-10-08T00:42:18.546Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio-predict"
+    },
+    {
+      "ratio": 0.5,
+      "t": "2026-10-08T00:42:19.629Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio"
+    },
+    {
+      "deg": 30,
+      "t": "2026-10-08T00:42:21.042Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio60-turn"
+    },
+    {
+      "deg": 60,
+      "t": "2026-10-08T00:42:21.609Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio60-turn"
+    },
+    {
+      "answer": "other",
+      "t": "2026-10-08T00:42:21.609Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio60-predict"
+    },
+    {
+      "rise": 3.46,
+      "t": "2026-10-08T00:42:21.762Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio60"
+    },
+    {
+      "c": [
+        2,
+        1
+      ],
+      "pos": [
+        2,
+        1
+      ],
+      "t": "2026-10-08T00:42:25.275Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector-step"
+    },
+    {
+      "c": [
+        4,
+        -1
+      ],
+      "pos": [
+        6,
+        0
+      ],
+      "t": "2026-10-08T00:42:26.108Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector-step"
+    },
+    {
+      "c": [
+        4,
+        -1
+      ],
+      "pos": [
+        4,
+        -1
+      ],
+      "t": "2026-10-08T00:42:27.941Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector-step"
+    },
+    {
+      "c": [
+        -1,
+        3
+      ],
+      "pos": [
+        3,
+        2
+      ],
+      "t": "2026-10-08T00:42:28.774Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector-step"
+    },
+    {
+      "answer": "other",
+      "t": "2026-10-08T00:42:29.427Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector-order"
+    },
+    {
+      "used": [
+        [
+          4,
+          -1
+        ],
+        [
+          -1,
+          3
+        ]
+      ],
+      "t": "2026-10-08T00:42:29.661Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector"
+    },
+    {
+      "answer": "swap",
+      "t": "2026-10-08T00:42:32.626Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "quarter-predict"
+    },
+    {
+      "turns": 1,
+      "v": [
+        -1,
+        3
+      ],
+      "t": "2026-10-08T00:42:34.042Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "quarter"
+    },
+    {
+      "turns": 2,
+      "v": [
+        -3,
+        -1
+      ],
+      "t": "2026-10-08T00:42:34.675Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "quarter"
+    },
+    {
+      "answer": "minus1",
+      "t": "2026-10-08T00:42:35.494Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "i-predict"
+    },
+    {
+      "ii": [
+        -1,
+        0
+      ],
+      "m4": [
+        -4,
+        0
+      ],
+      "t": "2026-10-08T00:42:35.928Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "complex"
+    },
+    {
+      "pair": [
+        5,
+        2
+      ],
+      "t": "2026-10-08T00:42:36.210Z",
+      "seg": "c10.pistas",
+      "run": 1,
+      "kind": "punto-try"
+    },
+    {
+      "a": 4,
+      "b": 3,
+      "ok": true,
+      "t": "2026-10-08T00:42:38.226Z",
+      "seg": "c10.pistas",
+      "run": 1,
+      "kind": "system-try"
+    },
+    {
+      "answer": "52",
+      "t": "2026-10-08T00:42:39.160Z",
+      "seg": "c10.pistas",
+      "run": 1,
+      "kind": "system-parallel"
+    },
+    {
+      "sol": {
+        "kind": "one",
+        "x": 4,
+        "y": 3
+      },
+      "none": "none",
+      "t": "2026-10-08T00:42:39.527Z",
+      "seg": "c10.pistas",
+      "run": 1,
+      "kind": "system"
+    },
+    {
+      "k": 1,
+      "r": "llena",
+      "t": "2026-10-08T00:42:43.926Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 2,
+      "r": "a medias",
+      "t": "2026-10-08T00:42:45.491Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 3,
+      "r": "llena",
+      "t": "2026-10-08T00:42:47.024Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 4,
+      "r": "llena",
+      "t": "2026-10-08T00:42:48.591Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 5,
+      "r": "llena",
+      "t": "2026-10-08T00:42:50.141Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 6,
+      "r": "a medias",
+      "t": "2026-10-08T00:42:51.673Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "answer": "half",
+      "t": "2026-10-08T00:42:53.159Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "chance-predict"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c10",
+      "title": "Vueltas y flechas",
+      "abbr": "Los giros se miden con el radio; lo que gira se repite; las flechas se suman; multiplicar por i gira un cuarto de vuelta.",
+      "body": [
+        "Un giro se mide por cuántos rayos recorre el borde, siguiendo la curva: una vuelta, 360°, son 2π radianes (≈ 6,28), media vuelta π. Derecho, de punta a punta, el rayo entra seis veces justo; por el borde, que es más largo, seis y un pedacito. π no es 3,14: 3,14 es una aproximación, y π no es ninguna fracción.",
+        "En una rueda de un rayo, la altura del punto que gira es el seno del ángulo y el costado, el coseno: sen 30° = 0,5, cos 30° ≈ 0,87; a la izquierda del centro el costado es negativo. Rayo, alto y costado forman un triángulo con esquina recta: alto² + costado² = 1. Después de 90° la manija baja como subió: a 120°, la altura de los 60°. Se repiten cada vuelta: sen(x + 360°) = sen x. En una rampa, alto ÷ largo de la tabla (el lado de enfrente de la esquina recta) es el seno del ángulo con el piso; en triángulos, la esquina recta y la misma inclinación dejan la forma fija.",
+        "Una flecha (vector) dice cuánto y hacia dónde, no desde dónde; un lugar no es una flecha, aunque desde el cero se anoten igual. Se suman punta con cola, coordenada a coordenada, y el orden no cambia el destino. La flecha (3, 1) es el número 3 + i. Multiplicar por i gira un cuarto de vuelta contra el reloj: (a, b) pasa a (−b, a), e i · i = −1. Con números de la recta, x · x nunca da negativo; con 2i, 2i · 2i = −4.",
+        "Dos condiciones de primer grado a la vez («tanto de a más tanto de b da tanto») son dos filas de pares sobre rectas: lo que cumple las dos está en el cruce; si son paralelas, no hay; si son la misma, todos. Con atados enteros, además, el cruce tiene que caer en un punto entero. Los números de cada condición, en filas, forman una tabla llamada matriz: si la izquierda de una fila es la de la otra por un mismo número y el resultado no, son paralelas; si también el resultado, es la misma recta."
+      ],
+      "seen": [
+        "Para la rampa de 6 sumaste; con la misma inclinación, alto ÷ largo no cambia: sube 3.",
+        "Para la rampa de 60° giraste la rueda hasta 30°, después 60°; a 60° la manija queda a 0,87: sube unos 3,5.",
+        "Pensaste que el orden cambiaba el destino; cambia el camino, no adónde se llega.",
+        "Para un cuarto de vuelta elegiste (−3, 1), que es un reflejo; girando, (−1, 3).",
+        "Probaste con −1; −1 · −1 es 1, vuelta entera. El cuarto de vuelta es i, y i · i = −1.",
+        "Con «suman 7» y «suman 3» propusiste (5, 2); suma 7, no 3: las rectas son paralelas y no hay par.",
+        "Para el balde 7 dijiste «ya le toca»; el balde no lleva la cuenta."
+      ],
+      "moments": [
+        {
+          "id": "c10.repite",
+          "label": "Desplegar: lo que se repite"
+        },
+        {
+          "id": "c10.cuarto",
+          "label": "Desplegar: un cuarto de vuelta"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c10.rampa",
+    "c10.flechas",
+    "c10.cuarto",
+    "c10.pistas",
+    "c10.a-veces"
+  ],
+  "moments": [
+    "c10.cuarto"
+  ],
+  "log": [
+    {
+      "who": "Rampa",
+      "text": "Mis rampas de carga tienen todas la misma inclinación: 30°. Una corta, de 2 tablones de largo, sube 1. La larga, de 4, sube 2. Quiero una de 6: ¿cuánto va a subir?"
+    },
+    {
+      "who": null,
+      "text": "No se suma: se multiplica. Las rampas son semejantes; alto ÷ largo es siempre 1/2. Con largo 6, sube 3."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, ¿semejantes por tener el mismo ángulo? En la ventana de Cornisa no alcanzaba. Pero en un triángulo sí: con la esquina recta y la misma inclinación, la forma queda fija. La ventana era una ele, con seis lados: con más de tres lados, los ángulos no alcanzan."
+    },
+    {
+      "who": "student",
+      "text": "Con la misma inclinación, alto ÷ largo de la tabla es siempre el mismo número, y es el seno del ángulo del piso: sen 30° = 0,5."
+    },
+    {
+      "who": "Rampa",
+      "text": "Para la cuesta del pozo quiero una empinada: 60°, con una tabla de largo 4. ¿Cuánto sube esa?"
+    },
+    {
+      "who": null,
+      "text": "A 30°, 0,5: esa era la inclinación de las rampas chicas. La cuesta es de 60°."
+    },
+    {
+      "who": null,
+      "text": "A 60°, la manija sube 0,87 de rayo. La tabla de largo 4 sube cuatro veces eso."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, con la rueda sabés cuánto sube una rampa de cualquier inclinación, sin construirla: girás hasta ese ángulo y leés el alto."
+    },
+    {
+      "who": "Rampa",
+      "text": "Punto, la soga vieja se había caído al pozo y ya la sacamos; yo la empalmo con la nueva en mi casa: traémela. Estás en el pozo, en el cero del mapa; mi casa está en (3, 2), como la anotó Mara. Mara sólo te deja moverte con estas flechas."
+    },
+    {
+      "who": null,
+      "text": "Quedaste en (6, 0), no en (3, 2). Probá con otro par de flechas."
+    },
+    {
+      "who": "student",
+      "text": "Punto, el camino cambia, pero el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar."
+    },
+    {
+      "who": "student",
+      "text": "Se suman los de adelante con los de adelante y los de arriba con los de arriba. Y como en cada suma el orden no importa, con cualquier par de flechas se llega al mismo lugar; si no van en la misma dirección, las dos rutas son los lados de un paralelogramo."
+    },
+    {
+      "who": "student",
+      "text": "La suma es la flecha (3, 2): la que va derecho del pozo a la casa. Desde el cero, la flecha que llega a un lugar se anota con los mismos números que el lugar; desde otro punto, no."
+    },
+    {
+      "who": "Mara",
+      "text": "En la Terraza de las Vueltas, cuando te dan media vuelta, se escribe × (−1). Así lo anotamos desde la piedra. ¿Y un cuarto de vuelta, cómo se escribe?"
+    },
+    {
+      "who": null,
+      "text": "(−3, 1) es reflejarla en el eje parado, no girarla: la flecha no se pone de pie. Quedó en (−1, 3)."
+    },
+    {
+      "who": null,
+      "text": "Dos cuartos: (−3, −1). Media vuelta: la flecha apunta para el lado contrario, como multiplicar por −1. Cada cuarto, (a, b) pasa a (−b, a)."
+    },
+    {
+      "who": null,
+      "text": "−1 por −1 es 1: dos medias vueltas, vuelta entera. Hace falta uno que sea medio camino: un cuarto."
+    },
+    {
+      "who": "student",
+      "text": "Mara, a la flecha (0, 1), uno arriba del cero, le decimos i. Multiplicar por i es girar un cuarto de vuelta, contra el reloj. Dos cuartos son media vuelta: i · i = −1. i no está en la recta."
+    },
+    {
+      "who": "student",
+      "text": "La flecha (3, 1) es el número 3 + i: tres adelante y uno arriba. Por i: i · 3 + i · i = 3i − 1. Es la flecha (−1, 3), la del primer giro: el de adelante pasa arriba, y el de arriba pasa adelante con el signo cambiado."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?"
+    },
+    {
+      "who": "student",
+      "text": "Con los números de la recta no se podía, y eso sigue valiendo en la recta. Con éstos sí: multiplicar por 2i es girar un cuarto de vuelta y estirar al doble. Dos veces: media vuelta y cuatro veces el largo, −4. Y −2i, girando para el otro lado, también."
+    },
+    {
+      "who": "Mara",
+      "text": "Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7."
+    },
+    {
+      "who": null,
+      "text": "Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos."
+    },
+    {
+      "who": "Mara",
+      "text": "Segunda pista: el de Cornisa le lleva 1 al de Balcón."
+    },
+    {
+      "who": null,
+      "text": "Punto mira la fila amarilla: (5, 2) no está en ella. El 5 le lleva 3 al 2, no 1. Se apuró."
+    },
+    {
+      "who": "student",
+      "text": "Mara, son Cornisa 4 y Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si te digo «suman 7» y «suman 3»?"
+    },
+    {
+      "who": null,
+      "text": "(5, 2) suma 7, pero no 3. Las dos filas son paralelas: ningún par cumple las dos."
+    },
+    {
+      "who": null,
+      "text": "Una tabla así, sólo con los números de cada pista, se llama matriz."
+    },
+    {
+      "who": "student",
+      "text": "Mara, en la tabla azul la parte de la izquierda es igual en las dos filas y el resultado no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si te digo «suman 7» y «el doble de los dos suma 14»?"
+    },
+    {
+      "who": "student",
+      "text": "Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares."
+    },
+    {
+      "who": "Balcón",
+      "text": "Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias."
+    },
+    {
+      "who": null,
+      "text": "El primero llegó lleno, hasta el borde."
+    },
+    {
+      "who": null,
+      "text": "El balde no lleva la cuenta: lo que salió antes no cambia lo que sale ahora."
+    },
+    {
+      "who": "Mara",
+      "text": "Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera."
+    },
+    {
+      "who": "Mara",
+      "text": "La Marea volvió anoche. Llegó hasta el primer escalón de la escalera de Balcón y dejó su raya. Mientras no la pase por arriba, no se lleva nada. Voy a anotar hasta dónde llega cada noche."
+    }
+  ],
+  "createdAt": "2026-10-08T00:42:16.579Z",
+  "updatedAt": null,
+  "chaptersDone": [
+    10
+  ]
+}

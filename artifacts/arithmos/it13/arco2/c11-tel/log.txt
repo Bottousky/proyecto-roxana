@@ -1,0 +1,23 @@
+[0.0s] escena → c11.dados
+[1.0s] lee: La Ronda vino a la fiesta. Punto la mira un rato largo, y después vuelve conmigo.
+[1.1s] lee: ¡Doce! ¿Vieron? En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande.
+[1.7s] elige «El 12: es el más grande.» (¿Qué suma sale más seguido, el 7 o el 12?)
+[5.0s] lee: —Rampa, el 7 sale de 6 maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene 6/36 de probabilidad y el 12, 1/36.
+[5.1s] lee: En la tabla, sí. ¿Y tirando de verdad?
+[6.1s] lee: Contando, el 7 debería salir cerca de 60 veces de 360 y el 12, cerca de 10. Salieron 58 y 6: cerca, no exacto.
+[6.1s] lee: Me paso al 7. Aunque el 12 puede salir igual: no es imposible, es raro.
+[6.2s] escena → c11.causa
+[7.2s] lee: Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche.
+[8.5s] elige «Sí: van juntos, el polvo hace borrar a la Marea.» (¿El polvo hace que la Marea borre más?)
+[9.6s] lee: Me olvidaba: también anoté el viento.
+[9.6s] lee: ¿Y qué hace el polvo solo, sin que el viento se meta? Uní dos días y mirá.
+[12.7s] lee: Las tres flechas bajan: con el mismo viento, más polvo no trajo más borrones.
+[13.3s] lee: —Mara, que dos cosas suban juntas no dice que una cause la otra. Acá el que acompaña a los borrones parece el viento. Pero son seis días: habría que anotar muchos más.
+[13.4s] escena → c11.anticipar
+[13.5s] lee: La escalera de Mara crece de a 10, la de Punto se duplica, la rueda vuelve, el balde a veces sí y a veces no. ¿Con todo eso se puede saber qué viene?
+[19.5s] lee: —Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar.
+[22.0s] lee: ¿Y la vuelta, se anticipa? La puerta del primer día se ve más que la otra vez. Cada cosa que entendemos la marca un poco más.
+[23.0s] lee: Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?
+[23.3s] lee: Anoche llegó al segundo escalón; la anterior, al primero. Cada noche más alto. La noche que pase la escalera por arriba, se lleva lo que esté apenas marcado, y la de Balcón sigue sin repasar.
+[23.9s] escena → c12.familias
+[24.2s] {"ended":true,"final":{"mode":"play","seg":"c12.familias"},"journal":["Lo que pasa a veces"],"evidenceKinds":["dice-predict","dice-cell","dice-done","dice-mark","dice-roll","cause-predict","cause-pair-wrong","cause-pair","anticipate"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":24.17,"size":"844x390","touch":true,"route":"errores","watch":false}

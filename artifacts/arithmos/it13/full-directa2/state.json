@@ -1,0 +1,6430 @@
+{
+  "version": 1,
+  "chapter": 12,
+  "segment": "c12.anticipar",
+  "flags": {
+    "metApproaches": 0,
+    "recorded": 12,
+    "pairs": [
+      [
+        "mark0",
+        "r0"
+      ],
+      [
+        "mark1",
+        "r1"
+      ],
+      [
+        "mark2",
+        "r2"
+      ],
+      [
+        "mark3",
+        "r3"
+      ],
+      [
+        "mark4",
+        "r4"
+      ],
+      [
+        "mark5",
+        "r5"
+      ],
+      [
+        "mark6",
+        "r6"
+      ],
+      [
+        "mark7",
+        "r7"
+      ],
+      [
+        "mark8",
+        "r8"
+      ],
+      [
+        "mark9",
+        "r9"
+      ],
+      [
+        "mark10",
+        "r10"
+      ],
+      [
+        "mark11",
+        "r11"
+      ]
+    ],
+    "freeMark": "mark11",
+    "reading": "missing",
+    "found": true,
+    "all": true,
+    "prediction": "nose",
+    "seated": {
+      "0": "r0",
+      "1": "r1",
+      "2": "r2",
+      "3": "r3",
+      "4": "r4",
+      "6": "r10",
+      "7": "r11",
+      "8": "r9",
+      "9": "r5",
+      "10": "punto",
+      "11": "r6",
+      "12": "r7",
+      "13": "r8"
+    },
+    "chapterDone": true,
+    "punto14": true,
+    "zero": true,
+    "thousand": true,
+    "c3debt": true,
+    "c3pairs": true,
+    "c3line": true,
+    "c3dist": true,
+    "c3forgive": true,
+    "c3pit": true,
+    "puntoArrow": true,
+    "c4groups": true,
+    "c4turn": true,
+    "c4scale": true,
+    "c4share": true,
+    "c4measure": true,
+    "c4zero": true,
+    "c5half": true,
+    "c5bars": true,
+    "c5equiv": true,
+    "c5line": true,
+    "c5compare": true,
+    "c5add": true,
+    "c5dec": true,
+    "c5percent": true,
+    "c6box": true,
+    "c6both": true,
+    "c6memory": true,
+    "c6zero": true,
+    "c6square": true,
+    "c6div": true,
+    "c6ineq": true,
+    "c7root": true,
+    "c7race": true,
+    "c7pow": true,
+    "c7roots": true,
+    "c7sci": true,
+    "c7area": true,
+    "c7factor": true,
+    "c7complete": true,
+    "c7log": true,
+    "c7rational": true,
+    "c8irr": true,
+    "c8angle": true,
+    "c8copy": true,
+    "c8scale": true,
+    "c8puntoFence": true,
+    "c8perim": true,
+    "balconStair": true,
+    "c8pythag": true,
+    "c8coords": true,
+    "c8shadow": true,
+    "c9fn": true,
+    "c9machine": true,
+    "c9graph": true,
+    "c9vertical": true,
+    "c9domain": true,
+    "c9image": true,
+    "c9ways": true,
+    "c9periodic": true,
+    "c10radian": true,
+    "c10sine": true,
+    "c10period": true,
+    "c10ramp": true,
+    "c10vector": true,
+    "c10complex": true,
+    "c10system": true,
+    "stairLost": 0,
+    "c10chance": true,
+    "c11freq": true,
+    "c11median": true,
+    "c11spread": true,
+    "c11graph": true,
+    "c11count": true,
+    "c11dice": true,
+    "c11cause": true,
+    "c11anticipate": true,
+    "c12families": true,
+    "c12params": true,
+    "c12jump": true,
+    "c12inverse": true,
+    "c12rate": true,
+    "c12accum": true,
+    "c12piecewise": true,
+    "stairDone": true,
+    "c12final": true,
+    "gameDone": true
+  },
+  "scratch": {
+    "c1.alguien": {
+      "approaches": 0
+    },
+    "c1.ronda": {
+      "method": "marks",
+      "recorded": [
+        "r0",
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9",
+        "r10",
+        "r11"
+      ]
+    },
+    "c1.vuelven": {
+      "links": [
+        [
+          "mark0",
+          "r0"
+        ],
+        [
+          "mark1",
+          "r1"
+        ],
+        [
+          "mark2",
+          "r2"
+        ],
+        [
+          "mark3",
+          "r3"
+        ],
+        [
+          "mark4",
+          "r4"
+        ],
+        [
+          "mark5",
+          "r5"
+        ],
+        [
+          "mark6",
+          "r6"
+        ],
+        [
+          "mark7",
+          "r7"
+        ],
+        [
+          "mark8",
+          "r8"
+        ],
+        [
+          "mark9",
+          "r9"
+        ],
+        [
+          "mark10",
+          "r10"
+        ]
+      ]
+    },
+    "c1.quien": {
+      "reading": "missing"
+    },
+    "c1.busqueda": {
+      "seen": [
+        "crack",
+        "house",
+        "smudge"
+      ]
+    },
+    "c1.todos": {
+      "links": [
+        [
+          "mark0",
+          "r0"
+        ],
+        [
+          "mark1",
+          "r1"
+        ],
+        [
+          "mark2",
+          "r2"
+        ],
+        [
+          "mark3",
+          "r3"
+        ],
+        [
+          "mark4",
+          "r4"
+        ],
+        [
+          "mark5",
+          "r5"
+        ],
+        [
+          "mark6",
+          "r6"
+        ],
+        [
+          "mark7",
+          "r7"
+        ],
+        [
+          "mark8",
+          "r8"
+        ],
+        [
+          "mark9",
+          "r9"
+        ],
+        [
+          "mark10",
+          "r10"
+        ],
+        [
+          "mark11",
+          "r11"
+        ]
+      ]
+    },
+    "c1.gradas": {
+      "prediction": "nose",
+      "seated": {
+        "0": "r0",
+        "1": "r1",
+        "2": "r2",
+        "3": "r3",
+        "4": "r4",
+        "6": "r10",
+        "7": "r11",
+        "8": "r9",
+        "9": "r5",
+        "10": "punto",
+        "11": "r6",
+        "12": "r7",
+        "13": "r8"
+      },
+      "conserve": "one"
+    },
+    "c1.nombre": {
+      "marked": true,
+      "counted": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "countRepeats": 0,
+      "lined": true,
+      "named": true
+    },
+    "c2.atados": {
+      "bundles": 3
+    },
+    "c2.deposito": {
+      "counts": [
+        0,
+        1,
+        1
+      ],
+      "load": 3,
+      "written": "110"
+    },
+    "c3.linea": {
+      "placed": {
+        "recta": 3,
+        "oval-a": 2,
+        "curva": -1,
+        "cuna": -4
+      },
+      "drawn": true,
+      "prediction": "espiral",
+      "labeled": true
+    },
+    "c4.grupos": {
+      "moved": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "guess": "12"
+    },
+    "c4.girar": {
+      "guess": "same",
+      "turned": true
+    },
+    "c4.estirar": {
+      "stage": 3
+    },
+    "c4.repartir": {
+      "given": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "guess": "3r2"
+    },
+    "c4.medir": {
+      "bags": 4,
+      "guess": "4"
+    },
+    "c4.nadie": {}
+  },
+  "evidence": [
+    {
+      "t": "2026-10-08T00:13:23.342Z",
+      "seg": "c1.puerta",
+      "run": 1,
+      "kind": "door"
+    },
+    {
+      "choice": "wait",
+      "t": "2026-10-08T00:13:57.829Z",
+      "seg": "c1.alguien",
+      "run": 1,
+      "kind": "meet"
+    },
+    {
+      "choice": "marks",
+      "t": "2026-10-08T00:14:32.827Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-method"
+    },
+    {
+      "id": "r0",
+      "n": 1,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:33.510Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r1",
+      "n": 2,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:34.610Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r2",
+      "n": 3,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:35.626Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r3",
+      "n": 4,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:36.642Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r4",
+      "n": 5,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:37.642Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r5",
+      "n": 6,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:39.559Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r6",
+      "n": 7,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:40.560Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r7",
+      "n": 8,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:41.575Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r8",
+      "n": 9,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:42.593Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r9",
+      "n": 10,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:43.610Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r10",
+      "n": 11,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:44.626Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r11",
+      "n": 12,
+      "viaHint": false,
+      "t": "2026-10-08T00:14:45.643Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "count": 12,
+      "repeats": 0,
+      "t": "2026-10-08T00:14:46.158Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "recorded"
+    },
+    {
+      "mark": "mark0",
+      "dot": "r0",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:22.285Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark1",
+      "dot": "r1",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:22.545Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark2",
+      "dot": "r2",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:22.808Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark3",
+      "dot": "r3",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:23.066Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark4",
+      "dot": "r4",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:23.326Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark5",
+      "dot": "r5",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:23.584Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark6",
+      "dot": "r6",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:23.843Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark7",
+      "dot": "r7",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:24.107Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark8",
+      "dot": "r8",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:24.362Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark9",
+      "dot": "r9",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:24.624Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark10",
+      "dot": "r10",
+      "viaHint": false,
+      "t": "2026-10-08T00:16:24.883Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "verdict": "left-more",
+      "pairs": 11,
+      "double": null,
+      "final": false,
+      "t": "2026-10-08T00:16:25.012Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "check"
+    },
+    {
+      "reading": "missing",
+      "t": "2026-10-08T00:16:31.890Z",
+      "seg": "c1.quien",
+      "run": 1,
+      "kind": "interpret"
+    },
+    {
+      "place": "crack",
+      "t": "2026-10-08T00:16:36.137Z",
+      "seg": "c1.busqueda",
+      "run": 1,
+      "kind": "search"
+    },
+    {
+      "place": "house",
+      "t": "2026-10-08T00:16:37.023Z",
+      "seg": "c1.busqueda",
+      "run": 1,
+      "kind": "search"
+    },
+    {
+      "place": "smudge",
+      "t": "2026-10-08T00:16:41.073Z",
+      "seg": "c1.busqueda",
+      "run": 1,
+      "kind": "search"
+    },
+    {
+      "mark": "mark11",
+      "dot": "r11",
+      "viaHint": false,
+      "t": "2026-10-08T00:17:16.147Z",
+      "seg": "c1.todos",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "verdict": "equal",
+      "pairs": 12,
+      "double": null,
+      "final": true,
+      "t": "2026-10-08T00:17:16.276Z",
+      "seg": "c1.todos",
+      "run": 1,
+      "kind": "check"
+    },
+    {
+      "prediction": "nose",
+      "why": null,
+      "t": "2026-10-08T00:17:20.804Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "predict"
+    },
+    {
+      "seat": 7,
+      "who": "r11",
+      "t": "2026-10-08T00:17:21.008Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "seat"
+    },
+    {
+      "seat": 6,
+      "who": "r10",
+      "t": "2026-10-08T00:17:21.648Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "seat"
+    },
+    {
+      "seat": 8,
+      "who": "r9",
+      "t": "2026-10-08T00:17:22.288Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "seat"
+    },
+    {
+      "reading": "seats",
+      "t": "2026-10-08T00:17:23.670Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "interpret-seat"
+    },
+    {
+      "answer": "one",
+      "t": "2026-10-08T00:17:24.620Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "conserve"
+    },
+    {
+      "mark": 0,
+      "word": "uno",
+      "t": "2026-10-08T00:17:25.746Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 1,
+      "word": "dos",
+      "t": "2026-10-08T00:17:25.873Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 2,
+      "word": "tres",
+      "t": "2026-10-08T00:17:26.003Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 3,
+      "word": "cuatro",
+      "t": "2026-10-08T00:17:26.130Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 4,
+      "word": "cinco",
+      "t": "2026-10-08T00:17:26.256Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 5,
+      "word": "seis",
+      "t": "2026-10-08T00:17:26.386Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 6,
+      "word": "siete",
+      "t": "2026-10-08T00:17:26.514Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 7,
+      "word": "ocho",
+      "t": "2026-10-08T00:17:26.642Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 8,
+      "word": "nueve",
+      "t": "2026-10-08T00:17:26.772Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 9,
+      "word": "diez",
+      "t": "2026-10-08T00:17:26.899Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 10,
+      "word": "once",
+      "t": "2026-10-08T00:17:27.025Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 11,
+      "word": "doce",
+      "t": "2026-10-08T00:17:27.155Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 12,
+      "word": "trece",
+      "t": "2026-10-08T00:17:27.283Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 13,
+      "word": "catorce",
+      "t": "2026-10-08T00:17:27.410Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "answer": "name",
+      "t": "2026-10-08T00:17:28.604Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "numeral"
+    },
+    {
+      "choice": "help",
+      "t": "2026-10-08T00:17:30.556Z",
+      "seg": "c2.manana",
+      "run": 1,
+      "kind": "meet-mara"
+    },
+    {
+      "answer": "cant",
+      "t": "2026-10-08T00:17:32.002Z",
+      "seg": "c2.marcar",
+      "run": 1,
+      "kind": "compare-tallies"
+    },
+    {
+      "n": 1,
+      "t": "2026-10-08T00:17:36.602Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "tie"
+    },
+    {
+      "t": "2026-10-08T00:17:36.697Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "fill-quick"
+    },
+    {
+      "n": 2,
+      "t": "2026-10-08T00:17:39.369Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "tie"
+    },
+    {
+      "t": "2026-10-08T00:17:39.398Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "fill-quick"
+    },
+    {
+      "n": 3,
+      "t": "2026-10-08T00:17:42.019Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "tie"
+    },
+    {
+      "bundles": 3,
+      "loose": 7,
+      "tieTries": 0,
+      "t": "2026-10-08T00:17:42.236Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "bundled"
+    },
+    {
+      "n": 1,
+      "t": "2026-10-08T00:17:43.669Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "ring-ten"
+    },
+    {
+      "n": 2,
+      "t": "2026-10-08T00:17:44.151Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "ring-ten"
+    },
+    {
+      "n": 3,
+      "t": "2026-10-08T00:17:44.684Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "ring-ten"
+    },
+    {
+      "t": "2026-10-08T00:17:44.728Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "ring-rest"
+    },
+    {
+      "yesterday": 34,
+      "today": 37,
+      "t": "2026-10-08T00:17:44.887Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "compare-resolved"
+    },
+    {
+      "t": "2026-10-08T00:17:45.996Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "fill-quick"
+    },
+    {
+      "n": 1,
+      "t": "2026-10-08T00:17:48.618Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "tie"
+    },
+    {
+      "from": 0,
+      "t": "2026-10-08T00:17:59.504Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "from": 1,
+      "t": "2026-10-08T00:18:05.337Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "from": 0,
+      "t": "2026-10-08T00:18:10.853Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "choice": "space",
+      "attempt": 0,
+      "t": "2026-10-08T00:18:19.902Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "write-empty"
+    },
+    {
+      "choice": "blank",
+      "attempt": 1,
+      "t": "2026-10-08T00:18:24.051Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "write-empty"
+    },
+    {
+      "choice": "space",
+      "attempt": 2,
+      "t": "2026-10-08T00:18:27.352Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "write-empty"
+    },
+    {
+      "choice": "zero",
+      "attempt": 3,
+      "t": "2026-10-08T00:18:31.519Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "write-empty"
+    },
+    {
+      "answer": "unknown",
+      "t": "2026-10-08T00:18:37.869Z",
+      "seg": "c2.cero",
+      "run": 1,
+      "kind": "smudge"
+    },
+    {
+      "answer": "320",
+      "t": "2026-10-08T00:18:38.918Z",
+      "seg": "c2.cero",
+      "run": 1,
+      "kind": "read-oval"
+    },
+    {
+      "side": "cmp-a",
+      "t": "2026-10-08T00:18:54.000Z",
+      "seg": "c2.cuantos",
+      "run": 1,
+      "kind": "untie"
+    },
+    {
+      "pairs": 10,
+      "untied": 1,
+      "mixed": 0,
+      "left": 15,
+      "t": "2026-10-08T00:18:58.063Z",
+      "seg": "c2.cuantos",
+      "run": 1,
+      "kind": "difference"
+    },
+    {
+      "from": 0,
+      "t": "2026-10-08T00:19:01.417Z",
+      "seg": "c2.cuarto",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "from": 1,
+      "t": "2026-10-08T00:19:02.845Z",
+      "seg": "c2.cuarto",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "choice": "build",
+      "t": "2026-10-08T00:19:04.005Z",
+      "seg": "c2.cuarto",
+      "run": 1,
+      "kind": "new-room"
+    },
+    {
+      "counts": [
+        2,
+        0,
+        5
+      ],
+      "value": 205,
+      "t": "2026-10-08T00:19:06.551Z",
+      "seg": "c2.lugar",
+      "run": 1,
+      "kind": "build-205"
+    },
+    {
+      "choice": "mark",
+      "t": "2026-10-08T00:19:09.502Z",
+      "seg": "c3.deuda",
+      "run": 1,
+      "kind": "write-debt"
+    },
+    {
+      "t": "2026-10-08T00:19:11.847Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "cancel"
+    },
+    {
+      "t": "2026-10-08T00:19:12.715Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "cancel"
+    },
+    {
+      "haves": 0,
+      "debts": 1,
+      "wrong": 0,
+      "t": "2026-10-08T00:19:12.715Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "cancel-result"
+    },
+    {
+      "answer": "-1",
+      "expect": "-1",
+      "t": "2026-10-08T00:19:13.667Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "read-balance"
+    },
+    {
+      "answer": "+3",
+      "expect": "+3",
+      "t": "2026-10-08T00:19:17.631Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "predict-balance"
+    },
+    {
+      "t": "2026-10-08T00:19:18.448Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "cancel"
+    },
+    {
+      "answer": "espiral",
+      "t": "2026-10-08T00:19:23.198Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "predict-order"
+    },
+    {
+      "family": "recta",
+      "at": 3,
+      "t": "2026-10-08T00:19:25.181Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place"
+    },
+    {
+      "family": "oval-a",
+      "at": 2,
+      "t": "2026-10-08T00:19:28.065Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place"
+    },
+    {
+      "family": "curva",
+      "at": -1,
+      "t": "2026-10-08T00:19:32.548Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place"
+    },
+    {
+      "family": "cuna",
+      "at": -4,
+      "t": "2026-10-08T00:19:38.714Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place"
+    },
+    {
+      "answer": "7",
+      "t": "2026-10-08T00:19:41.933Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "predict-steps"
+    },
+    {
+      "at": -3,
+      "t": "2026-10-08T00:19:42.298Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": -2,
+      "t": "2026-10-08T00:19:42.680Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": -1,
+      "t": "2026-10-08T00:19:43.064Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": 0,
+      "t": "2026-10-08T00:19:43.464Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": 1,
+      "t": "2026-10-08T00:19:43.848Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": 2,
+      "t": "2026-10-08T00:19:44.214Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": 3,
+      "t": "2026-10-08T00:19:44.598Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "answer": "same",
+      "t": "2026-10-08T00:19:45.766Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "abs"
+    },
+    {
+      "removed": 1,
+      "t": "2026-10-08T00:19:47.547Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive"
+    },
+    {
+      "choice": "pair",
+      "t": "2026-10-08T00:19:48.682Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive-how"
+    },
+    {
+      "removed": 2,
+      "t": "2026-10-08T00:19:49.178Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive"
+    },
+    {
+      "value": 1,
+      "t": "2026-10-08T00:19:49.178Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive-result"
+    },
+    {
+      "answer": "give",
+      "t": "2026-10-08T00:19:51.496Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive-same"
+    },
+    {
+      "answer": "take",
+      "t": "2026-10-08T00:19:53.730Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "read-minus"
+    },
+    {
+      "answer": "-3",
+      "t": "2026-10-08T00:19:55.879Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "predict-pay"
+    },
+    {
+      "paid": 1,
+      "t": "2026-10-08T00:19:56.279Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "paid": 2,
+      "t": "2026-10-08T00:19:56.795Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "lent": 1,
+      "t": "2026-10-08T00:19:57.462Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-pad"
+    },
+    {
+      "paid": 3,
+      "t": "2026-10-08T00:19:57.878Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "lent": 2,
+      "t": "2026-10-08T00:19:58.379Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-pad"
+    },
+    {
+      "paid": 4,
+      "t": "2026-10-08T00:19:58.895Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "lent": 3,
+      "t": "2026-10-08T00:19:59.395Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-pad"
+    },
+    {
+      "paid": 5,
+      "t": "2026-10-08T00:19:59.928Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "value": -3,
+      "padded": true,
+      "t": "2026-10-08T00:19:59.929Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-result"
+    },
+    {
+      "answer": "+1",
+      "t": "2026-10-08T00:20:03.280Z",
+      "seg": "c3.pozo",
+      "run": 1,
+      "kind": "predict-pit"
+    },
+    {
+      "to": 1,
+      "steps": 5,
+      "t": "2026-10-08T00:20:05.545Z",
+      "seg": "c3.pozo",
+      "run": 1,
+      "kind": "pit-climb"
+    },
+    {
+      "to": "recta",
+      "value": 4,
+      "t": "2026-10-08T00:20:07.562Z",
+      "seg": "c3.hacia",
+      "run": 1,
+      "kind": "punto-goes"
+    },
+    {
+      "to": "oval-a",
+      "value": -3,
+      "t": "2026-10-08T00:20:08.912Z",
+      "seg": "c3.hacia",
+      "run": 1,
+      "kind": "punto-goes"
+    },
+    {
+      "answer": "12",
+      "t": "2026-10-08T00:20:12.297Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "predict-total"
+    },
+    {
+      "family": "peldano",
+      "row": 0,
+      "t": "2026-10-08T00:20:13.451Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "gather"
+    },
+    {
+      "family": "rampa",
+      "row": 1,
+      "t": "2026-10-08T00:20:14.533Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "gather"
+    },
+    {
+      "family": "cornisa",
+      "row": 2,
+      "t": "2026-10-08T00:20:20.714Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "gather"
+    },
+    {
+      "family": "balcon",
+      "row": 3,
+      "t": "2026-10-08T00:20:21.913Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "gather"
+    },
+    {
+      "groups": 4,
+      "each": -3,
+      "total": -12,
+      "t": "2026-10-08T00:20:23.450Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "times"
+    },
+    {
+      "answer": "same",
+      "t": "2026-10-08T00:20:25.447Z",
+      "seg": "c4.girar",
+      "run": 1,
+      "kind": "turn-predict"
+    },
+    {
+      "rect": {
+        "rows": 4,
+        "cols": 3,
+        "total": 12,
+        "turned": {
+          "rows": 3,
+          "cols": 4,
+          "total": 12
+        }
+      },
+      "t": "2026-10-08T00:20:26.747Z",
+      "seg": "c4.girar",
+      "run": 1,
+      "kind": "turn"
+    },
+    {
+      "answer": "one",
+      "t": "2026-10-08T00:20:27.730Z",
+      "seg": "c4.girar",
+      "run": 1,
+      "kind": "turn-transfer"
+    },
+    {
+      "op": "times2",
+      "t": "2026-10-08T00:20:28.985Z",
+      "seg": "c4.estirar",
+      "run": 1,
+      "kind": "scale-choice"
+    },
+    {
+      "factor": 2,
+      "cornisa": -6,
+      "t": "2026-10-08T00:20:30.813Z",
+      "seg": "c4.estirar",
+      "run": 1,
+      "kind": "scale"
+    },
+    {
+      "op": "timesm1",
+      "t": "2026-10-08T00:20:30.957Z",
+      "seg": "c4.estirar",
+      "run": 1,
+      "kind": "flip-choice"
+    },
+    {
+      "answer": "back",
+      "t": "2026-10-08T00:20:33.580Z",
+      "seg": "c4.estirar",
+      "run": 1,
+      "kind": "predict-flip2"
+    },
+    {
+      "answer": "3r2",
+      "t": "2026-10-08T00:20:37.464Z",
+      "seg": "c4.repartir",
+      "run": 1,
+      "kind": "predict-share"
+    },
+    {
+      "t": "2026-10-08T00:20:39.671Z",
+      "seg": "c4.repartir",
+      "run": 1,
+      "kind": "share-round"
+    },
+    {
+      "t": "2026-10-08T00:20:41.548Z",
+      "seg": "c4.repartir",
+      "run": 1,
+      "kind": "share-round"
+    },
+    {
+      "choice": "aside",
+      "t": "2026-10-08T00:20:44.397Z",
+      "seg": "c4.repartir",
+      "run": 1,
+      "kind": "rest"
+    },
+    {
+      "defined": true,
+      "each": 3,
+      "rest": 2,
+      "t": "2026-10-08T00:20:45.330Z",
+      "seg": "c4.repartir",
+      "run": 1,
+      "kind": "share"
+    },
+    {
+      "answer": "4",
+      "t": "2026-10-08T00:20:46.780Z",
+      "seg": "c4.medir",
+      "run": 1,
+      "kind": "predict-measure"
+    },
+    {
+      "n": 1,
+      "t": "2026-10-08T00:20:47.745Z",
+      "seg": "c4.medir",
+      "run": 1,
+      "kind": "bag"
+    },
+    {
+      "n": 2,
+      "t": "2026-10-08T00:20:48.778Z",
+      "seg": "c4.medir",
+      "run": 1,
+      "kind": "bag"
+    },
+    {
+      "n": 3,
+      "t": "2026-10-08T00:20:49.795Z",
+      "seg": "c4.medir",
+      "run": 1,
+      "kind": "bag"
+    },
+    {
+      "n": 4,
+      "t": "2026-10-08T00:20:50.828Z",
+      "seg": "c4.medir",
+      "run": 1,
+      "kind": "bag"
+    },
+    {
+      "answer": "3",
+      "t": "2026-10-08T00:20:52.863Z",
+      "seg": "c4.medir",
+      "run": 1,
+      "kind": "measure-transfer"
+    },
+    {
+      "defined": true,
+      "bags": 4,
+      "rest": 0,
+      "t": "2026-10-08T00:20:53.796Z",
+      "seg": "c4.medir",
+      "run": 1,
+      "kind": "measure"
+    },
+    {
+      "answer": "none",
+      "t": "2026-10-08T00:20:55.230Z",
+      "seg": "c4.nadie",
+      "run": 1,
+      "kind": "share-zero"
+    },
+    {
+      "n": 1,
+      "t": "2026-10-08T00:20:56.261Z",
+      "seg": "c4.nadie",
+      "run": 1,
+      "kind": "zero-bag"
+    },
+    {
+      "answer": "never",
+      "t": "2026-10-08T00:20:57.464Z",
+      "seg": "c4.nadie",
+      "run": 1,
+      "kind": "measure-zero"
+    },
+    {
+      "answer": "none",
+      "t": "2026-10-08T00:20:58.530Z",
+      "seg": "c4.nadie",
+      "run": 1,
+      "kind": "times-zero"
+    },
+    {
+      "answer": "no",
+      "t": "2026-10-08T00:21:01.662Z",
+      "seg": "c4.partir",
+      "run": 1,
+      "kind": "predict-split"
+    },
+    {
+      "at": 1,
+      "parts": [
+        4,
+        16
+      ],
+      "sum": 20,
+      "t": "2026-10-08T00:21:04.109Z",
+      "seg": "c4.partir",
+      "run": 1,
+      "kind": "cut"
+    },
+    {
+      "at": 2,
+      "parts": [
+        8,
+        12
+      ],
+      "sum": 20,
+      "t": "2026-10-08T00:21:07.044Z",
+      "seg": "c4.partir",
+      "run": 1,
+      "kind": "cut"
+    },
+    {
+      "answer": "52",
+      "t": "2026-10-08T00:21:09.746Z",
+      "seg": "c4.partir",
+      "run": 1,
+      "kind": "distributive-transfer"
+    },
+    {
+      "choice": "two",
+      "t": "2026-10-08T00:21:12.545Z",
+      "seg": "c5.medio",
+      "run": 1,
+      "kind": "share-two"
+    },
+    {
+      "choice": "halve",
+      "t": "2026-10-08T00:21:13.562Z",
+      "seg": "c5.medio",
+      "run": 1,
+      "kind": "share-two"
+    },
+    {
+      "answer": "monton",
+      "t": "2026-10-08T00:21:16.462Z",
+      "seg": "c5.medio",
+      "run": 1,
+      "kind": "unit-half"
+    },
+    {
+      "t": "2026-10-08T00:21:17.270Z",
+      "seg": "c5.barras",
+      "run": 1,
+      "kind": "cut-uneven"
+    },
+    {
+      "n": 4,
+      "t": "2026-10-08T00:21:18.462Z",
+      "seg": "c5.barras",
+      "run": 1,
+      "kind": "cut"
+    },
+    {
+      "each": "3/4",
+      "path": 4,
+      "t": "2026-10-08T00:21:19.460Z",
+      "seg": "c5.barras",
+      "run": 1,
+      "kind": "share-bars"
+    },
+    {
+      "answer": "same",
+      "t": "2026-10-08T00:21:20.845Z",
+      "seg": "c5.equivalentes",
+      "run": 1,
+      "kind": "equiv-predict"
+    },
+    {
+      "same": true,
+      "t": "2026-10-08T00:21:22.115Z",
+      "seg": "c5.equivalentes",
+      "run": 1,
+      "kind": "equiv"
+    },
+    {
+      "answer": "3",
+      "t": "2026-10-08T00:21:23.062Z",
+      "seg": "c5.equivalentes",
+      "run": 1,
+      "kind": "equiv-transfer"
+    },
+    {
+      "names": [
+        "1/2",
+        "2/4",
+        "3/6"
+      ],
+      "ok": true,
+      "t": "2026-10-08T00:21:23.301Z",
+      "seg": "c5.equivalentes",
+      "run": 1,
+      "kind": "equiv-names"
+    },
+    {
+      "d": 4,
+      "t": "2026-10-08T00:21:25.276Z",
+      "seg": "c5.recta",
+      "run": 1,
+      "kind": "line-partition"
+    },
+    {
+      "at": "3/4",
+      "t": "2026-10-08T00:21:26.308Z",
+      "seg": "c5.recta",
+      "run": 1,
+      "kind": "place-frac"
+    },
+    {
+      "answer": "past",
+      "t": "2026-10-08T00:21:27.226Z",
+      "seg": "c5.recta",
+      "run": 1,
+      "kind": "predict-54"
+    },
+    {
+      "answer": "yes",
+      "t": "2026-10-08T00:21:28.227Z",
+      "seg": "c5.recta",
+      "run": 1,
+      "kind": "density"
+    },
+    {
+      "a": "1/2",
+      "b": "3/4",
+      "found": [
+        "5/8",
+        "9/16"
+      ],
+      "ok": true,
+      "t": "2026-10-08T00:21:28.304Z",
+      "seg": "c5.recta",
+      "run": 1,
+      "kind": "between"
+    },
+    {
+      "seen": true,
+      "t": "2026-10-08T00:21:31.991Z",
+      "seg": "c5.comparar",
+      "run": 1,
+      "kind": "compare-unit"
+    },
+    {
+      "n": 12,
+      "t": "2026-10-08T00:21:33.161Z",
+      "seg": "c5.comparar",
+      "run": 1,
+      "kind": "common-partition"
+    },
+    {
+      "ok": true,
+      "t": "2026-10-08T00:21:33.234Z",
+      "seg": "c5.comparar",
+      "run": 1,
+      "kind": "compare-result"
+    },
+    {
+      "n": 6,
+      "t": "2026-10-08T00:21:37.060Z",
+      "seg": "c5.sumar",
+      "run": 1,
+      "kind": "add-partition"
+    },
+    {
+      "result": "5/6",
+      "naive": "2/5",
+      "naiveSmaller": true,
+      "t": "2026-10-08T00:21:37.197Z",
+      "seg": "c5.sumar",
+      "run": 1,
+      "kind": "add"
+    },
+    {
+      "box": 1,
+      "t": "2026-10-08T00:21:37.634Z",
+      "seg": "c5.decimos",
+      "run": 1,
+      "kind": "store-half"
+    },
+    {
+      "answer": "less",
+      "t": "2026-10-08T00:21:39.343Z",
+      "seg": "c5.decimos",
+      "run": 1,
+      "kind": "read-205"
+    },
+    {
+      "a": "2,05",
+      "b": "2,5",
+      "less": true,
+      "tries": 1,
+      "t": "2026-10-08T00:21:39.693Z",
+      "seg": "c5.decimos",
+      "run": 1,
+      "kind": "decimal"
+    },
+    {
+      "answer": "same",
+      "t": "2026-10-08T00:21:41.111Z",
+      "seg": "c5.cien",
+      "run": 1,
+      "kind": "percent-predict"
+    },
+    {
+      "a": 40,
+      "b": 40,
+      "t": "2026-10-08T00:21:42.080Z",
+      "seg": "c5.cien",
+      "run": 1,
+      "kind": "percent"
+    },
+    {
+      "d": 2,
+      "lo": 2,
+      "exact": false,
+      "t": "2026-10-08T00:21:46.523Z",
+      "seg": "c5.diagonal",
+      "run": 1,
+      "kind": "diag-try"
+    },
+    {
+      "d": 3,
+      "lo": 4,
+      "exact": false,
+      "t": "2026-10-08T00:21:48.657Z",
+      "seg": "c5.diagonal",
+      "run": 1,
+      "kind": "diag-try"
+    },
+    {
+      "d": 5,
+      "lo": 7,
+      "exact": false,
+      "t": "2026-10-08T00:21:50.773Z",
+      "seg": "c5.diagonal",
+      "run": 1,
+      "kind": "diag-try"
+    },
+    {
+      "answer": "none",
+      "tried": [
+        2,
+        3,
+        5
+      ],
+      "t": "2026-10-08T00:21:51.709Z",
+      "seg": "c5.diagonal",
+      "run": 1,
+      "kind": "diag-predict"
+    },
+    {
+      "fits": false,
+      "t": "2026-10-08T00:21:51.999Z",
+      "seg": "c5.diagonal",
+      "run": 1,
+      "kind": "diag"
+    },
+    {
+      "x": 8,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:21:54.574Z",
+      "seg": "c6.caja",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "tries": 1,
+      "t": "2026-10-08T00:21:54.574Z",
+      "seg": "c6.caja",
+      "run": 1,
+      "kind": "solve-box"
+    },
+    {
+      "op": "both",
+      "t": "2026-10-08T00:21:56.824Z",
+      "seg": "c6.dos-lados",
+      "run": 1,
+      "kind": "op2"
+    },
+    {
+      "answer": "both",
+      "t": "2026-10-08T00:21:59.207Z",
+      "seg": "c6.dos-lados",
+      "run": 1,
+      "kind": "pasa-sumando"
+    },
+    {
+      "answer": "sub",
+      "t": "2026-10-08T00:22:01.424Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "check-how"
+    },
+    {
+      "x": 2,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:02.757Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 8,
+      "match": false,
+      "holds": false,
+      "t": "2026-10-08T00:22:03.572Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 8,
+      "ok": false,
+      "t": "2026-10-08T00:22:03.840Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "substitute"
+    },
+    {
+      "x": 2,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:04.672Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "wrong": {
+        "kind": "one",
+        "x": 8
+      },
+      "right": {
+        "kind": "one",
+        "x": 2
+      },
+      "same": false,
+      "t": "2026-10-08T00:22:04.740Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "pass-wrong"
+    },
+    {
+      "from": "x = 5 + 3 = 8",
+      "to": "x = 2",
+      "t": "2026-10-08T00:22:04.808Z",
+      "seg": "c6.memoria",
+      "run": 1,
+      "kind": "punto-rewrites"
+    },
+    {
+      "x": -4,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:06.907Z",
+      "seg": "c6.por-cero",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 3,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:07.757Z",
+      "seg": "c6.por-cero",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 6,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:08.640Z",
+      "seg": "c6.por-cero",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "answer": "lost",
+      "solutions": "all",
+      "t": "2026-10-08T00:22:09.624Z",
+      "seg": "c6.por-cero",
+      "run": 1,
+      "kind": "times-zero-eq"
+    },
+    {
+      "answer": "2",
+      "t": "2026-10-08T00:22:11.924Z",
+      "seg": "c6.cuadrado",
+      "run": 1,
+      "kind": "square-predict"
+    },
+    {
+      "x": -3,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:12.740Z",
+      "seg": "c6.cuadrado",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "before": [
+        3
+      ],
+      "after": [
+        -3,
+        3
+      ],
+      "t": "2026-10-08T00:22:12.791Z",
+      "seg": "c6.cuadrado",
+      "run": 1,
+      "kind": "square"
+    },
+    {
+      "answer": "yes",
+      "t": "2026-10-08T00:22:16.041Z",
+      "seg": "c6.dividir",
+      "run": 1,
+      "kind": "zero-root-predict"
+    },
+    {
+      "x": 0,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:16.856Z",
+      "seg": "c6.dividir",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "before": [
+        0,
+        1
+      ],
+      "after": [
+        1
+      ],
+      "t": "2026-10-08T00:22:18.016Z",
+      "seg": "c6.dividir",
+      "run": 1,
+      "kind": "div-by-x"
+    },
+    {
+      "x": -5,
+      "match": false,
+      "holds": false,
+      "t": "2026-10-08T00:22:20.207Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 2,
+      "match": false,
+      "holds": true,
+      "t": "2026-10-08T00:22:21.056Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "op": "flip",
+      "t": "2026-10-08T00:22:22.908Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "ineq-op"
+    },
+    {
+      "same": true,
+      "t": "2026-10-08T00:22:24.128Z",
+      "seg": "c6.al-reves",
+      "run": 1,
+      "kind": "ineq"
+    },
+    {
+      "op": "d2",
+      "keeps": true,
+      "t": "2026-10-08T00:22:27.305Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step"
+    },
+    {
+      "op": "mh",
+      "keeps": true,
+      "t": "2026-10-08T00:22:29.256Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step"
+    },
+    {
+      "x": 3,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:30.339Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "x": 3,
+      "path": [
+        "d2",
+        "mh"
+      ],
+      "rescued": false,
+      "kept": [
+        "d2",
+        "mh"
+      ],
+      "t": "2026-10-08T00:22:30.461Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "two-step-result"
+    },
+    {
+      "op": "x4",
+      "t": "2026-10-08T00:22:31.508Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "right-side"
+    },
+    {
+      "x": 12,
+      "match": true,
+      "holds": true,
+      "t": "2026-10-08T00:22:33.406Z",
+      "seg": "c6.dos-pasos",
+      "run": 1,
+      "kind": "try-x"
+    },
+    {
+      "rows": 3,
+      "t": "2026-10-08T00:22:35.795Z",
+      "seg": "c7.lado",
+      "run": 1,
+      "kind": "square-rows"
+    },
+    {
+      "answer": "less",
+      "t": "2026-10-08T00:22:37.741Z",
+      "seg": "c7.lado",
+      "run": 1,
+      "kind": "side-predict"
+    },
+    {
+      "lo": 1.41,
+      "hi": 1.42,
+      "t": "2026-10-08T00:22:42.674Z",
+      "seg": "c7.lado",
+      "run": 1,
+      "kind": "side"
+    },
+    {
+      "answer": "mul",
+      "t": "2026-10-08T00:22:44.739Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-predict"
+    },
+    {
+      "day": 1,
+      "add": 11,
+      "mul": 2,
+      "t": "2026-10-08T00:22:45.596Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 2,
+      "add": 21,
+      "mul": 4,
+      "t": "2026-10-08T00:22:45.795Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 3,
+      "add": 31,
+      "mul": 8,
+      "t": "2026-10-08T00:22:45.926Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 4,
+      "add": 41,
+      "mul": 16,
+      "t": "2026-10-08T00:22:46.064Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 5,
+      "add": 51,
+      "mul": 32,
+      "t": "2026-10-08T00:22:46.192Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 6,
+      "add": 61,
+      "mul": 64,
+      "t": "2026-10-08T00:22:46.318Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 7,
+      "add": 71,
+      "mul": 128,
+      "t": "2026-10-08T00:22:46.899Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "day": 8,
+      "add": 81,
+      "mul": 256,
+      "t": "2026-10-08T00:22:47.027Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-day"
+    },
+    {
+      "answer": "ok",
+      "t": "2026-10-08T00:22:48.239Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race-general"
+    },
+    {
+      "overtake": 6,
+      "guess": "mul",
+      "t": "2026-10-08T00:22:49.329Z",
+      "seg": "c7.duplicar",
+      "run": 1,
+      "kind": "race"
+    },
+    {
+      "n": 3,
+      "v": 8,
+      "t": "2026-10-08T00:22:51.337Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "pow-row"
+    },
+    {
+      "n": 2,
+      "v": 4,
+      "t": "2026-10-08T00:22:52.171Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "pow-row"
+    },
+    {
+      "n": 1,
+      "v": 2,
+      "t": "2026-10-08T00:22:53.088Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "pow-row"
+    },
+    {
+      "answer": "1",
+      "t": "2026-10-08T00:22:54.090Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "pow-zero"
+    },
+    {
+      "zero": 1,
+      "minus": 0.5,
+      "t": "2026-10-08T00:22:55.045Z",
+      "seg": "c7.factores",
+      "run": 1,
+      "kind": "powers"
+    },
+    {
+      "answer": "4",
+      "t": "2026-10-08T00:22:58.506Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "pow-product"
+    },
+    {
+      "answer": "6",
+      "t": "2026-10-08T00:23:02.340Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "pow-power"
+    },
+    {
+      "answer": "yes",
+      "t": "2026-10-08T00:23:05.939Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "pow-sum"
+    },
+    {
+      "answer": "3",
+      "t": "2026-10-08T00:23:07.073Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "pow-quotient"
+    },
+    {
+      "answer": "4",
+      "t": "2026-10-08T00:23:09.811Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-predict"
+    },
+    {
+      "layers": 1,
+      "blocks": 16,
+      "t": "2026-10-08T00:23:10.405Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-layer"
+    },
+    {
+      "layers": 2,
+      "blocks": 32,
+      "t": "2026-10-08T00:23:10.939Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-layer"
+    },
+    {
+      "layers": 3,
+      "blocks": 48,
+      "t": "2026-10-08T00:23:11.522Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-layer"
+    },
+    {
+      "layers": 4,
+      "blocks": 64,
+      "t": "2026-10-08T00:23:12.038Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-layer"
+    },
+    {
+      "layers": 4,
+      "t": "2026-10-08T00:23:12.046Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube-call"
+    },
+    {
+      "side": 4,
+      "square": 8,
+      "t": "2026-10-08T00:23:12.538Z",
+      "seg": "c7.juntar",
+      "run": 1,
+      "kind": "cube"
+    },
+    {
+      "answer": "a",
+      "t": "2026-10-08T00:23:15.640Z",
+      "seg": "c7.grande",
+      "run": 1,
+      "kind": "sci-compare"
+    },
+    {
+      "a": {
+        "m": 3,
+        "e": 6
+      },
+      "b": {
+        "m": 4,
+        "e": 5
+      },
+      "small": {
+        "m": 1,
+        "e": -3
+      },
+      "t": "2026-10-08T00:23:15.945Z",
+      "seg": "c7.grande",
+      "run": 1,
+      "kind": "sci"
+    },
+    {
+      "answer": "full",
+      "t": "2026-10-08T00:23:19.906Z",
+      "seg": "c7.areas",
+      "run": 1,
+      "kind": "expand-predict"
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:21.171Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": true,
+      "t": "2026-10-08T00:23:21.804Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": true,
+      "t": "2026-10-08T00:23:22.405Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": true,
+      "t": "2026-10-08T00:23:23.021Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:23.621Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:24.204Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:24.705Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:25.171Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:25.638Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:26.154Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:26.655Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "kind": "expand-place",
+      "vertical": false,
+      "t": "2026-10-08T00:23:27.155Z",
+      "seg": "c7.areas",
+      "run": 1
+    },
+    {
+      "x2": 1,
+      "x": 5,
+      "one": 6,
+      "t": "2026-10-08T00:23:27.344Z",
+      "seg": "c7.areas",
+      "run": 1,
+      "kind": "expand"
+    },
+    {
+      "p": 0,
+      "q": 5,
+      "units": 5,
+      "t": "2026-10-08T00:23:30.071Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "p": 1,
+      "q": 4,
+      "units": 5,
+      "t": "2026-10-08T00:23:31.053Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "p": 2,
+      "q": 3,
+      "units": 5,
+      "t": "2026-10-08T00:23:32.041Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "tried": [
+        "05",
+        "14",
+        "23"
+      ],
+      "t": "2026-10-08T00:23:33.037Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-none"
+    },
+    {
+      "p": 1,
+      "q": 6,
+      "units": 6,
+      "t": "2026-10-08T00:23:34.037Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "p": 2,
+      "q": 3,
+      "units": 6,
+      "t": "2026-10-08T00:23:35.020Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor-try"
+    },
+    {
+      "f": {
+        "p": 2,
+        "q": 3
+      },
+      "five": null,
+      "t": "2026-10-08T00:23:35.161Z",
+      "seg": "c7.al-reves",
+      "run": 1,
+      "kind": "factor"
+    },
+    {
+      "answer": "one",
+      "t": "2026-10-08T00:23:37.137Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete-predict"
+    },
+    {
+      "answer": "9",
+      "t": "2026-10-08T00:23:39.437Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete-other"
+    },
+    {
+      "answer": "one",
+      "roots": [
+        -1
+      ],
+      "t": "2026-10-08T00:23:40.787Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete-zero"
+    },
+    {
+      "answer": "none",
+      "roots": [],
+      "t": "2026-10-08T00:23:41.721Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete-negative"
+    },
+    {
+      "square": 9,
+      "roots": [
+        2,
+        -4
+      ],
+      "t": "2026-10-08T00:23:41.890Z",
+      "seg": "c7.completar",
+      "run": 1,
+      "kind": "complete"
+    },
+    {
+      "answer": "10",
+      "t": "2026-10-08T00:23:43.170Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-predict"
+    },
+    {
+      "k": 1,
+      "v": 2,
+      "t": "2026-10-08T00:23:44.006Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 2,
+      "v": 4,
+      "t": "2026-10-08T00:23:44.137Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 3,
+      "v": 8,
+      "t": "2026-10-08T00:23:44.264Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 4,
+      "v": 16,
+      "t": "2026-10-08T00:23:44.391Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 5,
+      "v": 32,
+      "t": "2026-10-08T00:23:44.521Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 6,
+      "v": 64,
+      "t": "2026-10-08T00:23:44.648Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 7,
+      "v": 128,
+      "t": "2026-10-08T00:23:44.778Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 8,
+      "v": 256,
+      "t": "2026-10-08T00:23:44.906Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 9,
+      "v": 512,
+      "t": "2026-10-08T00:23:45.032Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "k": 10,
+      "v": 1024,
+      "t": "2026-10-08T00:23:45.157Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log-step"
+    },
+    {
+      "answer": "sqrt",
+      "t": "2026-10-08T00:23:46.587Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "half-doubling"
+    },
+    {
+      "k": 10,
+      "log": 9.966,
+      "t": "2026-10-08T00:23:46.940Z",
+      "seg": "c7.cuantas-veces",
+      "run": 1,
+      "kind": "log"
+    },
+    {
+      "answer": "2",
+      "t": "2026-10-08T00:23:48.220Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-predict"
+    },
+    {
+      "x": 2,
+      "t": "2026-10-08T00:23:49.569Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 5,
+      "t": "2026-10-08T00:23:49.725Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 4,
+      "t": "2026-10-08T00:23:49.856Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-try"
+    },
+    {
+      "x": 2,
+      "reason": "no se divide por cero",
+      "t": "2026-10-08T00:23:50.191Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational"
+    },
+    {
+      "answer": "almost",
+      "t": "2026-10-08T00:23:51.770Z",
+      "seg": "c7.no-se-puede",
+      "run": 1,
+      "kind": "rational-simplify"
+    },
+    {
+      "q": 2,
+      "p": 3,
+      "diff": 1,
+      "t": "2026-10-08T00:23:55.558Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "near-miss"
+    },
+    {
+      "q": 3,
+      "p": 4,
+      "diff": -2,
+      "t": "2026-10-08T00:23:56.208Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "near-miss"
+    },
+    {
+      "q": 5,
+      "p": 7,
+      "diff": -1,
+      "t": "2026-10-08T00:23:56.847Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "near-miss"
+    },
+    {
+      "answer": "arg",
+      "t": "2026-10-08T00:23:58.387Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-need"
+    },
+    {
+      "where": [
+        "tl",
+        "br"
+      ],
+      "opposite": true,
+      "t": "2026-10-08T00:23:59.552Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-corners"
+    },
+    {
+      "pick": "corner",
+      "t": "2026-10-08T00:23:59.678Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-compare"
+    },
+    {
+      "pick": "corner",
+      "t": "2026-10-08T00:23:59.806Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "proof-compare"
+    },
+    {
+      "answer": "forever",
+      "example": [
+        {
+          "p": 3,
+          "q": 2
+        },
+        {
+          "p": 1,
+          "q": 1
+        }
+      ],
+      "t": "2026-10-08T00:24:03.104Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "descent"
+    },
+    {
+      "nearest": {
+        "p": 17,
+        "q": 12,
+        "pp": 289,
+        "twoQq": 288,
+        "diff": 1
+      },
+      "t": "2026-10-08T00:24:06.039Z",
+      "seg": "c8.diagonal",
+      "run": 1,
+      "kind": "irrational"
+    },
+    {
+      "corner": "A",
+      "deg": 67,
+      "t": "2026-10-08T00:24:08.635Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angle-cut"
+    },
+    {
+      "corner": "B",
+      "deg": 42,
+      "t": "2026-10-08T00:24:09.402Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angle-cut"
+    },
+    {
+      "corner": "C",
+      "deg": 72,
+      "t": "2026-10-08T00:24:10.136Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angle-cut"
+    },
+    {
+      "answer": "why",
+      "t": "2026-10-08T00:24:11.154Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angle-general"
+    },
+    {
+      "pick": "A",
+      "t": "2026-10-08T00:24:11.790Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "alt-angle"
+    },
+    {
+      "A": 67,
+      "B": 42,
+      "C": 72,
+      "wrongPicks": 0,
+      "t": "2026-10-08T00:24:12.123Z",
+      "seg": "c8.vuelta",
+      "run": 1,
+      "kind": "angles"
+    },
+    {
+      "cand": "rot",
+      "op": "girar",
+      "t": "2026-10-08T00:24:14.523Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "cand": "flip",
+      "op": "dar vuelta",
+      "t": "2026-10-08T00:24:16.872Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "cand": "big",
+      "op": "achicar a la mitad",
+      "t": "2026-10-08T00:24:19.257Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "cand": "wide",
+      "op": "no hay manera",
+      "t": "2026-10-08T00:24:21.657Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "copy-try"
+    },
+    {
+      "answer": "angles",
+      "t": "2026-10-08T00:24:23.070Z",
+      "seg": "c8.copias",
+      "run": 1,
+      "kind": "similar-keeps"
+    },
+    {
+      "answer": "4",
+      "t": "2026-10-08T00:24:25.103Z",
+      "seg": "c8.doble",
+      "run": 1,
+      "kind": "area-scale-predict"
+    },
+    {
+      "early": false,
+      "t": "2026-10-08T00:24:28.092Z",
+      "seg": "c8.doble",
+      "run": 1,
+      "kind": "area-fill"
+    },
+    {
+      "early": false,
+      "t": "2026-10-08T00:24:31.573Z",
+      "seg": "c8.doble",
+      "run": 1,
+      "kind": "volume-fill"
+    },
+    {
+      "length": 2,
+      "area": 4,
+      "volume": 8,
+      "t": "2026-10-08T00:24:31.840Z",
+      "seg": "c8.doble",
+      "run": 1,
+      "kind": "scale"
+    },
+    {
+      "answer": "depends",
+      "t": "2026-10-08T00:24:33.903Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "perimeter-predict"
+    },
+    {
+      "a": 2,
+      "b": 4,
+      "area": 8,
+      "t": "2026-10-08T00:24:34.762Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "fence"
+    },
+    {
+      "a": 3,
+      "b": 3,
+      "area": 9,
+      "t": "2026-10-08T00:24:35.158Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "fence"
+    },
+    {
+      "a": 3,
+      "area": 9,
+      "t": "2026-10-08T00:24:35.606Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "fence-build"
+    },
+    {
+      "areas": [
+        5,
+        8,
+        9
+      ],
+      "best": [
+        3,
+        3
+      ],
+      "t": "2026-10-08T00:24:36.586Z",
+      "seg": "c8.cerca",
+      "run": 1,
+      "kind": "perimeter"
+    },
+    {
+      "answer": "5",
+      "t": "2026-10-08T00:24:37.885Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-predict"
+    },
+    {
+      "k": 0,
+      "t": "2026-10-08T00:24:38.970Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-move"
+    },
+    {
+      "k": 2,
+      "t": "2026-10-08T00:24:38.974Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-move"
+    },
+    {
+      "k": 3,
+      "t": "2026-10-08T00:24:39.107Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-move"
+    },
+    {
+      "answer": "right",
+      "t": "2026-10-08T00:24:41.452Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag-general"
+    },
+    {
+      "r": {
+        "big": 49,
+        "tris": 24,
+        "freeA": 25,
+        "squaresAB": 25
+      },
+      "holds": true,
+      "t": "2026-10-08T00:24:42.489Z",
+      "seg": "c8.pitagoras",
+      "run": 1,
+      "kind": "pythag"
+    },
+    {
+      "name": "Rampa",
+      "x": 3,
+      "y": 2,
+      "t": "2026-10-08T00:24:44.441Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-try"
+    },
+    {
+      "name": "Peldaño",
+      "x": -1,
+      "y": -1,
+      "t": "2026-10-08T00:24:44.711Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-try"
+    },
+    {
+      "x": 3,
+      "y": -1,
+      "ok": true,
+      "t": "2026-10-08T00:24:44.912Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-corner"
+    },
+    {
+      "answer": "5",
+      "t": "2026-10-08T00:24:46.737Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coord-distance"
+    },
+    {
+      "dist": {
+        "d2": 25,
+        "exact": true,
+        "d": 5
+      },
+      "t": "2026-10-08T00:24:46.870Z",
+      "seg": "c8.casas",
+      "run": 1,
+      "kind": "coords"
+    },
+    {
+      "h": 8,
+      "k": 4,
+      "ok": true,
+      "t": "2026-10-08T00:24:48.719Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 8,
+      "len": 4,
+      "t": "2026-10-08T00:24:49.317Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 10,
+      "k": 2,
+      "ok": true,
+      "t": "2026-10-08T00:24:50.806Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 10,
+      "len": 2,
+      "t": "2026-10-08T00:24:51.400Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 12,
+      "k": 1,
+      "ok": true,
+      "t": "2026-10-08T00:24:52.872Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 12,
+      "len": 1,
+      "t": "2026-10-08T00:24:53.467Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 14,
+      "k": 2,
+      "ok": true,
+      "t": "2026-10-08T00:24:54.960Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 14,
+      "len": 2,
+      "t": "2026-10-08T00:24:55.567Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 16,
+      "k": 4,
+      "ok": true,
+      "t": "2026-10-08T00:24:57.038Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow-measure"
+    },
+    {
+      "h": 16,
+      "len": 4,
+      "t": "2026-10-08T00:24:57.634Z",
+      "seg": "c8.sombras",
+      "run": 1,
+      "kind": "shadow"
+    },
+    {
+      "h": 8,
+      "s": 4,
+      "ok": true,
+      "t": "2026-10-08T00:25:00.052Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "map-arrow"
+    },
+    {
+      "h": 10,
+      "s": 2,
+      "ok": true,
+      "t": "2026-10-08T00:25:00.636Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "map-arrow"
+    },
+    {
+      "h": 12,
+      "s": 1,
+      "ok": true,
+      "t": "2026-10-08T00:25:01.219Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "map-arrow"
+    },
+    {
+      "h": 14,
+      "s": 2,
+      "ok": true,
+      "t": "2026-10-08T00:25:01.796Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "map-arrow"
+    },
+    {
+      "h": 16,
+      "s": 4,
+      "ok": true,
+      "t": "2026-10-08T00:25:02.319Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "map-arrow"
+    },
+    {
+      "answer": "both",
+      "t": "2026-10-08T00:25:03.718Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "inverse-predict"
+    },
+    {
+      "h": 10,
+      "ok": true,
+      "t": "2026-10-08T00:25:03.876Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "back-arrow"
+    },
+    {
+      "answer": "look",
+      "t": "2026-10-08T00:25:05.286Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "back-more"
+    },
+    {
+      "h": 14,
+      "ok": true,
+      "t": "2026-10-08T00:25:05.290Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "back-arrow"
+    },
+    {
+      "fn": true,
+      "inverse": false,
+      "bad": [
+        2,
+        4
+      ],
+      "t": "2026-10-08T00:25:06.019Z",
+      "seg": "c9.flechas",
+      "run": 1,
+      "kind": "function"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "t": "2026-10-08T00:25:08.066Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "machine"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "t": "2026-10-08T00:25:08.900Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "machine"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "t": "2026-10-08T00:25:09.716Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "machine"
+    },
+    {
+      "rule": "× 2 + 1",
+      "ok": true,
+      "tries": 1,
+      "t": "2026-10-08T00:25:13.166Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "rule-try"
+    },
+    {
+      "answer": "21",
+      "matching": [
+        "double1"
+      ],
+      "t": "2026-10-08T00:25:14.151Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "rule-predict"
+    },
+    {
+      "x": 10,
+      "y": 21,
+      "t": "2026-10-08T00:25:14.950Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "machine"
+    },
+    {
+      "y": 7,
+      "t": "2026-10-08T00:25:15.649Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "punto-machine"
+    },
+    {
+      "y": 9,
+      "t": "2026-10-08T00:25:16.100Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "punto-machine"
+    },
+    {
+      "rule": "double1",
+      "seen": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          10,
+          21
+        ]
+      ],
+      "t": "2026-10-08T00:25:16.500Z",
+      "seg": "c9.maquina",
+      "run": 1,
+      "kind": "rule"
+    },
+    {
+      "h": 8,
+      "v": 4,
+      "ok": true,
+      "t": "2026-10-08T00:25:17.755Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 10,
+      "v": 2,
+      "ok": true,
+      "t": "2026-10-08T00:25:17.888Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 12,
+      "v": 1,
+      "ok": true,
+      "t": "2026-10-08T00:25:18.020Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 14,
+      "v": 2,
+      "ok": true,
+      "t": "2026-10-08T00:25:18.151Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "h": 16,
+      "v": 4,
+      "ok": true,
+      "t": "2026-10-08T00:25:18.279Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "plot"
+    },
+    {
+      "answer": "join",
+      "t": "2026-10-08T00:25:19.400Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "join-predict"
+    },
+    {
+      "answer": "loose",
+      "t": "2026-10-08T00:25:21.335Z",
+      "seg": "c9.puntos",
+      "run": 1,
+      "kind": "join-discrete"
+    },
+    {
+      "shape": "line",
+      "said": true,
+      "truth": true,
+      "moves": 5,
+      "sawTwo": false,
+      "t": "2026-10-08T00:25:24.553Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical-predict"
+    },
+    {
+      "shape": "circle",
+      "said": false,
+      "truth": false,
+      "moves": 5,
+      "sawTwo": true,
+      "t": "2026-10-08T00:25:26.868Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical-predict"
+    },
+    {
+      "shape": "parabola",
+      "said": true,
+      "truth": true,
+      "moves": 5,
+      "sawTwo": false,
+      "t": "2026-10-08T00:25:29.184Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical-predict"
+    },
+    {
+      "shape": "sideways",
+      "said": false,
+      "truth": false,
+      "moves": 5,
+      "sawTwo": true,
+      "t": "2026-10-08T00:25:31.485Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical-predict"
+    },
+    {
+      "done": {
+        "line": true,
+        "circle": false,
+        "parabola": true,
+        "sideways": false
+      },
+      "t": "2026-10-08T00:25:32.089Z",
+      "seg": "c9.recta",
+      "run": 1,
+      "kind": "vertical"
+    },
+    {
+      "x": -1,
+      "out": "−1/3",
+      "t": "2026-10-08T00:25:34.764Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain-try"
+    },
+    {
+      "x": 0,
+      "out": "−1/2",
+      "t": "2026-10-08T00:25:35.599Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain-try"
+    },
+    {
+      "x": 2,
+      "out": null,
+      "t": "2026-10-08T00:25:36.548Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain-try"
+    },
+    {
+      "answer": "int",
+      "t": "2026-10-08T00:25:37.553Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain-story"
+    },
+    {
+      "dom": [
+        -1,
+        0,
+        3,
+        5
+      ],
+      "t": "2026-10-08T00:25:37.653Z",
+      "seg": "c9.dominio",
+      "run": 1,
+      "kind": "domain"
+    },
+    {
+      "x": -3,
+      "y": 9,
+      "t": "2026-10-08T00:25:39.648Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": -2,
+      "y": 4,
+      "t": "2026-10-08T00:25:40.515Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": -1,
+      "y": 1,
+      "t": "2026-10-08T00:25:41.348Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "t": "2026-10-08T00:25:42.215Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "t": "2026-10-08T00:25:43.031Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "t": "2026-10-08T00:25:43.865Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "t": "2026-10-08T00:25:44.698Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-try"
+    },
+    {
+      "answer": "never",
+      "t": "2026-10-08T00:25:45.600Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image-predict"
+    },
+    {
+      "img": [
+        0,
+        1,
+        4,
+        9
+      ],
+      "t": "2026-10-08T00:25:45.900Z",
+      "seg": "c9.imagen",
+      "run": 1,
+      "kind": "image"
+    },
+    {
+      "expr": "A",
+      "graph": "A",
+      "ok": true,
+      "t": "2026-10-08T00:25:47.259Z",
+      "seg": "c9.maneras",
+      "run": 1,
+      "kind": "match"
+    },
+    {
+      "expr": "C",
+      "graph": "C",
+      "ok": true,
+      "t": "2026-10-08T00:25:47.524Z",
+      "seg": "c9.maneras",
+      "run": 1,
+      "kind": "match"
+    },
+    {
+      "done": [
+        "A",
+        "C"
+      ],
+      "t": "2026-10-08T00:25:47.760Z",
+      "seg": "c9.maneras",
+      "run": 1,
+      "kind": "three-ways"
+    },
+    {
+      "answer": "2",
+      "t": "2026-10-08T00:25:51.133Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-predict"
+    },
+    {
+      "v": 2,
+      "t": "2026-10-08T00:25:51.873Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-check"
+    },
+    {
+      "answer": "4",
+      "t": "2026-10-08T00:25:53.668Z",
+      "seg": "c9.vuelve",
+      "run": 1,
+      "kind": "periodic-transfer"
+    },
+    {
+      "answer": "6+",
+      "t": "2026-10-08T00:25:57.167Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian-predict"
+    },
+    {
+      "n": 1,
+      "over": false,
+      "t": "2026-10-08T00:25:58.514Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian-piece"
+    },
+    {
+      "n": 2,
+      "over": false,
+      "t": "2026-10-08T00:25:59.031Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian-piece"
+    },
+    {
+      "n": 3,
+      "over": false,
+      "t": "2026-10-08T00:25:59.547Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian-piece"
+    },
+    {
+      "n": 4,
+      "over": false,
+      "t": "2026-10-08T00:26:00.062Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian-piece"
+    },
+    {
+      "n": 5,
+      "over": false,
+      "t": "2026-10-08T00:26:00.597Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian-piece"
+    },
+    {
+      "n": 6,
+      "over": false,
+      "t": "2026-10-08T00:26:01.147Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian-piece"
+    },
+    {
+      "n": 7,
+      "over": true,
+      "t": "2026-10-08T00:26:01.681Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian-piece"
+    },
+    {
+      "pieces": 6,
+      "tau": 6.283,
+      "t": "2026-10-08T00:26:02.570Z",
+      "seg": "c10.rueda",
+      "run": 1,
+      "kind": "radian"
+    },
+    {
+      "answer": "half",
+      "t": "2026-10-08T00:26:04.566Z",
+      "seg": "c10.alto",
+      "run": 1,
+      "kind": "sin30-predict"
+    },
+    {
+      "deg": 30,
+      "y": 0.5,
+      "t": "2026-10-08T00:26:06.897Z",
+      "seg": "c10.alto",
+      "run": 1,
+      "kind": "height"
+    },
+    {
+      "deg": 60,
+      "y": 0.866,
+      "t": "2026-10-08T00:26:08.398Z",
+      "seg": "c10.alto",
+      "run": 1,
+      "kind": "height"
+    },
+    {
+      "deg": 90,
+      "y": 1,
+      "t": "2026-10-08T00:26:09.914Z",
+      "seg": "c10.alto",
+      "run": 1,
+      "kind": "height"
+    },
+    {
+      "deg": 120,
+      "answer": "same",
+      "t": "2026-10-08T00:26:11.649Z",
+      "seg": "c10.alto",
+      "run": 1,
+      "kind": "sin-past90-predict"
+    },
+    {
+      "deg": 120,
+      "y": 0.866,
+      "t": "2026-10-08T00:26:12.247Z",
+      "seg": "c10.alto",
+      "run": 1,
+      "kind": "height"
+    },
+    {
+      "rows": [
+        {
+          "deg": 30,
+          "y": 0.5,
+          "x": 0.866
+        },
+        {
+          "deg": 60,
+          "y": 0.866,
+          "x": 0.5
+        },
+        {
+          "deg": 90,
+          "y": 1,
+          "x": 0
+        },
+        {
+          "deg": 120,
+          "y": 0.866,
+          "x": -0.5
+        }
+      ],
+      "t": "2026-10-08T00:26:13.718Z",
+      "seg": "c10.alto",
+      "run": 1,
+      "kind": "sine"
+    },
+    {
+      "answer": "half",
+      "t": "2026-10-08T00:26:16.487Z",
+      "seg": "c10.repite",
+      "run": 1,
+      "kind": "period-predict"
+    },
+    {
+      "turns": 2,
+      "t": "2026-10-08T00:26:19.165Z",
+      "seg": "c10.repite",
+      "run": 1,
+      "kind": "period"
+    },
+    {
+      "answer": "3",
+      "t": "2026-10-08T00:26:20.465Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio-predict"
+    },
+    {
+      "ratio": 0.5,
+      "t": "2026-10-08T00:26:21.565Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio"
+    },
+    {
+      "deg": 60,
+      "t": "2026-10-08T00:26:22.129Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio60-turn"
+    },
+    {
+      "answer": "sin",
+      "t": "2026-10-08T00:26:22.129Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio60-predict"
+    },
+    {
+      "rise": 3.46,
+      "t": "2026-10-08T00:26:22.286Z",
+      "seg": "c10.rampa",
+      "run": 1,
+      "kind": "ratio60"
+    },
+    {
+      "c": [
+        4,
+        -1
+      ],
+      "pos": [
+        4,
+        -1
+      ],
+      "t": "2026-10-08T00:26:25.029Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector-step"
+    },
+    {
+      "c": [
+        -1,
+        3
+      ],
+      "pos": [
+        3,
+        2
+      ],
+      "t": "2026-10-08T00:26:25.863Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector-step"
+    },
+    {
+      "answer": "same",
+      "t": "2026-10-08T00:26:26.763Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector-order"
+    },
+    {
+      "used": [
+        [
+          4,
+          -1
+        ],
+        [
+          -1,
+          3
+        ]
+      ],
+      "t": "2026-10-08T00:26:27.001Z",
+      "seg": "c10.flechas",
+      "run": 1,
+      "kind": "vector"
+    },
+    {
+      "answer": "ok",
+      "t": "2026-10-08T00:26:30.164Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "quarter-predict"
+    },
+    {
+      "turns": 1,
+      "v": [
+        -1,
+        3
+      ],
+      "t": "2026-10-08T00:26:30.762Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "quarter"
+    },
+    {
+      "turns": 2,
+      "v": [
+        -3,
+        -1
+      ],
+      "t": "2026-10-08T00:26:31.363Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "quarter"
+    },
+    {
+      "answer": "new",
+      "t": "2026-10-08T00:26:32.412Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "i-predict"
+    },
+    {
+      "ii": [
+        -1,
+        0
+      ],
+      "m4": [
+        -4,
+        0
+      ],
+      "t": "2026-10-08T00:26:32.801Z",
+      "seg": "c10.cuarto",
+      "run": 1,
+      "kind": "complex"
+    },
+    {
+      "pair": [
+        5,
+        2
+      ],
+      "t": "2026-10-08T00:26:33.331Z",
+      "seg": "c10.pistas",
+      "run": 1,
+      "kind": "punto-try"
+    },
+    {
+      "a": 4,
+      "b": 3,
+      "ok": true,
+      "t": "2026-10-08T00:26:34.503Z",
+      "seg": "c10.pistas",
+      "run": 1,
+      "kind": "system-try"
+    },
+    {
+      "answer": "none",
+      "t": "2026-10-08T00:26:35.664Z",
+      "seg": "c10.pistas",
+      "run": 1,
+      "kind": "system-parallel"
+    },
+    {
+      "sol": {
+        "kind": "one",
+        "x": 4,
+        "y": 3
+      },
+      "none": "none",
+      "t": "2026-10-08T00:26:36.058Z",
+      "seg": "c10.pistas",
+      "run": 1,
+      "kind": "system"
+    },
+    {
+      "k": 1,
+      "r": "llena",
+      "t": "2026-10-08T00:26:39.647Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 2,
+      "r": "a medias",
+      "t": "2026-10-08T00:26:41.195Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 3,
+      "r": "llena",
+      "t": "2026-10-08T00:26:42.726Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 4,
+      "r": "llena",
+      "t": "2026-10-08T00:26:44.276Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 5,
+      "r": "llena",
+      "t": "2026-10-08T00:26:45.843Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "k": 6,
+      "r": "a medias",
+      "t": "2026-10-08T00:26:47.393Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "pull"
+    },
+    {
+      "answer": "unsure",
+      "t": "2026-10-08T00:26:49.079Z",
+      "seg": "c10.a-veces",
+      "run": 1,
+      "kind": "chance-predict"
+    },
+    {
+      "answer": "about",
+      "t": "2026-10-08T00:26:51.578Z",
+      "seg": "c11.baldes",
+      "run": 1,
+      "kind": "freq-predict"
+    },
+    {
+      "n": 10,
+      "share": 0.7,
+      "batch": 1,
+      "t": "2026-10-08T00:26:54.127Z",
+      "seg": "c11.baldes",
+      "run": 1,
+      "kind": "freq"
+    },
+    {
+      "n": 30,
+      "share": 0.733,
+      "batch": 1,
+      "t": "2026-10-08T00:26:55.860Z",
+      "seg": "c11.baldes",
+      "run": 1,
+      "kind": "freq"
+    },
+    {
+      "n": 100,
+      "share": 0.66,
+      "batch": 1,
+      "t": "2026-10-08T00:26:57.593Z",
+      "seg": "c11.baldes",
+      "run": 1,
+      "kind": "freq"
+    },
+    {
+      "n": 1000,
+      "share": 0.671,
+      "batch": 2,
+      "t": "2026-10-08T00:26:59.344Z",
+      "seg": "c11.baldes",
+      "run": 1,
+      "kind": "freq"
+    },
+    {
+      "n": 1000,
+      "share": 0.64,
+      "batch": 1,
+      "t": "2026-10-08T00:27:01.110Z",
+      "seg": "c11.baldes",
+      "run": 1,
+      "kind": "freq"
+    },
+    {
+      "n": 1000,
+      "second": true,
+      "t": "2026-10-08T00:27:01.110Z",
+      "seg": "c11.baldes",
+      "run": 1,
+      "kind": "freq-stop"
+    },
+    {
+      "kind": "summary",
+      "v": 10,
+      "t": "2026-10-08T00:27:02.531Z",
+      "seg": "c11.medio",
+      "run": 1
+    },
+    {
+      "kind": "summary",
+      "v": 4,
+      "t": "2026-10-08T00:27:02.662Z",
+      "seg": "c11.medio",
+      "run": 1
+    },
+    {
+      "answer": "median",
+      "t": "2026-10-08T00:27:03.651Z",
+      "seg": "c11.medio",
+      "run": 1,
+      "kind": "summary-pick"
+    },
+    {
+      "answer": "A",
+      "t": "2026-10-08T00:27:05.895Z",
+      "seg": "c11.parejo",
+      "run": 1,
+      "kind": "spread-pick"
+    },
+    {
+      "answer": "check",
+      "t": "2026-10-08T00:27:07.361Z",
+      "seg": "c11.grafico",
+      "run": 1,
+      "kind": "graph-predict"
+    },
+    {
+      "from": 0,
+      "tried": [
+        0
+      ],
+      "t": "2026-10-08T00:27:07.964Z",
+      "seg": "c11.grafico",
+      "run": 1,
+      "kind": "graph-axis"
+    },
+    {
+      "answer": "24",
+      "t": "2026-10-08T00:27:13.028Z",
+      "seg": "c11.contar",
+      "run": 1,
+      "kind": "count-predict"
+    },
+    {
+      "six": 6,
+      "more": 24,
+      "t": "2026-10-08T00:27:13.196Z",
+      "seg": "c11.contar",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "answer": "7",
+      "t": "2026-10-08T00:27:14.746Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-predict"
+    },
+    {
+      "a": 1,
+      "b": 6,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:27:15.618Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 2,
+      "b": 5,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:27:15.751Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 3,
+      "b": 4,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:27:15.883Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 4,
+      "b": 3,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:27:16.017Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 5,
+      "b": 2,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:27:16.151Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "a": 6,
+      "b": 1,
+      "target": 7,
+      "ok": true,
+      "t": "2026-10-08T00:27:16.285Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "target": 7,
+      "found": 6,
+      "missing": 0,
+      "t": "2026-10-08T00:27:16.417Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-done"
+    },
+    {
+      "sum": 7,
+      "n": 6,
+      "t": "2026-10-08T00:27:16.417Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-mark"
+    },
+    {
+      "a": 6,
+      "b": 6,
+      "target": 12,
+      "ok": true,
+      "t": "2026-10-08T00:27:16.550Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-cell"
+    },
+    {
+      "target": 12,
+      "found": 1,
+      "missing": 0,
+      "t": "2026-10-08T00:27:16.684Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-done"
+    },
+    {
+      "sum": 12,
+      "n": 1,
+      "t": "2026-10-08T00:27:16.684Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-mark"
+    },
+    {
+      "n7": 58,
+      "n12": 6,
+      "t": "2026-10-08T00:27:16.996Z",
+      "seg": "c11.dados",
+      "run": 1,
+      "kind": "dice-roll"
+    },
+    {
+      "answer": "maybe",
+      "t": "2026-10-08T00:27:19.978Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-predict"
+    },
+    {
+      "wind": "poco",
+      "down": true,
+      "t": "2026-10-08T00:27:21.593Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-pair"
+    },
+    {
+      "wind": "bastante",
+      "down": true,
+      "t": "2026-10-08T00:27:22.277Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-pair"
+    },
+    {
+      "wind": "mucho",
+      "down": true,
+      "t": "2026-10-08T00:27:22.911Z",
+      "seg": "c11.causa",
+      "run": 1,
+      "kind": "cause-pair"
+    },
+    {
+      "item": "add",
+      "said": "sure",
+      "truth": "sure",
+      "t": "2026-10-08T00:27:24.423Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "dbl",
+      "said": "sure",
+      "truth": "sure",
+      "t": "2026-10-08T00:27:24.682Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "wheel",
+      "said": "sure",
+      "truth": "sure",
+      "t": "2026-10-08T00:27:24.938Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "item": "bucket",
+      "said": "chance",
+      "truth": "chance",
+      "t": "2026-10-08T00:27:25.201Z",
+      "seg": "c11.anticipar",
+      "run": 1,
+      "kind": "anticipate"
+    },
+    {
+      "rule": "rueda",
+      "family": "ola",
+      "ok": true,
+      "t": "2026-10-08T00:27:32.244Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "mara",
+      "family": "recta",
+      "ok": true,
+      "t": "2026-10-08T00:27:33.227Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "reparto",
+      "family": "hueco",
+      "ok": true,
+      "t": "2026-10-08T00:27:34.210Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "punto",
+      "family": "despega",
+      "ok": true,
+      "t": "2026-10-08T00:27:35.197Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "huerta",
+      "family": "u",
+      "ok": true,
+      "t": "2026-10-08T00:27:36.177Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "rule": "veces",
+      "family": "aplana",
+      "ok": true,
+      "t": "2026-10-08T00:27:37.161Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "family-try"
+    },
+    {
+      "done": [
+        "rueda",
+        "mara",
+        "reparto",
+        "punto",
+        "huerta",
+        "veces"
+      ],
+      "t": "2026-10-08T00:27:37.467Z",
+      "seg": "c12.familias",
+      "run": 1,
+      "kind": "families"
+    },
+    {
+      "a": 6,
+      "b": 5,
+      "t": "2026-10-08T00:27:39.348Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 8,
+      "b": 5,
+      "t": "2026-10-08T00:27:39.479Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 5,
+      "t": "2026-10-08T00:27:39.605Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 3,
+      "t": "2026-10-08T00:27:39.737Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 1,
+      "t": "2026-10-08T00:27:39.864Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "knob"
+    },
+    {
+      "a": 10,
+      "b": 1,
+      "moves": 5,
+      "t": "2026-10-08T00:27:40.028Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "params"
+    },
+    {
+      "answer": "2",
+      "t": "2026-10-08T00:27:41.027Z",
+      "seg": "c12.perillas",
+      "run": 1,
+      "kind": "params-u"
+    },
+    {
+      "answer": "3",
+      "t": "2026-10-08T00:27:43.359Z",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-predict"
+    },
+    {
+      "t": "2026-10-08T00:27:44.252Z",
+      "key": "top",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-tap"
+    },
+    {
+      "t": "2026-10-08T00:27:44.380Z",
+      "key": "zero",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-tap"
+    },
+    {
+      "t": "2026-10-08T00:27:44.511Z",
+      "key": "zero",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump-tap"
+    },
+    {
+      "zeros": [
+        0,
+        6
+      ],
+      "top": [
+        3,
+        9
+      ],
+      "t": "2026-10-08T00:27:44.794Z",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "jump"
+    },
+    {
+      "answer": "1",
+      "t": "2026-10-08T00:27:46.626Z",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "box-predict"
+    },
+    {
+      "max": 16,
+      "t": "2026-10-08T00:27:46.830Z",
+      "seg": "c12.salto",
+      "run": 1,
+      "kind": "box"
+    },
+    {
+      "k": "ab",
+      "v": 25,
+      "t": "2026-10-08T00:27:48.747Z",
+      "seg": "c12.encadenar",
+      "run": 1,
+      "kind": "compose"
+    },
+    {
+      "k": "ba",
+      "v": 9,
+      "t": "2026-10-08T00:27:48.877Z",
+      "seg": "c12.encadenar",
+      "run": 1,
+      "kind": "compose"
+    },
+    {
+      "answer": "right",
+      "t": "2026-10-08T00:27:49.925Z",
+      "seg": "c12.encadenar",
+      "run": 1,
+      "kind": "inverse-predict"
+    },
+    {
+      "answer": "both",
+      "t": "2026-10-08T00:27:50.860Z",
+      "seg": "c12.encadenar",
+      "run": 1,
+      "kind": "inverse-square"
+    },
+    {
+      "h": 1,
+      "r": 3,
+      "t": "2026-10-08T00:27:53.041Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "rate"
+    },
+    {
+      "h": 0.5,
+      "r": 3.5,
+      "t": "2026-10-08T00:27:53.926Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "rate"
+    },
+    {
+      "h": 0.1,
+      "r": 3.9,
+      "t": "2026-10-08T00:27:54.809Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "rate"
+    },
+    {
+      "h": -0.1,
+      "r": 4.1,
+      "t": "2026-10-08T00:27:55.710Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "rate"
+    },
+    {
+      "h": 0.01,
+      "r": 3.99,
+      "t": "2026-10-08T00:27:56.576Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "rate"
+    },
+    {
+      "answer": "4",
+      "t": "2026-10-08T00:27:58.326Z",
+      "seg": "c12.rapido",
+      "run": 1,
+      "kind": "derivative-predict"
+    },
+    {
+      "n": 3,
+      "above": false,
+      "s": 6,
+      "t": "2026-10-08T00:27:59.725Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "accum"
+    },
+    {
+      "n": 6,
+      "above": false,
+      "s": 7.5,
+      "t": "2026-10-08T00:28:00.593Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "accum"
+    },
+    {
+      "n": 30,
+      "above": false,
+      "s": 8.7,
+      "t": "2026-10-08T00:28:01.461Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "accum"
+    },
+    {
+      "n": 12,
+      "above": true,
+      "s": 9.75,
+      "t": "2026-10-08T00:28:02.327Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "accum"
+    },
+    {
+      "answer": "9",
+      "t": "2026-10-08T00:28:04.061Z",
+      "seg": "c12.junta",
+      "run": 1,
+      "kind": "integral-predict"
+    },
+    {
+      "answer": "13",
+      "t": "2026-10-08T00:28:06.324Z",
+      "seg": "c12.tramos",
+      "run": 1,
+      "kind": "piecewise-predict"
+    },
+    {
+      "rule": "suma 1",
+      "t": "2026-10-08T00:28:07.808Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-guess"
+    },
+    {
+      "t": "2026-10-08T00:28:08.009Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-erase"
+    },
+    {
+      "id": "dbl",
+      "t": "2026-10-08T00:28:08.928Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-family"
+    },
+    {
+      "answer": "5",
+      "t": "2026-10-08T00:28:09.000Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-predict"
+    },
+    {
+      "night": 4,
+      "v": 16,
+      "t": "2026-10-08T00:28:09.359Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-check"
+    },
+    {
+      "t": "2026-10-08T00:28:17.259Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "punto-name"
+    },
+    {
+      "answer": "back",
+      "t": "2026-10-08T00:28:22.075Z",
+      "seg": "c12.anticipar",
+      "run": 1,
+      "kind": "final-door"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c1",
+      "title": "¿Están todos?",
+      "abbr": "Misma cantidad: se pueden emparejar uno a uno sin que sobre nada.",
+      "body": [
+        "Uno a uno quiere decir: cada cosa de un lado con una sola del otro, y ninguna usada dos veces.",
+        "Si al emparejar así sobra algo de un solo lado, ese lado tiene más. Si sobran de los dos lados, todavía no se terminó de emparejar. La forma, el tamaño y la distancia no cambian cuántos son.",
+        "Contar también es emparejar: cada cosa con una palabra, en orden, sin saltear ni repetir; la última palabra dice cuántas hay.",
+        "El número es lo que no cambia entre todas las colecciones que se pueden emparejar así. \"14\" y \"catorce\" son nombres de ese número: el 14 no tiene catorce cosas adentro (cómo funciona su escritura es otra pregunta).",
+        "Todo esto vale para colecciones que se terminan. Con colecciones que no se terminan pasan cosas raras; Punto todavía no lo sabe."
+      ],
+      "seen": [
+        "Antes de la Marea hiciste una marca por cada uno de la Ronda.",
+        "Al volver, emparejaste marcas y puntos uno a uno: sobró una marca, y faltaba el más chico.",
+        "En las gradas, para la Ronda y Punto, dijiste \"todavía no sé\". Al sentarlos de a uno, sobró un asiento.",
+        "Cuando Punto los apretó en una fila corta, anticipaste que seguiría sobrando un asiento: apretados o no, eran trece.",
+        "Contaste las marcas de Punto: una palabra por marca. La última fue \"catorce\"."
+      ],
+      "moments": [
+        {
+          "id": "c1.todos",
+          "label": "Desplegar: emparejar marcas y puntos"
+        },
+        {
+          "id": "c1.nombre",
+          "label": "Desplegar: el número y sus nombres"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "title": "Demasiados para marcar",
+      "abbr": "El lugar dice el tamaño del grupo; el cero guarda el lugar vacío.",
+      "body": [
+        "Para muchas cosas, las marcas no alcanzan: hay que agrupar. Acá, de a diez.",
+        "Un numeral es una lista de cuántos grupos hay de cada tamaño: el de la derecha cuenta sueltos, el siguiente atados de diez, el siguiente atados de cien… Cada lugar vale diez veces el de su derecha.",
+        "\"Me llevo uno\": cuando se juntan diez de un tamaño, se atan y pasan como uno al lugar de la izquierda.",
+        "El 0 dice \"ninguno\" en ese lugar: ningún grupo de ese tamaño. Sin él, las demás cifras se correrían de lugar.",
+        "Una resta también se puede leer como comparación: emparejar atado con atado y suelto con suelto; si no queda pareja, se desata un atado (\"pedir prestado\"). Lo que sobra es la diferencia.",
+        "Diez es una costumbre, no una ley: se puede agrupar de a otra cantidad, siempre que todos sepan de a cuánto."
+      ],
+      "seen": [
+        "Ataste la carga en el molde de diez: 3 atados y 7 sueltos, 37.",
+        "Viste que dos hileras largas de marcas no se comparan de un vistazo; agrupadas de a diez, sí: 34 ayer, 37 hoy.",
+        "En el depósito, 5 veces un cuarto juntó diez y lo ataste para pasarlo al de al lado: eso es \"me llevo uno\".",
+        "Para el cuarto vacío probaste un espacio, no escribir nada, un espacio, un 0: sólo el 0 mantuvo cada cifra en su lugar.",
+        "En el registro de los Oval faltaba un cero: 32 en lugar de 302. Lo comprobaste mirando su tiza guardada.",
+        "Para comparar a Recta con Curva emparejaste atados con atados y sueltos con sueltos, desataste un atado cuando no quedaba pareja: sobraron 15.",
+        "Cuando el último cuarto juntó diez, dibujaste un cuarto nuevo: 1000."
+      ],
+      "moments": [
+        {
+          "id": "c2.cero",
+          "label": "Desplegar: el cero que faltaba"
+        },
+        {
+          "id": "c2.lugar",
+          "label": "Desplegar: lo que vale el lugar"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "title": "Menos que nada",
+      "abbr": "El signo dice hacia qué lado; un tener y un deber se anulan de a pares.",
+      "body": [
+        "Un número con signo dice cuánto y para qué lado: +3, tres que se tienen; −3, tres que se deben (o tres debajo del cero).",
+        "Juntar lo que se tiene con lo que se debe es emparejar: cada par vale cero y se borra; lo que sobra es el resultado.",
+        "En la línea, más a la derecha es más: −4 es menos que −1, aunque 4 sea más que 1.",
+        "La distancia no tiene signo: de −4 a +3 hay 7 pasos. Lo lejos que está un número del cero se escribe con barritas: |−4| = |+4| = 4.",
+        "Sacar una deuda sube el valor, igual que dar un atado: −1 − (−2) = −1 + 2 = +1. Si no hay deudas para sacar, se agregan pares que valen cero.",
+        "Pagar más de lo que se tiene deja deudas: 2 − 5 = −3. Para poder sacar los atados que faltan, se agregan pares que valen cero.",
+        "\"Deber 4\" y \"estar 4 debajo del suelo\" son dos lecturas del mismo número: −4.",
+        "El mismo signo \"−\" se usa para \"menos tres\" y para \"restar\": los paréntesis ayudan a no confundirlos.",
+        "Dato: los signos + y − aparecen impresos en 1489 (Widmann) para marcar exceso y faltante en cuentas de comercio."
+      ],
+      "seen": [
+        "Para anotar la deuda de Curva elegiste una marca nueva delante del número: −3.",
+        "Emparejaste atados con deudas y se borraron de a pares.",
+        "Anticipaste que −4 es menor que −1.",
+        "Anticipaste siete pasos de −4 a +3, y Punto los dio.",
+        "+4 y −4 están igual de lejos del cero.",
+        "Para sacar dos deudas cuando quedaba una sola, agregaste un atado y una deuda (valen cero) y sacaste la deuda: −1 − (−2) = +1.",
+        "Viste que sacar dos deudas deja igual que dar dos atados.",
+        "Anticipaste que Oval, con 2 y pagando 5, quedaba debiendo 3: 2 − 5 = −3.",
+        "Desde −4, subir cinco: anticipaste +1; Punto quedó en +1."
+      ],
+      "moments": [
+        {
+          "id": "c3.hacia",
+          "label": "Desplegar: cuánto y hacia dónde"
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "title": "Veces",
+      "abbr": "Multiplicar: grupos iguales o estirar desde el cero. Dividir: repartir o medir.",
+      "body": [
+        "Multiplicar es juntar grupos iguales: 4 × 3 son cuatro grupos de tres. Con deudas, 4 × (−3) = −12.",
+        "Un rectángulo de 4 filas de 3, girado, es de 3 filas de 4: 4 × 3 = 3 × 4.",
+        "Multiplicar también es estirar la recta desde el cero: por 2, todo se aleja el doble; por 1, nada se mueve; por −1, media vuelta. Dos medias vueltas son una entera: (−1) × (−1) = 1.",
+        "Multiplicar no siempre agranda: (−3) × 2 = −6 queda más lejos del cero, pero es menor que −3.",
+        "Dividir es repartir (14 entre 4: tres cada una, sobran 2; 14 = 4 × 3 + 2) o medir (12 en bolsas de 3: 4 bolsas). Las dos deshacen una multiplicación: 12 ÷ 3 = 4 porque 4 × 3 = 12.",
+        "No se divide por cero: ningún número por 0 da 6. Tampoco 0 ÷ 0: cualquier número por 0 da 0, así que no hay uno solo.",
+        "Partir un rectángulo no cambia el total: 4 × 5 = 4 × 3 + 4 × 2. Así, 4 × 13 = 4 × 10 + 4 × 3 = 52.",
+        "Dato: Brahmagupta (628) dio reglas para operar con \"fortunas\" y \"deudas\"; también escribió que 0 ÷ 0 = 0. Hoy se sabe que 0 ÷ 0 no tiene un resultado."
+      ],
+      "seen": [
+        "Anticipaste que las Terrazas debían doce atados: cuatro grupos de tres.",
+        "Anticipaste que girar el rectángulo no cambiaba el total.",
+        "Con la huerta de 9 × 4, viste que alcanzaba contar una sola vez.",
+        "Para el plano al doble elegiste × 2: cada casa al doble de lejos del pozo, y Cornisa de −3 a −6.",
+        "Anticipaste que dos medias vueltas devuelven a todos a su lugar: (−1) × (−1) = 1.",
+        "Anticipaste el reparto de 14 entre 4: tres cada una y sobran dos.",
+        "Anticipaste cuatro bolsas de tres con doce atados.",
+        "Repartir entre nadie no empieza nunca, y llenar bolsas de cero no termina nunca: 6 ÷ 0 no tiene respuesta.",
+        "Anticipaste que cortar la huerta no cambia el total.",
+        "Calculaste 4 × 13 partiendo en 4 × 10 y 4 × 3: 52."
+      ],
+      "moments": [
+        {
+          "id": "c4.estirar",
+          "label": "Desplegar: estirar y dar vuelta"
+        },
+        {
+          "id": "c4.partir",
+          "label": "Desplegar: partir el rectángulo"
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "title": "Partes de algo",
+      "abbr": "Una fracción mide con pedazos iguales de una unidad; un mismo número tiene muchos nombres.",
+      "body": [
+        "n/d de una unidad son n pedazos del tamaño que entra d veces justo en ella: 3/4 son tres pedazos de un cuarto; 5/4, cinco, más que una entera. Repartir 3 entre 4 da 3/4: 3 ÷ 4 = 3/4.",
+        "Un mismo número tiene muchos nombres: 1/2 = 2/4 = 3/6 = 0,5. Para comparar o sumar, primero una partición común: 1/2 + 1/3 = 3/6 + 2/6 = 5/6.",
+        "En la recta, entre dos números siempre cabe otro. Los decimales siguen las cajas del depósito hacia la derecha de la coma; por ciento quiere decir de cada cien.",
+        "Hay medidas que ninguna partición alcanza justo, como la diagonal de un cuadrado de lado 1 (≈ 1,414). No cerrar en decimales no lo prueba (1/3 tampoco cierra); la prueba llega más adelante."
+      ],
+      "seen": [
+        "Darle un atado a dos familias no era igual para todas.",
+        "Viste que medio montón de seis es más que medio atado: \"medio\" depende de qué.",
+        "Cortaste las barras en 4: tres cuartos de barra para cada familia.",
+        "Anticipaste que dos cuartos y una mitad son lo mismo.",
+        "Para comparar 2/3 y 3/4 partiste en doceavos: 8/12 < 9/12.",
+        "Para sumar 1/2 y 1/3 elegiste sextos: 5/6.",
+        "Viste que 2,05 es menos que 2,5.",
+        "Mediste la diagonal partiendo el lado en 2, 3, 5: ninguna partición entró justo."
+      ],
+      "moments": [
+        {
+          "id": "c5.diagonal",
+          "label": "Desplegar: lo que no entra justo"
+        }
+      ]
+    },
+    {
+      "id": "c6",
+      "title": "Lo que no se ve",
+      "abbr": "Una ecuación son dos miembros; resolver es buscar para qué x coinciden, sin perder ni inventar soluciones.",
+      "body": [
+        "Una incógnita es un número que está pero no se ve. Se le pone un nombre: x. Resolver es encontrar para qué x los dos miembros dan lo mismo.",
+        "Hacer lo mismo a los dos lados no cambia para qué x coinciden si cumple dos cosas: que se pueda hacer con cualquier x (así no se pierde ninguna solución) y que se pueda deshacer (así no aparece ninguna). Sumar o restar cualquier número, o multiplicar o dividir por un número que no sea cero, cumplen las dos. \"Pasa sumando\" abrevia eso: sumar a los dos lados y simplificar.",
+        "Para comprobar, se pone el valor en la cuenta original. De memoria se puede pasar un número con el signo equivocado.",
+        "Una ecuación pregunta para qué x se cumple (x − 3 = 5, sólo con 8); una identidad se cumple con cualquier x (x − 3 + 3 = x; 0 = 0). Por cero no se deshace: la ecuación se vuelve una identidad y aparecen todas las x. Al cuadrado no se deshace: pueden aparecer de más (3 y −3). Dividir por algo que vale cero en alguna x no se puede hacer en esa x: ahí se puede perder una solución (el 0 en x · x = x).",
+        "En una desigualdad, multiplicar o dividir por un negativo da vuelta la recta: el signo se invierte. Por un positivo, no.",
+        "Hay muchos caminos válidos; no todos ayudan, pero todo camino válido que deja sola a la x da el mismo número.",
+        "Dato: al-Khwārizmī (Bagdad, hacia 820) llamó al-jabr a restituir lo que se resta, y al-muqābala a cancelar lo igual de los dos lados; lo hacía en palabras, sin símbolos. De al-jabr viene \"álgebra\"."
+      ],
+      "seen": [
+        "Moviste a Punto (la x) hasta que x − 3 cayó en el 5: con x = 8. La caja tenía ocho.",
+        "Sumaste 3 a los dos lados: los marcadores siguieron juntos y quedó x = 8.",
+        "\"Pasa sumando\" quedó como abreviatura de sumar a los dos lados.",
+        "Punto resolvió de memoria y pasó el 3 con el signo que tenía; elegiste comprobarlo poniéndolo en el 8: no cumplía. Era x = 2, y Punto borró su renglón.",
+        "Con el truco de multiplicar por cero, cualquier x parecía servir: por cero se pierde lo que decía la cuenta.",
+        "Anticipaste que x · x = 9 tiene dos soluciones; buscando, aparecieron el 3 y el −3.",
+        "Dividiendo x · x = x por x se perdió el 0, que sí cumplía.",
+        "Al dividir −2x < 6 por −2 diste vuelta el signo: x > −3, y las x marcadas no cambiaron.",
+        "En 2x + 1 = 7 tu camino fue: dividir por 2, restar 1/2. x = 3."
+      ],
+      "moments": [
+        {
+          "id": "c6.dos-lados",
+          "label": "Desplegar: pasa sumando"
+        },
+        {
+          "id": "c6.dos-pasos",
+          "label": "Desplegar: dos pasos"
+        }
+      ]
+    },
+    {
+      "id": "c7",
+      "title": "Crecer",
+      "abbr": "Multiplicar repetido crece distinto que sumar repetido, y cada crecimiento tiene su pregunta al revés.",
+      "body": [
+        "La raíz es el lado de un cuadrado de área dada: √9 = 3. √2 es el largo de la diagonal de un cuadrado de lado 1 (≈ 1,414). El signo √ indica el número positivo, el lado; x · x = 9 tiene además −3. La raíz cúbica es el lado de un cubo: un cubo de 64 bloques tiene lado 4, porque 4 · 4 · 4 = 64; con 8 · 8 = 64 sale un cuadrado plano, √64 = 8.",
+        "Sumar lo mismo crece parejo (sucesión aritmética: el día n, 1 + 10 · n); duplicar empieza lento y después saca cada vez más ventaja (sucesión geométrica: cada día, el doble del anterior). En 2ⁿ, el exponente n dice cuántas veces se multiplica por 2, empezando en 1; para abajo se divide: 2⁰ = 1, 2⁻¹ = 1/2. Con otro número abajo es igual: 4³ = 1 · 4 · 4 · 4. Cuando los exponentes cuentan factores, multiplicar potencias del mismo número los junta y los exponentes se suman: 2³ · 2² = 2⁵. Dividirlas saca factores, y los exponentes se restan: 2⁵ ÷ 2² = 2³. Elevar una potencia la repite, y los exponentes se multiplican: (2³)² = 2⁶. Sumando no: 2³ + 2² = 12. Los números muy grandes o muy chicos se escriben con un número de 1 a menos de 10 por una potencia de 10: 3 · 10⁶, 1 · 10⁻³.",
+        "Un producto de sumas es un rectángulo partido: (x + 2)(x + 3) = x² + 5x + 6. Factorizar es armar el rectángulo con las fichas; completar el cuadrado es agregar la esquina que falta, de los dos lados del igual: (x + 1)² = 9 da x = 2 o x = −4. La raíz de (x + 1)² es lo lejos que está x + 1 del cero; por eso hay dos. Si x + 1 es positivo, la raíz de (x + 1)² es x + 1; si es negativo, no. Si el cuadrado da 0, hay una sola solución; si da un negativo, ninguna en la recta.",
+        "Para pasar mil duplicando hacen falta diez duplicaciones (2⁹ = 512, 2¹⁰ = 1024). Media duplicación es multiplicar por √2 (dos veces da × 2); para que juntar exponentes siga valiendo, se elige escribirla 2 elevado a un medio. El número justo de veces para llegar a mil no es entero: es log₂ 1000 ≈ 9,97, la pregunta al revés de la potencia. Y una cuenta con x abajo de una división no vale donde ese abajo da cero: 1 ÷ (x − 2) pide x ≠ 2. Al simplificar, la restricción se anota: (x · x − 4) ÷ (x − 2) = x + 2, con x ≠ 2."
+      ],
+      "seen": [
+        "Anticipaste que una huerta cuadrada de dos cuadros tiene lado menor que 2; armándola con triángulos, el lado era la diagonal de un cuadro: √2.",
+        "Apostaste por duplicar: al principio perdía, y desde el día 6 pasó adelante.",
+        "Para cualquier día n elegiste 1 + 10 · n.",
+        "Siguiendo la tabla hacia abajo, dijiste 2⁰ = 1.",
+        "Para 2³ · 2² sumaste arriba y multiplicaste los dos de abajo: 4⁵; el 2 no cambia: cinco dos, 2⁵.",
+        "Para (2³)² viste seis dos: 2⁶.",
+        "Para 2⁵ ÷ 2² sacaste dos factores: 2³.",
+        "Pensaste que 2³ + 2² era 2⁵; sumando da 12: los exponentes se juntan al multiplicar.",
+        "Anticipaste que el cubo de 64 bloques tenía lado 4.",
+        "Elegiste la noche de 3 · 10⁶: es más que 4 · 10⁵.",
+        "Anticipaste las cinco tiras de (x + 2)(x + 3).",
+        "Con cinco cuadraditos probaste x(x + 5), (x + 1)(x + 4) y (x + 2)(x + 3): ninguno cerraba. x² + 5x + 5 no se arma con fichas enteras.",
+        "Para x² + 5x + 6 probaste (x + 1)(x + 6) y (x + 2)(x + 3).",
+        "Al completar el cuadrado sumaste 1 de los dos lados del igual.",
+        "Viste que (x + 1)² = 0 tiene una sola solución.",
+        "Viste que (x + 1)² = −9 no tiene solución en la recta.",
+        "Para media duplicación elegiste × √2: dos veces da × 2.",
+        "Anticipaste unos diez días para pasar mil duplicando.",
+        "Viste que (x · x − 4) ÷ (x − 2) es x + 2 salvo en x = 2.",
+        "Viste que 1 ÷ (x − 2) no se puede con x = 2."
+      ],
+      "moments": [
+        {
+          "id": "c7.areas",
+          "label": "Desplegar: áreas con x"
+        },
+        {
+          "id": "c7.cuantas-veces",
+          "label": "Desplegar: ¿cuántas veces?"
+        }
+      ]
+    },
+    {
+      "id": "c8",
+      "title": "Formas",
+      "abbr": "Una forma se mide, se copia, se agranda y se ubica; un dibujo muestra, un argumento prueba.",
+      "body": [
+        "Probando casos no se termina: para saber que algo vale siempre hace falta una razón que sirva para todos a la vez. Así se ve que √2 no es una fracción: si hubiera un par de enteros, habría otro más chico, sin fin; pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible.",
+        "Un ángulo es cuánto se gira. Los tres ángulos de un triángulo juntos hacen media vuelta, 180°: la paralela lo muestra para cualquier triángulo del plano.",
+        "Copias iguales (congruentes): se mueven, se giran o se dan vuelta y calzan. Parecidas (semejantes): los mismos ángulos y todos los lados multiplicados por lo mismo. Con el lado × 2, el área va × 4 y el volumen × 8; con × 3, × 9 y × 27.",
+        "El perímetro mide el borde; el área, lo de adentro: la misma cerca encierra distinta tierra. Con ángulo recto, cateto² + cateto² = hipotenusa² (reacomodando cuatro triángulos en un cuadrado). Un punto del plano se ubica con dos números en orden: (3, 2) no es (2, 3)."
+      ],
+      "seen": [
+        "Partiste el lado en 2, 3, 5: nunca cayó justo.",
+        "Viste que probando no se termina y que hacía falta una razón.",
+        "Con dos cuadrados adentro de uno, cada par que cumpliera daba otro más chico: con enteros, imposible. √2 no es una fracción.",
+        "Juntaste las puntas de un triángulo en media vuelta y pediste una razón para todos: la paralela.",
+        "Una copia parecida conserva la forma: ángulos y proporción.",
+        "Con el lado doble, anticipaste cuatro veces la tierra: fueron cuatro huertas como la de antes.",
+        "Llenaste la caja de lado doble caja por caja: entraron ocho, cuatro en cada piso.",
+        "Con la misma cerca, anticipaste que la tierra depende de la forma: de 5 a 9.",
+        "Anticipaste el tirante de 5.",
+        "Entre (−1, −1) y (3, 2) viste el tirante: 5."
+      ],
+      "moments": [
+        {
+          "id": "c8.doble",
+          "label": "Desplegar: el doble de grande"
+        },
+        {
+          "id": "c8.pitagoras",
+          "label": "Desplegar: el tirante"
+        }
+      ]
+    },
+    {
+      "id": "c9",
+      "title": "Depende",
+      "abbr": "Una función le asigna a cada entrada una sola salida; se puede decir con flechas, tablas, gráficos o cuentas.",
+      "body": [
+        "Una función le asigna a cada entrada una sola salida: el largo de la sombra depende de la hora. Al revés no siempre: con el largo 2 pueden ser las 10 o las 14. Eso es una relación, pero no una función.",
+        "Una regla se adivina con casos; un caso nuevo puede mostrar que está mal, pero si coincide no la prueba (otra regla podría coincidir ahí). Una relación une entradas con salidas; es función si a cada entrada le toca una sola. Una máquina que con el mismo número da distinto no es una función.",
+        "Un gráfico se lee: cada punto dice algo. Se unen los puntos cuando entre medio también hay valores (y es una suposición); no se unen cuando no hay nada entre medio. Si una recta parada corta un dibujo dos veces, no es el gráfico de una función.",
+        "El dominio son las entradas con las que se puede: 1 ÷ (x − 2), todo menos el 2; el reparto, enteros mayores que 2. La imagen es lo que puede salir: con números de la recta, x · x da 0 o positivos. Una misma función se dice con una cuenta, una tabla o un gráfico; lo que se repite se puede anticipar."
+      ],
+      "seen": [
+        "Con la sombra 2 dijiste «las 10 o las 14»: la hora no depende sólo de la sombra.",
+        "Armaste la regla de Mara a la primera: × 2 + 1.",
+        "Con tu regla anticipaste que con 10 salía 21.",
+        "Uniste los puntos de la sombra: entre medición y medición también hay sombra.",
+        "Las familias por día quedaron sueltas: no hay «lunes y medio».",
+        "Con la recta parada acertaste 4 de 4 dibujos, y la moviste antes de decidir.",
+        "Para el reparto de Rampa elegiste los enteros mayores que 2.",
+        "Viste que x · x, con números de la recta, nunca da negativo.",
+        "Antes de verlo, anticipaste que el día 2 a las 10 la sombra mediría 2.",
+        "Para dentro de diez días a las 8 dijiste 4, si el sol sigue dando la misma vuelta."
+      ],
+      "moments": [
+        {
+          "id": "c9.puntos",
+          "label": "Desplegar: puntos que se paran"
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "title": "Vueltas y flechas",
+      "abbr": "Los giros se miden con el radio; lo que gira se repite; las flechas se suman; multiplicar por i gira un cuarto de vuelta.",
+      "body": [
+        "Un giro se mide por cuántos rayos recorre el borde, siguiendo la curva: una vuelta, 360°, son 2π radianes (≈ 6,28), media vuelta π. Derecho, de punta a punta, el rayo entra seis veces justo; por el borde, que es más largo, seis y un pedacito. π no es 3,14: 3,14 es una aproximación, y π no es ninguna fracción.",
+        "En una rueda de un rayo, la altura del punto que gira es el seno del ángulo y el costado, el coseno: sen 30° = 0,5, cos 30° ≈ 0,87; a la izquierda del centro el costado es negativo. Rayo, alto y costado forman un triángulo con esquina recta: alto² + costado² = 1. Después de 90° la manija baja como subió: a 120°, la altura de los 60°. Se repiten cada vuelta: sen(x + 360°) = sen x. En una rampa, alto ÷ largo de la tabla (el lado de enfrente de la esquina recta) es el seno del ángulo con el piso; en triángulos, la esquina recta y la misma inclinación dejan la forma fija.",
+        "Una flecha (vector) dice cuánto y hacia dónde, no desde dónde; un lugar no es una flecha, aunque desde el cero se anoten igual. Se suman punta con cola, coordenada a coordenada, y el orden no cambia el destino. La flecha (3, 1) es el número 3 + i. Multiplicar por i gira un cuarto de vuelta contra el reloj: (a, b) pasa a (−b, a), e i · i = −1. Con números de la recta, x · x nunca da negativo; con 2i, 2i · 2i = −4.",
+        "Dos condiciones de primer grado a la vez («tanto de a más tanto de b da tanto») son dos filas de pares sobre rectas: lo que cumple las dos está en el cruce; si son paralelas, no hay; si son la misma, todos. Con atados enteros, además, el cruce tiene que caer en un punto entero. Los números de cada condición, en filas, forman una tabla llamada matriz: si la izquierda de una fila es la de la otra por un mismo número y el resultado no, son paralelas; si también el resultado, es la misma recta."
+      ],
+      "seen": [
+        "Anticipaste seis rayos y un poco más alrededor de la rueda.",
+        "Anticipaste que a 30° la manija sube medio rayo.",
+        "Anticipaste que a 120° la manija baja como subió: la altura de los 60°.",
+        "A los 390° marcaste 0,5, la altura de los 30°: la ola se repite cada vuelta.",
+        "La rampa de 6 sube 3: alto ÷ largo no cambia.",
+        "Para la rampa de 60° giraste la rueda hasta 60° y leíste 0,87: 4 · 0,87 ≈ 3,5.",
+        "Viste que el orden de las flechas no cambia el destino.",
+        "Anticipaste que un cuarto de vuelta lleva (3, 1) a (−1, 3).",
+        "Buscaste un número nuevo para el cuarto de vuelta: i.",
+        "Con «suman 7» y «suman 3» viste que no hay par: rectas paralelas.",
+        "Para el balde 7 dijiste «no se sabe seguro»."
+      ],
+      "moments": [
+        {
+          "id": "c10.repite",
+          "label": "Desplegar: lo que se repite"
+        },
+        {
+          "id": "c10.cuarto",
+          "label": "Desplegar: un cuarto de vuelta"
+        }
+      ]
+    },
+    {
+      "id": "c11",
+      "title": "Lo que pasa a veces",
+      "abbr": "Lo que pasa a veces no se anticipa caso por caso, pero se puede contar.",
+      "body": [
+        "Con muchos casos, la parte de veces que algo pasa se acomoda cerca de un número (2 de cada 3 baldes llenos). Es algo que se observa, no una garantía: del próximo caso dice qué es más probable, no qué va a pasar.",
+        "Un número resume muchos datos y siempre esconde algo: el promedio reparte todo y uno muy grande lo arrastra; la mediana, el del medio, no. El rango dice qué tan desparejos son. En un gráfico de barras, hay que mirar dónde empieza el eje.",
+        "Cuando se elige una cosa de cada grupo, las maneras se multiplican (3 · 2 · 4 = 24). Con casos igual de posibles, la probabilidad es casos que sirven sobre casos posibles: el 7 con dos dados, 6/36; el 12, 1/36.",
+        "Que dos cosas suban juntas no dice que una cause la otra: puede haber una tercera, como el viento."
+      ],
+      "seen": [
+        "Anticipaste que con muchos baldes subirían llenos cerca de dos de cada tres.",
+        "Subiste hasta mil baldes; otra tanda empezó distinta y llegó cerca de lo mismo.",
+        "Para una familia común elegiste el del medio, 4 (la mediana).",
+        "Para tener por lo menos 4 llamaste al ayudante parejo.",
+        "Miraste dónde empezaba el eje del gráfico de Punto.",
+        "Con 4 botas multiplicaste: 24 maneras.",
+        "Anticipaste que el 7 sale más que el 12: 6 maneras contra 1.",
+        "Sospechaste una tercera cosa detrás de las dos: el viento parecía acompañar a los borrones."
+      ],
+      "moments": [
+        {
+          "id": "c11.dados",
+          "label": "Desplegar: dos dados"
+        }
+      ]
+    },
+    {
+      "id": "c12",
+      "title": "Anticipar",
+      "abbr": "Reconocer la familia, ajustar las perillas, leer el gráfico: así se anticipa.",
+      "body": [
+        "Las reglas se agrupan en familias que se reconocen por su forma: rectas, curvas que despegan, U (simétricas: iguales de los dos lados de su eje; y = a · x · x, con a positiva más grande, más angosta), olas, curvas que suben cada vez más despacio y curvas partidas. Donde el gráfico se interrumpe hay una discontinuidad; una raya a la que la curva se acerca tanto como se quiera es una asíntota (la de 1 ÷ (x − 2), en el 2, no se toca nunca porque ahí no hay valor; y con x muy grande se acerca a 0 tanto como se quiera sin llegar: la raya acostada del 0 también es asíntota). Los parámetros eligen cuál de la familia: en y = a · x + b, b es dónde empieza y a cuánto sube por paso.",
+        "Un gráfico se lee: los ceros, dónde crece y dónde decrece, el máximo; también en uno que no es una U, como la caja de Cornisa, x · (6 − 2x)², un polinomio de grado 3, que como caja sólo tiene sentido con el corte entre 0 y 3. Las reglas se encadenan, y el orden importa; algunas se deshacen (en el orden contrario) y otras sólo si se sabe más (x · x, si se conoce el signo). Con x desde 0, el gráfico de la raíz es el de x · x reflejado sobre la diagonal: (a, b) pasa a (b, a), como (2, 4) y (4, 2).",
+        "La tasa de cambio en un tramo es cuánto cambió dividido cuánto pasó; con tramos cada vez más cortos se acerca a la derivada. Juntar lo que entra de a poco es sumar rectángulos cada vez más finos: se acerca al área bajo el gráfico, la integral.",
+        "Hay reglas por tramos: una hasta un lugar y otra después, como el precio de Rampa o la distancia al cero, |x|: x a la derecha del cero y −x a la izquierda, que ahí da positivo. Con todo eso se anticipa, suponiendo que la regla sigue; y cuando llegan datos nuevos, se revisa."
+      ],
+      "seen": [
+        "Uniste cada forma con su regla sin errar ninguna.",
+        "Anticipaste el punto más alto del salto en la mitad, a los 3.",
+        "Deshiciste «el doble más uno» en el orden contrario.",
+        "En la caja de Cornisa leíste el máximo en x = 1: 16.",
+        "Viste que las velocidades de tramos cada vez más cortos se acercan a 4.",
+        "Viste que las sumas se acercan al área bajo el caudal: 9.",
+        "Marcaste la noche 5 como plazo y la escalera de Balcón llegó entera a la Marea grande.",
+        "Al final volviste por la puerta del primer día y la dejaste abierta; Punto llegó antes y se quedó con la Ronda."
+      ],
+      "moments": [
+        {
+          "id": "c12.salto",
+          "label": "Desplegar: el salto de Punto"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c1.puerta",
+    "c1.alguien",
+    "c1.ronda",
+    "c1.marea",
+    "c1.vuelven",
+    "c1.quien",
+    "c1.busqueda",
+    "c1.todos",
+    "c1.gradas",
+    "c1.nombre",
+    "c2.manana",
+    "c2.marcar",
+    "c2.atados",
+    "c2.deposito",
+    "c2.cero",
+    "c2.cuantos",
+    "c2.cuarto",
+    "c2.lugar",
+    "c3.deuda",
+    "c3.pares",
+    "c3.linea",
+    "c3.distancia",
+    "c3.perdon",
+    "c3.pozo",
+    "c3.hacia",
+    "c4.grupos",
+    "c4.girar",
+    "c4.estirar",
+    "c4.repartir",
+    "c4.medir",
+    "c4.nadie",
+    "c4.partir",
+    "c5.medio",
+    "c5.barras",
+    "c5.equivalentes",
+    "c5.recta",
+    "c5.comparar",
+    "c5.sumar",
+    "c5.decimos",
+    "c5.cien",
+    "c5.diagonal",
+    "c6.caja",
+    "c6.dos-lados",
+    "c6.memoria",
+    "c6.por-cero",
+    "c6.cuadrado",
+    "c6.dividir",
+    "c6.al-reves",
+    "c6.dos-pasos",
+    "c7.lado",
+    "c7.duplicar",
+    "c7.factores",
+    "c7.juntar",
+    "c7.grande",
+    "c7.areas",
+    "c7.al-reves",
+    "c7.completar",
+    "c7.cuantas-veces",
+    "c7.no-se-puede",
+    "c8.diagonal",
+    "c8.vuelta",
+    "c8.copias",
+    "c8.doble",
+    "c8.cerca",
+    "c8.pitagoras",
+    "c8.casas",
+    "c8.sombras",
+    "c9.flechas",
+    "c9.maquina",
+    "c9.puntos",
+    "c9.recta",
+    "c9.dominio",
+    "c9.imagen",
+    "c9.maneras",
+    "c9.vuelve",
+    "c10.rueda",
+    "c10.alto",
+    "c10.repite",
+    "c10.rampa",
+    "c10.flechas",
+    "c10.cuarto",
+    "c10.pistas",
+    "c10.a-veces",
+    "c11.baldes",
+    "c11.medio",
+    "c11.parejo",
+    "c11.grafico",
+    "c11.contar",
+    "c11.dados",
+    "c11.causa",
+    "c11.anticipar",
+    "c12.familias",
+    "c12.perillas",
+    "c12.salto",
+    "c12.encadenar",
+    "c12.rapido",
+    "c12.junta",
+    "c12.tramos",
+    "c12.anticipar"
+  ],
+  "moments": [
+    "c1.marea",
+    "c1.todos",
+    "c1.nombre",
+    "c2.cero",
+    "c2.lugar",
+    "c3.hacia",
+    "c4.estirar",
+    "c4.partir",
+    "c5.diagonal",
+    "c6.dos-lados",
+    "c6.dos-pasos",
+    "c7.areas",
+    "c7.cuantas-veces",
+    "c8.doble",
+    "c8.pitagoras",
+    "c9.puntos",
+    "c10.repite",
+    "c10.cuarto",
+    "c11.dados",
+    "c12.salto"
+  ],
+  "log": [
+    {
+      "who": "student",
+      "text": "Mara, multiplicar potencias del mismo número es juntar sus factores. Los exponentes se suman: 3 + 2 = 5. Con cualquier número abajo pasa lo mismo: se cuentan factores iguales."
+    },
+    {
+      "who": "Mara",
+      "text": "Y si un día se duplica tres veces, y eso pasa dos días seguidos, lo anoto así."
+    },
+    {
+      "who": null,
+      "text": "Seis dos: 2⁶."
+    },
+    {
+      "who": "student",
+      "text": "Elevar una potencia es repetirla: tres dos, dos veces. Los exponentes se multiplican: 3 · 2 = 6."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si en vez de multiplicar sumo? ¿Se juntan igual?"
+    },
+    {
+      "who": null,
+      "text": "Los exponentes se suman cuando se multiplica. Sumando, 8 + 4 = 12: no es 32."
+    },
+    {
+      "who": "student",
+      "text": "Sumar no junta factores: junta cantidades. Lo de sumar los exponentes vale para multiplicar."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si divido? Cinco dos, divididos por dos dos."
+    },
+    {
+      "who": null,
+      "text": "Tres dos: 8."
+    },
+    {
+      "who": "student",
+      "text": "Dividir saca factores: si el que se divide tiene más factores, los exponentes se restan, 5 − 2 = 3. Como en la tabla de antes, cada renglón hacia abajo sacaba un dos."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Tengo 64 bloques de tiza y quiero apilarlos en un cubo: igual de largo, de ancho y de alto."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Probemos con capas de 4 por 4."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, el cubo tiene 4 de largo, 4 de ancho y 4 de alto: 4 · 4 · 4 = 64. El lado del cubo es la raíz cúbica de 64: 4."
+    },
+    {
+      "who": "student",
+      "text": "Con 8 de lado sale un cuadrado, plano: 8 · 8 = 64, y √64 = 8. La raíz cuadrada pregunta por el lado de un cuadrado; la cúbica, por el de un cubo."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y cómo puede ser que el 64 sirva para las dos cosas?"
+    },
+    {
+      "who": "student",
+      "text": "64 son seis dos: 2⁶. Juntados de a dos, tres veces: 4 · 4 · 4. Juntados de a tres, dos veces: 8 · 8."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Medí el polvo de tiza que dejó la Marea esta noche: tres millones de granos. No me entra en la libreta."
+    },
+    {
+      "who": "student",
+      "text": "Punto, seis ceros, seis veces por diez. El 3 no se cuenta: es el que se multiplica."
+    },
+    {
+      "who": "Cornisa",
+      "text": "La de anoche la anoté así: 4 · 10⁵."
+    },
+    {
+      "who": "student",
+      "text": "Esta noche: tres millones contra cuatrocientos mil. El exponente dice cuántos lugares, y pesa más que el 3 o el 4."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Y un grano solo es nada: una milésima de gramo."
+    },
+    {
+      "who": "student",
+      "text": "Lo chico también se corre: tres lugares para el otro lado, como la tabla de los dos, para abajo."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Voy a agrandar una huerta cuadrada, pero todavía no decidí de qué lado: le digo x. Le sumo dos filas abajo y tres columnas al costado. Quiero una cuenta que sirva para cualquier lado."
+    },
+    {
+      "who": null,
+      "text": "La ficha x la dibujo de un largo cualquiera: x puede ser cualquier número."
+    },
+    {
+      "who": null,
+      "text": "Un x por x, cinco tiras, seis cuadraditos."
+    },
+    {
+      "who": "student",
+      "text": "Peldaño, es partir el rectángulo, como cuando repartimos en las Terrazas, pero de los dos lados. Dos por tres, los cuadraditos; dos más tres, las tiras."
+    },
+    {
+      "who": "Balcón",
+      "text": "A mí me dieron las fichas sueltas: un x por x, cinco tiras y cinco cuadraditos. Quiero una huerta rectangular, sin que sobre nada."
+    },
+    {
+      "who": null,
+      "text": "Así no cierra: sobran cinco cuadraditos."
+    },
+    {
+      "who": null,
+      "text": "Así no cierra: sobra un cuadradito."
+    },
+    {
+      "who": null,
+      "text": "Así no cierra: falta un cuadradito."
+    },
+    {
+      "who": null,
+      "text": "Probé los tres pares que suman cinco y ninguno cierra: con cinco cuadraditos, este rectángulo no se arma."
+    },
+    {
+      "who": "Balcón",
+      "text": "Me dieron un cuadradito más: seis. ¿Y ahora?"
+    },
+    {
+      "who": null,
+      "text": "Así no cierra: faltan dos tiras."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, los dos números tienen que sumar cinco, por las tiras, y multiplicados dar seis, por los cuadraditos. Dos y tres."
+    },
+    {
+      "who": "Balcón",
+      "text": "Con cinco no había manera: cero por cinco, cero; uno por cuatro, cuatro; dos por tres, seis. Ninguno da cinco. Con seis, sí."
+    },
+    {
+      "who": "Rampa",
+      "text": "Mi huerta: un cuadrado de lado x y dos tiras de x pegadas, una a cada lado. En total, ocho cuadraditos de tierra. ¿Cuánto mide x?"
+    },
+    {
+      "who": "student",
+      "text": "Rampa, un cuadrado de nueve tiene lado 3. Entonces x + 1 = 3, y x mide 2."
+    },
+    {
+      "who": null,
+      "text": "Con x = 2 se pueden contar: cuatro del cuadrado y dos de cada tira, ocho de tierra. Con la esquina, nueve: tres por tres."
+    },
+    {
+      "who": null,
+      "text": "Las dos cumplen (x + 1)² = 9, porque (−3) · (−3) también es 9. Pruebo x = −4 en la cuenta de Rampa: 16 − 8 = 8. Cumple. La huerta no: un lado no mide −4. La cuenta tiene dos soluciones; la huerta, una."
+    },
+    {
+      "who": "student",
+      "text": "La raíz da el lado, el positivo. La raíz de (x + 1)² no siempre es x + 1: es lo lejos que está x + 1 del cero. Si x + 1 es positivo, es x + 1; si es negativo, no. Por eso x + 1 puede ser 3 o −3, los dos a 3 del cero."
+    },
+    {
+      "who": "Mara",
+      "text": "Al completar, siempre queda un cuadrado igual a un número. ¿Y si el número fuera otro?"
+    },
+    {
+      "who": null,
+      "text": "Una: sólo el 0, multiplicado por sí mismo, da 0."
+    },
+    {
+      "who": null,
+      "text": "Ninguna en la recta: con la cuenta también, un número de la recta multiplicado por sí mismo da 0 o positivo."
+    },
+    {
+      "who": "student",
+      "text": "Al completar el cuadrado queda (x + algo)² = un número. Si es positivo, dos soluciones; si es cero, una; si es negativo, ninguna en la recta."
+    },
+    {
+      "who": "Mara",
+      "text": "Punto, con tu manera de duplicar: empezando con un escalón, ¿cuántos días hasta pasar los mil de la escalera grande?"
+    },
+    {
+      "who": "student",
+      "text": "Punto, 10 veces. 2⁹ es 512, todavía no; 2¹⁰ es 1024, ya pasó."
+    },
+    {
+      "who": null,
+      "text": "Diez: duplicar llega lejos enseguida."
+    },
+    {
+      "who": "Mara",
+      "text": "Para pasar mil, diez. ¿Y para llegar justo a mil?"
+    },
+    {
+      "who": "student",
+      "text": "Con duplicaciones enteras no se llega justo: nueve no alcanzan y diez se pasan. Pero puede haber pasos más chicos: media duplicación."
+    },
+    {
+      "who": null,
+      "text": "Dos veces × √2: √2 · √2 = 2. Una duplicación entera."
+    },
+    {
+      "who": "student",
+      "text": "Si queremos que juntar exponentes siga valiendo también con medios, un medio y un medio tienen que hacer uno: media duplicación tiene que ser √2, el positivo. Por eso se elige escribir √2 como 2 elevado a un medio, igual que se eligió 2⁰ = 1 para que la tabla siguiera."
+    },
+    {
+      "who": "student",
+      "text": "Nueve duplicaciones y media: 512 · 1,414, unos 724. Todavía no."
+    },
+    {
+      "who": null,
+      "text": "El número justo está entre 9,5 y 10. La potencia pregunta: dos, tantas veces, ¿cuánto da? Esto es al revés: ¿cuántas veces, para que dé justo mil? Esa pregunta tiene nombre: logaritmo."
+    },
+    {
+      "who": "Rampa",
+      "text": "Tengo un atado para repartir entre los que vengan a la escalera, menos los dos que ya cobraron. Si vienen x, a cada uno le toca 1 ÷ (x − 2)."
+    },
+    {
+      "who": "student",
+      "text": "Punto, ¿uno repartido entre nadie da cero? Acordate de las bolsas de las Terrazas: no hay cuántas."
+    },
+    {
+      "who": null,
+      "text": "Con x = 2, abajo queda cero. Con x = 0 sí se puede: abajo queda −2."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, la cuenta sirve para cualquier x menos 2. Ahí no da cero ni un número raro: no está definida, porque no se divide por cero."
+    },
+    {
+      "who": "Rampa",
+      "text": "La cuenta sirve para cualquier x menos 2. Mi reparto, en cambio, sólo si vienen más de dos: con 1 o con 0 da negativo, y nadie cobra menos que nada. Lo anoto arriba."
+    },
+    {
+      "who": "Mara",
+      "text": "Yo tengo otra cuenta: (x · x − 4) ÷ (x − 2). Dicen que es lo mismo que x + 2, que es más corta."
+    },
+    {
+      "who": null,
+      "text": "Con 3 y con 0 dan igual. Con 2, la primera es 0 ÷ 0: no está definida, y x + 2 da 4."
+    },
+    {
+      "who": "student",
+      "text": "Mara, con x = 2 queda 0 ÷ 0: cualquier número por 0 da 0, así que no hay un solo resultado. Por eso no está definida, aunque x + 2 dé 4."
+    },
+    {
+      "who": "student",
+      "text": "Y x · x − 4 es (x − 2) · (x + 2). Si x no es 2, el (x − 2) que multiplica se va con el (x − 2) que divide, y queda x + 2. Simplificar vale, pero hay que anotar dónde no: x ≠ 2."
+    },
+    {
+      "who": null,
+      "text": "Abreviaturas sueltas. Ninguna dice por qué."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Con la raíz de dos pinté la puerta. Pero ayer partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas hay que partirlo?"
+    },
+    {
+      "who": "Peldaño",
+      "text": "Partí el lado del cuadro en doce y la diagonal no cayó en ninguna rayita. ¿En cuántas lo parto para que caiga justo?"
+    },
+    {
+      "who": "student",
+      "text": "Si partiendo el lado en q cayera justo, la diagonal mediría p de esas rayitas. Con esa rayita chica, el cuadrado del lado tendría q · q cuadraditos, y el de la diagonal, p · p."
+    },
+    {
+      "who": null,
+      "text": "Y el cuadrado de la diagonal es el de los dos cuadros: tendría que ser p · p = 2 · q · q, justo."
+    },
+    {
+      "who": "Mara",
+      "text": "Una noche probé hasta mil. Siempre faltó o sobró, a veces uno solo."
+    },
+    {
+      "who": "student",
+      "text": "Supongamos que hubiera enteros p y q que cumplen. El de p tiene tanto lugar como los dos de q juntos. La diagonal es más larga que el lado y más corta que dos lados: q es menos que p, y p menos que 2q. Entonces cada cuadrado de q entra en el de p, y los dos juntos se pisan."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Buscamos otro par más chico: un cuadrado con tanto lugar como dos cuadrados iguales. ¿En qué esquinas del grande ponés los dos de q para que aparezca? Tocá una esquina para cada uno."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Los dos de q juntos tienen tanto lugar como el de p. Lo amarillo se tapó dos veces: ¿qué parte del cuadrado grande tiene que tener tanto lugar como lo amarillo?"
+    },
+    {
+      "who": null,
+      "text": "Una. ¿Hay otra parte que no tapó ningún azul?"
+    },
+    {
+      "who": "student",
+      "text": "Los dos de q juntos tienen tanto lugar como el de p. Lo amarillo lo cuentan los dos azules; las esquinas, ninguno. Entonces lo amarillo tiene tanto lugar como las dos esquinas juntas."
+    },
+    {
+      "who": null,
+      "text": "Un cuadrado, el del medio, con tanto lugar como dos cuadrados, las esquinas. Otro par que cumpliría. Sus lados, 2q − p y p − q, son enteros, y positivos porque q < p < 2q. Y más chicos que p y q."
+    },
+    {
+      "who": null,
+      "text": "Eso dice la regla: cada par que cumple da otro más chico. Pero con enteros positivos no se puede bajar para siempre: q, uno menor, otro menor… en algún momento no hay más. Las dos cosas a la vez no pueden ser."
+    },
+    {
+      "who": "student",
+      "text": "Punto, si hubiera un par de enteros que cumple, habría otro más chico, y otro, sin fin. Pero los enteros positivos no bajan para siempre. La suposición lleva a algo imposible: no hay ningún par."
+    },
+    {
+      "who": null,
+      "text": "El dibujo mostraba lo que pasaría si existiera el par, y con un dibujo no se distingue un largo de un entero. Lo que prueba es el razonamiento, y vale para todos los p y q a la vez. Probando casos, en cambio, nunca se termina."
+    },
+    {
+      "who": "Peldaño",
+      "text": "En la puerta dejo √2, que es exacto. Y abajo, chiquito: «1,414 y un poco más»."
+    },
+    {
+      "who": null,
+      "text": "Peldaño tiene su puerta, con √2. Allá, después de las Terrazas, se ve apenas otra: la del primer día. Antes no estaba."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Voy a cortar tejas triangulares. El carpintero dice que las tres puntas juntas siempre hacen lo mismo. ¿Lo mismo que qué?"
+    },
+    {
+      "who": null,
+      "text": "Las tres puntas juntas hacen la línea recta: media vuelta."
+    },
+    {
+      "who": "student",
+      "text": "Media vuelta es lo que gira Punto para mirar para atrás. Si la vuelta entera se parte en 360 partes, los grados, media vuelta son 180."
+    },
+    {
+      "who": "student",
+      "text": "Por la punta de arriba, una recta paralela a la de abajo: no se cruzan nunca."
+    },
+    {
+      "who": null,
+      "text": "Con dos paralelas, el lado AC está igual de inclinado contra las dos: el ángulo de A y el de arriba a la izquierda son iguales. Lo mismo B, del otro lado."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, arriba, sobre la paralela, quedan el de A, el de C y el de B, uno al lado del otro: media vuelta. No usé ninguna medida de este triángulo: vale para cualquiera."
+    },
+    {
+      "who": null,
+      "text": "En un plano, como la pizarra o el piso. Sobre una pelota, un triángulo grande suma más: ahí no hay paralelas que no se crucen."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Mi ventana tiene esta forma de ele. Me trajeron cuatro marcos. ¿Cuáles son copias de la mía?"
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, el girado y el dado vuelta son iguales a tu ventana, congruentes: se mueven y calzan. El grande es parecido, semejante: achicado a la mitad, calza. Y los iguales también son semejantes, con × 1."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Y el ancho tiene los mismos ángulos, todos rectos, pero no todos sus lados se multiplicaron por lo mismo: estirado de un solo lado ya no es mi ventana."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Mi huerta es la de nueve cuadros, tres por tres. Quiero otra con el lado el doble de largo. ¿Cuánta tierra va a tener?"
+    },
+    {
+      "who": null,
+      "text": "Cuatro huertas como la de ahora: treinta y seis cuadros."
+    },
+    {
+      "who": "Mara",
+      "text": "Y la caja de atados de Cornisa, que es de dos por dos por dos: si la hago con el lado doble, ¿cuántas cajas como esa entran? Llenala vos."
+    },
+    {
+      "who": null,
+      "text": "Ocho: cuatro en el piso de abajo y cuatro en el de arriba. Se duplicaron el largo, el ancho y también el alto."
+    },
+    {
+      "who": "student",
+      "text": "Peldaño, el lado se multiplica una vez; el área, por el largo y por el ancho; el volumen, también por el alto. Con el lado × 3 serían × 9 y × 27."
+    },
+    {
+      "who": "Rampa",
+      "text": "Me quedaron doce tramos de cerca. Quiero una huerta rectangular, con la mayor cantidad de tierra adentro."
+    },
+    {
+      "who": "Rampa",
+      "text": "Anotemos las que faltan."
+    },
+    {
+      "who": null,
+      "text": "La misma cerca y la tierra va de 5 a 9. Depende de la forma. De los rectángulos con doce tramos enteros, el cuadrado de tres por tres es el que más encierra."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, la cerca mide el borde, el perímetro; la tierra mide lo de adentro, el área. Son medidas distintas: saber una no alcanza para saber la otra."
+    },
+    {
+      "who": "Balcón",
+      "text": "Para la escalera nueva quiero un tirante en diagonal. Las patas miden 3 y 4 cuadros, en escuadra. ¿Cuánto mide el tirante?"
+    },
+    {
+      "who": "student",
+      "text": "Armo un cuadrado de lado 3 + 4 con cuatro triángulos como el de Balcón, uno en cada esquina."
+    },
+    {
+      "who": null,
+      "text": "Lo que queda libre en el medio tiene cuatro lados iguales, tirantes. ¿Y sus esquinas? En cada borde se juntan las dos puntas agudas de dos triángulos; esas dos suman 90°, porque las tres puntas de un triángulo suman 180° y una es recta. Queda 180° − 90° = 90°: es un cuadrado."
+    },
+    {
+      "who": "Balcón",
+      "text": "¿Y ahora qué quedó libre, sin triángulo encima?"
+    },
+    {
+      "who": null,
+      "text": "El mismo cuadrado grande y los mismos cuatro triángulos: lo libre tiene que ser lo mismo. Antes, el cuadrado del tirante; ahora, 9 más 16."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, el cuadrado del tirante tiene 9 + 16 = 25 cuadros. El tirante mide 5."
+    },
+    {
+      "who": "student",
+      "text": "El lado de enfrente del ángulo recto se llama hipotenusa; los otros dos, catetos."
+    },
+    {
+      "who": "Balcón",
+      "text": "Cinco cuadros de tirante. Y sin medir."
+    },
+    {
+      "who": "Balcón",
+      "text": "La empiezo hoy, al costado de la pizarra. Treinta escalones: la voy a ir repasando de a poco."
+    },
+    {
+      "who": "Mara",
+      "text": "La Marea borró el camino entre las casas. Las vuelvo a dibujar con mi mapa: dos rectas como la del pozo, una acostada y una parada."
+    },
+    {
+      "who": "Mara",
+      "text": "La casa de Rampa la tengo anotada así: (3, 2)."
+    },
+    {
+      "who": "student",
+      "text": "Tres para el costado y dos para arriba. Al revés, (2, 3), es otro lugar."
+    },
+    {
+      "who": "Mara",
+      "text": "Y Peldaño vive del otro lado de los dos ceros, como el pozo: (−1, −1)."
+    },
+    {
+      "who": "Mara",
+      "text": "Por las rectas, Peldaño camina en ele: derecho por una recta, dobla una sola vez y sigue derecho por otra. ¿Dónde dobla?"
+    },
+    {
+      "who": null,
+      "text": "Doblando en (3, −1): 4 y 3, siete en total. Doblando en (−1, 2) también daría 3 y 4."
+    },
+    {
+      "who": "student",
+      "text": "Por la acostada, de −1 a 3: 3 − (−1) = 4. Por la parada, de −1 a 2: 2 − (−1) = 3. Es el tirante de Balcón otra vez: 4² + 3² = 25, el camino derecho mide 5."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Desde que entendí lo de las copias, mido mi sombra para saber la hora. ¿Me ayudan a armar la tabla?"
+    },
+    {
+      "who": null,
+      "text": "A la mañana la sombra apunta para un lado; a la tarde, para el otro. Y el largo baja hasta el mediodía y después vuelve a subir."
+    },
+    {
+      "who": "Mara",
+      "text": "Cornisa, si un viajero te dice sólo el largo de su sombra, sin decir para qué lado apunta, ¿le podés decir qué hora es?"
+    },
+    {
+      "who": "Cornisa",
+      "text": "Con la tabla de ayer sé qué largo tiene mi sombra a cada hora. Un viajero me preguntó la hora y le dije sólo el largo: «mi sombra mide 2». No supo qué contestar."
+    },
+    {
+      "who": null,
+      "text": "De cada hora sale una flecha, y una sola."
+    },
+    {
+      "who": null,
+      "text": "Del 2 salen dos flechas, como dijiste."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, a cada hora le toca un solo largo de sombra: el largo es función de la hora. Al revés no: al largo 2 le tocan dos horas. Eso es una relación (une entradas con salidas), pero no una función. Si además decís para qué lado apunta, ahí sí se distinguen: pero esa ya es otra entrada."
+    },
+    {
+      "who": "Mara",
+      "text": "Hice una máquina para las cuentas de los escalones: le doy un número, lo da vuelta adentro y sale otro. Adiviná qué hace."
+    },
+    {
+      "who": null,
+      "text": "Coincide con todo lo anotado."
+    },
+    {
+      "who": null,
+      "text": "Veintiuno: el doble más uno. Coincide, pero coincidir no prueba la regla: otra regla rara podría dar lo mismo con estos números y otra cosa con uno que no probamos, como el 100."
+    },
+    {
+      "who": "Mara",
+      "text": "La hice yo: es el doble más uno. La armaste bien, y el 10 no la desmintió."
+    },
+    {
+      "who": "student",
+      "text": "Mara, tu máquina hace «el doble más uno». Con el mismo número, siempre sale lo mismo."
+    },
+    {
+      "who": "Mara",
+      "text": "Punto también hizo una."
+    },
+    {
+      "who": "student",
+      "text": "Punto, el mismo 3 dio 7 y después 9. Con tu máquina no puedo anticipar nada: no es una función."
+    },
+    {
+      "who": null,
+      "text": "Punto mira su máquina un rato. Adentro tenía una ruedita que giraba sola."
+    },
+    {
+      "who": "Cornisa",
+      "text": "La tabla me sirve, pero quisiera verla de un vistazo."
+    },
+    {
+      "who": "student",
+      "text": "En el mapa de Mara: la hora por la recta acostada, la sombra por la parada."
+    },
+    {
+      "who": "student",
+      "text": "Punto, es linda, pero ¿a qué hora es esa ola? No sale de la tabla."
+    },
+    {
+      "who": null,
+      "text": "A cada momento hay una sombra: se puede unir. La línea dice lo que suponemos entre medición y medición."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Entonces a las 9 mi sombra es… más o menos 3. Casi, porque no lo medí."
+    },
+    {
+      "who": "Mara",
+      "text": "Yo anoto cuántas familias vienen cada día al depósito: lunes 3, martes 5, miércoles 4."
+    },
+    {
+      "who": "student",
+      "text": "Mara, entre el lunes y el martes no hay un día a medias: la entrada se cuenta de a uno. Los puntos van sueltos."
+    },
+    {
+      "who": "Balcón",
+      "text": "Encontré estos dibujos en el depósito. Mara dice que alguno es el gráfico de una de sus máquinas. ¿Cuáles pueden serlo?"
+    },
+    {
+      "who": "student",
+      "text": "Si fuera el gráfico de una máquina, a cada entrada le tocaría una sola salida."
+    },
+    {
+      "who": "Mara",
+      "text": "Las entradas van sobre la recta acostada. Para mirar una entrada sola, poné una recta parada en ese lugar y contá cuántas veces corta el dibujo."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, la recta y la U pueden ser gráficos de máquinas. El círculo y la U acostada no: hay entradas con dos alturas."
+    },
+    {
+      "who": null,
+      "text": "La recta parada sirve con la entrada sobre la recta acostada. Y dice si puede ser una función, no cuál."
+    },
+    {
+      "who": "Rampa",
+      "text": "Le pedí a Mara una máquina para mi reparto: entra cuántos vienen, sale lo que le toca a cada uno. 1 ÷ (x − 2), como en la escalera."
+    },
+    {
+      "who": null,
+      "text": "Con 2 se traba: abajo queda cero. Con todos los demás sale algo, aunque sea negativo."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, las entradas con las que se puede se llaman el dominio. El de la cuenta es todo menos el 2; el de tu reparto, 3, 4, 5… Depende de qué cuenta la máquina."
+    },
+    {
+      "who": "Mara",
+      "text": "Esta máquina hace «por sí mismo»: x · x. Oval me pidió que le saque un −4 para una cuenta. ¿Qué le doy?"
+    },
+    {
+      "who": "student",
+      "text": "Mara, lo que puede salir se llama la imagen. Con los números que probamos salió 0, 1, 4 o 9; con todos, sale cualquier número de 0 para arriba (√2 · √2 = 2), nunca uno negativo. El −4 no está, con los números de la recta."
+    },
+    {
+      "who": "Mara",
+      "text": "Dibujé las escaleras de la otra vez: la mía, diez por día, y la de Punto, el doble cada día. Y una tercera que me trajo Peldaño. Se me mezclaron los carteles."
+    },
+    {
+      "who": "student",
+      "text": "Mara, con la cuenta se calcula cualquier día; con la tabla se leen algunos; con el gráfico se ve de un vistazo: los puntos de A suben lo mismo cada día y los de C despegan. Las dos empiezan en 1; el día 6, la de Punto pasa a la de Mara: 64 contra 61, como vimos. Y como se cuentan por día, lo que se lee son los puntos."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Y la mía, la B, es diez más uno por día: 10 + d."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Seguí midiendo, varios días. Miren."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Fijate el día 2: ¿cuánto midió a las 10? Tocá ese punto."
+    },
+    {
+      "who": null,
+      "text": "Dos, como dijiste: la misma ve."
+    },
+    {
+      "who": null,
+      "text": "Entre las 16 de un día y las 8 del otro no medimos: de noche no hay sombra, ahí no está definida; al atardecer sí hay, pero no está en la tabla. En el dibujo cada día ocupa sus 24 horas: la ve vuelve cada 24 horas, aunque se mida sólo de 8 a 16."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, si el sol sigue haciendo el mismo recorrido, unos 4. No es una medición: es anticipar. En diez días lo medimos y vemos."
+    },
+    {
+      "who": null,
+      "text": "Lo que se repite se puede anticipar, mientras el sol dé la misma vuelta. En invierno la ve cambia mucho: a la misma hora, la sombra es varias veces más larga."
+    },
+    {
+      "who": "Mara",
+      "text": "Vueltas que se repiten… El sol da vueltas, la rueda del pozo da vueltas. Para eso hay que medir ángulos de otra manera."
+    },
+    {
+      "who": "Balcón",
+      "text": "La rueda del pozo perdió la soga. Tengo pedazos del largo del rayo de la rueda, de la punta al centro. ¿Cuántos hacen falta para dar toda la vuelta?"
+    },
+    {
+      "who": null,
+      "text": "El séptimo se pasa: pisa al primero. Seis enteros y un pedacito."
+    },
+    {
+      "who": null,
+      "text": "Seis enteros y un pedacito."
+    },
+    {
+      "who": null,
+      "text": "Derecho, de punta a punta por adentro, el rayo entra seis veces justo: el hexágono azul. Por el borde, que es más largo, sobra un pedacito."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, una vuelta entera son 6 rayos y un poco más: 6,28… Se lo llama 2π. Media vuelta, π, unos 3,14 rayos: por eso el borde entero es π veces el diámetro, que son dos rayos. Se sabe que π no es una fracción, aunque probarlo es más difícil que lo de √2."
+    },
+    {
+      "who": null,
+      "text": "Medir un giro por cuántos rayos recorre el borde: eso es medir en radianes. Sirve para cualquier rueda: con una más grande, los pedazos también son más largos."
+    },
+    {
+      "who": "Balcón",
+      "text": "Ato el balde a la manija de la rueda. Si giro la rueda, ¿a qué altura queda la manija?"
+    },
+    {
+      "who": null,
+      "text": "0,87, como a 60°. Lo que cambia es el costado: ahora está del lado izquierdo, negativo."
+    },
+    {
+      "who": null,
+      "text": "Medio rayo justo."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, en el centro, 30 y 30 hacen 60°. Los dos lados que salen del centro son rayos, iguales, así que las otras dos esquinas son iguales. Las tres suman 180°: a esas dos les quedan 120°, 60 cada una."
+    },
+    {
+      "who": "student",
+      "text": "Tres esquinas de 60°: los tres lados miden un rayo. El lado parado va de la marca de los 30° a su reflejo, y la línea del centro lo corta por la mitad: con la manija en los 30°, está a medio rayo de altura."
+    },
+    {
+      "who": "student",
+      "text": "Del centro al pie de la marca de los 30° va el costado: 0,87 a los 30°. Rayo, alto y costado forman un triángulo con esquina recta, como el tirante: alto² + costado² = 1."
+    },
+    {
+      "who": "student",
+      "text": "0,5 · 0,5 + 0,87 · 0,87 da 1,0069: casi 1, porque 0,87 está redondeado. A la altura de la manija, en la rueda de un rayo, se le dice seno del ángulo; al costado, coseno. A la izquierda del centro, el costado es negativo."
+    },
+    {
+      "who": "Cornisa",
+      "text": "¿Y si la rueda sigue girando? Pongamos las alturas en el mapa, como mi sombra."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Girada 390°, ¿a qué altura va a quedar la manija? Marcalo en la raya."
+    },
+    {
+      "who": null,
+      "text": "390 es una vuelta y 30 más: misma altura que a los 30°."
+    },
+    {
+      "who": null,
+      "text": "A los 150° también está a 0,5, pero bajando. Subiendo, como a los 30°, recién a los 390°: ahí se repite todo."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, la ola se repite cada vuelta, cada 360° o 2π. Se parece a tu sombra en que vuelve, pero no es la misma regla: tu sombra nunca se hace negativa, y de noche no hay sombra que medir."
+    },
+    {
+      "who": "Rampa",
+      "text": "Mis rampas de carga tienen todas la misma inclinación: 30°. Una corta, de 2 tablones de largo, sube 1. La larga, de 4, sube 2. Quiero una de 6: ¿cuánto va a subir?"
+    },
+    {
+      "who": null,
+      "text": "Tres: las rampas son semejantes, como las copias de Cornisa. Alto ÷ largo no cambia: 1/2."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, ¿semejantes por tener el mismo ángulo? En la ventana de Cornisa no alcanzaba. Pero en un triángulo sí: con la esquina recta y la misma inclinación, la forma queda fija. La ventana era una ele, con seis lados: con más de tres lados, los ángulos no alcanzan."
+    },
+    {
+      "who": "student",
+      "text": "Con la misma inclinación, alto ÷ largo de la tabla es siempre el mismo número, y es el seno del ángulo del piso: sen 30° = 0,5."
+    },
+    {
+      "who": "Rampa",
+      "text": "Para la cuesta del pozo quiero una empinada: 60°, con una tabla de largo 4. ¿Cuánto sube esa?"
+    },
+    {
+      "who": null,
+      "text": "A 60°, la manija sube 0,87 de rayo. La tabla de largo 4 sube cuatro veces eso."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, con la rueda sabés cuánto sube una rampa de cualquier inclinación, sin construirla: girás hasta ese ángulo y leés el alto."
+    },
+    {
+      "who": "Rampa",
+      "text": "Punto, la soga vieja se había caído al pozo y ya la sacamos; yo la empalmo con la nueva en mi casa: traémela. Estás en el pozo, en el cero del mapa; mi casa está en (3, 2), como la anotó Mara. Mara sólo te deja moverte con estas flechas."
+    },
+    {
+      "who": "student",
+      "text": "Punto, el camino cambia, el destino no. Una flecha dice cuánto y hacia dónde, no desde dónde. La casa, en cambio, es un lugar."
+    },
+    {
+      "who": "student",
+      "text": "Se suman los de adelante con los de adelante y los de arriba con los de arriba. Y como en cada suma el orden no importa, con cualquier par de flechas se llega al mismo lugar; si no van en la misma dirección, las dos rutas son los lados de un paralelogramo."
+    },
+    {
+      "who": "student",
+      "text": "La suma es la flecha (3, 2): la que va derecho del pozo a la casa. Desde el cero, la flecha que llega a un lugar se anota con los mismos números que el lugar; desde otro punto, no."
+    },
+    {
+      "who": "Mara",
+      "text": "En la Terraza de las Vueltas, cuando te dan media vuelta, se escribe × (−1). Así lo anotamos desde la piedra. ¿Y un cuarto de vuelta, cómo se escribe?"
+    },
+    {
+      "who": null,
+      "text": "El primer cuarto la dejó en (−1, 3), como dijiste."
+    },
+    {
+      "who": null,
+      "text": "Dos cuartos: (−3, −1). Media vuelta: la flecha apunta para el lado contrario, como multiplicar por −1. Cada cuarto, (a, b) pasa a (−b, a)."
+    },
+    {
+      "who": "student",
+      "text": "Mara, a la flecha (0, 1), uno arriba del cero, le decimos i. Multiplicar por i es girar un cuarto de vuelta, contra el reloj. Dos cuartos son media vuelta: i · i = −1. i no está en la recta."
+    },
+    {
+      "who": "student",
+      "text": "La flecha (3, 1) es el número 3 + i: tres adelante y uno arriba. Por i: i · 3 + i · i = 3i − 1. Es la flecha (−1, 3), la del primer giro: el de adelante pasa arriba, y el de arriba pasa adelante con el signo cambiado."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y lo de Oval, que quería sacar −4 de «por sí mismo»?"
+    },
+    {
+      "who": "student",
+      "text": "Con los números de la recta no se podía, y eso sigue valiendo en la recta. Con éstos sí: multiplicar por 2i es girar un cuarto de vuelta y estirar al doble. Dos veces: media vuelta y cuatro veces el largo, −4. Y −2i, girando para el otro lado, también."
+    },
+    {
+      "who": "Mara",
+      "text": "Pensé dos números de atados: el de Cornisa y el de Balcón. Primera pista: entre los dos suman 7."
+    },
+    {
+      "who": null,
+      "text": "Con una sola pista hay ocho pares de atados posibles, en fila sobre una recta. Atados enteros: sólo los puntos."
+    },
+    {
+      "who": "Mara",
+      "text": "Segunda pista: el de Cornisa le lleva 1 al de Balcón."
+    },
+    {
+      "who": null,
+      "text": "Punto mira la fila amarilla: (5, 2) no está en ella. El 5 le lleva 3 al 2, no 1. Se apuró."
+    },
+    {
+      "who": "student",
+      "text": "Mara, son Cornisa 4 y Balcón 3. Cada pista es una fila de pares; el que cumple las dos está en las dos filas. Si las filas se cruzaran entre puntos, con medios atados, no habría par de atados enteros."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si te digo «suman 7» y «suman 3»?"
+    },
+    {
+      "who": null,
+      "text": "Paralelas: ningún par cumple las dos."
+    },
+    {
+      "who": null,
+      "text": "Una tabla así, sólo con los números de cada pista, se llama matriz."
+    },
+    {
+      "who": "student",
+      "text": "Mara, en la tabla azul la parte de la izquierda es igual en las dos filas y el resultado no. Las mismas cuentas no pueden dar 7 y 3 a la vez: son paralelas, y se ve sin dibujarlas."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y si te digo «suman 7» y «el doble de los dos suma 14»?"
+    },
+    {
+      "who": "student",
+      "text": "Es la misma pista dicha dos veces: la segunda fila es la primera por 2. Es la misma recta, y sirven los ocho pares."
+    },
+    {
+      "who": "Balcón",
+      "text": "Con la soga nueva, la rueda gira derecha. Pero el balde no siempre sube igual: a veces llega lleno y a veces a medias."
+    },
+    {
+      "who": null,
+      "text": "El primero llegó lleno, hasta el borde."
+    },
+    {
+      "who": null,
+      "text": "Ni la rueda ni el balde avisan. Lo que pasó dice qué es más común, no qué va a pasar."
+    },
+    {
+      "who": "Mara",
+      "text": "Lo que se repite igual se puede anticipar. Lo que pasa a veces… también se puede contar, pero de otra manera."
+    },
+    {
+      "who": "Mara",
+      "text": "La Marea volvió anoche. Llegó hasta el primer escalón de la escalera de Balcón y se lo llevó: no estaba repasado. Voy a anotar hasta dónde llega cada noche."
+    },
+    {
+      "who": "Balcón",
+      "text": "De seis baldes, cuatro subieron llenos. ¿Eso quiere decir que siempre van a ser cuatro de cada seis?"
+    },
+    {
+      "who": "Balcón",
+      "text": "Otra tanda de baldes, desde el primero."
+    },
+    {
+      "who": null,
+      "text": "La otra tanda empezó muy distinta: con 10 baldes, 90 %. Con pocos baldes salta para cualquier lado; con mil, 67 %: también cerca de dos tercios."
+    },
+    {
+      "who": null,
+      "text": "Al principio salta; con muchos, se queda cerca de dos tercios."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, con muchos baldes, la parte que sube llena se acomoda cerca de 2 de cada 3. Eso lo vimos, no está garantizado. Y el próximo balde, igual, no se sabe."
+    },
+    {
+      "who": "Mara",
+      "text": "Me piden cuántos atados tiene una familia de las Terrazas, así, en general. Peldaño 3, Rampa 4, Cornisa 4, Balcón 5… y la Ronda, que guarda los de todos, 34."
+    },
+    {
+      "who": null,
+      "text": "Cuatro, como casi todas. El promedio se lo lleva la Ronda."
+    },
+    {
+      "who": "student",
+      "text": "Mara, un número solo siempre esconde algo. El promedio reparte todo, y uno muy grande lo arrastra. El del medio, que se llama mediana, no se mueve aunque la Ronda tenga mil."
+    },
+    {
+      "who": "Rampa",
+      "text": "Dos ayudantes redibujan escalones. Los dos hacen 5 por día en promedio. Mañana necesito por lo menos 4. Te muestro sus últimos cinco días. ¿A cuál llamo?"
+    },
+    {
+      "who": null,
+      "text": "A: sus días van de 4 a 6. B a veces hace 1."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, el promedio no dice qué tan desparejo es. De lo más bajo a lo más alto: A va de 4 a 6, una diferencia de 2; B, de 1 a 9, 8. Eso se llama rango."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Punto juntó tiza para la escalera: 104 trozos. Mara juntó 100. Punto hizo un gráfico."
+    },
+    {
+      "who": null,
+      "text": "A ver qué pasa si el eje empieza en otro lado."
+    },
+    {
+      "who": null,
+      "text": "Desde cero, ×1,04: lo mismo que la tiza, 104 ÷ 100."
+    },
+    {
+      "who": null,
+      "text": "104 es 4 más que 100, no el doble: el eje en 96 lo hacía parecer."
+    },
+    {
+      "who": "student",
+      "text": "Punto, los números eran ciertos, pero el dibujo decía otra cosa. Si las barras no empiezan en cero, el alto no compara cantidades."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Para la fiesta de la escalera tengo 3 sombreros y 2 bufandas. ¿De cuántas maneras distintas me puedo vestir?"
+    },
+    {
+      "who": null,
+      "text": "Cada sombrero se abre en dos: 3 veces 2, seis maneras."
+    },
+    {
+      "who": null,
+      "text": "Veinticuatro: 3 · 2 · 4."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, cuando se elige una cosa de cada grupo, las maneras se multiplican: 3 · 2 = 6, y con las botas, 6 · 4 = 24. No hace falta dibujar todas."
+    },
+    {
+      "who": null,
+      "text": "La Ronda vino a la fiesta. Punto la mira un rato largo, y después vuelve conmigo."
+    },
+    {
+      "who": "Rampa",
+      "text": "¡Doce! ¿Vieron? En la fiesta se juega con dos dados: gana el que acierta la suma. Yo voy siempre al 12, que es el más grande."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, el 7 sale de 6 maneras de 36; el 12, de una sola, con dos seises. Contamos cuál dado es cuál: 1 y 6 no es lo mismo que 6 y 1. Si los dados son parejos, los 36 pares salen igual de seguido, y el 7 tiene 6/36 de probabilidad y el 12, 1/36."
+    },
+    {
+      "who": "Rampa",
+      "text": "En la tabla, sí. ¿Y tirando de verdad?"
+    },
+    {
+      "who": null,
+      "text": "Contando, el 7 debería salir cerca de 60 veces de 360 y el 12, cerca de 10. Salieron 58 y 6: cerca, no exacto."
+    },
+    {
+      "who": "Rampa",
+      "text": "Me paso al 7. Aunque el 12 puede salir igual: no es imposible, es raro."
+    },
+    {
+      "who": "Mara",
+      "text": "Anoté seis días: cuánto polvo de tiza había a la mañana y cuántos renglones borró la Marea a la noche."
+    },
+    {
+      "who": "Mara",
+      "text": "Me olvidaba: también anoté el viento."
+    },
+    {
+      "who": "Mara",
+      "text": "Para ver qué hace el polvo solo, compará días con el mismo viento."
+    },
+    {
+      "who": null,
+      "text": "Las tres flechas bajan: con el mismo viento, más polvo no trajo más borrones."
+    },
+    {
+      "who": "student",
+      "text": "Mara, que dos cosas suban juntas no dice que una cause la otra. Acá el que acompaña a los borrones parece el viento. Pero son seis días: habría que anotar muchos más."
+    },
+    {
+      "who": "Balcón",
+      "text": "La escalera de Mara crece de a 10, la de Punto se duplica, la rueda vuelve, el balde a veces sí y a veces no. ¿Con todo eso se puede saber qué viene?"
+    },
+    {
+      "who": "student",
+      "text": "Balcón, lo que tiene una regla fija se anticipa exacto, con una cuenta. Lo que pasa a veces, no caso por caso; pero con muchos casos, se sabe más o menos qué parte va a pasar."
+    },
+    {
+      "who": null,
+      "text": "¿Y la vuelta, se anticipa? La puerta del primer día se ve más que la otra vez. Cada cosa que entendemos la marca un poco más."
+    },
+    {
+      "who": "Mara",
+      "text": "Las reglas que vimos son todas distintas: sumar, duplicar, volver… ¿Y si las pusiéramos juntas, para elegir la que sirve cada vez?"
+    },
+    {
+      "who": "Mara",
+      "text": "Anoche, dos escalones. La anterior, uno. Cada noche llega más alto, y la escalera de Balcón sigue sin repasar."
+    },
+    {
+      "who": "Mara",
+      "text": "Juntemos las reglas del viaje. Dibujé seis formas. Cada regla tiene la suya: si reconocemos la forma, sabemos qué esperar."
+    },
+    {
+      "who": "student",
+      "text": "Mara, cada forma es una familia. Las rectas cambian parejo, lo mismo por paso; las que despegan crecen cada vez más rápido; las U son iguales de los dos lados de una raya parada que pasa por su punta, y por eso se dice que son simétricas; las olas vuelven; las del «¿cuántas veces?» suben cada vez más despacio."
+    },
+    {
+      "who": "student",
+      "text": "Las partidas no están definidas en un lugar: el gráfico se interrumpe ahí, y a eso se le dice discontinuidad. Cerca del 2 se disparan, y se acercan a la raya punteada tanto como se quiera: una raya así se llama asíntota. Esta no la tocan nunca, porque en el 2 no hay valor."
+    },
+    {
+      "who": "student",
+      "text": "Y la del reparto tiene otra, acostada: si vienen 102, a cada uno le toca 1 ÷ 100 = 0,01; si vienen 1002, 0,001. Con más gente se acerca a 0 tanto como se quiera, y nunca llega, porque 1 dividido por un número no da 0: la raya del 0 también es asíntota."
+    },
+    {
+      "who": "student",
+      "text": "La del «¿cuántas veces?» también tiene una: cerca del 0 baja sin fin, pegada al eje parado."
+    },
+    {
+      "who": "student",
+      "text": "Viendo un pedazo, uno sabe qué esperar si la regla sigue igual: es una suposición, y hay que mirar si se cumple."
+    },
+    {
+      "who": "Rampa",
+      "text": "Todas las rectas son de la misma familia, pero no son iguales. La escalera de Mara: el día 0 tenía 1 escalón; el día 3, 31. ¿Qué recta es?"
+    },
+    {
+      "who": "student",
+      "text": "Rampa, b es dónde empieza, el día 0: 1. a es cuánto sube por día: 10. La escalera de Mara es y = 10 · x + 1. Con las perillas se elige cuál de la familia."
+    },
+    {
+      "who": "Rampa",
+      "text": "Las U de las huertas también tienen perilla. Mi huerta nueva es de a cuadrados de lado x, pegados: la tierra es a · x · x. Con lado 2, quiero 8 de tierra."
+    },
+    {
+      "who": null,
+      "text": "a = 2: con x = 2, 2 · 4 = 8."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, en las U la perilla a la estrecha o la abre: con a más grande (y positiva), sube más rápido y queda más angosta. Para pasar por (2, 8), a = 2: dos cuadrados."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Punto salta de alegría. Mara le midió la altura: a los t segundos está a 6t − t², y tarda 6 en volver al piso."
+    },
+    {
+      "who": null,
+      "text": "A los 3, la mitad: el salto es igual de los dos lados."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, los ceros, 0 y 6, son cuando toca el piso. Entre 0 y 3 la altura crece; entre 3 y 6, decrece. Arriba, a los 3, el máximo: 9. Y la altura nunca es negativa mientras salta."
+    },
+    {
+      "who": "Cornisa",
+      "text": "Con una tabla de 6 por 6 hago cajas: corto un cuadrado de lado x en cada esquina y levanto los bordes. Entra x · (6 − 2x) · (6 − 2x)."
+    },
+    {
+      "who": null,
+      "text": "Uno: entra 1 · 4 · 4 = 16."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, el corte va de 0 a 3: con más de 3 no queda tabla. Ahí se lee igual que el salto: ceros en 0 y en 3, crece hasta x = 1, el máximo es 16, y después decrece. Pero no es una U dada vuelta como el salto: no es igual de los dos lados."
+    },
+    {
+      "who": "student",
+      "text": "Una suma de términos con x multiplicada por sí misma se llama polinomio, y el grado es cuántas veces, como mucho: acá x · x · x, grado 3. Como cuenta sirve para cualquier x; como caja, sólo de 0 a 3."
+    },
+    {
+      "who": "Mara",
+      "text": "Puse dos máquinas en fila: «el doble más uno» y «por sí mismo». Si entra 2, ¿importa cuál va primero?"
+    },
+    {
+      "who": null,
+      "text": "25 y 9: el orden importa. Encadenar reglas es otra regla, y depende de cuál va primero."
+    },
+    {
+      "who": null,
+      "text": "Se deshace en el orden contrario, como en el capítulo de la caja: 5 menos 1 es 4, la mitad, 2."
+    },
+    {
+      "who": "student",
+      "text": "Mara, «el doble más uno» se deshace siempre. «Por sí mismo», no: el 9 puede venir del 3 o del −3. Sólo se deshace si sabemos el signo; con los lados de las huertas, que son positivos, la raíz lo deshace."
+    },
+    {
+      "who": "student",
+      "text": "Dibujadas para x desde 0, la raíz es x · x dada vuelta sobre la diagonal: se cambian la entrada y la salida. 2 va a 4 en una; 4 vuelve a 2 en la otra: (2, 4) y (4, 2). Cada punto (a, b) de una es el (b, a) de la otra."
+    },
+    {
+      "who": "student",
+      "text": "Es la familia de las raíces. Como la del «¿cuántas veces?», sube cada vez más despacio, pero arranca en el 0 con valor 0; aquella, cerca del 0, baja sin fin."
+    },
+    {
+      "who": "Cornisa",
+      "text": "En el salto de Punto: justo al segundo 1, ¿qué tan rápido sube?"
+    },
+    {
+      "who": "student",
+      "text": "En un tramo se puede medir: cuánto subió dividido cuánto tiempo pasó. Del 1 al 2 subió de 5 a 8: 3 por segundo."
+    },
+    {
+      "who": null,
+      "text": "Por la derecha dieron menos que 4 y por la izquierda, más: lo encierran."
+    },
+    {
+      "who": null,
+      "text": "Cuatro. Con tramo cero no se divide, pero los tramos cada vez más cortos se acercan a 4."
+    },
+    {
+      "who": "student",
+      "text": "Cornisa, justo al segundo 1, Punto sube a 4 por segundo. Ese número al que se acercan las velocidades de tramos cada vez más cortos se llama derivada. La recta azul del final pasa por dos puntos muy cercanos; la recta que tiene justo inclinación 4 en el segundo 1 se llama tangente."
+    },
+    {
+      "who": "Balcón",
+      "text": "Abrí la canilla del pozo de a poco: a los t minutos salen 2t baldes por minuto. ¿Cuánta agua juntamos en 3 minutos?"
+    },
+    {
+      "who": null,
+      "text": "Por abajo dieron 6, 7,5, 8,7; por arriba, 9,75: lo juntado queda entre las dos, y las dos se le acercan."
+    },
+    {
+      "who": null,
+      "text": "Nueve: el triángulo bajo la recta, 3 · 6 ÷ 2."
+    },
+    {
+      "who": "student",
+      "text": "Balcón, si el caudal cambia, se parte el tiempo en pedazos chicos y se suma caudal por tiempo. Con pedazos cada vez más finos, la suma se acerca al área debajo del gráfico: 9 baldes. Eso se llama integral. Y es al revés de la derivada: una dice qué tan rápido, la otra cuánto se juntó."
+    },
+    {
+      "who": "Rampa",
+      "text": "Mi precio por redibujar escalones: hasta 10, un trozo de tiza cada uno. Después del décimo, medio trozo por escalón."
+    },
+    {
+      "who": null,
+      "text": "Trece: diez por el primer tramo, tres por el segundo."
+    },
+    {
+      "who": "student",
+      "text": "Rampa, tu precio es una función por tramos: una regla hasta 10 y otra después. Un solo gráfico, dos reglas."
+    },
+    {
+      "who": "student",
+      "text": "Lo lejos del cero también va por tramos, como Recta y Cuña en la línea del depósito: +4 y −4 están igual de lejos. A la derecha del cero, x. A la izquierda, −x: con −4, −x es −(−4) = 4. No es negativo: es la distancia. Una V."
+    },
+    {
+      "who": "Mara",
+      "text": "La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera nueva de Balcón tiene 30, y está a medio dibujar. ¿Llegamos a terminarla?"
+    },
+    {
+      "who": "Mara",
+      "text": "Esperá, Punto. Las noches 2 y 3 fueron 4 y 8."
+    },
+    {
+      "who": null,
+      "text": "Los puntos nuevos quedan por arriba de su recta. Punto la mira un rato."
+    },
+    {
+      "who": null,
+      "text": "Con dos noches, 1 y 2, pasaban las dos: la recta que suma uno y la que duplica, como la de Punto en la carrera. Él eligió una antes de tiempo; las noches 2 y 3 la desmintieron."
+    },
+    {
+      "who": "Mara",
+      "text": "Si sigue duplicando, ¿hasta qué noche tenemos? Marcá en la raya del 30 la primera noche en que la Marea la pasa."
+    },
+    {
+      "who": "student",
+      "text": "Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Lo anotamos como suposición y miramos cada noche si se cumple."
+    },
+    {
+      "who": "Mara",
+      "text": "Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra."
+    },
+    {
+      "who": "Mara",
+      "text": "Noche 4."
+    },
+    {
+      "who": null,
+      "text": "Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más."
+    },
+    {
+      "who": "Mara",
+      "text": "Entonces la terminamos esta noche, antes de la noche 5. ¡A trabajar!"
+    },
+    {
+      "who": "Mara",
+      "text": "Llegamos. La escalera sigue ahí, y lo que entendimos también."
+    },
+    {
+      "who": "student",
+      "text": "Punto, el primer día te dije que te iba a llamar así hasta que me dijeras cómo te llamás. ¿Y?"
+    },
+    {
+      "who": "student",
+      "text": "Un punto, una flecha, una curva. Te sigo diciendo Punto, entonces: es como empezaste. Pero ya sé que no sos sólo un punto."
+    },
+    {
+      "who": null,
+      "text": "La Ronda baila otra vez, como el primer día. Punto se suma a la vuelta, un paso adelante."
+    },
+    {
+      "who": null,
+      "text": "La puerta del primer día. Se fue dibujando de a poco, cada vez que algo se entendía. Aquel día no había vuelta; ahora sí. Del otro lado está todo lo de antes."
+    },
+    {
+      "who": "student",
+      "text": "Mara, vuelvo por la puerta del primer día. La dejo abierta."
+    },
+    {
+      "who": "Mara",
+      "text": "Andá. Lo que entendiste, la Marea no lo borra."
+    },
+    {
+      "who": "student",
+      "text": "Punto, llegaste antes, como siempre. Quedate con la Ronda: paso y la dejo abierta, por si quiero volver a entrar."
+    },
+    {
+      "who": null,
+      "text": "Fin. Tu Bitácora queda guardada: desde ella podés volver a desplegar cualquier momento del viaje."
+    }
+  ],
+  "createdAt": "2026-10-08T00:13:22.920Z",
+  "updatedAt": "2026-10-08T00:28:22.782Z",
+  "chaptersDone": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "finished": true
+}

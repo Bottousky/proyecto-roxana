@@ -380,9 +380,9 @@ export const aVeces = {
     await pulse(d, p, 1, 0.3).catch(() => {});
     // esa noche vuelve la Marea: llega al primer escalón de la escalera de Balcón
     g.flags.balconStair = true;
-    await mareaNight(d, g, {reach: 1, describe: 'De noche vuelve la Marea: una franja ancha de borrador cruza la pizarra, la escalera de Balcón y las Terrazas.'});
-    d.describe('A la mañana, a la escalera de Balcón le falta el primer escalón.');
-    await d.say('Mara', 'La Marea volvió anoche. Llegó hasta el primer escalón de la escalera de Balcón y se lo llevó: no estaba repasado. Voy a anotar hasta dónde llega cada noche.');
+    await mareaNight(d, g, {night: 0, steps: 1, describe: 'De noche vuelve la Marea: una franja ancha de borrador cruza la pizarra, la escalera de Balcón y las Terrazas.'});
+    d.describe('A la mañana, en la escalera de Balcón hay una raya azul en el primer escalón: hasta ahí llegó la Marea.');
+    await d.say('Mara', 'La Marea volvió anoche. Llegó hasta el primer escalón de la escalera de Balcón y dejó su raya. Mientras no la pase por arriba, no se lleva nada. Voy a anotar hasta dónde llega cada noche.');
     g.flags.c10chance = true;
   },
 };

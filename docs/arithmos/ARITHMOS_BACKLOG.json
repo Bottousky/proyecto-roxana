@@ -323,8 +323,10 @@
         "C6"
       ],
       "acceptance": "Revisión narrativa sin hallazgos altos",
-      "status": "pendiente",
-      "evidence": []
+      "status": "cerrado",
+      "evidence": [
+        "artifacts/arithmos/it13/review-arco2/informe.md (sin hallazgos altos)"
+      ]
     },
     {
       "id": "C7",
@@ -377,8 +379,10 @@
         "C7"
       ],
       "acceptance": "Revisión narrativa sin hallazgos altos",
-      "status": "pendiente",
-      "evidence": []
+      "status": "cerrado",
+      "evidence": [
+        "artifacts/arithmos/it13/review-arco2/informe.md (sin hallazgos altos)"
+      ]
     },
     {
       "id": "C8",
@@ -434,8 +438,10 @@
         "C8"
       ],
       "acceptance": "Revisión narrativa sin hallazgos altos",
-      "status": "pendiente",
-      "evidence": []
+      "status": "cerrado",
+      "evidence": [
+        "artifacts/arithmos/it13/review-arco2/informe.md (sin hallazgos altos)"
+      ]
     },
     {
       "id": "C9-R",

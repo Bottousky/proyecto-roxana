@@ -267,11 +267,11 @@ export const causa = {
     });
     d.describe('Al lado de cada punto, el viento de ese día: los días de mucho viento son los de más polvo y más borrones.');
     // el jugador compara de a pares con el mismo viento: una flecha del día de menos polvo al de más
-    await d.say('Mara', 'Para ver qué hace el polvo solo, compará días con el mismo viento.');
+    await d.say('Mara', '¿Y qué hace el polvo solo, sin que el viento se meta? Uní dos días y mirá.');
     const pairs = new Set();
     await d.interact(ctl => new Promise(resolve => {
       let sel = null;
-      g.setHint(() => ['Tocá los dos días que tienen el mismo viento: se unen con una flecha del de menos polvo al de más. Hacelo con los tres vientos.', 'Fijate si la flecha sube o baja: ¿con más polvo, más borrones?']);
+      g.setHint(() => ['Tocá dos días: se unen con una flecha del de menos polvo al de más.', 'Para ver el polvo solo, el viento tiene que ser el mismo en los dos días.']);
       const refresh = () => g.ui.setSpots(DAYS.map((r, i) => ({r, i})).filter(({r}) => !pairs.has(r.wind)).map(({r, i}) => rectSpot(`c11-day${i}`, `El día de polvo ${r.dust}, ${r.erase} borrones, viento ${r.wind}`, {x: gx + r.dust * U - 14, y: gy - r.erase * U - 14, w: 28, h: 28}, async () => {
         if (!ctl.alive()) return;
         if (sel === null) { sel = i; refresh(); return; }
@@ -371,9 +371,9 @@ export const anticipar = {
     await pulse(d, p, 1, 0.3).catch(() => {});
     // la noche 1: la Marea llega más alto que la anterior
     g.flags.balconStair = true;
-    await mareaNight(d, g, {reach: 2, describe: 'Otra noche, otra pasada de la Marea, más alta que la anterior.'});
-    d.describe('A la mañana, a la escalera de Balcón le faltan los dos primeros escalones.');
-    await d.say('Mara', 'Anoche, dos escalones. La anterior, uno. Cada noche llega más alto, y la escalera de Balcón sigue sin repasar.');
+    await mareaNight(d, g, {night: 1, steps: 2, describe: 'Otra noche, otra pasada de la Marea, más alta que la anterior.'});
+    d.describe('A la mañana, otra raya azul en la escalera de Balcón, en el segundo escalón, arriba de la de la noche anterior.');
+    await d.say('Mara', 'Anoche llegó al segundo escalón; la anterior, al primero. Cada noche más alto. La noche que pase la escalera por arriba, se lleva lo que esté apenas marcado, y la de Balcón sigue sin repasar.');
     g.flags.c11anticipate = true;
   },
 };

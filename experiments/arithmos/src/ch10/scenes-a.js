@@ -446,14 +446,14 @@ export const rampa = {
     for (;;) {
       const deg = await d.interact(ctl => new Promise(resolve => {
         g.setHint(() => ['Tocá hasta qué ángulo girar la rueda: la regla dice a qué alto queda la manija.', 'La cuesta tiene 60° entre el piso y la tabla.']);
-        g.ui.setSpots([30, 45, 60, 90].map((a, k) => wordSpot(`c10-turn${a}`, `${a}°`, cx - 90 + k * 60, A.y1 - 22, () => { if (ctl.alive()) resolve(a); }, {label: `Girar la rueda hasta ${a}°`})));
+        g.ui.setSpots([30, 45, 60, 90].map((a, k) => wordSpot(`c10-turn${a}`, `${a}°`, A.x0 + 110 + (k % 2) * 110, A.y0 + 110 + Math.floor(k / 2) * 70, () => { if (ctl.alive()) resolve(a); }, {label: `Girar la rueda hasta ${a}°`})));
       }));
       g.setHint(null);
       const h = await turnTo(deg);
       d.evidence('ratio60-turn', {deg});
       tried60 ??= deg;
       if (deg === 60) break;
-      await d.think(deg === 30 ? `A 30°, ${h}: ésa era la inclinación de las rampas chicas. La cuesta es de 60°.` : deg === 90 ? `A 90°, ${h}: la manija bien arriba. Una tabla así sería una pared; la cuesta es de 60°.` : `A 45°, ${h}. La cuesta no es de 45°: es de 60°.`);
+      await d.think(deg === 30 ? `A 30°, ${h}: esa era la inclinación de las rampas chicas. La cuesta es de 60°.` : deg === 90 ? `A 90°, ${h}: la manija bien arriba. Una tabla así sería una pared; la cuesta es de 60°.` : `A 45°, ${h}. La cuesta no es de 45°: es de 60°.`);
     }
     d.evidence('ratio60-predict', {answer: tried60 === 60 ? 'sin' : 'other'});
     await d.think('A 60°, la manija sube 0,87 de rayo. La tabla de largo 4 sube cuatro veces eso.');

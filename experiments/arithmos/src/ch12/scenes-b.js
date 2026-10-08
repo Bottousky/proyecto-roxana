@@ -7,7 +7,7 @@ import {Drawing, Label, Shape, SHOTS, area, boardCast, clean, poly, dot, S, seed
 import {studentWrites} from '../ch7/scenes-a.js';
 import {RONDA_IDS, rondaDot, rondaDance} from '../ch1/common.js';
 import {mareaBand} from '../ch1/scenes.js';
-import {LAD, stair, restoreStair} from '../stair.js';
+import {LAD, stair, markTide} from '../stair.js';
 import * as art from '../art.js';
 import {GROUND} from '../ch9/common.js';
 
@@ -238,14 +238,15 @@ export const final = {
     // lo que está en juego: la escalera nueva de Balcón (la del tirante, 8.6), treinta escalones, todavía borroneada;
     // las noches 0 y 1 la Marea ya se llevó los escalones de abajo (fin de los caps. 10 y 11)
     g.flags.balconStair = true;
-    g.flags.stairLost ??= 2;
+    // si se empieza acá, las noches 0 y 1 ya dejaron su raya (fin de los caps. 10 y 11)
+    if (!g.flags.tides?.length) { markTide(g, 0, 1); markTide(g, 1, 2); }
     stair(g);
     // los tramos se buscan siempre por su id: al reponer escalones, el de abajo se rehace
     const grp = k => w.get(`stair-g${k}`);
     const groups = () => Array.from({length: 6}, (_, k) => grp(k));
     w.add(new Label('c12-stl', 'escalera de Balcón: 30', LAD.x + LAD.w / 2, GROUND + 26, {size: 16, align: 'center', z: 3, ch: YELLOW}));
-    d.describe(`Al costado de la pizarra, la escalera nueva de Balcón, la del tirante: treinta escalones, todavía borroneados${g.flags.stairLost === 1 ? '; le falta el primer escalón' : g.flags.stairLost ? `; le faltan los ${g.flags.stairLost} de abajo` : ''}.`);
-    await d.say('Mara', 'La Marea vuelve. Medí hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera nueva de Balcón tiene 30, y está a medio dibujar. ¿Llegamos a terminarla?');
+    d.describe('Al costado de la pizarra, la escalera nueva de Balcón, la del tirante: treinta escalones, todavía apenas marcados, con dos rayas azules abajo: hasta donde llegó la Marea las noches 0 y 1.');
+    await d.say('Mara', 'La Marea vuelve. Anoté hasta qué altura llegó cada noche. La noche 0, 1 escalón; la noche 1, 2. La escalera nueva de Balcón tiene 30, y está a medio dibujar. ¿Llegamos a terminarla?');
     const box = {x: A.x0 + 40, y: A.y0 + 20, w: 300, h: 210};
     const {px, py} = axes(w, 'c12-g', box, [0, 6], [0, 40], {xticks: [1, 2, 3, 4, 5, 6], yticks: [10, 20, 30, 40], xname: 'noche'});
     const night = ([n, v]) => w.add(new Shape(`c12-n${n}`, dot(`c12-n${n}`, 6, BLUE), px(n), py(v), {z: 14}));
@@ -270,7 +271,7 @@ export const final = {
     d.evidence('punto-guess', {rule: 'suma 1'});
     await d.say('Mara', 'Esperá, Punto. Las noches 2 y 3 fueron 4 y 8.');
     g.setCinematic(true);
-    for (const nv of NIGHTS.slice(2)) { const sh = night(nv); sh.fade = 0; await d.fadeTo(sh, 1, 0.4); }
+    for (const nv of NIGHTS.slice(2)) { const sh = night(nv); sh.fade = 0; await d.fadeTo(sh, 1, 0.4); markTide(g, nv[0], nv[1]); }
     g.setCinematic(false);
     d.describe('Dos puntos azules más, 4 y 8: quedan por arriba de la recta de Punto.');
     g.audio.punto('question');
@@ -315,7 +316,7 @@ export const final = {
     d.describe(`Marcaste la noche ${c}.`);
     if (c === '3' || c === '4') await d.think(c === '3' ? 'La noche 3 llegó a 8: lejos del 30. Duplicando, la 4 llega a 16 y la 5 a 32: pasa en la 5. Mejor temprano que tarde.' : 'La noche 4 llega a 16: todavía no. La 5, 32: ahí pasa. Marqué temprano: mejor que tarde.');
     await d.say('student', 'Mara, con cuatro noches no se puede estar seguro: otra regla podría pasar por los mismos cuatro puntos y seguir distinto. Lo anotamos como suposición y miramos cada noche si se cumple.');
-    await d.say('Mara', 'Y mientras, redibujamos lo que todavía no se entiende: lo que entendimos, la Marea no lo borra.');
+    await d.say('Mara', 'Y mientras, repasamos la escalera. Lo que entendimos, la Marea no lo borra; lo que está apenas marcado, sí, la noche que la pase por arriba.');
     // la noche 4 pone a prueba la suposición
     await d.say('Mara', 'Noche 4.');
     g.setCinematic(true);
@@ -324,6 +325,7 @@ export const final = {
     g.setCinematic(false);
     d.describe('Un punto azul nuevo: la noche 4 la Marea llegó a 16, justo sobre la curva que duplica.');
     d.evidence('final-check', {night: 4, v: 16});
+    markTide(g, 4, 16);
     await d.think('Dieciséis, sobre la curva. La suposición aguantó una noche más: no es una prueba, pero ahora confiamos un poco más.');
     // el jugador repasa la escalera tramo por tramo; con el plazo de la noche 6, esta noche sólo alcanza la mitad
     const late = c === '6';
@@ -333,7 +335,6 @@ export const final = {
       const refresh = () => g.ui.setSpots(groups().map((st, k) => ({st, k})).filter(({st}) => st.fade < 1).map(({k}) => rectSpot(`c12-rep${k}`, `Repasar el tramo ${k + 1} de la escalera`, {x: LAD.x - 10, y: GROUND - (k + 1) * LAD.h / 6, w: LAD.w + 20, h: LAD.h / 6}, async () => {
         if (!ctl.alive() || grp(k).fade >= 1) return;
         g.ui.setSpots([]);
-        if (k === 0 && g.flags.stairLost) restoreStair(g);
         const st = grp(k);
         st.fade = 1;
         st.progress = 0;
@@ -348,6 +349,7 @@ export const final = {
       void nightLabel;
     }));
     await d.shot(SHOTS.board, 0.8);
+    await d.say('Balcón', 'Es mi escalera, la del tirante. La repasamos juntos, tramo por tramo; yo te sostengo la tiza.');
     if (late) {
       await d.say('Mara', 'Hasta la noche 6, entonces. Esta noche repasamos la mitad.');
       await repass(3, 4);

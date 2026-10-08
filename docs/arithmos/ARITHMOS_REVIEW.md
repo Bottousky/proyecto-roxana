@@ -547,5 +547,24 @@ Cierra N9-R. Los demás pendientes narrativos no cierran por siete hallazgos alt
 | N12-A1 | El clímax no pone nada en juego en pantalla | Corregido: la escalera de Balcón (30 escalones, a la que la Marea ya le sacó dos) está al costado de la pizarra, borroneada; el jugador marca en el mapa la noche en que la Marea pasa los 30 y la repasa tramo por tramo; si marca la 6, la Marea de la noche 5 se ve cruzar y se lleva lo no repasado, y se rehace antes de la 6; la Marea grande es la franja de 1.4 cruzando la escalera y las Terrazas |
 | ARC-M1…M5 y medias por capítulo | Punto que no cambia, estudiante profesor, opciones que se delatan, Mara anuncia el capítulo siguiente, teléfono | Pendientes (N-ARC y N-R de cada capítulo) |
 
+## Segunda revisión del arco (review-arco2, 2026-10-07)
+
+Informe: `artifacts/arithmos/it13/review-arco2/informe.md` (sin navegador; código en 848dfb91, capturas y una simulación
+de `stair.js`). La matemática revisada está bien y ningún lugar traba al jugador. De los siete altos: N6-A1, N7-A1, N10-A1 y
+N11-A1 resueltos; ARC-A1 baja a media; ARC-A2 y N12-A1 dependían de un alto nuevo. Cierran N6-R, N7-R y N8-R. Evidencia de
+lo corregido: `artifacts/arithmos/it13/arco2/`.
+
+| # | Hallazgo | Disposición |
+|---|---|---|
+| NA1 (alta) | La escalada se contradecía: las noches 0 y 1 borraban escalones y las 2 a 4 no; y el plazo «la primera noche que pasa los 30» sólo tiene sentido si la Marea no borra hasta pasar por arriba | Corregido: la Marea ya no borra al subir; deja una raya azul con su noche en el escalón al que llegó (noches 0 y 1 al final de los caps. 10 y 11; 2, 3 y 4 en 12.8). La noche que pasa la escalera por arriba (la 5, 32) se lleva lo que esté apenas marcado |
+| NM1 | La escalada no se veía | Corregido con las mismas rayas (cinco rayas que suben, cada una con su noche) |
+| NM2 | La regla cambiaba sin decirlo («repasada» contra «entendida») | Corregido: «Lo que entendimos, la Marea no lo borra; lo que está apenas marcado, sí, la noche que la pase por arriba» |
+| NM3 | La Marea del cap. 6 borraba «pasa sumando», que el jugador entendió; aparecían de golpe | Corregido: «se despeja», «se tacha», «cambia de lado y de signo», al costado desde el principio de 6.8 |
+| NM4 | 6.3 dejaba x = 2 dos veces, con la respuesta antes del paso | Corregido: Punto borra su renglón sin escribir nada; después el estudiante escribe el paso y x = 2 |
+| NM5b | 11.7: Mara daba el método antes de que el jugador lo intentara | Corregido: «¿Y qué hace el polvo solo, sin que el viento se meta? Uní dos días y mirá»; el mismo viento aparece en la segunda ayuda y en la devolución a un par mezclado |
+| NM7 | Balcón ausente de su escalera | Corregido: Balcón repasa con el jugador («yo te sostengo la tiza») |
+| NB | «Medí» ambiguo, «ésa», comillas rectas | Corregidos |
+| NM5a, NM5c, NM5d, NM6, NB restantes | 10.4 el ángulo lo dice Rampa; 7.3b cinco predicciones seguidas; repasar sin decisión; corridas que faltaban | NM6 rehecho en `it13/arco2`; el resto, pendiente (medias) en N-ARC y N10-12 |
+
 ## Regresiones
 - rev-mat-2 encontró regresiones de M10 y M15 introducidas por la reescritura `f3974ca` (corregidas arriba).

@@ -1,0 +1,70 @@
+[0.0s] escena → c6.memoria
+[1.0s] lee: Yo tengo otra caja: si le agrego tres, son cinco. ¿Cuánto hay adentro?
+[1.1s] lee: ¿Ocho? Punto lo hizo de memoria: el 3 se pasó al otro lado.
+[2.4s] elige «Creerle a Punto: lo hizo de memoria.» (Punto dice que x es 8. ¿Cómo lo comprobás?)
+[2.8s] lee: Si se equivoca de memoria, de memoria no se da cuenta. Mejor probar.
+[6.1s] lee: Con Punto en el 8, x + 3 da 11. No cae en el 5.
+[7.2s] lee: Dos. Dos más tres, cinco.
+[7.3s] lee: —Punto, el 3 sumaba: para sacarlo, se resta a los dos lados. «Pasa restando» es eso. De memoria lo pasaste con el signo que tenía, y salió otra cuenta.
+[7.4s] lee: Entonces el 3 no se muda: se resta de los dos lados. Dos.
+[7.4s] escena → c6.por-cero
+[8.4s] lee: Yo tengo un truco más rápido: multiplico los dos lados por cero. Me queda cero igual a cero, y listo.
+[8.5s] lee: Los dos marcadores, en el cero. Y si muevo a Punto…
+[12.1s] lee: Con Punto en cualquier lado, siguen juntos en el cero. Con esta cuenta, cualquier caja serviría. En el 8 también siguen juntos: que el 8 siga sirviendo no alcanza, tampoco tienen que aparecer otras.
+[12.7s] elige «Entonces cualquier x es solución de verdad.» (¿Qué hizo el truco de Cuña?)
+[13.1s] lee: La caja tiene ocho. No cualquier cosa.
+[13.1s] lee: Desde 0 = 0 no se puede volver: por cero no se deshace. Y lo que no se deshace puede hacer aparecer soluciones que no estaban.
+[13.2s] lee: —Mara, x − 3 = 5 se cumple sólo con 8. Es una ecuación: pregunta qué x la cumplen. Por cero, en cambio, todo da 0, con cualquier x: 0 = 0 se cumple siempre. A una igualdad que vale para cualquier x se le dice identidad. Otra: x − 3 + 3 = x, «ir tres para atrás y volver tres».
+[13.3s] lee: —El truco de Cuña cambió una ecuación por una identidad. Por eso cualquier caja parecía servir.
+[13.3s] escena → c6.cuadrado
+[14.4s] lee: A mí me gusta elevar todo al cuadrado: x por x, y 3 por 3. Queda más lindo.
+[15.0s] elige «Una sola: el 3, como antes.» (¿Cuántas x hacen que x · x caiga en el 9?)
+[17.3s] lee: Menos tres por menos tres, nueve. Apareció otra x.
+[18.4s] lee: —En la cuenta de Oval, x = 3, el −3 no cumple: los marcadores se separan. El −3 lo trajo el cuadrado.
+[18.4s] lee: Al cuadrado, −3 y 3 caen en el mismo 9: no se puede deshacer sin perder cuál era. Después de elevar, hay que probar en la cuenta de antes.
+[18.5s] lee: Más lindo, pero con un invitado de más.
+[18.5s] escena → c6.dividir
+[19.6s] lee: Esta la saqué rápido: x por x igual a x. Divido los dos lados por x, y queda x = 1.
+[20.2s] elige «No: Curva ya encontró la x, es 1.» (¿x = 0 cumple x · x = x?)
+[22.6s] lee: Con Punto en el 0, los dos dan 0: cumple.
+[23.7s] lee: Y en la cuenta dividida, con Punto en el 0, los marcadores desaparecen: dividir por cero no está definido, no hay ningún número.
+[23.8s] lee: —Al dividir por x, se suponía que x no es cero. Y justo el 0 era una de las soluciones. Se perdió.
+[23.9s] lee: —Por partes: si x no es cero, dividir se puede y se deshace, y queda x = 1. Si x es cero, se mira aparte: 0 · 0 = 0, cumple. No hay más.
+[23.9s] lee: Dos, el 0 y el 1. Y yo había encontrado una.
+[24.0s] escena → c6.al-reves
+[25.0s] lee: Me dieron un acertijo: −2 por x tiene que dar menos que 6. ¿Qué x sirven?
+[25.1s] lee: Ahora no es "igual": es "menor". Cuando se cumple, aparece una tilde sobre Punto.
+[27.8s] lee: Algunas x cumplen y otras no. Las que cumplen quedan marcadas debajo de la recta.
+[29.2s] elige «Dividir por −2 y dejar el «<».» (Dividí los dos lados por −2 para dejar sola a la x. ¿El signo queda igual o se da vuelta?)
+[30.8s] lee: Las marcas se fueron al otro lado. Con Punto en el 0: antes se cumplía (0 < 6) y ahora no (0 < −3). Cambiaron las x que sirven.
+[32.0s] elige «Dividir por −2 y dar vuelta el signo: «>».» (Dividí los dos lados por −2 para dejar sola a la x. ¿El signo queda igual o se da vuelta?)
+[33.6s] lee: Las marcas no se movieron: cumplen las mismas x de antes. Y con Punto en el 0, sigue cumpliéndose: 0 > −3.
+[33.6s] lee: —Dividir por un negativo da vuelta la recta, como la media vuelta de las Terrazas: lo que estaba a la izquierda queda a la derecha. Por eso el signo se da vuelta.
+[33.7s] lee: Dividir por 2, en cambio, no da vuelta nada: 2x < 6 queda x < 3. Lo que da vuelta es el signo menos del número por el que se divide.
+[33.7s] escena → c6.dos-pasos
+[34.8s] lee: Una última: dos cajas iguales y un atado suelto son siete atados.
+[35.4s] elige «Restar 7 a los dos lados» (Elegí qué hacerle a la cuenta (si un paso no ayuda, se puede deshacer).)
+[36.9s] lee: Sigue valiendo, pero no ayudó: la x no quedó más sola.
+[37.4s] elige «Dividir por 2 sólo el término con x» (Elegí qué hacerle a la cuenta (si un paso no ayuda, se puede deshacer).)
+[39.2s] lee: El 0 no se movió: no fue lo mismo a los dos lados, y la mitad de 2x − 6 no es x − 6. Esa cuenta pide x = 6: es otra cuenta.
+[40.4s] elige «Deshacer el último paso» (Elegí qué hacerle a la cuenta (si un paso no ayuda, se puede deshacer).)
+[41.3s] elige «Restar 1 a los dos lados» (Elegí qué hacerle a la cuenta (si un paso no ayuda, se puede deshacer).)
+[43.3s] elige «Dividir los dos lados por 2» (Elegí qué hacerle a la cuenta (si un paso no ayuda, se puede deshacer).)
+[44.8s] lee: —Primero el +1, después el doble: x = 3.
+[44.9s] lee: ¿Y si dividías primero?
+[44.9s] lee: —También da 3. Sumar, restar, o dividir por un número que no es cero, a los dos lados, no pierde ni agrega soluciones: cualquier camino así que deje sola a la x llega al mismo número.
+[46.9s] lee: Dos por tres, más uno: siete. Se cumple.
+[47.0s] lee: Las dos cajas, de a tres. Ahora me acuerdo.
+[47.1s] lee: ¿Y si la caja está del otro lado? Tres atados son la cuarta parte de una caja.
+[47.6s] elige «Dividir los dos lados por 4» (La x está a la derecha. ¿Qué la deja sola?)
+[49.2s] lee: Del lado de la x quedó x ÷ 16: más lejos de quedar sola. Lo que deshace un "÷ 4" es "× 4".
+[50.4s] elige «Sumar 4 a los dos lados» (La x está a la derecha. ¿Qué la deja sola?)
+[51.9s] lee: Quedó x ÷ 4 + 4: la x no se soltó. Lo que deshace dividir es multiplicar.
+[53.0s] elige «Multiplicar los dos lados por 4» (La x está a la derecha. ¿Qué la deja sola?)
+[55.4s] lee: Doce dividido cuatro, tres: los marcadores caen juntos. La x puede quedar de cualquier lado del igual.
+[55.4s] lee: Las abreviaturas sueltas del costado no son nuestras: ninguna tiene al lado la cuenta que abrevia.
+[56.3s] lee: Lo que nadie entendía se lo llevó. Lo que comprobamos, paso por paso, quedó.
+[57.1s] lee: Peldaño anda con otro problema: quiere una huerta cuadrada con justo dos cuadros de tierra. ¿Cuánto mide el lado?
+[57.2s] lee: Un número que, multiplicado por sí mismo, da 2. Uno por uno es 1; dos por dos, 4. Está en el medio. Hay que aprender a hacer crecer los números… y a deshacerlo.
+[57.2s] escena → c7.lado
+[57.9s] {"ended":true,"final":{"mode":"play","seg":"c7.lado"},"journal":["Lo que no se ve"],"evidenceKinds":["check-how","try-x","substitute","pass-wrong","punto-rewrites","times-zero-eq","square-predict","square","zero-root-predict","div-by-x","ineq-op","ineq","two-step","two-step-result","right-side"],"fps":{"min":"30.0","median":"60.0"},"errors":[],"seconds":57.901,"size":"1600x900","touch":false,"route":"errores","watch":false}
