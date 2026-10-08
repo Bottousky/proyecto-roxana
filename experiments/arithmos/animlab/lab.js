@@ -11,6 +11,7 @@ import {Camera} from '../src/engine/camera.js';
 
 const TESTS = {
   '01': () => import('./tests/t01-line.js'),
+  '02': () => import('./tests/t02-circle.js'),
 };
 
 const params = new URLSearchParams(location.search);

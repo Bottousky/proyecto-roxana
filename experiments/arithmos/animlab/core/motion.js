@@ -61,14 +61,15 @@ export function curvature(p, w = 4) {
  * @param o.accel aceleración máxima (px/s²)
  * @param o.k0 curvatura de referencia: por debajo, la curva no frena
  * @param o.v0, o.v1 velocidad al tocar y al levantar (la tiza aterriza con algo de inercia)
+ * @param o.profile multiplicador de crucero según la fracción recorrida u∈[0,1] (p. ej. acelerar a propósito)
  * Devuelve {t: Float32Array tiempo acumulado por muestra, v: velocidad por muestra, T: duración}.
  */
-export function planStroke(p, {speed = 520, accel = 5200, k0 = 1 / 60, v0 = 30, v1 = 45, beta = 1 / 3} = {}) {
+export function planStroke(p, {speed = 520, accel = 5200, k0 = 1 / 60, v0 = 30, v1 = 45, beta = 1 / 3, profile = null} = {}) {
   const {n, s, L} = p;
   const k = curvature(p);
   const v = new Float32Array(n);
   for (let i = 0; i < n; i++) {
-    const pl = speed * Math.pow((k[i] + k0) / k0, -beta);
+    const pl = speed * (profile ? profile(s[i] / L) : 1) * Math.pow((k[i] + k0) / k0, -beta);
     const up = Math.sqrt(v0 * v0 + 2 * accel * s[i]);
     const down = Math.sqrt(v1 * v1 + 2 * accel * (L - s[i]));
     v[i] = Math.min(pl, up, down);
