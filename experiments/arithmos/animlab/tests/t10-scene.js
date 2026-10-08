@@ -33,18 +33,21 @@ const W = 5.5;
 
 let S; // escena construida
 
+/** Duración del salto n del conteo: se acorta 12 % por salto (el 3.º dura 77 % del 1.º; contar agarra ritmo). */
+const hopDur = n => Math.max(0.26, 0.5 * Math.pow(0.88, n));
+
 /** Toques del jugador por defecto (modo automático): los 7 puntos en orden, con el ritmo del guion original. */
 export function autoTaps(order = [0, 1, 2, 3, 4, 5, 6]) {
   let t = 5.1, n = 0;
   const out = [];
   const seen = new Set();
   // reposo ≥ 0.3 s entre saltos (R3: Punto nunca quedaba quieto) y 0.4 s más tras el quinto (el atado de cinco es la idea)
-  for (const dot of order) { out.push({t, dot}); const again = seen.has(dot); seen.add(dot); t += again ? 1.4 : 0.5 - 0.035 * n + 0.32 + (n === 4 ? 0.4 : 0); if (!again) n++; }
+  for (const dot of order) { out.push({t, dot}); const again = seen.has(dot); seen.add(dot); t += again ? 1.4 : hopDur(n) + 0.32 + (n === 4 ? 0.4 : 0); if (!again) n++; }
   return out;
 }
 
 function build(taps = autoTaps()) {
-  const sc = {strokes: [], hand: [], score: [], punto: [], rings: [], links: [], marks: {}, events: {}};
+  const sc = {strokes: [], hand: [], score: [], punto: [], rings: [], links: [], marks: {}, events: {}, gaze: []};
   const ev = (k, t) => { sc.events[k] = +t.toFixed(2); };
   // aceleración ≤ 5000 px/s² y además proporcional a la velocidad: la rampa dura ≥ 0.12 s y se ve a 60 Hz (R8: un trazo lento
   // llegaba a crucero en menos de un cuadro y la curva parecía una pared)
@@ -75,9 +78,11 @@ function build(taps = autoTaps()) {
     t = Math.max(t, tap.t);
     const i = tap.dot;
     const again = counted.has(i);
-    const dur = again ? 0.4 : 0.5 - 0.035 * n;
+    const dur = again ? 0.4 : hopDur(n);
     const to = [DOTS[i][0], DOTS[i][1] - 36]; // se posa arriba del punto, sin pisar el anillo (R2)
     sc.punto.push({kind: 'hop', t, dur, from, to, h: 36 + 8 * (n === 0)});
+    // los ojos van al punto antes de que Punto llegue (la mirada lidera) y después bajan a la marca
+    if (!again) { const hx = X1 + 6, hy = G - 335, dx = DOTS[i][0] - hx, dy = DOTS[i][1] - hy, l = Math.hypot(dx, dy); sc.gaze.push({t: t + dur * 0.4, gaze: [dx / l, dy / l * 1.4]}); }
     const land = t + dur;
     from = to;
     if (again) {
@@ -107,6 +112,7 @@ function build(taps = autoTaps()) {
     const link = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; });
     // el hilo nace de la marca recién escrita y sube hasta su punto (R7: «cada hilo nace de su marca»)
     const linkSt = depositStroke(link.reverse(), {w: 2.6, p: 0.46, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
+    sc.gaze.push({t: land + 0.02, gaze: [0.55, 0.55]});
     const markEnd = write(chalk(guide, 60 + n, {motion: {speed: n === 4 ? 900 : 620}}), land + 0.1, `marca${n}`);
     sc.links.push({t: markEnd + 0.04, st: linkSt, i, n, b, seed: 80 + i});
     n++;
@@ -117,7 +123,7 @@ function build(taps = autoTaps()) {
   sc.idleFrom = t + 0.4;
   if (n < 7) { // falta contar: la escena espera al jugador
     sc.duration = Infinity;
-    sc.actor = buildActor({ground: G, x: X0, k: K, duration: Math.max(30, t + 30), poses: POSES2, script: baseScript(T_PUNTO, taps.length ? taps[0].t + 0.3 : Infinity)});
+    sc.actor = buildActor({ground: G, x: X0, k: K, duration: Math.max(30, t + 30), poses: POSES2, script: [...baseScript(T_PUNTO, taps.length ? taps[0].t + 0.3 : Infinity), ...sc.gaze]});
     sc.camera = cameraTrack(cameraShots(T_PUNTO, Infinity));
     return sc;
   }
@@ -164,9 +170,9 @@ function build(taps = autoTaps()) {
   sc.punto.push({kind: 'trace', t: tp - 0.14, st: L5});
   sc.links.push({t: tp, st: L5});
   sc.score.push({type: 'chalk', t0: tp, t1: tp + L5.T, speed: tt => depositSpeed(L5, tt - tp)});
-  ev('escribe 5 y 2', tp);
   t = tp;
   writeGlyph('5', TALLY.x + 1.5 * TALLY.gap - GLYPHS['5'].adv * sz / 2, NUM.y, sz, 101);
+  ev('escribe 5 y 2', sc.strokes.find(x => x.tag === '5').t);
   tp = Math.max(tp + L5.T, t) + 0.15;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.4, from: endOf(L5), to: startOf(L2), h: 30});
   tp += 0.4 + 0.2;
@@ -197,14 +203,25 @@ function build(taps = autoTaps()) {
     // la llave dura lo mismo que el lazo grande (se dibujan juntos)
     const braceSt = chalk(brace, 125, {motion: {speed: Math.max(160, 520 * (brace.length * 18) / Math.max(1, LALL.T * 520))}});
     t = write(braceSt, t, 'llave');
+    // de los lazos al 7 (R9): al cerrar el lazo grande, Punto sigue de largo y dibuja un hilo celeste hasta la punta de la
+    // llave; se queda ahí, quieto, mientras se escribe el 7 (los siete puntos → la llave → el 7)
+    const tip = [bm, by + 21 + 6], e0 = endOf(LALL);
+    const ctrl = [(e0[0] + tip[0]) / 2, Math.min(e0[1], tip[1]) - 60];
+    const carryG = Array.from({length: 30}, (_, k) => { const u = k / 29; return [(1 - u) ** 2 * e0[0] + 2 * (1 - u) * u * ctrl[0] + u * u * tip[0], (1 - u) ** 2 * e0[1] + 2 * (1 - u) * u * ctrl[1] + u * u * tip[1]]; });
+    const CARRY = depositStroke(carryG, {w: 3.6, p: 0.78, ch: BLUE, seed: 173, motion: {speed: 700, accel: 2500, v0: 10, v1: 10, smooth: 90}});
+    const tc = tp + LALL.T + 0.1;
+    sc.punto.push({kind: 'trace', t: tc - 0.14, st: CARRY});
+    sc.links.push({t: tc, st: CARRY});
+    sc.score.push({type: 'chalk', t0: tc, t1: tc + CARRY.T, speed: tt => depositSpeed(CARRY, tt - tc)});
     // quietud: la mano y Punto se detienen antes del resultado
-    t = Math.max(t, tp + LALL.T) + 0.6;
+    t = Math.max(t, tc + CARRY.T) + 0.6;
     ev('quieto antes del 7', t);
-    sc.T_UNION = tp + LALL.T;
+    sc.T_UNION = tc + CARRY.T;
+    sc.carryEnd = endOf(CARRY);
     ev('empieza el 7', t + 0.0);
     writeGlyph('7', bm - GLYPHS['7'].adv * sz / 2, by + 21 + sz + 6, sz, 141);
   }
-  sc.punto.push({kind: 'hop', t: t + 0.15, dur: 0.6, from: endOf(LALL), toFn: perchAt, h: 60});
+  sc.punto.push({kind: 'hop', t: t + 0.15, dur: 0.6, from: sc.carryEnd, toFn: perchAt, h: 60});
   sc.punto.push({kind: 'perch', t: t + 0.15 + 0.95});
   sc.score.push({type: 'note', t: t + 0.75, freq: 392, dur: 0.2, gain: 0.04});
   ev('termina el 7', t);
@@ -220,6 +237,7 @@ function build(taps = autoTaps()) {
   // ——— actor ———
   sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, poses: POSES2, script: [
     ...baseScript(T_PUNTO, Math.max(5.0, taps[0].t + 0.3)),
+    ...sc.gaze,
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
     {t: sc.events['escribe 5 y 2'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
     {t: T_STEP, pose: 'write', overrides: {drop: 8}, gaze: [0.8, 0.6]},           // dobla apenas las rodillas para escribir más abajo
@@ -227,8 +245,9 @@ function build(taps = autoTaps()) {
     {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
     {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true, swing: 0.25}, face: 0.6, overrides: {armR: [-0.1, 0.3]}},      // dos pasos atrás (de ¾: las piernas no se funden, R5)
     {t: T_BACK + 0.2, pose: 'lookDown', gaze: [0.7, 0.6]},                              // mira lo que escribió (cabeza abajo)
-    {t: T_GET - 0.5, pose: 'lookUp', gaze: [1, -0.7]},                                  // levanta la cabeza hacia la Ronda (los ojos primero: canal de mirada más rápido)
-    {t: T_GET - 0.12, pose: 'lookDown'},                                                // micro-encogida
+    {t: T_GET - 0.62, pose: 'lookDown', overrides: {tilt: 0.55}},                        // contramovimiento: baja un poco más antes de levantar la cabeza
+    {t: T_GET - 0.5, pose: 'lookUp', gaze: [1, -0.7]},                                  // levanta la cabeza hacia la Ronda (los ojos primero)
+    {t: T_GET - 0.12, pose: 'lookUp', overrides: {tilt: -0.2, drop: 3}},                 // micro-encogida pequeña (antes bajaba la cabeza 0.6 rad: vaivén)
     {t: T_GET, pose: 'eureka', face: 0.9, gaze: [1, -0.5]},                             // ¡ya está! (el brazo sube lejos de la escritura)
     {t: T_GET + 1.0, pose: 'open', gaze: [0.2, -0.3]},
   ]});
@@ -464,7 +483,7 @@ export default {
       ctx.save(); ctx.translate(x - hx, y - hy); draw(ctx, r.st, t - r.t); ctx.restore();
     }
     // después de la unión, los hilos bajan de presión: lo que ya no importa se aquieta (R8)
-    const dim = S.T_UNION ? 1 - 0.55 * minJerk((t - S.T_UNION) / 0.8) : 1;
+    const dim = S.T_UNION ? 1 - 0.8 * minJerk((t - S.T_UNION) / 0.8) : 1; // al 20 % (R9)
     for (const l of S.links) {
       const st = linkFor(l, t);
       if (dim < 0.999 && l.i != null) drawDeposit(ctx, st, t - l.t, dim); else draw(ctx, st, t - l.t);
@@ -550,7 +569,8 @@ export default {
     const h = S.hand.find(h => t >= h.t0 && t <= h.t1);
     const p = puntoAt(t);
     const sk = S.actor.at(t);
-    return {headUp: +(-(sk.head[0] - sk.neck[0]) * 0 + (sk.neck[1] - sk.head[1])).toFixed(2), tilt: +Math.atan2(sk.head[0] - sk.neck[0], sk.neck[1] - sk.head[1]).toFixed(3), handH: G - sk.aR[2][1], torso: +Math.atan2(sk.neck[0] - sk.hip[0], sk.hip[1] - sk.neck[1]).toFixed(3), contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
+    // pies tal como se dibujan (esqueleto), no el plan de pisadas
+    return {pieL: +sk.lL[2][0].toFixed(2), pieR: +sk.lR[2][0].toFixed(2), alzaL: +(G - sk.lL[2][1]).toFixed(2), alzaR: +(G - sk.lR[2][1]).toFixed(2), headUp: +(-(sk.head[0] - sk.neck[0]) * 0 + (sk.neck[1] - sk.head[1])).toFixed(2), tilt: +Math.atan2(sk.head[0] - sk.neck[0], sk.neck[1] - sk.head[1]).toFixed(3), handH: G - sk.aR[2][1], torso: +Math.atan2(sk.neck[0] - sk.hip[0], sk.hip[1] - sk.neck[1]).toFixed(3), contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
   },
   metrics(lab) {
     // alcance: ¿la mano llega a cada punto de cada trazo? (error > 0 = la tiza estaría fuera del brazo)

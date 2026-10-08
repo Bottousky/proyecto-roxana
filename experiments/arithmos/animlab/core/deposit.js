@@ -129,8 +129,10 @@ export function depositTip(st, tl) {
 
 /** Velocidad de la punta en tl (px/s). */
 export function depositSpeed(st, tl) {
-  const i = indexAt(st.plan, tl);
-  return st.plan.v[Math.min(st.path.n - 1, Math.round(i))];
+  // interpolada entre muestras: redondear al índice más cercano hacía saltar la sonda (15 → 72 px/s "en un instante",
+  // cuando en realidad tarda 0.011 s a 5000 px/s²)
+  const i = indexAt(st.plan, tl), i0 = Math.floor(i), i1 = Math.min(st.path.n - 1, i0 + 1);
+  return lerp(st.plan.v[i0], st.plan.v[i1], i - i0);
 }
 
 /**

@@ -367,3 +367,12 @@ R8 midió sobre las sondas: **No** — la tiza pasaba de 0 a crucero en un cuadr
 3. Hilos al 45 % después de la unión.
 4. Lazos de Punto sin frenadas en V (suavizado amplio del plan).
 5. Eventos «empieza el 7» / «termina el 7»; 404 del favicon del laboratorio resuelto.
+
+## Revisión R9 (VS8) y VS9 — ciclo 16
+R9: **N3 en todas las dimensiones** (mínimo de producción alcanzado); falta N4 en Timing, Actuación y Matemática. Disposición (`c19/`):
+(a) saltos que se aceleran 12 % cada uno: vuelo medido 0.383 → 0.142 s, **3.º/1.º = 0.71**; (b) comprensión sin vaivén (micro-encogida chica), con contramovimiento antes de levantar la cabeza; superposición medida en ESTA corrida (`eureka.png`); (c) **mirada**: los ojos van a cada punto antes de que llegue Punto y bajan a la marca; (d) **de los lazos al 7**: Punto sigue de largo desde el lazo grande dibujando un hilo hasta la punta de la llave y espera ahí el 7; (e) sondas a 240 Hz (`--hz`), velocidad de contacto interpolada (redondear al índice hacía saltar la sonda: 15 → 72 px/s "instantáneo"); hilos al 20 % tras la unión; evento «escribe 5 y 2» en el primer trazo del 5.
+
+## E16 — pies plantados (ciclo 16)
+**Hallazgo** (sonda de pies del esqueleto a 240 Hz): el pie "apoyado" saltaba 16.2 px (= 6·k) al terminar una caminata hacia atrás y 9–13 px al empezar a caminar; además, al cambiar de pose u orientación los pies se deslizaban (el esqueleto 2D los recoloca).
+**Técnica** (`actor.js`): pies plantados de pie (bloqueo de pie: el pie apoyado no se mueve; si la pose lo pide > 8·k más allá, pasito de 0.22 s de a un pie); piernas por IK hasta el pie plantado; las mezclas hacia/desde la marcha parten y llegan a pies quietos; cada caminata arranca con las pisadas reales (el de atrás primero; se intercambian los nombres si hace falta) y termina donde la dejó el plan.
+**Resultado**: deslizamiento máx. **0.42 px por 1/240 s** con el pie apoyado (antes 16.2), ninguna muestra > 0.5 px (`c19/pies-entra.png`, `pies-atras.png`).

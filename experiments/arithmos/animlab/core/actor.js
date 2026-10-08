@@ -81,19 +81,62 @@ export function buildActor({ground, x, k = 1, script, duration, facing = 1, pose
     swing[i * 2 + 1] = i ? swingR.step(1 / HZ, -g.armSwing) : 0;
   }
   const faceAt = t => { let f = facing; for (const e of events) { if (e.t > t) break; if (e.face != null) f = e.face; else if (e.pose && poses[e.pose]?.face != null) f = poses[e.pose].face * Math.sign(f || 1); if (e.walk && !e.walk.back) f = Math.sign(e.walk.to - (gaitAt(segs, e.t, x).hip)) || f; } return f; };
+  const raw = (t, plant = null) => {
+    const i = clamp(Math.round(t * HZ), 0, n - 1);
+    const ch = name => [out[name][i * 2], out[name][i * 2 + 1]];
+    const g = gaitAt(segs, t, x);
+    return skeletonFrom({
+      x: g.hip, ground, k, f: smoothFace(faceAt, t),
+      lean: ch('lean')[0] + g.walking * 0.08, tilt: ch('tilt')[0], drop: ch('drop')[0],
+      armL: addv(ch('armL'), [swing[i * 2] * g.walking, 0.22 * g.walking]), armR: addv(ch('armR'), [swing[i * 2 + 1] * g.walking, 0.22 * g.walking]),
+      legL: ch('legL'), legR: ch('legR'), gait: g, bob: bob[i], plant,
+    });
+  };
+  // ——— pies plantados de pie (E16) ———
+  // Parado, un pie apoyado NO se mueve aunque la pose o la orientación cambien (al girar hacia la cámara el pie se
+  // deslizaba 16 px en 1/240 s: R9). Si la pose lo quiere en otro lado (> 8·k), da un pasito de 0.22 s, de a un pie.
+  const PH = 120, np = Math.ceil(duration * PH) + 2;
+  const plantX = new Float32Array(np * 2), plantLift = new Float32Array(np * 2);
+  const computePlants = () => {
+  const pl = {L: null, R: null}, step = {L: null, R: null};
+  for (let j = 0; j < np; j++) {
+    const t = j / PH, g = gaitAt(segs, t, x), sk = raw(t);
+    const want = {L: sk.lL[2][0], R: sk.lR[2][0]};
+    for (const [fi, f] of [[0, 'L'], [1, 'R']]) {
+      const ww = g.wWalk ?? 0;
+      // caminando del todo: el pie plantado es el del plan de pisadas; en las mezclas (empezar/terminar de caminar)
+      // queda fijo donde estaba, para que la mezcla parta y llegue a un pie quieto
+      if (pl[f] === null) pl[f] = want[f];
+      if (ww >= 0.999) { pl[f] = g.feet[f].x; step[f] = null; }
+      else if (ww > 0.001) { step[f] = null; }
+      else if (step[f]) {
+        const u = (t - step[f].t0) / 0.22;
+        if (u >= 1) { pl[f] = step[f].to; step[f] = null; }
+      } else if (Math.abs(want[f] - pl[f]) > 8 * k && !step[f === 'L' ? 'R' : 'L']) step[f] = {t0: t, from: pl[f], to: want[f]};
+      let xf = pl[f], lift = 0;
+      if (step[f]) { const u = clamp((t - step[f].t0) / 0.22); xf = lerp(step[f].from, step[f].to, minJerk(u)); lift = Math.sin(Math.PI * u) * 7 * k; }
+      plantX[j * 2 + fi] = xf; plantLift[j * 2 + fi] = lift;
+    }
+  }
+  };
+  computePlants();
+  // cada caminata arranca con los pies donde están apoyados (el plan suponía pies a ±3·k de la cadera y la mezcla los
+  // arrastraba): las dos primeras pisadas del plan pasan a ser los pies plantados, el de atrás primero
+  for (const sg of segs) {
+    const j = clamp(Math.round(sg.t0 * PH) - 1, 0, np - 1);
+    const xl = plantX[j * 2], xr = plantX[j * 2 + 1];
+    const lBehind = sg.dir * xl <= sg.dir * xr;
+    sg.swap = !lBehind;
+    sg.P[0] = lBehind ? xl : xr;
+    sg.P[1] = lBehind ? xr : xl;
+  }
+  computePlants();
   return {
     duration, ground, k, segs, x0: x,
     /** Esqueleto en t (mismo formato que Figure.skeleton()). */
     at(t) {
-      const i = clamp(Math.round(t * HZ), 0, n - 1);
-      const ch = name => [out[name][i * 2], out[name][i * 2 + 1]];
-      const g = gaitAt(segs, t, x);
-      return skeletonFrom({
-        x: g.hip, ground, k, f: smoothFace(faceAt, t),
-        lean: ch('lean')[0] + g.walking * 0.08, tilt: ch('tilt')[0], drop: ch('drop')[0],
-        armL: addv(ch('armL'), [swing[i * 2] * g.walking, 0.22 * g.walking]), armR: addv(ch('armR'), [swing[i * 2 + 1] * g.walking, 0.22 * g.walking]),
-        legL: ch('legL'), legR: ch('legR'), gait: g, bob: bob[i],
-      });
+      const j = clamp(Math.round(t * PH), 0, np - 1);
+      return raw(t, {L: [plantX[j * 2], plantLift[j * 2]], R: [plantX[j * 2 + 1], plantLift[j * 2 + 1]]});
     },
     gaze(t) { const i = clamp(Math.round(t * HZ), 0, n - 1); return [out.gaze[i * 2], out.gaze[i * 2 + 1]]; },
     gait: t => gaitAt(segs, t, x),
@@ -161,7 +204,11 @@ function gaitAt(segs, t, xStart) {
   // al terminar de caminar, las piernas pasan de los pies plantados a la pose de pie en 0.35 s
   const since = last ? t - last.t0 - last.T : 1e9;
   const wWalk = 1 - minJerk(clamp(since / 0.35));
-  return {hip, feet: {L: {x: hip - 3 * k * d, lift: 0}, R: {x: hip + 3 * k * d, lift: 0}}, walking: 0, moving: false, bob: 0, armSwing: 0, wWalk};
+  // después de caminar, los pies quedan donde los dejó el plan (antes: hip ± 3k según la dirección, que en una caminata
+  // hacia atrás invertía izquierdo y derecho: el pie saltaba 6·k = 16 px al terminar, R9)
+  let fL = hip - 3 * k * d, fR = hip + 3 * k * d;
+  if (last) { const P = last.P, iL = (P.length - 1) % 2 === 0 ? P.length - 1 : P.length - 2; fL = P[iL]; fR = P[iL === P.length - 1 ? P.length - 2 : P.length - 1]; if (last.swap) [fL, fR] = [fR, fL]; }
+  return {hip, feet: {L: {x: fL, lift: 0}, R: {x: fR, lift: 0}}, walking: 0, moving: false, bob: 0, armSwing: 0, wWalk};
 }
 
 /** Pies durante una caminata, en función de la posición de la cadera (así frenan cuando frena la cadera). */
@@ -188,7 +235,7 @@ function feetAt(s, hip) {
     }
     feet[name] = {x: pos, lift};
   }
-  return feet;
+  return s.swap ? {L: feet.R, R: feet.L} : feet;
 }
 
 /** Péndulo invertido: la cadera sube cuando un solo pie apoya debajo; brazos opuestos a las piernas. */
@@ -212,7 +259,7 @@ export function ik(hip, foot, a, b, f) {
 }
 
 /** Arma el esqueleto (formato de Figure.skeleton) desde los canales. */
-function skeletonFrom({x, ground, k, f, lean, tilt, drop, armL, armR, legL, legR, gait, bob}) {
+function skeletonFrom({x, ground, k, f, lean, tilt, drop, armL, armR, legL, legR, gait, bob, plant = null}) {
   const front = 1 - Math.abs(f);
   const limb = (base, a1, a2, l1, l2, side) => {
     const fx = f + (1 - Math.abs(f)) * side;
@@ -232,6 +279,14 @@ function skeletonFrom({x, ground, k, f, lean, tilt, drop, armL, armR, legL, legR
   for (const p of new Set([...sL, ...sR])) p[1] += ground - low;
   let hip = sL[0], lL = sL, lR = sR;
   const w = gait.wWalk ?? 0;
+  if (plant) {
+    // de pie con los pies plantados: la cadera la da la pose; las piernas, por IK hasta donde está apoyado cada pie.
+    // Es también el punto de partida de la mezcla con la marcha (si no, al empezar a caminar el pie saltaba: 9.5 px)
+    const fL = [plant.L[0], ground - plant.L[1]], fR = [plant.R[0], ground - plant.R[1]];
+    lL = [hip, ik(hip, fL, BONES.thigh * k, BONES.shin * k, f), fL];
+    lR = [[...hip], ik(hip, fR, BONES.thigh * k, BONES.shin * k, f), fR];
+  }
+  const sLp = lL, sRp = lR;
   if (w > 0) {
     // piernas de marcha: cadera a la altura que permiten las piernas, pies donde dice el plan (IK)
     const L = (BONES.thigh + BONES.shin) * k * 0.97;
@@ -240,8 +295,8 @@ function skeletonFrom({x, ground, k, f, lean, tilt, drop, armL, armR, legL, legR
     const wL = [wHip, ik(wHip, fL, BONES.thigh * k, BONES.shin * k, f), fL];
     const wR = [[...wHip], ik(wHip, fR, BONES.thigh * k, BONES.shin * k, f), fR];
     const mix = (a, b) => a.map((p, i) => [lerp(p[0], b[i][0], w), lerp(p[1], b[i][1], w)]);
-    lL = mix(sL, wL);
-    lR = mix(sR, wR);
+    lL = mix(sLp, wL);
+    lR = mix(sRp, wR);
     hip = lL[0];
     lR[0] = hip;
   }

@@ -44,7 +44,9 @@ await page.evaluate(t => window.__lab.seek(t), dur);
 await page.screenshot({path: join(out, 'final.png')});
 const metrics = await page.evaluate(() => window.__lab.metrics());
 // sondas a 60 Hz
-const probes = await page.evaluate(d => { const o = []; for (let t = 0; t <= d; t += 1 / 60) o.push({t: +t.toFixed(4), p: window.__lab.probe(t)}); return o; }, dur);
+// sondas a 60 Hz (o --hz=240 para medir aceleraciones sin el ruido de un cuadro)
+const hz = Number(opt.hz || 60);
+const probes = await page.evaluate(([d, hz]) => { const o = []; for (let t = 0; t <= d; t += 1 / hz) o.push({t: +t.toFixed(4), p: window.__lab.probe(t)}); return o; }, [dur, hz]);
 await writeFile(join(out, 'probes.json'), JSON.stringify(probes));
 await writeFile(join(out, 'metrics.json'), JSON.stringify({test, dur, times, renderMs: ms.map(m => +m.toFixed(2)), metrics, errors}, null, 1));
 // sonido: partitura renderizada fuera de línea → WAV + envolvente RMS (para medir sincronía, no calidad)
