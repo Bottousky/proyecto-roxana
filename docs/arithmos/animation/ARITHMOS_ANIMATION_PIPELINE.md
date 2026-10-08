@@ -39,8 +39,17 @@ Una técnica pasa de `animlab/` a `src/engine/` sólo si:
 |---|---|
 | `experiments/arithmos/animlab/` | Laboratorio: `index.html?test=NN&t=…` o `&play=1` |
 | `scripts/animlab-capture.mjs` | Cuadros, hoja, recortes, sondas a 60 Hz, métricas, video opcional (`--video`, sólo para humanos) |
-| `scripts/animlab-plot.mjs` | Curvas de sondas (velocidad, posición, ángulos) |
+| `scripts/animlab-plot.mjs` | Curvas de sondas (velocidad, posición, ángulos) — alturas siempre como altura sobre el suelo (R1: un revisor leyó un salto como caída) |
+| `scripts/animlab-stack.mjs` | Apila recortes (antes/después, instantes) en una imagen |
+| `scripts/animlab-diff.mjs` | Diferencia de píxeles entre dos PNG: sólo para regresiones no buscadas (p. ej. caché) |
+| `scripts/animlab-interact.mjs` | Prueba con clics reales de la escena interactiva |
+| `--audio` en la captura | Partitura → `score.wav` + `rms.json` (sincronía medible; calidad [H]) |
 | Chrome del sistema vía Playwright 1.63 | Render real con GPU (`--use-angle=metal`) |
+
+## Lecciones de las revisiones (R1–R3)
+- Darle al revisor **sólo la versión vigente** y una **tabla de tiempos**: sin ella no puede juzgar Timing en imágenes fijas.
+- Tiras densas (cada 0.04–0.12 s) para anticipaciones; recortes dpr 3 para textura; captura 844×390 para legibilidad.
+- El revisor encuentra problemas de composición que el autor no ve (escritura tapando la cabeza, hilos que cruzan la cara): cada versión candidata pasa por uno.
 
 ## Lo que NO hace este pipeline
 - No certifica audio (nadie lo escuchó).

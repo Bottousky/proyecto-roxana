@@ -109,7 +109,7 @@ function build(taps = autoTaps()) {
   sc.counted = n;
   if (n < 7) { // falta contar: la escena espera al jugador
     sc.duration = Infinity;
-    sc.actor = buildActor({ground: G, x: X0, k: K, duration: Math.max(30, t + 30), poses: POSES2, script: baseScript(T_PUNTO, Infinity)});
+    sc.actor = buildActor({ground: G, x: X0, k: K, duration: Math.max(30, t + 30), poses: POSES2, script: baseScript(T_PUNTO, taps.length ? taps[0].t + 0.3 : Infinity)});
     sc.camera = cameraTrack([{t: 0, cx: 1440, cy: 600, w: 1250}]);
     return sc;
   }
@@ -153,7 +153,7 @@ function build(taps = autoTaps()) {
   sc.duration = T_GET + 4.0; // R3: cola de 2.8 s sin cambio → ≤ 1 s quieto al final
   // ——— actor ———
   sc.actor = buildActor({ground: G, x: X0, k: K, duration: sc.duration, poses: POSES2, script: [
-    ...baseScript(T_PUNTO, sc.events['fin de contar']),
+    ...baseScript(T_PUNTO, Math.max(5.0, taps[0].t + 0.3)),
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
     {t: sc.events['escribe 5 y 2'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
     {t: T_STEP, pose: 'write', overrides: {lean: 0.36, armR: [1.3, 0.3]}, gaze: [0.8, 0.5]},
@@ -181,14 +181,16 @@ function build(taps = autoTaps()) {
 }
 
 /** Lo que hace el alumno hasta terminar de contar (compartido por la escena completa y la que espera al jugador). */
-function baseScript(T_PUNTO, countEnd) {
+function baseScript(T_PUNTO, writeAt = 5.0) {
   return [
     {t: 0, pose: 'stand', face: 1},
     {t: 0.6, walk: {to: X1, speed: 165}},
     {t: 3.9, pose: 'stand', gaze: [0.7, -0.6]},
     {t: T_PUNTO + 0.15, pose: 'surprise', gaze: [0.6, -0.9]},       // ¡un punto! (se vuelve hacia nosotros)
     {t: T_PUNTO + 0.8, pose: 'stand', gaze: [0.9, -0.5]},
-    {t: 5.0, pose: 'write', gaze: [1, -0.4]},
+    // espera mirando la Ronda; levanta la tiza recién con el primer toque (antes quedaba con el brazo arriba esperando)
+    {t: Math.min(5.0, writeAt), pose: 'stand', gaze: [1, -0.3]},
+    {t: writeAt, pose: 'write', gaze: [1, -0.4]},
   ];
 }
 
@@ -282,10 +284,13 @@ export default {
     const frame = Math.floor(t * 8);
     // la Ronda: siete puntos vivos (respiran desfasados; se aplastan al recibir a Punto)
     DOTS.forEach(([x, y], i) => {
-      const land = S.rings[i].t;
+      const ring = S.rings.find(r => r.dot === i);
+      const land = ring ? ring.t - 0.05 : Infinity;
+      // mientras la escena espera al jugador, los puntos sin contar respiran más (invitan a tocarlos)
+      const invite = S.counted < 7 && !ring && t > S.waitFrom ? 0.08 : 0.03;
       const hit = t > land ? Math.exp(-(t - land) * 7) * Math.cos((t - land) * 16) * 0.2 : 0;
       const sl = 1 - hit;
-      fillPressure(ctx, blobOutline(x, y + 2 * hit * 8, 8.5 * (1 + 0.03 * Math.sin(t * 2.6 + i)), {ang: Math.PI / 2, sl, sw: 1 / sl, boil: frame % 3, seed: 20 + i}), 0, 0.74, [x, y], 9);
+      fillPressure(ctx, blobOutline(x, y + 2 * hit * 8, 8.5 * (1 + invite * Math.sin(t * 2.6 + i)), {ang: Math.PI / 2, sl, sw: 1 / sl, boil: frame % 3, seed: 20 + i}), 0, 0.74, [x, y], 9);
     });
     // lo terminado se dibuja desde su bitmap (se estampa una sola vez); `?nocache` para comparar
     const draw = lab.params.has('nocache') ? drawDeposit : drawDepositCached;

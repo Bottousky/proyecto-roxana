@@ -82,7 +82,7 @@ function render(t) {
   const dctx = renderer.beginDust(view);
   test.renderDust?.(lab, t, dctx);
   renderer.present(view);
-  hud.textContent = `${id} · ${test.title} · t=${t.toFixed(2)} / ${duration.toFixed(2)} s · tiza ${ms.toFixed(1)} ms`;
+  hud.textContent = `${id} · ${test.title} · t=${t.toFixed(2)} / ${Number.isFinite(test.duration) ? test.duration.toFixed(2) : '…'} s · tiza ${ms.toFixed(1)} ms`;
   return ms;
 }
 
@@ -94,7 +94,7 @@ window.__lab = {
   audio: async () => {
     if (!test.score) return null;
     const {renderOffline} = await import('./core/score.js');
-    const r = await renderOffline(test.score(lab), duration);
+    const r = await renderOffline(test.score(lab), Number.isFinite(test.duration) ? test.duration : duration);
     return {wav: r.wav, rms: Array.from(r.rms, v => +v.toFixed(5))};
   },
   metrics: () => test.metrics?.(lab) ?? null,
@@ -137,11 +137,25 @@ if (params.has('play')) {
     actx = new AudioContext();
     renderScore(actx, test.score(lab), {t0});
   };
-  addEventListener('pointerdown', () => { start = performance.now(); startAudio(0); });
+  let tNow = 0;
+  addEventListener('pointerdown', e => {
+    // escenas interactivas: el toque se pasa en coordenadas de mundo; la escena se rehace desde ese instante
+    if (test.onPointer) {
+      const w = camera.toWorld(lab.view, e.clientX, e.clientY);
+      if (test.onPointer(lab, tNow, w)) startAudio(tNow);
+      else if (!actx) startAudio(tNow);
+      return;
+    }
+    start = performance.now(); startAudio(0);
+  });
+  window.__lab.tap = (wx, wy) => { const r = test.onPointer?.(lab, tNow, [wx, wy]); return r; };
+  window.__lab.now = () => tNow;
   const loop = now => {
+    const D = test.duration; // puede cambiar (escena interactiva que espera al jugador)
     let t = (now - start) / 1000 * speed;
-    if (t > duration + hold) { start = now; t = 0; if (actx) startAudio(0); }
-    render(Math.min(t, duration));
+    if (t > D + hold) { start = now; t = 0; if (test.onPointer) location.reload(); if (actx) startAudio(0); }
+    tNow = Math.min(t, D);
+    render(tNow);
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
