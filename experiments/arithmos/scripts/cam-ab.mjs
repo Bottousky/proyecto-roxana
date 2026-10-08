@@ -10,7 +10,7 @@ import {startServer} from './serve.mjs';
 const args = process.argv.slice(2);
 const [out, seg, secs = '40'] = args.filter(a => !a.startsWith('--'));
 const extra = (args.find(a => a.startsWith('--q=')) || '').slice(4);
-const server = await startServer(4800 + Math.floor(Math.random() * 300));
+const server = await startServer(0); // puerto libre que elige el sistema
 const port = server.address().port;
 const browser = await chromium.launch({channel: 'chrome', args: ['--use-angle=metal', '--enable-gpu']});
 const page = await browser.newPage({viewport: {width: 1600, height: 900}});

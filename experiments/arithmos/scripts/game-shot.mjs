@@ -8,7 +8,7 @@ const args = process.argv.slice(2);
 const [seg, secs = '5', out = 'shot.png'] = args.filter(a => !a.startsWith('--'));
 const val = n => (args.find(a => a.startsWith(`--${n}=`)) || '').slice(n.length + 3);
 const extra = val('q'), dpr = Number(val('dpr') || 1), crop = val('crop');
-const server = await startServer(5100 + Math.floor(Math.random() * 300));
+const server = await startServer(0); // puerto libre que elige el sistema (dos capturas en paralelo chocaban)
 const browser = await chromium.launch({channel: 'chrome', args: ['--use-angle=metal', '--enable-gpu']});
 const page = await browser.newPage({viewport: {width: 1600, height: 900}, deviceScaleFactor: dpr});
 const errors = [];

@@ -61,7 +61,7 @@ function stampFor(ch, variant) {
  * @param o.w diámetro de la punta (px de mundo); o.p presión de cuerpo; o.ch canal de color
  * @param o.motion opciones del plan de velocidad (motion.planStroke)
  */
-export function depositStroke(guide, {w = 4.2, p = 0.9, ch = 0, seed = 1, motion = {}, nib = -0.6, aspect = 1.45, tremor = 0.7, land = true, lift = true, down = 0} = {}) {
+export function depositStroke(guide, {w = 4.2, p = 0.9, ch = 0, seed = 1, motion = {}, nib = -0.6, aspect = 1.45, tremor = 0.7, land = true, lift = true, down = 0, liftFrac = Infinity} = {}) {
   const path = resample(guide, 0.5);
   const plan = planStroke(path, motion);
   const n = path.n;
@@ -88,7 +88,9 @@ export function depositStroke(guide, {w = 4.2, p = 0.9, ch = 0, seed = 1, motion
     // toque y levantada se aplican DESPUÉS del tope de la cantidad (antes se aplicaban antes y el tope se comía el toque:
     // +18 % → +0 % en la mayoría de los trazos, medido en R15)
     const fromEnd = path.L - s;
-    const shape = (land && s < 5 ? 1.18 - 0.03 * s : 1) * (lift && fromEnd < 14 ? 0.35 + 0.65 * (fromEnd / 14) : 1);
+    // liftFrac: en trazos cortos la levantada ocupa a lo sumo esa fracción del largo (si no, el palito de la «t» quedaba casi sin tiza)
+    const LL = Math.min(14, liftFrac * path.L);
+    const shape = (land && s < 5 ? 1.18 - 0.03 * s : 1) * (lift && fromEnd < LL ? 0.35 + 0.65 * (fromEnd / LL) : 1);
     // más rápido, menos depósito por unidad de largo; además huecos secos a alta velocidad
     const speedK = clamp(Math.pow(vRef / Math.max(40, v), 0.3), 0.72, 1.3);
     const dry = 0.5 + 0.5 * nDry(s / 6) + Math.max(0, v / vRef - 1.1) * 1.5;

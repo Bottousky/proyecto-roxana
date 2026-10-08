@@ -3,8 +3,9 @@
 import {drawStrokes, strokesTip, stroke, circleGuide, dotStrokes, chalkText, lineGuide, WHITE, YELLOW, pressureStyle} from './chalk.js';
 import {mulberry32, seedOf, clamp, lerp} from './rng.js';
 import {anim} from './anim.js';
-import {depositStroke, drawDeposit, depositTip, depositSpeed} from './deposit.js';
+import {depositStroke, drawDeposit, drawDepositCached, depositTip, depositSpeed} from './deposit.js';
 import {liftTime} from './motion.js';
+import {GLYPHS, glyphGuides, sideGap} from './glyphs.js';
 
 export class World {
   constructor() {
@@ -74,6 +75,21 @@ export class World {
  * `progress` lo dibuja trazo a trazo; `fade` lo atenúa (borrado parcial).
  * Los dibujos terminados se guardan en un lienzo propio a la escala de la cámara.
  */
+/** Envolvente del rasgueo de un plan {list: [{st, t0}], T} tocado en `sec` s: suena mientras la tiza toca, con nivel según
+ *  la velocidad de la punta; un golpe al empezar cada trazo. Muestras cada 1/40 s de reloj. */
+function envelopeOf({list, T}, sec) {
+  const k = T / Math.max(1e-3, sec), env = [];
+  for (const e of list) env.push({t: e.t0 / k, tap: true});
+  for (let t = 0; t <= sec + 1e-6; t += 1 / 40) {
+    const tau = t * k;
+    const e = list.find(x => tau >= x.t0 && tau <= x.t0 + x.st.T);
+    env.push({t, v: e ? 0.35 + 0.65 * clamp(depositSpeed(e.st, tau - e.t0) * k / 650) : 0});
+  }
+  return env;
+}
+// altura de mayúscula de los glifos frente al tamaño de la fuente de los Label (se ajusta con A/B, M3)
+const LABEL_CAP = 0.72;
+
 // calibración del depósito frente al trazo del motor (ancho de estampa y presión): se ajusta con capturas A/B (M2)
 const DEP_W = 1.75, DEP_P = 1.12;
 
@@ -123,14 +139,7 @@ export class Drawing {
   /** Envolvente del rasgueo para un dibujo de `sec` segundos (?anim=2): suena mientras la tiza toca, con nivel según la
    *  velocidad de la punta; un golpe al empezar cada trazo. Muestras cada 1/40 s de reloj. */
   soundEnvelope(sec) {
-    const {list, T} = this.#dep(), k = T / Math.max(1e-3, sec), env = [];
-    for (const e of list) env.push({t: e.t0 / k, tap: true});
-    for (let t = 0; t <= sec + 1e-6; t += 1 / 40) {
-      const tau = t * k;
-      const e = list.find(x => tau >= x.t0 && tau <= x.t0 + x.st.T);
-      env.push({t, v: e ? 0.35 + 0.65 * clamp(depositSpeed(e.st, tau - e.t0) * k / 650) : 0});
-    }
-    return env;
+    return envelopeOf(this.#dep(), sec);
   }
 
   #depTip() {
@@ -236,7 +245,56 @@ export class Label {
       const css = (size * view.scale) / (view.dpr || 1);
       if (css < 12) size = Math.min(size * 1.3, (12 * (view.dpr || 1)) / view.scale);
     }
+    if (this.reveal <= 0 || this.fade <= 0.001) return;
+    const plan = anim.level === 2 && this.#glyphPlan(size);
+    if (plan) {
+      // ?anim=2 (M3): escrito con glifos de un trazo y plan de mano; `reveal` es la fracción del tiempo de escritura
+      const t = clamp(this.reveal) * plan.T;
+      for (const e of plan.list) { if (t <= e.t0) break; (this.reveal >= 1 ? drawDepositCached : drawDeposit)(ctx, e.st, this.reveal >= 1 ? Infinity : t - e.t0, this.fade); }
+      return;
+    }
     chalkText(ctx, this.text, this.x, this.y, {size, ch: this.ch, align: this.align, reveal: this.reveal, fade: this.fade, weight: this.weight, p: this.p});
+  }
+
+  /** ?anim=2: plan de escritura con glifos de un trazo, o null si algún signo no tiene glifo (queda la fuente). */
+  #glyphPlan(size = this.size) {
+    const key = `${this.text}|${size}|${this.x}|${this.y}|${this.align}|${this.ch}|${this.weight}|${this.p}`;
+    if (this.gplan?.key === key) return this.gplan.plan;
+    let plan = null;
+    if ([...this.text].every(c => GLYPHS[c])) {
+      const S = size * LABEL_CAP, list = [];
+      let width = 0;
+      for (const c of this.text) width += c === ' ' ? 0.42 * S : (GLYPHS[c].adv + 2 * sideGap(c) - 0.05) * S;
+      let x = this.x - (this.align === 'center' ? width / 2 : this.align === 'right' ? width : 0), t = 0, last = null, seed = seedOf(this.id) % 997 + 1;
+      for (const c of this.text) {
+        if (c === ' ') { x += 0.42 * S; t += 0.12; continue; }
+        for (const g of glyphGuides(c, x + sideGap(c) * S, this.y, S, {seed: seed++, slant: 0.06})) {
+          if (last) t += liftTime(Math.hypot(g[0][0] - last[0], g[0][1] - last[1]));
+          const st = depositStroke(g, {w: S * 0.16 * (this.weight >= 600 ? 1.4 : 1), p: Math.min(1, this.p * 1.1), ch: this.ch, seed: seed++, down: 0.14, liftFrac: 0.3,
+            motion: {speed: S * 6.5, accel: S * 110, k0: 1 / (S * 0.4), v0: 25, v1: 35}});
+          list.push({st, t0: t});
+          t += st.T;
+          last = g.at(-1);
+        }
+        x += (GLYPHS[c].adv + 2 * sideGap(c) - 0.05) * S;
+        t += 0.02;
+      }
+      plan = list.length ? {list, T: t} : null;
+    }
+    this.gplan = {key, plan};
+    return plan;
+  }
+
+  get planKey() { return 'reveal'; }
+
+  /** Duración natural de la escritura (?anim=2), o null si se dibuja con la fuente. */
+  planDuration() {
+    return anim.level === 2 ? this.#glyphPlan()?.T ?? null : null;
+  }
+
+  soundEnvelope(sec) {
+    const plan = anim.level === 2 && this.#glyphPlan();
+    return plan ? envelopeOf(plan, sec) : null;
   }
 
   renderClean(ctx, view, cam) {

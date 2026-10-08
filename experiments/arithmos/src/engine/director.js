@@ -119,8 +119,9 @@ export class Director {
   async draw(obj, sec = 1, {sound = true, key = 'progress'} = {}) {
     obj[key] = this.skipping ? 1 : obj[key] ?? 0;
     // ?anim=2: el dibujo dura lo que dura su plan de mano; `sec` es el tope (si el plan es más largo, se acelera)
-    if (this.game.anim === 2 && key === 'progress' && typeof obj.planDuration === 'function') sec = Math.min(sec, obj.planDuration());
-    const env = this.game.anim === 2 && key === 'progress' && typeof obj.soundEnvelope === 'function' ? obj.soundEnvelope(sec) : null;
+    const planned = this.game.anim === 2 && key === (obj.planKey ?? 'progress') && typeof obj.planDuration === 'function' ? obj.planDuration() : null;
+    if (planned) sec = Math.min(sec, planned);
+    const env = planned ? obj.soundEnvelope(sec) : null;
     const voice = sound && !this.skipping ? this.audio.chalkStart?.(sec, 1, env) : null;
     try {
       await this.tween(sec, k => { obj[key] = k; });

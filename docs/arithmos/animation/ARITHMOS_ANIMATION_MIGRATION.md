@@ -5,8 +5,8 @@ Estado: **en curso**. La condición de inicio se cumplió el 2026-10-08 (R16 apr
 | Paso | Estado | Evidencia |
 |---|---|---|
 | 1. Cámara (`Camera.go` → van Wijk–Nuij + mínimo jerk, `dur` como tope) | **hecho detrás de `?anim=2`** | `tests/camera.test.mjs` (5 pruebas), `c27/cam2-*.json` (A/B en c1.ronda, c1.vuelven, c1.marea), bot del capítulo 1 con y sin bandera (`c27/bot-c1-{A,B}.out`) |
-| 2. `Drawing` + `d.draw` → depósito con plan de mano | **hecho detrás de `?anim=2`**, con rasgueo que suena sólo mientras la tiza toca (nivel por velocidad de la punta, golpe al empezar cada trazo; `tests/drawing-anim2.test.mjs`) | `c28/puerta-{A,B}` (hojas), `c28/puerta-door-AB2.png` (recorte dpr 2), bot del capítulo 1 sin errores (`c28/bot-c1-B.out`); corrida en tiempo real en curso |
-| 3. `Label` → glifos | — | — |
+| 2. `Drawing` + `d.draw` → depósito con plan de mano | **hecho detrás de `?anim=2`**, con rasgueo que suena sólo mientras la tiza toca (nivel por velocidad de la punta, golpe al empezar cada trazo; `tests/drawing-anim2.test.mjs`) | `c28/puerta-{A,B}` (hojas), `c28/puerta-door-AB2.png` (recorte dpr 2), bot del capítulo 1 sin errores (`c28/bot-c1-B.out`); capítulo 1 en tiempo real con y sin bandera (`c28/watch-c1-{A,B}.out`: 362 / 376 s, fps mín. 46.7 / 45.0, mediana 60, 0 errores) |
+| 3. `Label` → glifos de un trazo | **hecho detrás de `?anim=2`** (si algún signo del texto no tiene glifo, queda la fuente; faltan W, ≠ y comillas) | `c29/vuelven-{A,B}` (hojas), `c29/title-AB2.png` (recorte dpr 2), bot del capítulo 1 (`c29/bot-c1-B2.out`, fps mín. 46.7) |
 | 4. Punto (`Dot`, `zip`/`hop`) | — | — |
 | 5. Figura → actor incremental | — | — |
 

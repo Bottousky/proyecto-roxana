@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-08, ciclo 24.
+**Última actualización**: 2026-10-08, ciclo 25.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Ver la vertical slice
@@ -64,7 +64,7 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **Migración (empieza)**: la slice pasó la revisión independiente R16 (N3 en todo, N4 en Timing/Actuación/Matemática). **Benchmark congelado: `artifacts/arithmos/animlab/c26/vs15b`** (etiqueta local `arithmos-animlab-benchmark-vs15`). **M1 cámara: hecho detrás de `?anim=2`** (pruebas, A/B en 3 escenas, bot del capítulo 1). Siguiente: **M2 `Drawing` + `d.draw` → depósito con plan de mano** (MIGRATION), con A/B y bot.
+1. **Migración (empieza)**: la slice pasó la revisión independiente R16 (N3 en todo, N4 en Timing/Actuación/Matemática). **Benchmark congelado: `artifacts/arithmos/animlab/c26/vs15b`** (etiqueta local `arithmos-animlab-benchmark-vs15`). **M1 cámara, M2 trazos (+ rasgueo desde el plan) y M3 Label → glifos: hechos detrás de `?anim=2`** (pruebas, A/B, bot y capítulo 1 en tiempo real sin errores). Siguiente: **M4 Punto** (`Dot`, `zip`/`hop` de `acting.js` y las copias locales de `ch1/scenes.js`) con el salto de cuatro fases y `SecondOrder`.
 2. Pulido de la slice (no bloqueante, con revisión propia): pendientes D1, D3, D4, E1–E4 de R16 (EXPERIMENTS).
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
