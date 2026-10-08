@@ -14,10 +14,11 @@ await page.evaluate(({series, title}) => {
   const c = document.getElementById('c').getContext('2d');
   c.fillStyle = '#10201b'; c.fillRect(0, 0, 1200, 420);
   const all = series.flatMap(s => s.pts);
-  const t1 = Math.max(...all.map(p => p[0])), v0 = Math.min(0, ...all.map(p => p[1])), v1 = Math.max(...all.map(p => p[1])) * 1.05 || 1;
-  const X = t => 60 + (t / t1) * 1110, Y = v => 380 - ((v - v0) / (v1 - v0)) * 340;
+  // el eje de tiempo empieza en el primer instante de los datos (un tramo de 16 a 18 s no queda aplastado contra la derecha)
+  const tA = Math.min(...all.map(p => p[0])), t1 = Math.max(...all.map(p => p[0])), v0 = Math.min(0, ...all.map(p => p[1])), v1 = Math.max(...all.map(p => p[1])) * 1.05 || 1;
+  const X = t => 60 + ((t - tA) / (t1 - tA || 1)) * 1110, Y = v => 380 - ((v - v0) / (v1 - v0)) * 340;
   c.strokeStyle = '#2c4a40'; c.fillStyle = '#7fa094'; c.font = '12px sans-serif';
-  for (let i = 0; i <= 10; i++) { const t = t1 * i / 10; c.beginPath(); c.moveTo(X(t), 40); c.lineTo(X(t), 380); c.stroke(); c.fillText(t.toFixed(2) + ' s', X(t) - 14, 398); }
+  for (let i = 0; i <= 10; i++) { const t = tA + (t1 - tA) * i / 10; c.beginPath(); c.moveTo(X(t), 40); c.lineTo(X(t), 380); c.stroke(); c.fillText(t.toFixed(2) + ' s', X(t) - 14, 398); }
   for (let i = 0; i <= 4; i++) { const v = v0 + (v1 - v0) * i / 4; c.beginPath(); c.moveTo(60, Y(v)); c.lineTo(1170, Y(v)); c.stroke(); c.fillText(v.toFixed(0), 8, Y(v) + 4); }
   const cols = ['#ff8f70', '#f2f2e6', '#7cc4ff', '#ffd76a', '#b48cff'];
   series.forEach((s, i) => {

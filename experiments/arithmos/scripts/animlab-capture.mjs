@@ -7,7 +7,8 @@ import {join} from 'node:path';
 import {startServer} from './serve.mjs';
 
 const [, , test = '01', out = '../../artifacts/arithmos/animlab/tmp', ...rest] = process.argv;
-const opt = Object.fromEntries(rest.map(a => { const [k, v = 'true'] = a.replace(/^--/, '').split('='); return [k, v]; }));
+// se separa sólo en el primer «=» (los valores pueden traer «=»: --q=taps=3,0,5)
+const opt = Object.fromEntries(rest.map(a => { const s = a.replace(/^--/, ''), i = s.indexOf('='); return i < 0 ? [s, 'true'] : [s.slice(0, i), s.slice(i + 1)]; }));
 const [W, H] = (opt.size || '1600x900').split('x').map(Number);
 const dpr = Number(opt.dpr || 1);
 await mkdir(join(out, 'frames'), {recursive: true});

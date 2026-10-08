@@ -19,5 +19,8 @@ export const POSES2 = {
   surprise: {face: 0.15, lean: -0.2, tilt: -0.26, armL: [1.95, -0.35], armR: [2.2, -0.45], legL: [0.32, -0.08], legR: [0.18, -0.05], drop: -4},
   shrug: {face: 0.12, lean: -0.03, tilt: 0.3, armL: [0.4, 1.35], armR: [0.5, 1.2], legL: [0.12, -0.04], legR: [0.18, -0.03], drop: 0},
   open: {face: 0.15, lean: -0.08, tilt: -0.2, armL: [1.25, 0.35], armR: [1.45, 0.2], legL: [0.3, -0.06], legR: [0.22, -0.04], drop: -2},
+  // mirar arriba / abajo con silueta (la lookUp/lookDown del motor, de perfil, junta brazos y piernas en una línea: c15)
+  lookUp: {face: 0.7, lean: -0.1, tilt: -0.36, armL: [-0.4, 0.45], armR: [0.38, 0.5], legL: [0.22, -0.06], legR: [-0.2, -0.04], drop: 0},
+  lookDown: {face: 0.7, lean: 0.12, tilt: 0.4, armL: [-0.3, 0.5], armR: [0.42, 0.6], legL: [0.2, -0.06], legR: [-0.18, -0.04], drop: 2},
   eureka: {face: 0.5, lean: -0.12, tilt: -0.38, armL: [-0.45, 0.55], armR: [2.85, -0.15], legL: [0.24, -0.06], legR: [-0.3, -0.04], drop: -5},
 };

@@ -100,9 +100,10 @@ function build(taps = autoTaps()) {
     // (no tapa la cara, no cruza el atado ni otros anillos: t10i, cache-cmp, t10k)
     const mid = guide[0];
     const a = [DOTS[i][0] - 6, DOTS[i][1] - 22], b = [mid[0] + 1, mid[1] - 5];
-    const c = [(a[0] + b[0]) / 2 + 60, Math.min(...DOTS.map(d => d[1])) - 175];
+    // cada hilo con su propio arco (abanico): se pueden seguir uno por uno hasta su marca (R5)
+    const c = [(a[0] + b[0]) / 2 + 40 + (n - 3) * 30, Math.min(...DOTS.map(d => d[1])) - 150 - Math.abs(n - 3) * 14];
     const link = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; });
-    const linkSt = depositStroke(link, {w: 3.0, p: 0.6, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
+    const linkSt = depositStroke(link, {w: 2.6, p: 0.46, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
     sc.links.push({t: land + 0.15, st: linkSt});
     write(chalk(guide, 60 + n, {motion: {speed: n === 4 ? 900 : 620}}), land + 0.15 + linkSt.T + 0.03, `marca${n}`);
     n++;
@@ -118,14 +119,21 @@ function build(taps = autoTaps()) {
     return sc;
   }
   ev('fin de contar', t);
-  // 4. Punto vuelve junto al alumno y mira lo escrito
-  // vuelve al hombro del alumno (R4: quieto en el origen de los hilos parecía un octavo punto)
-  sc.punto.push({kind: 'hop', t: t + 0.25, dur: 0.6, from, toFn: perchAt, h: 60});
-  sc.punto.push({kind: 'perch', t: t + 0.25 + 0.6 + 0.35});
-  sc.score.push({type: 'note', t: t + 0.85, freq: 392, dur: 0.2, gain: 0.04});
-  // 5. debajo del atado «5», debajo del par «2», «+» en el medio
-  t += 1.15;
-  ev('escribe 5 y 2', t);
+  // 4. Punto agrupa en la Ronda: corre alrededor de los cinco primeros contados y deja un lazo celeste mientras el alumno
+  //    escribe «5»; después alrededor de los dos últimos mientras escribe «+» y «2» (R5: la partición 5 | 2 tiene que
+  //    verse en los puntos, no sólo en las marcas). Al terminar, vuelve a la cabeza del alumno.
+  const order = [...counted];
+  // jerarquía (R5/t10u): el lazo (el grupo) más firme que los hilos (cada correspondencia)
+  // si los grupos se entremezclan en el espacio (el jugador contó salteado), un lazo quedaría dentro del otro y se leería
+  // como "grupo dentro de grupo": entonces cada grupo se enhebra como un hilo de cuentas, en el orden en que se contó
+  const g5 = order.slice(0, 5).map(k => DOTS[k]), g2 = order.slice(5).map(k => DOTS[k]);
+  const nested = g2.some(p => insideHull(p, g5, 27)) || g5.some(p => insideHull(p, g2, 27));
+  const groupGuide = (pts, seed) => nested ? beadString(pts) : lassoGuide(pts, 27, seed);
+  const lasso = (pts, seed) => depositStroke(groupGuide(pts, seed), {w: 4.2, p: 0.82, ch: BLUE, seed, motion: {speed: 640, accel: 6000, k0: 1 / 40}});
+  const L5 = lasso(g5, 170), L2 = lasso(g2, 171);
+  sc.groupStyle = nested ? 'hilo' : 'lazo';
+  const startOf = st => [st.path.x[0], st.path.y[0]], endOf = st => [st.path.x.at(-1), st.path.y.at(-1)];
+  const sz = NUM.size;
   const writeGlyph = (ch, x, y, size, seed, color = 0) => {
     for (const g of glyphGuides(ch, x, y, size, {seed})) {
       const prev = sc.hand.at(-1);
@@ -135,10 +143,29 @@ function build(taps = autoTaps()) {
     }
     t += 0.04;
   };
-  const sz = NUM.size;
+  let tp = t + 0.3;
+  sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from, to: startOf(L5), h: 40});
+  tp += 0.45 + 0.25;
+  sc.punto.push({kind: 'trace', t: tp, st: L5});
+  sc.links.push({t: tp, st: L5});
+  sc.score.push({type: 'chalk', t0: tp, t1: tp + L5.T, speed: tt => depositSpeed(L5, tt - tp)});
+  ev('escribe 5 y 2', tp);
+  t = tp;
   writeGlyph('5', TALLY.x + 1.5 * TALLY.gap - GLYPHS['5'].adv * sz / 2, NUM.y, sz, 101);
+  tp = Math.max(tp + L5.T, t) + 0.15;
+  sc.punto.push({kind: 'hop', t: tp, dur: 0.4, from: endOf(L5), to: startOf(L2), h: 30});
+  tp += 0.4 + 0.2;
+  sc.punto.push({kind: 'trace', t: tp, st: L2});
+  sc.links.push({t: tp, st: L2});
+  sc.score.push({type: 'chalk', t0: tp, t1: tp + L2.T, speed: tt => depositSpeed(L2, tt - tp)});
+  t = Math.max(t, tp);
+  // «+» a 1.3× la cifra: en el plano final de 844×390 queda ≥ 12 px CSS (R5: medía 8.6)
+  writeGlyph('+', TALLY.x + (1.5 * TALLY.gap + TALLY.pairDx + TALLY.gap / 2) / 2 - GLYPHS['+'].adv * sz * 0.65, NUM.y, sz * 1.3, 121);
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
-  writeGlyph('+', TALLY.x + (1.5 * TALLY.gap + TALLY.pairDx + TALLY.gap / 2) / 2 - GLYPHS['+'].adv * sz * 0.55, NUM.y, sz * 1.1, 121); // «+» a ≥ 50 % del alto de la cifra (R2)
+  tp = Math.max(tp + L2.T, t) + 0.15;
+  sc.punto.push({kind: 'hop', t: tp, dur: 0.6, from: endOf(L2), toFn: perchAt, h: 60});
+  sc.punto.push({kind: 'perch', t: tp + 0.95});
+  sc.score.push({type: 'note', t: tp + 0.6, freq: 392, dur: 0.2, gain: 0.04});
   // 6. un paso a la derecha y «= 7»
   // 6. una llave une los dos grupos y debajo el 7: «5 y 2, juntos, son 7» (R4/c13: inclinarse para «= 7» metía la cabeza
   //    sobre el atado; con la llave todo queda al alcance sin inclinarse y la unión de los grupos se dibuja)
@@ -172,7 +199,7 @@ function build(taps = autoTaps()) {
     {t: T_STEP, pose: 'write', overrides: {drop: 8}, gaze: [0.8, 0.6]},           // dobla apenas las rodillas para escribir más abajo
     // anticipación: se encoge y el brazo baja por debajo de la ecuación antes de subir (R3/VS2: barría por encima de «5+2=7»)
     {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
-    {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true}},                  // dos pasos atrás
+    {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true}, face: 0.6},       // dos pasos atrás (de ¾: las piernas no se funden, R5)
     {t: T_BACK + 0.2, pose: 'lookDown', gaze: [0.7, 0.6]},                              // mira lo que escribió (cabeza abajo)
     {t: T_GET - 0.5, pose: 'lookUp', gaze: [1, -0.7]},                                  // levanta la cabeza hacia la Ronda (los ojos primero: canal de mirada más rápido)
     {t: T_GET - 0.12, pose: 'lookDown'},                                                // micro-encogida
@@ -230,6 +257,8 @@ function puntoAt(t) {
     } else if (p.kind === 'no') {
       if (tl < 0.8) { pos = [p.at[0] + 15 * Math.sin(tl * 24) * Math.exp(-tl * 3.2), p.at[1]]; sl = 1 + 0.08 * Math.abs(Math.sin(tl * 26)) * Math.exp(-tl * 4); ang = 0; }
       else pos = p.at;
+    } else if (p.kind === 'trace') {
+      pos = depositTip(p.st, Math.min(tl, p.st.T)); sl = tl < p.st.T ? 1.08 : 1; ang = 0;
     } else if (p.kind === 'perch') {
       pos = perchAt(t);
     } else if (p.kind === 'bounce') {
@@ -252,6 +281,48 @@ function puntoAt(t) {
   return pos ? {pos, sl, ang, fill} : null;
 }
 
+/** Lazo que rodea un grupo de puntos: el borde de la envolvente convexa engordada (suma de Minkowski con un disco),
+ *  arrancando arriba a la izquierda, antihorario, con un leve sobrepaso al cerrar y algo de temblor. */
+function lassoGuide(pts, pad, seed) {
+  const g = [], n = 56, a0 = -Math.PI / 2 - 0.7;
+  for (let k = 0; k <= n + 4; k++) {
+    const a = a0 - (k / n) * Math.PI * 2;
+    const ux = Math.cos(a), uy = Math.sin(a);
+    let best = pts[0], bv = -Infinity;
+    for (const p of pts) { const v = p[0] * ux + p[1] * uy; if (v > bv) { bv = v; best = p; } }
+    const r = pad * (1 + 0.06 * Math.sin(k * 0.7 + seed));
+    g.push([best[0] + ux * r, best[1] + uy * r]);
+  }
+  return g;
+}
+
+/** ¿p cae dentro de la envolvente de pts engordada `pad`? (para decidir si dos lazos se superpondrían) */
+function insideHull(p, pts, pad) {
+  if (pts.length === 1) return Math.hypot(p[0] - pts[0][0], p[1] - pts[0][1]) < pad * 2;
+  for (let k = 0; k < 64; k++) {
+    const a = (k / 64) * Math.PI * 2, ux = Math.cos(a), uy = Math.sin(a);
+    const support = Math.max(...pts.map(q => q[0] * ux + q[1] * uy)) + pad;
+    if (p[0] * ux + p[1] * uy > support) return false; // hay una dirección que lo separa
+  }
+  return true;
+}
+
+/** Hilo de cuentas: una curva suave que pasa por los puntos del grupo en el orden en que se contaron (y se pasa un poco). */
+function beadString(pts) {
+  const ext = (a, b, k) => [a[0] + (a[0] - b[0]) * k, a[1] + (a[1] - b[1]) * k];
+  const P = pts.length > 1 ? [ext(pts[0], pts[1], 0.25), ...pts, ext(pts.at(-1), pts.at(-2), 0.25)] : [[pts[0][0] - 25, pts[0][1]], pts[0], [pts[0][0] + 25, pts[0][1]]];
+  const g = [];
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(P.length - 1, i + 2)];
+    for (let k = 0; k < 10; k++) {
+      const t = k / 10, t2 = t * t, t3 = t2 * t;
+      g.push([0, 1].map(j => 0.5 * (2 * p1[j] + (-p0[j] + p2[j]) * t + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3)));
+    }
+  }
+  g.push(P.at(-1));
+  return g;
+}
+
 /** Arriba de la cabeza del alumno, donde Punto se posa (en el hombro quedaba tapado por la cabeza: t10r). */
 function perchAt(t) {
   const sk = S.actor.at(t);
@@ -261,7 +332,7 @@ function perchAt(t) {
 /** Planos: medio fijo; al aparecer Punto se acerca (la causa es Punto) y llega antes de contar; se abre al alejarse el alumno. */
 function cameraShots(T_PUNTO, T_BACK) {
   const shots = [{t: 0, cx: 1440, cy: 600, w: 1250}, {t: T_PUNTO + 0.45, cx: 1480, cy: 560, w: 1020, arrive: T_PUNTO + 1.1}];
-  if (Number.isFinite(T_BACK)) shots.push({t: T_BACK + 0.3, cx: 1400, cy: 600, w: 1450});
+  if (Number.isFinite(T_BACK)) shots.push({t: T_BACK + 0.3, cx: 1385, cy: 590, w: 1220});
   return shots;
 }
 
@@ -367,6 +438,23 @@ export default {
       ctx.stroke();
     }
     ctx.restore();
+    // la quinta marca, al cruzar las cuatro, levanta un poco de polvo en cada cruce (R5)
+    const m5 = S.strokes.find(x => x.tag === 'marca4');
+    if (m5 && t > m5.t) {
+      const [x0, y0] = [TALLY.x - 8, TALLY.bot - 8], [x1, y1] = [TALLY.x + 3 * TALLY.gap + 10, TALLY.top + 6];
+      ctx.save();
+      for (let k = 0; k < 4; k++) {
+        const xk = TALLY.x + k * TALLY.gap, u = (xk - x0) / (x1 - x0);
+        const tc = m5.t + u * m5.st.T;
+        if (t < tc) continue;
+        const a = 0.06 + 0.06 * Math.exp(-(t - tc) / 1.5);
+        const y = y0 + (y1 - y0) * u;
+        const gr = ctx.createRadialGradient(xk, y, 0, xk, y, 9);
+        gr.addColorStop(0, `rgba(255,255,255,${a})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(xk, y, 9, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
   },
   score() { return S.score; },
   /** Interacción: tocar un punto de la Ronda mientras se cuenta. Devuelve true si la escena cambió. */
@@ -384,7 +472,8 @@ export default {
   probe(lab, t) {
     const h = S.hand.find(h => t >= h.t0 && t <= h.t1);
     const p = puntoAt(t);
-    return {contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
+    const sk = S.actor.at(t);
+    return {headUp: +(-(sk.head[0] - sk.neck[0]) * 0 + (sk.neck[1] - sk.head[1])).toFixed(2), tilt: +Math.atan2(sk.head[0] - sk.neck[0], sk.neck[1] - sk.head[1]).toFixed(3), handH: G - sk.aR[2][1], torso: +Math.atan2(sk.neck[0] - sk.hip[0], sk.hip[1] - sk.neck[1]).toFixed(3), contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
   },
   metrics(lab) {
     // alcance: ¿la mano llega a cada punto de cada trazo? (error > 0 = la tiza estaría fuera del brazo)
