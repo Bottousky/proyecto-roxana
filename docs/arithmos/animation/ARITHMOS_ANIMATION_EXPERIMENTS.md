@@ -113,3 +113,50 @@ Velocidad (speed.png de t01d): A rectangular (0→570 px/s en un cuadro); C tria
 **Conclusión**: B supera a A en todas las acciones pedidas; la actuación por trayectoria funciona. Nivel estimado: Actuación N3–N4 (anticipación y asentamiento medidos; superposición no aplica a un punto), Continuidad N3 (división y fusión con causa), Matemática N3 (2ⁿ y "la recta está hecha de puntos" se ven, sin texto).
 
 **Siguiente**: E09 figura (superposición de cabeza/torso/brazos, pies plantados, mano que escribe) — la mano visible es lo que más falta en E03.
+
+---
+
+## Revisión independiente R1 (E03 y E05), 2026-10-07
+
+Revisor con contexto fresco (sólo imágenes + QUALITY_BAR + VISUAL_LANGUAGE; sin código ni este registro). Veredicto: **ni B03 ni B05 alcanzan el mínimo de producción**; la mayoría de las dimensiones en N2–N3. Disposición de cada hallazgo:
+
+| Hallazgo | Disposición |
+|---|---|
+| B03: el «8» aparece suelto bajo «5 + 3»; falta un gesto que relacione | **Aceptado** → subrayar/abrazar «5 + 3» con un trazo y escribir el 8 desde ahí; la mano visible lo hará causal (E10). |
+| B03: el miembro derecho se borra por partes (el «5» se va, el «+3» queda flotando) | **Parcial**: el vaivén avanza de izquierda a derecha (es físico), pero sin borrador visible se lee como desaparición. → borrador visible (E07). |
+| B03: óvalos semitransparentes detrás de glifos sin causa | **Aceptado**: el rastro de polvo es una franja redondeada que no tiene la forma de lo que se movió. → rastro con la forma del glifo arrastrado. |
+| B03: velocidad en pico, sin rampa | **Rechazado con evidencia parcial**: en trazos de 30–80 px el perfil correcto es campana (mínimo jerk), no trapecio; la aceleración escala con el tamaño (16× la velocidad de crucero). Se corrige el texto del lenguaje visual (5000 px/s² era para líneas largas). Se muestreará a 240 Hz en el próximo gráfico. |
+| B03: crucero oscila ±10 % en trazos largos | **Rechazado**: son curvas (el «3», el «5»): la ley 2/3 frena en la curvatura a propósito. |
+| B03: glifos de grosor uniforme, "trazado técnico" | **Aceptado**: falta modulación por dirección (bajadas más cargadas que subidas) y el peso subió de 0.09 a 0.12 del alto después de la hoja revisada. |
+| B05: el salto no tiene vuelo | **Rechazado (error de lectura)**: la curva usa y de pantalla (hacia abajo); el "hueco" es el vuelo de 70 px. → los gráficos de altura se dibujan ahora como altura sobre el suelo (positivo hacia arriba). |
+| B05: estira ~2:1 al moverse | **Aceptado**: tope de deformación 0.42 → 0.25 (lenguaje visual: ≤ 25 %). |
+| B05: bordes duros y huecos binarios en la textura del punto | **Aceptado**: relleno con presión uniforme + umbral del diente → bordes escalonados. → presión decreciente hacia el borde y variación interna. |
+| B05: quedan cuentas tras la fusión | Ya corregido en t05b (el revisor vio t05a). |
+| B05: los intervalos de duplicación no se aceleran | **Error de lectura** (1.6 s y 1.2 s ya se aceleran); se acentúa: 1.3 s y 0.9 s. |
+| B05: la x escalona sin causa | **Rechazado**: el escalonamiento es la división (cada nivel reparte el grupo); en la hoja se ve la causa. |
+
+Lección de proceso: los gráficos deben estar en unidades que no se puedan malinterpretar (altura positiva hacia arriba, una sola hoja por versión) y el revisor debe recibir sólo la versión vigente.
+
+---
+
+## E09 — TEST 09 · figura de palitos (ciclo 5, 2026-10-07)
+
+**Hipótesis**: con el mismo dibujo y las mismas poses del motor, (1) un plan de pisadas con pies plantados, IK y cadera de péndulo invertido elimina el patinaje y da arranque/frenada; (2) canales de segundo orden con retrasos (mirada → cabeza → torso → brazos) dan superposición y follow-through medibles.
+
+**Técnica**: `animlab/core/actor.js` (canales con f/ζ/retraso propios; pisadas: despega cuando la cadera pasa el punto medio de los pies, aterriza a ¼ de paso; cadera con perfil de aceleración acotada; mezcla de 0.3/0.35 s entre piernas de marcha y de pie); se dibuja con `Figure.render` del motor (mismos trazos y hervor), sustituyendo sólo `skeleton()`.
+
+**Resultado** (`c05/t09a`, `t09b`, `t09c`):
+- Pies (`t09a/feet.png`): escalera perfecta — cada pie quieto mientras apoya (deslizamiento máx. 0.015 px por tick de 1/120 s), vuelo suave; la cadera acelera y frena (4.7 s, 14 pisadas). A desliza los pies continuamente (piernas senoidales sobre una cadera a velocidad constante).
+- Mano/cabeza (`t09c/hand-head.png`): al señalar, la mano de B sube, se pasa ~10 px y se asienta (follow-through); A llega con un ease de 0.45 s sin sobrepaso.
+- Recortes (`t09b/walk.png`, `act1.png`, `act2.png`): la caminata de B se lee como caminar (rodillas, paso cruzado); "¡ya sé!" (brazo arriba) y "uy" (mano a la cabeza) se leen.
+
+**Defectos** (abiertos):
+1. La **anticipación** de señalar está mal guionada: el recogido sube la mano en vez de bajarla (`hand-head.png` 6.0 s). Debe bajar/atrasar la mano 80–140 ms antes.
+2. La sorpresa casi no mueve la cabeza (alto de cabeza plano): falta el respingo (cabeza y torso atrás, 100 ms, antes que los brazos).
+3. Las poses del motor en perfil esconden un brazo detrás del otro: siluetas débiles. Un ¾ (facing ≈ 0.6) y poses con brazos separados del torso darían siluetas legibles.
+4. Paso corto (30·k) y balanceo de brazos chico frente a A: la caminata de B es correcta pero tímida.
+5. No hay transición de mirada visible en capturas (los ojos son 2 puntos): la "mirada lidera" no se puede verificar en imagen fija; sólo por sonda.
+
+**Conclusión**: (1) apoyada sin reservas — es un salto de N1 a N3–N4 en locomoción. (2) apoyada en lo medible (sobrepaso y retraso), pero la actuación todavía no alcanza N4 porque el guion de anticipación y las siluetas son débiles. Nivel estimado B: Actuación N3, Timing N3, Continuidad N3.
+
+**Siguiente**: ciclo de pulido de R1 + E09 (lista en STATE), después E07 borrador visible y E10 microescena con mano visible.
