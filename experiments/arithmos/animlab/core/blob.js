@@ -36,7 +36,7 @@ export function sampleSim(sim, t) {
  * Deformación por movimiento conservando el área: se estira en la dirección de la velocidad
  * y se aplasta contra la dirección del frenado. Devuelve {ang, sl, sw} (largo y ancho relativos, sl·sw = 1).
  */
-export function deform(v, a, {stretch = 1 / 2200, squash = 1 / 26000, max = 0.42} = {}) {
+export function deform(v, a, {stretch = 1 / 2200, squash = 1 / 26000, max = 0.25} = {}) {
   const sp = Math.hypot(v[0], v[1]);
   if (sp < 2 && Math.hypot(a[0], a[1]) < 50) return {ang: 0, sl: 1, sw: 1};
   const ang = sp > 2 ? Math.atan2(v[1], v[0]) : Math.atan2(a[1], a[0]);
@@ -61,11 +61,19 @@ export function blobOutline(x, y, r, {ang = 0, sl = 1, sw = 1, boil = 0, seed = 
   return pts;
 }
 
-/** Rellena un contorno con presión (composición 'lighten': uniones de piezas sin cuentas). */
-export function fillPressure(ctx, pts, ch = 0, p = 0.86) {
+/** Rellena un contorno con presión (composición 'lighten': uniones de piezas sin cuentas).
+ *  Con `center` y `radius`, la presión baja hacia el borde (el borde se deshace en el diente en vez de cortarse:
+ *  con presión pareja el borde quedaba escalonado y con huecos binarios, R1). */
+export function fillPressure(ctx, pts, ch = 0, p = 0.86, center = null, radius = 0) {
   const prev = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = 'lighten';
-  ctx.fillStyle = pressureStyle(ch, p);
+  if (center && radius > 0) {
+    const g = ctx.createRadialGradient(center[0], center[1], 0, center[0], center[1], radius);
+    g.addColorStop(0, pressureStyle(ch, p * 1.08));
+    g.addColorStop(0.55, pressureStyle(ch, p));
+    g.addColorStop(1, pressureStyle(ch, p * 0.55));
+    ctx.fillStyle = g;
+  } else ctx.fillStyle = pressureStyle(ch, p);
   ctx.beginPath();
   pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
   ctx.closePath();

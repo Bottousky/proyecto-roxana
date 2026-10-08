@@ -113,7 +113,7 @@ function smoothFace(faceAt, t) {
 function planWalk(x0, x1, t0, speed, k) {
   const dir = Math.sign(x1 - x0) || 1;
   const dist = Math.abs(x1 - x0);
-  const D = 30 * k; // largo de paso
+  const D = 36 * k; // largo de paso
   const N = Math.max(2, Math.round(dist / D) + 1);
   const Dd = (dist - 3 * k) / Math.max(0.5, N - 1.5);
   // pisadas: -1 izquierdo (atrás), 0 derecho (adelante), luego alternadas; la última junta los pies
@@ -196,7 +196,7 @@ function vault(s, hip, feet) {
   const stance = [feet.L, feet.R].filter(f => f.lift < 0.5);
   const dx = stance.length ? Math.min(...stance.map(f => Math.abs(f.x - hip))) : 0;
   const bob = L - Math.sqrt(Math.max(0, L * L - dx * dx)); // cuánto baja la cadera
-  const armSwing = clamp((feet.L.x - feet.R.x) / (s.Dd || 30) * s.dir, -1, 1) * 0.45;
+  const armSwing = clamp((feet.L.x - feet.R.x) / (s.Dd || 30) * s.dir, -1, 1) * 0.6;
   return {bob, armSwing};
 }
 

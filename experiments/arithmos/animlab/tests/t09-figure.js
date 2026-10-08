@@ -15,7 +15,7 @@ const D = 14.5;
 const SCRIPT = [
   {t: 0, pose: 'idle'},
   {t: 0.5, walk: {to: X1, speed: 125}},
-  {t: 5.0, pose: 'lookUp', gaze: [0.6, -0.8]},
+  {t: 5.0, pose: 'lookUp', gaze: [0.6, -0.8], face: 0.62},  // se queda de ¾: se leen los dos brazos
   {t: 6.1, pose: 'point', overrides: {armR: [2.35, 0.05]}, gaze: [0.8, -0.6]},
   {t: 7.4, pose: 'surprise', gaze: [1, -0.3]},           // aparece la marca «!»
   {t: 8.6, pose: 'think', gaze: [0.4, -0.6]},
@@ -26,9 +26,9 @@ const SCRIPT = [
 ];
 // anticipación en B: antes de señalar, el brazo se recoge; antes de sorprenderse, un microencogimiento
 const ANTICIP = [
-  {t: 5.98, overrides: {armR: [0.1, 1.6]}},
+  {t: 5.96, overrides: {armR: [-0.45, 0.35]}},  // la mano baja y va atrás antes de subir a señalar
   {t: 7.3, pose: 'hands'},
-  {t: 9.5, overrides: {armR: [0.3, 1.9]}},
+  {t: 9.48, overrides: {armR: [-0.35, 0.3]}},
   {t: 12.48, pose: 'lookDown'},
 ];
 
@@ -84,7 +84,7 @@ export default {
   probe(lab, t) {
     const sk = actor.at(t), g = actor.gait(t);
     const a = figAt(t).skeleton();
-    return {A: {hip: a.hip[0], head: a.head[0], hand: a.aR[2][0], handY: -a.aR[2][1], headY: -a.head[1]}, B: {headY: -sk.head[1], hip: sk.hip[0], hipY: -sk.hip[1], head: sk.head[0], hand: sk.aR[2][0], handY: -sk.aR[2][1], footL: g.feet.L.x, footR: g.feet.R.x, liftL: g.feet.L.lift, liftR: g.feet.R.lift}};
+    return {A: {hip: a.hip[0], head: a.head[0], hand: a.aR[2][0], handH: GA - a.aR[2][1], headH: GA - a.head[1], headX: a.head[0] - a.hip[0]}, B: {headH: GB - sk.head[1], handH: GB - sk.aR[2][1], headX: sk.head[0] - sk.hip[0], hip: sk.hip[0], hipY: -sk.hip[1], head: sk.head[0], hand: sk.aR[2][0], handY: -sk.aR[2][1], footL: g.feet.L.x, footR: g.feet.R.x, liftL: g.feet.L.lift, liftR: g.feet.R.lift}};
   },
   metrics() {
     // deslizamiento de pies: mientras un pie no está en el aire, su x no debe cambiar

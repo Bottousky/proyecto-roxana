@@ -61,7 +61,7 @@ function stampFor(ch, variant) {
  * @param o.w diámetro de la punta (px de mundo); o.p presión de cuerpo; o.ch canal de color
  * @param o.motion opciones del plan de velocidad (motion.planStroke)
  */
-export function depositStroke(guide, {w = 4.2, p = 0.9, ch = 0, seed = 1, motion = {}, nib = -0.6, aspect = 1.45, tremor = 0.7, land = true, lift = true} = {}) {
+export function depositStroke(guide, {w = 4.2, p = 0.9, ch = 0, seed = 1, motion = {}, nib = -0.6, aspect = 1.45, tremor = 0.7, land = true, lift = true, down = 0} = {}) {
   const path = resample(guide, 0.5);
   const plan = planStroke(path, motion);
   const n = path.n;
@@ -82,7 +82,9 @@ export function depositStroke(guide, {w = 4.2, p = 0.9, ch = 0, seed = 1, motion
     const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
     // temblor en el tiempo (~9 Hz fisiológico, amplitud sub-píxel) y deriva lenta en el espacio
     const off = tremor * (0.35 * nTrem(t * 9) + 0.65 * nTrem2(s / 40));
-    let pr = p * (1 + 0.12 * nPress(s / 23));
+    // `down`: al escribir, las bajadas cargan más que las subidas (la mano empuja hacia abajo)
+    const dy = (path.y[b] - path.y[a]) / Math.max(1e-6, path.s[b] - path.s[a]);
+    let pr = p * (1 + 0.12 * nPress(s / 23)) * (1 + down * dy);
     if (land && s < 5) pr *= 1.18 - 0.03 * s;
     const fromEnd = path.L - s;
     if (lift && fromEnd < 14) pr *= 0.35 + 0.65 * (fromEnd / 14);

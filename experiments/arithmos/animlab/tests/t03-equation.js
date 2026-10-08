@@ -29,7 +29,7 @@ let T = 0, handXY = null;
 const hand = []; // [{start, end, st}] tramos con contacto, para la sonda
 
 function strokeAt(guide, ch, seed, speed = SIZE * 7.5) {
-  return depositStroke(guide, {w: W, p: 0.92, ch, seed, motion: {speed, accel: speed * 16, k0: 1 / (SIZE * 0.55), v0: 25, v1: 35}});
+  return depositStroke(guide, {w: W, p: 0.88, ch, seed, down: 0.14, motion: {speed, accel: speed * 16, k0: 1 / (SIZE * 0.55), v0: 25, v1: 35}});
 }
 function travel(to) {
   if (handXY) T += liftTime(Math.hypot(to[0] - handXY[0], to[1] - handXY[1]));
@@ -139,12 +139,24 @@ function build() {
   // 4. 5 + 3 = 8: se escribe el 8 debajo, se borra lo cancelado y la suma, y todo se acomoda alrededor del «=»
   const five = p2.get('five'), c = p2.get('c');
   const mid = (five.x + c.x + c.w) / 2;
+  // el gesto que une: se subraya «5 + 3» y el 8 se escribe debajo del subrayado
+  events.push(['subraya 5 + 3', T]);
+  {
+    const ux0 = five.x - 6, ux1 = c.x + c.w + 6, uy = YB + SIZE * 0.22;
+    const guide = [[ux0, uy], [(ux0 + ux1) / 2, uy + 3], [ux1, uy - 1]];
+    travel(guide[0]);
+    const st = strokeAt(guide, 0, 905, SIZE * 9);
+    extras.push({st, start: T, group: 'R'});
+    hand.push({start: T, end: T + st.T, st});
+    T += st.T + 0.12;
+    handXY = guide.at(-1);
+  }
   events.push(['escribe 8 debajo de 5 + 3', T]);
   writeGlyph('eight', '8', mid - GLYPHS['8'].adv * SIZE * 0.4, YB + SIZE * 1.25, 0, 77, SIZE * 0.8);
   T += 0.45;
   erase('L', [p2.get('m').x - 10, YB - SIZE * 1.05, p2.get('b').x + p2.get('b').w + 12, YB + SIZE * 0.15]);
   T += 0.08;
-  erase('R', [five.x - 10, YB - SIZE * 1.05, c.x + c.w + 12, YB + SIZE * 0.15]);
+  erase('R', [five.x - 10, YB - SIZE * 1.05, c.x + c.w + 12, YB + SIZE * 0.3]);
   T += 0.25;
   const L3 = layoutAround(tok(S3), PIVOT, SIZE);
   const p3 = new Map(L3.map(l => [l.key, l]));
@@ -207,20 +219,26 @@ export default {
     ctx.save();
     ctx.lineCap = 'round';
     ctx.strokeStyle = '#fff';
+    // rastro de polvo con la forma de lo que se arrastró: el glifo, repetido tenue a lo largo del camino
     for (const g of glyphs.values()) {
       for (const m of g.moves) {
         if (t < m.start) continue;
         const k = minJerk((t - m.start) / m.dur);
         const age = Math.max(0, t - m.start - m.dur);
-        const a = 0.09 * Math.exp(-age / 1.5);
-        if (a < 0.004) continue;
-        const cx = g.home[0] + GLYPHS[g.ch].adv * g.size / 2, cy = g.home[1] - g.size * 0.45;
+        const a = 0.05 * Math.exp(-age / 1.5);
+        if (a < 0.003) continue;
         ctx.globalAlpha = a;
-        ctx.lineWidth = g.size * 0.55;
-        ctx.beginPath();
-        ctx.moveTo(cx + m.from[0], cy + m.from[1]);
-        ctx.lineTo(cx + lerp(m.from[0], m.to[0], k), cy + lerp(m.from[1], m.to[1], k));
-        ctx.stroke();
+        ctx.lineWidth = W * 1.5;
+        ctx.lineJoin = 'round';
+        for (let u = 0; u <= k + 1e-6; u += 0.08) {
+          const ox = lerp(m.from[0], m.to[0], u), oy = lerp(m.from[1], m.to[1], u) - Math.sin(Math.PI * u) * m.lift;
+          for (const {st} of g.strokes) {
+            const P = st.path;
+            ctx.beginPath();
+            for (let i = 0; i < P.n; i += 3) (i ? ctx.lineTo(P.x[i] + ox, P.y[i] + oy) : ctx.moveTo(P.x[i] + ox, P.y[i] + oy));
+            ctx.stroke();
+          }
+        }
       }
     }
     for (const e of erasers) {

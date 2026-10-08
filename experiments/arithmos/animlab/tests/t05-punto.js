@@ -12,10 +12,10 @@ import {depositStroke, drawDeposit} from '../core/deposit.js';
 import {minJerk, clamp, lerp} from '../core/motion.js';
 
 const YA = 250, YB = 640, R = 14;
-const BODY = 0.68; // presión del relleno: deja ver el diente (0.86 parecía papel recortado, E05 t05b)
+const BODY = 0.72; // presión del relleno: deja ver el diente (0.86 parecía papel recortado, E05 t05b)
 const X0 = 260, X1 = 760;
 // beats (s)
-const B = {appear: 0.4, move: 1.6, mark: 3.4, react: 3.4 + 0.2 + 0.12, split1: 5.3, split2: 6.9, split3: 8.1, line: 9.5, end: 11.8};
+const B = {appear: 0.4, move: 1.6, mark: 3.4, react: 3.4 + 0.2 + 0.12, split1: 5.3, split2: 6.6, split3: 7.5, line: 8.9, end: 11.2};
 const ROW = 525, SP = 75, C0 = 800 - ROW / 2 + SP * 3.5; // centro de la fila de 8
 const leafX = i => C0 - SP * 3.5 + i * SP; // posición final de la hoja i (0..7)
 
@@ -84,7 +84,8 @@ export default {
   probe(lab, t) {
     const s = sampleSim(sims[0], t);
     const j = jump(t - B.react);
-    return {B: {x: s.p[0], y: s.p[1] + j.dy, vx: s.v[0]}, A: stateA(t)};
+    const a = stateA(t);
+    return {B: {x: s.p[0], h: YB - (s.p[1] + j.dy), vx: s.v[0]}, A: {x: a.x, h: YA - a.y}};
   },
 };
 
@@ -121,7 +122,7 @@ function renderB(ctx, t) {
     let {ang, sl, sw} = d;
     let y = s.p[1];
     if (Math.abs(j.sy - 1) > 0.005 || j.dy) { ang = Math.PI / 2; sl = j.sy; sw = 1 / j.sy; y += j.dy; }
-    fillPressure(ctx, blobOutline(s.p[0], y, r, {ang, sl, sw, boil, seed: i + 1}), 0, BODY * fill);
+    fillPressure(ctx, blobOutline(s.p[0], y, r, {ang, sl, sw, boil, seed: i + 1}), 0, BODY * fill, [s.p[0], y], r * Math.max(sl, sw) * 1.08);
   });
   // cuellos entre hermanas que se están separando
   for (const size of [4, 2, 1]) {

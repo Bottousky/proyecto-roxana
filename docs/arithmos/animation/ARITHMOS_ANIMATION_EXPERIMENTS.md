@@ -160,3 +160,16 @@ Lección de proceso: los gráficos deben estar en unidades que no se puedan mali
 **Conclusión**: (1) apoyada sin reservas — es un salto de N1 a N3–N4 en locomoción. (2) apoyada en lo medible (sobrepaso y retraso), pero la actuación todavía no alcanza N4 porque el guion de anticipación y las siluetas son débiles. Nivel estimado B: Actuación N3, Timing N3, Continuidad N3.
 
 **Siguiente**: ciclo de pulido de R1 + E09 (lista en STATE), después E07 borrador visible y E10 microescena con mano visible.
+
+---
+
+## P1 — pulido por R1 y E09 (ciclo 6, 2026-10-07)
+
+Cambios (evidencia en `c06/`):
+- **Punto**: tope de deformación 0.25 (antes 0.42 → 2:1); relleno con presión decreciente hacia el borde (gradiente 1.08 → 1 → 0.55) que deshace el borde en el diente (`c06/punto-cmp.png`: arriba antes, medio después); divisiones a 1.3 s y 0.9 s (se aceleran); sonda de altura positiva hacia arriba (`c06/t05e/h.png`).
+- **Ecuación**: rastro de polvo con la forma del glifo arrastrado (repetido tenue a lo largo del camino) en lugar de franjas ovaladas (`c06/eq-cmp.png`, fila 1 antes / fila 2 después); **subrayado de «5 + 3»** y el 8 escrito debajo del subrayado (fila 3); bajadas 14 % más cargadas que las subidas en los glifos.
+- **Figura**: anticipación corregida (la mano baja y va atrás antes de subir: muesca visible a 6.1 s en `c06/t09d/hand.png`); respingo de cabeza en la sorpresa (headX a 7.4 s); ¾ de perfil al detenerse; paso 36·k y más balanceo.
+
+**Resultado**: los hallazgos aceptados de R1 están resueltos salvo los que dependen de piezas nuevas (borrador y mano visibles). En la figura, el ¾ no alcanzó: las poses del motor dejan los brazos pegados al torso (`c06/t09d/act.png`, cuadros 1–2) — **la debilidad es de diseño de poses, no de tiempo**.
+
+**Siguiente**: E07 borrador visible + neblina; E10 microescena con la mano que escribe (base de la vertical slice); un ciclo de poses con siluetas claras (brazos separados del torso, línea de acción).
