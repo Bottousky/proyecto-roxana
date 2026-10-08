@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-07, ciclo 13.
+**Última actualización**: 2026-10-07, ciclo 13 (cont.).
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Ver la vertical slice
@@ -34,6 +34,9 @@
 - R3 (VS1): No, pero Timing/Actuación/Continuidad/Matemática en N3. **VS2** (`c12/t10p`) corrige su lista mínima y agrega **interacción real**: el jugador toca los puntos (`?interactive=1&play=1`); tocar uno ya contado no suma marca («ya está»). Probado con clics reales (`scripts/animlab-interact.mjs`, `c12/interactive2`).
 - VS2.1 (`c13/t10q`): se aleja y mira antes de comprender. **R4: No** (Actuación y Legibilidad N2): correspondencia no trazable a 1×, 5 + 2 sin separación visible, mirada que no lidera, sin señal de toque, negación invisible, blanco de toque chico, Punto parece un octavo punto al final.
 - E13 palabras: minúsculas de un trazo (C) ganan a la fuente (A, B): a mitad de escritura la fuente se ve recortada. Falta el alfabeto completo (~60 signos). `ARITHMOS_ANIMATION_MIGRATION.md`: plan de adaptadores con la escala de uso (306 Label, 165 d.draw, 241 d.shot…).
+- E13b/E13c: alfabeto de un trazo completo para las etiquetas del juego (minúsculas, mayúsculas usadas, tildes, puntuación, × → ÷ ° < > ↑ ↓ ← √ ≈ % …).
+- VS3/VS4 (R4 corregida): cámara que se acerca con causa, Punto que llama al próximo punto, negación con repaso, blanco de toque ≥ 52 px CSS, Punto sobre la cabeza, **llave que une 5 y 2 con el 7 debajo** (sin inclinarse: la cabeza ya no tapa el atado).
+- R5 (VS4): No, pero Timing N4 (prov.) y el resto N3. **VS5** (`c15/t10w`): Punto dibuja lazos alrededor de los 5 y los 2 en la Ronda mientras el alumno escribe «5» y «2»; hilos en abanico; polvo en los cruces; poses de mirar con silueta; superposición medida (`c15/eureka.png`). Pendiente: R6.
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
 - **Se conserva**: el compuesto WebGL de presión + diente (`renderer.js`) — es la base de la textura en todas las técnicas ganadoras; el modelo de mundo/escenas, el director asincrónico, la UI, el guardado y el contenido de los 12 capítulos.
@@ -50,7 +53,7 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **Corregir R4** (lista en EXPERIMENTS) y revisión R5.
+1. **R6 sobre VS5** (en curso). Si aprueba: congelar la slice como benchmark (`c15/t10w`) y pasar a los adaptadores del plan de migración.
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
 4. ~~Rendimiento en escritorio~~ (E12: ~1 ms/cuadro con caché). Teléfono real [H].
