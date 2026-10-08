@@ -80,6 +80,8 @@ function build(taps = autoTaps()) {
     from = to;
     if (again) {
       sc.punto.push({kind: 'no', t: land + 0.3, at: to});
+      // el anillo de ese punto se repasa: «este ya está» (la tiza enfatiza repasando, no brillando)
+      sc.rings.push({t: land + 0.35, dot: i, again: true, st: depositStroke(circleGuide(DOTS[i][0], DOTS[i][1], 18, {seed: 140 + i, wob: 0.05, sweep: Math.PI * 2 + 0.4}), {w: 4.6, p: 0.85, ch: BLUE, seed: 150 + i, motion: {speed: 700}})});
       sc.score.push({type: 'note', t: land + 0.3, freq: 233, dur: 0.18, gain: 0.05}, {type: 'note', t: land + 0.5, freq: 220, dur: 0.22, gain: 0.05});
       ev(`ya contado ${i}`, land);
       t = land + 1.0;
@@ -107,16 +109,19 @@ function build(taps = autoTaps()) {
     t = land + 0.1;
   }
   sc.counted = n;
+  sc.pending = DOTS.map((_, k) => k).filter(k => !counted.has(k));
+  sc.idleFrom = t + 0.4;
   if (n < 7) { // falta contar: la escena espera al jugador
     sc.duration = Infinity;
     sc.actor = buildActor({ground: G, x: X0, k: K, duration: Math.max(30, t + 30), poses: POSES2, script: baseScript(T_PUNTO, taps.length ? taps[0].t + 0.3 : Infinity)});
-    sc.camera = cameraTrack([{t: 0, cx: 1440, cy: 600, w: 1250}]);
+    sc.camera = cameraTrack(cameraShots(T_PUNTO, Infinity));
     return sc;
   }
   ev('fin de contar', t);
   // 4. Punto vuelve junto al alumno y mira lo escrito
-  const P1 = [X1 + 150, G - 410];
-  sc.punto.push({kind: 'hop', t: t + 0.25, dur: 0.6, from, to: P1, h: 60});
+  // vuelve al hombro del alumno (R4: quieto en el origen de los hilos parecía un octavo punto)
+  sc.punto.push({kind: 'hop', t: t + 0.25, dur: 0.6, from, toFn: perchAt, h: 60});
+  sc.punto.push({kind: 'perch', t: t + 0.25 + 0.6 + 0.35});
   sc.score.push({type: 'note', t: t + 0.85, freq: 392, dur: 0.2, gain: 0.04});
   // 5. debajo del atado «5», debajo del par «2», «+» en el medio
   t += 1.15;
@@ -149,7 +154,7 @@ function build(taps = autoTaps()) {
   const T_BACK = t + 0.35;
   const T_GET = T_BACK + 0.15 + 1.35 + 0.4;
   ev('comprende', T_GET);
-  sc.punto.push({kind: 'bounce', t: T_GET + 0.15, at: P1, n: 2});
+  sc.punto.push({kind: 'bounce', t: T_GET + 0.15, n: 2});
   sc.score.push({type: 'note', t: T_GET + 0.15, freq: 523, dur: 0.6, gain: 0.05}, {type: 'note', t: T_GET + 0.32, freq: 659, dur: 0.6, gain: 0.045}, {type: 'note', t: T_GET + 0.5, freq: 784, dur: 0.9, gain: 0.04});
   sc.T_GET = T_GET;
   sc.duration = T_GET + 2.6; // R3: ≤ 1 s quieto al final
@@ -162,8 +167,8 @@ function build(taps = autoTaps()) {
     // anticipación: se encoge y el brazo baja por debajo de la ecuación antes de subir (R3/VS2: barría por encima de «5+2=7»)
     {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
     {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true}},                  // dos pasos atrás
-    {t: T_BACK + 0.2, pose: 'stand', gaze: [0.7, 0.1]},                                 // mira lo que escribió
-    {t: T_GET - 0.4, pose: 'stand', gaze: [1, -0.4]},                                   // mira la Ronda... (pausa ≥ 0.35 s)
+    {t: T_BACK + 0.2, pose: 'lookDown', gaze: [0.7, 0.6]},                              // mira lo que escribió (cabeza abajo)
+    {t: T_GET - 0.5, pose: 'lookUp', gaze: [1, -0.7]},                                  // levanta la cabeza hacia la Ronda (los ojos primero: canal de mirada más rápido)
     {t: T_GET - 0.12, pose: 'lookDown'},                                                // micro-encogida
     {t: T_GET, pose: 'eureka', face: 0.9, gaze: [1, -0.5]},                             // ¡ya está! (el brazo sube lejos de la escritura)
     {t: T_GET + 1.0, pose: 'open', gaze: [0.2, -0.3]},
@@ -176,11 +181,7 @@ function build(taps = autoTaps()) {
     prev = g;
   }
   // ——— cámara: general → medio (llega antes de que aparezca Punto) → abre al final ———
-  sc.camera = cameraTrack([
-    // sin zoom de entrada (R2: «zoom sin causa»): el plano ya es el medio; sólo se abre al final, cuando el alumno da un paso atrás
-    {t: 0, cx: 1440, cy: 600, w: 1250},
-    {t: T_BACK + 0.3, cx: 1400, cy: 610, w: 1450},
-  ]);
+  sc.camera = cameraTrack(cameraShots(T_PUNTO, T_BACK));
   return sc;
 }
 
@@ -206,6 +207,7 @@ function puntoAt(t) {
     const tl = t - p.t;
     if (p.kind === 'appear') { pos = p.at; fill = clamp(tl / p.dur); if (tl < p.dur) sl = 1; }
     else if (p.kind === 'hop') {
+      if (p.toFn) p.to = p.toFn(p.t + p.dur);
       if (tl >= p.dur + 0.35) { pos = p.to; continue; }
       const crouch = 0.12; // anticipación 80–140 ms (lenguaje visual; R3)
       if (tl < crouch) { pos = p.from; sl = 1 - 0.22 * minJerk(tl / crouch); }               // se agacha
@@ -220,15 +222,41 @@ function puntoAt(t) {
         sl = 1 - 0.24 * Math.exp(-k * 5) * Math.cos(k * 11);
       }
     } else if (p.kind === 'no') {
-      if (tl < 0.6) { pos = [p.at[0] + 7 * Math.sin(tl * 26) * Math.exp(-tl * 4), p.at[1]]; sl = 1 + 0.08 * Math.abs(Math.sin(tl * 26)) * Math.exp(-tl * 4); ang = 0; }
+      if (tl < 0.8) { pos = [p.at[0] + 15 * Math.sin(tl * 24) * Math.exp(-tl * 3.2), p.at[1]]; sl = 1 + 0.08 * Math.abs(Math.sin(tl * 26)) * Math.exp(-tl * 4); ang = 0; }
       else pos = p.at;
+    } else if (p.kind === 'perch') {
+      pos = perchAt(t);
     } else if (p.kind === 'bounce') {
-      const per = 0.36, i = Math.floor(tl / per);
-      if (i < p.n) { const u = (tl % per) / per; pos = [p.at[0], p.at[1] - 4 * 26 * u * (1 - u)]; sl = u < 0.15 || u > 0.85 ? 0.82 : 1.1; }
-      else pos = p.at;
+      const per = 0.36, i = Math.floor(tl / per), at = perchAt(t);
+      if (i < p.n) { const u = (tl % per) / per; pos = [at[0], at[1] - 4 * 26 * u * (1 - u)]; sl = u < 0.15 || u > 0.85 ? 0.82 : 1.1; }
+      else pos = at;
+    }
+  }
+  // esperando al jugador: cada 1.8 s Punto se inclina y da un saltito hacia el próximo punto sin contar (sin texto: «ese»)
+  if (pos && S.counted < 7 && t > S.idleFrom) {
+    const next = DOTS[S.pending[0]];
+    const ph = ((t - S.idleFrom) % 1.8) / 1.8;
+    if (next && ph < 0.3) {
+      const u = ph / 0.3, dx = next[0] - pos[0], dy = next[1] - pos[1], l = Math.hypot(dx, dy) || 1;
+      const hump = Math.sin(Math.PI * u);
+      pos = [pos[0] + dx / l * 12 * hump, pos[1] + dy / l * 12 * hump - 14 * hump];
+      sl = 1 + 0.15 * hump; ang = Math.atan2(dy, dx);
     }
   }
   return pos ? {pos, sl, ang, fill} : null;
+}
+
+/** Arriba de la cabeza del alumno, donde Punto se posa (en el hombro quedaba tapado por la cabeza: t10r). */
+function perchAt(t) {
+  const sk = S.actor.at(t);
+  return [sk.head[0] - 4 * Math.sign(sk.f || 1), sk.head[1] - 15.5 * K - 17];
+}
+
+/** Planos: medio fijo; al aparecer Punto se acerca (la causa es Punto) y llega antes de contar; se abre al alejarse el alumno. */
+function cameraShots(T_PUNTO, T_BACK) {
+  const shots = [{t: 0, cx: 1440, cy: 600, w: 1250}, {t: T_PUNTO + 0.45, cx: 1480, cy: 560, w: 1020, arrive: T_PUNTO + 1.1}];
+  if (Number.isFinite(T_BACK)) shots.push({t: T_BACK + 0.3, cx: 1400, cy: 600, w: 1450});
+  return shots;
 }
 
 // ——— brazo que escribe ———
@@ -338,7 +366,8 @@ export default {
   /** Interacción: tocar un punto de la Ronda mientras se cuenta. Devuelve true si la escena cambió. */
   onPointer(lab, t, [wx, wy]) {
     if (!lab.params.has('interactive') || S.counted >= 7 || t < S.waitFrom - 0.3) return false;
-    let best = -1, bd = 46;
+    // radio de toque: 46 px de mundo o lo que haga falta para ≥ 52 px CSS de diámetro (R4: en 844×390 eran ~5 px)
+    let best = -1, bd = Math.max(46, 26 / (lab.view.scale / lab.view.dpr));
     DOTS.forEach(([x, y], i) => { const d = Math.hypot(wx - x, wy - y); if (d < bd) { bd = d; best = i; } });
     if (best < 0) return false;
     this.taps.push({t, dot: best});

@@ -26,7 +26,9 @@ async function open(scale, video = false) {
   return {ctx, page};
 }
 const {ctx, page} = await open(dpr);
-const dur = await page.evaluate(() => window.__lab.duration);
+// una escena interactiva que espera al jugador tiene duración infinita: se acota (último instante pedido + 1 s, o --maxdur)
+const rawDur = await page.evaluate(() => window.__lab.duration);
+const dur = Number.isFinite(rawDur) ? rawDur : Number(opt.maxdur || (opt.times ? Math.max(...opt.times.split(',').map(Number)) + 1 : 30));
 const n = Number(opt.frames || 12);
 const times = opt.times ? opt.times.split(',').map(Number) : Array.from({length: n}, (_, i) => +(dur * i / (n - 1)).toFixed(3));
 const shots = [];

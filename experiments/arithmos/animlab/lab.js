@@ -151,6 +151,7 @@ if (params.has('play')) {
   });
   window.__lab.tap = (wx, wy) => { const r = test.onPointer?.(lab, tNow, [wx, wy]); return r; };
   window.__lab.now = () => tNow;
+  window.__lab.toScreen = (wx, wy) => camera.toScreen(lab.view, wx, wy);
   const loop = now => {
     const D = test.duration; // puede cambiar (escena interactiva que espera al jugador)
     let t = (now - start) / 1000 * speed;
