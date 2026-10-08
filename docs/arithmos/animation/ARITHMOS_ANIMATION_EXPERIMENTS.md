@@ -313,3 +313,22 @@ R3: **No**, pero sube: Timing N3, Actuación N3, Continuidad N3, Matemática N3;
 - **A mitad de escritura**: B muestra la «t» cortada por un rectángulo vertical (se ve que es un barrido); C muestra el palo de la «t» dibujándose. Sólo C cumple «nada aparece sin ser dibujado».
 
 **Conclusión**: C para todo texto que se ve escribir; la fuente queda sólo para la lectura limpia (capa de accesibilidad) y la interfaz. **Trabajo pendiente**: alfabeto completo (a–z, mayúsculas usadas, á é í ó ú ü ñ, ¿ ? ¡ ! , . : → ×) ≈ 60 signos, diseñados y revisados en hoja como `c13/words-b`. Es diseño, no mecánica: lo hace la sesión principal, con revisión independiente de la hoja.
+
+---
+
+## Revisión R4 (VS2.1) y VS3/VS4 — ciclo 13, 2026-10-07
+
+R4: **No** (Actuación y Legibilidad N2; Timing, Textura, Continuidad, Matemática N3). Disposición:
+
+| R4 | Disposición |
+|---|---|
+| Correspondencia no trazable a 1×; 5 + 2 no se separa | Cámara se acerca al aparecer Punto (plano 1020 de ancho durante el conteo y la escritura): marcas 23 px CSS en 844×390. **Además** (VS4): llave que une los grupos y «7» debajo. |
+| La mirada no lidera antes de comprender | Mira lo escrito (cabeza abajo), después la Ronda (cabeza arriba, la mirada se mueve antes por su canal más rápido), micro-encogida, eureka. |
+| Sin señal para tocar | Mientras espera, Punto se inclina y da un saltito hacia el próximo punto sin contar cada 1.8 s (`c13/strip-wait`). |
+| La negación no se ve | Vaivén de 15 px durante 0.8 s y **repaso del anillo** de ese punto (`c13/interactive3/2-ya-contado.png`). |
+| Blanco de toque diminuto | Radio ≥ 26 px CSS (≥ 52 px de diámetro) además del radio de mundo. |
+| Punto parece un octavo punto al final | Vuelve al alumno y se posa sobre su cabeza (en el hombro lo tapaba la cabeza). |
+| Recorte dpr 3 de las marcas | **Hecho y reveló un defecto nuevo** (`c13/tally-dpr3`): al inclinarse para «= 7», la cabeza tapaba el atado. → **VS4**: sin inclinación; la llave y el «7» quedan al alcance (`reachOver` 0) y debajo (`c14/t10t/m.png`). |
+| Final sin salida / repetir | Pendiente (no es parte de la escena; lo resuelve el juego). |
+
+Medidas en 844×390: cifra 23 px CSS (plano medio), 16 px (final); «+» 8.6 px en el final (por debajo de 12 px: defecto abierto menor).

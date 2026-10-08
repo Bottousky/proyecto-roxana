@@ -28,7 +28,7 @@ const DOTS = [[1500, 520], [1585, 470], [1640, 560], [1560, 615], [1710, 490], [
 // la escritura va a la derecha de la cabeza (radio ≈ 42) y a escala de mano: letras ≈ 8 % del alto de la figura
 // (t10a: las marcas tapaban la cabeza y el paso al costado tapaba lo escrito)
 const TALLY = {x: X1 + 58, top: G - 300, bot: G - 266, gap: 13, pairDx: 64}; // R3: ≥ 8 px entre marcas a 1600 y grupos separados
-const NUM = {y: G - 214, size: 34};
+const NUM = {y: G - 226, size: 34}; // pegado bajo las marcas: deja lugar a la llave y al 7 dentro del alcance
 const W = 5.5;
 
 let S; // escena construida
@@ -140,15 +140,21 @@ function build(taps = autoTaps()) {
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
   writeGlyph('+', TALLY.x + (1.5 * TALLY.gap + TALLY.pairDx + TALLY.gap / 2) / 2 - GLYPHS['+'].adv * sz * 0.55, NUM.y, sz * 1.1, 121); // «+» a ≥ 50 % del alto de la cifra (R2)
   // 6. un paso a la derecha y «= 7»
-  // 6. se inclina para llegar más a la derecha (sin pasar por delante de lo escrito) y «= 7»
-  const T_STEP = t + 0.1;
-  ev('se inclina', T_STEP);
-  t = T_STEP + 0.45;
-  const eqX = TALLY.x + TALLY.pairDx + TALLY.gap + 0.32 * sz;
-  writeGlyph('=', eqX, NUM.y, sz, 131);
-  t += 0.12;
-  writeGlyph('7', eqX + (GLYPHS['='].adv + 0.22) * sz, NUM.y, sz, 141);
-  ev('escribe = 7', t);
+  // 6. una llave une los dos grupos y debajo el 7: «5 y 2, juntos, son 7» (R4/c13: inclinarse para «= 7» metía la cabeza
+  //    sobre el atado; con la llave todo queda al alcance sin inclinarse y la unión de los grupos se dibuja)
+  const T_STEP = t + 0.12;
+  ev('une los grupos', T_STEP);
+  t = T_STEP;
+  {
+    const bx0 = TALLY.x - 4, bx1 = TALLY.x + TALLY.pairDx + TALLY.gap + 6, by = NUM.y + 10, bm = (bx0 + bx1) / 2;
+    const brace = [[bx0, by], [bx0 + 6, by + 9], [bm - 10, by + 11], [bm, by + 21], [bm + 10, by + 11], [bx1 - 6, by + 9], [bx1, by]];
+    const prev = sc.hand.at(-1);
+    t = Math.max(t, prev.t1 + liftTime(Math.hypot(brace[0][0] - prev.st.path.x.at(-1), brace[0][1] - prev.st.path.y.at(-1))));
+    t = write(chalk(brace, 125, {motion: {speed: 520}}), t, 'llave');
+    t += 0.1;
+    writeGlyph('7', bm - GLYPHS['7'].adv * sz / 2, by + 21 + sz + 6, sz, 141);
+  }
+  ev('escribe 7', t);
   // 7. comprende: el alumno se abre, Punto rebota dos veces; la cámara se aleja
   // primero se aleja para mirar lo hecho; la comprensión llega al ver el conjunto (y el brazo ya no pasa por la escritura)
   const T_BACK = t + 0.35;
@@ -163,7 +169,7 @@ function build(taps = autoTaps()) {
     ...baseScript(T_PUNTO, Math.max(5.0, taps[0].t + 0.3)),
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
     {t: sc.events['escribe 5 y 2'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
-    {t: T_STEP, pose: 'write', overrides: {lean: 0.36, armR: [1.3, 0.3]}, gaze: [0.8, 0.5]},
+    {t: T_STEP, pose: 'write', overrides: {drop: 8}, gaze: [0.8, 0.6]},           // dobla apenas las rodillas para escribir más abajo
     // anticipación: se encoge y el brazo baja por debajo de la ecuación antes de subir (R3/VS2: barría por encima de «5+2=7»)
     {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
     {t: T_BACK + 0.15, walk: {to: X1 - 170, speed: 190, back: true}},                  // dos pasos atrás
