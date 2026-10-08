@@ -26,22 +26,13 @@ def sp(i):
     a = p[i-1]['p']['punto']; b = p[i]['p']['punto']
     return 0 if not a or not b else ((b['x']-a['x'])**2 + (b['h']-a['h'])**2) ** 0.5 / dt
 t_fin = ev['fin de contar']
-# vuelo = la altura cambia (al aterrizar la altura queda fija aunque el cuerpo siga de largo en x); se unen huecos ≤ 30 ms (el ápice)
-runs, wins, cur, gap = [], [], None, 0
-for i in range(1, len(p)):
-    t = p[i]['t']
-    if not ev['aparece Punto'] + 0.9 <= t <= t_fin + 0.2: continue
-    a, b = p[i-1]['p']['punto'], p[i]['p']['punto']
-    air = bool(a and b and abs(b['h'] - a['h']) / dt > 2)
-    if air:
-        if cur is None: cur = t
-        gap = 0; last = t
-    elif cur is not None:
-        gap += 1
-        if gap > 7: runs.append(round(last - cur + dt, 3)); wins.append((cur, last)); cur = None
+# saltos de conteo: del plan de la escena (metrics.hops: agachada 0.12 s + vuelo); en cada uno, vx a 60 Hz desde el
+# despegue hasta 0.3 s después de aterrizar (la altura ya no sirve para detectar el vuelo: el centro baja al aplastarse)
+hops = [h for h in m['hops'] if ev['aparece Punto'] < h['t'] < t_fin]
+runs = [round(h['dur'] - 0.12, 3) for h in hops]
 ramps = []
-for t0, t1 in wins:  # vx a 60 Hz desde 50 ms antes del despegue hasta 0.3 s después de aterrizar
-    s60 = [x for x in p if t0 - 0.05 <= x['t'] <= t1 + 0.3 and x['p']['punto']][::4]
+for h in hops:
+    s60 = [x for x in p if h['t'] + 0.12 - 0.05 <= x['t'] <= h['t'] + h['dur'] + 0.3 and x['p']['punto']][::4]
     v = [(b['p']['punto']['x'] - a['p']['punto']['x']) * 60 for a, b in zip(s60, s60[1:])]
     pk = max(map(abs, v)) or 1
     ramps.append(round(max(abs(b - a) for a, b in zip(v, v[1:])) / pk, 2))
@@ -60,13 +51,25 @@ dd = lambda a, b: ((b['p']['punto']['x']-a['p']['punto']['x'])**2 + (b['p']['pun
 spikes = [round(P[i]['t'], 3) for i in range(2, len(P) - 1) if dd(P[i-1], P[i]) > 1 and dd(P[i-1], P[i]) > 3 * max(dd(P[i-2], P[i-1]), dd(P[i], P[i+1]), 0.2)]
 sq = max((abs(b['p']['punto']['squash'] - a['p']['punto']['squash']), b['t']) for a, b in zip(P, P[1:]))
 # saltos: cambio máximo de vx por cuadro de 60 Hz, relativo al pico de ese salto (rampas, no arranques en seco)
+# pausas de lectura (VL §5.4): quietud antes de cada idea nueva, a 60 Hz: Punto < 5 px/s, sin tiza, mano < 20 px/s
+def still_before(T):
+    xs = [x for x in p if x['t'] < T][::-1][::4]; n = 0
+    for b, a in zip(xs, xs[1:]):
+        d = b['t'] - a['t']; pa, pb = a['p']['punto'], b['p']['punto']
+        v = ((pb['x'] - pa['x'])**2 + (pb['h'] - pa['h'])**2) ** 0.5 / d
+        if v < 5 and b['p']['contact'] == 0 and abs(b['p']['handH'] - a['p']['handH']) / d < 20: n += 1
+        else: break
+    return round(n / 60, 2)
+pauses = {k: still_before(ev[k]) for k in ('escribe el 5', 'lazo de 2', 'une los grupos', 'empieza el 7') if k in ev}
 lines = [
-  f'saltos de conteo (vuelo medido, s): {runs}; 3.º/1.º = {runs[2]/runs[0]:.2f}' if len(runs) > 2 else f'saltos: {runs}',
+  f'saltos de conteo (vuelo del plan, s): {runs}; 3.º/1.º = {runs[2]/runs[0]:.2f}' if len(runs) > 2 else f'saltos: {runs}',
   f'saltos: máx. cambio de vx por cuadro de 60 Hz / pico del salto = {ramps}',
+  f'pausas de lectura (s quieto antes de cada idea; Punto < 5 px/s, sin tiza, mano < 20 px/s, a 60 Hz): {pauses}',
   f'tiza: aceleración máx. en render a 240 Hz = {acc:.0f} px/s² (plan: {m.get("chalkAccelMax")})',
   f'pies: deslizamiento máx. con el pie apoyado = {slide:.2f} px por 1/240 s',
   f'Punto: saltos de posición aislados = {len(spikes)} {spikes[:5]}; mayor cambio de aplastamiento = {sq[0]:.1f} % en 1/240 s (t = {sq[1]:.3f})',
   f'alcance: reachOver = {m.get("reachOver")}',
+  'textura (presión antes del compuesto; autocorr. a 2 px del grano tras quitar la tendencia: cerca de 1 = "a cuentas" regulares, cerca de 0 = grano sin patrón; el 0.85 del motor viejo (E01) era sobre una recta, sin quitar tendencia): ' + ('; '.join(f"{x['where']}: pico medio {x['peakMean']}, CV pico {x['peakCV']}, CV ancho {x['widthCV']}, autocorr. 2 px {x['autocorr2px']} ({x['cols']} columnas)" for x in m['texture']) if m.get('texture') else 'sin medir'),
 ]
 open(f'{D}/medidas.txt', 'w').write('\n'.join(lines) + '\n')
 tg = ev['comprende']

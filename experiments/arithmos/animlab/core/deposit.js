@@ -140,7 +140,7 @@ export function depositSpeed(st, tl) {
  * El bitmap guarda la presión en espacio de mundo a la escala de la vista (se rehace si la escala cambia > 30 %).
  * Se compone con 'lighter', como las estampas: el resultado es el mismo que estamparlo.
  */
-export function drawDepositCached(ctx, st, tl = Infinity, fade = 1) {
+export function drawDepositCached(ctx, st, tl = Infinity, fade = 1, op = 'lighter') {
   if (tl < st.T || fade !== 1) return drawDeposit(ctx, st, tl, fade);
   const m = ctx.getTransform();
   const scale = Math.hypot(m.a, m.b);
@@ -161,7 +161,7 @@ export function drawDepositCached(ctx, st, tl = Infinity, fade = 1) {
     c = st.cache = {canvas, scale, x0, y0, w: x1 - x0, h: y1 - y0};
   }
   const prev = ctx.globalCompositeOperation;
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = op; // 'lighten' (máximo): para trazos que no deben sumarse entre sí (hilos que convergen)
   ctx.drawImage(c.canvas, c.x0, c.y0, c.w, c.h);
   ctx.globalCompositeOperation = prev;
 }

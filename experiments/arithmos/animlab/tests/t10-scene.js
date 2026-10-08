@@ -172,8 +172,9 @@ function build(taps = autoTaps()) {
   };
   let tp = t + 0.3;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from, to: startOf(L5), h: 40, brake: true});
-  tp += 0.45 + 0.25;
+  tp += 0.45 + 0.4; // Punto quieto 0.4 s antes del lazo y del 5 (R12: 0.25)
   sc.punto.push({kind: 'trace', t: tp - 0.14, st: L5});
+  const tL5 = tp;
   sc.links.push({t: tp, st: L5});
   sc.score.push({type: 'chalk', t0: tp, t1: tp + L5.T, speed: tt => depositSpeed(L5, tt - tp)});
   t = tp;
@@ -182,8 +183,9 @@ function build(taps = autoTaps()) {
   ev('lazo de 5', tp);
   tp = Math.max(tp + L5.T, t) + 0.15;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.4, from: endOf(L5), to: startOf(L2), h: 30, brake: true});
-  tp += 0.4 + 0.2;
+  tp += 0.4 + 0.4; // quieto 0.4 s antes del lazo de 2, el + y el 2 (R12: 0.20)
   sc.punto.push({kind: 'trace', t: tp - 0.14, st: L2});
+  const tL2 = tp;
   sc.links.push({t: tp, st: L2});
   sc.score.push({type: 'chalk', t0: tp, t1: tp + L2.T, speed: tt => depositSpeed(L2, tt - tp)});
   t = Math.max(t, tp);
@@ -191,6 +193,24 @@ function build(taps = autoTaps()) {
   writeGlyph('+', TALLY.x + (1.5 * TALLY.gap + TALLY.pairDx + TALLY.gap / 2) / 2 - GLYPHS['+'].adv * sz * 0.65, NUM.y, sz * 1.3, 121);
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
   ev('lazo de 2', tp);
+  // al cerrarse cada lazo, los hilos de sus puntos se juntan en UN hilo: del atado de marcas al lazo (contar de a uno →
+  // el grupo). Es movimiento de lo que ya está, no un fundido: cada hilo desliza sus dos extremos hasta coincidir.
+  // el hilo de 5 llega al lado cercano de su lazo con un arco bajo; el de 2, por arriba a la derecha bajando de lo alto
+  // (así no cruza el lazo de 5 ni el otro hilo)
+  const top5 = Math.min(...L5.path.y);
+  const gatherOf = (idx, st, t0, score, ctrl) => {
+    const ls = sc.links.filter(l => l.i != null && idx.includes(l.i));
+    const b = [ls.reduce((a, l) => a + l.b[0], 0) / ls.length, Math.min(...ls.map(l => l.b[1]))];
+    let a = null, best = -Infinity;
+    for (let k = 0; k < st.path.n; k++) { const q = [st.path.x[k], st.path.y[k]], v = score(q); if (v > best) { best = v; a = q; } }
+    return {idx, t0, a, b, c: ctrl(a, b)};
+  };
+  sc.gather = [
+    gatherOf(order.slice(0, 5), L5, tL5 + L5.T + 0.1, q => -q[1] - 0.8 * q[0], (a, b) => [(a[0] + b[0]) / 2, Math.min(a[1], b[1]) - 45]), // el lado cercano, arco bajo: el de 2 pasa por encima sin cruzarlo
+    gatherOf(order.slice(5), L2, tL2 + L2.T + 0.1, q => 0.6 * q[0] - q[1], a => [a[0] - 20, Math.min(top5, a[1]) - 210]),
+  ];
+  ev('se juntan los hilos de 5', sc.gather[0].t0);
+  ev('se juntan los hilos de 2', sc.gather[1].t0);
   ev('escribe el +', sc.strokes.find(x => x.tag === '+').t);
   ev('escribe el 2', sc.strokes.find(x => x.tag === '2').t);
   // 6. la unión: mientras el alumno dibuja la llave que junta 5 y 2 (en el papel), Punto rodea los siete con un lazo grande
@@ -201,7 +221,7 @@ function build(taps = autoTaps()) {
   const LALL = depositStroke(lassoGuide(DOTS, 58, 172, Math.atan2(braceEnd[1] - cyR, braceEnd[0] - cxR)), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 2500, v0: 8, v1: 10, k0: 1 / 60, smooth: 90}});
   tp = Math.max(tp + L2.T, t) + 0.42; // quietud ≥ 0.35 s con «5+2» escrito antes de unir (R11: 0.31 s)
   sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from: endOf(L2), to: startOf(LALL), h: 40, brake: true});
-  tp += 0.45 + 0.2;
+  tp += 0.45 + 0.4; // quieto 0.4 s antes de unir (R12: 0.20)
   const T_STEP = tp;
   ev('une los grupos', T_STEP);
   sc.punto.push({kind: 'trace', t: tp - 0.14, st: LALL});
@@ -235,6 +255,8 @@ function build(taps = autoTaps()) {
     sc.T_UNION = tc + CARRY.T;
     sc.carryEnd = endOf(CARRY);
     ev('empieza el 7', t + 0.0);
+    sc.seven = {x: bm - GLYPHS['7'].adv * sz / 2, top: by + 21 + 6, w: GLYPHS['7'].adv * sz}; // para medir la textura
+    sc.braceBox = {x: bx0 + 10, y: by - 4, w: bx1 - bx0 - 20, h: 30};
     writeGlyph('7', bm - GLYPHS['7'].adv * sz / 2, by + 21 + sz + 6, sz, 141);
   }
   sc.punto.push({kind: 'hop', t: t + 0.15, dur: 0.6, from: sc.carryEnd, toFn: perchAt, h: 60});
@@ -255,7 +277,7 @@ function build(taps = autoTaps()) {
     ...baseScript(T_PUNTO, Math.max(5.0, taps[0].t + 0.3)),
     ...sc.gaze,
     {t: sc.events['fin de contar'] + 0.1, pose: 'think', gaze: [0.5, 0.2]},
-    {t: sc.events['escribe el 5'] - 0.25, pose: 'write', gaze: [0.6, 0.4]},
+    {t: sc.events['escribe el 5'] - 0.75, pose: 'write', gaze: [0.6, 0.4]},          // se prepara antes de la pausa de lectura (R12)
     {t: T_STEP, pose: 'write', overrides: {drop: 8}, gaze: [0.8, 0.6]},           // dobla apenas las rodillas para escribir más abajo
     // anticipación: se encoge y el brazo baja por debajo de la ecuación antes de subir (R3/VS2: barría por encima de «5+2=7»)
     {t: T_BACK, pose: 'lookDown', overrides: {armR: [0.15, 0.35]}, gaze: [0.6, 0.3]},   // baja el brazo y anticipa el paso atrás
@@ -294,6 +316,7 @@ function baseScript(T_PUNTO, writeAt = 5.0) {
 }
 
 // ——— Punto ———
+const R_PUNTO = 15;
 function puntoAt(t) {
   let pos = null, sl = 1, ang = Math.PI / 2, fill = 0;
   for (const p of S.punto) {
@@ -303,7 +326,7 @@ function puntoAt(t) {
       // nace de un toque: una mota que se hincha con sobrepaso y se asienta (R11: crecía lineal, como un fundido de escala)
       pos = p.at;
       const k = Math.max(0, tl - 0.05) / p.dur;
-      fill = tl < 0.05 ? 0.12 : Math.min(1.25, 1 - 0.88 * Math.exp(-k * 6) * Math.cos(k * 7.5));
+      fill = tl < 0.05 ? 0.12 : 1 - 0.88 * Math.exp(-k * 7.5) * Math.cos(k * 7.5); // sobrepaso ≈ 7 % (VL: ≤ 8 %)
       sl = tl < 0.05 ? 1 : 1 + 0.12 * Math.exp(-k * 5) * Math.sin(k * 11);
     }
     else if (p.kind === 'hop') {
@@ -320,11 +343,12 @@ function puntoAt(t) {
       const b = a, lam = p.brake ? 0 : 0.55, A = 1 - a / 2 - b * (1 - lam) / 2;
       const warp = s => (s < a ? s * s / (2 * a) : s < 1 - b ? a / 2 + (s - a) : a / 2 + (1 - a - b) + (s - 1 + b) - (1 - lam) * (s - 1 + b) ** 2 / (2 * b)) / A;
       const flightSl = u => 1.18 - 0.18 * Math.abs(2 * u - 1);
-      if (tl < crouch) { pos = p.from; sl = 1 - 0.22 * minJerk(tl / crouch); }               // se agacha
+      if (tl < crouch) { sl = Math.min(sl, 1 - 0.22 * minJerk(tl / crouch)); pos = [p.from[0], p.from[1] + R_PUNTO * (1 - sl)]; } // se agacha: la base apoyada, el centro baja
       else if (tl < p.dur) {
         const sN = (tl - crouch) / M, u = warp(sN);
         pos = [lerp(p.from[0], p.to[0], u), lerp(p.from[1], p.to[1], u) - 4 * p.h * u * (1 - u)];
         sl = sN < a ? lerp(0.78, flightSl(u), minJerk(sN / a)) : flightSl(u);                 // el estiramiento se libera en el impulso
+        if (sN < a) pos[1] += R_PUNTO * 0.22 * (1 - minJerk(sN / a));                         // el centro sube desde la agachada
         ang = Math.atan2((p.to[1] - p.from[1]) - 4 * p.h * (1 - 2 * u), p.to[0] - p.from[0]);
       } else {                                                                                // aterriza, sigue de largo, vuelve y se asienta
         const tau = tl - p.dur, base = p.toFn ? p.toFn(t) : p.to;
@@ -335,8 +359,13 @@ function puntoAt(t) {
         // con una curva suave de pendiente nula en los extremos (si no, saltaba 2.8 px al terminar)
         const Tset = 0.3, ov = x => vx * x * Math.exp(-x / tau0), sm = clamp(tau / Tset);
         pos = [base[0] + (tau < Tset ? ov(tau) - ov(Tset) * sm * sm * (3 - 2 * sm) : 0), base[1]]; ang = Math.PI / 2;
-        const ta = 0.04;                                                                      // aplastamiento que crece en ~2 cuadros
-        sl = 1 - 0.24 * (tau / ta) * Math.exp(1 - tau / ta);
+        // el aplastamiento crece al ritmo de la caída: el centro (que baja r·(1 − sl) con la base apoyada) sigue con la
+        // velocidad vertical que traía, se hunde y vuelve, con un pequeño rebote (R12: frenaba de −306 px/s a 0 en un cuadro)
+        const vy = Math.max(0, (p.to[1] - p.from[1]) + 4 * p.h) * lam / (M * A);              // velocidad de caída al tocar (dy/du · du/dt)
+        const ta = clamp(0.24 * Math.E * R_PUNTO / Math.max(1, vy), 0.025, 0.06);
+        const amp = 0.24 * clamp(vy / 250, 0.12, 1);                                         // aterrizaje suave (brake) → casi sin aplastarse: queda quieto para leer
+        sl = 1 - amp * (tau / ta) * Math.exp(1 - tau / ta) + amp / 0.24 * 0.05 * Math.sin(Math.PI * clamp((tau - 3 * ta) / 0.16)) * (tau > 3 * ta);
+        pos[1] += R_PUNTO * (1 - sl);
       }
     } else if (p.kind === 'no') {
       if (tl < 0.8) { pos = [p.at[0] + 15 * Math.sin(tl * 24) * Math.exp(-tl * 3.2), p.at[1]]; sl = 1 + 0.08 * Math.abs(Math.sin(tl * 26)) * Math.exp(-tl * 4); ang = 0; }
@@ -346,8 +375,8 @@ function puntoAt(t) {
       const pre = p.pre ?? 0.14, u = tl - pre;
       pos = depositTip(p.st, clamp(u, 0, p.st.T)); ang = Math.PI / 2;
       if (u < 0) sl = Math.min(sl, 1 - 0.2 * minJerk(tl / pre)); // si todavía se aplasta del aterrizaje, parte de ahí
-      else if (u < p.st.T) { sl = pre ? lerp(0.8, 1.06, clamp(u / 0.15)) : 1.06; ang = 0; }
-      else { const tau = u - p.st.T, ta = 0.05; sl = lerp(1.06, 1, clamp(tau / 0.06)) - 0.2 * (tau / ta) * Math.exp(1 - tau / ta); } // R11: saltaba 1.06 → 0.82
+      else if (u < p.st.T) { const st_ = 1 + 0.07 * clamp(depositSpeed(p.st, u) / 640); sl = pre ? lerp(0.8, st_, clamp(u / 0.15)) : st_; ang = 0; } // se estira según la velocidad (R12)
+      else { const tau = u - p.st.T, ta = 0.05, e = 1 + 0.07 * clamp(depositSpeed(p.st, p.st.T) / 640); sl = lerp(e, 1, clamp(tau / 0.06)) - 0.2 * (tau / ta) * Math.exp(1 - tau / ta); pos = [pos[0], pos[1] + R_PUNTO * (1 - sl)]; } // continuo desde el estiramiento final; la base apoyada
     } else if (p.kind === 'perch') {
       pos = perchAt(t);
     } else if (p.kind === 'bounce') {
@@ -389,16 +418,29 @@ function lassoGuide(pts, pad, seed, a0 = -Math.PI / 2 - 0.7) {
 /** El hilo de una marca a su punto, rehecho si el punto se movió (los hilos son relaciones vivas: siguen a su punto). */
 const linkCache = new Map();
 function linkFor(l, t) {
-  if (l.i == null || !S.regroup || t <= S.regroup.t0) return l.st; // los lazos no son hilos
-  const p = dotAt(l.i, t), key = `${l.n}:${Math.round(p[0])},${Math.round(p[1])}`;
+  if (l.i == null) return l.st; // los lazos no son hilos
+  const moving = S.regroup && t > S.regroup.t0;
+  const G_ = S.gather?.find(g => g.idx.includes(l.i));
+  const u = G_ ? minJerk(clamp((t - G_.t0 - G_.idx.indexOf(l.i) * GATHER_STAGGER) / GATHER_DUR)) : 0;
+  if (!moving && u <= 0) return l.st;
+  const p = dotAt(l.i, t), a0 = [p[0] - 6, p[1] - 22], b0 = l.b;
+  const c0 = [(a0[0] + b0[0]) / 2 + 40 + (l.n - 3) * 30, Math.min(...DOTS.map(d => d[1])) - 115 - Math.abs(l.n - 3) * 12];
+  const L = (q, r) => [lerp(q[0], r[0], u), lerp(q[1], r[1], u)];
+  const a = u ? L(a0, G_.a) : a0, b = u ? L(b0, G_.b) : b0, c = u ? L(c0, G_.c) : c0;
+  const key = `${l.n}:${a.map(Math.round)},${b.map(Math.round)},${c.map(Math.round)}`;
   if (linkCache.has(key)) return linkCache.get(key);
-  const a = [p[0] - 6, p[1] - 22], b = l.b;
-  const c = [(a[0] + b[0]) / 2 + 40 + (l.n - 3) * 30, Math.min(...DOTS.map(d => d[1])) - 115 - Math.abs(l.n - 3) * 12];
-  const g = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; }).reverse();
+  const g = Array.from({length: 25}, (_, k) => { const w = k / 24; return [(1 - w) ** 2 * a[0] + 2 * (1 - w) * w * c[0] + w * w * b[0], (1 - w) ** 2 * a[1] + 2 * (1 - w) * w * c[1] + w * w * b[1]]; }).reverse();
   const st = depositStroke(g, {w: 2.6, p: 0.46, ch: BLUE, seed: l.seed, motion: {speed: 1500, accel: 16000}});
-  if (linkCache.size > 400) linkCache.clear();
+  if (linkCache.size > 160) linkCache.clear();
   linkCache.set(key, st);
   return st;
+}
+const GATHER_DUR = 0.7, GATHER_STAGGER = 0.06;
+/** ¿Este hilo ya se fundió con el primero de su grupo? (entonces no se dibuja: coincide con él) */
+function gatheredAway(l, t) {
+  const G_ = S.gather?.find(g => g.idx.includes(l.i));
+  if (!G_ || G_.idx.indexOf(l.i) === 0) return false;
+  return t >= G_.t0 + G_.idx.indexOf(l.i) * GATHER_STAGGER + GATHER_DUR;
 }
 
 /** Posición de un punto de la Ronda en t (se desplaza si los grupos se juntan). */
@@ -451,6 +493,7 @@ function cameraShots(T_PUNTO, T_BACK) {
 }
 
 // ——— brazo que escribe ———
+const HAND_HOLD = 0.4;
 function writingArm(t, sk) {
   // tramo de contacto o de aire entre dos tramos cercanos
   const H = S.hand;
@@ -462,11 +505,13 @@ function writingArm(t, sk) {
     if (next && t > h.t1 && t < next.t0) {
       const a = [h.st.path.x.at(-1), h.st.path.y.at(-1)], b = [next.st.path.x[0], next.st.path.y[0]];
       const gap = next.t0 - h.t1;
-      if (gap < 1.4) { const k = minJerk((t - h.t1) / gap); target = [lerp(a[0], b[0], k), lerp(a[1], b[1], k) - Math.sin(Math.PI * k) * 6]; w = 1; }
+      // en las pausas (≥ 0.8 s) la mano llega antes y espera quieta 0.4 s sobre el próximo trazo (VL §5.4; R12: se movía
+      // durante toda la pausa)
+      if (gap < 1.4) { const T = gap >= 0.8 ? gap - HAND_HOLD : gap, k = minJerk(clamp((t - h.t1) / T)); target = [lerp(a[0], b[0], k), lerp(a[1], b[1], k) - Math.sin(Math.PI * k) * 6]; w = 1; }
       else { // pausa larga: la mano baja y descansa justo debajo de lo escrito, con la tiza lista, y vuelve
         // (R11: volvía a la pose de escribir, con el brazo en alto, y cruzaba las marcas del 5)
         const rest = [Math.min(a[0], b[0]) - 6, NUM.y + 34];
-        const out = minJerk(clamp((t - h.t1) / 0.45)), back = minJerk(clamp((next.t0 - t) / 0.45));
+        const out = minJerk(clamp((t - h.t1) / 0.45)), back = minJerk(clamp((next.t0 - HAND_HOLD - t) / 0.45));
         target = t - h.t1 < next.t0 - t ? [lerp(a[0], rest[0], out), lerp(a[1], rest[1], out)] : [lerp(b[0], rest[0], back), lerp(b[1], rest[1], back)];
         w = 1;
       }
@@ -524,11 +569,12 @@ export default {
       const [x, y] = dotAt(r.dot, t), [hx, hy] = DOTS[r.dot];
       ctx.save(); ctx.translate(x - hx, y - hy); draw(ctx, r.st, t - r.t); ctx.restore();
     }
-    // después de la unión, los hilos bajan de presión: lo que ya no importa se aquieta (R8)
-    const dim = S.T_UNION ? 1 - 0.8 * minJerk((t - S.T_UNION) / 0.8) : 1; // al 20 % (R9)
+    // hilos: ya no se atenúan tras la unión (R12: era un fundido); los de cada grupo se juntan en uno (linkFor).
+    // Entre hilos se compone con 'lighten': mientras convergen, dos hilos superpuestos no suman tiza
     for (const l of S.links) {
+      if (l.i != null && gatheredAway(l, t)) continue;
       const st = linkFor(l, t);
-      if (dim < 0.999 && l.i != null) drawDeposit(ctx, st, t - l.t, dim); else draw(ctx, st, t - l.t);
+      if (l.i != null && t - l.t >= st.T) drawDepositCached(ctx, st, Infinity, 1, 'lighten'); else draw(ctx, st, t - l.t);
     }
     for (const s of S.strokes) draw(ctx, s.st, t - s.t);
     // alumno
@@ -611,6 +657,7 @@ export default {
     const h = S.hand.find(h => t >= h.t0 && t <= h.t1);
     const p = puntoAt(t);
     const sk = S.actor.at(t);
+    writingArm(t, sk); // la mano tal como se dibuja (R12: la sonda medía la de la pose, quieta mientras escribía)
     // pies tal como se dibujan (esqueleto), no el plan de pisadas
     return {pieL: +sk.lL[2][0].toFixed(2), pieR: +sk.lR[2][0].toFixed(2), alzaL: +(G - sk.lL[2][1]).toFixed(2), alzaR: +(G - sk.lR[2][1]).toFixed(2), headUp: +(-(sk.head[0] - sk.neck[0]) * 0 + (sk.neck[1] - sk.head[1])).toFixed(2), tilt: +Math.atan2(sk.head[0] - sk.neck[0], sk.neck[1] - sk.head[1]).toFixed(3), handH: G - sk.aR[2][1], torso: +Math.atan2(sk.neck[0] - sk.hip[0], sk.hip[1] - sk.neck[1]).toFixed(3), contact: h ? depositSpeed(h.st, t - h.t0) : 0, punto: p ? {x: p.pos[0], h: G - p.pos[1], squash: +(p.sl * 100).toFixed(1), size: +(p.fill * 100).toFixed(1)} : null, cam: S.camera.at(t)[2]};
   },
@@ -633,6 +680,24 @@ export default {
         if (a > aMax) { aMax = a; aTag = h.tag; }
       }
     }
-    return {events: S.events, duration: +S.duration.toFixed(2), strokes: S.strokes.length, reachOver: +maxErr.toFixed(1), worstAt: worst, chalkAccelMax: Math.round(aMax), chalkAccelAt: aTag};
+    // textura sobre la presión (antes del compuesto), en el trazo de arriba del 7, en el cuadro final: pico por columna
+    // (media, CV), ancho sobre el umbral (CV) y autocorrelación del pico a 2 px de pantalla (≈ 1 = "a cuentas", sin grano)
+    let texture = null;
+    const api = globalThis.__lab; // las mediciones de presión viven en la API del laboratorio
+    const tex = (where, c) => {
+      const pk = c.peak.filter(v => v > 0.05), wd = c.width.filter(v => v > 0);
+      const mean = a => a.reduce((x, y) => x + y, 0) / a.length, sd = a => Math.sqrt(mean(a.map(v => (v - mean(a)) ** 2)));
+      // autocorrelación del grano: antes se resta la tendencia (media móvil de 9 columnas), si no la curvatura de un trazo
+      // curvo (la llave) da autocorrelación alta sin que haya "cuentas"
+      const m = mean(pk), r = pk.map((v, i) => v - mean(pk.slice(Math.max(0, i - 4), i + 5)));
+      const ac = lag => { let n = 0, d = 0; for (let i = lag; i < r.length; i++) n += r[i] * r[i - lag]; for (const v of r) d += v * v; return d ? n / d : 0; };
+      return {where, cols: pk.length, peakMean: +m.toFixed(3), peakCV: +(sd(pk) / m).toFixed(3), widthCV: +(sd(wd) / mean(wd)).toFixed(3), autocorr2px: +ac(2).toFixed(3)};
+    };
+    if (S.seven && api?.columns) texture = [
+      tex('llave (cuadro final)', api.columns(S.braceBox.x, S.braceBox.y, S.braceBox.w, S.braceBox.h)),
+      tex('trazo de arriba del 7 (cuadro final)', api.columns(S.seven.x + 2, S.seven.top - 6, S.seven.w * 0.7, 14)),
+    ];
+    const hops = S.punto.filter(p => p.kind === 'hop').map(p => ({t: +p.t.toFixed(3), dur: +p.dur.toFixed(3), brake: !!p.brake}));
+    return {events: S.events, duration: +S.duration.toFixed(2), strokes: S.strokes.length, reachOver: +maxErr.toFixed(1), worstAt: worst, chalkAccelMax: Math.round(aMax), chalkAccelAt: aTag, texture, hops};
   },
 };
