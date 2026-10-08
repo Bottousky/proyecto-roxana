@@ -64,7 +64,7 @@ export function curvature(p, w = 4) {
  * @param o.profile multiplicador de crucero según la fracción recorrida u∈[0,1] (p. ej. acelerar a propósito)
  * Devuelve {t: Float32Array tiempo acumulado por muestra, v: velocidad por muestra, T: duración}.
  */
-export function planStroke(p, {speed = 520, accel = 5200, k0 = 1 / 60, v0 = 30, v1 = 45, beta = 1 / 3, profile = null} = {}) {
+export function planStroke(p, {speed = 520, accel = 5200, k0 = 1 / 60, v0 = 30, v1 = 45, beta = 1 / 3, profile = null, smooth = 12} = {}) {
   const {n, s, L} = p;
   const k = curvature(p);
   const v = new Float32Array(n);
@@ -74,8 +74,13 @@ export function planStroke(p, {speed = 520, accel = 5200, k0 = 1 / 60, v0 = 30, 
     const down = Math.sqrt(v1 * v1 + 2 * accel * (L - s[i]));
     v[i] = Math.min(pl, up, down);
   }
-  // suavizado: media móvil sobre ~12 px, que conserva los extremos
-  const out = smoothArray(v, 12);
+  // límite de aceleración en todo el trazo (no sólo al arrancar y frenar): pasada hacia adelante y hacia atrás,
+  // como un planificador de movimiento; así las frenadas por curvatura también respetan `accel` (R8: 9600 px/s² en el «7»)
+  // suavizado (media móvil) y DESPUÉS el límite de aceleración: si se suaviza al final, la media sube la velocidad junto a
+  // los extremos y queda un salto en la primera muestra (medido: 92 000 px/s² en una marca)
+  const out = smoothArray(v, smooth);
+  for (let i = 1; i < n; i++) out[i] = Math.min(out[i], Math.sqrt(out[i - 1] * out[i - 1] + 2 * accel * (s[i] - s[i - 1])));
+  for (let i = n - 2; i >= 0; i--) out[i] = Math.min(out[i], Math.sqrt(out[i + 1] * out[i + 1] + 2 * accel * (s[i + 1] - s[i])));
   const t = new Float32Array(n);
   for (let i = 1; i < n; i++) {
     const ds = s[i] - s[i - 1];

@@ -46,7 +46,9 @@ export function autoTaps(order = [0, 1, 2, 3, 4, 5, 6]) {
 function build(taps = autoTaps()) {
   const sc = {strokes: [], hand: [], score: [], punto: [], rings: [], links: [], marks: {}, events: {}};
   const ev = (k, t) => { sc.events[k] = +t.toFixed(2); };
-  const chalk = (guide, seed, o = {}) => depositStroke(guide, {w: W, p: 0.9, seed, down: 0.14, ...o, motion: {speed: 560, accel: 5000, k0: 1 / 30, ...(o.motion || {})}}); // ≤ 5000 px/s² (R7)
+  // aceleración ≤ 5000 px/s² y además proporcional a la velocidad: la rampa dura ≥ 0.12 s y se ve a 60 Hz (R8: un trazo lento
+  // llegaba a crucero en menos de un cuadro y la curva parecía una pared)
+  const chalk = (guide, seed, o = {}) => { const sp = o.motion?.speed ?? 560; return depositStroke(guide, {w: W, p: 0.9, seed, down: 0.14, ...o, motion: {speed: sp, accel: Math.min(5000, sp / 0.12), v0: 15, v1: 30, k0: 1 / 30, ...(o.motion || {}), accel: Math.min(5000, sp / 0.12)}}); };
   const write = (st, t, tag) => {
     sc.strokes.push({st, t, tag});
     sc.hand.push({st, t0: t, t1: t + st.T});
@@ -106,7 +108,7 @@ function build(taps = autoTaps()) {
     // el hilo nace de la marca recién escrita y sube hasta su punto (R7: «cada hilo nace de su marca»)
     const linkSt = depositStroke(link.reverse(), {w: 2.6, p: 0.46, ch: BLUE, seed: 80 + i, motion: {speed: 1500, accel: 16000}});
     const markEnd = write(chalk(guide, 60 + n, {motion: {speed: n === 4 ? 900 : 620}}), land + 0.1, `marca${n}`);
-    sc.links.push({t: markEnd + 0.04, st: linkSt});
+    sc.links.push({t: markEnd + 0.04, st: linkSt, i, n, b, seed: 80 + i});
     n++;
     t = land + 0.1;
   }
@@ -127,12 +129,24 @@ function build(taps = autoTaps()) {
   // jerarquía (R5/t10u): el lazo (el grupo) más firme que los hilos (cada correspondencia)
   // si los grupos se entremezclan en el espacio (el jugador contó salteado), un lazo quedaría dentro del otro y se leería
   // como "grupo dentro de grupo": entonces cada grupo se enhebra como un hilo de cuentas, en el orden en que se contó
-  const g5 = order.slice(0, 5).map(k => DOTS[k]), g2 = order.slice(5).map(k => DOTS[k]);
+  let g5 = order.slice(0, 5).map(k => DOTS[k]), g2 = order.slice(5).map(k => DOTS[k]);
   const nested = g2.some(p => insideHull(p, g5, 27)) || g5.some(p => insideHull(p, g2, 27));
-  const groupGuide = (pts, seed) => nested ? groupContour(pts, {r: 24, w: 10}) : lassoGuide(pts, 27, seed);
-  const lasso = (pts, seed) => depositStroke(groupGuide(pts, seed), {w: 4.2, p: 0.82, ch: BLUE, seed, motion: {speed: 640, accel: 2500, v0: 8, v1: 10, k0: 1 / 40}});
+  // si los grupos se entremezclan (conteo salteado), los puntos SE JUNTAN antes de los lazos: agrupar es acercar
+  // (R8: los contornos de grupos entremezclados se cruzaban). Los hilos y los anillos acompañan a su punto.
+  sc.regroup = null;
+  if (nested) {
+    const slots5 = [[1530, 500], [1600, 470], [1625, 545], [1560, 590], [1500, 560]], slots2 = [[1740, 520], [1770, 590]];
+    const assign = (idx, slots) => { const free = [...slots], m = new Map(); for (const k of idx) { let bi = 0, bd = Infinity; free.forEach((q, j) => { const d = Math.hypot(DOTS[k][0] - q[0], DOTS[k][1] - q[1]); if (d < bd) { bd = d; bi = j; } }); m.set(k, free.splice(bi, 1)[0]); } return m; };
+    const targets = new Map([...assign(order.slice(0, 5), slots5), ...assign(order.slice(5), slots2)]);
+    sc.regroup = {t0: t + 0.35, dur: 0.75, stagger: 0.07, targets, order};
+    g5 = order.slice(0, 5).map(k => targets.get(k)); g2 = order.slice(5).map(k => targets.get(k));
+    ev('se juntan', sc.regroup.t0);
+    t += 0.35 + 0.75 + 0.07 * 6 + 0.25;
+  }
+  const groupGuide = (pts, seed) => lassoGuide(pts, 27, seed);
+  const lasso = (pts, seed) => depositStroke(groupGuide(pts, seed), {w: 4.2, p: 0.82, ch: BLUE, seed, motion: {speed: 640, accel: 2500, v0: 8, v1: 10, k0: 1 / 40, smooth: 90}});
   const L5 = lasso(g5, 170), L2 = lasso(g2, 171);
-  sc.groupStyle = nested ? 'contorno' : 'lazo';
+  sc.groupStyle = nested ? 'se juntan + lazo' : 'lazo';
   const startOf = st => [st.path.x[0], st.path.y[0]], endOf = st => [st.path.x.at(-1), st.path.y.at(-1)];
   const sz = NUM.size;
   const writeGlyph = (ch, x, y, size, seed, color = 0) => {
@@ -165,7 +179,7 @@ function build(taps = autoTaps()) {
   writeGlyph('2', TALLY.x + TALLY.pairDx + TALLY.gap / 2 - GLYPHS['2'].adv * sz / 2, NUM.y, sz, 111);
   // 6. la unión: mientras el alumno dibuja la llave que junta 5 y 2 (en el papel), Punto rodea los siete con un lazo grande
   //    (en la Ronda): el mismo gesto en las dos representaciones. Después, quietud ≥ 0.4 s y recién el «7» (R6).
-  const LALL = depositStroke(lassoGuide(DOTS, 58, 172), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 2500, v0: 8, v1: 10, k0: 1 / 60}});
+  const LALL = depositStroke(lassoGuide(DOTS, 58, 172), {w: 4.6, p: 0.86, ch: BLUE, seed: 172, motion: {speed: 760, accel: 2500, v0: 8, v1: 10, k0: 1 / 60, smooth: 90}});
   tp = Math.max(tp + L2.T, t) + 0.2;
   sc.punto.push({kind: 'hop', t: tp, dur: 0.45, from: endOf(L2), to: startOf(LALL), h: 40});
   tp += 0.45 + 0.2;
@@ -186,12 +200,14 @@ function build(taps = autoTaps()) {
     // quietud: la mano y Punto se detienen antes del resultado
     t = Math.max(t, tp + LALL.T) + 0.6;
     ev('quieto antes del 7', t);
+    sc.T_UNION = tp + LALL.T;
+    ev('empieza el 7', t + 0.0);
     writeGlyph('7', bm - GLYPHS['7'].adv * sz / 2, by + 21 + sz + 6, sz, 141);
   }
   sc.punto.push({kind: 'hop', t: t + 0.15, dur: 0.6, from: endOf(LALL), toFn: perchAt, h: 60});
   sc.punto.push({kind: 'perch', t: t + 0.15 + 0.95});
   sc.score.push({type: 'note', t: t + 0.75, freq: 392, dur: 0.2, gain: 0.04});
-  ev('escribe 7', t);
+  ev('termina el 7', t);
   // 7. comprende: el alumno se abre, Punto rebota dos veces; la cámara se aleja
   // primero se aleja para mirar lo hecho; la comprensión llega al ver el conjunto (y el brazo ya no pasa por la escritura)
   const T_BACK = t + 0.35;
@@ -311,6 +327,30 @@ function lassoGuide(pts, pad, seed) {
   return g;
 }
 
+/** El hilo de una marca a su punto, rehecho si el punto se movió (los hilos son relaciones vivas: siguen a su punto). */
+const linkCache = new Map();
+function linkFor(l, t) {
+  if (l.i == null || !S.regroup || t <= S.regroup.t0) return l.st; // los lazos no son hilos
+  const p = dotAt(l.i, t), key = `${l.n}:${Math.round(p[0])},${Math.round(p[1])}`;
+  if (linkCache.has(key)) return linkCache.get(key);
+  const a = [p[0] - 6, p[1] - 22], b = l.b;
+  const c = [(a[0] + b[0]) / 2 + 40 + (l.n - 3) * 30, Math.min(...DOTS.map(d => d[1])) - 115 - Math.abs(l.n - 3) * 12];
+  const g = Array.from({length: 25}, (_, k) => { const u = k / 24; return [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]]; }).reverse();
+  const st = depositStroke(g, {w: 2.6, p: 0.46, ch: BLUE, seed: l.seed, motion: {speed: 1500, accel: 16000}});
+  if (linkCache.size > 400) linkCache.clear();
+  linkCache.set(key, st);
+  return st;
+}
+
+/** Posición de un punto de la Ronda en t (se desplaza si los grupos se juntan). */
+function dotAt(i, t) {
+  const R = S.regroup, home = DOTS[i];
+  if (!R || t <= R.t0) return home;
+  const k = R.order.indexOf(i), to = R.targets.get(i);
+  const u = minJerk((t - R.t0 - k * R.stagger) / R.dur);
+  return [lerp(home[0], to[0], u), lerp(home[1], to[1], u) - Math.sin(Math.PI * u) * 18];
+}
+
 /** ¿p cae dentro de la envolvente de pts engordada `pad`? (para decidir si dos lazos se superpondrían) */
 function insideHull(p, pts, pad) {
   if (pts.length === 1) return Math.hypot(p[0] - pts[0][0], p[1] - pts[0][1]) < pad * 2;
@@ -407,7 +447,8 @@ export default {
   render(lab, t, ctx) {
     const frame = Math.floor(t * 8);
     // la Ronda: siete puntos vivos (respiran desfasados; se aplastan al recibir a Punto)
-    DOTS.forEach(([x, y], i) => {
+    DOTS.forEach((_, i) => {
+      const [x, y] = dotAt(i, t);
       const ring = S.rings.find(r => r.dot === i);
       const land = ring ? ring.t - 0.05 : Infinity;
       // mientras la escena espera al jugador, los puntos sin contar respiran más (invitan a tocarlos)
@@ -418,8 +459,16 @@ export default {
     });
     // lo terminado se dibuja desde su bitmap (se estampa una sola vez); `?nocache` para comparar
     const draw = lab.params.has('nocache') ? drawDeposit : drawDepositCached;
-    for (const r of S.rings) draw(ctx, r.st, t - r.t);
-    for (const l of S.links) draw(ctx, l.st, t - l.t);
+    for (const r of S.rings) {
+      const [x, y] = dotAt(r.dot, t), [hx, hy] = DOTS[r.dot];
+      ctx.save(); ctx.translate(x - hx, y - hy); draw(ctx, r.st, t - r.t); ctx.restore();
+    }
+    // después de la unión, los hilos bajan de presión: lo que ya no importa se aquieta (R8)
+    const dim = S.T_UNION ? 1 - 0.55 * minJerk((t - S.T_UNION) / 0.8) : 1;
+    for (const l of S.links) {
+      const st = linkFor(l, t);
+      if (dim < 0.999 && l.i != null) drawDeposit(ctx, st, t - l.t, dim); else draw(ctx, st, t - l.t);
+    }
     for (const s of S.strokes) draw(ctx, s.st, t - s.t);
     // alumno
     const sk = S.actor.at(t);
@@ -455,6 +504,17 @@ export default {
       ctx.stroke();
     }
     ctx.restore();
+    // los puntos que se juntan arrastran un poco de polvo
+    if (S.regroup && t > S.regroup.t0) {
+      ctx.save(); ctx.strokeStyle = '#fff'; ctx.lineCap = 'round'; ctx.lineWidth = 16;
+      for (const [i] of S.regroup.targets) {
+        const a = 0.06 * Math.exp(-Math.max(0, t - S.regroup.t0 - S.regroup.dur - 0.5) / 1.5);
+        ctx.globalAlpha = a; ctx.beginPath();
+        for (let tt = S.regroup.t0; tt <= Math.min(t, S.regroup.t0 + S.regroup.dur + 0.5); tt += 0.04) { const [x, y] = dotAt(i, tt); tt === S.regroup.t0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     // la quinta marca, al cruzar las cuatro, levanta un poco de polvo en cada cruce (R5)
     const m5 = S.strokes.find(x => x.tag === 'marca4');
     if (m5 && t > m5.t) {
@@ -500,6 +560,17 @@ export default {
       const reach = Math.hypot(tip[0] - sk.shoulder[0], tip[1] - sk.shoulder[1]) - (25 + 32) * K;
       if (reach > maxErr) { maxErr = reach; worst = +tt.toFixed(2); }
     }
-    return {events: S.events, duration: +S.duration.toFixed(2), strokes: S.strokes.length, reachOver: +maxErr.toFixed(1), worstAt: worst};
+    // aceleración real de cada trazo, medida sobre su plan (a = v·dv/ds), sin el ruido del muestreo a 60 Hz
+    let aMax = 0, aTag = null;
+    for (const h of S.strokes) {
+      const {path, plan} = h.st;
+      for (let i = 1; i < path.n; i++) {
+        const ds = path.s[i] - path.s[i - 1];
+        if (ds <= 0) continue;
+        const a = Math.abs((plan.v[i] + plan.v[i - 1]) / 2 * (plan.v[i] - plan.v[i - 1]) / ds);
+        if (a > aMax) { aMax = a; aTag = h.tag; }
+      }
+    }
+    return {events: S.events, duration: +S.duration.toFixed(2), strokes: S.strokes.length, reachOver: +maxErr.toFixed(1), worstAt: worst, chalkAccelMax: Math.round(aMax), chalkAccelAt: aTag};
   },
 };

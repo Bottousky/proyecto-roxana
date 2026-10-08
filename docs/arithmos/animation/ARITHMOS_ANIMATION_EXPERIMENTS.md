@@ -359,3 +359,11 @@ La escena dura ahora 22 s.
 
 ## Revisión R7 (VS6) y VS7 — ciclo 14
 R7: **No** (N3 en todo; eureka N4). Lista y disposición (`c17/`): (1) Punto arrancaba y frenaba en seco en los lazos → anticipación 0.14 s, aceleración 2500 px/s², asentamiento (`punto.png`); (2) tiza > 5000 px/s² → 5000 (`tiza.png`); (3) piernas fuera de cuadro en el plano medio → plano 1100 de ancho con el suelo dentro (`t10z/sheet.png`); (4) **el hilo nace de la marca** recién escrita y sube al punto; (5) el plano final arranca con el paso atrás; (6) quietud antes del 7: 0.6 s. Además: al retroceder, balanceo de brazos al 25 % (el brazo barría «5+2»). Texturas a dpr 3: `textura.png` (escritura, lazos, figura con depósito).
+
+## Revisión R8 (VS7) y VS8 — ciclo 15
+R8 midió sobre las sondas: **No** — la tiza pasaba de 0 a crucero en un cuadro (8 400–11 300 px/s² a 60 Hz). Hallazgos y disposición (`c18/`):
+1. **Error del modelo de movimiento** (afecta a todos los tests): (a) la media móvil se aplicaba después de los límites de arranque/frenada y subía la velocidad junto a los extremos (salto de **92 000 px/s²** en la 1.ª muestra de una marca, medido sobre el plan); (b) las frenadas por curvatura (ley 2/3) no respetaban la aceleración máxima. Corrección en `motion.planStroke`: suavizar y **después** limitar aceleración con pasadas hacia adelante y hacia atrás (planificador de movimiento). Además, en la escena, aceleración ∝ velocidad (rampa ≥ 0.12 s). Resultado: **máx. 5000 px/s² en todos los trazos** (métrica `chalkAccelMax` sobre el plan), rampas visibles (`tiza.png`).
+2. Conteo salteado: **los puntos se juntan** (5 y 2) antes de los lazos; anillos e hilos los acompañan (los hilos se rehacen con la posición viva del punto); los lazos ya no se cruzan (`finals.png` abajo, `salteado-junta/sheet.png`).
+3. Hilos al 45 % después de la unión.
+4. Lazos de Punto sin frenadas en V (suavizado amplio del plan).
+5. Eventos «empieza el 7» / «termina el 7»; 404 del favicon del laboratorio resuelto.
