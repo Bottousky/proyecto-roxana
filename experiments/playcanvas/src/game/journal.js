@@ -90,7 +90,7 @@ function behind(id, snapshot) {
   const reveal = snapshot?.completed ? revealFor(id, snapshot) : null;
   if (!reveal) return '';
   const words = WORD_ORDER.filter(key => WORDS[key].from === id);
-  return `<section class="dj-behind"><h4>Lo que hay detrás <small>lo que vio Ohm</small></h4><ol>${reveal.cards.map(card => `<li><b>${esc(card.title)}.</b> ${esc(card.text)}</li>`).join('')}</ol>
+  return `<section class="dj-behind"><h4>Lo que hay detrás <small>lo que vio Ohm</small></h4><ol>${reveal.cards.map((card, i) => `<li><span class="dj-num" aria-hidden="true">${i + 1}</span><b>${esc(card.title)}.</b> ${esc(card.text)}</li>`).join('')}</ol>
     ${words.length ? `<ul class="dj-words-mini" aria-label="Palabras del oficio que aparecieron acá">${words.map(key => `<li>${wordSymbol(WORDS[key].symbol)}<span><b>${esc(WORDS[key].term)}</b>${WORDS[key].unit ? ` · ${esc(WORDS[key].unit)}` : ''}</span></li>`).join('')}</ul>` : ''}
     <blockquote class="dj-sticky dj-sticky-question" style="--tilt:2deg"><b>Para pensar</b>${esc(reveal.question)}</blockquote></section>`;
 }
@@ -168,17 +168,20 @@ export function renderJournal(state, {selected, puzzles={}, evidenceFor=()=>[], 
       <div class="dj-marginalia">No borres lo que falló.<br>También cuenta el camino.<span>— anotación de Edda</span></div>
       </div><span class="dj-folio">${index+2}</span>${corner(next,'Hoja siguiente →','next')}</section>`;
   }
-  return `${roughFilter}<div class="book-heading dj-heading"><span class="eyebrow">INSTITUTO ROXANA · CUADERNO DE CAMPO</span><h2>La Bitácora</h2><p>de ${esc(owner)} · Lo que vi. Lo que probé. Lo que todavía no sé.</p><button class="dj-print-button" data-journal-print title="Imprimir o guardar como PDF, hoja por hoja">Imprimir la Bitácora</button></div>
+  return `${roughFilter}<div class="book-heading dj-heading"><span class="eyebrow">INSTITUTO ROXANA · CUADERNO DE CAMPO</span><h2>La Bitácora</h2><p>de ${esc(owner)} · Lo que vi. Lo que probé. Lo que todavía no sé.</p><span class="dj-download"><button class="dj-print-button" data-journal-download="spreads" title="Un PDF para leer o imprimir en casa en hojas A4: el cuaderno abierto, dos páginas por hoja">Descargar la Bitácora</button><button class="dj-download-book" data-journal-download="book" title="Un PDF página por página, en tamaño A5, para llevar a una imprenta">Versión libro A5</button></span></div>
     <div class="dj-desk" data-journal-page="${esc(page.id)}"><div class="dj-book ${turn?`dj-turn-${turn}`:''}"><span class="dj-ribbon" aria-hidden="true"></span><span class="dj-band" aria-hidden="true"></span><div class="dj-spread">${left}<span class="dj-spine" aria-hidden="true"></span>${right}</div>${tabs}</div></div>
     <footer class="book-footer dj-footer"><button data-journal-page="${esc(previous?.id||page.id)}" ${!previous?'disabled':''} aria-label="Página anterior">← Hoja anterior</button><span>${Math.max(1,index+1)} / ${Math.max(1,pages.length)}</span><button data-journal-page="${esc(next?.id||page.id)}" ${!next?'disabled':''} aria-label="Página siguiente">Hoja siguiente →</button></footer>`;
 }
 
 /**
- * The whole book, ready for paper: a cover, then every spread as two A5 pages. Built on demand,
- * printed, and thrown away; it reuses the same pages the player reads on screen.
+ * The whole book as loose notebook pages, for the downloadable PDF: the owner's name for the cover,
+ * then every page of every spread, in reading order, exactly as the player reads them on screen.
  */
-export function renderJournalPrint(state, opts = {}) {
-  const pages = bookPages(state, opts.puzzles), owner = playerName(state);
-  const spreads = pages.map(page => renderJournal(state, {...opts, selected: page.id, turn: ''}).match(/<div class="dj-spread">([\s\S]*)<\/div><nav class="dj-tabs"/)?.[1] ?? '').join('');
-  return `${roughFilter.replace('id="dj-rough"', 'id="dj-rough-print"')}<div class="dj-print-book"><section class="dj-print-cover"><span class="eyebrow">INSTITUTO ROXANA · CUADERNO DE CAMPO</span><h1>Ohmdal</h1><p class="dj-print-arc">Arco I · La Luz</p><p class="dj-print-owner">Bitácora de ${esc(owner)}</p><p class="dj-print-motto">Lo que vi. Lo que probé. Lo que todavía no sé.</p></section>${spreads}</div>`;
+export function journalSheets(state, opts = {}) {
+  const pages = bookPages(state, opts.puzzles);
+  const sections = pages.flatMap(page => {
+    const spread = renderJournal(state, {...opts, selected: page.id, turn: ''}).match(/<div class="dj-spread">([\s\S]*)<\/div><nav class="dj-tabs"/)?.[1] ?? '';
+    return spread.split('<span class="dj-spine" aria-hidden="true"></span>').filter(Boolean);
+  });
+  return {owner: playerName(state), sections};
 }

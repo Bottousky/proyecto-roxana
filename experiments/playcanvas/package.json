@@ -18,6 +18,8 @@
     "sync:canon": "node sync-game.mjs"
   },
   "dependencies": {
+    "html-to-image": "1.11.13",
+    "jspdf": "4.2.1",
     "playcanvas": "2.22.1"
   },
   "devDependencies": {

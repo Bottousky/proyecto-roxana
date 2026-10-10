@@ -253,7 +253,7 @@
 .dj-behind h4 small{font-family:var(--hand);font-size:19px;color:var(--graphite);margin-left:6px}
 .dj-behind ol{margin:0;padding-left:26px;counter-reset:behind;list-style:none}
 .dj-behind ol li{position:relative;font-family:var(--hand);font-weight:600;font-size:21px;line-height:1.22;color:var(--ink-blue);margin:0 0 8px}
-.dj-behind ol li::before{counter-increment:behind;content:counter(behind);position:absolute;left:-26px;top:1px;width:20px;height:20px;border:2px solid var(--ink-red);border-radius:50%;font-size:15px;line-height:17px;text-align:center;color:var(--ink-red)}
+.dj-behind ol li .dj-num{position:absolute;left:-26px;top:1px;width:20px;height:20px;border:2px solid var(--ink-red);border-radius:50%;font-size:15px;line-height:17px;text-align:center;color:var(--ink-red)}
 .dj-behind ol li b{color:var(--ink-black)}
 .dj-words-mini{display:flex;flex-wrap:wrap;gap:6px 10px;margin:8px 0 0;padding:0;list-style:none}
 .dj-words-mini li{display:flex;align-items:center;gap:4px;padding:2px 8px 2px 2px;border:2px solid var(--ink-red);border-radius:3px 8px 4px 9px;transform:rotate(-.8deg);font-family:var(--note);font-size:15px;color:var(--ink-black)}
@@ -288,39 +288,45 @@
 
 .modal.journal-modal .dj-heading .dj-print-button{margin-left:auto;align-self:center;padding:6px 14px;font-family:var(--hand);font-weight:700;font-size:19px;color:#2b2620;background:linear-gradient(#efdfb8,#d8c08e);border:1px solid #8a6a43;border-radius:4px;box-shadow:0 2px 0 #0006;transform:rotate(-1deg);cursor:pointer;min-height:40px}
 .modal.journal-modal .dj-heading .dj-print-button:hover{background:linear-gradient(#f7ead0,#e2cc9d)}
-#journal-print{display:none;
+/* ── On paper: the downloadable PDF (journal-pdf.js). Sheets are built off screen, photographed and bound. ── */
+.modal.journal-modal .dj-heading p{flex:1 1 220px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal.journal-modal .dj-heading .dj-download{margin-left:auto;display:flex;align-items:center;gap:8px;align-self:center;flex:none}
+.modal.journal-modal .dj-heading .dj-download .dj-print-button{font-size:17px;padding:4px 12px;min-height:36px}
+@media (max-width:820px){.modal.journal-modal .dj-heading p{white-space:normal}.modal.journal-modal .dj-heading .dj-download-book{display:none}}
+.modal.journal-modal .dj-heading .dj-print-button{margin-left:0}
+.modal.journal-modal .dj-heading .dj-download-book{font-family:var(--hand);font-size:17px;color:#d8c39b;background:none;border:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:40px}
+.modal.journal-modal .dj-heading .dj-download button:disabled{opacity:.75;cursor:progress}
+.dj-pdf{position:fixed;left:-40000px;top:0;z-index:-1;pointer-events:none;
   --paper:#eadcb9;--paper-light:#f3e8cb;--paper-edge:#c9b083;
   --ink-blue:#1f3c78;--ink-black:#2b2620;--ink-red:#b0302a;--ink-green:#2f6a3c;--graphite:#55524c;--sienna:#9a4b22;
-  --hand:'Caveat','Kalam','Segoe Print','Bradley Hand',cursive;--note:'Kalam','Caveat',cursive;--marker:'Permanent Marker','Kalam',cursive;--type:'Special Elite','Courier New',monospace}
-
-/* ── On paper: each notebook page becomes an A5 page; the book opens with a cover ─────── */
-@media print{
-  @page{size:A5 portrait;margin:0}
-  body.printing-journal>*:not(#journal-print){display:none!important}
-  html:has(body.printing-journal),body.printing-journal{height:auto!important;min-height:0!important;overflow:visible!important;position:static!important}
-  body.printing-journal{background:#eadcb9!important;margin:0}
-  #journal-print .dj-page::before,#journal-print .dj-page::after,#journal-print .dj-stain{display:none!important}
-  #journal-print .dj-page{box-shadow:none!important;border-radius:0!important;background:#eadcb9 radial-gradient(ellipse at 50% 30%,#f3e8cb,transparent 75%)!important}
-  #journal-print *{backdrop-filter:none!important}
-  body.printing-journal #journal-print{display:block}
-  #journal-print{-webkit-print-color-adjust:exact;print-color-adjust:exact;color:var(--ink-black)}
-  #journal-print .dj-print-cover,#journal-print .dj-page{position:relative;width:148mm;min-height:210mm;box-sizing:border-box;break-after:page;page-break-after:always;overflow:visible;
-    background:var(--paper) radial-gradient(ellipse at 50% 40%,var(--paper-light),transparent 70%)}
-  #journal-print .dj-page-body{position:static;overflow:visible;padding:14mm 12mm 16mm}
-  #journal-print .dj-page.dj-left .dj-page-body{padding-left:16mm}
-  #journal-print .dj-page.dj-right .dj-page-body{padding-right:16mm}
-  #journal-print .dj-corner,#journal-print .dj-spine,#journal-print .dj-tabs,#journal-print .dj-print-button,#journal-print .dj-own-note small{display:none!important}
-  #journal-print .dj-folio{position:absolute;bottom:8mm;font-family:var(--hand);font-size:16px;color:var(--graphite)}
-  #journal-print .dj-left .dj-folio{left:12mm}#journal-print .dj-right .dj-folio{right:12mm}
-  #journal-print .dj-schematic svg{filter:url(#dj-rough-print)}
-  #journal-print .dj-schematics{display:block}#journal-print .dj-schematic{margin-bottom:4mm}
-  #journal-print .dj-schematic,#journal-print .dj-trial,#journal-print .dj-word,#journal-print .dj-conjuro,#journal-print .dj-behind li,#journal-print .dj-photo{break-inside:avoid}
-  #journal-print .dj-printed-note{font-family:var(--hand);font-weight:600;font-size:20px;line-height:28px;color:var(--ink-blue);background:repeating-linear-gradient(transparent 0 27px,#9fc3d8 27px 28px);min-height:90px;margin:4px 0 0}
-  #journal-print .dj-print-cover{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20mm;
-    background:radial-gradient(ellipse at 30% 20%,#ffffff12,transparent 55%),repeating-linear-gradient(92deg,#2a1d13 0 3px,#2f2116 3px 9px,#28190f 9px 14px),#2a1c12;color:#e9d3a6}
-  #journal-print .dj-print-cover .eyebrow{font-family:var(--type);letter-spacing:.16em;font-size:10px;color:#c8a978}
-  #journal-print .dj-print-cover h1{font-family:var(--marker);font-weight:400;font-size:64px;margin:10mm 0 2mm;color:#ecd7aa}
-  #journal-print .dj-print-arc{font-family:var(--type);font-size:13px;letter-spacing:.3em;text-transform:uppercase}
-  #journal-print .dj-print-owner{margin-top:18mm;font-family:var(--hand);font-size:30px;font-weight:700;color:#f3e3bf;border-bottom:2px solid #c8a978;padding:0 8mm 2mm}
-  #journal-print .dj-print-motto{font-family:var(--hand);font-size:20px;color:#d8c39b}
-}
+  --hand:'Caveat','Kalam','Segoe Print','Bradley Hand',cursive;--note:'Kalam','Caveat',cursive;--marker:'Permanent Marker','Kalam',cursive;--type:'Special Elite','Courier New',monospace;color:var(--ink-black)}
+.dj-pdf-plate{display:flex;justify-content:center;align-items:stretch;background:#2a1c12;overflow:hidden}
+.dj-pdf-sheet{position:relative;flex:none;width:148mm;height:210mm;overflow:hidden;box-sizing:border-box;border-radius:0;box-shadow:none}
+.dj-pdf-sheet.dj-page::after{display:none}
+/* Paper without the embedded noise image (it does not survive being photographed): warm light, foxed corners. */
+.dj-pdf-sheet.dj-page{background:radial-gradient(ellipse at 50% 38%,#f3e8cb,transparent 72%),radial-gradient(ellipse at 8% 96%,#b8955a3a,transparent 38%),radial-gradient(ellipse at 94% 5%,#a8834a2e,transparent 34%),repeating-linear-gradient(0deg,#00000004 0 2px,transparent 2px 5px),#eadcb9}
+.dj-pdf .dj-schematic{display:block;break-inside:avoid}
+.dj-pdf .dj-schematic svg{max-height:66mm;width:100%}
+.dj-pdf-spreads .dj-pdf-sheet.dj-page:first-child{box-shadow:inset -16px 0 22px -16px #6b5434}
+.dj-pdf-spreads .dj-pdf-sheet.dj-page:last-child{box-shadow:inset 16px 0 22px -16px #6b5434}
+.dj-pdf-window{position:absolute;overflow:hidden}
+.dj-pdf .dj-pdf-flow{position:static;inset:auto;overflow:visible;padding:0}
+.dj-pdf-folio{position:absolute;bottom:7mm;font-family:var(--hand);font-size:17px;color:var(--graphite)}
+.dj-pdf-folio.is-left{left:14mm}.dj-pdf-folio.is-right{right:14mm}
+.dj-pdf .dj-schematic svg{filter:url(#dj-rough-pdf)}
+.dj-pdf .dj-schematics{display:block}.dj-pdf .dj-schematic{margin-bottom:4mm}
+.dj-pdf .dj-evidence-head,.dj-pdf h3,.dj-pdf h4,.dj-pdf .dj-schematic figcaption{break-after:avoid}
+.dj-pdf .dj-evidence-head{break-before:auto}
+.dj-pdf .dj-marginalia,.dj-pdf .dj-own-note,.dj-pdf .dj-route,.dj-pdf .dj-keep,.dj-pdf .dj-schematic,.dj-pdf .dj-trial,.dj-pdf .dj-word,.dj-pdf .dj-conjuro,.dj-pdf .dj-behind li,.dj-pdf .dj-photo,.dj-pdf .dj-person,.dj-pdf .dj-sticky,.dj-pdf .dj-card,.dj-pdf .dj-page-head{break-inside:avoid}
+.dj-pdf .dj-printed-note{font-family:var(--hand);font-weight:600;font-size:20px;line-height:28px;color:var(--ink-blue);background:repeating-linear-gradient(transparent 0 27px,#9fc3d8 27px 28px);min-height:112px;margin:4px 0 0;white-space:pre-line}
+.dj-pdf-blank{position:absolute;top:44%;left:0;right:0;text-align:center;font-family:var(--hand);font-size:22px;color:var(--graphite)}
+.dj-pdf-cover{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20mm;
+  background:radial-gradient(ellipse at 30% 20%,#ffffff12,transparent 55%),repeating-linear-gradient(92deg,#2a1d13 0 3px,#2f2116 3px 9px,#28190f 9px 14px),#2a1c12;color:#e9d3a6;box-shadow:inset 0 0 0 5mm #00000022,inset 0 0 60px #000a}
+.dj-pdf-cover::before{content:'';position:absolute;inset:7mm;border:1px dashed #b07f4e88;border-radius:3mm;pointer-events:none}
+.dj-pdf-cover .eyebrow{font-family:var(--type);letter-spacing:.16em;font-size:10px;color:#c8a978}
+.dj-pdf-cover h1{font-family:var(--marker);font-weight:400;font-size:64px;margin:10mm 0 2mm;color:#ecd7aa}
+.dj-pdf-arc{font-family:var(--type);font-size:13px;letter-spacing:.3em;text-transform:uppercase}
+.dj-pdf-owner{margin-top:18mm;font-family:var(--hand);font-size:30px;font-weight:700;color:#f3e3bf;border-bottom:2px solid #c8a978;padding:0 8mm 2mm}
+.dj-pdf-motto{font-family:var(--hand);font-size:20px;color:#d8c39b;line-height:1.3}
+.dj-pdf-back{justify-content:flex-end;gap:8mm;padding-bottom:22mm}
+.dj-pdf .dj-keep .dj-trials{margin-bottom:0}.dj-pdf .dj-keep+.dj-trials{margin-top:0}

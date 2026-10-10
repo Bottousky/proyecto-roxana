@@ -533,6 +533,23 @@ Verificado: raíz y PlayCanvas en verde, `npm run check`; partida nueva jugada d
 Castillo; PDF de la Bitácora completa generado (54 páginas A5). Aprendizaje real con personas
 NO VERIFICADO: ver «Lo que queda» en la auditoría.
 
+## Ciclo 22 · La Bitácora se descarga en PDF (10 oct 2026)
+
+«Descargar la Bitácora» arma el PDF en el navegador, sin servidor, con las mismas páginas que el
+jugador lee en pantalla (`src/journal-pdf.js`, html-to-image 1.11.13 y jsPDF 4.2.1, cargados sólo al
+pedir la descarga: 135 kB comprimidos aparte del juego). Cada página del cuaderno se vierte en hojas
+A5 con columnas CSS (una página larga sigue en la hoja siguiente, sin cortar párrafos ni esquemas) y
+se fotografía. Dos encuadernaciones:
+- **A4 apaisado** (botón principal): el cuaderno abierto, dos páginas A5 por hoja, ~150 dpi. Se lee
+  en pantalla y se imprime en casa al 100 % en el papel de cualquier escuela. Partida completa:
+  31 hojas, 7,6 MB, unos 20 s.
+- **Libro A5** («Versión libro A5»): una página por hoja, ~215 dpi, para imprenta. 62 páginas, 13 MB.
+
+Tapa y contratapa de cuero, folios, notas propias en renglones, las notas al margen de Edda una sola
+vez. Reemplaza el camino anterior por el diálogo de imprimir. Para una tirada comercial convendrá un
+PDF vectorial generado en servidor (texto nítido a 300 dpi, sangrado y lomo): ver la conversación
+del ciclo sobre el producto físico.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |

@@ -32,7 +32,7 @@ test('the Monte Quieto page borrows no bench: no trials or sketch of the lens', 
 
 import {PUZZLES, initialPuzzleSnapshot} from '../src/puzzle-model.js';
 import {getBenchEvidence} from '../src/bench-evidence.js';
-import {renderJournalPrint} from '../src/journal.js';
+import {journalSheets} from '../src/journal.js';
 
 const repaired = (id, tested = true) => { const s = initialPuzzleSnapshot(id); PUZZLES[id].solve(s); s.completed = true; s.conjuro = tested; return s; };
 
@@ -48,13 +48,14 @@ test('a repaired bench leaves its circuit drawn twice, the inherited conjuro and
   assert.doesNotMatch(renderJournal(unfinished, {selected: 'experiment:workshop', puzzles: PUZZLES, evidenceFor: getBenchEvidence}), /Lo que hay detrás/, 'nothing is explained before it works');
 });
 
-test('the glossary page grows with the benches, and the book prints with a cover in the traveller’s name', () => {
+test('the glossary page grows with the benches, and the book is handed to paper page by page', () => {
   const state = {...freshState(), playerName: 'Manuel', known: ['edda', 'ohm'], flags: {awaken: true, gate: true}};
   const html = renderJournal(state, {selected: 'words'});
   assert.match(html, /Palabras del oficio/); assert.match(html, /Resistencia/); assert.match(html, /ohmio \(Ω\)/);
   assert.doesNotMatch(html, /Divisor de tensión/, 'a word not yet earned stays out');
-  const book = renderJournalPrint(state, {puzzles: PUZZLES, evidenceFor: getBenchEvidence});
-  assert.match(book, /Bitácora de Manuel/);
-  assert.equal((book.match(/class="dj-page /g) || []).length % 2, 0, 'every notebook page prints as a pair');
-  assert.match(book, /id="dj-rough-print"/);
+  const book = journalSheets(state, {puzzles: PUZZLES, evidenceFor: getBenchEvidence});
+  assert.equal(book.owner, 'Manuel', 'the cover carries the traveller’s name');
+  assert.equal(book.sections.length % 2, 0, 'every notebook page goes to paper with its facing page');
+  assert.ok(book.sections.every(html => /^<section class="dj-page dj-(left|right)/.test(html) && html.includes('dj-page-body')));
+  assert.ok(book.sections.some(html => /Palabras del oficio/.test(html)));
 });
