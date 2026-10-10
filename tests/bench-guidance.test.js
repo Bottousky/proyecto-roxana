@@ -35,7 +35,6 @@ test('every bench ends its hints with a concrete step that names real terminals'
 
 test('the hint button announces when the next help is a concrete step', () => {
   const b = bench('workshop');
-  b.state.bet = { choice: 'skip', settled: false };
   b.state.hints = BENCH_GUIDANCE.workshop.hints.length - 1;
   assert.match(b.html(), /Mostrame un paso para probar/);
 });
@@ -46,8 +45,7 @@ test('the board never asks to switch off: a cable is taken at once and the place
   try {
   const b = bench('distribution');
   assert.doesNotMatch(b.html(), /apagá|Apagar alimentación|Encender alimentación|data-action="power"/);
-  assert.match(b.html(), /data-action="bet" data-choice="skip"/, 'Edda asks for a bet before anything is touched, and it can be declined');
-  b.state.bet = { choice: 'skip', settled: false };
+  assert.match(b.html(), /class="wb-conjuro"><span aria-hidden="true">✦<\/span><q>La Luz es una sola/, "the Council's inherited saying is in view while the bench has not tested it");
   assert.equal(instruction(b.html()), BENCH_GUIDANCE.distribution.steps[0].how.replace(/«/g, '«'), 'Ohm says what can be touched for the first item of the brief');
   b.touchPort('clinicOut');
   assert.equal(b.selected, 'clinicOut', 'the cable is in hand without a procedure');
@@ -171,7 +169,7 @@ test('only parts with a reason to care about direction are polarized: plain coil
   }
 });
 
-test("Edda's lost bet in the Castillo is what the model shows: the infirmary does not dim when the kitchen gets its own path", async () => {
+test("The Council's saying that Edda copied fails in the Castillo, as the model shows: the infirmary does not dim when the kitchen gets its own path", async () => {
   const { DIALOGUES } = await import('../src/content.js');
   assert.match(DIALOGUES.edda_castle_after.map(l => l.text).join(' '), /brilla igual/);
   const s = initialPuzzleSnapshot('distribution'); PUZZLES.distribution.solve(s); s.sourceOn = true; s.tripped = false;

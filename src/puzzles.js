@@ -1,7 +1,7 @@
 import { measureVoltage, measureResistance } from './electrical.js';
 import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized } from './puzzle-model.js';
 import { appendBenchEvidence, getBenchEvidence } from './bench-evidence.js';
-import { PREDICTIONS, betChoiceText, betQuestion, betVerdict, revealFor, WORDS } from './understanding.js';
+import { CONJUROS, revealFor, WORDS } from './understanding.js';
 export { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, getBenchEvidence };
 import './puzzles.css';
 
@@ -147,7 +147,7 @@ export class PuzzleWorkbench {
     this.hintShown = false;
     this.successDismissed = false;
     this.reveal = null;
-    this.betNote = '';
+    this.conjuroNote = '';
     this.showNumbers = false;
     this.progress = { met: -1, at: performance.now(), changes: 0 };
     this.reading = '';
@@ -254,27 +254,27 @@ export class PuzzleWorkbench {
       this.feedback = `${proof.recorded} ${proof.who} lo vio.`;
       if (notify) this.callbacks.onSound?.('success');
     }
-    this.settleBet();
+    this.settleConjuro();
     if (notify && this.result.solved && !this.wasOperating && !this.state.completed) this.callbacks.onSound?.('success');
     this.wasOperating = this.result.solved;
   }
 
-  // Edda's bet is settled by the bench itself, the moment the physics (or a recorded proof) shows the answer.
-  settleBet() {
-    const guess = PREDICTIONS[this.id], bet = this.state.bet;
-    if (!guess || !bet || bet.choice === 'skip' || bet.settled || this.practice || !guess.settled(this.result, this.state)) return;
-    bet.settled = true;
-    appendBenchEvidence(this.state, { kind: 'result', text: `Lo que pasó: ${guess.outcome}` });
-    this.betNote = `Apostaste «${betChoiceText(this.id, bet.choice)}». ${betVerdict(this.id, bet.choice)}`;
+  // The keeper's inherited conjuro meets the copper: the bench says so once, the moment the physics
+  // (or a recorded proof) shows what really happens.
+  settleConjuro() {
+    const spell = CONJUROS[this.id];
+    if (!spell || this.state.conjuro || this.state.completed || this.practice || !spell.settled(this.result, this.state)) return;
+    this.state.conjuro = true;
+    appendBenchEvidence(this.state, { kind: 'result', text: `El conjuro, a prueba: «${spell.words}» ${spell.copper}` });
+    this.conjuroNote = spell.copper;
   }
 
   change(mutate, { history = true, sound = 'click' } = {}) {
     const before = copy(this.state);
     if (history) { this.history.push(copy(this.state)); if (this.history.length > 40) this.history.shift(); }
-    this.hintShown = false; this.betNote = '';
+    this.hintShown = false; this.conjuroNote = '';
     if (history) this.probeMarks = null;
     mutate(this.state);
-    if (history && PREDICTIONS[this.id] && !this.state.bet && !this.state.completed) this.state.bet = { choice: 'skip', settled: false };
     this.powerForMode(history);
     this.callbacks.onSound?.(sound);
     this.evaluate();
@@ -329,7 +329,7 @@ export class PuzzleWorkbench {
       const across = ends[0] !== ends[1] && probe.includes(ends[0]) && probe.includes(ends[1]), powered = this.state.sourceOn && !this.state.tripped;
       const shown = asked.continuityOpen ? this.mode === 'continuity' && !powered && measureResistance(puzzleNetwork(this.id, this.state, false), m.a, m.b) === Infinity
         : this.mode === 'voltage' && powered && Math.abs(measureVoltage(this.result.solution, m.a, m.b) ?? 0) >= asked.minVoltage;
-      if (across && shown) { (this.state.proofs ??= {})[asked.id] = true; appendBenchEvidence(this.state, { kind: 'result', text: asked.recorded }); this.feedback = `${asked.recorded} ${asked.who} lo vio.`; this.callbacks.onSound?.('success'); this.result = evaluatePuzzle(this.id, this.state); this.settleBet(); }
+      if (across && shown) { (this.state.proofs ??= {})[asked.id] = true; appendBenchEvidence(this.state, { kind: 'result', text: asked.recorded }); this.feedback = `${asked.recorded} ${asked.who} lo vio.`; this.callbacks.onSound?.('success'); this.result = evaluatePuzzle(this.id, this.state); this.settleConjuro(); }
       return;
     }
     const proof = this.puzzle.proof?.measure && this.puzzle.proof;
@@ -346,7 +346,7 @@ export class PuzzleWorkbench {
         : u.values !== l.values ? `Medí la toma sin la lente (${fmt(u.volts)}) y con la lente, después de mover el mando (${fmt(l.volts)}). Con el mismo ajuste todavía no las comparé.`
         : l.volts < u.volts - .05 ? `Medí la toma sin la lente (${fmt(u.volts)}) y con la lente (${fmt(l.volts)}): al cargarla, la tensión baja.`
         : `Medí la toma sin la lente (${fmt(u.volts)}) y con la lente (${fmt(l.volts)}): no cambió.`;
-      proofs[proof.id] = true; appendBenchEvidence(this.state, { kind: 'result', text }); this.feedback = `${text} ${proof.who} lo anota.`; this.callbacks.onSound?.('success'); this.result = evaluatePuzzle(this.id, this.state); this.settleBet();
+      proofs[proof.id] = true; appendBenchEvidence(this.state, { kind: 'result', text }); this.feedback = `${text} ${proof.who} lo anota.`; this.callbacks.onSound?.('success'); this.result = evaluatePuzzle(this.id, this.state); this.settleConjuro();
     }
   }
 
@@ -424,16 +424,6 @@ export class PuzzleWorkbench {
     if (action === 'close') return this.close();
     if (action === 'commission') return this.close(true, { commission: true });
     if (action === 'stay') { this.successDismissed = true; this.render(); this.shell.querySelector('[data-action="commission"]')?.focus?.({ preventScroll: true }); return; }
-    if (action === 'bet') {
-      const choice = el.dataset.choice, guess = PREDICTIONS[this.id];
-      if (!guess || this.state.bet) return;
-      this.state.bet = { choice, settled: false };
-      if (choice !== 'skip') appendBenchEvidence(this.state, { kind: 'prediction', text: `${betQuestion(this.id)} Aposté: «${betChoiceText(this.id, choice)}».` });
-      this.callbacks.onSound?.('click');
-      this.evaluate(false); this.callbacks.onChange?.(this.id, copy(this.state)); this.render();
-      this.shell.querySelector('.wb-say')?.focus?.({ preventScroll: true });
-      return;
-    }
     if (action === 'reveal') { const reveal = revealFor(this.id, this.state); if (!reveal) return; this.reveal = { ...reveal, at: 0 }; this.callbacks.onSound?.('page'); this.render(); this.shell.querySelector('.wb-reveal [data-action]')?.focus?.({ preventScroll: true }); return; }
     if (action === 'reveal-step') { if (!this.reveal) return; this.reveal.at = Math.max(0, Math.min(this.reveal.cards.length - 1, this.reveal.at + Number(el.dataset.delta))); this.callbacks.onSound?.('page'); this.render(); this.shell.querySelector('.wb-reveal [data-delta="1"], .wb-reveal [data-action="commission"], .wb-reveal [data-action="reveal-end"]')?.focus?.({ preventScroll: true }); return; }
     if (action === 'reveal-end') { this.reveal = null; this.successDismissed = true; this.render(); return; }
@@ -740,9 +730,7 @@ export class PuzzleWorkbench {
   // touched for the next item of the brief. A hint, when asked, takes its place until the next change.
   message(step) {
     const s = this.state, r = this.result, p = this.puzzle, guidance = BENCH_GUIDANCE[this.id], voice = guidance.voice;
-    if (this.betNote) return { kind: 'bet-result', who: PREDICTIONS[this.id]?.who ?? voice, tag: 'Tu apuesta', text: this.betNote };
-    const guess = PREDICTIONS[this.id];
-    if (guess && !s.bet && !s.completed && !this.practice && !r.solved) return { kind: 'bet', who: guess.who, tag: 'Una apuesta, antes de tocar', text: guess.ask, options: guess.options };
+    if (this.conjuroNote) return { kind: 'conjuro', who: 'OHM', tag: 'El conjuro, a prueba', text: this.conjuroNote };
     if (this.hintShown && s.hints) return { kind: 'hint', who: voice, tag: `Pista ${s.hints} de ${guidance.hints.length}`, text: guidance.hints[s.hints - 1] };
     if (this.feedback) return { kind: s.tripped ? 'warning' : 'note', who: voice, text: this.feedback };
     if (s.tripped) return { kind: 'warning', who: voice, text: observePuzzle(this.id, s, r)[0].text };
@@ -915,11 +903,17 @@ export class PuzzleWorkbench {
   }
 
   dockMarkup({ say, hintButton, controls, inService, tools, portMarkup, p, s }) {
-    const options = say.options ? `<div class="wb-bet-options" role="group" aria-label="Tu apuesta">${say.options.map(o => `<button data-action="bet" data-choice="${o.id}">${escapeHtml(o.text)}</button>`).join('')}<button class="wb-bet-skip" data-action="bet" data-choice="skip">Prefiero probar sin apostar</button></div>` : '';
-    return `<div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face ${SAY_FACES[say.who ?? 'OHM'] ? `wb-face wb-face-${SAY_FACES[say.who ?? 'OHM']}` : ''}" aria-hidden="true">${SAY_FACES[say.who ?? 'OHM'] ? '' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${say.options ? '' : hintButton}${options}</div>
+    return `${this.conjuroStrip()}<div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face ${SAY_FACES[say.who ?? 'OHM'] ? `wb-face wb-face-${SAY_FACES[say.who ?? 'OHM']}` : ''}" aria-hidden="true">${SAY_FACES[say.who ?? 'OHM'] ? '' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${hintButton}</div>
         ${controls && !inService ? `<div class="wb-compact-controls">${controls}</div>` : ''}
         <div class="wb-toolbar">${tools ? `<div class="wb-tools">${tools}</div>` : ''}${this.renderProbe()}<div class="wb-history">${inService && revealFor(this.id, s) ? '<button data-action="reveal"><span class="wb-eye-icon" aria-hidden="true"></span>Lo que vio Ohm</button>' : ''}${inService ? '<button data-action="practice">Practicar con una copia</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : ''}${!inService ? `<button data-action="undo" ${!this.history.length ? 'disabled' : ''} title="Deshacer el último cambio"><span aria-hidden="true">↶</span>Deshacer</button><button data-action="reset" title="Volver a la disposición inicial de la mesa"><span aria-hidden="true">↺</span>Empezar de nuevo</button>` : ''}</div></div>
         <details class="wb-terminal-drawer" data-drawer="terminals" ${p.cables ? 'open' : ''}><summary>Tocar las conexiones <span>Las mismas piezas, más cerca</span></summary><div class="wb-terminal-rail">${p.ports.map(n => portMarkup(n, true)).join('')}</div></details>`;
+  }
+
+  /** The keeper's inherited formula stays in view until the bench puts it to the test. */
+  conjuroStrip() {
+    const spell = CONJUROS[this.id];
+    if (!spell || this.state.conjuro || this.state.completed || this.practice) return '';
+    return `<p class="wb-conjuro"><span aria-hidden="true">✦</span><q>${escapeHtml(spell.words)}</q><small>— conjuro ${escapeHtml(spell.heir)}</small></p>`;
   }
 
   /** Ohm lends his eye: one card at a time, the pieces it speaks about lit on the board. */

@@ -122,7 +122,7 @@ const REVEALS = {
       { spot: ['clinic', 'kitchen'], title: 'En fila', words: ['serie'], tags: { clinic: `antes ${volts(V(before, 'clinic'))}`, kitchen: `antes ${volts(V(before, 'kitchen'))}` },
         text: `Antes las dos luces estaban en fila: las mismas cargas atravesaban la enfermería y después la cocina. Brillaban igual de poco: la corriente no se gasta en la primera. Lo que se repartían era el empuje: ${volts(V(before, 'clinic'))} para cada una.` },
       { spot: ['clinic', 'kitchen'], title: 'Cada una, su camino', words: ['paralelo'], tags: { clinic: volts(V(now, 'clinic')), kitchen: volts(V(now, 'kitchen')) },
-        text: `Ahora cada luz va de «Fuente +» a «Retorno −» por su cuenta, y las dos reciben el empuje entero: ${volts(V(now, 'clinic'))}. Edda apostó que la enfermería brillaría menos. Brilla más.` },
+        text: `Ahora cada luz va de «Fuente +» a «Retorno −» por su cuenta, y las dos reciben el empuje entero: ${volts(V(now, 'clinic'))}. El Consejo decía que la Luz es una sola y se reparte; acá cada camino tiene la suya.` },
       { spot: ['clinic', 'kitchen'], title: 'Lo de más, de dónde sale',
         text: `De la fuente: antes entregaba ${amps(before.current)}, ahora ${amps(now.current)}, la suma de las dos ramas. Y como cada rama es independiente, Ivara pudo aislar la cocina sin apagar la enfermería.` },
     ],
@@ -194,75 +194,43 @@ export function revealFor(id, state) {
   return make({ id, state, now, before: evaluatePuzzle(id, initialPuzzleSnapshot(id)) });
 }
 
-// ── Apuestas ─────────────────────────────────────────────────────────────────────────────
-// Predict, then look (White & Gunstone). Whoever is at the bench asks before anything is touched; the bench settles the
-// bet when the physics shows the answer. Nothing is blocked by a wrong guess: it is the point.
-export const PREDICTIONS = {
-  workshop: {
-    who: 'LUMEN', ask: 'Antes de medir: ¿cuál de los tres tramos está cortado?',
-    options: [{ id: 't1', text: 'El tramo 1' }, { id: 't2', text: 'El tramo 2' }, { id: 't3', text: 'El tramo 3' }, { id: 'look', text: 'Mirando no se puede saber' }],
-    answer: 'look', settled: (r, s) => !!s.proofs?.foundBreak,
-    outcome: 'El instrumento encontró el corte en el tramo 2. Por fuera, los tres eran iguales.',
-    said: { look: 'Así fue: por fuera eran iguales. Hizo falta preguntarle al cobre.', t2: 'Era el 2. Pero por fuera eran iguales: fue suerte hasta que el instrumento lo confirmó.', other: 'Era el 2. Por fuera no había forma de saberlo: por eso medimos.' },
-  },
-  gate: {
-    who: 'EDDA', ask: 'Si das vuelta los dos cables de la bobina, ¿qué hace el cerrojo?',
-    options: [{ id: 'flip', text: 'Empuja hacia el otro lado' }, { id: 'same', text: 'Sigue empujando hacia atrás' }, { id: 'stop', text: 'Se queda quieto' }, { id: 'more', text: 'Empuja con más fuerza' }],
-    answer: 'flip', settled: r => r.solution.valid && (r.solution.branches.latch?.current ?? 0) > .05 && !r.overloaded,
-    outcome: 'Empujó hacia el otro lado, con la misma fuerza.',
-    said: { flip: 'Lo dijiste: el sentido de la corriente decidió el sentido del empuje.', other: 'Pasó otra cosa: empujó hacia el otro lado, con la misma fuerza. Sentido y fuerza son dos perillas distintas.' },
-  },
-  pump: {
-    who: 'VEGA', ask: 'Los tres empalmes dejan pasar. Con la bomba andando, ¿dónde va a haber diferencia entre A y B?',
-    options: [{ id: 'warm', text: 'Sólo en el empalme malo' }, { id: 'all', text: 'Un poco en todos, igual' }, { id: 'none', text: 'En ninguno: si deja pasar, no pierde' }],
-    answer: 'warm', settled: (r, s) => !!s.proofs?.foundLoss,
-    outcome: 'Los empalmes sanos apenas se notaban; el 2 se quedaba con casi todo el empuje.',
-    said: { warm: 'Así fue: el empalme 2 se quedaba con casi todo.', none: 'Era tentador: si deja pasar, ¿qué va a perder? Pero el 2 se quedaba con casi todo el empuje.', other: 'Los sanos apenas se notaban; el 2 se quedaba con casi todo.' },
-  },
-  distribution: {
-    who: 'EDDA', ask: 'Yo ya aposté: si cada luz tiene su propio camino, la enfermería va a brillar menos. ¿Y vos?',
-    noted: 'Edda apostó que, con caminos propios, la enfermería brillaría menos. ¿Y yo?',
-    options: [{ id: 'less', text: 'Menos: se reparten la luz' }, { id: 'same', text: 'Igual que ahora' }, { id: 'more', text: 'Más fuerte' }],
-    answer: 'more', settled: r => !!r.operating.clinic && !!r.operating.kitchen,
-    outcome: 'Las dos brillan más fuerte: cada una recibe ahora el empuje entero.',
-    said: { more: 'Me ganaste la apuesta: cada luz recibe ahora el empuje entero.', less: 'Apostamos lo mismo, y pasó lo contrario: brilla más. Antes cada luz recibía la mitad del empuje.', other: 'Brilla más: antes cada luz recibía la mitad del empuje. Perdimos los dos.' },
-  },
-  irrigation: {
-    who: 'VEGA', ask: 'Si frenás el horno, ¿qué les pasa a las raíces?',
-    options: [{ id: 'none', text: 'Nada: siguen igual' }, { id: 'warmer', text: 'Se calientan más: les queda más' }, { id: 'colder', text: 'Se enfrían también' }],
-    answer: 'none', settled: (r, s) => s.values.forge !== PUZZLES.irrigation.knobs.find(k => k.key === 'forge').initial,
-    outcome: 'Frenaste el horno y las raíces siguieron igual. Lo que bajó fue la corriente del cable compartido.',
-    said: { none: 'Así fue: cada rama tiene el mismo empuje. Frenar el horno sólo alivia el cable compartido.', warmer: 'Parecía lógico: lo que suelta uno, ¿no lo toma otro? Acá no: las raíces siguen igual. Lo que baja es la suma en el cable.', other: 'Las raíces no se enteraron: cada rama recibe el mismo empuje.' },
-  },
-  beacon_supply: {
-    who: 'NEREO', ask: 'Si sumás el tendido sur al lado del norte, ¿cuánto se calienta el norte?',
-    options: [{ id: 'same', text: 'Igual que ahora' }, { id: 'half', text: 'La mitad' }, { id: 'less', text: 'Mucho menos que la mitad' }, { id: 'more', text: 'Más' }],
-    answer: 'less', settled: r => (Math.abs(r.solution.branches.lineB?.current ?? 0)) > .1 && !r.overloaded,
-    outcome: 'Con la corriente repartida, cada tendido se calienta un cuarto de lo que se calentaba uno solo.',
-    said: { less: 'Así: la mitad de corriente da un cuarto del calor.', half: 'Casi: la corriente se reparte a la mitad, pero el calor baja a un cuarto. Crece con la corriente al cuadrado.', other: 'Bajó mucho: con la corriente repartida, cada tendido se calienta un cuarto.' },
-  },
-  beacon_network: {
-    who: 'EDDA', ask: 'Cuando cada voz tenga su propio camino, ¿cuál va a tomar más corriente?',
-    options: [{ id: 'optic', text: 'La óptica · 18 Ω' }, { id: 'signal', text: 'La señal · 72 Ω' }, { id: 'same', text: 'Las tres lo mismo' }],
-    answer: 'optic', settled: r => ['optic', 'bearing', 'signal'].every(k => r.operating[k]),
-    outcome: 'La óptica, la que menos frena, toma más: el doble que el giro y cuatro veces lo de la señal.',
-    said: { optic: 'Así: con el mismo empuje, la que menos frena deja pasar más.', signal: 'Al revés: la señal, con más freno, toma la menor. Menos freno, más corriente.', other: 'Reciben el mismo empuje, pero no la misma corriente: depende de cuánto frena cada una.' },
-  },
-  beacon_lens: {
-    who: 'EDDA', ask: 'Cuando conectes la lente a la toma, la tensión de la toma…',
-    options: [{ id: 'down', text: 'Baja' }, { id: 'up', text: 'Sube' }, { id: 'same', text: 'Queda igual' }],
-    answer: 'down', settled: (r, s) => !!s.proofs?.tapUnloaded && !!s.proofs?.tapLoaded,
-    outcome: 'Con la lente conectada, la toma bajó.',
-    said: { down: 'Bajó, como dijiste: la lente le hace compañía al brazo inferior y juntos frenan menos.', other: 'Bajó: con la lente al lado, el brazo inferior tiene compañía y juntos frenan menos.' },
-  },
+// ── Conjuros ─────────────────────────────────────────────────────────────────────────────
+// The sabios of Ohmdal are heirs to a craft they no longer understand: what the Maestros left them
+// survived as words and gestures, said over the copper like spells. They distrust what can be counted
+// («la Luz no se deja contar»). Each bench opens with the formula its keeper inherited, and the copper
+// puts it to the test: every conjuro carries one of the classic wrong ideas about circuits, so the
+// moment it fails is the moment the real cause shows. Nobody is mocked; the rite can stay, as a custom.
+export const CONJUROS = {
+  workshop: { who: 'LUMEN', heir: 'que Lumen heredó de su padre',
+    words: 'Paño seco, tres vueltas al contacto, lámpara nueva: la Luz vuelve a quien la atiende.',
+    settled: (r, s) => !!s.proofs?.foundBreak,
+    copper: 'Ninguna vuelta llega adentro de la tela. El cobre estaba cortado ahí, y la lámpara era la misma.' },
+  gate: { who: 'EDDA', heir: 'de los guardianes de la Calzada',
+    words: 'La Puerta cede a quien le da toda la Luz. Por eso alguien le tendió ese puente.',
+    settled: r => !!r.operating.latch,
+    copper: 'Con toda la Luz, el cerrojo golpeaba hacia el lado equivocado. El sentido lo dieron los cables; la fuerza justa, el freno.' },
+  pump: { who: 'VEGA', heir: 'de las operadoras del acueducto',
+    words: 'Por donde pasa el agua, pasa la Luz. Unión que deja pasar, no roba.',
+    settled: (r, s) => !!s.proofs?.foundLoss,
+    copper: 'El empalme 2 dejaba pasar, y aun así se quedaba con casi todo el empuje mientras la bomba trabajaba.' },
+  distribution: { who: 'IVARA', heir: 'del Consejo de la Red',
+    words: 'La Luz es una sola: lo que se le da a una casa, se le quita a otra.',
+    settled: r => !!r.operating.clinic && !!r.operating.kitchen,
+    copper: 'Con un camino cada una, las dos luces brillan más que antes. Cada camino recibe el empuje entero.' },
+  irrigation: { who: 'YESCA', heir: 'de las forjas de la ladera',
+    words: 'La ladera da una sola Luz: el fuego que yo suelto, se lo bebe el agua.',
+    settled: (r, s) => s.values.forge !== PUZZLES.irrigation.knobs.find(k => k.key === 'forge').initial,
+    copper: 'Con el horno frenado, las raíces siguieron igual. Lo que bajó fue lo que carga el cable compartido.' },
+  beacon_supply: { who: 'NEREO', heir: 'de los fareros',
+    words: 'Cobre que se queja, cobre que descansa: un tendido por vez.',
+    settled: r => Math.abs(r.solution.branches.lineB?.current ?? 0) > .1 && !r.overloaded,
+    copper: 'Los dos tendidos juntos se reparten la corriente, y cada uno se calienta un cuarto de lo que se calentaba solo.' },
+  beacon_network: { who: 'NEREO', heir: 'de los fareros',
+    words: 'Las voces del Faro cantan en fila: la primera da el tono y las demás la siguen.',
+    settled: r => ['optic', 'bearing', 'signal'].every(k => r.operating[k]),
+    copper: 'En fila, ninguna voz recibía lo que necesitaba. Con su propio camino, cada una toma lo que su freno le deja: la óptica, cuatro veces lo de la señal.' },
+  beacon_lens: { who: 'NEREO', heir: 'de los fareros',
+    words: 'La lente se templa una sola vez, a oscuras, antes de abrirle el ojo al lago.',
+    settled: (r, s) => !!s.proofs?.tapUnloaded && !!s.proofs?.tapLoaded,
+    copper: 'Templada a oscuras no alcanzaba: al conectar la lente, la toma bajó. Hay que templarla con la lente puesta.' },
 };
-
-/** The question as the player writes it down in the Bitácora. */
-export function betQuestion(id) { return PREDICTIONS[id]?.noted ?? PREDICTIONS[id]?.ask ?? ''; }
-export function betChoiceText(id, choice) { return PREDICTIONS[id]?.options.find(o => o.id === choice)?.text ?? ''; }
-/** What the one who asked says once the bench showed the answer. */
-export function betVerdict(id, choice) {
-  const p = PREDICTIONS[id];
-  if (!p) return '';
-  return p.said[choice] ?? p.said.other;
-}

@@ -173,7 +173,7 @@ export function terracesAgreement(state) {
 export function initialPuzzleSnapshot(id) {
   const p = PUZZLES[id];
   if (!p) throw new Error(`Unknown puzzle: ${id}`);
-  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], bet: null, completed: false };
+  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, completed: false };
 }
 
 export function normalizePuzzleSnapshot(id, saved) {
@@ -192,8 +192,9 @@ export function normalizePuzzleSnapshot(id, saved) {
     hints: Number.isFinite(saved.hints) ? Math.max(0, Math.min(HINT_STEPS, Math.floor(saved.hints))) : 0,
     meter: { mode: ['voltage', 'continuity', 'current'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) ? saved.meter.branch : null },
   };
-  // Edda's bet, if one was taken: the option chosen (or «skip») and whether the bench already showed the answer.
-  normalized.bet = saved.bet && typeof saved.bet.choice === 'string' && /^[a-z0-9]{1,12}$/.test(saved.bet.choice) ? { choice: saved.bet.choice, settled: saved.bet.settled === true } : null;
+  // Whether the copper already put the keeper's inherited conjuro to the test on this bench.
+  // A repaired installation already answered it, also in saves from before conjuros existed.
+  normalized.conjuro = saved.conjuro === true || saved.completed === true;
   // A proof counts once seen. Installations commissioned before a proof was required keep it.
   normalized.proofs = !p.proof ? {} : Object.fromEntries([p.proof.id, ...(p.proof.parts ?? [])].filter(k => saved.proofs?.[k] === true).map(k => [k, true]));
   if (p.proof && saved.completed === true) normalized.proofs[p.proof.id] = true;

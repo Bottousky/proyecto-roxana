@@ -1,7 +1,7 @@
 import {AREAS, CHARACTERS, JOURNAL, journalText, knowsCharacter, playerName, characterNote} from './content.js';
 import {hasRequirements} from './state.js';
 import {JOURNEY_PHASES, inferredTime} from './story-time.js';
-import {revealFor, PREDICTIONS, betChoiceText, betQuestion, WORDS, WORD_ORDER, wordsKnown} from './understanding.js';
+import {revealFor, CONJUROS, WORDS, WORD_ORDER, wordsKnown} from './understanding.js';
 import {renderSchematic, wordSymbol} from './schematic.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -81,7 +81,7 @@ function routeList(state) {
 
 // ── The circuit pages ────────────────────────────────────────────────────────────────────
 // What a bench left in the notebook: the montage drawn twice (found / left), what Ohm saw behind it,
-// the bet taken before touching, and the trials, the ones that decided first.
+// the conjuro its keeper inherited and what the copper answered, and the trials, the ones that decided first.
 function schematics(id, snapshot, puzzles) {
   if (!id || !puzzles[id] || !snapshot?.wires) return '';
   return `<div class="dj-schematics">${renderSchematic(id, snapshot, {mode: 'before'})}${renderSchematic(id, snapshot, {mode: 'after', caption: snapshot.completed ? 'Así lo dejé' : 'Así va, por ahora'})}</div>`;
@@ -94,17 +94,17 @@ function behind(id, snapshot) {
     ${words.length ? `<ul class="dj-words-mini" aria-label="Palabras del oficio que aparecieron acá">${words.map(key => `<li>${wordSymbol(WORDS[key].symbol)}<span><b>${esc(WORDS[key].term)}</b>${WORDS[key].unit ? ` · ${esc(WORDS[key].unit)}` : ''}</span></li>`).join('')}</ul>` : ''}
     <blockquote class="dj-sticky dj-sticky-question" style="--tilt:2deg"><b>Para pensar</b>${esc(reveal.question)}</blockquote></section>`;
 }
-function bet(id, snapshot) {
-  const guess = PREDICTIONS[id], b = snapshot?.bet;
-  if (!guess || !b || b.choice === 'skip') return '';
-  const right = b.choice === guess.answer;
-  return `<div class="dj-bet ${b.settled ? (right ? 'is-right' : 'is-wrong') : ''}"><span class="dj-bet-label">Mi apuesta</span><p class="dj-bet-ask">${esc(betQuestion(id))}</p><p class="dj-bet-mine">«${esc(betChoiceText(id, b.choice))}»</p>${b.settled ? `<p class="dj-bet-out"><span aria-hidden="true">${right ? '✓' : '✗'}</span> ${esc(guess.outcome)}</p>` : '<p class="dj-bet-out">Todavía no lo comprobé.</p>'}</div>`;
+function conjuro(id, snapshot) {
+  const spell = CONJUROS[id];
+  if (!spell || !snapshot?.wires) return '';
+  const tested = snapshot.conjuro === true || snapshot.completed === true;
+  return `<div class="dj-conjuro"><span class="dj-conjuro-label">✦ El conjuro <small>${esc(spell.heir)}</small></span><p class="dj-conjuro-words">«${esc(spell.words)}»</p><p class="dj-conjuro-copper">${tested ? `<b>Lo que dijo el cobre:</b> ${esc(spell.copper)}` : 'Todavía no lo puse a prueba.'}</p></div>`;
 }
-const KEY_TRIALS = new Set(['measurement', 'prediction']);
+const KEY_TRIALS = new Set(['measurement']);
 function trials(notes) {
   if (!notes.length) return '<p class="dj-pencil dj-empty">Todavía no registré una lectura aquí. Cuando use el instrumento, conservaré los puntos y el resultado.</p>';
   const item = note => `<li class="dj-trial dj-ink-${INK[note.kind] || 'obs'}"><strong>${esc(note.title)}</strong><p>${esc(note.text)}</p>${note.reading ? `<span class="dj-reading">${esc(note.reading)}</span>` : ''}${note.reference ? `<small>${esc(note.reference)}</small>` : ''}</li>`;
-  // What decided: every measurement and bet, and how it ended. Routine «what happened» notes stay in the full log.
+  // What decided: every measurement, and how it ended. Routine «what happened» notes stay in the full log.
   const last = notes.filter(note => note.kind === 'result').at(-1);
   const key = notes.filter(note => KEY_TRIALS.has(note.kind) || note === last).slice(-6), shown = key.length ? key : notes.slice(-4);
   return `<ol class="dj-trials">${shown.map(item).join('')}</ol>${notes.length > shown.length ? `<details class="dj-all-trials"><summary>Todos mis intentos, en orden (${notes.length})</summary><ol class="dj-trials">${notes.map(item).join('')}</ol></details>` : ''}`;
@@ -161,7 +161,7 @@ export function renderJournal(state, {selected, puzzles={}, evidenceFor=()=>[], 
       ${photo(page.area, AREAS[page.area]?.name || 'Ohmdal', index%2?3:-3)}<p class="dj-ink">${esc(page.text)}</p>${schematics(page.puzzle,snapshot,puzzles)}
       ${page.question?`<blockquote class="dj-sticky" style="--tilt:-2deg">${esc(page.question)}</blockquote>`:''}
       </div><span class="dj-folio">${index+1}</span>${corner(previous,'← Hoja anterior','prev')}</section>`;
-    right=`<section class="dj-page dj-right"><div class="dj-page-body">${behind(page.puzzle,snapshot)}${bet(page.puzzle,snapshot)}<header class="dj-evidence-head"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3></header>
+    right=`<section class="dj-page dj-right"><div class="dj-page-body">${conjuro(page.puzzle,snapshot)}${behind(page.puzzle,snapshot)}<header class="dj-evidence-head"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3></header>
       ${trials(notes)}
       ${page.explanation?`<details class="dj-card"><summary>La idea que pudimos explicar</summary><p>${esc(page.explanation)}</p></details>`:''}
       <div class="dj-own-note"><label for="personal-journal-note">Mi pregunta o hipótesis</label><textarea id="personal-journal-note" data-note-for="${esc(page.id)}" maxlength="1200" rows="4" placeholder="Creo que… / Me pregunto qué pasaría si…">${esc(state.personalNotes?.[page.id]||'')}</textarea><small>Una idea puede cambiar. No hace falta tener la respuesta.</small></div>

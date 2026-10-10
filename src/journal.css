@@ -266,16 +266,14 @@
 .dj-sticky-question{margin-top:12px}
 .dj-sticky-question b,.dj-sticky>b{display:block;font-family:var(--marker);font-weight:400;font-size:14px;color:#7a5c12}
 
-/* The bet: green ink, ticked or crossed once the bench answered. */
-.dj-bet{position:relative;margin:4px 4px 14px;padding:8px 12px 8px 14px;border-left:3px solid var(--ink-green);background:#2f6a3c0d}
-.dj-bet-label{font-family:var(--marker);font-size:15px;color:var(--ink-green)}
-.dj-bet p{margin:2px 0;font-family:var(--hand);font-weight:600;font-size:20px;line-height:1.2;color:var(--ink-black)}
-.dj-bet-mine{color:var(--ink-green)!important;font-size:23px!important}
-.dj-bet-out{color:var(--ink-blue)!important}
-.dj-bet-out span{font-family:var(--marker);font-size:20px}
-.dj-bet.is-right .dj-bet-out span{color:var(--ink-green)}
-.dj-bet.is-wrong .dj-bet-out span{color:var(--ink-red)}
-.dj-bet.is-wrong .dj-bet-mine{text-decoration:line-through;text-decoration-color:var(--ink-red);text-decoration-thickness:2px}
+/* The conjuro: the keeper's words in sienna, as copied from an old margin; the copper's answer in ballpoint. */
+.dj-conjuro{position:relative;margin:0 4px 16px;padding:8px 14px 8px 16px;border-left:3px double var(--sienna);background:#9a4b220d;transform:rotate(-.4deg)}
+.dj-conjuro-label{font-family:var(--marker);font-size:16px;color:var(--sienna)}
+.dj-conjuro-label small{font-family:var(--hand);font-size:17px;margin-left:6px;color:var(--graphite)}
+.dj-conjuro p{margin:3px 0;font-family:var(--hand);font-weight:600;font-size:21px;line-height:1.22}
+.dj-conjuro-words{color:var(--sienna);font-style:italic;font-size:23px!important}
+.dj-conjuro-copper{color:var(--ink-blue)}
+.dj-conjuro-copper b{font-family:var(--marker);font-weight:400;font-size:15px;color:var(--ink-black)}
 .dj-all-trials{margin:4px 0 10px}
 .dj-all-trials summary{cursor:pointer;font-family:var(--hand);font-weight:700;font-size:19px;color:var(--graphite)}
 
@@ -316,7 +314,7 @@
   #journal-print .dj-left .dj-folio{left:12mm}#journal-print .dj-right .dj-folio{right:12mm}
   #journal-print .dj-schematic svg{filter:url(#dj-rough-print)}
   #journal-print .dj-schematics{display:block}#journal-print .dj-schematic{margin-bottom:4mm}
-  #journal-print .dj-schematic,#journal-print .dj-trial,#journal-print .dj-word,#journal-print .dj-bet,#journal-print .dj-behind li,#journal-print .dj-photo{break-inside:avoid}
+  #journal-print .dj-schematic,#journal-print .dj-trial,#journal-print .dj-word,#journal-print .dj-conjuro,#journal-print .dj-behind li,#journal-print .dj-photo{break-inside:avoid}
   #journal-print .dj-printed-note{font-family:var(--hand);font-weight:600;font-size:20px;line-height:28px;color:var(--ink-blue);background:repeating-linear-gradient(transparent 0 27px,#9fc3d8 27px 28px);min-height:90px;margin:4px 0 0}
   #journal-print .dj-print-cover{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20mm;
     background:radial-gradient(ellipse at 30% 20%,#ffffff12,transparent 55%),repeating-linear-gradient(92deg,#2a1d13 0 3px,#2f2116 3px 9px,#28190f 9px 14px),#2a1c12;color:#e9d3a6}

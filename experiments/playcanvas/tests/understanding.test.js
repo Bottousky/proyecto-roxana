@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PUZZLES, initialPuzzleSnapshot, evaluatePuzzle, normalizePuzzleSnapshot } from '../src/game/puzzle-model.js';
-import { revealFor, PREDICTIONS, WORDS, WORD_ORDER, wordsKnown, betVerdict } from '../src/game/understanding.js';
+import { revealFor, CONJUROS, WORDS, WORD_ORDER, wordsKnown } from '../src/game/understanding.js';
 
 const solved = id => { const s = initialPuzzleSnapshot(id); PUZZLES[id].solve(s); return s; };
 
@@ -38,20 +38,22 @@ test('the glossary is earned bench by bench, and every word comes from one', () 
   assert.ok(wordsKnown({ flags: { awaken: true, gate: true } }).includes('resistencia'));
 });
 
-test('each bet can be lost, is open before touching and is settled by the repair itself', () => {
-  for (const [id, guess] of Object.entries(PREDICTIONS)) {
-    assert.ok(guess.options.some(o => o.id === guess.answer), `${id}: the right answer is among the options`);
-    assert.ok(guess.options.length >= 3, `${id}: more than a yes or no`);
+test("each keeper's conjuro is put to the test by the repair itself, never before", () => {
+  const voices = new Set(['LUMEN', 'EDDA', 'VEGA', 'IVARA', 'YESCA', 'NEREO']);
+  for (const [id, spell] of Object.entries(CONJUROS)) {
+    assert.ok(voices.has(spell.who), `${id}: said by one of the heirs`);
+    assert.ok(spell.words && spell.copper && spell.heir, `${id}: the words, who they come from and what the copper answers`);
     const start = initialPuzzleSnapshot(id);
-    assert.equal(guess.settled(evaluatePuzzle(id, start), start), false, `${id}: nothing is shown before touching`);
+    assert.equal(spell.settled(evaluatePuzzle(id, start), start), false, `${id}: untested before anything is touched`);
     const done = solved(id);
-    assert.equal(guess.settled(evaluatePuzzle(id, done), done), true, `${id}: the repair shows the answer`);
-    for (const o of guess.options) assert.ok(betVerdict(id, o.id), `${id}: Edda has something to say about «${o.text}»`);
+    assert.equal(spell.settled(evaluatePuzzle(id, done), done), true, `${id}: the repair answers it`);
   }
 });
 
-test('a bet survives a reload, and a malformed one is dropped', () => {
-  const s = initialPuzzleSnapshot('gate'); s.bet = { choice: 'flip', settled: true };
-  assert.deepEqual(normalizePuzzleSnapshot('gate', s).bet, { choice: 'flip', settled: true });
-  assert.equal(normalizePuzzleSnapshot('gate', { ...s, bet: { choice: '<b>' } }).bet, null);
+test('a tested conjuro is remembered across a reload, and old bets are forgotten', () => {
+  const s = { ...initialPuzzleSnapshot('gate'), conjuro: true, bet: { choice: 'flip', settled: true } };
+  const loaded = normalizePuzzleSnapshot('gate', s);
+  assert.equal(loaded.conjuro, true);
+  assert.equal(loaded.bet, undefined);
+  assert.equal(normalizePuzzleSnapshot('gate', { ...s, conjuro: 'yes' }).conjuro, false);
 });

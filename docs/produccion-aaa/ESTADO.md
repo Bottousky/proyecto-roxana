@@ -511,9 +511,12 @@ muy difícil, con el lema de Roxana («aprender sin darse cuenta», entender en 
 Auditoría e investigación: [AUDITORIA-APRENDIZAJE.md](AUDITORIA-APRENDIZAJE.md) e
 [INVESTIGACION-APRENDIZAJE.md](INVESTIGACION-APRENDIZAJE.md). Jugado en el navegador desde un
 registro nuevo hasta el Castillo, apostando mal a propósito. Lo que cambió:
-- **Apuestas** (predecir → observar → explicar): ocho bancos abren con una pregunta de quien está
-  presente; el montaje la resuelve y quien preguntó responde. Cada una ataca una idea previa
-  documentada. Prueba: `tests/understanding.test.js`.
+- **Conjuros heredados** (en lugar de las apuestas del primer intento, quitadas a pedido del
+  usuario): los sabios vuelven a ser herederos de una magia que no conocen y desconfían de lo que
+  se puede contar. Cada banco muestra el conjuro de su cuidador, que es una idea errónea clásica;
+  el montaje lo pone a prueba y la Bitácora guarda «lo que dijo el cobre». Diálogos de Lumen,
+  Edda, Vega, Ivara, Yesca, Nereo y Ohm retocados; canon en LORE.md («Los herederos de la Luz»).
+  Prueba: `tests/understanding.test.js`.
 - **«Lo que vio Ohm»**: al funcionar, tres tarjetas con lo que no se ve (cargas que ya están,
   empuje que se reparte), las piezas iluminadas y etiquetas con los números del montaje del
   jugador, la palabra del Instituto y una pregunta. También desde un banco en servicio.
