@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {freshState,validateState} from '../src/game/state.js';
-import {renderJournal,journalPages,recordFieldObservation,renderCircuitSketch} from '../src/game/journal.js';
+import {renderJournal,journalPages,recordFieldObservation} from '../src/game/journal.js';
+import {renderSchematic} from '../src/game/schematic.js';
 import {PUZZLES,initialPuzzleSnapshot} from '../src/game/puzzle-model.js';
 import {getBenchEvidence} from '../src/game/bench-evidence.js';
 
@@ -13,12 +14,12 @@ test('journal explains only experienced chapters and draws the saved wiring, nev
   assert.match(html,/UNA PRUEBA ABIERTA/);
   assert.doesNotMatch(html,/La idea que pudimos explicar/);
   assert.match(html,/Todavía no registré una lectura/);
-  assert.doesNotMatch(renderCircuitSketch(PUZZLES.workshop,state.puzzles.workshop),/M310 160 L545 160\"\/>.*<\/g><g class="sketch-pieces">/);
-  const before=renderCircuitSketch(PUZZLES.awaken,initialPuzzleSnapshot('awaken'));
-  const after=renderCircuitSketch(PUZZLES.awaken,{...initialPuzzleSnapshot('awaken'),wires:[['heartOut','negative']]});
-  assert.match(before,/M85 125 L540 210/);
-  assert.doesNotMatch(before,/M790 210 L85 375/);
-  assert.match(after,/M790 210 L85 375/);
+  // The notebook draws the montage the player left: the cable they added goes in their own blue ink.
+  const found=renderSchematic('awaken',initialPuzzleSnapshot('awaken'),{mode:'before'});
+  const left=renderSchematic('awaken',{...initialPuzzleSnapshot('awaken'),wires:[['positive','heartIn'],['heartOut','negative']]},{mode:'after'});
+  assert.match(found,/Así estaba/);assert.doesNotMatch(found,/class="sk-blue"/);
+  assert.match(left,/Así lo dejé/);assert.match(left,/class="sk-blue"/);
+  assert.match(left,/6 V · 0,5 A/,'what reached the heart, in red pencil');
 });
 
 test('real field readings are bounded, deduplicated, persisted, and distinguish floating from zero',()=>{

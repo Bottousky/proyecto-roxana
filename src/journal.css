@@ -77,14 +77,6 @@
 .dj-photo figcaption{font-family:var(--note);font-size:15px;color:var(--ink-black);text-align:center;margin-top:4px}
 
 /* The circuit drawn in pencil, a little shaky, with red pencil marks. */
-.dj-page .journal-sketch{clear:both;margin:10px 0 6px;padding:0;background:none;border:0}
-.dj-page .journal-sketch svg{width:100%;height:auto;filter:url(#dj-rough);overflow:visible}
-.dj-page .journal-sketch path{fill:none;stroke:var(--graphite);stroke-width:4;stroke-linecap:round}
-.dj-page .journal-sketch .sketch-wires path{stroke:var(--ink-blue);stroke-width:5}
-.dj-page .journal-sketch rect{fill:#ffffff30;stroke:var(--ink-black);stroke-width:3.5}
-.dj-page .journal-sketch circle{fill:var(--paper);stroke:var(--ink-red);stroke-width:4}
-.dj-page .journal-sketch text{font-family:var(--hand);font-size:50px;font-weight:700;fill:var(--ink-black);text-anchor:middle}
-.dj-page .journal-sketch figcaption{font-family:var(--hand);font-size:19px;color:var(--graphite);text-align:right;margin-top:-4px}
 
 /* The explanation: a lined index card, folded until opened. */
 .dj-card{clear:both;margin:14px 6px 12px;background:repeating-linear-gradient(#fdfaf0 0 25px,#9fc3d8 25px 26px);border-left:2px solid #d9827c55;box-shadow:0 2px 6px #0004;padding:6px 14px 10px 22px;transform:rotate(.6deg);position:relative}
@@ -228,3 +220,109 @@
 /* Many pages: each tab keeps one line, the full title shows on hover and to screen readers. */
 .dj-tab{flex:none;min-height:30px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .dj-tab span{margin-right:5px}.dj-tab small{display:inline;margin-left:6px}
+
+
+/* ── Circuit pages: the montage drawn by hand, twice ───────────────────────────────── */
+.dj-schematics{clear:both;display:grid;gap:4px;margin:8px 0 4px}
+.dj-schematic{margin:0;padding:0;position:relative}
+.dj-schematic figcaption{font-family:var(--marker);font-size:16px;color:var(--ink-red);transform:rotate(-1.5deg);margin:0 0 -6px 6px;position:relative;z-index:1}
+.dj-schematic-before figcaption{color:var(--graphite)}
+.dj-schematic svg{display:block;width:100%;height:auto;overflow:visible;filter:url(#dj-rough)}
+.dj-schematic-before svg{opacity:.78}
+.sk-ink,.sk-blue,.sk-red,.sk-pencil,.sk-plate{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.sk-ink{stroke:var(--ink-black);stroke-width:3.2}
+.sk-blue{stroke:var(--ink-blue);stroke-width:3.6}
+.sk-red{stroke:var(--ink-red);stroke-width:2.6}
+.sk-pencil{stroke:var(--graphite);stroke-width:2;opacity:.75}
+.sk-second{stroke-width:1.3;opacity:.45}
+.sk-plate{stroke:var(--ink-black);stroke-width:3.6}.sk-plate.sk-thick{stroke-width:9}
+.sk-cover{fill:#c8a77122;stroke:var(--sienna);stroke-width:2;stroke-dasharray:7 6}
+.sk-dot{fill:var(--ink-black)}.sk-node{fill:var(--ink-black);stroke:var(--paper);stroke-width:2}
+.sk-red-dot{fill:var(--ink-red)}.sk-blue-dot{fill:var(--ink-blue)}.sk-paper{fill:var(--paper);stroke:var(--ink-black);stroke-width:3}
+.dj-schematic text,.dj-word-symbol text{font-family:var(--hand);text-anchor:middle}
+.sk-label{font-size:42px;font-weight:700;fill:var(--ink-black)}
+.sk-value{font-size:38px;font-weight:700;fill:var(--graphite)}
+.sk-glyph{font-size:34px;font-weight:700;fill:var(--ink-black)}.sk-glyph.sk-big{font-size:40px}
+.sk-sign{font-size:46px;font-weight:700;fill:var(--ink-black)}
+.sk-red-note{font-size:38px;font-weight:700;fill:var(--ink-red)}
+.sk-blue-note{font-size:36px;font-weight:700;fill:var(--ink-blue)}
+
+/* What Ohm saw: numbered notes in ballpoint, the Instituto's words boxed in red. */
+.dj-behind{margin:0 0 14px}
+.dj-behind h4,.dj-print-book h4{font-family:var(--marker);font-weight:400;font-size:22px;color:var(--ink-black);margin:0 0 6px;transform:rotate(-.6deg)}
+.dj-behind h4 small{font-family:var(--hand);font-size:19px;color:var(--graphite);margin-left:6px}
+.dj-behind ol{margin:0;padding-left:26px;counter-reset:behind;list-style:none}
+.dj-behind ol li{position:relative;font-family:var(--hand);font-weight:600;font-size:21px;line-height:1.22;color:var(--ink-blue);margin:0 0 8px}
+.dj-behind ol li::before{counter-increment:behind;content:counter(behind);position:absolute;left:-26px;top:1px;width:20px;height:20px;border:2px solid var(--ink-red);border-radius:50%;font-size:15px;line-height:17px;text-align:center;color:var(--ink-red)}
+.dj-behind ol li b{color:var(--ink-black)}
+.dj-words-mini{display:flex;flex-wrap:wrap;gap:6px 10px;margin:8px 0 0;padding:0;list-style:none}
+.dj-words-mini li{display:flex;align-items:center;gap:4px;padding:2px 8px 2px 2px;border:2px solid var(--ink-red);border-radius:3px 8px 4px 9px;transform:rotate(-.8deg);font-family:var(--note);font-size:15px;color:var(--ink-black)}
+.dj-words-mini li:nth-child(2n){transform:rotate(.9deg)}
+.dj-words-mini .dj-word-symbol{width:44px;height:33px}
+.dj-word-symbol{flex:none;overflow:visible}
+.dj-word-symbol .sk-ink,.dj-word-symbol .sk-blue,.dj-word-symbol .sk-red,.dj-word-symbol .sk-plate{stroke-width:2.6}
+.dj-word-symbol .sk-plate.sk-thick{stroke-width:7}
+.dj-word-symbol .sk-sign{font-size:20px}.dj-word-symbol .sk-red-note{font-size:17px}.dj-word-symbol .sk-glyph{font-size:34px}.dj-word-symbol .sk-glyph.sk-big{font-size:40px}
+.dj-sticky-question{margin-top:12px}
+.dj-sticky-question b,.dj-sticky>b{display:block;font-family:var(--marker);font-weight:400;font-size:14px;color:#7a5c12}
+
+/* The bet: green ink, ticked or crossed once the bench answered. */
+.dj-bet{position:relative;margin:4px 4px 14px;padding:8px 12px 8px 14px;border-left:3px solid var(--ink-green);background:#2f6a3c0d}
+.dj-bet-label{font-family:var(--marker);font-size:15px;color:var(--ink-green)}
+.dj-bet p{margin:2px 0;font-family:var(--hand);font-weight:600;font-size:20px;line-height:1.2;color:var(--ink-black)}
+.dj-bet-mine{color:var(--ink-green)!important;font-size:23px!important}
+.dj-bet-out{color:var(--ink-blue)!important}
+.dj-bet-out span{font-family:var(--marker);font-size:20px}
+.dj-bet.is-right .dj-bet-out span{color:var(--ink-green)}
+.dj-bet.is-wrong .dj-bet-out span{color:var(--ink-red)}
+.dj-bet.is-wrong .dj-bet-mine{text-decoration:line-through;text-decoration-color:var(--ink-red);text-decoration-thickness:2px}
+.dj-all-trials{margin:4px 0 10px}
+.dj-all-trials summary{cursor:pointer;font-family:var(--hand);font-weight:700;font-size:19px;color:var(--graphite)}
+
+/* Palabras del oficio: a glossary written in the margins of a workshop. */
+.dj-words{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:12px}
+.dj-word{display:flex;gap:10px;align-items:flex-start}
+.dj-word>.dj-word-symbol{width:70px;height:52px;margin-top:4px}
+.dj-word strong{font-family:var(--marker);font-weight:400;font-size:20px;color:var(--ink-black)}
+.dj-word-unit{margin-left:8px;padding:0 6px;font-family:var(--hand);font-weight:700;font-size:20px;color:var(--ink-red);border:2px solid var(--ink-red);border-radius:40% 60% 50% 50%/55% 45% 55% 45%}
+.dj-word em{display:block;font-family:var(--note);font-style:normal;font-size:14px;color:var(--sienna)}
+.dj-word p{margin:2px 0 0;font-family:var(--hand);font-weight:600;font-size:19px;line-height:1.2;color:var(--ink-blue)}
+
+.modal.journal-modal .dj-heading .dj-print-button{margin-left:auto;align-self:center;padding:6px 14px;font-family:var(--hand);font-weight:700;font-size:19px;color:#2b2620;background:linear-gradient(#efdfb8,#d8c08e);border:1px solid #8a6a43;border-radius:4px;box-shadow:0 2px 0 #0006;transform:rotate(-1deg);cursor:pointer;min-height:40px}
+.modal.journal-modal .dj-heading .dj-print-button:hover{background:linear-gradient(#f7ead0,#e2cc9d)}
+#journal-print{display:none;
+  --paper:#eadcb9;--paper-light:#f3e8cb;--paper-edge:#c9b083;
+  --ink-blue:#1f3c78;--ink-black:#2b2620;--ink-red:#b0302a;--ink-green:#2f6a3c;--graphite:#55524c;--sienna:#9a4b22;
+  --hand:'Caveat','Kalam','Segoe Print','Bradley Hand',cursive;--note:'Kalam','Caveat',cursive;--marker:'Permanent Marker','Kalam',cursive;--type:'Special Elite','Courier New',monospace}
+
+/* ── On paper: each notebook page becomes an A5 page; the book opens with a cover ─────── */
+@media print{
+  @page{size:A5 portrait;margin:0}
+  body.printing-journal>*:not(#journal-print){display:none!important}
+  html:has(body.printing-journal),body.printing-journal{height:auto!important;min-height:0!important;overflow:visible!important;position:static!important}
+  body.printing-journal{background:#eadcb9!important;margin:0}
+  #journal-print .dj-page::before,#journal-print .dj-page::after,#journal-print .dj-stain{display:none!important}
+  #journal-print .dj-page{box-shadow:none!important;border-radius:0!important;background:#eadcb9 radial-gradient(ellipse at 50% 30%,#f3e8cb,transparent 75%)!important}
+  #journal-print *{backdrop-filter:none!important}
+  body.printing-journal #journal-print{display:block}
+  #journal-print{-webkit-print-color-adjust:exact;print-color-adjust:exact;color:var(--ink-black)}
+  #journal-print .dj-print-cover,#journal-print .dj-page{position:relative;width:148mm;min-height:210mm;box-sizing:border-box;break-after:page;page-break-after:always;overflow:visible;
+    background:var(--paper) radial-gradient(ellipse at 50% 40%,var(--paper-light),transparent 70%)}
+  #journal-print .dj-page-body{position:static;overflow:visible;padding:14mm 12mm 16mm}
+  #journal-print .dj-page.dj-left .dj-page-body{padding-left:16mm}
+  #journal-print .dj-page.dj-right .dj-page-body{padding-right:16mm}
+  #journal-print .dj-corner,#journal-print .dj-spine,#journal-print .dj-tabs,#journal-print .dj-print-button,#journal-print .dj-own-note small{display:none!important}
+  #journal-print .dj-folio{position:absolute;bottom:8mm;font-family:var(--hand);font-size:16px;color:var(--graphite)}
+  #journal-print .dj-left .dj-folio{left:12mm}#journal-print .dj-right .dj-folio{right:12mm}
+  #journal-print .dj-schematic svg{filter:url(#dj-rough-print)}
+  #journal-print .dj-schematics{display:block}#journal-print .dj-schematic{margin-bottom:4mm}
+  #journal-print .dj-schematic,#journal-print .dj-trial,#journal-print .dj-word,#journal-print .dj-bet,#journal-print .dj-behind li,#journal-print .dj-photo{break-inside:avoid}
+  #journal-print .dj-printed-note{font-family:var(--hand);font-weight:600;font-size:20px;line-height:28px;color:var(--ink-blue);background:repeating-linear-gradient(transparent 0 27px,#9fc3d8 27px 28px);min-height:90px;margin:4px 0 0}
+  #journal-print .dj-print-cover{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20mm;
+    background:radial-gradient(ellipse at 30% 20%,#ffffff12,transparent 55%),repeating-linear-gradient(92deg,#2a1d13 0 3px,#2f2116 3px 9px,#28190f 9px 14px),#2a1c12;color:#e9d3a6}
+  #journal-print .dj-print-cover .eyebrow{font-family:var(--type);letter-spacing:.16em;font-size:10px;color:#c8a978}
+  #journal-print .dj-print-cover h1{font-family:var(--marker);font-weight:400;font-size:64px;margin:10mm 0 2mm;color:#ecd7aa}
+  #journal-print .dj-print-arc{font-family:var(--type);font-size:13px;letter-spacing:.3em;text-transform:uppercase}
+  #journal-print .dj-print-owner{margin-top:18mm;font-family:var(--hand);font-size:30px;font-weight:700;color:#f3e3bf;border-bottom:2px solid #c8a978;padding:0 8mm 2mm}
+  #journal-print .dj-print-motto{font-family:var(--hand);font-size:20px;color:#d8c39b}
+}

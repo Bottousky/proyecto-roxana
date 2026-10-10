@@ -13,7 +13,7 @@ import './hud.css';
 import './journal.css';
 import {renderJourneyGuide} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
-import {renderJournal,recordFieldObservation} from './journal.js';
+import {renderJournal,renderJournalPrint,recordFieldObservation} from './journal.js';
 import {AREAS,CHARACTERS,DIALOGUES,speakerLabel,personLabel,personalize,learnNames,withIntroductions,knownFromSeen,playerName,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
@@ -371,6 +371,17 @@ function openJournal(selected){
   const current=document.querySelector('.dj-tabs [aria-current=page]');if(current){const list=current.parentElement;list.scrollTop=current.offsetTop-list.clientHeight/2+current.offsetHeight/2;}
   document.querySelectorAll('button[data-journal-page]').forEach(button=>button.onclick=()=>{openJournal(button.dataset.journalPage);});
   $('#personal-journal-note')?.addEventListener('input',event=>{state.personalNotes||={};state.personalNotes[event.target.dataset.noteFor]=event.target.value.slice(0,1200);persist();});
+  $('[data-journal-print]')?.addEventListener('click',printJournal);
+}
+// The Bitácora on paper: every page, a cover with the traveller's name, the drawers that explain, opened; the full log of attempts stays on screen.
+function printJournal(){
+  document.querySelector('#journal-print')?.remove();
+  const sheet=document.createElement('div');sheet.id='journal-print';sheet.setAttribute('aria-hidden','true');
+  sheet.innerHTML=renderJournalPrint(state,{puzzles:PUZZLES,evidenceFor:getBenchEvidence});
+  sheet.querySelectorAll('.dj-all-trials').forEach(d=>d.remove());sheet.querySelectorAll('details').forEach(d=>{d.open=true;});sheet.querySelectorAll('textarea').forEach(t=>{const p=document.createElement('p');p.className='dj-printed-note';p.textContent=t.value||'…';t.replaceWith(p);});
+  document.body.appendChild(sheet);document.body.classList.add('printing-journal');
+  const done=()=>{document.body.classList.remove('printing-journal');sheet.remove();window.removeEventListener('afterprint',done);};
+  window.addEventListener('afterprint',done);window.print();
 }
 
 function openGuide(){
