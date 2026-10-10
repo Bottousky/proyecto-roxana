@@ -17,7 +17,7 @@ for(const name of modules){
 // Layout only needs the footprints, never the Three.js builder.
 const water=fs.readFileSync(new URL('world-waterworks.js',root),'utf8');
 fs.writeFileSync(new URL('world-waterworks.js',out),water.slice(water.indexOf('export const SPRING'),water.indexOf('\nfunction water'))+'\nexport const LIGHTHOUSE_ISLET_RADIUS = 4.3;\n');
-for(const name of ['style','interface','atlas','art-polish','puzzles','travel-instrument','journey-ui','kingdom-map'])fs.copyFileSync(new URL(name+'.css',root),new URL(name+'.css',out));
+for(const name of ['style','interface','atlas','art-polish','puzzles','travel-instrument','journey-ui','kingdom-map','journal'])fs.copyFileSync(new URL(name+'.css',root),new URL(name+'.css',out));
 fs.cpSync(new URL('../../public/assets/',import.meta.url),new URL('./public/assets/',import.meta.url),{recursive:true});
 const fonts=new URL('./public/fonts/',import.meta.url);fs.mkdirSync(fonts,{recursive:true});let css='';
 for(const [name,family] of [['inter','Inter'],['cormorant-garamond','Cormorant Garamond']])for(const weight of [400,500,600]){const filename=`${name}-latin-${weight}-normal.woff2`;fs.copyFileSync(new URL(`../../node_modules/@fontsource/${name}/files/${filename}`,import.meta.url),new URL(filename,fonts));css+=`@font-face{font-family:'${family}';font-style:normal;font-weight:${weight};font-display:swap;src:url('/fonts/${filename}') format('woff2')}\n`;}

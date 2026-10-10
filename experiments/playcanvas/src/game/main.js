@@ -10,6 +10,7 @@ import './travel-instrument.css';
 import './art-polish.css';
 import './journey-ui.css';
 import './hud.css';
+import './journal.css';
 import {renderJourneyGuide} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
@@ -357,9 +358,13 @@ function modal(html,kind='standard'){
 function openJournal(selected){
   if(!started||!['world','modal'].includes(mode))return;
   show('#journal-dot',false);
-  modal(renderJournal(state,{selected:typeof selected==='string'?selected:undefined,puzzles:PUZZLES,evidenceFor:getBenchEvidence}),'journal-modal');
-  const current=document.querySelector('.book-index [aria-current=page]');if(current){const list=current.parentElement;list.scrollTop=current.offsetTop-list.clientHeight/2+current.offsetHeight/2;}
-  document.querySelectorAll('button[data-journal-page]').forEach(button=>button.onclick=()=>{openJournal(button.dataset.journalPage);$('.book-leaf')?.scrollIntoView({block:'nearest'});});
+  // Turning forward swings the right leaf in, turning back the left one.
+  const previousPage=document.querySelector('.dj-desk')?.dataset.journalPage,order=[...document.querySelectorAll('.dj-tab')].map(tab=>tab.dataset.journalPage);
+  const turn=typeof selected==='string'&&previousPage&&selected!==previousPage?(order.indexOf(selected)>order.indexOf(previousPage)?'next':'prev'):'';
+  if(turn)sound('page');
+  modal(renderJournal(state,{selected:typeof selected==='string'?selected:undefined,puzzles:PUZZLES,evidenceFor:getBenchEvidence,turn}),'journal-modal');
+  const current=document.querySelector('.dj-tabs [aria-current=page]');if(current){const list=current.parentElement;list.scrollTop=current.offsetTop-list.clientHeight/2+current.offsetHeight/2;}
+  document.querySelectorAll('button[data-journal-page]').forEach(button=>button.onclick=()=>{openJournal(button.dataset.journalPage);});
   $('#personal-journal-note')?.addEventListener('input',event=>{state.personalNotes||={};state.personalNotes[event.target.dataset.noteFor]=event.target.value.slice(0,1200);persist();});
 }
 

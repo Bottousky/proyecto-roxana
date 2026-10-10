@@ -65,6 +65,33 @@ export function withIntroductions(lines, state) {
   }
   return result;
 }
+// What the traveller wrote in the Bitácora about each person; it grows with what they lived together.
+const PEOPLE_NOTES = {
+  edda: [[[], 'Cuida el Portal, como su abuela. Lo barre todas las mañanas «por si acaso». Dibuja todo, también lo que sale mal.'],
+    [['distribution'], 'Perdió una apuesta en el Castillo y la dejó escrita con su nombre al lado. Así se equivoca alguien que quiere aprender.'],
+    [['epilogue_shared'], 'Le costó no señalarle a Tala dónde estaba la reparación. Se aguantó. Va a ser buena maestra.']],
+  ohm: [[[], 'Pequeño, de bronce, con un Ω en la panza. Pasó cuarenta años mirando musgo. Mide lo que yo no veo y no adorna las respuestas.'],
+    [['beacon_link'], 'Nereo lo conoce. Ohm se equivocó por treinta y seis años y lo aceptó sin drama. Tiene una nota vieja firmada con su Ω que no recuerda haber escrito.']],
+  lumen: [[[], 'Reparador de la Plaza. Tres vueltas al contacto, como su padre. Guarda todo: «no tirar».'],
+    [['workshop'], 'Ahora agrega a la receta: «Si no enciende, no gastes otra lámpara antes de mirar el camino». Sigue haciendo tres vueltas porque le gustan.']],
+  marin: [[[], 'Panadero de la Plaza. Amasa a oscuras, por el ruido de la masa. El pan de ayer es gratis.'],
+    [['beacon_lens'], 'Hizo un pan con forma de Faro. Como faro, pésimo. Como pan, extraordinario.']],
+  tala: [[[], 'Aprendiz. Vuelve a contar las rayas de la campana aunque Marín ya las contó: «no es lo mismo confiar que dejar de mirar».'],
+    [['epilogue_shared'], 'Encontró sola la reparación vieja bajo la tela. Quiere guardar también el dibujo de cuando no funcionaba.']],
+  vega: [[[], 'Cuida el agua desde el Manantial hasta las Terrazas. Anota las sequías con la misma letra que la abundancia.'],
+    [['irrigation'], 'Antes creía que ser prudente era no tocar nada. Ahora sabe qué mirar después de tocarlo.']],
+  consejera: [[[], 'Ivara, Consejera de la Red. Vio arder dos distribuidores. No quiere promesas: quiere una prueba que no ponga en riesgo lo que funciona.'],
+    [['distribution'], 'Dejó el plano en la puerta, a la altura de quien quiera leerlo. Agregó al registro: «¿Cómo lo comprobamos?».']],
+  yesca: [[[], 'Forjadora de las Terrazas. Prefiere diez azadas terminadas que once empezadas. Guarda comida para Vega, aunque discutan.'],
+    [['beacon_lens'], 'Le está haciendo una bisagra a Nereo para la puerta de su casa. Va a tardar lo que tenga que tardar.']],
+  nereo: [[[], 'Farero mayor. Cuarenta años girando la manivela cada noche aunque nadie viera la señal. Una vuelta, una pausa.'],
+    [['beacon_lens'], 'Anoche pudo volver a su casa. Su compañera había puesto una lámpara para que el farero también encontrara la suya.']],
+};
+/** The traveller's note about someone, as far as the story has gone. */
+export function characterNote(id, state = {}) {
+  const notes = PEOPLE_NOTES[id] || [];
+  return notes.filter(([requires]) => requires.every(flag => state.flags?.[flag])).map(([, text]) => text).join(' ');
+}
 /** For a save made before names were learned: whom the conversations already seen introduced. */
 export function knownFromSeen(state) {
   const probe = { ...state, known: [] };

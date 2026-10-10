@@ -435,6 +435,11 @@ export class AudioDirector {
         this._noise(time + 0.07, 0.12, 0.05, 1800, true);
         this._noise(time + 0.17, 0.16, 0.035, 900);
         break;
+      case 'page':
+        // A notebook leaf turning: a quick whisk of paper and the soft slap as it lands.
+        this._noise(time, 0.11, 0.05, 3400, true);
+        this._noise(time + 0.1, 0.06, 0.04, 1200);
+        break;
       case 'disconnect':
         this._wood(300, time, 0.05);
         this._noise(time, 0.05, 0.09, 1400, true);
