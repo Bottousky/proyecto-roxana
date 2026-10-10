@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ohmdal-playcanvas-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "experiments/playcanvas", "run", "dev"],
+      "port": 4190
+    },
+    {
+      "name": "ohmdal-playcanvas-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "experiments/playcanvas", "exec", "--", "vite", "preview", "--host", "127.0.0.1", "--port", "4191", "--strictPort"],
+      "port": 4191
+    }
+  ]
+}
