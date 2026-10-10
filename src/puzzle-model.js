@@ -63,8 +63,10 @@ export const PUZZLES = {
     sealed: [['positive', 'e1a'], ['e1b', 'e2a'], ['e2b', 'e3a'], ['e3b', 'pumpIn'], ['pumpOut', 'negative']], cables: 1,
     boardLabels: { e1a: 'A', e1b: 'B', e2a: 'A', e2b: 'B', e3a: 'A', e3b: 'B' },
     proof: { id: 'foundLoss', who: 'Vega', voltageAcross: ['e2a', 'e2b'], minVoltage: 2, request: 'Vega quiere ver, con la bomba trabajando, la comparación de los dos extremos del empalme que pierde.', recorded: 'Con la bomba trabajando comparé los extremos del empalme 2: ahí se pierde casi toda la tensión.' },
-    criteria: [{ text: 'Vega vio en qué empalme se pierde la fuerza', met: r => r.proven }, { text: 'La bomba recibe toda la fuerza: el agua sale plena', met: r => r.operating.pump }],
-    solve: s => { s.wires.push(['e2a', 'e2b']); s.proofs = { ...s.proofs, foundLoss: true }; },
+    // Vega wants to know where the 12 V went: every part of the loop measured on one montage, added up.
+    tally: { id: 'loop', kind: 'voltage', who: 'Vega', title: 'La cuenta de la vuelta', parts: ['joint1', 'joint2', 'joint3', 'pump'], request: 'Antes de dejarla andando, Vega quiere saber adónde se fueron los 12 V: compará los extremos de cada empalme y de la bomba, en este mismo montaje, y ella suma.' },
+    criteria: [{ text: 'Vega vio en qué empalme se pierde la fuerza', met: r => r.proven }, { text: 'Vega cerró la cuenta de la vuelta: adónde fue cada voltio', met: (r, s) => s.tally?.closed === true }, { text: 'La bomba recibe toda la fuerza: el agua sale plena', met: r => r.operating.pump }],
+    solve: s => { s.wires.push(['e2a', 'e2b']); s.proofs = { ...s.proofs, foundLoss: true }; s.tally = { closed: true, readings: {} }; },
     lesson: 'Un empalme puede tener continuidad y aun así perder tensión y calentarse bajo carga. Comparar los extremos de cada tramo con la carga trabajando localiza la pérdida.',
     observation: 'La rueda del generador gira, pero la bomba apenas impulsa agua. Uno de los empalmes está tibio.',
   },
@@ -129,8 +131,10 @@ export const PUZZLES = {
     components: [component('optic', 'Cámara óptica · 18 Ω', 'opticIn', 'opticOut', 18, { kind: 'lamp', goal: goal(16.5, 18.2, .91, 1.03) }), component('bearing', 'Giro de la cúpula · 36 Ω', 'bearingIn', 'bearingOut', 36, { kind: 'motor', goal: goal(16.5, 18.2, .45, .52) }), component('signal', 'Señal de la costa · 72 Ω', 'signalIn', 'signalOut', 72, { kind: 'coil', goal: goal(16.5, 18.2, .22, .26) })],
     initialWires: [['positive', 'opticIn'], ['opticOut', 'bearingIn'], ['bearingOut', 'signalIn'], ['signalOut', 'negative']],
     sealed: [['positive', 'opticIn'], ['signalOut', 'negative']], cables: 4,
-    criteria: [{ text: 'La cámara óptica brilla', met: r => r.operating.optic }, { text: 'La cúpula gira', met: r => r.operating.bearing }, { text: 'La señal de la costa suena', met: r => r.operating.signal }],
-    solve: s => { s.wires = [['positive', 'opticIn'], ['opticOut', 'negative'], ['positive', 'bearingIn'], ['bearingOut', 'negative'], ['positive', 'signalIn'], ['signalOut', 'negative']]; },
+    // Nereo writes numbers for the first time: each voice's current and what leaves the source.
+    tally: { id: 'nodes', kind: 'current', who: 'Nereo', title: 'La regla de los nudos', parts: ['optic', 'bearing', 'signal', 'source'], request: 'Nereo quiere anotar la regla de los nudos: con “Medir un camino”, medí cada voz y también lo que sale de la fuente.' },
+    criteria: [{ text: 'La cámara óptica brilla', met: r => r.operating.optic }, { text: 'La cúpula gira', met: r => r.operating.bearing }, { text: 'La señal de la costa suena', met: r => r.operating.signal }, { text: 'Nereo anotó cada voz y lo que sale de la fuente', met: (r, s) => s.tally?.closed === true }],
+    solve: s => { s.wires = [['positive', 'opticIn'], ['opticOut', 'negative'], ['positive', 'bearingIn'], ['bearingOut', 'negative'], ['positive', 'signalIn'], ['signalOut', 'negative']]; s.tally = { closed: true, readings: {} }; },
     lesson: 'Tres resistencias diferentes en paralelo reciben la misma tensión y conducen corrientes distintas. La corriente de la fuente es la suma de las corrientes de sus ramas.',
     observation: 'Una inscripción: «Que ninguna voz tenga que atravesar a las otras para llegar al mar».',
   },
@@ -173,7 +177,7 @@ export function terracesAgreement(state) {
 export function initialPuzzleSnapshot(id) {
   const p = PUZZLES[id];
   if (!p) throw new Error(`Unknown puzzle: ${id}`);
-  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, estimate: null, completed: false };
+  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, estimate: null, tally: null, completed: false };
 }
 
 export function normalizePuzzleSnapshot(id, saved) {
@@ -190,11 +194,17 @@ export function normalizePuzzleSnapshot(id, saved) {
     switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, typeof saved.switches?.[s.key] === 'boolean' ? saved.switches[s.key] : s.initial])),
     values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, Number.isFinite(saved.values?.[k.key]) ? Math.max(k.min, Math.min(k.max, Math.round(saved.values[k.key] / k.step) * k.step)) : k.initial])),
     hints: Number.isFinite(saved.hints) ? Math.max(0, Math.min(HINT_STEPS, Math.floor(saved.hints))) : 0,
-    meter: { mode: ['voltage', 'continuity', 'current'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) ? saved.meter.branch : null },
+    meter: { mode: ['voltage', 'continuity', 'current'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) || (saved.meter?.branch === 'source' && p.tally?.parts.includes('source')) ? saved.meter.branch : null },
   };
   // Whether the copper already put the keeper's inherited conjuro to the test on this bench.
   // A repaired installation already answered it, also in saves from before conjuros existed.
   normalized.conjuro = saved.conjuro === true || saved.completed === true;
+  // The keeper's sum (Kirchhoff's laws, in Ohmdal words): readings taken on one montage, and whether it closed.
+  // An installation already in service closed it, also in saves from before the sum was asked.
+  if (p.tally) {
+    const readings = Object.fromEntries(p.tally.parts.filter(k => Number.isFinite(saved.tally?.readings?.[k])).map(k => [k, saved.tally.readings[k]]));
+    normalized.tally = { closed: saved.tally?.closed === true || saved.completed === true, readings, ...(typeof saved.tally?.signature === 'string' ? { signature: saved.tally.signature.slice(0, 2000) } : {}) };
+  }
   // The mark written in the keepers' book before measuring («skip» if measured without one), and what was read.
   normalized.estimate = saved.estimate && typeof saved.estimate.choice === 'string' && /^[a-z]{1,12}$/.test(saved.estimate.choice)
     ? { choice: saved.estimate.choice, settled: saved.estimate.settled === true, ...(Number.isFinite(saved.estimate.measured) ? { measured: saved.estimate.measured } : {}) } : null;
@@ -246,7 +256,8 @@ export function evaluatePuzzle(id, state) {
   // «solved» is physics. Commissioning may also need a proof the community asked to see.
   const proofMet = !!p.proof?.when && powered && solution.valid && constraintsMet && p.proof.when(state) && operating[p.proof.component];
   const proven = !p.proof || state.proofs?.[p.proof.id] === true || proofMet;
-  const result = { network, solution, overloaded, requestedCurrent, current, power: current * p.voltage, voltage: powered ? p.voltage : 0, operating, constraintsMet, solved, proofMet, proven, commissionable: solved && proven };
+  const tallied = !p.tally || state.tally?.closed === true;
+  const result = { network, solution, overloaded, requestedCurrent, current, power: current * p.voltage, voltage: powered ? p.voltage : 0, operating, constraintsMet, solved, proofMet, proven, tallied, commissionable: solved && proven && tallied };
   // The brief's checklist, read from the same physics: what the player sees ticked is what counts.
   result.checks = (p.criteria ?? []).map(c => ({ text: c.text, met: !!c.met(result, state) }));
   return result;
@@ -282,3 +293,20 @@ export function wireFlow(result, index, powered) {
   return { forward: current > 0, current, seconds: +(2.4 - 1.7 * magnitude / 1.5).toFixed(2) };
 }
 
+
+/** What the montage looks like, to know whether readings were all taken on the same one. */
+export function montageSignature(state) { return JSON.stringify([[...state.wires].map(w => [...w].sort().join('~')).sort(), state.values, state.switches]); }
+/** One reading of a part, as the keeper writes it: a voltage across it, or the current through it (or out of the source). */
+export function tallyReading(id, state, result, part) {
+  const p = PUZZLES[id];
+  if (p.tally.kind === 'current') return Math.abs(part === 'source' ? result.current : result.solution.branches[part]?.current ?? 0);
+  return Math.abs(result.solution.branches[part]?.voltage ?? 0);
+}
+/** Whether the sum closes: the parts of the loop add up to the source; the voices add up to what leaves it. */
+export function tallyCloses(id, readings) {
+  const p = PUZZLES[id], t = p.tally;
+  if (!t.parts.every(k => Number.isFinite(readings[k]))) return false;
+  if (t.kind === 'current') { const sum = t.parts.filter(k => k !== 'source').reduce((a, k) => a + readings[k], 0); return readings.source > .05 && Math.abs(sum - readings.source) <= .05 * readings.source + .02; }
+  const sum = t.parts.reduce((a, k) => a + readings[k], 0);
+  return sum >= .95 * p.voltage && sum <= 1.01 * p.voltage;
+}

@@ -105,6 +105,15 @@ function keepersBook(id, snapshot) {
   if (!book || !mark || mark.choice === 'skip') return '';
   return `<div class="dj-conjuro dj-mark"><span class="dj-conjuro-label">⌖ ${esc(book.book)} <small>marca esperada</small></span><p class="dj-mark-ask">${esc(book.noted)}</p><p class="dj-conjuro-words">«${esc(estimateChoiceText(id, mark.choice))}»</p><p class="dj-conjuro-copper">${mark.settled ? esc(estimateVerdict(id, mark.choice, mark.measured)) : 'Todavía no lo medimos.'}</p></div>`;
 }
+// The keeper's sum, as it was written down: each part, a line, the total, and the source beside it.
+function tallyBlock(id, snapshot, puzzles) {
+  const t = puzzles[id]?.tally, r = snapshot?.tally?.readings;
+  if (!t || !snapshot?.tally?.closed || !r || !t.parts.every(k => Number.isFinite(r[k]))) return '';
+  const current = t.kind === 'current', unit = current ? 'A' : 'V', round = v => Math.round(v * 100) / 100, n = v => round(v).toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const name = k => puzzles[id].components.find(c => c.id === k)?.label.replace(/ · .*/, '') ?? k;
+  const parts = t.parts.filter(k => k !== 'source'), sum = parts.reduce((a, k) => a + round(r[k]), 0);
+  return `<div class="dj-tally"><span class="dj-conjuro-label">Σ ${esc(t.title)} <small>anotada por ${esc(t.who)}</small></span><table>${parts.map((k, i) => `<tr><td>${i ? '+' : ''}</td><td>${esc(name(k))}</td><td>${n(r[k])} ${unit}</td></tr>`).join('')}<tr class="dj-tally-total"><td>=</td><td></td><td>${n(sum)} ${unit}</td></tr></table><p>${current ? `De la fuente salen ${n(r.source)} A: lo que llega al nudo, sale.` : `La fuente empuja ${puzzles[id].voltage} V: el resto se quedó en los cables.`}</p></div>`;
+}
 const KEY_TRIALS = new Set(['measurement']);
 function trials(notes) {
   if (!notes.length) return '<p class="dj-pencil dj-empty">Todavía no registré una lectura aquí. Cuando use el instrumento, conservaré los puntos y el resultado.</p>';
@@ -166,7 +175,7 @@ export function renderJournal(state, {selected, puzzles={}, evidenceFor=()=>[], 
       ${photo(page.area, AREAS[page.area]?.name || 'Ohmdal', index%2?3:-3)}<p class="dj-ink">${esc(page.text)}</p>${schematics(page.puzzle,snapshot,puzzles)}
       ${page.question?`<blockquote class="dj-sticky" style="--tilt:-2deg">${esc(page.question)}</blockquote>`:''}
       </div><span class="dj-folio">${index+1}</span>${corner(previous,'← Hoja anterior','prev')}</section>`;
-    right=`<section class="dj-page dj-right"><div class="dj-page-body">${conjuro(page.puzzle,snapshot)}${keepersBook(page.puzzle,snapshot)}${behind(page.puzzle,snapshot)}<header class="dj-evidence-head"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3></header>
+    right=`<section class="dj-page dj-right"><div class="dj-page-body">${conjuro(page.puzzle,snapshot)}${keepersBook(page.puzzle,snapshot)}${tallyBlock(page.puzzle,snapshot,puzzles)}${behind(page.puzzle,snapshot)}<header class="dj-evidence-head"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3></header>
       ${trials(notes)}
       ${page.explanation?`<details class="dj-card"><summary>La idea que pudimos explicar</summary><p>${esc(page.explanation)}</p></details>`:''}
       <div class="dj-own-note"><label for="personal-journal-note">Mi pregunta o hipótesis</label><textarea id="personal-journal-note" data-note-for="${esc(page.id)}" maxlength="1200" rows="4" placeholder="Creo que… / Me pregunto qué pasaría si…">${esc(state.personalNotes?.[page.id]||'')}</textarea><small>Una idea puede cambiar. No hace falta tener la respuesta.</small></div>

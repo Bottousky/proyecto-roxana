@@ -395,3 +395,15 @@
   .wb-reveal-body>p:not([class]){font-size:13px;line-height:1.4}
   .wb-reveal .wb-say-face{display:none}
 }
+
+/* The keeper's running sum (Kirchhoff, in Ohmdal words): each part written as it is measured. */
+.wb-tally{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:5px 12px;border-radius:8px;background:#f2e6c61a;border:1px dashed #e0c27f66;color:#f1e6c8}
+.wb-tally>b{font:600 11px/1.2 Inter,system-ui,sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:#e0c27f}
+.wb-tally-sum{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap;font:700 17px/1.1 'Caveat','Kalam',cursive;color:#e9c9a0}
+.wb-tally-sum span{display:flex;flex-direction:column;align-items:center;min-width:56px;padding:1px 6px;border-bottom:1px solid #e0c27f44;opacity:.55}
+.wb-tally-sum span.is-read{opacity:1;color:#ffb4a0}
+.wb-tally-sum small{font:10.5px/1.2 Inter,system-ui,sans-serif;color:#c9bf9f;white-space:nowrap}
+.wb-tally-sum i{font-style:normal;color:#c9bf9f;padding-bottom:2px}
+.wb-tally.is-closed{border-style:solid;border-color:#8fd09e88;background:#8fd09e14}
+.wb-tally.is-closed .wb-tally-total{color:#bfe0a8}
+@media (max-height:520px) and (orientation:landscape){.wb-tally{padding:2px 8px}.wb-tally-sum{font-size:14px}.wb-tally-sum small{display:none}}

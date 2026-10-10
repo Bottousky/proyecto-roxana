@@ -1,5 +1,5 @@
 import { measureVoltage, measureResistance } from './electrical.js';
-import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized } from './puzzle-model.js';
+import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized, montageSignature, tallyReading, tallyCloses } from './puzzle-model.js';
 import { appendBenchEvidence, getBenchEvidence } from './bench-evidence.js';
 import { CONJUROS, ESTIMATES, estimateChoiceText, estimateVerdict, revealFor, WORDS } from './understanding.js';
 export { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, getBenchEvidence };
@@ -21,7 +21,7 @@ export const BENCH_GUIDANCE = {
     steps: [{ how: 'El sentido depende de por dónde entra la corriente a la bobina. Tocá sus cables para retirarlos y tendelos de nuevo.', tool: 'wire' }, { how: 'La fuerza la da el freno de la bobina: probá de a una posición.', tool: 'wire' }],
     tools: ['voltage'], voice: 'OHM', hints: ['El encargo tiene dos partes: hacia dónde empuja y con cuánta fuerza. Conviene resolverlas por separado.', 'El freno cambia la fuerza, nunca el sentido. El sentido depende de por dónde entra la corriente a la bobina.', 'Si la corriente entra por «Avance −», empuja al revés. Invertí los dos cables de la bobina.', 'Un paso para probar: retirá los dos cables que llegan a la bobina y uní «Freno B» con «Avance +» y «Avance −» con «Retorno −». Después girá el freno de a una posición hasta que el cerrojo ni tiemble ni golpee.'] },
   pump: { goal: 'Encontrá el empalme que pierde fuerza y puentealo.', learned: 'Un empalme puede conducir y aun así comerse la fuerza: se descubre comparando sus extremos con la bomba andando.',
-    steps: [{ how: 'Elegí “Comparar dos puntos” y apoyá las puntas en A y B de cada empalme, con la bomba andando.', tool: 'voltage' }, { how: 'Con tu cable, uní A y B del empalme que pierde.', tool: 'wire' }],
+    steps: [{ how: 'Elegí “Comparar dos puntos” y apoyá las puntas en A y B de cada empalme, con la bomba andando.', tool: 'voltage' }, { how: 'Vega quiere saber adónde se fueron los 12 V. Compará los dos extremos de cada empalme y de la bomba, en el mismo montaje: ella va sumando.', tool: 'voltage' }, { how: 'Con tu cable, uní A y B del empalme que pierde.', tool: 'wire' }],
     tools: ['voltage'], voice: 'OHM', hints: ['Los tres empalmes conducen: la prueba de camino diría que sí en los tres. La pérdida es otra cosa.', 'Con la bomba trabajando, un empalme sano apenas se nota; uno malo se come parte de la fuerza. Y se entibia.', 'Compará los dos extremos de cada empalme con la bomba andando. Donde haya una diferencia grande, ahí se pierde.', 'Un paso para probar: elegí “Comparar dos puntos” y apoyá las puntas en los extremos de cada empalme. En el que muestre diferencia, volvé a “Cables” y tendé tu cable entre sus dos extremos.'] },
   distribution: { goal: 'Que enfermería y cocina tengan cada una su propio camino.', learned: 'En paralelo, cada luz tiene su propio camino: se puede aislar una sin apagar la otra.',
     steps: [{ how: 'Seguí con el dedo el camino de la enfermería: ¿por dónde vuelve a la fuente? Tocá un cable para retirarlo y tendelo de nuevo.', tool: 'wire' }, { how: 'La cocina tampoco tendría que depender de la enfermería para recibir su fuerza.', tool: 'wire' }, { how: 'Ivara quiere verlo: aislá la cocina con su llave y mirá si la enfermería sigue encendida.' }],
@@ -33,7 +33,7 @@ export const BENCH_GUIDANCE = {
     steps: [{ how: 'Aflojá el regulador del generador para darle fuerza al núcleo, y mirá qué le pasa al tendido norte.' }, { how: 'Un solo tendido no alcanza. Con tus dos cables sumá el tendido sur: uno junto al generador y otro junto al núcleo.', tool: 'wire' }],
     tools: ['voltage'], voice: 'OHM', hints: ['Aflojar el regulador le da fuerza al núcleo, pero toda esa corriente pasa por el tendido norte.', 'Con un solo tendido no hay posición buena: o el núcleo queda débil o el cobre se calienta.', 'Dos tendidos lado a lado se reparten la corriente: cada uno lleva la mitad.', 'Un paso para probar: junto al generador, uní «Fuente +» con «Tendido sur · A»; junto al núcleo, «Tendido sur · B» con «Regulador A». Después aflojá el regulador hasta que el núcleo sostenga su pulso.'] },
   beacon_network: { goal: 'Que luz, giro y campana tengan cada una su propio camino.', learned: 'En paralelo, cada voz recibe la misma tensión y toma la corriente que necesita.',
-    steps: [0, 1, 2].map(() => ({ how: 'Que ninguna voz tenga que atravesar a otra para volver al mar. Como en el Castillo, pero con tres. Tocá un cable para retirarlo.', tool: 'wire' })),
+    steps: [...[0, 1, 2].map(() => ({ how: 'Que ninguna voz tenga que atravesar a otra para volver al mar. Como en el Castillo, pero con tres. Tocá un cable para retirarlo.', tool: 'wire' })), { how: 'Nereo quiere anotar la regla de los nudos: con “Medir un camino”, medí cada voz y también lo que sale de la fuente.', tool: 'current' }],
     tools: ['current'], voice: 'OHM', hints: ['Seguí los caminos: la corriente de la campana atraviesa la luz y el giro antes de volver.', 'En el Castillo, cada luz tuvo su propio camino. Acá son tres.', 'Cada voz necesita ida desde «Fuente +» y vuelta a «Retorno −», sin pasar por las otras.', 'Un paso para probar: retirá los dos cables que pasan de un receptor al siguiente. Con tus cuatro cables uní «Óptica −» y «Giro −» con «Retorno −», y «Fuente +» con «Giro +» y con «Señales +».'] },
   beacon_lens: { goal: 'Alimentá la lente desde la toma del divisor y calibrala.', learned: 'Al conectar una carga, la toma del divisor baja: por eso se calibra con la lente puesta.',
     steps: [{ how: 'Elegí “Comparar dos puntos” y compará «Toma intermedia» con «Retorno −»: una vez así y otra con la lente conectada a la toma.', tool: 'voltage' }, { how: 'Con el cable de la lente en la «Toma intermedia», girá el freno de la lente hasta que la luz sea dorada.', tool: 'wire' }],
@@ -149,6 +149,7 @@ export class PuzzleWorkbench {
     this.reveal = null;
     this.conjuroFresh = false;
     this.estimateNote = '';
+    this.tallyNote = '';
     this.showNumbers = false;
     this.progress = { met: -1, at: performance.now(), changes: 0 };
     this.reading = '';
@@ -271,6 +272,53 @@ export class PuzzleWorkbench {
     this.conjuroFresh = true;
   }
 
+  /** The keeper writes down each part measured on this montage; when every part is there, the sum is checked. */
+  recordTally() {
+    const t = this.puzzle.tally, s = this.state, m = s.meter;
+    if (!t || this.practice || s.completed || !s.sourceOn || s.tripped || this.result.overloaded) return;
+    let part = null;
+    if (t.kind === 'current' && this.mode === 'current') part = t.parts.includes(m.branch) ? m.branch : null;
+    if (t.kind === 'voltage' && this.mode === 'voltage' && m.a && m.b) {
+      const { nodeOf } = wireNodes(this.id, s), probe = [nodeOf[m.a], nodeOf[m.b]].sort().join('|');
+      part = t.parts.find(id => { const c = this.puzzle.components.find(x => x.id === id); return [nodeOf[c.a], nodeOf[c.b]].sort().join('|') === probe; }) ?? null;
+    }
+    if (!part) return;
+    const signature = montageSignature(s), tally = s.tally ??= { closed: false, readings: {} };
+    if (tally.signature !== signature) Object.assign(tally, { signature, readings: {} });
+    tally.readings[part] = tallyReading(this.id, s, this.result, part);
+    if (tally.closed || !t.parts.every(k => Number.isFinite(tally.readings[k]))) return;
+    // The sum is done on the numbers as written, so what the player reads always adds up.
+    const round = n => Math.round(n * 100) / 100, fmtV = n => `${round(n).toFixed(2).replace('.', ',')} V`, fmtA = n => `${round(n).toFixed(2).replace('.', ',')} A`, r = tally.readings;
+    if (tallyCloses(this.id, r)) {
+      tally.closed = true;
+      const items = t.parts.filter(k => k !== 'source').map(k => (t.kind === 'current' ? fmtA : fmtV)(r[k])).join(' + ');
+      const sum = t.parts.filter(k => k !== 'source').reduce((a, k) => a + round(r[k]), 0);
+      this.tallyNote = t.kind === 'current'
+        ? `${items} = ${fmtA(sum)}. Y de la fuente salen ${fmtA(r.source)}${Math.abs(round(sum) - round(r.source)) > .001 ? ': lo mismo, salvo el último decimal' : ''}. Lo que llega al nudo, sale de él: nada se queda en el camino. Primera vez que un farero escribe números. No pasó nada malo.`
+        : `${items} = ${fmtV(sum)}, casi los ${this.puzzle.voltage} V de la fuente; el resto se quedó en los cables. Ningún voltio se perdió: cada uno se quedó en alguna parte.`;
+      appendBenchEvidence(s, { kind: 'result', text: `${t.title}: ${this.tallyNote}` });
+      this.callbacks.onSound?.('success');
+      this.result = evaluatePuzzle(this.id, s);
+    } else if (t.kind === 'current') this.tallyNote = 'En fila no hay nudos: la misma corriente atraviesa las tres voces y la suma no cierra con lo que sale de la fuente. La regla se ve cuando cada voz tiene su camino.';
+    else this.tallyNote = 'La suma todavía no da lo que empuja la fuente. ¿Falta medir alguna parte de la vuelta, o alguna lectura quedó de antes?';
+  }
+
+  /** The keeper's running sum, written as it grows: what is measured on this montage, and what is missing. */
+  tallyStrip() {
+    const t = this.puzzle.tally, s = this.state;
+    if (!t || this.practice || (s.completed && !this.tallyNote)) return '';
+    // It appears when its item of the brief comes up, or once something is written in it.
+    const at = this.puzzle.criteria.findIndex(c => /cuenta de la vuelta|nudos|cada voz/.test(c.text)), { current } = this.steps();
+    const r = (s.tally?.closed || s.tally?.signature === montageSignature(s) ? s.tally?.readings : null) ?? {};
+    if (!s.tally?.closed && current < at && !Object.keys(r).length) return '';
+    const unit = t.kind === 'current' ? 'A' : 'V', round = n => Math.round(n * 100) / 100, fmtN = n => round(n).toFixed(2).replace('.', ',');
+    const name = id => id === 'source' ? 'Sale de la fuente' : simpleLabel(this.puzzle.components.find(c => c.id === id)?.label ?? id);
+    const parts = t.parts.filter(k => k !== 'source'), sum = parts.reduce((a, k) => a + round(r[k] ?? 0), 0), all = parts.every(k => Number.isFinite(r[k]));
+    const cells = parts.map(k => `<span class="${Number.isFinite(r[k]) ? 'is-read' : ''}"><small>${escapeHtml(name(k))}</small>${Number.isFinite(r[k]) ? `${fmtN(r[k])} ${unit}` : '¿?'}</span>`).join('<i>+</i>');
+    const total = t.kind === 'current' ? `<span class="${Number.isFinite(r.source) ? 'is-read' : ''}"><small>Sale de la fuente</small>${Number.isFinite(r.source) ? `${fmtN(r.source)} A` : '¿?'}</span>` : `<span class="is-read"><small>Empuja la fuente</small>${this.puzzle.voltage} V</span>`;
+    return `<div class="wb-tally ${s.tally?.closed ? 'is-closed' : ''}" aria-label="${escapeHtml(t.title)}"><b>${escapeHtml(t.title)}</b><div class="wb-tally-sum">${cells}<i>=</i><span class="wb-tally-total ${all ? 'is-read' : ''}">${all ? `${fmtN(sum)} ${unit}` : '…'}</span><i>${s.tally?.closed ? '≈' : '¿='}</i>${total}</div></div>`;
+  }
+
   /** Turning the gate's brake, Ohm compares in proportions: how much the brake changed, how much the current. */
   proportionNote(before) {
     const value = this.state.values.brake, current = Math.abs(this.result.solution.branches.latch?.current ?? 0);
@@ -299,7 +347,8 @@ export class PuzzleWorkbench {
   change(mutate, { history = true, sound = 'click' } = {}) {
     const before = copy(this.state);
     if (history) { this.history.push(copy(this.state)); if (this.history.length > 40) this.history.shift(); }
-    this.hintShown = false; this.estimateNote = '';
+    this.hintShown = false; this.estimateNote = ''; this.tallyNote = '';
+    if (history) this.conjuroFresh = false;
     const brakeBefore = this.id === 'gate' ? { value: this.state.values.brake, current: Math.abs(this.result?.solution.branches.latch?.current ?? 0) } : null;
     if (history) this.probeMarks = null;
     mutate(this.state);
@@ -342,11 +391,13 @@ export class PuzzleWorkbench {
     if (this.mode === 'wire' || (this.mode === 'current' ? !m.branch : !m.a || !m.b)) return;
     const reading = this.presentedReading();
     const blocked = this.mode === 'continuity' && this.state.sourceOn && !this.state.tripped;
-    const reference = this.mode === 'current'
+    const reference = this.mode === 'current' && m.branch === 'source' ? 'Medidor en serie con la fuente: todo lo que sale de ella.'
+      : this.mode === 'current'
       ? `Medidor en serie con ${simpleLabel(this.puzzle.components.find(c => c.id === m.branch)?.label ?? '')}; sentido ${this.portLabel(this.puzzle.components.find(c => c.id === m.branch)?.a)} → ${this.portLabel(this.puzzle.components.find(c => c.id === m.branch)?.b)}.`
       : `Punta roja: ${this.portLabel(m.a)}; punta negra: ${this.portLabel(m.b)}.`;
     appendBenchEvidence(this.state, { kind: blocked ? 'observation' : 'measurement', text: blocked ? 'La prueba de continuidad quedó pendiente: la alimentación estaba encendida.' : TOOL_NAMES[this.mode], value: `${reading.value}${reading.unit ? ` ${reading.unit}` : ''}`, reference: `${reference} Alimentación ${this.state.sourceOn && !this.state.tripped ? 'encendida' : 'apagada'}.` });
     if (!blocked) this.recordProofMeasurement(reading);
+    if (!blocked) this.recordTally();
     if (!blocked) this.markProbe();
   }
 
@@ -579,6 +630,7 @@ export class PuzzleWorkbench {
     if (this.mode === 'wire') return { value: '— —', unit: '', caption: this.selected ? 'Elegí el borne de llegada' : 'Uní dos bornes para tender un cable' };
     if (this.mode === 'current') {
       if (!m.branch) return { value: '— —', unit: 'A', caption: 'Apagá la alimentación y elegí una pieza para insertar el medidor en serie.' };
+      if (m.branch === 'source') return { value: fmt(this.result.current), unit: 'A', caption: 'En serie con la fuente: todo lo que sale de ella pasa por el medidor.' };
       const branch = this.result.solution.branches[m.branch];
       return { value: fmt(branch?.current ?? 0), unit: 'A', caption: `En serie con ${this.puzzle.components.find(c => c.id === m.branch)?.label}. Sentido: borne izquierdo → derecho.` };
     }
@@ -597,6 +649,7 @@ export class PuzzleWorkbench {
     const m = this.state.meter;
     if (this.mode === 'current') {
       if (!m.branch) return { value: 'Elegí una pieza', unit: '', caption: 'Apagá y elegí la pieza: el medidor irá dentro de su camino.' };
+      if (m.branch === 'source') return { value: this.result.current > .001 ? 'Sale corriente' : 'No sale nada', unit: '', caption: 'El medidor va en serie con la fuente: todo lo que sale de ella lo atraviesa. Para la cuenta, Nereo escribe el número.' };
       const amount = this.result.solution.branches[m.branch]?.current ?? 0;
       return { value: Math.abs(amount) < .001 ? 'No pasa' : amount < 0 ? 'Al revés' : 'Hay paso', unit: '', caption: `Medidor en serie con ${simpleLabel(this.puzzle.components.find(c => c.id === m.branch)?.label ?? '')}. ${this.state.sourceOn && !this.state.tripped ? 'La misma corriente atraviesa ambos.' : 'Encendé para probar este camino.'}` };
     }
@@ -770,6 +823,7 @@ export class PuzzleWorkbench {
   // touched for the next item of the brief. A hint, when asked, takes its place until the next change.
   message(step) {
     const s = this.state, r = this.result, p = this.puzzle, guidance = BENCH_GUIDANCE[this.id], voice = guidance.voice;
+    if (this.tallyNote) return { kind: s.tally?.closed ? 'tally' : 'note', who: this.puzzle.tally.who.toLocaleUpperCase('es'), tag: this.puzzle.tally.title, text: this.tallyNote };
     const book = ESTIMATES[this.id];
     if (this.estimateNote) return { kind: 'estimate', who: book.who, tag: book.book, text: this.estimateNote };
     if (book && !s.estimate && !s.completed && !this.practice && !r.solved) return { kind: 'estimate', who: book.who, tag: `${book.book} · Marca esperada`, text: book.ask, options: book.options };
@@ -779,6 +833,7 @@ export class PuzzleWorkbench {
     if (s.completed && !this.practice) return { kind: 'note', who: voice, text: 'La instalación está en servicio. Podés medirla, o practicar con una copia sin tocarla.' };
     if (this.practice && r.solved) return { kind: 'note', who: voice, text: 'En la copia también funciona. La instalación real sigue como la dejaste.' };
     if (r.solved && !r.proven && !this.practice) return { kind: 'proof', who: p.proof.who.toLocaleUpperCase('es'), text: `Funciona. ${p.proof.request}` };
+    if (r.solved && r.proven && !r.tallied && !this.practice) return { kind: 'proof', who: p.tally.who.toLocaleUpperCase('es'), text: `Funciona. ${p.tally.request}` };
     if (this.selected) return { kind: 'note', who: voice, text: `Tenés el cable tomado de ${this.portLabel(this.selected)}. Tocá el borne donde va el otro extremo, o el mismo para soltarlo.` };
     if (r.solved) return { kind: 'note', who: voice, text: 'Todo el encargo está cumplido.' };
     // Once the instrument the step names is in hand, the sentence starts where the player is.
@@ -866,7 +921,7 @@ export class PuzzleWorkbench {
     const meter = this.presentedReading(), s = this.state, m = s.meter;
     const empty = this.mode === 'current' ? !m.branch : !m.a || !m.b;
     const introduction = { continuity: 'La mesa se apaga sola: esta prueba usa la pila del instrumento y dice si hay camino entre dos lugares.', voltage: 'Compara dos lugares: esa diferencia se llama tensión. La mesa sigue encendida.', current: 'El medidor se pone en el camino de una pieza: toda su corriente lo atraviesa.' }[this.mode];
-    return `<div class="wb-probe" role="status"><span class="wb-probe-name">${TOOL_NAMES[this.mode]}</span><div class="wb-meter-readout"><strong>${escapeHtml(meter.value)}</strong><span>${meter.unit}</span></div><p>${escapeHtml(empty ? introduction : meter.caption)}</p>${this.mode === 'current' ? `<select data-meter-branch aria-label="Pieza en cuyo camino va el medidor"><option value="">Elegir una pieza…</option>${this.puzzle.components.map(c => `<option value="${c.id}" ${m.branch === c.id ? 'selected' : ''}>${escapeHtml(this.pieceName(c))}</option>`).join('')}</select>` : ''}<button class="wb-numbers" data-action="numbers" aria-pressed="${this.showNumbers}">${this.showNumbers ? 'Sin números' : 'Ver números'}</button>${this.renderDetails()}</div>`;
+    return `<div class="wb-probe" role="status"><span class="wb-probe-name">${TOOL_NAMES[this.mode]}</span><div class="wb-meter-readout"><strong>${escapeHtml(meter.value)}</strong><span>${meter.unit}</span></div><p>${escapeHtml(empty ? introduction : meter.caption)}</p>${this.mode === 'current' ? `<select data-meter-branch aria-label="Pieza en cuyo camino va el medidor"><option value="">Elegir una pieza…</option>${this.puzzle.components.map(c => `<option value="${c.id}" ${m.branch === c.id ? 'selected' : ''}>${escapeHtml(this.pieceName(c))}</option>`).join('')}${this.puzzle.tally?.parts.includes('source') ? `<option value="source" ${m.branch === 'source' ? 'selected' : ''}>Lo que sale de la fuente</option>` : ''}</select>` : ''}<button class="wb-numbers" data-action="numbers" aria-pressed="${this.showNumbers}">${this.showNumbers ? 'Sin números' : 'Ver números'}</button>${this.renderDetails()}</div>`;
   }
 
   /** During a dial drag the input stays mounted: only states, notches and the brief follow. */
@@ -945,7 +1000,7 @@ export class PuzzleWorkbench {
   }
 
   dockMarkup({ say, hintButton, controls, inService, tools, portMarkup, p, s }) {
-    return `${this.conjuroStrip()}<div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face ${SAY_FACES[say.who ?? 'OHM'] ? `wb-face wb-face-${SAY_FACES[say.who ?? 'OHM']}` : ''}" aria-hidden="true">${SAY_FACES[say.who ?? 'OHM'] ? '' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${say.options ? '' : hintButton}${say.options ? `<div class="wb-marks" role="group" aria-label="Marca esperada">${say.options.map(o => `<button data-action="estimate" data-choice="${o.id}">${escapeHtml(o.text)}</button>`).join('')}<button class="wb-marks-skip" data-action="estimate" data-choice="skip">Medir sin anotar</button></div>` : ''}</div>
+    return `${this.conjuroStrip()}${this.tallyStrip()}<div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face ${SAY_FACES[say.who ?? 'OHM'] ? `wb-face wb-face-${SAY_FACES[say.who ?? 'OHM']}` : ''}" aria-hidden="true">${SAY_FACES[say.who ?? 'OHM'] ? '' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${say.options ? '' : hintButton}${say.options ? `<div class="wb-marks" role="group" aria-label="Marca esperada">${say.options.map(o => `<button data-action="estimate" data-choice="${o.id}">${escapeHtml(o.text)}</button>`).join('')}<button class="wb-marks-skip" data-action="estimate" data-choice="skip">Medir sin anotar</button></div>` : ''}</div>
         ${controls && !inService ? `<div class="wb-compact-controls">${controls}</div>` : ''}
         <div class="wb-toolbar">${tools ? `<div class="wb-tools">${tools}</div>` : ''}${this.renderProbe()}<div class="wb-history">${inService && revealFor(this.id, s) ? '<button data-action="reveal"><span class="wb-eye-icon" aria-hidden="true"></span>Lo que vio Ohm</button>' : ''}${inService ? '<button data-action="practice">Practicar con una copia</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : ''}${!inService ? `<button data-action="undo" ${!this.history.length ? 'disabled' : ''} title="Deshacer el último cambio"><span aria-hidden="true">↶</span>Deshacer</button><button data-action="reset" title="Volver a la disposición inicial de la mesa"><span aria-hidden="true">↺</span>Empezar de nuevo</button>` : ''}</div></div>
         <details class="wb-terminal-drawer" data-drawer="terminals" ${p.cables ? 'open' : ''}><summary>Tocar las conexiones <span>Las mismas piezas, más cerca</span></summary><div class="wb-terminal-rail">${p.ports.map(n => portMarkup(n, true)).join('')}</div></details>`;

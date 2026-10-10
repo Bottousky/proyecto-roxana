@@ -310,7 +310,8 @@ export const DIALOGUES = {
     ['vega', 'Y sin embargo deja pasar. Las viejas decían «por donde pasa el agua, pasa la Luz». Unión que deja pasar, no roba.'],
     ['player', 'En el taller había un corte. ¿Acá también?'],
     ['ohm', 'Podemos comparar. Hay una lectura con la bomba apagada y otra mientras intenta trabajar.'],
-    ['vega', 'Mirá en los dos lados de la unión. Yo vigilo el canal.']),
+    ['vega', 'Mirá en los dos lados de la unión. Yo vigilo el canal.'],
+    ['vega', 'Y después quiero saber adónde se van los doce que da la rueda. Si a la bomba no le llegan, alguien se los queda. Los voy a ir sumando.']),
   pump_complete: d(
     ['narrator', 'La bomba toma aire, tose una vez y llena el primer conducto. El agua corre hacia la Plaza.'],
     ['vega', 'Ese sonido. Pensé que lo había olvidado. Era el comienzo de mis mañanas.'],
@@ -489,6 +490,7 @@ export const DIALOGUES = {
     ['nereo', 'Mi maestro decía que las voces cantan en fila: la primera da el tono y las demás la siguen. Lo repetía como una oración.'],
     ['player', '¿Qué comparte ahora cada una con las otras?'],
     ['edda', 'Voy a anotar qué esperamos de cada una antes de tocarlas.'],
+    ['nereo', 'Y esta vez lo anoto con números: cuánto toma cada voz y cuánto sale de la fuente. Un farero escribiendo números. Si mi maestro me viera.'],
     ['ohm', 'Hay tres servicios. Dispongo de tres espacios en el registro. Coincidencia muy práctica.']),
   beacon_network_complete: d(
     ['narrator', 'La corona de engranajes comienza a girar. Lámparas sucesivas iluminan la galería y el enorme cristal.'],

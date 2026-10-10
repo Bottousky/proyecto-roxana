@@ -59,3 +59,13 @@ test('the glossary page grows with the benches, and the book is handed to paper 
   assert.ok(book.sections.every(html => /^<section class="dj-page dj-(left|right)/.test(html) && html.includes('dj-page-body')));
   assert.ok(book.sections.some(html => /Palabras del oficio/.test(html)));
 });
+
+test("the keeper's sum is written in the Bitácora as an addition, only with readings the player took", () => {
+  const s = repaired('pump');
+  const html = page => renderJournal({...freshState(), flags: {awaken: true, workshop: true, gate: true, pump: true}, puzzles: {pump: page}}, {selected: 'source_load', puzzles: PUZZLES, evidenceFor: getBenchEvidence});
+  assert.doesNotMatch(html(s), /dj-tally/, 'a sum closed without readings (an old save) is not invented');
+  s.tally = {closed: true, readings: {joint1: .08, joint2: 7.06, joint3: .08, pump: 4.71}};
+  const page = html(s);
+  assert.match(page, /La cuenta de la vuelta/); assert.match(page, /anotada por Vega/);
+  assert.match(page, /11,93 V/, 'the total is the sum of the numbers as written'); assert.match(page, /La fuente empuja 12 V/);
+});

@@ -274,6 +274,15 @@
 .dj-conjuro-words{color:var(--sienna);font-style:italic;font-size:23px!important}
 .dj-conjuro-copper{color:var(--ink-blue)}
 .dj-conjuro-copper b{font-family:var(--marker);font-weight:400;font-size:15px;color:var(--ink-black)}
+.dj-tally{margin:0 4px 16px;padding:8px 14px;transform:rotate(-.5deg)}
+.dj-tally table{border-collapse:collapse;margin:4px 0 2px 10px;font-family:var(--hand);font-weight:700;font-size:21px;color:var(--ink-black)}
+.dj-tally td{padding:0 8px 0 0;line-height:1.15}
+.dj-tally td:first-child{color:var(--graphite);width:14px}
+.dj-tally td:last-child{text-align:right;color:var(--ink-red)}
+.dj-tally .dj-tally-total td{border-top:2px solid var(--ink-black);padding-top:2px}
+.dj-tally .dj-tally-total td:last-child{color:var(--ink-red);font-size:24px}
+.dj-tally p{margin:2px 0 0;font-family:var(--hand);font-weight:600;font-size:19px;color:var(--ink-blue)}
+.dj-pdf .dj-tally{break-inside:avoid}
 .dj-mark{border-left-style:solid;border-left-color:var(--graphite);background:#55524c0d;transform:rotate(.3deg)}
 .dj-mark .dj-conjuro-label{color:var(--graphite)}
 .dj-mark-ask{color:var(--ink-black);font-size:19px!important}

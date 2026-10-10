@@ -160,12 +160,23 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
       measureTap();
       bench.touchPort('tap'); bench.touchPort('lensIn');
     }
-    assert.equal(bench.state.proofs[proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.commissionable, true, id);
+    assert.equal(bench.state.proofs[proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.proven, true, id);
+    if (!PUZZLES[id].tally) assert.equal(bench.result.commissionable, true, id);
+  }
+  // Vega's sum and Nereo's knots: every part measured on this montage, then the brief is complete.
+  const tally = PUZZLES[id].tally;
+  if (tally) {
+    assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the keeper's sum`);
+    for (const part of tally.parts) {
+      if (tally.kind === 'voltage') { const c = PUZZLES[id].components.find(x => x.id === part); probe('voltage', c.a, c.b); }
+      else { click({ action: 'mode', mode: 'current' }); bench.handleSliderCommit({ target: { dataset: { meterBranch: '' }, value: part } }); click({ action: 'mode', mode: 'wire' }); }
+    }
+    assert.equal(bench.state.tally.closed, true, `${id}: the sum closes`); assert.equal(bench.result.commissionable, true, id);
   }
   assert.ok(bench.result.checks.every(c => c.met), `${id}: every item of the brief is ticked`);
   assert.ok(bench.state.evidence.some(e => e.kind === 'result'));
   // Measurements are only the ones the player took for a requested proof, never invented.
-  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, proof?.measure ? 2 : proof?.continuityOpen || proof?.voltageAcross ? 1 : 0, 'successful operation must not invent a measurement or require a quiz');
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, (proof?.measure ? 2 : proof?.continuityOpen || proof?.voltageAcross ? 1 : 0) + (tally?.parts.length ?? 0), 'only the measurements the player took: the requested proof and the keeper\'s sum');
   const previousDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
   try { bench.close(true, { commission: true }); bench.close(true, { commission: true }); } finally { globalThis.document = previousDocument; }

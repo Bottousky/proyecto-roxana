@@ -160,6 +160,8 @@ const SYMBOLS = {
   power: '<circle class="sk-ink" cx="40" cy="34" r="13"/><path class="sk-red" d="M40 4 v10 M22 10 l6 8 M58 10 l-6 8"/>',
   heat: '<path class="sk-ink" d="M4 40 H76"/><path class="sk-red" d="M24 30 q6 -7 0 -14 q-6 -7 0 -14 M40 30 q6 -7 0 -14 q-6 -7 0 -14 M56 30 q6 -7 0 -14 q-6 -7 0 -14"/>',
   ohm: '<text class="sk-glyph sk-big" x="40" y="42">Ω</text>',
+  loopsum: '<rect class="sk-ink" x="8" y="10" width="64" height="40" rx="4"/><path class="sk-blue" d="M30 6 l8 4 l-8 4"/><text class="sk-red-note" x="40" y="38">Σ</text>',
+  nodesum: '<path class="sk-ink" d="M4 30 H40 M40 30 L74 8 M40 30 H76 M40 30 L74 52"/><circle class="sk-node" cx="40" cy="30" r="5"/><path class="sk-blue" d="M14 24 h12 m-5 -4 l5 4 l-5 4"/>',
   node: '<path class="sk-ink" d="M4 30 H40 L74 10 M40 30 L74 50"/><circle class="sk-node" cx="40" cy="30" r="5"/>',
   divider: '<path class="sk-ink" d="M20 2 V10 L12 13 L28 19 L12 25 L20 28 V32 L12 35 L28 41 L12 47 L20 50 V58 M20 30 H60"/><circle class="sk-node" cx="20" cy="30" r="4"/><text class="sk-red-note" x="66" y="34">V</text>',
 };
