@@ -317,3 +317,9 @@
   .wb-primary{min-height:44px;padding:8px 18px;font-size:15px}
   .wb-quiet{min-height:36px;font-size:12px}
 }
+/* The board shows the consequence first: the card waits until the receptor has answered. */
+.wb-success{animation:wb-success-late .5s cubic-bezier(.2,1.4,.4,1) 1.6s both}
+@keyframes wb-success-late{0%{opacity:0;visibility:hidden;transform:translate(-50%,-46%) scale(.94)}1%{visibility:visible}100%{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}}
+@media (max-width:530px){.wb-success{animation:wb-success-late-static .4s ease-out 1.6s both}}
+@keyframes wb-success-late-static{0%{opacity:0;visibility:hidden}1%{visibility:visible}100%{opacity:1;visibility:visible}}
+.reduced-motion .wb-success{animation-duration:.01s}

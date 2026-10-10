@@ -8,9 +8,9 @@ import './puzzles.css';
 // reach it («how»), and the instrument it needs, if any. Hints go one step further when asked.
 // A bench offers a single instrument: the one its story asks for.
 export const BENCH_GUIDANCE = {
-  awaken: { goal: 'Despertá a Ohm: cerrá el camino de su corazón.', learned: 'La energía necesita un camino completo: sale de la celda, atraviesa a Ohm y vuelve a la celda.', pulseLoose: true,
-    steps: [{ how: 'Tenés un cable. Tocá un borne redondo y después otro para unirlos: el camino tiene que salir de la celda, pasar por Ohm y volver.' }],
-    tools: [], voice: 'EDDA', hints: ['Ese cable sale de la celda y llega a Ohm. ¿Y después? Para volver, la energía necesita otro camino.', 'Tiene dos piezas redondas de cada lado: una ya está ocupada. La otra quedó sola.', 'Si unís las dos piezas de la celda entre sí, se oye un clic: el camino no pasa por Ohm. No se rompe nada.', 'Un paso para probar: tocá «Ohm −» y después «Celda −»: ese es el camino de vuelta.'] },
+  awaken: { goal: 'Despertá al pequeño de bronce: cerrá el camino de su corazón.', learned: 'La energía necesita un camino completo: sale de la celda, atraviesa al pequeño y vuelve a la celda.', pulseLoose: true,
+    steps: [{ how: 'Tenés un cable. Tocá un borne redondo y después otro para unirlos: el camino tiene que salir de la celda, pasar por el pequeño y volver.' }],
+    tools: [], voice: 'EDDA', hints: ['Ese cable sale de la celda y llega al pequeño. ¿Y después? Para volver, la energía necesita otro camino.', 'Tiene dos piezas redondas de cada lado: una ya está ocupada. La otra quedó sola.', 'Si unís las dos piezas de la celda entre sí, se oye un clic: el camino no pasa por él. No se rompe nada.', 'Un paso para probar: tocá «Bronce −» y después «Celda −»: ese es el camino de vuelta.'] },
   workshop: { goal: 'Encontrá el tramo cortado y puentealo con tu cable.', learned: 'Por fuera los tramos se ven iguales: la prueba de camino encuentra el corte que el ojo no ve.',
     steps: [{ how: 'Elegí “Comprobar el camino” y apoyá las puntas en A y B de cada tramo, uno por vez.', tool: 'continuity' }, { how: 'Con tu cable, uní A y B del tramo que no tiene camino.', tool: 'wire' }],
     tools: ['continuity'], voice: 'OHM', hints: ['Por fuera los tres tramos son iguales. Mirarlos no alcanza: hay que preguntarle al cobre.', 'La prueba de camino dice si hay paso entre dos piezas redondas. Funciona con la mesa apagada.', 'Podés probar un tramo por vez, apoyando las puntas en sus dos extremos. Dos van a tener camino; uno, no.', 'Un paso para probar: elegí “Comprobar el camino” y apoyá las puntas en los extremos de cada tramo. Donde diga “Sin camino”, volvé a “Cables” y tendé tu cable entre esos dos extremos.'] },
@@ -505,7 +505,7 @@ export class PuzzleWorkbench {
   }
 
   portLabel(id) {
-    if (this.id === 'awaken') return { positive: 'Celda +', negative: 'Celda −', heartIn: 'Ohm +', heartOut: 'Ohm −' }[id] ?? id;
+    if (this.id === 'awaken') return { positive: 'Celda +', negative: 'Celda −', heartIn: 'Bronce +', heartOut: 'Bronce −' }[id] ?? id;
     return this.puzzle.ports.find(p => p.id === id)?.label ?? id;
   }
 
@@ -812,7 +812,7 @@ export class PuzzleWorkbench {
     const previous = this.shell.contains(focus) ? { ...focus.dataset } : null;
     const drawers = Object.fromEntries([...this.shell.querySelectorAll('[data-drawer]')].map(d => [d.dataset.drawer, d.open]));
     const p = this.puzzle, s = this.state, r = this.result, guidance = BENCH_GUIDANCE[this.id];
-    const leaveLabel = this.id === 'awaken' ? 'Seguir con Ohm →' : 'Seguir la historia →';
+    const leaveLabel = this.id === 'awaken' ? 'A ver si despierta →' : 'Seguir la historia →';
     const powered = s.sourceOn && !s.tripped, inService = s.completed && !this.practice;
     const tool = this.availableTool(), wiring = p.cables !== 0 && !inService, inHand = Math.max(0, cablesInHand(this.id, s));
     const { steps, current } = this.steps(), step = steps[current];

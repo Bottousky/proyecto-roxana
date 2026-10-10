@@ -4,28 +4,100 @@ import { quietMountState } from './quiet-mount.js';
 const line = (speaker, text, emotion) => ({ speaker, text, ...(emotion ? { emotion } : {}) });
 const d = (...lines) => lines.map(([speaker, text, emotion]) => line(speaker, text, emotion));
 
+// `stranger` is how the player can only describe someone before they have heard that person's
+// name; `names` are the words that, said in front of them, make the name known (see learnNames).
 export const CHARACTERS = {
-  player: { name: 'Vos', role: 'Un viaje que acaba de empezar', color: '#8ad1df' },
+  player: { name: 'Vos', role: 'Del Instituto Roxana', color: '#8ad1df' },
   narrator: { name: 'Bitácora', role: 'Observaciones de viaje', color: '#c8bb91' },
-  edda: { name: 'Edda', role: 'Cuidadora del Portal', color: '#ecaa78' },
-  ohm: { name: 'Ohm', role: 'Compañero e instrumento de medida', color: '#81dfe5' },
-  lumen: { name: 'Maese Lumen', role: 'Reparador de la Plaza', color: '#e3be79' },
-  consejera: { name: 'Consejera Ivara', role: 'Custodia de la Red', color: '#c1aceb' },
-  yesca: { name: 'Yesca', role: 'Forjadora de las Terrazas', color: '#e98966' },
-  vega: { name: 'Vega', role: 'Operadora del acueducto', color: '#a2c789' },
-  nereo: { name: 'Nereo', role: 'Farero mayor', color: '#a9c9e4' },
-  marin: { name: 'Marín', role: 'Panadero de la Plaza', color: '#d7a577' },
-  tala: { name: 'Tala', role: 'Aprendiz y coleccionista de preguntas', color: '#d8ce88' },
+  edda: { name: 'Edda', role: 'Cuidadora del Portal', color: '#ecaa78', stranger: 'La muchacha de la escoba', names: ['Edda'] },
+  ohm: { name: 'Ohm', role: 'Compañero e instrumento de medida', color: '#81dfe5', stranger: 'El pequeño de bronce', names: ['Ohm'] },
+  lumen: { name: 'Maese Lumen', role: 'Reparador de la Plaza', color: '#e3be79', stranger: 'El dueño del taller', names: ['Lumen'] },
+  consejera: { name: 'Consejera Ivara', role: 'Custodia de la Red', color: '#c1aceb', stranger: 'La Consejera', names: ['Ivara'] },
+  yesca: { name: 'Yesca', role: 'Forjadora de las Terrazas', color: '#e98966', stranger: 'La forjadora', names: ['Yesca'] },
+  vega: { name: 'Vega', role: 'Operadora del acueducto', color: '#a2c789', stranger: 'La mujer del canal', names: ['Vega'] },
+  nereo: { name: 'Nereo', role: 'Farero mayor', color: '#a9c9e4', stranger: 'El viejo del muelle', names: ['Nereo'] },
+  marin: { name: 'Marín', role: 'Panadero de la Plaza', color: '#d7a577', stranger: 'El panadero', names: ['Marín'],
+    introduction: 'Marín, panadero. El mejor de la Plaza: somos uno solo, así que no miento.' },
+  tala: { name: 'Tala', role: 'Aprendiz y coleccionista de preguntas', color: '#d8ce88', stranger: 'Una aprendiz', names: ['Tala'],
+    introduction: 'Soy Tala. Aprendiz. De qué, todavía no decidí.' },
 };
+
+/** The name the player registered at the Instituto Roxana (the school's site), or «Vos». */
+export function playerName(state) {
+  const name = typeof state?.playerName === 'string' ? state.playerName.trim() : '';
+  return name || CHARACTERS.player.name;
+}
+/** Dialogue text with the player's own name where the script says {nombre}. */
+export const personalize = (text, state) => String(text ?? '').replaceAll('{nombre}', playerName(state));
+
+/** Whether the player has heard this character's name. Player and narrator are always known. */
+export function knowsCharacter(state, id) {
+  return !CHARACTERS[id]?.names || !!state?.known?.includes(id);
+}
+// «Plaza de Ohm» and «Puerta de Ohm» are places, not the little one introducing himself.
+const namePattern = word => new RegExp(`(?<![\\p{L}]|de )${word}(?![\\p{L}])`, 'u');
+/** A character becomes known when their name is said in a conversation they take part in:
+ * «Soy Edda», or someone else greeting them by name. Hearsay about an absent person does not count.
+ * Returns the ids learned at this line. */
+export function learnNames(lines, index, state) {
+  const line = lines?.[index];
+  if (!line || !state) return [];
+  const present = new Set(lines.map(l => l.speaker));
+  const text = personalize(line.text, state), learned = [];
+  for (const id of present) {
+    const names = CHARACTERS[id]?.names;
+    if (!names || state.known?.includes(id)) continue;
+    if (names.some(word => namePattern(word).test(text))) { (state.known ||= []).push(id); learned.push(id); }
+  }
+  return learned;
+}
+/** Someone the player has not met yet introduces themselves before speaking, unless the
+ * conversation itself says their name (then the name arrives in its own time). */
+export function withIntroductions(lines, state) {
+  if (!Array.isArray(lines) || !state) return lines;
+  let result = lines;
+  for (const id of new Set(lines.map(l => l.speaker))) {
+    const character = CHARACTERS[id];
+    if (!character?.introduction || knowsCharacter(state, id)) continue;
+    if (lines.some(l => character.names.some(word => namePattern(word).test(personalize(l.text, state))))) continue;
+    const at = result.findIndex(l => l.speaker === id);
+    result = [...result.slice(0, at), line(id, character.introduction), ...result.slice(at)];
+  }
+  return result;
+}
+/** For a save made before names were learned: whom the conversations already seen introduced. */
+export function knownFromSeen(state) {
+  const probe = { ...state, known: [] };
+  for (const id of state?.seen || []) {
+    const lines = withIntroductions(DIALOGUES[id], probe);
+    if (Array.isArray(lines)) lines.forEach((_, i) => learnNames(lines, i, probe));
+  }
+  return probe.known;
+}
+/** What the dialogue box shows for a speaker, given what the player knows so far. */
+export function speakerLabel(id, state) {
+  const character = CHARACTERS[id] || { name: id || 'Ohmdal', role: '' };
+  if (id === 'player') return { ...character, name: playerName(state) };
+  if (knowsCharacter(state, id)) return character;
+  return { ...character, name: '???', role: character.stranger || '' };
+}
+/** The world prompt and map label for a person. */
+export function personLabel(object, state) {
+  const id = object?.character;
+  if (!state || !id || !CHARACTERS[id] || knowsCharacter(state, id)) return object?.label;
+  return CHARACTERS[id].stranger || object.label;
+}
 
 export const DIALOGUES = {
   portal_arrival: d(
     ['narrator', 'El Portal Ω te suelta sobre la piedra tibia. De este lado, la mañana huele a lluvia. El instrumento de viaje del Instituto conserva el norte; tu Bitácora todavía está en blanco.'],
     ['edda', '¡Cruzaste! ¡Alguien cruzó!', 'surprised'],
     ['player', '¿Eso no pasa seguido?'],
-    ['edda', 'No desde antes de que yo naciera. Soy Edda. En el valle a mi familia le dicen «los Porteros»: mi abuela recibía acá a los Maestros del Instituto y a sus alumnos.'],
+    ['edda', 'No desde antes de que yo naciera. En el valle a mi familia le dicen «los Porteros»: mi abuela recibía acá a los Maestros del Instituto y a sus alumnos.'],
     ['player', '¿Y vos?'],
-    ['edda', 'Yo lo barro todas las mañanas, por si acaso. Hoy fue el «por si acaso».'],
+    ['edda', 'Yo lo barro todas las mañanas, por si acaso. Hoy fue el «por si acaso». ¡Perdón! Soy Edda. ¿Y vos?'],
+    ['player', '{nombre}. Vengo del Instituto Roxana.'],
+    ['edda', '{nombre}, del Instituto. Lo voy a anotar en el libro de llegadas con mi mejor letra. Mi abuela se moriría de envidia.', 'happy'],
     ['edda', 'Y justo hoy el pequeño de bronce del pedestal no me contesta. Vení: capaz entre los dos encontramos algo.']),
   edda_portal: d(
     ['edda', 'Limpié el polvo. Giré esa manivela. Hasta le dije por favor.'],
@@ -37,7 +109,7 @@ export const DIALOGUES = {
     ['edda', 'Lo anoto entre paréntesis. Los espero en la Plaza.']),
   portal_arch: d(
     ['narrator', 'Junto a la puerta de los Porteros, un libro de llegadas descansa en su atril. La tapa copia la inscripción del arco: «INSTITUTO ROXANA · MUNDOS APLICADOS». En el margen, otra mano: «Dejen el dibujo junto a la máquina».'],
-    ['narrator', 'Las primeras páginas están llenas de firmas: docentes, alumnos, fechas, una mancha de té. Después, años de hojas en blanco. En la última, con letra nueva: «Hoy: alguien».'],
+    ['narrator', 'Las primeras páginas están llenas de firmas: docentes, alumnos, fechas, una mancha de té. Después, años de hojas en blanco. En la última, con letra nueva y todavía fresca: «Hoy: {nombre}, del Instituto».'],
     ['edda', 'Mi abuela anotaba a todos los que cruzaban. Decía que por ahí venían los Maestros. No dijo que trajeran mochilas.']),
   portal_seed: d(
     ['narrator', 'Entre dos raíces hay una placa doblada. El dibujo muestra dos caminos entre una fuente y una pequeña lámpara.'],
@@ -59,7 +131,7 @@ export const DIALOGUES = {
   ohm_pedestal_after: d(
     ['narrator', 'El asiento de bronce conserva la huella de Ohm. Dos caminos de cobre unen el cristal con el lugar donde descansaba.'],
     ['ohm', 'Cuarenta años mirando la misma pared. Tu compañía mejora sensiblemente el paisaje.']),
-  portal_locked: d(['edda', 'Antes de irnos, ayudemos a Ohm. Si despierta, tal vez quiera venir. Preguntarle dormido no cuenta.']),
+  portal_locked: d(['edda', 'Antes de irnos, ayudemos al pequeño de bronce. Si despierta, tal vez quiera venir. Preguntarle dormido no cuenta.']),
 
   plaza_arrival: d(
     ['narrator', 'La Plaza de Ohm conserva guirnaldas para una fiesta que nadie ha cancelado del todo. Entre las últimas casas, la Calzada sigue el agua hacia la Puerta de Ohm.'],
@@ -97,7 +169,8 @@ export const DIALOGUES = {
   workshop_arrival: d(
     ['lumen', 'Dejalo ahí.'],
     ['player', 'Ni lo toqué.'],
-    ['lumen', 'Estabas por tocarlo. Todos ponen esa cara. Pasá: si vas a curiosear, te consigo un lugar en el banco.'],
+    ['lumen', 'Estabas por tocarlo. Todos ponen esa cara. Lumen, reparador. «Maese Lumen» para los que me deben una lámpara.'],
+    ['lumen', 'Pasá: si vas a curiosear, te consigo un lugar en el banco.'],
     ['ohm', 'Su voz se parece a otra que recuerdo.'],
     ['lumen', 'Mi padre, seguramente. Tenía mejor oído y peores modales. Los dos cierres de la mesa están sueltos; se ajustan desde los costados.']),
   lumen_before: d(
@@ -180,6 +253,7 @@ export const DIALOGUES = {
   spring_arrival: d(
     ['narrator', 'El Manantial canta detrás de una compuerta. La rueda está quieta. El agua encuentra su propio camino hacia el río.'],
     ['vega', 'Cuidado con el borde. La piedra verde resbala incluso cuando una cree que ya aprendió.'],
+    ['vega', 'Soy Vega; cuido el agua desde acá hasta las Terrazas. Ustedes abrieron la Puerta: el golpe se oyó hasta la compuerta.'],
     ['player', '¿Vos apartaste el agua de la rueda?'],
     ['vega', 'Después de la avería. La Plaza se quedó sin fuente, pero el canal dejó de desbordar. Cada decisión moja algún patio.']),
   vega_spring: d(
@@ -215,7 +289,7 @@ export const DIALOGUES = {
   castle_arrival: d(
     ['consejera', 'La Red permanece sellada.'],
     ['player', 'Abrimos la Calzada. Tal vez podamos ayudar acá.'],
-    ['consejera', 'Quienes estaban antes también podían repararla. La repararon. Tres días después ardieron dos distribuidores.'],
+    ['consejera', 'Soy Ivara, Consejera de la Red. Quienes estaban antes también podían repararla. La repararon. Tres días después ardieron dos distribuidores.'],
     ['edda', 'No podemos descubrir qué pasa con todo apagado.'],
     ['consejera', 'Tampoco incendiando la ciudad. Encuentren una prueba que no ponga en riesgo lo que aún funciona.']),
   consejera_before: d(
@@ -264,7 +338,7 @@ export const DIALOGUES = {
     ['yesca', 'Si vienen a decirme que trabaje menos, pueden ahorrarse la caminata.'],
     ['player', 'No veníamos a decir eso.'],
     ['ohm', 'Todavía no hemos determinado qué veníamos a decir.'],
-    ['vega', 'Cuando sube tu horno, baja mi bomba. Lo vi otra vez esta mañana.'],
+    ['vega', 'Cuando sube tu horno, Yesca, baja mi bomba. Lo vi otra vez esta mañana.'],
     ['yesca', 'Mi forja hace las herramientas que cultivan tu comida.'],
     ['vega', 'Y mi comida fabrica herreros.'],
     ['ohm', 'Las dos tienen razón. El cable de la ladera es uno solo.']),
@@ -290,7 +364,7 @@ export const DIALOGUES = {
     ['yesca', 'Menos por tanda. Más tandas sin parar. Odio cuando algo razonable suena tan poco espectacular.'],
     ['vega', 'Voy a anotar las alturas y las lecturas. Si mañana cambian, tenemos con qué comparar.'],
     ['vega', 'El sendero del lago está abierto. Nereo los espera. Si dice que no, miren cuántas tazas puso.']),
-  yesca_after: d(['yesca', 'El hierro tarda lo que tarda. Antes discutía con él. Ahora uso ese rato para almorzar.'], ['ohm', '¿Y qué se almuerza mientras el hierro se calienta?'], ['yesca', 'Pan de Marin. Hoy salió entero.']),
+  yesca_after: d(['yesca', 'El hierro tarda lo que tarda. Antes discutía con él. Ahora uso ese rato para almorzar.'], ['ohm', '¿Y qué se almuerza mientras el hierro se calienta?'], ['yesca', 'Pan de Marín. Hoy salió entero.']),
   vega_after: d(['vega', 'Durante años pensé que ser prudente era no tocar nada.'], ['player', '¿Y ahora?'], ['vega', 'Ahora sé qué mirar después de tocarlo. Todavía voy a recorrer los canales. Pero ya no sólo para lamentarme.']),
   terraces_marker: d(
     ['narrator', 'Las marcas del poste indican caudal, turnos y nombres. Bajo una pintura reciente asoma: «Preguntar a Vega».'],
@@ -467,7 +541,7 @@ export const DIALOGUES = {
   tala_epilogue: d(['tala', 'Edda dice que primero mire. Estoy mirando.'], ['player', '¿Y qué encontraste?'], ['tala', 'Esta tela no tiene el mismo color. Todavía no sé qué hay debajo.']),
   tala_epilogue_after: d(['tala', 'Quiero guardar también el dibujo de cuando no funcionaba.'], ['player', '¿Por qué?'], ['tala', 'Porque si sólo guardo el otro, parece que ya lo sabía. Edda hizo una cara rara cuando se lo dije.']),
   lake_boat_after: d(['narrator', 'La señal del Faro vuelve sobre las tres maderas de la barca. Las marcas de nombres y estaturas siguen en su banco.'], ['nereo', 'Mañana puedo traerla hasta el muelle. Hay gente que creció mientras esperaba.']),
-  portal_arch_without_edda: d(['narrator', 'El libro de llegadas sigue abierto en la última hoja. Debajo de «Hoy: alguien», Edda agregó con letra prolija: «Del Instituto. Despertó a Ohm».'], ['narrator', 'Al lado dejó una flecha a lápiz hacia la Plaza y una nota: «Preguntar por los Maestros».']),
+  portal_arch_without_edda: d(['narrator', 'El libro de llegadas sigue abierto en la última hoja. Debajo de «Hoy: {nombre}, del Instituto», Edda agregó con letra prolija: «Despertó a Ohm».'], ['narrator', 'Al lado dejó una flecha a lápiz hacia la Plaza y una nota: «Preguntar por los Maestros».']),
   plaza_statue_without_edda: d(['narrator', 'La Primera Maestra sostiene un cuaderno abierto. El nombre gastado empieza por «ROX…».'], ['narrator', 'A los pies quedó una nota de Edda: «El abuelo dice que ella nunca se quedaba quieta. Buscar otro retrato».']),
   castle_archive_without_edda: d(['narrator', 'Las cartas siguen ordenadas por fecha. La última solicitud de un docente no tiene respuesta.'], ['ohm', 'Instituto Roxana. Esa era nuestra dirección.'], ['narrator', 'Edda dejó una copia junto al legajo. En el margen: «¿Quién las recibía?».']),
   spring_levels_without_vega: d(['narrator', 'Las fechas de sequía y abundancia siguen en el muro. Una marca reciente lleva la letra de Vega.'], ['narrator', 'En su tablilla: «Anotar también lo que no salió como esperábamos. Voy a revisar los bancales».']),
@@ -534,7 +608,7 @@ export const AREAS = {
     id: 'portal', name: 'Portal Ω', subtitle: 'Donde una pregunta vuelve a cruzar', theme: 'portal', bounds: [28, 24], spawn: [0, -2.4], entryDialogue: 'portal_arrival',
     objects: [
       npc('edda_portal', -3.6, 0.6, 'edda', 'edda_portal', { flag: 'awaken', afterDialogue: 'edda_portal_after' }),
-      panel('ohm_pedestal', 3.5, 0, 'El pedestal de Ohm', 'awaken', [], null, 'ohm_pedestal_after'),
+      panel('ohm_pedestal', 3.5, 0, 'El pedestal de bronce', 'awaken', [], null, 'ohm_pedestal_after'),
       lore('portal_arch', -7.5, -5, 'El libro de llegadas', 'portal_arch'),
       secret('portal_seed', 8.5, 5, 'Una placa entre las raíces', 'portal_seed'),
     ],

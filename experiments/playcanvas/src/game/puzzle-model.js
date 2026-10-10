@@ -17,12 +17,12 @@ const branchOf = (r, id) => r.solution.branches[id] ?? { voltage: 0, current: 0,
 
 export const PUZZLES = {
   awaken: {
-    title: 'Un pequeño latido', place: 'PORTAL Ω · EL CORAZÓN DE OHM', subtitle: 'Un cable ya sale de la celda hacia Ohm. Tenés otro en la mano.', voltage: 6, protection: 1.2,
+    title: 'Un pequeño latido', place: 'PORTAL Ω · EL PEQUEÑO DE BRONCE', subtitle: 'Un cable ya sale de la celda hacia Ohm. Tenés otro en la mano.', voltage: 6, protection: 1.2,
     brief: 'Despertá a Ohm. Su corazón necesita un camino que salga de la celda, lo atraviese y vuelva a ella. Tenés un cable.',
     ports: [...sourcePorts, port('heartIn', 'Corazón +', 540, 210), port('heartOut', 'Corazón −', 790, 210)],
-    components: [component('heart', 'Corazón de Ohm', 'heartIn', 'heartOut', 12, { kind: 'orb', goal: goal(5.6, 6.1, .45, .52) })],
+    components: [component('heart', 'Corazón de bronce', 'heartIn', 'heartOut', 12, { kind: 'orb', goal: goal(5.6, 6.1, .45, .52) })],
     initialWires: [['positive', 'heartIn']], sealed: [['positive', 'heartIn']], cables: 1,
-    criteria: [{ text: 'El corazón de Ohm late', met: r => r.operating.heart }],
+    criteria: [{ text: 'El corazón de bronce late', met: r => r.operating.heart }],
     solve: s => { s.wires.push(['heartOut', 'negative']); },
     lesson: 'Un receptor necesita un camino completo: desde un borne de la fuente, a través de él, hasta el otro borne.',
     observation: 'Un filamento dorado tiembla bajo el vidrio. Todavía no hay latido.',

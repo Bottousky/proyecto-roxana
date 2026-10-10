@@ -13,7 +13,7 @@ import './hud.css';
 import {renderJourneyGuide} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,speakerLabel,personLabel,personalize,learnNames,withIntroductions,knownFromSeen,playerName,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
 import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
@@ -73,6 +73,17 @@ function queueDialogue(id,delay=0,area=state.area){if(id)dialogueQueue.push({id,
 function show(node,value=true){(typeof node==='string'?$(node):node).classList.toggle('hidden',!value);if(node==='#dialogue')$('#hud').classList.toggle('conversing',value);}
 function toast(text,duration=3600){$('#toast').textContent=text;show('#toast');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>show('#toast',false),duration);}
 function sound(name){try{audio.play(name);}catch{}}
+// The player's name lives in the Instituto Roxana's register (the school's site, same origin):
+// whatever the student wrote there is how Ohmdal knows them. Without one, the game asks once.
+const SCHOOL_KEY='roxana.escuela.v1';
+function schoolProfile(){try{const data=JSON.parse(localStorage.getItem(SCHOOL_KEY)||'null');return data&&typeof data==='object'&&data.version===1?data:null;}catch{return null;}}
+function schoolName(){const name=schoolProfile()?.name;return typeof name==='string'?name.trim().slice(0,40):'';}
+function storeSchoolName(name){try{const profile=schoolProfile()||{version:1};profile.name=name;localStorage.setItem(SCHOOL_KEY,JSON.stringify(profile));}catch{}}
+function askName(next){
+  modal(`<div class="eyebrow">REGISTRO DEL INSTITUTO ROXANA</div><h2>¿Cómo te llamás?</h2><p class="modal-intro">Así te van a conocer en Ohmdal. Es el mismo nombre de tu registro en la escuela; podés cambiarlo después desde Opciones.</p><form id="name-form" class="name-form"><input id="player-name" maxlength="40" autocomplete="nickname" placeholder="Tu nombre" aria-label="Tu nombre" required/><button class="primary" type="submit">Cruzar el Portal ${svg('arrow')}</button></form>`,'options-modal name-modal');
+  const input=$('#player-name');setTimeout(()=>input.focus(),0);
+  $('#name-form').onsubmit=event=>{event.preventDefault();const name=input.value.trim().slice(0,40);if(!name){input.focus();return;}storeSchoolName(name);closeModal();next(name);};
+}
 function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);}
 storeSettings();
 
@@ -172,6 +183,8 @@ async function startGame(resume=false){
   await audio.unlock();
   if(resume){state=resumeState;settings={...state.settings};storeSettings();}
   else state=freshState(settings);
+  {const registered=schoolName();if(registered)state.playerName=registered;}
+  if(!Array.isArray(state.known))state.known=knownFromSeen(state);
   try{initWorld();}catch(error){console.error(error);modalReturn='title';modal('<div class="eyebrow">OHMDAL</div><h2>El mundo no pudo abrirse</h2><p class="modal-intro">El navegador no pudo iniciar los gráficos. Activá la aceleración gráfica del navegador y volvé a intentar, o abrí el juego en Chrome o Edge actualizados.</p>','options-modal');return;}
   $('#transition-name').textContent='Abriendo los caminos de Ohmdal';show('#transition');
   const art=await (assetLoadFailed?world.loadArtAssets():world.assetsReady);
@@ -222,8 +235,10 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
 }
 
 function linesFor(id){
-  if(Array.isArray(id))return id;
-  try{return resolveDialogue(id,state)||DIALOGUES[id]||[];}catch{return DIALOGUES[id]||[];}
+  let lines;
+  if(Array.isArray(id))lines=id;
+  else try{lines=resolveDialogue(id,state)||DIALOGUES[id]||[];}catch{lines=DIALOGUES[id]||[];}
+  return withIntroductions(lines,state).map(line=>({...line,text:personalize(line.text,state)}));
 }
 function speak(id,onEnd=null,target=null){
   if(typeof id==='string')id=resolveDialogueId(id,state);
@@ -237,8 +252,15 @@ function speak(id,onEnd=null,target=null){
 }
 const portraits={edda:'edda',ohm:'ohm',lumen:'lumen',nereo:'nereo',vega:'vega',consejera:'consejera',yesca:'yesca',marin:'marin',tala:'tala',player:'player'};
 function renderLine(){
-  const line=dialogue.lines[dialogue.index];const character=CHARACTERS[line.speaker]||{name:line.speaker||'Ohmdal',role:''};
-  $('#speaker').textContent=character.name;$('#speaker-role').textContent=character.role||'';
+  const line=dialogue.lines[dialogue.index];
+  // A name appears in the box when it is said in front of its owner: if the speaker says it,
+  // the label changes as the typing reaches the name.
+  const before=speakerLabel(line.speaker,state);
+  const learned=learnNames(dialogue.lines,dialogue.index,state);
+  const character=learned.includes(line.speaker)?before:speakerLabel(line.speaker,state);
+  nameReveal=null;
+  if(learned.includes(line.speaker)){const at=CHARACTERS[line.speaker].names.map(word=>line.text.indexOf(word)).filter(i=>i>=0).sort((a,b)=>a-b)[0]??0;nameReveal={at,label:speakerLabel(line.speaker,state)};}
+  $('#speaker').textContent=character.name;$('#speaker-role').textContent=character.role||'';$('#speaker').classList.remove('name-revealed');
   $('#portrait').className=`portrait ${portraits[line.speaker]?'portrait-'+portraits[line.speaker]:'portrait-symbol'}`;
   $('#portrait span').textContent=portraits[line.speaker]?'':line.speaker==='narrator'?'Ω':character.name.slice(0,1);
   $('#portrait').style.setProperty('--character-color',character.color||'#c9b084');
@@ -253,6 +275,8 @@ function renderLine(){
   sound('voice');
   state.activeDialogue=typeof dialogue.id==='string'?{id:dialogue.id,index:dialogue.index}:null;persist();
 }
+let nameReveal=null;
+function revealName(){if(!nameReveal)return;$('#speaker').textContent=nameReveal.label.name;$('#speaker-role').textContent=nameReveal.label.role||'';$('#speaker').classList.add('name-revealed');$('#dialogue-announcement').textContent=`${nameReveal.label.name}: ${dialogue.lines[dialogue.index].text}`;nameReveal=null;}
 function removeChoices(){if(typeof document!=='undefined')document.getElementById('dialogue-choices')?.remove();}
 function chooseInDialogue(id){
   if(!dialogue?.lines[dialogue.index]?.choices)return;
@@ -263,7 +287,7 @@ function nextLine(){
   if(!dialogue)return;
   if(dialogue.lines[dialogue.index]?.choices){const focused=document.activeElement?.closest?.('#dialogue-choices button');if(focused)focused.click();return;}
   const text=dialogue.lines[dialogue.index].text;
-  if(typed<text.length){typed=text.length;typing=typed;$('#dialogue-text').textContent=text;return;}
+  if(typed<text.length){typed=text.length;typing=typed;$('#dialogue-text').textContent=text;revealName();return;}
   if(++dialogue.index<dialogue.lines.length){renderLine();return;}
   if(dialogue.id==='lighthouse_epilogue'){state.flags.epilogue_shared=true;refreshHUD();}
   world?.endInhabitantConversation?.();
@@ -357,7 +381,8 @@ function openMap(){
 
 function openOptions(){
   const titleMode=mode==='title';
-  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label><label><span>Caminar con clic<span class="setting-note">Con el mouse. En pantallas táctiles siempre se puede tocar para ir</span></span><input id="click-walk" aria-label="Caminar con clic" type="checkbox" ${settings.clickToWalk?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>O</kbd> Hablar con Ohm <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic sobre algo cercano para usarlo. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
+  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Tu nombre<span class="setting-note">El de tu registro en el Instituto Roxana</span></span><input id="player-name-option" maxlength="40" autocomplete="nickname" aria-label="Tu nombre" value="${esc(schoolName()||state.playerName||'')}" placeholder="Tu nombre"/></label><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label><label><span>Caminar con clic<span class="setting-note">Con el mouse. En pantallas táctiles siempre se puede tocar para ir</span></span><input id="click-walk" aria-label="Caminar con clic" type="checkbox" ${settings.clickToWalk?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>O</kbd> Hablar con Ohm <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic sobre algo cercano para usarlo. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
+  $('#player-name-option').onchange=e=>{const name=e.target.value.trim().slice(0,40);if(!name){e.target.value=schoolName()||state.playerName||'';return;}storeSchoolName(name);state.playerName=name;if(started)persist();toast(`En Ohmdal te conocen como ${name}.`);};
   $('#volume').oninput=e=>{settings.volume=Number(e.target.value);storeSettings();};
   $('#mute').onchange=e=>{settings.muted=e.target.checked;storeSettings();};
   $('#motion').onchange=e=>{settings.reducedMotion=e.target.checked;storeSettings();};
@@ -423,10 +448,11 @@ function showEnding(){
 }
 
 $('#new-game').onclick=()=>{
-  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">El nuevo viaje reemplazará la bitácora de este navegador. Podés exportar una copia desde Opciones antes de comenzar.</p><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');$('#confirm-new').onclick=()=>{closeModal();startGame(false);};$('#cancel-new').onclick=closeModal;}
+  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">El nuevo viaje reemplazará la bitácora de este navegador. Podés exportar una copia desde Opciones antes de comenzar.</p><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');$('#confirm-new').onclick=()=>{closeModal();if(!schoolName())askName(()=>startGame(false));else startGame(false);};$('#cancel-new').onclick=closeModal;}
+  else if(!schoolName())askName(()=>startGame(false));
   else startGame(false);
 };
-$('#continue').onclick=()=>startGame(true);$('#title-settings').onclick=openOptions;$('#pause-button').onclick=openOptions;
+$('#continue').onclick=()=>{if(!schoolName()&&!loadState().state?.playerName)askName(()=>startGame(true));else startGame(true);};$('#title-settings').onclick=openOptions;$('#pause-button').onclick=openOptions;
 $('#ohm-button').onclick=()=>talkToOhm();$('#guide-button').onclick=openGuide;$('#journal-button').onclick=openJournal;$('#map-button').onclick=openMap;$('#interact-button').onclick=()=>interact();$('#touch-interact').onclick=()=>interact();$('#dialogue-next').onclick=nextLine;
 $('#field-measure').onclick=fieldMeasure;$('#close-field-meter').onclick=()=>{activeMeasurement=null;show('#field-meter',false);};
 $('#objective-toggle').onclick=()=>{const folded=$('#objective').classList.toggle('folded');$('#objective-toggle').setAttribute('aria-expanded',String(!folded));objectiveUntil=folded?0:Infinity;};
@@ -519,12 +545,15 @@ function loop(now){
       show('#interaction',mode==='world'&&!!nearby);
       if(nearby&&mode==='world'){
         $('#interaction').classList.toggle('companion-prompt',nearby.id==='ohm_companion');
-        let label=nearby.label||'Observar';
+        let label=personLabel(nearby,state)||'Observar';
         if(nearby.action?.type==='toggle')label=(state.flags[nearby.action.flag]?nearby.action.offLabel:nearby.action.onLabel)||label;
         $('#interaction-label').textContent=label;
         const candidate=state.area+nearby.id+JSON.stringify(state.flags);if(candidate!==lastMeasurementCandidate){lastMeasurementCandidate=candidate;measurementAvailable=Boolean(state.flags.awaken&&measureWorld(state.area,state,nearby.id));}show('#field-measure',measurementAvailable);
         const pos=world.getScreenPosition(nearby),prompt=$('#interaction');
         const blocked=world.area.exits.map(exit=>world.getScreenPosition({...exit,target:true})).filter(point=>point.visible).map(point=>({left:point.x-30,right:point.x+30,top:point.y-24,bottom:point.y+24}));
+        // Never over the player: the figure is what the eye follows while walking up to something.
+        {const [px,pz]=world.getPlayerPosition(),feet=world.getScreenPosition({x:px,z:pz,ground:true}),head=world.getScreenPosition({x:px,z:pz,character:true});
+          if(feet.visible||head.visible)blocked.push({left:Math.min(feet.x,head.x)-24,right:Math.max(feet.x,head.x)+24,top:Math.min(feet.y,head.y)-14,bottom:Math.max(feet.y,head.y)+6});}
         for(const selector of ['#travel-instrument','#field-meter','#ohm-bubble','.dpad','#touch-interact']){
           const element=$(selector);if(element.getClientRects().length)blocked.push(element.getBoundingClientRect());
         }
@@ -544,7 +573,7 @@ function loop(now){
   }
   if(mode==='dialogue'&&dialogue){
     const line=dialogue.lines[dialogue.index];typing+=dt*settings.textSpeed;const amount=Math.min(line.text.length,Math.floor(typing));
-    if(amount>typed){typed=amount;$('#dialogue-text').textContent=line.text.slice(0,typed);}
+    if(amount>typed){typed=amount;$('#dialogue-text').textContent=line.text.slice(0,typed);if(nameReveal&&typed>=nameReveal.at)revealName();}
   }
   if(now>bubbleUntil)show('#ohm-bubble',false);
   requestAnimationFrame(loop);

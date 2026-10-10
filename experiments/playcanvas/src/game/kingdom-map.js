@@ -1,4 +1,4 @@
-import { AREAS, getObjective } from './content.js';
+import { AREAS, getObjective, personLabel, playerName } from './content.js';
 import { AREA_LAYOUTS } from './world-layout.js';
 import { KINGDOM, EXTERIORS, isExterior, passageGeometry, toKingdom } from './kingdom-geography.js';
 import { journeyGuidance } from './journey-guide.js';
@@ -63,7 +63,7 @@ export function kingdomMapMarks(state, { position, facing, inhabitants = [] } = 
   if (visited.has('spring')) { const lamp = quietMountState(state).lamp; marks.push({ kind: 'works', id: 'quiet-mount-house', at: [QUIET_MOUNT.powerhouse.x, QUIET_MOUNT.powerhouse.z], label: QUIET_MOUNT.house, lamp, minZoom: .4 }); }
   // The workshop is a building of the village: its bench is shown at its door.
   if (visited.has('workshop')) for (const object of AREAS.workshop.objects || []) if (object.puzzle) marks.push({ kind: 'bench', id: object.id, at: [KINGDOM.workshop.x, KINGDOM.workshop.z], label: object.label, restored: !!state.flags?.[object.puzzle], minZoom: .35 });
-  for (const person of inhabitants) if (Number.isFinite(person.x)) marks.push({ kind: 'person', id: person.id, at: kingdomOf(state.area, [person.x, person.z]), label: person.label, minZoom: 1 });
+  for (const person of inhabitants) if (Number.isFinite(person.x)) marks.push({ kind: 'person', id: person.id, at: kingdomOf(state.area, [person.x, person.z]), label: personLabel(person, state), minZoom: 1 });
   // Where the objective is: its object if it is known, otherwise the place.
   const objective = getObjective(state), area = valid(objective.area) ? objective.area : state.area;
   const object = [...(AREAS[area]?.objects || [])].find(o => o.id === objective.object);
@@ -71,7 +71,7 @@ export function kingdomMapMarks(state, { position, facing, inhabitants = [] } = 
   marks.push({ kind: 'objective', id: 'objective', at: goal.at, label: objective.title });
   const here = kingdomOf(state.area, position || state.position || AREAS[state.area]?.spawn || [0, 0]);
   const heading = facing && Math.hypot(facing[0], facing[1]) > .01 ? Math.atan2(facing[0], -facing[1]) * 180 / Math.PI : 0;
-  marks.push({ kind: 'player', id: 'player', at: here, label: 'Estás aquí', heading });
+  marks.push({ kind: 'player', id: 'player', at: here, label: playerName(state), heading });
   return { marks, route: journeyRoute(state, here, goal), here, goal, visited };
 }
 
@@ -92,7 +92,7 @@ function markHtml(mark) {
     case 'locked': return `<div class="kmap-mark kmap-locked" ${data} title="${esc(mark.label)}"><i aria-hidden="true">×</i></div>`;
     case 'person': return `<div class="kmap-mark kmap-person" ${data}><i aria-hidden="true"></i>${label}</div>`;
     case 'objective': return `<div class="kmap-mark kmap-objective" ${data} title="${esc(mark.label)}"><i aria-hidden="true"></i></div>`;
-    case 'player': return `<div class="kmap-mark kmap-player" ${data} title="Estás aquí"><i aria-hidden="true" style="--heading:${n(mark.heading)}deg"></i><span class="kmap-label">Vos</span></div>`;
+    case 'player': return `<div class="kmap-mark kmap-player" ${data} title="Estás aquí"><i aria-hidden="true" style="--heading:${n(mark.heading)}deg"></i><span class="kmap-label">${esc(mark.label)}</span></div>`;
     default: return '';
   }
 }
@@ -122,7 +122,7 @@ export function renderKingdomMap(state, options = {}) {
     <div class="kmap-scale" data-kmap-scale aria-hidden="true"><i></i><span>50 m</span></div>
     <div class="kmap-controls" role="group" aria-label="Zoom del mapa"><button type="button" data-kmap-zoom="1" aria-label="Acercar">+</button><button type="button" data-kmap-zoom="-1" aria-label="Alejar">−</button><button type="button" data-kmap-center aria-label="Centrar en vos">◎</button></div>
     ${destinations ? `<details class="map-return kmap-travel"><summary>Viajar a un lugar visitado · ${visited.size}</summary><nav class="map-destinations" aria-label="Volver a lugares visitados">${destinations}</nav></details>` : ''}
-    <ul class="kmap-legend" aria-label="Referencias"><li><i class="lg-player"></i>Vos</li><li><i class="lg-objective"></i>Siguiente paso</li><li><i class="lg-bench restored"></i>Restaurado</li><li><i class="lg-bench"></i>Por restaurar</li><li><i class="lg-fog"></i>Sin recorrer</li></ul>
+    <ul class="kmap-legend" aria-label="Referencias"><li><i class="lg-player"></i>${esc(playerName(state))}</li><li><i class="lg-objective"></i>Siguiente paso</li><li><i class="lg-bench restored"></i>Restaurado</li><li><i class="lg-bench"></i>Por restaurar</li><li><i class="lg-fog"></i>Sin recorrer</li></ul>
   </div>`;
 }
 

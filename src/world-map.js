@@ -1,4 +1,4 @@
-import {AREAS, getObjective} from './content.js';
+import {AREAS, getObjective, personLabel } from './content.js';
 import {AREA_LAYOUTS} from './world-layout.js';
 import {inhabitantPlan} from './world-inhabitants.js';
 import {KINGDOM,WATERCOURSE,nextPassage,isExterior,passagesFor,passageGeometry,fromKingdom,corridorX,travelBounds} from './kingdom-geography.js';
@@ -95,10 +95,10 @@ function shapeSvg(shape, project, scale, attributes = '') {
 }
 
 /** Labels may move; the projected resident dots always retain their real position. */
-export function layoutPersonLabels(people,project,bounds,blocked=[]){
+export function layoutPersonLabels(people,project,bounds,blocked=[],state){
   const points=people.filter(person=>person.id!=='ohm_companion').map(person=>{
     const [x,y]=project(person.x,person.z);
-    return {id:person.id,label:person.label,x,y,width:[...String(person.label||'')].length*16*.72+6,height:22};
+    const label=personLabel(person,state);return {id:person.id,label,x,y,width:[...String(label||'')].length*16*.72+6,height:22};
   }).sort((a,b)=>a.y-b.y||a.x-b.x||a.id.localeCompare(b.id));
   const occupied=[...blocked,...points.map(point=>({left:point.x-6,right:point.x+6,top:point.y-6,bottom:point.y+6}))];
   const overlaps=(a,b)=>a.left<b.right+3&&a.right>b.left-3&&a.top<b.bottom+3&&a.bottom>b.top-3;
@@ -173,10 +173,10 @@ export function renderLocalMap(area, layout = AREA_LAYOUTS[area?.id], position, 
   const labelObstacles=(area.exits||[]).filter(inside).map(exit=>{const [x,y]=project(exit.x,exit.z);return {left:x-12,right:x+12,top:y-12,bottom:y+12};});
   // The player stays in place; reserve both the halo and the "Vos" label below it.
   labelObstacles.push({left:px-13,right:px+13,top:py-13,bottom:py+13},{left:px-16,right:px+16,top:py+11,bottom:py+28});
-  const personLabels=new Map(layoutPersonLabels(people.filter(object=>inside(object)&&!object.hidden),project,bounds,labelObstacles).map(placement=>[placement.id,placement]));
+  const personLabels=new Map(layoutPersonLabels(people.filter(object=>inside(object)&&!object.hidden),project,bounds,labelObstacles,state).map(placement=>[placement.id,placement]));
   const objects = [...(area.objects||[]).filter(o=>o.kind!=='npc'),...people].filter(object => inside(object) && !object.hidden).map(object => {
     if (object.secret) return state.secrets?.includes(object.secret) ? localMarker(object, project, 'memory', 'Recuerdo encontrado') : '';
-    if (object.kind === 'npc') return localMarker(object, project, 'person',object.label,personLabels.get(object.id));
+    if (object.kind === 'npc') return localMarker(object, project, 'person',personLabel(object,state),personLabels.get(object.id));
     if (['panel','beacon'].includes(object.kind)) return localMarker(object, project, 'place');
     return '';
   }).join('');

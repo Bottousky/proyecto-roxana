@@ -8,7 +8,7 @@ export const AREA_IDS = ['portal','plaza','workshop','road','spring','castle','t
 export const DEFAULT_SETTINGS = {volume:0.55, muted:false, reducedMotion:false, quality:'high', textSpeed:36, clickToWalk:false};
 
 export function freshState(settings = {}) {
-  return {version:1,area:'portal',position:null,flags:{},seen:[],secrets:[],visited:[],puzzles:{},fieldNotes:[],personalNotes:{},journeyTime:{phase:0},activeDialogue:null,activeCinematic:null,endingPending:false,playtime:0,createdAt:Date.now(),savedAt:Date.now(),settings:{...DEFAULT_SETTINGS,...settings}};
+  return {version:1,area:'portal',position:null,flags:{},seen:[],secrets:[],visited:[],puzzles:{},fieldNotes:[],personalNotes:{},known:[],playerName:'',journeyTime:{phase:0},activeDialogue:null,activeCinematic:null,endingPending:false,playtime:0,createdAt:Date.now(),savedAt:Date.now(),settings:{...DEFAULT_SETTINGS,...settings}};
 }
 function record(value) { return value && typeof value === 'object' && !Array.isArray(value); }
 function settingsFrom(value) {
@@ -28,6 +28,10 @@ export function validateState(data) {
   for(const key of ['flags','puzzles']) if(record(data[key])) state[key]=data[key];
   for(const key of ['seen','secrets','visited']) if(Array.isArray(data[key])) state[key]=[...new Set(data[key].filter(x=>typeof x==='string'))];
   state.visited=state.visited.filter(id=>AREA_IDS.includes(id));
+  // Who the player has met. A save from before names were learned has none: null asks the game to
+  // work it out from the conversations already seen.
+  state.known=Array.isArray(data.known)?[...new Set(data.known.filter(x=>typeof x==='string'))]:null;
+  if(typeof data.playerName==='string')state.playerName=data.playerName.trim().slice(0,40);
   if(Number.isFinite(data.playtime) && data.playtime>=0) state.playtime=data.playtime;
   if(Number.isFinite(data.createdAt)) state.createdAt=data.createdAt;
   if(Number.isFinite(data.savedAt)) state.savedAt=data.savedAt;

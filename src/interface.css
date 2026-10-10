@@ -42,3 +42,8 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}#hud,#dial
 .arrival h2{text-shadow:0 2px 14px #06121a,0 0 3px #06121a}
 .arrival p{text-shadow:0 1px 8px #06121a,0 0 2px #06121a}
 @media(max-width:640px){.arrival{top:max(40%,262px);padding:12px 28px 16px}}
+/* The name in the Instituto's register: asked once, editable in Options. */
+.name-form{display:flex;flex-direction:column;gap:14px;margin-top:22px}.name-form input,.options-list input[type=text],.options-list #player-name-option{background:#16221d;border:1px solid #c0a57680;color:#f1e3c2;font:500 20px 'Cormorant Garamond',serif;padding:10px 14px;min-height:44px;border-radius:2px}.name-form input:focus,.options-list #player-name-option:focus{outline:2px solid #d8bb7c;outline-offset:2px}.options-list #player-name-option{width:190px;font-size:17px}
+#speaker.name-revealed{animation:name-revealed .9s ease-out}@keyframes name-revealed{0%{opacity:0;letter-spacing:.18em;text-shadow:0 0 18px #ffe2a0}100%{opacity:1;letter-spacing:normal;text-shadow:none}}.reduced-motion #speaker.name-revealed{animation:none}
+/* An element marked hidden stays hidden whatever display its component style gives it. */
+[hidden]{display:none!important}

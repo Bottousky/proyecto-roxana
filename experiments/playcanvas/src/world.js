@@ -220,6 +220,24 @@ export class PlayCanvasWorld {
     if(this.home)return true;
     return walkableTerrain(this.area.id,x,z);
   }
+  // Path guidance for keyboard walkers. Pushing straight into a hedge or a wall slides toward the
+  // way through, preferring paving; walking along a path that bends follows the bend (up to ~35°)
+  // instead of stepping off into the planting. Leaving a path on purpose (a wider angle) still works.
+  followPaths(p,dx,dz,step,next,walk){
+    const layout=AREA_LAYOUTS[this.area?.id];if(!layout)return next;
+    const paved=(x,z)=>pointOnPaving(layout,x,z),l=Math.hypot(dx,dz),ux=dx/l,uz=dz/l;
+    const turn=a=>[ux*Math.cos(a)-uz*Math.sin(a),ux*Math.sin(a)+uz*Math.cos(a)];
+    const moved=Math.hypot(next[0]-p.x,next[1]-p.z);
+    if(moved<step*.25){
+      let best=null;
+      for(const a of [.44,.79,1.13])for(const side of [1,-1]){const [vx,vz]=turn(a*side),alt=walk(vx,vz),d=Math.hypot(alt[0]-p.x,alt[1]-p.z);if(d<step*.3)continue;
+        const ahead=paved(alt[0]+vx*.8,alt[1]+vz*.8),score=(ahead?2:0)+((alt[0]-p.x)*ux+(alt[1]-p.z)*uz)/step-a*.2;if(!best||score>best.score)best={alt,score};}
+      return best?best.alt:next;
+    }
+    if(!paved(p.x,p.z)||paved(p.x+ux*.9,p.z+uz*.9))return next;
+    for(const a of [.2,.4,.6])for(const side of [1,-1]){const [vx,vz]=turn(a*side);if(!paved(p.x+vx*.9,p.z+vz*.9))continue;const alt=walk(vx,vz);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.5)return alt;}
+    return next;
+  }
   canStand(x,z,radius=.34){return isPositionClear([x,z],this.bounds,this.obstacles,{radius,isWalkable:(x,z)=>this.walkableLand(x,z)});}
   nearestWalkable(p,radius=.34){if(this.canStand(...p,radius))return [...p];for(let d=.15;d<15;d+=.15)for(let i=0;i<32;i++){const x=p[0]+Math.cos(i*Math.PI/16)*d,z=p[1]+Math.sin(i*Math.PI/16)*d;if(this.canStand(x,z,radius))return [x,z];}return [...this.area.spawn];}
   groundHeight(x,z){if(this.area.id==='lake'&&Math.abs(x-9.2)<4.5&&Math.abs(z-3)<2.25)return .24;let height=.08;for(const s of this.data.areas[this.area.id].walkSurfaces||[]){if(s.r!=null?Math.hypot(x-s.x,z-s.z)<=s.r:Math.abs(x-s.x)<=s.w/2&&Math.abs(z-s.z)<=s.d/2)height=Math.max(height,s.y+.02);}return height;}
@@ -379,6 +397,7 @@ export class PlayCanvasWorld {
       // Only when a short sidestep (under half a metre) opens the way ahead; flat walls still stop the walker.
       if(!this.target&&Math.hypot(next[0]-p.x,next[1]-p.z)<step*.25){const l=Math.hypot(dx,dz),ux=dx/l,uz=dz/l;
         find:for(const o of [.15,.3,.45])for(const side of [1,-1]){const sx=p.x-uz*side*o,sz=p.z+ux*side*o;if(this.canStand(sx,sz)&&this.canStand(sx+ux*.35,sz+uz*.35)){const alt=walk(-uz*side,ux*side);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.3)next=alt;break find;}}}
+      if(!this.target)next=this.followPaths(p,dx,dz,step,next,walk);
       p.set(next[0],this.groundHeight(...next),next[1]);}
     this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;if(this.walking){const l=Math.hypot(p.x-old[0],p.z-old[1]);this.lastStep=[(p.x-old[0])/l,(p.z-old[1])/l];}if(this.portalArrival)this.updatePortalArrival(dt,reduced);else this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
     this.updateDust(dt,!!input.run&&this.walking&&!paused,reduced);
