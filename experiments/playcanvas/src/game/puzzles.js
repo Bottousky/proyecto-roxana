@@ -1,7 +1,7 @@
 import { measureVoltage, measureResistance } from './electrical.js';
 import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized } from './puzzle-model.js';
 import { appendBenchEvidence, getBenchEvidence } from './bench-evidence.js';
-import { PREDICTIONS, betChoiceText, betVerdict, revealFor, WORDS } from './understanding.js';
+import { PREDICTIONS, betChoiceText, betQuestion, betVerdict, revealFor, WORDS } from './understanding.js';
 export { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, getBenchEvidence };
 import './puzzles.css';
 
@@ -428,7 +428,7 @@ export class PuzzleWorkbench {
       const choice = el.dataset.choice, guess = PREDICTIONS[this.id];
       if (!guess || this.state.bet) return;
       this.state.bet = { choice, settled: false };
-      if (choice !== 'skip') appendBenchEvidence(this.state, { kind: 'prediction', text: `${guess.ask} Aposté: «${betChoiceText(this.id, choice)}».` });
+      if (choice !== 'skip') appendBenchEvidence(this.state, { kind: 'prediction', text: `${betQuestion(this.id)} Aposté: «${betChoiceText(this.id, choice)}».` });
       this.callbacks.onSound?.('click');
       this.evaluate(false); this.callbacks.onChange?.(this.id, copy(this.state)); this.render();
       this.shell.querySelector('.wb-say')?.focus?.({ preventScroll: true });
@@ -740,9 +740,9 @@ export class PuzzleWorkbench {
   // touched for the next item of the brief. A hint, when asked, takes its place until the next change.
   message(step) {
     const s = this.state, r = this.result, p = this.puzzle, guidance = BENCH_GUIDANCE[this.id], voice = guidance.voice;
-    if (this.betNote) return { kind: 'bet-result', who: 'EDDA', tag: 'Tu apuesta', text: this.betNote };
+    if (this.betNote) return { kind: 'bet-result', who: PREDICTIONS[this.id]?.who ?? voice, tag: 'Tu apuesta', text: this.betNote };
     const guess = PREDICTIONS[this.id];
-    if (guess && !s.bet && !s.completed && !this.practice && !r.solved) return { kind: 'bet', who: 'EDDA', tag: 'Una apuesta, antes de tocar', text: guess.ask, options: guess.options };
+    if (guess && !s.bet && !s.completed && !this.practice && !r.solved) return { kind: 'bet', who: guess.who, tag: 'Una apuesta, antes de tocar', text: guess.ask, options: guess.options };
     if (this.hintShown && s.hints) return { kind: 'hint', who: voice, tag: `Pista ${s.hints} de ${guidance.hints.length}`, text: guidance.hints[s.hints - 1] };
     if (this.feedback) return { kind: s.tripped ? 'warning' : 'note', who: voice, text: this.feedback };
     if (s.tripped) return { kind: 'warning', who: voice, text: observePuzzle(this.id, s, r)[0].text };
@@ -925,12 +925,12 @@ export class PuzzleWorkbench {
   /** Ohm lends his eye: one card at a time, the pieces it speaks about lit on the board. */
   revealPanel(card, inService) {
     const r = this.reveal, last = r.at === r.cards.length - 1;
-    const words = (card.words ?? []).map(k => WORDS[k]).filter(Boolean).map(w => `<span class="wb-word"><b>${escapeHtml(w.term)}</b>${w.unit ? ` · ${escapeHtml(w.unit)}` : ''}<small>${escapeHtml(w.world)}, en Ohmdal</small></span>`).join('');
+    const words = (card.words ?? []).map(k => WORDS[k]).filter(Boolean).map(w => `<span class="wb-word"><span><b>${escapeHtml(w.term)}</b>${w.unit ? ` · ${escapeHtml(w.unit)}` : ''}</span><small>${escapeHtml(w.world)}, en Ohmdal</small></span>`).join('');
     const leave = this.id === 'awaken' ? 'A ver si despierta →' : 'Seguir la historia →';
     const actions = last
       ? (inService || this.practice ? '<button class="wb-primary" data-action="reveal-end">Volver a la mesa</button>' : `<button class="wb-primary" data-action="commission">${leave}</button><button class="wb-quiet" data-action="reveal-end">Quedarme mirando la mesa</button>`)
       : '<button class="wb-primary" data-action="reveal-step" data-delta="1">Seguí →</button>';
-    return `<div class="wb-reveal" role="region" aria-label="Lo que vio Ohm"><span class="wb-say-face wb-face wb-face-ohm" aria-hidden="true"></span><div class="wb-reveal-body"><p class="wb-reveal-tag"><b>OHM · Lo que vi</b><span>${r.at + 1} / ${r.cards.length}</span></p><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.text)}</p>${words ? `<div class="wb-words">${words}</div>` : ''}${last ? `<p class="wb-reveal-question"><b>Para pensar en el camino</b>${escapeHtml(r.question)}</p><p class="wb-reveal-saved">Lo anoté en tu Bitácora.</p>` : ''}</div><div class="wb-reveal-actions">${r.at ? '<button class="wb-quiet" data-action="reveal-step" data-delta="-1">← Antes</button>' : ''}${actions}</div></div>`;
+    return `<div class="wb-reveal" role="region" aria-label="Lo que vio Ohm"><span class="wb-say-face wb-face wb-face-ohm" aria-hidden="true"></span><div class="wb-reveal-body"><p class="wb-reveal-tag"><b>OHM · Lo que vi</b><span>${r.at + 1} / ${r.cards.length}</span></p><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.text)}</p>${words ? `<div class="wb-words">${words}</div>` : ''}</div><div class="wb-reveal-side">${last ? `<p class="wb-reveal-question"><b>Para pensar en el camino</b>${escapeHtml(r.question)}</p><p class="wb-reveal-saved">Lo anoté en tu Bitácora.</p>` : ''}<div class="wb-reveal-actions">${r.at ? '<button class="wb-quiet" data-action="reveal-step" data-delta="-1">← Antes</button>' : ''}${actions}</div></div></div>`;
   }
 
   // Plates sit over their pieces in board percentages, so on a small board (a landscape phone)

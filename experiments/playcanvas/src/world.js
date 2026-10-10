@@ -226,7 +226,25 @@ export class PlayCanvasWorld {
   // Path guidance for keyboard walkers. Pushing straight into a hedge or a wall slides toward the
   // way through, preferring paving; walking along a path that bends follows the bend (up to ~35°)
   // instead of stepping off into the planting. Leaving a path on purpose (a wider angle) still works.
+  /** Between two places the road is the guide: a keyboard walker heading roughly along it (within
+   * about 80°) follows its bends, drawn gently back toward its middle. Null away from any road. */
+  corridorDirection(x,z,ux,uz){
+    if(!this.area||!isExterior(this.area.id))return null;
+    const [gx,gz]=toKingdom(this.area.id,[x,z]);let best=null;
+    for(const exit of passagesFor(this.area.id)){const pass=passageGeometry(this.area.id,exit.target);if(!pass)continue;const pts=pass.points;
+      for(let i=1;i<pts.length-1;i++){const d=Math.hypot(pts[i][0]-gx,pts[i][1]-gz);if(!best||d<best.d)best={d,i,pts};}}
+    if(!best||best.d>5.5)return null;
+    const {i,pts}=best;let tx=pts[i+1][0]-pts[i-1][0],tz=pts[i+1][1]-pts[i-1][1];const tl=Math.hypot(tx,tz)||1;tx/=tl;tz/=tl;
+    let along=ux*tx+uz*tz;if(along<0){tx=-tx;tz=-tz;along=-along;}
+    if(along<.18)return null;
+    // Only where the road turns away from the key held: on a road that already runs that way, walking stays free.
+    if(along>.92)return null;
+    const cx=pts[i][0]-gx,cz=pts[i][1]-gz,pull=Math.min(.35,best.d*.12),vx=tx+cx/(best.d||1)*pull,vz=tz+cz/(best.d||1)*pull,vl=Math.hypot(vx,vz);
+    return [vx/vl,vz/vl];
+  }
   followPaths(p,dx,dz,step,next,walk){
+    { const l=Math.hypot(dx,dz),guide=l&&this.corridorDirection(p.x,p.z,dx/l,dz/l);
+      if(guide){const alt=walk(...guide);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.3)return alt;} }
     const layout=AREA_LAYOUTS[this.area?.id];if(!layout)return next;
     const paved=(x,z)=>pointOnPaving(layout,x,z),l=Math.hypot(dx,dz),ux=dx/l,uz=dz/l;
     const turn=a=>[ux*Math.cos(a)-uz*Math.sin(a),ux*Math.sin(a)+uz*Math.cos(a)];

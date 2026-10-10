@@ -1,7 +1,7 @@
 import {AREAS, CHARACTERS, JOURNAL, journalText, knowsCharacter, playerName, characterNote} from './content.js';
 import {hasRequirements} from './state.js';
 import {JOURNEY_PHASES, inferredTime} from './story-time.js';
-import {revealFor, PREDICTIONS, betChoiceText, WORDS, WORD_ORDER, wordsKnown} from './understanding.js';
+import {revealFor, PREDICTIONS, betChoiceText, betQuestion, WORDS, WORD_ORDER, wordsKnown} from './understanding.js';
 import {renderSchematic, wordSymbol} from './schematic.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -98,7 +98,7 @@ function bet(id, snapshot) {
   const guess = PREDICTIONS[id], b = snapshot?.bet;
   if (!guess || !b || b.choice === 'skip') return '';
   const right = b.choice === guess.answer;
-  return `<div class="dj-bet ${b.settled ? (right ? 'is-right' : 'is-wrong') : ''}"><span class="dj-bet-label">Mi apuesta</span><p class="dj-bet-ask">${esc(guess.ask)}</p><p class="dj-bet-mine">«${esc(betChoiceText(id, b.choice))}»</p>${b.settled ? `<p class="dj-bet-out"><span aria-hidden="true">${right ? '✓' : '✗'}</span> ${esc(guess.outcome)}</p>` : '<p class="dj-bet-out">Todavía no lo comprobé.</p>'}</div>`;
+  return `<div class="dj-bet ${b.settled ? (right ? 'is-right' : 'is-wrong') : ''}"><span class="dj-bet-label">Mi apuesta</span><p class="dj-bet-ask">${esc(betQuestion(id))}</p><p class="dj-bet-mine">«${esc(betChoiceText(id, b.choice))}»</p>${b.settled ? `<p class="dj-bet-out"><span aria-hidden="true">${right ? '✓' : '✗'}</span> ${esc(guess.outcome)}</p>` : '<p class="dj-bet-out">Todavía no lo comprobé.</p>'}</div>`;
 }
 const KEY_TRIALS = new Set(['measurement', 'prediction']);
 function trials(notes) {

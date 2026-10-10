@@ -504,6 +504,32 @@ Verificado: raíz 313/313, PlayCanvas 95/95, `npm run check`. Partida completa j
 revisión; rendimiento NO medido (render por software). Pendiente: revisar con GPU real la
 intensidad del secado en escenas de noche y la densidad de flora en el borde de cada lugar.
 
+## Ciclo 21 · Aprender lo que hay detrás, y una Bitácora para imprimir (10 oct 2026)
+
+Pedido del usuario: auditar si se aprende electricidad desde cero jugando, sin que avanzar sea
+muy difícil, con el lema de Roxana («aprender sin darse cuenta», entender en vez de memorizar).
+Auditoría e investigación: [AUDITORIA-APRENDIZAJE.md](AUDITORIA-APRENDIZAJE.md) e
+[INVESTIGACION-APRENDIZAJE.md](INVESTIGACION-APRENDIZAJE.md). Jugado en el navegador desde un
+registro nuevo hasta el Castillo, apostando mal a propósito. Lo que cambió:
+- **Apuestas** (predecir → observar → explicar): ocho bancos abren con una pregunta de quien está
+  presente; el montaje la resuelve y quien preguntó responde. Cada una ataca una idea previa
+  documentada. Prueba: `tests/understanding.test.js`.
+- **«Lo que vio Ohm»**: al funcionar, tres tarjetas con lo que no se ve (cargas que ya están,
+  empuje que se reparte), las piezas iluminadas y etiquetas con los números del montaje del
+  jugador, la palabra del Instituto y una pregunta. También desde un banco en servicio.
+- **Palabras del oficio**: 16 entradas ganadas banco a banco, con unidad y símbolo.
+- **Física y recetas**: las cargas vuelven a la celda, no la energía. Castillo, Faro II y
+  Terrazas ya no dictan la solución en el paso.
+- **Bitácora de circuitos**: esquema a mano con símbolos reales, antes y después, cables propios
+  en azul y lo medido en rojo. «Imprimir la Bitácora» arma un libro A5 con tapa a nombre del
+  jugador. Prueba: `tests/journal-notebook.test.js`.
+- **Recorrido**: entre lugares, la guía de teclado sigue el camino; del Manantial al Castillo
+  alcanza con W (antes se trababa contra la baranda del canal).
+
+Verificado: raíz y PlayCanvas en verde, `npm run check`; partida nueva jugada del Portal al
+Castillo; PDF de la Bitácora completa generado (54 páginas A5). Aprendizaje real con personas
+NO VERIFICADO: ver «Lo que queda» en la auditoría.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -554,8 +580,8 @@ pendientes, fuera del alcance de este equipo:
 - medir el rendimiento de esta candidata con el equipo tranquilo.
 
 Siguen abiertos y para decidir con el usuario:
-- **Bancos:** pistas que cambien según el error cometido y una pregunta de predicción en los bancos
-  clave ([BANCOS-UX.md](BANCOS-UX.md)).
+- **Bancos:** pistas que cambien según el error cometido ([BANCOS-UX.md](BANCOS-UX.md)). La
+  predicción en los bancos clave quedó hecha en el ciclo 21.
 - **Escenas oscuras:** la llegada al Faro de noche, el Lago al crepúsculo y el taller a oscuras.
   El canon las pide así.
 - **Arco II:** la Casa de Compuertas ya está en el mundo y espera su arco.

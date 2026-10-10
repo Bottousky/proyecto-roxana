@@ -195,60 +195,61 @@ export function revealFor(id, state) {
 }
 
 // ── Apuestas ─────────────────────────────────────────────────────────────────────────────
-// Predict, then look (White & Gunstone). Edda asks before anything is touched; the bench settles the
+// Predict, then look (White & Gunstone). Whoever is at the bench asks before anything is touched; the bench settles the
 // bet when the physics shows the answer. Nothing is blocked by a wrong guess: it is the point.
 export const PREDICTIONS = {
   workshop: {
-    ask: 'Antes de medir: ¿cuál de los tres tramos está cortado?',
+    who: 'LUMEN', ask: 'Antes de medir: ¿cuál de los tres tramos está cortado?',
     options: [{ id: 't1', text: 'El tramo 1' }, { id: 't2', text: 'El tramo 2' }, { id: 't3', text: 'El tramo 3' }, { id: 'look', text: 'Mirando no se puede saber' }],
     answer: 'look', settled: (r, s) => !!s.proofs?.foundBreak,
     outcome: 'El instrumento encontró el corte en el tramo 2. Por fuera, los tres eran iguales.',
     said: { look: 'Así fue: por fuera eran iguales. Hizo falta preguntarle al cobre.', t2: 'Era el 2. Pero por fuera eran iguales: fue suerte hasta que el instrumento lo confirmó.', other: 'Era el 2. Por fuera no había forma de saberlo: por eso medimos.' },
   },
   gate: {
-    ask: 'Si das vuelta los dos cables de la bobina, ¿qué hace el cerrojo?',
+    who: 'EDDA', ask: 'Si das vuelta los dos cables de la bobina, ¿qué hace el cerrojo?',
     options: [{ id: 'flip', text: 'Empuja hacia el otro lado' }, { id: 'same', text: 'Sigue empujando hacia atrás' }, { id: 'stop', text: 'Se queda quieto' }, { id: 'more', text: 'Empuja con más fuerza' }],
     answer: 'flip', settled: r => r.solution.valid && (r.solution.branches.latch?.current ?? 0) > .05 && !r.overloaded,
     outcome: 'Empujó hacia el otro lado, con la misma fuerza.',
     said: { flip: 'Lo dijiste: el sentido de la corriente decidió el sentido del empuje.', other: 'Pasó otra cosa: empujó hacia el otro lado, con la misma fuerza. Sentido y fuerza son dos perillas distintas.' },
   },
   pump: {
-    ask: 'Los tres empalmes dejan pasar. Con la bomba andando, ¿dónde va a haber diferencia entre A y B?',
+    who: 'VEGA', ask: 'Los tres empalmes dejan pasar. Con la bomba andando, ¿dónde va a haber diferencia entre A y B?',
     options: [{ id: 'warm', text: 'Sólo en el empalme malo' }, { id: 'all', text: 'Un poco en todos, igual' }, { id: 'none', text: 'En ninguno: si deja pasar, no pierde' }],
     answer: 'warm', settled: (r, s) => !!s.proofs?.foundLoss,
     outcome: 'Los empalmes sanos apenas se notaban; el 2 se quedaba con casi todo el empuje.',
     said: { warm: 'Así fue: el empalme 2 se quedaba con casi todo.', none: 'Era tentador: si deja pasar, ¿qué va a perder? Pero el 2 se quedaba con casi todo el empuje.', other: 'Los sanos apenas se notaban; el 2 se quedaba con casi todo.' },
   },
   distribution: {
-    ask: 'Edda apuesta que, si cada luz tiene su propio camino, la enfermería brilla menos. ¿Y vos?',
+    who: 'EDDA', ask: 'Yo ya aposté: si cada luz tiene su propio camino, la enfermería va a brillar menos. ¿Y vos?',
+    noted: 'Edda apostó que, con caminos propios, la enfermería brillaría menos. ¿Y yo?',
     options: [{ id: 'less', text: 'Menos: se reparten la luz' }, { id: 'same', text: 'Igual que ahora' }, { id: 'more', text: 'Más fuerte' }],
     answer: 'more', settled: r => !!r.operating.clinic && !!r.operating.kitchen,
     outcome: 'Las dos brillan más fuerte: cada una recibe ahora el empuje entero.',
-    said: { more: 'Le ganaste la apuesta a Edda: cada luz recibe ahora el empuje entero.', less: 'Edda y vos apostaron lo mismo, y pasó lo contrario: brilla más. Antes cada luz recibía la mitad del empuje.', other: 'Brilla más: antes cada luz recibía la mitad del empuje.' },
+    said: { more: 'Me ganaste la apuesta: cada luz recibe ahora el empuje entero.', less: 'Apostamos lo mismo, y pasó lo contrario: brilla más. Antes cada luz recibía la mitad del empuje.', other: 'Brilla más: antes cada luz recibía la mitad del empuje. Perdimos los dos.' },
   },
   irrigation: {
-    ask: 'Si frenás el horno, ¿qué les pasa a las raíces?',
+    who: 'VEGA', ask: 'Si frenás el horno, ¿qué les pasa a las raíces?',
     options: [{ id: 'none', text: 'Nada: siguen igual' }, { id: 'warmer', text: 'Se calientan más: les queda más' }, { id: 'colder', text: 'Se enfrían también' }],
     answer: 'none', settled: (r, s) => s.values.forge !== PUZZLES.irrigation.knobs.find(k => k.key === 'forge').initial,
     outcome: 'Frenaste el horno y las raíces siguieron igual. Lo que bajó fue la corriente del cable compartido.',
     said: { none: 'Así fue: cada rama tiene el mismo empuje. Frenar el horno sólo alivia el cable compartido.', warmer: 'Parecía lógico: lo que suelta uno, ¿no lo toma otro? Acá no: las raíces siguen igual. Lo que baja es la suma en el cable.', other: 'Las raíces no se enteraron: cada rama recibe el mismo empuje.' },
   },
   beacon_supply: {
-    ask: 'Si sumás el tendido sur al lado del norte, ¿cuánto se calienta el norte?',
+    who: 'NEREO', ask: 'Si sumás el tendido sur al lado del norte, ¿cuánto se calienta el norte?',
     options: [{ id: 'same', text: 'Igual que ahora' }, { id: 'half', text: 'La mitad' }, { id: 'less', text: 'Mucho menos que la mitad' }, { id: 'more', text: 'Más' }],
     answer: 'less', settled: r => (Math.abs(r.solution.branches.lineB?.current ?? 0)) > .1 && !r.overloaded,
     outcome: 'Con la corriente repartida, cada tendido se calienta un cuarto de lo que se calentaba uno solo.',
     said: { less: 'Así: la mitad de corriente da un cuarto del calor.', half: 'Casi: la corriente se reparte a la mitad, pero el calor baja a un cuarto. Crece con la corriente al cuadrado.', other: 'Bajó mucho: con la corriente repartida, cada tendido se calienta un cuarto.' },
   },
   beacon_network: {
-    ask: 'Cuando cada voz tenga su propio camino, ¿cuál va a tomar más corriente?',
+    who: 'EDDA', ask: 'Cuando cada voz tenga su propio camino, ¿cuál va a tomar más corriente?',
     options: [{ id: 'optic', text: 'La óptica · 18 Ω' }, { id: 'signal', text: 'La señal · 72 Ω' }, { id: 'same', text: 'Las tres lo mismo' }],
     answer: 'optic', settled: r => ['optic', 'bearing', 'signal'].every(k => r.operating[k]),
     outcome: 'La óptica, la que menos frena, toma más: el doble que el giro y cuatro veces lo de la señal.',
     said: { optic: 'Así: con el mismo empuje, la que menos frena deja pasar más.', signal: 'Al revés: la señal, con más freno, toma la menor. Menos freno, más corriente.', other: 'Reciben el mismo empuje, pero no la misma corriente: depende de cuánto frena cada una.' },
   },
   beacon_lens: {
-    ask: 'Cuando conectes la lente a la toma, la tensión de la toma…',
+    who: 'EDDA', ask: 'Cuando conectes la lente a la toma, la tensión de la toma…',
     options: [{ id: 'down', text: 'Baja' }, { id: 'up', text: 'Sube' }, { id: 'same', text: 'Queda igual' }],
     answer: 'down', settled: (r, s) => !!s.proofs?.tapUnloaded && !!s.proofs?.tapLoaded,
     outcome: 'Con la lente conectada, la toma bajó.',
@@ -256,8 +257,10 @@ export const PREDICTIONS = {
   },
 };
 
+/** The question as the player writes it down in the Bitácora. */
+export function betQuestion(id) { return PREDICTIONS[id]?.noted ?? PREDICTIONS[id]?.ask ?? ''; }
 export function betChoiceText(id, choice) { return PREDICTIONS[id]?.options.find(o => o.id === choice)?.text ?? ''; }
-/** What Edda says once the bench showed the answer. */
+/** What the one who asked says once the bench showed the answer. */
 export function betVerdict(id, choice) {
   const p = PREDICTIONS[id];
   if (!p) return '';

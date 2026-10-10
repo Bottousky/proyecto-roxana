@@ -325,7 +325,7 @@
 .reduced-motion .wb-success{animation-duration:.01s}
 /* The instrument panel needs room for its name, display, sentence and button: on narrower
    screens it takes its own row under the tools instead of squeezing its sentence into a column. */
-@media (min-width:821px){.wb-probe{flex:1 1 560px}.wb-probe p{min-width:180px}}
+@media (min-width:821px){.wb-probe{flex:1 1 560px;flex-wrap:wrap;row-gap:2px}.wb-probe p{min-width:180px}}
 /* The voice at the bench is a face, not a letter. */
 .wb-say-face.wb-face{background-color:#24372e;background-repeat:no-repeat;background-size:300% 100%;background-position:var(--col,0%) 20%;color:transparent}
 .wb-face-edda,.wb-face-lumen,.wb-face-nereo{background-image:url('/assets/art-polish/portraits-main.webp')}
@@ -353,7 +353,7 @@
 .wb-plate.wb-spot{box-shadow:0 0 0 2px #f4dc9acc,0 0 22px #f4dc9a55}
 .wb-eye-tag{display:block;margin:3px auto 0;padding:2px 8px;width:max-content;border-radius:6px;background:#f4e7c4;color:#7a1f14;font:700 14px/1.3 'Caveat','Kalam',cursive;letter-spacing:.3px;transform:rotate(-2deg);box-shadow:0 2px 6px #0006;animation:wb-tag-in .4s ease-out}
 @keyframes wb-tag-in{from{opacity:0;transform:rotate(-2deg) translateY(4px)}}
-.wb-reveal{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:linear-gradient(160deg,#1c2b25,#10201b);border:1px solid #e0c27f66;box-shadow:0 0 26px #e0c27f1c;animation:wb-tag-in .35s ease-out}
+.wb-reveal{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(210px,300px);gap:6px 14px;align-items:start;padding:12px 14px;border-radius:14px;background:linear-gradient(160deg,#1c2b25,#10201b);border:1px solid #e0c27f66;box-shadow:0 0 26px #e0c27f1c;animation:wb-tag-in .35s ease-out}
 .wb-reveal .wb-say-face{width:52px;height:52px}
 .wb-reveal-body{flex:1;min-width:0}
 .wb-reveal-tag{display:flex;justify-content:space-between;margin:0 0 2px;font-size:10px;letter-spacing:1.8px;color:#c9b27c}
@@ -361,16 +361,18 @@
 .wb-reveal h3{margin:0 0 4px;font:normal 21px/1.2 Georgia,serif;color:#fbf0d2}
 .wb-reveal-body>p:not([class]){margin:0;font-size:15.5px;line-height:1.5;color:#ece5cf;max-width:70ch}
 .wb-words{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.wb-word{display:inline-flex;flex-direction:column;padding:5px 10px;border-radius:8px;background:#f2e6c6;color:#2a2418;font-size:13px;line-height:1.25;transform:rotate(-.6deg)}
+.wb-word{display:inline-flex;flex-direction:column;align-items:flex-start;padding:5px 10px;border-radius:8px;background:#f2e6c6;color:#2a2418;font-size:13px;line-height:1.25;transform:rotate(-.6deg)}
 .wb-word b{font:700 15px/1.2 Georgia,serif;color:#1f3b5c}
 .wb-word small{font-size:11px;color:#6b5f48}
-.wb-reveal-question{margin:10px 0 0;padding:8px 11px;border-left:3px solid #bfd99a;background:#0b1915aa;font-size:14.5px;line-height:1.45;color:#e6eed6}
+.wb-reveal-side{display:flex;flex-direction:column;gap:6px;align-self:stretch;justify-content:flex-end}
+.wb-reveal-question{margin:0;padding:8px 11px;border-left:3px solid #bfd99a;background:#0b1915aa;font-size:14.5px;line-height:1.45;color:#e6eed6}
 .wb-reveal-question b{display:block;font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:#bfd99a}
 .wb-reveal-saved{margin:6px 0 0;font:15px/1.3 'Caveat','Kalam',cursive;color:#e0c27f}
-.wb-reveal-actions{display:flex;flex-direction:column;align-items:stretch;gap:6px;flex:none;align-self:flex-end}
+.wb-reveal-actions{display:flex;flex-direction:column;align-items:stretch;gap:4px}
 .wb-reveal-actions .wb-primary{min-height:44px;padding:10px 20px;font-size:16px}
 @media (max-width:820px){
-  .wb-reveal{flex-wrap:wrap;padding:10px}
+  .wb-reveal{grid-template-columns:auto minmax(0,1fr);padding:10px}
+  .wb-reveal-side{grid-column:1/-1}
   .wb-reveal .wb-say-face{width:40px;height:40px}
   .wb-reveal-body>p:not([class]){font-size:14px}
   .wb-reveal-actions{flex-direction:row;flex-basis:100%;justify-content:flex-end}
