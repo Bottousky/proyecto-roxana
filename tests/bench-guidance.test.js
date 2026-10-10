@@ -7,7 +7,7 @@ import { PUZZLES, HINT_STEPS, initialPuzzleSnapshot, evaluatePuzzle, isPolarized
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
-  .replace(/'\.\/(electrical|puzzle-model|bench-evidence)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/${name}.js`)).href));
+  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/${name}.js`)).href));
 const { PuzzleWorkbench, BENCH_GUIDANCE, observePuzzle } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 
 function bench(id, state = initialPuzzleSnapshot(id)) {
@@ -35,6 +35,7 @@ test('every bench ends its hints with a concrete step that names real terminals'
 
 test('the hint button announces when the next help is a concrete step', () => {
   const b = bench('workshop');
+  b.state.bet = { choice: 'skip', settled: false };
   b.state.hints = BENCH_GUIDANCE.workshop.hints.length - 1;
   assert.match(b.html(), /Mostrame un paso para probar/);
 });
@@ -45,6 +46,8 @@ test('the board never asks to switch off: a cable is taken at once and the place
   try {
   const b = bench('distribution');
   assert.doesNotMatch(b.html(), /apagá|Apagar alimentación|Encender alimentación|data-action="power"/);
+  assert.match(b.html(), /data-action="bet" data-choice="skip"/, 'Edda asks for a bet before anything is touched, and it can be declined');
+  b.state.bet = { choice: 'skip', settled: false };
   assert.equal(instruction(b.html()), BENCH_GUIDANCE.distribution.steps[0].how.replace(/«/g, '«'), 'Ohm says what can be touched for the first item of the brief');
   b.touchPort('clinicOut');
   assert.equal(b.selected, 'clinicOut', 'the cable is in hand without a procedure');

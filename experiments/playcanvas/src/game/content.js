@@ -152,7 +152,12 @@ export const DIALOGUES = {
     ['ohm', 'Significa que puedo desplazarme. Soy Ohm.'],
     ['player', 'Con una sola conexión no pasaba nada. Con las dos, sí.'],
     ['edda', 'Entonces necesitaba las dos. Quiero dibujarlo antes de olvidarme.'],
-    ['ohm', 'Observación registrada. No dispongo de una explicación para haber pasado tanto tiempo mirando musgo.'],
+    ['ohm', 'Mientras dormía, lo veía todo quieto. El cobre está lleno de cargas diminutas. Ninguna se movía.'],
+    ['ohm', 'Con la segunda conexión, la celda pudo empujarlas a dar la vuelta entera. Se movieron todas a la vez, como la cadena de una bicicleta.'],
+    ['player', '¿Y se gastan al pasar por vos?'],
+    ['ohm', 'No. Vuelven a la celda. Lo que me dejan al pasar es energía: con eso late esto.'],
+    ['edda', 'Una cadena que da vueltas… Eso sí lo puedo dibujar.'],
+    ['ohm', 'Lo que no dispongo es de una explicación para haber pasado tanto tiempo mirando musgo.'],
     ['edda', 'Lumen va a querer conocerte. Su taller está en la Plaza, siguiendo el canal.'],
     ['edda', 'Mi abuela llevaba a los visitantes en bote por el canal hasta el pueblo. El bote sigue atado; ahora junta hojas. Vamos a pie: canal arriba, remar cansa el doble.']),
   ohm_pedestal_after: d(
@@ -220,7 +225,7 @@ export const DIALOGUES = {
   workshop_complete: d(
     ['lumen', 'Ahí está. Brillo firme. Y sin ese olor a tela cocinada.'],
     ['player', 'La lámpara era la misma. Lo que cambiamos fue el camino hasta ella.'],
-    ['ohm', 'Coincidencia registrada. Explicación todavía no. Podemos comparar el tramo viejo con el nuevo.'],
+    ['ohm', 'Coincidencia registrada. La explicación es más larga: la dejé en la Bitácora. El tramo viejo conviene guardarlo para comparar.'],
     ['lumen', 'Dejá el viejo acá. No lo voy a tirar. Mis dedos reconocen una unión floja, pero mañana mis dedos no le sirven a otro.'],
     ['player', 'Podemos dejar el dibujo y lo que probamos.'],
     ['lumen', 'Y el instrumento a mano. Llévenlo hoy; cuando vuelvan les cuento cómo salió la cuarta lámpara.'],
