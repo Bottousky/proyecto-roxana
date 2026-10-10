@@ -472,6 +472,38 @@ Responde a lo que se hizo en el reino y deja el umbral del Arco II. El detalle e
     se tocan, la que no tiene mando se corre de costado lo justo, sin salirse del tablero. Lo
     vuelve a acomodar al girar el teléfono.
 
+## Ciclo 20 · Partida real de punta a punta, nombres, Bitácora de campo y legibilidad (10 oct 2026)
+
+Pedido del usuario: jugar Ohmdal de verdad, en un navegador, y corregir en el camino. Partida completa
+en Chromium (Xvfb + llvmpipe, 1100×690, ~5 FPS por render por software), con teclado y mouse,
+desde un registro vacío hasta la primera clase y el cierre del arco. Lo que se corrigió, en orden:
+- **Nombres:** nadie aparece con nombre en el diálogo hasta decirlo frente a su dueño («???» y una
+  descripción). Lumen, Marín, Vega, Ivara, Yesca y Tala se presentan; Ohm lo hace al despertar y el
+  banco del Portal habla del «pequeño de bronce». El viajero usa el nombre de su registro en la
+  escuela (`roxana.escuela.v1`); si no hay, se pide al cruzar el Portal. Prueba:
+  `tests/character-names.test.js`.
+- **Bitácora:** cuaderno de campo (cuero, papel, letra a mano local, tintas por tipo de prueba, foto
+  del lugar con cinta, croquis a lápiz, post-it, sello de fecha, pestañas) y página «Gente que
+  conocí». Prueba: `tests/journal-notebook.test.js`.
+- **Legibilidad** (investigación en [INVESTIGACION-LEGIBILIDAD.md](INVESTIGACION-LEGIBILIDAD.md)):
+  claros alrededor de instalaciones y personas, mucha menos flora y flores, el «olvido» pasó del
+  filtro de pantalla al suelo, flora, setos, copas y lomas (`src/living.js`), contorno en los
+  personajes. Prueba: `experiments/playcanvas/tests/legibility.test.js`.
+- **Recorrido:** guía de caminos para teclado (sigue curvas, desliza contra setos); del Portal a la
+  Plaza alcanza con W. Llegadas que no se pierden al recargar. Hablar por encima de una baranda
+  (Nereo era inalcanzable). Mandos asegurados no le ganan a la persona de al lado.
+- **Bancos:** instrumento del primer paso preseleccionado, punta suelta descartada al reabrir, panel
+  del instrumento que no aplasta el tablero a ≤1100 px, lectura sin números con magnitud
+  (empalmes del Manantial, lente con y sin carga), «¡Funciona!» que espera a la reacción, retrato
+  de quien habla.
+- **Mapa:** «Viajar acá» siempre en pantalla; el nombre del viajero no pisa el del lugar.
+- **Diálogos:** Edda ya no nombra a Ohm antes de que despierte; el jugador no menciona el lago antes
+  de tiempo; Yesca reconoce quién movió su horno; «Marín» con tilde.
+
+Verificado: raíz 313/313, PlayCanvas 95/95, `npm run check`. Partida completa jugada en esta
+revisión; rendimiento NO medido (render por software). Pendiente: revisar con GPU real la
+intensidad del secado en escenas de noche y la densidad de flora en el borde de cada lugar.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
