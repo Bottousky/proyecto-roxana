@@ -109,6 +109,9 @@ function persist(){
   return ok;
 }
 
+// A control locked by a commissioned installation can still be looked at, but never wins the
+// interaction over a person standing next to it, and says what it is instead of offering a change.
+function isLatched(flag){return WORLD_SYSTEMS.find(system=>(system.requires?.includes(flag)||system.off?.includes(flag))&&state.flags[system.latch]);}
 function refreshWorldSystems(silent=false){
   const changes=evaluateWorld(state)||[];
   for(const change of changes){
@@ -155,7 +158,7 @@ function fieldMeasure(){
 
 function initWorld(){
   if(world)return;
-  world=new World($('#world'));
+  world=new World($('#world'));world.isLatched=isLatched;
   workbench=new PuzzleWorkbench($('#workbench'),{
     onChange:(id,snapshot)=>{state.puzzles[id]=snapshot;persist();},
     onSound:sound,
@@ -325,7 +328,7 @@ function interact(obj=nearby){
   if(obj.action){
     const action=obj.action;
     if(action.type==='toggle'){
-      const latched=WORLD_SYSTEMS.find(system=>(system.requires?.includes(action.flag)||system.off?.includes(action.flag))&&state.flags[system.latch]);
+      const latched=isLatched(action.flag);
       if(latched){bubble('Los mandos quedaron asegurados al poner esta instalación en servicio.');return;}
       state.flags[action.flag]=!state.flags[action.flag];sound('switch');
       toast(state.flags[action.flag]?(action.onText||'Contacto cerrado'):(action.offText||'Contacto abierto'));
@@ -553,7 +556,7 @@ function loop(now){
       if(nearby&&mode==='world'){
         $('#interaction').classList.toggle('companion-prompt',nearby.id==='ohm_companion');
         let label=personLabel(nearby,state)||'Observar';
-        if(nearby.action?.type==='toggle')label=(state.flags[nearby.action.flag]?nearby.action.offLabel:nearby.action.onLabel)||label;
+        if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(state.flags[nearby.action.flag]?nearby.action.offLabel:nearby.action.onLabel)||label;
         $('#interaction-label').textContent=label;
         const candidate=state.area+nearby.id+JSON.stringify(state.flags);if(candidate!==lastMeasurementCandidate){lastMeasurementCandidate=candidate;measurementAvailable=Boolean(state.flags.awaken&&measureWorld(state.area,state,nearby.id));}show('#field-measure',measurementAvailable);
         const pos=world.getScreenPosition(nearby),prompt=$('#interaction');
