@@ -188,7 +188,11 @@ export function bindKingdomMap(root, { onTravel } = {}) {
   const offer = mark => {
     popover.innerHTML = `<strong>${mark.dataset.travelName}</strong><button type="button" class="kmap-go" data-area="${mark.dataset.travel}">Viajar acá</button><button type="button" class="kmap-dismiss" aria-label="Cerrar">×</button>`;
     const r = mark.getBoundingClientRect(), h = host.getBoundingClientRect();
-    popover.style.left = `${Math.round(r.left + r.width / 2 - h.left)}px`; popover.style.top = `${Math.round(r.top - h.top - 8)}px`; popover.hidden = false;
+    popover.hidden = false;
+    // Keep the offer on screen: below the place when it sits near the top, never past the sides.
+    const w = popover.offsetWidth, ph = popover.offsetHeight, cx = r.left + r.width / 2 - h.left;
+    const above = r.top - h.top - 8 - ph >= 8, x = Math.min(h.width - 8 - w / 2, Math.max(8 + w / 2, cx));
+    popover.style.left = `${Math.round(x)}px`; popover.style.top = `${Math.round(above ? r.top - h.top - 8 : r.bottom - h.top + 8 + ph)}px`;
     popover.querySelector('.kmap-go').focus({ preventScroll: true });
   };
   host.addEventListener('click', e => {

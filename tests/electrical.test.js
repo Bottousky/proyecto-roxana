@@ -215,7 +215,7 @@ test('comparison requires two valid points and preserves polarity without mandat
   state.meter.a = 'latchIn';
   assert.equal(bench.presentedReading().value, 'Una punta más');
   state.meter.b = 'latchOut';
-  assert.equal(bench.presentedReading().value, 'Al revés');
+  assert.match(bench.presentedReading().value, /^Al revés · /, 'polarity first, then how much of the source');
   bench.showNumbers = true;
   assert.ok(bench.presentedReading().value.startsWith('-'));
   assert.equal(bench.presentedReading().unit, 'V');
