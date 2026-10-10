@@ -1,7 +1,7 @@
 import {AREAS, CHARACTERS, JOURNAL, journalText, knowsCharacter, playerName, characterNote} from './content.js';
 import {hasRequirements} from './state.js';
 import {JOURNEY_PHASES, inferredTime} from './story-time.js';
-import {revealFor, CONJUROS, WORDS, WORD_ORDER, wordsKnown} from './understanding.js';
+import {revealFor, CONJUROS, ESTIMATES, estimateChoiceText, estimateVerdict, WORDS, WORD_ORDER, wordsKnown} from './understanding.js';
 import {renderSchematic, wordSymbol} from './schematic.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -100,6 +100,11 @@ function conjuro(id, snapshot) {
   const tested = snapshot.conjuro === true || snapshot.completed === true;
   return `<div class="dj-conjuro"><span class="dj-conjuro-label">✦ El conjuro <small>${esc(spell.heir)}</small></span><p class="dj-conjuro-words">«${esc(spell.words)}»</p><p class="dj-conjuro-copper">${tested ? `<b>Lo que dijo el cobre:</b> ${esc(spell.copper)}` : 'Todavía no lo puse a prueba.'}</p></div>`;
 }
+function keepersBook(id, snapshot) {
+  const book = ESTIMATES[id], mark = snapshot?.estimate;
+  if (!book || !mark || mark.choice === 'skip') return '';
+  return `<div class="dj-conjuro dj-mark"><span class="dj-conjuro-label">⌖ ${esc(book.book)} <small>marca esperada</small></span><p class="dj-mark-ask">${esc(book.noted)}</p><p class="dj-conjuro-words">«${esc(estimateChoiceText(id, mark.choice))}»</p><p class="dj-conjuro-copper">${mark.settled ? esc(estimateVerdict(id, mark.choice, mark.measured)) : 'Todavía no lo medimos.'}</p></div>`;
+}
 const KEY_TRIALS = new Set(['measurement']);
 function trials(notes) {
   if (!notes.length) return '<p class="dj-pencil dj-empty">Todavía no registré una lectura aquí. Cuando use el instrumento, conservaré los puntos y el resultado.</p>';
@@ -161,7 +166,7 @@ export function renderJournal(state, {selected, puzzles={}, evidenceFor=()=>[], 
       ${photo(page.area, AREAS[page.area]?.name || 'Ohmdal', index%2?3:-3)}<p class="dj-ink">${esc(page.text)}</p>${schematics(page.puzzle,snapshot,puzzles)}
       ${page.question?`<blockquote class="dj-sticky" style="--tilt:-2deg">${esc(page.question)}</blockquote>`:''}
       </div><span class="dj-folio">${index+1}</span>${corner(previous,'← Hoja anterior','prev')}</section>`;
-    right=`<section class="dj-page dj-right"><div class="dj-page-body">${conjuro(page.puzzle,snapshot)}${behind(page.puzzle,snapshot)}<header class="dj-evidence-head"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3></header>
+    right=`<section class="dj-page dj-right"><div class="dj-page-body">${conjuro(page.puzzle,snapshot)}${keepersBook(page.puzzle,snapshot)}${behind(page.puzzle,snapshot)}<header class="dj-evidence-head"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3></header>
       ${trials(notes)}
       ${page.explanation?`<details class="dj-card"><summary>La idea que pudimos explicar</summary><p>${esc(page.explanation)}</p></details>`:''}
       <div class="dj-own-note"><label for="personal-journal-note">Mi pregunta o hipótesis</label><textarea id="personal-journal-note" data-note-for="${esc(page.id)}" maxlength="1200" rows="4" placeholder="Creo que… / Me pregunto qué pasaría si…">${esc(state.personalNotes?.[page.id]||'')}</textarea><small>Una idea puede cambiar. No hace falta tener la respuesta.</small></div>

@@ -274,6 +274,9 @@
 .dj-conjuro-words{color:var(--sienna);font-style:italic;font-size:23px!important}
 .dj-conjuro-copper{color:var(--ink-blue)}
 .dj-conjuro-copper b{font-family:var(--marker);font-weight:400;font-size:15px;color:var(--ink-black)}
+.dj-mark{border-left-style:solid;border-left-color:var(--graphite);background:#55524c0d;transform:rotate(.3deg)}
+.dj-mark .dj-conjuro-label{color:var(--graphite)}
+.dj-mark-ask{color:var(--ink-black);font-size:19px!important}
 .dj-all-trials{margin:4px 0 10px}
 .dj-all-trials summary{cursor:pointer;font-family:var(--hand);font-weight:700;font-size:19px;color:var(--graphite)}
 

@@ -1,7 +1,7 @@
 import { measureVoltage, measureResistance } from './electrical.js';
 import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized } from './puzzle-model.js';
 import { appendBenchEvidence, getBenchEvidence } from './bench-evidence.js';
-import { CONJUROS, revealFor, WORDS } from './understanding.js';
+import { CONJUROS, ESTIMATES, estimateChoiceText, estimateVerdict, revealFor, WORDS } from './understanding.js';
 export { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, getBenchEvidence };
 import './puzzles.css';
 
@@ -147,7 +147,8 @@ export class PuzzleWorkbench {
     this.hintShown = false;
     this.successDismissed = false;
     this.reveal = null;
-    this.conjuroNote = '';
+    this.conjuroFresh = false;
+    this.estimateNote = '';
     this.showNumbers = false;
     this.progress = { met: -1, at: performance.now(), changes: 0 };
     this.reading = '';
@@ -255,6 +256,7 @@ export class PuzzleWorkbench {
       if (notify) this.callbacks.onSound?.('success');
     }
     this.settleConjuro();
+    this.settleEstimate();
     if (notify && this.result.solved && !this.wasOperating && !this.state.completed) this.callbacks.onSound?.('success');
     this.wasOperating = this.result.solved;
   }
@@ -266,18 +268,46 @@ export class PuzzleWorkbench {
     if (!spell || this.state.conjuro || this.state.completed || this.practice || !spell.settled(this.result, this.state)) return;
     this.state.conjuro = true;
     appendBenchEvidence(this.state, { kind: 'result', text: `El conjuro, a prueba: «${spell.words}» ${spell.copper}` });
-    this.conjuroNote = spell.copper;
+    this.conjuroFresh = true;
+  }
+
+  /** Turning the gate's brake, Ohm compares in proportions: how much the brake changed, how much the current. */
+  proportionNote(before) {
+    const value = this.state.values.brake, current = Math.abs(this.result.solution.branches.latch?.current ?? 0);
+    if (value === before.value || this.feedback || before.current < .05 || current < .05 || this.state.tripped) return;
+    const ratio = (a, b) => b / a, brake = before.value ? ratio(before.value, value) : null, flow = ratio(before.current, current);
+    const said = n => n === 2 ? 'el doble' : n === .5 ? 'la mitad' : n === 3 ? 'el triple' : null;
+    const amps = n => `${n.toFixed(2).replace('.', ',')} A`;
+    const words = said(brake);
+    this.feedback = words
+      ? `Freno de ${before.value} a ${value} Ω: ${words}. Corriente de ${amps(before.current)} a ${amps(current)}: ${flow < 1 ? 'bajó' : 'subió'}, pero no ${words === 'el doble' ? 'a la mitad' : words === 'la mitad' ? 'al doble' : 'en la misma proporción'}. La bobina también frena, y ese freno no cambió.`
+      : `Freno de ${before.value} a ${value} Ω. Corriente de ${amps(before.current)} a ${amps(current)}: ${flow < 1 ? 'más freno, menos corriente' : 'menos freno, más corriente'}.`;
+  }
+
+  // The mark Nereo wrote in the keepers' book meets the instrument.
+  settleEstimate() {
+    const e = ESTIMATES[this.id], mark = this.state.estimate;
+    if (!e || !mark || mark.choice === 'skip' || mark.settled || this.practice) return;
+    const measured = e.measured(this.result, this.state, this.proofReadings);
+    if (!Number.isFinite(measured)) return;
+    Object.assign(mark, { settled: true, measured });
+    const verdict = estimateVerdict(this.id, mark.choice, measured);
+    appendBenchEvidence(this.state, { kind: 'result', text: `${e.book}: ${verdict}` });
+    this.estimateNote = verdict;
   }
 
   change(mutate, { history = true, sound = 'click' } = {}) {
     const before = copy(this.state);
     if (history) { this.history.push(copy(this.state)); if (this.history.length > 40) this.history.shift(); }
-    this.hintShown = false; this.conjuroNote = '';
+    this.hintShown = false; this.estimateNote = '';
+    const brakeBefore = this.id === 'gate' ? { value: this.state.values.brake, current: Math.abs(this.result?.solution.branches.latch?.current ?? 0) } : null;
     if (history) this.probeMarks = null;
     mutate(this.state);
+    if (history && ESTIMATES[this.id] && !this.state.estimate && !this.state.completed) this.state.estimate = { choice: 'skip', settled: false };
     this.powerForMode(history);
     this.callbacks.onSound?.(sound);
     this.evaluate();
+    if (brakeBefore) this.proportionNote(brakeBefore);
     if (history) this.trackProgress();
     this.recordChanges(before);
     this.recordMeasurement();
@@ -339,6 +369,7 @@ export class PuzzleWorkbench {
     const loaded = nodeOf[proof.measure.load[0]] === nodeOf[proof.measure.load[1]], proofs = this.state.proofs ??= {};
     const volts = Math.abs(measureVoltage(this.result.solution, m.a, m.b) ?? 0), key = loaded ? 'tapLoaded' : 'tapUnloaded';
     proofs[key] = true; (this.proofReadings ??= {})[key] = { volts, values: JSON.stringify(this.state.values) };
+    this.settleEstimate();
     if (!proofs[proof.id] && proof.parts.every(k => proofs[k])) {
       // Say only what these two readings show: a drop, no change, or a comparison made after recalibrating.
       const u = this.proofReadings.tapUnloaded, l = this.proofReadings.tapLoaded, fmt = v => `${v.toFixed(2).replace('.', ',')} V`;
@@ -424,6 +455,15 @@ export class PuzzleWorkbench {
     if (action === 'close') return this.close();
     if (action === 'commission') return this.close(true, { commission: true });
     if (action === 'stay') { this.successDismissed = true; this.render(); this.shell.querySelector('[data-action="commission"]')?.focus?.({ preventScroll: true }); return; }
+    if (action === 'estimate') {
+      const choice = el.dataset.choice, book = ESTIMATES[this.id];
+      if (!book || this.state.estimate) return;
+      this.state.estimate = { choice, settled: false };
+      if (choice !== 'skip') appendBenchEvidence(this.state, { kind: 'prediction', text: `${book.book}, marca esperada. ${book.noted} Anoté: «${estimateChoiceText(this.id, choice)}».` });
+      this.callbacks.onSound?.('click');
+      this.evaluate(false); this.callbacks.onChange?.(this.id, copy(this.state)); this.render();
+      return;
+    }
     if (action === 'reveal') { const reveal = revealFor(this.id, this.state); if (!reveal) return; this.reveal = { ...reveal, at: 0 }; this.callbacks.onSound?.('page'); this.render(); this.shell.querySelector('.wb-reveal [data-action]')?.focus?.({ preventScroll: true }); return; }
     if (action === 'reveal-step') { if (!this.reveal) return; this.reveal.at = Math.max(0, Math.min(this.reveal.cards.length - 1, this.reveal.at + Number(el.dataset.delta))); this.callbacks.onSound?.('page'); this.render(); this.shell.querySelector('.wb-reveal [data-delta="1"], .wb-reveal [data-action="commission"], .wb-reveal [data-action="reveal-end"]')?.focus?.({ preventScroll: true }); return; }
     if (action === 'reveal-end') { this.reveal = null; this.successDismissed = true; this.render(); return; }
@@ -730,7 +770,9 @@ export class PuzzleWorkbench {
   // touched for the next item of the brief. A hint, when asked, takes its place until the next change.
   message(step) {
     const s = this.state, r = this.result, p = this.puzzle, guidance = BENCH_GUIDANCE[this.id], voice = guidance.voice;
-    if (this.conjuroNote) return { kind: 'conjuro', who: 'OHM', tag: 'El conjuro, a prueba', text: this.conjuroNote };
+    const book = ESTIMATES[this.id];
+    if (this.estimateNote) return { kind: 'estimate', who: book.who, tag: book.book, text: this.estimateNote };
+    if (book && !s.estimate && !s.completed && !this.practice && !r.solved) return { kind: 'estimate', who: book.who, tag: `${book.book} · Marca esperada`, text: book.ask, options: book.options };
     if (this.hintShown && s.hints) return { kind: 'hint', who: voice, tag: `Pista ${s.hints} de ${guidance.hints.length}`, text: guidance.hints[s.hints - 1] };
     if (this.feedback) return { kind: s.tripped ? 'warning' : 'note', who: voice, text: this.feedback };
     if (s.tripped) return { kind: 'warning', who: voice, text: observePuzzle(this.id, s, r)[0].text };
@@ -903,16 +945,17 @@ export class PuzzleWorkbench {
   }
 
   dockMarkup({ say, hintButton, controls, inService, tools, portMarkup, p, s }) {
-    return `${this.conjuroStrip()}<div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face ${SAY_FACES[say.who ?? 'OHM'] ? `wb-face wb-face-${SAY_FACES[say.who ?? 'OHM']}` : ''}" aria-hidden="true">${SAY_FACES[say.who ?? 'OHM'] ? '' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${hintButton}</div>
+    return `${this.conjuroStrip()}<div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face ${SAY_FACES[say.who ?? 'OHM'] ? `wb-face wb-face-${SAY_FACES[say.who ?? 'OHM']}` : ''}" aria-hidden="true">${SAY_FACES[say.who ?? 'OHM'] ? '' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${say.options ? '' : hintButton}${say.options ? `<div class="wb-marks" role="group" aria-label="Marca esperada">${say.options.map(o => `<button data-action="estimate" data-choice="${o.id}">${escapeHtml(o.text)}</button>`).join('')}<button class="wb-marks-skip" data-action="estimate" data-choice="skip">Medir sin anotar</button></div>` : ''}</div>
         ${controls && !inService ? `<div class="wb-compact-controls">${controls}</div>` : ''}
         <div class="wb-toolbar">${tools ? `<div class="wb-tools">${tools}</div>` : ''}${this.renderProbe()}<div class="wb-history">${inService && revealFor(this.id, s) ? '<button data-action="reveal"><span class="wb-eye-icon" aria-hidden="true"></span>Lo que vio Ohm</button>' : ''}${inService ? '<button data-action="practice">Practicar con una copia</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : ''}${!inService ? `<button data-action="undo" ${!this.history.length ? 'disabled' : ''} title="Deshacer el último cambio"><span aria-hidden="true">↶</span>Deshacer</button><button data-action="reset" title="Volver a la disposición inicial de la mesa"><span aria-hidden="true">↺</span>Empezar de nuevo</button>` : ''}</div></div>
         <details class="wb-terminal-drawer" data-drawer="terminals" ${p.cables ? 'open' : ''}><summary>Tocar las conexiones <span>Las mismas piezas, más cerca</span></summary><div class="wb-terminal-rail">${p.ports.map(n => portMarkup(n, true)).join('')}</div></details>`;
   }
 
-  /** The keeper's inherited formula stays in view until the bench puts it to the test. */
+  /** The keeper's inherited formula stays in view until the bench tests it; then, for the rest of the visit, the copper's answer. */
   conjuroStrip() {
     const spell = CONJUROS[this.id];
-    if (!spell || this.state.conjuro || this.state.completed || this.practice) return '';
+    if (!spell || this.practice || ((this.state.conjuro || this.state.completed) && !this.conjuroFresh)) return '';
+    if (this.conjuroFresh) return `<p class="wb-conjuro is-answered"><span aria-hidden="true">✦</span><span class="wb-conjuro-answer"><b>Lo que dijo el cobre:</b> ${escapeHtml(spell.copper)}</span><small>— al conjuro ${escapeHtml(spell.heir)}</small></p>`;
     return `<p class="wb-conjuro"><span aria-hidden="true">✦</span><q>${escapeHtml(spell.words)}</q><small>— conjuro ${escapeHtml(spell.heir)}</small></p>`;
   }
 

@@ -187,3 +187,13 @@ test('a loose terminal shows where a path is cut, and the mark goes once the ben
   const s = initialPuzzleSnapshot('beacon_supply'); PUZZLES.beacon_supply.solve(s); s.sourceOn = true;
   assert.doesNotMatch(bench('beacon_supply', s).html(), /wb-open/);
 });
+
+test('turning the gate brake, Ohm compares in proportions and does not round them to a rule', () => {
+  const s = initialPuzzleSnapshot('gate'); PUZZLES.gate.solve(s); s.values.brake = 4;
+  const b = bench('gate', s);
+  const previous = globalThis.document;
+  globalThis.document = { activeElement: null };
+  try { b.change(state => { state.values.brake = 8; }); } finally { globalThis.document = previous; }
+  assert.match(b.feedback, /Freno de 4 a 8 Ω: el doble/);
+  assert.match(b.feedback, /bajó, pero no a la mitad/, 'the coil also brakes: doubling the brake does not halve the current');
+});

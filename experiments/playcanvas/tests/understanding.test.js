@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PUZZLES, initialPuzzleSnapshot, evaluatePuzzle, normalizePuzzleSnapshot } from '../src/game/puzzle-model.js';
-import { revealFor, CONJUROS, WORDS, WORD_ORDER, wordsKnown } from '../src/game/understanding.js';
+import { revealFor, CONJUROS, ESTIMATES, estimateVerdict, WORDS, WORD_ORDER, wordsKnown } from '../src/game/understanding.js';
 
 const solved = id => { const s = initialPuzzleSnapshot(id); PUZZLES[id].solve(s); return s; };
 
@@ -56,4 +56,21 @@ test('a tested conjuro is remembered across a reload, and old bets are forgotten
   assert.equal(loaded.conjuro, true);
   assert.equal(loaded.bet, undefined);
   assert.equal(normalizePuzzleSnapshot('gate', { ...s, conjuro: 'yes' }).conjuro, false);
+});
+
+test("Nereo's expected marks are answered by the same model: half the push at an even divider, four times the current at a quarter of the brake", () => {
+  const net = solved('beacon_network'), ratio = ESTIMATES.beacon_network.measured(evaluatePuzzle('beacon_network', net), net);
+  assert.ok(ESTIMATES.beacon_network.close(4, ratio), `the optic takes four times the signal's current (${ratio})`);
+  assert.equal(ESTIMATES.beacon_network.measured(evaluatePuzzle('beacon_network', initialPuzzleSnapshot('beacon_network')), initialPuzzleSnapshot('beacon_network')), null, 'nothing to read while the voices are in a row');
+  const lens = initialPuzzleSnapshot('beacon_lens'), share = ESTIMATES.beacon_lens.measured(null, lens, { tapUnloaded: { volts: 9 } });
+  assert.ok(ESTIMATES.beacon_lens.close(.5, share));
+  assert.match(estimateVerdict('beacon_lens', 'half', share), /^Anotado: esperábamos «la mitad» y marcó 9 V de 18 V/);
+  assert.match(estimateVerdict('beacon_network', 'double', ratio), /Lo anoto igual/);
+  for (const [id, book] of Object.entries(ESTIMATES)) assert.equal(book.who, 'NEREO', `${id}: asked by the keeper who needs the mark`);
+});
+
+test('a written mark survives a reload with what was read', () => {
+  const s = { ...initialPuzzleSnapshot('beacon_lens'), estimate: { choice: 'half', settled: true, measured: .5 } };
+  assert.deepEqual(normalizePuzzleSnapshot('beacon_lens', s).estimate, { choice: 'half', settled: true, measured: .5 });
+  assert.equal(normalizePuzzleSnapshot('beacon_lens', { ...s, estimate: { choice: 'x<' } }).estimate, null);
 });

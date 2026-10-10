@@ -173,7 +173,7 @@ export function terracesAgreement(state) {
 export function initialPuzzleSnapshot(id) {
   const p = PUZZLES[id];
   if (!p) throw new Error(`Unknown puzzle: ${id}`);
-  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, completed: false };
+  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, estimate: null, completed: false };
 }
 
 export function normalizePuzzleSnapshot(id, saved) {
@@ -195,6 +195,9 @@ export function normalizePuzzleSnapshot(id, saved) {
   // Whether the copper already put the keeper's inherited conjuro to the test on this bench.
   // A repaired installation already answered it, also in saves from before conjuros existed.
   normalized.conjuro = saved.conjuro === true || saved.completed === true;
+  // The mark written in the keepers' book before measuring («skip» if measured without one), and what was read.
+  normalized.estimate = saved.estimate && typeof saved.estimate.choice === 'string' && /^[a-z]{1,12}$/.test(saved.estimate.choice)
+    ? { choice: saved.estimate.choice, settled: saved.estimate.settled === true, ...(Number.isFinite(saved.estimate.measured) ? { measured: saved.estimate.measured } : {}) } : null;
   // A proof counts once seen. Installations commissioned before a proof was required keep it.
   normalized.proofs = !p.proof ? {} : Object.fromEntries([p.proof.id, ...(p.proof.parts ?? [])].filter(k => saved.proofs?.[k] === true).map(k => [k, true]));
   if (p.proof && saved.completed === true) normalized.proofs[p.proof.id] = true;

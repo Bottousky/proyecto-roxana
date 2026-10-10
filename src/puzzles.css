@@ -326,6 +326,7 @@
 /* The instrument panel needs room for its name, display, sentence and button: on narrower
    screens it takes its own row under the tools instead of squeezing its sentence into a column. */
 @media (min-width:821px){.wb-probe{flex:1 1 560px;flex-wrap:wrap;row-gap:2px}.wb-probe p{min-width:180px}}
+@media (min-width:821px) and (max-width:1180px){.wb-probe-name{display:none}}
 /* The voice at the bench is a face, not a letter. */
 .wb-say-face.wb-face{background-color:#24372e;background-repeat:no-repeat;background-size:300% 100%;background-position:var(--col,0%) 20%;color:transparent}
 .wb-face-edda,.wb-face-lumen,.wb-face-nereo{background-image:url('/assets/art-polish/portraits-main.webp')}
@@ -341,7 +342,17 @@
 .wb-conjuro small{margin-left:auto;padding-left:10px;font:12px/1.3 Inter,system-ui,sans-serif;font-style:normal;color:#c7ad80;white-space:nowrap}
 .wb-say.is-conjuro{border-color:#c99a55aa;background:#2c211599}
 .wb-say.is-conjuro p b{color:#e5b86a}
-@media (max-width:820px){.wb-conjuro{flex-wrap:wrap;font-size:13.5px}.wb-conjuro small{margin-left:0;padding-left:0}}
+.wb-conjuro.is-answered{border-left-color:#8fd09e;background:linear-gradient(90deg,#1f3324aa,#2a1f1400);font-style:normal;animation:wb-tag-in .4s ease-out}
+.wb-conjuro-answer{font:14.5px/1.4 Inter,system-ui,sans-serif;color:#e6eed6}
+.wb-conjuro-answer b{color:#bfe0a8;font-weight:650}
+/* Nereo's book: a row of marks to choose from, like the notches of a gauge. */
+.wb-say.is-estimate{flex-wrap:wrap;border-color:#c99a55aa;background:#2c2115aa}
+.wb-say.is-estimate p b{color:#e5b86a}
+.wb-marks{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-left:48px}
+.wb-marks button{min-height:38px;padding:6px 14px;border-radius:6px;border:1px solid #c99a5588;border-bottom-width:3px;background:#3a2b1a;color:#f3e3bf;font:14px/1.2 Georgia,serif}
+.wb-marks button:hover,.wb-marks button:focus-visible{background:#4d3a22;border-color:#e5b86a}
+.wb-marks .wb-marks-skip{border:0;background:none;color:#c7ad80;text-decoration:underline;text-underline-offset:3px;font:13px Inter,system-ui,sans-serif}
+@media (max-width:820px){.wb-marks{padding-left:0}.wb-conjuro{flex-wrap:wrap;font-size:13.5px}.wb-conjuro small{margin-left:0;padding-left:0}}
 @media (max-height:520px) and (orientation:landscape){.wb-conjuro{font-size:12.5px;padding:2px 8px}.wb-conjuro small{display:none}}
 
 /* ── «Lo que vio Ohm»: the board dims, the pieces Ohm talks about stay lit ──────────── */

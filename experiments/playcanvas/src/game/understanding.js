@@ -234,3 +234,39 @@ export const CONJUROS = {
     settled: (r, s) => !!s.proofs?.tapUnloaded && !!s.proofs?.tapLoaded,
     copper: 'Templada a oscuras no alcanzaba: al conectar la lente, la toma bajó. Hay que templarla con la lente puesta.' },
 };
+
+// ── El libro del farero: marcas esperadas ───────────────────────────────────────────────
+// Proportional reasoning, asked for by someone who needs it: before measuring, Nereo writes in the
+// keepers' book the mark the next keeper should expect. No sums: a fraction of the push, a ratio of
+// currents. The measurement answers, and the book keeps both, right or wrong.
+const fraction = n => ({ 0: 'casi nada', .25: 'un cuarto', .5: 'la mitad', .75: 'tres cuartos', 1: 'todo' })[n];
+const nearestFraction = x => [0, .25, .5, .75, 1].reduce((a, b) => Math.abs(b - x) < Math.abs(a - x) ? b : a);
+export const ESTIMATES = {
+  beacon_network: { who: 'NEREO', book: 'Libro del farero',
+    ask: 'Para el libro del farero: la óptica frena 18 Ω y la señal 72 Ω, cuatro veces más. Cuando cada una tenga su propio camino, ¿cuánta corriente va a tomar la óptica, comparada con la señal?',
+    noted: 'La óptica frena 18 Ω; la señal, 72 Ω. Con caminos propios, ¿cuánta corriente toma la óptica, comparada con la señal?',
+    options: [{ id: 'same', text: 'La misma', value: 1 }, { id: 'double', text: 'El doble', value: 2 }, { id: 'four', text: 'Cuatro veces más', value: 4 }, { id: 'quarter', text: 'Un cuarto', value: .25 }],
+    // The ratio of the two currents, once both voices have their own path.
+    measured: r => r.operating.optic && r.operating.signal ? Math.abs(r.solution.branches.optic.current) / Math.abs(r.solution.branches.signal.current) : null,
+    close: (value, x) => Math.abs(x - value) / value < .15,
+    reading: x => `la óptica tomó ${num(x, 1)} veces lo de la señal`,
+    why: 'Un cuarto del freno, cuatro veces la corriente.' },
+  beacon_lens: { who: 'NEREO', book: 'Libro del farero',
+    ask: 'Para el libro del farero, antes de medir: los dos brazos del divisor frenan lo mismo. Sin la lente, ¿qué parte de los 18 V debería marcar la toma?',
+    noted: 'Los dos brazos del divisor frenan lo mismo. Sin la lente, ¿qué parte de los 18 V marca la toma?',
+    options: [{ id: 'none', text: 'Casi nada', value: 0 }, { id: 'quarter', text: 'Un cuarto', value: .25 }, { id: 'half', text: 'La mitad', value: .5 }, { id: 'three', text: 'Tres cuartos', value: .75 }, { id: 'all', text: 'Todo', value: 1 }],
+    // The share of the source read at the tap, the first time it is measured without the lens.
+    measured: (r, s, readings) => readings?.tapUnloaded ? readings.tapUnloaded.volts / PUZZLES.beacon_lens.voltage : null,
+    close: (value, x) => Math.abs(x - value) < .08,
+    reading: x => `marcó ${volts(x * PUZZLES.beacon_lens.voltage)} de 18 V: ${fraction(nearestFraction(x))}`,
+    why: 'Dos brazos iguales en fila se reparten el empuje por mitades.' },
+};
+export function estimateChoiceText(id, choice) { return ESTIMATES[id]?.options.find(o => o.id === choice)?.text ?? ''; }
+/** What Nereo writes once the instrument answered the expected mark. */
+export function estimateVerdict(id, choice, measured) {
+  const e = ESTIMATES[id], option = e?.options.find(o => o.id === choice);
+  if (!option || !Number.isFinite(measured)) return '';
+  return e.close(option.value, measured)
+    ? `Anotado: esperábamos «${option.text.toLowerCase()}» y ${e.reading(measured)}. ${e.why} El próximo farero va a poder confiar en esa marca.`
+    : `Esperábamos «${option.text.toLowerCase()}»; ${e.reading(measured)}. ${e.why} Lo anoto igual: que el próximo farero sepa que también nos equivocamos.`;
+}
