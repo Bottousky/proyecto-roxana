@@ -172,6 +172,12 @@ export class PuzzleWorkbench {
     clearInterval(this.nudgeTimer);
     this.nudgeTimer = setInterval(() => this.shell?.querySelector('.wb-hint')?.classList.toggle('wb-nudge', this.needsNudge()), 5000);
     this.evaluate(false);
+    // The instrument the brief asks for first is already in hand: touching A and B then measures,
+    // instead of spending the only cable by accident. Wires stay one click away.
+    { const { steps, current } = this.steps(), wanted = steps[current]?.tool;
+      if (wanted && wanted !== 'wire' && wanted === this.availableTool()) { this.mode = wanted; this.powerForMode(); this.evaluate(false); } }
+    // Hands come back empty: a tip left half-placed in an earlier visit would pair with the next touch.
+    if (this.state.meter?.a && !this.state.meter.b) this.state.meter.a = null;
     if (!this.state.evidence.length) this.recordObservation('observation');
     this.render();
     this.shell.querySelector('[data-action="close"]')?.focus({ preventScroll: true });
@@ -707,7 +713,10 @@ export class PuzzleWorkbench {
     if (r.solved && !r.proven && !this.practice) return { kind: 'proof', who: p.proof.who.toLocaleUpperCase('es'), text: `Funciona. ${p.proof.request}` };
     if (this.selected) return { kind: 'note', who: voice, text: `Tenés el cable tomado de ${this.portLabel(this.selected)}. Tocá el borne donde va el otro extremo, o el mismo para soltarlo.` };
     if (r.solved) return { kind: 'note', who: voice, text: 'Todo el encargo está cumplido.' };
-    return { kind: 'step', who: voice, text: step?.how ?? '' };
+    // Once the instrument the step names is in hand, the sentence starts where the player is.
+    const how = step?.how ?? '', inHand = step?.tool && step.tool === this.mode && step.tool !== 'wire';
+    const text = inHand ? how.replace(/^Elegí “[^”]+” y (\p{L})/u, (_, first) => first.toLocaleUpperCase('es')) : how;
+    return { kind: 'step', who: voice, text };
   }
 
   plateOffset(c) { return c.kind === 'orb' ? 136 : c.kind === 'lens' ? 98 : 69; }

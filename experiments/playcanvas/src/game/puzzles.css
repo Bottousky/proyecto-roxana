@@ -323,3 +323,6 @@
 @media (max-width:530px){.wb-success{animation:wb-success-late-static .4s ease-out 1.6s both}}
 @keyframes wb-success-late-static{0%{opacity:0;visibility:hidden}1%{visibility:visible}100%{opacity:1;visibility:visible}}
 .reduced-motion .wb-success{animation-duration:.01s}
+/* The instrument panel needs room for its name, display, sentence and button: on narrower
+   screens it takes its own row under the tools instead of squeezing its sentence into a column. */
+@media (min-width:821px){.wb-probe{flex:1 1 560px}.wb-probe p{min-width:180px}}
