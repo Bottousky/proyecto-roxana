@@ -8,6 +8,7 @@ import {walkableTerrain} from './terrain.js';
 import {reliefHeight,reliefSlope} from './relief.js';
 import {quietMountKeepsClear} from './game/quiet-mount.js';
 import {surface} from './art.ts';
+import {makeLiving,setDry} from './living.js';
 import grid from './data/relief.json';
 
 // Pasto, flores, matas y juncos pixel art (art-src/plants → scripts/plants.py) sembrados
@@ -34,10 +35,23 @@ function atlasTexture(app,name,image){
 // Qué sprites puede tomar cada situación: [hoja, fila, altura en unidades de mundo, peso].
 // Las flores se juntan donde alguien las cuida (al pie de las casas); en el campo manda el
 // verde: pasto alto, helechos y matas, con alguna flor silvestre suelta.
-const LOW=[['a',0,.55,8],['a',3,.65,2],['a',2,.55,1]];
-const GARDEN=[['b',3,1.15,3],['b',1,1.3,3],['a',2,.65,3],['b',0,1.2,2],['a',1,1.0,1]];
-const EDGE=[['a',1,1.05,5],['a',3,.8,4],['b',0,1.3,3],['a',0,.6,3],['a',2,.6,1]];
-const WILD=[['a',1,1.15,6],['a',0,.6,4],['a',3,.85,3],['b',0,1.55,2],['a',2,.65,1],['b',1,1.4,.3]];
+// A forgotten kingdom, not a garden: on what is walked only low grass; flowers only where someone
+// still tends a house, and few. The stage around people and installations stays clear (see clearing).
+const LOW=[['a',0,.38,9],['a',3,.42,1]];
+const SHORT=[['a',0,.32,1]];
+const GARDEN=[['b',0,1.1,4],['a',1,.95,3],['a',3,.7,2],['b',1,1.15,.8],['a',2,.55,.6],['b',3,1.05,.4]];
+const EDGE=[['a',1,1.0,5],['a',3,.75,4],['b',0,1.25,3],['a',0,.55,3]];
+const WILD=[['a',1,1.15,6],['a',0,.6,4],['a',3,.85,3],['b',0,1.55,2],['a',2,.6,.25],['b',1,1.3,.08]];
+const FLOWERS=new Set(['a2','b1','b3']);
+// Clearings (metres): nothing within `none` of an installation or a person, only short grass
+// within `low`, and no flowers within `bloom`. What matters stands on open ground.
+const CLEAR={installation:{none:2,low:3.5,bloom:4},person:{none:1.5,low:2.4,bloom:3}};
+export function clearing(spots,x,z){
+  let level=null;
+  for(const s of spots){const d=Math.hypot(x-s.x,z-s.z),c=CLEAR[s.kind];
+    if(d<c.none)return 'none';if(d<c.low)level='low';else if(d<c.bloom&&!level)level='bloom';}
+  return level;
+}
 const REEDS=[['b',2,1.5,1]];
 // Donde termina lo caminable y no hay agua ni muro que lo diga, un seto tupido lo dice:
 // ningún pasto abierto debe parecer un camino que después no deja pasar.
@@ -49,9 +63,11 @@ export async function sowFlora(world){
   for(const key of ['a','b']){const p=await pixels(`./assets/plants/${key}.png`);sheets[key]={texture:atlasTexture(app,'flora-'+key,p.image),size:[p.width,p.height]};}
   const map=await pixels('./assets/shore-distance.png');
   const sample=(X,Z)=>{const u=Math.floor((X-shore.x0)/shore.width*map.width),v=Math.floor((Z-shore.z0)/shore.depth*map.height);if(u<0||v<0||u>=map.width||v>=map.height)return null;const i=(v*map.width+u)*4;return {water:map.data[i]/255,paved:map.data[i+1]/255};};
-  const batches={a:{positions:[],uvs:[],colors:[],indices:[]},b:{positions:[],uvs:[],colors:[],indices:[]}};
+  const batches={a:{positions:[],uvs:[],colors:[],indices:[],places:[]},b:{positions:[],uvs:[],colors:[],indices:[],places:[]}};
   const claimed=new Set();let count=0;
   const exteriors=Object.keys(AREAS).filter(isExterior).map(id=>{const [ox,oz]=world.data.areas[id].offset,[tw,td]=travelBounds(id);return {id,ox,oz,tw,td};});
+  // Which place a plant belongs to, so it can dry with that place and green again when it is restored.
+  const placeOf=(X,Z)=>{let best=-1,d=Infinity;exteriors.forEach((a,i)=>{const k=Math.hypot((X-a.ox)/(a.tw/2+8),(Z-a.oz)/(a.td/2+8));if(k<1&&k<d){d=k;best=i;}});return best;};
   const seaLine=world.data.areas.lighthouse.offset[1]-8;
   const corridor=(X,Z)=>exteriors.some(a=>inTravelCorridor(a.id,X-a.ox,Z-a.oz,-.6));
   const walkable=(X,Z)=>exteriors.some(a=>{const x=X-a.ox,z=Z-a.oz;return Math.abs(x)<=a.tw/2&&Math.abs(z)<=a.td/2&&walkableTerrain(a.id,x,z);});
@@ -61,6 +77,7 @@ export async function sowFlora(world){
     if(!isExterior(id)||!FLAT.has(id))continue;
     const [ox,oz]=world.data.areas[id].offset,[tw,td]=travelBounds(id),bw=tw+36,bd=td+24,[aw,ad]=AREAS[id].bounds,obstacles=world.localObstacles(id),surfaces=world.data.areas[id].walkSurfaces||[];
     const near=(x,z,pad,only)=>obstacles.some(o=>(!only||o.id===only)&&Math.abs(x-o.x)<o.w+pad&&Math.abs(z-o.z)<o.d+pad);
+    const spots=AREAS[id].objects.filter(o=>Number.isFinite(o.x)).map(o=>({x:o.x,z:o.z,kind:o.kind==='npc'?'person':'installation'}));
     for(let gx=Math.floor((ox-bw/2)/SPACING);gx<=Math.ceil((ox+bw/2)/SPACING);gx++)for(let gz=Math.floor((oz-bd/2)/SPACING);gz<=Math.ceil((oz+bd/2)/SPACING);gz++){
       const key=gx+','+gz;if(claimed.has(key))continue;claimed.add(key);
       const X=(gx+hash(gx,gz,1))*SPACING,Z=(gz+hash(gx,gz,2))*SPACING,x=X-ox,z=Z-oz,s=sample(X,Z);if(!s)continue;
@@ -75,21 +92,25 @@ export async function sowFlora(world){
         for(let k=0;k<3;k++){const hx=X+(hash(gx,gz,20+k)-.5)*SPACING,hz=Z+(hash(gx,gz,30+k)-.5)*SPACING;if(walkable(hx,hz))continue;hedges.positions.push([hx,hz,pick(HEDGE,hash(gx,gz,40+k)),Math.floor(hash(gx,gz,50+k)*4)]);}
         continue;
       }
-      const garden=near(x,z,1.3,'building'),edge=near(x,z,.9),patch=noise(X*.16,Z*.16),r=hash(gx,gz,3);
+      const garden=near(x,z,1.3,'building'),edge=near(x,z,.9),patch=noise(X*.16,Z*.16),r=hash(gx,gz,3),clear=clearing(spots,x,z);
+      if(clear==='none')continue;
       let pool;
       if(shoreline)pool=REEDS;
-      else if(garden){if(r>.7)continue;pool=GARDEN;}
-      else if(edge){if(r>.5)continue;pool=EDGE;}
-      else if(!inside){if(r>.12+patch*.62)continue;pool=WILD;}
-      else{if(r>patch*.5-.08)continue;pool=LOW;}
-      const [sheet,row,height]=pick(pool,hash(gx,gz,4)),col=Math.floor(hash(gx,gz,5)*4),cell=plants[sheet][row*4+col];if(!cell)continue;
+      else if(clear==='low'){if(r>.18)continue;pool=SHORT;}
+      else if(garden){if(r>.35)continue;pool=GARDEN;}
+      else if(edge){if(r>.3)continue;pool=EDGE;}
+      else if(!inside){if(r>.1+patch*.55)continue;pool=WILD;}
+      else{if(r>patch*.3-.06)continue;pool=LOW;}
+      let [sheet,row,height]=pick(pool,hash(gx,gz,4));
+      if(clear==='bloom'&&FLOWERS.has(sheet+row))[sheet,row,height]=['a',0,.4];
+      const col=Math.floor(hash(gx,gz,5)*4),cell=plants[sheet][row*4+col];if(!cell)continue;
       if(reliefSlope(X,Z)>.9)continue;
       const h=height*(.8+hash(gx,gz,6)*.45),w=h*cell.aspect,b=batches[sheet],base=b.positions.length/3,tint=.86+hash(gx,gz,7)*.2,y=reliefHeight(X,Z)+.02;
       const [u0,v0,u1,v1]=cell.uv;
       b.positions.push(X-w/2,y,Z, X+w/2,y,Z, X+w/2,y+h,Z, X-w/2,y+h,Z);
       b.uvs.push(u0,v1, u1,v1, u1,v0, u0,v0);
       // Pie en sombra, copa al sol: la mata se asienta en el pasto.
-      for(const k of [.62,.62,1,1])b.colors.push(tint*k,tint*k,tint*k*.96,1);
+      for(const k of [.62,.62,1,1])b.colors.push(tint*k,tint*k,tint*k*.96,1);b.places.push(placeOf(X,Z));
       b.indices.push(base,base+1,base+2,base,base+2,base+3);count++;
     }
   }
@@ -99,7 +120,7 @@ export async function sowFlora(world){
     const [u0,v0,u1,v1]=cell.uv;
     if(reliefSlope(X,Z)>.9)continue;const y=reliefHeight(X,Z)+.02;
     b.positions.push(X-w/2,y,Z, X+w/2,y,Z, X+w/2,y+h,Z, X-w/2,y+h,Z);b.uvs.push(u0,v1,u1,v1,u1,v0,u0,v0);
-    for(const k of [.55,.55,1,1])b.colors.push(tint*k,tint*k,tint*k*.95,1);
+    for(const k of [.55,.55,1,1])b.colors.push(tint*k,tint*k,tint*k*.95,1);b.places.push(placeOf(X,Z));
     b.indices.push(base,base+1,base+2,base,base+2,base+3);count++;
   }
   // Sotobosque en todas las lomas: pasto alto y matas donde no llegó la siembra de los lugares.
@@ -110,7 +131,7 @@ export async function sowFlora(world){
     const [sheet,row,height]=pick(WILD,hash(i,j,73)),cell=plants[sheet][row*4+Math.floor(hash(i,j,74)*4)];if(!cell)continue;
     const h=height*(.9+hash(i,j,75)*.5),w=h*cell.aspect,b=batches[sheet],base=b.positions.length/3,tint=.8+hash(i,j,76)*.2,[u0,v0,u1,v1]=cell.uv;
     b.positions.push(X-w/2,y,Z, X+w/2,y,Z, X+w/2,y+h,Z, X-w/2,y+h,Z);b.uvs.push(u0,v1,u1,v1,u1,v0,u0,v0);
-    for(const k of [.55,.55,1,1])b.colors.push(tint*k,tint*k,tint*k*.95,1);b.indices.push(base,base+1,base+2,base,base+2,base+3);count++;
+    for(const k of [.55,.55,1,1])b.colors.push(tint*k,tint*k,tint*k*.95,1);b.places.push(placeOf(X,Z));b.indices.push(base,base+1,base+2,base,base+2,base+3);count++;
   }
   const root=world.regions.get('landscape').root;
   // Bosque en las colinas: árboles del reino apretados en manchas, claros en las cumbres,
@@ -128,7 +149,7 @@ export async function sowFlora(world){
   }
   for(let t=0;t<6;t++){const f=forest[t];if(!f.indices.length)continue;
     const mesh=new Mesh(app.graphicsDevice);mesh.setPositions(f.positions);mesh.setUvs(0,f.uvs);mesh.setColors(f.colors);mesh.setNormals(new Array(f.positions.length/3).fill(0).flatMap(()=>[0,1,0]));mesh.setIndices(f.indices);mesh.update();
-    const map=await surface(app,'tree'+t),m=new StandardMaterial();m.name='bosque-'+t;m.diffuseMap=map;m.opacityMap=map;m.opacityMapChannel='a';m.alphaTest=.35;m.cull=CULLFACE_NONE;m.diffuseVertexColor=true;m.useMetalness=true;m.metalness=0;m.gloss=.1;m.update();
+    const map=await surface(app,'tree'+t),m=new StandardMaterial();m.name='bosque-'+t;m.diffuseMap=map;m.opacityMap=map;m.opacityMapChannel='a';m.alphaTest=.35;m.cull=CULLFACE_NONE;m.diffuseVertexColor=true;m.useMetalness=true;m.metalness=0;m.gloss=.1;m.update();makeLiving(m);setDry(m,1-WILDS);
     makeWind(m,'tree');(world.windy??=[]).push(m);
     const e=new Entity('Bosque · '+t),mi=new MeshInstance(mesh,m);mi.castShadow=true;mi.receiveShadow=true;e.addComponent('render',{meshInstances:[mi]});root.addChild(e);}
 
@@ -136,9 +157,23 @@ export async function sowFlora(world){
     if(!b.indices.length)continue;
     const mesh=new Mesh(app.graphicsDevice);mesh.setPositions(b.positions);mesh.setUvs(0,b.uvs);mesh.setColors(b.colors);
     const normals=new Array(b.positions.length/3).fill(0).flatMap(()=>[0,1,0]);mesh.setNormals(normals);mesh.setIndices(b.indices);mesh.update();
-    const m=new StandardMaterial();m.name='flora-'+key;m.diffuseMap=sheets[key].texture;m.opacityMap=sheets[key].texture;m.opacityMapChannel='a';m.alphaTest=.5;m.cull=CULLFACE_NONE;m.diffuseVertexColor=true;m.useMetalness=true;m.metalness=0;m.gloss=.1;m.update();
+    const m=new StandardMaterial();m.name='flora-'+key;m.diffuseMap=sheets[key].texture;m.opacityMap=sheets[key].texture;m.opacityMapChannel='a';m.alphaTest=.5;m.cull=CULLFACE_NONE;m.diffuseVertexColor=true;m.useMetalness=true;m.metalness=0;m.gloss=.1;m.update();makeLiving(m,{lifeInAlpha:true});
     makeWind(m,'plant');(world.windy??=[]).push(m);
     const e=new Entity('Flora · '+key),mi=new MeshInstance(mesh,m);mi.castShadow=key==='b';mi.receiveShadow=true;e.addComponent('render',{meshInstances:[mi]});root.addChild(e);
+    (world.floraLife??={ids:exteriors.map(a=>a.id),meshes:[]}).meshes.push({mesh,base:Float32Array.from(b.colors),places:Int8Array.from(b.places),colors:new Float32Array(b.colors.length)});
   }
   return count;
+}
+
+// The kingdom's plants follow their places: the living albedo (living.js) dries them while a place
+// is forgotten and lets a muted green back once it is restored. The vertex alpha carries that life.
+const WILDS=.55;
+export const WILD_LIFE=WILDS;
+export function recolorFlora(world,life){
+  const f=world.floraLife;if(!f)return;
+  const levels=f.ids.map(id=>life[id]??0);
+  for(const m of f.meshes){const {base,places,colors}=m;
+    for(let q=0;q<places.length;q++){const l=places[q]<0?WILDS:levels[places[q]],dim=.88+.1*l;
+      for(let v=q*16;v<q*16+16;v+=4){colors[v]=base[v]*dim;colors[v+1]=base[v+1]*dim;colors[v+2]=base[v+2]*dim;colors[v+3]=l;}}
+    m.mesh.setColors(colors);m.mesh.update();}
 }

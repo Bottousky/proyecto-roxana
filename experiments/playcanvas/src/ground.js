@@ -14,6 +14,8 @@ uniform sampler2D uCobble;
 uniform sampler2D uGroundAo;
 uniform vec3 uPave[${shore.paving.length}];
 uniform vec3 uClouds;
+// Each outdoor place: kingdom centre x, z, reach and how alive it is (0 forgotten, 1 restored).
+uniform vec4 uLife[8];
 float gHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float gNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
   return mix(mix(gHash(i),gHash(i+vec2(1,0)),f.x),mix(gHash(i+vec2(0,1)),gHash(i+vec2(1,1)),f.x),f.y);}
@@ -28,6 +30,13 @@ void getAlbedo(){
   // Broad lush and sun-dried patches, then a finer mottling.
   float broad=gNoise(p*0.045)*0.65+gNoise(p*0.11+7.3)*0.35,fine=gNoise(p*0.6+3.1);
   grass*=mix(vec3(0.84,0.95,0.86),vec3(1.12,1.05,0.8),smoothstep(0.25,0.8,broad))*(0.93+0.14*fine);
+  // A forgotten kingdom: the meadow never reaches a garden's green, and around a place nobody has
+  // restored yet it dries to straw and grey olive. Restoring the place greens it again.
+  float dry=0.0;
+  for(int i=0;i<8;i++){vec4 l=uLife[i];float w=1.0-smoothstep(l.z*0.55,l.z,distance(p,l.xy));dry=max(dry,w*(1.0-l.w));}
+  float lum=dot(grass,vec3(0.3,0.59,0.11));
+  grass=mix(grass,vec3(lum),0.2);
+  grass=mix(grass,vec3(lum*1.16,lum*1.0,lum*0.66),dry*0.72)*(1.0-0.1*dry);
   vec2 uv=(p-uShoreRect.xy)/uShoreRect.zw;
   float cover=texture2D(uShoreMap,uv).g;
   float edge=gNoise(p*2.3)*0.6+gNoise(p*5.7+1.7)*0.4;
@@ -54,7 +63,7 @@ export function makeGround(material,{shoreMap,meadow,cobble,ao}){
   material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',diffusePS);
   material.setParameter('uShoreMap',shoreMap);material.setParameter('uShoreRect',[shore.x0,shore.z0,shore.width,shore.depth]);material.setParameter('uShoreSize',shore.pixels);
   material.setParameter('uMeadow',meadow);material.setParameter('uGroundAo',ao);material.setParameter('uCobble',cobble);material.setParameter('uPave[0]',tones);
-  material.setParameter('uClouds',[0,0,.035]);material.update();
+  material.setParameter('uClouds',[0,0,.035]);material.setParameter('uLife[0]',new Float32Array(32));material.update();
   return material;
 }
 let aoTexture=null;
@@ -89,3 +98,4 @@ export function makeRock(material,{rock,moss}){
   material.shaderChunksVersion='2.22';material.diffuseMap=null;material.diffuse.set(.92,.92,.9);material.flatShading=true;
   material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',rockPS);material.setParameter('uRock',rock);material.setParameter('uMoss',moss);material.update();return material;
 }
+export function updateGroundLife(materials,life){for(const m of materials)m.setParameter('uLife[0]',life);}

@@ -232,7 +232,9 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   if(initial&&first&&id==='portal'){world.playPortalArrival();sound('portal');}
   if(initial&&first){$('#arrival h2').textContent=AREAS[id].name;$('#arrival p').textContent=AREAS[id].subtitle||'';show('#arrival');arrivalTimeout=setTimeout(()=>show('#arrival',false),2400);}
   $('#world').focus({preventScroll:true});persist();
-  if(first && AREAS[id].entryDialogue)queueDialogue(AREAS[id].entryDialogue,initial?(id==='portal'?2500:1400):1200,id);
+  // A place introduces itself until that introduction has actually been heard: turning back at the
+  // border or reloading before reaching its heart must not lose it for good.
+  {const entry=AREAS[id].entryDialogue;if(entry&&!state.seen.includes(entry)&&!dialogueQueue.some(q=>q.id===entry))queueDialogue(entry,initial?(id==='portal'?2500:1400):1200,id);}
 }
 
 function linesFor(id){

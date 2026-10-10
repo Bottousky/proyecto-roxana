@@ -47,11 +47,23 @@ function cropFigure(img:HTMLImageElement,col:number,row:number,cols:number,rows:
   for(let i=0;i<p.length;i+=4){const m=Math.min(p[i],p[i+2])-p[i+1];if(m>50&&p[i]>95&&p[i+2]>90)p[i+3]=Math.min(p[i+3],Math.max(0,255-(m-50)*5));if(p[i+3]<30)p[i+3]=0;}
   isolateFigure(p,w,h,{x0:x0-X0,x1:x1-X0,y0:y0-Y0,y1:y1-Y0});ctx.putImageData(d,0,0);return c;
 }
+// People must read against grass, flowers and stone: a dark warm rim around every figure, about one
+// screen pixel at play distance, the way hand-drawn sprites separate characters from busy ground.
+function outlineFigures(ctx:CanvasRenderingContext2D,w:number,h:number,radius:number){
+  const d=ctx.getImageData(0,0,w,h),p=d.data,solid=new Uint8Array(w*h),grow=new Uint8Array(w*h),out=new Uint8Array(w*h);
+  for(let i=0;i<w*h;i++)solid[i]=p[i*4+3]>110?1:0;
+  // Separable dilation: rows, then columns.
+  for(let y=0;y<h;y++){let last=-1e9;for(let x=0;x<w;x++){if(solid[y*w+x])last=x;if(x-last<=radius)grow[y*w+x]=1;}last=1e9;for(let x=w-1;x>=0;x--){if(solid[y*w+x])last=x;if(last-x<=radius)grow[y*w+x]=1;}}
+  for(let x=0;x<w;x++){let last=-1e9;for(let y=0;y<h;y++){if(grow[y*w+x])last=y;if(y-last<=radius)out[y*w+x]=1;}last=1e9;for(let y=h-1;y>=0;y--){if(grow[y*w+x])last=y;if(last-y<=radius)out[y*w+x]=1;}}
+  for(let i=0;i<w*h;i++){if(!out[i]||p[i*4+3]>110)continue;const a=p[i*4+3]/255,k=1-a;p[i*4]=Math.round(p[i*4]*a+27*k);p[i*4+1]=Math.round(p[i*4+1]*a+19*k);p[i*4+2]=Math.round(p[i*4+2]*a+14*k);p[i*4+3]=235;}
+  ctx.putImageData(d,0,0);
+}
 export async function actorArt(app:Application,name:string){
   const ohm=name==='ohm',cols=ohm?6:5,rows=4,img=await image(ohm?'/assets/ohm.webp':`/assets/actors/${name}.webp`),tiles:HTMLCanvasElement[]=[],bounds:ReturnType<typeof opaqueBounds>[]=[];
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const tile=ohm?crop(img,c,r,cols,rows,true):cropFigure(img,c,r,cols,rows);tiles.push(tile);bounds.push(opaqueBounds(tile.getContext('2d')!.getImageData(0,0,tile.width,tile.height).data,tile.width,tile.height));}
   const sheet=canvas(cols*256,rows*256),ctx=sheet.getContext('2d')!,layout=actorFrameLayout(bounds);
   tiles.forEach((tile,i)=>{const b=bounds[i],p=ohm?{x:128-b.width/2,y:244-b.height,width:b.width,height:b.height}:layout.placements[i];ctx.drawImage(tile,b.x,b.y,b.width,b.height,(i%cols)*256+p.x,Math.floor(i/cols)*256+p.y,p.width,p.height);});
+  outlineFigures(ctx,sheet.width,sheet.height,ohm?3:4);
   const atlas=new TextureAtlas();atlas.frames={};atlas.texture=texture(app,name+'-atlas',sheet,false,true);
   const keys=[];for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){const key=String(row*cols+col);keys.push(key);atlas.setFrame(key,{rect:new Vec4(col*256,(3-row)*256,256,256),pivot:new Vec2(.5,12/256),border:new Vec4(0,0,0,0)});}
   const sprite=new Sprite(app.graphicsDevice,{atlas,pixelsPerUnit:256/(ohm?2.05:2.95),frameKeys:keys});const asset=new Asset(name,'sprite');asset.resource=sprite;asset.loaded=true;app.assets.add(asset);return sprite;

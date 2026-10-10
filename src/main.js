@@ -222,7 +222,7 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   clearTimeout(arrivalTimeout);
   if(initial&&first){$('#arrival h2').textContent=AREAS[id].name;$('#arrival p').textContent=AREAS[id].subtitle||'';show('#arrival');arrivalTimeout=setTimeout(()=>show('#arrival',false),2400);}
   $('#world').focus({preventScroll:true});persist();
-  if(first && AREAS[id].entryDialogue)queueDialogue(AREAS[id].entryDialogue,initial?1400:1200,id);
+  {const entry=AREAS[id].entryDialogue;if(entry&&!state.seen.includes(entry)&&!dialogueQueue.some(q=>q.id===entry))queueDialogue(entry,initial?1400:1200,id);}
 }
 
 function linesFor(id){

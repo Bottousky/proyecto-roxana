@@ -17,14 +17,15 @@ import sceneUrl from './data/scene.json?url';
 import geometryUrl from './data/geometry.bin.gz?url';
 import {walkableTerrain} from './terrain.js';
 import {makeWater,updateWater,loadShore,bindShore} from './water.js';
-import {makeGround,makeRock,updateClouds,loadGroundAo} from './ground.js';
+import {makeGround,makeRock,updateClouds,loadGroundAo,updateGroundLife} from './ground.js';
 import {makeWind,updateWind,windKind} from './wind.js';
 import {occludes,makeSeeThrough,seeThroughFrame,applySeeThrough} from './see-through.js';
 import {channel} from './geometry-format.js';
 import {makePortalSurface} from './portal.js';
 import {buildGrid,updateGrid} from './grid.js';
 import {placeDressing,propObstacles} from './props.js';
-import {sowFlora} from './flora.js';
+import {sowFlora,recolorFlora,WILD_LIFE} from './flora.js';
+import {makeLiving,setDry} from './living.js';
 import {raiseRelief} from './relief.js';
 import {buildHomes} from './homes.js';
 
@@ -129,6 +130,8 @@ export class PlayCanvasWorld {
       if(d.opacity<1){m.blendType=BLEND_NORMAL;m.depthWrite=false;}
       if(d.texture==='water'){makeWater(m);bindShore(m,shore,!b.dynamic,{lighthouse:1,lake:.6}[b.area]||0);this.waters.push(m);}
       if(d.texture==='ground')(this.grounds??=[]).push(makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble,ao:groundAo}));
+      // Leaves, ferns, hedges and waterside plants dry and green with their place (see updateEnvironment).
+      if(/^(tree\d|fern|foliage|bank\d)$/.test(d.texture||'')||(!d.texture&&['518557','8c9a52','829559'].includes(d.color))){makeLiving(m);(this.living??=[]).push({material:m,area:b.area});}
       m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>channel(binary,b,key);
       mesh.setPositions(attr('positions'));if(b.normals.type==='i8')mesh.setVertexStream(SEMANTIC_NORMAL,attr('normals'),4,undefined,TYPE_INT8,true);else mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));if(b.colors.type==='u8')mesh.setVertexStream(SEMANTIC_COLOR,attr('colors'),4,undefined,TYPE_UINT8,true);else mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
       const instance=new MeshInstance(mesh,m,e);instance.castShadow=d.shadow&&d.opacity===1;instance.receiveShadow=true;e.addComponent('render',{meshInstances:[instance]});let parent=this.regions.get(b.area).root;
@@ -514,8 +517,15 @@ export class PlayCanvasWorld {
     // A place nobody has restored yet is literally dimmer: muted and cool. Its colour floods
     // back with the restoration, and crossing into a forgotten place drains it again.
     const alive=f[power[this.area.id]]?1:0;this.vitality??=alive;
+    // Every outdoor place dries or greens on its own: the ground and the plants carry the forgotten
+    // look, so the people and the installations keep their colour against it.
+    {this.areaLife??={};let changed=!this.lifeApplied;const reach=[];
+      for(const id of Object.keys(AREAS).filter(isExterior)){const want=f[power[id]]?1:0,was=this.areaLife[id]??want,now=was+(want-was)*Math.min(1,dt*(want>was?.55:2));if(Math.abs(now-(this.lifeShown?.[id]??-1))>.015)changed=true;this.areaLife[id]=now;const [ox,oz]=this.data.areas[id].offset,[tw,td]=travelBounds(id);reach.push(ox,oz,Math.max(tw,td)*.62,now);}
+      this.lifeClock=(this.lifeClock||0)+dt;
+      if(changed&&this.lifeClock>.12){this.lifeClock=0;this.lifeApplied=true;this.lifeShown={...this.areaLife};updateGroundLife(this.grounds||[],new Float32Array(reach));recolorFlora(this,this.areaLife);
+        for(const l of this.living||[]){if(!isExterior(l.area)&&l.area!=='landscape')continue;setDry(l.material,1-(l.area==='landscape'?WILD_LIFE:this.areaLife[l.area]??1));}}}
     this.restoration=Math.max(0,(this.restoration||0)-dt);this.vitality+=(alive-this.vitality)*Math.min(1,dt*(this.restoration>0?.75:alive?.5:1.2));const v=this.vitality;
-    if(this.frame?.enabled){const base=GRADES[inside?'inside':phase.id]||GRADES.morning,g=this.grade,target=[base[0]*(.58+.42*v),base[1]*(.94+.06*v),base[2]*(.97+.03*v),base[3]*(1.05-.05*v),base[4]*(.93+.07*v)];let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
+    if(this.frame?.enabled){const base=GRADES[inside?'inside':phase.id]||GRADES.morning,g=this.grade,target=[base[0]*(.86+.14*v),base[1]*(.97+.03*v),base[2]*(.99+.01*v),base[3]*(1.03-.03*v),base[4]*(.97+.03*v)];let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
       if(moved>.0005||!this.gradeApplied){this.gradeApplied=true;const f=this.frame.grading;f.saturation=g[0];f.tint=new Color(g[1],g[2],g[3]);f.brightness=g[4];this.frame.update();}}
     for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?2.4:n*3.2):0;light.entity.light.range=light.area==='workshop'?11:9;}
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
