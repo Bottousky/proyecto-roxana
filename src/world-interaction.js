@@ -3,7 +3,8 @@ import {isSegmentClear} from './collision.js';
 
 export function inInteractionReach(world,object,position=world.getPlayerPosition()) {
   if(Math.hypot(object.x-position[0],object.z-position[1])>=(object.radius||2.85))return false;
-  const blockers=world.obstacles.filter(o=>object.inhabitant||!(Math.abs(o.x-object.x)<=o.w+.001&&Math.abs(o.z-object.z)<=o.d+.001));
+  // A person can be spoken to over a railing or a low fence (thin obstacles); levers and plaques cannot.
+  const blockers=world.obstacles.filter(o=>!(object.character&&Math.min(o.w,o.d)<.15)&&(object.inhabitant||!(Math.abs(o.x-object.x)<=o.w+.001&&Math.abs(o.z-object.z)<=o.d+.001)));
   // This is a sight/contact line, not the player's body. A small skin admits
   // plaques beside masonry without opening a route through the masonry itself.
   return isSegmentClear(position,[object.x,object.z],world.bounds,blockers,{radius:.02,isWalkable:(x,z)=>world.walkableLand(x,z)});
