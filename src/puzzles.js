@@ -553,7 +553,8 @@ export class PuzzleWorkbench {
     // Without numbers the instrument still says how much: a share of what the source gives, in words
     // and a small gauge, so two comparisons can be told apart.
     const source = Math.abs(measureVoltage(this.result.solution, 'positive', 'negative') ?? 0), share = source > .01 && voltage !== null ? Math.abs(voltage) / source : null;
-    const amount = share === null ? 'Hay diferencia' : share < .08 ? 'Casi iguales ▮▯▯▯' : share < .25 ? 'Algo de diferencia ▮▮▯▯' : share < .6 ? 'Mucha diferencia ▮▮▮▯' : 'Casi toda la fuerza ▮▮▮▮';
+    const gauge = share === null ? '' : ` ${'▮'.repeat(Math.max(share > .01 ? 1 : 0, Math.min(8, Math.round(share * 8))))}${'▯'.repeat(8 - Math.max(share > .01 ? 1 : 0, Math.min(8, Math.round(share * 8))))}`;
+    const amount = share === null ? 'Hay diferencia' : `${share < .08 ? 'Casi iguales' : share < .25 ? 'Algo de diferencia' : share < .5 ? 'Bastante diferencia' : share < .75 ? 'Mucha diferencia' : 'Casi toda la fuerza'}${gauge}`;
     return { value: voltage === null ? 'Sin referencia' : Math.abs(voltage) < .01 ? 'Iguales' : voltage < 0 ? `Al revés · ${amount.replace(/ ▮.*/, '').toLocaleLowerCase('es')}` : amount, unit: '', caption: voltage === null ? 'Una punta quedó aislada. No hay una comparación fiable.' : `Comparación entre ${this.portLabel(m.a)} y ${this.portLabel(m.b)}. Al intercambiar las puntas, cambia el sentido de la lectura.` };
   }
 

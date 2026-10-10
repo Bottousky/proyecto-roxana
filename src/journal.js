@@ -7,12 +7,13 @@ const RECORDS = {
   arrival: {area:'portal'}, circuit:{area:'portal',puzzle:'awaken'}, diagnosis:{area:'workshop',puzzle:'workshop'},
   operating_window:{area:'road',puzzle:'gate'}, source_load:{area:'spring',puzzle:'pump'}, parallel:{area:'castle',puzzle:'distribution'},
   power:{area:'terraces',puzzle:'irrigation'}, return_at_scale:{area:'lake'}, tower_source:{area:'lighthouse',puzzle:'beacon_supply'},
-  tower_distribution:{area:'lighthouse',puzzle:'beacon_network'}, light:{area:'lighthouse',puzzle:'beacon_lens'}, quiet_mount:{area:'spring'},
+  tower_distribution:{area:'lighthouse',puzzle:'beacon_network'}, light:{area:'lighthouse',puzzle:'beacon_lens'}, quiet_mount:{area:'spring',puzzle:null},
 };
 
 export function journalPages(state) {
   return JOURNAL.filter(entry => hasRequirements(state, entry.requires)).map(entry => {
-    const puzzle = RECORDS[entry.id]?.puzzle || entry.requires?.find(flag => state.puzzles?.[flag]);
+    // A page tied to no bench (the Monte Quieto) must not borrow the trials of the one it requires.
+    const puzzle = RECORDS[entry.id] && 'puzzle' in RECORDS[entry.id] ? RECORDS[entry.id].puzzle : entry.requires?.find(flag => state.puzzles?.[flag]);
     const area = RECORDS[entry.id]?.area || Object.values(AREAS).find(area => area.objects.some(obj => obj.puzzle === puzzle))?.id || 'lighthouse';
     return {...entry, text: journalText(entry, state), area, puzzle};
   });
@@ -106,7 +107,7 @@ export function renderJournal(state, {selected, puzzles={}, evidenceFor=()=>[], 
   const notes=[...evidence.map(note=>({kind:note.kind,title:note.label||names[note.kind]||'Una prueba',text:note.text,reading:note.value,reference:note.reference})),...field.map(note=>({...note,kind:'measurement'}))];
   const previous=pages[index-1],next=pages[index+1];
   const owner=playerName(state);
-  const tabs=`<nav class="dj-tabs" aria-label="Páginas de la Bitácora">${pages.map((item,i)=>`<button class="dj-tab dj-tab-${TAB_COLORS[i%TAB_COLORS.length]}" data-journal-page="${esc(item.id)}" aria-current="${item.id===page.id?'page':'false'}"><span>${item.people?'✎':String(i+1).padStart(2,'0')}</span>${esc(item.title)}${item.experiment?'<small>en estudio</small>':''}</button>`).join('')}</nav>`;
+  const tabs=`<nav class="dj-tabs" aria-label="Páginas de la Bitácora">${pages.map((item,i)=>`<button class="dj-tab dj-tab-${TAB_COLORS[i%TAB_COLORS.length]}" data-journal-page="${esc(item.id)}" title="${esc(item.title)}" aria-current="${item.id===page.id?'page':'false'}"><span>${item.people?'✎':String(i+1).padStart(2,'0')}</span>${esc(item.title)}${item.experiment?'<small>en estudio</small>':''}</button>`).join('')}</nav>`;
   const corner=(target,label,dir)=>`<button class="dj-corner dj-corner-${dir}" data-journal-page="${esc(target?.id||page.id)}" ${!target?'disabled':''} aria-label="${dir==='prev'?'Página anterior':'Página siguiente'}">${label}</button>`;
   const stain=index%3===1?'<span class="dj-stain" aria-hidden="true"></span>':'';
   let left,right;

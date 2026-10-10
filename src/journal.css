@@ -224,3 +224,7 @@
   .modal.journal-modal .dj-footer{display:none}
 }
 @media (max-width:820px) and (orientation:portrait){.dj-page::after{display:none}}
+
+/* Many pages: each tab keeps one line, the full title shows on hover and to screen readers. */
+.dj-tab{flex:none;min-height:30px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.dj-tab span{margin-right:5px}.dj-tab small{display:inline;margin-left:6px}
