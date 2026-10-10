@@ -101,6 +101,9 @@ gustan; Vega sigue cantando las manivelas; la Consejera deja el dicho de la fund
 y escribe debajo «cada camino, su Luz»; Nereo escribe el ritmo en números y el Faro lo
 reconoce igual.
 
+El vocabulario, las creencias y los ritos del Oficio, con lo que cada uno tiene de verdad, están
+en [docs/OFICIO-DE-LA-LUZ.md](docs/OFICIO-DE-LA-LUZ.md).
+
 ## Habitantes
 
 ### El estudiante
