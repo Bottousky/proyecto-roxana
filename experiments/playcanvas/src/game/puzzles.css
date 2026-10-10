@@ -326,3 +326,10 @@
 /* The instrument panel needs room for its name, display, sentence and button: on narrower
    screens it takes its own row under the tools instead of squeezing its sentence into a column. */
 @media (min-width:821px){.wb-probe{flex:1 1 560px}.wb-probe p{min-width:180px}}
+/* The voice at the bench is a face, not a letter. */
+.wb-say-face.wb-face{background-color:#24372e;background-repeat:no-repeat;background-size:300% 100%;background-position:var(--col,0%) 20%;color:transparent}
+.wb-face-edda,.wb-face-lumen,.wb-face-nereo{background-image:url('/assets/art-polish/portraits-main.webp')}
+.wb-face-vega,.wb-face-consejera{background-image:url('/assets/art-polish/portraits-north.webp')}
+.wb-face-yesca{background-image:url('/assets/art-polish/portraits-village.webp')}
+.wb-face-ohm{background-image:url('/assets/art-polish/portrait-ohm.webp');background-size:cover;background-position:center}
+.wb-face-edda,.wb-face-yesca{--col:0%}.wb-face-lumen,.wb-face-vega{--col:50%}.wb-face-nereo,.wb-face-consejera{--col:100%}

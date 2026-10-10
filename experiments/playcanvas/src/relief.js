@@ -19,6 +19,7 @@ uniform vec3 material_diffuse;
 uniform sampler2D uMeadow;
 uniform sampler2D uRock;
 uniform sampler2D uMoss;
+uniform vec4 uLife[8];
 float tHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float tNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(tHash(i),tHash(i+vec2(1,0)),f.x),mix(tHash(i+vec2(0,1)),tHash(i+vec2(1,1)),f.x),f.y);}
 void getAlbedo(){
@@ -28,6 +29,9 @@ void getAlbedo(){
   vec3 grass=texture2D(uMeadow,top/6.0).rgb;
   float broad=tNoise(p.xz*0.045)*0.65+tNoise(p.xz*0.11+7.3)*0.35;
   grass*=mix(vec3(0.84,0.95,0.86),vec3(1.12,1.05,0.8),smoothstep(0.25,0.8,broad));
+  // The hills share the meadow's forgotten look (ground.js): muted always, dry around a forgotten place.
+  {float dry=0.45;for(int i=0;i<8;i++){vec4 l=uLife[i];float w=1.0-smoothstep(l.z*0.55,l.z,distance(p.xz,l.xy));dry=max(dry,w*(1.0-l.w));}
+   float lum=dot(grass,vec3(0.3,0.59,0.11));grass=mix(grass,vec3(lum),0.2);grass=mix(grass,vec3(lum*1.16,lum,lum*0.66),dry*0.72)*(1.0-0.1*dry);}
   vec2 side=a.x>a.z?p.zy:p.xy;
   // Strata: tall faces read as layered rock, not as a wall of cobbles. Each layer, gently wavy,
   // stretches the stones into slabs, shifts them and has its own tone; under each lip a dark seam,
@@ -65,7 +69,7 @@ export async function raiseRelief(world){
   const mesh=new Mesh(world.app.graphicsDevice);mesh.setPositions(positions);mesh.setNormals(normals);mesh.setIndices(indices);mesh.update();
   const m=new StandardMaterial();m.name='relieve';m.diffuse=new Color(.95,.97,.92);m.useMetalness=true;m.metalness=0;m.gloss=.05;
   m.shaderChunksVersion='2.22';m.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',diffusePS);
-  m.setParameter('uMeadow',await surface(world.app,'ground'));m.setParameter('uRock',await surface(world.app,'rock'));m.setParameter('uMoss',await surface(world.app,'moss'));m.update();
+  m.setParameter('uMeadow',await surface(world.app,'ground'));m.setParameter('uRock',await surface(world.app,'rock'));m.setParameter('uMoss',await surface(world.app,'moss'));m.setParameter('uLife[0]',new Float32Array(32));m.update();(world.grounds??=[]).push(m);
   const e=new Entity('Colinas del reino'),mi=new MeshInstance(mesh,m);mi.castShadow=true;mi.receiveShadow=true;e.addComponent('render',{meshInstances:[mi]});
   world.regions.get('landscape').root.addChild(e);
 }

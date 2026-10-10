@@ -146,3 +146,5 @@
 .kmap-popover .kmap-go{min-height:40px;padding:8px 14px;border:1px solid #f6e0a8;border-radius:8px;background:linear-gradient(#f4d995,#cda65c);color:#1d2417;font-weight:700;cursor:pointer}
 .kmap-popover .kmap-dismiss{width:36px;height:36px;border:0;border-radius:50%;background:#26342d;color:#e6dcc0;font-size:18px;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.kmap{animation:none}}
+/* The traveller's name rides above the arrow as a small tag, so it never sits on a place's name. */
+.kmap-player .kmap-label{position:absolute;left:50%;bottom:calc(100% + 6px);top:auto;transform:translateX(-50%);padding:1px 7px;border-radius:9px;background:#10201bdd;border:1px solid #a8f0dd88;color:#d9fff4;font-size:11px;line-height:1.4;white-space:nowrap;text-shadow:none}

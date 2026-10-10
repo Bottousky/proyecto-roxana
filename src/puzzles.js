@@ -7,6 +7,8 @@ import './puzzles.css';
 // One goal per bench, said in a line. Each item of the brief comes with what can be touched to
 // reach it («how»), and the instrument it needs, if any. Hints go one step further when asked.
 // A bench offers a single instrument: the one its story asks for.
+// Who speaks at a bench wears their own portrait in the dock.
+const SAY_FACES = { OHM: 'ohm', EDDA: 'edda', LUMEN: 'lumen', VEGA: 'vega', IVARA: 'consejera', YESCA: 'yesca', NEREO: 'nereo' };
 export const BENCH_GUIDANCE = {
   awaken: { goal: 'Despertá al pequeño de bronce: cerrá el camino de su corazón.', learned: 'La energía necesita un camino completo: sale de la celda, atraviesa al pequeño y vuelve a la celda.', pulseLoose: true,
     steps: [{ how: 'Tenés un cable. Tocá un borne redondo y después otro para unirlos: el camino tiene que salir de la celda, pasar por el pequeño y volver.' }],
@@ -859,7 +861,7 @@ export class PuzzleWorkbench {
       <p class="wb-rotate-hint"><span aria-hidden="true">⟳</span>Con el teléfono apaisado, el tablero se ve más grande.</p>
       <ul class="wb-piece-list">${[...p.components.filter(c => c.goal || this.probeMarks?.[c.id] || (p.constraints ?? []).some(k => k.branch === c.id)).map(c => `<li><span>${escapeHtml(this.pieceName(c))}</span>${this.stateMarkup(c)}</li>`), (p.constraints ?? []).some(k => k.source) ? `<li>${this.linePlate().replace(/^<div[^>]*>|<\/div>$/g, '')}</li>` : ''].join('')}</ul>
 </main>
-      <footer class="wb-dock"><div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face" aria-hidden="true">${say.who === 'EDDA' ? 'E' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${hintButton}</div>
+      <footer class="wb-dock"><div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face ${SAY_FACES[say.who ?? 'OHM'] ? `wb-face wb-face-${SAY_FACES[say.who ?? 'OHM']}` : ''}" aria-hidden="true">${SAY_FACES[say.who ?? 'OHM'] ? '' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${hintButton}</div>
         ${controls && !inService ? `<div class="wb-compact-controls">${controls}</div>` : ''}
         <div class="wb-toolbar">${tools ? `<div class="wb-tools">${tools}</div>` : ''}${this.renderProbe()}<div class="wb-history">${inService ? '<button data-action="practice">Practicar con una copia</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : ''}${!inService ? `<button data-action="undo" ${!this.history.length ? 'disabled' : ''} title="Deshacer el último cambio"><span aria-hidden="true">↶</span>Deshacer</button><button data-action="reset" title="Volver a la disposición inicial de la mesa"><span aria-hidden="true">↺</span>Empezar de nuevo</button>` : ''}</div></div>
         <details class="wb-terminal-drawer" data-drawer="terminals" ${p.cables ? 'open' : ''}><summary>Tocar las conexiones <span>Las mismas piezas, más cerca</span></summary><div class="wb-terminal-rail">${p.ports.map(n => portMarkup(n, true)).join('')}</div></details></footer>
